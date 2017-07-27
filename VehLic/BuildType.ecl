@@ -1,0 +1,1 @@
+export BuildType := VehLic.BuildType_Accurint;

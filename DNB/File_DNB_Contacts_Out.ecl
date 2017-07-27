@@ -1,0 +1,1 @@
+export File_DNB_Contacts_Out := dataset('~thor_data400::OUT::DNB_Contacts'/*_' + DNB.version*/, Layout_DNB_Contacts_Out, flat);

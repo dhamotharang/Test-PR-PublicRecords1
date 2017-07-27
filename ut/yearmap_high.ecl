@@ -1,0 +1,1 @@
+shared yearmap_high(unsigned8 l) := IF(l%100=0,l+12,l);

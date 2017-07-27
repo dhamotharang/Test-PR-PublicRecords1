@@ -1,0 +1,1 @@
+export File_Fares_Deeds_In := dataset('~thor_data400::in::fares_1080',property.layout_fares_deeds,flat);

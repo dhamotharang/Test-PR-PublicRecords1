@@ -1,0 +1,19 @@
+export street_suffix := [
+'STREET',
+'DRIVE',
+'DIRVE',
+'RD',
+'ROAD',
+'AVE',
+'AVENUE',
+'BOULEVARD',
+'BLVD',
+'ROUTE',
+'RR',
+'STR',
+'COURT',
+'DR',
+'CT',
+'PLACE',
+'PL'
+];

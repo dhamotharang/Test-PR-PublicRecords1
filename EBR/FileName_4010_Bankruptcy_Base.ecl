@@ -1,0 +1,1 @@
+export FileName_4010_Bankruptcy_Base := trim(GetSegmentFileName_Base('4010')) : global;

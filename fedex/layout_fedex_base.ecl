@@ -1,0 +1,1 @@
+export	layout_fedex_base	:=	FedEx.Layout_Fedex.Base;

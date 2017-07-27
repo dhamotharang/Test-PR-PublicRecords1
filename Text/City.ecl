@@ -1,0 +1,1 @@
+export rule city := ANY*;

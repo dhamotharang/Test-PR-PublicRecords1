@@ -1,0 +1,1 @@
+export Key_Stock_Corpkey := keys().Stock.corpkey.qa;

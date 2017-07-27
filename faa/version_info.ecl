@@ -1,0 +1,1 @@
+export version_info := version_aircraft;

@@ -1,0 +1,20 @@
+export ResultsFileFmt := RECORD
+	UNSIGNED6 WID;
+	STRING8 FTD;
+	STRING8 MRTD;
+	STRING8 TUD;
+	BOOLEAN newName;
+	BOOLEAN changeName;
+	BOOLEAN newAddress;
+	BOOLEAN changeAddress;
+	BOOLEAN newSSN;
+	BOOLEAN changeSSN;
+	BOOLEAN deathStatus;
+	BOOLEAN newPhone;
+	BOOLEAN changePhone;
+	BOOLEAN firstNameOnly;
+	BOOLEAN firstAddressOnly;
+	BOOLEAN firstSSNOnly;
+	BOOLEAN firstPhoneOnly;
+	Layout_delta;
+END;

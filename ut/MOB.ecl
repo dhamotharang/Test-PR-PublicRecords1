@@ -1,0 +1,1 @@
+export integer4 MOB(integer l) := (INTEGER4)MAP ( l > 10000000 => l div 100, l );

@@ -1,0 +1,22 @@
+export SeedKeys := macro
+output(choosen(Seed_Files.key_cd1ocd2i,10));
+output(choosen(Seed_Files.Key_ct1ophni,10));
+output(choosen(Seed_Files.Key_ef1oef1i,10));
+output(choosen(Seed_Files.Key_idpoidpi,10));
+output(choosen(Seed_Files.Key_np2opr2i,10));
+output(choosen(Seed_Files.Key_np2oprii,10));
+output(choosen(Seed_Files.Key_nptoprii,10));
+output(choosen(Seed_Files.key_pb1opb1i,10));
+output(choosen(Seed_Files.Key_prioprii,10));
+output(choosen(Seed_Files.Key_prwoprwi,10));
+output(choosen(Seed_Files.Key_sc1osd1i,10));
+output(choosen(Seed_Files.Key_sd1osd1i,10));
+output(choosen(Seed_Files.Key_sd5osd5i,10));
+output(choosen(Seed_Files.Key_sdbosd2i,10));
+output(choosen(Seed_Files.Key_sdbosd4i,10));
+output(choosen(Seed_Files.Key_bd1obd1i,10));
+output(choosen(Seed_Files.key_it1oit1i,10));
+output(choosen(seed_files.key_sd1osd1i,10));
+output(choosen(seed_files.key_fa2onafi,10));
+output(choosen(seed_files.key_bc1obc1i,10));
+endmacro;

@@ -1,0 +1,1 @@
+export str_AutokeyName := '~thor_data400::key::' + liensv2.str_SegmentName + '_autokey';

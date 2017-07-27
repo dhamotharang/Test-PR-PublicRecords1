@@ -1,0 +1,5 @@
+import doxie_build;
+
+df := file_offenders_keybuilding;
+
+export key_prep_offenders := index(df((integer)did != 0),{unsigned6 sdid := (integer)df.did},{df},'~thor_data400::key::corrections_Offenders_' + doxie_build.buildstate + thorlib.wuid());

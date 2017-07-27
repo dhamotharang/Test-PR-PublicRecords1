@@ -1,0 +1,1 @@
+export pattern AlphaNum := pattern('[A-Za-z0-9]');

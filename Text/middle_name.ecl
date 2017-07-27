@@ -1,0 +1,1 @@
+export pattern middle_name := proper_noun | AlphaUpper opt('.');

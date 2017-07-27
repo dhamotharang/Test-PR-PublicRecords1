@@ -1,0 +1,1 @@
+export KeyName_4030_Judgement_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('4030')) : global;

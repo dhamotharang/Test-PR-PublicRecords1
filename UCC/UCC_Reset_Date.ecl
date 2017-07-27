@@ -1,0 +1,1 @@
+EXPORT STRING8 UCC_Reset_Date := '20041119';

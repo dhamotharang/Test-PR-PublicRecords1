@@ -1,0 +1,1 @@
+export _testXMLspray := output(enth(file_in_bookings_raw_xml,1000));

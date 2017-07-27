@@ -1,0 +1,4 @@
+EXPORT Query := RECORD
+	UNSIGNED4 seq := 0;
+	STRING100 query;
+END;

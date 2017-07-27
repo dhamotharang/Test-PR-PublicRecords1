@@ -1,0 +1,1 @@
+export EarliestDate := '20030502';

@@ -1,0 +1,1 @@
+EXPORT BOOLEAN Infile_Is_Extract := FALSE;

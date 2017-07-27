@@ -1,0 +1,1 @@
+export FileName_2025_Trade_Quarterly_Averages_In := trim(GetSegmentFileName_In('2025')) : global;

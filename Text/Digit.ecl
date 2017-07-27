@@ -1,0 +1,1 @@
+export pattern digit := PATTERN('[0-9]');

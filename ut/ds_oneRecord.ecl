@@ -1,0 +1,1 @@
+export ds_oneRecord := dataset([{1}], {unsigned a}):DEPRECATED('Replace with: ds := DATASET ([my_transform()])');

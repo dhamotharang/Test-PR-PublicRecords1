@@ -1,0 +1,1 @@
+export g(UNSIGNED1 i) := i BETWEEN 80 AND 100;

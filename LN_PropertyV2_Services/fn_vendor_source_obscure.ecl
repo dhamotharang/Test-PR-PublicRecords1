@@ -1,0 +1,1 @@
+export string1 fn_vendor_source_obscure(string1 flag) := if(flag in ['F','S'], 'A', 'B');

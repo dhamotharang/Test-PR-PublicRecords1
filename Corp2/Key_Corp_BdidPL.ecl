@@ -1,0 +1,1 @@
+export Key_Corp_BdidPL := keys().Corp.BdidPl.qa;

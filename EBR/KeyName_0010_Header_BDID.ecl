@@ -1,0 +1,1 @@
+export KeyName_0010_Header_BDID := trim(GetSegmentKeyName_BDID('0010')) : global;

@@ -1,0 +1,1 @@
+export Key_Token_Patterns := index(token_patterns,,'~thor400::key::token_patterns');

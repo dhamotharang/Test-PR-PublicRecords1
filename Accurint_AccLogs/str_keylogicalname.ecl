@@ -1,0 +1,1 @@
+export str_keylogicalname := '~thor_data400::key::acclogs';

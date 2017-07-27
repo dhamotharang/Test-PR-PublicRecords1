@@ -1,0 +1,1 @@
+export File_6000_Inquiries_Base := dataset(FileName_6000_Inquiries_Base, Layout_6000_Inquiries_Base,flat) : global;

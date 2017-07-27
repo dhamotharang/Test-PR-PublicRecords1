@@ -1,0 +1,1 @@
+export FileName_2015_Trade_Payment_Totals_In := trim(GetSegmentFileName_In('2015')) : global;

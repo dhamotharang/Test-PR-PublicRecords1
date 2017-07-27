@@ -1,0 +1,1 @@
+export file_ssn_suppression := dataset('~thor_data400::base::ssn_suppression',{string9 ssn,string ssn_mask,string rc,string2 crlf},flat);

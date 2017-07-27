@@ -1,0 +1,1 @@
+export File_DNB_Companies_Out := dataset('~thor_data400::OUT::DNB_Companies'/*_' + DNB.version*/, Layout_DNB_Companies_Out, flat);

@@ -1,0 +1,1 @@
+export Layout_Custom_Logs := Inquiry_AccLogs.Layout_Accurint_Logs;

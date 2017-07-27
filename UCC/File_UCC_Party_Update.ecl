@@ -1,0 +1,1 @@
+EXPORT File_UCC_Party_Update := DATASET('in::ucc_party_upd20050830', Layout_UCC_Expanded_Party, THOR);

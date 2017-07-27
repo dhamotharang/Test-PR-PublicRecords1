@@ -1,0 +1,1 @@
+export File_Corp_Event_Out := dataset('~thor_data400::OUT::Corp_Event_' + Corp.Corp_Build_Date, Layout_Corp_Event_Out, flat);

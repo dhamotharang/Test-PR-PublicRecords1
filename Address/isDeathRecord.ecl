@@ -1,0 +1,1 @@
+export isDeathRecord(string pn) := pn[1..4]='DOD ' or pn[1..5]='DOD: ';

@@ -1,0 +1,1 @@
+export key_prep_did_rid := index(file_base_did_rid,{rid,did,stable,__filepos},'~thor_data400::key::rid_did'+ thorlib.wuid());

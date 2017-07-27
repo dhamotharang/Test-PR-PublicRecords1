@@ -1,0 +1,36 @@
+export FCRA_BankruptcyKeys := macro
+
+//output(choosen(doxie_files.Key_BocaShell_bkrupt_FCRA,10));
+//output(choosen(doxie_files.key_bkrupt_didslim_FCRA,10));
+//output(choosen(doxie_files.key_bkrupt_full_FCRA,10));
+//output(choosen(doxie_files.key_bkrupt_did_fcra,10));
+//output(choosen(doxie_files.key_bkrupt_casenum_fcra,10));
+output(choosen(Autokey.Key_Address(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+	output(choosen(AutoKey.Key_CityStName(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+	output(choosen(AutoKey.Key_Name(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+	output(choosen(AutoKey.Key_Phone2(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+	output(choosen(AutoKey.Key_SSN2(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+	output(choosen(AutoKey.Key_StName(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+	output(choosen(AutoKey.Key_Zip(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+	output(choosen(AutokeyB2.Key_Address(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+	output(choosen(AutoKeyB2.Key_CityStName(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+	output(choosen(AutoKeyB2.Key_FEIN(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+	output(choosen(AutoKeyB2.key_name(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+	output(choosen(AutoKeyB2.Key_NameWords(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+	output(choosen(AutoKeyB2.key_phone(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+	output(choosen(AutoKeyB2.Key_StName(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+	output(choosen(AutoKeyB2.Key_Zip(BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::'),10));
+output(choosen(BankruptcyV3.key_bankruptcyV3_bdid(true),10));
+output(choosen(BankruptcyV3.key_bankruptcyV3_casenumber(true),10));
+output(choosen(BankruptcyV3.key_bankruptcyV3_did(true),10));
+output(choosen(BankruptcyV3.key_bankruptcyV3_ssn(true),10));
+output(choosen(BankruptcyV3.key_bankruptcyV3_fein(true),10));
+output(choosen(BankruptcyV3.Key_BankruptcyV3_Payload(true),10));
+output(choosen(BankruptcyV3.key_bankruptcyV3_main_full(true),10));
+output(choosen(BankruptcyV3.key_bankruptcyV3_search_full(true),10));
+output(choosen(BankruptcyV3.key_bankruptcyV3_ssn4st(true),10));
+output(choosen(BankruptcyV3.key_bankruptcy_main_supp(true),10));
+output(choosen(BankruptcyV3.Key_bankruptcyV3_FCRA_bocashell,10));
+output(choosen(BankruptcyV2.key_bankruptcy_ssn4name('~thor_data400::key::bankruptcy::autokey::fcra::'),10));
+output(choosen(BankruptcyV3.key_bankruptcyv3_trusteeidname(true),10));
+endmacro;

@@ -1,0 +1,3 @@
+EXPORT TestInput := RECORD
+	STRING100 str;
+END;

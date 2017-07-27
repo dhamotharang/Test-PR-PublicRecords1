@@ -1,0 +1,1 @@
+export KeyName_Executive_Summary_BDID := trim(GetSegmentKeyName_BDID('1000')) : global;

@@ -1,0 +1,3 @@
+//Superfile version coming shortly...
+export File_Base_Coastguard_Prod
+ := dataset(Watercraft.Cluster + 'base::watercraft_coastguard_' + Watercraft.Version_Production,Watercraft.Layout_Watercraft_Coastguard_Base,thor);

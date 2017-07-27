@@ -1,0 +1,1 @@
+export string26 alphabet := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' :DEPRECATED('Too trivial to record as an attribute');

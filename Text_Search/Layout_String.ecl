@@ -1,0 +1,3 @@
+EXPORT Layout_String := RECORD
+	UNICODE	rqst{MAXLENGTH(4096)};
+END;

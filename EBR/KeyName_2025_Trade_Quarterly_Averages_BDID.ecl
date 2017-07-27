@@ -1,0 +1,1 @@
+export KeyName_2025_Trade_Quarterly_Averages_BDID := trim(GetSegmentKeyName_BDID('2025')) : global;

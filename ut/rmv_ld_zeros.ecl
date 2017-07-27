@@ -1,0 +1,1 @@
+export string rmv_ld_zeros(string in_str) := if (trim(in_str)='','',(string)((unsigned)in_str));

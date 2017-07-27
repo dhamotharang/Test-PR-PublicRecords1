@@ -1,0 +1,1 @@
+export Name_Moxie_DOC_Punishment_Dev := '~thor_data400::base::crim_punishment_' + Crim_Common.Version_Development;

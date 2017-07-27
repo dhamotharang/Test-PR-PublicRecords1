@@ -1,0 +1,1 @@
+export File_Edgar_Contacts_Base := dataset('~thor_data400::BASE::Edgar_Contacts', Layout_Edgar_Contact_Base, flat);

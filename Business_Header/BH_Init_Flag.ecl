@@ -1,0 +1,2 @@
+export BH_Init_Flag := FALSE;  // If TRUE, reinitialize Business Headers from sources, reassign BDIDS
+                               // If FALSE, Business Headers and BDIDs will be persistent from build to build

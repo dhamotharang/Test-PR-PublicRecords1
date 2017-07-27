@@ -1,0 +1,1 @@
+export pattern pws := PATTERN('[ ,.();:\t\r\n]+');

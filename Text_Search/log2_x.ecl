@@ -1,0 +1,1 @@
+export log2_x(REAL val) := LN(val) * log2_mult;

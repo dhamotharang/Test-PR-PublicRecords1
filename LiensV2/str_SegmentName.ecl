@@ -1,0 +1,1 @@
+export str_SegmentName := 'liensv2';

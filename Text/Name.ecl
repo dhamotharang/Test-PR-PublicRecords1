@@ -1,0 +1,1 @@
+export pattern name := salutations? proper_noun ws REPEAT(middle_name ws, 0, 3) last_name;

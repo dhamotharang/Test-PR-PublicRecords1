@@ -1,0 +1,1 @@
+export FileName_Header_Base := trim(GetSegmentFileName_Base('0010')) : global;

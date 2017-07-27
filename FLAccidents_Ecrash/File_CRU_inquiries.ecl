@@ -1,0 +1,1 @@
+export File_CRU_inquiries := dataset('~thor_data400::base::ntlcrash_inquiry',FLAccidents_Ecrash.Layout_CRU_inquiries,thor);

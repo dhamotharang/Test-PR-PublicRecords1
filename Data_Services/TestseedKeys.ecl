@@ -1,0 +1,19 @@
+export TestseedKeys := macro
+	output(choosen(seed_files.Key_BInstantID,10));
+	output(choosen(seed_files.Key_InstantID,10));
+	output(choosen(seed_files.Key_CBD,10));
+	output(choosen(seed_files.key_BusinessDefender,10));
+	output(choosen(seed_files.key_frauddefender,10));
+	output(choosen(seed_files.key_redflags,10));
+	output(choosen(seed_files.Key_IntlIID,10));
+	output(choosen(Seed_Files.Key_LNSmallBusiness,10));
+	output(choosen(Seed_Files.Key_BS_Services,10));
+	output(choosen(seed_files.Key_Identifier2,10));
+	output(choosen(seed_files.Key_CBDAttributes,10));
+	output(choosen(Seed_Files.key_FOVRenewal,10));
+	output(choosen(Seed_Files.key_FOVInteractive,10));
+	output(choosen(Seed_Files.key_identityreport,10));
+	output(choosen(Seed_Files.Key_FlexID,10));
+	output(choosen(Seed_Files.Key_LeadIntegrityAttributes,10));
+	output(choosen(Seed_Files.Key_Boca_Shell(),10));
+endmacro;

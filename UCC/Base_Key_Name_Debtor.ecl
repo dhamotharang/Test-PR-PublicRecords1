@@ -1,0 +1,1 @@
+export Base_Key_Name_Debtor := 'key::moxie.ucc_debtor_master.';

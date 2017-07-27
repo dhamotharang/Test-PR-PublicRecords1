@@ -1,0 +1,21 @@
+import doxie_files, doxie, ut, Data_Services, fcra;
+
+
+base_file := Prof_License_Mari.files_base.disciplinary_actions;
+
+KeyName 			:= 'thor_data400::key::proflic_mari::';
+
+layout_disciplinary	:= RECORD, MAXLENGTH(8000)
+prof_license_mari.layouts.Disciplinary_Action;
+
+END;
+
+// Blank Out Default Dates
+dsDisciplinary := project(base_file,transform(layout_disciplinary,
+																							self.CLN_ACTION_DTE := IF(LEFT.CLN_ACTION_DTE = '17530101','',LEFT.CLN_ACTION_DTE);
+																							self:=left));
+
+export key_disciplinary := 	index(dsDisciplinary
+																	,{INDIVIDUAL_NMLS_ID}
+																	,{dsDisciplinary}
+																	,Data_Services.Data_location.Prefix('mari')+ KeyName+ doxie.Version_SuperKey+'::disciplinary_actions');

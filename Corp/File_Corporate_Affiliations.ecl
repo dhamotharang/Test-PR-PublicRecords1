@@ -1,0 +1,1 @@
+export File_Corporate_Affiliations := dataset('~thor_data400::BASE::Corporate_Affiliations', Layout_Corporate_Affiliation, flat);

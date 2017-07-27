@@ -1,0 +1,1 @@
+export MOXIE_BH_DESPRAY_SERVER := '172.16.68.91';//edata14

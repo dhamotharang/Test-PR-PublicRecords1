@@ -1,0 +1,1 @@
+export string8 Date_customer_info_system := '20040629';

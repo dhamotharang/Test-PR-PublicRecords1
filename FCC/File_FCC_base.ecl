@@ -1,0 +1,1 @@
+export File_FCC_base :=project(FCC.File_FCC_base_bip,transform(fcc.Layout_FCC_base,self:=left));

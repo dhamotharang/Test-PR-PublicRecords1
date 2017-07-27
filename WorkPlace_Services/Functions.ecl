@@ -1,0 +1,524 @@
+import Address,Autokey_batch,BatchServices,doxie,gong,mdr,POE,PSS,risk_indicators,ut,Yellowpages;
+
+// NOTE: Within this module certain BatchServices.Workplace_* attributes are used.
+//       This is because the BatchServices.WorkPlace_BatchService was created first, 
+//       then after that the online Search & Report Services were created.
+//       Some of the functions below are basically parts of coding from 
+//       BatchServices.Workplace_Records that were changed into functions.
+//       However due to time constraints and the need to get the search & report services
+//       completed by December 2010, BatchServices.Workplace_Records was not modifed
+//       to use the functions below; but could be in the future.
+
+export Functions := module
+
+	// This function gets did(s) based upon the input data (in standard batch input format)
+	// and checks for more than 1 did per acctno/input, sorts/dedups on did, and finally
+	// puts the data into a common POE did key lookup layout.
+	export getSubjectDids(dataset(Autokey_batch.Layouts.rec_inBatchMaster) ds_batch_in) :=
+	       function
+
+    // 1. Do a project with transform to convert any lower case input to upper case.
+    ds_batch_in_caps := project(ds_batch_in,
+		                            BatchServices.transforms.xfm_capitalize_input(left));
+
+    // 2. Get the DID(s) associated with each input record by using an already existing 
+		//    common BatchServices function to get the dids for the input data.
+	  ds_acctnos_dids_appended := 
+		        BatchServices.Functions.fn_find_dids_and_append_to_acctno(ds_batch_in_caps);
+
+    // Make sure each acctno's input criteria only resolved to 1 did.
+    // If more than 1 did per acctno, don't return anything for that acctno.
+	  //
+    // 3. Table/count to count the number of dids for each acctno.
+	  //    Only keep the acctno if the resulting did_count is less than or equal
+	  //    the did_limit (currently 1); otherwise drop that acctno.
+    layout_dids_count := RECORD
+		  ds_acctnos_dids_appended.acctno;
+      did_count := COUNT(GROUP);
+    END;
+	
+	  ds_acctnos_dids_table := table(ds_acctnos_dids_appended,layout_dids_count,acctno,few);
+		
+		// Since this is a search service, there will only ever be 1 accno./record in this dataset.
+		IF(ds_acctnos_dids_table[1].did_count > BatchServices.WorkPlace_Constants.Limits.DID_LIMIT,
+		   FAIL(ut.constants_MessageCodes.SUBJECT_NOT_UNIQUE,
+            'Your subject cannot be uniquely identified.  Please include more information ' +
+						'such as Name and full address or SSN.  You were not charged for this search.'));
+												 
+    ds_acctnos_w1did      := ds_acctnos_dids_table(did_count<=
+		                                               BatchServices.WorkPlace_Constants.Limits.DID_LIMIT);
+
+    // 4. Join all acctnos with dids appended to those with just 1 did per acctno to 
+	  //    remove any acctnos with more than 1 did or with no did.
+	  ds_acctnos_dids_good := join(ds_acctnos_w1did,ds_acctnos_dids_appended,
+	                                 left.acctno = right.acctno,
+													       transform(right),
+													       left outer, // keep all the recs from the left ds
+													       atmost(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));
+
+    // 5. Sort/dedup on did in case same person input more than once and 
+	  //    to reduce number of lookups against the POE did key file later.
+    //    We will re-attach all acctnos back to the dids later.
+    ds_dids_deduped := dedup(sort(ds_acctnos_dids_good,did),did);
+
+	  // 6. Project the resulting deduped subject dids with a transform to put into a 
+	  //    common poe did key lookup layout and set the correct spouse_indicator.
+	  // NOTE: the spouse_indicator only indicates if the record is a spouse record, 
+	  // not if a spouse was found for the subject/did.
+    ds_subject_dids := project(ds_dids_deduped, 
+	                             transform(BatchServices.WorkPlace_Layouts.POE_lookup,
+															   self.acctno           := left.acctno,
+															   self.lookupDid        := left.did,
+															   self.subjectDid 	     := left.did,
+															   self.spouseDid        := 0,
+                                 self.spouse_indicator := 'N'));
+	
+	  // Uncomment lines below as needed for debugging
+	  //OUTPUT(ds_batch_in_caps,         NAMED('ds_batch_in_caps'));
+		//OUTPUT(ds_acctnos_dids_appended, NAMED('ds_acctnos_dids_appended'));
+	
+	  return ds_subject_dids;
+		
+	end; // end of getSubjectDids function
+
+
+	// This function gets the did for the spouse based upon the input did and 
+	// then puts the data into a common POE did key lookup layout.
+	export getSpouseDids(dataset(BatchServices.WorkPlace_Layouts.POE_lookup) ds_subject_dids)
+	       := function
+    // 1. Project the subject acctnos/dids into the needed layout and 
+    //    then call a function to attempt to get the spouse did for each subject did.
+    ds_dids_spousein := project(ds_subject_dids,
+	                              transform(BatchServices.WorkPlace_Layouts.subjectspouse,
+															   self.acctno    := left.acctno,
+															   self.did       := left.subjectDid,
+															   self.spouseDid := 0));
+
+	  ds_spouse_acctnos_dids := BatchServices.WorkPlace_Functions.getSpouseDidBatch(ds_dids_spousein);
+  
+    // 2. Sort/dedup all the spouse dids by did to reduce number of lookups against 
+	  //    the POE did key file later.
+    //    We will re-attach all acctnos back to the spouse dids later.
+	  ds_spouse_dids_deduped := dedup(sort(ds_spouse_acctnos_dids(spousedid<>0), spousedid), 
+	                                  spousedid);
+
+    // 3. Project the resulting deduped spouse dids with a transform to put into a 
+	  //    common poe key did lookup layout and set the correct spouse_indicator.
+	  // NOTE: the spouse_indicator=Y indicates this record is a spouse record.
+	  ds_spouse_dids := project(ds_spouse_dids_deduped, 
+	                            transform(BatchServices.WorkPlace_Layouts.POE_lookup,
+														    self.acctno           := left.acctno,
+															  self.lookupDid        := left.spouseDid,
+															  self.subjectDid 	    := left.did,
+															  self.spouseDid        := left.spouseDid,
+                                self.spouse_indicator := 'Y'));
+
+	  return ds_spouse_dids;
+
+  end; // end getSpouseDids function
+
+
+  // This function combines subject and optional spouse dids, sorts & dedups them, 
+	// then "looks" them up on the POE did key file.
+	export getPoeRecs(dataset(BatchServices.WorkPlace_Layouts.POE_lookup) ds_subject_dids, 
+	                  dataset(BatchServices.WorkPlace_Layouts.POE_lookup) ds_spouse_dids)
+	       := function
+ 
+    // 1. Combine the subject dids and spouse dids into 1 dataset and then sort and 
+	  //     dedup by lookup did in case 1 subject did is another subject's spouse did.
+	  ds_combined_dids_sorted := dedup(sort(ds_subject_dids + ds_spouse_dids,lookupdid),
+	                                   lookupdid);
+
+    // 2. Join the ds of unique combined dids with POE key did file, transforming the
+	  //     full did key layout into a slimmmed format of just the fields needed for 
+	  //     choosing a candidate record below.
+    SSN_WIDTH         := 9;
+		LEADING_ZERO_FILL := 1;
+	  ds_poe_recs_slimmed := join(ds_combined_dids_sorted,POE.Keys().did.qa,
+															    keyed(left.lookupdid = right.did),
+	                              transform(WorkPlace_Services.Layouts.poe_didkey_plus,
+															    // certain fields need special handling/name changes
+                                  self.spouse_indicator   := left.spouse_indicator,
+																  self.subject_first_name := right.subject_name.fname,
+																  self.subject_last_name  := right.subject_name.lname,
+																	self.name_title         := right.subject_name.title,
+																	self.middle_name        := right.subject_name.mname,
+																	self.name_suffix        := right.subject_name.name_suffix,
+																  self.subject_ssn        := if(right.subject_ssn=0,
+																	                              '', // store blank instead of zero
+																																// otherwise convert integer ssn to string9 ssn
+																																// use intformat in case leading digit of ssn is zero
+																	                              intformat(right.subject_ssn,
+																																          SSN_WIDTH,
+																																					LEADING_ZERO_FILL)),
+																	// Store both full and parts of street address 
+																	// because both are used in different sections.
+		                              self.company_address    := Address.Addr1FromComponents(
+														                                 right.company_address.prim_range,
+                                                             right.company_address.predir,
+                                                             right.company_address.prim_name,
+                                                             right.company_address.addr_suffix,
+                                                             right.company_address.postdir,
+                                                             right.company_address.unit_desig,
+                                                             right.company_address.sec_range),
+														      self.company_prim_range  := right.company_address.prim_range,
+                                  self.company_predir      := right.company_address.predir,
+                                  self.company_prim_name   := right.company_address.prim_name,
+                                  self.company_addr_suffix := right.company_address.addr_suffix,
+                                  self.company_postdir     := right.company_address.postdir,
+                                  self.company_unit_desig  := right.company_address.unit_desig,
+                                  self.company_sec_range   := right.company_address.sec_range,
+														      self.company_city        := right.company_address.city_name,
+                                  self.company_state       := right.company_address.st,
+                                  self.company_zip         := right.company_address.zip,
+                                  self.company_zip4        := right.company_address.zip4,
+																  self.company_phone1     := if(right.company_phone=0,
+																                                '',(string) right.company_phone);
+																  // rest of fields use the poe did key field names from right
+                                  self := right),
+												        inner, // use all recs from right that match left
+												        LIMIT(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
+
+    return ds_poe_recs_slimmed;
+
+  end; // end of getPoeRecs function
+
+	// This function combines subject and optional spouse dids, sorts & dedups them, 
+	// then "looks" them up on the PSS did key file.
+	export	getPSSRecs(	dataset(BatchServices.WorkPlace_Layouts.POE_lookup) ds_subject_dids, 
+											dataset(BatchServices.WorkPlace_Layouts.POE_lookup) ds_spouse_dids
+										)	:=
+	function
+		// 1. Combine the subject dids and spouse dids into 1 dataset and then sort and 
+	  //     dedup by lookup did in case 1 subject did is another subject's spouse did.
+	  ds_combined_dids_sorted := dedup(sort(ds_subject_dids + ds_spouse_dids,lookupdid),lookupdid);
+		
+		// 2. Join the ds of unique combined dids with PSS Accutrac did file transforming the
+		//     full did key layout into a slimmmed format of just the fields needed for 
+		//     choosing a candidate record below.
+		WorkPlace_Services.Layouts.PSS_DID_Plus	tPSS(ds_combined_dids_sorted	le,PSS.Keys().DID.QA	ri)	:=
+		transform
+			// Clean company address. PSS data doesn't contain the clean company name
+			// and hence,cleaning the company name to populate the necessary clean address fields for company
+			vCityStateZip		:=	Address.Addr2FromComponents(ri.company_city,ri.company_state,ri.company_zip);
+			modCleanAddress	:=	Address.GetCleanAddress(ri.company_address,vCityStateZip,Address.Components.Country.US).results;
+			
+			// certain fields need special handling/name changes
+			self.acctno								:=	le.acctno;
+			self.source								:=	MDR.sourceTools.src_PSS;
+			self.dt_last_seen					:=	(unsigned4)ri.date_last_seen;
+			self.spouse_indicator			:=	le.spouse_indicator;
+			self.subject_first_name		:=	ri.subject_first_name;
+			self.subject_last_name		:=	ri.subject_last_name;
+			self.subject_ssn					:=	if(	(integer)ri.response_ssn	=	0,
+																				'', // store blank instead of zero otherwise convert integer ssn to string9 ssn use intformat in case leading digit of ssn is zero
+																				ri.response_ssn
+																			);
+			self.company_phone1				:=	if(			ut.fnTrim2Upper(ri.response_phone_1_status)	in	BatchServices.WorkPlace_Constants.PSS_PHONE_STATUS
+																				and	ut.DaysApart(ut.GetDate,(string8)ri.dt_vendor_last_reported)	<=	BatchServices.WorkPlace_Constants.PSS_DAYS_WINDOW,
+																				ri.company_phone1,
+																				''
+																			);
+			self.company_phone2				:=	if(			ut.fnTrim2Upper(ri.response_phone_2_status)	in	BatchServices.WorkPlace_Constants.PSS_PHONE_STATUS
+																				and	ut.DaysApart(ut.GetDate,(string8)ri.dt_vendor_last_reported)	<=	BatchServices.WorkPlace_Constants.PSS_DAYS_WINDOW,
+																				ri.company_phone2,
+																				''
+																			);
+			// Clean company address fields
+			self.company_prim_range		:=	modCleanAddress.prim_range;
+			self.company_predir				:=	modCleanAddress.predir;
+			self.company_prim_name		:=	modCleanAddress.prim_name;
+			self.company_addr_suffix	:=	modCleanAddress.suffix;
+			self.company_postdir			:=	modCleanAddress.postdir;
+			self.company_unit_desig		:=	modCleanAddress.unit_desig;
+			self.company_sec_range		:=	modCleanAddress.sec_range;
+			self.company_zip5					:=	modCleanAddress.zip;
+			self.company_zip4					:=	modCleanAddress.zip4;
+			// rest of fields use the pss did key field names from right
+			self											:=	ri;
+		end;
+		
+		ds_PSS_Results	:=	join(	ds_combined_dids_sorted,
+															PSS.Keys().DID.QA,
+															keyed(left.lookupdid	=	right.did)	and
+															(	(ut.fnTrim2Upper(right.response_phone_1_status)	in	BatchServices.WorkPlace_Constants.PSS_PHONE_STATUS	and	ut.DaysApart(ut.GetDate,(string8)right.dt_vendor_last_reported)	<=	BatchServices.WorkPlace_Constants.PSS_DAYS_WINDOW)	or
+																(ut.fnTrim2Upper(right.response_phone_2_status)	in	BatchServices.WorkPlace_Constants.PSS_PHONE_STATUS	and	ut.DaysApart(ut.GetDate,(string8)right.dt_vendor_last_reported)	<=	BatchServices.WorkPlace_Constants.PSS_DAYS_WINDOW)
+															),
+															tPSS(left,right),
+															LIMIT(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT,skip)
+														);
+		
+		// Dedup on did and keep the most recent record
+		ds_PSS_Results_Dedup	:=	dedup(	sort(	ds_PSS_Results,
+																						did,subject_first_name,subject_last_name,subject_ssn,-dt_vendor_last_reported
+																					),
+																			did,subject_first_name,subject_last_name,subject_ssn
+																		);
+		
+		return	project(ds_PSS_Results_Dedup,WorkPlace_Services.Layouts.poe_didkey_plus);
+	end;	//	end of getPSSRecs funtion
+
+
+	// This function trys to get any missing company name or address info from the 
+  // EDA(gong) history key file by doing a 'reverse" lookup using the company_phone1 data.
+	export getCompInfoFromGong(
+	       dataset(WorkPlace_Services.Layouts.poe_didkey_plus) ds_all_recs_in) := function
+
+	  // 1. Filter to include only recs that have a phone1, but are missing the comp 
+		//    name or some address parts.
+		//    Then sort/dedup on non-blank company_phone1 to reduce the number of lookups
+	  //    against the gong key history file.
+    ds_all_phone1_deduped := dedup(sort(ds_all_recs_in(company_phone1<>'' and
+	                                                     (company_name    = '' or
+																										    company_address = '' or
+																										    company_city    = '' or
+																										    company_state   = '' or
+																										    company_zip     = '')),
+	                                      company_phone1),company_phone1);
+
+    // 2. Join the unique non-blank phone1s with the gong history phone key file, 
+	  //    to get the gong company name/address & bdid (if needed).
+	  ds_all_phone1_gongcomp := join(ds_all_phone1_deduped, gong.Key_History_phone, 
+				                             keyed(left.company_phone1[4..10] = right.p7 and 
+					                                 left.company_phone1[1..3]  = right.p3) and 
+																           right.current_flag and //we only want current data
+							                             right.business_flag,   //we only want businesses
+							                     transform(WorkPlace_Services.Layouts.poe_didkey_plus,
+																     // comp name/address/bdid from right gong history
+                                     self.company_name    := right.listed_name,
+																		// store both full and parts of street address,
+																	  // both of which are used in different places.
+		                                 self.company_address := Address.Addr1FromComponents(
+														                                 right.prim_range,
+                                                             right.predir,
+                                                             right.prim_name,
+                                                             right.suffix,
+                                                             right.postdir,
+                                                             right.unit_desig,
+                                                             right.sec_range),
+														         self.company_prim_range  := right.prim_range,
+                                     self.company_predir      := right.predir,
+                                     self.company_prim_name   := right.prim_name,
+                                     self.company_addr_suffix := right.suffix,
+                                     self.company_postdir     := right.postdir,
+                                     self.company_unit_desig  := right.unit_desig,
+                                     self.company_sec_range   := right.sec_range,
+														         self.company_city        := right.p_city_name,
+                                     self.company_state       := right.st,
+                                     self.company_zip         := right.z5, 
+                                     self.company_zip4        := right.z4,
+                                     self.bdid            := if(left.bdid<>0,
+																		                            left.bdid,right.bdid),
+																	   self.from_gong       := true,
+																	   //rest of fields from left
+								                     self                 := left),
+																   inner,
+					                         keep(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
+																   limit(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
+
+    // 3. Join the phone#s with comp info from gong history back to the input dataset
+		//    to supply missing company name/address if needed.
+    ds_all_recs_gongcomp := join(ds_all_recs_in, ds_all_phone1_gongcomp,
+				                           left.company_phone1 = right.company_phone1,
+                                 transform(WorkPlace_Services.Layouts.poe_didkey_plus,
+																   // store gong comp name/address/bdid from right
+																	 self.company_name    := if(right.from_gong,right.company_name,
+																	                                            left.company_name),
+																   self.company_address := if(right.from_gong,right.company_address,
+																	                                            left.company_address),
+														       self.company_prim_range  := if(right.from_gong,right.company_prim_range,
+																	                                                left.company_prim_range),
+                                   self.company_predir      := if(right.from_gong,right.company_predir,
+																	                                                left.company_predir),
+                                   self.company_prim_name   := if(right.from_gong,right.company_prim_name,
+																	                                                left.company_prim_name),
+                                   self.company_addr_suffix := if(right.from_gong,right.company_addr_suffix,
+																	                                                left.company_addr_suffix),
+                                   self.company_postdir     := if(right.from_gong,right.company_postdir,
+																	                                                left.company_postdir),
+                                   self.company_unit_desig  := if(right.from_gong,right.company_unit_desig,
+																	                                                left.company_unit_desig),
+                                   self.company_sec_range   := if(right.from_gong,right.company_sec_range,
+																	                                                left.company_sec_range),
+																	 self.company_city    := if(right.from_gong,right.company_city,
+																	                                            left.company_city),
+                                   self.company_state   := if(right.from_gong,right.company_state,
+																	                                            left.company_state),
+                                   self.company_zip     := if(right.from_gong,right.company_zip, 
+																	                                            left.company_zip),
+                                   self.company_zip4    := if(right.from_gong,right.company_zip4, 
+																	                                            left.company_zip4),
+																	 self.bdid            := if(right.from_gong and left.bdid=0,
+																	                                            right.bdid,left.bdid),
+                                   // rest of the fields, keep the ones from the left ds
+                                   self := left),
+											           left outer,  // keep all the recs from the left ds
+												         atmost(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));
+	  
+		return ds_all_recs_gongcomp;
+
+  end; // end of getCompInfoFromGong function
+
+
+	// This function gets the current phone# for the bdid from the EDA/gong history 
+	// bdid key file.  Then stores it into company_phone2 if POE company_phone1 exists;   
+	// otherwise stores it into company_phone1.
+	export getPhoneFromGong(
+	       dataset(WorkPlace_Services.Layouts.poe_didkey_plus) ds_all_recs_in) := function
+
+	  // 1. Sort/dedup on non-zero bdids to reduce the number of lookups against the gong key.
+	  ds_all_bdids_deduped := dedup(sort(ds_all_recs_in(bdid<>0), bdid), bdid);
+
+    // 2. Join the ds unique non-zero bdids with the gong history bdid key file 
+	  //    to get the phone#.
+	  ds_all_bdids_gongphone := join(ds_all_bdids_deduped, gong.Key_History_BDID,
+				                             keyed(left.bdid=right.bdid)     and 
+																		  //we only want current data
+																     right.current_record_flag = BatchServices.WorkPlace_Constants.GONG_HIST_CURRENT and
+																		 //we only want businesses
+				                             right.listing_type_bus    = BatchServices.WorkPlace_Constants.GONG_HIST_BUSINESS and 
+																	   // Also match on city name since some bdids have 
+																	   // multiple current phone#s for different locations
+																	   left.company_city = right.p_city_name,
+																	 transform(WorkPlace_Services.Layouts.poe_didkey_plus,
+																	   self.company_phone2 := right.phone10,
+																	   self                := left),
+											             inner,
+															     keep(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
+																   limit(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
+
+    // 3. Join the bdids with a gong phone# back to the ds of poe key did records with 
+	  //    gong company info added.
+	  ds_all_recs_gongphone := join(ds_all_recs_in, ds_all_bdids_gongphone,
+		  		                          left.bdid=right.bdid,
+                                  transform(WorkPlace_Services.Layouts.poe_didkey_plus,
+				  												  // store right gong phone into phone1 (if empty) or 
+																		// in phone2 (if empty and not same as phone1)
+									  							  self.company_phone1 := if(left.company_phone1 != '', 
+										  							                          left.company_phone1,right.company_phone2),
+																    self.company_phone2 := if(left.company_phone2!='', 
+																                              left.company_phone2,
+																                              if(left.company_phone1 !='' and
+																			    										   left.company_phone1 != right.company_phone2,
+																				    							       right.company_phone2,'')),
+                                    // Rest of the fields, keep the ones from the left ds
+                                    self := left),
+											            left outer,  // keep all the recs from the left ds
+												          atmost(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));
+
+		return ds_all_recs_gongphone;
+
+  end; // end of getPhoneFromGong function
+
+
+	// This function gets the current phone# for the bdid from the Yellow Pages 
+	// bdid key file.  Then stores it into company_phone1 if empty; 
+	// otherwise stores it into company_phone2.
+	export getPhoneFromYP(
+	       dataset(WorkPlace_Services.Layouts.poe_didkey_plus) ds_all_recs_in) := function
+
+
+    // 1. Sort/dedup on non-zero bdids and empty phone2 to reduce the number
+	  //    of lookups against the yellow pages key bdid file.
+    ds_all_bdids_nogong := dedup(sort(ds_all_recs_in(bdid!=0 and company_phone2=''), 
+	                                    bdid), bdid);
+
+    // 2. Join the ds of unique no-zero bdids with no phone2 with the YellowPages
+	  //    bdid key file, to get the yellow pages phone#.
+	  ds_all_bdids_ypphone := join(ds_all_bdids_nogong, YellowPages.Key_YellowPages_BDID,
+				                           keyed(left.bdid=right.bdid),
+                                 transform(WorkPlace_Services.Layouts.poe_didkey_plus,
+																   self.company_phone2 := right.phone10,
+																   self                := left),
+											           inner,
+															   keep(BatchServices.WorkPlace_Constants.Limits.KEEP_LIMIT),
+															   limit(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT,skip));
+
+    // 3. Join the bdids with yp phone# back to the ds of poe key did records with
+	  //    gong phone# added.
+    ds_all_recs_wphone  := join(ds_all_recs_in, ds_all_bdids_ypphone,
+				                          left.bdid=right.bdid,
+                                transform(WorkPlace_Services.Layouts.poe_didkey_plus,
+															    // store yp phone into phone1 (if empty) or 
+																	// in phone2 (if empty and not same as phone1)
+																  // phone1 may be from poe or gong, so keep it if not empty
+																  self.company_phone1 := if(left.company_phone1!='', 
+																	                          left.company_phone1,right.company_phone2),
+                                  // phone2 may be from gong, so keep it if not empty
+																  // otherwise if phone2 empty store yp phone into it if phone1 was not empty 
+																  // and if phone2 is diff than phone1
+																  self.company_phone2 := if(left.company_phone2!='', 
+																                            left.company_phone2,
+																                            if(left.company_phone1 !='' and
+																			  										   left.company_phone1 != right.company_phone2,
+																				  							       right.company_phone2,'')),
+                                 // Rest of the fields, keep the ones from the left ds
+                                  self := left),
+											          left outer, // keep all the recs from the left ds
+												        atmost(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT));
+
+		return ds_all_recs_wphone;
+
+  end; // end of getPhoneFromYP function
+
+	// This function takes in the combined sources and populates only phone numbers which do not exist in PSS
+	// or that match the criteria of phone status = A and is in the 30 day window
+	export	SuppressPhones(dataset(WorkPlace_Services.Layouts.poe_didkey_plus)	ds_recs_in)	:=
+	function
+		// Check company phone1 to see if it fits the criteria for valid phone
+		WorkPlace_Services.Layouts.poe_didkey_plus	tSuppressPhone1(ds_recs_in	le,PSS.Keys().BDID_Phone.QA	ri)	:=
+		transform
+			self.company_phone1	:=	if(	le.bdid	=	ri.bdid	and	le.company_phone1	=	ri.response_company_phone,
+																	if(	ri.response_phone_status	in	BatchServices.WorkPlace_Constants.PSS_PHONE_STATUS	and	ut.DaysApart(ut.GetDate,(string8)ri.dt_vendor_last_reported)	<=	BatchServices.WorkPlace_Constants.PSS_DAYS_WINDOW,
+																			le.company_phone1,
+																			''
+																		),
+																	le.company_phone1
+																);
+			self								:=	le;
+		end;
+		
+		ds_suppress_badphone1	:=	join(	ds_recs_in,
+																		PSS.Keys().BDID_Phone.QA,
+																		keyed(left.bdid						=	right.bdid)	and
+																		keyed(left.company_phone1	=	right.response_company_phone),
+																		tSuppressPhone1(left,right),
+																		left outer,
+																		limit(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT)
+																	);
+		
+		// Check company phone2 to see if it fits the criteria for valid phone
+		WorkPlace_Services.Layouts.poe_didkey_plus	tSuppressPhone2(ds_suppress_badphone1	le,PSS.Keys().BDID_Phone.QA	ri)	:=
+		transform
+			self.company_phone2	:=	if(	le.bdid	=	ri.bdid	and	le.company_phone2	=	ri.response_company_phone,
+																	if(	ri.response_phone_status	in	BatchServices.WorkPlace_Constants.PSS_PHONE_STATUS	and	ut.DaysApart(ut.GetDate,(string8)ri.dt_vendor_last_reported)	<=	BatchServices.WorkPlace_Constants.PSS_DAYS_WINDOW,
+																			le.company_phone2,
+																			''
+																		),
+																	le.company_phone2
+																);
+			self								:=	le;
+		end;
+		
+		ds_suppress_badphone2	:=	join(	ds_suppress_badphone1,
+																		PSS.Keys().BDID_Phone.QA,
+																		keyed(left.bdid						=	right.bdid)	and
+																		keyed(left.company_phone2	=	right.response_company_phone),
+																		tSuppressPhone2(left,right),
+																		left outer,
+																		limit(BatchServices.WorkPlace_Constants.Limits.JOIN_LIMIT)
+																	);
+		
+		// Move phone2 to phone1 if phone1 is empty
+		ds_suppress_badphones	:=	project(	ds_suppress_badphone2,
+																				transform(	WorkPlace_Services.Layouts.poe_didkey_plus,
+																										self.company_phone1	:=	if(left.company_phone1	!=	'',left.company_phone1,left.company_phone2);
+																										self.company_phone2	:=	if(left.company_phone1	=	'','',left.company_phone2);
+																										self								:=	left;
+																									)
+																			);
+		
+		return	ds_suppress_badphones;
+	end;	// end of SuppressPhones function 
+	
+end; // end of Functions module

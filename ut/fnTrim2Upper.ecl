@@ -1,0 +1,1 @@
+export	fnTrim2Upper(string	pStr)	:=	stringlib.stringtouppercase(stringlib.stringcleanspaces(pStr));

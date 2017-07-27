@@ -1,0 +1,1 @@
+export Key_Stock_Bdid := keys().Stock.bdid.qa;

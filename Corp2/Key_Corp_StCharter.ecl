@@ -1,0 +1,1 @@
+export Key_Corp_StCharter := keys().Corp.StCharter.qa;

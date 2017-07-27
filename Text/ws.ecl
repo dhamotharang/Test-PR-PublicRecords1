@@ -1,0 +1,1 @@
+export pattern ws := sws+;

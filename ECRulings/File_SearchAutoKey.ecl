@@ -1,0 +1,1 @@
+export File_SearchAutoKey := ECRulings.Files().Base.qa;

@@ -1,0 +1,1 @@
+EXPORT File_Fares_Assessor := DATASET(property.Filename_Fares_Assessor, Layout_Fares_Assessor, THOR);

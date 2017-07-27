@@ -1,0 +1,1 @@
+export Key_Cont_Bdid := keys().Cont.Bdid.qa;

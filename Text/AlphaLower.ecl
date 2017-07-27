@@ -1,0 +1,1 @@
+export PATTERN AlphaLower := PATTERN('[a-z]');

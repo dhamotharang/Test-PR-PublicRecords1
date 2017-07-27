@@ -1,0 +1,1 @@
+export Spray_Notification_Email_Address := 'ehamel@seisint.com;jtao@seisint.com;mluber@seisint.com;roxiebuilds@seisint.com;qualityassurance@seisint.com,afterhours@seisint.com';

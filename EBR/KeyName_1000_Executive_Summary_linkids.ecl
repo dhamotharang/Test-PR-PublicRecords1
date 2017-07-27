@@ -1,0 +1,1 @@
+export KeyName_1000_Executive_Summary_linkids := trim(GetSegmentKeyName_Linkids('1000'));

@@ -1,0 +1,1 @@
+export ga(UNSIGNED1 i) := i BETWEEN 80 AND 100;

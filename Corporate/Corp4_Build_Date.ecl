@@ -1,0 +1,1 @@
+EXPORT STRING8 Corp4_Build_Date := '20041012';

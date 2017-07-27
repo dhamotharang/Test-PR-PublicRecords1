@@ -1,0 +1,1 @@
+export Filename_Fares_DID_Out := '~thor_data400::OUT::Property_DID';

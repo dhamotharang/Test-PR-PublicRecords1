@@ -1,0 +1,1 @@
+export Key_Cont_Corpkey := keys().Cont.corpkey.qa;

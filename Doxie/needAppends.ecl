@@ -1,0 +1,1 @@
+export needAppends(string2 src, string listed_name) := src<>'PH' or listed_name = '';

@@ -1,0 +1,33 @@
+export CanadianPhonesKeys := macro
+//output(choosen(CanadianPhones.key_auto_citystname,10));
+//output(choosen(CanadianPhones.key_auto_name,10));
+//output(choosen(CanadianPhones.key_auto_phone,10));
+//output(choosen(CanadianPhones.key_auto_stname,10));
+//output(choosen(CanadianPhones.key_auto_zip,10));
+output(choosen(CanadianPhones.key_fdids,10));
+output(choosen(CanadianPhones.Key_CWP_Addr,10));
+output(choosen(CanadianPhones.Key_CWP_Phone,10));
+output(choosen(canadianphones.key_autokey_address,10));
+output(choosen(AutoKey.Key_CityStName(CanadianPhones.Constants.FILE_NAME_MASK_QA),10));
+output(choosen(AutoKey.Key_Name(CanadianPhones.Constants.FILE_NAME_MASK_QA),10));
+output(choosen(AutoKey.Key_Phone2(CanadianPhones.Constants.FILE_NAME_MASK_QA),10));
+//output(choosen(AutoKey.Key_SSN2(CanadianPhones.Constants.FILE_NAME_MASK_QA),10));
+output(choosen(AutoKey.Key_StName(CanadianPhones.Constants.FILE_NAME_MASK_QA),10));
+//output(choosen(AutoKeyb2.Key_fein(CanadianPhones.Constants.FILE_NAME_MASK_QA),10));
+// --- new keys
+// output(choosen(autokeyb2.Key_Zip(CanadianPhones.Constants.FILE_NAME_MASK_QA),10));
+zipb2d := DATASET([], CanadianPhones.layouts.zipb);
+zipb2key := INDEX (zipb2d, {zipb2d}, CanadianPhones.Constants.FILE_NAME_MASK_QA+'zipb2');
+output(choosen(zipb2key,10));
+output(choosen(autokeyb2.Key_name(CanadianPhones.Constants.FILE_NAME_MASK_QA),10));
+output(choosen(autokeyb2.Key_citystname(CanadianPhones.Constants.FILE_NAME_MASK_QA),10));
+output(choosen(autokeyb2.Key_stname(CanadianPhones.Constants.FILE_NAME_MASK_QA),10));
+// output(choosen(autokeyb2.Key_address(CanadianPhones.Constants.FILE_NAME_MASK_QA),10));
+addb2d := DATASET([], CanadianPhones.layouts.addressb);
+addb2key := INDEX (addb2d, {addb2d}, CanadianPhones.Constants.FILE_NAME_MASK_QA+'addressb2');
+output(choosen(addb2key,10));
+output(choosen(autokeyb2.Key_namewords(CanadianPhones.Constants.FILE_NAME_MASK_QA),10));
+output(choosen(autokeyb2.Key_phone(CanadianPhones.Constants.FILE_NAME_MASK_QA),10));
+output(choosen(CAN_PH.key_ZipPRLName,10));
+output(choosen(canadianphones.key_autokey_zip,10));
+endmacro;

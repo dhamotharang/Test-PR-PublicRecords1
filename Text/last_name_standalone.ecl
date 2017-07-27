@@ -1,0 +1,1 @@
+export pattern last_name_standalone := opt(salutations ws) last_name_prefix_form REPEAT(ws last_name_prefix_form, 0, 2) opt((ws | ',' ws*) last_name_suffix);

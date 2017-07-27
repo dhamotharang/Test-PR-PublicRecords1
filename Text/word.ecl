@@ -1,0 +1,1 @@
+export pattern word := (alpha|'-'|'\'')+;

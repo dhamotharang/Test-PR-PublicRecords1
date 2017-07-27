@@ -1,0 +1,1 @@
+export pattern Alpha := PATTERN('[A-Za-z]');

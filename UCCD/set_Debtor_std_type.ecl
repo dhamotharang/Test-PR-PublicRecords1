@@ -1,0 +1,1 @@
+export set_Debtor_std_type := ['D'];

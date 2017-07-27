@@ -1,0 +1,23 @@
+export layout_relative_booleans := record
+	boolean corp_charter_number;
+	boolean business_registration;
+	boolean bankruptcy_filing;
+	boolean duns_number;
+	boolean duns_tree;
+	boolean edgar_cik;
+	boolean name;
+	boolean name_address;
+	boolean name_phone;
+	boolean gong_group;
+	boolean ucc_filing;
+	boolean fbn_filing;
+	boolean fein_m;
+	boolean phone_m;
+	boolean addr;
+	boolean mail_addr;
+	boolean dca_company_number;
+	boolean dca_hierarchy;
+	boolean abi_number;
+	boolean abi_hierarchy;
+	boolean rel_group;
+end;

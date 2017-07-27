@@ -1,0 +1,1 @@
+export Source_is_lnOnly := mdr.sourceTools.set_LNOnly;

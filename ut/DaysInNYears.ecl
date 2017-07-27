@@ -1,0 +1,1 @@
+export DaysInNYears(integer i) := (INTEGER)(i*365.25);

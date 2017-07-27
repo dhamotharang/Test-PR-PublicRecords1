@@ -1,0 +1,1 @@
+export Key_AR_Corpkey := keys().ar.corpkey.qa;

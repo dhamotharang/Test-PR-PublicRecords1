@@ -1,0 +1,1 @@
+export layout_report := recordof(doxie_cbrs.all_base_records_prs());

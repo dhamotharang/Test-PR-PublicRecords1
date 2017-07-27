@@ -1,0 +1,1 @@
+export version_aircraft := '20050810';

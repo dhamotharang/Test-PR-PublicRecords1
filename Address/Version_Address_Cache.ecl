@@ -1,0 +1,1 @@
+export string8 Version_Address_Cache := '20040505';

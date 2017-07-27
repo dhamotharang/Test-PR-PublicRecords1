@@ -1,0 +1,1 @@
+export Chr2Code(string1 c) := transfer(c,unsigned1)-transfer('A',unsigned1)+1;

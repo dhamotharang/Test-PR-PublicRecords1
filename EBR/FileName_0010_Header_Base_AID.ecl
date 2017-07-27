@@ -1,0 +1,1 @@
+export FileName_0010_Header_Base_AID := trim(GetSegmentFileName_Base('0010','A'));

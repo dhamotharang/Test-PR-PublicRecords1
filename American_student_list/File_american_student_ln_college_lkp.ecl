@@ -1,0 +1,1 @@
+EXPORT File_american_student_ln_college_lkp := DATASET('~thor_data400::lookup::american_student_list::college_name', layout_american_student_ln_college_lkp, THOR);

@@ -1,0 +1,78 @@
+import doxie_raw, header, ut, doxie;
+
+export Comp_Subject_Addresses(dataset(Doxie.layout_references) dids,
+															unsigned3 dateVal = 0,
+															unsigned1 dppa_purpose = 0,
+															unsigned1 glb_purpose = 0,
+															boolean ln_branded_value = false,
+															boolean include_gong = true,
+															boolean probation_override_value,
+															string5 industry_class_value='UTILI',
+															boolean no_scrub=false,
+															unsigned1 dial_contactprecision_value = 4,
+                              unsigned2 address_limit = 1000) :=
+MODULE
+
+include_dailies := ~ut.IndustryClass.is_knowx;
+
+head_all := doxie.mod_header_records(
+	/*DoSearch:=*/false,											
+	include_dailies, 					
+	/*allow_wildcard:=*/false,	
+	dateVal,
+	dppa_purpose,
+	glb_purpose,
+	ln_branded_value,
+	include_gong,
+	probation_override_value,
+	industry_class_value, 
+	no_scrub).results(project(dids, doxie.layout_references_hh));
+	
+head_for_append := head_all(doxie.needAppends(src, listed_name));
+head_skip 			:= head_all(~doxie.needAppends(src, listed_name));
+head_gd1 := doxie.Append_Gong(head_for_append, DATASET([], doxie.layout_relative_dids_v3), dial_contactprecision_value);
+head_gd := 
+	project(head_gd1, doxie.layout_presentation) +
+	project(head_skip, doxie.layout_presentation);
+
+shared Mainfat := IF(include_gong, head_gd, head_all);
+export raw := Mainfat;
+Main := project(Mainfat,transform(Layout_Comp_Addresses, self := left, self.hri_address := []));
+MAC_Address_Rollup(Main,address_limit,Main_Dn, ut.IndustryClass.is_knowx)
+
+Layout_Comp_Addresses tra(Main_Dn lef,Main_Dn ref) := transform
+  self.address_seq_no := if(lef.address_seq_no <=0,1,lef.address_seq_no +1);  	
+	self := ref;		
+  end;
+
+// transform to switch the dates in case the search is knowx.	
+Layout_Comp_Addresses traConsumer(Main_Dn lef,Main_Dn ref) := transform
+  self.address_seq_no := if(lef.address_seq_no <=0,1,lef.address_seq_no +1);  
+	self.dt_last_seen := ref.dt_vendor_last_reported;
+	self.dt_first_seen := ref.dt_vendor_first_reported;
+	self.dt_vendor_first_reported := ref.dt_first_seen;
+	self.dt_vendor_last_reported := ref.dt_last_seen;
+	self := ref;		
+  end;
+	
+//****** Push infile through transform above
+Main_Dn_U := iterate(Main_Dn, tra(left, right));
+Main_Dn_C := iterate(Main_Dn, traConsumer(left, right));
+Mainseq := if(ut.IndustryClass.is_Knowx, Main_Dn_C, Main_Dn_U);
+export Addresses := Mainseq;
+
+shared doxie.layout_NameDID name_tra(doxie.layout_NameDID l,doxie.layout_NameDID r) := transform
+	self.name_occurences := 
+		if(l.did = r.did and l.name_suffix = r.name_suffix and l.fname = r.fname and l.lname = r.lname,
+			1+l.name_occurences, 1);
+	self := r;
+end;
+
+export Names := 
+	dedup(
+		sort(
+			iterate(sort(project(Mainfat, doxie.layout_NameDID), name_suffix, did, fname, lname), name_tra(left, right)),
+		name_suffix, did, fname, lname,-name_occurences),
+			name_suffix, did, fname, lname);
+
+END;

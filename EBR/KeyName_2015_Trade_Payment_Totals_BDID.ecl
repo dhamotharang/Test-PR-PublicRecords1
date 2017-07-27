@@ -1,0 +1,1 @@
+export KeyName_2015_Trade_Payment_Totals_BDID := trim(GetSegmentKeyName_BDID('2015')) : global;

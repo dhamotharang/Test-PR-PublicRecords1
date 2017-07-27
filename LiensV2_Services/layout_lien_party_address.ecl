@@ -1,0 +1,21 @@
+import address, Liensv2;
+export layout_lien_party_address := record
+  LiensV2.Layout_liens_base_module.layout_party_info.orig_address1;
+	LiensV2.Layout_liens_base_module.layout_party_info.orig_address2;
+  address.layout_clean182.prim_range;
+  address.layout_clean182.predir;
+  address.layout_clean182.prim_name;
+  address.layout_clean182.addr_suffix;
+  address.layout_clean182.postdir;
+  address.layout_clean182.unit_desig;
+  address.layout_clean182.sec_range;
+  address.layout_clean182.p_city_name;
+  address.layout_clean182.v_city_name;
+  address.layout_clean182.st;
+  address.layout_clean182.zip;
+  address.layout_clean182.zip4;
+  address.layout_clean182.county;
+  address.layout_clean182.msa;
+	string18 county_name;
+	dataset(liensv2_services.layout_lien_party_phone) phones{maxcount(5)};
+end;

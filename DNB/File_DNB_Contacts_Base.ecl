@@ -1,0 +1,1 @@
+export File_DNB_Contacts_Base := dataset('~thor_data400::BASE::DNB_Contacts'/*_20050204'*/, Layout_DNB_Contacts_Base, flat);

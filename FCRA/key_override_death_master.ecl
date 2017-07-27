@@ -1,0 +1,21 @@
+import Death_Master, Doxie;
+EXPORT key_override_death_master := module
+	shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
+	shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
+	shared keyname_prefix := '~thor_data400::key::override::fcra::';
+
+//Death Master DID
+	Death_rec := RECORD
+	recordof (doxie.key_death_masterV2_DID_fcra);
+	string20 flag_file_id;
+  END;
+
+	ds_did_death := dataset(fname_prefix + 'did_death',Death_rec,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
+	dailyds_did_death := dataset(daily_prefix + 'did_death',Death_rec,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
+	kf := dedup(sort(ds_did_death,-flag_file_id),except flag_file_id,keep(1));
+	FCRA.Mac_Replace_Records(kf,dailyds_did_death,state_death_id,replaceds);
+
+	export did_death := index(replaceds,{flag_file_id}, {replaceds},
+						keyname_prefix + 'did_death::qa::ffid',OPT);
+
+end;
