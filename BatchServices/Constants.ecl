@@ -1,4 +1,4 @@
-/*2014-08-27T23:00:06Z (greg whitaker)
+﻿/*2014-08-27T23:00:06Z (greg whitaker)
 TRIS V3 constants added
 */
 import ut,MDR;
@@ -115,22 +115,6 @@ EXPORT Constants := MODULE
 		EXPORT SUFFIX_SENIOR		:= ['S', '1', 'I', 'SR'];
 		EXPORT SUFFIX_FIFTH			:= ['V', '5'];
 		
-	END;
-	EXPORT JailBooking := MODULE
-	   EXPORT MAX_RESULTS_PER_ACCT := 20;
-	   EXPORT MAX_RESULTS := 10000;
-	   EXPORT MAX_CHARGES := 1000;
-	   EXPORT MAX_CHARGES_OUT := 5;
-		 EXPORT MAX_BOOKINGS := 100;
-		 EXPORT DID_SCORE_THRESHOLD := 75;
-		 EXPORT MATCH_FL_SSN := 'Y';
-		 EXPORT MATCH_FL_DOB := 'Y';
-		 EXPORT MATCH_FL_ADDR := 'Y';
-		 EXPORT MATCH_FBI := 'Y';
-		 EXPORT MATCH_DL := 'Y';
-		 EXPORT MATCH_STATEID := 'Y';
-		 EXPORT MATCH_LINKID := 'Y';
-		 EXPORT NAME_VARIATIONS := 4;  
 	END;
 	export Residents := Module
 		export integer TODAY_YYYYMM 								:= (INTEGER)ut.GetDate DIV 100;
