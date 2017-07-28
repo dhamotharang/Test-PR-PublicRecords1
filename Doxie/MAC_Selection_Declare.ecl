@@ -1,4 +1,4 @@
-export MAC_Selection_Declare := MACRO
+﻿export MAC_Selection_Declare := MACRO
 
 boolean	  Always_Compute := false : stored('AlwaysCompute');
 boolean	  Select_Indiv := false : stored('SelectIndividually');
@@ -59,7 +59,6 @@ boolean IncludeRTVeh := false : stored('IncludeRTVeh');
 boolean AppendRTVeh := false : stored('AppendRTVeh');
 boolean IncludeImages := false : stored('IncludeImages');
 boolean IncludeStudentInformation := false : stored('IncludeStudentInformation');
-boolean IncludeJailBookings := false : stored('IncludeJailBookings');
 boolean IncludeTransactionHistory := false : stored('IncludeTransactionHistory');
 boolean IncludeCriminalIndicators := false : stored('IncludeCriminalIndicators');
 
@@ -146,7 +145,6 @@ include_hri_val := Include_Them_All or include_hri;
 include_NoticeOfDefaults_val := Include_Them_All or Include_NoticeOfDefaults;
 include_foreclosures_val := Include_Them_All or Include_Foreclosures;
 include_StudentInformation_val := Include_Them_All or IncludeStudentInformation;
-include_JailBooking_val := Include_Them_All or IncludeJailBookings;
 include_CriminalIndicators_val := IncludeCriminalIndicators;
 
 //Bug 10913

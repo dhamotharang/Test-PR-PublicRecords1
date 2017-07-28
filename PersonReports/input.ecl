@@ -1,4 +1,4 @@
-// TODO: create common defaults to use in AutoStandardI.GlobalModule, here, etc.
+﻿// TODO: create common defaults to use in AutoStandardI.GlobalModule, here, etc.
 
 // Encapsulates input parameters for each particular component
 // (probably will be split and moved to each correspondent service)
@@ -299,7 +299,6 @@ EXPORT input := MODULE
     export boolean include_huntingfishing := false;
     export boolean include_historicalneighbors := false;
     export boolean include_imposters := false;
-    export boolean include_jailbookings := false;
 		export boolean include_kris := false;
     export boolean include_liensjudgments := false;
     export boolean include_merchantvessels := false; // not used in doxie-CRS
