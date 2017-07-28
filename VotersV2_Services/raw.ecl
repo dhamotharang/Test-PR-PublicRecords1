@@ -1,4 +1,4 @@
-// This module provides voters data in different formats.
+﻿// This module provides voters data in different formats.
 import VotersV2, doxie, suppress, ut, census_data, codes,AutoStandardI;
 
 //IMPORTANT FCRA-NOTE: -- FCRA ISN't USED SO FAR, placeholders are reserved for future needs
@@ -92,9 +92,9 @@ EXPORT raw := MODULE
       ds_old_format := GetVotersInOldFormat (srt);
 
       // mapping
-      ut.mac_map_gender (ds_old_format, gender, gender_mapped, ds_map_1);
-      ut.mac_map_race   (ds_map_1, race, race_mapped, ds_map_2) // it's in the key, actually, with blank=unknown
-      ut.mac_map_state  (ds_map_2, source_state, source_state_mapped, ds_map_3);
+      codes.mac_map_gender (ds_old_format, gender, gender_mapped, ds_map_1);
+      codes.mac_map_race   (ds_map_1, race, race_mapped, ds_map_2) // it's in the key, actually, with blank=unknown
+      codes.mac_map_state  (ds_map_2, source_state, source_state_mapped, ds_map_3);
       census_data.MAC_Fips2County_Keyed (ds_map_3, st, county, county_name, ds_map_4);
 
       return ds_map_4;
