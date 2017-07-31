@@ -1,4 +1,4 @@
-import riskwise, did_add, ut, UtilFile, risk_indicators, NID;
+﻿import riskwise, did_add, ut, UtilFile, risk_indicators, NID;
 
 export iid_getAddressInfo(grouped dataset(risk_indicators.Layout_Output ) flagrecs, unsigned1 glb, boolean isFCRA, 
 											boolean require2Ele, integer BSversion, boolean isUtility,
@@ -170,14 +170,9 @@ phonerecsByaddr_history_thor := join(distribute(flagrecs, hash64(prim_name, z5, 
 						       RiskWise.max_atmost),
 					       keep(300), LOCAL);
 								 
-// phonerecsByaddr_history := if(onThor, 
-																// group(sort(distribute(phonerecsByaddr_history_thor, hash64(seq)), seq,-dirsaddr_phone, -phoneaddr_date_last_seen, dirsaddr_last, dirsaddr_first, dirsaddr_cmpy, phoneAddrSourceUsed, record, LOCAL),seq, LOCAL), 
-																// sort(phonerecsByaddr_history_roxie, seq,-dirsaddr_phone, -phoneaddr_date_last_seen, dirsaddr_last, dirsaddr_first, dirsaddr_cmpy, phoneAddrSourceUsed, record));
-
 phonerecsByaddr_history := if(onThor, 
 																group(sort(distribute(phonerecsByaddr_history_thor, hash64(seq)), seq,-dirsaddr_phone, -phoneaddr_date_last_seen, dirsaddr_last, dirsaddr_first, dirsaddr_cmpy, phoneAddrSourceUsed, record, LOCAL),seq, LOCAL), 
-																phonerecsByaddr_history_roxie);
-
+																sort(phonerecsByaddr_history_roxie, seq,-dirsaddr_phone, -phoneaddr_date_last_seen, dirsaddr_last, dirsaddr_first, dirsaddr_cmpy, phoneAddrSourceUsed, record));
 
 phonerecsByaddr := phonerecsByaddr_history;	
 

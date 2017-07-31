@@ -1,4 +1,4 @@
-import ut, did_add, address, risk_indicators, census_data, riskwise, USPIS_HotList, ADVO, DOXIE, MDR;
+﻿import ut, did_add, address, risk_indicators, census_data, riskwise, USPIS_HotList, ADVO, DOXIE, MDR;
 
 export iid_combine_verification(grouped dataset(risk_indicators.Layout_Output) ssnrecs, 
 								grouped dataset(risk_indicators.Layout_Output) pphonerecs,
@@ -601,9 +601,7 @@ pphonerecs1 := project(pphonerecs, clean_flags(left, 2));
 combined_records1 := ungroup(ssnrecs1 + pphonerecs1);
 
 // force the ssnrecs to be the left record on the rollup so we don't get results from rollup that are indeterminate
-combined_records_roxie := group(sort( combined_records1, seq, version), seq );
-combined_records_thor := group(sort( combined_records1, seq, version, record), seq );
-combined_records := if(onThor, combined_records_thor, combined_records_roxie);
+combined_records := group(sort( combined_records1, seq, version, record), seq );
 
 combine_Scores := ROLLUP(combined_records,left.seq=right.seq,combo(LEFT,RIGHT));
 

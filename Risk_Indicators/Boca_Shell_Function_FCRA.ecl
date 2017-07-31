@@ -1,4 +1,4 @@
-import FCRA, Riskwise, _control, Gateway;
+﻿import FCRA, Riskwise, _control, Gateway;
 
 USE_BOCA_SHELL_LIBRARY := not _Control.LibraryUse.ForceOff_Risk_Indicators__LIB_Boca_Shell_Function;
 
@@ -148,10 +148,6 @@ seq_map := join( pre_iid1, pre_iid,
 
   fcra_shell_results := per_prop;
 #end
-
-// If the shell comes back from Library with errors, fail the transaction so we know about it instead of dropping the record gracefully without notice
-fcra_shell_errors := fcra_shell_results(trim(errmsg)<>'');
-if(exists(fcra_shell_errors), FAIL(fcra_shell_errors[1].errmsg));
 
 // join the results back to the original input so that every record on input has a response populated
 full_response := join( seq_map, fcra_shell_results, left.deduped_seq=right.seq, transform( Risk_Indicators.Layout_Boca_Shell, self.seq := left.input_seq, self.shell_input.seq := left.input_seq, self := right ), keep(1) );

@@ -1,4 +1,4 @@
-Import Models, STD, Address, risk_indicators, riskwise, ut;
+﻿Import Models, STD, Address, risk_indicators, riskwise, ut;
 Import Models.Healthcare_SocioEconomic_Functions_V2;
 
 EXPORT Healthcare_SocioEconomic_Transforms_V2 := MODULE
@@ -16,7 +16,8 @@ EXPORT Healthcare_SocioEconomic_Transforms_V2 := MODULE
                               (integer)le.acctno<>0 => (integer)le.acctno,
                               C);
       self.HistorydateYYYYMM := history;
-      self.Age := Models.Healthcare_SocioEconomic_Functions_V2.calcAge(le.DOB);
+			ageRefYYYYMMDD := if((string)history = '999999', (string)Std.Date.Today(), (string)history+(string2)Models.Healthcare_SocioEconomic_Functions_V2.calcDaysInMonth((string)history));
+      self.Age := Models.Healthcare_SocioEconomic_Functions_V2.calcAgeInYears(le.DOB,(string)ageRefYYYYMMDD);
       self.goodInput := goodInput;
       self := le;
    END;
@@ -32,7 +33,8 @@ EXPORT Healthcare_SocioEconomic_Transforms_V2 := MODULE
       self.seq := map((integer)le.seq<>0 => (integer)le.seq,
                               (integer)le.acctno<>0 => (integer)le.acctno,
                               C);
-      self.Age := Models.Healthcare_SocioEconomic_Functions_V2.calcAge(le.DOB);
+      ageRefYYYYMMDD := if((string)history = '999999', (string)Std.Date.Today(), (string)history+ (string2)Models.Healthcare_SocioEconomic_Functions_V2.calcDaysInMonth((string)history));
+      self.Age := Models.Healthcare_SocioEconomic_Functions_V2.calcAgeInYears(le.DOB,(string)ageRefYYYYMMDD);
       self.goodInput := goodInput;
       self.LexID := [];
       self.Name_Full := Le.unParsedFullName;

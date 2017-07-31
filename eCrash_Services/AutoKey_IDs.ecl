@@ -1,4 +1,4 @@
-import AutoKeyI, FLAccidents, AutokeyB2;
+﻿import AutoKeyI, FLAccidents, AutokeyB2;
 
 export AutoKey_IDs(IParam.autokey_search in_mod) := function
 		
@@ -20,6 +20,6 @@ export AutoKey_IDs(IParam.autokey_search in_mod) := function
 		
 		by_auto := dedup(sort(project(outpl, 
 	        	                      transform (Layouts.search,
-			 	  				                           self.reportnumber := left.accident_nbr )),record),record);
+			 	  				                           self.reportnumber := left.accident_nbr;self := []; )),record),record);
 		return by_auto;
 end;

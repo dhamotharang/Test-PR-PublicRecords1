@@ -1,4 +1,4 @@
-import risk_indicators, ut;
+﻿import risk_indicators, ut;
 
 export iid_roll_header(grouped DATASET(risk_indicators.layout_output) all_header, boolean suppressNearDups=false,
 											 unsigned1 BSversion, boolean experian_batch_feed=false, boolean isFCRA=false,
@@ -30,18 +30,11 @@ sortedBest_original := sort(gh, seq, did, -dt_last_seen, -chronodate_first, chro
 		-socsvalid, -chronozip, -chronoprim_name, -chronoprim_range, -chronopredir, -chronosuffix, -chronopostdir, -chronosec_range, -chronounit_desig, -chronogeo_blk, -chronozip4, -chronocity, -chronostate, -verdob, src);
 
 // sort the addresses using the new logic from address hierarchy key
-address_hierarchy_sort_roxie := sort(gh, seq, did, if(address_history_seq=0, 255, address_history_seq), 
-		-dt_last_seen, -chronodate_first, chronolast, chronofirst, 
-		// added more fields to sort by to make code deterministic when picking between EQ record and EQ(QH) record with same dates, but different address and ssn_valid results
-		-socsvalid, -chronozip, -chronoprim_name, -chronoprim_range, -chronopredir, -chronosuffix, -chronopostdir, 
-		-chronosec_range, -chronounit_desig, -chronogeo_blk, -chronozip4, -chronocity, -chronostate, -verdob, src );
-address_hierarchy_sort_thor := sort(gh, seq, did, if(address_history_seq=0, 255, address_history_seq), 
+address_hierarchy_sort := sort(gh, seq, did, if(address_history_seq=0, 255, address_history_seq), 
 		-dt_last_seen, -chronodate_first, chronolast, chronofirst, 
 		// added more fields to sort by to make code deterministic when picking between EQ record and EQ(QH) record with same dates, but different address and ssn_valid results
 		-socsvalid, -chronozip, -chronoprim_name, -chronoprim_range, -chronopredir, -chronosuffix, -chronopostdir, 
 		-chronosec_range, -chronounit_desig, -chronogeo_blk, -chronozip4, -chronocity, -chronostate, -verdob, src, record );
-address_hierarchy_sort := if(onThor, address_hierarchy_sort_thor, address_hierarchy_sort_roxie);
-
 sortedBest := if(bsversion>=50, address_hierarchy_sort, sortedBest_original);
 		
 risk_indicators.layout_output countadd(risk_indicators.layout_output l,risk_indicators.layout_output r) := transform

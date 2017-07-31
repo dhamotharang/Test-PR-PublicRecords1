@@ -1,4 +1,4 @@
-Import Models;
+﻿Import Models;
 Import Profilebooster;
 
 EXPORT Layouts_Healthcare_V2 := module 
@@ -24,18 +24,18 @@ EXPORT Layouts_Healthcare_V2 := module
 	EXPORT Layout_SocioEconomic_Batch := RECORD 
 		Layout_SocioEconomic_Batch_In;
 		unsigned3 HistorydateYYYYMM;
-		uDecimal6_3 Age   := 0.000;
+		REAL8 Age   := 0.000;
 		BOOLEAN goodInput := false;
 	END;
 	EXPORT Layout_SocioEconomic_Batch_PB_In := RECORD 
 		Profilebooster.Layouts.Layout_PB_In;
-		uDecimal6_3 Age                         := 0.000;
+		REAL8 Age                         := 0.000;
 		BOOLEAN goodInput                       := false;
 	END;
 
 	EXPORT layout_SocioEconomic_custom_member_attributes := RECORD 
 		uDecimal6_2 MemberForecastedCost := 0.00;
-		uDecimal6_3 MemberAge                                := 0.000;
+		REAL8 MemberAge                                := 0.000;
 		integer1 MemberGENDer                                := 0; //Has different mapping than Female
 		string1 GENDerStr                                    := '';
 		integer1 GENDer                                      := 0;
@@ -272,7 +272,7 @@ EXPORT Layouts_Healthcare_V2 := module
 		UNSIGNED4 ST     := [];
 		UNSIGNED4 FEMALE := [];
 		//UNSIGNED4 GENDER := [];
-		real4 AGE_IN_YEARS := [];
+		real8 AGE_IN_YEARS := [];
 		layout_SocioEconomic_custom_attributes;
 		//Models.layouts.Layout_LeadIntegrity_attributes_v4;
 		INTEGER4 AgeOldestRECORD;
@@ -2069,7 +2069,7 @@ END;
 		STRING3 SearchAddrSearchCount;
 		STRING3 SearchPhoneSearchCount;
 		STRING1 ComponentCharRiskLevel;
-		string10 Age_in_Years;
+		string16 Age_in_Years;
 		string2 Female;
 		string10 ST;
 		String2 ProspectMaritalStatus;
@@ -2175,7 +2175,7 @@ END;
 		String3 ResCurrBusinessCnt;
 		String7 ResCurrMortgageAmount;
 		String2 ResCurrOwnershipIndex;
-		string10 Age_in_Years;
+		string16 Age_in_Years;
 		string2 Female;
 		String3 HHCnt;
 		String3 HHElderlyMmbrCnt;

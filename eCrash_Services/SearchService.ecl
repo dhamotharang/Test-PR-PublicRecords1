@@ -1,4 +1,4 @@
-/*2015-06-24T16:52:16Z (Sai Nagula)
+﻿/*2015-06-24T16:52:16Z (Sai Nagula)
 Open State search and Drivers exchange report grouping.
 */
 /*--SOAP--
@@ -122,7 +122,7 @@ Open State search and Drivers exchange report grouping.
 */
 
 
-import AutoStandardI,iesp;
+import AutoStandardI,iesp, std;
 EXPORT SearchService := MACRO
 
 	 	#constant('StrictMatch', false);
@@ -137,10 +137,12 @@ EXPORT SearchService := MACRO
 		gateways_in := dataset([], gateways_record) : stored ('Gateways', FEW);
 		
     first_row := ds_in[1] : independent;
-		string tmpURLString := gateways_in[1].url;
+		// string tmpURLString := gateways_in[1].url;
+		// 7/14/17 - For alias - since we get more than 1 gateway information, we check if it belongs to delta_ec and use that
+		string tmpURLString := gateways_in(STD.Str.ToUpperCase (TRIM(servicename,ALL)) = 'DELTA_EC')[1].url;
+		
 		// 7/16 - Tino said they are populating servicename with 'delta_ec' which will not work for the servicename.
 		// string tmpNAMEString := gateways_in[1].servicename;
-		// OUTPUT(gateways_in[1].servicename);
 		string tmpNAMEString := initial_default_ESP_NAME;
 		// remove the temporary definition above and go back to the gateway if they fix the populated value
 		
@@ -153,13 +155,15 @@ EXPORT SearchService := MACRO
 
     //set search criteria
     search_by := global (first_row.searchBy);
-    #stored ('AccidentLocationCrossStreet', stringlib.stringtouppercase(search_by.AccidentLocation.CrossStreet));
-    #stored ('AccidentLocationStreet', stringlib.stringtouppercase(search_by.AccidentLocation.Street));
+	
+    #stored ('AccidentLocationCrossStreet', STD.Str.ToUpperCase (search_by.AccidentLocation.CrossStreet));
+    #stored ('AccidentLocationStreet', STD.Str.ToUpperCase (search_by.AccidentLocation.Street));
 		#stored ('ReportNumber', search_by.ReportNumber);
-		#stored ('Jurisdiction', stringlib.stringtouppercase(search_by.Jurisdiction));
-		#stored ('JurisdictionState', stringlib.stringtouppercase(search_by.JurisdictionState));
-		#stored ('UserType', stringlib.stringtouppercase(search_by.UserType));
-		#stored ('AgencyORI', stringlib.stringtouppercase(search_by.AgencyORI));
+		#stored ('Jurisdiction', STD.Str.ToUpperCase (search_by.Jurisdiction));
+		#stored ('JurisdictionState', STD.Str.ToUpperCase (search_by.JurisdictionState));
+		#stored ('Agencies', search_by.Agencies);
+		#stored ('UserType', STD.Str.ToUpperCase (search_by.UserType));
+		#stored ('AgencyORI', STD.Str.ToUpperCase (search_by.AgencyORI));
 		#stored ('RequestHashKey', search_by.RequestHashKey);
 		
 		#stored ('GroupRecords', Search_opt.GroupRecords);
@@ -186,20 +190,50 @@ EXPORT SearchService := MACRO
 		#stored('DolStartdate', dol_start_date);
 		#stored('DolEnddate', dol_end_date);
 
+		string Jurisdiction_tmp 					:= '' : stored('Jurisdiction');
+		string Jurisdiction_old 					:= STD.Str.ToUpperCase (Jurisdiction_tmp);
+		string JurisdictionState_tmp 			:= '' : stored('JurisdictionState');
+		string JurisdictionState_old 			:= STD.Str.ToUpperCase (JurisdictionState_tmp);
+		string AgencyORI_old 							:= '' : stored('AgencyORI');
+		//added empty dataset if no state or jurisdiction information is supplied in request	
+		recordof(iesp.ecrash.t_ECrashSearchAgency) xform_emptyagency():=TRANSFORM
+					self:=[];
+		END;
+		
+		DATASET(iesp.ecrash.t_ECrashSearchAgency) Agencies_stored := DATASET([], iesp.ecrash.t_ECrashSearchAgency) : stored('Agencies', FEW);
+		DATASET(iesp.ecrash.t_ECrashSearchAgency) Agencies_tmp 		:= PROJECT(IF(EXISTS(Agencies_stored), Agencies_stored, dataset([xform_emptyagency()])), TRANSFORM(iesp.ecrash.t_ECrashSearchAgency,
+																																								SELF.Jurisdiction := STD.Str.ToUpperCase (LEFT.Jurisdiction);
+																																								SELF.JurisdictionState := STD.Str.ToUpperCase (LEFT.JurisdictionState);
+																																								SELF.AgencyID := STD.Str.ToUpperCase (LEFT.AgencyID);
+																																								SELF.AgencyORI := STD.Str.ToUpperCase (LEFT.AgencyORI);
+																																								SELF := LEFT;));
+		recordof(iesp.ecrash.t_ECrashSearchAgency) xform_agency():=TRANSFORM
+					SELF.Jurisdiction := Jurisdiction_old;
+					SELF.JurisdictionState := JurisdictionState_old;
+					SELF.AgencyORI := AgencyORI_old;	
+					SELF.PrimaryAgency := TRUE;
+					SELF:=[];
+	  END;
+		boolean old_agency_exists := 	Jurisdiction_old <> '' OR JurisdictionState_old <> '';
+		agency_ds := IF(old_agency_exists, dataset([xform_agency()]), Agencies_tmp);
+			
     tempmod := MODULE(PROJECT(AutoStandardI.GlobalModule(),eCrash_Services.IParam.searchrecords,opt));
         export string AccidentLocationCrossStreet  := '' : stored('AccidentLocationCrossStreet');
         export string AccidentLocationStreet  := '' : stored('AccidentLocationStreet');
 				export string ReportNumber_raw 			:= '' : stored('ReportNumber');
-        export string ReportNumber 			:= stringlib.stringfilter(stringlib.stringtouppercase(ReportNumber_raw), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
-				export string Jurisdiction_tmp 			:= '' : stored('Jurisdiction');
-				export string Jurisdiction 			:= stringlib.stringtouppercase(Jurisdiction_tmp);
-				export string JurisdictionState_tmp 			:= '' : stored('JurisdictionState');
-				export string JurisdictionState 			:= stringlib.stringtouppercase(JurisdictionState_tmp);
+        export string ReportNumber 			:= stringlib.stringfilter(STD.Str.ToUpperCase (ReportNumber_raw), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+				// export string Jurisdiction 			:= Jurisdiction_old;
+				// export string JurisdictionState 			:= JurisdictionState_old;
+				// export string Jurisdiction_tmp 			:= '' : stored('Jurisdiction');
+				// export string Jurisdiction 			:= stringlib.stringtouppercase(Jurisdiction_tmp);
+				// export string JurisdictionState_tmp 			:= '' : stored('JurisdictionState');
+				// export string JurisdictionState 			:= stringlib.stringtouppercase(JurisdictionState_tmp);
+				export dataset(iesp.ecrash.t_ECrashSearchAgency) Agencies := agency_ds;	
 				export string DateOfLoss 				:= '' : stored('DateOfLoss');
 				export string DolStartdate 				:= '' : stored('DolStartdate');
 				export string DolEnddate 				:= '' : stored('DolEnddate');
 				export string UserType 				:= '' : stored('UserType');
-				export string AgencyORI 				:= '' : stored('AgencyORI');
+				// export string AgencyORI 				:= '' : stored('AgencyORI');
 				export boolean RequestHashKey := false : stored('RequestHashKey');
 				export boolean GroupRecords 				:= false : stored('GroupRecords');
 				export boolean SubscriptionReports 				:= false : stored('SubscriptionReports');
@@ -213,11 +247,12 @@ EXPORT SearchService := MACRO
 		Recs_in := eCrash_Services.Records(tempmod);
 		
 		recs := if (tempmod.SubscriptionReports = true, Recs_in.getSubscriptionRecords(), Recs_in.getSearchRecords());
-
+				
 //look to pass Max limit in Macro. 
 //could be this maxRetCnt:=MaxLimit
 		iesp.ECL2ESP.Marshall.MAC_Marshall_Results(recs, results,iesp.eCrash.t_ECrashSearchResponse, Records, false);
-     output(results,named('Results'));
+    output(results,named('Results'));
+		// output(tmpURLString);
 
 ENDMACRO;
  // SearchService();

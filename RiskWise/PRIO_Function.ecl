@@ -1,4 +1,4 @@
-import ut, Risk_Indicators, Risk_Reporting, Models, gateway;
+﻿import ut, Risk_Indicators, Risk_Reporting, Models, gateway;
 
 export PRIO_Function(DATASET(Layout_PRII) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 glb, unsigned1 dppa, 
 	string4 tribCode, string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,
@@ -84,7 +84,11 @@ string2 getSocsLevel(unsigned1 level) := map(level in [0,2,3,5,8] => '0',
 
 //regular expressions
 poAddress_expression := '((P[\\s\\.]*O[\\.\\s]*)|(POST[\\s]*OFFICE[\\s]*))+BOX';  //find reference to po box or post office box
-
+onlyContains_express := '^(([\\s]*CO[\\.]?)|([\\s]*ASSOCIATES))$';
+endingInc_expression := '(INC[.]*)$';
+endsWith_expression := '([\\s]*ASSOC|[\\s]*ASSOCIATES|(AND)?[\\s\\&]*COMPANY|[\\.\\s\\&]*CO[\\.]?|[\\s]*ACCT|[\\s\\&]*LLP[\\.]?|[\\s\\&]*LLC[\\.]?)$';
+lastEndsWith_expression := '([\\s]*DDS[\\.]?)$';
+contains_expression := '(ACCOUNT|BUSINESS|\\&)';
 
 
 working_layout format_out(ret le, indata ri) := TRANSFORM
@@ -141,12 +145,21 @@ working_layout format_out(ret le, indata ri) := TRANSFORM
 	
 	f := if(tribCode in ['pi04','pi60'], 9, 2);
 	
-	
+	isFirstExpressionFound := if(tribCode = 'pi02', if(regexfind(onlyContains_express + '|' + contains_expression + '|' + endsWith_expression, TRIM(ri.first), NOCASE), TRUE, FALSE), FALSE);
+	isLastExpressionFound  := if(tribCode = 'pi02', if(regexfind(onlyContains_express + '|' + contains_expression + '|' + endsWith_expression + '|' + lastEndsWith_expression + '|' + endingInc_expression, TRIM(ri.last), NOCASE), TRUE, FALSE), FALSE);
 	isPoBoxExpressionFound := if(tribCode = 'pi02', if(regexfind(poAddress_expression, TRIM(ri.addr), NOCASE), TRUE, FALSE), FALSE);	
 	
 	
-	self.firstcount := if(ri.first <> '' and tribCode in ['pi01','pi02','pi04','pi05','pi07','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'], flattenCount(le.combo_firstcount,f,1), '');
-	self.lastcount := if(ri.last <> '' and tribCode in ['pi01','pi02','pi04','pi05','pi07','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'], flattenCount(le.combo_lastcount,f,1), '');
+	self.firstcount := if(ri.first <> '' and tribCode in ['pi01','pi02','pi04','pi05','pi07','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'], 
+																		map(tribCode = 'pi02' AND isFirstExpressionFound => '0',
+																				flattenCount(le.combo_firstcount,f,1)), 
+																		'');
+																			
+	self.lastcount := if(ri.last <> '' and tribCode in ['pi01','pi02','pi04','pi05','pi07','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'],
+																		map(tribCode = 'pi02' AND isLastExpressionFound => '0',
+																				flattenCount(le.combo_lastcount,f,1)),
+																		'');
+																		
 	self.formerlastcount := if(ri.cmpy <> '' and tribCode in ['pi04','pi05','pi07','allv','pi60','hdx1','flfn'], flattenCount(le.combo_cmpycount,f,1), '');
 	self.addrcount := if(ri.addr <> '' and tribCode in ['pi01','pi02','pi04','pi05','pi07','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'], 
 																	map(tribCode = 'pi02' AND isPoBoxExpressionFound => '0',
@@ -174,8 +187,16 @@ working_layout format_out(ret le, indata ri) := TRANSFORM
 							(string)((integer)self.firstcount+(integer)self.lastcount+(integer)self.addrcount+(integer)self.hphonecount+(integer)self.wphonecount+
 								    (integer)self.socscount+(integer)self.dobcount), '');
 	
-	self.verfirst := if(tribCode in ['pi01','pi02','pi04','pi05','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'], le.combo_first, '');
-	self.verlast := if(tribCode in ['pi01','pi02','pi04','pi05','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'], le.combo_last, '');
+	self.verfirst := if(tribCode in ['pi01','pi02','pi04','pi05','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'],
+														map(tribCode = 'pi02' AND isFirstExpressionFound => '',
+																le.combo_first),
+														'');
+
+	self.verlast := if(tribCode in ['pi01','pi02','pi04','pi05','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'],
+														map(tribCode = 'pi02' AND isLastExpressionFound => '',
+																le.combo_last),
+														'');
+														
 	self.vercmpy := if(tribCode in ['pi01','pi02','pi04','pi05','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'], le.combo_cmpy, '');
 	self.veraddr := if(tribCode in ['pi01','pi02','pi04','pi05','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'],
 														map(tribCode = 'pi02' AND isPoBoxExpressionFound => '',
@@ -204,10 +225,16 @@ working_layout format_out(ret le, indata ri) := TRANSFORM
 					'');
 	self.verdob := if(tribCode in ['pi01','pi02','pi04','pi05','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'], le.combo_dob, '');
 	
-	self.firstscore := if(ri.first <> '' and tribCode in ['pi01','pi02','pi04','pi05','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'], 
-																									if(le.combo_firstscore = 255, '0', (string)le.combo_firstscore), '');
-	self.lastscore := if(ri.last <> '' and tribCode in ['pi01','pi02','pi04','pi05','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'], 
-																									if(le.combo_lastscore = 255, '0', (string)le.combo_lastscore), '');
+	self.firstscore := if(ri.first <> '' and tribCode in ['pi01','pi02','pi04','pi05','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'],
+															map(tribCode = 'pi02' AND isFirstExpressionFound => '0',
+																	if(le.combo_firstscore = 255, '0', (string)le.combo_firstscore)),
+															'');
+																																																												
+	self.lastscore := if(ri.last <> '' and tribCode in ['pi01','pi02','pi04','pi05','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'],
+															map(tribCode = 'pi02' AND isLastExpressionFound => '0',
+																	if(le.combo_lastscore = 255, '0', (string)le.combo_lastscore)),
+															'');
+															
 	self.cmpyscore := if(ri.cmpy <> '' and tribCode in ['pi01','pi02','pi04','pi05','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'], 
 																									if(le.combo_cmpyscore = 255, '0', (string)le.combo_cmpyscore), '');
 	self.addrscore := if(ri.addr <> '' and tribCode in ['pi01','pi02','pi04','pi05','pi09','pi14','allv','pi60','hdx1','flfn','bnk2','bnk3'],

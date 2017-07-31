@@ -1,4 +1,4 @@
-import risk_indicators, riskprocessing, models;
+﻿import risk_indicators, riskprocessing, models;
 
 EXPORT get_attributes_LnJ(grouped DATASET(RiskView.Layouts.shell_NoScore) clam,
 			 									boolean isPrescreen)
@@ -42,9 +42,11 @@ riskview.layouts.attributes_internal_layout_noscore map_attributes(pre_clam le) 
 	self.LnJJudgmentCount              := attr.LnJJudgmentCount             ;
 	self.LnJJudgmentTimeNewest         := attr.LnJJudgmentTimeNewest        ;
 	self.LnJJudgmentDollarTotal        := attr.LnJJudgmentDollarTotal       ;
+	self.ConfirmationSubjectFound	     := attr.ConfirmationSubjectFound     ;
+	
 	self.LnJliens	:= le.LnJ_datasets.LnJLiens;
 	self.LnJJudgments	:= le.LnJ_datasets.LnJJudgments;
-	
+
 	self := [];
 end;
 with_attributes_lnj := project(pre_clam, map_attributes(left));
@@ -87,8 +89,11 @@ with_attributes_lnj_noScore := join(clam, with_attributes_lnj,
 		self.LnJliens	:= if(no_score, dataset([], Risk_Indicators.Layouts_Derog_Info.Liens), 
 			project(right.LnJLiens, transform(Risk_Indicators.Layouts_Derog_Info.liens, self := left)));
 		self.LnJJudgments	:= if(no_score, dataset([], Risk_Indicators.Layouts_Derog_Info.Judgments), 
-		project(right.LnJJudgments, transform(Risk_Indicators.Layouts_Derog_Info.Judgments, self := left)));
-		self := [];//non Juli attributes
+			project(right.LnJJudgments, transform(Risk_Indicators.Layouts_Derog_Info.Judgments, self := left)));
+
+		self.ConfirmationSubjectFound	     := right.ConfirmationSubjectFound     ;
+
+	self := [];//non Juli attributes
 ));
 
 return with_attributes_lnj_noScore;

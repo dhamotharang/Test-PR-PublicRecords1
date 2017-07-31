@@ -1,4 +1,4 @@
-export Mac_Update_Base (file_in, incr_update = true, file_out) := macro
+﻿export Mac_Update_Base (file_in, incr_update = true, file_out) := macro
 import ExperianCred;
 #uniquename(exp_phone_base)
 %exp_phone_base% := Experian_Phones.Files.Base;
@@ -8,7 +8,7 @@ import ExperianCred;
 %exp_phone_layout% := recordof(%exp_phone_base%);
 
 #uniquename(curr_plus_prev)
-%curr_plus_prev% := if(FileServices.GetSuperFileSubCount(Filenames.Base) = 0,
+%curr_plus_prev% := if(nothor(FileServices.GetSuperFileSubCount(Filenames.Base) = 0),
 									 file_in,
 									 if(~incr_update,
 									 file_in + project(%exp_phone_base%, transform(Experian_Phones.Layouts.base, self.is_current := false, self := left)),									
@@ -23,6 +23,7 @@ import ExperianCred;
 												local)));
 //append did from experiancred
 #uniquename(t_append)
+
 %exp_phone_layout% %t_append% (%curr_plus_prev% le,  %expcred_base% ri) := transform
 self.did := ri.did,
 self.did_score := ri.did_score_field;
@@ -92,5 +93,5 @@ end;
 					rec_type,
   				local);
 
-file_out := %Experian_Phones_base%;
+file_out := %Experian_Phones_base%:INDEPENDENT;
 endmacro;

@@ -1,4 +1,4 @@
-
+﻿
 // NOTE1: To assist in finding things, this attribute has been re-arranged to put things
 // in alphabetic product name order.  However the BR & AR modules refer to other modules,
 // so they have to be at the bottom.
@@ -1219,7 +1219,7 @@ EXPORT Constants := MODULE
 	EXPORT PersonContext := MODULE
 	   export unsigned2 CD_CONTENT_MAX_SIZE := 3000;
 	   export unsigned2 MAX_RECORDS := 10000;
-		 export unsigned2 MAX_KEYS := 100;
+		 export unsigned2 MAX_KEYS := 300;
 	END;
 
   // phones feedback (PHONESFEEDBACK name can't be used)
@@ -1602,6 +1602,11 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MaxRespRecords := 5; 
 		EXPORT UNSIGNED2 MaxRelatives := 10;
 	END;
+	
+	EXPORT TISTA := MODULE
+		export unsigned2 MAX_WARNINGS := 20;
+		export unsigned2 MAX_ADDRESSES := 5;
+	end;
 
 	// TopBusiness, AKA BIP/Business Integration Project 
 	EXPORT TOPBUSINESS := module

@@ -1,4 +1,4 @@
-//RiskView.Search_Service
+﻿//RiskView.Search_Service
 /*--SOAP--
 <message name="RiskView Search_Service">
 	<part name="RiskView2Request" type="tns:XmlDataSet" cols="110" rows="75"/>
@@ -1036,14 +1036,17 @@ MLA_royalties := IF(TestDataEnabled, Royalty.RoyaltyMLA.GetNoRoyalties(), Royalt
 
 OUTPUT(MLA_royalties, NAMED('RoyaltySet'));
 
-intermediateLog := DATASET([], Risk_Reporting.Layouts.LOG_Boca_Shell) : STORED('Intermediate_Log');
+// ****************************** temporarily turn off intermediate logging in Riskview to see how much latency improves ****************************
+
+// intermediateLog := DATASET([], Risk_Reporting.Layouts.LOG_Boca_Shell) : STORED('Intermediate_Log');
 
 // Note: All intermediate logs must have the following name schema:
 // Starts with 'LOG_' (Upper case is important!!)
 // Middle part is the database name, in this case: 'log__mbs__fcra'
 // Must end with '_intermediate__log'
 
-OUTPUT( intermediateLog, NAMED('LOG_log__mbs__fcra_intermediate__log'));
+// OUTPUT( intermediateLog, NAMED('LOG_log__mbs__fcra_intermediate__log'));
+// ****************************** temporarily turn off intermediate logging in Riskview to see how much latency improves ****************************
 
 //Log to Deltabase
 Deltabase_Logging_prep := project(riskview_xml, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,

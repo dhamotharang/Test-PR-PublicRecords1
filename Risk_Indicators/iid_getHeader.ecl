@@ -1,4 +1,4 @@
-import risk_indicators, doxie, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address;
+﻿import risk_indicators, doxie, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address;
 
 export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
 							boolean isFCRA=false, boolean ln_branded, 
@@ -766,15 +766,10 @@ layout_working getCorrectCorrections(finalCorr le, finalCorr ri) := transform
 	self := le;	// keep the remaining left fields
 end;
  
-finalCorr2_roxie := rollup (sort(finalCorr(isCorrected),	seq, h.persistent_record_id,-h.Fname,-h.Mname,-h.Lname,-h.Name_Suffix,-h.Prim_Range,-h.Predir,-h.Prim_Name,-h.Suffix,-h.Postdir,-h.Unit_Desig,-h.Sec_Range,-h.City_Name,
+finalCorr2 := rollup (sort(finalCorr(isCorrected),	seq, h.persistent_record_id,-h.Fname,-h.Mname,-h.Lname,-h.Name_Suffix,-h.Prim_Range,-h.Predir,-h.Prim_Name,-h.Suffix,-h.Postdir,-h.Unit_Desig,-h.Sec_Range,-h.City_Name,
 																			-h.St,-h.Zip,-h.Zip4,-h.SSN,-h.DOB,
 																			-addr_flags.DwellType,-addr_flags.Valid,-addr_flags.PrisonAddr,-addr_flags.HighRisk,-addr_flags.CorpMil,-addr_flags.DoNotDeliver,
-																			-addr_flags.DeliveryStatus,-addr_flags.AddressType,-addr_flags.DropIndicator), left.h.persistent_record_id=right.h.persistent_record_id and left.seq=right.seq, getCorrectCorrections(left,right));
-finalCorr2_thor := rollup (sort(finalCorr(isCorrected),	seq, h.persistent_record_id,-h.Fname,-h.Mname,-h.Lname,-h.Name_Suffix,-h.Prim_Range,-h.Predir,-h.Prim_Name,-h.Suffix,-h.Postdir,-h.Unit_Desig,-h.Sec_Range,-h.City_Name,
-																			-h.St,-h.Zip,-h.Zip4,-h.SSN,-h.DOB,
-																			-addr_flags.DwellType,-addr_flags.Valid,-addr_flags.PrisonAddr,-addr_flags.HighRisk,-addr_flags.CorpMil,-addr_flags.DoNotDeliver,
-																			-addr_flags.DeliveryStatus,-addr_flags.AddressType,-addr_flags.DropIndicator,came_from_fastheader, h.RID), left.h.persistent_record_id=right.h.persistent_record_id and left.seq=right.seq, getCorrectCorrections(left,right));									
-finalCorr2 := if(onThor, finalCorr2_thor, finalCorr2_roxie);
+																			-addr_flags.DeliveryStatus,-addr_flags.AddressType,-addr_flags.DropIndicator,came_from_fastheader, h.RID), left.h.persistent_record_id=right.h.persistent_record_id and left.seq=right.seq, getCorrectCorrections(left,right));
 
 // need to add back the corrOnly records
 header_recs := PROJECT(real_header, TRANSFORM(layout_working, self := left, self := [])) + finalCorr2 + corrOnly;

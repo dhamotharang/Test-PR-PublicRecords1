@@ -1,4 +1,4 @@
-/*2014-01-15T20:58:21Z (Todd  Steil_Prod)
+﻿/*2014-01-15T20:58:21Z (Todd  Steil_Prod)
 updates for CIID enhancements per bug 122860
 */
 import risk_indicators, riskwise, ut, NID;
@@ -144,7 +144,7 @@ eqfsphonerecs_history_roxie := join(somedata, chrono_phones,
 						  left.chronozip=right.z5 and left.chronoprim_range=right.prim_range and left.chronosec_range=right.sec_range,
 						  RiskWise.max_atmost
 					  ),
-					  keep(100));
+					  keep(300));
 						
 						
 eqfsphonerecs_history_thor_pre := join(distribute(somedata(chronoprim_name<> '' AND chronozip<>''), hash64(chronoprim_name,chronoprim_range,chronozip)),
@@ -165,7 +165,7 @@ eqfsphonerecs_history_thor_pre := join(distribute(somedata(chronoprim_name<> '' 
 eqfsphonerecs_history_thor := group(sort(eqfsphonerecs_history_thor_pre + 
 									project(somedata(chronoprim_name= '' OR chronozip=''), transform(recordof(left), self.chronophone_namematch:=255,self:=left)), seq, did, LOCAL), seq, did,LOCAL);
 
-eqfsphonerecs_history := if(onThor, sort(eqfsphonerecs_history_thor, seq, did, -chronophone, record), eqfsphonerecs_history_roxie);
+eqfsphonerecs_history :=  sort(if(onThor,eqfsphonerecs_history_thor,eqfsphonerecs_history_roxie), seq, did, -chronophone, record);
 
 risk_indicators.layout_output rollphone1(risk_indicators.layout_output le, risk_indicators.layout_output ri) := TRANSFORM
 	take_left1 := iid_constants.tscore(le.chronophone_namematch) >= iid_constants.tscore(ri.chronophone_namematch);						// only takes phones that match last and address
@@ -195,7 +195,7 @@ eqfsphonerecs2_history_roxie := join(eqfsphonerecs_rolled,chrono_phones,
 						  left.chronoprim_name2=right.prim_name and left.chronostate2=right.st and 
 						  left.chronozip2=right.z5 and left.chronoprim_range2=right.prim_range and left.chronosec_range2=right.sec_range,
 						  RiskWise.max_atmost
-					), keep(100));
+					), keep(300));
 							 
 eqfsphonerecs2_history_thor_pre := join(distribute(eqfsphonerecs_rolled(chronoprim_name2<> '' AND chronozip2<>''), hash64(chronoprim_name2,chronoprim_range2,chronozip2)),
 								distribute(chrono_phones, hash64(prim_name,prim_range,z5)),
@@ -214,7 +214,7 @@ eqfsphonerecs2_history_thor_pre := join(distribute(eqfsphonerecs_rolled(chronopr
 eqfsphonerecs2_history_thor := group(sort(eqfsphonerecs2_history_thor_pre + 
 						project(eqfsphonerecs_rolled(chronoprim_name2= '' OR chronozip2=''),transform(recordof(left), self.chronophone2_namematch:=255,self:=left)), seq, did, LOCAL), seq, did,LOCAL);
 
-eqfsphonerecs2_history := if(onThor, sort(eqfsphonerecs2_history_thor, seq, did, -chronophone2, record), eqfsphonerecs2_history_roxie);
+eqfsphonerecs2_history := sort(if(onThor, eqfsphonerecs2_history_thor, eqfsphonerecs2_history_roxie), seq, did, -chronophone2, record);
 
 risk_indicators.layout_output rollphone2(risk_indicators.layout_output le, risk_indicators.layout_output ri) := TRANSFORM
 	take_left2 := iid_constants.tscore(le.chronophone2_namematch) >= iid_constants.tscore(ri.chronophone2_namematch);
@@ -243,7 +243,7 @@ eqfsphonerecs3_history_roxie := join(eqfsphonerecs2_rolled, chrono_phones,
 						   left.chronoprim_name3=right.prim_name and left.chronostate3=right.st and 
 						   left.chronozip3=right.z5 and left.chronoprim_range3=right.prim_range and left.chronosec_range3=right.sec_range,
 						   RiskWise.max_atmost),
-					   keep(100));
+					   keep(300));
 
 eqfsphonerecs3_history_thor_pre := join(distribute(eqfsphonerecs2_rolled(chronoprim_name3<> '' AND chronozip3<>''), hash64(chronoprim_name3, chronoprim_range3,chronozip3)), 
 								distribute(chrono_phones, hash64(prim_name,prim_range,z5)),
@@ -261,7 +261,7 @@ eqfsphonerecs3_history_thor_pre := join(distribute(eqfsphonerecs2_rolled(chronop
 eqfsphonerecs3_history_thor := group(sort(eqfsphonerecs3_history_thor_pre + 
 					project(eqfsphonerecs2_rolled(chronoprim_name3='' OR chronozip3=''),transform(recordof(left), self.chronophone3_namematch:=255,self:=left)), seq, did, LOCAL), seq, did,LOCAL);
 						 
-eqfsphonerecs3_history := if(onThor, sort(eqfsphonerecs3_history_thor, seq, did, -chronophone3, record), eqfsphonerecs3_history_roxie);						 
+eqfsphonerecs3_history := sort(if(onThor, eqfsphonerecs3_history_thor,eqfsphonerecs3_history_roxie), seq, did, -chronophone3, record);						 
 	
 risk_indicators.layout_output rollphone3(risk_indicators.layout_output le, risk_indicators.layout_output ri) := TRANSFORM
 	take_left3 := iid_constants.tscore(le.chronophone3_namematch) >= iid_constants.tscore(ri.chronophone3_namematch);							

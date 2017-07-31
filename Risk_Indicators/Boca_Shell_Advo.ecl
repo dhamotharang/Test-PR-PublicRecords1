@@ -1,4 +1,4 @@
-import advo, riskwise, ut, fcra;
+﻿import advo, riskwise, ut, fcra;
 
 export Boca_Shell_Advo(GROUPED DATASET(layout_bocashell_neutral) clam_pre_ADVO, 
 											boolean isFCRA, string50 DataRestrictionMask, boolean isPreScreen,
@@ -256,15 +256,10 @@ advo_raw_data_thor := join(distribute(normed_addresses(z5!='' and prim_range!=''
 						left.sec_range = right.sec_range,riskwise.max_atmost), LOCAL);	
 
 advo_raw_data := if(onThor, group(sort(advo_raw_data_thor, seq),seq), advo_raw_data_roxie);
-
-advo_raw_deduped_roxie :=  dedup(sort(advo_raw_data, seq, zip,prim_range,
-															prim_name, addr_suffix, predir, postdir, sec_range, -date_first_seen), 
-															seq, zip, prim_range, prim_name, addr_suffix, predir, postdir, sec_range	);
-advo_raw_deduped_thor :=  dedup(sort(advo_raw_data, seq, zip,prim_range,
+															
+advo_raw_deduped := dedup(sort(advo_raw_data, seq, zip,prim_range,
 															prim_name, addr_suffix, predir, postdir, sec_range, -date_first_seen, record), 
 															seq, zip, prim_range, prim_name, addr_suffix, predir, postdir, sec_range	);
-															
-advo_raw_deduped := if(onThor, advo_raw_deduped_thor, advo_raw_deduped_roxie);
 
 advo_raw_override := project(advo_raw_deduped, transform(FCRA.Layout_Override_ADVO, self := left));
 

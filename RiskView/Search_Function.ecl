@@ -1,4 +1,4 @@
-import gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA;
+﻿import gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA;
 
 EXPORT Search_Function(
 	dataset(RiskView.Layouts.layout_riskview_input) riskview_input, 
@@ -293,6 +293,7 @@ transform(riskview.layouts.layout_riskview5_search_results,
 	self.LnJJudgmentDollarTotal        := right.LnJJudgmentDollarTotal       ;
 	self.lnjliens					   					 := right.LnJLiens;
 	self.lnjJudgments				   				 := right.LnJJudgments;
+	self.ConfirmationSubjectFound			 := if(IncludeLnJ, right.ConfirmationSubjectFound, left.ConfirmationSubjectFound);
 	self := left,
 	self := []), LEFT OUTER, KEEP(1), ATMOST(100));
 
@@ -900,6 +901,9 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 							dataset([], Risk_Indicators.Layouts_Derog_Info.Liens), le.LnJliens       ); 
 	self.LnJJudgments 								 := if(suppress_condition, 
 							dataset([], Risk_Indicators.Layouts_Derog_Info.Judgments), le.LnJJudgments ); 
+
+	self.ConfirmationSubjectFound	 := if(isLnJRunningAlone or valid_attributes_requested = false, '', le.ConfirmationSubjectFound	);
+
 	self := le;
 end;
 
@@ -954,10 +958,10 @@ riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, risk
  /* *************************************
   *   Boca Shell Logging Functionality  *
   ***************************************/
-	intermediate_Log := IF(caller=riskview.constants.batch, 
-		DATASET([], Risk_Reporting.Layouts.LOG_Boca_Shell), 
-		Risk_Reporting.To_LOG_Boca_Shell(clam, Risk_Reporting.ProductID.RiskView__Search_Service, bsVersion) );
-	#stored('Intermediate_Log', intermediate_log);
+	// intermediate_Log := IF(caller=riskview.constants.batch, 
+		// DATASET([], Risk_Reporting.Layouts.LOG_Boca_Shell), 
+		// Risk_Reporting.To_LOG_Boca_Shell(clam, Risk_Reporting.ProductID.RiskView__Search_Service, bsVersion) );
+	// #stored('Intermediate_Log', intermediate_log);
  /* ************ End Logging ************/
 
 
@@ -965,6 +969,7 @@ riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, risk
 // 					for debugging
 // ===================================
 
+// output(riskview5_search_results, named('riskview5_final_results'));
 // OUTPUT(auto_model, NAMED('auto_model'));
 // OUTPUT(bankcard_model, NAMED('bankcard_model'));
 // OUTPUT(short_term_lending_model, NAMED('short_term_lending_model'));
