@@ -1,4 +1,4 @@
-import AutoKeyI, AutoStandardI;
+﻿import AutoKeyI, AutoStandardI, iesp;
 
 export IParam := module
 	
@@ -8,14 +8,15 @@ export IParam := module
 		export boolean isdeepDive 			:= false;
 	end;
 
-	
 	export search := interface(autokey_search)
 		export unsigned2 MAX_DEEP_DIDS  := 100;
 		export unsigned2 MAX_DEEP_BDIDS := 100;
 		
 		export string ReportNumber  		:= '';
-	  export string Jurisdiction      := '';
-	  export string JurisdictionState      := '';
+		export Agencies := DATASET([], iesp.ecrash.t_ECrashSearchAgency) ;
+		
+		export string Jurisdiction      := '';
+		export string JurisdictionState      := '';
 		export string AccidentLocationStreet 	:= '';
 		export string AccidentLocationCrossStreet 	:= '';
 		export string DateOfLoss 				:= '';

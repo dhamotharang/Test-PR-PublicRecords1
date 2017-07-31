@@ -1,3 +1,6 @@
+﻿/*2016-07-11T18:11:51Z (Dmitriy Lazarenko)
+adding a comment on why we have limit of 7000 here
+*/
 IMPORT FLAccidents_Ecrash, ut, doxie,lib_stringlib,std, iesp;
 
 EXPORT Raw(IParam.searchrecords in_mod) := MODULE
@@ -9,7 +12,7 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 		shared reportLinkKey := FLAccidents_Ecrash.Key_eCrashv2_ReportLinkId;
 		shared lastName_key := FLAccidents_Ecrash.Key_EcrashV2_LastName;
 		
-		shared hasJurisdictionInfo := in_mod.JurisdictionState <> '' and in_mod.Jurisdiction <> '';
+		shared boolean hasJurisdictionInfo    := COUNT(in_mod.agencies(JurisdictionState <> '' AND Jurisdiction <> '')) > 0;
 		
 		shared boolean containsReportNumber (string src, string report_in) := (report_in = '') or (StringLib.StringFind (src, report_in, 1) >0); //Input report number is already 'cleaned'
 		
@@ -17,24 +20,47 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 				string8 daterange;
 		end;
 		
+		shared tmp_dtrange_rec_withAgencies := record
+				string8 daterange;
+				string JurisdictionState;
+				string Jurisdiction;
+				string AgencyId;
+				string AgencyORI;
+				boolean PrimaryAgency;
+		end;
+
 		//BAP
 		EXPORT 	by_auto_recs() := FUNCTION
-				RETURN autokey_ids(project(in_mod,IParam.autokey_search));
+				auto_ds := project(in_mod,IParam.autokey_search);
+				
+				autokey_ds := autokey_ids(auto_ds);
+				
+				autokey_with_alias := JOIN(autokey_ds, in_mod.agencies, TRUE, TRANSFORM(Layouts.search,
+																		SELF.JurisdictionState := right.JurisdictionState;
+																		SELF.Jurisdiction := right.Jurisdiction;
+																		SELF.PrimaryAgency := right.PrimaryAgency;
+																		SELF.AgencyORI := right.AgencyORI;
+																		SELF := LEFT;), ALL);
+																	
+				RETURN autokey_with_alias;
 		END;
+	
 		EXPORT by_rpt_num() := FUNCTION				
-				Layouts.search tmp_xform():=TRANSFORM
-					self.reportnumber := in_mod.reportnumber;
-					self.isdeepdive:=false;
-				END;
-				RETURN DATASET([tmp_xform()]);
+							
+				agency_search_ds := PROJECT(in_mod.agencies, TRANSFORM(Layouts.search, 
+																												SELF.reportnumber := in_mod.reportnumber;
+																												SELF.isdeepdive 	:= false;																												
+																												SELF := LEFT;));				
+				
+				RETURN agency_search_ds;
 		END;
-		
+
 		EXPORT byReportNumber(dataset(Layouts.search) ids_raw_in) := FUNCTION
 							
 				rpn_recs_res1:= join(ids_raw_in,accnbr_key,
 													keyed(right.l_accnbr=left.reportnumber) and
 													keyed(right.report_code in constants.ecrash_src_codes) and
-													if(in_mod.RequestHashKey,(right.agency_ori = in_mod.AgencyORI and right.image_hash<>''),right.jurisdiction<>''),
+													if(in_mod.RequestHashKey,(right.agency_ori = left.AgencyORI and right.image_hash<>''),right.jurisdiction<>''),
 													transform(recordof(accnbr_key),
 													self := right),limit(constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
 				// TODO: a hack to return some meaningful response in a case of (incorrectly created) test data;
@@ -43,17 +69,16 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 				rpn_recs_res_w_jur:= join(ids_raw_in,accnbr_key,
 													keyed(right.l_accnbr=left.reportnumber) and
 													keyed(right.report_code in constants.ecrash_src_codes) and
-													keyed(right.jurisdiction_state = in_mod.jurisdictionState) and
-													keyed(right.jurisdiction = in_mod.jurisdiction) and
-													if(in_mod.RequestHashKey,(right.agency_ori = in_mod.AgencyORI and right.image_hash<>''), true),
+													keyed(right.jurisdiction_state = left.jurisdictionState) and
+													keyed(right.jurisdiction = left.jurisdiction) and
+													if(in_mod.RequestHashKey,(right.agency_ori = left.AgencyORI and right.image_hash<>''), true),
 													transform(recordof(accnbr_key),
 													self := right),limit(constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
 				
 				rpn_recs_res := if(hasJurisdictionInfo,
 													 rpn_recs_res_w_jur,
-													 rpn_recs_res1);
+													 rpn_recs_res1);	
 
-        										 
 				RETURN rpn_recs_res;
 		END;
 		
@@ -61,45 +86,63 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 				boolean isPartial := length(in_mod.reportnumber) = 4;
 				partial_report_number := if(isPartial, in_mod.reportnumber, in_mod.reportnumber[1..4]);
 				
-				Layouts.search tmp_xform_partial():=transform
-					self.reportnumber := partial_report_number;
-					self.isdeepdive:=false;
-				end;
-				by_partial_rptNum := dataset([tmp_xform_partial()]);
-		
-				Layouts.search xformToAccnbr(partial_accnbr_key R):=transform
+				by_partial_rptNum := PROJECT(in_mod.agencies, TRANSFORM(Layouts.search, 
+																												SELF.reportnumber := partial_report_number;
+																												SELF.isdeepdive 	:= false;																												
+																												SELF := LEFT;));
+				
+				
+			Layouts.search xformToAccnbr(by_partial_rptNum L, partial_accnbr_key R):=transform
 					self.reportnumber := R.l_accnbr;
 					self.isdeepdive:=false;
+					self.jurisdiction := L.jurisdiction;
+					self.jurisdictionstate := L.JurisdictionState;
+					self.primaryagency := L.primaryagency;
+					self := R;
+					self := [];
 				end;
-		//BAP - kevin says needs cleanup, but not yet.
+				
+					//BAP - kevin says needs cleanup, but not yet.
 				partial_rpn_recs_res1:= join(by_partial_rptNum,partial_accnbr_key,
 													keyed(right.partial_report_nbr=left.reportnumber) and
 													keyed(right.report_code in constants.ecrash_src_codes) and 
 													keyed (right.jurisdiction != '') and
 													wild (right.jurisdiction_state) and
 													wild (right.accident_date) and
-													(Constants.valid_match(right.jurisdiction_state,in_mod.JurisdictionState)) and 
-													(Constants.valid_match(stringlib.stringtouppercase(right.jurisdiction),in_mod.jurisdiction)),
-													xformToAccnbr(right),limit(constants.MAX_PARTIAL_NUMBER, fail(203, doxie.ErrorCodes(203))));
+													(Constants.valid_match(right.jurisdiction_state,left.JurisdictionState)) and 
+													(Constants.valid_match(STD.Str.ToUpperCase(right.jurisdiction),left.jurisdiction)),
+													xformToAccnbr(left, right),limit(constants.MAX_PARTIAL_NUMBER, fail(203, doxie.ErrorCodes(203))));
 										
 				partial_rpn_recs_res_w_jur:= join(by_partial_rptNum,partial_accnbr_key,
 													keyed(right.partial_report_nbr=left.reportnumber) and
 													keyed(right.report_code in constants.ecrash_src_codes) and
-													keyed(right.jurisdiction_state = in_mod.jurisdictionState) and
-													keyed(right.jurisdiction = in_mod.jurisdiction),
-													xformToAccnbr(right),limit(constants.MAX_PARTIAL_NUMBER, fail(203, doxie.ErrorCodes(203))));
+													keyed(right.jurisdiction_state = left.jurisdictionState) and
+													keyed(right.jurisdiction = left.jurisdiction),
+													xformToAccnbr(left, right),limit(constants.MAX_PARTIAL_NUMBER, fail(203, doxie.ErrorCodes(203))));
 													
 				partial_recs := if(hasJurisdictionInfo, partial_rpn_recs_res_w_jur, partial_rpn_recs_res1);
+
+				ds_date_range_search_ds := JOIN(in_mod.agencies, ds_date_range, TRUE, TRANSFORM(tmp_dtrange_rec_withAgencies, 
+																					SELF.daterange := RIGHT.daterange;
+																					SELF := LEFT;), ALL);
 				
-				partial_rpn_recs_w_fuzzydol:=	join(ds_date_range, partial_accnbr_key,
+				Layouts.search xformToAccnbrWithDOL(ds_date_range_search_ds L, partial_accnbr_key R):=transform
+					self.reportnumber := R.l_accnbr;
+					self.isdeepdive:=false;
+					self.jurisdiction := L.jurisdiction;
+					self.jurisdictionstate := L.JurisdictionState;
+					self := L;
+				end;
+				
+				partial_rpn_recs_w_fuzzydol:=	join(ds_date_range_search_ds, partial_accnbr_key,
 																				keyed (right.partial_report_nbr=partial_report_number) and 
 																				keyed (right.report_code in constants.ecrash_src_codes) and 
 																				keyed (right.accident_date=left.daterange) and
 																				keyed (right.jurisdiction != '') and
 																				wild (right.jurisdiction_state) and
-																				(Constants.valid_match(right.jurisdiction_state,in_mod.JurisdictionState)) and 
-																				(Constants.valid_match(stringlib.stringtouppercase(right.jurisdiction),in_mod.jurisdiction)),
-																				xformToAccnbr(right),limit(Constants.MAX_ACCIDENTS_PER_DAY, fail(203, doxie.ErrorCodes(203))));
+																				(Constants.valid_match(right.jurisdiction_state,left.JurisdictionState)) and 
+																				(Constants.valid_match(STD.Str.ToUpperCase(right.jurisdiction),left.jurisdiction)),
+																				xformToAccnbrWithDOL(left, right),limit(Constants.MAX_ACCIDENTS_PER_DAY, fail(203, doxie.ErrorCodes(203))));
 																				
 				partial_rpn_recs_res := if(hasInputDOL, partial_rpn_recs_w_fuzzydol, partial_recs);
 				
@@ -107,35 +150,73 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 																			partial_rpn_recs_res,
 																			partial_rpn_recs_res(containsReportNumber(reportnumber, in_mod.reportnumber)));
 				
-				dup_partial_recs := dedup(sort(filter_partial_rpn_res, reportnumber), reportnumber);
+				dup_partial_recs := dedup(sort(filter_partial_rpn_res, reportnumber, JurisdictionState, jurisdiction, agencyid, agencyori, -primaryagency), reportnumber, JurisdictionState, jurisdiction, agencyid, agencyori, primaryagency);
 				//BAP above indexes have no payload so they use the byReportNumber to lookup payload
 				partial_rpn_res := byReportNumber(dup_partial_recs);
 				
 				RETURN partial_rpn_res;
 		END;
-			
-	EXPORT byDOL(string start_date, string end_date) := FUNCTION
+		
+		EXPORT byDOL(string start_date, string end_date) := FUNCTION
 		
 			// TODO: set limit for exact date of loss + filters match
+			// dol := in_mod.dateofloss;
+			// in_jurisdiction := STD.Str.ToUpperCase(in_mod.jurisdiction);
+			// in_jurisdiction_state := STD.Str.ToUpperCase(in_mod.JurisdictionState);
+			boolean ignore_state_search 						:= constants.no_state_search(in_mod);
+			boolean ignore_jurisdiction_search 			:= constants.no_jurisdiction_search(in_mod);
 			
-			in_jurisdiction := stringlib.stringtouppercase(in_mod.jurisdiction);
-			in_jurisdiction_state := stringlib.stringtouppercase(in_mod.JurisdictionState);
+      tmp_dol_rec := record
+				string8 dol;
+				string8 start_date;
+				string8 end_date;
+				string JurisdictionState;
+				string Jurisdiction;
+				string AgencyId;
+				string AgencyORI;
+				boolean primaryagency;
+		  end;
+		
+			dol_rec := RECORD
+			RECORDOF(dol_key);
+			boolean primaryagency;
+			end;
 			
-			dol_recs:=	dol_key(keyed (accident_date=in_mod.dateofloss) and 
-													keyed (report_code in constants.ecrash_src_codes) and 
-													keyed (in_jurisdiction = '' or jurisdiction = in_jurisdiction) and
-													keyed (in_jurisdiction_state = '' or jurisdiction_state = in_jurisdiction_state));
-													
-																		
-			dol_fuzzy_recs := dol_key(keyed (accident_date between start_date and end_date) and 
-																 keyed (report_code in constants.ecrash_src_codes) and 
-																 keyed (in_jurisdiction = '' or jurisdiction = in_jurisdiction) and
-																 keyed (in_jurisdiction_state = '' or jurisdiction_state = in_jurisdiction_state));
-																 
+			dol_search_ds    := PROJECT(in_mod.agencies, transform(tmp_dol_rec, 
+																																				self.dol := in_mod.dateofloss;
+																																				self.start_date:=start_date;
+																																				self.end_date := end_date;
+																																				self := left;));
 			
-			dol_recs_temp := IF(EXISTS(dol_recs), dol_recs, dol_fuzzy_recs);
+			dol_rec xformToDolRec(dol_search_ds L, dol_key R):=transform
+					self.primaryagency := L.primaryagency;
+					self := R;
+			end;
+			// Limit 2k records for each agency(left record) and then sort by primary agency to get all the primary records
+			//If primary records exceed 2k limit then fail else take remaining to fill 2k from alias records
+			agency_dol_recs:=	JOIN(dol_search_ds, dol_key,  keyed (right.accident_date=left.dol) and 
+																								keyed (right.report_code in constants.ecrash_src_codes) and 
+																									keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
+																									keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState),
+																									xformToDolRec(left, right), KEEP(constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1));
 			
-			dol_fuzzy_recs_filtered :=	LIMIT(dol_recs_temp,2000,fail(203, doxie.ErrorCodes(203)));
+			agency_dol_recs_sorted := SORT(agency_dol_recs, -primaryagency, record);
+
+			dol_recs := IF(count(agency_dol_recs_sorted(primaryagency)) < (constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1), agency_dol_recs_sorted[1..constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY], fail(agency_dol_recs_sorted, 203, doxie.ErrorCodes(203))); 
+			
+			agency_dol_fuzzy_recs := JOIN(dol_search_ds, dol_key,  keyed (right.accident_date between left.start_date and left.end_date) and 
+																											  keyed (right.report_code in constants.ecrash_src_codes) and 
+																												keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
+																												keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState),
+																												xformToDolRec(left, right), KEEP(constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1));
+			
+			agency_dol_fuzzy_recs_sorted := SORT(agency_dol_fuzzy_recs, -primaryagency);
+			
+			dol_fuzzy_recs := IF(count(agency_dol_fuzzy_recs_sorted(primaryagency)) < (constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1), agency_dol_fuzzy_recs_sorted[1..constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY], fail(agency_dol_fuzzy_recs_sorted, 203, doxie.ErrorCodes(203))); 
+			
+			dol_fuzzy_recs_filtered := IF(EXISTS(dol_recs), dol_recs, dol_fuzzy_recs);
+			
+			// dol_fuzzy_recs_filtered :=	LIMIT(dol_recs_temp,2000,fail(203, doxie.ErrorCodes(203)));
 																
 			final_dol_fuzzy_recs := join(dol_fuzzy_recs_filtered,accnbr_key,
 																		keyed(right.l_accnbr=left.accident_nbr) and
@@ -149,24 +230,61 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 		END;
 		
 	EXPORT byLocation() := FUNCTION
-			CrossStreet := lib_stringlib.StringLib.StringToUpperCase(in_mod.AccidentLocationCrossStreet);
-			LocStreet := lib_stringlib.StringLib.StringToUpperCase(in_mod.AccidentLocationStreet);
+			CrossStreet := STD.Str.ToUpperCase(in_mod.AccidentLocationCrossStreet);
+			LocStreet := STD.Str.ToUpperCase(in_mod.AccidentLocationStreet);
 			start_date := in_mod.DolStartdate;
 			end_date := in_mod.DolEnddate;
 			DateOfLoss := in_mod.DateOfLoss;
-
-			loc_recs :=	location_key(keyed ((CrossStreet <> '' AND partial_accident_location[1..LENGTH(TRIM(CrossStreet))] = CrossStreet) OR
-				                              (LocStreet <> '' AND partial_accident_location[1..LENGTH(TRIM(LocStreet))] = LocStreet)) and
-															 keyed (in_mod.JurisdictionState = '' or jurisdiction_state=in_mod.JurisdictionState) and 
-							                 keyed (in_mod.jurisdiction = '' or jurisdiction=in_mod.jurisdiction) and
-															 (start_date = '' or (accident_date between start_date and end_date)) and
-															 (DateOfLoss = '' or accident_date = DateOfLoss)
-															 );
+			
+		 tmp_loc_rec := record
+				string CrossStreet;
+				string LocStreet;
+				string8 start_date;
+				string8 end_date;
+				string8 dol;
+				string JurisdictionState;
+				string Jurisdiction;
+				string AgencyId;
+				string AgencyORI;
+				boolean primaryagency;
+		  end;
+	
+			loc_rec := RECORD
+				RECORDOF(location_key);
+				boolean primaryagency;
+			end;
+			
+			loc_search_ds    := PROJECT(in_mod.agencies, transform(tmp_loc_rec, 
+																																				self.CrossStreet := STD.Str.ToUpperCase(in_mod.AccidentLocationCrossStreet);
+																																				self.LocStreet := STD.Str.ToUpperCase(in_mod.AccidentLocationStreet);
+																																				self.dol := in_mod.dateofloss;
+																																				self.start_date:=in_mod.DolStartdate;
+																																				self.end_date := in_mod.DolEnddate;
+																																				self := left;));
+			loc_rec xformToLocRec(loc_search_ds L, location_key R):=transform
+					self.primaryagency := L.primaryagency;
+					self := R;
+			end;
+			
+			// Limit 7k records for each agency(left record) and then sort by primary agency to get all the primary records
+			//If primary records exceed 7k limit then fail else take remaining to fill 7k from alias records
+			
+			loc_recs :=	JOIN(loc_search_ds, location_key, keyed ((left.CrossStreet <> '' AND right.partial_accident_location[1..LENGTH(TRIM(CrossStreet))] = left.CrossStreet) OR
+																														(left.LocStreet <> '' AND right.partial_accident_location[1..LENGTH(TRIM(LocStreet))] = left.LocStreet)) and
+																										  keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
+																									    keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState) and
+																									          (left.start_date = '' or (right.accident_date between left.start_date and left.end_date)) and
+																										        (left.dol = '' or right.accident_date = left.dol), 
+																														xformToLocRec(left, right), KEEP(constants.MAX_ACCIDENTS_PER_AGENCY_PER_LOCATION + 1));
 		 
 			//7k limit is used because on average if we have more then 7k records here then we run into a memory limit exhausted in recs_raw_dupe join in Records file
 			//which is something we need to look at.
-			filtered_loc_recs := Limit(loc_recs,7000,fail(203, doxie.ErrorCodes(203)));
+			// filtered_loc_recs := Limit(loc_recs,7000,fail(203, doxie.ErrorCodes(203)));
 			
+			loc_recs_sorted := SORT(loc_recs, -primaryagency, record);
+			//add 7000 to constants
+			filtered_loc_recs := IF(count(loc_recs_sorted(primaryagency)) < (constants.MAX_ACCIDENTS_PER_AGENCY_PER_LOCATION + 1), loc_recs_sorted[1..constants.MAX_ACCIDENTS_PER_AGENCY_PER_LOCATION], fail(loc_recs_sorted, 203, doxie.ErrorCodes(203))); 
+						
 			loc_recs_exact := join(filtered_loc_recs,accnbr_key,
 													keyed(right.l_accnbr=left.accident_nbr) and
 													keyed(right.report_code in constants.ecrash_src_codes) and
@@ -182,72 +300,129 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 		
 		EXPORT byFirstName() := FUNCTION
 															
-      firstName := lib_stringlib.StringLib.StringToUpperCase(in_mod.firstname);	
-			CrossStreet := lib_stringlib.StringLib.StringToUpperCase(in_mod.AccidentLocationCrossStreet);
-			LocStreet := lib_stringlib.StringLib.StringToUpperCase(in_mod.AccidentLocationStreet);
+      firstName := STD.Str.ToUpperCase(in_mod.firstname);	
+			CrossStreet := STD.Str.ToUpperCase(in_mod.AccidentLocationCrossStreet);
+			LocStreet := STD.Str.ToUpperCase(in_mod.AccidentLocationStreet);
 			start_date := in_mod.DolStartdate;
 			end_date := in_mod.DolEnddate;
-																						
-      fname_recs :=	LIMIT(
-				preferredName_key(keyed(fname = firstName) and
-					keyed(in_mod.JurisdictionState = '' or jurisdiction_state=in_mod.JurisdictionState) and
-					keyed(in_mod.jurisdiction ='' or jurisdiction=in_mod.jurisdiction) and
-					(CrossStreet = '' OR Constants.contains_match(accident_location,CrossStreet)) and
-					(LocStreet = '' OR Constants.contains_match(accident_location,LocStreet)) and
-					(start_date = '' or (accident_date between start_date and end_date))
-				),
-				constants.MAX_RAW_PERSON_COUNT,
-				FAIL(203, doxie.ErrorCodes(203))
-			);
-																			
-			filtered_name_recs := Limit(dedup(sort(fname_recs,accident_nbr,report_code,jurisdiction_state,jurisdiction),accident_nbr,report_code,jurisdiction_state,jurisdiction),2000,fail(203, doxie.ErrorCodes(203)));
+			
+			tmp_fname_rec := record
+				string firstName;	
+				string CrossStreet;
+				string LocStreet;
+				string8 start_date;
+				string8 end_date;
+				string JurisdictionState;
+				string Jurisdiction;
+				string AgencyId;
+				string AgencyORI;
+				boolean primaryagency;
+		  end;
+		
+			fname_rec := RECORD
+				RECORDOF(preferredName_key);
+				boolean primaryagency;
+			end;
+			
+			fname_search_ds    := PROJECT(in_mod.agencies, transform(tmp_fname_rec, 
+																																				self.firstName := STD.Str.ToUpperCase(in_mod.firstname);	
+																																				self.CrossStreet := STD.Str.ToUpperCase(in_mod.AccidentLocationCrossStreet);
+																																				self.LocStreet := STD.Str.ToUpperCase(in_mod.AccidentLocationStreet);
+																																				self.start_date:=in_mod.DolStartdate;
+																																				self.end_date := in_mod.DolEnddate;
+																																				self := left;));
+			fname_rec xformToFnameRec(fname_search_ds L, preferredName_key R):=transform
+					self.primaryagency := L.primaryagency;
+					self := R;
+			end;
+			
+      fname_recs :=	join(fname_search_ds, preferredName_key, 
+																		keyed(right.fname = left.firstName) and
+																		keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
+																		keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState) and
+																		(left.CrossStreet = '' OR Constants.contains_match(right.accident_location,left.CrossStreet)) and
+																		(left.LocStreet = '' OR Constants.contains_match(right.accident_location,left.LocStreet)) and
+																		(left.start_date = '' or (right.accident_date between left.start_date and left.end_date)), xformToFnameRec(left, right)
+																		, KEEP(constants.MAX_RAW_PERSON_COUNT + 1));
+			
+			fname_recs_sorted 	:= SORT(fname_recs, -primaryagency, record);
+			filtered_max_person_fname_recs := IF(count(fname_recs_sorted(primaryagency)) < (constants.MAX_RAW_PERSON_COUNT +1), fname_recs_sorted[1..constants.MAX_RAW_PERSON_COUNT], fail(fname_recs_sorted, 203, doxie.ErrorCodes(203))); 	
+			
+			filtered_fname_recs := Limit(dedup(sort(filtered_max_person_fname_recs,-primaryagency,accident_nbr,report_code,jurisdiction_state,jurisdiction),accident_nbr,report_code,jurisdiction_state,jurisdiction),2000,fail(203, doxie.ErrorCodes(203)));
 															 
-			first_name_recs_exact := join(filtered_name_recs,accnbr_key,
+			first_name_recs_exact := join(filtered_fname_recs,accnbr_key,
 																		keyed(right.l_accnbr=left.accident_nbr) and
 																		keyed(right.report_code in constants.ecrash_src_codes) and
 																		keyed(right.jurisdiction_state = left.jurisdiction_state) and
 																		keyed(right.jurisdiction = left.jurisdiction),
 																		transform(recordof(accnbr_key),
 																		self := right),limit(constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
-																		
-			//OUTPUT(filtered_name_recs, named('filtered_name_recs'));
-			
+
 			RETURN first_name_recs_exact;
 			
 		END;
 		
 		EXPORT byLastName() := FUNCTION
 															
-      lastname := lib_stringlib.StringLib.StringToUpperCase(TRIM(in_mod.lastname));	
-			CrossStreet := lib_stringlib.StringLib.StringToUpperCase(in_mod.AccidentLocationCrossStreet);
-			LocStreet := lib_stringlib.StringLib.StringToUpperCase(in_mod.AccidentLocationStreet);
+      lastname := STD.Str.ToUpperCase(TRIM(in_mod.lastname));	
+			CrossStreet := STD.Str.ToUpperCase(in_mod.AccidentLocationCrossStreet);
+			LocStreet := STD.Str.ToUpperCase(in_mod.AccidentLocationStreet);
 			start_date := in_mod.DolStartdate;
 			end_date := in_mod.DolEnddate;
-																						
-      lname_recs :=	LIMIT(
-				lastName_key(keyed(lname = lastname) and
-					keyed(in_mod.JurisdictionState = '' or jurisdiction_state=in_mod.JurisdictionState) and
-					keyed(in_mod.jurisdiction ='' or jurisdiction=in_mod.jurisdiction) and
-					(CrossStreet = '' OR Constants.contains_match(accident_location,CrossStreet)) and
-					(LocStreet = '' OR Constants.contains_match(accident_location,LocStreet)) and
-					(start_date = '' or (accident_date between start_date and end_date))
-				),
-				constants.MAX_RAW_PERSON_COUNT,
-				FAIL(203, doxie.ErrorCodes(203))	
-			);
 			
-      filtered_name_recs := Limit(dedup(sort(lname_recs,accident_nbr,report_code,jurisdiction_state,jurisdiction),accident_nbr,report_code,jurisdiction_state,jurisdiction),2000,fail(203, doxie.ErrorCodes(203)));
+			tmp_lname_rec := record
+				string lastname;	
+				string CrossStreet;
+				string LocStreet;
+				string8 start_date;
+				string8 end_date;
+				string JurisdictionState;
+				string Jurisdiction;
+				string AgencyId;
+				string AgencyORI;
+				boolean primaryagency;
+		  end;
+		
+			lname_rec := RECORD
+				RECORDOF(lastName_key);
+				boolean primaryagency;
+			end;
+			
+			lname_search_ds    := PROJECT(in_mod.agencies, transform(tmp_lname_rec, 
+																																				self.lastName := STD.Str.ToUpperCase(TRIM(in_mod.lastname));	
+																																				self.CrossStreet := STD.Str.ToUpperCase(in_mod.AccidentLocationCrossStreet);
+																																				self.LocStreet := STD.Str.ToUpperCase(in_mod.AccidentLocationStreet);
+																																				self.start_date:=in_mod.DolStartdate;
+																																				self.end_date := in_mod.DolEnddate;
+																																				self := left;));
+			
+			lname_rec xformToLnameRec(lname_search_ds L, lastName_key R):=transform
+					self.primaryagency := L.primaryagency;
+					self := R;
+			end;
+			
+      lname_recs :=	join(lname_search_ds, lastName_key, 
+																		keyed(right.lname = left.lastname) and
+																		keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
+																		keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState) and
+																		(left.CrossStreet = '' OR Constants.contains_match(right.accident_location,left.CrossStreet)) and
+																		(left.LocStreet = '' OR Constants.contains_match(right.accident_location,left.LocStreet)) and
+																		(left.start_date = '' or (right.accident_date between left.start_date and left.end_date)), xformToLnameRec(left, right)
+																		, KEEP(constants.MAX_RAW_PERSON_COUNT + 1));
+			
+			lname_recs_sorted 	:= SORT(lname_recs, -primaryagency, record);
+			filtered_max_person_lname_recs := IF(count(lname_recs_sorted(primaryagency)) < (constants.MAX_RAW_PERSON_COUNT + 1), lname_recs_sorted[1..constants.MAX_RAW_PERSON_COUNT], fail(lname_recs_sorted, 203, doxie.ErrorCodes(203))); 	
+      
+			filtered_lname_recs := Limit(dedup(sort(filtered_max_person_lname_recs,-primaryagency,accident_nbr,report_code,jurisdiction_state,jurisdiction),accident_nbr,report_code,jurisdiction_state,jurisdiction),2000,fail(203, doxie.ErrorCodes(203)));
 															 
-			last_name_recs_exact := join(filtered_name_recs,accnbr_key,
+			last_name_recs_exact := join(filtered_lname_recs,accnbr_key,
 																		keyed(right.l_accnbr=left.accident_nbr) and
 																		keyed(right.report_code in constants.ecrash_src_codes) and
 																		keyed(right.jurisdiction_state = left.jurisdiction_state) and
 																		keyed(right.jurisdiction = left.jurisdiction),
 																		transform(recordof(accnbr_key),
 																		self := right),limit(constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
-																		
-      //sorted_first_name_recs_exact := CHOOSEN(SORT(first_name_recs_exact,jurisdiction_state,-report_id),1000);
-													
+
 			RETURN last_name_recs_exact;
 			
 		END;
@@ -322,9 +497,11 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 		END;
 		
 		EXPORT getSubscriptionReports() := FUNCTION
-		
-		  in_jurisdiction := stringlib.stringtouppercase(in_mod.jurisdiction);
-			in_jurisdiction_state := stringlib.stringtouppercase(in_mod.JurisdictionState);	
+
+			primary_agency  := in_mod.agencies(PrimaryAgency = TRUE)[1];
+		  in_jurisdiction := STD.Str.ToUpperCase(primary_agency.jurisdiction);
+			in_jurisdiction_state := STD.Str.ToUpperCase(primary_agency.JurisdictionState);
+			
 			max_results := in_mod.MaxLimit;
 			sort_order := in_mod.SortOrder;
 			sort_field := in_mod.SortField;
@@ -505,5 +682,5 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 			
 			return grouped_result_recs;
 		END;
-			
+		
 END;

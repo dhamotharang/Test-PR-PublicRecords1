@@ -1,4 +1,4 @@
-import prof_licenseV2, FCRA, riskwise, ut, RiskView;
+﻿import prof_licenseV2, FCRA, riskwise, ut, RiskView;
 
 export Boca_Shell_Proflic_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, 
 				boolean isPrescreen, boolean isDirectToConsumerPurpose = false, boolean onThor = false) := FUNCTION
@@ -273,10 +273,7 @@ PL_Plus_temp roll_licenses2(PL_Plus_temp le, PL_Plus_temp rt) := transform
 	self := le;
 end;
 
-rolled_licenses2_roxie := rollup(group(sort(ungroup(rolled_licenses), seq, -tmp_MostRecent, -PLCategory), seq), true, roll_licenses2(left,right));
-rolled_licenses2_thor := rollup(group(sort(ungroup(rolled_licenses), seq, -tmp_MostRecent, -PLCategory, prolic_key), seq), true, roll_licenses2(left,right));
-rolled_licenses2 := if(onThor, rolled_licenses2_thor, rolled_licenses2_roxie);
-
+rolled_licenses2 := rollup(group(sort(ungroup(rolled_licenses), seq, -tmp_MostRecent, -PLCategory, prolic_key), seq), true, roll_licenses2(left,right));
 
 rolled_licenses_final := project(rolled_licenses2, transform(RiskWise.Layouts.Layout_Professional_License_Plus, self := left));
 // output(license_recs1, named('license_recs1'));

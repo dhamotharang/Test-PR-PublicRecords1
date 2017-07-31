@@ -1,4 +1,4 @@
-import riskwise, ut, gong, FCRA;
+﻿import riskwise, ut, gong, FCRA;
 
 export Boca_Shell_Gong_FCRA(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, boolean onThor=false) := FUNCTION
 
@@ -154,10 +154,7 @@ Layout_Gong getDates(Layout_Gong le, Layout_Gong ri) := transform
 	self := ri;
 end;
 
-getgongdates_roxie := rollup(sort(combo, seq, -gongPhone, -gong_did.gong_did_phone_ct), true, getDates(left,right));
-getgongdates_thor := rollup(sort(combo, seq, -gongPhone, -gong_did.gong_did_phone_ct, record), true, getDates(left,right));
-getgongdates := if(onThor, getgongdates_thor, getgongdates_roxie);
-
+getgongdates := rollup(sort(combo, seq, -gongPhone, -gong_did.gong_did_phone_ct, record), true, getDates(left,right));
 
 Layout_Gong getAddrs(Layout_Gong le, Layout_Gong ri) := transform
 	self.gong_did.gong_did_addr_ct := le.gong_did.gong_did_addr_ct + if(le.gongAddr=ri.gongAddr, 0, ri.gong_did.gong_did_addr_ct);

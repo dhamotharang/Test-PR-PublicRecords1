@@ -1,4 +1,4 @@
-export layout_american_student_base := record
+﻿export layout_american_student_base := record
 
 	integer8        KEY;
 	string9					SSN;
@@ -78,6 +78,9 @@ export layout_american_student_base := record
 	string7   			geo_blk;
 	string1   			geo_match;
 	string4   			err_stat;
+	//Added for OKC Student List 7/10/17
+	STRING5					CollegeID := '';
+	STRING4					CollegeUpdate := '';
 	string2					source := '';
 
 end;

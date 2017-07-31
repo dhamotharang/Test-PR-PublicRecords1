@@ -1,4 +1,4 @@
-import Risk_Indicators, STD;
+﻿import Risk_Indicators, STD;
 
 /*
 	*************************************************************************************
@@ -96,7 +96,7 @@ export Configuration := module
 	export IsPhoneMetadata(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.PhonesMetaData;		
 	export IsDeltaPersoncontext(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.delta_personcontext;	
 	export IsAttIapQuery(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.AttIapQuery;	
-	export IsConsumerCreditReport(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.consumerCreditReport;	
+	export IsConsumerCreditReport(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.ConsumerCreditReport;	
 	// ************************************************************************	
 	// Use functions below to retrieve gateway configuration properties.
 	//

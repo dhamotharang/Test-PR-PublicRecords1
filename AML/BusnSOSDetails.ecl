@@ -1,4 +1,4 @@
-import Risk_indicators, corp2, BusReg, business_header, RiskWise, Address_attributes, ut, MDR, Business_Risk;
+﻿import Risk_indicators, corp2, BusReg, business_header, RiskWise, Address_attributes, ut, MDR, Business_Risk;
 
 
 EXPORT BusnSOSDetails(DATASET(Layouts.BusnLayoutV2) BusnIds ) := FUNCTION
@@ -6,52 +6,24 @@ EXPORT BusnSOSDetails(DATASET(Layouts.BusnLayoutV2) BusnIds ) := FUNCTION
 riskKey := Address_Attributes.key_AML_addr;	
 	
 //------------------check for 'good standing' ---------  corp keys
-
-// Because the re-Corp effort has re-stamped all of the dt_first_* and dt_last_* dates with 
-// an internal processing date, we must perform date filtering for archive purposes against 
-// a Business Header key first, instead. Logic adapted from Business_Risk.InstantID_Function, 
-// lines 1612-1654 roughly.
-
 corprec := record
 	unsigned4	seq;
 	unsigned6 bdid;
 	unsigned4	historydate;
 	string120 company_name := '';
 	string30	corp_key;
-	unsigned4 dt_first_seen;
-	unsigned4 dt_last_seen;
 end;
 
-corprec xfm_applyDateFilter(BusnIds L, Business_Risk.key_bdid_table R) := transform
+corprec get_corpkeys(BusnIds L, corp2.key_Corp_bdid R) := transform
 	self.seq := l.seq;
 	self.bdid := l.linkedbdid;
-	self.corp_key := '';
-	self.historyDate := l.historyDate;
-	self.company_name := l.company_name;
-	self.dt_first_seen := r.dt_first_seen_min;
-	self.dt_last_seen := r.dt_last_seen_max;
-end;
-
-BusnIds_filt := join(BusnIds,
-				  Business_Risk.key_bdid_table,
-					left.linkedbdid != 0 and 
-					keyed(left.linkedbdid = right.bdid) and
-					(RIGHT.dt_first_seen_min < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)),
-				  xfm_applyDateFilter(left,right),
-				  left outer, atmost(riskwise.max_atmost), keep(1));
-
-corprec get_corpkeys(BusnIds_filt L, corp2.key_Corp_bdid R) := transform
-	self.seq := l.seq;
-	self.bdid := l.bdid;
 	self.corp_key := R.corp_key;
 	self.historyDate := l.historyDate;
 	self.company_name := l.company_name;
-	self.dt_first_seen := l.dt_first_seen;
-	self.dt_last_seen := l.dt_last_seen;
 end;
 
-corpkeys := join(ungroup(BusnIds_filt), corp2.key_Corp_bdid,
-					keyed(left.bdid = right.bdid),
+corpkeys := join(ungroup(BusnIds), corp2.key_Corp_bdid,
+					keyed(left.linkedBdid = right.bdid),
 			  get_corpkeys(LEFT,RIGHT), atmost(250), keep(100));
 
 corprec2 := record
@@ -82,10 +54,10 @@ corprec2 get_corp_recs(corpkeys L, corp2.key_corp_corpkey R) := transform
 							if (stringlib.stringfind(CorpStatusDescUC, 'REINSTAT', 1) != 0, 'R' 
 							,'U'))))));
 	self.corpStatus := CorpStatusCd;
-	self.lastReinstatDate := if(CorpStatusCd = 'R',  l.dt_last_seen, 0);
-	self.lastDissolvedDate := if(CorpStatusCd = 'D',  l.dt_last_seen, 0);
-	self.LastSeenDate := l.dt_last_seen;
-	self.FirstSeenDate := If((integer)r.corp_filing_date = 0, l.dt_first_seen,(integer)r.corp_filing_date) ;
+	self.lastReinstatDate := if(CorpStatusCd = 'R',  r.dt_last_seen, 0);
+	self.lastDissolvedDate := if(CorpStatusCd = 'D',  r.dt_last_seen, 0);
+	self.LastSeenDate := r.dt_last_seen;
+	self.FirstSeenDate := If((integer)r.corp_filing_date = 0, r.dt_first_seen,(integer)r.corp_filing_date) ;
 	self.bdid := l.bdid;
 	// self.NoSOSFiling := If(r.corp_key = '', true, false);
 	self := R;
@@ -93,10 +65,13 @@ corprec2 get_corp_recs(corpkeys L, corp2.key_corp_corpkey R) := transform
 	self := [];
 end;
 
+
+
 corprecs := join(corpkeys,  corp2.key_corp_corpkey,
 								left.corp_key!='' and 
 								keyed(Left.corp_key = right.corp_key) and
-								left.bdid = right.bdid,
+								left.bdid = right.bdid and
+								(unsigned4) (string8)(left.historydate + '01') >= right.dt_first_seen,
 								get_corp_recs(LEFT,RIGHT), 
 								ATMOST(keyed(Left.corp_key = right.corp_key),RiskWise.max_atmost), keep(100));
 

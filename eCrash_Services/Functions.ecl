@@ -1,4 +1,4 @@
-/*2017-03-14T21:25:39Z (Dmitriy Lazarenko)
+﻿/*2017-03-14T21:25:39Z (Dmitriy Lazarenko)
 checking if input params are populated for IsReportDeletedFromDeltabase() function and also changing vehicle_incident_id comparison since we can have situation where deleted and non deleted reports have the same incident_id
 */
 import iesp,lib_stringlib,ut,FLAccidents_Ecrash,AutoStandardI,doxie,Std;
@@ -386,6 +386,7 @@ export Functions := MODULE
 			
 			self.Documents := project(RawDocIn.GetReportDocuments(l.superreportid),xform_Documents(left));
 			self := l;
+			self := [];
 		END;
 	
 		iesp.ecrash.t_ECrashSearchRecord groupable_xform(iesp.ecrash.t_ECrashSearchRecord l, dataset(iesp.ecrash.t_ECrashSearchRecord) r):= TRANSFORM
@@ -393,6 +394,7 @@ export Functions := MODULE
 			SELF.DateOfLoss.Year := l.DateOfLoss.Year;
 			SELF.DateOfLoss.Month := l.DateOfLoss.Month;
 			SELF.DateOfLoss.Day := l.DateOfLoss.Day;
+			SELF := l;
 			SELF := [];
 		END;
 		
@@ -401,12 +403,15 @@ export Functions := MODULE
 			SELF.DateOfLoss.Year := l.DateOfLoss.Year;
 			SELF.DateOfLoss.Month := l.DateOfLoss.Month;
 			SELF.DateOfLoss.Day := l.DateOfLoss.Day;
+			SELF := l;
 			SELF := [];
 		END;
 		
-		groupable := in_recs.ReportType in constants.groupable_report_codes and in_recs.ReportCode in (constants.Iyetek_src);
-		groupable_recs := in_recs(groupable);
-    non_groupable_recs := in_recs(~groupable);
+		// groupable := in_recs.ReportType in constants.groupable_report_codes and in_recs.ReportCode in (constants.Iyetek_src);
+		// groupable_recs := in_recs(in_recs.ReportType in constants.groupable_report_codes and in_recs.ReportCode in (constants.Iyetek_src));
+    // non_groupable_recs := in_recs(~(in_recs.ReportType in constants.groupable_report_codes and in_recs.ReportCode in (constants.Iyetek_src)));
+		groupable_recs := in_recs(ReportType in constants.groupable_report_codes and ReportCode in constants.Iyetek_src);
+    non_groupable_recs := in_recs(ReportType not in constants.groupable_report_codes or ReportCode not in constants.Iyetek_src);
 		
 		rpt_grp := GROUP(
 				SORT(groupable_recs,
@@ -423,7 +428,6 @@ export Functions := MODULE
 			non_groupable_xform_recs := project(non_groupable_recs,nongroupable_xform(left));
 			groupable_xform_recs := rollup (rpt_grp, group, groupable_xform (left, rows (left)));	
 			
-			
 			RETURN non_groupable_xform_recs + groupable_xform_recs;
 	END;
 	
@@ -431,6 +435,13 @@ export Functions := MODULE
 	
 	EXPORT InvolvedPartyTransform (dataset(Layouts.recs_with_penalty) in_recs, IParam.searchrecords in_mod, boolean is_direct_match):=FUNCTION
 		
+		primary_agency := in_mod.agencies(PrimaryAgency)[1];
+		boolean no_state_search :=constants.no_state_search(in_mod);
+		boolean no_jurisdiction_search :=constants.no_jurisdiction_search(in_mod);
+		boolean use_rpt_num:= Constants.use_rpt_num (in_mod);
+		boolean direct_match_confirm:= is_direct_match and not no_state_search and not no_jurisdiction_search;
+		boolean has_name:=in_mod.firstname<>'' and in_mod.lastname<>'';
+
 		iesp.ecrash.t_ECrashSearchRecord final_xform(Layouts.recs_with_penalty l, dataset(Layouts.recs_with_penalty) r):=TRANSFORM	
 		
 			iesp.ecrash.t_ECrashInvolvedParty xform_InvolvedParty(Layouts.recs_with_penalty l):=TRANSFORM
@@ -442,28 +453,31 @@ export Functions := MODULE
 																															l.v_city_name, l.st, l.zip, l.zip4,''),					
 					END;
 					
-					boolean no_state_search :=constants.no_state_search(in_mod);
-					boolean no_jurisdiction_search :=constants.no_jurisdiction_search(in_mod);
-					boolean use_rpt_num:= Constants.use_rpt_num (in_mod);
+					// boolean no_state_search :=constants.no_state_search(in_mod);
+					// boolean no_jurisdiction_search :=constants.no_jurisdiction_search(in_mod);
+					// boolean use_rpt_num:= Constants.use_rpt_num (in_mod);
 					// boolean use_dol_internal:= Constants.use_dol_internal(in_mod);
 
 					/* match_type --> D for direct and P for possible  => is_direct_match corresponds to previous match_type = 'D'*/
 
-					boolean direct_match_confirm:= is_direct_match and not no_state_search and not no_jurisdiction_search;
+					// boolean direct_match_confirm:= is_direct_match and not no_state_search and not no_jurisdiction_search;
 									
 					// boolean dol_valid:=in_mod.dateofloss<>'';
-					boolean has_name:=in_mod.firstname<>'' and in_mod.lastname<>'';
+					// boolean has_name:=in_mod.firstname<>'' and in_mod.lastname<>'';
 					
 				  deltaReportPricingRec := GetReportPricingData(l, in_mod);
 				
 					self.SuperReportID := IF(NOT l.isDelta, l.super_report_id, deltaReportPricingRec.SuperReportID);
 					self.pages := (integer)deltaReportPricingRec.pagecount;
 					//self.pages := IF(NOT l.isDelta, (integer)l.page_count, (integer)deltaReportPricingRec.pagecount);
-					
-					
-				  self.ResultType := MAP(	constants.b_internal_pduser(in_mod.UserType) and direct_match_confirm and (use_rpt_num or has_name)=>constants.DIRECT_hit,
+								
+					boolean agency_match   := (l.jurisdiction_state = primary_agency.JurisdictionState and
+																		 l.Jurisdiction = primary_agency.Jurisdiction);
+				
+																						 
+				  self.ResultType := MAP(	constants.b_internal_pduser(in_mod.UserType) and direct_match_confirm and (use_rpt_num or has_name) and agency_match =>constants.DIRECT_hit,
 																	constants.b_internal_pduser(in_mod.UserType) =>constants.POSSIBLE_hit,
-																  direct_match_confirm=>constants.DIRECT_hit,
+																  direct_match_confirm and agency_match =>constants.DIRECT_hit,
 																	constants.POSSIBLE_hit),
 					self.ReportHashKey := l.image_hash;
 					self.AgencyORI := l.agency_ori;
@@ -510,8 +524,7 @@ export Functions := MODULE
 			
 			
 			recs_result := rollup (rpt_grp, group, final_xform (left, rows (left)));	
-			
-			
+		
 			RETURN recs_result;
 		END;
 		
@@ -827,4 +840,31 @@ export Functions := MODULE
 			ReportHashKeyesFromKeyForDedup
 		}, Layouts.GetSupplementalsResult);
 		END;	
+		
+		EXPORT SortFinalResults (dataset(iesp.ecrash.t_ECrashSearchRecord) in_recs, IParam.searchrecords in_mod):=FUNCTION
+		
+			search_record_with_primaryAgency := RECORD
+					iesp.ecrash.t_ECrashSearchRecord;
+					integer SortOrder;
+			END;
+						
+			result_recs_joined := JOIN(in_recs, in_mod.agencies, (left.JurisdictionState = right.JurisdictionState or right.JurisdictionState = '')and
+																													 (left.Jurisdiction = right.Jurisdiction or right.Jurisdiction = '') and
+																													 (left.AgencyId = right.AgencyId or right.AgencyId ='') and
+																													 (left.AgencyORI = right.AgencyORI or right.AgencyORI = ''),
+																														TRANSFORM(search_record_with_primaryAgency, 
+																																// self.PrimaryAgency := right.PrimaryAgency;
+																																self.SortOrder := IF(right.PrimaryAgency <> TRUE, 1, 0);
+																																// self.ResultType		 := IF(left.ResultType = constants.DIRECT_hit AND right.PrimaryAgency,
+																																													// left.ResultType, constants.POSSIBLE_hit);
+																																self := left;), LEFT OUTER, ALL);
+																								
+      result_recs_sorted := SORT(result_recs_joined, SortOrder, -DateOfLoss);
+			results_filtered   := CHOOSEN(result_recs_sorted,iesp.constants.eCrashMod.MaxRecords);
+			result_recs 			 := PROJECT(results_filtered, TRANSFORM(iesp.ecrash.t_ECrashSearchRecord,
+																															self:=left;), ORDERED(TRUE));
+																															
+			
+			RETURN result_recs;
+		END;
 END;

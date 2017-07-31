@@ -1,12 +1,41 @@
-IMPORT FLAccidents_Ecrash,iesp;
+﻿IMPORT FLAccidents_Ecrash,iesp;
 
 //** Added the fix for bug 138974
 
 EXPORT Layouts := MODULE
 
+			EXPORT ECrashSearchAgency_alias_extended := RECORD
+				string JurisdictionState;
+				string Jurisdiction;
+				string AgencyId;
+				string AgencyORI;
+				boolean	PrimaryAgency;
+				boolean hasAgencyORI; 
+			  string agencyORISQL;
+				string imageHashNotNull ; 
+			  string requestedHashKeySQLifParms; 
+				boolean hasJurisdiction; 
+				boolean hasJurisdictionState; 
+				string jurisNotNullSQL; 
+				string jurisString; 
+				string jurisIfParmSQL; 
+				string jurisStateString; 
+				string jurisStateIfParmSQL; 
+				string jurisNotNullIfNoParmSQL; 
+				string jurisAndStateIfParms; 
+				string jurisAndStateIfParmsElseNotNull;
+				string fNameStateSQL; 
+				string simplePartialReportNumberWhere;
+		END;		
+		
 		EXPORT search := record
 			string ReportNumber;
 			boolean isDeepDive := false;
+			string JurisdictionState;
+			string Jurisdiction;
+			string AgencyId;
+			string AgencyORI;
+			boolean PrimaryAgency := false;
 		END;	
 		
 		// ****** For resolving bug 138974 modified eCrashRecordStrure to add date_added , I have added date_added  to enable the query

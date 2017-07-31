@@ -1,4 +1,4 @@
-EXPORT Layouts := module
+﻿EXPORT Layouts := module
 EXPORT Input := record
 	string15 Encrypted_Experian_PIN;     // 15 digit unique identifier
 	string3 Phone_1_digits;     // last 2 digits of a phone
@@ -14,7 +14,7 @@ EXPORT Input := record
 	string1 Phone_3_Source;
 	string8 Phone_3_Last_Updt;
 	string25 Filler;
-	string2 crlf;
+	string3 crlf;
 end;
 
 
@@ -40,6 +40,7 @@ EXPORT base:= record
 	unsigned 	date_vendor_last_reported  	:= 0;
 	string2		rec_type := '';    // SP (spouse), CO (main subject in PIN)
 	boolean  is_current;   // true if the record is part of the last update, false if is not longer received in the latest update
+  string10  fullphone:='';
 end;
 
 

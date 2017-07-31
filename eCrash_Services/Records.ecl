@@ -1,4 +1,4 @@
-import FLAccidents_Ecrash,codes,ut,AutoStandardI,iesp,AutoKeyI,lib_stringlib,doxie,Std,BatchShare;
+﻿import FLAccidents_Ecrash,codes,ut,AutoStandardI,iesp,AutoKeyI,lib_stringlib,doxie,Std,BatchShare;
 
 //** Added the fix for bug 138974
 
@@ -6,7 +6,7 @@ import FLAccidents_Ecrash,codes,ut,AutoStandardI,iesp,AutoKeyI,lib_stringlib,dox
 EXPORT Records(IParam.searchrecords in_mod) := MODULE
 
 		shared Raw_in := Raw(in_mod);
-		
+				
 		EXPORT getSearchRecords() := FUNCTION 
 		
 		DeltaBaseRecords := RecordsDeltaBase(in_mod);
@@ -33,22 +33,21 @@ EXPORT Records(IParam.searchrecords in_mod) := MODULE
 		boolean use_location := ~use_rpt_num AND hasLocationInformation;
 		
 		by_rptNum := Raw_in.by_rpt_num();
-		by_autoRecs := Raw_in.by_auto_recs();
-
-		initial_search_report_by := if(use_rpt_num, by_rptNum, by_autoRecs);
+		by_autoRecs := Raw_in.by_auto_recs();	
 		
+		initial_search_report_by := if(use_rpt_num, by_rptNum, by_autoRecs);
+						
 		//------- by exact report# or by autoRecs -----------------------------------------------------------------------
 		recs_raw_tmp := MAP(use_first_name_search => Raw_in.byFirstName(), 
 												use_last_name_search => Raw_in.byLastName(),
 												use_location => Raw_in.byLocation(), 
 												Raw_in.byReportNumber(initial_search_report_by));
-														 
-		
+	
 		deltaIncidentsFirst := MAP(use_first_name_search => DeltaBaseRecords.readByFirstName(),
 														   use_location => DeltaBaseRecords.readByLocation(),
 														   use_rpt_num => DeltaBaseRecords.readFirstByReport(),
 														   DeltaBaseRecords.readFirstByAuto());  
-									
+		
 			/*debugInitialSearchBy := MAP(use_first_name_search => 'First Name Search', 
 															 use_location => 'location search',
 															 use_rpt_num => 'Report number search',
@@ -57,11 +56,11 @@ EXPORT Records(IParam.searchrecords in_mod) := MODULE
 			recs_raw_tmp_pen :=project(recs_raw_tmp,TRANSFORM(Layouts.recs_with_penalty, SELF.isMatched:=true, SELF:=LEFT));
 			deltaIncidentsFirst_Pen:=project(deltaIncidentsFirst,TRANSFORM(Layouts.recs_with_penalty, SELF.isDelta:=true, SELF.isMatched:=true, SELF:=LEFT));
 			deltaMergedInitialReadRecs := recs_raw_tmp_pen + deltaIncidentsFirst_Pen;
-			//deltaMergedInitialReadRecs := deltaIncidentsFirst_Pen;//temp remove
+			// deltaMergedInitialReadRecs := deltaIncidentsFirst_Pen;//temp remove
 			FIRSTCount := 'BAPDEBUG_DeltaIncidentsFirst_COUNT: '+COUNT(deltaIncidentsFirst);
 
 			boolean initial_searchby_exists := EXISTS(deltaMergedInitialReadRecs);
-			
+
 			//---------------------------------------------------------------------------------------------------------------
 
 			//-------- by partial report# -----------------------------------------------------------------------------------
@@ -100,6 +99,7 @@ EXPORT Records(IParam.searchrecords in_mod) := MODULE
 			deltaDOLBatch_pen:=project(deltaDOLBatch,TRANSFORM(Layouts.recs_with_penalty, SELF.isDelta:=true, SELF.isMatched:=true, SELF:=LEFT));
 			
 			deltaMergedDOLRecs := dol_recs_pen + deltaDOLBatch_pen;
+
 			//deltaMergedDOLRecs := deltaDOLBatch_pen; //Temp Remove
 			
 			//---------------------------------------------------------------------------------------------------------------
@@ -153,7 +153,7 @@ EXPORT Records(IParam.searchrecords in_mod) := MODULE
 													'EMPTY SET');
 
 		
-			//OUTPUT(debugMap,named('debugMap_PATH_CHOSEN'));
+			// OUTPUT(debugMap,named('debugMap_PATH_CHOSEN'));
 
 			recs_raw_all := Functions.FilterOutDeletedReports(recs_raw_all_with_deleted);	
 
@@ -208,14 +208,23 @@ EXPORT Records(IParam.searchrecords in_mod) := MODULE
 			// ======= search is completed, the remaining is a waterfall approach based on preferences =======
 			//---------------------------------------------------------------------------------------------------------------
 
-			boolean ignore_state_search 				:= in_mod.JurisdictionState='';
-			boolean ignore_jurisdiction_search	:= in_mod.jurisdiction='';
+			// boolean ignore_state_search 				:= in_mod.JurisdictionState='';
+			// boolean ignore_jurisdiction_search	:= in_mod.jurisdiction='';
+			boolean ignore_state_search 						:= constants.no_state_search(in_mod);
+			boolean ignore_jurisdiction_search 			:= constants.no_jurisdiction_search(in_mod);
 			boolean ignore_dateofloss_search 		:= in_mod.dateofloss='' AND in_mod.dolStartDate='';
 			string incoming_dateofloss_param		:= if(in_mod.dateofloss !='',in_mod.dateofloss,in_mod.dolStartdate);
+			recordof(in_mod.agencies) xform_agency():=TRANSFORM
+					self:=[];
+		  END;
 			
-			ds_filtered :=  recs_raw((stringlib.stringtouppercase(jurisdiction)=in_mod.jurisdiction OR ignore_jurisdiction_search) AND 
-                                                (jurisdiction_state=in_mod.JurisdictionState OR ignore_state_search));
-
+			agency_ds := IF(exists(in_mod.agencies), in_mod.agencies, dataset([xform_agency()]));
+			ds_filtered :=  JOIN(recs_raw, agency_ds, (left.jurisdiction = right.jurisdiction OR
+																											 ignore_jurisdiction_search)
+																											 AND 
+                                                      (left.jurisdiction_state = right.JurisdictionState OR
+																											 ignore_state_search), TRANSFORM(LEFT), ALL);
+	
 		ds_filtered_reports := Functions.dedupReportRecordsFromParties(ds_filtered);
     ds_dol_range_raw := join(ds_date_range, ds_filtered_reports, 
 		                     right.accident_date=left.daterange,
@@ -248,27 +257,30 @@ EXPORT Records(IParam.searchrecords in_mod) := MODULE
 			boolean Possible_match := (not direct_match and EXISTS(recs_exact1_final));
 			
 
-			recs_exact_jur:=recs_raw((stringlib.stringtouppercase(jurisdiction)=in_mod.jurisdiction or ignore_jurisdiction_search)
-																and 
-																(jurisdiction_state=in_mod.JurisdictionState or ignore_state_search));
+			// recs_exact_jur:= JOIN(recs_raw, agency_ds, (left.jurisdiction = right.jurisdiction OR
+																												// ignore_jurisdiction_search) AND 
+                                                       // (left.jurisdiction_state = right.JurisdictionState  OR 
+																												// ignore_state_search), TRANSFORM(LEFT) , ALL);
 																
 																
-			recs_exact_dol_state:=recs_raw(Constants.valid_match(accident_date,in_mod.dateofloss)and 
-																		(jurisdiction_state=in_mod.JurisdictionState or ignore_state_search)
-																		);
+			recs_exact_dol_state:= JOIN(recs_raw(Constants.valid_match(accident_date,in_mod.dateofloss)), agency_ds, 
+																												left.jurisdiction_state = right.JurisdictionState   OR 
+																												ignore_state_search, TRANSFORM(LEFT), ALL);
 
-			boolean hasExactJurRecs := EXISTS(recs_exact_jur);
+			boolean hasExactJurRecs := EXISTS(ds_filtered);
 			
 																								
-			recs_waterfall_days:= map(hasExactJurRecs and hasInputDolParams => recs_exact_jur(ut.DaysApart(accident_date,incoming_dateofloss_param)<=fuzzy_days_range),
-																hasExactJurRecs => recs_exact_jur,
+			recs_waterfall_days:= map(hasExactJurRecs and hasInputDolParams => ds_filtered(ut.DaysApart(accident_date,incoming_dateofloss_param)<=fuzzy_days_range),
+																hasExactJurRecs => ds_filtered,
 																recs_exact_dol_state);
 																
-																
+			recs_waterfall_ds := JOIN(recs_raw(~hasInputDolParams or ut.DaysApart(accident_date,incoming_dateofloss_param)<=fuzzy_days_range), agency_ds,   
+																												left.jurisdiction_state = right.JurisdictionState  OR 
+																												ignore_state_search, TRANSFORM(LEFT) ,ALL);
+																								
 			recs_waterfall_pre_Loc	:=if(EXISTS(recs_waterfall_days),
 																			recs_waterfall_days,
-																			recs_raw((~hasInputDolParams or ut.DaysApart(accident_date,incoming_dateofloss_param)<=fuzzy_days_range) and 
-																								jurisdiction_state=in_mod.JurisdictionState or ignore_state_search));
+																			recs_waterfall_ds);
 																								
 																								
 			recs_waterfall_loc_match := functions.location_filter(recs_waterfall_pre_Loc,in_mod);													
@@ -298,7 +310,9 @@ EXPORT Records(IParam.searchrecords in_mod) := MODULE
 	// 7/12/13: REMOVED THESE FROM THE SORT AND DEDUP ... accident_street,accident_cross_street,next_street,																										
 			sorted_final_recs := if(hasInputDOLDateRange,SORT(recs_filtered_dedup,-accident_date),recs_filtered_dedup);	
 
-			final_records:= if(in_mod.RequestHashKey,hash_key_recs_dedup,choosen(sorted_final_recs,iesp.constants.eCrashMod.MaxRecords));									 
+//Person records should not be restricted to 2k, since this is dropping out reports. This is an exisitng bug in production fixed with alias functionality
+			// final_records:= if(in_mod.RequestHashKey,hash_key_recs_dedup,choosen(sorted_final_recs,iesp.constants.eCrashMod.MaxRecords));
+			final_records:= if(in_mod.RequestHashKey,hash_key_recs_dedup,sorted_final_recs);									 
 			
 			//associated_reports := Raw_in.getAssociatedReports(final_records);
 			
@@ -308,27 +322,18 @@ EXPORT Records(IParam.searchrecords in_mod) := MODULE
 			
 			grouped_result_recs := functions.AssociatedReportsTransform(recs_result,in_mod);
 			
-			final_recs_result := if(in_mod.GroupRecords, SORT(grouped_result_recs,-DateOfLoss), SORT(recs_result,-DateOfLoss));
+			final_recs_ds := if(in_mod.GroupRecords, grouped_result_recs, recs_result);
 			
-		//	 output(recs_raw_all, named('recs_raw_all'));
-			// output(recs_raw, named('recs_raw'));
-			// output(recs_exact1, named('recs_exact1'));
-			// output(recs_waterfall,named('recs_waterfall'));
-			// output(recs_exact_loc,named('recs_exact_loc'));
-			// output(recs_exact1_final,named('recs_exact1_final'));
+			final_recs_result := functions.SortFinalResults(final_recs_ds, in_mod);
+			
+			// final_recs_result := if(in_mod.GroupRecords, SORT(grouped_result_recs,-DateOfLoss), SORT(recs_result,-DateOfLoss));
 
-			// output(recs_filtered_dedup,named('recs_filtered_dedup'));
-			// output(hash_key_recs_dedup,named('hash_key_recs_dedup'));
-			
-			//output(final_records,named ('final_records'));
-			//output(final_associated_reports, named('final_associated_reports'));
-			
 			return final_recs_result;
 		END;
-		
+	
 		EXPORT getSubscriptionRecords() := FUNCTION
 			Raw_in := Raw(in_mod);
 			return Raw_in.getSubscriptionReports();
 		END;
-   
+		
 END;
