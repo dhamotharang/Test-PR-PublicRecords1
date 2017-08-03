@@ -124,8 +124,7 @@ EXPORT BusinessInstantID20_Services.Layouts.OutputLayout_batch xfm_ToBatchLayout
 				SELF.rep5_email := le.InputEcho.in_rep5_email;
 				
 				// Verified input fields
-				SELF.vercmpy := le.VerifiedEcho.bus_ver_name;
-    SELF.veraltcmpy := le.VerifiedEcho.bus_ver_altname;
+				SELF.vercmpy := IF( le.Verification.ver_name_indicator = '1', le.VerifiedEcho.bus_ver_name, le.VerifiedEcho.bus_ver_altname );
 				SELF.veraddr := le.VerifiedEcho.bus_ver_addr;
 				SELF.vercity := le.VerifiedEcho.bus_ver_city;
 				SELF.verstate := le.VerifiedEcho.bus_ver_state;

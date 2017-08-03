@@ -675,7 +675,6 @@ EXPORT Layouts := MODULE
 	EXPORT BatchVerifiedLayout := RECORD // VerifiedEcho
 		UNSIGNED4 Seq;
 		STRING120 vercmpy; // bus_ver_name
-  STRING120 veraltcmpy; // bus_ver_altname
 		STRING50 veraddr; // bus_ver_addr
 		STRING30 vercity; // bus_ver_city
 		STRING2 verstate; // bus_ver_state
