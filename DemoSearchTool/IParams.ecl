@@ -1,4 +1,4 @@
-IMPORT DemoSearchTool, iesp, ut;
+﻿IMPORT DemoSearchTool, iesp, ut;
 
 EXPORT IParams := 
   MODULE
@@ -30,9 +30,10 @@ EXPORT IParams :=
             EXPORT BOOLEAN isBusinessSearch := options.isBusinessSearch;
             EXPORT BOOLEAN isPersonSearch := options.isPersonSearch;
             EXPORT BOOLEAN isMultiBizAtAddress := options.isMultiBizAtSameAddress;
-            EXPORT BOOLEAN is_Biz_SearchLegacyKeys := searchBy.BusinessDataset.isSearchLegacyKeys;
+            EXPORT BOOLEAN is_Biz_SearchLegacyKeys := (options.isBusinessSearch OR options.isMultiBizAtSameAddress) AND
+                                                       searchBy.BusinessDataset.isSearchLegacyKeys;
             EXPORT BOOLEAN is_Biz_SearchBipKeys := (options.isBusinessSearch OR options.isMultiBizAtSameAddress) AND
-                                                    NOT searchBy.BusinessDataset.isSearchLegacyKeys;
+                                                   (searchBy.BusinessDataset.isSearchBipKeys OR NOT searchBy.BusinessDataset.isSearchLegacyKeys);
           END; 
           
         RETURN DemoSearchTool_inMod;
@@ -98,7 +99,8 @@ EXPORT IParams :=
         (searchBy.PersonDataset.SecondDegreeRelativesCount = '' OR ut.isNumeric(searchBy.PersonDataset.SecondDegreeRelativesCount)) AND
         (searchBy.PersonDataset.SexualOffenderCount = '' OR ut.isNumeric(searchBy.PersonDataset.SexualOffenderCount)) AND
         (searchBy.PersonDataset.SSNsCount = '' OR ut.isNumeric(searchBy.PersonDataset.SSNsCount)) AND
-        (searchBy.PersonDataset.WatercraftsCount = '' OR ut.isNumeric(searchBy.PersonDataset.WatercraftsCount));
+        (searchBy.PersonDataset.WatercraftsCount = '' OR ut.isNumeric(searchBy.PersonDataset.WatercraftsCount)) AND
+        (searchBy.PersonDataset.ThirdDegreeRelativesCount = '' OR ut.isNumeric(searchBy.PersonDataset.ThirdDegreeRelativesCount));
       END; 
 
     EXPORT fn_checkForInputFailures(iesp.demosearchtool.t_DemoSearchToolSearchBy SearchBy,

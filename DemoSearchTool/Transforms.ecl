@@ -1,4 +1,4 @@
-IMPORT BIPV2, BIPV2_Best, Business_Header, iesp, Infutor, Watchdog;
+﻿IMPORT BIPV2, BIPV2_Best, Business_Header, iesp, Infutor, Watchdog;
 
 EXPORT Transforms := 
   MODULE
@@ -231,6 +231,10 @@ EXPORT Transforms :=
         IF(searchBy.PersonDataset.SSNsCount = '',
            DemoSearchTool.Constants.DEFAULT_INTEGER,
            (INTEGER2)searchBy.PersonDataset.SSNsCount);
+      SELF.Per_ThirdDegreeRelativesCount := 
+        IF(searchBy.PersonDataset.ThirdDegreeRelativesCount = '',
+           DemoSearchTool.Constants.DEFAULT_INTEGER,
+           (INTEGER2)searchBy.PersonDataset.ThirdDegreeRelativesCount);
       SELF.Per_WatercraftsCount := 
         IF(searchBy.PersonDataset.WatercraftsCount = '',
            DemoSearchTool.Constants.DEFAULT_INTEGER,

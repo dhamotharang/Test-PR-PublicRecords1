@@ -1,4 +1,4 @@
-EXPORT Macros := 
+﻿EXPORT Macros := 
   MODULE
     
     EXPORT mac_JoinPersonKeys() :=
@@ -10,6 +10,10 @@ EXPORT Macros :=
         IF( LEFT.Per_SecondDegreeRelativesCount  = 0,
             LEFT.Per_SecondDegreeRelativesCount  = RIGHT.Second_Degree_Relatives_cnt,
             LEFT.Per_SecondDegreeRelativesCount <= RIGHT.Second_Degree_Relatives_cnt ) 
+        AND
+        IF( LEFT.Per_ThirdDegreeRelativesCount  = 0,
+            LEFT.Per_ThirdDegreeRelativesCount  = RIGHT.Third_Degree_Relatives_cnt,
+            LEFT.Per_ThirdDegreeRelativesCount <= RIGHT.Third_Degree_Relatives_cnt ) 
         AND
         IF( LEFT.Per_AssociatesCount  = 0,
             LEFT.Per_AssociatesCount  = RIGHT.Associates_cnt,
