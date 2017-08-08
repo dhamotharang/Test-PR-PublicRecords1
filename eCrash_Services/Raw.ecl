@@ -198,7 +198,8 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 																								keyed (right.report_code in constants.ecrash_src_codes) and 
 																									keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
 																									keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState),
-																									xformToDolRec(left, right), KEEP(constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1));
+																									xformToDolRec(left, right), 
+																									limit(constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1, fail(203, doxie.ErrorCodes(203))));
 			
 			agency_dol_recs_sorted := SORT(agency_dol_recs, -primaryagency, record);
 
@@ -208,7 +209,8 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 																											  keyed (right.report_code in constants.ecrash_src_codes) and 
 																												keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
 																												keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState),
-																												xformToDolRec(left, right), KEEP(constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1));
+																												xformToDolRec(left, right), 
+																												limit(constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1, fail(203, doxie.ErrorCodes(203))));
 			
 			agency_dol_fuzzy_recs_sorted := SORT(agency_dol_fuzzy_recs, -primaryagency);
 			
@@ -275,7 +277,8 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 																									    keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState) and
 																									          (left.start_date = '' or (right.accident_date between left.start_date and left.end_date)) and
 																										        (left.dol = '' or right.accident_date = left.dol), 
-																														xformToLocRec(left, right), KEEP(constants.MAX_ACCIDENTS_PER_AGENCY_PER_LOCATION + 1));
+																														xformToLocRec(left, right), 
+																														limit(constants.MAX_ACCIDENTS_PER_AGENCY_PER_LOCATION + 1, fail(203, doxie.ErrorCodes(203))));
 		 
 			//7k limit is used because on average if we have more then 7k records here then we run into a memory limit exhausted in recs_raw_dupe join in Records file
 			//which is something we need to look at.
@@ -342,8 +345,8 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 																		keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState) and
 																		(left.CrossStreet = '' OR Constants.contains_match(right.accident_location,left.CrossStreet)) and
 																		(left.LocStreet = '' OR Constants.contains_match(right.accident_location,left.LocStreet)) and
-																		(left.start_date = '' or (right.accident_date between left.start_date and left.end_date)), xformToFnameRec(left, right)
-																		, KEEP(constants.MAX_RAW_PERSON_COUNT + 1));
+																		(left.start_date = '' or (right.accident_date between left.start_date and left.end_date)), xformToFnameRec(left, right),
+																		limit(constants.MAX_RAW_PERSON_COUNT + 1, fail(203, doxie.ErrorCodes(203))));
 			
 			fname_recs_sorted 	:= SORT(fname_recs, -primaryagency, record);
 			filtered_max_person_fname_recs := IF(count(fname_recs_sorted(primaryagency)) < (constants.MAX_RAW_PERSON_COUNT +1), fname_recs_sorted[1..constants.MAX_RAW_PERSON_COUNT], fail(fname_recs_sorted, 203, doxie.ErrorCodes(203))); 	
@@ -407,8 +410,8 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 																		keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState) and
 																		(left.CrossStreet = '' OR Constants.contains_match(right.accident_location,left.CrossStreet)) and
 																		(left.LocStreet = '' OR Constants.contains_match(right.accident_location,left.LocStreet)) and
-																		(left.start_date = '' or (right.accident_date between left.start_date and left.end_date)), xformToLnameRec(left, right)
-																		, KEEP(constants.MAX_RAW_PERSON_COUNT + 1));
+																		(left.start_date = '' or (right.accident_date between left.start_date and left.end_date)), xformToLnameRec(left, right),
+																		limit(constants.MAX_RAW_PERSON_COUNT + 1, fail(203, doxie.ErrorCodes(203))));
 			
 			lname_recs_sorted 	:= SORT(lname_recs, -primaryagency, record);
 			filtered_max_person_lname_recs := IF(count(lname_recs_sorted(primaryagency)) < (constants.MAX_RAW_PERSON_COUNT + 1), lname_recs_sorted[1..constants.MAX_RAW_PERSON_COUNT], fail(lname_recs_sorted, 203, doxie.ErrorCodes(203))); 	
