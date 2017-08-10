@@ -1,4 +1,4 @@
-import _control;
+﻿import _control;
 ////////////////////////////////////////////////////////////////////////////////////////////
 // -- mod_FilenamesInput module
 // -- Parameters:
@@ -30,7 +30,7 @@ export mod_FilenamesInput(
 	,unsigned4	precord_size					= 0	
 	,string			pSuperfilesMask				= '^(?!.*(using|used|delete)).*$'
 	,string			pfun_Groupname				= fun_Groupname()
-	,string			pFileDate							= ''
+	,string			pPlaceholderDate			= ''                //so as not to break anything that has parameters in order
 	,string			pdate_regex						= '[0-9]{8}'	
 	,string			pfile_type						= 'FIXED'			  			// CAN BE 'VARIABLE', OR 'XML'
 	,string			psourceRowTagXML			= ''					
@@ -57,6 +57,7 @@ module
 	export Delete								:= fVersion(ldelete);
 	export Template							:= ptemplatename;
 	export Mask									:= fVersion('*')[2..];
+	export Regex								:= fVersion('.*')[2..];
 	export Logical							:= fVersion(pFileDate);
 
 	export setRoot		:= [Root		];
