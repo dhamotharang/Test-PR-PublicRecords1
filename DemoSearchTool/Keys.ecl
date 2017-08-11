@@ -1,16 +1,16 @@
-import  doxie;
+﻿import  doxie;
 
 EXPORT Keys := Module
  
 
 	Export People			:= Index(	Dataset([], Layouts.People_Layout) , 
-																							{IsFCRA,First_Degree_Relatives_cnt,Second_Degree_Relatives_cnt,Associates_cnt,
+																							{IsFCRA,First_Degree_Relatives_cnt,Second_Degree_Relatives_cnt,Third_Degree_Relatives_cnt,Associates_cnt,
 																							Neighbors_cnt,AKAs_cnt,Bankruptcy_cnt,Corporate_Affiliation_cnt,Criminal_cnt,Criminal_DOC_cnt,
 																							in_Deceased,Directory_Assistance_Gong_cnt,DL_cnt,Email_cnt,FAA_Aircraft_cnt,
 																							Foreclosure_cnt,GWL_cnt,in_GWL_OFAC_Only,in_Address_HRI,in_SSN_HRI,Liens_cnt,Judgements_cnt,
 																							Evictions_cnt,Marriage_and_Divorce_cnt,MVR_cnt,Notice_of_Default_cnt,People_at_Work_cnt,
 																							in_Person_Header,PhonesPlus_cnt,Professional_License_cnt,Property_cnt,Registered_Agent_cnt,
-																							Sex_Offender_cnt,Watercraft_cnt,Addresses_cnt,SSN_Cnt,Owned_Business_bdid_cnt,Owned_Business_linkid_cnt, did,Third_Degree_Relatives_cnt},
+																							Sex_Offender_cnt,Watercraft_cnt,Addresses_cnt,SSN_Cnt,Owned_Business_bdid_cnt,Owned_Business_linkid_cnt, did},
 																							Layouts.People_Layout - [IsFCRA,First_Degree_Relatives_cnt,Second_Degree_Relatives_cnt,Associates_cnt,
 																							Neighbors_cnt,AKAs_cnt,Bankruptcy_cnt,Corporate_Affiliation_cnt,Criminal_cnt,Criminal_DOC_cnt,
 																							in_Deceased,Directory_Assistance_Gong_cnt,DL_cnt,Email_cnt,FAA_Aircraft_cnt,
@@ -40,13 +40,13 @@ EXPORT Keys := Module
 																							Constants.SearchTool_Prefix + doxie.Version_SuperKey + '::combined_biz_linkids'
 																			);
 	Export DTC					:= Index(		Dataset([], Layouts.People_Layout), 
-																							{First_Degree_Relatives_cnt,Second_Degree_Relatives_cnt,Associates_cnt,
+																							{First_Degree_Relatives_cnt,Second_Degree_Relatives_cnt,Third_Degree_Relatives_cnt,Associates_cnt,
 																							Neighbors_cnt,AKAs_cnt,Bankruptcy_cnt,Corporate_Affiliation_cnt,Criminal_cnt,Criminal_DOC_cnt,
 																							in_Deceased,Directory_Assistance_Gong_cnt,DL_cnt,Email_cnt,FAA_Aircraft_cnt,
 																							Foreclosure_cnt,GWL_cnt,in_GWL_OFAC_Only,in_Address_HRI,in_SSN_HRI,Liens_cnt,Judgements_cnt,
 																							Evictions_cnt,Marriage_and_Divorce_cnt,MVR_cnt,Notice_of_Default_cnt,People_at_Work_cnt,
 																							in_Person_Header,PhonesPlus_cnt,Professional_License_cnt,Property_cnt,Registered_Agent_cnt,
-																							Sex_Offender_cnt,Watercraft_cnt,Addresses_cnt,SSN_Cnt,Owned_Business_bdid_cnt,Owned_Business_linkid_cnt, did,Third_Degree_Relatives_cnt},
+																							Sex_Offender_cnt,Watercraft_cnt,Addresses_cnt,SSN_Cnt,Owned_Business_bdid_cnt,Owned_Business_linkid_cnt, did},
 																							Layouts.People_Layout - [IsFCRA,First_Degree_Relatives_cnt,Second_Degree_Relatives_cnt,Associates_cnt,
 																							Neighbors_cnt,AKAs_cnt,Bankruptcy_cnt,Corporate_Affiliation_cnt,Criminal_cnt,Criminal_DOC_cnt,
 																							in_Deceased,Directory_Assistance_Gong_cnt,DL_cnt,Email_cnt,FAA_Aircraft_cnt,

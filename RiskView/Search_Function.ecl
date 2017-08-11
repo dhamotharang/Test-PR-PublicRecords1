@@ -1,4 +1,4 @@
-import gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA;
+﻿import gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA;
 
 EXPORT Search_Function(
 	dataset(RiskView.Layouts.layout_riskview_input) riskview_input, 
@@ -192,6 +192,7 @@ bsversion := 50;  // hard code this for now
 	returnedReportLayout := RECORD
 		unsigned4 Seq;
 		iesp.riskview2.t_RiskView2Report;
+		string1 ConfirmationSubjectFound;
 	END;	
 
 Report_output := if(RiskviewReportRequest, RiskView.Search_RptFunction(bsprep, 
@@ -219,6 +220,20 @@ valid_attributes_requested := stringlib.stringtolowercase(AttributesVersionReque
 isLnJRunningAlone := if(IncludeLnJ and  
 	(valid_attributes_requested  = false and // noattributes
 	RiskviewReportRequest = false and //no report
+	trim(Auto_model_name) = '' and//no models
+	trim(Bankcard_model_name) = '' and
+	trim(Short_term_lending_model_name) = '' and
+	trim(Telecommunications_model_name) = '' and
+	trim(Custom_model_name) = '' and 
+	trim(Custom2_model_name) = '' and 
+	trim(Custom3_model_name) = '' and
+	trim(Custom4_model_name) = '' and
+	trim(Custom5_model_name) = ''),
+		true, false);
+
+isReportAlone := if(RiskviewReportRequest and  
+	(valid_attributes_requested  = false and // noattributes
+	IncludeLnJ = false and //no LNJ report
 	trim(Auto_model_name) = '' and//no models
 	trim(Bankcard_model_name) = '' and
 	trim(Short_term_lending_model_name) = '' and
@@ -262,7 +277,7 @@ transform(riskview.layouts.layout_riskview5_search_results,
 
 riskview5_attr_search_results := join(riskview5_attr_search_results_attrv5, attrLnJ, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
-	self.LexID := if(right.did=0, '', (string)right.did);
+	self.LexID := if(right.did=0, '', (string)right.did); //don't show a lexid if the truedid is not TRUE
 	self.ConsumerStatements := left.ConsumerStatements;
 	self.LnJEvictionTotalCount        := right.LnJEvictionTotalCount;
 	self.LnJEvictionTotalCount12Month := right.LnJEvictionTotalCount12Month ;
@@ -293,6 +308,7 @@ transform(riskview.layouts.layout_riskview5_search_results,
 	self.LnJJudgmentDollarTotal        := right.LnJJudgmentDollarTotal       ;
 	self.lnjliens					   					 := right.LnJLiens;
 	self.lnjJudgments				   				 := right.LnJJudgments;
+	self.ConfirmationSubjectFound			 := if(IncludeLnJ, right.ConfirmationSubjectFound, left.ConfirmationSubjectFound);
 	self := left,
 	self := []), LEFT OUTER, KEEP(1), ATMOST(100));
 
@@ -900,6 +916,11 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 							dataset([], Risk_Indicators.Layouts_Derog_Info.Liens), le.LnJliens       ); 
 	self.LnJJudgments 								 := if(suppress_condition, 
 							dataset([], Risk_Indicators.Layouts_Derog_Info.Judgments), le.LnJJudgments ); 
+
+	self.ConfirmationSubjectFound	 := map(isLnJRunningAlone => '',
+							isReportAlone => '',
+							le.ConfirmationSubjectFound	);
+
 	self := le;
 end;
 
@@ -909,6 +930,7 @@ END;
 
 riskview.layouts.layout_riskview5_search_results doReport(riskview.layouts.layout_riskview5_search_results le,returnedReportLayout ri)  := transform
 	self.report := row(createReport(ri));
+	self.ConfirmationSubjectFound := if(isReportAlone, ri.ConfirmationSubjectFound, le.ConfirmationSubjectFound);
 	self := le;
 end;
 
@@ -918,7 +940,6 @@ riskview5_search_results_tmp := join(riskview5_score_search_results, Report_outp
 		 
 riskview5_search_results := join(riskview5_search_results_tmp, clam, 
 		left.seq=right.seq, apply_score_alert_filters(left, right));
-
 
 //Military Lending Act - new as of September 2016 
 layout_preMLA := record
@@ -954,10 +975,10 @@ riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, risk
  /* *************************************
   *   Boca Shell Logging Functionality  *
   ***************************************/
-	intermediate_Log := IF(caller=riskview.constants.batch, 
-		DATASET([], Risk_Reporting.Layouts.LOG_Boca_Shell), 
-		Risk_Reporting.To_LOG_Boca_Shell(clam, Risk_Reporting.ProductID.RiskView__Search_Service, bsVersion) );
-	#stored('Intermediate_Log', intermediate_log);
+	// intermediate_Log := IF(caller=riskview.constants.batch, 
+		// DATASET([], Risk_Reporting.Layouts.LOG_Boca_Shell), 
+		// Risk_Reporting.To_LOG_Boca_Shell(clam, Risk_Reporting.ProductID.RiskView__Search_Service, bsVersion) );
+	// #stored('Intermediate_Log', intermediate_log);
  /* ************ End Logging ************/
 
 
@@ -965,6 +986,7 @@ riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, risk
 // 					for debugging
 // ===================================
 
+// output(riskview5_search_results, named('riskview5_final_results'));
 // OUTPUT(auto_model, NAMED('auto_model'));
 // OUTPUT(bankcard_model, NAMED('bankcard_model'));
 // OUTPUT(short_term_lending_model, NAMED('short_term_lending_model'));

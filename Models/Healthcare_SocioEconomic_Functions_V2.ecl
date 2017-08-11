@@ -1,4 +1,4 @@
-Import STD,UT;
+﻿Import STD,UT;
 EXPORT Healthcare_SocioEconomic_Functions_V2 := Module
 	export calcAge(STRING8 inDOB) := function
 		AgeinYears := (string)ut.GetAge(inDOB);
@@ -13,6 +13,30 @@ EXPORT Healthcare_SocioEconomic_Functions_V2 := Module
 		// output(monthsDiff);
 		// output(partialAge);
 		// output(finalAge);
+		return if(inDOB='',0,finalAge);
+	end;
+	export calcDaysInMonth(String RefYYYYMM) := function
+		RefYYYY := (INTEGER2)RefYYYYMM[1..4];
+		RefMM := (UNSIGNED1)RefYYYYMM[5..6];
+		days := case(RefMM, 
+					 01 => 31,
+					 03 => 31,
+					 05 => 31,
+					 07 => 31,
+					 08 => 31,
+					 10 => 31,
+					 12 => 31,
+					 02 => IF(STD.Date.IsLeapYear(RefYYYY), 29, 28), 30);
+		return if(RefYYYYMM='',0,days);
+	end;
+	export calcAgeInYears(STRING8 inDOB, STRING8 AgeRefYYYYMMDD) := function
+		inDOBYear := (INTEGER2)inDOB[1..4];
+		inDOBMonth := (UNSIGNED1)inDOB[5..6];
+		inDOBDay := (UNSIGNED1)inDOB[7..8];
+		AgeRefYear := (INTEGER2)AgeRefYYYYMMDD[1..4];
+		AgeRefMonth := (UNSIGNED1)AgeRefYYYYMMDD[5..6];
+		AgeRefDay := (UNSIGNED1)AgeRefYYYYMMDD[7..8];
+		finalAge := ( STD.Date.FromGregorianYMD(AgeRefYear,AgeRefMonth,AgeRefDay)-STD.Date.FromGregorianYMD(inDOBYear,inDOBMonth,inDOBDay) )/365.2425;
 		return if(inDOB='',0,finalAge);
 	end;
 	export crosswalkState(String inState) := function

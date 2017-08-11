@@ -1,6 +1,6 @@
-//This Function Macro validates the minimal input criteria per validMinInput_enum defined in BatchShare.Constants
+﻿//This Function Macro validates the minimal input criteria per validMinInput_enum defined in BatchShare.Constants
 EXPORT MAC_IsInputValid(ds_in,valMinInput_enum):=FUNCTIONMACRO
-IMPORT BatchShare,ut;
+IMPORT BatchShare,ut,std;
 
 	c_enum :=BatchShare.Constants.Valid_Min_Cri;
 	//FILTERS
@@ -8,8 +8,8 @@ IMPORT BatchShare,ut;
 	has_Address  := (ds_in.prim_range<>'' OR ut.isPOBox(ds_in.prim_name) OR ut.isRR(ds_in.prim_name))
 									 AND ds_in.prim_name<>''
 									 AND ((ds_in.p_city_name<>'' AND ds_in.st<>'') OR ds_in.z5<>'');
-	has_SSN      := (UNSIGNED)ds_in.SSN<>0;
-	has_DOB      := (UNSIGNED)ds_in.DOB<>0;
+	has_SSN      := (UNSIGNED)ds_in.SSN<>0 AND LENGTH(TRIM(ds_in.SSN,ALL))=9;
+	has_DOB      := Std.Date.IsValidDate((UNSIGNED)ds_in.DOB);
 	has_DID      := ds_in.DID<>0;
 	RETURN CASE(valMinInput_enum
 							,c_enum.DID                                 => has_DID

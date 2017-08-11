@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Healthcare_SocioEconomic_Batch_Service_V2">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="20"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -170,7 +170,8 @@ export Healthcare_SocioEconomic_Batch_Service_V2 := MACRO
 
 	rawResults_appendInput := join(rawResults,batchinseq,(integer)left.seq=(integer)right.seq,
 															transform(Models.Layouts_Healthcare_V2.layout_SocioEconomic_attributes_combined,
-																self.MemberAge := Models.Healthcare_SocioEconomic_Functions_V2.calcAge(right.DOB);
+																ageRefYYYYMMDD := if((string)history_date = '999999', (string)Std.Date.Today(), (string)history_date+(string2)Models.Healthcare_SocioEconomic_Functions_V2.calcDaysInMonth((string)history_date));
+																self.MemberAge := Models.Healthcare_SocioEconomic_Functions_V2.calcAgeInYears(right.DOB,(string)ageRefYYYYMMDD);
 																//Do other crosswalks.....
 																gender:=STD.Str.ToUpperCase(right.MemberGender);
 																self.GenderStr := gender; //Needed for Model  as Gender attribute

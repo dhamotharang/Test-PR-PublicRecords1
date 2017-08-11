@@ -1,4 +1,4 @@
-import risk_indicators, gong, ut, targus, LIB_Date, FCRA, Inquiry_AccLogs, PhonesPlus_V2, gateway, nid;
+﻿import risk_indicators, gong, ut, targus, LIB_Date, FCRA, Inquiry_AccLogs, PhonesPlus_V2, gateway, nid;
 
 
 export getDirsByPhone(dataset(Risk_Indicators.Layouts.Layout_Input_Plus_Overrides) input, dataset(Gateway.Layouts.Config) gateways, unsigned1 dppa, unsigned1 glb,
@@ -258,7 +258,6 @@ targus_gw := if(count(targus_gw_prep)>0, risk_indicators.getTargusGW(targus_gw_p
 // output(valid_internal_listings, named('valid_internal_listings'));
 // output(targus_gw_prep, named('targus_gw_prep'));
 
-return if(onThor, dedup(sort(in_house_with_insurance + targus_gw, phone10, -dt_last_seen, name_last, name_first,listed_name,record), record),
-					sort(in_house_with_insurance + targus_gw, phone10, -dt_last_seen, name_last, name_first,listed_name));
+return dedup(sort(in_house_with_insurance + targus_gw, phone10, -dt_last_seen, name_last, name_first,listed_name,record), record);
 
 end;

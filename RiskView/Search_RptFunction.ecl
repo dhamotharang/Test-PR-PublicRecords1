@@ -1,4 +1,4 @@
-import iesp, risk_indicators, fcra, doxie, ut, RiskView, Suppress, faa, 
+﻿import iesp, risk_indicators, fcra, doxie, ut, RiskView, Suppress, faa, 
 	RiskWiseFCRA, PersonContext;
 // for now this only supports a single input record -- that's what the fcradataservice restricts too...
 
@@ -16,6 +16,7 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 		returnLayout := RECORD
 			unsigned4 Seq;
 			iesp.riskview2.t_RiskView2Report;
+			string1 ConfirmationSubjectFound;
 		END;
 
 		bs := bocashell[1];
@@ -357,7 +358,10 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 			
 			self.ConsumerStatement := ConsumerStatements[1].cs_text;  // after all products are turned on to use personContext, this will be changing
 			// self.ConsumerStatement := bocashell_in[1].ConsumerStatements(trim(StatementType)=PersonContext.Constants.RecordTypes.CS)[1].Content;  // after all products are turned on to use personContext function, this will also need to be updated and get rid of old search
-			
+			self.ConfirmationSubjectFound := if(l.iid.nas_summary <= 4 and l.iid.nap_summary <= 4 and 
+				l.infutor_phone.infutor_nap <= 4 and l.address_verification.input_address_information.naprop <= 3 and l.truedid=false, 
+				'0',  // subject not found
+				'1');  // subject found
 			self := [];
 		END;
 		// OUTPUT (watercrafts.owners, NAMED ('watercraft'));

@@ -265,7 +265,6 @@ to be relatively harmless anyway). <br />
       &lt;IncludeVerification&gt;&lt;/IncludeVerification&gt;
       &lt;IncludePhoneSummary&gt;&lt;/IncludePhoneSummary&gt;
       &lt;IncludeStudentInformation&gt;&lt;/IncludeStudentInformation&gt;
-      &lt;IncludeJailBookings&gt;&lt;/IncludeJailBookings&gt;
     &lt;/Options&gt;
     &lt;ReportBy&gt;
       &lt;Name&gt;

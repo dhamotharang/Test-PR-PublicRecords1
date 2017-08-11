@@ -1,4 +1,4 @@
-import risk_indicators, gong, ut, targus, FCRA, Phonesplus_v2;
+﻿import risk_indicators, gong, ut, targus, FCRA, Phonesplus_v2;
 
 export getDirsByAddr(dataset(Risk_Indicators.Layouts.Layout_Input_Plus_Overrides) input, boolean isFCRA=false, unsigned1 glb=0, unsigned8 BSOptions=0, boolean onThor=false) := function
 
@@ -226,9 +226,7 @@ phonesPlusNonFcraTemp_thor := join(distribute(input(trim(prim_name)!='' and trim
 phonesPlusNonFcraTemp := if(onThor, phonesPlusNonFcraTemp_thor, phonesPlusNonFcraTemp_roxie);
 phonesPlusNonFcra := if((BSOptions & risk_indicators.iid_constants.BSOptions.IsInstantIDv1) > 0 and ~isFCRA, phonesPlusNonFcraTemp);
 			
-in_house_roxie := sort(combo + targus_wp + phonesPlusNonFcra, -phone10, -dt_last_seen, name_last, name_first,listed_name);  
-in_house_thor := dedup(sort(combo + targus_wp + phonesPlusNonFcra, -phone10, -dt_last_seen, name_last, name_first,listed_name, record), record);  
-in_house := if(onThor, in_house_thor, in_house_roxie);
+in_house := dedup(sort(combo + targus_wp + phonesPlusNonFcra, -phone10, -dt_last_seen, name_last, name_first,listed_name, record), record);  
 
 return in_house;
 

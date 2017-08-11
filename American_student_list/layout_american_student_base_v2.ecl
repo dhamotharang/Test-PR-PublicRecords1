@@ -1,4 +1,4 @@
-IMPORT AID;
+﻿IMPORT AID;
 export layout_american_student_base_v2 := record
 
 	integer8        KEY;
@@ -93,6 +93,9 @@ export layout_american_student_base_v2 := record
 	string4   			err_stat;
 	//Added for Shell 5.0 project 6/3/13
 	STRING5					tier2;
+	//Added for OKC Student List 7/10/17 DF-19691
+	STRING5					CollegeID := '';
+	STRING4					CollegeUpdate := '';
 	string2					source := '';
 
 end;

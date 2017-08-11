@@ -1,4 +1,4 @@
-export Constants := module
+﻿export Constants := module
 
 	export void_gateway := dataset([], Gateway.layouts.config);
 	
@@ -54,7 +54,7 @@ export Constants := module
 		// FCRA Full File Disclosure person context deltabase	
 		export String40 delta_personcontext	:= 'delta_personcontext';				//FCRA Full File Disclosure
 		export String40 AttIapQuery	:= 'att_iap';				// ATT DQ_IRS - Information Retrieval Service
-		export String40 consumerCreditReport := 'consumercreditreport';			//FCRA Consumer Credit Report
+		export String40 ConsumerCreditReport := 'consumercreditreport';			//FCRA Consumer Credit Report
 		
 	end;
 	

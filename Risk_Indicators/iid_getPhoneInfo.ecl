@@ -1,4 +1,4 @@
-import riskwise, did_add, ut, risk_indicators, NID, gateway;
+﻿import riskwise, did_add, ut, risk_indicators, NID, gateway;
 
 export iid_getPhoneInfo(grouped dataset(risk_indicators.Layout_Output) with_address_info, dataset(Gateway.Layouts.Config) gateways,
 													unsigned1 dppa, unsigned1 glb, 
@@ -215,6 +215,7 @@ risk_indicators.layout_output phvertrans(risk_indicators.layout_output le, dirs_
 END;
 
 biggestrec_history_roxie := join(withInquiriesNAP,dirs_by_phone,
+					left.phone10<>'' and
 								(IF(iid_constants.gn(left.dirsaddr_phonescore) and length(trim(left.dirsaddr_phone))=10,left.dirsaddr_phone[4..10],
 								IF(iid_constants.gn(left.utili_phonescore) and length(trim(left.utiliphone))=10,left.utiliphone[4..10],left.phone10[4..10]))=right.p7) and 
 								(IF(iid_constants.gn(left.dirsaddr_phonescore) and length(trim(left.dirsaddr_phone))=10,left.dirsaddr_phone[1..3],
@@ -225,7 +226,7 @@ biggestrec_history_roxie := join(withInquiriesNAP,dirs_by_phone,
 					((unsigned)RIGHT.dt_first_seen < (unsigned)iid_constants.full_history_date(left.historydate)) AND
 					(RIGHT.current_flag OR iid_constants.myDaysApart(left.historydate,((STRING6)RIGHT.deletion_date[1..6]+'31'), LastSeenThreshold)),
 					phvertrans(left,right), left outer, many lookup, 
-					keep(100));
+					keep(300));
 
 with_InquiriesNAP_withPhone := withInquiriesNAP(phone10<>'' OR iid_constants.gn(dirsaddr_phonescore) or iid_constants.gn(utili_phonescore));
 with_InquiriesNAP_noPhone := withInquiriesNAP(phone10='' AND NOT risk_indicators.iid_constants.gn(dirsaddr_phonescore) AND NOT risk_indicators.iid_constants.gn(utili_phonescore));
@@ -264,7 +265,7 @@ biggestrec_history_thor_nophone := project(with_InquiriesNAP_noPhone,
 biggestrec_history_thor := group(sort(biggestrec_history_thor_pre + biggestrec_history_thor_nophone, seq, -phone_date_last_seen, dirslast,dirsfirst,dirscmpy, record/*,-dirs_addrscore*/), seq);
 
 biggestrec_history_roxie_sort := IF(IsFCRA, sort(biggestrec_history_roxie,seq, -phone_date_last_seen, dirslast,dirsfirst,dirscmpy, record), biggestrec_history_roxie);
-biggestrec_history := if(onThor, biggestrec_history_thor, biggestrec_history_roxie/*_sort*/);					
+biggestrec_history := if(onThor, biggestrec_history_thor, biggestrec_history_roxie_sort);					
 
 phone_velocity := risk_indicators.iid_roll_PhoneVelocity(biggestrec_history);
 
@@ -438,7 +439,7 @@ wphonerec_history_roxie := join(biggestrec_rolled,dirs_by_phone,
 						ATMOST(
 							left.wphone10[4..10]=right.p7 and left.wphone10[1..3]=right.p3,
 							RiskWise.max_atmost
-						), keep(100));
+						), keep(300));
 
 
 wphonerec_history_thor_pre := join(distribute(biggestrec_rolled(wphone10<>''), hash64(wphone10)),

@@ -1,4 +1,4 @@
-IMPORT iesp, DemoSearchTool;
+﻿IMPORT iesp, DemoSearchTool;
 
 EXPORT Layouts := 
   MODULE
@@ -101,6 +101,7 @@ EXPORT Layouts :=
         INTEGER2 Per_SecondDegreeRelativesCount;
         INTEGER2 Per_SexualOffenderCount;
         INTEGER2 Per_SSNsCount;
+        INTEGER2 Per_ThirdDegreeRelativesCount;
         INTEGER2 Per_WatercraftsCount;
      END;
 
@@ -128,6 +129,7 @@ EXPORT People_Layout := RECORD
   boolean isfcra;
   integer8 first_degree_relatives_cnt;
   integer8 second_degree_relatives_cnt;
+  integer8 Third_Degree_Relatives_cnt;
   integer8 associates_cnt;
   integer8 neighbors_cnt;
   integer8 akas_cnt;
@@ -164,7 +166,6 @@ EXPORT People_Layout := RECORD
   integer8 owned_business_bdid_cnt;
   integer8 owned_business_linkid_cnt;
   unsigned6 did;
-	integer8 Third_Degree_Relatives_cnt;
   DATASET(business_bdid_rec) owned_businesses_bdid{maxcount(25)} := DATASET([],business_bdid_rec);
   DATASET(business_linkid_rec) owned_businesses_linkid{maxcount(25)} := DATASET([],business_linkid_rec);
   unsigned8 __internal_fpos__ :=0;

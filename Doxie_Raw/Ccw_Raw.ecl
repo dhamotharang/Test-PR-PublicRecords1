@@ -1,4 +1,4 @@
-//============================================================================
+﻿//============================================================================
 // Attribute: ccw_raw.  Used by view source service and comp-report.
 // Function to get concealed weapon records by did.
 // Return value: dataset. Layout: plusdid.
@@ -71,10 +71,10 @@ export Ccw_Raw(
    ccw_raw := if (IsFCRA, ccw_fcra_ffd, raw);
    
    census_data.MAC_Fips2County_Keyed(ccw_raw,st,county,county_name,f2)
-   ut.mac_map_gender(f2,gender,gender_mapped,f3)
-   ut.mac_map_race(f3,race,race_mapped,f4)
-   ut.mac_map_state(f4,source_state,source_state_name,fetched)
-   
+   codes.mac_map_gender(f2,gender,gender_mapped,f3)
+   codes.mac_map_race(f3,race,race_mapped,f4)
+   codes.mac_map_state(f4,source_state,source_state_name,fetched)
+  
    out_f := sort(fetched, whole record);
    
    doxie.MAC_PruneOldSSNs(out_f, out_f_pruned, best_ssn, did_out, isFCRA);
