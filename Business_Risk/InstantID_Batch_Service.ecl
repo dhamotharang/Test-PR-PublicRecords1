@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name = 'INSTANTID_BATCH'>
 	<part name = 'batch_in'    type = 'tns:XmlDataSet' cols="70" rows="25"/>
 	<part name = 'HaveBDIDS'   type = 'xsd:boolean'/>
@@ -114,7 +114,7 @@
 */
 
 export InstantID_Batch_Service() := macro
-import doxie, address, AutoStandardI;
+import doxie, address, AutoStandardI,OFAC_XG5;
 
 // Can't have duplicate definitions of Stored with different default values, 
 // so add the default to #stored to eliminate the assignment of a default value.
@@ -132,7 +132,11 @@ boolean ExcludeWatchLists := false : stored('ExcludeWatchLists');
 unsigned1 OFAC_version :=1 :STORED('OFACversion');
 boolean Include_Additional_watchlists := FALSE: stored('IncludeAdditionalWatchlists');
 boolean Include_Ofac := FALSE: stored('IncludeOfac');
-real Global_WatchList_Threshold :=.84 :stored('GlobalWatchlistThreshold');
+real Global_WatchList_Threshold_temp := 0 :stored('GlobalWatchlistThreshold');
+	global_watchlist_threshold := Map( 
+																		OFAC_version >= 4	and global_watchlist_threshold_temp = 0			=> OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
+																		OFAC_version < 4  and global_watchlist_threshold_temp = 0 		=> OFAC_XG5.Constants.DEF_THRESHOLD_REAL,
+																		global_watchlist_threshold_temp);
 boolean IncludeFraudScores := false :stored('IncludeFraudScores');
 boolean isUtility := false;
 boolean ln_branded_value := false;

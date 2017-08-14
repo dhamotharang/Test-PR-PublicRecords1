@@ -1,9 +1,9 @@
+﻿IMPORT ut, Std, FraudShared;
+
 EXPORT File_KeyBuild (
-dataset(Layouts.Base.Main)										pBaseMainBuilt									= Files().Base.Main.Built ) 
+dataset(FraudShared.Layouts.Base.Main)										pBaseMainBuilt									= FraudShared.Files().Base.Main.Built ) 
 := 
 Function 
-import ut, Std; 
-
 
   BaseMain              := pBaseMainBuilt(Record_id != 0); 	
 
@@ -18,7 +18,7 @@ import ut, Std;
 																			);
 
 
-	DpatchGLB5did   := project ( Outfile , transform (Layouts.KeyBuild, 
+	DpatchGLB5did   := project ( Outfile , transform (FraudShared.Layouts.KeyBuild, 
 	                            self.did  := if(left.source = 'GLB5' and left.did =0, left.Rawlinkid , left.did ); 
                               self      := left ; 
 															)); 

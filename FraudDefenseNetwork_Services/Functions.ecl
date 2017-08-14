@@ -1,4 +1,4 @@
-IMPORT FraudShared_Services;
+﻿IMPORT FraudShared_Services;
 
 EXPORT Functions := MODULE
 
@@ -22,5 +22,30 @@ EXPORT Functions := MODULE
 	  alreadyWAF // waf already on?, leave it on
       OR (NOT FDNContDataPermitted and file_type = ContribData);
       // or contributory data not permitted to be seen and contributory data was found
+
+  EXPORT SetSequences(
+    DATASET(FraudDefenseNetwork_Services.Layouts.batch_search_rec) ds_in
+  ) := FUNCTION
+    // Coded that if a person bothered to put the seq numbers in, 
+    // we should keep them because they probably may care about them
+    FraudDefenseNetwork_Services.Layouts.batch_search_rec xfm_SetSequence(FraudDefenseNetwork_Services.Layouts.batch_search_rec L, integer C) := TRANSFORM
+      SELF.seq := IF(L.seq != 0, L.seq, C);
+      SELF := L;
+    END;
+  
+    RETURN PROJECT(ds_in, xfm_SetSequence(LEFT, COUNTER));
+  
+  END;
+  
+  EXPORT boolean IsFirstRecordValid(
+    DATASET(FraudDefenseNetwork_Services.Layouts.batch_search_rec) ds_in
+  ) := FUNCTION
+    // I know this is convoluted, but logically easier since it leads more toward the future developmnen of FDN as a batchable service
+    ds_batch_in := FraudDefenseNetwork_Services.StandardizeBatchInput(ds_in);
+    ds_valid_in := FraudShared_Services.ValidateInput.BuildValidityRecs(ds_batch_in);
+    RETURN ds_Valid_In[1].hasValidInput;
+  END;
+  
+  
 
 END;

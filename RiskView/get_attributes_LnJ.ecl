@@ -43,7 +43,7 @@ riskview.layouts.attributes_internal_layout_noscore map_attributes(pre_clam le) 
 	self.LnJJudgmentTimeNewest         := attr.LnJJudgmentTimeNewest        ;
 	self.LnJJudgmentDollarTotal        := attr.LnJJudgmentDollarTotal       ;
 	self.ConfirmationSubjectFound	     := attr.ConfirmationSubjectFound     ;
-	
+	self.SubjectDeceased							 := attr.SubjectDeceased							;
 	self.LnJliens	:= le.LnJ_datasets.LnJLiens;
 	self.LnJJudgments	:= le.LnJ_datasets.LnJJudgments;
 
@@ -92,8 +92,8 @@ with_attributes_lnj_noScore := join(clam, with_attributes_lnj,
 			project(right.LnJJudgments, transform(Risk_Indicators.Layouts_Derog_Info.Judgments, self := left)));
 
 		self.ConfirmationSubjectFound	     := right.ConfirmationSubjectFound     ;
-
-	self := [];//non Juli attributes
+		self.SubjectDeceased						   := right.SubjectDeceased								;
+		self := [];//non Juli attributes
 ));
 
 return with_attributes_lnj_noScore;

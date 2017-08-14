@@ -1,7 +1,7 @@
-IMPORT iesp, FraudShared;
+﻿IMPORT iesp, FraudShared;
 
 EXPORT FilterThruMBS(
-  DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_ids = DATASET([],FraudShared_Services.Layouts.Raw_Payload_rec),
+  DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_ids,
   unsigned6 gc_id_in, 
   unsigned2 ind_type_in, 
   unsigned6 product_code_in, 

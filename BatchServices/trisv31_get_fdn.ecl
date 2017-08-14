@@ -1,4 +1,4 @@
-import iesp,BatchServices,FraudDefenseNetwork_Services,FraudShared_Services,doxie;
+﻿import iesp,BatchServices,FraudDefenseNetwork_Services,FraudShared_Services,doxie;
  
 EXPORT trisv31_get_fdn(dataset(BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in_wdid) ds_batch_w_did,
                        BatchServices.TaxRefundISv3_BatchService_Interfaces.Input in_args) := function
@@ -8,7 +8,7 @@ ds_rec_file := dataset([],iesp.frauddefensenetwork.t_FDNFileType);
 fdn_const := BatchServices.Constants.TRISv31_FDN;
    	
    	
-FraudShared_Services.Layouts.batch_search_rec xfdnForm(ds_batch_w_did l) := transform
+FraudDefenseNetwork_Services.Layouts.batch_search_rec xfdnForm(ds_batch_w_did l) := transform
    	
    	self.seq := (UNSIGNED)l.acctno;
    	self.did	:= l.did;

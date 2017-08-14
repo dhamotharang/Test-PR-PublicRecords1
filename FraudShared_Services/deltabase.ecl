@@ -1,7 +1,7 @@
-IMPORT iesp, Gateway, ut;
+﻿IMPORT iesp, Gateway, ut;
 
 EXPORT deltabase(
-  DATASET(FraudShared_Services.Layouts.batch_search_rec) in_recs,
+  DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
   DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) key_recs,
   DATASET(iesp.frauddefensenetwork.t_FDNFileType) ds_fileTypes,
   integer1 DeltaStrict = 0
@@ -18,18 +18,18 @@ EXPORT deltabase(
 
   fileTypeSet := FraudShared_Services.Utilities.convertToSet(ds_fileTypes);
   
-  FraudShared_Services.Layouts.t_DeltaBaseSelectRequest xRead(FraudShared_Services.Layouts.batch_search_rec L) := TRANSFORM
+  FraudShared_Services.Layouts.t_DeltaBaseSelectRequest xRead(FraudShared_Services.Layouts.BatchIn_rec L) := TRANSFORM
     SELF.Select := 'SELECT * FROM delta_fdn.delta_key WHERE '
       + IF(L.did  = 0,  '', ' lexid = ' + FraudShared_Services.Utilities.dqString(TRIM((string)L.did, ALL)))
       + IF(L.ssn  = '',   '', ' ssn = ' + FraudShared_Services.Utilities.dqString(TRIM(L.ssn, ALL)))
-      + IF(L.phone10  = '',   '', ' phone = ' + FraudShared_Services.Utilities.dqString(TRIM(L.phone10, ALL)))
+      + IF(L.phoneno  = '',   '', ' phone = ' + FraudShared_Services.Utilities.dqString(TRIM(L.phoneno, ALL)))
       + ' AND date_added >= '  + FraudShared_Services.Utilities.dqString(checkDate)
       + ' AND date_added <= '  + FraudShared_Services.Utilities.dqString(today) 
       + IF(fileTypeSet = '',  '', ' AND file_Type IN ( '  + fileTypeSet  +  ' ) ')  
       + FraudShared_Services.Constants.limiter;
   END;
    
-  readDeltabase := PROJECT(in_recs, xRead(LEFT));
+  readDeltabase := PROJECT(ds_batch_in, xRead(LEFT));
    
   //Getting URL from ESP
   GatewayRes := Gateway.Configuration.get();

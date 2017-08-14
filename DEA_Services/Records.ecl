@@ -1,4 +1,4 @@
-import AutoStandardI,dea_Services,doxie,dea,iesp,ut,suppress;
+﻿import AutoStandardI, dea_Services, dea, iesp, ut, suppress;
 
 export Records := module
 	export params := interface(
@@ -6,14 +6,15 @@ export Records := module
 		AutoStandardI.LIBIN.PenaltyI_Indv.base,
 		AutoStandardI.InterfaceTranslator.glb_purpose.params,
 		AutoStandardI.InterfaceTranslator.dppa_purpose.params,
-		AutoStandardI.InterfaceTranslator.penalt_threshold_value.params)
+		AutoStandardI.InterfaceTranslator.penalt_threshold_value.params,
+		AutoStandardI.InterfaceTranslator.ssn_mask_val.params)
 	end;
 	export val(params in_mod) := function
 	
 		// Get the IDs, pull the payload records and add DEA_id.
 		ids := DEA_services.SearchService_IDs.val(in_mod);
 																 
-		Suppress.MAC_Suppress(ids,ids_tmp,in_mod.applicationType,Suppress.Constants.LinkTypes.DID,did);
+		Suppress.MAC_Suppress(ids, ids_tmp, in_mod.applicationType, Suppress.Constants.LinkTypes.DID, did);
 
 		recs := join(ids_tmp,DEA.Key_dea_reg_num,
 		             keyed(left.Dea_Registration_Number =  right.Dea_Registration_Number),
@@ -22,15 +23,12 @@ export Records := module
 													 self.did :=(string) left.did,
 													 self.Dea_Registration_Number :=left.Dea_Registration_Number,
 													 self.isDeepDive:=left.isDeepDive;		
- 													 self:=right,  // set for use later.
-																),limit(ut.limits.DEA_MAX, skip));
-		
-	
-			
+ 													self:=right,  // set for use later.
+														),limit(ut.limits.DEA_MAX, skip));
+					
 		// Calculate the penalty on the records
-
-		recs_plus_pen := project(recs,transform(DEA_Services.Layouts.rawrec,
-			tempindvmod := module(project(in_mod,AutoStandardI.LIBIN.PenaltyI_Indv.full,opt))
+		recs_plus_pen := project(recs, transform(DEA_Services.Layouts.rawrec,
+			tempindvmod := module(project(in_mod, AutoStandardI.LIBIN.PenaltyI_Indv.full,opt))
 				export allow_wildcard := false;
 				export city_field := left.p_city_name;
 				export did_field := left.did;
@@ -52,9 +50,8 @@ export Records := module
 				export dob_field := '';
 				export dod_field := '';
 			end;
-
 			
-			tempbizmod := module(project(in_mod,AutoStandardI.LIBIN.PenaltyI_Biz.full,opt))
+			tempbizmod := module(project(in_mod,AutoStandardI.LIBIN.PenaltyI_Biz.full, opt))
 				export allow_wildcard := false;
 				export bdid_field := left.bdid;
 				export city_field := left.p_city_name;
@@ -90,10 +87,12 @@ export Records := module
 		
     mod_penalty := project (in_mod, AutoStandardI.InterfaceTranslator.penalt_threshold_value.params);
     unsigned2 pthreshold_translated := AutoStandardI.InterfaceTranslator.penalt_threshold_value.val (mod_penalty);
-		recs_sort := dedup(sort(recs_fmt(_penalty <= pthreshold_translated),if(AlsoFound,1,0),
-						_penalty,registrationnumber,-ExpirationDate,record),
+		recs_sort := dedup(sort(recs_fmt(_penalty <= pthreshold_translated), if(AlsoFound,1,0),
+						_penalty, registrationnumber, -ExpirationDate,record),
 						record);
 		tempresults_slim := choosen(recs_sort, iesp.Constants.MAX_COUNT_DEA_SEARCH); 
+
+  Suppress.MAC_Mask(tempresults_slim, tmp_masked, ssn, '', true, false, maskVal := in_mod.SSNMASK); //masking ssn
 
 		//for debugging purpose
 		// output(ids,named('SSREcs_ids'));
@@ -102,7 +101,7 @@ export Records := module
 		// output(recs_plus_pen,named('SSREcs_recs_plus_pen'));
 		// output(recs_sort,named('SSREcs_recs_sort'));
 		
-		return tempresults_slim;
+		return tmp_masked;
 		
 		end;
 		

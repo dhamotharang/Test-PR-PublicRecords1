@@ -1,7 +1,4 @@
-/*2017-03-08T23:27:08Z (Andrea Koenen)
-RR-11056: Release of Juli CR 7
-*/
-import doxie_files, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD;
+﻿import doxie_files, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD;
  
 export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0, 
 		GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_corrections,
@@ -44,50 +41,14 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 	MAC_liensParty_transform(trans_name, key_liens_party) := MACRO	
 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working trans_name(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_LnJ le, key_liens_party ri) := TRANSFORM
-		myGetDate := iid_constants.myGetDate(le.historydate);
-		isRecent := ut.DaysApart(ri.date_first_seen,myGetDate)<365*2+1;
-
-		// Unreleased Liens--------------------------------
-		SELF.lnj_recent_unreleased_count := (INTEGER)(ri.rmsid<>'' AND 
-																					 (INTEGER)ri.date_last_seen=0 AND
-																						isRecent);
-		SELF.lnj_historical_unreleased_count := (INTEGER)(ri.rmsid<>'' AND 
-																							(INTEGER)ri.date_last_seen=0 AND
-																							~isRecent);																						
-		SELF.lnj_unreleased_count12 := (INTEGER)(ri.rmsid<>'' AND (INTEGER)ri.date_last_seen=0 and 
-																					Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)ri.date_first_seen,ut.DaysInNYears(1)));
-																																										
-		// Released Liens	-----------------------------------																		
-		SELF.lnj_recent_released_count := (INTEGER)(ri.rmsid<>'' AND 
-																				(INTEGER)ri.date_last_seen<>0 AND
-																				isRecent);
-		SELF.lnj_historical_released_count := (INTEGER)(ri.rmsid<>'' AND 
-																						(INTEGER)ri.date_last_seen<>0 AND
-																						~isRecent);
-		SELF.lnj_released_count12 := (INTEGER)(ri.rmsid<>'' AND (INTEGER)ri.date_last_seen<>0 and 
-																				Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)ri.date_first_seen,ut.DaysInNYears(1)));
-
-		self.lnj_last_unreleased_date := if((INTEGER)ri.date_last_seen=0, ri.date_first_seen, '');																			
-		SELF.lnj_last_released_date := if((INTEGER)ri.date_last_seen<>0, (unsigned)ri.date_first_seen, 0);
 		
-		SELF.date_first_seen := (unsigned)ri.date_first_seen;// to be used in evictions
-		SELF.date_last_seen := (unsigned)ri.date_last_seen;// to be used in evictions
-		
-		self.tmsid := if(ri.tmsid='', '', le.tmsid);	// set these to blank so that we miss on the evictions search below
+		self.tmsid := if(ri.tmsid='', '', le.tmsid);	
 		self.rmsid := if(ri.rmsid='', '', le.rmsid);
+		self.date_last_seen := (unsigned) ri.date_last_seen; //at defendant level so take here over at main where it's all defendants
+		self.date_first_seen := (unsigned) ri.date_first_seen;
 		self.name_type := ri.name_type;
 		//orig_name is not parsed/cleaned...so need to use the cleaned name fields
 		self.orig_name := Risk_Indicators.iid_constants.CreateFullName(ri.title, ri.fname, ri.mname, ri.lname, ri.name_suffix);
-		self.lnj_last_jgmt_unreleased_date := if((INTEGER)ri.date_last_seen=0, ri.date_first_seen, '');																			
-		SELF.lnj_last_jgmt_released_date := if((INTEGER)ri.date_last_seen<>0, (unsigned)ri.date_first_seen, 0);
-		self.lnj_last_lien_unreleased_date := if((INTEGER)ri.date_last_seen=0, ri.date_first_seen, '');																			
-		SELF.lnj_last_lien_released_date := if((INTEGER)ri.date_last_seen<>0, (unsigned)ri.date_first_seen, 0);
-		self.lnj_last_allTax_unreleased_date := if((INTEGER)ri.date_last_seen=0, ri.date_first_seen, '');																			
-		SELF.lnj_last_allTax_released_date := if((INTEGER)ri.date_last_seen<>0, (unsigned)ri.date_first_seen, 0);
-		self.lnj_last_state_unreleased_date := if((INTEGER)ri.date_last_seen=0, ri.date_first_seen, '');																			
-		SELF.lnj_last_state_released_date := if((INTEGER)ri.date_last_seen<>0, (unsigned)ri.date_first_seen, 0);
-		self.lnj_last_federal_unreleased_date := if((INTEGER)ri.date_last_seen=0, ri.date_first_seen, '');																			
-		SELF.lnj_last_federal_released_date := if((INTEGER)ri.date_last_seen<>0, (unsigned)ri.date_first_seen, 0);
 		SELF.VendorDateLastSeen := ri.date_vendor_last_reported;
 		SELF := le;
 		SELF := [];
@@ -100,11 +61,11 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 
 	liens_party_raw_roxie := JOIN (liens_added, liensv2.key_liens_party_id_FCRA, 
               LEFT.rmsid<>'' AND
-              keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid) and 
+							keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid) and 
 							left.did=(unsigned)right.did and
 							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-							FCRA.lien_is_ok(Risk_Indicators.iid_constants.myGetDate(left.historydate),RIGHT.date_first_seen) and right.name_type='D'
-							AND (string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
+							right.name_type='D' and
+						  (string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
 							and trim((string)right.persistent_record_id) not in left.lien_correct_tmsid_rmsid  // new way - exclude corrected records that match the persistent_record_id										
 							and if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
 							get_liensparty_raw(LEFT,RIGHT), LEFT OUTER,
@@ -115,16 +76,17 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 							(LEFT.rmsid=RIGHT.rmsid) AND (left.tmsid=right.tmsid) and 
 							left.did=(unsigned)right.did and
 							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-							FCRA.lien_is_ok(Risk_Indicators.iid_constants.myGetDate(left.historydate),RIGHT.date_first_seen)
-							AND (string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
+							(string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
 							and trim((string)right.persistent_record_id) not in left.lien_correct_tmsid_rmsid  // new way - exclude corrected records that match the persistent_record_id										
 							and if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
 							get_liensparty_raw(LEFT,RIGHT), LEFT OUTER,
 							ATMOST((LEFT.rmsid=RIGHT.rmsid) AND (left.tmsid=right.tmsid), riskwise.max_atmost), LOCAL);
 
 	liens_party_raw_thor := group(sort(liens_party_raw_thor_rmsid + 
-							project(liens_added(rmsid=''), transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working, self := left, self := [])), seq, local), seq, local);
+							project(liens_added(rmsid=''), 
+							transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working, self := left, self := [])), seq, local), seq, local);
 
+	//we want the earliest date filed so order party info to keep that info
 	liens_party_raw := if(onThor, liens_party_raw_thor, liens_party_raw_roxie);
 
 	unique_ffids := dedup(sort(liens_added,did), did);
@@ -134,7 +96,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 											keyed(right.flag_file_id IN left.lien_correct_ffid) and 
 											left.did=(unsigned)right.did and
 											(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-											FCRA.lien_is_ok(Risk_Indicators.iid_constants.myGetDate(left.historydate),RIGHT.date_first_seen) and right.name_type='D'
+											right.name_type='D'
 											and if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL								
 											get_liensparty_corrections(LEFT, RIGHT),
 											ATMOST(riskwise.max_atmost));
@@ -143,7 +105,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 											right.flag_file_id IN left.lien_correct_ffid and 
 											left.did=(unsigned)right.did and
 											(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-											FCRA.lien_is_ok(Risk_Indicators.iid_constants.myGetDate(left.historydate),RIGHT.date_first_seen) and right.name_type='D'
+											right.name_type='D'
 											and if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL								
 											get_liensparty_corrections(LEFT, RIGHT), ALL, LOCAL);
 					
@@ -153,26 +115,71 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 	MAC_liensMain_transform(trans_name, key_liens_main) := MACRO	
 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working trans_name(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working le, key_liens_main ri) := transform
-		myGetDate := iid_constants.myGetDate(le.historydate);
-		isRecent := ut.DaysApart((string8)le.date_first_seen,myGetDate)<365*2+1;
-
 		isEviction := ri.eviction='Y';
 		self.evictionInd := isEviction;
-	
-		SELF.lnj_eviction_recent_unreleased_count := (INTEGER)(isEviction and (INTEGER)le.date_last_seen=0 AND isRecent);
-		SELF.lnj_eviction_historical_unreleased_count := (INTEGER)(isEviction and (INTEGER)le.date_last_seen=0 AND ~isRecent);
-		SELF.lnj_eviction_recent_released_count := (INTEGER)(isEviction and (INTEGER)le.date_last_seen<>0 AND isRecent);
-		SELF.lnj_eviction_historical_released_count := (INTEGER)(isEviction and (INTEGER)le.date_last_seen<>0 AND ~isRecent);
+		//set variables for these fields and take from party key as that has the defendant info. Where as main has all the parties info
+		releasedDate := (string) le.date_last_seen ;
+		OrigDateFiled := (string) le.date_first_seen;
+		
+		SELF.date_first_seen := (unsigned) OrigDateFiled;
+		SELF.date_last_seen :=(unsigned)  releasedDate;
+		myGetDate := iid_constants.myGetDate(le.historydate);
+		isRecent := ut.DaysApart(OrigDateFiled,myGetDate)<365*2+1;
 
-		SELF.lnj_eviction_count := (integer)(isEviction and (INTEGER)le.date_last_seen=0) ; // fcra eviction must be unreleased
-		SELF.lnj_eviction_count12 := (integer)(isEviction and (INTEGER)le.date_last_seen=0 and Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)le.date_first_seen,ut.DaysInNYears(1)));
-		SELF.lnj_last_eviction_date := if(isEviction, (unsigned)le.date_first_seen, 0);
+		// Unreleased Liens--------------------------------
+		tmp_lnj_recent_unreleased_count := (INTEGER)(ri.rmsid<>'' AND 
+																					 (INTEGER)releasedDate=0 AND
+																						isRecent);
+		tmp_lnj_historical_unreleased_count := (INTEGER)(ri.rmsid<>'' AND 
+																							(INTEGER)releasedDate=0 AND
+																							~isRecent);																						
+		tmp_lnj_unreleased_count12 := (INTEGER)(ri.rmsid<>'' AND (INTEGER)releasedDate=0 and 
+																					Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)OrigDateFiled,ut.DaysInNYears(1)));
+																																										
+		// Released Liens	-----------------------------------																		
+		tmp_lnj_recent_released_count := (INTEGER)(ri.rmsid<>'' AND 
+																				(INTEGER)releasedDate<>0 AND
+																				isRecent);
+		tmp_lnj_historical_released_count := (INTEGER)(ri.rmsid<>'' AND 
+																						(INTEGER)releasedDate<>0 AND
+																						~isRecent);
+		tmp_lnj_released_count12 := (INTEGER)(ri.rmsid<>'' AND (INTEGER)releasedDate<>0 and 
+																				Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)OrigDateFiled,ut.DaysInNYears(1)));
+
+		tmp_lnj_last_unreleased_date := if((INTEGER)releasedDate=0, OrigDateFiled, '');																			
+		tmp_lnj_last_released_date := if((INTEGER)releasedDate<>0, (unsigned)OrigDateFiled, 0);
+		
+		self.tmsid := if(ri.tmsid='', '', le.tmsid);	// set these to blank so that we miss on the evictions search below
+		self.rmsid := if(ri.rmsid='', '', le.rmsid);
+		tmp_lnj_last_jgmt_unreleased_date := if((INTEGER)releasedDate=0, OrigDateFiled, '');																			
+		tmp_lnj_last_jgmt_released_date := if((INTEGER)releasedDate<>0, (unsigned)OrigDateFiled, 0);
+		tmp_lnj_last_lien_unreleased_date := if((INTEGER)releasedDate=0, OrigDateFiled, '');																			
+		tmp_lnj_last_lien_released_date := if((INTEGER)releasedDate<>0, (unsigned)OrigDateFiled, 0);
+		tmp_lnj_last_allTax_unreleased_date := if((INTEGER)releasedDate=0, OrigDateFiled, '');																			
+		tmp_lnj_last_allTax_released_date := if((INTEGER)releasedDate<>0, (unsigned)OrigDateFiled, 0);
+		tmp_lnj_last_state_unreleased_date := if((INTEGER)releasedDate=0, OrigDateFiled, '');																			
+		tmp_lnj_last_state_released_date := if((INTEGER)releasedDate<>0, (unsigned)OrigDateFiled, 0);
+		tmp_lnj_last_federal_unreleased_date := if((INTEGER)releasedDate=0, OrigDateFiled, '');																			
+		tmp_lnj_last_federal_released_date := if((INTEGER)releasedDate<>0, (unsigned)OrigDateFiled, 0);
+
+
+//end	
+	
+		SELF.lnj_eviction_recent_unreleased_count := (INTEGER)(isEviction and (INTEGER)releasedDate=0 AND isRecent);
+		SELF.lnj_eviction_historical_unreleased_count := (INTEGER)(isEviction and (INTEGER)releasedDate=0 AND ~isRecent);
+		SELF.lnj_eviction_recent_released_count := (INTEGER)(isEviction and (INTEGER)releasedDate<>0 AND isRecent);
+		SELF.lnj_eviction_historical_released_count := (INTEGER)(isEviction and (INTEGER)releasedDate<>0 AND ~isRecent);
+
+		SELF.lnj_eviction_count := (integer)(isEviction and (INTEGER)releasedDate=0) ; // fcra eviction must be unreleased
+		SELF.lnj_eviction_count12 := (integer)(isEviction and (INTEGER)releasedDate=0 and 
+			Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)OrigDateFiled,ut.DaysInNYears(1)));
+		SELF.lnj_last_eviction_date := if(isEviction, (unsigned)OrigDateFiled, 0);
 
 		// they want liens seperated by type and released or unreleased for modeling shell 3.0
 		ftd := trim(stringlib.stringtouppercase(ri.filing_type_desc));
 		goodResult := ri.rmsid<>'';
-		unreleased := le.date_last_seen=0;
-		released := le.date_last_seen<>0;
+		unreleased := (integer) releasedDate=0;
+		released := (integer) releasedDate<>0;
 		
 		// only count evictions in the liens buckets if you are running version prior to 50
 		isCivilJudgment := ftd in iid_constants.setCivilJudgment and goodResult and unreleased and ((~isEviction and ftd not in iid_constants.setSuitsFCRA) );
@@ -245,14 +252,14 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.lnj_released_small_claims_amt:= if(isSmallClaimsReleased, (real)ri.amount, 0);
 
 		// blank out line counters and dates for suits on records that were counted in Liens Party join above
-		SELF.lnj_recent_unreleased_count := if((isSuits or isSuitsReleased or isEviction), 0, le.lnj_recent_unreleased_count);
-		SELF.lnj_historical_unreleased_count := if((isSuits or isSuitsReleased or isEviction), 0, le.lnj_historical_unreleased_count	);																					
-		SELF.lnj_unreleased_count12 :=  if((isSuits or isSuitsReleased or isEviction), 0, le.lnj_unreleased_count12 );	
-		SELF.lnj_recent_released_count :=  if((isSuits or isSuitsReleased or isEviction), 0, le.lnj_recent_released_count );	
-		SELF.lnj_historical_released_count := if((isSuits or isSuitsReleased or isEviction), 0, le.lnj_historical_released_count );	
-		SELF.lnj_released_count12 :=  if((isSuits or isSuitsReleased or isEviction), 0, le.lnj_released_count12 );	
-		self.lnj_last_unreleased_date := if((isSuits or isSuitsReleased or isEviction), '', le.lnj_last_unreleased_date );	
-		SELF.lnj_last_released_date :=  if((isSuits or isSuitsReleased or isEviction), 0, le.lnj_last_released_date );	
+		SELF.lnj_recent_unreleased_count := if((isSuits or isSuitsReleased or isEviction), 0, tmp_lnj_recent_unreleased_count);
+		SELF.lnj_historical_unreleased_count := if((isSuits or isSuitsReleased or isEviction), 0, tmp_lnj_historical_unreleased_count	);																					
+		SELF.lnj_unreleased_count12 :=  if((isSuits or isSuitsReleased or isEviction), 0, tmp_lnj_unreleased_count12 );	
+		SELF.lnj_recent_released_count :=  if((isSuits or isSuitsReleased or isEviction), 0, tmp_lnj_recent_released_count );	
+		SELF.lnj_historical_released_count := if((isSuits or isSuitsReleased or isEviction), 0, tmp_lnj_historical_released_count );	
+		SELF.lnj_released_count12 :=  if((isSuits or isSuitsReleased or isEviction), 0, tmp_lnj_released_count12 );	
+		self.lnj_last_unreleased_date := if((isSuits or isSuitsReleased or isEviction), '', tmp_lnj_last_unreleased_date );	
+		SELF.lnj_last_released_date :=  if((isSuits or isSuitsReleased or isEviction), 0, tmp_lnj_last_released_date );	
 	
 	//Start Juli additions
 		SELF.LJType := map(
@@ -264,9 +271,9 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 												 ftd in risk_indicators.iid_constants.setPRLien => risk_indicators.iid_constants.LienText,	
 												 ftd NOT in risk_indicators.iid_constants.setPROther => risk_indicators.iid_constants.OtherText,
 												 '');
-		SELF.DateFiled := ri.orig_filing_date;
+		SELF.DateFiled := OrigDateFiled;
 		SELF.Amount := (string) (integer) ri.Amount; //attributes make this a real and store in an integer so making integer then string
-		SELF.ReleaseDate := ri.release_date;
+		SELF.ReleaseDate := releasedDate;
 		SELF.FileTypeDesc := trim(stringlib.stringtouppercase(ri.filing_type_desc));
 		SELF.Filingnumber := ri.Filing_number;
 		SELF.Filingbook := ri.Filing_book;
@@ -277,37 +284,42 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.Defendant := if(trim(le.name_type) = 'D', trim(le.orig_name), '');
 		SELF.Plaintiff := '';
 		SELF.Eviction := if(isEviction, 'Y', 'N');
-		SELF.FilingDescription := if(TRIM(ri.release_date)<>'', 'RELEASED', '');
+		SELF.FilingDescription := if(TRIM((String) releasedDate)<>'0', 'RELEASED', '');
+		SELF.OrigFilingNumber := ri.Orig_Filing_Number;
+		SELF.certificateNumber := ri.certificate_number;
+		SELF.irsSerialNumber := ri.irs_serial_number;
+		SELF.CaseNumberL := ri.Case_number;
+		SELF.ProcessDate := ri.Process_Date;
 		SELF.seq := (Unsigned4) le.Seq;
 		//liens
 		is_Lien := self.LJType = risk_indicators.iid_constants.LienText;
 		SELF.lnj_lien_cnt := if(is_Lien, 1, 0);	
 		SELF.lnj_lien_total := if(is_Lien, (real)ri.amount, 0);
-		SELF.lnj_last_lien_unreleased_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), '', le.lnj_last_lien_unreleased_date );	
-		SELF.lnj_last_lien_released_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), 0, le.lnj_last_lien_released_date );	
+		SELF.lnj_last_lien_unreleased_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), '', tmp_lnj_last_lien_unreleased_date );	
+		SELF.lnj_last_lien_released_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), 0, tmp_lnj_last_lien_released_date );	
 		//All Tax
 		SELF.lnj_liens_unreleased_all_tax_cnt:= (integer)(isAllTax and is_Lien);
 		SELF.lnj_liens_unreleased_all_tax_amt:= if(isAllTax and is_Lien, (real)ri.amount, 0);
 		SELF.lnj_liens_released_all_tax_cnt:= (integer)(isAllTaxReleased and is_Lien);
 		SELF.lnj_liens_released_all_tax_amt:= if(isAllTaxReleased and is_Lien, (real)ri.amount, 0);
-		SELF.lnj_last_allTax_unreleased_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), '', if(isAllTax and is_Lien, le.lnj_last_allTax_unreleased_date, '') );	
-		SELF.lnj_last_allTax_released_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), 0, if(isAllTaxReleased and is_Lien, le.lnj_last_allTax_released_date, 0) );	
+		SELF.lnj_last_allTax_unreleased_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), '', if(isAllTax and is_Lien, tmp_lnj_last_allTax_unreleased_date, '') );	
+		SELF.lnj_last_allTax_released_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), 0, if(isAllTaxReleased and is_Lien, tmp_lnj_last_allTax_released_date, 0) );	
 
 		//state tax
 		SELF.lnj_liens_unreleased_state_tax_cnt:= (integer)(isStateTax and is_Lien);
 		SELF.lnj_liens_unreleased_state_tax_amt:= if(isStateTax and is_Lien, (real)ri.amount, 0);
 		SELF.lnj_liens_released_state_tax_cnt:= (integer)(isStateTaxReleased and is_Lien);
 		SELF.lnj_liens_released_state_tax_amt:= if(isStateTaxReleased and is_Lien, (real)ri.amount, 0);
-		SELF.lnj_last_state_unreleased_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), '', if(isStateTax and is_Lien, le.lnj_last_state_unreleased_date, '') );	
-		SELF.lnj_last_state_released_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), 0, if(isStateTaxReleased and is_Lien, le.lnj_last_state_released_date, 0) );	
+		SELF.lnj_last_state_unreleased_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), '', if(isStateTax and is_Lien, tmp_lnj_last_state_unreleased_date, '') );	
+		SELF.lnj_last_state_released_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), 0, if(isStateTaxReleased and is_Lien, tmp_lnj_last_state_released_date, 0) );	
 
 		//federal tax
 		SELF.lnj_liens_unreleased_federal_tax_cnt:= (integer)(isFederalTax and is_Lien);
 		SELF.lnj_liens_unreleased_federal_tax_amt:= if(isFederalTax and is_Lien, (real)ri.amount, 0);
 		SELF.lnj_liens_released_federal_tax_cnt:= (integer)(isFederalTaxReleased and is_Lien);
 		SELF.lnj_liens_released_federal_tax_amt:= if(isFederalTaxReleased and is_Lien, (real)ri.amount, 0);
-		SELF.lnj_last_federal_unreleased_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), '', if(isFederalTax and is_Lien, le.lnj_last_federal_unreleased_date, '') );	
-		SELF.lnj_last_federal_released_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), 0, if(isFederalTaxReleased and is_Lien, le.lnj_last_federal_released_date, 0) );	
+		SELF.lnj_last_federal_unreleased_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), '', if(isFederalTax and is_Lien, tmp_lnj_last_federal_unreleased_date, '') );	
+		SELF.lnj_last_federal_released_date := if((isSuits or isSuitsReleased or isEviction or ~is_lien), 0, if(isFederalTaxReleased and is_Lien, tmp_lnj_last_federal_released_date, 0) );	
 
 		//Judgments
 		is_Jgmt := self.LJType IN [
@@ -315,13 +327,14 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 								risk_indicators.iid_constants.EvictionText,
 								risk_indicators.iid_constants.OtherText
 								];
-		self.lnj_last_jgmt_unreleased_date := if((isSuits or isSuitsReleased or isEviction or ~is_Jgmt), '', le.lnj_last_jgmt_unreleased_date );	
-		SELF.lnj_last_jgmt_released_date :=  if((isSuits or isSuitsReleased or isEviction or ~is_Jgmt), 0, le.lnj_last_jgmt_released_date );	
+		self.lnj_last_jgmt_unreleased_date := if((isSuits or isSuitsReleased or isEviction or ~is_Jgmt), '', tmp_lnj_last_jgmt_unreleased_date );	
+		SELF.lnj_last_jgmt_released_date :=  if((isSuits or isSuitsReleased or isEviction or ~is_Jgmt), 0, tmp_lnj_last_jgmt_released_date );	
 		SELF.lnj_jgmt_total := if((isSuits or isSuitsReleased or isEviction or ~is_Jgmt), 0, (real)ri.amount);
 		SELF.lnj_jgmt_cnt := if((isSuits or isSuitsReleased or isEviction or ~is_Jgmt), 0, 1);							
 		//End Juli additions
 		
 		SELF := le;
+		//self := [];
 	end;
 	endmacro;
 
@@ -331,6 +344,8 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 	liens_main_raw_roxie := JOIN(liens_party_raw, liensV2.key_liens_main_ID_FCRA,
 					left.rmsid<>'' and left.tmsid<>'' and 
 					keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid) and
+					(unsigned) left.date_first_seen = (unsigned) right.orig_filing_date and 
+					(unsigned) left.date_last_seen = (unsigned) right.release_date and //ensure we get the correct record for the defendant
 					right.filing_type_desc not in Risk_Indicators.iid_constants.setMechanicsLiens and
 					right.filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50 AND
 					(string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
@@ -341,18 +356,21 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 
 	liens_main_raw_thor_pre := JOIN(distribute(liens_party_raw(rmsid <> '' and tmsid <> ''), hash64(tmsid, rmsid)), 
 					distribute(pull(liensV2.key_liens_main_ID_FCRA(
-										filing_type_desc not in Risk_Indicators.iid_constants.setMechanicsLiens and filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50)), hash64(tmsid, rmsid)),
+					filing_type_desc not in Risk_Indicators.iid_constants.setMechanicsLiens and 
+					filing_type_desc not in Risk_Indicators.iid_constants.set_Invalid_Liens_50)), hash64(tmsid, rmsid)),
 					(left.tmsid=right.tmsid) and (left.rmsid=right.rmsid) and
+					(unsigned) left.date_first_seen = (unsigned) right.orig_filing_date and 
+					(unsigned) left.date_last_seen = (unsigned) right.release_date and //ensure we get the correct record for the defendant			
 					(string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
 					and trim((string)right.persistent_record_id) not in left.lien_correct_tmsid_rmsid  // new way - exclude corrected records that match the persistent_record_id										
 					and if(FilterBCB, RIGHT.BCBFlag = TRUE, TRUE),	
 					get_liens_main_raw(LEFT,RIGHT), left outer, 
-					ATMOST((LEFT.tmsid=RIGHT.tmsid) and (left.rmsid=right.rmsid), riskwise.max_atmost), LOCAL);
+					ATMOST((LEFT.tmsid=RIGHT.tmsid) and (left.rmsid=right.rmsid) 
+					, riskwise.max_atmost), LOCAL);
 												
 	liens_main_raw_thor := group(sort(liens_main_raw_thor_pre + liens_party_raw(rmsid='' or tmsid=''), seq, local), seq, local);
-									
-	liens_main_raw := if(onThor, liens_main_raw_thor, liens_main_raw_roxie);
-
+								
+  liens_main_raw := if(onThor, liens_main_raw_thor, liens_main_raw_roxie);
 	liens_main_overrides_roxie := JOIN(liens_party_overrides, fcra.key_Override_liensv2_main_ffid,
 											exists(left.lien_correct_ffid) and
 											keyed(right.flag_file_id IN left.lien_correct_ffid),  
@@ -366,9 +384,104 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 												
 	liens_main_overrides := if(onThor, liens_main_overrides_thor, liens_main_overrides_roxie);
 
+	liensWithDesc := ungroup(liens_main_raw(ljType !=''));//FileTypeDesc != '');
+	//get smallest date first seen for each tmsid	
+	liensTmsidDF := DEDUP(SORT(liensWithDesc, did, tmsid, (integer) DateFiled), did, tmsid);
 
-	liensWithDesc := liens_main_raw(FileTypeDesc != '');
+	lienswithNewDF := join(liensWithDesc, liensTmsidDF,
+		left.did = right.did and left.tmsid = right.tmsid,
+		transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_workingDF,
+			self.DF := (string) right.DateFiled;
+			self := left,
+			self := []), 
+			left outer);	
+	//unique TMSID and DF will have oldest date filed
+	liensTmsidDF_total := DEDUP(SORT(lienswithNewDF, did, tmsid,
+		(integer) if((integer) ReleaseDate = 0, 99999999, (integer) ReleaseDate)
+		-(integer) ProcessDate), did, tmsid);	
 	
+	liensWithDesc_DF2 := project(liensTmsidDF_total, 
+		transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_workingDF,
+			self.sort2Date := map(
+				trim(left.OrigFilingNumber, left, right) != '' => left.OrigFilingNumber,
+				trim(left.filingNumber, left, right) != '' => left.filingNumber,
+				trim(left.certificateNumber, left, right) != '' => left.certificateNumber,
+				trim(left.irsSerialNumber, left, right) != '' => left.irsSerialNumber,
+				trim(left.filingBook, left, right) != '' and trim(left.filingPage, left, right) != ''=> 
+							'BK' +trim(left.filingBook, left, right) + 'PG'+trim(left.filingPage, left, right),
+				trim(left.CaseNumberL, left, right) != '' => left.CaseNumberL,
+				left.tmsid);//default to tmsid over blank
+				self := left,
+				self := []));
+	//least sort for sort2			
+	liensSort2DF := DEDUP(SORT(liensWithDesc_DF2, did, Agencystate, AgencyCounty, 
+			sort2Date, (integer) datefiled, (integer) DF), 
+			did, Agencystate, AgencyCounty, sort2Date, datefiled);
+	lienswithNewDF2 := join(liensWithDesc_DF2, liensSort2DF,
+		left.did = right.did and left.AgencyState = right.AgencyState and 
+		left.AgencyCounty = right.AgencyCounty and
+		left.sort2Date = right.sort2Date and
+		left.datefiled = right.datefiled,
+		transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_workingDF,
+			self.DF2 := (string) right.DF;
+			self := left,
+			self := []), 
+			left outer);	
+	//unique Agencystate, AgencyCounty, sort2Date and DF2 will have oldest date filed
+	liensTmsidDF2_total := DEDUP(SORT(lienswithNewDF2, did, Agencystate, AgencyCounty, 
+		sort2Date, (integer) if((integer) ReleaseDate = 0, 99999999, (integer) ReleaseDate),
+		-(integer) ProcessDate), did, Agencystate, AgencyCounty, 
+		sort2Date);				
+	//Just sorting to get the top record with the oldest date filed
+	liensSort3DF := DEDUP(SORT(liensTmsidDF2_total, did, (integer) datefiled, -amount,
+			Agencystate, AgencyCounty, (integer) DF2), 
+			did, DateFiled, amount, Agencystate, AgencyCounty);
+	//any matching records will get updated to have the earliest date filed		
+	lienswithNewDF3 := join(liensTmsidDF2_total, liensSort3DF,
+			left.did = right.did and 
+			left.DateFiled = right.DateFiled and 
+			left.amount = right.amount and
+			left.AgencyState = right.AgencyState and 
+			left.AgencyCounty = right.AgencyCounty,
+		transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_workingDF,
+			self.DF3 := (string) right.DF2;
+			self := left,
+			self := []), 
+			left outer);
+	//now all matching records have same date filed, so keep record by sort order for output		
+	liensTmsidDF3_total := DEDUP(SORT(lienswithNewDF3, did,
+			(integer) datefiled, -amount,  Agencystate, AgencyCounty,
+		(integer) if((integer) ReleaseDate = 0, 99999999, (integer) ReleaseDate),
+			-(integer) ProcessDate), 
+			did, DateFiled, amount, Agencystate, AgencyCounty);
+		//Just sorting to get the top record with the oldest date filed
+	liensSort4DF := DEDUP(SORT(liensTmsidDF3_total, did, filingNumber, 
+			Agencystate, AgencyCounty, (integer) DF3), 
+			did, filingNumber, Agencystate, AgencyCounty);
+	//any matching records will get updated to have the earliest date filed		
+	lienswithNewDF4 := join(liensTmsidDF3_total, liensSort4DF,
+			left.did = right.did and 
+			left.filingNumber = right.filingNumber and 
+			left.AgencyState = right.AgencyState and 
+			left.AgencyCounty = right.AgencyCounty,
+		transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_workingDF,
+			self.DF4 := (string) right.DF3;
+			self := left,
+			self := []), 
+			left outer);
+	//now all matching records have same date filed, so keep record by sort order for output		
+	liensTmsidDF4_total := DEDUP(SORT(lienswithNewDF4, did,
+			filingNumber, Agencystate, AgencyCounty,
+			(integer) if((integer) ReleaseDate = 0, 99999999, (integer) ReleaseDate),
+			-(integer) ProcessDate), 
+			did, filingNumber, Agencystate, AgencyCounty);	
+
+	liens_filtered_DF_ := liensTmsidDF4_total(FCRA.lien_is_ok(Risk_indicators.iid_constants.myGetDate(historydate),(string) DF4));
+
+	//drop off the DF date
+	liens_filtered_DF := project(liens_filtered_DF_, transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working,
+		self := left, self := []));
+
 	//grab C records ...sometimes the cname can be blank on those
 	Risk_Indicators.Layouts_Derog_Info.plaintiff_rec getPlaintiff(liensWithDesc le, liensv2.key_liens_party_id_FCRA ri) := TRANSFORM
 		SELF.Plaintiff := if((le.lnj_jgmt_cnt>=1 or le.lnj_eviction_count >= 1) and ri.name_type='C', 
@@ -376,47 +489,55 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 											Risk_Indicators.iid_constants.CreateFullName(ri.title, ri.fname, ri.mname, ri.lname, ri.name_suffix)),
 											'');
 		SELF.Name_type := ri.name_type;
+		SELF.vendorDateLastSeen := ri.Date_vendor_Last_reported;
 		SELF := le;
 	END;
 	
-	liensWplainTiff_roxie := join(liensWithDesc, liensv2.key_liens_party_id_FCRA, 
+	liensWplainTiff_roxie := join(liens_filtered_DF, liensv2.key_liens_party_id_FCRA, 
 							LEFT.rmsid<>'' and left.did != 0 and 
-							keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid) and 
+							keyed(LEFT.rmsid=RIGHT.rmsid) AND 
+							keyed(left.tmsid=right.tmsid) and 
 							(left.lnj_jgmt_cnt >= 1 or left.lnj_eviction_count >= 1) and 
 							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-							FCRA.lien_is_ok(Risk_indicators.iid_constants.myGetDate(left.historydate),RIGHT.date_first_seen) and 
+							(unsigned) left.date_first_seen = (unsigned) right.date_first_seen and 
+							(unsigned) left.date_last_seen = (unsigned) right.date_last_seen and //ensure we get the correct record for the defendant
 							right.name_type='C'
 							AND (string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
 							and trim((string)right.persistent_record_id) not in left.lien_correct_tmsid_rmsid  // new way - exclude corrected records that match the persistent_record_id										
 							and if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
 							getPlaintiff(LEFT,RIGHT), 
-							ATMOST(keyed(LEFT.rmsid=RIGHT.rmsid) AND keyed(left.tmsid=right.tmsid), 
+							ATMOST(keyed(LEFT.rmsid=RIGHT.rmsid) AND 
+							keyed(left.tmsid=right.tmsid), 
 							riskwise.max_atmost));
-							
-	liensWplainTiff_thor := join(distribute(liensWithDesc(rmsid<>'' and did <> 0 and (lnj_jgmt_cnt >= 1 or lnj_eviction_count >= 1)), hash64(rmsid, tmsid)), 
+	liensWplainTiff_thor := join(distribute(liens_filtered_DF(rmsid<>'' and did <> 0 and (lnj_jgmt_cnt >= 1 or lnj_eviction_count >= 1)), hash64(rmsid, tmsid)), 
 							distribute(pull(liensv2.key_liens_party_id_FCRA), hash64(rmsid, tmsid)), 
-							(LEFT.rmsid=RIGHT.rmsid) AND (left.tmsid=right.tmsid) and 
+							(LEFT.rmsid=RIGHT.rmsid) AND 
+							(left.tmsid=right.tmsid) and
+							(unsigned) left.date_first_seen = (unsigned) right.date_first_seen and 
+							(unsigned) left.date_last_seen = (unsigned) right.date_last_seen and //ensure we get the correct record for the defendant
 							(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate AND (unsigned)RIGHT.date_first_seen<>0 and	// date first seen was blank on some records
-							FCRA.lien_is_ok(Risk_indicators.iid_constants.myGetDate(left.historydate),RIGHT.date_first_seen) and 
 							right.name_type='C'
 							AND (string50)right.tmsid + (string50)right.rmsid not in left.lien_correct_tmsid_rmsid  // old way - exclude corrected records from prior to 11/13/2012
 							and trim((string)right.persistent_record_id) not in left.lien_correct_tmsid_rmsid  // new way - exclude corrected records that match the persistent_record_id										
 							and if(FilterSSNs, Risk_indicators.iid_constants.GoodSSNLength(RIGHT.SSN), TRUE),//if filter is not set return ALL
 							getPlaintiff(LEFT,RIGHT), 
-							ATMOST((LEFT.rmsid=RIGHT.rmsid) AND (left.tmsid=right.tmsid), riskwise.max_atmost), LOCAL);
+							ATMOST((LEFT.rmsid=RIGHT.rmsid) AND 
+							(left.tmsid=right.tmsid), riskwise.max_atmost), LOCAL);
 
-	liensWplainTiff := if(onThor, liensWplainTiff_thor, ungroup(liensWplainTiff_roxie));
-
-	liensWplainTiff_duped := DEDUP(SORT(liensWplainTiff, TMSID, RMSID, name_type), TMSID, RMSID, name_type, KEEP(1));
-	
-	liens_fuller := JOIN(liensWithDesc, liensWplainTiff_duped,
-		LEFT.Tmsid = RIGHT.Tmsid and LEFT.rmsid = RIGHT.rmsid and LEFT.Did = RIGHT.did,
+  liensWplainTiff := if(onThor, liensWplainTiff_thor, ungroup(liensWplainTiff_roxie));
+	liensWplainTiff_duped := DEDUP(SORT(liensWplainTiff, TMSID, RMSID, name_type, vendorDateLastSeen), TMSID, name_type, KEEP(1));
+	liens_fuller := JOIN(liens_filtered_DF, liensWplainTiff_duped,
+		LEFT.Tmsid = RIGHT.Tmsid and 
+		LEFT.rmsid = RIGHT.rmsid and 
+		LEFT.Did = RIGHT.did,
 		transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working,
 			self.plaintiff := right.plaintiff,
 			self := left),LEFT OUTER);
 			
-	liens_full := group(ungroup(liens_fuller + liens_main_overrides), did);
+	liens_fullunSorted := ungroup(liens_fuller + liens_main_overrides);
 
+	liens_full := group(liens_fullunSorted, did);
+	
 	liens_filtered_a := if(FilterCityLiens, liens_full(FileTypeDesc NOT IN Risk_Indicators.iid_constants.CityLienFltrs), liens_full);
 	liens_filtered_b := if(FilterCountyLiens, liens_filtered_a(FileTypeDesc NOT IN Risk_Indicators.iid_constants.CountyLienFltrs), liens_filtered_a);
 	liens_filtered_c := if(FilterStateWarrent, liens_filtered_b(FileTypeDesc NOT IN Risk_Indicators.iid_constants.StateWarrentFltrs), liens_filtered_b);
@@ -429,8 +550,9 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 	//start Juli Logic
 	LiensOnly := liens_filtered_h(LJType = risk_indicators.iid_constants.LienText);
 
-	SrtedLiens_dp := DEDUP(DEDUP(SORT(ungroup(LiensOnly), did,tmsid,rmsid,-lnj_last_unreleased_date,
-		-lnj_last_eviction_date, -(integer) DateFiled, record), did,tmsid, rmsid), did, KEEP(99)); //keep 99 for each did
+	SrtedLiens_dp := DEDUP(DEDUP(SORT(ungroup(LiensOnly), did,tmsid,
+		-(integer) ReleaseDate, -(integer) datefiled, record),
+		did,tmsid), did, KEEP(99)); //keep 99 for each did
 
 //now sort for output the fields that only the client sees	
 	SrtedLiens := SORT(group(SrtedLiens_dp,seq), -(integer) VendorDateLastSeen, -(integer) DateFiled, -(integer) ReleaseDate);
@@ -441,8 +563,9 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 								risk_indicators.iid_constants.OtherText
 								]);
 
-	SrtedJudgments_dp := DEDUP(DEDUP(SORT(ungroup(JudgmentsOnly), did,tmsid,rmsid,-lnj_last_unreleased_date,
-		-lnj_last_eviction_date, -(integer) DateFiled, record), did,tmsid, rmsid), did, Keep(99));//keep 99 for each did
+	SrtedJudgments_dp := DEDUP(DEDUP(SORT(ungroup(JudgmentsOnly), did,tmsid,
+		-(integer) ReleaseDate, -(integer) datefiled, record),
+		did,tmsid), did, Keep(99));//keep 99 for each did
 
 //now sort for output the fields that only the client sees
 	SrtedJudgments := SORT(group(SrtedJudgments_dp,seq), -(integer) VendorDateLastSeen, -(integer) DateFiled, -(integer) ReleaseDate);
@@ -463,7 +586,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working roll_liens(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working le, 
 		Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working ri) :=
 	TRANSFORM
-		sameLien := le.tmsid=ri.tmsid and le.rmsid=ri.rmsid;
+		sameLien := le.tmsid = ri.tmsid;
 
 	//don't increment the lien counters in shell 5.0 and higher if right record is an eviction
 		SELF.lnj_recent_unreleased_count := le.lnj_recent_unreleased_count + IF(sameLien or (ri.evictionInd and bsVersion >=50),0,ri.lnj_recent_unreleased_count);
@@ -477,7 +600,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.lnj_last_unreleased_date := if((integer)le.lnj_last_unreleased_date > (integer)ri.lnj_last_unreleased_date, le.lnj_last_unreleased_date, ri.lnj_last_unreleased_date);
 		SELF.lnj_last_released_date := if((integer)le.lnj_last_released_date > (integer)ri.lnj_last_released_date, le.lnj_last_released_date, ri.lnj_last_released_date);
 		
-		SELF.lnj_eviction_count := le.lnj_eviction_count + IF(sameLien,0,ri.lnj_eviction_count);
+		SELF.lnj_eviction_count := le.lnj_eviction_count + IF(sameLien, 0, ri.lnj_eviction_count);
 		SELF.lnj_eviction_count12 := le.lnj_eviction_count12 + IF(sameLien,0,ri.lnj_eviction_count12);
 	
 		SELF.lnj_eviction_recent_unreleased_count := le.lnj_eviction_recent_unreleased_count + IF(sameLien,0,ri.lnj_eviction_recent_unreleased_count);
@@ -602,18 +725,36 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 			le.lnj_last_jgmt_released_date, 
 			ri.lnj_last_jgmt_released_date));
 		SELF.lnj_jgmt_total := le.lnj_jgmt_total + if(isJgmt, IF(sameLien and le.lnj_jgmt_total>0, 0, ri.lnj_jgmt_total), 0);
+
+		self.date_First_seen := le.date_first_seen;
+		SELF.FileTypeDesc := trim(le.FileTypeDesc);
+		SELF.Filingnumber := le.Filingnumber;
+		SELF.Filingbook := le.Filingbook;
+		SELF.Filingpage := le.Filingpage;
+		SELF.Agency := le.Agency;
+		SELF.Agencycounty := le.Agencycounty;
+		SELF.Agencystate := le.Agencystate;
+		SELF.Defendant := le.Defendant;
+		SELF.Plaintiff := le.Plaintiff;
+		SELF.Eviction := le.Eviction;
+		SELF.FilingDescription := le.FilingDescription;
+		// SELF.date_last_seen := le.VendorDateLastSeen;
+		SELF.datefiled := le.datefiled;
+		SELF.ReleaseDate := le.ReleaseDate;
 		SELF := ri;
 	END;
 
-	liens_rolled_original := ROLLUP(SORT(liensJudgments,did,tmsid,rmsid,-lnj_last_unreleased_date,
-		-lnj_last_eviction_date, -(integer) DateFiled, record),
+	liens_rolled_original1 := ROLLUP(SORT(ungroup(liens_filtered_DF), did, tmsid,
+	-(integer) ReleaseDate, -(integer) datefiled, record),
 		LEFT.did=RIGHT.did, roll_liens(LEFT,RIGHT)); 
-		
+	//if we have liens date from main that are not within 7 year window, drop them to the floor
+	liens_rolled_original := group(liens_rolled_original1, did);	
 	//Liens section of PR
 	Risk_Indicators.Layouts_Derog_Info.Liens GetLienSeq(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working le, integer c) := transform
 		self.seq := (string) c;
 		self.LienType := le.FileTypeDesc;
 		self.DateLastSeen := (string) le.VendorDateLastSeen;
+		self.ReleaseDate := if((integer) le.ReleaseDate =0, '', (string)le.ReleaseDate);
 		self := le;
 		self :=[];
 	end;
@@ -648,6 +789,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		self.seq := (string) c;
 		self.JudgmentType := le.FileTypeDesc;
 		self.DateLastSeen := (string) le.VendorDateLastSeen;
+		self.ReleaseDate := if((integer) le.ReleaseDate =0, '', (string)le.ReleaseDate);
 		self := le;
 		self :=[];
 	end;
@@ -751,6 +893,9 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 // output(liens_party_raw, named('liens_party_raw'));
 // output(liensWplainTiff, named('liensWplainTiff'));
 // output(liensWplainTiff_duped, named('liensWplainTiff_duped'));
-return GROUP(w_LiensNJudgmentsFinal, seq);	
+// output(liens_party_rawTMp, named('liens_party_rawTMp'));
+// output(liens_added, named('liens_added'));
+
+	return SORT(GROUP(w_LiensNJudgmentsFinal, seq), seq);	
 
  END;
