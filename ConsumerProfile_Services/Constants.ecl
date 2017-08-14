@@ -1,8 +1,16 @@
-IMPORT iesp;
+﻿IMPORT iesp;
 
 EXPORT Constants := MODULE
 	export MAX_SEEDS_REC 	:= 25;
-						
+	
+// the Risk 5.0 reason codes 	
+  export Reason_Codes := module
+		export string S65 := 'S65';
+		export string F04 := 'F04';
+		export string F00 := 'F00';
+		export string F03 := 'F03';
+	end;
+	
 	export SSN_HRI := module
 		export string DECEASED := '02';
 		export string ISSUED_PRIOR_DOB := '03';
@@ -21,19 +29,6 @@ EXPORT Constants := MODULE
 	export SSN_INFO := module
 		export VALID := 'true';
 		export INVALID := 'false';
-	end;
-	
-	export SSN_NAME_VERIFICATION := module
-		export set of unsigned1 NO_MATCH := [0, 1, 2, 3, 5, 6, 8];
-		export set of unsigned1 FNAME_SSN_MATCH := [4, 10];
-		export set of unsigned1 LNAME_SSN_MATCH := [7, 11];
-		export set of unsigned1 MATCH := [9, 12];
-		export string DESCRIPTION(unsigned1 c) := map(
-						c in NO_MATCH 				=> 	'No Name and SSN Match',
-						c in FNAME_SSN_MATCH	=>	'First Name and SSN Match',
-						c in LNAME_SSN_MATCH	=>	'Last Name and SSN Match',
-						c in MATCH						=>	'Full Name and SSN Match',
-						'');
 	end;
 	
 	export ADDRESS_VERIFICATION := module

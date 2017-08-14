@@ -1,7 +1,7 @@
-import tools, HealthCareFacility; 
+﻿import tools, HealthCareFacility,FraudShared; 
 EXPORT MapToCommon  (
-
-		dataset(Layouts.Base.SuspectIP)    inBaseSuspectIP    = Files().Base.SuspectIP.Built
+		string pversion
+	 ,dataset(Layouts.Base.SuspectIP)    inBaseSuspectIP    = Files().Base.SuspectIP.Built
 	 ,dataset(Layouts.Base.GLB5)         inBaseGLB5         = Files().Base.GLB5.Built
 	 ,dataset(Layouts.Base.Tiger)        inBaseTiger        = Files().Base.Tiger.Built
 	 ,dataset(Layouts.Base.CFNA)         inBaseCFNA         = Files().Base.CFNA.Built
@@ -13,7 +13,7 @@ module
  
  // SuspectIP 
  
- Export		SuspectIP                    := project (inBaseSuspectIP, transform(Layouts.Base.Main , 
+ Export		SuspectIP                    := project (inBaseSuspectIP, transform(FraudShared.Layouts.Base.Main , 
 
       self.Record_ID                      := 0 ;
       self.Reported_Date                  := left.Reported_Date;
@@ -60,7 +60,7 @@ module
 
 // GLB5 Append Market information 
 
-	j := join(inBaseGLB5, Files().Input.MBSmarketAppend.Sprayed/*Files().mbs_lookup*/ , left.orig_COMPANY_ID = right.company_id,
+	j := join(inBaseGLB5, FraudShared.Files().Input.MBSmarketAppend.Sprayed/*Files().mbs_lookup*/ , left.orig_COMPANY_ID = right.company_id,
                                               transform(FraudDefenseNetwork.Layouts.base.Glb5,
 																							        self.sybase_company_id        := stringlib.stringtouppercase(right.company_id); 
 																							        self.sybase_main_country_code := stringlib.stringtouppercase(right.main_country_code); 
@@ -74,8 +74,8 @@ module
 // Source exlusions 
 
   FilterSet    := ['GOV', 'GOVERNMENT & ACADEMIC', 'GOVERNMENT', 'HEA', 'HEALTHCARE INITIATIVE', 'GOVERNMENT HEALTHCARE', 'INTERNAL', 'HC -   PROVIDER',  'TAX & REVENUE.FEDERAL','HEALTHCARE' , 'PROVIDER', 'PHARMACY' ,'PAYER'];
-  SrcExclusion := set(FraudDefenseNetwork.Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0  and status = 1), (string)gc_id); 
-	SrcExclusionC := set(FraudDefenseNetwork.Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0 and status = 1), (string)company_id); 
+  SrcExclusion := set(FraudShared.Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0  and status = 1), (string)gc_id); 
+	SrcExclusionC := set(FraudShared.Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0 and status = 1), (string)company_id); 
   Jfiltered    := J (global_company_id   not in SrcExclusion ); 
 	Jfiltered1   := Jfiltered(company_id    not in SrcExclusionC );
   JcountryCode := Jfiltered1(sybase_MAIN_COUNTRY_CODE = 'USA'); 
@@ -114,7 +114,7 @@ module
 				 Jdedup       := dedup(dInSegment,(unsigned)linkid, trim(company_id,left,right), trim(global_company_id,left,right) , trim(datetime[1..8],left,right),all ); 
 
 				
- Export		GLB5                    := project (Jdedup , transform(Layouts.Base.Main , 
+ Export		GLB5                    := project (Jdedup , transform(FraudShared.Layouts.Base.Main , 
 			
 		
 			self.Record_ID              := 0 ; 
@@ -199,7 +199,7 @@ module
 	
 // Tiger base to common 
 
-Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base.Main , 
+Export		Tiger                   := project (inBaseTiger , transform(FraudShared.Layouts.Base.Main , 
 			
 			self.Record_ID              := 0 ; 
       self.Customer_Event_ID      := left.CUST_ID_NUM ; 
@@ -267,7 +267,7 @@ Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base
 	)); 
 
  // CFNA 
- Export		CFNA                   := project (inBaseCFNA , transform(Layouts.Base.Main , 
+ Export		CFNA                   := project (inBaseCFNA , transform(FraudShared.Layouts.Base.Main , 
 
       self.Record_ID                      := 0 ;
 			self.Reason_Description             := 'IDENTITY FRAUD'; 
@@ -340,7 +340,7 @@ Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base
 	)); 
 
 
- Export		TextMinedCrim                            := project(inBaseTextMinedCrim, transform(Layouts.Base.Main , 
+ Export		TextMinedCrim                            := project(inBaseTextMinedCrim, transform(FraudShared.Layouts.Base.Main , 
 
       self.Record_ID                      := 0 ;
 			self.Reason_Description             := left.charge; 
@@ -408,7 +408,7 @@ Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base
   	  self:= [];
      )); 
 
- Export		OIG                            := project (inBaseOIG, transform(Layouts.Base.Main , 
+ Export		OIG                            := project (inBaseOIG, transform(FraudShared.Layouts.Base.Main , 
 
       self.Record_ID                      := 0 ;
 			self.Reason_Description             := left.sancdesc;
@@ -486,7 +486,7 @@ Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base
 	));
  
  // Address Inspection
- Export		AInspection                    := project (inBaseAInspection(length(trim(state,left,right)) <3), transform(Layouts.Base.Main , 
+ Export		AInspection                    := project (inBaseAInspection(length(trim(state,left,right)) <3), transform(FraudShared.Layouts.Base.Main , 
 
       self.Record_ID                      := 0 ;
 			self.ln_report_date                 := left.dt_first_reported; 
@@ -540,7 +540,7 @@ Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base
  
 // Append MBS classification attributes 
 
-  CombinedClassification := FraudDefenseNetwork.Functions.Classification(SuspectIP + GLB5 + Tiger + CFNA /*+ CRIM */+ TextMinedCrim + OIG + AInspection) ; 
+  CombinedClassification := Functions.Classification(SuspectIP + GLB5 + Tiger + CFNA /*+ CRIM */+ TextMinedCrim + OIG + AInspection) ; 
 	
 	// append rid 
 	
@@ -561,6 +561,7 @@ Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base
 
  combined       := project(CombinedClassification,to_form(left));
  // Filter header records
-Export  NewBaseRid := combined (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
+NewBaseRid := combined (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
+EXPORT Build_Base_Shared_Main := FraudShared.Build_Base_Main(pversion,NewBaseRid);
 
 END;

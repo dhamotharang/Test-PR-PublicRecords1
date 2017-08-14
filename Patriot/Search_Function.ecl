@@ -1,4 +1,4 @@
-/*2016-08-16T13:02:56Z (mwalklin)
+﻿/*2016-08-16T13:02:56Z (mwalklin)
 C:\Users\walkmi01\AppData\Roaming\HPCC Systems\eclide\mwalklin\DatalandStaging\Patriot\Search_Function\2016-08-16T13_02_56Z.ecl
 */
 import GlobalWatchLists, GlobalWatchLists_Services, iesp, ut, OFAC_XG5, Gateway;
@@ -13,8 +13,8 @@ export Search_Function(GROUPED DATASET(patriot.Layout_batch_in) in_data,
 														dataset(iesp.share.t_StringArrayItem) watchlists_requested=dataset([], iesp.share.t_StringArrayItem) ) :=
 FUNCTION
 
-r_threshold_score := map(threshold_value = 0.00 and ofac_version <= 3 => Patriot.Constants.DEF_THRESHOLD, 
-												threshold_value = 0.00 => Patriot.Constants.DEF_THRESHOLD_V4,
+r_threshold_score := map(threshold_value = 0.00 and ofac_version < 4 => OFAC_XG5.Constants.DEF_THRESHOLD_REAL, 
+												threshold_value = 0.00 and ofac_version  >= 4 => OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL, 
 												threshold_value < Patriot.Constants.MIN_THRESHOLD => Patriot.Constants.MIN_THRESHOLD,
 												threshold_value > Patriot.Constants.MAX_THRESHOLD => Patriot.Constants.MAX_THRESHOLD,
 												threshold_value);
@@ -47,7 +47,7 @@ END;
 
  XG5_ptys := OFAC_XG5.OFACXG5call(prep_XG5, 
 																	ofaconly_value ,
-																	threshold_value * 100 , 
+																	r_threshold_score * 100 , 
 																	include_ofac,
 																	include_Additional_watchlists,
 																	dob_radius,

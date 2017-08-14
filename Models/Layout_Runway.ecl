@@ -1,4 +1,4 @@
-EXPORT Layout_Runway := record
+﻿EXPORT Layout_Runway := record
 	Unsigned seq := 0;
 	Unsigned did := 0;
 	
@@ -1113,6 +1113,12 @@ string2 RVB711_0_0_reason1 := '';
 string2 RVB711_0_0_reason2 := '';
 string2 RVB711_0_0_reason3 := '';
 string2 RVB711_0_0_reason4 := '';
+
+String3 RVB1610_1_0_score := '';
+string3 RVB1610_1_0_reason1 := '';
+string3 RVB1610_1_0_reason2 := '';
+string3 RVB1610_1_0_reason3 := '';
+string3 RVB1610_1_0_reason4 := '';
 
 String3 RVC1110_1_0_score := '';
 string2 RVC1110_1_0_reason1 := '';

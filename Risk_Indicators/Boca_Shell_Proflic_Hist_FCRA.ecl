@@ -1,4 +1,4 @@
-import prof_licenseV2, riskwise, ut, RiskView;
+﻿import prof_licenseV2, riskwise, ut, RiskView;
 
 export Boca_Shell_Proflic_Hist_FCRA(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integer bsversion, 
 			boolean isPrescreen, boolean isDirectToConsumerPurpose = false) := FUNCTION
@@ -138,8 +138,8 @@ PL_Plus_temp roll_licenses(PL_Plus_temp le, PL_Plus_temp rt) := transform
 	side_to_use := if(le.license_type<>'', le, rt);
 	self.license_type := side_to_use.license_type;	// keep the most current license type
 	
- 	self.PLcategory := if(bsversion >= 50, '', side_to_use.PLcategory);
-	self.jobCategory := if(bsversion >= 50, '', side_to_use.jobCategory);
+ 	self.PLcategory := if(bsversion >= 4, '', side_to_use.PLcategory);
+	self.jobCategory := if(bsversion >= 4, '', side_to_use.jobCategory);
 	self := le;
 end;
 
@@ -160,7 +160,7 @@ with_category_v5 := join(rolled_licenses_pre, Prof_LicenseV2.Key_LicenseType_loo
 			self.PLcategory := if(trim(right.category) != '', right.category, '0');
 			self := left), left outer, atmost(100), keep(1));
 			
-rolled_licenses := if(bsversion >= 50, with_category_v5, rolled_licenses_pre);
+rolled_licenses := if(bsversion >= 4, with_category_v5, rolled_licenses_pre);
 			
 PL_Plus_temp roll_licenses2(PL_Plus_temp le, PL_Plus_temp rt) := transform
 	self.proflic_count30 := le.proflic_count30+rt.proflic_count30;

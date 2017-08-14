@@ -421,7 +421,13 @@ EXPORT Constants := MODULE
 		
 	//Due Diligence
 	export DDRAttributesConst := MODULE
-		export unsigned2 MaxAttributes := 21;
+		export unsigned2 MaxAttributes      := 21;
+		export unsigned2 MaxDescriptions    := 210;
+		export unsigned2 MaxBusinesses      := 20;
+		export unsigned2 MaxActions         := 20;
+		export unsigned2 MaxAssets          := 20;
+    export unsigned2 MaxPersonNames     := 20;
+    export unsigned2 MaxRecords         := 20;
 	end;
 
   //Dun and Bradstreet (DNB)
@@ -1219,7 +1225,7 @@ EXPORT Constants := MODULE
 	EXPORT PersonContext := MODULE
 	   export unsigned2 CD_CONTENT_MAX_SIZE := 3000;
 	   export unsigned2 MAX_RECORDS := 10000;
-		 export unsigned2 MAX_KEYS := 300;
+		 export unsigned2 MAX_KEYS := 100;
 	END;
 
   // phones feedback (PHONESFEEDBACK name can't be used)

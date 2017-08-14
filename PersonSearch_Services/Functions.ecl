@@ -1,5 +1,5 @@
-import iesp,ut, AutoStandardI, AutoHeaderI, doxie, suppress, codes, AutokeyI, NID,
-       PhonesFeedback_Services,PhonesFeedback, AddressFeedback_Services, FraudDefenseNetwork_Services, FraudShared_Services;
+﻿import iesp,ut, AutoStandardI, AutoHeaderI, doxie, suppress, codes, AutokeyI, NID,
+       PhonesFeedback_Services,PhonesFeedback, AddressFeedback_Services, FraudDefenseNetwork_Services;
 
 export Functions := MODULE
 	
@@ -863,7 +863,7 @@ export Functions := MODULE
 		//                    when 3 assign ssn, when 4 assign phone, when 5 assign listed_phone
 		// Also transforming the data onto the layout needed to be passed into the new FraudDefenseNetwork_Services 
 		// function and converting the did field into the type expected by the function.
-    FraudShared_Services.Layouts.batch_search_rec  tf_NormAndSlim(
+    FraudDefenseNetwork_Services.Layouts.batch_search_rec  tf_NormAndSlim(
 		 PersonSearch_Services.Layouts.rec_headerRecordExt_seq L, integer C) := transform
 		   self.did         := choose(C,(unsigned6)L.did,0,0,0);
 			 self.prim_range  := choose(C,'',L.prim_range,'','');
@@ -901,7 +901,7 @@ export Functions := MODULE
     // Sort/dedup the normed phones children recs to only keep unique phone10 values.
 		// Then project onto the layout needed to be passed into the new FraudDefenseNetwork_Services function.
 		ds_in_seq_pc_dedup := project(dedup(sort(ds_in_seq_phones_children(phone10!=''),phone10),phone10),
-		                              transform(FraudShared_Services.Layouts.batch_search_rec,
+		                              transform(FraudDefenseNetwork_Services.Layouts.batch_search_rec,
 															      self.phone10 := left.phone10, // only keep "phones" phones10
 																    self         := [] // null all other unused fields
 	   														  ));
@@ -949,7 +949,7 @@ export Functions := MODULE
 		// FDN did indicator and the FDN WAF Contrib data indicator.
     PersonSearch_Services.Layouts.rec_headerRecordExt_seq tf_did_info(
       PersonSearch_Services.Layouts.rec_headerRecordExt_seq l, 
-			FraudShared_Services.Layouts.batch_response_rec r) := transform  
+			FraudDefenseNetwork_Services.Layouts.batch_response_rec r) := transform  
 	      self.fdn_did_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type),
         self := l
@@ -969,7 +969,7 @@ export Functions := MODULE
 		// set the FDN addr indicator and the FDN WAF Contrib data indicator.
     PersonSearch_Services.Layouts.rec_headerRecordExt_seq tf_addr_info(
       PersonSearch_Services.Layouts.rec_headerRecordExt_seq l, 
-	    FraudShared_Services.Layouts.batch_response_rec  r) := transform  
+	    FraudDefenseNetwork_Services.Layouts.batch_response_rec  r) := transform  
 			   self.fdn_addr_ind  := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			   self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 																	                 l.fdn_waf_contrib_data),
@@ -1000,7 +1000,7 @@ export Functions := MODULE
 		// set the FDN ssn indicator and the FDN WAF indicator.
     PersonSearch_Services.Layouts.rec_headerRecordExt_seq tf_ssn_info(
       PersonSearch_Services.Layouts.rec_headerRecordExt_seq l, 
-	    FraudShared_Services.Layouts.batch_response_rec r) := transform  
+	    FraudDefenseNetwork_Services.Layouts.batch_response_rec r) := transform  
         self.fdn_ssn_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 																	                l.fdn_waf_contrib_data),
@@ -1021,7 +1021,7 @@ export Functions := MODULE
 		// set the FDN phone indicator and the FDN WAF indicator.
     PersonSearch_Services.Layouts.rec_headerRecordExt_seq tf_phone_info(
       PersonSearch_Services.Layouts.rec_headerRecordExt_seq l, 
-	    FraudShared_Services.Layouts.batch_response_rec   r) := transform
+	    FraudDefenseNetwork_Services.Layouts.batch_response_rec   r) := transform
         self.fdn_phone_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 				  													              l.fdn_waf_contrib_data),
@@ -1042,7 +1042,7 @@ export Functions := MODULE
 		// set the FDN listed_phone indicator and the FDN WAF indicator.
     PersonSearch_Services.Layouts.rec_headerRecordExt_seq tf_listed_phone_info(
       PersonSearch_Services.Layouts.rec_headerRecordExt_seq l, 
-			FraudShared_Services.Layouts.batch_response_rec   r) := transform  
+			FraudDefenseNetwork_Services.Layouts.batch_response_rec   r) := transform  
         self.fdn_listed_phone_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 																	                l.fdn_waf_contrib_data),
@@ -1063,7 +1063,7 @@ export Functions := MODULE
 		// set the FDN phone indicator on the phones child dataset layout
     PersonSearch_Services.Layouts.rec_layout_phones_seq tf_phone_child_info(
       PersonSearch_Services.Layouts.rec_layout_phones_seq l, 
-	    FraudShared_Services.Layouts.batch_response_rec   r) := transform  
+	    FraudDefenseNetwork_Services.Layouts.batch_response_rec   r) := transform  
         self.fdn_phone_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 																	                l.fdn_waf_contrib_data),
@@ -1212,7 +1212,7 @@ export Functions := MODULE
 		// Check the counter: when 1 assign did,  when 2 assign address fields
 		// Also transforming the data onto the layout needed to be passed into the new FraudDefenseNetwork_Services 
 		// function and converting the did field into the type expected by the function.
-    FraudShared_Services.Layouts.batch_search_rec tf_NormAndSlim(
+    FraudDefenseNetwork_Services.Layouts.batch_search_rec tf_NormAndSlim(
 		  PersonSearch_Services.Layouts.rec_rollupRecord_seq L, integer C) := transform
 		   self.did         := choose(C,(unsigned6)L.did,0);
 			 self.prim_range  := choose(C,'',L.prim_range);
@@ -1249,7 +1249,7 @@ export Functions := MODULE
    // Sort/dedup the normed "ssns" children recs to only keep unique ssn values.
 	 // Then project onto the layout needed to be passed into the new FraudDefenseNetwork_Services function.
 	 ds_in_seq_sc_dedup := project(dedup(sort(ds_in_seq_ssns_children(ssn != ''),ssn),ssn),
-		                             transform(FraudShared_Services.Layouts.batch_search_rec,
+		                             transform(FraudDefenseNetwork_Services.Layouts.batch_search_rec,
 															      self.ssn := left.ssn, // only keep "ssns" ssn field
 																    self     := [] // null all other unused fields
 	   														 ));
@@ -1270,7 +1270,7 @@ export Functions := MODULE
     // Sort/dedup the normed "phones" children recs to only keep unique phone10 values.
 		// Then project onto the layout needed to be passed into the new FraudDefenseNetwork_Services function.
 		ds_in_seq_pc_dedup := project(dedup(sort(ds_in_seq_phones_children(phone10 !=''),phone10),phone10),
-		                              transform(FraudShared_Services.Layouts.batch_search_rec,
+		                              transform(FraudDefenseNetwork_Services.Layouts.batch_search_rec,
 															      self.phone10 := left.phone10, // only keep "phones" phones10
 																    self         := [] // null all other unused fields
 	   														  ));
@@ -1315,7 +1315,7 @@ export Functions := MODULE
 		// FDN did indicator and the FDN WAF Contrib data indicator.
 	  PersonSearch_Services.Layouts.rec_rollupRecord_seq tf_did_info(
       PersonSearch_Services.Layouts.rec_rollupRecord_seq l, 
-	    FraudShared_Services.Layouts.batch_response_rec r) := transform  
+	    FraudDefenseNetwork_Services.Layouts.batch_response_rec r) := transform  
 	      self.fdn_did_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type),
         self := l
@@ -1335,7 +1335,7 @@ export Functions := MODULE
 		// set the FDN addr indicator and the FDN WAF indicator.
      PersonSearch_Services.Layouts.rec_rollupRecord_seq tf_addr_info(
        PersonSearch_Services.Layouts.rec_rollupRecord_seq l, 
-	     FraudShared_Services.Layouts.batch_response_rec  r) := transform  
+	     FraudDefenseNetwork_Services.Layouts.batch_response_rec  r) := transform  
 			   self.fdn_addr_ind  := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			   self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 																	                 l.fdn_waf_contrib_data),
@@ -1366,7 +1366,7 @@ export Functions := MODULE
 		// set the FDN ssn indicator and the FDN WAF indicator) on the "ssns" child dataset layout
     PersonSearch_Services.Layouts.rec_ssnRec_seq tf_ssn_info(
       PersonSearch_Services.Layouts.rec_ssnRec_seq l, 
-	    FraudShared_Services.Layouts.batch_response_rec r) := transform  
+	    FraudDefenseNetwork_Services.Layouts.batch_response_rec r) := transform  
         self.fdn_ssn_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 																	                l.fdn_waf_contrib_data),
@@ -1402,7 +1402,7 @@ export Functions := MODULE
 		// set the FDN phone indicator and the FDN WAF indicator) on the "phones" child dataset layout.
     PersonSearch_Services.Layouts.rec_layout_phones_seq tf_phone_info(
       PersonSearch_Services.Layouts.rec_layout_phones_seq l, 
-	    FraudShared_Services.Layouts.batch_response_rec   r) := transform  
+	    FraudDefenseNetwork_Services.Layouts.batch_response_rec   r) := transform  
         self.fdn_phone_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 				  													              l.fdn_waf_contrib_data),

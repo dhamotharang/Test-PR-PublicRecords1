@@ -1,4 +1,4 @@
-/* Drivers License Validation Logic - US States and Territories, Canadian Provinces
+﻿/* Drivers License Validation Logic - US States and Territories, Canadian Provinces
 
 Drivers License result code definition:
 0=valid id number										7=last name failed
@@ -191,6 +191,9 @@ ret := CASE(state,
 						dl_trim[3]=lname[1] AND dl_trim[4]=lname[LENGTH(lname)] => '9',
 				    dl_len=10 AND dl_trim[1..2]=dob[5..6] AND dl_trim[6..7]=dob[3..4] AND dl_trim[8..9]=dob[7..8] => '7',
 				    dl_len=10 => '5',
+						dl_len=11 AND dl_trim[1..2] = 'NH' and dl_trim[3] >= 'A' and dl_trim[3] <= 'Z' and IsAllNumeric(dl_trim[4..11]) => '0',
+						dl_len=11 AND dl_trim[1..2] = 'NH' and dl_trim[3] >= 'A' and dl_trim[3] <= 'Z' => '12',
+						dl_len=11 => '6',
 				    '1'),
 		'NJ' =>  	MAP(dob='' => '99',
 				    dl_len=15 AND dl_trim[1]=lname[1] AND IsAllNumeric(dl_trim[2..15]) AND dl_trim[13..14]=dob[3..4] AND

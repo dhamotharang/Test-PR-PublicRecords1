@@ -1,6 +1,7 @@
+﻿IMPORT FraudShared;
 EXPORT Constants(
 
-	BOOLEAN	pUseOtherEnvironment	= FALSE
+	BOOLEAN	pUseOtherEnvironment	= true
 
 ) :=
 MODULE
@@ -18,9 +19,15 @@ MODULE
 
 */
 	EXPORT          TYPE_STR	       := 'AK';
-	EXPORT          ak_dataset       := FraudDefenseNetwork.File_Autokey();
-	EXPORT          ak_qa_keyname    := _Dataset(pUseOtherEnvironment).thor_cluster_files + 'key::fdn::qa::autokey::';
+	
+  #STORED('Platform','FDN');  
+	EXPORT          ak_dataset       := FraudShared.File_Autokey();
+	EXPORT          ak_qa_keyname    := _Dataset().thor_cluster_files + 'key::fdn::qa::autokey::';
 	EXPORT          AUTOKEY_SKIP_SET := autokey_buildskipset;  
+	
+	EXPORT 	special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|\\.|;|_|#|%|&|\\*|<|>|/|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
+  EXPORT  word_characters       := ' A | ABC | AN | AND | ANY | AS | AT | BUT | BY | ETC | FOR | FROM | IN | NA | OF | ON | OR | OTH | OTHER | PER | THAN | THE | THEN | TO | UP | WITH ';
+
 
 
 END;

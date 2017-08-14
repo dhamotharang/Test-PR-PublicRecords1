@@ -1,4 +1,4 @@
-/*2016-05-21T00:39:26Z (Kevin Huls)
+﻿/*2016-05-21T00:39:26Z (Kevin Huls)
 Automated reinstate from 2016-05-19T17:50:17Z
 */
 /*--SOAP--
@@ -153,7 +153,11 @@ boolean ExcludeWatchLists := false : stored('ExcludeWatchLists');
 unsigned1 OFAC_version :=1 :STORED('OFACversion');
 boolean Include_Additional_watchlists := FALSE: stored('IncludeAdditionalWatchlists');
 boolean Include_Ofac := FALSE: stored('IncludeOfac');
-real Global_WatchList_Threshold :=.84 :stored('GlobalWatchlistThreshold');
+real Global_WatchList_Threshold_temp := 0 :stored('GlobalWatchlistThreshold');
+			global_watchlist_threshold := Map( 
+																		OFAC_version >= 4	and global_watchlist_threshold_temp = 0			=> OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
+																		OFAC_version < 4  and global_watchlist_threshold_temp = 0 		=> OFAC_XG5.Constants.DEF_THRESHOLD_REAL,
+																		global_watchlist_threshold_temp);
 boolean IncludeFraudScores := false :stored('IncludeFraudScores');
 boolean IncludeRiskIndices := false :stored('IncludeRiskIndices');
 boolean use_dob_filter := FALSE :stored('UseDobFilter');

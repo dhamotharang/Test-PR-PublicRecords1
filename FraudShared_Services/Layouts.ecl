@@ -1,107 +1,89 @@
-IMPORT FraudShared, iesp;
+﻿IMPORT BatchShare, FraudShared, iesp, FraudDefenseNetwork_Services;
 
 EXPORT Layouts := MODULE
 
-  EXPORT FilterBy_rec := RECORD
-    string8   filterby_StartingReportedDate;
-    string8   filterby_EndingReportedDate;
-    string8   filterby_StartingEventDate;
-    string8   filterby_EndingEventDate;
-    string25  filterby_Disposition;
-    string3   filterby_Mitigated;
-    string10  filterby_NameType;
-    string2   filterby_State;
-    string10  filterby_PhoneNumber;
-    string1   filterby_InService;
-    string50  filterby_ProfessionType;
-    string2   filterby_LicensedPrState;
-    unsigned2 filterby_SourceTypeId;
-    unsigned2 filterby_PrimarySourceEntityId;
-    unsigned2 filterby_ExpectationOfVictimEntitiesId;
-    string100 filterby_IndustrySegment;
-    unsigned2 filterby_SuspectedDiscrepancyId;
-    unsigned2 filterby_ConfidenceThatActivityWasDeceitfulId;
-    unsigned2 filterby_WorkflowStageCommittedId;
-    unsigned2 filterby_WorkflowStageDetectedId;
-    unsigned2 filterby_ChannelsId;
-    string50  filterby_CategoryOrFraudType;
-    unsigned2 filterby_ThreatId;
-    unsigned2 filterby_AlertLevelId;
-    unsigned2 filterby_EntityTypeId;
-    unsigned2 filterby_EntitySubTypeId;
-    unsigned2 filterby_RoleId;
-    unsigned2 filterby_EvidenceId;
-    unsigned3 filterby_FileType;
-    unsigned6 filterby_Did;
+  EXPORT MailingAddress := RECORD
+    // copy of BatchShare.Layouts.ShareAddress, prepending mailing_ to the field names
+    string100 mailing_addr          := '';
+    string10  mailing_prim_range    := '';
+    string2   mailing_predir        := '';
+    string28  mailing_prim_name     := '';
+    string4   mailing_addr_suffix   := '';
+    string2   mailing_postdir       := '';
+    string10  mailing_unit_desig    := '';
+    string8   mailing_sec_range     := '';
+    string25  mailing_p_city_name   := '';
+    string2   mailing_st            := '';
+    string5   mailing_z5            := '';
+    string4   mailing_zip4          := '';
+    string18  mailing_county_name   := '';
   END;
 
-  EXPORT Recid_rec := RECORD
-    string25  acctno;
-    unsigned8 record_id;
-    unsigned2 entity_type_id := 0;
-    unsigned2 entity_sub_type_id := 0;
-    FilterBy_rec;
-  END;
-
-  EXPORT Raw_Payload_rec := RECORD
-    string25 acctno; 
-    RECORDOF(FraudShared.Layouts_Key.Main);
-    FilterBy_rec;
-  END;
-    
-  EXPORT batch_search_rec := RECORD
-    unsigned3 seq;
-    string10  prim_range;
-    string2   predir;
-    string28  prim_name;
-    string4   addr_suffix;
-    string2   postdir;
-    string10  unit_desig;
-    string8   sec_range;
-    string25  v_city_name;
-    string2   st;
-    string5   zip5;
-    string4   zip4;
-    unsigned6 did; 
-    string9   ssn;
-    string10  phone10;
+  EXPORT BatchIn_rec := RECORD
+    unsigned4 seq := 0;
+    BatchShare.Layouts.ShareAcct;
+    BatchShare.Layouts.SharePII;
+    BatchShare.Layouts.ShareDID;
+    BatchShare.Layouts.ShareName;    
+    BatchShare.Layouts.ShareAddress;  //physical or single address
+    MailingAddress;                   //mailing address
+    BatchShare.Layouts.SharePhone;
     unsigned6 ultid;
     unsigned6 orgid;
     unsigned6 seleid;
+    string10  tin;
+    string50  email_address;
     unsigned6 appendedproviderid;
     unsigned6 lnpid;
-    string10  tin;
     string10  npi;
-    string50  emailaddress;
-    string25  ipaddress;
-    string50  deviceid;
+    string25  ip_address;
+    string50  device_id;
     string12  professionalid;
-    FilterBy_rec;
-  END; 
-            
-  EXPORT batch_search_flags_rec := RECORD
-    batch_search_rec;
-    boolean isValidSearchInput := false;
-    boolean isAddress          := false;
-    boolean isSSN              := false;
-    boolean isPhone            := false;
-    boolean isPerson           := false;
-    boolean isBusiness         := false;
-    boolean isEmailAddress     := false;
-    boolean isDevice           := false;
-    boolean isIpAddress        := false;
-    boolean isProfessionalid   := false;
-    boolean isProvider         := false;
-    boolean isTin              := false;
+    string10  bank_routing_number;
+    string30  bank_account_number; 
+    string2   dl_state;
+    string25  dl_number;
+    string10  geo_lat;
+    string11  geo_long;
   END;
 
-  EXPORT batch_response_rec := RECORD
-    batch_search_rec;
+  EXPORT BatchIn_Valid_rec := RECORD
+    BatchIn_rec;
+    boolean hasValidInput         := false;
+    boolean hasFullName           := false;
+    boolean hasPhysicalAddress    := false;
+    boolean hasMailingAddress     := false;
+    boolean hasSSN                := false;
+    boolean hasDOB                := false;
+    boolean hasPhone              := false;
+    boolean hasPerson             := false;
+    boolean hasBusiness           := false;
+    boolean hasEmailAddress       := false;
+    boolean hasDevice             := false;
+    boolean hasIpAddress          := false;
+    boolean hasProfessionalid     := false;
+    boolean hasLnpid              := false;
+    boolean hasNpi                := false;
+    boolean hasAppendedproviderid := false;
+    boolean hasTin                := false;
+    boolean hasGeo                := false;
+    boolean hasBankAccount        := false;
+    boolean hasDL                 := false;
+  END;
+
+
+  EXPORT Recid_rec := RECORD
+    BatchShare.Layouts.ShareAcct;
+    unsigned8 record_id;
+    unsigned2 entity_type_id := 0;
+    unsigned2 entity_sub_type_id := 0;
+  END;
+
+  EXPORT Raw_Payload_rec := RECORD
+    BatchShare.Layouts.ShareAcct;
     FraudShared.Layouts_Key.Main;
-    string9   fdn_idkey_ssn;
-    unsigned6 fdn_idkey_did; 
   END;
-
+    
   EXPORT SetOfFdnMasterId_rec := RECORD
     unsigned6     gc_id; 
     data16        FdnMasterId;

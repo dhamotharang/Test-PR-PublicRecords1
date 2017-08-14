@@ -6,9 +6,8 @@ import iesp;
 
 export consumercreditreport_fcra := MODULE
 			
-export t_FcraCCCROptions := record (iesp.share_fcra.t_FcraReportOption)
+export t_FcraCCROptions := record (iesp.share_fcra.t_FcraReportOption)
 	boolean IncludeLiensJudgments {xpath('IncludeLiensJudgments')};
-	integer ScoreThreshold {xpath('ScoreThreshold')};
 end;
 		
 export t_FcraCCRReportBy := record
@@ -33,7 +32,7 @@ export t_FcraConsumerCreditReportResponse := record (iesp.share.t_BaseResponse)
 end;
 		
 export t_FcraConsumerCreditReportRequest := record (iesp.share.t_BaseRequest)
-	t_FcraCCCROptions Options {xpath('Options')};
+	t_FcraCCROptions Options {xpath('Options')};
 	t_FcraCCRReportBy ReportBy {xpath('ReportBy')};
 end;
 		
