@@ -69,7 +69,8 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------                                                         -----																					 
 	// ------ Get the vehicle details from the vehicle Main Key1      -----
 	// ------                                                         -----	
-	VehicleDetails       := VehicleV2.Key_Vehicle_Main_Key1;          																			 
+	//VehicleDetails       := VehicleV2.Key_Vehicle_Main_Key1;          																			 
+	VehicleDetails       := VehicleV2.Key_Vehicle_Main_Key;          																			 
   // ------                              ------------
   // ------ Define the TRANSFORM here    ------------
   // ------                              ------------
@@ -98,7 +99,7 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   // ------                                                                 ------------																		 																			 																																					  
 	VehicleSlim   :=   join(VehiclesSelectedForThisBusiness(Vehicle_key != ''),VehicleDetails,
 	                        /* Where */  
-			                    left.vehicle_key = right.vehicle_key,
+			                    keyed(left.vehicle_key = right.vehicle_key),
 													getVehicleDetails(left,right,counter),
 																	LEFT OUTER);
 																	
