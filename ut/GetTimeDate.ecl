@@ -11,7 +11,6 @@ string17 getTimeDate() := BEGINC++
 	// Declarations
 	struct tm localt; // localtime in "tm" structure
 	time_t timeinsecs;  // variable to store time in secs
-	char ret[17];
 	
 	
 	// Get time in sec since Epoch
