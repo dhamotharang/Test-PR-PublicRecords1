@@ -1,4 +1,4 @@
-import Address_file, ADVO;
+import ADVO;
 
 rec := fedex_services.Layouts.out;
 
