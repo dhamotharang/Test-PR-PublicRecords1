@@ -530,7 +530,10 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	boolean PrescreenOptOut :=  isPreScreenPurpose and risk_indicators.iid_constants.CheckFlag( risk_indicators.iid_constants.IIDFlag.IsPreScreen, rt.iid.iid_flags );
 	
 	hasScore (STRING score) := le.Auto_score = score OR le.Bankcard_score = score OR le.Short_term_lending_Score = score OR le.Telecommunications_score = score OR le.Custom_score = score;
-	boolean Alerts200 := if(le.SubjectDeceased = '1', true, false) ;
+	
+	// instead of just using the le.SubjectDeceased, also calculate it here because sometimes attributes are not requested, and then the alert doesn't get triggered.
+	attr := models.Attributes_Master(rt, true);
+	boolean Alerts200 := if(le.SubjectDeceased='1' or attr.SubjectDeceased = '1', true, false) ;
 	boolean has200Score := hasScore('200') or Alerts200 ;
 	boolean has222Score := hasScore('222');
 	
