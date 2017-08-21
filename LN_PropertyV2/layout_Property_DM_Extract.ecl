@@ -71,7 +71,7 @@ export layout_Property_DM_Extract := record
 		string330 sales_price_desc := '';
 		string330 assessment_match_land_use_desc := '';
 		string330 property_use_desc := '';
-		string330 condo_desc := '';
+		string330 condo_desc_in := '';
 		string330 first_td_lender_type_desc := '';
 		string330 second_td_lender_type_desc := '';
 		string330 first_td_loan_type_desc := '';
@@ -102,9 +102,18 @@ export layout_Property_DM_Extract := record
 	  string25   second_home_rider;
     string15	 loan_term_months;
 		string15	 loan_term_years;
+		string33 	 fares_transaction_type_desc;
 		 //extra fields
 		string80   buyer1;
 		string80   buyer2;
+		string330  buyer_vesting_desc := '';
+		string330  buyer_1_id_desc := '';
+		string330  buyer_2_id_desc := '';
+		string330  borrower_vesting_desc := '';
+		string330  borrower_1_id_desc := '';
+		string330  borrower_2_id_desc := '';
+		string330  seller_1_id_desc := '';
+		string330  seller_2_id_desc := '';
 		string70   buyer_mailing_full_street_address;
 		string6    buyer_mailing_address_unit_number;
 		string51   buyer_mailing_address_citystatezip;

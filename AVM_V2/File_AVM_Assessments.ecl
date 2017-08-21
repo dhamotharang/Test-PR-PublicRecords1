@@ -2,21 +2,21 @@ import ln_propertyv2;
 
 export File_AVM_Assessments(string8 history_date) := function
 
-search_file := LN_PropertyV2.File_Search_DID(ln_fares_id[1]!='R'  and ln_fares_id[2] = 'A' and source_code[2] = 'P' and (integer)zip <> 0);  // search file, assessment records
+search_file := LN_PropertyV2.File_Search_DID(ln_fares_id[1]!='R'  and ln_fares_id[2] = 'A' and source_code[2] = 'P' and (integer)zip <> 0 
+										and trim(county)<>'');  // search file, assessment records
 
 sfa := distribute(search_file, hash(ln_fares_id));
 
 ta_file := LN_PropertyV2.File_Assessment(ln_fares_id[1]!='R' and state_code in avm_v2.filters(history_date).valid_states 
 										and avm_v2.filters(history_date).valid_date(recording_date)
-										and recording_date <= history_date and prior_recording_date <= history_date 
-										and trim(fips_code)<>'');
+										and recording_date <= history_date and prior_recording_date <= history_date);
 										
 ta_base := distribute(ta_file, hash(ln_fares_id));
  
 avm_v2.layouts.layout_clean_assessment clean_assessment(ta_base le, sfa rt) := transform
 	self.ln_fares_id := le.ln_fares_id;
 	self.unformatted_apn := avm_v2.filters(history_date).stripformat(le.apna_or_pin_number);
-	self.fips_code := le.fips_code;
+	self.fips_code := rt.county;
 	self.land_use_code := le.standardized_land_use_code;
 	
 	// impute the sales price from the prior sales if sales price or recording date are missing
@@ -55,7 +55,7 @@ end;
 
 
 // append the clean address and clean the apn to use for linking to assessment records
-assessment_slim := join(ta_base, sfa, left.ln_fares_id=right.ln_fares_id, clean_assessment(left,right), left outer, keep(1), local); 
+assessment_slim := join(ta_base, sfa, left.ln_fares_id=right.ln_fares_id, clean_assessment(left,right), keep(1), local); 
 
 // if a property doesn't have an apn to search by, or a valid address, remove it
 good_assessments := assessment_slim(trim(unformatted_apn)<>'' or 

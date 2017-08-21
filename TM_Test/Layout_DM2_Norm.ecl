@@ -1,0 +1,20 @@
+export Layout_DM2_Norm := record
+unsigned4 rid;
+unsigned4 seq := 0;
+unsigned6 group_id := 0;
+unsigned6 bdid := 0;
+unsigned2 bdid_score := 0;
+string15  COID;
+string30	Company_Name;
+string30  Company_Mail_Stop;
+string30  Company_Division;
+string30  Company_Address;
+string12  Company_PO_Box;
+string13  Company_City;
+string2   Company_State;
+string10  Company_Zip;
+string16  Phone;
+string16  Fax;
+string40  Email_Domain;
+string30  Company_Address_Norm;
+end;

@@ -1,3 +1,5 @@
+import	AID;
+
 export	Mac_Property_Rollup(inFile,outFile,includeBB	=	true,isBase	=	false)	:=
 macro
 	LOADXML('<xml/>');
@@ -5,7 +7,7 @@ macro
 
 	#uniquename(tAssignSource)
 	
-	recordof(inFile)	%tAssignSource%(inFile	pInput)	:=
+	recordof(inFile)	%tAssignSource%(recordof(inFile)	pInput)	:=
 	transform
 		#IF(%'doAssignDefaults'%='')
 			#DECLARE(doAssignDefaults)
@@ -62,29 +64,91 @@ macro
 	#uniquename(dPreRollupDist)
 	#uniquename(dPreRollupSort)
 	
-	%dPreRollupFilt%	:=	%dPreRollup%(prim_range	!=	''	and	prim_name	!=	''	and	zip	!=	'');
-	
-	#if(includeBB	=	true)
-		%dPreRollupDist%	:=	distribute(%dPreRollupFilt%,property_ace_aid);
+	%dPreRollupFilt%	:=	%dPreRollup%(property_ace_aid	!=	0);
+
+// Bug Ticket 177570:	Remove duplicate address per source
+	#if(includeBB)
+		%dPreRollupDist%	:=	distribute(%dPreRollupFilt%, hash64(prim_range,predir,prim_name,addr_suffix,postdir, sec_range, zip));
 		%dPreRollupSort%	:=	sort(	%dPreRollupDist%,
-																property_ace_aid,
+																prim_range, predir, prim_name, addr_suffix, postdir, sec_range, zip,
 																-tax_sortby_date,-deed_sortby_date,vendor_preference,-dt_vendor_last_reported,
 																local
 															);
+		
+		// Group the dataset by property clean aid to assign the preference for each record
+		#uniquename(dPreRollupGrp)
+		#uniquename(dPreRollupGrpSrt)
+		
+		%dPreRollupGrp%			:=	group(%dPreRollupSort%,prim_range,predir,prim_name,addr_suffix, postdir,sec_range,zip,local);
+		%dPreRollupGrpSrt%	:=	sort(%dPreRollupGrp%,-tax_sortby_date,-deed_sortby_date,vendor_preference,-dt_vendor_last_reported);
+		
+		// Populate the child dataset with the additional fields
+		#uniquename(tIBAppendAceAID)
+		PropertyCharacteristics.Layouts.TempRollup	%tIBAppendAceAID%(%dPreRollupGrpSrt%	pInput,integer	cnt)	:=
+		transform
+			self.insurbase_codes	:=	project(	pInput.insurbase_codes,transform(	PropertyCharacteristics.Layouts.rIBTemp_layout,
+																																						self.property_ace_aid	:=	pInput.property_ace_aid;
+																																						self.preference		:=	cnt;
+																																						self							:=	left;
+																																					)
+																				);
+			self									:=	pInput;
+		end;
+		
+		#uniquename(dIBAppendAceAID)
+		#uniquename(dIBUngroup)
+		
+		%dIBAppendAceAID%	:=	project(%dPreRollupGrpSrt%,%tIBAppendAceAID%(left,counter));
+		%dIBUngroup%			:=	ungroup(%dIBAppendAceAID%);
+		
+		// Normalize the child dataset (insurbase codes) as we need to roll them up too
+		#uniquename(tIBNormalize)
+		PropertyCharacteristics.Layouts.rIBTemp_layout	%tIBNormalize%(PropertyCharacteristics.Layouts.rIBTemp_layout	pInput)	:=
+		transform
+			self	:=	pInput;
+		end;
+		
+		#uniquename(dIBNormalize)
+		%dIBNormalize%	:=	normalize(%dIBUngroup%,left.insurbase_codes,%tIBNormalize%(right),local);
+		
+		// Rollup the insurbase codes by category
+		#uniquename(dIBNormSort)
+		#uniquename(dIBNormGroup)
+		#uniquename(dIBNormGrpSort)
+		
+		%dIBNormSort%			:=	sort(%dIBNormalize%,property_ace_aid,category,local);
+		%dIBNormGroup%		:=	group(%dIBNormSort%,property_ace_aid,category,local);
+		%dIBNormGrpSort%	:=	sort(%dIBNormGroup%,preference);
+		
+		// Iterate to populate boolean flag which indicates which category records needs to kept
+		#uniquename(tIBIterate)
+		PropertyCharacteristics.Layouts.rIBTemp_layout	%tIBIterate%(recordof(%dIBNormGrpSort%)	le,recordof(%dIBNormGrpSort%)	ri,integer	cnt)	:=
+		transform
+			self.remove_rec	:=	if(cnt	!=	1	and	le.preference	!=	ri.preference,true,false);
+			self.preference	:=	if(cnt	=	1,ri.preference,le.preference);
+			self						:=	ri;
+		end;
+		
+		#uniquename(dIBIterate)
+		%dIBIterate%	:=	iterate(%dIBNormGrpSort%,%tIBIterate%(left,right,counter));
+		
+		// Ungroup the dataset and filter the records which have remove_rec set to true
+		#uniquename(dIBFilter)
+		%dIBFilter%	:=	ungroup(%dIBIterate%)(~remove_rec);
 	#else
-		%dPreRollupDist%	:=	distribute(%dPreRollupFilt%,hash32(vendor_source,property_ace_aid));
+		%dPreRollupDist%	:=	distribute(%dPreRollupFilt%,hash32(vendor_source,prim_range, predir, prim_name, addr_suffix, postdir, sec_range, zip));
 		%dPreRollupSort%	:=	sort(	%dPreRollupDist%,
-																vendor_source,property_ace_aid,
+																vendor_source,prim_range, predir, prim_name, addr_suffix, postdir, sec_range, zip,
 																-tax_sortby_date,-deed_sortby_date,-dt_vendor_last_reported,
 																local
 															);
 	#end
-
+	
 	// Rollup data on property address
 	#EXPORTXML(dPreRollupMetaInfo,recordof(%dPreRollupSort%))
 	
 	#uniquename(tRollup)
-	recordof(inFile)	%tRollup%(%dPreRollupSort%	le,%dPreRollupSort%	ri)	:=
+	recordof(inFile)	%tRollup%(recordof(%dPreRollupSort%)	le,recordof(%dPreRollupSort%)	ri)	:=
 	transform
 		#IF(%'doRollupText'%='')
 			#DECLARE(doRollupText)
@@ -148,7 +212,7 @@ macro
 					#APPEND(doRollupText,'self.'	+	%'@name'%)
 					#APPEND(doRollupText,'	:=	le.vendor_source;\n')
 					%doRollupText%;
-				#ELSEIF(%'@type'% = 'string'	and	regexfind('category|material|quality|condition',%'@name'%,nocase)	=	false)
+				#ELSEIF(%'@type'% = 'string'	and	regexfind('^(category|material|quality|condition)$',%'@name'%,nocase)	=	false)
 					#APPEND(doRollupText,'self.'	+	%'@name'%)
 					#APPEND(doRollupText,'	:=	if(le.')
 					#APPEND(doRollupText,%'@name'%)
@@ -169,25 +233,56 @@ macro
 	end;
 
 	#uniquename(dRollup)
+	#uniquename(dRollupIBDenorm)
 	
 	#if(includeBB)
 		%dRollup%	:=	rollup(	%dPreRollupSort%,
-													left.property_ace_aid	=	right.property_ace_aid,
+													left.prim_range 	= right.prim_range 	and
+													left.predir				= right.predir 			and
+													left.prim_name		= right.prim_name 	and
+													left.addr_suffix	= right.addr_suffix and
+													left.postdir			= right.postdir 		and
+													left.sec_range		= right.sec_range 	and
+													left.zip					= right.zip,
 													%tRollup%(left,right),
 													local
 												);
+		
+		// Denormalize records to create a child dataset of the IB records
+		#uniquename(tIBDenorm)
+		recordof(inFile)	%tIBDenorm%(recordof(%dRollup%)	le,dataset(recordof(%dIBFilter%))	ri)	:=
+		transform
+			self.insurbase_codes	:=	project(ri,PropertyCharacteristics.Layout_Codes.TradeMaterials);
+			self									:=	le;
+		end;
+			
+		%dRollupIBDenorm%	:=	denormalize(	%dRollup%,
+																				%dIBFilter%,
+																				left.property_ace_aid	=	right.property_ace_aid,
+																				group,
+																				%tIBDenorm%(left,rows(right)),
+																				local
+																			);
 	#else
 		%dRollup%	:=	rollup(	%dPreRollupSort%,
-													left.vendor_source		=	right.vendor_source	and
-													left.property_ace_aid	=	right.property_ace_aid,
+													left.vendor_source		=	right.vendor_source and
+													left.prim_range 			= right.prim_range 		and
+													left.predir						= right.predir 				and
+													left.prim_name				= right.prim_name 		and
+													left.addr_suffix			= right.addr_suffix 	and
+													left.postdir					= right.postdir 			and
+													left.sec_range				= right.sec_range 		and
+													left.zip							= right.zip,
 													%tRollup%(left,right),
 													local
 												);
+		
+		%dRollupIBDenorm%	:=	%dRollup%;
 	#end
-
+	
 	// Rollup records keeping the most recent tax record
 	#uniquename(tTaxRollup)
-	recordof(inFile)	%tTaxRollup%(%dPreRollupSort%	le,%dPreRollupSort%	ri)	:=
+	recordof(inFile)	%tTaxRollup%(recordof(%dPreRollupSort%)	le,recordof(%dPreRollupSort%)	ri)	:=
 	transform
 		// Populate the below tax fields with the most recent tax data
 		// If two records meet the criteria for the rollup, make sure to keep the field with populated value
@@ -443,14 +538,26 @@ macro
 	
 	#if(includeBB)
 		%dTaxRollup%	:=	rollup(	%dPreRollupSort%,
-															left.property_ace_aid	=	right.property_ace_aid,
+															left.prim_range 	= right.prim_range 	and
+															left.predir				= right.predir 			and
+															left.prim_name		= right.prim_name 	and
+															left.addr_suffix	= right.addr_suffix and
+															left.postdir			= right.postdir 		and
+															left.sec_range		= right.sec_range 	and
+															left.zip					= right.zip,
 															%tTaxRollup%(left,right),
 															local
 														);
 	#else
 		%dTaxRollup%	:=	rollup(	%dPreRollupSort%,
-															left.vendor_source		=	right.vendor_source	and
-															left.property_ace_aid	=	right.property_ace_aid,
+															left.vendor_source		=	right.vendor_source and
+															left.prim_range 	= right.prim_range 	and
+															left.predir				= right.predir 			and
+															left.prim_name		= right.prim_name 	and
+															left.addr_suffix	= right.addr_suffix and
+															left.postdir			= right.postdir 		and
+															left.sec_range		= right.sec_range 	and
+															left.zip					= right.zip,
 															%tTaxRollup%(left,right),
 															local
 														);
@@ -458,7 +565,7 @@ macro
 	
 	// Join the rolled up file to the current tax file to get the latest tax information
 	#uniquename(tGetCurrentTaxInfo)
-	recordof(inFile)	%tGetCurrentTaxInfo%(%dRollup%	le,%dTaxRollup%	ri)	:=
+	recordof(inFile)	%tGetCurrentTaxInfo%(recordof(%dRollupIBDenorm%)	le,recordof(%dTaxRollup%)	ri)	:=
 	transform
 		self.homestead_exemption_ind						:=	ri.homestead_exemption_ind;
 		self.src_homestead_exemption_ind				:=	ri.src_homestead_exemption_ind;
@@ -508,18 +615,30 @@ macro
 	#uniquename(dCurrentTaxInfo)
 	
 	#if(includeBB)
-		%dCurrentTaxInfo%	:=	join(	%dRollup%,
+		%dCurrentTaxInfo%	:=	join(	%dRollupIBDenorm%,
 																%dTaxRollup%,
-																left.property_ace_aid	=	right.property_ace_aid,
+																left.prim_range 	= right.prim_range 	and
+																left.predir				= right.predir 			and
+																left.prim_name		= right.prim_name 	and
+																left.addr_suffix	= right.addr_suffix and
+																left.postdir			= right.postdir 		and
+																left.sec_range		= right.sec_range 	and
+																left.zip					= right.zip,
 																%tGetCurrentTaxInfo%(left,right),
 																left outer,
 																local
 															);
 	#else
-		%dCurrentTaxInfo%	:=	join(	%dRollup%,
+		%dCurrentTaxInfo%	:=	join(	%dRollupIBDenorm%,
 																%dTaxRollup%,
-																left.vendor_source		=	right.vendor_source	and
-																left.property_ace_aid	=	right.property_ace_aid,
+																left.vendor_source	=	right.vendor_source	and
+																left.prim_range 		= right.prim_range 		and
+																left.predir					= right.predir 				and
+																left.prim_name			= right.prim_name 		and
+																left.addr_suffix		= right.addr_suffix 	and
+																left.postdir				= right.postdir 			and
+																left.sec_range			= right.sec_range 		and
+																left.zip						= right.zip,
 																%tGetCurrentTaxInfo%(left,right),
 																left outer,
 																local
@@ -529,14 +648,14 @@ macro
 	// Sort records on property address and deed recording date and rollup records keeping the most recent record
 	#uniquename(dDeedSort)
 	%dDeedSort%		:=	sort(	%dPreRollupDist%,
-													property_ace_aid,
+													prim_range, predir, prim_name, addr_suffix, postdir, sec_range, zip,
 													-deed_sortby_date,-tax_sortby_date,
 													vendor_preference,-dt_vendor_last_reported,
 													local
 												);
 
 	#uniquename(tDeedRollup)
-	recordof(inFile)	%tDeedRollup%(%dDeedSort%	le,%dDeedSort%	ri)	:=
+	recordof(inFile)	%tDeedRollup%(recordof(%dDeedSort%)	le,recordof(%dDeedSort%)	ri)	:=
 	transform
 		// Populate the below deed fields with the most recent deed/mortgage data
 		// If two records meet the criteria for the rollup, make sure to keep the field with populated value
@@ -737,7 +856,13 @@ macro
 	
 	#uniquename(dDeedRollup)
 	%dDeedRollup%	:=	rollup(	%dDeedSort%,
-														left.property_ace_aid	=	right.property_ace_aid,
+														left.prim_range 	= right.prim_range 	and
+														left.predir				= right.predir 			and
+														left.prim_name		= right.prim_name 	and
+														left.addr_suffix	= right.addr_suffix and
+														left.postdir			= right.postdir 		and
+														left.sec_range		= right.sec_range 	and
+														left.zip					= right.zip,
 														%tDeedRollup%(left,right),
 														local
 													);
@@ -747,7 +872,7 @@ macro
 	
 	#if(includeBB)
 		#uniquename(tGetCurrentDeedInfo)
-		recordof(inFile)	%tGetCurrentDeedInfo%(%dCurrentTaxInfo%	le,%dDeedRollup%	ri)	:=
+		recordof(inFile)	%tGetCurrentDeedInfo%(recordof(%dCurrentTaxInfo%)	le,recordof(%dDeedRollup%)	ri)	:=
 		transform
 			self.deed_document_number						:=	ri.deed_document_number;
 			self.src_deed_document_number				:=	ri.src_deed_document_number;
@@ -787,7 +912,13 @@ macro
 	
 		%dCurrentDeedInfo%	:=	join(	%dCurrentTaxInfo%,
 																	%dDeedRollup%,
-																	left.property_ace_aid	=	right.property_ace_aid,
+																	left.prim_range 	= right.prim_range 	and
+																	left.predir				= right.predir 			and
+																	left.prim_name		= right.prim_name 	and
+																	left.addr_suffix	= right.addr_suffix and
+																	left.postdir			= right.postdir 		and
+																	left.sec_range		= right.sec_range 	and
+																	left.zip					= right.zip,
 																	%tGetCurrentDeedInfo%(left,right),
 																	left outer,
 																	local
@@ -824,6 +955,6 @@ macro
 		
 		%dCurrentDeedInfo%	:=	project(%dCurrentTaxInfo%,%tGetCurrentLNDeedInfo%(left));
 	#end
-
+	
 	outFile	:=	%dCurrentDeedInfo%;
 endmacro;

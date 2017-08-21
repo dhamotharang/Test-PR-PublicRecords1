@@ -1,0 +1,1 @@
+export LatestDate(integer l, integer r) := if ( r>l,r,l);

@@ -1,4 +1,4 @@
-import crim_common;
+import crim_common, hygenics_crim, ut;
 
 preLayout :=
 RECORD
@@ -20,26 +20,40 @@ END;
 preFile := dataset('~thor_data400::in::MoxieImagesInfo_fixKY', preLayout, 
 							csv(SEPARATOR('\t'), TERMINATOR('\n'), QUOTE('"')));
 
-Layout_Moxie_Info goodLayout(preLayout L) :=
-TRANSFORM
+Layout_Moxie_Info goodLayout(preLayout L) := TRANSFORM
 	SELF.url_status := (INTEGER)L.url_status;
 	SELF.status := (INTEGER)L.status;
 	SELF.cnter := (INTEGER)L.cnter;
 	SELF.dbversion := (INTEGER)L.dbversion;
 	SELF := L;
 END;
-				
-
+		
 jpgPos(STRING nm) := IF(StringLib.StringFind(StringLib.StringToUpperCase(nm), '.JPG', 1) > 0,
 						StringLib.StringFind(StringLib.StringToUpperCase(nm), '.JPG', 1)-1, 
 						LENGTH(TRIM(nm)));
 
-
 p := PROJECT(preFile, goodLayout(LEFT));
 		
-f := crim_common.File_Crim_Offender2_Plus;
+//f := crim_common.File_Crim_Offender2_Plus;
+
+DOCpublicFiles 			:= hygenics_crim.File_Moxie_Crim_Offender2_Dev;
+dFile								:= DOCpublicFiles(data_type='1');
+
+	oldLayout	:= record
+		string60 offender_key;
+		string2  state_origin;
+		string10 doc_num;
+	end;
+
+	oldLayout fixLayout(dFile l):= transform
+		SELF.state_origin	 		:= ut.st2abbrev(stringlib.stringtouppercase(l.orig_state));
+		self 									:= l;
+	end;
+	
+f := project(dFile, fixLayout(left));
+
 crims := TABLE(f, {f.state_origin, f.offender_key, f.doc_num});
-crim := DEDUP(crims, state_origin, offender_key, all);		
+crim 	:= DEDUP(crims, state_origin, offender_key, all);		
 		
 Layout_Moxie_Info getdoc(Layout_Moxie_Info L, crim R) :=
 TRANSFORM

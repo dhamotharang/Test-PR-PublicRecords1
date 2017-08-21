@@ -1,3 +1,16 @@
+/*2015-11-24T01:45:27Z (Srilatha Katukuri)
+#193680 - Changed hte filter to include 2 and 3 reports whcih are not A/DE
+*/
+/*2015-11-20T22:08:49Z (Srilatha Katukuri)
+#193680
+*/
+/*2015-11-19T17:06:38Z (Srilatha Katukuri)
+#193680
+
+*/
+/*2015-11-16T20:50:27Z (Srilatha Katukuri)
+#193680 - CR 323
+*/
 /*2015-08-14T23:19:47Z (Srilatha Katukuri)
 #181860 - key builds in PRUS folder for testing.
 */
@@ -15,7 +28,7 @@ bug# 173256 - code review
 */
 Import Data_Services, doxie,FLAccidents;
 
-Ecrash := FLAccidents_Ecrash.File_KeybuildV2.out(report_code in ['EA','TM','TF']);//for ecrash iyetek they need report number displayed even no vin and name
+Ecrash := FLAccidents_Ecrash.File_KeybuildV2.out(report_code in ['EA','TM','TF'] and  (work_type_id not in ['0','1']  OR trim(report_type_id,all) in ['A','DE']) );   
 
 Filter_CRU := FLAccidents_Ecrash.File_KeybuildV2.out(report_code not in ['EA','TM','TF']);
 				
@@ -195,6 +208,7 @@ Page_Count
 		 
 									 }
 							      ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_accnbrv1_' + doxie.Version_SuperKey);
+										// ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::PRUS::ecrashV2_accnbrv1_' + doxie.Version_SuperKey);
 										
 
 

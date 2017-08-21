@@ -25,7 +25,7 @@ info := text_search.FileName_Info_Instance('~THOR_DATA400', 'MFIND', filedate);
 textType := Text_Search.Types.SegmentType.TextType;
 dateType := Text_Search.Types.SegmentType.DateType;
 numericType := Text_Search.Types.SegmentType.NumericType;
-
+keyType := Text_search.Types.SegmentType.ExternalKey;
 
 
 
@@ -37,10 +37,11 @@ segmentMetaData := DATASET([
 		{'SEX',							textType,		[5]},
 		{'LEGAL_RESIDENCE',				textType,		[6]},
 		{'MILITARY_SERVICE_BRANCH',		textType,		[7]},
-		{'DATE_OF_RETIREMENT',			textType,		[8]},
+		{'DATE_OF_RETIREMENT',			DateType,		[8]},
 		{'YEARS_OF_SERVICE',		 	textType,		[9]},
-		{'name',						textType,		[10]}
-
+		{'name',						textType,		[10]},
+		{'mil_pay_grade', texttype, [11]},
+	{'EXTERNALKEY',       keyType, [250]}
 
 		], Text_Search.Layout_Segment_Definition);
 
@@ -48,11 +49,14 @@ segmentMetaData := DATASET([
 lfileName := Text_Search.FileName(info, Text_Search.Types.FileTypeEnum.SegList,true);
 sfileName := Text_Search.FileName(info, Text_Search.Types.FileTypeEnum.SegList);
 
-retval := sequential(
-					OUTPUT(segmentMetaData,,lfileName, OVERWRITE),
-					Text_Search.Boolean_Move_To_QA(sfileName,lfileName)
-					);
-
+retval := if (fileservices.fileexists(lfilename),
+								output('Metadata file '+lfilename+' already exists'),
+								sequential(
+										OUTPUT(segmentMetaData,,lfileName, OVERWRITE),
+										Text_Search.Boolean_Move_To_QA(sfileName,lfileName)
+										)
+							);
+							
 return retval;
 
 end;

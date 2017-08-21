@@ -5,7 +5,8 @@ EXPORT ExpandedHeaderFragments(Types.StateList st_list=ALL) := MODULE
 	SHARED Persist_Header		:= Persist_Stem + 'Header';
 	EXPORT Persist_Name			:= Persist_Header;
 	EXPORT DeletePersist 		:= FileServices.DeleteLogicalFile(Persist_Name);
-	d0 :=  DATASET(header.Filename_Header,header.Layout_Header_v2,flat);
+	ds_h :=  DATASET(header.Filename_Header,header.Layout_Header_v2,flat);
+	d0 := get_header_sup(ds_h) ;
 	d1 := d0(src NOT IN MDR.sourceTools.set_LnPropertyV2);	// no double up
 	ds := d1(st IN st_list);
 	SHARED hdrFile :=  PROJECT(ds, Layout_ExpandedHeader) : PERSIST(Persist_Header);

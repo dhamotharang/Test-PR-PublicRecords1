@@ -61,7 +61,7 @@ EXPORT fSpray(
 
 	STRING		pDirectory												= '/hms/hms_pm/' + pVersion,
 //	STRING		pDirectory												= '/enclarity/HMS/' + pVersion,
-	STRING		pGroupName												= IF((tools._Constants.IsDataland),'thor400_dev01','thor400_30'),
+	STRING		pGroupName												= IF((tools._Constants.IsDataland),'thor400_dev01','thor400_44'),
 	BOOLEAN		pIsTesting												= false,
 	BOOLEAN		pOverwrite												= true,
 	STRING		pNameOutput												= 'HMS Source Files Info Spray Report'

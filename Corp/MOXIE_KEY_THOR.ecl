@@ -1,0 +1,1 @@
+export MOXIE_KEY_THOR := '~thor_data400::';

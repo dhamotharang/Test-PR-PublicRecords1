@@ -70,13 +70,14 @@ export NumCollisions_eid0 := count(Collisions_eid);
     h.persons_sid;
     h.picture;
     h.facial_recognition;
+    h.personstamp;
   END;
 EXPORT TranslatedFile := TABLE(h,rf);
 // Compute the null for each field value
-  Def(INTEGER2 c) := CHOOSE(c,'','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','0','0','0','0','0','0','','','','');
+  Def(INTEGER2 c) := CHOOSE(c,'','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','');
  
 Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
-  SELF.word := CHOOSE(c,(SALT30.StrType)le.eid,(SALT30.StrType)le.eid,(SALT30.StrType)le.gh12,(SALT30.StrType)le.etype,(SALT30.StrType)le.ir_number,(SALT30.StrType)le.name_type,(SALT30.StrType)le.last_name,(SALT30.StrType)le.first_name,(SALT30.StrType)le.middle_name,(SALT30.StrType)le.moniker,(SALT30.StrType)le.persons_address,(SALT30.StrType)le.clean_dob,(SALT30.StrType)le.race,(SALT30.StrType)le.sex,(SALT30.StrType)le.hair,(SALT30.StrType)le.hair_length,(SALT30.StrType)le.eyes,(SALT30.StrType)le.hand_use,(SALT30.StrType)le.speech,(SALT30.StrType)le.teeth,(SALT30.StrType)le.physical_condition,(SALT30.StrType)le.build,(SALT30.StrType)le.complexion,(SALT30.StrType)le.facial_hair,(SALT30.StrType)le.hat,(SALT30.StrType)le.mask,(SALT30.StrType)le.glasses,(SALT30.StrType)le.appearance,(SALT30.StrType)le.shirt,(SALT30.StrType)le.pants,(SALT30.StrType)le.shoes,(SALT30.StrType)le.jacket,(SALT30.StrType)le.soundex,(SALT30.StrType)le.persons_notes,(SALT30.StrType)le.weight_1,(SALT30.StrType)le.weight_2,(SALT30.StrType)le.height_1,(SALT30.StrType)le.height_2,(SALT30.StrType)le.age_1,(SALT30.StrType)le.age_2,(SALT30.StrType)le.persons_sid,(SALT30.StrType)le.picture,(SALT30.StrType)le.facial_recognition,SKIP,SKIP);
+  SELF.word := CHOOSE(c,(SALT30.StrType)le.eid,(SALT30.StrType)le.eid,(SALT30.StrType)le.gh12,(SALT30.StrType)le.etype,(SALT30.StrType)le.ir_number,(SALT30.StrType)le.name_type,(SALT30.StrType)le.last_name,(SALT30.StrType)le.first_name,(SALT30.StrType)le.middle_name,(SALT30.StrType)le.moniker,(SALT30.StrType)le.persons_address,(SALT30.StrType)le.clean_dob,(SALT30.StrType)le.race,(SALT30.StrType)le.sex,(SALT30.StrType)le.hair,(SALT30.StrType)le.hair_length,(SALT30.StrType)le.eyes,(SALT30.StrType)le.hand_use,(SALT30.StrType)le.speech,(SALT30.StrType)le.teeth,(SALT30.StrType)le.physical_condition,(SALT30.StrType)le.build,(SALT30.StrType)le.complexion,(SALT30.StrType)le.facial_hair,(SALT30.StrType)le.hat,(SALT30.StrType)le.mask,(SALT30.StrType)le.glasses,(SALT30.StrType)le.appearance,(SALT30.StrType)le.shirt,(SALT30.StrType)le.pants,(SALT30.StrType)le.shoes,(SALT30.StrType)le.jacket,(SALT30.StrType)le.soundex,(SALT30.StrType)le.persons_notes,(SALT30.StrType)le.weight_1,(SALT30.StrType)le.weight_2,(SALT30.StrType)le.height_1,(SALT30.StrType)le.height_2,(SALT30.StrType)le.age_1,(SALT30.StrType)le.age_2,(SALT30.StrType)le.persons_sid,(SALT30.StrType)le.picture,(SALT30.StrType)le.facial_recognition,(SALT30.StrType)le.personstamp,SKIP,SKIP);
   SELF.len := LENGTH(TRIM(SELF.word));
   SELF.wip := IF(SELF.Word=Def(c-1),SKIP,1); // Adjusted later - also filters blank words
   SELF.nominal := 0; //Filled in later
@@ -87,7 +88,7 @@ Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
   SELF.docref.src := 0; // Filled in later
   SELF.src := TRANSFER(MDR.sourceTools.src_Bair_Analytics,UNSIGNED2); // Namespace for ID provided
   SELF.seg := c; // Field number is seg; values filled in in segment definition
-  SELF.segName := Text_Search.MakeShortSeg(choose(c,text_search.constants.DocKeyField,'eid','gh12','etype','ir_number','name_type','last_name','first_name','middle_name','moniker','persons_address','clean_dob','race','sex','hair','hair_length','eyes','hand_use','speech','teeth','physical_condition','build','complexion','facial_hair','hat','mask','glasses','appearance','shirt','pants','shoes','jacket','soundex','persons_notes','weight_1','weight_2','height_1','height_2','age_1','age_2','persons_sid','picture','facial_recognition','NOTES'));
+  SELF.segName := Text_Search.MakeShortSeg(choose(c,text_search.constants.DocKeyField,'eid','gh12','etype','ir_number','name_type','last_name','first_name','middle_name','moniker','persons_address','clean_dob','race','sex','hair','hair_length','eyes','hand_use','speech','teeth','physical_condition','build','complexion','facial_hair','hat','mask','glasses','appearance','shirt','pants','shoes','jacket','soundex','persons_notes','weight_1','weight_2','height_1','height_2','age_1','age_2','persons_sid','picture','facial_recognition','personstamp','NOTES'));
   SELF.typ := text_search.types.WordType.TextStr; // May get changed later
   SELF.sect := 0; // Not needed
   SELF.pos := 0; // Not needed
@@ -95,7 +96,7 @@ Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
   self.sid := le.hashed_sid;
   self.lid := (SALT30.UIDType)le.newrid;
 END;
-SHARED FieldsAsPostings := NORMALIZE(h,44,into(left,counter));
+SHARED FieldsAsPostings := NORMALIZE(h,45,into(left,counter));
 EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Constants.DocKeyField),text_search.Constants.DocKeyField,text_search.types.SegmentType.ExternalKey,[text_search.MakeShortSeg(text_search.Constants.DocKeyField)]}
   ,{text_search.MakeShortSeg('eid'),'eid',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('eid')]}
   ,{text_search.MakeShortSeg('gh12'),'gh12',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gh12')]}
@@ -139,6 +140,7 @@ EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Cons
   ,{text_search.MakeShortSeg('persons_sid'),'persons_sid',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('persons_sid')]}
   ,{text_search.MakeShortSeg('picture'),'picture',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('picture')]}
   ,{text_search.MakeShortSeg('facial_recognition'),'facial_recognition',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('facial_recognition')]}
+  ,{text_search.MakeShortSeg('personstamp'),'personstamp',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('personstamp')]}
   ,{text_search.MakeShortSeg('NOTES'),'NOTES',text_search.types.SegmentType.GroupSeg,[text_search.MakeShortSeg('persons_notes')]}
 ],Text_Search.Layout_Segment_ComposeDef );
  

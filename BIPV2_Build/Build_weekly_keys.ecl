@@ -4,6 +4,8 @@ EXPORT Build_weekly_keys(
    string   pversion    = BIPV2.KeySuffix
   ,boolean  pInBIPBuild = false
   ,boolean  pPromote2QA = true
+  ,string   pWuid       = workunit
+	,string	  pEmail_List = BIPV2_Build.mod_email.emailList
 ) :=
 module
 
@@ -13,19 +15,27 @@ module
 
   export BuildDirLinkIds := if(pInBIPBuild  ,BuildDirLinkIdsInsideBIPBuild  ,BuildDirLinkIdsOutsideBIPBuild);
   
-  shared keyfilt        := 'directories_linkids|contact_linkids';
-  export promote2built  := promote(pversion,keyfilt).new2built;
+  shared keyfilt        := '(contact_linkids|directories_linkids)';
+
+  shared keyfiltcont        := 'contact_linkids';
+  export promote2builtcont  := promote(pversion,keyfiltcont).new2built;
+
+  shared keyfiltdir        := 'directories_linkids';
+  export promote2builtdir  := promote(pversion,keyfiltdir).new2built;
+
+
+  shared regexfilterout := '^(?!.*?(base::paw::|header_wa_w|source_ingest::data|biz_preferred|bizlinkfull|bipv2::internal_linking|persist::bip_contacts|directories_linkids|contact_linkids|hpccinternal|bipv2_ingest).*)'
+                          + '.*?(base|keybuild|temp|biz).*$';
 
   //Get file items for orbit, send email including them to make easier to populate item list in orbit instance
-  fileitems         := wk_ut.get_StringFilesRead(workunit,'base|keybuild|temp|biz');  
-  SendOrbitItemList := BIPV2_Build.Send_Emails(pversion,pBuildName := 'BIPV2 Weekly Keys Orbit Item List',pBuildMessage := fileitems).BIPV2WeeklyKeys.BuildNote;
+  export SendOrbitItemList  := wk_ut.Strata_Orbit_Item_list(pWuid,'BIPV2','Weekly_Keys'  ,pversion ,pEmailNotifyList := pEmail_List     ,pFileRegex := regexfilterout,pIsTesting := false);
   
   export buildall := 
   sequential(
      BuildLinkIds
-    ,promote2built
+    ,promote2builtcont
     ,BuildDirLinkIds // uses contact key
-    ,promote2built
+    ,promote2builtdir
     ,SendOrbitItemList
     ,BIPV2_Strata.mac_check_sources(pversion)
     ,BIPV2_Strata.mac_Compare_BH_To_BIP_Ids(pversion)

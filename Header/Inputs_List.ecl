@@ -1,51 +1,41 @@
-import ut;
-ut.MAC_ListSubFiles_seq('~thor_data400::BASE::DLHeader_Building',out1);
-ut.MAC_ListSubFiles_seq('~thor_data400::BASE::VehiclesHeader_Building',out2);
-ut.MAC_ListSubFiles_seq('~thor_data400::base::emergesHeader_Building',out3);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::AKHeader_Building',out4);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::AKPEHeader_Building',out5);
-ut.MAC_ListSubFiles_seq('~thor_data400::BASE::atfHeader_Building',out6);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::ProfLicHeader_Building',out7);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::MSHeader_Building',out8);
-ut.MAC_ListSubFiles_seq('~thor_data400::base::LiensHeader_Building',out9);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::UtilityHeader_Building',out10);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::BKSrcHeader_Building',out11);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::BkMnHeader_Building',out12);
-ut.MAC_ListSubFiles_seq('~thor_data400::BASE::LN_PropDeedHeader_Building',out13);
-ut.MAC_ListSubFiles_seq('~thor_data400::BASE::LN_PropAssessHeader_Building',out14);
-ut.MAC_ListSubFiles_seq('~thor_data400::BASE::LN_PropSrchHeader_Building',out15);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::DeathHeader_Building',out16);
-ut.MAC_ListSubFiles_seq('~thor_data400::base::gongheader_building',out17);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::ForeclosureHeader_Building',out18);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::AirmenHeader_Building',out19);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::AircraftHeader_Building',out20);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::BoatHeader_Building',out21);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::WatercraftSrchHeader_Building',out22);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::DeaHeader_Building',out23);
-ut.MAC_ListSubFiles_seq('~thor_data400::Base::WatercraftMainHeader_Building',out24);
+import ut, lib_stringlib, lib_fileservices;
+
+rWithSuperFileName
+ :=
+  record, maxlength(10000)
+	FsLogicalFileNameRecord;
+	dataset(FsLogicalFileNameRecord) SubFileName;
+  end
+ ;
+
+dHeaderBuildingSuperFiles		:= FileServices.LogicalFileList('*base::*header_building',false,true);
+
+/*Added to capture Orbit entries*/
+dOtherFiles := 	FileServices.LogicalFileList('thor_data400::base::watchdog_best',false,true)
+							+ FileServices.LogicalFileList('thor_data400::key::new_suppression::qa::link_type_link_id',false,true)
+							;
 
 
-export Inputs_List := parallel(output(out1,all),
-						output(out2,all),
-						output(out3,all),
-						output(out4,all),
-						output(out5,all),
-						output(out6,all),
-						output(out7,all),
-						output(out8,all),
-						output(out9,all),
-						output(out10,all),
-						output(out11,all),
-						output(out12,all),
-						output(out13,all),
-						output(out14,all),
-						output(out15,all),
-						output(out16,all),
-						output(out17,all),
-						output(out18,all),
-						output(out19,all),
-						output(out20,all),
-						output(out21,all),
-						output(out22,all),
-						output(out23,all),
-						output(out24,all));
+dHeaderBuildingSuperFilesNoBiz	:=	dHeaderBuildingSuperFiles(StringLib.StringFind(Name,'business',1)=0
+                                                          and StringLib.StringFind(Name,'base::ebr',1)=0
+                                                          and StringLib.StringFind(Name,'quickheader',1)=0
+                                                          and StringLib.StringFind(Name,'base::propd',1)=0
+                                                          and StringLib.StringFind(Name,'base::propa',1)=0
+                                                          and StringLib.StringFind(Name,'base::props',1)=0
+                                                          and StringLib.StringFind(Name,'fcra',1)=0
+                                                          and StringLib.StringFind(Name,'experianwpheader',1)=0
+                                                          and StringLib.StringFind(Name,'tucreditheader',1)=0
+														     )
+						          + dOtherFiles
+								  ;
+
+rWithSuperFileName	tPreLoadSuperFileNames(dHeaderBuildingSuperFilesNoBiz pInput)
+ :=
+  transform
+	self.Name			:=	pInput.Name[1..100];
+	self.SubFileName	:=	Lib_FileServices.FileServices.SuperFileContents('~' + pInput.Name,true)[count(Lib_FileServices.FileServices.SuperFileContents('~' + pInput.Name,true))-50..];
+  end
+ ;
+
+dPreLoadSuperFileNames	:=	nothor(project(dHeaderBuildingSuperFilesNoBiz,tPreLoadSuperFileNames(left)));
+export Inputs_List		:=	output(sort(dPreLoadSuperFileNames,name),all,named('Header_Inputs'));

@@ -1,5 +1,17 @@
+export proc_build_all(string filedate) := function
 
-email_success := FileServices.sendemail('jlezcano@seisint.com; cmaroney@seisint.com','images build successful','Images have been successfully built on prod200.');
-email_fail := FileServices.sendemail('jlezcano@seisint.com; cmaroney@seisint.com','images build failed!','Image build has failed on prod200.');
+to_thor := output('Moving to QA...');
 
-export proc_build_all := sequential(proc_build_base,proc_build_keys, proc_accept_sk_to_qa, email_success) : failure(email_fail);
+email_success := fileservices.sendemail('roxiebuilds@seisint.com;vniemela@seisint.com;darren.knowles@lexisnexis.com'
+                                  ,'SEX OFFENDER IMAGES BUILD SUCCESS ' + filedate,
+							'keys: 1) images::key::sexoffender::matrix_images_did_qa (images::key::sexoffender::'+filedate+'::did)'   + '\n' +
+							'      2) images::key::sexoffender::matrix_images_qa (images::key::sexoffender::'+filedate+'::data)' + '\n' +
+							'         have been built and ready to be deployed to QA.' + '\n');
+
+email_fail := FileServices.sendemail('darren.knowles@lexisnexis.com','images build failed!','Image build has failed, wu ' + thorlib.wuid());
+
+do_first := proc_accept_sk_to_qa : failure(email_fail);
+
+return  sequential(to_thor,do_first, email_success);
+
+end;

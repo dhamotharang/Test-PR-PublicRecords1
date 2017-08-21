@@ -1,0 +1,1 @@
+EXPORT Layout_Watercraft_Search := recordof(In_Watercraft_Search);

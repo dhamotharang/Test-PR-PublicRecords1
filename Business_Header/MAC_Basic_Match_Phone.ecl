@@ -1,10 +1,22 @@
-EXPORT MAC_Basic_Match_Phone(infile, outfile, matchsourcegroup='false') := MACRO
+import business_header;
+
+EXPORT MAC_Basic_Match_Phone(
+
+	 infile
+	,outfile
+	,matchsourcegroup				= 'false'
+	,pFileVersion						= '\'prod\''														// default to use prod version of superfiles
+	,pUseOtherEnvironment		= business_header._Dataset().IsDataland	// default is to hit prod on dataland, and on prod hit prod.
+
+) := MACRO
 
 // This macro assumes the vendor_id is unique and persistent within the source file.
 // Source type should be defined in Business_Header.Set_Source_Vendor_Id_Unique
+#uniquename(pBHFile)
+%pBHFile%	:= Business_Header.Files(pFileVersion,pUseOtherEnvironment).Base.Business_headers.logical;
 
 #uniquename(match_to)
-%match_to% := Business_Header.File_Business_Header_Previous;
+%match_to% := %pBHFile%;
 
 //-- slimmer record format for business header file (match_to)
 #uniquename(slimrec)

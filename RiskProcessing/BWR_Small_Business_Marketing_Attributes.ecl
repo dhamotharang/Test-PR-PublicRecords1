@@ -1,7 +1,7 @@
 #workunit('name','Small Business Marketing Attributes');
 #option ('hthorMemoryLimit', 1000);
 
-IMPORT Data_Services, iESP, LNSmallBusiness, Risk_Indicators, RiskWise, UT;
+IMPORT Data_Services, iESP, LNSmallBusiness, Risk_Indicators, RiskWise;
 /* ********************************************************************
  *                               OPTIONS                              *
  **********************************************************************
@@ -10,73 +10,85 @@ IMPORT Data_Services, iESP, LNSmallBusiness, Risk_Indicators, RiskWise, UT;
  * threads: Number of parallel threads to run. Set to 1 - 30.         *
  * roxieIP: IP Address of the non-FCRA roxie.                         *
  **********************************************************************/
-recordsToRun := 100000;
-eyeball := 50;
+ 
+recordsToRun := 0;
+eyeball      := 10;
+threads      := 2;
 
-threads := 2;
-RoxieIP := RiskWise.shortcuts.Dev194; // Development Roxie 194
-version := '.9';
+RoxieIP := RiskWise.shortcuts.prod_batch_neutral;      // Production
+// RoxieIP := RiskWise.shortcuts.staging_neutral_roxieIP; // Staging/Cert
+// RoxieIP := RiskWise.shortcuts.Dev192;                  // Development Roxie 192
+// RoxieIP := RiskWise.shortcuts.Dev194;                  // Development Roxie 194
 
+ 
 inputFile := Data_Services.foreign_prod + 'jpyon::in::compass_1190_bus_shell_in_in';
-outputFile := '~tgertken::out::small_business_marketing_2';
+outputFile := '~tgertken::out::sba4m_' + thorlib.wuid();
 
 // Universally Set the History Date for ALL records. Set to 0 to use the History Date located on each record of the input file
 histDateYYYYMM := 0;
-histDate 			 := 0;
+histDate       := 0;
+
+//To process real time use this
+//histDateYYYYMM := 999999;
+//histDate       := 999999999999;
+
+dataRestrictionMask_val := '0000000000000000000000000';
+dataPermissionMask_val  := '00000000000000000000'; 			// SBFE Not included: All 0's
+
+GLBA := '0';
+DPPA := '0';
 
 
-// Uncomment the attribute groups below that you wish to have returned
 AttributesRequested := 
-		DATASET([{'SmallBusinessAttrV1'}], iesp.share.t_StringArrayItem) + 
-		// DATASET([{'SBFEAttrV1'}], iesp.share.t_StringArrayItem) + 
+		DATASET([{LNSmallBusiness.Constants.SMALL_BIZ_MKT_ATTR_V1_NAME}], iesp.share.t_StringArrayItem) + 
 		DATASET([], iesp.share.t_StringArrayItem);
 		
 
-// Uncomment the models below that you wish to have returned
-ModelsRequested :=
-		// DATASET([{'SBA9999_9'}], iesp.share.t_StringArrayItem) +
-		// DATASET([{'SBFE9999_9'}], iesp.share.t_StringArrayItem) +
-		DATASET([], iesp.share.t_StringArrayItem);
+ModelsRequested := DATASET([], iesp.share.t_StringArrayItem);
 
 /* **************************************
  *         MAIN SCRIPT CODE             *
  ****************************************/
-bus_in := record
-     string30  AccountNumber := '';
-		 string100 AlternateCompanyName := '';
-		 string16  BusinessIPAddress := '';
-		 string8	 NAICCode;
+bus_in := RECORD
+		 string30  AccountNumber := '';
      string100 CompanyName := '';
+     string100 AlternateCompanyName := '';
      string50  Addr := '';
      string30  City := '';
      string2   State := '';
      string9   Zip := '';
      string10  BusinessPhone := '';
-     string9   TaxIdNumber := '';	 
-		 string8	 SICCode;
+     string9   TaxIdNumber := '';
+     string16  BusinessIPAddress := '';
      string15  Representativefirstname := '';
-	   string15  RepresentativeMiddleName := '';
+     string15  RepresentativeMiddleName := '';
      string20  Representativelastname := '';
-	   string5   RepresentativeNameSuffix := '';
+     string5   RepresentativeNameSuffix := '';
      string50  RepresentativeAddr := '';
      string30  RepresentativeCity := '';
      string2   RepresentativeState := '';
      string9   RepresentativeZip := '';
      string9   RepresentativeSSN := '';
      string8   RepresentativeDOB := '';
-	   string3   RepresentativeAge := '';
+     string3   RepresentativeAge := '';
      string20  RepresentativeDLNumber := '';
      string2   RepresentativeDLState := '';
-	   string10  RepresentativeHomePhone := '';
+     string10  RepresentativeHomePhone := '';
      string50  RepresentativeEmailAddress := '';
-	   string20  RepresentativeFormerLastName := '';
-	   integer   historydate;
+     string20  RepresentativeFormerLastName := '';
+     integer   historydate;
+     string8   SICCode;
+     string8   NAICCode;
+
 end;
 
-f := IF(recordsToRun <= 0, DATASET(inputFile, bus_in, CSV(QUOTE('"'))), 
-                          CHOOSEN(DATASET(inputFile, bus_in, CSV(QUOTE('"'))), recordsToRun));
 
-OUTPUT(CHOOSEN(f, eyeball), NAMED('Sample_Raw_Input'));
+ds_input := IF(recordsToRun <= 0, DATASET(inputFile, bus_in, CSV(QUOTE('"'))), 
+                          CHOOSEN(DATASET(inputFile, bus_in, CSV(QUOTE('"'))), recordsToRun));
+													
+f_with_seq := PROJECT(ds_input, TRANSFORM({UNSIGNED seq, RECORDOF(LEFT)}, SELF.seq := COUNTER, SELF := LEFT));	
+
+OUTPUT(CHOOSEN(ds_input, eyeball), NAMED('Sample_Raw_Input'));
 
 layout_soap := RECORD
 	STRING Seq;// Forcing this into the layout so that we have something to join the attribute results by to get the account number back
@@ -89,163 +101,156 @@ layout_soap := RECORD
 	UNSIGNED6 HistoryDate;
 	UNSIGNED1 OFAC_Version;
 	UNSIGNED1 LinkSearchLevel;
-	UNSIGNED1 MarketingMode;
 	STRING50 AllowedSources;
 	REAL Global_Watchlist_Threshold;
 	BOOLEAN OutcomeTrackingOptOut;
-	UNSIGNED1 DppaPurpose; 
-	UNSIGNED1 GLBPurpose;
 END;
 
-layout_soap transform_input_request(f le, UNSIGNED8 ctr) := TRANSFORM
-	u := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_User, 
-			SELF.AccountNumber := le.accountnumber; 
-			// SELF.DLPurpose := '1'; 
-			// SELF.GLBPurpose := '1'; 
-			// SELF.DataRestrictionMask := '0000000000000000000000000'; 
-			// SELF.DataPermissionMask := '0000000000000'; 
-			SELF := []));
-	o := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMOptions, 
-			SELF.AttributesVersionRequest := AttributesRequested; 
-			SELF.IncludeModels.Names := ModelsRequested; 
-			SELF := []));
-	c := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMCompany, 
-			SELF.CompanyName := le.CompanyName; 
-			SELF.AlternateCompanyName := le.AlternateCompanyName; 
-			SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
-						SELF.StreetAddress1 := le.Addr; 
-						SELF.City := le.City; 
-						SELF.State := le.State; 
-						SELF.Zip5 := le.Zip[1..5]; 
-						SELF.Zip4 := le.Zip[6..9]; 
-						SELF := []))[1];
-			SELF.Phone := le.BusinessPhone;
-			SELF.FaxNumber := '';
-			SELF.FEIN := le.TaxIdNumber;
-			SELF.SICCode := le.SICCode;
-			SELF.NAICCode := le.NAICCode;
-			SELF.BusinessStructure := '';
-			SELF.YearsInBusiness := '';
-			SELF.BusinessStartDate := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
-						SELF.Year := (INTEGER)'';
-						SELF.Month := (INTEGER)'';
-						SELF.Day := (INTEGER)'';
-						SELF := []))[1]; 
-			SELF.YearlyRevenue := '';
-			SELF := []));
-	a1 := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMAuthRep, 
-			SELF.Name := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Name, 
-						SELF.First := le.Representativefirstname; 
-						SELF.Middle := le.RepresentativeMiddleName; 
-						SELF.Last := le.Representativelastname; 
-						SELF.Suffix := le.RepresentativeNameSuffix; 
-						SELF := []))[1]; 
-			SELF.FormerLastName := le.RepresentativeFormerLastName; 
-			SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
-						SELF.StreetAddress1 := le.RepresentativeAddr; 
-						SELF.City := le.RepresentativeCity; 
-						SELF.State := le.RepresentativeState; 
-						SELF.Zip5 := le.RepresentativeZip[1..5]; 
-						SELF.Zip4 := le.RepresentativeZip[6..9]; 
-						SELF := []))[1];
-			SELF.DOB := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
-						SELF.Year := (INTEGER)le.RepresentativeDOB[1..4];
-						SELF.Month := (INTEGER)le.RepresentativeDOB[5..6];
-						SELF.Day := (INTEGER)le.RepresentativeDOB[7..8];
-						SELF := []))[1]; 
-			SELF.Age := le.RepresentativeAge; 
-			SELF.SSN := le.RepresentativeSSN; 
-			SELF.Phone := le.RepresentativeHomePhone; 
-			SELF.DriverLicenseNumber := le.RepresentativeDLNumber; 
-			SELF.DriverLicenseState := le.RepresentativeDLState; 
-			SELF.BusinessTitle := ''; 
-			SELF := []));
-	a2 := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMAuthRep, 
-			SELF.Name := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Name, 
-						SELF.First := ''; 
-						SELF.Middle := ''; 
-						SELF.Last := ''; 
-						SELF.Suffix := ''; 
-						SELF := []))[1]; 
-			SELF.FormerLastName := ''; 
-			SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
-						SELF.StreetAddress1 := ''; 
-						SELF.City := ''; 
-						SELF.State := ''; 
-						SELF.Zip5 := ''; 
-						SELF.Zip4 := ''; 
-						SELF := []))[1];
-			SELF.DOB := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
-						SELF.Year := (INTEGER)'';
-						SELF.Month := (INTEGER)'';
-						SELF.Day := (INTEGER)'';
-						SELF := []))[1]; 
-			SELF.Age := ''; 
-			SELF.SSN := ''; 
-			SELF.Phone := ''; 
-			SELF.DriverLicenseNumber := ''; 
-			SELF.DriverLicenseState := ''; 
-			SELF.BusinessTitle := ''; 
-			SELF := []));
-	a3 := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMAuthRep, 
-			SELF.Name := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Name, 
-						SELF.First := ''; 
-						SELF.Middle := ''; 
-						SELF.Last := ''; 
-						SELF.Suffix := ''; 
-						SELF := []))[1]; 
-			SELF.FormerLastName := ''; 
-			SELF.Address := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Address, 
-						SELF.StreetAddress1 := ''; 
-						SELF.City := ''; 
-						SELF.State := ''; 
-						SELF.Zip5 := ''; 
-						SELF.Zip4 := ''; 
-						SELF := []))[1]; 
-			SELF.DOB := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.share.t_Date, 
-						SELF.Year := (INTEGER)'';
-						SELF.Month := (INTEGER)'';
-						SELF.Day := (INTEGER)'';
-						SELF := []))[1]; 
-			SELF.Age := ''; 
-			SELF.SSN := ''; 
-			SELF.Phone := ''; 
-			SELF.DriverLicenseNumber := ''; 
-			SELF.DriverLicenseState := ''; 
-			SELF.BusinessTitle := ''; 
-			SELF := []));
+layout_soap transform_input_request(f_with_seq le) := TRANSFORM
+	u := DATASET([TRANSFORM(iesp.share.t_User, 
+															SELF.AccountNumber := le.accountnumber; 
+															SELF.DLPurpose := DPPA; 
+															SELF.GLBPurpose := GLBA; 
+															SELF.DataRestrictionMask := dataRestrictionMask_val; 
+															SELF.DataPermissionMask := dataPermissionMask_val; 
+															SELF := [])]);
+	o := DATASET([TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMOptions, 
+															SELF.AttributesVersionRequest := AttributesRequested; 
+															SELF.IncludeModels.Names := ModelsRequested; 
+															SELF := [])]);
+	c := DATASET([TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMCompany, 
+															SELF.CompanyName := le.CompanyName; 
+															SELF.AlternateCompanyName := le.AlternateCompanyName; 
+															SELF.Address := DATASET([TRANSFORM(iesp.share.t_Address, 
+																																		SELF.StreetAddress1 := le.Addr; 
+																																		SELF.City := le.City; 
+																																		SELF.State := le.State; 
+																																		SELF.Zip5 := le.Zip[1..5]; 
+																																		SELF.Zip4 := le.Zip[6..9]; 
+																																		SELF := [])])[1];
+															SELF.Phone := le.BusinessPhone;
+															SELF.FaxNumber := '';
+															SELF.FEIN := le.TaxIdNumber;
+															SELF.SICCode := le.SICCode;
+															SELF.NAICCode := le.NAICCode;
+															SELF.BusinessStructure := '';
+															SELF.YearsInBusiness := '';
+															SELF.YearlyRevenue := '';
+															SELF.BusinessStartDate := DATASET([TRANSFORM(iesp.share.t_Date, SELF := [];)])[1];
+															SELF.BusinessIds := DATASET([TRANSFORM(iesp.share.t_BusinessIdentity,
+																																				//	SELF.SeleID := 19290761;
+																																					SELF := [])])[1];
+															SELF := [])]);
+	a1 := DATASET([TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMAuthRep, 
+															SELF.Name := DATASET([TRANSFORM(iesp.share.t_Name, 
+																																SELF.First := le.Representativefirstname; 
+																																SELF.Middle := le.RepresentativeMiddleName; 
+																																SELF.Last := le.Representativelastname; 
+																																SELF.Suffix := le.RepresentativeNameSuffix; 
+																																SELF := [])])[1]; 
+															SELF.FormerLastName := ''; 
+															SELF.Address := DATASET([TRANSFORM(iesp.share.t_Address, 
+																																	SELF.StreetAddress1 := le.RepresentativeAddr; 
+																																	SELF.City := le.RepresentativeCity; 
+																																	SELF.State := le.RepresentativeState; 
+																																	SELF.Zip5 := le.RepresentativeZip[1..5]; 
+																																	SELF.Zip4 := le.RepresentativeZip[6..9]; 
+																																	SELF := [])])[1];
+															SELF.DOB := DATASET([TRANSFORM(iesp.share.t_Date, 
+																																SELF.Year := (INTEGER)le.RepresentativeDOB[1..4];
+																																SELF.Month := (INTEGER)le.RepresentativeDOB[5..6];
+																																SELF.Day := (INTEGER)le.RepresentativeDOB[7..8];
+																																SELF := [])])[1]; 
+															SELF.Age := le.RepresentativeAge; 
+															SELF.SSN := le.RepresentativeSSN; 
+															SELF.Phone := le.RepresentativeHomePhone; 
+															SELF.DriverLicenseNumber := le.RepresentativeDLNumber; 
+															SELF.DriverLicenseState := le.RepresentativeDLState; 
+															SELF.BusinessTitle := '';
+															SELF := [])]);
+	a2 := DATASET([TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMAuthRep, 
+															SELF.Name := DATASET([TRANSFORM(iesp.share.t_Name, 
+																																SELF.First := ''; 
+																																SELF.Middle := ''; 
+																																SELF.Last := ''; 
+																																SELF.Suffix := ''; 
+																																SELF := [])])[1]; 
+															SELF.FormerLastName := ''; 
+															SELF.Address := DATASET([TRANSFORM(iesp.share.t_Address, 
+																																		SELF.StreetAddress1 := ''; 
+																																		SELF.City := ''; 
+																																		SELF.State := ''; 
+																																		SELF.Zip5 := ''; 
+																																		SELF.Zip4 := ''; 
+																																		SELF := [])])[1];
+															SELF.DOB := DATASET([TRANSFORM(iesp.share.t_Date, 
+																																SELF.Year := (INTEGER)'';
+																																SELF.Month := (INTEGER)'';
+																																SELF.Day := (INTEGER)'';
+																																SELF := [])])[1]; 
+															SELF.Age := ''; 
+															SELF.SSN := ''; 
+															SELF.Phone := ''; 
+															SELF.DriverLicenseNumber := ''; 
+															SELF.DriverLicenseState := ''; 
+															SELF.BusinessTitle := ''; 
+															SELF := [])]);
+	a3 := DATASET([TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMAuthRep, 
+															SELF.Name := DATASET([TRANSFORM(iesp.share.t_Name, 
+																																SELF.First := ''; 
+																																SELF.Middle := ''; 
+																																SELF.Last := ''; 
+																																SELF.Suffix := ''; 
+																																SELF := [])])[1]; 
+															SELF.FormerLastName := ''; 
+															SELF.Address := DATASET([TRANSFORM(iesp.share.t_Address, 
+																																		SELF.StreetAddress1 := ''; 
+																																		SELF.City := ''; 
+																																		SELF.State := ''; 
+																																		SELF.Zip5 := ''; 
+																																		SELF.Zip4 := ''; 
+																																		SELF := [])])[1]; 
+															SELF.DOB := DATASET([TRANSFORM(iesp.share.t_Date, 
+																																SELF.Year := (INTEGER)'';
+																																SELF.Month := (INTEGER)'';
+																																SELF.Day := (INTEGER)'';
+																																SELF := [])])[1]; 
+															SELF.Age := ''; 
+															SELF.SSN := ''; 
+															SELF.Phone := ''; 
+															SELF.DriverLicenseNumber := ''; 
+															SELF.DriverLicenseState := ''; 
+															SELF.BusinessTitle := ''; 
+															SELF := [])]);
 
-s := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMSearchBy, SELF.Seq := (STRING)ctr; 
+	s := DATASET([TRANSFORM(iesp.smallbusinessmarketingattributes.t_SBMSearchBy, SELF.Seq := (STRING)le.seq; 
    																																										 SELF.Company := c[1]; 
    																																										 SELF.AuthorizedRep1 := a1[1]; 
    																																										 SELF.AuthorizedRep2 := a2[1]; 
    																																										 SELF.AuthorizedRep3 := a3[1]; 
-   																																										 SELF := []));
+   																																										 SELF := [])]);
 
 																																										 
-r := PROJECT(ut.ds_oneRecord, TRANSFORM(iesp.smallbusinessmarketingattributes.t_SmallBusinessMarketingRequest, SELF.User := u[1]; SELF.Options := o[1]; SELF.SearchBy := s[1]; SELF := []));
+	r := DATASET([TRANSFORM(iesp.smallbusinessmarketingattributes.t_SmallBusinessMarketingRequest, SELF.User := u[1]; SELF.Options := o[1]; SELF.SearchBy := s[1]; SELF := [])]);
+	
 	SELF.SmallBusinessMarketingRequest := r[1];
 
 	SELF.HistoryDateYYYYMM := IF(histDateYYYYMM = 0, (INTEGER)(STRING)le.historydate[1..6], histDateYYYYMM);
 	SELF.HistoryDate       := IF(histDate       = 0, le.historydate, histDate); // Input file doesn't have any other history date field besides historydateyyyymm.	
+	
 	SELF.OFAC_Version := 3;
 	SELF.LinkSearchLevel := 0;
 	SELF.AllowedSources := '';
 	SELF.Global_Watchlist_Threshold := 0.84;
 	SELF.OutcomeTrackingOptOut := TRUE; // Turn off SCOUT logging
 	
-	SELF.DppaPurpose := 1; 
-	SELF.GLBPurpose := 1; 
-	// SELF.DataRestrictionMask := '0000000000000000000000000'; 
-	// SELF.DataPermissionMask := '0000000000000'; 
-
-	SELF.Seq := (STRING)ctr;
+	SELF.Seq := (STRING)le.seq;
 	SELF.AccountNumber := le.accountnumber;
 	
 	SELF := [];
 END;
 
-SmallBusinessMarketing_input := DISTRIBUTE(PROJECT(f, transform_input_request(LEFT, COUNTER)), RANDOM());
+SmallBusinessMarketing_input := DISTRIBUTE(PROJECT(f_with_seq, transform_input_request(LEFT)), RANDOM());
 
 OUTPUT(CHOOSEN(SmallBusinessMarketing_input, eyeball), NAMED('SmallBusinessMarketing_input'));
 
@@ -262,26 +267,73 @@ SmallBusinessMarketingoutput myFail(SmallBusinessMarketing_input le) := TRANSFOR
 	SELF := [];
 END;
 
+			
 SmallBusinessMarketing_attributes := 
 				SOAPCALL(SmallBusinessMarketing_input, 
 				RoxieIP,
-				'LNSmallBusiness.SmallBusiness_Marketing_Service' + version, 
+				'lnsmallbusiness.smallbusiness_marketing_service', 
 				{SmallBusinessMarketing_input}, 
 				DATASET(SmallBusinessMarketingoutput),
         RETRY(5), TIMEOUT(500),
-				XPATH('LNSmallBusiness.SmallBusiness_Marketing_Service' + version + 'Response/Results/Result/Dataset[@name=\'Results\']/Row'),
+				XPATH('lnsmallbusiness.smallbusiness_marketing_serviceResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
 				PARALLEL(threads), onFail(myFail(LEFT)));
-				
-Passed := SmallBusinessMarketing_attributes(TRIM(ErrorCode) = '');
-Failed := SmallBusinessMarketing_attributes(TRIM(ErrorCode) <> '');
+
+
+// Records that completed having a MinInputErrorCode shall be kept in the "Passed"
+// dataset. However, we still need to display them.
+MinInputErrorCode := 'Please input the minimum required fields';
+
+
+// ----------[ PASSED RECORDS ]----------				
+Passed := SmallBusinessMarketing_attributes(TRIM(ErrorCode) = '' OR Stringlib.StringFind(ErrorCode, MinInputErrorCode, 1) > 0);
+
+records_having_MinInputErrorCode := Passed(Stringlib.StringFind(ErrorCode, MinInputErrorCode, 1) > 0);
+OUTPUT( records_having_MinInputErrorCode, NAMED('MinimumInputErrorCode_recs'), ALL );
+
+// ----------[ FAILED RECORDS ]----------
+records_having_other_ErrorCode := SmallBusinessMarketing_attributes(TRIM(ErrorCode) != '' AND Stringlib.StringFind(ErrorCode, MinInputErrorCode, 1) = 0);
+OUTPUT( records_having_other_ErrorCode, NAMED('OtherErrorCode_recs'), ALL );
+
+
+ds_input_dist := DISTRIBUTE(f_with_seq, HASH64(seq)) : INDEPENDENT;
+
+records_having_other_ErrorCode_as_input :=
+	JOIN(
+		ds_input_dist, DISTRIBUTE(records_having_other_ErrorCode, HASH64((UNSIGNED)Result.InputEcho.Seq)),
+		LEFT.seq = (UNSIGNED)RIGHT.Result.InputEcho.Seq,
+		TRANSFORM(LEFT),
+		KEEP(1),
+		INNER, LOCAL
+	);
+
+// Grab any dropped records, i.e. those records not returned by the Roxie. These
+// get tossed into the "Failed" dataset also.
+dropped_records_as_input :=
+	JOIN(
+		ds_input_dist, DISTRIBUTE(SmallBusinessMarketing_attributes, HASH64((UNSIGNED)Result.InputEcho.Seq)),
+		LEFT.seq = (UNSIGNED)RIGHT.Result.InputEcho.Seq,
+		TRANSFORM(LEFT),
+		LEFT ONLY, LOCAL
+	);
+
+Failed := records_having_other_ErrorCode_as_input + dropped_records_as_input;
+
+
+SBAMFailed_Inputs := SORT( Failed, AccountNumber );
+
+
+OUTPUT(CHOOSEN(SmallBusinessMarketing_attributes, eyeball), NAMED('SmallBusinessMarketing_results'));
 				
 OUTPUT(CHOOSEN(Passed, eyeball), NAMED('SmallBusinessMarketing_Results_Passed'));
 OUTPUT(CHOOSEN(Failed, eyeball), NAMED('SmallBusinessMarketing_Errors'));
+OUTPUT(CHOOSEN(dropped_records_as_input, eyeball), NAMED('SmallBusinessMarketing_Dropped_Records'));
 OUTPUT(COUNT(Passed), NAMED('SmallBusinessMarketing_Total_Passed'));
 OUTPUT(COUNT(Failed), NAMED('SmallBusinessMarketing_Total_Errors'));
+OUTPUT(COUNT(dropped_records_as_input), NAMED('SmallBusinessMarketing_Total_Dropped') );
 
 // Now transform the attributes and scores into a flat layout
 layout_flat_v1 := RECORD
+		UNSIGNED6 seq;
 		STRING30 AccountNumber;
 		UNSIGNED3 HistoryDateYYYYMM;
 		STRING120 Bus_Company_Name;
@@ -578,6 +630,7 @@ END;
 getValue(DATASET(iesp.share.t_NameValuePair) AttributeResults, STRING AttributeName) := AttributeResults (StringLib.StringToLowerCase(Name) = StringLib.StringToLowerCase(AttributeName))[1].Value;
 
 layout_flat_v1 flatten_v1(SmallBusinessMarketing_input le, Passed ri) := TRANSFORM
+	SELF.seq := (UNSIGNED)le.seq;
 	SELF.AccountNumber := le.AccountNumber;
 	SELF.HistoryDateYYYYMM := le.HistoryDateYYYYMM;
 	SELF.Bus_Company_Name := ri.Result.InputEcho.Company.CompanyName;
@@ -586,7 +639,7 @@ layout_flat_v1 flatten_v1(SmallBusinessMarketing_input le, Passed ri) := TRANSFO
 	SELF.SeleID := ri.Result.BusinessID.SeleID;
 	SELF.OrgID := ri.Result.BusinessID.OrgID;
 	SELF.UltID := ri.Result.BusinessID.UltID;
-	V1AttributeResults := ri.Result.AttributeGroups(StringLib.StringToLowerCase(Name) = 'smallbusinessattrv1')[1].Attributes;
+	V1AttributeResults := ri.Result.AttributeGroups(StringLib.StringToLowerCase(Name) = StringLib.StringToLowerCase(LNSmallBusiness.Constants.SMALL_BIZ_MKT_ATTR_V1_NAME))[1].Attributes;
 	// Attributes Section
 	SELF.InputCheckBusName := getValue(V1AttributeResults, 'InputCheckBusName');
 	SELF.InputCheckBusAltName := getValue(V1AttributeResults, 'InputCheckBusAltName');
@@ -882,9 +935,14 @@ layout_flat_v1 flatten_v1(SmallBusinessMarketing_input le, Passed ri) := TRANSFO
 	SELF.ErrorCode := ri.ErrorCode;
 END;
 
-flatResults := JOIN(SmallBusinessMarketing_input, (Passed + Failed), LEFT.Seq = RIGHT.Result.InputEcho.Seq, flatten_v1(LEFT, RIGHT), KEEP(1), ATMOST(10));
+
+
+flatResults_seq := SORT(JOIN(DISTRIBUTE(SmallBusinessMarketing_input, HASH64((UNSIGNED)seq)), DISTRIBUTE((Passed), HASH64((UNSIGNED)Result.InputEcho.Seq)), (UNSIGNED)LEFT.Seq = (UNSIGNED)RIGHT.Result.InputEcho.Seq, flatten_v1(LEFT, RIGHT), KEEP(1), ATMOST(10), LOCAL), seq);
+flatResults := PROJECT(flatResults_seq, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));
+
+failedResults := PROJECT(SBAMFailed_Inputs, TRANSFORM({RECORDOF(LEFT) - seq}, SELF := LEFT));
 
 OUTPUT(CHOOSEN(flatResults, eyeball), NAMED('Sample_Final_Results'));
 OUTPUT(COUNT(flatResults), NAMED('Total_Final_Results_Passed'));
 OUTPUT(flatResults,, outputFile, CSV(HEADING(single), QUOTE('"')), OVERWRITE);
-
+OUTPUT(failedResults,, outputFile + '_failed_records', CSV(QUOTE('"')), OVERWRITE);

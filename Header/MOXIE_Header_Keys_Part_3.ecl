@@ -117,8 +117,8 @@ Key3e	:= BUILDINDEX(short_ssn_records,,header.base_key_name + 'ssn4.lfmname.key'
 export MOXIE_Header_Keys_Part_3
  :=
   parallel(
-			   Key3a
-			  ,Key3b
+/*			   Key3a  --NO LONGER NEEDED
+			  ,*/Key3b
 			  ,Key3c
 			  ,Key3d
 			  ,Key3e

@@ -1,6 +1,11 @@
-IMPORT Business_Header;
+Import Data_Services, Business_Header, PRTE2_Business_Header;
 
-f_f := Business_Header_SS.File_Prep_BH_CompanyName_FEIN_Plus;
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+f_f := PRTE2_Business_Header.files().base.CompanynameFein.keybuild;
+#ELSE
+f_f := business_header.files().base.CompanynameFein.keybuild;
+#END;
+
 
 layout_fein_index := RECORD
 	f_f.FEIN;

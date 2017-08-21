@@ -4,7 +4,7 @@ export Layouts_Voters := MODULE
 
 	export Voters := record
 		 unsigned6  vtid;
-		 string8	process_date;
+		 string8	  process_date;
 		 string8    date_first_seen;
 		 string8    date_last_seen;
 		 string7    Source;
@@ -37,16 +37,16 @@ export Layouts_Voters := MODULE
 		 string25   race_exp;
 		 string1    gender;
 		 string2    political_party;
-		 string25	politicalparty_exp;
+		 string25	  politicalparty_exp;
 		 string10 	phone;
 		 string10 	work_phone;
 		 string10 	other_phone;
 		 string1    active_status;
-		 string20	active_status_exp;
+		 string20	  active_status_exp;
 		 string1    GenderSurNamGuess; //voterfiller2;
 		 string1    active_other;	 
 		 string2    voter_status;
-		 string50	voter_status_exp;
+		 string50	  voter_status_exp;
 		 string40 	res_Addr1;
 		 string40 	res_Addr2;
 		 string40 	res_city;
@@ -164,39 +164,67 @@ export Layouts_Voters := MODULE
 		 string1    geo_match;
 		 string4    err_stat;
 		 string10 	mail_prim_range;
-		 string2 	mail_predir;
+		 string2 	  mail_predir;
 		 string28 	mail_prim_name;
-		 string4 	mail_addr_suffix;
-		 string2 	mail_postdir;
+		 string4 	  mail_addr_suffix;
+		 string2 	  mail_postdir;
 		 string10 	mail_unit_desig;
-		 string8 	mail_sec_range;
+		 string8 	  mail_sec_range;
 		 string25 	mail_p_city_name;
 		 string25 	mail_v_city_name;
-		 string2 	mail_st;
-		 string5 	mail_ace_zip;
-		 string4 	mail_zip4;
-		 string4 	mail_cart;
-		 string1 	mail_cr_sort_sz;
-		 string4 	mail_lot;
-		 string1 	mail_lot_order;
-		 string2 	mail_dpbc;
-		 string1 	mail_chk_digit;
-		 string2 	mail_rec_type;
-		 string2 	mail_ace_fips_st;
-		 string3 	mail_fips_county;
-		 string10	mail_geo_lat;
+		 string2 	  mail_st;
+		 string5 	  mail_ace_zip;
+		 string4 	  mail_zip4;
+		 string4 	  mail_cart;
+		 string1 	  mail_cr_sort_sz;
+		 string4 	  mail_lot;
+		 string1 	  mail_lot_order;
+		 string2 	  mail_dpbc;
+		 string1 	  mail_chk_digit;
+		 string2 	  mail_rec_type;
+		 string2 	  mail_ace_fips_st;
+		 string3 	  mail_fips_county;
+		 string10	  mail_geo_lat;
 		 string11 	mail_geo_long;
-		 string4 	mail_msa;
-		 string7 	mail_geo_blk;
-		 string1 	mail_geo_match;
-		 string4 	mail_err_stat;
+		 string4 	  mail_msa;
+		 string7 	  mail_geo_blk;
+		 string1 	  mail_geo_match;
+		 string4 	  mail_err_stat;
 	end;
 	
-	// Vote History Fields
-	// Note: Modify this layout begning of every year to accommodiate the new vendor layout 
-	// to add the new vote history year fields.
+	export Voters_new := record
+		 Voters;
+     // Adding new fields that replaced other fields after 9/23/2011
+		 string15 	IDTypes;
+		 string30 	precinct;
+		 string10 	ward1;
+		 string1    IDCode;	 
+		 string40 	PrecinctPartTextDesig;
+		 string40 	PrecinctPartTextName;
+		 string40 	PrecinctTextDesig;
+		 string2    MarriedAppend;
+		 string9    SupervisorDistrict;
+		 string20 	district;
+		 string20 	ward2;
+		 string7    CityCountyCouncil;
+		 string7    CountyPrecinct;
+		 string7    CountyCommis;
+		 string7    SchoolBoard;
+		 string7    ward3;
+		 string7    TownCityCouncil1;
+		 string4    TownCityCouncil2;
+		 string4    regents;
+		 string5    WaterShed;
+		 string5    education;
+		 string4    PoliceConstable;
+		 string4    FreeHolder;
+		 string4    MuniCourt;
+		 string10   ChangeDate;
+	end;
+	
+	// Leave this layout alone
 	shared VoteHistory := record
-	     string2    Primary2008;     
+	   string2    Primary2008;     
 		 string2    Special12008;    
 		 string2    Other2008;       
 		 string2    Special22008;   
@@ -267,9 +295,85 @@ export Layouts_Voters := MODULE
 		 string2    General1996     := '';     // old base fields
 	end;
 	
+	// Vote History Fields
+	// Note: Modify this layout begning of every year to accommodiate the new vendor layout 
+	// to add the new vote history year fields.
+	// As of code changes in 2015, the layout accomodates up to 2020 and back to 2004.
+	shared VoteHistory_new := record
+		 string1    Primary2020;
+		 string1    Special12020;
+		 string1    Other2020;
+		 string1    Special22020;
+		 string1    General2020;
+		 string1    PresPrimary2020;
+		 string1    Primary2019;
+		 string1    Special12019;
+		 string1    Other2019;
+		 string1    Special22019;
+		 string1    General2019;
+		 string1    Primary2018;
+		 string1    Special12018;
+		 string3    Other2018;
+		 string1    Special22018;
+		 string1    General2018;
+		 string1    Primary2017;
+		 string1    Special12017;
+		 string1    Other2017;
+		 string1    Special22017;
+		 string1    General2017;
+		 string1    Primary2016;
+		 string1    Special12016;
+		 string1    Other2016;
+		 string1    Special22016;
+		 string1    General2016;
+		 string1    PresPrimary2016;
+		 string1    Primary2015;
+		 string1    Special12015;
+		 string1    Other2015;
+		 string1    Special22015;
+		 string1    General2015;
+		 string1    Primary2014;
+		 string1    Special12014;
+		 string1    Other2014;
+		 string1    Special22014;
+		 string1    General2014;
+		 string1    Primary2013;
+		 string1    Special12013;
+		 string1    Other2013;
+		 string1    Special22013;
+		 string1    General2013;
+		 string2    Primary2012;
+		 string2    Special12012;
+		 string2    Other2012;
+		 string2    Special22012;
+		 string2    General2012;
+		 string2    PresPrimary2012;
+		 string2    Primary2011;
+		 string2    Special12011;
+		 string2    Other2011;
+		 string2    Special22011;
+		 string2    General2011;
+		 string2    Primary2010;
+		 string2    Special12010;
+		 string2    Other2010;
+		 string2    Special22010;
+		 string2    General2010;
+		 string2    Primary2009;
+		 string2    Special12009;
+		 string2    Other2009;
+		 string2    Special22009;
+		 string2    General2009;
+	   VoteHistory;
+	end;
+	
 	Export Layout_Voters_Common := record
-	    Voters;
+	  Voters;
 		VoteHistory;
+	end;
+	
+	Export Layout_Voters_Common_new := record
+	  Voters_new;
+		VoteHistory_new;
 	end;
 	
 	Export Layout_Voters_base := record
@@ -278,6 +382,16 @@ export Layouts_Voters := MODULE
 		unsigned1  did_score;
 		string9    ssn;
 		Voters;
+		string1    name_type;
+		string1    addr_type;
+	end;
+	
+	Export Layout_Voters_base_new := record
+		unsigned6  rid;
+		unsigned6  did;
+		unsigned1  did_score;
+		string9    ssn;
+		Voters_new;
 		string1    name_type;
 		string1    addr_type;
 	end;
@@ -304,7 +418,7 @@ export Layouts_Voters := MODULE
 		Voters.zip;
 		Voters.phone;
 		unsigned1 zero  := 0;
-	    string1   blank := '';
+	  string1   blank := '';
 	end;
 
 end;

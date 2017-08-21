@@ -68,7 +68,7 @@ EXPORT ConvertDEAtoHeader (DATASET (HealthCareProvider.Layouts.DEA_DID) Infile =
 		SELF.LNAME												:=	'';
 		SELF.SNAME												:=	'';
 		SELF.SIC_CODE											:=	'';
-		SELF.CNAME												:=	HealthCareProvider.CleanData.fUpperCleanSpaces(HealthCareProvider.CleanData.fReplaceUnprintable(L.CNAME));
+		SELF.CNAME												:=	HealthCareFacility.clean_facility_name(L.CNAME); //HealthCareFacility.FacilityNameCleaner.fnCleanAsConfigured(HealthCareProvider.CleanData.fReplaceUnprintable(L.CNAME));
 		SELF.CNP_NAMEID										:=	0;
 		SELF.CNP_NAME											:=	'';
 		SELF.CNP_NUMBER										:=	'';	
@@ -125,12 +125,12 @@ EXPORT ConvertDEAtoHeader (DATASET (HealthCareProvider.Layouts.DEA_DID) Infile =
 		SELF.TAXONOMY											:=	'';
 		SELF.TAXONOMY_CODE								:=	'';
 		SELF.MEDICARE_FACILITY_NUMBER			:=	'';
-		SELF.PROVIDER_STATUS							:=	'';
+		SELF.PROVIDER_STATUS							:=	''; 
 		SELF.VENDOR_ID										:=	L.dea_registration_number;
 		SELF := [];
 	END;
 
-	Provider_DS := PROJECT (Infile,getProviderInfo (LEFT)) (TRIM(CNAME) <> '' AND TRIM(ZIP) <> '' AND TRIM(PRIM_NAME) <> '');
+	Provider_DS := PROJECT (Infile(is_company_flag),getProviderInfo (LEFT)) (TRIM(CNAME) <> '' AND TRIM(ZIP) <> '' AND TRIM(PRIM_NAME) <> '');
 	
 	D_Provider_DS := DISTRIBUTE (Provider_DS,HASH32(VENDOR_ID));
 

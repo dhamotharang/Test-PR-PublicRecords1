@@ -12,7 +12,7 @@ shared CountryCodes := [
 												'AFG', // Afghanistan
 												'AGO', // Angola
 												'AIA', // Anguilla
-												'ALA', // Åland Islands
+												'ALA', // Ã…land Islands
 												'ALB', // Albania
 												'AND', // Andorra
 												'ANT', // Netherlands Antilles
@@ -35,7 +35,7 @@ shared CountryCodes := [
 												'BHR', // Bahrain
 												'BHS', // Bahamas
 												'BIH', // Bosnia and Herzegovina
-												'BLM', // Saint Barthélemy
+												'BLM', // Saint BarthÃ©lemy
 												'BLR', // Belarus
 												'BLZ', // Belize
 												'BMU', // Bermuda
@@ -52,7 +52,7 @@ shared CountryCodes := [
 												'CHE', // Switzerland
 												'CHL', // Chile
 												'CHN', // China
-												'CIV', // Côte d'Ivoire
+												'CIV', // CÃ´te d'Ivoire
 												'CMR', // Cameroon
 												'COD', // Congo, the Democratic Republic of the
 												'COG', // Congo
@@ -194,7 +194,7 @@ shared CountryCodes := [
 												'PSE', // Palestinian Territory, Occupied
 												'PYF', // French Polynesia
 												'QAT', // Qatar
-												'REU', // Réunion
+												'REU', // RÃ©union
 												'ROU', // Romania
 												'RUS', // Russian Federation
 												'RWA', // Rwanda

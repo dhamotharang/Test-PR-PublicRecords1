@@ -104,16 +104,17 @@ case(code,
 'W' => 'WISCONSIN ASSIGNED', '');
 
 
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_WI_clean_in, watercraft.Layout_WI_clean_in,hull_clean_in)
 
-watercraft.Layout_Watercraft_Coastguard_Base main_mapping_format(watercraft.file_WI_clean_in L) := transform
+watercraft.Layout_Watercraft_Coastguard_Base main_mapping_format(hull_clean_in L) := transform
 
 
-self.watercraft_key                    :=  'WI-'+ trim(L.REG_NUM, left, right);
-self.sequence_key                      :=  '';
+self.watercraft_key					   :=	trim(L.reg_num, left, right);
+self.sequence_key				       :=	if(trim(L.reg_date, left, right)<>'',L.reg_DATE,L.LAST_TRANSACTION_DATE);
 self.state_origin                      :=  'WI';
 self.source_code                       :=  'AW';
 self.vessel_id                         :=  '';
-self.vessel_database_key               :=  L.FLEETID;
+self.vessel_database_key               := if(trim(L.FLEETID,left,right)= 'NULL', '', trim(L.FLEETID,left,right));
 self.name_of_vessel                    :=  L.BOATNAME;
 self.call_sign                         :=  '';
 self.official_number                   :=  '';
@@ -180,5 +181,5 @@ self.itc_tons_cod_ind                                           :=  '';
   
 end;
 
-export Mapping_WI_as_Coastguard := project(watercraft.file_WI_clean_in, main_mapping_format(left));
+export Mapping_WI_as_Coastguard := dedup(project(hull_clean_in, main_mapping_format(left)),all);
 

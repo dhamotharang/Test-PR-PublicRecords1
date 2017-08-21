@@ -36,6 +36,7 @@ MyFields := record					// Fields needed to build all keys
   string12 st_name := h.prim_name[1..12];
   string4  dob_year := h.dob[1..4];
   string2  dob_month := h.dob[5..6];
+  string5  ssn5 := h.ssn[1..5];
   string4  ssn4 := h.ssn[6..9];
   string11 name_first := h.fname[1..11];
   string11 name_middle := h.mname[1..11];
@@ -74,6 +75,7 @@ st_lfmname_fields := record
   t.zip;
   t.phone7;
   t.area_code;
+  t.ssn5;
   t.__filepos;
   end;
 
@@ -84,6 +86,7 @@ Key1e	:= BUILDINDEX(st_lfmname_recs,{zip,lfmname,(big_endian unsigned8 )__filepo
 Key1f	:= BUILDINDEX(st_lfmname_recs,{phone7,(big_endian unsigned8 )__filepos},header.base_key_name + 'phone7.key',moxie,overwrite);
 Key1g	:= BUILDINDEX(st_lfmname_recs,{st,phone7,(big_endian unsigned8 )__filepos},header.base_key_name + 'st.phone7.key',moxie,overwrite);
 Key1h	:= BUILDINDEX(st_lfmname_recs,{phone7,area_code,st,(big_endian unsigned8 )__filepos},header.base_key_name + 'phone7.area_code.st.key',moxie,overwrite);
+Key1l	:= BUILDINDEX(st_lfmname_recs,{ssn5,lfmname,(big_endian unsigned8 )__filepos},header.base_key_name + 'ssn5.lfmname.key',moxie,overwrite);
 
 export MOXIE_Header_Keys_Part_1
  :=
@@ -93,8 +96,9 @@ export MOXIE_Header_Keys_Part_1
 			  ,Key1c
 			  ,Key1d
 			  ,Key1e
-			  ,Key1f
+			  ,/*Key1f
 			  ,Key1g
-			  ,Key1h
+			  ,*/Key1h
+			  ,Key1l
 		   )
  ;

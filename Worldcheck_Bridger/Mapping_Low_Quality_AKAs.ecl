@@ -14,7 +14,7 @@ export Mapping_Low_Quality_AKAs(dataset(Layout_WorldCheck_Premium) in_f):= funct
 		unicode Last_Name{xpath('Last_Name')};
 		unicode Generation{xpath('Generation')};
 		unicode Full_Name{xpath('Full_Name')};
-		string Comments{xpath('Comments')};
+		unicode Comments{xpath('Comments')};
 	end;
 	
 	Layout_temp := record//, maxlength(30900)
@@ -54,12 +54,12 @@ export Mapping_Low_Quality_AKAs(dataset(Layout_WorldCheck_Premium) in_f):= funct
 									,(unicode)TRIM(l.CompleteName,left,right));
 		self.Type 			:= 'AKA'; // Name type of two for the AKA records
 		self.Category		:= 'WEAK';
-		self.First_Name		:= (unicode)'';
-		self.Middle_Name	:= (unicode)'';
-		self.Last_Name		:= (unicode)'';
-		self.Generation		:= (unicode)'';
-		self.Full_Name		:= (unicode)'';
-		self.Comments		:= '';
+		self.First_Name		:= U'';
+		self.Middle_Name	:= U'';
+		self.Last_Name		:= U'';
+		self.Generation		:= U'';
+		self.Full_Name		:= U'';
+		self.Comments		:= U'';
 		self.ID				:= l.uid;
 		self.e_i_ind		:= l.e_i_ind;
 	end;

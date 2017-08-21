@@ -89,7 +89,15 @@ self.corp_sos_charter_nbr := map_charter_number(l.corp_vendor,l.corp_state_origi
 self := l;
 end;
 
-corp_file := if(Corp_Update_Flag, File_Corporate_Direct_Corp_Update, File_Corporate_Direct_Corp_In);
+corp_file := if(Corp_Update_Flag
+								,if(Flags.IsUsingV2Inputs
+									,if(Flags.UseV2CurrentSprayed
+										,File_Corporate_Direct_Corp_Update + Corp.Files.V2.corp
+										,File_Corporate_Direct_Corp_Update + Corp.Files.V2.corp_father
+									)
+									,File_Corporate_Direct_Corp_Update
+								)
+						,File_Corporate_Direct_Corp_In);
 
 corp_update_dist := distribute(corp_file, hash(corp_key));
 corp_update_sort := sort(corp_update_dist, record, local);
@@ -131,7 +139,7 @@ self.record_type := 'H';
 self := l;
 end;
 
-corp_current_init := project(File_Corp_Base(corp_vendor <> 'EX', Corp_Base_Filter), InitCurrentBase(left));
+corp_current_init := project(File_Corp_Base(corp_vendor <> 'EX', Filters.Base.Corp_Base), InitCurrentBase(left));
 corp_current_init_dist := distribute(corp_current_init, hash(corp_key));
 
 
@@ -376,10 +384,39 @@ corp_update_event := join(corp_update,
 					left outer,
 					local);
 					
-// BDID Corporate records
-corp_to_bdid := corp_update_event;
 
-Business_Header.MAC_Source_Match(corp_to_bdid, corp_bdid_init,
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// -- Sequence records using bdid field for now(since patch function uses Corp.Layout_Corp_Base)
+// -- so we can put fields back in their place after bdiding
+/////////////////////////////////////////////////////////////////////////////////////////////////
+ut.MAC_Sequence_Records(corp_update_event, bdid, corp_update_event_seq);
+
+corp_to_bdid_patched := corp.fun_PatchAddrWithRA(corp_update_event_seq);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// -- Add seq field, since now we can have another field(and need to use bdid field now)
+/////////////////////////////////////////////////////////////////////////////////////////////////
+layout_corp_seq :=
+record
+	Corp.Layout_Corp_Base;
+	unsigned4 seq := 0;
+end;
+
+layout_corp_seq tPopulateSeqField(Corp.Layout_Corp_Base l) :=
+transform
+	self.seq	:= l.bdid;
+	self.bdid	:= 0;
+	self 		:= l;
+end;
+
+corp_to_bdid_patched_seq	:= project(corp_to_bdid_patched,	tPopulateSeqField(left));
+corp_to_bdid_nonpatched_seq	:= project(corp_update_event_seq,	tPopulateSeqField(left));
+
+
+// BDID Corporate records first pass
+Business_Header.MAC_Source_Match(corp_to_bdid_patched_seq, corp_bdid_patched_init,
                         FALSE, bdid,
                         FALSE, 'C',
                         TRUE, corp_key,
@@ -394,9 +431,9 @@ Business_Header.MAC_Source_Match(corp_to_bdid, corp_bdid_init,
 // since the Corporate file may be newer than the Business Headers
 BDID_Matchset := ['A'];
 
-corp_bdid_match := corp_bdid_init(bdid <> 0);
+corp_bdid_match := corp_bdid_patched_init(bdid <> 0);
 
-corp_bdid_nomatch := corp_bdid_init(bdid = 0);
+corp_bdid_nomatch := corp_bdid_patched_init(bdid = 0);
 
 Business_Header_SS.MAC_Add_BDID_Flex(corp_bdid_nomatch,
                                   BDID_Matchset,
@@ -404,12 +441,47 @@ Business_Header_SS.MAC_Add_BDID_Flex(corp_bdid_nomatch,
                                   corp_addr1_prim_range, corp_addr1_prim_name, corp_addr1_zip5,
                                   corp_addr1_sec_range, corp_addr1_state,
                                   corp_phone10, corp_fed_tax_id,
-                                  bdid, Layout_Corp_Temp,
+                                  bdid, layout_corp_seq,
                                   FALSE, BDID_score_field,
                                   corp_bdid_rematch)
 
 corp_bdid_all := corp_bdid_match + corp_bdid_rematch;
-					
 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// -- Match back to before the patch, getting original fields
+/////////////////////////////////////////////////////////////////////////////////////////////////
+Corp.Layout_Corp_Base tbacktobaseformat(corp_to_bdid_nonpatched_seq l, corp_bdid_all r) :=
+transform
+	self.bdid	:= r.bdid;
+	self 		:= l;
+end;
 
-export Corp_Updated_Corp := corp_bdid_all : persist('TEMP::Corp_Base');
+corp_to_bdid_nonpatched_seq_sort	:= sort(distribute(corp_to_bdid_nonpatched_seq, seq), seq, local);
+corp_bdid_all_sort					:= sort(distribute(corp_bdid_all, seq), seq, local);
+
+corp_match_back := join( corp_to_bdid_nonpatched_seq_sort
+						,corp_bdid_all_sort
+						,left.seq = right.seq
+						,tbacktobaseformat(left,right)
+						,local);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// -- Add Dummy data to corp base file
+/////////////////////////////////////////////////////////////////////////////////////////////////
+dummy_dataset := dataset(
+[
+	 {999999001001,20060627,0,20060627,0,'26-RVH9999999001001','26','MI','20060719','L9999999001001','MARSUPIAL MANOR III','','PRINCIPAL CORPORATE ADDRESS','12345 S. WAYNE RD.','','ROMULUS, MI 48174','','','','','','','','','','','','','','','','','','','','','','','CC','ACTIVE','20060627','','','MI','19740228','','','D','20221231','EXPIRATION DATE','','','','','','','','','','','','LIMITED PARTNERSHIP','','','','','UNITED STATES CORPORATION COMPANY','','REGISTERED AGENT','','','','','','REGISTERED AGENT ADDRESS','222 W. GENESEE ST.','','LANSING, MI 48933','','','','','','','','','12345','','WAYNE','RD','','','','ROMULUS','ROMULUS','MI','48174','1551','C076','D','136','A','0','4','S','26','163','42.23264','-83.385796','2160','5859001','1','S820','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','UNITED STATES CORPORATION COMPANY','','','','222','W','GENESEE','ST','','','','LANSING','LANSING','MI','48933','1224','C003','D','220','A','22','0','S','26','65','42.738637','-84.55463','4040','6001','1','S800','L9999999001001','','','C'}
+	,{999999001001,20021124,20040902,20021124,20040902,'26-RVH9999999001001','26','MI','20040902','L9999999001001','MARSUPIAL MANOR III','','PRINCIPAL CORPORATE ADDRESS','999 S. WAYNE RD.','','ROMULUS, MI 48174','','','','','','','','','','','','','','','','','','','','','','','CC','ACTIVE','20060627','','','MI','19740228','','','D','20221231','EXPIRATION DATE','','','','','','','','','','','','LIMITED PARTNERSHIP','','','','','UNITED STATES CORPORATION COMPANY','','REGISTERED AGENT','','','','','','REGISTERED AGENT ADDRESS','222 W. GENESEE ST.','','LANSING, MI 48933','','','','','','','','','999','','WAYNE','RD','','','','ROMULUS','ROMULUS','MI','48174','1551','C076','D','133','A','0','4','S','26','163','42.23264','-83.385796','2160','5859001','1','S820','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','UNITED STATES CORPORATION COMPANY','','','','222','W','GENESEE','ST','','','','LANSING','LANSING','MI','48933','1224','C003','D','220','A','22','0','S','26','65','42.738637','-84.55463','4040','6001','1','S800','L9999999001001','','','H'}	
+
+], Corp.Layout_Corp_Base);	
+
+Corp.Layout_Corp_Base tAddBuildDates(Corp.Layout_Corp_Base l) :=
+transform
+	self.dt_last_seen				:= (unsigned4)Corp.Corp_Build_Date;
+	self.dt_vendor_last_reported	:= (unsigned4)Corp.Corp_Build_Date;
+	self							:= l;
+end;
+
+dummy_data_fix_dates := project(dummy_dataset, tAddBuildDates(left));
+
+export Corp_Updated_Corp := corp_match_back + dummy_data_fix_dates : persist(Thor_Cluster + 'persist::Corp::Corp_Updated_Corp');

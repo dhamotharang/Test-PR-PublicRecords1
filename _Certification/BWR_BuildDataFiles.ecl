@@ -111,3 +111,4 @@ dist_base_flpszanbm := distribute(base_flpszanbm,hash32(fname,lname, prange,stre
 MAC_Sequence_Records(dist_base_flpszanbm,id,base_flpszanbm_1)
 
 output(base_flpszanbm_1,,_Certification.Setup.filename,overwrite);
+output(AddrCleanLib.CleanPersonFML73('mickey mouse'));

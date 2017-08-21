@@ -1,4 +1,4 @@
-import BIPV2, DCAV2, DNB_DMI, Frandx, bipv2_hrchy, ut,tools;
+import BIPV2, DCAV2, DNB_DMI, Frandx, bipv2_hrchy, ut,tools, Data_Services;
 
 
 EXPORT files_HRCHY := module
@@ -8,7 +8,7 @@ EXPORT files_HRCHY := module
 	
 
 	/*----------------- Other Inputs to Hrchy Build ------------------------------------------ */
-	export lnca := DCAV2.Files().base.companies.qa;						
+	export lnca := DCAV2.Files(,pUseOtherEnvironment := tools._Constants.IsDataland).base.companies.qa;						
 	export duns := DNB_DMI.Files().base.companies.qa;					
 	export fran := Frandx.files().base.qa;//** NEED TO INCORPORATE THIS FILE TOO
 
@@ -176,7 +176,9 @@ shared headrec2 := RECORD
 
 	export FILE_HRCY_BASE_LF_FULL						:= if(tools._constants.isdataland ,FILE_HRCY_BASE_LF_FULL_persist           ,FILE_HRCY_BASE_LF_FULL_nopersist         );
 	export FILE_HRCY_BASE_LF_FULL_BUILDING	:= if(tools._constants.isdataland ,FILE_HRCY_BASE_LF_FULL_BUILDING_persist  ,FILE_HRCY_BASE_LF_FULL_BUILDING_nopersist); 
-
+	
+  export FILENAME_HRCY_BASE_LF_FULL_BUILDING	:= BIPv2_HRCHY.Filenames(,tools._constants.isdataland).base.built;
+  
 	EXPORT KEY_HRCY_PROXID_FULL(dataset(ref.Layouts.lgidr) lt = dataset([], ref.Layouts.lgidr)) :=
 	INDEX(
 		dedup(lt(lgid > 0, proxid > 0), proxid, lgid, lgid_level, proxid_level_within_lgid, src, all),
@@ -233,8 +235,8 @@ shared headrec2 := RECORD
 
 
 	// index (perhaps temporary) for proxids that need hrchy patching between data builds
-	new := dataset( ut.foreign_prod+'thor_data400::bipv2_hrchy::base::20130330::data',headrec2, thor);
-	old := dataset( ut.foreign_prod+'thor_data400::bipv2_hrchy::base::20130212::datab',headrec2, thor);
+	new := dataset( Data_Services.foreign_prod+'thor_data400::bipv2_hrchy::base::20130330::data',headrec2, thor);
+	old := dataset( Data_Services.foreign_prod+'thor_data400::bipv2_hrchy::base::20130212::datab',headrec2, thor);
 
 	newd := dedup(new, proxid, all);
 	oldd := dedup(old, proxid, all);

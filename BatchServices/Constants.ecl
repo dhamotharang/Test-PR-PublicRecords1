@@ -1,4 +1,4 @@
-﻿/*2014-08-27T23:00:06Z (greg whitaker)
+/*2014-08-27T23:00:06Z (greg whitaker)
 TRIS V3 constants added
 */
 import ut,MDR;

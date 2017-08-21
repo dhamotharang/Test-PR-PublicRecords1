@@ -1,12 +1,23 @@
-import aca, business_header, header, fcra, versioncontrol,paw,corp2;
+import aca, business_header, header, fcra, versioncontrol,paw,corp2,mdr;
+
+laycorp	  := corp2.Layout_Corporate_Direct_Corp_Base;
+laybus		:= business_header.Layout_Business_Header_base;
+layaca		:= aca.Layout_ACA_Clean;
+laypbsa	  := Risk_Indicators.Layout_PBSA.base;
 
 export HRI_Businesses(
 
-	 boolean	isFCRA
-	,boolean	pUseDatasets	= false
-	,string		pPersistname		= 'persist::Risk_Indicators::HRI_Businesses::'
-	,string		pPersistUnique	= ''
-	,dataset(corp2.Layout_Corporate_Direct_Corp_Base)	pInactiveCorps 				= paw.fCorpInactives()
+	 boolean					isFCRA
+	,boolean					pUseDatasets		= false
+	,string						pPersistname		= 'persist::Risk_Indicators::HRI_Businesses::'
+	,string						pPersistUnique	= ''
+	,dataset(laycorp)	pInactiveCorps 	= paw.fCorpInactives()
+	,string						pBhVersion			= 'qa'
+	,boolean					puse_prod				= versioncontrol._Flags.IsDataland
+	,dataset(laybus	)	pBhFile 				= business_header.files(pBhVersion, puse_prod).Base.business_headers.new
+	,string						psicunique			= if(pPersistUnique = '', '', '::' + pPersistUnique[1..(length(trim(pPersistUnique)) - 2)])
+	,dataset(layaca	) pACAFile				= aca.File_ACA_Clean(pUseDatasets := pUseDatasets, pPersistnameAid := '~thor_data400::persist::aca::file_aca_clean_aid' + psicunique, pPersistname := '~thor_data400::persist::aca::file_aca_clean' + psicunique)
+	,dataset(laypbsa) pPBSAFile				= Risk_Indicators.File_PBSA.base
 	
 ) := function
 
@@ -15,7 +26,7 @@ use_prod := versioncontrol._Flags.IsDataland;
 thor_cluster := business_header._dataset().thor_cluster_Persists;
 
 sic_code_set := ['0971','2710','2711','4311','4449','4783','4822',
-                 '6515','7011','7021','7032','7033','7291','7323',
+                 '6515','7000','7011','7021','7032','7033','7291','7323',
                  '7331','7334','8051','8052','8059','8062','8063'
 								 ,'8082','8211','8221','8222','8231','8322','8361'
 								 ,'9223','9711'];
@@ -26,13 +37,13 @@ persistrootname := thor_cluster + pPersistname + pPersistUnique;
 persistname := if (isFCRA, persistrootname + 'bh_bdid_sic_FCRA', persistrootname + 'bh_bdid_sic');
 uniquename := if (isFCRA, '::FCRA', '::NotFCRA');
 
-sicunique := if(pPersistUnique = '', '', '::' + pPersistUnique[1..(length(trim(pPersistUnique)) - 2)]);
+//sicunique := if(pPersistUnique = '', '', '::' + pPersistUnique[1..(length(trim(pPersistUnique)) - 2)]);
 
-sicptname  := business_header.persistnames().BHBDIDSIC			+ sicunique;
-sicFptname := business_header.persistnames().BHBDIDSICFCRA	+ sicunique;
+sicptname  := business_header.persistnames().BHBDIDSIC			+ psicunique;
+sicFptname := business_header.persistnames().BHBDIDSICFCRA	+ psicunique;
 
-f_bdid_sic_nonpersisted := if (isFCRA, business_header.bh_bdid_sic_FCRA(pUseDatasets := pUseDatasets,pPersistname := sicFptname,pInactiveCorps := pInactiveCorps), business_header.bh_bdid_sic(pUseDatasets := pUseDatasets,pPersistname := sicptname,pInactiveCorps := pInactiveCorps));
-f_bdid_sic_persisted 		:= if (isFCRA, business_header.bh_bdid_sic_FCRA(pUseDatasets := pUseDatasets,pPersistname := sicFptname,pInactiveCorps := pInactiveCorps), business_header.bh_bdid_sic(pUseDatasets := pUseDatasets,pPersistname := sicptname,pInactiveCorps := pInactiveCorps)) : persist(persistname);
+f_bdid_sic_nonpersisted := if (isFCRA, business_header.bh_bdid_sic_FCRA(pBhVersion,pUseDatasets := pUseDatasets,pPersistname := sicFptname,pInactiveCorps := pInactiveCorps), business_header.bh_bdid_sic(pBhVersion,pUseDatasets := pUseDatasets,pPersistname := sicptname,pInactiveCorps := pInactiveCorps));
+f_bdid_sic_persisted 		:= if (isFCRA, business_header.bh_bdid_sic_FCRA(pBhVersion,pUseDatasets := pUseDatasets,pPersistname := sicFptname,pInactiveCorps := pInactiveCorps), business_header.bh_bdid_sic(pBhVersion,pUseDatasets := pUseDatasets,pPersistname := sicptname,pInactiveCorps := pInactiveCorps)) : persist(persistname);
                                                                                                                                                                                                                           
 f_bdid_sic	:= if(pUseDatasets	,f_bdid_sic_nonpersisted	,f_bdid_sic_persisted);
 
@@ -50,7 +61,7 @@ end;
 
 
 f_bdid_sic_slim := project(f_bdid_sic, get_sic4(left));
-f_bdid_sic_valid := f_bdid_sic_slim(sic_code<>'',source<>'D');
+f_bdid_sic_valid := f_bdid_sic_slim(sic_code<>'',not (MDR.sourceTools.SourceIsDunn_Bradstreet(source)));
 /////////////////////
 f_bdid_sic_dist := distribute(f_bdid_sic_valid,hash(bdid,sic_code));
 f_bdid_sic_sort := sort(f_bdid_sic_dist,bdid,sic_code,local);
@@ -58,11 +69,12 @@ f_bdid_sic_dedup := dedup(f_bdid_sic_sort,bdid,sic_code,local);
 
 f_bdid_dist := distribute(f_bdid_sic_dedup, hash(bdid));
 
-bh_base := business_header.files(, use_prod).Base.business_headers.built(~isFCRA or ~fcra.Restricted_BusHeader_Src(source, vendor_id[1..2]));
+bh_base := pBhFile(~isFCRA or ~fcra.Restricted_BusHeader_Src(source, vendor_id[1..2]));
 
 layout_bh_bestphone := RECORD
 	bh_base.bdid;
 	bh_base.phone;
+	string2 phone_source;
 END;
 
 dbestphonepersisted := business_header.bestphone(bh_base) : persist(persistrootname + 'BestPhone' + uniquename);
@@ -91,10 +103,10 @@ BestCompanyName := if(pUseDatasets
 									);
 
 
-bh_best_company_dist := distribute(BestCompanyName,random());
+bh_best_company_dist := distribute(BestCompanyName, hash(bdid));
 //////////////
-f_sic_addr_out_2 := join(bh_best_company_dist, f_sic_addr_out_1, 
-					left.bdid = right.bdid, right outer);
+f_sic_addr_out_2 := join(bh_best_company_dist, distribute(f_sic_addr_out_1, hash(bdid)), 
+					left.bdid = right.bdid, right outer, local);
 
 layout_bh_bestaddress := RECORD
 	bh_base.bdid;
@@ -110,6 +122,7 @@ layout_bh_bestaddress := RECORD
 	UNSIGNED3 zip;
 	UNSIGNED2 zip4;
 	unsigned4 dt_last_seen;
+	STRING2 addr_source;
 END;
 
 BestAddressPersisted := business_header.BestAddress(bh_base) : persist(persistrootname + 'BestAddress' + uniquename);
@@ -119,54 +132,39 @@ BestAddress := if(pUseDatasets
 											,BestAddressPersisted
 									);
 
-bh_best_address_dist := distribute(BestAddress,random());
+bh_best_address_dist := distribute(BestAddress, hash(bdid));
 
-f_sic_addr_out := join (bh_best_address_dist, distribute(f_sic_addr_out_2, random()),
+f_sic_addr_out := join (bh_best_address_dist, distribute(f_sic_addr_out_2, hash(bdid)),
                         left.bdid = right.bdid,
-												right outer);
+												right outer, local);
 						
 // Get a date of the first time we saw this business
-rec := RECORD
-	string10 prim_range;
-	string2   predir;
-	string28 prim_name;
-	string4  addr_suffix;
-	string2   postdir;
-	string5  unit_desig;
-	string8  sec_range;
-	string25 city;
-	string2   state;
-	integer3  zip;
-	integer2  zip4;
-  string4   sic_code;
-	unsigned3 dt_first_seen;
-	string120	company_name;
-	integer	phone;
-	unsigned6	bdid;
-	string2	source;
-END;
+rec := layouts.layout_HRI_Businesses;
 
 rec get_date(Business_Header.File_Business_Header le, f_sic_addr_out ri) := TRANSFORM
 	SELF.dt_first_seen := le.dt_first_seen DIV 100;
 	SELF := ri;
 END;
 
-bhfile := distribute(business_header.files(,use_prod).Base.business_headers.built(~isFCRA or ~FCRA.Restricted_BusHeader_Src(source, vendor_id[1..2])) ,random());
+bhfile := pBhFile(~isFCRA or ~FCRA.Restricted_BusHeader_Src(source, vendor_id[1..2]));
 
-j := JOIN (bhfile, distribute(f_sic_addr_out, random()), 
+j := JOIN (bhfile, f_sic_addr_out, 
            LEFT.bdid=RIGHT.bdid,
-           get_date(LEFT,RIGHT));
+           get_date(LEFT,RIGHT), hash);
 
+WordSearchSet := ' INN|SUITES|MOTEL|HOTEL|RESORT|LODGE|BED|COTTAGE|PLACE|CAMPGROUND|' +
+								 'CLUB|HOSPITALITY|RETREAT|SUPER 8|RV PARK|VACATION|CABINS';
 
 rec cleaner(j l) := TRANSFORM
 	self.sic_code := map( l.sic_code = '0971' => '2330',
                           l.sic_code = '2710' => '2335',
-					 l.sic_code = '2711' => '2335',
+													l.sic_code = '2711' => '2335',
                           l.sic_code = '4311' => '2265', 
                           l.sic_code = '4449' => '2325',
                           l.sic_code = '4783' => '2310',
                           l.sic_code = '4822' => '2300',
                           l.sic_code = '6515' => '2285',
+													l.sic_code = '7000' => '2210',
                           l.sic_code = '7011' => '2210',
                           l.sic_code = '7021' => '2230',
                           l.sic_code = '7032' => '2290',
@@ -191,10 +189,11 @@ rec cleaner(j l) := TRANSFORM
                           l.sic_code = '9223' => '2225',
                           l.sic_code = '9711' => '2295',
                           '');
+	SELF.Company_name := if(l.sic_code = '7000' and ~regexfind(WordSearchSet, l.company_name), '', l.company_name);
 	SELF := l;
 END;
 
-clean1 := PROJECT(j, cleaner(LEFT));
+clean1 := PROJECT(j, cleaner(LEFT))(trim(Company_name) <> '');
 
 rec get_ACAs(recordof(aca.File_ACA_Clean()) L) := transform
 	self.sic_code := '2225';
@@ -202,7 +201,7 @@ rec get_ACAs(recordof(aca.File_ACA_Clean()) L) := transform
 	self.zip4 := (integer)L.zip4;
 	self.phone := (integer)L.phone;
 	self.bdid := 0;
-	self.source := 'AC';
+	self.source := MDR.sourceTools.src_ACA;
 	//self.dt_last_seen := 0;
 	self.company_name := L.institution;
 	//self.fein := 0;
@@ -212,10 +211,29 @@ rec get_ACAs(recordof(aca.File_ACA_Clean()) L) := transform
 	self := l;
 end;
 
-pACAPersistname	:= '~thor_data400::persist::aca::file_aca_clean' + sicunique;
+//pACAPersistname	:= '~thor_data400::persist::aca::file_aca_clean' + psicunique;
 
-clean2 := project(aca.File_ACA_Clean(pUseDatasets := pUseDatasets, pPersistname := pACAPersistname), get_ACAs(LEFT));
+clean2 := project(pACAFile, get_ACAs(LEFT));
 
-return clean1 + clean2;
+// Add PBSA addresses
+dPBSAFile_ded := dedup(sort(project(pPBSAFile,Risk_Indicators.Layout_PBSA.base_slim),record),record);
+
+rec get_PBSAs(Risk_Indicators.Layout_PBSA.base_slim l) := transform
+	self.sic_code 			:= '2265';
+	self.zip 						:= (integer)l.zip;
+	self.zip4 					:= (integer)l.zip4;
+	self.city						:= l.v_city_name;
+	self.state					:= l.st;
+	self.bdid 					:= 0;
+	self.source 				:= MDR.sourceTools.src_pbsa;
+  self.company_name 	:= 'UNITED STATES POSTAL SERVICE';
+	self.dt_first_seen 	:= 0;
+	self.phone					:= 0;
+	self 								:= l;	
+end;
+
+clean3 := project(dPBSAFile_ded, get_PBSAs(LEFT));
+
+return clean1 + clean2 + clean3;
 
 end;

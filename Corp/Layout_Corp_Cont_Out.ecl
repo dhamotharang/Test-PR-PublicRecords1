@@ -115,4 +115,6 @@ string10  cont_phone10;
 string1   record_type;           // 'C' Current
                                  // 'H' Historical
 string1   address_ind := '';     // 'C' Contact Address Copied form Corporate Address
+string1   myblank := '';
+
 end;

@@ -5,15 +5,15 @@
 */
 /*--INFO-- Find the history of a given Seleid. Enter the current ID and it will walk backwards and find what went into it*/
 EXPORT SeleidHistoryService := MACRO
-  IMPORT SALT30,BIPV2_Seleid_Relative,ut;
+  IMPORT SALT31,BIPV2_Seleid_Relative,ut;
   STRING50 Seleidstr := ''  : STORED('Seleid');
   UNSIGNED8 Seleid0 := (UNSIGNED8)Seleidstr; 
   BFile := BIPV2_Seleid_Relative.In_Base;
   K := BIPV2_Seleid_Relative.Keys(BFile).MatchHistoryKey;
   R := RECORD
-    SALT30.UIDType Seleid_before;
-    SALT30.UIDType Seleid_after;
-    SALT30.UIDType rcid;
+    SALT31.UIDType Seleid_before;
+    SALT31.UIDType Seleid_after;
+    SALT31.UIDType rcid;
     UNSIGNED4 change_date;
     UNSIGNED2 Depth; // The depth down the tree, 0 is the top node
   END;
@@ -26,4 +26,3 @@ EXPORT SeleidHistoryService := MACRO
   tree := LOOP(seed,LEFT.Depth=COUNTER-1,ftch(ROWS(LEFT),COUNTER));
   OUTPUT( tree,NAMED('History'));
 ENDMACRO;
- 

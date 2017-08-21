@@ -93,7 +93,8 @@ end;
 export ready_File(dataset(inquiry_acclogs.layout_in_common) SSNFile, string select_source = 'BANKOBATCH') := function
 
 							
-PersonData := project(SSNFile(source_file = select_source and domain_name + clean_cname1 + ucc_number + ein + charter_number = ''), transform(inquiry_acclogs.Layout.Common,
+PersonData := project(SSNFile(source_file = select_source and domain_name + clean_cname1 + ucc_number + ein + charter_number = ''), 
+	transform(inquiry_acclogs.Layout.Common_ThorAdditions,
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
 			
@@ -177,7 +178,8 @@ PersonData := project(SSNFile(source_file = select_source and domain_name + clea
 			self := left;
 			self := []));
 
-BusinessData := project(SSNFile(source_file = select_source and domain_name + clean_cname1 + ucc_number + ein + charter_number <> ''), transform(inquiry_acclogs.Layout.Common,
+BusinessData := project(SSNFile(source_file = select_source and domain_name + clean_cname1 + ucc_number + ein + charter_number <> ''), 
+	transform(inquiry_acclogs.Layout.Common_ThorAdditions,
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
 			

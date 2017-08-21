@@ -53,8 +53,10 @@ export convert_cont_func(DATASET(Layout_Corporate_Direct_Cont_Base_keyed)ds) := 
 				l.cont_address_line4 + ' ' + l.cont_address_line5 + ' ' + l.cont_address_line6},
 		{84,0,l.cont_phone_number},
 		{85,0,l.cont_effective_date},
-		{86,0,l.cont_status_desc},
-		{87,0,l.cont_fein + '; ' + l.cont_ssn}
+		//{86,0,l.cont_status_desc},
+		{87,0,l.cont_fein + '; ' + l.cont_ssn},
+		{89,0,l.corp_state_origin},
+		{249,0,l.corp_process_date}
 		
 		
 		

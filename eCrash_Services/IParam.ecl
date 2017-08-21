@@ -1,4 +1,4 @@
-﻿import AutoKeyI, AutoStandardI, iesp;
+import AutoKeyI, AutoStandardI, iesp;
 
 export IParam := module
 	

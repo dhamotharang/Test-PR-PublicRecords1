@@ -1,11 +1,11 @@
 import watercraft;
 
-export Layout_IL_clean_in := 
+export Layout_IL_clean_in := record 
+//rec length: 1690
 
-record
-string2 	  state_origin;
-string8	      process_date;
-watercraft.layout_IL;
+  string2 	  state_origin;
+  string8	      process_date;
+  watercraft.layout_IL;
 
   string70 pname1;
   string3  pname1_score;

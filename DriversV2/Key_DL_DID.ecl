@@ -2,7 +2,7 @@ import Doxie_Files, doxie, Doxie_Build, Drivers;
 
 //export Key_DL_DID := Doxie_Files.key_DL_DID;
 
-base := dedup(DriversV2.DL_Decoded(did != 0), all);
+base := dedup(sort(distribute(DriversV2.DL_Decoded(did != 0), hash(did)),record, local), record, local);
 
 export Key_DL_DID := index(base,
 						   {did},

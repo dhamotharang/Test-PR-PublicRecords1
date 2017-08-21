@@ -6,12 +6,12 @@ EXPORT key_override_ibehavior := MODULE
 	
 	shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
 	shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-	shared keyname_prefix_consumer := '~thor_data400::key::override::fcra::ibehavior_consumer::qa::';
-	shared keyname_prefix_purchase := '~thor_data400::key::override::fcra::ibehavior_purchase::qa::';
+	shared keyname_prefix_consumer := data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::ibehavior_consumer::qa::';
+	shared keyname_prefix_purchase := data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::ibehavior_purchase::qa::';
 	
 	
 // consumer record
-	consumer_rec := RECORD
+	export consumer_rec := RECORD
 	ibehavior.layout_consumer_search;
 	STRING20 flag_file_id;
 end;
@@ -24,7 +24,7 @@ end;
 
 
 //purchase record
-	purchase_rec := record
+	export purchase_rec := record
 	ibehavior.layout_behavior_search;
 	STRING20 flag_file_id;
 end;

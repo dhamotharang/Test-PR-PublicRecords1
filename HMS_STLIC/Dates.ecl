@@ -250,14 +250,16 @@ EXPORT Dates := MODULE
 		deltaRange(s) between 1 and 99;
 
 	EXPORT integer DayOfWeek(unsigned4 dt) := function
-			year := STD.Date.Year(dt); 
+			yr := STD.Date.Year(dt); 
 			month := STD.Date.Month(dt); 
 			day := STD.Date.Day(dt); 
-			a:=(14-month)/12;
-			y:= year-a;
-			m:=month+12*a;//-2?
+			year := if(month<3,yr-1,yr);
 			
-			return (day+y+y/4-y/100+y/400+31*m/12)%7;  
+			c:= if(STD.Date.IsLeapYear(year),1,0);
+			
+			mth := '032503514624';
+			
+			return  ( year + year/4 - year/100 + year/400 + (unsigned1)mth[month] + day + c)%7;
 	END;
 	
 END;

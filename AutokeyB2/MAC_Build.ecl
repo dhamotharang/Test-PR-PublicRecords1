@@ -1,3 +1,6 @@
+/*
+Reinstating previous version due to (as yet) unexplained YP issues with DID field and dedup differences
+*/
 export MAC_Build (indataset,infname,inmname,inlname,
 						inssn,
 						indob,
@@ -156,7 +159,7 @@ visitor.MAC_Add_Cities (%withaddcontactaddr%, inzip, incity_name, %ds_normed%); 
 #uniquename(indataset_w_compound_names)
 #uniquename(forMacBuild)
 #if(processCompoundNames)	
-	output('Compound Name Normalization is enabled');
+	// output('Compound Name Normalization is enabled');
 	AutokeyB2.MAC_NormalizeCompoundNames(%ds_normed%, %indataset_w_compound_names%, inlname);
 	%forMacBuild% := %indataset_w_compound_names%;
 #else	

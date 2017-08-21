@@ -1,4 +1,4 @@
-IMPORT AID,address;
+IMPORT AID,address,BIPV2;
 
 EXPORT Layouts :=
 MODULE
@@ -29,6 +29,7 @@ MODULE
 		unsigned6														rid													;
 		unsigned6														bdid												;
 		unsigned1														bdid_score									;
+		BIPV2.IDlayouts.l_xlink_ids																			;
 		unsigned6														did													;
 		unsigned1														did_score										;
 		unsigned4   												date_first_seen							;
@@ -43,13 +44,14 @@ MODULE
 		Address.Layout_Clean182_fips				clean_address								;
 	END;
 
-	export keybuild := base;
+	export keybuild := base - BIPV2.IDlayouts.l_xlink_ids;
 
 	EXPORT strata_base :=
 	RECORD
 		unsigned6														rid													;
 		unsigned6														bdid												;
 		unsigned1														bdid_score									;
+		BIPV2.IDlayouts.l_xlink_ids																			;
 		unsigned6														did													;
 		unsigned1														did_score										;
 		unsigned4   												date_first_seen							;
@@ -96,13 +98,20 @@ MODULE
 			string5			zip5							;
 			string8			sec_range					;
 			string2			state		 					;
+			string25    p_city_name				;
 			string10		phone		  		    ;
 			string9			fein		  		    ;
 			string34		source_group	    ;
 			unsigned6		bdid					:= 0;
 			unsigned1		bdid_score		:= 0;
+			BIPV2.IDlayouts.l_xlink_ids 	;	
+			string80		Web_Address				;
+			string50		Email							;
+			string20 		fname							;
+			string20 		mname							;
+			string20 		lname							;			
 	  end;
-		
+			
 	  export UniqueId := 
 		record
  		  unsigned8		unique_id	;

@@ -1,4 +1,4 @@
-IMPORT Business_Header, Business_Header_SS, ut, DID_Add, Address;
+IMPORT Business_Header, Business_Header_SS, DID_Add, Address, PromoteSupers;
 
 #workunit('name', 'Govt Phones Reset BDID ' + govdata.Gov_Phones_Reset_Date);
 
@@ -51,7 +51,7 @@ gov_base_BDID_All := gov_base_BDID_Match + gov_base_BDID_Rematch;
 /*OUTPUT(gov_base_BDID_All,, 
 	'~thor_data400::BASE::gov_phones_' + govdata.Gov_Phones_Reset_Date, OVERWRITE);*/
 	
-ut.MAC_SF_BuildProcess(gov_base_bdid_all,'~thor_data400::base::gov_phones',do1,2);
+PromoteSupers.MAC_SF_BuildProcess(gov_base_bdid_all,'~thor_data400::base::gov_phones',do1,2);
 
 export Make_Gov_Phones_Base_Reset_BDID := do1;
 

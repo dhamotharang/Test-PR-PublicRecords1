@@ -19,9 +19,11 @@ vehlic.Layout_Vehicles NMFullToCommon(Layout_NM_Full pInput) := transform
 	self.MODEL := pInput.orig_SERIES_MODEL;
 	self.REGISTRATION_STATUS_CODE := pInput.orig_REG_STATUS;
 	self.TITLE_STATUS_CODE := pInput.orig_TITLE_STATUS;
+	self.TITLE_ISSUE_DATE := pInput.orig_TITLE_ISSUED_DATE;
 	self.LICENSE_PLATE_NUMBERxBG4 := pInput.orig_PLATE_NUMBER;
 	self.TRUE_LICENSE_PLSTE_NUMBER := pInput.orig_PLATE_NUMBER;
 	self.REGISTRATION_EXPIRATION_DATE := pInput.orig_REG_EXPIRE_DATE;
+	self.REGISTRATION_EFFECTIVE_DATE:=if( pInput.orig_REG_ISSUED_DATE='19010101','',pInput.orig_REG_ISSUED_DATE);
 	self.PLATE_ISSUE_DATE := pInput.orig_REG_ISSUED_DATE;
 	self.REGISTRANT_1_CUSTOMER_TYPExBG5 := map(trim(pInput.clean_REG1_NAME_last) <> '' => 'I',trim(pInput.orig_REG1_BUSINESS_NAME) <> '' => 'B','U');
 	self.REG_1_CUSTOMER_NAME := if(pInput.orig_REG1_NAME_LAST <> '',

@@ -117,8 +117,9 @@ county_reg(string2 code)
 
 				'' );   
 
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_WV_clean_in, watercraft.Layout_WV_clean_in,hull_clean_in)
 
-watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_WV_clean_in L) := transform
+watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := transform
 
 
     self.watercraft_key				        :=	if(trim(L.year, left, right) >= '1972' and length(trim(L.HULL_ID,left, right)) = 12, trim(L.HULL_ID,left,right),
@@ -223,7 +224,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_WV_cl
 
 
 
-export Mapping_WV_as_Main := project(watercraft.file_WV_clean_in, main_mapping_format(left));
+export Mapping_WV_as_Main := project(hull_clean_in, main_mapping_format(left));
 
 
 	

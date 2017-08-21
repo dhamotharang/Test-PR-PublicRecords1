@@ -1,4 +1,4 @@
-IMPORT CanadianPhones, ut, autokeyb2, RoxieKeyBuild, standard;
+IMPORT CanadianPhones, PromoteSupers, autokeyb2, RoxieKeyBuild, standard, autokey;
 
 // ===========================================================================
 // ================================= HELPERS =================================
@@ -154,29 +154,73 @@ newbase Prepare (base L) := TRANSFORM
   
 base_autoready := PROJECT (base, Prepare (Left));
 
-  autokeyb2.MAC_Build (base_autoready, firstname, middlename, lastname, //indataset,infname,inmname,inlname,
-                     company_name,//inssn, - i am not building an SSN key, so i am hijacking this parameter to get company_name into the zip_prlname key
-                     blank, //indob,
-                     phonenumber, //phone
-                     prim_name, prim_range, state,p_city_name, zip, sec_range, //inprim_name,inprim_range,inst,incity_name,inzip,insec_range,
-                     zero, //instates,
-                     zero,zero,zero, //inlname1,inlname2,inlname3
-					 zero,zero,zero, //incity1,incity2,incity3,
-					 zero,zero,zero,//inrel_fname1,inrel_fname2,inrel_fname3,
-					 zero,//inlookups,
-					 fdid,//inDID,
-					 company_name,//inbname,
-                     zero,//infein,
-                     phonenumber,//bphone,
-                     prim_name, prim_range, state, p_city_name, zip, sec_range, //inbprim_name,inbprim_range,inbst,inbcity_name,inbzip,inbsec_range,
-                     fdid2,//inbdid,
-                     BASE_NAME, SetVersion (BASE_NAME, filedate),bld_auto_keys, false, //inkeyname,inlogical,outaction,diffing='false',
-					 CanadianPhones.Constants.skip_set, //build_skip_set='[]',
-                     false, , true,  // useFakeIDs, typeStr = ['AK'], useOnlyRecordIDs
-                     ,,zero, // FakeIDFieldType = 'unsigned6', Rep_Addr=4, uniqueid = 'zero1'
-					 ,,,,,CanadianPhones.MAutokey, // ,,,,, standard.MStandardBuild
-					 CanadianPhones.MAutokeyb
-);
+
+
+// BUILD AUTOKEYS USING THE NEW INTERFACE APPROACH
+
+outdataset := 
+	project(
+		base_autoready,
+		transform(
+			autokey.layouts.master,
+			self.inp.fname := left.firstname;
+			self.inp.mname := left.middlename;
+			self.inp.lname := left.lastname;
+			self.inp.ssn := '';
+			self.inp.dob := 0;
+			self.inp.phone := (string10)left.phonenumber;
+			self.inp.prim_name := left.prim_name;
+			self.inp.prim_range := left.prim_range;
+			self.inp.st := left.state;
+			self.inp.city_name := left.p_city_name;
+			self.inp.zip := (string6)left.zip;
+			self.inp.sec_range := left.sec_range;
+			self.inp.states := 0;
+			self.inp.lname1 := 0;
+			self.inp.lname2 := 0;
+			self.inp.lname3 :=0;
+			self.inp.city1 := 0;
+			self.inp.city2 := 0;
+			self.inp.city3 := 0;
+			self.inp.rel_fname1 := 0;
+			self.inp.rel_fname2 := 0;
+			self.inp.rel_fname3 := 0;
+			self.inp.lookups := 0;
+			self.inp.DID := (unsigned6)left.fdid;
+			self.inp.bname := left.company_name;
+			self.inp.fein := '';
+			self.inp.bphone := (string10)left.phonenumber;
+			self.inp.bprim_name := left.prim_name;
+			self.inp.bprim_range := left.prim_range;
+			self.inp.bst := left.state;
+			self.inp.bcity_name := left.p_city_name;
+			self.inp.bzip := (string6)left.zip;
+			self.inp.bsec_range := left.sec_range;
+			self.inp.BDID := (unsigned6)left.fdid2;
+			self.FakeID := 0;
+			self.p := [];
+			self.b := [];
+		)
+	);
+
+
+akmod := module(AutokeyB2.Fn_Build.params)
+	export dataset(autokey.layouts.master) L_indata := outdataset;
+	export string L_inkeyname 								:= BASE_NAME;
+	export string L_inlogical 								:= SetVersion (BASE_NAME, filedate);
+	export boolean L_diffing 									:= false;
+	export boolean L_Indv_useAllLookups				:= true;				
+	export boolean L_useOnlyRecordIDs					:= true;
+	export boolean L_useFakeIDs								:= false;
+	export boolean L_AddCities								:= false;
+	export set of string1 L_build_skip_set 		:= CanadianPhones.Constants.skip_set;
+end;	
+
+
+bld_auto_keys := AutokeyB2.Fn_Build.Do(akmod,CanadianPhones.MAutokey,CanadianPhones.MAutokeyb);
+
+
+
 
 // ========================================================================
 // ============================ MOVE TO ... ===============================
@@ -185,7 +229,7 @@ base_autoready := PROJECT (base, Prepare (Left));
   RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::canadianwp_fdids',
 	   '~thor_data400::key::canadianwp::'+filedate+'::fdids',mv_fdid_to_blt);
 
-  ut.MAC_SK_Move_v2('~thor_data400::key::canadianwp_fdids', 'Q', mv_fdid_to_qa);
+  PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::canadianwp_fdids', 'Q', mv_fdid_to_qa);
 
 
   createSupers := createSuperAutoFiles ();

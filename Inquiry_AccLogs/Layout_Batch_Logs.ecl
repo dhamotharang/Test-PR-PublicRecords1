@@ -8,7 +8,7 @@ export Layout_Batch_Logs := record, maxlength(10000)
 	 string orig_function_name;
 	 string orig_transaction_type;
 	 string orig_login_history_id;
-	 string orig_job_id;
+	 string20 orig_job_id;
 	 string orig_sequence_number;
 	 string orig_first_name;
 	 string orig_middle_name;
@@ -58,4 +58,10 @@ export Layout_Batch_Logs := record, maxlength(10000)
 	 string orig_ucc_original_filing_number;
 	 string orig_email_address;
 	 string orig_domain_name;
+	 string orig_full_name;
+	 string orig_dl_purpose;
+	 string orig_glb_purpose;
+	 string orig_fcra_purpose;
+	 string orig_process_id;
 end;
+

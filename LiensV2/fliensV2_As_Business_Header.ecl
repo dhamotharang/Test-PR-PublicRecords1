@@ -1,15 +1,15 @@
 import Business_Header, ut,mdr;
 
-export fliensV2_As_Business_Header(dataset(LiensV2.layout_liens_party_ssn_bid) pFile_Liens) :=
+export fliensV2_As_Business_Header(dataset(LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags) pFile_Liens, BOOLEAN IsPRCT = false) :=
 function
 
 	
 
-	Business_Header.Layout_Business_Header_New  Translate_Liens_to_BHF(LiensV2.layout_liens_party_ssn_bid l) := 
+	Business_Header.Layout_Business_Header_New  Translate_Liens_to_BHF(LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags l) := 
 	transform
     self.vl_id      := '';
 		self.rcid 			:=0;
-		self.bdid 			:= 0;
+		self.bdid 			:= IF(IsPRCT,(unsigned)l.bdid,0);
 		self.source 		:= MDR.sourceTools.src_Liens_v2;
 		self.source_group 	:= if(l.tax_id <> '' ,trim(l.tmsid[1..2]) + trim(l.cname,left,right) + l.st +l.tax_id, trim(l.tmsid[1..2]) + trim(l.cname,left,right) + l.st+l.prim_name +l.p_city_name); 
 		self.group1_id 		:= 0;
@@ -47,8 +47,8 @@ function
 	Business_Header.Layout_Business_Header_New RollupLiens(Business_Header.Layout_Business_Header_New L, Business_Header.Layout_Business_Header_New R) := transform
 	self.dt_first_seen := ut.EarliestDate(ut.EarliestDate(L.dt_first_seen,R.dt_first_seen),
 				          ut.EarliestDate(L.dt_last_seen,R.dt_last_seen));
-	self.dt_last_seen := ut.LatestDate(L.dt_last_seen,R.dt_last_seen);
-	self.dt_vendor_last_reported := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+	self.dt_last_seen := MAX(L.dt_last_seen,R.dt_last_seen);
+	self.dt_vendor_last_reported := MAX(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 	self.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 	self.company_name := if(L.company_name = '', R.company_name, L.company_name);
 	self.group1_id := if(L.group1_id = 0, R.group1_id, L.group1_id);

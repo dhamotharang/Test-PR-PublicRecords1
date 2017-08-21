@@ -1,0 +1,2 @@
+import lib_FileServices;
+FileServices.SprayVariable('10.150.13.201','/data_build_5/temp/bkwatch.csv',/*maxrecordsize*/,'\\,:','\\n,\\r\\n','\'','thor_data50','~thor_data50::bkwatch01',-1,/*dfu server*/,1,false,false);

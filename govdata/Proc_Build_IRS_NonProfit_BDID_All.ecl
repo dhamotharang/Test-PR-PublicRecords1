@@ -3,13 +3,13 @@ import ut, _control;
 export Proc_Build_IRS_NonProfit_BDID_All(string filedate) := function
 
 //Spray File
-sprayfile := FileServices.SprayVariable(_control.IPAddress.edata10
-							,'/prod_data_build_10/production_data/business_headers/irs/non-profit/in/'+filedate+'/eo*.csv'
+sprayfile := FileServices.SprayVariable(_control.IPAddress.bctlpedata11
+							,'/data/prod_data_build_10/production_data/business_headers/irs/non-profit/in/'+filedate+'/eo*.csv'
 							,
 							,','
 							,'\\n,\\r\\n'     
 							,'\''
-							,'thor400_92' 
+							,'thor400_44' 
 							,'~thor_data400::in::irs::'+filedate+'::non_profit_in'
 							,-1
 							,

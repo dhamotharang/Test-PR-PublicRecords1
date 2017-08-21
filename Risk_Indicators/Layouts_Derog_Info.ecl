@@ -58,6 +58,12 @@ EXPORT Layouts_Derog_Info := MODULE
 		boolean evictionInd;
 		string name_type;
 		string Orig_name;
+		string OrigFilingNumber;
+		string certificateNumber;
+		string irsSerialNumber;
+		string CaseNumberL;
+		string sort2Date;
+		string ProcessDate;
 	END;		
 
 	export plaintiff_rec := record
@@ -66,6 +72,7 @@ EXPORT Layouts_Derog_Info := MODULE
 		string rmsid;
 		string name_type;
 		string plaintiff;
+		string vendorDateLastSeen;
 	end;
 
   export LNJ_attrs := RECORD
@@ -169,6 +176,15 @@ EXPORT Layouts_Derog_Info := MODULE
 		LNJ_attrs;		
 		Liens_Working;
 	END;	
+	
+	EXPORT layout_derog_process_plus_workingDF := RECORD
+		layout_derog_process_plus_working;
+		STRING DF;
+		STRING DF2;
+		STRING DF3;
+		STRING DF4;
+	END;
+	
 	
 	EXPORT Liens := RECORD
 		string30 Seq                ;

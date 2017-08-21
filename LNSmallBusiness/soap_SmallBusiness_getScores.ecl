@@ -191,7 +191,7 @@ EXPORT soap_SmallBusiness_getScores( DATASET(Business_Risk_BIP.Layouts.Input) in
 			SELF := [];
 		END;
 
-		InputBusShell := DISTRIBUTE(PROJECT(InputFile, intoSOAP(LEFT)), RANDOM());
+		InputBusShell := DISTRIBUTE(PROJECT(InputFile, intoSOAP(LEFT)), RANDOM() % 50); // DISTRIBUTE as a 50-way
 
 		xLayout := RECORD
 			Business_Risk_BIP.Layouts.OutputLayout;
@@ -332,13 +332,13 @@ EXPORT soap_SmallBusiness_getScores( DATASET(Business_Risk_BIP.Layouts.Input) in
 					SELF.ModelResults := LEFT.ModelResults + RIGHT.ModelResults;
 					SELF := LEFT));
 						
-		results_sample := CHOOSEN(results, 10);
+		// results_sample := CHOOSEN(results, 10);
 		
 		// 7. ...write to disk... 
-		outputFileName := 'sbfe::out::get_scores_' + WORKUNIT;
-		OUTPUT(results,, outputFileName); 
+		// outputFileName := 'sbfe::out::get_scores_' + WORKUNIT;
+		// OUTPUT(results,, outputFileName); 
 		
 		// 8. ...and return a sample.
-		RETURN results_sample;
+		RETURN results;
 	END;
 	

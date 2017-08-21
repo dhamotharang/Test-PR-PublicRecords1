@@ -1,6 +1,6 @@
-import ut, address,mdr;
+import ut, address,mdr,std;
 ad := header.FCRA_addressid_occupancy;
-TheDate := (unsigned4)ut.GetDate;
+TheDate := (unsigned4)(STRING8)Std.Date.Today();
 
 f := header.file_headers(src in mdr.sourceTools.set_scoring_FCRA);
 

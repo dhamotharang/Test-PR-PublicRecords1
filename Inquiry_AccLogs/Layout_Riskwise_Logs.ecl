@@ -83,6 +83,7 @@ export Input := record
 end;
 
 export Denorm := record
+			string5		sequence_number;
 			string20	orig_login_id;
 			string20	orig_billing_code;
 			string16	orig_transaction_id;

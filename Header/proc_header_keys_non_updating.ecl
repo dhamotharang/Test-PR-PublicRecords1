@@ -1,16 +1,16 @@
 import RoxieKeybuild , header , ut; 
 export proc_header_keys_non_updating(string filedate) := function 
 
-RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(Header.key_Phonetic_equivs_fname, '~thor_data400::hdr_phonetic_fname_top10','~thor_data400::key::header::'+filedate+'::phonetic_fname_top10',fname_blg);
+RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(Header.key_Phonetic_equivs_fname, '~thor_data400::key::hdr_phonetic_fname_top10','~thor_data400::key::header::'+filedate+'::phonetic_fname_top10',fname_blg);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::hdr_phonetic_fname_top10','~thor_data400::key::header::'+filedate+'::phonetic_fname_top10',mv_fname);
 
-RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(Header.key_Phonetic_equivs_lname, '~thor_data400::hdr_phonetic_lname_top10','~thor_data400::key::header::'+filedate+'::phonetic_lname_top10',lname_blg);
+RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(Header.key_Phonetic_equivs_lname, '~thor_data400::key::hdr_phonetic_lname_top10','~thor_data400::key::header::'+filedate+'::phonetic_lname_top10',lname_blg);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::hdr_phonetic_lname_top10','~thor_data400::key::header::'+filedate+'::phonetic_lname_top10',mv_lname);
 
 RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(Header.key_fname_ngram, '~thor_data400::key::hdr_fname_ngram','~thor_data400::key::header::'+filedate+'::fname_ngram',fname_ngram);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::hdr_fname_ngram','~thor_data400::key::header::'+filedate+'::fname_ngram',mv_fname_ngram);
 
-RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(Header.key_lname_ngram, '~thor_data400::hdr_lname_ngram','~thor_data400::key::header::'+filedate+'::lname_ngram',lname_ngram);
+RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(Header.key_lname_ngram, '~thor_data400::key::hdr_lname_ngram','~thor_data400::key::header::'+filedate+'::lname_ngram',lname_ngram);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::hdr_lname_ngram','~thor_data400::key::header::'+filedate+'::lname_ngram',mv_lname_ngram);
 
 // move to qa 

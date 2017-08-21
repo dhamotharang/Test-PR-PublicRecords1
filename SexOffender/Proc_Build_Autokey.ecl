@@ -71,12 +71,8 @@ mod_AKB := module(AutokeyB2.Fn_Build.params)
 	export set of string1 L_build_skip_set:= ak_skipSet;
 end;
 
-outaction := parallel(proc_build_payload_key_AKB, AutokeyB2.Fn_Build.Do(mod_AKB, SexOffender.MAutokey, AutoKeyI.BuildI_Biz.DoBuild) );
+outaction := parallel(proc_build_payload_key_AKB, AutokeyB2.Fn_Build.DoQA(mod_AKB, SexOffender.MAutokey, AutoKeyI.BuildI_Biz.DoBuild) );
 
-AutoKeyB2.MAC_AcceptSK_to_QA(ak_keyname, mymove,, ak_skipset);
-
-retval := sequential(outaction,mymove);
-
-return retval;
+return outaction;
 
 end;

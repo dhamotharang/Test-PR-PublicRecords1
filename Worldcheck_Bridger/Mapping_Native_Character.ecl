@@ -1,7 +1,7 @@
 #option('skipFileFormatCrcCheck', 1);
 #option('maxLength', 131072);
 
-import WorldCheck, lib_stringlib;
+import WorldCheck, lib_stringlib, std;
 
 //Standard Layout	
 	Layout_Aliases := record
@@ -12,7 +12,7 @@ import WorldCheck, lib_stringlib;
 		unicode Last_Name{xpath('Last_Name')};
 		unicode Generation{xpath('Generation')};
 		unicode Full_Name{xpath('Full_Name')};
-		string Comments{xpath('Comments')};
+		unicode Comments{xpath('Comments')};
 	end;
 	
 	Layout_temp := record//, maxlength(30900)
@@ -52,12 +52,12 @@ ds_with_new_fields 	:= in_file_2;
 									,TRIM(l.CompleteName,left,right));
 		self.Type 			:= 'AKA'; // Name type of two for the AKA records
 		self.Category		:= '';
-		self.First_Name		:= (unicode)'';
-		self.Middle_Name	:= (unicode)'';
-		self.Last_Name		:= (unicode)'';
-		self.Generation		:= (unicode)'';
-		self.Full_Name		:= (unicode)'';
-		self.Comments		:= '';
+		self.First_Name		:= U'';
+		self.Middle_Name	:= U'';
+		self.Last_Name		:= U'';
+		self.Generation		:= U'';
+		self.Full_Name		:= U'';
+		self.Comments		:= U'';
 		self.e_i_ind		:= '';
 		self.ID				:= l.uid;
 	end;
@@ -67,11 +67,11 @@ ds_with_new_fields 	:= in_file_2;
 	
 	Layout_temp2 := record
 		Layout_temp;
-		string string_alias;
+		unicode string_alias;
 	end;
 	
 	Layout_temp2 trfAkaNames(ds_NormAKAName l) := transform
-		self.string_alias := (string)l.name_alias;
+		self.string_alias := l.name_alias;
 		self := l;
 	end;
 	
@@ -79,22 +79,22 @@ ds_with_new_fields 	:= in_file_2;
 						
 	Layout_temp akaTran(ds_NormAKANames l):= transform
 		
-		language_filter		:= trim(l.string_alias[stringlib.stringfind(l.string_alias, '{', 1)+1..stringlib.stringfind(l.string_alias, '}', 1)-1], left, right);
+		unicode language_filter		:= trim(l.string_alias[Std.uni.find(l.string_alias, U'{', 1)+1..Std.uni.find(l.string_alias, U'}', 1)-1], left, right);
 		
-		self.First_Name		:= if(regexfind(',', l.string_alias, 0)<>'' and regexfind('\\{', l.string_alias, 0)<>'',
-									trim(l.name_alias[stringlib.stringfind(l.string_alias, ',', 1)+1..stringlib.stringfind(l.string_alias, '{', 1)-1], left, right),
-									if(regexfind(',', l.string_alias, 0)<>'',
-									trim(l.name_alias[stringlib.stringfind(l.string_alias, ',', 1)+1..length(l.string_alias)], left, right),
+		self.First_Name		:= if(regexfind(U',', l.string_alias, 0)<>'' and regexfind(U'\\{', l.string_alias, 0)<>'',
+									trim(l.name_alias[Std.uni.find(l.string_alias, U',', 1)+1..Std.uni.find(l.string_alias, U'{', 1)-1], left, right),
+									if(regexfind(U',', l.string_alias, 0)<>'',
+									trim(l.name_alias[Std.uni.find(l.string_alias, U',', 1)+1..length(l.string_alias)], left, right),
 									(unicode)''));
-		self.Last_Name 		:= if(regexfind(',', l.string_alias, 0)<>'',
-									trim(l.name_alias[1..stringlib.stringfind(l.string_alias, ',', 1)-1], left, right),
+		self.Last_Name 		:= if(regexfind(U',', l.string_alias, 0)<>'',
+									trim(l.name_alias[1..Std.uni.find(l.string_alias, U',', 1)-1], left, right),
 									(unicode)'');
-		self.Full_Name		:= if(regexfind(',', l.string_alias, 0)='' and regexfind('\\{', l.string_alias, 0)<>'',
-									trim(l.name_alias[1..stringlib.stringfind(l.string_alias, '{', 1)-1], left, right),
+		self.Full_Name		:= if(regexfind(U',', l.string_alias, 0)='' and regexfind(U'\\{', l.string_alias, 0)<>'',
+									trim(l.name_alias[1..Std.uni.find(l.string_alias, '{', 1)-1], left, right),
 									(unicode)'');
 		self.Comments		:= if(language_filter<>'',
-									'Language: {'+language_filter+'}',
-									'');
+									U'Language: {'+language_filter + U'}',
+									U'');
 		self 				:= l;
 	end;
 	

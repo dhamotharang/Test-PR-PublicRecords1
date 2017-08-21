@@ -6,6 +6,7 @@ export File_AVM_Hedonic_Base(string8 history_date) := function
 f := avm_v2.File_AVM_Assessments(history_date)(land_use_code in avm_v2.filters(history_date).land_use_codes
 										and ( (integer)assessed_total_value > avm_v2.filters(history_date).minimum_sale_price or
 										      (integer)market_total_value > avm_v2.filters(history_date).minimum_sale_price)
+											and assessed_value_year <= history_date[1..4]		
 									    and lat != '' and long !='' );
 											  
 mapped1 := project(f, transform(recordof(f), 

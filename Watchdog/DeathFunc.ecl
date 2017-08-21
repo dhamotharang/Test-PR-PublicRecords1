@@ -14,14 +14,7 @@ export DeathFunc(
     boolean   dppa   = false, 
 		boolean   glb    = false) := FUNCTION
 
-death_flags := [':', '1', '2'];
-
-f := myDs(src in ['DE', 'DS'] and 
-          (
-					 (prim_name[1..4] = 'DOD ' and prim_name[5] in death_flags) OR 
-					 (trim(prim_name) = 'DOD' and prim_range <> '')
-					)
-		     );
+f := myDs(src in ['DE', 'DS'] and stringlib.stringfind(prim_name,'DOD',1)!=0);
 
 rfields := record
   unsigned6 did;
@@ -29,12 +22,8 @@ rfields := record
 end;
 
 rfields slim(f le) := transform
-  self.dod := Map(le.prim_name[5] = ':' => stringlib.StringFilterOut(le.prim_name,'DOD :'),
-                  le.prim_name[5] = '1' => stringlib.StringFilterOut(le.prim_name,'DOD '),
-			            le.prim_name[5] = '2' => stringlib.StringFilterOut(le.prim_name,'DOD '),
-			            trim(le.prim_name) = 'DOD' and le.prim_range <> '' => le.prim_range,
-			        '');
-  self := le;
+  self.dod := stringlib.stringfilter(le.prim_name,'0123456789');
+  self     := le;
 end;
 
 slim_h10 := project(f, slim(left));

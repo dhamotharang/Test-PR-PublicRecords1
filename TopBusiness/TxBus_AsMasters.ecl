@@ -33,6 +33,7 @@ export TxBus_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.outlet_v_city_name),
 				self.state := left.outlet_st,
 				self.zip := left.outlet_zip5,
+				self.zip4 := left.outlet_zip4,
 				self.county_fips := left.outlet_fips_county,
 				self.msa := '',
 				self.phone := left.outlet_Phone, //left.telephone_number,
@@ -69,6 +70,7 @@ export TxBus_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.taxpayer_v_city_name),
 				self.state := left.taxpayer_st,
 				self.zip := left.taxpayer_zip5,
+				self.zip4 := left.taxpayer_zip4,
 				self.county_fips := left.taxpayer_fips_county,
 				self.msa := '',
 				self.phone := left.Taxpayer_Phone, 
@@ -94,6 +96,8 @@ export TxBus_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.date_first_seen := (unsigned4)left.dt_first_seen,
 				self.date_last_seen := (unsigned4)left.dt_last_seen,
 				self.ssn           := '',
+				self.did           := left.did,
+				self.score         := left.did_score,
 				self.name_prefix   := left.taxPayer_title;
 		    self.name_first    := left.taxPayer_fname;
 		    self.name_middle   := left.taxPayer_mname;

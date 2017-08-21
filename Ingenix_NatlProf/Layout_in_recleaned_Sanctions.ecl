@@ -1,0 +1,23 @@
+export Layout_in_recleaned_Sanctions := record
+  string4 sanc_updte_yyyy;
+	string2 sanc_updte_mm;
+	string2 sanc_updte_dd;
+	string9 SANC_UPDTE_orig;
+	string8 SANC_UPDTE_form;
+  string4 SANC_REINDTE_yyyy;
+	string2 SANC_REINDTE_mm;
+	string2 SANC_REINDTE_dd;
+	string9 SANC_REINDTE_orig;
+	string8 SANC_REINDTE_form;
+  string4 SANC_SANCDTE_yyyy;
+	string2 SANC_SANCDTE_mm;
+	string2 SANC_SANCDTE_dd;
+	string9 SANC_SANCDTE_orig;
+	string8 SANC_SANCDTE_form;
+	string8 process_date;
+	string8 date_first_seen;
+	string8 date_last_seen;
+	string8	date_first_reported;
+	string8 date_last_reported;
+	Ingenix_NatlProf.Layout_in_SanctionProviders;
+end;

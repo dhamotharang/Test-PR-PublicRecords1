@@ -2,7 +2,7 @@ import doxie_build, header, header_quick, fcra, BankruptcyV2, doxie, address, ut
 
 export SSN_Table_v5(boolean isFCRA) := function;
 
-h_full := doxie_build.file_header_building(~iid_constants.filtered_source(src));
+h_full := doxie_build.file_header_building(~iid_constants.filtered_source(src, st));
 h_quick := project( header_quick.file_header_quick(src IN ['QH', 'WH']), transform(header.Layout_Header,  self.src := mdr.sourceTools.src_Equifax, self := left));
 headerprod_building := ungroup(h_full + h_quick);
 

@@ -1,11 +1,11 @@
-import Business_Header_SS, Business_Header;
+import Business_Header_SS, Business_Header,Business_HeaderV2;
 
 // Per Jill, the fips_code filter to throw out "crap records"  :-)
 // Omitting "bad pairs" of name/address.  Namely, "OS" and "SO" (owner name, seller address and vice versa)
 sGoodSource	:=	['OO','BB','SS'];
-dAssessorIn	:=	LN_Property.Assessor_as_Source(length(trim(fips_code)) = 5);
-dDeedIn		:=	LN_Property.Deed_as_Source;
-dSearchIn	:=	LN_Property.File_Search(source_code in sGoodSource);
+dAssessorIn	:=	LN_Property.Assessor_as_Business_Source(length(trim(fips_code)) = 5);
+dDeedIn		:=	LN_Property.Deed_as_Business_Source;
+dSearchIn	:=	Business_HeaderV2.Source_Files.propSearch.BusinessHeader(source_code in sGoodSource);
 
 
 // Start getting one record per Search record when at least one record per fares_id has non-blank cname
@@ -17,7 +17,9 @@ rSearchWithCNameOnly
   end
  ;
 
-dSearchWithoutBogusNames	:=	dSearchIn(length(trim(cname)) >= 5,
+dSearchWithoutBogusNames	:=	dSearchIn(
+											ln_fares_id != '',
+											length(trim(cname)) >= 5,
 										  ~((integer)zip = 0 and prim_name = ''),
 										  stringlib.stringfind(cname,'00000',1) = 0,
 										  stringlib.stringfilterout(cname,'1234567890-') != '',

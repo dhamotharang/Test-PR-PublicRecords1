@@ -1,1 +1,1 @@
-export KeyName_6000_Inquiries_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('6000')) : global;
+export KeyName_6000_Inquiries_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('6000'));

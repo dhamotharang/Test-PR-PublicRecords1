@@ -4,10 +4,11 @@ export NameIndicators := module
 		export Person_  := 001b;			// Person
 		export Dual     := 010b;			// Dual Name
 		export Business := 011b;			// Business or Organization
-		export Unclassified  := 100b;		// Unclassified (trustees, estates, ie, neither person nor business)
+		export Trust  := 100b;		// Unclassified (trustees, estates, ie, neither person nor business)
 		export Invalid  := 101b;			// Invalid Name (scatological, nonsense, etc)
 		export Blank    := 110b;			// Name is blank or whitespaces
-		export Unexpected  := 111b;			// unexpected cleaning error
+		export Unexpected	 := 111b;			// this will be going away
+		export Unclassified  := 100b;		// Unclassified (trustees, estates, ie, neither person nor business)
 				
 		export DerivedName   := 000000001000b;		// Individual name Derived from dual name
 		export DerivedName2  := 000000010000b;		// second Individual name Derived from dual name
@@ -31,7 +32,8 @@ export NameIndicators := module
 			'D' => Dual,
 			'B' => Business,
 			'I' => Invalid,
-			'U' => Unclassified,
+			'T' => Trustee,
+			'U' => Unexpected,
 			'?' => Unexpected,
 			Unknown);
 			
@@ -52,9 +54,9 @@ export NameIndicators := module
 			Business => 'B',
 			Dual => 'D',
 			Invalid => 'I',
-			Unclassified => 'U',
+			Trust => 'T',
 			Blank => '',
-			'?');
+			'U');
 		shared DerivedNameFlags := DerivedName | DerivedName2;
 		export boolean fn_IsDerivedName(unsigned2 name_ind) := (name_ind & DerivedNameFlags) > 0;
 		export boolean fn_IsMaleName(unsigned2 name_ind) := (name_ind & MaleName) > 0;
@@ -64,6 +66,10 @@ export NameIndicators := module
 			fn_IsMaleName(name_ind) => 'M',
 			fn_IsFemaleName(name_ind) => 'F',
 			'U');
-
+			
+		export string1 fn_getDerivation(unsigned2 name_ind) := MAP(
+			(name_ind & DerivedName) > 0 => '1',
+			(name_ind & DerivedName2) > 0 => '2',
+			'0');
 		
 	end;

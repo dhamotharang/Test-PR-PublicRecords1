@@ -92,7 +92,7 @@ clean_out :=  PROJECT(NormFiles,
 			self.DateTime := fixTime;														
 			self.SSN := Inquiry_AccLogs.fncleanfunctions.clean_ssn(left.orig_ssn);
 			self.DOB := Inquiry_AccLogs.fncleanfunctions.clean_dob(left.orig_dob);
-
+      self.TRANSACTION_ID := left.orig_transaction_id;
 			self.dl 						:= left.orig_dl;
 			self.domain_name 		:= left.orig_domain_name;
 			self.ein 						:= left.orig_ein;
@@ -112,7 +112,8 @@ end;
 export ready_File(dataset(inquiry_acclogs.layout_in_common) AppendForward, string select_source = 'BATCHR3') := function
 
 person_project := project(AppendForward(domain_name + clean_cname1 + ucc_number + ein + charter_number = '' and source_file = select_source), 
-		transform(inquiry_acclogs.Layout.Common,
+		transform(inquiry_acclogs.Layout.Common_ThorAdditions,
+			self.source := stringlib.stringtouppercase(left.source_file);
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
 			
@@ -125,6 +126,8 @@ person_project := project(AppendForward(domain_name + clean_cname1 + ucc_number 
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
+			self.bus_intel.Use := left.use;
+
 			
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
@@ -190,13 +193,14 @@ person_project := project(AppendForward(domain_name + clean_cname1 + ucc_number 
 			self.person_q.err_stat :=   left.err_stat;
 			self.person_q.Appended_SSN := left.appendssn;
 			self.person_q.Appended_ADL := left.appendadl;
-			// self := left;
+			self := left;
 			self := []));
 
 ///////////////// PROJECT INTO BUSINESS QUERY LAYOUT ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bus_project := project(AppendForward(domain_name + clean_cname1 + ucc_number + ein + charter_number <> '' and source_file = select_source), 
-		transform(inquiry_acclogs.Layout.Common,
+		transform(inquiry_acclogs.Layout.Common_ThorAdditions,
+			self.source := stringlib.stringtouppercase(left.source_file);
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
 			
@@ -209,6 +213,8 @@ bus_project := project(AppendForward(domain_name + clean_cname1 + ucc_number + e
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
+			self.bus_intel.Use := left.use;
+
 			
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
@@ -256,6 +262,7 @@ bus_project := project(AppendForward(domain_name + clean_cname1 + ucc_number + e
 			self.bus_q.err_stat :=  left.err_stat;
 			self.bus_q.appended_bdid := left.appendbdid;
 			self.bus_q.appended_ein := left.appendtaxid;
+			self := left;
 			self := []));
 
 return dedup(sort(distribute(person_project + bus_project, 

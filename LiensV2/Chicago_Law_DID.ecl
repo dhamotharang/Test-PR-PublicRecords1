@@ -3,7 +3,7 @@
 
 // DEPENDENT ON : liensV2.Mapping_Chicago_Law_party,
 //				  liensv2.Layout_Liens_party,
-//				  did_Add.MAC_Match_Flex,
+//				  did_Add.Mac_Match_Flex_V2,
 //				  Business_Header_SS.MAC_Add_BDID_FLEX,
 //				  liensV2.Layout_liens_party_SSN_bid,
 //					TopBusiness_External
@@ -20,7 +20,7 @@ file_in := liensV2.Mapping_Chicago_law_party;
 PreDID_Rec
  :=
   record
-	liensv2.Layout_Liens_party_bid;
+	liensv2.Layout_Liens_party_BIPV2;
 	qstring34   vendor_id := '';
 	integer8	temp_DID		    := 0;
 	integer8	temp_BDID    	    := 0;
@@ -46,19 +46,53 @@ header_slimsort.Layout_Source;
 PreDID_Rec;
 end;
 
+src_rec_BDID := record
+string2 source;
+PreDID_Rec;
+end;
+
 DID_ADD.Mac_Set_Source_Code(preDID, src_rec, MDR.sourceTools.src_Liens_v2, PreDID_src)
 
 //append DID
 matchset :=['A', 'Z', 'S', 'P'];
 
-did_Add.MAC_Match_Flex(PreDID_src, matchset,
-	 ssn, '', fname, mname,lname, name_suffix, 
-	 prim_range, prim_name, sec_range, zip, st,phone,
-	 temp_did,   			
-	 src_rec, 
-	 false, did_score_field,	//these should default to zero in definition
-	 75,	  //dids with a score below here will be dropped 	
-	 postDID_src, true, src)
+did_Add.Mac_Match_Flex_V2(
+	PreDID_src,				//	infile
+	matchset,					//	matchset
+	ssn,							//	ssn_field
+	'',								//	dob_field
+	fname,						//	fname_field
+	mname,						//	mname_field
+	lname,						//	lname_field
+	name_suffix,			//	suffix_field
+	prim_range,				//	prange_field
+	prim_name,				//	pname_field
+	sec_range,				//	srange_field
+	zip,							//	zip_field
+	st,								//	state_field
+	phone,						//	phone_field
+	temp_did,					//	DID_field
+	src_rec,					//	outrec
+	FALSE,						//	bool_outrec_has_score
+	did_score_field,	//	DID_Score_field
+	75,								//	low_score_threshold
+	postDID_src,			//	outfile
+	TRUE,							//	bool_infile_has_name_source
+	src,							//	src_field
+	,									//	bool_outrec_has_indiv_scores
+	,									//	score_n_field
+	,									//	bool_clean_addr
+	,									//	predir_field
+	,									//	addr_suffix_field
+	,									//	postdir_field
+	,									//	udesig_field
+	,									//	city_field
+	,									//	zip4_field
+	TRUE,							//	bool_switch_priority
+	,									//	weight_threshold
+	,									//	distance
+	FALSE							//	segmentation
+);
 
 //remove src
 postDID := project(postDID_src, transform(PreDID_Rec, self := left));
@@ -77,28 +111,43 @@ business_header.MAC_Source_Match(preBDID,dPostSourceMatch,
 								 
 dPostSourceMatchPersist	:=	dPostSourceMatch : persist('~thor_data400::persist::Chicago_Law_PostSourceMatch');
 
-dWithSourceMatch		:=	dPostSourceMatchPersist(temp_BDID != 0);
-dWithNoSourceMatch		:=	dPostSourceMatchPersist(temp_BDID = 0);
+preBDID_src	:=	project(dPostSourceMatch, transform(src_rec_BDID, self.source	:=	MDR.sourceTools.src_Liens_v2; self := left;));
 
 myset := ['A', 'N', 'F', 'P'];
 
-Business_Header_SS.MAC_Add_BDID_FLEX(dWithNoSourceMatch,myset,
+Business_Header_SS.MAC_Add_BDID_FLEX(preBDID_src,myset,
 						cname,
-                        prim_range,prim_name,zip,sec_range,
+						prim_range,prim_name,zip,sec_range,
 						st,
 						phone,tax_id,
 						temp_bdid,
-						PreDID_Rec,
+						src_rec_BDID,
 						false, BDID_Score_field,  //these should default to zero in definition
-						postbdid);
+						postbdid_src
+						,													// default threshold
+						,													// use prod version of superfiles
+						,													// default is to hit prod from dataland, and on prod hit prod.
+						,BIPV2.xlink_version_set 	// Create BIP Keys only
+						,   											// Url
+						,													// Email
+						,p_City_name							// City
+						,fname										// fname
+						,mname										// mname
+						,lname										// lname
+						,													// Contact_SSN
+						,source										// Source Â– MDR.sourceTools
+						,persistent_record_id			//Source_Record_Id
+						,true											//Src_Matching_is_priorty
+						);
 
+					
+postBDID 		:= 	project(postBDID_src, transform(PreDID_Rec, self := left));
 						
-post_DID_BDID := postbdid +  postDID + dWithSourceMatch;//reformat DID and BDID
-
+post_DID_BDID := postbdid +  postDID;//reformat DID and BDID
 
 //reformat DID and BDID
 
-liensV2.Layout_liens_party_bid tBdid(post_DID_BDID L)
+liensV2.Layout_liens_party_BIPV2 tBdid(post_DID_BDID L)
  :=
   transform
     self.DID		    :=	intformat(L.temp_DID,12,1);
@@ -111,12 +160,12 @@ liensV2.Layout_liens_party_bid tBdid(post_DID_BDID L)
 proj_tbdid := project(post_DID_BDID, tbdid(left));
 
 rec_temp := record
-	liensV2.Layout_liens_party_SSN_bid;
+	liensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags;
 	integer8  temp_DID;
 	integer8  temp_bdid;
 end;
 
-rec_temp tappendSSN(liensV2.Layout_liens_party_bid L) := transform
+rec_temp tappendSSN(liensV2.Layout_liens_party_BIPV2 L) := transform
 
 self := L;
 self.temp_did := (unsigned6)L.did;
@@ -134,55 +183,34 @@ did_add.MAC_Add_SSN_By_DID(file_party_SSN_temp, temp_did, app_ssn, file_party_ss
 
 Business_Header_SS.MAC_Add_FEIN_By_BDID(file_party_ssn, temp_bdid, app_tax_id, file_party_fein)
 
-liensV2.Layout_liens_party_SSN_bid tremovetempDID(rec_temp L) := transform
+liensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags tremovetempDID(rec_temp L) := transform
 self := L;
 
 end;
 
 post_append_ssn := project(file_party_fein,tremovetempDID(left));
 
-post_append_ssn_dist := distribute(post_append_ssn,hash(tmsid)); // Distribute full daily file by tmsid
-
 // Full File - Distributed
 
-Full_CL_Party_nondist := dataset('~thor_data400::base::Liens::party::chicago_law',liensv2.Layout_liens_party_SSN_bid,thor);
-
-Full_CL_Party := distribute(Full_CL_Party_nondist,hash(tmsid));
+Full_CL_Party_nondist := dataset('~thor_data400::base::Liens::party::chicago_law',liensv2.Layout_liens_party_SSN_BIPV2_with_LinkFlags
+,thor);
 
 // Add Full File and Daily Party File (distributed)
 
-daily_plus_full := post_append_ssn_dist + Full_CL_Party; 
-//** BID Macro call
-TopBusiness_External.MAC_External_BID(
-	 daily_plus_full											// The input file to have BIDs appended
-	,postBID												// The output file to write to
-	,bid						// The field into which the BID should be populated
-	,bid_score				// The field into which the BID score should be populated
-	, MDR.sourceTools.src_Liens_v2						// The field in which the source value is populated
-	,trim(tmsid,left,right)			// The field in which the source_docid value is populated
-	,name_type[1] + intformat(hash32(cname,orig_address1,orig_address2,orig_city,orig_state,orig_zip5) % 1000000000,9,1)			// The field in which the source_party value is populated
-	,cname			// The field in which the company_name value is populated
-	,zip					// The field in which the ZIP value is populated
-	,prim_name			// The field in which the prim_name value is populated
-	,prim_range				// The field in which the prim_range value is populated
-	,tax_id						// The field in which the FEIN value is populated
-	,phone						// The field in which the phone value is populated
-	,false		// Do we want to return a BID score at all?
-) ;
-
+daily_plus_full := distribute((post_append_ssn + Full_CL_Party_nondist),hash(tmsid));
+ 
 // Sort and Dedup locally
 
-full_sort := sort(postBID,record,except Date_First_Seen, Date_Last_Seen,
+full_sort := sort(daily_plus_full,record,except Date_First_Seen, Date_Last_Seen,
 			   Date_Vendor_First_Reported, Date_Vendor_Last_Reported,name_type,local);
 
-liensv2.Layout_liens_party_SSN_bid rollup_records(liensv2.Layout_liens_party_SSN_bid L, Liensv2.Layout_liens_party_SSN_bid R) := transform
+liensv2.Layout_liens_party_SSN_BIPV2_with_LinkFlags rollup_records(liensv2.Layout_liens_party_SSN_BIPV2_with_LinkFlags L, Liensv2.Layout_liens_party_SSN_BIPV2_with_LinkFlags R) := transform
 		self.Date_First_Seen := if(l.Date_First_Seen > r.Date_First_Seen, r.Date_First_Seen, l.Date_First_Seen);
 		self.Date_Last_Seen  := if(l.Date_Last_Seen  < r.Date_Last_Seen,  r.Date_Last_Seen,  l.Date_Last_Seen);
 		self.Date_Vendor_First_Reported := if(l.Date_Vendor_First_Reported > r.Date_Vendor_First_Reported, r.Date_Vendor_First_Reported, l.Date_Vendor_First_Reported);
 		self.Date_Vendor_Last_Reported  := if(l.Date_Vendor_Last_Reported  < r.Date_Vendor_Last_Reported,  r.Date_Vendor_Last_Reported, l.Date_Vendor_Last_Reported);
 		self := l;
 end;
-
 
 full_dedup := rollup(full_sort,  rollup_records(left, right),record,except Date_First_Seen, Date_Last_Seen,
 			   Date_Vendor_First_Reported, Date_Vendor_Last_Reported,name_type, local);

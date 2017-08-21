@@ -2,17 +2,17 @@ import EBR,MDR;
 
 export EBR_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 
+	shared header_base := EBR.File_0010_Header_Base_AID; // Before this date some of the data is highly suspect
+		
 	export dataset(Layout_Linking.Unlinked) As_Linking_Master := function
 	
-		base := EBR.File_0010_Header_Base_AID; // Before this date some of the data is highly suspect
-		
-		filtered := base(process_date != '' and file_number != '' and company_name != '');
+		filtered := header_base(process_date != '' and file_number != '' and company_name != '');
 		
 		extract := normalize(filtered,if(left.clean_address.v_city_name != left.clean_address.p_city_name,2,1),
 			transform(Layout_Linking.Unlinked,
 				self.source := MDR.sourceTools.src_EBR,
 				self.source_docid := left.file_number + '//' + left.process_date,
-				self.source_party := '',
+				self.source_party := 'C' + hash64(left.company_name),
 				self.date_first_seen := (unsigned4)left.date_first_seen,
 				self.date_last_seen := (unsigned4)left.date_last_seen,
 				self.company_name := left.company_name,
@@ -32,6 +32,7 @@ export EBR_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.clean_address.v_city_name),
 				self.state := left.clean_address.st,
 				self.zip := left.clean_address.zip,
+				self.zip4 := left.clean_address.zip4,
 				self.county_fips := left.clean_address.county[3..5],
 				self.msa := left.clean_address.msa,
 				self.phone := left.phone_number,
@@ -53,14 +54,18 @@ export EBR_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 		
 		filtered := base(process_date != '' and file_number != '' and clean_officer_name.lname != '');
 		
-		extract := project(filtered,
+		extract := join(filtered,dedup(header_base,file_number,process_date,all),
+			left.file_number = right.file_number and
+			left.process_date = right.process_date,
 			transform(Layout_Contacts.Unlinked,
 				self.source := MDR.sourceTools.src_EBR,
 				self.source_docid := left.file_number + '//' + left.process_date,
-				self.source_party := '',
+				self.source_party := 'C' + hash64(right.company_name),
 				self.date_first_seen := (unsigned4)left.date_first_seen,
 				self.date_last_seen := (unsigned4)left.date_last_seen,
 				self.ssn := '',
+				self.did := left.did,
+				self.score := left.did_score,
 				self.name_prefix := left.clean_officer_name.title,
 				self.name_first := left.clean_officer_name.fname,
 				self.name_middle := left.clean_officer_name.mname,
@@ -93,11 +98,13 @@ export EBR_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 		
 		filtered := base(process_date != '' and file_number != '' and business_category_description != '');
 		
-		extract := project(filtered,
+		extract := join(filtered,dedup(header_base,file_number,process_date,all),
+			left.file_number = right.file_number and
+			left.process_date = right.process_date,
 			transform(Layout_TradeLines.Unlinked,
 				self.source := MDR.sourceTools.src_EBR,
 				self.source_docid := left.file_number + '//' + left.process_date,
-				self.source_party := '',
+				self.source_party := 'C' + hash64(right.company_name),
 				self.asof_date := (unsigned)left.process_date[1..6],
 				self.business_category := left.business_category_description,
 				self.account_balance := (unsigned)left.masked_account_balance,
@@ -117,11 +124,13 @@ export EBR_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 		
 		filtered := base(process_date != '' and file_number != '' and yrs_in_bus_actual != '');
 		
-		extract := project(filtered,
+		extract := join(filtered,dedup(header_base,file_number,process_date,all),
+			left.file_number = right.file_number and
+			left.process_date = right.process_date,
 			transform(Layout_Incorporation.Unlinked,
 				self.source := MDR.sourceTools.src_EBR,
 				self.source_docid := left.file_number + '//' + left.process_date,
-				self.source_party := '',
+				self.source_party := 'C' + hash64(right.company_name),
 				// self.yearsInBusiness := (integer) left.yrs_in_bus_actual;
         // OR calculate start_date from process_date - years_in_bus_actual; ???
         temp_start      := (integer)(left.process_date[1..4]) - (integer)left.yrs_in_bus_actual; 
@@ -138,7 +147,14 @@ export EBR_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 		
 		filtered := base(process_date != '' and file_number != '' and sic_1_code != '');
 		
-		extract := normalize(filtered,
+		attached := join(filtered,dedup(header_base,file_number,process_date,all),
+			left.file_number = right.file_number and
+			left.process_date = right.process_date,
+			transform({recordof(left);header_base.company_name;},
+				self.company_name := right.company_name,
+				self := left));
+		
+		extract := normalize(attached,
 			map(
 				left.sic_2_code = '' => 1,
 				left.sic_3_code = '' => 2,
@@ -147,7 +163,7 @@ export EBR_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 		  transform(Layout_Industry.Unlinked,
 				self.source := MDR.sourceTools.src_EBR,
 				self.source_docid := left.file_number + '//' + left.process_date,
-				self.source_party := '',
+				self.source_party := 'C' + hash64(left.company_name),
 				self.SicCode := choose(counter,
 					left.sic_1_code,
 					left.sic_2_code,
@@ -169,7 +185,7 @@ export EBR_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 		  transform(Layout_Industry.Unlinked,
 				self.source := MDR.sourceTools.src_EBR,
 				self.source_docid := left.file_number + '//' + left.process_date,
-				self.source_party := '',
+				self.source_party := 'C' + hash64(left.company_name),
 				self.SicCode              := '',
 				self.NAICS                := '',
 			  // Even though the field used below is labeled as "business_desc", the field has
@@ -193,10 +209,10 @@ export EBR_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 			transform(Layout_Liens.Main.Unlinked,
 				self.source := MDR.sourceTools.src_EBR,
 				self.source_docid := left.file_number + '//' + left.process_date,
-				//self.source_party := '', ???
-				self.filing_jurisdiction := left.filing_location,
-				self.orig_filing_number := left.document_number,
-				self.orig_filing_type := map(
+				// self.source_party := 'C' + hash64(right.company_name),
+				self.agency := left.filing_location,
+				self.filing_number := left.document_number,
+				self.filing_type_desc := map(
 					left.type_description = 'STAT-TX-' => 'STATE TAX LIEN',
 					left.type_description = 'FED-TX-' => 'FEDERAL TAX LIEN',
 					left.type_description),
@@ -218,7 +234,7 @@ export EBR_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 			transform(Layout_UCC.Main.Unlinked,
 				self.source := MDR.sourceTools.src_EBR,
 				self.source_docid := left.file_number + '//' + left.process_date,
-				//self.source_party := '', ???
+				// self.source_party := 'C' + hash64(right.company_name),
 				self.filing_jurisdiction := left.orig_file_state_code,
 				self.orig_filing_number := left.orig_file_number,
 				self.orig_filing_type := left.type_desc,

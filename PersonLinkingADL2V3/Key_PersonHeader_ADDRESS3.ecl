@@ -46,7 +46,7 @@ layout := record // project out required fields
 END;
 s := Specificities(File_PersonHeader).Specificities[1];
 DataForKey0 := dedup(sort(table(h(PRIM_RANGE NOT IN SET(s.nulls_PRIM_RANGE,PRIM_RANGE),PRIM_NAME NOT IN SET(s.nulls_PRIM_NAME,PRIM_NAME),ZIP NOT IN SET(s.nulls_ZIP,ZIP)),layout),whole record,local),whole record,local); // Project out the fields in match candidates required for this linkpath
-export Key := index(DataForKey0,,ut.Data_Location.Person_header+'thor_data400::key::PersonLinkingADL2V3PersonHeaderADDRESS3Refs_' + doxie.version_superkey);
+export Key := index(DataForKey0,,PersonLinkingADL2V3.Filename_keys.kADDRESS3);
 export RawFetch( typeof(h.PRIM_RANGE) param_PRIM_RANGE, typeof(h.PRIM_NAME) param_PRIM_NAME, typeof(h.ZIP) param_ZIP, typeof(h.FNAME) param_FNAME, typeof(h.MNAME) param_MNAME, typeof(h.LNAME) param_LNAME) := 
     STEPPED( LIMIT( Key(
           ( PRIM_RANGE = param_PRIM_RANGE and param_PRIM_RANGE <> (typeof(PRIM_RANGE))'' )

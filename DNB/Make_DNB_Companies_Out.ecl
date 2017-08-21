@@ -1,4 +1,4 @@
-#workunit('name', 'D&B Companies Out Creation ' + DNB.version);
+//#workunit('name', 'D&B Companies Out Creation ' + DNB.version);
 import ut;
 
 // Format D&B Companies File for Output
@@ -86,4 +86,4 @@ DNB_Companies_BDID_All := DNB_Companies_No_BDID + DNB_Companies_BDID_Grp_Dedup;
 
 //output(DNB_Companies_BDID_All,,'OUT::DNB_Companies_' + DNB.version, overwrite);
 ut.MAC_SF_BuildProcess(DNB_Companies_BDID_All,'~thor_Data400::out::DNB_Companies',do1,2)
-do1;
+export Make_DNB_Companies_Out := do1;

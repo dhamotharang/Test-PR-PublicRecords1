@@ -136,7 +136,8 @@ left.lender_address = right.lender_address and
 ut.nneq(trim(left.apn_parcel_number_unformatted,all),trim(right.apn_parcel_number_unformatted,all)), 
 rollFares(left,right),local);
 
-return dup;
+dupwgood := LN_PropertyV2.fn_junk_deed.fares_deeds(dup) ;
+return dupwgood;
 
 end;
 

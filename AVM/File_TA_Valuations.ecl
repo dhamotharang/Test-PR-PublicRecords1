@@ -73,6 +73,6 @@ with_valuation := join(ta_deduped, ta_update, left.assessed_value_year=right.ass
 									left.land_use_code=right.land_use_code,
 									add_valuation(left,right), left outer, lookup);
 									
-output(with_valuation,,'~thor_data400::avm_validate2::ta_valuations_' + thorlib.WUID(), __compressed__);
+output(with_valuation,,'~thor_data400::avm::ta_valuations', __compressed__, overwrite);
 
 export File_TA_Valuations := with_valuation;

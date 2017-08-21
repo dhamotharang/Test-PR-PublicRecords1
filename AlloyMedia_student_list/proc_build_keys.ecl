@@ -43,7 +43,7 @@ return sequential(
 				, mv_did_FCRA_key_built
 					),
 				parallel(
-					mv_did_key_built
+					mv_did_key_QA
 				, mv_did_key_fcra_QA
 					)
 				);

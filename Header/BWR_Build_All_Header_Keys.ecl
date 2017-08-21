@@ -1,8 +1,9 @@
 import Header, Lib_FileServices;
 
 #workunit('name','Header Keybuild');
+#option('skipFileFormatCrcCheck', 1);
 
-leMailTarget := 'jlezcano@seisint.com';
+leMailTarget := 'kgummadi@seisint.com;gavin.witz@lexisnexis.com,jose.bello@lexisnexis.com';
 
 fSendMail(string pSubject, string pBody)
  := lib_fileservices.fileservices.sendemail(leMailTarget,pSubject,pBody);

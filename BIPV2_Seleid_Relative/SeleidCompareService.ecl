@@ -6,7 +6,7 @@
 */
 /*--INFO-- Compare two IDs to see if they should be joined.<p>If it is easier you may place the two IDs on the first line and they will be parsed into first and second.</p>*/
 EXPORT SeleidCompareService := MACRO
-  IMPORT SALT30,BIPV2_Seleid_Relative,ut;
+  IMPORT SALT31,BIPV2_Seleid_Relative,ut;
 STRING50 Seleidonestr := ''  : STORED('SeleidOne');
 STRING20 Seleidtwostr := '*'  : STORED('Seleidtwo');
 UNSIGNED8 Seleidone0 := (UNSIGNED8)ut.Word(Seleidonestr,1); // Allow for two token on a line input
@@ -21,7 +21,7 @@ s := GLOBAL(PROJECT(k,BIPV2_Seleid_Relative.Layout_Specificities.R)[1]);
 odlv := BIPV2_Seleid_Relative.Debug(BFile,s).RolledEntities(odl);
 odrv := BIPV2_Seleid_Relative.Debug(BFile,s).RolledEntities(odr);
 mtch := BIPV2_Seleid_Relative.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,Seleidone,Seleidtwo,0,0}],BIPV2_Seleid_Relative.match_candidates(BFile).layout_matches));
-// Put out easy to read versions of the 5195232 data
+// Put out easy to read versions of the Seleid data
 OUTPUT( odlv,NAMED('SeleidOneFieldValues'));
 OUTPUT( odrv,NAMED('SeleidTwoFieldValues'));
 // Put out the actually matching information
@@ -40,4 +40,3 @@ OUTPUT(Rel.SOURCE_Links_np,NAMED('SOURCELinks'));
 OUTPUT( odl,NAMED('SeleidOneRecords'));
 OUTPUT( odr,NAMED('SeleidTwoRecords'));
 ENDMACRO;
- 

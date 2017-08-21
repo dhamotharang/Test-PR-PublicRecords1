@@ -1,0 +1,26 @@
+shared layout_trade := record //Trade
+   unsigned4 per_id;
+   boolean master := false;
+   data5 presflag;
+   unsigned3 date_reported;
+   unsigned3 date_opened;
+   unsigned3 date_activity;
+   string2 indust_cd;
+   unsigned decimal8 member;
+   string1 typ;
+   string1 rate;
+   data2 optind;
+   decimal3 mos_rvwd;
+   unsigned integer1 narr1;
+   unsigned integer1 narr2;
+   decimal7 hc;
+   decimal7 bal;
+   decimal7 terms;
+   decimal7 pda;
+   decimal3 cnt30;
+   decimal3 cnt60;
+   decimal3 cnt90;
+   string1 term;
+   string1 fbcd;
+   string20 actno;
+  end;

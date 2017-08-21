@@ -1,4 +1,4 @@
-import ut, mdr, watchdog;
+import ut, mdr, watchdog, lib_datalib;
 
 h := distribute(Apt_Patch(dob>0),hash(did));
 
@@ -50,7 +50,7 @@ with_bad := join(compare_us,slim_header,left.did>right.did and
 								left.prim_name=right.prim_name and 
 								left.zip=right.zip and 
 								ut.NNEQ(left.sec_range,right.sec_range) and
-								ut.NameMatch(left.fname,left.mname,left.lname,right.fname,right.mname,right.lname)<4,
+                                datalib.DoNamesMatch(left.fname,left.mname,left.lname,right.fname,right.mname,right.lname,4) < 4,
 								setBad(left,right),left outer,hash);
 
 dup_bad := dedup(with_bad,rid,all);

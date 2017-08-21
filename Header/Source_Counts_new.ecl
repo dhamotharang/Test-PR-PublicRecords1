@@ -1,4 +1,4 @@
-v := header.Last_Rollup;
+v := dataset('~thor_data400::base::header',header.Layout_Header,flat);
 
 slimrec := record
 	v.src;

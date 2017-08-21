@@ -3,22 +3,35 @@ macro
 #uniquename(spray_liens)
 #uniquename(super_liens)
 #uniquename(recordsize)
-#uniquename(fullfile)
-#uniquename(daily)
-#uniquename(basefile)
-#uniquename(baseout)
+#uniquename(ds_superior_liens_preprocess)
+#uniquename(ds_superior_liens)
+#uniquename(layout_superior)
+#uniquename(did)
+#uniquename(did_score)
+#uniquename(ssn_app)
+#uniquename(bdid)
+#uniquename(build_superior_liens_keys)
 
 #workunit('name','Superior Liens Daily Spray ' + filedate);
 
-%recordsize% := 1603;
+%recordsize% := 815;
 
-%spray_liens% := FileServices.SprayFixed(sourceIP, sourcefile, %recordsize%, group_name, '~thor_data400::in::superior_liens_' + filedate , -1,,, true, true);
-%fullfile%    := dataset('~thor_data400::base::superior_liens', liens_superior.Layout_superior_Liens, thor);
-%daily%       := dataset('~thor_data400::in::superior_liens_' + filedate,liens_superior.Layout_superior_Liens, thor);
-%basefile%    := %fullfile% + %daily%;
-%baseout%     := output(%basefile%,, 'in::superior_liens_full_' + filedate, overwrite);
+%spray_liens% := FileServices.SprayFixed(sourceIP, sourcefile, %recordsize%, group_name, '~thor_data400::in::superior_liens_' + filedate , -1,,, true, true)
+				 : success(output('superior liens spray succeeded')), failure(output('superior liens spray failed'));
 
-%super_liens% := sequential(%baseout%,
+%ds_superior_liens_preprocess% := dataset('~thor_data400::in::superior_liens_' + filedate,liens_superior.Layout_Superior_Liens_Preprocess, thor);
+
+%layout_superior% := record
+  %ds_superior_liens_preprocess%;
+  string12 	%did% := '';
+  string3  	%did_score% := '';
+  string9  	%ssn_app% := '';
+  string12	%bdid% := '';
+end;
+
+%ds_superior_liens% := output(table(%ds_superior_liens_preprocess%, %layout_superior%),,'~thor_data400::in::superior_liens_full_' + filedate);
+
+%super_liens% := sequential(%ds_superior_liens%,
 				FileServices.StartSuperFileTransaction(),
 				FileServices.AddSuperFile('~thor_data400::base::superior_liens_delete','~thor_data400::base::superior_liens_grandfather',, true),
 				FileServices.ClearSuperFile('~thor_data400::base::superior_liens_grandfather'),
@@ -27,14 +40,16 @@ macro
 				FileServices.AddSuperFile('~thor_data400::base::superior_liens_father', '~thor_data400::base::superior_liens',, true),
 				FileServices.ClearSuperFile('~thor_data400::base::superior_liens'),
 				FileServices.AddSuperFile('~thor_data400::base::superior_liens', '~thor_data400::in::superior_liens_full_' + filedate), 
-				// FileServices.ClearSuperFile('~thor_data400::in::superior_liens_did_in'),
-				// FileServices.AddSuperFile('~thor_data400::in::superior_liens_did_in', '~thor_data400::in::superior_liens_full_' + filedate), 
 				FileServices.FinishSuperFileTransaction(),
-				FileServices.ClearSuperFile('~thor_data400::base::superior_liens_Delete', true));
+				FileServices.ClearSuperFile('~thor_data400::base::superior_liens_Delete', true))
+				: success(output('super liens succeeded')), failure(output('super liens failed'));
 
-sequential(%spray_liens%,%super_liens%)
- : success(FileServices.sendemail(if(email_target<>' ', email_target, liens_superior.Spray_Notification_Email_Address),'Superior Liens Spray Succeeded','Superior Liens Spray Succeeded')),
-   failure(FileServices.sendemail(if(email_target<>' ', email_target, liens_superior.Spray_Notification_Email_Address),'Superior Liens Spray Failure','Superior Liens Spray Failure'))
+%build_superior_liens_keys% := Liens_Superior.Proc_build_superior_keys(filedate)
+							   : success(output('superior liens roxie key build completed successfully')), failure(output('superior liens roxie key build failed'));
+
+sequential(%spray_liens%, %super_liens%, %build_superior_liens_keys%)
+ : success(FileServices.sendemail(if(email_target<>' ', email_target, 'kgummadi@seisint.com'),'Superior Liens Macro Succeeded','Superior Liens Macro Succeeded')),
+   failure(FileServices.sendemail(if(email_target<>' ', email_target, 'kgummadi@seisint.com'),'Superior Liens Macro Failure','Superior Liens Macro Failure'))
  ;
 
 endmacro;

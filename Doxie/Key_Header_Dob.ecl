@@ -23,4 +23,4 @@ ds_grp := GROUP (SORT (ds_filt, did, dob, fname, pfname, -zip, -st, LOCAL), did,
 ds_ready := DEDUP (ds_grp, ut.NNEQ(Left.zip, Right.zip) and ut.NNEQ(Left.st, Right.st));
 
 EXPORT key_header_dob := INDEX (ds_ready, {dob, fname, pfname, st, zip}, {did}, 
-                                     '~thor_data400::key::header.dob_' + doxie.version_superkey, OPT);
+                                     ut.Data_Location.Person_header+'thor_data400::key::header.dob_' + doxie.version_superkey, OPT);

@@ -1,6 +1,11 @@
 IMPORT header, address;
 
-export BestAddress(dataset(business_header.Layout_Business_Header_Base) bh) := FUNCTION
+export BestAddress(
+
+	dataset(business_header.Layout_Business_Header_Base) bh = Files().Base.Business_Headers.Built,
+	BOOLEAN best_poss_non_DandB = FALSE
+
+) := FUNCTION
 
 // Ignore addresses from whois.
 bh_d_bdid := DISTRIBUTE(bh, HASH(bdid));
@@ -9,6 +14,7 @@ bh_d_bdid := DISTRIBUTE(bh, HASH(bdid));
 layout_bh_header := RECORD
 	bh_d_bdid.bdid;
 	UNSIGNED6 rid;
+	STRING2 source;
 	bh_d_bdid.dt_first_seen;
 	bh_d_bdid.dt_last_seen;
 	bh_d_bdid.dt_vendor_last_reported;
@@ -43,8 +49,8 @@ END;
 
 bh_p := PROJECT(bh_d_bdid, Proj(LEFT));
 
-header.MAC_Best_Address(bh_p, bdid, 1, bh_address_sort, TRUE)
-
+header.MAC_Best_Address(bh_p, bdid, 1, bh_address_sort, TRUE,, best_poss_non_DandB)
+															
 layout_bh_bestaddress := RECORD
 	bh_address_sort.bdid;
 	bh_address_sort.prim_range;
@@ -59,6 +65,7 @@ layout_bh_bestaddress := RECORD
 	UNSIGNED3 zip;
 	UNSIGNED2 zip4;
 	unsigned4 dt_last_seen;
+	STRING2 addr_source;
 END;
 
 layout_bh_bestaddress SlimBack(bh_address_sort l) := TRANSFORM
@@ -68,10 +75,11 @@ layout_bh_bestaddress SlimBack(bh_address_sort l) := TRANSFORM
 	SELF.state := l.st;
 	SELF.zip := (UNSIGNED3) l.zip;
 	SELF.zip4 := (UNSIGNED2) l.zip4;
+	SELF.addr_source := l.source;
 	SELF := l;
 END;
 
-bh_bestaddress := PROJECT(GROUP(bh_address_sort), SlimBack(LEFT)) : persist('BH::BestAddress');
+bh_bestaddress := PROJECT(GROUP(bh_address_sort), SlimBack(LEFT));
 
 return bh_bestaddress;
 end;

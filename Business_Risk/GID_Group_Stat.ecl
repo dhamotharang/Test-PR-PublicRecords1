@@ -1,8 +1,6 @@
 import Business_Header;
 
-//f := Business_Header.BH_Super_Group;
-
-f := dataset('~thor_data400::TEMP::BH_Super_Group', Business_Header.Layout_BH_Super_Group, flat);
+f := Business_Header.BH_Super_Group();
 
 layout_stat := record
 f.group_id;
@@ -11,4 +9,4 @@ end;
 
 group_stat := table(f, layout_stat, group_id);
 
-export GID_Group_Stat := group_stat : persist('TMTEMP::gid_group_stat');
+export GID_Group_Stat := group_stat : persist('~thor_data400::persist::business_risk::gid_group_stat');

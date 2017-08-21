@@ -1,0 +1,23 @@
+export Layout_TN_RutherFord_CC := RECORD
+string10	Cause_number;
+string1	  Type_of_case;
+string40	Name;
+string20	Alias;
+string40	Address;
+string20	City;
+string10	State;
+string10	Zip;
+string6	  Birthday;
+string2	  Race;
+string1	  Sex;
+string15	Drivers_License;
+string12	Social_Sec_No;
+string6	  IndictmentDate;
+string40	Charge;
+string6	  Judgment_date;
+string10	GS_warrant_number;
+string76	disposition;
+string30	arrest_officer_and_agency;
+string6	  Capias_date;
+string2   Linefeed;
+end;

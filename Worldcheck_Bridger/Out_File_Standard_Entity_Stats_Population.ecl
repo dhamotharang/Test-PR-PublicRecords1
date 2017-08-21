@@ -7,16 +7,6 @@ export Out_File_Standard_Entity_Stats_Population (string filedate) := function
 	
 //MAIN FILE//////////////////////////////////////////////////////////////////////	
 	//Flatten MAIN File
-	layout_aliases := RECORD
-		string type{xpath('Type')};
-		string category{xpath('Category')};
-		unicode first_name{xpath('First_Name')};
-		unicode middle_name{xpath('Middle_Name')};
-		unicode last_name{xpath('Last_Name')};
-		unicode generation{xpath('Generation')};
-		unicode full_name{xpath('Full_Name')};
-		string comments{xpath('Comments')};
-	   END;
 
 	aka_rollup := RECORD
 	   string id;
@@ -156,14 +146,14 @@ dsMain := dataset('~thor_200::persist::worldcheck::standard_worldcheck_bridger.m
 
 //COMPANIES//////////////////////////////////////////////////////////////////////
 	
-	dsNormCompanyLayout := RECORD
+	dsNormCompanyLayout := RECORD,maxlength(100000)
 	//,maxLength(100000)
 	  string uid;
 	  string last_name;
 	  string first_name;
-	  string aliases;
-	  string low_quality_aliases;
-	  string alternate_spelling;
+	  unicode aliases;
+	  unicode low_quality_aliases;
+	  unicode alternate_spelling;
 	  string category;
 	  string title;
 	  string sub_category;
@@ -198,9 +188,9 @@ dsMain := dataset('~thor_200::persist::worldcheck::standard_worldcheck_bridger.m
 	  string uid;
 	  string last_name;
 	  string first_name;
-	  string aliases;
-	  string low_quality_aliases;
-	  string alternate_spelling;
+	  unicode aliases;
+	  unicode low_quality_aliases;
+	  unicode alternate_spelling;
 	  string category;
 	  string title;
 	  string sub_category;
@@ -270,9 +260,9 @@ dsMain := dataset('~thor_200::persist::worldcheck::standard_worldcheck_bridger.m
 	  string uid;
 	  string last_name;
 	  string first_name;
-	  string aliases;
-	  string low_quality_aliases;
-	  string alternate_spelling;
+	  unicode aliases;
+	  unicode low_quality_aliases;
+	  unicode alternate_spelling;
 	  string category;
 	  string title;
 	  string sub_category;
@@ -303,13 +293,13 @@ dsMain := dataset('~thor_200::persist::worldcheck::standard_worldcheck_bridger.m
 	dsNormLinkTos := dataset('~thor_200::persist::worldcheck::norm_linktos', dsNormLinkTosLayout, flat);
 
 	dsOneLinkTosLayout := RECORD
-	,maxLength(131072)
+	//,maxLength(131072)
 	  string uid;
 	  string last_name;
 	  string first_name;
-	  string aliases;
-	  string low_quality_aliases;
-	  string alternate_spelling;
+	  unicode aliases;
+	  unicode low_quality_aliases;
+	  unicode alternate_spelling;
 	  string category;
 	  string title;
 	  string sub_category;
@@ -630,13 +620,13 @@ dsMain := dataset('~thor_200::persist::worldcheck::standard_worldcheck_bridger.m
 //KEYWORDS//////////////////////////////////////////////////////////////////////
 
 	 dsLayoutKeywords := RECORD
-		//,maxLength(100000)
+		,maxLength(100000)
 		  string uid;
 		  string last_name;
 		  string first_name;
-		  string aliases;
-		  string low_quality_aliases;
-		  string alternate_spelling;
+		  unicode aliases;
+		  unicode low_quality_aliases;
+		  unicode alternate_spelling;
 		  string category;
 		  string title;
 		  string sub_category;

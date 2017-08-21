@@ -1,0 +1,27 @@
+export Layout_In_SO_Other := record
+	string40	RecordID;
+	string2		StateCode;
+	string50	Attorney;
+	string20	AttorneyType;
+	string20	AttorneyPhone;
+	string150	AttorneyStreet;
+	string50	AttorneyCity;
+	string2		AttorneyState;
+	string9		AttorneyZip;
+	string50	Judge;
+	string50	Officer;
+	string20	OfficerNumber;
+	string115	NextOfKin;
+	string150	NextOfKinStreet;
+	string50	NextOfKinCity;
+	string2		NextOfKinState;
+	string9		NextOfKinZip;
+	string20	NextOfKinPhone;
+	string20	NextOfKinType;
+	string1		MilitaryDischargeFlag;
+	string8		MilitaryDischargeDate;
+	string50	MilitaryBranch;
+	string100	EmailAddress;
+	string100	SourceName;
+	string		SourceID;
+end;

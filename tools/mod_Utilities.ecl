@@ -1,5 +1,12 @@
+/*2011-12-16T20:00:28Z (Vern Bentley)
+fix create all supers
+
+*/
+import ut;
 export mod_Utilities :=
 module
+	export loutput(string pLog) := Logging.addWorkunitInformation(pLog + ' on: ' + ut.GetTimeDate());
+
 	///////////////////////////////////////////////////////////////////////////////////
 	// -- compare_supers(string psuperfile1, string psuperfile2 = '') function
 	// -- if psuperfile2 is blank, return true if psuperfile1 contains subfiles, return false if it doesn't
@@ -74,13 +81,15 @@ module
 				,if(fileservices.superfileexists(psubfile2add)
 					,sequential(
 						 fileservices.StartSuperFileTransaction()
-						,fileservices.clearsuperfile(psuperfile, pDelete)
+						,fileservices.RemoveOwnedSubFiles(psuperfile, pDelete)
+						,fileservices.clearsuperfile(psuperfile)
 						,fileservices.addsuperfile(psuperfile, psubfile2add,,true)
 						,fileservices.finishSuperFileTransaction()
 					)
 					,sequential(
 						 fileservices.StartSuperFileTransaction()
-						,fileservices.clearsuperfile(psuperfile, pDelete)
+						,fileservices.RemoveOwnedSubFiles(psuperfile, pDelete)
+						,fileservices.clearsuperfile(psuperfile)
 						,fileservices.addsuperfile(psuperfile, psubfile2add)
 						,fileservices.finishSuperFileTransaction()
 					)
@@ -97,13 +106,15 @@ module
 				and (fileservices.FileExists(psubfile2add) or fileservices.SuperFileExists(psubfile2add))
 				,if(fileservices.superfileexists(psubfile2add)
 					,sequential(
-						 fileservices.clearsuperfile(psuperfile, true)
+						 fileservices.RemoveOwnedSubFiles(psuperfile, true)
+						,fileservices.clearsuperfile(psuperfile)
 						,fileservices.StartSuperFileTransaction()
 						,fileservices.addsuperfile(psuperfile, psubfile2add,,true)
 						,fileservices.finishSuperFileTransaction()
 					)
 					,sequential(
-						 fileservices.clearsuperfile(psuperfile, true)
+						 fileservices.RemoveOwnedSubFiles(psuperfile, true)
+						,fileservices.clearsuperfile(psuperfile)
 						,fileservices.StartSuperFileTransaction()
 						,fileservices.addsuperfile(psuperfile, psubfile2add)
 						,fileservices.finishSuperFileTransaction()
@@ -147,6 +158,10 @@ module
 						,fileservices.DeleteSuperFile(pSuperfilename)
 					))
 		);
+		
+	export createinputsupers(	dataset(Layout_FilenameVersions.inputs) pInputFilenames ) :=
+		nothor(apply(pInputFilenames, apply(dSuperfiles, createsuper(name))));
+		
 	export createsupers(dataset(Layout_FilenameVersions.builds) pFilenames) :=
 		nothor(apply(pFilenames, apply(dSuperfiles, createsuper(name))));
 		
@@ -155,11 +170,32 @@ module
 		,dataset(Layout_FilenameVersions.builds) pBuildFilenames
 	) :=
 	sequential(
-		 nothor(apply(pInputFilenames, apply(dSuperfiles, createsuper(name))))
-		,nothor(apply(pBuildFilenames, apply(dSuperfiles, createsuper(name))))
+		 nothor(if(count(pInputFilenames) != 0	,apply(pInputFilenames, apply(dSuperfiles, createsuper(name)))))
+		,nothor(if(count(pBuildFilenames) != 0	,apply(pBuildFilenames, apply(dSuperfiles, createsuper(name)))))
 	);
 	
 	export IsSubfileMemberOfOtherSupers(string pFilename) :=
-		count(fileservices.logicalfilesuperowners('~' +
-						fileservices.GetSuperFileSubName(pFilename,1))) > 1;
+		if(fileservices.GetSuperFileSubName(pFilename,1) != ''
+			,count(	fileservices.logicalfilesuperowners('~' +
+							fileservices.GetSuperFileSubName(pFilename,1))) > 1
+			,false
+		);
+	
+	export ConvertInput2SprayDataset(dataset(Layout_FilenameVersions.Inputs) pInput) :=
+		project(pInput, transform(Layout_Sprays.Info, self := left));
+
+  // Pull out the parts when in the form: '192.1.2.1/mydirectory/myotherdirectory/*.csv'
+	IMPORT SALT22;
+	export IpFromFull(STRING u) := FUNCTION
+	  ip := SALT22.GetNthWord(u,1,'/');
+		RETURN IF( (UNSIGNED)ip>0, ip, '' );
+		END;
+		
+	export WildCardFromFull(STRING u) := SALT22.GetNthWord(u,SALT22.WordCount(u,'/'),'/');	
+	
+	export DirectoryFromFull(STRING u) := FUNCTION
+	  hasIP := IpFromFull(u) <> '';
+	  RETURN '/' + SALT22.GetRangeOfWords(u,IF(hasIP,2,1),SALT22.WordCount(u,'/')-1,'/');
+	END;
+
 end;

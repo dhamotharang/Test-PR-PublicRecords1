@@ -42,12 +42,16 @@ EXPORT _proc_empid_down(
 	
   /* ---------------------- Init From POWID ---------------------------- */
 	SHARED ds_powid := BIPV2_Files.files_powid().DS_BASE;
+  export kick_copy2_storage_thor  := BIPV2_Tools.Copy2_Storage_Thor('~' + nothor(std.file.superfilecontents(BIPV2_Files.files_powid().FILE_BASE)[1].name) ,Build_Date ,'empid_down_preprocess');
+  export copy2StorageThor         := if(not wk_ut._constants.IsDev ,output(kick_copy2_storage_thor ,named('copy2_Storage_Thor__html')));  //copy orig file to storage thor
+
 	EXPORT init(DATASET(l_base) ds = ds_powid, BOOLEAN idReset=FALSE) := SEQUENTIAL(
 		_files_empid_down.clearBuilding
 		,OUTPUT(preProcess(ds,idReset),,f_init,COMPRESSED,OVERWRITE)
     ,if(not wk_ut._constants.IsDev ,dostrata_ID_Check(ds,idReset))
 		,_files_empid_down.updateBuilding(f_init)
-    ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(BIPV2_Files.files_powid().FILE_BASE)[1].name)  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
+    ,copy2StorageThor
+    // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(BIPV2_Files.files_powid().FILE_BASE)[1].name)  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
 	);
 	EXPORT initFromPOWID := sequential(
      init(ds_powid,TRUE)

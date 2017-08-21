@@ -1,11 +1,11 @@
 import doxie;
 
-DayBatchPCNSR.Layout_PCNSR_prekey  reformat(DayBatchPCNSR.File_PCNSR l) := transform 
+DayBatchPCNSR.Layout_PCNSR_prekey  reformat(DayBatchPCNSR.File_PCNSR_keybuild l) := transform 
 
    self:= l ;
 end; 
 
-file_prekey_in:= project(DayBatchPCNSR.File_PCNSR ,reformat(left));  
+file_prekey_in:= project(DayBatchPCNSR.File_PCNSR_keybuild ,reformat(left));  
 
 in_file := file_prekey_in(hhid <> 0);
 

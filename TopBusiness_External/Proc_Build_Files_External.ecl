@@ -1,8 +1,10 @@
 import TopBusiness,tools;
 
 export Proc_Build_Files_External(
-	dataset(TopBusiness.Layout_Linking.Linked) in_linking,
+	dataset(TopBusiness.Layout_Linking.Linked) in_linking_0,
 	string version) := function
+	
+	in_linking := in_linking_0;
 
 	sourcefile := dedup(
 		distribute(
@@ -12,29 +14,32 @@ export Proc_Build_Files_External(
 			hash(source,source_docid,source_party)),
 		source,source_docid,source_party,bid,all,local);
 	
-	addressfile := dedup(
+	addressfile_0 := dedup(
 		distribute(
 			project(
 				in_linking((unsigned3)zip != 0 and prim_name != '' and (prim_name[1..7] = 'PO BOX ' or prim_range != '') and company_name != ''),
 				TopBusiness_External.Layouts.Address),
 			hash(zip,prim_name,prim_range)),
 		zip,prim_name,prim_range,company_name,bid,all,local);
+	TopBusiness.Macro_CleanCompanyName(addressfile_0,company_name,company_name,addressfile);
 	
-	feinfile := dedup(
+	feinfile_0 := dedup(
 		distribute(
 			project(
 				in_linking(fein != '' and company_name != ''),
 				TopBusiness_External.Layouts.FEIN),
 			hash(fein)),
 		fein,company_name,bid,all,local);
+	TopBusiness.Macro_CleanCompanyName(feinfile_0,company_name,company_name,feinfile);
 	
-	phonefile := dedup(
+	phonefile_0 := dedup(
 		distribute(
 			project(
 				in_linking(phone != '' and company_name != ''),
 				TopBusiness_External.Layouts.Phone),
 			hash(phone)),
 		phone,company_name,bid,all,local);
+	TopBusiness.Macro_CleanCompanyName(phonefile_0,company_name,company_name,phonefile);
 	
 	tools.mac_WriteFile(Filenames(version).Source.New,sourcefile,Build_External_Source_File,pShouldExport := false);
 	tools.mac_WriteFile(Filenames(version).Address.New,addressfile,Build_External_Address_File,pShouldExport := false);

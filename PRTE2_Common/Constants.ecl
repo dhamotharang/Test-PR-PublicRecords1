@@ -19,7 +19,7 @@ EXPORT Constants := MODULE
 	EXPORT is_running_in_prod 		:= thisEnvironmentName = 'Prod_Thor';		
 	EXPORT TodayString 						:= (STRING8)Std.Date.Today();
 	EXPORT TodayInt	 							:= Std.Date.Today();
-// PRTE2_Common.Constants.TodayString
+
 	// DS Prod's useful only for CT Despray processes
 	// ut.Foreign_prod includes a ~, so this will work in PROD as well, as a no-op.
 	// Assumption built into this is that all files have a ~ in the name.

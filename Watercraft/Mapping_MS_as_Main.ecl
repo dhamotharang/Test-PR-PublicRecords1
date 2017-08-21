@@ -86,25 +86,27 @@ county_reg(string2 code) := case(code,
 '82' => 'YAZOO',
 '83' => 'OUT OF STATE', '');
 
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_MS_clean_in, watercraft.Layout_MS_clean_in,hull_clean_in)
 
-watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_MS_clean_in L) := transform
+watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := transform
 
 
     self.watercraft_key						:=	if(trim(L.YEAR, left, right) >= '1972' and length(trim(L.HULL_ID,left, right)) = 12, trim(L.HULL_ID, left, right), if(L.HULL_ID = '',
 	                                            (trim(L.MAKE, left, right) + trim(L.YEAR, left, right) + trim(L.FIRST_NAME, left, right) + trim(L.MID, left, right)
 												+ trim(L.LAST_NAME, left, right))[1..30], (trim(L.HULL_ID, left, right) + trim(L.MAKE, left, right) + trim(L.YEAR, left, right))[1..30]));
-	self.sequence_key						:=	L.transaction;
+	self.sequence_key						:=	L.TRANSACTION_DATE;
 	self.watercraft_id						:=	'';
 	self.state_origin						:=	'MS';
 	self.source_code						:=	'AW';
 	self.st_registration					:=	L.STATEABREV;
-	self.county_registration				:=	county_reg(trim(L.county,left,right));
+	self.county_registration				:=	trim(L.county,left,right);
 	self.registration_number				:=	trim(L.REG_NUM, left, right);
 	self.hull_number						:=	L.hull_id;
 	self.propulsion_code					:=	'';
 	self.propulsion_description				:=	L.PROP;
 	self.vehicle_type_Code					:=	'';
-	self.vehicle_type_Description			:=	L.VEH_TYPE;
+	self.vehicle_type_Description			:=	map( L.VEH_TYPE = 'OTHER' and L.BOAT_TYPE_CODE <> '' => L.BOAT_TYPE_CODE,
+	                                            L.VEH_TYPE <> '' =>  L.VEH_TYPE,L.BOAT_TYPE_CODE);
 	self.fuel_code							:=	'';
 	self.fuel_description					:=	L.FUEL;
 	self.hull_type_code						:=	'';
@@ -147,7 +149,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_MS_cl
 	self.coast_guard_documented_flag		:=	'';
 	self.coast_guard_number					:=	'';
 	self.registration_date					:=	L.REG_DATE;
-	self.registration_expiration_date		:=	L.EXPIRE_DATE;
+	self.registration_expiration_date		:=	L.EXPIRATION_DATE;
 	self.registration_status_code			:=	'';
 	self.registration_status_description	:=	'';
 	self.registration_status_date			:=	'';
@@ -185,7 +187,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_MS_cl
 	self.purchase_price						:=	'';
 	self.new_used_flag						:=	'';
 	self.watercraft_status_code				:=	'';
-	self.watercraft_status_description		:=	'';
+	self.watercraft_status_description		:=	L.STATUS;
 	self.history_flag						:=	'';
 	self.coastguard_flag					:=	'';
   
@@ -193,7 +195,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_MS_cl
 
 
 
-export Mapping_MS_as_Main := project(watercraft.file_MS_clean_in, main_mapping_format(left));
+export Mapping_MS_as_Main := project(hull_clean_in, main_mapping_format(left));
 
 		
 

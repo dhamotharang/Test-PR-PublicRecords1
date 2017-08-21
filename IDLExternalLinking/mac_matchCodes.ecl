@@ -21,7 +21,8 @@ EXPORT mac_matchCodes(aRes) := MACRO
 					IF (aRes.dl_nbr_match_code = 99, '-',  (STRING)aRes.dl_nbr_match_code) + '/' + 
 					IF (aRes.src_match_code = 99, '-',  (STRING)aRes.src_match_code) + '/' + 
 					IF (aRes.source_rid_match_code = 99, '-',  (STRING)aRes.source_rid_match_code) + '/' + 
-					IF (aRes.rid_match_code = 99, '-',  (STRING)aRes.rid_match_code) + '/' + 
+					// IF (aRes.rid_match_code = 99, '-',  (STRING)aRes.rid_match_code) + '/' + 
+					'/' + 
 					IF (aRes.mainname_match_code = 99, '-',  (STRING)aRes.mainname_match_code) ;		
 					
 ENDMACRO;

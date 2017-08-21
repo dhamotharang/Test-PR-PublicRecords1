@@ -4,10 +4,10 @@ export fSpray(
 								//string version, boolean pUseProd = false
 								STRING		pVersion              = '',
 								BOOLEAN   pUseProd              = false,
-								STRING		pServerIP							= _control.IPAddress.bctlpedata10, //'bctlpedata10.risk.regn.net'
+								STRING		pServerIP							= _control.IPAddress.bctlpedata12, //'bctlpedata10.risk.regn.net'
 								STRING		pTrgtFilename			= '*trgt_harv_results*.tab',
-								STRING		pDirectory						= '/data/temp/trgt_harv/',
-								STRING		pGroupName						= IF((tools._Constants.IsDataland),'thor400_dev01','thor400_30'),
+								STRING		pDirectory						= '/data/temp/healthcare/trgt_harv/',
+								STRING		pGroupName						= IF((tools._Constants.IsDataland),'thor400_dev01','thor400_44'),
 								BOOLEAN		pIsTesting						= false,
 								BOOLEAN		pOverwrite						= true,
 								STRING		pNameOutput						= 'KOP TGRT HARV'
@@ -16,7 +16,7 @@ export fSpray(
 	
 	{
 		pServerIP	                   
-		,pDirectory + '/' + pVersion + '/'             
+		,pDirectory + pVersion + '/'             
 		,pTrgtFilename    
 		,0                     
 		,_Dataset(pUseProd).thor_cluster_Files+ 'in::' + _Dataset().Name + '::trgt_harv_results::' + pVersion   

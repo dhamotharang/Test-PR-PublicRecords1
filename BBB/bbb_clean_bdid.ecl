@@ -28,7 +28,7 @@ string10  phone10;
 end;
 
 layout_bbb_clean CleanInput(layout_bbb_seq l) := transform
-self.clean_address := addrcleanlib.cleanAddress182(l.address1, l.address2);
+self.clean_address := address.cleanAddress182(l.address1, l.address2);
 self.phone10 := if(l.phone <> '', Address.CleanPhone(trim(l.phone,all)), '');
 self := l;
 end;
@@ -46,8 +46,8 @@ self.bdid := 0;
 self.report_date := intformat((unsigned2) l.listing_year, 4, 1) +
                     intformat((unsigned1) l.listing_month, 2, 1) +
 				intformat((unsigned1) l.listing_day, 2, 1);
-self.member_since_date := if(l.member_attr_name = 'Member since',
-                             l.member_attr[7..10] + l.member_attr[1..2] + l.member_attr[4..5],
+self.member_since_date := map(Stringlib.StringToUpperCase(l.member_attr_name1) = 'MEMBER SINCE' => l.member_attr1[7..10] + l.member_attr1[1..2] + l.member_attr1[4..5],
+                              Stringlib.StringToUpperCase(l.member_attr_name2) = 'MEMBER SINCE' => l.member_attr2[7..10] + l.member_attr2[1..2] + l.member_attr2[4..5],
 					    '');
   // clean business address
   self.prim_range := l.clean_address[1..10];
@@ -117,7 +117,7 @@ Business_Header.MAC_Source_Match(bbb_to_bdid, bbb_bdid_init,
 
 // Then do a standard BDID match for the records which did not BDID,
 // since the BBB file may be newer than the Business Headers
-BDID_Matchset := ['A','P','F','N'];
+BDID_Matchset := ['A','P'];
 
 bbb_bdid_match := bbb_bdid_init(bdid <> 0);
 
@@ -134,9 +134,7 @@ Business_Header_SS.MAC_Match_Flex
 	BDID,	
 	Business_Header_SS.Layout_BDID_OutBatch,
 	true, score,  //these should default to zero in definition
-	bbb_bdid_rematch,
-	1,   //keep count
-	50   //score threshold
+	bbb_bdid_rematch
 )
 
 bbb_bdid_all := bbb_bdid_match + bbb_bdid_rematch;

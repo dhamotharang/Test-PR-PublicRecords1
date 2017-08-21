@@ -1,4 +1,4 @@
-import ut, doxie, risk_indicators;
+Import  ut, doxie, risk_indicators;
 
 unsigned2 MAX_FARES := 100;
 
@@ -387,9 +387,15 @@ pre_Deeds_added := JOIN (assessments_added,
 
 ds := distribute (pre_deeds_added, hash(did, prim_range, prim_name, zip5, sec_range));
 deeds_added := ROLLUP (SORT (ds, did, prim_range, prim_name, zip5, sec_range, own_fares_id, local),
-				roll_prop_searched(LEFT,RIGHT, TRUE), did, prim_range, prim_name, zip5, sec_range, fairs_count < MAX_FARES, local);
-
-
+                       left.did = right.did
+                   and left.prim_range = right.prim_range
+                   and left.prim_name = right.prim_name
+                   and left.zip5 = right.zip5
+                   and left.sec_range = right.sec_range
+                   and left.fairs_count < MAX_FARES,
+                       roll_prop_searched(LEFT,RIGHT, TRUE),
+                       local
+                      );
 
 
 

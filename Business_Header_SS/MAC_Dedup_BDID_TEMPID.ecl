@@ -12,7 +12,7 @@ EXPORT MAC_Dedup_BDID_TEMPID
 // the current distribution is based on a subset of the fields in the
 // distribution by which they were assigned.
 outfile := DEDUP(
-	SORT(infile, temp_id, BDID_field, -name_similar_score, -BDID_Score, LOCAL),
+	SORT(infile, temp_id, BDID_field, -BDID_Score, -name_similar_score, LOCAL),
 	temp_id, BDID_field, LOCAL);
 
 ENDMACRO;

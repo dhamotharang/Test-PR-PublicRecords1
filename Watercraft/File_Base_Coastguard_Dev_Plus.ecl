@@ -6,4 +6,4 @@ rMoxieFileForKeybuildLayout
   end
  ;
 
-export File_Base_Coastguard_Dev_Plus := dataset(Watercraft.Cluster + 'base::watercraft_coastguard_' + Watercraft.Version_Development,rMoxieFileForKeybuildLayout,flat);
+export File_Base_Coastguard_Dev_Plus := dataset(Watercraft.Cluster + 'base::watercraft_coastguard',rMoxieFileForKeybuildLayout,flat);

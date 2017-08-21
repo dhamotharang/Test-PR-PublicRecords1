@@ -25,7 +25,7 @@ EXPORT build_file := join(distribute(res, hash(person1)),
 											left outer,
 											local);
 
-EXPORT file := dataset(data_services.Data_location.person_header +'~thor_data400::base::relative_title', Layout_Relatives_v2.main_rel_title, thor);
+EXPORT file := dataset(data_services.Data_location.person_header +'thor_data400::base::relative_title', Layout_Relatives_v2.main_rel_title, thor);
 
 END;
 	

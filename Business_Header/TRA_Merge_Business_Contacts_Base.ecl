@@ -5,7 +5,7 @@ SELF.source := IF(L.source = '', R.source, L.source);
 SELF.dt_first_seen := 
             ut.EarliestDate(ut.EarliestDate(L.dt_first_seen,R.dt_first_seen),
 		    ut.EarliestDate(L.dt_last_seen,R.dt_last_seen));
-SELF.dt_last_seen := ut.LatestDate(L.dt_last_seen,R.dt_last_seen);
+SELF.dt_last_seen := max(L.dt_last_seen,R.dt_last_seen);
 SELF.vendor_id := IF(L.vendor_id = '', R.vendor_id, L.vendor_id);
 SELF.title := IF(L.title = '', R.title, L.title);
 SELF.fname := IF(L.fname = '', R.fname, L.fname);

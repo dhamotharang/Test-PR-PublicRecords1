@@ -1,4 +1,4 @@
-import header, watchdog, ut;
+import header, watchdog, ut, data_services;
 
 
 h_all := header.File_Headers;
@@ -34,7 +34,7 @@ br := join(b(ut.GenderTools .gender(fname,mname) <> 'M'), r,
 wb := join(distribute(br, hash((unsigned6)person2)), b, 
 					 left.person2 = right.did and
 					 left.lname = right.lname and
-					 ut.getageI(left.dob) - ut.getageI(right.dob) < -15, //right is 15 yrs older
+					 ut.Age(left.dob) - ut.Age(right.dob) < -15, //right is 15 yrs older
 					 transform({br.did, br.lname}, self := left),
 					 local);
 					 
@@ -50,4 +50,5 @@ t := table(wb, {wb.lname,wb.did, cnt := count(group)},did,lname);
 // output(wb, named('wb'));
 // output(t, named('t'));
 
-export key_ParentLnames := index(t, {did}, {t}, '~thor_data400::key::header.parentlnames_'+doxie.Version_SuperKey);
+export key_ParentLnames := index(t, {did}, {t}, data_services.Data_Location.Person_header+'thor_data400::key::header.parentlnames_'+doxie.Version_SuperKey);
+

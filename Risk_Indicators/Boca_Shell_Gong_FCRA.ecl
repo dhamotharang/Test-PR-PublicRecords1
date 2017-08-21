@@ -1,4 +1,4 @@
-﻿import riskwise, ut, gong, FCRA;
+import riskwise, ut, gong, FCRA;
 
 export Boca_Shell_Gong_FCRA(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, boolean onThor=false) := FUNCTION
 

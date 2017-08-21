@@ -24,10 +24,10 @@ export Constants := module
 	export ntl_dataset	:= FLAccidents.File_ntlcrash_AutoKey;
 	export ntl_srcType	:= 'ntlcrash';
 	///////////////////////////////////////////////////////////////////////////////////////////////////
-	export e_keyname  := Cluster + '::key::ecrash::autokey::';
+/*	export e_keyname  := Cluster + '::key::ecrash::autokey::';
 	export e_logical(string filedate='')	:= Cluster+'::key::ecrash::'+filedate+'::autokey::';
 	export e_dataset	:= FLAccidents_Ecrash.File_Ecrash_AutoKey;
-	export e_srcType	:= 'ecrash';
+	export e_srcType	:= 'ecrash';*/
 	///////////////////////////////////eCrash V2 keys//////////////////////////////////////////////////
 	export eV2_keyname  := Cluster + '::key::ecrashV2::autokey::';
 	export eV2_logical(string filedate='')	:= Cluster+'::key::ecrashV2::'+filedate+'::autokey::';

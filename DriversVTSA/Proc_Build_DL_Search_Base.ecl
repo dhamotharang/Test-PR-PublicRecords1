@@ -38,7 +38,7 @@ export Proc_Build_DL_Search_Base := sequential(
 				IF(FileServices.SuperFileExists(sfname), 
 					FileServices.ClearSuperFile(sfname),
 					FileServices.CreateSuperFile(sfname)),
-				OUTPUT(p,,basename, overwrite),
+				OUTPUT(p,,basename, compressed,overwrite),
 				FileServices.StartSuperFileTransaction(),
 					FileServices.AddSuperfile(sfname, basename),
 				FileServices.FinishSuperFileTransaction()

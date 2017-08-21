@@ -1,0 +1,20 @@
+EXPORT Layout_MontanaStateDeath_data := RECORD
+	UNSIGNED4	rowNo;
+	STRING		fname;
+	STRING 		mname;
+	STRING		lname;
+	STRING9		ssn;
+	STRING		gender;
+	STRING2		dod_mth;
+	STRING2		dod_day;
+	STRING4		dod_yr;
+	STRING2		dob_mth;
+	STRING2		dob_day;
+	STRING4		dob_yr;
+	STRING		state;
+	STRING		county;
+	STRING		city;
+	STRING		addr_1;
+	STRING		addr_2;
+	STRING		zip;
+END;

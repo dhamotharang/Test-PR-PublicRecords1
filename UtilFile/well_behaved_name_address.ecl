@@ -1,5 +1,7 @@
-import header, ut;
-h := header.propagated_header_matchrecs;
+import header, ut, watchdog;
+
+inf := header.file_headers(header.Blocked_data());
+h := header.fn_populate_matchrecs(inf,watchdog.File_Best);
 
 // slimrec
 r := record

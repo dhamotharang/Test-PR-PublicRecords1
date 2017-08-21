@@ -25,7 +25,6 @@ EXPORT LinkIDs := RECORD
 		LinkIDs UltID;
 	END;
 
-
 	EXPORT Address := RECORD
 		STRING   streetAddress1;
 		STRING   streetAddress2;
@@ -57,6 +56,7 @@ EXPORT LinkIDs := RECORD
 	END;
 
 	EXPORT Name := RECORD
+		STRING120 fullName;
 		STRING20 firstName;
 		STRING20 middleName;
 		STRING20 lastName;
@@ -85,16 +85,13 @@ EXPORT LinkIDs := RECORD
 
 
 	EXPORT Input := RECORD
-		UNSIGNED4 seq;
-		UNSIGNED4 historyDateYYYYMMDD;
-		Busn_Input business;
-		Indv_Input individual;
-	END;
-	
-	EXPORT RequestValidation := RECORD
 		BOOLEAN validRequest;
 		STRING errorMessage;
-		Input;
+		UNSIGNED4 seq;
+		UNSIGNED4 historyDateYYYYMMDD;
+		STRING10 requestedVersion;
+		Busn_Input business;
+		Indv_Input individual;
 	END;
 
 	EXPORT CleanedData := RECORD
@@ -171,107 +168,209 @@ EXPORT LinkIDs := RECORD
 		STRING10  BusAssetOwnWatercraft_Flags   := ' ';               
 		
 		STRING2  BusAssetOwnVehicle;
-		STRING11 BusAssetOwnVehicle_Flags       := 'XXXXXXXXXXX';
+		STRING10 BusAssetOwnVehicle_Flags       := ' ';
 		
 		STRING2  BusAccessToFundsProperty;
-		STRING11 BusAccessToFundsProperty_Flags := 'XXXXXXXXXXX';
+		STRING10 BusAccessToFundsProperty_Flags := 'XXXXXXXXXXX';
 		
 		STRING2  BusGeographicRisk;
-		STRING11 BusGeographicRisk_Flags        := 'XXXXXXXXXXX';
+		STRING10 BusGeographicRisk_Flags        := 'XXXXXXXXXXX';
 		
 		STRING2  BusValidityRisk;
-		STRING11 BusValidityRisk_Flags          := '';	
+		STRING10 BusValidityRisk_Flags;	
 		
 		STRING2  BusStabilityRisk;
-		STRING11 BusStabilityRisk_Flags        := 'XXXXXXXXXXX';	
+		STRING10 BusStabilityRisk_Flags        := 'XXXXXXXXXXX';	
 		
 		STRING2  BusIndustryRisk;
-		STRING11 BusIndustryRisk_Flags         := 'XXXXXXXXXXX';
+		STRING10 BusIndustryRisk_Flags         := 'XXXXXXXXXXX';
 		
 		STRING2  BusStructureType;
-		STRING11 BusStructureType_Flags        := 'XXXXXXXXXXX';
+		STRING10 BusStructureType_Flags;
 		
 		STRING2  BusSOSAgeRange;
-		STRING11 BusSOSAgeRange_Flags          := ' ';
+		STRING10 BusSOSAgeRange_Flags;
 		
 		STRING2  BusPublicRecordAgeRange;
-		STRING11 BusPublicRecordAgeRange_Flags := '';
+		STRING10 BusPublicRecordAgeRange_Flags;
 		
 		STRING30 BusShellShelfRisk;
-		STRING11 BusShellShelfRisk_Flags       := 'XXXXXXXXXXX';
+		STRING10 BusShellShelfRisk_Flags       := 'XXXXXXXXXXX';
 		
 		STRING2  BusMatchLevel;
-		STRING11 BusMatchLevel_Flags           := 'XXXXXXXXXXX';
+		STRING10 BusMatchLevel_Flags           := 'XXXXXXXXXXX';
 		
 		STRING2  BusLegalEvents;
-		STRING11 BusLegalEvents_Flags          := 'XXXXXXXXXXX';
+		STRING10 BusLegalEvents_Flags          := 'XXXXXXXXXXX';
 		
 		STRING2  BusLegalEventsFelonyType;
-		STRING11 BusLegalEventsFelonyType_Flags := 'XXXXXXXXXXX';
+		STRING10 BusLegalEventsFelonyType_Flags := 'XXXXXXXXXXX';
 		
 		STRING4  BusHighRiskNewsProfiles;
-		STRING12 BusHighRiskNewsProfiles_Flags := 'XXXXXXXXXXXX';
+		STRING10 BusHighRiskNewsProfiles_Flags := 'XXXXXXXXXXXX';
 		
 		STRING2  BusLinkedBusRisk; 
-		STRING11 BusLinkedBusRisk_Flags        := 'XXXXXXXXXXX';
+		STRING10 BusLinkedBusRisk_Flags        := 'XXXXXXXXXXX';
 		
 		STRING2  BusExecOfficersRisk;
-		STRING11 BusExecOfficersRisk_Flags     := 'XXXXXXXXXXX';
+		STRING10 BusExecOfficersRisk_Flags     := 'XXXXXXXXXXX';
 		
 		STRING2  BusExecOfficersResidencyRisk;
-		STRING11 BusExecOfficersResidencyRisk_Flags := 'XXXXXXXXXXX';
+		STRING10 BusExecOfficersResidencyRisk_Flags := 'XXXXXXXXXXX';
 	END;
 
 
-	EXPORT AssocIndexLayout  := RECORD
+	
+	EXPORT Indv_Internal := Record
+		unsigned4	  seq := 0;
+		UNSIGNED4	  historydate;
+		Indv_Input  indv_info; 
+		IndAttributes;
+	END;
+
+	EXPORT BatchInLayout  := RECORD
 		unsigned4 seq;
-		unsigned6 did;
-		unsigned6 CLAMdid;
-		boolean isrelat;
-		unsigned3 RelIndCitizenshipIndex5Count  := 0;
-		unsigned3 RelIndCitizenshipIndex6Count  := 0;
-		unsigned3 RelIndCitizenshipIndex7Count  := 0;
-		unsigned3 RelIndCitizenshipIndex8Count  := 0;
-		unsigned3 RelIndCitizenshipIndex9Count  := 0;
-		unsigned3 RelIndMobilityIndex5Count  := 0;
-		unsigned3 RelIndMobilityIndex6Count  := 0;
-		unsigned3 RelIndMobilityIndex7Count  := 0;
-		unsigned3 RelIndMobilityIndex8Count  := 0;
-		unsigned3 RelIndMobilityIndex9Count  := 0;
-		unsigned3 RelIndLegalEventsIndex5Count  := 0;
-		unsigned3 RelIndLegalEventsIndex6Count  := 0;
-		unsigned3 RelIndLegalEventsIndex7Count  := 0;
-		unsigned3 RelIndLegalEventsIndex8Count  := 0;
-		unsigned3 RelIndLegalEventsIndex9Count  := 0;
-		unsigned3 RelIndAccesstoFundsIndex5Count  := 0;
-		unsigned3 RelIndAccesstoFundsIndex6Count  := 0;
-		unsigned3 RelIndAccesstoFundsIndex7Count  := 0;
-		unsigned3 RelIndAccesstoFundsIndex8Count  := 0;
-		unsigned3 RelIndAccesstoFundsIndex9Count  := 0;
-		unsigned3 RelIndBusAssocIndex5Count  := 0;
-		unsigned3 RelIndBusAssocIndex6Count  := 0;
-		unsigned3 RelIndBusAssocIndex7Count  := 0;
-		unsigned3 RelIndBusAssocIndex8Count  := 0;
-		unsigned3 RelIndBusAssocIndex9Count  := 0;
-		unsigned3 RelIndHighValAssetsIndex5Count  := 0;
-		unsigned3 RelIndHighValAssetsIndex6Count  := 0;
-		unsigned3 RelIndHighValAssetsIndex7Count  := 0;
-		unsigned3 RelIndHighValAssetsIndex8Count  := 0;
-		unsigned3 RelIndHighValAssetsIndex9Count  := 0;
-		unsigned3 RelIndGeogIndex5Count  := 0;
-		unsigned3 RelIndGeogIndex6Count  := 0;
-		unsigned3 RelIndGeogIndex7Count  := 0;
-		unsigned3 RelIndGeogIndex8Count  := 0;
-		unsigned3 RelIndGeogIndex9Count  := 0;
-		unsigned3 RelIndAssocIndex  := 0;
-		unsigned3 RelIndAgeIndex5Count  := 0;
-		unsigned3 RelIndAgeIndex6Count  := 0;
-		unsigned3 RelIndAgeIndex7Count  := 0;
-		unsigned3 RelIndAgeIndex8Count  := 0;
-		unsigned3 RelIndAgeIndex9Count  := 0;
+		string30  acctNo;
+		string15  custType;
+		STRING15 	lexID;
+		string120 companyName;
+		string120 altCompanyName;
+		string11  taxID;
+		STRING3		nameInputOrder;	// sequence of name (FML = First/Middle/Last, LFM = Last/First/Middle) if not specified, uses default name parser
+		STRING120 fullName;
+		STRING20 	firstName;
+		STRING20 	middleName;
+		STRING20 	lastName;
+		STRING5 	suffix;
+		STRING9   ssn;
+		STRING8   dob;
+		
+		STRING120   streetAddress1;
+		STRING120   streetAddress2;
+		STRING10 		prim_range;
+		STRING2  		predir;
+		STRING28 		prim_name;
+		STRING4  		addr_suffix;
+		STRING2  		postdir;
+		STRING10 		unit_desig;
+		STRING8  		sec_range;
+		STRING25 		city;
+		STRING2  		state;
+		STRING5  		zip5;
+		STRING4  		zip4;
+
+		STRING10  phone;
+		unsigned4	HistoryDateYYYYMMDD;
 	END;
 
+	EXPORT BatchOut := RECORD
+		STRING30 AcctNo;
+		STRING15 IndLexID;
+		STRING2 IndAssetOwnProperty;
+		STRING10 IndAssetOwnProperty_Flags;
+		STRING2 IndAssetOwnAircraft;
+		STRING10 IndAssetOwnAircraft_Flags;
+		STRING2 IndAssetOwnWatercraft;
+		STRING10 IndAssetOwnWatercraft_Flags;
+		STRING2 IndAssetOwnVehicle;
+		STRING10 IndAssetOwnVehicle_Flags;
+		STRING2 IndAccessToFundsIncome;
+		STRING10 IndAccessToFundsIncome_Flags;
+		STRING2 IndAccessToFundsProperty;
+		STRING10 IndAccessToFundsProperty_Flags;
+		STRING2 IndGeographicRisk;
+		STRING10 IndGeographicRisk_Flags;
+		STRING2 IndMobility;
+		STRING10 IndMobility_Flags;
+		STRING2 IndLegalEvents;
+		STRING10 IndLegalEvents_Flags;
+		STRING2 IndLegalEventsFelonyType;
+		STRING10 IndLegalEventsFelonyType_Flags;
+		STRING2 IndHighRiskNewsProfiles;
+		STRING10 IndHighRiskNewsProfiles_Flags;
+		STRING2 IndAgeRange;
+		STRING10 IndAgeRange_Flags;
+		STRING2 IndIdentityRisk;
+		STRING10 IndIdentityRisk_Flags;
+		STRING2 IndResidencyRisk;
+		STRING10 IndResidencyRisk_Flags;
+		STRING2 IndMatchLevel;
+		STRING10 IndMatchLevel_Flags;
+		STRING2 IndAssociatesRisk;
+		STRING10 IndAssociatesRisk_Flags;
+		STRING2 IndProfessionalRisk;
+		STRING10 IndProfessionalRisk_Flags;
+		 
+		STRING15 BusLexID;
+		STRING2 BusAssetOwnProperty;
+		STRING10 BusAssetOwnProperty_Flags;
+		STRING2 BusAssetOwnAircraft;
+		STRING10 BusAssetOwnAircraft_Flags;
+		STRING2 BusAssetOwnWatercraft;
+		STRING10 BusAssetOwnWatercraft_Flags;
+		STRING2 BusAssetOwnVehicle;
+		STRING10 BusAssetOwnVehicle_Flags;
+		STRING2 BusAccessToFundsProperty;
+		STRING10 BusAccessToFundsProperty_Flags;
+		STRING2 BusGeographicRisk;
+		STRING10 BusGeographicRisk_Flags;
+		STRING2 BusValidityRisk;
+		STRING10 BusValidityRisk_Flags;
+		STRING2 BusStabilityRisk;
+		STRING10 BusStabilityRisk_Flags;
+		STRING2 BusIndustryRisk;
+		STRING10 BusIndustryRisk_Flags;
+		STRING2 BusStructureType;
+		STRING10 BusStructureType_Flags;
+		STRING2 BusSOSAgeRange;
+		STRING10 BusSOSAgeRange_Flags;
+		STRING2 BusPublicRecordAgeRange;
+		STRING10 BusPublicRecordAgeRange_Flags;
+		STRING2 BusShellShelfRisk;
+		STRING10 BusShellShelfRisk_Flags;
+		STRING2 BusMatchLevel;
+		STRING10 BusMatchLevel_Flags;
+		STRING2 BusLegalEvents;
+		STRING10 BusLegalEvents_Flags;
+		STRING2 BusLegalEventsFelonyType;
+		STRING10 BusLegalEventsFelonyType_Flags;
+		STRING2 BusHighRiskNewsProfiles;
+		STRING10 BusHighRiskNewsProfiles_Flags;
+		STRING2 BusLinkedBusRisk;
+		STRING10 BusLinkedBusRisk_Flags;
+		STRING2 BusExecOfficersRisk;
+		STRING10 BusExecOfficersRisk_Flags;
+		STRING2 BusExecOfficersResidencyRisk;
+		STRING10 BusExecOfficersResidencyRisk_Flags;
+	END;
+	
+	EXPORT LayoutSICNAIC := RECORD
+		STRING2 Source;
+		UNSIGNED4 DateFirstSeen;
+		UNSIGNED4 DateLastSeen;
+		UNSIGNED4 RecordCount;
+		STRING10 SICCode;
+		STRING5 SICIndustry;
+		STRING7 SICRiskLevel;
+		STRING10 NAICCode;
+		STRING5 NAICIndustry;
+		STRING7 NAICRiskLevel;
+		BOOLEAN IsPrimary;
+	END;
+	
+	EXPORT SicNaicRiskLayout := RECORD
+		BOOLEAN cibExists;
+		BOOLEAN msbExists;
+		BOOLEAN nbfiExists;
+		BOOLEAN cagExists;
+		BOOLEAN legAcctTeleFlightTravExists;
+		BOOLEAN autoExists;
+		BOOLEAN otherHighRiskIndustExists;
+		BOOLEAN moderateRiskIndustExists;
+		BOOLEAN lowRiskIndustExists;
+	END;
 
+	
 	EXPORT Busn_Internal := Record
 		unsigned4	  seq := 0;
 		UNSIGNED4	  historydate;
@@ -287,32 +386,40 @@ EXPORT LinkIDs := RECORD
 		unsigned2 	CountOwnProp;                           //populated in DueDiligence.getBusProperty - 
 		/* BusAssetOwnWatercraft */ 
 		unsigned2 	WatercraftCount;                        //populated in DueDiligence.getBusWatercraft 
-		unsigned2   Watercraftlength;                       //populated in DueDiligence.getBusWatercraft 
+		unsigned2   Watercraftlength;                       //populated in DueDiligence.getBusWatercraft - this is the longest length boat found 
 		/* BusAssetOwnAircraft */
 		unsigned2 	AircraftCount;                          //populated in DueDiligence.getBusAircraft 
-		/* BusSOSAgeRange      */  
+		/* BusAssetOwnVehicle */
+		unsigned2 	VehicleCount;                           //populated in DueDiligence.getBusVehicle
+		unsigned6   VehicleBaseValue;
+		/*BusSOSAgeRange*/  
 		unsigned4   SOSIncorporationDate;										//populated in DueDiligence.getBusSOSDetail
-		/* BusPublicRecordAgeRange */ 	
+		/*BusPublicRecordAgeRange*/ 	
 		unsigned4 	BusnHdrDtFirstSeen;											//populated in DueDiligence.getBusHeader
 		
 		
-		string2   	LastCorpStatus;													//populated in DueDiligence.getBusSOSDetail
+		string2   	LastCorpStatus;													
+		/*BusSOSAgeRange*/
 		boolean   	NoSOSFilingEver;												//populated in DueDiligence.getBusSOSDetail
-		unsigned4   SOSLastReported;												//populated in DueDiligence.getBusSOSDetail
-		unsigned4   lastReinstatDate;												//populated in DueDiligence.getBusSOSDetail
-		unsigned4   lastDissolvedDate;											//populated in DueDiligence.getBusSOSDetail
-		boolean   	BusnNameChangeSOS;											//populated in DueDiligence.getBusSOSDetail
-		boolean   	contactChangeSOS;												//populated in DueDiligence.getBusSOSDetail  -- Need to do yet
-		boolean   	addressChangeSOS;												//populated in DueDiligence.getBusSOSDetail  -- Need to do yet
+		unsigned4		filingDate;
+		unsigned4   SOSLastReported;												
+		unsigned4   lastReinstatDate;												
+		unsigned4   lastDissolvedDate;											
+		boolean   	BusnNameChangeSOS;											
+		boolean   	contactChangeSOS;												
+		boolean   	addressChangeSOS;												
+		/*BusValidityRisk*/
 		unsigned2 	SOSAddrLocationCount;										//populated in DueDiligence.getBusSOSDetail
-		unsigned2 	CorpStateCount;													//populated in DueDiligence.getBusSOSDetail
-		
+		unsigned2 	CorpStateCount;													
+		/*BusPublicRecordAgeRange*/ 	
 		unsigned3 	srcCount := 0;													//populated in DueDiligence.getBusHeader
+		/*BusValidityRisk*/
 		unsigned2 	CreditSrcCnt := 0;											//populated in DueDiligence.getBusHeader
 		unsigned2 	ShellHdrSrcCnt := 0;										//populated in DueDiligence.getBusHeader
-		unsigned4 	BusnHdrDtFirstNonCredit;								//populated in DueDiligence.getBusHeader  -- Need to do yet
+		unsigned4 	BusnHdrDtFirstNonCredit;								//populated in DueDiligence.getBusHeader
 		unsigned4	  BusnHdrDtLastSeen;											//populated in DueDiligence.getBusHeader
-		integer8 	  FirstSeenInputAddr;											//populated in DueDiligence.getBusHeader  -- Need to do yet
+		integer8 	  FirstSeenInputAddr;											//populated in DueDiligence.getBusHeader
+		/*BusValidityRisk*/
 		unsigned2 	HDAddrCount;														//populated in DueDiligence.getBusHeader  
 		unsigned2 	HDStateCount;														//populated in DueDiligence.getBusHeader  
 		
@@ -323,14 +430,14 @@ EXPORT LinkIDs := RECORD
 		string10  	phone10 := '';
 		string2	    src := '';
 		
-
+		/*BusIndustryRisk*/
+		SicNaicRiskLayout sicNaicRisk;											//populated in DueDiligence.getBusSicNaic
+		DATASET(LayoutSICNAIC) SicNaicSources;							//populated in DueDiligence.getBusSicNaic, DueDiligence.getBusHeader, DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
 		
-		string4   	HRBusnSIC;
-		string4   	HRBusnYPNAICS;
-		string5     IndustryNAICS;
-		string4   	BusnRisklevel;
-		STRING60    busnType;
-		boolean     NoFein;
+		/*BusStructureType*/
+		STRING60    busnType;																//populated in DueDiligence.getBusHeader
+		/*BusValidityRisk*/
+		boolean     NoFein;																	//populated in DueDiligence.getBusAddrData
 		string1   	AddressVacancyInd;
 		string3	    EasiTotCrime;
 		boolean     CountyBordersForgeinJur;
@@ -347,7 +454,8 @@ EXPORT LinkIDs := RECORD
 		boolean     ShelfBusn;
 		BOOLEAN		  PotentialNIS;
 		boolean     RAShelfBusn;
-		boolean     BusRegHit := false;
+		/*BusValidityRisk*/
+		boolean     BusRegHit := false;										//populated in DueDiligence.getBusRegistration
 		BOOLEAN		  RAPotentialNIS;
 		boolean     HasCurrRA;
 		boolean		  inc_st_loose;
@@ -374,124 +482,21 @@ EXPORT LinkIDs := RECORD
 		unsigned2		ReleasedLienCount	       := 0;
 		unsigned2		UnreleasedLienCount12    := 0;
 		unsigned2		ReleasedLienCount12	     := 0;
-		unsigned2		LinkedBusnValidityCount	 := 0;
-		string120		bestCompanyName	         := '';
+		unsigned2		LinkedBusnValidityCount	 := 0;	
+		string120		bestCompanyName	         := '';										//populated in DueDiligence.getBusBIPId
 		UNSIGNED1 	bestCompanyNamescore     := 0;
-		string50		bestAddr			           := '';
-		string25		bestCity			           := '';
-		string2			bestState			           := '';
-		string5			bestZip			             := '';
-		string4			bestZip4			           := '';
+		string50		bestAddr			           := '';										//populated in DueDiligence.getBusBIPId
+		string25		bestCity			           := '';										//populated in DueDiligence.getBusBIPId
+		string2			bestState			           := '';										//populated in DueDiligence.getBusBIPId
+		string5			bestZip			             := '';										//populated in DueDiligence.getBusBIPId
+		string4			bestZip4			           := '';										//populated in DueDiligence.getBusBIPId
 		unsigned1		bestAddrScore		         := 0;
-		string9			bestFEIN			           := '';
+		string9			bestFEIN			           := '';										//populated in DueDiligence.getBusBIPId
 		unsigned1		bestFEINScore		         := 0;
-		string10		bestPhone			           := '';
+		string10		bestPhone			           := '';										//populated in DueDiligence.getBusBIPId
 		unsigned1		bestPhoneScore		       := 0;
 		BusAttributes_KRI;
+		iesp.duediligencereport.t_DDRBusinessReport BusinessReport;
 	END;
 
-	EXPORT BatchInLayout  := RECORD
-		unsigned4 seq;
-		string30  acctNo;
-		string15  custType;
-		STRING15 lexID;
-		string120 companyName;
-		string120 altCompanyName;
-		string11  taxID;
-		STRING20 firstName;
-		STRING20 middleName;
-		STRING20 lastName;
-		STRING5 suffix;
-		STRING9   ssn;
-		STRING8   dob;
-
-		STRING120 streetAddress1;
-		STRING120 streetAddress2;
-		STRING25  city;
-		STRING2   state;
-		STRING5   zip5;
-		STRING10  phone;
-		unsigned4	HistoryDateYYYYMMDD;
-	END;
-
-	EXPORT BatchOut := RECORD
-		STRING30 AcctNo;
-		STRING15 IndLexID;
-		STRING25 IndAssetOwnProperty;
-		STRING35 IndAssetOwnProperty_Flags;
-		STRING25 IndAssetOwnAircraft;
-		STRING35 IndAssetOwnAircraft_Flags;
-		STRING30 IndAssetOwnWatercraft;
-		STRING35 IndAssetOwnWatercraft_Flags;
-		STRING25 IndAssetOwnVehicle;
-		STRING35 IndAssetOwnVehicle_Flags;
-		STRING30 IndAccessToFundsIncome;
-		STRING35 IndAccessToFundsIncome_Flags;
-		STRING30 IndAccessToFundsProperty;
-		STRING40 IndAccessToFundsProperty_Flags;
-		STRING25 IndGeographicRisk;
-		STRING30 IndGeographicRisk_Flags;
-		STRING20 IndMobility;
-		STRING25 IndMobility_Flags;
-		STRING20 IndLegalEvents;
-		STRING30 IndLegalEvents_Flags;
-		STRING30 IndLegalEventsFelonyType;
-		STRING40 IndLegalEventsFelonyType_Flags;
-		STRING30 IndHighRiskNewsProfiles;
-		STRING40 IndHighRiskNewsProfiles_Flags;
-		STRING20 IndAgeRange;
-		STRING25 IndAgeRange_Flags;
-		STRING20 IndIdentityRisk;
-		STRING30 IndIdentityRisk_Flags;
-		STRING25 IndResidencyRisk;
-		STRING30 IndResidencyRisk_Flags;
-		STRING20 IndMatchLevel;
-		STRING30 IndMatchLevel_Flags;
-		STRING25 IndAssociatesRisk;
-		STRING30 IndAssociatesRisk_Flags;
-		STRING25 IndProfessionalRisk;
-		STRING35 IndProfessionalRisk_Flags;
-		 
-		STRING15 BusLexID;
-		STRING25 BusAssetOwnProperty;
-		STRING35 BusAssetOwnProperty_Flags;
-		STRING25 BusAssetOwnAircraft;
-		STRING35 BusAssetOwnAircraft_Flags;
-		STRING30 BusAssetOwnWatercraft;
-		STRING35 BusAssetOwnWatercraft_Flags;
-		STRING25 BusAssetOwnVehicle;
-		STRING35 BusAssetOwnVehicle_Flags;
-		STRING30 BusAccessToFundsProperty;
-		STRING40 BusAccessToFundsProperty_Flags;
-		STRING25 BusGeographicRisk;
-		STRING30 BusGeographicRisk_Flags;
-		STRING20 BusValidityRisk;
-		STRING30 BusValidityRisk_Flags;
-		STRING25 BusStabilityRisk;
-		STRING30 BusStabilityRisk_Flags;
-		STRING20 BusIndustryRisk;
-		STRING30 BusIndustryRisk_Flags;
-		STRING25 BusStructureType;
-		STRING20 BusStructureType_Flags;
-		STRING20 BusSOSAgeRange;
-		STRING30 BusSOSAgeRange_Flags;
-		STRING30 BusPublicRecordAgeRange;
-		STRING40 BusPublicRecordAgeRange_Flags;
-		STRING25 BusShellShelfRisk;
-		STRING30 BusShellShelfRisk_Flags;
-		STRING20 BusMatchLevel;
-		STRING30 BusMatchLevel_Flags;
-		STRING20 BusLegalEvents;
-		STRING30 BusLegalEvents_Flags;
-		STRING30 BusLegalEventsFelonyType;
-		STRING40 BusLegalEventsFelonyType_Flags;
-		STRING30 BusHighRiskNewsProfiles;
-		STRING40 BusHighRiskNewsProfiles_Flags;
-		STRING25 BusLinkedBusRisk;
-		STRING30 BusLinkedBusRisk_Flags;
-		STRING25 BusExecOfficersRisk;
-		STRING35 BusExecOfficersRisk_Flags;
-		STRING35 BusExecOfficersResidencyRisk;
-		STRING45 BusExecOfficersResidencyRisk_Flags;
-	END;
 END;

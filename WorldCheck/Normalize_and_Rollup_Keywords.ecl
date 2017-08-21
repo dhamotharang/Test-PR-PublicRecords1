@@ -2,7 +2,9 @@ import WorldCheck;
 
 export Normalize_and_Rollup_Keywords (string filedate) := function
 
-in_file := WorldCheck.File_WorldCheck_In;
+in_f 	:= WorldCheck.File_WorldCheck_In;
+
+in_file	:= distribute(in_f, random());
 
 // Shared parsing pieces for keywords
 pattern SingleKeyword := pattern('[^~]+');
@@ -74,7 +76,7 @@ output('Keyword plus count: ' + count_ds_Keywords_with_extra);
 ds_NormKeywords_sorted := sort(j_Keyword,UID);
 
 /* Rollup of Places of Birth////////*/
-Keyword_rollup := record, maxlength(10000)
+Keyword_rollup := record, maxlength(20000)
 	Layout_WorldCheck_rollup;
 	dataset(layout_Keywords) Keyword_detail;
 end;
@@ -100,7 +102,7 @@ Keyword_out := rollup(sort(p_Keyword,record)
 count_ds_Keywords_rollup := count(Keyword_out);
 output('Keyword rollup count: ' + count_ds_Keywords_rollup);
 
-Keyword_out_dist := distribute(Keyword_out,hash32(UID)) : persist(WorldCheck.cluster_name + 'Persist::WorldCheck::Keyword::rollup');
+Keyword_out_dist := sort(distribute(Keyword_out, hash32(UID)), uid, local) : persist(WorldCheck.cluster_name + 'Persist::WorldCheck::Keyword::rollup');
 
 return Keyword_out_dist;
 

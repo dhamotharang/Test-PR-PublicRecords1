@@ -1,0 +1,103 @@
+EXPORT Layouts := module
+  //Note:  Maine only has one vendor layout.  However, there is a 
+	//			 1 to many relationship for records to corporation key (corp_id).
+	export CorpBulkLayoutIn				 					:= record, maxlength(4096)
+		string10 		corp_id;
+		string8	 		incorp_date;
+		string8 		qual_date;
+		string8 		file_date;
+		string8 		expire_date;
+		string3 		jurisdiction;
+		string13 		ar_dcn;
+		string1			rpt_dlnq_ind;
+		string1			rpt_type;
+		string1 		members_ind;
+		string1 		quasi_ind;
+		string1			close_ind;
+		string3 		directors_from;
+		string3 		directors_to;
+		string3 		corp_status;
+		string1 		meetings_ind;
+		string1 		fdba;
+		string1 		preemp_ind;
+		string160 	purpose;
+		string1 		work_pending;
+		string1 		override_flag;
+		string8 		process_date;
+		string4 		clerk_id;
+		string8 		work_pending_date;
+		string80 		work_pending_type;
+		string1 		fiduciary_ind;
+		string1 		pa_ind;
+		string50		coop_name;
+		string10 		public_mutual;
+		string4 		nam_seq_no;
+		string1 		sort_fld;
+		string1 		name_type;
+		string150 	corp_name;
+		string140 	compr_name;
+		string1 		protect_flag;
+		string1 		addr_type;
+		string50 		addr_name;
+		string50 		addr_1;
+		string50		addr_2;
+		string20 		city;
+		string3 		state;
+		string30		country;
+		string5			zip1;
+		string4			zip2;
+		string150 	cra_entity_name;
+		string50  	cra_mail_addr1;
+		string50  	cra_mail_addr2;
+		string50  	cra_mail_addr3;
+		string1 		lf;
+	end;
+
+	export CorpBulkLayoutBase  				 			:= record
+		string1			action_flag;
+		unsigned4		dt_first_received;
+		unsigned4		dt_last_received;		
+		CorpBulkLayoutIn;
+	end;	
+
+	export Temp_CorpBulkDenormLayoutIn 			:= record
+		CorpBulkLayoutIn - lf;
+		string1 		home_office_addr_type;
+		string50 		home_office_addr_name;
+		string50 		home_office_addr_1;
+		string50		home_office_addr_2;
+		string20 		home_office_city;
+		string3 		home_office_state;
+		string30		home_office_country;
+		string5			home_office_zip1;
+		string4			home_office_zip2;
+		string1 		home_office_other_addr_type;
+		string50 		home_office_other_addr_name;
+		string50 		home_office_other_addr_1;
+		string50		home_office_other_addr_2;
+		string20 		home_office_other_city;
+		string3 		home_office_other_state;
+		string30		home_office_other_country;
+		string5			home_office_other_zip1;
+		string4			home_office_other_zip2;
+		string1 		registered_office_addr_type;
+		string50	 	registered_office_addr_name;
+		string50 		registered_office_addr_1;
+		string50		registered_office_addr_2;
+		string20 		registered_office_city;
+		string3 		registered_office_state;
+		string30		registered_office_country;
+		string5			registered_office_zip1;
+		string4			registered_office_zip2;
+		string1 		registered_office_other_addr_type;
+		string50 		registered_office_other_addr_name;
+		string50 		registered_office_other_addr_1;
+		string50		registered_office_other_addr_2;
+		string20 		registered_office_other_city;
+		string3 		registered_office_other_state;
+		string30		registered_office_other_country;
+		string5			registered_office_other_zip1;
+		string4			registered_office_other_zip2;
+	end;
+
+end;

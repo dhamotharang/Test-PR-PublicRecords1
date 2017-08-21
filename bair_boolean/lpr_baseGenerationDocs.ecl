@@ -6,17 +6,19 @@ FILENAME:lpr_base
 RIDFIELD:newrid:GENERATE
 DOCFIELD:eid:HASH5
 IDNAME:newrid
-IDSPACE:MDR.sourceTools.src_Bair_Analytics
+IDSPACE:le.class_code
 FIELD:eid:0,0
 FIELD:gh12:0,0
+FIELD:gh4:0,0
+FIELD:gh5:0,0
+FIELD:gh6:0,0
 FIELD:etype:0,0
 FIELD:eventnumber:0,0
+FIELD:wc_plate:SEGTYPE(FieldDataType):0,0
 FIELD:plate:0,0
 DATEFIELD:clean_capturedatetime:0,0
-FIELD:plateimage:0,0
-FIELD:overviewimage:0,0
-NUMBERFIELD:x_coordinate:0,0
-NUMBERFIELD:y_coordinate:0,0
+FIELD:agency:0,0
+FIELD:data_provider_ori:0,0
 CONCEPT:DATE:clean_capturedatetime:SEGTYPE(GroupSeg):1,0
  
 Total available specificity:1

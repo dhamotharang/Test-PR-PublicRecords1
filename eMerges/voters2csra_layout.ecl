@@ -1,7 +1,63 @@
 import census_data;
 #workunit ('name', 'Convert Emerges voters to Lexis CSRA voters');
 
+export csra_layout_out := record
+   string2 State_Abbreviation;
+   string10 County_Code;
+   string5 Title;
+   string20 Last_Name;
+   string15 First_Name;
+   string15 Middle_Name;
+   string5 Suffix;
+   string10 Voter_ID;
+   string8 Date_of_Birth;
+   string2 Age_Code;
+   string3 Age;
+   string1 Gender;
+   string2 Race;
+   string2 Active_Code;
+   string1 Parsed_Code;
+   string59 Res_Line1;
+   string29 Res_Line2;
+   string15 City;
+   string2 State;
+   string5 ZipCode5;
+   string4 ZipCode4;
+   string1 Mail_Parsed;
+   string49 Mail_Line1;
+   string39 Mail_Line2;
+   string15 Mail_City;
+   string2 Mail_State;
+   string5 Mail_ZipCode5;
+   string4 Mail_ZipCode4;
+   string10 Telephone;
+   string3 Party_Code;
+   string8 Date_of_Registration;
+   string8 Last_Date_Voted;
+   string7 History0;
+   string7 History1;
+   string7 History2;
+   string7 History3;
+   string7 History4;
+   string7 History5;
+   string7 History6;
+   string7 History7;
+   string7 History8;
+   string7 History9;
+   string6 Congressional;
+   string6 State_Senate;
+   string6 State_House;
+   string6 Judicial;
+   string20 Precinct;
+   string20 Town;
+   string6 Village;
+   string6 Ward;
+   string6 District;
+   string89 State_Specific_Data;
+end;
+
 export csra_layout := record
+   string8 date_last_seen;
    string2 State_Abbreviation;
    string10 County_Code;
    string5 Title;
@@ -57,6 +113,7 @@ export csra_layout := record
 end;
 
 export csra_layout_temp := record
+   string8 date_last_seen;
    string2 State_Abbreviation;
    string10 County_Code;
    string2 fipsstate;
@@ -1672,9 +1729,33 @@ CSRA_voters_blankfips2 := project(csra_voters_blankfips,convert2CSRA_blank(left)
 CSRA_voters := CSRA_voters_nonblankfips2 + CSRA_voters_blankfips2;
 //CSRA_voters := CSRA_voters_nonblankfips2;
 
+srt_csra_voters := sort(CSRA_voters, -date_last_seen);
 
+srt_csra_voters_vdi := sort(srt_csra_voters,
+							Last_Name,
+							First_Name,
+							Middle_Name,
+							Date_of_Birth,
+							Date_of_Registration,
+							County_Code,
+							Voter_ID);
+					   
+dedup_csra_voters_vdi := dedup(srt_csra_voters_vdi,
+							  Last_Name,
+							  First_Name,
+							  Middle_Name,
+							  Date_of_Birth,
+							  Date_of_Registration,
+							  County_Code,
+							  Voter_ID);
 
-output(CSRA_voters,,'out::csra_voters',overwrite);
+csra_layout_out rm_dt_last_seen(csra_layout l) := transform
+	self := l;
+end;
+
+csra_voters_out := project(dedup_csra_voters_vdi, rm_dt_last_seen(left));
+
+output(csra_voters_out,,'out::csra_voters',overwrite);
 count(csra_voters(County_Code != ''));
 count(csra_voters(State_Abbreviation != ''));
 count(csra_voters(State_Abbreviation != '' and County_Code != ''));

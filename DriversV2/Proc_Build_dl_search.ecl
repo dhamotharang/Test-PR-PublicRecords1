@@ -1,7 +1,9 @@
-import doxie_build, DriversV2, Roxiekeybuild;
+import doxie_build, DriversV2, Roxiekeybuild,orbit_report;
 
 export proc_build_dl_search(string filedate) :=
 function
+
+doValidateParm  :=   if(filedate = '', fail('filedate parameter is blank'));
 
 dofirst  := DriversV2.Proc_Build_DL_Search_Base;
 
@@ -15,10 +17,12 @@ dofourth := Driversv2.Proc_Build_DL_CP_Keys(filedate);
 
 dolast   := Driversv2.Proc_Build_Boolean_keys(filedate);
 
-// Update dops page upon keybuild completion
-dlv2_dops_update := sequential(RoxieKeybuild.updateversion('DLV2Keys',DriversV2.Version_Development,'fhumayun@seisint.com'));
+orbit_report.DL_Stats(getretval);
 
-e_mail_success := fileservices.sendemail('roxiebuilds@seisint.com;fhumayun@seisint.com;vniemela@seisint.com;giri.rajulapalli@lexisnexis.com',
+// Update dops page upon keybuild completion
+dlv2_dops_update := sequential(RoxieKeybuild.updateversion('DLV2Keys',filedate,'mgould@lexisnexis.com',,'N|B'));
+
+e_mail_success := fileservices.sendemail('roxiebuilds@seisint.com;vniemela@seisint.com;michael.gould@lexisnexis.com;giri.rajulapalli@lexisnexis.com',
 										 'DL2 Roxie Build Succeeded ' + filedate,
 										 'DL keys: ------, \n' +
 										 '    1) ~thor_data400::key::dl2::qa::dl_public(~thor_data400::key::dl2::'+filedate+'::dl_public),\n' + 
@@ -49,13 +53,13 @@ e_mail_success := fileservices.sendemail('roxiebuilds@seisint.com;fhumayun@seisi
 										 '   24) ~thor_data400::key::dl2::qa::FRA_Insur_DLCP_Key(~thor_data400::key::dl2::'+filedate+'::FRA_Insur_DLCP_Key),\n' + 
 										 '    have been built and ready to be deployed to QA.');
 				
-e_mail_fail := fileservices.sendemail('fhumayun@seisint.com;giri.rajulapalli@lexisnexis.com',
+e_mail_fail := fileservices.sendemail('michael.gould@lexisnexis.com;giri.rajulapalli@lexisnexis.com',
                                       'DL2 Roxie Build FAILED',
 									  failmessage);
-
-email_notify := sequential(dofirst, dosecond, movetoqa, dothird, dofourth, dolast,dlv2_dops_update) : 
-				success(e_mail_success), 
-				FAILURE(e_mail_fail);
+				
+email_notify := sequential(doValidateParm, dofirst, dosecond, movetoqa, dothird, dofourth, dolast,dlv2_dops_update,getretval) : 
+                success(e_mail_success), 
+                FAILURE(e_mail_fail);
 
 return email_notify;
 

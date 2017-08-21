@@ -22,14 +22,18 @@ f.postdir; // int1
 f.unit_desig; // int1 lookup
 f.st; // int1 lookup
 f.tnt;
+f.valid_SSN;
+f.jflag1;
+f.jflag2;
+f.jflag3;
   end;
 
 #uniquename(slimmy)
 %slimmy% := table(f,%fcounts%);
 
-ut.MAC_Field_Count(%slimmy%,%slimmy%.pflag1, 'pflag1', true, true, lbl_30)
-ut.MAC_Field_Count(%slimmy%,%slimmy%.pflag2, 'pflag2', true, true, lbl_31)
-ut.MAC_Field_Count(%slimmy%,%slimmy%.pflag3, 'pflag3', true, true, lbl_32)
+ut.MAC_Field_Count(%slimmy%,%slimmy%.pflag1, 'pflag1', true, true, lbl_30, true)
+ut.MAC_Field_Count(%slimmy%,%slimmy%.pflag2, 'pflag2', true, true, lbl_31, true)
+ut.MAC_Field_Count(%slimmy%,%slimmy%.pflag3, 'pflag3', true, true, lbl_32, true)
 ut.MAC_Field_Count(%slimmy%,%slimmy%.src, 'src', true, true, lbl_33)
 ut.MAC_Field_Count(%slimmy%,%slimmy%.dt_first_seen, 'dt_first_seen', true, true, lbl_34)
 ut.MAC_Field_Count(%slimmy%,%slimmy%.dt_last_seen, 'dt_last_seen', true, true, lbl_35)
@@ -45,7 +49,11 @@ ut.MAC_Field_Count(%slimmy%,%slimmy%.suffix, 'suffix', true, true, lbl_44)
 ut.MAC_Field_Count(%slimmy%,%slimmy%.postdir, 'postdir', true, true, lbl_45)
 ut.MAC_Field_Count(%slimmy%,%slimmy%.unit_desig, 'unit_desig', true, true, lbl_46)
 ut.MAC_Field_Count(%slimmy%,%slimmy%.st, 'st', true, true, lbl_47)
-ut.MAC_Field_Count(%slimmy%,%slimmy%.tnt, 'tnt', true, true, lbl_48)
+ut.MAC_Field_Count(%slimmy%,%slimmy%.tnt, 'tnt', true, true, lbl_48, true)
+ut.MAC_Field_Count(%slimmy%,%slimmy%.valid_ssn, 'valid_ssn', true, true, lbl_49, true)
+ut.MAC_Field_Count(%slimmy%,%slimmy%.jflag1, 'jflag1', true, true, lbl_50, true)
+ut.MAC_Field_Count(%slimmy%,%slimmy%.jflag2, 'jflag2', true, true, lbl_51, true)
+ut.MAC_Field_Count(%slimmy%,%slimmy%.jflag3, 'jflag3', true, true, lbl_52, true)
 
 outputname := sequential(
 lbl_30,
@@ -66,8 +74,11 @@ lbl_44,
 lbl_45,
 lbl_46,
 lbl_47,
-lbl_48
-
+lbl_48,
+lbl_49,
+lbl_50,
+lbl_51,
+lbl_52
 );
 
 endmacro;

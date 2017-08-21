@@ -1,0 +1,31 @@
+export	Layout_LT_Input_Raw	:=
+record
+   string12	processing_id;
+   string8 billing_id;
+   string80 lender_name;
+   string10 lender_id;
+   string25 AccountManager; 
+   string5  title;
+   string20 fname;
+   string20 mname;
+   string20 lname;
+   string5  name_suffix;
+   string3  name_score;
+   string8  qf_name;
+   string8  qf_id;
+   string36 qf_uid;
+   string10 borrower_id;
+   string11  ssn;
+   string20 orig_fname;
+   string20 orig_lname;
+   //string20 orig_mname;
+   string23 qf_date;
+   string23 transmit_date;
+   string23 requested_product;
+   string18 requested_sub_product;
+   string1  found_home;
+   string3  credit_score;
+   string11 amount_requested;
+   string39 filter_class_lookup;
+   string86 fixed_filter_desc;
+end;

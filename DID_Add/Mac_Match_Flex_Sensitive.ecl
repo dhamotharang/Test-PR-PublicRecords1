@@ -83,7 +83,7 @@ export Mac_Match_Flex_Sensitive
 #uniquename(pg_score)
 #uniquename(id_layout)
 %id_layout% := record
-	integer4 temp_ID;
+	unsigned6 temp_ID;
 	unsigned1 %did_score% := 0;	//i will use my scoring fields regardless, and then assign at the end
 	outrec;
 end;

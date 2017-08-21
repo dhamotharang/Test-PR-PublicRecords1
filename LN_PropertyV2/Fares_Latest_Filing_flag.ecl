@@ -10,7 +10,7 @@ asses_dist := distribute(in_asses,hash(fares_unformatted_apn,(integer)fips_code,
 
 asses_sort      := sort(asses_dist, fares_unformatted_apn,(integer)fips_code,property_full_street_address,local); 
 asses_sort_grpd := group(asses_sort,fares_unformatted_apn,(integer)fips_code,property_full_street_address,local);
-asses_grpd_sort := sort(asses_sort_grpd,-(integer)tax_year,-(integer)process_date); 
+asses_grpd_sort := sort(asses_sort_grpd,-(integer)tax_year,-(integer)assessed_value_year,-(integer)process_date); 
 
 
  
@@ -43,7 +43,11 @@ end;
 export Deedwflag(dataset(recordof(LN_PropertyV2.layout_deed_mortgage_common_model_base)) in_deeds) :=
 function
 
-deeds_dist := distribute(in_deeds,hash(fares_unformatted_apn,(integer)fips_code,property_full_street_address));
+empty_apn  := in_deeds(fares_unformatted_apn = ''); 
+
+non_empty_apn := in_deeds(fares_unformatted_apn <> ''); 
+
+deeds_dist := distribute(non_empty_apn,hash(fares_unformatted_apn,(integer)fips_code,property_full_street_address));
 
 deeds_sort      := sort(deeds_dist, fares_unformatted_apn,(integer)fips_code,property_full_street_address,local); 
 deeds_sort_grpd := group(deeds_sort,fares_unformatted_apn,fips_code,property_full_street_address,local);
@@ -60,7 +64,7 @@ deeds_grpd_sort tkeepflag(deeds_grpd_sort L, deeds_grpd_sort R) := transform
 
 end;
 
-deed_iterate := GROUP(iterate(deeds_grpd_sort, tkeepflag(left, right)));
+deed_iterate := GROUP(iterate(deeds_grpd_sort, tkeepflag(left, right))) + empty_apn;
 
 deed_iterate  reformat(deed_iterate l) := transform
 
@@ -68,7 +72,7 @@ deed_iterate  reformat(deed_iterate l) := transform
    self := l ;
 end; 
 
-deed_current_flag := project(deed_iterate ,reformat(left)); 
+deed_current_flag := project(deed_iterate ,reformat(left)) ; 
 return deed_current_flag;
 
 end;

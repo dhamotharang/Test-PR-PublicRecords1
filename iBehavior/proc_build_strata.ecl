@@ -9,9 +9,9 @@ EXPORT proc_build_strata(STRING version) := FUNCTION
 		:=
 			RECORD
 				// basefile.clean_st;
-				basefile.State;
 				CountGroup:=COUNT(GROUP);
-				Persistent_Record_ID := SUM(GROUP,IF(basefile.persistent_record_id <> 0,1,0));
+        basefile.State;
+        Persistent_Record_ID := SUM(GROUP,IF(basefile.persistent_record_id <> 0,1,0));
 				Last_Name_cnt := SUM(GROUP, IF(basefile.Last_Name <> '', 1, 0));
 				First_Name_cnt := SUM(GROUP, IF(basefile.First_Name <> '', 1, 0));
 				Middle_Initial_cnt := SUM(GROUP, IF(basefile.Middle_Initial <> '', 1, 0));
@@ -89,8 +89,7 @@ EXPORT proc_build_strata(STRING version) := FUNCTION
 Layout_Purchase
 		:=
 			RECORD
-				// PurchaseFile.number_of_sources;
-				// CountGroup:=COUNT(GROUP);
+			  STRING3 NoGrouping       := 'ALL'; // field to GROUP by -- all values are "ALL"
 				Persistent_Record_ID := SUM(GROUP,IF(PurchaseFile.persistent_record_id <> 0,1,0));
 				IB_Individual_ID_cnt := SUM(GROUP, IF(PurchaseFile.IB_Individual_ID <> '', 1, 0));
 				IB_Household_ID_cnt := SUM(GROUP, IF(PurchaseFile.IB_Household_ID <> '', 1, 0));

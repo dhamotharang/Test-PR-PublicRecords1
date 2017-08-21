@@ -12,8 +12,9 @@
 //				  the fill file.
 //////////////////////////////////////////////////////////////////////////////////////////
 
-import LiensV2, address;
+import LiensV2, address, Data_Services;
 
+export mapping_Hogan_main := FUNCTION
 // Process daily file (distribute, sort and flatten)
 
 liensv2.layout_liens_main_temp tmakemain(liensV2.Layout_Liens_temp_base L) := transform
@@ -59,22 +60,25 @@ file_flat := project(hogan_main_temp_dedup, tmakefatrecord(left));
 file_adds := file_flat(ADDDELFLAG != 'D');
 
 // FILTER DELETE RECORDS
-file_deletes := file_flat(ADDDELFLAG = 'D') ;
-
+//file_deletes := DEDUP(SORT(liensV2.mapping_hogan(ADDDELFLAG = 'D'),orig_rmsid),orig_rmsid) ;
+file_deletes := fnMainDeletes(LiensV2.file_Hogan_main, LiensV2.file_Hogan_party_full);
 
 // FULL FILE 
 
 Full_hogan_Main_nondist := dataset('~thor_data400::base::liens::main::hogan',liensv2.layout_liens_main_module_for_hogan.layout_liens_main,thor);
 
-liensv2.Layout_liens_main_module_for_hogan.layout_liens_main tjoin(Full_hogan_Main_nondist  L, file_deletes  R) := transform
-
-self := L ;
-end;
-
 // REMOVE DELETES FROM MAIN BASE FILE
 
-Full_hogan_remove_Delete:= join(Full_hogan_Main_nondist, file_deletes , left.orig_rmsid = right.orig_rmsid and left.tmsid = right.tmsid,
-                                                                  tjoin(left,right),left only);
+Full_hogan_remove_Delete	:=	JOIN(
+																	DISTRIBUTE(Full_hogan_Main_nondist,HASH(orig_rmsid)), 
+																	DISTRIBUTE(file_deletes(orig_rmsid_main_del <> ''),HASH(orig_rmsid_main_del)),
+																	LEFT.orig_rmsid	=	RIGHT.orig_rmsid_main_del AND
+																	left.tmsid = right.tmsid,
+																	TRANSFORM(LEFT),
+																	LEFT ONLY,
+																	LOCAL,
+																	LOOKUP
+																	);
 
 // TRANSFORM UPDATES TO MAIN FILE LAYOUT
 
@@ -82,7 +86,7 @@ liensv2.Layout_liens_main_module_for_hogan.layout_liens_main  treformat(rec_temp
 self := L; 
 end ; 
 
-file_update := distribute(project(file_flat, treformat(left)),hash(tmsid));
+file_update := distribute(project(file_adds, treformat(left)),hash(tmsid));
 
 Full_hogan_Main := distribute(Full_hogan_remove_Delete,hash(tmsid));
 
@@ -107,5 +111,7 @@ Hogan_main_out := rollup(full_sort, tmsid +rmsid+record_code+date_vendor_removed
 							  filing_book+filing_page+release_date+amount+eviction+satisifaction_type+judg_satisfied_date+judg_vacated_date+tax_code+irs_serial_number+effective_date+
 							  lapse_date+accident_date+sherrif_indc+expiration_date+agency+agency_city+agency_state+agency_county+legal_lot+legal_block+legal_borough+certificate_number, tmakechildren(left, right), local);
 
-export mapping_Hogan_main:= Hogan_main_out;
+RETURN Hogan_main_out;
+
+END;
 

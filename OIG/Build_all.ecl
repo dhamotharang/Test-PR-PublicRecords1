@@ -1,9 +1,9 @@
-import versioncontrol, _control, ut,Roxiekeybuild, lib_stringlib;
+import versioncontrol, _control, ut,Roxiekeybuild, lib_stringlib, OIG;
 
 export Build_all(string    pVersion,string filedate) := function 
                      
     current_Keybase      := OIG.Proc_Oig_KeyBase(pVersion);
-    Previous_Keybase     := Files().KeyBase.qa ;
+    Previous_Keybase     := OIG.Files().KeyBase.qa ;
     
     // There were garbage records introduced by a corrupted raw_input file and as a result carried over
     // into the base files. The corruption had no delimiters, so all of the records had only the lastname
@@ -31,7 +31,7 @@ export Build_all(string    pVersion,string filedate) := function
                                                   wvrstate   = '')    and
                                                   not regexfind ('[^[:print:]]', lastname));
                                      
-    Test                 := count(nothor(fileservices.superfilecontents(filenames().Keybuild.qa))) > 0;
+    Test                 := count(nothor(fileservices.superfilecontents(OIG.filenames().Keybuild.qa))) > 0;
     Full_keybase         := sort(if(Test,current_Keybase + Filtered_Keybase, current_Keybase),RECORD);
     
     OIG.Layouts.KeyBuild   rollupXform(OIG.Layouts.KeyBuild  l, OIG.Layouts.KeyBuild  r) := transform
@@ -45,7 +45,7 @@ export Build_all(string    pVersion,string filedate) := function
         self                           := l;
     end;
 
-    shared  new_Keybase                := rollup(Full_keybase, rollupXform(LEFT,RIGHT), RECORD,EXCEPT dt_vendor_first_reported,dt_vendor_last_reported,dt_first_seen,dt_last_seen,NPI,WAIVERDATE,WVRSTATE);
+    new_Keybase                        := rollup(Full_keybase, rollupXform(LEFT,RIGHT), RECORD,EXCEPT dt_vendor_first_reported,dt_vendor_last_reported,dt_first_seen,dt_last_seen,NPI,WAIVERDATE,WVRSTATE);
     
     CreateSuper                        := FileServices.CreateSuperFile(OIG.Cluster+'temp::oig::qa::data',false);
             
@@ -62,31 +62,30 @@ export Build_all(string    pVersion,string filedate) := function
 
     Add_KeyBuildFile      := if(FileServices.FindSuperFileSubName(OIG.Cluster+'temp::oig::qa::data', OIG.Cluster+'temp::oig::'+pVersion+'::data') = 0,KeyBuild_main); 
     
-    Base                  := project(new_Keybase ,TRANSFORM(Layouts.Base,SELF := LEFT;));
+    Base                  := project(new_Keybase ,TRANSFORM(OIG.Layouts.Base,SELF := LEFT;));
 
-    VersionControl.macBuildNewLogicalFile(Filenames(pversion).base.new,Base,Build_Base_File);
+    VersionControl.macBuildNewLogicalFile(OIG.Filenames(pversion).base.new,Base,Build_Base_File);
                         
-    //dops_update           := Roxiekeybuild.updateversion('OIGKeys',pVersion,'saritha.myana@lexisnexis.com'); 
-		dops_update           := Roxiekeybuild.updateversion('OIGKeys',pVersion,'saritha.myana@lexisnexis.com;Randy.Reyes@lexisnexis.com;Manuel.Tarectecan@lexisnexis.com;Abednego.Escobal@lexisnexis.com',,'N');
+    dops_update           := Roxiekeybuild.updateversion('OIGKeys',pVersion,'saritha.myana@lexisnexis.com;Randy.Reyes@lexisnexisrisk.com;Manuel.Tarectecan@lexisnexisrisk.com;Abednego.Escobal@lexisnexisrisk.com',,'N'); 
                                                             
-    export full_build     := sequential (nothor(apply(filenames().Base.dAll_filenames, apply(dSuperfiles, versioncontrol.mUtilities.createsuper(name))))
-                                         ,nothor(apply(Keynames(pversion).dall_filenames, apply(dSuperfiles,VersionControl.mUtilities.createsupers(Keynames(pversion).dall_filenames))))
+    full_build            := sequential (nothor(apply(OIG.filenames().Base.dAll_filenames, apply(dSuperfiles, versioncontrol.mUtilities.createsuper(name))))
+                                         ,nothor(apply(OIG.Keynames(pversion).dall_filenames, apply(dSuperfiles,VersionControl.mUtilities.createsupers(OIG.Keynames(pversion).dall_filenames))))
                                          ,CreateTempKeyBuildIfNotExist
-                                         ,fSprayFiles(filedate)
+                                         ,OIG.fSprayFiles(filedate)
                                          ,Build_KeyBuild_File
                                          ,Build_Base_File
                                          ,Add_KeyBuildFile
-                                         ,Proc_Build_AutoKeys(pversion)
-                                         ,Proc_Build_RoxieKeys(pversion)
-                                         ,Promote(pversion).New2Built
-                                         ,Promote(pversion).Built2Qa
-                                         ,output(choosen(Files().base.qa (addr_type='B' and bdid<> 0), 1000), named ('Sample_Basefile_BusinessRecords'))
-                                         ,output(choosen(Files().base.qa(addr_type='P'and did<> 0) , 1000), named ('Sample_Basefile_PeopleRecords'))
-                                         ,output(choosen(Files().KeyBase.qa (addr_type='B' and bdid<> 0), 1000), named ('Sample_KeyBasefile_BusinessRecords'))
-                                         ,output(choosen(Files().KeyBase.qa(addr_type='P'and did<> 0) , 1000), named ('Sample_KeyBasefile_PeopleRecords'))
-                                         ,Out_base_OIG_stats_pop(pVersion)
+                                         ,OIG.Proc_Build_AutoKeys(pversion)
+                                         ,OIG.Proc_Build_RoxieKeys(pversion)
+                                         ,OIG.Promote(pversion).New2Built
+                                         ,OIG.Promote(pversion).Built2Qa
+                                         ,output(choosen(OIG.Files().base.qa (addr_type='B' and bdid<> 0), 1000), named ('Sample_Basefile_BusinessRecords'))
+                                         ,output(choosen(OIG.Files().base.qa(addr_type='P'and did<> 0) , 1000), named ('Sample_Basefile_PeopleRecords'))
+                                         ,output(choosen(OIG.Files().KeyBase.qa (addr_type='B' and bdid<> 0), 1000), named ('Sample_KeyBasefile_BusinessRecords'))
+                                         ,output(choosen(OIG.Files().KeyBase.qa(addr_type='P'and did<> 0) , 1000), named ('Sample_KeyBasefile_PeopleRecords'))
+                                         ,OIG.Out_base_OIG_stats_pop(pVersion)
                                          ,dops_update
-                                         ): success(send_email(pversion).buildsuccess), failure(send_email(pversion).buildfailure);
+                                         ): success(OIG.send_email(pversion).buildsuccess), failure(OIG.send_email(pversion).buildfailure);
                                                                      
 
 return  if(VersionControl.IsValidVersion(pversion)

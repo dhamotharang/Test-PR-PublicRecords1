@@ -31,7 +31,7 @@ ut.MAC_Sequence_Records_NewRec(infile, %layout_infile_seq%, %uid%, %infile_seq%)
 PATTERN %word% := text.alpha+;
 PATTERN %cityname% := %word% REPEAT(text.ws %word%, 0, 3);
 PATTERN %vcity% := VALIDATE(%cityname%, LENGTH(MATCHTEXT) > 2 
-		AND ut.IsCityName(stringlib.stringtouppercase(MATCHTEXT))); 
+		AND Address.IsCityName(stringlib.stringtouppercase(MATCHTEXT))); 
 PATTERN %magic1% := 'CITY' text.ws 'OF' text.ws;
 PATTERN %magic2% := text.ws 'CITY';
 PATTERN %find_city% :=	(FIRST | text.pws) 
@@ -51,7 +51,7 @@ END;
 %parsed% := PARSE(%init%, trim(name), %find_city%, %layout_city%, SCAN all);
 
 #uniquename(pd_rcid)
-%pd_rcid% := DISTRIBUTE(%parsed%, HASH(rcid)) : PERSIST('TEMP::BH_GeoParseRaw');
+%pd_rcid% := DISTRIBUTE(%parsed%, HASH(rcid)) : PERSIST(persistnames().MACParseGeo.Raw);
 
 // The SCAN ALL parse may generate multiple rows with the
 // same matchtext, so keep only unique ones per input record.
@@ -104,7 +104,7 @@ END;
 
 // All city records.
 #uniquename(ct_all)
-%ct_all% := SUM(%table_state%, ct_s ) : PERSIST('TEMP::BH_City_Count');
+%ct_all% := SUM(%table_state%, ct_s ) : PERSIST(persistnames().MACParseGeo.CityCount);
 
 #uniquename(layout_stats_city)
 %layout_stats_city% := RECORD
@@ -163,7 +163,7 @@ END;
 END;
 
 #uniquename(narrow)
-%narrow% := PROJECT(%unique_stats%, %MakeNarrow%(LEFT)) : PERSIST('TEMP::BH_CityAffinity');
+%narrow% := PROJECT(%unique_stats%, %MakeNarrow%(LEFT)) : PERSIST(persistnames().MACParseGeo.CityAffinity);
 
 #uniquename(d_pcty)
 %d_pcty% := DISTRIBUTE(
@@ -217,6 +217,6 @@ END;
 outfile := JOIN(	%init%, %geo_result%, 
 					LEFT.%uid% = RIGHT.rcid,
 					%format_result%(LEFT, RIGHT),
-					LEFT OUTER, LOCAL) : PERSIST('TEMP::BH_Geo_parse_city');
+					LEFT OUTER, LOCAL) : PERSIST(persistnames().MACParseGeo.City);
 
 ENDMACRO;

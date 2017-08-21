@@ -1,4 +1,4 @@
-import STRATA;
+import DEA, STRATA;
 
 export Out_Base_Stats_Population(string filedate) :=
 function

@@ -71,8 +71,8 @@ EXPORT fIRS_Non_Profit_As_Business_Linking(DATASET(govdata.Layouts_IRS_NonProfit
 	rNewBusinessLayout RollupBL(rNewBusinessLayout l, rNewBusinessLayout r) := TRANSFORM
 	  SELF.dt_first_seen               := ut.EarliestDate(ut.EarliestDate(l.dt_first_seen,r.dt_first_seen),
 				                                                ut.EarliestDate(l.dt_last_seen,r.dt_last_seen));
-	  SELF.dt_last_seen                := ut.LatestDate(l.dt_last_seen,r.dt_last_seen);
-	  SELF.dt_vendor_last_reported     := ut.LatestDate(l.dt_vendor_last_reported, 
+	  SELF.dt_last_seen                := max(l.dt_last_seen,r.dt_last_seen);
+	  SELF.dt_vendor_last_reported     := max(l.dt_vendor_last_reported, 
                                                       r.dt_vendor_last_reported);
 	  SELF.dt_vendor_first_reported    := ut.EarliestDate(l.dt_vendor_first_reported,
                                                         r.dt_vendor_first_reported);

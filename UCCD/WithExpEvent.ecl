@@ -13,7 +13,7 @@ rec formatexp(expin_filtered l,exp_filed_place_in r) := transform
 	self.ucc_process_date 	:= '';//new
 	self.processing_rule 	:= '';//new
 	self.ucc_key 			:= uccd.constructUCCkey(l.file_state, l.orig_filing_num);
-	self.event_key 			:= if (l.filing_type='0801', uccd.constructUCCkey(l.file_state, l.orig_filing_num),l.filing_type+'-'+l.filing_date);
+	self.event_key 			:= if (l.filing_type='0801', uccd.constructUCCkey(l.file_state, l.orig_filing_num),l.filing_type+trim(l.document_num,left,right)+l.filing_date);
 	self.event_action_cd 	:= '';//new
 	self.event_action_desc 	:= '';//new
 	self.filing_type_desc 	:= codes.UCC_FILING.FILING_TYPE((string)l.filing_type);
@@ -28,7 +28,7 @@ expfor := join(expin_filtered ,exp_filed_place_in, left.filed_place=right.filing
 
 
 //incoming direct
-dirin := uccd.File_Event_Base;
+dirin := uccd.Updated_Event;
 
 // direct into expanded layout
 rec formatdir(dirin l) := transform
@@ -41,11 +41,11 @@ rec formatdir(dirin l) := transform
 	self.orig_filing_num 	:= l.ucc_filing_num;
 	//self.experian_rec_type := '';	//not mapped
 	
-	self.filing_type 		:= if (l.ucc_state_origin='AL',l.event_action_cd, l.event_type_cd);
-	self.filing_type_desc 	:= if (l.ucc_state_origin='AL',l.event_action_desc, l.event_type_desc);
+	self.filing_type 		:= l.event_type_cd;
+	self.filing_type_desc 	:= l.event_type_desc;
 	
-	self.event_action_cd	:= if (l.ucc_state_origin='AL', '', l.event_action_cd);
-	self.event_action_desc	:= if (l.ucc_state_origin='AL', '', l.event_action_desc);
+	//self.event_action_cd	:= if (l.ucc_state_origin='AL', '', l.event_action_cd);
+	//self.event_action_desc	:= if (l.ucc_state_origin='AL', '', l.event_action_desc);
 
 	self.document_num 		:= l.event_document_num;
 	self.filing_date 		:= l.event_date;

@@ -48,6 +48,9 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 																		+ ' '+ trim(L.zip,left,right)[..5]
 																		)),LEFT,RIGHT);
 				
+				SELF.dateofbirth 						:= if(length(trim(L.dateofbirth,left,right))>20,ut.CleanSpacesAndUpper( RemoveTimeStamp(trim(L.dateofbirth))),L.dateofbirth); 
+				SELF.dateofdeath 						:= if(length(trim(L.dateofdeath,left,right))>20,ut.CleanSpacesAndUpper( RemoveTimeStamp(trim(L.dateofdeath))),L.dateofdeath);
+				
 				// SELF.clean_phone1						:= if(ut.CleanPhone(L.phone1) [1] not in ['0','1'] and length(ut.CleanPhone(L.phone1)) >= 10 and length(REGEXREPLACE('9',ut.CleanPhone(L.phone1),'')) > 0,ut.CleanPhone(L.phone1), '');
 				// SELF.clean_phone2						:= if(ut.CleanPhone(L.phone2) [1] not in ['0','1'] and length(ut.CleanPhone(L.phone2)) >= 10 and length(REGEXREPLACE('9',ut.CleanPhone(L.phone2),'')) > 0,ut.CleanPhone(L.phone2), '');
 				// SELF.clean_phone3						:= if(ut.CleanPhone(L.phone3) [1] not in ['0','1'] and length(ut.CleanPhone(L.phone3)) >= 10 and length(REGEXREPLACE('9',ut.CleanPhone(L.phone3),'')) > 0,ut.CleanPhone(L.phone3), '');
@@ -68,8 +71,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 				SELF.clean_phone						:= HMS_STLIC.fn_cleanHMSPhone (L.phone_number);
 				
 				SELF.clean_company_name 		:= if(ut.CleanCompany(L.firmname)<> '', ut.CleanCompany(L.firmname), datalib.companyclean(L.firmname));
-				SELF.dateofbirth := if(length(trim(L.dateofbirth))>20,ut.CleanSpacesAndUpper( RemoveTimeStamp(trim(L.dateofbirth))),L.dateofbirth); 
-				SELF.dateofdeath := if(length(trim(L.dateofdeath))>20,ut.CleanSpacesAndUpper( RemoveTimeStamp(trim(L.dateofdeath))),L.dateofdeath);
+				
 				
 				// SELF.clean_issue_date				:= if(length(trim(L.issue_date,left,right))<4,'',if(HMS_STLIC.Dates.ChkDtStr(StringLib.StringCleanSpaces(L.issue_date)),_validate.date.fCorrectedDateString(HMS_STLIC.Dates.CvtDate( HMS_STLIC.Dates.CvtDateEx(HMS_STLIC.Dates.PrepDtStr(trim(StringLib.StringCleanSpaces(L.issue_date),left,right)) ) ,'%Y%m%d'),false),_validate.date.fCorrectedDateString(HMS_STLIC.Dates.ChkRevDtStr(trim(StringLib.StringCleanSpaces(L.issue_date),left,right)),false)));
 				// SELF.clean_expiration_date	:= if(length(trim(L.expiration_date,left,right))<4,'',if(HMS_STLIC.Dates.ChkDtStr(StringLib.StringCleanSpaces(L.expiration_date)),_validate.date.fCorrectedDateString(HMS_STLIC.Dates.CvtDate( HMS_STLIC.Dates.CvtDateEx(HMS_STLIC.Dates.PrepDtStr(trim(StringLib.StringCleanSpaces(L.expiration_date),left,right)) ),'%Y%m%d'),false),_validate.date.fCorrectedDateString(HMS_STLIC.Dates.ChkRevDtStr(trim(StringLib.StringCleanSpaces(L.expiration_date),left,right)),false)));
@@ -82,10 +84,12 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 				SELF.clean_expiration_date	:= HMS_STLIC.fn_cleanDate(L.expiration_date);
 				SELF.clean_offense_date			:= HMS_STLIC.fn_cleanDate(L.offense_date);
 				SELF.clean_action_date			:= HMS_STLIC.fn_cleanDate(L.action_date);
-				SELF.clean_dateofbirth			:= if(length(trim(L.dateofbirth))>20,HMS_STLIC.fn_cleanDate(ut.CleanSpacesAndUpper( RemoveTimeStamp(trim(L.dateofbirth)))),HMS_STLIC.fn_cleanDate(L.dateofbirth));
-				SELF.clean_dateofdeath			:= if(length(trim(L.dateofdeath))>20,HMS_STLIC.fn_cleanDate(ut.CleanSpacesAndUpper( RemoveTimeStamp(trim(L.dateofdeath)))),HMS_STLIC.fn_cleanDate(L.dateofdeath));
+				
 				// SELF.clean_dateofbirth			:= HMS_STLIC.fn_cleanDate(L.dateofbirth);
 				// SELF.clean_dateofdeath			:= HMS_STLIC.fn_cleanDate(L.dateofdeath);
+				
+				SELF.clean_dateofbirth			:= if(length(trim(L.dateofbirth,left,right))>20,HMS_STLIC.fn_cleanDate(ut.CleanSpacesAndUpper( RemoveTimeStamp(trim(L.dateofbirth)))),HMS_STLIC.fn_cleanDate(L.dateofbirth));
+				SELF.clean_dateofdeath			:= if(length(trim(L.dateofdeath,left,right))>20,HMS_STLIC.fn_cleanDate(ut.CleanSpacesAndUpper( RemoveTimeStamp(trim(L.dateofdeath)))),HMS_STLIC.fn_cleanDate(L.dateofdeath));
 				
 				SELF.clean_zip5							:= REGEXREPLACE('-', L.zip[..5], '');
 				SELF.clean_zip4							:= REGEXREPLACE('-', L.zip[6..], '');

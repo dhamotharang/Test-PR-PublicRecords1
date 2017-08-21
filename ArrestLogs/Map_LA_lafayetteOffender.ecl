@@ -94,8 +94,8 @@ pada := project(p, tada(left));
 ArrestLogs.ArrestLogs_clean(pada,cleanada);
 
 dd_arrOut := dedup(sort(distribute(cleanada,hash(offender_key)),
-										offender_key,pty_nm,local)
-										,offender_key,pty_nm,local): 
-										PERSIST('~thor_dell400::persist::Arrestlogs_la_lafayette_Offender');
+								   offender_key,pty_nm,street_address_1,street_address_2,local)
+									,offender_key,pty_nm,street_address_1,street_address_2,local): 
+									PERSIST('~thor_dell400::persist::Arrestlogs_la_lafayette_Offender');
 
 export map_la_lafayetteOffender := dd_arrOut;

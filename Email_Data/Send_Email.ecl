@@ -10,7 +10,7 @@ export Send_Email(
 
 	export notificationlist := if(VersionControl._Flags.IsDataland
 																,_Control.myinfo.EmailAddressNotify
-																,'Angela.Herzberg@LexisNexis.com;'  + _Control.myinfo.EmailAddressNotify
+																,'Angela.Herzberg@LexisNexis.com; Timothy.Humphrey@lexisnexis.com;'  + _Control.myinfo.EmailAddressNotify
 															);
 							
 	export build_success := fileservices.sendemail(

@@ -7,6 +7,10 @@ BaseFile := File_Appriss_image_base;
 d_basefile := distribute(basefile, hash(Booking_sid));
 
 d_basefile applydeletes(d_basefile L , File_Image_link R) := TRANSFORM 
+//inherited the modified values for the following bug 72731
+  self.agencyKey   := r.agencyKey;
+	self.maxQueueSid := r.maxQueueSid;	
+  self.did         := r.did;
   self := L;
 end;
 

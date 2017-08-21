@@ -1,0 +1,25 @@
+export Layout_Executive_Summary_1000_In := record
+string8  process_date;
+string10 FILE_NUMBER;
+string4  SEGMENT_CODE;
+string5  SEQUENCE_NUMBER;
+string6  FILLER1;
+string3 CURR_DBT;
+string3 PRED_DBT;
+string3 CONF_PCT;
+string1 CONF_SLOPE;
+string6 PRED_DATE_MMDDYY;
+string3 IND_DBT;
+string3 ALL_IND_DBT;
+string8 LOW_BAL;
+string8 HI_BAL;
+string8 CUR_ACCT_BAL;
+string8 HI_CREDIT_EXT;
+string8 MEDIAN_CREDIT;
+string1 PAY_PERFORM;
+string1 PAY_TREND;
+string20 IND_DESC;
+string391 FILLER2;
+string583 FILLER3;
+string1  lf;
+end;

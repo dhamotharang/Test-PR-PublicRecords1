@@ -19,4 +19,4 @@ export File_In_Subcategory_Premium := dataset([
 	{'17','PEP Non-Government - Immediate Relative','','3'},
 	{'18','PEP Non-Government - Close Associate','','3'},
 	{'19','PEP State Owned Entity','','3'}],
-	{string5 subcategory_id, string55 subcategory, string1 x, string5 group_id});
+	Layout_Subcategory);

@@ -16,7 +16,7 @@ export Keynames(string		pversion			= '',   boolean pUseProd = false) := module
 	export specialty_lFileTemplate	    := _Dataset(pUseProd).thor_cluster_files		+ 'key::'	+ _Dataset().name + '::specialty::@version@::'	;
 	export sanc_prov_type_lFileTemplate	:= _Dataset(pUseProd).thor_cluster_files		+ 'key::'	+ _Dataset().name + '::sanc_prov_type::@version@::'	;
 	export sanc_codes_lFileTemplate	    := _Dataset(pUseProd).thor_cluster_files		+ 'key::'	+ _Dataset().name + '::sanc_codes::@version@::'	;
-	export dea_BAcodes_lFileTemplate	  := _Dataset(pUseProd).thor_cluster_files		+ 'key::'	+ _Dataset().name + '::dea_BAcodes::@version@::'	;
+	// export dea_BAcodes_lFileTemplate	  := _Dataset(pUseProd).thor_cluster_files		+ 'key::'	+ _Dataset().name + '::dea_BAcodes::@version@::'	;
 	export prov_birthdate_lFileTemplate	:= _Dataset(pUseProd).thor_cluster_files		+ 'key::'	+ _Dataset().name + '::provider_birthdate::@version@::'	;
 	export sanction_lFileTemplate	    	:= _Dataset(pUseProd).thor_cluster_files		+ 'key::'	+ _Dataset().name + '::sanction::@version@::'	;
 	
@@ -184,10 +184,10 @@ export Keynames(string		pversion			= '',   boolean pUseProd = false) := module
 	export specialty	:= specialty_group_key_spec_code.dAll_filenames + specialty_spec_desc_group_key.dAll_filenames;
 	
 	//dea_bacodes keys - dea_bus_act_ind+dea_bus_act_ind_sub
-	shared dea_bacodes_ldea_bus_act_ind		:= dea_bacodes_lFileTemplate + 'dea_bus_act_ind';
-	export dea_bacodes_dea_bus_act_ind		:= tools.mod_FilenamesBuild(dea_bacodes_ldea_bus_act_ind, pversion);
-	export dea_bacodes_dea_bus_dAll_filenames	:= dea_bacodes_dea_bus_act_ind.dAll_filenames;
+	// shared dea_bacodes_ldea_bus_act_ind		:= dea_bacodes_lFileTemplate + 'dea_bus_act_ind';
+	// export dea_bacodes_dea_bus_act_ind		:= tools.mod_FilenamesBuild(dea_bacodes_ldea_bus_act_ind, pversion);
+	// export dea_bacodes_dea_bus_dAll_filenames	:= dea_bacodes_dea_bus_act_ind.dAll_filenames;
 	
-	export dea_bacodes	:= dea_bacodes_dea_bus_act_ind.dAll_filenames;
+	// export dea_bacodes	:= dea_bacodes_dea_bus_act_ind.dAll_filenames;
 
 end;

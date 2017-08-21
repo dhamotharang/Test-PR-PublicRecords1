@@ -200,9 +200,9 @@ mj0 := JOIN( dn0_deduped, dn0_deduped, LEFT.DOTid > RIGHT.DOTid AND ( LEFT.SALT_
       AND LEFT.prim_name = RIGHT.prim_name
       AND LEFT.st = RIGHT.st
       AND LEFT.isContact = RIGHT.isContact,10000),HASH);
-last_mjs_t :=_mj_extra(hfile,trans) + mj0;
+last_mjs_t := /*_mj_extra(hfile,trans) + *//*HACK*/mj0;
 SALT33.mac_select_best_matches(last_mjs_t,rcid1,rcid2,o);
-mjs0 := o : PERSIST('~temp::DOTid::BIPV2_DOTID::mj::0',EXPIRE(Config.PersistExpire));
+mjs0 := o : PERSIST('~temp::DOTid::BIPV2_DotID::mj::0',EXPIRE(Config.PersistExpire));
  
 RETURN  mjs0;
 ENDMACRO;
@@ -223,12 +223,12 @@ match_candidates(ih).layout_candidates strim(j1 le) := TRANSFORM
   SELF := le;
 END;
 attr_match := JOIN(DISTRIBUTE(j1,HASH(DOTid1)),hd,LEFT.DOTid1 = RIGHT.DOTid AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition OR LEFT.SALT_Partition='' OR RIGHT.SALT_Partition = '' ),match_join( RIGHT,PROJECT(LEFT,strim(LEFT)),LEFT.Rule, LEFT.Conf),LOCAL); // Will be distributed by DID1
-with_attr := attr_match + all_mjs;
+with_attr := /*attr_match + */all_mjs;
 all_matches0 := Mod_Attr_ForeignCorpkey(ih).ForceFilter(ih,with_attr,DOTid1,DOTid2); // Restrict to those matches obeying force upon ForeignCorpkey
-EXPORT All_Matches := all_matches0 : PERSIST('~temp::DOTid::BIPV2_DOTID::all_m',EXPIRE(Config.PersistExpire)); // To by used by rcid and DOTid
+EXPORT All_Matches := all_matches0 : PERSIST('~temp::DOTid::BIPV2_DotID::all_m',EXPIRE(Config.PersistExpire)); // To by used by rcid and DOTid
 SALT33.mac_avoid_transitives(All_Matches,DOTid1,DOTid2,Conf,DateOverlap,Rule,o);
-EXPORT PossibleMatches := o : PERSIST('~temp::DOTid::BIPV2_DOTID::mt',EXPIRE(Config.PersistExpire));
-EXPORT Matches := PossibleMatches(Conf>=MatchThreshold) : PERSIST('~temp::DOTid::BIPV2_DOTID::Matches::Matches',EXPIRE(Config.PersistExpire));
+EXPORT PossibleMatches := o : PERSIST('~temp::DOTid::BIPV2_DotID::mt',EXPIRE(Config.PersistExpire));
+EXPORT Matches := PossibleMatches(Conf>=MatchThreshold) : PERSIST('~temp::DOTid::BIPV2_DotID::Matches::Matches',EXPIRE(Config.PersistExpire));
  
 //Output the attributes to use for match debugging
 EXPORT MatchSample := ENTH(Matches,1000);
@@ -301,8 +301,8 @@ EXPORT IdChanges := JOIN(ih_thin,patched_infile_thin,LEFT.rcid = RIGHT.rcid AND 
 EXPORT MatchesPerformed := COUNT( Matches );
 EXPORT MatchesPropAssisted := COUNT( Matches(Conf_Prop>0) );
 EXPORT MatchesPropRequired := COUNT( Matches(Conf-Conf_Prop<MatchThreshold) );
-EXPORT PreIDs := BIPV2_DOTID.Fields.UIDConsistency(ih_thin); // Export whole consistency module
-EXPORT PostIDs := BIPV2_DOTID.Fields.UIDConsistency(Patched_Infile_thin); // Export whole consistency module
+EXPORT PreIDs := BIPV2_DotID.Fields.UIDConsistency(ih_thin); // Export whole consistency module
+EXPORT PostIDs := BIPV2_DotID.Fields.UIDConsistency(Patched_Infile_thin); // Export whole consistency module
 EXPORT PatchingError0 := PreIDs.IdCounts[2].cnt - PostIDs.IdCounts[2].cnt - MatchesPerformed - COUNT(BasicMatch(ih).patch_file)  + Cleave(ih).patch_count; // Should be zero
 EXPORT DuplicateRids0 := COUNT(Patched_Infile_thin) - PostIDs.IdCounts[1].Cnt; // Should be zero
 END;

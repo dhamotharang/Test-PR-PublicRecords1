@@ -1,7 +1,7 @@
-import doxie, doxie_files, watchdog, bankrupt, ut, risk_indicators, liensv2, fcra, riskwise;
+Import Data_Services, doxie, doxie_files, watchdog, bankrupt, ut, risk_indicators, liensv2, fcra, riskwise;
 
-liens_party := distribute(LiensV2.file_liens_party,hash(tmsid,rmsid));
-liens_main := distribute(LiensV2.file_liens_main,hash(tmsid,rmsid));
+liens_party := distribute(LiensV2.file_liens_fcra_party,hash(tmsid,rmsid));
+liens_main := distribute(LiensV2.file_liens_fcra_main,hash(tmsid,rmsid));
 
 layout_date := RECORD
 	unsigned4 date;
@@ -28,7 +28,7 @@ END;
 
 myGetDate := ut.getDate;
 
-slimrec_rmsid get_liens(LiensV2.file_liens_party le, LiensV2.file_liens_main ri) := transform
+slimrec_rmsid get_liens(LiensV2.file_liens_fcra_party le, LiensV2.file_liens_fcra_main ri) := transform
 	SELF.did := (integer)le.did;
 	SELF.rmsid := le.rmsid;
 	self.tmsid := le.tmsid;
@@ -96,4 +96,4 @@ liens_slimmed := PROJECT (liens_rolled, transform(slimrec,
 						self.liens_recent_released_count := left.liens_recent_released_count,
 						self.liens_historical_released_count := left.liens_historical_released_count));
 						
-export Key_BocaShell_LiensV3_FCRA := index(liens_slimmed, {did}, {liens_slimmed}, '~thor_data400::key::liensv2::fcra::bocashell_did_v2_' + doxie.Version_SuperKey);
+export Key_BocaShell_LiensV3_FCRA := index(liens_slimmed, {did}, {liens_slimmed}, Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::liensv2::fcra::bocashell_did_v2_' + doxie.Version_SuperKey);

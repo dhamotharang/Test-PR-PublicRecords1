@@ -1,5 +1,5 @@
 IMPORT Business_Header;
-bh := Business_Header.File_Business_Header_Base;
+bh := Business_Header.Layout_Business_Header_base;
 
 export Layout_CompanyName_Phone_SS := RECORD
 	bh.bdid;

@@ -1,13 +1,13 @@
 Import Data_Services, doxie, header_services, Data_Services;
 
-base := VotersV2.File_Voters_Building;
+base := PROJECT(VotersV2.File_Voters_Building, VotersV2.Layouts_Voters.Layout_Voters_Base);
 
 //************************************************************************
 //ADD INFORMATION - CNG 20070507 - dWU20070507-153008 dWU20070507-152748
 //************************************************************************
 
 Drop_voter_Layout := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
-Record //GEOBLK in LNSSI DATA
+Record
 string15	rid;
 string15	did;
 string3	did_score;

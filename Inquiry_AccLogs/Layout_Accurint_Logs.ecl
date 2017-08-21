@@ -1,5 +1,5 @@
 export Layout_Accurint_Logs := 
-record, maxlength(100000)
+record, maxlength(250000)
   string	orig_END_USER_ID;
 	string	orig_LOGINID;
 	string	orig_BILLING_CODE;

@@ -72,7 +72,7 @@ fieldstats.mac_stat_file(corp_event_base,stats,'corp_base',50,5,true,
 						event_filing_date,'string','F');
 
 
-emailx := fileservices.sendemail('lbentley@seisint.com; rvanheusen@seisint.com; cmaroney@seisint.com','CORP_FieldPop_Stats','Finished Corp Build ' + ut.getDate +  '\r\n \r\n ' +
+emailx := fileservices.sendemail('jtrost@seisint.com; lbentley@seisint.com; rvanheusen@seisint.com; cmaroney@seisint.com','CORP_FieldPop_Stats','Finished Corp Build ' + ut.getDate +  '\r\n \r\n ' +
 			  'Results and stats:  http://10.150.28.12:8010/WsWorkunits/WUInfo?Wuid=' + workunit + '\r\n');
 
 sequential(do1,do2,do3,do4,stats,emailx);

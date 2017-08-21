@@ -53,7 +53,7 @@ export macGetCleanAddr(origDatasetIn ,pRawAID ,phasAddFields='false' ,pDatasetOu
 			score5 := if(le.postdir=le.aidwork_acecache.postdir,score,if(le.aidwork_acecache.postdir<>'',score+1,score-1));
 			score6 := if(le.unit_desig=le.aidwork_acecache.unit_desig,score,if(le.aidwork_acecache.unit_desig<>'',score+1,score-1));
 			score7 := if(le.sec_range=le.aidwork_acecache.sec_range,score,if(le.aidwork_acecache.sec_range<>'',score+1,score-1));
-			score8 := if(le.city_name=le.aidwork_acecache.p_city_name,score,if(le.aidwork_acecache.p_city_name<>'',score+1,score-1));
+			score8 := if(le.city_name=le.aidwork_acecache.v_city_name,score,if(le.aidwork_acecache.v_city_name<>'',score+1,score-1));
 			score9 := if(le.st=le.aidwork_acecache.st,score,if(le.aidwork_acecache.st<>'',score+1,score-1));
 			score10 := if(le.zip=le.aidwork_acecache.zip5,score,if(le.aidwork_acecache.zip5<>'',score+1,score-1));
 			score11 := if(le.zip4=le.aidwork_acecache.zip4,score,if(le.aidwork_acecache.zip4<>'',score+1,score-1));
@@ -70,7 +70,7 @@ export macGetCleanAddr(origDatasetIn ,pRawAID ,phasAddFields='false' ,pDatasetOu
 		self.postdir		:= 	if(err_flg,le.aidwork_acecache.postdir,if(choose_address,le.aidwork_acecache.postdir,le.postdir));
 		self.unit_desig		:= 	if(err_flg,le.aidwork_acecache.unit_desig,if(choose_address,le.aidwork_acecache.unit_desig,le.unit_desig));
 		self.sec_range		:= 	if(err_flg,le.aidwork_acecache.sec_range,if(choose_address,le.aidwork_acecache.sec_range,le.sec_range));
-		self.city_name		:= 	if(err_flg,le.aidwork_acecache.p_city_name,if(choose_address,le.aidwork_acecache.p_city_name,le.city_name));
+		self.city_name		:= 	if(err_flg,le.aidwork_acecache.v_city_name,if(choose_address,le.aidwork_acecache.v_city_name,le.city_name));
 		self.st				:= 	if(err_flg,le.aidwork_acecache.st,if(choose_address,le.aidwork_acecache.st,le.st));
 		self.zip			:= 	if(err_flg,le.aidwork_acecache.zip5,if(choose_address,le.aidwork_acecache.zip5,le.zip));
 		self.zip4			:= 	if(err_flg,le.aidwork_acecache.zip4,if(choose_address,le.aidwork_acecache.zip4,le.zip4));

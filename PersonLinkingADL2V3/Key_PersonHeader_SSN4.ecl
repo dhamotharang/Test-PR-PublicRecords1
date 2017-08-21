@@ -37,7 +37,7 @@ layout := record // project out required fields
 END;
 s := Specificities(File_PersonHeader).Specificities[1];
 DataForKey0 := dedup(sort(table(h(SSN4 NOT IN SET(s.nulls_SSN4,SSN4),FNAME NOT IN SET(s.nulls_FNAME,FNAME)),layout),whole record,local),whole record,local); // Project out the fields in match candidates required for this linkpath
-export Key := index(DataForKey0,,ut.Data_Location.Person_header+'thor_data400::key::PersonLinkingADL2V3PersonHeaderSSN4Refs_' + doxie.version_superkey);
+export Key := index(DataForKey0,,PersonLinkingADL2V3.Filename_keys.kSSN4);
 export RawFetch( typeof(h.SSN4) param_SSN4, typeof(h.FNAME) param_FNAME, typeof(h.LNAME) param_LNAME) := 
     STEPPED( LIMIT( Key(
           ( SSN4 = param_SSN4 and param_SSN4 <> (typeof(SSN4))'' )

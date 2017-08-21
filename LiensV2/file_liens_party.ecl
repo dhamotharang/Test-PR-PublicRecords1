@@ -3,4 +3,4 @@ LiensV2.Layout_liens_party_ssn refLiensParty(LiensV2.layout_liens_party_ssn_BIPV
 	self := l;
 end;
 
-export file_liens_party := project(LiensV2.file_Liens_party_BIPV2, refLiensParty(left)) : persist('~thor_data400::Liens::party::PUID');
+export file_liens_party := project(LiensV2.file_Liens_party_BIPV2, refLiensParty(left));

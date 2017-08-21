@@ -1,0 +1,28 @@
+export layout_doc_co := RECORD , MAXLENGTH(500)
+String received_date;
+String ID; 
+String Name; 
+String FirstName; 
+String MiddleName; 
+String LastName; 
+String Suffix; 
+String DOB; 
+String Ethnicity; 
+String Gender; 
+String HairColor; 
+String EyeColor; 
+String Height; 
+String Weight; 
+String DOCNumber; 
+String EstParoleEligibilityDate; 
+String NextParoleHearingDate; 
+String EstMandatoryReleaseDate; 
+String EstSentenceDischargeDate; 
+String CurrentFacilityAssignment; 
+String SentenceDate; 
+String Sentence; 
+String County; 
+String CaseNumber; 
+String Offense; 
+String PhotoName; 
+END;

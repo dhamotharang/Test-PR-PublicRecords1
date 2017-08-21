@@ -38,8 +38,8 @@ EXPORT Scrub_Code (string filedate, boolean pUseProd = false) := MODULE
 				ErrorSummary,
 				EyeballSomeErrors,
 				SomeErrorValues,
-				SubmitStats,
-				mailfile
+				SubmitStats
+			//	mailfile Removed to receive orbit notification only. AP.
 			);
 
 			Return true;

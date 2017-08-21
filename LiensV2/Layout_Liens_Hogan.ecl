@@ -44,7 +44,7 @@ export Layout_Liens_Hogan := record
    string4  S341TIM;
    string5  CTYRESID;
    string2  STL_TYPE;
-   string1  VOL_INVOL;
+   string1  VOL_INVOL;		//	This field now represents and INSURANCE_RELATED_RECORD 0=FALSE, 1=TRUE
 	 string50 EMPLOYER_NAME;
    string50 court_desc;
    string50 filingtype_desc;

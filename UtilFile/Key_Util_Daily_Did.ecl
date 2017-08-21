@@ -1,10 +1,11 @@
-import doxie, ut, header_services;
+/*2016-12-09T01:00:14Z (Wendy Ma)
+
+*/
+import doxie, ut, header_services, Data_Services;
 
 daily := utilfile.daily_fdid((unsigned6)did<>0);
-
-header_services.Supplemental_Data.mac_verify('file_utility_inj.thor',Utilfile.Layout_DID_Out,read);
  
-utility_in := read();
+utility_in := utilfile.file_supplemental.out_supp;
 
 end_fdid := count(utilfile.daily_fdid);
 
@@ -38,8 +39,8 @@ ut.mac_suppress_by_phonetype(PhSuppressed1,phone,st,PhSuppressed2,true,did_temp)
 
 //Reformat back to the standard format layout of the Base search file 
 
-p := PROJECT(PhSuppressed2,transform(utilfile.Layout_DID_Out,self := left));
+p := PROJECT(PhSuppressed2,transform(utilfile.Layout_DID_Out, self.ssn := '', self := left));
 
 //************************************************************************************************************	
 
-export Key_Util_Daily_Did := INDEX(p,{unsigned6 s_did := (unsigned6)did},{p},ut.foreign_prod+'thor_data400::key::utility::daily.did_'+doxie.Version_SuperKey);
+export Key_Util_Daily_Did := INDEX(p,{unsigned6 s_did := (unsigned6)did},{p},Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::utility::daily.did_'+doxie.Version_SuperKey);

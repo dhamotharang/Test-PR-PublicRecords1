@@ -3,7 +3,7 @@ import ut, data_services, RoxieKeyBuild, Risk_Indicators;
 ///////// Total time for 100M recs - 8Mins
 
 #workunit('name','Inquiry Table Update Keys')
-#OPTION('AllowedClusters','thor400_92,thor400_84,thor400_72');
+#OPTION('AllowedClusters','thor400_92,thor400_84');
 
 rundate := ut.GetDate;
 

@@ -268,3 +268,5 @@ dDPHLNameKeysTableNormDedup	:= dedup(dDPHLNameKeysTableNormSort,St,City,DPH_LNam
 buildindex(dDPHLNameKeysTableNormDedup(St+City+DPH_LName+FName+MName+LName<>''),{St,City,DPH_LName,FName,MName,LName,
 								(big_endian unsigned8)__filepos},
 								lBaseKeyName + 'st.city.dph_lname.fname.mname.lname.key',moxie,overwrite);
+
+Drivers.Out_Moxie_Dev_FPos_Data_Key;

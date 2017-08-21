@@ -7,12 +7,13 @@ out_layout := record
 	unsigned1 did_score := 0;
 	string9	  ssn       := '';
 	string1   addr_type := '';
-    VotersV2.Layouts_Voters.Layout_Voters_Common;	
+  VotersV2.Layouts_Voters.Layout_Voters_Common_new;	
 end;
 															
-// Transform and Normalize the Mailing Addresses.
-// Skip the normalized mailing records that only has mailing city, st and zip populate and 
-// is equivalent to resident addr city, st and zip values.
+// Transform to Normalize the Mailing Addresses.
+// Skip's the normalized mailing records that only contain the mailing city, st and zip populate 
+// and are equivalent to resident addr city, st and zip values. or all mailing address parts are
+// blank.
 out_layout trfNormMailAddr(in_file l, unsigned c) := transform
 	 ,skip(c = 2 and
 	       trim(l.p_city_name,left,right) = trim(l.mail_p_city_name,left,right) and
@@ -60,9 +61,8 @@ end;
 
 // Normalize the Mailing Addresses 
 Clean_Addr_Norn_file  := NORMALIZE(in_file,
-								   if((trim(left.mail_p_city_name,left,right)  +
-	 							       trim(left.mail_st,left,right) +
-								       trim(left.mail_zip,left,right) = '')  or 
+								   if((trim(left.mail_p_city_name,left,right) + trim(left.mail_st,left,right) = '' and
+								       (integer)left.mail_ace_zip = 0)  or 
 								      (trim(left.prim_range,left,right)  = trim(left.mail_prim_range,left,right) and
 									   trim(left.predir,left,right)      = trim(left.mail_predir,left,right) and
 								       trim(left.prim_name,left,right)   = trim(left.mail_prim_name,left,right) and									   

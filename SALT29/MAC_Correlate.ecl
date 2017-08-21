@@ -10,17 +10,14 @@ EXPORT Data_Layout := RECORD
   END;
 	
 SHARED Field_Identification := MAC_Character_Counts.Field_Identification;
-
 SHARED Cor := RECORD
   UNSIGNED2 FldNo;
   SALT29.StrType FieldName;
 	REAL8 Weight;
   END;
-
 SHARED ResultLine_Layout := RECORD(Field_Identification)
   DATASET(Cor)    Relates {MAXCOUNT(MaxRel)} := DATASET([],Cor);
   END;
-
 // Data only comes in one way around (FldNo1 < FldNo2)
 EXPORT FN_Profile(DATASET(Data_Layout) TheData,DATASET(Field_Identification)TheFields) := FUNCTION
   IRec := RECORD
@@ -69,7 +66,7 @@ EXPORT FN_Profile(DATASET(Data_Layout) TheData,DATASET(Field_Identification)TheF
 	END;
 	T2 := TABLE(T1,FTR,FldNo1,FldNo2,FEW);
 	RR1 := RECORD
-	  STRING Fld1;
+	  SALT29.StrType Fld1;
 		UNSIGNED2 FldNo2;
 		REAL Corr;
 		END;
@@ -80,15 +77,14 @@ EXPORT FN_Profile(DATASET(Data_Layout) TheData,DATASET(Field_Identification)TheF
 	END;
 	J3 := JOIN(T2,TheFields,LEFT.FldNo1=RIGHT.FldNo,TR1(LEFT,RIGHT),LOOKUP);
 	RR2 := RECORD
-	  STRING Fld1;
-		STRING Fld2;
+	  SALT29.StrType Fld1;
+		SALT29.StrType Fld2;
 		REAL Corr;
   END;
 	J4 := JOIN(J3,TheFields,LEFT.FldNo2=RIGHT.FldNo,TRANSFORM(RR2,SELF.Fld2 := RIGHT.FieldName, SELF := LEFT),LOOKUP);
 	T5 := DISTRIBUTE(J4 + PROJECT(J4,TRANSFORM(RR2,SELF.Fld1:=LEFT.Fld2,SELF.Fld2:=LEFT.Fld1,SELF := LEFT)),HASH(Fld1));
-
 	Resl := RECORD
-	  STRING Fld2;
+	  SALT29.StrType Fld2;
 		REAL   Corr;
 		END;		
 	Resr := RECORD

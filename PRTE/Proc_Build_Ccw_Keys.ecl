@@ -66,10 +66,21 @@ export Proc_Build_Ccw_Keys(string pIndexVersion) := function
 	kKeyCcw__autokey__stname				:=	index(dKeyCcw__autokey__stname, {st,dph_lname,lname,pfname,fname,minit,yob,s4,zip,dob,states,lname1,lname2,lname3,city1,city2,city3,rel_fname1,rel_fname2,rel_fname3,lookups}, {dKeyCcw__autokey__stname}, '~prte::key::ccw::' + pIndexVersion + '::autokey::stname');																											
 	kKeyCcw__autokey__zip					:=	index(dKeyCcw__autokey__zip, {zip,dph_lname,lname,pfname,fname,minit,yob,s4,dob,states,lname1,lname2,lname3,city1,city2,city3,rel_fname1,rel_fname2,rel_fname3,lookups}, {dKeyCcw__autokey__zip}, '~prte::key::ccw::' + pIndexVersion + '::autokey::zip');
 	kKeyCcw__did						:=	index(dKeyCcw__did, {did_out6}, {dKeyCcw__did}, '~prte::key::ccw::' + pIndexVersion + '::did');
-	kKeyCcw__rid						:=	index(dKeyCcw__rid, {rid,persistent_record_id}, {dKeyCcw__rid}, '~prte::key::ccw::' + pIndexVersion + '::rid');
-	
-	
-	
+	// kKeyCcw__rid						:=	index(dKeyCcw__rid, {rid}, {dKeyCcw__rid}, '~prte::key::ccw::' + pIndexVersion + '::rid');
+  kKeyCcw__rid						:=	index(dKeyCcw__rid, {rid,persistent_record_id}, {dKeyCcw__rid}, '~prte::key::ccw::' + pIndexVersion + '::rid');
+
+//FCRA keys
+	kKeyCcw__autokey__address_fcra			:=	index(dKeyCcw__autokey__address, {prim_name,prim_range,st,city_code,zip,sec_range,dph_lname,lname,pfname,fname,states,lname1,lname2,lname3,lookups}, {dKeyCcw__autokey__address}, '~prte::key::ccw::fcra::' + pIndexVersion + '::autokey::address');																						
+	kKeyCcw__autokey__citystname_fcra		:=	index(dKeyCcw__autokey__citystname, {city_code,st,dph_lname,lname,pfname,fname,dob,states,lname1,lname2,lname3,city1,city2,city3,rel_fname1,rel_fname2,rel_fname3,lookups}, {dKeyCcw__autokey__citystname}, '~prte::key::ccw::fcra::' + pIndexVersion + '::autokey::citystname');																													
+	kKeyCcw__autokey__name_fcra					:=	index(dKeyCcw__autokey__name, {dph_lname,lname,pfname,fname,minit,yob,s4,dob,states,lname1,lname2,lname3,city1,city2,city3,rel_fname1,rel_fname2,rel_fname3,lookups}, {dKeyCcw__autokey__name}, '~prte::key::ccw::fcra::' + pIndexVersion + '::autokey::name');
+	kKeyCcw__autokey__payload_fcra			:=	index(dKeyCcw__autokey__payload, {fakeid}, {dKeyCcw__autokey__payload}, '~prte::key::ccw::fcra::' + pIndexVersion + '::autokey::payload');	
+	kKeyCcw__autokey__ssn2_fcra					:=	index(dKeyCcw__autokey__ssn2, {s1,s2,s3,s4,s5,s6,s7,s8,s9,dph_lname,pfname,did}, {dKeyCcw__autokey__ssn2}, '~prte::key::ccw::fcra::' + pIndexVersion + '::autokey::ssn2');
+	kKeyCcw__autokey__stname_fcra				:=	index(dKeyCcw__autokey__stname, {st,dph_lname,lname,pfname,fname,minit,yob,s4,zip,dob,states,lname1,lname2,lname3,city1,city2,city3,rel_fname1,rel_fname2,rel_fname3,lookups}, {dKeyCcw__autokey__stname}, '~prte::key::ccw::fcra::' + pIndexVersion + '::autokey::stname');																											
+	kKeyCcw__autokey__zip_fcra					:=	index(dKeyCcw__autokey__zip, {zip,dph_lname,lname,pfname,fname,minit,yob,s4,dob,states,lname1,lname2,lname3,city1,city2,city3,rel_fname1,rel_fname2,rel_fname3,lookups}, {dKeyCcw__autokey__zip}, '~prte::key::ccw::fcra::' + pIndexVersion + '::autokey::zip');
+	kKeyCcw__did_fcra										:=	index(dKeyCcw__did, {did_out6}, {dKeyCcw__did}, '~prte::key::ccw::fcra::' + pIndexVersion + '::did');
+	// kKeyCcw__rid_fcra										:=	index(dKeyCcw__rid, {rid}, {dKeyCcw__rid}, '~prte::key::ccw::fcra::' + pIndexVersion + '::rid');
+  kKeyCcw__rid_fcra					        	:=	index(dKeyCcw__rid, {rid,persistent_record_id}, {dKeyCcw__rid}, '~prte::key::ccw::fcra::' + pIndexVersion + '::rid');
+		
 	return	sequential(
 											parallel(																
 																build(kKeyCcw__autokey__address			, update),																
@@ -80,13 +91,30 @@ export Proc_Build_Ccw_Keys(string pIndexVersion) := function
 																build(kKeyCcw__autokey__stname			, update),																
 																build(kKeyCcw__autokey__zip					, update),																	
 																build(kKeyCcw__did						    	, update),
-																build(kKeyCcw__rid					    		, update)
+																build(kKeyCcw__rid					    		, update),
+																
+																build(kKeyCcw__autokey__address_fcra			, update),																
+																build(kKeyCcw__autokey__citystname_fcra		, update),																
+																build(kKeyCcw__autokey__name_fcra					, update),																
+																build(kKeyCcw__autokey__payload_fcra			, update),																
+																build(kKeyCcw__autokey__ssn2_fcra					, update),
+																build(kKeyCcw__autokey__stname_fcra				, update),																
+																build(kKeyCcw__autokey__zip_fcra					, update),																	
+																build(kKeyCcw__did_fcra						    		, update),
+																build(kKeyCcw__rid_fcra					    			, update)
 														),
 											PRTE.UpdateVersion('EmergesKeys',										//	Package name
 																				 pIndexVersion,												//	Package version
 																				 _control.MyInfo.EmailAddressNormal,	//	Who to email with specifics
 																				 'B',																	//	B = Boca, A = Alpharetta
 																				 'N',																	//	N = Non-FCRA, F = FCRA
+																				 'N'																	//	N = Do not also include boolean, Y = Include boolean, too
+																				),
+										 PRTE.UpdateVersion('FCRA_EmergesKeys',										//	Package name
+																				 pIndexVersion,												//	Package version
+																				 _control.MyInfo.EmailAddressNormal,	//	Who to email with specifics
+																				 'B',																	//	B = Boca, A = Alpharetta
+																				 'F',																	//	N = Non-FCRA, F = FCRA
 																				 'N'																	//	N = Do not also include boolean, Y = Include boolean, too
 																				)
 										 );

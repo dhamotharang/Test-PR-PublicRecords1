@@ -24,6 +24,7 @@ EXPORT Candidates := INDEX(prop_file,{POWID},{prop_file},CandidatesKeyName);
 // Build enough to support the debug services such as the compare service
 EXPORT BuildDebug := PARALLEL(Build_Specificities_Key, BUILDINDEX(Candidates, OVERWRITE));
 // Build Everything
-EXPORT BuildAll := PARALLEL(BuildDebug, PARALLEL(BUILDINDEX(MatchSample, OVERWRITE),BUILDINDEX(PatchedCandidates, OVERWRITE)));
+EXPORT BuildAll := PARALLEL(BuildDebug, PARALLEL(BUILDINDEX(MatchSample, OVERWRITE),BUILDINDEX(PatchedCandidates, OVERWRITE)),MatchHistory.BuildAll);
+EXPORT RelationshipKeys := BUILDINDEX(Candidates, OVERWRITE);
 END;
  

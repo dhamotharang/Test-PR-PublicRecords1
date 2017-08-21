@@ -1,0 +1,1 @@
+export MOXIE_CORP_MOUNT := '/corp_data2_74/';

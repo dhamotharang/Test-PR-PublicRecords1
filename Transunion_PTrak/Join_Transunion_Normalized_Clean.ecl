@@ -1,3 +1,4 @@
+import _validate;
 //-----------------------------------------------------------------
 //JOIN CLEAN NAMES and ADDRESSES TO MAIN OUTPUT FILE: join clean addresses, clean names, format dates, phone numbers and SSN
 //-----------------------------------------------------------------
@@ -5,9 +6,7 @@ EXPORT Join_Transunion_Normalized_Clean(STRING Full_filedate,STRING Update_filed
 
 Import ut;
 
-norm_data :=  IF(FileServices.GetSuperFileSubCount(SuperFileList.SourceFileFullIn) <> 0,
-										Transunion_PTrak.Normalize_Transunion_Name_Full + Transunion_PTrak.Normalize_Transunion_Update,
-										Transunion_PTrak.Normalize_Transunion_Update);
+norm_data := Transunion_PTrak.Normalize_Transunion_Update;
 
 //filter data with blank names, names = ',' or length 1
 
@@ -67,7 +66,8 @@ get_address := t_get_address + t_blank_address;
 										
 //-----------------------------------------------------------------
 //REFORMAT TO FINAL LAYOUT
-//-----------------------------------------------------------------										
+//-----------------------------------------------------------------		
+							
 invalid_prim_name := ['NONE','UNKNOWN','UNKNWN','UNKNOWEN','UNKNONW','UNKNON','UNKNWON','UNKONWN','UNEKNOWN','UN KNOWN','GENERAL DELIVERY'];
 
 Transunion_PTrak.Layout_Transunion_Out.LayoutTransunionBaseOut t_output_formatting (get_address L) := TRANSFORM
@@ -75,14 +75,15 @@ Transunion_PTrak.Layout_Transunion_Out.LayoutTransunionBaseOut t_output_formatti
 	 STRING28  v_prim_name 			:= L.CleanAddress[13..40];
 	 STRING5   v_zip       			:= L.CleanAddress[117..121];
 	 STRING4   v_zip4      			:= L.CleanAddress[122..125];
-	 STRING9   v_sss_unformatted  	:= IF(L.FileType = 'F', REGEXREPLACE('-',TRIM(L.SSNFirst5Digit,LEFT,RIGHT) + TRIM(L.SSNLast4Digit,LEFT,RIGHT),''), L.SSNFull);
-	 STRING7   v_phone_unformatted 	:= REGEXREPLACE('-',TRIM(L.TelephoneNumber,LEFT,RIGHT),'');
+	 STRING9   v_sss_unformatted  	:= IF(L.FileType = 'F', TRIM(StringLib.StringFindReplace(L.SSNFirst5Digit + L.SSNLast4Digit, '-',''), left, right), L.SSNFull);
+	 STRING7   v_phone_unformatted 	:= TRIM(StringLib.StringFindReplace(L.TelephoneNumber, '-',''), left, right);
 	 STRING8   v_dob_unformatted	:= L.CurrentName.Dob_YYYY + INTFORMAT((UNSIGNED1)L.CurrentName.Dob_MM, 2,1) + INTFORMAT((UNSIGNED1)L.CurrentName.Dob_DD, 2,1);
 	 
-	 
-	SELF.FileDate	 	:= IF(L.FileType = 'F', Full_filedate, Update_filedate);
-	SELF.dt_first_seen  := IF(L.FileType = 'F', (UNSIGNED)(Full_filedate[1..6] + '01'), (UNSIGNED)(Update_filedate[1..6] + '01'));
-	SELF.dt_last_seen  	:= IF(L.FileType = 'F', (UNSIGNED)(Full_filedate[1..6] + '01'), (UNSIGNED)(Update_filedate[1..6] + '01'));
+	SELF.FileDate	 	:= if(Full_filedate <> '',Full_filedate,Update_filedate);
+	SELF.dt_first_seen  := (unsigned) (L.COMPILATIONDATE[5..]+ L.COMPILATIONDATE[1..2] + L.COMPILATIONDATE[3..4]);
+	SELF.dt_last_seen  	:= (unsigned) (L.COMPILATIONDATE[5..]+ L.COMPILATIONDATE[1..2] + L.COMPILATIONDATE[3..4]);
+	SELF.dt_vendor_first_reported  := (unsigned) if(Full_filedate <> '',Full_filedate,Update_filedate) ;
+	SELF.dt_vendor_last_reported  	:= (unsigned) if(Full_filedate <> '',Full_filedate,Update_filedate) ;
 	SELF.title       	:= L.CleanName[ 1.. 5];
 	SELF.fname       	:= L.CleanName[ 6..25];
 	SELF.mname       	:= L.CleanName[26..45];
@@ -117,26 +118,20 @@ Transunion_PTrak.Layout_Transunion_Out.LayoutTransunionBaseOut t_output_formatti
 	SELF.err_stat    	:= L.CleanAddress[179..182];
 	
 	SELF.TRANSFERDATE_Unformatted 		:= Transunion_PTrak.FN_Date_Reformat_To_YYYYMMDD(L.TransferDate);
-	SELF.DEATHDATE_unformatted 			:= Transunion_PTrak.FN_Date_Reformat_To_YYYYMMDD(L.DateOfDeath);
-	SELF.BIRTHDATE_unformatted 	 		:= IF(REGEXFIND('^[[:digit:]]+$',v_dob_unformatted) =true ,v_dob_unformatted,'');
+	SELF.BIRTHDATE_unformatted 	 		:= IF((unsigned)_validate.date.fCorrectedDateString(v_dob_unformatted,false) > 0 ,_validate.date.fCorrectedDateString(v_dob_unformatted,false),'');
 	SELF.UPDATEDATE_unformatted 		:= Transunion_PTrak.FN_Date_Reformat_To_YYYYMMDD(L.NormAddress.UpdatedDate);
 	SELF.FILESINCEDATE_unformatted 		:= L.FILESINCEDATE[5..]+ L.FILESINCEDATE[1..2] + L.FILESINCEDATE[3..4];
 	SELF.COMPILATIONDATE_unformatted 	:= L.COMPILATIONDATE[5..]+ L.COMPILATIONDATE[1..2] + L.COMPILATIONDATE[3..4];
 	SELF.CONSUMERUPDATEDATE_unformatted := Transunion_PTrak.FN_Date_Reformat_To_YYYYMMDD(L.ConsumerUpdateDate); 
-	SELF.SSN_unformatted				:= IF(REGEXFIND('^[[:digit:]]+$',v_sss_unformatted) =true ,v_sss_unformatted,'');
-	SELF.TELEPHONE_unformatted			:= if(REGEXFIND('^[[:digit:]]+$',v_phone_unformatted) =true ,v_phone_unformatted,'');
+	SELF.SSN_unformatted				:= IF((unsigned) v_sss_unformatted > 0 ,v_sss_unformatted,'');
+	SELF.TELEPHONE_unformatted			:= if((unsigned) v_phone_unformatted > 0,v_phone_unformatted,'');
 	SELF.DECEASEDINDICATOR 				:= IF(L.CurrentName.DeathIndicator = 'DECEASED' OR L.Orig_DECEASEDINDICATOR = 'Y', 'Y', '');
+  SELF.DECEASEDDATE := if((unsigned) _validate.date.fCorrectedDateString(l.deceaseddate,false) > 0, _validate.date.fCorrectedDateString(l.deceaseddate,false),'') ,   
+	SELF.is_current := true;
 	SELF:= L ;
 END; 
 
-d_clean := project(get_address,t_output_formatting(LEFT));
-outputclean := output(d_clean,,'~thor_data400::in::transunionptrak_clean_normalized_' + Update_FileDate ,overwrite,__compressed__);
+d_clean := project(get_address,t_output_formatting(LEFT)) : persist('~thor_data400::persist::transunionptrak_clean_normalized');
 
-BuildNormalizedClean:= SEQUENTIAL(outputclean,
-FileServices.StartSuperFileTransaction(),
-FileServices.AddSuperFile('~thor_data400::in::transunionptrak_clean_normalized','~thor_data400::in::transunionptrak_clean_normalized_' + Update_FileDate),
-FileServices.FinishSuperFileTransaction()
-);
-
-RETURN BuildNormalizedClean;
+RETURN d_clean;
 END;

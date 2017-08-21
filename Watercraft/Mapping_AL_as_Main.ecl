@@ -84,10 +84,35 @@ county_reg(string2 code)
                 '66'  => 'WILCOX',
                 '67'  => 'WINSTON',
 
-				'' );   
+				'' ); 
 
+ds_water_old := watercraft.file_AL_clean_in_pre20090407;
+ds_water_new := watercraft.file_AL_clean_in;//new layout
 
-watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_AL_clean_in L) := transform
+ds_newlayout := record
+watercraft.Layout_al_clean_in_pre20090407;
+string20 engine_number;
+end;
+
+ds_newlayout new_format1(ds_water_old l) := transform
+self.engine_number := l.engine_num;
+self := l;
+end;
+
+ds_water_proj_old := project(ds_water_old, new_format1(left));
+
+ds_newlayout new_format2(ds_water_new l) := transform
+self.engine_number := l.engine_num;
+self := l;
+end;
+
+ds_water_proj_new := project(ds_water_new, new_format2(left));
+
+ds_water_concat := ds_water_proj_old + ds_water_proj_new;
+
+Watercraft.Macro_Clean_Hull_ID(ds_water_concat, ds_newlayout,hull_clean_in)
+
+watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := transform
 
 
     self.watercraft_key						:=	(trim(L.HULL_ID, left, right) + trim(L.DECAL_NUMBER, left, right) + trim(L.MAKE, left, right) + trim(L.YEAR, left, right))[1..30];
@@ -130,7 +155,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_AL_cl
 	self.watercraft_hp_1					:=	L.ENGINE_HP;
 	self.watercraft_hp_2					:=	'';
 	self.watercraft_hp_3					:=	'';
-	self.engine_number_1					:=	L.ENGINE_NUM;
+	self.engine_number_1					:=	L.ENGINE_NUMBER;
 	self.engine_number_2					:=	'';
 	self.engine_number_3					:=	'';
 	self.engine_make_1						:=	L.ENGINE_MAKE;
@@ -191,5 +216,5 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_AL_cl
 
 
 
-export Mapping_AL_as_Main := project(watercraft.file_AL_clean_in, main_mapping_format(left));
+export Mapping_AL_as_Main := project(hull_clean_in, main_mapping_format(left));
 

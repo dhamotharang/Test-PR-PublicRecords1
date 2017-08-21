@@ -7,16 +7,6 @@ export Out_File_Premium_Plus_Entity_Stats_Population (string filedate) := functi
 	
 //MAIN FILE//////////////////////////////////////////////////////////////////////	
 	//Flatten MAIN File
-	layout_aliases := RECORD
-		string type{xpath('Type')};
-		string category{xpath('Category')};
-		unicode first_name{xpath('First_Name')};
-		unicode middle_name{xpath('Middle_Name')};
-		unicode last_name{xpath('Last_Name')};
-		unicode generation{xpath('Generation')};
-		unicode full_name{xpath('Full_Name')};
-		string comments{xpath('Comments')};
-	   END;
 
 	aka_rollup := RECORD
 	   string id;
@@ -88,7 +78,7 @@ export Out_File_Premium_Plus_Entity_Stats_Population (string filedate) := functi
 	  string middle_name{xpath('Middle_Name')};
 	  string last_name{xpath('Last_Name')};
 	  string generation{xpath('Generation')};
-	  string full_name{xpath('Full_Name')};
+	  unicode full_name{xpath('Full_Name')};
 	  string gender{xpath('Gender')};
 	  string listed_date{xpath('Listed_Date')};
 	  string entity_added_by{xpath('Entity_Added_By')};
@@ -126,6 +116,7 @@ dsMain := dataset('~thor_200::persist::worldcheck::premium_plus_mapping_dedup', 
 	
 	dsMainFlatLayout dsMainFlatFix(dsMain l):= transform
 		self.category 	:= trim(l.comments[stringlib.stringfind(l.comments, 'Category:', 1)+10..(stringlib.stringfind(l.comments, 'Category:', 1) + stringlib.stringfind(l.comments[stringlib.stringfind(l.comments, 'Category:', 1)..length(l.comments)], '||', 1)-2)], left, right); 
+		self.full_name := (string)l.full_name;
 		self 			:= l;
 	end;
 	
@@ -157,13 +148,13 @@ dsMain := dataset('~thor_200::persist::worldcheck::premium_plus_mapping_dedup', 
 //COMPANIES//////////////////////////////////////////////////////////////////////
 	
 	dsNormCompanyLayout := RECORD
-	//,maxLength(100000)
+	,maxLength(100000)
 	  string uid;
 	  string last_name;
 	  string first_name;
-	  string aliases;
-	  string low_quality_aliases;
-	  string alternate_spelling;
+	  unicode aliases;
+	  unicode low_quality_aliases;
+	  unicode alternate_spelling;
 	  string category;
 	  string title;
 	  string sub_category;
@@ -198,9 +189,9 @@ dsMain := dataset('~thor_200::persist::worldcheck::premium_plus_mapping_dedup', 
 	  string uid;
 	  string last_name;
 	  string first_name;
-	  string aliases;
-	  string low_quality_aliases;
-	  string alternate_spelling;
+	  unicode aliases;
+	  unicode low_quality_aliases;
+	  unicode alternate_spelling;
 	  string category;
 	  string title;
 	  string sub_category;
@@ -266,13 +257,13 @@ dsMain := dataset('~thor_200::persist::worldcheck::premium_plus_mapping_dedup', 
 //LINK TOS//////////////////////////////////////////////////////////////////////
 	
 	dsNormLinkTosLayout := RECORD
-	//,maxLength(100000)
+	,maxLength(100000)
 	  string uid;
 	  string last_name;
 	  string first_name;
-	  string aliases;
-	  string low_quality_aliases;
-	  string alternate_spelling;
+	  unicode aliases;
+	  unicode low_quality_aliases;
+	  unicode alternate_spelling;
 	  string category;
 	  string title;
 	  string sub_category;
@@ -303,13 +294,13 @@ dsMain := dataset('~thor_200::persist::worldcheck::premium_plus_mapping_dedup', 
 	dsNormLinkTos := dataset('~thor_200::persist::worldcheck::norm_linktos', dsNormLinkTosLayout, flat);
 
 	dsOneLinkTosLayout := RECORD
-	,maxLength(131072)
+	//,maxLength(131072)
 	  string uid;
 	  string last_name;
 	  string first_name;
-	  string aliases;
-	  string low_quality_aliases;
-	  string alternate_spelling;
+	  unicode aliases;
+	  unicode low_quality_aliases;
+	  unicode alternate_spelling;
 	  string category;
 	  string title;
 	  string sub_category;
@@ -630,13 +621,13 @@ dsMain := dataset('~thor_200::persist::worldcheck::premium_plus_mapping_dedup', 
 //KEYWORDS//////////////////////////////////////////////////////////////////////
 
 	 dsLayoutKeywords := RECORD
-		//,maxLength(100000)
+		,maxLength(100000)
 		  string uid;
 		  string last_name;
 		  string first_name;
-		  string aliases;
-		  string low_quality_aliases;
-		  string alternate_spelling;
+		  unicode aliases;
+		  unicode low_quality_aliases;
+		  unicode alternate_spelling;
 		  string category;
 		  string title;
 		  string sub_category;

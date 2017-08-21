@@ -1,11 +1,11 @@
-import ut;
+import ut,address;
 
 norm_addr := ExperianCred.Normalize_Address;
 cache_addr := distribute(ExperianCred.Files.Cashed_Address_File, 
-			  hash(Orig_Prim_Range, Orig_Predir, Orig_Prim_Name, Orig_Addr_Suffix, Orig_Postdir, Orig_Unit_Desig, Orig_Sec_Range, Orig_City, Orig_State, Orig_ZipCode)); 
+			  hash(Orig_Prim_Range, Orig_Predir, Orig_Prim_Name, Orig_Addr_Suffix, Orig_Postdir, Orig_Unit_Desig, Orig_Sec_Range, Orig_City, Orig_State, Orig_ZipCode)) :INDEPENDENT; 
 
 d_addresses:= distribute(norm_addr,
-			  hash(Orig_Prim_Range, Orig_Predir, Orig_Prim_Name, Orig_Addr_Suffix, Orig_Postdir, Orig_Unit_Desig, Orig_Sec_Range, Orig_City, Orig_State, Orig_ZipCode)); 
+			  hash(Orig_Prim_Range, Orig_Predir, Orig_Prim_Name, Orig_Addr_Suffix, Orig_Postdir, Orig_Unit_Desig, Orig_Sec_Range, Orig_City, Orig_State, Orig_ZipCode))  :INDEPENDENT; 
 
 dedup_addr := dedup(sort(d_addresses,Orig_Prim_Range, Orig_Predir, Orig_Prim_Name, Orig_Addr_Suffix, Orig_Postdir, Orig_Unit_Desig, Orig_Sec_Range, Orig_City, Orig_State, Orig_ZipCode,LOCAL),
 								     Orig_Prim_Range, Orig_Predir, Orig_Prim_Name, Orig_Addr_Suffix, Orig_Postdir, Orig_Unit_Desig, Orig_Sec_Range, Orig_City, Orig_State, Orig_ZipCode, LOCAL) ; 
@@ -43,7 +43,7 @@ ExperianCred.Layouts.Layout_Clean_Address t_clean_address (addr_to_clean le) := 
 	Address1 :=  StringLib.StringCleanSpaces(le.Orig_Prim_Range + ' ' + le.Orig_Predir + ' ' + le.Orig_Prim_Name + ' ' + le.Orig_Addr_Suffix + ' ' + le.Orig_Postdir);
 	Address2 :=  StringLib.StringCleanSpaces(le.Orig_Unit_Desig + ' ' + le.Orig_Sec_Range);
 	
-	SELF.Clean_Address := addrcleanlib.CleanAddress182(Address1 + ' ' + Address2, le.Orig_City + ' ' + le.Orig_State + ' ' + le.Orig_ZipCode);
+	SELF.Clean_Address := address.CleanAddress182(Address1 + ' ' + Address2, le.Orig_City + ' ' + le.Orig_State + ' ' + le.Orig_ZipCode);
 	SELF := le;
 END;
 

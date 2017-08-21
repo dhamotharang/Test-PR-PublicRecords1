@@ -7,7 +7,7 @@ export key_override_watercraft := MODULE
   shared keyname_prefix := data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::watercraft::qa::';
 
   // SID
-  sid_rec := record
+  export sid_rec := record
 	  string20 flag_file_id;
     recordof (watercraft.key_watercraft_sid (true));
   end;

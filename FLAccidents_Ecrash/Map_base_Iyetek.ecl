@@ -474,10 +474,10 @@ eAcc_all := appndDID2 + eAcc_allothers :  persist('~thor_data400::persist::iyete
 
 sfShuffle := sequential(
 	fileservices.addsuperfile('~thor_data400::base::iyetek_metadata_delete','~thor_data400::base::iyetek_metadata_grandfather',0,true),
+		fileservices.clearsuperfile('~thor_data400::base::iyetek_metadata_grandfather'),
 	fileservices.deletesuperfile('~thor_data400::base::iyetek_metadata_delete',true),
 	fileservices.startsuperfiletransaction(),
 	fileservices.createsuperfile('~thor_data400::base::iyetek_metadata_delete'),
-	fileservices.clearsuperfile('~thor_data400::base::iyetek_metadata_grandfather'),
 	fileservices.addsuperfile('~thor_data400::base::iyetek_metadata_grandfather','~thor_data400::base::iyetek_metadata_father',0,true),
 	fileservices.clearsuperfile('~thor_data400::base::iyetek_metadata_father'),
 	fileservices.addsuperfile('~thor_data400::base::iyetek_metadata_father','~thor_data400::base::iyetek_metadata',0,true),

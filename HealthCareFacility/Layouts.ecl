@@ -569,6 +569,14 @@ EXPORT Layouts := MODULE
 		string1 oig_flag;
 		string10 sanc1_date;
 		string10 sanc1_code;
+		string10 medicare_fac_num1;
+		string2 clia_status_code;
+		string10 clia_num;
+		string10 clia_end_date;
+		string1 clia_cert_type_code;
+		string10 clia_cert_eff_date;
+		string7 ncpdp_id;
+		string10 tin1;
 		unsigned6 pid;
 		string2 src;
 		unsigned4 dt_vendor_first_reported;
@@ -586,6 +594,8 @@ EXPORT Layouts := MODULE
 		unsigned4 clean_sanc1_date;
 		unsigned4 clean_dea_num_exp;
 		string100 clean_company_name;
+		unsigned4 clean_clia_end_date;
+		unsigned4 clean_clia_cert_eff_date;
 		string1 normed_addr_rec_type;
 		string50 prepped_addr1;
 		string39 prepped_addr2;

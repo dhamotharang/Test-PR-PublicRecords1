@@ -7,7 +7,7 @@ export Gong_Weekly := MACRO
 
 output(choosen(gong.key_did,10));
 output(choosen(gong.key_hhid,10));
-output(choosen(gong.key_address,10));
+//output(choosen(gong.key_address,10));
 output(choosen(doxie_cbrs.key_phone_gong,10));
 
 output(choosen(DayBatchEda.Key_gong_phone,10));

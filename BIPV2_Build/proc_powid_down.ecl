@@ -31,9 +31,14 @@ EXPORT proc_powid_down(
 		,BIPv2_Files.files_powid_down.updateBuilding(f_init)
 	);
 	SHARED ds_lgid3 := BIPV2_Files.files_lgid3.DS_BASE;
+
+  export kick_copy2_storage_thor  := BIPV2_Tools.Copy2_Storage_Thor('~' + nothor(std.file.superfilecontents(BIPV2_Files.files_lgid3.FILE_BASE)[1].name) ,bipv2.KeySuffix ,'powid_down_preprocess');
+  export copy2StorageThor         := if(not wk_ut._constants.IsDev ,output(kick_copy2_storage_thor ,named('copy2_Storage_Thor__html')));  //copy orig file to storage thor
+
 	EXPORT initFromLGID3 := sequential(
-     init(ds_lgid3, TRUE)
-    ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(BIPV2_Files.files_lgid3.FILE_BASE)[1].name)  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
+      init(ds_lgid3, TRUE)
+     ,copy2StorageThor
+    // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(BIPV2_Files.files_lgid3.FILE_BASE)[1].name)  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
   ); // HACK - preserve id values someday
 	
 	/* ---------------------- SALT Specificities ------------------------- */
@@ -58,7 +63,7 @@ EXPORT proc_powid_down(
 	/* ---------------------- Take Action -------------------------------- */
 	export runSpecBuild := sequential(specBuild, specDebug);
 	
-	export runIter := sequential(linking, outputReviewSamples/*, updateBuilding(), updateLinkHist*/)
+	export runIter := sequential(linking, outputReviewSamples, updateBuilding(), updateLinkHist)
 		: SUCCESS(mod_email.SendSuccessEmail(,'BIPv2', , 'POWID_Down')),
 			FAILURE(mod_email.SendFailureEmail(,'BIPv2', failmessage, 'POWID_Down'));
 	

@@ -10,3 +10,4 @@ clean_f := project(infile, transform(inquiry_acclogs.Layout.Common_ThorAdditions
 																	
 return clean_f;
 end;
+

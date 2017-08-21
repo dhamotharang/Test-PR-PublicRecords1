@@ -2,7 +2,7 @@ IMPORT ut,SALT35;
 EXPORT hygiene(dataset(layout_BASE) h) := MODULE
  
 //A simple summary record
-EXPORT Summary(SALT35.Str30Type txt,BOOLEAN Glob=TRUE) := FUNCTION
+EXPORT Summary(SALT35.Str30Type txt,BOOLEAN Glob=TRUE) := FUNCTION 
   SummaryLayout := RECORD
     txt;
     Source := MAX(GROUP,h.source);    NumberOfRecords := COUNT(GROUP);

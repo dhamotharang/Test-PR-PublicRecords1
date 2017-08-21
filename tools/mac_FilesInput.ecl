@@ -34,6 +34,7 @@ export mac_FilesInput(pfilenameversions
 													, pShouldAddVirtualFilename = 'false'
 													, pUnicode		= 'false'
 													, pFilter			= '\'\''
+													, pNoTrim 		= 'false'
 ) :=
 macro
 #uniquename(lfilter)
@@ -85,6 +86,7 @@ macro
 																						,heading(pHeading)
 																						,maxlength(pMaxLength)
 																						#if(pUnicode) ,UNICODE #end
+																						#if(pNoTrim ) ,NOTRIM  #end
 																						) #if(pOpt) ,opt #end)
 																						#if(%'lfilter'% != '') ( %lfilter% ) #END;
 		export Root									:= fDataset(pfilenameversions.Root);

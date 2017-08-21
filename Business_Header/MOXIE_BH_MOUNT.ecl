@@ -1,1 +1,1 @@
-export MOXIE_BH_MOUNT := '/bus_hdr_16/';
+export MOXIE_BH_MOUNT := '/bus_hdr_14/';

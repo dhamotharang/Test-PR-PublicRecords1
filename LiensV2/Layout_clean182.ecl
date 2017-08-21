@@ -2,33 +2,33 @@ export Layout_clean182 := module
 
 export clean_debtor_addr := record
 
-string10  			clean_debtor_prim_range		;
-string2  			clean_debtor_predir			;
-string28 			clean_debtor_prim_name		;
-string4   			clean_debtor_addr_suffix	    ;
-string2  			clean_debtor_postdir			;
-string10  			clean_debtor_unit_desig		;
-string8   			clean_debtor_sec_range		;
-string25 			clean_debtor_p_city_name	    ;
-string25 			clean_debtor_v_city_name	    ;
-string2  			clean_debtor_st				;
-string5  			clean_debtor_zip			    ;
-string4  			clean_debtor_zip4			    ;
-string4  			clean_debtor_cart				;
-string1  			clean_debtor_cr_sort_sz		;
-string4   			clean_debtor_lot				;
-string1  			clean_debtor_lot_order	    ;
-string2  			clean_debtor_dpbc			  	;
-string1  			clean_debtor_chk_digit	    ;
-string2  			clean_debtor_record_type		;
-string2  			clean_debtor_ace_fips_st		;
-string3  			clean_debtor_fipscounty	    ;
-string10 			clean_debtor_geo_lat			;
-string11 			clean_debtor_geo_long			;
-string4 			clean_debtor_msa				;
+string10  			clean_debtor_prim_range	:= ''	;
+string2  			clean_debtor_predir		:= ''	;
+string28 			clean_debtor_prim_name	:= ''	;
+string4   			clean_debtor_addr_suffix	:= ''    ;
+string2  			clean_debtor_postdir	:= ''		;
+string10  			clean_debtor_unit_desig	:= ''	;
+string8   			clean_debtor_sec_range	:= ''	;
+string25 			clean_debtor_p_city_name:= ''	    ;
+string25 			clean_debtor_v_city_name:= ''	    ;
+string2  			clean_debtor_st		:= ''		;
+string5  			clean_debtor_zip	:= ''		    ;
+string4  			clean_debtor_zip4	:= ''		    ;
+string4  			clean_debtor_cart		:= ''		;
+string1  			clean_debtor_cr_sort_sz	:= ''	;
+string4   			clean_debtor_lot		:= ''		;
+string1  			clean_debtor_lot_order	 := ''   ;
+string2  			clean_debtor_dpbc		:= ''	  	;
+string1  			clean_debtor_chk_digit	 := ''   ;
+string2  			clean_debtor_record_type:= ''		;
+string2  			clean_debtor_ace_fips_st	:= ''	;
+string3  			clean_debtor_fipscounty	 := ''  ;
+string10 			clean_debtor_geo_lat	:= ''		;
+string11 			clean_debtor_geo_long	:= ''		;
+string4 			clean_debtor_msa		:= ''		;
 //string7             clean_debtor_geo_blk        ;
-string1  			clean_debtor_geo_match	    ;
-string4  			clean_debtor_err_stat			;
+string1  			clean_debtor_geo_match	 := ''   ;
+string4  			clean_debtor_err_stat	:= ''		;
 
 end;
 

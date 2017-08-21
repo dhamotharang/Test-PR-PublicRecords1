@@ -51,7 +51,7 @@ export Convert_Corp2_Func(DATASET(Layout_Corporate_Direct_Corp_Base_keyed)ds) :=
 		{7,0,l.corp_fax_nbr},
 		{8,0,l.corp_email_address},
 		{9,0,l.corp_web_address},
-		{10,0,l.corp_filing_date},
+		{10,0,l.corp_filing_date + '; ' + l.corp_inc_date},
 		{11,0,l.corp_filing_desc},
 		
 //		{12,0,l.},  <--------------------
@@ -66,21 +66,16 @@ export Convert_Corp2_Func(DATASET(Layout_Corporate_Direct_Corp_Base_keyed)ds) :=
 		{19,0,l.corp_inc_county},
 		{20,0,l.corp_inc_date},
 		
-		{21,0,l.corp_fed_tax_id},
-		{22,0,l.corp_state_tax_id},
-		
-		
-
-		{23,0,l.corp_term_exist_exp},
-
-		
-		{24,0,l.corp_term_exist_desc},		
+		{21,0,l.corp_fed_tax_id + '; ' + l.corp_forgn_fed_tax_id},
+    {22,0,l.corp_state_tax_id + '; ' + l.corp_forgn_state_tax_id},
+    {23,0,l.corp_term_exist_exp + '; ' + l.corp_forgn_term_exist_exp},
+    {24,0,l.corp_term_exist_desc + '; ' + l.corp_forgn_term_exist_desc},
 		{25,0,l.corp_forgn_date},
 		
 		{26,0,l.corp_orig_org_structure_desc},
 		{27,0,l.corp_sic_code},		
 		{28,0,l.corp_naic_code},
-		{29,0,l.corp_orig_bus_type_desc},
+		{29,0,l.corp_orig_bus_type_desc + ';' + l.corp_orig_org_structure_desc},
 		{30,0,l.corp_certificate_nbr},
 		{31,0,l.corp_internal_nbr},
 		{32,0,l.corp_previous_nbr},
@@ -151,7 +146,7 @@ export Convert_Corp2_Func(DATASET(Layout_Corporate_Direct_Corp_Base_keyed)ds) :=
 		{84,0,l.corp_ra_phone_number},
 		
 		{85,0,l.corp_filing_date},
-		{85,0,l.corp_filing_desc},	
+		//{85,0,l.corp_filing_desc},	
 		{85,0,l.corp_inc_date},	
 		{85,0,l.corp_term_exist_exp},
 		{85,0,l.corp_forgn_date},
@@ -161,7 +156,7 @@ export Convert_Corp2_Func(DATASET(Layout_Corporate_Direct_Corp_Base_keyed)ds) :=
 
 
 		{86,0,l.corp_status_desc},		
-		{86,0,l.corp_status_comment},
+		//{86,0,l.corp_status_comment},
 		
 		{87,0,l.corp_fed_tax_id},
 		{87,0,l.corp_state_tax_id},
@@ -172,7 +167,10 @@ export Convert_Corp2_Func(DATASET(Layout_Corporate_Direct_Corp_Base_keyed)ds) :=
 		{87,0,l.corp_internal_nbr},
 		{87,0,l.corp_previous_nbr},
 		{87,0,l.corp_ra_fein},
-		{87,0,l.corp_ra_ssn}
+		{87,0,l.corp_ra_ssn},
+		{87,0,l.corp_sos_charter_nbr},
+		{89,0,l.corp_state_origin},
+		{249,0,l.corp_process_date}
 		
 
 //vesa: doxie_build.key_prep_Vehicles

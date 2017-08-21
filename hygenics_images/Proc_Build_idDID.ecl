@@ -1,7 +1,7 @@
-import crim_common, hygenics_crim, images;
+import crim_common, hygenics_crim, images, corrections, ut;
 
 //Base Offender File
-ds 	:= dataset(Crim_Common.Name_Moxie_Crim_Offender2_Dev +'_new', hygenics_crim.Layout_Common_Crim_Offender_new, flat)(trim(image_link,left,right) <> '');
+ds 	:= dataset('~thor_data400::base::corrections_offenders_public', corrections.layout_offender, flat)(trim(image_link,left,right) <> '');
 
 //Crim Records
 /*
@@ -20,10 +20,10 @@ ds 	:= dataset(Crim_Common.Name_Moxie_Crim_Offender2_Dev +'_new', hygenics_crim.
 	DOCFiles := ds(data_type='1');
 
 	Layout_idDID stripPublicDOCs(DOCFiles L) := TRANSFORM
-		SELF.state 	:= L.state_origin;
+		SELF.state 	:= ut.st2abbrev(stringlib.stringtouppercase(l.orig_state));
 		SELF.rtype 	:= 'DC';
-		SELF.id 	:= L.offender_key;
-		SELF.did 	:= (unsigned)L.did;
+		SELF.id 		:= L.offender_key;
+		SELF.did 		:= (unsigned)L.did;
 	END;
 	
 	justDOCid := PROJECT(DOCFiles, stripPublicDOCs(LEFT));
@@ -32,15 +32,15 @@ ds 	:= dataset(Crim_Common.Name_Moxie_Crim_Offender2_Dev +'_new', hygenics_crim.
 	ArrestFiles := ds(data_type='5');
 
 	Layout_idDID strip_PublicARRESTs(ArrestFiles L) := transform
-		self.state 	:= L.state_origin; 
+		self.state 	:= ut.st2abbrev(stringlib.stringtouppercase(l.orig_state));
 		self.rtype 	:= 'AL';
-		self.id 	:= L.offender_key;
-		self.did 	:= (unsigned)L.did;
+		self.id 		:= L.offender_key;
+		self.did 		:= (unsigned)L.did;
 	end;
 
-	JustARRESTid := project(ArrestFiles, strip_PublicARRESTs(LEFT));
+	JustARRESTid 	:= project(ArrestFiles, strip_PublicARRESTs(LEFT));
 
-	noBlankDIDs := (justDOCid + justARRESTid)(did != 0);
-	allids 		:= DEDUP(noBlankDIDs, ALL);
+	noBlankDIDs 	:= (justDOCid + justARRESTid)(did != 0);
+	allids 				:= DEDUP(noBlankDIDs, ALL);
 
 export proc_build_idDID := allids : persist('~criminal_images::idDID');

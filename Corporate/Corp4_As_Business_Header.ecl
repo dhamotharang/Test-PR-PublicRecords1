@@ -34,7 +34,7 @@ Corp4_RA_Addr := File_Corp4_Base(not(
                               (suppress_ra_addr='Y' AND
                                ra_officer_also='Y' AND
                                (Datalib.CompanyClean(reg_agent_name))[41..120] = '' AND
-                                (integer)((addrcleanlib.cleanPerson73(reg_agent_name))[71..73]) >= 85
+                                (integer)((address.cleanPerson73(reg_agent_name))[71..73]) >= 85
                                ))) : PERSIST('TMTEMP::Corp_Companies_RA');
 
 Corp4_Blank_Addr := project(Corp4_RA_Addr, BlankCorpAddress(left));
@@ -45,7 +45,7 @@ Corp4_Init := File_Corp4_Base(stringlib.stringfind(abbrev_legal_name, '000000000
                               (suppress_ra_addr='Y' AND
                                ra_officer_also='Y' AND
                                (Datalib.CompanyClean(reg_agent_name))[41..120] = '' AND
-                                (integer)((addrcleanlib.cleanPerson73(reg_agent_name))[71..73]) >= 85
+                                (integer)((address.cleanPerson73(reg_agent_name))[71..73]) >= 85
                                ));
 
 Corp4_Clean := Corp4_Init + Corp4_Blank_Addr;

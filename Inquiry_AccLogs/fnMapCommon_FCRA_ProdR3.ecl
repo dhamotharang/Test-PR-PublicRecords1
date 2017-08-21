@@ -12,8 +12,8 @@ NullSet := inquiry_acclogs.fncleanfunctions.nullset;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-InputFile := choosen(Inquiry_acclogs.File_FCRA_ProdR3_Logs
-																,IF(n > 0, n, choosen:ALL));
+InputFile := dedup(choosen(Inquiry_acclogs.File_FCRA_ProdR3_Logs
+																,IF(n > 0, n, choosen:ALL)), record, all);
 
 inquiry_acclogs.fncleanfunctions.cleanfields(InputFile, cleaned_fields);
 Inquiry_AccLogs.File_MBSApp(cleaned_fields, 'BATCHR3', 'Y', outfileBatchR3); 
@@ -106,7 +106,7 @@ clean_out :=  PROJECT(NormFiles,
 return clean_out;
 end;
 
-export ready_File(dataset(inquiry_acclogs.layout_in_common) AppendForward, string select_source = 'BATCHR3') := function
+export ready_File(dataset(inquiry_acclogs.layout_in_common) AppendForward, string select_source = 'BATCHR3', boolean ReAppendDay) := function
 
 person_project := project(AppendForward(domain_name + clean_cname1 + ucc_number + ein + charter_number = '' and source_file = select_source), 
 		transform(inquiry_acclogs.Layout.Common,
@@ -122,6 +122,7 @@ person_project := project(AppendForward(domain_name + clean_cname1 + ucc_number 
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
+			self.bus_intel.Use := left.use;
 			
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
@@ -206,6 +207,7 @@ bus_project := project(AppendForward(domain_name + clean_cname1 + ucc_number + e
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
+			self.bus_intel.Use := left.use;
 			
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
@@ -262,8 +264,6 @@ prev_base_trans := project(prev_base, transform({inquiry_acclogs.Layout.Common, 
 inquiry_acclogs.file_MBSApp_Base().FCRA_Append(prev_base_trans,prev_base_mbs);
 
 prev_base_ready := project(prev_base_mbs, transform(inquiry_acclogs.Layout.Common, self := left));
-
-ReAppendDay := stringlib.stringtolowercase(ut.Weekday((unsigned8)ut.getdate)) in ['friday'];
 
 newFile := if(ReAppendDay, 
 							dedup(sort(distribute(person_project + bus_project + prev_base_ready, 

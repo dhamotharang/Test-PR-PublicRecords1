@@ -10,10 +10,20 @@ IMPORT doxie, Data_Services;
 																SELF.response_data := L.response_data;
 																SELF := L;
 END;
-																
-InpFile1 := PROJECT(InstantID_Archiving.Files_Base.InstantID_Report, trInFile(LEFT, 'INSTANTID')); 
+
+
+		
+//  THE KEY IS NOW BUILT DIRECTLY FROM A BASE FILE, INSTEAD OF FROM THE INPUT FILE.		
+
+/*InpFile1 := PROJECT(InstantID_Archiving.Files_Base.InstantID_Report, trInFile(LEFT, 'INSTANTID')); 
 InpFile2 := PROJECT(InstantID_Archiving.Files_Base.InstantIDi_Report, trInFile(LEFT, 'INSTANTID INTERNATIONAL')); 
-InpFile3 := PROJECT(InstantID_Archiving.Files_Base.FlexID_Report, trInFile(LEFT, 'FLEXID')); 
+InpFile3 := PROJECT(InstantID_Archiving.Files_Base.FlexID_Report, trInFile(LEFT, 'FLEXID'));*/
+InstantID_Report_base   := InstantID_Archiving.Files.InstantID_Report_base;
+InstantIDi_Report_base  := InstantID_Archiving.Files.InstantIDi_Report_base;
+FlexID_Report_base		  := InstantID_Archiving.Files.FlexID_Report_base;
+InpFile1 := PROJECT(InstantID_Report_base, trInFile(LEFT, 'INSTANTID')); 
+InpFile2 := PROJECT(InstantIDi_Report_base, trInFile(LEFT, 'INSTANTID INTERNATIONAL')); 
+InpFile3 := PROJECT(FlexID_Report_base, trInFile(LEFT, 'FLEXID'));
 InpFile4 := PROJECT(InstantID_Archiving.Files_Batch.InstantID_Report, trInFile(LEFT, 'INSTANTID')); 
 InpFile5 := PROJECT(InstantID_Archiving.Files_Batch.FlexID_Report, trInFile(LEFT, 'FLEXID')); 
 
@@ -23,7 +33,7 @@ InpFile := InpFile1 + InpFile2 + InpFile3 + InpFile4 + InpFile5;
 
 DstFile := DISTRIBUTE(InpFile, HASH(transaction_ID, product, date_added));
 
-SrtFile := SORT(DstFile, transaction_ID, product, date_added, LOCAL);
+SrtFile := SORT(DstFile, RECORD, LOCAL);
 
 shared DdpFile := DEDUP(SrtFile, RECORD, LOCAL);
 

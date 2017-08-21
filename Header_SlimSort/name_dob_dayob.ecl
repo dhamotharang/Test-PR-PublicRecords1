@@ -306,8 +306,10 @@ m6 := join(m5,g2tab,left.fname = right.fname and
 			  
 final0 := m2d + m4d + m6;
 
+alphinit2(qstring1 f, qstring1 l) := if(f < l, f + l, l + f);
+
 final0 strip_probationary_and_add_alphinit(final0 L, header_slimsort.Table_DID_OnProbation R) := transform
-	self.alphinit := ut.alphinit2(L.fname[1],l.lname[1]);
+	self.alphinit := alphinit2(L.fname[1],l.lname[1]);
 	self := L;
 end;
 

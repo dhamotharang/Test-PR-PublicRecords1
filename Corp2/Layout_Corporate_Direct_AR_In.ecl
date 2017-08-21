@@ -13,7 +13,7 @@ string8   ar_mailed_dt;
 string8   ar_due_dt;
 string8   ar_filed_dt;
 string8   ar_report_dt;
-string10  ar_report_nbr;
+string30  ar_report_nbr;  //modified length from 10 to 30
 string8   ar_franchise_tax_paid_dt;
 string8   ar_delinquent_dt;
 string10  ar_tax_factor;
@@ -24,7 +24,7 @@ string10  ar_roll;
 string10  ar_frame;
 string10  ar_extension;
 string10  ar_microfilm_nbr;
-string100 ar_comment;
-string1   ar_type;
+string350 ar_comment; //modified length from 100 to 350
+string60  ar_type; //modified length from 1 to 60
 
 end;

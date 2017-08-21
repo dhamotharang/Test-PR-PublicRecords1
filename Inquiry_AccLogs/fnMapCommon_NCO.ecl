@@ -101,7 +101,8 @@ end;
 
 export ready_File(dataset(inquiry_acclogs.layout_in_common) SSNFile, string select_source = 'NCO') := function
 
-AppendForward := project(SSNFile(source_file = select_source), transform(inquiry_acclogs.Layout.Common,
+AppendForward := project(SSNFile(source_file = select_source), transform(inquiry_acclogs.Layout.Common_ThorAdditions,
+			self.source := stringlib.stringtouppercase(left.source_file);
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
 			
@@ -192,7 +193,7 @@ prev_base := inquiry_acclogs.File_NCO_Logs_Common;
 
 jnToMBS := 	join(prev_base, dedup(Inquiry_AccLogs.File_MBS.File(id = '8135331' and idflag = 'GCID'), id, all),
 													left.mbs.global_company_id = right.id,
-													transform(inquiry_acclogs.layout.common,
+													transform(inquiry_acclogs.layout.Common_ThorAdditions,
 																			self.mbs.global_company_id := '8135331';
 																			self.mbs.company_id := '1476744';
 																			self.search_info.product_code := right.product_id;
@@ -209,7 +210,7 @@ jnToMBS := 	join(prev_base, dedup(Inquiry_AccLogs.File_MBS.File(id = '8135331' a
 													left outer, lookup);
 
 baseMBS := project(jnToMBS,
-									transform(inquiry_acclogs.Layout.Common,
+									transform(inquiry_acclogs.Layout.Common_ThorAdditions,
 														self := left));
 
 distrNewBase := distribute(baseMBS + AppendForward, hash(search_info.Sequence_Number + search_info.Login_History_ID))(mbs.company_id + mbs.global_company_id <> '');

@@ -18,6 +18,6 @@ ds := project(o, transform(Layout_liens_party_linkids,
 														 self.title := if(left.orig_name = 'SPENCER JAMES, ANGELA E','MS',left.title)
 														,self.fname := if(left.orig_name = 'SPENCER JAMES, ANGELA E','ANGELA',left.fname)
 														,self.mname := if(left.orig_name = 'SPENCER JAMES, ANGELA E','E',left.mname)
-														,self.lname := if(left.orig_name = 'SPENCER JAMES, ANGELA E','SPENCER JAMES',left.lname),self := left));
+														,self.lname := if(left.orig_name = 'SPENCER JAMES, ANGELA E','SPENCER JAMES',left.lname),self := left)) : independent;
 
 export file_liens_party_keybuild := ds ;

@@ -10,7 +10,7 @@ in_hdr2 := project(in_hdr1,transform(recordof(in_hdr1)
 in_hdr  := in_hdr2(rid not in header.fraud_records);
 in_base := in_hdr;
 
-Suppression_Layout 	:= header_services.Supplemental_Data.layout_in;
+Suppression_Layout 	:= header_services.Supplemental_Data.layout_in; 
 header_services.Supplemental_Data.mac_verify('driverslicense_sup.txt',Suppression_Layout, dl_supp_ds_func);
 DL_Suppression_In 	:= dl_supp_ds_func();
 DLSuppressedIn 			:= PROJECT(	DL_Suppression_In,header_services.Supplemental_Data.in_to_out(left));
@@ -23,7 +23,7 @@ shortHashrec := record
 end;
 
 shortHashrec HashDID_DLnumber(header.Layout_Header l) := transform                            
-	self.hval := hashmd5(	intformat((unsigned6)l.did,12,1),TRIM((string14)l.vendor_id, left, right));
+	self.hval := hashmd5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right));
 	self := l;
 end;
 
@@ -34,31 +34,6 @@ header.layout_header shortSuppress(hdr_withMD5 l, DLSuppressedIn r) := transform
 end;
 
 full_ShortSuppress := join(hdr_withMD5,DLSuppressedIn,left.hval=right.hval,shortSuppress(left,right),left only,lookup);
-
-header_services.Supplemental_Data.mac_verify('driverslicenseall_sup.txt',Suppression_Layout,dl_supp_ALL_ds_func);																					
- 
-DL_Supp_All_In := dl_supp_ALL_ds_func();
-DLSuppressAllIn := PROJECT(	DL_Supp_All_In, header_services.Supplemental_Data.in_to_out(left));
-
-HashDLLong := header_services.Supplemental_Data.layout_out;
-
-longHashrec := record
- header.layout_header;
- HashDLLong;
-end;
-
-longHashrec HashALL(header.Layout_Header l) := transform                            
- self.hval := HASHMD5(	intformat((unsigned6)l.did,12,1),TRIM((string14)l.vendor_id, left, right),intformat((unsigned4)l.dob,8,1),Trim((string9)l.ssn));
- self := l;
-end;
-
-hdrFull_withMD5 := project(full_ShortSuppress, HashALL(left));
-
-header.layout_header longSuppress(hdrFull_withMD5 l, DLSuppressAllIn r) := transform
- self := l;
-end;
-
-full_LongSuppress := join(	hdrFull_withMD5,DLSuppressAllIn,left.hval=right.hval,longSuppress(left,right),left only,lookup);
 
 
 // Start of code to suppress data based on an MD5 Hash of DID+Address
@@ -77,12 +52,12 @@ rFullOut_HashDIDAddress := record
 end;
 
 rFullOut_HashDIDAddress tHashDIDAddress(header.Layout_Header l) := transform                            
- self.hval := hashmd5(intformat(l.did,12,1),(string)l.st,(string)l.zip,(string)l.city_name,
+ self.hval := hashmd5(intformat(l.did,15,1),(string)l.st,(string)l.zip,(string)l.city_name,
 									(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.suffix,(string)l.postdir,(string)l.sec_range);
  self := l;
 end;
 
-dHeader_withMD5 := project(full_LongSuppress, tHashDIDAddress(left));
+dHeader_withMD5 := project(full_ShortSuppress, tHashDIDAddress(left));
 
 header.layout_header tSuppress(dHeader_withMD5 l, dSuppressedIn r) := transform
  self := l;
@@ -148,7 +123,7 @@ Record
   string1   eor; // changed from string2 to  string1 - KLM 
 end;
 
-header_services.Supplemental_Data.mac_verify('file_headersv2_inj.txt',Drop_Header_Layout,attr); // V2 added - KLM
+header_services.Supplemental_Data.mac_verify('file_fcra_header_inj.txt',Drop_Header_Layout,attr); // V2 added - KLM
  
 Base_File_Append_In := attr();
  

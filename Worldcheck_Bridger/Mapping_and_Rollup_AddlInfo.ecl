@@ -30,7 +30,85 @@ export Mapping_and_Rollup_AddlInfo(dataset(Layout_WorldCheck_Premium) in_f):= fu
 		in_f;
 		string addl_info;
 	end;
+	
 
+//New Multiple DOB's 
+
+	pattern Splitdates := pattern('[^;]+');
+	MyParsedRec := record, maxlength(30900)
+		ds_with_new_fields;
+		string CompleteDOB := TRIM(MATCHTEXT(Splitdates),left,right);
+	end;
+
+
+	MyParsedDOB := PARSE(ds_with_new_fields(trim(Date_Of_Birth,left,right) != ''),Date_Of_Birth,Splitdates,MyParsedRec,scan,first);
+	
+	Layout_dob trfDOB(MyParsedDOB l) := transform
+			self.addl_info		:= TRIM(l.CompleteDOB,left,right);
+			self				:= l;
+	end;
+
+	ds_NormDOB := project(MyParsedDOB, trfDOB(left));
+	
+
+	//Calculate DOB Dob Field
+	Layout_dob dobTran2(ds_NormDOB l):= transform
+		self.addl_info 	:= l.addl_info;
+		self 							:= l;
+	end;
+
+	populate_dob_flow1 := project(ds_NormDOB((trim(date_of_birth,left,right)!='')  and 
+						(trim(age,left,right) not between '18' and '95') and 
+						(trim(age_as_of_date,left,right)[1..2] not between '19' and '20') and 
+						(length(trim(age_as_of_date[1..4],left,right))!=4))
+						,dobTran2(left));
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////																										
+	//Calculate DOB with Age and Age_As_Of_Date --- Bugzilla #86894	
+							Layout_dob dobTran(ds_with_new_fields l, unsigned1 cnt):= transform
+								string10 addl_info1 	:= (string)((integer)L.age_as_of_date[1..4]-(integer)L.age)+'/00/00';
+							
+								string10 addl_info2 	:= if(addl_info1 !='',(string)((integer)addl_info1[1..4]-1)+'/00/00','');
+		
+								self.addl_info := choose(cnt,addl_info1,addl_info2);
+								self 			:= l;
+							end;
+							populate_dob_flow2 := normalize(ds_with_new_fields((trim(date_of_birth,left,right)='')  and 
+											(trim(age,left,right) between '18' and '95') and 
+											(trim(age_as_of_date,left,right)[1..2] between '19' and '20') and 
+											(length(trim(age_as_of_date[1..4],left,right))=4))
+											,2, dobTran(left,counter));
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+	populate_dob := populate_dob_flow1 + populate_dob_flow2;
+	
+	Layout_temp standardTran(populate_dob l):= transform
+		self.type 				:= 'Date of Birth';
+		self.information		:= l.addl_info;
+								//Bridger needs dobs in YYYY/MM/DD format in order to do a search	
+		self.parsed				:= if(length(trim(l.addl_info, left, right))=10 and regexfind('/', trim(l.addl_info, left, right)[5],0)<>'' and regexfind('/', trim(l.addl_info, left, right)[8],0)<>'',
+										l.addl_info,
+										'');
+		self.comments 			:= '';
+		self.id					:= l.uid;
+		self := l;
+	end;
+	
+	ds_reformd := project(populate_dob, standardTran(left))(information<>'');//: persist('~thor_200::persist::worldcheck::all_dob');
+
+
+//Remove '/' and replace with '-' for dates//////////////////////////////////////////////////////////////////////////
+	
+	ds_reformd removeSlash(ds_reformd l) := transform
+		self.information 	:= _Functions.Fix_Date(l.information);
+		self.parsed 		:= _Functions.Fix_Date(l.parsed);
+		self.addl_info		:= _Functions.Fix_Date(l.addl_info);							
+		self := l;
+	end;
+
+ds_reformdob := project(ds_reformd, removeSlash(left)): persist('~thor_200::persist::worldcheck::all_dob');
+
+//Old version
+/*
 	//Calculate DOB Dob Field
 	Layout_dob dobTran2(ds_with_new_fields l):= transform
 		self.addl_info 	:= 	L.date_of_birth;
@@ -87,6 +165,8 @@ export Mapping_and_Rollup_AddlInfo(dataset(Layout_WorldCheck_Premium) in_f):= fu
 
 	ds_reformdob := project(ds_reformd, removeSlash(left)): persist('~thor_200::persist::worldcheck::all_dob');
 
+// END of DOB
+*/
 //POPULATE POSITIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	// Shared parsing pieces for Positions

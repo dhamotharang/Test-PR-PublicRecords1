@@ -1,7 +1,6 @@
 IMPORT BIPV2_COMPANY_NAMES, lib_StringLib,UT, STD;
-EXPORT clean_facility_name (STRING120 FNAME_RAW)  := FUNCTION
+EXPORT clean_facility_name (STRING120 FNAME)  := FUNCTION
 
-	FNAME := lib_StringLib.StringLib.StringFilterOut(FNAME_RAW,'&'); 
 	Facility_Name_DS := DATASET ([{1,lib_StringLib.StringLib.StringCleanSpaces(FNAME),'','','','','','',0}],BIPV2_COMPANY_NAMES.layouts.layout_names);
 	
 	WORD_DS := NORMALIZE (Facility_Name_DS,ut.NoWords(LEFT.CNP_NAME, ' '),TRANSFORM(BIPV2_COMPANY_NAMES.layouts.layout_words, 

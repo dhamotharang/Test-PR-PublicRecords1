@@ -5,8 +5,8 @@ export Spray(
 	 string		pversion				= ''
 	,string		pServerIP				= _control.IPAddress.edata10
 	,string		pDirectory			= '/prod_data_build_13/eval_data/debt_settlement'
-	,string		pFilename1			= 'attroney_file_did_stats.csv'
-	,string		pFilename2			= 'DebtSettlementCreditCounsel.csv'
+	,string		pFilename1			= 'attroney_file_did_stats*.csv'
+	,string		pFilename2			= 'DebtSettlementCreditCounsel*.csv'
 	,string		pGroupName			= _Constants().groupname																		
 	,boolean	pIsTesting			= false
 	,boolean	pOverwrite			= false
@@ -23,11 +23,11 @@ function
 	 	,pDirectory
 	 	,pFilename1
 	 	,0
-	 	,Filenames().inputRSIH.Template
+	 	,Filenames(pversion).inputRSIH.logical
 	 	,[ {Filenames().inputRSIH.sprayed	}	]
 		,pGroupName
+		,pversion
 		,''
-		,'[0-9]{8}'
 		,'VARIABLE'
 		,''
 		,_Constants().max_record_size
@@ -37,14 +37,15 @@ function
 	 	,pDirectory
 	 	,pFilename2
 	 	,0
-	 	,Filenames().inputCC.Template
+	 	,Filenames(pversion).inputCC.logical
 	 	,[ {Filenames().inputCC.sprayed	}	]
 		,pGroupName
+		,pversion
 		,''
-		,'[0-9]{8}'
 		,'VARIABLE'
 		,''
 		,_Constants().max_record_size
+    ,','
 	 	}
 	], tools.Layout_Sprays.Info);
 		

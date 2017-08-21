@@ -32,6 +32,7 @@ export DEA_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.v_city_name),
 				self.state := left.st,
 				self.zip := left.zip,
+				self.zip4 := left.zip4,
 				self.county_fips := left.county[3..5],
 				self.msa := left.msa,
 				self.phone := '',
@@ -82,6 +83,8 @@ export DEA_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.name_last         := left.lname,
 				self.name_suffix       := left.name_suffix,
 				self.position_title    := 'DEA License Contact',
+				self.did               := (unsigned)left.did,
+				self.score             := (unsigned)left.score,
 				self := []));
 		
 		return extract(name_last != '');

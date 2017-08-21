@@ -1,4 +1,4 @@
-import ut, Corporate;
+import ut, Corporate, _validate, Address;
 
 Layout_Corp4_Temp := record
 Corporate.Layout_Corporate_Base;
@@ -6,7 +6,7 @@ string120 ra_company_name;
 string73  ra_clean_name;
 end;
 
-Layout_Corporate_Direct_Corp_Base TranslateCorp4ToCorp(Layout_Corp4_Temp l) := transform
+Layout_Corporate_Direct_Corp_AID TranslateCorp4ToCorp(Layout_Corp4_Temp l) := transform
 self.dt_first_seen := (unsigned4)fCheckDate(l.dt_first_seen);
 self.dt_last_seen := (unsigned4)fCheckDate(l.dt_last_seen);
 self.dt_vendor_first_reported := (unsigned4)fCheckDate(l.dt_first_seen);
@@ -31,6 +31,14 @@ self.corp_address1_type_desc := case(l.orig_address_ind,
 										  'O' => 'OWNER ADDRESS',
 										  'R' => 'REGISTERED AGENT ADDRESS',
 										  'CORPORATE ADDRESS');
+self.corp_prep_addr1_line1      := Stringlib.StringToUpperCase(l.street);
+self.corp_prep_addr1_last_line 	:= if (trim(l.orig_city,left,right) != '',
+																						 StringLib.StringCleanSpaces(Stringlib.StringToUpperCase(	trim(l.orig_city,left,right) + ', ' +
+																																																			trim(l.orig_state,left,right) + ' ' + 
+																																																			trim(l.zip,left,right)[1..5])), 
+																						 StringLib.StringCleanSpaces(Stringlib.StringToUpperCase(	trim(l.orig_state,left,right) + ' ' + 
+																																																			trim(l.zip,left,right)[1..5]))
+                                            ); 											
 self.corp_address1_line1 := Stringlib.StringToUpperCase(l.street);
 self.corp_address1_line2 := Stringlib.StringCleanSpaces(Stringlib.StringToUpperCase(trim(l.orig_city) + ' ' + l.orig_state + ' ' + l.zip));
 self.corp_address1_line3 := '';
@@ -42,6 +50,14 @@ self.corp_address2_type_cd := '';
 self.corp_address2_type_desc := if(l.prior_street <> '' or l.prior_city <> '' or l.prior_state <> '' or l.prior_zip <> '',
                                      'PRIOR ADDRESS',
 									 '');
+self.corp_prep_addr2_line1      := Stringlib.StringToUpperCase(l.prior_street);
+self.corp_prep_addr2_last_line 	:= if (trim(l.prior_city,left,right) != '',
+																						 StringLib.StringCleanSpaces(Stringlib.StringToUpperCase(	trim(l.prior_city,left,right) + ', ' +
+																																																			trim(l.prior_state,left,right) + ' ' + 
+																																																			trim(l.prior_zip,left,right)[1..5])), 
+																						 StringLib.StringCleanSpaces(Stringlib.StringToUpperCase(	trim(l.prior_state,left,right) + ' ' + 
+																																																			trim(l.prior_zip,left,right)[1..5]))
+                                            ); 											 
 self.corp_address2_line1 := Stringlib.StringToUpperCase(l.prior_street);
 self.corp_address2_line2 := Stringlib.StringCleanSpaces(Stringlib.StringToUpperCase(trim(l.prior_city) + ' ' + l.prior_state + ' ' + l.prior_zip));
 self.corp_address2_line3 := '';
@@ -254,12 +270,16 @@ self.corp_fed_tax_id := l.fed_tax_id_9;
 self.corp_state_tax_id := l.state_tax_id;
 self.corp_term_exist_cd := l.term_of_existence_flag;
 self.corp_term_exist_exp := l.term_exist;
-self.corp_term_exist_desc := case(l.term_of_existence_flag,
+self.corp_term_exist_desc := if((trim(l.term_exist,left,right) <>'' and trim(l.term_exist,left,right) <>'0'), 
+									case(l.term_of_existence_flag,
                                        'D' => 'DATE OF EXPIRATION',
-									   'N' => 'NUMBER OF YEARS',
+									   'N' => if(_validate.date.fIsValid(l.term_exist),
+												'DATE OF EXPIRATION',
+												'NUMBER OF YEARS'),
 									   'P' => 'PERPETUAL',
 									   'U' => 'UNKNOWN',
-									   '');
+									   ''),
+									'');
 self.corp_foreign_domestic_ind := l.foreign_domestic_flag;
 self.corp_forgn_state_cd := '';
 self.corp_forgn_state_desc := '';
@@ -297,6 +317,14 @@ self.corp_ra_dob := '';
 self.corp_ra_effective_date := '';
 self.corp_ra_address_type_cd := 'A';
 self.corp_ra_address_type_desc := 'AGENT ADDRESS';
+self.RA_prep_addr_line1      	:= Stringlib.StringToUpperCase(l.reg_agent_street);
+self.RA_prep_addr_last_line 	:= if (trim(l.reg_agent_city,left,right) != '',
+																						 StringLib.StringCleanSpaces(Stringlib.StringToUpperCase(	trim(l.reg_agent_city,left,right) + ', ' +
+																																																			trim(l.reg_agent_state,left,right) + ' ' + 
+																																																			trim(l.reg_agent_zip5,left,right)[1..5])), 
+																						 StringLib.StringCleanSpaces(Stringlib.StringToUpperCase(	trim(l.reg_agent_state,left,right) + ' ' + 
+																																																			trim(l.reg_agent_zip5,left,right)[1..5]))
+                                            ); 	
 self.corp_ra_address_line1 := Stringlib.StringToUpperCase(l.reg_agent_street);
 self.corp_ra_address_line2 := Stringlib.StringCleanSpaces(Stringlib.StringToUpperCase(trim(l.reg_agent_city) + ' ' + l.reg_agent_state + ' ' + l.reg_agent_zip5));
 self.corp_ra_address_line3 := '';
@@ -465,6 +493,12 @@ self.record_type := l.record_type;
 	self.corp_ra_no_comp_igs            := '';
 	self.corp_ra_addl_info              := '';
 	self.corp_ra_fax_nbr                := '';
+	self.Append_Addr1_RawAID						:= 0;
+	self.Append_Addr1_ACEAID						:= 0;
+	self.Append_Addr2_RawAID						:= 0;
+	self.Append_Addr2_ACEAID						:= 0;
+	self.Append_RA_RawAID								:= 0;
+	self.Append_RA_ACEAID								:= 0;		
 
 self := l;
 end;
@@ -490,7 +524,7 @@ end;
 
 Layout_Corp4_Temp CleanRAName(Corporate.Layout_Corporate_Base l) := transform
 self.ra_company_name := Datalib.CompanyClean(l.reg_agent_name);
-self.ra_clean_name := addrcleanlib.cleanPerson73(l.reg_agent_name);
+self.ra_clean_name := Address.cleanPerson73(l.reg_agent_name);
 self := l;
 end;
 

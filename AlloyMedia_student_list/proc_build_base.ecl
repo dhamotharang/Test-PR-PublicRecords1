@@ -1,5 +1,4 @@
 #workunit('name', 'AlloyMedia_student_list Build')
-
 IMPORT	ut
 				, AID
 				, American_Student_list
@@ -7,65 +6,85 @@ IMPORT	ut
 				, header_slimsort
 				, address
 				, lib_StringLib
-				, idl_header;
-				
+				, idl_header
+				, mdr;
+																							
 EXPORT proc_build_base(STRING version) := FUNCTION
 
+	//Validate Title
+	setValidTitle:=['MR','MS'];
+	string fGetTitle(string TitleIn)		:=		map(TitleIn in setValidTitle => TitleIn
+																								,'');
+	//Validate Suffix																			
+	setValidSuffix:=['JR','SR','I','II','III','IV','V','VI','VII','VIII','IX'];
+	string fGetSuffix(string SuffixIn)	:=		map(SuffixIn = '1' => 'I'
+																								,SuffixIn in ['2','ND'] => 'II'
+																								,SuffixIn in ['3','RD'] => 'III'
+																								,SuffixIn = '4' => 'IV'
+																								,SuffixIn = '5' => 'V'
+																								,SuffixIn = '6' => 'VI'
+																								,SuffixIn = '7' => 'VII'
+																								,SuffixIn = '8' => 'VIII'
+																								,SuffixIn = '9' => 'IX'
+																								,SuffixIn in setValidSuffix => SuffixIn
+																								,'');
+																							
 	layouts.Layout_base tFormatInFileFields(layouts.Layout_in pInput) := TRANSFORM
-		self.school_act_code							:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.school_act_code,LEFT,RIGHT)));
-		self.tuition_code									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.tuition_code,LEFT,RIGHT)));
-		self.public_private_code					:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.public_private_code,LEFT,RIGHT)));
-		self.school_size_code							:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.school_size_code,LEFT,RIGHT)));
-		self.student_last_name						:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.student_last_name,LEFT,RIGHT)));
-		self.student_first_name						:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.student_first_name,LEFT,RIGHT)));
-		self.gender_code									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.gender_code,LEFT,RIGHT)));
-		self.competitive_code							:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.competitive_code,LEFT,RIGHT)));
-		self.intl_exchange_student_code		:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.intl_exchange_student_code,LEFT,RIGHT)));
-		self.address_sequence_code				:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.address_sequence_code,LEFT,RIGHT)));
-		self.school_name									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.school_name,LEFT,RIGHT)));
-		self.school_address_2_secondary		:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.school_address_2_secondary,LEFT,RIGHT)));
-		self.filler_1											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.filler_1,LEFT,RIGHT)));
-		self.school_address_1_primary			:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.school_address_1_primary,LEFT,RIGHT)));
-		self.filler_2											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.filler_2,LEFT,RIGHT)));
-		self.school_city									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.school_city,LEFT,RIGHT)));
-		self.school_state									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.school_state,LEFT,RIGHT)));
-		self.school_zip5									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.school_zip5,LEFT,RIGHT)));
-		self.school_zip4									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.school_zip4,LEFT,RIGHT)));
-		self.school_phone_number					:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.school_phone_number,LEFT,RIGHT)));
-		self.school_housing_code					:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.school_housing_code,LEFT,RIGHT)));
-		self.filler_3											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.filler_3,LEFT,RIGHT)));
-		self.home_address_1_secondary			:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.home_address_1_secondary,LEFT,RIGHT)));
-		self.filler_4											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.filler_4,LEFT,RIGHT)));
-		self.home_address_2_primary				:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.home_address_2_primary,LEFT,RIGHT)));
-		self.filler_5											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.filler_5,LEFT,RIGHT)));
-		self.home_city										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.home_city,LEFT,RIGHT)));
-		self.home_state										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.home_state,LEFT,RIGHT)));
-		self.home_zip5										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.home_zip5,LEFT,RIGHT)));
-		self.home_zip4										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.home_zip4,LEFT,RIGHT)));
-		self.home_phone_number						:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.home_phone_number,LEFT,RIGHT)));
-		self.home_housing_code						:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.home_housing_code,LEFT,RIGHT)));
-		self.class_rank										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.class_rank,LEFT,RIGHT)));
-		self.major_code										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.major_code,LEFT,RIGHT)));
-		self.school_info_time_zone				:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.school_info_time_zone,LEFT,RIGHT)));
-		self.filler_6											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.filler_6,LEFT,RIGHT)));
-		self.filler_7											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.filler_7,LEFT,RIGHT)));
-		self.home_info_time_zone					:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.home_info_time_zone,LEFT,RIGHT)));
-		self.filler_8											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.filler_8,LEFT,RIGHT)));
-		self.filler_9											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.filler_9,LEFT,RIGHT)));
-		self.address_type									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.address_type,LEFT,RIGHT)));
-		self.address_info_code						:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.address_info_code,LEFT,RIGHT)));
-		self.sequence_number							:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.sequence_number,LEFT,RIGHT)));
-		self.filler_10										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.filler_10,LEFT,RIGHT)));
-		self.filler_11										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.filler_11,LEFT,RIGHT)));
-		self.key_code											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(TRIM(pInput.key_code,LEFT,RIGHT)));
+		self.school_act_code							:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.school_act_code));
+		self.tuition_code									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.tuition_code));
+		self.public_private_code					:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.public_private_code));
+		self.school_size_code							:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.school_size_code));
+		self.student_last_name						:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.student_last_name));
+		self.student_first_name						:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.student_first_name));
+		self.gender_code									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.gender_code));
+		self.competitive_code							:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.competitive_code));
+		self.intl_exchange_student_code		:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.intl_exchange_student_code));
+		self.address_sequence_code				:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.address_sequence_code));
+		self.school_name									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.school_name));
+		self.school_address_2_secondary		:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.school_address_2_secondary));
+		self.filler_1											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.filler_1));
+		self.school_address_1_primary			:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.school_address_1_primary));
+		self.filler_2											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.filler_2));
+		self.school_city									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.school_city));
+		self.school_state									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.school_state));
+		self.school_zip5									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.school_zip5));
+		self.school_zip4									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.school_zip4));
+		self.school_phone_number					:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.school_phone_number));
+		self.school_housing_code					:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.school_housing_code));
+		self.filler_3											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.filler_3));
+		self.home_address_1_secondary			:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.home_address_1_secondary));
+		self.filler_4											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.filler_4));
+		self.home_address_2_primary				:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.home_address_2_primary));
+		self.filler_5											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.filler_5));
+		self.home_city										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.home_city));
+		self.home_state										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.home_state));
+		self.home_zip5										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.home_zip5));
+		self.home_zip4										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.home_zip4));
+		self.home_phone_number						:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.home_phone_number));
+		self.home_housing_code						:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.home_housing_code));
+		self.class_rank										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.class_rank));
+		self.major_code										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.major_code));
+		self.school_info_time_zone				:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.school_info_time_zone));
+		self.filler_6											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.filler_6));
+		self.filler_7											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.filler_7));
+		self.home_info_time_zone					:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.home_info_time_zone));
+		self.filler_8											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.filler_8));
+		self.filler_9											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.filler_9));
+		self.address_type									:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.address_type));
+		self.address_info_code						:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.address_info_code));
+		self.sequence_number							:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.sequence_number));
+		self.filler_10										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.filler_10));
+		self.filler_11										:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.filler_11));
+		self.key_code											:=	StringLib.StringToUpperCase(StringLib.StringCleanSpaces(pInput.key_code));
 		self.file_type										:=	'C';
 		self.DID              						:=	0;
 		self.RawAID												:=	0;
-		self.Process_Date 								:=	thorlib.wuid()[2..9];
+		self.Process_Date 								:=	version;
 		self.date_first_seen							:=	self.Process_Date;
 		self.date_last_seen								:=	self.Process_Date;
 		self.Date_Vendor_First_Reported 	:=	self.key_code[1..4] + '0101';
 		self.Date_Vendor_Last_Reported 		:=	self.key_code[1..4] + '0101';
+		self.source												:=  mdr.sourceTools.src_AlloyMedia_student_list;
 		self															:=	pInput;
 		self															:=	[];
 	END;
@@ -74,11 +93,11 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 	
 	layouts.Layout_base tCleanName(FormattedInputFile pInput) := TRANSFORM
 		clean_name							:=	Address.CleanPersonFML73(TRIM(TRIM(pInput.student_first_name) + ' ' + TRIM(pInput.student_last_name)));
-		self.clean_title				:=	clean_name[1..5];
+		self.clean_title				:=	fGetTitle(clean_name[1..5]);
 		self.clean_fname				:=	clean_name[6..25];
 		self.clean_mname				:=	clean_name[26..45];
 		self.clean_lname				:=	clean_name[46..65];
-		self.clean_name_suffix	:=	clean_name[66..70];
+		self.clean_name_suffix	:=	fGetSuffix(clean_name[66..70]);
 		self.clean_name_score		:=	clean_name[71..73];
 		self										:=	pInput;
 	END;
@@ -87,38 +106,18 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 
 	BOOLEAN basefileexists	:=	fileservices.GetSuperFileSubCount(thor_cluster + 'base::AlloyMedia_student_list') > 0;
 	
-	//Reset AID and DID
-	layouts.Layout_base tResetIDs(files.File_base pInput) := TRANSFORM
-		self.DID 		:= 0;
-		self.RawAID := 0;
-		self				:= pInput;
-	END;
-	
-	BasePlusIn	:=	IF(basefileexists, InputFileClnName + PROJECT(files.File_base, tResetIDs(LEFT)), InputFileClnName);
-		
-	// BasePlusInDist	:=	SORT(DISTRIBUTE(BasePlusIn, HASH(sequence_number)), sequence_number + key_code, LOCAL);
-	// BasePlusInDist	:=	SORT(DISTRIBUTE(BasePlusIn, HASH(student_last_name
-																										 // + student_first_name
-																										 // + school_name
-																										 // + school_address_1_primary
-																										 // + home_address_2_primary)), 
-																										   // student_last_name
-																										 // + student_first_name
-																										 // + school_name
-																										 // + school_address_1_primary
-																										 // + home_address_2_primary, LOCAL);
-	BasePlusInDist	:=	SORT(DISTRIBUTE(BasePlusIn, HASH(sequence_number
-																										 + key_code
-																										 + school_name
+	BasePlusIn	:=	IF(basefileexists, InputFileClnName + files.File_base, InputFileClnName);
+																										 
+	BasePlusInDist	:=	SORT(DISTRIBUTE(BasePlusIn, HASH(student_first_name
+																										 + student_last_name
 																										 + school_act_code
 																										 + school_address_1_primary
 																										 + home_address_2_primary)), 
-																										 sequence_number
-																										 + key_code
-																										 + school_name
+																										 student_first_name
+																										 + student_last_name
 																										 + school_act_code
 																										 + school_address_1_primary
-																										 + home_address_2_primary, LOCAL);																										 
+																										 + home_address_2_primary, -key_code, LOCAL);																											 
 	
 	layouts.layout_base  rollupXform(layouts.layout_base L, layouts.layout_base R) := transform
 		self.Process_Date    := if(L.Process_Date > R.Process_Date, L.Process_Date, R.Process_Date);
@@ -130,19 +129,16 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 	end;
 	
 	BasePlusInRollup := ROLLUP(BasePlusInDist,rollupXform(LEFT,RIGHT)
-													 , LEFT.sequence_number = RIGHT.sequence_number
-												 AND LEFT.key_code = RIGHT.key_code
+													 , /* LEFT.sequence_number = RIGHT.sequence_number
+												 AND LEFT.key_code = RIGHT.key_code */
+														 LEFT.student_first_name = RIGHT.student_first_name
+												 AND LEFT.student_last_name = RIGHT.student_last_name
 												 AND LEFT.school_act_code = RIGHT.school_act_code
 												 AND LEFT.school_address_1_primary = RIGHT.school_address_1_primary
+												 AND (LEFT.school_phone_number != '' AND RIGHT.school_phone_number = '' OR (LEFT.school_phone_number = RIGHT.school_phone_number AND LEFT.school_phone_number != '') OR LEFT.school_phone_number = '' AND RIGHT.school_phone_number = '')
 												 AND LEFT.home_address_2_primary = RIGHT.home_address_2_primary
+												 AND (LEFT.home_phone_number != '' AND RIGHT.home_phone_number = '' OR (LEFT.home_phone_number = RIGHT.home_phone_number AND LEFT.home_phone_number != '') OR LEFT.home_phone_number = '' AND RIGHT.home_phone_number = '')
 													 , LOCAL);
-	// BasePlusInRollup := ROLLUP(BasePlusInDist,rollupXform(LEFT,RIGHT)
-													 // , LEFT.student_last_name = RIGHT.student_last_name
-												 // AND LEFT.student_first_name = RIGHT.student_first_name
-												 // AND LEFT.school_name = RIGHT.school_name
-												 // AND LEFT.school_address_1_primary = RIGHT.school_address_1_primary
-												 // AND LEFT.home_address_2_primary = RIGHT.home_address_2_primary
-													 // , LOCAL);										 
 
 	//****Parse out the different types of addresses to correctly populate the clean address****
 	//address_type 2,3,5 contain a single address in the home address fields (type 3 contains a duplicate address in populated in both school and home fields)
@@ -211,6 +207,8 @@ EXPORT proc_build_base(STRING version) := FUNCTION
     SELF.clean_chk_digit            := pInput.aidwork_acecache.chk_digit;
     SELF.clean_rec_type             := pInput.aidwork_acecache.rec_type;
     SELF.clean_county               := pInput.aidwork_acecache.county;
+		SELF.clean_ace_fips_st					:= pInput.aidwork_acecache.county[1..2];
+		SELF.clean_fips_county					:= pInput.aidwork_acecache.county[3..5];
     SELF.clean_geo_lat              := pInput.aidwork_acecache.geo_lat;
     SELF.clean_geo_long             := pInput.aidwork_acecache.geo_long;
     SELF.clean_msa                  := pInput.aidwork_acecache.msa;
@@ -219,46 +217,11 @@ EXPORT proc_build_base(STRING version) := FUNCTION
     SELF.clean_err_stat             := pInput.aidwork_acecache.err_stat;
     SELF.rawaid               			:= pInput.aidwork_rawaid;
     SELF  													:= pInput;		
-	END;
-	
-	layouts.layout_base tProjectNoAddrClean(rsAID_NoAddr pInput) := TRANSFORM
-
-		cl_addr			:= Address.CleanAddress182('', TRIM(pInput.home_city) + ' ' + TRIM(pInput.home_state) + ' ' + TRIM(pInput.home_zip5));
-	
-		SELF.clean_prim_range  	:=  cl_addr[1..10];
-		SELF.clean_predir  			:=  cl_addr[11..12];
-		SELF.clean_prim_name  	:=  cl_addr[13..40];
-		SELF.clean_addr_suffix  :=  cl_addr[41..44];
-		SELF.clean_postdir  		:=  cl_addr[45..46];
-		SELF.clean_unit_desig  	:=  cl_addr[47..56];
-		SELF.clean_sec_range  	:=  cl_addr[57..64];
-		SELF.clean_p_city_name  :=  cl_addr[65..89];
-		SELF.clean_v_city_name  :=  cl_addr[90..114];
-		SELF.clean_st  					:=  cl_addr[115..116];
-		SELF.clean_zip5  				:=  cl_addr[117..121];
-		SELF.clean_zip4  				:=  cl_addr[122..125];
-		SELF.clean_cart  				:=  cl_addr[126..129];
-		SELF.clean_cr_sort_sz  	:=  cl_addr[130];
-		SELF.clean_lot  				:=  cl_addr[131..134];
-		SELF.clean_lot_order  	:=  cl_addr[135];
-		SELF.clean_dbpc  				:=  cl_addr[136..137];
-		SELF.clean_chk_digit  	:=  cl_addr[138];
-		SELF.clean_rec_type  		:=  cl_addr[139..140];
-		SELF.clean_county  			:=  cl_addr[141..145];
-		SELF.clean_geo_lat  		:=  cl_addr[146..155];
-		SELF.clean_geo_long  		:=  cl_addr[156..166];
-		SELF.clean_msa  				:=  cl_addr[167..170];
-		SELF.clean_geo_blk  		:=  cl_addr[171..177];
-		SELF.clean_geo_match  	:=  cl_addr[178];
-		SELF.clean_err_stat  		:=  cl_addr[179..182];
-		
-    SELF  									:= pInput;		
 	END;	
 	
 	rsCleanAIDGoodAddr		:= PROJECT(rsCleanAID, tProjectClean(LEFT));
-	rsCleanAIDGoodNoAddr	:= PROJECT(rsAID_NoAddr, tProjectNoAddrClean(LEFT));
 	
-	rsCleanAIDGood	:=	rsCleanAIDGoodAddr + rsCleanAIDGoodNoAddr : PERSIST(thor_cluster + '::persist::AlloyMediaAID');
+	rsCleanAIDGood	:=	rsCleanAIDGoodAddr + rsAID_NoAddr : PERSIST(thor_cluster + '::persist::AlloyMediaAID');
 	
 	//Flip names before DID process
 	ut.mac_flipnames(rsCleanAIDGood,clean_fname,clean_mname,clean_lname,rsAIDCleanFlipNames);
@@ -281,10 +244,12 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 			TRANSFORM
 				self.LN_COLLEGE_NAME	:=	pLkp.LN_COLLEGE_NAME;
 				self.tier							:=	pLkp.tier;
+				//Added for Shell 5.0
+				self.tier2						:=	pLkp.tierv20;
 				self									:=	pLeft;
 			END;
 			
-	rsFormattedInputPlusBaseFileTiered	:=	JOIN(rsCleanAID_DID, American_Student_list.file_college_metadata_lkp, StringLib.StringCleanSpaces(LEFT.school_act_code) = StringLib.StringCleanSpaces(RIGHT.Alloy_MatchKey), tAddCollegeMetadata(left,right), LEFT OUTER, LOOKUP);		
+	rsFormattedInputPlusBaseFileTiered	:=	JOIN(rsCleanAID_DID, American_Student_list.file_college_metadata_lkp, StringLib.StringCleanSpaces(LEFT.school_act_code) != '' AND StringLib.StringCleanSpaces(LEFT.school_act_code) = StringLib.StringCleanSpaces(RIGHT.Alloy_MatchKey), tAddCollegeMetadata(left,right), LEFT OUTER, LOOKUP);		
 	
 	//Check for orphan college_name fields
 	orphan_college_names	:=	rsFormattedInputPlusBaseFileTiered(TRIM(school_name) != '' AND TRIM(ln_college_name) = '');
@@ -293,6 +258,10 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 		:=
 			RECORD
 				string50        SCHOOL_NAME;
+				string5   			school_act_code;
+				string1   			tuition_code;
+				string1   			school_size_code;
+				string1   			competitive_code;				
 			END;
 
 	ProcessMissingCollegeName	:=	SEQUENTIAL(
@@ -308,7 +277,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 											)
 											, fileservices.sendemail(Email_Notification_Lists.MissingCollege
 												, 'Alloy Student List: Missing College Name'
-												, 'Please see ' + thorlib.wuid() + ' MissingCollegeNames output for details. Please use the code in American_Student_List.BWR_Update_ln_college_lkp to update the lookup file with the missing college names.')
+												, 'Please see ' + thorlib.wuid() + ' MissingCollegeNames output for details.')
 												);
 
 	checkOrphanNames	:=	IF(COUNT(orphan_college_names) > 0
@@ -330,7 +299,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 											NAMED('MissingCollegeTiers'), ALL
 											)
 											, fileservices.sendemail(Email_Notification_Lists.MissingCollege
-												, 'American Student List: Missing College Tier'
+												, 'Alloy Student List: Missing College Tier'
 												, 'Please see ' + thorlib.wuid() + ' MissingCollegeTiers output for details.')
 												);
 
@@ -340,8 +309,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 												
 	file_base_final	:=	rsFormattedInputPlusBaseFileTiered;
 
-	ut.MAC_SF_BuildProcess(file_base_final, thor_cluster + 'base::alloymedia_student_list', build_base);
-	// ut.MAC_SF_BuildProcess(BasePlusInRollup, thor_cluster + 'base::alloymedia_student_list', build_base);
+	ut.MAC_SF_BuildProcess(file_base_final, thor_cluster + 'base::alloymedia_student_list', build_base, 3, /*csvout*/false, /*compress*/true);
 
 	RETURN sequential(build_base, parallel(checkOrphanNames, checkOrphanTiers));
 	

@@ -30,6 +30,9 @@ export NumCollisions_eid0 := count(Collisions_eid);
   SALT30.UIDType lid := (SALT30.UIDType)h.newrid;
     h.eid;
     h.gh12;
+    h.gh4;
+    h.gh5;
+    h.gh6;
     h.etype;
     h.id;
     h.data_provider_id;
@@ -43,10 +46,10 @@ export NumCollisions_eid0 := count(Collisions_eid);
     h.hitandrun;
     h.intersectionrelated;
     h.officername;
+    h.wc_crashtype;
     h.crashtype;
+    h.wc_locationtype;
     h.locationtype;
-    h.x;
-    h.y;
     h.accidentclass;
     h.specialcircumstance1;
     h.specialcircumstance2;
@@ -60,8 +63,8 @@ export NumCollisions_eid0 := count(Collisions_eid);
     h.surfacecondition;
     h.trafficcontrolpresent;
     h.narrative;
-    h.vehicleid;
     h.vin;
+    h.wc_plate;
     h.plate;
     h.platestate;
     h.year;
@@ -75,7 +78,6 @@ export NumCollisions_eid0 := count(Collisions_eid);
     h.driverimpairment;
     h.first_name;
     h.last_name;
-    h.per_crashid;
     h.driveractions;
     h.licensenumber;
     h.licensestate;
@@ -86,13 +88,16 @@ export NumCollisions_eid0 := count(Collisions_eid);
     h.seatbelt;
     h.per_city;
     h.per_state;
+    h.agency;
+    h.data_provider_ori;
+    h.primaryrec;
   END;
 EXPORT TranslatedFile := TABLE(h,rf);
 // Compute the null for each field value
-  Def(INTEGER2 c) := CHOOSE(c,'','','','','','','','','','','','','','','','','','0','0','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','0','','','','','');
+  Def(INTEGER2 c) := CHOOSE(c,'','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','');
  
 Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
-  SELF.word := CHOOSE(c,(SALT30.StrType)le.eid,(SALT30.StrType)le.eid,(SALT30.StrType)le.gh12,(SALT30.StrType)le.etype,(SALT30.StrType)le.id,(SALT30.StrType)le.data_provider_id,(SALT30.StrType)le.case_number,(SALT30.StrType)le.reportnumber,(SALT30.StrType)le.clean_report_date,(SALT30.StrType)le.address,(SALT30.StrType)le.county,(SALT30.StrType)le.crash_city,(SALT30.StrType)le.crash_state,(SALT30.StrType)le.hitandrun,(SALT30.StrType)le.intersectionrelated,(SALT30.StrType)le.officername,(SALT30.StrType)le.crashtype,(SALT30.StrType)le.locationtype,(SALT30.StrType)le.x,(SALT30.StrType)le.y,(SALT30.StrType)le.accidentclass,(SALT30.StrType)le.specialcircumstance1,(SALT30.StrType)le.specialcircumstance2,(SALT30.StrType)le.specialcircumstance3,(SALT30.StrType)le.lightcondition,(SALT30.StrType)le.weathercondition,(SALT30.StrType)le.surfacetype,(SALT30.StrType)le.roadspecialfeature1,(SALT30.StrType)le.roadspecialfeature2,(SALT30.StrType)le.roadspecialfeature3,(SALT30.StrType)le.surfacecondition,(SALT30.StrType)le.trafficcontrolpresent,(SALT30.StrType)le.narrative,(SALT30.StrType)le.vehicleid,(SALT30.StrType)le.vin,(SALT30.StrType)le.plate,(SALT30.StrType)le.platestate,(SALT30.StrType)le.year,(SALT30.StrType)le.make,(SALT30.StrType)le.model,(SALT30.StrType)le.towed,(SALT30.StrType)le.vehicle_type,(SALT30.StrType)le.damage,(SALT30.StrType)le.action,(SALT30.StrType)le.sequence,(SALT30.StrType)le.driverimpairment,(SALT30.StrType)le.first_name,(SALT30.StrType)le.last_name,(SALT30.StrType)le.per_crashid,(SALT30.StrType)le.driveractions,(SALT30.StrType)le.licensenumber,(SALT30.StrType)le.licensestate,(SALT30.StrType)le.airbag,(SALT30.StrType)le.race,(SALT30.StrType)le.sex,(SALT30.StrType)le.age,(SALT30.StrType)le.seatbelt,(SALT30.StrType)le.per_city,(SALT30.StrType)le.per_state,SKIP,SKIP,SKIP);
+  SELF.word := CHOOSE(c,(SALT30.StrType)le.eid,(SALT30.StrType)le.eid,(SALT30.StrType)le.gh12,(SALT30.StrType)le.gh4,(SALT30.StrType)le.gh5,(SALT30.StrType)le.gh6,(SALT30.StrType)le.etype,(SALT30.StrType)le.id,(SALT30.StrType)le.data_provider_id,(SALT30.StrType)le.case_number,(SALT30.StrType)le.reportnumber,(SALT30.StrType)le.clean_report_date,(SALT30.StrType)le.address,(SALT30.StrType)le.county,(SALT30.StrType)le.crash_city,(SALT30.StrType)le.crash_state,(SALT30.StrType)le.hitandrun,(SALT30.StrType)le.intersectionrelated,(SALT30.StrType)le.officername,(SALT30.StrType)le.wc_crashtype,(SALT30.StrType)le.crashtype,(SALT30.StrType)le.wc_locationtype,(SALT30.StrType)le.locationtype,(SALT30.StrType)le.accidentclass,(SALT30.StrType)le.specialcircumstance1,(SALT30.StrType)le.specialcircumstance2,(SALT30.StrType)le.specialcircumstance3,(SALT30.StrType)le.lightcondition,(SALT30.StrType)le.weathercondition,(SALT30.StrType)le.surfacetype,(SALT30.StrType)le.roadspecialfeature1,(SALT30.StrType)le.roadspecialfeature2,(SALT30.StrType)le.roadspecialfeature3,(SALT30.StrType)le.surfacecondition,(SALT30.StrType)le.trafficcontrolpresent,(SALT30.StrType)le.narrative,(SALT30.StrType)le.vin,(SALT30.StrType)le.wc_plate,(SALT30.StrType)le.plate,(SALT30.StrType)le.platestate,(SALT30.StrType)le.year,(SALT30.StrType)le.make,(SALT30.StrType)le.model,(SALT30.StrType)le.towed,(SALT30.StrType)le.vehicle_type,(SALT30.StrType)le.damage,(SALT30.StrType)le.action,(SALT30.StrType)le.sequence,(SALT30.StrType)le.driverimpairment,(SALT30.StrType)le.first_name,(SALT30.StrType)le.last_name,(SALT30.StrType)le.driveractions,(SALT30.StrType)le.licensenumber,(SALT30.StrType)le.licensestate,(SALT30.StrType)le.airbag,(SALT30.StrType)le.race,(SALT30.StrType)le.sex,(SALT30.StrType)le.age,(SALT30.StrType)le.seatbelt,(SALT30.StrType)le.per_city,(SALT30.StrType)le.per_state,(SALT30.StrType)le.agency,(SALT30.StrType)le.data_provider_ori,SKIP,SKIP,(SALT30.StrType)le.primaryrec,SKIP);
   SELF.len := LENGTH(TRIM(SELF.word));
   SELF.wip := IF(SELF.Word=Def(c-1),SKIP,1); // Adjusted later - also filters blank words
   SELF.nominal := 0; //Filled in later
@@ -101,9 +106,9 @@ Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
   SELF.kwp := 0; // Adjusted later
   SELF.docref.doc := 0; // Filled in later
   SELF.docref.src := 0; // Filled in later
-  SELF.src := TRANSFER(MDR.sourceTools.src_Bair_Analytics,UNSIGNED2); // Namespace for ID provided
+  SELF.src := TRANSFER(le.class_code,UNSIGNED2); // Namespace for ID provided
   SELF.seg := c; // Field number is seg; values filled in in segment definition
-  SELF.segName := Text_Search.MakeShortSeg(choose(c,text_search.constants.DocKeyField,'eid','gh12','etype','id','data_provider_id','case_number','reportnumber','clean_report_date','address','county','crash_city','crash_state','hitandrun','intersectionrelated','officername','crashtype','locationtype','x','y','accidentclass','specialcircumstance1','specialcircumstance2','specialcircumstance3','lightcondition','weathercondition','surfacetype','roadspecialfeature1','roadspecialfeature2','roadspecialfeature3','surfacecondition','trafficcontrolpresent','narrative','vehicleid','vin','plate','platestate','year','make','model','towed','vehicle_type','damage','action','sequence','driverimpairment','first_name','last_name','per_crashid','driveractions','licensenumber','licensestate','airbag','race','sex','age','seatbelt','per_city','per_state','NOTES','DATE'));
+  SELF.segName := Text_Search.MakeShortSeg(choose(c,text_search.constants.DocKeyField,'eid','gh12','gh4','gh5','gh6','etype','id','data_provider_id','case_number','reportnumber','clean_report_date','address','county','crash_city','crash_state','hitandrun','intersectionrelated','officername','wc_crashtype','crashtype','wc_locationtype','locationtype','accidentclass','specialcircumstance1','specialcircumstance2','specialcircumstance3','lightcondition','weathercondition','surfacetype','roadspecialfeature1','roadspecialfeature2','roadspecialfeature3','surfacecondition','trafficcontrolpresent','narrative','vin','wc_plate','plate','platestate','year','make','model','towed','vehicle_type','damage','action','sequence','driverimpairment','first_name','last_name','driveractions','licensenumber','licensestate','airbag','race','sex','age','seatbelt','per_city','per_state','agency','data_provider_ori','NOTES','DATE','primaryrec'));
   SELF.typ := text_search.types.WordType.TextStr; // May get changed later
   SELF.sect := 0; // Not needed
   SELF.pos := 0; // Not needed
@@ -111,10 +116,13 @@ Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
   self.sid := le.hashed_sid;
   self.lid := (SALT30.UIDType)le.newrid;
 END;
-SHARED FieldsAsPostings := NORMALIZE(h,61,into(left,counter));
+SHARED FieldsAsPostings := NORMALIZE(h,66,into(left,counter));
 EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Constants.DocKeyField),text_search.Constants.DocKeyField,text_search.types.SegmentType.ExternalKey,[text_search.MakeShortSeg(text_search.Constants.DocKeyField)]}
   ,{text_search.MakeShortSeg('eid'),'eid',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('eid')]}
   ,{text_search.MakeShortSeg('gh12'),'gh12',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gh12')]}
+  ,{text_search.MakeShortSeg('gh4'),'gh4',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gh4')]}
+  ,{text_search.MakeShortSeg('gh5'),'gh5',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gh5')]}
+  ,{text_search.MakeShortSeg('gh6'),'gh6',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gh6')]}
   ,{text_search.MakeShortSeg('etype'),'etype',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('etype')]}
   ,{text_search.MakeShortSeg('id'),'id',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('id')]}
   ,{text_search.MakeShortSeg('data_provider_id'),'data_provider_id',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('data_provider_id')]}
@@ -128,10 +136,10 @@ EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Cons
   ,{text_search.MakeShortSeg('hitandrun'),'hitandrun',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('hitandrun')]}
   ,{text_search.MakeShortSeg('intersectionrelated'),'intersectionrelated',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('intersectionrelated')]}
   ,{text_search.MakeShortSeg('officername'),'officername',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('officername')]}
+  ,{text_search.MakeShortSeg('wc_crashtype'),'wc_crashtype',text_search.types.SegmentType.FieldDataType,[text_search.MakeShortSeg('wc_crashtype')]}
   ,{text_search.MakeShortSeg('crashtype'),'crashtype',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('crashtype')]}
+  ,{text_search.MakeShortSeg('wc_locationtype'),'wc_locationtype',text_search.types.SegmentType.FieldDataType,[text_search.MakeShortSeg('wc_locationtype')]}
   ,{text_search.MakeShortSeg('locationtype'),'locationtype',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('locationtype')]}
-  ,{text_search.MakeShortSeg('x'),'x',text_search.types.SegmentType.NumericType,[text_search.MakeShortSeg('x')]}
-  ,{text_search.MakeShortSeg('y'),'y',text_search.types.SegmentType.NumericType,[text_search.MakeShortSeg('y')]}
   ,{text_search.MakeShortSeg('accidentclass'),'accidentclass',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('accidentclass')]}
   ,{text_search.MakeShortSeg('specialcircumstance1'),'specialcircumstance1',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('specialcircumstance1')]}
   ,{text_search.MakeShortSeg('specialcircumstance2'),'specialcircumstance2',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('specialcircumstance2')]}
@@ -145,8 +153,8 @@ EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Cons
   ,{text_search.MakeShortSeg('surfacecondition'),'surfacecondition',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('surfacecondition')]}
   ,{text_search.MakeShortSeg('trafficcontrolpresent'),'trafficcontrolpresent',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('trafficcontrolpresent')]}
   ,{text_search.MakeShortSeg('narrative'),'narrative',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('narrative')]}
-  ,{text_search.MakeShortSeg('vehicleid'),'vehicleid',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('vehicleid')]}
   ,{text_search.MakeShortSeg('vin'),'vin',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('vin')]}
+  ,{text_search.MakeShortSeg('wc_plate'),'wc_plate',text_search.types.SegmentType.FieldDataType,[text_search.MakeShortSeg('wc_plate')]}
   ,{text_search.MakeShortSeg('plate'),'plate',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('plate')]}
   ,{text_search.MakeShortSeg('platestate'),'platestate',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('platestate')]}
   ,{text_search.MakeShortSeg('year'),'year',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('year')]}
@@ -156,11 +164,10 @@ EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Cons
   ,{text_search.MakeShortSeg('vehicle_type'),'vehicle_type',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('vehicle_type')]}
   ,{text_search.MakeShortSeg('damage'),'damage',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('damage')]}
   ,{text_search.MakeShortSeg('action'),'action',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('action')]}
-  ,{text_search.MakeShortSeg('sequence'),'sequence',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('sequence')]}
+  ,{text_search.MakeShortSeg('sequence'),'sequence',text_search.types.SegmentType.NumericType,[text_search.MakeShortSeg('sequence')]}
   ,{text_search.MakeShortSeg('driverimpairment'),'driverimpairment',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('driverimpairment')]}
   ,{text_search.MakeShortSeg('first_name'),'first_name',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('first_name')]}
   ,{text_search.MakeShortSeg('last_name'),'last_name',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('last_name')]}
-  ,{text_search.MakeShortSeg('per_crashid'),'per_crashid',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('per_crashid')]}
   ,{text_search.MakeShortSeg('driveractions'),'driveractions',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('driveractions')]}
   ,{text_search.MakeShortSeg('licensenumber'),'licensenumber',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('licensenumber')]}
   ,{text_search.MakeShortSeg('licensestate'),'licensestate',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('licensestate')]}
@@ -171,8 +178,11 @@ EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Cons
   ,{text_search.MakeShortSeg('seatbelt'),'seatbelt',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('seatbelt')]}
   ,{text_search.MakeShortSeg('per_city'),'per_city',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('per_city')]}
   ,{text_search.MakeShortSeg('per_state'),'per_state',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('per_state')]}
+  ,{text_search.MakeShortSeg('agency'),'agency',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('agency')]}
+  ,{text_search.MakeShortSeg('data_provider_ori'),'data_provider_ori',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('data_provider_ori')]}
   ,{text_search.MakeShortSeg('NOTES'),'NOTES',text_search.types.SegmentType.GroupSeg,[text_search.MakeShortSeg('narrative')]}
   ,{text_search.MakeShortSeg('DATE'),'DATE',text_search.types.SegmentType.GroupSeg,[text_search.MakeShortSeg('clean_report_date')]}
+  ,{text_search.MakeShortSeg('primaryrec'),'primaryrec',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('primaryrec')]}
 ],Text_Search.Layout_Segment_ComposeDef );
  
 SHARED Text_Search.Layout_Posting setRef(Text_Search.Layout_Posting le, INTEGER2 sw) := TRANSFORM

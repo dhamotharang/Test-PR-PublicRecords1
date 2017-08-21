@@ -45,14 +45,14 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriage_divorce
  
  //marriage info
  self.number_of_children 		:= le.living_child_under18;
- self.marriage_dt     			:= le.date_of_marriage_year+le.date_of_marriage_month+le.date_of_marriage_day;
+ self.marriage_dt     			:= if(trim(le.date_of_marriage_year,LEFT,RIGHT)+trim(le.date_of_marriage_month,LEFT,RIGHT)+trim(le.date_of_marriage_day,LEFT,RIGHT) != '99999999',trim(le.date_of_marriage_year,LEFT,RIGHT)+trim(le.date_of_marriage_month,LEFT,RIGHT)+trim(le.date_of_marriage_day,LEFT,RIGHT),'');
  self.place_of_marriage 		:= stringlib.stringtouppercase(marriage_divorce_v2.get_fl_states(le.marr_state_code));
 
  //divorce info
- self.divorce_filing_dt 		:= le.date_filed_recYY+le.date_filed_recMM+le.date_filed_recDD;
- self.divorce_dt        		:= le.date_of_final_judgmentYY+le.date_of_final_judgmentMM+le.date_of_final_judgmentDD;
+ self.divorce_filing_dt 		:= trim(le.date_filed_recYY,LEFT,RIGHT)+trim(le.date_filed_recMM,LEFT,RIGHT)+trim(le.date_filed_recDD,LEFT,RIGHT);
+ self.divorce_dt        		:= trim(le.date_of_final_judgmentYY,LEFT,RIGHT)+trim(le.date_of_final_judgmentMM,LEFT,RIGHT)+trim(le.date_of_final_judgmentDD,LEFT,RIGHT);
  self.divorce_filing_number := le.certnumber;
- self.divorce_county        := stringlib.stringtouppercase(marriage_divorce_v2.get_ky_county(le.county_issuing_report));
+ self.divorce_county        := le.county_issuing_report;
  self.divorce_docket_volume := trim(le.docket_vol_page);
 
  self := [];
@@ -60,4 +60,4 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriage_divorce
  
 end;
 
-export mapping_fl_divorce := project(marriage_divorce_v2.File_Divorce_FL_In,t_map_to_common(left)) : persist('mar_div_fl_div');
+export mapping_fl_divorce := project(marriage_divorce_v2.File_Divorce_FL_In(regexfind('[a-z,-]',date_of_marriage_month) = false),t_map_to_common(left));// : persist('mar_div_fl_div');

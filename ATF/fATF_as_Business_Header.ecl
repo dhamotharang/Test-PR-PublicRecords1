@@ -1,20 +1,17 @@
-/*2011-12-05T16:51:39Z (Giri_Prod Rajulapalli)
-
-*/
 import Business_Header, ut, lib_stringlib,mdr,address;
 
-export fATF_as_Business_Header(dataset(layout_firearms_explosives_out_Bid) pInput) :=
+export fATF_as_Business_Header(dataset(layout_firearms_explosives_out_bip) pInput, boolean IsPRCT = false) :=
 function
 
 	atf_in := pInput;
 
 	Layout_atf_Local := record
 	unsigned6 record_id := 0;
-	ATF.layout_firearms_explosives_out_Bid;
+	ATF.layout_firearms_explosives_out_Bip;
 	end;
 
 	// Add unique record id to atf file
-	Layout_atf_Local AddRecordID(ATF.layout_firearms_explosives_out_Bid L) := transform
+	Layout_atf_Local AddRecordID(ATF.layout_firearms_explosives_out_Bip L) := transform
 	self := L;
 	end;
 
@@ -23,6 +20,7 @@ function
 	ut.MAC_Sequence_Records(atf_Init, record_id, atf_Seq)
 
 	Business_Header.Layout_Business_Header_New  Translate_atf_to_BHF(Layout_atf_Local l, integer c) := transform
+	SELF.bdid  			:= If(IsPRCT,(integer)l.BDID,0);
 	self.vl_id := l.license_number;
 	self.group1_id := L.record_id;
 	self.vendor_id := l.license_number;
@@ -132,8 +130,8 @@ function
 	self.dt_first_seen := 
 				ut.EarliestDate(ut.EarliestDate(L.dt_first_seen,R.dt_first_seen),
 				ut.EarliestDate(L.dt_last_seen,R.dt_last_seen));
-	self.dt_last_seen := ut.LatestDate(L.dt_last_seen,R.dt_last_seen);
-	self.dt_vendor_last_reported := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+	self.dt_last_seen := max(L.dt_last_seen,R.dt_last_seen);
+	self.dt_vendor_last_reported := max(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 	self.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 	self.company_name := if(L.company_name = '', R.company_name, L.company_name);
 	self.vl_id := if(L.vl_id = '', R.vl_id, L.vl_id);

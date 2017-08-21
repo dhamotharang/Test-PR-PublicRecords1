@@ -12,9 +12,10 @@ FUNCTION
 	
 	lskname := _Constants().autokeytemplate				;
 	llgname := Keynames(pversion).autokeyroot.new	;
+	newBase := PROJECT(pBase, TRANSFORM(Layouts.Keybuild, SELF := LEFT));
 	
 	autokey.mac_useFakeIDs(
-		 pBase
+		 newBase
 		,pBase_withFakeID
 		,build_payload_key
 		,lskname

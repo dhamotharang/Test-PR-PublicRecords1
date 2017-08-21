@@ -1,7 +1,7 @@
-import crim_common;
+import crim_common, hygenics_search;
 
 df := dataset(Crim_Common.Name_Moxie_DOC_Punishment_Dev+'_new',
-			{crim_common.Layout_Moxie_DOC_Punishment.new,unsigned8 __fpos { virtual(fileposition)}},flat,unsorted);
+			{hygenics_search.Layout_Moxie_DOC_Punishment,unsigned8 __fpos { virtual(fileposition)}},flat,unsorted);
 
 layout_crimpunishment into(df L) := transform
 	self.orig_state := L.vendor;

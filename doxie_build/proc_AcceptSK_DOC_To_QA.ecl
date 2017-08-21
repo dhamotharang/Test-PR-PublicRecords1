@@ -1,4 +1,4 @@
-import ut,doxie_build,autokey;
+import ut,doxie_build,autokey,roxiekeybuild;
 
 ut.MAC_SK_Move('~thor_data400::key::corrections_activity_' + doxie_build.buildstate,'Q',do1)
 ut.MAC_SK_Move('~thor_data400::key::corrections_offenders_' + doxie_build.buildstate,'Q',do2)
@@ -8,6 +8,14 @@ ut.MAC_SK_Move('~thor_data400::key::corrections_offenses_' + doxie_build.buildst
 ut.MAC_SK_Move('~thor_data400::key::corrections_court_offenses_' + doxie_build.buildstate,'Q',do6)
 ut.MAC_SK_Move('~thor_data400::key::corrections_punishment_' + doxie_build.buildstate,'Q',do7)
 ut.MAC_SK_Move('~thor_data400::key::corrections_fdid_'+doxie_build.buildstate,'Q',do8)
+
+// BocaShell and FCRA Keys
+RoxieKeyBuild.Mac_SK_Move('~thor_data400::key::corrections_offenders::bocashell_did','Q', do9);
+/*RoxieKeyBuild.Mac_SK_Move('~thor_data400::key::corrections_offenders::fcra::bocashell_did','Q', do10);
+RoxieKeyBuild.Mac_SK_Move('~thor_200::key::criminal_offenders::fcra::@version@::did','Q',do11);
+RoxieKeyBuild.Mac_SK_Move('~thor_200::key::criminal_offenses::fcra::@version@::offender_key','Q',do12);
+RoxieKeyBuild.Mac_SK_Move('~thor_200::key::criminal_punishment::fcra::@version@::offender_key.punishment_type','Q',do13);*/
+
 autokey.MAC_AcceptSK_to_QA('~thor_data400::key::corrections_'+buildstate,autokeymove);
 
-export proc_AcceptSK_DOC_To_QA := parallel(do1,do2,do3,do4,do5,do6,do7,do8,autokeymove);
+export proc_AcceptSK_DOC_To_QA := parallel(do1,do2,do3,do4,do5,do6,do7,do8,do9/*,do10,do11,do12,do13*/,autokeymove);

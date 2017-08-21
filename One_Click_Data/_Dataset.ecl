@@ -1,4 +1,4 @@
-import _control, versioncontrol,ut;
+import _control, tools,ut;
 
 export _Dataset(
 
@@ -7,9 +7,9 @@ export _Dataset(
 ):=
 module
 
-	export IsDataland 					:= VersionControl._Flags.IsDataland;
+	export IsDataland 					:= Tools._Constants.IsDataland;
 	
-	export foreign_environment := if(VersionControl._Flags.IsDataland
+	export foreign_environment := if(IsDataland
 																	,ut.foreign_prod
 																	,ut.foreign_dataland
 																);
@@ -22,6 +22,6 @@ module
 	export thor_cluster_Persists	:= thor_cluster_Files		;
 	export max_record_size				:= 5024000									;
 
-	export Groupname							:= VersionControl.Groupname();
+	export Groupname							:= tools.fun_Groupname('44');
 
 end;

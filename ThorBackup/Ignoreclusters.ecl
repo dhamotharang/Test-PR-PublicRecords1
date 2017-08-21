@@ -1,0 +1,1 @@
+EXPORT Ignoreclusters := ['thor_200','thor400_84'];

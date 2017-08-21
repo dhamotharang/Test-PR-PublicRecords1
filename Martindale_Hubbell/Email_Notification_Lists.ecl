@@ -2,7 +2,7 @@ import _control,RoxieKeyBuild;
 export Email_Notification_Lists :=
 module
 	
-	export all_hands := 'lbentley@seisint.com; tedman@seisint.com;' + 
+	export all_hands := 'lbentley@seisint.com;' + 
 											_control.MyInfo.EmailAddressNotify
 											;
 											

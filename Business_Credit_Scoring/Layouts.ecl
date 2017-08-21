@@ -50,8 +50,8 @@ EXPORT	Layouts	:=	MODULE
 	
 	EXPORT	rScoring	:=	RECORD
 		STRING25	Score_Name			:=	Business_Credit_Scoring.Constants().Score_Name; // Credit Score,  Failure Score or Future LN Credit Score etc..
-		INTEGER		Min_Score_Range	:=	Business_Credit_Scoring.Constants().Min_Score_Range;
-		INTEGER		Max_Score_Range	:=	Business_Credit_Scoring.Constants().Max_Score_Range;
+		INTEGER		Min_Score_Range	:=	(INTEGER)Business_Credit_Scoring.Constants().Min_Score_Range;
+		INTEGER		Max_Score_Range	:=	(INTEGER)Business_Credit_Scoring.Constants().Max_Score_Range;
 		INTEGER		Score;
 		STRING25	Model_Name;
 		DATASET(rScoreReason)	ScoreReasons{MAXCOUNT(iesp.constants.SBAnalytics.MaxHRICount)};

@@ -12,7 +12,7 @@
 </message>
 */
 /*--INFO-- This service returns best address and phone etc.*/
-
+/*--RESULT-- xslt.html */
 
 import doxie, header, header_quick, header_services, header_slimsort, watchdog, ut, utilfile;
 

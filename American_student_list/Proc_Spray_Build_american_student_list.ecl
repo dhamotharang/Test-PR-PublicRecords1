@@ -4,8 +4,8 @@ export Proc_Spray_Build_american_student_list(string filedate, string filename) 
 
 GroupName	:=	VersionControl.GroupName('88');
 
-American_student_list.Mac_spray_american_student(_control.IPAddress.edata12
-   																				,'/data_build_1/american_student/data/'+filedate[1..8]+'/'
+American_student_list.Mac_spray_american_student(_control.IPAddress.bctlpedata11
+   																				,'/data/data_build_1/american_student/data/'+filedate[1..8]+'/'
    																				,filedate
    																				,filename
 																					,GroupName

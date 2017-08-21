@@ -13,6 +13,7 @@ TRANSFORM
 	SELF.num := 0;
 	SELF.imgLength := (INTEGER)L.imgLength;
 	SELF.photo := (DATA)L.photo;
+	self.image_link := self.state + l.filename;
 END;
 j1 := JOIN(imges, info, LEFT.filename = RIGHT.filename, toCommon(LEFT, RIGHT), HASH);
 

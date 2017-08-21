@@ -50,7 +50,7 @@ layout note_init2(layout le,Specificities(File_PersonHeader).FNAME_values_persis
   self := le;
 end;
 DataForKey2 := join(DataForKey0,Specificities(File_PersonHeader).FNAME_values_persisted(length(trim(FNAME))=1),left.FNAME[1]=right.FNAME[1],note_init2(left,right),lookup,left outer); // Append specificities for initials of FNAME
-export Key := index(DataForKey2,,ut.Data_Location.Person_header+'thor_data400::key::PersonLinkingADL2V3PersonHeaderZPRFRefs_' + doxie.version_superkey);
+export Key := index(DataForKey2,,PersonLinkingADL2V3.Filename_keys.kZPRF);
 export RawFetch( typeof(h.ZIP) param_ZIP, typeof(h.PRIM_RANGE) param_PRIM_RANGE, typeof(h.FNAME) param_FNAME) := 
     STEPPED( LIMIT( Key(
           ( ZIP = param_ZIP and param_ZIP <> (typeof(ZIP))'' )

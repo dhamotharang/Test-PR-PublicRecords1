@@ -115,8 +115,15 @@ self.corp_sos_charter_nbr := Map_Charter_Number(l.corp_vendor,l.corp_state_origi
 self := l;
 end;
 
-corp_cont_file := if(Corp_Update_Flag, File_Corporate_Direct_Cont_Update, File_Corporate_Direct_Cont_In);
-
+corp_cont_file := if(Corp_Update_Flag
+								,if(Flags.IsUsingV2Inputs
+									,if(Flags.UseV2CurrentSprayed
+										,File_Corporate_Direct_Cont_Update + Corp.Files.V2.cont
+										,File_Corporate_Direct_Cont_Update + Corp.Files.V2.cont_father
+									)
+									,File_Corporate_Direct_Cont_Update
+								)
+						,File_Corporate_Direct_Cont_In);
 
 cont_update_dist := distribute(corp_cont_file, hash(corp_key));
 cont_update_sort := sort(cont_update_dist, record, local);
@@ -162,7 +169,7 @@ self.record_type := 'H';
 self := l;
 end;
 
-cont_current_init := project(File_Corp_Cont_Base(corp_vendor <> 'EX', Corp_Cont_Base_Filter), InitCurrentBase(left));
+cont_current_init := project(File_Corp_Cont_Base(corp_vendor <> 'EX', Filters.Base.Corp_Cont), InitCurrentBase(left));
 cont_current_init_dedup := dedup(cont_current_init, all);
 cont_current_init_dist := distribute(cont_current_init_dedup, hash(corp_key));
 
@@ -531,5 +538,22 @@ cont_did_append := join(cont_did_seq_dist,
 						AssignDIDs(left, right),
 						left outer,
 						local);
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// -- Add Dummy data to corp cont base file
+/////////////////////////////////////////////////////////////////////////////////////////////////
+dummy_dataset := dataset(
+[
+	{999999001001,999999001001,20021124,0,20021124,0,'26-RVH9999999001001','26','MI','20060719','L9999999001001','L9999999001001','MARSUPIAL MANOR III','','PRINCIPAL CORPORATE ADDRESS','12345 S. WAYNE RD.','','ROMULUS, MI 48174','','','','','','','','','','','','','','','','MARK MARSUPIAL','PRESIDENT','','351762213','','','','GENERAL PARTNER ADDRESS','ONE PARK AVE','','NEW YORK, NY 10016','','','','','','','','','','12345','','WAYNE','RD','','','','ROMULUS','ROMULUS','MI','48174','1551','C076','D','136','A','0','4','S','26','163','42.23264','-83.385796','2160','5859001','1','S820','MR','MARK','','MARSUPIAL','','','','','1','','PARK','AVE','','','','NEW YORK','NEW YORK','NY','10016','5802','C016','D','16','A','99','9','HD','36','61','40.746087','-73.981982','5600','72004','1','S800','','','C'}
 
-export Corp_Updated_Cont := cont_did_append : persist('TEMP::Corp_Cont_Base');
+], Layout_Corp_Cont_Temp);	
+
+Layout_Corp_Cont_Temp tAddBuildDates(Layout_Corp_Cont_Temp l) :=
+transform
+	self.dt_last_seen				:= (unsigned4)Corp.Corp_Build_Date;
+	self.dt_vendor_last_reported	:= (unsigned4)Corp.Corp_Build_Date;
+	self							:= l;
+end;
+
+dummy_data_fix_dates := project(dummy_dataset, tAddBuildDates(left));
+
+export Corp_Updated_Cont := cont_did_append + dummy_data_fix_dates : persist('TEMP::Corp_Cont_Base');

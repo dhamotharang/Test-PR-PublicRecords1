@@ -7,14 +7,6 @@ import did_add,fair_isaac,didville,ut,header_slimsort,watchdog, Business_Header,
 /*                                           */
 /*-------------------------------------------*/
 
-pre := sequential(
-		fileservices.startsuperfiletransaction(),
-		fileservices.clearsuperfile('~thor_data400::in::liens_did_father',true),
-		fileservices.addsuperfile('~thor_data400::in::liens_did_father','~thor_Data400::in::liens_did_in'),
-		fileservices.clearsuperfile('~thor_data400::in::liens_did_in'),
-		fileservices.addsuperfile('~thor_data400::in::liens_did_in','~thor_data400::in::liens'+bankrupt.version_search_doxie),
-		fileservices.finishsuperfiletransaction()
-		);
 
 df := bankrupt.File_Liens;
 
@@ -39,7 +31,7 @@ did_add.MAC_Match_Flex(df2,myset,orig_ssn,foo,def_fname,def_mname,def_lname,
 
 did_add.MAC_Add_SSN_By_DID(outf,did_temp,ssn_appended_temp,out2,true)	
 
-to_bdid := out2 : persist('TEMP:liens_did');
+to_bdid := out2 : persist('~thor_data400::temp::liens_did');
 to_bdid_company := to_bdid((indivbusun='B' or aka_yn = 'B') and company_name <> '');
 to_bdid_no_company := to_bdid(not((indivbusun='B' or aka_yn = 'B') and company_name <> ''));
 
@@ -87,10 +79,5 @@ typeof(df) into(out3 L) := transform
 end;
 
 out4 := project(out3,into(LEFT));
-output(out4,,'~thor_data400::out::liens_rebdid_20050512',overwrite);
-//ut.mac_sf_buildprocess(out4,'~thor_data400::base::liens',done,3)
 
-//sequential (pre,done);
-//output(count(df((integer)df.did > 0)));
-
-//output(out4,,'out::liens_did_added',overwrite);
+output(out4,,'~thor_data400::out::liens_rebdid_'+bankrupt.version_search_doxie,overwrite);

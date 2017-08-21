@@ -1,12 +1,20 @@
+/*2016-06-02T23:05:56Z (Andi Koenen)
+checkin for review so code can get pushed to 196 for testing without key errors
+*/
+
 IMPORT ut,Data_services,Doxie,_control,bipv2;
 EXPORT Filename_Keys := module
+
   SHARED THISMODULE:='BizLinkFull';
-  EXPORT STRING superkey_version:=TRIM(MAP(
-     THISMODULE[LENGTH(THISMODULE)-1..] ='02'=> 'Dev'
-    ,THISMODULE[LENGTH(THISMODULE)-1..] ='03'=> 'Dev03'
-    ,regexfind('roxie',_Control.ThisEnvironment.Name,nocase) or not regexfind('dataland|thor',_Control.ThisEnvironment.Name,nocase)  =>  doxie.version_superkey
-    ,BIPV2.KeySuffix
-  ));
+	EXPORT STRING superkey_version:=TRIM(doxie.version_superkey);
+
+  // EXPORT STRING superkey_version:=TRIM(MAP(
+     // THISMODULE[LENGTH(THISMODULE)-1..] ='02'=> 'Dev'
+    // ,THISMODULE[LENGTH(THISMODULE)-1..] ='03'=> 'Dev03'
+    // ,regexfind('roxie',_Control.ThisEnvironment.Name,nocase) or not regexfind('dataland|thor',_Control.ThisEnvironment.Name,nocase)  =>  doxie.version_superkey
+    // ,BIPV2.KeySuffix
+  // ));
+
   SHARED STRING basename:=Data_services.Data_location.Prefix('biz_linking') + 'key::'+THISMODULE+'::'+superkey_version+'::proxid::';
   // Key_BizHead_
   EXPORT Refs                      := basename+'refs';

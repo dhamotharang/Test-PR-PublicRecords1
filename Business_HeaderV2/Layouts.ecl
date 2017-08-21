@@ -6,9 +6,12 @@ module
 	export Base :=
 	module
 	
+		export Source_Business_header		:= business_header.Layout_Business_Header;
 		export Business_headers					:= business_header.Layout_Business_Header_Base;
 		export Business_Best						:= Business_Header.Layout_BH_Best;
 		export Supergroup								:= Business_Header.Layout_BH_Super_Group;
+		export Business_Contacts_Full		:= Business_Header.Layout_Business_Contact_full;
+		export Business_Contacts_Keybuild	:= Business_Header.Layout_Business_Contact_Plus;
 		export Business_Contacts				:= Business_Header.Layout_Business_Contact;
 		export Business_Contact_Stats		:= Business_Header.Layout_Business_Contacts_Stats;
 		export Business_header_Stat			:= Business_Header.Layout_Business_Header_Stat;
@@ -28,6 +31,7 @@ module
 		export Business_Relative				:= Business_Header.Layout_Business_Relatives_Out;
 		export Business_Relative_Group	:= Business_Header.Layout_Business_Relatives_Group_Out;
 		export PeopleAtWork							:= Business_Header.Layout_Employment_Out;
+		export PeopleAtWork_Keybuild		:= Business_Header.Layout_Employment_keybuild;
 	
 	end;
 

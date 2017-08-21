@@ -2,7 +2,7 @@ export layout_flcrash1_v3 := record
 //	string1   rec_type_1,
 	string   accident_nbr,
 	string  Image_nbr,  //new field added
-	string  Accident_date, //new field added
+	string  report_date, //8 bytes instead of 6
 	string    codeable_noncodeable, //new field added
 //	string4   filler1,
 	string   day_week,

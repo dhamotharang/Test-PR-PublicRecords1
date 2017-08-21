@@ -2,13 +2,11 @@ import _control,VersionControl;
 
 export Spray_CompID(
 			string pVersion				=	Version
-			,string pSourceDIR			=	'/hds_180/cid/'
-			,string pTarget				=	'~thor_data400::in::alpharetta::compid'
+			,string pSourceDIR			=	'/hds_180/cid/weekly/in/'
+			,string pTarget				=	'thor_data400::in::alpharetta::compid'
 			,string pSourceIP			=	_Control.IPAddress.edata12
 			,string pDestinationgroup	=	_Control.ThisCluster.GroupName
 			) := function
-
-	clear_sf:=fileservices.clearsuperfile(pTarget);
 
 	FilesToSpray := DATASET([
 
@@ -17,7 +15,7 @@ export Spray_CompID(
 	 	,'LN_*'
 	 	,sizeof(compID.Layout_compID)
 	 	,'~thor_data400::in::alpharetta::compid::@version@'
-	 	,[{pTarget}]
+	 	,[{'~'+pTarget}]
 	 	,pDestinationgroup
 		,pVersion
 	 	}
@@ -27,7 +25,9 @@ export Spray_CompID(
 	fSpray:=VersionControl.fSprayInputFiles(FilesToSpray,,,,,,false);
 
 	return sequential(
-					clear_sf
+					Promote(pVersion,pTarget)._delete
+					,Promote(pVersion,pTarget)._father
+					,Promote(pVersion,pTarget)._prod
 					,fSpray
 					);
 

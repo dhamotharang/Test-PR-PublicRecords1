@@ -40,18 +40,19 @@ FIELD:shoes:0,0
 FIELD:jacket:0,0
 FIELD:soundex:0,0
 FIELD:persons_notes:0,0
-NUMBERFIELD:weight_1:0,0
-NUMBERFIELD:weight_2:0,0
-NUMBERFIELD:height_1:0,0
-NUMBERFIELD:height_2:0,0
-NUMBERFIELD:age_1:0,0
-NUMBERFIELD:age_2:0,0
+FIELD:weight_1:SEGTYPE(NumericType):1,0
+FIELD:weight_2:SEGTYPE(NumericType):1,0
+FIELD:height_1:SEGTYPE(NumericType):1,0
+FIELD:height_2:SEGTYPE(NumericType):1,0
+FIELD:age_1:SEGTYPE(NumericType):1,0
+FIELD:age_2:SEGTYPE(NumericType):1,0
 FIELD:persons_sid:0,0
 FIELD:picture:0,0
 FIELD:facial_recognition:0,0
+FIELD:personstamp:0,0
 CONCEPT:NOTES:persons_notes:SEGTYPE(GroupSeg):1,0
  
-Total available specificity:1
+Total available specificity:7
 Search Threshold set at -4
 Use of PERSISTs in code set at:3
  

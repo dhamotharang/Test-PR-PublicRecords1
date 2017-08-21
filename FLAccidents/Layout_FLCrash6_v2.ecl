@@ -8,6 +8,7 @@ export Layout_FLCrash6_v2 := record
 	string16  filler2,
 	string1   ped_name_suffix,
 	// Expanded column from 40
+		string60  ped_address,
 	string60  ped_st_city,
 	string18  filler3,
 	string2   ped_state,

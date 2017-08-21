@@ -1,6 +1,6 @@
-IMPORT Business_Header, ut;
+IMPORT Business_Header, ut,mdr;
 
-export fABIUS_Company_As_Business_Header(dataset(Layout_abius_company_data_In) pABIUS_Company)
+export fABIUS_Company_As_Business_Header(dataset(InfoUSA.Layout_ABIUS_Company_Base_AID) pABIUS_Company)
  :=
   function
 
@@ -15,13 +15,13 @@ export fABIUS_Company_As_Business_Header(dataset(Layout_abius_company_data_In) p
 
 	Layout_abius_company_Local := RECORD
 	UNSIGNED6 record_id := 0;
-	Layout_abius_company_data_In;
+	InfoUSA.Layout_ABIUS_Company_Base_AID;
 	END;
 
 	//--------------------------------------------
 	// Add unique record id to abius_company file
 	//--------------------------------------------
-	Layout_abius_company_Local AddRecordID(Layout_abius_company_data_In L) := TRANSFORM
+	Layout_abius_company_Local AddRecordID(InfoUSA.Layout_ABIUS_Company_Base_AID L) := TRANSFORM
 	SELF := L;
 	END;
 
@@ -29,12 +29,13 @@ export fABIUS_Company_As_Business_Header(dataset(Layout_abius_company_data_In) p
 
 	ut.MAC_Sequence_Records(abius_company_Init, record_id, abius_company_Seq);
 
-	bh_layout := business_header.Layout_Business_Header;
+	bh_layout := business_header.Layout_Business_Header_New;
 
 	bh_layout Translate_abius_company_To_BHF(Layout_abius_company_Local L, integer CTR) := transform
-	  SELF.source 				  := 'IA'; 
+	  SELF.source 				  := MDR.sourceTools.src_INFOUSA_ABIUS_USABIZ; 
 	  SELF.source_group 		  := L.ABI_NUMBER;
 	  SELF.group1_id 			  := L.record_id;
+		SELF.vl_id 			      := L.ABI_NUMBER;
 	  SELF.vendor_id 			  := L.ABI_NUMBER + L.COMPANY_NAME;
 	  SELF.dt_first_seen 		  := if(L.DATE_ADDED <> '', ((UNSIGNED4)L.DATE_ADDED) * 100, 0);  
 	  SELF.dt_last_seen 		  := if(L.DATE_ADDED <> '', ((UNSIGNED4)L.DATE_ADDED) * 100, 0);
@@ -48,7 +49,7 @@ export fABIUS_Company_As_Business_Header(dataset(Layout_abius_company_data_In) p
 	  SELF.postdir 			  := CHOOSE(CTR, L.postdir,		L.postdir2);
 	  SELF.unit_desig 			  := CHOOSE(CTR, L.unit_desig,	L.unit_desig2);
 	  SELF.sec_range 			  := CHOOSE(CTR, L.sec_range,		L.sec_range2);
-	  SELF.city 				  := CHOOSE(CTR, L.p_city_name,	L.p_city_name2);
+	  SELF.city 				  := CHOOSE(CTR, L.v_city_name,	L.v_city_name2);
 	  SELF.state 				  := CHOOSE(CTR, L.st, 			L.st2);
 	  SELF.zip 				  := CHOOSE(CTR, (UNSIGNED3)L.z5, 	(UNSIGNED3)L.z52);
 	  SELF.zip4 				  := CHOOSE(CTR, (UNSIGNED2)L.zip4,(UNSIGNED2)L.zip42);
@@ -60,6 +61,7 @@ export fABIUS_Company_As_Business_Header(dataset(Layout_abius_company_data_In) p
 	  SELF.phone_score 			  := IF((UNSIGNED8)L.PHONE = 0, 0, 1);
 	  SELF.fein 				  := 0;
 	  SELF.current 			  := TRUE;
+		self.rawaid					:= L.Append_RawAID;	
 	END;
 
 	//--------------------------------------------
@@ -103,11 +105,12 @@ export fABIUS_Company_As_Business_Header(dataset(Layout_abius_company_data_In) p
 	SELF.dt_first_seen := 
 				ut.EarliestDate(ut.EarliestDate(L.dt_first_seen,R.dt_first_seen),
 				ut.EarliestDate(L.dt_last_seen,R.dt_last_seen));
-	SELF.dt_last_seen := ut.LatestDate(L.dt_last_seen,R.dt_last_seen);
-	SELF.dt_vendor_last_reported := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+	SELF.dt_last_seen := max(L.dt_last_seen,R.dt_last_seen);
+	SELF.dt_vendor_last_reported := max(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 	SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 	SELF.company_name := IF(L.company_name = '', R.company_name, L.company_name);
 	SELF.group1_id := IF(L.group1_id = 0, R.group1_id, L.group1_id);
+	SELF.vl_id := IF(L.vl_id = '', R.vl_id, L.vl_id);
 	SELF.vendor_id := IF((L.group1_id = 0 AND R.group1_id <> 0) OR
 						 L.vendor_id = '', R.vendor_id, L.vendor_id);
 	SELF.source_group := IF((L.group1_id = 0 AND R.group1_id <> 0) OR

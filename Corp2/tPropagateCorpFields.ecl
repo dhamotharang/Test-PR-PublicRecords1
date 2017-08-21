@@ -1,4 +1,4 @@
-export Layout_Corporate_Direct_Corp_Base tPropagateCorpFields(Layout_Corporate_Direct_Corp_Base l, Layout_Corporate_Direct_Corp_Base r) := 
+export Layout_Corporate_Direct_Corp_AID tPropagateCorpFields(Layout_Corporate_Direct_Corp_AID l, Layout_Corporate_Direct_Corp_AID r) := 
 transform
 	PropagateField(unsigned address_type) :=	(address_type = 1 and (r.corp_address1_effective_date <> '' or r.corp_address1_line1 <> '' or r.corp_address1_line2 <> '')) or
 						(address_type = 2 and (r.corp_address2_effective_date <> '' or r.corp_address2_line1 <> '' or r.corp_address2_line2 <> '')) or
@@ -53,7 +53,13 @@ transform
 	self.corp_stock_exchange := if(r.corp_stock_exchange <> '' or r.corp_ticker_symbol <> '', r.corp_stock_exchange, l.corp_stock_exchange);
 	//
 	self.corp_inc_state := if(r.corp_inc_state <> '', r.corp_inc_state, l.corp_inc_state);
-	self.corp_inc_date := if(r.corp_inc_date <> '', r.corp_inc_date, l.corp_inc_date);
+	self.corp_inc_date 	:= if(	r.corp_inc_date <> '', 
+								r.corp_inc_date, 
+								if(	trim(stringlib.StringtoUpperCase(r.corp_filing_desc),left,right) = 'INCORPORATION',
+									l.corp_inc_date,
+									''
+								   )
+							  );
 	self.corp_fed_tax_id := if(r.corp_fed_tax_id <> '', r.corp_fed_tax_id, l.corp_fed_tax_id);
 	self.corp_state_tax_id := if(r.corp_state_tax_id <> '', r.corp_state_tax_id, l.corp_state_tax_id);
 	// check to propagate term of existence info

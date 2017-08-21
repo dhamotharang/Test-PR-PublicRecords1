@@ -1,4 +1,4 @@
-import doxie_files, ut, doxie, autokey;
+Import Data_Services, doxie_files, ut, doxie, autokey;
 
 f_phonesplus := phonesplus_v2._keybuild_royalty_base;
 
@@ -18,4 +18,4 @@ _DS_phonesplus_xpand := project(f_phonesplus, xpand_phonesplus(left, counter));
 
 export Key_Royalty_Fdid := index(_DS_phonesplus_xpand,{fdid},{_DS_phonesplus_xpand},
                                   // ut.foreign_prod+'thor_data400::key::phonesplus_fdids_' + doxie.Version_SuperKey);
-                                  '~thor_data400::key::phonesplusv2_royalty_fdids_' + doxie.Version_SuperKey);
+                                  Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::phonesplusv2_royalty_fdids_' + doxie.Version_SuperKey);

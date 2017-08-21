@@ -54,7 +54,7 @@ EXPORT SplitCompoundPostings := MODULE
 		short * resp = (short *) __result; // No allocation, use area given
 		for (int i=0; i < STAT_ENTRIES; i++) resp[i] = 0;
 		short char_class;
-		for (int i=0; i<len_input; i++) {
+		for (int i=0; i< static_cast<int64_t>(len_input); i++) {
 		  char_class = CLASS_TAB[input[i]];
 			resp[char_class]++;
 			if (XSP!=char_class && 0!=char_class) resp[TRIMLEN]++;
@@ -218,7 +218,7 @@ EXPORT SplitCompoundPostings := MODULE
 		sd->entries = 0;
 		short pos;
 		pos = (start < 0) ? 0   : start;
-		while (pos < len_input && (td.typ==JUNK || start < 0)) {
+		while (pos < static_cast<int64_t>(len_input) && (td.typ==JUNK || start < 0)) {
 			findTok(pos, len_input, input, false, &td);
 			if (td.typ != JUNK) sd->entries++;
 			pos += td.tokLen;

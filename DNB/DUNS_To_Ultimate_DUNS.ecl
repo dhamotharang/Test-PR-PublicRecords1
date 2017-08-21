@@ -1,6 +1,14 @@
-IMPORT ut;
+IMPORT ut,Business_HeaderV2;
 
-df := File_DNB_Base;
+EXPORT DUNS_To_Ultimate_DUNS(
+
+	 dataset(Layout_DNB_Base	)	pFile_DNB_Base	= Business_HeaderV2.Source_Files.dnb_companies.BusinessHeader	()
+	,string											pPersistname		= '~thor_data400::persist::DNB::DUNS_To_Ultimate_DUNS'													
+
+) :=
+function
+
+df := pFile_DNB_Base;
 du := df(active_duns_number = 'Y', duns_number != '');
 
 du_ded := DEDUP(du, duns_number, 
@@ -69,4 +77,8 @@ ultimate_dist := DISTRIBUTE(
 	DEDUP(ultimate_ded3 + child_ded3, duns_number, ultimate_duns_number, ALL),
 	HASH(duns_number));
 
-EXPORT DUNS_To_Ultimate_DUNS := ultimate_dist : PERSIST('TEMP::DUNS_To_Ultimate_DUNS');
+DUNS_To_Ultimate_DUNS_persisted := ultimate_dist : PERSIST(pPersistname);
+
+return DUNS_To_Ultimate_DUNS_persisted;
+
+end;

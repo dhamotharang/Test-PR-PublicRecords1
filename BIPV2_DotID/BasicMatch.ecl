@@ -11,13 +11,14 @@ SHARED  h00 := Specificities(ih).input_file;
     SALT33.UIDType DOTid2;
   END;
 // It is important that this is an EQUIVALENCE relationship - it allows us to form an implicit transitive closure
-  h01 := SORT(h00_match,SALT_Partition,cnp_name,corp_legal_name,cnp_number,cnp_btype,company_fein,active_duns_number,active_enterprise_number,active_domestic_corp_key,prim_range,prim_name,sec_range,st,v_city_name,zip,isContact,fname,mname,lname,name_suffix,contact_ssn,DOTid);
-  h02 := DEDUP(h01,SALT_Partition,cnp_name,corp_legal_name,cnp_number,cnp_btype,company_fein,active_duns_number,active_enterprise_number,active_domestic_corp_key,prim_range,prim_name,sec_range,st,v_city_name,zip,isContact,fname,mname,lname,name_suffix,contact_ssn,LOCAL); // ,LOCAL ok - we don't need a perfect dedup - this is an optimization
+    h02 := table(h00_match
+            ,{SALT_Partition,cnp_name,corp_legal_name,cnp_number,cnp_btype,company_fein,active_duns_number,active_enterprise_number,active_domestic_corp_key,prim_range,prim_name,sec_range,st,v_city_name,zip,isContact,fname,mname,lname,name_suffix,contact_ssn,unsigned6 DOTid := min(group,DOTid)}
+            , SALT_Partition,cnp_name,corp_legal_name,cnp_number,cnp_btype,company_fein,active_duns_number,active_enterprise_number,active_domestic_corp_key,prim_range,prim_name,sec_range,st,v_city_name,zip,isContact,fname,mname,lname,name_suffix,contact_ssn,merge);/*HACK*/
   Match := JOIN(h02,MatchCands,LEFT.cnp_name = RIGHT.cnp_name AND LEFT.corp_legal_name = RIGHT.corp_legal_name AND LEFT.cnp_number = RIGHT.cnp_number AND LEFT.cnp_btype = RIGHT.cnp_btype AND LEFT.company_fein = RIGHT.company_fein
        AND LEFT.active_duns_number = RIGHT.active_duns_number AND LEFT.active_enterprise_number = RIGHT.active_enterprise_number AND LEFT.active_domestic_corp_key = RIGHT.active_domestic_corp_key AND LEFT.prim_range = RIGHT.prim_range AND LEFT.prim_name = RIGHT.prim_name
        AND LEFT.sec_range = RIGHT.sec_range AND LEFT.st = RIGHT.st AND LEFT.v_city_name = RIGHT.v_city_name AND LEFT.st = RIGHT.st AND LEFT.zip = RIGHT.zip AND LEFT.isContact = RIGHT.isContact
        AND LEFT.fname = RIGHT.fname AND LEFT.mname = RIGHT.mname AND LEFT.lname = RIGHT.lname AND LEFT.name_suffix = RIGHT.name_suffix AND LEFT.contact_ssn = RIGHT.contact_ssn AND ( LEFT.SALT_Partition = RIGHT.SALT_Partition ) AND LEFT.DOTid < RIGHT.DOTid,TRANSFORM(Rec,SELF.DOTid2 := LEFT.DOTid,SELF.DOTid1 := RIGHT.DOTid), HASH);
-SHARED PickOne := DEDUP( SORT( DISTRIBUTE( Match,HASH(DOTid1) ), DOTid1, DOTid2, LOCAL), DOTid1, LOCAL); // Lowest collector ID for each singleton
+SHARED PickOne := table( Match  ,{DOTid1  ,unsigned6 DOTid2 := min(group,DOTid2)}, DOTid1, merge);/*HACK*/ // Lowest collector ID for each singleton
 EXPORT patch_file := PickOne;
   ut.MAC_Patch_Id(h00,DOTid,PickOne,DOTid1,DOTid2,o1); // Patch the input file
 EXPORT input_file := o1 : INDEPENDENT;

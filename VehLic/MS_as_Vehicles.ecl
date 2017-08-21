@@ -144,6 +144,8 @@ self.orig_state := 'MS';
 self.VEHICLE_NUMBERxBG1:= le.title_num ;
 self.ORIG_VIN:= le.vin;
 self.FIRST_REGISTRATION_DATE:= if(ut.Date_MMDDYY_i2(le.purchase_date)<>0,(string8)ut.Date_MMDDYY_i2(le.purchase_date),'');
+//added eff_reg info.
+self.REGISTRATION_EFFECTIVE_DATE:= if(ut.Date_MMDDYY_i2(le.tag_issue_date)<>0,(string8)ut.Date_MMDDYY_i2(le.tag_issue_date),'');
 self.YEAR_MAKE:= if((unsigned1)le.veh_year<10,'20','19')+le.veh_year ;
 self.MAKE_CODE:= le.veh_make ;
 self.VEHICLE_TYPE:= le.veh_type ;
@@ -164,7 +166,8 @@ self.OWN_1_ZIP5_ZIP4_FOREIGN_POSTAL:= le.title_own_zip_new[1..5] +
 										 ''
 										);
 //reformatting of zip code above
-self.PLATE_ISSUE_DATE:= if(ut.Date_MMDDYY_i2(le.tag_issue_date)<>0,(string8)ut.Date_MMDDYY_i2(le.tag_issue_date),'');
+//self.PLATE_ISSUE_DATE:= if(ut.Date_MMDDYY_i2(le.tag_issue_date)<>0,(string8)ut.Date_MMDDYY_i2(le.tag_issue_date),'');
+
 self.DECAL_TYPE:= le.LST_REG_TRAN_TYP;
 self.TRUE_LICENSE_PLSTE_NUMBER:= le.tag_num ;
 self.REG_1_CUSTOMER_NAME:= le.reg_name ;

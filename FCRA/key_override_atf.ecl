@@ -5,7 +5,7 @@ EXPORT key_override_atf := module
 	shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
   shared keyname_prefix := data_services.data_location.prefix('ATF') + 'thor_data400::key::override::fcra::atf::qa::';
 
-  atf_rec := RECORD
+  export atf_rec := RECORD
     ATF_Services.layouts.firearms_out;
     string20 flag_file_id;
   end;

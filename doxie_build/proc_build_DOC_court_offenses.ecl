@@ -1,8 +1,8 @@
-import ut, corrections, codes;
+import ut, corrections, codes, hygenics_crim;
 
-df := corrections.allcourtoffenses;
+df := hygenics_crim.allcourtoffenses;
 
-corrections.layout_CourtOffenses into_cof(df L, codes.File_Codes_V3_In R) := transform
+hygenics_crim.layout_CourtOffenses into_cof(df L, codes.File_Codes_V3_In R) := transform
 	self.court_off_lev_mapped := R.long_desc;
 	self.arr_off_lev_mapped := '';
 	self := L;
@@ -14,7 +14,7 @@ df2 := join(df,codes.File_Codes_V3_In,right.file_name='COURT_OFFENSES' and
 			right.code = left.court_off_lev,
 			into_cof(LEFT,RIGHT),lookup,left outer);
 			
-corrections.layout_CourtOffenses into_aof(df2 L, codes.File_Codes_V3_In R) := transform
+hygenics_crim.layout_CourtOffenses into_aof(df2 L, codes.File_Codes_V3_In R) := transform
 	self.arr_off_lev_mapped := R.long_desc;
 	self := L;
 end;

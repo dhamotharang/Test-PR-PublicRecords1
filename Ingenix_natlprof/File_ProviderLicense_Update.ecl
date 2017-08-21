@@ -1,1 +1,0 @@
-export File_ProviderLicense_Update := dataset(Ingenix_NatlProf.File_In_Cluster + 'in::Ingenix_NatlProf_ProviderLicense_update', Ingenix_Natlprof.Layout_in_ProviderLicense,CSV(quote(''),separator('|')));

@@ -7,7 +7,7 @@ end;
 
 export Key_Src_TN(boolean pFastHeader = false, boolean pCombo = true, dataset(src_rec) pDataset=dataset([],src_rec)) := function
 
-d:=if(pCombo,pDataset,TransunionCred.as_source(if(pFastHeader,TransunionCred.Files.Base),~pFastHeader,pFastHeader));
+d:=if(pCombo,pDataset,header.Files_SeqdSrc(pFastHeader).TN);
 
 dTransUnionCred_as_Source	:=	project(d
 //for contractual reasons with TU dob and phone cannot be displayed in any customer report

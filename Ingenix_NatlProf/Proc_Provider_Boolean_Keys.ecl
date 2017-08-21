@@ -1,0 +1,2 @@
+export Proc_Provider_Boolean_Keys(string filedate) := sequential(Ingenix_natlprof.BWR_Build_Segment_Metadata('provider',filedate),
+																												Ingenix_natlprof.BWR_Build_Provider_Boolean(filedate));

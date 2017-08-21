@@ -43,6 +43,7 @@ SuppressResultSchemas      =1
 		boolean IsSupplied{xpath('IsSupplied')};
 		boolean ShowFileContent{xpath('ShowFileContent')};
 		unsigned Total{xpath('Total')};
+
       // <Name>Result 1</Name>
       // <Sequence>0</Sequence>
       // <Value>[938517726 rows]</Value>
@@ -70,6 +71,7 @@ SuppressResultSchemas      =1
   // <xsd:element minOccurs="0" name="Subs" type="xsd:int" /> 
   // <xsd:element minOccurs="0" name="Count" type="xsd:int" /> 
   // <xsd:element minOccurs="0" name="ECLSourceFiles" type="tns:ArrayOfECLSourceFile" /> 
+
 		string FileCluster {xpath('FileCluster')};
 		string Name{xpath('Name')};
 		boolean IsSuperFile{xpath('IsSuperFile')};
@@ -79,7 +81,9 @@ SuppressResultSchemas      =1
 		// string ECLSourceFiles{xpath('ECLSourceFiles')};
 	
 	end;
+
 //export WsFileRead := record  string name{maxlength(256)}; string cluster{maxlength(64)}; boolean isSuper; unsigned4 usage; end;
+
 	export eclGraphResultLayout :=
 	record, maxlength(500)
 	
@@ -92,6 +96,7 @@ SuppressResultSchemas      =1
 		string 	RunningId	{xpath('RunningId')};
 	
 	end;
+
 	export eclWorkflowsResultLayout :=
 	record
 	
@@ -102,6 +107,7 @@ SuppressResultSchemas      =1
 		string  CountRemaining	{xpath('CountRemaining'	)};
 	
 	end;
+
 	export eclTimerResultLayout :=
 	record
 	
@@ -112,6 +118,7 @@ SuppressResultSchemas      =1
 		string  SubGraphId	{xpath('SubGraphId' )};
 	
 	end;
+
 	export ECLTimingDataLayout :=
 	record
 	
@@ -133,6 +140,7 @@ SuppressResultSchemas      =1
 		string  NumberSlaves		{xpath('NumberSlaves'	)};
 	
 	end;
+
 	export ECLExceptionLayout :=
 	record
 	
@@ -145,6 +153,7 @@ SuppressResultSchemas      =1
 		integer Column  		{xpath('Column'	  )};
 	
 	end;
+
 	export wuinfoOutRecord :=
 	record, maxlength(100000)
 	
@@ -177,7 +186,7 @@ SuppressResultSchemas      =1
 		string EventSchedule      {xpath('Workunit/EventSchedule'       )};
 		string HaveSubGraphTimings{xpath('Workunit/HaveSubGraphTimings' )};
 		string TotalThorTime      {xpath('Workunit/TotalThorTime'       )};
-		string Query              {xpath('Workunit/Query'               )};
+		string Query              {xpath('Workunit/Query/Text'          )};
     
 	  dataset(eclResultLayout           ) results     {xpath('Workunit/Results/ECLResult'       )};
 		dataset(ECLSourceFileLayout       ) SourceFiles {xpath('Workunit/SourceFiles/ECLSourceFile')};
@@ -190,12 +199,17 @@ SuppressResultSchemas      =1
 	
   
 	end;
+
 	export WUInfo := 
 	function
 	
 		userid 		:= _control.MyInfo.UserID;
 		password	:= _control.MyInfo.Password;
+
 		esp				:= pesp + ':8010';	//oss is 242,infiniband is '10.241.3.242'
+
+
+
 		results := SOAPCALL(
 			'http://' + esp + '/WsWorkunits?ver_=1.48'
 			,'WUInfo'
@@ -207,12 +221,17 @@ SuppressResultSchemas      =1
 		return if(wk_ut.Is_Valid_Wuid(pWorkunitID)  ,results ,dataset([],wuinfoOutRecord));
 		
 	end;
+
 	export WUInfo_nofail := 
 	function
 	
 		userid 		:= _control.MyInfo.UserID;
 		password	:= _control.MyInfo.Password;
+
 		esp				:= pesp + ':8010';	//oss is 242,infiniband is '10.241.3.242'
+
+
+
 		results := SOAPCALL(
 			'http://' + esp + '/WsWorkunits?ver_=1.48'
 			,'WUInfo'
@@ -227,6 +246,7 @@ SuppressResultSchemas      =1
 		return if(wk_ut.Is_Valid_Wuid(pWorkunitID)  ,results ,dataset([],wuinfoOutRecord));
 		
 	end;
+
   export dnormresults      := normalize(WUInfo(),left.results    ,transform(recordof(left.results    ),self := right));  //i get these
   export dnormSourceFiles  := normalize(WUInfo(),left.SourceFiles,transform(recordof(left.SourceFiles),self := right));  //we'll see...
   export dnormworkflows    := normalize(WUInfo(),left.workflows  ,transform(recordof(left.workflows  ),self := right));  //nothing(well, I guess if there are workflows in the workunit u would get them back)
@@ -235,6 +255,22 @@ SuppressResultSchemas      =1
   export dnormTimers       := normalize(WUInfo(),left.Timers     ,transform(recordof(left.Timers     ),self := right));  //i get these
   export dnormThorLogInfo  := normalize(WUInfo(),left.ThorLogInfo,transform(recordof(left.ThorLogInfo),self := right));  //nothing(not sure here either)
   export dnormECLException := normalize(WUInfo(),left.Exceptions ,transform(recordof(left.Exceptions ),self := right));  //
+
+  WsTiming := 
+  RECORD
+    UNSIGNED4 count                     ;
+    UNSIGNED4 duration                  ;
+    UNSIGNED4 max                       ;
+    STRING    name      {MAXLENGTH(64)} ;
+  END;
+  
+  export ds_Wstiming := project(dnormTimers  ,transform(WsTiming 
+    ,self.count    := (unsigned4)left.count
+    ,self.duration := 0//map(regexfind('ms'  ,left.Value ,nocase)  => 
+    ,self.max      := 0
+    ,self.name     := left.name
+  )); 
+
   export dnormresults_nofail      := normalize(WUInfo_nofail(),left.results    ,transform(recordof(left.results    ),self := right));  //i get these
   export dnormSourceFiles_nofail  := normalize(WUInfo_nofail(),left.SourceFiles,transform(recordof(left.SourceFiles),self := right));  //we'll see...
   export dnormworkflows_nofail    := normalize(WUInfo_nofail(),left.workflows  ,transform(recordof(left.workflows  ),self := right));  //nothing(well, I guess if there are workflows in the workunit u would get them back)
@@ -249,6 +285,7 @@ SuppressResultSchemas      =1
 		string   Name {xpath('Name')};
 		unsigned Count{xpath('Count')};
   end;
+
 	export ECLSourceFileLayout :=
 	record, maxlength(500)
 	
@@ -259,6 +296,7 @@ SuppressResultSchemas      =1
   // <xsd:element minOccurs="0" name="Subs" type="xsd:int" /> 
   // <xsd:element minOccurs="0" name="Count" type="xsd:int" /> 
   // <xsd:element minOccurs="0" name="ECLSourceFiles" type="tns:ArrayOfECLSourceFile" /> 
+
 		string FileCluster {xpath('FileCluster')};
 		string Name{xpath('Name')};
 		boolean IsSuperFile{xpath('IsSuperFile')};
@@ -268,6 +306,7 @@ SuppressResultSchemas      =1
 		// string ECLSourceFiles{xpath('ECLSourceFiles')};
 	
 	end;
+
 */
   export WsFileRead := record  string name{maxlength(256)}; string cluster{maxlength(64)}; boolean isSuper; unsigned4 usage; end;
   export FilesRead1 := normalize(dnormSourceFiles,count(left.Subfiles) + 1  ,transform(WsFileRead//STD.System.Workunit.WsFileRead
@@ -285,12 +324,14 @@ SuppressResultSchemas      =1
     STRING cluster{MAXLENGTH(64)};
     UNSIGNED4 kind;
   END;
+
   export FilesWritten1 := project(dnormresults,transform({unsigned rid,WsFileWritten} ,self.rid := counter,self.name := left.filename,self.graph := '',self.cluster := '',self.kind := 0));
   export FilesWritten2 := sort(join(FilesWritten1,FilesRead,left.name = right.name,transform(recordof(left),self.cluster := right.cluster,self := left),left outer),rid); 
   export FilesWritten  := project(FilesWritten2,WsFileWritten); 
   
   //////////
   shared dexcepfilt := dnormECLException(severity = 'Error');
+
   shared dexcepttransform := project(dexcepfilt  ,transform({string line},self.line := 
       left.source + ': '
     + trim(left.fileName)  + ' ('
@@ -300,13 +341,16 @@ SuppressResultSchemas      =1
     + '\n'
   ));
   shared dexceptrollup := rollup(dexcepttransform,true,transform(recordof(left),self.line := left.line + right.line));
+
   export totalthortime := WUInfo()[1].TotalThorTime;
   export JobName       := WUInfo()[1].Jobname;
   export Cluster       := WUInfo()[1].Cluster;
   export State         := WUInfo()[1].State;
   export SoapError     := WUInfo()[1].exception_msg;
   export Description   := WUInfo()[1].Description;
+  export Query         := WUInfo()[1].Query;
   export Errors        := dexceptrollup[1].line;
+
   export dnormresults2    := normalize(global(WUInfo(),few),left.results    ,transform(recordof(left.results    ),self := right));  //i get these
   export dnormresults3    := normalize(WUInfo(),left.results    ,transform(recordof(left.results    ),self := right));  //i get these
   export dfiltresults     := global(dnormresults2,few);
@@ -315,6 +359,7 @@ SuppressResultSchemas      =1
   export ScalarResultSeq2 (string pNamedOutput)  := dnormresults3(name = pNamedOutput)[1].Sequence;
   export DS_Count     (string pNamedOutput)  := dfiltresults(name = pNamedOutput)[1].Total;
   
+
   export totalthortime_nofail := WUInfo_nofail()[1].TotalThorTime;
   export JobName_nofail       := WUInfo_nofail()[1].Jobname;
   export Cluster_nofail       := WUInfo_nofail()[1].Cluster;
@@ -324,4 +369,3 @@ SuppressResultSchemas      =1
   // export Errors_nofail        := dexceptrollup[1].line;
   
 end;
-

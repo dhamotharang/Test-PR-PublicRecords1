@@ -9,8 +9,8 @@ end;
 
 Layout_liens_party_linkids tformat(get_recs L) := transform
 
-self.ssn := if((unsigned6)L.ssn <> 0, if(L.ssn[1..5] = '00000', L.ssn[6..9], L.ssn), L.app_ssn);
-self.tax_id := if((unsigned6)L.tax_id <> 0, if(L.tax_id[1..5] = '00000', L.tax_id[6..9], L.tax_id), L.app_tax_id);
+self.ssn		:=	IF((UNSIGNED6)L.ssn <> 0, IF(L.ssn[1..5] = '00000', L.ssn[6..9], L.ssn), '');
+self.tax_id :=	IF((UNSIGNED6)L.tax_id <> 0, IF(L.tax_id[1..5] = '00000', L.tax_id[6..9], L.tax_id), '');
 self := L;
 
 end;

@@ -31,10 +31,11 @@ end;
   #END
   #IF ( #TEXT(Input_Taxonomy) <> '' )
     SELF.i_taxonomy := (TYPEOF(SELF.i_taxonomy))l.Input_Taxonomy;
+		SELF.i_taxonomy_code := (TYPEOF(SELF.i_taxonomy))l.Input_Taxonomy;
   #ELSE
     SELF.i_taxonomy := (TYPEOF(SELF.i_taxonomy))'';
+		SELF.i_taxonomy_code := (TYPEOF(SELF.i_taxonomy))''; 
   #END
-	SELF.i_taxonomy_code := l.Input_Taxonomy [1..2];
 	self := l;
 	self := [];
 end;
@@ -75,7 +76,7 @@ Health_Facility_Services.MAC_MEOW_xLNPID_Batch(%apply_clean_cname%,uniqueID,Inpu
 // output (%result_thor%);
 #uniquename(result_thor_trim)
 Health_Facility_Services.mac_trim_xLNPID_layout(%result_thor%, %result_thor_trim%);
-output (%result_thor%);																
+// output (%result_thor%);																
 /*------- Final Result ----*/
 #uniquename(result)
 // %result% := %result_thor_trim%;
@@ -164,9 +165,9 @@ end;
 #uniquename(AssignDID)
 recordof(infile) %assignDID%(%infiledist% l, %best_lnpid% r) := transform
 	self.lnpid 				:= if(r.weight >= score, r.lnpid, 0);
-	self.total_score 	:= r.weight;
-	self.keys_tried		:=	r.keys_tried;
-	self.best_criteria:= r.best_criteria;
+	// self.total_score 	:= r.weight;
+	// self.keys_tried		:=	r.keys_tried;
+	// self.best_criteria:= r.best_criteria;
 	self := l;
 end;
 

@@ -6,9 +6,9 @@ import data_services, marriage_divorce_v2, ut;
 // Any record definitions can be exported, if needed
 export key_override_marriage := MODULE
 
-  shared fname_prefix := data_services.data_location.prefix('marriage') + 'thor_data400::base::override::fcra::qa::';
-	shared daily_prefix := data_services.data_location.prefix('marriage') + 'thor_data400::base::override::fcra::daily::qa::';
-  shared keyname_prefix := data_services.data_location.prefix('marriage') + 'thor_data400::key::override::fcra::';
+  shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
+	shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
+  shared keyname_prefix := data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::';
 	
   // marriage record
   marriage_main_rec := RECORD
@@ -24,7 +24,7 @@ export key_override_marriage := MODULE
 
 
   // party records
-  marriage_search_rec := RECORD
+  export marriage_search_rec := RECORD
     marriage_divorce_v2.layout_mar_div_search;
     string20 flag_file_id;
   end;

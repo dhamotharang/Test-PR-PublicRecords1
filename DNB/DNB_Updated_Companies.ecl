@@ -1,4 +1,4 @@
-import ut, Business_Header, Business_Header_SS, did_add;
+import ut, Business_Header, Business_Header_SS, did_add,mdr;
 
 DNB_Companies_Update := DNB.File_DNB_Companies_Update;
 
@@ -18,8 +18,8 @@ DNB_Base_Init := project(DNB.File_DNB_Base, InitBase(left));
 DNB_Base_Update := project(DNB_Companies_Update(delete_record_indicator = ''), DNB.TRA_Format_Input(left));
 
 // Append new update
-DNB_Base_Append := DNB_Base_Init + DNB_Base_Update;
-DNB_Base_Append_Dedup := dedup(DNB_Base_Append, all);
+DNB_Base_Append := sort(distribute(DNB_Base_Init + DNB_Base_Update, hash64(duns_number)),record,local);
+DNB_Base_Append_Dedup := dedup(DNB_Base_Append, record,local);
 DNB_Base_Append_Dist := distribute(DNB_Base_Append_Dedup, hash(duns_number));
 
 // Process delete records
@@ -389,7 +389,7 @@ DNB_Base_ToBDID := group(iterate(DNB_Base_Updated_Rollup_Grpd_Sort, SetRecordTyp
 // First do a direct source match to the current Business Headers
 Business_Header.MAC_Source_Match(DNB_Base_ToBDID, DNB_Base_BDID_Init,
                         FALSE, bdid,
-                        FALSE, 'D',
+                        FALSE, MDR.sourceTools.src_Dunn_Bradstreet,
                         TRUE, source_group,
                         clean_business_name,
                         prim_range, prim_name, sec_range, zip,

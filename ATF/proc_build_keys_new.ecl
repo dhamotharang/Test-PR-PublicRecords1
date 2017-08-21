@@ -1,4 +1,4 @@
-import AutoKeyB2, RoxieKeyBuild,ut,standard,_Control;
+import AutoKeyB2, RoxieKeyBuild,PromoteSupers,standard,_Control;
 
 export proc_build_keys_new(string filedate, boolean isFCRA = false) := function
 
@@ -23,13 +23,13 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::atf::firearms::atfid'
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::atf::firearms::linkids','~thor_data400::key::atf::firearms::'+filedate+'::linkids',M5);
 
 
-ut.MAC_SK_Move_v2('~thor_data400::key::atf::firearms::did','Q',MQ1,2);
-ut.MAC_SK_Move_v2('~thor_data400::key::atf::firearms::bdid','Q',MQ2,2);
-ut.MAC_SK_Move_v2('~thor_data400::key::atf::firearms::lnum','Q',MQ3,2);
-ut.MAC_SK_Move_v2('~thor_data400::key::atf::firearms::atfid','Q',MQ4,2);
-ut.MAC_SK_Move_v2('~thor_data400::key::atf::firearms::linkids','Q',MQ5,2);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::atf::firearms::did','Q',MQ1,2);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::atf::firearms::bdid','Q',MQ2,2);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::atf::firearms::lnum','Q',MQ3,2);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::atf::firearms::atfid','Q',MQ4,2);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::atf::firearms::linkids','Q',MQ5,2);
 
-ThorName:=if(_Control.ThisEnvironment.Name='Dataland','thor400_sta01','thor400_30');
+ThorName:=if(_Control.ThisEnvironment.Name='Dataland','thor400_sta01','thor400_44');
 
 fcopy :=	sequential(
 			fileservices.clearsuperfile('~thor_data400::key::atf::firearms::fcra::qa::did',true)

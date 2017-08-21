@@ -27,6 +27,7 @@ export Layout_FLCrash2v_v2 := record
 	string16  filler2,
 	string1   vehicle_owner_suffix,
 	// Expanded column from 40
+	string60  vehicle_owner_address,
 	string60  vehicle_owner_st_city,
 	string18  filler3,
 	string2   vehicle_owner_st,

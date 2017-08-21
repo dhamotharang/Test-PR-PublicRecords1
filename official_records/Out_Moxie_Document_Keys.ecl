@@ -1,4 +1,7 @@
-lBaseKeyName 	:= 'key::moxie.official_records_document.';
+/*2004-05-31T10:50:40Z (Tony Kirk)
+doc_num, not doc_number in the key
+*/
+lBaseKeyName 	:= '~thor_200::key::moxie.official_records_document.';
 
 rMoxieFileForKeybuildLayout
  :=
@@ -8,7 +11,7 @@ rMoxieFileForKeybuildLayout
   end
  ;
 
-lMoxieFileForKeybuild := dataset(Official_Records.Name_Moxie_Document_Dev,rMoxieFileForKeybuildLayout,flat);
+lMoxieFileForKeybuild := dataset('~thor_200::base::official_records_document',rMoxieFileForKeybuildLayout,flat);
 
 rKey_Fields_Layout
  :=

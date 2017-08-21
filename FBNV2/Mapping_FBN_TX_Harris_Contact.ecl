@@ -1,68 +1,69 @@
-import ut,fbnv2;
+import ut,fbnv2,_validate;
 
-dFiling			            := dedup(File_TX_Harris_in(file_number<>''),all);
+dFiling_combined := File_TX_Harris_in.Cleaned_Old(file_number <> '') +
+                       File_TX_Harris_in.Cleaned(file_number <> '');
+dFiling_dist     := distribute(dFiling_combined, hash(FILE_NUMBER));
+dFiling_sort     := sort(dFiling_dist, record, local);
+dFiling          := dedup(dFiling_sort, record, local);
 
-layout_common.contact tFiling(dFiling pInput)
+layout_common.contact_AID tFiling(dFiling pInput)
    :=TRANSFORM
    
-            string date                     :=pInput.DATE_FILED[5..8]+pInput.DATE_FILED[3..4]+pInput.DATE_FILED[1..2];
+			// All versions (old and new) stored as MMDDYYYY, translate back to YYYYMMDD
+			string date                     := pInput.DATE_FILED[5..8] + pInput.DATE_FILED[1..4];
 			
 			self.tmsid					    := 'TXH'+ hash(pInput.CITY1+pInput.NAME1);
 			self.rmsid                      := 'T'+if(pInput.FILe_NUMBER<>'',hash(pInput.FILE_NUMBER),
 			                                    			if(DATE<>'',hash(DATE),hash(pInput.STREET_ADD1 )));
-			
-			self.dt_first_seen      		:= (integer) date ;
-			self.dt_last_seen       		:= (integer) date ;
-			self.dt_vendor_first_reported  	:= (integer) date ;
-			self.dt_vendor_last_reported  	:= (integer) date ;
+			self.dt_first_seen      		:= if(_validate.date.fIsValid((string) date), (integer) date,0); 
+			self.dt_last_seen       		:= if(_validate.date.fIsValid((string) date), (integer) date,0); 
+			self.dt_vendor_first_reported  	:= if(_validate.date.fIsValid((string) pInput.process_date), (integer) pInput.process_date,0); 
+			self.dt_vendor_last_reported  	:= if(_validate.date.fIsValid((string) pInput.process_date), (integer) pInput.process_date,0); 
 			self.contact_type	    		:= 'O';
 			self.contact_NAME          		:= pInput.name2;			
-			self.contact_NAME_FORMAT        := if(pInput.pname='','C','P');
+			// NOTE: CONTACT_NAME_FORMAT is taken care of via the NID later down the line, so we leave
+			//       it alone here.
 			self.contact_ADDR           	:= pInput.STREET_ADD2;        
 			self.contact_CITY          		:= pInput.CITY2;            
 			self.contact_STATE          	:= pInput.STATE2 ;      
 			self.contact_ZIP          		:= (integer)pInput.ZIP2 ;     
-			self.title						:=	pInput.pname[1..5];
-			self.fname						:=	pInput.pname[6..25];
-			self.mname						:=	pInput.pname[26..45];
-			self.lname					    :=	pInput.pname[46..65];
-			self.name_suffix				:=	pInput.pname[66..70];
-			self.name_score			        :=	pInput.pname[71..73];
-			self.prim_range 				:=	pInput.clean_address1[1..10];			
-			self.predir 					:=	pInput.clean_address1[11..12];			
-			self.prim_name 					:=	pInput.clean_address1[13..40];			
-			self.addr_suffix				:=	pInput.clean_address1[41..44];			
-			self.postdir 					:=	pInput.clean_address1[45..46];			
-			self.unit_desig 				:=	pInput.clean_address1[47..56];			
-			self.sec_range 					:=	pInput.clean_address1[57..64];			
-			self.v_city_name 				:=	pInput.clean_address1[90..114];			
-			self.st 						:=	pInput.clean_address1[115..116];			
-			self.zip5 						:=	pInput.clean_address1[117..121];			
-			self.zip4 						:=	pInput.clean_address1[122..125];			
-			self.addr_rec_type				:=	pInput.clean_address1[139..140];			
-			self.fips_state 				:=	pInput.clean_address1[141..142];			
-			self.fips_county 				:=  pInput.clean_address1[143..145];				
-			self.geo_lat 					:=	pInput.clean_address1[146..155];			
-			self.geo_long 					:=	pInput.clean_address1[156..166];			
-			self.cbsa						:=	pInput.clean_address1[167..170];			
-			self.geo_blk 					:=	pInput.clean_address1[171..177];			
-			self.geo_match 					:=	pInput.clean_address1[178];			
-			self.err_stat 					:=	pInput.clean_address1[179..182];	
+			// The new info supposedly stores the person's name properly and doesn't do what the old data did
+			self.title										:= if((integer)pInput.process_date > 20110801,
+			                                    pInput.name2_title,
+																					pInput.name1_title);
+			self.fname										:= if((integer)pInput.process_date > 20110801,
+			                                    pInput.name2_fname,
+																					pInput.name1_fname);
+			self.mname										:= if((integer)pInput.process_date > 20110801,
+			                                    pInput.name2_mname,
+																					pInput.name1_mname);
+			self.lname					   				:= if((integer)pInput.process_date > 20110801,
+			                                    pInput.name2_lname,
+																					pInput.name1_lname);
+			self.name_suffix							:= if((integer)pInput.process_date > 20110801,
+			                                    pInput.name2_name_suffix,
+																					pInput.name1_name_suffix);
+			self.name_score			       		:= if((integer)pInput.process_date > 20110801,
+			                                    '',
+																					pInput.name1_name_score);
+			self.Prep_Addr_Line1			:= pInput.prep_addr1_line1;
+			self.Prep_Addr_Line_last	:= pInput.prep_addr1_line_last;
+			self                			:= pInput;
 	 end;
 
-layout_common.contact  rollupXform(layout_common.contact pLeft, layout_common.contact pRight) 
+layout_common.contact_AID  rollupXform(layout_common.contact_AID pLeft, layout_common.contact_AID pRight) 
 	:= transform
-		
-		self.Dt_First_Seen := IF(pLeft.dt_First_Seen > pRight.dt_First_Seen, pRight.dt_First_Seen, pLeft.dt_First_Seen);
-		self.Dt_Last_Seen  := IF(pLeft.dt_Last_Seen  < pRight.dt_Last_Seen,  pRight.dt_Last_Seen,  pLeft.dt_Last_Seen);
-		self.Dt_Vendor_First_Reported := IF(pLeft.dt_Vendor_First_Reported > pRight.dt_Vendor_First_Reported, 
-											pRight.dt_Vendor_First_Reported, pLeft.dt_Vendor_First_Reported);
-		self.Dt_Vendor_Last_Reported  := IF(pLeft.dt_Vendor_Last_Reported  < pRight.dt_Vendor_Last_Reported,  
-											pRight.dt_Vendor_Last_Reported, pLeft.dt_Vendor_Last_Reported);
+	
+		self.Dt_First_Seen := ut.Min2(pLeft.dt_First_Seen,pRight.dt_First_Seen);
+		self.Dt_Last_Seen  := MAX(pLeft.dt_Last_Seen ,pRight.dt_last_seen);
+		self.Dt_Vendor_First_Reported := ut.min2(pLeft.dt_Vendor_First_Reported,pRight.dt_Vendor_First_Reported);
+		self.Dt_Vendor_Last_Reported  := MAX(pLeft.dt_Vendor_Last_Reported,pRight.dt_Vendor_Last_Reported);
+
 		self := pLeft;
 	END;
 	
-dSortFiling	:=SORT(DISTRIBUTE(dedup(project(dfiling,tfiling(left)),all),hash(tmsid))
+// DEDUP removed because it's unnecessary
+dSortFiling	:=SORT(DISTRIBUTE(project(dfiling,tfiling(left)),hash(tmsid))
 					,RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local); 
 					
 dout        :=rollup(dSortFiling,rollupXform(left,right),

@@ -4,17 +4,55 @@ import doxie_files, doxie,ut,Address,did_Add,header_slimsort,watchdog,RoxieKeyBu
 
 export clean_opt_out_data(string filedate) := function
 
-f := fcra_opt_out.dataset_infile;
+// converting to YYYYMMMDD format - ut.dob_convert
 
+pos1(string dob) := stringlib.StringFind(dob, '/', 1);
+pos2(string dob) := stringlib.StringFind(dob, '/', 2);
+
+integer2 iday(string dob) := (integer2)(dob[pos1(dob) + 1..pos2(dob) - 1]);
+integer2 imonth(string dob) := (integer2)(dob[1..pos1(dob) - 1]);
+integer2 iyear(string dob, integer2 year_digits) 
+	:= (integer2)(dob[pos2(dob) + 1..pos2(dob) + 1 + year_digits]);
+
+string8 convert_date(string dob, integer2 year_digits) := 
+	intformat(if(year_digits = 2, iyear(dob, year_digits) + 2000, iyear(dob, year_digits)), 4, 1) + 
+	intformat(imonth(dob), 2, 1) +
+	intformat(iday(dob), 2, 1);
+
+
+f := fcra_opt_out.dataset_infile;
+al_file := fcra_opt_out.File_Alpharetta_In;
+
+// convert alpharetta file to standard format.
+fcra_opt_out.layout_infile_appended tarecs(al_file L) := transform
+	self.source_flag := l.source_flag;
+	self.inname_first := l.fname;
+	self.inname_middle := l.mname;
+	self.inname_last := l.lname;
+	self.inname_suffix := l.suffix;
+	self.address := l.address;
+	self.city := l.city;
+	self.state := l.state;
+	self.zip5 := l.zip;
+	self.ssn := l.ssn;
+	self.date_YYYYMMDD :=  if(l.date_added <> '',convert_date(l.date_added,2),'');
+	self.address1 := L.address;
+	self.address2 := L.city + ' '+ L.state + ' '+ L.zip;
+	self := l;
+end;
+
+arecs := project(al_file,tarecs(left));
 
 fcra_opt_out.layout_infile_appended trecs(f L) := transform
-self.date_YYYYMMDD :=  ut.JultoYYYYMMDD(l.julian_date);
+self.date_YYYYMMDD :=  if(l.julian_date <> '',ut.JultoYYYYMMDD(l.julian_date),'');
 self.address1 := L.address;
 self.address2 := L.city + ' '+ L.state + ' '+ L.zip5;
 self := L;
 end;
 
-precs := project(f,trecs(left));
+erecs := project(f,trecs(left));
+
+precs := arecs + erecs;
 
 Address.MAC_Address_Clean(precs,address1,address2,true,appndAddr);
 newfile:= appndAddr;

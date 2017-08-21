@@ -1,91 +1,102 @@
+//Tony's comments to resolve issue after platform upgrade
+// I added the zCheckSupers parallel, changed all those IF() to end with comma instead of semicolon, then add zCheckSupers to the SEQUENTIAL() at bottom.
+// It then stops complaining.  Essentially, those IF() were out there by themselves, without a â€œcallableâ€ reference/label, so it expects you want them
+// to occur as a side-effect of the next definition, but that next definition (c := Foreclosure_Services.Constants(filedate)) is a reference to a MODULE
+// which is not permitted.
+
+
 IMPORT Foreclosure_Services,AutoKeyB2,ut, roxiekeybuild;
 export Proc_Build_Autokeys(string filedate) := function
 inkey := '~thor_data400::key::foreclosure::autokey::QA::';
 inkeyB := '~thor_data400::key::foreclosure::autokey::BUILT::';
 
+zCheckSupers := 
+
+parallel(
+
 if(fileservices.superfileexists(inkey + 'Payload'),
-					FileServices.ClearSuperfile(inkey + 'Payload'),fileservices.createsuperfile(inkey + 'Payload'));
+					FileServices.ClearSuperfile(inkey + 'Payload'),fileservices.createsuperfile(inkey + 'Payload')),
 
 if(fileservices.superfileexists(inkeyb + 'Payload'),
-					FileServices.ClearSuperfile(inkeyb + 'Payload'),fileservices.createsuperfile(inkeyb + 'Payload'));
+					FileServices.ClearSuperfile(inkeyb + 'Payload'),fileservices.createsuperfile(inkeyb + 'Payload')),
 
 if(fileservices.superfileexists(inkey + 'AddressB2'),
-					FileServices.ClearSuperfile(inkey + 'AddressB2'),fileservices.createsuperfile(inkey + 'AddressB2'));
+					FileServices.ClearSuperfile(inkey + 'AddressB2'),fileservices.createsuperfile(inkey + 'AddressB2')),
 
 if(fileservices.superfileexists(inkeyb + 'AddressB2'),
-					FileServices.ClearSuperfile(inkeyb + 'AddressB2'),fileservices.createsuperfile(inkeyb + 'AddressB2'));
+					FileServices.ClearSuperfile(inkeyb + 'AddressB2'),fileservices.createsuperfile(inkeyb + 'AddressB2')),
 
 if(fileservices.superfileexists(inkey + 'CityStNameB2'),
-					FileServices.ClearSuperfile(inkey + 'CityStNameB2'),fileservices.createsuperfile(inkey + 'CityStNameB2'));
+					FileServices.ClearSuperfile(inkey + 'CityStNameB2'),fileservices.createsuperfile(inkey + 'CityStNameB2')),
 
 if(fileservices.superfileexists(inkeyb + 'CityStNameB2'),
-					FileServices.ClearSuperfile(inkeyb + 'CityStNameB2'),fileservices.createsuperfile(inkeyb + 'CityStNameB2'));
+					FileServices.ClearSuperfile(inkeyb + 'CityStNameB2'),fileservices.createsuperfile(inkeyb + 'CityStNameB2')),
 					
 if(fileservices.superfileexists(inkey + 'NameB2'),
-					FileServices.ClearSuperfile(inkey + 'NameB2'),fileservices.createsuperfile(inkey + 'NameB2'));
+					FileServices.ClearSuperfile(inkey + 'NameB2'),fileservices.createsuperfile(inkey + 'NameB2')),
 
 if(fileservices.superfileexists(inkeyb + 'NameB2'),
-					FileServices.ClearSuperfile(inkeyb + 'NameB2'),fileservices.createsuperfile(inkeyb + 'NameB2'));
+					FileServices.ClearSuperfile(inkeyb + 'NameB2'),fileservices.createsuperfile(inkeyb + 'NameB2')),
 
 if(fileservices.superfileexists(inkey + 'StNameB2'),
-					FileServices.ClearSuperfile(inkey + 'StNameB2'),fileservices.createsuperfile(inkey + 'StNameB2'));
+					FileServices.ClearSuperfile(inkey + 'StNameB2'),fileservices.createsuperfile(inkey + 'StNameB2')),
 
 if(fileservices.superfileexists(inkeyb + 'StNameB2'),
-					FileServices.ClearSuperfile(inkeyb + 'StNameB2'),fileservices.createsuperfile(inkeyb + 'StNameB2'));
+					FileServices.ClearSuperfile(inkeyb + 'StNameB2'),fileservices.createsuperfile(inkeyb + 'StNameB2')),
 
 if(fileservices.superfileexists(inkey + 'ZipB2'),
-					FileServices.ClearSuperfile(inkey + 'ZipB2'),fileservices.createsuperfile(inkey + 'ZipB2'));
+					FileServices.ClearSuperfile(inkey + 'ZipB2'),fileservices.createsuperfile(inkey + 'ZipB2')),
 
 if(fileservices.superfileexists(inkeyb + 'ZipB2'),
-					FileServices.ClearSuperfile(inkeyb + 'ZipB2'),fileservices.createsuperfile(inkeyb + 'ZipB2'));
+					FileServices.ClearSuperfile(inkeyb + 'ZipB2'),fileservices.createsuperfile(inkeyb + 'ZipB2')),
 
 if(fileservices.superfileexists(inkey + 'NameWords2'),
-					FileServices.ClearSuperfile(inkey + 'NameWords2'),fileservices.createsuperfile(inkey + 'NameWords2'));
+					FileServices.ClearSuperfile(inkey + 'NameWords2'),fileservices.createsuperfile(inkey + 'NameWords2')),
 
 if(fileservices.superfileexists(inkeyb + 'NameWords2'),
-					FileServices.ClearSuperfile(inkeyb + 'NameWords2'),fileservices.createsuperfile(inkeyb + 'NameWords2'));
+					FileServices.ClearSuperfile(inkeyb + 'NameWords2'),fileservices.createsuperfile(inkeyb + 'NameWords2')),
 
 if(fileservices.superfileexists(inkey + 'Address'),
-					FileServices.ClearSuperfile(inkey + 'Address'),fileservices.createsuperfile(inkey + 'Address'));
+					FileServices.ClearSuperfile(inkey + 'Address'),fileservices.createsuperfile(inkey + 'Address')),
 
 if(fileservices.superfileexists(inkeyb + 'Address'),
-					FileServices.ClearSuperfile(inkeyb + 'Address'),fileservices.createsuperfile(inkeyb + 'Address'));
+					FileServices.ClearSuperfile(inkeyb + 'Address'),fileservices.createsuperfile(inkeyb + 'Address')),
 
 if(fileservices.superfileexists(inkey + 'CityStName'),
-					FileServices.ClearSuperfile(inkey + 'CityStName'),fileservices.createsuperfile(inkey + 'CityStName'));
+					FileServices.ClearSuperfile(inkey + 'CityStName'),fileservices.createsuperfile(inkey + 'CityStName')),
 
 if(fileservices.superfileexists(inkeyb + 'CityStName'),
-					FileServices.ClearSuperfile(inkeyb + 'CityStName'),fileservices.createsuperfile(inkeyb + 'CityStName'));
+					FileServices.ClearSuperfile(inkeyb + 'CityStName'),fileservices.createsuperfile(inkeyb + 'CityStName')),
 					
 if(fileservices.superfileexists(inkey + 'Name'),
-					FileServices.ClearSuperfile(inkey + 'Name'),fileservices.createsuperfile(inkey + 'Name'));
+					FileServices.ClearSuperfile(inkey + 'Name'),fileservices.createsuperfile(inkey + 'Name')),
 
 if(fileservices.superfileexists(inkeyb + 'Name'),
-					FileServices.ClearSuperfile(inkeyb + 'Name'),fileservices.createsuperfile(inkeyb + 'Name'));
+					FileServices.ClearSuperfile(inkeyb + 'Name'),fileservices.createsuperfile(inkeyb + 'Name')),
 
 if(fileservices.superfileexists(inkey + 'StName'),
-					FileServices.ClearSuperfile(inkey + 'StName'),fileservices.createsuperfile(inkey + 'StName'));
+					FileServices.ClearSuperfile(inkey + 'StName'),fileservices.createsuperfile(inkey + 'StName')),
 
 if(fileservices.superfileexists(inkeyb + 'StName'),
-					FileServices.ClearSuperfile(inkeyb + 'StName'),fileservices.createsuperfile(inkeyb + 'StName'));
+					FileServices.ClearSuperfile(inkeyb + 'StName'),fileservices.createsuperfile(inkeyb + 'StName')),
 
 if(fileservices.superfileexists(inkey + 'Zip'),
-					FileServices.ClearSuperfile(inkey + 'Zip'),fileservices.createsuperfile(inkey + 'Zip'));
+					FileServices.ClearSuperfile(inkey + 'Zip'),fileservices.createsuperfile(inkey + 'Zip')),
 
 if(fileservices.superfileexists(inkeyb + 'Zip'),
-					FileServices.ClearSuperfile(inkeyb + 'Zip'),fileservices.createsuperfile(inkeyb + 'Zip'));
+					FileServices.ClearSuperfile(inkeyb + 'Zip'),fileservices.createsuperfile(inkeyb + 'Zip')),
 
 if(fileservices.superfileexists(inkey + 'NameWords2'),
-					FileServices.ClearSuperfile(inkey + 'NameWords2'),fileservices.createsuperfile(inkey + 'NameWords2'));
+					FileServices.ClearSuperfile(inkey + 'NameWords2'),fileservices.createsuperfile(inkey + 'NameWords2')),
 
 if(fileservices.superfileexists(inkeyb + 'NameWords2'),
-					FileServices.ClearSuperfile(inkeyb + 'NameWords2'),fileservices.createsuperfile(inkeyb + 'NameWords2'));
+					FileServices.ClearSuperfile(inkeyb + 'NameWords2'),fileservices.createsuperfile(inkeyb + 'NameWords2')),
 
 if(fileservices.superfileexists(inkey + 'SSN2'),
-					FileServices.ClearSuperfile(inkey + 'SSN2'),fileservices.createsuperfile(inkey + 'SSN2'));
+					FileServices.ClearSuperfile(inkey + 'SSN2'),fileservices.createsuperfile(inkey + 'SSN2')),
 
 if(fileservices.superfileexists(inkeyb + 'SSN2'),
-					FileServices.ClearSuperfile(inkeyb + 'SSN2'),fileservices.createsuperfile(inkeyb + 'SSN2'));
+					FileServices.ClearSuperfile(inkeyb + 'SSN2'),fileservices.createsuperfile(inkeyb + 'SSN2')));
 	
 	//************************************
 
@@ -137,7 +148,7 @@ AutoKeyB2.MAC_Build (ak_dataset,name_first,name_middle,name_last,
 						 
 	AutoKeyB2.MAC_AcceptSK_to_QA(ak_keyname, move_auto_keys,, ak_skipSet);
 
-retval := sequential(bld_auto_keys,move_auto_keys);
+retval := sequential(zCheckSupers,bld_auto_keys,move_auto_keys);
 
 return retval;
 end;

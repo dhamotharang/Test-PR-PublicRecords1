@@ -1,5 +1,12 @@
 import Ut, lib_stringlib;						// utilities library
 
+string4 fix_year(string2 yr) := if(yr <= '0' + trim((string2)((decimal2)((ut.GetDate[3..4])) + (decimal1)('1'))),
+                                  '20' + yr,
+				                  '19' + yr);
+string8 fix_date(string2 dt, string2 mn, string2 dy) := if(dt <= '0' + trim((string2)((decimal2)((ut.GetDate[3..4])) + (decimal1)('1'))),
+                                '20' + dt + mn + dy,
+				                '19' + dt + mn + dy);
+
 vehlic.Layout_Vehicles KYFullToCommon(vehlic.File_KY_Full pLeft) := transform
 	self.orig_state:='KY';
 	self.dt_first_seen := (unsigned8)(pLeft.append_PROCESS_DATE[1..6]);
@@ -9,17 +16,14 @@ vehlic.Layout_Vehicles KYFullToCommon(vehlic.File_KY_Full pLeft) := transform
 	self.VEHICLE_NUMBERxBG1 := if(length(trim(pLeft.IDENTIFICATION_NUM_VEH)) < 17,
 	                               pLeft.NUM_TITLE,pLeft.IDENTIFICATION_NUM_VEH);
 	self.ORIG_VIN := pLeft.IDENTIFICATION_NUM_VEH;
-	self.YEAR_MAKE := if(pLeft.YEAR_MODEL_VEHICLE <> '',
-	                  if(pLeft.YEAR_MODEL_VEHICLE > '05',
-					  '19' + pLeft.YEAR_MODEL_VEHICLE,
-					  '20' + pLeft.YEAR_MODEL_VEHICLE), '');
+	self.YEAR_MAKE := if(pLeft.YEAR_MODEL_VEHICLE <> '', fix_year(pLeft.YEAR_MODEL_VEHICLE), '');
 	self.MAKE_CODE := pLeft.MAKE_VEHICLE;				
 	self.BODY_CODE := pLeft.CODE_STYLE_BODY;
 	self.LICENSE_PLATE_NUMBERxBG4 := pLeft.NUM_LICENSE_PLT;
 	self.REGISTRATION_EXPIRATION_DATE := pLeft.DATE_EXPIR_REGISTRATION;
 	self.REGISTRATION_STATUS_CODE := pLeft.CODE_STATUS_REGISTRATION;
 	self.TRUE_LICENSE_PLSTE_NUMBER := pLeft.NUM_LICENSE_PLT;
-	self.FIRST_REGISTRATION_DATE := pLeft.DATE_REGISTRATION;
+	self.REGISTRATION_EFFECTIVE_DATE := pLeft.DATE_REGISTRATION;
 	self.VEHICLE_TYPE := pLeft.CODE_TYPE_MODEL_VEH;
 	self.MAJOR_COLOR_CODE := pLeft.CODE_COLOR_MAJOR;
 	self.MINOR_COLOR_CODE := pLeft.CODE_COLOR_MINOR;
@@ -141,10 +145,7 @@ vehlic.Layout_Vehicles KYFullToCommon(vehlic.File_KY_Full pLeft) := transform
 													         pLeft.ADDR_ZIPCODE_OWNER_VEHICLE[2..6]), ''));
 													      
 										
-	self.LH_1_LIEN_DATE                  :=		if(pLeft.YEAR_LIEN_FILED_1 <> '',
-	                                                if(pLeft.YEAR_LIEN_FILED_1 > '05',
-													   '19' + pLeft.YEAR_LIEN_FILED_1 + pLeft.MONTH_LIEN_FILED_1 + pLeft.DAY_LIEN_FILED_1,
-													   '20' + pLeft.YEAR_LIEN_FILED_1 + pLeft.MONTH_LIEN_FILED_1 + pLeft.DAY_LIEN_FILED_1), '');
+	self.LH_1_LIEN_DATE                  :=		if(pLeft.YEAR_LIEN_FILED_1 <> '', fix_date(pLeft.YEAR_LIEN_FILED_1, pLeft.MONTH_LIEN_FILED_1, pLeft.DAY_LIEN_FILED_1), '');
 	self.LH_1_CUSTOMER_NAME              :=		pLeft.NAME_LIENHOLDER_1;
 	self.LH_1_STREET_ADDRESS             :=		pLeft.ADDR_STREET_LIENHOLDER_1;
 	self.LH_1_CITY                       :=		pLeft.ADDR_CITY_LIENHOLDER_1;
@@ -152,10 +153,7 @@ vehlic.Layout_Vehicles KYFullToCommon(vehlic.File_KY_Full pLeft) := transform
 	self.LH_1_ZIP5_ZIP4_FOREIGN_POSTAL   :=		pLeft.ADDR_ZIPCODE_LIENHOLDER_1;
 	
 	
-	self.LH_2_LEIN_DATE                  :=	    if(pLeft.YEAR_LIEN_FILED_2 <> '',
-	                                                if(pLeft.YEAR_LIEN_FILED_2 > '05',
-													   '19' + pLeft.YEAR_LIEN_FILED_2 + pLeft.MONTH_LIEN_FILED_2 + pLeft.DAY_LIEN_FILED_2,
-													   '20' + pLeft.YEAR_LIEN_FILED_2 + pLeft.MONTH_LIEN_FILED_2 + pLeft.DAY_LIEN_FILED_2), '');
+	self.LH_2_LEIN_DATE                  :=	    if(pLeft.YEAR_LIEN_FILED_2 <> '', fix_date(pLeft.YEAR_LIEN_FILED_2, pLeft.MONTH_LIEN_FILED_2, pLeft.DAY_LIEN_FILED_2), '');
 	self.LH_2_CUSTOMER_NAME              :=		pLeft.NAME_LIENHOLDER_2;
 	self.LH_2_STREET_ADDRESS             :=		pLeft.ADDR_STREET_LIENHOLDER_2;
 	self.LH_2_CITY                       :=		pLeft.ADDR_CITY_LIENHOLDER_2;

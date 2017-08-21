@@ -10,7 +10,7 @@ export Layout_Name_Source := record
      string8   sec_range;
      string5   name_suffix;
      string9   ssn;
-     unsigned2 dob;
+     unsigned4 dob;
      unsigned2 dids_with_this_nm_addr          := 0;
      unsigned2 suffix_cnt_with_this_nm_addr    := 0;
      unsigned2 sec_range_cnt_with_this_nm_addr := 0;
@@ -19,6 +19,8 @@ export Layout_Name_Source := record
      unsigned2 mname_cnt_with_this_nm_addr     := 0;
      unsigned2 dids_with_this_nm_ssn           := 0;
      unsigned2 dob_cnt_with_this_nm_ssn        := 0;
+	 unsigned2 dids_with_this_nm_dob           := 0;
+	 unsigned2 zip_cnt_with_this_nm_dob        := 0;
 	 
  END;
 

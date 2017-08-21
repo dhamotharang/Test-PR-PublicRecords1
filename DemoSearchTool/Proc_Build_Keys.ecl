@@ -1,4 +1,4 @@
-﻿Import RoxieKeyBuild;
+Import RoxieKeyBuild;
 EXPORT Proc_Build_Keys(string filedate) := Function
 
 	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local( demosearchtool.keys.People,

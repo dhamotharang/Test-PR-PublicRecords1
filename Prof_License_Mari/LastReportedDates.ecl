@@ -1,0 +1,14 @@
+import ut;
+
+rSlim := RECORD
+		    STRING5			STD_SOURCE_UPD,
+				STRING8			DATE_VENDOR_LAST_REPORTED,
+END;
+
+EXPORT LastReportedDates(DATASET(Prof_License_Mari.layouts.final) f) := 
+
+  DEDUP(
+		SORT(
+				DISTRIBUTE(PROJECT(f,rSlim),hash(STD_SOURCE_UPD)),
+			STD_SOURCE_UPD, DATE_VENDOR_LAST_REPORTED, LOCAL),
+		STD_SOURCE_UPD, RIGHT, LOCAL);

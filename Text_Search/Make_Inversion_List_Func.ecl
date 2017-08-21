@@ -1,7 +1,7 @@
 // The process for making a file of postings for the inversion.
 // Uses generic documents only.
 //
-#OPTION('parseDfaComplexity',10000)
+#OPTION('parseDfaComplexity',10000);
 IMPORT LIB_ThorLib, LIB_Word;
 export Make_Inversion_List_Func(DATASET(Layout_DocSeg) ds,
 																			FileName_Info info,
@@ -39,16 +39,18 @@ export Make_Inversion_List_Func(DATASET(Layout_DocSeg) ds,
 	fs := DISTRIBUTED(ws, docRef.doc);
 
 	MAC_Doc_Parse_Rule()
-	
+	// insert leading zero for day
 	Make_dd(STRING d) := IF(LENGTH(d)=1, '0' + d, d);
-
+	// pad out date to force 8 digits
 	padZero(STRING str) := (str + '00000000')[1..8];
-
+	//
 	STRING multiWds(STRING str) := TRIM(StringLib.StringSubstituteOut(str, '.-', ' '), LEFT, RIGHT);
 	STRING getNthWord(STRING str, UNSIGNED1 pos) := TRIM(LIB_Word.Word(str, pos), LEFT, RIGHT);
 
 	Work_Posting p1(Work_DocSeg l) 	:= TRANSFORM
 		STRING numStr := MATCHTEXT(number);
+		BOOLEAN isSSN := MATCHED(ssnPattern) AND l.segType = Types.SegmentType.SSN;
+		STRING ssn_str:= TRIM(STRINGLIB.StringFilterOut(MATCHTEXT(ssnPattern), '-'),LEFT,RIGHT);
 		Types.Nominal	numVal := (Types.Nominal) numStr;
 		BOOLEAN ForceString := l.segType = Types.SegmentType.TextType AND MATCHED(intg);
 		BOOLEAN ForceDate := l.segType = Types.SegmentType.DateType
@@ -59,6 +61,7 @@ export Make_Inversion_List_Func(DATASET(Layout_DocSeg) ds,
 		UNSIGNED1 startAt := StringLib.StringFind(MATCHTEXT, getNthWord(matchX, 1), 1);
 		
 		SELF.word := MAP(
+			MATCHED(ssnPattern)			=>	ssn_str,
 			mayNeedCnv	 						=>	matchX,
 			ForceDate								=>	padZero(numStr),
 			MATCHED(wordPattern)		=>	MATCHTEXT(wordPattern),
@@ -78,6 +81,8 @@ export Make_Inversion_List_Func(DATASET(Layout_DocSeg) ds,
 			MATCHED(MultiEquiv)			=>	countWords(MATCHTEXT(MultiEquiv))+1, // Add one to allow for insertion of equivalency term
 			1);
 		SELF.typ := MAP(
+			isSSN										=>	Types.WordType.SSN,
+			MATCHED(ssnPattern)			=>  Types.WordType.Numeric,
 			mayNeedCnv	 						=> 	Types.WordType.TextStr,
 			ForceDate								=> 	Types.WordType.Date,
 			MATCHED(wordPattern)		=>	Types.WordType.TextStr,
@@ -92,6 +97,7 @@ export Make_Inversion_List_Func(DATASET(Layout_DocSeg) ds,
 		SELF.nominal := MAP(
 			mayNeedCnv	 						=>	0,
 			ForceDate 							=>	(Types.Nominal) padZero(numStr),
+			isSSN										=> 	0,
 			MATCHED(wordPattern)		=>	0,
 			MATCHED(kwdWPuncts)			=>	0,
 			MATCHED(MultiEquiv)			=>	0,
@@ -100,6 +106,7 @@ export Make_Inversion_List_Func(DATASET(Layout_DocSeg) ds,
 			MATCHED(yr_mo_dy)				=>	ConvertDate(MATCHTEXT(yr_mo_dy),TRUE),
 			MATCHED(decimalString)	=>	(Types.Nominal) NumericCollationFormat.StringToNCF(MATCHTEXT),
 			MATCHED(intg)						=>	(Types.Nominal) NumericCollationFormat.StringToNCF(MATCHTEXT),
+			MATCHED(ssnPattern)			=>	(Types.Nominal) NumericCollationFormat.StringToNCF(ssn_str),
 			MATCHED(paraPattern)		=>	Constants.ParagraphNominal,
 			0);
 		SELF.suffix := 0;

@@ -23,7 +23,7 @@ useV2 = false								// use new repository
 
 // layout with cleaned name
 	cln_layout := RECORD
-		NID.Common.xNID	nameid := Nid.Common.BlankNid;
+		NID.Common.xNID	nameid := 0;
 		string1		namType := '';
 		string5		_title := '';
 		string20	_fname := '';
@@ -76,19 +76,20 @@ END;
 		self := L;
 	END;
 	
-	options := case(#text(_nameorder),
-								'f' => ['f'],
-								'F' => ['f'],	
-								'l' => ['l'],
-								'L' => ['L'],
-								[]);
+	//options := case(#text(_nameorder),
+	//							'f' => ['f'],
+	//							'F' => ['f'],	
+	//							'l' => ['l'],
+	//							'L' => ['L'],
+	//							[]);
+	options := #text(_nameorder);
 	
 	new_layout xform2(new_layout L) := TRANSFORM
-		ntype := Address.Business.GetNameType(L.Field, options);
+		ntype := Nid.GetNameType(L.Field);
 		self.namType := if(usev2 OR ntype<>'T',ntype,'U');
 		name := TRIM(L.Field,LEFT,RIGHT);
 		self.nameid		:= NID.Common.fGetNID(name);
-		string140 cln_name := Address.NameCleaner.CleanNameEx(name, bSkipTrust := (ntype='T'), nmtype := ntype);
+		string140 cln_name := Nid.CleanNameEx(name, bSkipTrust := (useV2 AND ntype='T'), nmtype := ntype);
 		
 		self._title		:= cln_name[1..5];
 		self._fname		:= cln_name[6..25];
@@ -122,42 +123,16 @@ END;
 			__nid);					
 						
 						
-	matches := JOIN(dsin, Nid.Overrides & 
+	matches := JOIN(dsin, SORT(Nid.Overrides(true) + 
 											if(useV2,Nid.NameRepository(derivation=0),Nid.NameRepositoryV1(derivation=0)),
+											nid, -derivation, LOCAL),
 						LEFT.__nid = RIGHT.NID,
 						xform(LEFT, RIGHT),
-						LOCAL, KEEP(1), LEFT OUTER);	//* : INDEPENDENT;
+						LOCAL, KEEP(1), LEFT OUTER, NOSORT(RIGHT)) : INDEPENDENT;
 						
-    ds1 := SORT(matches(Nid=0),Field, LOCAL);	// : INDEPENDENT;
-		//nomatchdedup := DEDUP(ds1,Field, LOCAL);
-		//nomatchclean := PROJECT(nomatchdedup, xform2(LEFT)); //* : INDEPENDENT; 
-		nomatchclean := PROJECT(DEDUP(ds1,Field, LOCAL), xform2(LEFT)) : INDEPENDENT; 
-
-		nomatches := IF(EXISTS(matches(Nid=0)),
-					JOIN(ds1, nomatchclean, 
-						    LEFT.Field=RIGHT.Field,
-							TRANSFORM(new_layout, 
-									SELF.nameid := RIGHT.nameid;
-									self.namType := RIGHT.namType;
-									self._title := RIGHT._title;
-									self._fname := RIGHT._fname;
-									self._mname := RIGHT._mname;
-									self._lname := RIGHT._lname;
-									self._suffix := RIGHT._suffix;
-									self._title2 := RIGHT._title2;
-									self._fname2 := RIGHT._fname2;
-									self._mname2 := RIGHT._mname2;
-									self._lname2 := RIGHT._lname2;
-									self._suffix2 := RIGHT._suffix2;
-									self._name_ind := RIGHT._name_ind;
-#if(_cleanBiznames=true)
-									self._cname := RIGHT._cname;
-#end
-									SELF := LEFT;),
-								LOCAL, LEFT OUTER, KEEP(1))); //: INDEPENDENT;						
-						
+		nomatches := PROJECT(matches(Nid=0), xform2(LEFT)) : INDEPENDENT; 
 	
-	tempout := IF(EXISTS(nomatches), matches(NID<>0) + nomatches, matches) +
+		tempout := IF(EXISTS(nomatches), matches(NID<>0) + nomatches, matches) +
 				PROJECT(DISTRIBUTE(inFile(Field='')),
 					TRANSFORM(new_layout, 
 							SELF.nameid := Nid.Common.BlankNid;
@@ -167,7 +142,8 @@ END;
 
 #if(normalizeDualNames=true)
 
-	new_layout xform_dual(new_layout L, integer c) := TRANSFORM
+	new_layout xform_dual(new_layout L, integer c) := TRANSFORM,
+				SKIP(c=2 AND L._fname=L._fname2 AND L._mname=L._mname2 AND L._lname=L._lname2 AND L._suffix=L._suffix2)
 		SELF.namType := IF(L.namType='D','P',SKIP);
 		name := TRIM(L.Field,LEFT,RIGHT);
 		self.nameid		:= NID.Common.fGetNID(name,c);
@@ -204,8 +180,8 @@ END;
 
 	
 #IF(includeInRepository=true)
-newnames := nomatchclean;
-Nid.MAC_IncludeInRepository(newnames,
+//newnames := DEDUP(nomatches,nid,local);
+Nid.MAC_IncludeInRepository(nomatches,
 	Field,
 	nameid,
 	namtype,		// name type field

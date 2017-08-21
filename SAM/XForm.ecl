@@ -55,7 +55,18 @@ Worldcheck_Bridger.Layout_Worldcheck_Entity_Exported.layout_sp MakeDunsId(Layout
 			],
 			Worldcheck_Bridger.Layout_Worldcheck_Entity_Exported.layout_sp);
 
-
+Worldcheck_Bridger.Layout_Worldcheck_Entity_Exported.layout_sp MakeCageId(Layout_Sam sam) :=
+		DATASET([{'Other',
+					'',			// label
+					sam.Cage,		// number
+					'Department of Defense\'s Defense Logistics Agency',			// issued_by
+					'',					// date_issued
+					'',					// date_expires
+					'Commercial And Government Entity (CAGE) Code',
+					}
+			],
+			Worldcheck_Bridger.Layout_Worldcheck_Entity_Exported.layout_sp);
+			
 Worldcheck_Bridger.Layout_Worldcheck_Entity_Exported.layout_addresses MakeAddress(Layout_Sam sam) :=
 		DATASET([{'',
 					NotNull(sam.Address_1),
@@ -99,7 +110,9 @@ EXPORT Layout_BridgerEx XForm(Layout_Sam sam, integer c) := TRANSFORM
 	self.listed_date := sam.ActiveDate;
 	self.modified_date := '';			//sam.TerminationDate;
 	
-	self.identification_list.identification := IF(sam.duns<>'',MakeDunsId(sam));
+	self.identification_list.identification := 
+						IF(sam.duns<>'',MakeDunsId(sam)) +
+						IF(sam.cage<>'',MakeCageId(sam));
 
 //	self.aka_list.aka := Project(ListToDS(FixString(sam.CrossReference)),
 //															InsertAKA(LEFT));

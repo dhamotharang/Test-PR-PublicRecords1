@@ -28,7 +28,7 @@ string10  phone10;
 end;
 
 layout_bbb_clean CleanInput(layout_bbb_seq l) := transform
-self.clean_address := addrcleanlib.cleanAddress182(l.address1, l.address2);
+self.clean_address := address.cleanAddress182(l.address1, l.address2);
 self.phone10 := if(l.phone <> '', Address.CleanPhone(trim(l.phone,all)), '');
 self := l;
 end;
@@ -114,7 +114,7 @@ Business_Header.MAC_Source_Match(bbb_to_bdid, bbb_bdid_init,
 
 // Then do a standard BDID match for the records which did not BDID,
 // since the BBB file may be newer than the Business Headers
-BDID_Matchset := ['A','P','F','N'];
+BDID_Matchset := ['A','P'];
 
 bbb_bdid_match := bbb_bdid_init(bdid <> 0);
 
@@ -131,9 +131,7 @@ Business_Header_SS.MAC_Match_Flex
 	BDID,	
 	Business_Header_SS.Layout_BDID_OutBatch,
 	true, score,  //these should default to zero in definition
-	bbb_bdid_rematch,
-	1,   //keep count
-	50   //score threshold
+	bbb_bdid_rematch
 )
 
 bbb_bdid_all := bbb_bdid_match + bbb_bdid_rematch;

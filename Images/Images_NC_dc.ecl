@@ -14,9 +14,10 @@ TRANSFORM
 	SELF.num := 0;
 	SELF.imgLength := L.imgLength;
 	SELF.photo := L.photo;
+	self.image_link := self.state + l.filename;
 END;
 
-j := JOIN(DISTRIBUTE(rtrn, HASH(TRIM(filename))),	File_Moxie_Info, 
+j := JOIN(DISTRIBUTE(rtrn, HASH(TRIM(filename))),	distribute(File_NC_Info, hash(file_name)), 
 			LEFT.filename = RIGHT.file_name,
 			make_common(LEFT, RIGHT), LOCAL);
 

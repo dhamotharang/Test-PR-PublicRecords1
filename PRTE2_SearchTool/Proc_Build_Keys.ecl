@@ -1,4 +1,4 @@
-﻿Import  RoxieKeyBuild;
+Import  RoxieKeyBuild;
 
 EXPORT Proc_Build_Keys(string filedate) := function
 	

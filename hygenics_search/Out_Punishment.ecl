@@ -1,5 +1,5 @@
-// NOTE:  This attribute produces a file but will do so only if called.  This
-//		  allows it to be called via sequential() and to more easily limit
-//		  whether it is called at all using conditional compile #IF() blocks.
+import PromoteSupers, doxie_build;
 
-export Out_Punishment := output(Punishment_Joined,,Name_Moxie_Punishment_Dev,overwrite, __compressed__);
+PromoteSupers.MAC_SF_BuildProcess(Punishment_Joined,'~thor_data400::base::corrections_punishment_' + doxie_build.buildstate, outPun, 2, , true);
+
+export Out_Punishment := outPun;

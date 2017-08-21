@@ -1,0 +1,1 @@
+export Key_Trade_Acct := INDEX(File_Trade_Plus,creditfile.KeyType_Trade_Acct,creditfile.KeyName_Trade_Acct);

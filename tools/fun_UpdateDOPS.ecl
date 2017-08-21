@@ -1,4 +1,4 @@
-import _control, Roxiekeybuild,tools;
+import _control, Roxiekeybuild,tools,wk_ut;
 export fun_UpdateDOPS(	 
 	 string									pEmailAddresses
 	,string									pPackageName
@@ -6,6 +6,7 @@ export fun_UpdateDOPS(
 	,string									pversion								= ''
 	,boolean								pShouldUpdateRoxiePage	= true
 	,string									pEnvironment						= ''		//	'N' - nonfcra, 'F' - FCRA
+  ,string                 pupdateflag             = 'F'
 ) :=
 function
 	
@@ -19,14 +20,15 @@ function
 										and count(nothor(file_list)) = 0
 										and pShouldUpdateRoxiePage
                     and tools._Constants.Isdataland = false
-														, Roxiekeybuild.updateversion(pPackageName, pversion, pEmailAddresses,,inenvment := pEnvironment)
+														, Roxiekeybuild.updateversion(pPackageName, pversion, pEmailAddresses,,inenvment := pEnvironment,updateflag := pupdateflag)
 									);
 	
 	return sequential(
 		fileservices.sendemail(	 
 									 pEmailAddresses
 									,pPackageName + alert + pversion + ' on ' + _Control.ThisEnvironment.Name
-									,roxieemailbody
+									,	tools.fun_GetWUBrowserString() + '\n'
+										+ roxieemailbody
 									)
     ,output(roxieemailbody)
 		,update_roxie

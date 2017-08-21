@@ -4,14 +4,28 @@ EXPORT offendersfragments(Types.StateList st_list=ALL, Boolean pDelta=true) := M
 	//SHARED Persist_Stem 		:= '~THOR_DATA400::PERSIST::FRAGS_';
 	SHARED Persist_offenders	:= bair_boolean.constants('').persistfile('offenders');
 
-  bair_data := Bair.files(pUseDelta:=pDelta).offenders_Base.built;
+  bair_data := Bair.files(pUseDelta:=pDelta).offenders_Base.built(eid not in set(bair_boolean.temp,ExternalKey));
+	// bair_data := enth(Bair.files(,true,false).offenders_Base.built,10000)(eid not in set(bair_boolean.temp,ExternalKey));
 	SHARED offenders_Base := DISTRIBUTE(bair_data(eid <> ''),HASH64(eid));
 	
 	// offenders Business
-	Layout_offenders_base xd(bair.layouts.dbo_offenders_Base l) := TRANSFORM
-		SELF := l;
-	END;
-	SHARED offenders_File := PROJECT(offenders_Base, xd(LEFT));
+
+	SHARED offenders_File := PROJECT(offenders_Base, 
+																		TRANSFORM(Layout_offenders_base,
+																		SELF.gh12							:= left.gh12,
+																		SELF.gh4 							:= left.gh12[1..4],
+																		SELF.gh5 							:= left.gh12[1..5],
+																		SELF.gh6 							:= left.gh12[1..6],
+																		SELF.wc_last_name			:= left.last_name,
+																		SELF.wc_first_name		:= left.first_name,
+																		SELF.wc_middle_name		:= left.middle_name,
+																		SELF.wc_name_type			:= left.name_type,
+																		SELF.wc_moniker				:= left.moniker,
+																		SELF.wc_offenders_sid	:= left.offenders_sid,
+																		SELF.class_code				:= Bair.MapClassCodeNum(7, left.classification),
+																		self.agency						:= left.data_provider_name,
+																		SELF := left));
+	
 	SHARED offenders_mod := offenders_baseBooleanSearch(offenders_File);
   //
 	Layout_AnswerListData xans(Layout_offenders_base l) := TRANSFORM

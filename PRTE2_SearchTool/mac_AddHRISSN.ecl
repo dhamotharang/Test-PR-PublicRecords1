@@ -1,4 +1,4 @@
-﻿export mac_AddHRISSN(infile, outfile, justIssueInfo, max_num='20') := macro
+export mac_AddHRISSN(infile, outfile, justIssueInfo, max_num='20') := macro
 import ut,codes,suppress, prte2_risktable;
 
 #uniquename(recentRec)

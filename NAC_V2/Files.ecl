@@ -4,7 +4,7 @@ export Files(string st='') := module;
 	export load_in   := DATASET(Superfile_List(st).in,{string75 fn { virtual(logicalfilename)},Layouts.load}, THOR);
 	export load_in_old  := DATASET(Superfile_List(st).in_old,{string75 fn { virtual(logicalfilename)},Layouts.load_old}, THOR);
 	export in_history  := DATASET(Superfile_List(st).in_history,{string75 fn { virtual(logicalfilename)},Layouts.load}, THOR);
-	export Base1      := DATASET(Superfile_List(st).Base,Layouts.base, THOR, opt)(case_state_abbreviation<>'MO');
+	export Base1      := DATASET(Superfile_List(st).Base,Layouts.base, THOR, opt);
 	
 	//export BaseMO := DATASET('~nac::poc::mo::fixage', Layouts.base, THOR);
 
@@ -42,22 +42,13 @@ export Files(string st='') := module;
 																			,''
 																			,left.prim_name)
 									,self:=left));	
-									
-	
-	poc1 := dataset('~nac::poc::mo::base2', nac_v2.Layout_Base2 - GroupId, THOR);
-	poc2 := dataset('~nac::poc::mameutwa::base2', nac_v2.Layout_Base2 - GroupId, THOR);
-	poc3 := dataset('~nac::poc::nyc::base2', nac_v2.Layout_Base2, THOR);
-	poc := PROJECT(poc1+poc2, TRANSFORM(nac_v2.Layout_Base2, self.GroupId:=left.programstate+'01';self:=left)); 
-									
 	export Base2 := DATASET(Superfile_List('').sfBase2, nac_v2.Layout_Base2, thor);
-//										& poc & poc3
-//										& NAC_V2.nac_demo_data();
+										//& NAC_V2.nac_demo_data(); (dataland only)
 
 	export Base_prev := DATASET(Superfile_List(st).Base_prev,Layouts.base, THOR);
 	export Collisions  := DATASET(Superfile_List(st).Collisions,Layouts.Collisions, THOR,opt);
 	//export Collisions2  := DATASET('~nac::uber::test::collisions2', Layout_Collisions2.Layout_Collisions, THOR,opt);
 	export Collisions2  := DATASET(Superfile_List(st).sfCollisions, Layout_Collisions2.Layout_Collisions, THOR,opt);
-	export NewCollisions  := DATASET(Superfile_List(st).sfNewCollisions, Layout_Collisions2.Layout_Collisions, THOR,opt);
 	
 	export temp      := DATASET(Superfile_List(st).temp,{string75 fn { virtual(logicalfilename)},Layouts.load}, THOR);
 	export rejected  := DATASET(Superfile_List(st).rejected,{string75 fn { virtual(logicalfilename)},Layouts.load}, THOR);

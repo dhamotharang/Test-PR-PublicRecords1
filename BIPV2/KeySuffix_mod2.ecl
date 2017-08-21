@@ -42,7 +42,19 @@ end;
 //export constant_ThisBuild_versionDate := '20160304'; // S37
 //export constant_ThisBuild_versionDate := '20160412'; // S38
 //export constant_ThisBuild_versionDate := '20160509'; // S39
-export constant_ThisBuild_versionDate := '20160617'; // S40
+//export constant_ThisBuild_versionDate := '20160617'; // S40
+//export constant_ThisBuild_versionDate := '20160722'; // S41
+//export constant_ThisBuild_versionDate := '20160830'; // S42  
+// export constant_ThisBuild_versionDate := '20161111'; // S43
+//export constant_ThisBuild_versionDate := '20161216'; // S44
+//export constant_ThisBuild_versionDate := '20170125'; // S45
+//export constant_ThisBuild_versionDate := '20170315'; // S46
+//export constant_ThisBuild_versionDate := '20170526'; // S47
+// export constant_ThisBuild_versionDate := '20170622'; // S48
+export constant_ThisBuild_versionDate := '20170801'; // S49
+
+
+
 export ds :=
 dataset([
 //data for previous sprints is below.  and thor release date, if needed, can be mined from keysuffix check in history on prod
@@ -80,15 +92,26 @@ dataset([
 ,{  29, '',   '20150618a',  '20150618', '20150730', '20150803', '20150811', 'Rebuild of S29 bizlinkfull keys using ds_clean.  Also copied xlink keys, xlink sample, weekly keys.  Then renamed rest of keys to match "a" version.'}
 ,{  30, '',   '20150804' ,  '20150804', '20150821', '20150821', '20150831', 'Ingested S29 base. Add back Property from source ingest. Data release only.'}
 ,{  31, '',   '20150828' ,  '20150828', '20151008', '20151012', '20151020', 'Ingested S30 base. Add Cclue(B source) and SBFE(A source).  Make sure SBFE and Cclue records only make it into the xlink search keys, not the xlink payload, or the other key.'}
-,{  32, '',   '20151014' ,  '20151014', '20151014', ''        , ''        , 'Ingested S32 base. BIPV2_LGID3 (give LGID3 access to more proxids), BIPV2_Proxid (account for F/D corp key data errors), BIPV2_Company_Names for PTA/PTO. BizLinkFull.'}
-,{  33, '',   '20151201' ,  '20151201', '20151201', '20151216', ''        , 'Ingested S33 base. Data release only'}
-,{  34, '',   '20151218' ,  '20151218', '20151218', '20160119', '20160126', 'Ingested S34 base. IPV2_LGID3(give LGID3 access to more proxids), Bug: 178357-Linking 2.2 EmpID-propagate DID across EmpID and measure impact, Bug 184232 - LINKING: EmpID/DID Issues '}
-,{  35, '',   '20160112' ,  '20160112', '20160112', '20160203', '20160209', 'Ingested S35 base. Data release only'}
-,{  36, '',   '20160204' ,  '20160204', '20160204', '', 				'', 				'Ingested S36 base. BIPV2_LGID3(186760 lower threshold to 40), bug 188309 LINKING: unlink Lawcopy, Bug 197272 - LINKING: powid up overlinking, Bug 137308: ProxID linking changes (new FEIN OR clause) '}
-,{  37, '',   '20160304' ,  '20160304', '20160304', '20160411', '20160419', 'Ingested S37 base. Bug 178442 - Linking 2.2 : empid, seleid, orgid relationship,  Bug: 182544 - company name FIELDTYPEs in DOT ,  Bug: 197761 - LINKING: upgrade POWID up to 3.3'}
-,{  38, '',   '20160412' ,  '20160412', '20160412', '', 				'', 				'Ingested S38 base. Bug: 200948 - Update company name cleaner to remove warnings,  Bug: 197270 - LINKING: proxid overlinking because of duns_number corrections, Hrchy performance enhancement'}
-,{  39, '',   '20160509' ,  '20160509', '20160509', '', 				'', 			  'Ingested S39 base. Data release only'}
-,{  40, '',   '20160617' ,  '20160617', '20160509', '', 				'', 			  'Ingested S40 base. BH-13 Tune Strata alerts more intelligently - phase 1 (ID integrity) '}
+,{  32, '',   '20151014' ,  '20151014', '20151014', ''        , ''        , 'Ingested S31 base. BIPV2_LGID3 (give LGID3 access to more proxids), BIPV2_Proxid (account for F/D corp key data errors), BIPV2_Company_Names for PTA/PTO. BizLinkFull.'}
+,{  33, '',   '20151201' ,  '20151201', '20151201', '20151216', ''        , 'Ingested S32 base. Data release only'}
+,{  34, '',   '20151218' ,  '20151218', '20151218', '20160119', '20160126', 'Ingested S33 base. IPV2_LGID3(give LGID3 access to more proxids), Bug: 178357-Linking 2.2 EmpID-propagate DID across EmpID and measure impact, Bug 184232 - LINKING: EmpID/DID Issues '}
+,{  35, '',   '20160112' ,  '20160112', '20160112', '20160203', '20160209', 'Ingested S34 base. Data release only'}
+,{  36, '',   '20160204' ,  '20160204', '20160204', '', 				'', 				'Ingested S35 base. BIPV2_LGID3(186760 lower threshold to 40), bug 188309 LINKING: unlink Lawcopy, Bug 197272 - LINKING: powid up overlinking, Bug 137308: ProxID linking changes (new FEIN OR clause) '}
+,{  37, '',   '20160304' ,  '20160304', '20160304', '20160411', '20160419', 'Ingested S36 base. Bug 178442 - Linking 2.2 : empid, seleid, orgid relationship,  Bug: 182544 - company name FIELDTYPEs in DOT ,  Bug: 197761 - LINKING: upgrade POWID up to 3.3'}
+,{  38, '',   '20160412' ,  '20160412', '20160412', '', 				'', 				'Ingested S37 base. Bug: 200948 - Update company name cleaner to remove warnings,  Bug: 197270 - LINKING: proxid overlinking because of duns_number corrections, Hrchy performance enhancement'}
+,{  39, '',   '20160509' ,  '20160509', '20160509', '', 				'', 			  'Ingested S38 base. Data release only'}
+,{  40, '',   '20160617' ,  '20160617', '20160617', '', 				'', 			  'Ingested S39 base. BH-13 Tune Strata alerts more intelligently - phase 1 (ID integrity) '}
+,{  41, '',   '20160722' ,  '20160722', '20160722', '', 				'', 			  'Ingested S40 base. BH-46 Service or defined process for how did this link? part one; BH-31 Fix Hierarchy ID Integrity Issues  '}
+,{  42, '',   '20160830' ,  '20160830', '20160830', '', 				'', 			  'Ingested S41 base. BH-29 Linking ETS: Tune Strata alerts more intelligently - phase 2; BH-19 Service or defined process for "how did this link?" part two; BH-49 fix blank sele_seg, prox_seg records; BH-14 Hierarchy shouldnot always break lgid3 leaf node clusters'}
+,{  43, '',   '20161111' ,  '20161111', '20161111', '', 				'', 			  'Ingested S42 base. BH-75,BH-64,BH-63,BH52,BH-55,BH-76,BH-91,BH-94,BH-18,BH-77,BH-80,BH-95,BH-96,BH-93'}
+,{  44, '',   '20161216' ,  '20161216', '20161216', '', 				'', 			  'Ingested S43 base. RR-10850'}
+,{  45, '',   '20170125' ,  '20170125', '', '', 				'', 			  'Ingested S44 base. RR-10877'}
+,{  46, '',   '20170315' ,  '20170315', '', '', 				'', 			  'Ingested S45 base. RR-11034'}
+,{  47, '',   '20170526' ,  '20170526', '', '', 				'', 			  'Ingested S46 base. RR-11124'}
+,{  48, '',   '20170622' ,  '20170622', '', '', 				'', 			  'Ingested S47 base. RR-11251'}
+,{  49, '',   '20170801' ,  '20170801', '', '', 				'', 			  'Ingested S48 base. BH-316 -- BIP Build 49 - August 2017'}
+
+
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.
 ],rec);
 //****

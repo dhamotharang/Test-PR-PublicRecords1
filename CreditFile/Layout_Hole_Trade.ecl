@@ -1,0 +1,27 @@
+export Layout_Hole_Trade := record
+   unsigned4 trd_per_id;
+   boolean master := false;
+   boolean duplicate := false;
+   //data5 presflag;
+   unsigned4 date_reported;
+   unsigned4 date_opened;
+   unsigned4 date_activity;
+   string2 indust_cd;
+   unsigned4 member;
+   string1 typ;
+   string1 rate;
+   //data2 optind;
+   //unsigned2 mos_rvwd;
+   unsigned integer1 narr1;
+   unsigned integer1 narr2;
+   integer4 hc;
+   integer4 bal;
+   //integer4 terms;
+   integer4 pda;
+   unsigned1 cnt30;
+   unsigned1 cnt60;
+   unsigned1 cnt90;
+   //string1 term;
+   //string1 fbcd;
+   string20 actno;
+   end;

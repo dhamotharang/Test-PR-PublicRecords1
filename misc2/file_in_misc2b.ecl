@@ -10,6 +10,6 @@ end;
 
 header_services.Supplemental_Data.mac_verify('ssi_sup.txt',in_layout,attr);
 in := attr();
-export file_in_misc2b := in;
+//export file_in_misc2b := in;
 
-// export file_in_misc2b := dataset([],in_layout);
+export file_in_misc2b := dataset([],in_layout);

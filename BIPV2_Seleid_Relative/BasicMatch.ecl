@@ -1,14 +1,13 @@
-IMPORT SALT30,ut;
+IMPORT SALT31,ut;
 EXPORT BasicMatch(DATASET(layout_Base) ih) := MODULE// An extremely tight pre-match designed to quickly eliminate high volume duplicates
- 
 SHARED  h00 := Specificities(ih).input_file;
   SHARED s := Specificities(ih).specificities[1];
   SHARED h00_match := h00( 
       0 + IF( cnp_name  IN SET(s.nulls_cnp_name,cnp_name), 0, 25 ) + IF( company_inc_state  IN SET(s.nulls_company_inc_state,company_inc_state), 0, 7 ) + IF( company_charter_number  IN SET(s.nulls_company_charter_number,company_charter_number), 0, 27 ) + IF( company_fein  IN SET(s.nulls_company_fein,company_fein), 0, 27 ) + IF( prim_range  IN SET(s.nulls_prim_range,prim_range), 0, 13 ) + IF( prim_name  IN SET(s.nulls_prim_name,prim_name), 0, 15 ) + IF( postdir  IN SET(s.nulls_postdir,postdir), 0, 7 ) + IF( sec_range  IN SET(s.nulls_sec_range,sec_range), 0, 12 ) + IF( v_city_name  IN SET(s.nulls_v_city_name,v_city_name), 0, 11 ) + IF( st  IN SET(s.nulls_st,st), 0, 5 ) + IF( active_duns_number  IN SET(s.nulls_active_duns_number,active_duns_number), 0, 28 ) + IF( active_enterprise_number  IN SET(s.nulls_active_enterprise_number,active_enterprise_number), 0, 28 ) + IF( source  IN SET(s.nulls_source,source), 0, 4 ) + IF( source_record_id  IN SET(s.nulls_source_record_id,source_record_id), 0, 27 ) + IF( fname  IN SET(s.nulls_fname,fname), 0, 11 ) + IF( mname  IN SET(s.nulls_mname,mname), 0, 8 ) + IF( lname  IN SET(s.nulls_lname,lname), 0, 16 ) + IF( contact_ssn  IN SET(s.nulls_contact_ssn,contact_ssn), 0, 27 ) + IF( contact_phone  IN SET(s.nulls_contact_phone,contact_phone), 0, 27 ) + IF( contact_email_username  IN SET(s.nulls_contact_email_username,contact_email_username), 0, 27 ) >= Config.BasicMatchThreshold); // Potentially remove anything that would violate FORCE(+) constraints
   MatchCands := JOIN(h00_match,Specificities(ih).ClusterSizes(InCluster=1),LEFT.Seleid=RIGHT.Seleid,TRANSFORM(LEFT),LOCAL); // Singletons only may match
   Rec := RECORD
-    SALT30.UIDType Seleid1;
-    SALT30.UIDType Seleid2;
+    SALT31.UIDType Seleid1;
+    SALT31.UIDType Seleid2;
   END;
 // It is important that this is an EQUIVALENCE relationship - it allows us to form an implicit transitive closure
   h01 := SORT(h00_match,cnp_name,company_inc_state,company_charter_number,company_fein,prim_range,prim_name,postdir,sec_range,v_city_name,st,active_duns_number,active_enterprise_number,source,source_record_id,fname,mname,lname,contact_ssn,contact_phone,contact_email_username,Seleid);

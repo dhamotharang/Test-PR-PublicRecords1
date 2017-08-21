@@ -1,7 +1,7 @@
 /*
 	Experian Business Reports:
 		The current list of file segments and their corresponding descriptions are provided 
-		in the Segment_Codes attribute.  
+		in the decode_Segments attribute.  
 		To spray a segment, use the ebr.MAC_Spray_InputFiles macro, passing it the correct
 			parameters.  This will spray the file, and add it to the correct superfiles,
 			only if the segment is in the segment_codes table, with it's corresponding 
@@ -42,15 +42,21 @@
 			Proc_Accept_SK_to_QA
 				same as above, except for QA
 			Proc_Build_Base_Files
-				add the BDID_segment attribute here to be built
+				add the BDID_segment attribute here to be built, and the clearing of
+				the input superfile.
 			Proc_Build_Keys
 				add the keys you created attributes here to be built
 			Query_BDID_Stats
 				Add the segment here to get stats run on it
 			Segment_Codes
-				Add the segment code, description, and the record sizes for the in file
+				Add the segment code and the record sizes for the in file
 				and the base file
-
+			Decode_segments
+				Add the segment code and description
+			Query_BDID_Stats
+				Add the segment here to do the stats on the input and base files
+			Clear_All_Input_Superfiles
+				Add the input file so it can be cleared out after a build
 
 	Only thing I am not able to make dependent on the segment code, is the persists
 	because the process needs to know the name of the persists first.

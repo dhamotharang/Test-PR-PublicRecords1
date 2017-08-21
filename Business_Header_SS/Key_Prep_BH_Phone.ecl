@@ -1,6 +1,11 @@
-IMPORT Business_Header;
+Import Data_Services, Business_Header, PRTE2_Business_Header;
 
-f_p := Business_Header_SS.File_Prep_BH_CompanyName_Phone_Plus;
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+f_p := PRTE2_Business_Header.files().base.CompanynamePhone.keybuild;
+#ELSE
+f_p := business_header.files().base.CompanynamePhone.keybuild;
+#END;
+
 
 layout_phone_index := RECORD
 	f_p.phone;

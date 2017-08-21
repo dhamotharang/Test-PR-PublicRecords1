@@ -5,6 +5,7 @@ EXPORT personsfragments(Types.StateList st_list=ALL, Boolean pDelta=true) := MOD
 	SHARED Persist_persons	:= bair_boolean.constants('').persistfile('persons');
 
   bair_data := Bair.files(pUseDelta:=pDelta).persons_Base.built;
+	//bair_data := choosen(Bair.files(pUseDelta:=pDelta).persons_Base.built,10000);
 	SHARED persons_Base := DISTRIBUTE(bair_data(eid <> ''),HASH64(eid));
 	
 	// persons Business

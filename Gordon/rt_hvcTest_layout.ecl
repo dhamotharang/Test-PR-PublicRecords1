@@ -1,0 +1,55 @@
+/*--METADATA('SampleFile', '~file::10.150.13.201::prod_data_build_13::production_data::emerges::hvc::out::emerges_hvc.20040805.d00')*/
+/*--METADATA('SampleFileType', 'Flat')*/
+export hvcTest_layout := 
+  record
+	string40 col1;
+	string4 source;
+	string13 col3;
+	string24 col4;
+	string30 col5;
+	string120 col6;
+	string163 col7;
+	string80 col8;
+	string40 col9;
+	string1416 col10;
+	string2 col11;
+	string5 col12;
+	string40 col13;
+	string25 col14;
+	string3 col15;
+	string12 col16;
+	string28 col17;
+	string24 col18;
+	string25 col19;
+	string25 col20;
+	string26 col21;
+	string15 col22;
+	string205 col23;
+	string182 col24;
+	string20 col25;
+	string40 col26;
+	string4 col27;
+	string13 col28;
+	string24 col29;
+	string30 col30;
+	string30 col31;
+	string90 col32;
+	string163 col33;
+	string80 col34;
+	string40 col35;
+	string1416 col36;
+	string2 col37;
+	string5 col38;
+	string20 col39;
+	string20 col40;
+	string25 col41;
+	string15 col42;
+	string52 col43;
+	string25 col44;
+	string25 col45;
+	string26 col46;
+	string15 col47;
+	string205 col48;
+	string182 col49;
+	string20 col50;
+  end;

@@ -1,16 +1,48 @@
-import ut;
+import ut, Roxiekeybuild, business_header, versioncontrol;
 
-#workunit('name','Business Risk Build Keys');
+export proc_build_brisk_keys(
 
+	string pversion
 
+) := 
+module
 
-ut.MAC_SK_BuildProcess_v2(Business_Risk.key_bdid_table,'~thor_data400::key::bdid_table',do1)
-ut.MAC_SK_BuildProcess_v2(Business_Risk.key_fein_table,'~thor_data400::key::fein_table',do2)
-ut.MAC_SK_BuildProcess_v2(Business_Risk.key_groupid_cnt,'~thor_data400::key::groupid_cnt',do3)
-ut.MAC_SK_BuildProcess_v2(business_risk.Key_SSN_Address,'~thor_data400::key::header_ssn_address',do4);
-ut.MAC_SK_BuildProcess_v2(business_risk.Key_BH_Fein,'~thor_Data400::key::business_InstantID_FEIN2Addr',do5);
-ut.mac_sk_buildprocess_v2(business_risk.Key_BH_BDID_Phone, '~thor_data400::key::BH_BDID_To_Phone',do6);
-ut.mac_sk_buildprocess_v2(business_risk.Key_Bus_Cont_DID_2_BDID, '~thor_data400::key::bh_contacts_did_2_bdid',do7);
+	shared keyName		:= business_header.keynames(pversion).risk;
 
+	VersionControl.macBuildNewLogicalKeyWithName(key_bdid_table								,keyName.Bdid.New					,Build_Key1);
+	VersionControl.macBuildNewLogicalKeyWithName(key_fein_table								,keyName.Fein.New					,Build_Key2);
+	VersionControl.macBuildNewLogicalKeyWithName(key_groupid_cnt							,keyName.Groupid.New			,Build_Key3);
+	VersionControl.macBuildNewLogicalKeyWithName(Key_BH_Fein									,keyName.FeinCompany.New	,Build_Key4);
+	VersionControl.macBuildNewLogicalKeyWithName(Key_BH_BDID_Phone						,keyName.BdidPhone.New		,Build_Key5);
+	VersionControl.macBuildNewLogicalKeyWithName(Key_Bus_Cont_DID_2_BDID			,keyName.Did.New					,Build_Key6);
+	VersionControl.macBuildNewLogicalKeyWithName(key_BDID_risk_table					,keyName.BdidRisk.New			,Build_Key7);
+	VersionControl.macBuildNewLogicalKeyWithName(Key_Business_Header_Address	,keyName.BHAddress.New		,Build_Key8);
 
-export proc_build_brisk_keys := sequential(do1, do2, do3,do4,do5, do6, do7);
+	shared keygroupnames := 
+				keyName.dAll_filenames                                                                           
+			; 
+                                          
+	shared Build_Keys :=
+	if(not VersionControl.DoAllFilesExist.fNamesBuilds(keygroupnames)
+		,parallel(
+
+			 Build_Key1
+			,Build_Key2
+			,Build_Key3
+			,Build_Key4
+			,Build_Key5
+			,Build_Key6
+			,Build_Key7
+			,Build_Key8
+
+		));
+
+	export all := 
+	sequential(
+
+		 Build_Keys
+		,business_header.promote(pversion,'^(?!.*moxie)(.*?)key(.*?)$').new2built
+
+	);
+
+end;

@@ -1,4 +1,4 @@
-﻿import Codes;
+import Codes;
 
 /*
 	*************************************************************************************
@@ -106,7 +106,7 @@ export Master := dataset(
 			// RESERVED: 390-399 - Delaware Corporation (ESP only)
 			{'ROYALTY', 'DELCORP_SRCH2'		, '390', 'G', ''			, 'Delaware Corporation'}, 
 			{'ROYALTY', 'DELCORP_RPT2'		, '391', 'G', ''			, 'Delaware Corporation'}, 
-			// RESERVED: 400-409 - Social Media Locator - Social Intelligence - AFI Social Media Locator Search – Project #2503 (ESP only)
+			// RESERVED: 400-409 - Social Media Locator - Social Intelligence - AFI Social Media Locator Search â€“ Project #2503 (ESP only)
 			{'ROYALTY', 'SMLOCATOR'				, '400', 'G', ''			, 'Social Media Locator (Social Intelligence)'}, 
 			{'ROYALTY', 'SMLOCATOR_DEMO'	, '401', 'G', ''			, 'Social Media Locator (Social Intelligence) - DEMO'}, 
 			// RESERVED: 410-419 - Worldview Validate - Global Data Consortium (ESP only)

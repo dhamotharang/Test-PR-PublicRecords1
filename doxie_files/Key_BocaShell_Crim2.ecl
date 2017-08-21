@@ -1,6 +1,6 @@
-import doxie, ut;
+import doxie, doxie_files, ut, std;
 
-todaysdate := ut.GetDate;
+todaysdate := (STRING8)Std.Date.Today();
 checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
 
 
@@ -78,8 +78,8 @@ TRANSFORM
 	SELF.criminal_count24 := le.criminal_count24+IF(le.crim_case_num=ri.crim_case_num,0,ri.criminal_count24);
 	SELF.criminal_count36 := le.criminal_count36+IF(le.crim_case_num=ri.crim_case_num,0,ri.criminal_count36);
 	SELF.criminal_count60 := le.criminal_count60+IF(le.crim_case_num=ri.crim_case_num,0,ri.criminal_count60);
-	self.last_criminal_date := ut.max2(le.last_criminal_date,ri.last_criminal_date);
-	self.last_felony_date := ut.max2(le.last_felony_date,ri.last_felony_date);
+	self.last_criminal_date := max(le.last_criminal_date,ri.last_criminal_date);
+	self.last_felony_date := max(le.last_felony_date,ri.last_felony_date);
 	SELF.felony_count := le.felony_count+IF(le.crim_case_num=ri.crim_case_num,0,ri.felony_count);
 	SELF := ri;
 END;
@@ -99,7 +99,7 @@ TRANSFORM
 	self.arrests_count24 := le.arrests_count24+IF(le.crim_case_num=ri.crim_case_num,0,ri.arrests_count24);
 	self.arrests_count36 := le.arrests_count36+IF(le.crim_case_num=ri.crim_case_num,0,ri.arrests_count36);
 	self.arrests_count60 := le.arrests_count60+IF(le.crim_case_num=ri.crim_case_num,0,ri.arrests_count60);
-	self.date_last_arrest := ut.max2(le.date_last_arrest,ri.date_last_arrest);
+	self.date_last_arrest := max(le.date_last_arrest,ri.date_last_arrest);
 	SELF := ri;
 END;
 

@@ -35,4 +35,4 @@ res_safe := PROJECT(res, lFieldTransform(left));
 
 DID_Add.MAC_Add_SSN_By_DID(res_safe,did,ssn,with_ssn)
 
-export DL := with_ssn : persist('~thor_data400::Persist::DrvLic_DLs_With_DIDs','400way');
+export DL := with_ssn : persist('~thor_data400::Persist::DrvLic_DLs_With_DIDs','thor_dell400_2');

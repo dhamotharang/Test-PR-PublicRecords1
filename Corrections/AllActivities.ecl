@@ -1,0 +1,1 @@
+export AllActivities := accurint_activity_as_common;

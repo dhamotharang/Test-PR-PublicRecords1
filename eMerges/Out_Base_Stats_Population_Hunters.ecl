@@ -1,0 +1,214 @@
+import STRATA;
+
+export Out_Base_Stats_Population_Hunters(string version_date) := function 
+	rPopulationStats_eMerges__file_hunters_out
+	 :=
+	  record
+		CountGroup                                      := count(group);
+		process_date_CountNonBlank                      := sum(group,if(eMerges.file_hunters_out.process_date<>'',1,0));
+		date_first_seen_CountNonBlank                   := sum(group,if(eMerges.file_hunters_out.date_first_seen<>'',1,0));
+		date_last_seen_CountNonBlank                    := sum(group,if(eMerges.file_hunters_out.date_last_seen<>'',1,0));
+		score_CountNonBlank                             := sum(group,if(eMerges.file_hunters_out.score<>'',1,0));
+		best_ssn_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.best_ssn<>'',1,0));
+		did_out_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.did_out<>'',1,0));
+		Source_CountNonBlank                            := sum(group,if(eMerges.file_hunters_out.Source<>'',1,0));
+		file_id_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.file_id<>'',1,0));
+		vendor_id_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.vendor_id<>'',1,0));
+		eMerges.file_hunters_out.source_state;
+		eMerges.file_hunters_out.source_code;
+		file_acquired_date_CountNonBlank                := sum(group,if(eMerges.file_hunters_out.file_acquired_date<>'',1,0));
+		use_CountNonBlank                               := sum(group,if(eMerges.file_hunters_out._use<>'',1,0));
+		title_in_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.title_in<>'',1,0));
+		lname_in_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.lname_in<>'',1,0));
+		fname_in_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.fname_in<>'',1,0));
+		mname_in_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.mname_in<>'',1,0));
+		maiden_prior_CountNonBlank                      := sum(group,if(eMerges.file_hunters_out.maiden_prior<>'',1,0));
+		name_suffix_in_CountNonBlank                    := sum(group,if(eMerges.file_hunters_out.name_suffix_in<>'',1,0));
+		votefiller_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.votefiller<>'',1,0));
+		source_voterId_CountNonBlank                    := sum(group,if(eMerges.file_hunters_out.source_voterId<>'',1,0));
+		dob_CountNonBlank                               := sum(group,if(eMerges.file_hunters_out.dob<>'',1,0));
+		ageCat_CountNonBlank                            := sum(group,if(eMerges.file_hunters_out.ageCat<>'',1,0));
+		headHousehold_CountNonBlank                     := sum(group,if(eMerges.file_hunters_out.headHousehold<>'',1,0));
+		place_of_birth_CountNonBlank                    := sum(group,if(eMerges.file_hunters_out.place_of_birth<>'',1,0));
+		occupation_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.occupation<>'',1,0));
+		maiden_name_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.maiden_name<>'',1,0));
+		motorVoterId_CountNonBlank                      := sum(group,if(eMerges.file_hunters_out.motorVoterId<>'',1,0));
+		regSource_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.regSource<>'',1,0));
+		regDate_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.regDate<>'',1,0));
+		race_CountNonBlank                              := sum(group,if(eMerges.file_hunters_out.race<>'',1,0));
+		gender_CountNonBlank                            := sum(group,if(eMerges.file_hunters_out.gender<>'',1,0));
+		poliparty_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.poliparty<>'',1,0));
+		phone_CountNonBlank                             := sum(group,if(eMerges.file_hunters_out.phone<>'',1,0));
+		work_phone_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.work_phone<>'',1,0));
+		other_phone_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.other_phone<>'',1,0));
+		active_status_CountNonBlank                     := sum(group,if(eMerges.file_hunters_out.active_status<>'',1,0));
+		votefiller2_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.votefiller2<>'',1,0));
+		active_other_CountNonBlank                      := sum(group,if(eMerges.file_hunters_out.active_other<>'',1,0));
+		voterStatus_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.voterStatus<>'',1,0));
+		resAddr1_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.resAddr1<>'',1,0));
+		resAddr2_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.resAddr2<>'',1,0));
+		res_city_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.res_city<>'',1,0));
+		res_state_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.res_state<>'',1,0));
+		res_zip_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.res_zip<>'',1,0));
+		res_county_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.res_county<>'',1,0));
+		mail_addr1_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.mail_addr1<>'',1,0));
+		mail_addr2_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.mail_addr2<>'',1,0));
+		mail_city_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.mail_city<>'',1,0));
+		mail_state_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.mail_state<>'',1,0));
+		mail_zip_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.mail_zip<>'',1,0));
+		mail_county_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.mail_county<>'',1,0));
+		HistoryFiller_CountNonBlank                     := sum(group,if(eMerges.file_hunters_out.HistoryFiller<>'',1,0));
+		HuntFishPerm_CountNonBlank                      := sum(group,if(eMerges.file_hunters_out.HuntFishPerm<>'',1,0));
+		License_type_Mapped_CountNonZero                := sum(group,if(eMerges.file_hunters_out.License_type_Mapped<>'',1,0));
+		DateLicense_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.DateLicense<>'',1,0));
+		HomeState_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.HomeState<>'',1,0));
+		Resident_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.Resident<>'',1,0));
+		NonResident_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.NonResident<>'',1,0));
+		Hunt_CountNonBlank                              := sum(group,if(eMerges.file_hunters_out.Hunt<>'',1,0));
+		Fish_CountNonBlank                              := sum(group,if(eMerges.file_hunters_out.Fish<>'',1,0));
+		ComboSuper_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.ComboSuper<>'',1,0));
+		Sportsman_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.Sportsman<>'',1,0));
+		Trap_CountNonBlank                              := sum(group,if(eMerges.file_hunters_out.Trap<>'',1,0));
+		Archery_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.Archery<>'',1,0));
+		Muzzle_CountNonBlank                            := sum(group,if(eMerges.file_hunters_out.Muzzle<>'',1,0));
+		Drawing_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.Drawing<>'',1,0));
+		Day1_CountNonBlank                              := sum(group,if(eMerges.file_hunters_out.Day1<>'',1,0));
+		Day3_CountNonBlank                              := sum(group,if(eMerges.file_hunters_out.Day3<>'',1,0));
+		Day7_CountNonBlank                              := sum(group,if(eMerges.file_hunters_out.Day7<>'',1,0));
+		Day14to15_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.Day14to15<>'',1,0));
+		DayFiller_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.DayFiller<>'',1,0));
+		SeasonAnnual_CountNonBlank                      := sum(group,if(eMerges.file_hunters_out.SeasonAnnual<>'',1,0));
+		LifeTimePermit_CountNonBlank                    := sum(group,if(eMerges.file_hunters_out.LifeTimePermit<>'',1,0));
+		LandOwner_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.LandOwner<>'',1,0));
+		Family_CountNonBlank                            := sum(group,if(eMerges.file_hunters_out.Family<>'',1,0));
+		Junior_CountNonBlank                            := sum(group,if(eMerges.file_hunters_out.Junior<>'',1,0));
+		SeniorCit_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.SeniorCit<>'',1,0));
+		CrewMemeber_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.CrewMemeber<>'',1,0));
+		Retarded_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.Retarded<>'',1,0));
+		Indian_CountNonBlank                            := sum(group,if(eMerges.file_hunters_out.Indian<>'',1,0));
+		Serviceman_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.Serviceman<>'',1,0));
+		Disabled_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.Disabled<>'',1,0));
+		LowIncome_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.LowIncome<>'',1,0));
+		RegionCounty_CountNonBlank                      := sum(group,if(eMerges.file_hunters_out.RegionCounty<>'',1,0));
+		Blind_CountNonBlank                             := sum(group,if(eMerges.file_hunters_out.Blind<>'',1,0));
+		HuntFiller_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.HuntFiller<>'',1,0));
+		Salmon_CountNonBlank                            := sum(group,if(eMerges.file_hunters_out.Salmon<>'',1,0));
+		Freshwater_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.Freshwater<>'',1,0));
+		Saltwater_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.Saltwater<>'',1,0));
+		LakesandResevoirs_CountNonBlank                 := sum(group,if(eMerges.file_hunters_out.LakesandResevoirs<>'',1,0));
+		SetLineFish_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.SetLineFish<>'',1,0));
+		Trout_CountNonBlank                             := sum(group,if(eMerges.file_hunters_out.Trout<>'',1,0));
+		FallFishing_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.FallFishing<>'',1,0));
+		Steelhead_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.Steelhead<>'',1,0));
+		WhiteJubHerring_CountNonBlank                   := sum(group,if(eMerges.file_hunters_out.WhiteJubHerring<>'',1,0));
+		Sturgeon_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.Sturgeon<>'',1,0));
+		ShellfishCrab_CountNonBlank                     := sum(group,if(eMerges.file_hunters_out.ShellfishCrab<>'',1,0));
+		ShellfishLobster_CountNonBlank                  := sum(group,if(eMerges.file_hunters_out.ShellfishLobster<>'',1,0));
+		Deer_CountNonBlank                              := sum(group,if(eMerges.file_hunters_out.Deer<>'',1,0));
+		Bear_CountNonBlank                              := sum(group,if(eMerges.file_hunters_out.Bear<>'',1,0));
+		Elk_CountNonBlank                               := sum(group,if(eMerges.file_hunters_out.Elk<>'',1,0));
+		Moose_CountNonBlank                             := sum(group,if(eMerges.file_hunters_out.Moose<>'',1,0));
+		Buffalo_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.Buffalo<>'',1,0));
+		Antelope_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.Antelope<>'',1,0));
+		SikeBull_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.SikeBull<>'',1,0));
+		Bighorn_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.Bighorn<>'',1,0));
+		Javelina_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.Javelina<>'',1,0));
+		Cougar_CountNonBlank                            := sum(group,if(eMerges.file_hunters_out.Cougar<>'',1,0));
+		Anterless_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.Anterless<>'',1,0));
+		Pheasant_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.Pheasant<>'',1,0));
+		Goose_CountNonBlank                             := sum(group,if(eMerges.file_hunters_out.Goose<>'',1,0));
+		Duck_CountNonBlank                              := sum(group,if(eMerges.file_hunters_out.Duck<>'',1,0));
+		Turkey_CountNonBlank                            := sum(group,if(eMerges.file_hunters_out.Turkey<>'',1,0));
+		SnowMobile_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.SnowMobile<>'',1,0));
+		BigGame_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.BigGame<>'',1,0));
+		SkiPass_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.SkiPass<>'',1,0));
+		MigBird_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.MigBird<>'',1,0));
+		SmallGame_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.SmallGame<>'',1,0));
+		Sturgeon2_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.Sturgeon2<>'',1,0));
+		Gun_CountNonBlank                               := sum(group,if(eMerges.file_hunters_out.Gun<>'',1,0));
+		Bonus_CountNonBlank                             := sum(group,if(eMerges.file_hunters_out.Bonus<>'',1,0));
+		Lottery_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.Lottery<>'',1,0));
+		OtherBirds_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.OtherBirds<>'',1,0));
+		huntfill1_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.huntfill1<>'',1,0));
+		title_CountNonBlank                             := sum(group,if(eMerges.file_hunters_out.title<>'',1,0));
+		fname_CountNonBlank                             := sum(group,if(eMerges.file_hunters_out.fname<>'',1,0));
+		mname_CountNonBlank                             := sum(group,if(eMerges.file_hunters_out.mname<>'',1,0));
+		lname_CountNonBlank                             := sum(group,if(eMerges.file_hunters_out.lname<>'',1,0));
+		name_suffix_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.name_suffix<>'',1,0));
+		score_on_input_CountNonBlank                    := sum(group,if(eMerges.file_hunters_out.score_on_input<>'',1,0));
+		prim_range_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.prim_range<>'',1,0));
+		predir_CountNonBlank                            := sum(group,if(eMerges.file_hunters_out.predir<>'',1,0));
+		prim_name_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.prim_name<>'',1,0));
+		suffix_CountNonBlank                            := sum(group,if(eMerges.file_hunters_out.suffix<>'',1,0));
+		postdir_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.postdir<>'',1,0));
+		unit_desig_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.unit_desig<>'',1,0));
+		sec_range_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.sec_range<>'',1,0));
+		p_city_name_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.p_city_name<>'',1,0));
+		city_name_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.city_name<>'',1,0));
+		st_CountNonBlank                                := sum(group,if(eMerges.file_hunters_out.st<>'',1,0));
+		zip_CountNonBlank                               := sum(group,if(eMerges.file_hunters_out.zip<>'',1,0));
+		zip4_CountNonBlank                              := sum(group,if(eMerges.file_hunters_out.zip4<>'',1,0));
+		cart_CountNonBlank                              := sum(group,if(eMerges.file_hunters_out.cart<>'',1,0));
+		cr_sort_sz_CountNonBlank                        := sum(group,if(eMerges.file_hunters_out.cr_sort_sz<>'',1,0));
+		lot_CountNonBlank                               := sum(group,if(eMerges.file_hunters_out.lot<>'',1,0));
+		lot_order_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.lot_order<>'',1,0));
+		dpbc_CountNonBlank                              := sum(group,if(eMerges.file_hunters_out.dpbc<>'',1,0));
+		chk_digit_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.chk_digit<>'',1,0));
+		record_type_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.record_type<>'',1,0));
+		ace_fips_st_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.ace_fips_st<>'',1,0));
+		county_CountNonBlank                            := sum(group,if(eMerges.file_hunters_out.county<>'',1,0));
+		county_name_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.county_name<>'',1,0));
+		geo_lat_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.geo_lat<>'',1,0));
+		geo_long_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.geo_long<>'',1,0));
+		msa_CountNonBlank                               := sum(group,if(eMerges.file_hunters_out.msa<>'',1,0));
+		geo_blk_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.geo_blk<>'',1,0));
+		geo_match_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.geo_match<>'',1,0));
+		err_stat_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.err_stat<>'',1,0));
+		mail_prim_range_CountNonBlank                   := sum(group,if(eMerges.file_hunters_out.mail_prim_range<>'',1,0));
+		mail_predir_CountNonBlank                       := sum(group,if(eMerges.file_hunters_out.mail_predir<>'',1,0));
+		mail_prim_name_CountNonBlank                    := sum(group,if(eMerges.file_hunters_out.mail_prim_name<>'',1,0));
+		mail_addr_suffix_CountNonBlank                  := sum(group,if(eMerges.file_hunters_out.mail_addr_suffix<>'',1,0));
+		mail_postdir_CountNonBlank                      := sum(group,if(eMerges.file_hunters_out.mail_postdir<>'',1,0));
+		mail_unit_desig_CountNonBlank                   := sum(group,if(eMerges.file_hunters_out.mail_unit_desig<>'',1,0));
+		mail_sec_range_CountNonBlank                    := sum(group,if(eMerges.file_hunters_out.mail_sec_range<>'',1,0));
+		mail_p_city_name_CountNonBlank                  := sum(group,if(eMerges.file_hunters_out.mail_p_city_name<>'',1,0));
+		mail_v_city_name_CountNonBlank                  := sum(group,if(eMerges.file_hunters_out.mail_v_city_name<>'',1,0));
+		mail_st_CountNonBlank                           := sum(group,if(eMerges.file_hunters_out.mail_st<>'',1,0));
+		mail_ace_zip_CountNonBlank                      := sum(group,if(eMerges.file_hunters_out.mail_ace_zip<>'',1,0));
+		mail_zip4_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.mail_zip4<>'',1,0));
+		mail_cart_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.mail_cart<>'',1,0));
+		mail_cr_sort_sz_CountNonBlank                   := sum(group,if(eMerges.file_hunters_out.mail_cr_sort_sz<>'',1,0));
+		mail_lot_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.mail_lot<>'',1,0));
+		mail_lot_order_CountNonBlank                    := sum(group,if(eMerges.file_hunters_out.mail_lot_order<>'',1,0));
+		mail_dpbc_CountNonBlank                         := sum(group,if(eMerges.file_hunters_out.mail_dpbc<>'',1,0));
+		mail_chk_digit_CountNonBlank                    := sum(group,if(eMerges.file_hunters_out.mail_chk_digit<>'',1,0));
+		mail_record_type_CountNonBlank                  := sum(group,if(eMerges.file_hunters_out.mail_record_type<>'',1,0));
+		mail_ace_fips_st_CountNonBlank                  := sum(group,if(eMerges.file_hunters_out.mail_ace_fips_st<>'',1,0));
+		mail_fipscounty_CountNonBlank                   := sum(group,if(eMerges.file_hunters_out.mail_fipscounty<>'',1,0));
+		mail_geo_lat_CountNonBlank                      := sum(group,if(eMerges.file_hunters_out.mail_geo_lat<>'',1,0));
+		mail_geo_long_CountNonBlank                     := sum(group,if(eMerges.file_hunters_out.mail_geo_long<>'',1,0));
+		mail_msa_CountNonBlank                          := sum(group,if(eMerges.file_hunters_out.mail_msa<>'',1,0));
+		mail_geo_blk_CountNonBlank                      := sum(group,if(eMerges.file_hunters_out.mail_geo_blk<>'',1,0));
+		mail_geo_match_CountNonBlank                    := sum(group,if(eMerges.file_hunters_out.mail_geo_match<>'',1,0));
+		mail_err_stat_CountNonBlank                     := sum(group,if(eMerges.file_hunters_out.mail_err_stat<>'',1,0));
+	  end;
+
+	dPopulationStats_eMerges__file_hunters_out := table(eMerges.file_hunters_out,
+														rPopulationStats_eMerges__file_hunters_out,
+														source_code,source_state,
+														few
+													   );
+
+	STRATA.createXMLStats(dPopulationStats_eMerges__file_hunters_out,
+						  'eMerges',
+						  'hunters',
+						  version_date,
+						  '',
+						  resultsOut,
+						  'view',
+						  'population'
+						 );
+					 
+	hunters_base_stats := resultsOut;
+	return hunters_base_stats;
+end;

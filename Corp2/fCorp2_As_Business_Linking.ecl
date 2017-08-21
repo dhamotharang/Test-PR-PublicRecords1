@@ -1,7 +1,40 @@
 IMPORT Address,AID, Business_Header,Business_HeaderV2,CORP,LIB_STRINGLIB,MDR,UT, _Validate;
 
-EXPORT fCorp2_As_Business_Linking(dataset(Layout_Corporate_Direct_Corp_AID) pCorp_Base, dataset(Layout_Corporate_Direct_Cont_AID) pCont_Base , dataset(Corp2.Layout_Corporate_Direct_Event_Base) pEvent_Base) := function
+EXPORT fCorp2_As_Business_Linking(
 
+   dataset(Layout_Corporate_Direct_Corp_AID         ) pCorp_Base    = corp2.files().AID.corp.prod
+  ,dataset(Layout_Corporate_Direct_Cont_AID         ) pCont_Base    = corp2.files().AID.cont.prod
+  ,dataset(Corp2.Layout_Corporate_Direct_Event_Base ) pEvent_Base   = corp2.files().base.events.prod
+  ,dataset(Corp2.Layout_Corporate_Direct_AR_Base    ) pAR_Base      = corp2.files().base.ar.prod
+  ,set of string                                      pTestCorpkeys = []                              //use this to query for specific corpkeys throughout the as header at each step.  adds additional debug outputs for them
+) := 
+function
+
+    
+    // -- backfill old pre recorp records -- REMOVED THIS
+    ds_corp_old   := dataset('~thor_data400::base::corp2::20160610::corp_aid' ,Corp2.Layout_Corporate_Direct_Corp_AID   ,thor);
+    ds_cont_old   := dataset('~thor_data400::base::corp2::20160610::cont_aid' ,Corp2.Layout_Corporate_Direct_Cont_AID   ,thor);
+    ds_events_old := dataset('~thor_data400::base::corp2::20160610::event'    ,Corp2.Layout_Corporate_Direct_Event_Base ,thor);
+    ds_ar_old     := dataset('~thor_data400::base::corp2::20160610::ar'       ,Corp2.Layout_Corporate_Direct_AR_Base    ,thor);
+
+    lcorp_base  :=   pCorp_Base
+                   // + project(ds_corp_old    ,transform(Layout_Corporate_Direct_Corp_AID         ,self := left,self := []))
+                   ;
+    lcont_base  :=   pCont_Base
+                   // + project(ds_cont_old    ,transform(Layout_Corporate_Direct_Cont_AID         ,self := left,self := []))
+                   ;
+    lEvent_base :=   pEvent_Base
+                   // + project(ds_events_old  ,transform(Corp2.Layout_Corporate_Direct_Event_Base ,self := left,self := []))
+                   ;
+    lAR_base    :=   pAR_Base
+                   // + project(ds_ar_old      ,transform(Corp2.Layout_Corporate_Direct_AR_Base    ,self := left,self := []))
+                   ;
+
+
+
+
+    lcorpkey := pTestCorpkeys;
+  
 		SET_OF_UNDESIRED_CORP_NAMES := ['X','SAME','NATIONAL REGISTERED AGENTS, INC.','NATIONAL REGISTERED AGENTS'];
 		
 		BadAddr	:=	['NOT PROVIDED','---'];
@@ -9,80 +42,92 @@ EXPORT fCorp2_As_Business_Linking(dataset(Layout_Corporate_Direct_Corp_AID) pCor
 		//////////////////////////////////////////////////////////////////////////////////////////////
 		// --Company Mapping
 		//////////////////////////////////////////////////////////////////////////////////////////////
-		base_company 			 	:= 	pCorp_Base(corp_legal_name NOT IN SET_OF_UNDESIRED_CORP_NAMES); //eliminate bad corp names
+		base_company 			 	:= 	lcorp_base(corp_legal_name NOT IN SET_OF_UNDESIRED_CORP_NAMES); //eliminate bad corp names
 
 		corpDist	:=	distribute(base_company,hash(corp_key));
 		deDupCorp	:=	dedup(sort(corpDist,record,local),record,local);
 
-		pEvent_base	chkCorpKey(pEvent_base l)	:=	transform
-				source				:= 	MDr.sourceTools.fCorpV2(l.corp_key, l.corp_state_origin);
-				corp_key			:= 	corp2.Linking_filters.corp_key('',source,l.corp_key);
-				self.corp_key	:=	l.corp_key;
-				self					:=	l;
-		end;
-		
-		base_event := dedup(sort(distribute(project(pEvent_base(_validate.date.fIsValid(event_filing_date)),chkCorpKey(left)),hash(corp_key)),corp_key,event_filing_date,dt_vendor_first_reported,dt_vendor_last_reported,local),corp_key,event_filing_date,dt_vendor_first_reported,dt_vendor_last_reported,local);
+
+    setcorpkey(string pckey,string pcorp_state) := 
+    function
+				lsource				:= 	MDr.sourceTools.fCorpV2(pckey, pcorp_state);
+				lcorp_key			:= 	corp2.Linking_filters.corp_key('',lsource,pckey);
+        return lcorp_key;
+    end;
+    
+		// pEvent_base	chkCorpKey(pEvent_base l)	:=	transform
+				// source				:= 	MDr.sourceTools.fCorpV2(l.corp_key, l.corp_state_origin);
+				// corp_key			:= 	corp2.Linking_filters.corp_key('',source,l.corp_key);
+				// self.corp_key	:=	l.corp_key;
+				// self					:=	l;
+		// end;
+
+    lCheckDate(string pdate) := if((unsigned)pdate  = 0 ,'99999999' ,corp2.fCheckDate(pdate));
+
+    current_year := trim(stringlib.GetDateYYYYMMDD())[3..4];
+
+    // -- make sure events have valid dates(non-zero, not future ,etc) and are not expiration dates.  Also use AR filing dates too if available
+    // ds_filter_event     := pEvent_base(_validate.date.fIsValid(event_filing_date)/*,corp2.fCheckDate(event_filing_date) != '',event_date_type_cd != 'EXP',~regexfind('expiration',event_date_type_desc,nocase)*/);  //old hack
+    ds_filter_event     := lEvent_base(_validate.date.fIsValid(event_filing_date),corp2.fCheckDate(event_filing_date) != '',event_date_type_cd != 'EXP',~regexfind('expiration',event_date_type_desc,nocase));
+    ds_filter_AR        := lAR_base   (_validate.date.fIsValid(ar_filed_dt      ),corp2.fCheckDate(ar_filed_dt      ) != '');
+    ds_filter_AR_report := lAR_base   (_validate.date.fIsValid(ar_report_dt     ),corp2.fCheckDate(ar_report_dt     ) != '');
+    ds_filter_AR_year4  := lAR_base   (length(trim(ar_year)) = 4                 ,corp2.fCheckDate(ar_year          ) != '');
+    ds_filter_AR_year2  := lAR_base   (length(trim(ar_year)) = 2                 ,corp2.fCheckDate(if((unsigned)ar_year > (unsigned)current_year  ,'','20' + trim(ar_year))) != '');  //only care about newer dates for now.  older dates won't get us more actives
+        
+    
+    
+		ds_proj_event       := table(ds_filter_event      ,{string30 corp_key := setcorpkey(corp_key,corp_state_origin)  ,dt_vendor_first_reported ,dt_vendor_last_reported  ,string8 event_filing_date := corp2.fCheckDate(event_filing_date   )});
+		ds_proj_AR          := table(ds_filter_AR         ,{string30 corp_key := setcorpkey(corp_key,corp_state_origin)  ,dt_vendor_first_reported ,dt_vendor_last_reported  ,string8 event_filing_date := corp2.fCheckDate(ar_filed_dt         )});
+		ds_proj_AR_report   := table(ds_filter_AR_report  ,{string30 corp_key := setcorpkey(corp_key,corp_state_origin)  ,dt_vendor_first_reported ,dt_vendor_last_reported  ,string8 event_filing_date := corp2.fCheckDate(ar_report_dt        )});
+		ds_proj_AR_year4    := table(ds_filter_AR_year4   ,{string30 corp_key := setcorpkey(corp_key,corp_state_origin)  ,dt_vendor_first_reported ,dt_vendor_last_reported  ,string8 event_filing_date := corp2.fCheckDate(ar_year             )});//corp2.fCheckDate makes a year an 8 digit date
+		ds_proj_AR_year2    := table(ds_filter_AR_year2   ,{string30 corp_key := setcorpkey(corp_key,corp_state_origin)  ,dt_vendor_first_reported ,dt_vendor_last_reported  ,string8 event_filing_date := corp2.fCheckDate('20' + trim(ar_year))});//corp2.fCheckDate makes a year an 8 digit date
+    
+    
+    ds_concat_event_ar  := ds_proj_event + ds_proj_AR + ds_proj_AR_report + ds_proj_AR_year4 + ds_proj_AR_year2;
+    
+    // -- get min and max event filing dates for each corpkey and vendor first/last reported
+		base_event := table(ds_concat_event_ar  ,{corp_key,dt_vendor_first_reported,dt_vendor_last_reported
+      ,unsigned4 event_dt_first_seen := if(min(group,(unsigned4)lCheckDate      (event_filing_date)) = 99999999  ,0  ,(unsigned4)min(group,(unsigned4)lCheckDate(event_filing_date)))
+      ,unsigned4 event_dt_last_seen  :=    max(group,(unsigned4)corp2.fCheckDate(event_filing_date))
+      }  
+      ,corp_key,dt_vendor_first_reported,dt_vendor_last_reported ,merge);
 
 		Layout_Add_RecID := record
 				unsigned6 record_id := 0;
 				corp2.Layout_Corporate_Direct_Corp_AID;
-				unsigned4 event_filing_date;
+				unsigned4 event_dt_first_seen;
+				unsigned4 event_dt_last_seen ;
 		end;
 		
-		Layout_Add_RecID AddEvent(corp2.Layout_Corporate_Direct_Corp_AID l, base_event r) := transform
-				self.event_filing_date	:=	if(_validate.date.fIsValid(r.event_filing_date),(unsigned4)r.event_filing_date,0);
-				self 										:= 	l;
-		end;			
-		
-		ds_combined1 := join(deDupCorp,
+    
+		ds_prep_corp := project(deDupCorp ,transform(Layout_Add_RecID ,self := left,self := []));
+    
+		ut.MAC_Sequence_Records(ds_prep_corp  ,record_id  ,ds_add_rec_id);
+
+		Layout_Add_RecID AddEvent(Layout_Add_RecID l, base_event r) := transform
+				self.event_dt_first_seen	:=	if(r.event_dt_first_seen != 0 ,r.event_dt_first_seen,0);
+				self.event_dt_last_seen 	:=	if(r.event_dt_last_seen  != 0 ,r.event_dt_last_seen ,0);
+				self 										  := 	l;
+		end;	
+
+		ds_combined := join(ds_add_rec_id,
 												base_event,
 												left.corp_key = right.corp_key and
 												(
                               (     left.dt_vendor_first_reported = right.dt_vendor_first_reported
                                 and left.dt_vendor_last_reported  = right.dt_vendor_last_reported
                               )
-                        )
-                        ,
-												AddEvent(left,right),
-												left outer, local,keep(1));
-    ds_combined1_nomatch := project(ds_combined1(event_filing_date = 0) ,corp2.Layout_Corporate_Direct_Corp_AID);
-    
-		ds_combined2 := join(ds_combined1_nomatch,
-												base_event,
-												left.corp_key = right.corp_key and
-												(
-                              ut.date_overlap(left.dt_vendor_first_reported , left.dt_vendor_last_reported
+                           or ut.date_overlap(left.dt_vendor_first_reported , left.dt_vendor_last_reported
                                              ,right.dt_vendor_first_reported, right.dt_vendor_last_reported) > 0
-                  
+                           or left.dt_vendor_last_reported  = right.dt_vendor_last_reported
+
                         )
                         ,
 												AddEvent(left,right),
-												left outer, local,keep(1));
+												left outer, hash);
+                        
+		// ds_combined := ds_combined1(event_dt_last_seen != 0) + ds_combined2;
 
-		ds_combined := ds_combined1(event_filing_date != 0) + ds_combined2;
-    
-		Layout_Add_RecID AddRecordID(Layout_Add_RecID L) := transform
-				// self.record_id	:= cnt;
-				unsigned4 dt_first_seen := 
-													ut.EarliestDate((unsigned4)corp2.fCheckDate(l.corp_filing_date), 
-													ut.EarliestDate((unsigned4)corp2.fCheckDate(l.corp_address1_effective_date), 
-													ut.EarliestDate((unsigned4)corp2.fCheckDate(l.corp_address2_effective_date), 
-													ut.EarliestDate((unsigned4)corp2.fCheckDate(l.corp_status_date),
-																					(unsigned4)corp2.fCheckDate((string)l.event_filing_date)))));
-				unsigned4 dt_last_seen := 
-													max((unsigned4)corp2.fCheckDate(l.corp_filing_date), 
-													max((unsigned4)corp2.fCheckDate(l.corp_address1_effective_date), 
-													max((unsigned4)corp2.fCheckDate(l.corp_address2_effective_date), 
-													max((unsigned4)corp2.fCheckDate(l.corp_status_date),
-																				(unsigned4)corp2.fCheckDate((string)l.event_filing_date)))));
-				self.dt_first_seen	:=	dt_first_seen;
-				self.dt_last_seen		:=	dt_last_seen;
-				self := L;
-		end;
-
-		company_seq1 := distribute(PROJECT(ds_combined, AddRecordID(LEFT)));
-    ut.MAC_Sequence_Records(company_seq1  ,record_id  ,company_seq);
-		
 		reformatDate1(string8 inDate)	:=	function
 				clean_inDate		:= trim(inDate,all);
 				Position1				:= StringLib.StringFind(clean_inDate,'/',1);
@@ -102,7 +147,62 @@ EXPORT fCorp2_As_Business_Linking(dataset(Layout_Corporate_Direct_Corp_AID) pCor
 				RETURN  newDate;	
 			 
 		END;		
-		
+
+    
+		Layout_Add_RecID trSetDates(Layout_Add_RecID L) := 
+    transform
+
+				FilingDate	:= if(l.corp_state_origin='LA' and not _validate.date.fIsValid(l.corp_filing_date)
+                        ,reformatDate1(l.corp_filing_date)
+                        ,l.corp_filing_date
+                      );
+				StatusDate	:= if(l.corp_state_origin='LA' and not _validate.date.fIsValid(l.corp_status_date)
+                        ,reformatDate2(l.corp_status_date)
+                        ,l.corp_status_date
+                      );
+
+				unsigned4 dt_first_seen := 
+          min(  
+             (unsigned4)lCheckDate(FilingDate                     )
+            ,(unsigned4)lCheckDate(l.corp_address1_effective_date )
+            ,(unsigned4)lCheckDate(l.corp_address2_effective_date )
+            ,(unsigned4)lCheckDate(StatusDate                     )
+            ,(unsigned4)lCheckDate((string)l.event_dt_first_seen  )
+                      
+          );
+
+				unsigned4 dt_last_seen := 
+          max(
+             (unsigned4)corp2.fCheckDate(FilingDate                     )
+            ,(unsigned4)corp2.fCheckDate(l.corp_address1_effective_date )
+            ,(unsigned4)corp2.fCheckDate(l.corp_address2_effective_date )
+            ,(unsigned4)corp2.fCheckDate(StatusDate                     )
+            ,(unsigned4)corp2.fCheckDate((string)l.event_dt_last_seen   )
+
+          );
+				self.dt_first_seen	:=	if(dt_first_seen = 99999999 ,0,dt_first_seen);
+				self.dt_last_seen		:=	dt_last_seen;
+				self                := L;
+		end;
+
+    // -- do this for the ones where there are not two duplicate records because the following rollup will not set them.
+    ds_combined_prep  := project(ds_combined  ,trSetDates(left));
+    
+		Layout_Add_RecID trRollupDates(Layout_Add_RecID L,Layout_Add_RecID R) := transform
+				// self.record_id	:= cnt;
+        
+				unsigned4 dt_first_seen := min((unsigned4)lCheckDate((string)l.dt_first_seen),(unsigned4)lCheckDate((string)r.dt_first_seen));
+				unsigned4 dt_last_seen  := max(l.dt_last_seen ,r.dt_last_seen );
+        
+				self.dt_first_seen	:= if(dt_first_seen = 99999999 ,0,dt_first_seen);
+				self.dt_last_seen		:= dt_last_seen;
+				self                := L;
+		end;
+    
+    // rollup any duplicates created because of the join to the events file
+		company_seq1 := distribute(  rollup( sort( distribute(ds_combined_prep) ,record_id,local) ,left.record_id = right.record_id, trRollupDates(LEFT,right),local)  );
+		company_seq := distribute(  rollup( sort( distribute(company_seq1,record_id) ,record_id,local) ,left.record_id = right.record_id, trRollupDates(LEFT,right),local)  );
+				
 	  DBApattern		:= '^(.*?)(DBA - |/ DBA |, DBA| DBA/|DBA / | DBA | DBA:|D/B/A:| D/B/A |D/B/A | DBA| D/B/A| AKA | A\\.K\\.A\\. |: WHICH WILL DO BUSINESS IN CALIFORNIA AS )(.+)';
 	  CareOfPattern	:= '^(.*?)( C/O | C/0 )(.+)';			
 
@@ -227,7 +327,7 @@ EXPORT fCorp2_As_Business_Linking(dataset(Layout_Corporate_Direct_Corp_AID) pCor
 
 		ds_company_rollup			:= rollup(ds_company_sort
 																		,left.record_id  									 	= right.record_id and
-																		 left.clean_company = right.clean_company and
+																		 left.clean_company                 = right.clean_company and
 																		((left.company_address.zip			 	  = right.company_address.zip and
 																		 left.company_address.prim_name 	  = right.company_address.prim_name and
 																		 left.company_address.prim_range   	= right.company_address.prim_range and
@@ -277,7 +377,7 @@ EXPORT fCorp2_As_Business_Linking(dataset(Layout_Corporate_Direct_Corp_AID) pCor
 																								ut.EarliestDate(l.dt_first_seen, r.dt_first_seen),
 																								ut.EarliestDate(l.dt_last_seen, r.dt_last_seen)
 																								);
-				self.dt_last_seen									:=	max(l.dt_last_seen,r.dt_last_seen);
+				self.dt_last_seen									:=	max(l.dt_last_seen,r.dt_last_seen,l.dt_first_seen, r.dt_first_seen);
 				self.dt_vendor_first_reported			:=	ut.EarliestDate(l.dt_vendor_first_reported, r.dt_vendor_first_reported);
 				self.dt_vendor_last_reported			:=	max(l.dt_vendor_last_reported, r.dt_vendor_last_reported);		
 				self.company_name 								:= if(l.company_name = '', r.company_name, l.company_name);
@@ -308,9 +408,9 @@ EXPORT fCorp2_As_Business_Linking(dataset(Layout_Corporate_Direct_Corp_AID) pCor
 				self 														  := l;
 		end;	
 
-		corp_clean_dist := distribute(corp_group_clean,hash(trim(company_address.zip),trim(company_address.prim_name),trim(company_address.prim_range),trim(company_name)));
+		corp_clean_dist := distribute(corp_group_clean,hash(/*trim(vl_id),*/trim(company_address.zip),trim(company_address.prim_name),trim(company_address.prim_range),trim(company_name)));
 
-		corp_clean_sort := sort(corp_clean_dist,company_address.zip,company_address.prim_range,company_address.prim_name,company_name
+		corp_clean_sort := sort(corp_clean_dist/*,vl_id*/,company_address.zip,company_address.prim_range,company_address.prim_name,company_name
 													,if(company_address.sec_range<>'',0,1), company_address.sec_range
 													,if(company_phone<>'',0,1), company_phone
 													,if(company_fein<>'',0,1), company_fein
@@ -320,7 +420,9 @@ EXPORT fCorp2_As_Business_Linking(dataset(Layout_Corporate_Direct_Corp_AID) pCor
 													,local);
 				
 		ds_company := rollup(corp_clean_sort
-															 ,left.company_address.zip 				= right.company_address.zip and
+															 ,
+                                // left.vl_id                      = right.vl_id and
+                                left.company_address.zip 				= right.company_address.zip and
 																left.company_address.prim_name 	= right.company_address.prim_name and
 																left.company_address.prim_range = right.company_address.prim_range and
 																left.company_name 							= right.company_name and
@@ -399,7 +501,7 @@ EXPORT fCorp2_As_Business_Linking(dataset(Layout_Corporate_Direct_Corp_AID) pCor
 			string10  cont_phone10;			
 		end;
 		
-		ContSlimLayout	SlimContacts(pCont_Base l)	:=	transform
+		ContSlimLayout	SlimContacts(lcont_base l)	:=	transform
 			dt_first_seen 			:=
 															ut.EarliestDate((unsigned4)corp2.fCheckDate(l.cont_filing_date), 
 															ut.EarliestDate((unsigned4)corp2.fCheckDate(l.cont_effective_date), (unsigned4)corp2.fCheckDate(l.cont_address_effective_date)));
@@ -414,7 +516,7 @@ EXPORT fCorp2_As_Business_Linking(dataset(Layout_Corporate_Direct_Corp_AID) pCor
 			self	:=	l;
 		end;
 		
-		contSlim						:= project(pCont_Base, SlimContacts(left));
+		contSlim						:= project(lcont_base, SlimContacts(left));
 		
 		bad_contacts	 			:= contSlim.cont_name IN Corp.Set_Bad_Contact_Names OR  
 													 regexfind('REGISTERED AGENT',contSlim.cont_title_desc, nocase);
@@ -524,6 +626,11 @@ EXPORT fCorp2_As_Business_Linking(dataset(Layout_Corporate_Direct_Corp_AID) pCor
 		Business_Header.Layout_Business_Linking.Combined joinfiles(Business_Header.Layout_Business_Linking.Company_ L, bh_layout_contact R) := transform
 				self.contact_address_type			:= 	if(l.company_aceaid=r.contact_aceaid, 'CC', r.contact_address_type);
 				self.company_address_type_raw := 	if(l.company_aceaid=r.contact_aceaid, 'CC', l.company_address_type_raw);		
+
+        self.dt_first_seen             := ut.EarliestDate(L.dt_first_seen           ,R.dt_first_seen_contact            );
+        self.dt_last_seen              := max  (self.dt_first_seen, L.dt_last_seen            ,R.dt_last_seen_contact             );
+        self.dt_vendor_first_reported  := ut.EarliestDate(L.dt_vendor_first_reported,R.dt_vendor_first_reported );
+        self.dt_vendor_last_reported   := max  (L.dt_vendor_last_reported ,R.dt_vendor_last_reported  );
 				self := l;
 				self := r;
 		end;
@@ -540,6 +647,7 @@ EXPORT fCorp2_As_Business_Linking(dataset(Layout_Corporate_Direct_Corp_AID) pCor
                              ,right.dt_vendor_first_reported, right.dt_vendor_last_reported) > 0
 
             )
+            or left.dt_vendor_last_reported  = right.dt_vendor_last_reported
           )
     ,joinfiles(left,right),left outer,local);
 		
@@ -606,7 +714,81 @@ EXPORT fCorp2_As_Business_Linking(dataset(Layout_Corporate_Direct_Corp_AID) pCor
 	
 		concatDist				:= 	sort(distribute(concat2, hash(vl_id)),record, except contact_name.name_score,company_rawaid,local);
 		concat_dupd 			:= 	dedup(project(concatDist,Business_Header.Layout_Business_Linking.Linking_Interface),except contact_name.name_score,company_rawaid,local)(company_name !='');
+
+    // -- if we have no events or filing or status dates, we can use forgn_date or inc date if we have it.  used as a last resort for new companies if all else fails....we do know this about the company
+    ds_result := project(concat_dupd  ,transform(
+       Business_Header.Layout_Business_Linking.Linking_Interface
+      ,
+       both_dates_zero_forgn := if(left.dt_first_seen = 0 and left.dt_last_seen = 0 and left.company_foreign_date       != 0 and Corp2.fCheckDate((string8)left.company_foreign_date      ) != '',true, false);
+       both_dates_zero_inc   := if(left.dt_first_seen = 0 and left.dt_last_seen = 0 and left.company_incorporation_date != 0 and Corp2.fCheckDate((string8)left.company_incorporation_date) != '',true, false);
+       
+       self.dt_first_seen := map(both_dates_zero_forgn  =>  (unsigned4)Corp2.fCheckDate((string8)left.company_foreign_date      )
+                                ,both_dates_zero_inc    =>  (unsigned4)Corp2.fCheckDate((string8)left.company_incorporation_date)  
+                                ,                           left.dt_first_seen
+                             );
+       self.dt_last_seen  := map(both_dates_zero_forgn  =>  (unsigned4)Corp2.fCheckDate((string8)left.company_foreign_date      )
+                                ,both_dates_zero_inc    =>  (unsigned4)Corp2.fCheckDate((string8)left.company_incorporation_date)  
+                                ,                           left.dt_last_seen
+                             );
+       self               := left
+    ));
+    
+    outputdebug := 
+    parallel(
+       output(base_company         (trim(corp_key           ) in lcorpkey                          )  ,named('base_company'        ),all)
+      ,output(corpDist             (trim(corp_key           ) in lcorpkey                          )  ,named('corpDist'            ),all) 
+      ,output(deDupCorp            (trim(corp_key           ) in lcorpkey                          )  ,named('deDupCorp'           ),all) 
+      
+      ,output(ds_filter_event      (trim(corp_key           ) in lcorpkey                          )  ,named('ds_filter_event'     ),all) 
+      ,output(ds_filter_AR         (trim(corp_key           ) in lcorpkey                          )  ,named('ds_filter_AR'        ),all) 
+      ,output(ds_proj_event        (trim(corp_key           ) in lcorpkey                          )  ,named('ds_proj_event'       ),all) 
+      ,output(ds_proj_AR           (trim(corp_key           ) in lcorpkey                          )  ,named('ds_proj_AR'          ),all) 
+      ,output(ds_concat_event_ar   (trim(corp_key           ) in lcorpkey                          )  ,named('ds_concat_event_ar'  ),all)       
+        
+      ,output(base_event           (trim(corp_key           ) in lcorpkey                          )  ,named('base_event'          ),all)                                          
+      ,output(ds_prep_corp         (trim(corp_key           ) in lcorpkey                          )  ,named('ds_prep_corp'        ),all)                                      
+      ,output(ds_add_rec_id        (trim(corp_key           ) in lcorpkey                          )  ,named('ds_add_rec_id'       ),all)
+      // ,output(ds_combined1         (trim(corp_key           ) in lcorpkey                          )  ,named('ds_combined1'        ),all)                                      
+      // ,output(ds_combined1_nomatch (trim(corp_key           ) in lcorpkey                          )  ,named('ds_combined1_nomatch'),all)
+      // ,output(ds_combined2         (trim(corp_key           ) in lcorpkey                          )  ,named('ds_combined2'        ),all)                                      
+      ,output(ds_combined          (trim(corp_key           ) in lcorpkey                          )  ,named('ds_combined'         ),all)
+      ,output(ds_combined_prep     (trim(corp_key           ) in lcorpkey                          )  ,named('ds_combined_prep'    ),all)
+      ,output(company_seq          (trim(corp_key           ) in lcorpkey                          )  ,named('company_seq'         ),all)                                      
+      ,output(ds_company_norm      (trim(vl_id              ) in lcorpkey                          )  ,named('ds_company_norm'     ),all)
+      ,output(ds_company_norm2	   (trim(vl_id              ) in lcorpkey                          )  ,named('ds_company_norm2'	   ),all)                                      
+      ,output(ds_company_norm_dist (trim(vl_id              ) in lcorpkey                          )  ,named('ds_company_norm_dist'),all)
+      ,output(ds_company_sort      (trim(vl_id              ) in lcorpkey                          )  ,named('ds_company_sort'     ),all)                                      
+      ,output(ds_company_rollup    (trim(vl_id              ) in lcorpkey                          )  ,named('ds_company_rollup'   ),all)
+      ,output(corp_group_clean     (trim(vl_id              ) in lcorpkey                          )  ,named('corp_group_clean'    ),all)                                      
+      ,output(corp_clean_dist      (trim(vl_id              ) in lcorpkey                          )  ,named('corp_clean_dist'     ),all)
+      ,output(corp_clean_sort      (trim(tmp_join_id_company) in lcorpkey or trim(vl_id) in lcorpkey)  ,named('corp_clean_sort'    ),all)                                      
+      ,output(ds_company           (trim(tmp_join_id_company) in lcorpkey or trim(vl_id) in lcorpkey)  ,named('ds_company'         ),all)
+      // ,output(ds_company           (trim(tmp_join_id_company) in lcorpkey or trim(vl_id) in lcorpkey or trim(company_name) = 'DIAMOND ONSHORE PRODUCTION II, L.P.' or (company_bdid = 2679968604 and dt_first_seen = 20041103)  )  ,named('ds_company'          ),all)
+            
+      ,output(corp_base            (trim(corp_key           ) in lcorpkey)  ,named('corp_base'           ),all)                                      
+      ,output(corpkeys_list				 (trim(corp_key           ) in lcorpkey)  ,named('corpkeys_list'			 ),all)					 
+      ,output(corpkeys_list_dist   (trim(corp_key           ) in lcorpkey)  ,named('corpkeys_list_dist'  ),all)                                      
+      ,output(contSlim             (trim(corp_key           ) in lcorpkey)  ,named('contSlim'            ),all)
+      ,output(base_contact         (trim(corp_key           ) in lcorpkey)  ,named('base_contact'        ),all)
+      ,output(base_contact_dist    (trim(corp_key           ) in lcorpkey)  ,named('base_contact_dist'   ),all)                                      
+      ,output(base_contact_select  (trim(corp_key           ) in lcorpkey)  ,named('base_contact_select' ),all)
+      ,output(ds_contact_proj      (trim(tmp_join_id_contact) in lcorpkey)  ,named('ds_contact_proj'     ),all)                                      
+      ,output(ds_contact           (trim(tmp_join_id_contact) in lcorpkey)  ,named('ds_contact'          ),all)
+      ,output(ds_company_dist      (trim(vl_id              ) in lcorpkey)  ,named('ds_company_dist'     ),all)                                      
+      ,output(ds_contact_dist      (trim(tmp_join_id_contact) in lcorpkey)  ,named('ds_contact_dist'     ),all)
+      ,output(j1	                 (trim(vl_id              ) in lcorpkey)  ,named('j1'	                 ),all)                                      
+      ,output(norm_j1              (trim(vl_id              ) in lcorpkey)  ,named('norm_j1'             ),all)
+      ,output(concat               (trim(vl_id              ) in lcorpkey)  ,named('concat'              ),all)                                      
+      ,output(ChkFile	             (trim(vl_id              ) in lcorpkey)  ,named('ChkFile'	           ),all)
+      ,output(DBAFile              (trim(vl_id              ) in lcorpkey)  ,named('DBAFile'             ),all)                                      
+      ,output(NonDBAFile           (trim(vl_id              ) in lcorpkey)  ,named('NonDBAFile'          ),all)
+      ,output(norm_DBAFile         (trim(vl_id              ) in lcorpkey)  ,named('norm_DBAFile'        ),all)                                      
+      ,output(concat2              (trim(vl_id              ) in lcorpkey)  ,named('concat2'             ),all)
+      ,output(concatDist           (trim(vl_id              ) in lcorpkey)  ,named('concatDist'          ),all)                                      
+      ,output(concat_dupd          (trim(vl_id              ) in lcorpkey)  ,named('concat_dupd'         ),all)
+      ,output(ds_result            (trim(vl_id              ) in lcorpkey)  ,named('ds_result'           ),all)
+    );                              
 		
-	return concat_dupd;
+	return when(ds_result ,if(count(pTestCorpkeys) != 0  ,outputdebug));
 			
 end;				

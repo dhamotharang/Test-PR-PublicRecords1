@@ -46,6 +46,13 @@ EXPORT filenames(unsigned1 pseudo_environment) := MODULE
 		EXPORT phoneownership	 := documents_template('phoneownership');
 		EXPORT bipbestupdate   := documents_template('bipbestupdate');
 		EXPORT sbfe   				 := documents_template('sbfe');
+		EXPORT ucc   				 	 := documents_template('ucc');
+		EXPORT govtdebarred	 	 := documents_template('govtdebarred');
+		EXPORT inquiry			 	 := documents_template('inquiry');
+		EXPORT corp					 	 := documents_template('corp');
+		EXPORT mvr					 	 := documents_template('mvr');
+		EXPORT aircraft			 	 := documents_template('aircraft');
+		EXPORT watercraft		 	 := documents_template('watercraft');
 	END;
 	
 	// The file name and location of the history files.  
@@ -71,6 +78,13 @@ EXPORT filenames(unsigned1 pseudo_environment) := MODULE
 		EXPORT phoneownership	 := history_template('phoneownership');
 		EXPORT bipbestupdate	 := history_template('bipbestupdate');
 		EXPORT sbfe	 					 := history_template('sbfe');
+		EXPORT ucc	 					 := history_template('ucc');
+		EXPORT govtdebarred		 := history_template('govtdebarred');
+		EXPORT inquiry				 := history_template('inquiry');
+		EXPORT corp	 					 := history_template('corp');
+		EXPORT mvr	 					 := history_template('mvr');
+		EXPORT aircraft				 := history_template('aircraft');
+		EXPORT watercraft			 := history_template('watercraft');
 	END;
 	
 	// The file name and location of the Inquiry tracking files are used solely for auditing purposes

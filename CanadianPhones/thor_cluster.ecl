@@ -1,1 +1,1 @@
-export thor_cluster := '~thor_200::';
+export thor_cluster := '~thor400_60::';

@@ -53,7 +53,9 @@ export convert_event_func (DATASET(Layout_Corporate_Direct_Event_Base_keyed)ds) 
 //		{'NUMBER',						textType,		[87]}	
 		{87,0,l.event_filing_reference_nbr},
 		{87,0,l.event_amendment_nbr},
-		{85,0,l.event_filing_date}
+		{85,0,l.event_filing_date},
+		{89,0,l.corp_state_origin},
+		{249,0,l.corp_process_date}
 	
 		
 //vesa: doxie_build.key_prep_Vehicles

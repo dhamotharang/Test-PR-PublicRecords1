@@ -1,3 +1,4 @@
+import prte2_header;
 h := header.File_Headers;
 
 tp := record
@@ -34,4 +35,8 @@ cnts f_result(t le, t1 ri) := transform
 
 j_back := join(t,t1,left.ht1[1..8] = right.mpt,f_result(left,right),local);
 
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export AddressID_Occupancy := j_back;
+#ELSE
 export AddressID_Occupancy := j_back : persist('AddressID_Occupancy');
+#END

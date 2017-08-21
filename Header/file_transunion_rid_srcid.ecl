@@ -1,4 +1,4 @@
-import ut,ln_tu;
+import ut,ln_tu,Data_Services;
 
 r0 := record
   string5 title;
@@ -16,7 +16,7 @@ r0 := record
   ln_tu.Layout_In_Header_UID_SRC;
 END;
 
-lt_as_src   := dataset(ut.foreign_prod+'~thor_data400::base::ln_tu',r0,flat);
+lt_as_src   := dataset(Data_Services.Data_location.prefix('person_header')+'thor_data400::base::ln_tu',r0,flat);
 hdr_lt_recs := header.file_transunion_did(src='LT');
 
 r1 := record

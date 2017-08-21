@@ -100,7 +100,7 @@ party_norm_all := party_norm + party_plate_norm(state_type='C');
 lic_plate_rec tformat(party_norm_all L) := transform
 self.state_origin := L.state;
 self.is_current := l.orig_name_type in ['4','5'] and l.history='';
-	age := ut.getage(l.orig_dob);
+	age := ut.Age((UNSIGNED) l.orig_dob);
 self.is_minor := if(age=0 or age>=18,FALSE,TRUE);
 self.date :=(unsigned4) map(l.Reg_Latest_Effective_Date<>''=>l.Reg_Latest_Effective_Date,
 								l.Reg_Latest_Expiration_Date<>''=>l.Reg_Latest_Expiration_Date,

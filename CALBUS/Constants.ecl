@@ -3,7 +3,7 @@ export Constants := module
 
    export Cluster := Data_Services.Data_location.Prefix('CALBUS') + 'thor_data400::';
 	 
-	 export Groupname	:= if(_Control.ThisEnvironment.name		 = 'Dataland'	,'thor40_241'	,'thor400_92');
+	 export Groupname	:= if(_Control.ThisEnvironment.name		 = 'Dataland'	,'thor40_241'	,'thor400_20');
    
    export autokey_logical(string filedate) := Cluster + 'key::calbus::'+ filedate + '::autokey::';
    

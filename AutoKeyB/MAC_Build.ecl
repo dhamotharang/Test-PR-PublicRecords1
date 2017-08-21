@@ -1,3 +1,6 @@
+/*
+Reinstating previous version due to (as yet) unexplained YP issues with DID field and dedup differences
+*/
 export MAC_Build (indataset,infname,inmname,inlname,
 						inssn,
 						indob,
@@ -35,7 +38,7 @@ export MAC_Build (indataset,infname,inmname,inlname,
 						)  :=
 MACRO
 
-import autokey,doxie,ut,business_header,Business_Header_SS,RoxieKeyBuild;
+import autokey,doxie,ut,business_header,Business_Header_SS,RoxieKeyBuild, standard;
 
 #uniquename(Payload_Key)
 

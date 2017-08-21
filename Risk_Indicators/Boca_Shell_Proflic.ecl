@@ -132,7 +132,7 @@ with_category_v5 := join(license_recs_original, Prof_LicenseV2.Key_LicenseType_l
 			self.PLcategory := if(trim(right.category) != '', right.category, '0');
 			self := left), left outer, atmost(100), keep(1));
 
-license_recs := if(bsversion >= 50, with_category_v5, ungroup(license_recs_original_pre));
+license_recs := if(bsversion >= 4, with_category_v5, ungroup(license_recs_original_pre));
 			
 PL_Plus_temp roll_licenses(PL_Plus_temp le, PL_Plus_temp rt) := transform
 	self.professional_license_flag := le.professional_license_flag or rt.professional_license_flag;

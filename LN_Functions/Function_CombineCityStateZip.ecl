@@ -4,4 +4,4 @@ export Function_CombineCityStateZip(string pCity, string pState, string pZip5, s
 	trim(pState) +
 	if(trim(pZip5,left,right)!='',' ','') +
 	trim(pZip5) +
-	trim(pZip4);
+	if((integer)pZip4<>0,'-'+trim(pZip4),'');

@@ -49,7 +49,7 @@ t := table(h, MyFields);
 
 //THE KEYS NOT NEEDED FOR MOXIE SERVED FROM ROXIE
 
-base_key_Name := '~thor_data400::key::moxie_ucc_secured2.';
+base_key_Name := '~thor_data400::key::moxie.ucc2_secured.';
 
 k1 := BUILDINDEX( t, {ucc_key,event_key,(big_endian unsigned8 )__filepos},
 			base_key_Name + 'ucc_key.event_key_'+ uccd.version_development, moxie);

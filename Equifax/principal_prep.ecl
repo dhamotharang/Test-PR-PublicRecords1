@@ -14,8 +14,8 @@ layout_input_init CleanInput(Layout_Principal l, integer cnt) := transform
 self.rid := cnt;
 self.did := 0;
 self.bdid := 0;
-self.clean_name := AddrCleanLib.CleanPerson73(trim(l.first_name) + if(l.middle_initial <> '', (' ' + trim(l.middle_initial) + ' '), ' ') + trim(l.last_name));
-self.clean_address := AddrCleanLib.CleanAddress182(l.delivery_line, trim(l.city) + ' ' + l.state + ' ' + l.zip_code[1..5]);
+self.clean_name := Address.CleanPerson73(trim(l.first_name) + if(l.middle_initial <> '', (' ' + trim(l.middle_initial) + ' '), ' ') + trim(l.last_name));
+self.clean_address := Address.CleanAddress182(l.delivery_line, trim(l.city) + ' ' + l.state + ' ' + l.zip_code[1..5]);
 self := L;
 end;
 

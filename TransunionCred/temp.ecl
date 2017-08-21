@@ -1,9 +1,10 @@
+import address;
 export temp(dataset(Layouts.base) d)  := function
 
 invalid_prim_name := ['NONE','UNKNOWN','UNKNWN','UNKNOWEN','UNKNONW','UNKNON','UNKNWON','UNKONWN','UNEKNOWN','UN KNOWN','GENERAL DELIVERY'];
 
 Layouts.base tr (d l) := transform
-	Clean_Address := addrcleanlib.CleanAddress182(l.Prepped_addr1,l.Prepped_addr2);
+	Clean_Address := address.CleanAddress182(l.Prepped_addr1,l.Prepped_addr2);
 	STRING28  v_prim_name 		:= Clean_Address[13..40];
 	STRING5   v_zip       		:= Clean_Address[117..121];
 	STRING4   v_zip4      		:= Clean_Address[122..125];

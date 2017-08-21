@@ -29,19 +29,17 @@ export KeyLayouts := module
 	end;
 	
 	export LLID9 := record
-		TopBusiness.Layout_LLID.Linked.llid9;
-		boolean core;
-		TopBusiness.Layout_LLID.Linked.bid;
-		TopBusiness.Layout_LLID.Linked.brid;
-		TopBusiness.Layout_LLID.Linked.blid;
+		TopBusiness.Layout_LLID.LLID9.Linked.llid9;
+		TopBusiness.Layout_LLID.LLID9.Linked.bid;
+		TopBusiness.Layout_LLID.LLID9.Linked.brid;
+		TopBusiness.Layout_LLID.LLID9.Linked.blid;
 	end;
 	
 	export LLID12 := record
-		TopBusiness.Layout_LLID.Linked.llid12;
-		boolean core;
-		TopBusiness.Layout_LLID.Linked.bid;
-		TopBusiness.Layout_LLID.Linked.brid;
-		TopBusiness.Layout_LLID.Linked.blid;
+		TopBusiness.Layout_LLID.LLID12.Linked.llid12;
+		TopBusiness.Layout_LLID.LLID12.Linked.bid;
+		TopBusiness.Layout_LLID.LLID12.Linked.brid;
+		TopBusiness.Layout_LLID.LLID12.Linked.blid;
 	end;
 	
 	export PhoneNumber := record

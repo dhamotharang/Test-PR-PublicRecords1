@@ -4,8 +4,9 @@ export key_watercraft_wid (boolean IsFCRA = false) := function
 
   // fcra-restricted states:
   states := fcra.compliance.watercrafts.restricted_states;
+	source := fcra.compliance.watercrafts.restricted_sources;
 
-  base_file := watercraft.file_base_main_dev (~IsFCRA or state_origin NOT IN states);
+  base_file := watercraft.file_base_main_dev (~IsFCRA or (state_origin NOT IN states and source_code NOT IN source));
 
   file_prefix := if (IsFCRA, 
                      data_services.data_location.prefix('watercraft')+'thor_data400::key::watercraft::fcra::wid_',

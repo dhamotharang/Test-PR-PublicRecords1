@@ -15,10 +15,16 @@ self.record_type := 'H';
 self := l;
 end;
 
-event_update_init := if(Corp_Update_Flag,
-                       project(dedup(Corp.File_Corporate_Direct_Event_Update, all), InitEventUpdate(left)),
-					   project(dedup(Corp.File_Corporate_Direct_Event_In, all), InitEventUpdate(left)));
-					   
+event_update_init := if(Corp_Update_Flag
+											,if(Flags.IsUsingV2Inputs
+												,if(Flags.UseV2CurrentSprayed
+													,project(dedup(Corp.File_Corporate_Direct_Event_Update, all), InitEventUpdate(left)) + project(dedup(Corp.Files.V2.events, all), InitEventUpdate(left))
+													,project(dedup(Corp.File_Corporate_Direct_Event_Update, all), InitEventUpdate(left)) + project(dedup(Corp.Files.V2.events_father, all), InitEventUpdate(left))
+												)
+												,project(dedup(Corp.File_Corporate_Direct_Event_Update, all), InitEventUpdate(left))
+											)
+									,project(dedup(Corp.File_Corporate_Direct_Event_In, all), InitEventUpdate(left)));
+
 // Fix any dates necessary
 event_update_init_fix := corp_event_fix_dates_function(event_update_init(corp_state_origin in Corp_State_Fix_Dates_List));
 event_update_init_combined := event_update_init(corp_state_origin not in Corp_State_Fix_Dates_List) + event_update_init_fix;
@@ -48,7 +54,7 @@ self.record_type := 'H';
 self := l;
 end;
 
-event_current_init := project(Corp.File_Corp_Event_Base(Corp.Corp_Event_Base_Filter), InitCurrentEventBase(left));
+event_current_init := project(Corp.File_Corp_Event_Base(Filters.Base.Corp_Event), InitCurrentEventBase(left));
 event_current_init_dedup := dedup(event_current_init, all);
 event_current_init_dist := distribute(event_current_init_dedup, hash(corp_key));
 

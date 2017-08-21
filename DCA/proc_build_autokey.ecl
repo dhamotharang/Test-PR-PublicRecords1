@@ -1,5 +1,5 @@
 
-IMPORT AutoKeyB2, DCA; 
+IMPORT AutoKeyB2, _control, DCA; 
 
 EXPORT Proc_Build_Autokey(STRING filedate) :=
 	FUNCTION
@@ -11,8 +11,8 @@ EXPORT Proc_Build_Autokey(STRING filedate) :=
 		ak_skipSet := cnst.ak_skipSet;
 		ak_typeStr := cnst.ak_typeStr;
 		
-		jobComplete := FileServices.sendemail('christopher.albee@lexisnexis.com', ' DCA Roxie autokey build succeeded.', '');									 
-		jobFailed   := FileServices.sendemail('christopher.albee@lexisnexis.com', ' DCA Roxie autokey build failed - ' + filedate, failmessage);		
+		jobComplete := FileServices.sendemail(_control.MyInfo.EmailAddressNotify, ' DCA Roxie autokey build succeeded.', '');									 
+		jobFailed   := FileServices.sendemail(_control.MyInfo.EmailAddressNotify, ' DCA Roxie autokey build failed - ' + filedate, failmessage);		
 
 		AutoKeyB2.MAC_Build(ak_dataset,blank,blank,blank,
 												blank,

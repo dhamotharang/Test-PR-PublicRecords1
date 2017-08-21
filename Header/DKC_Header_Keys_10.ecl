@@ -1,23 +1,47 @@
-import lib_fileservices;
+import _control, lib_fileservices;
 
 #workunit('name','DKC Header Keys - 10');
-
-//edata10=10.150.13.201
-//edata12=10.150.12.240
-//edata13=192.168.0.71
-//edata14=172.16.68.91
-
-DestinationIP := '172.16.68.91';
-DestinationData := '/hdr_data_16/';
 
 DKCKeys_Data(string SourceKeyName,string DestKeyName)
  :=
   if(lib_fileservices.fileservices.FileExists(SourceKeyName),
-	 lib_fileservices.FileServices.DKC(SourceKeyName,DestinationIP,DestinationData+DestKeyName,,,,TRUE),
+	 lib_fileservices.FileServices.DKC(SourceKeyName,DKC_Moxie_Server,DKC_Moxie_Mounts.DestinationData+DestKeyName,,,,TRUE),
 	 output(SourceKeyName + ' does not exist')
 	)
 ;
 
-key1 := DKCKeys_Data('~thor_dell400_2::key::moxie.header.fpos.data.key','headers_v69.fpos.data.key');
+DKCKeys_Keys(string SourceKeyName,string DestKeyName)
+ :=
+  if(lib_fileservices.fileservices.FileExists(SourceKeyName),
+	 lib_fileservices.FileServices.DKC(SourceKeyName,DKC_Moxie_Server,DKC_Moxie_Mounts.DestinationKeys+DestKeyName,,,,TRUE),
+	 output(SourceKeyName + ' does not exist')
+	)
+;
 
-key1;
+DKCKeys_Xtra(string SourceKeyName,string DestKeyName)
+ :=
+  if(lib_fileservices.fileservices.FileExists(SourceKeyName),
+	 lib_fileservices.FileServices.DKC(SourceKeyName,DKC_Moxie_Server,DKC_Moxie_Mounts.DestinationXtra+DestKeyName,,,,TRUE),
+	 output(SourceKeyName + ' does not exist')
+	)
+;
+
+DKCKeys_Xtra2(string SourceKeyName,string DestKeyName)
+ :=
+  if(lib_fileservices.fileservices.FileExists(SourceKeyName),
+	 lib_fileservices.FileServices.DKC(SourceKeyName,DKC_Moxie_Server,DKC_Moxie_Mounts.DestinationXtra2+DestKeyName,,,,TRUE),
+	 output(SourceKeyName + ' does not exist')
+	)
+;
+
+DKCKeys_Xtra3(string SourceKeyName,string DestKeyName)
+ :=
+  if(lib_fileservices.fileservices.FileExists(SourceKeyName),
+	 lib_fileservices.FileServices.DKC(SourceKeyName,DKC_Moxie_Server,DKC_Moxie_Mounts.DestinationXtra3+DestKeyName,,,,TRUE),
+	 output(SourceKeyName + ' does not exist')
+	)
+;
+
+key1 := DKCKeys_Data('~thor_data400::key::moxie.header.fpos.data.key','headers_v69.fpos.data.key');
+
+export DKC_Header_Keys_10 := key1;

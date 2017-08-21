@@ -41,7 +41,7 @@ export input	:=record
  ,string1 orig_Lat_Long_Assignment_Level
  ,string11 orig_Latitude
  ,string11 orig_Longitude
-  ,string10 orig_TelephoneNumber_1
+ ,string10 orig_TelephoneNumber_1
  ,string1 orig_ValidationFlag_1
  ,string8 orig_ValidationDate_1
  ,string1 orig_DMA_TPS_DNC_Flag_1
@@ -70,7 +70,7 @@ export input	:=record
  ,string8 orig_ValidationDate_7
  ,string1 orig_DMA_TPS_DNC_Flag_7
  ,string1 orig_TOT_PHONES
-  ,string3 orig_Length_of_Residence
+ ,string3 orig_Length_of_Residence
  ,string1 orig_Homeowner
  ,string1 orig_EstimatedIncome
  ,string1 orig_Dwelling_Type
@@ -78,7 +78,7 @@ export input	:=record
  ,string1 orig_CHILD
  ,string1 orig_NBRCHILD
  ,string1 orig_TeenCD
-  ,string1 orig_Percent_Range_Black
+ ,string1 orig_Percent_Range_Black
  ,string1 orig_Percent_Range_White
  ,string1 orig_Percent_Range_Hispanic
  ,string1 orig_Percent_Range_Asian
@@ -98,7 +98,8 @@ export input	:=record
  ,string6 orig_RECDATE
 end;	
 	
-	export base	:=record
+
+export orig_base	:=record
   input;
 	address.Layout_Clean_Name.title;
   address.Layout_Clean_Name.fname;
@@ -124,26 +125,74 @@ end;
 	address.Layout_Clean182.dbpc;
 	address.Layout_Clean182.chk_digit;
 	address.Layout_Clean182.rec_type;
-	string2		fips_st:='';
-	string3		fips_county:='';
+	string2	fips_st				:='';
+	string3	fips_county		:='';
 	address.Layout_Clean182.geo_lat;
 	address.Layout_Clean182.geo_long;
 	address.Layout_Clean182.msa;
 	address.Layout_Clean182.geo_blk;
 	address.Layout_Clean182.geo_match;
 	address.Layout_Clean182.err_stat;
-	UNSIGNED6 did 			:= 0;	
-	UNSIGNED1 did_score 			:= 0;
-	string10 clean_Phone;
-	string8 clean_DOB;	
-	string8 date_first_seen  := '0';
-	string8 date_last_seen :='0';
+	UNSIGNED6 did 				:= 0;	
+	UNSIGNED1 did_score 	:= 0;
+	string10 	clean_Phone;
+	string8 	clean_DOB;	
+	string8 	date_first_seen  	:= 	'0';
+	string8 	date_last_seen 		:=	'0';
 	UNSIGNED6 Date_vendor_first_reported;
 	UNSIGNED6 Date_vendor_last_reported;
-	string1   	record_type;
-	string2 		src;
+	string1 record_type;
+	string2 src;
 	AID.Common.xAID		RawAID;
 	end;
-
 	
-	END;
+	
+export base	:=record
+ input;
+ address.Layout_Clean_Name.title;
+ address.Layout_Clean_Name.fname;
+ address.Layout_Clean_Name.mname;
+ address.Layout_Clean_Name.lname;
+ address.Layout_Clean_Name.name_suffix;
+ address.Layout_Clean182.prim_range;
+ address.Layout_Clean182.predir;
+ address.Layout_Clean182.prim_name;
+ address.Layout_Clean182.addr_suffix;
+ address.Layout_Clean182.postdir;
+ address.Layout_Clean182.unit_desig;
+ address.Layout_Clean182.sec_range;
+ address.Layout_Clean182.p_city_name;
+ address.Layout_Clean182.v_city_name;
+ address.Layout_Clean182.st;
+ address.Layout_Clean182.zip;
+ address.Layout_Clean182.zip4;
+ address.Layout_Clean182.cart;
+ address.Layout_Clean182.cr_sort_sz;
+ address.Layout_Clean182.lot;
+ address.Layout_Clean182.lot_order;
+ address.Layout_Clean182.dbpc;
+ address.Layout_Clean182.chk_digit;
+ address.Layout_Clean182.rec_type;
+ string2		fips_st:='';
+ string3		fips_county:='';
+ address.Layout_Clean182.geo_lat;
+ address.Layout_Clean182.geo_long;
+ address.Layout_Clean182.msa;
+ address.Layout_Clean182.geo_blk;
+ address.Layout_Clean182.geo_match;
+ address.Layout_Clean182.err_stat;
+ UNSIGNED6 did 							:= 0;	
+ UNSIGNED1 did_score 				:= 0;
+ string10  clean_Phone;
+ string8	clean_DOB;	
+ string8 	date_first_seen  	:='0';
+ string8 	date_last_seen 		:='0';
+ UNSIGNED6 Date_vendor_first_reported;
+ UNSIGNED6 Date_vendor_last_reported;
+ string1  record_type;
+ string2 	src;
+ AID.Common.xAID		RawAID;
+ UNSIGNED6 LexHHID 					:= 0;
+ end;
+	
+END;

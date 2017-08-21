@@ -74,13 +74,24 @@ export NumCollisions_eid0 := count(Collisions_eid);
     h.y_coordinate;
     h.geocoded;
     h.synopsis_of_crime;
+    h.Sequence;
+    h.Interval;
+    h.Commonalities;
+    h.MOSTAMP;
+    h.coordinate;
+    h.clean_edit_date;
+    h.ORI;
+    h.Raids;
+    h.Quarantined;
+    h.Public_Address;
+    h.group_id;
   END;
 EXPORT TranslatedFile := TABLE(h,rf);
 // Compute the null for each field value
-  Def(INTEGER2 c) := CHOOSE(c,'','','','','','','','','','','','','','','','','','','','','','','','0','','','','','','0','0','','','','','','','','0','','','','0','0','','','','');
+  Def(INTEGER2 c) := CHOOSE(c,'','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','');
  
 Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
-  SELF.word := CHOOSE(c,(SALT30.StrType)le.eid,(SALT30.StrType)le.eid,(SALT30.StrType)le.gh12,(SALT30.StrType)le.etype,(SALT30.StrType)le.ir_number,(SALT30.StrType)le.crime,(SALT30.StrType)le.location_type,(SALT30.StrType)le.object_of_attack_1,(SALT30.StrType)le.object_of_attack_2,(SALT30.StrType)le.point_of_entry_1,(SALT30.StrType)le.point_of_entry_2,(SALT30.StrType)le.method_of_entry_1,(SALT30.StrType)le.method_of_entry_2,(SALT30.StrType)le.suspects_actions_against_person_1,(SALT30.StrType)le.suspects_actions_against_person_2,(SALT30.StrType)le.suspects_actions_against_person_3,(SALT30.StrType)le.suspects_actions_against_person_4,(SALT30.StrType)le.suspects_actions_against_person_5,(SALT30.StrType)le.suspects_actions_against_property_1,(SALT30.StrType)le.suspects_actions_against_property_2,(SALT30.StrType)le.suspects_actions_against_property_3,(SALT30.StrType)le.property_taken_1,(SALT30.StrType)le.property_taken_2,(SALT30.StrType)le.property_taken_3,(SALT30.StrType)le.property_value,(SALT30.StrType)le.weapon_type_1,(SALT30.StrType)le.weapon_type_2,(SALT30.StrType)le.method_of_departure,(SALT30.StrType)le.clean_first_date_time,(SALT30.StrType)le.clean_last_date_time,(SALT30.StrType)le.first_time,(SALT30.StrType)le.last_time,(SALT30.StrType)le.clean_report_date,(SALT30.StrType)le.first_day,(SALT30.StrType)le.last_day,(SALT30.StrType)le.address_of_crime,(SALT30.StrType)le.address_name,(SALT30.StrType)le.beat,(SALT30.StrType)le.rd,(SALT30.StrType)le.companions,(SALT30.StrType)le.apt,(SALT30.StrType)le.agency,(SALT30.StrType)le.accuracy,(SALT30.StrType)le.x_coordinate,(SALT30.StrType)le.y_coordinate,(SALT30.StrType)le.geocoded,(SALT30.StrType)le.synopsis_of_crime,SKIP,SKIP,SKIP);
+  SELF.word := CHOOSE(c,(SALT30.StrType)le.eid,(SALT30.StrType)le.eid,(SALT30.StrType)le.gh12,(SALT30.StrType)le.etype,(SALT30.StrType)le.ir_number,(SALT30.StrType)le.crime,(SALT30.StrType)le.location_type,(SALT30.StrType)le.object_of_attack_1,(SALT30.StrType)le.object_of_attack_2,(SALT30.StrType)le.point_of_entry_1,(SALT30.StrType)le.point_of_entry_2,(SALT30.StrType)le.method_of_entry_1,(SALT30.StrType)le.method_of_entry_2,(SALT30.StrType)le.suspects_actions_against_person_1,(SALT30.StrType)le.suspects_actions_against_person_2,(SALT30.StrType)le.suspects_actions_against_person_3,(SALT30.StrType)le.suspects_actions_against_person_4,(SALT30.StrType)le.suspects_actions_against_person_5,(SALT30.StrType)le.suspects_actions_against_property_1,(SALT30.StrType)le.suspects_actions_against_property_2,(SALT30.StrType)le.suspects_actions_against_property_3,(SALT30.StrType)le.property_taken_1,(SALT30.StrType)le.property_taken_2,(SALT30.StrType)le.property_taken_3,(SALT30.StrType)le.property_value,(SALT30.StrType)le.weapon_type_1,(SALT30.StrType)le.weapon_type_2,(SALT30.StrType)le.method_of_departure,(SALT30.StrType)le.clean_first_date_time,(SALT30.StrType)le.clean_last_date_time,(SALT30.StrType)le.first_time,(SALT30.StrType)le.last_time,(SALT30.StrType)le.clean_report_date,(SALT30.StrType)le.first_day,(SALT30.StrType)le.last_day,(SALT30.StrType)le.address_of_crime,(SALT30.StrType)le.address_name,(SALT30.StrType)le.beat,(SALT30.StrType)le.rd,(SALT30.StrType)le.companions,(SALT30.StrType)le.apt,(SALT30.StrType)le.agency,(SALT30.StrType)le.accuracy,(SALT30.StrType)le.x_coordinate,(SALT30.StrType)le.y_coordinate,(SALT30.StrType)le.geocoded,(SALT30.StrType)le.synopsis_of_crime,(SALT30.StrType)le.Sequence,(SALT30.StrType)le.Interval,(SALT30.StrType)le.Commonalities,(SALT30.StrType)le.MOSTAMP,(SALT30.StrType)le.coordinate,(SALT30.StrType)le.clean_edit_date,(SALT30.StrType)le.ORI,(SALT30.StrType)le.Raids,(SALT30.StrType)le.Quarantined,(SALT30.StrType)le.Public_Address,(SALT30.StrType)le.group_id,SKIP,SKIP,SKIP);
   SELF.len := LENGTH(TRIM(SELF.word));
   SELF.wip := IF(SELF.Word=Def(c-1),SKIP,1); // Adjusted later - also filters blank words
   SELF.nominal := 0; //Filled in later
@@ -91,7 +102,7 @@ Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
   SELF.docref.src := 0; // Filled in later
   SELF.src := TRANSFER(MDR.sourceTools.src_Bair_Analytics,UNSIGNED2); // Namespace for ID provided
   SELF.seg := c; // Field number is seg; values filled in in segment definition
-  SELF.segName := Text_Search.MakeShortSeg(choose(c,text_search.constants.DocKeyField,'eid','gh12','etype','ir_number','crime','location_type','object_of_attack_1','object_of_attack_2','point_of_entry_1','point_of_entry_2','method_of_entry_1','method_of_entry_2','suspects_actions_against_person_1','suspects_actions_against_person_2','suspects_actions_against_person_3','suspects_actions_against_person_4','suspects_actions_against_person_5','suspects_actions_against_property_1','suspects_actions_against_property_2','suspects_actions_against_property_3','property_taken_1','property_taken_2','property_taken_3','property_value','weapon_type_1','weapon_type_2','method_of_departure','clean_first_date_time','clean_last_date_time','first_time','last_time','clean_report_date','first_day','last_day','address_of_crime','address_name','beat','rd','companions','apt','agency','accuracy','x_coordinate','y_coordinate','geocoded','synopsis_of_crime','NOTES','DATE'));
+  SELF.segName := Text_Search.MakeShortSeg(choose(c,text_search.constants.DocKeyField,'eid','gh12','etype','ir_number','crime','location_type','object_of_attack_1','object_of_attack_2','point_of_entry_1','point_of_entry_2','method_of_entry_1','method_of_entry_2','suspects_actions_against_person_1','suspects_actions_against_person_2','suspects_actions_against_person_3','suspects_actions_against_person_4','suspects_actions_against_person_5','suspects_actions_against_property_1','suspects_actions_against_property_2','suspects_actions_against_property_3','property_taken_1','property_taken_2','property_taken_3','property_value','weapon_type_1','weapon_type_2','method_of_departure','clean_first_date_time','clean_last_date_time','first_time','last_time','clean_report_date','first_day','last_day','address_of_crime','address_name','beat','rd','companions','apt','agency','accuracy','x_coordinate','y_coordinate','geocoded','synopsis_of_crime','Sequence','Interval','Commonalities','MOSTAMP','coordinate','clean_edit_date','ORI','Raids','Quarantined','Public_Address','group_id','NOTES','DATE'));
   SELF.typ := text_search.types.WordType.TextStr; // May get changed later
   SELF.sect := 0; // Not needed
   SELF.pos := 0; // Not needed
@@ -99,7 +110,7 @@ Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
   self.sid := le.hashed_sid;
   self.lid := (SALT30.UIDType)le.newrid;
 END;
-SHARED FieldsAsPostings := NORMALIZE(h,49,into(left,counter));
+SHARED FieldsAsPostings := NORMALIZE(h,60,into(left,counter));
 EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Constants.DocKeyField),text_search.Constants.DocKeyField,text_search.types.SegmentType.ExternalKey,[text_search.MakeShortSeg(text_search.Constants.DocKeyField)]}
   ,{text_search.MakeShortSeg('eid'),'eid',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('eid')]}
   ,{text_search.MakeShortSeg('gh12'),'gh12',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gh12')]}
@@ -147,6 +158,17 @@ EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Cons
   ,{text_search.MakeShortSeg('y_coordinate'),'y_coordinate',text_search.types.SegmentType.NumericType,[text_search.MakeShortSeg('y_coordinate')]}
   ,{text_search.MakeShortSeg('geocoded'),'geocoded',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('geocoded')]}
   ,{text_search.MakeShortSeg('synopsis_of_crime'),'synopsis_of_crime',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('synopsis_of_crime')]}
+  ,{text_search.MakeShortSeg('Sequence'),'Sequence',text_search.types.SegmentType.NumericType,[text_search.MakeShortSeg('Sequence')]}
+  ,{text_search.MakeShortSeg('Interval'),'Interval',text_search.types.SegmentType.NumericType,[text_search.MakeShortSeg('Interval')]}
+  ,{text_search.MakeShortSeg('Commonalities'),'Commonalities',text_search.types.SegmentType.NumericType,[text_search.MakeShortSeg('Commonalities')]}
+  ,{text_search.MakeShortSeg('MOSTAMP'),'MOSTAMP',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('MOSTAMP')]}
+  ,{text_search.MakeShortSeg('coordinate'),'coordinate',text_search.types.SegmentType.NumericType,[text_search.MakeShortSeg('coordinate')]}
+  ,{text_search.MakeShortSeg('clean_edit_date'),'clean_edit_date',text_search.types.SegmentType.DateType,[text_search.MakeShortSeg('clean_edit_date')]}
+  ,{text_search.MakeShortSeg('ORI'),'ORI',text_search.types.SegmentType.NumericType,[text_search.MakeShortSeg('ORI')]}
+  ,{text_search.MakeShortSeg('Raids'),'Raids',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('Raids')]}
+  ,{text_search.MakeShortSeg('Quarantined'),'Quarantined',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('Quarantined')]}
+  ,{text_search.MakeShortSeg('Public_Address'),'Public_Address',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('Public_Address')]}
+  ,{text_search.MakeShortSeg('group_id'),'group_id',text_search.types.SegmentType.NumericType,[text_search.MakeShortSeg('group_id')]}
   ,{text_search.MakeShortSeg('NOTES'),'NOTES',text_search.types.SegmentType.GroupSeg,[text_search.MakeShortSeg('synopsis_of_crime')]}
   ,{text_search.MakeShortSeg('DATE'),'DATE',text_search.types.SegmentType.GroupSeg,[text_search.MakeShortSeg('clean_first_date_time')]}
 ],Text_Search.Layout_Segment_ComposeDef );

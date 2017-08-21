@@ -1,0 +1,51 @@
+export Layout_Master_origOnly_SNT := record 
+
+
+	string1		trans_type;
+	string6		book_section;
+	string3		listing_type;
+	string12	listing_id;
+	string1		indent_level;
+	string10	acct_no;
+	string10	phoneno;
+	string1		class_of_service;
+	string4		exchange;
+	string1		all_hours;
+	string1		answer_bureau;
+	string1		no_addr_tel;
+	string1		omit_address;
+	string1		omit_name;
+	string1		non_listed;
+	string1		non_pub;
+	string1		ju;
+	string159	so_name;
+	string83	so_address;
+	string30	finding_name;
+	string80	sub_name;
+	string10	lineage;
+	string50	prefix_title;
+	string50	suffix_title;
+	string40	designation_orig;
+	string10	house_number;
+	string30	street_name;
+	string10	thoroughfare;
+	string5		directional_prefix;
+	string5		directional_suffix;
+	string15	location;
+	string20	abbreviated_locality;
+	string25	locality;
+	string20	printed_locality;
+	string2		state;
+	string9		zip;
+	string80	indent_text;
+	string60	pla_name;
+	string150	see_text;
+	string83	service_addr;
+	string10	activity_date;
+	string10	completion_date;
+	string120	yp_heading;
+	string2		product_type;
+	string1		bus_res;
+	string4		recNo;
+
+end;

@@ -1,4 +1,4 @@
-﻿export Mac_Update_Base (file_in, incr_update = true, file_out) := macro
+export Mac_Update_Base (file_in, incr_update = true, file_out) := macro
 import ExperianCred;
 #uniquename(exp_phone_base)
 %exp_phone_base% := Experian_Phones.Files.Base;

@@ -16,10 +16,10 @@ text_search.Layout_document prolic_Convert(dist_ds l) := transform
         {4,0,l.orig_name},
         {5,0,';' + l.orig_former_name},
 				{6,0,l.orig_addr_1 + ' ' + l.orig_addr_2 + ' ' + l.orig_addr_3 + ' ' + 
-							l.orig_addr_4 + ' ' + l.orig_city +  ' ' + l.orig_st + ' ' + l.county_str +  ' ' + l.country_str},
-				{7,0,l.orig_city + ';' + l.additional_orig_city},
-				{8,0,l.orig_st + ';' + l.additional_orig_st},
-				{9,0,l.orig_zip + ';' + l.additional_orig_zip},
+							l.orig_addr_4 + ' ' + l.orig_city +  ' ' + l.orig_st + ' ' + l.orig_zip +  ' ' + l.country_str},
+				//{7,0,l.orig_city + ';' + l.additional_orig_city},
+				//{8,0,l.orig_st + ';' + l.additional_orig_st},
+				//{9,0,l.orig_zip + ';' + l.additional_orig_zip},
 				{10,0,l.phone + ';' + l.additional_phone},
 				{11,0,l.sex},
 				{12,0,l.dob},
@@ -39,7 +39,11 @@ text_search.Layout_document prolic_Convert(dist_ds l) := transform
 				{24,0,l.misc_email},
 				{25,0,l.misc_fax},
 				{26,0,l.misc_web_site},
-				{27,0,l.best_ssn}
+				{27,0,l.best_ssn},
+				{36,0,l.best_ssn}, // populate tax-id field as well with ssn bug# 33503
+				{37,0,l.source_st},
+				{38,0,l.company_name},
+				{39,0,l.status}
 				
 				
 
@@ -68,8 +72,20 @@ text_search.Layout_DocSeg iterate_prolic(text_search.Layout_DocSeg l,text_search
 	itr_out := iterate(sort_out,iterate_prolic(left,right),local);
 
 
-retval := itr_out(trim(content) <> '' and trim(content) <> ';');
+	// External key
+	
+	text_search.Layout_DocSeg MakeKeySegs( itr_out l, unsigned2 segno ) := TRANSFORM
+		self.docref.doc := l.docref.doc;
+        self.docref.src := l.docref.src;
+		self.segment := segno;
+        self.content := 'L' + intformat(l.docRef.doc,15,1);
+        self.sect := 1;
+    END;
 
-return retval;
+    segkeys := PROJECT(itr_out(trim(content) <> '' and trim(content) <> ';'),MakeKeySegs(LEFT,250));
+
+	full_ret := itr_out(trim(content) <> '' and trim(content) <> ';') + segkeys;
+	
+	return full_ret;
 			
 end;

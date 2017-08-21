@@ -299,6 +299,7 @@ export Report_Service := macro
 		self.IncludeABMSCareer := request.options.IncludeCareer;
 		self.IncludeABMSEducation := request.options.IncludeEducation;
 		self.IncludeABMSProfessionalAssociations := request.options.IncludeProfessionalAssociations;
+		self.excludeSourceNCPDP := _DRM[21] = '1';
 		// self:=[];Do not uncomment otherwise the default values will not get set.
 	end;
 	cfg:=dataset([buildConfig()]);

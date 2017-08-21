@@ -19,8 +19,21 @@ unsigned2 src;
 end;
 header.Mac_Set_Header_Source(indata,DNB_FEINv2.layout_DNB_fein_base_main,fpos_fein,0,fein_withID);
 
+// External key
+	
+	Text_Search.layout_DocSeg MakeKeySegs( fein_withID l, unsigned2 segno ) := TRANSFORM
+		self.docref.doc := l.uid;
+        self.docref.src := 0;
+		self.segment := segno;
+        self.content := l.tmsid;
+        self.sect := 1;
+    END;
 
-docs := DNB_FEINV2.Convert_FEIN_Func(fein_withID) : persist('~thor_data400::persist::feinv2::boolean');
+    segkeys := PROJECT(fein_withID,MakeKeySegs(LEFT,250));
+
+
+
+docs := DNB_FEINV2.Convert_FEIN_Func(fein_withID) + segkeys : persist('~thor_data400::persist::feinv2::boolean');
 
 
 string_rec := record

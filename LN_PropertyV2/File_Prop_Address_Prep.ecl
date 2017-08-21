@@ -53,7 +53,7 @@ end;
 // source_code[2]='P' - property 
 // ln_fares_id[1] != 'R' - FCRA compliant data
 // Use FCRA boolean to determine if FARES records need to be filtered out
-fdf := ln_propertyv2.File_Search_Did (source_code[2] = 'P', prim_name != '', zip != '');
+fdf := LN_PropertyV2.file_search_building (source_code[2] = 'P', prim_name != '', zip != '');
 fcra_df := fdf(ln_fares_id[1] != 'R');
 df := if(isFCRA, fcra_df, fdf);
 

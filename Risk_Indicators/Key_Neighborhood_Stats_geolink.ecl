@@ -37,7 +37,7 @@ prop_stats_rec := RECORD
   unsigned4 total_property_count;
  END;
 
-// prop_stats := dataset('~thor400_88_staging::temp::ln_propertyv2_neighborhood_stats', prop_stats_rec, thor);
+// prop_stats := dataset('~thor200_144::temp::ln_propertyv2_neighborhood_stats', prop_stats_rec, thor);
 prop_stats := ln_propertyv2.NeighborhoodStats;
 
 advo_stats_rec := RECORD
@@ -51,8 +51,8 @@ advo_stats_rec := RECORD
   unsigned4 neighborhood_property_count;
  END;
  
-// advo_stats := dataset('~thor400_88_staging::temp::advo_neighborhood_stats', advo_stats_rec, thor);
-advo_stats := advo.NeighborhoodStats;
+//advo_stats := dataset('~thor200_144::temp::advo_neighborhood_stats', advo_stats_rec, thor);
+advo_stats := advo.NeighborhoodStats();
 
 combined := record
 	prop_stats_rec;

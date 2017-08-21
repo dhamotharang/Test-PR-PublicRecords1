@@ -1,6 +1,6 @@
-export Layout_NE_clean_in := 
+export Layout_NE_clean_in := record
 
-record
+//record length : 2628
 string2      state_origin;
 string8      process_date;
 string3       STATEABREV;

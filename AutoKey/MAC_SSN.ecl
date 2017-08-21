@@ -20,15 +20,15 @@ MACRO
 #uniquename(recs)
 Autokey.Layout_SSN %proj%(%indata% le) :=
 TRANSFORM
-  SELF.s1 := le.inssn[1];
-  SELF.s2 := le.inssn[2];
-  SELF.s3 := le.inssn[3];
-  SELF.s4 := le.inssn[4];
-  SELF.s5 := le.inssn[5];
-  SELF.s6 := le.inssn[6];
-  SELF.s7 := le.inssn[7];
-  SELF.s8 := le.inssn[8];
-  SELF.s9 := le.inssn[9];
+  SELF.s1 := ((string)le.inssn)[1];
+  SELF.s2 := ((string)le.inssn)[2];
+  SELF.s3 := ((string)le.inssn)[3];
+  SELF.s4 := ((string)le.inssn)[4];
+  SELF.s5 := ((string)le.inssn)[5];
+  SELF.s6 := ((string)le.inssn)[6];
+  SELF.s7 := ((string)le.inssn)[7];
+  SELF.s8 := ((string)le.inssn)[8];
+  SELF.s9 := ((string)le.inssn)[9];
   SELF.dph_lname := metaphonelib.DMetaPhone1(le.inlname);
   SELF.pfname := datalib.preferredfirst(le.infname);
   SELF.did := le.indid;

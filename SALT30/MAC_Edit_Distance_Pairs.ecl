@@ -36,16 +36,16 @@ export MAC_Edit_Distance_Pairs(infile,infield,countfield,thresh,phonetics,outfil
 	#uniquename(inf)
 	%inf% := infile(thresh>0,length(trim(infield))>=5);
 	#uniquename(j1)
-	%j1% := join(%inf7%,%inf7%,left.infield[1..2]=right.infield[1..2] and  left.infield[3..*]=right.infield[3..*] and SALT30.WithinEditN(left.infield,right.infield,thresh),%trans%(left,right),atmost(left.infield[1..2]=right.infield[1..2] and  left.infield[3..*]=right.infield[3..*],3500),HINT(unsorted_output),HINT(parallel_match));
+	%j1% := join(%inf7%,%inf7%,left.infield[1..2]=right.infield[1..2] and  left.infield[3..*]=right.infield[3..*] and SALT30.WithinEditN(left.infield,right.infield,thresh),%trans%(left,right),atmost(left.infield[1..2]=right.infield[1..2] and  left.infield[3..*]=right.infield[3..*],3500));
 	#uniquename(j2)
-	%j2% := join(%inf%,%inf%,left.infield[1..3]=right.infield[1..3] and  left.infield[4..*]=right.infield[4..*] and SALT30.WithinEditN(left.infield,right.infield,thresh),%trans%(left,right),atmost(left.infield[1..3]=right.infield[1..3] and  left.infield[4..*]=right.infield[4..*],5000),HINT(unsorted_output),HINT(parallel_match));
+	%j2% := join(%inf%,%inf%,left.infield[1..3]=right.infield[1..3] and  left.infield[4..*]=right.infield[4..*] and SALT30.WithinEditN(left.infield,right.infield,thresh),%trans%(left,right),atmost(left.infield[1..3]=right.infield[1..3] and  left.infield[4..*]=right.infield[4..*],5000));
 	#uniquename(j3)
-	%j3% := join(%inf7%,%inf7%,left.infield[3..*]=right.infield[3..*] and left.infield[length(trim(left.infield))-2..] = right.infield[length(trim(right.infield))-2..] and SALT30.WithinEditN(left.infield,right.infield,thresh),%trans%(left,right),atmost(left.infield[3..*]=right.infield[3..*] and left.infield[length(trim(left.infield))-2..] = right.infield[length(trim(right.infield))-2..],3500),HINT(unsorted_output),HINT(parallel_match));
+	%j3% := join(%inf7%,%inf7%,left.infield[3..*]=right.infield[3..*] and left.infield[length(trim(left.infield))-2..] = right.infield[length(trim(right.infield))-2..] and SALT30.WithinEditN(left.infield,right.infield,thresh),%trans%(left,right),atmost(left.infield[3..*]=right.infield[3..*] and left.infield[length(trim(left.infield))-2..] = right.infield[length(trim(right.infield))-2..],3500));
 	#uniquename(j4)
-	%j4% := join(%inf%,%inf%,left.infield[4..*]=right.infield[4..*] and left.infield[length(trim(left.infield))-3..] = right.infield[length(trim(right.infield))-3..] and SALT30.WithinEditN(left.infield,right.infield,thresh),%trans%(left,right),atmost(left.infield[4..*]=right.infield[4..*] and left.infield[length(trim(left.infield))-3..] = right.infield[length(trim(right.infield))-3..],2500),HINT(unsorted_output),HINT(parallel_match));
+	%j4% := join(%inf%,%inf%,left.infield[4..*]=right.infield[4..*] and left.infield[length(trim(left.infield))-3..] = right.infield[length(trim(right.infield))-3..] and SALT30.WithinEditN(left.infield,right.infield,thresh),%trans%(left,right),atmost(left.infield[4..*]=right.infield[4..*] and left.infield[length(trim(left.infield))-3..] = right.infield[length(trim(right.infield))-3..],2500));
 	#uniquename(j5)
 	// Allow positions 4&5 to vary
-	%j5% := join(%inf%,%inf%,left.infield[1..*]=right.infield[1..*] and left.infield[length(trim(left.infield))-2..] = right.infield[length(trim(right.infield))-2..] and SALT30.WithinEditN(left.infield,right.infield,thresh),%trans%(left,right),atmost(left.infield[1..*]=right.infield[1..*] and left.infield[length(trim(left.infield))-2..] = right.infield[length(trim(right.infield))-2..],2500),HINT(unsorted_output),HINT(parallel_match));
+	%j5% := join(%inf%,%inf%,left.infield[1..*]=right.infield[1..*] and left.infield[length(trim(left.infield))-2..] = right.infield[length(trim(right.infield))-2..] and SALT30.WithinEditN(left.infield,right.infield,thresh),%trans%(left,right),atmost(left.infield[1..*]=right.infield[1..*] and left.infield[length(trim(left.infield))-2..] = right.infield[length(trim(right.infield))-2..],2500));
 	#uniquename(jnull)
 	// Make sure the 'fullmatch' case always gets through
 	#IF(phonetics)

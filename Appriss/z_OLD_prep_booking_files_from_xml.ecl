@@ -342,8 +342,8 @@ self:=R;
 END;
 //
 bookings_rec_norm normBookings(booking_rec L):= TRANSFORM
-vcleanname 			:= AddrCleanLib.CleanPersonLFM73(L.ap_full_name);
-vcleanaddress 	:= AddrCleanLib.CleanAddress182(TRIM(L.ap_address1)+TRIM(l.ap_address2),
+vcleanname 			:= Address.CleanPersonLFM73(L.ap_full_name);
+vcleanaddress 	:= Address.CleanAddress182(TRIM(L.ap_address1)+TRIM(l.ap_address2),
                                                    TRIM(L.ap_city)+','+TRIM(L.ap_state)+','+TRIM(L.ap_zipcode));
 self.creation_ts			:=toStdTimestamp(L.creation_ts);
 self.last_change_ts		:=toStdTimestamp(L.last_change_ts);

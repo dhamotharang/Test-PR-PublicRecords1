@@ -3,4 +3,4 @@ string_rec := record
     unsigned integer8 __filepos { virtual(fileposition)};
 end;
 
-export Layout_Business_Header_Out_Keybuild := DATASET(bus_thor + 'OUT::Business_Header', string_rec, THOR);
+export Layout_Business_Header_Out_Keybuild := DATASET(_dataset().thor_cluster_files + 'out::business_header_built', string_rec, THOR);

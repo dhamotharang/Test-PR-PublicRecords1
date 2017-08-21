@@ -1,1 +1,1 @@
-export string8 Corp_Build_Date := '20050829';
+export Corp_Build_Date := '20070418';

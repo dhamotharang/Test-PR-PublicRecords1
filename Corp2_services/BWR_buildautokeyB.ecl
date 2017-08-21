@@ -4,11 +4,12 @@ export BWR_buildautokeyB(string pversion) :=
 function
 
 d1 :=distribute(corp2.files('').Base.Corp.built,hash(corp_key));
+d1_dedup :=dedup(sort(d1,corp_key,local),corp_key,local);
 pre_d2:=distribute(corp2.files('').Base.cont.Built,hash(corp_key));
 
 // eliminate corp keys that are only in the contact file
 
-d2 := join(pre_d2,d1,left.corp_key=right.corp_key,transform(recordof(pre_d2),self:=left), local,keep(1));
+d2 := join(pre_d2,d1_dedup,left.corp_key=right.corp_key,transform(recordof(pre_d2),self:=left), local,keep(1));
 
 
 layout_cont :=record

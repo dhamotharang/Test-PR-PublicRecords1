@@ -1,1 +1,0 @@
-export File_SpecialityGroup_Update := dataset(Ingenix_NatlProf.File_In_Cluster+'in::Ingenix_NatlProf_SpecialityGroup_Update',Ingenix_NatlProf.Layout_in_SpecialityGroup,CSV(quote(''),separator('|')));

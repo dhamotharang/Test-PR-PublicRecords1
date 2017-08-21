@@ -1,4 +1,4 @@
-import doxie, ut;
+import doxie, ut, doxie_build;
 
 todaysdate := ut.GetDate;
 checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
@@ -30,7 +30,7 @@ END;
 
 
 
-slimrec add_doc(doxie_files.File_Offenders le) :=
+slimrec add_doc(doxie_build.file_offenders_keybuilding le) :=
 TRANSFORM
 	SELF.criminal_count := 1;
 	SELF.crim_case_num := le.case_num;
@@ -59,7 +59,7 @@ TRANSFORM
 	self.arrests_count60 := if(isArrest, (unsigned)checkDays(todaysDate,le.case_date,ut.DaysInNYears(5)), 0);
 END;
 
-doc_added := PROJECT(doxie_files.file_offenders((integer)did != 0), add_doc(LEFT));
+doc_added := PROJECT(doxie_build.file_offenders_keybuilding((integer)did != 0), add_doc(LEFT));
 
 
 slimrec roll_doc(doc_added le, doc_added ri) :=

@@ -2,7 +2,15 @@ import ut;
 reg := vehlic.File_MO_Reg;
 ttl := vehlic.File_MO_Ttl;
 
-reg_dist := distribute(reg, hash(title_no));
+//just standardizing 1 date field.
+ut.macAppendStandardizedDate(  reg
+   							              ,LIC_APPL_DA_1
+							                ,reg1
+ 						                  ,true
+														);
+
+
+reg_dist := distribute(reg1, hash(title_no));
 ttl_dist := distribute(ttl, hash(title));
 
 
@@ -25,7 +33,7 @@ string8 decode_month(string yr, string code) :=
 				 '  ') + 
 		'  ');
 
-vehlic.Layout_Vehicles tra(reg le, ttl ri) := transform
+vehlic.Layout_Vehicles tra(reg1 le, ttl ri) := transform
 	self.orig_state:='MO';
 	self.dt_first_seen := if(le.process_Date = '',(unsigned8)(ri.process_date[1..6]), (unsigned8)(le.process_date[1..6]));
 	self.dt_last_seen := if(le.process_Date = '',(unsigned8)(ri.process_date[1..6]), (unsigned8)(le.process_date[1..6]));
@@ -35,7 +43,7 @@ vehlic.Layout_Vehicles tra(reg le, ttl ri) := transform
 	self.LICENSE_PLATE_CODE := le.PLATE_TYPE_1;
 	self.REG_2_ADDR_NON_DISCLOSURE_FLAG := le.suspended;
 
-	self.VEHICLE_NUMBERxBG1 := if(ri.TITLE <> '', ri.TITLE, le.TITLE_NO);			
+	//self.VEHICLE_NUMBERxBG1 := ''; // let vehicles_joined figure it out...  if(ri.TITLE <> '', ri.TITLE, le.TITLE_NO);			
 	self.ORIG_VIN :=if(ri.VIN <> '', ri.VIN, le.VIN);			
 	self.FIRST_REGISTRATION_DATE :=if(ri.PUR_DATE <> '', undoMMDDYY(ri.PUR_DATE), undoYYMMDD(le.PURCHASE_DATE));			//Format Ttl = MMDDYY; Format Reg = YYMMDD
 	self.YEAR_MAKE := vehlic.getCCYY( if(ri.MOD_YR <> '', ri.MOD_YR, le.YEAR));			//YY
@@ -55,7 +63,7 @@ vehlic.Layout_Vehicles tra(reg le, ttl ri) := transform
 	self.OWN_1_ZIP5_ZIP4_FOREIGN_POSTAL :=ri.orig_ZIP_CODE;						
 	self.OWN_1_RESIDENCE_COUNTY :=ri.orig_COUNTY_CODE;						
 	self.LICENSE_PLATE_NUMBERxBG4 :=le.LIC_NO_1;						
-	self.REGISTRATION_EFFECTIVE_DATE := '';						
+	self.REGISTRATION_EFFECTIVE_DATE := le.yyyy+le.mm+le.dd;						
 	self.REGISTRATION_EXPIRATION_DATE := decode_month(le.EXPIR_YR_1, le.LIC_EXP_MM_CODE_1); //A = 01, B = 02,...L = 12. * Annual, N = Non-Expiring, # = blank
 	self.TRUE_LICENSE_PLSTE_NUMBER :=le.LIC_NO_1;						
 	self.REG_1_CUSTOMER_NAME :=le.orig_NAME;						
@@ -135,7 +143,15 @@ vehlic.Layout_Vehicles tra(reg le, ttl ri) := transform
 	self.reg_2_name_suffix :=le.suffix2;						
 	self.reg_2_company_name :=le.company2;						
 	self.price :=le.NET_PRICE;
-    self.history := if(self.TITLE_STATUS_CODE = 'Z','E','');
+    self.history     := if(self.TITLE_STATUS_CODE = 'Z','E','');
+	//Added the 2 mappings below because Vehicles_Joined doesn't perform the Iterate
+	//on Expired records.  Currently, MO Direct is the only source that has Expired
+	//records going into Vehicles_Joined.
+	self.source_code        := if(self.history='E','DI','');
+	self.VEHICLE_NUMBERxBG1 := if(self.history='E',
+	                           map(validvin(self.orig_vin) => self.orig_vin,
+                                   (string20)hash(self.orig_vin,self.LICENSE_PLATE_NUMBERxBG4,self.own_1_customer_name, self.reg_1_customer_name) ),
+							   '');
 end;
 
 jnd := join(reg_dist, ttl_Dist, 
@@ -144,4 +160,4 @@ jnd := join(reg_dist, ttl_Dist,
 			full outer,
 			local);
 
-export MO_as_Vehicles := jnd : persist('Persist::VehReg_MO_as_Vehicles');
+export MO_as_Vehicles := jnd : persist('~thor_data400::persist::vehreg_mo_as_vehicles');

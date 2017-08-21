@@ -12,7 +12,7 @@ export key_bankruptcy_main_full(boolean isFCRA = false) := function
 
 	get_rec_clean := project(get_recs , reformat(left)); 
 	dist_id := distribute(get_rec_clean, hash(TMSID));
-	sort_id := sort(dist_id, TMSID,local);
+	sort_id := dedup(sort(dist_id, TMSID, -process_Date, local), TMSID,local);
 
 	key_name := bankruptcyv2.BuildKeyName(isFCRA, 'main::tmsid');
 

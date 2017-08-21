@@ -98,7 +98,7 @@ EXPORT Layout_Property_A_Extract := RECORD
   layout_search_out.st;
   layout_search_out.zip;
   layout_search_out.zip4;
-  layout_search_out.phone_number;
+ 	string10 phone_num;		// removed layout_search_out.phone_number ref to avoid SegName phone_number collision
   layout_search_out.dt_first_seen; //new
   layout_search_out.dt_last_seen; //new
   layout_search_out.dt_vendor_first_reported; //new

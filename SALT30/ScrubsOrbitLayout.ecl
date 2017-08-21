@@ -3,6 +3,7 @@ EXPORT ScrubsOrbitLayout := RECORD
 	UNSIGNED4 processdate;
 	STRING10  sourcecode;
 	STRING    ruledesc;
+	STRING    ErrorMessage := '';
 	UNSIGNED8 rulecnt;
 	UNSIGNED1 rulepcnt;
 	STRING1   rejectwarning := '';

@@ -1,10 +1,10 @@
-import watchdog,ut;
+import watchdog,ut,PRTE2_Header;
 hh := file_hhid_current(ver=1);
 b := watchdog.File_Best;
 
 pcr := record
   b.did;
-  unsigned1 age := ut.GetAgeI(b.dob);
+  unsigned1 age := ut.Age(b.dob);
   string1   gender := datalib.gender(trim(b.fname));
   end;
 
@@ -156,4 +156,8 @@ f_result guess_status(f_result le) := transform
   end;
 
 //export LivingSituation := l;
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export LivingSituation := project(res,guess_status(left));
+#ELSE
 export LivingSituation := project(res,guess_status(left)) : persist('LivingSituation');
+#END;

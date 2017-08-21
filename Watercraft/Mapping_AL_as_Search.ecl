@@ -1,12 +1,39 @@
-
-
 import lib_stringlib, watercraft;
 
-Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Watercraft.Layout_AL_clean_in L, integer1 C)
+ds_water_old := watercraft.file_AL_clean_in_pre20090407;
+ds_water_new := watercraft.file_AL_clean_in;//new layout
+
+ds_newlayout := record
+watercraft.Layout_al_clean_in_pre20090407;
+string20 engine_number;
+string5	 FIPS_fix;			//Fix FIPS truncation
+end;
+
+ds_newlayout new_format1(ds_water_old l) := transform
+self.engine_number := l.engine_num;
+self.FIPS_fix	:= l.FIPS;
+self := l;
+end;
+
+ds_water_proj_old := project(ds_water_old, new_format1(left));
+
+ds_newlayout new_format2(ds_water_new l) := transform
+self.engine_number := l.engine_num;
+self.FIPS_fix	:= l.FIPS;
+self := l;
+end;
+
+ds_water_proj_new := project(ds_water_new, new_format2(left));
+
+ds_water_concat := ds_water_proj_old + ds_water_proj_new;
+
+Watercraft.Macro_Clean_Hull_ID(ds_water_concat, ds_newlayout,hull_clean_in)
+
+Watercraft.Layout_Watercraft_Search_Group search_mapping_format(hull_clean_in L, integer1 C)
  :=
   transform
-	self.date_first_seen			:=	if(L.REG_DATE > L.RENEWAL_DATE, L.RENEWAL_DATE, L.REG_DATE);
-	self.date_last_seen				:=	if(L.REG_DATE > L.RENEWAL_DATE, L.REG_DATE, L.RENEWAL_DATE);
+	self.date_first_seen			:=	L.REG_DATE;
+	self.date_last_seen				:=	L.REG_DATE;
 	self.date_vendor_first_reported	:=	L.process_date;
 	self.date_vendor_last_reported	:=	L.process_date;
 	self.watercraft_key				:=	(trim(L.HULL_ID, left, right) + trim(L.DECAL_NUMBER, left, right) + trim(L.MAKE, left, right) + trim(L.YEAR, left, right))[1..30];
@@ -26,7 +53,7 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Watercraft.Layou
 	self.orig_city					:=	L.CITY;
 	self.orig_state					:=	L.STATE;
 	self.orig_zip					:=	L.ZIP;
-	self.orig_fips					:=	L.FIPS;
+	self.orig_fips					:=	L.FIPS_fix;
 	self.dob						:=	L.DOB;
 	self.orig_ssn					:=	'';
 	self.orig_fein					:=	'';
@@ -47,7 +74,7 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Watercraft.Layou
   end
  ; 
  
-Mapping_AL_as_Search_norm			:= normalize(Watercraft.file_AL_clean_in,5,search_mapping_format(left,counter));
+Mapping_AL_as_Search_norm			:= normalize(hull_clean_in,5,search_mapping_format(left,counter));
 
 export Mapping_AL_as_Search         := Mapping_AL_as_Search_norm(clean_pname <> '' or company_name <> '');
 

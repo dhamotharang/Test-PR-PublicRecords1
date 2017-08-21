@@ -30,6 +30,7 @@ module
 			Party.dAll_filenames;
 	end;
 	export Contacts := ftemplate('key','contacts','main');	
+	export ContactsDID := ftemplate('key','contactsdid','main');	
 	export Finance := ftemplate('key','finance','main');
 	export Incorporation := ftemplate('key','incorporation','main');
 	export Industry := ftemplate('key','industry','main');
@@ -42,7 +43,8 @@ module
 			Party.dAll_filenames;
 	end;
 	export LinkDiagnostic := ftemplate('key','linkdiagnostic','main');
-	export LLID := ftemplate('key','llid','main');
+	export LLID12 := ftemplate('key','llid12','main');
+	export LLID9 := ftemplate('key','llid9','main');
 	export MatchDiagnostic := ftemplate('key','matchdiagnostic','main');
 	export MotorVehicle := module
 	  export Main  := ftemplate('key','motorvehicle','main');
@@ -102,7 +104,8 @@ module
 		+ License.dAll_filenames
 		+ Liens.dAll_filenames
 		+ LinkDiagnostic.dAll_filenames
-		+ LLID.dAll_filenames
+		+ LLID12.dAll_filenames
+		+ LLID9.dAll_filenames
 		+ MatchDiagnostic.dAll_filenames
 		+ MotorVehicle.dAll_filenames
 		+ NamesFEINs.dAll_filenames

@@ -30,7 +30,7 @@ function
 	end;
 
 	EmpFullOut_HashBDID EmpHashBDID(Layout.Employment_Out_bipv2 l) := transform                            
-	 self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1), intformat((unsigned6)l.did,12,1));
+	 self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1), intformat((unsigned6)l.did,15,1)); 
 	 self := l;
 	end;
 
@@ -65,7 +65,7 @@ function
 	end;
 
 	rEmp_withHash addHash(Layout.Employment_Out_bipv2 l) := transform                            
-	 self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1), l.company_title, l.lname, l.fname);
+	 self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1), l.company_title, l.lname, l.fname);
 	 self := l;
 	end;
 
@@ -99,7 +99,7 @@ function
 	end;
 
 	rFullOut_HashBDID tHashBDID(Layout.Employment_Out_bipv2 l) := transform                            
-	 self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1));
+	 self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1));
 	 self := l;
 	end;
 
@@ -186,11 +186,42 @@ function
 																								attr );
 	Base_File_In := attr();
 	
-	UNSIGNED6 endMax := MAX(paw.File_Base, contact_id);
+	//UNSIGNED6 endMax := MAX(paw.File_Base, contact_id);
 	
 	paw.Layout.Employment_Out_bipv2 reformated_header(Base_File_In L, INTEGER c) := 
 	transform
-			self.contact_id 		:= endMax + c;
+			self.contact_id 		:= hash64(l.did,
+																		l.bdid,
+																		l.ssn,
+																		l.company_name,
+																		l.company_prim_range,
+																		l.company_predir,
+																		l.company_prim_name,
+																		l.company_addr_suffix,
+																		l.company_unit_desig,
+																		l.company_sec_range,
+																		l.company_city,
+																		l.company_state,
+																		l.company_zip,
+																		l.company_title,
+																		l.company_phone,
+																		l.company_fein,
+																		l.fname,
+																		l.mname,
+																		l.lname,
+																		l.name_suffix,
+																		l.prim_range,
+																		l.predir,
+																		l.prim_name,
+																		l.addr_suffix,
+																		l.unit_desig,
+																		l.sec_range,
+																		l.city,
+																		l.state,
+																		l.zip,
+																		l.phone,
+																		l.email_address,
+																		l.source);
 			self.bdid 					:= (unsigned6)l.bdid;
 			self.did  					:= (unsigned6)l.did;
 			self.old_score			:= L.score;
@@ -208,4 +239,3 @@ function
 	return File_To_Process_To_Key;
 
 end;
-	

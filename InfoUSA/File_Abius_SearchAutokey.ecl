@@ -36,6 +36,6 @@ rec tNormalizeAddr(dbase l,unsigned1 pCounter) := transform
 	self 				     		:= l;
 end;
 
-b:=project(dbase,tNormalizeAddr(left,2));
+b:=normalize(dbase,2,tNormalizeAddr(left,counter));
 
  export File_Abius_SearchAutokey := b;

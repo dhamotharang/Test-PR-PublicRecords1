@@ -1,9 +1,7 @@
 /*
-	Count the number of matches across all concept components using appropriately selected component
-  xxx_cnt count. Since the e1p_cnt and e2p_cnt counts represent the number of instances where both EDIT1/2 
-  and PHONETIC matches were detected, an adjustment is made in these two cases to use e1_cnt+p_cnt-e1p_cnt
-  or e2_cnt+p_cnt-e2p_cnt instead, as these counts represent the number of instances where either EDIT1/2 
-  or PHONETIC matches were detected.
+	The countfieldX parameter takes one of the following values: e1_cnt,e2_cnt,e1p_cnt,e2p_cnt,p_cnt.
+	Use values associated with these field names, unless e1p_cnt or e2p_cnt names are passed in. When
+	e1p_cnt or e2p_cnt are passed in, they get replaced with e1_cnt or e2_cnt.
 */
 EXPORT MAC_Concept4_Specificities(addfield,infile1,infield1,countfield1,infile2,infield2,countfield2,infile3,infield3,countfield3,infile4,infield4,countfield4,outfile) := MACRO
 #uniquename(change_countfield1)
@@ -28,12 +26,12 @@ EXPORT MAC_Concept4_Specificities(addfield,infile1,infield1,countfield1,infile2,
   UNSIGNED8 addfield;
   END;
 #uniquename(file1)
-%file1%:=PROJECT(infile1,TRANSFORM(%r%,SELF.addfield:=#IF(%change_countfield1%) LEFT.#EXPAND(%changed_countfield1%)+LEFT.p_cnt-LEFT.countfield1 #ELSE LEFT.countfield1 #END;;SELF:=LEFT));	
+%file1%:=PROJECT(infile1,TRANSFORM(%r%,SELF.addfield:=#IF(%change_countfield1%) LEFT.#EXPAND(%changed_countfield1%) #ELSE LEFT.countfield1 #END;;SELF:=LEFT));	
 #uniquename(file2)
-%file2%:=JOIN(%file1%,infile2,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield2,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%change_countfield2%) (RIGHT.#EXPAND(%changed_countfield2%)+RIGHT.p_cnt-RIGHT.countfield2) #ELSE RIGHT.countfield2 #END;;SELF:=LEFT;),LEFT OUTER);
+%file2%:=JOIN(%file1%,infile2,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield2,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%change_countfield2%) (RIGHT.#EXPAND(%changed_countfield2%)) #ELSE RIGHT.countfield2 #END;;SELF:=LEFT;),LEFT OUTER);
 #uniquename(file3)
-%file3%:=JOIN(%file2%,infile3,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield3,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%change_countfield3%) (RIGHT.#EXPAND(%changed_countfield3%)+RIGHT.p_cnt-RIGHT.countfield3) #ELSE RIGHT.countfield3 #END;;SELF:=LEFT;),LEFT OUTER);
+%file3%:=JOIN(%file2%,infile3,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield3,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%change_countfield3%) (RIGHT.#EXPAND(%changed_countfield3%)) #ELSE RIGHT.countfield3 #END;;SELF:=LEFT;),LEFT OUTER);
 #uniquename(file4)
-%file4%:=JOIN(%file3%,infile4,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield4,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%change_countfield4%) (RIGHT.#EXPAND(%changed_countfield4%)+RIGHT.p_cnt-RIGHT.countfield4) #ELSE RIGHT.countfield4 #END;;SELF:=LEFT;),LEFT OUTER);
+%file4%:=JOIN(%file3%,infile4,LEFT.infield1=(TYPEOF (infile1.infield1))RIGHT.infield4,TRANSFORM(%r%,SELF.addfield:=LEFT.addfield+#IF(%change_countfield4%) (RIGHT.#EXPAND(%changed_countfield4%)) #ELSE RIGHT.countfield4 #END;;SELF:=LEFT;),LEFT OUTER);
 outfile:=%file4%;
 ENDMACRO;

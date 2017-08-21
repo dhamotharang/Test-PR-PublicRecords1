@@ -4,7 +4,7 @@ integer8 monthsever(string6 strdate) :=
 	((integer)(strdate[1..4])) * 12 + 
 	((integer)(strdate[5..6]));
 
-f0 := file_header_filtered;
+f0 := file_header_filtered(~(lname='INVEST' and src in mdr.sourceTools.set_Utility_sources));
 bln := bestlastname_sub1(lname = '');
 
 f0 extract_subset(f0 L, bln R) := transform
@@ -12,6 +12,8 @@ f0 extract_subset(f0 L, bln R) := transform
 end;
 
 f := join(f0,bln,left.did = right.did,extract_subset(LEFT,RIGHT),hash);
+
+Mac_Bucket_Dates (f, dt_last_seen, ,dt_vendor_last_reported, ,3, date_bucket, date_bucket_f)
 
 rfields := record
 unsigned6     did;
@@ -22,15 +24,15 @@ qstring20	    fname;
 unsigned1	    mult;
 end;
 
-rfields slim(f le) := transform
-self.dt_last_seen := ((integer)(ut.GetDate[1..6])-if(le.dt_last_seen=0,le.dt_vendor_last_reported,le.dt_last_seen))/3;
+rfields slim(date_bucket_f le) := transform
+self.dt_last_seen := le.date_bucket;
 self.dt_first_seen := if(le.dt_first_seen=0,le.dt_vendor_first_reported,le.dt_first_seen);
 self.mult := 1;
 self := le;
 end;
 
 //set the date last seen by finding how many quarters the max date is from today
-slim_h := project(f,slim(left));
+slim_h := project(date_bucket_f,slim(left));
 
 bfs1 := bestfirstname_sub1;
 

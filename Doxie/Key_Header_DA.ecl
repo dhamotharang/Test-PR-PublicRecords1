@@ -1,4 +1,4 @@
-import header;
+import header,ut;
 t := header.Prepped_For_Keys;
 
 stflcrec := record
@@ -25,4 +25,4 @@ stflcrec := record
 
 recs := dedup( sort( table( t,stflcrec ), record), record );
 
-export Key_Header_DA := INDEX(recs, {recs}, '~thor_data400::key::header.da_' + version_superkey, OPT);
+export Key_Header_DA := INDEX(recs, {recs}, ut.Data_Location.Person_header+'thor_data400::key::header.da_' + version_superkey, OPT);

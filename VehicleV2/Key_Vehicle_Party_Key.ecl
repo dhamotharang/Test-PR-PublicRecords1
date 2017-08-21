@@ -10,7 +10,7 @@ layout_std_lienholder_lkp := RECORD
 	STRING70	std_lienholder_name;
 END;
 
-file_std_lienholder_lkp := DATASET(ut.foreign_prod+ '~thor_data400::lookup::vehiclesv2::std_lienholder', layout_std_lienholder_lkp, CSV(SEPARATOR('|')));
+file_std_lienholder_lkp := DATASET('~thor_data400::lookup::vehiclesv2::std_lienholder', layout_std_lienholder_lkp, CSV(SEPARATOR('|')));
 
 layout_Key_Vehicle_Party_Key
 	:=

@@ -1,4 +1,4 @@
-lTNFullBaseName := (Drivers.cluster + 'in::drvlic_tn_full_');
+/*lTNFullBaseName := (Drivers.cluster + 'in::drvlic_tn_full_');
 
 rPre20040409Layout
  :=
@@ -81,21 +81,8 @@ Drivers.Layout_TN_Full tPre20040409toCurrent(rPre20040409Layout pInput)
  ;
 
 dPre20040409asCurrent	:= project(dFile_TN_Full_Pre20040409,tPre20040409toCurrent(left));
-
+*/
 export File_TN_Full
- := dPre20040409asCurrent
- +	dataset(lTNFullBaseName + '20040409',drivers.Layout_TN_Full,flat)
- +	dataset(lTNFullBaseName + '20040614',drivers.Layout_TN_Full,flat)
- +	dataset(lTNFullBaseName + '20040813',drivers.Layout_TN_Full,flat)
- +	dataset(lTNFullBaseName + '20040927',drivers.Layout_TN_Full,flat)
- +	dataset(lTNFullBaseName + '20041027',drivers.Layout_TN_Full,flat)
- +	dataset(lTNFullBaseName + '20041127',drivers.Layout_TN_Full,flat)
- +	dataset(lTNFullBaseName + '20041217',drivers.Layout_TN_Full,flat)
- +	dataset(lTNFullBaseName + '20050117',drivers.Layout_TN_Full,flat)
- +	dataset(lTNFullBaseName + '20050314',drivers.Layout_TN_Full,flat)
- +	dataset(lTNFullBaseName + '20050422',drivers.Layout_TN_Full,flat)
- +	dataset(lTNFullBaseName + '20050516',drivers.Layout_TN_Full,flat)
- +	dataset(lTNFullBaseName + '20050616',drivers.Layout_TN_Full,flat)
- +	dataset(lTNFullBaseName + '20050714',drivers.Layout_TN_Full,flat)
- +	dataset(lTNFullBaseName + '20050816',drivers.Layout_TN_Full,flat)
+ := //dPre20040409asCurrent +	
+ dataset(Drivers.Cluster + 'in::drvlic_tn_full', drivers.Layout_TN_Full,thor) 
  ;

@@ -1,28 +1,3 @@
-/*
- * The input record set is a graph with each record representing an edge and each
- * id is a vertex. This function identifies non-overlapping cliques and for each clique,
- * the output will contain a link from each id to the lowest numbered id in that
- * clique. In the output, did1 will always be greater than did2.
- *
- * For each id in the input, only the records with the highest conf will be evaluated.
- * This means that each edge in the clique must have the same conf.
- * dover is not used.
- * All else being equal, the lowest rule_num is kept for each edge.
- *
- * EXAMPLES:
- * INPUT                         OUPUT
- * ======                        ======
- * 2->1                          2->1
- * 3->1                          3->1
- * 3->2 
- * -----------------------------------------
- * 2->1                          2->1
- * 3->1                       
- * -----------------------------------------
- * 2->1                          2->1
- * 3->2                          4->3
- * 4->3
- */
 EXPORT mac_avoid_transitives(ifile, did1, did2, conf, dover, rule_num, ofile) := macro
 	// First remove the simplest dups
 	// Dedupping before sorting can remove many dups before the sort and often helps with
@@ -65,12 +40,9 @@ EXPORT mac_avoid_transitives(ifile, did1, did2, conf, dover, rule_num, ofile) :=
 	
 	// output(sort(%only_mutual%,did2,did1),named('only_mutual'),all);
 	
-	// only_top_side contains only a single record for each edge (the one with the highest
-	// conf) and ids are ordered so that did1 is always greater than did2. 
 	#uniquename(only_top_side)
 	%only_top_side% := %only_mutual%(did1 > did2);
 	// output(sort(%only_top_side%,did2,did1),named('only_top_side'),all);
-
 	#uniquename(statusEnum)
 	%statusEnum% := ENUM(unsigned1, UNKNOWN, GOOD, BAD, ADD);
 	#uniquename(statusRec)
@@ -80,20 +52,19 @@ EXPORT mac_avoid_transitives(ifile, did1, did2, conf, dover, rule_num, ofile) :=
 	};
 	#uniquename(loopFunc)
 	// The input dataset is only records with an unknown status. The LOOP
-	// declaration will filter out any record which doesn't have a known status
+	// declaration will filter out any record witch doesn't have an unknown status
 	// so that we don't try to process them multiple times.
 	// Each iteration of the loop only tries to set the status of "terminal" links:
 	// ones where the "target" (did2) doesn't link to a "source" (did1).
-	// First a single edge is chosen for each unique terminal did2, then it is built upon
-	// to make as large as a clique as possible that includes that edge.
+	// First a single good record is chosen for each did2, then it is built upon
+	// to make a group of all good links associated with it.
 	%loopFunc%(dataset(%statusRec%) unknown) := function
-		// These are the records where "target" is not a "source" in another record.
+		// These are the records where "target" is not a "source" in another record
+		// and therefore there are no transitives in this dataset.
 		terminalDups := join(distribute(unknown, hash(did2)), unknown,
 		                     left.did2 = right.did1,
 		                     transform(left), left only, local);
 		// Remove all of the 'sources' if they are targetted by someone superior or equal
-		// TODO: removeLowConf does nothing because lower conf records were already removed.
-		//       This need to be removed from the code.
 		removeLowConf := join(distribute(terminalDups, hash(did1)), distribute(unknown, hash(did2)),
 		                      left.did1 = right.did2 and left.conf < right.conf,
 		                      transform(left), left only, local);
@@ -102,10 +73,8 @@ EXPORT mac_avoid_transitives(ifile, did1, did2, conf, dover, rule_num, ofile) :=
 		unknownRemoveTerminal := join(distribute(unknown, hash(did2)), distribute(terminalDups, hash(did2)),
 		                              left.did2 = right.did2,
 		                              transform(left), left only, local);
-		// Choose one record for each did2. This is a 2 vertex clique that will be built
-		// upon to generate the largest clique possible. Ideally these will be maximal cliques
-		// but this code doesn't always achieve that. At the very least, these single edge
-		// cliques will be included in the output.
+		// Choose one record for each did2. Call this one good and then we'll build up as much
+		// of a group as we can from it.
 		goodOne := project(dedup(sort(distribute(terminal, hash(did2)), did2, did1, local), did2, local),
 		                   transform(recordof(left),
 		                     self._status := %statusEnum%.GOOD,
@@ -118,7 +87,7 @@ EXPORT mac_avoid_transitives(ifile, did1, did2, conf, dover, rule_num, ofile) :=
 		goodSourceIdRec := {
 			typeof(ifile.did1) _good_source_id,
 		};
-		// Find all of the other records that link to a did2 from the single-edge cliques.
+		// These are other records that target the same id as the good recs.
 		potentialGood := join(distribute(terminal, hash(did2)), goodOne,
 		                      left.did2 = right.did2,
 		                      transform({recordof(left), goodSourceIdRec},
@@ -126,13 +95,11 @@ EXPORT mac_avoid_transitives(ifile, did1, did2, conf, dover, rule_num, ofile) :=
 		                        // self.target_id := right.did2,
 		                        self := left),
 		                      local);
-		// Each did1 in potentialGood2 forms a triangle with one of the single-edge clique.
+		// We only want to look at ones that target the goodOne recs.
 		potentialGood2 := join(distribute(potentialGood, hash(did1)), distribute(unknownRemoveTerminal, hash(did1)),
 		                       left.did1 = right.did1
 		                         and left._good_source_id = right.did2,
 		                       transform(left), local);
-		// Let's check if all of the triangles for each single-edge clique can come
-		// together to form a clique including all of them.
 		// Get all pairs of did1's that link to the same target_id.
 		did1Pairs := join(distribute(potentialGood2, hash(did2)), distribute(potentialGood2, hash(did2)),
 		                  left.did2 = right.did2
@@ -141,13 +108,12 @@ EXPORT mac_avoid_transitives(ifile, did1, did2, conf, dover, rule_num, ofile) :=
 		                    self.did1 := left.did1,
 		                    self.did2 := right.did1,
 		                    self.target_id := left.did2), local);
-		// These are pairs that aren't found so these did1's can't be included in the clique.
+		// These are pairs that aren't found
 		badRecs := join(distribute(did1Pairs, hash(did1)), distribute(unknownRemoveTerminal, hash(did1)),
 		                left.did1 = right.did1
 		                  and left.did2 = right.did2,
 		                transform(left), left only, local);
-		// Remove the bad ones, leaving only good. These are cliques we will include
-		// in the output.
+		// Remove the bad ones, leaving only good.
 		goodGroup := join(potentialGood2, badRecs,
 		                  left.did1 = right.did1,
 		                  transform(recordof(unknown),
@@ -155,12 +121,11 @@ EXPORT mac_avoid_transitives(ifile, did1, did2, conf, dover, rule_num, ofile) :=
 		                    self := left),
 		                  left only, hash);
 		allGood := distribute(goodGroup + goodOne, hash(did1));
-		// Links that are part of a clique are no longer an unknown.
+		// The unknowns shouldn't include the good links.
 		stillUnknown0 := join(distribute(unknownRemoveTerminal, hash(did1)), allGood,
 		                       left.did1 = right.did1,
 		                       transform(left), left only, local);
-		// Each id should only belong to one cluster so remove records that link to
-		// one of the found cliques.
+		// Remove records that target a good group so as to avoid transitives.
 		stillUnknown := join(distribute(stillUnknown0, hash(did2)), allGood,
 		                       left.did2 = right.did1,
 		                       transform(left), left only, local);

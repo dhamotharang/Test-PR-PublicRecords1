@@ -1,4 +1,4 @@
-import bankruptcyv2, did_add, ut, header_slimsort, didville, business_header,business_header_ss, address, watchdog;
+import bankruptcyv2, did_add, ut, header_slimsort, didville, business_header,business_header_ss, address, watchdog,mdr;
 
 file_in := BankruptcyV2.Mapping_BK_search_history ; 
 
@@ -32,7 +32,7 @@ PreDID_Rec taddDID(file_in L)
 Prefile	:= project(file_in,taddDID(left));
 
 //append DID
-matchset :=['A', 'z', 'S', 'P','4'];
+matchset :=['A', 'Z', 'S', 'P','4'];
 
 did_Add.MAC_Match_Flex(Prefile, matchset,
 	 ssn, '', fname, mname,lname, name_suffix, 
@@ -50,7 +50,7 @@ preBDID := postDID(cname <> '');
 
 business_header.MAC_Source_Match(preBDID,dPostSourceMatch,
 								 false,temp_BDID,
-								 false,'BK',	
+								 false,MDR.sourceTools.src_Bankruptcy,	
 								 TRUE, source_group,
 								 cname,
 								 prim_range,prim_name,sec_range,zip,
@@ -101,5 +101,5 @@ BankruptcyV2.layout_bankruptcy_search reformattemp(file_search_fein L)
 
 file_out := project(file_search_fein, reformattemp(left));
 
-export BK_DID_history := file_out : persist('~thor_data400::persist::bankruptcy::BK_DID_history');
+export BK_DID_history := distribute(file_out,hash(tmsid)) : persist('~thor_data400::persist::bankruptcy::BK_DID_history');
 

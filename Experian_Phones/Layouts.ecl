@@ -1,4 +1,4 @@
-﻿EXPORT Layouts := module
+EXPORT Layouts := module
 EXPORT Input := record
 	string15 Encrypted_Experian_PIN;     // 15 digit unique identifier
 	string3 Phone_1_digits;     // last 2 digits of a phone

@@ -1,7 +1,7 @@
 export Layout_Moxie_Deed_Mortgage_Property_Search := record
   
   string5   vendor_source_flag;
-  string14  fid;
+  string14  ln_fares_id;
   string8   process_date;
   string2   source_code;
   string5   title;
@@ -18,7 +18,7 @@ export Layout_Moxie_Deed_Mortgage_Property_Search := record
   string2   postdir;
   string10  unit_desig;
   string8   sec_range;
-  string25  cty2;
+  string25  p_city_name;
   string25  v_city_name;
   string2   st;
   string5   zip;

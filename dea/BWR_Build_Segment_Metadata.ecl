@@ -13,17 +13,20 @@ dateType := Text_Search.Types.SegmentType.DateType;
 numericType := Text_Search.Types.SegmentType.NumericType;
 groupType := Text_Search.Types.SegmentType.GroupSeg;
 ConcatSeg := Text_Search.Types.SegmentType.ConcatSeg;
-
+keyType := Text_search.Types.SegmentType.ExternalKey;
 
 segmentMetaData := DATASET([
-         {'license-number',  TextType,       [1]},
-        {'bus-activity',       TextType,       [2]},
+        {'license-number',  TextType,       [1]},
+        {'bus-activity',    TextType,       [2]},
         {'drug-schedules',  TextType,       [3]},
-        {'expiration-date', TextType,       [4]},
-         {'address',   TextType,       [5]},
-        {'person-name',        TextType,       [6]},
-				{'company-name',        TextType,       [7]}
-				
+        {'expiration-date', dateType,       [4]},
+        {'address',   		TextType,       [5]},
+        {'person-name',     TextType,       [6]},
+		{'company-name',    TextType,       [7]},
+		{'number', GroupType, [1]},
+		{'date', GroupType, [4]},
+		{'name', ConcatSeg, [6,7]},
+		{'EXTERNALKEY',       keyType, [250]}				
 				
 				], Text_Search.Layout_Segment_Definition);
 

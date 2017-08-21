@@ -1,4 +1,4 @@
-﻿Import STD,UT;
+Import STD,UT;
 EXPORT Healthcare_SocioEconomic_Functions_V2 := Module
 	export calcAge(STRING8 inDOB) := function
 		AgeinYears := (string)ut.GetAge(inDOB);

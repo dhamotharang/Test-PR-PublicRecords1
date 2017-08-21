@@ -8,7 +8,6 @@ macro
 	not pInput.rel_group
 	and	(
 						pInput.corp_charter_number
-				or	pInput.business_registration
 				or	pInput.duns_number
 				or	pInput.edgar_cik
 				or	pInput.name_address
@@ -36,6 +35,33 @@ macro
 										or	pInput.phone
 									)
 						)
+				or	(
+									pInput.business_registration
+									and (
+													 pInput.corp_charter_number 	
+												or pInput.bankruptcy_filing 	
+												or pInput.duns_number 					
+												or pInput.duns_tree							
+												or pInput.edgar_cik							
+												or pInput.name									
+												or pInput.name_address					
+												or pInput.name_phone						
+												or pInput.gong_group						
+												or pInput.ucc_filing						
+												or pInput.fbn_filing						
+												or pInput.fein									
+												or pInput.phone									
+												or pInput.addr									
+												or pInput.mail_addr							
+												or pInput.dca_company_number 		
+												or pInput.dca_hierarchy					
+												or pInput.abi_number						
+												or pInput.abi_hierarchy					
+												or pInput.lien_properties				
+												or pInput.liens_v2 							
+									)
+						)
+
 			)
 )
 

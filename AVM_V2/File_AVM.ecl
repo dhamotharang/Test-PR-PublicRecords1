@@ -242,8 +242,8 @@ blended := join(merged, avm_v2.File_Model_Accuracy_Table,
 				
 // output(blended,,'~thor_data400::avm_v2::avm_base_full_' + history_date, __compressed__, overwrite);	
 
-// filter out any records that don't have a confidence score of at least 25
-cutoff := blended(confidence_score >= 25);
+// filter out any records that don't have a confidence score of at least 25 and anything over 20 Million bucks
+cutoff := blended(confidence_score >= 25 and automated_valuation < 20000000);
 
 r := record
   string5 fips_code;

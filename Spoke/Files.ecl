@@ -1,4 +1,4 @@
-import versioncontrol;
+import tools;
 export Files(
 
 	 string		pversion = ''
@@ -13,13 +13,13 @@ module
 	//////////////////////////////////////////////////////////////////
 	// -- Input File Versions
 	//////////////////////////////////////////////////////////////////
-	versioncontrol.macInputFileVersions(Filenames(pversion,pUseProd).input	,layouts.Input.Sprayed	,Input	,'CSV','','\r\n',pDelimiter,1,pMaxLength := max_size);
+	export Input := tools.macf_FilesInput(Filenames(pversion,pUseProd).input	,layouts.Input.Sprayed  ,'CSV','','\r\n',pDelimiter,1,pMaxLength := max_size);
 
 	//////////////////////////////////////////////////////////////////
 	// -- Base File Versions
 	//////////////////////////////////////////////////////////////////
-	versioncontrol.macBuildFileVersions(Filenames(pversion,pUseProd).Base		,layouts.Base						,Base			);
-	versioncontrol.macBuildFileVersions(Filenames(pversion,pUseProd).Base		,layouts_old.Base				,BaseOld	);
+	export Base		 := tools.macf_FilesBase(Filenames(pversion,pUseProd).Base		,layouts.Base						);
+	export BaseOld := tools.macf_FilesBase(Filenames(pversion,pUseProd).Base		,layouts_old.Base				);
 
 
 //export StandardizeInput	:= dataset		(Persistnames().StandardizeInput	,layouts.Temporary	,flat);

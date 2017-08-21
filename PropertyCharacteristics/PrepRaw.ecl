@@ -13,9 +13,14 @@ module
 	shared	unsigned	maxMLS2PropertyID	:=	max(PropertyCharacteristics.Files.Prepped.MLS2,(unsigned)BBPropertyID[5..])				:	global;
 	shared	unsigned	maxMLS3PropertyID	:=	max(PropertyCharacteristics.Files.Prepped.MLS3,(unsigned)BBPropertyID[5..])				:	global;
 	shared	unsigned	maxMLS4PropertyID	:=	max(PropertyCharacteristics.Files.Prepped.MLS4,(unsigned)BBPropertyID[5..])				:	global;
-	shared	unsigned	maxIns1PropertyID	:=	max(PropertyCharacteristics.Files.Prepped.Insurance1,(unsigned)BBPropertyID[5..])	:	global;
-	// shared	unsigned	maxIns2PropertyID	:=	max(PropertyCharacteristics.Files.Prepped.Insurance2,(unsigned)BBPropertyID[5..])	:	global;
-	shared	unsigned	maxApprPropertyID	:=	max(PropertyCharacteristics.Files.Prepped.Appraiser,(unsigned)BBPropertyID[5..])	:	global;
+	shared	unsigned	maxIns1PropertyID	:=	0;	//since it's a complete replacement file
+	shared	unsigned	maxApprPropertyID	:=	0;	//since it's a complete replacement file
+	
+	
+/* 	shared	unsigned	maxIns1PropertyID	:=	max(PropertyCharacteristics.Files.Prepped.Insurance1,(unsigned)BBPropertyID[5..])	:	global;
+   	shared	unsigned	maxIns2PropertyID	:=	max(PropertyCharacteristics.Files.Prepped.Insurance2,(unsigned)BBPropertyID[5..])	:	global;
+   	shared	unsigned	maxApprPropertyID	:=	max(PropertyCharacteristics.Files.Prepped.Appraiser,(unsigned)BBPropertyID[5..])	:	global;
+*/
 	
 	// Prep function for MLS1
 	PropertyCharacteristics.Layout_In.MLS1_Prepped	tMLS1Prepped(PropertyCharacteristics.Layout_In.MLS1	pInput,integer	cnt)	:=
@@ -239,7 +244,7 @@ module
 
 	// Prep function for INS1
 	// Dedup the dataset by PolicyID
-	dIns1RawDist	:=	distribute(PropertyCharacteristics.Files.Raw.Insurance1,(unsigned)PolicyID);
+	dIns1RawDist	:=	distribute(PropertyCharacteristics.Files.Raw.Insurance1(PolicyID	not in	['297318','297341','297643']),(unsigned)PolicyID);
 	dIns1RawDedup	:=	dedup(dIns1RawDist,PolicyID,all,local);
 	
 	// Reformat to prepped layout
@@ -320,19 +325,18 @@ module
 	dIns1StructureDetailDedup	:=	dedup(dIns1StructureDetailDist,record,all,local);
 	
 	// Create a child dataset for the structure attributes
-	PropertyCharacteristics.Layout_In.BlueBook_Prepped	tStructureDetailDenorm(	PropertyCharacteristics.Layout_In.BlueBook_Prepped					le,
-																																							dataset(PropertyCharacteristics.Layout_In.StructureDetail)	ri
+	PropertyCharacteristics.Layout_In.BlueBook_Prepped	tStructureDetailDenorm(	PropertyCharacteristics.Layout_In.BlueBook_Prepped	le,
+																																							PropertyCharacteristics.Layout_In.StructureDetail		ri
 																																						)	:=
 	transform
-		self.IBCodes	:=	ri;
+		self.IBCodes	:=	le.IBCodes	+	ri;
 		self					:=	le;
 	end;
 	
 	dIns1StructureDetailDenorm	:=	denormalize(	dIns1AttrDenorm,
 																								dIns1StructureDetailDedup,
 																								left.PolicyID	=	(integer)right.PolicyID,
-																								group,
-																								tStructureDetailDenorm(left,rows(right)),
+																								tStructureDetailDenorm(left,right),
 																								local
 																							);
 	
@@ -365,14 +369,16 @@ module
 												hash
 											);
 	
-	outIns1Prepped	:=	output(dIns1RawAID,,'~thor_data400::in::propertybluebook::ins1::'	+	pFileDate,/*csv(separator('\t'),terminator('\n'),quote('')),*/__compressed__,overwrite);
+	outIns1Prepped	:=	output(dIns1RawAID,,'~thor_data400::in::propertybluebook::ins1::'	+	pFileDate,__compressed__,overwrite);
 	
 	superIns1Prepped	:=	sequential(	fileservices.startsuperfiletransaction(),
-																		fileservices.addsuperfile('~thor_data400::in::propertybluebook::ins1::raw_delete','~thor_data400::in::propertybluebook::ins1::raw',,true),
-																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::ins1::raw'),
+																		fileservices.addsuperfile('~thor_data400::in::propertybluebook::ins1_delete','~thor_data400::in::propertybluebook::ins1_father',,true),
+																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::ins1_father'),
+																		fileservices.addsuperfile('~thor_data400::in::propertybluebook::ins1_father','~thor_data400::in::propertybluebook::ins1',,true),
+																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::ins1'),
 																		fileservices.addsuperfile('~thor_data400::in::propertybluebook::ins1','~thor_data400::in::propertybluebook::ins1::'	+	pFileDate),
 																		fileservices.finishsuperfiletransaction(),
-																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::ins1::raw_delete',true)
+																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::ins1_delete',true)
 																	);
 	
 	export	Ins1_Prepped	:=	sequential(outIns1Prepped,superIns1Prepped);
@@ -461,26 +467,25 @@ module
 	dIns2StructureDetailDedup	:=	dedup(dIns2StructureDetailDist,record,all,local);
 	
 	// Create a child dataset for the structure attributes
-	PropertyCharacteristics.Layout_In.BlueBook_Prepped	tStructureDetailDenorm(	PropertyCharacteristics.Layout_In.BlueBook_Prepped					le,
-																																							dataset(PropertyCharacteristics.Layout_In.StructureDetail)	ri
+	PropertyCharacteristics.Layout_In.BlueBook_Prepped	tStructureDetailDenorm(	PropertyCharacteristics.Layout_In.BlueBook_Prepped	le,
+																																							PropertyCharacteristics.Layout_In.StructureDetail		ri
 																																						)	:=
 	transform
-		self.IBCodes	:=	ri;
+		self.IBCodes	:=	le.IBCodes	+	ri;
 		self					:=	le;
 	end;
 	
 	dIns2StructureDetailDenorm	:=	denormalize(	dIns2AttrDenorm,
 																								dIns2StructureDetailDedup,
 																								left.PolicyID	=	(integer)right.PolicyID,
-																								group,
-																								tStructureDetailDenorm(left,rows(right)),
+																								tStructureDetailDenorm(left,right),
 																								local
 																							);
 	
 	// Append sequence number
 	PropertyCharacteristics.Layout_In.BlueBook_Prepped	tIns2PropID(PropertyCharacteristics.Layout_In.BlueBook_Prepped	pInput,integer	cnt)	:=
 	transform
-		self.BBPropertyID	:=	'1INS'	+	intformat(maxIns2PropertyID+cnt,10,1);
+		self.BBPropertyID	:=	'2INS'	+	intformat(maxIns2PropertyID+cnt,10,1);
 		self							:=	pInput;
 	end;
 	
@@ -506,14 +511,16 @@ module
 												hash
 											);
 	
-	outIns2Prepped	:=	output(dIns2RawAID,,'~thor_data400::in::propertybluebook::Ins2::'	+	pFileDate,__compressed__,overwrite);
+	outIns2Prepped	:=	output(dIns2RawAID,,'~thor_data400::in::propertybluebook::ins2::'	+	pFileDate,__compressed__,overwrite);
 	
 	superIns2Prepped	:=	sequential(	fileservices.startsuperfiletransaction(),
-																		fileservices.addsuperfile('~thor_data400::in::propertybluebook::Ins2::raw_delete','~thor_data400::in::propertybluebook::Ins2::raw',,true),
-																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::Ins2::raw'),
-																		fileservices.addsuperfile('~thor_data400::in::propertybluebook::Ins2','~thor_data400::in::propertybluebook::Ins2::'	+	pFileDate),
+																		fileservices.addsuperfile('~thor_data400::in::propertybluebook::ins2_delete','~thor_data400::in::propertybluebook::ins2_father',,true),
+																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::ins2_father'),
+																		fileservices.addsuperfile('~thor_data400::in::propertybluebook::ins2_father','~thor_data400::in::propertybluebook::ins2',,true),
+																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::ins2'),
+																		fileservices.addsuperfile('~thor_data400::in::propertybluebook::ins2','~thor_data400::in::propertybluebook::ins2::'	+	pFileDate),
 																		fileservices.finishsuperfiletransaction(),
-																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::Ins2::raw_delete',true)
+																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::ins2_delete',true)
 																	);
 	
 	export	Ins2_Prepped	:=	sequential(outIns2Prepped,superIns2Prepped);
@@ -539,8 +546,8 @@ module
 																																			)	:=
 	transform
 		self.ProcessDate				:=	pProcessDate;
-		self.VendorSource				:=	'Appr';
-		self.PreppedLogicalName	:=	fnPreppedLogicalFileName('Appr');
+		self.VendorSource				:=	'APPR';
+		self.PreppedLogicalName	:=	fnPreppedLogicalFileName('appr');
 		self.Append_PrepAddr1		:=	stringlib.stringtouppercase(stringlib.stringcleanspaces(le.StreetName));
 		self.Append_PrepAddr2		:=	stringlib.stringtouppercase(regexreplace(	'[,]$',
 																																					stringlib.stringcleanspaces(		if(	le.City	!=	'',
@@ -602,26 +609,25 @@ module
 	dApprStructureDetailDedup	:=	dedup(dApprStructureDetailDist,record,all,local);
 	
 	// Create a child dataset for the structure attributes
-	PropertyCharacteristics.Layout_In.BlueBook_Prepped	tStructureDetailDenorm(	PropertyCharacteristics.Layout_In.BlueBook_Prepped					le,
-																																							dataset(PropertyCharacteristics.Layout_In.StructureDetail)	ri
+	PropertyCharacteristics.Layout_In.BlueBook_Prepped	tStructureDetailDenorm(	PropertyCharacteristics.Layout_In.BlueBook_Prepped	le,
+																																							PropertyCharacteristics.Layout_In.StructureDetail		ri
 																																						)	:=
 	transform
-		self.IBCodes	:=	ri;
+		self.IBCodes	:=	le.IBCodes	+	ri;
 		self					:=	le;
 	end;
 	
 	dApprStructureDetailDenorm	:=	denormalize(	dApprAttrDenorm,
 																								dApprStructureDetailDedup,
 																								left.PolicyID	=	(integer)right.PolicyID,
-																								group,
-																								tStructureDetailDenorm(left,rows(right)),
+																								tStructureDetailDenorm(left,right),
 																								local
 																							);
 	
 	// Append sequence number
 	PropertyCharacteristics.Layout_In.BlueBook_Prepped	tApprPropID(PropertyCharacteristics.Layout_In.BlueBook_Prepped	pInput,integer	cnt)	:=
 	transform
-		self.BBPropertyID	:=	'1INS'	+	intformat(maxApprPropertyID+cnt,10,1);
+		self.BBPropertyID	:=	'APPR'	+	intformat(maxApprPropertyID+cnt,10,1);
 		self							:=	pInput;
 	end;
 	
@@ -647,16 +653,18 @@ module
 												hash
 											);
 	
-	outApprPrepped	:=	output(dApprRawAID,,'~thor_data400::in::propertybluebook::Appr::'	+	pFileDate,/*csv(separator('\t'),terminator('\n'),quote('')),*/__compressed__,overwrite);
+	outApprPrepped	:=	output(dApprRawAID,,'~thor_data400::in::propertybluebook::appr::'	+	pFileDate,__compressed__,overwrite);
 	
 	superApprPrepped	:=	sequential(	fileservices.startsuperfiletransaction(),
-																		fileservices.addsuperfile('~thor_data400::in::propertybluebook::Appr::raw_delete','~thor_data400::in::propertybluebook::Appr::raw',,true),
-																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::Appr::raw'),
-																		fileservices.addsuperfile('~thor_data400::in::propertybluebook::Appr','~thor_data400::in::propertybluebook::Appr::'	+	pFileDate),
+																		fileservices.addsuperfile('~thor_data400::in::propertybluebook::appr_delete','~thor_data400::in::propertybluebook::appr_father',,true),
+																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::appr_father'),
+																		fileservices.addsuperfile('~thor_data400::in::propertybluebook::appr_father','~thor_data400::in::propertybluebook::appr',,true),
+																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::appr'),
+																		fileservices.addsuperfile('~thor_data400::in::propertybluebook::appr','~thor_data400::in::propertybluebook::appr::'	+	pFileDate),
 																		fileservices.finishsuperfiletransaction(),
-																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::Appr::raw_delete',true)
+																		fileservices.clearsuperfile('~thor_data400::in::propertybluebook::appr_delete',true)
 																	);
-	
+
 	export	Appr_Prepped	:=	sequential(outApprPrepped,superApprPrepped);
 
 end;

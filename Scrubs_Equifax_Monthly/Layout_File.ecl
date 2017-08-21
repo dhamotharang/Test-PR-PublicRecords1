@@ -1,0 +1,1 @@
+EXPORT Layout_File := recordof(Scrubs_Equifax_Monthly.In_File);

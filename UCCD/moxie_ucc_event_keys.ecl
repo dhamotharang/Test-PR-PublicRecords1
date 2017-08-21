@@ -4,14 +4,14 @@ import uccd,lib_keylib,lib_stringlib;
 
 
 Layout_WithExpEvent_Filepos := record
-	uccd.rec_withEXpEvent;
+	uccd.layout_moxie_withEXpEvent;
     unsigned integer8 __filepos { virtual(fileposition)};
 end;
 
  
 h := uccd.File_WithExpEvent2_Base_Dev;
 
-base_key_Name := '~thor_data400::key::moxie_ucc_events2.';
+base_key_Name := '~thor_data400::key::moxie.ucc2_events.';
 
 //output(h);
 

@@ -1,6 +1,6 @@
 IMPORT fcra, Bankrupt, ut;
 
-kf := dataset('~thor_data400::base::override::fcra::qa::bankrupt_search', fcra.Layout_Override_bk_search,flat);
+kf := dedup(sort(dataset('~thor_data400::base::override::fcra::qa::bankrupt_search', fcra.Layout_Override_bk_search,flat),-flag_file_id),except flag_file_id,keep(1));
 
 // to keep flag_file_id as a first field.
 layout_output := RECORD

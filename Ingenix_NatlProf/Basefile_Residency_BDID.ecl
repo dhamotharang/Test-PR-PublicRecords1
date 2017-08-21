@@ -1,0 +1,1 @@
+export Basefile_Residency_BDID := PROJECT(Ingenix_NatlProf.Basefile_Residency_BDID_BIP,TRANSFORM(Ingenix_NatlProf.Layout_Residency_Base,SELF := LEFT;));																																														

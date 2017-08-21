@@ -116,8 +116,7 @@ mk12 := buildindex(dedup(dd_phln(st<>''),st,phln,pct,advMatch,__filepos,all),{st
 
 n_phlnTbl norm2(n_phlnTbl L, unsigned1 cnt) := TRANSFORM
 
-self.normPhcn 	:= L.phcn[length(L.phcn)-cnt*4..length(L.phcn)-cnt*4+4];
-
+self.normPhcn 	:= L.phcn[((cnt-1)*4)+1..((cnt-1)*4)+4];;
 
 self := L;
 end;

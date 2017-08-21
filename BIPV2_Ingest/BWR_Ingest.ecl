@@ -2,7 +2,7 @@
 #OPTION('multiplePersistInstances', FALSE);
 #workunit('name','BIPV2_Ingest.BWR_Ingest - Ingest - SALT V3.5.2');
 IMPORT BIPV2_Ingest,SALT35;
-//If you are not ingesting as part of a header build you can use the below;
+//If you are not ingesting as part of a header build you can use the below; 
 //Set incremental to TRUE to run an incremental ingest mode
 MyDelta := DATASET([],BIPV2_Ingest.Layout_BASE);
 ingestMod := BIPV2_Ingest.Ingest(FALSE,MyDelta);

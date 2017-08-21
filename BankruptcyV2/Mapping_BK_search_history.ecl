@@ -2,14 +2,14 @@ import bankruptcyV2, address;
 
 formatearliestdates(string8 ldate ,string8 rdate) := function
 
-out_date := if((unsigned8)lDate = 0, rDate,if((unsigned8)rDate = 0,lDate,if(lDate < rDate,lDate, rDate)));
+out_date := if((unsigned8)lDate = 0, rDate,if((unsigned8)rDate = 0,lDate,if((unsigned8)lDate <= (unsigned8)rDate,lDate, rDate)));
 
 return out_date ;
 end ;
 
 formatlatestdates(string8 ldate ,string8 rdate) := function
 
-out_date := if((unsigned8)lDate = 0,rDate,if((unsigned8)rDate = 0,lDate,if(lDate > rDate, lDate, rDate )));
+out_date := if((unsigned8)lDate = 0,rDate,if((unsigned8)rDate = 0,lDate,if((unsigned8)lDate >= (unsigned8)rDate, lDate, rDate )));
 return out_date ;
 end ;
 
@@ -53,16 +53,22 @@ self.date_first_seen                :=      L.date_first_seen;
 self.date_last_seen                 :=      L.date_last_seen;
 self.date_vendor_first_reported     :=      L.process_date;
 self.date_vendor_last_reported      :=      L.process_date;
+self.cname                  :=      StringLib.StringToUpperCase(L.cname); 
+self.orig_company           :=      StringLib.StringToUpperCase(L.orig_company); 
+self.orig_name              :=      StringLib.StringToUpperCase(L.orig_name); 
+self.orig_fname             :=      StringLib.StringToUpperCase(L.orig_fname); 
+self.orig_mname             :=      StringLib.StringToUpperCase(L.orig_mname); 
+self.orig_lname             :=      StringLib.StringToUpperCase(L.orig_lname); 
+self.orig_name_suffix       :=      StringLib.StringToUpperCase(L.orig_name_suffix);
 self := L;
 end;
 
 mapping_file := project(distribute(file_in,hash(tmsid)), treformat(left));
 
-file_sort  := sort(mapping_file,TMSID,court_code,case_number,orig_case_number,SSN,TAX_ID,name_type,
+file_sort  := sort(mapping_file,TMSID,orig_case_number,SSN,TAX_ID,name_type,
              fname,mname,lname,name_suffix,cname,prim_range, predir, prim_name, addr_suffix, postdir, unit_desig, sec_range, p_city_name,v_city_name, st, zip, zip4, county,
              -date_last_seen,debtor_seq,local);
 
-// ALL ORIG FILEDS ARE EMPTY IN HISTORY FILE SO ROLLUP DOESN'T USE ORIG FIELDS.
 
 BankruptcyV2.layout_bankruptcy_search  rolluplatestparties(BankruptcyV2.layout_bankruptcy_search l, BankruptcyV2.layout_bankruptcy_search r) := transform
 		
@@ -74,13 +80,12 @@ BankruptcyV2.layout_bankruptcy_search  rolluplatestparties(BankruptcyV2.layout_b
 		self := l;
 end;
 
-export Mapping_BK_search_history := rollup(file_sort,left.tmsid = right.tmsid and left.court_code = right.court_code and
-    left.case_number= right.case_number and left.orig_case_number= right.orig_case_number and 
+export Mapping_BK_search_history := rollup(file_sort,left.tmsid = right.tmsid and left.orig_case_number= right.orig_case_number and
     left.SSN = right.ssn and left.TAX_ID = right.tax_id and left.name_type = right.name_type
     and left.fname= right.fname and left.mname = right.mname and 
     left.lname= right.lname and left.name_suffix= right.name_suffix and left.cname = right.cname and 
-	left.prim_range= right.prim_range and 
-    left.predir= right.predir and left.prim_name= right.prim_name and  left.addr_suffix= 
+	left.prim_range= right.prim_range and left.predir= right.predir and
+    left.prim_name= right.prim_name and  left.addr_suffix= 
     right.addr_suffix and left.postdir= right.postdir and left.unit_desig= right.unit_desig and 
     left.sec_range = right.sec_range and left.p_city_name= right.p_city_name and left.v_city_name= right.v_city_name
     and left.st = right.st and left.zip = right.zip  and left.zip4= right.zip4

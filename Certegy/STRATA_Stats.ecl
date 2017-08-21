@@ -1,6 +1,8 @@
 import STRATA;
+EXPORT STRATA_Stats(string filedate) := function
+
 pCertegy_base:=Files.certegy_base;
-pVersion:=Version;
+pVersion:=filedate;
 
 rPopulationStats_Certegy_base
  :=
@@ -87,7 +89,9 @@ STRATA.createXMLStats(dPopulationStats_Certegy_base
 					 ,'DL'
 					 ,'Certegy DL'
 					 ,pVersion
-					 ,'jbello@seisint.com'
+					 ,_Control.MyInfo.EmailAddressNotify
 					 ,zCertegy_base);
 
-EXPORT STRATA_Stats := zCertegy_base;
+retval := zCertegy_base;
+return retval;
+end;

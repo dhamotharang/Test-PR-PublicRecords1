@@ -37,7 +37,11 @@ ssns_done := ssns_app + sd3((unsigned8)ssn=0);
 //by_nmaddr := distribute(ssns_done,hash(fname,lname,zip,prim_range,prim_name));
 by_nmaddr := ssns_done;
 
-typeof(sd3)  add_addr_flag(sd3 le,wbna ri,boolean safeFnameInitial = false) := transform
+by_nmaddr_	:= project(by_nmaddr, transform({sd3, string1 mphfname1:=''}
+									,self.mphfname1:=metaphonelib.DMetaPhone1(left.fname)[1]
+									,self:=left));
+
+typeof(by_nmaddr_)  add_addr_flag(by_nmaddr_ le,wbna ri,boolean safeFnameInitial = false) := transform
   self.good_nmaddr := MAP( 	ri.lname = '' and safeFnameInitial	=> le.good_nmaddr,  //this to handle non hits in the second join
 														ri.dob_min=0 												=> -1, 
 														ri.dob_min=99999999 								=> 0, 
@@ -46,7 +50,7 @@ typeof(sd3)  add_addr_flag(sd3 le,wbna ri,boolean safeFnameInitial = false) := t
   self := le;
   end; 
 
-addrs_app1 := join(by_nmaddr,wbna(length(trim(fname)) > 1),
+addrs_app0 := join(by_nmaddr_,wbna(length(trim(fname)) > 1),
 																					 left.fname=right.fname and 
                                            left.lname=right.lname and
                                            left.zip=right.zip and
@@ -57,13 +61,16 @@ addrs_app1 := join(by_nmaddr,wbna(length(trim(fname)) > 1),
 	
 	
 
-addrs_app := join(addrs_app1,wbna(length(trim(fname)) = 1),
-										metaphonelib.DMetaPhone1(left.fname)[1]= right.fname and 
+addrs_app1 := join(addrs_app0,wbna(length(trim(fname)) = 1),
+					left.mphfname1 = right.fname and 
                     left.lname=right.lname and
                     left.zip=right.zip and
                     left.prim_range=right.prim_range and
                     left.prim_name=right.prim_name
                    ,add_addr_flag(left,right,true),hash,left outer);
+
+addrs_app := project(addrs_app1,recordof(sd3));
+
 
 rare_names := header.fn_rare_names(sd3);
 

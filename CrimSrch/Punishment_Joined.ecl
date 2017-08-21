@@ -1,6 +1,6 @@
-import CrimSrch, Crim_Common;
+import CrimSrch, Crim_Common, hygenics_search;
 
-Layout_Moxie_Punishment tDOCtoCrimSrchPunishment(Crim_Common.Layout_Moxie_DOC_Punishment.previous pInput)
+Layout_Moxie_Punishment tDOCtoCrimSrchPunishment(hygenics_search.Layout_Moxie_DOC_Punishment pInput)
  :=
   transform
 	self.date_first_reported	:= pInput.process_date; 
@@ -51,10 +51,11 @@ Layout_Moxie_Punishment tDOCtoCrimSrchPunishment(Crim_Common.Layout_Moxie_DOC_Pu
 												pInput.latest_adm_dt => 'I',
 												''
 											   );
+	self 								:= pInput;
   end
  ;
 
-lPunishmentProcessed := project(File_DOC_Punishment,tDOCtoCrimSrchPunishment(left));
+lPunishmentProcessed := project(hygenics_search.File_DOC_Punishment,tDOCtoCrimSrchPunishment(left));
 
 #if(CrimSrch.Switch_ShouldUsePersists = CrimSrch.Switch_YesValue)
 export Punishment_Joined

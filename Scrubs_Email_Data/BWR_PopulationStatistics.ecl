@@ -1,0 +1,7 @@
+//This is the code to execute in a builder window
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','Scrubs_Email_Data.BWR_PopulationStatistics - Population Statistics - SALT V3.0 A21');
+IMPORT Scrubs_Email_Data,SALT30;
+// In the line below substitute the file you want statistics for; and substitute any field names you can
+  Scrubs_Email_Data.MAC_PopulationStatistics(In_Email_Data,/*Reference Field*/,email_src, clean_email, append_email_username, append_domain, append_domain_type, append_domain_root, append_domain_ext, append_is_tld_state, append_is_tld_generic, append_is_tld_country, append_is_valid_domain_ext, email_rec_key, email_src, rec_src_all, email_src_all, email_src_num, num_email_per_did, num_did_per_email, orig_pmghousehold_id, orig_pmgindividual_id, orig_first_name, orig_last_name, orig_address, orig_city, orig_state, orig_zip, orig_zip4, orig_email, orig_ip, orig_login_date, orig_site, orig_e360_id, orig_teramedia_id, did, did_score, did_type, is_did_prop, hhid, title, fname, mname, lname, name_suffix, name_score, prim_range, predir, prim_name, addr_suffix, postdir, unit_desig, sec_range, p_city_name, v_city_name, st, zip, zip4, cart, cr_sort_sz, lot, lot_order, dbpc, chk_digit, rec_type, county, geo_lat, geo_long, msa, geo_blk, geo_match, err_stat, append_rawaid, best_ssn, best_dob, process_date, activecode, date_first_seen, date_last_seen, date_vendor_first_reported, date_vendor_last_reported, current_rec,outfile);
+  OUTPUT(outfile,NAMED('PopulationStatistics'));

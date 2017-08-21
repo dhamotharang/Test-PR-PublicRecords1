@@ -107,9 +107,9 @@ EnFiles
 
 TnFiles
 	:=
-	  DATASET(TransunionCred.SuperFile_List.Updates_history_compressed, {string75 fn { virtual(logicalfilename)},TransunionCred.Layouts.update}, THOR)
-	+ DATASET(TransunionCred.SuperFile_List.Updates_father,             {string75 fn { virtual(logicalfilename)},TransunionCred.Layouts.update}, THOR)
-	+ DATASET(TransunionCred.SuperFile_List.load_father,                {string75 fn { virtual(logicalfilename)},TransunionCred.Layouts.load},   THOR)
+	  DATASET(TransunionCred.SuperFile_List.Updates_history_compressed, {string75 fn { virtual(logicalfilename)},TransunionCred.Layouts.update-cr}, THOR)
+	+ DATASET(TransunionCred.SuperFile_List.Updates_father,             {string75 fn { virtual(logicalfilename)},TransunionCred.Layouts.update-cr}, THOR)
+	+ DATASET(TransunionCred.SuperFile_List.load_father,                {string75 fn { virtual(logicalfilename)},TransunionCred.Layouts.load-cr},   THOR)
 	;
 
 fn_addresFromParts(String10	prim_range,String2	predir,String32	prim_name,String4	suffix,String2	postdir,String4	Unit_desig,String8	sec_range
@@ -240,10 +240,11 @@ bureau:=distribute(EQ + EN + TN
 output(bureau(dt_vendor_first_reported='00000000'));
 #end
 
-gp:=group(sort(bureau,src,region,vendor_id,curr_addr,prev_addr1,prev_addr2,prev_addr3,prev_addr4,prev_addr5,prev_addr6,prev_addr7,local),src,region,vendor_id);
+gp:=group(sort(bureau,src,region,vendor_id,curr_addr,prev_addr1,prev_addr2,prev_addr3,prev_addr4,prev_addr5,prev_addr6,prev_addr7,local),src,region,vendor_id)
+:independent;
 g:=rollup(gp,transform(layouts.prepped_nlr
 				,self.dt_vendor_first_reported:=(string)ut.min2((unsigned)left.dt_vendor_first_reported,(unsigned)right.dt_vendor_first_reported)
-				,self.dt_vendor_last_reported:=(string)ut.max2((unsigned)left.dt_vendor_last_reported,(unsigned)right.dt_vendor_last_reported)
+				,self.dt_vendor_last_reported:=(string)max((unsigned)left.dt_vendor_last_reported,(unsigned)right.dt_vendor_last_reported)
 				,self.nlr0:=max(left.nlr0,right.nlr0)
 				,self.nlr1:=max(left.nlr1,right.nlr1)
 				,self.nlr2:=max(left.nlr2,right.nlr2)
@@ -392,12 +393,12 @@ i8:=iterate(sort(i7,-dt_vendor_first_reported,-prev_addr7)
 				,self:=right
 			));
 
-export flagged_nlr_addresses := i8;
+export flagged_nlr_addresses := i8:independent;
 
 i8eq1:=group(sort(group(files.prepped_nlr(src='EQ')),src,vendor_id,curr_addr[1..7],prev_addr1[1..7],prev_addr2[1..7],prev_addr3[1..7],prev_addr4[1..7],prev_addr5[1..7],prev_addr6[1..7],prev_addr7[1..7],local),src,vendor_id);
 i8eq:=rollup(i8eq1,transform(layouts.prepped_nlr
 				,self.dt_vendor_first_reported:=(string)ut.min2((unsigned)left.dt_vendor_first_reported,(unsigned)right.dt_vendor_first_reported)
-				,self.dt_vendor_last_reported:=(string)ut.max2((unsigned)left.dt_vendor_last_reported,(unsigned)right.dt_vendor_last_reported)
+				,self.dt_vendor_last_reported:=(string)max((unsigned)left.dt_vendor_last_reported,(unsigned)right.dt_vendor_last_reported)
 				,self.nlr0:=min(left.nlr0,right.nlr0)
 				,self.nlr1:=min(left.nlr1,right.nlr1)
 				,self.nlr2:=min(left.nlr2,right.nlr2)

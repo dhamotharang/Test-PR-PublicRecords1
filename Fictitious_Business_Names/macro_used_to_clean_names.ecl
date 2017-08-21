@@ -1,5 +1,5 @@
 
-import lib_addrclean, lib_stringlib;
+import address, lib_stringlib;
 
  
 
@@ -311,7 +311,7 @@ end;
 
 %Layout_for_clean_names%  %ztnew2%(%zFor_Name_Cleaning% l) := Transform
 
-self.%zclean_name_1% := addrcleanlib.CleanPersonfml73(l.pNameField);
+self.%zclean_name_1% := Address.CleanPersonfml73(l.pNameField);
 
 self := l;
 
@@ -371,7 +371,7 @@ self.%suffix_replace% := map(trim(self.%suffix%)=' 1'=>'FIRST',
 
                                                                                      trim(self.%suffix%)=' E'=>'ESQ.','');
 
-self.%clean_name_suffix% := addrcleanlib.CleanPersonlfm73(l.pNameField[1..StringLib.StringFind(l.pNameField,' ',1)]+
+self.%clean_name_suffix% := Address.CleanPersonlfm73(l.pNameField[1..StringLib.StringFind(l.pNameField,' ',1)]+
 
                           ' ' + self.%suffix_replace% + ' ' 
 
@@ -413,7 +413,7 @@ end;
 
 self.%zfmlclean_name_2% := 
 
-                                                                                                                                                                        addrcleanlib.CleanPersonfml73(
+                                                                                                                                                                        Address.CleanPersonfml73(
 
                                                                                                                                                             l.pNameField[StringLib.StringFind(l.pNameField,' ',1)+1..
 
@@ -519,45 +519,45 @@ end;
 
 %Layout_in_conj_new% %tnew_conj%(%File_for_conj_new% l) := Transform
 
-self.%clean_split_name3% := map(         StringLib.StringFind(l.pNameField, ' & ',1) != 0 =>addrcleanlib.CleanPerson73(l.pNameField[1..StringLib.StringFind(l.pNameField, ' & ',1)-1]),
+self.%clean_split_name3% := map(         StringLib.StringFind(l.pNameField, ' & ',1) != 0 =>Address.CleanPerson73(l.pNameField[1..StringLib.StringFind(l.pNameField, ' & ',1)-1]),
 
-                                                                                                                                                                                                            StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' AND ',1) != 0 =>addrcleanlib.CleanPerson73(l.pNameField[1..StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' AND ',1)-1]),
+                                                                                                                                                                                                            StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' AND ',1) != 0 =>Address.CleanPerson73(l.pNameField[1..StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' AND ',1)-1]),
 
-                                                                                                                                                                                    StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' OR ',1) != 0 =>addrcleanlib.CleanPerson73(l.pNameField[1..StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' OR ',1)-1]),
+                                                                                                                                                                                    StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' OR ',1) != 0 =>Address.CleanPerson73(l.pNameField[1..StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' OR ',1)-1]),
 
-                                                                                                                                                                                    StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' C/O ',1) != 0 =>addrcleanlib.CleanPerson73(l.pNameField[1..StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' C/O ',1)-1]),
+                                                                                                                                                                                    StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' C/O ',1) != 0 =>Address.CleanPerson73(l.pNameField[1..StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' C/O ',1)-1]),
 
-                                                                                                                                                                                    StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' DBA ',1) != 0 =>addrcleanlib.CleanPerson73(l.pNameField[1..StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' DBA ',1)-1]),
+                                                                                                                                                                                    StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' DBA ',1) != 0 =>Address.CleanPerson73(l.pNameField[1..StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' DBA ',1)-1]),
 
-                                                                                                                                                                            StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' % ',1) != 0 =>addrcleanlib.CleanPerson73(l.pNameField[1..StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' % ',1)-1]),                                                                                                 
+                                                                                                                                                                            StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' % ',1) != 0 =>Address.CleanPerson73(l.pNameField[1..StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField), ' % ',1)-1]),                                                                                                 
 
-                                                                                                                                                                                                            addrcleanlib.CleanPerson73(l.pNameField));                                                                                                                                                                                                                     
+                                                                                                                                                                                                            Address.CleanPerson73(l.pNameField));                                                                                                                                                                                                                     
 
 self.%clean_split_name2% := map(         StringLib.StringFind(l.pNameField,' & ',1) != 0
 
-                                                                                    =>addrcleanlib.CleanPerson73(l.pNameField[StringLib.StringFind(l.pNameField,' & ',1)..53]),
+                                                                                    =>Address.CleanPerson73(l.pNameField[StringLib.StringFind(l.pNameField,' & ',1)..53]),
 
                                                                                                             StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' AND ',1) != 0 
 
-                                                                                    =>addrcleanlib.CleanPerson73(l.pNameField[StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' AND ',1)+5..53]),
+                                                                                    =>Address.CleanPerson73(l.pNameField[StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' AND ',1)+5..53]),
 
                                                                                                             StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' OR ',1) != 0 
 
-                                                                                    =>addrcleanlib.CleanPerson73(l.pNameField[StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' OR ',1)+4..53]),
+                                                                                    =>Address.CleanPerson73(l.pNameField[StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' OR ',1)+4..53]),
 
                                                             StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' C/O ',1) != 0 
 
-                                                                                    =>addrcleanlib.CleanPerson73(l.pNameField[StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' C/O ',1)+5..53]),
+                                                                                    =>Address.CleanPerson73(l.pNameField[StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' C/O ',1)+5..53]),
 
                                                                                                             StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' DBA ',1) != 0 
 
-                                                                                    =>addrcleanlib.CleanPerson73(l.pNameField[StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' DBA ',1)+5..53]),
+                                                                                    =>Address.CleanPerson73(l.pNameField[StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' DBA ',1)+5..53]),
 
                                                                                                             StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' % ',1) != 0 
 
-                                                                                    =>addrcleanlib.CleanPerson73(l.pNameField[StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' % ',1)+3..53]),                                                                                                        
+                                                                                    =>Address.CleanPerson73(l.pNameField[StringLib.StringFind(StringLib.StringToUpperCase(l.pNameField),' % ',1)+3..53]),                                                                                                        
 
-                                                                                                            addrcleanlib.CleanPerson73(l.pNameField));                     
+                                                                                                            Address.CleanPerson73(l.pNameField));                     
 
                                     
 
@@ -565,7 +565,7 @@ self.%clean_split_name2% := map(         StringLib.StringFind(l.pNameField,' & '
 
                                                                                                                                                                                                             
 
-//addrcleanlib.CleanPersonlfm73(l.pNameField);
+//Address.CleanPersonlfm73(l.pNameField);
 
 self.clean_company_name := l.pNameField;                                                                                                            
 
@@ -743,7 +743,7 @@ self.clean_cleaned_name_2 := map(trim(l.%clean_split_name2%)='000'=>'',
 
                              l.%clean_split_name2%[71..73]>='090'=>l.%clean_split_name2%,
 
-                                                                                     l.%clean_split_name2%[71..73]<'090'=>addrcleanlib.CleanPersonfml73(trim(l.%clean_split_name2%)[1..70]+' '+trim(l.%clean_split_name3%)[46..70]),
+                                                                                     l.%clean_split_name2%[71..73]<'090'=>Address.CleanPersonfml73(trim(l.%clean_split_name2%)[1..70]+' '+trim(l.%clean_split_name3%)[46..70]),
 
                                                                                     ''
 
@@ -753,7 +753,7 @@ self.clean_cleaned_name   :=         map(trim(l.%clean_split_name3%)='000'=>'',
 
                              l.%clean_split_name3%[71..73]>='090'=>l.%clean_split_name3%,
 
-                                                                                     l.%clean_split_name3%[71..73]<'090'=>addrcleanlib.CleanPersonfml73(trim(l.%clean_split_name3%)[1..70]+' '+trim(l.%clean_split_name2%)[46..70]),
+                                                                                     l.%clean_split_name3%[71..73]<'090'=>Address.CleanPersonfml73(trim(l.%clean_split_name3%)[1..70]+' '+trim(l.%clean_split_name2%)[46..70]),
 
                                                                                     ''
 

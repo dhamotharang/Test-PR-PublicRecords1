@@ -1,4 +1,10 @@
+IMPORT Data_Services, PRTE2_Business_Header;
+
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+stats_base := PRTE2_Business_Header.File_Prep_Bus_Contacts_Stats_Plus;
+#ELSE
 stats_base := File_Prep_Business_Contacts_Stats_Plus;
+#END;
 
 layout_contact_stat := RECORD
 	stats_base.__filepos;  // This is the filepos in the contacts file

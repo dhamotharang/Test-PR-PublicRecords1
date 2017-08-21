@@ -1,9 +1,8 @@
-export layout_OH_clean_in :=
-
-record
-string2      state_origin;
-string8      process_date;
-string3 STATEABREV;
+export layout_OH_clean_in := record
+//rec length: 1731
+  string2      state_origin;
+  string8      process_date;
+  string3 STATEABREV;
    string22 REG_NUM;
    string23 HULL_ID;
    string15 PROP;

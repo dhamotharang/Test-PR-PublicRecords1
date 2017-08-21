@@ -1,9 +1,9 @@
-import Crim_common, Address, Lib_AddrClean, Ut, lib_stringlib;
+import Crim_common, Address, Ut, lib_stringlib;
 // Transforms
 input := DOC.file_doc_fl(regexfind('[0-9]', dc_number));
 
 /////////////////
-
+/*
 history := dataset(ut.foreign_prod+'~thor_data400::in::fl_doc_offenses_history',
 			crim_common.Layout_In_DOC_Offenses.previous, flat)(vendor = 'FL');
 
@@ -12,7 +12,7 @@ crim_common.Layout_In_DOC_Offenses.previous dojoin(crim_common.Layout_In_DOC_Off
 end;
 
 historyout := join(distribute(input, hash(dc_number)), distribute(history, hash(regexreplace('^[(FL)]', offender_key, ''))), left.dc_number = regexreplace('^(FL)', right.offender_key, ''), dojoin(right), right only, local);
-
+*/
 ////////////////
 
 input_new_layout := record, maxlength(7000) 
@@ -221,7 +221,8 @@ return three;
 end;
 
 	self.process_date := Crim_Common.Version_In_DOC_Offender;
-	self.offender_key := 'FL' +  trim(l.DC_Number,left, right) + hash(trim(l.Birth_Date, left, right), trim(L.Name, left, right));
+   //self.offender_key		:= 'FL' +  trim(l.DC_Number,left, right) + hash(trim(l.Birth_Date, left, right), trim(L.Name, left, right)); 
+  self.offender_key		:= 'FL' +  trim(l.DC_Number,left, right);	
 	self.vendor := 'FL';
 	self.source_file := 'FL-doc';
 	self.offense_key := 'FL' +  trim(l.DC_Number,left, right) + l.case_no + l.charge_type + hash(trim(l.offense, left, right), trim(l.Birth_Date, left, right), trim(L.Name, left, right));
@@ -280,6 +281,7 @@ end;
 
 refFile := project(normedINPUTp2(offense <> ''), tFL(left));
 
-outfile := dedup(sort(refFile + historyout, off_date, case_num, off_desc_1, -stc_dt, local), off_date, case_num, off_desc_1, local);
+outfile := dedup(sort(refFile, offender_key,off_date, arr_date, off_desc_1, stc_dt, local)
+							 , offender_key,off_date, arr_date, off_desc_1, right,local): PERSIST('~thor_data400::persist::doc::map_fl_offenses');
 
-export map_doc_fl_offenses := outfile : PERSIST('~thor_data400::persist::doc::map_fl_offenses');
+export map_doc_fl_offenses := outfile;

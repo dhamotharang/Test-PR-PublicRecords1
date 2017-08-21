@@ -1,0 +1,133 @@
+//This is the code to execute in a builder window
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','Scrubs_VehicleV2.Experian_BWR_Hygiene - Hygiene & Stats - SALT V3.6.1');
+IMPORT Scrubs_VehicleV2,SALT36;
+// First create an instantiated hygiene module
+  infile := Scrubs_VehicleV2.Experian_In_VehicleV2;
+  ip := DISTRIBUTE(infile, SKEW(0.1));
+  h := Scrubs_VehicleV2.Experian_Hygiene(ip);
+  p := h.AllProfiles; // Detailed profile of every field
+  OUTPUT(h.Summary('SummaryReport'),ALL);
+  OUTPUT(h.SourceCounts,ALL,NAMED('SourceCounts'));
+  OUTPUT(h.CrossLinkingPotential,ALL,NAMED('CrossLinkingPotential'));
+  OUTPUT(h.invSummary,NAMED('InvertedSummary'),ALL);
+  OUTPUT(p,NAMED('AllProfiles'),ALL); // Detailed profile of every field
+  OUTPUT(h.Correlations,NAMED('Correlations'),ALL); // Which fields are related to which other fields
+  OUTPUT(h.ValidityErrors,NAMED('ValidityErrors'),ALL); // Violations of FieldType statements
+  OUTPUT(SALT36.MAC_Character_Counts.EclRecord(p,'Layout_VehicleV2'),NAMED('OptimizedLayout'));// File layout suggested by data
+  // Produces field types that match the most common 99.9% of your data. Change to 100 to match all your data
+  OUTPUT(SALT36.MAC_Character_Counts.FieldTypes(p,99.9),NAMED('Types'));
+  // ****** Cross Tabs *******
+  // It is possible to create a cross table between any two fields, see documentation on SALT36.MAC_CrossTab
+  // These commented out lines will create crosstabs from the sourcefield to each individual field
+  // IF you find yourself using ALL of these a LOT - let me know, I can make the 'all' case faster
+   Examples := 10;
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,append_process_date,Examples),NAMED('append_process_dateByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,file_typ,Examples),NAMED('file_typByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,vin,Examples),NAMED('vinByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,vehicle_typ,Examples),NAMED('vehicle_typByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,model_yr,Examples),NAMED('model_yrByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,model_yr_ind,Examples),NAMED('model_yr_indByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,make,Examples),NAMED('makeByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,make_ind,Examples),NAMED('make_indByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,series,Examples),NAMED('seriesByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,series_ind,Examples),NAMED('series_indByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,prime_color,Examples),NAMED('prime_colorByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,second_color,Examples),NAMED('second_colorByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,body_style,Examples),NAMED('body_styleByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,body_style_ind,Examples),NAMED('body_style_indByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,model,Examples),NAMED('modelByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,model_ind,Examples),NAMED('model_indByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,weight,Examples),NAMED('weightByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,lengt,Examples),NAMED('lengtByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,axle_cnt,Examples),NAMED('axle_cntByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,plate_nbr,Examples),NAMED('plate_nbrByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,plate_state,Examples),NAMED('plate_stateByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,prev_plate_nbr,Examples),NAMED('prev_plate_nbrByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,prev_plate_state,Examples),NAMED('prev_plate_stateByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,plate_typ_cd,Examples),NAMED('plate_typ_cdByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,mstr_src_state,Examples),NAMED('mstr_src_stateByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,reg_decal_nbr,Examples),NAMED('reg_decal_nbrByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,org_reg_dt,Examples),NAMED('org_reg_dtByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,reg_renew_dt,Examples),NAMED('reg_renew_dtByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,reg_exp_dt,Examples),NAMED('reg_exp_dtByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,title_nbr,Examples),NAMED('title_nbrByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,org_title_dt,Examples),NAMED('org_title_dtByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,title_trans_dt,Examples),NAMED('title_trans_dtByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,name_typ_cd,Examples),NAMED('name_typ_cdByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,owner_typ_cd,Examples),NAMED('owner_typ_cdByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,first_nm,Examples),NAMED('first_nmByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,middle_nm,Examples),NAMED('middle_nmByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,last_nm,Examples),NAMED('last_nmByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,name_suffix,Examples),NAMED('name_suffixByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,prof_suffix,Examples),NAMED('prof_suffixByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,ind_ssn,Examples),NAMED('ind_ssnByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,ind_dob,Examples),NAMED('ind_dobByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,mail_range,Examples),NAMED('mail_rangeByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_pre_dir,Examples),NAMED('m_pre_dirByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_street,Examples),NAMED('m_streetByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_suffix,Examples),NAMED('m_suffixByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_post_dir,Examples),NAMED('m_post_dirByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_pob,Examples),NAMED('m_pobByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_rr_nbr,Examples),NAMED('m_rr_nbrByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_rr_box,Examples),NAMED('m_rr_boxByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_scndry_rng,Examples),NAMED('m_scndry_rngByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_scndry_des,Examples),NAMED('m_scndry_desByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_city,Examples),NAMED('m_cityByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_state,Examples),NAMED('m_stateByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_zip5,Examples),NAMED('m_zip5Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_zip4,Examples),NAMED('m_zip4Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_cntry_cd,Examples),NAMED('m_cntry_cdByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_cc_filler,Examples),NAMED('m_cc_fillerByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_cc,Examples),NAMED('m_ccByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,m_county,Examples),NAMED('m_countyByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,phys_range,Examples),NAMED('phys_rangeByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_pre_dir,Examples),NAMED('p_pre_dirByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_street,Examples),NAMED('p_streetByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_suffix,Examples),NAMED('p_suffixByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_post_dir,Examples),NAMED('p_post_dirByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_pob,Examples),NAMED('p_pobByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_rr_nbr,Examples),NAMED('p_rr_nbrByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_rr_box,Examples),NAMED('p_rr_boxByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_scndry_rng,Examples),NAMED('p_scndry_rngByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_scndry_des,Examples),NAMED('p_scndry_desByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_city,Examples),NAMED('p_cityByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_state,Examples),NAMED('p_stateByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_zip5,Examples),NAMED('p_zip5Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_zip4,Examples),NAMED('p_zip4Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_cntry_cd,Examples),NAMED('p_cntry_cdByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_cc_filler,Examples),NAMED('p_cc_fillerByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_cc,Examples),NAMED('p_ccByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,p_county,Examples),NAMED('p_countyByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,opt_out_cd,Examples),NAMED('opt_out_cdByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,asg_wgt,Examples),NAMED('asg_wgtByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,asg_wgt_uom,Examples),NAMED('asg_wgt_uomByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,source_ctl_id,Examples),NAMED('source_ctl_idByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,raw_name,Examples),NAMED('raw_nameByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,branded_title_flag,Examples),NAMED('branded_title_flagByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_code_1,Examples),NAMED('brand_code_1Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_date_1,Examples),NAMED('brand_date_1Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_state_1,Examples),NAMED('brand_state_1Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_code_2,Examples),NAMED('brand_code_2Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_date_2,Examples),NAMED('brand_date_2Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_state_2,Examples),NAMED('brand_state_2Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_code_3,Examples),NAMED('brand_code_3Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_date_3,Examples),NAMED('brand_date_3Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_state_3,Examples),NAMED('brand_state_3Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_code_4,Examples),NAMED('brand_code_4Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_date_4,Examples),NAMED('brand_date_4Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_state_4,Examples),NAMED('brand_state_4Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_code_5,Examples),NAMED('brand_code_5Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_date_5,Examples),NAMED('brand_date_5Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,brand_state_5,Examples),NAMED('brand_state_5Byappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,tod_flag,Examples),NAMED('tod_flagByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,model_class_code,Examples),NAMED('model_class_codeByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,model_class,Examples),NAMED('model_classByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,min_door_count,Examples),NAMED('min_door_countByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,safety_type,Examples),NAMED('safety_typeByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,airbag_driver,Examples),NAMED('airbag_driverByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,airbag_front_driver_side,Examples),NAMED('airbag_front_driver_sideByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,airbag_front_head_curtain,Examples),NAMED('airbag_front_head_curtainByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,airbag_front_pass,Examples),NAMED('airbag_front_passByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,airbag_front_pass_side,Examples),NAMED('airbag_front_pass_sideByappend_state_origin'));
+  //  OUTPUT(SALT36.MAC_CrossTab(infile,append_state_origin,airbags,Examples),NAMED('airbagsByappend_state_origin'));

@@ -1,3 +1,4 @@
+#OPTION('multiplePersistInstances',FALSE);
 IMPORT Business_Header, ut;
 
 //*************************************************************************

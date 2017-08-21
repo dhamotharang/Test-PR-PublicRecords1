@@ -1,5 +1,5 @@
 export Layout_Sex_Pred_Search_DID := record 
-    string16	seisint_primary_key;
+    string60	seisint_primary_key;
 	string8		dt_last_reported;
 	string8     src_upload_date;			//new field added for CROSS
 	string2		vendor_code;

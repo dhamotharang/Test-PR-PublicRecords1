@@ -1,11 +1,11 @@
-import versioncontrol, _control, ut, tools, MPRD, Healthcare_ProviderPoint_QA;
+import versioncontrol, _control, ut, tools, MPRD, Healthcare_ProviderPoint_QA,RoxieKeyBuild;
 export Build_all(string pversion, boolean pUseProd = false) := function
 
 	spray_  		 := VersionControl.fSprayInputFiles(MPRD.fSpray(pversion,pUseProd));
 
 	built := sequential(
    					spray_,
-						Healthcare_ProviderPoint_QA.Make_QA_MPRD_Files(pversion),
+						// Healthcare_ProviderPoint_QA.Make_QA_MPRD_Files(pversion), -> no test cases on prod - per Miller
 						parallel(
 							MPRD.Build_Keys.Build_Keys_npi_tin_xref(pversion,pUseProd).npi_tin_xref_All,
 							MPRD.Build_Keys.Build_Keys_taxonomy_full_lu(pversion,pUseProd).taxonomy_full_lu_All,
@@ -353,7 +353,8 @@ export Build_all(string pversion, boolean pUseProd = false) := function
 							FileServices.ClearSuperFile(MPRD.Filenames(pversion,pUseProd).opi_facility_lInputTemplate),
 							FileServices.ClearSuperFile(MPRD.Filenames(pversion,pUseProd).abms_cert_lu_lInputTemplate),
 							FileServices.ClearSuperFile(MPRD.Filenames(pversion,puseProd).abms_cooked_lInputTemplate),
-							FileServices.FinishSuperFileTransaction())					
+							FileServices.FinishSuperFileTransaction()),
+							RoxieKeyBuild.updateversion('MPRDKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N');
 					): success(Send_Email(pversion,pUseProd).BuildSuccess), failure(send_email(pversion,pUseProd).BuildFailure);
    
    return built;

@@ -1,12 +1,21 @@
-IMPORT ut;
+IMPORT ut, NID;
+EXPORT BC_Scored(
 
-bce := BC_Extra;
+	 dataset(Layout_Business_Contacts_Temp)	pBC_Extra									= BC_Extra()
+	,dataset(Layout_BH_Super_Group				)	pSuper_Group							= Files		().Base.Super_Group.built
+	,string																	pPersistname							= persistnames().BCScored
+	,boolean																pShouldRecalculatePersist	= true													
+
+) := 
+function
+
+bce := filters.bcextra(pBC_Extra);
 bce_dist := distribute(bce(bdid != 0), hash(bdid));
 
 // Propagate DIDs within a non-zero BDID, with the assumption that
 // a name will be unique within a BDID.
-Emps_Sort := SORT(bce_dist, bdid, lname, mname[1], datalib.PreferredFirst(fname), name_suffix, LOCAL);
-Emps_Grpd := GROUP(Emps_Sort, bdid, lname, mname[1], datalib.PreferredFirst(fname), name_suffix, LOCAL);
+Emps_Sort := SORT(bce_dist, bdid, lname, mname[1], NID.PreferredFirstVersionedStr(fname, NID.version), name_suffix, LOCAL);
+Emps_Grpd := GROUP(Emps_Sort, bdid, lname, mname[1], NID.PreferredFirstVersionedStr(fname, NID.version), name_suffix, LOCAL);
 Emps_Grpd_Sort := SORT(Emps_Grpd, -did);
 
 Layout_Business_Contacts_Temp PropagateDID(Emps_Grpd_Sort l, Emps_Grpd_Sort r) := TRANSFORM
@@ -25,7 +34,7 @@ unsigned6 group_id := 0;
 Layout_Business_Contacts_Temp;
 end;
 
-bhsg := Business_Header.File_Super_Group;
+bhsg := pSuper_Group;
 bhsg_dist := distribute(bhsg, hash(bdid));
 
 // Append the Group ID
@@ -49,7 +58,7 @@ unsigned3 hdrcnt := count(group, Emps_Prop_GID.from_hdr='Y');
 unsigned3 totcnt := count(group);
 end;
 
-Emps_Prop_GID_Stat := table(Emps_Prop_GID(group_id != 0), layout_group_stat, group_id);
+Emps_Prop_GID_Stat := table(Emps_Prop_GID, layout_group_stat, group_id);
 
 // Join stat to select groups for propagation
 Emps_Prop_GID_Dist := distribute(Emps_Prop_GID, hash(group_id));
@@ -67,8 +76,8 @@ Emp_Prop_GID_Reduced := join(Emps_Prop_GID_Dist,
 							 left outer,
 							 local);
 
-Emps_GID_Sort := SORT(Emp_Prop_GID_Reduced(group_id <> 0), group_id, lname, mname[1], datalib.PreferredFirst(fname), name_suffix, LOCAL);
-Emps_GID_Grpd := GROUP(Emps_GID_Sort, group_id, lname, mname[1], datalib.PreferredFirst(fname), name_suffix, LOCAL);
+Emps_GID_Sort := SORT(Emp_Prop_GID_Reduced(group_id <> 0), group_id, lname, mname[1], NID.PreferredFirstVersionedStr(fname, NID.version), name_suffix, LOCAL);
+Emps_GID_Grpd := GROUP(Emps_GID_Sort, group_id, lname, mname[1], NID.PreferredFirstVersionedStr(fname, NID.version), name_suffix, LOCAL);
 Emps_GID_Grpd_Sort := SORT(Emps_GID_Grpd, -did);
 
 Layout_Group_Contact PropagateDID_GID(Emps_GID_Grpd_Sort l, Emps_GID_Grpd_Sort r) := TRANSFORM
@@ -102,7 +111,7 @@ j := JOIN(emps_d_seq, emps_d_seq,
 	(
 		(LEFT.did = RIGHT.did AND LEFT.did != 0) OR
 		(LEFT.lname = RIGHT.lname AND
-		 datalib.preferredfirst(LEFT.fname) = datalib.preferredfirst(RIGHT.fname) AND
+		 NID.PreferredFirstVersionedStr(LEFT.fname, NID.version) = NID.PreferredFirstVersionedStr(RIGHT.fname, NID.version) AND
 		 LEFT.mname = RIGHT.mname AND
 		 ut.NNEQ(LEFT.name_suffix, RIGHT.name_suffix)
 		) OR
@@ -174,6 +183,11 @@ Emps_Scored := JOIN(
 	LEFT.uid = RIGHT.rseq,
 	PutBackScore(LEFT, RIGHT), LEFT OUTER, LOCAL);
 
-Emps_All := Emps_Scored + bce(bdid = 0);
+Emps_All := Emps_Scored + bce(bdid = 0) : PERSIST(pPersistname);
 
-EXPORT BC_Scored := Emps_All : PERSIST('TEMP::BC_Scored');
+returndataset := if(pShouldRecalculatePersist = true, Emps_All
+																										, persists().BCScored
+									);
+return returndataset;
+
+end;

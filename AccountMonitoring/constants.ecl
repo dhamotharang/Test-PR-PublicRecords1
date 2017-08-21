@@ -3,10 +3,11 @@ IMPORT AccountMonitoring, lib_thorlib, Data_Services;
 EXPORT constants := MODULE
 	// The file cluster name
 	EXPORT STRING SPRAY_GROUPNAME  := lib_thorlib.thorlib.cluster();
-	EXPORT STRING DATA_LOCATION 	 := IF(SPRAY_GROUPNAME in ['thor400_30','thor400_20'],
+	EXPORT STRING DATA_LOCATION 	 := IF(SPRAY_GROUPNAME in ['thor400_30','thor400_20','thor400_44'],
 																			 '~', 							// thor400_30 and thor400_20
 																			 Data_Services.foreign_prod); 	// thorwatch and thor_10_219 
-	EXPORT STRING FILENAME_CLUSTER := '~' + SPRAY_GROUPNAME  + '::';
+	//EXPORT STRING FILENAME_CLUSTER := '~' + SPRAY_GROUPNAME  + '::';
+	EXPORT STRING FILENAME_CLUSTER := '~' + IF(SPRAY_GROUPNAME in ['thor_10_219'], SPRAY_GROUPNAME, 'batchr3') + '::';	
 	
 	// Candidate record disposition.
 	EXPORT UNSIGNED1 UNCHANGED  := 1;
@@ -42,6 +43,13 @@ EXPORT constants := MODULE
 	EXPORT UNSIGNED8 PM_PHONEOWNERSHIP  := AccountMonitoring.types.productMask.phoneownership;
 	EXPORT UNSIGNED8 PM_BIPBESTUPDATE	  := AccountMonitoring.types.productMask.bipbestupdate;
 	EXPORT UNSIGNED8 PM_SBFE						:= AccountMonitoring.types.productMask.sbfe;
+	EXPORT UNSIGNED8 PM_UCC							:= AccountMonitoring.types.productMask.ucc;
+	EXPORT UNSIGNED8 PM_GOVTDEBARRED		:= AccountMonitoring.types.productMask.govtdebarred;
+	EXPORT UNSIGNED8 PM_INQUIRY					:= AccountMonitoring.types.productMask.inquiry;
+	EXPORT UNSIGNED8 PM_CORP						:= AccountMonitoring.types.productMask.corp;
+	EXPORT UNSIGNED8 PM_MVR							:= AccountMonitoring.types.productMask.mvr;
+	EXPORT UNSIGNED8 PM_AIRCRAFT				:= AccountMonitoring.types.productMask.aircraft;
+	EXPORT UNSIGNED8 PM_WATERCRAFT			:= AccountMonitoring.types.productMask.watercraft;
 	
 	// This special value provides the user with a shortcut for utilities to say ALL.
 	EXPORT UNSIGNED8 PM_ALL        := -1;

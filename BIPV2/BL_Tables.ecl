@@ -432,10 +432,12 @@ export BL_Tables := module
 	//*** Company Status Description Table
 		export CompanyStatusConstants :=
 		MODULE
-		
+		                                                                                    
 			//if a status is added here, please add it to the appropriate set below
 			export strActive 			:= 'ACTIVE';
 			export strDissolved 	:= 'DISSOLVED';
+			export strClosed    	:= 'CLOSED';
+			export strDormant    	:= 'DORMANT';
 			export strForfeited		:= 'FORFEITED';
 			export strInactive		:= 'INACTIVE';
 			export strMergedout	  := 'MERGED OUT'; //added for bug 122751 and based upon emails & phone discussion with Tom Reed on 03/03/14.
@@ -446,8 +448,8 @@ export BL_Tables := module
 			
 			//these sets used by linking group in at least BIPV2_PostProcess.segmentation
 			export setActive 		:= [strActive];
-			export setInactive	:= [strInactive,strNGS,strSuspended];
-			export setDefunct		:= [strDissolved,strForfeited,strMergedout,strTerminated,strDefunct];
+			export setInactive	:= [strInactive,strNGS,strSuspended,strDormant];
+			export setDefunct		:= [strDissolved,strForfeited,strMergedout,strTerminated,strDefunct,strClosed];
 		
 		end;
 	
@@ -482,6 +484,7 @@ export BL_Tables := module
 											inCode = 'ORGANIZED'																				=> c.strActive,
 											inCode = 'RESTORED TO GOOD STANDING'												=> c.strActive,
 											inCode = 'REVIVED'																					=> c.strActive,
+											inCode = 'CLOSED'	  																				=> c.strClosed,
 											inCode = 'AD-DISSOLVED-FILE ANNUAL REPORT'									=> c.strDissolved,
 											inCode = 'ADMIN DISSOLUTION'																=> c.strDissolved,
 											inCode = 'ADMIN DISSOLVED'																	=> c.strDissolved,
@@ -501,6 +504,7 @@ export BL_Tables := module
 											inCode = 'VOLUNTARILY DISSOLVED'														=> c.strDissolved,
 											inCode = 'VOLUNTARY DISSOLUTION'														=> c.strDissolved,
 											inCode = 'VOLUNTARY DISSOLVED'															=> c.strDissolved,
+											inCode = 'DORMANT'            															=> c.strDormant,
 											inCode = 'FORFEITED'																				=> c.strForfeited,
 											inCode = 'FORFEITED - FAILED TO TIMELY FILE A/R'						=> c.strForfeited,
 											inCode = 'FORFEITED EXISTENCE'															=> c.strForfeited,

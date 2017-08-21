@@ -73,7 +73,9 @@ apped_src_did := join(distribute(email_in, hash(clean_email)),
 apped_src_nm := join(distribute(apped_src_did, hash(clean_email)),
                   distribute( email_src_nm, hash(clean_email)),
 									left.clean_email = right.clean_email and
-									ut.DoNamesMatch(left.clean_name.fname,'', left.clean_name.lname, right.fname, '', right.lname, 4) < 4,
+									left.clean_name.fname = right.fname and
+									left.clean_name.lname = right.lname,
+									//ut.DoNamesMatch(left.clean_name.fname,'', left.clean_name.lname, right.fname, '', right.lname, 4) < 4,
 									t_append_src(left, right),
 									keep(1),
 									left outer,

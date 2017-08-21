@@ -6,7 +6,7 @@ EXPORT mac_check_sources(
    pversion       = 'bipv2.KeySuffix'                           // build date
   ,pSource_Ingest = 'BIPV2.File_Business_Sources'
   ,pIngest_Base   = 'BIPV2_Files.files_ingest.DS_BASE'
-  ,pDS_Base       = 'Bipv2.CommonBase.ds_base'
+  ,pDS_Base       = 'Bipv2.CommonBase.ds_built'
   ,pDS_Clean      = 'Bipv2.CommonBase.ds_clean'
   ,pDS_Xlink      = 'Bipv2.CommonBase.ds_xlink'
   ,pBIP_Key       = 'BIPV2_Build.key_contact_linkids.keybuilt'

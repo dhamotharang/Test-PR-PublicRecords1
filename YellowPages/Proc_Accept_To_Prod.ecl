@@ -1,0 +1,1 @@
+export Proc_Accept_To_Prod := Promote().buildfiles.QA2Prod;

@@ -79,7 +79,7 @@ EXPORT DATASET(Layout_Posting) fPatchDocRef(Filename_Info info,
   END;
   collisions_old_new := SORT(collisions, newKey, collision_pos, extKey); // new all all 0 pos
   colliders_marked := ASSERT(UNGROUP(ITERATE(collisions_old_new, setPos(LEFT,RIGHT))),
-                             collision_pos<250, 'Too many collisions found', FAIL);
+                             collision_pos<255, 'Too many collisions found', FAIL);
   // make patch records
   patch_rec := RECORD
     UNSIGNED4 rel_doc;

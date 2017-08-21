@@ -95,9 +95,9 @@ EXPORT fCA_Sales_Tax_As_Business_Linking (DATASET(Layout_CA_Sales_Tax) pBasefile
 	Business_Header.Layout_Business_Linking.Company_ RollupCA_ST(Business_Header.Layout_Business_Linking.Company_ L, business_header.Layout_Business_Linking.Company_ R) := TRANSFORM
 	  SELF.dt_first_seen                := ut.EarliestDate(ut.EarliestDate(L.dt_first_seen,R.dt_first_seen),
 			                                   ut.EarliestDate(L.dt_last_seen,R.dt_last_seen));
-	  SELF.dt_last_seen                 := ut.LatestDate(L.dt_last_seen,R.dt_last_seen);
+	  SELF.dt_last_seen                 := max(L.dt_last_seen,R.dt_last_seen);
 		SELF.dt_vendor_first_reported     := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-	  SELF.dt_vendor_last_reported      := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+	  SELF.dt_vendor_last_reported      := max(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 	  SELF.company_name                 := IF(L.company_name = '', R.company_name, L.company_name);
 	  SELF.company_address.prim_range   := IF(l.company_address.prim_range = '' AND (INTEGER)l.company_address.zip4 = 0, r.company_address.prim_range, l.company_address.prim_range);
 	  SELF.company_address.predir       := IF(l.company_address.predir = '' AND (INTEGER)l.company_address.zip4 = 0, r.company_address.predir, l.company_address.predir);

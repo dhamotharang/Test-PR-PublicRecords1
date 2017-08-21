@@ -27,21 +27,72 @@ export fn_best_ssn(dataset(recordof(header.layout_header)) in_hdr) := module
 
 //purposefully excluded UW (it would be a double-counting if i left it in)
 //resolve double-counting of UT and EQ sources later in the process (exclude UT only if EQ already provides it)
-export hdr1 := distribute(in_hdr(ut.full_ssn(ssn)=true and ssn not in ut.set_badssn and src<>'UW'),hash(did));
+//append SSN flags
+
+in_hdr_ssn0 := in_hdr(ssn <> '');
+header.Mac_flag_legacy_ssn(in_hdr_ssn0,in_hdr_ssn);
+
+rec_ssn := record
+in_hdr_ssn.did;
+in_hdr_ssn.ssn;
+in_hdr_ssn.legacy;
+end;
+		
+hdr_ssn := project(in_hdr_ssn, rec_ssn);
+
+hdr_ssn_dedup := dedup(distribute(hdr_ssn, hash(did)),did,ssn,all,local);
+
+append_ssn_flag:=header.append_ssn_flags(hdr_ssn_dedup(legacy)).legacy_ssn
+                +header.append_ssn_flags(hdr_ssn_dedup(~legacy)).randomized_ssn;
+
+//join back to in file
+
+rec_append_ssn_flag := record
+  header.layout_header;
+  boolean   legacy  :=false;
+  boolean   ssn_is_invalid  :=false;
+ end;
+ 
+
+rec_append_ssn_flag tSSN_flag(in_hdr_ssn le, append_ssn_flag ri) := transform
+
+self.ssn_is_invalid := ri.ssn_is_invalid;
+self := le;
+
+end;
+
+shared hdr_ssn_flag := join(distribute(in_hdr_ssn,hash(did))
+										, distribute(append_ssn_flag,hash(did))
+											,   left.did=right.did
+											and trim((string9)left.ssn,left, right) = trim(right.ssn,left, right)
+											, tSSN_flag(left,right)
+											, left outer
+											, local);
+
+//keep valid SSN 
+hdr_valid_ssn := project(hdr_ssn_flag(ssn_is_invalid = false), header.layout_header);
+
+export hdr1 := distribute(hdr_valid_ssn(ut.full_ssn(ssn)=true and ssn not in ut.set_badssn and src not in mdr.sourceTools.set_Util_WorkPH ),hash(did));
 
 shared unique_eq_confirmeds := watchdog.fn_DID_has_one_confirmed_SSN(hdr1);
 
 //keep the set of ADLs having zero or more than 1 confirmed EQ SSN
-header.layout_header tjoin(hdr1 le, unique_eq_confirmeds ri) := transform
+header_plus:={header.layout_header,boolean legacy:=false};
+header_plus tjoin(hdr1 le, unique_eq_confirmeds ri) := transform
  self := le;
 end;
+hdr2_ := join(hdr1,unique_eq_confirmeds,left.did=right.did,tjoin(left,right),left only,local);
 
-shared hdr2 := join(hdr1,unique_eq_confirmeds,left.did=right.did,tjoin(left,right),left only,local);
+header_plus tjoin2(hdr2_ le, hdr_ssn_flag ri) := transform
+ self.legacy := ri.legacy;
+ self := le;
+end;
+shared hdr2 := join(hdr2_ , hdr_ssn_flag(ssn_is_invalid = false) , left.rid=right.rid,tjoin2(left,right),left outer,local);
 
 //get the MIN DOB for all records, not just those with an SSN
 shared r_min_dob := record
  in_hdr.did;
- integer min_dob := min(group,in_hdr.dob div 10000);
+ integer min_dob := min(group,if(in_hdr.dob>0,in_hdr.dob div 10000,9999));
 end;
 
 shared ta_dob := table(in_hdr,r_min_dob,did,local);
@@ -78,6 +129,7 @@ shared r1 := record
  boolean dt_last_seen_is_recent;
  ta_dob.min_dob;
  string1 old_ssn;
+ boolean legacy;
 end;
 
 r1 t1(hdr2 le, r_min_dob ri) := transform
@@ -88,7 +140,7 @@ r1 t1(hdr2 le, r_min_dob ri) := transform
  boolean v_in_ssa_deaths := le.src='DE';
  boolean v_in_bk         := le.src='BA';
  boolean v_in_liens      := le.src='L2';
- boolean v_in_utility    := le.src='UT';
+ boolean v_in_utility    := le.src in mdr.sourceTools.set_Util_noWorkPH;
  boolean v_in_certegy    := le.src='CY';
 
  integer v_score_eq         := 5;
@@ -103,7 +155,7 @@ r1 t1(hdr2 le, r_min_dob ri) := transform
  
  //idea is to use dppa content for scoring
  //we won't return an SSN that's only DPPA sourced
- self.ssn_only_in_dppa        := mdr.sourcetools.sourceisdppa(le.src)=true;
+ self.ssn_only_in_dppa        := mdr.sourcetools.sourceisdppa(le.src)=true or le.src in mdr.sourcetools.set_Utility_sources;
  self.ssn_belongs_to_relative := le.valid_ssn='R';
  
  self.in_eq         := v_in_eq;
@@ -157,6 +209,7 @@ r1 t1(hdr2 le, r_min_dob ri) := transform
  self.dt_last_seen_is_recent := if(self.dt_last_seen>0 and (header.ConvertYYYYMMToNumberOfMonths((unsigned3)ut.getdate[1..6]) - header.ConvertYYYYMMToNumberOfMonths(self.dt_last_seen) < 24),true,false);
  
  self := le;
+ self.min_dob                :=if(ri.min_dob=9999,0,ri.min_dob);
  self := ri;
  
 end;
@@ -164,9 +217,9 @@ end;
 p1 := join(hdr2,ta_dob,left.did=right.did,t1(left,right),left outer,local);
 
 r1 t_issued_before_dob(r1 le, header.Layout_SSN_Map ri) := transform
-  self.old_ssn := if(le.min_dob <= (integer)(string)ri.end_date[1..4],'N',
-                  if(le.min_dob  > (integer)(string)ri.end_date[1..4],'Y',
-				  ''));
+  self.old_ssn := map(le.ssn[1..5]=ri.ssn5 and le.legacy and le.min_dob <= (integer)(string)ri.end_date[1..4] => 'N'
+											,le.ssn[1..5]=ri.ssn5 and le.legacy and le.min_dob  > (integer)(string)ri.end_date[1..4] => 'Y'
+											,'N');
   self                       := le;
 end;
 

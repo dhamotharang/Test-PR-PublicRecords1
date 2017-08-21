@@ -8,6 +8,7 @@ built := sequential(
 					,Enclarity_Facility_Sanctions.Build_base.build_base_facility_sanctions(pversion,pUseProd).facility_sanctions_all
 					,Enclarity_Facility_Sanctions.Build_Keys.build_keys_facility_sanctions(pversion,pUseProd).facility_sanctions_all
 					,Enclarity_Facility_Sanctions.Promote.promote_facility_sanctions(pversion,pUseProd).buildfiles.Built2QA
+					,Enclarity_Facility_Sanctions.Build_Strata(pversion,pUseProd).All
 					//Archive processed files in history					
 						,FileServices.StartSuperFileTransaction()
 						,FileServices.RemoveOwnedSubFiles(Enclarity_Facility_Sanctions.Filenames(pversion,pUseProd).facility_sanctions_lInputHistTemplate,true)

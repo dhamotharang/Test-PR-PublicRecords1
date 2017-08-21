@@ -1,0 +1,1 @@
+export File_AddressID_building := dataset('~thor_data400::base::address_type_keybuild',Address_file.Layout_address_file,flat)(city_name<>'' and st<>'') : persist('persist::addressid_building');

@@ -1,4 +1,4 @@
-import tools;
+import tools,MDR;
 export KeyPrep_Source_ID(
 	dataset(Layout_Linking.Linked) linking_master,
 	dataset(Layout_Industry.Linked) industry_master,
@@ -14,6 +14,19 @@ export KeyPrep_Source_ID(
 	dataset(Layout_Property.Main.Linked) property_master,
 	string version,
 	boolean pUseOtherEnvironment = false) := function
+	
+	string correct_source_docid(string in_source,string in_source_docid) := function
+		return map(
+			MDR.SourceTools.SourceIsCorpV2(in_source) =>
+				trim(in_source_docid[1..StringLib.StringFind(in_source_docid,'//',1)-1]),
+			MDR.SourceTools.SourceIsAircrafts(in_source) =>
+				trim(in_source_docid[stringlib.StringFind(in_source_docid,'//',1)+2..]),
+			MDR.SourceTools.SourceIsEBR(in_source) =>
+				trim(in_source_docid[1..StringLib.StringFind(in_source_docid,'//',1)-1]),
+			MDR.SourceTools.SourceIsTXBUS(in_source) =>
+				trim(in_source_docid[1..StringLib.StringFind(in_source_docid,'//',1)-1]),
+			in_source_docid);
+	end;
 
 	name_items := project(linking_master(company_name != ''),
 		transform(KeyLayouts.Source,
@@ -226,7 +239,7 @@ export KeyPrep_Source_ID(
 		property_items;
 		// foreclosurenod_items;
 		
-	deduped_items := dedup(all_items,record,all);
+	deduped_items := dedup(all_items,bid,item_type,item_hash,source,correct_source_docid(source,source_docid),all);
 
 	tools.mac_FilesIndex('deduped_items,{bid,item_type,item_hash,source},{deduped_items}',keynames(version,pUseOtherEnvironment).Source,idx);
 

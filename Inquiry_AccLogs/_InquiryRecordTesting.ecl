@@ -51,9 +51,12 @@ export Output_Internal := record
 	string Appended_SSN;
 	string hashid;
 	unsigned count_records := 0;
+	string8 date_f;
+	unsigned date_bucket;
  end;
  
 export Output_Customer := RECORD
+  unsigned acct_no;
   string watchdog_fname := '';
   string watchdog_mname := '';
   string watchdog_lname := '';
@@ -65,7 +68,7 @@ export Output_Customer := RECORD
 	string watchdog_hashID := '';
 END;
 
-export WatchDog_PersonData(set of string pVertical = [''], set of string pIndustry = [''], set of string pFunction = [''], unsigned number_out = 10000, string start_date, string end_date = ut.getdate, boolean opt_in_only = false, string paramwu_, boolean fast_match = false) := function
+export WatchDog_PersonData(set of string pVertical = [''], set of string pIndustry = [''], set of string pFunction = [''], unsigned number_out = 1000000, string start_date, string end_date = ut.getdate, boolean opt_in_only = false, string paramwu_, boolean fast_match = false) := function
 
 // #WORKUNIT('name','Inquiry Tracking Testing Extract')
 // #OPTION('allowedClusters', 'thor400_84,thor400_92')// comment out if not on prod thor or cluster names change
@@ -98,7 +101,7 @@ Mac_Efficient_Table := project(filtNameAddrPopulation,
 															 transform({Output_Customer, Output_Internal, Randomize},
 																					self.watchdog_hashID := (string)hash(left.person_q.appended_adl);
 																					self.hashID := self.watchdog_hashID;
-																				 
+																				  self.acct_no := 0;
 																					self.Primary_Market_Code := left.bus_intel.Primary_Market_Code;
 																					self.Secondary_Market_Code := left.bus_intel.Secondary_Market_Code;
 																					self.Industry_1_Code := left.bus_intel.Industry_1_Code;
@@ -130,8 +133,9 @@ Mac_Efficient_Table := project(filtNameAddrPopulation,
 																					self.st := left.person_q.st;
 																					self.zip5 := left.person_q.zip5;
 																					self.zip4 := left.person_q.zip4;
-																					
 																					self.random_number := random();
+																					self.date_f := left.search_info.datetime[1..8];
+																					self.date_bucket := if(left.search_info.datetime[1..6] between '201110' and '201201', 1 ,2);
 																					self := left));
 
 fastMatchFilter := choosen(Mac_Efficient_Table, if(fast_Match, 14000000, choosen:all));
@@ -164,11 +168,11 @@ dstReDIDFile := distribute(reDIDFile, hash(appended_adl));
 
 trimDIDFile := table(dstReDIDFile, {appended_adl}, appended_adl, local);
 
-WatchDogRecords := choosen(join(watchdog.File_Best_nonglb(fname <> '' and lname <> '' and prim_range + prim_name <> '' and zip <> '' and ssn <> ''), 
+WatchDogRecords := choosen(distribute(join(watchdog.File_Best_nonglb(fname <> '' and lname <> '' and prim_range + prim_name <> '' and zip <> '' and ssn <> ''), 
 															  trimDIDFile, 
-															  right.appended_adl = left.did, keep(1), local), number_out);
+															  right.appended_adl = left.did, keep(1), local), hash(random())), number_out);
 
-JnWDtoIQTrack := join(dstReDIDFile, WatchDogRecords, 
+JnWDtoIQTrack_ := join(distribute(dstReDIDFile, hash(appended_adl)), distribute(WatchDogRecords, hash(did)),
 											right.did = left.appended_adl,
 											transform(recordof(dstReDIDFile),
 													 self.watchdog_fname := right.fname,
@@ -179,7 +183,11 @@ JnWDtoIQTrack := join(dstReDIDFile, WatchDogRecords,
 													 self.watchdog_address_line_2 := stringlib.stringcleanspaces(right.unit_desig + ' ' + right.sec_range),
 													 self.watchdog_address_last_line := stringlib.stringcleanspaces(right.city_name + ' ' + right.st + ' ' + right.zip + ' ' + right.zip4),
 													 self.watchdog_ssn := right.ssn;
-													 self := left));
+													 self := left), local);
+
+JnWDtoIQTrack__ := dedup(sort(distribute(JnWDtoIQTrack_, hash(watchdog_fname, watchdog_mname, watchdog_lname, watchdog_sname,watchdog_address_line1, watchdog_address_line_2, watchdog_address_last_line,watchdog_ssn)), watchdog_fname, watchdog_mname, watchdog_lname, watchdog_sname,watchdog_address_line1, watchdog_address_line_2, watchdog_address_last_line,-watchdog_ssn, local), watchdog_fname, watchdog_mname, watchdog_lname, watchdog_sname,watchdog_address_line1, watchdog_address_line_2, watchdog_address_last_line,watchdog_ssn, local);  
+ 
+jnWDtoIQTrack := project(JnWDtoIQTrack__, transform(recordof(JnWDtoIQTrack__), self.acct_no := counter, self := left));
  
 ForCustomer := sort(dedup(project(JnWDtoIQTrack, Output_Customer), record, all), watchdog_hashID);
 Customer := dataset('~thor_200::out::inquiry_acclogs::inquiry_test::collections::customer_'+wu_,recordof(forcustomer), csv(separator('\t')));
@@ -207,23 +215,23 @@ tb_out := table(customer, tb, 'all', few);
 
 /* Header Rows */
 
-headerCustomer := dataset([{'fname','mname','lname','sname','address_line1','address_line_2','address_last_line','ssn','hashID'}], Output_Customer);
-headerCustomerNoSSN := dataset([{'fname','mname','lname','sname','address_line1','address_line_2','address_last_line','hashID'}], Output_Customer-watchdog_ssn);
+headerCustomer := dataset([{'acct_no', 'fname','mname','lname','sname','address_line1','address_line_2','address_last_line','ssn','hashID'}], Output_Customer);
+headerCustomerNoSSN := dataset([{'acct_no', 'fname','mname','lname','sname','address_line1','address_line_2','address_last_line','hashID'}], Output_Customer-watchdog_ssn);
 
 /* ----------- */
 
  
-return parallel(output(WatchDogRecords);
-				output(choosen(sort(JnWDtoIQTrack, Appended_ADL), 1000), named('test'));
+return parallel(output(choosen(WatchDogRecords,100));
+				output(choosen(sort(JnWDtoIQTrack, Appended_ADL), 100), named('test'));
 				
-				output(choosen(ForCustomer, 100), named('Customer_Sample'));
-				output(headerCustomer & ForCustomer,,'~thor_200::out::inquiry_acclogs::inquiry_test::collections::customer_'+wu_, overwrite, csv(separator('\t')),expire(30));
+				output(ForCustomer, named('Customer_Sample'));
+				output(headerCustomer & ForCustomer,,'~thor_200::out::inquiry_acclogs::inquiry_test::collections::customer_'+wu_, overwrite, csv(separator('\t')));
 
-				output(choosen(ForCustomerWithoutSSN, 100), named('Customer_SamplenoSSN'));
-				output(headerCustomerNoSSN & ForCustomerWithoutSSN,,'~thor_200::out::inquiry_acclogs::inquiry_test::collections::customernossn_'+wu_, overwrite, csv(separator('\t')),expire(30));
+				output(ForCustomerWithoutSSN, named('Customer_SamplenoSSN'));
+				output(headerCustomerNoSSN & ForCustomerWithoutSSN,,'~thor_200::out::inquiry_acclogs::inquiry_test::collections::customernossn_'+wu_, overwrite, csv(separator('\t')));
 
-				output(choosen(ForInternal, 100), named('Internal_Sample'));
-				output(ForInternal,,'~thor_200::out::inquiry_acclogs::inquiry_test::collections::internal_'+wu_, overwrite, csv(separator('\t')),expire(30));
+				output(ForInternal, named('Internal_Sample'));
+				output(ForInternal,,'~thor_200::out::inquiry_acclogs::inquiry_test::collections::internal_'+wu_, overwrite, csv(separator('\t')));
 
 				output(tb_out, named('Customer_Sample_Populations'));
 				output(table(ForInternal, {industry, count(group)}, industry, few), named('Industry_Counts'));

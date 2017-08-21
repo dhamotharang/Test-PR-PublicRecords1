@@ -1,1 +1,1 @@
-export version_aircraft := '20050810';
+export version_aircraft := '20071106';

@@ -109,6 +109,34 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 		candidates_sbfe      			:= AccountMonitoring.fn_monitor_for_candidates( product_config.sbfe, timestamp ) : INDEPENDENT;
 		update_history_file_sbfe	:= AccountMonitoring.fn_update_history_file( candidates_sbfe, product_config.sbfe, timestamp );
 
+			// ***** UCC *****
+		candidates_ucc      			:= AccountMonitoring.fn_monitor_for_candidates( product_config.ucc, timestamp ) : INDEPENDENT;
+		update_history_file_ucc		:= AccountMonitoring.fn_update_history_file( candidates_ucc, product_config.ucc, timestamp );
+
+			// ***** Govt Debarred *****
+		candidates_govtdebarred							:= AccountMonitoring.fn_monitor_for_candidates( product_config.govtdebarred, timestamp ) : INDEPENDENT;
+		update_history_file_govtdebarred		:= AccountMonitoring.fn_update_history_file( candidates_govtdebarred, product_config.govtdebarred, timestamp );
+
+			// ***** Inquiry *****
+		candidates_inquiry    				:= AccountMonitoring.fn_monitor_for_candidates( product_config.inquiry, timestamp ) : INDEPENDENT;
+		update_history_file_inquiry		:= AccountMonitoring.fn_update_history_file( candidates_inquiry, product_config.inquiry, timestamp );
+
+			// ***** Corp *****
+		candidates_corp      			:= AccountMonitoring.fn_monitor_for_candidates( product_config.corp, timestamp ) : INDEPENDENT;
+		update_history_file_corp	:= AccountMonitoring.fn_update_history_file( candidates_corp, product_config.corp, timestamp );
+
+			// ***** MVR *****
+		candidates_mvr      			:= AccountMonitoring.fn_monitor_for_candidates( product_config.mvr, timestamp ) : INDEPENDENT;
+		update_history_file_mvr		:= AccountMonitoring.fn_update_history_file( candidates_mvr, product_config.mvr, timestamp );
+
+			// ***** Aircraft *****
+		candidates_aircraft      			:= AccountMonitoring.fn_monitor_for_candidates( product_config.aircraft, timestamp ) : INDEPENDENT;
+		update_history_file_aircraft	:= AccountMonitoring.fn_update_history_file( candidates_aircraft, product_config.aircraft, timestamp );
+
+			// ***** Watercraft *****
+		candidates_watercraft      			:= AccountMonitoring.fn_monitor_for_candidates( product_config.watercraft, timestamp ) : INDEPENDENT;
+		update_history_file_watercraft	:= AccountMonitoring.fn_update_history_file( candidates_watercraft, product_config.watercraft, timestamp );
+
 
 		// Union all records, maintaining record order on each node ('&' -- ref. Lang. Guide, p. 26); then filter.
 		candidates_all := IF(product_config.bankruptcy.product_is_in_mask,candidates_bankruptcy)
@@ -128,11 +156,19 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 									  & IF(product_config.bdidupdate.product_is_in_mask,candidates_bdidupdate)
 									  & IF(product_config.phoneownership.product_is_in_mask,candidates_phoneownership)
 										& IF(product_config.bipbestupdate.product_is_in_mask,candidates_bipbestupdate)
-										& IF(product_config.sbfe.product_is_in_mask,candidates_sbfe);
+										& IF(product_config.sbfe.product_is_in_mask,candidates_sbfe)
+										& IF(product_config.ucc.product_is_in_mask,candidates_ucc)
+										& IF(product_config.govtdebarred.product_is_in_mask,candidates_govtdebarred)
+										& IF(product_config.inquiry.product_is_in_mask,candidates_inquiry)
+										& IF(product_config.corp.product_is_in_mask,candidates_corp)
+										& IF(product_config.mvr.product_is_in_mask,candidates_mvr)
+										& IF(product_config.aircraft.product_is_in_mask,candidates_aircraft)
+										& IF(product_config.watercraft.product_is_in_mask,candidates_watercraft);
 		
 		// We check for 0 hashvalue here because we don't want to return history records that simply reflect
 		// a deleted portfolio record.
 		// NOTE TO SELF --  TO DO  -- This should probably be in fn_rollup_candidates --
+		
 		candidates_new_or_changed := candidates_all(candidates_all.hash_value != 0 AND candidates_all.timestamp = ^.timestamp[2..9] + ^.timestamp[11..16]);
 		
 		// 2. Roll up all candidates, update candidate history files, and output portfolio candidate hits.
@@ -158,7 +194,14 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 													 IF(product_config.bdidupdate.product_is_in_mask,update_history_file_bdidupdate),
 													 IF(product_config.phoneownership.product_is_in_mask,update_history_file_phoneownership),
 													 IF(product_config.bipbestupdate.product_is_in_mask,update_history_file_bipbestupdate),
-													 IF(product_config.sbfe.product_is_in_mask,update_history_file_sbfe)
+													 IF(product_config.sbfe.product_is_in_mask,update_history_file_sbfe),
+													 IF(product_config.ucc.product_is_in_mask,update_history_file_ucc),
+													 IF(product_config.govtdebarred.product_is_in_mask,update_history_file_govtdebarred),
+													 IF(product_config.inquiry.product_is_in_mask,update_history_file_inquiry),
+													 IF(product_config.corp.product_is_in_mask,update_history_file_corp),
+													 IF(product_config.mvr.product_is_in_mask,update_history_file_mvr),
+													 IF(product_config.aircraft.product_is_in_mask,update_history_file_aircraft),
+													 IF(product_config.watercraft.product_is_in_mask,update_history_file_watercraft)
 													);
 		
 		RETURN SEQUENTIAL(

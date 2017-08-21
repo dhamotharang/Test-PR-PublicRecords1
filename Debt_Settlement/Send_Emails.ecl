@@ -11,7 +11,7 @@ export Send_Emails(
 	,string								pEmailList							= Email_Notification_Lists(not pShouldUpdateRoxiePage).BuildSuccess
 	,string								pRoxieEmailList					= Email_Notification_Lists(not pShouldUpdateRoxiePage).Roxie
 	,string								pBuildName							= _Constants().Name
-	,string								pPackageName						= 'Debt Settlement Keys'
+	,string								pPackageName						= 'Debt_SettlementKeys'
 	,string								pBuildMessage						= 'Base Files Finished'
 
 ) := 

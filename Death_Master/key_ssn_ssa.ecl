@@ -24,7 +24,7 @@ set_temp_fcra_exclude := [
 	];
 	
 // to match what we have in SSN Table for now, only use DE source for FCRA	
-fcra_base := dm_base(trim(src) IN  [mdr.sourceTools.src_Death_Master, mdr.sourceTools.src_Death_Restricted] and glb_flag != 'Y');
+fcra_base := dm_base(trim(src) in mdr.sourceTools.set_scoring_FCRA and trim(src) not in mdr.sourceTools.set_scoring_FCRA_retro_test);
 base := if(isFCRA, fcra_base, dm_base);
 
 key_name := if(isFCRA, 

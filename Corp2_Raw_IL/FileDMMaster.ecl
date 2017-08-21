@@ -1,0 +1,73 @@
+import corp2;
+
+//********************************************************************
+//FileDMMaster -> Project string format into structured layout.
+//******************************************************************** 
+Corp2_Raw_IL.Layouts.MasterLayoutIn MasterTransform(Corp2_Raw_IL.Layouts.MasterFixedStringLayoutIn l) := transform
+	self.cd41100_file_number				:= corp2.t2u(l.payload[1..8]);
+	self.cd41100_incorp_date				:= corp2.t2u(l.payload[9..16]);
+	self.cd41100_state_code					:= corp2.t2u(l.payload[17..18]);
+	self.cd41100_filler							:= corp2.t2u(l.payload[19..27]);
+	self.cd41100_corp_intent				:= corp2.t2u(l.payload[28..30]);
+	self.cd41100_status							:= corp2.t2u(l.payload[31..32]);
+	self.cd41100_type_corp					:= corp2.t2u(l.payload[33..33]);
+	self.cd41100_trans_date					:= corp2.t2u(l.payload[34..41]);
+	self.filler_01									:= corp2.t2u(l.payload[42..44]);
+	self.cd41100_date_last_change		:= corp2.t2u(l.payload[45..52]);
+	self.cd41100_cr_factor					:= corp2.t2u(l.payload[53..59]);
+	self.cd41100_cr_paid_amount			:= corp2.t2u(l.payload[60..68]);
+	self.cd41100_ar_cap							:= corp2.t2u(l.payload[69..79]);
+	self.cd41100_cr_del_run_date		:= corp2.t2u(l.payload[80..87]);
+	self.cd41100_cr_run_date				:= corp2.t2u(l.payload[88..95]);
+	self.cd41100_paid_batch_no			:= corp2.t2u(l.payload[96..99]);
+	self.cd41100_paid_batch_yr			:= corp2.t2u(l.payload[100..103]);
+	self.cd41100_hold_prorate				:= corp2.t2u(l.payload[104..104]);
+	self.cd41100_regulated_ind 			:= corp2.t2u(l.payload[105..105]);
+	self.filler_02									:= corp2.t2u(l.payload[106..106]);
+	self.cd41100_name_length_ind		:= corp2.t2u(l.payload[107..107]);
+	self.cd41100_records_destroyed	:= corp2.t2u(l.payload[108..108]);
+	self.cd41100_cr_paid_date 			:= corp2.t2u(l.payload[109..116]);
+	self.cd41100_cap_date  					:= corp2.t2u(l.payload[117..124]); 
+	self.cd41100_pv_factor 					:= corp2.t2u(l.payload[125..131]);
+	self.cd41100_pv_paid_amount 		:= corp2.t2u(l.payload[132..140]);
+	self.cd41100_pv_ar_cap 					:= corp2.t2u(l.payload[141..151]);
+	self.cd41100_pv_del_run_date		:= corp2.t2u(l.payload[152..159]);
+	self.cd41100_pv_run_date 				:= corp2.t2u(l.payload[160..167]);
+	self.cd41100_pv_paid_batch_no 	:= corp2.t2u(l.payload[168..171]);
+	self.cd41100_pv_paid_batch_yr 	:= corp2.t2u(l.payload[172..175]);
+	self.cd41100_inc_letter_ind 		:= corp2.t2u(l.payload[176..176]); 
+	self.cd41100_abinitio_ind 			:= corp2.t2u(l.payload[177..177]);
+	self.cd41100_assume_old_ind 		:= corp2.t2u(l.payload[178..178]);
+	self.filler_03 									:= corp2.t2u(l.payload[179..180]);
+	self.cd41100_pv_paid_date 			:= corp2.t2u(l.payload[181..188]);
+	self.cd41100_duration_date 			:= corp2.t2u(l.payload[189..196]);
+	self.cd41100_total_cap 					:= corp2.t2u(l.payload[197..208]); 
+	self.filler_04									:= corp2.t2u(l.payload[209..218]); 
+	self.cd41100_tax_cap 						:= corp2.t2u(l.payload[219..230]);
+	self.filler_05									:= corp2.t2u(l.payload[231..240]);
+	self.cd41100_ill_cap 						:= corp2.t2u(l.payload[241..251]);
+	self.cd41100_new_ill_cap				:= corp2.t2u(l.payload[252..262]);
+	self.cd41100_pv_ill_cap 				:= corp2.t2u(l.payload[263..269]);
+	self.filler_05a 								:= corp2.t2u(l.payload[270..273]);
+	self.cd41100_agent_change_date 	:= corp2.t2u(l.payload[274..281]);
+	self.cd41100_agent_code 				:= corp2.t2u(l.payload[282..282]);
+	self.cd41100_agent_zip 					:= corp2.t2u(l.payload[283..291]); 
+	self.cd41100_agent_county_code 	:= corp2.t2u(l.payload[292..294]);  		
+	self.cd41100_fiscal_year 				:= corp2.t2u(l.payload[295..302]);
+	self.cd41100_extended_date 			:= corp2.t2u(l.payload[303..310]);
+	self.filler_06 						 			:= corp2.t2u(l.payload[311..316]);		
+	self.filler_07 									:= corp2.t2u(l.payload[317..322]);
+	self.cd41100_section_code 			:= corp2.t2u(l.payload[323..326]);
+	self.cd41100_stock_date 				:= corp2.t2u(l.payload[327..334]);
+	self.cd41100_revenue_ind 				:= corp2.t2u(l.payload[335..335]);
+	self.filler_08 									:= corp2.t2u(l.payload[336..341]);
+	self.cd41100_agent_name					:= corp2.t2u(l.payload[342..371]); 
+	self.cd41100_agent_street				:= corp2.t2u(l.payload[372..401]);
+	self.cd41100_agent_city					:= corp2.t2u(l.payload[402..419]);
+	self.cd41100_survivor_nbr				:= corp2.t2u(l.payload[420..427]);
+	self.cd41100_pres_name_addr			:= corp2.t2u(l.payload[428..487]);	
+	self.cd41100_sec_name_addr			:= corp2.t2u(l.payload[488..547]);
+	self.cd41100_corp_name					:= corp2.t2u(l.payload[548..729]);
+end;
+
+export FileDMMaster(dataset(Corp2_Raw_IL.Layouts.MasterFixedStringLayoutIn) pInMaster) := project(pInMaster,MasterTransform(LEFT));

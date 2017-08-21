@@ -1,0 +1,28 @@
+EXPORT layout_in_Corp_Mapping_NV := RECORD, MAXLENGTH(1150)
+	     STRING10  corp_id;
+         STRING10  ra_id;
+         STRING50  corp_type;
+         STRING50  corp_category;
+         STRING50  corp_status;
+         STRING15  managed_by;
+         STRING250 corp_name;
+         STRING3   qualifying_state;
+         STRING50  corp_no;
+         STRING21  capital_amt;
+         STRING10  no_par_share_count;
+         STRING250 corp_foreign_name;
+         STRING1   is_on_admin_hold;
+         STRING3   classification;
+         STRING150 reservation_owner_name;
+         STRING65  reservation_owner_addr1;
+         STRING65  reservation_owner_addr2;
+         STRING25  reservation_owner_city;
+         STRING2   reservation_owner_st;
+         STRING10  reservation_owner_zip;
+         STRING3   reservation_owner_country;
+         STRING10  creation_dt;
+         STRING10  status_changed_dt;
+         STRING10  annual_lo_due_dt;
+         STRING10  ra_resigned_dt;
+         STRING10  expired_dt;
+       END;

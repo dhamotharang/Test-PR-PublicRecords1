@@ -1,12 +1,12 @@
 // R	Requirement: Insurance Phone Verification
 // The Insurance Phone File created as part of the Phone Score v2.0 project shall be used to create a new Modeling Shell 5.0 field that indicates whether or not the input phone is associated with the LexID selected by the Modeling Shell.  The following response value shall be supported for this new field:
 
-// •	-1 – Input phone not provided or DID = 0.
-// •	0 – Neither DID nor input phone found in Insurance Phone File
-// •	1 – DID not found in Insurance Phone File and input phone is associated with a different DID
-// •	2 – DID found in Insurance Phone File but with a different phone and input phone not found 
-// •	3 – DID found in Insurance Phone File but with a different phone and input phone associated with a different DID
-// •	4 – DID found in Insurance Phone File with the input phone
+// â€¢	-1 â€“ Input phone not provided or DID = 0.
+// â€¢	0 â€“ Neither DID nor input phone found in Insurance Phone File
+// â€¢	1 â€“ DID not found in Insurance Phone File and input phone is associated with a different DID
+// â€¢	2 â€“ DID found in Insurance Phone File but with a different phone and input phone not found 
+// â€¢	3 â€“ DID found in Insurance Phone File but with a different phone and input phone associated with a different DID
+// â€¢	4 â€“ DID found in Insurance Phone File with the input phone
 
 // Development Comments: There is a dependency on the data team building the keys as part of the Phone Shell v2.0 project prior to implementing this requirement. 
 

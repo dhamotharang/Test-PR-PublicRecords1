@@ -186,47 +186,30 @@ layout_withpropvars take_sec_range(with_props le,sec_range_props ri) := TRANSFOR
   END;
 SHARED pj15 := JOIN(pj12,sec_range_props,left.Proxid=right.Proxid,take_sec_range(left,right),LEFT OUTER,HASH/*,HINT(parallel_match)*/);  //HACK comment out hint(parallel_match) for now
 
-SHARED ForeignCorpkey_prop7 := JOIN(ForeignCorpkey_prop6,sec_range_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
  
 SALT30.mac_prop_field(with_props(v_city_name NOT IN SET(s.nulls_v_city_name,v_city_name)),v_city_name,Proxid,v_city_name_props); // For every DID find the best FULL v_city_name
  
 SALT30.mac_prop_field(with_props((SALT30.StrType)st<>(SALT30.StrType)''),st,Proxid,st_props_context); // For every DID find the best FULL st
-SHARED ForeignCorpkey_prop8 := JOIN(ForeignCorpkey_prop7,v_city_name_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
-SHARED ForeignCorpkey_prop9 := JOIN(ForeignCorpkey_prop8,st_props_context,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
+SHARED ForeignCorpkey_prop7 := JOIN(ForeignCorpkey_prop6,v_city_name_props,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
+SHARED ForeignCorpkey_prop8 := JOIN(ForeignCorpkey_prop7,st_props_context,left.Proxid=right.Proxid,LEFT OUTER,LOCAL);
  
 SALT30.mac_prop_field(with_props(st NOT IN SET(s.nulls_st,st)),st,Proxid,st_props); // For every DID find the best FULL st
-SHARED ForeignCorpkey_prop10 := JOIN(ForeignCorpkey_prop9,st_props,left.Proxid=right.Proxid,LOCAL);
+SHARED ForeignCorpkey_prop9 := JOIN(ForeignCorpkey_prop8,st_props,left.Proxid=right.Proxid,LOCAL);
  
 SALT30.mac_prop_field(with_props(zip NOT IN SET(s.nulls_zip,zip)),zip,Proxid,zip_props); // For every DID find the best FULL zip
-SHARED ForeignCorpkey_prop11 := JOIN(ForeignCorpkey_prop10,zip_props,left.Proxid=right.Proxid,LOCAL);
-ForeignCorpkey_prop12_layout := RECORD
-  ForeignCorpkey_prop11;
+SHARED ForeignCorpkey_prop10 := JOIN(ForeignCorpkey_prop9,zip_props,left.Proxid=right.Proxid,LOCAL);
+ 
+SALT30.mac_prop_field(with_props(company_csz NOT IN SET(s.nulls_company_csz,company_csz)),company_csz,Proxid,company_csz_props); // For every DID find the best FULL company_csz
+ForeignCorpkey_prop11_layout := RECORD
+  ForeignCorpkey_prop10;
   UNSIGNED4 company_csz;
 END;
-ForeignCorpkey_prop12_layout ForeignCorpkey_addconceptcompany_csz(ForeignCorpkey_prop11 le) := TRANSFORM
+ForeignCorpkey_prop11_layout ForeignCorpkey_addconceptcompany_csz(ForeignCorpkey_prop10 le) := TRANSFORM
   SELF := le;
   self.company_csz := hash32((SALT30.StrType)le.v_city_name,(SALT30.StrType)le.st,(SALT30.StrType)le.zip); // Need to recompute hash as children have changed
 END;
-SHARED ForeignCorpkey_prop12 := PROJECT(ForeignCorpkey_prop11,ForeignCorpkey_addconceptcompany_csz(LEFT));
-ForeignCorpkey_prop13_layout := RECORD
-  ForeignCorpkey_prop12;
-  UNSIGNED4 company_addr1;
-END;
-ForeignCorpkey_prop13_layout ForeignCorpkey_addconceptcompany_addr1(ForeignCorpkey_prop12 le) := TRANSFORM
-  SELF := le;
-  self.company_addr1 := hash32((SALT30.StrType)le.prim_range,(SALT30.StrType)le.prim_name_derived,(SALT30.StrType)le.sec_range); // Need to recompute hash as children have changed
-END;
-SHARED ForeignCorpkey_prop13 := PROJECT(ForeignCorpkey_prop12,ForeignCorpkey_addconceptcompany_addr1(LEFT));
-ForeignCorpkey_prop14_layout := RECORD
-  ForeignCorpkey_prop13;
-  UNSIGNED4 company_address;
-END;
-ForeignCorpkey_prop14_layout ForeignCorpkey_addconceptcompany_address(ForeignCorpkey_prop13 le) := TRANSFORM
-  SELF := le;
-  self.company_address := hash32((SALT30.StrType)le.company_addr1,(SALT30.StrType)le.company_csz); // Need to recompute hash as children have changed
-END;
-SHARED ForeignCorpkey_prop14 := PROJECT(ForeignCorpkey_prop13,ForeignCorpkey_addconceptcompany_address(LEFT));
-SHARED ForeignCorpkey_prp := ForeignCorpkey_prop14;
+SHARED ForeignCorpkey_prop11 := PROJECT(ForeignCorpkey_prop10,ForeignCorpkey_addconceptcompany_csz(LEFT));
+SHARED ForeignCorpkey_prp := ForeignCorpkey_prop11;
  
 pj15 do_computes(pj15 le) := TRANSFORM
   SELF.company_csz := IF (Fields.InValid_company_csz((SALT30.StrType)le.v_city_name,(SALT30.StrType)le.st,(SALT30.StrType)le.zip),0,HASH32((SALT30.StrType)le.v_city_name,(SALT30.StrType)le.st,(SALT30.StrType)le.zip)); // Combine child fields into 1 for specificity counting
@@ -291,8 +274,6 @@ EXPORT Layout_ForeignCorpkey_Candidates := RECORD
   BOOLEAN prim_range_isnull := ForeignCorpkey_prp.prim_range  IN SET(s.nulls_prim_range,prim_range); // Simplify later processing 
   INTEGER2 prim_name_derived_weight100 := 0; // Contains 100x the specificity
   BOOLEAN prim_name_derived_isnull := ForeignCorpkey_prp.prim_name_derived  IN SET(s.nulls_prim_name_derived,prim_name_derived); // Simplify later processing 
-  INTEGER2 sec_range_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN sec_range_isnull := ForeignCorpkey_prp.sec_range  IN SET(s.nulls_sec_range,sec_range); // Simplify later processing 
   INTEGER2 v_city_name_weight100 := 0; // Contains 100x the specificity
   BOOLEAN v_city_name_isnull := ForeignCorpkey_prp.v_city_name  IN SET(s.nulls_v_city_name,v_city_name); // Simplify later processing 
   INTEGER2 st_weight100 := 0; // Contains 100x the specificity
@@ -301,10 +282,6 @@ EXPORT Layout_ForeignCorpkey_Candidates := RECORD
   BOOLEAN zip_isnull := ForeignCorpkey_prp.zip  IN SET(s.nulls_zip,zip); // Simplify later processing 
   INTEGER2 company_csz_weight100 := 0; // Contains 100x the specificity
   BOOLEAN company_csz_isnull := (ForeignCorpkey_prp.v_city_name  IN SET(s.nulls_v_city_name,v_city_name) AND ForeignCorpkey_prp.st  IN SET(s.nulls_st,st) AND ForeignCorpkey_prp.zip  IN SET(s.nulls_zip,zip)); // Simplify later processing 
-  INTEGER2 company_addr1_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN company_addr1_isnull := (ForeignCorpkey_prp.prim_range  IN SET(s.nulls_prim_range,prim_range) AND ForeignCorpkey_prp.prim_name_derived  IN SET(s.nulls_prim_name_derived,prim_name_derived) AND ForeignCorpkey_prp.sec_range  IN SET(s.nulls_sec_range,sec_range)); // Simplify later processing 
-  INTEGER2 company_address_weight100 := 0; // Contains 100x the specificity
-  BOOLEAN company_address_isnull := ((ForeignCorpkey_prp.prim_range  IN SET(s.nulls_prim_range,prim_range) AND ForeignCorpkey_prp.prim_name_derived  IN SET(s.nulls_prim_name_derived,prim_name_derived) AND ForeignCorpkey_prp.sec_range  IN SET(s.nulls_sec_range,sec_range)) AND (ForeignCorpkey_prp.v_city_name  IN SET(s.nulls_v_city_name,v_city_name) AND ForeignCorpkey_prp.st  IN SET(s.nulls_st,st) AND ForeignCorpkey_prp.zip  IN SET(s.nulls_zip,zip))); // Simplify later processing 
 END;
 SHARED ForeignCorpkey_pp := TABLE(ForeignCorpkey_prp,Layout_ForeignCorpkey_Candidates);
 EXPORT Layout_Candidates := RECORD // A record to hold weights of each field value
@@ -368,37 +345,37 @@ layout_candidates add_v_city_name(layout_candidates le,Specificities(ih).v_city_
   SELF.v_city_name_weight100 := MAP (le.v_city_name_isnull => 0, patch_default and ri.field_specificity=0 => s.v_city_name_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-j20 := JOIN(j21,PULL(Specificities(ih).v_city_name_values_persisted),LEFT.v_city_name=RIGHT.v_city_name,add_v_city_name(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
-layout_candidates add_company_csz(layout_candidates le,Specificities(ih).company_csz_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.company_csz_weight100 := MAP (le.company_csz_isnull => 0, patch_default and ri.field_specificity=0 => s.company_csz_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-j19 := JOIN(j20,PULL(Specificities(ih).company_csz_values_persisted),LEFT.company_csz=RIGHT.company_csz,add_company_csz(LEFT,RIGHT,TRUE),LOOKUP,LEFT OUTER);
-layout_candidates add_zip(layout_candidates le,Specificities(ih).zip_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.zip_weight100 := MAP (le.zip_isnull => 0, patch_default and ri.field_specificity=0 => s.zip_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-j18 := JOIN(j19,PULL(Specificities(ih).zip_values_persisted),LEFT.zip=RIGHT.zip,add_zip(LEFT,RIGHT,TRUE),LOOKUP,LEFT OUTER);
+SALT30.MAC_Choose_JoinType(j21,s.nulls_v_city_name,Specificities(ih).v_city_name_values_persisted,v_city_name,v_city_name_weight100,add_v_city_name,j20);
 layout_candidates add_sec_range(layout_candidates le,Specificities(ih).sec_range_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.sec_range_weight100 := MAP (le.sec_range_isnull => 0, patch_default and ri.field_specificity=0 => s.sec_range_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(j18,s.nulls_sec_range,Specificities(ih).sec_range_values_persisted,sec_range,sec_range_weight100,add_sec_range,j17);
-layout_candidates add_prim_name_derived(layout_candidates le,Specificities(ih).prim_name_derived_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.prim_name_derived_weight100 := MAP (le.prim_name_derived_isnull => 0, patch_default and ri.field_specificity=0 => s.prim_name_derived_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-SALT30.MAC_Choose_JoinType(j17,s.nulls_prim_name_derived,Specificities(ih).prim_name_derived_values_persisted,prim_name_derived,prim_name_derived_weight100,add_prim_name_derived,j16);
+SALT30.MAC_Choose_JoinType(j20,s.nulls_sec_range,Specificities(ih).sec_range_values_persisted,sec_range,sec_range_weight100,add_sec_range,j19);
 layout_candidates add_prim_range(layout_candidates le,Specificities(ih).prim_range_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.prim_range_weight100 := MAP (le.prim_range_isnull => 0, patch_default and ri.field_specificity=0 => s.prim_range_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(j16,s.nulls_prim_range,Specificities(ih).prim_range_values_persisted,prim_range,prim_range_weight100,add_prim_range,j15);
+SALT30.MAC_Choose_JoinType(j19,s.nulls_prim_range,Specificities(ih).prim_range_values_persisted,prim_range,prim_range_weight100,add_prim_range,j18);
+layout_candidates add_company_csz(layout_candidates le,Specificities(ih).company_csz_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.company_csz_weight100 := MAP (le.company_csz_isnull => 0, patch_default and ri.field_specificity=0 => s.company_csz_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(j18,s.nulls_company_csz,Specificities(ih).company_csz_values_persisted,company_csz,company_csz_weight100,add_company_csz,j17);
+layout_candidates add_zip(layout_candidates le,Specificities(ih).zip_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.zip_weight100 := MAP (le.zip_isnull => 0, patch_default and ri.field_specificity=0 => s.zip_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(j17,s.nulls_zip,Specificities(ih).zip_values_persisted,zip,zip_weight100,add_zip,j16);
 layout_candidates add_cnp_number(layout_candidates le,Specificities(ih).cnp_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.cnp_number_weight100 := MAP (le.cnp_number_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(j15,s.nulls_cnp_number,Specificities(ih).cnp_number_values_persisted,cnp_number,cnp_number_weight100,add_cnp_number,j14);
+SALT30.MAC_Choose_JoinType(j16,s.nulls_cnp_number,Specificities(ih).cnp_number_values_persisted,cnp_number,cnp_number_weight100,add_cnp_number,j15);
+layout_candidates add_prim_name_derived(layout_candidates le,Specificities(ih).prim_name_derived_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.prim_name_derived_weight100 := MAP (le.prim_name_derived_isnull => 0, patch_default and ri.field_specificity=0 => s.prim_name_derived_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(j15,s.nulls_prim_name_derived,Specificities(ih).prim_name_derived_values_persisted,prim_name_derived,prim_name_derived_weight100,add_prim_name_derived,j14);
 layout_candidates add_company_addr1(layout_candidates le,Specificities(ih).company_addr1_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.company_addr1_weight100 := MAP (le.company_addr1_isnull => 0, patch_default and ri.field_specificity=0 => s.company_addr1_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
@@ -409,26 +386,26 @@ layout_candidates add_company_address(layout_candidates le,Specificities(ih).com
   SELF := le;
 END;
 SALT30.MAC_Choose_JoinType(j13,s.nulls_company_address,Specificities(ih).company_address_values_persisted,company_address,company_address_weight100,add_company_address,j12);
-layout_candidates add_company_phone(layout_candidates le,Specificities(ih).company_phone_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.company_phone_weight100 := MAP (le.company_phone_isnull => 0, patch_default and ri.field_specificity=0 => s.company_phone_max, ri.field_specificity) * 100; // If never seen before - must be rare
+layout_candidates add_cnp_name(layout_candidates le,Specificities(ih).cnp_name_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.cnp_name_weight100 := MAP (le.cnp_name_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_name_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(j12,s.nulls_company_phone,Specificities(ih).company_phone_values_persisted,company_phone,company_phone_weight100,add_company_phone,j11);
+SALT30.MAC_Choose_JoinType(j12,s.nulls_cnp_name,Specificities(ih).cnp_name_values_persisted,cnp_name,cnp_name_weight100,add_cnp_name,j11);
 layout_candidates add_company_fein(layout_candidates le,Specificities(ih).company_fein_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.company_fein_weight100 := MAP (le.company_fein_isnull => 0, patch_default and ri.field_specificity=0 => s.company_fein_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
 SALT30.MAC_Choose_JoinType(j11,s.nulls_company_fein,Specificities(ih).company_fein_values_persisted,company_fein,company_fein_weight100,add_company_fein,j10);
-layout_candidates add_cnp_name(layout_candidates le,Specificities(ih).cnp_name_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.cnp_name_weight100 := MAP (le.cnp_name_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_name_max, ri.field_specificity) * 100; // If never seen before - must be rare
+layout_candidates add_active_enterprise_number(layout_candidates le,Specificities(ih).active_enterprise_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.active_enterprise_number_weight100 := MAP (le.active_enterprise_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_enterprise_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(j10,s.nulls_cnp_name,Specificities(ih).cnp_name_values_persisted,cnp_name,cnp_name_weight100,add_cnp_name,j9);
-layout_candidates add_ebr_file_number(layout_candidates le,Specificities(ih).ebr_file_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.ebr_file_number_weight100 := MAP (le.ebr_file_number_isnull => 0, patch_default and ri.field_specificity=0 => s.ebr_file_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
+SALT30.MAC_Choose_JoinType(j10,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_active_enterprise_number,j9);
+layout_candidates add_company_phone(layout_candidates le,Specificities(ih).company_phone_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.company_phone_weight100 := MAP (le.company_phone_isnull => 0, patch_default and ri.field_specificity=0 => s.company_phone_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(j9,s.nulls_ebr_file_number,Specificities(ih).ebr_file_number_values_persisted,ebr_file_number,ebr_file_number_weight100,add_ebr_file_number,j8);
+SALT30.MAC_Choose_JoinType(j9,s.nulls_company_phone,Specificities(ih).company_phone_values_persisted,company_phone,company_phone_weight100,add_company_phone,j8);
 layout_candidates add_unk_corp_key(layout_candidates le,Specificities(ih).unk_corp_key_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.unk_corp_key_weight100 := MAP (le.unk_corp_key_isnull => 0, patch_default and ri.field_specificity=0 => s.unk_corp_key_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
@@ -449,90 +426,75 @@ layout_candidates add_hist_duns_number(layout_candidates le,Specificities(ih).hi
   SELF := le;
 END;
 SALT30.MAC_Choose_JoinType(j5,s.nulls_hist_duns_number,Specificities(ih).hist_duns_number_values_persisted,hist_duns_number,hist_duns_number_weight100,add_hist_duns_number,j4);
-layout_candidates add_hist_enterprise_number(layout_candidates le,Specificities(ih).hist_enterprise_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.hist_enterprise_number_weight100 := MAP (le.hist_enterprise_number_isnull => 0, patch_default and ri.field_specificity=0 => s.hist_enterprise_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-SALT30.MAC_Choose_JoinType(j4,s.nulls_hist_enterprise_number,Specificities(ih).hist_enterprise_number_values_persisted,hist_enterprise_number,hist_enterprise_number_weight100,add_hist_enterprise_number,j3);
 layout_candidates add_active_domestic_corp_key(layout_candidates le,Specificities(ih).active_domestic_corp_key_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.active_domestic_corp_key_weight100 := MAP (le.active_domestic_corp_key_isnull => 0, patch_default and ri.field_specificity=0 => s.active_domestic_corp_key_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(j3,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_active_domestic_corp_key,j2);
-layout_candidates add_active_enterprise_number(layout_candidates le,Specificities(ih).active_enterprise_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.active_enterprise_number_weight100 := MAP (le.active_enterprise_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_enterprise_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-SALT30.MAC_Choose_JoinType(j2,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_active_enterprise_number,j1);
+SALT30.MAC_Choose_JoinType(j4,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_active_domestic_corp_key,j3);
 layout_candidates add_active_duns_number(layout_candidates le,Specificities(ih).active_duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.active_duns_number_weight100 := MAP (le.active_duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_duns_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(j1,s.nulls_active_duns_number,Specificities(ih).active_duns_number_values_persisted,active_duns_number,active_duns_number_weight100,add_active_duns_number,j0);
+SALT30.MAC_Choose_JoinType(j3,s.nulls_active_duns_number,Specificities(ih).active_duns_number_values_persisted,active_duns_number,active_duns_number_weight100,add_active_duns_number,j2);
+layout_candidates add_ebr_file_number(layout_candidates le,Specificities(ih).ebr_file_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.ebr_file_number_weight100 := MAP (le.ebr_file_number_isnull => 0, patch_default and ri.field_specificity=0 => s.ebr_file_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(j2,s.nulls_ebr_file_number,Specificities(ih).ebr_file_number_values_persisted,ebr_file_number,ebr_file_number_weight100,add_ebr_file_number,j1);
+layout_candidates add_hist_enterprise_number(layout_candidates le,Specificities(ih).hist_enterprise_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.hist_enterprise_number_weight100 := MAP (le.hist_enterprise_number_isnull => 0, patch_default and ri.field_specificity=0 => s.hist_enterprise_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(j1,s.nulls_hist_enterprise_number,Specificities(ih).hist_enterprise_number_values_persisted,hist_enterprise_number,hist_enterprise_number_weight100,add_hist_enterprise_number,j0);
 //Using HASH(did) to get smoother distribution
 SHARED Annotated := DISTRIBUTE(j0,hash(Proxid)) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::mc',EXPIRE(Config.PersistExpire)); // Distributed for keybuild case
  
 //Now prepare candidate file for ForeignCorpkey attribute file
-layout_ForeignCorpkey_candidates add_ForeignCorpkey_active_enterprise_number(layout_ForeignCorpkey_candidates le,Specificities(ih).active_enterprise_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.active_enterprise_number_weight100 := MAP (le.active_enterprise_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_enterprise_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-SALT30.MAC_Choose_JoinType(ForeignCorpkey_pp,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_ForeignCorpkey_active_enterprise_number,jForeignCorpkey_1);
 layout_ForeignCorpkey_candidates add_ForeignCorpkey_active_domestic_corp_key(layout_ForeignCorpkey_candidates le,Specificities(ih).active_domestic_corp_key_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.active_domestic_corp_key_weight100 := MAP (le.active_domestic_corp_key_isnull => 0, patch_default and ri.field_specificity=0 => s.active_domestic_corp_key_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jForeignCorpkey_1,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_ForeignCorpkey_active_domestic_corp_key,jForeignCorpkey_2);
+SALT30.MAC_Choose_JoinType(ForeignCorpkey_pp,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_ForeignCorpkey_active_domestic_corp_key,jForeignCorpkey_3);
+layout_ForeignCorpkey_candidates add_ForeignCorpkey_active_enterprise_number(layout_ForeignCorpkey_candidates le,Specificities(ih).active_enterprise_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.active_enterprise_number_weight100 := MAP (le.active_enterprise_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_enterprise_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(jForeignCorpkey_3,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_ForeignCorpkey_active_enterprise_number,jForeignCorpkey_9);
 layout_ForeignCorpkey_candidates add_ForeignCorpkey_cnp_name(layout_ForeignCorpkey_candidates le,Specificities(ih).cnp_name_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.cnp_name_weight100 := MAP (le.cnp_name_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_name_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jForeignCorpkey_2,s.nulls_cnp_name,Specificities(ih).cnp_name_values_persisted,cnp_name,cnp_name_weight100,add_ForeignCorpkey_cnp_name,jForeignCorpkey_9);
-layout_ForeignCorpkey_candidates add_ForeignCorpkey_company_address(layout_ForeignCorpkey_candidates le,Specificities(ih).company_address_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.company_address_weight100 := MAP (le.company_address_isnull => 0, patch_default and ri.field_specificity=0 => s.company_address_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-SALT30.MAC_Choose_JoinType(jForeignCorpkey_9,s.nulls_company_address,Specificities(ih).company_address_values_persisted,company_address,company_address_weight100,add_ForeignCorpkey_company_address,jForeignCorpkey_12);
-layout_ForeignCorpkey_candidates add_ForeignCorpkey_company_addr1(layout_ForeignCorpkey_candidates le,Specificities(ih).company_addr1_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.company_addr1_weight100 := MAP (le.company_addr1_isnull => 0, patch_default and ri.field_specificity=0 => s.company_addr1_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-SALT30.MAC_Choose_JoinType(jForeignCorpkey_12,s.nulls_company_addr1,Specificities(ih).company_addr1_values_persisted,company_addr1,company_addr1_weight100,add_ForeignCorpkey_company_addr1,jForeignCorpkey_13);
-layout_ForeignCorpkey_candidates add_ForeignCorpkey_cnp_number(layout_ForeignCorpkey_candidates le,Specificities(ih).cnp_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.cnp_number_weight100 := MAP (le.cnp_number_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-SALT30.MAC_Choose_JoinType(jForeignCorpkey_13,s.nulls_cnp_number,Specificities(ih).cnp_number_values_persisted,cnp_number,cnp_number_weight100,add_ForeignCorpkey_cnp_number,jForeignCorpkey_14);
-layout_ForeignCorpkey_candidates add_ForeignCorpkey_prim_range(layout_ForeignCorpkey_candidates le,Specificities(ih).prim_range_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.prim_range_weight100 := MAP (le.prim_range_isnull => 0, patch_default and ri.field_specificity=0 => s.prim_range_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-SALT30.MAC_Choose_JoinType(jForeignCorpkey_14,s.nulls_prim_range,Specificities(ih).prim_range_values_persisted,prim_range,prim_range_weight100,add_ForeignCorpkey_prim_range,jForeignCorpkey_15);
+SALT30.MAC_Choose_JoinType(jForeignCorpkey_9,s.nulls_cnp_name,Specificities(ih).cnp_name_values_persisted,cnp_name,cnp_name_weight100,add_ForeignCorpkey_cnp_name,jForeignCorpkey_11);
 layout_ForeignCorpkey_candidates add_ForeignCorpkey_prim_name_derived(layout_ForeignCorpkey_candidates le,Specificities(ih).prim_name_derived_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.prim_name_derived_weight100 := MAP (le.prim_name_derived_isnull => 0, patch_default and ri.field_specificity=0 => s.prim_name_derived_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jForeignCorpkey_15,s.nulls_prim_name_derived,Specificities(ih).prim_name_derived_values_persisted,prim_name_derived,prim_name_derived_weight100,add_ForeignCorpkey_prim_name_derived,jForeignCorpkey_16);
-layout_ForeignCorpkey_candidates add_ForeignCorpkey_sec_range(layout_ForeignCorpkey_candidates le,Specificities(ih).sec_range_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.sec_range_weight100 := MAP (le.sec_range_isnull => 0, patch_default and ri.field_specificity=0 => s.sec_range_max, ri.field_specificity) * 100; // If never seen before - must be rare
+SALT30.MAC_Choose_JoinType(jForeignCorpkey_11,s.nulls_prim_name_derived,Specificities(ih).prim_name_derived_values_persisted,prim_name_derived,prim_name_derived_weight100,add_ForeignCorpkey_prim_name_derived,jForeignCorpkey_14);
+layout_ForeignCorpkey_candidates add_ForeignCorpkey_cnp_number(layout_ForeignCorpkey_candidates le,Specificities(ih).cnp_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.cnp_number_weight100 := MAP (le.cnp_number_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jForeignCorpkey_16,s.nulls_sec_range,Specificities(ih).sec_range_values_persisted,sec_range,sec_range_weight100,add_ForeignCorpkey_sec_range,jForeignCorpkey_17);
+SALT30.MAC_Choose_JoinType(jForeignCorpkey_14,s.nulls_cnp_number,Specificities(ih).cnp_number_values_persisted,cnp_number,cnp_number_weight100,add_ForeignCorpkey_cnp_number,jForeignCorpkey_15);
 layout_ForeignCorpkey_candidates add_ForeignCorpkey_zip(layout_ForeignCorpkey_candidates le,Specificities(ih).zip_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.zip_weight100 := MAP (le.zip_isnull => 0, patch_default and ri.field_specificity=0 => s.zip_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-jForeignCorpkey_18 := JOIN(jForeignCorpkey_17,PULL(Specificities(ih).zip_values_persisted),LEFT.zip=RIGHT.zip,add_ForeignCorpkey_zip(LEFT,RIGHT,TRUE),LOOKUP,LEFT OUTER);
+SALT30.MAC_Choose_JoinType(jForeignCorpkey_15,s.nulls_zip,Specificities(ih).zip_values_persisted,zip,zip_weight100,add_ForeignCorpkey_zip,jForeignCorpkey_16);
 layout_ForeignCorpkey_candidates add_ForeignCorpkey_company_csz(layout_ForeignCorpkey_candidates le,Specificities(ih).company_csz_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.company_csz_weight100 := MAP (le.company_csz_isnull => 0, patch_default and ri.field_specificity=0 => s.company_csz_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-jForeignCorpkey_19 := JOIN(jForeignCorpkey_18,PULL(Specificities(ih).company_csz_values_persisted),LEFT.company_csz=RIGHT.company_csz,add_ForeignCorpkey_company_csz(LEFT,RIGHT,TRUE),LOOKUP,LEFT OUTER);
+SALT30.MAC_Choose_JoinType(jForeignCorpkey_16,s.nulls_company_csz,Specificities(ih).company_csz_values_persisted,company_csz,company_csz_weight100,add_ForeignCorpkey_company_csz,jForeignCorpkey_17);
+layout_ForeignCorpkey_candidates add_ForeignCorpkey_prim_range(layout_ForeignCorpkey_candidates le,Specificities(ih).prim_range_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.prim_range_weight100 := MAP (le.prim_range_isnull => 0, patch_default and ri.field_specificity=0 => s.prim_range_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(jForeignCorpkey_17,s.nulls_prim_range,Specificities(ih).prim_range_values_persisted,prim_range,prim_range_weight100,add_ForeignCorpkey_prim_range,jForeignCorpkey_18);
 layout_ForeignCorpkey_candidates add_ForeignCorpkey_v_city_name(layout_ForeignCorpkey_candidates le,Specificities(ih).v_city_name_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.v_city_name_weight100 := MAP (le.v_city_name_isnull => 0, patch_default and ri.field_specificity=0 => s.v_city_name_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-jForeignCorpkey_20 := JOIN(jForeignCorpkey_19,PULL(Specificities(ih).v_city_name_values_persisted),LEFT.v_city_name=RIGHT.v_city_name,add_ForeignCorpkey_v_city_name(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
+SALT30.MAC_Choose_JoinType(jForeignCorpkey_18,s.nulls_v_city_name,Specificities(ih).v_city_name_values_persisted,v_city_name,v_city_name_weight100,add_ForeignCorpkey_v_city_name,jForeignCorpkey_20);
 layout_ForeignCorpkey_candidates add_ForeignCorpkey_st(layout_ForeignCorpkey_candidates le,Specificities(ih).st_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.st_weight100 := MAP (le.st_isnull => 0, patch_default and ri.field_specificity=0 => s.st_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
@@ -540,7 +502,7 @@ END;
 jForeignCorpkey_21 := JOIN(jForeignCorpkey_20,PULL(Specificities(ih).st_values_persisted),LEFT.st=RIGHT.st,add_ForeignCorpkey_st(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
 EXPORT ForeignCorpkey_candidates := jForeignCorpkey_21 : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::mc::ForeignCorpkey',EXPIRE(Config.PersistExpire));
 //Now see if these records are actually linkable
-TotalWeight := Annotated.active_duns_number_weight100 + Annotated.active_enterprise_number_weight100 + Annotated.active_domestic_corp_key_weight100 + Annotated.hist_enterprise_number_weight100 + Annotated.hist_duns_number_weight100 + Annotated.hist_domestic_corp_key_weight100 + Annotated.foreign_corp_key_weight100 + Annotated.unk_corp_key_weight100 + Annotated.ebr_file_number_weight100 + Annotated.cnp_name_weight100 + Annotated.company_fein_weight100 + Annotated.company_phone_weight100 + Annotated.company_address_weight100 + Annotated.cnp_number_weight100;
+TotalWeight := Annotated.hist_enterprise_number_weight100 + Annotated.ebr_file_number_weight100 + Annotated.active_duns_number_weight100 + Annotated.active_domestic_corp_key_weight100 + Annotated.hist_duns_number_weight100 + Annotated.hist_domestic_corp_key_weight100 + Annotated.foreign_corp_key_weight100 + Annotated.unk_corp_key_weight100 + Annotated.company_phone_weight100 + Annotated.active_enterprise_number_weight100 + Annotated.company_fein_weight100 + Annotated.cnp_name_weight100 + Annotated.company_address_weight100 + Annotated.cnp_number_weight100;
 SHARED Linkable := TotalWeight >= Config.MatchThreshold;
 EXPORT Unlinkables := Annotated(~Linkable); // Insufficient data to ever get a match
 EXPORT Candidates := Annotated(); //Attribute Files might bring total score up to threshold

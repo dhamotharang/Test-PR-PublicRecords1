@@ -79,9 +79,10 @@ county_reg(string2 code)
 '74' => 'WOODRUFF',
 '75' => 'YELL','' );   
 
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_AR_clean_in, watercraft.Layout_ar_clean_in,hull_clean_in)
 
 
-watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_AR_clean_in L) := transform
+watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := transform
 
 
     self.watercraft_key						:=	(trim(L.HULL_ID, left, right) + trim(L.MAKE,left, right) + trim(L.YEAR, left, right))[1..30];                                          
@@ -185,7 +186,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_AR_cl
 
 
 
-export Mapping_AR_as_Main := project(watercraft.file_AR_clean_in, main_mapping_format(left));
+export Mapping_AR_as_Main := project(hull_clean_in, main_mapping_format(left));
 
 
 	

@@ -2,12 +2,9 @@ import STRATA,TaxPro;
 
 export Strata_Pop_Base(string pVersion) := function
 
-
-rPopulationStats_TAXPRO
- :=
-  record
-    integer countGroup 									 := count(group);
-	dt_first_seen_CountNonZero                           := sum(group,if(File_base.dt_first_seen<>0,1,0));
+rPopulationStats_TAXPRO :=record
+    integer countGroup 									                 := count(group);
+	  dt_first_seen_CountNonZero                           := sum(group,if(File_base.dt_first_seen<>0,1,0));
     dt_last_seen_CountNonZero                            := sum(group,if(File_base.dt_last_seen<>0,1,0));
     dt_vendor_first_reported_CountNonZero                := sum(group,if(File_base.dt_vendor_first_reported<>0,1,0));
     dt_vendor_last_reported_CountNonZero                 := sum(group,if(File_base.dt_vendor_last_reported<>0,1,0));
@@ -60,7 +57,29 @@ rPopulationStats_TAXPRO
     did_score_CountNonZero                               := sum(group,if(File_base.did_score<>0,1,0));
     bdid_CountNonZero                                    := sum(group,if(File_base.bdid<>0,1,0));
     bdid_score_CountNonZero                              := sum(group,if(File_base.bdid_score<>0,1,0));
-  end;
+		//BIPV2 fields have been added 
+		DotID_CountNonZeros	 															   := sum(group,if(File_base.DotID<>0,1,0));
+		DotScore_CountNonZeros	   												 	 := sum(group,if(File_base.DotScore<>0,1,0));
+		DotWeight_CountNonZeros	 													   := sum(group,if(File_base.DotWeight<>0,1,0));
+		EmpID_CountNonZeros	   														   := sum(group,if(File_base.EmpID<>0,1,0));
+		EmpScore_CountNonZeros	 													   := sum(group,if(File_base.EmpScore<>0,1,0));
+		EmpWeight_CountNonZeros	 									           := sum(group,if(File_base.EmpWeight<>0,1,0));
+		POWID_CountNonZeros	                                 := sum(group,if(File_base.POWID<>0,1,0));
+		POWScore_CountNonZeros	                             := sum(group,if(File_base.POWScore<>0,1,0));
+		POWWeight_CountNonZeros	                             := sum(group,if(File_base.POWWeight<>0,1,0));
+		ProxID_CountNonZeros	                               := sum(group,if(File_base.ProxID<>0,1,0));
+		ProxScore_CountNonZeros	                             := sum(group,if(File_base.ProxScore<>0,1,0));
+		ProxWeight_CountNonZeros	                           := sum(group,if(File_base.ProxWeight<>0,1,0));
+		SeleID_CountNonZeros	                               := sum(group,if(File_base.SeleID<>0,1,0));
+		SeleScore_CountNonZeros	                             := sum(group,if(File_base.SeleScore<>0,1,0));
+		SeleWeight_CountNonZeros	                           := sum(group,if(File_base.SeleWeight<>0,1,0));
+		OrgID_CountNonZeros	                                 := sum(group,if(File_base.OrgID<>0,1,0));
+	  OrgScore_CountNonZeros	                             := sum(group,if(File_base.OrgScore<>0,1,0));
+		OrgWeight_CountNonZeros	                             := sum(group,if(File_base.OrgWeight<>0,1,0));
+		UltID_CountNonZeros	                                 := sum(group,if(File_base.UltID<>0,1,0));
+		UltScore_CountNonZeros	                             := sum(group,if(File_base.UltScore<>0,1,0));
+		UltWeight_CountNonZeros	                             := sum(group,if(File_base.UltWeight<>0,1,0));
+end;
 
 rDIDstatsDID := record
   integer countGroup := count(group);
@@ -69,36 +88,29 @@ rDIDstatsDID := record
   Has_DID 	 := sum(group,IF((unsigned6)File_Base(name.lname <> '').did <> 0,1,0))/sum(group,IF(File_Base.name.lname <> '',1,0)) * 100;
   has_bdid   := sum(group,IF((unsigned6)File_Base(company <> '').bdid <> 0,1,0))/sum(group,IF(File_Base.company <> '',1,0)) * 100;
 end;
-	dPopulationStats_dMain := table(group(sort(distribute(File_base,hash( State)), State, source, local)
-									  ,State, source, local) 
-	                                  ,rPopulationStats_TAXPRO, State, source, local
-                                      ,few);
+dPopulationStats_dMain := table(File_base,rPopulationStats_TAXPRO, State, source,few);
 
-	STRATA.createXMLStats(dPopulationStats_dMain
-	                     ,'TaxPro'
-						 ,'Base'
-						 ,pVersion
-						 ,''
-						 ,zBaseStats
-						 ,'view'
-						 ,'Population');
-
-
+STRATA.createXMLStats( dPopulationStats_dMain
+											 ,'TaxPro'
+											 ,'BaseFile'
+											 ,pVersion
+											 ,''
+											 ,zBaseStats
+											 ,'view'
+											 ,'Population');
 					 
 //output party DID stats	
 				 
-	dDIDstats              := table(group(sort(distribute(File_Base,hash( State)), State, source, local)
-									  ,State, source, local) 
-									  ,rDIDstatsDID,State, source, local,few);
+dDIDstats              := table(File_Base,rDIDstatsDID,State, source, few);
     
-	STRATA.createXMLStats(dDIDstats
-	                     ,'TaxPro'
-						 ,'Base'
-						 ,pVersion
-						 ,''
-						 ,zDIDStats
-						 ,'view'
-					     ,'DIDStats');
+STRATA.createXMLStats( dDIDstats
+											 ,'TaxPro'
+											 ,'Base'
+											 ,pVersion
+											 ,''
+											 ,zDIDStats
+											 ,'view'
+											 ,'DIDStats');
 
 zOut := parallel(zBaseStats,zDIDStats);
 return zout; 

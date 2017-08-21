@@ -1,5 +1,5 @@
 import ut,header,watchdog;
-v := vehicles_as_source;
+v := vehicles_as_source(,true);
 
 slim_veh := record
 string18  vendor_id;

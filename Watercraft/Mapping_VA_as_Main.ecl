@@ -1,7 +1,8 @@
 import watercraft;
 
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_VA_clean_in, watercraft.Layout_VA_clean_in,hull_clean_in)
 
-file_VA_dedup := dedup(sort(watercraft.file_VA_clean_in, reg_date, reg_num), reg_date, reg_num); 
+file_VA_dedup := dedup(sort(hull_clean_in, reg_date, reg_num), reg_date, reg_num); 
 
 Layout_VA_clean_temp := record
 

@@ -1,4 +1,4 @@
-import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build;
+import header, Census_data, Gong, Watchdog, did_add, ut, doxie_build, PRTE2_Header;
 
 head := doxie_build.file_fcra_header_building; 
 
@@ -154,7 +154,7 @@ with_appends := JOIN(with_county, with_best,
 
 
 set_external_srcs:=['TN','TS','TU','LT'];
-segmented_h := Header.fn_ADLSegmentation(head(src not in set_external_srcs)).core_check;
+segmented_h := Header.fn_ADLSegmentation_v2(head(src not in set_external_srcs)).core_check;
 
 xHead_Layout get_lookups(with_appends le, segmented_h ri) :=
 TRANSFORM
@@ -165,5 +165,8 @@ END;
 
 with_segmented := JOIN(with_appends,segmented_h,left.did=right.did,get_lookups(LEFT,RIGHT), LOCAL): PERSIST('persist::fcra_header_pre_keybuild');
 
-
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export FCRA_header_pre_keybuild := project(PRTE2_Header.files.header_FCRA_pre_keybuild,{xHead_Layout});
+#ELSE
 export FCRA_header_pre_keybuild := with_segmented;
+#END;

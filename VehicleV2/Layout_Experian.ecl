@@ -349,6 +349,7 @@ module
     string50 AIRBAG_FRONT_PASS	;
     string50 AIRBAG_FRONT_PASS_SIDE	;
     string50 AIRBAGS	;
+		unsigned8				source_rec_id := 0;	 	//Added for BIP project		
 	end;
 	
 	export Layout_temp_VehicleV2	:=

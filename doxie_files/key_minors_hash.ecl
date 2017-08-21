@@ -5,7 +5,7 @@ h :=
 	header.File_Headers(
 		dob > 0 and 
 		_Validate.Date.fIsValid((string8)dob,,true,true) and 
-		ut.GetAgeI(dob) < 18
+		ut.Age(dob) < 18
 	);
 
 //just keep the higher of their DOBs, if multiple	
@@ -29,7 +29,7 @@ b :=
 	watchdog.File_Best(
 		dob > 0 and 
 		_Validate.Date.fIsValid((string8)dob,,true,true) and 
-		ut.GetAgeI(dob) >= 18
+		ut.Age(dob) >= 18
 	);		
 
 j := 

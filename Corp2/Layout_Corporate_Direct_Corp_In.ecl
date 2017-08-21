@@ -21,7 +21,7 @@ string350 corp_legal_name;
 string2   corp_ln_name_type_cd;
 string30  corp_ln_name_type_desc;
 string32  corp_supp_nbr;
-string100 corp_name_comment;
+string250 corp_name_comment;  //modified length from 100 to 250
 	
 string8	  corp_address1_type_cd;
 string60  corp_address1_type_desc;
@@ -59,7 +59,7 @@ string8	  corp_status_cd;
 string60  corp_status_desc;
 string8	  corp_status_date;
 string1   corp_standing;
-string100 corp_status_comment;
+string350 corp_status_comment; //modified length from 100 to 350
 	
 string8	  corp_ticker_symbol;
 string8	  corp_stock_exchange;
@@ -92,8 +92,8 @@ string1   corp_public_or_private_ind;
 string8	  corp_sic_code;
 string8   corp_naic_code;
 string8	  corp_orig_bus_type_cd;
-string70  corp_orig_bus_type_desc;
-string60  corp_entity_desc;
+string350 corp_orig_bus_type_desc;  //modified length from 70 to 350
+string350 corp_entity_desc;         //modified length from 60 to 350
 string32  corp_certificate_nbr;
 string32  corp_internal_nbr;
 string32  corp_previous_nbr;
@@ -102,7 +102,7 @@ string5   corp_amendments_filed;
 string50  corp_acts;
 string1   corp_partnership_ind;
 string1   corp_mfg_ind;
-string100 corp_addl_info;
+string250 corp_addl_info;        //modified length from 100 to 250
 
 string10  corp_taxes;
 string8   corp_franchise_taxes;
@@ -119,7 +119,7 @@ string8	  corp_ra_effective_date;
 string8   corp_ra_resign_date;
 string5   corp_ra_no_comp;
 string5   corp_ra_no_comp_igs;
-string100 corp_ra_addl_info;
+string250 corp_ra_addl_info; //modified length from 100 to 250
 	
 string8	  corp_ra_address_type_cd;
 string60  corp_ra_address_type_desc;
@@ -245,5 +245,11 @@ string4   corp_ra_msa;
 string7   corp_ra_geo_blk;
 string1   corp_ra_geo_match;
 string4   corp_ra_err_stat;
-	
+// Adding the following fields for AID purposes
+string100	corp_prep_addr1_line1;
+string50	corp_prep_addr1_last_line;	
+string100	corp_prep_addr2_line1;
+string50	corp_prep_addr2_last_line;
+string100	RA_prep_addr_line1;
+string50	RA_prep_addr_last_line;
 end;

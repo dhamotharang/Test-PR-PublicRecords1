@@ -10,6 +10,4 @@ end;
 
 header_services.Supplemental_Data.mac_verify('ssi2_sup.txt',in_layout,attr);
 in := attr();
-export file_in_DateCorrect := in;
-
-// export file_in_DateCorrect := dataset([],in_layout);
+export file_in_DateCorrect := dedup(sort(in,hval,-endDate),hval);

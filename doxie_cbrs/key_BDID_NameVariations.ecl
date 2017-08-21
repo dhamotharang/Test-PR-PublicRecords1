@@ -1,8 +1,14 @@
-import doxie, business_header,ut;
+Import Data_Services, doxie, business_header, ut, PRTE2_Business_Header;
 
-bf := business_header.File_Business_Header_Best;
-rel := table(business_header.File_Business_Relatives(name or name_Address or name_phone),	
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+bf := PRTE2_business_header.Files().Base.Business_Header_Best.built;
+rel := table(PRTE2_business_header.Files().Base.Business_Relatives.built(name or name_Address or name_phone),	
 						 {bdid1, bdid2});
+#ELSE
+bf := business_header.Files().Base.Business_Header_Best.built;
+rel := table(business_header.Files().Base.Business_Relatives.built(name or name_Address or name_phone),	
+						 {bdid1, bdid2});
+#END;
 
 rec := record
 	unsigned6 bdid;

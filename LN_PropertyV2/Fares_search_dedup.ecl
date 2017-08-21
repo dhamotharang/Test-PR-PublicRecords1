@@ -1,6 +1,6 @@
 import ut,LN_PropertyV2,property;
 
-export Fares_search_dedup(dataset(recordof(LN_PropertyV2.Layout_Fares_Search_in))  in_search,
+export Fares_search_dedup(dataset(recordof(LN_PropertyV2.layout_deed_mortgage_property_search_mod))  in_search,
                           dataset(recordof(property.layout_fares_deeds))   deeds_dedup,
 						  dataset(recordof(property.layout_fares_assessor)) assesor_dedup) :=
 function
@@ -17,18 +17,18 @@ fares_rec assesSlim(property.Layout_Fares_Assessor L) := transform
  self := l;
 end;
 
-search_file := distribute(in_search,hash(fares_id));
+search_file := distribute(in_search,hash(ln_fares_id));
 
 deeds_file := project(deeds_dedup,deedslim(left));
 asses_file := project(assesor_dedup,assesSlim(left));
 
 join_file := distribute(deeds_file+asses_file,hash(fares_id));
 
-LN_PropertyV2.Layout_Fares_Search_in loseAsses(search_file L, fares_rec R) := transform
+LN_PropertyV2.layout_deed_mortgage_property_search loseAsses(search_file L, fares_rec R) := transform
  self := l;
 end;
 
-search_dup := join(search_file,join_file,left.fares_id=right.fares_id,loseAsses(left,right),local);
+search_dup := join(search_file,join_file,left.ln_fares_id=right.fares_id,loseAsses(left,right),local);
 
 return search_dup;
 

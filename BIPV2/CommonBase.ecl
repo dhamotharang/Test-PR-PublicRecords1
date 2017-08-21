@@ -14,7 +14,7 @@
 // Almost everyone who needs the header should reference #3.  #2 feeds back around
 // as the base file for the next build.
 
-IMPORT ut, BIPV2, BIPV2_Company_Names, AID, _Control, Suppress;
+IMPORT ut, BIPV2, BIPV2_Company_Names, AID, _Control, Suppress, Data_Services;
 
 EXPORT CommonBase := MODULE
 
@@ -40,11 +40,11 @@ EXPORT CommonBase := MODULE
 	EXPORT FILE_FATHER_LOCAL      := '~' + filePrefix + 'father'      ;
 	EXPORT FILE_GRANDFATHER_LOCAL	:= '~' + filePrefix + 'grandfather' ;
 
-	EXPORT FILE_PROD_BUILT		    := ut.foreign_prod      + filePrefix + 'built'     ;
-	EXPORT FILE_PROD				      := ut.foreign_prod      + filePrefix + 'base'         ;
-	EXPORT FILE_FATHER_PROD	      := ut.foreign_prod      + filePrefix + 'father'       ;
-	EXPORT FILE_GRANDFATHER_PROD	:= ut.foreign_prod      + filePrefix + 'grandfather'  ;
-	EXPORT FILE_DATALAND		      := ut.foreign_dataland  + filePrefix + 'base'         ;
+	EXPORT FILE_PROD_BUILT		    := Data_Services.foreign_prod      + filePrefix + 'built'     ;
+	EXPORT FILE_PROD				      := Data_Services.foreign_prod      + filePrefix + 'base'         ;
+	EXPORT FILE_FATHER_PROD	      := Data_Services.foreign_prod      + filePrefix + 'father'       ;
+	EXPORT FILE_GRANDFATHER_PROD	:= Data_Services.foreign_prod      + filePrefix + 'grandfather'  ;
+	EXPORT FILE_DATALAND		      := Data_Services.foreign_dataland  + filePrefix + 'base'         ;
   
 	EXPORT FILE_BUILT				      := IF(_Control.ThisEnvironment.Name = 'Prod_Thor' ,FILE_LOCAL_BUILT         ,FILE_PROD_BUILT        );
 	EXPORT FILE_BASE				      := IF(_Control.ThisEnvironment.Name = 'Prod_Thor' ,FILE_LOCAL               ,FILE_PROD              );
@@ -107,8 +107,8 @@ EXPORT CommonBase := MODULE
 			StringLib.StringToLowerCase(#TEXT(in_loc)),
 			''					=> '~',
 			'local'			=> '~',
-			'dataland'	=> ut.foreign_dataland,
-			'prod'			=> ut.foreign_prod,
+			'dataland'	=> Data_Services.foreign_dataland,
+			'prod'			=> Data_Services.foreign_prod,
 			ERROR('BIPV2.CommonBase.DS_OMNI -- bad location'));
 		
 		LOCAL ver := CASE(

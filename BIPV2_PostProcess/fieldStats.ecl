@@ -3,6 +3,7 @@ import strata, BIPV2_Files,BIPv2_HRCHY,BIPV2;
 EXPORT fieldStats(
 
    dataset(BIPV2.CommonBase.layout ) pInfile  = BIPV2.CommonBase.DS_CLEAN
+	 ,string for_unique_persist_name 						= ''
 
 ) := module
 
@@ -14,7 +15,7 @@ export fieldPopulation_entity 	:= Strata.macf_Pops(fieldPopulation_entity0,,,,,,
 /* ------------------------------------------- */
 // Count unique identifier
 /* ------------------------------------------- */
-shared proxFile := project(pinfile, BIPV2_PostProcess.layouts.slim_layout_v1) : persist('~thor::BIPV2_PostProcess::fieldStats');
+shared proxFile := project(pinfile, BIPV2_PostProcess.layouts.slim_layout_v1) : persist('~thor::BIPV2_PostProcess::fieldStats' + trim(for_unique_persist_name), expire(3));
 
 rec := record
 	unsigned6 id;
@@ -30,7 +31,7 @@ getCount(dataset(rec) slimInput, string10 fieldName) := module
 	s1 := dedup(sort(d1, id, local), id, local);
 	idCount := count(s1);
 	
-	output(choosen(d1, 100), named(fieldName));
+	// output(choosen(d1, 100), named(fieldName));
 	export result := dataset([{fieldName, idCount}], op);
 	// return result;	
 end;
@@ -70,7 +71,7 @@ shared getFieldDist(dataset(distRec) slimInput, string20 codeName) := module
 	r3 := project(r2, transform(op, self.field1 := trim(left.val)[1..4], self.field2 := trim(left.val)[5..], self := left));
 	s1 := sort(r3, fieldname, field1, field2);	
 	
-	output(s1, named(codeName), all);
+	// output(s1, named(codeName), all);
 	export result := s1;
 	// return result;	
 end;

@@ -1,5 +1,5 @@
 import _control;
-#option('maxLength', 131072); // have to increase for the remote directory child datasets
+// #option('maxLength', 131072); // have to increase for the remote directory child datasets
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
 export mod_Soapcalls :=
@@ -46,13 +46,17 @@ module
 		dataset(eclResultLayout) results{xpath('outAttributes/ECLAttribute')};
 	
 	end;
+
+  /////////////////////////////////////////////
+  // -- fGetAttributes
+  /////////////////////////////////////////////
 	export fGetAttributes(
 	
 		 string		pModuleName			= ''
 		,string		pAttributeName	= ''
 		,string		pEsp						= if(_Constants.IsDataland
-																	,'10.241.3.242:8145'	//oss is 242,infiniband is '10.241.3.242'
-																	,'10.173.84.202:8145'
+																	,'10.241.12.207:8145'	//oss is 242,infiniband is '10.241.3.242'
+																	,'prod_esp.br.seisint.com:8145'
 																)
 		,string		pUserName     	= ''
 		,string		pPattern      	= ''
@@ -80,13 +84,13 @@ module
 			string Pattern      {xpath('Pattern'			)}	:= pPattern      	;
 			string Regexp       {xpath('Regexp'				)}	:= pRegexp       	;	
 			string ChangedSince {xpath('ChangedSince'	)}	:= pChangedSince 	;
-			boolean Sandboxed   {xpath('Sandboxed'		)}	:= pSandboxed   	;
+			boolean Sandboxed   {xpath('Sandboxed'		)}	:= false;//pSandboxed   	;
 			boolean Locked      {xpath('Locked'				)}	:= pLocked      	;
 			boolean CheckedOut  {xpath('CheckedOut'		)}	:= pCheckedOut  	;
 			boolean Orphaned    {xpath('Orphaned'			)}	:= pOrphaned    	;
 			boolean GetText   	{xpath('GetText'			)}	:= pGetText   		;
 			boolean IncludeHistory   	{xpath('IncludeHistory'			)}	:= pIncludeHistory   		;
-			dataset(item_layout) Items{xpath('TypeList')} := dataset([{'ECL'}],item_layout);  //for some reason, putting both SALT and ECL attributes in this dataset does not give you both back, just ECL ones returned
+			dataset(item_layout) Items{xpath('TypeList')} := dataset(['ECL'],item_layout);
                                                      
 		end;                
 		
@@ -98,7 +102,7 @@ module
 			string Pattern      {xpath('Pattern'			)}	:= pPattern      	;
 			string Regexp       {xpath('Regexp'				)}	:= pRegexp       	;	
 			string ChangedSince {xpath('ChangedSince'	)}	:= pChangedSince 	;
-			boolean Sandboxed   {xpath('Sandboxed'		)}	:= pSandboxed   	;
+			boolean Sandboxed   {xpath('Sandboxed'		)}	:= false;//pSandboxed   	;
 			boolean Locked      {xpath('Locked'				)}	:= pLocked      	;
 			boolean CheckedOut  {xpath('CheckedOut'		)}	:= pCheckedOut  	;
 			boolean Orphaned    {xpath('Orphaned'			)}	:= pOrphaned    	;
@@ -107,10 +111,27 @@ module
 			dataset(item_layout) Items{xpath('TypeList')} := dataset(['SALT'],item_layout);
                                                      
 		end;                
-				
-		results := 
-    SOAPCALL(
-				'http://' + pEsp + '/WsAttributes'
+
+		userid 		:= _control.MyInfo.UserID;
+		password	:= _control.MyInfo.Password;
+
+		// userid_prod 	:= _control.MyInfo.UserID_prod;
+		// password_prod	:= _control.MyInfo.Password_prod;
+
+    url1 := 'http://' + pEsp + '/WsAttributes';
+    // url2 := 'http://' + userid      + ':' + password      + '@' + pEsp + '/WsAttributes';
+    // url3 := 'http://' + userid_prod + ':' + password_prod + '@' + pEsp + '/WsAttributes';
+    // url := map(
+       // _Constants.IsDataland = true  and pEsp = '10.241.12.207:8145'  => url1
+      // ,_Constants.IsDataland = true  and pEsp = '10.173.84.202:8145' => url3
+      // ,_Constants.IsDataland = false and pEsp = '10.173.84.202:8145' => url1
+      // ,_Constants.IsDataland = false and pEsp = '10.241.12.207:8145'  => url2
+      // ,''
+    // );
+    url := url1;
+    
+		results := SOAPCALL(
+				url
 			,'FindAttributes'
 			,InfoInRecord
 			,dataset(InfoOutRecord)
@@ -118,17 +139,18 @@ module
 		) 
 		+
 		SOAPCALL(
-				'http://' + pesp + '/WsAttributes'
+				url
 			,'FindAttributes'
 			,InfoInRecord2
 			,dataset(InfoOutRecord)
 			,xpath('FindAttributesResponse')
-		)
-
-;
+		);
 		return results;
 		
 	end;
+  /////////////////////////////////////////////
+  // -- fNormResults
+  /////////////////////////////////////////////
 	export fNormResults(
 	
 		 dataset(InfoOutRecord) pInfoOut
@@ -153,13 +175,17 @@ module
 		return normit;
 	
 	end;
+
+  /////////////////////////////////////////////
+  // -- fFindAttributes
+  /////////////////////////////////////////////
 	export fFindAttributes(
 	
 		 string		pModuleNameRegex		= ''
 		,string		pattributenameRegex	= ''
 		,string		pEsp								= if(_Constants.IsDataland
-																		,'10.241.3.242:8145'	//oss is 242,infiniband is '10.241.3.242'
-																		,'10.173.84.202:8145'
+																		,'10.241.12.207:8145'	//oss is 242,infiniband is '10.241.12.207'
+																		,'prod_esp.br.seisint.com:8145'
 																	)
 		,boolean	pGetText   					= true
 		,boolean	pIsSandbox    			= false
@@ -175,8 +201,7 @@ module
 		,boolean	pIsLocked     			= false
 		,boolean	pIsCheckedOut 			= false
 		,boolean	pIsOrphaned   			= false
-		,boolean	pHistory            = false
-	            
+	  ,boolean  pShouldIncludeHistory     = false      
 	) := 
 	function
 		dgetattributes := fGetAttributes(
@@ -187,7 +212,7 @@ module
 			,pRegexp 					:= pRegexp 
 		  ,pGetText   			:= pGetText   
 			,pSandboxed				:= pIsSandbox
-      ,pIncludeHistory  := pHistory
+      ,pIncludeHistory  := pShouldIncludeHistory
 		);                   
 		  
 		dnormresults := fNormResults(dgetattributes);
@@ -212,14 +237,17 @@ module
 	end;
 
 
+  /////////////////////////////////////////////
+  // -- fSaveAttribute
+  /////////////////////////////////////////////
 	export fSaveAttribute(
 	
 		 string		pModuleName			= ''
 		,string		pAttributeName	= ''
 		,string		pText					 	= ''
 		,string		pEsp						= if(_Constants.IsDataland
-																	,'10.241.3.242:8145'	//oss is 242,infiniband is '10.241.3.242'
-																	,'10.173.84.202:8145'
+																	,'10.241.12.207:8145'	//oss is 242,infiniband is '10.241.12.207'
+																	,'prod_esp.br.seisint.com:8145'
 																)
 		,string		pFlags     			= ''
 		,string		pResultType    	= ''
@@ -252,11 +280,104 @@ module
 
 		end;
 		
+		userid 		:= _control.MyInfo.UserID;
+		password	:= _control.MyInfo.Password;
+
+		// userid_prod 	:= _control.MyInfo.UserID_prod;
+		// password_prod	:= _control.MyInfo.Password_prod;
+
+    url1 := 'http://' + pEsp + '/WsAttributes';
+    // url2 := 'http://' + userid      + ':' + password      + '@' + pEsp + '/WsAttributes';
+    // url3 := 'http://' + userid_prod + ':' + password_prod + '@' + pEsp + '/WsAttributes';
+/*
+    url := map(
+       _Constants.IsDataland = true  and pEsp = '10.241.12.207:8145'  => url1
+      ,_Constants.IsDataland = true  and pEsp = '10.173.84.202:8145' => url3
+      ,_Constants.IsDataland = false and pEsp = '10.173.84.202:8145' => url1
+      ,_Constants.IsDataland = false and pEsp = '10.241.12.207:8145'  => url2
+      ,''
+    );
+*/
+    url := url1;
+    
 		results := SOAPCALL(
-				'http://' + pEsp + '/WsAttributes'
-//				'http://' + pEsp + '/'
+				url
 			,'SaveAttributes'
 			,AttributesIn
+			,dataset(InfoOutRecord)
+			,xpath('UpdateAttributesResponse')
+		);
+		return results;
+		
+	end;
+
+  /////////////////////////////////////////////
+  // -- fRenameAttribute
+  /////////////////////////////////////////////
+	export fRenameAttribute(
+	
+		 string		pModuleName			    = ''
+		,string		pAttributeName	    = ''
+		,string		pNewModuleName			= ''
+		,string		pNewAttributeName	  = ''
+		,string		pEsp						    = if(_Constants.IsDataland
+                                      ,'10.241.12.207:8145'	//oss is 242,infiniband is '10.241.12.207'
+                                      ,'prod_esp.br.seisint.com:8145'
+                                    )
+	
+	) := 
+	function
+	
+		export AttributeRecord :=
+		record, maxlength(100000)
+   		string ModuleName		    {xpath('ModuleName'		    )}	:= pModuleName		  ;
+   		string AttributeName    {xpath('AttributeName'    )}	:= pAttributeName	  ;
+   		string NewModuleName		{xpath('NewModuleName'		)}	:= pNewModuleName		;
+   		string NewAttributeName {xpath('NewAttributeName' )}	:= pNewAttributeName;
+		end;                
+
+		export RenameAttributeRequest :=
+		record, maxlength(100000)
+
+			dataset(AttributeRecord) RenameAttributeRequest{xpath('RenameAttributeRequest')} := dataset([{pModuleName,pAttributeName,pNewModuleName,pNewAttributeName}],AttributeRecord);
+
+		end;
+
+		export Attributes :=
+		record, maxlength(100000)
+
+			dataset(RenameAttributeRequest) Attributes{xpath('Attributes')} := dataset([{dataset([{pModuleName,pAttributeName,pNewModuleName,pNewAttributeName}],AttributeRecord)}],RenameAttributeRequest);
+
+		end;
+
+		export RenameAttributesRequest :=
+		record, maxlength(100000)
+
+			dataset(Attributes) RenameAttributesRequest{xpath('RenameAttributesRequest')} := dataset([{dataset([{dataset([{pModuleName,pAttributeName,pNewModuleName,pNewAttributeName}],AttributeRecord) }],RenameAttributeRequest) }],Attributes);
+
+		end;
+		
+		userid 		:= _control.MyInfo.UserID;
+		password	:= _control.MyInfo.Password;
+
+		userid_prod 	:= _control.MyInfo.UserID_prod;
+		password_prod	:= _control.MyInfo.Password_prod;
+
+    url1 := 'http://' + pEsp + '/WsAttributes';
+    url2 := 'http://' + userid      + ':' + password      + '@' + pEsp + '/WsAttributes';
+    url3 := 'http://' + userid_prod + ':' + password_prod + '@' + pEsp + '/WsAttributes';
+    url := map(
+       _Constants.IsDataland = true  and pEsp = '10.241.12.207:8145'  => url1
+      ,_Constants.IsDataland = true  and pEsp = '10.173.84.202:8145' => url3
+      ,_Constants.IsDataland = false and pEsp = '10.173.84.202:8145' => url1
+      ,_Constants.IsDataland = false and pEsp = '10.241.12.207:8145'  => url2
+      ,''
+    );
+
+		results := SOAPCALL(
+				url
+			,'RenameAttributes'
+			,Attributes
 			,dataset(InfoOutRecord)
 			,xpath('UpdateAttributesResponse')
 		);
@@ -269,8 +390,8 @@ module
 		 string		pModuleName			= ''
 		,string		pAttributeName	= ''
 		,string		pEsp						= if(_Constants.IsDataland
-																	,'10.241.3.242:8145'	//oss is 242,infiniband is '10.241.3.242'
-																	,'10.173.84.202:8145'
+																	,'10.241.12.207:8145'	//oss is 242,infiniband is '10.241.12.207'
+																	,'prod_esp.br.seisint.com:8145'
 																)
 	
 	) := 
@@ -445,12 +566,14 @@ function
 	 pECLText				:= 'output(\'Hi, I am a workunit.  I just got created by a soapcall\');'
 	,pCluster				:= 'thor5_241_10a'
 	,pQueue					:= 'thor5_241_10a'
-	,pTargetESPIP		:= '10.241.3.242'
+	,pTargetESPIP		:= '10.241.12.207'
 	,pTargetESPPort	:= '8010'
 ));
 	*/
 end;
 /*
+http://dataland_esp:8010/WsWorkunits/WUPushEvent?EventNam
+http://dataland_esp:8010/WsDFU/
 http://10.173.3.6:8010/?inner=../WsDFU/DFUSearchData															-- view data file(roxie)
 http://10.173.3.6:8010/?inner=../WsSMC/Activity																		-- dfu workunits
 http://10.173.3.6:8010/?inner=../WsTopology/TpServiceQuery%3FType%3DALLSERVICES		-- system servers , target clusters

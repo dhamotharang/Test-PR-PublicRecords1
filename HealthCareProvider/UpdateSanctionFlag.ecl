@@ -1,0 +1,47 @@
+import Enclarity;
+EXPORT UpdateSanctionFlag (DATASET (HealthCareProvider.Layout_HealthProvider.HealthCareProvider_Header) hdr) := FUNCTION
+
+	DE_Sanction_Base := DEDUP(SORT (HealthCareProvider.Files.Enclarity_Sanc_DS,GROUP_KEY,LEVEL),GROUP_KEY,LEVEL);
+	
+	Sanc_DS  := PROJECT (DE_Sanction_Base, TRANSFORM(HealthCareProvider.Layouts.LNPID_SANC_REC, SELF.isState := IF (LEFT.LEVEL = 'STATE',TRUE,FALSE); 
+																																															SELF.isOIG := IF (LEFT.LEVEL = 'OIG',TRUE,FALSE); 
+																																															SELF.isOPM := IF (LEFT.LEVEL = 'OPM',TRUE,FALSE); 
+																																															SELF := LEFT; SELF := [];));
+	
+	HealthCareProvider.Layouts.LNPID_SANC_REC doRollUp (HealthCareProvider.Layouts.LNPID_SANC_REC L, DATASET (HealthCareProvider.Layouts.LNPID_SANC_REC) R) := TRANSFORM
+			SELF.isState := IF (EXISTS(R(isState = TRUE)),TRUE,FALSE);
+			SELF.isOIG	 := IF (EXISTS(R(isOIG	 = TRUE)),TRUE,FALSE);
+			SELF.isOPM	 := IF (EXISTS(R(isOPM 	 = TRUE)),TRUE,FALSE);
+			SELF := L;
+	END;
+	
+	R_Sanc_DS := ROLLUP (GROUP(Sanc_DS,GROUP_KEY),GROUP,doRollUp (LEFT, ROWS(LEFT)));
+	
+	Sanc_Flag_DS := UNGROUP (R_Sanc_DS);
+	
+	Trim_Header := PROJECT (HDR (SRC = '64' AND VENDOR_ID <> ''),TRANSFORM(HealthCareProvider.Layouts.LNPID_SANC_REC, SELF.LNPID := LEFT.LNPID; SELF.GROUP_KEY := LEFT.VENDOR_ID; SELF := [];));
+	
+	LNPID_VendorID := DEDUP(SORT (Trim_Header,LNPID,GROUP_KEY,LOCAL),LNPID,GROUP_KEY,LOCAL);
+	
+	GetSanction_LNPID	:= JOIN (DISTRIBUTE(LNPID_VendorID,HASH32(GROUP_KEY)),DISTRIBUTE(Sanc_Flag_DS,HASH32(GROUP_KEY)),LEFT.GROUP_KEY = RIGHT.GROUP_KEY,TRANSFORM(HealthCareProvider.Layouts.LNPID_SANC_REC, SELF.LNPID := LEFT.LNPID; SELF.GROUP_KEY := RIGHT.GROUP_KEY; SELF := RIGHT; SELF := [];), LOCAL);
+
+	De_GetSanction_LNPID := DEDUP(SORT (DISTRIBUTE(GetSanction_LNPID (LNPID > 0),HASH32(LNPID)), LNPID, -MAP(ISSTATE AND ISOIG AND ISOPM => 3, ISSTATE AND ISOIG => 2, ISSTATE AND ISOPM => 2, ISOPM AND ISOIG => 2,1),LNPID,LOCAL),LNPID,LOCAL);
+	
+	D_HDR	:=	DISTRIBUTE(HDR,HASH32(LNPID));
+	
+	Apply_EnClarity_Sanction_Flag := JOIN (D_HDR,De_GetSanction_LNPID,LEFT.LNPID = RIGHT.LNPID,TRANSFORM(RECORDOF(HDR), SELF.is_State_Sanction := RIGHT.isState; SELF.is_OIG_Sanction := RIGHT.isOIG; SELF.is_OPM_Sanction := RIGHT.isOPM; SELF := LEFT;), LEFT OUTER ,LOOKUP,  LOCAL);
+
+	Apply_Ingenix_Sanction_Flag	:=	JOIN (Apply_EnClarity_Sanction_Flag,HealthCareProvider.key_sanction,LEFT.LNPID = RIGHT.LNPID,TRANSFORM(RECORDOF(HDR), SELF.is_State_Sanction := IF (LEFT.LNPID = RIGHT.LNPID, TRUE,LEFT.is_State_Sanction); SELF := LEFT;), LEFT OUTER , LOOKUP, LOCAL);
+
+	// OUTPUT (DE_Sanction_Base (GROUP_KEY = '11769166790279800000000038549430865148'));
+	// OUTPUT (Sanc_DS (GROUP_KEY = '11769166790279800000000038549430865148'));
+	// OUTPUT (Sanc_Flag_DS (GROUP_KEY = '11769166790279800000000038549430865148'));
+	// OUTPUT (Trim_Header (GROUP_KEY = '11769166790279800000000038549430865148'));
+	// OUTPUT (LNPID_VendorID (GROUP_KEY = '11769166790279800000000038549430865148'));
+	// OUTPUT (GetSanction_LNPID (GROUP_KEY = '11769166790279800000000038549430865148'));
+	// OUTPUT (De_GetSanction_LNPID (GROUP_KEY = '11769166790279800000000038549430865148'));
+	// OUTPUT (Apply_EnClarity_Sanction_Flag (VENDOR_ID = '11769166790279800000000038549430865148'));
+	// OUTPUT(COUNT(Apply_EnClarity_Sanction_Flag));
+	// OUTPUT(COUNT(Apply_Ingenix_Sanction_Flag));
+	RETURN Apply_Ingenix_Sanction_Flag;
+END;

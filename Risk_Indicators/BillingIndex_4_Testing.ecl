@@ -1,3 +1,4 @@
+
 // Billing index rule of thumb:
 // ECL index % 100 + 30 == ESP index
 // e.g., sub-prime auto is 108; 108%100+30 = 38
@@ -29,12 +30,12 @@ export BillingIndex_4_Testing := MODULE
 		export RVG_rvg904_1         := '118'; // Custom RV Money for ThinkCash
 
 		// flagship v3
-		export RVAuto_v3            := '119'; // RVA1003.0.0 – Auto 
-		export RVBankcard_v3        := '120'; // RVB1003.0.0 – Bankcard 
-		export RVTelecom_v3         := '121'; // RVT1003.0.0 – Telecom/Wireless
-		export RVRetail_v3          := '122'; // RVR1003.0.0 – Retail 
-		export RVMoney_v3           := '123'; // RVG1003.0.0 – Money Service Business
-		export RVPreScreen_v3       := '124'; // RVP1003.0.0 – Prescreen     
+		export RVAuto_v3            := '119'; // RVA1003.0.0 Â– Auto 
+		export RVBankcard_v3        := '120'; // RVB1003.0.0 Â– Bankcard 
+		export RVTelecom_v3         := '121'; // RVT1003.0.0 Â– Telecom/Wireless
+		export RVRetail_v3          := '122'; // RVR1003.0.0 Â– Retail 
+		export RVMoney_v3           := '123'; // RVG1003.0.0 Â– Money Service Business
+		export RVPreScreen_v3       := '124'; // RVP1003.0.0 Â– Prescreen     
 		export RVA_rva1007_1			:= '125'; // RVA1007.1.0 - Santander
 		export RVA_rva1007_2			:= '126'; // RVA1007.2.0 - Santander
 		export RVD_rvd1010_0        := '127';

@@ -100,13 +100,13 @@ TRANSFORM
 		self.adj_wthd			:= '';
 		self.stc_comp 			:= '';
 		self.stc_cd			    := '';
-		self.stc_dt 			:= commonFn.DateToStandard(L.SentenceDate);
+		self.stc_dt 			  := IF (stringlib.stringfind(L.SentenceDate,'/',1) <> 0, CommonFn.DateToStandard(L.SentenceDate),stringlib.stringfindreplace(L.SentenceDate,'-','')); 
 		self.stc_desc_1			:= '';
 		self.stc_desc_2			:= '';
 		self.stc_desc_3			:= '';
 		self.stc_desc_4			:= '';
 		
-		self.stc_lgth			:= L.sentence;		
+		self.stc_lgth			  := L.sentence;		
 		self.stc_lgth_desc	    := commonFn.sentence_descr(L.sentence);//;
 		self.min_term		    := '';
 		self.min_term_desc	    := ''; //
@@ -115,8 +115,8 @@ TRANSFORM
 end;
 
 ds_offense_mapped := project(offenses_combo,transform_CO_offenses(left));
-ds_offense_sorted := sort(distribute(ds_offense_mapped,hash(offender_key)), offender_key,case_num, cty_conv, stc_lgth, stc_dt, off_desc_1, local) ;
-ds_offense_dedup  := dedup(ds_offense_sorted,offender_key,case_num, cty_conv, stc_lgth, right, local);
+ds_offense_sorted := sort(distribute(ds_offense_mapped,hash(offender_key)), offender_key,case_num, cty_conv, stc_lgth, stc_dt, off_desc_1,process_date, local) ;
+ds_offense_dedup  := dedup(ds_offense_sorted,offender_key,case_num, cty_conv, stc_lgth,stc_dt, right, local);
 //ds_offense_sorted := sort(distribute(ds_offense_mapped,hash(offender_key)), offender_key,case_num,off_desc_1, cty_conv,stc_dt, stc_lgth, process_date,local) ;
 //ds_offense_dedup  := dedup(ds_offense_sorted,offender_key,case_num,off_desc_1, cty_conv,stc_dt, stc_lgth,right, local);
 

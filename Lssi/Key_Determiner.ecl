@@ -1,4 +1,4 @@
-import doxie,header;
+import doxie,header,ut;
 
 f := File_QuestionFile;
 
@@ -25,4 +25,4 @@ t := TABLE(f, no_did);
 
 d := DEDUP(t, ALL);
 
-export Key_Determiner := INDEX(d, {d}, '~thor_data400::key::lssi.determiner_'+ doxie.Version_SuperKey);
+export Key_Determiner := INDEX(d, {d}, ut.Data_Location.Person_header+'thor_data400::key::lssi.determiner_'+ doxie.Version_SuperKey);

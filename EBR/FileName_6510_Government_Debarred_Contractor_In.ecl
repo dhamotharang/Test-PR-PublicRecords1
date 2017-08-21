@@ -1,1 +1,1 @@
-export FileName_6510_Government_Debarred_Contractor_In := trim(GetSegmentFileName_In('6510')) : global;
+export FileName_6510_Government_Debarred_Contractor_In := trim(GetSegmentFileName_In('6510'));

@@ -1,0 +1,40 @@
+import watercraft;
+
+search := watercraft.Layout_Watercraft_Search_Base;
+
+export layout_address_patch := record
+ search.orig_address_1;
+ search.orig_address_2;
+ search.orig_city;
+ search.orig_state;
+ search.orig_zip;
+ search.prim_range;
+ search.predir;
+ search.prim_name;
+ search.suffix;
+ search.postdir;
+ search.unit_desig;
+ search.sec_range;
+ search.p_city_name;
+ search.v_city_name;
+ search.st;
+ search.zip5;
+ search.zip4;
+ search.cart;
+ search.cr_sort_sz;
+ search.lot;
+ search.lot_order;
+ search.dpbc;
+ search.chk_digit;
+ search.rec_type;
+ search.ace_fips_st;
+ search.ace_fips_county;
+ search.geo_lat;
+ search.geo_long;
+ search.msa;
+ search.geo_blk;
+ search.geo_match;
+ search.err_stat;
+ string182 orig_clean_address;
+ string182 clean_address;
+end;

@@ -1,0 +1,71 @@
+export Layout_DL_LA_In := module
+
+	export	Raw	:=	record
+		string35	Name;
+		string20 	Address;
+		string15	City;
+		string2		State;
+		string5		ZipCode;
+		string1		Race;
+		string1		Filler1;
+		string1		Gender;
+		string8		DOB;
+		string3		Height;
+		string3		Weight;
+		string3		Parish;
+		string1		Restriction1;
+		string1		Restriction2;
+		string2		Restriction3;
+		string1		LicenseClass;
+		string8		ExpirationDate;
+		string9		Filler2;
+		string1		LicenseType;
+		string7		Endorsements;
+		string9		Filler3;
+		string1		PrivacyFlag;	
+		string14	Filler4;		
+	end;
+		
+	export	cleaned	:=	record
+		string08	append_PROCESS_DATE;
+		unsigned3	dt_first_seen;
+		unsigned3	dt_last_seen;
+		unsigned3	dt_vendor_first_reported;
+		unsigned3	dt_vendor_last_reported;
+		Raw - [Filler1, filler2, filler3, filler4];
+		string05	clean_name_prefix;
+		string20	clean_name_first;
+		string20	clean_name_middle;
+		string20	clean_name_last;
+		string05	clean_name_suffix;
+		string03	clean_name_score;
+		string10	clean_prim_range;
+		string02	clean_predir;
+		string28	clean_prim_name;
+		string04	clean_addr_suffix;
+		string02	clean_postdir;
+		string10	clean_unit_desig;
+		string08	clean_sec_range;
+		string25	clean_p_city_name;
+		string25	clean_v_city_name;
+		string02	clean_st;
+		string05	clean_zip;
+		string04	clean_zip4;
+		string04	clean_cart;
+		string01	clean_cr_sort_sz;
+		string04	clean_lot;
+		string01	clean_lot_order;
+		string02	clean_dpbc;
+		string01	clean_chk_digit;
+		string02	clean_record_type;
+		string02	clean_ace_fips_st;
+		string03	clean_fipscounty;
+		string10	clean_geo_lat;
+		string11	clean_geo_long;
+		string04	clean_msa;
+		string07	clean_geo_blk;
+		string01	clean_geo_match;
+		string04	clean_err_stat;
+  end;
+
+end;

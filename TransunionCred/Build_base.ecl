@@ -1,11 +1,10 @@
-IMPORT  address, ut, header_slimsort, did_add, didville,AID;
+IMPORT  address, ut, header_slimsort, did_add, didville,AID,std;
 
 #IF (IsFullUpdate = false)
 	TrnUn_credit := Files.update_in;
 #ELSE
 	TrnUn_credit := Files.load_in;
 #END
-
 setValidSuffix:=['JR','SR','I','II','III','IV','V','VI','VII','VIII','IX'];
 string fGetSuffix(string SuffixIn)	:=		map(SuffixIn = '1' => 'I'
 																							,SuffixIn in ['2','ND'] => 'II'
@@ -22,7 +21,7 @@ string fGetSuffix(string SuffixIn)	:=		map(SuffixIn = '1' => 'I'
 //Normalize current name, alias, aka and former name
 Layouts.base t_norm_name (TrnUn_credit L, INTEGER C):= TRANSFORM
 	SELF.Prepped_rec_type         := CHOOSE(C,'A','B','C','D') + l.Record_Type[2];
-	current_name                  := trim(StringLib.StringCleanSpaces(L.Last_Name
+	current_name                  := trim(StringLib.StringCleanSpaces(trim(L.Last_Name)
 																+','+L.First_Name
 																+' '+L.Middle_Name
 																+' '+fGetSuffix(L.name_suffix_)));
@@ -43,7 +42,7 @@ Layouts.base t_norm_name (TrnUn_credit L, INTEGER C):= TRANSFORM
 	self.dt_last_seen             := if(self.Prepped_rec_type='A1',(unsigned)version,0);
 	self.dt_vendor_first_reported := (unsigned)version;
 	self.dt_vendor_last_reported  := (unsigned)version;
-	valid_dob                     := if((unsigned)l.Date_of_Birth between 18000101 and (unsigned)ut.GetDate
+	valid_dob                     := if((unsigned)l.Date_of_Birth between 18000101 and (unsigned)(STRING8)Std.Date.Today()
 																				,(unsigned)l.Date_of_Birth
 																				,0);
 	valid_ssn                     := if((unsigned)l.Ssn > 0,l.Ssn, '');
@@ -58,16 +57,16 @@ END;
 
 norm_names0 := NORMALIZE(TrnUn_credit, 4, t_norm_name(LEFT, COUNTER))(length(stringlib.stringfilterout(Prepped_name,' ,'))>0);
 
-names1:=dedup(table(norm_names0,{Prepped_name ,title,fname,mname,lname,name_suffix}),record,all);
+names1:=dedup(table(norm_names0,{Prepped_name ,title,fname,mname,lname,name_suffix,string3 name_score:=''}),record,all);
 
 {names1} tCleanNames(names1 l) := transform
-	cleanName        := AddrCleanLib.CleanPersonLFM73(l.Prepped_name);
-	good_score       := (integer)cleanName[71..73]>50;
-	self.title       := if(good_score and cleanName[1..5] in ['MR','MS'],cleanName[1..5],'');
-	self.fname       := if(good_score,cleanName[6..25],'');
-	self.mname       := if(good_score,cleanName[26..45],'');
-	self.lname       := if(good_score,cleanName[46..65],'');
-	self.name_suffix := if(good_score,cleanName[66..70],'');
+	cleanName        := Address.CleanPersonLFM73(l.Prepped_name);
+	self.title       := cleanName[1..5];
+	self.fname       := cleanName[6..25];
+	self.mname       := cleanName[26..45];
+	self.lname       := cleanName[46..65];
+	self.name_suffix := cleanName[66..70];
+	self.name_score  := cleanName[71..73];
 	self:=l;
 end;
 
@@ -83,6 +82,7 @@ norm_names1:=join(distribute(norm_names0,hash(Prepped_name))
 												,self.mname       :=if(left.Prepped_name=right.Prepped_name,right.mname,'')
 												,self.lname       :=if(left.Prepped_name=right.Prepped_name,right.lname,'')
 												,self.name_suffix :=if(left.Prepped_name=right.Prepped_name,right.name_suffix,'')
+												,self.name_score  :=if(left.Prepped_name=right.Prepped_name,right.name_score,'')
 												,self:=left)
 											,left outer
 											,local);
@@ -109,22 +109,20 @@ END;
 preprocess := project(norm_names,tr_addr(left)):persist('~thor_data400::persist::TransunionCred_clean');
 // preprocess := dataset('~thor_data400::persist::TransunionCred_clean',Layouts.base,flat);
 
-cur_base_d := distribute(Files.Base, hash(Party_ID));
+cur_base_d := distribute(project(Files.Base, transform(recordof(Files.Base), self.did := 0, self := left)), hash(Party_ID));
 
 #IF (IsFullUpdate = false)
 	cur_update_d := dedup(distribute(preprocess, hash(Party_ID)),Party_ID,all,local);
 
-	apply_updates := join(cur_base_d, cur_update_d,
-									left.Party_ID = right.Party_ID
-							and left.fname    = right.fname
-							and left.lname    = right.lname
+	apply_updates := join(cur_base_d, cur_update_d
+									,left.Party_ID = right.Party_ID
 							,transform(Layouts.base
 								,self.IsCurrent	:= if(left.Party_ID=right.Party_ID and left.Prepped_rec_type='A1',false,left.IsCurrent)
 								,self           := left)
 							,left outer
 							,local);
 
-	base_and_update := if(FileServices.GetSuperFileSubCount(Superfile_List.Base) = 0
+	base_and_update := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base)) = 0
 												,preprocess
 												,preprocess + apply_updates);
 
@@ -134,12 +132,12 @@ cur_base_d := distribute(Files.Base, hash(Party_ID));
 											,self.IsUpdating := false
 											,self := left));
 
-	base_and_update := if(FileServices.GetSuperFileSubCount(Superfile_List.Base) = 0
+	base_and_update := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base)) = 0
 											 ,preprocess
 											 ,preprocess + reset_cur_base);
 #END
 
-TN_ready := base_and_update(fname<>'',lname<>'',prim_name<>'');
+TN_ready := base_and_update;
 //-----------------------------------------------------------------
 //Rollup to eliminate duplications
 //-----------------------------------------------------------------
@@ -170,9 +168,9 @@ build_TN_base_s := sort(build_TN_base_d
 
 Layouts.base t_rollup (build_TN_base_s  le, build_TN_base_s ri) := transform
  self.dt_first_seen            := ut.min2(le.dt_first_seen, ri.dt_first_seen);
- self.dt_last_seen             := ut.max2(le.dt_last_seen, ri.dt_last_seen);
+ self.dt_last_seen             :=     max(le.dt_last_seen, ri.dt_last_seen);
  self.dt_vendor_first_reported := ut.min2(le.dt_vendor_first_reported, ri.dt_vendor_first_reported);
- self.dt_vendor_last_reported  := ut.max2(le.dt_vendor_last_reported, ri.dt_vendor_last_reported);
+ self.dt_vendor_last_reported  :=     max(le.dt_vendor_last_reported, ri.dt_vendor_last_reported);
  self.IsCurrent                := if(le.IsCurrent=true,le.IsCurrent,ri.IsCurrent);
  self.IsUpdating               := if(le.IsUpdating=true,le.IsUpdating,ri.IsUpdating);
 
@@ -222,6 +220,7 @@ TransunionCred_base := rollup(build_TN_base_s
 																	and left.clean_dob=right.clean_dob
 																	,t_rollup(left, right)
 																	,local);
+																																
 //-----------------------------------------------------------------
 //APPEND DID
 //-----------------------------------------------------------------
@@ -234,4 +233,34 @@ did_add.MAC_Match_Flex
 	 DID, Layouts.base, true, did_score,
 	 75, d_did);
 
-export Build_base := d_did;
+//-----------------------------------------------------------------
+//APPEND DELETE FLAG
+//-----------------------------------------------------------------																	
+TrnUn_delete := Files.Delete_In;
+TrnUn_delete_dist := distribute(TrnUn_delete, hash(party_id));
+TrnUn_delete_dedup := dedup(sort(TrnUn_delete_dist,party_id,local),party_id,local);
+
+transunioncred.layouts.base tIsDelete(d_did Le, TrnUn_delete_dedup Ri) := transform
+
+self.IsDelete := if(le.party_id = ri.party_id,true,le.isdelete);
+self := le;
+end;
+
+d_append_delete := join(d_did, TrnUn_delete_dedup, left.party_id = right.party_id, tIsDelete(left, right), left outer, lookup);
+
+base_and_delete := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.deletes)) = 0
+												,d_did
+												,d_append_delete);
+//-----------------------------------------------------------------
+//INCREMENT DT_LAST_SEEN: IF IsDelete=false and IsUpdating=true and Deceased_Indicator_Flag <> 'Y' and IsCurrent=true
+//-----------------------------------------------------------------
+candidates		:=base_and_delete(IsDelete=false and IsUpdating=true and Deceased_Indicator_Flag <> 'Y' and IsCurrent=true);
+not_candidates:=base_and_delete(IsDelete=true  or  IsUpdating=false or Deceased_Indicator_Flag =  'Y' or  IsCurrent=false);
+TransunionCred_out:=project(candidates
+															,transform(layouts.base
+																	,self.dt_last_seen:=if((unsigned)version > left.dt_first_seen, (unsigned)version, left.dt_last_seen)
+																	,self:=left
+																	))
+																	+ not_candidates;
+
+export Build_base := TransunionCred_out;

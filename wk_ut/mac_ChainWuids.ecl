@@ -35,6 +35,7 @@ EXPORT mac_ChainWuids(
                                                                 // example: ['MatchesPerformed','< 1000000'].  This will pull the MatchesPerformed value from the finished iteration, and if it is less than 1 million
                                                                 // it will not kick off the next iteration, it will stop there.  THIS HAS BEEN IMPLEMENTED, BUT 
                                                                 // IS BLOCKED BY JIRA ISSUE 11172.
+  ,pForceSkip           = false
 ) :=
 functionmacro
 	
@@ -298,7 +299,7 @@ cond3 := STD.File.FileExists('~temp::lbentley::20130719::it38');
 
       // #APPEND(ECL ,'wk_ut.CreateWuid(\'wk_ut.RunWuid(\\\'' + %'LOOPTEXT'% + '\\\',\\\'' + %'CNTR'% + '\\\',\\\'' + pversion + '\\\',\\\'' + pCluster + '\\\',\\\'' + %'NOTIFYMASTEREVENT'% + '\\\',\\\'' + %'WAIT4MASTEREVENT'% + '\\\',\\\'\' + WORKUNIT + \'\\\',\\\'' + pESP + '\\\',,,\\\'' + trim(pUniqueOutput,all)  + '\\\',\\\'' + trim(pPollingFrequency,all)  + '\\\')\',\'' + %'WATCHERCLUSTER'% + '\')\n')
     #ELSE
-      #APPEND(ECL ,%'STOPCONDITION'% + ',\n\tsequential(\n\t\twk_ut.CreateWuid(\'wk_ut.RunWuid(\\\'' + %'LOOPTEXT'% + '\\\',\\\'' + %'CNTR'% + '\\\',\\\'' + pversion + '\\\',\\\'' + pCluster + '\\\',\\\'' + %'NOTIFYMASTEREVENT'% + '\\\',\\\'' + %'WAIT4MASTEREVENT'% + '\\\',\\\'\' + WORKUNIT + \'\\\',\\\'' + %'LOOPFILENAME'% + '\\\',\\\'' + pOutputSuperfile + '\\\',\\\'' + %'LOCALESP'% + '\\\',,,\\\'' + trim(pUniqueOutput,all)  + '\\\',\\\'' + trim(pPollingFrequency,all)  + '\\\',' + if(pForceRun = true,'true','false')  + ')\',\'' + %'WATCHERCLUSTER'% + '\',\'' + pESP + '\')\n')
+      #APPEND(ECL ,%'STOPCONDITION'% + ',\n\tsequential(\n\t\twk_ut.CreateWuid(\'wk_ut.RunWuid(\\\'' + %'LOOPTEXT'% + '\\\',\\\'' + %'CNTR'% + '\\\',\\\'' + pversion + '\\\',\\\'' + pCluster + '\\\',\\\'' + %'NOTIFYMASTEREVENT'% + '\\\',\\\'' + %'WAIT4MASTEREVENT'% + '\\\',\\\'\' + WORKUNIT + \'\\\',\\\'' + %'LOOPFILENAME'% + '\\\',\\\'' + pOutputSuperfile + '\\\',\\\'' + %'LOCALESP'% + '\\\',\\\'' + pNotifyEmails + '\\\',,\\\'' + trim(pUniqueOutput,all)  + '\\\',\\\'' + trim(pPollingFrequency,all)  + '\\\',' + if(pForceRun = true,'true','false')  + ',' + if(pForceSkip = true,'true','false') + ')\',\'' + %'WATCHERCLUSTER'% + '\',\'' + pESP + '\')\n')
       #APPEND(ECL ,',wait(\'' + %'NOTIFYMASTEREVENT'% + '\')')
       #APPEND(EXTRAPARENS,'))')
         // ,if((unsigned)global(wk_ut.get_Scalar_Result(wuid36,'MatchesPerformed'),few) < 10000 , 
@@ -354,12 +355,14 @@ cond3 := STD.File.FileExists('~temp::lbentley::20130719::it38');
     #APPEND(PREECL ,');\n')
 
     #IF(pSummaryFilename = '')
-      #APPEND(PREECL ,'outsummary' + %'CNTR'% + '     := if(wuid' + %'CNTR'% + ' != \'\'  ,output(project(wk_ut.mac_CreateSummaryReport(\'' + pversion + '\',wuid' + %'CNTR'% + ',wuid' + %'CNTR'% + ',,,,' + %'SUMMARYSET'% + ',,,[\'Iteration\'],[\'' + %'CNTR'% + '\'],,,1,pESP := ' + #TEXT(pEsp) + '),{recordof(left) - filesread - fileswritten}),named(\'SummaryReport' + trim(pUniqueOutput,all) + '\'),EXTEND));\n')
+      // #APPEND(PREECL ,'outsummary' + %'CNTR'% + '     := if(wuid' + %'CNTR'% + ' != \'\'  ,output(project(wk_ut.mac_CreateSummaryReport(\'' + pversion + '\',wuid' + %'CNTR'% + ',wuid' + %'CNTR'% + ',,,,' + %'SUMMARYSET'% + ',,,[\'Iteration\'],[\'' + %'CNTR'% + '\'],,,1,pESP := ' + #TEXT(pEsp) + '),{recordof(left) - filesread - fileswritten}),named(\'SummaryReport' + trim(pUniqueOutput,all) + '\'),EXTEND));\n')
+      #APPEND(PREECL ,'outsummary' + %'CNTR'% + '     := output(90); ')  
     #ELSE
-      #APPEND(PREECL ,'outsummary' + %'CNTR'% + '     := if(wuid' + %'CNTR'% + ' != \'\'  ,wk_ut.mac_CreateSummaryReport(\'' + pversion + '\',wuid' + %'CNTR'% + ',wuid' + %'CNTR'% + ',,,,' + %'SUMMARYSET'% + ',,,[\'Iteration\'],[\'' + %'CNTR'% + '\'],,,1,,,\'' + %'LOOPSUMFILENAME'% + '\',\'' + pSummarySuperfile + '\',pESP := ' + #TEXT(pEsp) + ',pOverwrite := true'/* + if(pForceRun = true,'true','false') */ + '));\n')
+      // #APPEND(PREECL ,'outsummary' + %'CNTR'% + '     := if(wuid' + %'CNTR'% + ' != \'\'  ,wk_ut.mac_CreateSummaryReport(\'' + pversion + '\',wuid' + %'CNTR'% + ',wuid' + %'CNTR'% + ',,,,' + %'SUMMARYSET'% + ',,,[\'Iteration\'],[\'' + %'CNTR'% + '\'],,,1,,,\'' + %'LOOPSUMFILENAME'% + '\',\'' + pSummarySuperfile + '\',pESP := ' + #TEXT(pEsp) + ',pOverwrite := true'/* + if(pForceRun = true,'true','false') */ + '));\n')
+      #APPEND(PREECL ,'outsummary' + %'CNTR'% + '     := output(90); ')  
     #END
     
-    #APPEND(PREECL ,'kickiter'   + %'CNTR'% + '     := wk_ut.CreateWuid(\'#workunit(\\\'name\\\',\\\'---ChildRunner---' + if(pUniqueOutput != '' ,' for ' + pUniqueOutput ,'') + ', version: ' + pversion + ', iteration: ' + %'CNTR'% + '\\\');\\n' + 'wk_ut.RunWuid(\\\'' + %'LOOPTEXT'% + '\\\',\\\'' + %'CNTR'% + '\\\',\\\'' + pversion + '\\\',\\\'' + pCluster + '\\\',\\\'' + %'NOTIFYMASTEREVENT'% + '\\\',\\\'' + %'WAIT4MASTEREVENT'% + '\\\',\\\'\' + WORKUNIT + \'\\\',\\\'' + %'LOOPFILENAME'% + '\\\',\\\'' + pOutputSuperfile + '\\\',\\\'' + %'LOCALESP'% + '\\\',,,\\\'' + trim(pUniqueOutput,all)  + '\\\',\\\'' + trim(pPollingFrequency,all)  + '\\\',' + if(pForceRun = true,'true','false')  + ')\',\'' + %'WATCHERCLUSTER'% + '\',\'' + pESP + '\');\n')
+    #APPEND(PREECL ,'kickiter'   + %'CNTR'% + '     := wk_ut.CreateWuid(\'#workunit(\\\'name\\\',\\\'---ChildRunner---' + if(pUniqueOutput != '' ,' for ' + pUniqueOutput ,'') + ', version: ' + pversion + ', iteration: ' + %'CNTR'% + '\\\');\\n' + 'wk_ut.RunWuid(\\\'' + %'LOOPTEXT'% + '\\\',\\\'' + %'CNTR'% + '\\\',\\\'' + pversion + '\\\',\\\'' + pCluster + '\\\',\\\'' + %'NOTIFYMASTEREVENT'% + '\\\',\\\'' + %'WAIT4MASTEREVENT'% + '\\\',\\\'\' + WORKUNIT + \'\\\',\\\'' + %'LOOPFILENAME'% + '\\\',\\\'' + pOutputSuperfile + '\\\',\\\'' + %'LOCALESP'% + '\\\',\\\'' + pNotifyEmails + '\\\',,\\\'' + trim(pUniqueOutput,all)  + '\\\',\\\'' + trim(pPollingFrequency,all)  + '\\\',' + if(pForceRun = true,'true','false')  + ',' + if(pForceSkip = true,'true','false') + ')\',\'' + %'WATCHERCLUSTER'% + '\',\'' + pESP + '\');\n')
     #APPEND(PREECL ,'// -----------------------------------------------------------------------------------------\n\n')
     
     #APPEND(ECL, '\t,sendemail'  + %'CNTR'% + '\n')
@@ -424,7 +427,8 @@ cond3 := STD.File.FileExists('~temp::lbentley::20130719::it38');
     #IF(pOutputSuperfile = '')
       #APPEND(PREECL ,'outputSumTimings      := output(get_wuids + dataset([{\'' + trim(pUniqueOutput,all) + ' Subtotal\',\'\',\'\',\'\',\'\',\'\',\'' + pversion + '\',\'\',0.0,\'\',0.0,totalthortime,sumseconds,wk_ut.getTimeDate()}],wk_ut.layouts.wks_slim),named(\'Workunits\'),overwrite);\n')
     #ELSE
-      #APPEND(PREECL ,'outputSumTimings      := sequential(output(dataset([{\'' + trim(pUniqueOutput,all) + ' Subtotal\',\'\',\'\',\'\',\'\',\'\',\'' + pversion + '\',\'\',0.0,\'\',0.0,totalthortime,sumseconds,wk_ut.getTimeDate()}],wk_ut.layouts.wks_slim),,\'' + %'TOTALSFILENAME'% + '\',__compressed__)\n')
+      #APPEND(PREECL ,'outputSumTimings      := sequential(wk_ut.Update_File(\'' + %'TOTALSFILENAME'% + '\',dataset([{\'' + trim(pUniqueOutput,all) + ' Subtotal\',\'\',\'\',\'\',\'\',\'\',\'' + pversion + '\',\'\',0.0,\'\',0.0,totalthortime,sumseconds,wk_ut.getTimeDate()}],wk_ut.layouts.wks_slim),true,true)\n')
+      // #APPEND(PREECL ,'outputSumTimings      := sequential(output(dataset([{\'' + trim(pUniqueOutput,all) + ' Subtotal\',\'\',\'\',\'\',\'\',\'\',\'' + pversion + '\',\'\',0.0,\'\',0.0,totalthortime,sumseconds,wk_ut.getTimeDate()}],wk_ut.layouts.wks_slim),,\'' + %'TOTALSFILENAME'% + '\',__compressed__)\n')
       #APPEND(PREECL ,'\t,std.file.addsuperfile(\'' + pOutputSuperfile + '\',\'' + %'TOTALSFILENAME'% + '\'));\n')
     #END
  

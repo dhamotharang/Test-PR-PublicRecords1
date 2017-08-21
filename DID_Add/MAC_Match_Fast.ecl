@@ -1,6 +1,8 @@
 export MAC_Match_Fast(infile, matchset, outfile, for_moxie = 'true', add_ssns = 'true', glb = 'true')
 	:= macro
 
+import header_slimsort, ut, didville, watchdog;
+
 #uniquename(outrec)
 %outrec% := record
 	infile;
@@ -49,7 +51,7 @@ did_Add.MAC_Match_Flex
 	 %rec%, 
 	 true, temp_Score, 	
 	 0,	
-	 %wdid%,true,true,score_any_addr,score_any_dob,score_any_ssn,score_any_phn,score_any_fzzy)
+	 %wdid%,,'',true,true,score_any_addr,score_any_dob,score_any_ssn,score_any_phn,score_any_fzzy)
 
 //****** Add the SSN (if desired)
 #uniquename(wssn)

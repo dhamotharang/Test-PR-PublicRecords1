@@ -1,6 +1,6 @@
 import standard;
 
-export Layout_In_Common := record
+export Layout_In_Common := record, maxlength(10000)
 				STRING	SOURCE_FILE;
 				STRING	SOURCE_INPUT := '';
 				STRING	PERSON_ORIG_IP_ADDRESS1 ;
@@ -65,13 +65,20 @@ export Layout_In_Common := record
 				INQUIRY_ACCLOGS.LAYOUT.PERMISSABLELAYOUT,
 				INQUIRY_ACCLOGS.LAYOUT.ALLOWLAYOUT,
 				INQUIRY_ACCLOGS.LAYOUT.SEARCHLAYOUT,
+				string orig_function_name;
+				string description;
 				
 				STRING	REPFLAG, 
 				STRING	JOB_ID;
 				
-				STRING	ORIG_REFERENCE_CODE;
+				STRING50	ORIG_REFERENCE_CODE;
 				STRING	ORIG_TRANSACTION_CODE; /* Transaction Type */
 
 				STRING	ORIG_SOURCE_CODE := '';
+				STRING3   fraudpoint_score  :='';
+				
+				string  orig_RECORD_COUNT   :='';
+				string	orig_PRICE					:='';
+				string	orig_REPORT_OPTIONS :='';
 
 end;

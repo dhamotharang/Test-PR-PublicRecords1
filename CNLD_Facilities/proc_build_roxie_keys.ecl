@@ -7,7 +7,11 @@ EXPORT proc_build_roxie_keys(STRING filedate) := FUNCTION
 											                       '~thor_data400::key::cnldfacilities::@version@::BDID',
 											                       '~thor_data400::key::cnldfacilities::' + filedate + '::BDID',
 											                       build_bdid_key);
-
+	// Build the LinkIDs key
+	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(CNLD_Facilities.key_LinkIDs.key,
+											                       '~thor_data400::key::cnldfacilities::@version@::LinkIDs',
+											                       '~thor_data400::key::cnldfacilities::' + filedate + '::LinkIDs',
+											                       build_LinkIDs_key);
 	// Build the dea key
 	RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(CNLD_Facilities.key_dea,
 											                       '~thor_data400::key::cnldfacilities::@version@::DEA',
@@ -53,7 +57,10 @@ EXPORT proc_build_roxie_keys(STRING filedate) := FUNCTION
   RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::cnldfacilities::@version@::BDID',
 										                    '~thor_data400::key::cnldfacilities::' + filedate + '::BDID',
 										                    mv_bdid_key_to_built);
-
+	// Move LinkIDs key to Built
+  RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::cnldfacilities::@version@::LinkIDs',
+										                    '~thor_data400::key::cnldfacilities::' + filedate + '::LinkIDs',
+										                    mv_LinkIDs_key_to_built);
 	// Move dea key to Built
   RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::cnldfacilities::@version@::DEA',
 										                     '~thor_data400::key::cnldfacilities::' + filedate + '::DEA',
@@ -94,6 +101,9 @@ EXPORT proc_build_roxie_keys(STRING filedate) := FUNCTION
 
 	// Move bdid key to QA
 	RoxieKeyBuild.MAC_SK_Move_v2('~thor_data400::key::cnldfacilities::@version@::BDID', 'Q', mv_bdid_key_to_qa);
+	
+	// Move LinkIDs key to QA
+	RoxieKeyBuild.MAC_SK_Move_v2('~thor_data400::key::cnldfacilities::@version@::LinkIDs', 'Q', mv_LinkIDs_key_to_qa);
 
 	// Move dea key to QA
 	RoxieKeyBuild.MAC_SK_Move_v2('~thor_data400::key::cnldfacilities::@version@::DEA', 'Q', mv_dea_key_to_qa);
@@ -120,6 +130,7 @@ EXPORT proc_build_roxie_keys(STRING filedate) := FUNCTION
 //-------------------------------------------------------------------------------------------------
 
   Keys := SEQUENTIAL(PARALLEL(build_bdid_key,
+															build_LinkIDs_key,
 															build_dea_key,
 															build_fein_key,
 															build_gennum_key,
@@ -128,6 +139,7 @@ EXPORT proc_build_roxie_keys(STRING filedate) := FUNCTION
 															build_npi_key,
 															build_zipcode_key),
 										 PARALLEL(mv_bdid_key_to_built,
+															mv_LinkIDs_key_to_built,
 															mv_dea_key_to_built,
 															mv_fein_key_to_built,
 															mv_gennum_key_to_built,
@@ -136,6 +148,7 @@ EXPORT proc_build_roxie_keys(STRING filedate) := FUNCTION
 															mv_npi_key_to_built,
 															mv_zipcode_key_to_built),
 										 PARALLEL(mv_bdid_key_to_qa,
+															mv_LinkIDs_key_to_qa,
 															mv_dea_key_to_qa,
 															mv_fein_key_to_qa,
 															mv_gennum_key_to_qa,

@@ -1,1 +1,2 @@
-export file_DEA_In := dataset('~thor_Data400::in::dea',layout_dea_in,flat);
+import DEA, ut;
+export file_DEA_In :=Dataset('~thor_Data400::in::dea', DEA.Layout.Dea_In, thor);

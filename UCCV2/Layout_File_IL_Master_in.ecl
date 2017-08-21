@@ -1,0 +1,23 @@
+export Layout_File_IL_Master_in	:=	record
+	string8     process_date;
+	string1     action_code;
+	string9     file_no;
+	string8     file_date;
+	string4     file_time;
+	string8     maturity_date;
+	string64    secured_name;
+	string32    secured_street;
+	string18    secured_city;
+	string2     secured_state;
+	string9     secured_zip;
+	string1     multi_secured;
+	string30    status;
+	string100   collateral;
+	string1     proceeds;
+	string1     products;
+	string5     financing_pages;
+	string3     transaction_cnt;
+	string2     husb_wife_cnt;
+	string100		prep_addr_line1;
+	string50		prep_addr_last_line;  					
+end;

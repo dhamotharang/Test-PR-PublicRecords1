@@ -1,4 +1,4 @@
-import ut;
+import ut, LN_PropertyV2;
 
 export filters(string8 history_date) := MODULE
 	
@@ -23,7 +23,7 @@ export filters(string8 history_date) := MODULE
 												 '' );
 	
 	//Function for unformatted apns
-	export stripFormat(string apn) := stringlib.stringfilter(apn,'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+	export stripFormat(string apn) := LN_PropertyV2.fn_strip_pnum(apn);
 	
 	export valid_date(string saledate) := ut.isNumeric(saledate) or trim(saledate)='' ;
 	

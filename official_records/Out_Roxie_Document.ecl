@@ -30,16 +30,36 @@ Standard.Official_Records_Document tDocumentInToRoxie(DInAsOutDeduped pInput)
 	self.address_line_4		:= pInput.address_4;
 	self.prior_doc_type_code	:= pInput.prior_doc_type_cd;
 	self.prior_book_type_code	:= pInput.prior_book_type_cd;
-	self.address := ROW({
-				  pInput.prim_range, pInput.predir, pInput.prim_name, pInput.addr_suffix, pInput.postdir,
-	                 pInput.unit_desig, pInput.sec_range, pInput.v_city_name, pInput.st, 
-				  pInput.zip, pInput.zip4, pInput.rec_type, pInput.ace_fips_st, 
-				  pInput.ace_fips_county, pInput.geo_lat, pInput.geo_long, 
-				  pInput.msa, pInput.geo_blk, pInput.geo_match, pInput.err_stat},Standard.Addr);
+	self.prim_range := pinput.prim_range;
+	self.predir := pinput.predir;
+	self.prim_name := pinput.prim_name;
+	self.addr_suffix := pinput.addr_suffix;
+	self.postdir := pinput.postdir;
+	self.unit_desig := pinput.unit_desig;
+	self.sec_range := pinput.sec_range;
+	self.v_city_name := pinput.v_city_name;
+	self.st := pinput.st;
+	self.zip5 := pinput.zip;
+	self.zip4 := pinput.zip4;
+	self.addr_rec_type := pinput.rec_type;
+	self.fips_state := pinput.ace_fips_st;
+	self.fips_county := pinput.ace_fips_county;
+	self.geo_lat := pinput.geo_lat;
+	self.geo_long := pinput.geo_long;
+	self.cbsa := pinput.msa;
+	self.geo_blk := pinput.geo_blk;
+	self.geo_match := pinput.geo_match;
+	self.err_stat := pinput.err_stat;
+	//self.address := ROW({
+		//		  pInput.prim_range, pInput.predir, pInput.prim_name, pInput.addr_suffix, pInput.postdir,
+	      //           pInput.unit_desig, pInput.sec_range, pInput.v_city_name, pInput.st, 
+			//	  pInput.zip, pInput.zip4, pInput.rec_type, pInput.ace_fips_st, 
+				//  pInput.ace_fips_county, pInput.geo_lat, pInput.geo_long, 
+				 // pInput.msa, pInput.geo_blk, pInput.geo_match, pInput.err_stat},Standard.Addr);
 	self := pInput;
   end
  ;
 
 dDocumentAsRoxie		:= project(DInAsOutDeduped,tDocumentInToRoxie(left));
 
-export Out_Roxie_Document := output(dDocumentAsRoxie,,Official_Records.Name_Roxie_Document_Dev,overwrite);
+export Out_Roxie_Document := output(dDocumentAsRoxie,,Official_Records.Name_Roxie_Document_Dev,__compressed__,overwrite);

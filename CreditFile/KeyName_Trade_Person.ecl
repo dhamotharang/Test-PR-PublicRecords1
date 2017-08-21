@@ -1,0 +1,1 @@
+export KeyName_Trade_Person := '~thor_data400::key.trade.person';

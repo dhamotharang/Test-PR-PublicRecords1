@@ -28,8 +28,8 @@ AutoKeyB2.MAC_Build (d2,person_name.fname,person_name.mname,person_name.lname,
 						liensv2.str_AutokeyName,
 						liensv2.str_AutokeyLogicalName(filedate),
 						outaction,false,
-						[],true,'BC',
-						true) 
+						[],true,,
+						true,,,zero) 
 
 
 

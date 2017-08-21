@@ -1,0 +1,1 @@
+EXPORT Version := (string8).STD.Date.Today();

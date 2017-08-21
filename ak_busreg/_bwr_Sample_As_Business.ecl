@@ -1,0 +1,2 @@
+output(enth(ak_busreg.As_Business(false).Header,200), named('AkBusRegAsBusinessHeaderSamples'), all);
+output(enth(ak_busreg.As_Business(false).Contact,200), named('AkBusRegAsBusinessContactSamples'), all);

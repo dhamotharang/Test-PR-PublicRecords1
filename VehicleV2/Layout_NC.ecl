@@ -246,6 +246,7 @@ module
 		string36        model_description;
 		string25        series_description;
 		string25        body_style_description;
+		unsigned8				source_rec_id := 0;	 	//Added for BIP project
 	end;
 
 end;

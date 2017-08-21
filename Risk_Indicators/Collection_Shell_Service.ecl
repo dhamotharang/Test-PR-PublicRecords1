@@ -33,6 +33,27 @@ export Collection_Shell_Service := MACRO
   // so add the default to #stored to eliminate the assignment of a default value.
   #stored('DataPermissionMask',risk_indicators.iid_constants.default_DataPermission);
 
+	#WEBSERVICE(FIELDS(
+		'AccountNumber',
+		'FirstName',
+		'MiddleName',
+		'LastName',
+		'NameSuffix',
+		'StreetAddress',
+		'City',
+		'State',
+		'Zip',
+		'SSN',
+		'DateOfBirth',
+		'HomePhone',
+		'DPPAPurpose',
+		'GLBPurpose', 
+		'DataRestrictionMask',
+		'DataPermissionMask',
+		'HistoryDateYYYYMM',
+		'BSVersion',
+		'model'));
+	
 	string30 account_value := '' 		: stored('AccountNumber');
 	string30 fname_val := ''     		: stored('FirstName');
 	string30 mname_val := ''     		: stored('MiddleName');

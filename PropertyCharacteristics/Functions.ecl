@@ -34,6 +34,18 @@ module
 		return	if(strIndex	!=	0,vIntegral	+	vRound,r);
 	end;
 
+	export real	round2decimal(real	r)	:= 	function
+		string		strNumber	:=	(string)r;
+		unsigned	strIndex	:=	stringlib.stringfind(strNumber,'.',1);
+		unsigned2	vIntegral	:=	if(strIndex	!=	0,(unsigned2)strNumber[1..strIndex-1],0);
+		unsigned2	vFraction	:=	if(strIndex	!=	0,(unsigned2)strNumber[strIndex+1..3],0);
+		real			vRound		:=	if(vFraction%10	<	5, 0,
+																if(vFraction%10	=	5, .5,
+																					1));
+		
+		return	if(strIndex	!=	0,vIntegral	+	vRound,r);
+	end;
+	
 	// Function to calculate the percentage
 	export	udecimal5_2	pct(string	n,string	d)	:=	if((real)d	!=	0,(real)n/(real)d	*	100.0,0);
 
@@ -143,4 +155,28 @@ module
 
 		outFile	:=	PROJECT(inFile,%tRemoveZeroes%(LEFT));
 	endmacro;
+	
+	
+	// Clean AID is assigned for each unique cleaned address, however small variations in fields p_city_name aren't collapsed into one clean aid
+	// As all the rollup logic is being done on clean aid, collapsing all the different varaitions of one cleaned address into one clean aid
+	export	fnCollapseAceAID(dataset(PropertyCharacteristics.Layouts.TempBase)	pInDataset)	:=
+	function
+		dPropAddrDist	:=	distribute(pInDataset,hash32(prim_range,prim_name,st,zip));
+		dPropAddrSort	:=	sort(dPropAddrDist,prim_range,predir,prim_name,addr_suffix,postdir,sec_range,zip,property_ace_aid,local);
+		dPropAddrGrp	:=	group(dPropAddrSort,prim_range,predir,prim_name,addr_suffix,postdir,sec_range,zip,local);
+
+		PropertyCharacteristics.Layouts.TempBase	tIteratePropAID(dPropAddrGrp	le,dPropAddrGrp	ri,integer	cnt)	:=
+		transform
+			self.property_ace_aid	:=	if(cnt	!=	1	and	le.property_ace_aid	!=	ri.property_ace_aid,le.property_ace_aid,ri.property_ace_aid);
+			self									:=	ri;
+		end;
+
+		dPropAddrIterate	:=	iterate(dPropAddrGrp,tIteratePropAID(left,right,counter));
+
+		dPropAddrUnGrp		:=	ungroup(dPropAddrIterate);
+		
+		return	dPropAddrUnGrp;
+	end;
+
+	
 end;

@@ -1,4 +1,4 @@
-import _control, tools,ut;
+import _control, tools, Data_Services;
 
 export _Dataset(
 
@@ -10,8 +10,8 @@ module
 	export IsDataland 					:= Tools._Constants.IsDataland;
 	
 	export foreign_environment := if(IsDataland
-																	,ut.foreign_prod
-																	,ut.foreign_dataland
+																	,Data_Services.foreign_prod
+																	,Data_Services.foreign_dataland
 																);
 												
 	export Name										:= 'POEsFromUtilities'		;
@@ -22,6 +22,6 @@ module
 	export thor_cluster_Persists	:= thor_cluster_Files		;
 	export max_record_size				:= 4096									;
 
-	export Groupname							:= tools.fun_Groupname();
+	export Groupname							:= tools.fun_Groupname('72');
 
 end;

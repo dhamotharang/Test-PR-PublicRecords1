@@ -18,20 +18,20 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriage_divorce
  
  //husband
  self.party1_name_format 		:= 'L';
- self.party1_type						:= 'H';
+ self.party1_type						:= 'G';
  self.party1_name        		:= stringlib.stringcleanspaces( if(trim(le.HName)='','UNKNOWN',trim(le.HName)));
- self.party1_age						:=le.HAGE;
+ self.party1_age						:=REGEXREPLACE('([.?-~])',le.HAGE,'');
    
 //wife 
  self.party2_name_format 		:= 'L';
- self.party2_type						:= 'W';
+ self.party2_type						:= 'B';
  self.party2_name        		:= stringlib.stringcleanspaces( if(trim(le.WNAME)='','UNKNOWN',trim(le.WNAME)));
- self.party2_age						:=le.WAGE;
+ self.party2_age						:=REGEXREPLACE('([.?-~])',le.WAGE,'');
  
  
  //marriage info
- v_marr_dt									 := stringlib.stringfindreplace(trim(le.MARRDATE),'/',''); 
- self.marriage_dt        		 := v_marr_dt[5..]+v_marr_dt[1..2]+v_marr_dt[3..4];
+ //v_marr_dt									 := stringlib.stringfindreplace(REGEXREPLACE('([.?-~])',trim(le.MARRDATE),''),'/',''); 
+ self.marriage_dt        		 := ut.date_slashed_MMDDYYYY_to_YYYYMMDD(le.MARRDATE);
 
                                  
  self.marriage_filing_number := trim(le.fnum);
@@ -44,4 +44,4 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriage_divorce
  
 end;
 
-export mapping_tx_marriage := project(marriage_divorce_v2.File_Marriage_TX_In,t_map_to_common(left)) : persist('mar_div_tx_mar');
+export mapping_tx_marriage := project(marriage_divorce_v2.File_Marriage_TX_In,t_map_to_common(left));// : persist('mar_div_tx_mar');

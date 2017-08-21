@@ -1,12 +1,11 @@
-import ut,bipv2,wk_ut;
-
-thecurrentdate  := ut.getdate;      
+import ut,bipv2,wk_ut,BIPV2_Findlinks,BIPV2_Postprocess,std;
+thecurrentdate  := (STRING8)Std.Date.Today();         
 highwuid        := 'W' + thecurrentdate + '-999999';
 
 EXPORT Build_DataCard(
    string   pversion  = bipv2.KeySuffix
   ,string20 TheSprint = 'Sprint ' + BIPV2.KeySuffix_mod2.SprintNumber(pversion)//'Sprint 26'
-  ,string   the_WU    = sort(wk_ut.get_Running_Workunits('W' + pversion + '-000001',highwuid,'completed')(job = 'BIPV2_PostProcess.proc_segmentation ' + pversion),-wuid)[1].wuid//'W20150217-055342'
+  ,string   the_WU    = trim(sort(wk_ut.get_Running_Workunits('W' + pversion + '-000001',highwuid,'completed')(job = 'BIPV2_PostProcess.proc_segmentation ' + pversion),-wuid)[1].wuid)//'W20150217-055342'
 
 ) := Module
 
@@ -290,8 +289,9 @@ Shared Segmentationds :=dataset([
 
 
 Shared Rec :={Unsigned8 countgroup,Unsigned1 nogrouping,Unsigned8 proxid,Unsigned8 rcid,Unsigned8 source,Unsigned8 ingest_status,Unsigned8 dotid,
-Unsigned8 empid,Unsigned8 powid,Unsigned8 seleid,Unsigned8 lgid3,Unsigned8 orgid,Unsigned8  ultid,Unsigned8  cnt_rcid_per_dotid, Unsigned8  
-cnt_dot_per_proxid, Unsigned8  cnt_prox_per_lgid3, Unsigned8 cnt_prox_per_powid, Unsigned8 cnt_dot_per_empid, Unsigned8 has_lgid,
+Unsigned8 empid,Unsigned8 powid,Unsigned8 seleid,Unsigned8 lgid3,Unsigned8 orgid,Unsigned8  ultid,Unsigned8 vanity_owner_did, 
+Unsigned8 cnt_rcid_per_dotid, Unsigned8 cnt_dot_per_proxid, Unsigned8  cnt_prox_per_lgid3, Unsigned8 cnt_prox_per_powid, 
+Unsigned8 cnt_dot_per_empid, Unsigned8 has_lgid,
 Unsigned8 is_sele_level, Unsigned8 is_org_level, Unsigned8 is_ult_level, Unsigned8 parent_proxid,Unsigned8 sele_proxid, Unsigned8 org_proxid, 
 Unsigned8 ultimate_proxid,Unsigned8 levels_from_top, Unsigned8 nodes_below, Unsigned8 nodes_total, Unsigned8 sele_gold, Unsigned8 ult_seg,
 Unsigned8 org_seg, Unsigned8 sele_seg, Unsigned8 prox_seg,Unsigned8 pow_seg, Unsigned8 ult_prob,Unsigned8 org_prob, Unsigned8 sele_prob,
@@ -299,11 +299,12 @@ Unsigned8 prox_prob, Unsigned8 pow_prob, Unsigned8 iscontact, Unsigned8 title, U
 Unsigned8 name_suffix,Unsigned8 name_score, Unsigned8 iscorp, Unsigned8 company_name, Unsigned8 company_name_type_raw, 
 Unsigned8 company_name_type_derived, Unsigned8 cnp_hasnumber, Unsigned8 cnp_name,Unsigned8 cnp_number, Unsigned8 cnp_store_number, 
 Unsigned8 cnp_btype, Unsigned8 cnp_component_code,Unsigned8 cnp_lowv, Unsigned8 cnp_translated, Unsigned8 cnp_classid,Unsigned8 company_rawaid, 
-Unsigned8 company_aceaid,Unsigned8 prim_range, Unsigned8 predir, Unsigned8 prim_name, Unsigned8 prim_name_derived,Unsigned8 addr_suffix, 
+Unsigned8 company_aceaid,Unsigned8 prim_range,Unsigned8 prim_range_derived, Unsigned8 predir, Unsigned8 prim_name, Unsigned8 prim_name_derived,Unsigned8 addr_suffix, 
 Unsigned8 postdir, Unsigned8 unit_desig,Unsigned8 sec_range,Unsigned8 p_city_name, Unsigned8 v_city_name,Unsigned8 st,Unsigned8 zip, 
 Unsigned8 zip4,Unsigned8 cart,Unsigned8 cr_sort_sz, Unsigned8 lot, Unsigned8 lot_order,Unsigned8 dbpc,Unsigned8 chk_digit, Unsigned8 rec_type, 
 Unsigned8 fips_state,Unsigned8 fips_county,Unsigned8 geo_lat, Unsigned8 geo_long, Unsigned8 msa, Unsigned8 geo_blk, Unsigned8 geo_match, 
 Unsigned8 err_stat,Unsigned8 corp_legal_name,Unsigned8 dba_name, Unsigned8 active_duns_number, Unsigned8 hist_duns_number,
+Unsigned8 deleted_key, Unsigned8 deleted_fein, /*Newly added ????????? !!!!!!!!!!!!!!!  W20160503-114312 */
 Unsigned8 active_enterprise_number, Unsigned8 hist_enterprise_number,Unsigned8 ebr_file_number, Unsigned8 active_domestic_corp_key,
 Unsigned8 hist_domestic_corp_key, Unsigned8 foreign_corp_key, Unsigned8 unk_corp_key,Unsigned8 dt_first_seen, Unsigned8 dt_last_seen, 
 Unsigned8 dt_vendor_first_reported,Unsigned8 dt_vendor_last_reported, Unsigned8 company_bdid, Unsigned8 company_address_type_raw, 
@@ -320,7 +321,8 @@ Unsigned8 contact_did, Unsigned8 contact_type_raw, Unsigned8 contact_job_title_r
 Unsigned8 contact_status_raw, Unsigned8 contact_email, Unsigned8 contact_email_username, Unsigned8 contact_email_domain, Unsigned8 contact_phone, 
 Unsigned8 from_hdr, Unsigned8 company_department, Unsigned8 company_address_type_derived,Unsigned8 company_org_structure_derived, 
 Unsigned8 company_name_status_derived, Unsigned8 company_status_derived, Unsigned8 contact_type_derived, Unsigned8 contact_job_title_derived, 
-Unsigned8 contact_status_derived
+Unsigned8 contact_status_derived, Unsigned8 address_type_derived,	Unsigned8 is_vanity_name_derived
+
 };
 
 Shared  V2FieldStatsActivePROX	 :=Dataset(WorkUnit(the_WU,'V2_FieldStats_Active_PROX'),Rec); 
@@ -331,6 +333,7 @@ Shared  V2FieldStatsInactivePOW	 :=Dataset(WorkUnit(the_WU,'V2_FieldStats_Inacti
 
 Shared  V2FieldStatsActiveSELE	 :=Dataset(WorkUnit(the_WU,'V2_FieldStats_Active_SELE'),Rec); 
 Shared  V2FieldStatsInactiveSELE :=Dataset(WorkUnit(the_WU,'V2_FieldStats_Inactive_SELE'),Rec); 
+Shared  V2FieldStatsActiveSELEGold:=Dataset(WorkUnit(the_WU,'V2_FieldStats_Active_SELE_GOLD'),Rec);
 
 Shared  V2FieldStatsActiveORG	 :=Dataset(WorkUnit(the_WU,'V2_FieldStats_Active_ORG'),Rec); 
 Shared  V2FieldStatsInactiveORG	 :=Dataset(WorkUnit(the_WU,'V2_FieldStats_Inactive_ORG'),Rec); 
@@ -363,30 +366,30 @@ Shared string80 u25	:='URL';
 Shared string80 u26	:='';
 //--------------------------------
 Shared string40 v1		:='';
-Shared string40 v2		:='';
+Shared string40 v2		:='WU: ' + the_WU;
 Shared string40 v3		:='PROXID--LexIDÂ® Business Place';
 Shared string40 v4		:='Active';
 Shared string40 v5		:='';
-Shared string40 v6		:='=+L7/L27';
-Shared string40 v7		:='=+L8/L27';
-Shared string40 v8		:='=+L9/L27';
-Shared string40 v9		:='=+L10/L27';
-Shared string40 v10	:='=+L11/L27';
-Shared string40 v11	:='=+L12/L27';
+Shared string40 v6		:='=+M7/M27';
+Shared string40 v7		:='=+M8/M27';
+Shared string40 v8		:='=+M9/M27';
+Shared string40 v9		:='=+M10/M27';
+Shared string40 v10	:='=+M11/M27';
+Shared string40 v11	:='=+M12/M27';
 Shared string40 v12	:='';
 Shared string40 v13	:='';
-Shared string40 v14	:='=+L15/L27';
-Shared string40 v15	:='=+L16/L27';
+Shared string40 v14	:='=+M15/M27';
+Shared string40 v15	:='=+M16/M27';
 Shared string40 v16	:='';
 Shared string40 v17	:='';
-Shared string40 v18	:='=+L19/L27';
-Shared string40 v19	:='=+L20/L27';
-Shared string40 v20	:='=+L21/L27';
+Shared string40 v18	:='=+M19/M27';
+Shared string40 v19	:='=+M20/M27';
+Shared string40 v20	:='=+M21/M27';
 Shared string40 v21	:='';
 Shared string40 v22	:='';
-Shared string40 v23	:='=+L24/L27';
-Shared string40 v24	:='=+L25/L27';
-Shared string40 v25	:='=+L26/L27';
+Shared string40 v23	:='=+M24/M27';
+Shared string40 v24	:='=+M25/M27';
+Shared string40 v25	:='=+M26/M27';
 Shared string40 v26	:='';
 // --------------------------------------------
 Shared string40 w1		:='';
@@ -394,26 +397,26 @@ Shared string40 w2		:='';
 Shared string40 w3		:='';
 Shared string40 w4		:='Inactive';
 Shared string40 w5		:='';
-Shared string40 w6		:='=+M7/M27';
-Shared string40 w7		:='=+M8/M27';
-Shared string40 w8		:='=+M9/M27';
-Shared string40 w9		:='=+M10/M27';
-Shared string40 w10	:='=+M11/M27';
-Shared string40 w11	:='=+M12/M27';
+Shared string40 w6		:='=+N7/N27';
+Shared string40 w7		:='=+N8/N27';
+Shared string40 w8		:='=+N9/N27';
+Shared string40 w9		:='=+N10/N27';
+Shared string40 w10	:='=+N11/N27';
+Shared string40 w11	:='=+N12/N27';
 Shared string40 w12	:='';
 Shared string40 w13	:='';
-Shared string40 w14	:='=+M15/M27';
-Shared string40 w15	:='=+M16/M27';
+Shared string40 w14	:='=+N15/N27';
+Shared string40 w15	:='=+N16/N27';
 Shared string40 w16	:='';
 Shared string40 w17	:='';
-Shared string40 w18	:='=+M19/M27';
-Shared string40 w19	:='=+M20/M27';
-Shared string40 w20	:='=+M21/M27';
+Shared string40 w18	:='=+N19/N27';
+Shared string40 w19	:='=+N20/N27';
+Shared string40 w20	:='=+N21/N27';
 Shared string40 w21	:='';
 Shared string40 w22	:='';
-Shared string40 w23	:='=+M24/M27';
-Shared string40 w24	:='=+M25/M27';
-Shared string40 w25	:='=+M26/M27';
+Shared string40 w23	:='=+N24/N27';
+Shared string40 w24	:='=+N25/N27';
+Shared string40 w25	:='=+N26/N27';
 Shared string40 w26	:='';
 //-------------------------------------
 Shared string40 e1		:='';
@@ -421,26 +424,26 @@ Shared string40 e2		:='';
 Shared string40 e3		:='SELE--LexIDÂ® Business Legal Entity';
 Shared string40 e4		:='Active';
 Shared string40 e5		:='';
-Shared string40 e6		:='=+N7/N27';
-Shared string40 e7		:='=+N8/N27';
-Shared string40 e8		:='=+N9/N27';
-Shared string40 e9		:='=+N10/N27';
-Shared string40 e10	:='=+N11/N27';
-Shared string40 e11	:='=+N12/N27';
+Shared string40 e6		:='=+O7/O27';
+Shared string40 e7		:='=+O8/O27';
+Shared string40 e8		:='=+O9/O27';
+Shared string40 e9		:='=+O10/O27';
+Shared string40 e10	:='=+O11/O27';
+Shared string40 e11	:='=+O12/O27';
 Shared string40 e12	:='';
 Shared string40 e13	:='';
-Shared string40 e14	:='=+N15/N27';
-Shared string40 e15	:='=+N16/N27';
+Shared string40 e14	:='=+O15/O27';
+Shared string40 e15	:='=+O16/O27';
 Shared string40 e16	:='';
 Shared string40 e17	:='';
-Shared string40 e18	:='=+N19/N27';
-Shared string40 e19	:='=+N20/N27';
-Shared string40 e20	:='=+N21/N27';
+Shared string40 e18	:='=+O19/O27';
+Shared string40 e19	:='=+O20/O27';
+Shared string40 e20	:='=+O21/O27';
 Shared string40 e21	:='';
 Shared string40 e22	:='';
-Shared string40 e23	:='=+N24/N27';
-Shared string40 e24	:='=+N25/N27';
-Shared string40 e25	:='=+N26/N27';
+Shared string40 e23	:='=+O24/O27';
+Shared string40 e24	:='=+O25/O27';
+Shared string40 e25	:='=+O26/O27';
 Shared string40 e26	:='';
 //-----------------------------------------
 Shared string40 f1		:='';
@@ -448,53 +451,82 @@ Shared string40 f2		:='';
 Shared string40 f3		:='';
 Shared string40 f4		:='Inactive';
 Shared string40 f5		:='';
-Shared string40 f6		:='=+O7/O27';
-Shared string40 f7		:='=+O8/O27';
-Shared string40 f8		:='=+O9/O27';
-Shared string40 f9		:='=+O10/O27';
-Shared string40 f10	:='=+O11/O27';
-Shared string40 f11	:='=+O12/O27';
+Shared string40 f6		:='=+P7/P27';
+Shared string40 f7		:='=+P8/P27';
+Shared string40 f8		:='=+P9/P27';
+Shared string40 f9		:='=+P10/P27';
+Shared string40 f10	:='=+P11/P27';
+Shared string40 f11	:='=+P12/P27';
 Shared string40 f12	:='';
 Shared string40 f13	:='';
-Shared string40 f14	:='=+O15/O27';
-Shared string40 f15	:='=+O16/O27';
+Shared string40 f14	:='=+P15/P27';
+Shared string40 f15	:='=+P16/P27';
 Shared string40 f16	:='';
 Shared string40 f17	:='';
-Shared string40 f18	:='=+O19/O27';
-Shared string40 f19	:='=+O20/O27';
-Shared string40 f20	:='=+O21/O27';
+Shared string40 f18	:='=+P19/P27';
+Shared string40 f19	:='=+P20/P27';
+Shared string40 f20	:='=+P21/P27';
 Shared string40 f21	:='';
 Shared string40 f22	:='';
-Shared string40 f23	:='=+O24/O27';
-Shared string40 f24	:='=+O25/O27';
-Shared string40 f25	:='=+O26/O27';
+Shared string40 f23	:='=+P24/P27';
+Shared string40 f24	:='=+P25/P27';
+Shared string40 f25	:='=+P26/P27';
 Shared string40 f26	:='';
+// ----- Add Gold -----------
+Shared string40 ff1		:='';
+Shared string40 ff2		:='';
+Shared string40 ff3		:='';
+Shared string40 ff4		:='Active Gold';
+Shared string40 ff5		:='';
+Shared string40 ff6		:='=+Q7/Q27';
+Shared string40 ff7		:='=+Q8/Q27';
+Shared string40 ff8		:='=+Q9/Q27';
+Shared string40 ff9		:='=+Q10/Q27';
+Shared string40 ff10	:='=+Q11/Q27';
+Shared string40 ff11	:='=+Q12/Q27';
+Shared string40 ff12	:='';
+Shared string40 ff13	:='';
+Shared string40 ff14	:='=+Q15/Q27';
+Shared string40 ff15	:='=+Q16/Q27';
+Shared string40 ff16	:='';
+Shared string40 ff17	:='';
+Shared string40 ff18	:='=+Q19/Q27';
+Shared string40 ff19	:='=+Q20/Q27';
+Shared string40 ff20	:='=+Q21/Q27';
+Shared string40 ff21	:='';
+Shared string40 ff22	:='';
+Shared string40 ff23	:='=+Q24/Q27';
+Shared string40 ff24	:='=+Q25/Q27';
+Shared string40 ff25	:='=+Q26/Q27';
+Shared string40 ff26	:='';
+
+
 // -----------------------------------------
 Shared string40 g1		:='';
 Shared string40 g2		:='';
 Shared string40 g3		:='ORGID--LexIDÂ® Business Legal Family';
 Shared string40 g4		:='Active';
 Shared string40 g5		:='';
-Shared string40 g6		:='=+P7/P27';
-Shared string40 g7		:='=+P8/P27';
-Shared string40 g8		:='=+P9/P27';
-Shared string40 g9		:='=+P10/P27';
-Shared string40 g10	:='=+P11/P27';
-Shared string40 g11	:='=+P12/P27';
+Shared string40 g6		:='=+R7/R27';
+Shared string40 g7		:='=+R8/R27';
+Shared string40 g8		:='=+R9/R27';
+Shared string40 g9		:='=+R10/R27';
+Shared string40 g10	:='=+R11/R27';
+Shared string40 g11	:='=+R12/R27';
 Shared string40 g12	:='';
 Shared string40 g13	:='';
-Shared string40 g14	:='=+P15/P27';
-Shared string40 g15	:='=+P16/P27';
+Shared string40 g14	:='=+R15/R27';
+Shared string40 g15	:='=+R16/R27';
 Shared string40 g16	:='';
 Shared string40 g17	:='';
-Shared string40 g18	:='=+P19/P27';
-Shared string40 g19	:='=+P20/P27';
-Shared string40 g20	:='=+P21/P27';
+Shared string40 g18	:='=+R19/R27';
+Shared string40 g19	:='=+R20/R27';
+Shared string40 g20	:='=+R21/R27';
 Shared string40 g21	:='';
 Shared string40 g22	:='';
-Shared string40 g23	:='=+P24/P27';
-Shared string40 g24	:='=+P25/P27';
-Shared string40 g25	:='=+P26/P27';
+Shared string40 g23	:='=+R24/R27';
+Shared string40 g24	:='=+R25/R27';
+Shared string40 g25	:='=+R26/R27';
 Shared string40 g26	:='';
 //---------------------------------
 Shared string40 h1		:='';
@@ -502,26 +534,26 @@ Shared string40 h2		:='';
 Shared string40 h3		:='';
 Shared string40 h4		:='Inactive';
 Shared string40 h5		:='';
-Shared string40 h6		:='=+Q7/Q27';
-Shared string40 h7		:='=+Q8/Q27';
-Shared string40 h8		:='=+Q9/Q27';
-Shared string40 h9		:='=+Q10/Q27';
-Shared string40 h10	:='=+Q11/Q27';
-Shared string40 h11	:='=+Q12/Q27';
+Shared string40 h6		:='=+S7/S27';
+Shared string40 h7		:='=+S8/S27';
+Shared string40 h8		:='=+S9/S27';
+Shared string40 h9		:='=+S10/S27';
+Shared string40 h10	:='=+S11/S27';
+Shared string40 h11	:='=+S12/S27';
 Shared string40 h12	:='';
 Shared string40 h13	:='';
-Shared string40 h14	:='=+Q15/Q27';
-Shared string40 h15	:='=+Q16/Q27';
+Shared string40 h14	:='=+S15/S27';
+Shared string40 h15	:='=+S16/S27';
 Shared string40 h16	:='';
 Shared string40 h17	:='';
-Shared string40 h18	:='=+Q19/Q27';
-Shared string40 h19	:='=+Q20/Q27';
-Shared string40 h20	:='=+Q21/Q27';
+Shared string40 h18	:='=+S19/S27';
+Shared string40 h19	:='=+S20/S27';
+Shared string40 h20	:='=+S21/S27';
 Shared string40 h21	:='';
 Shared string40 h22	:='';
-Shared string40 h23	:='=+Q24/Q27';
-Shared string40 h24	:='=+Q25/Q27';
-Shared string40 h25	:='=+Q26/Q27';
+Shared string40 h23	:='=+S24/S27';
+Shared string40 h24	:='=+S25/S27';
+Shared string40 h25	:='=+S26/S27';
 Shared string40 h26	:='';
 // ---------------------------
 Shared string40 i1		:='';
@@ -583,26 +615,26 @@ Shared string40 k2		:='';
 Shared string40 k3		:='POWID--LexIDÂ® Business Place Group';
 Shared string40 k4		:='Active';
 Shared string40 k5		:='';
-Shared string40 k6		:='=+T7/T27';
-Shared string40 k7		:='=+T8/T27';
-Shared string40 k8		:='=+T9/T27';
-Shared string40 k9		:='=+T10/T27';
-Shared string40 k10	:='=+T11/T27';
-Shared string40 k11	:='=+T12/T27';
+Shared string40 k6		:='=+V7/V27';
+Shared string40 k7		:='=+V8/V27';
+Shared string40 k8		:='=+V9/V27';
+Shared string40 k9		:='=+V10/V27';
+Shared string40 k10	:='=+V11/V27';
+Shared string40 k11	:='=+V12/V27';
 Shared string40 k12	:='';
 Shared string40 k13	:='';
-Shared string40 k14	:='=+T15/T27';
-Shared string40 k15	:='=+T16/T27';
+Shared string40 k14	:='=+V15/V27';
+Shared string40 k15	:='=+V16/V27';
 Shared string40 k16	:='';
 Shared string40 k17	:='';
-Shared string40 k18	:='=+T19/T27';
-Shared string40 k19	:='=+T20/T27';
-Shared string40 k20	:='=+T21/T27';
+Shared string40 k18	:='=+V19/V27';
+Shared string40 k19	:='=+V20/V27';
+Shared string40 k20	:='=+V21/V27';
 Shared string40 k21	:='';
 Shared string40 k22	:='';
-Shared string40 k23	:='=+T24/T27';
-Shared string40 k24	:='=+T25/T27';
-Shared string40 k25	:='=+T26/T27';
+Shared string40 k23	:='=+V24/V27';
+Shared string40 k24	:='=+V25/V27';
+Shared string40 k25	:='=+V26/V27';
 Shared string40 k26	:='';
 // ------------------------
 Shared string40 l1		:='';
@@ -610,26 +642,26 @@ Shared string40 l2		:='';
 Shared string40 l3		:='';
 Shared string40 l4		:='Inactive';
 Shared string40 l5		:='';
-Shared string40 l6		:='=+U7/U27';
-Shared string40 l7		:='=+U8/U27';
-Shared string40 l8		:='=+U9/U27';
-Shared string40 l9		:='=+U10/U27';
-Shared string40 l10	:='=+U11/U27';
-Shared string40 l11	:='=+U12/U27';
+Shared string40 l6		:='=+W7/W27';
+Shared string40 l7		:='=+W8/W27';
+Shared string40 l8		:='=+W9/W27';
+Shared string40 l9		:='=+W10/W27';
+Shared string40 l10	:='=+W11/W27';
+Shared string40 l11	:='=+W12/W27';
 Shared string40 l12	:='';
 Shared string40 l13	:='';
-Shared string40 l14	:='=+U15/U27';
-Shared string40 l15	:='=+U16/U27';
+Shared string40 l14	:='=+W15/W27';
+Shared string40 l15	:='=+W16/W27';
 Shared string40 l16	:='';
 Shared string40 l17	:='';
-Shared string40 l18	:='=+U19/U27';
-Shared string40 l19	:='=+U20/U27';
-Shared string40 l20	:='=+U21/U27';
+Shared string40 l18	:='=+W19/W27';
+Shared string40 l19	:='=+W20/W27';
+Shared string40 l20	:='=+W21/W27';
 Shared string40 l21	:='';
 Shared string40 l22	:='';
-Shared string40 l23	:='=+U24/U27';
-Shared string40 l24	:='=+U25/U27';
-Shared string40 l25	:='=+U26/U27';
+Shared string40 l23	:='=+W24/W27';
+Shared string40 l24	:='=+W25/W27';
+Shared string40 l25	:='=+W26/W27';
 Shared string40 l26	:='';
 // ---------------------------------
 Shared string40 al1	:='';
@@ -740,6 +772,33 @@ Shared string40 ao23	:=(string40)V2FieldStatsInactiveSELE[1].company_fein;
 Shared string40 ao24	:=(string40)V2FieldStatsInactiveSELE[1].company_ticker;
 Shared string40 ao25	:=(string40)V2FieldStatsInactiveSELE[1].company_url;
 Shared string40 ao26	:=(string40)V2FieldStatsInactiveSELE[1].countgroup;
+//----------------------------add additional SELE GOLD part
+Shared string40 ang1	:='';
+Shared string40 ang2	:='';
+Shared string40 ang3	:='SELE';
+Shared string40 ang4	:='Active GOLD'; 
+Shared string40 ang5	:='';
+Shared string40 ang6	:=(string40)V2FieldStatsActiveSELEGold[1].prim_name;
+Shared string40 ang7	:=(string40)V2FieldStatsActiveSELEGold[1].v_city_name; 
+Shared string40 ang8	:=(string40)V2FieldStatsActiveSELEGold[1].st;
+Shared string40 ang9	:=(string40)V2FieldStatsActiveSELEGold[1].zip;
+Shared string40 ang10	:=(string40)V2FieldStatsActiveSELEGold[1].company_phone; 
+Shared string40 ang11	:=(string40)V2FieldStatsActiveSELEGold[1].dba_name;
+Shared string40 ang12	:='';
+Shared string40 ang13	:='';
+Shared string40 ang14	:=(string40)V2FieldStatsActiveSELEGold[1].company_sic_code1;
+Shared string40 ang15	:=(string40)V2FieldStatsActiveSELEGold[1].company_naics_code1;
+Shared string40 ang16	:='';
+Shared string40 ang17	:='';
+Shared string40 ang18	:=(string40)V2FieldStatsActiveSELEGold[1].lname;
+Shared string40 ang19	:=(string40)V2FieldStatsActiveSELEGold[1].contact_email; 
+Shared string40 ang20	:=(string40)V2FieldStatsActiveSELEGold[1].contact_phone; 
+Shared string40 ang21	:='';
+Shared string40 ang22	:='';
+Shared string40 ang23	:=(string40)V2FieldStatsActiveSELEGold[1].company_fein; 
+Shared string40 ang24	:=(string40)V2FieldStatsActiveSELEGold[1].company_ticker; 
+Shared string40 ang25	:=(string40)V2FieldStatsActiveSELEGold[1].company_url;
+Shared string40 ang26	:=(string40)V2FieldStatsActiveSELEGold[1].countgroup;
 //----------------
 Shared string40 ap1	:='';
 Shared string40 ap2	:='';
@@ -922,34 +981,34 @@ Shared string40 au26	:=(string40)V2FieldStatsInactivePOW[1].countgroup;
 */
 Shared Data_Fill_Rates_Rec :={string100 t1, string40 t2, string40 t3, string40 t4, string40 t5, string40 t6, string40 t7, 
 					   string40 t8, string40 t9, string40 t10, string40 t11, string40 t12, string40 t13, string40 t14, 
-					   string40 t15, string40 t16, string40 t17, string40 t18, string40 t19, string40 t20, string40 t21};
+					   string40 t15, string40 t16, string40 t17, string40 t18, string40 t19, string40 t20, string40 t21, string40 t22,string40 t23};
 Shared Data_Fill_Rates :=dataset([
-   							{u1,v1,w1,e1,f1,g1,h1,i1,j1,k1,l1,al1,am1,an1,ao1,ap1,aq1,ar1,as1,at1,au1},
-							{u2,v2,w2,e2,f2,g2,h2,i2,j2,k2,l2,al2,am2,an2,ao2,ap2,aq2,ar2,as2,at2,au2},
-							{u3,v3,w3,e3,f3,g3,h3,i3,j3,k3,l3,al3,am3,an3,ao3,ap3,aq3,ar3,as3,at3,au3},
-							{u4,v4,w4,e4,f4,g4,h4,i4,j4,k4,l4,al4,am4,an4,ao4,ap4,aq4,ar4,as4,at4,au4},
-							{u5,v5,w5,e5,f5,g5,h5,i5,j5,k5,l5,al5,am5,an5,ao5,ap5,aq5,ar5,as5,at5,au5},
-							{u6,v6,w6,e6,f6,g6,h6,i6,j6,k6,l6,al6,am6,an6,ao6,ap6,aq6,ar6,as6,at6,au6},
-							{u7,v7,w7,e7,f7,g7,h7,i7,j7,k7,l7,al7,am7,an7,ao7,ap7,aq7,ar7,as7,at7,au7},
-							{u8,v8,w8,e8,f8,g8,h8,i8,j8,k8,l8,al8,am8,an8,ao8,ap8,aq8,ar8,as8,at8,au8},
-							{u9,v9,w9,e9,f9,g9,h9,i9,j9,k9,l9,al9,am9,an9,ao9,ap9,aq9,ar9,as9,at9,au9},
-							{u10,v10,w10,e10,f10,g10,h10,i10,j10,k10,l10,al10,am10,an10,ao10,ap10,aq10,ar10,as10,at10,au10},
-							{u11,v11,w11,e11,f11,g11,h11,i11,j11,k11,l11,al11,am11,an11,ao11,ap11,aq11,ar11,as11,at11,au11},
-							{u12,v12,w12,e12,f12,g12,h12,i12,j12,k12,l12,al12,am12,an12,ao12,ap12,aq12,ar12,as12,at12,au12},
-							{u13,v13,w13,e13,f13,g13,h13,i13,j13,k13,l13,al13,am13,an13,ao13,ap13,aq13,ar13,as13,at13,au13},
-							{u14,v14,w14,e14,f14,g14,h14,i14,j14,k14,l14,al14,am14,an14,ao14,ap14,aq14,ar14,as14,at14,au14},
-							{u15,v15,w15,e15,f15,g15,h15,i15,j15,k15,l15,al15,am15,an15,ao15,ap15,aq15,ar15,as15,at15,au15},
-							{u16,v16,w16,e16,f16,g16,h16,i16,j16,k16,l16,al16,am16,an16,ao16,ap16,aq16,ar16,as16,at16,au16},
-							{u17,v17,w17,e17,f17,g17,h17,i17,j17,k17,l17,al17,am17,an17,ao17,ap17,aq17,ar17,as17,at17,au17},
-							{u18,v18,w18,e18,f18,g18,h18,i18,j18,k18,l18,al18,am18,an18,ao18,ap18,aq18,ar18,as18,at18,au18},
-							{u19,v19,w19,e19,f19,g19,h19,i19,j19,k19,l19,al19,am19,an19,ao19,ap19,aq19,ar19,as19,at19,au19},
-							{u20,v20,w20,e20,f20,g20,h20,i20,j20,k20,l20,al20,am20,an20,ao20,ap20,aq20,ar20,as20,at20,au20},
-							{u21,v21,w21,e21,f21,g21,h21,i21,j21,k21,l21,al21,am21,an21,ao21,ap21,aq21,ar21,as21,at21,au21},
-							{u22,v22,w22,e22,f22,g22,h22,i22,j22,k22,l22,al22,am22,an22,ao22,ap22,aq22,ar22,as22,at22,au22},
-							{u23,v23,w23,e23,f23,g23,h23,i23,j23,k23,l23,al23,am23,an23,ao23,ap23,aq23,ar23,as23,at23,au23},
-							{u24,v24,w24,e24,f24,g24,h24,i24,j24,k24,l24,al24,am24,an24,ao24,ap24,aq24,ar24,as24,at24,au24},
-							{u25,v25,w25,e25,f25,g25,h25,i25,j25,k25,l25,al25,am25,an25,ao25,ap25,aq25,ar25,as25,at25,au25},
-							{u26,v26,w26,e26,f26,g26,h26,i26,j26,k26,l26,al26,am26,an26,ao26,ap26,aq26,ar26,as26,at26,au26}							
+   						{u1,v1,w1,e1,f1,ff1,g1,h1,i1,j1,k1,l1,al1,am1,an1,ao1,ang1,ap1,aq1,ar1,as1,at1,au1},
+							{u2,v2,w2,e2,f2,ff2,g2,h2,i2,j2,k2,l2,al2,am2,an2,ao2,ang2,ap2,aq2,ar2,as2,at2,au2},
+							{u3,v3,w3,e3,f3,ff3,g3,h3,i3,j3,k3,l3,al3,am3,an3,ao3,ang3,ap3,aq3,ar3,as3,at3,au3},
+							{u4,v4,w4,e4,f4,ff4,g4,h4,i4,j4,k4,l4,al4,am4,an4,ao4,ang4,ap4,aq4,ar4,as4,at4,au4},
+							{u5,v5,w5,e5,f5,ff5,g5,h5,i5,j5,k5,l5,al5,am5,an5,ao5,ang5,ap5,aq5,ar5,as5,at5,au5},
+							{u6,v6,w6,e6,f6,ff6,g6,h6,i6,j6,k6,l6,al6,am6,an6,ao6,ang6,ap6,aq6,ar6,as6,at6,au6},
+							{u7,v7,w7,e7,f7,ff7,g7,h7,i7,j7,k7,l7,al7,am7,an7,ao7,ang7,ap7,aq7,ar7,as7,at7,au7},
+							{u8,v8,w8,e8,f8,ff8,g8,h8,i8,j8,k8,l8,al8,am8,an8,ao8,ang8,ap8,aq8,ar8,as8,at8,au8},
+							{u9,v9,w9,e9,f9,ff9,g9,h9,i9,j9,k9,l9,al9,am9,an9,ao9,ang9,ap9,aq9,ar9,as9,at9,au9},
+							{u10,v10,w10,e10,f10,ff10,g10,h10,i10,j10,k10,l10,al10,am10,an10,ao10,ang10,ap10,aq10,ar10,as10,at10,au10},
+							{u11,v11,w11,e11,f11,ff11,g11,h11,i11,j11,k11,l11,al11,am11,an11,ao11,ang11,ap11,aq11,ar11,as11,at11,au11},
+							{u12,v12,w12,e12,f12,ff12,g12,h12,i12,j12,k12,l12,al12,am12,an12,ao12,ang12,ap12,aq12,ar12,as12,at12,au12},
+							{u13,v13,w13,e13,f13,ff13,g13,h13,i13,j13,k13,l13,al13,am13,an13,ao13,ang13,ap13,aq13,ar13,as13,at13,au13},
+							{u14,v14,w14,e14,f14,ff14,g14,h14,i14,j14,k14,l14,al14,am14,an14,ao14,ang14,ap14,aq14,ar14,as14,at14,au14},
+							{u15,v15,w15,e15,f15,ff15,g15,h15,i15,j15,k15,l15,al15,am15,an15,ao15,ang15,ap15,aq15,ar15,as15,at15,au15},
+							{u16,v16,w16,e16,f16,ff16,g16,h16,i16,j16,k16,l16,al16,am16,an16,ao16,ang16,ap16,aq16,ar16,as16,at16,au16},
+							{u17,v17,w17,e17,f17,ff17,g17,h17,i17,j17,k17,l17,al17,am17,an17,ao17,ang17,ap17,aq17,ar17,as17,at17,au17},
+							{u18,v18,w18,e18,f18,ff18,g18,h18,i18,j18,k18,l18,al18,am18,an18,ao18,ang18,ap18,aq18,ar18,as18,at18,au18},
+							{u19,v19,w19,e19,f19,ff19,g19,h19,i19,j19,k19,l19,al19,am19,an19,ao19,ang19,ap19,aq19,ar19,as19,at19,au19},
+							{u20,v20,w20,e20,f20,ff20,g20,h20,i20,j20,k20,l20,al20,am20,an20,ao20,ang20,ap20,aq20,ar20,as20,at20,au20},
+							{u21,v21,w21,e21,f21,ff21,g21,h21,i21,j21,k21,l21,al21,am21,an21,ao21,ang21,ap21,aq21,ar21,as21,at21,au21},
+							{u22,v22,w22,e22,f22,ff22,g22,h22,i22,j22,k22,l22,al22,am22,an22,ao22,ang22,ap22,aq22,ar22,as22,at22,au22},
+							{u23,v23,w23,e23,f23,ff23,g23,h23,i23,j23,k23,l23,al23,am23,an23,ao23,ang23,ap23,aq23,ar23,as23,at23,au23},
+							{u24,v24,w24,e24,f24,ff24,g24,h24,i24,j24,k24,l24,al24,am24,an24,ao24,ang24,ap24,aq24,ar24,as24,at24,au24},
+							{u25,v25,w25,e25,f25,ff25,g25,h25,i25,j25,k25,l25,al25,am25,an25,ao25,ang25,ap25,aq25,ar25,as25,at25,au25},
+							{u26,v26,w26,e26,f26,ff26,g26,h26,i26,j26,k26,l26,al26,am26,an26,ao26,ang26,ap26,aq26,ar26,as26,at26,au26}							
    						  ],Data_Fill_Rates_Rec);
    
    
@@ -1122,9 +1181,22 @@ Shared string s54:='Total Header SELEs';
    							{s49,n49},{s50,n50},{s51,n51},{s52,n52},{s53,n53},{s54,n54}
    							],GOLD);
    
-   
+	 shared path1:='~' + BIPV2_postProcess.DataCollector().superfile_version_wuid;
+	 shared xx :=dataset(path1,BIPV2_postProcess.DataCollector().version_wuid_rec,flat);
+	 shared wu :=(string)xx(version=pversion)[1].wuid;
+	 shared rr :=wk_ut.Restore_Workunit(wu);
+
+   shared Prox:=BIPV2_postProcess.Data_GetProxConfStat();
+	 shared Lgid:=BIPV2_postProcess.Data_GetLgidConfStat();
+
+
    //output(GOLD_ds, named('GOLD'));
   export run :=sequential(
+													output(rr),
+													output(Prox,named('ProxConf')),
+													output(Lgid,named('LgidConf')),		
+													BIPV2_Findlinks.DS_Version_IterNumber.UpdateProxVersionIterNumber(),
+													BIPV2_Findlinks.DS_Version_IterNumber.UpdateLgid3VersionIterNumber(),
   												output(SegmentationdsProb, named('ID_Probation')), 
 													output(Segmentationds, named('ID_Segmentation')),   
 													output(Data_Fill_Rates, named('Data_Fill_Rates')),

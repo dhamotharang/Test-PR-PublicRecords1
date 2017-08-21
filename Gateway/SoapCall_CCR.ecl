@@ -1,4 +1,4 @@
-﻿IMPORT iesp, Gateway, Royalty;
+IMPORT iesp, Gateway, Royalty;
 
 EXPORT SoapCall_CCR(DATASET(iesp.conscredit_req.t_ConsumerCreditReportRequest) ccrReq,
 										Gateway.Layouts.Config gateway_cfg,

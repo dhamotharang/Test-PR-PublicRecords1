@@ -1,3 +1,5 @@
+import	AID_Support;
+
 export Layouts
  :=
 	module
@@ -207,58 +209,14 @@ export Layouts
 			end
 		 ;
 
-		/**************************************************************************************
-		 ** Layout of Raw cache update file
-		 **************************************************************************************/
-		export	rRawCacheUpdate
-		 :=
-			record
-				Common.xAID						AID;
-				Common.xDateString		DateSeenFirst;
-				Common.xDateString		DateSeenLast;
-				boolean								IsNormalized;
-				Common.xFlags					NormalizeFlags;
-				Common.xFlags					Flags;
-				Common.xVersion				StdVersion;
-				Common.xAID						StdAID;
-				Common.xAID						ReferAID;
-			end
-		 ;
+		/**************************************************************************************/
+		export	rRawCacheUpdate	:=	AID_Support.Layouts.rRawCacheUpdate;
 
-		/**************************************************************************************
-		 ** Layout of Std cache update file
-		 **************************************************************************************/
-		export	rStdCacheUpdate
-		 :=
-			record
-				Common.xAID						AID;
-				Common.xDateString		DateSeenFirst;
-				Common.xDateString		DateSeenLast;
-				Common.xAddressType		Cleaner;
-				Common.xAID						CleanAID;
-				Common.xDateString		DateCleanLast;
-				Common.xDateString		DateValidFirst;
-				Common.xDateString		DateValidLast;
-				Common.xDateString		DateErrorFirst;
-				Common.xDateString		DateErrorLast;
-				Common.xCleanStatus		ReturnCode;
-				Common.xAID						ReferAID;
-			end
-		 ;
+		/**************************************************************************************/
+		export	rStdCacheUpdate	:=	AID_Support.Layouts.rStdCacheUpdate;
 
-		/**************************************************************************************
-		 ** Layout of Std cache update file
-		 **************************************************************************************/
-		export	rACECacheUpdate
-		 :=
-			record
-			Common.xAID							AID;
-			Common.xDateString			DateSeenFirst;
-			Common.xDateString			DateSeenLast;
-			Common.xAID							CleanAID;
-			Common.xAID							ReferAID;
-			end
-		 ;
+		/**************************************************************************************/
+		export	rACECacheUpdate	:=	AID_Support.Layouts.rACECacheUpdate;
 
 	end
  ;

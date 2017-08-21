@@ -23,13 +23,13 @@ export Convert_fein_Func(DATASET(fpos_fein)ds) := FUNCTION
 		{1,0,l.orig_company_name},
 		{2,0,l.FEIN},
 		{3,0,l.SOURCE_DUNS_NUMBER},
-		{4,0,l.CASE_DUNS_NUMBER},
-		{5,0,l.orig_address1},
-		{6,0,l.orig_address2},
-		{7,0,l.orig_CITY},
-		{8,0,l.orig_STATE},
-		{9,0,l.orig_ZIP5},
-		{10,0,l.orig_zip4},
+		//{4,0,l.CASE_DUNS_NUMBER},
+		//{5,0,l.orig_address1},
+		//{6,0,l.orig_address2},
+		//{7,0,l.orig_CITY},
+		//{8,0,l.orig_STATE},
+		//{9,0,l.orig_ZIP5},
+		//{10,0,l.orig_zip4},
 		{11,0,l.orig_address1 + ' ' +l.orig_address2+ ' ' +l.orig_CITY+ ' ' +
 				l.orig_STATE + ' ' +l.orig_ZIP5 + ' ' + l.orig_zip4}
 

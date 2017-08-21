@@ -99,6 +99,9 @@ EXPORT constants := module
 	export string20 Ecore					:= 'EMERGINGCORE';
 	export string20 Inactive			:= 'INACTIVE';
 	
+	set_active := [mTriCore.s1, mDualCore.s1, mTrustedSource.s1, mSingleSource.s1, mTrustedSrcSingleton.s1];
+	export fIsActive(string2 pType) := pType in set_active;
+	
 	export fCoreDesc(string2 pType) := 
 			case(pType			
 				,mTriCore.s1 				=> mTriCore.desc
@@ -122,6 +125,8 @@ EXPORT constants := module
 			);
 			
 	export fDesc(string2 pType) := trim(fCoreDesc(pType)) + trim(fECoreDesc(pType)) + trim(fInactiveDesc(pType));
+	
+
 	
 	
 end;

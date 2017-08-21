@@ -1,0 +1,1 @@
+export Key_Trade_Person := index(File_Trade_Plus,KeyType_Trade_PersonId,KeyName_Trade_Person);

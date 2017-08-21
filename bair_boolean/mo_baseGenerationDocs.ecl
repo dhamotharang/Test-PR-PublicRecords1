@@ -30,14 +30,14 @@ FIELD:suspects_actions_against_property_3:0,0
 FIELD:property_taken_1:0,0
 FIELD:property_taken_2:0,0
 FIELD:property_taken_3:0,0
-NUMBERFIELD:property_value:0,0
+FIELD:property_value:SEGTYPE(NumericType):1,0
 FIELD:weapon_type_1:0,0
 FIELD:weapon_type_2:0,0
 FIELD:method_of_departure:0,0
 DATEFIELD:clean_first_date_time:0,0
 DATEFIELD:clean_last_date_time:0,0
-NUMBERFIELD:first_time:0,0
-NUMBERFIELD:last_time:0,0
+FIELD:first_time:SEGTYPE(NumericType):1,0
+FIELD:last_time:SEGTYPE(NumericType):1,0
 DATEFIELD:clean_report_date:0,0
 FIELD:first_day:0,0
 FIELD:last_day:0,0
@@ -45,18 +45,29 @@ FIELD:address_of_crime:0,0
 FIELD:address_name:0,0
 FIELD:beat:0,0
 FIELD:rd:0,0
-NUMBERFIELD:companions:0,0
+FIELD:companions:SEGTYPE(NumericType):1,0
 FIELD:apt:0,0
 FIELD:agency:0,0
 FIELD:accuracy:0,0
-NUMBERFIELD:x_coordinate:0,0
-NUMBERFIELD:y_coordinate:0,0
+FIELD:x_coordinate:SEGTYPE(NumericType):1,0
+FIELD:y_coordinate:SEGTYPE(NumericType):1,0
 FIELD:geocoded:0,0
 FIELD:synopsis_of_crime:0,0
+FIELD:Sequence:SEGTYPE(NumericType):1,0
+FIELD:Interval:SEGTYPE(NumericType):1,0
+FIELD:Commonalities:SEGTYPE(NumericType):1,0
+FIELD:MOSTAMP:0,0
+FIELD:coordinate:SEGTYPE(NumericType):1,0
+DATEFIELD:clean_edit_date:0,0
+FIELD:ORI:SEGTYPE(NumericType):1,0
+FIELD:Raids:0,0
+FIELD:Quarantined:0,0
+FIELD:Public_Address:0,0
+FIELD:group_id:SEGTYPE(NumericType):1,0
 CONCEPT:NOTES:synopsis_of_crime:SEGTYPE(GroupSeg):1,0
 CONCEPT:DATE:clean_first_date_time:SEGTYPE(GroupSeg):1,0
  
-Total available specificity:2
+Total available specificity:14
 Search Threshold set at -4
 Use of PERSISTs in code set at:3
  

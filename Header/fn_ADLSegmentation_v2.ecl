@@ -1,8 +1,13 @@
-import ut,doxie,header,mdr;
+import ut,doxie,header,mdr, header_services,PRTE2_Header;
 
 export fn_ADLSegmentation_v2(dataset(header.Layout_Header) hdr_in, boolean filter_utility_z_recs=false)  := module
 
-  f_ := if(filter_utility_z_recs,hdr_in(src not in [mdr.sourceTools.src_ZUtilities,mdr.sourceTools.src_ZUtil_Work_Phone]),hdr_in);
+
+  header_services.Supplemental_Data.mac_verify('adl_segment_inj.txt',header.Layout_Header, adl_in); // 
+  hdr_adl_in := adl_in();
+	hdr_full := distribute(hdr_in + hdr_adl_in,hash(did)) ; 
+ 
+  f_ := if(filter_utility_z_recs,hdr_full(src not in [mdr.sourceTools.src_ZUtilities,mdr.sourceTools.src_ZUtil_Work_Phone]),hdr_full);
 
 	slimr := record
 		f_.did;
@@ -22,9 +27,12 @@ export fn_ADLSegmentation_v2(dataset(header.Layout_Header) hdr_in, boolean filte
 		string   ind                              := '';
 		string2  src;
 	end;
-		
-	df := dedup(sort(distribute(header.file_did_death_masterv2,hash((unsigned6)did)),did,local),did,local);
 	
+    #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+	df := dataset([],{header.file_did_death_masterv2});
+    #ELSE
+	df := dedup(sort(distribute(header.file_did_death_masterv2,hash((unsigned6)did)),did,local),did,local);
+	#END;
   slimr x0(slimr le, slimr ri) := transform
 	 self.ssns_dont_belong_to_someone_else := le.ssns_dont_belong_to_someone_else or ri.ssns_dont_belong_to_someone_else;
 	 self := le;
@@ -48,9 +56,9 @@ export fn_ADLSegmentation_v2(dataset(header.Layout_Header) hdr_in, boolean filte
 		
 	//Just get all DIDs
 	slimr roller(slimr le,slimr ri) := transform	
-		SELF.dt_last_seen  := ut.max2(le.dt_last_seen,ri.dt_last_seen);
+		SELF.dt_last_seen  := max    (le.dt_last_seen,ri.dt_last_seen);
 		SELF.dt_first_seen := ut.min2(le.dt_first_seen,ri.dt_first_seen);
-    self.is_ambig      := le.is_ambig    or ri.is_ambig;
+        self.is_ambig      := le.is_ambig    or ri.is_ambig;
 		self.has_an_ssn    := le.has_an_ssn  or ri.has_an_ssn;
 		self.owns_an_ssn   := le.owns_an_ssn or ri.owns_an_ssn;
 		self.is_dead       := le.is_dead     or ri.is_dead;

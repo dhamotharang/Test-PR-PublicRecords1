@@ -1,0 +1,1 @@
+export File_Dea_Bid := PROJECT(DEA.file_dea_modified,TRANSFORM(DEA.layout_DEA_Out, self.bdid := (string)left.bid, SELF := LEFT;));

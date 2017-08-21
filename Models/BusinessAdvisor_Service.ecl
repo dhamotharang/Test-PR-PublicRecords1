@@ -476,11 +476,12 @@ models.Layout_Model form_model2(final le, ret3 ri) := TRANSFORM
 END;
 final2 := join(final,ret3,left.seq=right.seq, form_model2(LEFT,RIGHT));
 
-// bd_seed_scores := seed_files.GetBusinessDefender(test_input, AccountNumber_value, Test_Data_Table_Name);
-// final_out := if(Test_Data_Enabled, bd_seed_scores, final2);
+/* TURN OFF TEST SEEDS - DEBUG ONLY :: comment out the next 3 lines of code, and comment in the 'final2' output. */
+bd_seed_scores := seed_files.GetBusinessDefender(test_input, AccountNumber_value, Test_Data_Table_Name);
+final_out := if(Test_Data_Enabled, bd_seed_scores, final2);
 
-// OUTPUT(final_out,NAMED('Results'));
-OUTPUT(final2,NAMED('Results'));
+OUTPUT(final_out,NAMED('Results'));
+// OUTPUT(final2,NAMED('Results'));  //When this line is active, test seeds are not included in the compiled code.
 
 ENDMACRO;
 // Models.BusinessAdvisor_Service()

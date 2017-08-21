@@ -177,22 +177,22 @@ layout_candidates add_company_fein(layout_candidates le,Specificities(ih).compan
   SELF := le;
 END;
 SALT30.MAC_Choose_JoinType(j7,s.nulls_company_fein,Specificities(ih).company_fein_values_persisted,company_fein,company_fein_weight100,add_company_fein,j6);
-layout_candidates add_duns_number_concept(layout_candidates le,Specificities(ih).duns_number_concept_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.duns_number_concept_weight100 := MAP (le.duns_number_concept_isnull => 0, patch_default and ri.field_specificity=0 => s.duns_number_concept_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-SALT30.MAC_Choose_JoinType(j6,s.nulls_duns_number_concept,Specificities(ih).duns_number_concept_values_persisted,duns_number_concept,duns_number_concept_weight100,add_duns_number_concept,j5);
-layout_candidates add_duns_number(layout_candidates le,Specificities(ih).duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.duns_number_weight100 := MAP (le.duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.duns_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-SALT30.MAC_Choose_JoinType(j5,s.nulls_duns_number,Specificities(ih).duns_number_values_persisted,duns_number,duns_number_weight100,add_duns_number,j4);
 layout_candidates add_company_name(layout_candidates le,Specificities(ih).company_name_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.company_name_weight100 := MAP (le.company_name_isnull => 0, patch_default and ri.field_specificity=0 => s.company_name_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF.company_name := IF( ri.field_specificity<>0 or ri.word<>'',SELF.company_name_weight100+' '+ri.word,SALT30.Fn_WordBag_AppendSpecs_Fake(le.company_name, s.company_name_specificity) );// Copy in annotated wordstring
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(j4,s.nulls_company_name,Specificities(ih).company_name_values_persisted,company_name,company_name_weight100,add_company_name,j3);
+SALT30.MAC_Choose_JoinType(j6,s.nulls_company_name,Specificities(ih).company_name_values_persisted,company_name,company_name_weight100,add_company_name,j5);
+layout_candidates add_duns_number_concept(layout_candidates le,Specificities(ih).duns_number_concept_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.duns_number_concept_weight100 := MAP (le.duns_number_concept_isnull => 0, patch_default and ri.field_specificity=0 => s.duns_number_concept_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(j5,s.nulls_duns_number_concept,Specificities(ih).duns_number_concept_values_persisted,duns_number_concept,duns_number_concept_weight100,add_duns_number_concept,j4);
+layout_candidates add_duns_number(layout_candidates le,Specificities(ih).duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.duns_number_weight100 := MAP (le.duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.duns_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(j4,s.nulls_duns_number,Specificities(ih).duns_number_values_persisted,duns_number,duns_number_weight100,add_duns_number,j3);
 layout_candidates add_active_duns_number(layout_candidates le,Specificities(ih).active_duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.active_duns_number_weight100 := MAP (le.active_duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_duns_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
@@ -211,7 +211,7 @@ SALT30.MAC_Choose_JoinType(j1,s.nulls_sbfe_id,Specificities(ih).sbfe_id_values_p
 //Using HASH(did) to get smoother distribution
 SHARED Annotated := DISTRIBUTE(j0,hash(LGID3)) : PERSIST('~temp::LGID3::BIPV2_LGID3::mc',EXPIRE(Config.PersistExpire)); // Distributed for keybuild case
 //Now see if these records are actually linkable
-TotalWeight := Annotated.sbfe_id_weight100 + Annotated.Lgid3IfHrchy_weight100 + Annotated.company_name_weight100 + Annotated.duns_number_concept_weight100 + Annotated.company_fein_weight100 + Annotated.company_charter_number_weight100 + Annotated.cnp_number_weight100 + Annotated.company_inc_state_weight100 + Annotated.cnp_btype_weight100;
+TotalWeight := Annotated.sbfe_id_weight100 + Annotated.Lgid3IfHrchy_weight100 + Annotated.duns_number_concept_weight100 + Annotated.company_name_weight100 + Annotated.company_fein_weight100 + Annotated.company_charter_number_weight100 + Annotated.cnp_number_weight100 + Annotated.company_inc_state_weight100 + Annotated.cnp_btype_weight100;
 SHARED Linkable := TotalWeight >= Config.MatchThreshold;
 EXPORT Unlinkables := Annotated(~Linkable); // Insufficient data to ever get a match
 EXPORT Candidates := Annotated(Linkable); //No point in trying to link records with too little data

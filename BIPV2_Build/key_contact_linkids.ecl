@@ -32,14 +32,15 @@ module
 	  unsigned8 rid:=0;
     BIPV2.IDlayouts.l_xlink_ids; 
     contacts_sources;
-		boolean executive_ind:='';
+		//boolean executive_ind:='';
+		boolean executive_ind:=False;
 		integer executive_ind_order:=0;
   end;
   
   shared ds1 := contacts_sources;
   
   shared ds_add_ids := project(ds1,r1);
-  shared ds_add_ids_commonbase := project(bipv2.commonbase.ds_base(BIPV2.mod_sources.srcInBase(source),ingest_status in ['New','Unchanged','Updated']),transform(r1
+  shared ds_add_ids_commonbase := project(bipv2.commonbase.ds_built(BIPV2.mod_sources.srcInBase(source),ingest_status in ['New','Unchanged','Updated']),transform(r1
     ,self                              := left  
     ,self.company_address.prim_range	 := left.prim_range	
     ,self.company_address.predir			 := left.predir			

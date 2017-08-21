@@ -1,4 +1,4 @@
-import ut,AutoKey;
+import ut,AutoKey, std;
  infile :=DriversV2.File_Uber_auto_base;
 
  //NORMALIZING WORDS
@@ -38,13 +38,13 @@ import ut,AutoKey;
    		self.field := fld;
    	end;
    
-   cnt_flds := normalize(infile,ut.NoWords((string)left.prim_range),tr(left,counter,1,fld_cnst('ADDR')),local)
-        +normalize(infile,ut.NoWords((string)left.predir),tr(left,counter,2,fld_cnst('ADDR')),local)
-        +normalize(infile,ut.NoWords((string)left.prim_name),tr(left,counter,3,fld_cnst('ADDR')),local)
-      	 +normalize(infile,ut.NoWords((string)left.suffix),tr(left,counter,4,fld_cnst('ADDR')),local)
-      	 +normalize(infile,ut.NoWords((string)left.postdir),tr(left,counter,5,fld_cnst('ADDR')),local)
-      	 +normalize(infile,ut.NoWords((string)left.unit_desig),tr(left,counter,6,fld_cnst('ADDR')),local)
-      	 +normalize(infile,ut.NoWords((string)left.sec_range),tr(left,counter,7,fld_cnst('ADDR')),local);
+   cnt_flds := normalize(infile,std.Str.CountWords((string)left.prim_range,' '),tr(left,counter,1,fld_cnst('ADDR')),local)
+              +normalize(infile,std.Str.CountWords((string)left.predir,' '),tr(left,counter,2,fld_cnst('ADDR')),local)
+              +normalize(infile,std.Str.CountWords((string)left.prim_name,' '),tr(left,counter,3,fld_cnst('ADDR')),local)
+      	      +normalize(infile,std.Str.CountWords((string)left.suffix,' '),tr(left,counter,4,fld_cnst('ADDR')),local)
+      	      +normalize(infile,std.Str.CountWords((string)left.postdir,' '),tr(left,counter,5,fld_cnst('ADDR')),local)
+      	      +normalize(infile,std.Str.CountWords((string)left.unit_desig,' '),tr(left,counter,6,fld_cnst('ADDR')),local)
+      	      +normalize(infile,std.Str.CountWords((string)left.sec_range,' '),tr(left,counter,7,fld_cnst('ADDR')),local);
    
    //WORD TABLE
    invert_records := (nfields_r + cnt_flds)(word<>'');

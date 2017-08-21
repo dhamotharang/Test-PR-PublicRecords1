@@ -30,7 +30,7 @@ EXPORT Mapping_Common_Spoofing(string8 version) := FUNCTION
 	 
 	phoneNorm 	:= normalize(inFile, 3, spoofTr(left,counter))(phone<>'');
 	concatFile	:= phoneNorm + PhoneFraud.File_Spoofing.Base;	
-	ddConcat 		:= dedup(sort(distribute(concatFile, hash(phone)), record, local), record, local);	
+	ddConcat 		:= dedup(sort(distribute(concatFile, hash(id)), id, phone_origin, date_file_loaded, local), record, except date_file_loaded, local);
 	
 	RETURN ddConcat;
 

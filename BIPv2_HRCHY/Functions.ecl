@@ -1,3 +1,6 @@
+/*2016-10-11T21:06:15Z (Dustin Skaggs)
+BH-95: handle proxid=0 correctly when deduping
+*/
 import BIPV2;
 import BIPV2_Files;
 import ut;
@@ -140,8 +143,51 @@ mydunsi :=
 END;
 export WithParentsChildren(dataset(Inrec) pd) := 
 FUNCTION
+
+
+	// If same proxid on two ids, prefer the one with a child
+	parentFlag := join(pd, pd(parent_id != 0),
+	                   left.id = right.parent_id
+	                     and left.src = right.src,
+	                   transform({recordof(left), boolean is_parent},
+	                     self.is_parent := right.parent_id != 0,
+	                     self := left),
+	                   hash, left outer);
+
+	preferParents0 := dedup(sort(parentFlag(proxid != 0),
+	                             proxid, src, if(is_parent, 0, 1)),
+	                        left.proxid = right.proxid
+	                          and left.src = right.src
+	                          and left.is_parent != right.is_parent);
+	preferParents := project(preferParents0, recordof(pd));
+
+	// There can be two ids with the same proxid.
+	proxKeeper := dedup(sort(preferParents, proxid, src, -parent_id, -ultimate_id, -id),
+	                    proxid, src);
+
+	dupProx := join(preferParents, proxKeeper,
+	                left.proxid = right.proxid
+	                  and left.src = right.src
+	                  and left != right,
+	                transform({recordof(left), recordof(right) _new_ids},
+	                  self._new_ids := right,
+	                  self := left),
+	                hash,
+	                limit(1));
+
+	// parent is one of two ids with the same proxid
+	redirectParent := join(proxKeeper, dupProx,
+	                       left.parent_id = right.id
+	                         and left.src = right.src,
+	                       transform(recordof(left),
+	                         self.parent_id := if(right.id != 0, if(right._new_ids.id != left.id, right._new_ids.id, 0), left.parent_id),
+	                         self := left),
+	                       hash,
+	                       left outer,
+	                       keep(1)) + project(parentFlag(proxid = 0, is_parent), recordof(pd));
+
 	//***** FIND PARENTS, GRANDPARENTS, ETC
-	d := distribute(nofold(ungroup(pd)), hash(id));			//d must be distributed for local denorm
+	d := distribute(nofold(ungroup(redirectParent)), hash(id));			//d must be distributed for local denorm
 	mac(infile, outfile, p_derived_levels_above, pid) := 
 	MACRO
 		outfile :=
@@ -153,7 +199,10 @@ FUNCTION
 			and left.src = right.src,
 			transform(
 				r1,
-				self.parents := left.parents & right,
+				self.parents := if(left.id != right.id
+				                     and not exists(left.parents(id = right.id)),
+				                   left.parents & right,
+				                   dataset([], recordof(left.parents))); // don't allow circular references
 				self.derived_levels_from_top := left.derived_levels_from_top + if(right.id > 0, 1, 0),
 				self := left
 			)
@@ -588,89 +637,182 @@ join(
 return  oj;
 */
 END;
+
+
+// This function will re-establish id integrity for the specified ids.
+// All of the records with the same parent_id will have it's parent_id changed
+// to be that of the smallest child_id.
+// This function assumes that no parent_ids or child_ids are zero.
+shared recalcParentId(ds, parent_id, child_id) := functionmacro
+
+	dsDist := distribute(ds, hash32(parent_id));
+	dsSort := sort(dsDist, parent_id, child_id, local);
+
+	setId := iterate(group(dsSort, parent_id, local),
+	                 transform(recordof(left),
+	                   self.parent_id := if(left.parent_id != 0, left.parent_id, right.child_id);
+	                   self := right));
+
+	return ungroup(setId);
+
+endmacro;
+
 EXPORT PatchHeader(
 	dataset(BIPV2_Files.layout_proxid)			head
 	,dataset(BIPV2_HRCHY.Layouts.rWithIDs)	wi
 ) := FUNCTION
 	
-	//first, clear the way...need upper level IDs reset for the clusters where we are going to apply these results
-	patched1 := 
+	headDist := distribute(head, hash32(proxid));
+
+	// New records have a 0 for lgid3 so some proxids will have both a 0 and a value for lgid3.
+	// Keeping the non-zero value and if there are two different non-zero lgid3s, keep the smaller.
+	headSort := sort(headDist, proxid, if(lgid3 != 0, 0, 1), lgid3, local);
+
+	// hrchy lowest level is proxid so deduping out unneeded records
+	headProx := dedup(headSort, proxid, local);
+	initLgid3 := project(headProx,
+	                     transform(recordof(left),
+	                       self.lgid3 := if(left.lgid3 = 0, left.proxid, left.lgid3);
+	                       self := left));
+
+	// fix id integrity issues with lgid3
+	recalcLgid3 := recalcParentId(initLgid3, lgid3, proxid);
+	
+	// append the lgid3s to the hrchy
+	appendLgid3 := 
 	join(
-		head,
+		recalcLgid3,
 		wi(proxid != 0),
 		left.proxid = right.proxid,
-		transform(BIPV2.CommonBase.Layout,
-			self.ultid 	:= if(right.derived_ultid > 0, 	right.derived_ultid, 	left.ultid);
-			self.orgid 	:= if(right.derived_orgid > 0, 	right.derived_orgid, 	left.orgid);
-			self.SELEid := if(right.derived_SELEid > 0, right.derived_SELEid, left.SELEid);
-			self.ultimate_proxid := right.ultimate_proxid;
-			self.org_proxid := right.org_proxid;
-			self.sele_proxid := right.sele_proxid;
-			self.is_Ult_level := right.is_Ult_level;
-			self.is_Org_level := right.is_Org_level;
-			self.is_SELE_level := right.is_sele_level;
-			self.has_lgid := right.proxid > 0;
-			self.parent_proxid := right.parent_proxid;
-			
-			self.levels_from_top := right.derived_levels_from_top;
-			self.nodes_below := right.nodes_below;
-			self.nodes_total := right.nodes_total;
-			
-			self := left),
-		left outer, limit(1), smart
-	)
-	;	
-	head_clear :=
-	join(
-		patched1(not has_lgid),
-		dedup(project(patched1(has_lgid), {patched1.lgid3}), lgid3, all),
-		left.lgid3 = right.lgid3 ,
-		transform(
-			recordof(patched1),
-			self.ultid 	:= if(right.lgid3 > 0, left.proxid, left.ultid),
-			self.orgid 	:= if(right.lgid3 > 0, left.proxid, left.orgid),
-			self.seleid := if(right.lgid3 > 0, left.proxid, left.seleid),
-			self.lgid3 	:= if(right.lgid3 > 0, left.proxid, left.lgid3),
-			self := left
-		)
-		,left outer
-		,limit(1), smart
-	);
-	patched2 := head_clear + patched1(has_lgid);
-	
-	patched := project(patched2,
-	                   transform(recordof(left),
-	                     self.lgid3 := if(left.has_lgid and left.lgid3 > 0, left.proxid, left.lgid3);
-	                     self := left));
-	// output(head,,'~thor::cemtemp.PatchHeader.head', overwrite);
-	// output(wi,,'~thor::cemtemp.PatchHeader.wi', overwrite);
-	// output(head,,'~thor::cemtemp.PatchHeader.patched1', overwrite);
-	// set_ults_1 := [226166362,96570304];
-	// set_ults_2 := [97950934,930440932];
-	// set_seles_1 := [226166362,96570304];
-	// set_seles_2 := [930440932];
-	
-	// mac(ds, s) := functionmacro
-	
-		// return 
-		// parallel(
-			 // output(dedup(ds(ultid in set_ults_1),ultid, orgid, seleid, lgid3, proxid, all), named('ults1_' + s))
-			// ,output(dedup(ds(ultid in set_ults_2),ultid, orgid, seleid, lgid3, proxid, all), named('ults2_' + s))
-			// ,output(dedup(ds(seleid in set_seles_1 or lgid3 in set_seles_1),ultid, orgid, seleid, lgid3, proxid, all), named('seles1_' + s))
-			// ,output(dedup(ds(seleid in set_seles_2 or lgid3 in set_seles_2),ultid, orgid, seleid, lgid3, proxid, all), named('seles2_' + s))
-		// );
-	
-	// endmacro;
-	
-	// mh 	:= mac(head, 			'head');
-	// mu	:= mac(ults_affected, 'ults_affected');
-	// mhc := mac(head_clear, 'head_clear');
-	// mp 	:= mac(patched1, 	'patched1');
-	
-	
-	
-	return patched;
-	// return parallel(mh, mu, mhc, mp);
+		transform({recordof(wi), head.lgid3},
+	    self.lgid3 := left.lgid3,
+	    self := right),
+	  limit(1), smart);
+
+	lgid3FlagRec := {
+		recordof(appendLgid3),
+		typeof(appendLgid3.lgid3) prev_lgid3,
+		boolean do_explode,
+	};
+
+	// Need to break up lgid3s where more than 1 proxid is in hrchy or a proxid
+	// is not a leaf node (nodes_below = 0)
+	lgid3Cnts := table(appendLgid3, {lgid3, cnt := count(group)}, lgid3);
+
+	multipleInHrchy :=
+	join(appendLgid3, lgid3Cnts(cnt > 1), 
+	     left.lgid3 = right.lgid3,
+	     transform(lgid3FlagRec,
+	       self.prev_lgid3 := left.lgid3;
+	       self.lgid3 := left.proxid;
+	       self.do_explode := true;
+	       self := left),
+	     limit(1), smart);
+
+	// NOTE: if lgid3 is changed to work on non-leaf nodes, this will need to change.
+	nonLeafHrchy := project(appendLgid3(nodes_below > 0),
+	                        transform(lgid3FlagRec,
+	                          self.prev_lgid3 := left.lgid3,
+	                          self.lgid3 := left.proxid,
+	                          self.do_explode := true,
+	                          self := left));
+
+	lgid3Bombs := dedup(multipleInHrchy + nonLeafHrchy, proxid, all);
+
+	lgid3Keepers :=
+	join(appendLgid3, lgid3Bombs,
+	     left.proxid = right.proxid,
+	     transform(lgid3FlagRec,
+	       self.prev_lgid3 := left.lgid3,
+	       self.do_explode := false,
+	       self := left),
+	     left only, smart);
+
+	// This is the hrchy with lgid3s added and the do_explode flag set.
+	hrchyPlus := lgid3Bombs + lgid3Keepers;
+
+	// If exploding the lgid3, reset it back to the proxid.
+	exploded :=
+	join(recalcLgid3, dedup(hrchyPlus(do_explode), prev_lgid3, all),
+	     left.lgid3 = right.prev_lgid3,
+	     transform(recordof(left),
+	       doExplode := right.prev_lgid3 != 0;
+	       self.lgid3 := if(doExplode, left.proxid, left.lgid3);
+	       self := left),
+	     left outer, limit(1), smart);
+
+	// These are fields that are set by hrchy and need copied back onto the input.
+	fieldsToCopy := {
+		head.proxid,
+		head.lgid3,
+		head.seleid,
+		head.orgid,
+		head.ultid,
+		head.parent_proxid,
+		head.sele_proxid,
+		head.org_proxid,
+		head.ultimate_proxid,
+		head.is_sele_level,
+		head.is_org_level,
+		head.is_ult_level,
+		head.levels_from_top,
+		head.nodes_below,
+		head.nodes_total,
+		head.has_lgid,
+	};
+
+	// Project to a smaller layout so that every field doesn't need to be called out
+	// separately in the following transforms.
+	hrchyPlus2 := project(hrchyPlus,
+	                      transform(fieldsToCopy,
+	                        self.has_lgid := true;
+	                        self.seleid := left.derived_seleid,
+	                        self.orgid := left.derived_orgid,
+	                        self.ultid := left.derived_ultid,
+	                        self.levels_from_top := left.derived_levels_from_top,
+	                        self := left));
+
+	// An empty row will be used for the proxids that aren't in hrchy.
+	emptyFields := row(transform(fieldsToCopy, self := []));
+
+	// If in hrchy or attached to hrchy by lgid3, copy the fields set in the hrchy process.
+	// If not in hrchy, reset sele/org/ult back to proxid and set other hrchy
+	// specific fields to empty.
+	patchProx :=
+	join(exploded, hrchyPlus2,
+	     left.lgid3 = right.lgid3,
+	     transform(fieldsToCopy,
+	       inHrchy := right.lgid3 != 0;
+	       self.has_lgid := inHrchy;
+	       self.proxid := left.proxid;
+	       self.lgid3 := left.lgid3;
+	       self.seleid := if(inHrchy, right.seleid, left.lgid3);
+	       self.orgid := if(inHrchy, right.orgid, left.lgid3);
+	       self.ultid := if(inHrchy, right.ultid, left.lgid3);
+	       self := if(inHrchy, right, emptyFields),
+	       self := left),
+	     left outer, limit(1), smart);
+
+	// Sele/org/ult was determine by hrchy, but the lgid3 linking may have pulled in
+	// a smaller proxid that would affect sele/org/ult. This will recalculate the correct
+	// values for these ids.
+	recalcSele := recalcParentId(patchProx, seleid, lgid3);
+	recalcOrg := recalcParentId(recalcSele, orgid, seleid);
+	recalcUlt := recalcParentId(recalcOrg, ultid, orgid);
+
+	// Now that all of the ids and fields have been set for all of the proxids, patch it
+	// back onto the input. 
+	patchHrchy :=
+	join(headSort, recalcUlt,
+	     left.proxid = right.proxid,
+	     transform(BIPV2.CommonBase.Layout,
+	       self.proxid := if(right.proxid != 0, left.proxid, error('missing proxid: ' + left.proxid));
+	       self := right,
+	       self := left),
+	     left outer, limit(1), hash);
+
+	return patchHrchy;
+
 END;//PatchHeader
 END;//Functions
 /* 

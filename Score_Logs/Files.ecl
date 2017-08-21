@@ -1,4 +1,4 @@
-IMPORT UT, Inquiry_Acclogs;
+IMPORT UT, Inquiry_Acclogs, data_services;
 EXPORT Files := MODULE
 
 //MBS transaction files
@@ -14,19 +14,15 @@ EXPORT FCRA_Intermediate := dataset('~thor_data400::in::score_tracking::log_mbs_
 //Accounting Log Files
 
 //Accurint
-EXPORT NonFCRA_Logs_Accurint := dataset(ut.foreign_logs + 'thor100_21::in::accurint_acclogs_sl', Inquiry_AccLogs.Layout_Accurint_Logs, csv(quote(''), separator(['~~','\t']), terminator(['\r\n', '\n'])), opt)
-																																				+dataset(ut.foreign_logs + 'thor100_21::in::accurint_acclogs_sl_preprocess', Inquiry_AccLogs.Layout_Accurint_Logs, csv(quote(''), separator(['~~','\t']), terminator(['\r\n', '\n'])), opt);
-
+EXPORT NonFCRA_Logs_Accurint := dataset('~thor_data400::in::accurint_acclogs_sl', Inquiry_AccLogs.Layout_Accurint_Logs, csv(quote(''), separator(['~~','\t']), terminator(['\r\n', '\n'])), opt);
+																																				
 //Custom
-EXPORT NonFCRA_Logs_Custom 	 := dataset(ut.foreign_logs + 'thor100_21::in::custom_acclogs_sl', Inquiry_AccLogs.Layout_Accurint_Logs, csv(quote(''), separator(['~~','\t']), terminator(['\r\n', '\n'])), opt)
-																																				+ dataset(ut.foreign_logs + 'thor100_21::in::custom_acclogs_sl_preprocess', Inquiry_AccLogs.Layout_Accurint_Logs, csv(quote(''), separator(['~~','\t']), terminator(['\r\n', '\n'])), opt);
-
+EXPORT NonFCRA_Logs_Custom 	 := dataset('~thor_data400::in::custom_acclogs_sl', Inquiry_AccLogs.Layout_Accurint_Logs, csv(quote(''), separator(['~~','\t']), terminator(['\r\n', '\n'])), opt);
+																															
 //Riskwise
-EXPORT NonFCRA_Logs_Riskwise := dataset(ut.foreign_logs + 'thor100_21::in::riskwise_acclogs_sl', Inquiry_Acclogs.Layout_Riskwise_Logs.Input, csv(separator('~~'), quote('')), opt)
-																																				+dataset(ut.foreign_logs + 'thor100_21::in::riskwise_acclogs_sl_preprocess', Inquiry_Acclogs.Layout_Riskwise_Logs.Input, csv(separator('~~'), quote('')),opt);
-
+EXPORT NonFCRA_Logs_Riskwise := dataset('~thor_data400::in::riskwise_acclogs_sl', Inquiry_Acclogs.Layout_Riskwise_Logs.Input, csv(separator('~~'), quote('')), opt);
+																															
 //FCRA Riskwise
-EXPORT FCRA_Logs_Riskwise := dataset(ut.foreign_fcra_logs + 'thor10_231::in::riskwise_acclogs_sl', Inquiry_Acclogs.Layout_Riskwise_Logs.Input, csv(separator('~~'), quote('')), opt)
-																															+ dataset(ut.foreign_fcra_logs + 'thor10_231::in::riskwise_acclogs_sl_preprocess', Inquiry_Acclogs.Layout_Riskwise_Logs.Input, csv(separator('~~'), quote('')), opt);
-
+EXPORT FCRA_Logs_Riskwise := dataset('~thor_data400::in::FCRA_riskwise_acclogs_sl', Inquiry_Acclogs.Layout_Riskwise_Logs.Input, csv(separator('~~'), quote('')), opt);
+																															
 END;

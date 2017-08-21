@@ -1,4 +1,4 @@
-#workunit ('name', 'Query DNB Company Stats ' + dnb.version);
+//#workunit ('name', 'Query DNB Company Stats ' + dnb.version);
 dnb_companies := DNB.File_DNB_Base;
 
 layout_dnb_companies_slim := record
@@ -21,10 +21,12 @@ end;
 
 dnb_counts := table(dnb_companies_slim, layout_dnb_counts);
 
-output(dnb_counts, named('DNB_Companies_Base_Counts'));
+do1 := output(dnb_counts, named('DNB_Companies_Base_Counts'));
 
-dnb_companies_slim_dedup_active := dedup(dnb_companies_slim(active_duns_number='Y'), duns_number); // total unique active
-dnb_companies_slim_dedup_inactive := dedup(dnb_companies_slim(active_duns_number='N'), duns_number); // total unique inactive
+dnb_companies_slim_dedup_active := dedup(dnb_companies_slim(active_duns_number='Y'), duns_number, all); // total unique active
+dnb_companies_slim_dedup_inactive := dedup(dnb_companies_slim(active_duns_number='N'), duns_number, all); // total unique inactive
 
-output(count(dnb_companies_slim_dedup_active), named('Unique_Active_Duns_Numbers'));
-output(count(dnb_companies_slim_dedup_inactive), named('Unique_Inactive_Duns_Numbers'));
+do2 := output(count(dnb_companies_slim_dedup_active), named('Unique_Active_Duns_Numbers_Companies'));
+do3 := output(count(dnb_companies_slim_dedup_inactive), named('Unique_Inactive_Duns_Numbers_Companies'));
+
+export Query_DNB_Company_Counts := parallel(do1,do2,  do3);

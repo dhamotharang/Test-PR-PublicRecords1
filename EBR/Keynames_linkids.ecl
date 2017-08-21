@@ -1,4 +1,4 @@
-import ut;
+import tools;
 
 export Keynames_linkids(string filedate) :=
 module
@@ -21,7 +21,7 @@ module
 			,s4510_ucc_filings_linkids	
 			,s5600_demographic_data_linkids			
 			,s5610_demographic_data_linkids
-		], ut.Layout_Names);
+		], tools.Layout_Names);
 
 	end;
 
@@ -31,11 +31,11 @@ module
 	export Versions	:= 
 	module
 
-		export k0010_header_linkids                            		 := ut.mbuildversions(Templates.s0010_header_linkids,filedate);
-		export k1000_executive_summary_linkids                 		 := ut.mbuildversions(Templates.s1000_executive_summary_linkids,filedate);
-		export k4510_ucc_filings_linkids                       		 := ut.mbuildversions(Templates.s4510_ucc_filings_linkids,filedate);
-		export k5600_demographic_data_linkids                  		 := ut.mbuildversions(Templates.s5600_demographic_data_linkids,filedate);
-		export k5610_demographic_data_linkids                  		 := ut.mbuildversions(Templates.s5610_demographic_data_linkids,filedate);
+		export k0010_header_linkids                            		 := tools.mod_FilenamesBuild(Templates.s0010_header_linkids,filedate);
+		export k1000_executive_summary_linkids                 		 := tools.mod_FilenamesBuild(Templates.s1000_executive_summary_linkids,filedate);
+		export k4510_ucc_filings_linkids                       		 := tools.mod_FilenamesBuild(Templates.s4510_ucc_filings_linkids,filedate);
+		export k5600_demographic_data_linkids                  		 := tools.mod_FilenamesBuild(Templates.s5600_demographic_data_linkids,filedate);
+		export k5610_demographic_data_linkids                  		 := tools.mod_FilenamesBuild(Templates.s5610_demographic_data_linkids,filedate);
 	end;
 	
 	export dAll_superfilenames :=
@@ -64,6 +64,6 @@ module
 			,KeyName_4510_UCC_Filings_linkids									
 			,KeyName_5600_Demographic_Data_linkids				
 			,KeyName_5610_Demographic_Data_linkids								
-		], ut.Layout_Names);
+		], tools.Layout_Names);
 
 end;

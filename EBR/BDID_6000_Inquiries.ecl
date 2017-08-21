@@ -32,5 +32,12 @@ File_in2base := normalize(File_in, 9, Convert2Base(left, counter));
 //////////////////////////////////////////////////////////////////////////////////////////////
 BDID_Segment(segment_code, File_in2base, BDID_Append)
 
+ebr.Layout_6000_Inquiries_Base							tLayout_6000_Inquiries_Base(						ebr.Layout_6000_Inquiries_Base						l) :=
+transform
+	self.process_date := (string)l.process_date_last_seen;
+	self := l;
+end;
 
-export BDID_6000_Inquiries := BDID_Append : persist(EBR_thor + 'TEMP::BDID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code));
+
+export BDID_6000_Inquiries := project(BDID_Append, tLayout_6000_Inquiries_Base(left))
+	/*: persist(EBR_thor + 'TEMP::BDID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code))*/;

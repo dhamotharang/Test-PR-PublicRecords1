@@ -1,0 +1,1 @@
+EXPORT SuccessEmail := 'Charles.Salvo@lexisnexis.com,ursula.rothe@lexisnexis.com,tony.kirk@lexisnexis.com';

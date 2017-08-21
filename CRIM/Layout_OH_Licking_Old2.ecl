@@ -1,0 +1,42 @@
+export Layout_OH_Licking_Old2 := record
+
+string ID;
+string Defendant;
+string FirstName;
+string MiddleName;
+string LastName;
+string Suffix;
+string DOB;
+string Caption;
+string PreliminaryCaseNumber;
+string Jurisdiction;
+string Address;
+string City;
+string State;
+string Zip;
+string Attorney;
+string Degree;
+string OffenseDate;
+string ArrestDate;
+string Officer;
+string Complainant;
+string Prosecutor;
+string Judge;
+string CaseNumber;
+string CaseStatus;
+string CaseFiled;
+string ChargeNumber;
+string ActionCode;
+string IndictCode;
+string AmdCharge;
+string DispositionCode;
+string Counts;
+string PartyName;
+string PartyType;
+string DispositionStatus;
+string DispositionStatusDate;
+string DispositionCde;
+string DispositionDate;
+string DispositionActionCode;
+
+end;

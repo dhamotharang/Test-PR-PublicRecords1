@@ -31,6 +31,7 @@ EXPORT mac_CreateSummaryReport(
   ,pFilesReadRegexFilter     = '\'\''           //filter files read by the workunit using this filter
   ,pFilesWrittenRegexFilter  = '\'\''           //filter files written by the workunit using this filter
   ,pOutputFilename           = ''               //filename to output results to.  If blank, just returns the dataset.  if not populated, when restoring, it will just return the apply,not the dataset
+  ,pOutputSuperfile          = ''               //filename to add the above file to.
   ,pOverwrite                = 'false'          //overwrite file?
   
   ,pState                    = ''
@@ -48,6 +49,7 @@ functionmacro
 import std,_control,tools,wk_ut;
 
   #UNIQUENAME(ECL)
+  #UNIQUENAME(TEMPECL)
   #UNIQUENAME(ECLSTRING)
   #UNIQUENAME(CNTR)
   #UNIQUENAME(NESTEDCNTR)
@@ -367,13 +369,20 @@ import std,_control,tools,wk_ut;
 
   #APPEND(ECL  ,%'RECORDS'%)
   #APPEND(ECL  ,'],layouttools)(wuid != \'\');\n')
+  #SET(TEMPECL  ,'')
   
   #IF(#TEXT(pOutputFilename) != '')
     #APPEND(ECL  ,'writefile := tools.macf_writefile(' + trim(#TEXT(pOutputFilename),all) + ' ,dproj ,pOverwrite := ' + #TEXT(pOverwrite) + ');\n')
+    #SET(TEMPECL  ,'writefile')
+    #IF(pOutputSuperfile  != '')
+      #APPEND(ECL  ,'addtosuper := std.file.addsuperfile(' + trim(#TEXT(pOutputSuperfile),all) + ' ,' + trim(#TEXT(pOutputFilename),all) +  ');\n')
+      #APPEND(TEMPECL  ,',addtosuper')
+    #END
+    #APPEND(ECL ,'dothis := sequential(')
     #IF(pShouldRestore = true)
-      #APPEND(ECL ,'dothis := sequential(restorewuids,writefile);\n')
+      #APPEND(ECL ,'restorewuids,' + %'TEMPECL'% + ');\n')
     #ELSE
-      #APPEND(ECL ,'dothis := sequential(writefile);\n')
+      #APPEND(ECL ,%'TEMPECL'% + ');\n')
     #END
   #ELSE
     #IF(pShouldRestore = true)

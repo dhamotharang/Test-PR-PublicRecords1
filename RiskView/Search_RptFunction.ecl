@@ -1,4 +1,4 @@
-﻿import iesp, risk_indicators, fcra, doxie, ut, RiskView, Suppress, faa, 
+import iesp, risk_indicators, fcra, doxie, ut, RiskView, Suppress, faa, 
 	RiskWiseFCRA, PersonContext;
 // for now this only supports a single input record -- that's what the fcradataservice restricts too...
 

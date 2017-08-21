@@ -1,1 +1,1 @@
-EXPORT STRING8 BusReg_Build_Date := '20050901';
+EXPORT STRING8 BusReg_Build_Date := '20080401';

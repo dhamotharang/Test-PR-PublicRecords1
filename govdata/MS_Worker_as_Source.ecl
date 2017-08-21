@@ -1,11 +1,16 @@
 import header;
-d := dataset('~thor_data400::Base::MSHeader_Building', Layout_MS_Workers_Comp_In, flat);
 
-src_rec := record
- header.Layout_Source_ID;
- layout_ms_workers_comp_in;
-end;
+export MS_Worker_as_Source(dataset(Layout_MS_Workers_Comp_In) pMS_Worker = dataset([],Layout_MS_Workers_Comp_In), boolean pForHeaderBuild=false)
+ :=
+  function
+	dSourceData	:=	if(pForHeaderBuild,
+					   dataset('~thor_data400::Base::MSHeader_Building', Layout_MS_Workers_Comp_In, flat),
+					   pMS_Worker
+					  );
 
-header.Mac_Set_Header_Source(d(employer_name!='DELETED'),Layout_MS_Workers_Comp_In,src_rec,'MW',withUID)
+	src_rec := header.layouts_SeqdSrc.WC_src_rec;
 
-export MS_Worker_as_Source := withUID : persist('persist::headerbuild_ms_src');
+	header.Mac_Set_Header_Source(dSourceData(employer_name!='DELETED'),Layout_MS_Workers_Comp_In,src_rec,'MW',withUID)
+	
+	return withUID;
+  end;

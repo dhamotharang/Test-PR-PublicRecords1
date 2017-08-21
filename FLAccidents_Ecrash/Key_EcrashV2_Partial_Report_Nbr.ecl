@@ -1,3 +1,6 @@
+/*2015-11-16T20:58:47Z (Srilatha Katukuri)
+#193680 - CR323
+*/
 /*2015-07-24T21:31:44Z (Srilatha Katukuri)
 #173256
 */
@@ -12,7 +15,7 @@ Import Data_Services, doxie,FLAccidents;
 
  // Allowing only EA agency and iyetek
  
-in_accnbr := FLAccidents_Ecrash.key_EcrashV2_accnbrv1(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3']);
+in_accnbr := FLAccidents_Ecrash.key_EcrashV2_accnbrv1(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']);
                             														
 // parsing 40 char reportnumber 
 slim := record 
@@ -182,5 +185,5 @@ end;
 	 
 export Key_EcrashV2_Partial_Report_Nbr := index(clean_partnbr,{partial_report_nbr,report_code, jurisdiction_state,jurisdiction,accident_date} ,{l_accnbr,orig_Accnbr,addl_report_number, report_type_id,work_type_id,vendor_code,vendor_report_id,Idfield,ReportLinkID }
 																								 ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_partialaccnbr_' + doxie.Version_SuperKey);
-																								 
+																							
 																								 

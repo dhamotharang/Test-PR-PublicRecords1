@@ -1,0 +1,21 @@
+export Extract_Layout := RECORD
+unsigned6       	DID;
+string40        	FULL_NAME;
+string20 					fname;
+string20 					mname;
+string20 					lname;
+string5 					name_suffix;
+string50        	LN_COLLEGE_NAME;
+string2         	CLASS_YEAR;
+string2						COLLEGE_CLASS;
+string1						COLLEGE_MAJOR;
+string2         	STATE;
+string10					RECORD_TYPE;
+UNSIGNED4         DATE_FIRST_SEEN;
+UNSIGNED4         DATE_LAST_SEEN;
+string8         	PROCESS_DATE;
+string20  				COLLEGE_CODE;
+string25					COLLEGE_TYPE;
+string20  				COLLEGE_CODE_EXPLODED;
+string25					COLLEGE_TYPE_EXPLODED;
+end;

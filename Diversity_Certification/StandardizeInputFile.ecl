@@ -1,4 +1,4 @@
-import Address, Ut, lib_stringlib,codes, _Control, business_header,_Validate, idl_header;
+import Address, Data_Services, ut, lib_stringlib,codes, _Control, business_header,_Validate, idl_header;
 ///////////////////////////////////////////////////////////////////////////////////
 //
 ///////////////////////////////////////////////////////////////////////////////////
@@ -243,7 +243,7 @@ end;
       		string desc;
       	end;
       	
-       SIC_Lookup_ds    := dataset(ut.foreign_prod+'~thor_data50::lookup::sic_code_table',SIC_Lookup_TBL,
+       SIC_Lookup_ds    := dataset(Data_Services.foreign_prod+'thor_data50::lookup::sic_code_table',SIC_Lookup_TBL,
       																			 csv(heading(0),separator('|'),quote('"')));
      
       	

@@ -3,7 +3,7 @@
 //      due to a lack of language support for access.  This will be
 //      fixed with bug: 24547
 IMPORT LIB_Word;
-EXPORT FileName_Info_Instance(STRING aStem, STRING aSrcType, STRING aQual) 
+EXPORT FileName_Info_Instance(STRING aStem, STRING aSrcType, STRING aQual, BOOLEAN aIncr=FALSE) 
 			:= MODULE(FileName_Info)
 	SHARED STRING 	wStem := TRIM(StringLib.StringToUpperCase(aStem));
 	SHARED STRING   wSrcType := TRIM(StringLib.StringToUpperCase(aSrcType));
@@ -11,4 +11,5 @@ EXPORT FileName_Info_Instance(STRING aStem, STRING aSrcType, STRING aQual)
 	EXPORT STRING		stem := LIB_Word.StripTail(wStem, '::BASE');// FIX Users!!!!!!!!
 	EXPORT STRING		srcType := IF(aSrcType<>'', aSrcType, 'UNKNOWN');
 	EXPORT STRING		qual := IF(wQual<>'', wQual, 'MISSING');
+  EXPORT BOOLEAN  incr := aIncr;
 END;

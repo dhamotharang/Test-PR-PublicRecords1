@@ -1,0 +1,40 @@
+/*--METADATA('SampleFile', '~file::10.150.13.201::data_build_5::temp::17175.ship.epr426.100')*/
+/*--METADATA('SampleFileRecordWidth', '5974')*/
+/*--METADATA('SampleFileType', 'Flat')*/
+export ship_epr426_2_layout := 
+  record
+	string5 col1;
+	string6 col2;
+	string61 col3;
+	string191 col4;
+	string28 col5;
+	string142 col6;
+	string50 col7;
+	string218 col8;
+	string128 col9;
+	string120 col10;
+	string78 col11;
+	string306 col12;
+	string325 col13;
+	string246 col14;
+	string19 col15;
+	string63 col16;
+	string48 col17;
+	string246 col18;
+	string178 col19;
+	string102 col20;
+	string59 col21;
+	string19 col22;
+	string69 col23;
+	string232 col24;
+	string28 col25;
+	string107 col26;
+	string64 col27;
+	string290 col28;
+	string111 col29;
+	string43 col30;
+	string196 col31;
+	string119 col32;
+	string2076 col33;
+	string1 col34;
+  end;

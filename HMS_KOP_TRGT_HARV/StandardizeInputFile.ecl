@@ -16,7 +16,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
    			// SELF.Dt_first_seen						:= 0;
    			// SELF.Dt_last_seen							:= 0;
 			
-				SELF.append_prep_address1					:= TRIM(Stringlib.StringToUpperCase(trim(L.address1,left,right) + if(trim(L.address2,left,right)<>'',',','') +  trim(L.address2,left,right)), LEFT, RIGHT);
+				SELF.append_prep_address1					:= TRIM(Stringlib.StringToUpperCase(trim(L.address1,left,right) + if(trim(L.address2,left,right)<>'', ',','') +  trim(L.address2,left,right)), LEFT, RIGHT);
 				SELF.append_prep_addresslast          := TRIM(Stringlib.StringToUpperCase(
 																							StringLib.StringCleanSpaces(	trim(L.city,left,right) + if(trim(L.city,left,right) <> '',',','')
 																		+ ' '+ trim(L.state,left,right)

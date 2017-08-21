@@ -1,4 +1,4 @@
-import tools,BIPV2_Files; 
+import tools,BIPV2_Files,BIPV2; 
 
 export Files(
 
@@ -8,7 +8,7 @@ export Files(
 ) :=
 module
 		
-	export base       := tools.macf_FilesBase	(filenames(pversion,pUseOtherEnvironment).base	    ,layouts.HrchyBase        );
+	export base       := tools.macf_FilesBase	(filenames(pversion,pUseOtherEnvironment).base	    ,BIPV2.CommonBase.Layout);
 	export baseold    := tools.macf_FilesBase	(filenames(pversion,pUseOtherEnvironment).base	    ,layouts.HrchyBase_static );
 	
 end;

@@ -42,9 +42,9 @@ string9   fein;
 end;
 
 layout_usbank_test_clean CleanInput(layout_usbank_test_seq l) := transform
-self.clean_bus_address := addrcleanlib.cleanAddress182(trim(l.Address), trim(l.City) + ', ' + trim(l.State) + ' ' + trim(l.Zip));
-self.clean_name := addrcleanlib.cleanPerson73(l.Prin_Name);
-self.clean_prin_address := addrcleanlib.cleanAddress182(trim(l.Prin_Address), trim(l.Prin_City) + ', ' + trim(l.Prin_State) + ' ' + trim(l.Prin_Orig_Zip));
+self.clean_bus_address := address.cleanAddress182(trim(l.Address), trim(l.City) + ', ' + trim(l.State) + ' ' + trim(l.Zip));
+self.clean_name := address.cleanPerson73(l.Prin_Name);
+self.clean_prin_address := address.cleanAddress182(trim(l.Prin_Address), trim(l.Prin_City) + ', ' + trim(l.Prin_State) + ' ' + trim(l.Prin_Orig_Zip));
 self.phone10 := '';
 self.ssn := '';
 self.fein := '';

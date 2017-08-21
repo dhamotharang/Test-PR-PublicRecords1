@@ -39,7 +39,7 @@ EXPORT ConvertEnclaritytoHeader (DATASET (HealthCareFacility.Layouts.Enclarity_R
 		SELF.MNAME_FLAG										:=	'';		
 		SELF.LNAME_FLAG										:=	'';		
 		SELF.CNAME_FLAG										:=	'';		
-		SELF.ADDR_FLAG										:=	''; //MAP (L.Addr_Conf_Score > 84 => 'G', L.Addr_Conf_Score > 54 => 'F', 'L');
+		SELF.ADDR_FLAG										:=	MAP (L.PV_ADDR_IND = 'Y' => 'G', 'L');
 		SELF.TAX_ID_FLAG									:=	'';	
 		SELF.FEIN_FLAG										:=	'';
 		SELF.UPIN_FLAG										:=	'';
@@ -69,7 +69,7 @@ EXPORT ConvertEnclaritytoHeader (DATASET (HealthCareFacility.Layouts.Enclarity_R
 		SELF.LNAME												:=	'';
 		SELF.SNAME												:=	'';
 		SELF.SIC_CODE											:=	'';
-		SELF.CNAME												:=	HealthCareProvider.CleanData.fUpperCleanSpaces(HealthCareProvider.CleanData.fReplaceUnprintable(L.PRAC_COMPANY_NAME));
+		SELF.CNAME												:=	L.PRAC_COMPANY_NAME; //HealthCareFacility.clean_facility_name(L.PRAC_COMPANY_NAME); //HealthCareFacility.FacilityNameCleaner.fnCleanAsConfigured(L.PRAC_COMPANY_NAME);
 		SELF.CNP_NAMEID										:=	0;
 		SELF.CNP_NAME											:=	'';
 		SELF.CNP_NUMBER										:=	'';	
@@ -116,33 +116,42 @@ EXPORT ConvertEnclaritytoHeader (DATASET (HealthCareFacility.Layouts.Enclarity_R
 		SELF.DEATH_IND										:=	'';
 		SELF.DOD													:=	0;
 		
-		SELF.TAX_ID												:=	0;
+		SELF.TAX_ID												:=	(INTEGER)L.TIN1;
 		SELF.FEIN													:=	0;
 		SELF.UPIN													:=	'';
 		SELF.NPI_NUMBER										:=	L.NPI_NUM;
 		SELF.DEA_BUS_ACT_IND							:=	L.DEA_BUS_ACT_IND;
 		SELF.DEA_NUMBER										:=	L.DEA_NUM;
-		SELF.CLIA_NUMBER									:=	'';
+		SELF.CLIA_NUMBER									:=	L.CLIA_NUM;
 		SELF.TAXONOMY											:=	L.TAXONOMY;
-		SELF.TAXONOMY_CODE								:=	L.TAXONOMY [1..4];
-		SELF.MEDICARE_FACILITY_NUMBER			:=	L.MEDICARE_FAC_NUM;
+		SELF.TAXONOMY_CODE								:=	L.TAXONOMY [1..2];
+		MEDICARE_FACILITY_NUMBER					:= IF (TRIM(L.MEDICARE_FAC_NUM) IN HealthCareFacility.Constants.INVALID_MEDICARE_FAC_NO,'',TRIM(L.MEDICARE_FAC_NUM));
+		SELF.MEDICARE_FACILITY_NUMBER			:=	TRIM(REGEXREPLACE(HealthCareProvider.CleanData.DL_No,stringLib.stringToUpperCase(MEDICARE_FACILITY_NUMBER),''),LEFT,RIGHT);
+		SELF.NCPDP_NUMBER									:=	L.NCPDP_ID;
+		SELF.SPECIALITY_CODE							:=	'';
 		SELF.PROVIDER_STATUS							:=	'';
 		SELF.VENDOR_ID										:=	L.Group_KEY;
+		SELF															:= [];
 	END;
 
-	Enclarity_Facility_DS	 	:= PROJECT (Infile,getFacilityInfo(LEFT))(TRIM(CNAME) <> '' AND TRIM(PRIM_NAME) <> '' AND TRIM(ZIP) <> '');
+	Enclarity_Facility_DS	 	:= PROJECT (Infile(RECORD_TYPE = 'C'),getFacilityInfo(LEFT))(TRIM(CNAME) <> '' AND TRIM(PRIM_NAME) <> '' AND TRIM(ZIP) <> '');
 
+	D_Enclarity_Facility_DS := DISTRIBUTE (Enclarity_Facility_DS,HASH32(VENDOR_ID));
+	
+	S_Enclarity_Facility_DS		:=	SORT (D_Enclarity_Facility_DS,VENDOR_ID,CNAME,PRIM_RANGE,PRIM_NAME,SEC_RANGE,V_CITY_NAME,ST,ZIP,PHONE,FAX,LIC_NBR,C_LIC_NBR,LIC_STATE,LIC_TYPE,LIC_STATUS,TAX_ID,NPI_NUMBER,DEA_BUS_ACT_IND,DEA_NUMBER,CLIA_NUMBER,TAXONOMY,MEDICARE_FACILITY_NUMBER,NCPDP_NUMBER,LOCAL);
+	De_Enclarity_Facility_DS	:=	DEDUP (S_Enclarity_Facility_DS,VENDOR_ID,CNAME,PRIM_RANGE,PRIM_NAME,SEC_RANGE,V_CITY_NAME,ST,ZIP,PHONE,FAX,LIC_NBR,C_LIC_NBR,LIC_STATE,LIC_TYPE,LIC_STATUS,TAX_ID,NPI_NUMBER,DEA_BUS_ACT_IND,DEA_NUMBER,CLIA_NUMBER,TAXONOMY,MEDICARE_FACILITY_NUMBER,NCPDP_NUMBER,LOCAL);	
+	
 	D_Enclarity_Assoc_DS	:=	DISTRIBUTE (HealthCareFacility.Files.Enclarity_Assoc_DS,HASH32(billing_group_key));
 	
 	Remove_Duplicate_TaxID	:=	DEDUP(SORT (D_Enclarity_Assoc_DS,billing_group_key,bill_tin,local),billing_group_key,bill_tin,local);
 	
-	Assign_Tax_ID	:=	JOIN (DISTRIBUTE(Enclarity_Facility_DS,HASH32(VENDOR_ID)),Remove_Duplicate_TaxID,LEFT.VENDOR_ID = RIGHT.Billing_Group_Key,TRANSFORM(
+	Assign_Tax_ID	:=	JOIN (DISTRIBUTE(De_Enclarity_Facility_DS,HASH32(VENDOR_ID)),Remove_Duplicate_TaxID,LEFT.VENDOR_ID = RIGHT.Billing_Group_Key,TRANSFORM(
 																				HealthCareProvider.Layout_HealthProvider.HealthCareProvider_Header, SELF.Tax_ID := (INTEGER) RIGHT.bill_tin; SELF := LEFT;),LEFT OUTER, LOCAL);
 	
 	// Remove_Duplicates := SORT (Assign_Tax_ID,Vendor_Id,);
-	OUTPUT(count (Enclarity_Facility_DS));
+	// OUTPUT(count (Enclarity_Facility_DS));
 	
-	OUTPUT(count (Assign_Tax_ID));
+	// OUTPUT(count (Assign_Tax_ID));
 	
-	RETURN Assign_Tax_ID;
+	RETURN Assign_Tax_ID (TRIM(CNAME) <> '' AND TRIM(PRIM_NAME) <> '' AND TRIM(ZIP) <> '');
 END;

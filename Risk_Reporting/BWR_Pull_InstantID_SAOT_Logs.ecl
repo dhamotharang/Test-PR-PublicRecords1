@@ -2,8 +2,8 @@
 
 IMPORT Risk_Reporting, RiskWise, Score_Logs, STD, UT;
 
-BeginDate := '20130301';
-EndDate := '20150416';
+BeginDate := '20151001';
+EndDate := '20151031';
 
 AccountIDs := ['']; // Set to a blank string dataset [''] to pull all records except for test transaction login ids
 
@@ -31,6 +31,7 @@ Logs := PROJECT(LogsRaw, TRANSFORM({RECORDOF(LogsRaw), STRING30 TransactionID, S
 																		SELF := LEFT));
 																												
 OUTPUT(CHOOSEN(Logs, eyeball), NAMED('Sample_Yesterday_Logs'));
+
 // OUTPUT(Logs(Logs.TransactionID = '131915833R121405'), NAMED('Sample_Yesterday_Logs'));
 
 // OUTPUT(Logs(StringLib.StringToUpperCase(TRIM(XMLTEXT('InstantID/User/EndUser/CompanyName'))) = 'GREENDOT' ), NAMED('Sample_Yesterday_Logs'));//find greendot
@@ -39,6 +40,7 @@ OUTPUT(CHOOSEN(Logs, eyeball), NAMED('Sample_Yesterday_Logs'));
 Risk_Reporting.Layouts.Parsed_InstantID_Layout parseInput () := TRANSFORM
 	SELF.TransactionID	:= TRIM(XMLTEXT('TransactionId')); // Forced into the record so I can join it all together
 	SELF.CompanyName		:= TRIM(XMLTEXT('User/EndUser/CompanyName'));
+	SELF.ReferenceCode  := TRIM(XMLTEXT('User/ReferenceCode'));
 	SELF.LoadAmount			:= MAP(stringlib.stringtolowercase(TRIM(XMLTEXT('Options/IncludeModels/ModelRequests/ModelRequest[1]/ModelOptions/ModelOption[1]/OptionName')))= 'loadamount' => TRIM(XMLTEXT('Options/IncludeModels/ModelRequests/ModelRequest/ModelOptions/ModelOption[1]/OptionValue')),
 															stringlib.stringtolowercase(TRIM(XMLTEXT('Options/IncludeModels/ModelRequests/ModelRequest[1]/ModelOptions/ModelOption[2]/OptionName')))= 'loadamount' => TRIM(XMLTEXT('Options/IncludeModels/ModelRequests/ModelRequest/ModelOptions/ModelOption[2]/OptionValue')),
 															stringlib.stringtolowercase(TRIM(XMLTEXT('Options/IncludeModels/ModelRequests/ModelRequest[1]/ModelOptions/ModelOption[3]/OptionName')))= 'loadamount' => TRIM(XMLTEXT('Options/IncludeModels/ModelRequests/ModelRequest/ModelOptions/ModelOption[3]/OptionValue')),
@@ -73,7 +75,9 @@ Risk_Reporting.Layouts.Parsed_InstantID_Layout parseInput () := TRANSFORM
 	SELF.FirstName			:= TRIM(XMLTEXT('SearchBy/Name/First'));
 	SELF.LastName				:= TRIM(XMLTEXT('SearchBy/Name/Last'));
 	SELF.FullName				:= TRIM(XMLTEXT('SearchBy/Name/Full'));
-	SELF.SSN						:= Risk_Reporting.Common.ParseSSN(XMLTEXT('SearchBy/SSN'));
+	FullSSN							:= Risk_Reporting.Common.ParseSSN(XMLTEXT('SearchBy/SSN'));
+	SSNLast4						:= Risk_Reporting.Common.ParseSSN(XMLTEXT('SearchBy/SSNLast4'), 4);
+	SELF.SSN						:= IF(FullSSN <> '', FullSSN, SSNLast4);
 	SELF.DOB						:= TRIM(XMLTEXT('SearchBy/DOB')) + Risk_Reporting.Common.ParseDate(XMLTEXT('SearchBy/DOB/Year'), XMLTEXT('SearchBy/DOB/Month'), XMLTEXT('SearchBy/DOB/Day'));
 	SELF.Address				:= Risk_Reporting.Common.ParseAddress(XMLTEXT('SearchBy/Address/StreetAddress1'), XMLTEXT('SearchBy/Address/StreetAddress2'), XMLTEXT('SearchBy/Address/StreetNumber'), XMLTEXT('SearchBy/Address/StreetPreDirection'), XMLTEXT('SearchBy/Address/StreetName'),
 															XMLTEXT('SearchBy/Address/StreetSuffix'), XMLTEXT('SearchBy/Address/StreetPostDirection'), XMLTEXT('SearchBy/Address/UnitDesignation'), XMLTEXT('SearchBy/Address/UnitNumber'));
@@ -95,7 +99,8 @@ OUTPUT(CHOOSEN(parsedInput, eyeball), NAMED('Sample_Parsed_Input'));
 Risk_Reporting.Layouts.Parsed_InstantID_Layout parseOutput () := TRANSFORM
 	SELF.TransactionID	:= TRIM(XMLTEXT('Header/TransactionId')); // Forced into the record so I can join it all together
 	ModelName           := TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/Type'));
-	CVIModel						:= IF(StringLib.StringToUpperCase(ModelName) = 'CVI', TRUE, FALSE);
+	CVIModel						:= IF(StringLib.StringToUpperCase(ModelName) = 'CVI' or 
+														TRIM(XMLTEXT('Result/ComprehensiveVerification/ComprehensiveVerificationIndex')) <> '', TRUE, FALSE);
 	SELF.CVI						:= TRIM(XMLTEXT('Result/ComprehensiveVerificationIndex')) + // Instant ID
 												 TRIM(XMLTEXT('Result/ComprehensiveVerification/ComprehensiveVerificationIndex')) +
 												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/Value')), ''); // Instant ID Model
@@ -116,28 +121,47 @@ Risk_Reporting.Layouts.Parsed_InstantID_Layout parseOutput () := TRANSFORM
 	SELF.RiskIndex4     :=TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/RiskIndices/RiskIndex[4]/Value'));
 	SELF.RiskIndex5     :=TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/RiskIndices/RiskIndex[5]/Value'));
 	SELF.RiskIndex6     :=TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/RiskIndices/RiskIndex[6]/Value'));
+
 	
 	SELF.RC1						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[1]/RiskCode')) + 
-												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[1]/RiskCode')), '');
-	SELF.RC2						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[2]/RiskCode')) + 
-												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[2]/RiskCode')), '');
-	SELF.RC3						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[3]/RiskCode')) + 
-												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[3]/RiskCode')), '');
-	SELF.RC4						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[4]/RiskCode')) + 
-												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[4]/RiskCode')), '');
-	SELF.RC5						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[5]/RiskCode')) + 
-												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[5]/RiskCode')), '');
-	SELF.RC6						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[6]/RiskCode')) + 
-												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[6]/RiskCode')), '');
-	SELF.RC7						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[7]/RiskCode')) + 
-												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[7]/RiskCode')), '');
-	SELF.RC8						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[8]/RiskCode')) + 
-												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[8]/RiskCode')), '');
-	SELF.RC9						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[9]/RiskCode')) + 
-												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[9]/RiskCode')), '');
-	SELF.RC10						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[10]/RiskCode')) + 
-												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[10]/RiskCode')), '');	
+												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[1]/RiskCode'))+ 
+													TRIM(XMLTEXT('Result/ComprehensiveVerification/RiskIndicators[1]/RiskIndicator[1]/RiskCode')), '');
 	
+	SELF.RC2						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[2]/RiskCode')) + 
+												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[2]/RiskCode'))+ 
+													TRIM(XMLTEXT('Result/ComprehensiveVerification/RiskIndicators[1]/RiskIndicator[2]/RiskCode')), '');
+
+	SELF.RC3						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[3]/RiskCode')) + 
+												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[3]/RiskCode'))+ 
+													TRIM(XMLTEXT('Result/ComprehensiveVerification/RiskIndicators[1]/RiskIndicator[3]/RiskCode')), '');
+
+	SELF.RC4						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[4]/RiskCode')) + 
+												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[4]/RiskCode'))+ 
+													TRIM(XMLTEXT('Result/ComprehensiveVerification/RiskIndicators[1]/RiskIndicator[4]/RiskCode')), '');
+
+	SELF.RC5						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[5]/RiskCode')) + 
+												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[5]/RiskCode'))+ 
+													TRIM(XMLTEXT('Result/ComprehensiveVerification/RiskIndicators[1]/RiskIndicator[5]/RiskCode')), '');
+
+	SELF.RC6						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[6]/RiskCode')) + 
+												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[6]/RiskCode'))+ 
+													TRIM(XMLTEXT('Result/ComprehensiveVerification/RiskIndicators[1]/RiskIndicator[6]/RiskCode')), '');
+
+	SELF.RC7						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[7]/RiskCode')) + 
+												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[7]/RiskCode'))+ 
+													TRIM(XMLTEXT('Result/ComprehensiveVerification/RiskIndicators[1]/RiskIndicator[7]/RiskCode')), '');
+
+	SELF.RC8						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[8]/RiskCode')) + 
+												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[8]/RiskCode'))+ 
+													TRIM(XMLTEXT('Result/ComprehensiveVerification/RiskIndicators[1]/RiskIndicator[8]/RiskCode')), '');
+
+	SELF.RC9						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[9]/RiskCode')) + 
+												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[9]/RiskCode'))+ 
+													TRIM(XMLTEXT('Result/ComprehensiveVerification/RiskIndicators[1]/RiskIndicator[9]/RiskCode')), '');
+
+	SELF.RC10						:= TRIM(XMLTEXT('Result/RiskIndicators[1]/RiskIndicator[10]/RiskCode')) + 
+												 IF(CVIModel, TRIM(XMLTEXT('Result/Models[1]/Model[1]/Scores[1]/Score[1]/HighRiskIndicators[1]/HighRiskIndicator[10]/RiskCode'))+ 
+													TRIM(XMLTEXT('Result/ComprehensiveVerification/RiskIndicators[1]/RiskIndicator[10]/RiskCode')), '');	
 	SELF := [];
 END;
 parsedOutputTemp := PARSE(Logs, outputxml, parseOutput(), XML('InstantID'));

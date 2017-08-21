@@ -6,8 +6,8 @@ EXPORT proc_build_all(
   ,dataset(BIPV2.CommonBase.layout                    ) pBase         = bipv2.CommonBase.DS_CLEAN
 	,boolean													                    pOverwrite		= false
 	,boolean													                    pIsTesting		= tools._Constants.isdataland
-  ,boolean                                              pDoBiz        = true
-  ,boolean                                              pDoDemo       = true
+  ,boolean                                              pDoBiz        = false
+  ,boolean                                              pDoDemo       = false
 	,string 													                    pToday 		    = bipv2.KeySuffix_mod2.MostRecentWithIngestVersionDate//in case you want to run as of a date in the past.  default to date of newest data.
 
 
@@ -66,6 +66,8 @@ function
      if(pDoBiz  = true  ,BuildBizStrat    )
     ,if(pDoDemo = true  ,BuildDemoStrata  )
     ,BIPV2_Strata.mac_Vanity_Lexid_VS_BIP_ID(pversion)
+    ,BIPV2_Strata.mac_Single_Multi_Sourced_IDS(pversion)
+    ,BIPV2_Strata.mac_Unique_Ids(pversion)
     ,semail.BuildSuccess
   ) : failure(semail.BuildFailure)
   ;

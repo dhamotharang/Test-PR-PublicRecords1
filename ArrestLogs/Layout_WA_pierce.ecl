@@ -1,0 +1,25 @@
+export Layout_WA_pierce := RECORD 
+STRING ID;
+STRING Name;
+STRING Booking_Date;
+STRING Future_Release_Date;
+STRING Race;
+STRING Ethnicity;
+STRING Gender;
+STRING Arresting_Agency;
+STRING PCN_Number;
+STRING CountNo;
+STRING Charge;
+STRING Warrant_Type;
+STRING Charging_Agency;
+STRING Jurisdiction;
+STRING Court_Date;
+STRING Sentence_Date;
+STRING Sentence;
+STRING Rls_Date_Time;
+STRING Incident_no;
+STRING Cause_no;
+STRING Bail;
+STRING Fine;
+STRING Disposition;
+END;

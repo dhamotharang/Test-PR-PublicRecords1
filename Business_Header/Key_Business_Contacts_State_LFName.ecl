@@ -1,6 +1,11 @@
-import business_header_ss, NID;
+Import Data_Services, business_header_ss, NID, PRTE2_Business_Header;
 
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+fbc := PRTE2_Business_Header.File_Prep_Business_Contacts_Plus(state <> '', lname <> '');
+#ELSE
 fbc := File_Prep_Business_Contacts_Plus(state <> '', lname <> '');
+#END;
+
 USE_NEW := TRUE;
 
 EXPORT Key_Business_Contacts_State_LFName := 

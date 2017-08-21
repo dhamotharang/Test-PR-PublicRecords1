@@ -28,6 +28,7 @@ export GamingLicenses_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.clean_address.v_city_name),
 				self.state := left.clean_address.st,
 				self.zip := left.clean_address.zip,
+				self.zip4 := left.clean_address.zip4,
 				self.county_fips := left.clean_address.fips_county,
 				self.msa := left.clean_address.msa,
 				self.phone := '',

@@ -1,0 +1,1 @@
+export File_IL_All_In := DATASET(Cluster.Cluster_In + 'in::uccv2::IL::ALL', UCCV2.Layout_File_Variable_All,csv(separator('|'),TERMINATOR(['\n','\r\n']),MAXLENGTH(100000)))(line[1..6]!='COUNTS' and line[1..3]!='END');

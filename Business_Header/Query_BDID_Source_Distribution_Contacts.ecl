@@ -6,7 +6,7 @@ bc.source;
 bc.bdid;
 end;
 
-bc_slim := table(bc, layout_bc_slim);
+bc_slim := table(bc(from_hdr='N'), layout_bc_slim);
 
 layout_bc_stat := record
 bc_slim.source;

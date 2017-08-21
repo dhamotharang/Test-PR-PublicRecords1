@@ -1,8 +1,8 @@
 import LiensV2, address;
 
-file_in := liensV2.ILFederal_DID;
+file_in := liensV2.mapping_ILFDLN;
 
-liensV2.Layout_liens_party tnormalize(liensv2.Layout_Liens_DID L, integer cnt) := transform
+liensV2.Layout_liens_party tnormalize(liensV2.Layout_Liens_Temp_Base L, integer cnt) := transform
 
 self.orig_name := choose(Cnt, L.DEBTOR_NAME, L.creditor_name);
 self.orig_address1 := choose(cnt, L.debtor_address1, '' );
@@ -41,7 +41,7 @@ self.lot_order:= choose(cnt, L.clean_debtor_lot_order, '');
 self.dbpc:= choose(cnt, L.clean_debtor_dpbc, '');
 self.chk_digit:= choose(cnt, L.clean_debtor_chk_digit, '');
 self.rec_type:= choose(cnt, L.clean_debtor_record_type, '');
-self.county:= choose(cnt, L.clean_debtor_fipscounty, '');
+self.county:= choose(cnt,L.clean_debtor_ace_fips_st + L.clean_debtor_fipscounty, '');
 self.geo_lat:= choose(cnt, L.clean_debtor_geo_lat, '');
 self.geo_long:= choose(cnt, L.clean_debtor_geo_long, '');
 self.msa:= choose(cnt, L.clean_debtor_msa,'');
@@ -49,18 +49,31 @@ self.geo_blk:= '';
 self.geo_match:= choose(cnt, L.clean_debtor_geo_match,'' );
 self.err_stat:= choose(cnt, L.clean_debtor_err_stat, '');
 self.phone := '' ;
-self.cname := choose(cnt, L.clean_debtor_cname,'');
-self.DID  := choose(cnt, L.def_did, '');
-self.BDID := choose(cnt, L.def_bdid, '' );
+self.cname := choose(cnt, L.clean_debtor_cname,L.creditor_name);
+self.date_first_seen                :=      L.orig_filing_date;
+self.date_last_seen                 :=      L.release_date;
+self.date_vendor_first_reported     :=      L.process_date;
+self.date_vendor_last_reported      :=      L.process_date;
 self := L;
 end;
 
 IL_norm := normalize(file_in, 2, tnormalize(left, counter));
+IL_dist := distribute(IL_norm(lname <> '' or fname <> '' or mname <> '' or cname <> ''), hash(tmsid,rmsid));
 
-//IL_dedup := dedup(IL_norm(orig_name <> ''), all);
+ILFDLN_sort  := sort(IL_dist,record,EXCEPT Date_First_Seen, Date_Last_Seen,
+			   Date_Vendor_First_Reported, Date_Vendor_Last_Reported,name_type, local);
 
-IL_sort  := sort(IL_norm(orig_name <> ''), rmsid, -date_vendor_last_reported );
+liensV2.Layout_liens_party  rollupXform(liensV2.Layout_liens_party l, liensV2.Layout_liens_party r) := transform
+		self.Date_First_Seen := if(l.Date_First_Seen > r.Date_First_Seen, r.Date_First_Seen, l.Date_First_Seen);
+		self.Date_Last_Seen  := if(l.Date_Last_Seen  < r.Date_Last_Seen,  r.Date_Last_Seen,  l.Date_Last_Seen);
+		self.Date_Vendor_First_Reported := if(l.Date_Vendor_First_Reported > r.Date_Vendor_First_Reported, r.Date_Vendor_First_Reported, l.Date_Vendor_First_Reported);
+		self.Date_Vendor_Last_Reported  := if(l.Date_Vendor_Last_Reported  < r.Date_Vendor_Last_Reported,  r.Date_Vendor_Last_Reported, l.Date_Vendor_Last_Reported);
+		self := l;
+end;
 
-IL_dedup := dedup(IL_sort, except date_first_seen, date_last_seen, date_vendor_first_reported, date_vendor_last_reported);
+export mapping_ILFDLN_party := rollup(ILFDLN_sort,rollupXform(LEFT,RIGHT),RECORD,
+                                EXCEPT Date_First_Seen, Date_Last_Seen,
+																Date_Vendor_First_Reported, Date_Vendor_Last_Reported, name_type,local);
 
-export Mapping_ILFDLN_Party := IL_dedup ;
+
+

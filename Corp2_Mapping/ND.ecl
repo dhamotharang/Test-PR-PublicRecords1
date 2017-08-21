@@ -1,1181 +1,777 @@
+import ut, std, Corp2, Corp2_Mapping, Scrubs, Corp2_Raw_ND, Scrubs_Corp2_Mapping_ND_Main, _control, Tools, versioncontrol; 
 
-import Corp2,ut,Corp2_Mapping, lib_stringlib, _validate, Address, _control, versioncontrol; 
-
- export ND:= MODULE; // __ ND module has seven vendor layouts
-   export Layouts_Raw_Input := MODULE;
-        export CORPORATIONREC1:= record
-         string10 	CBSID;
-         string4 	CBCTYP;
-         string1 	CBCST;
-         string1 	dummy1;
-         string10 	CBCSTD;
-         string10 	CBODF;
-         string2 	CBSOO;
-         string1200 NNAM;
-         string30 	NADD1;
-         string30 	NADD2;
-         string20 	NCITY;
-         string2 	NSTAT;
-         string10 	NZIP;
-         string39 	CRANM1;
-         string37 	CRANM2;
-         string30 	CRADR1;
-         string30 	CRADR2;
-         string20 	CRACTY;
-         string2 	CRAST;
-         string10 	CRAZIP;
-         string6 	CSHCLS;
-         string20 	CSHNO;
-         string20 	CSHPV;
-         string1 	CSHNP;
-         string6 	CSHCLS01;
-         string20 	CSHNO01;
-         string20 	CSHPV01;
-         string1 	CSHNP01;
-         string6 	CSHCLS02;
-         string20 	CSHNO02;
-         string20 	CSHPV02;
-         string1 	CSHNP02;
-         string6 	CSHCLS03;
-         string20 	CSHNO03;
-         string20 	CSHPV03;
-         string1 	CSHNP03;
-         string6 	CSHCLS04;
-         string20 	CSHNO04;
-         string20 	CSHPV04;
-         string1 	CSHNP04;
-         string6 	CSHCLS05;
-         string20 	CSHNO05;
-         string19 	CSHPV05;
-         string1 	CSHNP05;
-		 string122 	CORP_CNNOB ;
-		 
-	   end;
-	   
-       export CORPORATIONREC2:= record
-         string10 	CORP_CBSID;
-         string4 	CORP_CBCTYP;
-         string1 	CORP_CBCST;
-         string1 	CORP_dummy1;
-         string10 	CORP_CBCSTD;
-         string10 	CORP_CBODF;
-         string2 	CORP_CBSOO;
-         string1200 CORP_NNAM;
-         string30 	CORP_NADD1;
-         string30 	CORP_NADD2;
-         string20 	CORP_NCITY;
-         string2 	CORP_NSTAT;
-         string10 	CORP_NZIP;
-         string39 	CORP_CRANM1;
-         string37 	CORP_CRANM2;
-         string30 	CORP_CRADR1;
-         string30 	CORP_CRADR2;
-         string20 	CORP_CRACTY;
-         string2 	CORP_CRAST;
-         string10 	CORP_CRAZIP;
-         string6 	CORP_CSHCLS;
-         string20 	CORP_CSHNO;
-         string20 	CORP_CSHPV;
-         string1 	CORP_CSHNP;
-         string6 	CORP_CSHCLS01;
-         string20 	CORP_CSHNO01;
-         string20 	CORP_CSHPV01;
-         string1 	CORP_CSHNP01;
-         string6 	CORP_CSHCLS02;
-         string20 	CORP_CSHNO02;
-         string20 	CORP_CSHPV02;
-         string1 	CORP_CSHNP02;
-         string6 	CORP_CSHCLS03;
-         string20 	CORP_CSHNO03;
-         string20 	CORP_CSHPV03;
-         string1 	CORP_CSHNP03;
-         string6 	CORP_CSHCLS04;
-         string20 	CORP_CSHNO04;
-         string20 	CORP_CSHPV04;
-         string1 	CORP_CSHNP04;
-         string6 	CORP_CSHCLS05;
-         string20 	CORP_CSHNO05;
-         string19 	CORP_CSHPV05;
-         string1 	CORP_CSHNP05;
-		 string122	CORP1_CNNOB ;
-        
-	   end;	
-	   
-    
-	   
-
-       export FICTITIOUS_NAMES1:= record
-         string10 	ESID;
-         string1 	ECLST;
-         string10 	ECSDT;
-         string10 	EOLDT;
-         string10 	ELRFD;
-         string10 	ELAD;
-         string1200 FICNNAM;
-         string1200 FICNNAM01;
-         string30 	FICNADD1;
-         string30 	FICNADD2;
-         string20	FICNCITY;
-         string2 	FICNSTAT;
-         string10 	FICNZIP;
-         string58 	lf;
-
-	   end;	
-	   
-	   
-	 export FICTITIOUS_NAMES2:= record
-         string10 	nESID;
-         string1 	nECLST;
-         string10 	nECSDT;
-         string10 	nEOLDT;
-         string10 	nELRFD;
-         string10 	nELAD;
-         string1200 nFICNNAM;
-         string1200 nFICNNAM01;
-         string30 	nFICNADD1;
-         string30 	nFICNADD2;
-         string20	nFICNCITY;
-         string2 	nFICNSTAT;
-         string10 	nFICNZIP;
-         string58 	nlf;
-
-	   end;	
-	   
+ export ND:= MODULE;   
  
-	   
-
-
-       export PARTNERSHIPSREC1 := record
-         string10 PAID;                
-         string4 PATYPE;               
-         string2 PASTAO;
-         string1 PASTS;
-         string1 dummy;                
-         string10 PASTDT;
-         string10 PADATE;
-         string10 PALRFD;
-         string10 PALAD;
-         string10 PALRD;
-         string351 PANAME;
-         string30 PAADD1;              
-         string30 PAADD2;              
-         string20 PACITY;
-         string2 PASTAT;
-         string10 PAZIP;
-         string39 PANAMER;
-         string39 PANAMER2;
-         string30 PAADDR1;
-         string30 PAADDR2;
-         string20 PACITYR;
-         string2 PASTATR;
-         string10 PAZIPR;
-         string320  P01NAME;
-		 string1200 lf1;
-		 string1200 lf2;
-		 string1200 lf3;
-	     string1200 lf4;
-		 string1200 lf5;
-		 string1200 lf6;
-		 string1200 lf7;
-		 string1200 lf8;
-		 string1200 lf9;
-		 string1200 lf10;
-		 string1200 lf11;
-		 string800 lf12;
-
-
-	   end;
-       export TRADEMARKREC1:= record
-	     string10 	RSID;
-	     string2 	RSTAT;
-	     string1	RCLST;
-	     string10 	RCSDT;
-	     string10 	ROLDT;
-	     string10 	RLRFD;
-	     string10 	RLAD;
-	     string1200 TM_NNAM;
-	     string1200 NNAM01;
-	     string30 	OADD1;
-	     string30 	OADD2;
-	     string20 	OCITY;
-	     string2 	OSTAT;
-	     string10 	OZIP;
-	     string4 	ICLASS;
-	     string50 	RDSCL;
-	     string2  	lf;
-
-     
-	   end;	
-  export TRADEMARKREC2:= record
-	     string10 	RSID;
-	     string2 	RSTAT;
-	     string1	RCLST;
-	     string10 	RCSDT;
-	     string10 	ROLDT;
-	     string10 	RLRFD;
-	     string10 	RLAD;
-	     string1200 TM_NNAM;
-	     string1200 NNAM01;
-	     string30 	OADD1;
-	     string30 	OADD2;
-	     string20 	OCITY;
-	     string2 	OSTAT;
-	     string10 	OZIP;
-	     string4 	ICLASS;
-	     string50 	RDSCL;
-	     string2  	lf;
-
-     
-	   end;	
-	   
-	   
-       export TRADENAMEREC1:= record
-
-         string10 	PSID;
-         string1 	PCLST;
-         string10 	PCSD8;
-         string10 	POLD8;
-         string10 	PLRD8;
-         string10 	PLAD8;
-         string1200 TN_NNAM;
-         string1200 NNAM01;
-         string30 	OADD1;
-         string30 	OADD2;
-         string20 	OCITY;
-         string2 	OSTAT;
-         string10 	OZIP;
-         string108 	lf;
-
-     
-	   end;	
-	   
-	 export TRADENAMEREC2:= record
-
-         string10 	PSID;
-         string1 	PCLST;
-         string10 	PCSD8;
-         string10 	POLD8;
-         string10 	PLRD8;
-         string10 	PLAD8;
-         string1200 TN_NNAM;
-         string1200 NNAM01;
-         string30 	OADD1;
-         string30 	OADD2;
-         string20 	OCITY;
-         string2 	OSTAT;
-         string10 	OZIP;
-         string108 	lf;
-
-     
-	   end;	
-
-
-	   
-   end; // end of Layouts_Raw_Input module
-   
-   	export Files_Raw_Input := MODULE;
-	
-		export CORPORATIONREC1 (string fileDate)    := dataset(ut.foreign_prod+'thor_data400::in::corp2::'+fileDate+'::Corpa_Vendor::nd',
-														        layouts_Raw_Input.CORPORATIONREC1,flat);
-																			 
-		export CORPORATIONREC2(string fileDate)     := dataset(ut.foreign_prod+'thor_data400::in::corp2::'+fileDate+'::Corpb_Vendor::nd',
-														        layouts_Raw_Input.CORPORATIONREC2,flat);
-															 
-		export FICTITIOUS1_NAMES (string fileDate)  := dataset(ut.foreign_prod+'thor_data400::in::corp2::'+fileDate+'::Fictitios1_Vendor::nd',
-														        layouts_Raw_Input.FICTITIOUS_NAMES1,flat);
-		export FICTITIOUS2_NAMES (string fileDate)  := dataset(ut.foreign_prod+'thor_data400::in::corp2::'+fileDate+'::Fictitios2_Vendor::nd',
-														        layouts_Raw_Input.FICTITIOUS_NAMES2,flat);														
-													
-		export PARTNERSHIPSREC1 (string fileDate)   := dataset(ut.foreign_prod+'thor_data400::in::corp2::'+fileDate+'::Partnership_Vendor::nd',
-		                                                        layouts_Raw_Input.PARTNERSHIPSREC1,flat);
+  export Update(string fileDate, string version, boolean pShouldSpray = _Dataset().bShouldSpray, boolean pOverwrite = false, pUseProd = Tools._Constants.IsDataland) := function
+ 		
+		state_origin	 := 'ND';
+		state_fips	 	 := '38';	
+		state_desc	 	 := 'NORTH DAKOTA';	  
 		
-		export TRADEMARKREC1 (string fileDate)       := dataset(ut.foreign_prod+'thor_data400::in::corp2::'+fileDate+'::Trademarks1_Vendor::nd',
-		                                                        layouts_Raw_Input.TRADEMARKREC1,flat);
-		export TRADEMARKREC2 (string fileDate)       := dataset(ut.foreign_prod+'thor_data400::in::corp2::'+fileDate+'::Trademarks2_Vendor::nd',
-		                                                        layouts_Raw_Input.TRADEMARKREC2,flat);														
-		export TRADENAMEREC1 (string fileDate)       := dataset(ut.foreign_prod+'thor_data400::in::corp2::'+fileDate+'::Tradename1_Vendor::nd',
-		                                                        layouts_Raw_Input.TRADENAMEREC1,flat);
-       	export TRADENAMEREC2 (string fileDate)       := dataset(ut.foreign_prod+'thor_data400::in::corp2::'+fileDate+'::Tradename2_Vendor::nd',
-		                                                        layouts_Raw_Input.TRADENAMEREC2,flat);												 
-	
-	end;	
- 
-  export Update(string fileDate, string version, boolean pShouldSpray = _Dataset().bShouldSpray, boolean pOverwrite = false) := function
-     //StateCountry type layout	
-	    StateCountryLayout := record,MAXLENGTH(350)
-			string code;
-			string desc;
+		// Vendor Input Files  
+		dCorp1    	 := dedup(sort(distribute(Corp2_Raw_ND.Files(filedate,pUseProd).Input.Corp1.Logical,      hash(CBSID)),record,local),record,local) : independent;
+		dCorp2     	 := dedup(sort(distribute(Corp2_Raw_ND.Files(filedate,pUseProd).Input.Corp2.Logical,      hash(CBSID)),record,local),record,local) : independent;
+		dFictName1   := dedup(sort(distribute(Corp2_Raw_ND.Files(filedate,pUseProd).Input.FictName1.Logical,  hash(ESID)),record,local),record,local)  : independent;
+		dFictName2   := dedup(sort(distribute(Corp2_Raw_ND.Files(filedate,pUseProd).Input.FictName2.Logical,  hash(ESID)),record,local),record,local)  : independent;														
+		dPartnership := dedup(sort(distribute(Corp2_Raw_ND.Files(filedate,pUseProd).Input.Partnership.Logical,hash(PAID)),record,local),record,local)  : independent;
+		dTradeMark1  := dedup(sort(distribute(Corp2_Raw_ND.Files(filedate,pUseProd).Input.TradeMark1.Logical, hash(RSID)),record,local),record,local)  : independent;
+		dTradeMark2  := dedup(sort(distribute(Corp2_Raw_ND.Files(filedate,pUseProd).Input.TradeMark2.Logical, hash(RSID)),record,local),record,local)  : independent;												
+		dTradeName1  := dedup(sort(distribute(Corp2_Raw_ND.Files(filedate,pUseProd).Input.TradeName1.Logical, hash(PSID)),record,local),record,local)  : independent; 
+		dTradeName2  := dedup(sort(distribute(Corp2_Raw_ND.Files(filedate,pUseProd).Input.TradeName2.Logical, hash(PSID)),record,local),record,local)  : independent;										 
+
+    // Combine Vendor Input files 		
+		fCorporations := dCorp1      + dCorp2      : independent;
+		fFictNames    := dFictName1  + dFictName2  : independent;
+    fTrademarks   := dTradeMark1 + dTradeMark2 : independent;
+		fTradenames   := dTradeName1 + dTradeName2 : independent;
 			
-		end;							
-		StateCountryTable := dataset(_dataset().foreign_prod + 'thor_data400::lookup::corp2::State_Country_Table::nd',StateCountryLayout,CSV(SEPARATOR([',']), TERMINATOR(['\r\n', '\n'])));
-   
-        trimUpper(string s) := function
-			return trim(stringlib.StringToUppercase(s),left,right);
-		end;
-		corporation_names:=Files_Raw_Input.CORPORATIONREC1(fileDate) + Files_Raw_Input.CORPORATIONREC2(fileDate);
-		ficticious_names := Files_Raw_Input.FICTITIOUS1_NAMES(fileDate) + Files_Raw_Input.FICTITIOUS2_NAMES(fileDate);
-		trademark_names  := Files_Raw_Input.TRADEMARKREC1(fileDate) + Files_Raw_Input.TRADEMARKREC2(fileDate);
-		tradename_files  := Files_Raw_Input.TRADENAMEREC1(fileDate) + Files_Raw_Input.TRADENAMEREC2(fileDate);
-		
-	    corp2_mapping.Layout_CorpPreClean nd_corp1Transform_Business(corporation_names  input):=transform,skip(trim(input.CBSID,left, right)='')
-     	    self.dt_first_seen					  :=fileDate;
-			self.dt_last_seen					  :=fileDate;
-			self.dt_vendor_first_reported		  :=fileDate;
-			self.dt_vendor_last_reported		  :=fileDate;
-			self.corp_ra_dt_first_seen			  :=fileDate;
-			self.corp_ra_dt_last_seen			  :=fileDate;
-			self.corp_key					      :='38-'+trim(input.CBSID,left, right);
-			self.corp_vendor					  :='38';
-		    self.corp_state_origin                :='ND';
-			self.corp_process_date				  := fileDate;  
-			self.corp_src_type                    :='SOS';
-     	    self.corp_orig_sos_charter_nbr        :=trim(input.CBSID, left, right);
-			self.corp_ln_name_type_cd             :=if(trim(input.NNAM,left,right) <> '','01','');
-			self.corp_ln_name_type_desc           :=if(trim(input.NNAM,left,right) <> '','LEGAL','');
-		    self.corp_legal_name                  :=if(trim(input.NNAM,left,right) <> '', trimUpper(input.NNAM),'');
-			self.corp_orig_org_structure_cd       :=if(trim(input.CBCTYP,left,right)<>'',trimUpper(input.CBCTYP),'');
-            self.corp_orig_org_structure_desc     :=map(trimUpper(input.CBCTYP)='AA'=>'AIRPORT AUTHORITIES',
-                                                   trimUpper(input.CBCTYP)='BANK'  =>'STATE BANK',
-                                                   trimUpper(input.CBCTYP)='BC'    =>'BUSINESS CORPORATION',
-                                                   trimUpper(input.CBCTYP)='C'     =>'COOPERATIVE ASSOCIATION',
-                                                   trimUpper(input.CBCTYP)='CH'    =>'INCORPORATED CHURCH',
-                                                   trimUpper(input.CBCTYP)='CNPD'  =>'CERTIFIED NONPROFIT DEVELOPMENT CORPORATION',
-                                                   trimUpper(input.CBCTYP)='CU'    =>'CREDIT UNION',
-                                                   trimUpper(input.CBCTYP)='EC'    =>'ELECTRIC COOPERATIVE',
-                                                   trimUpper(input.CBCTYP)='F'     =>'FOREIGN BUSINESS CORPORATION',
-                                                   trimUpper(input.CBCTYP)='FARM'  =>'FARM CORPORATION',
-                                                   trimUpper(input.CBCTYP)='FC'    =>'FOREIGN COOPERATIVE ASSOCIATION',
-                                                   trimUpper(input.CBCTYP)='FLC'   =>'FOREIGN LIMITED LIABILITY COMPANY',
-                                                   trimUpper(input.CBCTYP)='FMLC'  =>'FARM LIMITED LIABILITY COMPANY',
-                                                   trimUpper(input.CBCTYP)='FNP'   =>'FOREIGN NONPROFIT CORPORATION',
-                                                   trimUpper(input.CBCTYP)='FPC'   =>'FOREIGN PROFESSIONAL CORPORATION',
-                                                   trimUpper(input.CBCTYP)='FPLC'  =>'FOREIGN PROFESSIONAL LIMITED LIABILITY COMPANY',
-                                                   trimUpper(input.CBCTYP)='GA'    =>'GRAZING ASSOCIATION',
-                                                   trimUpper(input.CBCTYP)='IC'    =>'INSURANCE COMPANY',  		
-                                                   trimUpper(input.CBCTYP)='ID'    =>'IRRIGATION DISTRICT',
-                                                   trimUpper(input.CBCTYP)='LC'    =>'LIMITED LIABILITY COMPANY',
-                                                   trimUpper(input.CBCTYP)='MAC'   =>'MUTUAL AID CORPORATION',
-                                                   trimUpper(input.CBCTYP)='MP'    =>'MUNICIPAL POWER AGENCY',
-                                                   trimUpper(input.CBCTYP)='NP'    =>'NONPROFIT CORPORATION',
-                                                   trimUpper(input.CBCTYP)='PC'    =>'PROFESSIONAL CORPORATION',
-                                                   trimUpper(input.CBCTYP)='PLC'   =>'PROFESSIONAL LIMITED LIABILITY COMPANY',
-                                                   trimUpper(input.CBCTYP)='REIT'  =>'REAL ESTATE INVESTMENT TRUST',
-                                                   trimUpper(input.CBCTYP)='SCD'   =>'SOIL CONSERVATION DISTRICT','');
+		//------- Begin CORP Mapping ---------------------------------------------------------------------//	
 			
-         	self.corp_address1_type_cd            :=if(trim(input.NADD1,left,right) <> '' or trim(input.NADD2,left,right) <> '' or trim(input.NCITY,left,right) <> '' or trim(input.NZIP,left,right) <> ''or trim(input.NSTAT,left,right) <> '','M','');
-			self.corp_address1_type_desc          :=if(trim(input.NADD1,left,right) <> '' or trim(input.NADD2,left,right) <> '' or trim(input.NCITY,left,right) <> '' or trim(input.NZIP,left,right) <> '' or trim(input.NSTAT,left,right) <> '','MAILING','');
-			self.corp_address1_line1              :=if(trim(input.NADD1,left,right) <> '', trimUpper(input.NADD1),''); 
-			self.corp_address1_line2              :=if(trim(input.NADD2,left,right) <> '', trimUpper(input.NADD2),''); 
-			self.corp_address1_line3              :=if(not lib_stringlib.StringLib.StringFind(trimUpper(input.NCITY),'X',1) <>0 and trim(input.NCITY,left,right) <> '', trimUpper(input.	NCITY),'');  
-			self.corp_address1_line4              :=if(trim(input.NSTAT,left,right) <> '', trimUpper(input.NSTAT),''); 
-			ZipCode1                              :=if((string)((integer)trim(input.NZIP[1..5],left,right)) <> '0' and trim(input.NZIP[1..5],left,right)<>''and trimUpper(input.NZIP[1..5])<>'X',trim(input.NZIP[1..5],left,right),'');
-			ZipExtension1                         :=if((string)((integer)trim(input.NZIP[6..10],left,right)) <> '0' and trim(input.NZIP[6..10],left,right)<>''and trimUpper(input.NZIP[6..10])<>'X',trim(input.NZIP[6..10],left,right),''); 
-			self.corp_address1_line5              :=ZipCode1+ZipExtension1;
+		// Map Corp from Corporations 	
+	  Corp2_Mapping.LayoutsCommon.Main corp1Trf(Corp2_Raw_ND.Layouts.CorpLayoutIn input):=transform
+	   	self.dt_vendor_first_reported	    := (integer)fileDate;
+			self.dt_vendor_last_reported	    := (integer)fileDate;
+			self.dt_first_seen				        := (integer)fileDate;
+			self.dt_last_seen				          := (integer)fileDate;
+			self.corp_ra_dt_first_seen		    := (integer)fileDate;
+			self.corp_ra_dt_last_seen		      := (integer)fileDate;
+			self.corp_key					            := state_fips + '-' + corp2.t2u(input.CBSID);
+			self.corp_vendor					        := state_fips;
+		  self.corp_state_origin            := state_origin;
+			self.corp_inc_state               := state_origin;
+			self.corp_process_date				    := fileDate;  
+			self.corp_orig_sos_charter_nbr    := corp2.t2u(input.CBSID);
+			self.corp_legal_name              := Corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.NNAM).BusinessName;
+			self.corp_ln_name_type_cd         := '01';
+  		self.corp_ln_name_type_desc       := 'LEGAL';
+		 	self.corp_orig_org_structure_cd   := corp2.t2u(input.CBCTYP);
+      self.corp_orig_org_structure_desc := Corp2_Raw_ND.Functions.GetStructureDesc(input.CBCTYP,'C');
+			self.corp_status_cd               := corp2.t2u(input.CBCST);
+      self.corp_status_desc             := Corp2_Raw_ND.Functions.GetStatusDesc(input.CBCST,'C');
+			self.corp_for_profit_ind          := if (corp2.t2u(input.CBCTYP) in ['FNP','CNPD','NP','NPLC'], 'N', '');	
+      self.corp_status_date             := Corp2_Mapping.fValidateDate(input.CBCSTD,'CCYYMMDD').PastDate;				
+			
+			foreignTyp := ['F','FC','FLC','FPC','FPLC','FNP'];
+			self.corp_inc_date                := if (corp2.t2u(input.CBSOO) in [state_origin,''] and corp2.t2u(input.CBCTYP) not in foreignTyp
+																							,Corp2_Mapping.fValidateDate(input.CBODF,'CCYYMMDD').PastDate ,'');	
+			self.corp_forgn_date              := if (corp2.t2u(input.CBSOO) not in [state_origin,''] and corp2.t2u(input.CBCTYP) in foreignTyp
+																							,Corp2_Mapping.fValidateDate(input.CBODF,'CCYYMMDD').PastDate ,'');	
+			self.corp_foreign_domestic_ind    := map(corp2.t2u(input.CBSOO) in [state_origin,''] and corp2.t2u(input.CBCTYP) not in foreignTyp => 'D',
+																							 corp2.t2u(input.CBSOO) not in [state_origin,''] and corp2.t2u(input.CBCTYP) in foreignTyp => 'F',
+																							 '');		
+			self.corp_forgn_state_cd          := if (corp2.t2u(input.CBSOO) not in [state_origin,''] and corp2.t2u(input.CBCTYP) in foreignTyp
+																							,corp2.t2u(input.CBSOO) ,'');
+			self.corp_forgn_state_desc        := Corp2_Raw_ND.Functions.GetForgnDesc(self.corp_forgn_state_cd);
+			self.corp_country_of_formation    := Corp2_Raw_ND.Functions.GetCountry(input.CBSOO);
+			self.corp_address1_type_cd        := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.NADD1,input.NADD2,input.NCITY,input.NSTAT,input.NZIP).ifAddressExists,'B','');
+			self.corp_address1_type_desc      := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.NADD1,input.NADD2,input.NCITY,input.NSTAT,input.NZIP).ifAddressExists,'BUSINESS','');
+			self.corp_address1_line1					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.NADD1,input.NADD2,input.NCITY,input.NSTAT,input.NZIP).AddressLine1;
+			self.corp_address1_line2					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.NADD1,input.NADD2,input.NCITY,input.NSTAT,input.NZIP).AddressLine2;
+			self.corp_address1_line3					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.NADD1,input.NADD2,input.NCITY,input.NSTAT,input.NZIP).AddressLine3;			
+			self.corp_prep_addr1_line1				:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.NADD1,input.NADD2,input.NCITY,input.NSTAT,input.NZIP).PrepAddrLine1;			
+			self.corp_prep_addr1_last_line	  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.NADD1,input.NADD2,input.NCITY,input.NSTAT,input.NZIP).PrepAddrLastLine;
+			
+			self.corp_ra_address_type_cd      := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.CRADR1,input.CRADR2,input.CRACTY,input.CRAST,input.CRAZIP).ifAddressExists, 'R', '');			
+			self.corp_ra_address_type_desc    := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.CRADR1,input.CRADR2,input.CRACTY,input.CRAST,input.CRAZIP).ifAddressExists, 'REGISTERED OFFICE', '');
+			self.corp_ra_address_line1				:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.CRADR1,input.CRADR2,input.CRACTY,input.CRAST,input.CRAZIP).AddressLine1;
+			self.corp_ra_address_line2				:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.CRADR1,input.CRADR2,input.CRACTY,input.CRAST,input.CRAZIP).AddressLine2;
+			self.corp_ra_address_line3				:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.CRADR1,input.CRADR2,input.CRACTY,input.CRAST,input.CRAZIP).AddressLine3;			
+			self.ra_prep_addr_line1						:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.CRADR1,input.CRADR2,input.CRACTY,input.CRAST,input.CRAZIP).PrepAddrLine1;			
+			self.ra_prep_addr_last_line 			:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.CRADR1,input.CRADR2,input.CRACTY,input.CRAST,input.CRAZIP).PrepAddrLastLine;
+		  
+			self.corp_ra_full_name            := Corp2_Raw_ND.Functions.GetRAName(input.CRANM1,input.CRANM2);
+			self.corp_orig_bus_type_desc      := corp2.t2u(StringLib.StringFindReplace(StringLib.StringFindReplace(StringLib.StringFindReplace(corp2.t2u(input.CNNOB),'\n',''),'.',' '),'0 0 0',''));
+			self.recordOrigin                 := 'C';
+		  self                              := [];
+    end;  
 
-		    self.corp_status_cd                   :=if(trim(input.CBCST,left,right)<>'',trimUpper(input.CBCST),'');
-            self.corp_status_desc                 := map(trimUpper(input.CBCST)='A'=>'ACTIVE AND IN GOOD STANDING',
-                                                   trimUpper(input.CBCST)='C'=>'CONSOLIDATED WITH ANOTHER ORGANIZATION',
-                                                   trimUpper(input.CBCST)='CV'=>'CONVERSION TO ALTERNATE CORP TYPE',
-                                                   trimUpper(input.CBCST)='E'=>'EXPIRED',
-                                                   trimUpper(input.CBCST)='I'=>'INVOLUNTARILY DISSOLVED OR TERMINATED',
-                                                   trimUpper(input.CBCST)='M'=>'RETIRED BY MERGER',
-                                                   trimUpper(input.CBCST)='N'=>'NOT IN GOOD STANDING',
-                                                   trimUpper(input.CBCST)='R'=>'IN RECEIVERSHIP',
-                                                   trimUpper(input.CBCST)='V '=>'VOLUNTARILY TERMINATED','');
-												   
-			self.corp_inc_date                    :=if(trim(input.CBODF ,left,right) <> ''and (string)((integer)trim(input.CBODF ,left,right)) <> '0' and _validate.date.fIsValid(trim(input.CBODF ,left,right) ) and 
-														_validate.date.fIsValid((trim(input.CBODF ,left,right) ),_validate.date.rules.DateInPast),
-														trim(input.CBODF ,left,right),'');		
-														
-		    self.corp_status_date                 :=if(trim(input.CBCSTD,left,right) <> ''and (string)((integer)trim(input.CBCSTD,left,right)) <> '0' and _validate.date.fIsValid(trim(input.CBCSTD,left,right)) and 
-														_validate.date.fIsValid((trim(input.CBCSTD,left,right)),_validate.date.rules.DateInPast),
-														trim(input.CBCSTD,left,right),'');
-			 string s1                            :=lib_stringlib.StringLib.StringFindReplace(lib_stringlib.StringLib.StringFindReplace(trim(input.CORP_CNNOB,left,right),'0',''),'.',''); 											
-			self.corp_entity_desc				  :=if(trim(s1,left,right) <> '', trimUpper(s1),'');						
-  		    self.corp_inc_state                   :=if(trim(input.CBSOO,left,right) = ''or trim( input.CBSOO,left,right) ='ND', 'ND','');
-            self.corp_forgn_state_cd              :=if(trim(input.CBSOO,left,right) <>''or trim(trimUpper(input.CBSOO),left,right) <>'ND', trimUpper(input.CBSOO),'');
-			 
-			CORPCRANM1                           := if(not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM1),'AGENT FOR',1) <>0 and
-                                                       not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM1),'NONE',1) <>0 and
-	                                                   not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM1),'AGENT RESIGN',1) <> 0 and
-													   not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM1),'AGENT NOT',1)<>0 and
-                                                       not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM1),'AGENT RESIGNED',1) <> 0 and
-	                                                   not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM1),'RESIGNED',1)<>0 and
-													   not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM1),'NONE APPOINTED',1)<> 0 and
-	                                                   not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM1),'AGENT RESIGNATION',1)<>0 ,
-                                                      '' ,trimUpper(input.CRANM1));
-													   
-			CORPCRANM2                           := if(not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM2),'AGENT FOR',2) <> 0 and
-                                                       not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM2),'NONE',2) <> 0 and
-	                                                   not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM2),'AGENT RESIGN',2)<>0 and
-													   not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM2),'AGENT NOT',2) <> 0 and
-                                                       not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM2),'AGENT RESIGNED',2) <>0 and
-	                                                   not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM2),'RESIGNED',2) <> 0 and
-													   not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM2),'NONE APPOINTED',2)<>0 and
-	                                                   not lib_stringlib.StringLib.StringFind(trimUpper(input.CRANM2),'AGENT RESIGNATION',2)<> 0 ,
-                                                       '',trimUpper(input.CRANM2));
-													   
-													   
-			raname1                               :=if(CORPCRANM1='' ,trimUpper(input.CRANM1),'');	
-			raname2                               :=if(CORPCRANM2='' ,trimUpper(input.CRANM2),'');	
-		    self.corp_ra_name                     :=raname1+raname2;
-			self.corp_ra_addl_info                :=CORPCRANM1+CORPCRANM2; 
- 
-		    self.corp_ra_address_line1            :=if(trim(input.CRADR1,left,right) <> '', trimUpper(input.CRADR1),''); 
-			self.corp_ra_address_line2            :=if(trim(input.CRADR2,left,right) <> '', trimUpper(input.CRADR2),''); 
-			self.corp_ra_address_line3            :=if(not lib_stringlib.StringLib.StringFind(trimUpper(input.CRACTY),'X',1) <>0 and trim(input.CRACTY,left,right) <> '', trimUpper(input.CRACTY),'');  
-			self.corp_ra_address_line4            :=if(trim(input.CRAST,left,right) <> '', trimUpper(input.CRAST),''); 
-			ZipCode2                              :=if((string)((integer)trim(input.CRAZIP[1..5],left,right)) <> '0' and trim(input.CRAZIP[1..5],left,right)<>''and trimUpper(input.CRAZIP[1..5])<>'X',trim(input.CRAZIP[1..5],left,right),'');
-			ZipExtension2                         :=if((string)((integer)trim(input.CRAZIP[6..10],left,right)) <> '0' and trim(input.CRAZIP[6..10],left,right)<>''and trimUpper(input.CRAZIP[6..10])<>'X',trim(input.CRAZIP[6..10],left,right),''); 
-			self.corp_ra_address_line5            :=ZipCode2+ZipExtension2;
-			self.corp_ra_address_type_desc        :=if(trim(input.CRADR1,left,right) <> '' or trim(input.CRADR2,left,right) <> ''or trim(input.CRACTY,left,right) <> ''or trim(input.CRAST,left,right) <> '' or trim(input.CRAZIP,left,right) <> '','REGISTERED OFFICE','');
-			
-		    self                                  := [];
-		
-        end; // end transform.
-		
-		
-		
-		    corp2_mapping.Layout_CorpPreClean nd_corp2Transform_Business(ficticious_names input):=transform,skip(trim(input.ESID,left, right)='')
-     	    self.dt_first_seen					  :=fileDate;
-			self.dt_last_seen					  :=fileDate;
-			self.dt_vendor_first_reported		  :=fileDate;
-			self.dt_vendor_last_reported		  :=fileDate;
-			self.corp_ra_dt_first_seen			  :=fileDate;
-			self.corp_ra_dt_last_seen			  :=fileDate;
-			self.corp_key					      :='38-'+trim(input.ESID,left, right);
-			self.corp_vendor					  :='38';
-		    self.corp_state_origin                :='ND';
-			self.corp_process_date				  := fileDate; 
-			self.corp_src_type                    :='SOS';
-     	    self.corp_orig_sos_charter_nbr        :=trim(input.ESID, left, right);
-			self.corp_ln_name_type_cd             :=if(trim(input.FICNNAM,left,right) <> '','F','');
-			self.corp_ln_name_type_desc           :=if(trim(input.FICNNAM,left,right) <> '','FBN','');
-		    self.corp_legal_name                  :=if(trim(input.FICNNAM,left,right) <> '', trimUpper(input.FICNNAM),'');
-		    self.corp_status_cd                   :=if(trim(input.ECLST,left,right)<>'',trimUpper(input.ECLST),'');
-            self.corp_status_desc                 := map(trimUpper(input.ECLST)='A'=>'ACTIVE',
-                                                   trimUpper(input.ECLST)='E'=>'EXPIRED',
-                                                   trimUpper(input.ECLST)='I'=>'INACTIVE',
-                                                   trimUpper(input.ECLST)='V '=>'VOLUNTARILY TERMINATED','');
-												   
-		    self.corp_status_date                 :=if(trim(input.ECSDT,left,right) <> ''and (string)((integer)trim(input.ECSDT,left,right)) <> '0' and _validate.date.fIsValid(trim(input.ECSDT,left,right)) and 
-														_validate.date.fIsValid((trim(input.ECSDT,left,right)),_validate.date.rules.DateInPast),
-														trim(input.ECSDT,left,right),'');
-														
-            self.corp_filing_date                 :=if(trim(input.ELRFD ,left,right) <> ''and (string)((integer)trim(input.ELRFD ,left,right)) <> '0' and _validate.date.fIsValid(trim(input.ELRFD ,left,right)) and 
-														_validate.date.fIsValid((trim(input.ELRFD ,left,right) ),_validate.date.rules.DateInPast),trim(input.ELRFD ,left,right),if(trim(input.EOLDT ,left,right) <> ''and 
-														 (string)((integer)trim(input.EOLDT ,left,right)) <> '0' and _validate.date.fIsValid(trim(input.EOLDT ,left,right) ) and 
-														_validate.date.fIsValid((trim(input.EOLDT ,left,right) ),_validate.date.rules.DateInPast),
-														trim(input.EOLDT ,left,right),''));	
-														
-			self.corp_filing_desc                  :=if(trim(input.EOLDT ,left,right) <> ''and (string)((integer)trim(input.EOLDT ,left,right)) <> '0' and _validate.date.fIsValid(input.EOLDT ) and 
-														_validate.date.fIsValid((input.EOLDT ),_validate.date.rules.DateInPast),
-														'RENEWAL','');											
-            self                                  := [];
-		
-        end; // end transform.
-		
-		    corp2_mapping.Layout_CorpPreClean nd_corp3Transform_Business(layouts_Raw_Input.PARTNERSHIPSREC1 input):=transform,skip(trim(input.PAID,left, right)='')
-     	    self.dt_first_seen					  :=fileDate;
-			self.dt_last_seen					  :=fileDate;
-			self.dt_vendor_first_reported		  :=fileDate;
-			self.dt_vendor_last_reported		  :=fileDate;
-			self.corp_ra_dt_first_seen			  :=fileDate;
-			self.corp_ra_dt_last_seen			  :=fileDate;
-			self.corp_key					      :='38-'+trim(input.PAID,left, right);
-			self.corp_vendor					  :='38';
-		    self.corp_state_origin                :='ND';
-			self.corp_process_date				  := fileDate;
-			self.corp_src_type                    :='SOS';
-     	    self.corp_orig_sos_charter_nbr        :=trim(input.PAID, left, right);
-			self.corp_ln_name_type_cd             :=if(trim(input.PANAME,left,right) <> '','01','');
-			self.corp_ln_name_type_desc           :=if(trim(input.PANAME,left,right) <> '','LEGAL','');
-		    self.corp_legal_name                  :=if(trim(input.PANAME,left,right) <> '', trimUpper(input.PANAME),'');
-			self.corp_orig_org_structure_cd       :=if(trim(input.PATYPE,left,right)<>'',trimUpper(input.PATYPE),'');
-            self.corp_orig_org_structure_desc     :=map(trimUpper(input.PATYPE)='G'=>'GENERAL PARTNERSHIP',
-                                                   trimUpper(input.PATYPE)='L'=>'LIMITED PARTNERSHIP',
-                                                   trimUpper(input.PATYPE)='LLLP'=>'LIMITED LIABILITY LIMITED PARTNERSHIP',
-                                                   trimUpper(input.PATYPE)='LLP'=>'LIMITED LIABILITY PARTNERSHIP',
-                                                   trimUpper(input.PATYPE)='LP'=>'LIMITED PARTNERSHIP',
-                                                   trimUpper(input.PATYPE)='PLLP'=>'PROFESSIONAL LIMITED LIABILITY PARTNERSHIP','');
-			self.corp_status_cd                   :=if(trim(input.PASTS,left,right)<>'',trimUpper(input.PASTS),'');
-            self.corp_status_desc                 := map(trimUpper(input.PASTS)='A'=>'ACTIVE',
-                                                   trimUpper(input.PASTS)='E'=>'EXPIRED',
-                                                   trimUpper(input.PASTS)='I'=>'INACTIVE',
-                                                   trimUpper(input.PASTS)='V '=>'VOLUNTARILY TERMINATED','');
-												   
-			self.corp_inc_date                    :=if(trim(input.PADATE ,left,right) <> ''and (string)((integer)trim(input.PADATE ,left,right)) <> '0' and _validate.date.fIsValid(trim(input.PADATE ,left,right)) and 
-														_validate.date.fIsValid((trim(input.PADATE ,left,right)),_validate.date.rules.DateInPast),
-														trim(input.PADATE ,left,right),'');	
-														
-		    self.corp_status_date                 :=if(trim(input.PASTDT,left,right) <> ''and (string)((integer)trim(input.PASTDT	 ,left,right)) <> '0' and _validate.date.fIsValid(trim(input.PASTDT,left,right)) and 
-														_validate.date.fIsValid((trim(input.PASTDT,left,right)),_validate.date.rules.DateInPast),
-														trim(input.PASTDT ,left,right),'');	
-
-														
-			self.corp_inc_state                   :=if(trim(input.PASTAO,left,right) = ''or trim( input.PASTAO,left,right) ='ND', 'ND','');
-			
-            self.corp_forgn_state_cd              :=if(trim(input.PASTAO,left,right) <>''or trim(trimUpper(input.PASTAO),left,right)<>'ND', trimUpper(input.PASTAO),'');
-			
-			self.corp_address1_type_cd            :=if(trim(input.PAADD1,left,right) <> '' or trim(input.PAADD2,left,right) <> '' or trim(input.PACITY,left,right) <> '' or trim(input.PAZIP,left,right) <> ''or trim(input.PASTAT,left,right) <> '','M','');
-			self.corp_address1_type_desc          :=if(trim(input.PAADD1,left,right) <> '' or trim(input.PAADD2,left,right) <> '' or trim(input.PACITY,left,right) <> '' or trim(input.PAZIP,left,right) <> '' or trim(input.PASTAT,left,right) <> '','MAILING','');
-			self.corp_address1_line1              :=if(trim(input.PAADD1,left,right) <> '', trimUpper(input.PAADD1),''); 
-			self.corp_address1_line2              :=if(trim(input.PAADD2,left,right) <> '', trimUpper(input.PAADD2),''); 
-			self.corp_address1_line3              :=if(not lib_stringlib.StringLib.StringFind(trimUpper(input.PACITY),'X',1) <>0 and trim(input.PACITY,left,right) <> '', trimUpper(input.PACITY),'');  
-			self.corp_address1_line4              :=if(trim(input.PASTAT,left,right) <> '', trimUpper(input.PASTAT),''); 
-			ZipCode1                              :=if((string)((integer)trim(input.PAZIP[1..5],left,right)) <> '0' and trim(input.PAZIP[1..5],left,right)<>''and trimUpper(input.PAZIP[1..5])<>'X',trim(input.PAZIP[1..5],left,right),'');
-			ZipExtension1                         :=if((string)((integer)trim(input.PAZIP[6..10],left,right)) <> '0' and trim(input.PAZIP[6..10],left,right)<>''and trimUpper(input.PAZIP[6..10])<>'X',trim(input.PAZIP[6..10],left,right),''); 
-			self.corp_address1_line5              :=ZipCode1+ZipExtension1;	
-			
-			corp_raname                           :=if(not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER),'AGENT FOR',1) <>0 and
-                                                       not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER),'NONE',1) <>0 and
-	                                                   not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER),'AGENT RESIGN',1) <>0 and
-													   not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER),'AGENT NOT',1) <>0 and
-                                                       not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER),'AGENT RESIGNED',1) <>0 and
-	                                                   not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER),'RESIGNED',1) <>0 and
-													   not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER),'NONE APPOINTED',1)<>0 and
-	                                                   not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER),'AGENT RESIGNATION',1) <>0 ,
-                                                      '', trimUpper(input.PANAMER));
-													   
-			corp_raname2                           :=if(not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER2),'AGENT FOR',1) <>0 and
-                                                       not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER2),'NONE',1) <>0 and
-	                                                   not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER2),'AGENT RESIGN',1) <>0 and
-													   not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER2),'AGENT NOT',1) <>0 and
-                                                       not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER2),'AGENT RESIGNED',1) <>0 and
-	                                                   not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER2),'RESIGNED',1) <>0 and
-													   not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER2),'NONE APPOINTED',1)<>0 and
-	                                                   not lib_stringlib.StringLib.StringFind(trimUpper(input.PANAMER2),'AGENT RESIGNATION',1) <>0 ,
-                                                       '',trimUpper(input.PANAMER2));	
-			ranm1                                 :=if(	corp_raname='',	trimUpper(input.PANAMER),'');
-			ranm2                                 :=if(	corp_raname2='',trimUpper(input.PANAMER2),'');
-			self.corp_ra_name                     :=ranm1 +ranm2; 
-			self.corp_ra_addl_info                :=corp_raname+corp_raname2 ;
-			self.corp_ra_address_line1            :=if(trim(input.PAADD1,left,right) <> '', trimUpper(input.PAADD1),''); 
-			self.corp_ra_address_line2            :=if(trim(input.PAADD2,left,right) <> '', trimUpper(input.PAADD2),''); 
-			self.corp_ra_address_line3            :=if(not lib_stringlib.StringLib.StringFind(trimUpper(input.PACITY),'X',1) <>0 and trim(input.PACITY,left,right) <> '', trimUpper(input.PACITY),'');  
-			self.corp_ra_address_line4            :=if(trim(input.PASTAT,left,right) <> '', trimUpper(input.PASTAT),''); 
-			ZipCode2                              :=if((string)((integer)trim(input.PAZIP[1..5],left,right)) <> '0' and trim(input.PAZIP[1..5],left,right)<>''and trimUpper(input.PAZIP[1..5])<>'X',trim(input.PAZIP[1..5],left,right),'');
-			ZipExtension2                         :=if((string)((integer)trim(input.PAZIP[6..10],left,right)) <> '0' and trim(input.PAZIP[6..10],left,right)<>''and trimUpper(input.PAZIP[6..10])<>'X',trim(input.PAZIP[6..10],left,right),''); 
-			self.corp_ra_address_line5            :=ZipCode2+ZipExtension2;
-			self.corp_ra_address_type_desc        :=if(trim(input.PAADD1,left,right) <> '' or trim(input.PAADD2,left,right) <> ''or trim(input.PACITY,left,right) <> ''or trim(input.PASTAT,left,right) <> '' or trim(input.PAZIP,left,right) <> '','REGISTERED OFFICE','');
-			
+		// Map Corp from FictNames 
+		jFictNames	:= join(fFictNames, fCorporations, 
+											corp2.t2u(left.ESID) = corp2.t2u(right.CBSID),
+											transform(Corp2_Raw_ND.Layouts.FictName_TempLay, 
+																 self.CBSOO   := right.CBSOO;
+																 self.CBCTYP 	:= right.CBCTYP;
+																 self.CBODF 	:= right.CBODF;
+																 self := left; self := right; self := [];),
+											left outer,local) : independent;
 											
-            self                                  := [];
+		Corp2_Mapping.LayoutsCommon.Main corp2Trf(Corp2_Raw_ND.Layouts.FictName_TempLay input):=transform
+					,skip(corp2.t2u(input.ESID)='')
+      self.dt_vendor_first_reported	    := (integer)fileDate;
+			self.dt_vendor_last_reported	    := (integer)fileDate;
+			self.dt_first_seen				        := (integer)fileDate;
+			self.dt_last_seen				          := (integer)fileDate;
+			self.corp_ra_dt_first_seen		    := (integer)fileDate;
+			self.corp_ra_dt_last_seen		      := (integer)fileDate;
+			self.corp_key					      			:= state_fips + '-' + corp2.t2u(input.ESID);
+			self.corp_vendor					  			:= state_fips;
+		  self.corp_state_origin            := state_origin;
+			self.corp_inc_state               := state_origin;
+			self.corp_process_date				    := fileDate; 
+     	self.corp_orig_sos_charter_nbr    := corp2.t2u(input.ESID);
+			self.corp_legal_name              := Corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.FICNNAM).BusinessName;
+			self.corp_ln_name_type_cd         := 'F';
+			self.corp_ln_name_type_desc       := 'FBN';
+		  self.corp_status_cd               := corp2.t2u(input.ECLST);
+      self.corp_status_desc             := Corp2_Raw_ND.Functions.GetStatusDesc(input.ECLST,'F');
+			self.corp_status_date             := Corp2_Mapping.fValidateDate(input.ECSDT,'CCYYMMDD').PastDate;
+			self.corp_filing_date             := Corp2_Mapping.fValidateDate(input.EOLDT,'CCYYMMDD').PastDate;	
+			self.corp_filing_cd               := if (self.corp_filing_date <> '' ,'X' ,'');
+			self.corp_filing_desc             := if (self.corp_filing_date <> '' ,'ORIGINAL LICENSE DATE' ,'');	
+			self.corp_last_renewal_date       := Corp2_Mapping.fValidateDate(input.ELRFD,'CCYYMMDD').PastDate;	
+			self.corp_addl_info               := if (Corp2_Mapping.fValidateDate(input.ELAD,'CCYYMMDD').PastDate <> ''
+																							 ,'LAST AMENDED DATE: ' + Corp2_Mapping.fValidateDate(input.ELAD,'CCYYMMDD').PastDate[5..6] + '/' + 
+																																				Corp2_Mapping.fValidateDate(input.ELAD,'CCYYMMDD').PastDate[7..8] + '/' + 
+																																				Corp2_Mapping.fValidateDate(input.ELAD,'CCYYMMDD').PastDate[1..4] ,'');	
+			self.corp_address1_type_cd        := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.FICNADD1,input.FICNADD2,input.FICNCITY,input.FICNSTAT,input.FICNZIP).ifAddressExists, 'B', '');			
+			self.corp_address1_type_desc      := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.FICNADD1,input.FICNADD2,input.FICNCITY,input.FICNSTAT,input.FICNZIP).ifAddressExists, 'BUSINESS', '');
+			self.corp_address1_line1					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.FICNADD1,input.FICNADD2,input.FICNCITY,input.FICNSTAT,input.FICNZIP).AddressLine1;
+			self.corp_address1_line2					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.FICNADD1,input.FICNADD2,input.FICNCITY,input.FICNSTAT,input.FICNZIP).AddressLine2;
+			self.corp_address1_line3					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.FICNADD1,input.FICNADD2,input.FICNCITY,input.FICNSTAT,input.FICNZIP).AddressLine3;			
+			self.corp_prep_addr1_line1				:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.FICNADD1,input.FICNADD2,input.FICNCITY,input.FICNSTAT,input.FICNZIP).PrepAddrLine1;			
+			self.corp_prep_addr1_last_line	  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.FICNADD1,input.FICNADD2,input.FICNCITY,input.FICNSTAT,input.FICNZIP).PrepAddrLastLine;
+			
+			foreignTyp := ['F','FC','FLC','FPC','FPLC','FNP'];
+			self.corp_inc_date                := if (corp2.t2u(input.CBSOO) in [state_origin,''] and corp2.t2u(input.CBCTYP) not in foreignTyp
+																							,Corp2_Mapping.fValidateDate(input.CBODF,'CCYYMMDD').PastDate ,'');	
+			self.corp_forgn_date              := if (corp2.t2u(input.CBSOO) not in [state_origin,''] and corp2.t2u(input.CBCTYP) in foreignTyp
+																							,Corp2_Mapping.fValidateDate(input.CBODF,'CCYYMMDD').PastDate ,'');	
+			self.recordOrigin                 := 'C';
+      self                              := [];
+   end;  
 		
-        end; // end transform.	
+		// Map Corp from Partnership 
+		Corp2_Mapping.LayoutsCommon.Main corp3Trf(Corp2_Raw_ND.Layouts.PartnershipLayoutIN input):=transform
+						,skip(corp2.t2u(input.PAID)='')
+     	self.dt_vendor_first_reported	    := (integer)fileDate;
+			self.dt_vendor_last_reported	    := (integer)fileDate;
+			self.dt_first_seen				        := (integer)fileDate;
+			self.dt_last_seen				          := (integer)fileDate;
+			self.corp_ra_dt_first_seen		    := (integer)fileDate;
+			self.corp_ra_dt_last_seen		      := (integer)fileDate;
+			self.corp_key					            := state_fips + '-' + corp2.t2u(input.PAID);
+			self.corp_vendor					  			:= state_fips;
+		  self.corp_state_origin            := state_origin;
+			self.corp_inc_state               := state_origin;
+			self.corp_process_date				    := fileDate;
+     	self.corp_orig_sos_charter_nbr    := corp2.t2u(input.PAID);
+			self.corp_ln_name_type_cd         := '01';
+			self.corp_ln_name_type_desc       := 'LEGAL';
+		  self.corp_legal_name              := Corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.PANAME).BusinessName;
+			self.corp_orig_org_structure_cd   := corp2.t2u(input.PATYPE);
+      self.corp_orig_org_structure_desc := Corp2_Raw_ND.Functions.GetStructureDesc(input.PATYPE,'P');
+			self.corp_status_cd               := corp2.t2u(input.PASTS);
+      self.corp_status_desc             := Corp2_Raw_ND.Functions.GetStatusDesc(input.PASTS,'P');
+			self.corp_status_date             := Corp2_Mapping.fValidateDate(input.PASTDT,'CCYYMMDD').PastDate;	
+	  	self.corp_foreign_domestic_ind    := map (corp2.t2u(input.PASTAO) in [state_origin,'']     => 'D',
+																								corp2.t2u(input.PASTAO) not in [state_origin,''] => 'F',
+																								'');		
+			self.corp_forgn_state_cd          := if (corp2.t2u(input.PASTAO) not in [state_origin,''] ,corp2.t2u(input.PASTAO) ,'');
+			self.corp_forgn_state_desc        := Corp2_Raw_ND.Functions.GetForgnDesc(self.corp_forgn_state_cd);
+			self.corp_inc_date                := if (corp2.t2u(input.PASTAO) in [state_origin,''] 
+																							 ,Corp2_Mapping.fValidateDate(input.PADATE,'CCYYMMDD').PastDate ,'');	
+			self.corp_forgn_date              := if (corp2.t2u(input.PASTAO) not in [state_origin,''] 
+																							 ,Corp2_Mapping.fValidateDate(input.PADATE,'CCYYMMDD').PastDate ,'');	
+			self.corp_country_of_formation    := Corp2_Raw_ND.Functions.GetCountry(input.PASTAO);
+			self.corp_last_renewal_date       := Corp2_Mapping.fValidateDate(input.PALRFD,'CCYYMMDD').PastDate;	
+			self.corp_addl_info               := if (Corp2_Mapping.fValidateDate(input.PALAD,'CCYYMMDD').PastDate <> ''
+																							 ,'LAST AMENDED DATE: ' + Corp2_Mapping.fValidateDate(input.PALAD,'CCYYMMDD').PastDate[5..6] + '/' + 
+																																				Corp2_Mapping.fValidateDate(input.PALAD,'CCYYMMDD').PastDate[7..8] + '/' + 
+																																				Corp2_Mapping.fValidateDate(input.PALAD,'CCYYMMDD').PastDate[1..4] ,'');	
+			self.corp_comment                 := if (Corp2_Mapping.fValidateDate(input.PALRD,'CCYYMMDD').PastDate <> ''
+																							 ,'LAST RESTATEMENT DATE: ' + Corp2_Mapping.fValidateDate(input.PALRD,'CCYYMMDD').PastDate[5..6] + '/' + 
+																																				    Corp2_Mapping.fValidateDate(input.PALRD,'CCYYMMDD').PastDate[7..8] + '/' + 
+																																				    Corp2_Mapping.fValidateDate(input.PALRD,'CCYYMMDD').PastDate[1..4] ,'');																					 
+			
+			self.corp_address1_type_cd        := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.PAADD1,input.PAADD2,input.PACITY,input.PASTAT,input.PAZIP).ifAddressExists, 'B', '');			
+			self.corp_address1_type_desc      := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.PAADD1,input.PAADD2,input.PACITY,input.PASTAT,input.PAZIP).ifAddressExists, 'BUSINESS', '');
+			self.corp_address1_line1					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PAADD1,input.PAADD2,input.PACITY,input.PASTAT,input.PAZIP).AddressLine1;
+			self.corp_address1_line2					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PAADD1,input.PAADD2,input.PACITY,input.PASTAT,input.PAZIP).AddressLine2;
+			self.corp_address1_line3					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PAADD1,input.PAADD2,input.PACITY,input.PASTAT,input.PAZIP).AddressLine3;			
+			self.corp_prep_addr1_line1				:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PAADD1,input.PAADD2,input.PACITY,input.PASTAT,input.PAZIP).PrepAddrLine1;			
+			self.corp_prep_addr1_last_line	  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PAADD1,input.PAADD2,input.PACITY,input.PASTAT,input.PAZIP).PrepAddrLastLine;
+			
+			self.corp_ra_address_type_cd      := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.PAADDR1,input.PAADDR2,input.PACITYR,input.PASTATR,input.PAZIPR).ifAddressExists, 'R', '');			
+			self.corp_ra_address_type_desc    := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.PAADDR1,input.PAADDR2,input.PACITYR,input.PASTATR,input.PAZIPR).ifAddressExists, 'REGISTERED OFFICE', '');
+			self.corp_ra_address_line1				:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PAADDR1,input.PAADDR2,input.PACITYR,input.PASTATR,input.PAZIPR).AddressLine1;
+			self.corp_ra_address_line2				:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PAADDR1,input.PAADDR2,input.PACITYR,input.PASTATR,input.PAZIPR).AddressLine2;
+			self.corp_ra_address_line3				:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PAADDR1,input.PAADDR2,input.PACITYR,input.PASTATR,input.PAZIPR).AddressLine3;			
+			self.ra_prep_addr_line1						:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PAADDR1,input.PAADDR2,input.PACITYR,input.PASTATR,input.PAZIPR).PrepAddrLine1;			
+			self.ra_prep_addr_last_line 			:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.PAADDR1,input.PAADDR2,input.PACITYR,input.PASTATR,input.PAZIPR).PrepAddrLastLine;
 
-		    corp2_mapping.Layout_CorpPreClean nd_corp4Transform_Business(trademark_names input):=transform,skip(trim(input.RSID,left, right)='')
-     	    self.dt_first_seen					  :=fileDate;
-			self.dt_last_seen					  :=fileDate;
-			self.dt_vendor_first_reported		  :=fileDate;
-			self.dt_vendor_last_reported		  :=fileDate;
-			self.corp_ra_dt_first_seen			  :=fileDate;
-			self.corp_ra_dt_last_seen			  :=fileDate;
-			self.corp_key					      :='38-'+trim(input. RSID,left, right);
-			self.corp_vendor					  :='38';
-		    self.corp_state_origin                :='ND';
-			self.corp_process_date				  := fileDate; 
-			self.corp_src_type                    :='SOS';
-     	    self.corp_orig_sos_charter_nbr        :=trim(input. RSID, left, right);
-			self.corp_ln_name_type_cd             :=if(trim(input.TM_NNAM,left,right) <> '','03','');
-			self.corp_ln_name_type_desc           :=if(trim(input.TM_NNAM,left,right) <> '','TRADEMARK','');
-		    self.corp_legal_name                  :=if(trim(input.TM_NNAM,left,right) <> '', trimUpper(input.TM_NNAM),'');
-			self.corp_status_cd                   :=if(trim(input.RCLST,left,right)<>'',trimUpper(input.RCLST),'');
-            self.corp_status_desc                 := map(trimUpper(input.RCLST)='A'=>'ACTIVE',
-                                                   trimUpper(input.RCLST)='E'=>'EXPIRED',
-                                                   trimUpper(input.RCLST)='I'=>'INACTIVE',
-                                                   trimUpper(input.RCLST)='V '=>'VOLUNTARILY TERMINATED','');
-												   
-		    self.corp_status_date                 :=if(trim(input.RCSDT,left,right) <> ''and (string)((integer)trim(input.RCSDT,left,right)) <> '0' and _validate.date.fIsValid(trim(input.RCSDT,left,right)) and 
-														_validate.date.fIsValid((trim(input.RCSDT,left,right)),_validate.date.rules.DateInPast),
-														trim(input.RCSDT,left,right),'');
-										
-										
-			self.corp_filing_date                 :=if(trim(input.RLRFD ,left,right) <> ''and (string)((integer)trim(input.RLRFD ,left,right)) <> '0' and _validate.date.fIsValid(trim(input.RLRFD ,left,right)) and 
-														_validate.date.fIsValid((trim(input.RLRFD ,left,right) ),_validate.date.rules.DateInPast),trim(input.RLRFD ,left,right),if(trim(input.ROLDT ,left,right) <> ''and (string)((integer)trim(input.ROLDT ,left,right)) <> '0' and 
-														_validate.date.fIsValid(trim(input.ROLDT ,left,right) ) and 
-														_validate.date.fIsValid((trim(input.ROLDT ,left,right)),_validate.date.rules.DateInPast),
-														trim(input.ROLDT ,left,right),''));
-														
-			self.corp_filing_desc                  :=if(trim(input.ROLDT ,left,right) <> ''and (string)((integer)trim(input.ROLDT ,left,right)) <> '0' and _validate.date.fIsValid(input.ROLDT ) and 
-														_validate.date.fIsValid((input.ROLDT ),_validate.date.rules.DateInPast),
-														'RENEWAL','');
-			self.corp_address1_type_cd            :=if(trim(input.OADD1,left,right) <> '' or trim(input.OADD2,left,right) <> '' or trim(input.OCITY,left,right) <> '' or trim(input.OZIP,left,right) <> ''or trim(input.OSTAT,left,right) <> '','M','');
-			self.corp_address1_type_desc          :=if(trim(input.OADD1,left,right) <> '' or trim(input.OADD2,left,right) <> '' or trim(input.OCITY,left,right) <> '' or trim(input.OZIP,left,right) <> '' or trim(input.OSTAT,left,right) <> '','MAILING','');
-			self.corp_address1_line1              :=if(trim(input.OADD1,left,right) <> '', trimUpper(input.OADD1),''); 
-			self.corp_address1_line2              :=if(trim(input.OADD2,left,right) <> '', trimUpper(input.OADD2),''); 
-			self.corp_address1_line3              :=if(not lib_stringlib.StringLib.StringFind(trimUpper(input.OCITY),'X',1) <>0 and trim(input.OCITY,left,right) <> '', trimUpper(input.OCITY),'');  
-			self.corp_address1_line4              :=if(trim(input.OSTAT,left,right) <> '', trimUpper(input.OSTAT),''); 
-			ZipCode2                              :=if((string)((integer)trim(input.OZIP[1..5],left,right)) <> '0' and trim(input.OZIP[1..5],left,right)<>''and trimUpper(input.OZIP[1..5])<>'X',trim(input.OZIP[1..5],left,right),'');
-			ZipExtension2                         :=if((string)((integer)trim(input.OZIP[6..10],left,right)) <> '0' and trim(input.OZIP[6..10],left,right)<>''and trimUpper(input.OZIP[6..10])<>'X',trim(input.OZIP[6..10],left,right),''); 
-			self.corp_address1_line5              :=ZipCode2+ZipExtension2;											
-            self                                  := [];
+			self.corp_ra_full_name            := Corp2_Raw_ND.Functions.GetRAName(input.PANAMER,input.PANAMER2);
+			self.recordOrigin                 := 'C';																			
+      self                              := [];
+		end;  
+
+    // Map Corp from Trademarks 
+	  jTrademarks	:= join(fTrademarks, fCorporations, 
+											corp2.t2u(left.RSID) = corp2.t2u(right.CBSID),
+											transform(Corp2_Raw_ND.Layouts.TradeMark_TempLay, 
+																 self.CBSOO   := right.CBSOO;
+																 self.CBCTYP 	:= right.CBCTYP;
+																 self.CBODF 	:= right.CBODF;
+																 self := left; self := right; self := [];),
+											left outer,local) : independent;
+											
+		Corp2_Mapping.LayoutsCommon.Main corp4Trf(Corp2_Raw_ND.Layouts.TradeMark_TempLay input):=transform
+					,skip(corp2.t2u(input.RSID)='')
+     	self.dt_vendor_first_reported	         := (integer)fileDate;
+			self.dt_vendor_last_reported	         := (integer)fileDate;
+			self.dt_first_seen				             := (integer)fileDate;
+			self.dt_last_seen				               := (integer)fileDate;
+			self.corp_ra_dt_first_seen		         := (integer)fileDate;
+			self.corp_ra_dt_last_seen		           := (integer)fileDate;
+			self.corp_key					     				     := state_fips + '-' + corp2.t2u(input.RSID);
+			self.corp_vendor					  			     := state_fips;
+		  self.corp_state_origin                 := state_origin;
+			self.corp_inc_state                    := state_origin;
+			self.corp_process_date				  	     := fileDate; 
+ 	    self.corp_orig_sos_charter_nbr         := corp2.t2u(input.RSID);
+			self.corp_ln_name_type_cd              := '03';
+			self.corp_ln_name_type_desc            := 'TRADEMARK';
+		  self.corp_legal_name                   := Corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.TM_NNAM).BusinessName;
+			self.corp_status_cd                    := corp2.t2u(input.RCLST);
+      self.corp_status_desc                  := Corp2_Raw_ND.Functions.GetStatusDesc(input.RCLST,'TM');
+			self.corp_status_date                  := Corp2_Mapping.fValidateDate(input.RCSDT,'CCYYMMDD').PastDate;												   
+			self.corp_filing_date             		 := Corp2_Mapping.fValidateDate(input.ROLDT,'CCYYMMDD').PastDate;
+			self.corp_filing_cd                    := if (self.corp_filing_date <> '' ,'X' ,'');
+			self.corp_filing_desc                  := if (self.corp_filing_date <> '' ,'ORIGINAL LICENSE DATE' ,'');	
+			self.corp_forgn_state_cd               := if (corp2.t2u(input.RSTAT) not in [state_origin,''] ,corp2.t2u(input.RSTAT) ,'');
+			self.corp_forgn_state_desc             := Corp2_Raw_ND.Functions.GetForgnDesc(self.corp_forgn_state_cd);
+			self.corp_foreign_domestic_ind         := map (corp2.t2u(input.RSTAT) in [state_origin,'']     => 'D',
+																							     	corp2.t2u(input.RSTAT) not in [state_origin,''] => 'F',	'');	
+			self.corp_addl_info                    := if (Corp2_Mapping.fValidateDate(input.RLAD,'CCYYMMDD').PastDate <> ''
+																							      ,'LAST AMENDED DATE: ' + Corp2_Mapping.fValidateDate(input.RLAD,'CCYYMMDD').PastDate[5..6] + '/' + 
+																																						 Corp2_Mapping.fValidateDate(input.RLAD,'CCYYMMDD').PastDate[7..8] + '/' + 
+																																						 Corp2_Mapping.fValidateDate(input.RLAD,'CCYYMMDD').PastDate[1..4] ,'');	
+			self.corp_address1_type_cd             := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).ifAddressExists, 'B', '');			
+			self.corp_address1_type_desc           := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).ifAddressExists, 'BUSINESS', '');
+			self.corp_address1_line1					     := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).AddressLine1;
+			self.corp_address1_line2					     := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).AddressLine2;
+			self.corp_address1_line3					     := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).AddressLine3;			
+			self.corp_prep_addr1_line1				     := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).PrepAddrLine1;			
+			self.corp_prep_addr1_last_line	       := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).PrepAddrLastLine;
+
+			self.corp_trademark_status             := self.corp_status_desc;
+			self.corp_trademark_class_desc1        := corp2.t2u(input.RDSCL);
+			self.corp_trademark_filing_date        := Corp2_Mapping.fValidateDate(input.ROLDT,'CCYYMMDD').PastDate;
+			self.corp_trademark_renewal_date       := Corp2_Mapping.fValidateDate(input.RLRFD,'CCYYMMDD').PastDate;	
+			self.corp_trademark_classification_nbr := corp2.t2u(input.ICLASS);
+			
+			foreignTyp := ['F','FC','FLC','FPC','FPLC','FNP'];
+			self.corp_inc_date                     := if (corp2.t2u(input.CBSOO) in [state_origin,''] and corp2.t2u(input.CBCTYP) not in foreignTyp
+																										,Corp2_Mapping.fValidateDate(input.CBODF,'CCYYMMDD').PastDate ,'');	
+			self.corp_forgn_date                   := if (corp2.t2u(input.CBSOO) not in [state_origin,''] and corp2.t2u(input.CBCTYP) in foreignTyp
+																										,Corp2_Mapping.fValidateDate(input.CBODF,'CCYYMMDD').PastDate ,'');	
+			self.recordOrigin                 		 := 'C';
+		  self                                   := [];
+    end;  
+
+		// Map Corp from Tradenames 
+		jTradenames	:= join(fTradenames, fCorporations, 
+											corp2.t2u(left.PSID) = corp2.t2u(right.CBSID),
+											transform(Corp2_Raw_ND.Layouts.Tradename_TempLay, 
+																 self.CBSOO   := right.CBSOO;
+																 self.CBCTYP 	:= right.CBCTYP;
+																 self.CBODF 	:= right.CBODF;
+																 self := left; self := right; self := [];),
+											left outer,local) : independent;
+											
+		Corp2_Mapping.LayoutsCommon.Main corp5Trf(Corp2_Raw_ND.Layouts.Tradename_TempLay input):=transform
+							,skip(corp2.t2u(input.PSID)='')
+     	self.dt_vendor_first_reported	    := (integer)fileDate;
+			self.dt_vendor_last_reported	    := (integer)fileDate;
+			self.dt_first_seen				        := (integer)fileDate;
+			self.dt_last_seen				          := (integer)fileDate;
+			self.corp_ra_dt_first_seen		    := (integer)fileDate;
+			self.corp_ra_dt_last_seen		      := (integer)fileDate;
+			self.corp_key					      			:= state_fips + '-' + corp2.t2u(input.PSID);
+			self.corp_vendor					  			:= state_fips;
+		  self.corp_state_origin            := state_origin;
+			self.corp_inc_state               := state_origin;
+			self.corp_process_date				  	:= fileDate; 
+    	self.corp_orig_sos_charter_nbr    := corp2.t2u(input.PSID);
+			self.corp_ln_name_type_cd         := '04';
+			self.corp_ln_name_type_desc       := 'TRADENAME';
+		  self.corp_legal_name              := Corp2_mapping.fCleanBusinessName(state_origin,state_desc,input.TN_NNAM).BusinessName;
+			self.corp_status_cd               := corp2.t2u(input.PCLST);
+      self.corp_status_desc             := Corp2_Raw_ND.Functions.GetStatusDesc(input.PCLST,'TN');
+			self.corp_status_date             := Corp2_Mapping.fValidateDate(input.PCSD8,'CCYYMMDD').PastDate;			
+			self.corp_filing_date             := Corp2_Mapping.fValidateDate(input.POLD8,'CCYYMMDD').PastDate;
+			self.corp_filing_cd               := if (self.corp_filing_date <> '' ,'X' ,'');
+			self.corp_filing_desc             := if (self.corp_filing_date <> '' ,'ORIGINAL LICENSE DATE' ,'');	
+			self.corp_last_renewal_date       := Corp2_Mapping.fValidateDate(input.PLRD8,'CCYYMMDD').PastDate;	
+			self.corp_addl_info               := if (Corp2_Mapping.fValidateDate(input.PLAD8,'CCYYMMDD').PastDate <> ''
+																							 ,'LAST AMENDED DATE: ' + Corp2_Mapping.fValidateDate(input.PLAD8,'CCYYMMDD').PastDate[5..6] + '/' + 
+																																				Corp2_Mapping.fValidateDate(input.PLAD8,'CCYYMMDD').PastDate[7..8] + '/' + 
+																																				Corp2_Mapping.fValidateDate(input.PLAD8,'CCYYMMDD').PastDate[1..4] ,'');	
+			self.corp_address1_type_cd        := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).ifAddressExists, 'B', '');			
+			self.corp_address1_type_desc      := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).ifAddressExists, 'BUSINESS', '');
+			self.corp_address1_line1					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).AddressLine1;
+			self.corp_address1_line2					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).AddressLine2;
+			self.corp_address1_line3					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).AddressLine3;			
+			self.corp_prep_addr1_line1				:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).PrepAddrLine1;			
+			self.corp_prep_addr1_last_line	  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).PrepAddrLastLine;
 		
-        end; // end transform.
+		  foreignTyp := ['F','FC','FLC','FPC','FPLC','FNP'];
+			self.corp_inc_date                := if (corp2.t2u(input.CBSOO) in [state_origin,''] and corp2.t2u(input.CBCTYP) not in foreignTyp
+																							,Corp2_Mapping.fValidateDate(input.CBODF,'CCYYMMDD').PastDate ,'');	
+			self.corp_forgn_date              := if (corp2.t2u(input.CBSOO) not in [state_origin,''] and corp2.t2u(input.CBCTYP) in foreignTyp
+																							,Corp2_Mapping.fValidateDate(input.CBODF,'CCYYMMDD').PastDate ,'');	
+			self.recordOrigin                 := 'C';																			
+			self                              := [];
+    end;  		
+		//---------- End CORP Mapping --------------------------------------------------------------//
 
-
-		    corp2_mapping.Layout_CorpPreClean nd_corp5Transform_Business(tradename_files input):=transform,skip(trim(input.PSID,left, right)='')
-     	    self.dt_first_seen					  :=fileDate;
-			self.dt_last_seen					  :=fileDate;
-			self.dt_vendor_first_reported		  :=fileDate;
-			self.dt_vendor_last_reported		  :=fileDate;
-			self.corp_ra_dt_first_seen			  :=fileDate;
-			self.corp_ra_dt_last_seen			  :=fileDate;
-			self.corp_key					      :='38-'+trim(input.PSID,left, right);
-			self.corp_vendor					  :='38';
-		    self.corp_state_origin                :='ND';
-			self.corp_process_date				  := fileDate; 
-			self.corp_src_type                    :='SOS';
-     	    self.corp_orig_sos_charter_nbr        :=trim(input.PSID, left, right);
-			self.corp_ln_name_type_cd             :=if(trim(input.TN_NNAM,left,right) <> '','04','');
-			self.corp_ln_name_type_desc           :=if(trim(input.TN_NNAM,left,right) <> '','TRADENAME','');
-		    self.corp_legal_name                  :=if(trim(input.TN_NNAM,left,right) <> '', trimUpper(input.TN_NNAM),'');
-			self.corp_status_cd                   :=if(trim(input.PCLST,left,right)<>'',trimUpper(input.PCLST),'');
-            self.corp_status_desc                 := map(trimUpper(input.PCLST)='A'=>'ACTIVE',
-                                                   trimUpper(input.PCLST)='E'=>'EXPIRED',
-                                                   trimUpper(input.PCLST)='I'=>'INACTIVE',
-                                                   trimUpper(input.PCLST)='V '=>'VOLUNTARILY TERMINATED','');
-												   
-		    self.corp_status_date                 :=if(trim(input.PCSD8,left,right) <> ''and (string)((integer)trim(input.PCSD8,left,right)) <> '0' and _validate.date.fIsValid(trim(input.PCSD8,left,right)) and 
-														_validate.date.fIsValid((trim(input.PCSD8,left,right)),_validate.date.rules.DateInPast),
-														trim(input.PCSD8,left,right),'');
-														
-			self.corp_filing_date                 :=if(trim(input.PLRD8 ,left,right) <> ''and (string)((integer)trim(input.PLRD8 ,left,right)) <> '0' and _validate.date.fIsValid(trim(input.PLRD8 ,left,right) ) and 
-														_validate.date.fIsValid((trim(input.PLRD8 ,left,right)),_validate.date.rules.DateInPast),trim(input.PLRD8 ,left,right),if(trim(input.POLD8 ,left,right) <> ''and (string)((integer)trim(input.POLD8 ,left,right)) <> '0' and 
-														_validate.date.fIsValid(trim(input.POLD8 ,left,right) ) and 
-														_validate.date.fIsValid((trim(input.POLD8 ,left,right) ),_validate.date.rules.DateInPast),
-														trim(input.POLD8 ,left,right),''));
-														
-			self.corp_filing_desc                  :=if(trim(input.POLD8 ,left,right) <> ''and (string)((integer)trim(input.POLD8 ,left,right)) <> '0' and _validate.date.fIsValid(input.POLD8 ) and 
-														_validate.date.fIsValid((input.POLD8 ),_validate.date.rules.DateInPast),
-														'RENEWAL','');	
-			self.corp_address1_type_cd            :=if(trim(input.OADD1,left,right) <> '' or trim(input.OADD2,left,right) <> '' or trim(input.OCITY,left,right) <> '' or trim(input.OZIP,left,right) <> ''or trim(input.OSTAT,left,right) <> '','M','');
-			self.corp_address1_type_desc          :=if(trim(input.OADD1,left,right) <> '' or trim(input.OADD2,left,right) <> '' or trim(input.OCITY,left,right) <> '' or trim(input.OZIP,left,right) <> ''or trim(input.OSTAT,left,right) <> '','MAILING','');
-			self.corp_address1_line1              :=if(trim(input.OADD1,left,right) <> '', trimUpper(input.OADD1),''); 
-			self.corp_address1_line2              :=if(trim(input.OADD2,left,right) <> '', trimUpper(input.OADD2),''); 
-			self.corp_address1_line3              :=if(not lib_stringlib.StringLib.StringFind(trimUpper(input.OCITY),'X',1) <>0 and trim(input.OCITY,left,right) <> '', trimUpper(input.OCITY),'');  
-			self.corp_address1_line4              :=if(trim(input.OSTAT,left,right) <> '', trimUpper(input.OSTAT),''); 
-			ZipCode2                              :=if((string)((integer)trim(input.OZIP[1..5],left,right)) <> '0' and trim(input.OZIP[1..5],left,right)<>''and trimUpper(input.OZIP[1..5])<>'X',trim(input.OZIP[1..5],left,right),'');
-			ZipExtension2                         :=if((string)((integer)trim(input.OZIP[6..10],left,right)) <> '0' and trim(input.OZIP[6..10],left,right)<>''and trimUpper(input.OZIP[6..10])<>'X',trim(input.OZIP[6..10],left,right),''); 
-			self.corp_address1_line5              :=ZipCode2+ZipExtension2;												
-            self                                  := [];
+    
+		//------- Begin CONTACTS Mapping ---------------------------------------------------------------------//	
 		
-        end; // end transform.		
+		// Normalize on the 32 sets of Partnership contact name and address data 	
+
+		Corp2_Raw_ND.Layouts.normContLayout normContTrf(Corp2_Raw_ND.Layouts.PartnershipLayoutIN l, unsigned1 cnt) := transform
+			,skip((cnt= 1 and corp2.t2u(l.P01Name) = '') or	(cnt= 2 and corp2.t2u(l.P02Name) = '') or
+						(cnt= 3 and corp2.t2u(l.P03Name) = '') or	(cnt= 4 and corp2.t2u(l.P04Name) = '') or
+						(cnt= 5 and corp2.t2u(l.P05Name) = '') or	(cnt= 6 and corp2.t2u(l.P06Name) = '') or
+						(cnt= 7 and corp2.t2u(l.P07Name) = '') or	(cnt= 8 and corp2.t2u(l.P08Name) = '') or
+						(cnt= 9 and corp2.t2u(l.P09Name) = '') or	(cnt=10 and corp2.t2u(l.P10Name) = '') or
+						(cnt=11 and corp2.t2u(l.P11Name) = '') or	(cnt=12 and corp2.t2u(l.P12Name) = '') or
+						(cnt=13 and corp2.t2u(l.P13Name) = '') or	(cnt=14 and corp2.t2u(l.P14Name) = '') or
+						(cnt=15 and corp2.t2u(l.P15Name) = '') or	(cnt=16 and corp2.t2u(l.P16Name) = '') or
+						(cnt=17 and corp2.t2u(l.P17Name) = '') or	(cnt=18 and corp2.t2u(l.P18Name) = '') or
+						(cnt=19 and corp2.t2u(l.P19Name) = '') or	(cnt=20 and corp2.t2u(l.P20Name) = '') or
+						(cnt=21 and corp2.t2u(l.P21Name) = '') or	(cnt=22 and corp2.t2u(l.P22Name) = '') or
+						(cnt=23 and corp2.t2u(l.P23Name) = '') or	(cnt=24 and corp2.t2u(l.P24Name) = '') or
+						(cnt=25 and corp2.t2u(l.P25Name) = '') or	(cnt=26 and corp2.t2u(l.P26Name) = '') or
+						(cnt=27 and corp2.t2u(l.P27Name) = '') or	(cnt=28 and corp2.t2u(l.P28Name) = '') or
+						(cnt=29 and corp2.t2u(l.P29Name) = '') or	(cnt=30 and corp2.t2u(l.P30Name) = '') or
+						(cnt=31 and corp2.t2u(l.P31Name) = '') or	(cnt=32 and corp2.t2u(l.P32Name) = ''))
+			self.norm_Name := choose(cnt, corp2.t2u(l.P01Name), corp2.t2u(l.P02Name), corp2.t2u(l.P03Name), corp2.t2u(l.P04Name), corp2.t2u(l.P05Name), corp2.t2u(l.P06Name), corp2.t2u(l.P07Name), corp2.t2u(l.P08Name),
+			                              corp2.t2u(l.P09Name), corp2.t2u(l.P10Name), corp2.t2u(l.P11Name), corp2.t2u(l.P12Name), corp2.t2u(l.P13Name), corp2.t2u(l.P14Name), corp2.t2u(l.P15Name), corp2.t2u(l.P16Name),
+																		corp2.t2u(l.P17Name), corp2.t2u(l.P18Name), corp2.t2u(l.P19Name), corp2.t2u(l.P20Name), corp2.t2u(l.P21Name), corp2.t2u(l.P22Name), corp2.t2u(l.P23Name), corp2.t2u(l.P24Name),
+																		corp2.t2u(l.P25Name), corp2.t2u(l.P26Name), corp2.t2u(l.P27Name), corp2.t2u(l.P28Name), corp2.t2u(l.P29Name), corp2.t2u(l.P30Name), corp2.t2u(l.P31Name), corp2.t2u(l.P32Name));
+			self.norm_Add1 := choose(cnt, corp2.t2u(l.P01Add1), corp2.t2u(l.P02Add1), corp2.t2u(l.P03Add1), corp2.t2u(l.P04Add1), corp2.t2u(l.P05Add1), corp2.t2u(l.P06Add1), corp2.t2u(l.P07Add1), corp2.t2u(l.P08Add1),
+			                              corp2.t2u(l.P09Add1), corp2.t2u(l.P10Add1), corp2.t2u(l.P11Add1), corp2.t2u(l.P12Add1), corp2.t2u(l.P13Add1), corp2.t2u(l.P14Add1), corp2.t2u(l.P15Add1), corp2.t2u(l.P16Add1),
+																		corp2.t2u(l.P17Add1), corp2.t2u(l.P18Add1), corp2.t2u(l.P19Add1), corp2.t2u(l.P20Add1), corp2.t2u(l.P21Add1), corp2.t2u(l.P22Add1), corp2.t2u(l.P23Add1), corp2.t2u(l.P24Add1),
+																		corp2.t2u(l.P25Add1), corp2.t2u(l.P26Add1), corp2.t2u(l.P27Add1), corp2.t2u(l.P28Add1), corp2.t2u(l.P29Add1), corp2.t2u(l.P30Add1), corp2.t2u(l.P31Add1), corp2.t2u(l.P32Add1)); 
+			self.norm_Add2 := choose(cnt, corp2.t2u(l.P01Add2), corp2.t2u(l.P02Add2), corp2.t2u(l.P03Add2), corp2.t2u(l.P04Add2), corp2.t2u(l.P05Add2), corp2.t2u(l.P06Add2), corp2.t2u(l.P07Add2), corp2.t2u(l.P08Add2),
+			                              corp2.t2u(l.P09Add2), corp2.t2u(l.P10Add2), corp2.t2u(l.P11Add2), corp2.t2u(l.P12Add2), corp2.t2u(l.P13Add2), corp2.t2u(l.P14Add2), corp2.t2u(l.P15Add2), corp2.t2u(l.P16Add2),
+																		corp2.t2u(l.P17Add2), corp2.t2u(l.P18Add2), corp2.t2u(l.P19Add2), corp2.t2u(l.P20Add2), corp2.t2u(l.P21Add2), corp2.t2u(l.P22Add2), corp2.t2u(l.P23Add2), corp2.t2u(l.P24Add2),
+																		corp2.t2u(l.P25Add2), corp2.t2u(l.P26Add2), corp2.t2u(l.P27Add2), corp2.t2u(l.P28Add2), corp2.t2u(l.P29Add2), corp2.t2u(l.P30Add2), corp2.t2u(l.P31Add2), corp2.t2u(l.P32Add2)); 	
+			self.norm_City := choose(cnt, corp2.t2u(l.P01City), corp2.t2u(l.P02City), corp2.t2u(l.P03City), corp2.t2u(l.P04City), corp2.t2u(l.P05City), corp2.t2u(l.P06City), corp2.t2u(l.P07City), corp2.t2u(l.P08City),
+			                              corp2.t2u(l.P09City), corp2.t2u(l.P10City), corp2.t2u(l.P11City), corp2.t2u(l.P12City), corp2.t2u(l.P13City), corp2.t2u(l.P14City), corp2.t2u(l.P15City), corp2.t2u(l.P16City),
+																		corp2.t2u(l.P17City), corp2.t2u(l.P18City), corp2.t2u(l.P19City), corp2.t2u(l.P20City), corp2.t2u(l.P21City), corp2.t2u(l.P22City), corp2.t2u(l.P23City), corp2.t2u(l.P24City),
+																		corp2.t2u(l.P25City), corp2.t2u(l.P26City), corp2.t2u(l.P27City), corp2.t2u(l.P28City), corp2.t2u(l.P29City), corp2.t2u(l.P30City), corp2.t2u(l.P31City), corp2.t2u(l.P32City)); 	
+			self.norm_Stat := choose(cnt, corp2.t2u(l.P01Stat), corp2.t2u(l.P02Stat), corp2.t2u(l.P03Stat), corp2.t2u(l.P04Stat), corp2.t2u(l.P05Stat), corp2.t2u(l.P06Stat), corp2.t2u(l.P07Stat), corp2.t2u(l.P08Stat),
+			                              corp2.t2u(l.P09Stat), corp2.t2u(l.P10Stat), corp2.t2u(l.P11Stat), corp2.t2u(l.P12Stat), corp2.t2u(l.P13Stat), corp2.t2u(l.P14Stat), corp2.t2u(l.P15Stat), corp2.t2u(l.P16Stat),
+																		corp2.t2u(l.P17Stat), corp2.t2u(l.P18Stat), corp2.t2u(l.P19Stat), corp2.t2u(l.P20Stat), corp2.t2u(l.P21Stat), corp2.t2u(l.P22Stat), corp2.t2u(l.P23Stat), corp2.t2u(l.P24Stat),
+																		corp2.t2u(l.P25Stat), corp2.t2u(l.P26Stat), corp2.t2u(l.P27Stat), corp2.t2u(l.P28Stat), corp2.t2u(l.P29Stat), corp2.t2u(l.P30Stat), corp2.t2u(l.P31Stat), corp2.t2u(l.P32Stat));
+			self.norm_Zip  := choose(cnt, corp2.t2u(l.P01Zip),  corp2.t2u(l.P02Zip),  corp2.t2u(l.P03Zip),  corp2.t2u(l.P04Zip),  corp2.t2u(l.P05Zip),  corp2.t2u(l.P06Zip),  corp2.t2u(l.P07Zip),  corp2.t2u(l.P08Zip),
+			                              corp2.t2u(l.P09Zip),  corp2.t2u(l.P10Zip),  corp2.t2u(l.P11Zip),  corp2.t2u(l.P12Zip),  corp2.t2u(l.P13Zip),  corp2.t2u(l.P14Zip),  corp2.t2u(l.P15Zip),  corp2.t2u(l.P16Zip),
+																		corp2.t2u(l.P17Zip),  corp2.t2u(l.P18Zip),  corp2.t2u(l.P19Zip),  corp2.t2u(l.P20Zip),  corp2.t2u(l.P21Zip),  corp2.t2u(l.P22Zip),  corp2.t2u(l.P23Zip),  corp2.t2u(l.P24Zip),
+																		corp2.t2u(l.P25Zip),  corp2.t2u(l.P26Zip),  corp2.t2u(l.P27Zip),  corp2.t2u(l.P28Zip),  corp2.t2u(l.P29Zip),  corp2.t2u(l.P30Zip),  corp2.t2u(l.P31Zip),  corp2.t2u(l.P32Zip));
+		  self           := l;
+			self 					 := [];
+		end;
 		
-
-		 // Stock_TRANSFORM 
-	     Corp2.Layout_Corporate_Direct_Stock_In nd_stockTransform(corporation_names input):=transform,skip(trim(input.CBSID,left, right)='')
-			self.corp_key					      := '38-' +trim(input.CBSID, left, right);
-			self.corp_vendor				      := '38';
-			self.corp_state_origin			      := 'ND';
-			self.corp_process_date			      := fileDate;
-			self.corp_sos_charter_nbr		      := trim(input.CBSID, left, right);
-			self.stock_type                       :=if(trim(input.CSHCLS,left,right) <> '', trimUpper(input.CSHCLS),'');
-			decimal20_6 stocksharesissued         :=if ((integer)trim(input.CSHNO,left, right)= 0 or trim(input.CSHNO, left, right) = '', 0, 
-                                                            (unsigned6)trim(input.CSHNO, left, right)/1000000);
-
-			self.stock_shares_issued              :=if((string) stocksharesissued='0','',(string) stocksharesissued)  ;
-					
-            decimal20_6 parvalue                  := if ((integer)trim(input.CSHPV,left, right)= 0 or trim(input.CSHPV, left, right) = '', 0, 
-                                                            (unsigned6)trim(input.CSHPV, left, right)/1000000);
-		   
-			self.stock_par_value                  :=if((string)parvalue='0','',(string)parvalue);
-			self.stock_addl_info                  :=if(trimUpper(input.CSHNP)='Y','NO PAR VALUE SHARES','');
-        	self                                  := [];
-			
-			
-		 end; // end of nd_Stock_transform 
+		normPartnership	:= normalize(dPartnership, 32, normContTrf(left, counter));	
 		
-		
-		 		 // Stock_TRANSFORM 
-	     Corp2.Layout_Corporate_Direct_Stock_In nd_stock1Transform(corporation_names input):=transform,skip(trim(input.CBSID,left, right)='')
-			self.corp_key					      := '38-' +trim(input.CBSID, left, right);
-			self.corp_vendor				      := '38';
-			self.corp_state_origin			      := 'ND';
-			self.corp_process_date			      := fileDate;
-			self.corp_sos_charter_nbr		      := trim(input.CBSID, left, right);
-			self.stock_type                       :=if(trim(input.CSHCLS01,left,right) <> '', trimUpper(input.CSHCLS01),'');
-			decimal20_6 stocksharesissued         :=if ((integer)trim(input.CSHNO01,left, right)= 0 or trim(input.CSHNO01, left, right) = '', 0, 
-                                                            (unsigned6)trim(input.CSHNO01, left, right)/1000000);
-
-			self.stock_shares_issued              :=if((string) stocksharesissued='0','',(string) stocksharesissued)  ;
-					
-            decimal20_6 parvalue                   := if ((integer)trim(input.CSHPV01,left, right)= 0 or trim(input.CSHPV01, left, right) = '', 0, 
-                                                            (unsigned6)trim(input.CSHPV01, left, right)/1000000);
-		   
-			self.stock_par_value                  :=if((string)parvalue='0','',(string)parvalue);
-			self.stock_addl_info                  :=if(trimUpper(input.CSHNP01)='Y','NO PAR VALUE SHARES','');
-        	self                                  := [];
-			
-			
-		 end; // end of nd_Stock_transform 
-
-				 		 // Stock_TRANSFORM 
-	     Corp2.Layout_Corporate_Direct_Stock_In nd_stock2Transform(corporation_names input):=transform,skip(trim(input.CBSID,left, right)='')
-			self.corp_key					      := '38-' +trim(input.CBSID, left, right);
-			self.corp_vendor				      := '38';
-			self.corp_state_origin			      := 'ND';
-			self.corp_process_date			      := fileDate;
-			self.corp_sos_charter_nbr		      := trim(input.CBSID, left, right);
-		    self.stock_type                       :=if(trim(input.CSHCLS02,left,right) <> '', trimUpper(input.CSHCLS02),'');
-			decimal20_6 stocksharesissued         :=if ((integer)trim(input.CSHNO02,left, right)= 0 or trim(input.CSHNO02, left, right) = '', 0, 
-                                                            (unsigned6)trim(input.CSHNO02, left, right)/1000000);
-
-			self.stock_shares_issued              :=if((string) stocksharesissued='0','',(string) stocksharesissued)  ;
-					
-            decimal20_6 parvalue                   := if ((integer)trim(input.CSHPV02,left, right)= 0 or trim(input.CSHPV02, left, right) = '', 0, 
-                                                            (unsigned6)trim(input.CSHPV02, left, right)/1000000);
-		   
-			self.stock_par_value                  :=if((string)parvalue='0','',(string)parvalue);
-			self.stock_addl_info                  :=if(trimUpper(input.CSHNP02)='Y','NO PAR VALUE SHARES','');
-        	self                                  := [];
-			
-			
-		 end; // end of nd_Stock_transform 
-		 
-		 
-		 		 		 // Stock_TRANSFORM 
-	     Corp2.Layout_Corporate_Direct_Stock_In nd_stock3Transform(corporation_names input):=transform,skip(trim(input.CBSID,left, right)='')
-			self.corp_key					      := '38-' +trim(input.CBSID, left, right);
-			self.corp_vendor				      := '38';
-			self.corp_state_origin			      := 'ND';
-			self.corp_process_date			      := fileDate;
-			self.corp_sos_charter_nbr		      := trim(input.CBSID, left, right);
-		    self.stock_type                       :=if(trim(input.CSHCLS03,left,right) <> '', trimUpper(input.CSHCLS03),'');
-			decimal20_6 stocksharesissued         :=if ((integer)trim(input.CSHNO03,left, right)= 0 or trim(input.CSHNO03, left, right) = '', 0, 
-                                                            (unsigned6)trim(input.CSHNO03, left, right)/1000000);
-
-			self.stock_shares_issued              :=if((string) stocksharesissued='0','',(string) stocksharesissued)  ;
-					
-            decimal20_6 parvalue                   := if ((integer)trim(input.CSHPV03,left, right)= 0 or trim(input.CSHPV03, left, right) = '', 0, 
-                                                            (unsigned6)trim(input.CSHPV03, left, right)/1000000);
-		   
-			self.stock_par_value                  :=if((string)parvalue='0','',(string)parvalue);
-			self.stock_addl_info                  :=if(trimUpper(input.CSHNP03)='Y','NO PAR VALUE SHARES','');
-        	self                                  := [];
-			
-			
-		 end; // end of nd_Stock_transform 
-		 
-		 
-		 		 		 // Stock_TRANSFORM 
-	     Corp2.Layout_Corporate_Direct_Stock_In nd_stock4Transform(corporation_names input):=transform,skip(trim(input.CBSID,left, right)='')
-			self.corp_key					      := '38-' +trim(input.CBSID, left, right);
-			self.corp_vendor				      := '38';
-			self.corp_state_origin			      := 'ND';
-			self.corp_process_date			      := fileDate;
-			self.corp_sos_charter_nbr		      := trim(input.CBSID, left, right);
-			self.stock_type                       :=if(trim(input.CSHCLS04,left,right) <> '', trimUpper(input.CSHCLS04),'');
-			decimal20_6 stocksharesissued         :=if ((integer)trim(input.CSHNO04,left, right)= 0 or trim(input.CSHNO04, left, right) = '', 0, 
-                                                            (unsigned6)trim(input.CSHNO04, left, right)/1000000);
-
-			self.stock_shares_issued              :=if((string) stocksharesissued='0','',(string) stocksharesissued)  ;
-					
-            decimal20_6 parvalue                   := if ((integer)trim(input.CSHPV04,left, right)= 0 or trim(input.CSHPV04, left, right) = '', 0, 
-                                                            (unsigned6)trim(input.CSHPV04, left, right)/1000000);
-		   
-			self.stock_par_value                  :=if((string)parvalue='0','',(string)parvalue);
-			self.stock_addl_info                  :=if(trimUpper(input.CSHNP04)='Y','NO PAR VALUE SHARES','');
-        	self                                  := [];
-			
-			
-		 end; // end of nd_Stock_transform 
-		 
-		 
-		 		 		 // Stock_TRANSFORM 
-	     Corp2.Layout_Corporate_Direct_Stock_In nd_stock5Transform(corporation_names input):=transform,skip(trim(input.CBSID,left, right)='')
-			self.corp_key					      := '38-' +trim(input.CBSID, left, right);
-			self.corp_vendor				      := '38';
-			self.corp_state_origin			      := 'ND';
-			self.corp_process_date			      := fileDate;
-			self.corp_sos_charter_nbr		      := trim(input.CBSID, left, right);
-		    self.stock_type                       :=if(trim(input.CSHCLS05,left,right) <> '', trimUpper(input.CSHCLS05),'');
-			decimal20_6 stocksharesissued         :=if ((integer)trim(input.CSHNO05,left, right)= 0 or trim(input.CSHNO05, left, right) = '',0 , 
-                                                            (unsigned6)trim(input.CSHNO05, left, right)/1000000);
-
-			self.stock_shares_issued              :=if((string) stocksharesissued='0','',(string) stocksharesissued)  ;
-					
-            decimal20_6 parvalue                   := if ((integer)trim(input.CSHPV05,left, right)= 0 or trim(input.CSHPV05, left, right) = '', 0, 
-                                                            (unsigned6)trim(input.CSHPV05, left, right)/1000000);
-		   
-			self.stock_par_value                  :=if((string)parvalue='0','',(string)parvalue);
-			self.stock_addl_info                  :=if(trimUpper(input.CSHNP05)='Y','NO PAR VALUE SHARES','');
-        	self                                  := [];
-			
-			
-		 end; // end of nd_Stock_transform 
-		 
-		 // contact_TRANSFORM
-		 corp2_mapping.Layout_ContPreClean nd_partnerContactTransform(layouts_Raw_Input.PARTNERSHIPSREC1 input):=transform
-     	    self.dt_first_seen					  :=fileDate;
-			self.dt_last_seen					  :=fileDate;
-			self.corp_key					      :='38-'+trim(input.PAID,left, right);
-			self.corp_vendor					  :='38';
-		    self.corp_state_origin                :='ND';
+		// Map Contacts from Partnership 	
+		Corp2_Mapping.LayoutsCommon.Main cont1Trf(Corp2_Raw_ND.Layouts.normContLayout input):=transform
+				,skip(Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,input.norm_Name).BusinessName = '')
+      self.dt_vendor_first_reported	  := (integer)fileDate;
+			self.dt_vendor_last_reported	  := (integer)fileDate;
+			self.dt_first_seen				      := (integer)fileDate;
+			self.dt_last_seen				        := (integer)fileDate;
+			self.corp_ra_dt_first_seen		  := (integer)fileDate;
+			self.corp_ra_dt_last_seen		    := (integer)fileDate;
+			self.corp_key					          := state_fips + '-' + corp2.t2u(input.PAID);
+			self.corp_vendor					      := state_fips;
+		  self.corp_state_origin          := state_origin;
+			self.corp_inc_state             := state_origin;
 			self.corp_process_date				  := fileDate;    
-     	    self.corp_orig_sos_charter_nbr        :=trim(input.PAID, left, right);
-			self.corp_legal_name                  :=if(trim(input.PANAME,left,right) <> '', trimUpper(input.PANAME),'');
-			self.cont_name                    	  :=if(trim(input.P01NAME,left,right) <> '', trimUpper(input.P01NAME),'');
-            self.cont_title1_desc             	  :='GENERAL/MANAGING PARTNER';
-			self.cont_address_type_cd         	  :=if(trim(input.PAADDR1,left,right) <> ''or trim(input.PAADDR2,left,right) <> '' or trim(input.PACITYR,left,right) <> '' or
-			                                        trim(input.PASTATR,left,right) <> '' or trim(input.PAZIPR,left,right) <> '','T','');
-			self.cont_address_type_desc       	  :=if(trim(input.PAADDR1,left,right) <> ''or trim(input.PAADDR2,left,right) <> '' or trim(input.PACITYR,left,right) <> '' or
-			                                        trim(input.PASTATR,left,right) <> '' or trim(input.PAZIPR,left,right) <> '','CONTACT','');
-			self.cont_address_line1           	  :=if(trim(input.PAADDR1,left,right) <> '', trimUpper(input.PAADDR1),''); 
-			self.cont_address_line2           	  :=if(trim(input.PAADDR2,left,right) <> '', trimUpper(input.PAADDR2),''); 
-			self.cont_address_line3           	  :=if(not lib_stringlib.StringLib.StringFind(trimUpper(input.PACITYR),'X',1) <>0 and trim(input.PACITYR,left,right) <> '', trimUpper(input.PACITYR),'');  
-			self.cont_address_line4           	  :=if(trim(input.PASTATR,left,right) <> '', trimUpper(input.PASTATR),''); 
-			ZipCode2                          	  :=if((string)((integer)trim(input.PAZIPR[1..5],left,right)) <> '0' and trim(input.PAZIPR[1..5],left,right)<>''and trimUpper(input.PAZIPR[1..5])<>'X',trim(input.PAZIPR[1..5],left,right),'');
-			ZipExtension2                     	  :=if((string)((integer)trim(input.PAZIPR[6..10],left,right)) <> '0' and trim(input.PAZIPR[6..10],left,right)<>''and trimUpper(input.PAZIPR[6..10])<>'X',trim(input.PAZIPR[6..10],left,right),''); 
-			self.cont_address_line5           	  :=ZipCode2+ZipExtension2;	
-            self                              	  := [];
-			
-		 end; // end of nd_contact_transform  	
-		
-		
-		 		 // contact_TRANSFORM
-		 corp2_mapping.Layout_ContPreClean nd_FictitiousContactTransform(ficticious_names input):=transform
-     	    self.dt_first_seen				  :=fileDate;
-			self.dt_last_seen				  :=fileDate;
-			self.corp_key					  :='38-'+trim(input.ESID,left, right);
-			self.corp_vendor				  :='38';
-		    self.corp_state_origin            :='ND';
-			self.corp_process_date			  := fileDate;    
-     	    self.corp_orig_sos_charter_nbr    :=trim(input.ESID, left, right);
-			self.corp_legal_name              :=if(trim(input.FICNNAM,left,right) <> '', trimUpper(input.FICNNAM),'');
-			self.cont_name                    :=if(trim(input.FICNNAM01,left,right) <> '', trimUpper(input.FICNNAM01),'');
-         	self.cont_type_cd         	      :=if(self.cont_name<>'','O','');
-			self.cont_type_desc       	      :=if(self.cont_name<>'','OWNER','');
-			self.cont_address_line1           :=if(trim(input.FICNADD1,left,right) <> '', trimUpper(input.FICNADD1),''); 
-			self.cont_address_line2           :=if(trim(input.FICNADD2,left,right) <> '', trimUpper(input.FICNADD2),''); 
-			self.cont_address_line3           :=if(not lib_stringlib.StringLib.StringFind(trimUpper(input.FICNCITY),'X',1) <>0 and trim(input.FICNCITY,left,right) <> '', trimUpper(input.FICNCITY),'');  
-			self.cont_address_line4           :=if(trim(input.FICNSTAT,left,right) <> '', trimUpper(input.FICNSTAT),''); 
-			ZipCode2                          :=if((string)((integer)trim(input.FICNZIP[1..5],left,right)) <> '0' and trim(input.FICNZIP[1..5],left,right)<>''and trimUpper(input.FICNZIP[1..5])<>'X',trim(input.FICNZIP[1..5],left,right),'');
-			ZipExtension2                     :=if((string)((integer)trim(input.FICNZIP[6..10],left,right)) <> '0' and trim(input.FICNZIP[6..10],left,right)<>''and trimUpper(input.FICNZIP[6..10])<>'X',trim(input.FICNZIP[6..10],left,right),''); 
-			self.cont_address_line5           :=ZipCode2+ZipExtension2;	
-            self                              := [];
+     	self.corp_orig_sos_charter_nbr  := corp2.t2u(input.PAID);
+			self.corp_legal_name            := Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,input.PANAME).BusinessName;
+			self.cont_full_name			        := Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,input.norm_Name).BusinessName;
+			self.cont_address_type_cd       := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.norm_Add1,input.norm_Add2,input.norm_City,input.norm_Stat,input.norm_Zip).ifAddressExists, 'M', '');			
+			self.cont_address_type_desc     := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.norm_Add1,input.norm_Add2,input.norm_City,input.norm_Stat,input.norm_Zip).ifAddressExists, 'MEMBER/MANAGER/PARTNER', '');
+			self.cont_address_line1					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.norm_Add1,input.norm_Add2,input.norm_City,input.norm_Stat,input.norm_Zip).AddressLine1;
+			self.cont_address_line2					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.norm_Add1,input.norm_Add2,input.norm_City,input.norm_Stat,input.norm_Zip).AddressLine2;
+			self.cont_address_line3					:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.norm_Add1,input.norm_Add2,input.norm_City,input.norm_Stat,input.norm_Zip).AddressLine3;			
+			self.cont_prep_addr_line1				:= Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.norm_Add1,input.norm_Add2,input.norm_City,input.norm_Stat,input.norm_Zip).PrepAddrLine1;			
+			self.cont_prep_addr_last_line	  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.norm_Add1,input.norm_Add2,input.norm_City,input.norm_Stat,input.norm_Zip).PrepAddrLastLine;
+			self.recordOrigin               := 'T';																			
+			self                            := [];
+	  end;  
+	
+		 // Map Contacts from FictNames 	
+		 Corp2_Mapping.LayoutsCommon.Main cont2Trf(Corp2_Raw_ND.Layouts.FictNameLayoutIn input):=transform
+					,skip(Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,corp2.t2u(StringLib.StringFindReplace(corp2.t2u(input.FICNNAM01),'SEE PHYSICAL FILE FOR ADDITIONAL PARTNERS',''))).BusinessName = '')
+      self.dt_vendor_first_reported	    := (integer)fileDate;
+			self.dt_vendor_last_reported	    := (integer)fileDate;
+			self.dt_first_seen				        := (integer)fileDate;
+			self.dt_last_seen				          := (integer)fileDate;
+			self.corp_ra_dt_first_seen		    := (integer)fileDate;
+			self.corp_ra_dt_last_seen		      := (integer)fileDate;
+			self.corp_key					            := state_fips + '-' + corp2.t2u(input.ESID);
+			self.corp_vendor					        := state_fips;
+		  self.corp_state_origin            := state_origin;
+			self.corp_inc_state               := state_origin;
+			self.corp_process_date				    := fileDate;    
+     	self.corp_orig_sos_charter_nbr    := corp2.t2u(input.ESID);
+			self.corp_legal_name              := Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,input.FICNNAM).BusinessName;
+			self.cont_full_name			          := Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,corp2.t2u(StringLib.StringFindReplace(corp2.t2u(input.FICNNAM01),'SEE PHYSICAL FILE FOR ADDITIONAL PARTNERS',''))).BusinessName;			
+			self.cont_type_cd         	      := if (self.cont_full_name <> '','O','');
+			self.cont_type_desc       	      := if (self.cont_full_name <> '','OWNER','');
+			self.cont_address_line1					  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.FICNADD1,input.FICNADD2,input.FICNCITY,input.FICNSTAT,input.FICNZIP).AddressLine1;
+			self.cont_address_line2					  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.FICNADD1,input.FICNADD2,input.FICNCITY,input.FICNSTAT,input.FICNZIP).AddressLine2;
+			self.cont_address_line3					  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.FICNADD1,input.FICNADD2,input.FICNCITY,input.FICNSTAT,input.FICNZIP).AddressLine3;			
+			self.cont_prep_addr_line1				  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.FICNADD1,input.FICNADD2,input.FICNCITY,input.FICNSTAT,input.FICNZIP).PrepAddrLine1;			
+			self.cont_prep_addr_last_line	    := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.FICNADD1,input.FICNADD2,input.FICNCITY,input.FICNSTAT,input.FICNZIP).PrepAddrLastLine;
+			self.recordOrigin                 := 'T';	
+			self                              := [];
+		 end;  
 
-			
-		 end; // end of nd_contact_transform  
-		 
-		 	 
-
-		 
-	corp2_mapping.Layout_ContPreClean nd_TradMark_ContactTransform(trademark_names  input):=transform
-     	    self.dt_first_seen					  :=fileDate;
-			self.dt_last_seen					  :=fileDate;
-			self.corp_key					      :='38-'+trim(input.RSID,left, right);
-			self.corp_vendor					  :='38';
-		    self.corp_state_origin                :='ND';
-			self.corp_process_date				  :=fileDate;    
-     	    self.corp_orig_sos_charter_nbr        :=trim(input.RSID, left, right);
-			self.corp_legal_name                  :=if(trim(input.TM_NNAM,left,right) <> '', trimUpper(input.TM_NNAM),'');
-			self.cont_name                    	  :=if(input.NNAM01<> '', trimUpper(input.NNAM01),'');
-			self.cont_type_cd         	          :=if(self.cont_name<>'','O','');
-			self.cont_type_desc       	          :=if(self.cont_name<>'','OWNER','');
-			self.cont_address_line1              :=if(input.OADD1<> '', trimUpper(input.OADD1),''); 
-   			self.cont_address_line2              :=if(input.OADD2 <> '', trimUpper(input.OADD2),''); 
-   			self.cont_address_line3              :=if(not lib_stringlib.StringLib.StringFind(trimUpper(input.OCITY),'X',1) <>0 and trim(input.OCITY,left,right) <> '', trimUpper(input.OCITY),'');  
-   			self.cont_address_line4              :=if(input.OSTAT<> '', trimUpper(input.OSTAT),''); 
-   			ZipCode2                              :=if((string)((integer)trim(input.OZIP[1..5],left,right)) <> '0' and trim(input.OZIP[1..5],left,right)<>''and trimUpper(input.OZIP[1..5])<>'X',trim(input.OZIP[1..5],left,right),'');
-   			ZipExtension2                         :=if((string)((integer)trim(input.OZIP[6..10],left,right)) <> '0' and trim(input.OZIP[6..10],left,right)<>''and trimUpper(input.OZIP[6..10])<>'X',trim(input.OZIP[6..10],left,right),''); 
-   			self.cont_address_line5              :=ZipCode2+ZipExtension2;
-			self.cont_address_type_cd         	  :=if(self.cont_address_line1<>'' or self.cont_address_line2<>'' or self.cont_address_line3<>'' or self.cont_address_line4<>'' or self.cont_address_line5<>'','T','');
-			self.cont_address_type_desc       	  :=if(self.cont_address_line1<>'' or self.cont_address_line2<>'' or self.cont_address_line3<>'' or self.cont_address_line4<>'' or self.cont_address_line5<>'','CONTACT','');
-            self                              	  := [];
-			
-		 end;
-		 
+	  // Map Contacts from Trademarks 		 
+	  Corp2_Mapping.LayoutsCommon.Main cont3Trf(Corp2_Raw_ND.Layouts.TradeMarkLayoutIn  input):=transform
+					,skip(Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,input.NNAM01).BusinessName = '')
+      self.dt_vendor_first_reported	    := (integer)fileDate;
+			self.dt_vendor_last_reported	    := (integer)fileDate;
+			self.dt_first_seen				        := (integer)fileDate;
+			self.dt_last_seen				          := (integer)fileDate;
+			self.corp_ra_dt_first_seen		    := (integer)fileDate;
+			self.corp_ra_dt_last_seen		      := (integer)fileDate;
+			self.corp_key					            := state_fips + '-' + corp2.t2u(input.RSID);
+			self.corp_vendor					        := state_fips;
+		  self.corp_state_origin            := state_origin;
+			self.corp_inc_state               := state_origin;
+			self.corp_process_date				    := fileDate;    
+     	self.corp_orig_sos_charter_nbr    := corp2.t2u(input.RSID);
+			self.corp_legal_name              := Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,input.TM_NNAM).BusinessName;
+			self.cont_full_name			          := Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,input.NNAM01).BusinessName;
+			self.cont_type_cd         	      := if (self.cont_full_name<>'','O','');
+			self.cont_type_desc       	      := if (self.cont_full_name<>'','OWNER','');
+			self.cont_address_line1					  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).AddressLine1;
+			self.cont_address_line2					  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).AddressLine2;
+			self.cont_address_line3					  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).AddressLine3;			
+			self.cont_prep_addr_line1				  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).PrepAddrLine1;			
+			self.cont_prep_addr_last_line	    := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).PrepAddrLastLine;
+			self.recordOrigin                 := 'T';																			
+			self                              := [];
+	  end;
  
+		// Map Contacts from Tradenames 	
+		Corp2_Mapping.LayoutsCommon.Main cont4Trf(Corp2_Raw_ND.Layouts.TradeNameLayoutIn  input):=transform
+					,skip(Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,input.NNAM01).BusinessName = '')
+      self.dt_vendor_first_reported	    := (integer)fileDate;
+			self.dt_vendor_last_reported	    := (integer)fileDate;
+			self.dt_first_seen				        := (integer)fileDate;
+			self.dt_last_seen				          := (integer)fileDate;
+			self.corp_ra_dt_first_seen		    := (integer)fileDate;
+			self.corp_ra_dt_last_seen		      := (integer)fileDate;
+			self.corp_key					            := state_fips + '-' + corp2.t2u(input.PSID);
+			self.corp_vendor					        := state_fips;
+		  self.corp_state_origin            := state_origin;
+			self.corp_inc_state               := state_origin;
+			self.corp_process_date				    := fileDate;    
+     	self.corp_orig_sos_charter_nbr    := corp2.t2u(input.PSID);
+			self.corp_legal_name              := Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,input.TN_NNAM).BusinessName;
+			self.cont_full_name			          := Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,input.NNAM01).BusinessName;
+			self.cont_type_cd         	      := if (self.cont_full_name<>'','O','');
+			self.cont_type_desc       	      := if (self.cont_full_name<>'','OWNER','');
+			self.cont_address_type_cd         := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).ifAddressExists,'T','');
+		  self.cont_address_type_desc       := if (Corp2_Mapping.fAddressExists(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).ifAddressExists,'CONTACT','');
+			self.cont_address_line1					  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).AddressLine1;
+			self.cont_address_line2					  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).AddressLine2;
+			self.cont_address_line3					  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).AddressLine3;			
+			self.cont_prep_addr_line1				  := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).PrepAddrLine1;			
+			self.cont_prep_addr_last_line	    := Corp2_Mapping.fCleanAddress(state_origin,state_desc,input.OADD1,input.OADD2,input.OCITY,input.OSTAT,input.OZIP).PrepAddrLastLine;
+			self.recordOrigin                 := 'T';																			
+			self                              := [];
+			
+		 end;	
+	  //---------- End CONTACTS Mapping --------------------------------------------------------------//
+		
+	 
+	  //---------- Begin STOCKS Mapping --------------------------------------------------------------//	 
 		 
-	corp2_mapping.Layout_ContPreClean nd_TradName_ContactTransform(tradename_files  input):=transform
-     	    self.dt_first_seen					  :=fileDate;
-			self.dt_last_seen					  :=fileDate;
-			self.corp_key					      :='38-'+trim(input.PSID,left, right);
-			self.corp_vendor					  :='38';
-		    self.corp_state_origin                :='ND';
-			self.corp_process_date				  :=fileDate;    
-     	    self.corp_orig_sos_charter_nbr        :=trim(input.PSID, left, right);
-			self.corp_legal_name                  :=if(trim(input.TN_NNAM,left,right) <> '', trimUpper(input.TN_NNAM),'');
-			self.cont_name                    	  :=if(input.NNAM01<> '', trimUpper(input.NNAM01),'');
-			self.cont_type_cd         	          :=if(self.cont_name<>'','O','');
-			self.cont_type_desc       	          :=if(self.cont_name<>'','OWNER','');
-			self.cont_address_line1               :=if(input.OADD1<> '', trimUpper(input.OADD1),''); 
-   			self.cont_address_line2               :=if(input.OADD2 <> '', trimUpper(input.OADD2),''); 
-   			self.cont_address_line3               :=if(not lib_stringlib.StringLib.StringFind(trimUpper(input.OCITY),'X',1) <>0 and trim(input.OCITY,left,right) <> '', trimUpper(input.OCITY),'');  
-   			self.cont_address_line4               :=if(input.OSTAT<> '', trimUpper(input.OSTAT),''); 
-   			ZipCode2                              :=if((string)((integer)trim(input.OZIP[1..5],left,right)) <> '0' and trim(input.OZIP[1..5],left,right)<>''and trimUpper(input.OZIP[1..5])<>'X',trim(input.OZIP[1..5],left,right),'');
-   			ZipExtension2                         :=if((string)((integer)trim(input.OZIP[6..10],left,right)) <> '0' and trim(input.OZIP[6..10],left,right)<>''and trimUpper(input.OZIP[6..10])<>'X',trim(input.OZIP[6..10],left,right),''); 
-   			self.cont_address_line5               :=ZipCode2+ZipExtension2;
-			self.cont_address_type_cd         	  :=if(self.cont_address_line1<>'' or self.cont_address_line2<>'' or self.cont_address_line3<>'' or self.cont_address_line4<>'' or self.cont_address_line5<>'','T','');
-			self.cont_address_type_desc       	  :=if(self.cont_address_line1<>'' or self.cont_address_line2<>'' or self.cont_address_line3<>'' or self.cont_address_line4<>'' or self.cont_address_line5<>'','CONTACT','');
-            self                              	  := [];
-			
-		 end;	 
-
-		//---------------------------- Clean corp Name and Addresses ---------------------//
-
-		
-		corp2.layout_corporate_direct_corp_in CleanCorpNameAddr(corp2_mapping.Layout_CorpPreClean input) := transform
-			string73 tempname 					:= if (input.corp_ra_name = '', '',Address.CleanPerson73(input.corp_ra_name));
-			pname 								:= Address.CleanNameFields(tempName);
-			cname 								:= DataLib.companyclean(input.corp_ra_name);
-			keepPerson 							:= corp2.Rewrite_Common.IsPerson(input.corp_ra_name);
-			keepBusiness 						:= ut.IsCompany(input.corp_ra_name);
-			
-			self.corp_ra_title1					:= if(keepPerson, pname.title, '');
-			self.corp_ra_fname1 				:= if(keepPerson, pname.fname, '');
-			self.corp_ra_mname1 				:= if(keepPerson, pname.mname, '');
-			self.corp_ra_lname1 				:= if(keepPerson, pname.lname, '');
-			self.corp_ra_name_suffix1 			:= if(keepPerson, pname.name_suffix,'');
-			self.corp_ra_score1 				:= if(keepPerson, pname.name_score, '');
-		
-			self.corp_ra_cname1 				:= if(keepBusiness, cname[1..70],'');
-			self.corp_ra_cname1_score 			:= if(keepBusiness, pname.name_score,'');	
+		// Normalize on the 6 sets of Stock data 	
 	
 
-			
-			string182 clean_address1 			:= Address.CleanAddress182(trim(trim(input.corp_address1_line1,left,right) + ' ' + 														                        
-												trim(input.corp_address1_line2,left,right),left,right),														                   
-												trim(trim(input.corp_address1_line3,left,right) + ', ' +
-												trim(input.corp_address1_line4,left,right) + ' ' +
-												trim(input.corp_address1_line5,left,right) +
-												trim(input.corp_address1_line6,left,right),left,right));
-
-			self.corp_addr1_prim_range    		:= clean_address1[1..10];
-			self.corp_addr1_predir 	      		:= clean_address1[11..12];
-			self.corp_addr1_prim_name 	  		:= clean_address1[13..40];
-			self.corp_addr1_addr_suffix   		:= clean_address1[41..44];
-			self.corp_addr1_postdir 	    	:= clean_address1[45..46];
-			self.corp_addr1_unit_desig 	  		:= clean_address1[47..56];
-			self.corp_addr1_sec_range 	  		:= clean_address1[57..64];
-			self.corp_addr1_p_city_name	  		:= clean_address1[65..89];
-			self.corp_addr1_v_city_name	  		:= clean_address1[90..114];
-			self.corp_addr1_state 				:= clean_address1[115..116];
-			self.corp_addr1_zip5 		    	:= clean_address1[117..121];
-			self.corp_addr1_zip4 		    	:= clean_address1[122..125];
-			self.corp_addr1_cart 		    	:= clean_address1[126..129];
-			self.corp_addr1_cr_sort_sz 	 		:= clean_address1[130];
-			self.corp_addr1_lot 		      	:= clean_address1[131..134];
-			self.corp_addr1_lot_order 	  		:= clean_address1[135];
-			self.corp_addr1_dpbc 		    	:= clean_address1[136..137];
-			self.corp_addr1_chk_digit 	  		:= clean_address1[138];
-			self.corp_addr1_rec_type		  	:= clean_address1[139..140];
-			self.corp_addr1_ace_fips_st	  		:= clean_address1[141..142];
-			self.corp_addr1_county 	  			:= clean_address1[143..145];
-			self.corp_addr1_geo_lat 	    	:= clean_address1[146..155];
-			self.corp_addr1_geo_long 	    	:= clean_address1[156..166];
-			self.corp_addr1_msa 		      	:= clean_address1[167..170];
-			self.corp_addr1_geo_blk				:= clean_address1[171..177];
-			self.corp_addr1_geo_match 	  		:= clean_address1[178];
-			self.corp_addr1_err_stat 	    	:= clean_address1[179..182];
-			
-			
-			
-			
-						
-			string182 clean_address 			:= Address.CleanAddress182(trim(trim(input.corp_ra_address_line1,left,right) + ' ' + 														                        
-												trim(input.corp_ra_address_line2,left,right),left,right),														                   
-												trim(trim(input.corp_ra_address_line3,left,right) + ', ' +
-												trim(input.corp_ra_address_line4,left,right) + ' ' +
-												trim(input.corp_ra_address_line5,left,right) +
-												trim(input.corp_ra_address_line6,left,right),left,right));
-
-			self.corp_ra_prim_range    			:= clean_address[1..10];
-			self.corp_ra_predir 	      		:= clean_address[11..12];
-			self.corp_ra_prim_name 	  			:= clean_address[13..40];
-			self.corp_ra_addr_suffix   			:= clean_address[41..44];
-			self.corp_ra_postdir 	    		:= clean_address[45..46];
-			self.corp_ra_unit_desig 	  		:= clean_address[47..56];
-			self.corp_ra_sec_range 	  			:= clean_address[57..64];
-			self.corp_ra_p_city_name	  		:= clean_address[65..89];
-			self.corp_ra_v_city_name	  		:= clean_address[90..114];
-			self.corp_ra_state 			      	:= clean_address[115..116];
-			self.corp_ra_zip5 		      		:= clean_address[117..121];
-			self.corp_ra_zip4 		      		:= clean_address[122..125];
-			self.corp_ra_cart 		      		:= clean_address[126..129];
-			self.corp_ra_cr_sort_sz 	 		:= clean_address[130];
-			self.corp_ra_lot 		      		:= clean_address[131..134];
-			self.corp_ra_lot_order 	  			:= clean_address[135];
-			self.corp_ra_dpbc 		      		:= clean_address[136..137];
-			self.corp_ra_chk_digit 	  			:= clean_address[138];
-			self.corp_ra_rec_type		  		:= clean_address[139..140];
-			self.corp_ra_ace_fips_st	  		:= clean_address[141..142];
-			self.corp_ra_county 	  			:= clean_address[143..145];
-			self.corp_ra_geo_lat 	    		:= clean_address[146..155];
-			self.corp_ra_geo_long 	    		:= clean_address[156..166];
-			self.corp_ra_msa 		      		:= clean_address[167..170];
-			self.corp_ra_geo_blk				:= clean_address[171..177];
-			self.corp_ra_geo_match 	  			:= clean_address[178];
-			self.corp_ra_err_stat 	    		:= clean_address[179..182];
-			
-			self								:= input;
-			self								:= [];
+		Corp2_Raw_ND.Layouts.normLayout normTrf(Corp2_Raw_ND.Layouts.CorpLayoutIN l, unsigned1 cnt) := transform
+					,skip((cnt=1 and corp2.t2u(l.cshcls)   in ['','0'] and corp2.t2u(l.cshno)   in ['','0'] and
+			                     corp2.t2u(l.cshpv)    in ['','0'] and corp2.t2u(l.cshnp)   in ['','0'])       
+						 or (cnt=2 and corp2.t2u(l.cshcls01) in ['','0'] and corp2.t2u(l.cshno01) in ['','0'] and
+			                     corp2.t2u(l.cshpv01)  in ['','0'] and corp2.t2u(l.cshnp01) in ['','0'])      
+						 or (cnt=3 and corp2.t2u(l.cshcls02) in ['','0'] and corp2.t2u(l.cshno02) in ['','0'] and
+			                     corp2.t2u(l.cshpv02)  in ['','0'] and corp2.t2u(l.cshnp02) in ['','0'])      
+						 or (cnt=4 and corp2.t2u(l.cshcls03) in ['','0'] and corp2.t2u(l.cshno03) in ['','0'] and
+			                     corp2.t2u(l.cshpv03)  in ['','0'] and corp2.t2u(l.cshnp03) in ['','0'])      
+						 or (cnt=5 and corp2.t2u(l.cshcls04) in ['','0'] and corp2.t2u(l.cshno04) in ['','0'] and
+			                     corp2.t2u(l.cshpv04)  in ['','0'] and corp2.t2u(l.cshnp04) in ['','0'])      
+						 or (cnt=6 and corp2.t2u(l.cshcls05) in ['','0'] and corp2.t2u(l.cshno05) in ['','0'] and
+			                     corp2.t2u(l.cshpv05)  in ['','0'] and corp2.t2u(l.cshnp05) in ['','0']))
+			self.norm_class	    := choose(cnt, corp2.t2u(l.cshcls), corp2.t2u(l.cshcls01), corp2.t2u(l.cshcls02), corp2.t2u(l.cshcls03), corp2.t2u(l.cshcls04), corp2.t2u(l.cshcls05));
+			self.norm_shares    := choose(cnt, corp2.t2u(l.cshno),  corp2.t2u(l.cshno01),  corp2.t2u(l.cshno02),  corp2.t2u(l.cshno03),  corp2.t2u(l.cshno04),  corp2.t2u(l.cshno05));	
+			self.norm_par_value := choose(cnt, corp2.t2u(l.cshpv),  corp2.t2u(l.cshpv01),  corp2.t2u(l.cshpv02),  corp2.t2u(l.cshpv03),  corp2.t2u(l.cshpv04),  corp2.t2u(l.cshpv05));
+			self.norm_non_par   := choose(cnt, corp2.t2u(l.cshnp),  corp2.t2u(l.cshnp01),  corp2.t2u(l.cshnp02),  corp2.t2u(l.cshnp03),  corp2.t2u(l.cshnp04),  corp2.t2u(l.cshnp05));
+			self 						   	:= l;
 		end;
 		
-		
-		     //*********************cleaned corp routine ends********
-			 
-			 
-			 
-			//******************Cont Cleaning starts.****************
-		Corp2.Layout_Corporate_Direct_Cont_In CleanContNameAddr(corp2_mapping.Layout_ContPreClean input) := transform
-			// cleaning name
-			string73 tempname 				:= if (input.cont_name = '', '',Address.CleanPersonFML73(input.cont_name));
-			pname 							:= Address.CleanNameFields(tempName);
-			cname 							:= DataLib.companyclean(input.cont_name);
-			keepPerson 						:= Corp2.Rewrite_Common.IsPerson(input.cont_name);
-			keepBusiness 					:= Corp2.Rewrite_Common.IsCompany(input.cont_name);
+		normStock	:= normalize(fCorporations, 6, normTrf(left, counter));
+	  keepStock := dedup(sort(normStock, record,local), record,local);		
+		 
+		// Map Stock from Corporations file normlized on the 6 sets of stock data
+	  Corp2_Mapping.LayoutsCommon.Stock stockTrf(Corp2_Raw_ND.Layouts.normLayout input):=transform
+							,skip(corp2.t2u(input.CBSID) = '')
+			self.corp_key					        := state_fips + '-' + corp2.t2u(input.CBSID);
+			self.corp_vendor				      := state_fips;
+			self.corp_state_origin			  := state_origin;
+			self.corp_process_date			  := fileDate;
+			self.corp_sos_charter_nbr		  := corp2.t2u(input.CBSID);
+			self.stock_class              := corp2.t2u(input.norm_class);
+									
+			decimal20_6 stocksharesissued := if ((integer)corp2.t2u(input.norm_shares)= 0 or corp2.t2u(input.norm_shares) = '' 
+																						,0 ,(unsigned6)corp2.t2u(input.norm_shares)/1000000);
+			self.stock_shares_issued      := if ((string) stocksharesissued = '0' 
+																						,'' ,corp2.t2u(StringLib.StringFindReplace((string)stocksharesissued,'*','')));
+			decimal20_6 parvalue          := if ((integer)corp2.t2u(input.norm_par_value)= 0 or corp2.t2u(input.norm_par_value) = '' 
+			                                  		,0 ,(unsigned6)corp2.t2u(input.norm_par_value)/1000000);
+     	self.stock_par_value          := if ((string)parvalue ='0' ,'' ,corp2.t2u(StringLib.StringFindReplace((string)parvalue,'*','')));
+			self.stock_non_par_value_flag := if (corp2.t2u(input.norm_non_par) in ['Y','N'] ,corp2.t2u(input.norm_non_par), '');
+			self.stock_addl_info          := if (corp2.t2u(input.norm_non_par) = 'Y' ,'NO PAR VALUE SHARES' ,''); // Retained from old mapper since stock_non_par_value_flag is a new field
+			self                          := [];
+		end;   
+		//---------- End STOCKS Mapping --------------------------------------------------------------//
 			
-			self.cont_title1				:= if(keepPerson, pname.title, '');
-			self.cont_fname1 				:= if(keepPerson, pname.fname, '');
-			self.cont_mname1 				:= if(keepPerson, pname.mname, '');
-			self.cont_lname1 				:= if(keepPerson, pname.lname, '');
-			self.cont_name_suffix1 			:= if(keepPerson, pname.name_suffix,'');
-			self.cont_score1 				:= if(keepPerson, pname.name_score, '');
-		
-			self.cont_cname1 				:= if(keepBusiness, cname[1..70],'');
-			self.cont_cname1_score 			:= if(keepBusiness, pname.name_score,'');	
-			
-			string182 clean_address 		:= Address.CleanAddress182(trim(trim(input.cont_address_line1,left,right) + ' ' + 														                        
-											trim(input.cont_address_line2,left,right),left,right),														                   
-											trim(trim(input.cont_address_line3,left,right) + ', ' +
-											trim(input.cont_address_line4,left,right) + ' ' +
-											trim(input.cont_address_line5,left,right) +
-											trim(input.cont_address_line6,left,right),left,right));
-
-			self.cont_prim_range    		:= clean_address[1..10];
-			self.cont_predir 	      		:= clean_address[11..12];
-			self.cont_prim_name 	  		:= clean_address[13..40];
-			self.cont_addr_suffix   		:= clean_address[41..44];
-			self.cont_postdir 	    		:= clean_address[45..46];
-			self.cont_unit_desig 	  		:= clean_address[47..56];
-			self.cont_sec_range 	  		:= clean_address[57..64];
-			self.cont_p_city_name	  		:= clean_address[65..89];
-			self.cont_v_city_name	  		:= clean_address[90..114];
-			self.cont_state 			    := clean_address[115..116];
-			self.cont_zip5 		      		:= clean_address[117..121];
-			self.cont_zip4 		      		:= clean_address[122..125];
-			self.cont_cart 		      		:= clean_address[126..129];
-			self.cont_cr_sort_sz 	 		:= clean_address[130];
-			self.cont_lot 		      		:= clean_address[131..134];
-			self.cont_lot_order 	  		:= clean_address[135];
-			self.cont_dpbc 		      		:= clean_address[136..137];
-			self.cont_chk_digit 	  		:= clean_address[138];
-			self.cont_rec_type		  		:= clean_address[139..140];
-			self.cont_ace_fips_st	  		:= clean_address[141..142];
-			self.cont_county 	  			:= clean_address[143..145];
-			self.cont_geo_lat 	    		:= clean_address[146..155];
-			self.cont_geo_long 	    		:= clean_address[156..166];
-			self.cont_msa 		      		:= clean_address[167..170];
-			self.cont_geo_blk				:= clean_address[171..177];
-			self.cont_geo_match 	  		:= clean_address[178];
-			self.cont_err_stat 	    		:= clean_address[179..182];
-			self							:= input;
-			self							:= [];
-		end;
-		//************************Cont cleaning ends************************************
-		
-
+		//---------- Begin EVENTS Mapping --------------------------------------------------------------//	 
 	
-							
-		MapCorp1   := project(corporation_names, nd_corp1Transform_Business(left)) ;
-		 MapCorp3  := project(Files_Raw_Input.PARTNERSHIPSREC1(fileDate) , nd_corp3Transform_Business(left)) ;
-		 
-
-		 
-		//*********************ExplosionTable lookupjoin**********						
-       
-       	corp2_mapping.Layout_CorpPreClean findState(corp2_mapping.Layout_CorpPreClean input, StateCountryLayout r ) := transform
-		    self.corp_forgn_state_cd    := r.code;
-			self.corp_forgn_state_desc  := r.desc;
-			self         			    := input;
-			self                        := [];
-		end; 
-		
-		// end transform
-		
-			
-		//StatusCode join
-		
-		joinStateType :=join(MapCorp1,StateCountryTable,
-									if(trim(left.corp_forgn_state_cd,left,right)<>'ND',trim(left.corp_forgn_state_cd,left,right),'') =  trim(right.code,left,right) ,
-									findState(left,right),
-									left outer, lookup
-								);
-								
-		corp2_mapping.Layout_CorpPreClean find_PartnerState(corp2_mapping.Layout_CorpPreClean input, StateCountryLayout r ) := transform
-		    self.corp_forgn_state_cd    := r.code;
-			self.corp_forgn_state_desc  := r.desc;
-			self         			    := input;
-			self                        := [];
-		end; 
-		
-		// end transform
-		
-			
-		//StatusCode join
-		
-		joinStateTypecode :=join(MapCorp3,StateCountryTable,
-									if(trim(left.corp_forgn_state_cd,left,right)<>'ND',trim(left.corp_forgn_state_cd,left,right),'') =  trim(right.code,left,right),
-									find_PartnerState(left,right),
-									left outer, lookup
-								);						
-		 
-		 MapCorp2   	 := project(ficticious_names , nd_corp2Transform_Business(left)) ;
-		
-		 MapCorp4   	 := project(trademark_names, nd_corp4Transform_Business(left)) ;
-		 
-		 MapCorp5   	 := project(tradename_files, nd_corp5Transform_Business(left)) ;
-		 AllCorp    	 :=joinStateType+MapCorp2+joinStateTypecode+MapCorp4+MapCorp5;
-		 MapCorp         := sort(AllCorp,corp_key);    
-		 cleanCorps      := project(MapCorp,CleanCorpNameAddr(left));			
-		
-		 
-		 MapCont1 		 := project(Files_Raw_Input.PARTNERSHIPSREC1(filedate), nd_partnerContactTransform(left));
-		 MapCont2 		 := project(ficticious_names, nd_FictitiousContactTransform(left));
-		 MapCont3 		 := project(trademark_names , nd_TradMark_ContactTransform(left));
-		 MapCont4		 := project(tradename_files , nd_TradName_ContactTransform(left));
-		 
-		 AllCont 		 := MapCont1+MapCont2+MapCont3+MapCont4;
-		 
-		 
-         cleanCont       := project(AllCont, CleanContNameAddr(left));      
-			    
-		  MapStock1 	 := project(corporation_names, nd_stockTransform(left));
-		  MapStock2 	 := project(corporation_names, nd_stock1Transform(left));
-		  MapStock3 	 := project(corporation_names, nd_stock2Transform(left));
-		  MapStock4		 := project(corporation_names, nd_stock3Transform(left));
-		  MapStock5		 := project(corporation_names, nd_stock4Transform(left));
-		  MapStock6		 := project(corporation_names, nd_stock5Transform(left));
+	  Corp2_Mapping.LayoutsCommon.Events event1Trf(Corp2_Raw_ND.Layouts.FictNameLayoutIn input) := transform
+			 ,skip(Corp2_Mapping.fValidateDate(input.ELRFD,'CCYYMMDD').PastDate = '' or
+			       corp2.t2u(input.ESID) = '')
+				 self.corp_key               := state_fips+'-'+corp2.t2u(input.ESID); 
+				 self.corp_vendor            := state_fips;
+				 self.corp_state_origin      := state_origin;
+				 self.corp_process_date      := fileDate;
+				 self.corp_sos_charter_nbr   := corp2.t2u(input.ESID);
+				 self.event_filing_date      := Corp2_Mapping.fValidateDate(input.ELRFD,'CCYYMMDD').PastDate;
+				 self.event_date_type_cd     := 'REN';																				 
+				 self.event_date_type_desc   := 'RENEWAL';
+				 self                        := [];
+			end; 
 	
-		 AllStock 		 :=  MapStock1+MapStock2+ MapStock3+ MapStock4+ MapStock5+ MapStock6;
-		 
+		MapEvent1 := project(fFictNames, event1Trf(left));
+				
+	  Corp2_Mapping.LayoutsCommon.Events event2Trf(Corp2_Raw_ND.Layouts.TradeNameLayoutIn input) := transform
+			 ,skip(Corp2_Mapping.fValidateDate(input.PLRD8,'CCYYMMDD').PastDate = '' or
+			       corp2.t2u(input.PSID) = '')
+				 self.corp_key               := state_fips+'-'+corp2.t2u(input.PSID); 
+				 self.corp_vendor            := state_fips;
+				 self.corp_state_origin      := state_origin;
+				 self.corp_process_date      := fileDate;
+				 self.corp_sos_charter_nbr   := corp2.t2u(input.PSID);
+				 self.event_filing_date      := Corp2_Mapping.fValidateDate(input.PLRD8,'CCYYMMDD').PastDate;
+				 self.event_date_type_cd     := 'REN';																				 
+				 self.event_date_type_desc   := 'RENEWAL';
+				 self                        := [];
+			end; 
+	
+	 MapEvent2 := project(fTradenames, event2Trf(left));
+	 
+	 Corp2_Mapping.LayoutsCommon.Events event3Trf(Corp2_Raw_ND.Layouts.TradeMarkLayoutIn input) := transform
+			 ,skip(Corp2_Mapping.fValidateDate(input.RLRFD,'CCYYMMDD').PastDate = '' or
+			       corp2.t2u(input.RSID) = '')
+				 self.corp_key               := state_fips+'-'+corp2.t2u(input.RSID); 
+				 self.corp_vendor            := state_fips;
+				 self.corp_state_origin      := state_origin;
+				 self.corp_process_date      := fileDate;
+				 self.corp_sos_charter_nbr   := corp2.t2u(input.RSID);
+				 self.event_filing_date      := Corp2_Mapping.fValidateDate(input.RLRFD,'CCYYMMDD').PastDate;
+				 self.event_date_type_cd     := 'REN';																				 
+				 self.event_date_type_desc   := 'RENEWAL';
+				 self                        := [];
+			end; 
+	
+	 MapEvent3 := project(fTrademarks, event3Trf(left));
+	 //---------- End EVENTS Mapping --------------------------------------------------------------//
+
+		MapCorp1  := project(fCorporations, corp1Trf(left)) ;
+		MapCorp2  := project(jFictNames,    corp2Trf(left)) ;
+		MapCorp3  := project(dPartnership,  corp3Trf(left)) ;
+		MapCorp4  := project(jTrademarks,   corp4Trf(left)) ;
+		MapCorp5  := project(jTradenames,   corp5Trf(left)) ;
+		MapCorp   := MapCorp1 + MapCorp2 + Mapcorp3 + MapCorp4 + MapCorp5;
 		
-	VersionControl.macBuildNewLogicalFile('~thor_data400::in::corp2::'+version+'::corp_nd'	,dedup(sort(cleanCorps,record),record)	,corp_out	,,,pOverwrite);		
-	VersionControl.macBuildNewLogicalFile('~thor_data400::in::corp2::'+version+'::cont_nd'	,dedup(sort(cleanCont,record),record)	,cont_out	,,,pOverwrite);
-	VersionControl.macBuildNewLogicalFile('~thor_data400::in::corp2::'+version+'::stock_nd'	,dedup(sort(AllStock,record),record) 	,stock_out,,,pOverwrite);
-                                                                                                                                                          
-		 mappednd_Filing := parallel(
-			 corp_out	                            
-			,cont_out
-			,stock_out
-		);		 
+		MapCont1 	:= project(normPartnership, cont1Trf(left));
+	  MapCont2 	:= project(fFictNames,      cont2Trf(left));
+		MapCont3 	:= project(fTrademarks,     cont3Trf(left));
+		MapCont4	:= project(fTradenames,     cont4Trf(left));
+		MapCont 	:= MapCont1 + MapCont2 + MapCont3 + MapCont4;
+    
+		
+		//-----------------------------------------------------------//
+		// Build the Final Mapped Files
+		//-----------------------------------------------------------//
+		MapMain  := dedup(sort(distribute(MapCorp + MapCont,hash(corp_key)), record,local), record,local) : independent;	
+		MapStock := dedup(sort(distribute(project(keepStock, stockTrf(left)),hash(corp_key)), record,local), record,local) : independent;
+	  MapEvent := dedup(sort(distribute(MapEvent1 + MapEvent2 + MapEvent3,hash(corp_key)), record,local), record,local) : independent;	
 
-		result := 
-		sequential(
-			 if(pshouldspray = true,fSprayFiles('nd',filedate,pOverwrite := pOverwrite))
-			,mappednd_Filing
- 			,parallel(
-   				 fileservices.addsuperfile('~thor_data400::in::corp2::sprayed::corp'	,'~thor_data400::in::corp2::'+version+'::corp_nd')		  
-   				,fileservices.addsuperfile('~thor_data400::in::corp2::sprayed::cont'	,'~thor_data400::in::corp2::'+version+'::cont_nd')						  
-   				,fileservices.addsuperfile('~thor_data400::in::corp2::sprayed::stock'	,'~thor_data400::in::corp2::'+version+'::stock_nd')
-   			)
+ //--------------------------------------------------------------------	
+  // Scrubs for MAIN
+  //--------------------------------------------------------------------
+		Main_F := MapMain;
+		Main_S := Scrubs_Corp2_Mapping_ND_Main.Scrubs;        // ND scrubs module
+		Main_N := Main_S.FromNone(Main_F); 										// Generate the error flags
+		Main_T := Main_S.FromBits(Main_N.BitmapInfile);     	// Use the FromBits module; makes my bitmap datafile easier to get to
+		Main_U := Main_S.FromExpanded(Main_N.ExpandedInFile); // Pass the expanded error flags into the Expanded module
 
-		);
-				  
-  return result;
-   end;//Function end					 
+	//Outputs reports
+		Main_ErrorSummary					:= output(Main_U.SummaryStats, named('Main_ErrorSummary_ND'+filedate));
+		Main_ScrubErrorReport 		:= output(choosen(Main_U.AllErrors, 1000), named('Main_ScrubErrorReport_ND'+filedate));
+		Main_SomeErrorValues			:= output(choosen(Main_U.BadValues, 1000), named('Main_SomeErrorValues_ND'+filedate));
+		Main_IsScrubErrors		 		:= IF(count(Main_U.AllErrors)<> 0,true,false);
 
-   
- end;  // end of nd module	
+		// Orbit Stats
+		Main_OrbitStats						:= Main_U.OrbitStats();
+		
+		//Outputs files
+		Main_CreateBitMaps				:= output(Main_N.BitmapInfile,,'~thor_data::corp_ND_main_scrubs_bits',overwrite,compressed);	//long term storage
+		Main_TranslateBitMap			:= output(Main_T);
+		
+    //Submits Profile's stats to Orbit
+    Main_SubmitStats          := Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_ND_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_ND_Main').SubmitStats;
+		
+		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_ND_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp_ND_Main').CompareToProfile_with_Examples;
+		
+		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
+		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
+		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
+																																	 ,'Scrubs CorpMain_ND Report' //subject
+																																	 ,'Scrubs CorpMain_ND Report' //body
+																																	 ,(data)Main_ScrubsAttachment
+																																	 ,'text/csv'
+																																	 ,'CorpNDMainScrubsReport.csv'
+																																	 ,
+																																	 ,
+																																	 ,corp2.Email_Notification_Lists.spray
+																																 );		
+																																 																													
+		Main_BadRecords := Main_T.ExpandedInFile(	dt_vendor_first_reported_invalid 	  <> 0 or
+																							dt_vendor_last_reported_invalid 	  <> 0 or
+																							dt_first_seen_invalid 			        <> 0 or
+																							dt_last_seen_invalid 			          <> 0 or
+																							corp_ra_dt_first_seen_invalid 		  <> 0 or
+																							corp_ra_dt_last_seen_invalid 			  <> 0 or
+																							corp_trademark_renewal_date_invalid <> 0 or
+																							corp_trademark_filing_date_invalid  <> 0 or
+																							corp_last_renewal_date_invalid      <> 0 or
+																							corp_key_invalid 			              <> 0 or
+																							corp_vendor_invalid 			          <> 0 or
+																							corp_state_origin_invalid 			    <> 0 or
+																							corp_process_date_invalid 			    <> 0 or
+																							corp_orig_sos_charter_nbr_invalid   <> 0 or
+																							corp_legal_name_invalid 			      <> 0 or
+																							corp_filing_date_invalid            <> 0 or
+																							corp_status_cd_invalid 						  <> 0 or
+																							corp_status_date_invalid            <> 0 or
+																							corp_inc_state_invalid 			        <> 0 or
+																							corp_inc_date_invalid               <> 0 or
+																							corp_foreign_domestic_ind_invalid   <> 0 or
+																							corp_forgn_date_invalid             <> 0 or
+																							corp_orig_org_structure_cd_invalid  <> 0 or
+																							corp_for_profit_ind_invalid 			  <> 0 or
+																							corp_ln_name_type_cd_invalid        <> 0 or
+																							corp_forgn_state_desc_invalid       <> 0 or
+																							corp_ln_name_type_desc_invalid      <> 0 );
+
+
+		Main_GoodRecords	:= Main_T.ExpandedInFile( dt_vendor_first_reported_invalid 	  = 0 and
+																								dt_vendor_last_reported_invalid 	  = 0 and
+																								dt_first_seen_invalid 			        = 0 and
+																								dt_last_seen_invalid 			          = 0 and
+																								corp_ra_dt_first_seen_invalid 		  = 0 and
+																								corp_ra_dt_last_seen_invalid 			  = 0 and
+																								corp_trademark_renewal_date_invalid = 0 and
+																								corp_trademark_filing_date_invalid  = 0 and
+																								corp_last_renewal_date_invalid      = 0 and
+																								corp_key_invalid 			              = 0 and
+																								corp_vendor_invalid 			          = 0 and
+																								corp_state_origin_invalid 			    = 0 and
+																								corp_process_date_invalid 			    = 0 and
+																								corp_orig_sos_charter_nbr_invalid   = 0 and
+																								corp_legal_name_invalid 			      = 0 and
+																								corp_filing_date_invalid            = 0 and
+																								corp_status_cd_invalid 						  = 0 and
+																								corp_status_date_invalid            = 0 and
+																								corp_inc_state_invalid 			        = 0 and
+																								corp_inc_date_invalid               = 0 and
+																								corp_foreign_domestic_ind_invalid   = 0 and
+																								corp_forgn_date_invalid             = 0 and
+																								corp_orig_org_structure_cd_invalid  = 0 and
+																								corp_for_profit_ind_invalid 			  = 0 and
+																								corp_ln_name_type_cd_invalid        = 0 and
+																								corp_forgn_state_desc_invalid       = 0 and
+																								corp_ln_name_type_desc_invalid      = 0 );																														 																	
+																																																																						
+		Main_FailBuild	:= map(corp2_mapping.fCalcPercent(count(Main_N.ExpandedInFile(corp_orig_sos_charter_nbr_invalid<>0)),count(Main_N.ExpandedInFile),false) > Scrubs_Corp2_Mapping_ND_Main.Threshold_Percent.CORP_ORIG_SOS_CHARTER_NBR => true,
+													 corp2_mapping.fCalcPercent(count(Main_N.ExpandedInFile(corp_legal_name_invalid<>0)),					 count(Main_N.ExpandedInFile),false) > Scrubs_Corp2_Mapping_ND_Main.Threshold_Percent.CORP_LEGAL_NAME 					=> true,
+													 corp2_mapping.fCalcPercent(count(Main_N.ExpandedInFile(corp_key_invalid<>0)),						     count(Main_N.ExpandedInFile),false) > Scrubs_Corp2_Mapping_ND_Main.Threshold_Percent.CORP_KEY 					 	      => true,
+													 count(Main_GoodRecords) = 0																																																																																				          => true,
+													 false );
+
+		Main_ApprovedRecords := project(Main_GoodRecords,transform(Corp2_Mapping.LayoutsCommon.Main,self := left));
+			
+		Main_ALL		 						:= sequential( IF(count(Main_BadRecords) <> 0
+																										,IF (poverwrite
+																												,OUTPUT(Main_BadRecords,,Corp2_Mapping._Dataset().thor_cluster_Files + 'out::corp2::'+version+'::rejected::main_'+state_origin,overwrite,__compressed__)
+																												,OUTPUT(Main_BadRecords,,Corp2_Mapping._Dataset().thor_cluster_Files + 'out::corp2::'+version+'::rejected::main_'+state_origin,__compressed__)
+																												)
+																							)
+																					,output(Main_ScrubsWithExamples, all, named('CorpMainNDScrubsReportWithExamples'+filedate))
+																					//Send Alerts if Scrubs exceeds thresholds
+																					,IF(COUNT(Main_ScrubsAlert) > 0, Main_SendEmailFile, OUTPUT('CORP2_MAPPING.ND - No "MAIN" Corp Scrubs Alerts'))
+																					,Main_ErrorSummary
+																					,Main_ScrubErrorReport
+																					,Main_SomeErrorValues
+																					,Main_SubmitStats
+																				);																	
+																			
+		//-------------------- Version Control -----------------------------------------------------//	
+	  VersionControl.macBuildNewLogicalFile('~thor_data400::in::corp2::'+version+'::main_ND'	  ,Main_ApprovedRecords,main_out ,,,pOverwrite);		
+ 	  VersionControl.macBuildNewLogicalFile('~thor_data400::in::corp2::'+version+'::stock_ND'		,MapStock		         ,stock_out,,,pOverwrite);
+		VersionControl.macBuildNewLogicalFile('~thor_data400::in::corp2::'+version+'::event_ND'		,MapEvent		         ,event_out,,,pOverwrite);
+	
+	  VersionControl.macBuildNewLogicalFile('~thor_data400::failed::corp2::'+version+'::main_ND',MapMain     ,write_fail_main	,,,pOverwrite);		
+			
+	  mapND:= sequential(if(pshouldspray = true,Corp2_mapping.fSprayFiles(state_origin ,version,pOverwrite := pOverwrite))
+												// ,Corp2_Raw_ND.Build_Bases(filedate,version,pUseProd).All  // Determined that build bases is not needed
+												,main_out
+												,stock_out
+												,event_out
+												,IF(Main_FailBuild <> true  
+														,sequential( fileservices.addsuperfile(Corp2_Mapping._Dataset().thor_cluster_Files + 'in::'+Corp2_Mapping._Dataset().NameMapped+'::sprayed::stock',Corp2_Mapping._Dataset().thor_cluster_Files + 'in::corp2::'+version+'::stock_ND')
+																				,fileservices.addsuperfile(Corp2_Mapping._Dataset().thor_cluster_Files + 'in::'+Corp2_Mapping._Dataset().NameMapped+'::sprayed::event',Corp2_Mapping._Dataset().thor_cluster_Files + 'in::corp2::'+version+'::event_ND')
+																				,fileservices.addsuperfile(Corp2_Mapping._Dataset().thor_cluster_Files + 'in::'+Corp2_Mapping._Dataset().NameMapped+'::sprayed::main'	,Corp2_Mapping._Dataset().thor_cluster_Files + 'in::corp2::'+version+'::main_ND')																		 
+																				,if (count(Main_BadRecords) <> 0 
+																						 ,Corp2_Mapping.Send_Email(state_origin ,version,count(Main_BadRecords)<>0,,,,count(Main_BadRecords),,,,count(Main_ApprovedRecords),,count(mapEvent),count(mapStock)).RecordsRejected																				 
+																						 ,Corp2_Mapping.Send_Email(state_origin ,version,count(Main_BadRecords)<>0,,,,count(Main_BadRecords),,,,count(Main_ApprovedRecords),,count(mapEvent),count(mapStock)).MappingSuccess	
+																						 )	 
+																			)
+														 ,sequential( write_fail_main//if it fails on  main file threshold ,still writing mapped files!
+																				 ,Corp2_Mapping.Send_Email(state_origin ,version).MappingFailed
+																				)
+													)
+												,IF(Main_IsScrubErrors
+													 ,Corp2_Mapping.Send_Email(state_origin ,version,Main_IsScrubErrors).FieldsInvalidPerScrubs)	
+												,Main_All	
+										);
+		// File is not always received within exactly one month, so setting the file date check to allow for 35 days													
+ 		isFileDateValid := if((string)Std.Date.Today() between ut.date_math(filedate,-35) and ut.date_math(filedate,35),true,false);
+    return sequential (if (isFileDateValid
+														,mapND
+														,sequential (Corp2_Mapping.Send_Email(state_origin,filedate).InvalidFileDateParm
+																				,FAIL('Corp2_Mapping.ND failed.  An invalid filedate was passed in as a parameter.')))); 	
+
+ End; //Update Function
+
+End;//End ND Module

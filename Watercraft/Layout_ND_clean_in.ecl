@@ -1,6 +1,6 @@
-export Layout_ND_clean_in := 
+export Layout_ND_clean_in := record  
+// rec_len: 918
 
-record
 string2       state_origin;
 string8       process_date;
 string3       STATEDATA;
@@ -25,11 +25,18 @@ string2       STATE;
 string10      ZIP;
 string50      COUNTY;
 string5       FIPS;
-string4       EXPIRE_YEAR;
+string4	      EXPIRE_YEAR;
+string8       OWNER_DOB;
+string1       CITIZEN;
+string4       REG_YEAR;
 string3       HP;
+string1       US_MFR;
+string2       USE_ST;
+string3       ND_PURTYPE_CD;
 string2       lf;
 integer2	  is_company_flag;
 string73      clean_pname;
 string100     clean_cname;
 string182     clean_address;
+
 end;

@@ -3,7 +3,7 @@ import uccd,lib_keylib,lib_stringlib;
 
 h := uccd.File_WithExpDebtor2_Base_Dev;
 
-base_key_Name := '~thor_data400::key::moxie_ucc_debtor2.';
+base_key_Name := '~thor_data400::key::moxie.ucc2_debtor.';
 
 MyFields := record
 h.ucc_vendor;
@@ -22,6 +22,7 @@ varstring  ZipToCityList := ZipLib.ZipToCities(h.zip);
 string5 z5 := h.zip;
 string5 zip := h.zip;
 STRING50  debtor_orig_st := h.st;
+string2 	  st2	     := '';	
 //STRING8   filing_date := h.fk_filing_date;
 //STRING4   filing_type := h.fk_filing_type;
 //STRING18  document_num := h.fk_document_num;
@@ -67,11 +68,30 @@ k7 := BUILDINDEX( t(orig_filing_num + file_state <> ''), {orig_filing_num,file_s
 			base_key_Name + 'orig_filing_num.file_state_' + uccd.version_development, moxie);
 k8 := BUILDINDEX( t(lfmname <> ''), {lfmname,(big_endian unsigned8 )__filepos},
 			base_key_Name + 'lfmname_'+ uccd.version_development, moxie);
-k9 := BUILDINDEX( t(st + lfmname <> ''), {st,lfmname,(big_endian unsigned8 )__filepos},
-			base_key_Name + 'st.lfmname_'+ uccd.version_development, moxie);
-k10 := BUILDINDEX( t(zip + lfmname <> ''), {zip,lfmname,(big_endian unsigned8 )__filepos},
+
+			
+k9 := BUILDINDEX( t(zip + lfmname <> ''), {zip,lfmname,(big_endian unsigned8 )__filepos},
 			base_key_Name + 'zip.lfmname_'+ uccd.version_development, moxie);
-						
+
+//including file_state and state for st.lfmname key
+
+MyFields NormalizeSt(MyFields L,unsigned1 C)
+ :=
+  transform
+	self.st2	:= choose(C, L.st, L.file_state);
+	self 	:= L;
+end;
+
+
+pAddress_St_Keys_File	:= normalize(t,2,NormalizeSt(left,counter));
+pSt_Keys_lfmname_Dist		:= distribute(pAddress_St_Keys_File,hash(st2,lfmname,__filepos));
+pSt_Keys_lfmname_Sort		:= sort(pSt_Keys_lfmname_Dist(st2<>''),st2,lfmname,__filepos,local);	
+pSt_Keys_lfmname_Dedup	  := dedup(pSt_Keys_lfmname_Sort,st2,lfmname,__filepos,local);
+
+k10 := BUILDINDEX(pSt_Keys_lfmname_Dedup(st2 + lfmname <> ''), {st2,lfmname,(big_endian unsigned8 )__filepos},
+			base_key_Name + 'st.lfmname_'+ uccd.version_development, moxie);
+			
+			
 //THE KEYS NOT NEEDED FOR MOXIE SERVED FROM ROXIE	
 		
 /*BUILDINDEX( t, {dph_lname,name_first,name_middle,(big_endian unsigned8 )__filepos},
@@ -82,9 +102,19 @@ BUILDINDEX( t, {st,city,dph_lname,name_first,name_middle,(big_endian unsigned8 )
 			'key.moxie_ucc_debtor2.st.city.dph_lname.name_first.name_middle.key', moxie);
 BUILDINDEX( t, {zip,dph_lname,name_first,name_middle,(big_endian unsigned8 )__filepos},
 			'key.moxie_ucc_debtor2.zip.dph_lname.name_first.name_middle.key', moxie);*/
-k11 := BUILDINDEX( t(nameasis <> ''), {nameasis,(big_endian unsigned8 )__filepos},
+			
+k11 := BUILDINDEX(t(nameasis <> ''), {nameasis,(big_endian unsigned8 )__filepos},
 			base_key_Name + 'nameasis_'+ uccd.version_development, moxie);
-k12 := BUILDINDEX( t(st + nameasis <> ''), {st,nameasis,(big_endian unsigned8 )__filepos},
+
+
+//including file_state and state for st.nameasis key
+
+pSt_Keys_nameasis_Dist		:= distribute(pAddress_St_Keys_File,hash(st2,nameasis,__filepos));
+pSt_Keys_nameasis_Sort		:= sort(pSt_Keys_nameasis_Dist(st2<>''),st2,nameasis,__filepos,local);	
+pSt_Keys_nameasis_Dedup	  := dedup(pSt_Keys_nameasis_Sort,st2,nameasis,__filepos,local);
+
+
+k12 := BUILDINDEX(pSt_Keys_nameasis_Dedup(st2 + nameasis <> ''), {st2,nameasis,(big_endian unsigned8 )__filepos},
 			base_key_Name + 'st.nameasis_'+ uccd.version_development, moxie);
 
 k13 := BUILDINDEX( t(zip + nameasis <> ''), {zip,nameasis,(big_endian unsigned8 )__filepos},
@@ -106,7 +136,8 @@ MyFields NormalizeCities(MyFields L,integer C)
 
 City_Keys_File	:= normalize(t,(integer)Stringlib.StringExtract(left.ZipToCityList,1)+1,
 									 NormalizeCities(left,counter));
-lfmname_City_Keys_Dist	:= distribute(City_Keys_File, hash(City,St,LFMName,__filepos));
+									 
+lfmname_City_Keys_Dist	:= distribute(City_Keys_File, hash(St,City,LFMName,__filepos));
 lfmname_City_Keys_Sort	:= sort(lfmname_City_Keys_Dist,St,city,LFMName,__filepos, local);
 lfmname_City_Keys_Dedup	:= dedup(lfmname_City_Keys_Sort,St,city,LFMName,__filepos,local);
 
@@ -116,7 +147,7 @@ k16 := BUILDINDEX(lfmname_City_Keys_Dedup(st+city+lfmname <> ''), {st,city,lfmna
 
 
 
-nameasis_City_Keys_Dist	:= distribute(City_Keys_File, hash(City,St,nameasis,__filepos));
+nameasis_City_Keys_Dist	:= distribute(City_Keys_File, hash(St,City,nameasis,__filepos));
 nameasis_City_Keys_Sort	:= sort(nameasis_City_Keys_Dist,St,city,nameasis,__filepos, local);
 nameasis_City_Keys_Dedup	:= dedup(nameasis_City_Keys_Sort,St,city,nameasis,__filepos,local);
 
@@ -124,7 +155,7 @@ nameasis_City_Keys_Dedup	:= dedup(nameasis_City_Keys_Sort,St,city,nameasis,__fil
 k17 := BUILDINDEX(nameasis_City_Keys_Dedup(st +city+nameasis <> ''), {st,city,nameasis,(big_endian unsigned8 )__filepos},
 			base_key_Name + 'st.city.nameasis_'+ uccd.version_development, moxie);
 			
-address_City_Keys_Dist	:= distribute(City_Keys_File, hash(City,St,nameasis,__filepos));
+address_City_Keys_Dist	:= distribute(City_Keys_File, hash(St,City,prim_name,prim_range,predir,postdir,addr_suffix,__filepos));
 address_City_Keys_Sort	:= sort(address_City_Keys_Dist,St,city,prim_name,prim_range,predir,postdir,addr_suffix,__filepos, local);
 address_City_Keys_Dedup	:= dedup(address_City_Keys_Sort,St,city,prim_name,prim_range,predir,postdir,addr_suffix,__filepos,local);
 			
@@ -135,9 +166,12 @@ k18 := BUILDINDEX(address_City_Keys_Dedup(st + city + prim_name + prim_range + p
 cn_rec := record
 	string10 cn;
     t.st;
+	t.st2;
+	t.file_state;
 	t.city;
 	t.zip;
 	t.ZipToCityList;
+	t.lfmname;
 	t.__filepos;
 end;
 
@@ -152,10 +186,28 @@ cn_records := NORMALIZE(t, 8,Norm_cn(LEFT, COUNTER));
 
 k19 := BUILDINDEX( cn_records(cn <> ''), {cn,(big_endian unsigned8 )__filepos},
 			base_key_Name + 'cn_'+ uccd.version_development, moxie);
-k20 := BUILDINDEX( cn_records(st + cn <> ''), {st,cn,(big_endian unsigned8 )__filepos},
+
+//including file_state and state for st.cn key
+
+cn_rec NormalizeStcn(cn_rec L,unsigned1 C)
+ :=
+  transform
+	self.st2	:= choose(C, L.st, L.file_state);
+	self 	:= L;
+end;
+
+
+pAddress_St_cn_Keys_File	:= normalize(cn_records,2,NormalizeStcn(left,counter));
+
+pSt_Keys_cn_Dist		:= distribute(pAddress_St_cn_Keys_File,hash(st2,cn,__filepos));
+pSt_Keys_cn_Sort		:= sort(pSt_Keys_cn_Dist(st2<>''),st2,cn,__filepos,local);	
+pSt_Keys_cn_Dedup	    := dedup(pSt_Keys_cn_Sort,st2,cn,__filepos,local);
+
+
+k20 := BUILDINDEX(pSt_Keys_cn_Dedup(st2 + cn <> '' ), {st2,cn,(big_endian unsigned8 )__filepos},
 			base_key_Name + 'st.cn_'+ uccd.version_development, moxie);
 
-k21 := BUILDINDEX( cn_records(zip + cn <> ''), {zip,cn,(big_endian unsigned8 )__filepos},
+k21 := BUILDINDEX(cn_records(zip + cn <> ''), {zip,cn,(big_endian unsigned8 )__filepos},
 			base_key_Name + 'zip.cn_'+ uccd.version_development, moxie);
 			
 

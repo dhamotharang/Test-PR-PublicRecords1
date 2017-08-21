@@ -1,4 +1,4 @@
-﻿import ut, did_add, address, risk_indicators, census_data, riskwise, USPIS_HotList, ADVO, DOXIE, MDR;
+import ut, did_add, address, risk_indicators, census_data, riskwise, USPIS_HotList, ADVO, DOXIE, MDR;
 
 export iid_combine_verification(grouped dataset(risk_indicators.Layout_Output) ssnrecs, 
 								grouped dataset(risk_indicators.Layout_Output) pphonerecs,

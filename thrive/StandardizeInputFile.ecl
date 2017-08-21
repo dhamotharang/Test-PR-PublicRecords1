@@ -1,4 +1,4 @@
-IMPORT  ut, mdr, tools,_validate;
+IMPORT  ut, mdr, std, tools,_validate;
 EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= function
 thrive.layouts.base tPDMapping(thrive.layouts.input_PD L, C) := TRANSFORM
 	SELF.src    := mdr.sourceTools.src_thrive_PD;							//	Code to indicate source: 'PD' or 'LT'
@@ -14,7 +14,19 @@ thrive.layouts.base tPDMapping(thrive.layouts.input_PD L, C) := TRANSFORM
 	SELF.phone_work					:= trim(L.phone_work, left, right); //	LT & PD
 	SELF.phone_home					:= trim(L.phone_home, left, right);//	PD
   SELF.phone_cell					:= trim(L.phone_cell, left, right);//	PD
-	SELF.Dob						:=  trim(L.dob, left, right);//	PD
+	
+	dob_no_special_char(string1 special_char) :=  function
+	new_date := intformat((unsigned)L.dob[1..StringLib.StringFind(L.dob, special_char, 1)-1], 2,1) +
+					intformat((unsigned)L.dob[StringLib.StringFind(L.dob, special_char, 1)+1..StringLib.StringFind(L.dob, special_char, 2)-1], 2,1) +		
+          intformat((unsigned)L.dob[StringLib.StringFind(L.dob, special_char, 2)+1.. length(L.dob)], 4,1) ;
+	return new_date;
+	end;
+	
+	SELF.Dob						:=  if(StringLib.StringFind(L.dob, '/', 1) > 0,
+													dob_no_special_char('/'),
+													 if(StringLib.StringFind(L.dob, '-', 1) > 0,
+													dob_no_special_char('-'),
+													trim(Stringlib.StringFilter(L.DOB,'0123456789'), left, right)));//PD
 	SELF.Email 				  := trim(stringlib.stringtouppercase(L.Email),left, right);						//	LT & PD
 	SELF.Employer 		  := trim(stringlib.stringtouppercase(L.Employer),left, right);				//	LT & PD
 	SELF.Income 			  := trim(L.Income_Monthly,left, right);	//	LT & PD
@@ -25,14 +37,22 @@ thrive.layouts.base tPDMapping(thrive.layouts.input_PD L, C) := TRANSFORM
 	SELF.MonthsEmployed := trim(stringlib.stringtouppercase(L.Months_Employed),left, right);							//	PD	
 	SELF.MonthsAtBank   := trim(stringlib.stringtouppercase(L.Months_At_Bank),left, right);							//	PD
 	SELF.ip							:= trim(Stringlib.StringFilter(L.ip,'0123456789.: '),left, right);	//	PD
-	SELF.Dt_first_seen  := (unsigned)filedate; //Using the initial date when the vendor started collecting the data
-	SELF.Dt_last_seen   := (unsigned)filedate;//Using the initial date when the vendor started collecting the data
+	SELF.DateCollected	:= trim(Stringlib.StringFilter(L.DT,'0123456789:-/ '),left, right);								//	LT & PD
+
+	seen_date := if(std.date.ConvertDateFormat(L.DT,'%m/%d/%Y') between '19000101' and (string)std.date.today(),(unsigned)std.date.ConvertDateFormat(L.DT,'%m/%d/%Y'), 
+														      if(std.date.ConvertDateFormat(L.DT,'%Y-%m-%d') between '19000101' and (string)std.date.today(),(unsigned)std.date.ConvertDateFormat(L.DT,'%Y-%m-%d'), 0));
+	SELF.Dt_first_seen  := seen_date;
+	SELF.Dt_last_seen   := seen_date;
 	SELF.Dt_vendor_first_reported := (unsigned)filedate;
 	SELF.Dt_vendor_last_reported := (unsigned)filedate;
 	SELF.Clean_Phone_Work := if(ut.CleanPhone(L.Phone_Work) [1] not in ['0','1'],ut.CleanPhone(L.Phone_Work), '') ;
 	SELF.Clean_Phone_Home := if(ut.CleanPhone(L.Phone_Home) [1] not in ['0','1'],ut.CleanPhone(L.Phone_Home), '') ;
 	SELF.Clean_Phone_Cell := if(ut.CleanPhone(L.Phone_Cell) [1] not in ['0','1'],ut.CleanPhone(L.Phone_Cell), '') ;;
-	SELF.clean_DOB := if(L.DOB <> '', _validate.date.fCorrectedDateString(L.DOB,false), '');
+	SELF.clean_DOB := map(std.date.ConvertDateFormat(self.dob, '%Y%m%d') between '19000101' and (string)std.date.today() => std.date.ConvertDateFormat(self.dob, '%Y%m%d'),
+												std.date.ConvertDateFormat(self.dob, '%m%d%Y') between '19000101' and (string)std.date.today() => std.date.ConvertDateFormat(self.dob, '%m%d%Y'),
+												(self.dob[5..] + self.dob[1..2] + self.dob[3..4])between '19000101' and (string)std.date.today() => self.dob[5..] + self.dob[1..2] + self.dob[3..4],
+												self.dob between '19000101' and (string)std.date.today() => self.dob, ''); 
+											
 	SELF  :=  L;
 	SELF := [];
 END;
@@ -60,9 +80,9 @@ thrive.layouts.base tLTMapping(thrive.layouts.input_LT L, C) := TRANSFORM
 	SELF.RateType				:= trim(stringlib.stringtouppercase(L.RateType),left, right);								//	LT
 	SELF.MortRate		:= trim(stringlib.stringtouppercase(L.MortRate),left, right);								//	LT
 	SELF.PropertyType		:= trim(stringlib.stringtouppercase(L.PropertyType),left, right);								//	LT
-	SELF.DateCollected	:= trim(Stringlib.StringFilter(L.DT,'0123456789:-/ '),left, right);								//	LT
-	SELF.Dt_first_seen  := if(ut.ConvertDate(L.DT,'%m/%d/%Y') between '19000101' and (string)ut.GetDate,(unsigned)ut.ConvertDate(L.DT,'%m/%d/%Y'), 0);
-	SELF.Dt_last_seen   := if(ut.ConvertDate(L.DT,'%m/%d/%Y') between '19000101' and (string)ut.GetDate,(unsigned)ut.ConvertDate(L.DT,'%m/%d/%Y'), 0);
+	SELF.DateCollected	:= trim(Stringlib.StringFilter(L.DT,'0123456789:-/ '),left, right);								//	LT & PD
+	SELF.Dt_first_seen  := if(std.date.ConvertDateFormat(L.DT,'%m/%d/%Y') between '19000101' and (string)std.date.today(),(unsigned)std.date.ConvertDateFormat(L.DT,'%m/%d/%Y'), 0);
+	SELF.Dt_last_seen   := if(std.date.ConvertDateFormat(L.DT,'%m/%d/%Y') between '19000101' and (string)std.date.today(),(unsigned)std.date.ConvertDateFormat(L.DT,'%m/%d/%Y'), 0);
 	SELF.Dt_vendor_first_reported := (unsigned)filedate;
 	SELF.Dt_vendor_last_reported := (unsigned)filedate;	
 	SELF.Clean_Phone_Work := if(ut.CleanPhone(L.Phone)[1] not in ['0','1'],ut.CleanPhone(L.Phone), '') ;

@@ -58,6 +58,7 @@ export Calbus_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.Business_v_city_name),
 				self.state := left.Business_st,
 				self.zip := left.Business_zip5,
+				self.zip4 := left.Business_zip4,
 				self.county_fips := left.Business_fips_county,
 				self.msa := '',
 				self.phone := '',
@@ -95,6 +96,7 @@ export Calbus_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.mailing_v_city_name),
 				self.state := left.mailing_st,
 				self.zip := left.mailing_zip5,
+				self.zip4 := left.mailing_zip4,
 				self.county_fips := left.mailing_fips_county,
 				self.msa := '',
 				self.phone := '', 
@@ -122,6 +124,8 @@ export Calbus_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.date_first_seen := (unsigned4)left.dt_first_seen,
 				self.date_last_seen := (unsigned4)left.dt_last_seen,
 				self.ssn           := '';
+				self.did           := left.did,
+				self.score         := left.did_score,
 				self.name_prefix   := left.owner_title;
 		    self.name_first    := left.owner_fname;
 		    self.name_middle   := left.owner_mname;

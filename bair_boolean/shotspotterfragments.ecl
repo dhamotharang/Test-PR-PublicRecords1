@@ -5,13 +5,22 @@ EXPORT shotspotterfragments(Types.StateList st_list=ALL, Boolean pDelta=true) :=
 	SHARED Persist_shotspotter	:= bair_boolean.constants('').persistfile('shotspotter');
 
   bair_data := Bair.files(pUseDelta:=pDelta).shotspotter_Base.built;
+	// bair_data := enth(Bair.files(,true,false).shotspotter_Base.built,10000);
 	SHARED shotspotter_Base := DISTRIBUTE(bair_data(eid <> ''),HASH64(eid));
 	
 	// shotspotter Business
-	Layout_shotspotter_base xd(bair.layouts.gunop_dbo_shot_incident_Base l) := TRANSFORM
-		SELF := l;
-	END;
-	SHARED shotspotter_File := PROJECT(shotspotter_Base, xd(LEFT));
+	SHARED shotspotter_File := PROJECT(shotspotter_Base,
+																			TRANSFORM(Layout_shotspotter_base,
+																			SELF.gh12					:= left.gh12,
+																			SELF.gh4 					:= left.gh12[1..4],
+																			SELF.gh5 					:= left.gh12[1..5],
+																			SELF.gh6 					:= left.gh12[1..6],
+																			SELF.class_code		:= Bair.MapClassCodeNum(6, (string)left.shot_incident_type),
+																			SELF.wc_beat			:= left.beat,
+																			SELF.wc_district	:= left.district,
+																			self.agency				:= left.data_provider_name,
+																			SELF := left));
+
 	SHARED shotspotter_mod := shotspotter_baseBooleanSearch(shotspotter_File);
   //
 	Layout_AnswerListData xans(Layout_shotspotter_base l) := TRANSFORM

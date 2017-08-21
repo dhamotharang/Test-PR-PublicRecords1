@@ -7,7 +7,7 @@ TopBusiness_BIPV2.Layouts.rec_industry_combined_layout MapIndustry(Base L) := TR
 	SELF.bdid_score								:=	0;
 	SELF.source       						:=	MDR.sourceTools.src_LaborActions_WHD;
 	SELF.source_docid  						:=	'';
-	SELF.source_rec_id 						:=	'';
+	SELF.source_rec_id 						:=	0;
 	SELF.siccode       						:=	'';
 	SELF.naics        						:=	L.naicscode;
 	SELF.industry_description 		:=	'';
@@ -29,9 +29,9 @@ TopBusiness_BIPV2.Layouts.rec_industry_combined_layout RollupLA(TopBusiness_BIPV
                                                                  TopBusiness_BIPV2.Layouts.rec_industry_combined_layout R) := TRANSFORM
 	  SELF.dt_first_seen               := ut.EarliestDate(ut.EarliestDate(L.dt_first_seen,R.dt_first_seen),
 				                                ut.EarliestDate(L.dt_last_seen,R.dt_last_seen));
-	  SELF.dt_last_seen                := ut.LatestDate(L.dt_last_seen,R.dt_last_seen);
+	  SELF.dt_last_seen                := Max(L.dt_last_seen,R.dt_last_seen);
 	  SELF.dt_vendor_first_reported    := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-	  SELF.dt_vendor_last_reported     := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+	  SELF.dt_vendor_last_reported     := Max(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 	  SELF := l;
 	END;
 Industry_dist := DISTRIBUTE(Industry, bdid);

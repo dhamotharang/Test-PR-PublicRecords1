@@ -1,4 +1,4 @@
-import Corp2, DNB_dmi, YellowPages, Busreg, Edgar, Vickers, infousa, ut, versioncontrol,paw, dnb_feinv2,mdr;
+import Corp2, DNB_dmi, YellowPages, Busreg, Edgar, Vickers, infousa, versioncontrol, paw, dnb_feinv2, mdr, Std;
 
 use_prod 	:= versioncontrol._Flags.IsDataland;
 layYpBase 	:= YellowPages.Layout_YellowPages_Base_V2_Bip;
@@ -6,7 +6,7 @@ layYpBase 	:= YellowPages.Layout_YellowPages_Base_V2_Bip;
 export BH_BDID_SIC(
 
 	 string																						pBhVersion						= 'qa'
-	,dataset(Corp2.Layout_Corporate_Direct_Corp_Base) pCorpFile							= Corp2.Files(,,use_prod).Base.Corp.QA
+	,dataset(Corp2.Layout_Corporate_Direct_Corp_Base) pCorpFile							= Corp2.Files(,,use_prod).Base.Corp.Prod
 	,dataset(dnb_dmi.Layouts.Base.CompaniesForBIP2	) pDNB_Base							= DNB_dmi.Files().base.companies.qa
 	,dataset(layYpBase															) pYellowpages_Base			= YellowPages.Files(,use_prod).base.qa
 	,dataset(BusReg.Layout_BusReg_Company						) pBusregCompany_Base 	= BusReg.File_BusReg_Company
@@ -102,7 +102,8 @@ yp_sic_dedup := dedup(yp_sic_init, all);
 // Extract SIC Codes from Business Registrations
 Layout_SIC_Code_Internal SICFromBusreg(Busreg.Layout_BusReg_Company l) := transform
 self.source := 'BR';
-self.sic_code := l.sic + '0000';
+//self.sic_code := l.sic + '0000';
+self.sic_code := if(stringlib.stringcleanspaces(l.sic) = '70', stringlib.stringcleanspaces(l.sic) + '000000', l.sic + '0000');
 self.dt_last_seen := (unsigned4)l.dt_last_seen;
 self := l;
 end;
@@ -235,7 +236,7 @@ sic_combined := corp_sic_dedup + dnb_sic_dedup + yp_sic_dedup + busreg_sic_dedup
 sic_filtered := Business_Header.Filters.BHBDIDSIC(sic_combined,pInactiveCorps,pBhVersion);
 
 	sic_filtered2				:= if(pShouldFilter = true, sic_filtered, sic_combined)(bdid <> 0, length(trim(sic_code)) = 8) ;
-	eight_years_ago 		:= (unsigned4)((string)((unsigned)ut.GetDate[1..4] - 8) + ut.GetDate[5..]);
+	eight_years_ago 		:= (unsigned4)((string)((unsigned)((string8)Std.Date.Today())[1..4] - 8) + ((string8)Std.Date.Today())[5..]);
 	sic_deduped					:= dedup(sort(sic_filtered2, source,sic_code, bdid,-dt_last_seen), source,sic_code, bdid,all)(dt_last_seen > eight_years_ago);
 	
 	sic_proj						:= project(sic_deduped, transform(layout_sic_code, self := left));

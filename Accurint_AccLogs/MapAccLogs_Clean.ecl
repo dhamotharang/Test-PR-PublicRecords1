@@ -1,6 +1,6 @@
-import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, inquiry_acclogs;
+import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, inquiry_acclogs, header_slimsort, business_header;
 
-inputFile := accurint_acclogs.MapAccLogs_PreProcess(orig_END_USER_ID <> 'END_USER_ID' and orig_detail in ['GOV','LE'] and orig_transaction_code = '110');
+inputFile := accurint_acclogs.MapAccLogs_PreProcess(orig_END_USER_ID <> 'END_USER_ID' and orig_detail in ['GOV','LE']);
 
 /////////////////NAME AND BUSINESS CLEAN NEW FILE - REMOVE NULL IDENTIFIERS - ASSIGN UNIQUE ID FIELDS/////////////////////////////////////////////////////////
 
@@ -179,10 +179,10 @@ BasicClean := PROJECT(reconName,
 			self.postdir := cleanaddr[45..46];
 			self.unit_desig := cleanaddr[47..56];
 			self.sec_range := cleanaddr[57..64];
-			self.p_city_name := if(cleanaddr[65..89] <> 'XXXXX', cleanaddr[65..89], '');
-			self.v_city_name := if(cleanaddr[90..114] <> 'XXXXX', cleanaddr[90..114], '');
-			self.st := if(cleanaddr[115..116] <> 'YY', cleanaddr[115..116], '');
-			self.zip :=if( cleanaddr[117..121] <> '99999',  cleanaddr[117..121], '');
+			self.p_city_name := if(cleanaddr[65..89] <> 'XXXXX', cleanaddr[65..89], stringlib.stringtouppercase(left.orig_city));
+			self.v_city_name := if(cleanaddr[90..114] <> 'XXXXX', cleanaddr[90..114], stringlib.stringtouppercase(left.orig_city));
+			self.st := if(cleanaddr[115..116] <> 'YY', cleanaddr[115..116], stringlib.stringtouppercase(left.orig_state));
+			self.zip :=if( cleanaddr[117..121] <> '99999',  cleanaddr[117..121], stringlib.stringtouppercase(left.orig_zip));
 			self.zip4 := cleanaddr[122..125];
 			self.cart := cleanaddr[126..129];
 			self.cr_sort_sz := cleanaddr[130];

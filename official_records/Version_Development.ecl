@@ -1,1 +1,3 @@
-export Version_Development := '20050826';
+import std;
+export Version_Development := (STRING8)Std.Date.Today();
+

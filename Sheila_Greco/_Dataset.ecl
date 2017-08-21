@@ -1,4 +1,4 @@
-import _control;
+import _control, ut;
 export _Dataset :=
 module
 
@@ -7,8 +7,8 @@ module
 	export thor_cluster_Persists	:= thor_cluster_Files	;
 	export max_record_size				:= 80000							;
 
-	export Groupname	:= if(	_Control.ThisEnvironment.name		 = 'Dataland'	,'thor_dataland_linux'
-																																					,'thor400_92'
+	export Groupname	:= if(	_Control.ThisEnvironment.name		 = 'Dataland'	,'thor50_dev02'
+																																					,'thor400_44'
 											);
 
 end;

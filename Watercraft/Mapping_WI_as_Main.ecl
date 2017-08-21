@@ -95,16 +95,17 @@ propulsion_desc(string1 code) :=
 
 case(code, '1' => 'OUTBOARD',
 '2' => 'INBOARD',
-'3' => 'INBOARD/STERNDRIVE(I/O)',
+'3' => 'INBOARD/STERNDRIVE',
 '4' => 'AIRBOAT', '');
 
 
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_WI_clean_in, watercraft.Layout_WI_clean_in,hull_clean_in)
 
-watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_WI_clean_in L) := transform
+watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := transform
 
 
     self.watercraft_key						:=	trim(L.reg_num, left, right);
-	self.sequence_key						:=	trim(L.reg_date, left, right);
+	self.sequence_key						:=	if(trim(L.reg_date, left, right)<>'',L.reg_DATE,L.LAST_TRANSACTION_DATE);
 	self.watercraft_id						:=	'';
 	self.state_origin						:=	'WI';
 	self.source_code						:=	'AW';
@@ -204,7 +205,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_WI_cl
 
 
 
-export Mapping_WI_as_Main := project(watercraft.file_WI_clean_in, main_mapping_format(left));
+export Mapping_WI_as_Main := project(hull_clean_in, main_mapping_format(left));
 
 
 	

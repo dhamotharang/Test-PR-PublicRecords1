@@ -22,6 +22,7 @@ export KeyLayouts := module
 		Layout_Linking.Linked.city_name;
 		Layout_Linking.Linked.state;
 		Layout_Linking.Linked.zip;
+		Layout_Linking.Linked.zip4;
 		Layout_Linking.Linked.county_name;
 		Layout_Linking.Linked.msa;
 		Layout_Linking.Linked.phone_type;
@@ -106,12 +107,20 @@ export KeyLayouts := module
 	
 	export LinkDiagnostic := Layout_Linking.Linked;
 
-	export LLID := record
-		Layout_LLID.Linked.bid;
-		Layout_LLID.Linked.brid;
-		Layout_LLID.Linked.blid;
-		Layout_LLID.Linked.llid12;
-		Layout_LLID.Linked.llid9;
+	export LLID12 := record
+		Layout_LLID.LLID12.Linked.bid;
+		Layout_LLID.LLID12.Linked.brid;
+		Layout_LLID.LLID12.Linked.blid;
+		Layout_LLID.LLID12.Linked.llid12;
+		Layout_LLID.LLID12.Linked.active12;
+	end;
+	
+	export LLID9 := record
+		Layout_LLID.LLID9.Linked.bid;
+		Layout_LLID.LLID9.Linked.brid;
+		Layout_LLID.LLID9.Linked.blid;
+		Layout_LLID.LLID9.Linked.llid9;
+		Layout_LLID.LLID9.Linked.active9;
 	end;
 	
 	export MatchDiagnostic := record
@@ -138,7 +147,7 @@ export KeyLayouts := module
 		end;
 	
 		export Party := record
-		  Layout_MotorVehicle.Party;
+		  Layout_MotorVehicle.Party.Linked;
 		end;
 
   end;				

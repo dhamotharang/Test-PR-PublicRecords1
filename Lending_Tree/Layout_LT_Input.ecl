@@ -12,4 +12,5 @@ export Layout_LT_Input := record
    string5  name_suffix;
    string3  name_score;
    string12 process_id;
+	 string10 borrower_id;
 end;

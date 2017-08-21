@@ -11,8 +11,8 @@ EXPORT promote := MODULE
 			,dataset(lay_builds)	pBuildFilenames = HMS_STLIC.Filenames(pversion,pUseProd).statelicense_Base.dAll_filenames
 																							// + HMS_STLIC.keynames	(pversion,pUseProd).dAll_filenames
 																							+ HMS_STLIC.keynames	(pversion,pUseProd).statelicense_lnpid_key.dAll_filenames //statelicense_lnpid_dAll_filenames
-																							+ HMS_STLIC.keynames	(pversion,pUseProd).statelicense_lnk_key.dAll_filenames
-																							+ HMS_STLIC.keynames	(pversion,pUseProd).statelicense_sourcerid_key.dAll_filenames
+																							// + HMS_STLIC.keynames	(pversion,pUseProd).statelicense_lnk_key.dAll_filenames
+																							// + HMS_STLIC.keynames	(pversion,pUseProd).statelicense_sourcerid_key.dAll_filenames
 																							// + HMS_STLIC.keynames	(pversion,pUseProd).stlicrollup_lnpid_key.dAll_filenames
 		) := MODULE
 				EXPORT buildfiles	:= tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pisTesting,pnGenerations := 2);

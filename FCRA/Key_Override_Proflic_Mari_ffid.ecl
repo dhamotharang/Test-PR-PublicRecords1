@@ -4,11 +4,11 @@ EXPORT Key_Override_Proflic_Mari_ffid := module
 
 shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
 shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-shared keyname_prefix := '~thor_data400::key::override::fcra::';
+shared keyname_prefix := data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::';
 
 
 // Professional License MARI record
-  proflic_mari_rec := RECORD
+  export proflic_mari_rec := RECORD
     recordof(Prof_License_Mari.key_did(true));
     string20 flag_file_id;
   end;

@@ -13,11 +13,15 @@ rec_temp tnormalize(liensV2.Layout_Liens_temp_base L, integer cnt) := transform
 city := choose(cnt, L.debtor_city, L.creditor_city, L.atty_city);
 self.vendor_id := L.record_code;
 self.orig_rmsid := L.orig_rmsid;
+self.bCBFlag	:= L.bCBFlag;
+self.eviction	:= L.eviction;
 self.orig_name := choose(Cnt, L.DEBTOR_NAME, L.creditor_name, L.ATTY_name);
 self.orig_address1 := choose(cnt, L.debtor_address1, L.creditor_address1, L.atty_address1);
 self.orig_address2 := '';
-self.orig_city := if(city = 'BX','BRONX',city);
+
 self.orig_state := choose(cnt, L.debtor_state, L.creditor_state, L.atty_state);
+self.orig_city := map(city = 'BX' and self.orig_state = 'NY'=>'BRONX',city);
+
 self.orig_zip5 := choose(cnt, L.debtor_zip5, L.creditor_zip5, L.atty_zip5);
 self.orig_zip4 := '';
 self.orig_county := '';

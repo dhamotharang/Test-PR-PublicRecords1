@@ -1,6 +1,15 @@
 export Normalize_and_Rollup_Companies (string filedate) := function
 
-in_file := WorldCheck.File_WorldCheck_In;
+ds_in 	:= WorldCheck.File_WorldCheck_In;
+
+ds 		:= distribute(ds_in, random());
+
+WorldCheck.Layout_WorldCheck_in fixcomp(ds l):= transform
+self.companies := l.companies[1..1000];
+self := l;
+end;
+
+in_file := project(ds, fixcomp(left));
 
 // Shared parsing patterns for most
 pattern SingleValue   := pattern('[^;]+');
@@ -93,7 +102,7 @@ count_ds_Companies_rollup := count(Company_out);
 output('Company rollup count: ' + count_ds_Companies_rollup);
 // output(Company_out);
 
-Company_out_dist := distribute(Company_out,hash32(UID)) : persist(WorldCheck.cluster_name + 'Persist::WorldCheck::Company::rollup');
+Company_out_dist := sort(distribute(Company_out, hash32(UID)), uid, local) : persist(WorldCheck.cluster_name + 'Persist::WorldCheck::Company::rollup');
 
 return Company_out_dist ;
 

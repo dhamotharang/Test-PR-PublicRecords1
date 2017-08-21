@@ -15,6 +15,7 @@ EXPORT Build_From_DocSeg_Records(
 	docsegs1 := IF(segd.KeySeg>0,docsegs(segment<>segd.KeySeg),docsegs);
 	
 	invFile := Make_Inversion_List_Func(docsegs1, info, kwd);
-	r := Build_From_Inversion(info, invFile, kwd, FALSE, FALSE, NoIndexFile, ExternalKeys);
+	segList := File_Segment_Definition(info);
+	r := Build_From_Inversion(info, invFile, kwd, FALSE, FALSE, NoIndexFile, segList, ExternalKeys);
 	RETURN r;
 END;

@@ -1,4 +1,4 @@
-IMPORT SALT35,BIPV2_Ingest;
+IMPORT SALT35,BIPV2_Ingest; 
 EXPORT Ingest(BOOLEAN incremental=FALSE
 , DATASET(Layout_BASE) Delta = DATASET([],Layout_BASE)
 , DATASET(Layout_BASE) dsBase = In_BASE // Change IN_BASE to change input to ingest process
@@ -137,9 +137,13 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
   END;
  
   // Full Ingest: combine delta with ingest files
-  GroupIngest0 := GROUP( Delta0+FilesToIngest0,source,source_record_id,title,fname,mname,lname,name_suffix,company_name,company_name_type_raw,prim_range,predir,prim_name,postdir,sec_range,v_city_name,st,zip,zip4,company_address_type_raw,company_fein,best_fein_indicator,company_phone,phone_type,phone_score,company_org_structure_raw,company_sic_code1,company_sic_code2,company_sic_code3,company_sic_code4,company_sic_code5,company_naics_code1,company_naics_code2,company_naics_code3,company_naics_code4
+  /*HACK04*/
+GroupIngest0_dist := DISTRIBUTE( Delta0+FilesToIngest0, hash32(source,source_record_id,title,fname,mname,lname,name_suffix,company_name,company_name_type_raw,prim_range,predir,prim_name,postdir,sec_range,v_city_name,st,zip,zip4,company_address_type_raw,company_fein,best_fein_indicator,company_phone,phone_type,phone_score,company_org_structure_raw,company_sic_code1,company_sic_code2,company_sic_code3,company_sic_code4,company_sic_code5,company_naics_code1,company_naics_code2,company_naics_code3,company_naics_code4
              ,company_naics_code5,company_ticker,company_ticker_exchange,company_url,company_inc_state,company_charter_number,company_name_status_raw,company_status_raw,vl_id,contact_type_raw,contact_job_title_raw,contact_ssn,contact_dob
-             ,contact_status_raw,contact_email,contact_phone,from_hdr,company_department,ALL);
+             ,contact_status_raw,contact_email,contact_phone,from_hdr,company_department));
+GroupIngest0 := GROUP(GroupIngest0_dist,source,source_record_id,title,fname,mname,lname,name_suffix,company_name,company_name_type_raw,prim_range,predir,prim_name,postdir,sec_range,v_city_name,st,zip,zip4,company_address_type_raw,company_fein,best_fein_indicator,company_phone,phone_type,phone_score,company_org_structure_raw,company_sic_code1,company_sic_code2,company_sic_code3,company_sic_code4,company_sic_code5,company_naics_code1,company_naics_code2,company_naics_code3,company_naics_code4
+             ,company_naics_code5,company_ticker,company_ticker_exchange,company_url,company_inc_state,company_charter_number,company_name_status_raw,company_status_raw,vl_id,contact_type_raw,contact_job_title_raw,contact_ssn,contact_dob
+             ,contact_status_raw,contact_email,contact_phone,from_hdr,company_department,ALL,LOCAL);
   AllIngestRecs0 := UNGROUP(ROLLUP( SORT( GroupIngest0,__Tpe,rcid),TRUE,MergeData(LEFT,RIGHT)));
   // Incremental Ingest: combine delta with base file
   GroupBase0 := GROUP( Base0+Delta0,source,source_record_id,title,fname,mname,lname,name_suffix,company_name,company_name_type_raw,prim_range,predir,prim_name,postdir,sec_range,v_city_name,st,zip,zip4,company_address_type_raw,company_fein,best_fein_indicator,company_phone,phone_type,phone_score,company_org_structure_raw,company_sic_code1,company_sic_code2,company_sic_code3,company_sic_code4,company_sic_code5,company_naics_code1,company_naics_code2,company_naics_code3,company_naics_code4
@@ -149,9 +153,13 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
  
   Base1 := IF(incremental,AllBaseRecs0,Base0);
   FilesToIngest1 := IF(incremental,FilesToIngest0,AllIngestRecs0);
-  Group0 := GROUP( Base1+FilesToIngest1,source,source_record_id,title,fname,mname,lname,name_suffix,company_name,company_name_type_raw,prim_range,predir,prim_name,postdir,sec_range,v_city_name,st,zip,zip4,company_address_type_raw,company_fein,best_fein_indicator,company_phone,phone_type,phone_score,company_org_structure_raw,company_sic_code1,company_sic_code2,company_sic_code3,company_sic_code4,company_sic_code5,company_naics_code1,company_naics_code2,company_naics_code3,company_naics_code4
+  /*HACK03*/
+Group0_dist := DISTRIBUTE( Base1+FilesToIngest1, hash32(source,source_record_id,title,fname,mname,lname,name_suffix,company_name,company_name_type_raw,prim_range,predir,prim_name,postdir,sec_range,v_city_name,st,zip,zip4,company_address_type_raw,company_fein,best_fein_indicator,company_phone,phone_type,phone_score,company_org_structure_raw,company_sic_code1,company_sic_code2,company_sic_code3,company_sic_code4,company_sic_code5,company_naics_code1,company_naics_code2,company_naics_code3,company_naics_code4
              ,company_naics_code5,company_ticker,company_ticker_exchange,company_url,company_inc_state,company_charter_number,company_name_status_raw,company_status_raw,vl_id,contact_type_raw,contact_job_title_raw,contact_ssn,contact_dob
-             ,contact_status_raw,contact_email,contact_phone,from_hdr,company_department,ALL);
+             ,contact_status_raw,contact_email,contact_phone,from_hdr,company_department));
+Group0 := GROUP(Group0_dist,source,source_record_id,title,fname,mname,lname,name_suffix,company_name,company_name_type_raw,prim_range,predir,prim_name,postdir,sec_range,v_city_name,st,zip,zip4,company_address_type_raw,company_fein,best_fein_indicator,company_phone,phone_type,phone_score,company_org_structure_raw,company_sic_code1,company_sic_code2,company_sic_code3,company_sic_code4,company_sic_code5,company_naics_code1,company_naics_code2,company_naics_code3,company_naics_code4
+             ,company_naics_code5,company_ticker,company_ticker_exchange,company_url,company_inc_state,company_charter_number,company_name_status_raw,company_status_raw,vl_id,contact_type_raw,contact_job_title_raw,contact_ssn,contact_dob
+             ,contact_status_raw,contact_email,contact_phone,from_hdr,company_department,ALL,LOCAL);
   AllRecs0 := UNGROUP(ROLLUP( SORT( Group0,__Tpe,rcid),TRUE,MergeData(LEFT,RIGHT)));
 //Now need to update 'rid' numbers on new records
 //Base upon ut.Mac_Sequence_Records

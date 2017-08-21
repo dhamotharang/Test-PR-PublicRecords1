@@ -1,19 +1,16 @@
-import wk_ut,bipv2_build;
+import wk_ut,bipv2_build,strata;
 
-pversion := '20131217';
-#workunit ('name', 'BIPV2 Business Header Source Ingest -'+pversion);
-#option('multiplePersistInstances',FALSE);
+pversion := '@version@';
 
-//Build_Ingest := output(BIPV2.BL_Init());
-Build_Stats	 := BIPV2.BH_Source_Ingest_Field_Pop_stats;
+#workunit ('name', 'BIPV2.BWR_Build_Source_Ingest ' + pversion);
+#option   ('multiplePersistInstances',FALSE);
 
-// -- Send Orbit item list--makes it easier to fill this out in Orbit
-fileitems         := wk_ut.get_StringFilesRead(workunit,'^(?=.*?[[:digit:]]{8}.*).*?(base|biz|out).*$');  
-SendOrbitItemList := BIPV2_Build.Send_Emails(pversion,pBuildName := 'BIPV2 Build Orbit Item List',pBuildMessage := fileitems).BIPV2WeeklyKeys.BuildNote;
+Build_Stats	        := BIPV2.BH_Source_Ingest_Field_Pop_stats;
+Orbit_Items_Strata  := wk_ut.Strata_Orbit_Item_list(workunit,'BIPV2','Full_Build'  ,pversion ,pEmailNotifyList := BIPV2_Build.mod_email.emailList,pIsTesting := false);
 
-sequential( BIPV2.Create_Supers
-					 ,BIPV2.Build_Source_Ingest(pversion)
-					 ,Build_Stats
-           ,SendOrbitItemList
-					);
-//EXPORT BWR_Build_Source_Ingest := 'todo';
+sequential( 
+   BIPV2.Create_Supers
+  ,BIPV2.Build_Source_Ingest(pversion)
+  ,Build_Stats
+  ,Orbit_Items_Strata
+);

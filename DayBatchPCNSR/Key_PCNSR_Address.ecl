@@ -1,11 +1,11 @@
 import doxie;
 
-DayBatchPCNSR.Layout_PCNSR_prekey  reformat(DayBatchPCNSR.File_PCNSR l) := transform 
+DayBatchPCNSR.Layout_PCNSR_prekey  reformat(DayBatchPCNSR.File_PCNSR_keybuild l) := transform 
 
    self:= l ;
 end; 
 
-file_prekey_in:= project(DayBatchPCNSR.File_PCNSR ,reformat(left));  
+file_prekey_in:= project(DayBatchPCNSR.File_PCNSR_keybuild ,reformat(left));  
 valid_addresses := file_prekey_in(zip<>'' and prim_name<>'');
 
 export Key_PCNSR_Address := index(valid_addresses,

@@ -28,7 +28,7 @@ AutoKeyB2.MAC_Build (b,
 					Constant(filedate,source).ak_logical,
 					outaction, false, //diffing
 					skip_set, true, 'BC', // use fakes
-					true); //useOnlyRecordIDs
+					true,,,zero); //useOnlyRecordIDs
 
 AutoKeyB2.MAC_AcceptSK_to_QA('~thor_data400::key::INFOUSA::'+source+'::@version@::autokey::', mymove)
 

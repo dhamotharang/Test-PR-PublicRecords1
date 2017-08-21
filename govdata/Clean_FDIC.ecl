@@ -32,7 +32,7 @@ export Clean_FDIC (string filedate,
 	 ds_sort_base						:= sort(dBase, RECORD, EXCEPT process_date,source_rec_id);
 	 
 	 govdata.Layouts_FDIC.Base_AID   rollupXform(govdata.Layouts_FDIC.Base_AID  l, govdata.Layouts_FDIC.Base_AID  r) := transform
-			self.process_date  	:= (STRING)ut.LatestDate((INTEGER)l.process_date,(INTEGER)r.process_date);
+			self.process_date  	:= (STRING)max((INTEGER)l.process_date,(INTEGER)r.process_date);
 			self.source_rec_id	:= if(l.source_rec_id <> 0,l.source_rec_id,r.source_rec_id);
 			self 								:= l;
 	 end;

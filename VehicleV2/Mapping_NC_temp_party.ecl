@@ -17,7 +17,7 @@ dNCBaseDist	:=	distribute(	dNCBase,
 																	VEHICLE_TYPE_desc,
 																	MODEL_desc,
 																	body_style_desc,
-																	Orig_Net_Weight,
+																	// Orig_Net_Weight,			//DF-8238
 																	Number_Of_Axles,
 																	MAJOR_COLOR_desc,
 																	MINOR_COLOR_desc 
@@ -35,7 +35,7 @@ dNCBaseSort	:=	sort(	dNCBaseDist,
 											VEHICLE_TYPE_desc,
 											MODEL_desc,
 											body_style_desc,
-											Orig_Net_Weight,
+											// Orig_Net_Weight,				//DF-8238
 											Number_Of_Axles,
 											MAJOR_COLOR_desc,
 											MINOR_COLOR_desc,
@@ -59,7 +59,7 @@ dNCTempMainDist	:=	distribute(	dNCTempMain,
 																			VEHICLE_TYPE_desc,
 																			MODEL_desc,
 																			body_style_desc,
-																			Orig_Net_Weight,
+																			// Orig_Net_Weight,			//DF-8238
 																			Number_Of_Axles,
 																			MAJOR_COLOR_desc,
 																			MINOR_COLOR_desc
@@ -78,7 +78,7 @@ dNCTempMainSort	:=	sort(	dNCTempMainDist,
 													VEHICLE_TYPE_desc,
 													MODEL_desc,
 													body_style_desc,
-													Orig_Net_Weight,
+													// Orig_Net_Weight,			//DF-8238
 													Number_Of_Axles,
 													MAJOR_COLOR_desc,
 													MINOR_COLOR_desc,
@@ -104,7 +104,7 @@ dNCPartyIterationKey	:=	join(	dNCBaseSort,
 																left.VEHICLE_TYPE_desc	=	right.VEHICLE_TYPE_desc			AND
 																left.MODEL_desc					=	right.MODEL_desc						AND
 																left.body_style_desc		=	right.body_style_desc				AND
-																left.Orig_Net_Weight		=	right.Orig_Net_Weight				AND
+																// left.Orig_Net_Weight		=	right.Orig_Net_Weight				AND		//DF-8238
 																left.Number_Of_Axles		=	right.Number_Of_Axles				AND
 																left.MAJOR_COLOR_desc		=	right.MAJOR_COLOR_desc			AND
 																left.MINOR_COLOR_desc		=	right.MINOR_COLOR_desc,
@@ -116,7 +116,7 @@ dNCPartyIterationKey	:=	join(	dNCBaseSort,
 //---------------------------------------------------------------------------
 //-------NORMALIZE TWO REGISTERED OWNERS
 //---------------------------------------------------------------------------
-VehicleV2.Layout_Base.Party	tParty(dNCPartyIterationKey	pInput,integer	cnt)	:=
+VehicleV2.Layout_Base.Party_BIP	tParty(dNCPartyIterationKey	pInput,integer	cnt)	:=
 transform
 	self.State_Bitmap_Flag						:=	0;
 	self.Date_First_Seen 							:=	(UNSIGNED) pInput.Dt_First_Seen;
@@ -226,7 +226,7 @@ AID.MacAppendFromRaw_2Line(	dNCAddrLastPopulated,
 														lAIDAppendFlags
 													);
 
-VehicleV2.Layout_Base.Party	tAceAddress(dNCPartyAppendAID	pInput)	:=
+VehicleV2.Layout_Base.Party_BIP	tAceAddress(dNCPartyAppendAID	pInput)	:=
 transform
 	self.Ace_prim_range			:=	pInput.AIDWork_AceCache.prim_range;
 	self.Ace_predir					:=	pInput.AIDWork_AceCache.predir;

@@ -144,6 +144,35 @@ module
 		
 		end;
 		
+		export Fixed_Companies :=
+			record, maxlength(max_size)
+				string11 	MainCompanyID;   	
+				string80 	CompanyName;        
+				string12 	Ticker;             
+				string5 	FortuneRank;        
+				string60 	PrimaryIndustry;     
+				string50 	Address1;           
+				string30 	Address2;           
+				string25 	City;               
+				string2 	State;             
+				string12 	Zip;                
+				string15 	Country;           			
+				string10 	Region;             
+				string17 	Phone;            
+				string7 	Extension;         
+				string30 	WebURL;             
+				string15 	Sales;              
+				string11 	Employees;         
+				string200 Competitors;        
+				string100 DivisionName;     
+				string245 SICCode;            
+				string250 Auditor;           
+				string11 	EntryDate;          				
+				string11 	LastUpdate;        
+				string3 	EntryStaffID;       
+				string8192 Description;      				
+			end; 
+			
 	end;
 
 	////////////////////////////////////////////////////////////////////////
@@ -205,6 +234,26 @@ module
 	export Temporary :=
 	module
 	
+		export Keybuild_LinkIds :=
+		record, maxlength(max_size)
+      bipv2.IDlayouts.l_xlink_ids;	//Added for BIP project
+			unsigned8 source_rec_id := 0; //Added for BIP project			
+			unsigned6																		Bdid												:= 0;
+			unsigned1																		bdid_score									:= 0;
+			unsigned8							    									raw_aid											:= 0;
+			unsigned8							    									ace_aid											:= 0;
+			unsigned4 																	dt_first_seen										;
+			unsigned4 																	dt_last_seen										;
+			unsigned4 																	dt_vendor_first_reported				;
+			unsigned4 																	dt_vendor_last_reported					;
+			string1																			record_type											;
+
+			input.Fixed_Companies											  rawfields												;
+			Address.Layout_Clean182_fips								Clean_address										;
+
+			Miscellaneous.Companies.Cleaned_Dates				clean_dates											;
+			Miscellaneous.Companies.Cleaned_Phones			clean_phones										;
+		end;
 	
 		export Slim_Contacts := record
 			string maincompanyid;	

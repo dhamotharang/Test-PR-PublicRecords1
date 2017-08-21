@@ -38,7 +38,7 @@ export Proc_Copy_FCRA_Keys(string filedate,string datasetname,string keysuffix) 
 	superkeys := fileservices.LogicalFileSuperOwners(destkeyname);
 	
 	email_me := fileservices.sendemail(
-													'avenkatachalam@seisint.com',
+													'christopher.brodeur@lexisnexis.com,cguyton@seisint.com',
 													'Gong NonFCRA-FCRA Copy Failed ' + filedate,
 													sourcekeyname + ' does not exist, check' + WORKUNIT
 													);
@@ -54,7 +54,7 @@ export Proc_Copy_FCRA_Keys(string filedate,string datasetname,string keysuffix) 
 								// Clearing superkeys
 								clearallsuperfiles(superkeys),
 								// Copy file
-								fileservices.copy(sourcekeyname,_control.TargetGroup.BDL_400,destkeyname,,,,,true),
+								fileservices.copy(sourcekeyname,_control.TargetGroup.BDL_400,destkeyname,,,,,true, true),
 								// perform superfile transacation
 								movekey(filedate,datasetname,keysuffix)
 								),
@@ -62,7 +62,7 @@ export Proc_Copy_FCRA_Keys(string filedate,string datasetname,string keysuffix) 
 							sequential(
 								output('Copying ' + sourcekeyname + ' to ' + destkeyname),
 								// Copy file
-								fileservices.copy(sourcekeyname,_control.TargetGroup.BDL_400,destkeyname,,,,,true),
+								fileservices.copy(sourcekeyname,_control.TargetGroup.BDL_400,destkeyname,,,,,true, true),
 								// perform superfile transaction
 								movekey(filedate,datasetname,keysuffix)
 								)

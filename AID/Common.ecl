@@ -168,26 +168,6 @@ export Common
 		 ** Returns current date/time as string14 formatted as YYYYMMDDhhmmss
 		 ** Can use local(fGetDateTimeString()) if nothor usage to help force unique evaluation
 		 **************************************************************************************/
-		export	string14	fGetDateTimeString()	:=
-		#if(__ECL_VERSION__ >= '5.2')
-			std.date.SecondsToString(std.date.CurrentSeconds(true), '%Y%m%d%H%M%S');
-		#else
-			function
-				string14 fGetDimeTime()	// 14 characters returned
-				 :=
-					BEGINC++
-					#option action
-					struct tm localt;	// localtime in "tm" structure
-					time_t timeinsecs;  // variable to store time in secs
-					time(&timeinsecs);  
-					localtime_r(&timeinsecs,&localt);
-					strftime(__result, 15, "%Y%m%d%H%M%S", &localt); // Formats the localtime to YYYYMMDDhhmmss
-					ENDC++
-				 ;
-				return fGetDimeTime();
-			end
-		 ;
-		#end
-
+		export	string14	fGetDateTimeString()	:=	std.date.SecondsToString(std.date.CurrentSeconds(true), '%Y%m%d%H%M%S');
   end
  ;

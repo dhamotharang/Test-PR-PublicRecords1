@@ -5,7 +5,7 @@
 // doxie.key_nbr_headers
 // doxie.key_nbr_headers_uid
 
-import doxie, header, Census_data, doxie_build, mdr;
+import doxie, header, Census_data, doxie_build, mdr,PRTE2_Header;
 
 // start with all the headers
 df := doxie_build.file_header_building(~mdr.Source_is_on_Probation(src));
@@ -44,7 +44,7 @@ slimrec := record
 	df.valid_SSN;
 	string18	county_name := '';
 	unsigned6 uid := 0;
-	unsigned8   RawAID := 0
+	df.RawAID;
 	
 end;
 df2 := table(
@@ -75,6 +75,7 @@ df3 := group(
 df3 roll_dates(df3 L, df3 R) := transform
 	self.dt_first_seen := if (L.dt_first_seen < R.dt_first_seen and L.dt_first_seen != 0, L.dt_first_seen, R.dt_first_seen);
 	self.dt_last_seen := if (L.dt_last_seen > R.dt_last_seen, L.dt_last_seen, R.dt_last_seen);
+  self.rawaid := if(L.rawaid < R.rawaid and L.rawaid != 0, L.rawaid, R.rawaid);
 	self := l;
 end;
 df4 := rollup(
@@ -99,4 +100,8 @@ df6 := ungroup(df5);
 Census_Data.MAC_Fips2County(df6, st, county, county_name, df7);
 
 // we're outta here (persistent results for efficiency)
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export nbr_headers := df7;
+#ELSE
 export nbr_headers := df7 : PERSIST('thor_data400::persist::doxie::nbr_headers');
+#END

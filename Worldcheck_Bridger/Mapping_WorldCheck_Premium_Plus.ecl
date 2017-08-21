@@ -1,10 +1,10 @@
-#workunit('priority', 'high')
+//workunit('priority', 'high');
 
 import worldcheck_bridger, std;
 
 export Mapping_WorldCheck_Premium_Plus(string filedate) := function
 
-in_f 			:= File_WorldCheck_Premium_In;
+in_f 			:= File_WorldCheck_Premium_In_Rectified;
 
 //POPULATE COMPANIES AND LINKED TOS
 in_comp_l 		:= Find_Companies_and_Linked_Tos(in_f);
@@ -23,7 +23,7 @@ map_keywords	:= distribute(map_keyword, random());
 		string middle_name{xpath('Middle_Name')};
 		string last_name{xpath('Last_Name')};
 		string generation{xpath('Generation')};
-		string full_name{xpath('Full_Name')};
+		unicode full_name{xpath('Full_Name')};
 		string gender{xpath('Gender')};
 		string listed_date{xpath('Listed_Date')};
 		string entity_added_by{xpath('Entity_Added_By')};
@@ -51,8 +51,8 @@ map_keywords	:= distribute(map_keyword, random());
 										l.last_name);
 		self.generation			:= '';
 		self.full_name			:= if(l.e_i_ind <> 'E',
-										'',
-										l.last_name);
+										U'',
+										Latin9ToUnicode(l.last_name));
 		self.gender				:= if(l.e_i_ind = 'M',
 										'Male',
 									if(l.e_i_ind = 'F',
@@ -192,18 +192,6 @@ ds_entity := project(map_keywords, entityTran(left));// : persist('~thor_200::pe
 
 	concat_AKAs := project(all_akas, oldReform(left));
 
-	//Standard Layout	
-	Layout_Aliases := record
-		string Type{xpath('Type')};
-		string Category{xpath('Category')};
-		unicode First_Name{xpath('First_Name')};
-		unicode Middle_Name{xpath('Middle_Name')};
-		unicode Last_Name{xpath('Last_Name')};
-		unicode Generation{xpath('Generation')};
-		unicode Full_Name{xpath('Full_Name')};
-		string Comments{xpath('Comments')};
-	end;
-	
 	// Rollup of Akas and Alternative Spellings
 	AKA_rollup := record
 		string ID;
@@ -445,8 +433,31 @@ map_and_rollup_ids := Mapping_and_Rollup_IDs(in_f);
 									,left.reference_ID = right.Phone_Number_List.ID
 									,join_phone(left,right)
 									,LEFT OUTER): persist('~thor_200::persist::worldcheck::premium_mapping');
+									
+			rOutP SplitRecordsIn254(rOutP l, integer pos) := transform,skip(COUNT(l.aka_list.aka) < 255 AND pos=2)
+				self.id 					:= CASE(pos,
+						1 => l.id,
+						2 => l.id + '999',
+						l.id);
+		
+				self.eui := CASE(pos,
+						1 => l.eui,
+						2 => l.eui + '_999',
+						l.eui);
+						
+				self.aka_list.aka :=	CASE(pos,
+						1 =>  choosen(l.aka_list.aka, 254),
+						2 =>  choosen(l.aka_list.aka, 254, 255),
+						//3 =>  IF(COUNT(l.aka_list.aka)<509, SKIP, choosen(l.aka_list.aka, 254, 209)),
+						l.aka_list.aka);
+
+				self := l;
+			end;	
 	
-	dedup_ent1 			:= dedup(sort(Join_phone_all, reference_id), record, all): persist('~thor_200::persist::worldcheck::premium_plus_mapping_dedup');
+								
+	akakludge := NORMALIZE(Join_phone_all, 2, SplitRecordsIn254(left, counter));
+
+	dedup_ent1 			:= dedup(sort(akakludge, reference_id), record, all): persist('~thor_200::persist::worldcheck::premium_plus_mapping_dedup');
 	
 	
 	entity_count_1		:= count(dedup_ent1(reference_id<>''));
@@ -456,12 +467,16 @@ map_and_rollup_ids := Mapping_and_Rollup_IDs(in_f);
 		dedup_ent1;
 	end;
 	
-	Layout_ent_child_1 ent_Child1(dedup_ent1 l):= transform
-		self := l;
-	end;
+	//Layout_ent_child_1 ent_Child1(dedup_ent1 l):= transform
+	//	self.entity := l;
+	//end;
+	//Layout_XG ent_Child1(dedup_ent1 l):= transform
+	//	self.entity := l;
+	//end;
 	
-	ds1 := project(dedup_ent1, ent_Child1(left));
-		
+	//ds1 := project(dedup_ent1, ent_Child1(left));
+	ds1 := dedup_ent1;
+/*		
 	Layout_Ent_P1	:= record
 		dataset(Layout_ent_child_1) Entity{xpath('Entity')};
 	end;
@@ -473,14 +488,33 @@ map_and_rollup_ids := Mapping_and_Rollup_IDs(in_f);
 
 	p_Ent1 := project(ds1, t_Entity1(left));//: persist('~thor_200::persist::worldcheck::standard_mapping_region_1');
 	
-	Layout_Worldcheck_Entity removeIDs1(p_Ent1 l):= transform
+	Layout_XG removeIDs1(p_Ent1 l):= transform
 		self := l;
 	end;
 	
 	p_Ent_NoIDs_1 := project(p_Ent1, removeIDs1(left));
-	
-	
- return output(p_Ent_NoIDs_1,,'~thor_data200::base::worldcheck_bridger::premium_plus_entity::'+filedate+'.xml', XML('', 
-   								HEADING('<Entity_List Count="'+entity_count_1+'">'
-   								,'</Entity_List></Watchlist>'), TRIM, OPT), overwrite);
+
+	ds := p_Ent_NoIDs_1;
+*/
+	ds := PROJECT(ds1, Layout_XG);
+	Premium_Options := dataset([{
+							 '1'
+							,0
+							,'Entity'
+							,'BAE74C62-6774-4a33-96C4-B622120264CA'
+							,'WORLDCHECK PREMIUM PLUS'
+							,'WorldCheck - Premium Plus Complete File'
+							,'31'
+							,'False'
+							,''
+							,Worldcheck_Bridger.File_In_Country
+							,Worldcheck_Bridger.File_In_Subcategory_Premium
+							}],
+		Worldcheck_Bridger.hdr_layout);
+ //return output(p_Ent_NoIDs_1,,'~thor::base::worldcheck_bridger::premium_plus_entity::'+filedate+'.xml', XML('MYROW', 
+  //								HEADING('<Entity_List Count="'+entity_count_1+'">'
+  // 								,'</Entity_List></Watchlist>'), TRIM, OPT), overwrite);
+  //OUTPUT(ds,,'~thor::base::worldcheck_bridger::premium_plus_entity::flat',compressed,overwrite);
+	return Worldcheck_Bridger.WriteXGFormat(ds, Premium_Options,
+						'~thor::base::worldcheck_bridger::premium_plus_entity::'+filedate+'.xml', filedate);
 end;

@@ -1,4 +1,4 @@
-﻿import AutoKeyI, FLAccidents, AutokeyB2;
+import AutoKeyI, FLAccidents, AutokeyB2;
 
 export AutoKey_IDs(IParam.autokey_search in_mod) := function
 		

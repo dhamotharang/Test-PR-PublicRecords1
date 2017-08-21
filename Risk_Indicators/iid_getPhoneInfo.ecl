@@ -1,4 +1,4 @@
-﻿import riskwise, did_add, ut, risk_indicators, NID, gateway;
+import riskwise, did_add, ut, risk_indicators, NID, gateway;
 
 export iid_getPhoneInfo(grouped dataset(risk_indicators.Layout_Output) with_address_info, dataset(Gateway.Layouts.Config) gateways,
 													unsigned1 dppa, unsigned1 glb, 

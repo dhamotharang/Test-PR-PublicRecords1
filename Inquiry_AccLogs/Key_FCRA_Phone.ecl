@@ -1,6 +1,6 @@
 import doxie, ut;
 
-HashDS := distribute(project(inquiry_acclogs.File_FCRA_Inquiry_Base(length(trim(person_q.personal_phone))=10 and (unsigned)person_q.personal_phone<>0 and
+HashDS := distribute(project(inquiry_acclogs.File_FCRA_Inquiry_Base(bus_intel.industry <> '' and length(trim(person_q.personal_phone))=10 and (unsigned)person_q.personal_phone<>0 and
 					trim(bus_intel.vertical)<>'' and
 					StringLib.StringToUpperCase(trim(search_info.function_description)) not in 
 					['RISKWISE EQUIFAX SEARCH (EQ99)', 'RISKWISE IP SEARCH (NA99)', 'RISKVIEW PRE-SCREENING NET', 'RISKVIEW PRE-SCREENING']), 
@@ -11,9 +11,3 @@ HashDS := distribute(project(inquiry_acclogs.File_FCRA_Inquiry_Base(length(trim(
 
 export Key_FCRA_Phone := index(HashDS, {string10 phone10 := person_q.personal_phone}, {HashDS}, 
 					'~thor_data400::key::inquiry_table::fcra::phone_' + doxie.Version_SuperKey);
-					
-																													
-// HashDS := dataset([], inquiry_acclogs.Layout_FCRAKeys.Phone);
-
-// export Key_FCRA_PHONE := index(HashDS, {phone10}, {HashDS}, 
-					// '~thor_data400::key::inquiry_table::fcra::phone_' + doxie.Version_SuperKey);

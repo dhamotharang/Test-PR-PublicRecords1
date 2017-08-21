@@ -1,7 +1,7 @@
 import ut,header;
 
 c := business_header.File_Business_Contacts_Stats(did<>0,bdid<>0,combined_score>50);
-relrec := header.Layout_relatives;
+relrec := header.Layout_relatives_v2.slim;
 cmi := record
   c.bdid;
   c.did;
@@ -58,4 +58,4 @@ withDups := join(associates_init_reduced,
 
 redis := distribute(withDups,hash(person1,person2));
 
-export BA_Dist := redis : persist('Business_Header_BA_Dist');
+export BA_Dist := redis : persist(persistnames().BADist);

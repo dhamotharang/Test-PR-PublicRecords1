@@ -1,91 +1,98 @@
-import ut,fbnv2;
 
-dFiling			            := dedup(File_TX_Harris_in(file_number<>''),all);
+IMPORT FBNV2, ut, _validate;
 
-layout_common.Business tFiling(dFiling pInput)
-   :=TRANSFORM
-            string date                     :=pInput.DATE_FILED[5..8]+pInput.DATE_FILED[1..2]+pInput.DATE_FILED[3..4];
-			self.tmsid					    := 'TXH'+ hash(pInput.CITY1+pInput.NAME1);
-			self.rmsid                      := 'T'+if(pInput.FILe_NUMBER<>'',hash(pInput.FILE_NUMBER),
-			                                    			if(DATE<>'',hash(DATE),hash(pInput.STREET_ADD1 )));
-			
+// Since we're always going to have old logic and new logic that's not so easily done in 1 transform,
+// we'll project into a common layout, doing the unique logic necessary, before going to the final
+// layout.
+cleaned_common_rec := RECORD
+  Layout_File_TX_Harris_in.Cleaned;
+	// Needed fields for unique logic
+	UNSIGNED4 the_cancellation_date := 0;
+	STRING10  business_status := '';
+END;
+
+cleaned_common_rec xform_old_to_common(Layout_File_TX_Harris_in.Cleaned L) := TRANSFORM
+  the_date_filed        		 := L.DATE_FILED[5..8] + L.DATE_FILED[1..4];
+	SELF.the_cancellation_date := IF(L.RECORD_TYPE = '3', (INTEGER)the_date_filed, 0);
+	SELF.business_status       := IF(L.RECORD_TYPE = '3', 'INACTIVE', 'ACTIVE');
+
+  SELF := L;
+END;
+
+cleaned_common_rec xform_new_to_common(Layout_File_TX_Harris_in.Cleaned L) := TRANSFORM
+  // NOTE: There is no cancellation date for the new input
+	SELF.business_status := IF(L.ASSUMED_NAME='W',
+			                       'WITHDRAWN',
+														 IF(L.EXPIRED_TERM = 'Y', 'EXPIRED', ''));
+
+  SELF := L;
+END;
+
+dOldFiling := PROJECT(File_TX_Harris_in.Cleaned_Old(FILE_NUMBER != ''), xform_old_to_common(LEFT));
+dNewFiling := PROJECT(File_TX_Harris_in.Cleaned(FILE_NUMBER != ''), xform_new_to_common(LEFT));
+dFiling_combined := dOldFiling + dNewFiling;
+dFiling_dist     := DISTRIBUTE(dFiling_combined, HASH(FILE_NUMBER));
+dFiling_sort     := SORT(dFiling_dist, RECORD, LOCAL);
+dFiling          := DEDUP(dFiling_sort, RECORD, LOCAL);
+
+layout_common.Business_AID tFiling(dFiling pInput) := TRANSFORM
+  // All versions (old and new) stored as MMDDYYYY, translate back to YYYYMMDD
+  the_date_filed        				:= pInput.DATE_FILED[5..8] + pInput.DATE_FILED[1..4];
+
+	SELF.tmsid					          := 'TXH' + HASH(pInput.CITY1 + pInput.NAME1);
+	SELF.rmsid                    := 'T' + IF(pInput.FILE_NUMBER <> '',
+	                                          HASH(pInput.FILE_NUMBER),
+																						IF(the_date_filed <> '',
+																						   HASH(the_date_filed),
+																							 HASH(pInput.STREET_ADD1)));
 	
-			self.dt_first_seen      		:= (integer) date ;
-			self.dt_last_seen       		:= (integer) date ;
-			self.dt_vendor_first_reported  	:= (integer) date ;
-			self.dt_vendor_last_reported  	:= (integer) date ;
-			self.Filing_Jurisdiction        := 'TXH';
-			self.FILING_NUMBER           	:= pInput.FILE_NUMBER;           
-			self.Filing_date                := (integer) DATE  ;          
-			self.BUS_NAME           		:= pInput.NAME1 ;
-			SELF.LONG_BUS_NAME              := pInput.NAME1;
-			self.BUS_ADDRESS1           	:= pInput.STREET_ADD1;             
-			self.BUS_CITY                   := pInput.CITY1;                
-			self.BUS_STATE                  := pInput.STATE1 ;              
-			self.BUS_ZIP           			:= (integer)pInput.ZIP1 ; 
-			self.EXPIRATION_DATE            := (INTEGER) date+((integer)pInput.TERM)*10000;
-			self.BUS_STATUS                 := IF(pInput.RECORD_TYPE='3','INACTIVE','ACTIVE');
-			self.cancellation_date          := IF(pInput.RECORD_TYPE='3',(INTEGER) date,0);
-			self.prim_range 				:=	pInput.clean_address[1..10];			
-			self.predir 					:=	pInput.clean_address[11..12];			
-			self.prim_name 					:=	pInput.clean_address[13..40];			
-			self.addr_suffix				:=	pInput.clean_address[41..44];			
-			self.postdir 					:=	pInput.clean_address[45..46];			
-			self.unit_desig 				:=	pInput.clean_address[47..56];			
-			self.sec_range 					:=	pInput.clean_address[57..64];			
-			self.v_city_name 				:=	pInput.clean_address[90..114];			
-			self.st 						:=	pInput.clean_address[115..116];			
-			self.zip5 						:=	pInput.clean_address[117..121];			
-			self.zip4 						:=	pInput.clean_address[122..125];			
-			self.addr_rec_type				:=	pInput.clean_address[139..140];			
-			self.fips_state 				:=	pInput.clean_address[141..142];			
-			self.fips_county 				:=  pInput.clean_address[143..145];				
-			self.geo_lat 					:=	pInput.clean_address[146..155];			
-			self.geo_long 					:=	pInput.clean_address[156..166];			
-			self.cbsa						:=	pInput.clean_address[167..170];			
-			self.geo_blk 					:=	pInput.clean_address[171..177];			
-			self.geo_match 					:=	pInput.clean_address[178];			
-			self.err_stat 					:=	pInput.clean_address[179..182];
-			self.mail_prim_range 			:=	pInput.clean_address[1..10];			
-			self.mail_predir 				:=	pInput.clean_address[11..12];			
-			self.mail_prim_name 			:=	pInput.clean_address[13..40];			
-			self.mail_addr_suffix			:=	pInput.clean_address[41..44];			
-			self.mail_postdir 				:=	pInput.clean_address[45..46];			
-			self.mail_unit_desig 			:=	pInput.clean_address[47..56];			
-			self.mail_sec_range 			:=	pInput.clean_address[57..64];			
-			self.mail_v_city_name 			:=	pInput.clean_address[90..114];			
-			self.mail_st 					:=	pInput.clean_address[115..116];			
-			self.mail_zip5 					:=	pInput.clean_address[117..121];			
-			self.mail_zip4 					:=	pInput.clean_address[122..125];			
-			self.mail_addr_rec_type			:=	pInput.clean_address[139..140];			
-			self.mail_fips_state 			:=	pInput.clean_address[141..142];			
-			self.mail_fips_county 			:=  pInput.clean_address[143..145];				
-			self.mail_geo_lat 				:=	pInput.clean_address[146..155];			
-			self.mail_geo_long 				:=	pInput.clean_address[156..166];			
-			self.mail_cbsa					:=	pInput.clean_address[167..170];			
-			self.mail_geo_blk 				:=	pInput.clean_address[171..177];			
-			self.mail_geo_match 			:=	pInput.clean_address[178];			
-			self.mail_err_stat 				:=	pInput.clean_address[179..182];
-
-	 end;
-
-layout_common.Business  rollupXform(layout_common.Business pLeft, layout_common.Business pRight) 
-	:= transform
-		
-		self.Dt_First_Seen := IF(pLeft.dt_First_Seen > pRight.dt_First_Seen, pRight.dt_First_Seen, pLeft.dt_First_Seen);
-		self.Dt_Last_Seen  := IF(pLeft.dt_Last_Seen  < pRight.dt_Last_Seen,  pRight.dt_Last_Seen,  pLeft.dt_Last_Seen);
-		self.Dt_Vendor_First_Reported := IF(pLeft.dt_Vendor_First_Reported > pRight.dt_Vendor_First_Reported, 
-											pRight.dt_Vendor_First_Reported, pLeft.dt_Vendor_First_Reported);
-		self.Dt_Vendor_Last_Reported  := IF(pLeft.dt_Vendor_Last_Reported  < pRight.dt_Vendor_Last_Reported,  
-											pRight.dt_Vendor_Last_Reported, pLeft.dt_Vendor_Last_Reported);
-		self := pLeft;
-	END;
+	SELF.dt_first_seen      		  := if(_validate.date.fIsValid((string) the_date_filed), (integer) the_date_filed,0); 
+	SELF.dt_last_seen       		  := if(_validate.date.fIsValid((string) the_date_filed), (integer) the_date_filed,0); 
+	SELF.dt_vendor_first_reported := if(_validate.date.fIsValid((string) pInput.process_date), (integer) pInput.process_date,0); 
+	SELF.dt_vendor_last_reported  := if(_validate.date.fIsValid((string) pInput.process_date), (integer) pInput.process_date,0); 
+	SELF.Filing_Jurisdiction      := 'TXH';
+	SELF.FILING_NUMBER           	:= pInput.FILE_NUMBER;
+	SELF.Filing_date              := if(_validate.date.fIsValid((string) the_date_filed), (integer) the_date_filed,0); 
+	SELF.BUS_NAME           		  := pInput.NAME1;
+	SELF.LONG_BUS_NAME            := pInput.NAME1;
+	SELF.BUS_ADDRESS1           	:= pInput.STREET_ADD1;
+	SELF.BUS_CITY                 := pInput.CITY1;
+	SELF.BUS_STATE                := 'TX';
+	SELF.BUS_COUNTY								:= 'HARRIS';
+	SELF.BUS_ZIP           			  := (INTEGER)pInput.ZIP1;
+	SELF.MAIL_STREET  				    := pInput.STREET_ADD1;
+	SELF.MAIL_CITY 					      := pInput.CITY1;
+	SELF.MAIL_STATE 				      := pInput.STATE1;
+	SELF.MAIL_ZIP 					      := pInput.ZIP1;
+	SELF.EXPIRATION_DATE          := if(_validate.date.fIsValid((string) ((INTEGER)the_date_filed + (INTEGER)pInput.TERM * 10000)), ((INTEGER)the_date_filed + (INTEGER)pInput.TERM * 10000),0); 
+	SELF.BUS_STATUS               := pInput.business_status;
+	SELF.cancellation_date        := if(_validate.date.fIsValid((string) pInput.the_cancellation_date), (integer) pInput.the_cancellation_date,0); 
+	SELF.prep_addr_line1					:= pInput.prep_addr1_line1;
+	SELF.prep_addr_line_last			:= pInput.prep_addr1_line_last;
+	SELF.prep_mail_addr_line1			:= pInput.prep_addr1_line1;
+	SELF.prep_mail_addr_line_last	:= pInput.prep_addr1_line_last;
 	
+	SELF := pInput;
+END;
 
-dSortFiling	:=SORT(DISTRIBUTE(dedup(project(dfiling,tfiling(left)),all),hash(ORIG_FILING_NUMBER)),
-                  RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local);
-dout        :=rollup(dSortFiling,rollupXform(left,right),
-					RECORD,except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported,local)
-					:persist(cluster.cluster_out+'persist::FBNV2::TXH::Business');
-					 
-export Mapping_FBN_TX_Harris_Business := dout ;
+layout_common.Business_AID rollupXform(layout_common.Business_AID pLeft, layout_common.Business_AID pRight) := TRANSFORM
+	SELF.Dt_First_Seen            := ut.Min2(pLeft.dt_First_Seen, pRight.dt_First_Seen);
+	SELF.Dt_Last_Seen             := MAX(pLeft.dt_Last_Seen , pRight.dt_last_seen);
+	SELF.Dt_Vendor_First_Reported := ut.min2(pLeft.dt_Vendor_First_Reported, pRight.dt_Vendor_First_Reported);
+	SELF.Dt_Vendor_Last_Reported  := MAX(pLeft.dt_Vendor_Last_Reported, pRight.dt_Vendor_Last_Reported);
+
+	SELF := pLeft;
+END;
+
+// DEDUP removed because it's unnecessary
+dSortFiling	:= SORT(DISTRIBUTE(PROJECT(dfiling, tfiling(LEFT)), HASH(ORIG_FILING_NUMBER)),
+                    RECORD,
+										   EXCEPT dt_first_seen, dt_last_seen, dt_vendor_first_reported, dt_vendor_last_reported,
+										LOCAL);
+dout := ROLLUP(dSortFiling,
+               rollupXform(LEFT, RIGHT),
+					     RECORD,
+							    EXCEPT dt_first_seen, dt_last_seen, dt_vendor_first_reported, dt_vendor_last_reported,
+							 LOCAL) : PERSIST(cluster.cluster_out + 'persist::FBNV2::TXH::Business');
+
+EXPORT Mapping_FBN_TX_Harris_Business := dout;

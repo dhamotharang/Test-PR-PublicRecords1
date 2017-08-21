@@ -1,12 +1,9 @@
-#workunit('name', 'Corp2 Complete Process ' + Corp2.versions.building);
+pversion	:= '20170707';   // modify to current date
 
-// -- Check the Flags attribute to make sure they are correct for this build
-// -- Also check the versions attribute and set to current date
+#workunit('protect',true);
+#workunit('name', 'Yogurt:Corp2 Complete Process ' + pversion);
+#workunit('priority','high');
+#workunit('priority',12);
+#option ('activitiesPerCpp', 50);
 
-corp2.mBuild_All.All;
-
-/*
-corp2.proc_BuildAll.build_bases
-corp2.proc_BuildAll.build_roxie_keys
-corp2.proc_BuildAll.accept2qa
-*/
+corp2.Proc_Build_All(pversion).all;								

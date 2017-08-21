@@ -1,0 +1,2 @@
+// separator as ~ because field delimiter is pipe
+export File_NYC_ALL_In := DATASET(Cluster.Cluster_In + 'in::uccv2::ny_new_york::ALL', UCCV2.Layout_File_Variable_All,csv(separator('~'),TERMINATOR(['\n','\r\n']),MAXLENGTH(100000)));

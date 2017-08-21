@@ -45,6 +45,8 @@ info := text_search.FileName_Info_Instance('~THOR_DATA400::BASE', 'TAXPRO', file
 inData := TAXPRO.File_Base;
 
 
+
+
 // record for mapping tmsid rmsid to doc
 layout_tmsid := record
 typeof(Taxpro.File_Base.tmsid)  tmsid;
@@ -69,6 +71,17 @@ uniquekeys := dedup(sort(distribute(allkeys,hash32(tmsid)),tmsid,local),tmsid,lo
 
 ut.MAC_Sequence_Records(uniquekeys,doc,taxpro_key_translation);
 
+// External key
+	
+	Text_Search.layout_DocSeg MakeKeySegs( taxpro_key_translation l, unsigned2 segno ) := TRANSFORM
+        self.docref.doc := l.doc;
+        self.docref.src := 0;
+		self.segment := segno;
+        self.content := trim(l.tmsid);
+        self.sect := 1;
+    END;
+
+    segkeys := PROJECT(taxpro_key_translation,MakeKeySegs(LEFT,250));
 
 //layout_layout_tmsid_rmsid number_records(layout_tmsid_rmsid L) := transform
 // self.doc := (unsigned)(header.Sourcedata_month[3..7] +(string)thorlib.node()+1*thorlib.nodes());
@@ -88,7 +101,7 @@ mac_append_key(inData,Layout.Taxpro_Standard_Base,
 			taxpro_key_translation,layout_tmsid,
 			taxpro_keyed,Layout_TaxPro_keyed);
 
-docs := TAXPRO.Convert_TaxPro_Func(taxpro_keyed) : persist('~thor_data400::persist::taxpro::boolean');
+docs := TAXPRO.Convert_TaxPro_Func(taxpro_keyed) + segkeys : persist('~thor_data400::persist::taxpro::boolean');
 
 
  

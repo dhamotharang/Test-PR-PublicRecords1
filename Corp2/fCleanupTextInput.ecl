@@ -5,7 +5,7 @@ import lib_stringlib;
 
 EXPORT STRING fCleanupTextInput(STRING pTextString, STRING pTextStringFld  = '' ) := FUNCTION
 
-corp_legal_name_filter := '[^-[:alnum:].,;&()/\'#?+`"!$@:\242\t\052=~%\\134 ]';
+corp_legal_name_filter := '[^-[:alnum:].,;&()/\'#?+`"!$@:\242\t\052=~%\134 ]';
 other_names_filter := '[^-[:alnum:].,\'&/" ]';
 alpha_filter := '[^[:alpha:]]';
 alnum_filter := '[^[:alnum:]]';
@@ -81,5 +81,3 @@ end;
 							 
 RETURN FltrString;
 END;
-
-

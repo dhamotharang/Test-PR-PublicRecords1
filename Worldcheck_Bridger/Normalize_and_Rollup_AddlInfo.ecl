@@ -30,7 +30,57 @@ export Normalize_and_Rollup_AddlInfo(dataset(Layout_WorldCheck_Premium) in_f):= 
 		in_f;
 		string addl_info;
 	end;
+	
+	
+//New Multiple DOB's production 3/15/2017
 
+	pattern Splitdates := pattern('[^;]+');
+	MyParsedRec := record, maxlength(30900)
+		ds_with_new_fields;
+		string CompleteDOB := TRIM(MATCHTEXT(Splitdates),left,right);
+	end;
+
+
+	MyParsedDOB := PARSE(ds_with_new_fields(trim(Date_Of_Birth,left,right) != ''),Date_Of_Birth,Splitdates,MyParsedRec,scan,first);
+	
+	Layout_dob trfDOB(MyParsedDOB l) := transform
+			self.addl_info		:= TRIM(l.CompleteDOB,left,right);
+			self				:= l;
+	end;
+
+
+	ds_NormDOBs := project(MyParsedDOB, trfDOB(left));
+
+	
+	//Calculate DOB with Age and Age_As_Of_Date
+	Layout_dob dobTran(ds_NormDOBs l):= transform
+		self.addl_info 	:= if(trim(L.date_of_birth,left,right)='' 
+								and trim(L.age,left,right) between '18' and '95'
+								and (trim(L.age_as_of_date,left,right)[1..2] between '19' and '20') 
+								and length(trim(L.age_as_of_date[1..4],left,right))=4,
+								(string)((integer)L.age_as_of_date[1..4]-(integer)L.age)+'/00/00',
+								L.date_of_birth);
+		self 			:= l;
+	end;
+
+	populate_dob := project(ds_NormDOBs, dobTran(left));
+	
+	Layout_temp standardTran(populate_dob l):= transform
+		self.type 				:= 'Date of Birth';
+		self.information		:= l.addl_info;
+								//Bridger needs dobs in YYYY/MM/DD format in order to do a search	
+		self.parsed				:= if(length(trim(l.addl_info, left, right))=10 and regexfind('/', trim(l.addl_info, left, right)[5],0)<>'' and regexfind('/', trim(l.addl_info, left, right)[8],0)<>'',
+										l.addl_info,
+										'');
+		self.comments 			:= '';
+		self.id					:= l.uid;
+		self := l;
+	end;
+	
+ds_reformdob := project(populate_dob, standardTran(left))(information<>'');
+
+//Old version - obsolete 2017/03/15
+/*
 	//Calculate DOB with Age and Age_As_Of_Date
 	Layout_dob dobTran(ds_with_new_fields l):= transform
 		self.addl_info 	:= if(trim(L.date_of_birth,left,right)='' 
@@ -57,6 +107,8 @@ export Normalize_and_Rollup_AddlInfo(dataset(Layout_WorldCheck_Premium) in_f):= 
 	end;
 	
 ds_reformdob := project(populate_dob, standardTran(left))(information<>'');
+*/
+//END DOB section
 
 //POPULATE POSITIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

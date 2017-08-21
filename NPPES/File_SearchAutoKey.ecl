@@ -1,6 +1,6 @@
 export File_SearchAutoKey := function
 			
-	akds := nppes.File_NPPES_Keybuild;
+	akds := project(nppes.File_NPPES_Keybuild,nppes.layouts.keybuild);
 	
 	return akds;
 	

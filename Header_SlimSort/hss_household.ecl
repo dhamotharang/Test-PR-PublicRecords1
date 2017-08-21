@@ -1,6 +1,6 @@
-IMPORT header, address, UT;
+IMPORT header, address, UT, mdr,prte2_header;
 
-h := header.file_headers(lname != ''); //propagated_matchrecs(lname != '');
+h := header.file_headers(lname != '' and ~mdr.sourceTools.SourceIsTransUnion(src)); //propagated_matchrecs(lname != '');
 
 hh_f := distribute(header.HHID_Table_Final, hash(did));
 hh := dedup(sort(hh_f, did, -last_current, local), did, local);
@@ -120,4 +120,8 @@ j2 := JOIN(j1, lname_addr_nosec_ct,
 	LEFT.st = RIGHT.st,
 	JoinNoSec(LEFT, RIGHT), LOCAL);
 
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+EXPORT hss_household := j2;
+#ELSE
 EXPORT hss_household := j2 : PERSIST('headerbuild_hss_hhid');
+#END

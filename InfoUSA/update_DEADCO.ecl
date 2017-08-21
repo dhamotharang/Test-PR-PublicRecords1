@@ -1,6 +1,6 @@
 import InfoUSA;
 
-file_in   := infousa.File_DEADCO_Clean_In;
+file_in   := infousa.File_DEADCO_Clean_In_bh;
 
 file_sort := sort(file_in, record, except dt_first_seen,dt_last_seen, dt_vendor_first_reported,dt_vendor_last_reported, process_date);  
 

@@ -1,9 +1,10 @@
+import ut;
 export Convert_Property_Search_V2 := function
 
 
 
-kf := dedup(sort(dataset ('~thor_data400::base::override::fcra::qa::property_search_v2',
-               FCRA.Layout_Override_Property_Search_In, flat,opt),-flag_file_id),except flag_file_id,keep(1));
+kf := dedup(sort(distribute(dataset ('~thor_data400::base::override::fcra::qa::property_search_v2',
+               FCRA.Layout_Override_Property_Search_In, flat,opt),hash(ln_fares_id)),ln_fares_id,did,source_code,-flag_file_id,local),record,except flag_file_id,keep(1),local);
 
 
 // This is practically LN_PropertyV2/layout_search_building, with a few fields defined in a different order

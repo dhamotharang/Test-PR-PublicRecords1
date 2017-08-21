@@ -1,0 +1,93 @@
+dell_input	:= Commercial_Fraud.Files().input.dell.sprayed;
+dell_output := Commercial_Fraud.Files().dell_out_append.qa;
+
+count_dell_input	:= count(dell_input	);
+count_dell_output	:= count(dell_output);
+
+count_unique_app_ref_key_input 	:= count(table(dell_input,{app_ref_key},app_ref_key));
+count_unique_app_ref_key_output := count(table(dell_output,{rawfields.app_ref_key},rawfields.app_ref_key));
+
+output(count_dell_input		,named('count_dell_input'	));
+output(count_dell_output	,named('count_dell_output'	));
+output(count_unique_app_ref_key_input 	,named('count_unique_app_ref_key_input' ));
+output(count_unique_app_ref_key_output	,named('count_unique_app_ref_key_output'));
+
+///////////////////////////////////////////////////////////////////////////////////////
+DellfStandardizeName												:= Commercial_Fraud.Persists().DellfStandardizeName												;									
+DellAppendIdsAid														:= Commercial_Fraud.Persists().DellAppendIdsAid														;
+DellAppendIdsBdid														:= Commercial_Fraud.Persists().DellAppendIdsBdid													;
+DellAppendIdsBdid_dBdid_in_BizSumm					:= Commercial_Fraud.Persists().DellAppendIdsBdid_dBdid_in_BizSumm					;
+DellAppendIdsBdid_dBdid_Not_in_BizSumm			:= Commercial_Fraud.Persists().DellAppendIdsBdid_dBdid_Not_in_BizSumm			;
+DellAppendIdsBdid_dBdidOut_withoutbdid_all	:= Commercial_Fraud.Persists().DellAppendIdsBdid_dBdidOut_withoutbdid_all	;
+DellAppendIdsBdid_djoinCityState						:= Commercial_Fraud.Persists().DellAppendIdsBdid_djoinCityState						;
+DellAppendIdsBdid_djoinCityState_nomatches	:= Commercial_Fraud.Persists().DellAppendIdsBdid_djoinCityState_nomatches	;
+DellAppendIdsBdid_dBDidOut_sort							:= Commercial_Fraud.Persists().DellAppendIdsBdid_dBDidOut_sort						;
+DellAppendIdsBdid_dBDidOut_dedup						:= Commercial_Fraud.Persists().DellAppendIdsBdid_dBDidOut_dedup						;
+DellAppendIdsBdid_dAssignBdids							:= Commercial_Fraud.Persists().DellAppendIdsBdid_dAssignBdids							;
+DellSummaryAppendsAddress										:= Commercial_Fraud.Persists().DellSummaryAppendsAddress									;
+DellSummaryAppendsBusiness									:= Commercial_Fraud.Persists().DellSummaryAppendsBusiness									;
+DellSummaryAppendsContact										:= Commercial_Fraud.Persists().DellSummaryAppendsContact									;
+DellAppendMiscellaneous											:= Commercial_Fraud.Persists().DellAppendMiscellaneous										;
+
+countDellfStandardizeName											 	:= count(DellfStandardizeName												);
+countDellAppendIdsAid													 	:= count(DellAppendIdsAid														);
+countDellAppendIdsBdid													:= count(DellAppendIdsBdid													);
+countDellAppendIdsBdid_dBdid_in_BizSumm				 	:= count(DellAppendIdsBdid_dBdid_in_BizSumm					);
+countDellAppendIdsBdid_dBdid_Not_in_BizSumm		 	:= count(DellAppendIdsBdid_dBdid_Not_in_BizSumm			);
+countDellAppendIdsBdid_dBdidOut_withoutbdid_all := count(DellAppendIdsBdid_dBdidOut_withoutbdid_all	);
+countDellAppendIdsBdid_djoinCityState					 	:= count(DellAppendIdsBdid_djoinCityState						);
+countDellAppendIdsBdid_djoinCityState_nomatches := count(DellAppendIdsBdid_djoinCityState_nomatches	);
+countDellAppendIdsBdid_dBDidOut_sort						:= count(DellAppendIdsBdid_dBDidOut_sort						);
+countDellAppendIdsBdid_dBDidOut_dedup					 	:= count(DellAppendIdsBdid_dBDidOut_dedup						);
+countDellAppendIdsBdid_dAssignBdids						 	:= count(DellAppendIdsBdid_dAssignBdids							);
+countDellSummaryAppendsAddress									:= count(DellSummaryAppendsAddress									);
+countDellSummaryAppendsBusiness								 	:= count(DellSummaryAppendsBusiness									);
+countDellSummaryAppendsContact									:= count(DellSummaryAppendsContact									);
+//countDellAppendMiscellaneous										:= count(DellAppendMiscellaneous										);
+
+count_DellfStandardizeName_unique												:= count(table(DellfStandardizeName													,{rawfields.app_ref_key	}	,rawfields.app_ref_key));
+count_DellAppendIdsAid_unique														:= count(table(DellAppendIdsAid															,{rawfields.app_ref_key	}	,rawfields.app_ref_key));
+count_DellAppendIdsBdid_unique 													:= count(table(DellAppendIdsBdid														,{rawfields.app_ref_key	}	,rawfields.app_ref_key));
+count_DellAppendIdsBdid_dBdid_in_BizSumm_unique 				:= count(table(DellAppendIdsBdid_dBdid_in_BizSumm						,{app_ref_key						}	,app_ref_key					));
+count_DellAppendIdsBdid_dBdid_Not_in_BizSumm_unique 		:= count(table(DellAppendIdsBdid_dBdid_Not_in_BizSumm				,{app_ref_key						}	,app_ref_key					));
+count_DellAppendIdsBdid_dBdidOut_withoutbdid_all_unique	:= count(table(DellAppendIdsBdid_dBdidOut_withoutbdid_all		,{app_ref_key						}	,app_ref_key					));
+count_DellAppendIdsBdid_djoinCityState_unique						:= count(table(DellAppendIdsBdid_djoinCityState							,{app_ref_key						}	,app_ref_key					));
+count_DellAppendIdsBdid_djoinCityState_nomatches_unique := count(table(DellAppendIdsBdid_djoinCityState_nomatches		,{app_ref_key						}	,app_ref_key					));
+count_DellAppendIdsBdid_dBDidOut_sort_unique						:= count(table(DellAppendIdsBdid_dBDidOut_sort							,{app_ref_key						}	,app_ref_key					));
+count_DellAppendIdsBdid_dBDidOut_dedup_unique						:= count(table(DellAppendIdsBdid_dBDidOut_dedup							,{app_ref_key						}	,app_ref_key					));
+count_DellAppendIdsBdid_dAssignBdids_unique							:= count(table(DellAppendIdsBdid_dAssignBdids								,{rawfields.app_ref_key	}	,rawfields.app_ref_key));
+count_DellSummaryAppendsAddress_unique									:= count(table(DellSummaryAppendsAddress										,{rawfields.app_ref_key	}	,rawfields.app_ref_key));
+count_DellSummaryAppendsBusiness_unique									:= count(table(DellSummaryAppendsBusiness										,{rawfields.app_ref_key	}	,rawfields.app_ref_key));
+count_DellSummaryAppendsContact_unique									:= count(table(DellSummaryAppendsContact										,{rawfields.app_ref_key	}	,rawfields.app_ref_key));
+//count_DellAppendMiscellaneous_unique										:= count(table(DellAppendMiscellaneous											,{rawfields.app_ref_key	}	,rawfields.app_ref_key));
+
+output(countDellfStandardizeName											 	,named('countDellfStandardizeName'											 	));
+output(countDellAppendIdsAid													 	,named('countDellAppendIdsAid'													 	));
+output(countDellAppendIdsBdid														,named('countDellAppendIdsBdid'													));
+output(countDellAppendIdsBdid_dBdid_in_BizSumm				 	,named('countDellAppendIdsBdid_dBdid_in_BizSumm'				 	));
+output(countDellAppendIdsBdid_dBdid_Not_in_BizSumm		 	,named('countDellAppendIdsBdid_dBdid_Not_in_BizSumm'		 	));
+output(countDellAppendIdsBdid_dBdidOut_withoutbdid_all 	,named('countDellAppendIdsBdid_dBdidOut_withoutbdid_all' ));
+output(countDellAppendIdsBdid_djoinCityState					 	,named('countDellAppendIdsBdid_djoinCityState'					 	));
+output(countDellAppendIdsBdid_djoinCityState_nomatches 	,named('countDellAppendIdsBdid_djoinCityState_nomatches' ));
+output(countDellAppendIdsBdid_dBDidOut_sort							,named('countDellAppendIdsBdid_dBDidOut_sort'						));
+output(countDellAppendIdsBdid_dBDidOut_dedup					 	,named('countDellAppendIdsBdid_dBDidOut_dedup'					 	));
+output(countDellAppendIdsBdid_dAssignBdids						 	,named('countDellAppendIdsBdid_dAssignBdids'						 	));
+output(countDellSummaryAppendsAddress										,named('countDellSummaryAppendsAddress'									));
+output(countDellSummaryAppendsBusiness								 	,named('countDellSummaryAppendsBusiness'								 	));
+output(countDellSummaryAppendsContact										,named('countDellSummaryAppendsContact'									));
+//output(countDellAppendMiscellaneous											,named('countDellAppendMiscellaneous'										));
+output(count_DellfStandardizeName_unique													,named('count_DellfStandardizeName_unique'												));
+output(count_DellAppendIdsAid_unique															,named('count_DellAppendIdsAid_unique'														));
+output(count_DellAppendIdsBdid_unique 														,named('count_DellAppendIdsBdid_unique' 													));
+output(count_DellAppendIdsBdid_dBdid_in_BizSumm_unique 						,named('count_DellAppendIdsBdid_dBdid_in_BizSumm_unique' 				));
+output(count_DellAppendIdsBdid_dBdid_Not_in_BizSumm_unique 				,named('count_DellAppendIdsBdid_dBdid_Not_in_BizSumm_unique' 		));
+output(count_DellAppendIdsBdid_dBdidOut_withoutbdid_all_unique		,named('count_DellAppendIdsBdid_dBdidOut_withoutbdid_all_unique'	));
+output(count_DellAppendIdsBdid_djoinCityState_unique							,named('count_DellAppendIdsBdid_djoinCityState_unique'						));
+output(count_DellAppendIdsBdid_djoinCityState_nomatches_unique 		,named('count_DellAppendIdsBdid_djoinCityState_nomatches_unique' ));
+output(count_DellAppendIdsBdid_dBDidOut_sort_unique								,named('count_DellAppendIdsBdid_dBDidOut_sort_unique'						));
+output(count_DellAppendIdsBdid_dBDidOut_dedup_unique							,named('count_DellAppendIdsBdid_dBDidOut_dedup_unique'						));
+output(count_DellAppendIdsBdid_dAssignBdids_unique								,named('count_DellAppendIdsBdid_dAssignBdids_unique'							));
+output(count_DellSummaryAppendsAddress_unique											,named('count_DellSummaryAppendsAddress_unique'									));
+output(count_DellSummaryAppendsBusiness_unique										,named('count_DellSummaryAppendsBusiness_unique'									));
+output(count_DellSummaryAppendsContact_unique											,named('count_DellSummaryAppendsContact_unique'									));
+//output(count_DellAppendMiscellaneous_unique												,named('count_DellAppendMiscellaneous_unique'									));

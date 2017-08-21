@@ -1,21 +1,20 @@
-import ut, CNLD_Facilities, AID, Address, Lib_FileServices, lib_stringlib, DID_Add, Business_Header, Business_Header_SS, Prof_License_Mari,tools,MDR; 
+import ut, CNLD_Facilities, AID, Address, Lib_FileServices, lib_stringlib, DID_Add, Business_Header, Business_Header_SS, Prof_License_Mari, tools, MDR, BIPV2 ; 
 
 
 in_Facilities := CNLD_Facilities.File_Facilities_in;
 
 
-valid_military_states					:=	['AA','AE','AP','FM','MH','MP','PW'];
-canadian_states_abbv := ['AB','BC','MB','NF','NT','NS','CN','ON','PE','QC','SK','YT'];
-begin_paren := '^\\((.*)\\)(.*)$'; 
-paren_pattern := '^(.*)\\((.*)\\)$';
-single_paren := '^(.*)\\((.*)$';
-sign_pattern := '^(.*)@(.*)$'; 
-misc_pattern := '^(.*)(NO MAIL|NEED CHECK FOR|PAID FOR )(.*)$';
-bad_addr_list := ['PO BOX #','PO BOX BOX','PO BOX NUMBER','PO BOX OFFICE','PO BOX BIN','PO BOX POB','PO BOX DRWR','PO BOX DRAWER'];
-
-address_accept := '(PO BOX|GENERAL DELIVERY|^ONE |^TWO |^THREE |^SIX |^SIXTH |^EIGHT|^NINTH |^TEN |OFFICE CENTER|CNTR| OFFICE PARK| PLAZA$| PLAZA | PLZ|EXECUTIVE PARK|HWY)';
-valid_unit_desig := '(^#| APT|^APT|BSMT|BLDG|^FL |FRNT|HNGR|LBBY|^LOT |LOWR|OFC|^PH |PIER|^PMB |^REAR|^RM |^SIDE|SLIP|SPC|^STOP|^STE |TRLR|^UNIT|^UPPR)';
-city_addr := '(^BLDG |^SUITE |^STE |^#|^B1D )';
+valid_military_states	:=	['AA','AE','AP','FM','MH','MP','PW'];
+canadian_states_abbv 	:= ['AB','BC','MB','NF','NT','NS','CN','ON','PE','QC','SK','YT'];
+begin_paren 					:= '^\\((.*)\\)(.*)$'; 
+paren_pattern 				:= '^(.*)\\((.*)\\)$';
+single_paren 					:= '^(.*)\\((.*)$';
+sign_pattern 					:= '^(.*)@(.*)$'; 
+misc_pattern 					:= '^(.*)(NO MAIL|NEED CHECK FOR|PAID FOR )(.*)$';
+bad_addr_list 				:= ['PO BOX #','PO BOX BOX','PO BOX NUMBER','PO BOX OFFICE','PO BOX BIN','PO BOX POB','PO BOX DRWR','PO BOX DRAWER'];
+address_accept 				:= '(PO BOX|GENERAL DELIVERY|^ONE |^TWO |^THREE |^SIX |^SIXTH |^EIGHT|^NINTH |^TEN |OFFICE CENTER|CNTR| OFFICE PARK| PLAZA$| PLAZA | PLZ|EXECUTIVE PARK|HWY)';
+valid_unit_desig 			:= '(^#| APT|^APT|BSMT|BLDG|^FL |FRNT|HNGR|LBBY|^LOT |LOWR|OFC|^PH |PIER|^PMB |^REAR|^RM |^SIDE|SLIP|SPC|^STOP|^STE |TRLR|^UNIT|^UPPR)';
+city_addr 						:= '(^BLDG |^SUITE |^STE |^#|^B1D )';
 
 
 // Normalizing Addresses
@@ -39,35 +38,34 @@ r0 := RECORD
 END;
 
 r0 	NormItAddr(CNLD_Facilities.layout_Facilities_Out L, INTEGER C) := TRANSFORM
-SELF := L;
+SELF 							:= L;
 // self.ADDR_IND 		:=  '';
-SELF.addr_id 		:= CHOOSE(C, L.addr1_id, L.addr2_id, L.addr3_id);
-SELF.addr_addr1 := CHOOSE(C, L.addr1_line1, L.addr2_line1, L.addr3_line1);
-SELF.addr_addr2 := CHOOSE(C, L.addr1_line2, L.addr2_line2, L.addr3_line2);
-SELF.addr_city	:= CHOOSE(C, L.addr1_city, L.addr2_city, L.addr3_city);
-SELF.addr_st		:= CHOOSE(C, L.addr1_st, L.addr2_st, L.addr3_st);
-SELF.addr_zip		:= CHOOSE(C, L.addr1_zip, L.addr2_zip, L.addr3_zip);
-SELF.addr_phone	:= CHOOSE(C, L.addr1_phone, L.addr2_phone, L.addr3_phone);
-SELF.addr_fax		:= CHOOSE(C, L.addr1_fax, L.addr2_fax, L.addr3_fax);
-SELF.addr_date	:= CHOOSE(C, L.addr1_date, L.addr2_date, L.addr3_date);
-SELF.addr_status := CHOOSE(C, L.addr1_status, L.addr3_status, L.addr3_status);
-SELF.addr_rank	:= CHOOSE(C, L.addr1_rank, L.addr2_rank, L.addr3_rank);
-SELF.name_dba := CHOOSE(C, L.name_dba_1, L.name_dba_2, L.name_dba_3);
+SELF.addr_id 			:= CHOOSE(C, L.addr1_id, L.addr2_id, L.addr3_id);
+SELF.addr_addr1 	:= CHOOSE(C, L.addr1_line1, L.addr2_line1, L.addr3_line1);
+SELF.addr_addr2 	:= CHOOSE(C, L.addr1_line2, L.addr2_line2, L.addr3_line2);
+SELF.addr_city		:= CHOOSE(C, L.addr1_city, L.addr2_city, L.addr3_city);
+SELF.addr_st			:= CHOOSE(C, L.addr1_st, L.addr2_st, L.addr3_st);
+SELF.addr_zip			:= CHOOSE(C, L.addr1_zip, L.addr2_zip, L.addr3_zip);
+SELF.addr_phone		:= CHOOSE(C, L.addr1_phone, L.addr2_phone, L.addr3_phone);
+SELF.addr_fax			:= CHOOSE(C, L.addr1_fax, L.addr2_fax, L.addr3_fax);
+SELF.addr_date		:= CHOOSE(C, L.addr1_date, L.addr2_date, L.addr3_date);
+SELF.addr_status	:= CHOOSE(C, L.addr1_status, L.addr3_status, L.addr3_status);
+SELF.addr_rank		:= CHOOSE(C, L.addr1_rank, L.addr2_rank, L.addr3_rank);
+SELF.name_dba 		:= CHOOSE(C, L.name_dba_1, L.name_dba_2, L.name_dba_3);
 SELF.name_contact := CHOOSE(C, L.name_contact_1, L.name_contact_2, L.name_contact_3);
 
 END;
 
 NormAddr := DEDUP(NORMALIZE(in_Facilities,3,NormItAddr(LEFT,COUNTER)),all,record);
 
-BlankAddrRecs	:= NormAddr(addr1_id = '' AND addr2_id = '' AND addr3_id = '');
-AddrRecs 	:= NormAddr(addr_id != '');
-FilteredDeaRecs  := BlankAddrRecs + AddrRecs;
+BlankAddrRecs	  := NormAddr(addr1_id = '' AND addr2_id = '' AND addr3_id = '');
+AddrRecs 			  := NormAddr(addr_id != '');
+FilteredDeaRecs := BlankAddrRecs + AddrRecs;
 
-dsFacilityFile := sort(distribute(PROJECT(FilteredDeaRecs, transform(CNLD_Facilities.layout_Facilities_Slim, self :=left)),hash(gennum)),gennum,local);
+dsFacilityFile  := sort(distribute(PROJECT(FilteredDeaRecs, transform(CNLD_Facilities.layout_Facilities_Slim, self :=left)),hash(gennum)),gennum,local);
 
 
-layout_FacilDIDClean :=
-		RECORD
+layout_FacilDIDClean :=RECORD
 			CNLD_Facilities.layout_Facilities_Slim;
 			unsigned6	BDID,
 			unsigned6	BDID_SCORE,
@@ -81,8 +79,7 @@ layout_FacilDIDClean :=
 END;
 		 
 		 
-layout_FacilCleanParsed :=
-		RECORD
+layout_FacilCleanParsed :=RECORD
 			layout_FacilDIDClean;
 			string10	PRIM_RANGE;
 			string2   PREDIR;
@@ -109,11 +106,10 @@ layout_FacilCleanParsed :=
       string4   MSA;
 			string7   GEO_BLK;
 			string1   GEO_MATCH;
-			string4   ERR_STAT;  			
-	END;		
+			string4   ERR_STAT; 
+ 			BIPV2.IDlayouts.l_xlink_IDs;
+	END;
 	
-
-
 //AID process
 	unsigned4 lAIDFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
 
@@ -175,10 +171,10 @@ layout_FacilCleanParsed :=
 												REGEXFIND(city_addr,pInput.ADDR_CITY) => '',
 														pInput.ADDR_CITY);
 														
-		prepLine1		:= tools.AID_Helpers.fRawFixLine1(ut.fn_addr_clean_prep(TRIM(TRIM(prepAddress1, LEFT,RIGHT) + ' ' 
+		prepLine1		:= tools.AID_Helpers.fRawFixLine1(Address.fn_addr_clean_prep(TRIM(TRIM(prepAddress1, LEFT,RIGHT) + ' ' 
 																														+ TRIM(prepAddress2,LEFT,RIGHT)),'first'));
 		
-		prepLine2 	:= tools.AID_Helpers.fRawFixLineLast(ut.fn_addr_clean_prep(TRIM(TRIM(prepCity,LEFT,RIGHT) 
+		prepLine2 	:= tools.AID_Helpers.fRawFixLineLast(Address.fn_addr_clean_prep(TRIM(TRIM(prepCity,LEFT,RIGHT) 
 																														+ IF(prepCity <> '',', ','') + TRIM(pInput.ADDR_ST,LEFT,RIGHT)) 
 																																+ ' ' + TRIM(pInput.ADDR_ZIP,LEFT,RIGHT),'last'));
 												
@@ -282,48 +278,61 @@ layout_FacilCleanParsed :=
 	rsCleanAIDGoodAddr		:= PROJECT(rsCleanAID, tProjectClean(LEFT));
 	rsCleanAIDGoodNoAddr	:= PROJECT(rsAID_NoAddr, TRANSFORM(layout_FacilCleanParsed,self := LEFT,self := []));
 
-	rsCleanAIDGood	:=	rsCleanAIDGoodAddr + rsCleanAIDGoodNoAddr; 
+	rsCleanAIDGood				:=	rsCleanAIDGoodAddr + rsCleanAIDGoodNoAddr; 
 	
+	business_header.MAC_Source_Match(rsCleanAIDGood,
+																	 outrecs,
+																	 false,
+																	 BDID,
+																	 false,
+																	 MDR.sourceTools.src_CNLD_Facilities,
+																	 false,
+																	 foo,
+																	 ORG_NAME,
+																	 PRIM_RANGE,
+																	 PRIM_NAME,
+																	 SEC_RANGE,
+																	 ZIP5,
+																	 true,
+																	 ADDR_PHONE,
+																	 true, 
+																	 CLN_SSN_TAXID
+																 );
 
 
-business_header.MAC_Source_Match(rsCleanAIDGood,
-																			outrecs,
-																			false,
-																			BDID,
-																			false,
-																			MDR.sourceTools.src_CNLD_Facilities,
-																			false,
-																			foo,
-																			ORG_NAME,
-																			PRIM_RANGE,
-																			PRIM_NAME,
-																			SEC_RANGE,
-																			ZIP5,
-																			true,
-																			ADDR_PHONE,
-																			true, 
-																			CLN_SSN_TAXID
+	/* Identifying Corporation records 
+	// 'A' = Address, 'P' = Phone, 'F' = FEIN
+	// Record could contain up to 4 FEIN(s)
+	*/
+
+	bdid_matchset 	 := ['A','P','F']; 
+		
+	Business_Header_SS.MAC_Add_BDID_Flex( outrecs       													   // Input Dataset						
+																				,bdid_matchset                            // BDID Matchset           
+																				,org_name        		             		     // company_name	              
+																				,prim_range		                          // prim_range		              
+																				,prim_name		                         // prim_name		              
+																				,zip5 					                      // zip5					              
+																				,sec_range		                       // sec_range		              
+																				,st				                          // state				              
+																				,ADDR_PHONE				           			 // phone				              
+																				,CLN_SSN_TAXID                    // fein              
+																				,bdid											       // bdid												
+																				,layout_FacilCleanParsed			  // Output Layout 
+																				,true                          // output layout has bdid score field?                       
+																				,BDID_SCORE                   // bdid_score                 
+																				,postbdid                    // Output Dataset   
+																				,														// deafult threscold
+																				,													 // use prod version of superfiles
+																				,													// default is to hit prod from dataland, and on prod hit prod.		
+																				,BIPV2.xlink_version_set // Create BIP Keys only
+																				,           						// Url
+																				,								       // Email
+																				,p_City_name					// City
+																				,fname							 // fname
+																				,mname							// mname
+																				,lname						 // lname
 																		 );
 
-
-/* Identifying Corporation records 
-// 'A' = Address, 'P' = Phone, 'F' = FEIN
-// Record could contain up to 4 FEIN(s)
-*/
-
-bdid_matchset := ['A','P','F'];
-Business_Header_SS.MAC_Match_Flex(outrecs, bdid_matchset,
-                                      org_name, PRIM_RANGE, PRIM_NAME, ZIP5, 
-																			SEC_RANGE, ST, ADDR_PHONE, CLN_SSN_TAXID, BDID, 
-																			layout_FacilCleanParsed, true, 
-																			BDID_SCORE,     //these should default to zero in definition
-																			rsClnFacilityCorp);
-
-
-rsAllFacilityRecOut := rsClnFacilityCorp;
-
-
-export proc_AID_CleanAddr := output(rsAllFacilityRecOut,,'~thor_data400::base::facilities',overwrite);
-
-
+	export proc_AID_CleanAddr := output(postbdid,,'~thor_data400::base::facilities',overwrite);
 

@@ -2,7 +2,7 @@ export Layout_Sex_Pred_2 := record
 	string8		dt_first_reported;
 	string8		dt_last_reported;
 	string2		state_of_origin;
-	string16	seisint_primary_key;
+	string60	seisint_primary_key;
 	string2		vendor_code;
 	string20	source_file;
 	string50	name_orig;

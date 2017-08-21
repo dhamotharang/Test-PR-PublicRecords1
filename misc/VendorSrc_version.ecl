@@ -1,1 +1,1 @@
-EXPORT VendorSrc_version := '20130813';
+EXPORT VendorSrc_version := '20131016';

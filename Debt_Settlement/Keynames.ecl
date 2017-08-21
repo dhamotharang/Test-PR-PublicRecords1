@@ -10,8 +10,9 @@ module
 
 	shared lkeyTemplate		:= _Constants(pUseOtherEnvironment).keyTemplate			;
 	shared lautokeytemplate := _Constants(pUseOtherEnvironment).autokeytemplate	;
-
+	
 	export Bdid						:= tools.mod_FilenamesBuild(lkeyTemplate			+ 'bdid'				,pversion);
+  export LinkIds				:= tools.mod_FilenamesBuild(lkeyTemplate			+ 'linkids'			,pversion);	
 	export autokeyroot		:= tools.mod_FilenamesBuild(lautokeytemplate									,pversion);
 	export addressb2			:= tools.mod_FilenamesBuild(lautokeytemplate + 'addressb2'		,pversion);
 	export citystnameb2		:= tools.mod_FilenamesBuild(lautokeytemplate + 'citystnameb2',pversion);
@@ -24,6 +25,7 @@ module
 
 	export dAll_filenames := 
 		  Bdid.dAll_filenames
+		+ LinkIds.dAll_filenames
 		+ addressb2.dAll_filenames
 		+ citystnameb2.dAll_filenames
 		+ nameb2.dAll_filenames

@@ -1,7 +1,7 @@
 export layout_ND := 
 
 record
-string3	STATEABREV;
+string3	STATEDATA;
 string22	REG_NUM;
 string23	HULL_ID;
 string15	PROP;
@@ -24,8 +24,13 @@ string10	ZIP;
 string50	COUNTY;
 string5	FIPS;
 string4	EXPIRE_YEAR;
-string3	HP;
-string2	lf;
+string8 OWNER_DOB;
+string1 CITIZEN;
+string4 REG_YEAR;
+string5 HP;
+string1 US_MFR;
+string2 USE_ST;
+string3 ND_PURTYPE_CD;
 end;
 
 

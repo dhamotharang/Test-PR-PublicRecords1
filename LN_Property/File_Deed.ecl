@@ -2,4 +2,4 @@
 
 import ln_mortgage;
 
-export file_deed := Dataset('~thor_data400::base::property_deed', LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE, flat);
+export file_deed := dataset(ln_property.filenames.builtDeeds, LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE, flat);

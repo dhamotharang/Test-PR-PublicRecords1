@@ -1,7 +1,7 @@
 import BIPV2, ut, MDR,BIPv2_HRCHY;
 
 EXPORT In_Base( 
-  dataset(BIPv2_HRCHY.Layouts.HrchyBase ) pHrchyBase  = project(BIPV2.CommonBase.DS_CLEAN,BIPv2_HRCHY.Layouts.HrchyBase)
+  dataset(BIPV2.CommonBase.Layout) pHrchyBase  = project(BIPV2.CommonBase.DS_CLEAN,BIPV2.CommonBase.Layout)
 ):= module
 //set source_for_votes and flags
 //source_for_votes

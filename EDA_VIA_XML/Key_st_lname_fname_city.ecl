@@ -1,14 +1,14 @@
-import gong, doxie;
+import gong_Neustar, doxie, ut, NID;
 
-input_recs := gong.File_Gong_Full((listing_type_res = 'R') AND (TRIM(name_last)<>'') AND (TRIM(name_first)<>''));
+input_recs := gong_Neustar.File_Gong_Full_Prepped_For_Keys((listing_type_res = 'R') AND (TRIM(name_last)<>'') AND (TRIM(name_first)<>''));
 
 Layout_extra := RECORD
 	STRING20	fname;
 	STRING25	city;
-	gong.Layout_bscurrent_raw;
+	gong_Neustar.Layout_bscurrent_raw;
 END;
 
-Layout_extra addOrig(gong.Layout_bscurrent_raw l) := TRANSFORM
+Layout_extra addOrig(recordof(input_recs) l) := TRANSFORM
 	SELF.fname := '';
 	SELF.city := l.p_city_name;
 	SELF := l;
@@ -16,7 +16,7 @@ END;
 
 orig_cities := PROJECT(input_recs, addOrig(LEFT));
 
-Layout_extra addExtra(gong.Layout_bscurrent_raw l, integer c) := TRANSFORM
+Layout_extra addExtra(recordof(input_recs) l, integer c) := TRANSFORM
 	SELF.fname := '';
 	SELF.city := StringLib.StringExtract(ZipLib.ZipToCities(l.z5),c+1);
 	SELF := l;
@@ -29,12 +29,12 @@ extra_cities := NORMALIZE(input_recs(TRIM(z5)<>''),
 all_cities := DEDUP(SORT(orig_cities + extra_cities(TRIM(city)<>''), RECORD), RECORD);
 
 Layout_extra addNames(Layout_extra l, integer c) := TRANSFORM
-	SELF.fname := IF(c=1,l.name_first,datalib.preferredFirst(l.name_first));
+	SELF.fname := IF(c=1,l.name_first,NID.PreferredFirstNew(l.name_first));
 	SELF := l;
 END;
 
 with_names := NORMALIZE(all_cities,
-							 IF(datalib.preferredFirst(LEFT.name_first)<>LEFT.name_first,2,1),
+							 IF(NID.PreferredFirstNew(LEFT.name_first)<>LEFT.name_first,2,1),
 					  	 addNames(LEFT, COUNTER));
 
 export Key_st_lname_fname_city := 

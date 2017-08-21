@@ -1,4 +1,4 @@
-Official_Records.Macro_Input_File_List('_party',Official_Records.Layout_In_Party,dTempDataset)
+Official_Records.Macro_Input_File_List('_party',Official_Records.Layout_In_Party,dTempDataset);
 
 dFilterDataset := dTempDataset(
 									// Requested February 23, 2005
@@ -19,4 +19,4 @@ dFilterDataset := dTempDataset(
 									TRIM(official_record_key) <>'112004067035176622826'
 									);
 									
-export File_In_Party := dFilterDataset();
+export File_In_Party := dFilterDataset;

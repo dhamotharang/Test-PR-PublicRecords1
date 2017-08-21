@@ -7,7 +7,7 @@
 */
 /*--INFO-- Look to see if Basercid should be plucked out of BaseSeleid. If a preferred Seleid is provided it will be compared to the RID too.*/
 export SeleidSliceOutService := MACRO
-  IMPORT SALT30,BIPV2_Seleid_Relative;
+  IMPORT SALT31,BIPV2_Seleid_Relative;
 string20 rcidstr := ''  : stored('Basercid');
 string20 Seleidstr := ''  : stored('BaseSeleid');
 string20 Pref_Seleidstr := ''  : stored('PreferredSeleid');
@@ -37,4 +37,3 @@ output( odr,named('PreferredSeleidValues'));
 output( odl_noprop,named('SeleidValues_NoProp'));
 output( odr_noprop,named('PreferredSeleidValues_NoProp'));
 endmacro;
- 

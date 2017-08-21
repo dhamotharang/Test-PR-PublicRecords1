@@ -1,1 +1,1 @@
-export	layout_fedex_base	:=	FedEx.Layout_Fedex.Base;
+export	layout_fedex_base	:=	FedEx.Layout_Fedex.Base	-	[Append_PrepAddr1,Append_PrepAddr2,Append_RawAID];

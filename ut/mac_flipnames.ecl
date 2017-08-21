@@ -1,6 +1,7 @@
+export mac_flipnames(file_in,fname_field,mname_field,lname_field,file_out,maxlen	=	0) := MACRO
+
 import idl_header;
 
-export mac_flipnames(file_in,fname_field,mname_field,lname_field,file_out) := MACRO
 #uniquename(input)
 #uniquename(idl_name)
 #uniquename(layout_score)
@@ -22,15 +23,27 @@ export mac_flipnames(file_in,fname_field,mname_field,lname_field,file_out) := MA
 %input%    := file_in;
 %idl_name% := idl_header.name_count_ds(length(trim(name))>1);//filter initials
 
-%layout_score% := record
- %input%;
- decimal6_3 lname_as_fname     :=0;
- decimal6_3 fname_as_fname     :=0;
- integer    lname_as_fname_cnt :=0;
- integer    fname_as_fname_cnt :=0;
- integer    lname_placement_cnt:=0;
- integer    fname_placement_cnt:=0;
-end;
+#if (maxlen = 0)
+	%layout_score% := record
+		%input%;
+		decimal6_3 lname_as_fname     :=0;
+		decimal6_3 fname_as_fname     :=0;
+		integer    lname_as_fname_cnt :=0;
+		integer    fname_as_fname_cnt :=0;
+		integer    lname_placement_cnt:=0;
+		integer    fname_placement_cnt:=0;
+	end;
+#else
+	%layout_score% := record,maxlength(maxlen)
+		%input%;
+		decimal6_3 lname_as_fname     :=0;
+		decimal6_3 fname_as_fname     :=0;
+		integer    lname_as_fname_cnt :=0;
+		integer    fname_as_fname_cnt :=0;
+		integer    lname_placement_cnt:=0;
+		integer    fname_placement_cnt:=0;
+	end;
+#end
 
 %layout_score% %t_get_lname_as_fname_pct%(%input% le, %idl_name% ri) := transform
  self.lname_as_fname     := ri.pct_fname;
@@ -39,7 +52,7 @@ end;
  self                    := le;
 end;
 
-%j_get_lname_as_fname_pct%:= join(%input%,%idl_name%,left.lname_field=right.name,%t_get_lname_as_fname_pct%(left,right),lookup,left outer);
+%j_get_lname_as_fname_pct%:= join(%input%,%idl_name%,stringlib.stringtouppercase(left.lname_field)=right.name,%t_get_lname_as_fname_pct%(left,right),lookup,left outer);
 
 %layout_score% %t_get_fname_as_fname_pct%(%j_get_lname_as_fname_pct% le, %idl_name% ri) := transform
  self.fname_as_fname     := ri.pct_fname;
@@ -48,7 +61,7 @@ end;
  self                    := le;
 end;
 
-%j_get_fname_as_fname_pct% := join(%j_get_lname_as_fname_pct%,%idl_name%,left.fname_field=right.name,%t_get_fname_as_fname_pct%(left,right),lookup,left outer);
+%j_get_fname_as_fname_pct% := join(%j_get_lname_as_fname_pct%,%idl_name%,stringlib.stringtouppercase(left.fname_field)=right.name,%t_get_fname_as_fname_pct%(left,right),lookup,left outer);
 
 %layout_flags% := record
  %j_get_fname_as_fname_pct%;

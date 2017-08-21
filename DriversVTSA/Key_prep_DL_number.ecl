@@ -1,4 +1,4 @@
-import DriversV2, doxie, doxie_build, census_data, ut, lib_stringlib;
+import DriversV2, doxie, doxie_build, census_data, Codes, lib_stringlib;
 
 ExtendedLayout :=
 RECORD
@@ -41,7 +41,7 @@ ExtendedLayout GetExtendedValues(DriversV2.Layout_DL L) := transform
 							'H' => 'HISTORICAL',
 							''  => 'CURRENT',
 							'');
-	self.orig_state_name := ut.St2Name(L.orig_state);
+	self.orig_state_name := Codes.St2Name(L.orig_state);
 	self.eye_Color_name := Lookups.lookup_Eye_Color(L.eye_color);
 	self.hair_Color_name := Lookups.lookup_Hair_Color(L.hair_color);
 	self.attention_name := '';	// not populated

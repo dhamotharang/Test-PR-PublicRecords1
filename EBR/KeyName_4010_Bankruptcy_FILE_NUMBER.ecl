@@ -1,1 +1,1 @@
-export KeyName_4010_Bankruptcy_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('4010')) : global;
+export KeyName_4010_Bankruptcy_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('4010'));

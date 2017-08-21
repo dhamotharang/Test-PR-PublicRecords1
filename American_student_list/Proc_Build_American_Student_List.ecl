@@ -20,7 +20,7 @@ e_mail_fail := fileservices.sendemail(
 									  'American Student List Roxie Build FAILED',
 									  failmessage);
 																																
-ut.MAC_SF_BuildProcess(American_student_list.Proc_rollup_American_Student_List_base(filedate),American_student_list.thor_cluster + 'base::american_student_list',a);
+ut.MAC_SF_BuildProcess(American_student_list.Proc_rollup_American_Student_List_base(filedate),American_student_list.cluster + 'base::american_student_list',a);
 																	
 build_base  				:= a : SUCCESS(OUTPUT('base files built successfully')), failure(OUTPUT('build of base files failed'));
 build_keys  				:=	American_student_list.Proc_build_keys(filedate);

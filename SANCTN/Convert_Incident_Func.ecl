@@ -34,7 +34,7 @@ export Convert_Incident_Func (DATASET(layout_SANCTN_incident_clean_keyed )ds) :=
 
 		
 		{3,0,l.CASE_NUMBER},
-		{4,0,l.INCIDENT_DATE},
+		{4,0,l.INCIDENT_DATE_CLEAN},
 		{5,0,l.JURISDICTION},
 		{6,0,l.SOURCE_DOCUMENT},
 		{7,0,l.AGENCY},

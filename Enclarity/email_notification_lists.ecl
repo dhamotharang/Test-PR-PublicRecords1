@@ -2,7 +2,7 @@ IMPORT _control,RoxieKeyBuild, enclarity;
 
 EXPORT Email_Notification_Lists := MODULE
    developer := 'jennifer.hennigar@lexisnexis.com;';
-   tester := _Control.MyInfo.EmailAddressNotify;
+   tester := _Control.MyInfo.EmailAddressNotify+ '; Senthilkumar.Periasamy@lexisnexis.com';
 	 //quality_assurance := 'qualityassurance@seisint.com;';
 	 quality_assurance := 'jennifer.hennigar@lexisnexis.com;';
    all_hands := developer + tester + ';' + quality_assurance;

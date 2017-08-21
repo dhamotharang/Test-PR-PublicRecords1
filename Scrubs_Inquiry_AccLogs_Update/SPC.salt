@@ -1,0 +1,161 @@
+OPTIONS:-gh
+MODULE:Scrubs_Inquiry_AccLogs_Update
+FILENAME:File
+
+//Uncomment up to NINES for internal or external adl
+//IDFIELD:EXISTS:<NameOfIDField>
+//RIDFIELD:<NameOfRidField>
+//RECORDS:<NumberOfRecordsInDataFile>
+//POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+//NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+//Uncomment Process if doing external adl
+//PROCESS:<ProcessName>
+//FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+//BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+//FUZZY can be used to create new types of FUZZY linking
+
+FIELDTYPE:mbslayout_company_id:SPACES( ):ALLOW():LEFTTRIM:LENGTHS(0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:mbslayout_global_company_id:SPACES( ):ALLOW():LEFTTRIM:LENGTHS(0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:allowlayout_allowflags:SPACES( ):ALLOW(13589):LEFTTRIM:LENGTHS(4,1):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:businfolayout_primary_market_code:SPACES( ):ALLOW(39):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:businfolayout_secondary_market_code:SPACES( ):ALLOW(1257GJKLNQRUWY):LEFTTRIM:LENGTHS(2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:businfolayout_industry_1_code:SPACES( ):ALLOW(012349ABPV):LEFTTRIM:LENGTHS(2,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:businfolayout_industry_2_code:SPACES( ):ALLOW(013456789ABCEFGKNPRTUXZ):LEFTTRIM:LENGTHS(2,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:businfolayout_sub_market:SPACES( ):ALLOW( ./ABCDEFGHILMNOPRSTUVWY):LEFTTRIM:LENGTHS(8,11,5,14,9,21,19,10,20,7,4,12,6,3,0):WORDS(1,2,3):ONFAIL(CLEAN)
+FIELDTYPE:businfolayout_vertical:SPACES( ):ALLOW( ABCEFGIKLMNOPRSTV):LEFTTRIM:LENGTHS(17,18,22):WORDS(2):ONFAIL(CLEAN)
+FIELDTYPE:businfolayout_use:SPACES( ):ALLOW(ACKMNOUW):LEFTTRIM:LENGTHS(0,7,2,4):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:businfolayout_industry:SPACES( ):ALLOW( -/ABCDEFGHIKLMNOPRSTUVWY):LEFTTRIM:LENGTHS(18,10,5,11,4,7,14,19,20,6,12,13,15,9):WORDS(1,3,2):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_full_name:SPACES( ):ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ):LEFTTRIM:LENGTHS(14,15,13,16,12,17,11,18,0,19,10,20,9,21,22,8,23,7,24,25,6,26,27,29,5,28):WORDS(3,2,1,4,5):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_first_name:SPACES( ):ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ):LEFTTRIM:LENGTHS(5,6,7,4,0,8,9,3,1,10,11,2,15,12):WORDS(1,2):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_middle_name:SPACES( ):ALLOW( .ABCDEFGHIJKLMNOPQRSTUVWYZ):LEFTTRIM:LENGTHS(0,1,5,6,4,3,7,8,9,2):WORDS(1,2):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_last_name:SPACES( ):ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ):LEFTTRIM:LENGTHS(6,5,7,0,8,4,9,10,3,11,12,13,1,2,14,15,20,16,17,19):WORDS(1,2,3):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_address:SPACES( ):ALLOW( 0123456789ABCDEFGHIJKLMNOPRSTUVWXYZ):LEFTTRIM:LENGTHS(0,15,16,14,17,13,18,19,12,20,21,11,22,10,23,24,25,26,27,9,28,29,30,31,8,32,33,34,35,7):WORDS(3,4,1,5,6,7,2):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_city:SPACES( ):ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXY):LEFTTRIM:LENGTHS(0,7,8,9,6,10,11,12,5,13,14,4,16,15,17,18,19,3,20):WORDS(1,2,3):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_state:SPACES( ):ALLOW(ACDEFGHIJKLMNOPRSTUVWXYZ):LEFTTRIM:LENGTHS(2,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_zip:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(9,0,5,1):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_personal_phone:SPACES( ):ALLOW(0123456789):LENGTHS(0,10):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_work_phone:SPACES( ):ALLOW(,0123456789):LENGTHS(0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_dob:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(0,8):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_dl:SPACES( ):ALLOW( -0123456789ABCDEFGHIJKLMNOPQRSTUVWYZ):LEFTTRIM:LENGTHS(0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_dl_st:SPACES( ):ALLOW(/19ACDEFGHIJKLMNOPRSTUVWXYZ):LEFTTRIM:LENGTHS(0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_email_address:SPACES( ):ALLOW(-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ):LEFTTRIM:LENGTHS(0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_ssn:SPACES( ):ALLOW( 0123456789):LENGTHS(0,9,8):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_linkid:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(0,12,10,9):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_ipaddr:SPACES( ):ALLOW(.0123456789):LEFTTRIM:LENGTHS(14,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_title:SPACES( ):ALLOW():LEFTTRIM:LENGTHS(0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_fname:SPACES( ):ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ):LENGTHS(5,6,7,4,8,9,0,3,1,10,11,2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_mname:SPACES( ):ALLOW( ABCDEFGHIJKLMNOPQRSTUVWYZ):LENGTHS(1,0,5,4,3,6,7,8,9,2):WORDS(1,2):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_lname:SPACES( ):ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ):LEFTTRIM:LENGTHS(6,5,7,8,4,9,0,10,3,11,12,13,1,14,2,15,16,20,17,18):WORDS(1,2,3):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_name_suffix:SPACES( ):ALLOW( ABCDEFHIJKLMNOPRSTUVWY):LENGTHS(0,2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_prim_range:SPACES( ):ALLOW( -/0123456789ANW):LEFTTRIM:LENGTHS(4,3,0,5,2,1,6,7):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_predir:SPACES( ):ALLOW(ENSW):LEFTTRIM:LENGTHS(0,1,2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_prim_name:SPACES( ):ALLOW( 0123456789ABCDEFGHIJKLMNOPRSTUVWXYZ):LEFTTRIM:LENGTHS(0,7,6,8,5,4,9,10,11,12,3,13,14,15,16,17,1,18,19,20,21,2):WORDS(1,2,3,4):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_addr_suffix:SPACES( ):ALLOW(ABCDEGHIKLNOPRSTUVWXY):LEFTTRIM:LENGTHS(2,0,3,4):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_postdir:SPACES( ):ALLOW(ENSW):LEFTTRIM:LENGTHS(0,2,1):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_unit_desig:SPACES( ):ALLOW(ABCDEFILMNOPRSTUX):LEFTTRIM:LENGTHS(0,3,4,2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_sec_range:SPACES( ):ALLOW(-0123456789ABCDEFGHIJKLMNOPQRSTUW):LEFTTRIM:LENGTHS(0,3,1,2,4,5):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_v_city_name:SPACES( ):ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXY):LEFTTRIM:LENGTHS(0,7,8,9,6,10,11,12,5,13,14,4,16,15,17,18,19,3,20):WORDS(1,2,3):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_st:SPACES( ):ALLOW(ACDEFGHIJKLMNOPRSTUVWXYZ):LEFTTRIM:LENGTHS(2,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_zip5:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(5,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_zip4:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(4,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_addr_rec_type:SPACES( ):ALLOW(DFHPRS):LEFTTRIM:LENGTHS(1,0,2):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_fips_state:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(2,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_fips_county:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(3,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_geo_lat:SPACES( ):ALLOW(.0123456789):LEFTTRIM:LENGTHS(9,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_geo_long:SPACES( ):ALLOW(-.0123456789):LEFTTRIM:LENGTHS(10,11,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_cbsa:SPACES( ):ALLOW():LEFTTRIM:LENGTHS(0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_geo_blk:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(7,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_geo_match:SPACES( ):ALLOW(0145):LEFTTRIM:LENGTHS(1,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_err_stat:SPACES( ):ALLOW(012348AES):LEFTTRIM:LENGTHS(4,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_appended_ssn:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(9,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:persondatalayout_appended_adl:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(10,0,9,12,11,8,7):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:permissablelayout_glb_purpose:SPACES( ):ALLOW(0135678):LEFTTRIM:LENGTHS(1,2,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:permissablelayout_dppa_purpose:SPACES( ):ALLOW(0134):LEFTTRIM:LENGTHS(1,0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:permissablelayout_fcra_purpose:SPACES( ):ALLOW(0):LEFTTRIM:LENGTHS(0,1):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:searchlayout_datetime:SPACES( ):ALLOW( 0123456789):LEFTTRIM:LENGTHS(17):WORDS(2):ONFAIL(CLEAN)
+FIELDTYPE:searchlayout_start_monitor:SPACES( ):ALLOW():LEFTTRIM:LENGTHS(0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:searchlayout_stop_monitor:SPACES( ):ALLOW():LEFTTRIM:LENGTHS(0):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:searchlayout_login_history_id:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(0,1,9):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:searchlayout_transaction_id:SPACES( ):ALLOW(0123456789R):LEFTTRIM:LENGTHS(9,15,16,14):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:searchlayout_sequence_number:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(7,6,5,8,4,0,3,2,13,1,14):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:searchlayout_method:SPACES( ):ALLOW(ABCGHILMNORTX):LEFTTRIM:LENGTHS(5,3,0,10,6):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:searchlayout_product_code:SPACES( ):ALLOW(15):LEFTTRIM:LENGTHS(1):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:searchlayout_transaction_type:SPACES( ):ALLOW(IRST):LEFTTRIM:LENGTHS(0,1):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:searchlayout_function_description:SPACES( ):ALLOW( .ABCDEFGHIKLMNOPRSTUVW):LEFTTRIM:LENGTHS(27,31,32,49,22,29,45,40,57,19,13,10,15,43,18,36,33,24,70,0,21,42,12,6,17,11,41,23,20,16,8):WORDS(1,2,3,4,7):ONFAIL(CLEAN)
+FIELDTYPE:searchlayout_ipaddr:SPACES( ):ALLOW(.0123456789):LEFTTRIM:LENGTHS(0,14,13,12,15,11):WORDS(1):ONFAIL(CLEAN)
+FIELDTYPE:fraudpoint_score:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(0,3):WORDS(1):ONFAIL(CLEAN)
+
+FIELD:mbslayout_company_id:LIKE(mbslayout_company_id):TYPE(STRING):0,0
+FIELD:mbslayout_global_company_id:LIKE(mbslayout_global_company_id):TYPE(STRING):0,0
+FIELD:allowlayout_allowflags:LIKE(allowlayout_allowflags):TYPE(UNSIGNED8):0,0
+FIELD:businfolayout_primary_market_code:LIKE(businfolayout_primary_market_code):TYPE(STRING):0,0
+FIELD:businfolayout_secondary_market_code:LIKE(businfolayout_secondary_market_code):TYPE(STRING):0,0
+FIELD:businfolayout_industry_1_code:LIKE(businfolayout_industry_1_code):TYPE(STRING):0,0
+FIELD:businfolayout_industry_2_code:LIKE(businfolayout_industry_2_code):TYPE(STRING):0,0
+FIELD:businfolayout_sub_market:LIKE(businfolayout_sub_market):TYPE(STRING):0,0
+FIELD:businfolayout_vertical:LIKE(businfolayout_vertical):TYPE(STRING):0,0
+FIELD:businfolayout_use:LIKE(businfolayout_use):TYPE(STRING):0,0
+FIELD:businfolayout_industry:LIKE(businfolayout_industry):TYPE(STRING):0,0
+FIELD:persondatalayout_full_name:LIKE(persondatalayout_full_name):TYPE(STRING):0,0
+FIELD:persondatalayout_first_name:LIKE(persondatalayout_first_name):TYPE(STRING):0,0
+FIELD:persondatalayout_middle_name:LIKE(persondatalayout_middle_name):TYPE(STRING):0,0
+FIELD:persondatalayout_last_name:LIKE(persondatalayout_last_name):TYPE(STRING):0,0
+FIELD:persondatalayout_address:LIKE(persondatalayout_address):TYPE(STRING):0,0
+FIELD:persondatalayout_city:LIKE(persondatalayout_city):TYPE(STRING):0,0
+FIELD:persondatalayout_state:LIKE(persondatalayout_state):TYPE(STRING):0,0
+FIELD:persondatalayout_zip:LIKE(persondatalayout_zip):TYPE(STRING):0,0
+FIELD:persondatalayout_personal_phone:LIKE(persondatalayout_personal_phone):TYPE(STRING):0,0
+FIELD:persondatalayout_work_phone:LIKE(persondatalayout_work_phone):TYPE(STRING):0,0
+FIELD:persondatalayout_dob:LIKE(persondatalayout_dob):TYPE(STRING):0,0
+FIELD:persondatalayout_dl:LIKE(persondatalayout_dl):TYPE(STRING):0,0
+FIELD:persondatalayout_dl_st:LIKE(persondatalayout_dl_st):TYPE(STRING):0,0
+FIELD:persondatalayout_email_address:LIKE(persondatalayout_email_address):TYPE(STRING):0,0
+FIELD:persondatalayout_ssn:LIKE(persondatalayout_ssn):TYPE(STRING):0,0
+FIELD:persondatalayout_linkid:LIKE(persondatalayout_linkid):TYPE(STRING):0,0
+FIELD:persondatalayout_ipaddr:LIKE(persondatalayout_ipaddr):TYPE(STRING):0,0
+FIELD:persondatalayout_title:LIKE(persondatalayout_title):TYPE(STRING5):0,0
+FIELD:persondatalayout_fname:LIKE(persondatalayout_fname):TYPE(STRING20):0,0
+FIELD:persondatalayout_mname:LIKE(persondatalayout_mname):TYPE(STRING20):0,0
+FIELD:persondatalayout_lname:LIKE(persondatalayout_lname):TYPE(STRING20):0,0
+FIELD:persondatalayout_name_suffix:LIKE(persondatalayout_name_suffix):TYPE(STRING5):0,0
+FIELD:persondatalayout_prim_range:LIKE(persondatalayout_prim_range):TYPE(STRING10):0,0
+FIELD:persondatalayout_predir:LIKE(persondatalayout_predir):TYPE(STRING2):0,0
+FIELD:persondatalayout_prim_name:LIKE(persondatalayout_prim_name):TYPE(STRING28):0,0
+FIELD:persondatalayout_addr_suffix:LIKE(persondatalayout_addr_suffix):TYPE(STRING4):0,0
+FIELD:persondatalayout_postdir:LIKE(persondatalayout_postdir):TYPE(STRING2):0,0
+FIELD:persondatalayout_unit_desig:LIKE(persondatalayout_unit_desig):TYPE(STRING10):0,0
+FIELD:persondatalayout_sec_range:LIKE(persondatalayout_sec_range):TYPE(STRING8):0,0
+FIELD:persondatalayout_v_city_name:LIKE(persondatalayout_v_city_name):TYPE(STRING25):0,0
+FIELD:persondatalayout_st:LIKE(persondatalayout_st):TYPE(STRING2):0,0
+FIELD:persondatalayout_zip5:LIKE(persondatalayout_zip5):TYPE(STRING5):0,0
+FIELD:persondatalayout_zip4:LIKE(persondatalayout_zip4):TYPE(STRING4):0,0
+FIELD:persondatalayout_addr_rec_type:LIKE(persondatalayout_addr_rec_type):TYPE(STRING2):0,0
+FIELD:persondatalayout_fips_state:LIKE(persondatalayout_fips_state):TYPE(STRING2):0,0
+FIELD:persondatalayout_fips_county:LIKE(persondatalayout_fips_county):TYPE(STRING3):0,0
+FIELD:persondatalayout_geo_lat:LIKE(persondatalayout_geo_lat):TYPE(STRING10):0,0
+FIELD:persondatalayout_geo_long:LIKE(persondatalayout_geo_long):TYPE(STRING11):0,0
+FIELD:persondatalayout_cbsa:LIKE(persondatalayout_cbsa):TYPE(STRING4):0,0
+FIELD:persondatalayout_geo_blk:LIKE(persondatalayout_geo_blk):TYPE(STRING7):0,0
+FIELD:persondatalayout_geo_match:LIKE(persondatalayout_geo_match):TYPE(STRING1):0,0
+FIELD:persondatalayout_err_stat:LIKE(persondatalayout_err_stat):TYPE(STRING4):0,0
+FIELD:persondatalayout_appended_ssn:LIKE(persondatalayout_appended_ssn):TYPE(STRING):0,0
+FIELD:persondatalayout_appended_adl:LIKE(persondatalayout_appended_adl):TYPE(UNSIGNED6):0,0
+FIELD:permissablelayout_glb_purpose:LIKE(permissablelayout_glb_purpose):TYPE(STRING):0,0
+FIELD:permissablelayout_dppa_purpose:LIKE(permissablelayout_dppa_purpose):TYPE(STRING):0,0
+FIELD:permissablelayout_fcra_purpose:LIKE(permissablelayout_fcra_purpose):TYPE(STRING):0,0
+FIELD:searchlayout_datetime:LIKE(searchlayout_datetime):TYPE(STRING):0,0
+FIELD:searchlayout_start_monitor:LIKE(searchlayout_start_monitor):TYPE(STRING):0,0
+FIELD:searchlayout_stop_monitor:LIKE(searchlayout_stop_monitor):TYPE(STRING):0,0
+FIELD:searchlayout_login_history_id:LIKE(searchlayout_login_history_id):TYPE(STRING):0,0
+FIELD:searchlayout_transaction_id:LIKE(searchlayout_transaction_id):TYPE(STRING):0,0
+FIELD:searchlayout_sequence_number:LIKE(searchlayout_sequence_number):TYPE(STRING):0,0
+FIELD:searchlayout_method:LIKE(searchlayout_method):TYPE(STRING):0,0
+FIELD:searchlayout_product_code:LIKE(searchlayout_product_code):TYPE(STRING):0,0
+FIELD:searchlayout_transaction_type:LIKE(searchlayout_transaction_type):TYPE(STRING):0,0
+FIELD:searchlayout_function_description:LIKE(searchlayout_function_description):TYPE(STRING):0,0
+FIELD:searchlayout_ipaddr:LIKE(searchlayout_ipaddr):TYPE(STRING):0,0
+FIELD:fraudpoint_score:LIKE(fraudpoint_score):TYPE(STRING3):0,0
+//CONCEPT statements should be used to group together interellated fields; such as address
+//RELATIONSHIP is used to find non-obvious relationships between the clusters
+//SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+//LINKPATH is used to define access paths for external linking

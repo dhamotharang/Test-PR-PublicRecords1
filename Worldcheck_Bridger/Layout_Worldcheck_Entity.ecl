@@ -6,7 +6,7 @@ layout_aliases := RECORD
     unicode last_name{xpath('Last_Name')};
     unicode generation{xpath('Generation')};
     unicode full_name{xpath('Full_Name')};
-    string comments{xpath('Comments')};
+    unicode comments{xpath('Comments')};
    END;
 
 aka_rollup := RECORD
@@ -78,7 +78,7 @@ routp := RECORD
   string middle_name{xpath('Middle_Name')};
   string last_name{xpath('Last_Name')};
   string generation{xpath('Generation')};
-  string full_name{xpath('Full_Name')};
+  unicode full_name{xpath('Full_Name')};
   string gender{xpath('Gender')};
   string listed_date{xpath('Listed_Date')};
   string entity_added_by{xpath('Entity_Added_By')};

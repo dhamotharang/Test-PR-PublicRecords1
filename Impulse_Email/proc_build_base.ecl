@@ -3,7 +3,9 @@ IMPORT ut
 		 , AID
 		 , DID_Add
 		 , header_slimsort
-		 , lib_stringlib;
+		 , lib_stringlib
+		 , idl_header
+		 , mdr;
 		 
 export proc_build_base(string file_date)
 	:=
@@ -121,9 +123,12 @@ export proc_build_base(string file_date)
 
 	rsImpulseCleanParsed	:=	PROJECT(rsImpulseEmailCleanName, tImpulseEmailCleanNameParse(LEFT));
 	
+	//Flip names before DID process
+	ut.mac_flipnames(rsImpulseCleanParsed,cln_fname,cln_mname,cln_lname,rsCleanedFlipNames);
+	
 	matchset	:=	['A','D','S','P','Z'];
 	
-	DID_Add.MAC_Match_Flex(rsImpulseCleanParsed, matchset,
+	DID_Add.MAC_Match_Flex(rsCleanedFlipNames, matchset,
 											 SSN, DOB, cln_FNAME, cln_MNAME, cln_LNAME, cln_NAME_SUFFIX, 
 											 prim_range, prim_name, sec_range, zip, st, HOMEPHONE,
 											 DID,
@@ -154,6 +159,7 @@ export proc_build_base(string file_date)
 																			pInput.TOTALINCOME != '' => (integer)pInput.TOTALINCOME,
 																			0
 																		);
+				self.source						:= mdr.sourceTools.src_Impulse;
 				self									:=	pInput;
 			END;
 

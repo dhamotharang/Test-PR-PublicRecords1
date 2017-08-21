@@ -1,4 +1,4 @@
-﻿import BIPV2, doxie, doxie_cbrs, UCCv2, FCRA, FFD;
+import BIPV2, doxie, doxie_cbrs, UCCv2, FCRA, FFD;
 
 // This module provides UCC data in different formats.
 export UCCRaw := module

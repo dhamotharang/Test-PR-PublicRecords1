@@ -60,4 +60,4 @@ dInAsOutSorted	:= sort(dInAsOutDist,vendor,state_origin,source_file,case_key,cou
 						 
 dInAsOutRollup  := rollup(dInAsOutSorted,tRollup(left, right),RECORD,EXCEPT process_date,dt_first_reported,dt_last_reported,LOCAL);
 					   
-export Out_Moxie_Case_Activity := output(dInAsOutRollup,,civil_court.Name_Moxie_Case_Activity_Dev,overwrite);
+export Out_Moxie_Case_Activity := output(dInAsOutRollup,,civil_court.Name_Moxie_Case_Activity_Dev,__compressed__,overwrite);

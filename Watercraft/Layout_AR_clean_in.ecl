@@ -1,8 +1,8 @@
-export Layout_AR_clean_in := 
+export Layout_AR_clean_in := //rec length=2594
 record
 string2       state_origin;
 string8       process_date;
-watercraft.layout_AR;
+watercraft.layout_AR_old;
 string70 pname1;
 string3  pname1_score;
 string100 cname1;

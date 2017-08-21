@@ -1,4 +1,4 @@
-import address;
+import address, bipv2;
 
 export Layouts := module
 
@@ -78,12 +78,14 @@ export Layouts := module
 	// -- Base Layout
 	////////////////////////////////////////////////////////////////////////
 	export Base := record 
+	  bipv2.IDlayouts.l_xlink_ids;	//Added for BIP project
 		unsigned6						Did							:= 0;
 		unsigned1						did_score				:= 0;
 		unsigned6						Bdid						:= 0;
 		unsigned1						bdid_score					;
 		CleanedFields;
 	end;
+	
 	
 	////////////////////////////////////////////////////////////////////////
 	// -- Keybuild Layout
@@ -106,6 +108,14 @@ export Layouts := module
 		Address.Layout_Clean182_fips 		Clean_address		    		;
 		string10												Clean_hphone						;
 		string10												Clean_wphone						;		
+	end;
+	
+	////////////////////////////////////////////////////////////////////////
+	// -- Keybuild LinkIDs Layout
+	////////////////////////////////////////////////////////////////////////
+	export Keybuild_LinkIDs := record   //Added for BIP project
+	  bipv2.IDlayouts.l_xlink_ids;	 
+		keybuild;
 	end;
 	
 		////////////////////////////////////////////////////////////////////////
@@ -146,13 +156,18 @@ export Layouts := module
 			string28		prim_name					;
 			string8			sec_range			 		;
 			string5			zip5							;
-			//string25    city							;
 			string2			state		 					;
 			string10		phone		  		    ;
 			unsigned6		bdid					:= 0;
 			unsigned1		bdid_score		:= 0;
+			string25    city         := '';
+			string20		fname 			 := '';
+			string20    mname 			 := '';
+			string20  	lname				 := '';
+			string9			ssn					 := '';
+			bipv2.IDlayouts.l_xlink_ids   ;
 	  end;
-		
+			
 	  export Teletrack_UniqueId := 
 		record, maxlength(max_size)
  		  unsigned8		unique_id	;

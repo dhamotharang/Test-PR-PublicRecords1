@@ -1,32 +1,25 @@
-import ut,business_header_ss;
+import marketing_best, govdata, versioncontrol,paw,Risk_Indicators,aca;
 
-//have keys on them
-  ut.mac_SF_Move('BASE::Business_Contacts','R',_a,3,true)
-	ut.mac_SF_Move('BASE::People_At_Work_Stats','R',_b,3,true)
-	ut.mac_SF_Move('BASE::business_header.Best','R',_c,3,true)
-	ut.mac_SF_Move('BASE::business_header.CompanyName','R',_d,3,true)
-	ut.mac_SF_Move('BASE::business_header.CompanyName_Address','R',_e,3,true)
-	ut.mac_SF_Move('BASE::business_header.CompanyName_Phone','R',_f,3,true)
-	ut.mac_SF_Move('BASE::business_header.CompanyName_FEIN','R',_g,3,true)
-	ut.mac_SF_Move('BASE::Business_Header','R',_h,3,true)
-	ut.mac_SF_Move('BASE::Business_Relatives','R',_i,3,true)
-	ut.mac_SF_Move('BASE::Business_Relatives_Group','R',_j,3,true)
-	ut.mac_SF_Move('BASE::bh_co_name_words','R',_k,3,true)
-	ut.mac_SF_Move('BASE::bh_bdid.city.zip.fein.phone','R',_l,3,true)
+// -- rollback everything
+// -- the first rollback is for the files used in the bdid macros(the slimsorts)
+// -- they are promoted to prod by the following attribute:
+// -- 		Business_Header.BWR_Expose_Slimsorts
+// -- once the build passes QA and is put in production.
+// -- if that above attribute hasn't been run for this build, then set hasExposeSlimsortsBeenRun to false.
 
-//have no keys
-	ut.mac_SF_Move('BASE::Business_Header_Stat','R',_m,3,false)
-	
-rollfiles := sequential(
-	_a,_b,_c,_d,_e,_f,_g,_h,_i,_j,_k,_l,_m);
-	
-
-//keys themselves
-business_header_ss.mac_AcceptSK('R',rollkeys,true,false)
-	
+IsTesting									:= false																												;
+bdidmacroregex						:= '.*?base::business_header.*?(search|best|companyname|BDL2).*';
+hasExposeSlimsortsBeenRun	:= true																													;
 
 sequential(
-	rollfiles,
-	rollkeys);
-
-
+	 if(hasExposeSlimsortsBeenRun
+		,business_header.Rollback('^'+bdidmacroregex+'$'		,pIsTesting := IsTesting).Father2Prod	()
+	 )
+	,business_header.Rollback('^'+bdidmacroregex+'$'			,pIsTesting := IsTesting).Prod2QA			()
+	,business_header.Rollback('^(?!'+bdidmacroregex+').*$',pIsTesting := IsTesting).Father2QA		()
+	,Marketing_Best.Rollback															(pIsTesting := IsTesting).Father2QA		()
+	,govdata.Rollback																			(pIsTesting := IsTesting).Father2QA		()
+	,paw.Rollback																					(pIsTesting := IsTesting).Father2QA		()
+	,Risk_Indicators.Rollback															(pIsTesting := IsTesting).Father2QA		()
+	,ACA.Rollback																					(pIsTesting := IsTesting).Father2QA		()
+);

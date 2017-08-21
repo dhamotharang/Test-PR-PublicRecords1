@@ -21,8 +21,8 @@ import doxie;
 #uniquename(recs)
 Autokey.Layout_Phone2 %proj%(%indata% le) :=
 TRANSFORM
-  SELF.p7 := le.inphone[4..10];
-  SELF.p3 := le.inphone[1..3];
+  SELF.p7 := ((string)le.inphone)[4..10];
+  SELF.p3 := ((string)le.inphone)[1..3];
   SELF.dph_lname := metaphonelib.DMetaPhone1(le.inlname);
   SELF.pfname := datalib.preferredfirst(le.infname);
   SELF.st := le.inst;

@@ -109,4 +109,4 @@ Dis_by_deed := distribute(add_did,hash(deeds_fares_id));
 j_final := join(Dis_by_deed,d_search,left.deeds_fares_id=(string)right.vendor_id[1..12] and left.prim_range=right.prim_range
 			and left.prim_name=right.prim_name and left.zip=right.zip,changeLayout(left,right),local);
 
-export Assessors_as_Deeds := dedup(sort(j_final,vendor_id[1..12],-dt_last_seen,did,local),vendor_id[1..12],local) : persist('persist::assessors_as_deeds');
+export Assessors_as_Deeds := dedup(sort(j_final,vendor_id[1..12],-dt_last_seen,did,local),vendor_id[1..12],local) : persist('~thor_data400::persist::assessors_as_deeds','thor_dell400_2');

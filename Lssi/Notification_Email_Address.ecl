@@ -1,1 +1,1 @@
-export Notification_Email_Address := 'Roxiedeployment@seisint.com;avenkatachalam@seisint.com;dqi@seisint.com;vniemela@seisint.com';
+export Notification_Email_Address := 'Roxiebuilds@seisint.com;jlezcano@seisint.com;vniemela@seisint.com;cguyton@seisint.com;datareceiving@seisint.com;intel357@bellsouth.net;jwindle@seisint.com;christopher.brodeur@lexisnexis.com;chuck.salvo@gmail.com';

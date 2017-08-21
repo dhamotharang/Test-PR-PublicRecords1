@@ -4,7 +4,7 @@ IMPORT ADDRESS_ATTRIBUTES, ADVO, AML, BIPV2, UT;
 search_range := address_attributes.Constants.sixYrAgo; 
 
 //FILES
-inBIP := DISTRIBUTE(BIPV2.CommonBase.DS_PROD,HASH(POWID)); 
+inBIP := DISTRIBUTE(BIPV2.CommonBase.DS_PROD_BUILT,HASH(POWID)); 
 
 ds_in := DISTRIBUTE(inBIP(POWID <> 0 AND dt_last_seen > search_range AND (company_status_derived ='ACTIVE' OR current) AND zip <> '' AND prim_range <> '' AND prim_name <> ''),HASH(POWID)); 
 ds    := DEDUP(SORT(ds_in, POWID, -dt_last_seen, -company_sic_code1, LOCAL), POWID, LOCAL);

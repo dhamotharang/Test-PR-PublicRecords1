@@ -1,17 +1,17 @@
 IMPORT Address, NID, tools, ut, _Validate;
 
-EXPORT Build_Base_Main(STRING pversion,
-											 DATASET(Layouts.Base.Main) inMainBase,
-											 DATASET(Layouts.Input.BIOG) inBIOGUpdate,
-											 DATASET(Layouts.Input.Address) inAddressUpdate,
-											 DATASET(Layouts.Input.Contact) inContactUpdate,
-											 DATASET(Layouts.Input.Deceased) inDeceasedUpdate,
+EXPORT Build_Base_Main(STRING 																 pversion,
+											 DATASET(Layouts.Base.Main) 						 inMainBase,
+											 DATASET(Layouts.Input.BIOG) 						 inBIOGUpdate,
+											 DATASET(Layouts.Input.Address) 				 inAddressUpdate,
+											 DATASET(Layouts.Input.Contact) 				 inContactUpdate,
+											 DATASET(Layouts.Input.Deceased) 				 inDeceasedUpdate,
 											 DATASET(Layouts.Input.MOCParticipation) inMOCParticipationUpdate) := MODULE
 
-  inBIOGUpdate_dist := DISTRIBUTE(inBIOGUpdate, HASH(biog_number));
-  inAddressUpdate_dist := DISTRIBUTE(inAddressUpdate, HASH(biog_number));
-  inContactUpdate_dist := DISTRIBUTE(inContactUpdate, HASH(biog_number));
-  inDeceasedUpdate_dist := DISTRIBUTE(inDeceasedUpdate, HASH(biog_number));
+  inBIOGUpdate_dist 						:= DISTRIBUTE(inBIOGUpdate, HASH(biog_number));
+  inAddressUpdate_dist 					:= DISTRIBUTE(inAddressUpdate, HASH(biog_number));
+  inContactUpdate_dist 					:= DISTRIBUTE(inContactUpdate, HASH(biog_number));
+  inDeceasedUpdate_dist 				:= DISTRIBUTE(inDeceasedUpdate, HASH(biog_number));
   inMOCParticipationUpdate_dist := DISTRIBUTE(inMOCParticipationUpdate, HASH(biog_number));
 	
 	TrimUpper(STRING s) := FUNCTION
@@ -35,9 +35,8 @@ EXPORT Build_Base_Main(STRING pversion,
 
 	temp_dead_rec determine_dead_indicator(workingMOCUpdate L, Layouts.Input.Deceased R) := TRANSFORM
     SELF.dead_ind := IF(L.biog_number = R.biog_number, 'Y', 'N');
-
-    SELF := L;
-		SELF := R;
+    SELF 				  := L;
+		SELF 					:= R;
 	END;
 	
   workingDeceasedUpdate := JOIN(workingMOCUpdate, inDeceasedUpdate_dist,
@@ -62,8 +61,7 @@ EXPORT Build_Base_Main(STRING pversion,
 	  SELF.country                   := R.country;
 	  SELF.address_type              := R.address_type;
 	  SELF.address_suppress_ind      := R.address_suppress_ind;
-
-    SELF := L;
+    SELF 													 := L;
 	END;
 
   workingAddressUpdate := JOIN(workingDeceasedUpdate_proj, inAddressUpdate_dist,
@@ -79,27 +77,25 @@ EXPORT Build_Base_Main(STRING pversion,
 		SELF.area_code                 := R.area_code;
 		SELF.exchange                  := R.exchange;
 		SELF.phone_last_four           := R.phone_last_four;
-
-    SELF := L;
+    SELF 													 := L;
 	END;
 
   workingContactUpdate := JOIN(workingAddressUpdate, inContactUpdate_dist,
 	                             LEFT.biog_number = RIGHT.biog_number AND
-															    LEFT.address_id = RIGHT.address_id,
+															 LEFT.address_id = RIGHT.address_id,
 															 assign_contact_occurrence(LEFT, RIGHT),
 															 LEFT OUTER,
 															 LOCAL);
 
   Layouts.Base.Main standardize_input(workingContactUpdate L) := TRANSFORM
 		// Convert from MM/DD/YYYY format to YYYYMMDD format.
-		the_dod         := IF(LENGTH(L.dod) = 10, L.dod[7..] + L.dod[1..2] + L.dod[4..5], '');
-		the_dob         := L.birth_year + L.birth_month + L.birth_day;
-		the_org1        := TrimUpper(L.org1);
-		the_line1       := TrimUpper(L.line1);
-		the_line2       := TrimUpper(L.line2);
-		the_line3       := TrimUpper(L.line3);
-		the_description := TrimUpper(L.description);
-			
+		the_dod         								 := IF(LENGTH(L.dod) = 10, L.dod[7..] + L.dod[1..2] + L.dod[4..5], '');
+		the_dob         								 := L.birth_year + L.birth_month + L.birth_day;
+		the_org1        								 := TrimUpper(L.org1);
+		the_line1       								 := TrimUpper(L.line1);
+		the_line2       								 := TrimUpper(L.line2);
+		the_line3       								 := TrimUpper(L.line3);
+		the_description 								 := TrimUpper(L.description);			
 		SELF.birth_date_suppress_ind     := TrimUpper(L.birth_date_suppress_ind);
 		SELF.birth_city                  := TrimUpper(L.birth_city);
 		SELF.birth_state                 := TrimUpper(L.birth_state);
@@ -142,21 +138,17 @@ EXPORT Build_Base_Main(STRING pversion,
 		SELF.dt_vendor_first_reported    := (UNSIGNED4)pversion;
 		SELF.dt_vendor_last_reported     := (UNSIGNED4)pversion;
 		SELF.record_type                 := 'C';
-		SELF.board_source                := 'ABMS';
-		
-		SELF := L;
-		SELF := [];
+		SELF.board_source                := 'ABMS';		
+		SELF 														 := L;
+		SELF 														 := [];
 	END;
 
 	// Take the main update file, standardize it, and PROJECT it into the base layout.
 	workingMainUpdate := PROJECT(workingContactUpdate, standardize_input(LEFT));
 
-	workingMainUpdate_clean_phone := Standardize_Phone(workingMainUpdate);
-	workingMainUpdate_clean_name := Standardize_Name(workingMainUpdate_clean_phone);
-
   // Distribute needed files for quicker processing.
-	workingMainUpdate_dist := DISTRIBUTE(workingMainUpdate_clean_name, HASH(biog_number));
-	inMainBase_dist := DISTRIBUTE(inMainBase, HASH(biog_number));
+	workingMainUpdate_dist := DISTRIBUTE(workingMainUpdate, HASH(biog_number));
+	inMainBase_dist 			 := DISTRIBUTE(inMainBase, HASH(biog_number));
 
 	// Make the input unique for biog_number, to help determine what's historical and what's not.
 	unique_update := DEDUP(SORT(workingMainUpdate_dist, biog_number, LOCAL), biog_number, LOCAL);
@@ -178,34 +170,59 @@ EXPORT Build_Base_Main(STRING pversion,
 																							SELF := LEFT),
 																		LOCAL);
 
-	// Join base and update main to determine what's new.  Apply AID logic to everything.
-	combinedMain := Standardize_Addr(workingCurrentMainBase + workingHistoricalMainBase +
-	                                    workingMainUpdate_dist);
+	workingMainUpdate_clean_phone := Standardize_Phone(workingCurrentMainBase + workingHistoricalMainBase +
+																										 workingMainUpdate_dist);
+	workingMainUpdate_clean_name  := Standardize_Name(workingMainUpdate_clean_phone);
 
+	// Join base and update main to determine what's new.  Apply AID logic to everything.
+	combinedMain 		:= Standardize_Addr(workingMainUpdate_clean_name);
 	// Add DID and BDID
 	combinedMainAID := Append_IDs.fAll(combinedMain);
 
-	combinedMain_dist := DISTRIBUTE(combinedMainAID, HASH(biog_number));
-	combinedMain_sort := SORT(combinedMain_dist,
-														biog_number, (UNSIGNED)address_id, (UNSIGNED)address_occurrence_number,
-														   (UNSIGNED)contact_occurrence_number, (UNSIGNED)moc_cert_id, record_type,
-															 -dt_vendor_last_reported, RECORD,
-														LOCAL);
-	
-	Layouts.Base.Main rollupMain(Layouts.Base.Main L, Layouts.Base.Main R) := TRANSFORM
-    SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-    SELF.dt_vendor_last_reported := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
-																								 
-	  SELF := L;
+ 	combinedMain_dist := DISTRIBUTE(combinedMainAID, HASH(biog_number));
+  combinedMain_sort := SORT(combinedMain_dist,
+   														biog_number, (UNSIGNED)address_id, (UNSIGNED)address_occurrence_number,
+   														   (UNSIGNED)contact_occurrence_number, (UNSIGNED)moc_cert_id, record_type,
+   															 -dt_vendor_last_reported, RECORD,
+   														LOCAL);
+   	
+   	Layouts.Base.Main rollupMain(Layouts.Base.Main L, Layouts.Base.Main R) := TRANSFORM
+      SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
+      SELF.dt_vendor_last_reported  := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+   		SELF.source_rec_id            := IF(L.source_rec_id = 0, R.source_rec_id, L.source_rec_id);
+   		// If there's a case where the records change gender to U or null, we keep the last known gender.
+   		// Regardless, it'll keep the most recent gender that's a definied gender of M or F.
+   		SELF.gender										:= IF(L.gender NOT IN ['M', 'F'], R.gender, L.gender);   
+   	  self.record_type							:= if(l.record_type = 'C' or r.record_type = 'C', 'C', 'H');
+			SELF 													:= L;
 	END;
-	
-	baseMain := ROLLUP(combinedMain_sort,
-										 rollupMain(LEFT, RIGHT),
-										 biog_number, address_id, address_occurrence_number, contact_occurrence_number,
-										    moc_cert_id, RECORD,
-												EXCEPT record_type, dt_vendor_last_reported, dt_vendor_first_reported,
-										 LOCAL);
-
+   	
+   	baseMain := ROLLUP(combinedMain_sort,
+   										 rollupMain(LEFT, RIGHT),
+											 biog_number, address_id, address_occurrence_number, contact_occurrence_number,
+   										 moc_cert_id, RECORD,
+											 except
+											 dt_vendor_first_reported
+											,dt_vendor_last_reported
+											,bdid_score
+											,gender
+											,record_type
+											,source_rec_id
+											,ultscore
+											,orgscore
+											,selescore
+											,proxscore
+											,powscore
+											,empscore
+											,dotscore
+											,ultweight
+											,orgweight
+											,seleweight
+											,proxweight
+											,powweight
+											,empweight
+											,dotweight,LOCAL);
+											
   Layouts.Base.Main add_description_text(Layouts.Base.Main L) := TRANSFORM
     SELF.address_type_desc := MAP(L.address_type = 'P' => 'PROFESSIONAL',
 		                              L.address_type = 'S' => 'SECONDARY',
@@ -213,14 +230,17 @@ EXPORT Build_Base_Main(STRING pversion,
 																  L.address_type = 'H' => 'HOME',
 																  '');
 
-    SELF := L;
+    SELF 									 := L;
 	END;
 
 	// Finally, get descriptions.
 	baseMainPlusDescriptions := PROJECT(baseMain, add_description_text(LEFT));
 	
+ 	// Add source record id
+  ut.MAC_Append_Rcid(baseMainPlusDescriptions, source_rec_id, baseMainPlusSourceRid);
+
 	// Return
-	tools.mac_WriteFile(Filenames(pversion).Base.Main.New, baseMainPlusDescriptions, Build_Base_File);
+	tools.mac_WriteFile(Filenames(pversion).Base.Main.New, baseMainPlusSourceRid, Build_Base_File);
 
 	EXPORT full_build := SEQUENTIAL(Build_Base_File,
 			                            Promote(pversion).buildfiles.New2Built);

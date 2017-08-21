@@ -51,4 +51,4 @@ END;
 
 recs := PROJECT(ds_ready, trans(LEFT));
 
-EXPORT Key_Header_DOBName := INDEX (recs, {recs}, '~thor_data400::key::header.dobname_' + doxie.version_superkey, OPT);
+EXPORT Key_Header_DOBName := INDEX (recs, {recs}, ut.Data_Location.Person_header+'thor_data400::key::header.dobname_' + doxie.version_superkey, OPT);

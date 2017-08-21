@@ -1,1 +1,1 @@
-export File_FCRA_Riskwise_Logs := dataset('~thor10_231::in::riskwise_acclogs', inquiry_acclogs.Layout_Riskwise_Logs.Input, csv(separator('~~'), quote('')));
+export File_FCRA_Riskwise_Logs := dataset('~thor10_231::in::riskwise_acclogs', inquiry_acclogs.Layout_Riskwise_Logs.Input, csv(separator('~~'), quote('')), opt);

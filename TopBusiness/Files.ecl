@@ -60,8 +60,12 @@ module
 		tools.mac_FilesBase(Filenames(pversion,pUseOtherEnvironment).Linking.Linked,Layout_Linking.Linked,Linked);
 	end;
 	
-	export LLID := module
-		tools.mac_FilesBase(Filenames(pversion,pUseOtherEnvironment).LLID.Linked,Layout_LLID.Linked,Linked);
+	export LLID12 := module
+		tools.mac_FilesBase(Filenames(pversion,pUseOtherEnvironment).LLID12.Linked,Layout_LLID.LLID12.Linked,Linked);
+	end;
+	
+	export LLID9 := module
+		tools.mac_FilesBase(Filenames(pversion,pUseOtherEnvironment).LLID9.Linked,Layout_LLID.LLID9.Linked,Linked);
 	end;
 	
 	export Mark := module
@@ -78,7 +82,9 @@ module
 		end;
 		tools.mac_FilesBase(Filenames(pversion,pUseOtherEnvironment).MotorVehicle.Registration,Layout_MotorVehicle.Registration,Registration);
 		tools.mac_FilesBase(Filenames(pversion,pUseOtherEnvironment).MotorVehicle.Title,Layout_MotorVehicle.Title,Title);
-		tools.mac_FilesBase(Filenames(pversion,pUseOtherEnvironment).MotorVehicle.Party,Layout_MotorVehicle.Party,Party);
+		export Party := module
+			tools.mac_FilesBase(Filenames(pversion,pUseOtherEnvironment).MotorVehicle.Party.Linked,Layout_MotorVehicle.Party.Linked,Linked);
+		end;
 	end;
 	
 	export NAPs := module

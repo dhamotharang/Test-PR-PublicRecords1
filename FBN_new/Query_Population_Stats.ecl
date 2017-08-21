@@ -1,0 +1,33 @@
+fbn_file := file_fbn_fixed_in;
+Layout_fbn_file_stat :=
+record
+   integer4 PROCESS_DATE_count                       := sum(group, if(fbn_file.PROCESS_DATE                    <> '',1,0));
+   integer4 CNTCT_SALUTATION_count                   := sum(group, if(fbn_file.CNTCT_SALUTATION                <> '',1,0));
+   integer4 CNTCT_FIRST_NAME_count                   := sum(group, if(fbn_file.CNTCT_FIRST_NAME                <> '',1,0));
+   integer4 CNTCT_LAST_NAME_count                    := sum(group, if(fbn_file.CNTCT_LAST_NAME                 <> '',1,0));
+   integer4 CNTCT_SUFFIX_count                       := sum(group, if(fbn_file.CNTCT_SUFFIX                    <> '',1,0));
+   integer4 BUS_NAME_count                           := sum(group, if(fbn_file.BUS_NAME                        <> '',1,0));
+   integer4 BUS_STR_ADDR_count                       := sum(group, if(fbn_file.BUS_STR_ADDR                    <> '',1,0));
+   integer4 BUS_CITY_count                           := sum(group, if(fbn_file.BUS_CITY                        <> '',1,0));
+   integer4 BUS_STATE_count                          := sum(group, if(fbn_file.BUS_STATE                       <> '',1,0));
+   integer4 BUS_ZIP_count                            := sum(group, if(fbn_file.BUS_ZIP                         <> '',1,0));
+   integer4 BUS_ZIP_4_count                          := sum(group, if(fbn_file.BUS_ZIP_4                       <> '',1,0));
+   integer4 BUS_CARRIER_RT_count                     := sum(group, if(fbn_file.BUS_CARRIER_RT                  <> '',1,0));
+   integer4 BUS_PHONE_NUM_count                      := sum(group, if(fbn_file.BUS_PHONE_NUM                   <> '',1,0));
+   integer4 FIPS_CNTY_CODE_count                     := sum(group, if(fbn_file.FIPS_CNTY_CODE                  <> '',1,0));
+   integer4 SIC_CODE_count                           := sum(group, if(fbn_file.SIC_CODE                        <> '',1,0));
+   integer4 BUS_DESCRIPTION_count                    := sum(group, if(fbn_file.BUS_DESCRIPTION                 <> '',1,0));
+   integer4 FILING_TYPE_count                        := sum(group, if(fbn_file.FILING_TYPE                     <> '',1,0));
+   integer4 FILING_DATE_count                        := sum(group, if(fbn_file.FILING_DATE                     <> '',1,0));
+   integer4 CNTCT_STR_ADDR_count                     := sum(group, if(fbn_file.CNTCT_STR_ADDR                  <> '',1,0));
+   integer4 CNTCT_CITY_count                         := sum(group, if(fbn_file.CNTCT_CITY                      <> '',1,0));
+   integer4 CNTCT_STATE_count                        := sum(group, if(fbn_file.CNTCT_STATE                     <> '',1,0));
+   integer4 CNTCT_ZIP_count                          := sum(group, if(fbn_file.CNTCT_ZIP                       <> '',1,0));
+   integer4 CNTCT_PHONE_NUM_count                    := sum(group, if(fbn_file.CNTCT_PHONE_NUM                 <> '',1,0));
+   integer4 HOTLINE_MM_YY_count                      := sum(group, if(fbn_file.HOTLINE_MM_YY                   <> '',1,0));
+   integer4 FILING_NUMBER_count                      := sum(group, if(fbn_file.FILING_NUMBER                   <> '',1,0));
+   integer4 total                                    := count(group);
+end;
+fbn_file_stat := table(fbn_file, Layout_fbn_file_stat, few);
+output_fbn_file_stat := output(fbn_file_stat, named('fbn_file_field_population_stats'), all);
+export Query_Population_Stats := output_fbn_file_stat;

@@ -2,9 +2,9 @@ export Layout_WorldCheck_Premium :=  record
 	string  UID;
 	string  Last_Name;
 	string  First_Name;
-	string  Aliases;
-	string  Low_Quality_Aliases;
-	string  Alternate_Spelling;
+	unicode  Aliases;
+	unicode  Low_Quality_Aliases;
+	unicode  Alternate_Spelling;
 	string  Category;
 	string  Title;
 	string  Sub_Category;
@@ -15,8 +15,10 @@ export Layout_WorldCheck_Premium :=  record
 	string  Date_Of_Death;
 	string  Passports;
 	string  Social_Security_Number;
+//	string 	IDENTIFICATION_NUMBERS; //new field
 	string  Locations;
 	string  Countries;
+//	string 	CITIZENSHIP;	//new field
 	string  Companies;
 	string  E_I_Ind;
 	string  Linked_Tos;

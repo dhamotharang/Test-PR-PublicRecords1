@@ -20,7 +20,8 @@ rec into_withExp(df_filtered L, integer C) := transform
 	self.seq := C;
 	self.ucc_vendor := ut.st2FipsCode(l.file_state);
 	self.ucc_key := uccd.constructUCCkey(l.file_state, l.orig_filing_num);
-	self.event_key 	:= if (l.filing_type='0801', uccd.constructUCCkey(l.file_state, l.orig_filing_num),l.filing_type+'-'+l.filing_date);
+//	self.event_key 	:= if (l.filing_type='0801', uccd.constructUCCkey(l.file_state, l.orig_filing_num),l.filing_type+'-'+l.filing_date);
+	self.event_key 	:= if (l.filing_type='0801', uccd.constructUCCkey(l.file_state, l.orig_filing_num),l.filing_type+trim(l.document_num,left,right)+l.filing_date);
 	self.ucc_process_date := '';
 	self.collateral_status_cd := '';
 	self.collateral_status_desc := '';
@@ -67,7 +68,7 @@ fromexp := project(o3 + table(o1(Length(trim(collateral_type_cd)) = 0),collat_re
 //output(fromexp);
 
 //****** DIRECT ******
-dirin := uccd.File_Collateral_Base;
+dirin := uccd.Updated_Collateral;
 
 outrec formatdir(dirin l) := transform
 	self.isDirect := true;

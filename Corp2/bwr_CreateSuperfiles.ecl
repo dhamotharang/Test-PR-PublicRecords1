@@ -1,3 +1,4 @@
-apply(corp2.filenames.Input.dAll_superfilenames, fileservices.createsuperfile(name));
-apply(corp2.filenames.Base.dAll_superfilenames, fileservices.createsuperfile(name));
-apply(corp2.keynames.dAll_superkeynames, fileservices.createsuperfile(name));
+sequential(
+	 apply(corp2.filenames().Input.dall_filenames, apply(dSuperfiles, fileservices.createsuperfile(name)))
+	,VersionControl.mUtilities.createsupers(corp2.Keynames().dall_filenames)
+);

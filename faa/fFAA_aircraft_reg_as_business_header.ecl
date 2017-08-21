@@ -8,7 +8,7 @@ rLayout_Plus
   end
  ;
 
-export fFAA_aircraft_reg_as_business_header(dataset(rLayout_Plus) pFAA_Aircraft_Reg)
+export fFAA_aircraft_reg_as_business_header(dataset(rLayout_Plus) pFAA_Aircraft_Reg, boolean isPRCT=false)
  :=
   function
 
@@ -40,6 +40,7 @@ export fFAA_aircraft_reg_as_business_header(dataset(rLayout_Plus) pFAA_Aircraft_
 		// reasonably unique.  Same thing is also used in faa_aircraft_reg_as_business_contact
 		self.vendor_id := L.name[1..6] + L.zip_code[1..5] + l.type_registrant + L.n_number;
 		self.vl_id := '';
+		self.bdid := if(isPRCT, (unsigned6)l.bdid_out,0);
 		self := L;
 	end;
 

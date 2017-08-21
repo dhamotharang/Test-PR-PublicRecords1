@@ -12,22 +12,22 @@ EXPORT match_cnp_number(TYPEOF(h.cnp_number) L, TYPEOF(h.cnp_number) R, BOOLEAN 
 		SALT30.MatchCode.NoMatch),
 	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
 );
-EXPORT match_prim_range(TYPEOF(h.prim_range) L, TYPEOF(h.prim_range) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+EXPORT match_active_duns_number(TYPEOF(h.active_duns_number) L, TYPEOF(h.active_duns_number) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
 	MAP(L = R => SALT30.MatchCode.ExactMatch,
 		SALT30.MatchCode.NoMatch),
 	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
 );
-EXPORT match_prim_name_derived(TYPEOF(h.prim_name_derived) L, TYPEOF(h.prim_name_derived) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+EXPORT match_active_enterprise_number(TYPEOF(h.active_enterprise_number) L, TYPEOF(h.active_enterprise_number) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
 	MAP(L = R => SALT30.MatchCode.ExactMatch,
 		SALT30.MatchCode.NoMatch),
 	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
 );
-EXPORT match_st(TYPEOF(h.st) L, TYPEOF(h.st) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+EXPORT match_active_domestic_corp_key(TYPEOF(h.active_domestic_corp_key) L, TYPEOF(h.active_domestic_corp_key) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
 	MAP(L = R => SALT30.MatchCode.ExactMatch,
 		SALT30.MatchCode.NoMatch),
 	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
 );
-EXPORT match_zip(TYPEOF(h.zip) L, TYPEOF(h.zip) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+EXPORT match_hist_enterprise_number(TYPEOF(h.hist_enterprise_number) L, TYPEOF(h.hist_enterprise_number) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
 	MAP(L = R => SALT30.MatchCode.ExactMatch,
 		SALT30.MatchCode.NoMatch),
 	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
@@ -57,27 +57,22 @@ EXPORT match_ebr_file_number(TYPEOF(h.ebr_file_number) L, TYPEOF(h.ebr_file_numb
 		SALT30.MatchCode.NoMatch),
 	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
 );
-EXPORT match_active_duns_number(TYPEOF(h.active_duns_number) L, TYPEOF(h.active_duns_number) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
-	MAP(L = R => SALT30.MatchCode.ExactMatch,
-		SALT30.MatchCode.NoMatch),
-	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
-);
-EXPORT match_active_enterprise_number(TYPEOF(h.active_enterprise_number) L, TYPEOF(h.active_enterprise_number) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
-	MAP(L = R => SALT30.MatchCode.ExactMatch,
-		SALT30.MatchCode.NoMatch),
-	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
-);
-EXPORT match_active_domestic_corp_key(TYPEOF(h.active_domestic_corp_key) L, TYPEOF(h.active_domestic_corp_key) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
-	MAP(L = R => SALT30.MatchCode.ExactMatch,
-		SALT30.MatchCode.NoMatch),
-	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
-);
 EXPORT match_company_fein(TYPEOF(h.company_fein) L, TYPEOF(h.company_fein) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
 	MAP(L = R => SALT30.MatchCode.ExactMatch,
 		SALT30.MatchCode.NoMatch),
 	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
 );
 EXPORT match_company_phone(TYPEOF(h.company_phone) L, TYPEOF(h.company_phone) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+	MAP(L = R => SALT30.MatchCode.ExactMatch,
+		SALT30.MatchCode.NoMatch),
+	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
+);
+EXPORT match_prim_range(TYPEOF(h.prim_range) L, TYPEOF(h.prim_range) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+	MAP(L = R => SALT30.MatchCode.ExactMatch,
+		SALT30.MatchCode.NoMatch),
+	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
+);
+EXPORT match_prim_name_derived(TYPEOF(h.prim_name_derived) L, TYPEOF(h.prim_name_derived) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
 	MAP(L = R => SALT30.MatchCode.ExactMatch,
 		SALT30.MatchCode.NoMatch),
 	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
@@ -92,7 +87,12 @@ EXPORT match_v_city_name(TYPEOF(h.v_city_name) L, TYPEOF(h.v_city_name) R, BOOLE
 		SALT30.MatchCode.NoMatch),
 	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
 );
-EXPORT match_hist_enterprise_number(TYPEOF(h.hist_enterprise_number) L, TYPEOF(h.hist_enterprise_number) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+EXPORT match_st(TYPEOF(h.st) L, TYPEOF(h.st) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
+	MAP(L = R => SALT30.MatchCode.ExactMatch,
+		SALT30.MatchCode.NoMatch),
+	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
+);
+EXPORT match_zip(TYPEOF(h.zip) L, TYPEOF(h.zip) R, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
 	MAP(L = R => SALT30.MatchCode.ExactMatch,
 		SALT30.MatchCode.NoMatch),
 	MAP(L = R => SALT30.MatchCode.ExactMatch, SALT30.MatchCode.NoMatch)
@@ -107,4 +107,3 @@ EXPORT match_company_address(TYPEOF(h.company_address) L,TYPEOF(h.company_addres
 	L = R => SALT30.MatchCode.ExactMatch,
 	SALT30.MatchCode.NoMatch);
 END;
-

@@ -33,9 +33,7 @@ GBID3.layout_GBID3_in prep_for_GBID3(indata L) := transform
 	self.searchby.Person.FirstName := trim(L.searchby.Name.First);
 	self.searchby.Person.MiddleName := trim(L.searchby.Name.Middle);
 	self.searchby.Person.LastName := trim(L.searchby.Name.Last);
-	self.searchby.Person.Gender := Map(trim(StringLib.StringToLowerCase(L.searchby.Gender)) in ['male','m'] => 'Male',
-																		 trim(StringLib.StringToLowerCase(L.searchby.Gender)) in ['female','f'] => 'Female',
-																		 '(unknown)');
+	self.searchby.Person.Gender := trim(L.searchby.Gender); //simplified by moving map to passport function
 	self.searchby.Person.DOB.Year := L.searchby.DOB.Year;
 	self.searchby.Person.DOB.Month := L.searchby.DOB.Month;
 	self.searchby.Person.DOB.Day := L.searchby.DOB.Day;
@@ -260,7 +258,8 @@ wWatch := join(wIP, getWatch, (unsigned)left._header.queryid=right.seq, addWatch
 // if doing watch, then join, otherwise dont
 watch := if(includeOfac=false and includeOtherWatchlists=false, wIP, wWatch);	
 
-// output(gbid3, named('gbid3'));
+// output(gbid3, named ('gbid3'));
+// output(indata, named ('indata'));
 return watch;
 
 end;

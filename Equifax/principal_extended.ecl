@@ -126,7 +126,7 @@ principal_extended_all := principal_busname + bh_contacts_select : persist('TEMP
 prin_ext_dist := distribute(principal_extended_all, hash(cid, pid));
 prin_ext_sort := sort(prin_ext_dist, cid, pid, local);
 prin_ext_grp := group(prin_ext_sort, cid, pid, local);
-prin_ext_grp_sort := sort(prin_ext_grp, lname, datalib.PreferredFirst(fname), record_type, if(did <> 0, 0, 1), did, ut.TitleRank(company_title), mname);
+prin_ext_grp_sort := sort(prin_ext_grp, lname, NID.PreferredFirstVersionedStr(fname, NID.version), record_type, if(did <> 0, 0, 1), did, ut.TitleRank(company_title), mname);
 
 Layout_Principal_Extended RollupPrincipals(Layout_Principal_Extended l, Layout_Principal_Extended r) := transform
 self := l;

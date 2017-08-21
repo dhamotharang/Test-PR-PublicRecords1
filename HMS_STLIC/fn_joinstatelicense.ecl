@@ -254,16 +254,16 @@ EXPORT fn_joinstatelicense (string pVersion, boolean pUseProd):= function
 		 
 		// SrcLookup := HMS_STLIC.LookupTables.StLicSrcLookup;
 		
-		t11_layout Join12(base_11 L,SrcLookup R) := TRANSFORM
-				SELF := L;
-		END;
+		// t11_layout Join12(base_11 L,SrcLookup R) := TRANSFORM
+				// SELF := L;
+		// END;
 			
-		base_12 := JOIN(base_11, SrcLookup
-   										,LEFT.hms_src = RIGHT.vsid 
-											,Join12(LEFT,RIGHT)
-   										,INNER
-   										,LOOKUP
-   										);
+		// base_12 := JOIN(base_11, SrcLookup
+   										// ,LEFT.hms_src = RIGHT.vsid 
+											// ,Join12(LEFT,RIGHT)
+   										// ,INNER
+   										// ,LOOKUP
+   										// );
 
 		// TaxonomyLookup := HMS_STLIC.LookupTables.TaxonomyLookup;
 		
@@ -272,19 +272,19 @@ EXPORT fn_joinstatelicense (string pVersion, boolean pUseProd):= function
 				string15 taxonomy_code := '';
 		END;
 			
-		t12_layout Join13(base_12 L,TaxonomyLookup R) := TRANSFORM
+		t12_layout Join12(base_11 L,TaxonomyLookup R) := TRANSFORM
 				SELF.taxonomy_code := R.taxonomy_code;
 				SELF := L;
 		END;
 		
-		base_13 := JOIN(base_12, TaxonomyLookup
+		base_12 := JOIN(base_11, TaxonomyLookup
    										,LEFT.mapped_class = RIGHT.hms_stlic_type_code
-   										,Join13(LEFT,RIGHT)
+   										,Join12(LEFT,RIGHT)
    										,LEFT OUTER
    										,LOOKUP
    										);
 		
-		base_d := distribute(base_13,hash(ln_key,entityid,hms_src,id));
+		base_d := distribute(base_12,hash(ln_key,entityid,hms_src,id));
 		
 		base_final := project(base_d,HMS_STLIC.Layouts.statelicense_layout);
 		

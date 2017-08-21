@@ -19,6 +19,7 @@ module
 	export BHAddrStats										:= Dataset(pname.BHAddrStats										,Layout_BH_Addr_Stats,flat);
 	export BHBasicMatchClean							:= Dataset(pname.BHBasicMatchClean							,Layout_Business_Header_Temp,flat);
 	export BHBasicMatchFEIN								:= Dataset(pname.BHBasicMatchFEIN								,Layout_Business_Header_Temp,flat);
+	export BHBasicMatchForRels						:= Dataset(pname.BHBasicMatchForRels						,Layout_Business_Header_Temp,flat);
 	export BHBasicMatchNameAddr						:= Dataset(pname.BHBasicMatchNameAddr						,Layout_Business_Header_Temp,flat);
 	export BHBasicMatchNoAddress					:= Dataset(pname.BHBasicMatchNoAddress					,Layout_Business_Header_Temp,flat);
 	export BHBasicMatchSALT								:= Dataset(pname.BHBasicMatchSALT								,Layout_Business_Header_Temp,flat);
@@ -39,6 +40,7 @@ module
 	export BHRelativeMatchABIHierarchy		:= Dataset(pname.BHRelativeMatchABIHierarchy		,Layout_Relative_Match,flat);
 	export BHRelativeMatchAddr						:= Dataset(pname.BHRelativeMatchAddr						,Layout_Relative_Match,flat);
 	export BHRelativeMatchDCAHierarchy		:= Dataset(pname.BHRelativeMatchDCAHierarchy		,Layout_Relative_Match,flat);
+	export BHRelativeMatchDCAHierarchySG		:= Dataset(pname.BHRelativeMatchDCAHierarchySG		,Layout_Relative_Match,flat);
 	export BHRelativeMatchDUNSTree				:= Dataset(pname.BHRelativeMatchDUNSTree				,Layout_Relative_Match,flat);
 	export BHRelativeMatchFBN							:= Dataset(pname.BHRelativeMatchFBN							,Layout_Relative_Match,flat);
 	export BHRelativeMatchFEIN						:= Dataset(pname.BHRelativeMatchFEIN						,Layout_Relative_Match,flat);

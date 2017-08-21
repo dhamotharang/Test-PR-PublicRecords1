@@ -16,8 +16,7 @@ end;
 
 bh_stats := table(bh_slim, layout_bh_stat, bdid);
 
-count(bh_stats);  // number of unique bdids
-
 bh_stats_sort := sort(bh_stats(cnt > 10), -cnt);
 
-output(choosen(bh_stats_sort, 1000));
+output(count(bh_stats)								,named('UniqueBdids'));
+output(choosen(bh_stats_sort, 1000)	,named('BdidsWithMostRecords'));

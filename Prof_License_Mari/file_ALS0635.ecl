@@ -1,0 +1,1 @@
+export file_ALS0635 := dataset('~thor_data400::in::proflic_mari::als0635::using::mtg_license',Prof_License_Mari.layout_ALS0635.Mortgage_License_src,csv(SEPARATOR(','),QUOTE('"'),heading(1)));

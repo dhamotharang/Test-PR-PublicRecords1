@@ -1,4 +1,4 @@
-﻿IMPORT AID;
+IMPORT AID;
 export layout_american_student_base_v2 := record
 
 	integer8        KEY;

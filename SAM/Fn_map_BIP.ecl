@@ -3,7 +3,7 @@ import sam, ut, address, NID;
 EXPORT Fn_map_BIP(dataset(SAM.Layout_SAM) pInFile):=  function 
 
 temp_clean_rec := record
-SAM.Layout_SAM;
+SAM.Layout_SAM - Cage;
 string name_clean;
 string address1_clean;
 string address2_clean;
@@ -12,8 +12,8 @@ string address_line2;
 
 end;
 
-need_clean := pInFile(country = 'USA' and (address_1 <> '' or address_2 <> '') and TRIM(address_1) != 'UNKNOWN');
-no_need_clean := pInFile(~(country = 'USA' and (address_1 <> '' or address_2 <> '') and TRIM(address_1) != 'UNKNOWN'));
+need_clean := pInFile(name <> '' and (country = 'USA' or country = ''));
+no_need_clean := pInFile(~(name <> '' and (country = 'USA' or country = '')));
 
 // clean name and address
 temp_clean_rec preclean_addr(need_clean le) := transform

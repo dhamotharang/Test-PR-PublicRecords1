@@ -1,30 +1,49 @@
-//////////////////////////////////////////////////////////////////////////////////////////////
-// -- Local value types for input files
-//////////////////////////////////////////////////////////////////////////////////////////////
-header_in 	:= File_Header_In;
-header_base 	:= File_Header_Base;
-es_in 		:= File_Executive_Summary_In;
-es_base 		:= File_Executive_Summary_Base;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-// -- Header Segment Counts
+// -- Do all stats
 //////////////////////////////////////////////////////////////////////////////////////////////
-header_in_records 	:= output('Total EBR Header In Records: ' 			+ count(header_in));
-header_base_records := output('Total EBR Header Base Records: ' 			+ count(header_base));
-header_base_bdids 	:= output('Total EBR Header Base Records w/BDID: ' 	+ count(header_base(bdid != 0)));
+Output_Segment_Stats('0010',header_segment_stats);
+Output_Segment_Stats('1000',executive_summary_segment_stats);
+Output_Segment_Stats('2000',trade1_segment_stats);
+Output_Segment_Stats('2015',Trade_Payment_Totals_segment_stats);
+Output_Segment_Stats('2020',Trade_Payment_Trends_segment_stats);
+Output_Segment_Stats('2025',Trade_Quarterly_Averages_segment_stats);
+Output_Segment_Stats('4010',Bankruptcy_segment_stats);
+Output_Segment_Stats('4020',Tax_Liens_segment_stats);
+Output_Segment_Stats('4030',Judgement_segment_stats);
+Output_Segment_Stats('4035',Attachment_Lien_segment_stats);
+Output_Segment_Stats('4040',Bulk_Transfers_segment_stats);
+Output_Segment_Stats('4500',Collateral_Accounts_segment_stats);
+Output_Segment_Stats('4510',UCC_Filings_segment_stats);
+Output_Segment_Stats('5000',Bank_Details_segment_stats);
+Output_Segment_Stats('5600',Demographic_Data1_segment_stats);
+Output_Segment_Stats('5610',Demographic_Data2_segment_stats);
+Output_Segment_Stats('6000',Inquiries_segment_stats);
+Output_Segment_Stats('6500',Government_Trade_segment_stats);
+Output_Segment_Stats('6510',Government_Debarred_Contractor_segment_stats);
+Output_Segment_Stats('7000',SNP_Parent_Name_Address_segment_stats);
+Output_Segment_Stats('7010',SNP_Data_segment_stats);
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-// -- Executive Summary Segment Counts
-//////////////////////////////////////////////////////////////////////////////////////////////
-executive_summary_in_records 	 := output('Total EBR Executive Summary In Records: ' 		   + count(es_in));
-executive_summary_base_records := output('Total EBR Executive Summary Base Records: ' 	   + count(es_base));
-executive_summary_base_bdids 	 := output('Total EBR Executive Summary Base Records w/BDID: ' + count(es_base(bdid != 0)));
-
-export Query_BDID_Stats := parallel(
-	 header_in_records
-	,header_base_records
-	,header_base_bdids
-	,executive_summary_in_records
-	,executive_summary_base_records
-	,executive_summary_base_bdids
-);
+export Query_BDID_Stats := output(
+	  header_segment_stats
+	+ executive_summary_segment_stats
+	+ trade1_segment_stats
+	+ Trade_Payment_Totals_segment_stats
+	+ Trade_Payment_Trends_segment_stats
+	+ Trade_Quarterly_Averages_segment_stats
+	+ Bankruptcy_segment_stats
+	+ Tax_Liens_segment_stats
+	+ Judgement_segment_stats
+//	+ Attachment_Lien_segment_stats
+//	+ Bulk_Transfers_segment_stats
+	+ Collateral_Accounts_segment_stats
+	+ UCC_Filings_segment_stats
+	+ Bank_Details_segment_stats
+	+ Demographic_Data1_segment_stats
+	+ Demographic_Data2_segment_stats
+	+ Inquiries_segment_stats
+	+ Government_Trade_segment_stats
+	+ Government_Debarred_Contractor_segment_stats
+//	+ SNP_Parent_Name_Address_segment_stats
+	+ SNP_Data_segment_stats
+, named('EBR_Counts'),all);

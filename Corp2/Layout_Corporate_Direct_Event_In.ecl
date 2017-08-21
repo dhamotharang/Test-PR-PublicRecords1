@@ -25,6 +25,6 @@ string8   event_start;
 string8   event_end;
 string10  event_microfilm_nbr;
 	
-string100 event_desc;
+string500 event_desc; //modified length from 100 to 500
 	
 end;

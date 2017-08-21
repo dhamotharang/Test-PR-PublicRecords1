@@ -1,4 +1,4 @@
-import header, doxie;
+import header, doxie, ut;
 
 t := header.Prepped_For_Keys;
 
@@ -18,4 +18,4 @@ ssn4_recs := project(t, get_ssn_last4(left));
 ssn4_dep := dedup(sort(ssn4_recs((unsigned)ssn4<>0, lname<>''), record),record);
 
 export Key_Header_SSN4 := INDEX(ssn4_dep, {ssn4_dep}, 
-                                '~thor_data400::key::header.ssn4.did_' + doxie.Version_SuperKey);
+                                ut.Data_Location.Person_header+'thor_data400::key::header.ssn4.did_' + doxie.Version_SuperKey);

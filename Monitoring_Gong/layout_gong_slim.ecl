@@ -1,0 +1,20 @@
+export layout_gong_slim := record
+	string vendor:='';
+  string10 phone10:='';
+  string10 prim_range:='';
+  string2 predir:='';
+  string28 prim_name:='';
+  string4 suffix:='';
+  string2 postdir:='';
+  string10 unit_desig:='';
+  string8 sec_range:='';
+  string25 p_city_name:='';
+  string25 v_city_name:='';
+  string2 st:='';
+  string5 z5:='';
+  string4 z4:='';
+  string120 company_name:='';
+  unsigned integer6 did:=0;
+  unsigned integer6 bdid:=0;
+  string8 dt_first_seen:='';
+end;

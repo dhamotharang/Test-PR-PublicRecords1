@@ -2,7 +2,7 @@ import ut;
 		
 base_rec :=RECORD
 	string1 source;
-	unsigned6 companyid;
+	string companyid;
 	String3   vert;
 	string20  loginid;
 	string32  session_id;
@@ -32,12 +32,12 @@ ds_csv := Webclick_tracker.WC_FileIn;
 ds_sorted  := SORT(ds_csv((LENGTH(TRIM(session_id))=24 or
 						LENGTH(TRIM(session_id))=32)and session_id<>''),companyid,loginid,session_id,time_accessed);
 ds_norm  := NORMALIZE(ds_sorted,3,xfm_r(LEFT,COUNTER));
-shared WC_File_In := ds_norm(event<>'');
+WC_File_In := ds_norm(event<>'');
 
 
 
-shared DSG:=group(SORT(WC_File_In,session_id,date_accessed,time_accessed,sorder),session_id);
-shared NewR:=record
+DSG:=group(dedup(SORT(distribute(WC_File_In,hash(session_id)),session_id,date_accessed,time_accessed,sorder,local),record,local),session_id);
+NewR:=record
 	string1 source;
     string20 companyID;
 		String3 vert;
@@ -49,9 +49,9 @@ shared NewR:=record
 	  integer hrs;
 	  integer mins;		
 end;
-shared NewR f(recordof(WC_File_In) L, integer C):=transform
+NewR f(recordof(WC_File_In) L, integer C):=transform
 			self.order:=C;
-			self.companyid := (string)l.companyid;
+			self.companyid := l.companyid;
 		  SELf.hrs:=  (integer)StringLib.StringExtract(StringLib.StringFindReplace(L.time_Accessed,':',','),1);
 		  SELf.mins:=  (integer)StringLib.StringExtract(StringLib.StringFindReplace(L.time_accessed,':',','),2);				
 			self:=L;

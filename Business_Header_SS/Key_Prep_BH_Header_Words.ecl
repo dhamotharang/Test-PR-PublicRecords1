@@ -1,6 +1,11 @@
-IMPORT Business_Header;
+Import Data_Services, Business_Header, PRTE2_Business_Header;
 
-wf := business_header_ss.File_Prep_BH_CompanyNameWords;
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+wf := PRTE2_Business_Header.Files().Base.CompanyWords.keybuild;
+#ELSE
+wf := business_header.Files().Base.CompanyWords.keybuild;
+#END;
+
 
 Layout_Header_Word_Index_Index := RECORD
 	wf.word;

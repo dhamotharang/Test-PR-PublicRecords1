@@ -1,5 +1,6 @@
 //This is the code to execute in a builder window
-#workunit('name','BIPV2_ProxID_mj6.BWR_Specificities - Specificities - SALT V3.0 B1');
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','BIPV2_ProxID_mj6.BWR_Specificities - Specificities - SALT V3.0 Beta 2');
 IMPORT BIPV2_ProxID_mj6,SALT30;
 IMPORT SALTTOOLS30;
 SpecMod := BIPV2_ProxID_mj6.specificities(BIPV2_ProxID_mj6.In_DOT_Base);

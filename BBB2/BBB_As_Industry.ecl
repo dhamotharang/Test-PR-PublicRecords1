@@ -7,7 +7,7 @@ TopBusiness_BIPV2.Layouts.rec_industry_combined_layout MapMIndustry(Base_Member 
 	SELF.bdid_score								:=	0;
 	SELF.source       						:=	MDR.sourceTools.src_BBB_Member;
 	SELF.source_docid  						:=	'';
-	SELF.source_rec_id 						:=	'';
+	SELF.source_rec_id 						:=	L.source_rec_id;
 	SELF.siccode       						:=	'';
 	SELF.naics        						:=	'';
 	SELF.industry_description 		:=	L.member_category;
@@ -31,7 +31,7 @@ TopBusiness_BIPV2.Layouts.rec_industry_combined_layout MapNMIndustry(Base_NonMem
 	SELF.bdid_score								:=	0;
 	SELF.source       						:=	MDR.sourceTools.src_BBB_Non_Member;
 	SELF.source_docid  						:=	'';
-	SELF.source_rec_id 						:=	'';
+	SELF.source_rec_id 						:=	L.source_rec_id;
 	SELF.siccode       						:=	'';
 	SELF.naics        						:=	'';
 	SELF.industry_description 		:=	L.non_member_category;

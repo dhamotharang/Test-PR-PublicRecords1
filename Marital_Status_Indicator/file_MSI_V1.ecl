@@ -563,4 +563,4 @@ norm_header := DENORMALIZE(protoFinal, data_final,
 																 left.did = right.did, 
 																 fillNameData(left,right,counter), local); 
 
-EXPORT file_MSI_V1 := norm_header;
+EXPORT file_MSI_V1 := norm_header : persist('~thor_data400::persist::marital_status_indicator_v1');

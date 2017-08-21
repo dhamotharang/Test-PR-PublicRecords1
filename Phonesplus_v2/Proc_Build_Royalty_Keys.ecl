@@ -1,4 +1,4 @@
-import Address,doxie_files, ut, doxie, autokey,Cellphone,RoxieKeyBuild,Phonesplus;
+import Address,doxie_files, ut, doxie, autokey,Cellphone,RoxieKeyBuild,Phonesplus, NID;
 
 export Proc_Build_Royalty_Keys(string filedate) := 
 function
@@ -51,7 +51,7 @@ Phonesplus_v2.MAC_Build('Phonesplusv2_royalty', dist_DSphonesplus,fname,mname,ln
 				 zero,zero,zero,
 				 lookups,
 				 fdid,
-				 '~thor_data400::key::phonesplusv2_royalty_',bld_phonesplus_auto,false)
+				 '~thor_data400::key::phonesplusv2_royalty_',bld_phonesplus_auto,false, ['C','Z','T','N','S'])
 
 						
 dist_DSphonesplus_rec := record
@@ -129,18 +129,18 @@ sequential(
 	parallel(
 			  bk_did
 			 ,bld_fdids
-			 ,bk_pcname
+			 //,bk_pcname
 			 ,bld_phonesplus_auto
 			),
 	parallel(
 			 mv2blt_did
 			,mv2blt_fdids
-			,mv2blt_pcname
+			//,mv2blt_pcname
 			),
 	parallel(
 			mv2qa_did
 		   ,mv2qa_fdids
-		   ,mv2qa_pcname
+		   //,mv2qa_pcname
 		   ,mv_autokey
 			 )
  
@@ -153,9 +153,3 @@ return sequential(build_keys
 				);
 
 end;
-
-
- 
- 
- 
- 

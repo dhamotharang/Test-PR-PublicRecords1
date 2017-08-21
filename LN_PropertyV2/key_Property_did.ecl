@@ -9,8 +9,16 @@ KeyName_fcra  := 'thor_data400::key::ln_propertyv2::fcra::';
 file_in := LN_PropertyV2.file_search_building((unsigned)did > 0);
 file_dedup := dedup(sort(distribute(file_in, hash(did)), did, ln_fares_id, source_code, local),did, ln_fares_id,source_code, local);
 
+//Blank field for fcra key
+file_dedup blankField(file_dedup l):= transform
+	self.xadl2_weight := 0;
+	self := l;
+end;
+
+file_dedup2 := project(file_dedup, blankField(left));
+
 //filtering by [ln_fares_id[1] != 'R'] produces FCRA compliant data
-base_file := if(IsFCRA,file_dedup(ln_fares_id[1] !='R'),file_dedup);
+base_file := if(IsFCRA,file_dedup2(ln_fares_id[1] !='R'),file_dedup);
 
 key_name := Data_services.Data_location.Prefix('Property') + if(isFCRA, KeyName_fcra, KeyName) + doxie.Version_SuperKey + '::search.did';
 									

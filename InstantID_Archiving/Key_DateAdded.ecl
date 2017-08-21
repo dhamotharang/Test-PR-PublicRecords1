@@ -11,7 +11,7 @@ InpFile := PROJECT(InstantID_Archiving.Files_Base.Delta + InstantID_Archiving.Fi
 
 DstFile := DISTRIBUTE(InpFile, HASH(transaction_ID, product, date_added));
 
-SrtFile := SORT(DstFile, transaction_ID, product, date_added, LOCAL);
+SrtFile := SORT(DstFile, RECORD, LOCAL);
 
 DdpFile := DEDUP(SrtFile, RECORD, LOCAL);
 

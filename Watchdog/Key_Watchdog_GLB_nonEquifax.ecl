@@ -1,4 +1,4 @@
-import lib_fileservices, ut, header_services, doxie,_Control,header;
+import lib_fileservices, ut, header_services, doxie,_Control,header,Data_Services;
 
 string_rec := record
 	watchdog.Layout_Best;
@@ -35,16 +35,16 @@ record
 	string10     main_count := '0';
 	string10     search_count := '0';
 	string15	 DL_number := '';
-	string12     bdid := '';
+	string15     bdid := '';
 	string10     run_date := '0';
 	string10	 total_records := '0';
-	string10 RawAID := '0';
+	string20 RawAID := '0';
   string8 addr_dt_first_seen := '0';
   string10 ind := '';
 	string2      EOR := '';
 end;
 
-header_services.Supplemental_Data.mac_verify('file_best_inj.txt', drop_header_layout, attr);
+header_services.Supplemental_Data.mac_verify('file_bestv2_inj.txt', drop_header_layout, attr);
 
 Base_File_Append_In := attr();
 
@@ -92,4 +92,4 @@ t0 := join(main_dataset,
 _t1 := t0 + Base_File_Append;
 ut.mac_suppress_by_phonetype(_t1,phone,st,t1,true,did);
 
-export Key_Watchdog_GLB_nonEquifax := INDEX(t1,{t1},'~thor_data400::key::watchdog_best_noneq.did_'+doxie.Version_SuperKey);
+export Key_Watchdog_GLB_nonEquifax := INDEX(t1,{t1},Data_Services.Data_location.Prefix('Watchdog_Best')+'thor_data400::key::watchdog_best_noneq.did_'+doxie.Version_SuperKey);

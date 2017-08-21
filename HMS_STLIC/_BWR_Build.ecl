@@ -1,7 +1,7 @@
 IMPORT HMS_STLIC;
 
-pVersion := '20150909';
-pUseProd := false; 
+pVersion := '20170328';
+pUseProd := true; 
    
 #workunit('name', 'HMS State License Build ' + pversion);
 

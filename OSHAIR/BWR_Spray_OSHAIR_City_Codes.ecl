@@ -1,4 +1,4 @@
-import OSHAIR;
+import OSHAIR, _control;
 
 #uniquename(spray_main)
 #uniquename(super_main)
@@ -23,13 +23,13 @@ import OSHAIR;
 
 %deleteIfExist% := if(FileServices.FileExists('~thor_data400::lookup::oshair::city_codes_temp')
                      ,%doCleanup%);
-%spray_main% := FileServices.SprayVariable('10.150.12.240'
+%spray_main% := FileServices.SprayVariable(_Control.IPAddress.edata12
                                           ,'/hds_4/oshair/data/lookup/OSHAIR_City_Code_Table.csv'
 										  ,9999
 										  ,%sourceCsvSeparator%
 										  ,%sourceCsvTeminator%
 										  ,%sourceCsvQuote%
-										  ,'thor_dell400'
+										  ,'thor400_92'
 										  ,'~thor_data400::lookup::oshair::city_codes_temp'
 										  ,-1
 										  ,

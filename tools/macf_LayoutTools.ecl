@@ -28,9 +28,10 @@ functionmacro
 	// #IF(pForUseInMacro	= false)
 		LOADXML('<xml/>');
   // #END
-  
+  import std;
 	#EXPORTXML(pRecord_MetaInfo, pRecord)
 	#uniquename(name							)
+	#uniquename(name_lowercase							)
 	#uniquename(named_layout			)
 	#uniquename(stringfiller			)
 	#uniquename(lenName						)
@@ -40,6 +41,7 @@ functionmacro
 	#uniquename(moutput						)
 	#uniquename(loutput						)
 	#uniquename(layout_record						)
+	#uniquename(layout_record_xpath						)
 	#uniquename(lsize							)
 	#uniquename(loutSetFields			)
 	#uniquename(lnumFields				)
@@ -57,6 +59,7 @@ functionmacro
 //	#SET(moutput				,							%'mymodule'% +  ' :=\nmodule\n')
 
 	#SET(layout_record					,'\texport layout_record :=\n\trecord\n')
+	#SET(layout_record_xpath					,'\texport layout_record_xpath :=\n\trecord\n')
 	#SET(loutSetFields					,'\texport setAllFields :=\n\t[\n')
 	#SET(lfGetField							,'\texport fGetFieldValue(unsigned2 pfield,' + trim(#TEXT(pRecord),all) + ' pRow) :=\n\tmap(\n') 
 	#SET(lfGetFieldName					,'\texport fGetFieldName(unsigned2 pfield) := setAllFields[pfield];\n') 
@@ -94,7 +97,10 @@ functionmacro
 
 					#IF(pFieldFilter = '' or regexfind(pFieldFilter,%'name'%,nocase) = true)
 						#SET(lType	,%'@type'%)
-						#APPEND(layout_record	,'\t\t' + %'@type'% + %'lsize'% + %'fillertype'% + %'name'% + %'fillername'% + ';\n')
+            #SET(name_lowercase ,STD.Str.ToLowerCase(%'name'%))
+            
+						#APPEND(layout_record	      ,'\t\t' + %'@type'% + %'lsize'% + %'fillertype'% + %'name'% + %'fillername'% + ';\n')
+						#APPEND(layout_record_xpath	,'\t\t' + %'@type'% + %'lsize'% + %'fillertype'% + %'name'% + %'fillername'% + '{xpath(\'' + %'name_lowercase'% + '\')};\n')
 
 						#SET(lnumFields	,%lnumFields% + 1)
 						#IF(%lnumFields% = 1) #SET(lcomma,'\t\t ') #ELSE #SET(lcomma,'\n\t\t,') #END
@@ -117,6 +123,7 @@ functionmacro
 	#END
 	
 	#APPEND(layout_record									, '\tend;\n')
+	#APPEND(layout_record_xpath									, '\tend;\n')
 	#APPEND(loutSetFields						, '\n\t];\n')
 	#IF((%'lType'% = 'unsigned' or %'lType'% = 'integer' or %'lType'% = 'real' or %'lType'% = 'decimal') and pConvertAllFields2String = false)
 		#APPEND(lfGetField						, '\n\t\t,0\n\t);\n')
@@ -124,7 +131,7 @@ functionmacro
 		#APPEND(lfGetField						, '\n\t\t,\'\'\n\t);\n')
 	#END
 	
-	#APPEND(moutput	,%'layout_record'% + %'loutSetFields'% + %'lfGetField'% + %'lfGetFieldName'% + '\nend;')
+	#APPEND(moutput	,%'layout_record'% + %'layout_record_xpath'% + %'loutSetFields'% + %'lfGetField'% + %'lfGetFieldName'% + '\nend;')
 //	#SET(loutput  ,%'moutput'% + ' return ' + %'mymodule'% + ';\n'))
 	#SET(loutput  ,%'moutput'% )
   

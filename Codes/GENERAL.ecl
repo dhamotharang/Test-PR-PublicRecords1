@@ -152,7 +152,8 @@ MODULE
 			code='WV'=>'West Virginia',  
 			code='WI'=>'Wisconsin',  
 			code='WY'=>'Wyoming',  
-			code='DC'=>'District of Columbia',  
+			code='DC'=>'District of Columbia',
+			code='VI'=>'Virgin Islands',
                '');
 
      export VARSTRING YESNO(string code) := MAP(

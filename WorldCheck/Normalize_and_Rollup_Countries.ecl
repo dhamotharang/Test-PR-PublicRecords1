@@ -1,6 +1,8 @@
 export Normalize_and_Rollup_Countries (string filedate) := function
 
-in_file := WorldCheck.File_WorldCheck_In;
+in_f 		:= WorldCheck.File_WorldCheck_In;
+
+in_file 	:= distribute(in_f, random());
 
 // Shared parsing patterns for most
 pattern SingleValue   := pattern('[^;]+');
@@ -74,7 +76,7 @@ Country_out := rollup(sort(p_Country,record)
 count_ds_Countries_rollup := count(Country_out);
 output('Country rollup count: ' + count_ds_Countries_rollup);
 
-Country_out_dist := distribute(Country_out,hash32(UID)) : persist(WorldCheck.cluster_name + 'Persist::WorldCheck::Country::rollup');
+Country_out_dist := sort(distribute(Country_out, hash32(UID)), uid, local) : persist(WorldCheck.cluster_name + 'Persist::WorldCheck::Country::rollup');
 
 return Country_out_dist;
 

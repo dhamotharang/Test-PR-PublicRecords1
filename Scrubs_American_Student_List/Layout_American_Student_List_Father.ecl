@@ -1,0 +1,2 @@
+import American_Student_List;
+EXPORT Layout_American_Student_List_Father := American_student_list.layout_american_student_base_v2;

@@ -1,5 +1,10 @@
-import autokey,header,ut,doxie_cbrs;
+Import Data_Services, autokey,header,ut,doxie_cbrs, PRTE2_Business_Header;
+
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+d := PRTE2_Business_Header.File_Business_Header_Base_for_keybuild;
+#ELSE
 d := Business_Header.File_Business_Header_Base_for_keybuild;
+#END;
 
 ds := 
 	project(d, 

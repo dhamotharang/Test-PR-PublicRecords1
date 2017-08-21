@@ -1,0 +1,12 @@
+BaseK := buildindex(Process_xADL2_Layouts.Key,overwrite);
+BKB := buildindex(Key_PersonHeader_.Key,overwrite);
+BKBV := buildindex(Key_PersonHeader_.ValueKey,overwrite);
+BK0 := buildindex(Key_PersonHeader_FLST.Key,overwrite);
+BK1 := buildindex(Key_PersonHeader_LFZ.Key,overwrite);
+BK2 := buildindex(Key_PersonHeader_ADDRESS3.Key,overwrite);
+BK3 := buildindex(Key_PersonHeader_S.Key,overwrite);
+BK4 := buildindex(Key_PersonHeader_SSN4.Key,overwrite);
+BK5 := buildindex(Key_PersonHeader_DO.Key,overwrite);
+BK6 := buildindex(Key_PersonHeader_PH.Key,overwrite);
+BK7 := buildindex(Key_PersonHeader_ZPRF.Key,overwrite);
+export Proc_GoExternal := parallel(BaseK,BKB,BKBV,BK0,BK1,BK2,BK3,BK4,BK5,BK6,BK7);

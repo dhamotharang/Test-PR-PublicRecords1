@@ -1,4 +1,4 @@
-﻿import risk_indicators, ut;
+import risk_indicators, ut;
 
 export iid_roll_header(grouped DATASET(risk_indicators.layout_output) all_header, boolean suppressNearDups=false,
 											 unsigned1 BSversion, boolean experian_batch_feed=false, boolean isFCRA=false,

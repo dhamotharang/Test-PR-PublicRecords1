@@ -1,4 +1,4 @@
-export rec_WithExpFilingSummary := record
+export Layout_Moxie_WithExpFilingSummary := record
 	string1	isDirect;
 	string2	ucc_vendor;
 	string8	ucc_process_date;

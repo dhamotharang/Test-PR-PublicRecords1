@@ -1,4 +1,4 @@
-﻿export mac_map_gender(infile,infield,outfield,outfile) := macro
+export mac_map_gender(infile,infield,outfield,outfile) := macro
        
        #uniquename(get_gender)
        typeof(infile) %get_gender%(infile L) := transform

@@ -1,4 +1,4 @@
-import business_header_ss;
+Import Data_Services, business_header_ss;
 stats_base := File_Business_Contacts_Stats_Plus;
 
 layout_contact_stat := RECORD
@@ -24,4 +24,4 @@ END;
 EXPORT Key_Business_Contacts_Stats := INDEX(
 	stats_base,
 	layout_contact_stat,
-	'~thor_data400::key::business_contacts_stat_' + business_header_ss.key_version);
+	Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::business_contacts_stat_' + business_header_ss.key_version);

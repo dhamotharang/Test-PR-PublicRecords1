@@ -1,19 +1,20 @@
-import tools, HealthCareFacility; 
+import tools, HealthCareFacility,FraudShared, NID, ut; 
 EXPORT MapToCommon  (
-
-		dataset(Layouts.Base.SuspectIP)    inBaseSuspectIP    = Files().Base.SuspectIP.Built
-	 ,dataset(Layouts.Base.GLB5)         inBaseGLB5         = Files().Base.GLB5.Built
-	 ,dataset(Layouts.Base.Tiger)        inBaseTiger        = Files().Base.Tiger.Built
-	 ,dataset(Layouts.Base.CFNA)         inBaseCFNA         = Files().Base.CFNA.Built
+		string pversion
+	 ,dataset(Layouts.Base.SuspectIP)    inBaseSuspectIP     = Files().Base.SuspectIP.Built
+	 ,dataset(Layouts.Base.GLB5)         inBaseGLB5          = Files().Base.GLB5.Built
+	 ,dataset(Layouts.Base.Tiger)        inBaseTiger         = Files().Base.Tiger.Built
+	 ,dataset(Layouts.Base.CFNA)         inBaseCFNA          = Files().Base.CFNA.Built
 	 ,dataset(Layouts.Base.TextMinedCrim)inBaseTextMinedCrim = Files().Base.TextMinedCrim.Built
 	 ,dataset(Layouts.Base.OIG)          inBaseOIG           = Files().Base.OIG.Built
-	 ,dataset(Layouts.Base.AInspection)  inBaseAInspection  = Files().Base.AInspection.Built
+	 ,dataset(Layouts.Base.AInspection)  inBaseAInspection   = Files().Base.AInspection.Built
+	 ,dataset(Layouts.Base.Erie)         inBaseErie          = Files().Base.Erie.Built
 ) :=
 module  
  
  // SuspectIP 
  
- Export		SuspectIP                    := project (inBaseSuspectIP, transform(Layouts.Base.Main , 
+ Export		SuspectIP                    := project (inBaseSuspectIP, transform(FraudShared.Layouts.Base.Main , 
 
       self.Record_ID                      := 0 ;
       self.Reported_Date                  := left.Reported_Date;
@@ -60,7 +61,7 @@ module
 
 // GLB5 Append Market information 
 
-	j := join(inBaseGLB5, Files().Input.MBSmarketAppend.Sprayed/*Files().mbs_lookup*/ , left.orig_COMPANY_ID = right.company_id,
+	j := join(inBaseGLB5, FraudShared.Files().Input.MBSmarketAppend.Sprayed/*Files().mbs_lookup*/ , left.orig_COMPANY_ID = right.company_id,
                                               transform(FraudDefenseNetwork.Layouts.base.Glb5,
 																							        self.sybase_company_id        := stringlib.stringtouppercase(right.company_id); 
 																							        self.sybase_main_country_code := stringlib.stringtouppercase(right.main_country_code); 
@@ -74,8 +75,8 @@ module
 // Source exlusions 
 
   FilterSet    := ['GOV', 'GOVERNMENT & ACADEMIC', 'GOVERNMENT', 'HEA', 'HEALTHCARE INITIATIVE', 'GOVERNMENT HEALTHCARE', 'INTERNAL', 'HC -   PROVIDER',  'TAX & REVENUE.FEDERAL','HEALTHCARE' , 'PROVIDER', 'PHARMACY' ,'PAYER'];
-  SrcExclusion := set(FraudDefenseNetwork.Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0  and status = 1), (string)gc_id); 
-	SrcExclusionC := set(FraudDefenseNetwork.Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0 and status = 1), (string)company_id); 
+  SrcExclusion := set(FraudShared.Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0  and status = 1), (string)gc_id); 
+	SrcExclusionC := set(FraudShared.Files().Input.MBSSourceGcExclusion.Sprayed (gc_id <>0 and status = 1), (string)company_id); 
   Jfiltered    := J (global_company_id   not in SrcExclusion ); 
 	Jfiltered1   := Jfiltered(company_id    not in SrcExclusionC );
   JcountryCode := Jfiltered1(sybase_MAIN_COUNTRY_CODE = 'USA'); 
@@ -114,7 +115,7 @@ module
 				 Jdedup       := dedup(dInSegment,(unsigned)linkid, trim(company_id,left,right), trim(global_company_id,left,right) , trim(datetime[1..8],left,right),all ); 
 
 				
- Export		GLB5                    := project (Jdedup , transform(Layouts.Base.Main , 
+ Export		GLB5                    := project (Jdedup , transform(FraudShared.Layouts.Base.Main , 
 			
 		
 			self.Record_ID              := 0 ; 
@@ -199,7 +200,7 @@ module
 	
 // Tiger base to common 
 
-Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base.Main , 
+Export		Tiger                   := project (inBaseTiger , transform(FraudShared.Layouts.Base.Main , 
 			
 			self.Record_ID              := 0 ; 
       self.Customer_Event_ID      := left.CUST_ID_NUM ; 
@@ -267,7 +268,7 @@ Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base
 	)); 
 
  // CFNA 
- Export		CFNA                   := project (inBaseCFNA , transform(Layouts.Base.Main , 
+ Export		CFNA                   := project (inBaseCFNA , transform(FraudShared.Layouts.Base.Main , 
 
       self.Record_ID                      := 0 ;
 			self.Reason_Description             := 'IDENTITY FRAUD'; 
@@ -340,7 +341,7 @@ Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base
 	)); 
 
 
- Export		TextMinedCrim                            := project(inBaseTextMinedCrim, transform(Layouts.Base.Main , 
+ Export		TextMinedCrim                            := project(inBaseTextMinedCrim, transform(FraudShared.Layouts.Base.Main , 
 
       self.Record_ID                      := 0 ;
 			self.Reason_Description             := left.charge; 
@@ -408,7 +409,7 @@ Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base
   	  self:= [];
      )); 
 
- Export		OIG                            := project (inBaseOIG, transform(Layouts.Base.Main , 
+ Export		OIG                            := project (inBaseOIG, transform(FraudShared.Layouts.Base.Main , 
 
       self.Record_ID                      := 0 ;
 			self.Reason_Description             := left.sancdesc;
@@ -486,7 +487,7 @@ Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base
 	));
  
  // Address Inspection
- Export		AInspection                    := project (inBaseAInspection(length(trim(state,left,right)) <3), transform(Layouts.Base.Main , 
+ Export		AInspection                    := project (inBaseAInspection(length(trim(state,left,right)) <3), transform(FraudShared.Layouts.Base.Main , 
 
       self.Record_ID                      := 0 ;
 			self.ln_report_date                 := left.dt_first_reported; 
@@ -535,12 +536,148 @@ Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base
 			self:= left; 
   	  self:= [];
 	
-	)); 
+	));  
+	
+//Erie
+ Export		Erie                                := project (inBaseErie, transform(FraudShared.Layouts.Base.Main , 
+
+      self.Record_ID                          := 0 ;
+			self.Reason_Description                 := '';
+		  self.reported_date                      := map(	left.dateofreferral <>'' => left.dateofreferral ,
+																											left.dateofloss     <>'' => left.dateofloss ,
+																											left.dateio         <>'' => left.dateio ,
+																											left.dateclosed     <>'' => left.dateclosed ,
+																											left.datereopen     <>'' => left.datereopen ,
+																											left.datecalc);													
+			self.event_date                         := map(	left.dateofloss     <>'' => left.dateofloss ,
+																											left.dateofreferral <>'' => left.dateofreferral ,
+																											left.dateio         <>'' => left.dateio ,
+																											left.dateclosed     <>'' => left.dateclosed ,
+																											left.datereopen     <>'' => left.datereopen ,
+																											left.datecalc);
+		  self.event_location                     := left.state;
+		  self.event_type_1                       := left.typeofloss;
+		  self.investigation_referral_date_opened := left.dateio;
+		  self.investigation_referral_date_closed := left.dateclosed;
+		  self.customer_fraud_code_1              := left.findings;
+		  self.disposition                        := if(left.filestatus <>'', stringlib.stringtouppercase(left.filestatus), 'O');
+		  self.mitigated                          := if(left.savingstype in ['C','D','O','R','W'],'Y','N');
+			SumAllSavings                           := SUM((decimal11_2)left.compsavings, (decimal11_2)left.deniedsavings, 
+			                                               (decimal11_2)left.withdrawnsavings,(decimal11_2)left.recdsavings);
+		  self.mitigated_amount                   := '$' + (string)ut.IntWithCommas((integer)(SumAllSavings));
+		  self.external_referral_or_casenumber    := map(left.lawenf = 'Y' and left.lawref = 'F' => 'LAWENF_FEDERAL',
+																										 left.lawenf = 'Y' and left.lawref = 'S' => 'LAWENF_STATE',
+																										 left.lawenf = 'Y' and left.lawref = 'L' => 'LAWENF_LOCAL',
+																										 left.lawenf = 'Y' and left.lawref = ''  => 'LAWENF_NOINFO',
+																										 left.nicb = 'Y'                         => 'NICB',
+																										 left.attorney = 'Y'                     => 'ATTORNEY',
+																										 '');
+			IsErieInsMapIndiv                      := left.TypeOfMapping = 'ERIE_INSURED_MAPPING' and (left.insuredfirstname <> '' and left.insuredlastName <> '');
+			IsErieInsMapBusi                       := left.TypeOfMapping = 'ERIE_INSURED_MAPPING' and (left.insuredfirstname = '' and left.insuredlastName <> '');
+			
+			IsEriePartyMapIndivUnk                 := left.TypeOfMapping = 'ERIE_PARTY_MAPPING' and (left.entity ='PERSON' or left.entity ='UNKNOWN');
+			IsEriePartyMapBusi                     := left.TypeOfMapping = 'ERIE_PARTY_MAPPING' and left.entity ='BUSINESS';
+			
+			RawFirstName                           := map(IsErieInsMapIndiv                            => left.insuredfirstName,
+			                                              IsEriePartyMapIndivUnk                       => left.name_first,
+			                                               '');  
+			
+			self.raw_first_name                    := RawFirstName; 
+			
+      self.raw_middle_name                   := '';
+			
+			RawLastName                            := map(IsErieInsMapIndiv                            => left.insuredlastName,
+		                                                IsEriePartyMapIndivUnk                       => left.name_last,
+			                                                ''); 
+																											
+			self.raw_last_name                     := RawLastName; 
+			
+      self.raw_orig_suffix                   := '';
+			
+			self.raw_full_name                     := trim(trim(RawFirstName,left,right)  + ' ' + trim(RawLastName,left,right),left, right);
+			
+			self.cleaned_name.title                := map(IsErieInsMapIndiv                         => left.cleaned_name.title, 
+			                                              IsEriePartyMapIndivUnk                    => left.cleaned_name_cp.title,
+																										'');
+
+			self.cleaned_name.fname                := map(IsErieInsMapIndiv                         => left.cleaned_name.fname, 
+			                                              IsEriePartyMapIndivUnk                    => left.cleaned_name_cp.fname,
+																										'');
+
+			self.cleaned_name.mname                := map(IsErieInsMapIndiv                         => left.cleaned_name.mname, 
+			                                              IsEriePartyMapIndivUnk                    => left.cleaned_name_cp.mname,
+																										'');
+
+			self.cleaned_name.lname                := map(IsErieInsMapIndiv                         => left.cleaned_name.lname, 
+			                                              IsEriePartyMapIndivUnk                    => left.cleaned_name_cp.lname,
+																										'');
+			self.ssn                               := left.ssn; 
+			self.dob                               := left.dob; 
+			self.street_1                          := left.o_address; 
+			self.street_2                          := ''; 
+			self.city                              := left.o_city; 
+			self.state                             := left.o_state; 
+			self.zip                               := left.o_zip; 
+			self.source                            := 'ERIE'; 
+			  
+			prepInsLastName                        := regexreplace(constants().special_char_bname, left.insuredlastName, '');
+			prepName_last                          := regexreplace(constants().special_char_bname, left.name_last, '');
+			
+			self.business_name                     := map(IsErieInsMapBusi                            => left.insuredlastName,
+			                                              IsEriePartyMapBusi                          => left.name_last,
+			                                               '');                                                                              
+			self.clean_business_name               := map(IsErieInsMapBusi                            => NID.clnBizName(prepInsLastName),
+			                                              IsEriePartyMapBusi                          => NID.clnBizName(prepName_last),
+			                                               ''); 
+			self.tin                               := left.tin;    
+			self.transaction_id                    := left.claimnumber;    
+			self.transaction_type                  := left.responsibleparty;    
+		// AID prep 
+			self.address_1                         :=	tools.AID_Helpers.fRawFixLine1(trim(left.o_address));
+
+		  self.address_2                         := tools.AID_Helpers.fRawFixLineLast(
+									                                                                  stringlib.stringtouppercase(trim(left.o_city)
+																																							      + if(left.o_state != '', ', ', '')
+																																							      + trim(left.o_state)
+																																							      + ' '
+																																							      + trim(left.o_zip)[1..5])); 
+      self.classification_source.source_type                                  := Mod_MbsContext.ErieFileType;
+			self.classification_source.Primary_source_Entity                        := Mod_MbsContext.EriePrimarySrcEntity; 
+			self.classification_source.Expectation_of_Victim_Entities               := Mod_MbsContext.ErieExpOfVicEntities; 
+			ErieIndSegment                                                          := Functions.Erie_IndustrySegment(left.typeofloss);
+			self.classification_source.Industry_segment                             := ErieIndSegment;
+			self.classification_Activity.Suspected_Discrepancy                      := Mod_MbsContext.ErieSuspDiscrepancy; 			
+			IsErieInsuredMapping                                                    := left.TypeOfMapping = 'ERIE_INSURED_MAPPING';
+			self.classification_Activity.Confidence_that_activity_was_deceitful     := if(IsErieInsuredMapping, Functions.Erie_ConfActivityDeceitful(left.findings),Mod_MbsContext.ErieConfActivityDeceitful_ne);
+      self.classification_Activity.Confidence_that_activity_was_deceitful_id  := if(IsErieInsuredMapping, Functions.Erie_ConfActivityDeceitful_id(left.findings),Mod_MbsContext.ErieConfActivityDeceitful_ne_id);
+			self.classification_Activity.workflow_stage_committed                   := Mod_MbsContext.ErieWrkFlowStgComtd; 
+			self.classification_Activity.workflow_stage_detected                    := Mod_MbsContext.ErieWrkFlowStgDetected; 
+			self.classification_Activity.Channels                                   := Mod_MbsContext.ErieChannels; 
+			self.classification_Activity.category_or_fraudtype                      := 'UNKNOWN';
+			ErieDesc                                                                := 'CLAIM' + ' ' + ErieIndSegment + ' ' + Functions.Erie_SubType(left.typeofloss);
+			self.classification_Activity.description                                := if(IsErieInsuredMapping, ErieDesc ,'');
+			self.classification_Activity.Threat                                     := Mod_MbsContext.ErieThreat;
+			self.classification_Activity.Exposure                                   := if(IsErieInsuredMapping, '$'+ (string)ut.IntWithCommas((integer)left.initialamountowed),'');
+			self.classification_Activity.write_off_loss                             := '';
+			self.classification_Activity.Mitigated                                  := '$' + (string)ut.IntWithCommas((integer)(SumAllSavings));
+			self.classification_Activity.Alert_level                                := Mod_MbsContext.ErieAlertLevel;
+			self.classification_Entity.Entity_type                                  := Functions.Erie_EntityType(left.entity);
+      self.classification_Entity.Entity_type_id                               := Functions.Erie_EntityType_id(left.entity);
+			self.classification_Entity.Entity_sub_type                              := if(IsErieInsuredMapping, '', Mod_MbsContext.ErieEntitySubType_AsscP);
+      self.classification_Entity.Entity_sub_type_id                           := if(IsErieInsuredMapping,  0, Mod_MbsContext.ErieEntitySubType_AsscP_id);
+			self.classification_Entity.role                                         := if(IsErieInsuredMapping, Mod_MbsContext.ErieRole_Susp, '');
+			self.classification_Entity.role_id                                      := if(IsErieInsuredMapping, Mod_MbsContext.ErieRole_Susp_id, 0);
+			self.classification_Entity.Evidence                                     := Mod_MbsContext.ErieEvidence;
+			self.classification_Entity.investigated_count                           := '';
+      self.did                                                                := 0; 
+			self            := left; 
+  	  self:= [];	
+	));
 	
  
 // Append MBS classification attributes 
 
-  CombinedClassification := FraudDefenseNetwork.Functions.Classification(SuspectIP + GLB5 + Tiger + CFNA /*+ CRIM */+ TextMinedCrim + OIG + AInspection) ; 
+  CombinedClassification := Functions.Classification(SuspectIP + GLB5 + Tiger + CFNA + TextMinedCrim + OIG + AInspection + Erie) ; 
 	
 	// append rid 
 	
@@ -550,6 +687,7 @@ Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base
 								                       l.source= 'TIGER'            =>  2000000000000,
 																			 l.source= 'CFNA'             =>  3000000000000,
 																			 l.source= 'TEXTMINEDCRIM'    =>  400000000000,
+																			 l.source= 'ERIE'             =>  5000000000000,
 																			 l.source= 'ADDRESSINSPECTION'=>  6000000000000,  
 																			 l.source= 'SUSPECTIPADDRESS' =>  7000000000000, 
 																			 l.source= 'OIG_INDIVIDUAL'   =>  8000000000000, 
@@ -561,6 +699,7 @@ Export		Tiger                   := project (inBaseTiger , transform(Layouts.Base
 
  combined       := project(CombinedClassification,to_form(left));
  // Filter header records
-Export  NewBaseRid := combined (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
+NewBaseRid := combined (Customer_event_id not in ['CUST_ID_NUM','CUSTOMERID']);
+EXPORT Build_Base_Shared_Main := FraudShared.Build_Base_Main(pversion,NewBaseRid);
 
 END;

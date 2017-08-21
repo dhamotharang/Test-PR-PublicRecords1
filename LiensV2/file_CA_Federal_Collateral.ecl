@@ -1,1 +1,1 @@
-export file_CA_Federal_Collateral := 'todo';
+export file_CA_Federal_Collateral := dataset([],LiensV2.Layout_Liens_CA_Fedral_Collateral);

@@ -26,7 +26,7 @@ AutoKeyB2.MAC_Build (dsearch,fname,mname,lname,
 						death_master.constants(filedate).autokey_Logical,
 						outaction,false,
 						skip_set,TRUE,death_master.constants(filedate).autokey_typeStr,
-						true); 
+						true,,,zero); 
 
 
 AutoKeyB2.MAC_AcceptSK_to_QA(death_master.constants(filedate).autokey_keyname,mymove)

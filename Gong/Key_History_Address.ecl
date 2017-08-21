@@ -20,19 +20,19 @@ srtHistOut := sort(ghhist_out, prim_name, st, z5, prim_range, sec_range, record,
 														disc_cnt12,
 														disc_cnt18												
 														);
- 
+														
 hist_out := rollup(srtHistOut, transform(recordof(ghhist_out),
 										self.dt_first_seen := if(left.dt_first_seen < right.dt_first_seen, left.dt_first_seen, right.dt_first_seen),
 										self.dt_last_seen := if(left.dt_last_seen > right.dt_last_seen, left.dt_last_seen, right.dt_last_seen),
 										self.deletion_date := if(left.deletion_date > right.deletion_date, left.deletion_date, right.deletion_date),
 										
-										/* The disc_cnt# fields are used in our ADL Risk Table, but that’s from the base file, not the Address History key.  - Adam Shirey*/
+										/* The disc_cnt# fields are used in our ADL Risk Table, but thatÂ’s from the base file, not the Address History key.  - Adam Shirey*/
 										self.disc_cnt6 := if(left.disc_cnt6 > right.disc_cnt6, left.disc_cnt6, right.disc_cnt6),
 										self.disc_cnt12 := if(left.disc_cnt12 > right.disc_cnt12, left.disc_cnt12, right.disc_cnt12),
 										self.disc_cnt18 := if(left.disc_cnt18 > right.disc_cnt18, left.disc_cnt18, right.disc_cnt18),
 										self.persistent_record_id := if(left.persistent_record_id < right.persistent_record_id,
 																								left.persistent_record_id, right.persistent_record_id),
-																								
+										
 										self := right),
 						record, except dt_first_seen,
 														dt_last_seen,

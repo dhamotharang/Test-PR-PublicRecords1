@@ -1,6 +1,6 @@
-export Send_Build_Completion_Email() := 
+export Send_Build_Completion_Email(string filedate) := 
 function
-	return fileservices.sendemail(EBR_Email_Notification_List_Stats
-				,Dataset_Name + ': Build Successfully completed', 
+	return fileservices.sendemail(Email_Notification_Lists.Stats
+				,Dataset_Name + ': Build ' + filedate + ' completed', 
 				 'workunit: ' + workunit);
 end;

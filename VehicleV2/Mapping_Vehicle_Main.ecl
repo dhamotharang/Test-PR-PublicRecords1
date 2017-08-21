@@ -25,15 +25,19 @@ transform
 										                    trim((string)(integer4)L.Number_Of_Axles,all)
 																			);
 	
-	self.VINA_Model_Year					:=	L.model_year;
-	self.VINA_Make_Desc						:=	L.make_description;
-	self.VINA_Model_Desc					:=	L.model_description;
-	self.VINA_Series_Desc					:=	L.series_description;
-	self.VINA_Body_Style_Desc			:=	if(L.body_style_description <> '',L.body_style_description,L.orig_body_desc);
-	self.VINA_Number_Of_Cylinders	:=	L.number_of_cylinders;
-	self.VINA_Engine_Size					:=	L.engine_size;
-	self.VINA_Fuel_Code						:=	L.fuel_code;
-	
+	// Giving preference to Vina values, and there are around 250K model desc in DI data not in vina file and these vehicle keys doesnt exist in AE. 
+	  
+  self.VINA_Make_Desc						:=	if(trim(l.VINA_Make_Desc,left,right) <>''  ,l.VINA_Make_Desc,L.make_description);
+	self.VINA_Model_Desc					:=	if(trim(l.VINA_Model_Desc,left,right) <>'' ,l.VINA_Model_Desc,L.model_description);
+	self.VINA_Series_Desc					:=	if(trim(l.VINA_Series_Desc,left,right)<>'' ,l.VINA_Series_Desc,L.series_description);
+	self.VINA_Engine_Size					:=	if(trim(l.VINA_Engine_Size,left,right)<>'' ,l.VINA_Engine_Size,L.engine_size);
+	self.VINA_Fuel_Code						:=	if(trim(l.VINA_Fuel_Code,left,right)  <>'' ,l.VINA_Fuel_Code,L.fuel_code);
+	self.VINA_Model_Year					:=	if(trim(l.Vina_model_year,left,right) <>'', l.vina_model_year, L.model_year);
+	self.VINA_Number_Of_Cylinders	:=	if(trim(l.VINA_Number_Of_Cylinders,left,right) <>'',l.VINA_Number_Of_Cylinders, L.number_of_cylinders);
+ 	self.vina_body_style_desc			:=	map(trim(L.vina_body_style_desc,left,right)	<>	'' => L.vina_body_style_desc,
+																					trim(L.body_style_description,left,right) <> ''  => l.body_style_description,L.orig_body_desc
+																				    );
+																						
 	self													:=	L;
 	self := [] ;//blank all experian new fields.
 end;

@@ -1,1 +1,1 @@
-export KeyName_4030_Judgement_BDID := trim(GetSegmentKeyName_BDID('4030')) : global;
+export KeyName_4030_Judgement_BDID := trim(GetSegmentKeyName_BDID('4030'));

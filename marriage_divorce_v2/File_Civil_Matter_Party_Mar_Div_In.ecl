@@ -1,53 +1,39 @@
-import ut;
-
-ds_filter1 := dataset('~thor_200::base::civil_matter_filtered_for_marrdiv20070713b ',marriage_divorce_v2.Layout_Civil_Matter_In,flat);
+import ut,lib_stringlib;
  
-ds_filter2 := ds_filter1( 
+ds_filter2 := marriage_divorce_v2.file_civil_matter_filtered( 
  
- regexfind('FAMILY RELATIONS',case_type,nocase)=false  and
- regexfind('FAMILY COURT',case_type,nocase)=false and
- regexfind('FAMILY LAW-LOMPOC DIVISION',case_type,nocase)=false and
- regexfind('FAMILY LAW-SANTA BARBARA',case_type,nocase)=false and
- regexfind('FAMILY LAW-SANTA MARIA',case_type,nocase)=false and
- regexfind('FAMILY LAW-SOLVANG DIVISION',case_type,nocase)=false and
- regexfind('CHANGE OF VENUE',case_type,nocase)=false and
- regexfind('PATERNITY/MATERNITY',case_type,nocase)=false and
- regexfind('ORDER OF PROTECTION',case_type,nocase)=false and
- regexfind('ESTABLISH SUPPORT',case_type,nocase)=false and
- regexfind('BREACH OF CONTRACT',case_type,nocase)=false and
- regexfind('DECLARATORY RELIEF',case_type,nocase)=false and
- regexfind('RECIPROCAL SUPPORT FAMILY LAW',case_type,nocase)=false and
- regexfind('EST. FOREIGN JGT./ABSTRACT/SISTER',case_type,nocase)=false and
- regexfind('A69611',trim(case_type_code),nocase)=false and
- regexfind('CIVIL LIMITED',case_type,nocase)=false and
- regexfind('CIVIL',case_type,nocase)=false and
- regexfind('DEBT COLLECTION',case_type,nocase)=false and
- regexfind('RIDGECREST',case_type,nocase)=false and
- regexfind('FSO/RECIP',case_type,nocase)=false and
- regexfind('FAMILY LAW',case_type,nocase)=false and
- regexfind('FAMILY SUPPORT',case_type,nocase)=false and
- regexfind('MISC-FAMILY LAW',case_type,nocase)=false and
- regexfind('OTHER CIVIL',case_type,nocase)=false and
- regexfind('OTHER DOMESTIC',case_type,nocase)=false and
- regexfind('PATERNITY',case_type,nocase)=false and
- regexfind('COHABITANT ABUSE',case_type,nocase)=false and
- regexfind('Injunction',case_type,nocase)=false and
- regexfind('Family',case_type,nocase)=false and 
-// regexfind('SECONDARY/OTHER DEFENDANT',trim(entity_type_description_1_orig),nocase)=false and 
- //regexfind('SECONDARY/OTHER PLAINTIFF',trim(entity_type_description_1_orig),nocase)=false and
- regexfind('CUSTODY AND SUPPORT',trim(case_type),nocase)=false and
- regexfind('A62800',trim(case_type_code),nocase)=false and
- regexfind('DA CHILD SUPPORT',trim(case_type),nocase)=false and
- regexfind('A60601',trim(case_type_code),nocase)=false and
- regexfind('UC',trim(case_type_code),nocase)=false and
- regexfind('UF',trim(case_type_code),nocase)=false and
- regexfind('DVI',trim(case_type_code),nocase)=false and
-  regexfind('XX',trim(case_type_code),nocase)=false and
- case_type != '' and
-// entity_1 != '' and
- case_type_code != '' and 
- case_key != ''); 	
-
+NOT(
+ regexfind('FAMILY RELATIONS',case_type,nocase)=true or
+ regexfind('CHANGE OF VENUE',case_type,nocase)=true or
+ regexfind('PATERNITY/MATERNITY',case_type,nocase)=true or
+ regexfind('ORDER OF PROTECTION',case_type,nocase)=true or
+ regexfind('ESTABLISH SUPPORT',case_type,nocase)=true or
+ regexfind('BREACH OF CONTRACT',case_type,nocase)=true or
+ regexfind('DECLARATORY RELIEF',case_type,nocase)=true or
+ regexfind('RECIPROCAL SUPPORT FAMILY LAW',case_type,nocase)=true or
+ regexfind('EST. FOREIGN JGT./ABSTRACT/SISTER',case_type,nocase)=true or
+ regexfind('A69611',trim(case_type_code),nocase)=true or
+ regexfind('CIVIL LIMITED',case_type,nocase)=true or
+ regexfind('CIVIL',case_type,nocase)=true or
+ regexfind('DEBT COLLECTION',case_type,nocase)=true or
+ regexfind('RIDGECREST',case_type,nocase)=true or
+ regexfind('FSO/RECIP',case_type,nocase)=true or
+ regexfind('FAMILY SUPPORT',case_type,nocase)=true or
+ regexfind('MISC-FAMILY LAW',case_type,nocase)=true or
+ regexfind('OTHER CIVIL',case_type,nocase)=true or
+ regexfind('OTHER DOMESTIC',case_type,nocase)=true or
+ regexfind('PATERNITY',case_type,nocase)=true or
+ regexfind('COHABITANT ABUSE',case_type,nocase)=true or
+ regexfind('Injunction',case_type,nocase)=true or
+ regexfind('CUSTODY AND SUPPORT',trim(case_type),nocase)=true or
+ regexfind('A62800',trim(case_type_code),nocase)=true or
+ regexfind('DA CHILD SUPPORT',trim(case_type),nocase)=true or
+ regexfind('A60601',trim(case_type_code),nocase)=true or
+ regexfind('UC',trim(case_type_code),nocase)=true or
+ regexfind('UF',trim(case_type_code),nocase)=true or
+ regexfind('DVI',trim(case_type_code),nocase)=true or
+ regexfind('XX',trim(case_type_code),nocase)=true 
+)); 	
 
 
 joined_civil_party_matter_layout := record
@@ -69,7 +55,8 @@ joined_civil_party_matter_layout := record
   string5 ruled_for_against_code;
   string20 ruled_for_against;
   string80 entity_1;
-  string1 entity_nm_format_1;
+	string80 entity1_alias;
+	string1 entity_nm_format_1;
   string10 entity_type_code_1_orig;
   string30 entity_type_description_1_orig;
   string2 entity_type_code_1_master;
@@ -193,16 +180,22 @@ distribRecords := distribute(ds_filter2,hash(case_key));
 sortedRecords := sort(distribRecords,case_key,local);
 dedupedRecords := dedup(sortedRecords,case_key,local);
 
-
-joined_civil_party_matter_layout do_join(dedupedRecords l, marriage_divorce_v2.File_Civil_Party_Mar_Div_In r ) := transform
-
+//reg Bug #4925-- MDV2 CIV18 records .Cleaning the names as FML  
+joined_civil_party_matter_layout do_join(marriage_divorce_v2.File_Civil_Party_Mar_Div_In l, dedupedRecords r) := transform
+self.entity_nm_format_1 := map(l.vendor = '18' and regexfind('[a-z]',l.entity_1) = true => 'F',
+                               l.vendor = '18' and regexfind('[a-z]',l.entity2) = true => 'F',l.entity_nm_format_1);
+self.entity_1 := lib_stringlib.StringLib.StringtoUpperCase(l.entity_1);
+self.entity2_nm_format_2 := map(l.vendor = '18' and regexfind('[a-z]',l.entity2) = true =>'F',
+                                l.vendor = '18' and regexfind('[a-z]',l.entity_1) = true => 'F', l.entity2_nm_format_2);
+self.entity2 := lib_stringlib.StringLib.StringtoUpperCase(l.entity2);
 self := l;
 self := r;	
 
 
 end;
 
-joined_civil_party_ds := JOIN(dedupedRecords, marriage_divorce_v2.File_Civil_Party_Mar_Div_In, left.case_key = right.case_key, do_join(left,right),left outer,local);
+joined_civil_party_ds := JOIN(marriage_divorce_v2.File_Civil_Party_Mar_Div_In,dedupedRecords,left.case_key = right.case_key, do_join(left,right),left outer,local);
 
-export File_Civil_Matter_Party_Mar_Div_In:= joined_civil_party_ds;
 
+
+export File_Civil_Matter_Party_Mar_Div_In:= joined_civil_party_ds(case_type_code!='CL') : persist('civil_matter_party_mar_div_in');

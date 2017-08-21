@@ -1,3 +1,4 @@
 //  Assessor
 
-export File_Assessment := dataset('~thor_data400::base::property_assessor', LN_Property.Layout_Property_Common_Model_BASE, flat);
+export File_Assessment := dataset(ln_property.fileNames.builtAssessor, 
+                          LN_Property.Layout_Property_Common_Model_BASE, flat);

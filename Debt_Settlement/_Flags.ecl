@@ -10,5 +10,5 @@ module
 		export ShouldFilter							:= true;
 		export UseBusinessHeader				:= true;
 		export Update 									:= ExistCurrentCCSprayed and ExistCurrentRSIHSprayed and ExistBaseFile;
-
+		
 end;

@@ -1,7 +1,7 @@
 export Layout_Offense := record
 	string8		process_date;
 	string60	offender_key;
-	string2		vendor;
+	string5		vendor;
 	string30	county_of_origin;
 	string20	source_file;
 	//string50	off_name;

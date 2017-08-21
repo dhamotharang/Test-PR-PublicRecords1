@@ -4,5 +4,5 @@ import mdr, doxie, ut, watchdog;
 	hdrNonGLB := Header.File_Headers_NonGLB;
 	
 	Header.File_Teaser_Macro(hdrNonGLB, hdrFileTeaser);
-
-export File_Teaser := hdrFileTeaser : persist('persist::file_teaser');
+	
+export File_Teaser := hdrFileTeaser;// : persist('persist::file_teaser');

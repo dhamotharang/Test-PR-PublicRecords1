@@ -1,4 +1,4 @@
-import ut, Corporate;
+import ut, Corporate,address;
 
 // Determine if contact date range overlaps company date range
 BOOLEAN ValidDateRange(UNSIGNED4 contact_dt_first_seen,
@@ -213,11 +213,11 @@ end;
 
 Layout_Corp4_Cont_Temp CleanContactName(Corporate.Layout_Corp_Contacts_DID l) := transform
 self.cont_company_name := Datalib.CompanyClean(l.officer_name);
-self.cont_clean_name := addrcleanlib.cleanPerson73(l.officer_name);
+self.cont_clean_name := address.cleanPerson73(l.officer_name);
 self := l;
 end;
 
-Corp4_Cont_Init := project(Corporate.File_Corp4_Contacts_Base_DID, CleanContactName(left));
+Corp4_Cont_Init := project(enth(Corporate.File_Corp4_Contacts_Base_DID, 20000), CleanContactName(left));
 
 Corp_Cont_Init := project(Corp4_Cont_Init, TranslateCorp4ToCorpContacts(left));
 

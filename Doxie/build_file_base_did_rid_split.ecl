@@ -13,9 +13,9 @@ slimrec into_slim1(header.layout_header L) := transform
 	self := L;
 end;
 
-head := project(header.file_headers,into_slim1(LEFT));	  
-head2 := project(header.file_header_previous,into_slim1(LEFT));	 
-head3 := project(header.file_header_prev_prev,into_slim1(LEFT));	
+head := project(header.file_header_raw_syncd,into_slim1(LEFT));	  
+head2 := project(header.file_header_raw_syncd_prev,into_slim1(LEFT));	 
+head3 := project(header.file_header_raw_syncd_prev_prev,into_slim1(LEFT));	  
  
 head1_byRid := distribute(head,hash(rid));
 head2_byRid := distribute(head2,hash(rid));
@@ -66,7 +66,7 @@ splitDids2 := join(distribute(splitCandidates2, hash(did)), head3_byDid,
 splitDids3 := join(distribute(splitDids2 + splitDids1, hash(rid)), head1_byRid, 
 									left.rid = right.rid and left.did2<> right.did and left.did <> right.did,
 									transform(slimrec,
-											self.did := right.did, self := left));
+											self.did := right.did, self := left),local);
 
 allsplitDids := splitDids2 + splitDids1 + splitDids3 ;
 

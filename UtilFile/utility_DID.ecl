@@ -28,14 +28,13 @@ did_Add.MAC_Match_Flex
 did_ed := project(out_src,transform(utilfile.Layout_DID_Out, self.did := intformat(left.did_temp,12,1),self := left));
 
 //reDID if the prod header version is newer than the last utility
-
-clear_super := FileServices.ClearSuperFile('~thor_data400::base::utility_DID',true);
-
-util_redid := output(did_ed,,'~thor_data400::base::utility::'+filedate+ '::reDID',overwrite);
+util_redid := output(did_ed ,,'~thor_data400::base::utility::'+filedate+ '::reDID',overwrite, __Compressed__);
 //add util redid to superfile
-add_util_redid := fileservices.addsuperfile('~thor_data400::base::utility_DID','~thor_data400::base::utility::'+filedate+ '::reDID');
+clear_super := sequential(FileServices.RemoveOwnedSubFiles('~thor_data400::base::utility_DID',true),
+               FileServices.ClearSuperFile('~thor_data400::base::utility_DID'),
+               Fileservices.addsuperfile('~thor_data400::base::utility_DID','~thor_data400::base::utility::'+filedate+ '::reDID'));
 
-build_util_did := sequential(clear_super,util_redid,add_util_redid);
+build_util_did := sequential(util_redid,clear_super);
 
 return build_util_did;
 end;

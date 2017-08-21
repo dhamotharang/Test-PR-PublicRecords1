@@ -15,7 +15,7 @@ module
 	export max_record_size				:= 4096									;
 
 	export Groupname	:= if(	_Control.ThisEnvironment.name		 = 'Dataland'	,'thor400_88'
-																																					,'thor400_92'
+																																					,'thor400_60'
 											);
 
 end;

@@ -53,5 +53,11 @@ File_in2base := normalize(File_in, 5, Convert2Base(left, counter));
 //////////////////////////////////////////////////////////////////////////////////////////////
 BDID_Segment(segment_code, File_in2base, BDID_Append)
 
+ebr.Layout_2025_Trade_Quarterly_Averages_Base			tLayout_2025_Trade_Quarterly_Averages_Base(		    ebr.Layout_2025_Trade_Quarterly_Averages_Base		l) :=
+transform
+	self.process_date := (string)l.process_date_last_seen;
+	self := l;
+end;
 
-export BDID_2025_Trade_Quarterly_Averages := BDID_Append : persist(EBR_thor + 'TEMP::BDID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code));
+export BDID_2025_Trade_Quarterly_Averages := project(BDID_Append, tLayout_2025_Trade_Quarterly_Averages_Base(left))
+	/*: persist(EBR_thor + 'TEMP::BDID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code))*/;

@@ -1,11 +1,10 @@
-import header, lib_fileservices,_control,ut,AID;
+boolean var1 := true : stored('production');
+import ut,data_services,header,PRTE2_Header;
 
-head := dataset('~thor_data400::Base::HeaderKey_Building', header.Layout_Header_v2, flat);
-
-ut.mac_suppress_by_phonetype(head,phone,st,phone_suppression,true,did);
-
-head_bldg:=doxie_build.fn_file_header_building(phone_suppression);
-
-header.macGetCleanAddr(head_bldg, RawAID, true, head_out); 
-
-export file_header_building := distribute(head_out,hash(did)) : persist('~thor400_84::persist::file_header_building');
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export file_header_building := 
+PRTE2_Header.files.file_header_building;
+#ELSE
+export file_header_building := 
+dataset(data_services.Data_location.file_header_building +'thor_data400::base::file_header_building' + if(var1,'_Prod',''),header.Layout_Header, flat);
+#END

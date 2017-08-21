@@ -1,7 +1,8 @@
 //This is the code to execute in a builder window
-#workunit('name','BIPV2_POWID_Down.BWR_Specificities - Specificities - SALT V2.7 Gold');
-IMPORT BIPV2_POWID_Down,SALT27;
-IMPORT SALTTOOLS22;
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','BIPV2_POWID_Down.BWR_Specificities - Specificities - SALT V3.5.2');
+IMPORT BIPV2_POWID_Down,SALT35;
+IMPORT SALTTOOLS30;
 SpecMod := BIPV2_POWID_Down.specificities(BIPV2_POWID_Down.In_POWID_Down);
 // Use the build command to actually build the specificity indexes
 //SpecMod.Build;
@@ -11,8 +12,11 @@ SpecMod := BIPV2_POWID_Down.specificities(BIPV2_POWID_Down.In_POWID_Down);
 // NOTE:This is done by automatically by BWR_Iterate for people doing a full internal build
 OUTPUT(SpecMod.Specificities,NAMED('Specificities'));
 OUTPUT(SpecMod.SpcShift,NAMED('SpcShift'));
+ 
 // Uncommenting the line below gives a detailed profile of the specificities of each field
 // OUTPUT(SpecMod.AllProfiles,NAMED('SpcProfiles'));
-// Uncommenting (and filling in) the following will patch your SPC attribute with the latest values
-// See comments in the macro for more options!
-// SALTTOOLS22.mac_Patch_SPC(SpecMod.Specificities,'BIPV2_POWID_Down.<your_spc_attribute>',BIPV2_POWID_Down.In_POWID_Down);
+ 
+// On repository-based HPCC platforms, the following macro will patch your SPC attribute with the
+// latest POPULATION count and specificity/switch values.  See comments in the macro for more options!
+// SALTTOOLS30.mac_Patch_SPC(SpecMod.Specificities,'BIPV2_POWID_Down.<your_spc_attribute>',BIPV2_POWID_Down.In_POWID_Down);
+ 

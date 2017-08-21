@@ -21,6 +21,9 @@ export Output_Segment_Stats(segment_code, output_stats) := macro
 #uniquename(Base_total_records_With_ProxID)
 #uniquename(Base_total_records_With_ProxScore)
 #uniquename(Base_total_records_With_ProxWeight)
+#uniquename(Base_total_records_With_SELEID)
+#uniquename(Base_total_records_With_SELEScore)
+#uniquename(Base_total_records_With_SELEWeight)
 #uniquename(Base_total_records_With_OrgID)
 #uniquename(Base_total_records_With_OrgScore)
 #uniquename(Base_total_records_With_OrgWeight)
@@ -56,12 +59,15 @@ EBR.GetSegmentFile_Base(	segment_code,	%file_base%, 'B')
 %Base_total_records_With_ProxID% 			:= count(%file_base%(ProxID != 0)) 		: global;
 %Base_total_records_With_ProxScore% 	:= count(%file_base%(ProxScore != 0)) : global;
 %Base_total_records_With_ProxWeight% 	:= count(%file_base%(ProxWeight != 0)): global;
+%Base_total_records_With_SELEID% 			:= count(%file_base%(SELEID != 0)) 		: global;
+%Base_total_records_With_SELEScore% 	:= count(%file_base%(SELEScore != 0)) : global;
+%Base_total_records_With_SELEWeight% 	:= count(%file_base%(SELEWeight != 0)): global;
 %Base_total_records_With_OrgID% 			:= count(%file_base%(OrgID != 0)) 		: global;
 %Base_total_records_With_OrgScore% 		:= count(%file_base%(OrgScore != 0)) 	: global;
 %Base_total_records_With_OrgWeight% 	:= count(%file_base%(OrgWeight != 0)) : global;
 %Base_total_records_With_UltID% 			:= count(%file_base%(UltID != 0)) 		: global;
 %Base_total_records_With_UltScore% 		:= count(%file_base%(UltScore != 0))  : global;
-%Base_total_records_With_UltWeight% 		:= count(%file_base%(UltWeight != 0)) : global;
+%Base_total_records_With_UltWeight% 	:= count(%file_base%(UltWeight != 0)) : global;
 
 #if(segment_code = '5610')
 %Base_total_records_With_DID% 	:= count(%file_base%(did != 0)) : global;
@@ -79,8 +85,8 @@ output_stats := DATASET([
 %Base_total_records_With_EmpID%,%Base_total_records_With_EmpScore%,%Base_total_records_With_EmpWeight%, 
 %Base_total_records_With_POWScore%,%Base_total_records_With_POWWeight%,%Base_total_records_With_ProxID%,
 %Base_total_records_With_ProxID%,%Base_total_records_With_ProxScore%,%Base_total_records_With_ProxWeight%, 
-%Base_total_records_With_OrgID%,%Base_total_records_With_OrgScore%,%Base_total_records_With_OrgWeight%, 
-%Base_total_records_With_UltID%,%Base_total_records_With_UltScore%,%Base_total_records_With_UltWeight%,
+%Base_total_records_With_SELEID%,%Base_total_records_With_SELEScore%,%Base_total_records_With_SELEWeight%,
+%Base_total_records_With_OrgID%,%Base_total_records_With_OrgScore%,%Base_total_records_With_OrgWeight%,%Base_total_records_With_UltID%,%Base_total_records_With_UltScore%,%Base_total_records_With_UltWeight%,
 %has_did_ssn%,%Base_total_records_With_DID%, %Base_total_records_With_SSN%}
 ], ebr.Layout_Segment_Stats);
 

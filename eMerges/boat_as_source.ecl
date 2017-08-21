@@ -1,11 +1,17 @@
 import header;
-d := dataset('~thor_data400::Base::BoatHeader_Building',layout_boats_in,flat);
 
-src_rec := record
- header.Layout_Source_ID;
- layout_boats_in;
-end;
+export Boat_as_Source(dataset(layout_boats_in) peMergesBoats = dataset([],layout_boats_in), boolean pForHeaderBuild=false)
+ :=
+  function
+	dSourceData	:=	if(pForHeaderBuild,
+					   dataset('~thor_data400::Base::BoatHeader_Building',layout_boats_in,flat),
+					   peMergesBoats
+					  );
 
-header.Mac_Set_Header_Source(d,layout_boats_in,src_rec,'EB',withUID)
+	src_rec := header.layouts_SeqdSrc.BO_src_rec;
 
-export boat_as_source := withUID : persist('persist::headerbuild_boat_src');
+	header.Mac_Set_Header_Source(dSourceData,layout_boats_in,src_rec,'EB',withUID)
+
+	return withUID;
+  end
+ ;

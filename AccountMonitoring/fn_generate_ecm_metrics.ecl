@@ -24,6 +24,13 @@ SHARED get_product_name(AccountMonitoring.types.productMask nth_product) :=
 				 AccountMonitoring.types.productMask.phoneownership	 => 'PHONEOWNERSHIP',
 				 AccountMonitoring.types.productMask.bipbestupdate	 => 'BIPBESTUPDATE',
 				 AccountMonitoring.types.productMask.sbfe	 					 => 'SBFE',
+				 AccountMonitoring.types.productMask.ucc	 					 => 'UCC',
+				 AccountMonitoring.types.productMask.govtdebarred		 => 'GOVTDEBARRED',
+				 AccountMonitoring.types.productMask.inquiry				 => 'INQUIRY',
+				 AccountMonitoring.types.productMask.corp	 					 => 'CORP',
+				 AccountMonitoring.types.productMask.mvr	 					 => 'MVR',
+				 AccountMonitoring.types.productMask.aircraft				 => 'AIRCRAFT',
+				 AccountMonitoring.types.productMask.watercraft			 => 'WATERCRAFT',
 				'UNKNOWN'
 			);
 		RETURN product_name;

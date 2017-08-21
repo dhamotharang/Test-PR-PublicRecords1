@@ -48,6 +48,7 @@ vehlic.Layout_Vehicles IDFullToCommon(Layout_ID_Full pInput) := transform
 	self.LICENSE_PLATE_NUMBERxBG4 := pInput.orig_LICENSE_PLATE_NUMBER;
 	self.TRUE_LICENSE_PLSTE_NUMBER := pInput.orig_LICENSE_PLATE_NUMBER;
 	self.REGISTRATION_EXPIRATION_DATE := fInsertDDinMMCCYY(pInput.orig_EXPIRATION_DATE);
+	self.REGISTRATION_EFFECTIVE_DATE := fMDYtoYMD(pInput.orig_ISSUE_DATE);
 	self.PLATE_ISSUE_DATE := fMDYtoYMD(pInput.orig_ISSUE_DATE);
 	self.REGISTRANT_1_CUSTOMER_TYPExBG5 := map(trim(pInput.clean_REG1_NAME_last) <> '' => 'I',trim(pInput.append_REG1_COMPANY_NAME) <> '' => 'B','U');
 	self.REG_1_CUSTOMER_NAME := pInput.orig_REG1_NAME ;

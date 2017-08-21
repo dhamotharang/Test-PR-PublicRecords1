@@ -1,0 +1,43 @@
+
+export Clear_Raw_Superfiles := sequential(
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_az',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_ia',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_ks',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_nd',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_tx',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_wy',false),
+												// Multiple name cleaning sources
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_ak',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_al',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_ar',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_ct',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_fl',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_ga',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_ky',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_ma',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_me',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_mi',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_mo',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_ms',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_ne',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_nm',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_oh',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_or',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_va',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_wa',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_wi',false)
+														//Non-updating - clean current history file	
+															/*FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_co',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_il',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_md',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_mn',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_mt',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_nc',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_nh',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_nv',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_ny',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_sc',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_tn',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_ut',false),
+															FileServices.ClearSuperFile('~thor_data400::in::watercraft_raw_wv',false)*/
+															);

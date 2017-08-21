@@ -1,23 +1,13 @@
 export sDPPA_Restricted_Watercraft_States
  := 
-  [
-	'AL',
-	'AK',
-	'CO',
-	'CT',
-	'FL',
-	'IL',
-	'KY',
-	'MI',
-	'MS',
-	'MO',
-	'MT',
-	'NE',
-	'NH',
-	'NY',
-	'OR',
-	'UT',
-	'WV',
-	'WI'
-  ]
- ;
+ 
+   ['AK','MD','MI','MO','MT','NE','NH','VA' ];
+
+//Old sDPPA States prior to 04/28/11
+/*   [
+       'CA', 'FL', 'IN', 'KY', 'MD', 'MI', 'MO', 'MT', 'NE', 'NH', 'NJ', 'NM', 'OK', 'PA', 'UT', 'WA', 'WV'
+     ];
+*/
+
+ 
+

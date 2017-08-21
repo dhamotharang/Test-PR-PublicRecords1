@@ -1,1 +1,1 @@
-export File_FCRA_BankoBatch_Logs := dataset('~thor10_231::in::banko_batch_acclogs', inquiry_acclogs.Layout_BankoBatch_Logs, csv(separator('|'), quote('')));
+export File_FCRA_BankoBatch_Logs := dataset('~thor10_231::in::banko_batch_acclogs', inquiry_acclogs.Layout_BankoBatch_Logs, csv(separator('|'), quote('')), opt);

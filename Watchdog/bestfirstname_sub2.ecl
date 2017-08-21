@@ -1,6 +1,7 @@
-import header,mdr;
+import header,mdr,NID;
 
-f0 := file_header_filtered;
+f0_ := file_header_filtered;
+watchdog.Mac_Exclude_as_Best(f0_, f0, 'fname');
 bfn := bestfirstname_sub1(fname = '');
 
 f0 extract_subset(f0 L, bfn R) := transform
@@ -67,10 +68,10 @@ two_DID := dedup(group_sort,did,keep 2,local);
 //If fname count is 1.5x greater than the next, it is 'best'
 rfields fname_join(rfields le, rfields rt) := transform
 self.fname := MAP(length(trim(le.fname)) = 1 and le.fname[1] = rt.fname[1] => rt.fname,
-				  length(trim(rt.fname)) = 1 and le.fname[1] = rt.fname[1] => le.fname,
-				  datalib.preferredfirst(le.fname) = rt.fname => rt.fname,
-				  datalib.preferredfirst(rt.fname) = le.fname => le.fname,
-				  le.fname_count < 1.5*rt.fname_count => '',le.fname);
+				          length(trim(rt.fname)) = 1 and le.fname[1] = rt.fname[1] => le.fname,
+				          NID.PreferredFirstVersionedStr(le.fname, NID.version) = rt.fname => rt.fname,
+				          NID.PreferredFirstVersionedStr(rt.fname, NID.version) = le.fname => le.fname,
+				          le.fname_count < 1.5*rt.fname_count => '',le.fname);
 self := le;
 end;
 

@@ -2,7 +2,7 @@ import VotersV2;
 
 in_file := VotersV2.Cleaned_Addr_Cache_Base;
 
-layout_base := VotersV2.Layouts_Voters.Layout_Voters_Base;
+layout_base := VotersV2.Layouts_Voters.Layout_Voters_Base_new;
 
 Invalid_Maiden_Names := ['','JR','SR','MRS','NONE','N/A',
                          'NOT AVAILABLE','UNAVAILABLE',

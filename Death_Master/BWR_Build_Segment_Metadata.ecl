@@ -13,23 +13,24 @@ dateType := Text_Search.Types.SegmentType.DateType;
 numericType := Text_Search.Types.SegmentType.NumericType;
 groupType := Text_Search.Types.SegmentType.GroupSeg;
 ConcatSeg := Text_Search.Types.SegmentType.ConcatSeg;
-
+keyType := Text_search.Types.SegmentType.ExternalKey;
+ssnType := Text_search.Types.SegmentType.SSN;
 
 segmentMetaData := DATASET([
          {'name',  TextType,       [1]},
         {'address',       TextType,       [2]},
-        {'city',  TextType,       [3]},
-        {'state', TextType,       [4]},
+        //{'city',  TextType,       [3]},
+        //{'state', TextType,       [4]},
        // {'address',       TextType,       [5]},
-        {'zip',   TextType,       [6]},
-        {'county',        TextType,       [7]},
-        {'ssn',   TextType,       [8]},
+        //{'zip',   TextType,       [6]},
+        //{'county',        TextType,       [7]},
+        {'ssn',   ssnType,       [8]},
         {'dob',   DateType,       [9]},
         {'dod',   DateType,       [10]},
         {'gender',        TextType,       [11]},
         {'birthplace',    TextType,       [12]},
         {'age',   NumericType,       [13]},
-        {'birth-cert',    NumericType,       [14]},
+        {'birth-cert',    TextType,       [14]},
         {'birth-volume-year',     TextType,       [15]},
         {'education',     TextType,       [16]},
         {'armed-forces',  TextType,       [17]},
@@ -38,11 +39,11 @@ segmentMetaData := DATASET([
         {'father-name',   TextType,       [20]},
         {'mother-name',   TextType,       [21]},
         {'filing-state',  TextType,       [22]},
-        {'cert-number',   NumericType,       [23]},
+        {'cert-number',   TextType,       [23]},
         {'filed-date',    DateType,       [24]},
         {'volume-number', TextType,       [25]},
         {'volume-year',   TextType,       [26]},
-        {'local-file-no', NumericType,       [27]},
+        {'local-file-no', TextType,       [27]},
         {'fh-lic-number', TextType,       [28]},
         {'emb-lic-number',        TextType,       [29]},
         {'zip-last-res',  TextType,       [30]},
@@ -52,7 +53,7 @@ segmentMetaData := DATASET([
         {'facility',      TextType,       [34]},
         {'type',  TextType,       [35]},
         {'disposition',   TextType,       [36]},
-        {'disposition-date',      TextType,       [37]},
+        {'disposition-date',      DateType,       [37]},
         {'autopsy',       TextType,       [38]},
         {'autopsy-findings',      TextType,       [39]},
         {'med-exam',      TextType,       [40]},
@@ -65,9 +66,9 @@ segmentMetaData := DATASET([
         {'pregnancy',      TextType,       [47]},
         {'certifier',     TextType,       [48]},
         {'hospital-status',       TextType,       [49]},
-		{'Date',	ConcatSeg, [9,10,24,43,46]},
-		{'Number',	ConcatSeg, [14,23,27]}
-		
+		{'Date',	GroupType, [9,10,24,37,42,43,46]},
+		{'Number',	GroupType, [14,23,27]},
+		{'EXTERNALKEY',       keyType, [250]}		
 
 
 		], Text_Search.Layout_Segment_Definition);
@@ -76,10 +77,13 @@ segmentMetaData := DATASET([
 lfileName := Text_Search.FileName(info, Text_Search.Types.FileTypeEnum.SegList,true);
 sfilename := Text_Search.FileName(info, Text_Search.Types.FileTypeEnum.SegList);
 
-retval := sequential(
+retval := if (fileservices.fileexists(lfilename),
+								output('Metadata file '+lfilename+' already exists'),
+								sequential(
 										OUTPUT(segmentMetaData,,lfileName, OVERWRITE),
 										Text_Search.Boolean_Move_To_QA(sfileName,lfileName)
-										);
+										)
+							);
 
 return retval;
 

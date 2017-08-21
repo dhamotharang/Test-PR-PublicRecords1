@@ -60,11 +60,11 @@ module
       ,'BIPV2_Tools.MAC_ChildId_Patch'
       ,'replace SALT30.MAC_ChildId_Patch with BIPV2_Tools.MAC_ChildId_Patch\n' 
     }
-    ,{
-       'ut.MAC_Patch_Id[(]ih,LGID3,BasicMatch[(]ih[)][.]patch_file,LGID31,LGID32,ihbp[)];'
+    ,{ 'SALT30[.]MAC_Reassign_UID[(]ih,split_patch,LGID3,rcid,ih0[)];'
+       // 'ut.MAC_Patch_Id[(]ih,LGID3,BasicMatch[(]ih[)][.]patch_file,LGID31,LGID32,ihbp[)];'
       ,''
-      ,'ut.MAC_Patch_Id(ih_thin,LGID3,BasicMatch(ih).patch_file,LGID31,LGID32,ihbp);'
-      ,'replace ih with ih_thin in call to ut.MAC_Patch_Id\n' 
+      ,'SALT30.MAC_Reassign_UID(ih_thin,split_patch,LGID3,rcid,ih0);'
+      ,'replace ih with ih_thin in call to SALT30.MAC_Reassign_UID\n' 
     }
     ,{
        'EXPORT Patched_Infile := PatchDotID;'
@@ -122,14 +122,14 @@ module
   function
   
     dme := dataset([{
-       '(// It is important.*?EXPORT basic_match_count := COUNT[(]PickOne[)];)'
+       '(// It is important.*?EXPORT basic_match_count := COUNT[(]NotBlocked[)];)'
       ,'EXPORT basic_match_count := 0'
       , '/* $1 */\n'
       + '// HACK - disable BasicMatch altogether\n'
       + 'EXPORT patch_file := dataset([],Rec);\n'
       + 'EXPORT input_file := h00_match;\n'
       + 'EXPORT basic_match_count := 0;\n'
-      ,'fix dedup skew\n'
+      ,'disable basic match altogether\n'
     }
     ],tools.layout_attribute_hacks);
 
@@ -288,15 +288,6 @@ module
   ) :=
   function
   
-    EclCode   := fGetAttribute(pAttribute) : independent;
-    
-    hackConfigCondition := pAttribute = 'Config' and not regexfind('DoSliceouts := false',EclCode,nocase);
-
-    HackConfig := if(hackConfigCondition 
-                        ,regexreplace('DoSliceouts := TRUE',EclCode,'DoSliceouts := false',nocase)
-                        ,EclCode
-                     );
-    HackConfig_message := if(hackConfigCondition ,'','Did not Hack ' + pAttribute + ' to disable Sliceouts\n');
 
     dme := dataset([{
        'DoSliceouts := TRUE'
@@ -319,10 +310,10 @@ module
   function
   
     dme := dataset([{
-          'ChangeName := \'~temp::LGID3::BIPV2_LGID3::changes_it\'+iter;\n'
+          'ChangeName := \'[~]temp::LGID3::BIPV2_LGID3::changes_it\'[+]iter;'
       ,''
       ,   'import bipv2;\n'
-        + 'ChangeName := \'~temp::LGID3::BIPV2_LGID3::changes_it\'+iter+\'_\'+ bipv2.KeySuffix;\n'
+        + 'ChangeName := \'~temp::LGID3::BIPV2_LGID3::changes_it\'+iter+\'_\'+ bipv2.KeySuffix;'
       ,'add keysuffix to changes filename\n'
     }
     ],tools.layout_attribute_hacks);

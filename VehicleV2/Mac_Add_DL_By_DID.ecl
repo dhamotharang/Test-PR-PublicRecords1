@@ -10,7 +10,7 @@ export MAC_Add_DL_By_DID(infile, did_field, DL_number_field, outfile) := macro
 %infile_skip% := infile(~%should_join%);
 
 #uniquename(dl)
-%dl% := doxie_files.File_dl(did > 0, dl_number <> '');
+%dl% := dedup(sort(doxie_files.File_dl(did > 0, dl_number <> ''), did, dl_number, -dt_vendor_first_reported), did, dl_number);
 #uniquename(dld)
 %dld% := table(%dl%, {%dl%.did, %dl%.dl_number});
 
@@ -28,7 +28,7 @@ end;
 %dl_added% := join(%infile_dist%,distribute(%dld%, hash(did)),
 				  left.did_field = right.did,
 				  %add_dl%(left, right),
-				  left outer,
+				  left outer,keep(1),
 				  local);
 
 //****** Add back those that skipped over

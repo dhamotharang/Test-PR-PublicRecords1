@@ -1,4 +1,4 @@
-import Bankrupt,lib_keylib,lib_fileservices;
+import Bankrupt,lib_keylib,lib_fileservices,_control;
 
 stat_dis := Bankrupt.File_BK_Search;
 
@@ -152,9 +152,9 @@ perc_rec_proj := project(stats,GetPerc(LEFT));
 
 stats_sort := sort(perc_rec_proj,stat_court_code);
 
-search_stat_out := output(stats_sort(trim(stat_court_code) <> 'ture:'),,'out::bk_search_full_stats',overwrite);
+search_stat_out := output(stats_sort(trim(stat_court_code) <> 'ture:'),,'~thor_data400::out::bk_search_full_stats',overwrite);
 
-search_file_despray := lib_fileservices.fileservices.Despray('~thor_dell400_2::out::bk_search_full_stats','192.168.0.39',
+search_file_despray := lib_fileservices.fileservices.Despray('~thor_data400::out::bk_search_full_stats',_control.IPAddress.edata12,
  									'/thor_back5/bk_v8/stats/bk_search_stat.d00',,,,TRUE);
 
 export BK_Search_Full_Stats := sequential(search_stat_out,search_file_despray);

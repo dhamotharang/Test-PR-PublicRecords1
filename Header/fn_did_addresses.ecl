@@ -1,8 +1,8 @@
-import mdr;
+import mdr,PRTE2_Header;
 
-export fn_did_addresses(boolean isFCRA=false) := function
+export fn_did_addresses(boolean isEN=false) := function
 
-h := Header.File_Headers(header.Blocked_data(isFCRA),src in mdr.sourceTools.set_scoring_FCRA);
+h := Header.File_FCRA_Header_prep(if(isEN,src<>'EQ',src<>'EN'));
 
 hslim := record
   h.prim_range;
@@ -36,8 +36,11 @@ rup := rollup(gds,left.prim_range=right.prim_range and
                   left.did=right.did and
                   left.sec_range=right.sec_range,combine_time(left,right));
 
-ofile := rup : persist(if(isFCRA,'fcra_','')+'DID_Addresses');
-
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+ofile := rup;
+#ELSE
+ofile := rup : persist(if(isEN,'EN_','')+'fcra_DID_Addresses');
+#END;
 return ofile;
 
 end;

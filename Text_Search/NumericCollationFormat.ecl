@@ -39,7 +39,7 @@ EXPORT NumericCollationFormat := MODULE
 		int expnt = 0;
 		char ch = '\0';
 
-		for (int i = 0; i < lenNumstr; i++)
+		for (int i = 0; i < (int)lenNumstr; i++)
 		{
 			if ((ch = numstr[i]) == '.')
 			{

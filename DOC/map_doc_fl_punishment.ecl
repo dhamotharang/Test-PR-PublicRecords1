@@ -1,9 +1,9 @@
-import Crim_common, Address, Lib_AddrClean, Ut, lib_stringlib;
+import Crim_common, Address, Ut, lib_stringlib;
 
 input := DOC.file_doc_fl(regexfind('[0-9]', dc_number));
 
 /////////////////
-
+/*
 history := dataset(ut.foreign_prod+'~thor_data400::in::fl_doc_punishment_history',
 			crim_common.Layout_In_DOC_Punishment.previous, flat)(vendor = 'FL');
 
@@ -12,7 +12,7 @@ Crim_Common.Layout_Moxie_DOC_Punishment.previous dojoin(Crim_Common.Layout_Moxie
 end;
 
 historyout := join(distribute(input, hash(dc_number)), distribute(history, hash(regexreplace('^[(FL)]', offender_key, ''))), left.dc_number = regexreplace('^(FL)', right.offender_key, ''), dojoin(right), right only, local);
-
+*/
 ////////////////
 
 input_new_layout := record, maxlength(7000) 
@@ -221,7 +221,7 @@ string clean_length(String s) := function
 	end;
 
 	self.process_date := Crim_Common.Version_In_DOC_Offender;
-	self.offender_key := 'FL' +  trim(l.DC_Number,left, right) + hash(trim(l.Birth_Date, left, right), trim(L.Name, left, right));
+	self.offender_key := 'FL' +  trim(l.DC_Number,left, right); /*+ hash(trim(l.Birth_Date, left, right), trim(L.Name, left, right));*/
 	self.vendor := 'FL';
 	self.source_file := 'FL-doc';
 	self.offense_key 		:= 'FL' +  trim(l.DC_Number,left, right) + l.case_no + l.charge_type + hash(trim(l.offense, left, right), trim(l.Birth_Date, left, right), trim(L.Name, left, right));
@@ -245,7 +245,7 @@ string clean_length(String s) := function
     self.gain_time_eff_dt   := '';
     self.latest_adm_dt 		:= '';
     self.sch_rel_dt 		:= if(regexfind('[^a-zA-Z]', l.current_release_date), l.current_release_date,  '');
-    self.act_rel_dt 		:= if(regexfind('(RELEASE)', stringlib.stringtouppercase(l.release_date)) and regexfind('[^a-zA-Z]', l.release_date) and l.release_date < Crim_Common.Version_In_DOC_Offender, l.release_date,  '');
+    self.act_rel_dt 		:= if(~regexfind('(RELEASE)', stringlib.stringtouppercase(l.release_date)) and ~regexfind('[a-zA-Z]', l.release_date) and l.release_date < Crim_Common.Version_In_DOC_Offender, l.release_date,  '');
     self.ctl_rel_dt 		:= '';
     self.presump_par_rel_dt := '';
     self.mutl_part_pgm_dt   := ''; 
@@ -258,7 +258,14 @@ string clean_length(String s) := function
     self.par_cty 		    := '';
 END;
 
-outfile := dedup(sort(project(distribute(normedINPUTp2, hash(DC_Number)), tFL(left)) + historyout, offender_key, -par_st_dt, local), offender_key,local);
+
+precs := project(normedINPUTp2, tFL(left));  
+
+outfile := dedup(
+				sort(
+					distribute(precs, hash(offender_key))
+				,offender_key, event_dt,latest_adm_dt,local)
+		  ,offender_key,event_dt,right,local);
 
 Crim_Common.Layout_Moxie_DOC_Punishment.previous tClear(outfile L) := TRANSFORM
    self.par_st_dt 			:= ''; 

@@ -7,7 +7,7 @@ end;
 
 export Key_Src_VehV2(boolean pFastHeader = false, boolean pCombo = true, dataset(src_rec) pDataset=dataset([],src_rec)) := function
 
-dVehicles_as_Source := if(pCombo,pDataset,vehiclev2.Vehicle_as_Source(if(pFastHeader,VehicleV2.Files.Base.Main),if(pFastHeader,VehicleV2.Files.Base.Party_Bip),~pFastHeader,pFastHeader));
+dVehicles_as_Source := if(pCombo,pDataset,header.Files_SeqdSrc(pFastHeader).VH);
 
 mac_key_src(dVehicles_as_Source, vehicleV2.layout_vehicle_source, 
 						veh_child, 

@@ -1,0 +1,91 @@
+#WORKUNIT('name','LAUNCH - Relatives Input for Alpharetta');
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* This attribute launches a soapcall that will run once a day for Case Connect;
+
+	 DEPLOY THIS CODE in HTHOR to avoid issues with Cluster. Thanks.
+*/
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+lTargetESPAddress		:=	'10.241.20.202';
+lTargetESPPort			:=	'8010';
+
+	export	string	fSubmitNewWorkunit(string pECLText, string pCluster)	:=
+	function
+		string fWUCreateAndUpdate(string pECLText)	:=
+		function
+
+			rWUCreateAndUpdateRequest	:=
+			record
+				string										QueryText{xpath('QueryText'),maxlength(20000)}	:=	pECLText;
+			end;
+
+			rESPExceptions	:=
+			record
+				string		Code{xpath('Code'),maxlength(10)};
+				string		Audience{xpath('Audience'),maxlength(50)};
+				string		Source{xpath('Source'),maxlength(30)};
+				string		Message{xpath('Message'),maxlength(200)};
+			end;
+
+			rWUCreateAndUpdateResponse	:=
+			record
+				string										Wuid{xpath('Workunit/Wuid'),maxlength(20)};
+				dataset(rESPExceptions)		Exceptions{xpath('Exceptions/ESPException'),maxcount(110)};
+			end;
+
+			dWUCreateAndUpdateResult	:=	soapcall('http://' + lTargetESPAddress + ':' + lTargetESPPort + '/WsWorkunits',
+																						 'WUUpdate',
+																						 rWUCreateAndUpdateRequest,
+																						 rWUCreateAndUpdateResponse,
+																						 xpath('WUUpdateResponse')
+																						);
+
+			return	dWUCreateAndUpdateResult.WUID;
+			
+		end;
+
+		fWUSubmit(string pWUID, string pCluster)	:=
+		function
+			rWUSubmitRequest	:=
+			record
+				string										WUID{xpath('Wuid'),maxlength(20)}										:=	pWUID;
+				string										Cluster{xpath('Cluster'),maxlength(30)}							:=	pCluster;
+				// string										Queue{xpath('Queue'),maxlength(30)}									:=	pQueue;
+				string										Snapshot{xpath('Snapshot'),maxlength(10)}						:=	'';
+				string										MaxRunTime{xpath('MaxRunTime'),maxlength(10)}				:=	'0';
+				string										Block{xpath('BlockTillFinishTimer'),maxlength(10)}	:=	'0';
+			end;
+
+			rWUSubmitResponse	:=
+			record
+				string										Code{xpath('Code'),maxlength(10)};
+				string										Audience{xpath('Audience'),maxlength(50)};
+				string										Source{xpath('Source'),maxlength(30)};
+				string										Message{xpath('Message'),maxlength(200)};
+			end;
+
+			dWUSubmitResult	:=	soapcall('http://' + lTargetESPAddress + ':' + lTargetESPPort + '/WsWorkunits',//http://10.193.211.1:8010/WsWorkunits/',
+																	 'WUSubmit',
+																	 rWUSubmitRequest,
+																	 rWUSubmitResponse,
+																	 xpath('WUSubmitResponse/Exceptions/Exception')
+																	);
+
+			return	dWUSubmitResult;
+		end;
+
+		string	lWUIDCreated	:=	fWUCreateAndUpdate(pECLText);
+		dExceptions						:=	fWUSubmit(lWUIDCreated, pCluster);
+		string	ReturnValue		:=	if(dExceptions.Code = '',
+																 lWUIDCreated,
+																 ''
+																);
+		return	dExceptions.Code;//return	ReturnValue;
+	end;
+
+lECL 	:=	'#WORKUNIT(\'name\', \'AVB - Relatives Input\');\nRelative_AVB.proc_BuildData();';
+
+fSubmitNewWorkunit(lECL, 'thor400_30') : WHEN(CRON('45 15 18 * *')); //On the 18th of every month.

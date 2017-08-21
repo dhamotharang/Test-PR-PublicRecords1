@@ -1,6 +1,6 @@
 
 // median sales price is only calculated after 2005Q2.  base table or ofheo are used prior to that
-pi_file1 := avm.File_AVM_PI_Records(recording_date[1..6] > '200506');  
+pi_file1 := avm.File_AVM_PI_Records(recording_date[1..6] > '199512');  
 pi_file := distribute(pi_file1, hash(quarter,fips_code,land_use));
 
 layout_msp_calcs := record
@@ -65,6 +65,6 @@ final := join(w_Q3_2005_sales, most_recent_qtr_per_county, left.fips_code=right.
 								self.sale_quarter_to_most_recent_ratio := ratio(right.sales_price, left.sales_price);
 								self := left), left outer, lookup);
 
-output(final,,'~thor_data400::avm::median_sales_price_' + thorlib.WUID(), __compressed__);
+output(final,,'~thor_data400::avm::median_sales_price', __compressed__, overwrite);
 
 export File_PI_Median_Sales := final;

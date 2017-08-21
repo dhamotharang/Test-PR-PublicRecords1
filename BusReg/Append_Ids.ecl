@@ -175,7 +175,9 @@ module
 			self.bdid_score												:= 0																		;
 			self.fname 														:= l.clean_officer1_name.fname					;	
 			self.mname 														:= l.clean_officer1_name.mname					;
-			self.lname														:= l.clean_officer1_name.lname					;				
+			self.lname														:= l.clean_officer1_name.lname					;
+			self.source														:= mdr.sourceTools.src_Business_Registration;
+			self.source_rec_id										:= l.source_rec_id											;
 			self																	:= l																		;		
 		end;  
 
@@ -183,7 +185,7 @@ module
 																
 		BDID_Matchset := ['A','P'];
 
-		Business_Header_SS.MAC_Add_BDID_Flex(
+		Business_Header_SS.MAC_Add_BDID_FLEX(
 			 dSlimForBdiding											// Input Dataset						
 			,BDID_Matchset                        // BDID Matchset what fields to match on           
 			,company_name	                        // company_name	              
@@ -208,18 +210,23 @@ module
 			,p_city_name													// city
 			,fname																// contact's first name
 			,mname																// contact's middle name
-			,lname																// contact's last name                 
+			,lname																// contact's last name
+			,																			// contact ssn
+			,source																// source
+			,source_rec_id												// source_record_id
+			,false	 															// does MAC_Source_Match exist before Flex macro			
 		);                                         
                                  
 		dBDidOut_dist			:= distribute	(dBdidOut(bdid 		!= 0 or 
 																							Ultid 	!= 0 or 
 																							OrgID 	!= 0 or 
 																							ProxID 	!= 0 or 
+																							SeleID 	!= 0 or 																							
 																							POWID 	!= 0 or 
 																							EmpID 	!= 0 or 
 																							DotID 	!= 0)	,unique_id										);				
 		
-		dBDidOut_sort			:= sort				(dBDidOut_dist				,unique_id, -bdid_score	,local);
+		dBDidOut_sort			:= sort				(dBDidOut_dist				,unique_id, -bdid_score	, -proxscore, local);
 		dBDidOut_dedup		:= dedup			(dBDidOut_sort				,unique_id							,local);
 
 		dAddUniqueId_dist := distribute	(pDataset							,unique_id										);
@@ -232,16 +239,25 @@ module
 			self.bdid_score	:= r.bdid_score;
 			self.Ultid			:= r.Ultid;
 			self.Ultscore		:= r.Ultscore;
+			self.UltWeight	:= r.UltWeight;			
 			self.OrgID			:= r.OrgID;
 			self.Orgscore		:= r.Orgscore;
+			self.OrgWeight	:= r.OrgWeight;			
 			self.ProxID			:= r.ProxID;
 			self.Proxscore	:= r.Proxscore;
+			self.ProxWeight	:= r.ProxWeight;			
+			self.SELEID			:= r.SELEID;
+			self.SELEscore	:= r.SELEscore;
+			self.SELEWeight	:= r.SELEWeight;			
 			self.POWID			:= r.POWID;
 			self.POWscore		:= r.POWscore;
+			self.POWWeight	:= r.POWWeight;			
 			self.EmpID			:= r.EmpID;
 			self.Empscore		:= r.Empscore;
+			self.EmpWeight	:= r.EmpWeight;			
 			self.DotID			:= r.DotID;
 			self.Dotscore		:= r.Dotscore;
+			self.DotWeight	:= r.DotWeight;			
 			self 						:= l;
 
 		end;

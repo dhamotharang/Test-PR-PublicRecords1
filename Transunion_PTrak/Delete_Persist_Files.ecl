@@ -8,7 +8,8 @@ delete01 := DeletePersistfiles('~thor_data400::persist::transunionptrak_clean_na
 delete02 := DeletePersistfiles('~thor_data400::persist::transunionptrak_clean_normalized');
 delete03 := DeletePersistfiles('~thor_data400::persist::transunionptrak_normalized_names');
 delete04 := DeletePersistfiles('~thor_data400::persist::transunionptrak_normalized_names_update');
+delete05 := DeletePersistfiles('~thor_data400::persist::transunionptrak_clean_normalized');
 
-export Delete_persist_files := parallel( delete01, delete02, delete03, delete04
+export Delete_persist_files := parallel( delete01, delete02, delete03, delete04, delete05
 										);
 																				

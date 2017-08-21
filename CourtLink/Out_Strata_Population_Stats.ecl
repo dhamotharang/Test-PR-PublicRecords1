@@ -7,14 +7,14 @@ ds := courtlink.files().base.qa;
 rPopulationStats_ds
  :=
   record
-    CountGroup                                             := count(group);
+    CountGroup                                           := count(group);
+	ds.CourtState;
     dt_first_seen_CountNonZero                           := sum(group,if(ds.dt_first_seen<>0,1,0));
     dt_last_seen_CountNonZero                            := sum(group,if(ds.dt_last_seen<>0,1,0));
     dt_vendor_first_reported_CountNonZero                := sum(group,if(ds.dt_vendor_first_reported<>0,1,0));
     dt_vendor_last_reported_CountNonZero                 := sum(group,if(ds.dt_vendor_last_reported<>0,1,0));
     record_type_CountNonBlank                            := sum(group,if(ds.record_type<>'',1,0));
     RecId_CountNonBlank                                  := sum(group,if(ds.RecId<>'',1,0));
-    CourtState_CountNonBlank                             := sum(group,if(ds.CourtState<>'',1,0));
     CourtID_CountNonBlank                                := sum(group,if(ds.CourtID<>'',1,0));
     CourtName_CountNonBlank                              := sum(group,if(ds.CourtName<>'',1,0));
     DocketNumber_CountNonBlank                           := sum(group,if(ds.DocketNumber<>'',1,0));
@@ -106,10 +106,10 @@ rPopulationStats_ds
   end;
 
 
-dPopulationStats_CourtLink := table(ds,rPopulationStats_ds,few);                                                               
+dPopulationStats_CourtLink := table(ds,rPopulationStats_ds,courtState,few);                                                               
 
 STRATA.createXMLStats(dPopulationStats_CourtLink,
-                        'CourtLink',
+                        'CourtLink2',
 						'base',
 						pversion,
 						'',

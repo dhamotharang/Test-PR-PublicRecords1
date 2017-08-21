@@ -1,4 +1,6 @@
-dOffender_Distributed := File_Moxie_Offender_Dev;
+import hygenics_search, corrections, hygenics_crim;
+
+dOffender_Distributed := hygenics_search.File_Moxie_Offender_Dev;
 
 rOffenderStatRecord
  :=
@@ -28,7 +30,7 @@ tOffenderStatsSorted:= sort(tOffenderStatsTable,vendor);
 
 A01 := output(tOffenderStatsSorted,all,named('Offender_Statistics'));
 
-dOffenses_Distributed := File_Moxie_Offenses_Dev;
+dOffenses_Distributed := dataset('~thor_data400::persist::CrimSrch_Offenses_Joined', hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory, flat);//hygenics_search.File_Moxie_Offenses_Dev;
 
 rOffensesStatRecord
  :=
@@ -53,7 +55,7 @@ tOffensesStatsSorted:= sort(tOffensesStatsTable,vendor);
 
 A02 := output(tOffensesStatsSorted,all,named('Offenses_Statistics'));
 
-dPunishment_Distributed := File_Moxie_Punishment_Dev;
+dPunishment_Distributed := hygenics_search.File_Moxie_Punishment_Dev;
 
 rPunishmentStatRecord
  :=

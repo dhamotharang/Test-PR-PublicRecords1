@@ -20,11 +20,6 @@ module
 		dataset(Field_count_layout) Samples;
 	end;
 
-	export Description_Stat_layout2 := 
-	record, maxlength(100000)
-		dataset(Description_Stat_layout) Samples;
-	end;
-
 	export standard_stat_out :=
 	record, maxlength(100000)
 		string														Build_Name										;	// name of build/dataset

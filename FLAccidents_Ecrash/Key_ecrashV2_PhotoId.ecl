@@ -1,3 +1,6 @@
+/*2015-11-16T20:59:11Z (Srilatha Katukuri)
+#193680 - CR323
+*/
 /*2015-08-28T21:26:05Z (Srilatha Katukuri)
 #181860 - changed the order of fields in sort and dedup clause
 */
@@ -9,7 +12,9 @@
 */
 import ut,Data_Services, Doxie;
 
-ds_SupplementalBase := FLAccidents_Ecrash.Files.Base.Supplemental;
+//ds_SupplementalBase := dataset(Data_Services.Data_location.Prefix('ecrash')+'thor_data400::base::ecrash_supplemental',FLAccidents_Ecrash.Layouts.ReportVersion,thor);
+ds_SupplementalBase := FLAccidents_Ecrash.Files.Base.Supplemental(trim(report_type_id,all) in ['A','DE']);
+//ds_PhotoBase := dataset(Data_Services.Data_location.Prefix('ecrash')+'thor_data400::base::ecrash_documents',FLAccidents_Ecrash.Layouts.PhotoLayout,thor);//FLAccidents_Ecrash.Files.Base.PhotoBase;
 ds_PhotoBase := FLAccidents_Ecrash.Files.Base.PhotoBase;
 
 ds_SuperReport := dedup(sort(distribute(ds_SupplementalBase, hash64(Super_report_id)), super_report_id,report_id, local), Super_report_id,report_id,local);
@@ -32,4 +37,5 @@ EXPORT Key_ecrashV2_PhotoId := index(ds_PhotoSuperCmbnd
                                      ,{Super_report_id,Document_id}
 							                       ,{ds_PhotoSuperCmbnd}
 							                       ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_PhotoId_' + doxie.Version_SuperKey);
+																		
 																		

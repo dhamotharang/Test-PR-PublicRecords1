@@ -1,4 +1,5 @@
 // When called will create the Moxie Punishment file, dated per Version_Development
+import hygenics_crim;
 
 //Reformat to New DOC Punishment Layout 
 Layout_Moxie_DOC_Punishment.new tDOCPunishmentInToOut(File_In_DOC_Punishment pInput)
@@ -23,14 +24,21 @@ Layout_Moxie_DOC_Punishment.new tDOCPunishmentInToOut(File_In_DOC_Punishment pIn
   end
  ;
 
-dDOCPunishmentOut := project(File_In_DOC_Punishment,tDOCPunishmentInToOut(left));
+dDOCPunishmentOut 	:= project(File_In_DOC_Punishment,tDOCPunishmentInToOut(left));
+dTXDOCPunishment 	:= File_In_DOC_Punishment_TX_OAG;
+dDOCCon 			:= dDOCPunishmentOut + dTXDOCPunishment;
 
-dTXDOCPunishment := File_In_DOC_Punishment_TX_OAG;
+hygenics_crim.layout_Common_DOC_Punishment newTran(dDOCCon l):= transform
+	self.pro_st_dt				:='';
+	self.pro_end_dt				:='';
+	self.pro_status				:='';
+	self := l;
+end;
+	
+dDOCConcat 			:= project(dDOCCon, newTran(left));	
 
-dDOCConcat 	:= dDOCPunishmentOut + dTXDOCPunishment;
-
-//Reformat to Old DOC Punishment Layout 
-Layout_Moxie_DOC_Punishment.previous tDOCPunishmentOldLayout(dDOCConcat pInput)
+//Reformat to "Old" Hygenics DOC Punishment Layout 
+hygenics_crim.Layout_In_DOC_Punishment.previous tDOCPunishmentOldLayout(dDOCConcat pInput)
  :=
   transform
 	self := pInput;

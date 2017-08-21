@@ -6,7 +6,7 @@ export KeyPrep_BID_Address(
 	boolean pUseOtherEnvironment = false) := function
 
 	// Remove property addresses; we don't want to find BIDs using those.
-	base := in_base(zip != '' and address_type != TopBusiness.Constants.Address_Types.PROPERTY);
+	base := in_base(zip != '' and address_type not in [TopBusiness.Constants.Address_Types.PROPERTY,TopBusiness.Constants.Address_Types.REGAGENT]);
 	
 	slim := dedup(sort(project(base,
 		transform(KeyLayouts.Address,

@@ -13,7 +13,7 @@ end;
 cleaned := project(CIUS_city, FBIClean(left));
 	
 clean_key_data := cleaned(state		!='' and 
-													city	 	!='');
+													city	 	!=''); 
 
 export key_CIUS_city_addr := index(clean_key_data,{
 														state, 

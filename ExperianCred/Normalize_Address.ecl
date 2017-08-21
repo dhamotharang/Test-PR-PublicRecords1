@@ -15,7 +15,8 @@ Layouts.Layout_Norm_Address t_norm_addr (Layouts.Layout_Norm_Name le, INTEGER C)
 	SELF.Orig_State 		:=choose(C,le.State_Abbreviation, le.State_Abbreviation1, le.State_Abbreviation2, le.State_Abbreviation3, le.State_Abbreviation4, le.State_Abbreviation5, le.State_Abbreviation6, le.State_Abbreviation7);
 	SELF.Orig_ZipCode		:=choose(C,le.ZIP_Code, le.ZIP_Code1, le.ZIP_Code2, le.ZIP_Code3, le.ZIP_Code4, le.ZIP_Code5, le.ZIP_Code6, le.ZIP_Code7);
 	SELF.Orig_ZipCode4		:=choose(C,le.ZIP_Plus_Four, le.ZIP_Plus_Four1, le.ZIP_Plus_Four2, le.ZIP_Plus_Four3, le.ZIP_Plus_Four4, le.ZIP_Plus_Four5, le.ZIP_Plus_Four6, le.ZIP_Plus_Four7);
-	SELF.Orig_Address_date  :=choose(C,le.Address_Create_Date, le.Address_Create_Date1, le.Address_Create_Date2, le.Address_Create_Date3, le.Address_Create_Date4, le.Address_Create_Date5, le.Address_Create_Date6, le.Address_Create_Date7); 
+	SELF.Orig_Address_Create_Date  :=choose(C,le.Address_Create_Date, le.Address_Create_Date1, le.Address_Create_Date2, le.Address_Create_Date3, le.Address_Create_Date4, le.Address_Create_Date5, le.Address_Create_Date6, le.Address_Create_Date7); 
+	SELF.Orig_Address_Update_Date  :=choose(C,le.Address_Update_Date, le.Address_Update_Date1, le.Address_Update_Date2, le.Address_Update_Date3, le.Address_Update_Date4, le.Address_Update_Date5, le.Address_Update_Date6, le.Address_Update_Date7); 
 	SELF.AddressSeq 		:= C ;	
 	SELF 					:= le;
 	SELF					:= [];

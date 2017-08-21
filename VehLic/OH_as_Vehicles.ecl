@@ -12,6 +12,29 @@ string lFixNameCharacters(string pOrigName)
 		 ,pOrigName
 		);
 
+string10	fZipFix(string pZip) :=	  if(length(trim(pZip)) = 5 and pZip[5..9] <> '00000',
+										 pZip,
+										 if(length(trim(pZip)) > 5 and pZip[5..9] <> '00000',
+										 pZip[5..9] +     	// reformatted
+										 if(pZip[1..4] <> '999' and
+											pZip[1..4] <> '0000' and regexfind(' ', pZip[1..4]) = FALSE,
+											'-' + pZip[1..4],
+											''),
+											''
+										   )
+										);										
+string10	fZipFixUpdate(string pZip) :=	  if(length(trim(pZip)) = 5 and pZip[1..5] <> '00000',
+										 pZip,
+										 if(length(trim(pZip)) > 5 and pZip[1..5] <> '00000', 
+										 pZip[1..5] +     	// reformatted
+										 if(pZip[6..8] <> '999' and
+											pZip[6..9] <> '0000' and regexfind(' ', pZip[6..9]) = FALSE,
+											'-' + pZip[6..9],
+											''),
+											''
+										   )
+										);			
+
 layout_vehicles intof(o le) := transform
 self.dt_first_seen:=(unsigned6)(le.process_date[1..6]);
 self.dt_last_seen:=(unsigned6)(le.process_date[1..6]);
@@ -34,7 +57,6 @@ self.VEHICLE_NUMBERxBG1:= if(lib_stringlib.stringlib.stringfind(le.s_title,'NONE
 */
 self.ORIG_VIN:= le.s_vin;
 self.vehicle_transaction_id := le.s_app;
-self.FIRST_REGISTRATION_DATE:= le.s_purchase;
 self.YEAR_MAKE:= le.s_year ;
 self.MAKE_CODE:= le.s_make ;
 self.VEHICLE_TYPE:= le.s_cat;
@@ -46,15 +68,11 @@ self.OWN_1_CUSTOMER_NAME:= lFixNameCharacters(le.s_name);
 self.OWN_1_STREET_ADDRESS:= le.s_address;
 self.OWN_1_CITY:= le.s_city ;
 self.OWN_1_STATE:= le.s_state;
-//self.OWN_1_ZIP5_ZIP4_FOREIGN_POSTAL:= le.s_zip;  			//as received
-self.OWN_1_ZIP5_ZIP4_FOREIGN_POSTAL:= le.s_zip[5..9] +     	// reformatted
-									  if(le.s_zip[1..4] <> '9990' and
-										 le.s_zip[1..4] <> '0000',
-										 '-' + le.s_zip[1..4],
-										 ''
-										);
-//zip formatting above
-self.OWN_2_CUSTOMER_NAME:= lFixNameCharacters(le.s_name2);
+self.OWN_1_ZIP5_ZIP4_FOREIGN_POSTAL:= fZipFix(le.s_zip);
+self.OWN_2_CUSTOMER_NAME:= if(le.s_name2[1..3]='***',
+							  '',
+							  lFixNameCharacters(le.s_name2)
+							 );
 self.LICENSE_PLATE_NUMBERxBG4:= le.s_plate ;
 self.registration_effective_date := le.s_issue;
 self.REGISTRATION_EXPIRATION_DATE:= le.s_exp[3..6]+le.s_exp[1..2];
@@ -62,6 +80,7 @@ self.DECAL_NUMBER:= le.s_sticker ;
 self.ACTIVITY_COUNTY:= le.s_cnty ;
 self.activity_agencyxeg6 := le.s_agency;
 self.TITLE_NUMBERxBG9:= le.s_title ;
+self.title_issue_date := le.s_purchase;
 self.LH_1_CUSTOMER_NAME := 'Not On File';
 self.LH_2_CUSTOMER_NAME := 'Not On File';
 self.LH_3_CUSTOMER_NAME := 'Not On File';
@@ -119,7 +138,6 @@ self.VEHICLE_NUMBERxBG1:= if(lib_stringlib.stringlib.stringfind(le.vr_title,'NON
 */
 self.ORIG_VIN:= le.vr_vin;
 self.vehicle_transaction_id := le.vr_app_nbr;
-self.FIRST_REGISTRATION_DATE:= le.vr_pur_date;
 self.YEAR_MAKE:= le.vr_yy ;
 self.MAKE_CODE:= le.vr_make ;
 self.VEHICLE_TYPE:= le.vr_cat;
@@ -132,14 +150,7 @@ self.OWN_1_CUSTOMER_NAME:= lFixNameCharacters(le.vr_name);
 self.OWN_1_STREET_ADDRESS:= le.vr_addr;
 self.OWN_1_CITY:= le.vr_city1 ;
 self.OWN_1_STATE:= le.vr_state1;
-//self.OWN_1_ZIP5_ZIP4_FOREIGN_POSTAL:= le.vr_zip9;						// as received
-self.OWN_1_ZIP5_ZIP4_FOREIGN_POSTAL:= le.vr_zip9[5..9] +     	// reformatted
-									  if(le.vr_zip9[1..4] <> '9990' and
-										 le.vr_zip9[1..4] <> '0000',
-										 '-' + le.vr_zip9[1..4],
-										 ''
-										);
-//zip formatting above
+self.OWN_1_ZIP5_ZIP4_FOREIGN_POSTAL:= fZipFixUpdate(le.vr_zip9);
 self.OWN_2_CUSTOMER_NAME:= lFixNameCharacters(le.vr_name2);
 self.LICENSE_PLATE_NUMBERxBG4:= le.vr_lic ;
 self.registration_effective_date := le.vr_iss_date;
@@ -150,6 +161,7 @@ self.true_license_plste_number := le.vr_lic;
 self.activity_datexbg6 := le.vr_sys_date;
 self.activity_agencyxeg6 := le.vr_agency;
 self.TITLE_NUMBERxBG9:= le.vr_title ;
+self.title_issue_date := le.vr_pur_date;
 self.LH_1_CUSTOMER_NAME := 'Not On File';
 self.LH_2_CUSTOMER_NAME := 'Not On File';
 self.LH_3_CUSTOMER_NAME := 'Not On File';

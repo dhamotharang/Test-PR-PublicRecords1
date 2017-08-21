@@ -1,1 +1,1 @@
-export FileName_4020_Tax_Liens_In := trim(GetSegmentFileName_In('4020')) : global;
+export FileName_4020_Tax_Liens_In := trim(GetSegmentFileName_In('4020'));

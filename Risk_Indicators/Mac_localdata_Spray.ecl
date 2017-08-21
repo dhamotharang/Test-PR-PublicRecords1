@@ -31,8 +31,8 @@ macro
 
 sequential(%spray_localdata%,if(lib_fileservices.fileservices.SuperFileExists(%KeyFileName%),
 				%super_localdata%,output(%KeyFileName% + ' does not exist')))
- : success(FileServices.sendemail(if(email_target<>' ',email_target,'cbrodeur@seisint.com'),localdata+' Spray Succeeded',localdata+' Spray Succeeded')),
-   failure(FileServices.sendemail(if(email_target<>' ',email_target,'cbrodeur@seisint.com'),localdata+' Spray Failure',localdata+' Spray Failure'))
+ : success(FileServices.sendemail(if(email_target<>' ',email_target,'christopher.brodeur@lexisnexis.com'),localdata+' Spray Succeeded',localdata+' Spray Succeeded')),
+   failure(FileServices.sendemail(if(email_target<>' ',email_target,'christopher.brodeur@lexisnexis.com'),localdata+' Spray Failure',localdata+' Spray Failure'))
  ;
 
 endmacro;

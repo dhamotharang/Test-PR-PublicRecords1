@@ -1,8 +1,10 @@
-import ut, address;
+import ut, address,std,PRTE2_Header,PromoteSupers;
 ad := header.addressid_occupancy;
-TheDate := (unsigned4)ut.GetDate;
+TheDate := (unsigned4)((STRING8)Std.Date.Today());
 
 f := header.file_headers;
+
+hnf := header.Name_Frequencies(f);
 
 MAC_Best_Address(f, did, 1, en)
 
@@ -38,7 +40,14 @@ layout_hhid take_r(slimed_Result le) := transform
   end;
 
 j1d := distribute(j1,hash(did));
-fhd := distribute(file_hhid,hash(did));
+fhd0 := distribute(file_hhid,hash(did));
+hd_did := dedup(sort (hd,did,local),did,local); 
+
+// refresh fhd file to have the did's only in current header 
+fhd0 tra(fhd0 l) := transform
+  self := l;
+  end;
+fhd :=  join(fhd0,hd_did,left.did=right.did,tra(left),local);
 
 j := join(j1d,fhd,left.did=right.did and
                                  left.addr_id=right.addr_id,
@@ -59,12 +68,12 @@ slimed_result take_aiw(layout_hhid le, ad ri) := transform
 
 wadd := join(j,ad,left.addr_id=right.ht1,take_aiw(left,right),hash);
 
-slimed_result take_lname_weight(wadd le, header.Name_Frequencies ri) := transform
+slimed_result take_lname_weight(wadd le, hnf ri) := transform
   self.lname_weight := le.oc_size * 10000 * ri.percentage; // Chances in 10000 of a collision by chance
   self := le;
   end;
 
-j_weighted := join(wadd,header.Name_Frequencies,left.lname=right.lname,take_lname_weight(left,right),hash);
+j_weighted := join(wadd,hnf,left.lname=right.lname,take_lname_weight(left,right),hash);
 
 ut.MAC_Sequence_Records(j_weighted,hhid,j_out)
 
@@ -82,5 +91,10 @@ slimed_result ass_hhid(j_out le,dj ri) := transform
 id_back := join(j_out,dj,left.addr_id=right.addr_id and
                        left.lname=right.lname,ass_hhid(left,right),hash);
 
-
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+pHHID_Table := id_back+updated;
+PromoteSupers.MAC_SF_BuildProcess(pHHID_Table,'~PRTE::BASE::HHID',make_hhid,2,,true,pVersion:=workunit);
+export HHID_Table := pHHID_Table : success(make_hhid);
+#ELSE
 export HHID_Table := id_back+updated : persist('HHID_Table');
+#END

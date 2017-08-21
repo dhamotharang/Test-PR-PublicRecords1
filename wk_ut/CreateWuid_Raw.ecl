@@ -1,4 +1,3 @@
-import tools,ut,_control;
 EXPORT CreateWuid_Raw(
 
    string  pEcl
@@ -9,6 +8,11 @@ EXPORT CreateWuid_Raw(
 ) := 
 function
 
+  // -- add parent wuid link
+  eclcode     := 'output(\'<a href="http://' + _constants.LocalEsp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit + '#/stub/Summary">Parent Workunit</a>\' ,named(\'Parent_Wuid__html\'));\n'
+                + pEcl
+                ;
+              
   string fWUCreateAndUpdate(string pECLText)  :=
   function
     rWUCreateAndUpdateRequest  :=
@@ -71,22 +75,12 @@ function
     return  dWUSubmitResult;
   end;
 
-  string  lWUIDCreated   :=  fWUCreateAndUpdate(pECL);
+  string  lWUIDCreated   :=  fWUCreateAndUpdate(eclcode);
   dExceptions            :=  fWUSubmit(lWUIDCreated);
   string  wuid           :=  if(dExceptions.Code = '',
                                 lWUIDCreated,
                                 ''
                                ) : global;
   return  wuid;
-
-  // createworkunit := tools.mod_Soapcalls.fSubmitNewWorkunit(
-     // ecl
-    // ,pcluster
-    // ,pcluster
-    // ,pESP
-    // ,'8010'
-  // ) : independent; // add independent so that they don't get reevalulated each time they are accessed
-
-  // return createworkunit;
 
 end;

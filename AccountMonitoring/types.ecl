@@ -20,7 +20,15 @@ EXPORT types := MODULE
 																				 phoneownership = bdidupdate << 1,				 //	 32768
 																				 bipbestupdate = phoneownership << 1,			 //	 65536
 																				 sbfe = bipbestupdate << 1,			 					 //	 131072
-                                         allProducts = (sbfe << 1) - 1); 					 //  262143
+																				 ucc = sbfe << 1,			 					 					 //	 262144
+																				 govtdebarred = ucc << 1,			 					 	 //	 524288
+																				 inquiry = govtdebarred << 1,			 				 //	 1048576
+																				 corp = inquiry << 1,			 					 			 //	 2097152
+																				 mvr = corp << 1,			 					 					 //	 4194304
+																				 aircraft = mvr << 1,			 					 			 //	 8388608
+																				 watercraft = aircraft << 1,			 				 //	 16777216
+                                         allProducts = (watercraft << 1) - 1); 		 //  33554431
+																				 
 
 	// Function used to verify whether a customer product mask (tstBits) contains a particular product 
 	// ie: 3 contains both bankruptcy and deceased.

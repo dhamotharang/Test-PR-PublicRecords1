@@ -1,0 +1,74 @@
+EXPORT IP_Metadata := MODULE
+
+	SHARED	lSubDirName					:=	'';
+	SHARED	lCSVVersion					:=	'20090706';
+	SHARED	lCSVFileNamePrefix	:=	PRTE_CSV.Constants.CSVFilesBaseName + lSubDirName;
+
+	EXPORT rthor_data400_key_ip_metadata := RECORD
+		unsigned8 beg_octet1;
+		unsigned8 end_octet1;
+		unsigned8 beg_octet2;
+		unsigned8 end_octet2;
+		unsigned8 beg_octets34;
+		unsigned8 end_octets34;
+		string20 ip_rng_beg;
+		string20 ip_rng_end;
+		string5 edge_country;
+		string10 edge_region;
+		string60 edge_city;
+		string10 edge_conn_speed;
+		unsigned8 edge_metro_code;
+		string10 edge_latitude;
+		string10 edge_longitude;
+		string10 edge_postal_code;
+		unsigned8 edge_country_code;
+		unsigned8 edge_region_code;
+		unsigned8 edge_city_code;
+		unsigned8 edge_continent_code;
+		string5 edge_two_letter_country;
+		unsigned8 edge_internal_code;
+		string20 edge_area_codes;
+		unsigned8 edge_country_conf;
+		unsigned8 edge_region_conf;
+		unsigned8 edge_city_conf;
+		unsigned8 edge_postal_conf;
+		integer8 edge_gmt_offset;
+		string5 edge_in_dst;
+		string10 sic_code;
+		string70 domain_name;
+		string200 isp_name;
+		string10 homebiz_type;
+		unsigned8 asn;
+		string200 asn_name;
+		string40 primary_lang;
+		string105 secondary_lang;
+		string15 proxy_type;
+		string15 proxy_description;
+		string5 is_an_isp;
+		string70 company_name;
+		string10 ranks;
+		string10 households;
+		string10 women;
+		string10 w18_34;
+		string10 w35_49;
+		string10 men;
+		string10 m18_34;
+		string10 m35_49;
+		string10 teens;
+		string10 kids;
+		unsigned8 naics_code;
+		unsigned8 cbsa_code;
+		string55 cbsa_title;
+		string10 cbsa_type;
+		unsigned8 csa_code;
+		string55 csa_title;
+		unsigned8 md_code;
+		string55 md_title;
+		string100 organization_name;
+		boolean generated_rec;
+		unsigned8 __internal_fpos__;
+	END;
+	
+	EXPORT dthor_data400_key_ip_metadata := dataset([], rthor_data400_key_ip_metadata);	
+
+END;

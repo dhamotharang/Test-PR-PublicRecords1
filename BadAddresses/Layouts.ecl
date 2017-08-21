@@ -4,7 +4,8 @@ Export Layouts := Module
 
 Export Lay_In := Record
 			String	Address;
-			String	City;
+			// String	City;
+			String	Added_By;
 			String	Added_Date;
 End;
 
@@ -21,6 +22,7 @@ Export Lay_Seq_In := Record
 			String	City;
 			String2	State:='';
 			String	ZipCode := '';
+			String	Added_By;
 			String	Added_Date;
 End;
 
@@ -45,6 +47,7 @@ Export Lay_Base := Record
 			String	City;
 			String2	State;
 			String	ZipCode;
+			String	Added_By;
 			String Added_Date;
 			String10 prim_range;
 			String2	predir;
@@ -75,7 +78,7 @@ Export Lay_Base := Record
 End;
 
 Export Lay_KeyAddress := Record		
-Lay_Base  and not [address , city];
+Lay_Base  and not [address , city, Added_by];
 			String100	Address;
 			String40	City;				
 

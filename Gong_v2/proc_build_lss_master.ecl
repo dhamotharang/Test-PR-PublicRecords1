@@ -175,7 +175,7 @@ end;
 
 #uniquename(history_did_hhid)
 Gong_v2.MAC_Did_Hhid_Append(%combinedFiles%,%history_did_hhid%);
-per_history := %history_did_hhid% : persist('~thor_dell400_2::persist::gongmaster_did',_Control.TargetQueue.ADL_400);
+per_history := %history_did_hhid% : persist('~thor_dell400_2::persist::gongmaster_did'/*,_Control.TargetQueue.ADL_2_400*/);
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////////
 //Append months disconnect

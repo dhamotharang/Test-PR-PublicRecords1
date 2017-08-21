@@ -1,3 +1,5 @@
+import address;
+
 export MAC_BDID_Corp(infile, outfile) := macro
 
 #uniquename(layout_seq)
@@ -66,7 +68,7 @@ end;
                               (suppress_ra_addr='Y' AND
                                ra_officer_also='Y' AND
                                (Datalib.CompanyClean(reg_agent_name))[41..120] = '' AND
-                                (integer)((addrcleanlib.cleanPerson73(reg_agent_name))[71..73]) >= 85
+                                (integer)((address.cleanPerson73(reg_agent_name))[71..73]) >= 85
                                )));
 
 #uniquename(Corp4_Blank_Addr)
@@ -78,7 +80,7 @@ end;
                               (suppress_ra_addr='Y' AND
                                ra_officer_also='Y' AND
                                (Datalib.CompanyClean(reg_agent_name))[41..120] = '' AND
-                                (integer)((addrcleanlib.cleanPerson73(reg_agent_name))[71..73]) >= 85
+                                (integer)((address.cleanPerson73(reg_agent_name))[71..73]) >= 85
                                ));
 
 #uniquename(Corp4_Clean)

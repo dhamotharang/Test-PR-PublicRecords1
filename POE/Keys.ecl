@@ -1,4 +1,4 @@
-import doxie, VersionControl,autokeyb2;
+import doxie, tools,autokeyb2, mdr;
 
 export Keys(
 
@@ -11,15 +11,16 @@ module
 
 	shared Base					:= Files(pversion,pFileUseOtherEnvironment).Base.Built;
 	shared dSourceHier	:= File_Source_Hierarchy;
-
-	shared dkeybuild		:= project(Base, transform(layouts.keybuild, self := left));
+	//
+  shared dkeybuild		:= project(Base, transform(layouts.keybuild, self.subject_ssn := if(mdr.sourceTools.sourceIsUtility(left.source), 0, left.subject_ssn),self := left));
+	shared dkeybuild_appends := Append_Supp(dkeybuild) ;
+	//
+	shared FilterBdids	:= dkeybuild_appends(bdid	!= 0);
+	shared FilterDids		:= dkeybuild_appends(did	!= 0);
 	
-	shared FilterBdids	:= dkeybuild(bdid	!= 0);
-	shared FilterDids		:= dkeybuild(did	!= 0);
-	
-	versioncontrol.macBuildKeyVersions(FilterBdids	,{bdid}	  						,{FilterBdids	}	,keynames(pversion,pUseOtherEnvironment).Bdid							,Bdid 						);
-	versioncontrol.macBuildKeyVersions(FilterDids		,{did	}	  						,{FilterDids	}	,keynames(pversion,pUseOtherEnvironment).Did							,Did	 						);
-	versioncontrol.macBuildKeyVersions(dkeybuild		,{unsigned6 FakeID	}	,{dkeybuild		}	,keynames(pversion,pUseOtherEnvironment).Payload					,Payload					);	//autokey payload key
-	versioncontrol.macBuildKeyVersions(dSourceHier	,{source}	 						,{dSourceHier	}	,keynames(pversion,pUseOtherEnvironment).Source_Hierarchy	,Source_Hierarchy	);
+	tools.mac_FilesIndex('FilterBdids				,{bdid}	  						,{FilterBdids				}'	,keynames(pversion,pUseOtherEnvironment).Bdid							,Bdid 						);
+	tools.mac_FilesIndex('FilterDids				,{did	}	  						,{FilterDids				}'	,keynames(pversion,pUseOtherEnvironment).Did							,Did	 						);
+	tools.mac_FilesIndex('dkeybuild_appends	,{unsigned6 FakeID	}	,{dkeybuild_appends	}'	,keynames(pversion,pUseOtherEnvironment).Payload					,Payload					);	//autokey payload key
+	tools.mac_FilesIndex('dSourceHier				,{source}	 						,{dSourceHier				}'	,keynames(pversion,pUseOtherEnvironment).Source_Hierarchy	,Source_Hierarchy	);
 	
 end;

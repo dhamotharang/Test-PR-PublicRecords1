@@ -1,1 +1,5 @@
-export File_addl_Fares_tax := dataset('~thor_data400::base::ln_propertyv2::Addl::fares_tax',LN_PropertyV2.layout_addl_fares_tax,flat);
+IMPORT LN_PropertyV2_Fast;
+export File_addl_Fares_tax := dataset(
+																			 LN_PropertyV2_Fast.Filenames.baseFull.addl_frs_a
+																			,LN_PropertyV2.layout_addl_fares_tax
+																			,flat);

@@ -51,7 +51,7 @@ ssn_stats := record
 	d_ssn.postdir;
 	d_ssn.sec_range;
 	ssn_ct := count(group);
-	ssn_ct_c6 := count(group, ut.DaysApart(sysdate, d_ssn.dt_first_seen[1..6]+'31') < 183);
+	ssn_ct_c6 := count(group, ut.DaysApart(sysdate, ((string)d_ssn.dt_first_seen)[1..6]+'31') < 183);
 end;
 ssn_counts := table(d_ssn, ssn_stats, zip,prim_range,predir,prim_name,suffix,postdir,sec_range, local);
 // output(ssn_counts, named('ssn_counts'));
@@ -83,7 +83,7 @@ did_stats := record
 	d_did.postdir;
 	d_did.sec_range;
 	did_ct := count(group);
-	did_ct_c6 := count(group, ut.DaysApart(sysdate, d_did.dt_first_seen[1..6]+'31') < 183);
+	did_ct_c6 := count(group, ut.DaysApart(sysdate, ((string)d_did.dt_first_seen)[1..6]+'31') < 183);
 end;
 did_counts := table(d_did, did_stats, zip,prim_range,predir,prim_name,suffix,postdir,sec_range, local);
 // output(did_counts, named('did_counts'));

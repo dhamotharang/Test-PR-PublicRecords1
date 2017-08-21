@@ -1,4 +1,5 @@
 EXPORT INTEGER4 fn_match_bagofwords_fuzzy(CONST STRING l, CONST STRING r, UNSIGNED mode=0, UNSIGNED1 score_mode=0) := BEGINC++
+namespace ns_SALT30_Fn_Match_Bagofwords_Fuzzy {
 /*
     Porter stemmer in C++, based on the ECL-ML ML/Docs/PorterStemC port. The original paper is in
     Porter, 1980, An algorithm for suffix stripping, Program, Vol. 14, no. 3, pp 130-137,
@@ -626,6 +627,8 @@ wb::wb(unsigned len,const char *s, bool use_stemming)
   };
   error = false;
 }
+} //namespace
+using namespace ns_SALT30_Fn_Match_Bagofwords_Fuzzy;
 #body
 #option pure
 {
@@ -644,8 +647,8 @@ wb::wb(unsigned len,const char *s, bool use_stemming)
 		bool stem = stem_distance>0;
     unsigned maxEdits = edit_max_distance?edit_max_distance:lenL+lenR; // ignore maxEdits if set to 0
 		
-    wb L(lenL,l,stem);
-    wb R(lenR,r,stem);
+    ns_SALT30_Fn_Match_Bagofwords_Fuzzy::wb L(lenL,l,stem);
+    ns_SALT30_Fn_Match_Bagofwords_Fuzzy::wb R(lenR,r,stem);
     if ( L.error || R.error )
         return -1; // Parsing error
     unsigned total_weight = L.total_weight+R.total_weight;
@@ -655,8 +658,8 @@ wb::wb(unsigned len,const char *s, bool use_stemming)
     // MORE - below was previous behavior; but feels wrong
     int spec = L.spec > R.spec ? R.spec : L.spec; // How many points are we fighting for? (proportion of longer string)
     // Short & Long
-    wb &SH = L.nwords < R.nwords || lenL < lenR ? L : R;
-    wb &LO = L.nwords < R.nwords || lenL < lenR ? R : L;
+    ns_SALT30_Fn_Match_Bagofwords_Fuzzy::wb &SH = L.nwords < R.nwords || lenL < lenR ? L : R;
+    ns_SALT30_Fn_Match_Bagofwords_Fuzzy::wb &LO = L.nwords < R.nwords || lenL < lenR ? R : L;
     // Now process the shorter string against the longer
     // Heuristic strategy
     //unsigned lo_finger = 0;

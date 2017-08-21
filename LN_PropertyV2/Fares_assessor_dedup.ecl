@@ -79,7 +79,8 @@ own_state,
 (integer)recording_date,
 seller_name,
 trim(slim_a.unformatted_apn,all),
-fares_id,local);
+fares_id,
+-owner_phone,local);
 
 property.Layout_Fares_Assessor dupFares(property.Layout_Fares_Assessor L, property.Layout_Fares_Assessor R) := transform
  self.fares_id := l.fares_id;
@@ -125,7 +126,8 @@ left.own_state = right.own_state and
 (integer)left.recording_date = (integer)right.recording_date and
 left.seller_name = right.seller_name, dupFares(left,right),local);
 
-return dup;
+dupwgood := LN_PropertyV2.Mac_junk_tax.fares_asses(dup) ;
+return dupwgood;
 
 end;
 

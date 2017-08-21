@@ -5,6 +5,8 @@ export layout_liens_party_for_hogan := record
 string50 tmsid;
 string50 rmsid;
 string10 orig_rmsid;
+BOOLEAN	bCBFlag		:=	FALSE;
+STRING	eviction	:=	'';
 string orig_full_debtorname := '';
 string orig_name := ''; 
 string orig_lname := '';

@@ -1,15 +1,17 @@
-export MAC_Prop_Field_Init(infile,infield,pivot,outfile) := macro
-// very similar to MAC_Prop_Field - possibly I should find some schmanzy way to common them up - some day
+export MAC_Prop_Field_Init(infile,infield,pivot,outfile) := macro  //sent from DAB on  6/17/2008 4:09 PM
+
 #uniquename(r)
 %r% := record
-  typeof(infile.pivot) pivot := max(group,infile.pivot);
+  infile.pivot; 
   unsigned4 cnt := count(group);
-	typeof(infile.infield) infield := max(group,infile.infield);
+      infile.infield;
   end;
-	
-#uniquename(d)
-%d% := dedup( sort( infile, -infield ), left.infield[1..length(trim(right.infield))]=right.infield ); // Remove following if leading substring of former
-	
-outfile := table ( %d% , %r% )(cnt=1); // Implicitely grouped by pivot
 
-  endmacro;
+#uniquename(d)
+%d% := table( infile, %r%, pivot, infield, local );
+
+#uniquename(d1)
+%d1% := dedup( sort( %d%, pivot,-infield,local ), left.pivot=right.pivot and left.infield[1..length(trim(right.infield))]=right.infield, local ); // Remove following if leading substring of former
+outfile := dedup ( sort ( %d1% , pivot, -cnt, local ), pivot, local );
+
+endmacro;

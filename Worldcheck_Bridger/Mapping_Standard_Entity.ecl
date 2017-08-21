@@ -1,6 +1,6 @@
-#workunit('priority', 'high')
+#workunit('priority', 'high');
 
-import ut, lib_stringlib, worldcheck, worldcheck_bridger;
+import ut, lib_stringlib, worldcheck, worldcheck_bridger, std;
 
 export Mapping_Standard_Entity (string filedate) := function
 
@@ -12,21 +12,21 @@ export Mapping_Standard_Entity (string filedate) := function
 //////////////////////////////////////////////////////////////////////////////////
 f := Worldcheck_Bridger.File_WorldCheck_In;
 f patchrecs(f L) := transform
-self.countries := if(L.countries = 'UNKNOWN', Worldcheck_Bridger._Functions.Find_Country_ifUnknown(L.locations),L.Countries);
+	self.countries := if(L.countries = 'UNKNOWN', Worldcheck_Bridger._Functions.Find_Country_ifUnknown(L.locations),L.Countries);
 
 
-self.aliases   := regexreplace('NEW YORK',
-										regexreplace(';NEW YORK',
-											regexreplace('NEW YORK;', stringlib.stringtouppercase(L.aliases),'')
-									,'')
-									,'');
-self.low_quality_aliases := 
-							 regexreplace('NEW YORK',
-										regexreplace(';NEW YORK',
-											regexreplace('NEW YORK;', stringlib.stringtouppercase(L.low_quality_aliases),'')
-									,'')
-									,''); 
-self := L;
+	self.aliases   := regexreplace(U'NEW YORK',
+										regexreplace(U';NEW YORK',
+											regexreplace(U'NEW YORK;', Std.Uni.ToUpperCase(L.aliases),'')
+									,U'')
+									,U'');
+	self.low_quality_aliases := 
+							 regexreplace(U'NEW YORK',
+										regexreplace(U';NEW YORK',
+											regexreplace(U'NEW YORK;', Std.Uni.ToUpperCase(L.low_quality_aliases),'')
+									,U'')
+									,U''); 
+	self := L;
 end;
 
 patchedrecs := project(f,patchrecs(left));
@@ -143,18 +143,6 @@ map_keywords	:= distribute(map_keyword, random());
 //POPULATE AKAS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 map_akas_altspell := Worldcheck_Bridger.Mapping_AKAs_and_AltSpell(in_f);
 
-	//Standard Layout	
-	Layout_Aliases := record
-		string Type{xpath('Type')};
-		string Category{xpath('Category')};
-		unicode First_Name{xpath('First_Name')};
-		unicode Middle_Name{xpath('Middle_Name')};
-		unicode Last_Name{xpath('Last_Name')};
-		unicode Generation{xpath('Generation')};
-		unicode Full_Name{xpath('Full_Name')};
-		string Comments{xpath('Comments')};
-	end;
-	
 	// Rollup of Akas and Alternative Spellings
 	AKA_rollup := record
 		string ID;
@@ -396,8 +384,32 @@ map_and_rollup_ids := Worldcheck_Bridger.Mapping_and_Rollup_IDs(in_f);
 									,left.reference_ID = right.Phone_Number_List.ID
 									,join_phone(left,right)
 									,LEFT OUTER);
+
+	rOutP SplitRecordsIn254(rOutP l, integer pos) := transform,skip(COUNT(l.aka_list.aka) < 255 AND pos=2)
+				self.id 					:= CASE(pos,
+						1 => l.id,
+						2 => l.id + '999',
+						l.id);
+		
+				self.eui := CASE(pos,
+						1 => l.eui,
+						2 => l.eui + '_999',
+						l.eui);
+						
+				self.aka_list.aka :=	CASE(pos,
+						1 =>  choosen(l.aka_list.aka, 254),
+						2 =>  choosen(l.aka_list.aka, 254, 255),
+						//3 =>  IF(COUNT(l.aka_list.aka)<509, SKIP, choosen(l.aka_list.aka, 254, 209)),
+						l.aka_list.aka);
+
+				self := l;
+			end;	
 	
-	standard_mapping 	:= dedup(sort(join_phone_all, reference_id), record, all): persist('~thor_200::persist::worldcheck::standard_Worldcheck_Bridger.Mapping_dedup');
+								
+	akakludge := NORMALIZE(Join_phone_all, 2, SplitRecordsIn254(left, counter));
+
+	
+	standard_mapping 	:= dedup(sort(akakludge, reference_id), record, all): persist('~thor_200::persist::worldcheck::standard_Worldcheck_Bridger.Mapping_dedup');
 
 //SPLIT INTO REGIONS
 standard_filter := standard_mapping(search_criteria[1..2]='1,');
@@ -461,7 +473,7 @@ standard_filter := standard_mapping(search_criteria[1..2]='1,');
 	
 	//output(p_Ent_NoIDs_1);
 	
-	p_Entity_1 := output(p_Ent_NoIDs_1,,'~thor_data200::base::worldcheck_bridger::region_1_entity::'+filedate+'.xml', XML('', 
+	p_Entity_1 := output(p_Ent_NoIDs_1,,'~thor_data200::base::worldcheck_bridger::region_1_entity::'+filedate+'.xml', XML('MYROW', 
 							HEADING('<Entity_List Count="'+entity_count_1+'">'
 							,'</Entity_List></Watchlist>'), TRIM, OPT), overwrite);
 
@@ -510,7 +522,7 @@ standard_filter := standard_mapping(search_criteria[1..2]='1,');
 	
 	//output(p_Ent_NoIDs_2);
 	
-	p_Entity_2 := output(p_Ent_NoIDs_2,,'~thor_data200::base::worldcheck_bridger::region_2_entity::'+filedate+'.xml', XML('', 
+	p_Entity_2 := output(p_Ent_NoIDs_2,,'~thor_data200::base::worldcheck_bridger::region_2_entity::'+filedate+'.xml', XML('MYROW', 
 							HEADING('<Entity_List Count="'+entity_count_2+'">'
 							,'</Entity_List></Watchlist>'), TRIM, OPT), overwrite);
 
@@ -559,7 +571,7 @@ standard_filter := standard_mapping(search_criteria[1..2]='1,');
 	
 	//output(p_Ent_NoIDs_3);
 	
-	p_Entity_3 := output(p_Ent_NoIDs_3,,'~thor_data200::base::worldcheck_bridger::region_3_entity::'+filedate+'.xml', XML('', 
+	p_Entity_3 := output(p_Ent_NoIDs_3,,'~thor_data200::base::worldcheck_bridger::region_3_entity::'+filedate+'.xml', XML('MYROW', 
 							HEADING('<Entity_List Count="'+entity_count_3+'">'
 							,'</Entity_List></Watchlist>'), TRIM, OPT), overwrite);
 
@@ -608,7 +620,7 @@ standard_filter := standard_mapping(search_criteria[1..2]='1,');
 	
 	//output(p_Ent_NoIDs_4);
 	
-	p_Entity_4 := output(p_Ent_NoIDs_4,,'~thor_data200::base::worldcheck_bridger::region_4_entity::'+filedate+'.xml', XML('', 
+	p_Entity_4 := output(p_Ent_NoIDs_4,,'~thor_data200::base::worldcheck_bridger::region_4_entity::'+filedate+'.xml', XML('MYROW', 
 							HEADING('<Entity_List Count="'+entity_count_4+'">'
 							,'</Entity_List></Watchlist>'), TRIM, OPT), overwrite);
 
@@ -657,7 +669,7 @@ standard_filter := standard_mapping(search_criteria[1..2]='1,');
 	
 	//output(p_Ent_NoIDs_5);
 	
-	p_Entity_5 := output(p_Ent_NoIDs_5,,'~thor_data200::base::worldcheck_bridger::region_5_entity::'+filedate+'.xml', XML('', 
+	p_Entity_5 := output(p_Ent_NoIDs_5,,'~thor_data200::base::worldcheck_bridger::region_5_entity::'+filedate+'.xml', XML('MYROW', 
 							HEADING('<Entity_List Count="'+entity_count_5+'">'
 							,'</Entity_List></Watchlist>'), TRIM, OPT), overwrite);
 
@@ -705,7 +717,7 @@ standard_filter := standard_mapping(search_criteria[1..2]='1,');
 	p_Ent_NoIDs_6 := project(p_Ent6, removeIDs6(left));
 	//output(p_Ent_NoIDs_6);
 	
-	p_Entity_6 := output(p_Ent_NoIDs_6,,'~thor_data200::base::worldcheck_bridger::region_6_entity::'+filedate+'.xml', XML('', 
+	p_Entity_6 := output(p_Ent_NoIDs_6,,'~thor_data200::base::worldcheck_bridger::region_6_entity::'+filedate+'.xml', XML('MYROW', 
 							HEADING('<Entity_List Count="'+entity_count_6+'">'
 							,'</Entity_List></Watchlist>'), TRIM, OPT), overwrite);
 						
@@ -754,7 +766,7 @@ standard_filter := standard_mapping(search_criteria[1..2]='1,');
 	
 	//output(p_Ent_NoIDs_7);
 	
-	p_Entity_7 := output(p_Ent_NoIDs_7,,'~thor_data200::base::worldcheck_bridger::region_7_entity::'+filedate+'.xml', XML('', 
+	p_Entity_7 := output(p_Ent_NoIDs_7,,'~thor_data200::base::worldcheck_bridger::region_7_entity::'+filedate+'.xml', XML('MYROW', 
 							HEADING('<Entity_List Count="'+entity_count_7+'">'
 							,'</Entity_List></Watchlist>'), TRIM, OPT), overwrite);
 							
@@ -799,30 +811,46 @@ standard_filter := standard_mapping(search_criteria[1..2]='1,');
 		self := l;
 	end;
 	
-	p_Ent_NoIDs_8 := project(p_Ent8, removeIDs8(left));
-	
+	//p_Ent_NoIDs_8 := project(p_Ent8, removeIDs8(left));
+		p_Entry_1 := PROJECT(dedup_ent1, Layout_XG);
+		p_Entry_2 := PROJECT(dedup_ent2, Layout_XG);
+		p_Entry_3 := PROJECT(dedup_ent3, Layout_XG);
+		p_Entry_4 := PROJECT(dedup_ent4, Layout_XG);
+		p_Entry_5 := PROJECT(dedup_ent5, Layout_XG);
+		p_Entry_6 := PROJECT(dedup_ent6, Layout_XG);
+		p_Entry_7 := PROJECT(dedup_ent7, Layout_XG);
+		p_Entry_8 := PROJECT(dedup_ent8, Layout_XG);
+
 	//output(p_Ent_NoIDs_8);
 	
-	p_Entity_8 := output(p_Ent_NoIDs_8,,'~thor_data200::base::worldcheck_bridger::region_8_entity::'+filedate+'.xml', XML('', 
-							HEADING('<Entity_List Count="'+entity_count_8+'">'
-							,'</Entity_List></Watchlist>'), TRIM, OPT), overwrite);
-	
-return /*sequential(output(dedup_ent1),
-							output(dedup_ent2),
-							output(dedup_ent3),
-							output(dedup_ent4),
-							output(dedup_ent5),
-							output(dedup_ent6),
-							output(dedup_ent7),
-							output(dedup_ent8));*/
+//	p_Entity_8 := output(p_Ent_NoIDs_8,,'~thor_data200::base::worldcheck_bridger::region_8_entity::'+filedate+'.xml', XML('MYROW', 
+//							HEADING('<Entity_List Count="'+entity_count_8+'">'
+//							,'</Entity_List></Watchlist>'), TRIM, OPT), overwrite);
+	p_Region_1 := WriteXGFormat(p_Entry_1, StandardOptions(speciallistid=U'9'), 
+										'~thor_data200::base::worldcheck_bridger::region_1_entity::'+filedate+'.xml', filedate);
+	p_Region_2 := WriteXGFormat(p_Entry_2, StandardOptions(speciallistid=U'10'), 
+										'~thor_data200::base::worldcheck_bridger::region_2_entity::'+filedate+'.xml', filedate);
+	p_Region_3 := WriteXGFormat(p_Entry_3, StandardOptions(speciallistid=U'11'), 
+										'~thor_data200::base::worldcheck_bridger::region_3_entity::'+filedate+'.xml', filedate);
+	p_Region_4 := WriteXGFormat(p_Entry_4, StandardOptions(speciallistid=U'12'), 
+										'~thor_data200::base::worldcheck_bridger::region_4_entity::'+filedate+'.xml', filedate);
+	p_Region_5 := WriteXGFormat(p_Entry_5, StandardOptions(speciallistid=U'13'), 
+										'~thor_data200::base::worldcheck_bridger::region_5_entity::'+filedate+'.xml', filedate);
+	p_Region_6 := WriteXGFormat(p_Entry_6, StandardOptions(speciallistid=U'14'), 
+										'~thor_data200::base::worldcheck_bridger::region_6_entity::'+filedate+'.xml', filedate);
+	p_Region_7 := WriteXGFormat(p_Entry_7, StandardOptions(speciallistid=U'15'), 
+										'~thor_data200::base::worldcheck_bridger::region_7_entity::'+filedate+'.xml', filedate);
+	p_Region_8 := WriteXGFormat(p_Entry_8, StandardOptions(speciallistid=U'16'), 
+										'~thor_data200::base::worldcheck_bridger::region_8_entity::'+filedate+'.xml', filedate);
 
-	sequential(p_Entity_1,
-							p_Entity_2,
-							p_Entity_3,
-							p_Entity_4,
-							p_Entity_5,
-							p_Entity_6,
-							p_Entity_7,
-							p_Entity_8);	
+	return 
+				parallel(p_Region_1,
+							p_Region_2,
+							p_Region_3,
+							p_Region_4,
+							p_Region_5,
+							p_Region_6,
+							p_Region_7,
+							p_Region_8);	
 
 end;

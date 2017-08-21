@@ -2,14 +2,11 @@
 // Attribute 	: MA_DID
 
 // DEPENDENT ON : liensV2.Mapping_MA_party,
-//				  liensv2.Layout_Liens_party_bid,
-//				  did_Add.MAC_Match_Flex,
+//				  did_Add.Mac_Match_Flex_V2,
 //				  Business_Header_SS.MAC_Add_BDID_FLEX,
-//				  liensv2.Layout_Liens_party_SSN_bid,
 //				  did_add.MAC_Add_SSN_By_DID,
-//					TopBusiness_External
 
-// PURPOSE	 	: BIDDID, BDID and append_ssn daily Hogan file 
+// PURPOSE	 	: DID, BDID and append_ssn daily Hogan file 
 //			      and add to the distributed full file to create
 //				  a new persist file.
 ////////////////////////////////////////////////////////////////////////
@@ -24,7 +21,7 @@ PreDID_Rec
   
     string1 ADDDELFLAG := '';
 	qstring34   vendor_id := '';
-	liensv2.Layout_Liens_party_bid;
+	liensv2.Layout_Liens_party_BIPV2;
 	integer8	temp_DID		    := 0;
 	integer8	temp_BDID    	    := 0;
 	
@@ -50,19 +47,53 @@ header_slimsort.Layout_Source;
 PreDID_Rec;
 end;
 
+src_rec_BDID := record
+string2 source;
+PreDID_Rec;
+end;
+
 DID_ADD.Mac_Set_Source_Code(preDID, src_rec, MDR.sourceTools.src_Liens_v2, PreDID_src)
 
 //append DID
 matchset :=['A', 'Z', 'S', 'P'];
 
-did_Add.MAC_Match_Flex(PreDID_src, matchset,
-	 ssn, '', fname, mname,lname, name_suffix, 
-	 prim_range, prim_name, sec_range, zip, st,phone,
-	 temp_did,   			
-	 src_rec, 
-	 false, did_score_field,	//these should default to zero in definition
-	 75,	  //dids with a score below here will be dropped 	
-	 postDID_src, true, src)
+did_Add.Mac_Match_Flex_V2(
+	PreDID_src,				//	infile
+	matchset,					//	matchset
+	ssn,							//	ssn_field
+	'',								//	dob_field
+	fname,						//	fname_field
+	mname,						//	mname_field
+	lname,						//	lname_field
+	name_suffix,			//	suffix_field
+	prim_range,				//	prange_field
+	prim_name,				//	pname_field
+	sec_range,				//	srange_field
+	zip,							//	zip_field
+	st,								//	state_field
+	phone,						//	phone_field
+	temp_did,					//	DID_field
+	src_rec,					//	outrec
+	FALSE,						//	bool_outrec_has_score
+	did_score_field,	//	DID_Score_field
+	75,								//	low_score_threshold
+	postDID_src,			//	outfile
+	TRUE,							//	bool_infile_has_name_source
+	src,							//	src_field
+	,									//	bool_outrec_has_indiv_scores
+	,									//	score_n_field
+	,									//	bool_clean_addr
+	,									//	predir_field
+	,									//	addr_suffix_field
+	,									//	postdir_field
+	,									//	udesig_field
+	,									//	city_field
+	,									//	zip4_field
+	TRUE,							//	bool_switch_priority
+	,									//	weight_threshold
+	,									//	distance
+	FALSE							//	segmentation
+);
 
 //remove src
 postDID := project(postDID_src, transform(PreDID_Rec, self := left));
@@ -81,29 +112,44 @@ business_header.MAC_Source_Match(preBDID,dPostSourceMatch,
 								 
 dPostSourceMatchPersist	:=	dPostSourceMatch : persist('~thor_data400::persist::MA_PostSourceMatch');
 
-dWithSourceMatch		:=	dPostSourceMatchPersist(temp_BDID != 0);
-dWithNoSourceMatch		:=	dPostSourceMatchPersist(temp_BDID = 0);
+preBDID_src	:=	project(dPostSourceMatch, transform(src_rec_BDID, self.source	:=	MDR.sourceTools.src_Liens_v2; self := left;));
 
 myset := ['A', 'N', 'F', 'P'];
 
-Business_Header_SS.MAC_Add_BDID_FLEX(dWithNoSourceMatch,myset,
+Business_Header_SS.MAC_Add_BDID_FLEX(preBDID_src,myset,
 						cname,
-                        prim_range,prim_name,zip,sec_range,
+            prim_range,prim_name,zip,sec_range,
 						st,
 						phone,tax_id,
 						temp_bdid,
-						PreDID_Rec,
+						src_rec_BDID,
 						false, BDID_Score_field,  //these should default to zero in definition
-						postbdid);
-
+						postbdid_src
+						,													// default threshold
+						,													// use prod version of superfiles
+						,													// default is to hit prod from dataland, and on prod hit prod.
+						,BIPV2.xlink_version_set 	// Create BIP Keys only
+						,   											// Url
+						,													// Email
+						,p_City_name							// City
+						,fname										// fname
+						,mname										// mname
+						,lname										// lname
+						,													// Contact_SSN
+						,source										// Source Â– MDR.sourceTools
+						,persistent_record_id			//Source_Record_Id
+						,true											//Src_Matching_is_priorty
+						);
 						
-post_DID_BDID := postbdid +  postDID + dWithSourceMatch;//reformat DID and BDID
+postBDID 		:= 	project(postBDID_src, transform(PreDID_Rec, self := left));
+						
+post_DID_BDID := postbdid +  postDID;//reformat DID and BDID
 
 //inlude flag
 
 temp_rec := record
 string1 ADDDELFLAG := '';
-liensv2.Layout_Liens_party_bid;
+liensv2.Layout_Liens_party_BIPV2;
 end;
 
 temp_rec tBdid(post_DID_BDID L)
@@ -122,7 +168,7 @@ proj_tbdid := project(post_DID_BDID, tbdid(left));
 
 rec_temp := record
     string1 ADDDELFLAG := '';
-	liensv2.Layout_Liens_party_SSN_bid;
+	liensv2.Layout_Liens_party_SSN_BIPV2_with_LinkFlags;
 	integer8  temp_DID;
 	integer8  temp_bdid;
 end;
@@ -145,7 +191,7 @@ did_add.MAC_Add_SSN_By_DID(file_party_SSN_temp, temp_did, app_ssn, file_party_ss
 
 Business_Header_SS.MAC_Add_FEIN_By_BDID(file_party_ssn, temp_bdid, app_tax_id, file_party_fein)
 
-liensv2.Layout_Liens_party_SSN_bid tremovetempDID(rec_temp L) := transform  
+liensv2.Layout_Liens_party_SSN_BIPV2_with_LinkFlags tremovetempDID(rec_temp L) := transform  
 self := L;
 end;
 
@@ -155,31 +201,11 @@ MA_party_update := distribute(project(file_party_ssn,tremovetempDID(left)),hash(
 
 daily_plus_full := MA_party_update ;
 
-//** BID Macro call
-TopBusiness_External.MAC_External_BID(
-	 daily_plus_full											// The input file to have BIDs appended
-	,postBID												// The output file to write to
-	,bid						// The field into which the BID should be populated
-	,bid_score				// The field into which the BID score should be populated
-	, MDR.sourceTools.src_Liens_v2						// The field in which the source value is populated
-	,trim(tmsid,left,right)			// The field in which the source_docid value is populated
-	,name_type[1] + intformat(hash32(cname,orig_address1,orig_address2,orig_city,orig_state,orig_zip5) % 1000000000,9,1)			// The field in which the source_party value is populated
-	,cname			// The field in which the company_name value is populated
-	,zip					// The field in which the ZIP value is populated
-	,prim_name			// The field in which the prim_name value is populated
-	,prim_range				// The field in which the prim_range value is populated
-	,tax_id						// The field in which the FEIN value is populated
-	,phone						// The field in which the phone value is populated
-	,false		// Do we want to return a BID score at all?
-) ;
-
-// Sort and Dedup locally
-
-full_sort := sort(postBID,record,except Date_First_Seen, Date_Last_Seen,
+full_sort := sort(daily_plus_full,record,except Date_First_Seen, Date_Last_Seen,
 			   Date_Vendor_First_Reported, Date_Vendor_Last_Reported,name_type,local);
 
 /*cng change fix bad ssn rollups*/
-liensv2.Layout_Liens_party_SSN_bid rollup_records(liensv2.Layout_Liens_party_SSN_bid L, liensv2.Layout_Liens_party_SSN_bid R) := transform
+liensv2.Layout_Liens_party_SSN_BIPV2_with_LinkFlags rollup_records(liensv2.Layout_Liens_party_SSN_BIPV2_with_LinkFlags L, liensv2.Layout_Liens_party_SSN_BIPV2_with_LinkFlags R) := transform
 		self.ssn := if(r.ssn = '', l.ssn, if(l.ssn > r.ssn and stringlib.stringfind(l.ssn[6..9], r.ssn[6..9], 1) > 0, l.ssn, r.ssn));
 		self.did := if(r.ssn = '', l.did, if(l.ssn > r.ssn and stringlib.stringfind(l.ssn[6..9], r.ssn[6..9], 1) > 0, l.did, r.did));
 		self.bdid := if(r.ssn = '', l.bdid, if(l.ssn > r.ssn and stringlib.stringfind(l.ssn[6..9], r.ssn[6..9], 1) > 0, l.bdid, r.bdid));

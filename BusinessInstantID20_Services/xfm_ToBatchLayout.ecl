@@ -1,4 +1,4 @@
-﻿
+
 IMPORT Business_Risk_BIP;
 
 // --------------------[ Transform to Batch layout ]--------------------

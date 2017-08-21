@@ -61,14 +61,18 @@ EXPORT SearchService := MACRO
   #stored ('CompanyName', search_by.CompanyName);
   #stored ('DID',search_by.UniqueId)
   input_params := AutoStandardI.GlobalModule();
+			
 	tempmod := module(project(input_params,DEA_Services.Records.params,opt))  
-		EXPORT string9 dea_registration_number := '' : stored ('RegistrationNumber');
-		EXPORT STRING32 ApplicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
-  end;
+			EXPORT string9 dea_registration_number := '' : stored ('RegistrationNumber');
+			EXPORT STRING32 ApplicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params, AutoStandardI.InterfaceTranslator.application_type_val.params));
+			EXPORT STRING6 SSNMASK 			:= 'NONE' : stored('SSNMask');
+ end;
+  
+ 	tmp := DEA_Services.Records.val(tempmod);
 
-  tmp := DEA_Services.Records.val(tempmod);
-  iesp.ECL2ESP.Marshall.MAC_Marshall_Results (tmp, results, iesp.controlledsubstance.t_DEASearchResponse);
-  output (results, named('Results'));
+	 iesp.ECL2ESP.Marshall.MAC_Marshall_Results (tmp, results, iesp.controlledsubstance.t_DEASearchResponse);
+	
+  output(results, named('Results'));
 ENDMACRO;
 // SearchService ();
 

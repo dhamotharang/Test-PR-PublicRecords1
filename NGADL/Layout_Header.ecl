@@ -1,2 +1,4 @@
 import header;
-export Layout_Header := header.Layout_Header;
+export Layout_Header := record(header.Layout_Header)
+	string1 gender := '';
+end;

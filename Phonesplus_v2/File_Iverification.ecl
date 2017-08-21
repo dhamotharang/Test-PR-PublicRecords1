@@ -6,13 +6,13 @@ unsigned6 did; //DID derived from original DID or from spouse or household relat
 string10 phone;
 unsigned6 orig_did; //Did from original record in Gong or Phonesplus
 unsigned6 hhid;
-unsigned1 file_source := 0; //1 – Gong, 2 - Phonesplus Above, 3 - Phonesplus Below
-unsigned6 rec_type := 0; //Bit map: 1 – Individual, 2 – Spouse, 3 - Household
+unsigned1 file_source := 0; //1 Â– Gong, 2 - Phonesplus Above, 3 - Phonesplus Below
+unsigned6 rec_type := 0; //Bit map: 1 Â– Individual, 2 Â– Spouse, 3 - Household
 unsigned6 dt_first_seen := 0;
 unsigned6 dt_last_seen := 0;
-unsigned6 iver_indicator:= 0; // Bit map: 1 – Did-Phone match current irec,
-															//          2 – Did-phone match historical irec 
-															//          3 – Hhid-Phone match current irec 
+unsigned6 iver_indicator:= 0; // Bit map: 1 Â– Did-Phone match current irec,
+															//          2 Â– Did-phone match historical irec 
+															//          3 Â– Hhid-Phone match current irec 
 															//          4 - Hhid-Phone match historical irec 
 unsigned6 iver_dt_first_seen := 0; //Date first seen in irecord: YYYYMMDD date when there is a match to irecord and 0 when there is no match
 unsigned6 iver_dt_last_seen := 0;  //Date last seen in irecord:

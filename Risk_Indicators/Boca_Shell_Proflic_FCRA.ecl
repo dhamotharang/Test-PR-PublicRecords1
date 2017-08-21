@@ -1,4 +1,4 @@
-﻿import prof_licenseV2, FCRA, riskwise, ut, RiskView;
+import prof_licenseV2, FCRA, riskwise, ut, RiskView;
 
 export Boca_Shell_Proflic_FCRA(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, 
 				boolean isPrescreen, boolean isDirectToConsumerPurpose = false, boolean onThor = false) := FUNCTION
@@ -241,7 +241,7 @@ with_category_v5_thor := join(rolled_licenses_pre, pull(LicenseType_Key),
 			
 with_category_v5 := if(onThor, with_category_v5_thor, with_category_v5_roxie);		
 
-rolled_licenses := if(bsversion >= 50, with_category_v5, rolled_licenses_pre);
+rolled_licenses := if(bsversion >= 4, with_category_v5, rolled_licenses_pre);
 
 PL_Plus_temp roll_licenses2(PL_Plus_temp le, PL_Plus_temp rt) := transform
 	self.proflic_count30 := le.proflic_count30+rt.proflic_count30;

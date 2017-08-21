@@ -53,8 +53,8 @@ export Proc_build_keys(string filedate) := function
 																					'~thor_data400::key::mxd_names::'+filedate+'::synonym_idx',
 																					mv_MXSynonymKey_to_built);  
 																				
-	RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::mxd_names::@version@::docket_num_idx',
-																				'~thor_data400::key::mxd_names::'+filedate+'::docket_num_idx',
+	RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::mxd_mxdocket::@version@::docket_num_idx',
+																				'~thor_data400::key::mxd_mxdocket::'+filedate+'::docket_num_idx',
 																					mv_MXDocketNumKey_to_built); 
 																				
 	// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

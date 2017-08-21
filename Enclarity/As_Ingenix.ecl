@@ -1,25 +1,25 @@
-IMPORT ingenix_natlprof,Healthcare_Provider_Services;
+IMPORT ingenix_natlprof,Healthcare_Provider_Services,NPPES;
 
 EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 
-		SHARED InSanc  := Enclarity.Files(,pUseProd).sanction_base.qa;
-		SHARED InSanTp := Enclarity.Files(,pUseProd).sanc_prov_type_base.qa;
-		SHARED InSanCd := Enclarity.Files(,pUseProd).sanc_codes_base.qa;
-		SHARED InIndi  := Enclarity.Files(,pUseProd).individual_base.qa;
-		SHARED InAsso  := Enclarity.Files(,pUseProd).associate_base.qa;
-		SHARED InFac   := Enclarity.Files(,pUseProd).facility_base.qa;
-		SHARED InLic   := Enclarity.Files(,pUseProd).license_base.qa;
-		SHARED InNpi   := Enclarity.Files(,pUseProd).npi_base.qa;
-		SHARED InDea   := Enclarity.Files(,pUseProd).dea_base.qa;
-		SHARED InDeaCd := Enclarity.Files(,pUseProd).dea_bacodes_base.qa;
-		SHARED InAddr  := Enclarity.Files(,pUseProd).address_base.qa;
-		SHARED InTxo   := Enclarity.Files(,pUseProd).taxonomy_base.qa;
-		SHARED InTxoCd := Enclarity.Files(,pUseProd).tax_codes_base.qa;
-		SHARED InMSch  := Enclarity.Files(,pUseProd).medschool_base.qa;
-		SHARED InSpec  := Enclarity.Files(,pUseProd).specialty_base.qa;
-		SHARED InProBd := Enclarity.Files(,pUseProd).prov_birthdate_base.qa;
-		SHARED InProSn := Enclarity.Files(,pUseProd).prov_ssn_base.qa;
-
+		SHARED InSanc  := Enclarity.Files(,pUseProd).sanction_base.qa(record_type='C');
+		SHARED InSanTp := Enclarity.Files(,pUseProd).sanc_prov_type_base.qa(record_type='C');
+		SHARED InSanCd := Enclarity.Files(,pUseProd).sanc_codes_base.qa(record_type='C');
+		SHARED InIndi  := Enclarity.Files(,pUseProd).individual_base.qa(record_type='C');
+		SHARED InAsso  := Enclarity.Files(,pUseProd).associate_base.qa(record_type='C');
+		SHARED InFac   := Enclarity.Files(,pUseProd).facility_base.qa(record_type='C');
+		SHARED InLic   := Enclarity.Files(,pUseProd).license_base.qa(record_type='C');
+		SHARED InNpi   := Enclarity.Files(,pUseProd).npi_base.qa(record_type='C');
+		SHARED InDea   := Enclarity.Files(,pUseProd).dea_base.qa(record_type='C');
+		SHARED InDeaCd := Enclarity.Files(,pUseProd).dea_bacodes_base;
+		SHARED InAddr  := Enclarity.Files(,pUseProd).address_base.qa(record_type='C');
+		SHARED InTxo   := Enclarity.Files(,pUseProd).taxonomy_base.qa(record_type='C');
+		SHARED InTxoCd := Enclarity.Files(,pUseProd).tax_codes_base.qa(record_type='C');
+		SHARED InMSch  := Enclarity.Files(,pUseProd).medschool_base.qa(record_type='C');
+		SHARED InSpec  := Enclarity.Files(,pUseProd).specialty_base.qa(record_type='C');
+		SHARED InProBd := Enclarity.Files(,pUseProd).prov_birthdate_base.qa(record_type='C');
+		SHARED InProSn := Enclarity.Files(,pUseProd).prov_ssn_base.qa(record_type='C');
+		SHARED NPPES_  := NPPES.File_NPPES_Base(length(trim(regexreplace('[^0-9]',npi,'')))=10,(unsigned)npi>0);
 		SHARED dsSancLookup_ := LookupTables.dsSancLookup;
 		SHARED decodeSancInfo(string code) := Function
 			checkCode := stringlib.StringToUpperCase(code);
@@ -33,8 +33,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 			return dsBoardInfo_(State=checkSt,ProviderType=checkTp)[1];
 		End;
 
-		SHARED
-			fn_scale_gk(string38 gk) := function
+		SHARED fn_scale_gk(string38 gk) := function
 				unsigned6 max_pid := 281474976710655;  //max unsigne6
 				new_gk
 					:=
@@ -50,7 +49,8 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 
 		OutLayout  := {string38 group_key
 									,string20 addr_key
-									,Ingenix_NatlProf.Sanctioned_providers_Bdid};
+									,Ingenix_NatlProf.layout_sanctions_bdid
+									};
 
 		OutLayout tr1(InSanc l) := transform
 			self.date_first_seen	:=	(string)l.dt_first_seen;
@@ -59,7 +59,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 			self.date_last_reported	:=	(string)l.dt_vendor_last_reported;
 			self.process_date	:=	(string)l.dt_vendor_last_reported;
 
-			self.SANC_ID:=(string)(string)l.pid;
+			self.SANC_ID:=(string)l.pid;
 
 			decodes:=decodeSancInfo(l.sanc1_code);
 
@@ -67,8 +67,9 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 			cleanCode := trim(l.sanc1_code,left,right);
 			lastCharacter := cleanCode[length(cleanCode)];
 			isReinstatement := if(lastCharacter='R',true,false);
-			self.SANC_SANCDTE := if(isReinstatement,'',l.sanc1_date);
-			self.SANC_REINDTE := if(isReinstatement,l.sanc1_date,'');
+			self.SANC_SANCDTE := l.clean_sanc1_date;
+			self.SANC_SANCDTE_form := l.clean_sanc1_date;
+			self.SANC_REINDTE := if((unsigned)l.clean_sanc1_rein_date>0,l.clean_sanc1_rein_date,l.LN_derived_rein_date);
 
 			self.SANC_SANCST	:=	l.sanc1_state	;
 			self.SANC_LICNBR	:=	if(length(stringlib.stringfilterout(trim(l.sanc1_lic_num,all),'0'))<>0,l.sanc1_lic_num,'')	;
@@ -90,11 +91,19 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 
 		prep2:=join(prep1,InSanTp
 							,left.SANC_PROVTYPE=right.prov_type_code
+							,transform({prep1,InSanTp.prov_type_code,InSanTp.prov_type_desc}
+									,self:=left
+									,self:=right
+									)
 							,left outer
 							,lookup);
 
 		prep3:=join(prep2,InSanCd
 							,left.sanc_brdtype=right.sanc_code  // note: overloaded sanc_brdtype for temp use above
+							,transform({prep2,InSanCd.sanc_code,InSanCd.sanc_desc}
+									,self:=left
+									,self:=right
+									)
 							,left outer
 							,lookup);
 
@@ -181,14 +190,37 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 			self.provco_address_clean_err_stat:=if(l.group_key=r.group_key,r.err_stat,l.provco_address_clean_err_stat);
 			self.source_rec_id:=if(l.group_key=r.group_key,r.source_rid,l.source_rec_id);
 
+			self.DotID			:= r.DotID;
+			self.DotScore	:= r.DotScore;
+			self.DotWeight	:= r.DotWeight;
+			self.EmpID			:= r.EmpID;
+			self.EmpScore	:= r.EmpScore;
+			self.EmpWeight	:= r.EmpWeight;
+			self.POWID			:= r.POWID;
+			self.POWScore	:= r.POWScore;
+			self.POWWeight	:= r.POWWeight;
+			self.ProxID		:= r.ProxID;
+			self.ProxScore	:= r.ProxScore;
+			self.ProxWeight:= r.ProxWeight;
+			self.SELEID		:= r.SELEID;
+			self.SELEScore	:= r.SELEScore;
+			self.SELEWeight:= r.SELEWeight;	
+			self.OrgID			:= r.OrgID;
+			self.OrgScore	:= r.OrgScore;
+			self.OrgWeight	:= r.OrgWeight;
+			self.UltID			:= r.UltID;
+			self.UltScore	:= r.UltScore;
+			self.UltWeight	:= r.UltWeight;	
+
 			self:=l;
 			self:=[];
 		end;
 
-		prep6:=join(prep5, dedup(sort(InIndi,group_key,-dt_vendor_last_reported),group_key)
+		prep6:=join(distribute(prep5,hash(group_key)), dedup(sort(distribute(InIndi,hash(group_key)),group_key,-dt_vendor_last_reported,local),group_key,local)
 							,left.group_key=right.group_key
 							,tr2(left,right)
 							,left outer
+							,local
 							);
 
 		OutLayout tr3(prep6 l, InAsso r) := transform
@@ -254,14 +286,37 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 			self.provco_address_clean_err_stat:=if(l.group_key=r.group_key,r.err_stat,l.provco_address_clean_err_stat);
 			self.source_rec_id:=if(l.group_key=r.group_key,r.source_rid,l.source_rec_id);
 
+			self.DotID			:= if(l.group_key=r.group_key,r.DotID,l.DotID);
+			self.DotScore	:= if(l.group_key=r.group_key,r.DotScore,l.DotScore);
+			self.DotWeight	:= if(l.group_key=r.group_key,r.DotWeight,l.DotWeight);
+			self.EmpID			:= if(l.group_key=r.group_key,r.EmpID,l.EmpID);
+			self.EmpScore	:= if(l.group_key=r.group_key,r.EmpScore,l.EmpScore);
+			self.EmpWeight	:= if(l.group_key=r.group_key,r.EmpWeight,l.EmpWeight);
+			self.POWID			:= if(l.group_key=r.group_key,r.POWID,l.POWID);
+			self.POWScore	:= if(l.group_key=r.group_key,r.POWScore,l.POWScore);
+			self.POWWeight	:= if(l.group_key=r.group_key,r.POWWeight,l.POWWeight);
+			self.ProxID		:= if(l.group_key=r.group_key,r.ProxID,l.ProxID);
+			self.ProxScore	:= if(l.group_key=r.group_key,r.ProxScore,l.ProxScore);
+			self.ProxWeight:= if(l.group_key=r.group_key,r.ProxWeight,l.ProxWeight);
+			self.SELEID		:= if(l.group_key=r.group_key,r.SELEID,l.SELEID);
+			self.SELEScore	:= if(l.group_key=r.group_key,r.SELEScore,l.SELEScore);
+			self.SELEWeight:= if(l.group_key=r.group_key,r.SELEWeight,l.SELEWeight);	
+			self.OrgID			:= if(l.group_key=r.group_key,r.OrgID,l.OrgID);
+			self.OrgScore	:= if(l.group_key=r.group_key,r.OrgScore,l.OrgScore);
+			self.OrgWeight	:= if(l.group_key=r.group_key,r.OrgWeight,l.OrgWeight);
+			self.UltID			:= if(l.group_key=r.group_key,r.UltID,l.UltID);
+			self.UltScore	:= if(l.group_key=r.group_key,r.UltScore,l.UltScore);
+			self.UltWeight	:= if(l.group_key=r.group_key,r.UltWeight,l.UltWeight);	
+
 			self:=l;
 			self:=[];
 		end;
 
-		prep7:=join(prep6, dedup(sort(InAsso,group_key,-dt_vendor_last_reported),group_key)
+		prep7:=join(distribute(prep6,hash(group_key)), dedup(sort(distribute(InAsso,hash(group_key)),group_key,-dt_vendor_last_reported,local),group_key,local)
 							,left.group_key=right.group_key
 							,tr3(left,right)
 							,left outer
+							,local
 							);
 
 		OutLayout tr4(InFac l) := transform
@@ -280,8 +335,9 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 			cleanCode := trim(l.sanc1_code,left,right);
 			lastCharacter := cleanCode[length(cleanCode)];
 			isReinstatement := if(lastCharacter='R',true,false);
-			self.SANC_SANCDTE := if(isReinstatement,'',l.sanc1_date);
-			self.SANC_REINDTE := if(isReinstatement,l.sanc1_date,'');
+			self.SANC_SANCDTE := if(isReinstatement,'',(string)l.clean_sanc1_date);
+			self.SANC_SANCDTE_form := if(isReinstatement,'',(string)l.clean_sanc1_date);
+			self.SANC_REINDTE := if(isReinstatement,(string)l.clean_sanc1_date,'');
 
 			self.SANC_SANCST	:=	l.lic_state	;
 			self.SANC_LICNBR	:=	if(length(stringlib.stringfilterout(trim(l.lic_num_in,all),'0'))<>0,l.lic_num_in,'')	;
@@ -331,11 +387,19 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 
 		prep9:=join(prep8,InSanTp
 							,left.SANC_PROVTYPE=right.prov_type_code
+							,transform({prep8,InSanTp.prov_type_code,InSanTp.prov_type_desc}
+									,self:=left
+									,self:=right
+									)
 							,left outer
 							,lookup);
 
 		prep10:=join(prep9,InSanCd
 							,left.sanc_brdtype=right.sanc_code  // note: overloaded sanc_brdtype for temp use above
+							,transform({prep9,InSanCd.sanc_code,InSanCd.sanc_desc}
+									,self:=left
+									,self:=right
+									)
 							,left outer
 							,lookup);
 
@@ -354,7 +418,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// update_BWR_Sanctions_Did_File
 		//////////////////////////////////////////////////////////
 
-		outlayout  := {Ingenix_NatlProf.update_BWR_Sanctions_Did_File};
+		outlayout  := {ingenix_natlprof.layout_sanctions_DID_RecID};
 
 		prep1 := project(Sanctions_All,outlayout);
 
@@ -364,7 +428,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// Sanctioned_providers_Bdid
 		//////////////////////////////////////////////////////////
 
-		outlayout  := {Ingenix_NatlProf.Sanctioned_providers_Bdid};
+		outlayout  := {Ingenix_NatlProf.layout_sanctions_bdid};
 
 		prep1 := project(Sanctions_All,outlayout);
 
@@ -375,7 +439,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		//////////////////////////////////////////////////////////
 
 		OutLayout  := {string38 group_key
-									,Ingenix_NatlProf.update_ProviderSanctions};
+									,Ingenix_NatlProf.Layout_in_ProviderSanctions.raw_Allsrc};
 
 		OutLayout tr1(Sanctions_all l) := transform
 			self.processdate:=l.process_date;
@@ -411,7 +475,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// update_ProviderSanctions
 		//////////////////////////////////////////////////////////
 
-		outlayout  := {Ingenix_NatlProf.update_ProviderSanctions};
+		outlayout  := {Ingenix_NatlProf.Layout_in_ProviderSanctions.raw_Allsrc};
 
 		prep1 := project(ProviderSanctions_all,outlayout);
 
@@ -423,7 +487,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 
 		OutLayout  := {string38 group_key
 									,string20 addr_key
-									,ingenix_natlprof.Provider_did
+									,ingenix_natlprof.Layout_provider_base_rid
 									,string10 p2
 									,string10 p3
 									,string10 f1
@@ -513,7 +577,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 
 		prep1:=project(InIndi,tr1(left));
 
-		prep2:=join(prep1,InAddr
+		prep2a:=join(prep1,InAddr
 							,left.group_key=right.group_key
 							and left.addr_key=right.addr_key
 							,transform(OutLayout
@@ -527,73 +591,8 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 									)
 							,left outer
 							);
-
-		// OutLayout tr2(InFac l) := transform
-			// self.did	:=	intformat(l.did,12,1)	;
-			// self.did_score	:=	(string)l.did_score;
-			// self.dt_first_seen	:=	(string)l.dt_first_seen;
-			// self.dt_last_seen	:=	(string)l.dt_last_seen;
-			// self.dt_vendor_first_reported	:=	(string)l.dt_vendor_first_reported;
-			// self.dt_vendor_last_reported	:=	(string)l.dt_vendor_last_reported;
-			// self.processdate	:=	(string)l.dt_vendor_last_reported;
-			// self.providerid	:=	(string)l.pid	;
-
-			// self.addressid	:=	l.Addr_key	;
-
-			// self.Address:=trim(stringlib.stringcleanspaces(
-																		// trim(l.prim_range)
-																// +' '+trim(l.predir)
-																// +' '+trim(l.prim_name)
-																// +' '+trim(l.addr_suffix)
-																// +' '+trim(l.postdir)
-																// ))
-																// ;
-			// self.Address2:=	trim(stringlib.stringcleanspaces(trim(l.unit_desig)
-																// +' '+trim(l.sec_range)
-																// ))
-																// ;
-
-			// self.city	:=	l.v_city_name	;
-			// self.state	:=	l.st	;
-			// self.county	:=	l.fips_county	;
-			// self.extzip	:=	l.zip4	;
-			// self.latitude	:=	l.geo_lat	;
-			// self.longitute	:=	l.geo_long	;
-			// self.birthdate	:=	l.clean_dob	;
-			// self.taxid	:=	l.clean_ssn	;
-
-			// self.prov_clean_prim_range	:=	l.prim_range	;
-			// self.prov_clean_predir	:=	l.predir	;
-			// self.prov_clean_prim_name	:=	l.prim_name	;
-			// self.prov_clean_addr_suffix	:=	l.addr_suffix	;
-			// self.prov_clean_postdir	:=	l.postdir	;
-			// self.prov_clean_unit_desig	:=	l.unit_desig	;
-			// self.prov_clean_sec_range	:=	l.sec_range	;
-			// self.prov_clean_p_city_name	:=	l.p_city_name	;
-			// self.prov_clean_v_city_name	:=	l.v_city_name	;
-			// self.prov_clean_st	:=	l.st	;
-			// self.prov_clean_zip	:=	l.zip	;
-			// self.prov_clean_zip4	:=	l.zip4	;
-			// self.prov_clean_cart	:=	l.cart	;
-			// self.prov_clean_cr_sort_sz	:=	l.cr_sort_sz	;
-			// self.prov_clean_lot	:=	l.lot	;
-			// self.prov_clean_lot_order	:=	l.lot_order	;
-			// self.prov_clean_dpbc	:=	l.dbpc	;
-			// self.prov_clean_chk_digit	:=	l.chk_digit	;
-			// self.prov_clean_record_type	:=	l.rec_type	;
-			// self.prov_clean_ace_fips_st	:=	l.fips_st	;
-			// self.prov_clean_fipscounty	:=	l.fips_county	;
-			// self.prov_clean_geo_lat	:=	l.geo_lat	;
-			// self.prov_clean_geo_long	:=	l.geo_long	;
-			// self.prov_clean_msa	:=	l.msa	;
-			// self.prov_clean_geo_match	:=	l.geo_match	;
-			// self.prov_clean_err_stat	:=	l.err_stat	;
-
-			// self:=l;
-			// self:=[];
-		// end;
-
-		// prep3:=project(InFac,tr2(left));
+		prep2	:= dedup(sort(distribute(prep2a, hash(group_key, addr_key, PhoneNumber, p2, p3, f1, f2, f3)), group_key, addr_key,
+								PhoneNumber, p2, p3, f1, f2, f3, local), record, local);
 
 		EXPORT Provider_all := prep2 : persist('~thor400_data::persist::Provider_all');
 
@@ -601,7 +600,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// Provider_did
 		//////////////////////////////////////////////////////////
 
-		outlayout  := {Ingenix_NatlProf.Provider_did};
+		outlayout  := {ingenix_natlprof.Layout_provider_base_rid};
 
 		prep1 := project(Provider_all,outlayout);
 
@@ -611,7 +610,13 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// License_all
 		//////////////////////////////////////////////////////////
 
-		OutLayout  := {string38 group_key,Ingenix_NatlProf.update_providerlicense};
+		OutLayout  := {string38 group_key
+									,Ingenix_Natlprof.Layout_in_ProviderLicense.raw_srctype
+									,string8  dt_first_seen
+									,string8  dt_last_seen
+									,string8  dt_vendor_first_reported
+									,string8  dt_vendor_last_reported
+									};
 
 		OutLayout tr1(InLic l) := transform
 			self.dt_first_seen	:=	(string)l.dt_first_seen;
@@ -653,7 +658,12 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// update_providerlicense
 		//////////////////////////////////////////////////////////
 
-		outlayout  := {Ingenix_NatlProf.update_providerlicense};
+		outlayout  := {Ingenix_Natlprof.Layout_in_ProviderLicense.raw_srctype
+									,string8  dt_first_seen
+									,string8  dt_last_seen
+									,string8  dt_vendor_first_reported
+									,string8  dt_vendor_last_reported
+									};
 
 		prep1 := project(License_all,outlayout);
 
@@ -663,7 +673,16 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// NPI_all
 		//////////////////////////////////////////////////////////
 
-		OutLayout  := {string38 group_key,Ingenix_NatlProf.update_NPI};
+		OutLayout  := {string38 group_key
+									,string1 npi_type
+									,Ingenix_Natlprof.Layout_in_ProviderNPI.raw_srctype
+									,string	TaxonomyCode
+									,string	PrimaryIndicator
+									,string8	dt_first_seen
+									,string8	dt_last_seen
+									,string8	dt_vendor_first_reported
+									,string8	dt_vendor_last_reported
+									};
 
 		OutLayout tr1(InNpi l) := transform
 			self.dt_first_seen	:=	(string)l.dt_first_seen;
@@ -673,10 +692,10 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 			self.processdate	:=	(string)l.dt_vendor_last_reported;
 			self.providerid	:=	(string)l.pid	;
 			self.npi	:=	l.npi_num	;
+			self.npi_type	:=	l.npi_type	;
 			self.taxonomycode	:=	l.taxonomy	;
 			self.PrimaryIndicator	:=	l.taxonomy_primary_ind	;
 			self.enumerationdate	:=	l.npi_enum_date	;
-			// self.NPITierTypeID	:=	Are you looking for Type1/Type 2 indicator?
 			self:=l;
 			self:=[];
 		end;
@@ -691,6 +710,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 			self.processdate	:=	(string)l.dt_vendor_last_reported;
 			self.providerid	:=	(string)l.pid	;
 			self.npi	:=	l.bill_npi;
+			self.npi_type	:=	'2'	;
 			self:=l;
 			self:=[];
 		end;
@@ -703,9 +723,16 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// update_NPI
 		//////////////////////////////////////////////////////////
 
-		outlayout  := {Ingenix_NatlProf.update_NPI};
+		outlayout  := {Ingenix_Natlprof.Layout_in_ProviderNPI.raw_srctype
+									,string	TaxonomyCode
+									,string	PrimaryIndicator
+									,string8	dt_first_seen
+									,string8	dt_last_seen
+									,string8	dt_vendor_first_reported
+									,string8	dt_vendor_last_reported
+									};
 
-		prep1 := project(NPI_all,outlayout);
+		prep1 := project(NPI_all(npi_type='1'),outlayout);
 
 		EXPORT update_NPI := prep1;
 
@@ -713,7 +740,13 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// DEA_all
 		//////////////////////////////////////////////////////////
 
-		OutLayout  := {string38 group_key,Ingenix_NatlProf.update_DEA};
+		OutLayout  := {string38 group_key
+									,Ingenix_Natlprof.Layout_in_ProviderDEA.raw_srctype
+									,string8  dt_first_seen
+									,string8  dt_last_seen
+									,string8  dt_vendor_first_reported
+									,string8  dt_vendor_last_reported
+									};
 
 		OutLayout tr1(InDea l) := transform
 			self.dt_first_seen	:=	(string)l.dt_first_seen;
@@ -753,7 +786,12 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// update_DEA
 		//////////////////////////////////////////////////////////
 
-		outlayout  := {Ingenix_NatlProf.update_DEA};
+		outlayout  := {Ingenix_Natlprof.Layout_in_ProviderDEA.raw_srctype
+									,string8  dt_first_seen
+									,string8  dt_last_seen
+									,string8  dt_vendor_first_reported
+									,string8  dt_vendor_last_reported
+									};
 
 		prep1 := project(DEA_all,outlayout);
 
@@ -763,7 +801,12 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// UPIN_all
 		//////////////////////////////////////////////////////////
 
-		OutLayout  := {string38 group_key,Ingenix_NatlProf.update_UPIN};
+		OutLayout  := {string38 group_key,Ingenix_Natlprof.Layout_in_ProviderUPIN.raw_srctype
+									,string8  dt_first_seen
+									,string8  dt_last_seen
+									,string8  dt_vendor_first_reported
+									,string8  dt_vendor_last_reported
+									};
 
 		OutLayout tr1(InIndi l) := transform
 			self.dt_first_seen	:=	(string)l.dt_first_seen;
@@ -786,7 +829,12 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// update_UPIN
 		//////////////////////////////////////////////////////////
 
-		outlayout  := {Ingenix_NatlProf.update_UPIN};
+		outlayout  := {Ingenix_Natlprof.Layout_in_ProviderUPIN.raw_srctype
+									,string8  dt_first_seen
+									,string8  dt_last_seen
+									,string8  dt_vendor_first_reported
+									,string8  dt_vendor_last_reported
+									};
 
 		prep1 := project(UPIN_all,outlayout);
 
@@ -796,7 +844,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// Group_all
 		//////////////////////////////////////////////////////////
 
-		OutLayout  := {string38 group_key,ingenix_natlprof.Group_BDID};
+		OutLayout  := {string38 group_key,ingenix_natlprof.Layout_Group_Base_BIP};
 
 		OutLayout tr1(InAsso l) := transform
 			self.dt_first_seen	:=	(string)l.dt_first_seen;
@@ -805,7 +853,6 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 			self.dt_vendor_last_reported	:=	(string)l.dt_vendor_last_reported;
 			self.processdate	:=	(string)l.dt_vendor_last_reported;
 			self.providerid	:=	(string)l.pid	;
-			// self.grouppracticeid	:=	fn_scale_gk(l.billing_group_key);
 			self.grouppracticeid	:=	fn_scale_gk(l.sloc_group_key);
 			self.GroupName	:=	l.Prepped_name	;
 			self.PhoneNumber	:=	l.clean_phone	;
@@ -840,7 +887,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// Group_BDID
 		//////////////////////////////////////////////////////////
 
-		outlayout  := {Ingenix_NatlProf.Group_BDID};
+		outlayout  := {Ingenix_NatlProf.Layout_Group_Base_BIP};
 
 		prep1 := project(Group_all,outlayout);
 
@@ -850,7 +897,21 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// Speciality_all
 		//////////////////////////////////////////////////////////
 
-		OutLayout  := {string38 group_key,ingenix_natlprof.File_in_Provider_Speciality_Joined};
+		OutLayout  := {string38 group_key
+									,string  FILETYP
+									,string  PROCESSDATE
+									,string	ProviderID
+									,string	SpecialityID
+									,string	SpecialtyCompanyCount
+									,string	SpecialtyTierTypeID
+									,string	SpecialityName
+									,string	SpecialityGroupID
+									,string	SpecialityGroupName
+									,string8  dt_first_seen
+									,string8  dt_last_seen
+									,string8  dt_vendor_first_reported
+									,string8  dt_vendor_last_reported
+									};
 
 		OutLayout tr1(InSpec l) := transform
 			self.dt_first_seen	:=	(string)l.dt_first_seen;
@@ -893,7 +954,20 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// File_in_Provider_Speciality_Joined
 		//////////////////////////////////////////////////////////
 
-		outlayout  := {Ingenix_NatlProf.File_in_Provider_Speciality_Joined};
+		outlayout  := {string  FILETYP
+									,string  PROCESSDATE
+									,string	ProviderID
+									,string	SpecialityID
+									,string	SpecialtyCompanyCount
+									,string	SpecialtyTierTypeID
+									,string	SpecialityName
+									,string	SpecialityGroupID
+									,string	SpecialityGroupName
+									,string8  dt_first_seen
+									,string8  dt_last_seen
+									,string8  dt_vendor_first_reported
+									,string8  dt_vendor_last_reported
+									};
 
 		prep1 := project(Speciality_all,outlayout);
 
@@ -903,7 +977,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// Hospital_all
 		//////////////////////////////////////////////////////////
 
-		OutLayout  := {string38 group_key,ingenix_natlprof.Hospital_BDID};
+		OutLayout  := {string38 group_key,ingenix_natlprof.Layout_Hospital_Base_BIP};
 
 		OutLayout tr1(InFac l) := transform
 			self.dt_first_seen	:=	(string)l.dt_first_seen;
@@ -938,7 +1012,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 			self:=[];
 		end;
 
-		prep1:=project(InFac,tr1(left));
+		prep1:=project(InFac(type1='HOSPITALS'),tr1(left));
 
 		EXPORT Hospital_all := prep1 : persist('~thor400_data::persist::Hospital_all');
 
@@ -946,17 +1020,17 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// Hospital_BDID
 		//////////////////////////////////////////////////////////
 
-		outlayout  := {Ingenix_NatlProf.Hospital_BDID};
+		outlayout  := {Ingenix_NatlProf.Layout_Hospital_Base_BIP};
 
 		prep1 := project(Hospital_all,outlayout);
 
-		EXPORT Hospital_BDID := prep1;
+		EXPORT Hospital_BDID := dedup(prep1,all);
 
 		//////////////////////////////////////////////////////////
 		// Medschool_all
 		//////////////////////////////////////////////////////////
 
-		OutLayout  := {string38 group_key,ingenix_natlprof.Medschool_BDID};
+		OutLayout  := {string38 group_key,ingenix_natlprof.Layout_Medschool_Base_BIP};
 
 		OutLayout tr1(InMSch l) := transform
 			self.dt_first_seen	:=	(string)l.dt_first_seen;
@@ -974,23 +1048,119 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 
 		prep1:=project(InMSch,tr1(left));
 
-		EXPORT Medschool_all := prep1 : persist('~thor400_data::persist::Medschool_all');
+		prep2:=join(dedup(prep1,all),InIndi
+							,left.group_key=right.group_key
+							,transform({prep1}
+								,self.bdid			:= if(left.group_key=right.group_key,intformat(right.bdid,12,1),left.bdid);
+								,self.bdid_score:= if(left.group_key=right.group_key,intformat(right.bdid_score,3,1),left.bdid_score);
+								,self.DotID			:= if(left.group_key=right.group_key,right.DotID,left.DotID);
+								,self.DotScore	:= if(left.group_key=right.group_key,right.DotScore,left.DotScore);
+								,self.DotWeight	:= if(left.group_key=right.group_key,right.DotWeight,left.DotWeight);
+								,self.EmpID			:= if(left.group_key=right.group_key,right.EmpID,left.EmpID);
+								,self.EmpScore	:= if(left.group_key=right.group_key,right.EmpScore,left.EmpScore);
+								,self.EmpWeight	:= if(left.group_key=right.group_key,right.EmpWeight,left.EmpWeight);
+								,self.POWID			:= if(left.group_key=right.group_key,right.POWID,left.POWID);
+								,self.POWScore	:= if(left.group_key=right.group_key,right.POWScore,left.POWScore);
+								,self.POWWeight	:= if(left.group_key=right.group_key,right.POWWeight,left.POWWeight);
+								,self.ProxID		:= if(left.group_key=right.group_key,right.ProxID,left.ProxID);
+								,self.ProxScore	:= if(left.group_key=right.group_key,right.ProxScore,left.ProxScore);
+								,self.ProxWeight:= if(left.group_key=right.group_key,right.ProxWeight,left.ProxWeight);
+								,self.SELEID		:= if(left.group_key=right.group_key,right.SELEID,left.SELEID);
+								,self.SELEScore	:= if(left.group_key=right.group_key,right.SELEScore,left.SELEScore);
+								,self.SELEWeight:= if(left.group_key=right.group_key,right.SELEWeight,left.SELEWeight);	
+								,self.OrgID			:= if(left.group_key=right.group_key,right.OrgID,left.OrgID);
+								,self.OrgScore	:= if(left.group_key=right.group_key,right.OrgScore,left.OrgScore);
+								,self.OrgWeight	:= if(left.group_key=right.group_key,right.OrgWeight,left.OrgWeight);
+								,self.UltID			:= if(left.group_key=right.group_key,right.UltID,left.UltID);
+								,self.UltScore	:= if(left.group_key=right.group_key,right.UltScore,left.UltScore);
+								,self.UltWeight	:= if(left.group_key=right.group_key,right.UltWeight,left.UltWeight);	
+								,self:=left
+								)
+							,left outer);
+
+		prep3:=join(dedup(prep2,all),InAsso
+							,left.group_key=right.group_key
+							,transform({prep1}
+								,self.bdid			:= if(left.group_key=right.group_key,intformat(right.bdid,12,1),left.bdid);
+								,self.bdid_score:= if(left.group_key=right.group_key,intformat(right.bdid_score,3,1),left.bdid_score);
+								,self.DotID			:= if(left.group_key=right.group_key,right.DotID,left.DotID);
+								,self.DotScore	:= if(left.group_key=right.group_key,right.DotScore,left.DotScore);
+								,self.DotWeight	:= if(left.group_key=right.group_key,right.DotWeight,left.DotWeight);
+								,self.EmpID			:= if(left.group_key=right.group_key,right.EmpID,left.EmpID);
+								,self.EmpScore	:= if(left.group_key=right.group_key,right.EmpScore,left.EmpScore);
+								,self.EmpWeight	:= if(left.group_key=right.group_key,right.EmpWeight,left.EmpWeight);
+								,self.POWID			:= if(left.group_key=right.group_key,right.POWID,left.POWID);
+								,self.POWScore	:= if(left.group_key=right.group_key,right.POWScore,left.POWScore);
+								,self.POWWeight	:= if(left.group_key=right.group_key,right.POWWeight,left.POWWeight);
+								,self.ProxID		:= if(left.group_key=right.group_key,right.ProxID,left.ProxID);
+								,self.ProxScore	:= if(left.group_key=right.group_key,right.ProxScore,left.ProxScore);
+								,self.ProxWeight:= if(left.group_key=right.group_key,right.ProxWeight,left.ProxWeight);
+								,self.SELEID		:= if(left.group_key=right.group_key,right.SELEID,left.SELEID);
+								,self.SELEScore	:= if(left.group_key=right.group_key,right.SELEScore,left.SELEScore);
+								,self.SELEWeight:= if(left.group_key=right.group_key,right.SELEWeight,left.SELEWeight);	
+								,self.OrgID			:= if(left.group_key=right.group_key,right.OrgID,left.OrgID);
+								,self.OrgScore	:= if(left.group_key=right.group_key,right.OrgScore,left.OrgScore);
+								,self.OrgWeight	:= if(left.group_key=right.group_key,right.OrgWeight,left.OrgWeight);
+								,self.UltID			:= if(left.group_key=right.group_key,right.UltID,left.UltID);
+								,self.UltScore	:= if(left.group_key=right.group_key,right.UltScore,left.UltScore);
+								,self.UltWeight	:= if(left.group_key=right.group_key,right.UltWeight,left.UltWeight);	
+								,self:=left
+								)
+							,left outer);
+
+		prep4:=join(dedup(prep3,all),InFac
+							,left.group_key=right.group_key
+							,transform({prep1}
+								,self.bdid			:= if(left.group_key=right.group_key,intformat(right.bdid,12,1),left.bdid);
+								,self.bdid_score:= if(left.group_key=right.group_key,intformat(right.bdid_score,3,1),left.bdid_score);
+								,self.DotID			:= if(left.group_key=right.group_key,right.DotID,left.DotID);
+								,self.DotScore	:= if(left.group_key=right.group_key,right.DotScore,left.DotScore);
+								,self.DotWeight	:= if(left.group_key=right.group_key,right.DotWeight,left.DotWeight);
+								,self.EmpID			:= if(left.group_key=right.group_key,right.EmpID,left.EmpID);
+								,self.EmpScore	:= if(left.group_key=right.group_key,right.EmpScore,left.EmpScore);
+								,self.EmpWeight	:= if(left.group_key=right.group_key,right.EmpWeight,left.EmpWeight);
+								,self.POWID			:= if(left.group_key=right.group_key,right.POWID,left.POWID);
+								,self.POWScore	:= if(left.group_key=right.group_key,right.POWScore,left.POWScore);
+								,self.POWWeight	:= if(left.group_key=right.group_key,right.POWWeight,left.POWWeight);
+								,self.ProxID		:= if(left.group_key=right.group_key,right.ProxID,left.ProxID);
+								,self.ProxScore	:= if(left.group_key=right.group_key,right.ProxScore,left.ProxScore);
+								,self.ProxWeight:= if(left.group_key=right.group_key,right.ProxWeight,left.ProxWeight);
+								,self.SELEID		:= if(left.group_key=right.group_key,right.SELEID,left.SELEID);
+								,self.SELEScore	:= if(left.group_key=right.group_key,right.SELEScore,left.SELEScore);
+								,self.SELEWeight:= if(left.group_key=right.group_key,right.SELEWeight,left.SELEWeight);	
+								,self.OrgID			:= if(left.group_key=right.group_key,right.OrgID,left.OrgID);
+								,self.OrgScore	:= if(left.group_key=right.group_key,right.OrgScore,left.OrgScore);
+								,self.OrgWeight	:= if(left.group_key=right.group_key,right.OrgWeight,left.OrgWeight);
+								,self.UltID			:= if(left.group_key=right.group_key,right.UltID,left.UltID);
+								,self.UltScore	:= if(left.group_key=right.group_key,right.UltScore,left.UltScore);
+								,self.UltWeight	:= if(left.group_key=right.group_key,right.UltWeight,left.UltWeight);	
+								,self:=left
+								)
+							,left outer);
+
+		EXPORT Medschool_all := dedup(prep4,all) : persist('~thor400_data::persist::Medschool_all');
 
 		//////////////////////////////////////////////////////////
 		// Medschool_BDID
 		//////////////////////////////////////////////////////////
 
-		outlayout  := {Ingenix_NatlProf.Medschool_BDID};
+		outlayout  := {Ingenix_NatlProf.Layout_Medschool_Base_BIP};
 
 		prep1 := project(Medschool_all,outlayout);
 
 		EXPORT Medschool_BDID := prep1;
 
 		//////////////////////////////////////////////////////////
-		// update_degree
+		// Degree_all
 		//////////////////////////////////////////////////////////
 
-		OutLayout  := {string38 group_key,Ingenix_NatlProf.update_degree};
+		OutLayout  := {string38 group_key
+									,Ingenix_Natlprof.Layout_in_ProviderDegree.raw_srctype
+									,string8  dt_first_seen
+									,string8  dt_last_seen
+									,string8  dt_vendor_first_reported
+									,string8  dt_vendor_last_reported
+									};
 
 		OutLayout tr1(InIndi l) := transform
 			self.dt_first_seen	:=	(string)l.dt_first_seen;
@@ -1005,15 +1175,30 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 			self:=[];
 		end;
 
-		prep1:=project(InIndi,tr1(left))(Degree<>'');
+		prep1:=project(InIndi,tr1(left))(Degree<>''): persist('~thor400_data::persist::Degree_all');
 
-		EXPORT update_degree := dedup(prep1,record,all);
+		EXPORT Degree_all := dedup(prep1,record,all);
+
+		//////////////////////////////////////////////////////////
+		// update_degree
+		//////////////////////////////////////////////////////////
+
+		OutLayout  := {Ingenix_Natlprof.Layout_in_ProviderDegree.raw_srctype
+									,string8  dt_first_seen
+									,string8  dt_last_seen
+									,string8  dt_vendor_first_reported
+									,string8  dt_vendor_last_reported
+									};
+
+		prep1 := project(Degree_all,OutLayout);
+
+		EXPORT update_degree := prep1;
 
 		//////////////////////////////////////////////////////////
 		// Residency_BDID
 		//////////////////////////////////////////////////////////
 
-		OutLayout  := {ingenix_natlprof.Residency_BDID};
+		OutLayout  := {ingenix_natlprof.Layout_Residency_Base_BIP};
 
 		prep1 := dataset([],OutLayout);
 
@@ -1023,7 +1208,12 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// update_language
 		//////////////////////////////////////////////////////////
 
-		OutLayout  := {Ingenix_NatlProf.update_language};
+		OutLayout  := {Ingenix_Natlprof.Layout_in_ProviderLanguage.raw_srctype
+									,string8  dt_first_seen
+									,string8  dt_last_seen
+									,string8  dt_vendor_first_reported
+									,string8  dt_vendor_last_reported
+									};
 
 		prep1 := dataset([],OutLayout);
 

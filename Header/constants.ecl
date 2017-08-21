@@ -78,4 +78,6 @@ export checkRNA := true; // there are additional glb and dppa restrictions for R
     export string CORE     := 'CORE';
   END;
 
+ EXPORT current_resident := 'CURR_RES';
+
 end;

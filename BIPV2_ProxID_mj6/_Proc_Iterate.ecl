@@ -29,7 +29,8 @@ functionmacro
 //  outputpossiblematches  := OUTPUT(BIPV2_ProxID_mj6.matches(InFile).PossibleMatches,,BIPV2_ProxID_mj6.filenames(combo).possiblematches.logical,OVERWRITE,COMPRESSED);
   FilesReadRegexFilter    := '^(?!.*?key.*)(?=.*?([[:digit:]]{5,}).*).*?(BIPV2_ProxID_mj6|dot).*$'    ;
   FilesWrittenRegexFilter := '^(?!.*?key.*)(?=.*?([[:digit:]]{5,}).*).*?(BIPV2_ProxID_mj6.*base).*$'  ;
-  outputwksummary := wk_ut.mac_createSALTSummaryReport(pversion,workunit,workunit,BIPV2_ProxID_mj6._filenames(combo).wkhistory.logical ,FilesReadRegexFilter,FilesWrittenRegexFilter,'Proxid',pOverwrite := true,pOutputEcl := false,pNumRecords := 1,pSALT28 := true);
+  // outputwksummary := wk_ut.mac_createSALTSummaryReport(pversion,workunit,workunit,BIPV2_ProxID_mj6._filenames(combo).wkhistory.logical ,FilesReadRegexFilter,FilesWrittenRegexFilter,'Proxid',pOverwrite := true,pOutputEcl := false,pNumRecords := 1,pSALT28 := true);
+	constructTraceFiles:=BIPV2_ProxID_mj6._ConstructTracebackFiles(lversion, siter).outKeyFiles;
   return sequential(
      if(pDotFilename != ''  ,BIPV2_ProxID_mj6._Promote(,'base',pOddFilename := pDotFilename).odd2built)
     ,output(choosen(BIPV2_ProxID_mj6.In_DOT_Base,100))
@@ -37,10 +38,12 @@ functionmacro
     ,piterate
     // ,DebugKeys
     ,BIPV2_ProxID_mj6._promote(combo,'^(?!.*?wkhistory.*).*$',pMove2DeleteSuper := true).new2built
+    ,BIPV2_ProxID_mj6._promote(,'base',pDelete := true,pIncludeBuiltDelete := true,pCleanupFilter := 'base').Cleanup //cleanup iterations as we go
     ,BIPV2_ProxID_mj6._Output_Review_Samples(pMatchThreshold)
-    ,outputwksummary
+    // ,outputwksummary
     ,BIPV2_ProxID_mj6._promote(combo,'wkhistory').new2qaMult
     ,BIPV2_ProxID_mj6._mac_Check_Samples(BIPV2_ProxID_mj6._files(combo).base.logical,'ProxMj6' + siter)
+		,constructTraceFiles
     ,BIPV2_Build.mod_email.SendSuccessEmail(msg := wk_ut.get_Errors(workunit),subProduct := wk_ut.get_jobname(workunit))
   );
 ENDmacro;

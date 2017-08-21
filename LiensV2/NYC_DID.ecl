@@ -1,22 +1,28 @@
-import LiensV2, did_add, ut, header_slimsort, didville, business_header,business_header_ss, address;
+////////////////////////////////////////////////////////////////////////
+// Attribute 	: NYC_DID
 
-file_in := liensV2.mapping_NYC;
+// DEPENDENT ON : liensV2.Mapping_NYC_party,
+//				  liensv2.Layout_Liens_party,
+//				  did_Add.Mac_Match_Flex_V2,
+//				  Business_Header_SS.MAC_Add_BDID_FLEX,
+//				  liensV2.Layout_liens_party_SSN_bid,
+//				  did_add.MAC_Add_SSN_By_DID,
+//					TopBusiness_External
 
-PreDID_Rec
- :=
-  record
-	liensV2.Layout_Liens_temp_base;
-	integer8	debtor_temp_DID		    := 0;
-	integer8	debtor_temp_BDID    	:= 0;
-	integer8	creditor_temp_DID		:= 0;
-	integer8	creditor_temp_BDID    	:= 0;
-	integer8	atty_temp_DID		    := 0;
-	integer8	atty_temp_BDID    	    := 0;
-	integer8	thd_temp_DID		    := 0;
-	integer8	thd_temp_BDID    	    := 0;
-	
-  end
- ;
+// PURPOSE	 	: BID,DID, BDID and append_ssn daily NYC file 
+//			      and add to the distributed full file to create
+//				  a new persist file.
+////////////////////////////////////////////////////////////////////////
+
+import LiensV2, did_add, ut, header_slimsort, didville, business_header,business_header_ss, address, watchdog,TopBusiness_External;
+
+file_in := liensV2.mapping_NYC_party;
+
+PreDID_Rec :=	record
+	LiensV2.layout_liens_party_BIPV2;
+	integer8	temp_DID	:= 0;
+	integer8	temp_BDID	:= 0;
+end;
 
 PreDID_Rec taddDID(file_in L)
  :=
@@ -26,143 +32,149 @@ PreDID_Rec taddDID(file_in L)
   end
  ;
 
-PreDID	:= project(file_in,taddDID(left));
+Prefile	:= project(file_in,taddDID(left));
+
+preDID  := prefile(cname  = '');
+preBDID := prefile(cname <> '');
 
 //append DID to Debtor
-matchset :=['A', 'z'];
+matchset :=['A', 'Z'];
 
-did_Add.MAC_Match_Flex(PreDID, matchset,
-	 '', '', clean_debtor_fname, clean_debtor_mname,clean_debtor_lname, clean_debtor_name_suffix, 
-	 clean_debtor_prim_range, clean_debtor_prim_name, clean_debtor_sec_range, clean_debtor_zip, clean_debtor_st,'',
-	 debtor_temp_did,   			
-	 PreDID_Rec, 
-	 false, did_score_field,	//these should default to zero in definition
-	 75,	  //dids with a score below here will be dropped 	
-	 postDID_debtor)
-
+did_Add.Mac_Match_Flex_V2(
+	PreDID,						//	infile
+	matchset,					//	matchset
+	'',								//	ssn_field
+	'',								//	dob_field
+	fname,						//	fname_field
+	mname,						//	mname_field
+	lname,						//	lname_field
+	name_suffix,			//	suffix_field
+	prim_range,				//	prange_field
+	prim_name,				//	pname_field
+	sec_range,				//	srange_field
+	zip,							//	zip_field
+	st,								//	state_field
+	'',								//	phone_field
+	temp_did,					//	DID_field
+	PreDID_Rec,				//	outrec
+	FALSE,						//	bool_outrec_has_score
+	did_score_field,	//	DID_Score_field
+	75,								//	low_score_threshold
+	postDID,					//	outfile
+	,									//	bool_infile_has_name_source
+	,									//	src_field
+	,									//	bool_outrec_has_indiv_scores
+	,									//	score_n_field
+	,									//	bool_clean_addr
+	,									//	predir_field
+	,									//	addr_suffix_field
+	,									//	postdir_field
+	,									//	udesig_field
+	,									//	city_field
+	,									//	zip4_field
+	TRUE,							//	bool_switch_priority
+	,									//	weight_threshold
+	,									//	distance
+	FALSE							//	segmentation
+);
+	 
 //append BDID to Debtor
 
-for_debtor_bdid := postDID_debtor(clean_debtor_cname != '');
+myset := ['A'];
 
-myset := ['A', 'N'];
-
-Business_Header_SS.MAC_Add_BDID_FLEX(for_debtor_bdid,myset,
-						clean_debtor_cname,
-                        clean_debtor_prim_range,clean_debtor_prim_name,clean_debtor_zip,clean_debtor_sec_range,
-						clean_debtor_st,
+Business_Header_SS.MAC_Add_BDID_FLEX_BIPAlpha(preBDID,myset,
+						cname,
+            prim_range,prim_name,zip,sec_range,
+						st,
 						'','',
-						debtor_temp_bdid,
+						temp_bdid,
 						PreDID_Rec,
 						false, BDID_Score_field,  //these should default to zero in definition
-						postbdid_debtor);
-						
-debtor_added_DID := postbdid_debtor +  postDID_debtor(clean_debtor_cname = '');
+						postbdid
+						,
+						,			// default to use prod version of superfiles
+						,			// default is to hit prod from dataland, and on prod hit prod.
+						,BIPV2.xlink_version_set
+						,
+						,
+						,
+						,fname
+						,mname
+						,lname		
+						);
 
-//append DID to Credtor
+				
+post_DID_BDID := postbdid +  postDID;
 
-
-did_Add.MAC_Match_Flex(debtor_added_DID, matchset,
-	 '', '', clean_creditor_fname, clean_creditor_mname,clean_creditor_lname, clean_creditor_name_suffix, 
-	 clean_creditor_prim_range, clean_creditor_prim_name, clean_creditor_sec_range, clean_creditor_zip, clean_creditor_st,'',
-	 creditor_temp_did,   			
-	 PreDID_Rec, 
-	 false, did_score_field,	//these should default to zero in definition
-	 75,	  //dids with a score below here will be dropped 	
-	 postDID_creditor)
-	 
-//append BDID to creditor
-
-for_creditor_bdid := postDID_creditor(clean_creditor_cname != '');
-
-
-Business_Header_SS.MAC_Add_BDID_FLEX(for_creditor_bdid,myset,
-						clean_creditor_cname,
-                        clean_creditor_prim_range,clean_creditor_prim_name,clean_creditor_zip,clean_creditor_sec_range,
-						clean_creditor_st,
-						'','',
-						creditor_temp_bdid,
-						PreDID_Rec,
-						false, BDID_Score_field,  //these should default to zero in definition
-						postbdid_creditor);
-						
-creditor_added_DID := postbdid_creditor +  postDID_creditor(clean_creditor_cname = '');
-
-//append DID to atty
-
-did_Add.MAC_Match_Flex(creditor_added_DID, matchset,
-	 '', '', clean_atty_fname, clean_atty_mname,clean_atty_lname, clean_atty_name_suffix, 
-	 clean_atty_prim_range, clean_atty_prim_name, clean_atty_sec_range, clean_atty_zip, clean_atty_st,'',
-	 atty_temp_did,   			
-	 PreDID_Rec, 
-	 false, did_score_field,	//these should default to zero in definition
-	 75,	  //dids with a score below here will be dropped 	
-	 postDID_atty)
-
-//append BDID to atty
-
-for_atty_bdid := postDID_atty(clean_atty_cname != '');
-
-
-Business_Header_SS.MAC_Add_BDID_FLEX(for_atty_bdid,myset,
-						clean_atty_cname,
-                        clean_atty_prim_range,clean_atty_prim_name,clean_atty_zip,clean_atty_sec_range,
-						clean_atty_st,
-						'','',
-						atty_temp_bdid,
-						PreDID_Rec,
-						false, BDID_Score_field,  //these should default to zero in definition
-						postbdid_atty);
-						
-atty_added_DID := postbdid_atty +  postDID_atty(clean_atty_cname = '');
-
-//append DID to thd
-
-
-did_Add.MAC_Match_Flex(atty_added_DID, matchset,
-	 '', '', clean_thd_fname, clean_thd_mname,clean_thd_lname, clean_thd_name_suffix, 
-	 clean_thd_prim_range, clean_thd_prim_name, clean_thd_sec_range, clean_thd_zip, clean_thd_st,'',
-	 thd_temp_did,   			
-	 PreDID_Rec, 
-	 false, did_score_field,	//these should default to zero in definition
-	 75,	  //dids with a score below here will be dropped 	
-	 postDID_thd)
-
-//append BDID to thd
-
-for_thd_bdid := postDID_thd(clean_thd_cname != '');
-
-
-Business_Header_SS.MAC_Add_BDID_FLEX(for_thd_bdid,myset,
-						clean_thd_cname,
-                        clean_thd_prim_range,clean_thd_prim_name,clean_thd_zip,clean_thd_sec_range,
-						clean_thd_st,
-						'','',
-						thd_temp_bdid,
-						PreDID_Rec,
-						false, BDID_Score_field,  //these should default to zero in definition
-						postbdid_thd);
-						
-post_DID_BDID := postbdid_thd +  postDID_thd(clean_thd_cname = '');
 
 //reformat DID and BDID
 
-liensV2.Layout_liens_DID tBdid(post_DID_BDID L)
+liensV2.Layout_liens_party_BIPV2 tBdid(post_DID_BDID L)
  :=
   transform
-    self.def_DID		:=	intformat(L.debtor_temp_DID,12,1);
-    self.def_BDID		:=	intformat(L.debtor_temp_BDID,12,1);
-    self.creditor_DID		:=	intformat(L.creditor_temp_DID,12,1);
-    self.creditor_BDID		:=	intformat(L.creditor_temp_BDID,12,1);
-    self.atty_DID		:=	intformat(L.atty_temp_DID,12,1);
-	self.atty_BDID		:=	intformat(L.atty_temp_BDID,12,1);
-	self.thd_DID		:=	intformat(L.thd_temp_DID,12,1);
-	self.thd_BDID		:=	intformat(L.thd_temp_BDID,12,1);
-	self.date_first_seen                :=      L.orig_filing_date;
-    self.date_last_seen                 :=      L.orig_filing_date;
-    self.date_vendor_first_reported     :=      L.process_date;
-    self.date_vendor_last_reported      :=      L.process_date;
+    self.DID		:=	intformat(L.temp_DID,12,1);
+    self.BDID		:=	intformat(L.temp_BDID,12,1);
 	self            := L;
 	
 	end;
+
+proj_tbdid := project(post_DID_BDID, tbdid(left));
+
+rec_temp := record
+	liensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags;
+	integer8  temp_DID;
+	integer8  temp_bdid;
+end;
+
+rec_temp tappendSSN(liensV2.Layout_liens_party_BIPV2 L) := transform
+
+self := L;
+self.temp_did := (unsigned6)L.did;
+self.temp_bdid := (unsigned6)L.bdid;
+end;
+
+file_party_SSN_temp := project(proj_tbdid,tappendSSN(left)); 
+
+//Append SSN 
+
+did_add.MAC_Add_SSN_By_DID(file_party_SSN_temp, temp_did, app_ssn, file_party_ssn, false);
+
+// Append Fein
+
+
+Business_Header_SS.MAC_Add_FEIN_By_BDID(file_party_ssn, temp_bdid, app_tax_id, file_party_fein)
+
+liensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags tremovetempDID(rec_temp L) := transform
+self := L;
+
+end;
+
+post_append_ssn := project(file_party_fein,tremovetempDID(left));
+
+post_append_ssn_dist := post_append_ssn; 
+
+Full_NYC_Party_nondist := dataset('~thor_data400::base::Liens::party::NYC',liensv2.Layout_liens_party_SSN_BIPV2_with_LinkFlags,thor);
+
+Full_NYC_Party := Full_NYC_Party_nondist;
+
+// Add Full File and Daily Party File (distributed)
+
+daily_plus_full := distribute((post_append_ssn_dist + Full_NYC_Party),hash(tmsid)); 
+
+// Sort and Dedup locally
+
+full_sort := sort(daily_plus_full,record,except Date_First_Seen, Date_Last_Seen,
+			   Date_Vendor_First_Reported, Date_Vendor_Last_Reported,name_type,local);
+
+liensv2.Layout_liens_party_SSN_BIPV2_with_LinkFlags rollup_records(liensv2.Layout_liens_party_SSN_BIPV2_with_LinkFlags L, Liensv2.Layout_liens_party_SSN_BIPV2_with_LinkFlags R) := transform
+		self.Date_First_Seen := if(l.Date_First_Seen > r.Date_First_Seen, r.Date_First_Seen, l.Date_First_Seen);
+		self.Date_Last_Seen  := if(l.Date_Last_Seen  < r.Date_Last_Seen,  r.Date_Last_Seen,  l.Date_Last_Seen);
+		self.Date_Vendor_First_Reported := if(l.Date_Vendor_First_Reported > r.Date_Vendor_First_Reported, r.Date_Vendor_First_Reported, l.Date_Vendor_First_Reported);
+		self.Date_Vendor_Last_Reported  := if(l.Date_Vendor_Last_Reported  < r.Date_Vendor_Last_Reported,  r.Date_Vendor_Last_Reported, l.Date_Vendor_Last_Reported);
+		self := l;
+end;
+
+full_dedup := rollup(full_sort,  rollup_records(left, right),record,except Date_First_Seen, Date_Last_Seen,
+			   Date_Vendor_First_Reported, Date_Vendor_Last_Reported,name_type, local);
 	
-export NYC_DID := project(post_DID_BDID, tbdid(left)): persist('~thor_data400::persist::Liens::NYC_DID');
+export NYC_DID := full_dedup : persist('~thor_data400::persist::Liens::NYC_DID');

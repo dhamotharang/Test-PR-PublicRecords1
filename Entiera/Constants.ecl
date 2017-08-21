@@ -6,7 +6,7 @@ export Constants
 		export	string		FileNameClusterPrefix			:=	'~thor_200::';
 		export	string		PreppedFileSuperFileName	:=	FileNameClusterPrefix	+	'in::entiera::email_addresses';
 		export	string		BaseFileSuperFileName			:=	FileNameClusterPrefix	+	'base::entiera::basefile';
-		export	string		SprayTargetCluster				:=	if(_Control.ThisEnvironment.Name = 'Dataland',	'thor200_144',	'thor_200');
+		export	string		SprayTargetCluster				:=	if(_Control.ThisEnvironment.Name = 'Dataland',	'thor200_144', 'thor400_44');
 
 		export	string		InFileCSVSeparator				:=	',';
 		export	string		InFileCSVTerminator				:=	'\r\n';

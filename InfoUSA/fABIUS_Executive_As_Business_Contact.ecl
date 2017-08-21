@@ -1,6 +1,6 @@
-IMPORT Business_Header, ut;
+IMPORT Business_Header, ut,mdr;
 
-export fABIUS_Executive_As_Business_Contact(dataset(Layout_abius_executive_data_In) pABIUS_Executive)
+export fABIUS_Executive_As_Business_Contact(dataset(InfoUSA.Layout_ABIUS_Company_Base_AID) pABIUS_Executive)
  :=
   function
 
@@ -54,11 +54,12 @@ export fABIUS_Executive_As_Business_Contact(dataset(Layout_abius_executive_data_
 
 	abius_executive_contacts := pABIUS_Executive(CONTACT_NAME <> '');
 
-	Business_Header.Layout_Business_Contact_Full Translate_abius_to_BCF(Layout_abius_executive_data_In l, integer CTR) := TRANSFORM
+	Business_Header.Layout_Business_Contact_Full_New Translate_abius_to_BCF(InfoUSA.Layout_ABIUS_Company_Base_AID l, integer CTR) := TRANSFORM
+	SELF.vl_id 		     := L.ABI_NUMBER;
 	SELF.vendor_id 		 := L.ABI_NUMBER + L.COMPANY_NAME;
 	SELF.dt_first_seen 		 := if(L.DATE_ADDED <> '', ((UNSIGNED4)L.DATE_ADDED) * 100, 0);
 	SELF.dt_last_seen		 := if(L.DATE_ADDED <> '', ((UNSIGNED4)L.DATE_ADDED) * 100, 0);
-	SELF.source			 := 'IA'; 
+	SELF.source			 := MDR.sourceTools.src_INFOUSA_ABIUS_USABIZ; 
 	SELF.record_type		 := 'C';
 	SELF.company_title		 := stringlib.stringtouppercase(mapProfessionalTitle(L.CONTACT_TITLE));
 	SELF.company_department 	 := '';
@@ -75,7 +76,7 @@ export fABIUS_Executive_As_Business_Contact(dataset(Layout_abius_executive_data_
 	SELF.postdir 			 := CHOOSE(CTR, L.postdir, 		L.postdir2, 		L.postdir, 		L.postdir2);
 	SELF.unit_desig 		 := CHOOSE(CTR, L.unit_desig, 	L.unit_desig2, 	L.unit_desig, 		L.unit_desig2);
 	SELF.sec_range 		 := CHOOSE(CTR, L.sec_range, 		L.sec_range2, 		L.sec_range, 		L.sec_range2);
-	SELF.city 			 := CHOOSE(CTR, L.p_city_name, 	L.p_city_name2, 	L.p_city_name, 	L.p_city_name2);
+	SELF.city 			 := CHOOSE(CTR, L.v_city_name, 	L.v_city_name2, 	L.v_city_name, 	L.v_city_name2);
 	SELF.state 			 := CHOOSE(CTR, L.st, 			L.st2, 			L.st, 			L.st2);
 	SELF.zip 				 := CHOOSE(CTR, (UNSIGNED3)L.z5, 	(UNSIGNED3)L.z52, 	(UNSIGNED3)L.z5, 	(UNSIGNED3)L.z52);
 	SELF.zip4 			 := CHOOSE(CTR, (UNSIGNED2)L.zip4, (UNSIGNED2)L.zip42, (UNSIGNED2)L.zip4, 	(UNSIGNED2)L.zip42);
@@ -95,12 +96,14 @@ export fABIUS_Executive_As_Business_Contact(dataset(Layout_abius_executive_data_
 	SELF.company_postdir 	 := CHOOSE(CTR, L.postdir, 		L.postdir2, 		L.postdir2, 		L.postdir);
 	SELF.company_unit_desig 	 := CHOOSE(CTR, L.unit_desig, 	L.unit_desig2, 	L.unit_desig2, 	L.unit_desig);
 	SELF.company_sec_range 	 := CHOOSE(CTR, L.sec_range, 		L.sec_range2, 		L.sec_range2, 		L.sec_range);
-	SELF.company_city 		 := CHOOSE(CTR, L.p_city_name, 	L.p_city_name2, 	L.p_city_name2, 	L.p_city_name);
+	SELF.company_city 		 := CHOOSE(CTR, L.v_city_name, 	L.v_city_name2, 	L.v_city_name2, 	L.v_city_name);
 	SELF.company_state 		 := CHOOSE(CTR, L.st, 			L.st2, 			L.st2, 			L.st);
 	SELF.company_zip 		 := CHOOSE(CTR, (UNSIGNED3)L.z5, 	(UNSIGNED3)L.z52, 	(UNSIGNED3)L.z52, 	(UNSIGNED3)L.z5);
 	SELF.company_zip4 		 := CHOOSE(CTR, (UNSIGNED2)L.zip4, (UNSIGNED2)L.zip42, (UNSIGNED2)L.zip42, (UNSIGNED2)L.zip4);
 	SELF.company_phone		 := (unsigned6)((unsigned8)L.PHONE);
 	SELF.company_fein 		 := 0;
+	self.rawaid							:= L.Append_RawAID;	
+	Self.company_rawaid 		:= l.Append_RawAID;		
 	end;
 
 	//--------------------------------------------
@@ -110,7 +113,7 @@ export fABIUS_Executive_As_Business_Contact(dataset(Layout_abius_executive_data_
 
 	from_abius_executive_norm_filtered	:=	from_abius_executive_norm((integer)name_score < 3, Business_Header.CheckPersonName(fname, mname, lname, name_suffix));
 	
-	return from_abius_executive_norm_filtered;
+	return dedup(from_abius_executive_norm_filtered(company_prim_name != '' and prim_name != ''), all);
 
   end
  ;

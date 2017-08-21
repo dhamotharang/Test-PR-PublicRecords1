@@ -1,7 +1,8 @@
-export Layout_MA_clean_in := record
-string2      state_origin;
-string8      process_date;
-watercraft.layout_MA;
+export Layout_MA_clean_in := record  //rec length: 1789
+
+  string2      state_origin;
+  string8      process_date;
+  watercraft.layout_MA;
   string100 concat_name;
   string70 pname1;
   string3  pname1_score;

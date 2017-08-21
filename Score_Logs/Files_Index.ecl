@@ -3,7 +3,7 @@ EXPORT Files_Index := module
 IMPORT DOXIE;
 #option('multiplePersistInstances',FALSE);
 
-Base := Score_Logs.Files_Base.File(stringlib.stringtouppercase(product) in Score_logs.set_product); 
+Base := Score_Logs.Files_Base.File(stringlib.stringtouppercase(product) in Score_logs.set_product or trim(customer_id,left,right) = '4'); 
 
 export File_TransactionID := JOIN(Base, Score_Logs.Files_Base.Transaction_IDs, LEFT.transaction_id = RIGHT.transaction_id, 
 												TRANSFORM({Score_Logs.Layouts.Base_Transaction_Key_Layout}, 
@@ -14,9 +14,10 @@ export File_TransactionID := JOIN(Base, Score_Logs.Files_Base.Transaction_IDs, L
 																	 SELF.inputxml := stringlib.stringcleanspaces(LEFT.inputxml);
 																	 SELF.outputxml := stringlib.stringcleanspaces(LEFT.outputxml);
 																	 SELF := LEFT), LEFT OUTER, LOCAL)
-											             ((StringLib.StringToUpperCase(product) <> 'RISKVIEWREPORT'  and length(inputxml) + length(outputxml) <= 32600) or
-																	  (StringLib.StringToUpperCase(product) =  'RISKVIEWREPORT'  and length(inputxml) + length(outputxml) <= 21884))
-																		: persist('~thor_data400::persist::acclogs_scoring'); // filter out records too long for index
+											           ((StringLib.StringToUpperCase(product) <> 'RISKVIEWREPORT'  and length(inputxml) + length(outputxml) <= 32600) or
+																	  (StringLib.StringToUpperCase(product) =  'RISKVIEWREPORT'  and length(inputxml) + length(outputxml) <= 21884)
+																	 or StringLib.StringToUpperCase(product) = 'SMALLBUSINESSBIPCOMBINEDREPORT')
+                                   : persist('~thor_data400::persist::acclogs_scoring'); // filter out records too long for index
 																												
 shared File_nonFCRA_Intermediate := JOIN(Score_Logs.Files_Base.Intermediate(product_code in ['1','2'] and source != 'F'), Score_Logs.Files_Base.Transaction_IDs, 
 												LEFT.transaction_id = RIGHT.transaction_id, 

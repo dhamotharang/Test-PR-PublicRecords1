@@ -39,6 +39,7 @@ string1	NODISCLOSURE;
 string8	DOB;
 string30	CONTACT;
 string30	ADDRESS2;
+string8		LAST_TRANSACTION_DATE;
 string2	lf;
 end;
 

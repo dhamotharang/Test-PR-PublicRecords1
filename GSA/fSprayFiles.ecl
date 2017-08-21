@@ -1,6 +1,7 @@
 import _control;
 export fSprayFiles(string sourcepath) := function
-groupname := 'thor400_92';
+ groupname := 'thor400_30';
+// groupname := 'thor400_92';
 // groupname := 'thor400_88';
 result :=
 sequential(        

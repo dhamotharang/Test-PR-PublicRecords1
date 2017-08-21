@@ -1,0 +1,1 @@
+EXPORT Layout_Profile_VehicleV2_Infutor_Motorcycle := recordof(In_VehicleV2_Infutor_Motorcycle);

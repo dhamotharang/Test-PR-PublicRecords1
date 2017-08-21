@@ -1,13 +1,24 @@
 import VersionControl;
-export Spray := DATASET([
- 	{'edata12-bld.br.seisint.com'										
- 	,'/hds_1/advo/' + version                      
- 	,'ELF_BASE_*.dat'                           
- 	,'302'                                                             
- 	,'~thor_data400::in::advo::@version@'    
- 	,[{'~thor_data400::in::advo'}]    
- 	,'thor400_84'
-                                
- 	}
+export Spray(
 
-], VersionControl.Layout_Sprays.Info);
+	//string pDirectory = '/data/hds_180/advo/spray'
+	string pDirectory = '/data/hds_180/advo/spray'
+
+) :=
+function
+
+	return
+	DATASET([
+		{'bctlpedata11.risk.regn.net'										
+		,pDirectory                      
+		,'VNEF_BASE_AID_*.dat'                           
+		,'302'                                                             
+		,Filenames().input.template    
+		,[{Filenames().input.sprayed	}]
+		,_dataset().groupname
+																	
+		}
+
+	], VersionControl.Layout_Sprays.Info);
+	
+end;

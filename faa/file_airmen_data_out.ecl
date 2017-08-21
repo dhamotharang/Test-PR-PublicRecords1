@@ -1,1 +1,2 @@
-export file_airmen_data_out := dataset('~thor_data400::base::faa_airmen_BUILT',faa.layout_airmen_data_out,flat);
+import data_services;
+export file_airmen_data_out := dataset(data_services.foreign_prod+'thor_data400::base::faa_airmen_BUILT',faa.layout_airmen_data_out,flat);

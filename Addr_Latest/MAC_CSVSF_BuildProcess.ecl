@@ -24,7 +24,7 @@ seq_name :=
 		sequential(
                     #if(%ft% = 'out' or %ft% = 'OUT')
 				output(thedataset,,basename + thorlib.WUID(),
-                           csv(heading('"cubs","name","addr line1","city","state","zip","cubs2","dob","bad address flag","ssn","drl","drl-state","prim range","predir","prim name","addr suffix","postdir","unit desig","sec range","city name","st","zip5","zip4","name match type","addr match type","dob match type","ssn match type","drl match type","rec match type","in last name","matched last name","in mid name","matched mid name","in first name","matched first name","in ssn","matched ssn","in birth date","matched birth date"'+'\n',''),
+                           csv(heading('"cubs","name","addr line1","city","state","zip","cubs2","dob","bad address flag","ssn","drl","drl-state","prim range","predir","prim name","addr suffix","postdir","unit desig","sec range","city name","st","zip5","zip4","name match type","addr match type","dob match type","ssn match type","drl match type","rec match type","in last name","matched last name","in mid name","matched mid name","in first name","matched first name","in ssn","matched ssn","in birth date","matched birth date"'+'\n',single),
                                        separator(','), terminator('\n'), quote('"')),overwrite),
                     #else 
                          #if(%ft% = 'stat' or %ft% = 'STAT')

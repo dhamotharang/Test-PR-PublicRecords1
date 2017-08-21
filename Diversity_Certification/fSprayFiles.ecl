@@ -6,8 +6,8 @@ import lib_fileservices,_control,lib_stringlib;
 
  spray_raw_data(string filedate)	:=	function
        
-		do_spray								:=	FileServices.SprayVariable(_control.IPAddress.edata12
-												   ,'/hds_180/SIM/Diversity_Certification/data/'+filedate+'/*.txt'
+		do_spray								:=	FileServices.SprayVariable(_control.IPAddress.bctlpedata11
+												   ,'/data/hds_180/SIM/Diversity_Certification/data/'+filedate+'/*.txt'
 												   ,_Dataset().max_record_size
 												   ,'|'
 												   ,'\\n,\\r\\n'     

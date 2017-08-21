@@ -1,9 +1,8 @@
-export layout_WI_clean_in := 
-record
+export layout_WI_clean_in := record
+//rec len: 1600
 string2       state_origin;
 string8       process_date;
-watercraft.layout_WI;
-  
+watercraft.layout_WI;  
   string70 CONTACT_pname1;
   string3  CONTACT_pname1_score;
   string70 CONTACT_cname1;
@@ -23,6 +22,6 @@ watercraft.layout_WI;
   string70 pname2;
   string3  pname2_score;
 
-string182 clean_address;
+  string182 clean_address;
 
 end;

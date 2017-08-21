@@ -73,7 +73,7 @@ function
 
   dSpace := tools.fun_CheckSpaceUsed(
      pversion
-    ,pOwner								:= 'lbentley'	  // regex to filter the file owner
+    ,pOwner								:= STD.System.Job.User()	  // regex to filter the file owner//'lbentley'
     ,pFilename						:= pFileRegex		// regex to filter the filenames
     ,pCluster							:= ''			      // regex to filter the cluster
     ,pModified						:= ''			      // regex to filter the modified time

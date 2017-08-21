@@ -1,3 +1,4 @@
 //process date.
 
-export version := '20080417';
+
+export version := fail(string,'Entiera.version attribute is now deprecated.  All functions now use parameter.');// '20090619';

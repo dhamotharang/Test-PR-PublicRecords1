@@ -14,11 +14,11 @@ export history := project(inquiry_acclogs.File_Inquiry_BaseSourced.history, inqu
 		findex 	:= stringlib.stringfind(sc, '::', 6)+2;
 		lindex 	:= stringlib.stringfind(sc, '_', 3)-1;
 
-  Vk := sc[findex..lindex];
+  Vk:=sc[findex..lindex];
 	
-	VP := did_add.get_EnvVariable('inquiry_build_version','http://roxiestaging.br.seisint.com:9876');
-  FileHistory := if(vk=vp,dataset('~thor_data400::out::inquiry_tracking::weekly_historical',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor),
+	VP:=did_add.get_EnvVariable('inquiry_build_version','http://roxiestaging.br.seisint.com:9876')[1..8];
+  FileHistory:=if(vk=vp,dataset('~thor_data400::out::inquiry_tracking::weekly_historical',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor),
                         dataset('~thor_data400::out::inquiry_tracking::weekly_historical_father',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor));
-export fileFull := FileHistory + inquiry_acclogs.File_Inquiry_BaseSourced.updates; 
+export fileFull:=FileHistory+inquiry_acclogs.File_Inquiry_BaseSourced.updates; 
 end; 
  

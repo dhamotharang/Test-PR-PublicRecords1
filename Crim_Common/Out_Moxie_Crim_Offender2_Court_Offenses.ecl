@@ -1,4 +1,4 @@
-import DID_Add, Header_Slimsort, ut, WatchDog, didville, Crim_Expunctions;
+import DID_Add, Header_Slimsort, ut, WatchDog, didville, Crim_Expunctions, lib_ziplib, Address, idl_header, hygenics_crim;
 ///////////////////////////////////////////////////////////////////////////////////
 //Create Offense file
 ///////////////////////////////////////////////////////////////////////////////////
@@ -27,11 +27,31 @@ Crim_Common.Layout_Moxie_Court_Offenses tCourtOffensesInToOut(Crim_Common.Layout
 dCourtOffensesOut := project(Crim_Common.File_In_Court_Offenses,tCourtOffensesInToOut(left));
 dArrestOffensesOut:= project(Crim_Common.File_In_Arrest_Offenses,tCourtOffensesInToOut(left));
 
-dCombinedOffensesOut
+dCombinedOffensesOut_orig
  := dCourtOffensesOut
  +	dArrestOffensesOut
  ;
 
+//Hygenics offense layout /////////////////////////////////////////////////////
+hygenics_crim.Layout_Common_Court_Offenses stOffLayout2(dCombinedOffensesOut_orig l):= transform
+	self.convict_dt			:= '';
+	self.offense_town		:= '';
+	self.cty_conv			:= '';
+	self.restitution		:= '';
+	self.community_service	:= '';
+	self.parole				:= '';
+	self.addl_sent_dates	:= '';
+	self.Probation_desc2	:= '';
+	self.court_dt			:= '';
+	self.court_county		:= '';
+	self 					:= l;
+end;
+	
+dCombinedOffensesOut			:= project(dCombinedOffensesOut_orig, stOffLayout2(left));	
+ 
+///////////////////////////////////////////////////////////////////////////
+ 
+ 
 ///////////////////////////////////////////////////////////////////////////////////
 //Create Offender File
 ///////////////////////////////////////////////////////////////////////////////////
@@ -114,6 +134,69 @@ dTXDOC_NewLayout := project(dTXDOC, tTXDOCNewLayout(left));
 //Concat Crim & DOC Offenders into New Layout 
 dConcatCrim_and_DOC_NewLayout := dCombined_DOC_and_CrimOffender2_New_Layout + dTXDOC_NewLayout;
 
+/////////////////////////////////////////////////////////////////////////
+//Reclean names that appear to have an issue from the current LFM cleaner
+/////////////////////////////////////////////////////////////////////////
+vendor_exception_list := ['05','09','11','12','14','15','27','34','31','44','46','54','56','57','59','61','64','66','69','73','76','77','78','79','80','81','82','87','89','90','94','97','1D','1F','1G','1H'];
+
+dNameHistoricalRecords     := dConcatCrim_and_DOC_NewLayout(vendor in vendor_exception_list);
+dNameUpdatingRecords       := dConcatCrim_and_DOC_NewLayout(vendor not in vendor_exception_list);
+
+dNameRecleanCandidates     := dNameUpdatingRecords(pty_nm_fmt = 'L' and regexfind('[A-Z]+[ ]+[A-Z]+', lname) = TRUE);
+dNameRecleanNonCandidatesA := dNameUpdatingRecords(pty_nm_fmt = 'L' and regexfind('[A-Z]+[ ]+[A-Z]+', lname) = FALSE);
+dNameRecleanNonCandidatesB := dNameUpdatingRecords(pty_nm_fmt != 'L');
+
+
+dNameRecleanCandidates80     := dNameRecleanCandidates(regexfind('80', cleaning_score) and regexfind('[A-Z]+[ ]+[A-Z]+[ ]+[A-Z]+', lname) = FALSE);
+dNameRecleanCandidatesNot80A := dNameRecleanCandidates(regexfind('80', cleaning_score) and regexfind('[A-Z]+[ ]+[A-Z]+[ ]+[A-Z]+', lname) = TRUE);
+dNameRecleanCandidatesNot80B := dNameRecleanCandidates(cleaning_score != '80' and cleaning_score != '080');
+
+dCombined_DOC_and_CrimOffender2_New_Layout tNewNames(dNameRecleanCandidates80 input) := Transform
+
+temp_input_pty_nm := regexreplace(',Jr\\.|,JR\\.| \\.JR | JR\\., | JR,\\. | JR\\. | JR, | JR | \\.SR | SR\\., | SR,\\. | SR\\. | SR, | SR | \\.III | III\\., | III,\\. | III\\. | III, | III | \\.IV | IV\\., | IV,\\. | IV\\. | IV, | IV | 2ND | 3RD ', input.pty_nm, ' ');
+
+PreName_Lname := if(regexfind(',', input.pty_nm) = TRUE,
+                    //if(stringlib.stringfindcount(input.pty_nm,',') >= 2, 
+										//temp_input_pty_nm[1..DataLib.StringFind(temp_input_pty_nm,',',2) - 1],
+                    temp_input_pty_nm[1..DataLib.StringFind(temp_input_pty_nm,',',1) - 1],
+                    if(regexfind('^MC |^DE |^ST |^LA |^VAN', temp_input_pty_nm) = TRUE, temp_input_pty_nm[1..DataLib.StringFind(temp_input_pty_nm,' ',2) - 1],
+										                                                                    temp_input_pty_nm[1..DataLib.StringFind(temp_input_pty_nm,' ',1) - 1]));
+
+PreName_FMname := if(regexfind(',', input.pty_nm) = TRUE, 
+                     //if(stringlib.stringfindcount(input.pty_nm,',') >= 2,
+                     //temp_input_pty_nm[DataLib.StringFind(temp_input_pty_nm,',',2)+1..35],
+										 temp_input_pty_nm[DataLib.StringFind(temp_input_pty_nm,',',1)+1..35],
+										 if(regexfind('^MC |^DE |^ST |^LA |^VAN', temp_input_pty_nm) = TRUE, temp_input_pty_nm[DataLib.StringFind(temp_input_pty_nm,' ',2)+1..35],
+										                                                                     temp_input_pty_nm[DataLib.StringFind(temp_input_pty_nm,' ',1)+1..35]));
+
+PreName_Suffix := if(regexfind(',Jr\\.|,JR\\.| \\.JR | JR\\., | JR,\\. | JR\\. | JR, | JR | \\.SR | SR\\., | SR,\\. | SR\\. | SR, | SR | \\.III | III\\., | III,\\. | III\\. | III, | III | \\.IV | IV\\., | IV,\\. | IV\\. | IV, | IV |2ND|3RD ', input.pty_nm) = TRUE,
+                     regexfind(',Jr\\.|,JR\\.| \\.JR | JR\\., | JR,\\. | JR\\. | JR, | JR | \\.SR | SR\\., | SR,\\. | SR\\. | SR, | SR | \\.III | III\\., | III,\\. | III\\. | III, | III | \\.IV | IV\\., | IV,\\. | IV\\. | IV, | IV |2ND|3RD ', input.pty_nm, 0), '');
+
+
+ReCleanedName	:= Address.CleanPersonFMl73(PreName_FMname + ' ' + PreName_Lname + ' ' + PreName_Suffix);						
+
+//self.case_name := trim(input.pty_nm, LEFT, RIGHT);
+//self.pty_nm   := trim(PreName_FMname, LEFT, RIGHT) + ' ' + trim(PreName_Lname, LEFT, RIGHT);						
+self.title 			:= ReCleanedName[1..5];
+self.fname 			:= ReCleanedName[6..25];
+self.mname 			:= ReCleanedName[26..45];
+self.lname 			:= ReCleanedName[46..65];
+self.name_suffix 	:= ReCleanedName[66..70];
+self.cleaning_score := ReCleanedName[71..73];
+self				:= input; 
+
+end;
+
+NewCleanNames := project(dNameRecleanCandidates80,tNewNames(left));
+
+dReCleanNamesAll := dNameHistoricalRecords + dNameRecleanNonCandidatesA + dNameRecleanNonCandidatesB + dNameRecleanCandidatesNot80A + dNameRecleanCandidatesNot80B + NewCleanNames;
+
+//output(choosen(NewCleanNames,200));
+
+/////////////////////////////////////////////////////////////////////////
+//END Name Reclean///////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+
 rCrimOffender2_WithDID
  :=
   record
@@ -122,17 +205,26 @@ rCrimOffender2_WithDID
 	unsigned6 	PreGLB_DID 	:= 0;
   end
  ;
+//add state origin to external linking
+add_orig_state_rec := record
+string2 temp_state;
+rCrimOffender2_WithDID;
+end;
 
+did_add.mac_add_orig_state(dReCleanNamesAll,add_orig_state_rec,zip5,state,state_origin,to_did)
 //DID
+
+//Flip names before DID process
+ut.mac_flipnames(to_did, fname, mname, lname, cleanFlipName);
 
 lMatchSet := ['S','A','D'];
 
 did_Add.MAC_Match_Flex//_Sensitive  // Removed sensitive macro
-	(dConcatCrim_and_DOC_NewLayout, lMatchSet,						
+	(cleanFlipName, lMatchSet,						
 	 orig_ssn, dob, fname, mname,lname, name_suffix, 
-	 prim_range, prim_name, sec_range, zip5, state, phone_field, 
+	 prim_range, prim_name, sec_range, zip5, temp_state, phone_field, 
 	 DID,
-	 rCrimOffender2_WithDID,
+	 add_orig_state_rec,
 	 false, DID_Score_field,
 	 75,						//dids with a score below here will be dropped
 	 dCrimOffender2_WithDID
@@ -146,7 +238,7 @@ rCrimOffender2_WithDID_SSN
   end
 ;
 
-rCrimOffender2_WithDID_SSN tUseSourceSSN(rCrimOffender2_WithDID pInput)
+rCrimOffender2_WithDID_SSN tUseSourceSSN(dCrimOffender2_WithDID pInput)
  :=
   transform
     self.offender_key := StringLib.StringToUpperCase(pInput.offender_key);
@@ -342,11 +434,23 @@ Crim_Common.Layout_Moxie_Crim_Offender2.new JoinKeys(Crim_Common.Layout_Moxie_Cr
 offnd_dMoxieFileDedup2 :=
 	JOIN(offnd, allExp, 
 			LEFT.offender_key=RIGHT.offender_key, JoinKeys(left, right), left only, lookup);
-offnd_hard_code_did_removals := crim_common.fn_blank_the_did(offnd_dMoxieFileDedup2);			
+
+offnd_hard_code_did_rem := crim_common.fn_blank_the_did(offnd_dMoxieFileDedup2);			
 //END EXPUNGE -- Offender
 
+//Hygenics offender layout////////////////////////////////////////////////	
+hygenics_crim.Layout_Common_Crim_Offender_new stOffndrLayout2(offnd_hard_code_did_rem l) := transform
+	self := l;
+	self.src_upload_date := '';
+	self.age := '';
+	self.image_link := '';
+end;
+	
+offnd_hard_code_did_removals			:= project(offnd_hard_code_did_rem, stOffndrLayout2(left));
 
-Crim_Common.Layout_Moxie_Court_Offenses JoinKeys2(Crim_Common.Layout_Moxie_Court_Offenses L, allExp R) 
+///////////////////////////////////////////////////////////////////////////
+
+hygenics_crim.Layout_Common_Court_Offenses JoinKeys2(hygenics_crim.Layout_Common_Court_Offenses L, allExp R) 
  := TRANSFORM
 	self := L;
  end;
@@ -368,8 +472,8 @@ dOldOffenderMoxieLayout := project(offnd_hard_code_did_removals,rOffenderOldLayo
 export Out_Moxie_Crim_Offender2_Court_Offenses := 
 sequential(
 	output(jrecs2,,'~thor_data400::base::cv_suppressions::found',overwrite),
-	output(dOldOffenderMoxieLayout,,Crim_Common.Name_Moxie_Crim_Offender2_Dev,overwrite), //old layout offender
-	output(offnd_hard_code_did_removals,,Crim_Common.Name_Moxie_Crim_Offender2_Dev +'_new',overwrite), //new layout offender
-	output(offns_dMoxieFileDedup2,,Crim_Common.Name_Moxie_Court_Offenses_Dev,overwrite));
+	output(dOldOffenderMoxieLayout,,Crim_Common.Name_Moxie_Crim_Offender2_Dev,overwrite,__compressed__), //old layout offender
+	output(offnd_hard_code_did_removals,,Crim_Common.Name_Moxie_Crim_Offender2_Dev +'_new',overwrite,__compressed__), //new layout offender
+	output(offns_dMoxieFileDedup2,,Crim_Common.Name_Moxie_Court_Offenses_Dev,overwrite,__compressed__));
 
 

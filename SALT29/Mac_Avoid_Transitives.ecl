@@ -1,97 +1,180 @@
-export mac_avoid_transitives(ifile,did1,did2,conf,dover,rule_num,ofile) := macro
+EXPORT mac_avoid_transitives(ifile, did1, did2, conf, dover, rule_num, ofile) := macro
+
 	// First remove the simplest dups
+	// Dedupping before sorting can remove many dups before the sort and often helps with
+	// performance because many records are already in a good order for the dedup.
 	#uniquename(fc)
-	%fc% := DEDUP( SORT( ifile, did1, did2, -conf, rule_num, LOCAL ), did1, did2, LOCAL );
+	%fc% := dedup(sort(dedup(ifile, left.did1 = right.did1
+	                                  and left.did2 = right.did2
+	                                  and (left.conf > right.conf
+	                                         or (left.conf = right.conf
+	                                               and left.rule_num <= right.rule_num)),
+	                         local),
+	                   did1, did2, -conf, rule_num, local ),
+	              did1, did2, local );
 	#uniquename(fc1)
-	%fc1% := DEDUP( SORT( DISTRIBUTE( %fc%, HASH(did1) ), did1, did2, -conf, rule_num, LOCAL), did1, did2, LOCAL );
-	// First reduce everything to a move to the 'best' close match
-	// One of the best for DID 1
+	%fc1% := dedup(distribute( %fc%, hash(did1), merge(did1, did2, -conf, rule_num )),
+	               did1, did2, local );
+
+	#uniquename(reverse)
+	%reverse% :=  distribute(project(%fc1%,
+	                                 transform(recordof(ifile),
+	                                   self.did1 := left.did2,
+	                                   self.did2 := left.did1,
+	                                   self := left)),
+	                         hash(did1)); // same distribution as fc1
+
 	#uniquename(add_reverse)
-	%add_reverse% := %fc1% + DISTRIBUTE( project(%fc1%,transform(recordof(ifile),
-		self.did1 := left.did2,
-		self.did2 := left.did1,
-		self := left)), HASH(did1) ); // Output of add_reverse is now distributed by HASH(did1)
+	%add_reverse% := %fc1% + %reverse%;
 		
-	//output(%add_reverse%,named('add_reverse'),all);
+	// output(%add_reverse%,named('add_reverse'),all);
 	
 	#uniquename(only_top_conf)
-	%only_top_conf% := rollup(sort(%add_reverse%,did1,-conf,did2,rule_num,local),left.did1=right.did1 and (left.conf>right.conf OR left.did2=right.did2),transform(left),local);
+	%only_top_conf% := rollup(sort(%add_reverse%, did1, -conf, did2, rule_num, local),
+	                          left.did1 = right.did1 and (left.conf > right.conf or left.did2 = right.did2),
+	                          transform(left), local);
 	
-	//output(sort(%only_top_conf%,did2,did1),named('only_top_conf'),all);
+	// output(sort(%only_top_conf%,did2,did1),named('only_top_conf'),all);
 	
 	#uniquename(only_mutual)
-	%only_mutual% := join(distribute(%only_top_conf%,hash(did2)),distribute(%only_top_conf%,hash(did1)),left.did2=right.did1 and left.did1=right.did2,transform(right),local);
+	%only_mutual% := join(distribute(%only_top_conf%, hash(did2)), %only_top_conf%,
+	                      left.did2 = right.did1 and left.did1 = right.did2,
+	                      transform(right), local);
 	
-	//output(sort(%only_mutual%,did2,did1),named('only_mutual'),all);
+	// output(sort(%only_mutual%,did2,did1),named('only_mutual'),all);
 	
 	#uniquename(only_top_side)
-	%only_top_side% := dedup(sort(%only_mutual%(did1 > did2),did1,did2,rule_num,local),did1,did2,local);
-	
-	//output(sort(%only_top_side%,did2,did1),named('only_top_side'),all);
-	
-	#uniquename(j0)
-	%j0% := dedup(sort(join( %only_top_side%, %only_top_side%, left.did2 = right.did1, transform(left), left only,hash ),did1,-did2),did1);
-	
-	//output(sort(%j0%,did2,did1),named('j0'),all);
-		
-	// Remove all of the 'sources' if they are targetted by someone superior or equal
-	#uniquename(j1)
-	%j1% := join( %j0%, %j0%, left.did1 = right.did2 and left.conf <= right.conf, transform(left), left only, hash );
-  //output(sort(%j1%,did2,did1),named('j1'),all);
-	
-	// Remove all 'targets' if the target is about to shift
-	// because of above we know that the target shift is a good thing
-	
-	//ofile := join( %j1%, %j1%, left.did2 = right.did1, transform(left), left only,hash );
-	
-	// Test proposed groups to insure all records match to each other
-  #uniquename(matchrec)	
-	%matchrec% := RECORD
-	SALT29.UIDType id1;
-	SALT29.UIDType id2;
-	SALT29.UIDType targetid; // target did
-	//%j1%.conf;
+	%only_top_side% := %only_mutual%(did1 > did2);
+	// output(sort(%only_top_side%,did2,did1),named('only_top_side'),all);
+
+	#uniquename(statusEnum)
+	%statusEnum% := ENUM(unsigned1, UNKNOWN, GOOD, BAD, ADD);
+
+	#uniquename(statusRec)
+	%statusRec% := {
+		recordof(ifile),
+		%statusEnum% _status,
+	};
+
+	#uniquename(loopFunc)
+	// The input dataset is only records with an unknown status. The LOOP
+	// declaration will filter out any record witch doesn't have an unknown status
+	// so that we don't try to process them multiple times.
+	// Each iteration of the loop only tries to set the status of "terminal" links:
+	// ones where the "target" (did2) doesn't link to a "source" (did1).
+	// First a single good record is chosen for each did2, then it is built upon
+	// to make a group of all good links associated with it.
+	%loopFunc%(dataset(%statusRec%) unknown) := function
+
+		// These are the records where "target" is not a "source" in another record
+		// and therefore there are no transitives in this dataset.
+		terminalDups := join(distribute(unknown, hash(did2)), unknown,
+		                     left.did2 = right.did1,
+		                     transform(left), left only, local);
+
+		// Remove all of the 'sources' if they are targetted by someone superior or equal
+		removeLowConf := join(distribute(terminalDups, hash(did1)), distribute(unknown, hash(did2)),
+		                      left.did1 = right.did2 and left.conf < right.conf,
+		                      transform(left), left only, local);
+
+		// Can't have duplicates for id1.
+		terminal := dedup(sort(distribute(removeLowConf, hash(did1)), did1, did2, local), did1, local);
+
+		unknownRemoveTerminal := join(distribute(unknown, hash(did2)), distribute(terminalDups, hash(did2)),
+		                              left.did2 = right.did2,
+		                              transform(left), left only, local);
+
+		// Choose one record for each did2. Call this one good and then we'll build up as much
+		// of a group as we can from it.
+		goodOne := project(dedup(sort(distribute(terminal, hash(did2)), did2, did1, local), did2, local),
+		                   transform(recordof(left),
+		                     self._status := %statusEnum%.GOOD,
+		                     self := left));
+
+		pairRec := {
+			typeof(ifile.did1) did1,
+			typeof(ifile.did2) did2,
+			typeof(ifile.did2) target_id,
+		};
+
+		goodSourceIdRec := {
+			typeof(ifile.did1) _good_source_id,
+		};
+
+		// These are other records that target the same id as the good recs.
+		potentialGood := join(distribute(terminal, hash(did2)), goodOne,
+		                      left.did2 = right.did2,
+		                      transform({recordof(left), goodSourceIdRec},
+		                        self._good_source_id := right.did1,
+		                        // self.target_id := right.did2,
+		                        self := left),
+		                      local);
+
+		// We only want to look at ones that target the goodOne recs.
+		potentialGood2 := join(distribute(potentialGood, hash(did1)), distribute(unknownRemoveTerminal, hash(did1)),
+		                       left.did1 = right.did1
+		                         and left._good_source_id = right.did2,
+		                       transform(left), local);
+
+		// Get all pairs of did1's that link to the same target_id.
+		did1Pairs := join(distribute(potentialGood2, hash(did2)), distribute(potentialGood2, hash(did2)),
+		                  left.did2 = right.did2
+		                    and left.did1 > right.did1,
+		                  transform(pairRec,
+		                    self.did1 := left.did1,
+		                    self.did2 := right.did1,
+		                    self.target_id := left.did2), local);
+
+		// These are pairs that aren't found
+		badRecs := join(distribute(did1Pairs, hash(did1)), distribute(unknownRemoveTerminal, hash(did1)),
+		                left.did1 = right.did1
+		                  and left.did2 = right.did2,
+		                transform(left), left only, local);
+
+		// Remove the bad ones, leaving only good.
+		goodGroup := join(potentialGood2, badRecs,
+		                  left.did1 = right.did1,
+		                  transform(recordof(unknown),
+		                    self._status := %statusEnum%.GOOD,
+		                    self := left),
+		                  left only, hash);
+
+		allGood := distribute(goodGroup + goodOne, hash(did1));
+
+		// The unknowns shouldn't include the good links.
+		stillUnknown0 := join(distribute(unknownRemoveTerminal, hash(did1)), allGood,
+		                       left.did1 = right.did1,
+		                       transform(left), left only, local);
+
+		// Remove records that target a good group so as to avoid transitives.
+		stillUnknown := join(distribute(stillUnknown0, hash(did2)), allGood,
+		                       left.did2 = right.did1,
+		                       transform(left), left only, local);
+
+		// Bad links are dropped and we only carry forward the good and unknown.
+		// The loop filter will only keep the unknowns for the next iteration
+		// through the loop function.
+		return distribute(stillUnknown, hash(did1)) + allGood;
+
 	end;
-	
-	#uniquename(j2)
-	//%j2% := join(%j1%, %j1%, left.did2 = right.did2 and left.did1 <> right.did1, transform(%matchrec%, self.id1 := left.did1, self.id2 := right.did1, self.targetid := left.did2, self.conf := left.conf), hash);
-	%j2% := join(%j1%, %j1%, left.did2 = right.did2 and left.did1 <> right.did1, transform(%matchrec%, self.id1 := left.did1, self.id2 := right.did1, self.targetid := left.did2), hash);
-	//output(sort(%j2%,targetid),named('j2'),all);
-	
-	// Join list of group matches to input with reverse to insure matches exist
-	// Dedup to get list of ids to exclude from group
-	#uniquename(j3)
-	//%j3% := dedup(sort(join(%j2%, %add_reverse%, left.id1 = right.did1 and left.id2 = right.did2 and left.conf = right.conf, transform(left), left only, hash),id1),id1);
-	%j3% := dedup(sort(join(DISTRIBUTE(%j2%,HASH(id1)), %add_reverse%, left.id1 = right.did1 and left.id2 = right.did2, transform(left), left only, LOCAL),id1,LOCAL),id1,LOCAL);
-	//output(sort(%j3%,targetid),named('j3'),all);
-	
-	// Exclude ids which do not match all records in a group
-	#uniquename(j4) 
-	%j4% := join(%j1%, %j3%, left.did1 = right.id1 and left.did2 = right.targetid, transform(left), left only, hash);
-	//output(sort(%j4%,did2,did1),named('j4'),all);
-	
-	// Determine if any groups were completely filtered out
-	#uniquename(tidrec)
-	%tidrec% := RECORD
-	SALT29.UIDType target_id; // target did
-	end;
-	
-	// Get the target id matches
-	#uniquename(tidlist)
-//	%tidlist% := dedup(project(%j1%, transform(%tidrec%, self.target_id := left.did2)),all);
-%tidlist% := dedup(sort(project(%j1%, transform(%tidrec%, self.target_id := left.did2)),target_id),target_id);
-	//output(sort(%tidlist%,target_id),named('tidlist'),all);
-	
-	// Make sure all target ids are included
-	#uniquename(tidmiss)
-	%tidmiss% := join(%tidlist%, %j4%, left.target_id = right.did2, transform(left), left only, hash);
-	//output(sort(%tidmiss%,target_id),named('tidmiss'),all);
-	
-	// Select missing match from target matches
-	#uniquename(tidadd)
-	%tidadd% := dedup(sort(join(%j1%, %tidmiss%, left.did2 = right.target_id, transform(left), hash), did2, did1), did2);
-	//output(sort(%tidadd%,did2,did1),named('tidadd'),all);
-	
-	ofile := %j4% + %tidadd%;
-  
-  endmacro;
+
+	#uniquename(markStatus)
+	%markStatus% := project(%only_top_side%,
+	                        transform(%statusRec%,
+	                          self._status := %statusEnum%.UNKNOWN,
+	                          self := left));
+
+	// Loops through all of the records with an unknown status, setting the status
+	// for the good links and removing records with bad links.
+	#uniquename(setStatus)
+	%setStatus% := loop(%markStatus%,
+	                    left._status = %statusEnum%.UNKNOWN,
+	                    exists(rows(left)) and counter <= 10,
+	                    %loopFunc%(rows(left)));
+
+	// output(sort(%setStatus%, did2, did1), named('setStatus'));
+
+
+	ofile := project(%setStatus%(_status != %statusEnum%.UNKNOWN), recordof(ifile));
+
+endmacro;

@@ -36,7 +36,10 @@ string_rec := record
     unsigned integer8 __filepos { virtual(fileposition)};
 end;
 
-FC := DATASET('~thor_data400::base::foreclosure', string_rec, thor);
+// FC := DATASET('~thor_data400::base::foreclosure', string_rec, thor);
+
+FC := dataset('~thor_data400::persist::file_foreclosure_building', string_rec, thor);
+
 
 // FID Record set *********************************************************************************
 
@@ -420,10 +423,9 @@ s := BUILDINDEX(czip2_duped,{nzip,nprim_name,nprim_range,c_tok,(big_endian unsig
 // *********************************************
 
 
-export Out_Moxie_Foreclosure_Keys := sequential(key1,key2,key3,key4,key5,key6,key7,key8,key9,
+export Out_Moxie_Foreclosure_Keys := sequential(output(choosen(property.file_foreclosure_building,100)),key1,key2,key3,key4,key5,key6,key7,key8,key9,
 												 key10,key11,key12,key13,key14,key15,key16,key17,key18,key19,
 												 parallel(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s));
 
 
 // END CODE
-

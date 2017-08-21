@@ -1,0 +1,26 @@
+export Layout_TexasDeath_Data := Record
+String1    HISTORY;
+String12   IMPORT_DATE;
+String9    SSN;
+String21   LAST_NAME;
+String16   FIRST_NAME;
+String16   MID_NAME;
+String4    SUFFIX;
+String8    DOD;
+String12   CLA_DOD;
+String8    DOB;
+String12   CLA_DOB;
+String2    STATE_CTRY;
+String5    ZIP_LAST_RES;
+String5    ZIP_PAYMENT;
+String6    CERTIF_NUM;
+String20   COUNTY;
+String1    GENDER;
+String1    RACE;
+String14   MARITAL_STS;
+String2    RECORD_SRC;
+String1    VERF_PROOF;
+String5    VOL_NUMB;
+String151  FILLER;
+String2    EOR;
+End;

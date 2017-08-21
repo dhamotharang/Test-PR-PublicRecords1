@@ -73,6 +73,13 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 		process_documents_phoneownership		:= process_input_file(fnms.documents.phoneownership.remote   ,fnms.documents.phoneownership.update);
 		process_documents_bipbestupdate			:= process_input_file(fnms.documents.bipbestupdate.remote    ,fnms.documents.bipbestupdate.update);
 		process_documents_sbfe							:= process_input_file(fnms.documents.sbfe.remote    				 ,fnms.documents.sbfe.update);
+		process_documents_ucc								:= process_input_file(fnms.documents.ucc.remote    				 	 ,fnms.documents.ucc.update);
+		process_documents_govtdebarred			:= process_input_file(fnms.documents.govtdebarred.remote     ,fnms.documents.govtdebarred.update);
+		process_documents_inquiry						:= process_input_file(fnms.documents.inquiry.remote    		 	 ,fnms.documents.inquiry.update);
+		process_documents_corp							:= process_input_file(fnms.documents.corp.remote    			 	 ,fnms.documents.corp.update);
+		process_documents_mvr								:= process_input_file(fnms.documents.mvr.remote    				 	 ,fnms.documents.mvr.update);
+		process_documents_aircraft					:= process_input_file(fnms.documents.aircraft.remote			 	 ,fnms.documents.aircraft.update);
+		process_documents_watercraft				:= process_input_file(fnms.documents.watercraft.remote   	 	 ,fnms.documents.watercraft.update);
 
 
 		spray_all_files := PARALLEL(
@@ -94,7 +101,14 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 			process_documents_bdidupdate.spray,
 			process_documents_phoneownership.spray,
 			process_documents_bipbestupdate.spray,
-			process_documents_sbfe.spray
+			process_documents_sbfe.spray,
+			process_documents_ucc.spray,
+			process_documents_govtdebarred.spray,
+			process_documents_inquiry.spray,
+			process_documents_corp.spray,
+			process_documents_mvr.spray,
+			process_documents_aircraft.spray,
+			process_documents_watercraft.spray
 		);
 		
 		update_all_superfiles := PARALLEL(
@@ -116,7 +130,14 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 			process_documents_bdidupdate.update,
 			process_documents_phoneownership.update,
 			process_documents_bipbestupdate.update,
-			process_documents_sbfe.update
+			process_documents_sbfe.update,
+			process_documents_ucc.update,
+			process_documents_govtdebarred.update,
+			process_documents_inquiry.update,
+			process_documents_corp.update,
+			process_documents_mvr.update,
+			process_documents_aircraft.update,
+			process_documents_watercraft.update
 		);
 			
 		RETURN SEQUENTIAL( IF( NOT valid_spray_criteria, 

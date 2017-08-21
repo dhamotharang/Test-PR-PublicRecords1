@@ -1,1 +1,1 @@
-EXPORT foreign_fcra_logs := '~';
+EXPORT foreign_fcra_logs := '~foreign::10.241.21.34::';

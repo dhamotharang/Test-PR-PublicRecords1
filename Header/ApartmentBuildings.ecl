@@ -1,3 +1,4 @@
+IMPORT PRTE2_Header;
 gds := header.did_addresses;
 
 scnt := record
@@ -89,4 +90,8 @@ j := join(a_numbers,d_numbers,left.prim_range=right.prim_range and
                               left.predir=right.predir,
                               join_them(left,right),local);
 
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export ApartmentBuildings := j;
+#ELSE
 export ApartmentBuildings := j : persist('ApartmentBuildings');
+#END

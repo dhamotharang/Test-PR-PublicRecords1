@@ -1,0 +1,1 @@
+export File_LN_AssessorDeedSAM_Search := dataset('~thor_data400::in::ln_assessor_deed_sam_initial_thru_20050908_search_v2',LN_Property.Layout_Deed_Mortgage_Property_Search,flat);

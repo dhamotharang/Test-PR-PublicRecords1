@@ -1,2 +1,1 @@
-export file_WY_clean_in := dataset(watercraft.Cluster_In + 'in::watercraft_wy_initial', watercraft.Layout_WY_clean_in, flat)
-						 + dataset(watercraft.Cluster_In + 'in::watercraft_wy_20050331_ff', watercraft.Layout_WY_clean_in, flat);
+export file_WY_clean_in := dataset(watercraft.Cluster_In + 'in::watercraft_wy', watercraft.Layout_WY_clean_in, flat);

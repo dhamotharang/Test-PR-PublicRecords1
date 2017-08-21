@@ -10,7 +10,9 @@ Layout_temp := record, maxlength(30900)
 	WorldCheck.Layout_WorldCheck_in;
 end;
 
-in_file := WorldCheck.File_WorldCheck_In;
+in_f 	:= WorldCheck.File_WorldCheck_In;
+
+in_file	:= distribute(in_f, random());
 
 //Remove '~' populated in the locations field
 WorldCheck.Layout_WorldCheck_in locFix(in_file l) := transform
@@ -147,5 +149,5 @@ ds_AllNames := DISTRIBUTE(PROJECT(SORT(ds_dedupedNames
 					             ,trfRemAliases(left,counter))
 						 ,hash32(UID));
 
-export WorldCheck_normalize := ds_AllNames : persist(WorldCheck.cluster_name + 'Persist::WorldCheck::Normalized');
+export WorldCheck_normalize := DISTRIBUTE(ds_AllNames, random()) : persist(WorldCheck.cluster_name + 'Persist::WorldCheck::Normalized');
 

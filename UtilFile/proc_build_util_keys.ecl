@@ -23,9 +23,7 @@ RECORD
 	unsigned6 did_temp;
 END;
 
-header_services.Supplemental_Data.mac_verify('file_utility_inj.thor',Utilfile.Layout_DID_Out,read);
- 
-utility_in := read();
+utility_in := utilfile.file_supplemental.out_supp;
 
 end_fdid := count(utilfile.daily_fdid);
 

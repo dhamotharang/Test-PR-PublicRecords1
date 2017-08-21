@@ -25,9 +25,9 @@ string9   fein;
 end;
 
 layout_nohit_test_clean CleanInput(layout_nohit_test_seq l) := transform
-self.clean_name := addrcleanlib.cleanPerson73(l.INQR_PRIN_NAME);
-self.clean_bus_address := addrcleanlib.cleanAddress182(trim(l.INQR_STREET), trim(l.INQR_CITY) + ', ' + trim(l.INQR_STATE) + ' ' + trim(l.INQR_ZIP));
-self.clean_prin_address := addrcleanlib.cleanAddress182(trim(l.INQR_PRIN_STREET), trim(l.INQR_PRIN_CITY) + ', ' + trim(l.INQR_PRIN_STATE) + ' ' + trim(l.INQR_PRIN_ZIP));
+self.clean_name := address.cleanPerson73(l.INQR_PRIN_NAME);
+self.clean_bus_address := address.cleanAddress182(trim(l.INQR_STREET), trim(l.INQR_CITY) + ', ' + trim(l.INQR_STATE) + ' ' + trim(l.INQR_ZIP));
+self.clean_prin_address := address.cleanAddress182(trim(l.INQR_PRIN_STREET), trim(l.INQR_PRIN_CITY) + ', ' + trim(l.INQR_PRIN_STATE) + ' ' + trim(l.INQR_PRIN_ZIP));
 self.phone10 := Address.CleanPhone(trim(l.INQR_TEL));
 self.ssn := l.INQR_PRIN_TAX;
 self.fein := l.INQR_TAX;

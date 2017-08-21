@@ -54,6 +54,7 @@ string legal_lot := '';
 string legal_block := '';
 string legal_borough := '';
 string certificate_number := '';
+BOOLEAN	bCBFlag	:=	FALSE;
 unsigned8 persistent_record_id := 0 ; 
 dataset(layout_filing_status) filing_status;
 

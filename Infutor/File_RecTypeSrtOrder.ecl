@@ -1,0 +1,96 @@
+/********************************************************************************/
+/* To add values...
+		Add record to the end of the Value List
+			* The new field can only be 1 string byte long
+		The temp_sort_order field does not have to be accurate
+		The new value will be sorted and have the appropriate sort number assigned
+		In regards to this attributes use within the consumer/knowx/teaser keys, the
+			the keys will updates appropriate upon rebuild with the the correct sort 
+			order value in the rec_type field.
+*/
+/********************************************************************************/
+
+Value_List := dataset([
+    {1,'1'},
+    {2,'2'},
+    {3,'3'},
+    {4,'4'},
+    {5,'5'},
+    {6,'6'},
+    {7,'7'},
+    {8,'8'},
+    {9,'9'},
+    {10,':'},
+    {11,';'},
+    {12,'<'},
+    {13,'='},
+    {14,'>'},
+    {15,'?'},
+    {16,'@'},
+    {17,'A'},
+    {18,'B'},
+    {19,'C'},
+    {20,'D'},
+    {21,'E'},
+    {22,'F'},
+    {23,'G'},
+    {24,'H'},
+    {25,'I'},
+    {26,'J'},
+    {27,'K'},
+    {28,'L'},
+    {29,'M'},
+    {30,'N'},
+    {31,'O'},
+    {32,'P'},
+    {33,'Q'},
+    {34,'R'},
+    {35,'S'},
+    {36,'T'},
+    {37,'U'},
+    {38,'V'},
+    {39,'W'},
+    {40,'X'},
+    {41,'Y'},
+    {42,'Z'},
+    {43,'['},
+    {44,'\\'},
+    {45,']'},
+    {46,'^'},
+    {47,'_'},
+    {48,'`'},
+    {49,'a'},
+    {50,'b'},
+    {51,'c'},
+    {52,'d'},
+    {53,'e'},
+    {54,'f'},
+    {55,'g'},
+    {56,'h'},
+    {57,'i'},
+    {58,'j'},
+    {59,'k'},
+    {60,'l'},
+    {61,'m'},
+    {62,'n'},
+    {63,'o'},
+    {64,'p'},
+    {65,'q'},
+    {66,'r'},
+    {67,'s'},
+    {68,'t'},
+    {69,'u'},
+    {70,'v'},
+    {71,'w'},
+    {72,'x'},
+    {73,'y'},
+    {74,'z'},
+    {75,'{'},
+    {76,'|'},
+    {77,'}'},
+    {78,'}'},
+    {79,'~'}], {unsigned3 temp_sort_order, string1 rec_type});
+
+new_sort_order := project(sort(value_list, rec_type), transform(recordof(value_list), self.temp_sort_order := counter, self := left));
+
+export File_RecTypeSrtOrder := new_sort_order;

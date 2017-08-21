@@ -1,6 +1,13 @@
 IMPORT Business_Header, ut;
 
-bh := Business_Header.File_Business_Header_Base;
+export CompanyName(
+
+	dataset(Business_Header.Layout_Business_Header_Base	)	pBusinessHeaders	= Business_Header.Files().Base.Business_Headers.Built
+
+) :=
+function
+
+bh := business_header.filters.keys.business_headers(pBusinessHeaders);
 
 // Project to slim record.
 layout_slim := RECORD
@@ -41,7 +48,9 @@ END;
 cn_joined := JOIN(cn_only_dist, bh_ded_cn_dist,
 	LEFT.clean_company_name[1..20] = RIGHT.clean_company_name[1..20] AND
 	ut.CompanySimilar100(LEFT.clean_company_name, RIGHT.clean_company_name) < 10,
-	AddRec(LEFT, RIGHT), LOCAL);
+	AddRec(LEFT, RIGHT), 
+	atmost(LEFT.clean_company_name[1..20] = RIGHT.clean_company_name[1..20],1500),
+	LOCAL);
 
 cn_ded := DEDUP(
 			SORT(
@@ -89,4 +98,6 @@ ss_cn := JOIN(
 		LEFT.clean_company_name = RIGHT.clean_company_name,
 		JoinCleanCount(LEFT, RIGHT), LEFT OUTER, LOCAL);
 
-EXPORT CompanyName := ss_cn;
+return ss_cn;
+
+end;

@@ -54,4 +54,4 @@ export MAC_Insert_CleanAddrs(cleanfield, cities = 'B', prefix = '\'\'') := macro
 #set(pref,prefix)
 #append(pref,'zip4')
 	self.%pref%	   		:= cleanfield[122..125];
-endmacro;
+endmacro : deprecated('Use Address.MAC_Insert_CleanAddrs instead.');

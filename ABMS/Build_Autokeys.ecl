@@ -1,14 +1,16 @@
 IMPORT Autokey, AutokeyB2, AutoKeyI;
 
-EXPORT Build_Autokeys(STRING pversion,
+EXPORT Build_Autokeys(STRING 										 pversion,
                       DATASET(Layouts.Base.Main) pBase = Files(pversion).Base.Main.Built) := FUNCTION
 
 	UNSIGNED4 zero := 0;
 
 	lskname := Keynames(pversion).lAutoKeyTemplate;
 	llgname := Keynames(pversion).autokeyroot.new;
+	
+	newBase := PROJECT(pBase, Layouts.Keybuild.Main);
 
-	Autokey.mac_useFakeIDs(pBase,
+	Autokey.mac_useFakeIDs(newBase,
 		                     pBase_withFakeID,
 		                     build_payload_key,
 		                     lskname,

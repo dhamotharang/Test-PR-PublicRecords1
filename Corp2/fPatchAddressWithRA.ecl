@@ -1,6 +1,6 @@
 import business_header,ut;
 
-export fPatchAddressWithRA(dataset(Layout_Corporate_Direct_Corp_Base) crecs) :=
+export fPatchAddressWithRA(dataset(Layout_Corporate_Direct_Corp_AID) crecs) :=
 FUNCTION
 
 addrcount := 20;

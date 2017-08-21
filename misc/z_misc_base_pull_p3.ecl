@@ -1,0 +1,118 @@
+/*
+my_layout_dl := 
+RECORD
+  unsigned integer6 dl_seq;
+  unsigned integer6 did;
+  unsigned integer6 preglb_did;
+  unsigned integer3 dt_first_seen;
+  unsigned integer3 dt_last_seen;
+  unsigned integer3 dt_vendor_first_reported;
+  unsigned integer3 dt_vendor_last_reported;
+  string14 dlcp_key;
+  string2 orig_state;
+  string2 source_code;
+  string1 history;
+  qstring52 name;
+  string1 addr_type;
+  qstring40 addr1;
+  qstring20 city;
+  qstring2 state;
+  qstring5 zip;
+  string2 province;
+  string3 country;
+  string10 postal_code;
+  unsigned integer4 dob;
+  string1 race;
+  string1 sex_flag;
+  string2 license_class;
+  qstring4 license_type;
+  qstring14 attention_flag;
+  qstring8 dod;
+  qstring42 restrictions;
+  qstring42 restrictions_delimited;
+  unsigned integer4 orig_expiration_date;
+  unsigned integer4 orig_issue_date;
+  unsigned integer4 lic_issue_date;
+  unsigned integer4 expiration_date;
+  unsigned integer3 active_date;
+  unsigned integer3 inactive_date;
+  qstring10 lic_endorsement;
+  qstring4 motorcycle_code;
+  qstring14 dl_number;
+  qstring9 ssn;
+  qstring9 ssn_safe;
+  qstring3 age;
+  string1 privacy_flag;
+  string1 driver_edu_code;
+  string1 dup_lic_count;
+  string1 rcd_stat_flag;
+  qstring3 height;
+  qstring3 hair_color;
+  qstring3 eye_color;
+  qstring3 weight;
+  qstring25 oos_previous_dl_number;
+  string2 oos_previous_st;
+  qstring5 title;
+  qstring20 fname;
+  qstring20 mname;
+  qstring20 lname;
+  qstring5 name_suffix;
+  qstring3 cleaning_score;
+  string1 addr_fix_flag;
+  qstring10 prim_range;
+  qstring2 predir;
+  qstring28 prim_name;
+  qstring4 suffix;
+  qstring2 postdir;
+  qstring10 unit_desig;
+  qstring8 sec_range;
+  qstring25 p_city_name;
+  qstring25 v_city_name;
+  qstring2 st;
+  qstring5 zip5;
+  qstring4 zip4;
+  qstring4 cart;
+  string1 cr_sort_sz;
+  qstring4 lot;
+  string1 lot_order;
+  string2 dpbc;
+  string1 chk_digit;
+  string2 rec_type;
+  string2 ace_fips_st;
+  qstring3 county;
+  qstring10 geo_lat;
+  qstring11 geo_long;
+  qstring4 msa;
+  qstring7 geo_blk;
+  string1 geo_match;
+  qstring4 err_stat;
+  string3 status;
+  qstring2 issuance;
+  qstring8 address_change;
+  string1 name_change;
+  string1 dob_change;
+  string1 sex_change;
+  qstring14 old_dl_number;
+  qstring9 dl_key_number;
+  string3 cdl_status;
+ END;
+
+my_Dl := dataset(DriversV2.Constants.Cluster + 'BASE::DL2::Drvlic',
+                          my_layout_dl,thor);
+//output(choosen(my_dl,200));
+//output(my_dl,,'~thor_200::temp::file_dlv2_base.csv',csv);
+//output(my_dl,,'~thor_200::temp::file_dlv2_base.xml',xml);
+//output(my_dl,,'~thor_200::temp::file_dlv2_base',overwrite);
+*/
+/*
+my_best := sample(business_header.File_Business_Header_Best,300000);
+output(my_best,,'~thor_200::temp::file_bus_best_base.csv',csv, overwrite);
+output(my_best,,'~thor_200::temp::file_bus_best_base.xml',xml,overwrite);
+output(my_best,,'~thor_200::temp::file_bus_best_base',overwrite,overwrite);
+*/
+my_employment := sample(business_header.File_Employment_Out,300000);
+output(my_employment,,'~thor_200::temp::file_employment_out.csv',csv, overwrite);
+output(my_employment,,'~thor_200::temp::file_employment_out.xml',xml,overwrite);
+output(my_employment,,'~thor_200::temp::file_employment_out',overwrite,overwrite);
+
+

@@ -1,8 +1,14 @@
 import STRATA, TXBUS;
 
-export Out_Base_Stats_Population(string pVersion) := function
+export Out_Base_Stats_Population(
 
-	dDataset := uspis_hotlist.File_USPIS_Hotlist_Base;
+	 string									pVersion
+	,dataset(layouts.Base)	pBaseFile = Files().base.built
+
+) := 
+function
+
+	dDataset := pBaseFile;
 
 	Layout_pInput_stat :=
 	record
@@ -54,7 +60,7 @@ export Out_Base_Stats_Population(string pVersion) := function
 							 ,'USPIS_Hotlist'
 							 ,'Base'
 							 ,pVersion
-							 ,'jtao@seisint.com'
+							 ,Email_Notification_Lists.Stats
 							 ,uspsis_result_base);
 			
 	return output(sort_uspis_hotlist_base);

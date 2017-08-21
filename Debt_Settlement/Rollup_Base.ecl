@@ -16,7 +16,7 @@ function
 	
 	Layouts.Base RollupUpdate(Layouts.Base l, Layouts.Base r) := 
 	transform
-		SELF.dt_vendor_last_reported 	:= ut.LatestDate	(l.dt_vendor_last_reported	,r.dt_vendor_last_reported	);
+		SELF.dt_vendor_last_reported 	:= max(l.dt_vendor_last_reported	,r.dt_vendor_last_reported	);
 		SELF.dt_vendor_first_reported := ut.EarliestDate(l.dt_vendor_first_reported	,r.dt_vendor_first_reported	);
 		self.record_type							:= if(l.record_type = 'C' or r.record_type = 'C', 'C', 'H');
 		self := l;

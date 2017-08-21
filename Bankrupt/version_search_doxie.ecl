@@ -1,1 +1,1 @@
-export version_search_doxie := '_20050824';
+export version_search_doxie := '20060104';

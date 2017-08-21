@@ -1,0 +1,125 @@
+OPTIONS:-gh
+MODULE:Scrubs_BusReg
+FILENAME:in_BusReg
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+
+//FIELDTYPE DEFINITIONS
+FIELDTYPE:invalid_ofc1_title:ENUM(Scrubs_BusReg.Functions.set_valid_off_title)
+FIELDTYPE:invalid_ofc1_gender:ENUM(Scrubs_BusReg.Functions.set_valid_gender_codes)
+FIELDTYPE:invalid_county:ALLOW( -ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid_corpcode:ENUM(Scrubs_BusReg.Functions.set_valid_corp_codes)
+FIELDTYPE:invalid_sos_code:ENUM(Scrubs_BusReg.Functions.set_valid_sos_codes)
+FIELDTYPE:invalid_filing_code:ENUM(Scrubs_BusReg.Functions.set_valid_filing_codes)
+FIELDTYPE:invalid_status:ENUM(Scrubs_BusReg.Functions.set_valid_status_codes)
+FIELDTYPE:invalid_filing_num:ALLOW( 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-/):SPACES( )
+FIELDTYPE:invalid_date:ALLOW(0123456789):CUSTOM(Scrubs.fn_valid_GeneralDate>0)
+FIELDTYPE:invalid_alphablank:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+
+FIELD:ofc1_name:TYPE(STRING40):0,0
+FIELD:ofc1_title:TYPE(STRING5):LIKE(invalid_ofc1_title):0,0
+FIELD:ofc1_gender:TYPE(STRING1):LIKE(invalid_ofc1_gender):0,0
+FIELD:ofc1_add:TYPE(STRING50):0,0
+FIELD:ofc1_suite:TYPE(STRING30):0,0
+FIELD:ofc1_city:TYPE(STRING30):0,0
+FIELD:ofc1_state:TYPE(STRING2):0,0
+FIELD:ofc1_zip:TYPE(STRING5):0,0
+FIELD:ofc1_ac:TYPE(STRING3):0,0
+FIELD:ofc1_phone:TYPE(STRING10):0,0
+FIELD:ofc1_fein:TYPE(STRING15):0,0
+FIELD:ofc1_ssn:TYPE(STRING12):0,0
+FIELD:ofc1_type:TYPE(STRING15):0,0
+FIELD:company:TYPE(STRING50):0,0
+FIELD:mail_add:TYPE(STRING50):0,0
+FIELD:mail_suite:TYPE(STRING30):0,0
+FIELD:mail_city:TYPE(STRING30):0,0
+FIELD:mail_state:TYPE(STRING2):0,0
+FIELD:mail_zip:TYPE(STRING5):0,0
+FIELD:mail_zip4:TYPE(STRING4):0,0
+FIELD:mail_key:TYPE(STRING1):0,0
+FIELD:county:TYPE(STRING15):LIKE(invalid_county):0,0
+FIELD:country:TYPE(STRING15):0,0
+FIELD:district:TYPE(STRING25):0,0
+FIELD:biz_ac:TYPE(STRING3):0,0
+FIELD:biz_phone:TYPE(STRING10):0,0
+FIELD:sic:TYPE(STRING4):0,0
+FIELD:naics:TYPE(STRING6):0,0
+FIELD:descript:TYPE(STRING100):0,0
+FIELD:emp_size:TYPE(STRING4):0,0
+FIELD:own_size:TYPE(STRING5):0,0
+FIELD:corpcode:TYPE(STRING2):LIKE(invalid_corpcode):0,0
+FIELD:sos_code:TYPE(STRING9):LIKE(invalid_sos_code):0,0
+FIELD:filing_cod:TYPE(STRING1):LIKE(invalid_filing_code):0,0
+FIELD:state_code:TYPE(STRING2):0,0
+FIELD:status:TYPE(STRING2):LIKE(invalid_status):0,0
+FIELD:filing_num:TYPE(STRING20):LIKE(invalid_filing_num):0,0
+FIELD:ctrl_num:TYPE(STRING15):0,0
+FIELD:start_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:file_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:form_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:exp_date:TYPE(STRING8):0,0
+FIELD:disol_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:rpt_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:chang_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:loc_add:TYPE(STRING50):0,0
+FIELD:loc_suite:TYPE(STRING30):0,0
+FIELD:loc_city:TYPE(STRING30):0,0
+FIELD:loc_state:TYPE(STRING2):0,0
+FIELD:loc_zip:TYPE(STRING5):0,0
+FIELD:loc_zip4:TYPE(STRING4):0,0
+FIELD:ofc2_name:TYPE(STRING40):0,0
+FIELD:ofc2_title:TYPE(STRING5):LIKE(invalid_ofc1_title):0,0
+FIELD:ofc2_add:TYPE(STRING50):0,0
+FIELD:ofc2_csz:TYPE(STRING50):0,0
+FIELD:ofc2_fein:TYPE(STRING15):0,0
+FIELD:ofc2_ssn:TYPE(STRING12):0,0
+FIELD:ofc3_name:TYPE(STRING40):0,0
+FIELD:ofc3_title:TYPE(STRING5):LIKE(invalid_ofc1_title):0,0
+FIELD:ofc3_add:TYPE(STRING50):0,0
+FIELD:ofc3_csz:TYPE(STRING50):0,0
+FIELD:ofc3_fein:TYPE(STRING15):0,0
+FIELD:ofc3_ssn:TYPE(STRING12):0,0
+FIELD:ofc4_name:TYPE(STRING40):0,0
+FIELD:ofc4_title:TYPE(STRING5):LIKE(invalid_ofc1_title):0,0
+FIELD:ofc4_add:TYPE(STRING50):0,0
+FIELD:ofc4_csz:TYPE(STRING50):0,0
+FIELD:ofc4_fein:TYPE(STRING15):0,0
+FIELD:ofc4_ssn:TYPE(STRING12):0,0
+FIELD:ofc5_name:TYPE(STRING40):0,0
+FIELD:ofc5_title:TYPE(STRING5):LIKE(invalid_ofc1_title):0,0
+FIELD:ofc5_add:TYPE(STRING50):0,0
+FIELD:ofc5_csz:TYPE(STRING50):0,0
+FIELD:ofc5_fein:TYPE(STRING15):0,0
+FIELD:ofc5_ssn:TYPE(STRING12):0,0
+FIELD:ofc6_name:TYPE(STRING40):0,0
+FIELD:ofc6_title:TYPE(STRING5):LIKE(invalid_ofc1_title):0,0
+FIELD:ofc6_add:TYPE(STRING50):0,0
+FIELD:ofc6_csz:TYPE(STRING50):0,0
+FIELD:ofc6_fein:TYPE(STRING15):0,0
+FIELD:ofc6_ssn:TYPE(STRING12):0,0
+FIELD:fee:TYPE(STRING8):0,0
+FIELD:fee_2:TYPE(STRING8):0,0
+FIELD:tax_cl:TYPE(STRING11):0,0
+FIELD:perm_type:TYPE(STRING15):0,0
+FIELD:page:TYPE(STRING4):0,0
+FIELD:volume:TYPE(STRING4):0,0
+FIELD:comments:TYPE(STRING20):0,0
+FIELD:jurisdiction:TYPE(STRING10):0,0
+FIELD:adcrecordno:TYPE(STRING25):0,0
+FIELD:crlf:TYPE(STRING2):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

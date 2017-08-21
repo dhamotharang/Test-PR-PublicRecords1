@@ -12,30 +12,43 @@ export dataset(OutputLayout) Function_GetBIDs(
 	pattern p_find := (p_phrase after (first or p_ws)) before (p_ws or last);
 
 	without_zip_set := parse(
-		in_data_unparsed(company_name != ''),
-		company_name,
+		in_data_unparsed(clean_company_name != ''),
+		clean_company_name,
 		p_find,
 		transform(InputLayout,
 			self.ph_phrase := metaphonelib.dmetaphone2(matchtext(p_phrase)),
 			self.phrase := matchtext(p_phrase),
 			self := left),
-		scan all) + in_data_unparsed(company_name = '') : independent;
+		scan all) + in_data_unparsed(clean_company_name = '') : independent;
+	
+	zip_set_record := record, maxlength(16384)
+		recordof(without_zip_set) - [zip];
+		set of string5 zip_set;
+	end;
 	
 	in_data := rollup(group(sort(without_zip_set,acctno,record,except zip),record,except zip),group,
-		transform({recordof(without_zip_set) - [zip];set of string5 zip_set;},
+		transform(zip_set_record,
 			self.zip_set := set(rows(left)(zip != ''),zip),
 			self := left));
+	
+	company_name_rec := record, maxlength(16384)
+		in_data.acctno;
+		in_data.ph_phrase;
+		in_data.phrase;
+		in_data.state;
+		in_data.zip_set;
+		in_data.company_name;
+	end;
 	
 	// Get BIDs by Company Name (and optionally CSZ)
 	company_name_bids :=
 		join(
 			dedup(
-				table(in_data(phrase != ''),
-					{acctno,ph_phrase,phrase,state,zip_set,company_name}),
+				table(in_data(phrase != ''),company_name_rec),
 				acctno,ph_phrase,phrase,state,zip_set,company_name,all),
 			Keys().CompanyName.QA,
 			keyed(left.ph_phrase = right.ph_phrase) and
-			keyed(in_options.phonetics or left.phrase = right.phrase) and
+			keyed(in_options.phoneticcompany or left.phrase = right.phrase) and
 			wild(right.core) and
 			keyed(left.state = '' or left.state = right.state) and
 			keyed(left.zip_set = [] or right.zip in left.zip_set) and
@@ -57,12 +70,20 @@ export dataset(OutputLayout) Function_GetBIDs(
 	company_name_bids_counted := table(dedup(company_name_lafn_phrases,acctno,phrase,bid,all),{acctno,phrase,unsigned cnt := count(group)},acctno,phrase);
 	company_name_bids_filtered := join(company_name_lafn_phrases,company_name_bids_counted(cnt > SEARCHLIMIT),left.acctno = right.acctno and left.phrase = right.phrase,transform(OutputLayout,self := left),left only);
 	
+	address_rec := record, maxlength(16384)
+		in_data.acctno;
+		in_data.state;
+		in_data.zip_set;
+		in_data.prim_name;
+		in_data.prim_range;
+		in_data.sec_range;
+	end;
+	
 	// Get BIDs by Address
 	address_bids := 
 		join(
 			dedup(
-				table(in_data(state != '' and zip_set != [] and prim_name != ''),
-					{acctno,state,zip_set,prim_name,prim_range,sec_range}),
+				table(in_data(state != '' and zip_set != [] and prim_name != ''),address_rec),
 				acctno,state,zip_set,prim_name,prim_range,sec_range,all),
 			Keys().Address.QA,
 			keyed(left.state = right.state) and

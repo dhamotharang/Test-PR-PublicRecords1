@@ -1,7 +1,7 @@
 /*--SOAP--
 <message name="CompanyNameClean">
 <part name="company_name" type="xsd:string"/>
-</message>
+</message> 
 */
 EXPORT CompanyNameClean := MACRO
   IMPORT BIPV2_Company_Names;
@@ -11,4 +11,3 @@ EXPORT CompanyNameClean := MACRO
   BIPV2_Company_Names.functions.mac_go(dInputPrep,dCnpName,rid,company_name,input_alphabetical);
 	OUTPUT(dCnpName,	NAMED('Result'));
 ENDMACRO;
-

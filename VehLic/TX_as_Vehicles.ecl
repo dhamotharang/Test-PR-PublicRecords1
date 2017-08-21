@@ -186,4 +186,4 @@ self.LH_3_ZIP5_ZIP4_FOREIGN_POSTAL:=lFormatZipAndZip4(le.lh3_zpcd,le.lh3_zpcd4);
 
 updp := project(File_TX_Update,upd_into(left));
 
-export TX_as_Vehicles :=  updp+j3 : persist('Persist::VehReg_TX_as_Vehicles');
+export TX_as_Vehicles :=  updp+j3 : persist('~thor_data400::persist::vehreg_tx_as_vehicles');

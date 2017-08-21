@@ -1,6 +1,7 @@
 import SANCTN,lib_stringlib;
 
 #uniquename(cluster);
+#OPTION('multiplePersistInstances',FALSE);
 
 layout_payload := record
 	string payload;

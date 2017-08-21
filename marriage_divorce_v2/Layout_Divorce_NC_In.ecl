@@ -14,7 +14,7 @@ export Layout_Divorce_NC_In := record
   string3   DECREE_CNTY;
   string4   P_SOUNDEX;
   string4   D_SOUNDEX;
-  string127 INFO_1998;
-  string1   crlf;
+  string16 INFO_1998;
+  string113   crlf;
 
 end;

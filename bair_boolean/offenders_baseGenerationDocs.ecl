@@ -6,17 +6,25 @@ FILENAME:offenders_base
 RIDFIELD:newrid:GENERATE
 DOCFIELD:eid:HASH5
 IDNAME:newrid
-IDSPACE:MDR.sourceTools.src_Bair_Analytics
+IDSPACE:le.class_code
 FIELD:eid:0,0
 FIELD:gh12:0,0
+FIELD:gh4:0,0
+FIELD:gh5:0,0
+FIELD:gh6:0,0
 FIELD:etype:0,0
 FIELD:agency_offender_id:0,0
 FIELD:address:0,0
-FIELD:first_name:0,0
-FIELD:middle_name:0,0
-FIELD:last_name:0,0
-FIELD:moniker:0,0
-FIELD:name_type:0,0
+FIELD:wc_first_name:SEGTYPE(FieldDataType):1,0
+FIELD:first_name:1,0
+FIELD:wc_middle_name:SEGTYPE(FieldDataType):1,0
+FIELD:middle_name:1,0
+FIELD:wc_last_name:SEGTYPE(FieldDataType):1,0
+FIELD:last_name:1,0
+FIELD:wc_moniker:SEGTYPE(FieldDataType):1,0
+FIELD:moniker:1,0
+FIELD:wc_name_type:SEGTYPE(FieldDataType):1,0
+FIELD:name_type:1,0
 DATEFIELD:clean_dob:0,0
 FIELD:race:0,0
 FIELD:sex:0,0
@@ -38,19 +46,19 @@ FIELD:shirt:0,0
 FIELD:pants:0,0
 FIELD:shoes:0,0
 FIELD:jacket:0,0
-NUMBERFIELD:weight_1:0,0
-NUMBERFIELD:weight_2:0,0
-NUMBERFIELD:height_1:0,0
-NUMBERFIELD:height_2:0,0
-NUMBERFIELD:age_1:0,0
-NUMBERFIELD:age_2:0,0
-FIELD:offenders_sid:0,0
+FIELD:weight_1:SEGTYPE(NumericType):1,0
+FIELD:weight_2:SEGTYPE(NumericType):1,0
+FIELD:height_1:SEGTYPE(NumericType):1,0
+FIELD:height_2:SEGTYPE(NumericType):1,0
+FIELD:age_1:SEGTYPE(NumericType):1,0
+FIELD:age_2:SEGTYPE(NumericType):1,0
+FIELD:wc_offenders_sid:SEGTYPE(FieldDataType):1,0
+FIELD:offenders_sid:1,0
 FIELD:dl_number:0,0
 FIELD:dl_state:0,0
 FIELD:fbi_number:0,0
 FIELD:offender_notes:0,0
 DATEFIELD:clean_edit_date:0,0
-FIELD:quarantined:0,0
 FIELD:admin_state:0,0
 FIELD:agency_name:0,0
 FIELD:user_text_1:0,0
@@ -69,11 +77,15 @@ FIELD:probation_officer:0,0
 FIELD:warrant_type:0,0
 FIELD:warrant_number:0,0
 FIELD:gang_name:0,0
+FIELD:agency:0,0
+FIELD:data_provider_ori:0,0
+FIELD:gang_role:0,0
 DATEFIELD:clean_classification_date:0,0
 DATEFIELD:clean_expiration_date:0,0
 CONCEPT:DATE:clean_classification_date:SEGTYPE(GroupSeg):1,0
  
-Total available specificity:1
+ 
+Total available specificity:19
 Search Threshold set at -4
 Use of PERSISTs in code set at:3
  

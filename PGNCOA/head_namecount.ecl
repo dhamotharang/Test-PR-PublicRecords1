@@ -1,6 +1,6 @@
-import header;
+import header,header_slimsort;
 
-head := header.File_Headers;
+head := header_slimsort.propagated_matchrecs;
 
 namerec := record
 	head.fname;

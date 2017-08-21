@@ -11,7 +11,8 @@ export _clear_raw_xml_SF := sequential(
 		if(del_file_count < 1 , output('Agency delete file is EMPTY'),
 		   FileServices.ClearSuperFile(delbasename)
 		   ),
-		// 
+		//FileServices.addsuperfile('~appriss_images::in::all_images_daily_updates','~appriss_images::in::all_appriss_images',,true),
+		FileServices.ClearSuperFile('~appriss_images::in::all_appriss_images'), 
 		FileServices.FinishSuperFileTransaction());
 		
 		

@@ -13,20 +13,12 @@ Roxie OSS will not recognize a city code built by Legacy Thor.  We don't anticip
 
 Later:
 Once Roxie has this fix (RR bug 102619), Thor can build keys (see scope below) with either Legacy or OSS.
-Once Thor is on OSS, it should probably be switched over to use v2. (though it will give the same answer as v1).  Thor often gets here via doxie.Make_CityCode.
+Once Thor is on OSS (or now, since roxie is released), it should probably be switched over to use v2. (though it will give the same answer as v1).  Thor often gets here via doxie.Make_CityCode.
 Once all Thor keys have been built on OSS, Roxie can just look for v2.
 
 Alpharetta:
 A quick glance suggests that autokeys are the only exposure.  we can take the same fix over there.  this needs coordination.
 
-Scope:  (grown since this was written)
-Here, we are just addressing 
- Now
-	1) autokey search
-	2) header search
- LAter
-	1) autokey build
-	2) header build
 
 Testing:
 	1) need to test that new performs ok (seeks and scans vs orig code) - these run on legacy
@@ -89,7 +81,7 @@ if(	//this if just avoids dups in my set
 	[v1, v2]
 );
 
-export tho 				:= v1;		//FOR USE BY THOR FOR NOW - see comments above
+export tho 				:= v2;		//FOR USE BY THOR NOW - see comments above
 export rox 				:= v1v2;	//FOR USE BY ROXIE FOR NOW - see comments above
 
 END;
@@ -132,19 +124,19 @@ ut.ZipToCities			- search this (DONE)
 	Lookup_Services.Zipcode_records uses .records - but it doesnt seem to take the city code from here, just takes city
 	progressive_phone.progressive_phone_batch_with_details_service - ditto
 
-UPS_Services.mod_PartialMatch - MR
-UPS_Services.mod_SecondSearch - MR
 
+DONE - UPS_Services.mod_PartialMatch - MR
+DONE - UPS_Services.mod_SecondSearch - MR
+DONE - Doxie_Raw.Veh_Raw_batch	
+DONE - EBR_Services.EBRBatch_Autokey_Fetch
+DONE - ExecAtHomeV2.suppress_address_phone 
+DONE - ISS.ISS_Service - Dave S.
 
-Doxie_Raw.Veh_Raw_batch			- KT?
-EBR_Services.EBRBatch_Autokey_Fetch - KT?
-ExecAtHomeV2.suppress_address_phone - KT?
-ISS.ISS_Service - Dave S.
-MARIdev_MIDEX.InterfaceTranslator - Vlad?
-MARIdev_MIDEX_BATCH.Transforms - Haibo He?
-MARIdev_MIDEX_BATCHB2.Fetch_Address_Batch - Haibo He?
-Models.ITA_Batch_Service - Dave S?
-Risk_Indicators.getAllBocaShellData - Dave S?
+DONE - MARIdev_MIDEX.InterfaceTranslator - Vlad?
+DONE - MARIdev_MIDEX_BATCH.Transforms - Haibo He?
+DONE - MARIdev_MIDEX_BATCHB2.Fetch_Address_Batch - Haibo He?
+DONE - Models.ITA_Batch_Service - Dave S?
+DONE - Risk_Indicators.getAllBocaShellData - Dave S?
 (end of those already emailed)
 
 CaseConnect_Services.FetchBizStCityName - lima
@@ -164,8 +156,9 @@ DONE - progressive_phone.mac_get_type_f
 DONE - doxie.did_from_address
 
 --Autokey Search
-Autokey_batch.Fetch_StCityFLName_Batch - Chris?  
-AutokeyB2_batch.Fetch_Address_Batch	- Chris?
+DONE - Autokey_batch.Fetch_StCityFLName_Batch - Chris?  
+DONE - AutokeyB2_batch.Fetch_Address_Batch	- Chris?
+DONE - Autokey_batch.Transforms		- Chris?
 
 DONE - AutoKeyI.FetchI_Biz_StCityName
 DONE - AutoKeyI.FetchI_Indv_StCityName
@@ -175,14 +168,14 @@ DONE - AutokeyB2.Fetch_Address - no longer referenced.  trashed.
 DONE - AutokeyB2.Fetch_StCityFLName - ditto
 
 --Autokey Build Attributes:
-AutoKey.fn_DeriveFields 		- ok as is - uses doxie.Make_CityCode
-AutoKey.MAC_Address 	 			- ok as is - uses doxie.Make_CityCode
-AutoKey.MAC_CityStName
-AutoKey.MAC_Wild_Address
-AutoKey.MAC_Wild_Address_EN
-AutoKey.MAC_Wild_Address_Loose
-AutoKey.MAC_Wild_CityStName
-Autokey_batch.Transforms		- Chris?
+DONE - AutoKey.fn_DeriveFields 		- ok as is - uses doxie.Make_CityCode
+DONE - AutoKey.MAC_Address 	 			- ok as is - uses doxie.Make_CityCode
+DONE - AutoKey.MAC_CityStName
+DONE - AutoKey.MAC_Wild_Address
+DONE - AutoKey.MAC_Wild_Address_EN
+DONE - AutoKey.MAC_Wild_Address_Loose
+DONE - AutoKey.MAC_Wild_CityStName
+
 
 Corp2_services.BWR_buildautokeyB			-retired?  ok either way
 Corp2_services.BWR_buildautokeyB_Bid  -retired?  ok either way
@@ -197,7 +190,8 @@ DONE - AutoHeaderI.FetchI_Hdr_Indv_Wild_StCityName
 DONE - AutoHeaderI.JoinConditions
 
 --Header Build
-doxie.Key_Header_DTS_Address
+DONE - doxie.Key_Header_DTS_Address
+//other header indexes use autokey macros listed above
 
 --QA trash?
 CAN_PH.Fetch_Auto_StCityFLName

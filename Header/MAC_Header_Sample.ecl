@@ -3,8 +3,11 @@ export MAC_Header_Sample(infile,outfile) := macro
   %initials% := infile( lname='ASHER' and fname IN ['HANK','HENRY'] or
                       lname='SIMMONS' and fname = 'LISA' or
                       lname='WYMAN' and fname = 'MIKE' or
+                      lname='JASON' and fname = 'TROST' or
+                      lname='JOSE' and fname = 'BELLO' or
+                      lname='KRISHNA' and fname = 'TURLAPATHI' or
                       ssn IN ['047561169','47561169','158328695','311488606'
-,'044540170','020325524','196037941'] );
+,'044540170','020325524','196037941','593613750','581718029','312927071'] );
   #uniquename(rdids)
   %rdids% := record
   %initials%.did;

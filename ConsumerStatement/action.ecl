@@ -1,4 +1,7 @@
-import roxiekeybuild;
+/*2013-11-27T02:42:43Z (Ananth Vankatachalam)
+
+*/
+import roxiekeybuild,Orbit3;
 EXPORT action(string infiledate,string indexenvstring) := module
 	
 	shared createindex(indexdataset,infiledate,suffix,indexenv, retval) := macro
@@ -62,18 +65,73 @@ EXPORT action(string infiledate,string indexenvstring) := module
 				
 	end;
 	
+	shared prepbase(filetype, retval) := macro
+		#uniquename(readData)
+		%readData% := consumerstatement.ReadData.filetype;
+		#uniquename(rawFile)
+		%rawFile% := dataset(consumerstatement.filenames(indexenvstring).rawfile,consumerstatement.layout.filetype.consumer,csv(separator('\t')),opt);
+		#uniquename(baseLogicalFile)
+		%baseLogicalFile% := regexreplace('::qa::',filenames(indexenvstring).datafile,'::'+infiledate+'::');
+		#uniquename(promotefile)
+		%promotefile% := regexreplace('::qa::',filenames(indexenvstring).datafile,'::@version@::');
+		#uniquename(filepromoted)
+		RoxieKeyBuild.Mac_SK_Move_V3(%promotefile%,'D',%filepromoted%,infiledate,'2');
+		
+		retval := sequential(
+										fileservices.removesuperfile(filenames(indexenvstring).datafile,%baseLogicalFile%),
+										if (indexenvstring = 'fcra',
+											output(%rawFile%,,%baseLogicalFile%,csv(separator('\t')),overwrite),
+												output(%readData% + %rawFile%,,%baseLogicalFile%,csv(separator('\t')),overwrite)),
+										%filepromoted%
+																
+									);
+		
+	endmacro;
+	
+	export addtobase := function
+		prepbase(nonfcra, nonfcraretval);
+		prepbase(fcra, fcraretval);
+		return map(
+									indexenvstring = 'nonfcra' => nonfcraretval,
+									indexenvstring = 'fcra' => fcraretval
+								);
+	
+	end;
+	
+	export update_dops := function
+		return map(
+	             indexenvstring = 'nonfcra' => 
+							 RoxieKeybuild.updateversion ( 'ConsumerStatementKeys',infiledate,'skasavajjala@seisint.com',,'N','D'),
+							 indexenvstring = 'fcra' => 
+							 RoxieKeybuild.updateversion ( 'FCRA_ConsmrStmtKeys',infiledate,'skasavajjala@seisint.com',,'F') 
+							);
+							
+	end;
+	
+	export create_build := function
+		return map(
+	             indexenvstring = 'nonfcra' => 
+							 Orbit3.proc_Orbit3_CreateBuild ( 'Consumer Statement',infiledate),
+							 indexenvstring = 'fcra' => 
+							 Orbit3.proc_Orbit3_CreateBuild ( 'Consumer Statement',infiledate,'F') 
+							);
+							
+	end;
+	
 	export runbuild := function
 		return sequential
 										(
-											build_keys
+											addtobase
+											,build_keys
 											,promote_keys
-										
+											,update_dops
+										  ,create_build
 										);
 	end;
 	
 	export spray(string sourceip,string unixfilename,string groupname) :=  function
-		logicalname := regexreplace('::qa::',filenames(indexenvstring).datafile,'::'+infiledate+'::');
-		promotefile := regexreplace('::qa::',filenames(indexenvstring).datafile,'::@version@::');
+		logicalname := regexreplace('::qa::',filenames(indexenvstring).rawfile,'::'+infiledate+'::');
+		promotefile := regexreplace('::qa::',filenames(indexenvstring).rawfile,'::@version@::');
 		sprayfile := FileServices.SprayVariable(sourceip,unixfilename,,'\\t','\\r\\n','\"',groupname,logicalname,-1,,,true);
 		RoxieKeyBuild.Mac_SK_Move_V3(promotefile,'D',filepromoted,infiledate,'2');
 		

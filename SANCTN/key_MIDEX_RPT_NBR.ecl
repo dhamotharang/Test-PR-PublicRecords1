@@ -1,4 +1,4 @@
-Import Data_Services, doxie_files, doxie,ut,lib_stringlib,Lib_FileServices;
+Import Data_Services, doxie_files, doxie,ut,lib_stringlib,Lib_FileServices, codes;
 
 f_sanctn_party := SANCTN.file_base_party;
 
@@ -25,7 +25,7 @@ layout_SANCTN_party_key tSANCTN_key(f_sanctn_party L) := transform
 																										+ tmp_incident_number +'-' 
 																										+ cln_party_number);
 	 //populate st field when instate exists and all other address fields are blank and address cleaner does not return a state.
-	 self.st 				 := IF(L.st='' and length(trim(L.instate))=2 and L.incity='' and L.inzip='' and L.inaddress='' and  ut.valid_st(L.instate),
+	 self.st 				 := IF(L.st='' and length(trim(L.instate))=2 and L.incity='' and L.inzip='' and L.inaddress='' and  codes.valid_st(L.instate),
 										 		 trim(L.instate),
 												 L.st);
 	 

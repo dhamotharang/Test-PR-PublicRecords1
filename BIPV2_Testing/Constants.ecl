@@ -1,6 +1,6 @@
 EXPORT Constants := 
 MODULE;
-
+	Export PlatFormTest :='BeforePfUpgrade'; //'' means not a PlatForm test. Other values should be 'BeforePfUpgrade', 'AfterPfUpgrade' and used to indicate pf test.
 	EXPORT SC := //ShortCycle
 	MODULE
 		Export LFPrefx := '~thor_data400::bipv2.shortcycle.';

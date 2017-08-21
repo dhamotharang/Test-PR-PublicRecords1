@@ -60,4 +60,6 @@ EXPORT Types := MODULE
 	EXPORT SequenceKeyType	:= UNSIGNED8;
   EXPORT DocVersion       := UNSIGNED1;
 	EXPORT SourceList				:= SET of SourceID;
+  EXPORT BuildType        := ENUM(Regular, SeparateIncrement, MergedIncrement,
+                                  CumulativeIncrement);
 END;

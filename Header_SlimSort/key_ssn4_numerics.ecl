@@ -1,4 +1,4 @@
-import header,ut,doxie,watchdog,mdr;
+import header,ut,doxie,watchdog,mdr,data_services;
 
 inf := header.fn_filter_for_keys_and_slimsorts(header.file_headers,true);
 
@@ -25,7 +25,7 @@ TRANSFORM
 	SELF.ssn4 := (unsigned2)(IF(LENGTH(TRIM(le.ssn))=4, le.ssn[1..4], le.ssn[6..9]));
 	SELF.ssn5 := (unsigned3) (IF(LENGTH(TRIM(le.ssn))=4, '', le.ssn[1..5]));
 	SELF.zip := (unsigned3)le.zip;
-	SELF.yob := (unsigned2)(le.dob[1..4]);
+	SELF.yob := (unsigned2)(((string)le.dob)[1..4]);
 	SELF.fi := IF(i=1,ut.Chr2PhoneDigit(le.fname[1]),ut.Chr2PhoneDigit(pfname[1]));
 	SELF.li := ut.Chr2PhoneDigit(le.lname[1]);
 	SELF.prim_range := (unsigned5) stringlib.StringFilter(le.prim_range,'0123456789');
@@ -70,5 +70,5 @@ INDEX(
 	j,
 	{ssn4,zip,yob,fi,li},
 	{j},
-	ut.foreign_prod+'thor_data400::key::header::ssn4_zip_yob_fi_' + doxie.Version_SuperKey
+	data_services.foreign_prod+'thor_data400::key::header::ssn4_zip_yob_fi_' + doxie.Version_SuperKey
 );

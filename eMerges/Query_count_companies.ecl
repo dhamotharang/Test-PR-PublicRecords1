@@ -1,3 +1,5 @@
+import address;
+
 hvcfile := emerges.file_hvccw_base;
 
 Layout_hvc_entity := record
@@ -9,13 +11,13 @@ end;
 Layout_hvc_entity AddEntity(emerges.Layout_eMerge_In L) := transform
 self := L;
 self.entity_type := if(Datalib.CompanyClean(l.lname_in + l.fname_in + l.mname_in)[41..120] = '' and 
-					(unsigned4)(AddrCleanLib.CleanPerson73(l.lname_in + l.fname_in + l.mname_in)[71..73]) >= 85  and
+					(unsigned4)(address.CleanPerson73(l.lname_in + l.fname_in + l.mname_in)[71..73]) >= 85  and
 					(unsigned4)(Datalib.NameClean(l.lname_in + l.fname_in + l.mname_in)[142]) < 3, 0, // person
 				if(Datalib.CompanyClean(l.lname_in + l.fname_in + l.mname_in)[41..120] <> '' and
-					(unsigned4)(AddrCleanLib.CleanPerson73(l.lname_in + l.fname_in + l.mname_in)[71..73]) >= 85  and
+					(unsigned4)(address.CleanPerson73(l.lname_in + l.fname_in + l.mname_in)[71..73]) >= 85  and
 					(unsigned4)(Datalib.NameClean(l.lname_in + l.fname_in + l.mname_in)[142]) < 3, 1, // person and business
 				if(Datalib.CompanyClean(l.lname_in + l.fname_in + l.mname_in)[41..120] <> '' or
-					(unsigned4)(AddrCleanLib.CleanPerson73(l.lname_in + l.fname_in + l.mname_in)[71..73]) < 85  and
+					(unsigned4)(address.CleanPerson73(l.lname_in + l.fname_in + l.mname_in)[71..73]) < 85  and
 					(unsigned4)(Datalib.NameClean(l.lname_in + l.fname_in + l.mname_in)[142]) >= 3, 2, 3))); // business
 end;
 

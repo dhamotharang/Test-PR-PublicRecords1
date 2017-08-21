@@ -1,9 +1,9 @@
-import _control, VersionControl;
+import _control, tools;
 
 export _Flags :=
 module
 
-	export IsTesting 							:= VersionControl._Flags.IsDataland;
+	export IsTesting 							:= tools._Constants.IsDataland;
 	
 	export UseStandardizePersists := not IsTesting;	// for bug 26170 -- Missing dependency from persist to stored
 	

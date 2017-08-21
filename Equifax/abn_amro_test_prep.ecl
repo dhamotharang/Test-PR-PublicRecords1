@@ -39,7 +39,7 @@ string9   fein;
 end;
 
 layout_abn_amro_test_clean CleanInput(layout_abn_amro_test_seq l) := transform
-self.clean_bus_address := addrcleanlib.cleanAddress182(trim(l.STREET), trim(l.CITY) + ', ' + trim(l.STATE) + ' ' + trim(l.ZIP));
+self.clean_bus_address := address.cleanAddress182(trim(l.STREET), trim(l.CITY) + ', ' + trim(l.STATE) + ' ' + trim(l.ZIP));
 self.phone10 := '';
 self.fein := '';
 self := l;

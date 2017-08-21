@@ -1,6 +1,11 @@
-IMPORT Business_Header, ut;
+Import Data_Services, Business_Header, ut, PRTE2_Business_Header;
 
-bh := Business_Header.File_Prep_Business_Header_Plus;
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+bh := PRTE2_Business_Header.File_Business_Header_Base_for_keybuild;
+#ELSE
+bh := Business_Header.File_Business_Header_Base_for_keybuild;
+#END;
+
 bh_ded := DEDUP(bh, bdid, source, ALL);
 
 layout_src_seq := RECORD

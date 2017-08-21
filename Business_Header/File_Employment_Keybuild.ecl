@@ -1,5 +1,2 @@
-string_rec := record
-	Business_Header.Layout_Employment_Out;
-    unsigned integer8 __filepos { virtual(fileposition)};
-end;
-export File_Employment_Keybuild := DATASET(Business_Header.Bus_Thor + 'OUT::Employment', string_rec, flat);
+export File_Employment_Keybuild := DATASET(_dataset().thor_cluster_files + 'OUT::Employment_built'
+	, Business_Header.Layout_Employment_keybuild, flat);

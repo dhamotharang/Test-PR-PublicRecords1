@@ -150,6 +150,9 @@ watercraft_color_desc(string3 code)
 'TPE' => 'TAUPE',
 'TRQ' => 'TURQUOISE',
 'UNK' => 'UNKNOWN',
+'BLU' => 'BLUE',
+'TEA' => 'TEAL',
+'WHI' => 'WHITE',
 'YEL' => 'YELLOW', '');
 		  
 		  
@@ -207,8 +210,8 @@ title_type_desc(string1 code)
 'S' => 'SNOW MCH',
 'Y' => 'YEAR TAB', '');
 
-
-watercraft.Macro_Is_hull_id_in_MIC(watercraft.file_AK_clean_in, watercraft.Layout_AK_clean_in, wDatasetwithflag)
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_AK_clean_in, watercraft.Layout_AK_clean_in,hull_clean_in)
+watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.Layout_AK_clean_in, wDatasetwithflag)
 
 
 watercraft.Layout_Watercraft_Main_Base main_mapping_format(wDatasetwithflag L) := transform
@@ -311,6 +314,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(wDatasetwithflag L) :
 	self.watercraft_status_description		:=	'';
 	self.history_flag						:=	'';
 	self.coastguard_flag					:=	'';
+	self.signatory                          := case(stringlib.StringToUpperCase(L.ConJuntnCode1), 'AND'=> 'YES', 'OR'=>'NO', '');
 	
 end;
 

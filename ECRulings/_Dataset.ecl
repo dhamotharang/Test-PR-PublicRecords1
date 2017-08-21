@@ -1,4 +1,4 @@
-import _control, versioncontrol,ut;
+import _control, data_services, versioncontrol;
 
 export _Dataset(
 
@@ -6,16 +6,17 @@ export _Dataset(
 
 ):=
 module
-	export Name							:= 'ECRulings';
+	export Name											:= 'ECRulings';
 	export foreign_environment 			:= if(VersionControl._Flags.IsDataland
-																	,ut.foreign_prod
-																	,ut.foreign_dataland
-																);
+																				,data_services.foreign_prod
+																				,data_services.foreign_dataland
+																			 );
 												
 	
-	export thor_cluster_Files			:= 	if(pUseOtherEnvironment 
-												,foreign_environment + 'thor_data400::'
-												,'~thor_data400::');
+	export thor_cluster_Files				:= 	if(pUseOtherEnvironment 
+																				,foreign_environment + 'thor_data400::'
+																				,'~thor_data400::'
+																			 );
 
 	export Groupname					:= VersionControl.Groupname();
 

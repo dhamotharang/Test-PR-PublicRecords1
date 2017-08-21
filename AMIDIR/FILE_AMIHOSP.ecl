@@ -1,0 +1,1 @@
+export File_AMIHOSP := dataset(AMIDIR.Cluster + 'in::AMIDIR::AMIHOSP',amidir.Layout_AMIHOSP,flat);

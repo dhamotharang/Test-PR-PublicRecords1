@@ -22,7 +22,7 @@ functionmacro
   );  //kick off on dataland
 
   cluster20 := tools.fun_Groupname('20');
-  cluster92 := tools.fun_Groupname('92');
+  cluster44 := tools.fun_Groupname('44');
   cluster30 := tools.fun_Groupname('30');
   cluster60 := tools.fun_Groupname('60');
 
@@ -32,28 +32,36 @@ functionmacro
   CheckDatalandKeys     := email.BIPV2DatalandKeys.Roxie;
   outputdatalandkeys    := BIPV2_Build.DatalandKeys_Package(pversion,false).outputpackage;
   
+  f_out :=   BIPV2_Files.files_CommonBase.filePrefix  + pversion;
+  
   return 
   iff(Tools._Constants.isdataland = false
     ,sequential(
-       BIPV2_Build.Promote().Built2QA //this includes everything
+       // BIPV2.CommonBase.updateSuperfiles(f_out) //update base file
+       BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Common_Base.dall_filenames).new2base  //update commonbase file
+      ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Common_Base.dall_filenames).built2qa  //update commonbase file
+      ,BIPV2_Build.Promote().Built2QA //this includes everything
       ,UpdateFullKeysDops
       ,UpdateWeeklyKeysDops
       ,iff(pShouldDoOtherClusters = true  ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster20).Built2QA )
-      ,iff(pShouldDoOtherClusters = true  ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster92).Built2QA )
+      ,iff(pShouldDoOtherClusters = true  ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster44).Built2QA )
       ,iff(pShouldDoOtherClusters = true  ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster30).Built2QA )
       ,iff(pShouldDoOtherClusters = true  ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster60).Built2QA )
       ,if(pShouldDoDataland ,KickPromote2QADataland)
       // ,BIPV2_Build.Build_Space_Usage(pversion,pType := 2)
       ,iff(pShouldDoOtherClusters = true and pPerformCleanup = true ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster20,pDelete := true).Cleanup  ) 
-      ,iff(pShouldDoOtherClusters = true and pPerformCleanup = true ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster92,pDelete := true).Cleanup  )
+      ,iff(pShouldDoOtherClusters = true and pPerformCleanup = true ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster44,pDelete := true).Cleanup  )
       ,iff(pShouldDoOtherClusters = true and pPerformCleanup = true ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster30,pDelete := true).Cleanup  )
       ,iff(pShouldDoOtherClusters = true and pPerformCleanup = true ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster60,pDelete := true).Cleanup  )
       ,iff(pPerformCleanup        = true                            ,BIPV2_Build.Promote(,'^(?!.*?(wkhistory|precision|space|dashboard).*).*$',pDelete := true).Cleanup )
       // ,BIPV2_Build.Build_Space_Usage(pversion,pType := 3)
     )
     ,sequential(
+       // BIPV2.CommonBase.updateSuperfiles(f_out) //update base file
        BIPV2_Build.Promote(pversion,'bizlinkfull|bipv2_seleid_relative|bipv2_best').new2Built  //just in case they weren't added to built
       ,BIPV2_Build.Promote(,'bizlinkfull|bipv2_seleid_relative|bipv2_best').Built2QA
+      ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Common_Base.dall_filenames).built2qa //update commonbase file
+      ,BIPV2_Build.Promote(pversion,,,false,BIPV2.Filenames(pversion).Common_Base.dall_filenames).new2Base //update commonbase file
       ,CheckDatalandKeys
       ,outputdatalandkeys
       ,iff(pPerformCleanup = true  ,BIPV2_Build.Promote(,'bizlinkfull|bipv2_seleid_relative|bipv2_best',pDelete := true).Cleanup  )

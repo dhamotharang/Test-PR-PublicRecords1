@@ -1,4 +1,4 @@
-import _control, versioncontrol,ut;
+import _control, versioncontrol,ut,Data_Services;
 
 export _Dataset(
 
@@ -8,8 +8,9 @@ export _Dataset(
 module
 
 	export foreign_environment := if(VersionControl._Flags.IsDataland
-																	,ut.foreign_prod
-																	,ut.foreign_dataland
+																	//,ut.foreign_prod
+																	,Data_Services.Data_location.Prefix('property') //using this instead of above statement
+																	,Data_Services.Data_location.Prefix('property') //DF16773
 																);
 												
 	export Name										:= 'foreclosure'		;

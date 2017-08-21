@@ -1,6 +1,6 @@
-import business_header, infousa, ut, address;
+import business_header, infousa, ut, address,mdr;
 
-export fDEADCO_As_Business_Header(dataset(infousa.Layout_DEADCO_Clean_In) pDEADCO)
+export fDEADCO_As_Business_Header(dataset(InfoUSA.Layout_Deadco_Base_AID) pDEADCO)
  :=
   function
 
@@ -8,13 +8,13 @@ export fDEADCO_As_Business_Header(dataset(infousa.Layout_DEADCO_Clean_In) pDEADC
 
 	Layout_DEADCO_temp := RECORD
 	UNSIGNED6 record_id := 0;
-	infousa.Layout_DEADCO_Clean_In;
+	InfoUSA.Layout_Deadco_Base_AID;
 	END;
 
 	//--------------------------------------------
 	// Add unique record id to deadco file
 	//--------------------------------------------
-	Layout_DEADCO_temp AddRecordID(infousa.Layout_DEADCO_CLEAN_In L) := TRANSFORM
+	Layout_DEADCO_temp AddRecordID(InfoUSA.File_Deadco_Base_AID L) := TRANSFORM
 	SELF := L;
 	END;
 
@@ -25,14 +25,15 @@ export fDEADCO_As_Business_Header(dataset(infousa.Layout_DEADCO_Clean_In) pDEADC
 	//ut.MAC_Sequence_Records(deadco_temp , record_id, deadco_out);
 
 
-	business_header.Layout_Business_Header tDEADCOtoHEADER(Layout_DEADCO_temp L) := transform
+	business_header.Layout_Business_Header_New tDEADCOtoHEADER(Layout_DEADCO_temp L) := transform
 
 	  
 	 self.group1_id        := L.record_id;
+	 self.vl_id            := L.ABI_NUMBER + L.production_date;
 	 self.vendor_id        := L.ABI_NUMBER + L.production_date;
 	 self.phone            := (UNSIGNED6)((UNSIGNED8)L.phone);
 	 self.phone_score      := IF((UNSIGNED8)L.phone = 0, 0, 1);
-	 self.source           := 'ID';//waiting for reply from the vendor
+	 self.source           := MDR.sourceTools.src_INFOUSA_DEAD_COMPANIES;
 	 self.source_group     := L.ABI_NUMBER;
 	 self.company_name     := stringlib.stringtouppercase(L.company_name);
 	 self.dt_first_seen    := if((unsigned)L.dt_first_seen < 300000, (unsigned)L.dt_first_seen * 100, (unsigned)L.dt_first_seen);
@@ -48,7 +49,7 @@ export fDEADCO_As_Business_Header(dataset(infousa.Layout_DEADCO_Clean_In) pDEADC
 	 self.postdir			:= L.postdir;
 	 self.unit_desig		:= L.unit_desig;
 	 self.sec_range			:= L.sec_range;
-	 self.city				:= L.p_city_name;
+	 self.city				:= L.v_city_name;
 	 self.state				:= L.st;
 	 self.zip 				:= (unsigned3)L.zip5;
 	 self.zip4				:= (unsigned2)L.zip4;
@@ -56,6 +57,7 @@ export fDEADCO_As_Business_Header(dataset(infousa.Layout_DEADCO_Clean_In) pDEADC
 	 self.msa				:= L.msa;
 	 self.geo_lat			:= L.geo_lat;
 	 self.geo_long			:= L.geo_long;
+	 self.rawaid		:= L.Append_RawAID;		 
 
 	end;
 
@@ -70,7 +72,7 @@ export fDEADCO_As_Business_Header(dataset(infousa.Layout_DEADCO_Clean_In) pDEADC
 
 	deadco_header_sort := SORT(deadco_header_dist, group1_id, ut.CleanCompany(company_name),  -zip, -state, -city, local);
 
-	business_header.Layout_Business_Header Rollupdeadcoheader(business_header.Layout_Business_Header L, business_header.Layout_Business_Header R) 
+	business_header.Layout_Business_Header_New Rollupdeadcoheader(business_header.Layout_Business_Header_New L, business_header.Layout_Business_Header_New R) 
 
 	:= TRANSFORM
 	SELF := L;
@@ -97,15 +99,16 @@ export fDEADCO_As_Business_Header(dataset(infousa.Layout_DEADCO_Clean_In) pDEADC
 
 
 	// Final Rollup
-	business_header.Layout_Business_Header Rollupdeadco(business_header.Layout_Business_Header L, business_header.Layout_Business_Header R) := TRANSFORM
+	business_header.Layout_Business_Header_New Rollupdeadco(business_header.Layout_Business_Header_New L, business_header.Layout_Business_Header_New R) := TRANSFORM
 	SELF.dt_first_seen := 
 				ut.EarliestDate(ut.EarliestDate(L.dt_first_seen,R.dt_first_seen),
 				ut.EarliestDate(L.dt_last_seen,R.dt_last_seen));
-	SELF.dt_last_seen := ut.LatestDate(L.dt_last_seen,R.dt_last_seen);
-	SELF.dt_vendor_last_reported := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+	SELF.dt_last_seen := max(L.dt_last_seen,R.dt_last_seen);
+	SELF.dt_vendor_last_reported := max(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 	SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 	SELF.company_name := IF(L.company_name = '', R.company_name, L.company_name);
 	SELF.group1_id := IF(L.group1_id = 0, R.group1_id, L.group1_id);
+	SELF.vl_id := IF(L.vl_id = '', R.vl_id, L.vl_id);
 	SELF.vendor_id := IF((L.group1_id = 0 AND R.group1_id <> 0) OR
 						 L.vendor_id = '', R.vendor_id, L.vendor_id);
 	SELF.source_group := IF((L.group1_id = 0 AND R.group1_id <> 0) OR

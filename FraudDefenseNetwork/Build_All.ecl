@@ -1,4 +1,4 @@
-import RoxieKeyBuild, tools, _control;
+import RoxieKeyBuild, tools, _control, Orbit3, FraudShared;
 
 export Build_All(
 
@@ -8,10 +8,10 @@ export Build_All(
   ,boolean                                      PSkipGlb5Base                   = false 
 	,boolean                                      pSkipTigerBase                  = false
 	,boolean                                      pSkipCFNABase                   = false
-//	,boolean                                      pskipCrimBase                   = false 
 	,boolean                                      pskipTextMinedCrimBase          = false 
   ,boolean                                      pskipOIGBase                    = false 
 	,boolean                                      pSkipAInspection                = false       
+	,boolean                                      pSkipErieBase                   = false       
 	,string																				pDirectory											= '/data/super_credit/fdn/in'
 	,string																				pServerIP												= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10)
 	,boolean																			pIsTesting											= false
@@ -20,20 +20,9 @@ export Build_All(
 	,string		                                    pFilenameSuspectIP              = '*suspicious_ip*'
 	,string		                                    pFilenameTiger                  = '*Tiger*txt'
 	,string		                                    pFilenameCFNA                   = '*CFNA*txt'
-	,string		                                    pFilenamembs                    = 'fdn_file_info.txt'	
-	,string		                                    pFilenameMbsGcIdExclusion       = '*prev_fdn_file_gc*txt'	
-	,string		                                    pFilenameMbsNewGcIdExclusion    = '*fdn_file_gc*txt'	
-	,string		                                    pFilenameMbsIndTypeExclusion    = '*fdn_file_ind_type_ex*txt'	
-	,string		                                    pFilenameMbsProductInclude      = '*fdn_file_product*txt'	
-	,string		                                    pFilenameMBSSourceGcExclusion   = '*fdn_source_gc_exclusion*txt'
-	,string		                                    pFilenameMBSmarketAppend        = '*fdn_market*txt'
-	,string                                       pFilenameMBSFdnIndType          = 'fdn_ind_type.txt'
-	,string                                       pFilenameMBSFdnCCID             = 'mbsi_fdn_accounts*'
-	,string                                       pFilenameMBSFdnHHID             = 'hhid_fdn_accounts*'
-	,string                                       pFilenameMBSTableCol            = 'table_column.txt'
-	,string                                       pFilenameMBSColValDesc          = 'column_value_desc.txt'
+	,string		                                    pFilenameErie                   = '*ERIE*txt'
 	,string																				pGroupName											= _dataset().groupname																		
-	,dataset(Layouts.Base.Main)										pBaseMainFile										=	IF(_Flags.Update.Main, Files().Base.Main.QA, DATASET([], Layouts.Base.Main))
+	,dataset(FraudShared.Layouts.Base.Main)				pBaseMainFile										=	IF(_Flags.Update.Main, FraudShared.Files().Base.Main.QA, DATASET([], FraudShared.Layouts.Base.Main))
 	,dataset(Layouts.Base.SuspectIP)			        pBaseSuspectIPFile					    =	IF(_Flags.Update.SuspectIP, Files().Base.SuspectIP.QA, DATASET([], Layouts.Base.SuspectIP))
 	,dataset(Layouts.Base.GLB5)							      pBaseGLB5File							      =	IF(_Flags.Update.GLB5, Files().Base.GLB5.QA, DATASET([], Layouts.Base.GLB5))
 	,dataset(Layouts.Base.Tiger)							    pBaseTigerFile							    =	IF(_Flags.Update.Tiger, Files().Base.Tiger.QA, DATASET([], Layouts.Base.Tiger))
@@ -41,12 +30,14 @@ export Build_All(
 	,dataset(Layouts.Base.TextMinedCrim)          pBaseTextMinedCrimFile		      =	IF(_Flags.Update.TextMinedCrim, Files().Base.TextMinedCrim.QA, DATASET([], Layouts.Base.TextMinedCrim))
 	,dataset(Layouts.Base.OIG)                    pBaseOIGFile							      =	IF(_Flags.Update.OIG, Files().Base.OIG.QA, DATASET([], Layouts.Base.OIG))
 	,dataset(Layouts.Base.Ainspection)						pBaseAinspectionFile						=	IF(_Flags.Update.Ainspection, Files().Base.Ainspection.QA, DATASET([], Layouts.Base.Ainspection))
+	,dataset(Layouts.Base.Erie)						        pBaseErieFile						       =	IF(_Flags.Update.Erie, Files().Base.Erie.QA, DATASET([], Layouts.Base.Erie))
 	,dataset(Layouts.Input.SuspectIP)	            pUpdateSuspectIPFile	          =	Files().Input.SuspectIP.Sprayed
 	,dataset(Layouts.Input.GLB5)	                pUpdateGLB5File	                =	Files().Input.GLB5.Sprayed
 	,dataset(Layouts.Input.Tiger)	                pUpdateTigerFile	              =	Files().Input.Tiger.Sprayed
 	,dataset(Layouts.Input.CFNA)	                pUpdateCFNAFile	                =	Files().Input.CFNA.Sprayed
 	,dataset(Layouts.Input.Ainspection)	          pUpdateAinspectionFile	        =	Files().Input.Ainspection.Sprayed
-	,dataset(Layouts.Base.Main)										pBaseMainBuilt									= File_keybuild(Files(pversion).Base.Main.Built)
+	,dataset(Layouts.Input.Erie)	                pUpdateErieFile	                =	Files().Input.Erie.Sprayed
+	,dataset(FraudShared.Layouts.Base.Main)				pBaseMainBuilt									= File_keybuild(FraudShared.Files(pversion).Base.Main.Built)
 	// This below flag is to run full file or update append if pUpdateGLB5flag = false full file run and true runs update append of the base file
 	,boolean                                      pUpdateSuspectIPflag            = FraudDefenseNetwork._Flags.Update.SuspectIP
 	,boolean                                      pUpdateGLB5flag                 = FraudDefenseNetwork._Flags.Update.GLB5
@@ -55,6 +46,7 @@ export Build_All(
 	,boolean                                      pUpdateTextMinedCrimflag        = FraudDefenseNetwork._Flags.Update.TextMinedCrim
 	,boolean                                      pUpdateOIGflag                  = FraudDefenseNetwork._Flags.Update.OIG
 	,boolean                                      pUpdateAInspectionflag          = FraudDefenseNetwork._Flags.Update.AInspection
+	,boolean                                      pUpdateErieflag                 = FraudDefenseNetwork._Flags.Update.Erie
          
 ) :=
 module
@@ -65,18 +57,7 @@ module
 		,pFilenameSuspectIP
 		,pFilenameTiger
 		,pFilenameCFNA
-		,pFilenameMBS
-		,pFilenameMbsGcIdExclusion
-		,pFilenameMbsNewGcIdExclusion
-		,pFilenameMbsIndTypeExclusion
-		,pFilenameMbsProductInclude
-		,pFilenameMBSSourceGcExclusion
-		,pFilenameMBSmarketAppend
-		,pFilenameMBSFdnIndType
-		,pFilenameMBSFdnCCID
-		,pFilenameMBSFdnHHID
-		,pFilenameMBSTableCol
-		,pFilenameMBSColValDesc
+		,pFilenameErie
 		,pversion
 		,pGroupName
 		,pIsTesting
@@ -84,11 +65,21 @@ module
 		,pReplicate
 	);
 	
-	export dops_update := RoxieKeyBuild.updateversion('FDNKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
+//	export dops_update := RoxieKeyBuild.updateversion('FDNKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 
+	export sprayMBS_files := FraudShared.SprayMBSFiles(
+		pServerIP,
+		pDirectory, 
+		pversion := pversion
+	);
+
+  export spray_fdn_files := parallel(sprayMBS_files, spray_files);
+ 
+ 
 	shared base_portion := sequential(
-		 Create_Supers
+		   Create_Supers
 		  ,spray_files
+			,sprayMBS_files
 		  ,Build_Base(
 			 pversion
 			,PSkipSuspectIP
@@ -98,6 +89,7 @@ module
 			,pSkipTextMinedCrimBase
 			,pSkipOIGBase
 			,pSkipAInspection
+			,pSkipErieBase
 			,pBaseMainFile	
 			,pBaseSuspectIPFile
 			,pUpdateSuspectIPFile	
@@ -118,18 +110,25 @@ module
 			,pBaseAinspectionFile
 			,pUpdateAinspectionFile	
 			,pUpdateAinspectionflag
+			,pBaseErieFile
+			,pUpdateErieFile	
+			,pUpdateErieflag
 		
 		).All
 			,notify('FDN BASE FILES COMPLETE','*');
 			
 	) : success(Send_Emails(pversion).Roxie), failure(Send_Emails(pversion).BuildFailure);
 	
+//Create build automation	-- 02/14/2017
+export	create_build := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FDN',pversion);
+	
+	
 	shared keys_portion := sequential(
-		  Build_Keys(
+		   FraudShared.Build_Keys(
 			 pversion
 			,pBaseMainBuilt
 			).All
-		  ,Build_AutoKeys(
+		  ,FraudShared.Build_AutoKeys(
 			 pversion
 			,pBaseMainBuilt)
 		  ,Promote().Inputfiles.Sprayed2Using
@@ -137,6 +136,11 @@ module
 		  ,Promote().Inputfiles.Using2Used
 		  ,Promote().Used2In
 			,Promote().buildfiles.cleanup
+			// Promote Shared Files
+			,FraudShared.Promote().Inputfiles.Sprayed2Using
+			,FraudShared.Promote().buildfiles.Built2QA			
+			,FraudShared.Promote().Inputfiles.Using2Used
+			,FraudShared.Promote().buildfiles.cleanup					
 		,QA_Records()
 		,Strata_Population_Stats(
 			 pversion
@@ -144,12 +148,13 @@ module
 			,pOverwrite
 			,pBaseMainBuilt
 			).All
-	  ,dops_update
+	  ,create_build
 	) : success(Send_Emails(pversion).Roxie), failure(Send_Emails(pversion).BuildFailure);
 
 	export full_build := sequential(
-		 Create_Supers
+		  Create_Supers
 		  ,spray_files
+			,sprayMBS_files
       ,Build_Base(
 			 pversion
 			,PSkipSuspectIP
@@ -159,6 +164,7 @@ module
 			,pSkipTextMinedCrimBase
 			,pSkipOIGBase
 			,pSkipAInspection
+			,pSkipErieBase
 			,pBaseMainFile	
 			,pBaseSuspectIPFile
 			,pUpdateSuspectIPFile	
@@ -179,13 +185,16 @@ module
 			,pBaseAinspectionFile
 			,pUpdateAinspectionFile	
 			,pUpdateAinspectionflag
+			,pBaseErieFile
+			,pUpdateErieFile	
+			,pUpdateErieflag
 		
 		).All
-		  ,Build_Keys(
+		  ,FraudShared.Build_Keys(
 			 pversion
 			,pBaseMainBuilt
 			).All
-		,Build_AutoKeys(
+		,FraudShared.Build_AutoKeys(
 			 pversion
 			,pBaseMainBuilt)
 		  ,Promote().Inputfiles.Sprayed2Using
@@ -193,6 +202,11 @@ module
 		  ,Promote().Inputfiles.Using2Used
 		  ,Promote().Used2In
 		  ,Promote().buildfiles.cleanup
+			// Promote Shared Files
+			,FraudShared.Promote().Inputfiles.Sprayed2Using
+			,FraudShared.Promote().buildfiles.Built2QA			
+			,FraudShared.Promote().Inputfiles.Using2Used
+			,FraudShared.Promote().buildfiles.cleanup				
 		,QA_Records()
 		,Strata_Population_Stats(
 			 pversion
@@ -200,7 +214,7 @@ module
 			,pOverwrite
 			,pBaseMainBuilt
 			).All
-		,dops_update
+	//	,dops_update
 
 	) : success(Send_Emails(pversion).Roxie), failure(Send_Emails(pversion).BuildFailure);
 	

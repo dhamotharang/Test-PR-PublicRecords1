@@ -1,4 +1,4 @@
-import business_header,header,gong,fcra, ut;
+import business_header,header,gong_Neustar,fcra, ut;
 
 EXPORT Phone_Table_v2 (boolean isFCRA = false, boolean gongFilter=false) := FUNCTION
 
@@ -29,7 +29,7 @@ rec := RECORD
 END;
 
 
-rec slimg(gong.File_History_Full_Prepped_for_Keys le) := TRANSFORM
+rec slimg(gong_Neustar.File_History_Full_Prepped_for_Keys le) := TRANSFORM
 	SELF.dt_first_seen := (unsigned3)(le.dt_first_seen[1..6]);
 	SELF.isCurrent := le.current_record_flag='Y';
 	SELF.potDisconnect := ~SELF.isCurrent;
@@ -44,13 +44,13 @@ rec slimg(gong.File_History_Full_Prepped_for_Keys le) := TRANSFORM
 END;
 
 sysdate := ut.GetDate[1..6] + '31';
-allowedBellIdForFCRA := ['LSS','LSI','LSP'];	// cjs
+allowedBellIdForFCRA := ['LSS','LSI','LSP','NEU'];	// cjs
 
-//good_phns := gong.File_Gong_History_Full(goodphone(phone10));
+//good_phns := gong_Neustar.File_GongHistory(goodphone(phone10));
 // cjs Filter out non FCRA phones
 good_phns := IF(gongFilter,
-				gong.File_Gong_History_FullEx(goodphone(phone10),bell_id in allowedBellIdForFCRA),
-				gong.File_Gong_History_FullEx(goodphone(phone10)));
+				gong_Neustar.File_Gong_History_FullEx(goodphone(phone10),bell_id in allowedBellIdForFCRA),
+				gong_Neustar.File_Gong_History_FullEx(goodphone(phone10)));
 gg := project(good_phns, slimg(LEFT));
 
 all_phones := DEDUP(SORT(DISTRIBUTE(gg,HASH(phone10)),RECORD, LOCAL),RECORD, LOCAL);
@@ -69,7 +69,7 @@ d_did := TABLE(good_phns_distr(did<>0), did_slim, phone10, did, LOCAL);
 did_stats := record
 	d_did.phone10;
 	did_ct := count(group);
-	did_ct_c6 := count(group, ut.DaysApart(sysdate, d_did.dt_first_seen[1..6]+'31') < 183);
+	did_ct_c6 := count(group, ut.DaysApart(sysdate, ((string)d_did.dt_first_seen)[1..6]+'31') < 183);
 end;
 did_counts := table(d_did, did_stats, phone10, local);
 
@@ -97,11 +97,17 @@ rec check_biz(rec le, business_header.file_business_header ri) := transform
 	self := le;
 end;
 
-bheader := IF (IsFCRA,
+//bheader := IF (IsFCRA,
+//               business_header.File_Business_Header (phone != 0, ~fcra.Restricted_BusHeader_Src(source, vendor_id[1..2])),
+//               business_header.File_Business_Header (phone != 0));
+bheader := DEDUP(SORT(
+							DISTRIBUTE(
+							IF (IsFCRA,
                business_header.File_Business_Header (phone != 0, ~fcra.Restricted_BusHeader_Src(source, vendor_id[1..2])),
-               business_header.File_Business_Header (phone != 0));
-
-with_busflag := join (with_cotype,distribute(bheader,hash((string10)phone)),
+               business_header.File_Business_Header (phone != 0))
+							 ,hash((string10)phone))
+							 ,phone,local),phone,local);
+with_busflag := join (with_cotype,bheader,
                       left.phone10 = (string10)right.phone,
                       check_biz(LEFT,RIGHT),local, left outer, keep(1));
 

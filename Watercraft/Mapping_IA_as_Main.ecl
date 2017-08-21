@@ -1,6 +1,5 @@
 import watercraft;
 
-
 transaction_type_desc(string1 code)
  := case(code,
 
@@ -16,8 +15,8 @@ transaction_type_desc(string1 code)
 '9' => 'TYPE CHANGE',
 
 					'' );
-
-
+					
+					
 county_reg(string2 code)
 
 := case(code, 	
@@ -121,40 +120,111 @@ county_reg(string2 code)
 '98' => 'WORTH',
 '99' => 'WRIGHT',
 
-				'' );   
+				'' );  
+				
+boat_desc ( string1 bt_type) 
 
-watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_IA_clean_in L) := transform
+:= case(bt_type,
+
+'1' => 'Cabin Cruiser',       
+'2'	=> 'Canoe',               
+'3'	=> 'Personal Watercraft', 
+'4'	=> 'Houseboat',           
+'5'	=> 'Pontoon',             
+'6'	=> 'Rowboat',             
+'7'	=> 'Runabout',            
+'8'	=> 'Sailboat',            
+'9'	=> 'Other',               
+'10'=> 'Kayak',               
+'11'=> 'Bass Boat',           
+'12'=> 'Jon Boat',            
+'');
+
+
+reg_status_desc( string1 code) 
+
+:= case(code,
+
+'1'	=> 'Active',                   
+'2'	=> 'Sold Out of State',        
+'3'	=> 'Lost',                     
+'4'	=> 'Stolen',                   
+'5'	=> 'Cancelled',                
+'6'	=> 'Abandoned',                
+'7'	=> 'Inactive',                 
+'8'	=> 'Storage',                  
+'9'	=> 'Transferred Out of County',
+'10'=> 'Destroyed/Junked',         
+'');
+
+trim2upper (string s) := function
+
+return StringLib.StringtoUpperCase(trim(s));
+end;
+
+
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_IA_clean_in, watercraft.Layout_IA_clean_in,hull_clean_in)
+
+watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := transform
 
 
     self.watercraft_key				        :=	if(L.HULL_ID = '', trim(L.REG_NUM, left, right), if(trim(L.year, left, right) >= '1972' and length(trim(L.HULL_ID,left, right)) = 12, trim(L.HULL_ID,left, right),
 	                                            (trim(L.HULL_ID, left, right) + trim(L.MAKE, left, right) + trim(L.YEAR, left, right))[1..30]));                                          
-	self.sequence_key				        :=	trim(L.REG_DATE[1..6], left, right);
-	self.watercraft_id						:=	'';
-	self.state_origin						:=	'IA';
-	self.source_code						:=	'AW';
-	self.st_registration					:=	L.STATEABREV;
-	self.county_registration				:=	county_reg(trim(L.county,left,right));
-	self.registration_number				:=	trim(L.REG_NUM, left, right);
-	self.hull_number						:=	L.hull_id;
-	self.propulsion_code					:=	'';
-	self.propulsion_description				:=	L.PROP;
-	self.vehicle_type_Code					:=	'';
-	self.vehicle_type_Description			:=	L.VEH_TYPE;
-	self.fuel_code							:=	'';
-	self.fuel_description					:=	L.FUEL;
-	self.hull_type_code						:=	'';
+	self.sequence_key				            :=	trim(L.REG_DATE[1..6], left, right);
+	self.watercraft_id						      :=	'';
+	self.state_origin						        :=	'IA';
+	self.source_code						        :=	'AW';
+	self.st_registration					      :=	L.STATEABREV;
+	self.county_registration				    :=	county_reg(trim(L.county));
+	self.registration_number				    :=	trim(L.REG_NUM, left, right);
+	self.hull_number						        :=	L.hull_id;
+	self.propulsion_code					      :=	case ( trim2upper(L.PROP) ,
+	                                                        'OUTBOARD' => '1',
+																													'INBOARD'  => '2',
+																													'OUTBOARD/INBOARD' => '3',
+																													'SAIL' => '4',
+																													'OTHER NONPOWER/NONSAIL' => '5',
+																													'PADDLE/OAR' => '6',
+																													'');
+	self.propulsion_description				  :=	L.PROP;
+	self.vehicle_type_Code					    :=	'';
+	self.vehicle_type_Description			  :=	map ( L.VEH_TYPE <> '' and L.VEH_TYPE <> 'CABIN' => L.VEH_TYPE,
+	                                               L.BOAT_TYPE <> '' and L.VEH_TYPE = 'CABIN' => trim2upper(boat_desc(L.BOAT_TYPE)),
+																								 '');
+	self.fuel_code							        :=	     case(trim2upper(L.FUEL) ,
+	                                             'GAS' => '1',
+																							  'DIESEL' => '2',
+																								'OTHER' => '3','');
+	self.fuel_description					      :=	L.FUEL;
+	self.hull_type_code						      :=	case( trim2upper(L.HULL) ,
+	                                                'ALUMINIUM' => '1',
+																									'FIBERGLASS' => '2',
+																									'WOOD'       => '3',
+																									'STEEL'      => '4',
+																									'PLASTIC'    => '5',
+																									'OTHER'      => '6',
+																									'UNKNOWN'    => '7',
+																									'');
 	self.hull_type_description				:=	L.HULL;
-	self.use_code							:=	'';
-	self.use_description					:=	L.USE_1;
-	self.watercraft_length					:=	L.TOTAL_INCH;
-	self.model_year							:=	L.YEAR;
-	self.watercraft_name					:=	'';
-	self.watercraft_class_code				:=	'';
+	self.use_code							        :=	 case ( trim2upper(L.USE_1) ,
+	                                                  'PLEASURE' => '1',
+																										'DEALER'   => '2',
+																										'LIVERY RENTAL' => '3',
+																										'OFFICIAL'     => '4',
+																										'COMMERCIAL PASSENGER' => '5',
+																										'COMMERCIAL FISHING'  => '6',
+																										'OTHER'  => '7',
+																										'');
+	self.use_description					     :=	L.USE_1;
+	self.watercraft_length					   :=	L.TOTAL_INCH;
+	self.model_year							       :=	L.YEAR;
+	self.watercraft_name					      :=	'';
+	self.watercraft_class_code				  :=	'';
 	self.watercraft_class_description		:=	'';
 	self.watercraft_make_code				:=	'';
 	self.watercraft_make_description		:=	L.MAKE;
 	self.watercraft_model_code				:=	'';
-	self.watercraft_model_description		:=	'';
+	self.watercraft_model_description		:=	L.MODEL;
 	self.watercraft_width					:=	L.Boat_WIDTH;
 	self.watercraft_weight					:=	'';
 	self.watercraft_color_1_code			:=	'';
@@ -182,21 +252,32 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_IA_cl
 	self.coast_guard_documented_flag		:=	'';
 	self.coast_guard_number					:=	'';
 	self.registration_date					:=	L.REG_DATE[1..6];
-	self.registration_expiration_date		:=	L.Expiration_Year;
-	self.registration_status_code			:=	'';
-	self.registration_status_description	:=	'';
+	self.registration_expiration_date		:=	L.Expiration_Date;
+	self.registration_status_code			:=	L.REG_STATUS;
+	self.registration_status_description	:=	trim2upper(reg_status_desc(L.REG_STATUS));
 	self.registration_status_date			:=	'';
 	self.registration_renewal_date			:=	'';
-	self.decal_number						:=	L.DECAL_number;
+	self.decal_number						:=	 L.DECAL_number;
 	self.transaction_type_code				:=	L.Transaction_Code;
 	self.transaction_type_description		:=	transaction_type_desc(L.Transaction_Code);
 	self.title_state						:=	'';
 	self.title_status_code					:=	'';
 	self.title_status_description			:=	'';
-	self.title_number						:=	if(L.Title_Number <> '00000000', L.Title_Number,'');
+	self.title_number						:=	if(L.Title_Number <> '000000000', L.Title_Number,'');
 	self.title_issue_date					:=	L.ISSUE_DATE[1..6];
-	self.title_type_code					:=	'';
-	self.title_type_description				:=	'';
+	self.title_type_code					:=	L.REG_TYPE;
+	self.title_type_description				:=	case( L.REG_TYPE,
+	                                                       '1' => 'REGULAR',
+																												 '2'  => 'DNR',
+																												  '3' => 'FARM',
+																													'4' => 'DOCUMENTED',
+																													'5' => 'TITLE ONLY',
+																													'');
+	self.watercraft_status_code      := L.Record_status;
+	self.watercraft_status_description := case (  L.Record_status,
+	                                                           '1' => 'CURRENT',
+																														 '2' => 'PREVIOUS','');
+	                                                           
 	self.additional_owner_count				:=	'';
 	self.lien_1_indicator					:=	'';
 	self.lien_1_name						:=	'';
@@ -219,9 +300,6 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_IA_cl
 	self.dealer								:=	'';
 	self.purchase_price						:=	'';
 	self.new_used_flag						:=	'';
-	self.watercraft_status_code				:=	L.Sold_Out_of_State + L.Lost_or_Stolen + L.CANCELED;
-	self.watercraft_status_description		:=	if(L.Sold_Out_of_State = '1', 'SOLD OUT OF STATE','') + if(L.Lost_or_Stolen = '1', 'LOST OR STOLEN', '')
-	                                            + if(L.CANCELED = '1', 'CANCELED', '');
 	self.history_flag						:=	'';
 	self.coastguard_flag					:=	'';
     
@@ -229,10 +307,6 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_IA_cl
 
 
 
-export Mapping_IA_as_Main := project(watercraft.file_IA_clean_in, main_mapping_format(left));
-
-
-
-
+export Mapping_IA_as_Main := project(hull_clean_in, main_mapping_format(left));
 
 

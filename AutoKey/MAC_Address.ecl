@@ -12,6 +12,8 @@ export MAC_Address(indataset,infname,inmname,inlname,
 						inkeyname,outkey,by_lookup=TRUE,rep_Addr=4) :=
 MACRO
 
+import NID;
+
 #uniquename(indata)
 %indata% := indataset;
 
@@ -26,13 +28,13 @@ TRANSFORM
 	SELF.prim_name := ut.StripOrdinal(le.inprim_name);
 	SELF.prim_range := TRIM(ut.CleanPrimRange(le.inprim_range),LEFT);
 	SELF.st := le.inst;
-	SELF.city_code := doxie.Make_CityCode(le.incity_name); 
+	SELF.city_code := doxie.Make_CityCodes(le.incity_name).tho; 
 	SELF.zip := le.inzip;
 	SELF.sec_range := le.insec_range;
 
 	SELF.dph_lname := metaphonelib.DMetaPhone1(le.inlname);
 	SELF.lname := le.inlname;
-	SELF.pfname := datalib.preferredfirst(le.infname);
+	SELF.pfname := NID.PreferredFirstVersionedStr(le.infname, NID.version);
 	SELF.fname := le.infname;
 
 	SELF.states := le.instates;

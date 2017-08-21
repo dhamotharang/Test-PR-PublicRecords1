@@ -1,0 +1,1 @@
+EXPORT File_GongBase := PROJECT(File_Gong_Base,layout_gong);

@@ -1,5 +1,4 @@
 import ut, business_header, relative_regression;
-#workunit('name', 'Business Contact Regression');
 
 old := business_Regression.BC_sample_old;
 new := business_regression.BC_sample_new;

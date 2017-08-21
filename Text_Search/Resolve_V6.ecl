@@ -11,10 +11,7 @@ EXPORT Resolve_V6(DATASET(Text_Search.Layout_Search_RPN_Set) rpn_srch,
 										Types.SourceList sources=ALL
 										) := FUNCTION
 
-	
 	initR := DATASET([], Text_Search.Layout_MergeWork);
-	g_sources := sources : GLOBAL;
-	
 	//Make GLOBAL so evaluated once in the farmer
 	executionPlan := GLOBAL(Text_Search.ManipulateRPN.chopOffTerms(rpn_srch), FEW);
 	dictStats := CHOOSEN(Text_Search.Indx_DictStat(info), 1); 
@@ -32,7 +29,7 @@ EXPORT Resolve_V6(DATASET(Text_Search.Layout_Search_RPN_Set) rpn_srch,
 	INTEGER thisChannel := partitionRecords[1].part;
 	
 	ex1(Text_Search.Layout_Search_RPN_Set s, SET OF DATASET(Text_Search.Layout_MergeWork) d)
-			:= Text_Search.Merge_v6(info, s, d, partList, FocusList, g_sources);
+			:= Text_Search.Merge_v6(info, s, d, partList, FocusList, sources);
 			
 	ais := GRAPH(initR, COUNT(executionPlan), 
 									ex1(executionPlan[NOBOUNDCHECK COUNTER], ROWSET(LEFT)), PARALLEL);
@@ -95,6 +92,6 @@ EXPORT Resolve_V6(DATASET(Text_Search.Layout_Search_RPN_Set) rpn_srch,
 													Text_Search.Layout_Result);
 	// 
 	results := ALLNODES(LOCAL((channel_rslt)));
-
+	
 	RETURN results;
 END;

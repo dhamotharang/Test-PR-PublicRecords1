@@ -165,5 +165,3 @@ end;
 zOut := parallel(%zMainStats%,%zPartyStats%)
 
 ENDMACRO;
-
-

@@ -1,0 +1,1 @@
+export Basefile_Hospital_BDID_extended := PROJECT(Ingenix_NatlProf.Basefile_Hospital_BDID_BIP,TRANSFORM(ingenix_natlprof.Layout_hospital_Base,SELF := LEFT;));

@@ -1,9 +1,9 @@
-import drivers, vehlic, mdr;
+import drivers, vehiclev2, mdr;
 
 old := header.Source_Counts_prev;
 new := header.Source_Counts_new;
 dlc := drivers.Source_Counts;
-veh := vehlic.Source_Counts;
+veh := vehiclev2.Source_Counts;
 
 rec := header.layout_Source_Check;
 
@@ -54,12 +54,12 @@ rec tra_ondlve(ondl o, veh v) := transform
 	self.is_ddpa := mdr.Source_is_DPPA(self.src);
 	self.is_on_probation := mdr.Source_is_on_Probation(self.src);
 	self.external_count := if(o.external_count > 0, o.external_count, v.counted);
-	self.external_state := if(o.external_state > '', o.external_state, v.orig_state);
+	self.external_state := if(o.external_state > '', o.external_state, v.state_origin);
 	self.alert := trim(o.alert) + trim(
-				  if(v.orig_state > '' and self.src = '', 
+				  if(v.state_origin > '' and self.src = '', 
 					 (string40)' * IN VEH, NOT IN HEADER *', 
 					 (string40)'') +
-				  if(v.orig_state > '' and self.is_ddpa = false, 
+				  if(v.state_origin > '' and self.is_ddpa = false, 
 					 (string40)' * IN VEH, NOT DPPA *', 
 					 (string40)''));
 	self := o;

@@ -1,10 +1,13 @@
-import ut, header, business_header;
-util := util_as_source;
+import ut, header, business_header, MDR,Std;
+
+export Sequenced(boolean pForHeaderBuild=false) := function
+
+util := if(pForHeaderBuild,header.Files_SeqdSrc().UT,util_as_source);
 
 // add 4 months to a yyyymm date, correctly adjusting year
 unsigned3 add4(unsigned3 dt) := if ((dt+4) % 100 > 12, dt + 104 - 12, dt+4);
 
-unsigned3 todaydate := (unsigned3)((integer)ut.GetDate div 100);
+unsigned3 todaydate := (unsigned3)((integer)(STRING8)Std.Date.Today() div 100);
 
 // will be used to adjust date last seens -- if d_first_seen+4 < today, use dfs+4, else today
 // not defining a condition to handle an incoming value of 0 would return a value of 4
@@ -16,7 +19,7 @@ unsigned3 lesser(unsigned3 dt2) := if(dt2=0,
 
 header.Layout_New_Records into(util L) := transform
 
-    boolean future_dt := l.date_first_seen>ut.getdate;
+    boolean future_dt := l.date_first_seen>(STRING8)Std.Date.Today();
 	
 	self.did := 0;
 	self.rid := 0;
@@ -27,14 +30,14 @@ header.Layout_New_Records into(util L) := transform
 	self.vendor_id := L.id;
 	self.dob := 0;
 	self.ssn := if(l.ssn in ut.set_badssn,'',l.ssn);
-	self.phone := if(l.src='UW', l.work_phone, l.phone);
+	self.phone := if(l.src in MDR.sourceTools.set_Util_WorkPH, l.work_phone, l.phone);
 	self.suffix := L.addr_suffix;
 	self.city_name := L.v_city_name;
 	self.dt_first_seen := if(future_dt,0,(integer)l.date_first_seen div 100);
     self.dt_last_seen := lesser(self.dt_first_seen);
-    self.dt_vendor_last_reported := self.dt_first_seen;
-    self.dt_vendor_first_reported := self.dt_first_seen;
-    self.dt_nonglb_last_seen := lesser(self.dt_first_seen);
+    self.dt_vendor_last_reported := if((integer)l.record_Date[5..6] > 12, (integer)(l.record_date[..4] + l.record_date[7..]),(integer)l.record_date[..6]);
+    self.dt_vendor_first_reported := if((integer)l.record_Date[5..6] > 12, (integer)(l.record_date[..4] + l.record_date[7..]),(integer)l.record_date[..6]);
+    self.dt_nonglb_last_seen := 0;
 	self.county := L.county[3..5];
     self.tnt := 'Y';
 	self.cbsa := if(l.msa='','',l.msa+'0');
@@ -44,4 +47,6 @@ end;
 
 util_seq := project(util,into(left));
 
-export Sequenced := util_seq;
+return util_seq;
+
+end;

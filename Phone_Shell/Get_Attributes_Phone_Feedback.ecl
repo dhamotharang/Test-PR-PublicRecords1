@@ -61,6 +61,7 @@ EXPORT Phone_Shell.Layout_Phone_Shell.Layout_Phone_Shell_Plus Get_Attributes_Pho
 		SELF := le;
 	END;
 	
+	// output(feedback,named('feedback'));
 	final := ROLLUP(feedbackSorted, LEFT.Unique_Record_Sequence = RIGHT.Unique_Record_Sequence AND LEFT.Clean_Input.Seq = RIGHT.Clean_Input.Seq AND LEFT.Gathered_Phone = RIGHT.Gathered_Phone,
 															rollFeedback(LEFT, RIGHT));
 															

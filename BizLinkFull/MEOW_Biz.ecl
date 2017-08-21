@@ -47,9 +47,9 @@ END;
   RR20 := IF ( MultiRec, RR1, RR0 );
   Process_Biz_Layouts.OutputLayout AdjustScores(RR0 le) := TRANSFORM // Adjust scores for non-exact matches if needed
     SELF.Results := UNGROUP(Process_Biz_Layouts.AdjustScoresForNonExactMatches(le.Results));
-    SELF.Results_seleid := UNGROUP(Process_Biz_Layouts.AdjustScoresForNonExactMatches(le.Results));
-    SELF.Results_orgid := UNGROUP(Process_Biz_Layouts.AdjustScoresForNonExactMatches(le.Results));
-    SELF.Results_ultid := UNGROUP(Process_Biz_Layouts.AdjustScoresForNonExactMatches(le.Results));
+    SELF.Results_seleid := UNGROUP(Process_Biz_Layouts.AdjustScoresForNonExactMatches(le.Results_seleid));
+    SELF.Results_orgid := UNGROUP(Process_Biz_Layouts.AdjustScoresForNonExactMatches(le.Results_orgid));
+    SELF.Results_ultid := UNGROUP(Process_Biz_Layouts.AdjustScoresForNonExactMatches(le.Results_ultid));
     SELF := le;
   END;
   RR2 := PROJECT(RR20,AdjustScores(LEFT));

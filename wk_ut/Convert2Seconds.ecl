@@ -5,6 +5,8 @@ convert thor time to seconds for easier excel
 so, '23:1:36.318' to 82896.318 seconds
 // 1 days 12:43:30.073
 
+wk_ut.Convert2Seconds('1 days,14 hours,18 minutes,25 seconds');
+
 */
 import std;
 
@@ -14,6 +16,9 @@ function
   //convert to seconds
   //days have 3 colons, so:  1:4:58:20.64
   //or                      1 days 4:58:20.64
+
+//thregex := '^([[:digit:]]+)( days |:)(?=[[:digit:]]+[:][[:digit:]]+[:][[:digit:]]+[.]?[[:digit:]]*)';  
+  
   getDays := if(regexfind('^([[:digit:]]+)( days |:)(?=[[:digit:]]+[:][[:digit:]]+[:][[:digit:]]+[.]?[[:digit:]]*)',time,nocase) ,regexfind   ('^([[:digit:]]+)( days |:)(?=[[:digit:]]+[:][[:digit:]]+[:][[:digit:]]+[.]?[[:digit:]]*)',time,1 ,nocase)  ,'0'  );
   getRest := if(regexfind('^([[:digit:]]+)( days |:)(?=[[:digit:]]+[:][[:digit:]]+[:][[:digit:]]+[.]?[[:digit:]]*)',time,nocase) ,regexreplace('^([[:digit:]]+)( days |:)(?=[[:digit:]]+[:][[:digit:]]+[:][[:digit:]]+[.]?[[:digit:]]*)',time,'',nocase)  ,time );
   
@@ -33,8 +38,22 @@ function
 
 //  return days + ':' + hours + ':' + minutes + ':' + seconds;
   totalsecs := (real)seconds + minutessec + hourssec + daysssec;
+
+  theregex := '^(([[:digit:]]+)( day[s]?,))?(([[:digit:]]+)( hour[s]?,))?(([[:digit:]]+)( minute[s]?,))?(([[:digit:]]+)( second[s]?))?$';
+
+  days2    := regexfind(theregex,time, 2,nocase);
+  hours2   := regexfind(theregex,time, 5,nocase);
+  minutes2 := regexfind(theregex,time, 8,nocase);
+  seconds2 := regexfind(theregex,time,11,nocase);
+
+  minutessec2  := (real)minutes2           * 60;
+  hourssec2    := (real)hours2        * 60 * 60;
+  daysssec2    := (real)days2    * 24 * 60 * 60;
   
-  return totalsecs;
+  totalsecs2 := (real)seconds2 + minutessec2 + hourssec2 + daysssec2;
+
+  
+  return if(regexfind(theregex,time,nocase) ,totalsecs2 ,totalsecs);
   
 end;
 /*

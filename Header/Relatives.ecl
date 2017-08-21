@@ -6,24 +6,15 @@ Split the original address logic to Header.Relatives_By_Address, to avoid
 	repeating the big self join upon changes of other relative conditions.
 */
 
-import business_header;
+import business_header,mdr;
 
-j := Relatives_By_Address + 
-	   Relatives_By_SSN + 											//prim_range:=-1
-		 Relatives_By_Relatives + 								//prim_range:=-2
-		 business_header.Business_Associates		//prim_range:=-4
-		 + Relatives_By_Property	//prim_range is -5.
-		 + Relatives_By_Vehicle		//prim_range is -6.
-		 ;
+export Relatives := module
 
-dj := distribute(j(number_cohabits>0),hash(person1,person2));
+shared h := (header.File_Headers + Header.File_Transunion_did + Header.file_TUCS_did + Header.File_TN_did)(mdr.sourceTools.SourceIsOnProbation(src)=false);
+shared oldr	:= header.File_Relatives;
 
-gj := group(dj,person1,person2,all);
+newr := header.fn_Relatives(h, oldr, IncludeOutsideMatches := true);
 
-sg := sort(gj,prim_range,IF(same_lname,0,1),-number_cohabits,zip);
+export Relatives1 := newr;//for roxie key
 
-ds := dedup(sg,prim_range);
-
-rolls := rollup(ds,true, header.tra_roll_relatives(left,right));
-
-export Relatives := rolls(same_lname OR number_cohabits>=6) :persist('relatives_temp');
+end;

@@ -1,0 +1,119 @@
+OPTIONS:-gh
+MODULE:Scrubs_DL_FL
+FILENAME:In_FL
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+
+//FIELDTYPE DEFINITIONS
+FIELDTYPE:invalid_mandatory:LENGTHS(1..)
+FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid_specials:ALLOW( 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@-.,)
+FIELDTYPE:invalid_numeric:ALLOW(0123456789)
+FIELDTYPE:invalid_alphanum_blank:ALLOW( 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid_boolean_yes_no:ALLOW( YN)
+FIELDTYPE:invalid_empty:LENGTHS(0)
+FIELDTYPE:invalid_wordbag:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):SPACES( <>{}[]()+-=^:;!?&$,`./#@*'\|_"%~)
+
+FIELDTYPE:invalid_process_date:LENGTHS(8):CUSTOM(Scrubs.fn_valid_pastDate>0)
+FIELDTYPE:invalid_08date:LENGTHS(0,8):CUSTOM(Scrubs_DL_FL.Functions.fn_valid_date>0)
+FIELDTYPE:invalid_8pastdate:LENGTHS(8):CUSTOM(Scrubs_DL_FL.Functions.fn_valid_past_date>0)
+
+FIELDTYPE:invalid_issuance:ALLOW( 0123459)
+FIELDTYPE:invalid_state:LENGTHS(0,2):LIKE(invalid_alphanum_blank)
+FIELDTYPE:invalid_zip:LENGTHS(0,5):LIKE(invalid_numeric)
+FIELDTYPE:invalid_race:ALLOW(ABHIOW ):LENGTHS(0,1)
+FIELDTYPE:invalid_sex_flag:ALLOW(FM ):LENGTHS(0,1)
+FIELDTYPE:invalid_license_type:ENUM(ID|LEARNER|CLASS A|CLASS B|CLASS C|CLASS E|)
+FIELDTYPE:invalid_attention_flag:ENUM(ORGAN DONOR|FLORIDA ONLY|)
+FIELDTYPE:invalid_dod:ALLOW(0):LENGTHS(0,8)
+FIELDTYPE:invalid_restrictions:CUSTOM(Scrubs_DL_FL.Functions.fn_check_restriction_codes>0)
+FIELDTYPE:invalid_lic_endorsement:CUSTOM(Scrubs_DL_FL.Functions.fn_check_endorsement_codes>0)
+FIELDTYPE:invalid_dl_number:LENGTHS(13):CUSTOM(Scrubs_DL_FL.Functions.fn_check_dl_number>0)
+FIELDTYPE:invalid_age:ALLOW(0123456789 ):LENGTHS(0,3)
+FIELDTYPE:invalid_new_dl_number:LENGTHS(0,13):CUSTOM(Scrubs_DL_FL.Functions.fn_check_dl_number>0)
+FIELDTYPE:invalid_height:ALLOW(0123456789):LENGTHS(0,3)
+FIELDTYPE:invalid_oos_previous_st:LENGTHS(0..2):LIKE(invalid_specials)
+FIELDTYPE:invalid_name:CUSTOM(Scrubs_DL_FL.Functions.fn_valid_name>0,mname,lname)
+
+//FIELD DEFINITIONS
+FIELD:process_date:TYPE(STRING8):LIKE(invalid_process_date):0,0
+FIELD:issuance:TYPE(STRING1):LIKE(invalid_issuance):0,0
+FIELD:address_change:TYPE(STRING1):LIKE(invalid_boolean_yes_no):0,0
+FIELD:name_change:TYPE(STRING1):LIKE(invalid_boolean_yes_no):0,0
+FIELD:dob_change:TYPE(STRING1):LIKE(invalid_boolean_yes_no):0,0
+FIELD:sex_change:TYPE(STRING1):LIKE(invalid_boolean_yes_no):0,0
+FIELD:name:TYPE(STRING52):LIKE(invalid_mandatory):0,0
+FIELD:addr1:TYPE(STRING30):0,0
+FIELD:city:TYPE(STRING20):LIKE(invalid_specials):0,0
+FIELD:state:TYPE(STRING2):LIKE(invalid_state):0,0
+FIELD:zip:TYPE(STRING5):LIKE(invalid_zip):0,0
+FIELD:dob:TYPE(STRING8):LIKE(invalid_8pastdate):0,0
+FIELD:race:TYPE(STRING1):LIKE(invalid_race):0,0
+FIELD:sex_flag:TYPE(STRING1):LIKE(invalid_sex_flag):0,0
+FIELD:license_type:TYPE(STRING12):LIKE(invalid_license_type):0,0
+FIELD:attention_flag:TYPE(STRING14):LIKE(invalid_attention_flag):0,0
+FIELD:dod:TYPE(STRING8):LIKE(invalid_dod):0,0
+FIELD:restrictions:TYPE(STRING5):LIKE(invalid_restrictions):0,0
+FIELD:orig_expiration_date:TYPE(STRING8):LIKE(invalid_08date):0,0
+FIELD:lic_issue_date:TYPE(STRING8):LIKE(invalid_8pastdate):0,0
+FIELD:lic_endorsement:TYPE(STRING5):LIKE(invalid_lic_endorsement):0,0
+FIELD:dl_number:TYPE(STRING13):LIKE(invalid_dl_number):0,0
+FIELD:ssn:TYPE(STRING9):LIKE(invalid_empty):0,0
+FIELD:age:TYPE(STRING3):LIKE(invalid_age):0,0
+FIELD:new_dl_number:TYPE(STRING13):LIKE(invalid_new_dl_number):0,0
+FIELD:personal_info_flag:TYPE(STRING1):LIKE(invalid_empty):0,0
+FIELD:dl_orig_issue_date:TYPE(STRING8):LIKE(invalid_8pastdate):0,0
+FIELD:height:TYPE(STRING3):LIKE(invalid_height):0,0
+FIELD:oos_previous_dl_number:TYPE(STRING21):0,0
+FIELD:oos_previous_st:TYPE(STRING2):LIKE(invalid_oos_previous_st):0,0
+FIELD:filler2:TYPE(STRING1):0,0
+FIELD:title:TYPE(STRING5):0,0
+FIELD:fname:TYPE(STRING20):LIKE(invalid_name):0,0
+FIELD:mname:TYPE(STRING20):0,0
+FIELD:lname:TYPE(STRING20):0,0
+FIELD:name_suffix:TYPE(STRING5):0,0
+FIELD:cleaning_score:TYPE(STRING3):0,0
+FIELD:addr_fix_flag:TYPE(STRING1):0,0
+FIELD:prim_range:TYPE(STRING10):0,0
+FIELD:predir:TYPE(STRING2):0,0
+FIELD:prim_name:TYPE(STRING28):0,0
+FIELD:suffix:TYPE(STRING4):0,0
+FIELD:postdir:TYPE(STRING2):0,0
+FIELD:unit_desig:TYPE(STRING10):0,0
+FIELD:sec_range:TYPE(STRING8):0,0
+FIELD:p_city_name:TYPE(STRING25):0,0
+FIELD:v_city_name:TYPE(STRING25):0,0
+FIELD:st:TYPE(STRING2):0,0
+FIELD:zip5:TYPE(STRING5):0,0
+FIELD:zip4:TYPE(STRING4):0,0
+FIELD:cart:TYPE(STRING4):0,0
+FIELD:cr_sort_sz:TYPE(STRING1):0,0
+FIELD:lot:TYPE(STRING4):0,0
+FIELD:lot_order:TYPE(STRING1):0,0
+FIELD:dpbc:TYPE(STRING2):0,0
+FIELD:chk_digit:TYPE(STRING1):0,0
+FIELD:rec_type:TYPE(STRING2):0,0
+FIELD:ace_fips_st:TYPE(STRING2):0,0
+FIELD:county:TYPE(STRING3):0,0
+FIELD:geo_lat:TYPE(STRING10):0,0
+FIELD:geo_long:TYPE(STRING11):0,0
+FIELD:msa:TYPE(STRING4):0,0
+FIELD:geo_blk:TYPE(STRING7):0,0
+FIELD:geo_match:TYPE(STRING1):0,0
+FIELD:err_stat:TYPE(STRING4):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

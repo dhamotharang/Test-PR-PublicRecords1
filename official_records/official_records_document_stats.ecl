@@ -1,16 +1,26 @@
-import official_records;
+#workunit('name','Official Records Document Stats');
 
-d := official_records.File_Moxie_Document_Dev;
+import official_records,Business_Header;
 
-//d := distribute(outf,hash(vendor));
+d1 := official_records.File_Moxie_Document_Dev(doc_filed_dt <> '');
+ 
+Official_Records.Layout_Moxie_Document proj_rec(d1 l) := transform
+ self.doc_filed_dt := Business_Header.validatedate(l.doc_filed_dt);
+ self := l;
+end;
+ 
+
+d := project(d1,proj_rec(left));
 
 stat_rec :=  record
 'official_records_document',
 d.vendor,
 d.state_origin,
 d.county_name,
-official_records.Version_Development;
-d.process_date;
+
+process_dt := max(group,d.process_date);
+start_date := min(group,d.doc_filed_dt);
+end_date := max(group,d.doc_filed_dt );
 
 total := count(group);
 process_date_count := count(group, d.process_date <> '');
@@ -82,21 +92,27 @@ doc_filed_dt_2001 := count(group,d.doc_filed_dt[1..4]='2001');
 doc_filed_dt_2002 := count(group,d.doc_filed_dt[1..4]='2002');
 doc_filed_dt_2003 := count(group,d.doc_filed_dt[1..4]='2003');
 doc_filed_dt_2004 := count(group,d.doc_filed_dt[1..4]='2004');
-doc_filed_dt_200501 := count(group,d.doc_filed_dt[1..6]='200501');
-doc_filed_dt_200502 := count(group,d.doc_filed_dt[1..6]='200502');
-doc_filed_dt_200503 := count(group,d.doc_filed_dt[1..6]='200503');
-doc_filed_dt_200504 := count(group,d.doc_filed_dt[1..6]='200504');
-doc_filed_dt_200505 := count(group,d.doc_filed_dt[1..6]='200505');
-doc_filed_dt_200506 := count(group,d.doc_filed_dt[1..6]='200506');
-doc_filed_dt_200507 := count(group,d.doc_filed_dt[1..6]='200507');
-doc_filed_dt_200508 := count(group,d.doc_filed_dt[1..6]='200508');
-doc_filed_dt_200509 := count(group,d.doc_filed_dt[1..6]='200509');
-doc_filed_dt_200510 := count(group,d.doc_filed_dt[1..6]='200510');
-doc_filed_dt_200511 := count(group,d.doc_filed_dt[1..6]='200511');
-doc_filed_dt_200512 := count(group,d.doc_filed_dt[1..6]='200512');
-doc_filed_dt_greater_than_200512 := count(group,d.doc_filed_dt[1..6]>'200512');
+doc_filed_dt_2005 := count(group,d.doc_filed_dt[1..4]='2005');
+doc_filed_dt_200601 := count(group,d.doc_filed_dt[1..6]='200601');
+doc_filed_dt_200602 := count(group,d.doc_filed_dt[1..6]='200602');
+doc_filed_dt_200603 := count(group,d.doc_filed_dt[1..6]='200603');
+doc_filed_dt_200604 := count(group,d.doc_filed_dt[1..6]='200604');
+doc_filed_dt_200605 := count(group,d.doc_filed_dt[1..6]='200605');
+doc_filed_dt_200606 := count(group,d.doc_filed_dt[1..6]='200606');
+doc_filed_dt_200607 := count(group,d.doc_filed_dt[1..6]='200607');
+doc_filed_dt_200608 := count(group,d.doc_filed_dt[1..6]='200608');
+doc_filed_dt_200609 := count(group,d.doc_filed_dt[1..6]='200609');
+doc_filed_dt_200610 := count(group,d.doc_filed_dt[1..6]='200610');
+doc_filed_dt_200611 := count(group,d.doc_filed_dt[1..6]='200611');
+doc_filed_dt_200612 := count(group,d.doc_filed_dt[1..6]='200612');
+doc_filed_dt_greater_than_200612 := count(group,d.doc_filed_dt[1..6]>'200612');
 end;
 
-stats := table(d,stat_rec,vendor,state_origin,county_name,d.process_date,few);
 
-output(choosen(stats,1000));
+
+
+stats := table(d(doc_filed_dt <> ''),stat_rec,vendor,state_origin,county_name,few);
+
+
+
+export official_records_document_stats := output(topn(stats,100,county_name));

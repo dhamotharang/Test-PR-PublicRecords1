@@ -1,4 +1,4 @@
-import doxie,gong,gong_services,ut;
+Import Data_Services, doxie,gong,gong_services,ut,nid,address, Phonesplus_v2;
 
 // Threshold for overly frequent combinations is 5000 instances
 // Any combination with less than 5000 instances will be excluded from the key (query will just search for these);
@@ -20,11 +20,15 @@ surnames_all := distribute(f(listing_type_res = 'R' AND current_record_flag='Y' 
 									AND ~isBadName(name_last) AND ~isBadName(name_first)),hash(name_last));
 */
 boolean isBadName(string lname) := (TRIM(stringlib.stringfilter(lname,'0123456789()')) <> '');
-surnames_all := distribute(PROJECT(File_Surnames(current_record_flag='Y',TRIM(name_last)<>'',TRIM(name_first)<>'',
+surnames_gong := PROJECT(File_Surnames(current_record_flag='Y',TRIM(name_last)<>'',TRIM(name_first)<>'',
 										~isBadName(name_last), ~isBadName(name_first)), 
-									recordof(Gong.File_History_Full_Prepped_for_Keys)),
-									hash(name_last));			// : PERSIST('~thor_data400::persist::gong_surnames_all');
+									recordof(Gong.File_History_Full_Prepped_for_Keys));
 
+surnames_pplus := PROJECT(Phonesplus_v2.File_Surnames(TRIM(name_last)<>'',TRIM(name_first)<>'',
+										~isBadName(name_last), ~isBadName(name_first)), 
+									recordof(Gong.File_History_Full_Prepped_for_Keys));
+									
+surnames_all := distribute((surnames_gong + surnames_pplus),hash(name_last)); //: PERSIST('~thor_data400::persist::gong_surnames_all');
 //get all of the permutations (lname is required; fname and state optional)
 surnames_l := TABLE(surnames_all, {name_last, cnt := COUNT(GROUP)}, name_last,local);
 surnames_lf := TABLE(surnames_all, {name_last,name_first, cnt := COUNT(GROUP)}, name_last, name_first,local);
@@ -162,6 +166,7 @@ surnames_lfs_final := PROJECT(surnames_lfs_dd, f_layout_cnt);
 // combine them all and index 
 surnames_final := surnames_l_final + surnames_lf_final + surnames_ls_final + surnames_lfs_final;
 
-d:=INDEX(surnames_final,{k_name_last,k_name_first,k_st},{surnames_final}, '~thor_data400::key::gong_history::qa::surnames');
+d:=INDEX(surnames_final,{k_name_last,k_name_first,k_st},{surnames_final},
+				Data_Services.Data_location.Prefix('Gong_History') + 'thor_data400::key::gong_history::qa::surnames');
 
 export Key_History_Surname := d;

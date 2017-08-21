@@ -1,0 +1,2 @@
+//export File_SGA_Contact_In := dataset('~thor_data400::in::sga-maincontact_20060522', Layout_SGA_Contact_In, CSV(heading(0),separator(''),quote(''),terminator('\n'),MAXLENGTH(32768)));
+export File_SGA_Contact_In := dataset('~thor_data400::in::sga-maincontact_20060522', Layout_SGA_Contact_In, XML('DATA/ROWDATA/ROW'));

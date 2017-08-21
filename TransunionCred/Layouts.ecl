@@ -44,6 +44,7 @@ export Layouts := MODULE
 		string1	   Date_of_Birth_Estimated_Ind;
 		string10   phone;
 		string15   Filler3;
+		string1   cr;
 	END;
 
 	export update := RECORD
@@ -55,7 +56,7 @@ export Layouts := MODULE
 	END;
 
 	export base := RECORD
-		load;
+		load-cr;
 		String75  Prepped_name:='';
 		String60  Prepped_addr1:='';
 		String35  Prepped_addr2:='';

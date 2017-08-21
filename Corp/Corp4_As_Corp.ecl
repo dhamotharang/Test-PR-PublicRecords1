@@ -1,4 +1,4 @@
-import ut, Corporate;
+import ut, Corporate,address;
 
 Layout_Corp4_Temp := record
 Corporate.Layout_Corporate_Base;
@@ -453,11 +453,11 @@ end;
 
 Layout_Corp4_Temp CleanRAName(Corporate.Layout_Corporate_Base l) := transform
 self.ra_company_name := Datalib.CompanyClean(l.reg_agent_name);
-self.ra_clean_name := addrcleanlib.cleanPerson73(l.reg_agent_name);
+self.ra_clean_name := address.cleanPerson73(l.reg_agent_name);
 self := l;
 end;
 
-Corp4_Init := project(Corporate.File_Corp4_Base, CleanRAName(left));
+Corp4_Init := project(enth(Corporate.File_Corp4_Base,3000), CleanRAName(left));
 
 Corp4_RA_Addr := Corp4_Init(not(
                               suppress_ra_addr<>'Y' OR

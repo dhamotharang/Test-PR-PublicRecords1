@@ -8,10 +8,10 @@ EXPORT Fl_Non_Profit_As_Business_Linking_Contact (DATASET(govdata.Layout_FL_Non_
 																	DDMMYYYY_2_YYYYMMDD(l.annual_report_date_2)),
 																	ut.Min2(DDMMYYYY_2_YYYYMMDD(l.annual_report_date_3),
 																	DDMMYYYY_2_YYYYMMDD(l.annual_cor_file_date)));
-		lastDate(govdata.Layout_FL_Non_Profit_Corp_base l)  := ut.Max2(
-																	ut.Max2(DDMMYYYY_2_YYYYMMDD(l.annual_report_date_1), 
+		lastDate(govdata.Layout_FL_Non_Profit_Corp_base l)  := max(
+																	max(DDMMYYYY_2_YYYYMMDD(l.annual_report_date_1), 
 																	DDMMYYYY_2_YYYYMMDD(l.annual_report_date_2)),
-																	ut.Max2(DDMMYYYY_2_YYYYMMDD(l.annual_report_date_3),
+																	max(DDMMYYYY_2_YYYYMMDD(l.annual_report_date_3),
 																	DDMMYYYY_2_YYYYMMDD(l.annual_last_trx_date))); 
 
 	  //CONTACT MAPPING
@@ -68,10 +68,10 @@ EXPORT Fl_Non_Profit_As_Business_Linking_Contact (DATASET(govdata.Layout_FL_Non_
                                                 BIPV2.Layout_Business_Linking_Full R) := TRANSFORM
 		  SELF.dt_first_seen               := ut.EarliestDate(ut.EarliestDate(L.dt_first_seen,R.dt_first_seen),
 					                                ut.EarliestDate(L.dt_last_seen,R.dt_last_seen));
-		  SELF.dt_last_seen                := ut.LatestDate(L.dt_last_seen,R.dt_last_seen);
+		  SELF.dt_last_seen                := max(L.dt_last_seen,R.dt_last_seen);
 		  SELF.dt_vendor_first_reported    := ut.EarliestDate(ut.EarliestDate(L.dt_vendor_first_reported,R.dt_vendor_first_reported),
 					                                ut.EarliestDate(L.dt_vendor_last_reported,R.dt_vendor_last_reported));
-		  SELF.dt_vendor_last_reported     := ut.LatestDate(L.dt_vendor_last_reported,R.dt_vendor_last_reported);
+		  SELF.dt_vendor_last_reported     := max(L.dt_vendor_last_reported,R.dt_vendor_last_reported);
 		  SELF.company_address.prim_range  := IF(L.company_address.prim_range  <> '', L.company_address.prim_range,  R.company_address.prim_range);
 			SELF.company_address.predir      := IF(L.company_address.predir      <> '', L.company_address.predir,      R.company_address.predir);
 			SELF.company_address.prim_name   := IF(L.company_address.prim_name   <> '', L.company_address.prim_name,   R.company_address.prim_name);

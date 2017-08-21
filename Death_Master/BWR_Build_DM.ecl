@@ -1,5 +1,4 @@
 #workunit('name','Death Master Boolean');
-//#workunit('priority','high');
 
 import Text_Search,Death_Master;
 
@@ -18,7 +17,8 @@ end;
 my_tab := project(ret,transform(string_rec,
 					self.doc := left.docref.doc;
 					self.src := left.docref.src;
-					self := left
+					self := left;
+					SELF := []
 					));
 
 dist_map := distribute(my_tab,hash(doc));
@@ -34,7 +34,8 @@ build_key := buildindex(sdid_map,{src,doc,state_death_id,__filepos},inlkeyname, 
 retval := sequential(
 					build_key,
 					Text_Search.Build_From_DocSeg_Records(ret,info),
-					Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname)
+					Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),
+					fileservices.deletelogicalfile('~thor_data400::persist::death_master::boolean')
 					);
 
 return retval;

@@ -1,1 +1,1 @@
-export File_FCC_base_bip :=dataset('~thor_data400::base::fcc',fcc.Layout_FCC_base_bip,flat);
+EXPORT File_FCC_base_bip :=PROJECT(FCC.File_FCC_base_bip_AID,TRANSFORM(FCC.Layout_FCC_base_bip,SELF:=LEFT));

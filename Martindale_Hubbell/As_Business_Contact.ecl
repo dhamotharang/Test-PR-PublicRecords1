@@ -6,6 +6,8 @@ export As_Business_Contact(
 ) :=
 module
 
+	#OPTION('multiplePersistInstances',FALSE);
+	
 	dAffBasefile := if(pUsingInBusinessHeader	
 		,files(,pUseOtherEnvironment).base.Affiliated_individuals.BusinessHeader
 		,files(,pUseOtherEnvironment).base.Affiliated_individuals.qa

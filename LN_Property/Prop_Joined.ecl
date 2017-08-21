@@ -5,7 +5,9 @@ import LN_Mortgage, header;
 //  DeedMortgage := file_deed;
 asse_in := LN_Property.Assessor_as_Source;
 deed_in := LN_Property.Deed_as_Source;
-sear_in := Dataset('~thor_data400::BASE::LN_PropSrchHeader_Building', LN_Property.Layout_Deed_Mortgage_Property_Search, flat)(source_code not in ['OS','SO']);
+//sear_in := Dataset('~thor_data400::base::ln_property::built::search', LN_Property.Layout_Deed_Mortgage_Property_Search, flat)(source_code not in ['OS','SO']);
+sear_in := Dataset(ln_property.fileNames.builtSearch, LN_Property.Layout_Deed_Mortgage_Property_Search, flat)(source_code not in ['OS','SO']);
+
 
 head_rec := header.Layout_New_Records;
 
@@ -30,6 +32,8 @@ deed_slim_rec := record
 	deed_in.recording_date;
 	deed_in.src;
 	deed_in.uid;
+	//Added so that we can filter and prevent from inclusion into the Header
+	deed_in.dummy_seg;
 end;
 
 deed_slim := table(deed_in, deed_slim_rec);
@@ -79,8 +83,14 @@ head_rec add_deed(sear_dist l, deed_dist r) := transform
 	self.dt_nonglb_last_seen      := (integer)(r.recording_date[1..6]);
 	self.src                      := r.src;
 	self.uid                      := r.uid;
+	self.vendor_id                := l.ln_fares_id + 'FA' + ((string)(hash(l.fname, l.lname, l.prim_name)))[1..4];
+	self.city_name                := l.v_city_name;
+	self.county                   := l.county[3..5];
+	
+	self.jflag3                   := if(r.dummy_seg='P','P','');
+	
 	self                          := l;
-	self						:= [];
+	self						  := [];
 end;
 
 d2 := join(sear_dist(ln_fares_id[2]!='A'), deed_dist, left.ln_fares_id = right.ln_fares_id,
@@ -95,7 +105,7 @@ head_rec easy_way(head_rec l) := transform
 	self                          := l;
 end;
 
-final := project(d1+d2, easy_way(left));
+final := dedup(project(d1+d2, easy_way(left)),all,local);
 
 
-export Prop_Joined := final: persist('~thor_data400::persist::headerbuild_ln_property_as_header');
+export Prop_Joined := final: persist('~thor_data400::persist::ln_property::headerbuild_ln_property_as_header');

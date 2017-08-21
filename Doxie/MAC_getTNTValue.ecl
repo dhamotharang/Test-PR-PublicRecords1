@@ -1,16 +1,16 @@
 
 /* TNT Verification levels
-Bullseye – is currently the ‘best’ address and is a DID match to the gong file
+B = Bullseye Â– is currently the Â‘bestÂ’ address and is a DID match to the gong file
 *** The ultimate, full phone verification and other records pointing at that being best address too
-Verified – is currently the ‘best’ address and is a HHID match to the gong file
+V = Verified Â– is currently the Â‘bestÂ’ address and is a HHID match to the gong file
 *** Other records support this as the best address and the HOUSEHOLD has a phone registered at this line. Will pick up women with different lname to husbands
-Current – is best address but not validated by the gong file
+C = Current Â– is best address but not validated by the gong file
 *** Self evident, works even when there is no phone indicator
-Probable – is not currently the best address, but is did verified or hhid verified with a dt_last_seen within 6 months
-*** Most likely because the best address is a mailing (only) address. This annotates the address with the active phone line out of ‘lived in’ addresses
-Relative – is not currently the best address, and has a dt_last_seen > 6 months ago but is HHID verified
+P = Probable Â– is not currently the best address, but is did verified or hhid verified with a dt_last_seen within 6 months
+*** Most likely because the best address is a mailing (only) address. This annotates the address with the active phone line out of Â‘lived inÂ’ addresses
+R = Relative Â– is not currently the best address, and has a dt_last_seen > 6 months ago but is HHID verified
 *** Probably identifies a situation where a family member moved out of the address
-Historic – is not the best address and is not HHID or DID verified
+H = Historic Â– is not the best address and is not HHID or DID verified
 *** A dead, historic address
 */
 
@@ -27,9 +27,8 @@ EXPORT MAC_getTNTValue(infile,
 							statefield='st',
               dtlastseenfield = 'dt_last_seen'
               ) := macro
-    
 		import doxie, Doxie_Raw, gong, ut, DID_Add;
-		
+ 
     //1. Check best records to determine if best address    
     #uniquename(trans_best)
     #uniquename(results_best)

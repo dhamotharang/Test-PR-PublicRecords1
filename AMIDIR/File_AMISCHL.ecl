@@ -1,0 +1,1 @@
+export File_AMISCHL := dataset(AMIDIR.Cluster + 'in::AMIDIR::AMISCHL',amidir.Layout_AMISCHL,flat);

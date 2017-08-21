@@ -1,4 +1,4 @@
-import BankruptcyV2,MDR;
+import BankruptcyV2,MDR,Codes;
 
 export Bankruptcy_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 
@@ -58,6 +58,8 @@ export Bankruptcy_AsMasters := module(Interface_AsMasters.Unlinked.Default)
  				self.date_first_seen := (unsigned4) left.date_first_seen,
 				self.date_last_seen  := (unsigned4) left.date_last_seen,
 				self.ssn := right.ssn,
+				self.did := (unsigned)right.did,
+				self.score := 0,
 				self.name_prefix := right.title,
 				self.name_first := right.fname,
 				self.name_middle := right.mname,
@@ -81,6 +83,8 @@ export Bankruptcy_AsMasters := module(Interface_AsMasters.Unlinked.Default)
  				self.date_first_seen := (unsigned4) left.date_first_seen,
 				self.date_last_seen  := (unsigned4) left.date_last_seen,
 				self.ssn := right.ssn,
+				self.did := (unsigned)right.did,
+				self.score := 0,
 				self.name_prefix := right.title,
 				self.name_first := right.fname,
 				self.name_middle := right.mname,
@@ -124,6 +128,7 @@ export Bankruptcy_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.city_name       := choose(counter,left.p_city_name,left.v_city_name),
 				self.state           := left.st,
 				self.zip             := left.zip,
+				self.zip4            := left.zip4,
 				self.county_fips     := left.county[3..5],
 				self.msa             := left.msa,
 				self.phone           := left.phone,
@@ -150,7 +155,10 @@ export Bankruptcy_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 	   		
 		filtered := base_main(process_date != '' and case_number != ''); // and ???
 
-		extract := project(filtered,
+		extract := join(
+			distribute(filtered,hash64(tmsid)),
+			dedup(distribute(base_search(tmsid != '' and filing_type = 'B'),hash64(tmsid)),tmsid,all,local),
+			left.tmsid = right.tmsid,
 		  transform(Layout_Bankruptcy.Main.Unlinked,
 				self.source := MDR.sourceTools.src_Bankruptcy,
 				self.source_docid        := left.tmsid,
@@ -160,6 +168,8 @@ export Bankruptcy_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 	      self.date_filed          := left.date_filed;
 	      self.filing_status       := left.filing_status;
 		    self.filing_jurisdiction := left.filing_jurisdiction;
+				self.status              := sort(left.status,-status_date,record)[1].status_type;
+				self.status_date         := sort(left.status,-status_date,record)[1].status_date;
 				self.court_code          := left.court_code;
 	      self.court_name          := left.court_name;
 	      self.court_location      := left.court_location;
@@ -172,8 +182,13 @@ export Bankruptcy_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 	      self.orig_case_number    := left.orig_case_number;
 	      self.orig_chapter        := left.orig_chapter;
 	      self.orig_filing_date    := left.orig_filing_date;
-		    self.orig_filing_type    := ''; // left.???
-			));
+		    self.orig_filing_type    := map(
+					right.filing_type = '' => 'INDIVIDUAL',
+					'BUSINESS');
+				self.filer_type          := Codes.BANKRUPTCIES.FILER_TYPE(left.filer_type);
+			),
+			left outer,
+			local);
 
 		return dedup(dedup(extract,record,all,local),record,all);
 

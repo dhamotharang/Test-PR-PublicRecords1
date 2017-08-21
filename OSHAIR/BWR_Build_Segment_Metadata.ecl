@@ -13,7 +13,7 @@ dateType := Text_Search.Types.SegmentType.DateType;
 numericType := Text_Search.Types.SegmentType.NumericType;
 groupType := Text_Search.Types.SegmentType.GroupSeg;
 ConcatSeg := Text_Search.Types.SegmentType.ConcatSeg;
-
+keyType := Text_search.Types.SegmentType.ExternalKey;
 
 segmentMetaData := DATASET([
          {'prev-act-type',  TextType,       [1]},
@@ -23,9 +23,9 @@ segmentMetaData := DATASET([
          {'inspector',   TextType,       [5]},
         {'company-name',        TextType,       [6]},
 				{'address',        TextType,       [7]},
-				{'state-address',        TextType,       [8]},
-				{'zip-address',        TextType,       [9]},
-				{'city-address',        TextType,       [10]},
+				//{'state-address',        TextType,       [8]},
+				//{'zip-address',        TextType,       [9]},
+				//{'city-address',        TextType,       [10]},
 				{'county',        TextType,       [11]},
 				{'duns-no',        TextType,       [12]},
 				{'establishment-id',        TextType,       [13]},
@@ -36,9 +36,9 @@ segmentMetaData := DATASET([
 				{'close-inspect-dt',        DateType,       [18]},
 				{'inspect-category',        TextType,       [19]},
 				{'sic',        TextType,       [20]},
-				{'nacis',        TextType,       [21]},
+				{'naics',        TextType,       [21]},
 				{'inspect-type',        TextType,       [22]},
-				{'scopt',        TextType,       [23]},
+				{'scope',        TextType,       [23]},
 				{'case-close-dt',        DateType,       [24]},
 				{'victim-name',        TextType,       [25]},
 				{'gender',        TextType,       [26]},
@@ -46,7 +46,8 @@ segmentMetaData := DATASET([
 				{'injury-degree',        TextType,       [28]},
 				{'injury-nature',        TextType,       [29]},
 				{'event-type',        TextType,       [30]},
-				{'name',	ConcatSeg, [6,25]}
+				{'name',	ConcatSeg, [6,25]},
+						{'EXTERNALKEY',       keyType, [250]}
 				
 				], Text_Search.Layout_Segment_Definition);
 
@@ -54,10 +55,14 @@ segmentMetaData := DATASET([
 lfileName := Text_Search.FileName(info, Text_Search.Types.FileTypeEnum.SegList,true);
 sfilename := Text_Search.FileName(info, Text_Search.Types.FileTypeEnum.SegList);
 
-retval := sequential(
+retval := if (fileservices.fileexists(lfilename),
+								output('Metadata file '+lfilename+' already exists'),
+								sequential(
 										OUTPUT(segmentMetaData,,lfileName, OVERWRITE),
 										Text_Search.Boolean_Move_To_QA(sfileName,lfileName)
-										);
+										)
+							);
+
 
 return retval;
 

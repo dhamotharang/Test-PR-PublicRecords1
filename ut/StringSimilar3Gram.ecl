@@ -4,11 +4,14 @@ export UNSIGNED INTEGER4 StringSimilar3Gram(STRING l, STRING r,
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+
 #define FIXED_TGRAM_SZ 100
+
 typedef struct TriGramEntry {
 	char		trigram[3];
 	short		freq[2];
 } TriGramEntry;
+
 int insertTrigram(int entries, TriGramEntry *tab, 
 				const char* tg, int which) {
 	int low = 0;
@@ -37,6 +40,7 @@ int insertTrigram(int entries, TriGramEntry *tab,
 	}
 	return entries;
 }
+
 int processString(int entries, int len, const char *str, 
 				  TriGramEntry *tab, int which) {
 	char	trigram[3];

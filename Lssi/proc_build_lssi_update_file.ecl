@@ -5,7 +5,7 @@ prt_title := output('200 new lssi sample records ...');
 prt_recs := output(choosen(enth(lssi.file_lssi_in(xcode = 'I', (unsigned)TELNO<>0),200),200));
 
 prt_sample := sequential(prt_title, prt_recs,
-                         FileServices.sendemail('rquerido@seisint.com','LSSI DAILY SAMPLE READY','at ' + thorlib.WUID()));
+                         FileServices.sendemail('qualityassurance@seisint.com;camaral@seisint.com','LSSI DAILY SAMPLE READY','at ' + thorlib.WUID()));
 
 lssi_add := distribute(lssi.file_hhid_did_add, hash(recid));
 lssi_remove := distribute(lssi.file_hhid_did_remove, hash(recid));

@@ -15,8 +15,8 @@ import doxie;
 #uniquename(recs)
 AutokeyB.Layout_Phone %proj%(%indata% le) :=
 TRANSFORM
-  SELF.p7 := le.inphone[4..10];
-  SELF.p3 := le.inphone[1..3];
+  SELF.p7 := ((string)le.inphone)[4..10];
+  SELF.p3 := ((string)le.inphone)[1..3];
   SELF.cname_indic := business_header.CompanyCleanFields(le.inbname, true).indicative; 
   SELF.cname_sec := business_header.CompanyCleanFields(le.inbname, true).secondary;
   SELF.st := le.inst;

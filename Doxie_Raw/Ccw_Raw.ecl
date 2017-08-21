@@ -1,4 +1,4 @@
-﻿//============================================================================
+//============================================================================
 // Attribute: ccw_raw.  Used by view source service and comp-report.
 // Function to get concealed weapon records by did.
 // Return value: dataset. Layout: plusdid.

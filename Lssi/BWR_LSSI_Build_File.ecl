@@ -1,4 +1,4 @@
-import address, lssi, did_add, business_header_ss, header, ut, header_slimsort, didville, business_header;
+import address, lssi, did_add, business_header_ss, header, ut, header_slimsort, didville, business_header,_control,instantid_logs, aid, address, ut, did_add, header_slimsort, didville, header, address, watchdog, yellowpages, gong, cellphone, risk_indicators, lib_stringlib;
 //this program is to clean, did(bdid) and hhid the lssi update file
 
 lssi_update_file := lssi.file_lssi_in(xcode = 'I');
@@ -8,49 +8,118 @@ comb_addr_record := record
 	layout_in,
 	string address_line1,
 	string address_line2,
+	unsigned8 rawAIDin := 0;
 end;
 
 comb_addr_record combine_address(lssi_update_file l) := transform                       
-	self.address_line1 := trim(l.hseno) + 
-                           trim(l.hsesx) + 
-		    		       ' ' + 
-				       trim(l.strt);
-	self.address_line2 := trim(l.locnm) + 
-				       ', ' + 
-				       trim(l.state) + 
+	self.address_line1 := stringlib.stringtouppercase(trim(l.hseno) + ' ' +
+				        if(trim(l.hsesx)  <> '', trim(l.hsesx)  +  ' ', '') +
+				       trim(l.strt));
+	self.address_line2 := stringlib.stringtouppercase(trim(l.locnm) + 
+				        if(l.state <> '', ', ' + trim(l.state) , '') +
 				       ' ' + 
-				       trim(l.zip);
+				       trim(l.zip[1..5]));
 	self := l;
 end; 
 
 comb_addr_file := project(lssi_update_file, combine_address(left));
 
-valid_addr_file := comb_addr_file(address_line1 <> '', address_line2 <> '');
+//valid_addr_file := comb_addr_file(address_line1 <> '', address_line2 <> '');
 
-address.mac_address_clean(valid_addr_file,
-          	           address_line1, 
-			           address_line2,
-			           true,
-			           clean_addr_file1);
+//address.mac_address_clean(valid_addr_file,
+          	         //  address_line1, 
+			           //address_line2,
+			           //true,
+			           //clean_addr_file1);
 					 
-invalid_addr_file := comb_addr_file(address_line1 = '' or address_line2 = '');					 
+//invalid_addr_file := comb_addr_file(address_line1 = '' or address_line2 = '');					 
 					 
 clean_addr_record := record
 	comb_addr_record,
 	string182 clean,
 end;					 
 
-clean_addr_record clean_others(invalid_addr_file l) := transform
-	self.clean := AddrCleanLib.CleanAddress182(l.address_line1,l.address_line2);
-	self := l;
-end;
+////////////////// AID APPENDS ////////////////////////////////////////////////////////////////////////////
 
-clean_addr_file2 := project(invalid_addr_file, clean_others(left));
+aid.common.xflags laidappendflags := aid.common.eReturnValues.rawaid | aid.common.eReturnValues.ACECacheRecords;
+	
+aid.MacAppendFromRaw_2Line(comb_addr_file, 
+														address_line1, address_line2,
+														rawAIDin, historical_out, laidappendflags);
 
-clean_addr_file := clean_addr_file1 + clean_addr_file2;
+cleaned := historical_out : persist('~thor400_84::persist::lssi::clean',_Control.TargetQueue.BDL_400);
+// cleaned := dataset('~thor400_88_staging::persist::infutorcid::clean',recordof(historical_out), thor);
 
-parse_addr_record := record
-	layout_in;
+DenormedRecOut := RECORD
+comb_addr_record;
+
+/* AID fields */
+   string10 prim_range;
+   string2 predir;
+   string28 prim_name;
+   string4 addr_suffix;
+   string2 postdir;
+   string10 unit_desig;
+   string8 sec_range;
+   string25 p_city_name;
+   string25 v_city_name;
+   string2 st;
+   string5 zipcode;
+   string4 zip4;
+   string4 cart;
+   string1 cr_sort_sz;
+   string4 lot;
+   string1 lot_order;
+   string2 dbpc;
+   string1 chk_digit;
+   string2 rec_type;
+   string5 countyname;
+   string10 geo_lat_val;
+   string11 geo_long_val;
+   string4 msa;
+   string7 geo_blk;
+   string1 geo_match;
+   string4 err_stat;
+
+END;
+
+DenormedRecOut tNormAidAppends(recordof(cleaned) l) := TRANSFORM
+ SELF.rawAIDin := 		L.aidwork_rawaid;
+ SELF.prim_range := 	L.aidwork_acecache.prim_range;
+ SELF.predir := 	L.aidwork_acecache.predir;
+ SELF.prim_name := 	L.aidwork_acecache.prim_name;
+ SELF.addr_suffix := 	L.aidwork_acecache.addr_suffix;
+ SELF.postdir := 	L.aidwork_acecache.postdir;
+ SELF.unit_desig := 	L.aidwork_acecache.unit_desig;
+ SELF.sec_range := 	L.aidwork_acecache.sec_range;
+ SELF.p_city_name := 	L.aidwork_acecache.p_city_name;
+ SELF.v_city_name := 	L.aidwork_acecache.v_city_name;
+ SELF.st := 	L.aidwork_acecache.st;
+ SELF.zipcode := 	L.aidwork_acecache.zip5;
+ SELF.zip4 := 	L.aidwork_acecache.zip4;
+ SELF.cart := 	L.aidwork_acecache.cart;
+ SELF.cr_sort_sz := 	L.aidwork_acecache.cr_sort_sz;
+ SELF.lot := 	L.aidwork_acecache.lot;
+ SELF.lot_order := 	L.aidwork_acecache.lot_order;
+ SELF.dbpc := 	L.aidwork_acecache.dbpc;
+ SELF.chk_digit := 	L.aidwork_acecache.chk_digit;
+ SELF.rec_type := 	L.aidwork_acecache.rec_type;
+ SELF.countyname := 	L.aidwork_acecache.county;
+ SELF.geo_lat_val := 	L.aidwork_acecache.geo_lat;
+ SELF.geo_long_val := 	L.aidwork_acecache.geo_long;
+ SELF.msa := 	L.aidwork_acecache.msa;
+ SELF.geo_blk := 	L.aidwork_acecache.geo_blk;
+ SELF.geo_match := 	L.aidwork_acecache.geo_match;
+ SELF.err_stat := 	L.aidwork_acecache.err_stat;
+ SELF := L;
+END;
+
+clean_addr_file := NORMALIZE(cleaned, 1, tNormAidAppends(LEFT));
+
+
+ parse_addr_record := record
+	 layout_in;
+	unsigned8 rawAIDin := 0;
 	string10	 prim_range;
 	string2  	 predir;
 	string28 	 prim_name;
@@ -80,36 +149,11 @@ parse_addr_record := record
 end;
 
 parse_addr_record parse_address(clean_addr_file l) := transform
-	self.prim_range := l.clean[1..10];
-	self.predir := l.clean[11..12];
-	self.prim_name := l.clean[13..40];
-	self.addr_suffix := l.clean[41..44];
-	self.postdir := l.clean[45..46];
-	self.unit_desig := l.clean[47..56];
-	self.sec_range := l.clean[57..64];
-	self.p_city_name := l.clean[65..89];
-	self.v_city_name := l.clean[90..114];
-	self.st := l.clean[115..116];
-	self.zipcode := l.clean[117..121];
-	self.zip4 := l.clean[122..125];
-	self.cart := l.clean[126..129];
-	self.cr_sort_sz := l.clean[130];
-	self.lot := l.clean[131..134];
-	self.lot_order := l.clean[135];
-	self.dbpc := l.clean[136..137];
-	self.chk_digit := l.clean[138];
-	self.rec_type := l.clean[139..140];
-	self.countyname := l.clean[141..145];
-	self.geo_lat_val := l.clean[146..155];
-	self.geo_long_val := l.clean[156..166];
-	self.msa := l.clean[167..170];
-	self.geo_blk := l.clean[171..177];
-	self.geo_match := l.clean[178];
-	self.err_stat := l.clean[179..182];
 	self := l;
 end;
 
-parse_addr_file := project(clean_addr_file, parse_address(left));
+parse_addr_file := project(clean_addr_file, parse_address(left)) : persist('~thor_200::persist::lssi::normclean', _Control.TargetQueue.thor_200);
+// parse_addr_file := dataset('~thor_200::persist::lssi::normclean', recordof(parse_addr_record), thor);
 
 //clean phone
 clean_phone_record := record
@@ -131,7 +175,7 @@ clean_name_record := record
 end;
 
 string73 clean_name_str(clean_phone_file l1) :=  
-         addrcleanlib.CleanPersonFML73(trim(l1.LSTGN) + ' ' + trim(l1.LSTNM));
+         Address.CleanPersonFML73(trim(l1.LSTGN) + ' ' + trim(l1.LSTNM));
 	     	   
 clean_name_record clean_name(clean_phone_file l2) := transform
 	self.clean_name := if((l2.split = '1'),clean_name_str(l2),'');
@@ -238,6 +282,8 @@ business_header_ss.MAC_Add_BDID_Flex(bus_lssi_ready, bus_matchset,
 						       bus_lssi_out);
 
 //merge did, hhided residential records with dided nonresidential records
-lssi_build_out := res_lssi_out + bus_lssi_out; 
+res := res_lssi_out: persist('~thor_data400::persist::resDID',_control.TargetQueue.ADL_400);
+bus := bus_lssi_out: persist('~thor_data400::persist::busDID',_control.TargetQueue.ADL_400); 
 
+lssi_build_out := res+bus;
 export bwr_lssi_build_file := lssi_build_out;

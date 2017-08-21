@@ -14,14 +14,13 @@ record
       string8   IGS_IN_END_DATE;
       string2   IGS_IN_END_REASON_CODE;
       string10  IGS_IN_CHARTER_NUMBER;
-      //string2   IGS_IN_CORP_TYPE;
       string8   IGS_IN_SOS_CHAR_DATE;
       string8   IGS_IN_SOS_CODE_DATE;
       string2   IGS_IN_SOS_STATUS;
-      string1   IGS_IN_STANDING;
-      string8   IGS_IN_STANDING_DATE;
+      string1   IGS_IN_RIGHT_TO_TRANSACT_CODE;
       string3   IGS_IN_CURR_EXEMPT_REASON;
       string8   IGS_IN_EXEMPT_BEGIN_DATE;
       string6   NAICS_CODE;
+      string8   IGS_IN_BLANK_FILLER;  // The vendor sends blanks to keep the fixed length the same
       string2   crlf;
 end;

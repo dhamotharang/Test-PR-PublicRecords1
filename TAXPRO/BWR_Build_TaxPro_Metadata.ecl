@@ -33,6 +33,7 @@ info := text_search.FileName_Info_Instance('~THOR_DATA400::BASE', 'TAXPRO', file
 textType := Text_Search.Types.SegmentType.TextType;
 dateType := Text_Search.Types.SegmentType.DateType;
 numericType := Text_Search.Types.SegmentType.NumericType;
+keyType := Text_search.Types.SegmentType.ExternalKey;
 
 /// add stuff
 
@@ -40,12 +41,13 @@ numericType := Text_Search.Types.SegmentType.NumericType;
 segmentMetaData := DATASET([
 		{'NAME',					textType,		[1]},
 		{'ENROLL-YEAR',				textType,		[2]},
-		{'ADDRESS',					textType,		[3]},
-		{'CITY',					textType,		[4]},
-		{'STATE',					textType,		[5]},
-		{'ZIP',						textType,		[6]},
-		{'PROVINCE',				textType,		[7]},
-		{'COUNTRY',					textType,		[8]}
+		{'ADDRESS',					TextType,		[3]},
+				{'EXTERNALKEY',       keyType, [250]}
+		//{'CITY',					textType,		[4]},
+		//{'STATE',					textType,		[5]},
+		//{'ZIP',						textType,		[6]},
+		//{'PROVINCE',				textType,		[7]},
+		//{'COUNTRY',					textType,		[8]}
 			
 
 		], Text_Search.Layout_Segment_Definition);

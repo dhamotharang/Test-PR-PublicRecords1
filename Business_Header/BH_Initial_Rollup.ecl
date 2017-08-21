@@ -1,5 +1,12 @@
 IMPORT Business_Header, ut;
 
+EXPORT BH_Initial_Rollup(
+
+	 dataset(Layout_Business_Header_Base)	pBusiness_Headers	= Files().Base.Business_Headers.QA
+
+) :=
+function
+
 Layout_BH_Slim := RECORD
   unsigned6 rcid;
   unsigned6 bdid;
@@ -16,7 +23,7 @@ Layout_BH_Slim := RECORD
   unsigned4 fein;
 END;
 
-file_bh_previous := Business_Header.File_Business_Header_Previous;
+file_bh_previous := pBusiness_Headers;
 
 //****** Slim down the business header to match fields
 Layout_BH_Slim SlimBH(file_bh_previous L) := TRANSFORM
@@ -53,4 +60,8 @@ BH_Match := join(BH_Slim,
                 
 BH_Match_Sort := SORT(DISTRIBUTE(BH_Match, old_rid), old_rid, new_rid, LOCAL);
 
-EXPORT BH_Initial_Rollup := DEDUP(BH_Match_Sort, old_rid, LOCAL);
+BH_Rollup := DEDUP(BH_Match_Sort, old_rid, LOCAL);
+
+return BH_Rollup;
+
+end;

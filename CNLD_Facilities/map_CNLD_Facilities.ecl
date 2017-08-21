@@ -77,13 +77,13 @@ layout_FacilityAddl xformFile(CNLD_Facilities.layout pInput)
 			self.last_seen_date	 := '20090226';
 			self.process_date			:= process_date;
 			
-	    TrimNAME_ORG	:= ut.fnTrim2Upper(pInput.org_name);
-			TrimAddr1_1 := ut.fnTrim2Upper(pInput.addr1_line1);
-			TrimAddr2_1	:= ut.fnTrim2Upper(pInput.addr2_line1);
-			TrimAddr3_1	:= ut.fnTrim2Upper(pInput.addr3_line1);
-			TrimAddr1_2	:= ut.fnTrim2Upper(pInput.addr1_line2);
-			TrimAddr2_2	:= ut.fnTrim2Upper(pInput.addr2_line2);
-			TrimAddr3_2	:= ut.fnTrim2Upper(pInput.addr3_line2);
+	    TrimNAME_ORG	:= ut.CleanSpacesAndUpper(pInput.org_name);
+			TrimAddr1_1 := ut.CleanSpacesAndUpper(pInput.addr1_line1);
+			TrimAddr2_1	:= ut.CleanSpacesAndUpper(pInput.addr2_line1);
+			TrimAddr3_1	:= ut.CleanSpacesAndUpper(pInput.addr3_line1);
+			TrimAddr1_2	:= ut.CleanSpacesAndUpper(pInput.addr1_line2);
+			TrimAddr2_2	:= ut.CleanSpacesAndUpper(pInput.addr2_line2);
+			TrimAddr3_2	:= ut.CleanSpacesAndUpper(pInput.addr3_line2);
 			
 			prepNAME_ORG		:= MAP(TrimNAME_ORG[1..6] = 'ATTN: ' => TrimNAME_ORG[7..],
 														 StringLib.stringfind(TrimNAME_ORG,'%',1) > 0 => StringLib.StringFilterOut(TrimNAME_ORG, '%'),
@@ -100,7 +100,7 @@ layout_FacilityAddl xformFile(CNLD_Facilities.layout pInput)
 			stripNAME_ORG := fn_RemoveSpecialChars(getNAME_ORG);													
 			 
 //Removing STORENO from ORG_NAME field
-			TrimStoreNo		:= ut.fnTrim2Upper(pInput.StoreNo);
+			TrimStoreNo		:= ut.CleanSpacesAndUpper(pInput.StoreNo);
 			getSTORENO 		:= IF(TrimStoreNo = '' and StringLib.stringfind(stripNAME_ORG[3..],'#',1) > 0,regexfind(pound_pattern,getNAME_ORG,2),'');
 			removeSTRNO		:= IF(getSTORENO <> '' and StringLib.StringFind(stripNAME_ORG[3..],'#',1) > 0, StringLib.StringFindReplace(stripNAME_ORG,'#'+ getSTORENO,''),
 												 																											stripNAME_ORG);
@@ -134,9 +134,9 @@ layout_FacilityAddl xformFile(CNLD_Facilities.layout pInput)
 			self.ADDR3_CITY		:= IF(StringLib.stringfind(TrimCity_3,' ',3) > 1 and regexfind(AddrExceptions,TrimCity_3) and TrimCity_1 <> TrimCity_3
 																	and prepTrimAddr3_1 = '','',TrimCity_3);
 			 
-		  self.ADDR1_ST		:= ut.fnTrim2Upper(pInput.ADDR1_ST);
-			self.ADDR2_ST		:= ut.fnTrim2Upper(pInput.ADDR2_ST);
-			self.ADDR3_ST		:= ut.fnTrim2Upper(pInput.ADDR3_ST);
+		  self.ADDR1_ST		:= ut.CleanSpacesAndUpper(pInput.ADDR1_ST);
+			self.ADDR2_ST		:= ut.CleanSpacesAndUpper(pInput.ADDR2_ST);
+			self.ADDR3_ST		:= ut.CleanSpacesAndUpper(pInput.ADDR3_ST);
 		  self.ADDR1_ZIP		:= pInput.ADDR1_ZIP;
 			self.ADDR2_ZIP		:= pInput.ADDR2_ZIP;
 			self.ADDR3_ZIP		:= pInput.ADDR3_ZIP;
@@ -149,7 +149,7 @@ layout_FacilityAddl xformFile(CNLD_Facilities.layout pInput)
 			self.PROFCODE				:= pInput.PROFCODE;
 			self.PROFSTAT				:= pInput.PROFSTAT;
 			
-			TrimNAME_OWN := StringLib.StringCleanSpaces(ut.fnTrim2Upper(pInput.ownername));
+			TrimNAME_OWN := StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(pInput.ownername));
 			self.OWNERNAME			:= IF(length(trim(TrimNAME_OWN)) < 3,'',TrimNAME_OWN);
 			self.OWNERTYPE			:= pInput.OWNERTYPE;
 			self.STD_PROF_DESC		:= '';
@@ -371,26 +371,26 @@ FilteredMiscRecs3  := NoMiscRecs3 + MiscRecs3;
 
 
 CNLD_Facilities.layout_Facilities_Out xformFileNorm(r5 pInput) := TRANSFORM
-	self.deanbr 		:= ut.fnTrim2Upper(pInput.deanbr);
+	self.deanbr 		:= ut.CleanSpacesAndUpper(pInput.deanbr);
 	self.deanbr_exp	:= pInput.deanbr_exp;
 	self.deanbr_sch	:= pInput.deanbr_sch;
-	self.st_lic_in	:= ut.fnTrim2Upper(pInput.st_lic_in);
+	self.st_lic_in	:= ut.CleanSpacesAndUpper(pInput.st_lic_in);
 	
-	TrimLIC_NBR		:= ut.fnTrim2Upper(pInput.ST_LIC_NUM);
+	TrimLIC_NBR		:= ut.CleanSpacesAndUpper(pInput.ST_LIC_NUM);
 	self.st_lic_num		:= IF(stringlib.stringfind(TrimLIC_NBR,'/',1) > 2, '',StringLib.StringFilterOut(TrimLIC_NBR, '*'));
-	self.st_lic_stat	:= ut.fnTrim2Upper(pInput.st_lic_stat);	
+	self.st_lic_stat	:= ut.CleanSpacesAndUpper(pInput.st_lic_stat);	
 	
-	TrimLIC_TYPE	:= ut.fnTrim2Upper(pInput.ST_LIC_TYPE);
+	TrimLIC_TYPE	:= ut.CleanSpacesAndUpper(pInput.ST_LIC_TYPE);
 	self.ST_LIC_TYPE		:= StringLib.StringFilterOut(TrimLIC_TYPE, '*');
 	self.fednum				:= pInput.fednum;
-	self.survey_type	:= ut.fnTrim2Upper(pInput.survey_type);
-	self.def_code			:= ut.fnTrim2Upper(pInput.def_code);
-	self.def_status		:= ut.fnTrim2Upper(pInput.def_status);
-	self.def_type			:= ut.fnTrim2Upper(pInput.def_type);
+	self.survey_type	:= ut.CleanSpacesAndUpper(pInput.survey_type);
+	self.def_code			:= ut.CleanSpacesAndUpper(pInput.def_code);
+	self.def_status		:= ut.CleanSpacesAndUpper(pInput.def_status);
+	self.def_type			:= ut.CleanSpacesAndUpper(pInput.def_type);
 	
-	TrimSANC_CSE := StringLib.StringCleanSpaces(ut.fnTrim2Upper(pInput.SANCTION_CASE));
+	TrimSANC_CSE := StringLib.StringCleanSpaces(ut.CleanSpacesAndUpper(pInput.SANCTION_CASE));
 	self.SANCTION_CASE		:= StringLib.StringFilterOut(TrimSANC_CSE, '"');
-	self.sanction_state	:= ut.fnTrim2Upper(pInput.sanction_state);
+	self.sanction_state	:= ut.CleanSpacesAndUpper(pInput.sanction_state);
 	
   self := pInput;
 	   

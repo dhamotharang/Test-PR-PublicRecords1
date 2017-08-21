@@ -1,10 +1,22 @@
-import LN_PropertyV2, text_search, Codes, ut;
+import LN_PropertyV2, text_search, Codes, ut,LN_PropertyV2_Services;
 
 
 export Convert_Assess_Func := function
-	ds_main := distribute(LN_PropertyV2.File_Assessment,hash(ln_fares_id));
+	ds_main_in := distribute(LN_PropertyV2.File_Assessment,hash(ln_fares_id));
 	ds_addl := distribute(LN_PropertyV2.File_addl_Fares_tax,hash(ln_fares_id));
 	ds_leg := distribute(LN_PropertyV2.File_addl_legal,hash(ln_fares_id));
+	
+	main_rec := record
+		ds_main_in;
+		string5 source_code;
+	end;
+	
+	main_rec proj_main(ds_main_in l) := transform
+		self.source_code := LN_PropertyV2_Services.fn_vendor_source(l.vendor_source_flag);
+		self := l;
+	end;
+	
+	ds_main := project(ds_main_in,proj_main(left));
 	
 	ds_addl_rec := record
 		LN_PropertyV2.layout_addl_fares_tax;
@@ -41,49 +53,56 @@ export Convert_Assess_Func := function
 	
 	myrec := record
 		ds_main;
-		string50 legal_lot_desc := '';
-		string50 ownership_type_desc := '';
-		string50 standardized_land_use_desc := '';
-		string50 mortgage_loan_type_desc := '';
-		string50 mortgage_lender_type_desc := '';
-		string50 tax_exemption1_desc := '';
-		string50 tax_exemption2_desc := '';
-		string50 tax_exemption3_desc := '';
-		string50 tax_exemption4_desc := '';
-		string50 neighborhood_desc := '';
+		string330 legal_lot_desc := '';
+		string330 ownership_type_desc := '';
+		string330 standardized_land_use_desc := '';
+		string330 mortgage_loan_type_desc := '';
+		string330 mortgage_lender_type_desc := '';
+		string330 tax_exemption1_desc := '';
+		string330 tax_exemption2_desc := '';
+		string330 tax_exemption3_desc := '';
+		string330 tax_exemption4_desc := '';
+		string330 neighborhood_desc := '';
+		string330 document_type_desc := '';
+		string330 sales_price_desc := '';
 	end;
 	
 	ut.Mac_Convert_Codes_To_Desc(ds_main,myrec,legal_lot_ds,'FARES_2580',
 																					'LEGAL_LOT_CODE',legal_lot_desc,
-																					legal_lot_code);
+																					legal_lot_code,source_code,true);
 	ut.Mac_Convert_Codes_To_Desc(legal_lot_ds,myrec,owner_ds,'FARES_2580',
 																					'OWNERSHIP_TYPE_CODE',ownership_type_desc,
-																					ownership_type_code);
+																					ownership_type_code,source_code,true);
 	ut.Mac_Convert_Codes_To_Desc(owner_ds,myrec,stand_ds,'FARES_2580',
-																					'STANDARDIZED_LAND_USE_CODE',standardized_land_use_desc,
-																					standardized_land_use_code);
+																					'LAND_USE',standardized_land_use_desc,
+																					standardized_land_use_code,source_code,true);
 	ut.Mac_Convert_Codes_To_Desc(stand_ds,myrec,ml_ds,'FARES_2580',
 																					'MORTGAGE_LOAN_TYPE_CODE',mortgage_loan_type_desc,
-																					mortgage_loan_type_code);
+																					mortgage_loan_type_code,source_code,true);
 	ut.Mac_Convert_Codes_To_Desc(ml_ds,myrec,mlen_ds,'FARES_2580',
 																					'MORTGAGE_LENDER_TYPE_CODE',mortgage_lender_type_desc,
-																					mortgage_lender_type_code);
+																					mortgage_lender_type_code,source_code,true);
 	ut.Mac_Convert_Codes_To_Desc(mlen_ds,myrec,t1_ds,'FARES_2580',
 																					'TAX_EXEMPTION1_CODE',tax_exemption1_desc,
-																					tax_exemption1_code);
+																					tax_exemption1_code,source_code,true);
 	ut.Mac_Convert_Codes_To_Desc(t1_ds,myrec,t2_ds,'FARES_2580',
 																					'TAX_EXEMPTION2_CODE',tax_exemption2_desc,
-																					tax_exemption2_code);
+																					tax_exemption2_code,source_code,true);
 	ut.Mac_Convert_Codes_To_Desc(t2_ds,myrec,t3_ds,'FARES_2580',
 																					'TAX_EXEMPTION3_CODE',tax_exemption3_desc,
-																					tax_exemption3_code);
+																					tax_exemption3_code,source_code,true);
 	ut.Mac_Convert_Codes_To_Desc(t3_ds,myrec,t4_ds,'FARES_2580',
 																					'TAX_EXEMPTION4_CODE',tax_exemption4_desc,
-																					tax_exemption4_code);
-	ut.Mac_Convert_Codes_To_Desc(t4_ds,myrec,n_ds,'FARES_2580',
+																					tax_exemption4_code,source_code,true);
+	ut.Mac_Convert_Codes_To_Desc(t4_ds,myrec,t5_ds,'FARES_2580',
 																					'NEIGHBORHOOD_CODE',neighborhood_desc,
-																					neighborhood_code);
-
+																					neighborhood_code,source_code,true);
+	ut.Mac_Convert_Codes_To_Desc(t5_ds,myrec,t6_ds,'FARES_2580',
+																					'DOCUMENT_TYPE_CODE',document_type_desc,
+																					document_type,source_code,true);
+	ut.Mac_Convert_Codes_To_Desc(t6_ds,myrec,n_ds,'FARES_2580',
+																					'SALE_CODE',sales_price_desc,
+																					SALES_PRICE_CODE,source_code,true);
 	// -------- Code conversion complete -------------------
 	
 	Layout_Assess_Record := record(Text_search.Layout_Document)
@@ -96,7 +115,7 @@ export Convert_Assess_Func := function
 		self.docref.doc := 0;
 		self.segs := dataset([
 								{1,0,l.state_code},
-								{2,0,l.county_name},
+								//{2,0,l.county_transfer_tax},
 								{3,0,l.apna_or_pin_number},
 								{4,0,l.certification_date},
 								{5,0,l.assessee_name + ';' + l.second_assessee_name + ';' + l.contract_owner
@@ -125,11 +144,11 @@ export Convert_Assess_Func := function
 								{25,0,l.recorder_book_number + '/' + l.recorder_page_number},
 								{26,0,l.transfer_date},
 								{27,0,l.recording_date},
-								{28,0,l.document_type},
+								{28,0,l.document_type_desc},
 								{29,0,';' + l.sale_date},
-								{30,0,l.sales_price + ';' + l.prior_sales_price},
+								{30,0,l.sales_price},
 								{31,0,l.mortgage_loan_amount},
-								{32,0,l.mortgage_loan_type_desc},
+								{32,0,l.mortgage_loan_type_code + '; ' + l.mortgage_loan_type_desc},
 								{33,0,l.mortgage_lender_name},
 								{34,0,l.mortgage_lender_type_desc},
 								{35,0,l.assessed_land_value /*+ ';' + l.fares_calculated_land_value*/},
@@ -140,18 +159,27 @@ export Convert_Assess_Func := function
 								{40,0,l.market_improvement_value /*+ ';' + l.fares_calculated_improvement_value*/},
 								{41,0,l.market_total_value /*+ ';' + l.fares_calculated_total_value*/},
 								{42,0,l.market_value_year},
-								{43,0,'HOMESTEAD HOMEOWNER EXEMPTION:' + l.homestead_homeowner_exemption /*+ ';' + 
+								{43,0,if (l.homestead_homeowner_exemption <> '',
+										'HOMESTEAD HOMEOWNER EXEMPTION:' + l.homestead_homeowner_exemption,'') /*+ ';' + 
 												'CALIFORNIA HOMEOWNER EXEMPTION:' + l.california_homeowner_exemption*/},
 								{44,0,l.tax_exemption1_desc + ';' + l.tax_exemption2_desc + ';' +
 											l.tax_exemption3_desc + ';' + l.tax_exemption4_desc},
 								{45,0,l.tax_rate_code_area},
 								{46,0,l.tax_amount},
 								{47,0,l.tax_year},
-								{48,0,'; YEAR BUILT:' + l.year_built},
-								{49,0,'; EFFECTIVE YEAR BUILT:' + l.effective_year_built},
+								{48,0,if(l.year_built <>  '','; YEAR BUILT:' + l.year_built,'')},
+								{49,0,if(l.effective_year_built <> '','; EFFECTIVE YEAR BUILT:' + l.effective_year_built,'')},
 								//{50,0,'; NEIGHBORHOOD DESCRIPTION:' + l.neighbor_desc},
-								{51,0,'; CONDO PROJECT NAME:' + l.condo_project_name},
-								{52,0,'; BUILDING NAME:' + l.building_name}
+								{51,0,if(l.condo_project_or_building_name <> '','; CONDO PROJECT NAME:' + l.condo_project_or_building_name,'')},
+								{52,0,if(l.condo_project_or_building_name <> '','; BUILDING NAME:' + l.condo_project_or_building_name,'')},
+								{68,0,l.sales_price_desc},
+								{90,0,l.county_name},
+								{91,0,l.census_tract},
+								{92,0,l.legal_city_municipality_township},
+								{93,0,l.legal_sec_twn_rng_mer},
+								{94,0,l.prior_sales_price},
+								{95,0,l.tax_account_number},
+								{249,0,l.process_date}
 								
 		],text_search.Layout_Segment);
 	end;
@@ -211,6 +239,21 @@ export Convert_Assess_Func := function
 	
 	itr_full := iterate(sort_full,iterate_assess(left,right),local);
 	
-	return itr_full(trim(content) <> '' and trim(content) <> ';');
+	// External key
+	
+	layout_assess_flat MakeKeySegs( itr_full l, unsigned2 segno ) := TRANSFORM
+		self.ln_fares_id := l.ln_fares_id;
+        self.docref.doc := l.docref.doc;
+        self.docref.src := l.docref.src;
+		self.segment := segno;
+        self.content := l.ln_fares_id;
+        self.sect := 1;
+    END;
 
-end;
+    segkeys := PROJECT(itr_full(trim(content) <> '' and trim(content) <> ';'),MakeKeySegs(LEFT,250));
+
+	full_ret := itr_full(trim(content) <> '' and trim(content) <> ';') + segkeys;
+	
+	return full_ret;
+
+end : DEPRECATED('Use Property_ABooleanSearch instead.  DO NOT USE!');

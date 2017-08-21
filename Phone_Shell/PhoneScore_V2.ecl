@@ -3164,7 +3164,7 @@ mod14_scr_1 := map(
 mod14_scr := min(if(Max(mod14_scr_1, 0) = NULL, -NULL, Max(mod14_scr_1, 0)), 999);
 
 phonescore_v2_1 := mod14_scr;
-phonescore_v2 := if(trim(StringLib.StringToUpperCase(phone_subject_title)) = 'NEIGHBOR', phonescore_v2_1 - 143, phonescore_v2_1);   /* Phone Subject Title Tweak – New */
+phonescore_v2 := if(trim(StringLib.StringToUpperCase(phone_subject_title)) = 'NEIGHBOR', phonescore_v2_1 - 143, phonescore_v2_1);   /* Phone Subject Title Tweak â€“ New */
 
 //Intermediate variables
 	#if(PHONE_DEBUG)

@@ -36,8 +36,8 @@ Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::areacode_change_plus'
 // -- Move Non-FCRA Keys to QA
 /////////////////////////////////////////////////////////////////////////////////
 
-ut.mac_sk_move('~thor_data400::key::areacode_change','Q',MoveKeyToQA3);
-ut.mac_sk_move('~thor_data400::key::areacode_change_plus','Q',MoveKeyToQA4);
+RoxieKeyBuild.mac_sk_move('~thor_data400::key::areacode_change','Q',MoveKeyToQA3);
+RoxieKeyBuild.mac_sk_move('~thor_data400::key::areacode_change_plus','Q',MoveKeyToQA4);
 //ut.mac_sk_move(OldName.HRI.Phone10.Root,		'Q',MoveKeyToQA5);
 
 
@@ -59,7 +59,7 @@ build_Non_FCRA_keys :=
 Move_keys_to_built :=
 	sequential(
 
-		MoveKeyToQA3
+		MoveKeyToBuilt3
 	   ,MoveKeyToBuilt4
 		//,MoveKeyToBuilt5
 		//,MoveFCRANeutralKeyToBuilt2

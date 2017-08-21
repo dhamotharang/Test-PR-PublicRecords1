@@ -30,7 +30,7 @@ module
 	module
 		export	string				BocaDev				:=	'10.241.12.201';
 		export	string				BocaOldDev		:=	'10.241.3.238';
-		export	string				BocaProd			:=	'10.241.20.205';
+		export	string				BocaProd			:=	'10.173.44.105';
 		export	string				AlphaDev			:=	'10.194.10.1';
 		export	string				AlphaProd			:=	'10.194.12.1';
 		export	set of string	sAll					:=	[BocaDev, BocaOldDev, BocaProd, AlphaDev, AlphaProd];

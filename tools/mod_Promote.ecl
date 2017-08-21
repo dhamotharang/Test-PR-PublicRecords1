@@ -224,6 +224,7 @@ module
 		,string		pVersion
 		,boolean	pDelete									= false
 		,boolean	pCheckVersionIntegrity	= false
+		,boolean	pMove2DeleteSuper     	= false
 	) :=
 	function
 	
@@ -233,7 +234,8 @@ module
 		
 		lpromotion :=
 			sequential(
-				 Tools.mod_Utilities.clear_add(lVersions.Built, pLogicalName)
+         iff(pMove2DeleteSuper and trim(fileservices.GetSuperFileSubName(lVersions.Built,1)) != '' and count(fileservices.logicalfilesuperowners('~' + fileservices.GetSuperFileSubName(lVersions.Built,1))) = 1 ,Tools.mod_Utilities.add_clear(lVersions.builtdelete, lVersions.Built))
+				,Tools.mod_Utilities.clear_add(lVersions.Built, pLogicalName)
 				,if(pCheckVersionIntegrity, _fVersionIntegrityCheck(pTemplateName,pDelete))
 			);
 		return sequential(
@@ -331,6 +333,41 @@ module
 						);
 	
 	end;
+
+	export fNew2Base(
+		 string		pTemplateName
+		,string		pNewTemplateName
+		,string		pVersion
+		,boolean	pDelete									= false
+		,boolean	pCheckVersionIntegrity	= false
+		,boolean	pIsNewNamingConvention	= false
+		,boolean	pClearSuperFirst				= true
+	) :=
+	function
+	
+		lversions := Tools.mod_FilenamesBuild(pTemplateName, pVersion, pNewTemplateName);
+		
+		lcreatesupers := apply(lversions.dAll_superfilenames + dataset([{lversions.Base}],layout_names),mod_Utilities.createsuper(name));
+		
+		lpromotion :=
+			if(pClearSuperFirst
+				,sequential(
+					Tools.mod_Utilities.clear_add(lVersions.base, lVersions.New)
+					// ,iff(pIsNewNamingConvention = false or pNewTemplateName != '',Tools.mod_Utilities.clear_add(lVersions.root	, lVersions.New))
+				)
+				,sequential(
+					Tools.mod_Utilities.add_clear(lVersions.base, lVersions.New)
+					// ,iff(pIsNewNamingConvention = false or pNewTemplateName != '',Tools.mod_Utilities.add_clear(lVersions.root	, lVersions.New))
+				)
+			);
+			
+		return sequential(
+							 lcreatesupers
+							,lpromotion
+						);
+	
+	end;
+
 	export fBuilding2Built(
 		 string		pTemplateName
 		,boolean	pDelete									= false
@@ -432,6 +469,7 @@ module
 		,boolean		pDelete									= false
 		,boolean		pCheckVersionIntegrity	= false
 		,boolean		pIsNewNamingConvention	= false
+		,boolean		pIsDeltaBuild	          = false
 	) :=
 	function
 	
@@ -467,10 +505,15 @@ module
 					if(	Tools.mod_Utilities.compare_supers(lVersions.built, lVersions.Qa) = true 
 						,loutput(lVersions.built + ' and ' + lVersions.qa + ' are the same, nothing to do'),
 					sequential(
-						if(Tools.mod_Utilities.compare_supers(lVersions.qa, lVersions.prod) = false 
-							,lTodo
-						)
-						,Tools.mod_Utilities.clear_add(lVersions.qa		, lVersions.built)
+            if(pIsDeltaBuild = false ,
+              sequential(
+                if(Tools.mod_Utilities.compare_supers(lVersions.qa, lVersions.prod) = false
+                  ,lTodo
+                )
+                ,Tools.mod_Utilities.clear_add(lVersions.qa		, lVersions.built)
+              )
+              ,Tools.mod_Utilities.add_clear(lVersions.qa		, lVersions.built)
+            )
 						,if(pIsNewNamingConvention = false,Tools.mod_Utilities.clear_add(lVersions.root	, lVersions.built))
 						,if(pCheckVersionIntegrity, _fVersionIntegrityCheck(pTemplateName,pDelete))
 					)))
@@ -670,6 +713,7 @@ module
 		,boolean																					pDelete 								= false
 		,unsigned1																				pnGenerations						= 3
 		,boolean																					pClearSuperFirst				= true
+		,boolean		                                      pIsDeltaBuild	          = false
 	) :=
 	module
 	
@@ -686,7 +730,7 @@ module
 		export building2built											:= nothor(apply(pNames, fbuilding2built				(OldTemplateName,pDelete,pCheckVersionIntegrity												)));
 		export Built2Qa2Delete										:= nothor(apply(pNames, fBuilt2Qa2Delete			(OldTemplateName,pDelete,pCheckVersionIntegrity,IsNewNamingConvention												)));
 		export Built2QA2Father										:= nothor(apply(pNames, fBuilt2QA2Father			(OldTemplateName,pDelete,pCheckVersionIntegrity,IsNewNamingConvention												)));
-		export Built2QA														:= nothor(apply(pNames, fBuilt2QA							(OldTemplateName,pnGenerations,pDelete,pCheckVersionIntegrity,IsNewNamingConvention					)));
+		export Built2QA														:= nothor(apply(pNames, fBuilt2QA							(OldTemplateName,pnGenerations,pDelete,pCheckVersionIntegrity,IsNewNamingConvention	,pIsDeltaBuild				)));
 		export QA2Prod														:= nothor(apply(pNames, fQA2Prod							(OldTemplateName,pDelete,pCheckVersionIntegrity												)));
 		export QA2Prod2Father											:= nothor(apply(pNames, fQA2Prod2FAther				(OldTemplateName,pDelete,pCheckVersionIntegrity												)));
 	
@@ -706,12 +750,13 @@ module
 		,boolean													pDelete 								= false
 		,unsigned1												pnGenerations						= 3
 		,boolean													pClearSuperFirst				= true
+		,boolean		                      pIsDeltaBuild	          = false
 	) :=
 	function
 		
 		dslim_templates := SlimFilenameDs.fOldTemps(pNames);
 		
-		promotion := BuildFiles(dslim_templates, pCheckVersionIntegrity, pDelete, pnGenerations,pClearSuperFirst);
+		promotion := BuildFiles(dslim_templates, pCheckVersionIntegrity, pDelete, pnGenerations,pClearSuperFirst,pIsDeltaBuild);
 		
 		return promotion;
 	

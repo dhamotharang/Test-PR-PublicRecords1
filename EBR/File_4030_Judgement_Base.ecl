@@ -1,1 +1,1 @@
-export File_4030_Judgement_Base := dataset(FileName_4030_Judgement_Base, Layout_4030_Judgement_Base,flat) : global;
+export File_4030_Judgement_Base := dataset(FileName_4030_Judgement_Base, Layout_4030_Judgement_Base,flat);

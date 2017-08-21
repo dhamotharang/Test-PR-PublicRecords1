@@ -1,4 +1,4 @@
-import doxie, ut;
+import doxie, ut, Watchdog;
 
 //Layouts
 rDS := RECORD
@@ -83,11 +83,13 @@ rOutput := record
 ds_address 	:= dataset(ut.foreign_prod+'thor400_20::persist::watchdog_bestaddress', rDS, thor);
 ds_wd				:= dataset(ut.foreign_prod+'thor_data400::base::watchdog_best', rWD, thor);
 ds_header 	:= doxie.key_header;
+ds_watchdog	:= Watchdog.Key_Watchdog_nonglb;
 
 //distributed
 dAddress 	:= distribute(ds_address, did);
 dWD 			:= distribute(ds_wd, did);
 dHeader 	:= distribute(ds_header, did);
+dWatchdog := distribute(ds_watchdog, did);
 
 //Filters
 fVehicles := ['FV','IV','KV','AV','NV','SV','MV','LV','RV','PV','EV','XV','QV','OV','TV','UV','WV','YV','AE','BE','EE','CE','&E','$E','GE','JE','IE','KE','LE','NE','ME','RE','PE','VE','YE','XE','ZE','@E','HE','+E','?E','QE','!E','OE','=E','SE','TE','.E','UE','WE','#E'];
@@ -108,23 +110,24 @@ rOutput slimHeader(dWD l) := transform
 end;
 oBase := project(dWD, slimHeader(left), local);
 
+output(choosen(oBase, 100));
 
-//Append best address
+//Append best address provided it is not blank
 rOutput addAddress(oBase l, dAddress r) := transform
-	self.prim_range := r.prim_range;
-  self.predir := r.predir;
-  self.prim_name := r.prim_name;
-  self.suffix := r.suffix;
-  self.postdir := r.postdir;
-  self.unit_desig := r.unit_desig;
-  self.sec_range := r.sec_range;
-  self.city_name := r.city_name;
-  self.st := r.st;
-  self.zip := r.zip;
-  self.zip4 := r.zip4;
-  self.rawaid := r.rawaid;
-  self.addr_dt_last_seen := r.addr_dt_last_seen;
-  self.addr_dt_first_seen := r.addr_dt_first_seen;
+	self.prim_range := if(l.prim_name <> '', l.prim_range, r.prim_range);
+  self.predir := if(l.prim_name <> '', l.predir, r.predir);
+  self.prim_name := if(l.prim_name <> '', l.prim_name, r.prim_name);
+  self.suffix := if(l.prim_name <> '', l.suffix, r.suffix);
+  self.postdir := if(l.prim_name <> '', l.postdir, r.postdir);
+  self.unit_desig := if(l.prim_name <> '', l.unit_desig, r.unit_desig);
+  self.sec_range := if(l.prim_name <> '', l.sec_range, r.sec_range);
+  self.city_name := if(l.prim_name <> '', l.city_name, r.city_name);
+  self.st := if(l.prim_name <> '', l.st, r.st);
+  self.zip := if(l.prim_name <> '', l.zip, r.zip);
+  self.zip4 := if(l.prim_name <> '', l.zip4, r.zip4);
+  self.rawaid := if(l.prim_name <> '', l.rawaid, r.rawaid);
+  self.addr_dt_last_seen := if(l.prim_name <> '', l.addr_dt_last_seen, r.addr_dt_last_seen);
+  self.addr_dt_first_seen := if(l.prim_name <> '', l.addr_dt_first_seen, r.addr_dt_first_seen);
 	self := l;
 	self := [];
 end;
@@ -132,19 +135,72 @@ end;
 oAddress := join(oBase, dAddress,
 							left.did = right.did,
 							addAddress(left,right), left outer, keep(1), local);
-					
+
+output(choosen(oAddress, 100));					
+
+//Append rest of the addresses
+rOutput addAddresses(oAddress l, dWD r) := transform
+	self.prim_range := if(l.prim_name <> '', l.prim_range, r.prim_range);
+  self.predir := if(l.prim_name <> '', l.predir, r.predir);
+  self.prim_name := if(l.prim_name <> '', l.prim_name, r.prim_name);
+  self.suffix := if(l.prim_name <> '', l.suffix, r.suffix);
+  self.postdir := if(l.prim_name <> '', l.postdir, r.postdir);
+  self.unit_desig := if(l.prim_name <> '', l.unit_desig, r.unit_desig);
+  self.sec_range := if(l.prim_name <> '', l.sec_range, r.sec_range);
+  self.city_name := if(l.prim_name <> '', l.city_name, r.city_name);
+  self.st := if(l.prim_name <> '', l.st, r.st);
+  self.zip := if(l.prim_name <> '', l.zip, r.zip);
+  self.zip4 := if(l.prim_name <> '', l.zip4, r.zip4);
+  self.rawaid := if(l.prim_name <> '', l.rawaid, r.rawaid);
+  self.addr_dt_last_seen := if(l.prim_name <> '', l.addr_dt_last_seen, r.addr_dt_last_seen);
+  self.addr_dt_first_seen := if(l.prim_name <> '', l.addr_dt_first_seen, r.addr_dt_first_seen);
+	self := l;
+	self := [];
+end;
+
+oAddresses := join(oAddress, dWD,
+							left.did = right.did,
+							addAddresses(left,right), left outer, keep(1), local);
+
+output(choosen(oAddresses, 100));
+
+rOutput addAddressFinal(oAddresses l, dWatchdog r) := transform
+	self.prim_range := if(l.prim_name <> '', l.prim_range, r.prim_range);
+  self.predir := if(l.prim_name <> '', l.predir, r.predir);
+  self.prim_name := if(l.prim_name <> '', l.prim_name, r.prim_name);
+  self.suffix := if(l.prim_name <> '', l.suffix, r.suffix);
+  self.postdir := if(l.prim_name <> '', l.postdir, r.postdir);
+  self.unit_desig := if(l.prim_name <> '', l.unit_desig, r.unit_desig);
+  self.sec_range := if(l.prim_name <> '', l.sec_range, r.sec_range);
+  self.city_name := if(l.prim_name <> '', l.city_name, r.city_name);
+  self.st := if(l.prim_name <> '', l.st, r.st);
+  self.zip := if(l.prim_name <> '', l.zip, r.zip);
+  self.zip4 := if(l.prim_name <> '', l.zip4, r.zip4);
+  self.rawaid := if(l.prim_name <> '', l.rawaid, r.rawaid);
+  self.addr_dt_last_seen := if(l.prim_name <> '', l.addr_dt_last_seen, r.addr_dt_last_seen);
+  self.addr_dt_first_seen := if(l.prim_name <> '', l.addr_dt_first_seen, r.addr_dt_first_seen);
+	self := l;
+	self := [];
+end;
+
+oAddressFull := join(oAddresses, dWatchdog,
+							left.did = right.did,
+							addAddressFinal(left,right), left outer, keep(1), local);
+
+output(choosen(oAddressFull, 100));
 
 //Get oldest last name
 ds_fLast := dedup(sort(dRange, did, dt_first_seen, local), did, local);
-rOutput addOldest(oAddress l, ds_fLast r) := transform
+rOutput addOldest(oAddressFull l, ds_fLast r) := transform
 	self.first_lname := r.lname;
 	self := l;
 end;
 
-oFirst := join(oAddress, ds_fLast,
+oFirst := join(oAddressFull, ds_fLast,
 							left.did = right.did,
 							addOldest(left,right), left outer, keep(1), local);
 
+output(choosen(oFirst, 100));
 
 //Get newest last name
 ds_lLast := dedup(sort(dRange, did, -dt_first_seen,local), did, local);
@@ -157,17 +213,24 @@ oLast := join(oFirst, ds_lLast,
 							left.did = right.did,
 							addNewest(left,right), left outer, keep(1), local);
 
+output(choosen(oLast, 100));
 
 //Final form
-rWD makeFinal(oLast l) := transform
+rWD makeFinal(oLast l, dWatchdog r ) := transform
+	self.dod := map(trim(l.dod) = '' and trim(r.dod) <> '' => r.dod,
+									trim(l.dod) = '' and trim(r.dod) = '' and trim(r.adl_ind) = 'DEAD' => '20120101',
+									trim(l.dod) = '' and trim(l.adl_ind) = 'DEAD' => '20120101',
+											 l.dod);
 	self.lname := map(l.first_lname = '' or l.last_lname = '' 		=> l.lname,
 										l.title = 'MR' and l.lname = l.first_lname 	=> l.lname,
 										l.title = 'MS' and (l.lname <> l.first_lname and l.first_lname <> l.last_lname)	=> l.last_lname,
 										l.lname);
 	self := l;
 end;
-final := project(oLast, makeFinal(left), local);
+final := join(oLast, dWatchdog,
+							left.did = right.did,
+							makeFinal(left,right), local);
 
-
+output(choosen(final, 100));
 
 EXPORT file_best_data := final;

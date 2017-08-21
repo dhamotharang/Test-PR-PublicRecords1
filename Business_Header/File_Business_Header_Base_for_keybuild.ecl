@@ -1,18 +1,7 @@
-import ut, lib_fileservices;
+import ut, lib_fileservices, header_services,mdr;
 
 //CNG W20070822-183241 dat//////////////////////////////////
 
-IP_Loc := 			'10.150.12.240';
-Directory_Loc := 	'/data_999/lnfab/';
-Rec_Length := 		565; //Rec_Length := sizeof(header.Layout_Header);  //*** USE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT - RIGHT NOW SET FOR STRING INPUTS
-dFilename_Loc :=	nothor(lib_fileservices.FileServices.RemoteDirectory(IP_Loc,Directory_Loc)(size % Rec_Length = 0 and size / Rec_Length <> 0 and size <> 3465));
-dFilename_LocOne:=	dFilename_Loc(modified=max(dFilename_Loc,modified));
-FileName_Loc := 	nothor(dFilename_LocOne[1].name):independent(few);
-
-FileServices.sendemail('cguyton@seisint.com', 'Upload from Drop Zone Status', if(FileName_Loc <> '', Thorlib.WUID() + ' Success - Business Header Records\r\n'+IP_Loc + ' ' + Directory_Loc + FileName_Loc+' is loaded.', 
-                                                'Business Header Failure\r\n Cluster: '+ Thorlib.Cluster() + '\r\n DaliServer: ' + Thorlib.DaliServers() + '\r\n Job Owner: ' +  Thorlib.JobOwner() + '\r\n Platform: ' + Thorlib.Platform() + ' ' + 
-                                                '\r\n\r\nFile Source. System Now Reading Alternative Records\r\n\r\n**Please Check Newest File Layout and Directory Structure**\r\n\r\n' +
-                                                IP_Loc + ' - IP Location\r\n' + Directory_Loc + ' - Directory Location\r\n' + (string4) Rec_Length + '- Desired Record Length ' + Thorlib.WUID()));
 
 Drop_Header_Layout := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
 Record
@@ -54,17 +43,13 @@ Record
  string2 eor := '';
 end;
 
+header_services.Supplemental_Data.mac_verify('file_business_header_inj.txt', Drop_Header_Layout, attr);
 
- 
-DummyRecord := dataset(
-            [{'','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''}],
-            Drop_Header_Layout); //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT if a dummy is already in attribute. Change to match correct layout
- 
-Base_File_Append_In := if(FileName_Loc <> '', dataset('~file::'+IP_Loc+'::'+Directory_Loc+FileName_Loc, Drop_Header_Layout, flat, opt), dummyrecord);
+Base_File_Append_In := attr();
 
-max_file_pos := max(Business_Header.files().base.business_headers.keybuild,__filepos) : global;
+max_file_pos := max(Business_Header.files(,_Dataset().IsDataland).base.business_headers.keybuild,__filepos) : global;
 
-Business_Header.Layout_Business_Header_Base_Plus reformat_header(Base_File_Append_In L, integer c) := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
+Business_Header.Layout_Business_Header_Base_Plus_Orig reformat_header(Base_File_Append_In L, integer c) := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
  transform
 	self.rcid := (unsigned6) L.rcid;
 	self.bdid := (unsigned6) L.bdid;
@@ -92,29 +77,63 @@ Base_File_Append := project(Base_File_Append_In, reformat_header(left,counter));
 export File_Business_Header_Base_for_keybuild :=
 function
 
-in_hdr := files().base.business_headers.keybuild;// + header.transunion_did;
+in_hdr := business_header.filters.keys.business_headers_keybuild(files(,_Dataset().IsDataland).base.business_headers.keybuild);// + header.transunion_did;
+in_hdr_layout := recordof(in_hdr);
+
+////////////////////////////////////////////////////////////////////////
+// Get best address from the BH_Basic_match_clean for keys
+////////////////////////////////////////////////////////////////////////
+in_hdr_dist 		    := distribute(in_hdr, rcid);
+	
+bh_basic_matchClean := distribute(persists().BHBasicMatchClean, rcid);
+
+//*** Getting the best addresses that got from the AID process and replacing the Orig addresses
+//*** for key build.
+in_hdr_layout getBestAddr(in_hdr_dist l, bh_basic_matchClean r) :=  transform
+		self.prim_range		:=  r.prim_range;
+		self.predir				:= 	r.predir;
+		self.prim_name		:=	r.prim_name;
+		self.addr_suffix	:=	r.addr_suffix;
+		self.postdir			:=	r.postdir;
+		self.unit_desig		:=	r.unit_desig;
+		self.sec_range		:=	r.sec_range;
+		self.city					:=	r.city;
+		self.state				:=	r.state;
+		self.zip					:=	r.zip;
+		self.zip4					:=	r.zip4;		
+	 self := l;
+end;
+	
+in_hdr_with_bestAddr := join(in_hdr_dist, bh_basic_matchClean,
+														 left.rcid = right.rcid,
+														 getBestAddr(left,right), left outer, local
+														);
 
 // Start of code to suppress data based on an MD5 Hash of DID+Address
-rHashDIDAddress := record
- data16 hval;
-end;
+Suppression_Layout := header_services.Supplemental_Data.layout_in;
 
-dSuppressedIn := dataset('~thor_data400::base::md5::bdid_address', rHashDIDAddress,flat);
+header_services.Supplemental_Data.mac_verify('didaddressbusiness_sup.txt',Suppression_Layout,supp_ds_func);
+ 
+Suppression_In := supp_ds_func();
+
+dSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
+
+rHashDIDAddress := header_services.Supplemental_Data.layout_out;
 
 rFullOut_HashDIDAddress := record
  Business_Header.Layout_Business_Header_Base_Plus;
  rHashDIDAddress;
 end;
 
-rFullOut_HashDIDAddress tHashDIDAddress(Business_Header.Layout_Business_Header_Base_Plus l) := transform                            
- self.hval := hashmd5(intformat(l.bdid,12,1),(string)l.state,(string)l.zip,(string)l.city,
+rFullOut_HashDIDAddress tHashDIDAddress(in_hdr_layout l) := transform                            
+ self.hval := hashmd5(intformat(l.bdid,15,1),(string)l.state,(string)l.zip,(string)l.city,
 									(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.addr_suffix,(string)l.postdir,(string)l.sec_range);
  self := l;
 end;
 
-dHeader_withMD5 := project(in_hdr, tHashDIDAddress(left));
+dHeader_withMD5 := project(in_hdr_with_bestAddr, tHashDIDAddress(left));
 
-Business_Header.Layout_Business_Header_Base_Plus tSuppress(dHeader_withMD5 l) := transform
+Business_Header.Layout_Business_Header_Base_Plus_Orig tSuppress(dHeader_withMD5 l) := transform
  self := l;
 end;
 
@@ -127,8 +146,10 @@ full_out_suppress := join(dHeader_withMD5,dSuppressedIn,
 /////////////////////////////////////////////////////////////////////////
 
 
-	file_keybuild := full_out_suppress + Base_File_Append;
+	dall := full_out_suppress + Base_File_Append;
 
-	return file_keybuild;
+	dreturndataset := dall;
 
-end; 
+	return dreturndataset;
+
+end;

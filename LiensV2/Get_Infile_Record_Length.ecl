@@ -1,4 +1,4 @@
-import liensv2;
+import liensv2,LiensV2_preprocess;
 
 export Get_Infile_Record_Length(string updatetype) := 
 	map(updatetype = 'federal' => sizeof(liensv2.Layout_Liens_NYFDLN),
@@ -17,7 +17,9 @@ export Get_Infile_Record_Length(string updatetype) :=
         updatetype = 'debtorn' => sizeof(LiensV2.Layout_Liens_Superior_Debtor_In),
         updatetype = 'judment' => sizeof(LiensV2.Layout_Liens_Superior_Judgment_In),
         updatetype = 'subjdmt' => sizeof(LiensV2.Layout_Liens_Superior_Sub_Judgment_In),
-        updatetype = 'remarks' => sizeof(LiensV2.Layout_Liens_Superior_Remarks_In),	
+        updatetype = 'remarks' => sizeof(LiensV2.Layout_Liens_Superior_Remarks_In),
+								updatetype = 'hgn' => sizeof(LiensV2_preprocess.Layouts_Hogan.raw_in),
+
 		 0);
 		 
 		 

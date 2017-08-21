@@ -1,0 +1,29 @@
+EXPORT layouts := module
+
+export rPlatformStatus := RECORD
+string PlatformName { xpath('PlatformName')}  ;
+string PlatformStatus { xpath('PlatformStatus')} ;
+end;
+
+
+
+EXPORT OrbitBuildInstanceLayout	:=	record
+		string										ComponentType											{xpath('ComponentType')};
+		string										DataType													{xpath('DataType')};
+		string										Family														{xpath('Family')};
+		string										Id																{xpath('Id')};
+		string										Name															{xpath('Name')};
+		string										Status														{xpath('Status')};
+		string										Version														{xpath('Version')};
+	end;
+	
+EXPORT OrbitBuildInstancenewLayout	:=	record
+		string										ComponentType											;
+		string										DataType													;
+		string										Family														;
+		string										Id																;
+		string										Name														;
+		string										Status														;
+		string										Version														;
+	end;	
+end;

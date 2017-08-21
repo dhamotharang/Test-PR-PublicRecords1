@@ -7,7 +7,10 @@ export Inquiry_Stats (string stat_type = 'nonfcra') := function
 // #workunit('name', 'Inquiry_AccLog Stats')
 
 //***************************Slim Inquiry Base File 
-inq_file := if(regexreplace('[^a-z]', stringlib.stringtolowercase(stat_type), '') = 'nonfcra',  Inquiry_AccLogs.File_Inquiry_BaseSourced.Full, Inquiry_AccLogs.File_FCRA_Inquiry_BaseSourced)(bus_intel.vertical not in Inquiry_AccLogs.fnCleanFunctions.FilterCds);
+
+fcra := project(Inquiry_AccLogs.File_FCRA_Inquiry_BaseSourced.File, transform({inquiry_acclogs.layout.common, string source := ''}, self := left));
+
+inq_file := if(regexreplace('[^a-z]', stringlib.stringtolowercase(stat_type), '') = 'nonfcra',  inquiry_acclogs.File_Inquiry_BaseSourced.history, FCRA)(bus_intel.vertical not in Inquiry_AccLogs.fnCleanFunctions.FilterCds);
 
 slim_Allow_Flags := record
 	inq_file.Allow_Flags.allowflags;
@@ -300,18 +303,18 @@ phones_all := project(tot_inq(length(trim(Personal_Phone, all)) = 10), transform
 
 phones_uniq := dedup(sort(distribute(phones_all, hash(phone)), phone, local), phone, local);
 
-new_phones := join(distribute(phones_uniq, hash(phone)),
+new_phones := join(phones_uniq,
 				   distribute(all_phones, hash(phone)),
 				   left.phone = right.phone,
 				   left only, 
 				   local);
 
-new_phones_valid := join(distribute(new_phones, hash(Phone[1..3], Phone[4..6] ,Phone[7])), 
-									telcordia_tpm,
+new_phones_valid := join(new_phones, 
+									table(telcordia_tpm, {npa, nxx, tb}, npa, nxx, tb, few),
 									left.Phone[1..3] = right.npa and 
 									left.Phone[4..6] = right.nxx and
 									left.Phone[7]    = right.tb,
-									local); 
+									lookup); 
 
 //output(new_phones_valid);
 //6.       Total number of new, unique addresses
@@ -423,15 +426,15 @@ tot_phone_bdl_uniq := dedup(sort(distribute(tot_phone_bdl_new_valid , hash(appen
 //10.   Total number of inquiry sourced unique addresses tied to an ADL 
 tot_address_adl := slim_inq(trim(prim_name + sec_range, all) <> '' and zip5 <> '' and appended_adl > 0 and zip4 <> '');
 
-tot_address_adl_new := join(distribute(tot_address_adl, hash(appended_adl)),
-							 slim_p_hdr_dist,
-							 left.appended_adl = right.did and
-							 left.prim_range = (string)right.prim_range and
-							 left.prim_name = (string)right.prim_name and
-							 left.sec_range = (string)right.sec_range and
-							 left.zip5 = (string)right.zip,
-							 left only,
-							 local);
+tot_address_adl_new := join(distribute(tot_address_adl, hash(appended_adl, prim_range, prim_name, sec_range, zip5)),
+													 distribute(slim_p_hdr_dist, hash(did, (string)prim_range, (string)prim_name, (string)sec_range, (string)sec_range, (string)zip)),
+													 left.appended_adl = right.did and
+													 left.prim_range = (string)right.prim_range and
+													 left.prim_name = (string)right.prim_name and
+													 left.sec_range = (string)right.sec_range and
+													 left.zip5 = (string)right.zip,
+													 left only,
+													 local);
 							 
 
 tot_address_adl_uniq := dedup(sort(tot_address_adl_new, appended_adl, prim_range, prim_name, sec_range, zip5,local), appended_adl, prim_range, prim_name, sec_range, zip5, local);
@@ -440,15 +443,15 @@ tot_address_adl_uniq := dedup(sort(tot_address_adl_new, appended_adl, prim_range
 
 tot_address_bdl := slim_inq(trim(prim_name + sec_range, all) <> '' and zip5 <> '' and appended_bdid > 0 and zip4 <> '');
 
-tot_address_bdl_new := join(distribute(tot_address_bdl, hash(appended_bdid)),
-							 slim_b_hdr_dist,
-							 left.appended_bdid = right.bdid and
-							 left.prim_range = right.prim_range and
-							 left.prim_name = right.prim_name and
-							 left.sec_range = right.sec_range and
-							 left.zip5 = right.zip,
-							 left only,
-							 local);
+tot_address_bdl_new := join(distribute(tot_address_bdl, hash(appended_bdid, prim_range, prim_name, sec_range, zip5)),
+													 distribute(slim_b_hdr_dist, hash(bdid, prim_range, prim_name, sec_range, zip)),
+													 left.appended_bdid = right.bdid and
+													 left.prim_range = right.prim_range and
+													 left.prim_name = right.prim_name and
+													 left.sec_range = right.sec_range and
+													 left.zip5 = right.zip,
+													 left only,
+													 local);
 							 
 
 tot_address_bdl_uniq := dedup(sort(tot_address_bdl_new, appended_bdid, prim_range, prim_name, sec_range, zip5,local), appended_bdid, prim_range, prim_name, sec_range, zip5, local);

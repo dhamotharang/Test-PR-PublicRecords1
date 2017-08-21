@@ -12,4 +12,4 @@ IMPORT ut;
 
 // export File_Foreclosure_Sprayed := ds_sequenced;
 
-export File_Foreclosure_Sprayed :=	DATASET(cluster + 'in::foreclosure::using::fares_update', Layout_Foreclosure_Raw_Formatted, THOR);
+export File_Foreclosure_Sprayed :=	DATASET(thor_cluster + 'in::foreclosure::using::fares_update', Layout_Foreclosure_Raw_Formatted, THOR);

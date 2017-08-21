@@ -19,7 +19,7 @@ ut.mac_suppress_by_phonetype(file_search_building0,phone_number,st,search_phone_
 
 append_puid  := ln_propertyV2.fn_append_puid(search_phone_suppressed);
 
-export	file_search_building	:=	append_puid : persist('~thor_data400::persist::ln_propertyv2::search_phone_suppression','thor400_92');
+export	file_search_building	:=	append_puid : persist('~thor_data400::persist::ln_propertyv2::search_phone_suppression');
 
 // export	file_search_building	:=	search_phone_suppressed : persist('~thor_data400::persist::ln_propertyv2::search_phone_suppression','thor400_92');
 

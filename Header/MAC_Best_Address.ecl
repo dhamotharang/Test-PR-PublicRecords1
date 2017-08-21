@@ -1,6 +1,3 @@
-/*2006-09-01 13:41:11 (Dave QI)
-allow to optionally return name, ssn, dob etc
-*/
 export MAC_Best_Address
 (
 	infile, 
@@ -8,13 +5,16 @@ export MAC_Best_Address
 	addresses_per_DID, 
 	outfile,
 	bool_want_street_address = 'false',
-	use_exp_out = 'false'
+	use_exp_out = 'false',
+	best_non_DandB_addr = 'false'
 ) := macro
+import MDR;
 
 #uniquename(rfields)
 %rfields% := record
 unsigned6 did_field;
 unsigned6 rid;
+string2   source := '';
 integer4      dt_first_seen;
 integer4      dt_last_seen;
 integer4      dt_vendor_last_reported;
@@ -85,15 +85,44 @@ self := le;
 %st_zip% := if(ziplib.ZipToState2(%slim_h%.zip)=%slim_h%.st,1,0);
 
 #uniquename(srt_h)
+#if(bool_want_street_address)
 %srt_h% := sort(%slim_h%,did_field,-%street_addr%,-dt_last_seen,rec_type,-%tnt_gd%,-dt_first_seen,
 				-dt_vendor_first_reported,-%add_score%,-prim_range,-predir,-prim_name,
 				-suffix,-postdir,-unit_desig,-sec_range,-city_name,-zip,-zip4,-%st_zip%,st,local);
-
+#else
+%srt_h% := sort(%slim_h%,did_field,               -dt_last_seen,rec_type,-%tnt_gd%,-dt_first_seen,
+				-dt_vendor_first_reported,-%add_score%,-prim_range,-predir,-prim_name,
+				-suffix,-postdir,-unit_desig,-sec_range,-city_name,-zip,-zip4,-%st_zip%,st,local);
+#end
 #uniquename(grp)
 %grp% := group(%srt_h%,did_field,local);
 
+#uniquename(grp_best_All)
+%grp_best_All% := dedup(%grp%,did_field,prim_range,prim_name,zip);
+
+/* This transformation is used to possibly select the 2nd address for a bdid pair. If the most recent address
+is from a D&B record, check the second most recent and if the address parts match use it instead. Reason being is
+that we are not legally allowed to display the street information from a D&B source, so if a matching address exists
+from another source we will use that one instead.
+*/
+
+#uniquename(roll_best_non_DandB_addr)
+%rfields% %roll_best_non_DandB_addr%(%grp% l, %grp% r) := TRANSFORM
+		#uniquename(L_Full_Addr)
+	  %L_Full_Addr% := L.prim_range + L.prim_name + L.zip;
+		#uniquename(R_Full_Addr)
+		%R_Full_Addr% := R.prim_range + R.prim_name + R.zip;
+		SELF := IF (L.source != MDR.sourceTools.src_Dunn_Bradstreet, l,  // If source isn't D&B use the first rec (left record)
+														 IF( %L_Full_Addr% = %R_Full_Addr%, R, L));  // If the address match, use the second (right) record
+		 
+END;
+
+#uniquename(grp_best_nonDandB)
+%grp_best_nonDandB% := ROLLUP(dedup(%grp%,did_field,prim_range,prim_name,zip,KEEP 2)
+														,%roll_best_non_DandB_addr%(LEFT,RIGHT),did_field);
+
 #uniquename(wipe_dble)
-%wipe_dble% := dedup(%grp%,did_field,prim_range,prim_name,zip);
+%wipe_dble% := IF (best_non_DandB_addr,%grp_best_nonDandB%,%grp_best_All%);
 
 #uniquename(k2)
 %k2% := dedup(%wipe_dble%,did_field,keep addresses_per_DID);

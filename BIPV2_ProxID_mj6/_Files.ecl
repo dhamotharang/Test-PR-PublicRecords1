@@ -5,7 +5,7 @@ export _Files(
 ) :=
 module
 
-	export dotfile      := BIPV2_Files.files_dotid.DS_BASE;
+	export dotfile      := BIPV2_Files.files_dotid().DS_BASE;
   shared fnames       := _filenames(pversion,pUseOtherEnvironment);
   
 	export base         := tools.macf_FilesBase	(fnames.base	    ,layout_DOT_Base                  );
@@ -14,5 +14,6 @@ module
 	export wkhistory    := tools.macf_FilesBase	(fnames.wkhistory	,_layouts.wkhistory               );
 	export wkhistoryold := tools.macf_FilesBase	(fnames.wkhistory	,_layouts.wkhistoryold            );
 	export precision    := tools.macf_FilesBase	(fnames.precision	,_layouts.precision               );
-	
+	export summary_report := tools.macf_FilesBase	(fnames.summary_report	,_layouts.summary_report               );
+  
 end;

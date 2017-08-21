@@ -17,7 +17,7 @@ veh_vin	:=	join(dInFileDist, VehLic.Vin_Matches,
 vehlic.mac_patch_vehreg_by_codes(veh_vin, veh_vins_done)		//v1.5
 
 #if(VehLic.BuildType = VehLic.BuildType_Accurint)
-  export Vehicles_Undid := veh_vins_done : persist('Persist::VehReg_Vehicles_UnDID');
+  export Vehicles_Undid := veh_vins_done : persist('~thor_data400::persist::vehreg_vehicles_undid');
 #end
 #if(VehLic.BuildType = VehLic.BuildType_Matrix)
   export Vehicles_Undid := veh_vins_done : persist('Persist::Matrix_MV_Vehicles_UnDID');

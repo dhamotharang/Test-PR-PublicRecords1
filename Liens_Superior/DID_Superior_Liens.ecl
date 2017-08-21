@@ -20,7 +20,7 @@ temprec := record
 	unsigned1  did_score_temp    := 0;
 	string9	   ssn_appended_temp := '';
 	unsigned6  bdid_new          := 0;
-	qstring34  vendor_id         := df.courtid + df.casenumber;
+	qstring34  vendor_id         := df.casenumber;
 	qstring120 company_name      := if(df.def_company <> '', df.def_company, df.defname);
 end;
 
@@ -37,7 +37,7 @@ did_add.MAC_Match_Flex(df2, myset, ssn, foo, def_fname, def_mname, def_lname,
 out2 := outf;
 
 
-to_bdid            := out2 : persist('TEMP:superior_liens_did');
+to_bdid            := out2 : persist('~thor_data400::TEMP::superior_liens_did', 'thor_dell400_2');
 to_bdid_company    := to_bdid((indivbusun = 'B' or aka_yn = 'B') and company_name <> '');
 to_bdid_no_company := to_bdid(not((indivbusun='B' or aka_yn = 'B') and company_name <> ''));
 

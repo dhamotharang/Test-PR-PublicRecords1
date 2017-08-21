@@ -1,4 +1,4 @@
-import ut,dnb_feinv2; 
+import PromoteSupers,dnb_feinv2; 
 
 export proc_build_main_base(string filedate) := function
 
@@ -22,7 +22,7 @@ lookup_tmsid := join(baseds,inds,left.tmsid = right.tmsid,
 //Sample Records for QA						 
 SampleRecords := output(choosen(lookup_tmsid,1000)) : success(output('Sample Of New Records for QA.'));
 
-ut.MAC_SF_BuildProcess(DNB_FEINv2.DNB_FEIN_BDID(inds),
+PromoteSupers.MAC_SF_BuildProcess(DNB_FEINv2.DNB_FEIN_BDID(inds),
                        '~thor_data400::base::main::dnb_fein', bld_dnbfein_main,3);
                          
 retval := sequential(SampleRecords, bld_dnbfein_main);

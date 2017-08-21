@@ -1,5 +1,6 @@
 
 import watercraft;
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_WY_clean_in, watercraft.Layout_WY_clean_in,hull_clean_in)
 
 Layout_WY_clean_temp := record
 
@@ -10,7 +11,7 @@ boolean is_hull_id_in_MIC;
     	
 end;
 
-Layout_WY_clean_temp main_mapping_temp(watercraft.file_WY_clean_in L, watercraft.file_MIC R)
+Layout_WY_clean_temp main_mapping_temp(hull_clean_in L, watercraft.file_MIC R)
 
 := transform
 
@@ -20,7 +21,7 @@ self.is_hull_id_in_MIC := if(trim(L.hull_id, left, right)[1..3] = R.MIC, true, f
 
 end;
 
-Mapping_WY_as_Main_temp := join(watercraft.file_WY_clean_in, watercraft.file_MIC, trim(left.hull_id, left, right)[1..3] = right.MIC,
+Mapping_WY_as_Main_temp := join(hull_clean_in, watercraft.file_MIC, trim(left.hull_id, left, right)[1..3] = right.MIC,
 main_mapping_temp(left, right), left outer, lookup);
 
 
@@ -32,7 +33,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(Mapping_WY_as_Main_te
 	                                            trim(L.HULL_ID, left, right), if(trim(L.HULL_ID, left, right) <> 'VARIOUS'and trim(L.HULL_ID, left, right) <> 'UNKNOWN',
 	                                            (trim(L.HULL_ID, left, right) + trim(L.MAKE, left, right) + trim(L.YEAR, left, right))[1..30],
 	                                            (trim(L.MAKE, left, right) + trim(L.YEAR, left, right) + trim(L.NAME, left, right))[1..30]));
-	self.sequence_key				        :=	L.RENEW_DATE;
+	self.sequence_key				        :=	L.PURCHASE_DATE;
 	self.watercraft_id						:=	'';
 	self.state_origin						:=	'WY';
 	self.source_code						:=	'AW';
@@ -68,7 +69,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(Mapping_WY_as_Main_te
 	self.watercraft_toilet_code				:=	'';
 	self.watercraft_toilet_description		:=	'';
 	self.watercraft_number_of_engines		:=	'';
-	self.watercraft_hp_1					:=	L.HP;
+	self.watercraft_hp_1					:=	'';
 	self.watercraft_hp_2					:=	'';
 	self.watercraft_hp_3					:=	'';
 	self.engine_number_1					:=	'';
@@ -90,7 +91,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(Mapping_WY_as_Main_te
 	self.registration_status_code			:=	'';
 	self.registration_status_description	:=	'';
 	self.registration_status_date			:=	'';
-	self.registration_renewal_date			:=	L.RENEW_DATE;
+	self.registration_renewal_date			:=	'';
 	self.decal_number						:=	'';
 	self.transaction_type_code				:=	'';
 	self.transaction_type_description		:=	'';
@@ -98,7 +99,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(Mapping_WY_as_Main_te
 	self.title_status_code					:=	'';
 	self.title_status_description			:=	'';
 	self.title_number						:=	'';
-	self.title_issue_date					:=	L.TITLE_DATE;
+	self.title_issue_date					:=	'';
 	self.title_type_code					:=	'';
 	self.title_type_description				:=	'';
 	self.additional_owner_count				:=	'';

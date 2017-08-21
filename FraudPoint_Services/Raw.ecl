@@ -160,7 +160,7 @@ EXPORT Raw := MODULE
 				JOIN(
 					iid_prep(did != 0), FraudPoint3.key_DID,
 					KEYED(LEFT.did = RIGHT.s_did) AND
-					(((UNSIGNED3)RIGHT.date_application) DIV 100 <= LEFT.historydate OR LEFT.historydate IN [0,999999]),
+					(((UNSIGNED3)RIGHT.date_application) DIV 100 < LEFT.historydate OR LEFT.historydate IN [0,999999]),
 					TRANSFORM( layout_IFD_bocashell,
 						SELF := RIGHT, 
 						SELF := LEFT
@@ -225,7 +225,7 @@ EXPORT Raw := MODULE
 						LEFT.prim_name = RIGHT.prim_name AND
 						LEFT.prim_range = RIGHT.prim_range AND
 						LEFT.sec_range = RIGHT.sec_range) AND
-						(((UNSIGNED3)RIGHT.date_application) DIV 100 <= LEFT.historydate OR LEFT.historydate IN [0,999999]),
+						(((UNSIGNED3)RIGHT.date_application) DIV 100 < LEFT.historydate OR LEFT.historydate IN [0,999999]),
 					TRANSFORM( layout_IFD_bocashell,
 						SELF := RIGHT,
 						SELF := LEFT
@@ -281,7 +281,7 @@ EXPORT Raw := MODULE
 				JOIN(
 					iid_prep, FraudPoint3.Key_Email,
 					KEYED( LEFT.email_address = RIGHT.Email_Address) AND
-					(((UNSIGNED3)RIGHT.date_application) DIV 100 <= LEFT.historydate OR LEFT.historydate IN [0,999999]),
+					(((UNSIGNED3)RIGHT.date_application) DIV 100 < LEFT.historydate OR LEFT.historydate IN [0,999999]),
 					TRANSFORM( layout_IFD_bocashell,
 						SELF := RIGHT,
 						SELF := LEFT
@@ -337,7 +337,7 @@ EXPORT Raw := MODULE
 				JOIN(
 					iid_prep, FraudPoint3.Key_IPaddress,
 					KEYED( LEFT.ip_address = RIGHT.ip_address) AND
-					(((UNSIGNED3)RIGHT.date_application) DIV 100 <= LEFT.historydate OR LEFT.historydate IN [0,999999]),
+					(((UNSIGNED3)RIGHT.date_application) DIV 100 < LEFT.historydate OR LEFT.historydate IN [0,999999]),
 					TRANSFORM( layout_IFD_bocashell,
 						SELF := RIGHT,
 						SELF := LEFT
@@ -399,7 +399,7 @@ EXPORT Raw := MODULE
 					KEYED( LEFT.lname = RIGHT.lname AND
 						LEFT.fname = RIGHT.fname AND 
 						(LEFT.mname = '' OR LEFT.mname[1] = RIGHT.mname[1]) ) AND
-						(((UNSIGNED3)RIGHT.date_application) DIV 100 <= LEFT.historydate OR LEFT.historydate IN [0,999999]),
+						(((UNSIGNED3)RIGHT.date_application) DIV 100 < LEFT.historydate OR LEFT.historydate IN [0,999999]),
 					TRANSFORM( layout_IFD_bocashell,
 						SELF := RIGHT,
 						SELF := LEFT
@@ -455,7 +455,7 @@ EXPORT Raw := MODULE
 				JOIN(
 					iid_prep, FraudPoint3.Key_Phone,
 					KEYED( LEFT.phone10 = RIGHT.phone_number) AND
-					(((UNSIGNED3)RIGHT.date_application) DIV 100 <= LEFT.historydate OR LEFT.historydate IN [0,999999]),
+					(((UNSIGNED3)RIGHT.date_application) DIV 100 < LEFT.historydate OR LEFT.historydate IN [0,999999]),
 					TRANSFORM( layout_IFD_bocashell,
 						SELF := RIGHT,
 						SELF := LEFT
@@ -511,7 +511,7 @@ EXPORT Raw := MODULE
 				JOIN(
 					iid_prep, FraudPoint3.Key_SSN,
 					KEYED( LEFT.ssn = RIGHT.ssn) AND
-					(((UNSIGNED3)RIGHT.date_application) DIV 100 <= LEFT.historydate OR LEFT.historydate IN [0,999999]),
+					(((UNSIGNED3)RIGHT.date_application) DIV 100 < LEFT.historydate OR LEFT.historydate IN [0,999999]),
 					TRANSFORM( layout_IFD_bocashell,
 						SELF := RIGHT,
 						SELF := LEFT
@@ -556,9 +556,9 @@ Origination Channel               N    Channel (1=Mail, 2=Point Of Sale, 3=Kiosk
 Income                            N    Income of Applicant
 Own or Rent                       N    Indicator if subject owns or rents home (Own | Rent)
 Location Identifier               N    Physical Address of Applicant
-Other Application Identifier      N    Other unique identifier  used to identify  the Applicant
-Other Application Identifier2     N    Other unique identifier-2 used to identify  the Applicant
-Other Application Identifier3     N    Other unique identifier-3 used to identify  the Applicant
+Other Application Identifier      N    Other unique identifierÂ  used to identifyÂ  the Applicant
+Other Application Identifier2     N    Other unique identifier-2 used to identifyÂ  the Applicant
+Other Application Identifier3     N    Other unique identifier-3 used to identifyÂ  the Applicant
 Date of Application               Y    Application Submission Date (MM/DD/YYYY)
 Time of Application               N    Application Hour and Minute submitted time of day (HH:MM) AM/PM
 Application ID                    N    Application identifier used by organization to track application submission

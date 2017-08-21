@@ -76,12 +76,13 @@ EXPORT Layouts := MODULE
 		UNSIGNED1 bdid_score;
 		Address.Layout_Clean182_fips clean_company_address;
 		Miscellaneous.Cleaned_Phones clean_phones;
+		unsigned8	lnpid;
+		UNSIGNED8 source_rec_id;
   END;
 
-	// EXPORT KeyBuild := Base;
-
-  // Since there's a Roxie Release freeze, I have to get the key layouts (including autokey payload) to
-	// match the old way, until we figure out what's happening.
+  // Clarifying this once and for all.  The layout for the keybuild will use this temp_old_base
+	// until such time as the powers-that-be allow a Roxie Release to change the keys to match the
+	// base file, which has been changing for the past few years.
 	EXPORT Temp_Old_Base := RECORD
 		Input;
 		STRING2		lab_term_code;			// added Aug 2013

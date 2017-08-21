@@ -1,1 +1,1 @@
-export crs_email := 'cmorton@seisint.com';
+export crs_email := 'cmorton@seisint.com;mluber@seisint.com';

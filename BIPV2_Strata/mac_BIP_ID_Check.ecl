@@ -42,7 +42,10 @@ functionmacro
     #IF('dotid'  not in %SET_IDS_DO_NOT_EXIST% and 'proxid' not in %SET_IDS_DO_NOT_EXIST%)   BIPV2_strata.mac_ID_Integrity_check_V2(ds_slim,rcid,dotid ,true ,proxid,pBuild_Step,pBuild_SubStep) #ELSE   dataset([],BIPV2_strata.layouts.Id_Integrity) #END
     //#IF('dotid'  not in %SET_IDS_DO_NOT_EXIST% and 'empid'  not in %SET_IDS_DO_NOT_EXIST%) + BIPV2_strata.mac_ID_Integrity_check_V2(ds_slim,rcid,dotid ,true ,empid,pBuild_Step,pBuild_SubStep) #ELSE + dataset([],BIPV2_strata.layouts.Id_Integrity) #END
     //#IF('proxid' not in %SET_IDS_DO_NOT_EXIST% and 'powid'  not in %SET_IDS_DO_NOT_EXIST%) + BIPV2_strata.mac_ID_Integrity_check_V2(ds_slim,rcid,proxid,true ,powid,pBuild_Step,pBuild_SubStep) #ELSE + dataset([],BIPV2_strata.layouts.Id_Integrity) #END
-    #IF('proxid' not in %SET_IDS_DO_NOT_EXIST% and 'seleid' not in %SET_IDS_DO_NOT_EXIST%) + BIPV2_strata.mac_ID_Integrity_check_V2(ds_slim,rcid,proxid,true ,seleid,pBuild_Step,pBuild_SubStep) #ELSE + dataset([],BIPV2_strata.layouts.Id_Integrity) #END
+    //add the following : (proxid, lgid3)  BH-75
+		#IF('proxid'  not in %SET_IDS_DO_NOT_EXIST% and 'lgid3'  not in %SET_IDS_DO_NOT_EXIST%) + BIPV2_strata.mac_ID_Integrity_check_V2(ds_slim,rcid,proxid,true ,lgid3,pBuild_Step,pBuild_SubStep) #ELSE + dataset([],BIPV2_strata.layouts.Id_Integrity) #END
+    
+		#IF('proxid' not in %SET_IDS_DO_NOT_EXIST% and 'seleid' not in %SET_IDS_DO_NOT_EXIST%) + BIPV2_strata.mac_ID_Integrity_check_V2(ds_slim,rcid,proxid,true ,seleid,pBuild_Step,pBuild_SubStep) #ELSE + dataset([],BIPV2_strata.layouts.Id_Integrity) #END
     #IF('lgid3'  not in %SET_IDS_DO_NOT_EXIST% and 'seleid' not in %SET_IDS_DO_NOT_EXIST%) + BIPV2_strata.mac_ID_Integrity_check_V2(ds_slim,rcid,lgid3 ,true ,seleid,pBuild_Step,pBuild_SubStep) #ELSE + dataset([],BIPV2_strata.layouts.Id_Integrity) #END
     #IF('empid'  not in %SET_IDS_DO_NOT_EXIST% and 'orgid'  not in %SET_IDS_DO_NOT_EXIST%) + BIPV2_strata.mac_ID_Integrity_check_V2(ds_slim,rcid,empid ,true ,orgid,pBuild_Step,pBuild_SubStep) #ELSE + dataset([],BIPV2_strata.layouts.Id_Integrity) #END
     #IF('powid'  not in %SET_IDS_DO_NOT_EXIST% and 'orgid'  not in %SET_IDS_DO_NOT_EXIST%) + BIPV2_strata.mac_ID_Integrity_check_V2(ds_slim,rcid,powid ,true ,orgid,pBuild_Step,pBuild_SubStep) #ELSE + dataset([],BIPV2_strata.layouts.Id_Integrity) #END

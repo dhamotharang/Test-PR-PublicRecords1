@@ -1,3 +1,0 @@
-_certification.Verify_NameClean;
-_certification.Verify_AddressClean;
-_certification.Verify_didResult;

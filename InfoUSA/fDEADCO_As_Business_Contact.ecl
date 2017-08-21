@@ -1,13 +1,13 @@
-import business_header, infousa, ut;
+import business_header, infousa, ut,mdr;
 
-export fDEADCO_As_Business_Contact(dataset(infousa.Layout_DEADCO_Clean_In) pDEADCO)
+export fDEADCO_As_Business_Contact(dataset(InfoUSA.Layout_Deadco_Base_AID) pDEADCO)
  :=
   function
 
 	DEADCO_IN := pDEADCO;
 
 
-	business_header.Layout_Business_Contact_Full tDEADCOtoHEADER(infousa.Layout_DEADCO_Clean_In L) := transform
+	business_header.Layout_Business_Contact_Full_New tDEADCOtoHEADER(InfoUSA.Layout_Deadco_Base_AID L) := transform
 
 	self.title                := L.title;
 	self.fname                := L.fname;
@@ -15,8 +15,9 @@ export fDEADCO_As_Business_Contact(dataset(infousa.Layout_DEADCO_Clean_In) pDEAD
 	self.lname                := L.lname;
 	self.name_suffix          := L.name_suffix;
 	self.company_title        := ''; 
+	self.vl_id                := L.ABI_number + L.production_date;
 	self.vendor_id            := L.ABI_number + L.production_date;
-	self.source               := 'ID';//waiting for replay from the vendor
+	self.source               := MDR.sourceTools.src_INFOUSA_DEAD_COMPANIES;
 	self.name_score           := Business_Header.CleanName(l.fname,l.mname,l.lname, l.name_suffix)[142];
 	self.prim_range		      := L.prim_range ;
 	self.predir			      := L.predir;
@@ -25,7 +26,7 @@ export fDEADCO_As_Business_Contact(dataset(infousa.Layout_DEADCO_Clean_In) pDEAD
 	self.postdir		      := L.postdir;
 	self.unit_desig		      := L.unit_desig;
 	self.sec_range		      := L.sec_range;
-	self.city			      := L.p_city_name;
+	self.city			      := L.v_city_name;
 	self.state			      := L.st;
 	self.zip 			      := (unsigned3)L.zip5;
 	self.zip4			      := (unsigned2)L.zip4;
@@ -42,7 +43,7 @@ export fDEADCO_As_Business_Contact(dataset(infousa.Layout_DEADCO_Clean_In) pDEAD
 	SELF.company_postdir      := L.postdir;
 	SELF.company_unit_desig   := L.unit_desig;
 	SELF.company_sec_range    := L.sec_range;
-	SELF.company_city         := L.p_city_name;
+	SELF.company_city         := L.v_city_name;
 	SELF.company_state        := L.st;
 	SELF.company_zip          := (UNSIGNED3)L.zip5;
 	SELF.company_zip4         := (UNSIGNED2)L.zip4;
@@ -53,6 +54,8 @@ export fDEADCO_As_Business_Contact(dataset(infousa.Layout_DEADCO_Clean_In) pDEAD
 	self.dt_first_seen        := if((unsigned)L.dt_first_seen < 300000, (unsigned)L.dt_first_seen * 100, (unsigned)L.dt_first_seen);
 	self.dt_last_seen         := if((unsigned)L.dt_last_seen < 300000, (unsigned)L.dt_last_seen * 100, (unsigned)L.dt_last_seen);
 	self.record_type          := 'C';
+	self.rawaid								:= L.Append_RawAID;	
+	Self.company_rawaid 			:= l.Append_RawAID;	
 	//self := L;
 	end;
 

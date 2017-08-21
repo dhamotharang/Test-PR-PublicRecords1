@@ -1,4 +1,4 @@
-import NID, Address;
+import NID, Address, Phonesplus_v2;
 
 // only want any names that are populated, but don't contain numbers, parens, etc.
 // only use current residential records that have good data
@@ -12,7 +12,11 @@ slim_rec := RECORD
 	good_names.st;
 END;
 
-good_names_slim := PROJECT(good_names, slim_rec);
+good_names_slim_gong := PROJECT(good_names, slim_rec);
+
+good_names_slim_pplus := PROJECT(Phonesplus_v2.File_Surnames, slim_rec);
+
+good_names_slim := good_names_slim_gong + good_names_slim_pplus;
 
 good_names_dist := DISTRIBUTE(good_names_slim, HASH(name_last, st));
 

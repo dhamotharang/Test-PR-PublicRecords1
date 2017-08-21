@@ -1,6 +1,7 @@
 import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
-Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID, watchdog,
-VersionControl,lib_fileservices;
+Header, Header_Slimsort, didville, DID_Add,Business_Header_SS, NID, AID, watchdog,
+VersionControl,lib_fileservices,Health_Provider_Services,Health_Facility_Services,
+BIPV2_Company_Names, HealthCareFacility;
 
 EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 
@@ -71,18 +72,14 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 	ENDMACRO;
 	
 	EXPORT Facility_Base := FUNCTION
-		// before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).facility_base.built, layouts.facility_base);
+		hist_base	:= Mark_history(enclarity.Files(filedate,pUseProd).facility_base.built, Enclarity.layouts.facility_base);
 
-		//standardize input(update file)
 		stdInput := Enclarity.StandardizeInputFile(filedate, pUseProd).Facility;
 		
-		//clean address	
-		cleanAdd_a	:= Clean_addr(stdInput, layouts.facility_base)
+		cleanAdd_a	:= Clean_addr(stdInput, Enclarity.layouts.facility_base)
 			:PERSIST('~thor_data400::persist::enclarity::facility_addr');
 			
-		//Add to previous base
-		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).facility_lBaseTemplate_built)) = 0
+		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity.Filenames(filedate, pUseProd).facility_lBaseTemplate_built)) = 0
 												 ,cleanAdd_a
 												 ,cleanAdd_a + hist_base);
 
@@ -118,9 +115,16 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 											,oig_flag
 											,sanc1_date
 											,sanc1_code
+											,clia_status_code
+											,clia_num
+											,clia_end_date
+											,clia_cert_type_code
+											,clia_cert_eff_date
+											,ncpdp_id
+											,tin1
 										,LOCAL);
 										
-		Layouts.facility_base t_rollup (new_base_s L, new_base_s R) := TRANSFORM
+		Enclarity.Layouts.facility_base t_rollup (new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported 	:= ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  	:= ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF.clean_last_verify_date   := ut.LatestDate	(L.clean_last_verify_date, R.clean_last_verify_date);
@@ -158,10 +162,16 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 											AND left.sanc1_date=right.sanc1_date
 											AND left.sanc1_code=right.sanc1_code
 											AND left.medicare_fac_num=right.medicare_fac_num
+											AND left.clia_status_code=right.clia_status_code
+											AND left.clia_num=right.clia_num
+											AND left.clia_end_date=right.clia_end_date
+											AND left.clia_cert_type_code=right.clia_cert_type_code
+											AND left.clia_cert_eff_date=right.clia_cert_eff_date
+											AND left.ncpdp_id=right.ncpdp_id
+											AND left.tin1=right.tin1
 										,t_rollup(LEFT,RIGHT),LOCAL);	
 										
-		//Assign source_rid
-		Layouts.facility_base GetSourceRID(base_f L)	:= TRANSFORM
+		Enclarity.Layouts.facility_base GetSourceRID(base_f L)	:= TRANSFORM
 			SELF.record_type 					:= if((unsigned)l.dea_num_exp >0 and l.dea_num_exp  < ut.GetDate
 																			and (unsigned)l.lic_end_date>0 and l.lic_end_date < ut.GetDate
 																				,'H'
@@ -201,7 +211,6 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 		
 		d_rid	:= PROJECT(base_f, GetSourceRID(left));
 
-		//BDID
 		matchset 	:= ['A', 'P'];
 		Business_Header_SS.MAC_Add_BDID_FLEX(
 			d_rid
@@ -215,7 +224,7 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 			,clean_phone
 			,foo
 			,bdid
-			,layouts.facility_base
+			,Enclarity.layouts.facility_base
 			,TRUE
 			,bdid_score
 			,d_bdid
@@ -234,27 +243,133 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 			,source_rid
 			,
 			);
+
+	Health_Facility_Services.mac_get_best_lnpid_on_thor (
+					d_bdid
+					,LNPID
+					,clean_company_name											
+					,prim_range
+					,PRIM_Name
+					,SEC_RANGE
+					,v_city_name
+					,ST
+					,ZIP
+					,//sanc_tin
+					,tin1
+					,phone1
+					,fax1
+					,//sanc_sancst
+					,//sanc_licnbr
+					,//Input_DEA_NUMBER
+					,group_key
+					,npi_num
+					,clia_num
+					,medicare_fac_num
+					,//Input_MEDICAID_NUMBER
+					,ncpdp_id
+					,taxonomy
+					,BDID
+					,//SRC
+					,//SOURCE_RID
+					,dLnpidOut
+					,false
+					,30
+					);
+
+		with_lnpid:=dLnpidOut(lnpid>0);
+		no_lnpid:=dLnpidOut(lnpid=0);
+
+		Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			no_lnpid
+			,LNPID
+			,//FNAME
+			,//MNAME
+			,//LNAME
+			,//name_suffix
+			,//GENDER
+			,PRIM_Range
+			,PRIM_Name
+			,SEC_RANGE
+			,v_city_name
+			,ST
+			,ZIP
+			,//clean_SSN
+			,//clean_DOB
+			,clean_Phone
+			,LIC_STATE
+			,LIC_Num_in
+			,//TAX_ID
+			,DEA_NUM
+			,group_key
+			,NPI_NUM
+			,//UPIN
+			,//DID
+			,BDID
+			,//SRC
+			,//SOURCE_RID
+			,result,false,38
+			);
 			
-		RETURN d_bdid;
+		RETURN result + with_lnpid;
 	END;
 	
 	EXPORT Individual_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).individual_base.built, layouts.individual_base);
+		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).individual_base.built, Enclarity.layouts.individual_base);
+													
+		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).Individual(Files(filedate,pUseProd).individual_input);
+												
+fn_cleanName(dataset(enclarity.Layouts.individual_base) d) := FUNCTION
 
-		//standardize input(update file)
-		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).Individual;
+	NID.Mac_CleanParsedNames(d, cleanNames
+													, firstname:=first_name,middlename:=middle_name,lastname:=last_name
+													, includeInRepository:=FALSE, normalizeDualNames:=FALSE
+												);	
+	
+	setValidSuffix:=['JR','SR','I','II','III','IV','V','VI','VII','VIII','IX'];
+	STRING fGetSuffix(STRING SuffixIn)	:=		MAP(SuffixIn = '1' => 'I'
+																						,SuffixIn IN ['2','ND'] => 'II'
+																						,SuffixIn IN ['3','RD'] => 'III'
+																						,SuffixIn = '4' => 'IV'
+																						,SuffixIn = '5' => 'V'
+																						,SuffixIn = '6' => 'VI'
+																						,SuffixIn = '7' => 'VII'
+																						,SuffixIn = '8' => 'VIII'
+																						,SuffixIn = '9' => 'IX'
+																						,SuffixIn IN setValidSuffix => SuffixIn
+																						,'');
+																			
+	enclarity.layouts.individual_base tr(cleanNames L) := TRANSFORM
+		SELF.title 				:= IF(l.nameType='P' and L.cln_title IN ['MR','MS'], L.cln_title, '');
+		SELF.fname 				:= if(l.nameType='P',L.cln_fname,'');
+		SELF.mname 				:= if(l.nameType='P',L.cln_mname,'');
+		SELF.lname 				:= if(l.nameType='P',L.cln_lname,'');
+		SELF.name_suffix 	:= if(l.nameType='P',fGetSuffix(L.cln_suffix),'');
+		SELF            	:= L;
+	END;
+	RETURN PROJECT(cleanNames,tr(LEFT));
+END;
 		
-		//clean name
-		cleanNames := Clean_name(std_input, Layouts.individual_base)
-			:PERSIST('~thor_data400::persist::enclarity::individual_names');
+		cleanNames := fn_cleanName(std_input):PERSIST('~thor_data400::persist::enclarity::individual_names');
 
-		//Add to previous base
 		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).individual_lBaseTemplate_built)) = 0
 											 ,cleanNames
 											 ,cleanNames + hist_base);
+											 
+		track_ancillaries:= record
+			enclarity.Layouts.individual_base;
+			integer addr	:= 0;
+			integer	dob		:= 0;
+			integer	ssn		:= 0;
+			integer	lic		:= 0;
+			integer	dea		:= 0;
+			integer	npi		:= 0;
+			integer	sanc	:= 0;
+			integer num_c	:= 0;
+		end;
+		
+		expand_base_and_update	:= project(base_and_update, track_ancillaries);
 
-fn_rollup(dataset(Layouts.individual_base) d):=function
+fn_rollup(dataset(track_ancillaries) d):=function
 
 		new_base_s := SORT(d
 												,group_key
@@ -280,7 +395,6 @@ fn_rollup(dataset(Layouts.individual_base) d):=function
 												,primary_location
 												,prac_addr_ind
 												,bill_addr_ind
-												,addr_conf_score
 												,addr_rectype
 												,Fax1
 												,Phone1
@@ -303,8 +417,6 @@ fn_rollup(dataset(Layouts.individual_base) d):=function
 												,type1
 												,classification
 												,taxonomy_primary_ind
-												,npi_enum_date
-												,npi_deact_date
 												,dea_num
 												,dea_num_exp
 												,Dea_bus_Act_Ind
@@ -315,11 +427,20 @@ fn_rollup(dataset(Layouts.individual_base) d):=function
 												,sanc1_rein_date
 												,LOCAL);
 
-		Layouts.individual_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
+		track_ancillaries t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF.clean_last_verify_date		:= ut.LatestDate(L.clean_last_verify_date, R.clean_last_verify_date);
-			SELF						 							:= IF(L.record_type = 'C', L, R);
+			sum_L := L.addr + L.dob + L.ssn + L.lic + L.dea + L.npi + L.sanc;
+			sum_R := R.addr + R.dob + R.ssn + R.lic + R.dea + R.npi + R.sanc;
+			SELF						 							:= map(
+																					l.record_type='C' and r.record_type='C' and sum_L > sum_R => L
+																					,l.record_type='C' and r.record_type='C' and sum_L < sum_R => R
+																					,l.record_type='H' and r.record_type='H' and sum_L > sum_R => L
+																					,l.record_type='H' and r.record_type='H' and sum_L < sum_R => R
+																					,l.record_type='C' => L
+																					, R
+																					);
 		END;
 
 		base_i := ROLLUP(new_base_s
@@ -345,7 +466,6 @@ fn_rollup(dataset(Layouts.individual_base) d):=function
 										AND left.primary_location=right.primary_location
 										AND left.prac_addr_ind=right.prac_addr_ind
 										AND left.bill_addr_ind=right.bill_addr_ind
-										AND left.addr_conf_score=right.addr_conf_score
 										AND left.addr_rectype=right.addr_rectype
 										AND left.Fax1=right.Fax1
 										AND left.Phone1=right.Phone1
@@ -368,8 +488,6 @@ fn_rollup(dataset(Layouts.individual_base) d):=function
 										AND left.type1=right.type1
 										AND left.classification=right.classification
 										AND left.taxonomy_primary_ind=right.taxonomy_primary_ind
-										AND left.npi_enum_date=right.npi_enum_date
-										AND left.npi_deact_date=right.npi_deact_date
 										AND left.dea_num=right.dea_num
 										AND left.dea_num_exp=right.dea_num_exp
 										AND left.Dea_bus_Act_Ind=right.Dea_bus_Act_Ind
@@ -383,13 +501,14 @@ fn_rollup(dataset(Layouts.individual_base) d):=function
 	return base_i;
 end;
 
-		new_base_d := DISTRIBUTE(base_and_update, HASH(group_key));
+		new_base_d := DISTRIBUTE(expand_base_and_update, HASH(group_key));
+		// new_base_d := DISTRIBUTE(expand_update, HASH(group_key));
 
-		add_file	:= distribute(Files().address_base.built, hash(group_key));
+		add_file	:= distribute(enclarity.Files().address_base.qa, hash(group_key));
 		base_a	:= JOIN(fn_rollup(new_base_d), add_file
 										,LEFT.group_key = RIGHT.group_key
-										,TRANSFORM(Layouts.individual_base
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
+										,TRANSFORM(track_ancillaries
+											,SELF.addr:=if(right.record_type in ['','C'],1,0)
 											,SELF.bdid:=right.bdid
 											,SELF.bdid_score:=right.bdid_score
 											,SELF.clean_company_name:=right.clean_company_name
@@ -427,7 +546,6 @@ end;
 											,SELF.primary_location:=right.primary_location
 											,SELF.prac_addr_ind:=right.prac_addr_ind
 											,SELF.bill_addr_ind:=right.bill_addr_ind
-											,SELF.addr_conf_score:=right.addr_conf_score
 											,SELF.addr_rectype:=right.addr_rectype
 											,SELF.clean_last_verify_date:=right.clean_last_verify_date
 											,SELF.Fax1:=right.Fax1
@@ -461,31 +579,31 @@ end;
 										,LEFT OUTER
 										,LOCAL);
 
-		dob_file	:= distribute(Files().prov_birthdate_base.built(clean_date_of_birth<>''), hash(group_key));
+		dob_file	:= distribute(enclarity.Files().prov_birthdate_base.qa(clean_date_of_birth<>''), hash(group_key));
 		base_d	:= JOIN(fn_rollup(base_a), dob_file
 										,LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({base_a}
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
+											,SELF.dob:=if(right.record_type in ['','C'],1,0);
 											,SELF.clean_dob	:= RIGHT.clean_date_of_birth
 											,SELF:=LEFT)
 										,LEFT OUTER
 										,LOCAL);
 
-		ssn_file	:= distribute(Files().prov_ssn_base.built(clean_ssn<>''), hash(group_key));
+		ssn_file	:= distribute(enclarity.Files().prov_ssn_base.qa(clean_ssn<>''), hash(group_key));
 		base_s	:= JOIN(fn_rollup(base_d), ssn_file
 										,LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({base_a}
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
+											,SELF.ssn:=if(right.record_type in ['','C'],1,0);
 											,SELF.clean_ssn	:= RIGHT.clean_ssn
 											,SELF:=LEFT)
 										,LEFT OUTER
 										,LOCAL);
 
-		lic_file	:= distribute(Files().license_base.built, hash(group_key));
-		base_l	:= JOIN(fn_rollup(base_s), lic_file
+		lic_file	:= distribute(enclarity.Files().license_base.qa, hash(group_key));
+		base_l	:= JOIN(distribute(fn_rollup(base_s),hash(group_key)), lic_file
 										,   LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({base_a}
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
+											,SELF.lic:=if(right.record_type in ['','C'],1,0);
 											,SELF.suffix_other  := RIGHT.suffix_other 
 											,SELF.lic_num_in := RIGHT.lic_num_in
 											,SELF.lic_num := RIGHT.lic_num
@@ -498,11 +616,11 @@ end;
 										,LEFT OUTER
 										,LOCAL);
 
-		dea_file	:= distribute(Files().dea_base.built, hash(group_key));
-		base_e	:= JOIN(fn_rollup(base_l), dea_file
+		dea_file	:= distribute(enclarity.Files().dea_base.qa, hash(group_key));
+		base_e	:= JOIN(distribute(fn_rollup(base_l),hash(group_key)), dea_file
 										,   LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({base_a}
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
+											,SELF.dea:=if(right.record_type in ['','C'],1,0)
 											,SELF.dea_num := RIGHT.dea_num
 											,SELF.dea_num_exp:=right.dea_num_exp
 											,SELF.Dea_bus_Act_Ind:=right.Dea_bus_Act_Ind
@@ -510,27 +628,25 @@ end;
 										,LEFT OUTER
 										,LOCAL);
 
-		npi_file	:= distribute(Files().npi_base.built, hash(group_key));
-		base_n	:= JOIN(fn_rollup(base_e), npi_file
+		npi_file	:= distribute(enclarity.Files().npi_base.qa, hash(group_key));
+		base_n	:= JOIN(distribute(fn_rollup(base_e),hash(group_key)), npi_file
 										,   LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({base_a}
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
+											,SELF.npi:=if(right.record_type in ['','C'],1,0)
 											,SELF.npi_num := RIGHT.npi_num
 											,SELF.taxonomy := RIGHT.taxonomy
 											,SELF.type1 := RIGHT.type1
 											,SELF.classification := RIGHT.classification
 											,SELF.taxonomy_primary_ind := RIGHT.taxonomy_primary_ind
-											,SELF.npi_enum_date := RIGHT.npi_enum_date
-											,SELF.npi_deact_date := RIGHT.npi_deact_date
 											,SELF:=LEFT)
 										,LEFT OUTER
 										,LOCAL);
 
-		sanc_file	:= distribute(Files().sanction_base.built, hash(group_key));
-		base_z	:= JOIN(fn_rollup(base_n), sanc_file
+		sanc_file	:= distribute(enclarity.Files().sanction_base.qa, hash(group_key,sanc1_lic_num,sanc1_state));
+		base_z	:= JOIN(distribute(fn_rollup(base_n),hash(group_key,lic_num,lic_state)), sanc_file
 										,   LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({base_a}
-											,SELF.record_type	:= if(right.record_type='H',right.record_type,left.record_type)
+											,SELF.sanc:=if(right.record_type in ['','C'],1,0)
 											,SELF.sanc1_date := RIGHT.sanc1_date
 											,SELF.sanc1_code := RIGHT.sanc1_code
 											,SELF.sanc1_state := RIGHT.sanc1_state
@@ -540,9 +656,7 @@ end;
 										,LEFT OUTER
 										,LOCAL);
 
-
-		//Assign source_rid
-		Layouts.individual_base GetSourceRID(base_z L)	:= TRANSFORM
+		track_ancillaries GetSourceRID(base_z L)	:= TRANSFORM
 			SELF.source_rid 					:= HASH64(hashmd5(
 																	trim(l.orig_fullname)
 																	,trim(l.prefix_name)
@@ -607,13 +721,12 @@ end;
 		
 		d_rid	:= PROJECT(fn_rollup(base_z), GetSourceRID(left));
 		
-		//DID
 		matchset := ['A','D','S'];
 		did_add.MAC_Match_Flex
 			(d_rid, matchset,					
 			clean_ssn, clean_dob, fname, mname, lname, name_suffix, 
 			prim_range, prim_name, sec_range, zip, st, '', 
-			DID, Layouts.individual_base, TRUE, did_score,
+			DID, track_ancillaries, TRUE, did_score,
 			75, d_did);
 
 		did_add.MAC_Add_SSN_By_DID(d_did,did,best_ssn,d_ssn);
@@ -623,13 +736,12 @@ end;
 											,transform({d_dob0}
 												,self.did:=if(    left.clean_dob<>''
 																			and left.best_dob>0
-																			and left.clean_dob[1..4]<>left.best_dob[1..4]
+																			and left.clean_dob[1..4]<>((STRING)left.best_dob)[1..4]
 																			,0
 																			,left.did)
 												,self.did_score:=if(self.did=0,0,left.did_score)
 												,self:=left));
 
-		//BDID
 		bdid_matchset := ['A'];
 		Business_Header_SS.MAC_Add_BDID_Flex
 			(
@@ -644,7 +756,7 @@ end;
 			,''
 			,foo
 			,bdid
-			,layouts.individual_base
+			,track_ancillaries
 			,TRUE
 			,bdid_score
 			,d_bdid
@@ -664,31 +776,63 @@ end;
 			,
 			);
 
-		RETURN d_bdid;
+		Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			d_bdid
+			,LNPID
+			,FNAME
+			,MNAME
+			,LNAME
+			,name_suffix
+			,//GENDER
+			,PRIM_Range
+			,PRIM_Name
+			,SEC_RANGE
+			,v_city_name
+			,ST
+			,ZIP
+			,clean_SSN
+			,clean_DOB
+			,phone1
+			,LIC_STATE
+			,LIC_Num_in
+			,//TAX_ID
+			,DEA_NUM
+			,group_key
+			,NPI_NUM
+			,UPIN
+			,DID
+			,BDID
+			,//SRC
+			,//SOURCE_RID
+			,result,false,38
+			);
+		
+		// expand_base			:= project(hist_base,track_ancillaries);
+		
+		// base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).individual_lBaseTemplate_built)) = 0
+											 // ,result
+											 // ,result + expand_base);
+
+		RETURN project(fn_rollup(result),enclarity.layouts.individual_base);//project(fn_rollup(base_and_update),enclarity.Layouts.individual_base);
 	END;
 			
 	EXPORT Associate_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).associate_base.built, layouts.associate_base);
+		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).associate_base.built, layouts.associate_base);
 
-		//standardize input(update file) (and normalize)
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).Associate;
 
-		//clean name
-		cleanNames := Clean_name(std_input, Layouts.associate_base,true);
+		cleanNames := Clean_name(std_input, Enclarity.Layouts.associate_base,true);
 
-		//clean address	
-		cleanAdd_a	:= Clean_addr(cleanNames, layouts.associate_base)
+		cleanAdd_a	:= Clean_addr(cleanNames, Enclarity.layouts.associate_base)
 			:PERSIST('~thor_data400::persist::enclarity::associate_addr');
 
-		//Add to previous base
 		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).associate_lBaseTemplate_built)) = 0
 												 ,cleanAdd_a
 												 ,cleanAdd_a + hist_base);
 
 		new_base_d := DISTRIBUTE(base_and_update, HASH(group_key));  
 
-		dob_file	:= distribute(Files().prov_birthdate_base.built(clean_date_of_birth<>''), hash(group_key));
+		dob_file	:= distribute(Enclarity.Files().prov_birthdate_base.built(clean_date_of_birth<>''), hash(group_key));
 		base_d	:= JOIN(new_base_d, dob_file
 										,LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({new_base_d}
@@ -699,7 +843,7 @@ end;
 										,LOCAL
 										);
 
-		ssn_file	:= distribute(Files().prov_ssn_base.built(clean_ssn<>''), hash(group_key));
+		ssn_file	:= distribute(Enclarity.Files().prov_ssn_base.built(clean_ssn<>''), hash(group_key));
 		base_s	:= JOIN(base_d, ssn_file
 										,LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({new_base_d}
@@ -710,7 +854,7 @@ end;
 										,LOCAL
 										);
 
-		fac_file	:= Files().facility_base.built;
+		fac_file	:= Enclarity.Files().facility_base.built;
 		base_f	:= JOIN( distribute(base_s,hash(sloc_group_key)), fac_file
 										,LEFT.sloc_group_key = RIGHT.group_key
 										,TRANSFORM({new_base_d}
@@ -734,8 +878,6 @@ end;
 		new_base_s := SORT(distribute(base_f1,hash(group_key))
 									,group_key
 									,Prepped_name
-									,prac_addr_confidence_score
-									,bill_addr_confidence_score
 									,addr_key
 									,Prepped_addr1
 									,Prepped_addr2
@@ -747,22 +889,13 @@ end;
 									,billing_group_key
 									,bill_npi
 									,bill_tin
-									,cam_latest
-									,cam_earliest
-									,cbm1
-									,cbm3
-									,cbm6
-									,cbm12
-									,cbm18
-									,pgk_works_for
-									,pgk_is_affiliated_to
 									,clean_dob
 									,clean_ssn
 									,sloc_type
 									,billing_type
 									,LOCAL);
 									
-		Layouts.associate_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
+		Enclarity.Layouts.associate_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
@@ -771,8 +904,6 @@ end;
 		base_n := ROLLUP(new_base_s
 										,   left.group_key=right.group_key
 										AND left.Prepped_name=right.Prepped_name
-										AND left.prac_addr_confidence_score=right.prac_addr_confidence_score
-										AND left.bill_addr_confidence_score=right.bill_addr_confidence_score
 										AND left.addr_key=right.addr_key
 										AND left.Prepped_addr1=right.Prepped_addr1
 										AND left.Prepped_addr2=right.Prepped_addr2
@@ -784,23 +915,13 @@ end;
 										AND left.billing_group_key=right.billing_group_key
 										AND left.bill_npi=right.bill_npi
 										AND left.bill_tin=right.bill_tin
-										AND left.cam_latest=right.cam_latest
-										AND left.cam_earliest=right.cam_earliest
-										AND left.cbm1=right.cbm1
-										AND left.cbm3=right.cbm3
-										AND left.cbm6=right.cbm6
-										AND left.cbm12=right.cbm12
-										AND left.cbm18=right.cbm18
-										AND left.pgk_works_for=right.pgk_works_for
-										AND left.pgk_is_affiliated_to=right.pgk_is_affiliated_to
 										AND left.clean_dob=right.clean_dob
 										AND left.clean_ssn=right.clean_ssn
 										AND left.sloc_type=right.sloc_type
 										AND left.billing_type=right.billing_type
 										,t_rollup(LEFT,RIGHT),LOCAL);
 
-		//Assign source_rid
-		Layouts.associate_base GetSourceRID(base_n L)	:= TRANSFORM
+		Enclarity.Layouts.associate_base GetSourceRID(base_n L)	:= TRANSFORM
 			SELF.source_rid :=   HASH64(hashmd5(
 																	trim(l.prac_addr_confidence_score)
 																	,trim(l.bill_addr_confidence_score)
@@ -833,7 +954,6 @@ end;
 		
 		d_rid	:= PROJECT(base_n, GetSourceRID(left));
 
-		//DID
 		matchset := ['A','S','Z','P'];
 		did_add.MAC_Match_Flex
 			(d_rid, matchset,					
@@ -849,13 +969,12 @@ end;
 											,transform({d_dob0}
 												,self.did:=if(    left.clean_dob<>''
 																			and left.best_dob>0
-																			and left.clean_dob[1..4]<>left.best_dob[1..4]
+																			and left.clean_dob[1..4]<>((STRING)left.best_dob)[1..4]
 																			,0
 																			,left.did)
 												,self.did_score:=if(self.did=0,0,left.did_score)
 												,self:=left));
 		
-		//BDID
 		bdid_matchset := ['A','P'];
 		Business_Header_SS.MAC_Add_BDID_Flex
 			(
@@ -870,7 +989,7 @@ end;
 			,clean_phone
 			,bill_tin
 			,bdid
-			,layouts.associate_base
+			,Enclarity.layouts.associate_base
 			,TRUE
 			,bdid_score
 			,d_bdid
@@ -890,21 +1009,49 @@ end;
 			,
 			);
 
-		RETURN d_bdid;
+		Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			d_bdid
+			,LNPID
+			,FNAME
+			,MNAME
+			,LNAME
+			,name_suffix
+			,//GENDER
+			,PRIM_Range
+			,PRIM_Name
+			,SEC_RANGE
+			,v_city_name
+			,ST
+			,ZIP
+			,clean_SSN
+			,clean_DOB
+			,clean_Phone
+			,//LIC_STATE
+			,//LIC_Num_in
+			,bill_tin
+			,//DEA_NUM
+			,group_key
+			,//NPI_NUM
+			,//UPIN
+			,DID
+			,BDID
+			,//SRC
+			,//SOURCE_RID
+			,result,false,38
+			);
+
+		RETURN result;
 	END;
 	
  	EXPORT Address_Base := FUNCTION
-   		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-   		hist_base	:= Mark_history(Files(filedate,pUseProd).address_base.built, layouts.address_base);
+   		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).address_base.built, Enclarity.layouts.address_base);
    
-   		//standardize input(update file)
    		stdInput := Enclarity.StandardizeInputFile(filedate, pUseProd).Address;
 
-   		cleanAdd_a	:= Clean_addr(stdInput, layouts.address_base)
+   		cleanAdd_a	:= Clean_addr(stdInput, Enclarity.layouts.address_base)
    			:PERSIST('~thor_data400::persist::enclarity::address_addr');	
 				
-   		//Add to previous base
-   		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).address_lBaseTemplate_built)) = 0
+   		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity.Filenames(filedate, pUseProd).address_lBaseTemplate_built)) = 0
    												 ,cleanAdd_a
    												 ,cleanAdd_a + hist_base);
 
@@ -940,12 +1087,11 @@ end;
 												,bill3_fax_ind
 												,prac_company_name
 												,last_verified_date
-												,addr_conf_score
 												,addr_rectype
 												,primary_location
 												,LOCAL);
    										
-   		Layouts.address_base t_rollup (new_base_s L, new_base_s R) := TRANSFORM
+   		Enclarity.Layouts.address_base t_rollup (new_base_s L, new_base_s R) := TRANSFORM
    			SELF.dt_vendor_first_reported 	:= ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
    			SELF.dt_vendor_last_reported  	:= ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 									:= IF(L.record_type = 'C', L, R);
@@ -981,14 +1127,12 @@ end;
 										AND left.bill3_fax_ind=right.bill3_fax_ind
 										AND left.prac_company_name=right.prac_company_name
 										AND left.last_verified_date=right.last_verified_date
-										AND left.addr_conf_score=right.addr_conf_score
 										AND left.addr_rectype=right.addr_rectype
 										AND left.primary_location=right.primary_location
 										,t_rollup(LEFT,RIGHT)
 										,LOCAL);								
    		
-   		//Assign source_rid
-   		Layouts.address_base GetSourceRID(base_t L)	:= TRANSFORM
+   		Enclarity.Layouts.address_base GetSourceRID(base_t L)	:= TRANSFORM
    			SELF.source_rid 					:= HASH64(hashmd5(
 																		trim(l.addr_key)
 																		,trim(l.Prepped_addr1)
@@ -1027,7 +1171,6 @@ end;
    		
    		d_rid	:= PROJECT(base_t, GetSourceRID(left));
    	
-   		//BDID
    		bdid_matchset := ['A','P'];
    		Business_Header_SS.MAC_Add_BDID_Flex
    		(
@@ -1042,7 +1185,7 @@ end;
 			,clean_phone
 			,foo
 			,bdid
-			,layouts.address_base
+			,Enclarity.layouts.address_base
 			,TRUE
 			,bdid_score
 			,d_bdid
@@ -1066,17 +1209,14 @@ end;
    	END;
 		
 	EXPORT DEA_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).dea_base.built, layouts.dea_base);
+		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).dea_base.built, Enclarity.layouts.dea_base);
 
-		//standardize input(update file)
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).DEA;
 		
 		cleanAdd_a	:= clean_addr(std_input, layouts.dea_base)
 			:PERSIST('~thor_data400::persist::enclarity::dea_addr');
 			
-		//Add to previous base
-		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).dea_lBaseTemplate_built)) = 0
+		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity.Filenames(filedate, pUseProd).dea_lBaseTemplate_built)) = 0
 												 ,cleanAdd_a
 												 ,cleanAdd_a + hist_base);
 
@@ -1095,7 +1235,7 @@ end;
 										,Prepped_addr2
 										,LOCAL);
 										
-		Layouts.dea_base t_rollup (new_base_s L, new_base_s R) := TRANSFORM
+		Enclarity.Layouts.dea_base t_rollup (new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported	:= ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
@@ -1125,27 +1265,22 @@ end;
 	END;
 	
 	EXPORT License_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).license_base.built, layouts.license_base);
+		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).license_base.built, Enclarity.layouts.license_base);
 	
-		//standardize input(update file)
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).License;
 
-		//clean name
-		cleanNames := Clean_name(std_input, Layouts.license_base);
+		cleanNames := Clean_name(std_input, Enclarity.Layouts.license_base);
 
-		//clean address	
-		cleanAdd_a	:= Clean_addr(cleanNames, layouts.license_base)
+		cleanAdd_a	:= Clean_addr(cleanNames, Enclarity.layouts.license_base)
 			:PERSIST('~thor_data400::persist::enclarity::license_addr');
 			
-		//Add to previous base
-		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).license_lBaseTemplate_built)) = 0
+		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity.Filenames(filedate, pUseProd).license_lBaseTemplate_built)) = 0
 											 ,cleanAdd_a
 											 ,cleanAdd_a + hist_base);
 
 		new_base_d := DISTRIBUTE(base_and_update, HASH(group_key));  
 
-		dob_file	:= distribute(Files().prov_birthdate_base.built(clean_date_of_birth<>''), hash(group_key));
+		dob_file	:= distribute(Enclarity.Files().prov_birthdate_base.built(clean_date_of_birth<>''), hash(group_key));
 		base_d	:= JOIN(new_base_d, dob_file
 										,LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({new_base_d}
@@ -1156,7 +1291,7 @@ end;
 										,LOCAL
 										);
 
-		ssn_file	:= distribute(Files().prov_ssn_base.built(clean_ssn<>''), hash(group_key));
+		ssn_file	:= distribute(Enclarity.Files().prov_ssn_base.built(clean_ssn<>''), hash(group_key));
 		base_s	:= JOIN(base_d, ssn_file
 										,LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({new_base_d}
@@ -1190,7 +1325,7 @@ end;
 										,clean_ssn
 										,LOCAL);
 		
-		Layouts.license_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
+		Enclarity.Layouts.license_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
@@ -1219,8 +1354,7 @@ end;
 										AND left.clean_ssn=right.clean_ssn
 										,t_rollup(LEFT,RIGHT),LOCAL);																																			
 										
-		//Assign source_rid
-		Layouts.license_base GetSourceRID(base_i L)	:= TRANSFORM
+		Enclarity.Layouts.license_base GetSourceRID(base_i L)	:= TRANSFORM
 			SELF.record_type 					:= if((unsigned)l.lic_end_date>0 and l.lic_end_date < ut.GetDate,'H',l.record_type);
 			SELF.source_rid 					:= HASH64(hashmd5(
 																	trim(l.orig_fullname)
@@ -1250,13 +1384,12 @@ end;
 		
 		d_rid	:= PROJECT(base_i, GetSourceRID(left));
 
-		//DID
 		matchset := ['A','S','Z'];
 		did_add.MAC_Match_Flex
 			(d_rid, matchset,					
 			clean_ssn, clean_dob, fname, mname, lname, name_suffix, 
 			prim_range, prim_name, sec_range, zip, st,'', 
-			DID, Layouts.license_base, true, did_score,
+			DID, Enclarity.Layouts.license_base, true, did_score,
 			75, d_did);
 	
 		did_add.MAC_Add_SSN_By_DID(d_did,did,best_ssn,d_ssn);
@@ -1266,13 +1399,12 @@ end;
 											,transform({d_dob0}
 												,self.did:=if(    left.clean_dob<>''
 																			and left.best_dob>0
-																			and left.clean_dob[1..4]<>left.best_dob[1..4]
+																			and left.clean_dob[1..4]<>((STRING)left.best_dob)[1..4]
 																			,0
 																			,left.did)
 												,self.did_score:=if(self.did=0,0,left.did_score)
 												,self:=left));
 		
-		//BDID
 		bdid_matchset := ['A'];
 		Business_Header_SS.MAC_Add_BDID_Flex
 			(
@@ -1287,7 +1419,7 @@ end;
 			,''
 			,foo
 			,bdid
-			,layouts.license_base
+			,Enclarity.layouts.license_base
 			,TRUE
 			,bdid_score
 			,d_bdid
@@ -1307,24 +1439,52 @@ end;
 			,
 			);
 
-		RETURN d_bdid;
+		Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			d_bdid
+			,LNPID
+			,FNAME
+			,MNAME
+			,LNAME
+			,name_suffix
+			,//GENDER
+			,PRIM_Range
+			,PRIM_Name
+			,SEC_RANGE
+			,v_city_name
+			,ST
+			,ZIP
+			,clean_SSN
+			,clean_DOB
+			,//clean_Phone
+			,LIC_STATE
+			,LIC_Num_in
+			,//bill_tin
+			,//DEA_NUM
+			,group_key
+			,//NPI_NUM
+			,//UPIN
+			,DID
+			,BDID
+			,//SRC
+			,//SOURCE_RID
+			,result,false,38
+			);
+
+		RETURN result;
 	END;
 	
 	EXPORT Taxonomy_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).taxonomy_base.built, layouts.taxonomy_base);
+		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).taxonomy_base.built, Enclarity.layouts.taxonomy_base);
 		
-		//standardize input(update file)
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).Taxonomy;
 
-		//Add to previous base
-		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).taxonomy_lBaseTemplate_built)) = 0
+		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity.Filenames(filedate, pUseProd).taxonomy_lBaseTemplate_built)) = 0
 										   ,std_input
 											 ,std_input + hist_base);			
 
 		new_base_d := DISTRIBUTE(base_and_update, HASH(group_key));
 
-		npi_file	:= distribute(Files().npi_base.built, hash(group_key));
+		npi_file	:= distribute(Enclarity.Files().npi_base.built, hash(group_key));
 		base_n	:= JOIN(new_base_d, npi_file
 										,   LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({new_base_d}
@@ -1343,7 +1503,7 @@ end;
 										,taxonomy_primary_ind
 										,LOCAL);
 										
-		Layouts.taxonomy_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
+		Enclarity.Layouts.taxonomy_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
@@ -1362,27 +1522,22 @@ end;
 	END;
 	
 	EXPORT NPI_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).npi_base.built, layouts.npi_base);
+		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).npi_base.built, Enclarity.layouts.npi_base);
 
-		//standardize input(update file)
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).npi;
 
-		//clean name
-		cleanNames := Clean_name(std_input, Layouts.npi_base);
+		cleanNames := Clean_name(std_input, Enclarity.Layouts.npi_base);
 
-		//clean address	
-		cleanAdd_a	:= Clean_addr(cleanNames, layouts.npi_base)
+		cleanAdd_a	:= Clean_addr(cleanNames, Enclarity.layouts.npi_base)
 			:PERSIST('~thor_data400::persist::enclarity::npi_addr');
 			
-		//Add to previous base
-		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).npi_lBaseTemplate_built)) = 0
+		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity.Filenames(filedate, pUseProd).npi_lBaseTemplate_built)) = 0
 											 ,cleanAdd_a
 											 ,cleanAdd_a + hist_base);			
 
 		new_base_d := DISTRIBUTE(base_and_update, HASH(group_key));
 
-		dob_file	:= distribute(Files().prov_birthdate_base.built(clean_date_of_birth<>''), hash(group_key));
+		dob_file	:= distribute(Enclarity.Files().prov_birthdate_base.built(clean_date_of_birth<>''), hash(group_key));
 		base_d	:= JOIN(new_base_d, dob_file
 										,LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({new_base_d}
@@ -1393,7 +1548,7 @@ end;
 										,LOCAL
 										);
 
-		ssn_file	:= distribute(Files().prov_ssn_base.built(clean_ssn<>''), hash(group_key));
+		ssn_file	:= distribute(Enclarity.Files().prov_ssn_base.built(clean_ssn<>''), hash(group_key));
 		base_s	:= JOIN(base_d, ssn_file
 										,LEFT.group_key = RIGHT.group_key
 										,TRANSFORM({new_base_d}
@@ -1429,11 +1584,9 @@ end;
 											,phone1
 											,npi_type
 											,npi_sole_proprietor
-											,npi_deact_date
-											,npi_enum_date
 										,LOCAL);
 						
-		Layouts.npi_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
+		Enclarity.Layouts.npi_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
@@ -1464,13 +1617,10 @@ end;
 										AND left.phone1=right.phone1
 										AND left.npi_type=right.npi_type
 										AND left.npi_sole_proprietor=right.npi_sole_proprietor
-										AND left.npi_deact_date=right.npi_deact_date
-										AND left.npi_enum_date=right.npi_enum_date
 										,t_rollup(LEFT,RIGHT)
 										,LOCAL);	
 		
-		//Assign source_rid
-		Layouts.npi_base GetSourceRID(base_i L)	:= TRANSFORM
+		Enclarity.Layouts.npi_base GetSourceRID(base_i L)	:= TRANSFORM
 			SELF.source_rid 	:= HASH64(hashmd5(
 																	trim(l.npi_num)
 																	,trim(l.taxonomy)
@@ -1505,13 +1655,12 @@ end;
 		
 		d_rid	:= PROJECT(base_i, GetSourceRID(left));
 																														
-		//DID
 		matchset := ['A','S','Z'];
 		did_add.MAC_Match_Flex
 			(d_rid, matchset,					
 			clean_ssn, clean_dob, fname, mname, lname, name_suffix, 
 			prim_range, prim_name, sec_range, zip, st,'', 
-			DID, Layouts.npi_base, TRUE, did_score,
+			DID, Enclarity.Layouts.npi_base, TRUE, did_score,
 			75, d_did);
 			
 		did_add.MAC_Add_SSN_By_DID(d_did,did,best_ssn,d_ssn);
@@ -1521,13 +1670,12 @@ end;
 											,transform({d_dob0}
 												,self.did:=if(    left.clean_dob<>''
 																			and left.best_dob>0
-																			and left.clean_dob[1..4]<>left.best_dob[1..4]
+																			and left.clean_dob[1..4]<>((STRING)left.best_dob)[1..4]
 																			,0
 																			,left.did)
 												,self.did_score:=if(self.did=0,0,left.did_score)
 												,self:=left));
 
-		//BDID
 		bdid_matchset := ['A','P'];
 		Business_Header_SS.MAC_Add_BDID_Flex
 			(
@@ -1542,7 +1690,7 @@ end;
 			,phone1
 			,foo
 			,bdid
-			,layouts.npi_base
+			,Enclarity.layouts.npi_base
 			,TRUE
 			,bdid_score
 			,d_bdid
@@ -1562,18 +1710,46 @@ end;
 			,
 			);
 
-		RETURN d_bdid;
+		Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			d_bdid
+			,LNPID
+			,FNAME
+			,MNAME
+			,LNAME
+			,name_suffix
+			,//GENDER
+			,PRIM_Range
+			,PRIM_Name
+			,SEC_RANGE
+			,v_city_name
+			,ST
+			,ZIP
+			,clean_SSN
+			,clean_DOB
+			,clean_Phone
+			,//LIC_STATE
+			,//LIC_Num_in
+			,//bill_tin
+			,//DEA_NUM
+			,group_key
+			,NPI_NUM
+			,//UPIN
+			,DID
+			,BDID
+			,//SRC
+			,//SOURCE_RID
+			,result,false,38
+			);
+
+		RETURN result;
 	END;
 	
 	EXPORT Medschool_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).medschool_base.built, layouts.medschool_base);
+		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).medschool_base.built, Enclarity.layouts.medschool_base);
 
-		//standardize input(update file)
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).medschool;
 
-		//Add to previous base			
-		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).medschool_lBaseTemplate_built)) = 0
+		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity.Filenames(filedate, pUseProd).medschool_lBaseTemplate_built)) = 0
 											 ,std_input
 											 ,std_input + hist_base);			
 
@@ -1585,7 +1761,7 @@ end;
 										medschool_year,							
 										LOCAL);
 										
-		Layouts.medschool_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
+		Enclarity.Layouts.medschool_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
@@ -1601,14 +1777,11 @@ end;
 	END;
 	
 	EXPORT Tax_Codes_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).tax_codes_base.built, layouts.tax_codes_base);
+		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).tax_codes_base.built, Enclarity.layouts.tax_codes_base);
 
-		//standardize input(update file)
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).Tax_Codes;
 
-		//Add to previous base
-		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).tax_codes_lBaseTemplate_built)) = 0
+		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity.Filenames(filedate, pUseProd).tax_codes_lBaseTemplate_built)) = 0
 											 ,std_input
 											 ,std_input + hist_base);			
 
@@ -1626,7 +1799,7 @@ end;
 										,notes
 										,LOCAL);
 										
-		Layouts.tax_codes_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
+		Enclarity.Layouts.tax_codes_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
@@ -1649,14 +1822,11 @@ end;
 	END;
 	
 	EXPORT Prov_SSN_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).prov_ssn_base.built, layouts.prov_ssn_base);
+		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).prov_ssn_base.built, Enclarity.layouts.prov_ssn_base);
 
-		//standardize input(update file)
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).Prov_SSN;
 
-		//Add to previous base
-		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).prov_ssn_lBaseTemplate_built)) = 0
+		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity.Filenames(filedate, pUseProd).prov_ssn_lBaseTemplate_built)) = 0
 											 ,std_input
 											 ,std_input + hist_base);			
 
@@ -1667,7 +1837,7 @@ end;
 										ssn,						
 										LOCAL);
 										
-		Layouts.prov_ssn_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
+		Enclarity.Layouts.prov_ssn_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
@@ -1683,14 +1853,11 @@ end;
 	END;
 	
 	EXPORT Specialty_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).specialty_base.built, layouts.specialty_base);
+		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).specialty_base.built, Enclarity.layouts.specialty_base);
 
-		//standardize input(update file)
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).specialty;
 
-		//Add to previous base
-		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).specialty_lBaseTemplate_built)) = 0
+		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity.Filenames(filedate, pUseProd).specialty_lBaseTemplate_built)) = 0
 											 ,std_input
 											 ,std_input + hist_base);			
 
@@ -1702,7 +1869,7 @@ end;
 										spec_desc,
 										LOCAL);
 						
-		Layouts.specialty_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
+		Enclarity.Layouts.specialty_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
@@ -1719,120 +1886,23 @@ end;
 	END;
 	
 	EXPORT Sanc_Prov_type_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).sanc_prov_type_base.built, layouts.sanc_prov_type_base);
-
-		//standardize input(update file)
-		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).sanc_prov_type;
-
-		//Add to previous base
-		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).sanc_prov_type_lBaseTemplate_built)) = 0
-											 ,std_input
-											 ,std_input + hist_base);			
-
-		new_base_d := DISTRIBUTE(base_and_update, HASH(prov_type_code, prov_type_desc));
-
-		new_base_s := SORT(new_base_d,
-										prov_type_code,						
-										prov_type_desc,
-										LOCAL);
-						
-		base_dedup	:= DEDUP(new_base_s, RECORD, LOCAL);
-		
-		Layouts.sanc_prov_type_base t_rollup(base_dedup L, base_dedup R) := TRANSFORM
-			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
-			SELF						 							:= IF(L.record_type = 'C', L, R);
-		END;
-
-		base_t := ROLLUP(base_dedup,
-										LEFT.prov_type_code = RIGHT.prov_type_code AND
-										LEFT.prov_type_desc = RIGHT.prov_type_desc,
-										t_rollup(LEFT,RIGHT)
-										,LOCAL);																																			
-
-		RETURN base_t;
+		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).sanc_prov_type;						
+		new_base_d	:= DEDUP(std_input, RECORD, ALL);
+		RETURN new_base_d;
 	END;
 	
 	EXPORT Sanc_Codes_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).sanc_codes_base.built, layouts.sanc_codes_base);
-
-		//standardize input(update file)
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).sanc_codes;
-
-		//Add to previous base
-		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).sanc_codes_lBaseTemplate_built)) = 0
-										 ,std_input
-										 ,std_input + hist_base);			
-
-		new_base_d := DISTRIBUTE(base_and_update, HASH(sanc_code, sanc_desc));
-
-		new_base_s := SORT(new_base_d,
-										sanc_code,						
-										sanc_desc,
-										LOCAL);
-										
-		Layouts.sanc_codes_base t_rollup(new_base_s  L, new_base_s R) := TRANSFORM
-			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(l.dt_vendor_last_reported, R.dt_vendor_last_reported);
-			SELF						 							:= IF(L.record_type = 'C', L, R);
-		END;
-
-		base_t := ROLLUP(new_base_s,
-										LEFT.sanc_code 		= RIGHT.sanc_code 	AND
-										LEFT.sanc_desc 		= RIGHT.sanc_desc,
-										t_rollup(LEFT,RIGHT)
-										,LOCAL);																																			
-
-		RETURN base_t;
-	END;
-	
-	EXPORT DEA_BACodes_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).dea_BAcodes_base.built, layouts.dea_BAcodes_base);
-
-		//standardize input(update file)
-		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).dea_BAcodes;
-
-		//Add to previous base
-		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).dea_BAcodes_lBaseTemplate_built)) = 0
-											 ,std_input
-											 ,std_input + hist_base);			
-
-		new_base_d := DISTRIBUTE(base_and_update, HASH(dea_bus_act_ind, dea_bus_act_ind_sub));
-
-		new_base_s := SORT(new_base_d
-										,dea_bus_act_ind
-										,dea_bus_act_ind_sub
-										,desc
-										,LOCAL);
-										
-		Layouts.dea_BAcodes_base t_rollup(new_base_s  L, new_base_s R) := TRANSFORM
-			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
-			SELF						 							:= IF(L.record_type = 'C', L, R);
-		END;
-
-		base_t := ROLLUP(new_base_s,
-										LEFT.dea_bus_act_ind 			= RIGHT.dea_bus_act_ind 		AND				
-										LEFT.dea_bus_act_ind_sub 	= RIGHT.dea_bus_act_ind_sub AND
-										LEFT.desc 								= RIGHT.desc,
-										t_rollup(LEFT,RIGHT)
-										,LOCAL);																																			
-
-		RETURN base_t;
+		new_base_d := DEDUP(std_input, sanc_code, ALL);
+		RETURN new_base_d;
 	END;
 	
 	EXPORT Prov_birthdate_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).prov_birthdate_base.built, layouts.prov_birthdate_base);
+		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).prov_birthdate_base.built, Enclarity.layouts.prov_birthdate_base);
 
-		//standardize input(update file)
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).Prov_birthdate;
 
-		//Add to previous base
-		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).prov_birthdate_lBaseTemplate_built)) = 0
+		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity.Filenames(filedate, pUseProd).prov_birthdate_lBaseTemplate_built)) = 0
 											 ,std_input
 											 ,std_input + hist_base);			
 
@@ -1843,7 +1913,7 @@ end;
 										date_of_birth,						
 										LOCAL);
 			
-		Layouts.prov_birthdate_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
+		Enclarity.Layouts.prov_birthdate_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
@@ -1859,14 +1929,11 @@ end;
 	END;
 
 	EXPORT Sanction_Base := FUNCTION
-		//before adding the updates to the base file, mark the existing base file records as 'H' for historical
-		hist_base	:= Mark_history(Files(filedate,pUseProd).sanction_base.built, layouts.sanction_base);
+		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).sanction_base.built, Enclarity.layouts.sanction_base);
 
-		//standardize input(update file)
 		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).sanction;
 
-		//Add to previous base
-		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Filenames(filedate, pUseProd).sanction_lBaseTemplate_built)) = 0
+		base_and_update := IF(NOTHOR(FileServices.GetSuperFileSubCount(Enclarity.Filenames(filedate, pUseProd).sanction_lBaseTemplate_built)) = 0
 											,std_input
 											,std_input + hist_base);			
 
@@ -1882,24 +1949,208 @@ end;
 											,sanc1_rein_date
 										,LOCAL);
 		
-		Layouts.sanction_base t_rollup(new_base_s  L, new_base_s R) := TRANSFORM
+		temp_explode:=record
+			enclarity.Layouts.sanction_base;
+			string1 lic_status := '';
+		end;
+
+		base_u	:= project(new_base_s, transform(temp_explode
+								,self.ln_derived_rein_date:=if(left.record_type = 'C',''   ,left.ln_derived_rein_date)
+								,self.ln_derived_rein_flag:=if(left.record_type = 'C',false,left.ln_derived_rein_flag)
+								,self:=left
+								));
+		
+		lic_t  :=enclarity.Files(,true).license_base.qa;
+		base_u1	:= distribute(base_u,hash(group_key));
+		lic_u1	:= distribute(lic_t,hash(group_key));
+		
+		base_u2	:= join(base_u1, lic_u1(record_type	=	'C')
+						,   left.group_key    = right.group_key
+						AND left.sanc1_state  = right.lic_state
+						,transform({base_u1}
+							,self.lic_status := right.lic_status
+							,self						 := left)
+						,left outer
+						,local);
+
+			base_u3 := SORT(base_u2
+											,group_key
+											,sanc1_date
+											,sanc1_code
+											,sanc1_state
+											,sanc1_lic_num
+											,sanc1_prof_type
+											,sanc1_rein_date
+											,sanc1_desc
+											,if(lic_status='A',0,1)
+										,LOCAL);
+
+		base_u3 t_rollup(base_u3  L, base_u3 R) := TRANSFORM
 			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 			SELF						 							:= IF(L.record_type = 'C', L, R);
 		END;
-
-		base_t := ROLLUP(new_base_s,
+		
+		base_t := ROLLUP(base_u3,
 										LEFT.group_key 				= RIGHT.group_key 			AND 
 										LEFT.sanc1_date 			= RIGHT.sanc1_date 			AND				
 										LEFT.sanc1_code 			= RIGHT.sanc1_code 			AND
 										LEFT.sanc1_state 			= RIGHT.sanc1_state 		AND
 										LEFT.sanc1_lic_num 		= RIGHT.sanc1_lic_num 	AND
 										LEFT.sanc1_prof_type 	= RIGHT.sanc1_prof_type AND
-										LEFT.sanc1_rein_date 	= RIGHT.sanc1_rein_date,
+										LEFT.sanc1_rein_date 	= RIGHT.sanc1_rein_date AND
+										LEFT.sanc1_desc			  = RIGHT.sanc1_desc,
 										t_rollup(LEFT,RIGHT)
-										,LOCAL);																																			
+										,LOCAL);	
 
-		RETURN base_t;
+		base_w_level := JOIN(base_t, Enclarity.LookupTables.dsSancLookup,
+										LEFT.sanc1_code=RIGHT.code,
+										transform({base_t}, 
+												SELF.level	:= RIGHT.level,
+												SELF				:= LEFT),
+												LEFT OUTER, LOOKUP);
+
+		base_t_plus:=project(base_w_level,{
+														 base_w_level
+														,string8 temp_st_revoke_dt := ''
+														,string8 temp_fed_revoke_dt	:= ''
+														,string8 temp_st_rein_dt:=''
+														,string8 temp_st_ds_dt:=''
+														,string8 temp_st_as_dt	:= ''
+														,string8 temp_fed_rein_dt:=''
+														});
+														
+		st_rein_codes			:= ['113R'];
+		st_ds_codes				:= ['112DS'];
+		st_as_codes				:= ['112AS'];
+		st_revoke_codes		:= ['111L','CANDD'];
+		fed_rein_codes		:= ['SMR'];
+		fed_revoke_codes	:= ['SME'];
+		
+		base_u2_dst :=distribute(base_t_plus,hash(group_key,sanc1_state));
+		base_u2_srt :=sort(base_u2_dst,group_key,sanc1_state,local);
+		Gbase_u2    :=group(base_u2_srt,group_key,sanc1_state);
+		Gbase_u2_std:=sort(Gbase_u2
+										,-sanc1_date
+										,map(
+ 										 sanc1_code in st_rein_codes		=>2
+										,sanc1_code in st_ds_codes			=>4
+										,sanc1_code in st_as_codes			=>6
+										,sanc1_code in st_revoke_codes	=>8
+										,sanc1_code in fed_rein_codes		=>10
+										,sanc1_code in fed_revoke_codes	=>12
+										,99)
+										);
+
+		Gbase_u2 tr_iter(Gbase_u2_std l, Gbase_u2_std r) :=transform
+			self.temp_st_rein_dt  	:= if(r.sanc1_code in st_rein_codes, 	r.clean_sanc1_date,l.temp_st_rein_dt);
+			self.temp_st_ds_dt 	    := if(r.sanc1_code in st_ds_codes, 	  r.clean_sanc1_date,l.temp_st_ds_dt);
+			self.temp_st_as_dt 	    := if(r.sanc1_code in st_as_codes, 	  r.clean_sanc1_date,l.temp_st_as_dt);
+			self.temp_st_revoke_dt  := if(r.sanc1_code in st_revoke_codes,r.clean_sanc1_date,l.temp_st_revoke_dt);
+			self.temp_fed_rein_dt   := if(r.sanc1_code in fed_rein_codes,	r.clean_sanc1_date,l.temp_fed_rein_dt);
+			self.temp_fed_revoke_dt := if(r.sanc1_code in fed_revoke_codes,r.clean_sanc1_date,l.temp_fed_revoke_dt);
+			self.LN_derived_rein_date:=map(
+																 r.sanc1_code in st_rein_codes  => self.temp_st_rein_dt
+
+																,r.sanc1_code in st_ds_codes
+																			and (unsigned)self.temp_st_rein_dt>0
+																			and (unsigned)self.temp_st_ds_dt<=(unsigned)self.temp_st_rein_dt
+																			and (unsigned)self.temp_st_ds_dt>=(unsigned)self.temp_st_revoke_dt
+																											=> self.temp_st_rein_dt
+
+																,r.sanc1_code in st_revoke_codes  //here comes the "fun!"
+																		=>	map(
+																			// we have no 112dS but have 112aS with active license within the group
+																			(
+																				(
+																				(unsigned)self.temp_st_ds_dt=0
+																				and (unsigned)self.temp_st_rein_dt=0
+																				)
+																			or
+																				(
+																				(unsigned)self.temp_st_ds_dt=0
+																				and (unsigned)self.temp_st_rein_dt>0
+																				and (unsigned)self.temp_st_as_dt<=(unsigned)self.temp_st_rein_dt
+																				)
+																			or
+																				(
+																				(unsigned)self.temp_st_ds_dt=0
+																				and (unsigned)self.temp_st_rein_dt=0
+																				)
+																			)
+																			and (unsigned)self.temp_st_as_dt>0
+																			and r.lic_status = 'A'
+																											=> self.temp_st_as_dt
+
+																			// we have a 112dS within the group
+																			,(
+																				(
+																				(unsigned)self.temp_st_ds_dt>0
+																				and (unsigned)self.temp_st_rein_dt=0
+																				)
+																			or
+																				(
+																				(unsigned)self.temp_st_ds_dt>0
+																				and (unsigned)self.temp_st_rein_dt>0
+																				and (unsigned)self.temp_st_ds_dt<=(unsigned)self.temp_st_rein_dt
+																				)
+																			)
+																											=> self.temp_st_ds_dt
+
+																			// we do not have a 112dS or 112aS but have a 113R within the group
+																			,self.temp_st_rein_dt
+																			)
+
+																,r.sanc1_code in fed_rein_codes
+																											=> self.temp_fed_rein_dt
+
+																,r.sanc1_code in fed_revoke_codes
+																											=> self.temp_fed_rein_dt
+
+																,r.LN_derived_rein_date
+																);
+			self.LN_derived_rein_flag:=if(
+																		 r.sanc1_code not in [st_rein_codes,fed_rein_codes]
+																		 and (unsigned)self.LN_derived_rein_date>0
+																				,true
+																				,r.LN_derived_rein_flag
+																		);
+			self:=r;
+		end;
+
+		it1:=iterate(Gbase_u2_std(record_type = 'C'),tr_iter(left,right)) + Gbase_u2_std(record_type = 'H');
+		flags_set	:= ungroup(project(it1, Enclarity.Layouts.sanction_base));
+		
+		flags_sort := SORT(flags_set
+											,group_key
+											,sanc1_date
+											,sanc1_code
+											,sanc1_state
+											,sanc1_lic_num
+											,sanc1_prof_type
+											,sanc1_rein_date
+											,sanc1_desc
+										,LOCAL);
+
+		flags_sort last_rollup(flags_sort  L, flags_sort R) := TRANSFORM
+			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
+			SELF.dt_vendor_last_reported  := ut.LatestDate	(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+			SELF						 							:= IF(L.record_type = 'C', L, R);
+		END;
+		
+		final_set := ROLLUP(flags_sort,
+										LEFT.group_key 				= RIGHT.group_key 			AND 
+										LEFT.sanc1_date 			= RIGHT.sanc1_date 			AND				
+										LEFT.sanc1_code 			= RIGHT.sanc1_code 			AND
+										LEFT.sanc1_state 			= RIGHT.sanc1_state 		AND
+										LEFT.sanc1_lic_num 		= RIGHT.sanc1_lic_num 	AND
+										LEFT.sanc1_prof_type 	= RIGHT.sanc1_prof_type AND
+										LEFT.sanc1_rein_date 	= RIGHT.sanc1_rein_date AND
+										LEFT.sanc1_desc			  = RIGHT.sanc1_desc,
+										last_rollup(LEFT,RIGHT)
+										,LOCAL);	
+
+		RETURN final_set;
 	END;
 	
 	EXPORT Collapse_Base := FUNCTION

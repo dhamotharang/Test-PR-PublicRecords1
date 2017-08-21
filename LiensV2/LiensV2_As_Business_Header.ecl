@@ -1,21 +1,22 @@
+#OPTION('multiplePersistInstances',FALSE);
 import Business_Header,Business_HeaderV2;
-shared bfiles := Business_HeaderV2.Source_Files;
+bfiles := Business_HeaderV2.Source_Files;
 
 export LiensV2_As_Business_Header(
 	 boolean																				pShouldPersist	= true
-	,dataset(layout_liens_party_ssn_for_hogan_Bid	)	pHogan					= bfiles.liens_party_Hogan.BusinessHeader
-	,dataset(Layout_liens_party_ssn_Bid						)	pILFDLN					= bfiles.liens_party_ILFDLN.BusinessHeader			
-	,dataset(Layout_liens_party_ssn_Bid						)	pNYC						= bfiles.liens_party_NYC.BusinessHeader					
-	,dataset(Layout_liens_party_ssn_Bid						)	pNYFDLN					= bfiles.liens_party_NYFDLN.BusinessHeader			
-	,dataset(Layout_liens_party_ssn_Bid						)	pSA							= bfiles.liens_party_SA.BusinessHeader					
-	,dataset(Layout_liens_party_ssn_Bid						)	pChicago				= bfiles.liens_party_chicago_law.BusinessHeader	
-	,dataset(Layout_liens_party_ssn_Bid						)	pCA							= bfiles.liens_party_CA.BusinessHeader					
-	,dataset(Layout_liens_party_ssn_Bid						)	pSuperior				= bfiles.liens_party_Superior.BusinessHeader		
+	,dataset(layout_liens_party_ssn_for_hogan_BIPV2_with_LinkFlags	)	pHogan					= bfiles.liens_party_Hogan.BusinessHeader
+	,dataset(Layout_liens_party_ssn_BIPV2_with_LinkFlags						)	pILFDLN					= bfiles.liens_party_ILFDLN.BusinessHeader			
+	,dataset(Layout_liens_party_ssn_BIPV2_with_LinkFlags						)	pNYC						= bfiles.liens_party_NYC.BusinessHeader					
+	,dataset(Layout_liens_party_ssn_BIPV2_with_LinkFlags						)	pNYFDLN					= bfiles.liens_party_NYFDLN.BusinessHeader			
+	,dataset(Layout_liens_party_ssn_BIPV2_with_LinkFlags						)	pSA							= bfiles.liens_party_SA.BusinessHeader					
+	,dataset(Layout_liens_party_ssn_BIPV2_with_LinkFlags						)	pChicago				= bfiles.liens_party_chicago_law.BusinessHeader	
+	,dataset(Layout_liens_party_ssn_BIPV2_with_LinkFlags						)	pCA							= bfiles.liens_party_CA.BusinessHeader					
+	,dataset(Layout_liens_party_ssn_BIPV2_with_LinkFlags						)	pSuperior				= bfiles.liens_party_Superior.BusinessHeader		
 	,string																					pPersistname		= thor_cluster + 'persist::LiensV2::LiensV2_As_Business_Header'
 ) :=                                                        			
 function
 
-	LiensV2.Layout_liens_party_ssn_Bid refHGPTY(LiensV2.layout_liens_party_ssn_for_hogan_Bid l) := transform
+	LiensV2.Layout_liens_party_ssn_BIPV2_with_LinkFlags refHGPTY(LiensV2.layout_liens_party_ssn_for_hogan_BIPV2_with_LinkFlags l) := transform
 		self := l;
 	end;
 

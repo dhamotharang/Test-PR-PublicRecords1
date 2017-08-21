@@ -1,16 +1,34 @@
+IMPORT MDR;
+
 EXPORT Constants := MODULE
+
+
+EXPORT VERSION_3 := 3;
 
 EXPORT IND_REQ_ATTRIBUTE_V3 := 'DDAINDV3';
 EXPORT BUS_REQ_ATTRIBUTE_V3 := 'DDABUSV3';
 
-EXPORT BUSINESS_V3 := 'BUS';
-EXPORT INDIVIDUAL_V3 := 'IND';
-
 EXPORT INDIVIDUAL := 'INDIVIDUAL';
 EXPORT BUSINESS := 'BUSINESS';
 
+EXPORT VALID_IND_ATTRIBUTE_VERSIONS := [IND_REQ_ATTRIBUTE_V3];
+EXPORT VALID_BUS_ATTRIBUTE_VERSIONS := [BUS_REQ_ATTRIBUTE_V3];
+
 EXPORT INVALID := 'INVALID';
 
+EXPORT VALIDATION_INVALID_INDIVIDUAL := 'Minimum input information not met. Minimum input information is: \n (1)  First Name, Last Name, Street Address, City and State or Zip  OR \n (2)  First Name, Last Name, SSN  OR \n (3)  LexID';
+EXPORT VALIDATION_INVALID_BUSINESS := 'Minimum input information not met. Minimum input information is: \n (1)  Business Name, Street Address, City and State or Zip  OR \n (2)  Business Name, Tax ID OR \n (3)  LexID';
+EXPORT VALIDATION_INVALID_VERSION := 'Please enter a valid attributes version';
+EXPORT VALIDATION_INVALID_GLB := 'Not an allowable GLB permissible purpose';
+EXPORT VALIDATION_INVALID_DPPA := 'Not an allowable DPPA permissible purpose';
+
+EXPORT DEFAULT_DPPA := 3;
+EXPORT DEFAULT_GLBA := 5;
+
+
+// NOTE: when calling these macros (mac_ListTop*), you will need to add a "#expand(...)" before the actual
+// fully qualified macro name or it will sort/dedup/group on the full string below 
+// instead of the field names inside the string.
 EXPORT mac_ListTop3Linkids := MACRO
     'UltID, OrgID, SeleID'
 ENDMACRO;
@@ -30,6 +48,13 @@ EXPORT LINKED_BUSINESS_DEGREE := 'LB';
 EXPORT LINKED_BUSINESS_EXEC_DEGREE := 'LE';
 EXPORT RELATED_BUSINESS_DEGREE := 'RB';
 
+EXPORT CORP_STATUS_ACTIVE := 'A';
+EXPORT CORP_STATUS_INACTIVE := 'I';
+EXPORT CORP_STATUS_DISSOLVED := 'D';
+EXPORT CORP_STATUS_REINSTATE := 'R';
+EXPORT CORP_STATUS_SUSPEND := 'S';
+EXPORT COPR_STATUS_UNKNOWN := 'U';
+
 //Company Types
 EXPORT CMPTYP_TRUST := 'TRUST';
 EXPORT CMPTYP_PROPRIETORSHIP := 'PROPRIETORSHIP';
@@ -45,72 +70,158 @@ EXPORT CMPTYP_LIMITED_PARTNERSHIP := 'LIMITED PARTNERSHIP';
 EXPORT CMPTYP_LIMITED_LIABILITY_CORP := 'LIMITED LIABILITY CORPORATION';
 EXPORT CMPTYP_LIMITED_LIABILITY_PARTNERSHIP := 'LIMITED LIABILITY PARTNERSHIP';
 
-
-EXPORT NAICS_RISK_HIGH	:=  ['42','44','45','48','49'] ;
-EXPORT NAICS_RISK_MED	 	:=  ['23','31','32','33','52','53','54','56','71','72','81','92'];
-EXPORT NAICS_RISK_LOW 	:=  ['11','21','22','51','55','61','62'];
-
-//Cash Intensive Businesses
-EXPORT CIB_NAICS  := ['445120', 																			//Convenience Store							
-										  '447110', 																			//Convenience W/Gas
-			 							  '722110', 	'722211', 	'722212', 							//Restaurant
-										  '445310', 																			//Liquor Store
-										  '424940', 																			//Tobacco Distributors
-										  '454210', 																			//Vending Machine
-										  '812930', 																			//Parking garage
-										  '811192', 																			//Car Wash
-										  '442110', 	'444210', 	'451110', 	'452111', 	//Retail
-										  '442210', 	'444220', 	'451110', 	'452112', 
-										  '442299', 	'446110', 	'451120', 	'452998', 
-										  '443111', 	'448120', 	'451120', 	'453110', 
-										  '443112', 	'448150', 	'451130', 	'453210', 
-										  '443120', 	'448190', 	'451140', 	'453220', 
-										  '444110', 	'448210', 	'451211', 	'453310', 
-										  '444120', 	'448210', 	'451220', 	'453998', 
-										  '454210', 																			//Private ATMs
-										  '813219']; 																			//Non-governmental charity	
-
-//Money Services Businesses											
-EXPORT  MSB_NAICS  := ['522390', 							//Check Cashing				
-											 '523130', 	            //Currency Exchange			
-											 '522320', 	            //Electronic Fund Transfer	
-											 '522390', 	'522291',   //Money Transmitter			
-											 '522390']; 	          //Money Order Sales	
-
-//Non-Bank Finaancial Institutions
-EXPORT  NBFI_NAICS := ['522298', 							//Pawn Shop
-											 '423940', 	'448310',   //Jewelry Store
-											 '448310', 	            //Jewelry/Gem
-											 '522291']; 	          //Consumer Loans
-
-//Casinos & Gaming
-EXPORT CASGAM_NAISC := ['713210', 		//Casinos
-												'713290',     //Card Clubs/Rooms & Gaming
-												'721120'];    //Casino Hotels
-
-//Legal, Accountant, Telemarketer, Flight Training or Travel Agency
-EXPORT LEGTRAV_NAISC := ['541110', 		//Lawyers / Law Offices
-												 '541211',    //Accountants
-												 '561990',    //Auctioneers
-												 '561422',    //Telemarketers
-												 '611512',    //Flight Training
-												 '561510'];   //Travel agency
-
-//Automotive
-EXPORT AUTO_NAISC  := ['441110', 	'441120',								//Auto Dealers
-											 '441210', 		                    	//Recreational Vehicles
-											 '441221', 		                    	//Motorcycle
-											 '441222', 		                    	//Boat Dealer
-											 '441229', 		                    	//Aircraft Dealer
-											 '441310', 		                    	//Automotive Parts
-											 '811111', 	'811113', 	'811118', 	//Automotive Repair
-											 '811121', 	'811224'];	          	//Automotive Repair
-
-
 EXPORT CREDIT_SOURCES := ['ER', 'Q3', 'DN']; 
 EXPORT BUS_SHELL_SOURCES := ['BM', 'Y', 'W', 'GB', 'GG', 'UT'];
 
+EXPORT SOURCE_BUSINESS_HEADER := 'BH';
+EXPORT SOURCE_BUSINESS_REGISTRATION := MDR.SourceTools.src_Business_Registration;
+EXPORT SOURCE_BUSINESS_CORP := 'CO';
+EXPORT SOURCE_OSHA := MDR.SourceTools.src_OSHAIR;
+EXPORT SOURCE_DCA := MDR.SourceTools.src_DCA;
+EXPORT SOURCE_FICTICIOUS_BUSINESS := MDR.SourceTools.src_FBNV2_BusReg;
+EXPORT SOURCE_CAL_BUSINESS := MDR.SourceTools.src_CalBus;
+EXPORT SOURCE_YELLOW_PAGES := MDR.SourceTools.src_Yellow_Pages;
+EXPORT SOURCE_EBR := MDR.SourceTools.src_EBR;
 
+EXPORT INDUSTRY_CASH_INTENSIVE_BUSINESS := 'CIB';
+EXPORT INDUSTRY_MONEY_SERVICE_BUSINESS := 'MSB';
+EXPORT INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS := 'NBFI';
+EXPORT INDUSTRY_CASINO_AND_GAMING := 'CAG';
+EXPORT INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL := 'LEGAL';
+EXPORT INDUSTRY_AUTOMOTIVE := 'AUTO';
+EXPORT INDUSTRY_OTHER := 'OTHER';
+
+EXPORT RISK_LEVEL_HIGH := 'HIGH';
+EXPORT RISK_LEVEL_MEDIUM := 'MEDIUM';
+EXPORT RISK_LEVEL_LOW := 'LOW';
+EXPORT RISK_LEVEL_UNKNOWN := 'UNKNOWN';
+
+
+EXPORT NAICS_RISK_HIGH	:=  ['42','44','45','48','49'];
+EXPORT NAICS_RISK_MED	 	:=  ['23','31','32','33','52','53','54','56','71','72','81','92'];
+EXPORT NAICS_RISK_LOW 	:=  ['11','21','22','51','55','61','62'];
+
+EXPORT NAICS_RISK_HIGH_EXCEP := ['522190', '522220', '522291', '522293' , '522298', '522320', '522390', '523110', '523120', '523130', 
+																	'523140', '523210', '523910', '523920', '523991', '523999', '525910', '525990', '531210', '541110', 
+																	'541211', '541219', '561422', '561499', '561510', '561599', '561990', '611512', '713210', '721120', 
+																	'722310', '722320', '722511', '722513', '722514', '722515', '811192', '812930', '812990', '813211', 
+																	'813212', '813312', '813319', '813930', '813940'];
+
+//Cash Intensive Businesses
+EXPORT CIB_NAICS  := ['813219', '812990', '812930', '812310', '812113', 
+											'812112', '811192', '722212', '722211', '722110', 
+											'713990', '713120', '485310', '454210', '453998', 
+											'453310', '453220', '453210', '453110', '452998', 
+											'452112', '452111', '451220', '451211', '451140', 
+											'451130', '451120', '451110', '448210', '448190', 
+											'448150', '448120', '447110', '446110', '445310', 
+											'445120', '444220', '444210', '444120', '444110', 
+											'443120', '443112', '443111', '442299', '442210', 
+											'442110', '424940', '423930']; 
+
+//Money Services Businesses											
+EXPORT  MSB_NAICS  := ['523130', '522390', '522320', '522291'];
+
+//Non-Bank Finaancial Institutions
+EXPORT  NBFI_NAICS := ['522298', '522291', '448310', '423940']; 	       
+
+//Casinos & Gaming
+EXPORT CASGAM_NAISC := ['721120', '713290', '713210'];   
+
+//Legal, Accountant, Telemarketer, Flight Training or Travel Agency
+EXPORT LEGTRAV_NAISC := ['611512', '561990', '561510', '561422', '541211', 
+												 '541110'];   
+
+//Automotive
+EXPORT AUTO_NAISC := ['811224', '811121', '811118', '811113', '811111', 
+											'441310', '441229', '441228', '441222', '441210', 
+											'441120', '441110'];	          
+
+
+
+EXPORT SIC_LENGTH_2_RISK_HIGH	:= ['58'];
+
+EXPORT SIC_LENGTH_4_RISK_HIGH	:= ['3111', '3151', '3199', '3911', '4724', 
+																	'4725', '4729', '4789', '5094', '5411', 
+																	'5499', '5500', '5511', '5521', '5551', 
+																	'5561', '5571', '5599', '6081', '6082', 
+																	'6211', '6722', '6799', '8111', '8721'];
+EXPORT SIC_LENGTH_4_2STAR_RISK_HIGH := ['58']; //length of SIC is 4 but must match on first 2 char																	
+
+EXPORT SIC_LENGTH_6_RISK_HIGH	:= ['315100', '315199', '608100', '608199', '608200', 
+																	'608299', '609901', '738914', '799913'];
+EXPORT SIC_LENGTH_6_2STAR_RISK_HIGH := ['3111', '3199', '3911', '4724', '4725', 
+																				'4729', '4789', '5094', '5411', '5499', 
+																				'5511', '5521', '5521', '5551', '5561', 
+																				'5571', '5599', '6211', '6722', '6799', 
+																				'8111', '8721']; //length of SIC is 6 but must mat on first 4 char	
+EXPORT SIC_LENGTH_6_4STAR_RISK_HIGH := ['58']; //length of SIC is 6 but must mat on first 2 char	
+
+EXPORT SIC_LENGTH_8_RISK_HIGH	:= ['31510000', '47310101', '47310102', '47310102', '59329904', 
+																	'60810000', '60819901', '60820000', '60990100', '60990101', 
+																	'60990102', '60990103', '60999901', '60999902', '60999903', 
+																	'60999906', '60999908', '60999908', '70110301', '73891005', 
+																	'73891400', '73891402', '79930401', '79930402', '79930403', 
+																	'79990803', '79990804', '79991301', '79991302', '79991303', 
+																	'79991304', '79991305', '79991306'];
+EXPORT SIC_LENGTH_8_2STAR_RISK_HIGH := ['315199']; //length of SIC is 8 but must mat on first 6 char																		
+EXPORT SIC_LENGTH_8_4STAR_RISK_HIGH := ['3111', '3199', '3911', '4724', '4725', 
+																				'4729', '4789', '5094', '5411', '5499', 
+																				'5511', '5551', '5561', '5571', '5599', 
+																				'6211', '6722', '6799', '8111', '8721']; //length of SIC is 8 but must mat on first 4 char																		
+EXPORT SIC_LENGTH_8_6STAR_RISK_HIGH := ['58']; //length of SIC is 8 but must mat on first 2 char																		
+
+//Cash Intensive Businesses
+EXPORT CIB_SIC	  := ['8399', '7993', '7699', '7542', '7521', 
+											'7299', '7231', '7215', '5999', '5992', 
+											'5962', '5949', '5947', '5945', '5943', 
+											'5942', '5941', '5932', '5912', '5736', 
+											'5719', '5714', '5713', '5712', '5699', 
+											'5661', '5632', '5621', '5611', '5541', 
+											'5411', '5311', '5292', '5261', '5231', 
+											'5211', '5199', '5194', '5193', '5192', 
+											'5191', '5182', '5181', '5162', '5159', 
+											'5153', '5139', '5137', '5136', '5131', 
+											'5122', '5113', '5112', '5111', '5099', 
+											'5093', '5092', '5091', '5085', '5083', 
+											'5049', '5044', '5031', '5023', '5021', 
+											'4121']; 
+											
+//Money Services Businesses											
+EXPORT  MSB_SIC  	:= ['7389', '6799', '6221', '6162', '6153', 
+											'6141', '6099'];		
+											
+//Non-Bank Finaancial Institutions
+EXPORT  NBFI_SIC 	:= ['7631', '6159', '6153', '6141', '6111', 
+											'6082', '6081', '6019', '5944', '5932', 
+											'5094']; 	
+
+//Casinos & Gaming
+EXPORT CASGAM_SIC := ['7999', '7993', '7011'];  
+
+//Legal, Accountant, Telemarketer, Flight Training or Travel Agency
+EXPORT LEGTRAV_SIC 	:= ['8721', '8299', '8249', '8111', '7389', 
+												'7299', '4724'];
+
+//Automotive
+EXPORT AUTO_SIC := ['7539', '7538', '7537', '7532', '5731', 
+										'5599', '5571', '5561', '5551', '5531', 
+										'5521', '5511', '5015', '5013'];	          											
+											
+											
+ // Vehicle key orig_name_type values
+ export string1 VEH_OWNER		 		:= '1';
+ export string1 VEH_LESSOR			:= '2';
+ export string1 VEH_REGISTRANT 	:= '4';
+ export string1 VEH_LESSEE			:= '5';
+ export string1 VEH_LIENHOLDER  := '7';
+	 
+	 
+											
+											
+											
+											
+											
 
 
 
@@ -860,11 +971,7 @@ EXPORT CountyBordersOceanForgJur		:= [ '02180','12087','12086'];
 
 
 
-EXPORT naics_highRisk_excep := ['522190', '522220', '522291', '522293' , '522298', '522320', '522390', '523110', '523120', '523130', '523140',
-																'523210', '523910', '523920', '523991', '523999', '525910', '525990', '531210', '541110', '541211', '541219', 
-																'561422', '561499', '561510', '561599', '561990', '611512', '713210', '721120', '722310', '722320', '722511', 
-																'722513', '722514', '722515', '811192', '812930', '812990', '813211', '813212', '813312', '813319', '813930',
-																'813940'];
+
 
 //todo   remove spaces
 EXPORT  CityBorderStation  := ['POKER CREEK,AK', 'ALCAN HIGHWAY,AK', 'DALTON CACHE,AK',

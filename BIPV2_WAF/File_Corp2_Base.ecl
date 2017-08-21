@@ -1,8 +1,8 @@
 import Corp2, mdr;
 #option('skipFileFormatCrcCheck', 1);
 
-Corp_base := corp2.files().AID.corp.qa(trim(corp_legal_name) <> '' and trim(corp_key) <> '' and ultid <> 0);
-Cont_base := corp2.files().base.cont.qa(trim(corp_key) <> '');
+Corp_base := corp2.files().AID.corp.prod(trim(corp_legal_name) <> '' and trim(corp_key) <> '' and ultid <> 0);
+Cont_base := corp2.files().base.cont.prod(trim(corp_key) <> '');
 
 
 slim_Cont_layout := record

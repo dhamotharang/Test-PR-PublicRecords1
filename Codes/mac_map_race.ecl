@@ -1,4 +1,4 @@
-﻿export mac_map_race(infile,infield,outfield,outfile) := macro
+export mac_map_race(infile,infield,outfield,outfile) := macro
 	
 	#uniquename(into)
 	typeof(infile) %into%(infile L) := transform

@@ -1,0 +1,1 @@
+EXPORT Layout_Profile_VehicleV2_Infutor_VIN := recordof(In_VehicleV2_Infutor_VIN);

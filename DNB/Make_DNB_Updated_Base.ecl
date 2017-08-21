@@ -1,10 +1,10 @@
 import ut, did_add, header_slimsort, didville;
 
-#workunit('name', 'D&B Companies/Contacts Update ' + DNB.version);
+//#workunit('name', 'D&B Companies/Contacts Update ' + DNB.version);
 
 // Output updated Companies base file
 //output(DNB.DNB_Updated_Companies,,'BASE::DNB_Companies_' + DNB.version, overwrite);
-ut.MAC_SF_BuildProcess(dnb.dnb_updated_companies,'~thor_data400::base::dnb_companies',do1,2);
+ut.MAC_SF_BuildProcess(dnb.dnb_updated_companies,'~thor_data400::base::dnb_companies',do1,2,pCompress := true);
 
 // Output updated Contacts base file
 dnb_contacts := DNB.DNB_Updated_Contacts;
@@ -23,6 +23,6 @@ did_add.MAC_Match_Flex(dnb_contacts, dnb_matchset,						//see above
 count(dnb_contacts_did(did > 0));
 
 //output(dnb_contacts_did,,'BASE::DNB_Contacts_' + DNB.version,overwrite);
-ut.MAC_SF_BuildProcess(dnb_contacts_did,'~thor_data400::base::dnb_contacts',do2,2);
+ut.MAC_SF_BuildProcess(dnb_contacts_did,'~thor_data400::base::dnb_contacts',do2,2,pCompress := true);
 
-sequential(do1,do2);
+export Make_DNB_Updated_Base := sequential(do1,do2);

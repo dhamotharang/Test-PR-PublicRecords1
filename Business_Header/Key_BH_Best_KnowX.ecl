@@ -1,6 +1,13 @@
-import business_header_ss,ut, lib_fileservices, header_services,codes;
+import business_header_ss,ut, lib_fileservices, header_services,codes,mdr,data_services, PRTE2_Business_Header;
 
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+bh_base := PRTE2_Business_Header.Files().Base.Business_Headers.built;
+f_best  := PRTE2_Business_Header.BestAll(bh_base, 'EB_AE_DNB_For_Knowx',, TRUE);  //Set param to true to retrieve best non D&B);
+#ELSE
 bh_base := Business_Header.filters.bases.business_header_best(Files().Base.Business_Headers.built);
+f_best  := Business_Header.BestAll(bh_base, 'EB_AE_DNB_For_Knowx',, TRUE);  //Set param to true to retrieve best non D&B);
+#END;
+
 codesV3 := codes.Key_Codes_V3;
 
 required_src_set := set(codesV3(file_name = 'BUSINESS-HEADER'
@@ -11,31 +18,32 @@ required_src_set := set(codesV3(file_name = 'BUSINESS-HEADER'
 										,code);
 
 
-bh_layout := business_header.Layout_Business_Header_Base;
+bh_best_layout := Business_Header.Layout_BH_Best;
 
-bh_layout  filterDNBAddressPhone(bh_layout l) := 
+
+bh_best_layout  filterDNBAddressPhone(bh_best_layout l) := 
 transform
-	self.prim_range		:= if(l.source = 'D'	,''	,l.prim_range	);
-	self.predir			:= if(l.source = 'D'	,''	,l.predir		);
-	self.prim_name		:= if(l.source = 'D'	,''	,l.prim_name	);
-	self.addr_suffix	:= if(l.source = 'D'	,''	,l.addr_suffix	);
-	self.postdir		:= if(l.source = 'D'	,''	,l.postdir		);
-	self.unit_desig		:= if(l.source = 'D'	,''	,l.unit_desig	);
-	self.sec_range		:= if(l.source = 'D'	,''	,l.sec_range	);
-	self.zip			:= if(l.source = 'D'	,0	,l.zip			);
-	self.zip4			:= if(l.source = 'D'	,0	,l.zip4			);
-	self.county			:= if(l.source = 'D'	,''	,l.county		);
-	self.msa			:= if(l.source = 'D'	,''	,l.msa			);
-	self.geo_lat		:= if(l.source = 'D'	,''	,l.geo_lat		);
-	self.geo_long		:= if(l.source = 'D'	,''	,l.geo_long		);
-	self.phone			:= if(l.source = 'D'	,0	,l.phone		);
-	self.phone_score	:= if(l.source = 'D'	,0	,l.phone_score	);
+	self.prim_range		:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.addr_source)	,''	,l.prim_range	);
+	self.predir				:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.addr_source)	,''	,l.predir			);
+	self.prim_name		:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.addr_source)	,''	,l.prim_name	);
+	self.addr_suffix	:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.addr_source)	,''	,l.addr_suffix);
+	self.postdir			:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.addr_source)	,''	,l.postdir		);
+	self.unit_desig		:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.addr_source)	,''	,l.unit_desig	);
+	self.sec_range		:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.addr_source)	,''	,l.sec_range	);
+	self.zip					:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.addr_source)	,0	,l.zip				);
+	self.zip4					:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.addr_source)	,0	,l.zip4				);
+	//self.county				:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.county			);
+	//self.msa					:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.msa				);
+	//self.geo_lat			:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.geo_lat		);
+	//self.geo_long			:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,''	,l.geo_long		);
+	self.phone				:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.phone_source)	,0	,l.phone			);
+	//self.phone_score	:= if(MDR.sourceTools.SourceIsDunn_Bradstreet(l.source)	,0	,l.phone_score);
 	self 				:= l;                     
 end;
 
-bh_base_filtered := project(bh_base(source in required_src_set), filterDNBAddressPhone(left));
+bh_base_filtered := project(f_best(source in required_src_set), filterDNBAddressPhone(left));
 
-f_best := Business_Header.BestAll(bh_base_filtered, 'EB_AE_DNB');
+
 // need to match back to BH to see if the dnb records with address information have another source
 
 Business_Header.Layout_BH_Best tblanksource(Business_Header.Layout_BH_Best l) :=
@@ -83,7 +91,8 @@ business_header.Layout_BH_Best reformat_header(Base_File_Append_In L) := //REMOV
 	self.phone := (unsigned6) L.phone;
 	self.fein := (unsigned4) L.fein;
 	self.best_flags := (unsigned3) L.best_flags;
-    self := L;
+	self := L;
+	self := [];
 
  end;
  
@@ -92,20 +101,31 @@ Base_File_Append := project(Base_File_Append_In, reformat_header(left)); //REMOV
 
 /////////////////////////////////////////////////////
 
-in_hdr := project(f_best, tblanksource(left));
+in_hdr := project(bh_base_filtered, tblanksource(left));
+
+mainDataSet := in_hdr + Base_File_Append;
+
+f_bbs := join(	mainDataSet, 
+								Base_File_Append,
+								left.bdid = right.bdid,
+								left only,
+								lookup);
 
 
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+rDataSet := f_bbs;
+#ELSE
+rDataSet := f_bbs + Base_File_Append;
+#END;
+
+/////////////////////////////////////////////////////
 // Start of code to suppress data based on an MD5 Hash of DID+Address
 Suppression_Layout := header_services.Supplemental_Data.layout_in;
 
 header_services.Supplemental_Data.mac_verify('didaddressbusiness_sup.txt',Suppression_Layout,supp_ds_func);
-header_services.Supplemental_Data.mac_verify('businessbest_sup.txt',Suppression_Layout,supp_ds_func1);
- 
 Suppression_In := supp_ds_func();
-supp_in1 := supp_ds_func1();
 
 dSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
-dSupp1 := project(supp_in1, header_services.Supplemental_Data.in_to_out(left));
 
 rHashDIDAddress := header_services.Supplemental_Data.layout_out;
 
@@ -122,25 +142,23 @@ rFullOut_HashDIDAddress tHashDIDAddress(business_header.Layout_BH_Best l) := tra
  self := l;
 end;
 
-dHeader_withMD5 := project(in_hdr, tHashDIDAddress(left));
+dHeader_withMD5 := project(rDataSet, tHashDIDAddress(left));
 
 business_header.Layout_BH_Best tSuppress(dHeader_withMD5 l) := transform
  self := l;
 end;
 
-supp_1 := join(dHeader_withMD5, dSupp1, left.hval1 = right.hval, left only, lookup);
-
-full_out_suppress := join(supp_1,dSuppressedIn,
+full_out_suppress := join(dHeader_withMD5,dSuppressedIn,
                           left.hval = right.hval,
             						  tSuppress(left),
 						              left only,lookup);
 
 /////////////////////////////////////////////////////////////////////////
 
-shared f_best_blanksource_unique := full_out_suppress + Base_File_Append;
+f_best_blanksource_unique := full_out_suppress;
 
 EXPORT Key_BH_Best_KnowX := INDEX(
 	f_best_blanksource_unique, 
 	{bdid},
-	{f_best_blanksource_unique},
+	{f_best_blanksource_unique}-business_header.layout_BH_exclusions,
 	ut.foreign_prod+'thor_data400::key::business_header.Best_Knowx_' + business_header_ss.key_version );

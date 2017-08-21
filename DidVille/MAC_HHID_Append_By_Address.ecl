@@ -10,11 +10,13 @@ EXPORT MAC_HHID_Append_By_Address
 	 state_field,
 	 zip_field
 ):= MACRO
-
+import ut, header_slimsort;
 #uniquename(layout_inf_seq)
 #uniquename(seq)
+#uniquename(match_found)
 %layout_inf_seq% := RECORD
 	UNSIGNED8 %seq%;
+	integer   %match_found%:=0;
 	infile;
 END;
 
@@ -31,8 +33,10 @@ ut.MAC_Sequence_Records_NewRec(infile, %layout_inf_seq%, %seq%, %inf_seq%)
 	
 #uniquename(join_ss)
 %layout_inf_seq% %join_ss%(%hhid_ss_dist% l, %inf_seq_dist% r) := TRANSFORM
-	SELF.hhid_field := l.hhid_relat;
-	SELF := r;
+	SELF.hhid_field    := l.hhid_relat;
+	//used to keep lowest non-zero value in the dedup below
+	self.%match_found% := if(self.hhid_field>0,1,0);
+	SELF               := r;
 END;
 
 #uniquename(j1)
@@ -56,7 +60,7 @@ END;
 	%join_ss%(LEFT, RIGHT), RIGHT OUTER, LOCAL);
 	
 #uniquename(j_ded)
-%j_ded% := DEDUP(%j1%, %seq%, ALL);
+%j_ded% := DEDUP(sort(%j1%,%seq%,-%match_found%,hhid_field), %seq%, ALL);
 
 ut.MAC_Slim_Back(%j_ded%, TYPEOF(infile), outfile)
 

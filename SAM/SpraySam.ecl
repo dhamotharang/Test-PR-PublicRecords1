@@ -2,17 +2,17 @@
 import _control, std;
 
 basename := 'SAM_Exclusions_Public_Extract_';		//12299.CSV';
-srcdir := '/hds_3/sam/';
+srcdir := '/data/hds_3/sam/control/';
 
 dest := '~thor::in::epls::sam::';
 superfile := '~thor::in::epls::sam';
 						
 SpraySamFile(string version) := 
 
-		FileServices.SprayVariable(_control.IPAddress.edata12,
+		FileServices.SprayVariable(_control.IPAddress.bctlpedata10,
 							srcdir + basename + version + '.CSV',
-							12000,',','"\n','"',
-							'thor400_30',		//_control.TargetGroup.ADL_400,
+							12000000,',','"\n','"',
+							'thor400_60',		//_control.TargetGroup.ADL_400,
 							dest + version,
 							,,,true,true,false
 						);

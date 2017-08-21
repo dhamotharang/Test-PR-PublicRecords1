@@ -26,13 +26,13 @@ export Convert_TaxPro_Func (DATASET(Layout_TaxPro_keyed )ds) := FUNCTION
 		{1,0,l.firstnm + ' ' + l.midinit + ' ' + l.lastnm},
 		{2,0,l.enroll_year},
 		{3,0,l.addr1 + ' ' + l.addr2 + ' ' + l.addr3 + ' ' + l.city + ' ' + l.state +
-				' ' /*+ l.province + ' '*/ + l.country + ' ' + l.zip},
-		{4,0,l.city},
-		{5,0,l.state},
-		{6,0,l.zip},
+				' ' /*+ l.province + ' '*/ + l.country + ' ' + l.zip}
+		//{4,0,l.city},
+		//{5,0,l.state},
+		//{6,0,l.zip},
 		
 		//{7,0,l.province},
-		{8,0,l.country}
+		//{8,0,l.country}
 		
 
 		], Text_Search.Layout_Segment);

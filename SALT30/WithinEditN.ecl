@@ -3,7 +3,7 @@
 	Otherwise use provided distance 'd'
 */
 IMPORT ut;
-EXPORT BOOLEAN WithinEditN(StrType l, StrType r, UNSIGNED1 d, UNSIGNED1 edit_threshold=0, BOOLEAN edFunction(STRING l,STRING r,UNSIGNED1 d) = ut.WithinEditN) := FUNCTION
+EXPORT BOOLEAN WithinEditN(StrType l, StrType r, UNSIGNED1 d, UNSIGNED1 edit_threshold=0) := FUNCTION
 	distance := MAP(edit_threshold=0 =>d,
 									edit_threshold>MIN(LENGTH(TRIM(l)),LENGTH(TRIM(r))) => 1,
 									2);
@@ -12,7 +12,7 @@ EXPORT BOOLEAN WithinEditN(StrType l, StrType r, UNSIGNED1 d, UNSIGNED1 edit_thr
 #elseif (UnicodeCfg.UseUnicode AND NOT UnicodeCfg.UseLocale)		
 	res := saltlib.UnicodeWithinEditN(l, r, distance);
 #else
-	res := edFunction(l, r, distance);
+	res := ut.WithinEditN(l, r, distance);
 #end
 	RETURN res;
 END;

@@ -7,7 +7,7 @@ export Mac_Duplicate_Count(infile,infield,outp) := macro
 %ttable% := distribute(table(infile,%proj%),hash(infield));
 #uniquename(count_record)
 %count_record% := record
-  integer2 cnt := count(group);
+  integer4 cnt := count(group);
   end;
 
 #uniquename(counts)
@@ -15,12 +15,12 @@ export Mac_Duplicate_Count(infile,infield,outp) := macro
 
 #uniquename(count_totals)
 %count_totals% := record
-  integer2 number_dups := %counts%.cnt;
+  integer4 number_dups := %counts%.cnt;
   integer4 occurrences := count(group);
   end;
 #uniquename(ccounts)
 %ccounts% := table(%counts%,%count_totals%,%counts%.cnt,few);
 
-outp := output(choosen(%ccounts%,1000), NAMED('Duplicate_Count'))
+outp := output(choosen(sort(%ccounts%,number_dups),all), NAMED('Duplicate_Count'))
 
   endmacro;

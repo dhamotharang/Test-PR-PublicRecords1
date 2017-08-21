@@ -301,11 +301,17 @@ module
     allhackedecl := h01 + h02 + h03 + h04 + h05 + Match;
     
 //////////////    
-    HackBasicMatch := if(hackBasicMatchCondition 
+    HackBasicMatch0 := if(hackBasicMatchCondition 
                         ,regexreplace('h01[[:space:]]*:=.*?Match[[:space:]]*:=[[:space:]]*JOIN[(]h02,',EclCode,allhackedecl,nocase)
                         ,EclCode
                      );
-    HackBasicMatch_message := if(hackBasicMatchCondition ,'','Did not Hack ' + pAttribute + ' to fix dedup skew\n');
+
+		forceFilters := 'cnp_name NOT IN SET(s.nulls_cnp_name,cnp_name), prim_name_derived NOT IN SET(s.nulls_prim_name_derived, prim_name_derived) OR v_city_name NOT IN SET(s.nulls_v_city_name, v_city_name) OR st NOT IN SET(s.nulls_st,st) OR zip NOT IN SET(s.nulls_zip,zip) OR active_duns_number NOT IN SET(s.nulls_active_duns_number,active_duns_number) OR active_enterprise_number NOT IN SET(s.nulls_active_enterprise_number,active_enterprise_number) OR active_domestic_corp_key NOT IN SET(s.nulls_active_domestic_corp_key,active_domestic_corp_key) OR hist_enterprise_number NOT IN SET(s.nulls_hist_enterprise_number,hist_enterprise_number) OR hist_duns_number NOT IN SET(s.nulls_hist_duns_number,hist_duns_number) OR hist_domestic_corp_key NOT IN SET(s.nulls_hist_domestic_corp_key,hist_domestic_corp_key) OR foreign_corp_key NOT IN SET(s.nulls_foreign_corp_key,foreign_corp_key) OR unk_corp_key NOT IN SET(s.nulls_unk_corp_key,unk_corp_key) OR ebr_file_number NOT IN SET(s.nulls_ebr_file_number,ebr_file_number) OR company_fein NOT IN SET(s.nulls_company_fein,company_fein) OR company_phone NOT IN SET(s.nulls_company_phone,company_phone),';
+		HackBasicMatch := if(hackBasicMatchCondition 
+                        ,regexreplace('(SHARED[[:space:]]+h00_match[[:space:]]*:=[[:space:]]*h00[(])',HackBasicMatch0,'$1' + forcefilters,nocase)
+                        ,HackBasicMatch0
+                     );
+    HackBasicMatch_message := if(hackBasicMatchCondition ,'','Did not Hack ' + pAttribute + ' to fix dedup skew and enforce FORCE\n');
 
 
     saveatt := fPutAttribute(pAttribute,HackBasicMatch);
@@ -616,7 +622,7 @@ module
     Hackkeycall_message := if(hackkeycallCondition ,HackProc_Iterate_message,HackProc_Iterate_message + ' ,Did not Hack ' + pAttribute + ' to add keyversion parameter to keys call.\n');
 
 //////
-    hackOutputChangesEcl := ',OutputChanges';
+    hackOutputChangesEcl := 'changes_it\'[+]iter;';
     
     hackOutputChangesCondition := pAttribute = 'Proc_Iterate' and regexfind(hackOutputChangesEcl,Hackkeycall,nocase);
     
@@ -624,11 +630,11 @@ module
                         ,regexreplace(
                           hackOutputChangesEcl
                         ,Hackkeycall,
-                          '/*,OutputChanges*/ /* HACK don\'t output Changes*/'
+                          'changes_it\'+keyversion;/* HACK use keyversion for changes file*/'
                         ,nocase) 
                         ,Hackkeycall
                      );
-    hackOutputChanges_message := if(hackOutputChangesCondition ,Hackkeycall_message,Hackkeycall_message + ' ,Did not Hack ' + pAttribute + ' to not output changes.\n');
+    hackOutputChanges_message := if(hackOutputChangesCondition ,Hackkeycall_message,Hackkeycall_message + ' ,Did not Hack ' + pAttribute + ' to change to keyversion for changes file.\n');
 
     saveatt := fPutAttribute(pAttribute,hackOutputChanges);
     

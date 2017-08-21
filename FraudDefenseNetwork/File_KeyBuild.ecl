@@ -1,9 +1,9 @@
+IMPORT ut, Std, FraudShared;
+
 EXPORT File_KeyBuild (
-dataset(Layouts.Base.Main)										pBaseMainBuilt									= Files().Base.Main.Built ) 
+dataset(FraudShared.Layouts.Base.Main)										pBaseMainBuilt									= FraudShared.Files().Base.Main.Built ) 
 := 
 Function 
-import ut, Std; 
-
 
   BaseMain              := pBaseMainBuilt(Record_id != 0); 	
 
@@ -14,11 +14,12 @@ import ut, Std;
 																			 (source= 'SUSPECTIPADDRESS'   and Reported_Date between  ut.getDateOffset(-Mod_MbsContext.SuspectIPExpdays) and (STRING8)Std.Date.Today()) or
 																			 (source= 'TEXTMINEDCRIM'   and Event_Date between  ut.getDateOffset(-Mod_MbsContext.TextMinedCrimExpdays) and (STRING8)Std.Date.Today()) or
 																			 (if(Mod_MbsContext.OIGIndividualExpdays =9999, source= 'OIG_INDIVIDUAL',   (source= 'OIG_INDIVIDUAL' and Event_Date between  ut.getDateOffset(-Mod_MbsContext.OIGIndividualExpdays) and (STRING8)Std.Date.Today()))) or
-																			 (if(Mod_MbsContext.OIGBusinessExpdays =9999, source= 'OIG_BUSINESS',   (source= 'OIG_BUSINESS' and Event_Date between  ut.getDateOffset(-Mod_MbsContext.OIGBusinessExpdays) and (STRING8)Std.Date.Today()))) 
-																			);
+																			 (if(Mod_MbsContext.OIGBusinessExpdays =9999, source= 'OIG_BUSINESS',   (source= 'OIG_BUSINESS' and Event_Date between  ut.getDateOffset(-Mod_MbsContext.OIGBusinessExpdays) and (STRING8)Std.Date.Today()))) or
+																			 (source= 'ERIE' and (did>0 or seleid>0 or orgid>0 or ultid>0) and classification_Entity.Entity_sub_type ='' and (Event_Date between  ut.getDateOffset(-Mod_MbsContext.ErieExpdays) and (STRING8)Std.Date.Today())) 
+																		);
 
 
-	DpatchGLB5did   := project ( Outfile , transform (Layouts.KeyBuild, 
+	DpatchGLB5did   := project ( Outfile , transform (FraudShared.Layouts.KeyBuild, 
 	                            self.did  := if(left.source = 'GLB5' and left.did =0, left.Rawlinkid , left.did ); 
                               self      := left ; 
 															)); 

@@ -2,15 +2,18 @@ import FBNV2 ;
 
 export Get_Update_SupperFilename(string updatetype)  := 
 
-map(updatetype='San_diego'=>Filenames().San_diegoupdate,
-	updatetype='Ventura'=>Filenames().Venturaupdate,
-	updatetype='Orange'=>Filenames().orangeupdate,
+
+	map(updatetype='San_Diego'=>Filenames().San_diego_newupdate,
+	updatetype='Ventura'=>Filenames().Ventura_newupdate,
+	updatetype='Orange'=>Filenames().orange_newupdate,
 	updatetype='San_Bernardino'=>Filenames().San_Bernardinoupdate,
-	updatetype='Santa_Clara'=>Filenames().Santa_Claraupdate,
+	updatetype='Santa_Clara'=>Filenames().Santa_Clara_newupdate,
 	updatetype='Dallas'=>Filenames().Dallasupdate,
-	updatetype='Harris'=>Filenames().Harrisupdate,
-	updatetype='Filing'=>Filenames().Filingupdate,
-	updatetype='Event'=>Filenames().Eventupdate,
+	updatetype='Harris'=>Filenames().Harris_newupdate,
+	updatetype='Filing'=>Filenames().Filing_newupdate,
+	updatetype='Event'=>Filenames().Event_newupdate,
 	updatetype='NYC'=>Filenames().NYCupdate,
 	updatetype='InfoUSA'=>Filenames().infoUSAupdate,						
 	'');
+	
+	

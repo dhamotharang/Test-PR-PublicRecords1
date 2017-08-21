@@ -9,7 +9,7 @@ plain_bad := sfirst and slast;// or ( sfirst or slast ) and f.ssn_cnt * 20 < f.c
 
 // check for city - bad lname
 
-j1 := join( f(slast,~plain_bad,cnt>10,cnt>ssn_cnt*20),fsm.Cities(cnt>10000),left.fname=right.city_name,transform(left),lookup );
+j1 := join( f(slast,~plain_bad,cnt>10,dob_cnt=0,ssn_cnt=0),fsm.Cities(cnt>10000),left.fname=right.city_name,transform(left),lookup );
 
 
 j := f( plain_bad );

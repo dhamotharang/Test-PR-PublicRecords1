@@ -33,7 +33,7 @@ function
 	RoxieKeyBuild.Mac_SK_Move_V2(SuperKeyName	+	'address','Q',mv_qa1,2);
 	RoxieKeyBuild.Mac_SK_Move_V2(SuperKeyName	+	'rid','Q',mv_qa2,2);
 	
-	updateDops	:=	RoxieKeyBuild.updateversion('PropertyInformationKeys',pVersion,'terri.hardy-george@lexisnexis.com');
+	updateDops	:=	RoxieKeyBuild.updateversion('PropertyInformationKeys',pVersion,'terri.hardy-george@lexisnexis.com',,'N');
 	
 	return	ordered(	
 											parallel(key1,key2),

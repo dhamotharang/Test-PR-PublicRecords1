@@ -1,16 +1,16 @@
 import lib_fileservices,ut,infutor;
 
-email_list := 'jtrost@seisint.com';
+email_list := 'michael.gould@lexisnexis.com';
 
 export fSprayInputFiles( string pSourceIP
 						,string pSourcefile
 						,string pThorFilename
-						,string pGroupName		= 'thor_dell400_2'
+						,string pGroupName		= 'thor400_44'
 ) := function
 
-output_Source_IP 			 := output(pSourceIP,	  named('Source_IP'));
-output_Source_Filename 		 := output(pSourcefile,  named('Source_Filename'));
-output_Thor_Logical_Filename := output(pThorFilename,named('Thor_Logical_Filename'));
+output_Source_IP 			 := output(pSourceIP,	  named('Source_IP'),overwrite);
+output_Source_Filename 		 := output(pSourcefile,  named('Source_Filename'),overwrite);
+output_Thor_Logical_Filename := output(pThorFilename,named('Thor_Logical_Filename'),overwrite);
 
 output_value_types := sequential(
 	 output_Source_IP

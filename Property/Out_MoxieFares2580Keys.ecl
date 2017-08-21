@@ -14,7 +14,9 @@ MyFields := record
   h.__filepos;
 end;
 
-t := table(h,MyFields);
+h_dist := distribute(h,random());
+
+t := table(h_dist,MyFields);
 
 kFaresID			:= BUILDINDEX(t,{fares_id,(big_endian unsigned8 )__filepos},
 									'key::moxie.fares_2580.fares_id.key', MOXIE, overwrite);
@@ -24,10 +26,10 @@ kParcel				:= BUILDINDEX(t,{unformatted_apn,(big_endian unsigned8 )__filepos},
 unsigned8 moxietransform(unsigned8 filepos, unsigned8 rawsize, unsigned8 headersize) :=
   if (filepos<headersize, rawsize+filepos, filepos);
 
-rawsize := sizeof(property.Layout_Fares_Assessor) * count(h) : global;
+rawsize := sizeof(property.Layout_Fares_Assessor) * count(h_dist) : global;
 headersize := if (sizeof(property.Layout_Fares_Assessor)>215, sizeof(property.Layout_Fares_Assessor), error('too bad')) : global;
 
-dfile := INDEX(h,{f:= moxietransform(__filepos, rawsize, headersize)},{h},'key::moxie.fares_2580.fpos.data.key');
+dfile := INDEX(h_dist,{f:= moxietransform(__filepos, rawsize, headersize)},{h_dist},'key::moxie.fares_2580.fpos.data.key');
 kFPos				:= BUILDINDEX(dfile,moxie,overwrite);
 
 export Out_MoxieFares2580Keys

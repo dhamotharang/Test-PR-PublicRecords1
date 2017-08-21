@@ -1,4 +1,4 @@
-bh := Business_Header.File_Business_Header_Base;
+bh := Business_Header.Layout_Business_Header_Base;
 
 export Layout_BH_Best := RECORD
 	bh.bdid;	         // Seisint Business Identifier
@@ -19,5 +19,8 @@ export Layout_BH_Best := RECORD
 	unsigned4 fein := 0;        // Federal Tax ID
 	unsigned1 best_flags := 0;
 	string2   source := '';	   // source type (non-blank only if DPPA_State is non-blank)
-     string2   DPPA_State := ''; // If nonblank, indicates state code for a DPPA restricted record
+  string2   DPPA_State := ''; // If nonblank, indicates state code for a DPPA restricted record
+	unsigned8	RawAID := 0;    // Added for Address_id	
+	string2 addr_source := '';
+	string2 phone_source := '';
 END;

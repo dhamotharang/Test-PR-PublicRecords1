@@ -1,5 +1,5 @@
-#workunit('name', 'Rollback ' + BIPV2_Seleid_relative._Constants().name + ' Build');
-BIPV2_Seleid_relative.Rollback(
+#workunit('name', 'Rollback ' + BIPV2_Seleid_Relative._Constants().name + ' Build');
+BIPV2_Seleid_Relative.Rollback(
 	 pversion						:=	''			//version of build you are rolling back
 	,pDeleteBuildFiles	:= 	false		//are the build files bad(base and key files) and need to be deleted?
 	,pIsTesting					:= 	true		//if false, will perform rollback and optional deletion.  

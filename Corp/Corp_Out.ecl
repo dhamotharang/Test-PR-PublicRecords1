@@ -9,22 +9,7 @@ self.corp_sos_charter_nbr := MapOutputCharterNumber(l.corp_state_origin,l.corp_s
 self := l;
 end;
 
-corp_out_init := project(Corp.File_Corp_Base, FormatCorpOut(left));
-
-// Propagate Status Information from current record for corp_key to all records
-corp_out_init_dist := distribute(corp_out_init, hash(corp_key));
-corp_out_init_sort := sort(corp_out_init_dist, corp_key, local);
-corp_out_init_grpd := group(corp_out_init_sort, corp_key, local);
-corp_out_init_grpd_sort := sort(corp_out_init_grpd, if(record_type = 'C', 0, 1), -dt_last_seen);
-
-Corp.Layout_Corp_Out PropagateStatus(Corp.Layout_Corp_Out l, Corp.Layout_Corp_Out r) := transform
-self.corp_status_cd := if(l.corp_status_cd = '' and l.corp_status_desc = '' and l.corp_status_date = '', r.corp_status_cd, l.corp_status_cd);
-self.corp_status_desc := if(l.corp_status_cd = '' and l.corp_status_desc = '' and l.corp_status_date = '', r.corp_status_desc, l.corp_status_desc);
-self.corp_status_date := if(l.corp_status_cd = '' and l.corp_status_desc = '' and l.corp_status_date = '', r.corp_status_date, l.corp_status_date);
-self := r;
-END;
-
-corp_out_status := group(iterate(corp_out_init_grpd_sort, PropagateStatus(left, right)));
+corp_out_init := project(fPrepareCorpBaseFile(Corp.File_Corp_Base), FormatCorpOut(left));
 
 // Populate Blank Corporate Address from Registered Agent
 Corp.Layout_Corp_Out Corp_MoveRAtoCorpAddress(Corp.Layout_Corp_Out l) := transform
@@ -61,11 +46,11 @@ self.address_ind := 'R';
 self := l;
 END;
 
-corp_out_ra_addr := project(corp_out_status(corp_addr1_prim_name = '' AND corp_addr1_p_city_name = '' AND
+corp_out_ra_addr := project(corp_out_init(corp_addr1_prim_name = '' AND corp_addr1_p_city_name = '' AND
                                           corp_ra_prim_name <> '' AND corp_ra_p_city_name <> '' AND
                                           corp_ra_name <> ''), Corp_MoveRAtoCorpAddress(left));
 
-corp_out_all := corp_out_status(not(corp_addr1_prim_name = '' AND corp_addr1_p_city_name = '' AND
+corp_out_all := corp_out_init(not(corp_addr1_prim_name = '' AND corp_addr1_p_city_name = '' AND
                                   corp_ra_prim_name <> '' AND corp_ra_p_city_name <> '' AND
 								  corp_ra_name <> '')) +
                 corp_out_ra_addr;

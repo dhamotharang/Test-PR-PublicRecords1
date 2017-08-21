@@ -95,6 +95,7 @@ string legal_lot := '';
 string legal_block := '';
 string legal_borough := '';
 string certificate_number := '';
+BOOLEAN	bCBFlag	:=	FALSE;
 liensv2.layout_clean_name.clean_debtor_name;
 liensv2.Layout_clean_name.clean_creditor_name;
 liensv2.Layout_clean_name.clean_attorney_name;

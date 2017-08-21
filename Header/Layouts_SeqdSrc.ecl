@@ -1,3 +1,6 @@
+/*2016-09-22T21:31:07Z (Wendy Ma)
+
+*/
 import
 			ak_perm_fund
 			,utilfile
@@ -27,7 +30,12 @@ import
 			,TransunionCred
 			,BankruptcyV2
 			,AlloyMedia_student_list
-			;
+			,gong_neustar
+			,Prof_License_Mari
+			,infutorCID
+			,Impulse_Email
+			,CNLD_Practitioner
+			,NCPDP;
 
 EXPORT Layouts_SeqdSrc := module
 
@@ -64,5 +72,12 @@ EXPORT Layouts_SeqdSrc := module
 	EXPORT ND_src_rec:={lsrc, Property.Layout_Fares_Foreclosure};
 	EXPORT EL_src_rec:={lsrc, ExperianIRSG_Build.Layouts.Layout_Out};
 	EXPORT AY_src_rec:={lsrc, AlloyMedia_student_list.layouts.layout_base};
+  EXPORT GN_src_rec:={lsrc, gong_neustar.Layout_History};
+  EXPORT MP_src_rec:={lsrc, Prof_License_Mari.layouts.final};
+	EXPORT IR_src_rec:={lsrc, infutorCID.Layout_InfutorCID_Base};
+	EXPORT IM_src_rec:={lsrc, Impulse_Email.layouts.layout_Impulse_Email_final};
+	EXPORT PT_src_rec:={lsrc, CNLD_Practitioner.layouts.keybuild};
+	EXPORT J2_src_rec:={lsrc, NCPDP.layouts.keybuild};
+
 
 end;

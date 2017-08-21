@@ -1,7 +1,7 @@
 import ut;
 
 input_r3 := dedup(dataset(ut.foreign_r3 + 'thorwatch::base::account_monitoring::prod::inquirytracking::pidmapping', 
-																		 {string pid, string product_id, string company_id, string gc_id, boolean isFcra}, csv(separator('|'))), record, all);
+																		 {string20 pid, string20 product_id, string20 company_id, string20 gc_id, boolean isFcra}, csv(separator('|'))), record, all);
 																		 
 find_dupes := table(input_r3, {pid, product_id, company_id, gc_id, isFCRA, cnt := count(group)}, pid, few);
 

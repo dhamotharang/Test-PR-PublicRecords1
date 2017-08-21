@@ -1,7 +1,16 @@
-import ut;
+import ut,mdr;
+
+EXPORT BH_Relative_Match_NameAddr(
+
+	 dataset(Layout_Business_Header_Temp)	pBH_Basic_Match_ForRels		= BH_Basic_Match_ForRels	()
+	,string																pPersistname							= persistnames().BHRelativeMatchNameAddr													
+	,boolean															pShouldRecalculatePersist	= true													
+
+) :=
+function
 
 // Initialize match file
-BH_File := BH_Basic_Match_ForRels;
+BH_File := pBH_Basic_Match_ForRels;
 
 Layout_BH_Match := record
 unsigned6 bdid;             // Seisint Business Identifier
@@ -41,12 +50,12 @@ ut.MAC_Split_Withdups_Local(NameAddr_Match_Dist, hash(zip, trim(prim_name), trim
 
 boolean CompanyMatchSource(string2 source1, string120 company1,
                            string2 source2, string120 company2) := 
-                            ( NOT(source1 = 'GG' or source2 = 'GG') and
-                              UT.CompanySimilar100(company1,company2) <= 30 and
+                            ( NOT(MDR.sourceTools.SourceIsGong_Government(source1) or MDR.sourceTools.SourceIsGong_Government(source2)) and
+                              UT.CompanySimilar100(company1,company2) <= 23 and
 															ut.StringSimilar100(datalib.companyclean(company1)[41..80], datalib.companyclean(company2)[41..80]) //check secondary words
 															<= 50)
                             or
-                            ( (source1 = 'GG' or source2 = 'GG') and
+                            ( (MDR.sourceTools.SourceIsGong_Government(source1) or MDR.sourceTools.SourceIsGong_Government(source2)) and
                               company1 = company2);
 
 NameAddr_Matches := JOIN(NameAddr_Match_Dist_Reduced,
@@ -76,4 +85,12 @@ NameAddr_Matches_Remainder := join(NameAddr_Match_Remainder_Reduced,
 
 NameAddr_Matches_Dedup := dedup(NameAddr_Matches + NameAddr_Matches_Remainder, bdid1, bdid2, all);
 
-export BH_Relative_Match_NameAddr := NameAddr_Matches_Dedup : persist('TMTEMP::BH_Relative_Match_NameAddr');
+BH_Relative_Match_NameAddr_persisted := NameAddr_Matches_Dedup 
+	: persist(pPersistname);
+
+returndataset := if(pShouldRecalculatePersist = true, BH_Relative_Match_NameAddr_persisted
+																										, persists().BHRelativeMatchNameAddr
+									);
+return returndataset;
+
+end;

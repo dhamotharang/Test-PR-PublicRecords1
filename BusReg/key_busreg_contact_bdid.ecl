@@ -1,7 +1,7 @@
 Import Data_Services, doxie;
 
 slimLayout	:=	record
-	BusReg.Layout_BusReg_Contact - [Prep_addr_line1, prep_addr_line_last, Append_RawAID, Append_ACEAID];
+	BusReg.Layout_BusReg_Contact - [ADCRecordNo, Prep_addr_line1, prep_addr_line_last, Append_RawAID, Append_ACEAID];
 end;
 
 df := PROJECT(busreg.File_BusReg_Contact(bdid != 0),TRANSFORM(slimLayout,SELF := LEFT;));

@@ -1,20 +1,20 @@
-import header, ut,mdr;
+import header, ut,mdr,Std;
 
-export LiensV2_as_header(dataset(LiensV2.layout_liens_party_ssn_bid) lien_in = dataset([],LiensV2.layout_liens_party_ssn_bid), boolean pForHeaderBuild=false, boolean pFastHeader = false)
+export LiensV2_as_header(dataset(LiensV2.layout_liens_party_ssn) lien_in = dataset([],LiensV2.layout_liens_party_ssn), boolean pForHeaderBuild=false, boolean pFastHeader = false)
  :=
 function
 
 party_all_ := if(pForHeaderBuild,
-					  dataset('~thor_data400::base::LiensV2_partyHeader_Building',LiensV2.layout_liens_party_ssn_bid,flat)	
+					  dataset('~thor_data400::base::LiensV2_partyHeader_Building',LiensV2.layout_liens_party_ssn,flat)	
 								((integer)did <= 999999001000 and cname='' and lname!='' and fname!='' and prim_name!=''  and (trim(prim_name)<>'NONE' and trim(v_city_name)<>'NONE')),
 					   lien_in((integer)did <= 999999001000)
 					  );
-party_all := if (pFastHeader, dataset('~thor_data400::base::LiensV2_partyQuickHeader_Building',LiensV2.layout_liens_party_ssn_bid,flat)
+party_all := if (pFastHeader, dataset('~thor_data400::base::LiensV2_partyQuickHeader_Building',LiensV2.layout_liens_party_ssn,flat)
 								((integer)did <= 999999001000 and cname='' and lname!='' and fname!='' and prim_name!=''  and (trim(prim_name)<>'NONE' and trim(v_city_name)<>'NONE')
-									and ut.DaysApart(ut.GetDate, date_vendor_last_reported[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep), 
+									and ut.DaysApart((STRING8)Std.Date.Today(), date_vendor_last_reported[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep), 
 								party_all_);
 					  
-dL2AsSource	:=	LiensV2.LiensV2_as_Source(pFastHeader);
+dL2AsSource	:=	header.Files_SeqdSrc(pFastHeader).LiensV2;
 
 
  party_all_dist := distribute(party_all,hash(tmsid));

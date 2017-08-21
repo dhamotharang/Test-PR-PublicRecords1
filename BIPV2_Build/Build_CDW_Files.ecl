@@ -42,7 +42,7 @@ function
   // b := pull(choosen(BIPV2_Best.Key_LinkIds.KeyFather, ALL));// : persist('~thor_data400::cemtemp.b');
   // h := choosen(BIPV2.CommonBase.DS_FATHER, ALL);// : persist('~thor_data400::cemtemp.h'); //change!!!!
   b := pull(choosen(BIPV2_Best.Key_LinkIds.KeyBuilt, ALL));// : persist('~thor_data400::cemtemp.b');
-  h := choosen(BIPV2.CommonBase.DS_BASE, ALL);// : persist('~thor_data400::cemtemp.h');
+  h := choosen(BIPV2.CommonBase.DS_BUILT, ALL);// : persist('~thor_data400::cemtemp.h');
 
   // output(choosen(b, 200), named('b'));
   // output(choosen(h, 200), named('h'));

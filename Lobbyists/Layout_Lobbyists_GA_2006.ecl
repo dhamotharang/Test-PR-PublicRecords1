@@ -1,0 +1,20 @@
+export Layout_Lobbyists_GA_2006 := record
+	string	filer_id;
+    string	last_name;
+	string	suffix;
+	string	first_name;
+	string	middle_name;
+	string	address1;
+	string	address2;
+	string	city;
+	string	state;
+	string	zip;
+	string	phone;
+	string	phone_ext;
+	string  phone_2;
+	string	association;
+	string	payment_exceeds;
+	string	date_registered;
+	string  date_terminated;
+	string	lobbying_level;
+end;

@@ -1,7 +1,7 @@
-import crim_common, hygenics_crim;
+import corrections, crim_common, hygenics_crim, ut;
 
 //Base Offender File
-ds 	:= dataset(Crim_Common.Name_Moxie_Crim_Offender2_Dev +'_new', hygenics_crim.Layout_Common_Crim_Offender_new, flat)(trim(image_link,left,right) <> '');
+ds 	:= dataset('~thor_data400::base::corrections_offenders_public', corrections.layout_offender, flat)(trim(image_link,left,right) <> '');
 
 	rec := RECORD
 		STRING offender_key;
@@ -10,8 +10,10 @@ ds 	:= dataset(Crim_Common.Name_Moxie_Crim_Offender2_Dev +'_new', hygenics_crim.
 	END;
 	
 	rec slimFile(ds l):= transform
-		self.filename 	:= l.image_link;
+		self.filename 		:= l.image_link;
+		self.state_origin := ut.st2abbrev(stringlib.stringtouppercase(l.orig_state));
 		self 			:= l;
 	end;
 
-export File_IMG_CommonInfo := project(ds, slimFile(left));
+ File_IMG_CommonIn := project(ds, slimFile(left));
+export File_IMG_CommonInfo	:= distribute(File_IMG_CommonIn, hash(filename));

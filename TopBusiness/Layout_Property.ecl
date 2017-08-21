@@ -54,6 +54,8 @@ export Layout_Property := module
 			string25 city_name;
 			string2 state;
 			string5 zip;		
+			string4 zip4;
+			string18 county_name;
 		end;
 		
 		export Linked := record
@@ -132,6 +134,11 @@ export Layout_Property := module
 			string40 documentType;	
 			string8  RecordingDate;
 			string10 auction_date;
+			string60 AttorneyName;
+			string10 AttorneyPhoneNumber;
+			string30 LenderFirstName;
+			string30 LenderLastName;
+			string30 LenderCompanyName;
 		end;
 		
 		export Linked := record

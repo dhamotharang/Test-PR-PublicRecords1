@@ -1,0 +1,1 @@
+export File_AMICountyp := dataset(AMIDIR.Cluster + 'in::AMIDIR::AMICOUNTYP',amidir.Layout_Countyp,flat);

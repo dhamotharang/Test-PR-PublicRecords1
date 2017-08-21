@@ -1,4 +1,4 @@
-import Corp, ut;
+import Corp, ut, NID;
 
 // Create contact base with all records removed which could contain a Corp record
 
@@ -34,15 +34,16 @@ bc_remove_1 := join(distribute(bc(bdid <> 0 and did <> 0), hash(bdid, did)),
 				
 // Filter out any contacts with same company name and person name
 bc_remove_2 := join(distribute(bc_remove_1 + bc(not((bdid <> 0 and did <> 0))),
-                      hash(trim(ut.CleanCompany(company_name)), trim(lname), trim(datalib.PreferredFirst(fname)))),
-				distribute(ccout_slim, hash(trim(ut.CleanCompany(company_name)), trim(lname), trim(datalib.PreferredFirst(fname)))),
+                      hash(trim(ut.CleanCompany(company_name)), trim(lname), trim(NID.PreferredFirstVersionedStr(fname, NID.version)))),
+				distribute(ccout_slim, hash(trim(ut.CleanCompany(company_name)), trim(lname), trim(NID.PreferredFirstVersionedStr(fname, NID.version)))),
 				ut.CleanCompany(left.company_name) = ut.CleanCompany(right.company_name) and
 				  left.lname = right.lname and
-				  Datalib.PreferredFirst(left.fname) = Datalib.PreferredFirst(right.fname) and
+				  NID.PreferredFirstVersionedStr(left.fname, NID.version) = NID.PreferredFirstVersionedStr(right.fname, NID.version) and
 				  left.mname = right.mname and
 				  left.name_suffix = right.name_suffix,
 				RemoveCont(left, right),
 				left only,
 				local);
 				
-export BH_Cont_Fix_Corp_Dates := bc_remove_2 : persist('TEMP::BH_Cont_Fix_Corp_Dates');
+export BH_Cont_Fix_Corp_Dates := bc_remove_2 
+	: persist(persistnames.BHContFixCorpDates);

@@ -44,6 +44,10 @@ shared ResultLine_Layout := record(Field_Identification)
 	unsigned                  Cardinality;
 	SALT29.Str30Type 					MinVal30;
 	SALT29.Str30Type 					MaxVal30;
+	REAL8                     AsNumber_MinVal;
+	REAL8                     AsNumber_MaxVal;
+	REAL8                     AsNumber_Mean;
+	REAL8                     AsNumber_Var;
   dataset(Length_Layout)    Len {MAXCOUNT(MaxChars)} := dataset([],Length_Layout);
 	dataset(Words_Layout)     Words {MAXCOUNT(MaxChars)} := dataset([],Words_Layout);
 	dataset(Character_Layout) Characters {MAXCOUNT(MaxChars)} := dataset([],Character_Layout);
@@ -131,8 +135,13 @@ export FN_Profile(dataset(Data_Layout) TheData,dataset(Field_Identification)TheF
 IRecTot0 := RECORD
   TheData.FldNo;
   UNSIGNED Cnt := COUNT(GROUP);
+	REAL8 AsNumber_MinVal := MIN(GROUP,(REAL8)TheData.Fld);
+	REAL8 AsNumber_MaxVal := MAX(GROUP,(REAL8)TheData.Fld);
+	REAL8 AsNumber_Mean := AVE(GROUP,(REAL8)TheData.Fld);
+	REAL8 AsNumber_Var := VARIANCE(GROUP,(REAL8)TheData.Fld);
 END;
 FldInv0 := TABLE(TheData,IRecTot0,FldNo,FEW);
+TF0 := JOIN(TheFields,FldInv0,LEFT.FldNo=RIGHT.FLdNo);
 IRecTot := RECORD
   TheData.Fld;
   TheData.FldNo;
@@ -154,11 +163,11 @@ card_rec := RECORD
   END;	
 	
 Cardinalities := table(FldInv,card_rec,FldNo,FEW);
-ResultLine_Layout NoteCard(TheFields Le,Cardinalities ri) := transform
+ResultLine_Layout NoteCard(TF0 Le,Cardinalities ri) := transform
     SELF := ri;
 		SELF := le;
   end;
-With_Cards := JOIN(TheFields,Cardinalities,left.FldNo=right.FldNo,NoteCard(LEFT,RIGHT));
+With_Cards := JOIN(TF0,Cardinalities,left.FldNo=right.FldNo,NoteCard(LEFT,RIGHT));
 // Produce highest 'MaxExamples' frequency for each fieldtype
 so := SORT(FldInv,FldNo,-Cnt,LOCAL);
 gci := RECORD

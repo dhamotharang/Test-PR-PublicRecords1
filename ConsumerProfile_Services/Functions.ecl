@@ -1,4 +1,4 @@
-import Risk_Indicators, iesp, ut, Address, RiskWiseFCRA, RiskWise, FCRA, FFD;
+import Risk_Indicators, iesp, ut, Address, RiskWiseFCRA, RiskWise, FCRA, FFD, Models;
 
 EXPORT Functions := MODULE
 		
@@ -138,11 +138,18 @@ EXPORT Functions := MODULE
 	//Get verification code and description based on NAS and NAP scores
 	export calculateNASPDVerification(Risk_Indicators.Layout_Boca_Shell clam) := function
 		//Name and SSN Verification
-		unsigned1 ssn_name_verif_code := map(clam.iid.nas_summary in ConsumerProfile_Services.Constants.SSN_NAME_VERIFICATION.NO_MATCH 				=> 0,
-																				 clam.iid.nas_summary in ConsumerProfile_Services.Constants.SSN_NAME_VERIFICATION.FNAME_SSN_MATCH => 1,
-																				 clam.iid.nas_summary in ConsumerProfile_Services.Constants.SSN_NAME_VERIFICATION.LNAME_SSN_MATCH => 2,
-																				 3); //clam.iid.nap_summary in ConsumerProfile_Services.Constants.SSN_NAME_VERIFICATION.MATCH
-		string ssn_name_verif_desc := ConsumerProfile_Services.Constants.SSN_NAME_VERIFICATION.DESCRIPTION(clam.iid.nas_summary);		
+		attr := Models.Attributes_Master(clam, true); // isFCRA = true since it is being used only by an FCRA service.
+		ssn_name_verif_code_pre := attr.ConfirmationInputSSN;
+    //â€œ-1â€ response to be displayed as a â€œ0â€		
+		ssn_name_verif_code := if(ssn_name_verif_code_pre = '-1','0',ssn_name_verif_code_pre);
+		string ssn_name_verif_desc := map(
+																				//ssn_name_verif_code = '-1'  => '',
+																				ssn_name_verif_code =  '0'  => 'No match as SSN not on file, input SSN is invalid, or SSN not provided as input',
+																				ssn_name_verif_code =  '1'  => 'No match as input SSN linked to a different name and address on file',
+																				ssn_name_verif_code =  '2'  => 'Input SSN matches SSN on file using close-matching miskey logic',
+																				ssn_name_verif_code =  '3'  => 'Input SSN matches SSN on file as an exact match',
+																				''
+																				);
 		
 		//Address Verification
 		unsigned1 addr_verif_code := map(clam.iid.nas_summary in ConsumerProfile_Services.Constants.ADDRESS_VERIFICATION.NO_MATCH => 0, //could also use nap_summary for this one...
@@ -180,15 +187,14 @@ EXPORT Functions := MODULE
 		HRI_ds_codes(string code) := DATASET([{code,risk_indicators.getHRIDesc(code)}],risk_indicators.Layout_Desc);
 		getHRI := RiskWise.Reasons(clam);
 		
-		hri_ds := IF(getHRI.rc02,HRI_ds_codes(ConsumerProfile_Services.Constants.SSN_HRI.DECEASED)) &
-							IF(getHRI.rc03,HRI_ds_codes(ConsumerProfile_Services.Constants.SSN_HRI.ISSUED_PRIOR_DOB)) &
-							IF(getHRI.rc06,HRI_ds_codes(ConsumerProfile_Services.Constants.SSN_HRI.INVALID)) &
-							IF(getHRI.rc25,HRI_ds_codes(ConsumerProfile_Services.Constants.Address_HRI.UNABLE_TO_VERIFY)) &
-							IF(getHRI.rc39,HRI_ds_codes(ConsumerProfile_Services.Constants.SSN_HRI.RECENTLY_ISSUED)) &
-							IF(getHRI.rc79,HRI_ds_codes(ConsumerProfile_Services.Constants.SSN_HRI.MISSING)) &
-							IF(getHRI.rc85,HRI_ds_codes(ConsumerProfile_Services.Constants.SSN_HRI.NON_US)) &
-							IF(getHRI.rc90,HRI_ds_codes(ConsumerProfile_Services.Constants.SSN_HRI.ISSUED_AFTER_5)) &
-							IF(getHRI.rc99,HRI_ds_codes(ConsumerProfile_Services.Constants.Address_HRI.VERIFIED_BUT_NOT_PRIMARY));
+ 		hri_ds 		:= 		IF(getHRI.rc02,HRI_ds_codes(ConsumerProfile_Services.Constants.Reason_Codes.S65)) &
+      							IF(getHRI.rc03,HRI_ds_codes(ConsumerProfile_Services.Constants.Reason_Codes.S65)) &
+      							IF(getHRI.rc06,HRI_ds_codes(ConsumerProfile_Services.Constants.Reason_Codes.S65)) &
+      							IF(getHRI.rc25,HRI_ds_codes(ConsumerProfile_Services.Constants.Reason_Codes.F04)) &
+      							IF(getHRI.rc39,HRI_ds_codes(ConsumerProfile_Services.Constants.Reason_Codes.S65)) &
+      							IF(getHRI.rc79,HRI_ds_codes(ConsumerProfile_Services.Constants.Reason_Codes.F00)) &
+      							IF(getHRI.rc99,HRI_ds_codes(ConsumerProfile_Services.Constants.Reason_Codes.F03));
+
 		return hri_ds;
 	end;
 	

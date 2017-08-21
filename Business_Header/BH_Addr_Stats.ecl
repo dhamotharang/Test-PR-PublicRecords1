@@ -1,7 +1,7 @@
-IMPORT Gong, Header, DNB, IRS5500, Corp, Business_Header_SS, ut;
+IMPORT Gong_Neustar, Header, DNB, IRS5500, Corp2, Business_Header_SS, ut;
 
-bh := Business_Header.File_Business_Header_Base;
-bb := Business_Header.File_Business_Header_Best;
+bh := Business_Header.Files().Base.Business_Headers.built;
+bb := Business_Header.Files().Base.Business_Header_Best.built;
 
 bh_addr_all := DEDUP(
 	SORT(
@@ -25,7 +25,7 @@ bh_addr := TABLE(bh_addr_all, layout_full_stat, zip, prim_name, prim_range, sec_
 
 
 // Get residential phones per addr.
-gng_res := Gong.File_Gong_full(publish_code = 'P', listing_type_res <> '', z5 != '', prim_name != '');
+gng_res := Gong_Neustar.File_Gong_full(publish_code = 'P', listing_type_res <> '', z5 != '', prim_name != '');
 gong_res_dist := DEDUP(
 	SORT(
 	DISTRIBUTE(gng_res, HASH(z5, prim_name, prim_range)),
@@ -44,7 +44,7 @@ gong_r_phone_per_addr := TABLE(gong_res_dist, layout_res_phones_per_addr,
 		z5, prim_name, prim_range, sec_range, LOCAL);
 
 // Get business/gov phones per addr.
-gng_bus := Gong.File_Gong_full(publish_code IN ['P','U'], listing_type_bus <> '', z5 != '', prim_name != '');
+gng_bus := Gong_Neustar.File_Gong_full(publish_code IN ['P','U'], listing_type_bus <> '', z5 != '', prim_name != '');
 gong_bus_dist := DEDUP(
 	SORT(
 	DISTRIBUTE(gng_bus, HASH(z5, prim_name, prim_range)),
@@ -240,7 +240,7 @@ bs_dnb_irs5500 := JOIN(bs_dnb,
 	LEFT.bdid = RIGHT.bdid, 
 	AddIRS2(LEFT, RIGHT), LEFT OUTER, LOCAL);
 
-cnf := Business_Header_SS.File_BH_CompanyName_Plus;
+cnf := Business_Header.Files().Base.CompanyName.keybuild;
 
 // Add company name frequency from the slimsorts.
 layout_bs_join AddCNScore(layout_bs_join l, cnf r) := TRANSFORM
@@ -320,7 +320,7 @@ layout_corp_check TakeCurrentCorpBDID(corp_recs l) := TRANSFORM
 	SELF := l;
 END;
 
-corp_base_recs := Corp.File_Corp_Base(business_header.is_ActiveCorp(record_type, corp_status_cd, corp_status_desc));
+corp_base_recs := Corp2.Files().Base.Corp.Prod(business_header.is_ActiveCorp(record_type, corp_status_cd, corp_status_desc));
 
 current_corp_recs := JOIN(
 	DISTRIBUTE(corp_recs, HASH((STRING34) vendor_id)),
@@ -428,4 +428,4 @@ END;
 
 scored_addr_stats := PROJECT(bh_addr_stats_init, ScoreAddr(LEFT));
 
-EXPORT BH_Addr_Stats := scored_addr_stats : PERSIST('TEMP::BH_Addr_Stats');
+EXPORT BH_Addr_Stats := scored_addr_stats : PERSIST(persistnames().BHAddrStats);

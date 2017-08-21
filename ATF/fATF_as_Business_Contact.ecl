@@ -1,9 +1,6 @@
-/*2011-12-05T16:51:25Z (Giri_Prod Rajulapalli)
-
-*/
 IMPORT ut, Business_Header,mdr;
 
-export fATF_as_Business_Contact(dataset(layout_firearms_explosives_out_Bid) pInput) :=
+export fATF_as_Business_Contact(dataset(layout_firearms_explosives_out_bip) pInput, boolean IsPRCT = false) :=
 function
 
 
@@ -13,9 +10,10 @@ function
 
 	atf_init := pInput;
 
-	Business_Header.Layout_Business_Contact_Full_New Translate_atf_to_BCF(atf.layout_firearms_explosives_out_Bid  L, INTEGER C) :=
+	Business_Header.Layout_Business_Contact_Full_New Translate_atf_to_BCF(atf.layout_firearms_explosives_out_Bip  L, INTEGER C) :=
 	TRANSFORM
-		SELF.bdid := 0;
+		SELF.bdid := IF(IsPRCT, (integer)L.bdid, 0);
+		SELF.DID	:= IF(IsPRCT, (integer)L.did_out, 0);
 		self.vl_id := l.license_number;
 		self.company_source_group := l.license_number;
 		self.vendor_id := l.license_number;

@@ -1,4 +1,4 @@
-import doxie;
+import doxie, NID;
 
 layout_auto_citystname := RECORD
   unsigned4 city_code;
@@ -16,7 +16,7 @@ layout_auto_citystname proj(file_cwp_with_fdid le) := TRANSFORM
 	SELF.st := le.PROVINCE;
 	SELF.dph_lname := metaphonelib.DMetaPhone1(le.lastname);
 	SELF.lname := le.lastname;
-	SELF.pfname := datalib.preferredfirst(le.firstname);
+	SELF.pfname := NID.PreferredFirstVersionedStr(le.firstname, NID.version);
 	SELF.fname := le.firstname;
 	self.minit := le.middlename[1];
 	SELF.did := le.fdid;

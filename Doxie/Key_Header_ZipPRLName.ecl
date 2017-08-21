@@ -13,7 +13,7 @@ autokey.MAC_zipPRLname(d,fname,mname,lname,
 						lookups,
 						did,
 						//ut.foreign_prod +'thor_data400::key::header.ZipPRLName',
-						'~thor_data400::key::header.ZipPRLName',
+						ut.Data_Location.Person_header+'thor_data400::key::header.ZipPRLName',
 						k)
 
 export Key_Header_ZipPRLName := k;

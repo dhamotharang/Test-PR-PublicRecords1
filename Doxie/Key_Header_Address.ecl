@@ -1,14 +1,8 @@
-import header, doxie_build;
+import header, doxie_build,ut;
 
 f := doxie_build.file_header_building(trim(prim_name)<>'', trim(zip)<>'');
 
-export Key_Header_Address := 
-       index(f,
-             {prim_name,
-		    zip, 
-		    prim_range, 
-		    sec_range},
-{did,
+slim_f := table(f, {did,
 src,
 dt_first_seen,
 dt_last_seen,
@@ -30,7 +24,16 @@ zip,
 zip4,
 county,
 geo_blk
-},
-		   '~thor_data400::key::header_address_' + doxie.Version_SuperKey);
-		   
-		 
+});
+
+slim_dedup  := DEDUP(SORT(slim_f,record),record);
+
+export Key_Header_Address := 
+       index(slim_dedup,
+             {prim_name,
+		    zip, 
+		    prim_range, 
+		    sec_range},
+{slim_dedup},
+		ut.Data_Location.Person_header+   'thor_data400::key::header_address_' + doxie.Version_SuperKey);
+	

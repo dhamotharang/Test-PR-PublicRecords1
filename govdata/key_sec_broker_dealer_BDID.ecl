@@ -1,5 +1,5 @@
-import doxie;
+import doxie, BIPV2;
 
-df := govdata.File_SEC_Broker_Dealer_BDID(bdid != 0);
+df := project(govdata.File_SEC_Broker_Dealer_BDID(bdid != 0),transform(layout_sec_broker_dealer_BDID - BIPV2.IDlayouts.l_xlink_IDs,self:=left;));
 
-export key_sec_broker_dealer_BDID := index(df,{bdid},{df},'~thor_data400::key::sec_broker_dealer_bdid_' + doxie.Version_SuperKey);
+export key_sec_broker_dealer_BDID := index(df,{bdid},{df},govdata.keynames().Sec_broker_dealerBdid.qa);

@@ -3,22 +3,23 @@ import ucc,did_add,didville,ut,header_slimsort;
 /* need to split debtor from secured/assigned */
 /* probably shouldn't normalize direct for clean names */
 
+first_experian_event := dedup(sort(distribute(uccd.WithExpEvent(isdirect=false),hash(file_state,orig_filing_num)),ucc_key,filing_date,local), ucc_key,local);
 
-df := ucc.File_UCC_Secured_Master;
-df2 := ucc.File_UCC_Debtor_Master;
+df := distribute(ucc.File_UCC_Secured_Master,hash(file_state,orig_filing_num));
+df2 := distribute(ucc.File_UCC_Debtor_Master,hash(file_state,orig_filing_num));
 
-df3 := uccd.File_Party_Base;
+df3 := uccd.BDID_Party;
 
 rec := uccd.Layout_WithExpParty;
 
-rec into_withExp(df L) := transform
+rec into_withExp(df L,first_experian_event R) := transform
 	self.isDirect := false;
 	self.record_type := 'C';
-	
 	self.ucc_vendor := ut.st2FipsCode(l.file_state);
 	self.ucc_process_Date := '';
 	self.ucc_key := uccd.constructUCCkey(l.file_state, l.orig_filing_num);
-	self.event_key 	:= uccd.constructUCCkey(l.file_state, l.orig_filing_num);
+//	self.event_key 	:= uccd.constructUCCkey(l.file_state, l.orig_filing_num);
+    self.event_key  :=r.event_key;
 	self.party_key := '';
 	self.collateral_key := '';
 	
@@ -43,13 +44,14 @@ rec into_withExp(df L) := transform
 	self.clean_address := L.prim_range + L.predir + L.prim_name + L.suffix + L.postdir + L.unit_desig + L.sec_range + L.p_city_name + L.v_city_name + L.state + L.zip5 + L.zip4 + L.cart + L.cr_sort_sz + L.lot + L.lot_order + L.dpbc + L.chk_digit + L.rec_type + L.ace_fips_st + L.county + L.geo_lat + L.geo_long + L.msa + L.geo_blk + L.geo_match + L.err_stat;
 	self.p_name := L.title + L.fname + L.mname + L.lname + L.name_suffix;
 	self.name := L.name;
-	
 end;
 
-o1 := project(df(file_state not in uccd.set_DirectStates),into_WithExp(LeFT));
-output(o1);
-o2 := project(df2(file_state not in uccd.set_DirectStates),into_WithExp(LeFT));
-output(o2);
+o1 := join( df(file_state not in uccd.set_DirectStates),first_experian_event,left.file_state=right.file_state and left.orig_filing_num=right.orig_filing_num, into_WithExp(LeFT,right),local);
+//output(o1);
+o2 := join(df2(file_state not in uccd.set_DirectStates),first_experian_event,left.file_state=right.file_state and left.orig_filing_num=right.orig_filing_num, into_WithExp(LeFT,right),local);
+//output(o2);
+
+
 
 denorm_rec := record
 	rec;
@@ -102,10 +104,6 @@ end;
 
 o3 := project(df3,into_WithExp2(LEFT));
 
-//keep non-blank orig name and pname with blank
-
-o3_pname_blank := o3(orig_name <> '' and p_name ='' and pname2 ='' and pname3 ='' and pname4 ='' and pname5 =''); 
-
 rec norm_direct(o3 L,integer C) := transform
 	self.clean_address := L.clean_address;
 	self.p_name := choose(C,L.p_name,L.pname2,L.pname3,L.pname4,L.pname5);
@@ -113,10 +111,6 @@ rec norm_direct(o3 L,integer C) := transform
 end;
 
 o3_norm := normalize(o3,5,norm_direct(LEFT,COUNTER));
-
-//keep non-blank orig name and pname with blank
-
-o3_norm_pname_blank := normalize(o3_pname_blank,5,norm_direct(LEFT,COUNTER));
 
 o4 := o1 + o2;
 
@@ -147,6 +141,6 @@ rec into_outrec(outf L) := transform
 	self := l;
 end;
 
-dups := o3_norm(~(p_name = '')) + o3_norm_pname_blank + project(outf,into_outrec(LEFT));
+dups := o3_norm(~(p_name = '' and orig_name = '')) + project(outf,into_outrec(LEFT));
 
 export WithExpParty := dedup(dups, all);

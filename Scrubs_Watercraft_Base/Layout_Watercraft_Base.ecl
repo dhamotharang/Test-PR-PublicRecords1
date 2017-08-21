@@ -1,0 +1,1 @@
+EXPORT Layout_Watercraft_Base := recordof(In_Watercraft_Base);

@@ -1,30 +1,38 @@
-import	header,ln_property,ln_mortgage,ut,_control,mdr;
+import	header,ln_property,ln_mortgage,ut,_control,mdr,data_services,Std;
 
-export	ln_propertyv2_as_source(boolean pFastHeader = false)	:=	module
+EXPORT	ln_propertyv2_as_source(boolean pFastHeader = false,boolean pForWatchdog = false)	:=	module
 						
 //same filter used in v1						
-shared dLNPropertySearch		:=	if(pFastHeader
-																				,LN_PropertyV2.File_Search_DID(ut.DaysApart(ut.GetDate, dt_vendor_last_reported[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep)
-																				,dataset('~thor_data400::base::ln_propv2srchheader_building',ln_propertyv2.Layout_DID_Out,flat)
-																				)
-																				(did < (unsigned6)ln_property.irs_dummy_cutoff and source_code not in ['SO','OS'])
-																				;
-shared dLNPropertyDeed			:= if(pFastHeader
-																				,LN_PropertyV2.File_Deed
-																				,dataset('~thor_data400::base::ln_propv2deedheader_building',ln_propertyv2.layout_deed_mortgage_common_model_base,flat)
-																				);
-shared dLNPropertyTax				:= if(pFastHeader
-																				,LN_PropertyV2.File_Assessment
-																				,dataset('~thor_data400::base::ln_propv2assessheader_building',ln_propertyv2.layout_property_common_model_base,flat)
-																				);
-shared dLNPropertyAddlDeed	:= if(pFastHeader
-																				,LN_PropertyV2.File_addl_fares_deed
-																				,dataset('~thor_data400::base::ln_propv2addldeedheader_building',ln_propertyv2.layout_addl_fares_deed,flat)
-																				);
-shared dLNPropertyAddlTax		:= if(pFastHeader
-																				,LN_PropertyV2.File_addl_Fares_tax
-																				,dataset('~thor_data400::base::ln_propv2addlassessheader_building',ln_propertyv2.layout_addl_fares_tax,flat)
-																				);
+SHARED dLNPropertySearch		:=	if(pFastHeader
+												,dataset('~thor_data400::base::ln_propv2srchQuickHeader_building',ln_propertyv2.Layout_DID_Out,flat)
+														(ut.DaysApart((STRING8)Std.Date.Today(), ((string)dt_vendor_last_reported)[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep)
+												,dataset('~thor_data400::base::ln_propv2srchheader_building',ln_propertyv2.Layout_DID_Out,flat)
+												)
+												(
+												did < (unsigned6)ln_property.irs_dummy_cutoff and source_code not in ['SO','OS']
+												,fname<>'',lname<>''
+												,~regexfind(' ',trim(mname))
+												,length(trim(fname))>1
+												,fname not in ['JR','SR','I','II','III','IV','V','VI','VII','VIII','IX']
+												)
+												;
+SHARED lc := data_services.Data_location.prefix('person_header');
+SHARED dLNPropertyDeed			:= if(pFastHeader
+												,dataset(lc+'thor_data400::base::ln_propv2deedQuickHeader_building',ln_propertyv2.layouts.layout_deed_mortgage_common_model_base_scrubs,flat)
+												,dataset(lc+'thor_data400::base::ln_propv2deedheader_building',ln_propertyv2.layouts.layout_deed_mortgage_common_model_base_scrubs,flat)
+												);
+SHARED dLNPropertyTax				:= if(pFastHeader
+												,dataset(lc+'thor_data400::base::ln_propv2assessQuickHeader_building',ln_propertyv2.layouts.layout_property_common_model_base_scrubs,flat)
+												,dataset(lc+'thor_data400::base::ln_propv2assessheader_building',ln_propertyv2.layouts.layout_property_common_model_base_scrubs,flat)
+												);
+SHARED dLNPropertyAddlDeed	:= if(pFastHeader
+												,dataset(lc+'thor_data400::base::ln_propv2addldeedQuickHeader_building',ln_propertyv2.layout_addl_fares_deed,flat)
+												,dataset(lc+'thor_data400::base::ln_propv2addldeedheader_building',ln_propertyv2.layout_addl_fares_deed,flat)
+												);
+SHARED dLNPropertyAddlTax		:= if(pFastHeader
+												,dataset(lc+'thor_data400::base::ln_propv2addlassessQuickHeader_building',ln_propertyv2.layout_addl_fares_tax,flat)
+												,dataset(lc+'thor_data400::base::ln_propv2addlassessheader_building',ln_propertyv2.layout_addl_fares_tax,flat)
+												);
 						
 //temporarily map to v1 layout - no substantial content gained in v2
 ds1	:=	distribute(dLNPropertyTax,hash(ln_fares_id));
@@ -44,22 +52,28 @@ in_file_tax	:=	join(	ds1,ds2,
 											local
 										);
 
-src_rec_tax	:=	record 
-	header.Layout_Source_ID;
-	LN_Property.Layout_Property_Common_Model_BASE;
-end;
+src_rec	:=	header.layouts_SeqdSrc.FAT_src_rec;
 
 seed:=if(pFastHeader,999999999999,1);
-header.Mac_Set_Header_Source(in_file_tax(ln_fares_id[1] ='R'),LN_Property.Layout_Property_Common_Model_BASE,src_rec_tax,mdr.sourceTools.src_LnPropV2_Fares_Asrs,withUID1,seed)
-header.Mac_Set_Header_Source(in_file_tax(ln_fares_id[1]!='R'),LN_Property.Layout_Property_Common_Model_BASE,src_rec_tax,mdr.sourceTools.src_LnPropV2_Lexis_Asrs,withUID2,seed) 
-                                                                                                           
-export	ln_propertyv2_tax_as_source	:=	distribute(withUID1 + withUID2,hash(uid))	:	persist('~thor_data400::persist::ln_propertyv2::headerbuild_ln_asses_src');
+header.Mac_Set_Header_Source(in_file_tax(ln_fares_id[1] ='R'),LN_Property.Layout_Property_Common_Model_BASE,src_rec,mdr.sourceTools.src_LnPropV2_Fares_Asrs,withUID1,seed)
+header.Mac_Set_Header_Source(in_file_tax(ln_fares_id[1]!='R'),LN_Property.Layout_Property_Common_Model_BASE,src_rec,mdr.sourceTools.src_LnPropV2_Lexis_Asrs,withUID2,seed) 
+
+EXPORT	ln_propertyv2_tax_as_source	:=	distribute(withUID1 + withUID2,hash(uid));
+
+/////////////*****************************//////////////////////
 
 ds3	:=	distribute(dLNPropertyDeed,hash(ln_fares_id));
 ds4	:=	distribute(dLNPropertyAddlDeed,hash(ln_fares_id));
 
 //dummy_seg field was originally used to store the propagated indicator
 //logic was only applied to deed data in v1, no tax
+//prop_addr_propagated_ind
+//blank  3,301,581,130
+//P	     58,996,599
+//8	     47,943,870
+//5	     45,045,306
+//3	     14,153,125
+//7	     11,926,071
 ln_mortgage.Layout_Deed_Mortgage_Common_Model_BASE t2(ds3 le, ds4 ri)	:=	transform
  self.dummy_seg	:=	le.prop_addr_propagated_ind;
  self          	:=	le;
@@ -74,16 +88,15 @@ in_file_deed	:=	join(	ds3,ds4,
 												local
 											);
 
-src_rec_deed	:=	record 
-	header.Layout_Source_ID;
-	LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE;
-end;
+src_rec	:=	header.layouts_SeqdSrc.FAD_src_rec;
 
 seed:=if(pFastHeader,999999999999,1);
-header.Mac_Set_Header_Source(in_file_deed(ln_fares_id[1] ='R'),LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE,src_rec_deed,mdr.sourceTools.src_LnPropV2_Fares_Deeds			,withUID3,seed)
-header.Mac_Set_Header_Source(in_file_deed(ln_fares_id[1]!='R'),LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE,src_rec_deed,mdr.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs,withUID4,seed)
-                                                                                                                 
-export ln_propertyv2_deed_as_source	:=	distribute(withUID3 + withUID4,hash(uid))	:	persist('~thor_data400::persist::ln_propertyv2::headerbuild_ln_deed_src');
+header.Mac_Set_Header_Source(in_file_deed(ln_fares_id[1] ='R'),LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE,src_rec,mdr.sourceTools.src_LnPropV2_Fares_Deeds		 ,withUID3,seed)
+header.Mac_Set_Header_Source(in_file_deed(ln_fares_id[1]!='R'),LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE,src_rec,mdr.sourceTools.src_LnPropV2_Lexis_Deeds_Mtgs,withUID4,seed)
+
+EXPORT	ln_propertyv2_deed_as_source	:=	distribute(withUID3 + withUID4,hash(uid));
+
+/////////////*****************************//////////////////////
 
 r1	:=	record
 	unsigned6 uid;
@@ -92,16 +105,8 @@ r1	:=	record
 	string1   dummy_seg;
 end;
 
-r1 t1(ln_propertyv2_deed_as_source le)	:=	transform
-	self          	:=	le;
-end;
-
-r1 t2(ln_propertyv2_tax_as_source le)	:=	transform
-	self          	:=	le;
-end;
-
-p1	:=	project(ln_propertyv2_deed_as_source,t1(left));
-p2	:=	project(ln_propertyv2_tax_as_source, t2(left));
+p1	:=	project(if(pForWatchdog,ln_propertyv2_deed_as_source,header.Files_SeqdSrc(pFastHeader).FAD),r1);
+p2	:=	project(if(pForWatchdog,ln_propertyv2_tax_as_source,header.Files_SeqdSrc(pFastHeader).FAT),r1);
 
 concat     	:=	p1+p2;
 concat_dist	:=	distribute(concat,hash(ln_fares_id));
@@ -121,12 +126,12 @@ end;
 //is_true denotes a propagated property address record
 //we want to exclude those from the header
 r2 t3(search_dist le, concat_dupd ri)	:=	transform
-	self.is_true	:=	if(le.ln_fares_id=ri.ln_fares_id and le.source_code[2]='P' and ri.dummy_seg='P',true,false);
+	self.is_true	:=	if(le.ln_fares_id=ri.ln_fares_id and le.source_code[2]='P' and ri.dummy_seg<>'',true,false);
 	self        	:=	le;
 	self        	:=	ri;
 end;
 
-export p3	:=	join(	search_dist,concat_dupd,
+EXPORT p3	:=	join(	search_dist,concat_dupd,
 										left.ln_fares_id=right.ln_fares_id,
 										t3(left,right),
 										local
@@ -134,7 +139,7 @@ export p3	:=	join(	search_dist,concat_dupd,
 
 //flip_name filter can be lifted once there's some assurance that it's working properly
 //for now let's prevent them from getting into the header
-shared p3_filt	:=	p3(~(is_true));
+SHARED p3_filt	:=	p3(~(is_true));
 
 //not the exact header layout -> source_code field added from property
 r_layout_new_records_strings	:=	record
@@ -226,14 +231,14 @@ p4_sort	:=	sort(p4_dist,src,vendor_id,fname,mname,lname,name_suffix,prim_range,p
 
 r_layout_new_records_strings t_rollup(p4_sort le, p4_dist ri)	:=	transform
  self.dt_first_seen           	:=	ut.Min2(le.dt_first_seen,ri.dt_first_seen);
- self.dt_last_seen            	:=	ut.Max2(le.dt_first_seen,ri.dt_first_seen);
+ self.dt_last_seen            	:=	max(le.dt_first_seen,ri.dt_first_seen);
  self.dt_vendor_first_reported	:=	ut.Min2(le.dt_first_seen,ri.dt_first_seen);
  self.dt_vendor_last_reported 	:=	self.dt_last_seen;
  self.dt_nonglb_last_seen     	:=	self.dt_last_seen;
  self                         	:=	le;
 end;
 
-shared p_rollup	:=	rollup(	p4_sort,
+SHARED p_rollup	:=	rollup(	p4_sort,
 														left.src         = right.src         and 
 														left.vendor_id   = right.vendor_id   and
 														left.fname       = right.fname       and 
@@ -257,18 +262,15 @@ shared p_rollup	:=	rollup(	p4_sort,
 														t_rollup(left,right),
 														local
 													);
-	  
 
-header.Layout_New_Records t_map_to_new_records(p_rollup le)	:=	transform
-	self.did	:=	0;
-	self	:=	le;
-end;
+p_rollup_new_records	:=	project(p_rollup
+															,transform(header.Layout_New_Records
+																,self.did:=0
+																,self:=left));
 
-p_rollup_new_records	:=	project(p_rollup,t_map_to_new_records(left));
+p_rollup_filt	:=	p_rollup_new_records;
 				  
-p_rollup_filt	:=	p_rollup_new_records	:	persist('~thor_data400::persist::ln_propertyv2::headerbuild_ln_property_as_header');
-				  
-export ln_propertyv2_as_header	:=	p_rollup_filt
+EXPORT ln_propertyv2_as_header	:=	p_rollup_filt
                                    (
 																		fname <> '',
 																		lname <> '', 
@@ -281,16 +283,9 @@ export ln_propertyv2_as_header	:=	p_rollup_filt
 																		trim(lname)<>'SG'
 																	);
 
-header.Layout_New_Records t_map_to_newf_records(p_rollup le)	:=	transform
-	self.did	:=	le.did;
-	self	:=	le;
-end;
-
-fp_rollup_new_records	:=	project(p_rollup,t_map_to_newf_records(left));
-				  
-fp_rollup_filt	:=	fp_rollup_new_records(ut.DaysApart(ut.GetDate, dt_vendor_last_reported[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep)	:	persist('~thor_data400::persist::ln_propertyv2::headerbuild_ln_property_as_header');
-	
-export ln_propertyv2_as_fheader	:=	fp_rollup_filt
+fp_rollup_new_records	:=	project(p_rollup,header.Layout_New_Records);
+fp_rollup_filt	:=	fp_rollup_new_records(ut.DaysApart((STRING8)Std.Date.Today(), ((string)dt_vendor_last_reported)[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep);
+EXPORT ln_propertyv2_as_fheader	:=	fp_rollup_filt
                                    (
 																		fname <> '',
 																		lname <> '', 
@@ -302,12 +297,9 @@ export ln_propertyv2_as_fheader	:=	fp_rollup_filt
 																		trim(title)<>'SGT',
 																		trim(lname)<>'SG'
 																	);
-
-export pwatchdog	:=	p_rollup(vendor_id[1]= 'R')	:	persist('~thor_data400::persist::ln_propertyv2::watchdog_prop_did'); //Watchdog taking only fares data
-
+/////////////*****************************//////////////////////
+EXPORT pWatchdog	:=	p_rollup(vendor_id[1]= 'R')	:	persist('~thor_data400::persist::ln_propertyv2::watchdog_prop_did'); //Watchdog taking only fares data
+/////////////*****************************//////////////////////
 // reformat watchdog to header layout 
-header.Layout_New_Records  reformat( pwatchdog l)	:=	transform 
-	self	:=	l ; 
-end; 
-export watchdog_prop_didv2	:=	project(pwatchdog,reformat(left)) ;  									   
-end;
+EXPORT watchdog_prop_didv2	:=	project(pwatchdog,header.Layout_New_Records);
+END;

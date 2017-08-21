@@ -2,14 +2,14 @@ import _control;
 
 version := '12299';		// UPDATE EACH TIME
 basename := 'SAM_Exclusions_Public_Extract_12286.CSV';
-srcdir := '/hds_3/epls/';
+srcdir := '/data/hds_3/sam/';
 
 dest := '~thor::in::epls::sam::';
 
 						
 sprayfileTxt(string filename) := 
 
-		FileServices.SprayVariable(_control.IPAddress.edata12,
+		FileServices.SprayVariable(_control.IPAddress.bctlpedata10,
 							srcdir + filename,
 							8192,',',,'"',
 							'thor40_241',
@@ -62,6 +62,6 @@ OUTPUT(vxml1(COUNT(actions)>2)),
 OUTPUT(vxml2(COUNT(actions)>1)),
 OUTPUT(vxml2(COUNT(actions)>2)),
 oxml,
-Despray('~thor::out::epls::results', 'edata12-bld.br.seisint.com','/hds_3/epls/epls.xml')
+Despray('~thor::out::epls::results', 'bctlpedata10.risk.regn.net','/data/hds_3/sam/output/epls.xml')
 );
 

@@ -1,0 +1,2 @@
+import SANCTN_Mari;
+EXPORT incident_codes_Layout_SANCTN_NPKeys := SANCTN_Mari.layouts_SANCTN_common.Midex_cd;

@@ -4,13 +4,13 @@ output(wk_ut.get_WUGetGraph('W20140206-084814','graph47','1720'));
 
   get_WUGetGraph gets graphs for workunits
 Can you be a little bit more specific, we have:
-•         Subgraphs (a group of activities)
-•         Activities (nodes/vertices)
-•         Edges (the lines joining two activities)
+â€¢         Subgraphs (a group of activities)
+â€¢         Activities (nodes/vertices)
+â€¢         Edges (the lines joining two activities)
 
 There are no counts associated with subgraphs, but there are timings associated with the top level subgraphs.
 
-Activities will get a “recordCount” property, which (in the example I am looking at) looks like this:  “500000..500000[memory]”
+Activities will get a â€œrecordCountâ€ property, which (in the example I am looking at) looks like this:  â€œ500000..500000[memory]â€
 
 Edges which do have a count property!
 

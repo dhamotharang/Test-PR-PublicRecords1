@@ -3,6 +3,7 @@
 IMPORT SALT30,ut,std;
 EXPORT matches(DATASET(layout_DOT_Base) ih,UNSIGNED MatchThreshold = Config.MatchThreshold) := MODULE
 SHARED LowerMatchThreshold := MatchThreshold-3; // Keep extra 'borderlines' for debug purposes
+SHARED split_patch := LinkBlockers(ih).Patches;
 SHARED h := match_candidates(ih).candidates;
 SHARED s := Specificities(ih).Specificities[1];
  
@@ -16,6 +17,10 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
   INTEGER2 cnp_number_score_temp := MAP(
                         le.cnp_number = ri.cnp_number  => le.cnp_number_weight100,
                         SALT30.Fn_Fail_Scale(le.cnp_number_weight100,s.cnp_number_switch));
+  INTEGER2 hist_duns_number_score := MAP(
+                        le.hist_duns_number_isnull OR ri.hist_duns_number_isnull => 0,
+                        le.hist_duns_number = ri.hist_duns_number  => le.hist_duns_number_weight100,
+                        SALT30.Fn_Fail_Scale(le.hist_duns_number_weight100,s.hist_duns_number_switch));
   INTEGER2 ebr_file_number_score := MAP(
                         le.ebr_file_number_isnull OR ri.ebr_file_number_isnull => 0,
                         le.ebr_file_number = ri.ebr_file_number  => le.ebr_file_number_weight100,
@@ -28,10 +33,6 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
                         le.hist_enterprise_number_isnull OR ri.hist_enterprise_number_isnull => 0,
                         le.hist_enterprise_number = ri.hist_enterprise_number  => le.hist_enterprise_number_weight100,
                         SALT30.Fn_Fail_Scale(le.hist_enterprise_number_weight100,s.hist_enterprise_number_switch));
-  INTEGER2 hist_duns_number_score := MAP(
-                        le.hist_duns_number_isnull OR ri.hist_duns_number_isnull => 0,
-                        le.hist_duns_number = ri.hist_duns_number  => le.hist_duns_number_weight100,
-                        SALT30.Fn_Fail_Scale(le.hist_duns_number_weight100,s.hist_duns_number_switch));
   INTEGER2 hist_domestic_corp_key_score := MAP(
                         le.hist_domestic_corp_key_isnull OR ri.hist_domestic_corp_key_isnull => 0,
                         le.hist_domestic_corp_key = ri.hist_domestic_corp_key  => le.hist_domestic_corp_key_weight100,
@@ -146,10 +147,10 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
   SELF.Conf_Prop := (0
     +MAX(le.cnp_number_prop,ri.cnp_number_prop)*cnp_number_score // Score if either field propogated
     +MAX(le.prim_range_derived_prop,ri.prim_range_derived_prop)*prim_range_derived_score // Score if either field propogated
+    +MAX(le.hist_duns_number_prop,ri.hist_duns_number_prop)*hist_duns_number_score // Score if either field propogated
     +MAX(le.ebr_file_number_prop,ri.ebr_file_number_prop)*ebr_file_number_score // Score if either field propogated
     +MAX(le.active_duns_number_prop,ri.active_duns_number_prop)*active_duns_number_score // Score if either field propogated
     +MAX(le.hist_enterprise_number_prop,ri.hist_enterprise_number_prop)*hist_enterprise_number_score // Score if either field propogated
-    +MAX(le.hist_duns_number_prop,ri.hist_duns_number_prop)*hist_duns_number_score // Score if either field propogated
     +MAX(le.hist_domestic_corp_key_prop,ri.hist_domestic_corp_key_prop)*hist_domestic_corp_key_score // Score if either field propogated
     +MAX(le.foreign_corp_key_prop,ri.foreign_corp_key_prop)*foreign_corp_key_score // Score if either field propogated
     +MAX(le.unk_corp_key_prop,ri.unk_corp_key_prop)*unk_corp_key_score // Score if either field propogated
@@ -161,12 +162,14 @@ SHARED match_candidates(ih).layout_matches match_join(match_candidates(ih).layou
     +MAX(le.sec_range_prop,ri.sec_range_prop)*sec_range_score // Score if either field propogated
     +if(le.company_address_prop+ri.company_address_prop>0,company_address_score*(0+if(le.company_addr1_prop+ri.company_addr1_prop>0,1,0))/2,0)
   ) / 100; // Score based on propogated fields
-  iComp1 := (cnp_number_score + ebr_file_number_score + active_duns_number_score + hist_enterprise_number_score + hist_duns_number_score + hist_domestic_corp_key_score + foreign_corp_key_score + unk_corp_key_score + company_fein_score + company_phone_score + active_enterprise_number_score + active_domestic_corp_key_score + cnp_name_score + cnp_btype_score + IF(company_address_score>0,MAX(company_address_score,IF(company_addr1_score>0,MAX(company_addr1_score,prim_range_derived_score + prim_name_derived_score + sec_range_score),prim_range_derived_score + prim_name_derived_score + sec_range_score) + IF(company_csz_score>0,MAX(company_csz_score,v_city_name_score + st_score + zip_score),v_city_name_score + st_score + zip_score)),IF(company_addr1_score>0,MAX(company_addr1_score,prim_range_derived_score + prim_name_derived_score + sec_range_score),prim_range_derived_score + prim_name_derived_score + sec_range_score) + IF(company_csz_score>0,MAX(company_csz_score,v_city_name_score + st_score + zip_score),v_city_name_score + st_score + zip_score))) / 100 + outside;
+  import ut;
+iComp1 := (cnp_number_score + hist_duns_number_score + ebr_file_number_score + active_duns_number_score + hist_enterprise_number_score + hist_domestic_corp_key_score + foreign_corp_key_score + unk_corp_key_score + company_fein_score + company_phone_score + active_enterprise_number_score + active_domestic_corp_key_score + cnp_name_score + cnp_btype_score + IF(company_address_score>0,MAX(company_address_score,IF(company_addr1_score>0,MAX(company_addr1_score,prim_range_derived_score + prim_name_derived_score + sec_range_score),prim_range_derived_score + prim_name_derived_score + sec_range_score) + IF(company_csz_score>0,MAX(company_csz_score,v_city_name_score + st_score + zip_score),v_city_name_score + st_score + zip_score)),IF(company_addr1_score>0,MAX(company_addr1_score,prim_range_derived_score + prim_name_derived_score + sec_range_score),prim_range_derived_score + prim_name_derived_score + sec_range_score) + IF(company_csz_score>0,MAX(company_csz_score,v_city_name_score + st_score + zip_score),v_city_name_score + st_score + zip_score))) / 100 + outside;
 iComp  := map( iComp1            >= MatchThreshold                                   => iComp1 
               ,le.company_address = ri.company_address and le.cnp_name = ri.cnp_name and ut.nneq(le.active_duns_number,ri.active_duns_number)=> MatchThreshold
               ,le.cnp_name = ri.cnp_name and  le.prim_range_derived = ri.prim_range_derived and le.prim_name_derived = ri.prim_name_derived and ut.nneq(le.v_city_name,ri.v_city_name) and le.st = ri.st and le.zip = ri.zip and ut.nneq(le.active_duns_number,ri.active_duns_number)=> MatchThreshold
               ,                                                                         iComp1
           );
+
   SELF.Conf := IF( iComp>=LowerMatchThreshold OR iComp-self.Conf_Prop >= LowerMatchThreshold,iComp,SKIP ); // Remove failing records asap
 END;
 //Allow rule numbers to be converted to readable text.
@@ -180,6 +183,7 @@ EXPORT RuleText(UNSIGNED n) :=  MAP (
   ,n = 106 => ':cnp_number:cnp_name:company_address'                                 /* HACK */
   ,'AttributeFile:'+(STRING)(n-10000)
   );
+
 //Now execute each of the 1 join conditions of which 0 have been optimized into preceding conditions
 EXPORT MAC_DoJoins(hfile,trans) := FUNCTIONMACRO
  
@@ -196,7 +200,7 @@ SHARED all_mjs := MAC_DoJoins(h,match_join);
  
 //Now construct candidates based upon attribute & relationship files
  
-AllAttrMatches := SORT(Mod_Attr_SrcRidVlid(ih).Match+Mod_Attr_ForeignCorpkey(ih).Match+Mod_Attr_RAAddresses(ih).Match+Mod_Attr_FilterPrimNames(ih).Match,Proxid1,Proxid2,Rule,-(Conf+Conf_Prop+support_cnp_name),LOCAL);
+AllAttrMatches := SORT(Mod_Attr_SrcRidVlid(ih).Match/*+Mod_Attr_ForeignCorpkey(ih).Match+Mod_Attr_RAAddresses(ih).Match+Mod_Attr_FilterPrimNames(ih).Match*/,Proxid1,Proxid2,Rule,-(Conf+Conf_Prop+support_cnp_name),LOCAL);
 match_candidates(ih).Layout_Attribute_Matches CombineResults(match_candidates(ih).Layout_Attribute_Matches le,match_candidates(ih).Layout_Attribute_Matches ri) := TRANSFORM
   SELF.Conf := le.Conf+ri.Conf;
   SELF.support_cnp_name := le.support_cnp_name+ri.support_cnp_name;
@@ -214,11 +218,13 @@ with_attr := attr_match + all_mjs;
 all_matches1 := Mod_Attr_ForeignCorpkey(ih).ForceFilter(ih,with_attr,Proxid1,Proxid2); // Restrict to those matches obeying force upon ForeignCorpkey
 all_matches2 := Mod_Attr_RAAddresses(ih).ForceFilter(ih,all_matches1,Proxid1,Proxid2); // Restrict to those matches obeying force upon RAAddresses
 all_matches3 := Mod_Attr_FilterPrimNames(ih).ForceFilter(ih,all_matches2,Proxid1,Proxid2); // Restrict to those matches obeying force upon FilterPrimNames
-EXPORT All_Matches := all_matches3 : PERSIST('~temp::Proxid::BIPV2_ProxID::all_m',EXPIRE(Config.PersistExpire)); // To by used by rcid and Proxid
+not_blocked := JOIN(all_matches3,LinkBlockers(ih).Block,left.Proxid1=right.Proxid1 and left.Proxid2=right.Proxid2,TRANSFORM(LEFT),LEFT ONLY, SMART); // Remove all blocked links
+EXPORT All_Matches := not_blocked : PERSIST('~temp::Proxid::BIPV2_ProxID::all_m',EXPIRE(Config.PersistExpire)); // To by used by rcid and Proxid
 // SALT30.mac_avoid_transitives(All_Matches,Proxid1,Proxid2,Conf,DateOverlap,Rule,o); /* HACK - disable default salt mac_avoid_transitives*/
 import BIPV2_Tools;
  /*HACK, import module for new transitives macro*/
 o := BIPV2_ProxID.mac_avoid_transitives_scalene(All_Matches,Proxid1,Proxid2,Conf,DateOverlap,Rule,MatchThreshold,10); // HACK - Use new transitives macro, bucket size 5*/
+
 EXPORT PossibleMatches := o : PERSIST('~temp::Proxid::BIPV2_ProxID::mt',EXPIRE(Config.PersistExpire));
 SALT30.mac_get_BestPerRecord( All_Matches,rcid1,Proxid1,rcid2,Proxid2,o );
 EXPORT BestPerRecord := o : PERSIST('~temp::Proxid::BIPV2_ProxID::mr',EXPIRE(Config.PersistExpire));
@@ -281,13 +287,15 @@ Full_Sample_Matches := MatchSample+BorderlineMatchSample+AlmostMatchSample;
 export MatchSampleRecords := Debug(ih,s,MatchThreshold).AnnotateMatches(Full_Sample_Matches,All_Attribute_Matches);
  
 //Now actually produce the new file
-ut.MAC_Patch_Id(ih,Proxid,BasicMatch(ih).patch_file,Proxid1,Proxid2,ihbp); // Perform basic matches
+SALT30.MAC_Reassign_UID(ih,split_patch,Proxid,rcid,ih0); // Perform splits
+ut.MAC_Patch_Id(ih0,Proxid,BasicMatch(ih).patch_file,Proxid1,Proxid2,ihbp); // Perform basic matches
 SALT30.MAC_Reassign_UID(ihbp,Cleave(ih).patch_file,Proxid,rcid,ih1); // Perform cleaves
 SALT30.MAC_SliceOut_ByRID(ih1,rcid,Proxid,ToSlice,rcid,sliced0); // Execute Sliceouts
   sliced := IF( Config.DoSliceouts, sliced0, ih1); // Compile time ability to remove sliceout cost
 ut.MAC_Patch_Id(sliced,Proxid,Matches,Proxid1,Proxid2,o); // Join Clusters
    o_thin := TABLE(o,{ultid,orgid,lgid3,proxid,dotid,rcid}); // HACK
 Patchlgid3 := BIPV2_Tools.MAC_ParentId_Patch( o_thin ,lgid3,Proxid);  // Collapse any lgid3 now joined by Proxid/* HACK - slim dataset*/
+
   Patchorgid := BIPV2_Tools.MAC_ParentId_Patch(Patchlgid3,orgid,lgid3);  // Collapse any orgid now joined by lgid3
   Patchultid := BIPV2_Tools.MAC_ParentId_Patch(Patchorgid,ultid,orgid);  // Collapse any ultid now joined by orgid
   Patchdotid := BIPV2_Tools.MAC_ChildID_Patch(Patchultid,Proxid,dotid,rcid); // Explode any dotid that need to because of splits in Proxid
@@ -326,10 +334,11 @@ EXPORT IdChanges := JOIN(ih,patched_infile,LEFT.rcid = RIGHT.rcid AND (LEFT.Prox
 //Now perform the safety checks
 EXPORT MatchesPerformed := COUNT( Matches );
 EXPORT SlicesPerformed := COUNT( ToSlice );
+EXPORT LinkBlocksPerformed := COUNT(LinkBlockers(ih).New); // Count dids created
 EXPORT MatchesPropAssisted := COUNT( Matches(Conf_Prop>0) );
 EXPORT MatchesPropRequired := COUNT( Matches(Conf-Conf_Prop<MatchThreshold) );
 EXPORT PreIDs := BIPV2_ProxID.Fields.UIDConsistency(ih); // Export whole consistency module
 EXPORT PostIDs := BIPV2_ProxID.Fields.UIDConsistency(Patched_Infile); // Export whole consistency module
-EXPORT PatchingError0 := PreIDs.IdCounts[1].Proxid_count - PostIDs.IdCounts[1].Proxid_count - MatchesPerformed - COUNT(BasicMatch(ih).patch_file) + SlicesPerformed + Cleave(ih).patch_count; // Should be zero
+EXPORT PatchingError0 := PreIDs.IdCounts[1].Proxid_count - PostIDs.IdCounts[1].Proxid_count - MatchesPerformed - COUNT(BasicMatch(ih).patch_file) + SlicesPerformed + LinkBlocksPerformed + Cleave(ih).patch_count; // Should be zero
 EXPORT DuplicateRids0 := COUNT(Patched_Infile) - PostIDs.IdCounts[1].rcid_Count; // Should be zero
 END;

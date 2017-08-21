@@ -1,3 +1,6 @@
+/*2015-11-16T21:03:51Z (Srilatha Katukuri)
+#193680 - CR323
+*/
 /*2015-07-23T16:50:02Z (Srilatha Katukuri)
 #173799 - reordering of fields
 
@@ -17,7 +20,7 @@ Adding Jurisdiction Field #173799
 */
 import doxie, ut, Data_Services ; 
 
-ds := project (FLAccidents_Ecrash.File_KeybuildV2.out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3']), FLAccidents_Ecrash.Layouts.key_slim_layout );  
+ds := project (FLAccidents_Ecrash.File_KeybuildV2.out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']), FLAccidents_Ecrash.Layouts.key_slim_layout );  
 
 
 SlimAccident := record 
@@ -354,4 +357,4 @@ Final_Accident_Location	:=	dedup(sort(distribute(project(norm_report , transform
 EXPORT Key_eCrashv2_StAndLocation  := index(Final_Accident_Location ,{ Partial_Accident_location,jurisdiction_state, jurisdiction}
                                                ,{Final_Accident_Location}
                                                ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_StAndLocation_' + doxie.Version_SuperKey);
-																								
+																							//	,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::PRUS::ecrashV2_StAndLocation_' + doxie.Version_SuperKey);

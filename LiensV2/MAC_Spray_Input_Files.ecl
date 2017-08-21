@@ -11,7 +11,8 @@ export MAC_Spray_Input_Files(sourcefile,thor_filename,updatetype,group_name='\'t
 #uniquename(output_Thor_Logical_Filename)
 #uniquename(Superfile_Subfiles)
 #uniquename(output_Superfile_Subfiles)
-#uniquename(spray_first) 
+#uniquename(spray_first)
+#uniquename(clear_superfile) 
 #uniquename(add_to_superfile)
 #uniquename(send_completion_email)
 #uniquename(recordsize)
@@ -23,7 +24,7 @@ export MAC_Spray_Input_Files(sourcefile,thor_filename,updatetype,group_name='\'t
 ///////////////////////////////////////////
 // -- Set value types
 ///////////////////////////////////////////
-%sourceIP% := _control.IPAddress.edata12;
+%sourceIP% := if ( _Control.ThisEnvironment.Name = 'Prod_Thor',  _control.IPAddress.bctlpedata10 , _control.IPAddress.bctlpedata12);
 unsigned4 %recordsize% 			:= liensv2.Get_Infile_Record_Length(updatetype);
 string100 %superfilename% 		:= LiensV2.Get_Upadte_SuperFilename(updatetype);
 //unsigned4 %recordsize% 			:= 1186 ;
@@ -37,6 +38,7 @@ string100 %superfilename% 		:= LiensV2.Get_Upadte_SuperFilename(updatetype);
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Superfile manipulation
 //////////////////////////////////////////////////////////////////////////////////////////////
+%clear_superfile%	:= FileServices.ClearSuperFile(%superfilename%);
 %add_to_superfile% := FileServices.AddSuperFile(%superfilename%, thor_filename);
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +64,7 @@ sequential
 (
 	 //%output_value_types%
 	%spray_first%
+	,%clear_superfile%
 	,%add_to_superfile%
 	//,%output_Superfile_Subfiles%
 	,%send_completion_email%

@@ -1,4 +1,4 @@
-IMPORT ut, Polk;
+IMPORT ut, Polk, NID;
 
 // All 50 Contintental States and District of Columbia
 states50 := ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL',
@@ -464,7 +464,7 @@ Customer_Analytic_Polk_Lifestyle := JOIN(Customer_Analytic_Polk,
                                            LEFT.prim_name = RIGHT.ls_prim_name AND
                                            LEFT.prim_range = RIGHT.ls_prim_range AND
                                            LEFT.name_last = RIGHT.ls_name_last AND
-                                           Datalib.PreferredFirst(LEFT.name_first) = Datalib.PreferredFirst(RIGHT.ls_name_first) AND
+                                           NID.PreferredFirstVersionedStr(LEFT.name_first, NID.version) = NID.PreferredFirstVersionedStr(RIGHT.ls_name_first, NID.version) AND
                                            ut.NNEQ(LEFT.sec_range, RIGHT.ls_sec_range),
                                          AppendLifestyletoCustomer(LEFT, RIGHT),
                                          LEFT OUTER,
@@ -496,7 +496,7 @@ Polk_Lifestyle_Random := JOIN(formatted_polk_dist,
                                 LEFT.pk_prim_name = RIGHT.ls_prim_name AND
                                 LEFT.pk_prim_range = RIGHT.ls_prim_range AND
                                 LEFT.pk_lname = RIGHT.ls_name_last AND
-                                Datalib.PreferredFirst(LEFT.pk_fname) = Datalib.PreferredFirst(RIGHT.ls_name_first) AND
+                                NID.PreferredFirstVersionedStr(LEFT.pk_fname, NID.version) = NID.PreferredFirstVersionedStr(RIGHT.ls_name_first, NID.version) AND
                                 ut.NNEQ(LEFT.pk_sec_range, RIGHT.ls_sec_range),
                               CombinePolkLifestyle(LEFT, RIGHT),
                               LEFT OUTER,

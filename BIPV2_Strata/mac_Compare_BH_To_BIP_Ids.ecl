@@ -12,7 +12,7 @@ import bipv2_build,paw,bipv2,strata;
 EXPORT mac_Compare_BH_To_BIP_Ids(
    pversion     = 'bipv2.KeySuffix'                           // build date
   ,pPaw_Base    = 'paw.File_Base'           
-  ,pBIP_Base    = 'bipv2.CommonBase.ds_base'
+  ,pBIP_Base    = 'bipv2.CommonBase.ds_built'
   ,pBIP_Key     = 'BIPV2_Build.key_contact_linkids.keybuilt'
   ,pEmail_List  = 'BIPV2_Build.mod_email.emailList'           // email list 
   ,pIsTesting   = 'false'

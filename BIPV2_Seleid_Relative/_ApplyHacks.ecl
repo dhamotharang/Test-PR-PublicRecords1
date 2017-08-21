@@ -1,8 +1,5 @@
-// -- BIPV2_LGID3._ApplyHacks('BIPV2_LGID3',,true).do_all_hacks;
-
+// -- BIPV2_Seleid_Relative._ApplyHacks('BIPV2_Seleid_Relative',,true).do_all_hacks;
 import SALTTOOLS22,STD,wk_ut,tools;
-
-
 EXPORT _ApplyHacks(
    string   pModule               = 'BIPV2_Seleid_Relative'
   ,string   pEsp                  = wk_ut._Constants.LocalEsp + ':8145'
@@ -11,7 +8,6 @@ EXPORT _ApplyHacks(
 module
   EXPORT fGetAttribute(STRING att                 ):=SALTTOOLS22.mod_Soapcalls.fGetAttributes(pModule,att,pEsp)(COUNT(results)>0)[1].results[1].Text;
   EXPORT fPutAttribute(STRING att,STRING ecl_text ):=OUTPUT(SALTTOOLS22.mod_Soapcalls.fSaveAttribute(pModule,att,ecl_text,pEsp));
-
   export fHackProc_Iterate(
   
      string   pAttribute            = 'Proc_Iterate' 
@@ -21,24 +17,14 @@ module
   function
   
     dme := dataset([{
-       ',IF[(]again,OutputFileA,OutputFile[)],OutputChanges'
-      ,'/[*],IF[(]again,OutputFileA,OutputFile[)],OutputChanges[*]/'
-      ,'/*,IF(again,OutputFileA,OutputFile),OutputChanges*//*HACK*/'
+           ',IF[(]again,OutputFileA,OutputFile[)],IF[(]again,OutputChangesA,OutputChanges[)]'
+      ,'/[*],IF[(]again,OutputFileA,OutputFile[)],IF[(]again,OutputChangesA,OutputChanges[)][*]/'
+      ,'/*,IF(again,OutputFileA,OutputFile),IF(again,OutputChangesA,OutputChanges)*//*HACK*/'
       ,'disable output file and changes file\n'
     }
-    ,{
-      'BUILDINDEX[(]keys[(]InFile[)][.]ASSOC,OVERWRITE[)];'
-      ,'BIPV2_Seleid_Relative[.]keynames[(]bipv2[.]keyversion[)][.]assoc[.]logical'
-      ,'BUILDINDEX(keys(InFile).ASSOC ,BIPV2_Seleid_Relative.keynames(BIPV2_Seleid_Relative.KeyInfix).assoc.logical/*HACK*/,OVERWRITE);'
-      ,'build relative key correctly'
-    
-    }
     ],tools.layout_attribute_hacks);
-
     RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
-
   END;
-
   export fHackspecificities(
   
      string   pAttribute            = 'specificities' 
@@ -54,11 +40,8 @@ module
       ,'replace keyinfix with config.keyinfix_specificities for specs keys to allow for 2 step specificities to not have to be run each time \n'
     }
     ],tools.layout_attribute_hacks);
-
     RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
-
   END;
-
   export fHackConfig(
   
      string   pAttribute            = 'Config' 
@@ -74,11 +57,8 @@ module
       ,'replace keyinfix with config.keyinfix_specificities for specs keys to allow for 2 step specificities to not have to be run each time \n'
     }
     ],tools.layout_attribute_hacks);
-
     RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
-
   END;
-
   export fHackKeys(
   
      string   pAttribute            = 'Keys' 
@@ -87,18 +67,23 @@ module
   ) :=
   function
   
-    dme := dataset([{
+    dme := dataset([
+    {
        'EXPORT RelKeyNameASSOC := \'~\'[+]KeyPrefix'
       ,'EXPORT RelKeyNameASSOC := BIPV2_Seleid_Relative[.]_Constants[(]_Constants[.]IsDataland[)][.]prefix [+]KeyPrefix'
       ,'import tools;/*HACK*/\n' + 'EXPORT RelKeyNameASSOC := BIPV2_Seleid_Relative._Constants(tools._Constants.IsDataland).prefix +KeyPrefix/*HACK*/'
       ,'Replace ~ with BIPV2_Seleid_Relative._Constants so it points to prod on dataland'
     }
+    ,{
+       'EXPORT BuildDebug := PARALLEL[(]Build_Specificities_Key, PARALLEL[(]BUILDINDEX[(]Candidates, OVERWRITE[)],BUILDINDEX[(]MatchHistoryKey, OVERWRITE[)][)][)];'
+      ,'REMOVE MATCH HISTORY HACK'
+      ,'EXPORT BuildDebug := PARALLEL(Build_Specificities_Key, PARALLEL(BUILDINDEX(Candidates, OVERWRITE)/*,BUILDINDEX(MatchHistoryKey, OVERWRITE)*//*REMOVE MATCH HISTORY HACK*/));'
+      ,'comment out match history.  not needed and fails anyway.\n'
+    
+    }
     ],tools.layout_attribute_hacks);
-
     RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
-
   END;
-
   export fHackmatch_candidates(
   
      string   pAttribute            = 'match_candidates' 
@@ -114,11 +99,8 @@ module
       ,'comment out hint(parallel_match) to avoid out of memory error'
     }
     ],tools.layout_attribute_hacks);
-
     RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
-
   END;
-
   export fHackRelationships(
   
      string   pAttribute            = 'relationships' 
@@ -138,7 +120,7 @@ module
        'SHARED CandidatesNAMEST := TABLE[(]BaseFile([(]cnp_name_weight100 [+] st_weight100>=[[:digit:]]+[)]),SlimRec[)];'
       ,'CandidatesNAMEST1'
       
-      , '/*HACK FOLLOWS*/'
+      , '/*HACK FOLLOWS*/\n'
       + '/******* To filter any franchise from name st relationship *****/\n'
       + 'CandidatesNAMEST1 := BaseFile $1;\n\n'
       + '// select the franchise seleids in the basefile.\n'
@@ -154,10 +136,11 @@ module
       + ' noFrandxCandidates.cnp_name_weight100;\n'
       + '  noFrandxCandidates.st;\n'
       + ' noFrandxCandidates.st_weight100;\n'
+      + ' noFrandxCandidates.dt_first_seen;\n'
+      + ' noFrandxCandidates.dt_last_seen;\n'
       + 'END;\n'
       + 'SHARED CandidatesNAMEST := TABLE(noFrandxCandidates,SlimRec1);\n '
       + '/*HACKS END*/'
-
       ,'Remove franchise from NAME ST relationship'
     }
     ,{
@@ -167,7 +150,7 @@ module
       ,'add local and remove group(left.seleid) to NoteLink join to avoid out of memory error'
     }
     ,{
-       'J2 := SORT(J1,Seleid2,dedup_val);'
+       'J2 := SORT[(]J1,Seleid2,dedup_val[)];'
       ,'DJ := DISTRIBUTE[(]J1, HASH[(]Seleid1[)], MERGE[(]Seleid1[)][)];'
       ,   '/*HACKS FOLLOW*/'
         + 'DJ := DISTRIBUTE(J1, HASH(Seleid1), MERGE(Seleid1));\n'
@@ -177,9 +160,7 @@ module
       ,'recreate manually the dist,group, and sort for notelink join'
     }
     ],tools.layout_attribute_hacks);
-
     RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
-
   END;
   
 /*  out of memory here:
@@ -188,15 +169,13 @@ module
     <att name="_kind" value="17"/>
     <att name="local" value="1"/>
     <att name="ecl" value="JOIN(LEFT.seleid > RIGHT.seleid AND LEFT.cnp_name = RIGHT.cnp_name AND LEFT.st = RIGHT.st, notelink(LEFT, RIGHT), atmost(LEFT.cnp_name = RIGHT.cnp_name AND LEFT.st = RIGHT.st, 10000), lookup, many, local);\n"/>
-
 relationships:
-
 */
   export do_all_hacks := 
     sequential(
        fHackProc_Iterate    ('Proc_Iterate'     ,pShouldSaveAttributes)
-      ,fHackspecificities   ('specificities'    ,pShouldSaveAttributes)
-      ,fHackConfig          ('Config'           ,pShouldSaveAttributes)
+      // ,fHackspecificities   ('specificities'    ,pShouldSaveAttributes)
+      // ,fHackConfig          ('Config'           ,pShouldSaveAttributes)
       ,fHackKeys            ('Keys'             ,pShouldSaveAttributes)
       ,fHackRelationships   ('relationships'    ,pShouldSaveAttributes)
       ,fHackmatch_candidates('match_candidates' ,pShouldSaveAttributes)

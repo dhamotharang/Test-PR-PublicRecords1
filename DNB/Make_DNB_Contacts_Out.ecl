@@ -1,4 +1,4 @@
-#workunit('name', 'D&B Contacts Out Creation ' + DNB.version);
+//#workunit('name', 'D&B Contacts Out Creation ' + DNB.version);
 import ut;
 
 // Format D&B Contacts for Output
@@ -41,4 +41,4 @@ DNB_Contacts_Out_Grp_Rollup := GROUP(ROLLUP(DNB_Contacts_Out_Grp_Sort,
 
 //output(DNB_Contacts_Out_Grp_Rollup,,'OUT::DNB_Contacts_' + DNB.version, overwrite);
 ut.MAC_SF_BuildProcess(DNB_Contacts_Out_Grp_Rollup,'~thor_data400::out::dnb_contacts',do1,2);
-do1;
+export Make_DNB_Contacts_Out := do1;

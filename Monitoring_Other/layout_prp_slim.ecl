@@ -1,0 +1,21 @@
+export layout_prp_slim := record
+		string10  customer_id;       
+    string30  record_id;
+		unsigned  did;
+		string17  Prpty_deed_id;
+		string45  parcel_number_1;
+		string60  name_owner_1_1;                                                  
+		string60  name_owner_2_1;    
+		string10  prim_range_d;
+    string2   predir_d;
+    string28  prim_name_d;
+    string4   suffix_d;
+    string2   postdir_d;
+    string10  unit_desig_d;
+    string8   sec_range_d;
+    string25  p_city_name_d;
+    string2   st_d;
+    string5   zip_d;
+    string4   zip4_d;
+		string8   date_in;
+end;

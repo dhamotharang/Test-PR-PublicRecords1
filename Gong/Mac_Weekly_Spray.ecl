@@ -1,4 +1,4 @@
-export Mac_Weekly_Spray(sourceIP,sourcefile,filedate,build_header_key='false',group_name='\'thor400_92\'') := 
+export Mac_Weekly_Spray(sourceIP,sourcefile,filedate,build_header_key='false',group_name= '') := 
 macro
 #uniquename(spray_first)
 #uniquename(clear_super)
@@ -79,8 +79,8 @@ gong.MAC_Merge_Current(filedate,%do_partial%)
 #uniquename(email_send_list)
 #uniquename(email_fail_list)
 
-%email_send_list% := 'jtolbert@seisint.com;mluber@seisint.com;dqi@seisint.com;Roxiebuilds@seisint.com;vniemela@seisint.com;cguyton@seisint.com';
-%email_fail_list% := 'AVenkatachalam@seisint.com;jtolbert@seisint.com;mluber@seisint.com;dqi@seisint.com;vniemela@seisint.com;cguyton@seisint.com;jtrost@seisint.com';
+%email_send_list% := 'jtolbert@seisint.com;mluber@seisint.com;dqi@seisint.com;Roxiebuilds@seisint.com;vniemela@seisint.com;tgibson@seisint.com';
+%email_fail_list% := 'AVenkatachalam@seisint.com;jtolbert@seisint.com;mluber@seisint.com;dqi@seisint.com;vniemela@seisint.com;tgibson@seisint.com';
 
 RoxieKeyBuild.Mac_Daily_Email_Local('GONG WEEKLY','SUCC', filedate, %send_succ_msg%,%email_send_list%);
 RoxieKeyBuild.Mac_Daily_Email_Local('GONG WEEKLY','FAIL', filedate, %send_fail_msg%,%email_fail_list%);

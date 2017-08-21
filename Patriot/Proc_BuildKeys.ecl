@@ -1,11 +1,11 @@
-import ut;
+import ut, _Control;
 
 #workunit('name','Patriot Spray And Build');
 
 ver := '2005xxxx'; // set to correct version
 insize := 4125;    // must match record length of input file
 
-ut.mac_file_spray_and_build('10.150.12.240','/sanc_15/sanctions_all.d00',insize,ver,'patriot_file',pre);
+ut.mac_file_spray_and_build(_Control.IPAddress.edata12,'/sanc_15/sanctions_all.d00',insize,ver,'patriot_file',pre);
 
 do1 := output(count(Patriot.ScoreNames));
 do2 := patriot.Proc_BuildDidKeys;

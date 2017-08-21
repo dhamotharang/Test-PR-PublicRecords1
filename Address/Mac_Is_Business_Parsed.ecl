@@ -14,7 +14,7 @@ export Mac_Is_Business_Parsed(inFile,
 		cln_mname2 = 'cln_mname2',		// cleaned middle name field
 		cln_lname2 = 'cln_lname2',		// cleaned last name field
 		cln_suffix2 = 'cln_suffix2',	// cleaned suffix field
-		options = '[]'				// 'X' for experimental name cleaner
+		options = '[]'
 ) := MACRO
 /*****************************************************************
 
@@ -38,7 +38,7 @@ doclean		If true, clean the name, if it is determined to be a person name
 The remaining fields are documented in Address.Mac_Is_Business
 
 ******************************************************************/
-
+import nid;
 #UNIQUENAME(nosuffix)
 %nosuffix% := IF(#TEXT(suffix) = '\'\'', true, false);
 
@@ -48,12 +48,10 @@ The remaining fields are documented in Address.Mac_Is_Business
 		string80	fullname := '';
 		string1 	nameType := '';
 	END;
-	
-	
+		
 #UNIQUENAME(cln_layout)
 // layout with cleaned name
 	%cln_layout% := RECORD
-		string80	fullname := '';
 		string1		nameType := '';
 		string5		cln_title := '';
 		string20	cln_fname := '';
@@ -73,131 +71,26 @@ The remaining fields are documented in Address.Mac_Is_Business
 #ELSE
 	%new_layout% := {RecordOf(inFile) OR %ind_layout%};
 #END
-  
-#UNIQUENAME(xform)
-	%new_layout% %xform%(RECORDOF(inFile) L) := TRANSFORM
-
-		name := Address.Persons.ReconstructName(L.fname,L.mname,L.lname,
-#IF(%nosuffix%)
-		''
-#ELSE
-		L.suffix
-#END
-		);
-		nametype := Address.Business.GetNameType(name);
-		//self.fullname := name;
-		self.fullname := Address.Persons.SuffixToAlpha(Address.Persons.FixupName(name));
-		self.nameType := nametype;
-#IF(doclean=true)
-		hint := IF(nametype='D','D','f');
-
-#uniquename(use_experimental)
-%use_experimental% := 'X' in options;
-#if(%use_experimental%)
-		string140 cln_name := Address.NameCleaner.CleanNameEx(name, hint);
-#else
-	cln_name := Address.Persons.CleanName(name, hint);
-#end
-		self.cln_title		:= cln_name[1..5];
-		self.cln_fname		:= cln_name[6..25];
-		self.cln_mname		:= cln_name[26..45];
-		self.cln_lname		:= cln_name[46..65];
-		self.cln_suffix	    := cln_name[66..70];
-		self.cln_title2		:= cln_name[71..75];
-		self.cln_fname2		:= cln_name[76..95];
-		self.cln_mname2		:= cln_name[96..115];
-		self.cln_lname2		:= cln_name[116..135];
-		self.cln_suffix2    := cln_name[136..140];
-#END
-		self := L;
-	END;
-	
 #UNIQUENAME(dsin)
-	%dsin% := IF(dodedup,
-					DISTRIBUTE(inFile(TRIM(fname) + TRIM(mname) + TRIM(lname)<>''),
-							HASH64(lname,fname,mname
-#IF(NOT %nosuffix%)
-							,suffix
-#END
-					)),
-					inFile);
-					
-#UNIQUENAME(ds)
-	%ds% := IF(dodedup,DEDUP(
-							SORT(DISTRIBUTED(%dsin%,
-									HASH64(lname,fname,mname
-#IF(NOT %nosuffix%)
-							,suffix
-#END
-							)),
-							lname,fname,mname
-#IF(NOT %nosuffix%)
-							,suffix
-#END
-							, LOCAL),
-						lname,fname,mname
-#IF(NOT %nosuffix%)
-						,suffix
-#END
-						, LOCAL),
-				inFile);
-
-#UNIQUENAME(dsOut)
-
-	%dsOut% := PROJECT(%ds%,  %xform%(LEFT)) : onwarning(4538,ignore);
-	//%dsOut% := DISTRIBUTE(PROJECT(%ds%,  %xform%(LEFT)),HASH64(lname,fname,mname
-//#IF(NOT %nosuffix%)
-//								,suffix
-//#END
-//					));
-	
-#UNIQUENAME(xform2)
-	%new_layout% %xform2%(RECORDOF(inFile) L, %new_layout% R) := TRANSFORM
-		self.fullname := R.fullname;
-		self.nameType := R.nameType;
-#IF(doclean=true)
-		self.cln_title := R.cln_title;
-		self.cln_fname := R.cln_fname;
-		self.cln_mname := R.cln_mname;
-		self.cln_lname := R.cln_lname;
-		self.cln_suffix := R.cln_suffix;
-		self.cln_title2 := R.cln_title2;
-		self.cln_fname2 := R.cln_fname2;
-		self.cln_mname2 := R.cln_mname2;
-		self.cln_lname2 := R.cln_lname2;
-		self.cln_suffix2 := R.cln_suffix2;
-#END
-		self := L;
+#UNIQUENAME(layoutin)
+#UNIQUENAME(blanksuffix)
+#IF(%nosuffix%=true)
+	%layoutin% := RECORD
+		inFile;
+		string5	%blanksuffix% := '';
 	END;
-/*	
-	outFile := IF(dodedup,
-					JOIN(inFile, %dsOut%, 
-					LEFT.fname=RIGHT.fname AND LEFT.mname=RIGHT.mname AND LEFT.lname=RIGHT.lname
-#IF(NOT %nosuffix%)
-					AND LEFT.suffix=RIGHT.suffix
+	%dsin% := TABLE(inFile, %layoutin%);
+#ELSE
+	%dsin% := inFile;
 #END
-					,%xform2%(LEFT, RIGHT), LEFT OUTER, KEEP(1)),
-					%dsOut%);
-*/
-	outFile := IF(dodedup,
-					JOIN(DISTRIBUTED(%dsin%, HASH64(lname,fname,mname
-#IF(NOT %nosuffix%)
-							,suffix
+  
+	outFile := PROJECT(Nid.fn_CleanParsedNames(%dsin%, fname,mname,lname
+#IF(%nosuffix%=true)
+							,%blanksuffix%),
+#ELSE
+							,suffix),
 #END
-					)),
-					DISTRIBUTED(%dsOut%, HASH64(lname,fname,mname
-#IF(NOT %nosuffix%)
-							,suffix
-#END
-					)),					
-					LEFT.fname=RIGHT.fname AND LEFT.mname=RIGHT.mname AND LEFT.lname=RIGHT.lname
-#IF(NOT %nosuffix%)
-					AND LEFT.suffix=RIGHT.suffix
-#END
-					,%xform2%(LEFT, RIGHT), LOCAL, LEFT OUTER, KEEP(1))
-					+ PROJECT(inFile(TRIM(fname) + TRIM(mname) + TRIM(lname)=''),%new_layout%),
-					%dsOut%);
-
+							%new_layout%);
 
 ENDMACRO;
 

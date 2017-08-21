@@ -2,7 +2,7 @@
 // - We were well-formed before linking on the id field
 // - No SPLICEs or CLEAVEs
 EXPORT MAC_MultiParent_Collapse(infile0,parentid,id) := FUNCTIONMACRO
-	IMPORT SALT33;
+	IMPORT SALT33,BIPV2_Tools;
 	infilep := infile0(parentid=0);
 	infile := infile0(parentid<>0);
 	

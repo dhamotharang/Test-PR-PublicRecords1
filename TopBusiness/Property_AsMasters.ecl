@@ -12,14 +12,13 @@ export Property_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.county_name := right.county_name,
 				self := left),
 			left outer,
-			lookup);
-	
+			lookup) : persist('~thor40_241_7::persist::brm::propertybase');
 
 	shared assessment_file := LN_PropertyV2.File_Assessment; 
 	// LN_PropertyV2.file_assessment_building 
 	// contains other fields needed. 
 	shared deed_file := ln_propertyV2.File_Deed; // LN_PropertyV2.file_deed_building
-	shared filtered := base(cname != ''); 
+	shared filtered := base(cname != '') : independent; 
 	export dataset(Layout_Linking.Unlinked) As_Linking_Master := function
 	
 		
@@ -112,6 +111,7 @@ export Property_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.v_city_name),
 				self.state := left.st,
 				self.zip := left.zip,
+				self.zip4 := left.zip4,
 				self.county_fips := left.county[3..5],
 				self.msa := left.msa,
 				self.phone := left.phone_number;
@@ -139,6 +139,8 @@ export Property_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					self.date_first_seen := (unsigned4)right.dt_first_seen * 100,
 					self.date_last_seen := (unsigned4)right.dt_last_seen * 100,
 					self.ssn := '',
+					self.did := left.did,
+					self.score := 0,
 					self.name_prefix := left.title,
 					self.name_first := left.fname,
 					self.name_middle := left.mname,
@@ -246,6 +248,8 @@ export Property_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.city_name    := if (isAPropertyRec, '',left.v_city_name),
 				self.state        := if (isAPropertyRec, '', left.st),
 				self.zip          := if (isAPropertyRec, '', left.zip),				
+				self.zip4         := if (isAPropertyRec, '', left.zip4),
+				self.county_name  := if (isAPropertyRec, '', left.county_name),
 			));				
 		return extract;						       								
 	end;
@@ -303,25 +307,25 @@ export Property_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					return dedup(dedup(extract,record,all,local),record,all);
 			end;
 	
-		export dataset(Layout_Relationship.Unlinked) As_Relationship_Master := function
+		// export dataset(Layout_Relationship.Unlinked) As_Relationship_Master := function
 		
-			tempjoin := join(
-				dedup(distribute(filtered(source_code[1] = 'C'),hash64(ln_fares_id)),ln_fares_id,if(nameasis != '',nameasis,cname),all),
-				dedup(distribute(filtered(source_code[1] = 'O'),hash64(ln_fares_id)),ln_fares_id,if(nameasis != '',nameasis,cname),all),
-				left.ln_fares_id = right.ln_fares_id,
-				transform(Layout_Relationship.Unlinked,
-					self.source_1 := MDR.sourceTools.fProperty(left.ln_fares_id),
-					self.source_docid_1 := left.ln_fares_id;
-					self.source_party_1 := left.source_code[1] + hash64(if(left.nameasis != '',left.nameasis,left.cname)),
-					self.role_1 := 'PROPERTY INTERMEDIARY',
-					self.source_2 := MDR.sourceTools.fProperty(right.ln_fares_id),
-					self.source_docid_2 := right.ln_fares_id;
-					self.source_party_2 := right.source_code[1] + hash64(if(right.nameasis != '',right.nameasis,right.cname)),
-					self.role_2 := 'PROPERTY_OWNER'),
-				local);
+			// tempjoin := join(
+				// dedup(distribute(filtered(source_code[1] = 'C'),hash64(ln_fares_id)),ln_fares_id,if(nameasis != '',nameasis,cname),all),
+				// dedup(distribute(filtered(source_code[1] = 'O'),hash64(ln_fares_id)),ln_fares_id,if(nameasis != '',nameasis,cname),all),
+				// left.ln_fares_id = right.ln_fares_id,
+				// transform(Layout_Relationship.Unlinked,
+					// self.source_1 := MDR.sourceTools.fProperty(left.ln_fares_id),
+					// self.source_docid_1 := left.ln_fares_id;
+					// self.source_party_1 := left.source_code[1] + hash64(if(left.nameasis != '',left.nameasis,left.cname)),
+					// self.role_1 := 'PROPERTY INTERMEDIARY',
+					// self.source_2 := MDR.sourceTools.fProperty(right.ln_fares_id),
+					// self.source_docid_2 := right.ln_fares_id;
+					// self.source_party_2 := right.source_code[1] + hash64(if(right.nameasis != '',right.nameasis,right.cname)),
+					// self.role_2 := 'PROPERTY_OWNER'),
+				// local);
 			
-			return tempjoin;
+			// return tempjoin;
 		
-		end;
+		// end;
 		
 	end;

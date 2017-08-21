@@ -1,4 +1,4 @@
-import ut;
+import Std;
 
 export _Filters :=
 module
@@ -103,7 +103,9 @@ module
 		return		if(_Flags.ShouldFilter, dproj_filt, dproj);
 
 	end;
-	shared one_year_ago := (unsigned4)((string)((unsigned)ut.GetDate[1..4] - 1) + ut.GetDate[5..]);
+	
+	shared getTodaysdate := (string8)Std.Date.Today();
+	shared one_year_ago := (unsigned4)((unsigned)getTodaysdate[1..4] - 1 + getTodaysdate[5..]);
 
 	export fAs_POE(
 	

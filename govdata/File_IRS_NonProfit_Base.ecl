@@ -1,1 +1,2 @@
-export File_IRS_NonProfit_Base := dataset('~thor_Data400::base::IRS_NonProfit',govdata.Layout_IRS_NonProfit_Base,flat);
+export File_IRS_NonProfit_Base := project(govdata.File_IRS_NonProfit_Base_AID,
+																					transform(govdata.Layout_IRS_NonProfit_Base, self := left, self := []));

@@ -1,8 +1,21 @@
-//Do Emerges vote keys first
 import emerges, lib_keylib,lib_stringlib;
-#workunit ('name', 'Build Emerges Hunters Keys ');
 
-h := emerges.file_hunters_keybuild;
+ds_hunt := emerges.file_hunters_keybuild;
+
+emerges.layout_hunters_out reformat(ds_hunt l) := transform
+	self := l;
+end;
+
+ds_hunt_out := project(ds_hunt,reformat(left));
+
+output(ds_hunt_out,,'~thor_data400::emerges::hunt_out',__compressed__,overwrite);
+
+string_rec := record
+	emerges.layout_hunters_out;
+	unsigned integer8 __filepos {virtual(fileposition)};
+end;
+
+h := dataset('~thor_data400::emerges::hunt_out',string_rec,flat);
 
 MyFields := record
    h.file_id;
@@ -35,17 +48,18 @@ MyFields := record
    h.mail_sec_range;
    h.mail_p_city_name;
    h.mail_ace_zip;
+   h.process_date;
    string2 mail_st := lib_stringlib.stringlib.stringtouppercase(h.mail_st);
-  string60 lfmname := TRIM(h.lname,right) + ' ' + IF(TRIM(h.fname,right) = '', ' ',TRIM(h.fname,right) + ' ') + 
-					  TRIM(h.mname,right);
-  string60 fmlname := TRIM(h.fname,right) + ' ' + IF(TRIM(h.mname,right) = '', ' ',TRIM(h.mname,right) + ' ') + 
-					  TRIM(h.lname,right);
-  string45 mfname := TRIM(h.mname,right) + ' ' + TRIM(h.fname,right);
-  string6  dph_lname := metaphonelib.DMetaPhone1(h.lname);
-  string5 all_zip := '';
-  string25 all_city := '';
-  string2 all_state := '';
-h.__filepos;
+   string60 lfmname := TRIM(h.lname,right) + ' ' + IF(TRIM(h.fname,right) = '', ' ',TRIM(h.fname,right) + ' ') + 
+					   TRIM(h.mname,right);
+   string60 fmlname := TRIM(h.fname,right) + ' ' + IF(TRIM(h.mname,right) = '', ' ',TRIM(h.mname,right) + ' ') + 
+					   TRIM(h.lname,right);
+   string45 mfname := TRIM(h.mname,right) + ' ' + TRIM(h.fname,right);
+   string6  dph_lname := metaphonelib.DMetaPhone1(h.lname);
+   string5 all_zip := '';
+   string25 all_city := '';
+   string2 all_state := '';
+   h.__filepos;
 end;
 
 // -- KEY #0
@@ -311,4 +325,17 @@ z5_address_lname_records := NORMALIZE(t, 2,Norm_z5_addr_lname(LEFT, COUNTER));
 k17 := BUILDINDEX(z5_address_lname_records(z5 != '' and street_name != ''),,emerges.base_key_name_emerges_hunt + 
 			'z5.street_name.predir.postdir.prim_range.lname.key', moxie, overwrite);
 
-export MOXIE_EMERGES_HUNTERS_KEYS := sequential(parallel(k1,k2,k3,k4,k5,k6,k7,k8,k9),parallel(k10,k11,k12,k13,k14,k15,k16,k17));
+//-- Key #16
+qadate_lfmname_rec := record
+	t.process_date;
+	t.st;
+	t.lfmname;
+	t.__filepos;
+end;
+
+qadate_lfmname_records := table(t, qadate_lfmname_rec);
+
+k18 := BUILDINDEX(qadate_lfmname_records(process_date != ''),,emerges.base_key_name_emerges_hunt + 'qa_date.st.lfmname.key',moxie,overwrite);
+
+
+export MOXIE_EMERGES_HUNTERS_KEYS := sequential(parallel(k1,k2,k3,k4,k5,k6,k7,k8,k9),parallel(k10,k11,k12,k13,k14,k15,k16,k17,k18));

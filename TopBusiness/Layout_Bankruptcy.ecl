@@ -10,6 +10,8 @@ export Layout_Bankruptcy := module
 	    string7   case_number;
       string3   chapter;
 	    string8   date_filed;
+			string8   status_date;
+			string30  status;
 	    string12  filing_status;
 		  string2   filing_jurisdiction;
 	    string5   court_code;
@@ -24,7 +26,8 @@ export Layout_Bankruptcy := module
 	    string25  orig_case_number;
 	    string3   orig_chapter;
 	    string8   orig_filing_date;
-		  string10  orig_filing_type;
+		  string15  orig_filing_type;
+			string15  filer_type;
 		  /* other fields (see below) - TBD, Tim Bernhard is deciding
  	    string8    process_date;
       string1	   source;

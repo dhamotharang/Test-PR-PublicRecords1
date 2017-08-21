@@ -1,17 +1,37 @@
-import	ut;
+import	Std;
 
 dVehiclePartyBase	:=	VehicleV2.Files.Base.Party_BIP;
 
-ConvertYYYYMMToNumberOfMonths(integer	pInput)	:= 
-	 (((integer)(pInput[1..4])*12)	+	((integer)(pInput[5..6])));
-	 
-VehicleV2.Layout_Base.Party_Base_BIP	tReformat2Bldg(dVehiclePartyBase	pInput)	:=
+// Blank out title number for experian states ME and NE
+VehicleV2.Layout_Base.Party_bip	tBlankTitleNum(dVehiclePartyBase	pInput)	:=
 transform
-	self.orig_DOB													:=	if(ConvertYYYYMMToNumberOfMonths((integer)ut.GetDate) - ConvertYYYYMMToNumberOfMonths((integer)pInput.orig_DOB) > 180, pInput.orig_DOB ,'');
-	self.Date_First_Seen					:=	(unsigned3)pInput.Date_First_Seen[1..6];
-	self.Date_Last_Seen						:=	(unsigned3)pInput.Date_Last_Seen[1..6];
-	self.Date_Vendor_First_Reported			:=	(unsigned3)pInput.Date_Vendor_First_Reported[1..6];
-	self.Date_Vendor_Last_Reported			:=	(unsigned3)pInput.Date_Vendor_Last_Reported[1..6];
+	self.Ttl_Number	:=	if(	(pInput.source_code	=	'AE'	and	pInput.state_origin	=	'ME')	or	pInput.state_origin	=	'NE',
+													'',
+													pInput.Ttl_Number
+												);
+												
+	// Blank out plate number for experian state LA 
+	// DF18154 - balnk out plate number for experian state LA only if the files were received on or before 20160818
+  self.Reg_True_License_Plate      := if(pInput.source_code	=	'AE'	and	pInput.state_origin	=	'LA' and pInput.Date_Vendor_First_Reported<=20160818, '',pInput.Reg_True_License_Plate ); 
+  self.Reg_License_Plate           := if(pInput.source_code	=	'AE'	and	pInput.state_origin	=	'LA' and pInput.Date_Vendor_First_Reported<=20160818, '',pInput.Reg_License_Plate  ); 
+  self.Reg_Previous_License_Plate  := if(pInput.source_code	=	'AE'	and	pInput.state_origin	=	'LA' and pInput.Date_Vendor_First_Reported<=20160818, '',pInput.Reg_Previous_License_Plate ); 
+  self.Reg_License_Plate_Type_Code := if(pInput.source_code	=	'AE'	and	pInput.state_origin	=	'LA' and pInput.Date_Vendor_First_Reported<=20160818, '',pInput.Reg_License_Plate_Type_Code); 
+  self.Reg_License_Plate_Type_Desc := if(pInput.source_code	=	'AE'	and	pInput.state_origin	=	'LA' and pInput.Date_Vendor_First_Reported<=20160818, '',pInput.Reg_License_Plate_Type_Desc ); 
+	self			                       :=	pInput;
+end;
+
+dVehicleV2PartyBldg	:=	project(dVehiclePartyBase,tBlankTitleNum(left));
+
+ConvertYYYYMMToNumberOfMonths(integer	pInput)	:= 
+	 (((integer)(((string)pInput)[1..4])*12)	+	((integer)(((string)pInput)[5..6])));
+	 
+VehicleV2.Layout_Base.Party_Base_BIP	tReformat2Bldg(dVehicleV2PartyBldg	pInput)	:=
+transform
+	self.orig_DOB													:=	if(ConvertYYYYMMToNumberOfMonths((integer)(STRING8)Std.Date.Today()) - ConvertYYYYMMToNumberOfMonths((integer)pInput.orig_DOB) > 180, pInput.orig_DOB ,'');
+	self.Date_First_Seen					:=	(unsigned3)((string)pInput.Date_First_Seen)[1..6];
+	self.Date_Last_Seen						:=	(unsigned3)((string)pInput.Date_Last_Seen)[1..6];
+	self.Date_Vendor_First_Reported			:=	(unsigned3)((string)pInput.Date_Vendor_First_Reported)[1..6];
+	self.Date_Vendor_Last_Reported			:=	(unsigned3)((string)pInput.Date_Vendor_Last_Reported)[1..6];
 	self.append_clean_name.title			:=	pInput.title;                                                                                                                      
 	self.append_clean_name.fname			:=	pInput.fname;                                                                                                                      
 	self.append_clean_name.mname			:=	pInput.mname;                                                                                                                      
@@ -61,7 +81,7 @@ transform
 	self																	:=	pInput;
 end;
 
-dVehicleV2Party	:=	project(dVehiclePartyBase,tReformat2Bldg(left));
+dVehicleV2Party	:=	project(dVehicleV2PartyBldg,tReformat2Bldg(left));
 
 // Bug 62451
 // Filter out lien holder information for experian state LA
@@ -70,23 +90,8 @@ dVehicleV2PartyFilter	:=	dVehicleV2Party(~(	(source_code	=	'AE'	and	state_origin
 																						)
 																					);
 
-// Blank out title number for experian states ME and NE
-VehicleV2.Layout_Base.Party_Base_BIP	tBlankTitleNum(dVehicleV2PartyFilter	pInput)	:=
-transform
-	self.Ttl_Number	:=	if(	(pInput.source_code	=	'AE'	and	pInput.state_origin	=	'ME')	or	pInput.state_origin	=	'NE',
-													'',
-													pInput.Ttl_Number
-												);
-												
-	// Blank out plate number for experian state LA 	
-  self.Reg_True_License_Plate      := if(pInput.source_code	=	'AE'	and	pInput.state_origin	=	'LA', '',pInput.Reg_True_License_Plate ); 
-  self.Reg_License_Plate           := if(pInput.source_code	=	'AE'	and	pInput.state_origin	=	'LA', '',pInput.Reg_License_Plate  ); 
-  self.Reg_Previous_License_Plate  := if(pInput.source_code	=	'AE'	and	pInput.state_origin	=	'LA', '',pInput.Reg_Previous_License_Plate ); 
-  self.Reg_License_Plate_Type_Code := if(pInput.source_code	=	'AE'	and	pInput.state_origin	=	'LA', '',pInput.Reg_License_Plate_Type_Code); 
-  self.Reg_License_Plate_Type_Desc := if(pInput.source_code	=	'AE'	and	pInput.state_origin	=	'LA', '',pInput.Reg_License_Plate_Type_Desc ); 
-	self			                       :=	pInput;
-end;
 
-dVehicleV2PartyBldg	:=	project(dVehicleV2PartyFilter,tBlankTitleNum(left));
+//Filter out record per legal request - DF-16726
+dVehicleV2PartySuppress := dVehicleV2PartyFilter(append_DID != 154640963692);
 
-export	File_VehicleV2_Party_Building	:=	dVehicleV2PartyBldg;
+export	File_VehicleV2_Party_Building	:=	dVehicleV2PartySuppress;

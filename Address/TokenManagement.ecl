@@ -5,7 +5,7 @@ export string32 TerminateToken(string32 s) := BEGINC++
 #body
 	memcpy(__result, s, 31);
 	__result[31] = 0;
-ENDC++;
+ENDC++ : DEPRECATED('Do not use');
 
 export integer4 TokenCount(string s) := BEGINC++
 //void tokenize(size32_t & __lenResult, char * & __result,
@@ -19,7 +19,7 @@ export integer4 TokenCount(string s) := BEGINC++
 	
 	while (i < lenS)
 	{
-		if (isalnum(s[i]) || s[i] == ('_'))
+		if (isalnum(s[i]) || s[i] == '_' || s[i] == '\'')
 		{
 			endtoken = false;
 		}
@@ -37,7 +37,7 @@ export integer4 TokenCount(string s) := BEGINC++
 	return n;
 
 
-ENDC++;
+ENDC++ : DEPRECATED('Do not use');
 
 export set of string32 TokenSet(string s, integer4 n) := BEGINC++
 //void tokenset(bool __isAllResult, size32_t & __lenResult, void * & __result
@@ -50,7 +50,7 @@ export set of string32 TokenSet(string s, integer4 n) := BEGINC++
 		temp = (char *)rtlMalloc(32 * n);
 	if ((n == 0) || (temp == (char *)0))
 	{
-		__isAllResult = true;
+		__isAllResult = false;
 		__lenResult = 0;
 		__result = (char *)0;
 		return;
@@ -65,17 +65,12 @@ export set of string32 TokenSet(string s, integer4 n) := BEGINC++
 	
 	while (i < lenS)
 	{
-		if (isalnum(s[i]) || (s[i] == '_'))
+		if (isalnum(s[i]) || s[i] == '_' || s[i] == '\'')
 		{
 			if (len < 32)
-				temp[j++] = s[i];
-			++len;		// word length
-			if (len > 32)	// token too long
 			{
-				__isAllResult = true;
-				__lenResult = 0;
-				__result = (char *)0;
-				return;
+				temp[j++] = s[i];
+				++len;		// word length
 			}
 
 			endtoken = false;
@@ -100,8 +95,8 @@ export set of string32 TokenSet(string s, integer4 n) := BEGINC++
 	__lenResult = 32 * n;
 	__result = temp;
 
-ENDC++;
-
+ENDC++ : DEPRECATED('Do not use');
+/*
 export SET OF STRING32 SortSet(SET OF STRING32 list) := BEGINC++
 #option pure
 //Function: void qsort (void *array, size_t count, size_t size, comparison_fn_t compare)
@@ -114,7 +109,7 @@ export SET OF STRING32 SortSet(SET OF STRING32 list) := BEGINC++
 	__result = array;
 
 ENDC++;
-
+*/
 export SET OF STRING32 SortAndTerminateSet(SET OF STRING32 list) := BEGINC++
 #option pure
 //Function: void qsort (void *array, size_t count, size_t size, comparison_fn_t compare)
@@ -136,7 +131,7 @@ export SET OF STRING32 SortAndTerminateSet(SET OF STRING32 list) := BEGINC++
 	__lenResult = lenList;
 	__result = array;
 
-ENDC++;
+ENDC++ : DEPRECATED('Do not use');
 
 
 export boolean FindToken(SET OF STRING32 list, string32 name) := BEGINC++
@@ -155,7 +150,8 @@ export boolean FindToken(SET OF STRING32 list, string32 name) := BEGINC++
 				(int (*)(const void*, const void*))strcmp);
 	return (s != NULL);
 
-ENDC++;
+ENDC++ : DEPRECATED('Do not use');
+/*
  boolean FindTokenX(SET OF STRING32 list, varstring name) := BEGINC++
 #option pure
 	int entries = lenList/32;
@@ -165,7 +161,7 @@ ENDC++;
 	return (s != NULL);
 
 ENDC++;
-
+*/
 export boolean AnyTokenInSet(SET OF STRING32 list, SET OF STRING32 tokens) := BEGINC++
 #option pure
 	int entries = lenList/32;
@@ -188,8 +184,8 @@ export boolean AnyTokenInSet(SET OF STRING32 list, SET OF STRING32 tokens) := BE
 			return true;
 	}
 	return false;
-ENDC++;
-
+ENDC++ : DEPRECATED('Do not use');
+/*
 export integer4 CountTokensInSet(SET OF STRING32 list, SET OF STRING32 tokens) := BEGINC++
 #option pure
 	int entries = lenList/32;
@@ -214,7 +210,7 @@ export integer4 CountTokensInSet(SET OF STRING32 list, SET OF STRING32 tokens) :
 	}
 	return count;
 ENDC++;
-
+*/
 export boolean AnyDigraphInSet(SET OF STRING32 list, SET OF STRING32 tokens) := BEGINC++
 #option pure
 	int entries = lenList/32;
@@ -246,8 +242,8 @@ export boolean AnyDigraphInSet(SET OF STRING32 list, SET OF STRING32 tokens) := 
 			return true;
 	}
 	return false;
-ENDC++;
-
+ENDC++ : DEPRECATED('Do not use');
+/*
 export SET OF STRING32 GetDigraphs(SET OF STRING32 list) := BEGINC++
 #option pure
 	int entries = lenList/32;
@@ -260,6 +256,6 @@ export SET OF STRING32 GetDigraphs(SET OF STRING32 list) := BEGINC++
 	return (s != NULL);
 
 ENDC++;
-
+*/
 
 END;

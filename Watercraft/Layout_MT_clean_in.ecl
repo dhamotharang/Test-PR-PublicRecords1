@@ -1,13 +1,10 @@
-export Layout_MT_clean_in := 
+export Layout_MT_clean_in := record   //rec_length: 1623
 
-record
-
-string2      state_origin;
-string8      process_date;
-
-watercraft.layout_MT;
-
-string70 pname1;
+  string2      state_origin;
+  string8      process_date;
+  watercraft.layout_MT;
+  
+  string70 pname1;
 
   string3  pname1_score;
 
@@ -38,8 +35,6 @@ string70 pname1;
   string100 cname5;
 
   string182 clean_address;
-
-
   
-  end;
+end;
 

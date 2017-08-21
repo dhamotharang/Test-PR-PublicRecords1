@@ -1,6 +1,6 @@
-import doxie;
+import doxie,ut;
 
-df1 := corp.File_Corp_Base(bdid != 0);
+df1 := fPrepareCorpBaseFile(corp.File_Corp_Base(bdid != 0));
 
 export key_Corp_base_bdid_pl := 
 index(

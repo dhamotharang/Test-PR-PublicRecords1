@@ -1,12 +1,18 @@
-import Watercraft_UMF, Ut,Business_Header_SS,Business_Header,watercraft;
+import Watercraft_UMF, Ut,Business_Header_SS,Business_Header,watercraft, watercraft_preprocess;
  
+//New raw input using ECL processing
+ Join_CG_new	:= dataset('~thor_data400::in::watercraft_coastguard_common',watercraft.Layout_Watercraft_Coastguard_Base,flat);
+ 
+//Previous input using AbInitio
  Join_CG :=     Watercraft.Mapping_CG_as_Coastguard
 										+ Watercraft.Mapping_WI_as_CoastGuard; 
 										
 										  
- //Add persistent record id 
+ //Combine both inputs for processing
+ dCombineJoin	:= Join_CG + Join_CG_new;
  
- dedup_coast := dedup(project(Join_CG, transform( Watercraft.Layout_Watercraft_Coastguard_Base, 
+ //Add persistent record id 
+ dedup_coast := dedup(project(dCombineJoin, transform( Watercraft.Layout_Watercraft_Coastguard_Base, 
  
     self.watercraft_key := stringlib.stringcleanspaces(stringlib.stringtouppercase(left.watercraft_key));
     self.sequence_key := stringlib.stringcleanspaces(stringlib.stringtouppercase(left.sequence_key));

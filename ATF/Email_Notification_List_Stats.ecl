@@ -1,0 +1,1 @@
+export Email_Notification_List_Stats := 'lbentley@seisint.com; kgummadi@seisint.com; tmiddleton@seisint.com; cmorton@seisint.com';

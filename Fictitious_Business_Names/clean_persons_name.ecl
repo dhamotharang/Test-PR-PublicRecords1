@@ -9,7 +9,7 @@ end;
 
 Layout_Clean_Name trans_cleanname(file1 l) := Transform
 self.combine_cct_name := trim(l.cct_firstname,left,right) + ' ' + trim(l.cct_lastname,left,right) + ' ' + trim(l.cct_suffix,left,right);
-self.clean_cct_name:= addrcleanlib.CleanPersonfml73(self.combine_cct_name); 
+self.clean_cct_name:= address.CleanPersonfml73(self.combine_cct_name); 
 self := l;
 end;
 

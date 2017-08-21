@@ -1,4 +1,4 @@
-import Business_Header,ut;
+import Business_Header,ut,Business_HeaderV2;
 
 Business_Header.Layout_Business_Header	tPropertyPrepToBusHdr(LN_Property.LN_Property_as_Business_Prep pInput)
  :=
@@ -19,5 +19,5 @@ Property_clean_rollup := Business_Header.As_Business_Header_Function(dPropertyPr
 
 export LN_Property_as_Business_Header
  :=	Property_clean_rollup
- :	persist('~thor_data400::persist::bushdr_ln_property_as_bus_hdr')
- ;
+	: persist(business_header._dataset().thor_cluster_Persists + 'persist::LN_Property::LN_Property_as_Business_Header')
+	;

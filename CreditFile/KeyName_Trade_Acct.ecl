@@ -1,0 +1,1 @@
+export KeyName_Trade_Acct := '~thor_data400::key.trade.acct';

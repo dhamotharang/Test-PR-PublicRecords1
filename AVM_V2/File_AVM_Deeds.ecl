@@ -5,7 +5,8 @@ export File_AVM_Deeds(string8 history_date) := function;
 // R = fares data, can't use
 // D = Deed record
 // P = Property record
-search_file := LN_PropertyV2.File_Search_DID(ln_fares_id[1]!='R'  and ln_fares_id[2] = 'D' and source_code[2] = 'P' and (integer)zip <> 0);  // search file, deed records
+search_file := LN_PropertyV2.File_Search_DID(ln_fares_id[1]!='R'  and ln_fares_id[2] = 'D' and source_code[2] = 'P' and (integer)zip <> 0 
+																							and trim(county)<>'');  // search file, deed records
 sfd := distribute(search_file, hash(ln_fares_id));
 						
 layout_clean_deed := record
@@ -38,9 +39,7 @@ deed_file := LN_PropertyV2.File_Deed(ln_fares_id[1]!='R' and
 								avm_v2.filters(history_date).valid_date(recording_date) and
 								first_td_loan_type_code not in avm_v2.filters(history_date).bad_loan_type_codes and
 								(integer)sales_price> avm_v2.filters(history_date).minimum_sale_price								
-								and recording_date <= history_date
-								and trim(fips_code)<>''								
-								);
+								and recording_date <= history_date);
 								
 deed_base := distribute(deed_file, hash(ln_fares_id));
 
@@ -48,7 +47,7 @@ deed_base := distribute(deed_file, hash(ln_fares_id));
 layout_clean_deed clean_deed(deed_base le, sfd rt) := transform
 	self.ln_fares_id := le.ln_fares_id;
 	self.unformatted_apn := avm_v2.filters(history_date).stripformat(le.apnt_or_pin_number);
-	self.fips_code := le.fips_code;
+	self.fips_code := rt.county;
 	self.land_use_code := le.assessment_match_land_use_code;
 	self.sales_price := le.sales_price;
 	self.recording_date := le.recording_date;
@@ -56,7 +55,7 @@ layout_clean_deed clean_deed(deed_base le, sfd rt) := transform
 end;
 
 // append the clean address and clean the apn to use for linking to assessment records
-deed_slim1 := join(deed_base, sfd, left.ln_fares_id=right.ln_fares_id, clean_deed(left,right), left outer, keep(1), local);
+deed_slim1 := join(deed_base, sfd, left.ln_fares_id=right.ln_fares_id, clean_deed(left,right), keep(1), local);
 
 // pull out the records with blank address and apns before the distribute and join
 deed_blanks := deed_slim1(trim(prim_range)='' and trim(prim_name)='' and trim(sec_range)='' and trim(zip)='' and trim(unformatted_apn)='');

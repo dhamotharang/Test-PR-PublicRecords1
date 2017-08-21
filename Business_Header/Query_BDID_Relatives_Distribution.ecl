@@ -1,8 +1,8 @@
-f := Business_Header.File_Business_Relatives(not rel_group);
+f := File_Business_Relatives(not rel_group, bdid2 < bdid1);
 fg := Business_Header.File_Business_Relatives_Group;
 
 layout_relatives_slim := record
-unsigned4 bdid;
+unsigned6 bdid;
 string2 relation_type;
 end;
 
@@ -27,6 +27,11 @@ relatives_gong_group := project(f(gong_group), MapRelationType(left, 'G'));
 relatives_ucc_filing := project(f(ucc_filing), MapRelationType(left, 'U'));
 relatives_fbn_filing := project(f(fbn_filing), MapRelationType(left, 'F'));
 relatives_fein := project(f(fein), MapRelationType(left, 'FE'));
+relatives_dca_company_number := project(f(dca_company_number), MapRelationType(left, 'DC'));
+relatives_dca_hierarchy := project(f(dca_hierarchy), MapRelationType(left, 'DH'));
+relatives_abi_number := project(f(abi_number), MapRelationType(left, 'AB'));
+relatives_abi_hierarchy := project(f(abi_hierarchy), MapRelationType(left, 'AH'));
+
 
 relatives_slim := relatives_corp_charter_number +
                   relatives_bankruptcy_filing +
@@ -43,7 +48,11 @@ relatives_slim := relatives_corp_charter_number +
                   relatives_gong_group +
                   relatives_ucc_filing +
                   relatives_fbn_filing +
-                  relatives_fein;
+                  relatives_fein +
+			   relatives_dca_company_number +
+			   relatives_dca_hierarchy +
+			   relatives_abi_number +
+			   relatives_abi_hierarchy;
 
 layout_relatives_stat := record
 relatives_slim.bdid;
@@ -99,3 +108,7 @@ output(relatives_stat_dedup_sort(relation_type='G'));
 output(relatives_stat_dedup_sort(relation_type='U'));
 output(relatives_stat_dedup_sort(relation_type='F'));
 output(relatives_stat_dedup_sort(relation_type='FE'));
+output(relatives_stat_dedup_sort(relation_type='DC'));
+output(relatives_stat_dedup_sort(relation_type='DH'));
+output(relatives_stat_dedup_sort(relation_type='AB'));
+output(relatives_stat_dedup_sort(relation_type='AH'));

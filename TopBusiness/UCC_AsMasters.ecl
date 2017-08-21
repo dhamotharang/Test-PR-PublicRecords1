@@ -32,6 +32,7 @@ export UCC_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.v_city_name),
 				self.state := left.st,
 				self.zip := left.zip5,
+				self.zip4 := left.zip4,
 				self.county_fips := left.ace_fips_county,
 				self.msa := left.msa,
 				self.phone := '',
@@ -45,6 +46,43 @@ export UCC_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 		return extract;	
 	end;
 	
+	export dataset(Layout_Contacts.Unlinked) As_Contact_Master := function
+
+		company_filtered := base_party(tmsid != '' and company_name != '');
+		person_filtered := base_party(tmsid != '' and lname != '');
+		
+		codebtors := join(
+			company_filtered(party_type = 'D'),
+			person_filtered(party_type = 'D'),
+			left.tmsid = right.tmsid,
+			transform(Layout_Contacts.Unlinked,
+				self.source := MDR.sourceTools.src_UCCv2,
+				self.source_docid := trim(left.tmsid,left,right),
+				self.source_party := left.party_type[1] + intformat(hash32(left.orig_name,left.orig_address1,left.orig_address2,left.orig_city,left.orig_state,left.orig_zip5) % 1000000000,9,1),
+				self.date_first_seen := left.dt_first_seen * 100,
+				self.date_last_seen := left.dt_last_seen * 100,
+				self.ssn := right.ssn,
+				self.did := (unsigned)right.did,
+				self.score := right.did_score,
+				self.name_prefix := right.title,
+				self.name_first := right.fname,
+				self.name_middle := right.mname,
+				self.name_last := right.lname,
+				self.name_suffix := right.name_suffix,
+				self.addr_suffix := right.suffix,
+				self.city_name := right.p_city_name,
+				self.zip := right.zip5,
+				self.state := right.st,
+				self.position_title := 'Co-Debtors',
+				self.position_type := 'O',
+				self.email := '',
+				self.phone := '',
+				self := right));
+		
+		return codebtors;
+				
+	end;
+		
 	export dataset(TopBusiness.Layout_UCC.Main.unlinked) As_UCC_Master := function
 	  main_base := UCCV2.File_UCC_Main_Base;		             
 		filtered := main_base( orig_filing_number != '');
@@ -53,7 +91,7 @@ export UCC_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.source_docid := trim(left.tmsid,left,right),			
 		    self.Filing_Jurisdiction := left.filing_jurisdiction,
   	    //self.filing_jurisdiction_name := left.filing_jurisdiction_name,
-	      self.orig_filing_number := left.orig_filing_number,
+	      self.orig_filing_number := if(left.orig_filing_number != '',left.orig_filing_number,left.filing_number),
 	      self.orig_filing_type := left.orig_filing_type,
 	      self.orig_filing_date := left.orig_filing_date,
 				self.status_type := left.status_type,
@@ -80,11 +118,11 @@ export UCC_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 	
 	//export dataset(Layout_ucc.party) As_UCC_Master_Party(dataset(layout_ucc.main.unlinked) in_layout) := function
   export dataset(TopBusiness.Layout_UCC.Party) As_UCC_Master_Party:= function
-		extract := join(dedup(UCCV2.File_UCC_Main_Base,filing_jurisdiction,orig_filing_number,tmsid,all),base_party,
+		extract := join(dedup(UCCV2.File_UCC_Main_Base,filing_jurisdiction,if(orig_filing_number != '',orig_filing_number,filing_number),tmsid,all),base_party,
 			left.tmsid = right.tmsid,
 			transform(TopBusiness.Layout_UCC.Party,
 				self.filing_jurisdiction := left.filing_jurisdiction,
-				self.orig_filing_number := left.orig_filing_number,
+	      self.orig_filing_number := if(left.orig_filing_number != '',left.orig_filing_number,left.filing_number),
 				self.filing_number := left.filing_number,
 				self.county_name := '',
 				self := right));

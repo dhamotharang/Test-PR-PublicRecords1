@@ -1,7 +1,7 @@
-import ut;
+import ut,std;
 
 export Constants := module
-	export todayStr   := ut.GetDate;
+	export todayStr   := (STRING8)Std.Date.Today();
 	export today1900  := ut.DaysSince1900( todayStr[1..4], todayStr[5..6], todayStr[7..8] );
 	export today      := (unsigned4)todayStr;
 	export todayMinus( integer days ) := (unsigned4)ut.DateFrom_DaysSince1900(today1900 - days );
@@ -14,6 +14,7 @@ export Constants := module
 	export sixtyYrAgo := (unsigned4)ut.DateFrom_DaysSince1900(today1900 - ut.DaysInNYears(60));
 	export YearsAgo(integer1 y)   := (unsigned4)ut.DateFrom_DaysSince1900(today1900 - ut.DaysInNYears(y));
 	export boolean isCurrent( unsigned4 dt_last_seen ) := ut.DaysApart( (string8)dt_last_seen, todayStr ) < 180;
+	export boolean isCurrent90( unsigned4 dt_last_seen ) := ut.DaysApart( (string8)dt_last_seen, todayStr ) < 90;
 	//PARSE CRITERIA
 	EXPORT	STRING NIS_includes 		:= '\\b(?:CORP[ ]SERVICES|CORPORATE[ ]SERVICES|INCORPORATION[ ]SERVICE|INCORPORATION[ ]SYSTEMS|HARVARD[ ]BUSINESS[ ]SERVICES|EXCELSIOR[ ]LEGAL[ ]INC|LEGALZOOM.COM|ALCO[ ]CORP[ ]SERVICES|HARVARD[ ]BUINESS[ ]SERVICES,[ ]INC.|HARVARD[ ]BUSINESS[ ]SERVICE|HARVARD[ ]BUSINESS[ ]SERVICES|HARVARD[ ]BUSINESS[ ]SERVICES[ ]INC)\\b';
 	EXPORT	STRING CRDRPR_includes 	:= '\\b(?:CREDIT[ ]REPAIR|SKY[ ]BLUE[ ]SOLUTIONS|LEXINGTON[ ]LAW|OVATION[ ]CREDIT|CREDIT[ ]FIXERS|CREDIT[ ]SOLUTIONS|CREDIT[ ]SERVICES|MY[ ]CREDIT[ ]GROUP)\\b';

@@ -1,129 +1,77 @@
 export Build_all(
 				dataset(compid.Layout_compID_out) result
-				,string version=compid.version
+				,string pVersion=Version
 				,boolean DoPersist=false
 				) := module
 
-	shared Target	:=	if(IsWeekly	,'~thor_data400::out::weekly::alpharetta::compid'
-									,'~thor_data400::out::monthly::alpharetta::compid');
+	shared Target1	:=	if(Mode.IsWeekly	,'thor_data400::out::weekly::alpharetta::compid'
+									,'thor_data400::out::monthly::alpharetta::compid');
+
+	shared Target	:=	'~' + Target1;
 
 	export split_	:=	parallel(
-							output(result(state='CA'),,Target+'::CA::'+version,overwrite,__compressed__),
-							output(result(state='NJ'),,Target+'::NJ::'+version,overwrite,__compressed__),
-							output(result(state='NC'),,Target+'::NC::'+version,overwrite,__compressed__),
-							output(result(state='IN'),,Target+'::IN::'+version,overwrite,__compressed__),
-							output(result(state='MO'),,Target+'::MO::'+version,overwrite,__compressed__),
-							output(result(state='NY'),,Target+'::NY::'+version,overwrite,__compressed__),
-							output(result(state='FL'),,Target+'::FL::'+version,overwrite,__compressed__),
-							output(result(state='VA'),,Target+'::VA::'+version,overwrite,__compressed__),
-							output(result(state='TX'),,Target+'::TX::'+version,overwrite,__compressed__),
-							output(result(state='PA'),,Target+'::PA::'+version,overwrite,__compressed__),
-							output(result(state='IL'),,Target+'::IL::'+version,overwrite,__compressed__),
-							output(result(state='OH'),,Target+'::OH::'+version,overwrite,__compressed__),
-							output(result(state='MI'),,Target+'::MI::'+version,overwrite,__compressed__),
-							output(result(state='GA'),,Target+'::GA::'+version,overwrite,__compressed__),
-							output(result(state='WA'),,Target+'::WA::'+version,overwrite,__compressed__),
-							output(result(state='TN'),,Target+'::TN::'+version,overwrite,__compressed__),
-							output(result(state='MD'),,Target+'::MD::'+version,overwrite,__compressed__),
-							output(result(state='AL'),,Target+'::AL::'+version,overwrite,__compressed__),
-							output(result(state='NV'),,Target+'::NV::'+version,overwrite,__compressed__),
-							output(result(state='NE'),,Target+'::NE::'+version,overwrite,__compressed__),
-							output(result(state='ID'),,Target+'::ID::'+version,overwrite,__compressed__),
-							output(result(state='RI'),,Target+'::RI::'+version,overwrite,__compressed__),
-							output(result(state='SD'),,Target+'::SD::'+version,overwrite,__compressed__),
-							output(result(state='DE'),,Target+'::DE::'+version,overwrite,__compressed__),
-							output(result(state='MA'),,Target+'::MA::'+version,overwrite,__compressed__),
-							output(result(state='SC'),,Target+'::SC::'+version,overwrite,__compressed__),
-							output(result(state='KY'),,Target+'::KY::'+version,overwrite,__compressed__),
-							output(result(state='OR'),,Target+'::OR::'+version,overwrite,__compressed__),
-							output(result(state='UT'),,Target+'::UT::'+version,overwrite,__compressed__),
-							output(result(state='WV'),,Target+'::WV::'+version,overwrite,__compressed__),
-							output(result(state='WY'),,Target+'::WY::'+version,overwrite,__compressed__),
-							output(result(state='ND'),,Target+'::ND::'+version,overwrite,__compressed__),
-							output(result(state='MT'),,Target+'::MT::'+version,overwrite,__compressed__),
-							output(result(state='AZ'),,Target+'::AZ::'+version,overwrite,__compressed__),
-							output(result(state='CT'),,Target+'::CT::'+version,overwrite,__compressed__),
-							output(result(state='KS'),,Target+'::KS::'+version,overwrite,__compressed__),
-							output(result(state='OK'),,Target+'::OK::'+version,overwrite,__compressed__),
-							output(result(state='MS'),,Target+'::MS::'+version,overwrite,__compressed__),
-							output(result(state='ME'),,Target+'::ME::'+version,overwrite,__compressed__),
-							output(result(state='DC'),,Target+'::DC::'+version,overwrite,__compressed__),
-							output(result(state='VT'),,Target+'::VT::'+version,overwrite,__compressed__),
-							output(result(state='AK'),,Target+'::AK::'+version,overwrite,__compressed__),
-							output(result(state='HI'),,Target+'::HI::'+version,overwrite,__compressed__),
-							output(result(state='WI'),,Target+'::WI::'+version,overwrite,__compressed__),
-							output(result(state='MN'),,Target+'::MN::'+version,overwrite,__compressed__),
-							output(result(state='LA'),,Target+'::LA::'+version,overwrite,__compressed__),
-							output(result(state='CO'),,Target+'::CO::'+version,overwrite,__compressed__),
-							output(result(state='IA'),,Target+'::IA::'+version,overwrite,__compressed__),
-							output(result(state='AR'),,Target+'::AR::'+version,overwrite,__compressed__),
-							output(result(state='NM'),,Target+'::NM::'+version,overwrite,__compressed__),
-							output(result(state='NH'),,Target+'::NH::'+version,overwrite,__compressed__)
+							if(exists(result(state='CA')),output(result(state='CA'),,Target+'::CA::'+pVersion,overwrite)),
+							if(exists(result(state='NJ')),output(result(state='NJ'),,Target+'::NJ::'+pVersion,overwrite)),
+							if(exists(result(state='NC')),output(result(state='NC'),,Target+'::NC::'+pVersion,overwrite)),
+							if(exists(result(state='IN')),output(result(state='IN'),,Target+'::IN::'+pVersion,overwrite)),
+							if(exists(result(state='MO')),output(result(state='MO'),,Target+'::MO::'+pVersion,overwrite)),
+							if(exists(result(state='NY')),output(result(state='NY'),,Target+'::NY::'+pVersion,overwrite)),
+							if(exists(result(state='FL')),output(result(state='FL'),,Target+'::FL::'+pVersion,overwrite)),
+							if(exists(result(state='VA')),output(result(state='VA'),,Target+'::VA::'+pVersion,overwrite)),
+							if(exists(result(state='TX')),output(result(state='TX'),,Target+'::TX::'+pVersion,overwrite)),
+							if(exists(result(state='PA')),output(result(state='PA'),,Target+'::PA::'+pVersion,overwrite)),
+							if(exists(result(state='IL')),output(result(state='IL'),,Target+'::IL::'+pVersion,overwrite)),
+							if(exists(result(state='OH')),output(result(state='OH'),,Target+'::OH::'+pVersion,overwrite)),
+							if(exists(result(state='MI')),output(result(state='MI'),,Target+'::MI::'+pVersion,overwrite)),
+							if(exists(result(state='GA')),output(result(state='GA'),,Target+'::GA::'+pVersion,overwrite)),
+							if(exists(result(state='WA')),output(result(state='WA'),,Target+'::WA::'+pVersion,overwrite)),
+							if(exists(result(state='TN')),output(result(state='TN'),,Target+'::TN::'+pVersion,overwrite)),
+							if(exists(result(state='MD')),output(result(state='MD'),,Target+'::MD::'+pVersion,overwrite)),
+							if(exists(result(state='AL')),output(result(state='AL'),,Target+'::AL::'+pVersion,overwrite)),
+							if(exists(result(state='NV')),output(result(state='NV'),,Target+'::NV::'+pVersion,overwrite)),
+							if(exists(result(state='NE')),output(result(state='NE'),,Target+'::NE::'+pVersion,overwrite)),
+							if(exists(result(state='ID')),output(result(state='ID'),,Target+'::ID::'+pVersion,overwrite)),
+							if(exists(result(state='RI')),output(result(state='RI'),,Target+'::RI::'+pVersion,overwrite)),
+							if(exists(result(state='SD')),output(result(state='SD'),,Target+'::SD::'+pVersion,overwrite)),
+							if(exists(result(state='DE')),output(result(state='DE'),,Target+'::DE::'+pVersion,overwrite)),
+							if(exists(result(state='MA')),output(result(state='MA'),,Target+'::MA::'+pVersion,overwrite)),
+							if(exists(result(state='SC')),output(result(state='SC'),,Target+'::SC::'+pVersion,overwrite)),
+							if(exists(result(state='KY')),output(result(state='KY'),,Target+'::KY::'+pVersion,overwrite)),
+							if(exists(result(state='OR')),output(result(state='OR'),,Target+'::OR::'+pVersion,overwrite)),
+							if(exists(result(state='UT')),output(result(state='UT'),,Target+'::UT::'+pVersion,overwrite)),
+							if(exists(result(state='WV')),output(result(state='WV'),,Target+'::WV::'+pVersion,overwrite)),
+							if(exists(result(state='WY')),output(result(state='WY'),,Target+'::WY::'+pVersion,overwrite)),
+							if(exists(result(state='ND')),output(result(state='ND'),,Target+'::ND::'+pVersion,overwrite)),
+							if(exists(result(state='MT')),output(result(state='MT'),,Target+'::MT::'+pVersion,overwrite)),
+							if(exists(result(state='AZ')),output(result(state='AZ'),,Target+'::AZ::'+pVersion,overwrite)),
+							if(exists(result(state='CT')),output(result(state='CT'),,Target+'::CT::'+pVersion,overwrite)),
+							if(exists(result(state='KS')),output(result(state='KS'),,Target+'::KS::'+pVersion,overwrite)),
+							if(exists(result(state='OK')),output(result(state='OK'),,Target+'::OK::'+pVersion,overwrite)),
+							if(exists(result(state='MS')),output(result(state='MS'),,Target+'::MS::'+pVersion,overwrite)),
+							if(exists(result(state='ME')),output(result(state='ME'),,Target+'::ME::'+pVersion,overwrite)),
+							if(exists(result(state='DC')),output(result(state='DC'),,Target+'::DC::'+pVersion,overwrite)),
+							if(exists(result(state='VT')),output(result(state='VT'),,Target+'::VT::'+pVersion,overwrite)),
+							if(exists(result(state='AK')),output(result(state='AK'),,Target+'::AK::'+pVersion,overwrite)),
+							if(exists(result(state='HI')),output(result(state='HI'),,Target+'::HI::'+pVersion,overwrite)),
+							if(exists(result(state='WI')),output(result(state='WI'),,Target+'::WI::'+pVersion,overwrite)),
+							if(exists(result(state='MN')),output(result(state='MN'),,Target+'::MN::'+pVersion,overwrite)),
+							if(exists(result(state='LA')),output(result(state='LA'),,Target+'::LA::'+pVersion,overwrite)),
+							if(exists(result(state='CO')),output(result(state='CO'),,Target+'::CO::'+pVersion,overwrite)),
+							if(exists(result(state='IA')),output(result(state='IA'),,Target+'::IA::'+pVersion,overwrite)),
+							if(exists(result(state='AR')),output(result(state='AR'),,Target+'::AR::'+pVersion,overwrite)),
+							if(exists(result(state='NM')),output(result(state='NM'),,Target+'::NM::'+pVersion,overwrite)),
+							if(exists(result(state='NH')),output(result(state='NH'),,Target+'::NH::'+pVersion,overwrite))
 							);
 
 	export promote_() := function
 
-		promote:=FileServices.PromoteSuperFileList([
-													Target
-													,Target+'_father'
-													,Target+'_grandfather'
-													]
-													,		Target+'::CA::'+version
-													+	','+Target+'::NJ::'+version
-													+	','+Target+'::CA::'+version
-													+	','+Target+'::NJ::'+version
-													+	','+Target+'::NC::'+version
-													+	','+Target+'::IN::'+version
-													+	','+Target+'::MO::'+version
-													+	','+Target+'::NY::'+version
-													+	','+Target+'::FL::'+version
-													+	','+Target+'::VA::'+version
-													+	','+Target+'::TX::'+version
-													+	','+Target+'::PA::'+version
-													+	','+Target+'::IL::'+version
-													+	','+Target+'::OH::'+version
-													+	','+Target+'::MI::'+version
-													+	','+Target+'::GA::'+version
-													+	','+Target+'::WA::'+version
-													+	','+Target+'::TN::'+version
-													+	','+Target+'::MD::'+version
-													+	','+Target+'::AL::'+version
-													+	','+Target+'::NV::'+version
-													+	','+Target+'::NE::'+version
-													+	','+Target+'::ID::'+version
-													+	','+Target+'::RI::'+version
-													+	','+Target+'::SD::'+version
-													+	','+Target+'::DE::'+version
-													+	','+Target+'::MA::'+version
-													+	','+Target+'::SC::'+version
-													+	','+Target+'::KY::'+version
-													+	','+Target+'::OR::'+version
-													+	','+Target+'::UT::'+version
-													+	','+Target+'::WV::'+version
-													+	','+Target+'::WY::'+version
-													+	','+Target+'::ND::'+version
-													+	','+Target+'::MT::'+version
-													+	','+Target+'::AZ::'+version
-													+	','+Target+'::CT::'+version
-													+	','+Target+'::KS::'+version
-													+	','+Target+'::OK::'+version
-													+	','+Target+'::MS::'+version
-													+	','+Target+'::ME::'+version
-													+	','+Target+'::DC::'+version
-													+	','+Target+'::VT::'+version
-													+	','+Target+'::AK::'+version
-													+	','+Target+'::HI::'+version
-													+	','+Target+'::WI::'+version
-													+	','+Target+'::MN::'+version
-													+	','+Target+'::LA::'+version
-													+	','+Target+'::CO::'+version
-													+	','+Target+'::IA::'+version
-													+	','+Target+'::AR::'+version
-													+	','+Target+'::NM::'+version
-													+	','+Target+'::NH::'+version
-													,true);
+		return sequential(
+						Promote(pVersion,Target)._delete
+						,Promote(pVersion,Target)._father
+						,Promote(pVersion,Target)._prod
+						,Promote(pVersion,Target1)._new
+						);
 
-		return promote;
 	end;
 
 END;

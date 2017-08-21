@@ -13,7 +13,8 @@ export BestSSNFunc(
 
 f := myDs(util OR pflag3='');
 
-header.MAC_Best_SSN(f, did, en)
+en := watchdog.fn_best_ssn(f).concat_them;
+
 did_ssn_rec := record
  f.did;
  f.ssn;
@@ -23,7 +24,11 @@ good_ssns := table(f(~mdr.Source_is_DPPA(src)),did_ssn_rec);
 en noDPPA(en L, good_ssns R) := transform 
  self := l;
 end;
-get_best := join(en,good_ssns,left.did=right.did and left.ssn=right.ssn,
+
+en_distr := distribute(en, hash(did));
+good_ssns_distr := distribute(good_ssns, hash(did));
+
+get_best := join(en_distr,good_ssns_distr,left.did=right.did and left.ssn=right.ssn,
 					noDPPA(left,right),local);
 
 return dedup(sort(get_best,did,local),did,local);

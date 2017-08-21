@@ -1,4 +1,4 @@
-﻿import Risk_indicators, corp2, BusReg, business_header, RiskWise, Address_attributes, ut, MDR, Business_Risk;
+import Risk_indicators, corp2, BusReg, business_header, RiskWise, Address_attributes, ut, MDR, Business_Risk;
 
 
 EXPORT BusnSOSDetails(DATASET(Layouts.BusnLayoutV2) BusnIds ) := FUNCTION

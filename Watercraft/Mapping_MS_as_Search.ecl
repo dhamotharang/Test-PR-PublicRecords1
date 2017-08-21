@@ -1,16 +1,19 @@
 import lib_stringlib, watercraft;
 
-Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Watercraft.Layout_MS_clean_in L, integer1 C)
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_MS_clean_in, watercraft.Layout_MS_clean_in,hull_clean_in)
+
+
+Watercraft.Layout_Watercraft_Search_Group search_mapping_format(hull_clean_in L, integer1 C)
  :=
   transform
-	self.date_first_seen			:=	L.transaction;
-	self.date_last_seen				:=	L.transaction;
+	self.date_first_seen			:=	L.TRANSACTION_DATE;
+	self.date_last_seen				:=	L.TRANSACTION_DATE;
 	self.date_vendor_first_reported	:=	L.process_date;
 	self.date_vendor_last_reported	:=	L.process_date;
 	self.watercraft_key			    :=	if(trim(L.YEAR, left, right) >= '1972' and length(trim(L.HULL_ID,left, right)) = 12, trim(L.HULL_ID, left, right), if(L.HULL_ID = '',
 	                                    (trim(L.MAKE, left, right) + trim(L.YEAR, left, right) + trim(L.FIRST_NAME, left, right) + trim(L.MID, left, right)
 									    + trim(L.LAST_NAME, left, right))[1..30], (trim(L.HULL_ID, left, right) + trim(L.MAKE, left, right) + trim(L.YEAR, left, right))[1..30]));
-	self.sequence_key				:=	L.transaction;
+	self.sequence_key				:=	L.TRANSACTION_DATE;
 	self.state_origin				:=	'MS';
 	self.source_code				:=	'AW';
 	self.dppa_flag                  :=  '';
@@ -45,7 +48,7 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Watercraft.Layou
   end
  ; 
  
-Mapping_MS_as_Search_norm			:= normalize(Watercraft.file_MS_clean_in,2,search_mapping_format(left,counter));
+Mapping_MS_as_Search_norm			:= normalize(hull_clean_in,2,search_mapping_format(left,counter));
 
 export Mapping_MS_as_Search         := Mapping_MS_as_Search_norm(clean_pname <> '' or company_name <> '');
 

@@ -16,6 +16,7 @@ module
 	export Best_Flat    := tools.macf_FilesBase	(fnames.Best_Flat     ,BIPV2_Build.Layouts.Best_Flat  );
 	export BIP_Owners   := tools.macf_FilesBase	(fnames.BIP_Owners    ,BIPV2_Build.Layouts.BIP_Owners );
   
-	export workunit_history   := tools.macf_FilesBase	(fnames.workunit_history ,wk_ut.Layouts.wks_slim );
+	export workunit_history   := tools.macf_FilesBase	(fnames.workunit_history ,wk_ut.Layouts.wks_slim          ,pOpt := true);
+	export workunit_history_  := tools.macf_FilesBase	(fnames.workunit_history ,wk_ut.Layouts.wks_slim_filename ,pOpt := true);
 	
 end;

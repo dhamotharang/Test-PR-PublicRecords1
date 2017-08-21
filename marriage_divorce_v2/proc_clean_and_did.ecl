@@ -1,4 +1,4 @@
-import ut, header_slimsort, did_add, didville, header;
+import ut, header_slimsort, did_add, didville, header,address;
 
 export proc_clean_and_did(dataset(marriage_divorce_v2.layout_mar_div_intermediate) in0) :=
 module
@@ -24,32 +24,32 @@ marriage_divorce_v2.layout_mar_div_intermediate t_clean(marriage_divorce_v2.layo
  boolean is_xml_rec         := stringlib.stringfind(le.source_file,'XML',1)!=0;
  
  string140 v_pname_conj := if(previously_cleaned=false and le.conjunctive_party<>'',
-                            if(le.conjunctive_name_format='L',addrcleanlib.CleanDualNameLFM140(le.conjunctive_party),							
-							if(le.conjunctive_name_format='F',addrcleanlib.CleanDualName140(le.conjunctive_party),
+                            if(le.conjunctive_name_format='L',address.CleanDualNameLFM140(le.conjunctive_party),							
+							if(le.conjunctive_name_format='F',address.CleanDualName140(le.conjunctive_party),
 						   '')),'');
 
  string73 v_pname_party1 := if(previously_cleaned=false and le.party1_name<>'',
-                             if(le.party1_name_format='L',addrcleanlib.CleanPersonLFM73(le.party1_name),							
-							 if(le.party1_name_format='F',addrcleanlib.CleanPersonFML73(le.party1_name),
+                             if(le.party1_name_format='L',address.CleanPersonLFM73(le.party1_name),							
+							 if(le.party1_name_format='F',address.CleanPersonFML73(le.party1_name),
 						    '')),'');
 
  string73 v_pname_party2 := if(previously_cleaned=false and le.party2_name<>'',
-                             if(le.party2_name_format='L',addrcleanlib.CleanPersonLFM73(le.party2_name),							
-							 if(le.party2_name_format='F',addrcleanlib.CleanPersonFML73(le.party2_name),
+                             if(le.party2_name_format='L',address.CleanPersonLFM73(le.party2_name),							
+							 if(le.party2_name_format='F',address.CleanPersonFML73(le.party2_name),
 						    '')),'');
 
  string73 v_pname_alias1 := if(previously_cleaned=false and le.party1_alias<>'',
-                             if(le.party1_name_format='L',addrcleanlib.CleanPersonLFM73(le.party1_alias),							
-							 if(le.party1_name_format='F',addrcleanlib.CleanPersonFML73(le.party1_alias),
+                             if(le.party1_name_format='L',address.CleanPersonLFM73(le.party1_alias),							
+							 if(le.party1_name_format='F',address.CleanPersonFML73(le.party1_alias),
 						    '')),'');
 
  string73 v_pname_alias2 := if(previously_cleaned=false and le.party2_alias<>'',
-                             if(le.party2_name_format='L',addrcleanlib.CleanPersonLFM73(le.party2_alias),							
-							 if(le.party2_name_format='F',addrcleanlib.CleanPersonFML73(le.party2_alias),
+                             if(le.party2_name_format='L',address.CleanPersonLFM73(le.party2_alias),							
+							 if(le.party2_name_format='F',address.CleanPersonFML73(le.party2_alias),
 						    '')),'');
 							
- string182 v_ca_party1 := addrcleanlib.cleanaddress182(le.party1_addr1,le.party1_csz);
- string182 v_ca_party2 := addrcleanlib.cleanaddress182(le.party2_addr1,le.party2_csz);
+ string182 v_ca_party1 := address.cleanaddress182(le.party1_addr1,le.party1_csz);
+ string182 v_ca_party2 := address.cleanaddress182(le.party2_addr1,le.party2_csz);
 
  string70 v_pname_conj_name1 := v_pname_conj[1..70];
  string70 v_pname_conj_name2 := v_pname_conj[71..140];
@@ -140,7 +140,7 @@ did_prep_rec := record
  string2   orig_residence_st;
  string2   birth_state;
  string30  race;
- string50  party1_csz;
+ string50  party_csz;
  string35  party_county;
  string20  previous_marital_status;
  string20  how_marriage_ended;
@@ -149,7 +149,7 @@ did_prep_rec := record
 
  //raw address fields
  string50  party_addr;
- string50  party_csz;
+ // string50  party_csz;
 end;
 
 did_prep_rec t_did_prep_rec(marriage_divorce_v2.layout_mar_div_intermediate le, integer c) := transform
@@ -214,23 +214,23 @@ end;
 
 did_prep_id_rec t_add_persistent(p_did_prep_rec le) := transform
 self.persistent_record_id	:= HASH64(le.record_id +','
-																		+ ut.fnTrim2Upper(le.vendor) +','
-																		+	ut.fnTrim2Upper(le.party_type) +','
-																		+	ut.fnTrim2Upper(le.which_party) +','
-																		+	ut.fnTrim2Upper(le.nameasis) +','
-																		+	ut.fnTrim2Upper(le.nameasis_name_format) +','
-																		+ ut.fnTrim2Upper(le.party_addr) +','
-																		+ ut.fnTrim2Upper(le.party_csz) +','
-																		+ ut.fnTrim2Upper(le.ssn) + ','
-																		+ ut.fnTrim2Upper(le.dob) +','
-																		+ ut.fnTrim2Upper(le.age) +','
-																		+ ut.fnTrim2Upper(le.birth_state) +','
-																		+ ut.fnTrim2Upper(le.race) +','
-																		+ ut.fnTrim2Upper(le.party_county) +','
-																		+ ut.fnTrim2Upper(le.previous_marital_status) +','
-																		+ ut.fnTrim2Upper(le.how_marriage_ended) +','
-																		+ ut.fnTrim2Upper(le.times_married) +','
-																		+ ut.fnTrim2Upper(le.last_marriage_end_dt)
+																		+ ut.CleanSpacesAndUpper(le.vendor) +','
+																		+	ut.CleanSpacesAndUpper(le.party_type) +','
+																		+	ut.CleanSpacesAndUpper(le.which_party) +','
+																		+	ut.CleanSpacesAndUpper(le.nameasis) +','
+																		+	ut.CleanSpacesAndUpper(le.nameasis_name_format) +','
+																		+ ut.CleanSpacesAndUpper(le.party_addr) +','
+																		+ ut.CleanSpacesAndUpper(le.party_csz) +','
+																		+ ut.CleanSpacesAndUpper(le.ssn) + ','
+																		+ ut.CleanSpacesAndUpper(le.dob) +','
+																		+ ut.CleanSpacesAndUpper(le.age) +','
+																		+ ut.CleanSpacesAndUpper(le.birth_state) +','
+																		+ ut.CleanSpacesAndUpper(le.race) +','
+																		+ ut.CleanSpacesAndUpper(le.party_county) +','
+																		+ ut.CleanSpacesAndUpper(le.previous_marital_status) +','
+																		+ ut.CleanSpacesAndUpper(le.how_marriage_ended) +','
+																		+ ut.CleanSpacesAndUpper(le.times_married) +','
+																		+ ut.CleanSpacesAndUpper(le.last_marriage_end_dt)
 																			);
 	
  self := le;
@@ -370,62 +370,64 @@ did_add.MAC_Match_Flex
 	 DID, redefine_rec, false, DID_Score_field,
 	 75, d_did)
 
-mar_div_did := d_did : persist('~thor_data400::persist::mar_div_did_new','thor400_84');
+mar_div_did := d_did : persist('~thor_data400::persist::mar_div_did_new');
 
-marriage_divorce_v2.layout_mar_div_search t_map_to_search(redefine_rec le) := transform
+
+// marriage_divorce_v2.layout_mar_div_search t_map_to_search(redefine_rec le) := transform
 // self.persistent_record_id	:= HASH64(le.record_id +','
-																			// + ut.fnTrim2Upper(le.vendor) +','
-																			// +	ut.fnTrim2Upper(le.party_type) +','
-																			// +	ut.fnTrim2Upper(le.which_party) +','
-																			// + ut.fnTrim2Upper(le.title) +','
-																			// + ut.fnTrim2Upper(le.fname) +','
-																			// +	ut.fnTrim2Upper(le.mname)	+','
-																			// + ut.fnTrim2Upper(le.lname) +','
-																			// +	ut.fnTrim2Upper(le.name_suffix) +','
-																			// +	ut.fnTrim2Upper(le.nameasis) +','
-																			// + ut.fnTrim2Upper(le.prim_range) +','
-																			// + ut.fnTrim2Upper(le.predir) +','
-																			// + ut.fnTrim2Upper(le.prim_name) +','
-																			// +	ut.fnTrim2Upper(le.suffix) +','
-																			// + ut.fnTrim2Upper(le.postdir) +','
-																			// + ut.fnTrim2Upper(le.unit_desig) +','
-																			// + ut.fnTrim2Upper(le.sec_range) +','
-																			// +	ut.fnTrim2Upper(le.p_city_name) +','
-																			// + ut.fnTrim2Upper(le.v_city_name) +','
-																			// + ut.fnTrim2Upper(le.st) +','
-																			// + ut.fnTrim2Upper(le.zip) +','
-																			// + ut.fnTrim2Upper(le.zip4) +','
-																			// +	ut.fnTrim2Upper(le.cart) +','
-																			// + ut.fnTrim2Upper(le.cr_sort_sz) +','
-																			// + ut.fnTrim2Upper(le.lot) +','
-																			// + ut.fnTrim2Upper(le.lot_order) +','
-																			// + ut.fnTrim2Upper(le.dbpc) +','
-																			// + ut.fnTrim2Upper(le.chk_digit) +','
-																			// + ut.fnTrim2Upper(le.rec_type) +','
-																			// + ut.fnTrim2Upper(le.county) +','
-																			// + ut.fnTrim2Upper(le.geo_lat) +','
-																			// + ut.fnTrim2Upper(le.geo_long) +','
-																			// + ut.fnTrim2Upper(le.msa) +','
-																			// + ut.fnTrim2Upper(le.geo_blk) +','
-																			// + ut.fnTrim2Upper(le.geo_match) +','
-																			// + ut.fnTrim2Upper(le.err_stat)
-																			// + ut.fnTrim2Upper(le.dob) +','
-																			// + ut.fnTrim2Upper(le.age) +','
-																			// + ut.fnTrim2Upper(le.birth_state) +','
-																			// + ut.fnTrim2Upper(le.race) +','
-																			// + ut.fnTrim2Upper(le.party_county) +','
-																			// + ut.fnTrim2Upper(le.previous_marital_status) +','
-																			// + ut.fnTrim2Upper(le.how_marriage_ended) +','
-																			// + ut.fnTrim2Upper(le.times_married) +','
-																			// + ut.fnTrim2Upper(le.last_marriage_end_dt)
+																			// + ut.CleanSpacesAndUpper(le.vendor) +','
+																			// +	ut.CleanSpacesAndUpper(le.party_type) +','
+																			// +	ut.CleanSpacesAndUpper(le.which_party) +','
+																			// + ut.CleanSpacesAndUpper(le.title) +','
+																			// + ut.CleanSpacesAndUpper(le.fname) +','
+																			// +	ut.CleanSpacesAndUpper(le.mname)	+','
+																			// + ut.CleanSpacesAndUpper(le.lname) +','
+																			// +	ut.CleanSpacesAndUpper(le.name_suffix) +','
+																			// +	ut.CleanSpacesAndUpper(le.nameasis) +','
+																			// + ut.CleanSpacesAndUpper(le.prim_range) +','
+																			// + ut.CleanSpacesAndUpper(le.predir) +','
+																			// + ut.CleanSpacesAndUpper(le.prim_name) +','
+																			// +	ut.CleanSpacesAndUpper(le.suffix) +','
+																			// + ut.CleanSpacesAndUpper(le.postdir) +','
+																			// + ut.CleanSpacesAndUpper(le.unit_desig) +','
+																			// + ut.CleanSpacesAndUpper(le.sec_range) +','
+																			// +	ut.CleanSpacesAndUpper(le.p_city_name) +','
+																			// + ut.CleanSpacesAndUpper(le.v_city_name) +','
+																			// + ut.CleanSpacesAndUpper(le.st) +','
+																			// + ut.CleanSpacesAndUpper(le.zip) +','
+																			// + ut.CleanSpacesAndUpper(le.zip4) +','
+																			// +	ut.CleanSpacesAndUpper(le.cart) +','
+																			// + ut.CleanSpacesAndUpper(le.cr_sort_sz) +','
+																			// + ut.CleanSpacesAndUpper(le.lot) +','
+																			// + ut.CleanSpacesAndUpper(le.lot_order) +','
+																			// + ut.CleanSpacesAndUpper(le.dbpc) +','
+																			// + ut.CleanSpacesAndUpper(le.chk_digit) +','
+																			// + ut.CleanSpacesAndUpper(le.rec_type) +','
+																			// + ut.CleanSpacesAndUpper(le.county) +','
+																			// + ut.CleanSpacesAndUpper(le.geo_lat) +','
+																			// + ut.CleanSpacesAndUpper(le.geo_long) +','
+																			// + ut.CleanSpacesAndUpper(le.msa) +','
+																			// + ut.CleanSpacesAndUpper(le.geo_blk) +','
+																			// + ut.CleanSpacesAndUpper(le.geo_match) +','
+																			// + ut.CleanSpacesAndUpper(le.err_stat)
+																			// + ut.CleanSpacesAndUpper(le.dob) +','
+																			// + ut.CleanSpacesAndUpper(le.age) +','
+																			// + ut.CleanSpacesAndUpper(le.birth_state) +','
+																			// + ut.CleanSpacesAndUpper(le.race) +','
+																			// + ut.CleanSpacesAndUpper(le.party_county) +','
+																			// + ut.CleanSpacesAndUpper(le.previous_marital_status) +','
+																			// + ut.CleanSpacesAndUpper(le.how_marriage_ended) +','
+																			// + ut.CleanSpacesAndUpper(le.times_married) +','
+																			// + ut.CleanSpacesAndUpper(le.last_marriage_end_dt)
 																			// );
 	
+ // self := le;
+// end;
+
+marriage_divorce_v2.layout_mar_div_search t_map_to_search(redefine_rec le) := transform
  self := le;
 end;
 
-// marriage_divorce_v2.layout_mar_div_search t_map_to_search(redefine_rec le) := transform
- // self := le;
-// end;
 export search_file := project(mar_div_did(trim(lname)<>'UNKNOWN'),t_map_to_search(left));
 
 end;

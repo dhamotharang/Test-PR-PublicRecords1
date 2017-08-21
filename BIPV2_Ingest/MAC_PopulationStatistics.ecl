@@ -10,7 +10,7 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',source='',Input_source = '',Input_
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
-    SELF.fields :=
+    SELF.fields := 
     #IF( #TEXT(Input_source)='' )
       '' 
     #ELSE

@@ -1,0 +1,1 @@
+export Email_Notification_List := 'RoxieBuilds@seisint.com';

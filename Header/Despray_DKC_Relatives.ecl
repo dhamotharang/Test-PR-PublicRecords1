@@ -1,4 +1,4 @@
-import lib_fileservices;
+import lib_fileservices, _control;
 
 #workunit('name','Despray DKC Relatives');
 
@@ -6,9 +6,10 @@ import lib_fileservices;
 //edata12=10.150.12.240
 //edata13=192.168.0.71
 //edata14=172.16.68.91
+//edata15=10.173.14.12
 
-DestinationIP := '172.16.68.91';
-DestinationVolume := '/relatives_15/';
+DestinationIP := _control.IPAddress.edata14a;
+DestinationVolume := '/relatives_82/';
 
 DKCKeys(string SourceKeyName,string DestKeyName)
  :=
@@ -18,8 +19,8 @@ DKCKeys(string SourceKeyName,string DestKeyName)
 	)
 ;
 
-d00 := fileservices.despray('~thor_dell400_2::out::relatives',DestinationIP,DestinationVolume + 'relatives.d00',,,,true);
-key1 := DKCKeys('~thor_dell400_2::key::moxie.relatives.same_lname.person1.person2.number_cohabits.key','relatives.same_lname.person1.person2.number_cohabits.key');
-key2 := DKCKeys('~thor_dell400_2::key::moxie.relatives.same_lname.person2.person1.number_cohabits.key','relatives.same_lname.person2.person1.number_cohabits.key');
+d00 := fileservices.despray('~thor400_84::out::relatives',DestinationIP,DestinationVolume + 'relatives.d00',,,,true);
+key1 := DKCKeys('~thor400_84::key::moxie.relatives.same_lname.person1.person2.number_cohabits.recent_cohabit.key','relatives.same_lname.person1.person2.number_cohabits.recent_cohabit.key');
+key2 := DKCKeys('~thor400_84::key::moxie.relatives.same_lname.person2.person1.number_cohabits.recent_cohabit.key','relatives.same_lname.person2.person1.number_cohabits.recent_cohabit.key');
 
 parallel(d00,key1,key2);

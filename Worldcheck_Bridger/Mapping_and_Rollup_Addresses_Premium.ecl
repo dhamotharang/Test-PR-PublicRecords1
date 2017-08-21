@@ -87,7 +87,7 @@ export Mapping_and_Rollup_Addresses_Premium(dataset(Layout_WorldCheck_Premium) i
 	
 reformLocation 	:= project(ds_NormLocations, locationsTran(left));
 
-	//Fix mappings where street_1 = city name; city = ,; (i.e: Brejo Alegre, São Paulo ~,~ BRAZIL)
+	//Fix mappings where street_1 = city name; city = ,; (i.e: Brejo Alegre, SÃ£o Paulo ~,~ BRAZIL)
 	Layout_temp cityTran(reformLocation l):= transform
 		self.Street_1		:= if(regexfind('State of', trim(l.City, left, right), 0) <> '' and trim(l.State, left, right) = '' and trim(l.Country, left, right) = 'USA'
 													,''

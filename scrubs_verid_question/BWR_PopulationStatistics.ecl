@@ -1,0 +1,6 @@
+//This is the code to execute in a builder window
+#workunit('name','Scrubs_verid_question.BWR_PopulationStatistics - Population Statistics - SALT V3.0 Alpha 5');
+IMPORT Scrubs_verid_question,SALT30;
+// In the line below substitute the file you want statistics for; and substitute any field names you can
+  Scrubs_verid_question.MAC_PopulationStatistics(YourFileName,/*Reference Field*/,/* QUESTIONSETID_field */,/* STRINGCODE_field */,/* QUESTIONSETTYPEFIELD_field */,/* CREATIONTIME_field */,/* ACCOUNTNAME_field */,/* SUBSETNUMBER_field */,/* TRANSACTIONID_field */,/* STARTTIME_field */,/* ENDTIME_field */,/* GRADE_field */,/* SUBSETGRADEOUTCOMETYPEFIELD_field */,/* QUESTIONID_field */,/* QUESTIONTYPEFIELD_field */,/* PRESENTATIONPOSITION_field */,/* SHUFFLEWEIGHT_field */,/* GRADEMULTICHOICERULETYPEFIELD_field */,/* STARTDATE_field */,/* ENDDATE_field */,/* QUESTIONGRADEOUTCOMETYPEFIELD_field */,/* SELECTEDCOUNT_field */,/* CORRECTCOUNT_field */,/* WASNONEOFTHEABOVESELECTED_field */,/* VERITEID_field */,/* LANGUAGETYPEFIELD_field */,/* QUESTIONTIERTYPEFIELD_field */,/* QUESTIONSTATEMENT_field */,/* CORRECTANSWER_field */,/* SELECTEDANSWER_field */,/* DATASOURCETYPEFIELD_field */,outfile);
+  OUTPUT(outfile,NAMED('PopulationStatistics'));

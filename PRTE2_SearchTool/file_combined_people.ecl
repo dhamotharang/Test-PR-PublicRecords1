@@ -1,4 +1,4 @@
-﻿import data_services, prte2_bankruptcy, prte2_corp, prte2_globalwatchlists,prte2_corp,prte2_doc,prte2_death_master,ut,
+import data_services, prte2_bankruptcy, prte2_corp, prte2_globalwatchlists,prte2_corp,prte2_doc,prte2_death_master,ut,
 	prte2_gong,prte2_dlv2,prte2_email_data,prte2_faa,prte2_foreclosure,prte2_lnproperty,prte2_sexoffender,PRTE2_liens,Risk_Indicators,
 	prte2_paw,doxie_build,Relationship,prte2_vehicle,prte2_watercraft,prte2_prof_licensev2, header, std, doxie,prte2_header,BIPV2,
 	prte2_marriage_divorce,LiensV2, RoxieKeyBuild, prte2_phonesplus, AddressReport_Services, personReports,PRTE2_Infutor;

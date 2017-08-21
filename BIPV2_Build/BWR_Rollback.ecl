@@ -13,7 +13,7 @@ pFilter						:= 	''		;	//regex filter to use if u want to rollback only specific
 sequential(
    BIPV2_Build.Rollback(pversion,pDeleteBuildFiles,pIsTesting,pFilter).clearbuilt;
 //	,BIPV2_Build.Rollback(pversion,pDeleteBuildFiles,pIsTesting,'bizlinkfull',tools.fun_Groupname('20')).father2qa
-//	,BIPV2_Build.Rollback(pversion,pDeleteBuildFiles,pIsTesting,'bizlinkfull',tools.fun_Groupname('84')).father2qa
-//	,BIPV2_Build.Rollback(pversion,pDeleteBuildFiles,pIsTesting,'bizlinkfull',tools.fun_Groupname('92')).father2qa
 //	,BIPV2_Build.Rollback(pversion,pDeleteBuildFiles,pIsTesting,'bizlinkfull',tools.fun_Groupname('30')).father2qa
+//	,BIPV2_Build.Rollback(pversion,pDeleteBuildFiles,pIsTesting,'bizlinkfull',tools.fun_Groupname('60')).father2qa
+//	,BIPV2_Build.Rollback(pversion,pDeleteBuildFiles,pIsTesting,'bizlinkfull',tools.fun_Groupname('44')).father2qa
 );

@@ -95,25 +95,25 @@ export Function_Matching(
 		local);
 	
 	// Create a table of record pairs that have the same residential address and close name
-	rec_residential_address_close_name :=
-		table(dedup(
-			distribute(in_data(clean_company_name != '' and zip != '' and prim_name != '' and residential_or_business_ind = 'A'),
-				hash64(zip,prim_range,prim_name,addr_suffix,predir,postdir)),
-			zip,prim_range,prim_name,addr_suffix,predir,postdir,clean_company_name,all,local),
-			{clean_company_name,beid,unsigned hv := hash64(zip,prim_range,prim_name,addr_suffix,predir,postdir)},local);
+	// rec_residential_address_close_name :=
+		// table(dedup(
+			// distribute(in_data(clean_company_name != '' and zip != '' and prim_name != '' and residential_or_business_ind = 'A'),
+				// hash64(zip,prim_range,prim_name,addr_suffix,predir,postdir)),
+			// zip,prim_range,prim_name,addr_suffix,predir,postdir,clean_company_name,all,local),
+			// {clean_company_name,beid,unsigned hv := hash64(zip,prim_range,prim_name,addr_suffix,predir,postdir)},local);
 
-	same_residential_address_close_name_recs := join(
-		rec_residential_address_close_name,
-		rec_residential_address_close_name,
-		left.hv = right.hv and
-		left.clean_company_name != right.clean_company_name and
-		ut.StringSimilar100(left.clean_company_name,right.clean_company_name) < 30 and
-		left.beid < right.beid,
-		transform(Layout_Linking.Match,
-			self.beid_low := left.beid,
-			self.beid_high := right.beid,
-			self.matchcode := TopBusiness.Constants.MatchCodes.REZADDR_CLOSENAME),
-		local);
+	// same_residential_address_close_name_recs := join(
+		// rec_residential_address_close_name,
+		// rec_residential_address_close_name,
+		// left.hv = right.hv and
+		// left.clean_company_name != right.clean_company_name and
+		// ut.StringSimilar100(left.clean_company_name,right.clean_company_name) < 30 and
+		// left.beid < right.beid,
+		// transform(Layout_Linking.Match,
+			// self.beid_low := left.beid,
+			// self.beid_high := right.beid,
+			// self.matchcode := TopBusiness.Constants.MatchCodes.REZADDR_CLOSENAME),
+		// local);
 	
 	// Create a table of record pairs that have the same phone-7, same address and close name
 	// Need to have sec_range match if a highrise indicator
@@ -331,6 +331,54 @@ export Function_Matching(
 			self.matchcode := TopBusiness.Constants.MatchCodes.FEIN_ADDR_PHONE),
 		local);
 	
+	// Create a table of record pairs that have the same duns and address and phone
+	dist_duns_address_phone := distribute(in_data(length(trim(duns)) = 9 and zip != '' and prim_name != '' and (telco_st = '' or state = '' or telco_st = state) and Validators.IsValidPhone(phone) and length(trim(phone)) = 10 and phone[1..3] not in ['800','888','877','866','855']),hash64(fein,zip,prim_name,prim_range/*,addr_suffix,predir,postdir*/,phone));
+	rec_duns_address_phone := table(
+		dist_duns_address_phone,
+		{duns,zip,prim_name,prim_range/*,addr_suffix,predir,postdir*/,phone,unsigned6 beid := min(group,beid)},
+		duns,zip,prim_name,prim_range/*,addr_suffix,predir,postdir*/,phone,local);
+	same_duns_address_phone_recs := join(
+		dist_duns_address_phone,
+		rec_duns_address_phone,
+		left.duns = right.duns and
+		left.zip = right.zip and
+		left.prim_name = right.prim_name and
+		left.prim_range = right.prim_range and
+/*		left.addr_suffix = right.addr_suffix and
+		left.predir = right.predir and
+		left.postdir = right.postdir and */
+		left.phone = right.phone and
+		left.beid != right.beid,
+		transform(Layout_Linking.Match,
+			self.beid_low := right.beid,
+			self.beid_high := left.beid,
+			self.matchcode := TopBusiness.Constants.MatchCodes.DUNS_ADDR_PHONE),
+		local);
+	
+	// Create a table of record pairs that have the same experian and address and phone
+	dist_experian_address_phone := distribute(in_data(length(trim(experian)) = 9 and zip != '' and prim_name != '' and (telco_st = '' or state = '' or telco_st = state) and Validators.IsValidPhone(phone) and length(trim(phone)) = 10 and phone[1..3] not in ['800','888','877','866','855']),hash64(fein,zip,prim_name,prim_range/*,addr_suffix,predir,postdir*/,phone));
+	rec_experian_address_phone := table(
+		dist_experian_address_phone,
+		{experian,zip,prim_name,prim_range/*,addr_suffix,predir,postdir*/,phone,unsigned6 beid := min(group,beid)},
+		experian,zip,prim_name,prim_range/*,addr_suffix,predir,postdir*/,phone,local);
+	same_experian_address_phone_recs := join(
+		dist_experian_address_phone,
+		rec_experian_address_phone,
+		left.experian = right.experian and
+		left.zip = right.zip and
+		left.prim_name = right.prim_name and
+		left.prim_range = right.prim_range and
+/*		left.addr_suffix = right.addr_suffix and
+		left.predir = right.predir and
+		left.postdir = right.postdir and */
+		left.phone = right.phone and
+		left.beid != right.beid,
+		transform(Layout_Linking.Match,
+			self.beid_low := right.beid,
+			self.beid_high := left.beid,
+			self.matchcode := TopBusiness.Constants.MatchCodes.EXPERIAN_ADDR_PHONE),
+		local);
+	
 	// Create a table of record pairs that have the same EBR file number and address
 	dist_experian_address := distribute(in_data(experian != '' and zip != '' and prim_name != ''),hash64(experian,zip,prim_name,prim_range/*,addr_suffix,predir,postdir*/));
 	rec_experian_address := table(
@@ -509,6 +557,26 @@ export Function_Matching(
 			self.matchcode := TopBusiness.Constants.MatchCodes.ZIP_PHONE_NAME_BLANK_CN),
 		local);
 
+	// Create a table of record pairs that have the same company name, prim range, prim_name and state
+	dist_name_pr_pn_st := distribute(
+		in_data(state != '' and clean_company_name != '' and prim_name != '' and prim_range != ''),
+		hash64(state,clean_company_name,prim_name,prim_range));
+	rec_name_pr_pn_st := dedup(table(dist_name_pr_pn_st,
+		{state,clean_company_name,prim_name,prim_range,unsigned6 min_beid := min(group,beid)},state,clean_company_name,prim_name,prim_range,local),state,clean_company_name,prim_name,prim_range,all,local);
+	same_name_pr_pn_st_recs := join(
+		dist_name_pr_pn_st,
+		rec_name_pr_pn_st,
+		left.state = right.state and
+		left.clean_company_name = right.clean_company_name and
+		left.prim_range = right.prim_range and
+		left.prim_name = right.prim_name and
+		left.beid != right.min_beid,
+		transform(Layout_Linking.Match,
+			self.beid_low := right.min_beid,
+			self.beid_high := left.beid,
+			self.matchcode := TopBusiness.Constants.MatchCodes.STATE_NAME_PR_PN),
+		local);
+
 	// Create a table of record pairs that have the same source-docid and source-party
 	dist_sourceparty := distribute(in_data,hash64(source,source_docid,source_party));
 	rec_sourceparty := table(dist_sourceparty,
@@ -587,6 +655,8 @@ export Function_Matching(
 		same_name_url_recs +
 		same_fein_address_duns_recs +
 		same_fein_address_phone_recs +
+		same_duns_address_phone_recs +
+		same_experian_address_phone_recs +
 		same_experian_close_name_recs +
 		// same_experian_address_recs +
 		// same_ucc_lien_address_recs +
@@ -598,6 +668,7 @@ export Function_Matching(
 		same_name_zip_npanxx_recs +
 		same_pr_zip_name_recs +
 		same_name_zip_phone_blank_pn_recs +
+		same_name_pr_pn_st_recs +
 		same_sourceparty_recs +
 		same_source_docid_close_name_recs;
 		// same_source_docid_address_recs;

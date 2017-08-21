@@ -1,4 +1,5 @@
-import tools;
+import tools,MDR;
+
 export KeyPrep_Relationship_ID(
 	dataset(Layout_Relationship.Linked) base,
 	string version,
@@ -11,8 +12,20 @@ export KeyPrep_Relationship_ID(
 		self.other_role := choose(counter,left.role_2,left.role_1),
 		self.source := choose(counter,left.source_1,left.source_2),
 		self.other_source := choose(counter,left.source_2,left.source_1),
-		self.source_docid_1 := choose(counter,left.source_docid_1[1],left.source_docid_2[1]),
-		self.other_source_docid_1 := choose(counter,left.source_docid_2[1],left.source_docid_1[1])));
+		self.source_docid_1 := choose(counter,
+			map(
+				MDR.SourceTools.SourceIsProperty(left.source_1) => left.source_docid_1[1],
+				''),
+			map(
+				MDR.SourceTools.SourceIsProperty(left.source_2) => left.source_docid_2[1],
+				'')),
+		self.other_source_docid_1 := choose(counter,
+			map(
+				MDR.SourceTools.SourceIsProperty(left.source_2) => left.source_docid_2[1],
+				''),
+			map(
+				MDR.SourceTools.SourceIsProperty(left.source_1) => left.source_docid_1[1],
+				''))));
 	
 	dedup_base := dedup(norm_base(bid != other_bid),record,all);
 	

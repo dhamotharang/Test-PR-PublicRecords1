@@ -1,7 +1,20 @@
-EXPORT MAC_Basic_Match(infile, outfile, matchsourcegroup) := MACRO
+import business_header;
+
+EXPORT MAC_Basic_Match(
+
+	 infile
+	,outfile
+	,matchsourcegroup
+	,pFileVersion						= '\'prod\''														// default to use prod version of superfiles
+	,pUseOtherEnvironment		= business_header._Dataset().IsDataland	// default is to hit prod on dataland, and on prod hit prod.
+
+) := MACRO
+
+#uniquename(pBHFile)
+%pBHFile%	:= Business_Header.Files(pFileVersion,pUseOtherEnvironment).Base.Business_headers.logical;
 
 #uniquename(match_to)
-%match_to% := Business_Header.File_Business_Header_Previous;
+%match_to% := %pBHFile%;
 
 //-- slimmer record format for business header file (match_to)
 #uniquename(slimrec)
@@ -38,15 +51,19 @@ end;
 //****** project business headers into slimmer record format
 #uniquename(bhinit)
 #uniquename(bhdist)
+#uniquename(bhdup)
 #uniquename(ifdist)
 %bhinit% := project(%match_to%(company_name<>''), %slimbh%(left));
 %bhdist% := distribute(%bhinit%, hash(trim(company_name), trim(source), trim(source_group), trim(prim_name), zip));
+%bhdup% := dedup(%bhdist%,zip,prim_name,prim_range,source,company_name,
+					source_group,sec_range,phone,fein,all,local);
+
 %ifdist% := distribute(infile, hash(trim(company_name), trim(source), trim(source_group), trim(prim_name), zip));
 
 //****** join to find matches between infile and business header file
 #uniquename(bmatch) 
 %bmatch% := join(%ifdist%,
-                 %bhdist%,
+                 %bhdup%,
 			     left.zip = right.zip and
 			       left.prim_name = right.prim_name and
 			       left.prim_range = right.prim_range and

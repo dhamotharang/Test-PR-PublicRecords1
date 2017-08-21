@@ -16,16 +16,17 @@ end;
 
 file_temp := project(file_in, tformat(left));
 
+Watercraft.Macro_Clean_Hull_ID(file_temp, watercraft.Layout_NC_clean_in,hull_clean_in)
 
-Watercraft.Layout_Watercraft_Search_Group search_mapping_format(watercraft.layout_NC_clean_in L, integer1 C)
+Watercraft.Layout_Watercraft_Search_Group search_mapping_format(hull_clean_in L, integer1 C)
  :=
   transform
 	self.date_first_seen			:=	L.process_date;
 	self.date_last_seen				:=	L.process_date;
 	self.date_vendor_first_reported	:=	L.process_date;
 	self.date_vendor_last_reported	:=	L.process_date;
-	self.watercraft_key				:=	if(length(trim(L.HULL_ID, left, right)) = 12 and trim(L.year, left, right) >= '1972', trim(L.HULL_ID, left, right),
-	                                    (trim(L.HULL_ID, left, right) + trim(L.MAKE,left, right) + trim(L.YEAR, left, right))[1..30]);                                          
+	self.watercraft_key				        :=	if(length(trim(L.HULL_ID, left, right)) = 12 and trim(L.year, left, right) >= '1972', trim(L.HULL_ID, left, right) ,
+	                                            (trim(L.HULL_ID, left, right) + trim(L.MAKE,left, right) + trim(L.YEAR, left, right) + trim(L.reg_num, left, right))[1..30]);                                    
 	self.sequence_key				:=	trim(L.RENEWNUM, left, right);
 	self.state_origin				:=	'NC';
 	self.source_code				:=	'AW';
@@ -64,7 +65,7 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(watercraft.layou
 
 //FILTER OUT CLEAN_PNAME WITH BLANK AND COMPANY_NAME WITH BLANK
 
-Mapping_NC_as_Search_name	:= (normalize(file_temp,4,search_mapping_format(left,counter)))
+Mapping_NC_as_Search_name	:= (normalize(hull_clean_in,4,search_mapping_format(left,counter)))
                                 (clean_pname <> '' and trim(clean_pname, left, right) <> '0' or company_name <> '');
 								
 //FILTER OUT CLEAN_ADDRESS WITH 'E502'

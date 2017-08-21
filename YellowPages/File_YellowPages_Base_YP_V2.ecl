@@ -1,0 +1,1 @@
+EXPORT File_YellowPages_Base_YP_V2 := DATASET(persistnames().YellowPagesBaseYP,YellowPages.Layout_YellowPages_Base_V2,THOR);

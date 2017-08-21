@@ -1,4 +1,4 @@
-﻿
+
 EXPORT BWR_ONE_TIME_CODE := MODULE
 
 SHARED MakeSuperKeys(string name) := FUNCTION

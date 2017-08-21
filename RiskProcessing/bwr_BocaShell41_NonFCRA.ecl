@@ -18,14 +18,14 @@ unsigned1 parallel_calls := 30;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 10;
 boolean RemoveFares := false;	// change this to TRUE for FARES filtering
 boolean LeadIntegrityMode := false;  // change this to TRUE for LeadIntegrity modeling
-string DataRestrictionMask := '0000000000000';	// byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
+string DataRestrictionMask := '0000000000000000000000000';	// byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
 																								// byte 10 restricts Transunion, 12 restricts ADVO, 13 restricts bureau deceased data
 unsigned1 glba := 1;
 unsigned1 dppa := 3;
 
 //===================  input-output files  ======================
 infile_name := '~jpyon::in::axcess_3339_f_s_in';
-outfile_name := '~tsteil::out::nonfcrashell40_ibehavior_axcess_hist_' + thorlib.wuid();
+outfile_name := '~jpyon::out::nonfcra41_' + thorlib.wuid();
 
 //==================  input file layout  ========================
 layout_input := RECORD
@@ -87,6 +87,7 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
 		
 // this is left for convenience: history date from the input file may be overwritten here
 	// SELF.HistoryDateYYYYMM := 999999;
+	SELF.HistoryDateYYYYMM := (Integer) le.historydateyyyymm[1..6];
   SELF.IncludeScore := true;
   SELF.datarestrictionmask := datarestrictionmask;
   SELF.RemoveFares := RemoveFares;
@@ -101,14 +102,8 @@ output(choosen(p_f,eyeball), named('BSInput'));
 s := Risk_Indicators.test_BocaShell_SoapCall (PROJECT (p_f, TRANSFORM (Risk_Indicators.Layout_InstID_SoapCall, SELF := LEFT)),
                                                 bs_service, roxieIP, parallel_calls);
 
-ox := RECORD
-	unsigned8 time_ms := 0;
-	STRING30 AccountNumber;
-	risk_indicators.Layout_Boca_Shell;
-	STRING200 errorcode;
-END;
-	
-ox getold(s le, l ri) :=	TRANSFORM
+
+riskprocessing.layouts.layout_internal_shell_noDatasets getold(s le, l ri) :=	TRANSFORM
   SELF.AccountNumber := ri.old_account_number;
   SELF := le;
 END;
@@ -126,7 +121,7 @@ OUTPUT (res_err, , outfile_name + '_err', CSV(QUOTE('"')), overwrite);
 // the conversion portion-----------------------------------------------------------------------
 
 	
-f := dataset(outfile_name, ox, csv(quote('"'), maxlength(20000)));
+f := dataset(outfile_name, riskprocessing.layouts.layout_internal_shell_noDatasets, csv(quote('"'), maxlength(20000)));
 // output(choosen(f,eyeball), named('infile'));
 
 

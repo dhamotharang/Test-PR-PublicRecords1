@@ -1,6 +1,6 @@
-export Layout_MN_clean_in := 
+export Layout_MN_clean_in := record	
+// rec length=1709
 
-record
 string2      state_origin;
 string8      process_date;
 watercraft.Layout_MN;

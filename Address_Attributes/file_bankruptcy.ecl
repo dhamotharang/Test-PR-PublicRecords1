@@ -1,4 +1,4 @@
-import address, doxie, ut, bankruptcyv2, risk_indicators;
+import address, doxie, ut, bankruptcyv2, risk_indicators, std;
 
 slimmerrec := RECORD
 	address.Layout_Clean182;
@@ -43,7 +43,7 @@ END;
 
 //
 
-myGetDate := ut.getDate;
+myGetDate := (STRING8)Std.Date.Today();
 historydate := 999999;
 slimrec get_bkrupt(BankruptcyV2.file_bankruptcy_search_v3 L) := transform
 	self.court_code := L.court_code;
@@ -86,7 +86,7 @@ slimrec get_bkrupt(BankruptcyV2.file_bankruptcy_search_v3 L) := transform
 		// disposition and date file used to be on the main, but they're on the search file now
 	self.filing_type := l.filing_type;
 	self.disposition := l.disposition;
-	date_last_seen := ut.max2((INTEGER)trim(l.date_filed), (INTEGER)trim(l.discharged));  // discharged now instead of disposed_date
+	date_last_seen := MAX((INTEGER)trim(l.date_filed), (INTEGER)trim(l.discharged));  // discharged now instead of disposed_date
 	self.date_last_seen := date_last_seen;
 	SELF.bk_disposed_recent_count := (INTEGER)(trim(l.disposition)<>'' AND ut.DaysApart(trim(l.discharged),myGetDate)<365*2+1);
 	SELF.bk_disposed_historical_count := (INTEGER)(trim(l.disposition)<>'' AND ut.DaysApart(trim(l.discharged),myGetDate)>365*2);

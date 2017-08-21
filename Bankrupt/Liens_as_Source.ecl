@@ -1,11 +1,17 @@
 import header;
-d := dataset('~thor_data400::base::LiensHeader_Building',bankrupt.Layout_Liens,flat);
 
-src_rec := record
- header.Layout_Source_ID;
- layout_liens;
-end;
+export Liens_as_Source(dataset(bankrupt.Layout_Liens) pLiens = dataset([],bankrupt.Layout_Liens), boolean pForHeaderBuild=false)
+ :=
+  function
+	dSourceData	:=	if(pForHeaderBuild,
+					   dataset('~thor_data400::base::LiensHeader_Building',bankrupt.Layout_Liens,flat)((integer)did <= 999999001000),
+					   pLiens((integer)did <= 999999001000)
+					  );
 
-header.Mac_Set_Header_Source(d(~(indivbusun='B' or aka_yn = 'B')),bankrupt.Layout_Liens,src_rec,'LI',withUID)
+	src_rec := header.layouts_SeqdSrc.LI_src_rec;
 
-export Liens_as_Source := withUID : persist('persist::headerbuild_liens_src');
+	header.Mac_Set_Header_Source(dSourceData(~(indivbusun='B' or aka_yn = 'B')),bankrupt.Layout_Liens,src_rec,'LI',withUID)
+
+	return withUID;
+  end
+ ;

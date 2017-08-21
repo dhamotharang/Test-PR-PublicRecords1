@@ -35,6 +35,7 @@ export EDA_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.v_city_name),
 				self.state := left.st,
 				self.zip := left.z5,
+				self.zip4 := left.z4,
 				self.county_fips := left.county_code[3..5],
 				self.msa := left.msa,
 				self.phone := left.phone10,

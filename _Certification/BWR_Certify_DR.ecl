@@ -92,7 +92,7 @@ rlocal := rollup(dfres,left.fname=right.fname,incr(left,right),local);
 //local grouped rollup
 rlgrp := rollup(gdfres,1,incr(left,right));
 
-check_b10(rfull,'Global Rollup',_Certification.Setup.NodeMult1)
+//check_b10(rfull,'Global Rollup',_Certification.Setup.NodeMult1)
 check_b10(rgroup,'Global Grouped Rollup',TotalNodes)
 check_b10(rlocal,'Local Rollup',_Certification.Setup.NodeMult1)
 check_b10(rlgrp,'Local Grouped Rollup',TotalNodes)

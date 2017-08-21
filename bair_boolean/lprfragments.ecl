@@ -5,13 +5,20 @@ EXPORT lprfragments(Types.StateList st_list=ALL, Boolean pDelta=true) := MODULE
 	SHARED Persist_lpr	:= bair_boolean.constants('').persistfile('lpr');
 
   bair_data := Bair.files(pUseDelta:=pDelta).lpr_Base.built;
+	// bair_data := enth(Bair.files(,true,false).lpr_Base.built,10000);
 	SHARED lpr_Base := DISTRIBUTE(bair_data(eid <> ''),HASH64(eid));
 	
 	// lpr Business
-	Layout_lpr_base xd(bair.layouts.lpr_dbo_LicensePlateEvent_Base l) := TRANSFORM
-		SELF := l;
-	END;
-	SHARED lpr_File := PROJECT(lpr_Base, xd(LEFT));
+	SHARED lpr_File := PROJECT(lpr_Base, 
+															TRANSFORM(Layout_lpr_base,
+															SELF.gh12	 					:= left.gh12,
+															SELF.gh4 						:= left.gh12[1..4],
+															SELF.gh5 						:= left.gh12[1..5],
+															SELF.gh6 						:= left.gh12[1..6],
+															SELF.class_code			:= 600,
+															SELF.wc_plate				:= left.plate,
+															self.agency					:= left.data_provider_name,
+															SELF := left));
 	SHARED lpr_mod := lpr_baseBooleanSearch(lpr_File);
   //
 	Layout_AnswerListData xans(Layout_lpr_base l) := TRANSFORM

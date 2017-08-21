@@ -348,6 +348,7 @@ export fTraffic_Flag_From_Vendor_and_Offense_Level(string5 pVendor, string5 pOff
 	pVendor =	 'UV' => if(trim(pOffenseLevel,right) in sVendorUVTrafficSet,'Y','N'),
 	pVendor =	 'UW' => if(trim(pOffenseLevel,right) in sVendorTrafficSetNoMMMO,'Y','N'),
 	//pVendor =	 'UP' => if(trim(pOffenseLevel,right) in sVendorTrafficSetNoMMMO,'Y','N'), //handled in NO_CT
+	pVendor =	 '7A' => if(trim(pOffenseLevel,right) in ['MAT','MBT','MCT','MUT'],'Y','N'),
 	pVendor =	 '7C' => if(trim(pOffenseLevel,right) in sVendorTrafficSetNoMMMO,'Y','N'),
 	pVendor =	 '7D' => if(trim(pOffenseLevel,right) in sVendorTrafficSetNoMMMO,'Y','N'),
 	pVendor =	 '7E' => if(trim(pOffenseLevel,right) in sVendorTrafficSetNoMMMO,'Y','N'),
@@ -357,6 +358,21 @@ export fTraffic_Flag_From_Vendor_and_Offense_Level(string5 pVendor, string5 pOff
 	pVendor =  'FN' => if(pOffenseLevel = 'CT','Y','N'),
 	pVendor IN	S_vendor_standard_NO_CT=> if(trim(pOffenseLevel,right) in sVendorTrafficSetNoCT,'Y','N'),
 	pVendor IN	S_vendor_standard => if(trim(pOffenseLevel,right) in sVendorTrafficSet,'Y','N'),
+	pVendor =	'8S' => if(trim(pOffenseLevel,right) in ['MT'],'Y','N'),
+	pVendor =	'8T' => if(trim(pOffenseLevel,right) in ['CVT','CT'],'Y','N'),
+	pVendor =	'9J' => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
+	pVendor =	'9L' => if(trim(pOffenseLevel,right) in ['TI','T','CT'],'Y','N'),
+	pVendor =	'9N' => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
+	pVendor =	'9W' => if(trim(pOffenseLevel,right) in ['MT'],'Y','N'),
+		//Crimwise Sources
+	pVendor =	'W0002' => if(trim(pOffenseLevel,right) in ['MT','GMT','T','PMT','FT'],'Y','N'),
+	pVendor IN ['W0016'] => if(trim(pOffenseLevel,right) in ['TI','CT'],'Y','N'),
+  pVendor IN ['W0017'] => if(trim(pOffenseLevel,right) in ['T','TI'],'Y','N'),
+	pVendor IN ['W0027','8R'] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
+	pVendor IN ['W0037'] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
+  pVendor IN ['W0038'] => if(trim(pOffenseLevel,right) in ['T','TA'],'Y','N'),  
+	pVendor IN ['W0156'] => if(trim(pOffenseLevel,right) in ['T','MT'],'Y','N'),
+	pVendor IN ['W0253'] => if(trim(pOffenseLevel,right) in ['CT'],'Y','N'),
   ''
 	)
  ;			 

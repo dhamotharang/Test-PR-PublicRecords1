@@ -1,0 +1,71 @@
+OPTIONS:-ma
+// OPTIONS:-ma 
+MODULE:BIPV2_WAF
+FILENAME:BizHead
+IDNAME:proxid
+IDFIELD:EXISTS:proxid
+IDPARENTS:seleid,orgid,ultid
+RIDFIELD:rcid
+RECORDS:4000000000
+POPULATION:100000000
+NINES:3
+PROCESS:Biz
+// HACK:MAXBLOCKSIZE:10000
+// HACK:KEYSUFFIX
+FIELDTYPE:wordbag:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):SPACES( <>{}[]-^=!+&,./):ONFAIL(CLEAN)
+FIELDTYPE:alpha:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ):ONFAIL(CLEAN)
+FIELDTYPE:number:ALLOW(0123456789):ONFAIL(CLEAN)
+FUZZY:Right4:RST:CUSTOM(fn_Right4):TYPE(STRING4)
+FUZZY:PreferredName:RST:CUSTOM(fn_PreferredName):TYPE(STRING20)
+FUZZY:NormSuffix:RST:CUSTOM(fn_normSuffix):TYPE(STRING5)
+FIELD:parent_proxid:CARRY:0,0
+FIELD:ultimate_proxid:CARRY:0,0
+FIELD:has_lgid:CARRY:0,0
+FIELD:empid:0,0
+FIELD:powid:0,0
+//FIELD:orgid:27,0 // Comment out when using IDPARENTS
+//FIELD:ultid:27,0 // Comment out when using IDPARENTS
+FIELD:source:2,0
+FIELD:source_record_id:26,0
+// FIELD:company_name:TYPE(STRING120):BAGOFWORDS:LIKE(wordbag):25,0
+FIELD:cnp_number:0,0
+FIELD:cnp_btype:0,0
+FIELD:cnp_lowv:0,0
+FIELD:cnp_name:TYPE(STRING120):BAGOFWORDS:LIKE(wordbag):24,0
+FIELD:company_phone:26,0
+FIELD:company_fein:LIKE(number):EDIT1:PROP:26,0
+FIELD:company_sic_code1:10,0
+FIELD:prim_range:EDIT1:13,0
+FIELD:prim_name:EDIT1:LIKE(wordbag):15,0
+FIELD:sec_range:EDIT1:LIKE(wordbag):12,0
+FIELD:p_city_name:EDIT1:LIKE(wordbag):CONTEXT(st):12,0
+FIELD:st:LIKE(alpha):5,0
+FIELD:zip:LIKE(number):MULTIPLE:14,0
+FIELD:company_url:TYPE(STRING120):BAGOFWORDS:LIKE(wordbag):26,0
+FIELD:isContact:1,0
+FIELD:title:1,0
+FIELD:fname:EDIT1:INITIAL:PreferredName:LIKE(wordbag):8,0
+FIELD:mname:INITIAL:EDIT2:LIKE(wordbag):9,0
+FIELD:lname:INITIAL:HYPHEN2:EDIT2:LIKE(wordbag):10,0
+FIELD:name_suffix:NormSuffix:LIKE(wordbag):8,0
+FIELD:contact_email:0,0
+CONCEPT:CONTACTNAME:fname:mname:lname:17,0
+CONCEPT:STREETADDRESS:prim_range:prim_name:sec_range:16,0
+
+LINKPATH:L_CNPNAME:cnp_name:?:zip:prim_name:p_city_name:st:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range 
+LINKPATH:L_CNPNAME_ST:cnp_name:st:?:zip:prim_name:p_city_name:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range                                                                              
+LINKPATH:L_ADDRESS1:prim_name:p_city_name:st:?:prim_range:cnp_name:+:zip:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:sec_range
+LINKPATH:L_ADDRESS2:prim_name:zip:?:st:prim_range:cnp_name:+:p_city_name:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:sec_range
+LINKPATH:L_PHONE:company_phone:+:company_sic_code1:cnp_name:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:p_city_name:st:prim_range:sec_range
+LINKPATH:L_FEIN:company_fein:+:company_sic_code1:cnp_name:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:p_city_name:st:prim_range:sec_range
+LINKPATH:L_CONTACT:fname:lname:?:mname:cnp_name:st:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:p_city_name:prim_range:sec_range
+LINKPATH:L_URL:company_url:?:st:+:company_sic_code1:cnp_name:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:p_city_name:prim_range:sec_range
+LINKPATH:L_EMAIL:contact_email:?:company_sic_code1:cnp_name:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:p_city_name:st:prim_range:sec_range
+LINKPATH:L_SOURCE:source_record_id:source:?:cnp_name:prim_name:p_city_name:st:zip:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range
+
+SOURCEFIELD:SOURCE:PERMITS(fn_sources,10)
+EXTERNALFILE:Corps:NAMED(File_Corp2_Base):IDDONE:MAPPING(cnp_name=corp_legal_name,prim_range=corp_addr1_prim_range,prim_name=corp_addr1_prim_name,sec_range=corp_addr1_sec_range,p_city_name=corp_addr1_p_city_name,st=corp_addr1_state,zip=corp_addr1_zip5,company_phone=corp_phone10,company_fein=corp_fed_tax_id,fname=cont_fname,lname=cont_lname,mname=cont_mname,source_record_id=source_rec_id):PERMIT(source):
+EXTERNALFILE:UCC:NAMED(File_Uccv2_Base):IDDONE:MAPPING(cnp_name=company_name,prim_range=prim_range,prim_name=prim_name,sec_range=sec_range,p_city_name=p_city_name,st=st,zip=zip5,company_phone=telephone_number,company_fein=fein,fname=fname,lname=lname,mname=mname):PERMIT(source):
+EXTERNALFILE:Vehicle:NAMED(File_VehicleV2_Base):IDDONE:MAPPING(cnp_name=append_clean_cname,prim_range=append_clean_address.prim_range,prim_name=append_clean_address.prim_name,sec_range=append_clean_address.sec_range,p_city_name=append_clean_address.v_city_name,st=append_clean_address.st,zip=append_clean_address.zip5,company_fein=orig_fein,fname=fname,mname=mname,lname=lname,source_record_id=source_rec_id):PERMIT(source):
+EXTERNALFILE:PropertyV2:NAMED(File_Ln_PropertyV2_Base):IDDONE:MAPPING(cnp_name=cname,prim_range=prim_range,prim_name=prim_name,sec_range=sec_range,p_city_name=p_city_name,st=st,zip=zip,company_phone=phone_number):PERMIT(source):
+EXTERNALFILE:BizContacts:NAMED(File_BizHead_Contacts):IDDONE:MAPPING(cnp_name=company_name,prim_range=prim_range,prim_name=prim_name,sec_range=sec_range,p_city_name=p_city_name,st=st,zip=zip,company_phone=company_phone,company_fein=company_fein):PERMIT(source):

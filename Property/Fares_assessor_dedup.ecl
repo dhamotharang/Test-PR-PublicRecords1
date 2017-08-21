@@ -84,5 +84,5 @@ left.own_state = right.own_state and
 (integer)left.recording_date = (integer)right.recording_date and
 left.seller_name = right.seller_name, dupFares(left,right),local);
 
-ut.MAC_SF_BuildProcess(dup,'~thor_data400::base::fares_2580',run_dup,2);
+ut.MAC_SF_BuildProcess(dup,'~thor_data400::base::fares_2580',run_dup,2,,true);
 export Fares_assessor_dedup := run_dup;

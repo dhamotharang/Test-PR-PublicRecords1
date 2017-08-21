@@ -5,4 +5,4 @@ ds_in := project(BIPV2_Tools.idIntegrity().blank_above_lgid3(BIPV2.CommonBase.DS
 // ds_in := BIPV2_Files.files_proxid().DS_PROXID_BASE;
 
 ds_clean := BIPV2_Files.tools_dotid().reclean(ds_in);
-EXPORT In_BASE := ds_clean : PERSIST('~thor_data400::persist::BIPV2_Ingest::In_BASE');
+EXPORT In_BASE := ds_clean : PERSIST('~thor_data400::persist::BIPV2_Ingest::In_BASE'); 

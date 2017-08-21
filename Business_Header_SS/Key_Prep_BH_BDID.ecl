@@ -1,6 +1,10 @@
-IMPORT Business_Header;
+Import Data_Services, Business_Header, PRTE2_Business_Header;
 
-f_bh := business_header.File_Prep_Business_Header_Plus;
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+f_bh := PRTE2_Business_Header.File_Business_Header_Base_for_keybuild;
+#ELSE
+f_bh := business_header.File_Business_Header_Base_for_keybuild;
+#END;
 
 layout_bdid_index := RECORD
 	f_bh.bdid;

@@ -116,7 +116,7 @@ module
 
   esp				:= pesp + ':8010';
 
-  dsoap_results := SOAPCALL(
+  export dsoap_results := SOAPCALL(
     'http://' + esp + '/WsWorkunits?ver_=1.48'
     // 'http://' + esp + '/WsWorkunits'
     ,'WUQuery'

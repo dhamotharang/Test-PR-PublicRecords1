@@ -8,6 +8,7 @@ module
 	export Root 	:= _dataset(pUseOtherEnvironment).thor_cluster_persists + 'persist::Business_Header::'		;
 	export RootSS := _dataset(pUseOtherEnvironment).thor_cluster_persists + 'persist::Business_Header_SS::'	;
 
+	export AppendAID											:= Root + 'Append_AID'													;
 	export BADist													:= Root + 'BA_Dist'															;
 	export BCDID													:= Root + 'BC_DID'															;
 	export BCExtra												:= Root + 'BC_Extra'														;
@@ -18,6 +19,7 @@ module
 	export BHAddrStats										:= Root + 'BH_Addr_Stats'												;
 	export BHBasicMatchClean							:= Root + 'BH_Basic_Match_Clean'								;
 	export BHBasicMatchFEIN								:= Root + 'BH_Basic_Match_FEIN'									;
+	export BHBasicMatchForRels						:= Root + 'BH_Basic_Match_ForRels'							;
 	export BHBasicMatchNameAddr						:= Root + 'BH_Basic_Match_NameAddr'							;
 	export BHBasicMatchNoAddress					:= Root + 'BH_Basic_Match_NoAddress'						;
 	export BHBasicMatchSALT								:= Root + 'BH_Basic_Match_SALT'									;
@@ -38,6 +40,7 @@ module
 	export BHRelativeMatchABIHierarchy		:= Root + 'BH_Relative_Match_ABI_Hierarchy'			;
 	export BHRelativeMatchAddr						:= Root + 'BH_Relative_Match_Addr'							;
 	export BHRelativeMatchDCAHierarchy		:= Root + 'BH_Relative_Match_DCA_Hierarchy'			;
+	export BHRelativeMatchDCAHierarchySG		:= Root + 'BH_Relative_Match_DCA_Hierarchy'	+ '.BH_Super_Group'		;
 	export BHRelativeMatchDUNSTree				:= Root + 'BH_Relative_Match_DUNS_Tree'					;
 	export BHRelativeMatchFBN							:= Root + 'BH_Relative_Match_FBN'								;
 	export BHRelativeMatchFEIN						:= Root + 'BH_Relative_Match_FEIN'							;
@@ -56,6 +59,7 @@ module
 	export BusinessAssociates							:= Root + 'Business_Associates'									;
 	export EqContacts											:= Root + 'Eq_Contacts'													;
 	export EqContactsWithEmployer					:= Root + 'Eq_Contacts::HasEmployer'						;
+	export fDCAForGroups									:= Root + 'fDCA_For_Groups'											;
 	export HeaderContacts									:= Root + 'Header_Contacts'											;					
 	export MaxRCID												:= Root + 'Max_RCID'														;					
 	export PhonesPlusContacts							:= Root + 'PhonesPlus_Contacts'									;	
@@ -100,7 +104,8 @@ module
         ,{Best_Joined											}						
         ,{BHAddrStats											}						
         ,{BHBasicMatchClean								}				
-        ,{BHBasicMatchFEIN								}					
+        ,{BHBasicMatchFEIN								}	
+				,{BHBasicMatchForRels							}
         ,{BHBasicMatchNameAddr						}				
         ,{BHBasicMatchNoAddress						}			
         ,{BHBDIDSIC												}					

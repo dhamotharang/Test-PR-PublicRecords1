@@ -88,6 +88,6 @@ index(
 	{city_name},
 	{st, percent_chance},
 	//'~thor_data400::cemtemp::city_name.st'
-	ut.foreign_prod+'thor_data400::key::hdr_city_name.st.percent_chance_' + doxie.Version_SuperKey);
+	ut.Data_Location.Person_header+'thor_data400::key::hdr_city_name.st.percent_chance_' + doxie.Version_SuperKey);
 
 export Key_CityStChance := i;

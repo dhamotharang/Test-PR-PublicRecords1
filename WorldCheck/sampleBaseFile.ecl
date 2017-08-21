@@ -4,7 +4,8 @@ export sampleBaseFile(string filedate) := function
 
 ds1 := dataset('~thor_data400::base::worldcheck::main',WorldCheck.Layout_WorldCheck_Cleaned.Layout_WorldCheck_Main,flat);
 
-smain := ds1(entered=filedate or updated=filedate); 
+smain := ds1(entered=filedate or entered=(string)((integer)filedate-2) or entered=(string)((integer)filedate-1) 
+			 or entered= filedate or updated=(string)((integer)filedate-2) or updated=(string)((integer)filedate-1) or updated= filedate ); 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +42,7 @@ sext := join(ds5_dedup, ds6_dedup,
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 sampleout:=  sequential(
-	output(choosen(smain,1000),named('PostProcessMainSample')),
+	output(choosen(smain,300),named('PostProcessMainSample')),
 	output(choosen(stok,1000),named('PostProcessTokenSample')),
 	output(choosen(sext,1000),named('PostProcessExternalSourcesSample'))
 	);

@@ -1,0 +1,22 @@
+export Layout_Lobbyists_CO_2006 := record
+	string40 	lobbyist_last_name;
+	string22	lobbyist_first_name;
+	string40	lobbyist_address_1;
+	string37	lobbyist_address_2;
+	string18	lobbyist_city;
+	string2		lobbyist_state;
+	string5		lobbyist_zip;
+	string11	lobbyist_id;
+	string75	employer_name;
+	string40	employer_address_1;
+	string78	employer_address_2;
+	string20	employer_city;
+	string2		employer_state;
+	string5		employer_zip;
+	string8		income_amount;
+	string10	date_income_received;
+	string9		report_month;
+	string4		fiscal_year;
+	string10	report_due_date;
+	string1		newline;
+end;

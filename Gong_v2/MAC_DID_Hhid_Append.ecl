@@ -28,16 +28,16 @@ end;
 
 #uniquename(history_matchset)
 %history_matchset% := ['A', 'P', 'Z'];
-
+//appending DID to input file
 #uniquename(history_did)
 did_add.MAC_Match_Flex(%history_init%,%history_matchset%,
                        foo,foo,name_first,name_middle,name_last,name_suffix,
 				   prim_range,prim_name,sec_range,z5,st,phone10,
 				   did,%layout_history_did_hhid_bdid%,true,did_score,75,%history_did%);
-				  
+  
 #uniquename(history_did_dist)		
-%history_did_dist% := distribute(%history_did%(name_last<>''), hash(name_last,prim_name));		
-
+%history_did_dist% := distribute(%history_did%, hash(name_last,prim_name));		
+//appending HHID 
 #uniquename(history_hhid)		
 didville.MAC_HHID_Append_By_Address(
 	%history_did_dist%, %history_hhid%, hhid, name_last,
@@ -47,8 +47,8 @@ didville.MAC_HHID_Append_By_Address(
 #uniquename(history_bdid)
 #uniquename(bdid_inrecs)
 %bdid_matchset% := ['A','P'];
-%bdid_inrecs% := %history_hhid%(listing_type_bus<>'',publish_code IN ['P','U']) + %history_did%(name_last = '', listing_type_bus<>'',publish_code IN ['P','U']);
-business_header_ss.MAC_match_FLEX(%bdid_inrecs%,%bdid_matchset%,company_name,
+//appending bdid
+business_header_ss.MAC_match_FLEX(%history_hhid%,%bdid_matchset%,company_name,
 				prim_range,prim_name,z5,sec_range,st,phone10,fein,
 				bdid,%layout_history_did_hhid_bdid%,true,bdid_score,
 				%history_bdid%)
@@ -56,15 +56,12 @@ business_header_ss.MAC_match_FLEX(%bdid_inrecs%,%bdid_matchset%,company_name,
 
 
 #uniquename(get_history_out)
-Gong_v2.layout_gongMaster %get_history_out%(%history_hhid% l) := transform
+Gong_v2.layout_gongMaster %get_history_out%(%history_bdid% l) := transform
 	self := l;
 end;
 
 #uniquename(out_raw)
-%out_raw% := project(%history_bdid% + 
-		  	      %history_hhid%(~(listing_type_bus<>'' and publish_code IN ['P','U'])) + 
-				 %history_did% (name_last='' and ~(listing_type_bus<>'' and publish_code IN ['P','U'])), 
-				 %get_history_out%(left));
+%out_raw% := project(%history_bdid%,%get_history_out%(left));
 				 
 #uniquename(out_with_hhid)				 
 %out_with_hhid% := %out_raw%(hhid<>0);	

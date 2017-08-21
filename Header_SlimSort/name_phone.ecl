@@ -17,7 +17,7 @@ phonep := record
 phonep into(h le) := transform 
   self.fname := datalib.preferredfirstNew(le.fname, Header_Slimsort.Constants.UsePFNew);
   self.mname := datalib.preferredfirstNew(le.mname, Header_Slimsort.Constants.UsePFNew);
-  self.name_suffix := if(ut.is_unk(le.name_suffix), '', ut.Translate_Suffix(le.name_suffix));
+  self.name_suffix := if(ut.is_unk(le.name_suffix), '', ut.fGetSuffix(le.name_suffix));
   self := le;
   end;
 

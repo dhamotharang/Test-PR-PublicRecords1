@@ -1,4 +1,4 @@
-IMPORT SANCTN, Address, lib_stringlib;
+IMPORT SANCTN, Address, lib_stringlib,ut, Prof_License_Mari, std;
 
 export clean_incident(string filedate) := function
 
@@ -13,8 +13,7 @@ layout_combined := RECORD
    string255 incident_text;   
 end;
 
-layout_combined  incident_combined(SANCTN_incident      L
-                                  ,SANCTN_incident_text R) := TRANSFORM
+layout_combined  incident_combined(SANCTN_incident L, SANCTN_incident_text R) := TRANSFORM
    self.incident_text   := R.INCIDENT_TEXT;
    self.ORDER_NUMBER    := R.ORDER_NUMBER;
    self := L;
@@ -22,40 +21,47 @@ end;
 
 j_incident := JOIN(SANCTN_incident
                   ,SANCTN_incident_text
-			      ,left.BATCH_NUMBER    = right.BATCH_NUMBER
-			   AND left.INCIDENT_NUMBER = right.INCIDENT_NUMBER
-			      ,incident_combined(left,right)
-			      ,LEFT OUTER
-			      ,LOCAL);
+									,left.BATCH_NUMBER    = right.BATCH_NUMBER
+									AND left.INCIDENT_NUMBER = right.INCIDENT_NUMBER
+									,incident_combined(left,right)
+									,LEFT OUTER
+									,LOCAL);
 
+//Remove nonprintable characters
+else_filter_find := '[Ã¢]';
+//else_filter_find := '[^[:print:]]';
+else_filter := '[^[:print:]]';
 
 SANCTN.layout_SANCTN_incident_clean clean_SANCTN_incident(j_incident input) := TRANSFORM
+  
+   self.incident_date_clean	:= if(input.INCIDENT_DATE = '', '',Prof_License_Mari.DateCleaner.ToYYYYMMDD(trim(input.INCIDENT_DATE,left,right)));
+	 self.fcr_date_clean			:= if(input.FCR_DATE= '','',Prof_License_Mari.DateCleaner.ToYYYYMMDD(trim(input.FCR_DATE,left,right)));
+	
+	//Remove nonprintable characters
+	 self.incident_text       := IF(regexfind(else_filter_find,input.incident_text) = false,input.incident_text,
+		                            regexreplace(else_filter,input.incident_text,'',NOCASE));
+	
+	  self.cln_modified_date   := if(input.MODIFIED_DATE = '','',Prof_License_Mari.DateCleaner.ToYYYYMMDD(trim(input.MODIFIED_DATE,left,right)));
+	 self.cln_load_date			 	 := if(input.LOAD_DATE = '','',Prof_License_Mari.DateCleaner.ToYYYYMMDD(trim(input.LOAD_DATE,left,right)));
 
-// 70-30 rule: if 2-digit reference year is less than current year + 30, assume 2000, otherwise 1900
-string4 AdjustYear(string year) := map(length(year) <> 2 => year,
-                                       (integer)year <= (current_yy + 30) => (string4)(2000 + (integer)year),
-									   (string4)(1900 + (integer)year));
-// Convert the m/d/yy date to yyyymmdd
-string8     fSlashedMDYtoCCYYMMDD(string pDateIn) := ((integer2)AdjustYear(regexreplace('.*/.*/([0-9]+)',pDateIn,'$1')))//,4,1) 
-                                                     + intformat((integer1)regexreplace('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
-									                 + intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
-
-   // Set the local values
-   self.incident_date_clean := fSlashedMDYtoCCYYMMDD(trim(input.INCIDENT_DATE,left,right));
-   self.fcr_date_clean      := fSlashedMDYtoCCYYMMDD(trim(input.FCR_DATE,left,right));
    self                     := input;
    
 end;
 
 clean_data := sort(PROJECT(j_incident, clean_SANCTN_incident(LEFT)),batch_number,incident_number, order_number);
 
+clean_data_suppress := clean_data ((trim(batch_number,left,right)+trim(incident_number,left,right) not in SANCTN.SuppressBatchIncident));
+
 output('Incident data: ' + count(clean_data));
 
-clean_data_deduped := output(dedup(clean_data,all),,SANCTN.cluster_name +'out::SANCTN::'+filedate+'::incident_cleaned');
+clean_data_deduped := output(dedup(clean_data_suppress,all),,SANCTN.cluster_name +'out::SANCTN::'+filedate+'::incident_cleaned');
 
-return sequential(clean_data_deduped);
+//Clear the history of the incident clean and party clean superfiles since it is full file replacement
+add_super := sequential(STD.File.StartSuperFileTransaction()
+                        ,STD.File.ClearSuperFile(SANCTN.cluster_name + 'out::sanctn::incident_cleaned',true)
+                        ,STD.File.AddSuperFile(SANCTN.cluster_name + 'out::sanctn::incident_cleaned', SANCTN.cluster_name + 'out::sanctn::' + filedate + '::incident_cleaned')
+												,STD.File.FinishSuperFileTransaction());
+
+return sequential(clean_data_deduped, add_super);
 
 end;
-
-// EXPORT clean_incident := PROJECT(j_incident, clean_SANCTN_incident(LEFT)) 
-                                // : PERSIST(SANCTN.cluster_name + 'persist::SANCTN::incident_clean');

@@ -6,8 +6,8 @@ EXPORT MOD_Attr_ForeignCorpkey(DATASET(layout_DOT) ih,UNSIGNED MatchThreshold = 
 EXPORT ForceFilter(inhead,infile,id1,id2) := FUNCTIONMACRO
 // Every attribute value must match to a value in the other attribute IF they have the same context
   /* HACK - replace Cands0 */
-	// Cands0 := BIPV2_DOTID.match_candidates(inhead).ForeignCorpkey_candidates;
-  Cands0 := BIPV2_DOTID._attr_ck_charters;
+	// Cands0 := BIPV2_DotID.match_candidates(inhead).ForeignCorpkey_candidates;
+  Cands0 := BIPV2_DotID._attr_ck_charters;
 // We are going to create a record for each candidate pair; this record will have a child dataset for the attribute values of each side
   /* HACK - add ChildRec1 */
 	ChildRec1 := RECORD
@@ -27,46 +27,27 @@ EXPORT ForceFilter(inhead,infile,id1,id2) := FUNCTIONMACRO
   Cands1 := rollup(sort(Cands                    ,dotid,local) ,left.dotid = right.dotid,transform(recordof(left),self.childs := left.childs + right.childs,self := left),local);
   Cands2 := rollup(sort(distribute(Cands1,dotid) ,dotid,local) ,left.dotid = right.dotid,transform(recordof(left),self.childs := left.childs + right.childs,self := left),local);
 	
+  layslimmtch := {unsigned6 id1,unsigned6 id2};
+  tslim := table(infile,{id1,id2},id1,id2,merge);
   PossRec := RECORD
-    infile;
-		/* HACK - change to ChildRec1 */
-    // DATASET(ChildRec) Kids1 := DATASET([],ChildRec);
-    // DATASET(ChildRec) Kids2 := DATASET([],ChildRec);
+    tslim;
     DATASET(ChildRec1) Kids1 := DATASET([],ChildRec1);
-    DATASET(ChildRec1) Kids2 := DATASET([],ChildRec1);
-    unsigned2 countKids1  := 0;
-    unsigned2 countKids2  := 0;
+//    DATASET(ChildRec1) Kids2 := DATASET([],ChildRec1);
     boolean   shouldFilterOut := false;
   END;
-  T := TABLE(infile,PossRec); // Allow for addition of children
-	/* HACK - replace D1/D2 */
-  // D1 := DENORMALIZE(T,Cands,LEFT.id1 = RIGHT.DOTid,GROUP,TRANSFORM(PossRec, SELF.Kids1 := DEDUP(ROWS(RIGHT),Basis,ALL), SELF := LEFT));
-  // D2 := DENORMALIZE(D1,Cands,LEFT.id2 = RIGHT.DOTid,GROUP,TRANSFORM(PossRec, SELF.Kids2 := DEDUP(ROWS(RIGHT),Basis,ALL), SELF := LEFT));
-  D1 := JOIN(T ,Cands2,LEFT.id1 = RIGHT.DOTid,TRANSFORM(PossRec, SELF.Kids1 := RIGHT.childs,self.countKids1 := count(self.kids1), SELF := LEFT), LEFT OUTER, HASH);
-  D2 := JOIN(D1,Cands2,LEFT.id2 = RIGHT.DOTid,TRANSFORM(PossRec, SELF.Kids2 := RIGHT.childs,self.countKids2 := count(RIGHT.childs)
-    // ,self.shouldFilterOut := false // default for now
-    ,SELF := LEFT), LEFT OUTER, HASH);
-  D2_dist := distribute(D2); //to make sure it does the distribute before the project(optimization sometimes puts it afterwards)
-  D2_sort := sort(D2_dist,id1,id2,local); //to make sure it does the distribute before the project(optimization sometimes puts it afterwards)
+//  T  := TABLE(tslim,PossRec); // Allow for addition of children
+  D1 := JOIN(Tslim ,Cands2,LEFT.id1 = RIGHT.Dotid,TRANSFORM(PossRec, SELF.Kids1 := RIGHT.childs, SELF := LEFT), HASH);
+  D2 := JOIN(D1    ,Cands2,LEFT.id2 = RIGHT.Dotid,TRANSFORM(PossRec/*, SELF.Kids2 := RIGHT.childs*/
+    ,self.shouldFilterOut := if(count(table(left.kids1 + RIGHT.childs,{context},context,few))  <  count(table(left.kids1 + RIGHT.childs,{context,basis},context,basis,few)),true,skip) 
+    ,SELF := LEFT), HASH);
+  d2_table := project(d2,layslimmtch);
   
-  D3 := project(D2_dist,transform(recordof(left)
-    ,self.shouldFilterOut := if(left.countKids1 > 0 and left.countKids2 > 0 
-      ,count(table(left.kids1 + left.kids2,{context},context))  <  count(table(left.kids1 + left.kids2,{context,basis},context,basis))  
-      ,false
-    )
-   ,self := left
-   ));
-  D3_tofilterout  := D3(shouldFilterOut = true );
-  D3_toKeep       := D3(shouldFilterOut = false);
-	/* HACK - change to ChildRec1 */
-  // Agree(DATASET(ChildRec) le, DATASET(ChildRec) ri) := FUNCTION
-  // Agree(DATASET(ChildRec1) le, DATASET(ChildRec1) ri) := FUNCTION
-    // j := JOIN(le,ri,LEFT.Context=RIGHT.Context AND LEFT.Basis<>RIGHT.Basis,TRANSFORM(LEFT));
-    // RETURN ~EXISTS(j);
-  // END;
-  RETURN PROJECT(D3_toKeep,RECORDOF(infile));
+  D2_tokeep := join(infile,d2_table,left.id1 = right.id1 and left.id2 = right.id2,transform(left),left only,hash);
+  RETURN D2_tokeep;
+
 ENDMACRO;
-SHARED Cands := match_candidates(ih).ForeignCorpkey_candidates;
+SHARED Cands := dataset([],recordof(match_candidates(ih).ForeignCorpkey_candidates));/*HACK Cands to prevent att matches*/
+
 SHARED s := Specificities(ih).Specificities[1];
  
 // Generate match candidates based upon this attribute file

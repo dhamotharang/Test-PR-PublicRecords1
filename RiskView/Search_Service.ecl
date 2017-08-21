@@ -1,4 +1,4 @@
-﻿//RiskView.Search_Service
+//RiskView.Search_Service
 /*--SOAP--
 <message name="RiskView Search_Service">
 	<part name="RiskView2Request" type="tns:XmlDataSet" cols="110" rows="75"/>

@@ -1,4 +1,4 @@
-import ut, Business_Header;
+import ut, Business_Header, NID;
 
 // Add businesses to records with DID
 nh_prin := Equifax.nohit_test_bdid_by_contact(did <> 0);
@@ -135,7 +135,7 @@ nh_prin_bus_all := nh_prin_init + bh_contacts_select;
 prin_bus_append_dist := distribute(nh_prin_bus_all, hash(seq));
 prin_bus_append_sort := sort(prin_bus_append_dist, seq, local);
 prin_bus_append_grp := group(prin_bus_append_sort, seq, local);
-prin_bus_append_grp_sort := sort(prin_bus_append_grp, lname, datalib.PreferredFirst(fname), record_type, if(did <> 0, 0, 1), did, ut.TitleRank(company_title), mname);
+prin_bus_append_grp_sort := sort(prin_bus_append_grp, lname, NID.PreferredFirstVersionedStr(fname, NID.version), record_type, if(did <> 0, 0, 1), did, ut.TitleRank(company_title), mname);
 
 Layout_NoHit_Test_Prin_Append RollupPrincipals(Layout_NoHit_Test_Prin_Append l, Layout_NoHit_Test_Prin_Append r) := transform
 self := l;

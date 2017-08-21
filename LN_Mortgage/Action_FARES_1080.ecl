@@ -45,7 +45,7 @@ LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE MapToCommonModel(source_file 
 										     trim(L.owner_quadrant,left,right);
   
   
-  self.buyer_mailing_full_street_address  := if(trim(v_buyer_mailing_full_street_address,left,right)='0','',v_buyer_mailing_full_street_address);
+  self.buyer_mailing_full_street_address  := if(trim(v_buyer_mailing_full_street_address,left,right)='0','',trim(v_buyer_mailing_full_street_address,left,right));
   self.buyer_mailing_address_unit_number  := L.owner_apartment_unit;
   self.buyer_mailing_address_citystatezip := LN_Functions.Function_CombineCityStateZip(L.owner_city, L.owner_state, L.owner_zip_code, '');
   
@@ -59,9 +59,9 @@ LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE MapToCommonModel(source_file 
 									   trim(L.prop_direction,left,right)           + if(trim(L.prop_quadrant,left,right)!='',' ','') +
 									   trim(L.prop_quadrant,left,right);
     
-  self.property_full_street_address := if(trim(v_property_full_street_address,left,right)='0','',v_property_full_street_address);
+  self.property_full_street_address := if(trim(v_property_full_street_address,left,right)='0','',trim(v_property_full_street_address,left,right));
   self.property_address_unit_number := L.prop_apartment_unit;
-  self.property_address_citystatezip := LN_Functions.Function_CombineCityStateZip(L.prop_city, L.prop_state, L.prop_property_address_zip_code_, '');
+  self.property_address_citystatezip := trim(LN_Functions.Function_CombineCityStateZip(L.prop_city, L.prop_state, L.prop_property_address_zip_code_, ''),left,right);
   self.property_address_code        := L.address_indicator;
   
   self.contract_date                := L.sale_date_yyyymmdd;
@@ -77,7 +77,7 @@ LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE MapToCommonModel(source_file 
   self.first_td_due_date            := L.mortgage_due_date;
   self.type_financing               := L.mortgage_interest_rate_type;
   self.title_company_name           := L.title_company_name;
-  self.second_td_loan_amount        := L.second_mortgage_amount;
+  self.second_td_loan_amount        := if(trim(L.second_mortgage_amount)!='','00'+L.second_mortgage_amount[1..9],'');
   self.partial_interest_transferred := L.ownership_transfer_percentage;
   self.lender_name := trim(trim(if(trim(L.lender_last_name,left,right)='PRIVATE INDIVIDUAL','',trim(L.lender_last_name,left,right)) +
                       ' ' +
@@ -109,7 +109,7 @@ LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE MapToCommonModel(source_file 
   //self.fares_multi_apn                          := L.multi_apn;
   //self.fares_title_company_code                 := L.title_company_code;
   //self.fares_residential_model_indicator        := L.residential_model_indicator;
-  //self.fares_mortgage_date                      := L.mortgage_date;
+  self.fares_mortgage_date                      := L.mortgage_date;
   self.fares_mortgage_deed_type                 := L.mortgage_deed_type;
   self.fares_mortgage_term_code                 := L.mortgage_term_code;
   self.fares_mortgage_term                      := L.mortgage_term;
@@ -210,7 +210,6 @@ LN_Mortgage.Layout_Deed_Mortgage_Common_Model_BASE MapToCommonModel(source_file 
   
 END;
 
-Result := PROJECT(source_file,MapToCommonModel(LEFT));
+export Action_FARES_1080 := PROJECT(source_file,MapToCommonModel(LEFT));
 
-output(Result,,LN_Mortgage.Filename_FARES_1080,overwrite);
 //output(Result);

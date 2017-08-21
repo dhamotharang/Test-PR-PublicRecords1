@@ -1,4 +1,4 @@
-﻿IMPORT MDR;
+IMPORT MDR;
 EXPORT RoyaltyCCR := MODULE
 
 	EXPORT GetOnlineRoyalties(ds_in,pSource='Source') := FUNCTIONMACRO

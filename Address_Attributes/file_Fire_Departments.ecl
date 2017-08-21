@@ -44,4 +44,4 @@ layout_clean_USFD := record
 		STRING12		geolink;
 end;
 
-export File_Fire_Departments := dataset('~thor_data400::usfd',  layout_clean_USFD,  csv);
+export File_Fire_Departments := dataset('~thor_data400::usfd',  layout_clean_USFD, flat);

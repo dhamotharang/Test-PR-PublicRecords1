@@ -19,6 +19,7 @@ inquiry_acclogs.fncleanfunctions.cleanfields(inputfile, cleaned_fields);
 normInputFile := normalize(cleaned_fields, 2, transform({inquiry_acclogs.Layout_Riskwise_Logs.denorm,
 																										string orig_transaction_type := '',
 																										string orig_global_company_id := ''}, 
+								self.sequence_number 			:= (string)counter;
 								self.orig_fname 			:= choose(counter, left.orig_fname, left.orig_fname_2);
 								self.orig_mname 			:= choose(counter, left.orig_mname, left.orig_mname_2);
 								self.orig_lname 			:= choose(counter, left.orig_lname, left.orig_lname_2);
@@ -51,8 +52,12 @@ removeNulls := project(mbs_outfile, transform(inquiry_acclogs.Layout_In_Common,
 								self.orig_full_name2 := left.orig_full_name;
 								self.orig_addr1 := left.orig_address;
 								self.orig_lastline1 := stringlib.stringcleanspaces(left.orig_CITY + ' ' + left.orig_state + ' ' + left.orig_zip + left.orig_zip4);
+								self.ORIG_CITY1 := left.orig_CITY;
+								self.ORIG_STATE1 := left.orig_state;
+								self.ORIG_ZIP1 := left.orig_zip+left.orig_zip4;
 
 								self.repflag	:= '';
+								self.sequence_number	:= left.sequence_number;
 
 								self.ssn := 		Inquiry_AccLogs.fncleanfunctions.clean_ssn(left.orig_ssn);
 								self.personal_phone := Inquiry_AccLogs.fncleanfunctions.clean_phone(left.orig_homephone);
@@ -101,7 +106,8 @@ export ready_File(dataset(inquiry_acclogs.Layout_In_Common) AppendForward, strin
 ///////////////// PROJECT INTO PERSON QUERY LAYOUT 
 							
 person_project := project(AppendForward(repflag = '' and source_file = select_source), 
-		transform(inquiry_acclogs.Layout.Common,
+		transform(inquiry_acclogs.Layout.Common_ThorAdditions,
+			self.source := stringlib.stringtouppercase(left.source_file);
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
 			
@@ -114,6 +120,8 @@ person_project := project(AppendForward(repflag = '' and source_file = select_so
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
+			self.bus_intel.Use := left.use;
+
 			
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
@@ -175,11 +183,13 @@ person_project := project(AppendForward(repflag = '' and source_file = select_so
 			self.person_q.err_stat :=   left.err_stat;
 			self.person_q.Appended_SSN := left.appendssn;
 			self.person_q.Appended_ADL := left.appendadl;
+			self := left;
 			self := []));
 
 bususer_project := project(AppendForward(repflag <> '' and source_file = select_source), 
-			transform(inquiry_acclogs.Layout.Common,
+			transform(inquiry_acclogs.Layout.Common_ThorAdditions,
 			
+			self.source := stringlib.stringtouppercase(left.source_file);
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
 			
@@ -192,6 +202,8 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
+			self.bus_intel.Use := left.use;
+
 			
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
@@ -251,7 +263,7 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bususer_q.err_stat :=  left.err_stat;
 			self.bususer_q.Appended_SSN := left.appendssn;
 			self.bususer_q.Appended_ADL := left.appendadl;
-
+      self := left;
 			self := []));
 
 update_records := bususer_project + person_project;

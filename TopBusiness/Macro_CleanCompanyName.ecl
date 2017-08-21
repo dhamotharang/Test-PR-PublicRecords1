@@ -13,8 +13,10 @@ export Macro_CleanCompanyName(inds,incn,inccn,outds) := macro
 			temp_uppercase := stringlib.StringToUpperCase(left.incn);
 			// FILTER BAD CHARACTERS
 			temp_filter := regexreplace('[^A-Z0-9&\' ]',temp_uppercase,' ');
+			// ADD SPACE BEFORE/AFTER NUMERALS
+			temp_numbers := regexreplace('[0-9]+',temp_filter,' $0 ');
 			// REMOVE DOUBLE SPACES
-			temp_spaces := stringlib.StringCleanSpaces(temp_filter);
+			temp_spaces := stringlib.StringCleanSpaces(temp_numbers);
 			// STANDARDIZE A B C = ABC
 			self.inccn := temp_spaces,
 			self := left));
@@ -67,12 +69,12 @@ export Macro_CleanCompanyName(inds,incn,inccn,outds) := macro
 	%namesalphabetized% := TopBusiness.Function_AlphabetizeWithinName(%suffixesremoved%)(repl_phrase != ''); /* get alphabetized, PLUS parsed */
 	
 	outds := join(
-		distribute(%whitespace%,hash64(inccn)),
+		distribute(%whitespace%(inccn != ''),hash64(inccn)),
 		distribute(%namesalphabetized%,hash64(clean_company_name)),
 		left.inccn = right.clean_company_name,
 		transform(%temprec%,
 			self.inccn := right.repl_phrase,
 			self := left),
-		local);
+		local) + %whitespace%(inccn = '');
 
 endmacro;

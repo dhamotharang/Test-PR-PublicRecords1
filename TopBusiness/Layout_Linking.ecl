@@ -33,6 +33,7 @@ export Layout_Linking := module
 		string25 city_name;
 		string2 state;
 		string5 zip;
+		string4 zip4;
 		string3 county_fips;
 		string4 msa;
 		string10 phone;

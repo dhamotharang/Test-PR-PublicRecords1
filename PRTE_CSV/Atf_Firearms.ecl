@@ -1,0 +1,578 @@
+export Atf_Firearms	:=
+module
+
+	shared	lSubDirName					:=	'';
+	shared	lCSVVersion					:=	'';
+	shared	lCSVFileNamePrefix	:=	PRTE_CSV.Constants.CSVFilesBaseName + lSubDirName;
+
+	export	rthor_data400__key__atf__firearms__atfid	:=
+RECORD
+  unsigned8 atf_id;
+  unsigned4 seq;
+  unsigned1 rec_code;
+  string12 bdid;
+  string3 bdid_score;
+  string3 d_score;
+  string9 best_ssn;
+  string12 did_out;
+  string8 date_first_seen;
+  string8 date_last_seen;
+  string1 expiration_flag;
+  string1 record_type;
+  string15 license_number;
+  string9 lic_regn;
+  string9 orig_lic_dist;
+  string2 lic_dist;
+  string9 lic_cnty;
+  string9 lic_type;
+  string11 lic_xprdte;
+  string9 lic_seqn;
+  string51 license_name;
+  string51 business_name;
+  string51 premise_street;
+  string24 premise_city;
+  string14 premise_state;
+  string17 premise_orig_zip;
+  string51 mail_street;
+  string26 mail_city;
+  string11 mail_state;
+  string14 mail_zip_code;
+  string11 voice_phone;
+  string1 irs_region;
+  string5 license1_title;
+  string20 license1_fname;
+  string20 license1_mname;
+  string20 license1_lname;
+  string5 license1_name_suffix;
+  string3 license1_score;
+  string51 license1_cname;
+  string5 license2_title;
+  string20 license2_fname;
+  string20 license2_mname;
+  string20 license2_lname;
+  string5 license2_name_suffix;
+  string3 license2_score;
+  string51 license2_cname;
+  string51 business_cname;
+  string10 premise_prim_range;
+  string2 premise_predir;
+  string28 premise_prim_name;
+  string4 premise_suffix;
+  string2 premise_postdir;
+  string10 premise_unit_desig;
+  string8 premise_sec_range;
+  string25 premise_p_city_name;
+  string25 premise_v_city_name;
+  string2 premise_st;
+  string5 premise_zip;
+  string4 premise_zip4;
+  string4 premise_cart;
+  string1 premise_cr_sort_sz;
+  string4 premise_lot;
+  string1 premise_lot_order;
+  string2 premise_dpbc;
+  string1 premise_chk_digit;
+  string2 premise_rec_type;
+  string2 premise_fips_st;
+  string3 premise_fips_county;
+  string18 premise_fips_county_name;
+  string10 premise_geo_lat;
+  string11 premise_geo_long;
+  string4 premise_msa;
+  string7 premise_geo_blk;
+  string1 premise_geo_match;
+  string4 premise_err_stat;
+  string10 mail_prim_range;
+  string2 mail_predir;
+  string28 mail_prim_name;
+  string4 mail_suffix;
+  string2 mail_postdir;
+  string10 mail_unit_desig;
+  string8 mail_sec_range;
+  string25 mail_p_city_name;
+  string25 mail_v_city_name;
+  string2 mail_st;
+  string5 mail_zip;
+  string4 mail_zip4;
+  string4 mail_cart;
+  string1 mail_cr_sort_sz;
+  string4 mail_lot;
+  string1 mail_lot_order;
+  string2 mail_dpbc;
+  string1 mail_chk_digit;
+  string2 mail_rec_type;
+  string2 mail_fips_st;
+  string3 mail_fips_county;
+  string10 mail_geo_lat;
+  string11 mail_geo_long;
+  string4 mail_msa;
+  string7 mail_geo_blk;
+  string1 mail_geo_match;
+  string4 mail_err_stat;
+  unsigned6 did;
+ END;
+
+
+  export  rthor_data400__key__atf__firearms__linkids	:=
+RECORD
+  unsigned6 ultid;
+  unsigned6 orgid;
+  unsigned6 seleid;
+  unsigned6 proxid;
+  unsigned6 powid;
+  unsigned6 empid;
+  unsigned6 dotid;
+  unsigned2 ultscore;
+  unsigned2 orgscore;
+  unsigned2 selescore;
+  unsigned2 proxscore;
+  unsigned2 powscore;
+  unsigned2 empscore;
+  unsigned2 dotscore;
+  unsigned2 ultweight;
+  unsigned2 orgweight;
+  unsigned2 seleweight;
+  unsigned2 proxweight;
+  unsigned2 powweight;
+  unsigned2 empweight;
+  unsigned2 dotweight;
+	string2 source;
+  unsigned4 seq;
+  unsigned1 rec_code;
+  string12 bdid;
+  string3 bdid_score;
+  string3 d_score;
+  string9 best_ssn;
+  string12 did_out;
+  string8 date_first_seen;
+  string8 date_last_seen;
+  string1 expiration_flag;
+  string1 record_type;
+  string15 license_number;
+  string9 lic_regn;
+  string9 orig_lic_dist;
+  string2 lic_dist;
+  string9 lic_cnty;
+  string9 lic_type;
+  string11 lic_xprdte;
+  string9 lic_seqn;
+  string51 license_name;
+  string51 business_name;
+  string51 premise_street;
+  string24 premise_city;
+  string14 premise_state;
+  string17 premise_orig_zip;
+  string51 mail_street;
+  string26 mail_city;
+  string11 mail_state;
+  string14 mail_zip_code;
+  string11 voice_phone;
+  string1 irs_region;
+  string5 license1_title;
+  string20 license1_fname;
+  string20 license1_mname;
+  string20 license1_lname;
+  string5 license1_name_suffix;
+  string3 license1_score;
+  string51 license1_cname;
+  string5 license2_title;
+  string20 license2_fname;
+  string20 license2_mname;
+  string20 license2_lname;
+  string5 license2_name_suffix;
+  string3 license2_score;
+  string51 license2_cname;
+  string51 business_cname;
+  string10 premise_prim_range;
+  string2 premise_predir;
+  string28 premise_prim_name;
+  string4 premise_suffix;
+  string2 premise_postdir;
+  string10 premise_unit_desig;
+  string8 premise_sec_range;
+  string25 premise_p_city_name;
+  string25 premise_v_city_name;
+  string2 premise_st;
+  string5 premise_zip;
+  string4 premise_zip4;
+  string4 premise_cart;
+  string1 premise_cr_sort_sz;
+  string4 premise_lot;
+  string1 premise_lot_order;
+  string2 premise_dpbc;
+  string1 premise_chk_digit;
+  string2 premise_rec_type;
+  string2 premise_fips_st;
+  string3 premise_fips_county;
+  string18 premise_fips_county_name;
+  string10 premise_geo_lat;
+  string11 premise_geo_long;
+  string4 premise_msa;
+  string7 premise_geo_blk;
+  string1 premise_geo_match;
+  string4 premise_err_stat;
+  string10 mail_prim_range;
+  string2 mail_predir;
+  string28 mail_prim_name;
+  string4 mail_suffix;
+  string2 mail_postdir;
+  string10 mail_unit_desig;
+  string8 mail_sec_range;
+  string25 mail_p_city_name;
+  string25 mail_v_city_name;
+  string2 mail_st;
+  string5 mail_zip;
+  string4 mail_zip4;
+  string4 mail_cart;
+  string1 mail_cr_sort_sz;
+  string4 mail_lot;
+  string1 mail_lot_order;
+  string2 mail_dpbc;
+  string1 mail_chk_digit;
+  string2 mail_rec_type;
+  string2 mail_fips_st;
+  string3 mail_fips_county;
+  string10 mail_geo_lat;
+  string11 mail_geo_long;
+  string4 mail_msa;
+  string7 mail_geo_blk;
+  string1 mail_geo_match;
+  string4 mail_err_stat;
+  string1 lf;
+  unsigned8 persistent_record_id;
+  integer1 fp;
+ END;
+
+
+	export	rthor_data400__key__atf__firearms__autokey__address	:=
+	record
+		string28 prim_name;
+		string10 prim_range;
+		string2 st;
+		unsigned4 city_code;
+		string5 zip;
+		string8 sec_range;
+		string6 dph_lname;
+		string20 lname;
+		string20 pfname;
+		string20 fname;
+		unsigned8 states;
+		unsigned4 lname1;
+		unsigned4 lname2;
+		unsigned4 lname3;
+		unsigned4 lookups;
+		unsigned6 did;
+	end;
+
+	export	rthor_data400__key__atf__firearms__autokey__addressb2	:=
+	record
+		string28 prim_name;
+		string10 prim_range;
+		string2 st;
+		unsigned4 city_code;
+		string5 zip;
+		string8 sec_range;
+		string40 cname_indic;
+		string40 cname_sec;
+		unsigned6 bdid;
+		unsigned4 lookups;
+	end;
+
+	export	rthor_data400__key__atf__firearms__autokey__citystname	:=
+	record
+		unsigned4 city_code;
+		string2 st;
+		string6 dph_lname;
+		string20 lname;
+		string20 pfname;
+		string20 fname;
+		integer4 dob;
+		unsigned8 states;
+		unsigned4 lname1;
+		unsigned4 lname2;
+		unsigned4 lname3;
+		unsigned4 city1;
+		unsigned4 city2;
+		unsigned4 city3;
+		unsigned4 rel_fname1;
+		unsigned4 rel_fname2;
+		unsigned4 rel_fname3;
+		unsigned4 lookups;
+		unsigned6 did;
+	end;
+
+	export	rthor_data400__key__atf__firearms__autokey__citystnameb2	:=
+	record
+		unsigned4 city_code;
+		string2 st;
+		string40 cname_indic;
+		string40 cname_sec;
+		unsigned6 bdid;
+		unsigned4 lookups;
+	end;
+
+	export	rthor_data400__key__atf__firearms__autokey__name	:=
+	record
+		string6 dph_lname;
+		string20 lname;
+		string20 pfname;
+		string20 fname;
+		string1 minit;
+		unsigned2 yob;
+		unsigned2 s4;
+		integer4 dob;
+		unsigned8 states;
+		unsigned4 lname1;
+		unsigned4 lname2;
+		unsigned4 lname3;
+		unsigned4 city1;
+		unsigned4 city2;
+		unsigned4 city3;
+		unsigned4 rel_fname1;
+		unsigned4 rel_fname2;
+		unsigned4 rel_fname3;
+		unsigned4 lookups;
+		unsigned6 did;
+	end;
+
+	export	rthor_data400__key__atf__firearms__autokey__nameb2	:=
+	record
+		string40 cname_indic;
+		string40 cname_sec;
+		unsigned6 bdid;
+		unsigned4 lookups;
+	end;
+
+	export	rthor_data400__key__atf__firearms__autokey__namewords2	:=
+	record
+		string40 word;
+		string2 state;
+		unsigned1 seq;
+		unsigned6 bdid;
+		unsigned4 lookups;
+	end;
+
+	export	rthor_data400__key__atf__firearms__autokey__payload	:=
+RECORD
+  unsigned6 fakeid;
+  unsigned4 seq;
+  unsigned1 rec_code;
+  string12 bdid;
+  string3 bdid_score;
+  string3 d_score;
+  string9 best_ssn;
+  string12 did_out;
+  string8 date_first_seen;
+  string8 date_last_seen;
+  string1 expiration_flag;
+  string1 record_type;
+  string15 license_number;
+  string9 lic_regn;
+  string9 orig_lic_dist;
+  string2 lic_dist;
+  string9 lic_cnty;
+  string9 lic_type;
+  string11 lic_xprdte;
+  string9 lic_seqn;
+  string51 license_name;
+  string51 business_name;
+  string51 premise_street;
+  string24 premise_city;
+  string14 premise_state;
+  string17 premise_orig_zip;
+  string51 mail_street;
+  string26 mail_city;
+  string11 mail_state;
+  string14 mail_zip_code;
+  string11 voice_phone;
+  string1 irs_region;
+  string5 license1_title;
+  string20 license1_fname;
+  string20 license1_mname;
+  string20 license1_lname;
+  string5 license1_name_suffix;
+  string3 license1_score;
+  string51 license1_cname;
+  string5 license2_title;
+  string20 license2_fname;
+  string20 license2_mname;
+  string20 license2_lname;
+  string5 license2_name_suffix;
+  string3 license2_score;
+  string51 license2_cname;
+  string51 business_cname;
+  string10 premise_prim_range;
+  string2 premise_predir;
+  string28 premise_prim_name;
+  string4 premise_suffix;
+  string2 premise_postdir;
+  string10 premise_unit_desig;
+  string8 premise_sec_range;
+  string25 premise_p_city_name;
+  string25 premise_v_city_name;
+  string2 premise_st;
+  string5 premise_zip;
+  string4 premise_zip4;
+  string4 premise_cart;
+  string1 premise_cr_sort_sz;
+  string4 premise_lot;
+  string1 premise_lot_order;
+  string2 premise_dpbc;
+  string1 premise_chk_digit;
+  string2 premise_rec_type;
+  string2 premise_fips_st;
+  string3 premise_fips_county;
+  string18 premise_fips_county_name;
+  string10 premise_geo_lat;
+  string11 premise_geo_long;
+  string4 premise_msa;
+  string7 premise_geo_blk;
+  string1 premise_geo_match;
+  string4 premise_err_stat;
+  string10 mail_prim_range;
+  string2 mail_predir;
+  string28 mail_prim_name;
+  string4 mail_suffix;
+  string2 mail_postdir;
+  string10 mail_unit_desig;
+  string8 mail_sec_range;
+  string25 mail_p_city_name;
+  string25 mail_v_city_name;
+  string2 mail_st;
+  string5 mail_zip;
+  string4 mail_zip4;
+  string4 mail_cart;
+  string1 mail_cr_sort_sz;
+  string4 mail_lot;
+  string1 mail_lot_order;
+  string2 mail_dpbc;
+  string1 mail_chk_digit;
+  string2 mail_rec_type;
+  string2 mail_fips_st;
+  string3 mail_fips_county;
+  string10 mail_geo_lat;
+  string11 mail_geo_long;
+  string4 mail_msa;
+  string7 mail_geo_blk;
+  string1 mail_geo_match;
+  string4 mail_err_stat;
+  unsigned8 atf_id;
+  unsigned1 zero;
+  string1 blank;
+  unsigned6 did_out6;
+  unsigned6 bdid6;
+ END;
+
+
+	export	rthor_data400__key__atf__firearms__autokey__ssn2	:=
+	record
+		string1 s1;
+		string1 s2;
+		string1 s3;
+		string1 s4;
+		string1 s5;
+		string1 s6;
+		string1 s7;
+		string1 s8;
+		string1 s9;
+		string6 dph_lname;
+		string20 pfname;
+		unsigned6 did;
+		unsigned4 lookups;
+	end;
+
+	export	rthor_data400__key__atf__firearms__autokey__stname	:=
+	record
+		string2 st;
+		string6 dph_lname;
+		string20 lname;
+		string20 pfname;
+		string20 fname;
+		string1 minit;
+		unsigned2 yob;
+		unsigned2 s4;
+		integer4 zip;
+		integer4 dob;
+		unsigned8 states;
+		unsigned4 lname1;
+		unsigned4 lname2;
+		unsigned4 lname3;
+		unsigned4 city1;
+		unsigned4 city2;
+		unsigned4 city3;
+		unsigned4 rel_fname1;
+		unsigned4 rel_fname2;
+		unsigned4 rel_fname3;
+		unsigned4 lookups;
+		unsigned6 did;
+	end;
+
+	export	rthor_data400__key__atf__firearms__autokey__stnameb2	:=
+	record
+		string2 st;
+		string40 cname_indic;
+		string40 cname_sec;
+		unsigned6 bdid;
+		unsigned4 lookups;
+	end;
+
+	export	rthor_data400__key__atf__firearms__autokey__zip	:=
+	record
+		integer4 zip;
+		string6 dph_lname;
+		string20 lname;
+		string20 pfname;
+		string20 fname;
+		string1 minit;
+		unsigned2 yob;
+		unsigned2 s4;
+		integer4 dob;
+		unsigned8 states;
+		unsigned4 lname1;
+		unsigned4 lname2;
+		unsigned4 lname3;
+		unsigned4 city1;
+		unsigned4 city2;
+		unsigned4 city3;
+		unsigned4 rel_fname1;
+		unsigned4 rel_fname2;
+		unsigned4 rel_fname3;
+		unsigned4 lookups;
+		unsigned6 did;
+	end;
+
+	export	rthor_data400__key__atf__firearms__autokey__zipb2	:=
+	record
+		integer4 zip;
+		string40 cname_indic;
+		string40 cname_sec;
+		unsigned6 bdid;
+		unsigned4 lookups;
+	end;
+
+	export	rthor_data400__key__atf__firearms__bdid := { string12 bdid, unsigned6 atf_id };
+
+	export	rthor_data400__key__atf__firearms__did := { unsigned6 did, string12 did_out, unsigned6 atf_id };
+
+	export	rthor_data400__key__atf__firearms__lnum := { string15 license_number, unsigned6 atf_id };
+
+	export	dthor_data400__key__atf__firearms__atfid 									:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__atfid.csv', rthor_data400__key__atf__firearms__atfid, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export  dthor_data400__key__atf__firearms__linkids                := dataset([], rthor_data400__key__atf__firearms__linkids);
+	export	dthor_data400__key__atf__firearms__autokey__address 			:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__autokey__address.csv', rthor_data400__key__atf__firearms__autokey__address, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__autokey__addressb2 		:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__autokey__addressb2.csv', rthor_data400__key__atf__firearms__autokey__addressb2, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__autokey__citystname 		:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__autokey__citystname.csv', rthor_data400__key__atf__firearms__autokey__citystname, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__autokey__citystnameb2 	:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__autokey__citystnameb2.csv', rthor_data400__key__atf__firearms__autokey__citystnameb2, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__autokey__name 					:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__autokey__name.csv', rthor_data400__key__atf__firearms__autokey__name, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__autokey__nameb2 				:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__autokey__nameb2.csv', rthor_data400__key__atf__firearms__autokey__nameb2, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__autokey__namewords2 		:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__autokey__namewords2.csv', rthor_data400__key__atf__firearms__autokey__namewords2, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__autokey__payload 			:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__autokey__payload.csv', rthor_data400__key__atf__firearms__autokey__payload, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__autokey__ssn2 					:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__autokey__ssn2.csv', rthor_data400__key__atf__firearms__autokey__ssn2, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__autokey__stname 				:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__autokey__stname.csv', rthor_data400__key__atf__firearms__autokey__stname, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__autokey__stnameb2 			:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__autokey__stnameb2.csv', rthor_data400__key__atf__firearms__autokey__stnameb2, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__autokey__zip 					:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__autokey__zip.csv', rthor_data400__key__atf__firearms__autokey__zip, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__autokey__zipb2 				:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__autokey__zipb2.csv', rthor_data400__key__atf__firearms__autokey__zipb2, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__bdid 									:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__bdid.csv', rthor_data400__key__atf__firearms__bdid, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__did 										:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__did.csv', rthor_data400__key__atf__firearms__did, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+	export	dthor_data400__key__atf__firearms__lnum 									:= dataset(lCSVFileNamePrefix + 'thor_data400__key__atf__firearms__' + lCSVVersion + '__lnum.csv', rthor_data400__key__atf__firearms__lnum, csv(separator('\t'), terminator('\r\n'), quote('"'), heading(single)));
+
+end;

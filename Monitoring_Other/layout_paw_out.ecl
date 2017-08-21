@@ -1,0 +1,26 @@
+export layout_paw_out := record
+	     string10 customer_id;       
+       string30 record_id;  
+			 unsigned6 did;
+		   unsigned6 bdid;
+			 string20 pawk_first_1;                                                   
+			 string20 pawk_middle_1;                                                  
+			 string20 pawk_last_1;                                                    
+			 string5 pawk_suffix_1;                                                  
+			 string9 pawk_ssn_1;                                                      
+			 string35 pawk_title_1;                                                    
+			 string120 pawk_name_company_1;                                             
+			 string35 pawk_department_1;                                               
+			 string9 pawk_fein_1;                                                     
+			 string64 pawk_address_1;                                                  
+			 string25 pawk_city_1;                                                     
+			 string2 pawk_state_1;                                                    
+			 string5 pawk_zip_1;                                                      
+			 string4 pawk_zip4_1;                                                     
+			 string10 pawk_phone10_1;                                                  
+			 string1 pawk_verified_1;
+			 string60 pawk_email_1;                                                    
+			 string8 pawk_first_seen_1;                                               
+			 string8 pawk_last_seen_1;                                                
+			 string3 pawk_confidence_level_1;                                         
+end;

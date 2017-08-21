@@ -4,14 +4,25 @@ EXPORT intelfragments(Types.StateList st_list=ALL, Boolean pDelta=true) := MODUL
 	//SHARED Persist_Stem 		:= '~THOR_DATA400::PERSIST::FRAGS_';
 	SHARED Persist_intel	:= bair_boolean.constants('').persistfile('intel');
 
-  bair_data := Bair.files(pUseDelta:=pDelta).intel_Base.built;
+  bair_data := Bair.files(pUseDelta:=pDelta).intel_Base.built(eid not in set(bair_boolean.temp,ExternalKey));
+	// bair_data := enth(Bair.files(,true,false).intel_Base.built,10000)(eid not in set(bair_boolean.temp,ExternalKey));
 	SHARED intel_Base := DISTRIBUTE(bair_data(eid <> ''),HASH64(eid));
 	
 	// intel Business
-	Layout_intel_base xd(bair.layouts.dbo_intel_Base l) := TRANSFORM
-		SELF := l;
-	END;
-	SHARED intel_File := PROJECT(intel_Base, xd(LEFT));
+	SHARED intel_File := PROJECT(intel_Base, 
+																TRANSFORM(Layout_intel_base,	
+																SELF.height 					:= (Integer)left.height,
+																SELF.weight 					:= (Integer)left.weight,
+																SELF.gh12							:= left.gh12,
+																self.gh4 							:= left.gh12[1..4],
+																self.gh5 							:= left.gh12[1..5],
+																self.gh6 							:= left.gh12[1..6],
+																SELF.class_code				:= Bair.MapClassCodeNum(5, left.incident_type),
+																SELF.wc_address_name	:= left.address_name,
+																SELF.wc_location_type	:= left.location_type,
+																self.agency						:= left.data_provider_name,
+																SELF := left));
+																							 
 	SHARED intel_mod := intel_baseBooleanSearch(intel_File);
   //
 	Layout_AnswerListData xans(Layout_intel_base l , INTEGER C) := TRANSFORM

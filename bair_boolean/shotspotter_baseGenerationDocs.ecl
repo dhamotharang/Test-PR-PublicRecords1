@@ -6,28 +6,31 @@ FILENAME:shotspotter_base
 RIDFIELD:newrid:GENERATE
 DOCFIELD:eid:HASH5
 IDNAME:newrid
-IDSPACE:MDR.sourceTools.src_Bair_Analytics
+IDSPACE:le.class_code
 FIELD:eid:0,0
 FIELD:gh12:0,0
+FIELD:gh4:0,0
+FIELD:gh5:0,0
+FIELD:gh6:0,0
 FIELD:etype:0,0
-FIELD:raids_record_id:0,0
 FIELD:shot_id:0,0
-NUMBERFIELD:shots:0,0
+FIELD:shots:SEGTYPE(NumericType):1,0
 FIELD:address:0,0
+FIELD:wc_beat:SEGTYPE(FieldDataType):0,0
 FIELD:beat:0,0
+FIELD:wc_district:SEGTYPE(FieldDataType):0,0
 FIELD:district:0,0
 FIELD:shot_source:0,0
-FIELD:shot_incident_type:0,0
 FIELD:shot_incident_status:0,0
-NUMBERFIELD:x_coordinate:0,0
-NUMBERFIELD:y_coordinate:0,0
 FIELD:shot_incident_notes:0,0
+FIELD:agency:0,0
+FIELD:data_provider_ori:0,0
 DATEFIELD:clean_shot_datetime:0,0
 CONCEPT:NOTES:shot_incident_notes:SEGTYPE(GroupSeg):1,0
 CONCEPT:DATE:clean_shot_datetime:SEGTYPE(GroupSeg):1,0
  
  
-Total available specificity:2
+Total available specificity:3
 Search Threshold set at -4
 Use of PERSISTs in code set at:3
  

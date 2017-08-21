@@ -1,9 +1,8 @@
-import ut;
-#workunit('name', 'Header Regression');
+import ut,mdr;
 
-Base := header.file_headers(header.Blocked_data());
+Base := dataset('~thor_data400::base::header_prod',header.Layout_Header,flat)(header.Blocked_data());
 
-New := header.Last_Rollup;
+New := dataset('~thor_data400::base::header',header.Layout_Header,flat);
 
 Header.MAC_Header_Sample(base,base_smpl)
 
@@ -19,11 +18,10 @@ rrec what_happened(base_smpl le, new_smpl ri) := transform
   self.what_happened := MAP ( le.rid=0 => 'APPEAR',
                               ri.rid=0 => 'DISAPPEAR',
                               le.did<>ri.did => 'DID SHIFT',
-                              //le.preGLB_did<>ri.preGLB_did => 'preGLB_DID',
                               le.fname<>ri.fname or
                               le.mname<>ri.mname or
                               le.lname<>ri.lname or
-                              (le.name_suffix<>ri.name_suffix and ri.name_suffix <> 'UNK') or
+                              (le.name_suffix<>ri.name_suffix and ~ut.is_unk(ri.name_suffix)) or
                               le.title<>ri.title => 'NAME',
                               le.ssn<>ri.ssn => 'SSN',
                               le.dob<>ri.dob => 'DOB',
@@ -58,7 +56,7 @@ rec_match := join(base_dist,new_dist,
 				  what_happened(left,right),
 				  full outer, local) : persist('headerbuild_regression_rec_match');
 
-ut.MAC_Field_Count(rec_match,rec_match.what_happened,'what_happened',true, true,field_count)
+// ut.MAC_Field_Count(rec_match,rec_match.what_happened,'what_happened',true, true,field_count)
 
 base_smpl_per := base_smpl  : persist('headerbuild_regression_base_smpl');
 new_smpl_per := new_smpl : persist('headerbuild_regression_new_smpl');
@@ -88,36 +86,9 @@ header.MAC_Regression_Samples(dold, dnew, diff, rid, 'DATE', 3000, old13, new13)
 
 export Proc_Regression_Test := sequential(
 parallel(
-field_count, 
+// field_count, 
 out_match, 
 out_base, 
 out_new),
 old1,new1,old2,new2,old3,new3,old4,new4,old5,new5,old6,new6,old7,new7,
 old8,new8,old9,new9,old10,new10,old11,new11,old12,new12,old13,new13);
-
-/*
-#workunit('name', 'View Header Regression Results');
-
-rrec := record
-  integer8 rid;
-  string10 what_happened;
-end;
-
-diff := dataset('~thor_data400::CEMTEMP::Match_Results',rrec,flat);
-dold := dataset('~thor_data400::CEMTEMP::Match_Base',header.Layout_Header,flat);
-dnew := dataset('~thor_data400::CEMTEMP::Match_New',header.Layout_Header,flat);
-
-header.MAC_Regression_Samples(dold, dnew, diff, 'APPEAR', 3000)
-header.MAC_Regression_Samples(dold, dnew, diff, 'DISAPPEAR', 3000)
-header.MAC_Regression_Samples(dold, dnew, diff, 'DID SHIFT', 3000)
-header.MAC_Regression_Samples(dold, dnew, diff, 'preGLB_DID', 3000)
-header.MAC_Regression_Samples(dold, dnew, diff, 'NAME', 3000)
-header.MAC_Regression_Samples(dold, dnew, diff, 'SSN', 3000)
-header.MAC_Regression_Samples(dold, dnew, diff, 'DOB', 3000)
-header.MAC_Regression_Samples(dold, dnew, diff, 'PHONE', 3000)
-header.MAC_Regression_Samples(dold, dnew, diff, 'ADDRESS', 3000)
-header.MAC_Regression_Samples(dold, dnew, diff, 'REC_TYPE', 3000)
-header.MAC_Regression_Samples(dold, dnew, diff, 'TNT', 3000)
-header.MAC_Regression_Samples(dold, dnew, diff, 'SIG DATE', 3000)
-header.MAC_Regression_Samples(dold, dnew, diff, 'DATE', 3000)
-*/

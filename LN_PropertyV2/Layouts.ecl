@@ -33,7 +33,13 @@ export PreProcess_Search_Layout := record
 		ln_estate_trust_date,
 		ln_goverment_type,
 		nid,
-		xadl2_weight];
+		xadl2_weight,	
+		Addr_ind,
+		Best_addr_ind,
+		addr_tx_id,
+		best_addr_tx_id,
+		Location_id,
+		best_locid];
 end;
 
 export layout_property_common_model_base_scrubs := record

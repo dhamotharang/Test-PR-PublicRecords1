@@ -1,1 +1,1 @@
-export version_development := '20050731';
+export version_development := '20060130';

@@ -1,4 +1,4 @@
-Import Data_Services, address_attributes, doxie, ut;
+import address_attributes, doxie, ut;
 
 sex_offenders := Address_Attributes.file_sex_offender;
 
@@ -6,4 +6,4 @@ clean_key_data := dedup(sort(sex_offenders(geolink !='' and st != '' and county 
 
 export key_sexoffender_geolink := index(clean_key_data,{
 														geolink},
-														{clean_key_data},Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::neighborhood::' + doxie.Version_SuperKey + '::sex_offender_geolink');
+														{clean_key_data},'~thor_data400::key::neighborhood::' + doxie.Version_SuperKey + '::sex_offender_geolink');

@@ -1,4 +1,4 @@
-import ut,address,idl_header,_validate, Header_Slimsort, AID,DID_Add,lib_stringlib,lib_date;
+import ut,address,idl_header,_validate, Header_Slimsort, AID,DID_Add,lib_stringlib,lib_date,OIG;
 						  
 TrimUpper(string s):= function
 		return trim(stringlib.StringToUppercase(s),left,right);
@@ -35,7 +35,7 @@ OIG.Layouts.KeyBuild getCleanaddress(addresscleaned pInput) := transform
 		self.SANCTYPE		      		:=trimUpper(pInput.SANCTYPE);
 		self.SANCDATE		      		:=if((integer)pInput.SANCDATE<>0 and _validate.date.fIsValid(trim(pInput.SANCDATE,left,right)),trim(pInput.SANCDATE,left,right),'');
 		self.REINDATE		      		:=if((integer)pInput.REINDATE<>0 and _validate.date.fIsValid(trim(pInput.REINDATE,left,right)),trim(pInput.REINDATE,left,right),'');
-		self.DOB			          	:=if((integer)lib_stringlib.StringLib.StringFindReplace(pInput.DOB, '/','')<>0,(string)(ut.Date_MMDDYY_I2_V2(StringLib.StringFindReplace(trim(pInput.DOB,left,right) ,'/',''))),'');
+		self.DOB			          	:=if((integer)pInput.DOB<>0 and _validate.date.fIsValid(trim(pInput.DOB,left,right)),trim(pInput.DOB,left,right),'');
 		self.Append_RawAID		  	:= pInput.AIDWork_RawAID;
 		self.ace_aid 			  			:= pInput.aidwork_acecache.aid;
 		self.Addr_Type            :=if(pInput.BUSNAME<>'','B','P');

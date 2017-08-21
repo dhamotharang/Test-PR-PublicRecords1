@@ -15,6 +15,8 @@ EXPORT MAC_External_BID(
 	,return_bid_score			= false		// Do we want to return a BID score at all?
 ) := MACRO
 
+import ut,TopBusiness;
+
 // If necessary add fields to the input file layout
 #uniquename(AdjustedInfileLayout)
 %AdjustedInfileLayout% := RECORD
@@ -47,9 +49,7 @@ END;
 %InfileSlimLayout% := RECORD
 	%InfileSequenceLayout%.%SequenceNumber%;
 	%InfileSequenceLayout%.bid_field;
-#if(return_bid_score)
-	%InfileSequenceLayout%.bid_score_field;
-#end
+	unsigned1 bid_score;
 	TopBusiness_External.Layouts.Source.source;
 	TopBusiness_External.Layouts.Source.source_docid;
 	TopBusiness_External.Layouts.Source.source_party;
@@ -61,13 +61,11 @@ END;
 	TopBusiness_External.Layouts.Address.phone;
 END;
 
-#uniquename(SlimInfile)
-%SlimInfile% := project(%SequencedInfile%,
+#uniquename(SlimInfileBeforeClean)
+%SlimInfileBeforeClean% := project(%SequencedInfile%,
 	transform(%InfileSlimLayout%,
 		self.bid_field := 0,
-#if(return_bid_score)
-		self.bid_score_field := 0,
-#end
+		self.bid_score := 0,
 		self.source := evaluate(left,source_field),
 		self.source_docid := evaluate(left,source_docid_field),
 		self.source_party := evaluate(left,source_party_field),
@@ -79,30 +77,58 @@ END;
 		self.phone := evaluate(left,phone_field),
 		self := left));
 
+#uniquename(SlimInfile)
+TopBusiness.Macro_CleanCompanyName(%SlimInfileBeforeClean%(company_name != ''),company_name,company_name,%SlimInfile%);
+
 #uniquename(SourceMatchedFile)
 TopBusiness_External.MAC_External_BID_Source(%SlimInfile%,%SequenceNumber%,bid_field,%SourceMatchedFile%);
+#uniquename(NotSourceMatched)
+%NotSourceMatched% := join(
+	distribute(%SlimInfile%,hash64(%SequenceNumber%)),
+	distribute(%SourceMatchedFile%,hash64(%SequenceNumber%)),
+	left.%SequenceNumber% = right.%SequenceNumber%,
+	transform(left),
+	left only,
+	local);
 #uniquename(AddressMatchedFile)
-TopBusiness_External.MAC_External_BID_Address(%SourceMatchedFile%,%SequenceNumber%,bid_field,%AddressMatchedFile%);
+TopBusiness_External.MAC_External_BID_Address(%NotSourceMatched%,%SequenceNumber%,bid_field,%AddressMatchedFile%);
 #uniquename(FEINMatchedFile)
-TopBusiness_External.MAC_External_BID_FEIN(%AddressMatchedFile%,%SequenceNumber%,bid_field,%FEINMatchedFile%);
+TopBusiness_External.MAC_External_BID_FEIN(%NotSourceMatched%,%SequenceNumber%,bid_field,%FEINMatchedFile%);
 #uniquename(PhoneMatchedFile)
-TopBusiness_External.MAC_External_BID_Phone(%FEINMatchedFile%,%SequenceNumber%,bid_field,%PhoneMatchedFile%);
+TopBusiness_External.MAC_External_BID_Phone(%NotSourceMatched%,%SequenceNumber%,bid_field,%PhoneMatchedFile%);
 
-// Distribute, sort, and dedup by Unique ID
-#uniquename(DedupedMatchedFile)
-%DedupedMatchedFile% := dedup(
+#uniquename(AllMatchedFile)
+%AllMatchedFile% :=
+	%SlimInfile% +
+	%SourceMatchedFile% +
+	%AddressMatchedFile% +
+	%FEINMatchedFile% +
+	%PhoneMatchedFile% +
+	%SlimInfileBeforeClean%(company_name = '');
+	
+// Roll up to eliminate records with multiple "best" BIDs
+#uniquename(RolledExactMatchedFile)
+%RolledExactMatchedFile% := rollup(
 	sort(
-		distribute(%PhoneMatchedFile%,hash(%SequenceNumber%)),
-		%SequenceNumber%,if(bid_field != 0,0,1),bid_field,local),
-	%SequenceNumber%);
+		distribute(%AllMatchedFile%,hash(%SequenceNumber%)),
+		%SequenceNumber%,-bid_score,bid_field,local),
+	left.%SequenceNumber% = right.%SequenceNumber%,
+	transform(recordof(left),
+		self.bid_score := if(left.bid_score = right.bid_score and left.bid_field != right.bid_field,0,left.bid_score),
+		self.bid_field := if(left.bid_score = right.bid_score and left.bid_field != right.bid_field,0,left.bid_field),
+		self := left),
+	local);
 
 #uniquename(InfileBID)
 %InfileBID% := join(
 	distribute(%SequencedInfile%,hash(%SequenceNumber%)),
-	distribute(%DedupedMatchedFile%,hash(%SequenceNumber%)),
+	distribute(%RolledExactMatchedFile%,hash(%SequenceNumber%)),
 	left.%SequenceNumber% = right.%SequenceNumber%,
 	transform(%AdjustedInfileLayout%,
 		self.bid_field := right.bid_field,
+#if(return_bid_score)
+		self.bid_score_field := right.bid_score,
+#end
 		self := left),
 	left outer,
 	local);

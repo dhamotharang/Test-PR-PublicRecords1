@@ -1,0 +1,1 @@
+export TranslateSource(string2 pSource, boolean pIsHeaderSource = false) := Business_Header.Source_Tools.fTranslateSource(pSource,pIsHeaderSource);

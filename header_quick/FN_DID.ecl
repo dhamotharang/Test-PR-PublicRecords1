@@ -1,9 +1,10 @@
 import header,did_add;
-rec := header.Layout_Header;
+
+rec := header.layout_new_records;
 
 export FN_DID(
 	dataset(rec) header_in, 
-	unsigned2 thresh = 51):=
+	unsigned2 thresh = 75):=
 FUNCTION
 
 //***** Prep for DIDing

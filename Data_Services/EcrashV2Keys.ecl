@@ -1,5 +1,19 @@
 export EcrashV2Keys := macro
+output(choosen(FLAccidents_Ecrash.Key_ECrash0,10));
+output(choosen(FLAccidents_Ecrash.Key_ECrash1,10));
+output(choosen(FLAccidents_Ecrash.Key_ECrash2v,10));
+output(choosen(FLAccidents_Ecrash.Key_ECrash3v,10));
+output(choosen(FLAccidents_Ecrash.Key_ECrash4,10));
+output(choosen(FLAccidents_Ecrash.Key_ECrash5,10));
+output(choosen(FLAccidents_Ecrash.Key_ECrash6,10));
+output(choosen(FLAccidents_Ecrash.Key_ECrash7,10));
+output(choosen(FLAccidents_Ecrash.Key_ECrash8,10));
+output(choosen(FLAccidents_Ecrash.Key_eCrash_ByAgencyID,10));
+output(choosen(FLAccidents_Ecrash.Key_eCrash_ByDOW,10));
+output(choosen(FLAccidents_Ecrash.Key_eCrash_ByHOD,10));
+output(choosen(FLAccidents_Ecrash.Key_eCrash_byMOY,10));
 output(choosen(FLAccidents_Ecrash.key_EcrashV2_accnbr,10));
+output(choosen(FLAccidents_Ecrash.key_EcrashV2_accnbrv1,10));
 output(choosen(FLAccidents_Ecrash.key_EcrashV2_bdid,10));
 output(choosen(FLAccidents_Ecrash.Key_EcrashV2_did,10));
 output(choosen(FLAccidents_Ecrash.Key_EcrashV2_DLNbr,10));

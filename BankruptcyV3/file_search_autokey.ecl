@@ -18,15 +18,15 @@ export file_search_autokey := function
 		unsigned6 intbdid;
 	end;
 
-	//Capture Both SSN, App_SSN
+	//Capture Both SSN, App_SSN, and SSNMatch (per bug# 42303)
 
 	d1 all_ssn(d1 le,integer C):=transform
-		self.ssn    := choose(C,le.ssn,le.app_ssn);
-		self.tax_id := choose(C,le.tax_id,le.app_tax_id);
+		self.ssn    := choose(C,le.ssn,le.app_ssn,le.ssnMatch);
+		self.tax_id := choose(C,le.tax_id,le.app_tax_id,'');
 		self :=le;
 	end;
 
-	Both_Search_SSN :=normalize(d1,2, all_ssn(left,counter));
+	Both_Search_SSN :=normalize(d1,3, all_ssn(left,counter));
 	
 	dm :=  file_bankruptcy_main_keybuild(fcra.bankrupt_is_ok (todaysdate,date_filed));
 

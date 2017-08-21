@@ -6,7 +6,7 @@ EXPORT fn_Prep_for_Base(
   ,dataset(BIPV2_Best_Seleid.Layout_Base                                ) sInBase           = BIPV2_Best_Seleid.In_Base
   ,dataset(recordof(BIPV2_Best_Proxid.best(pInBase).BestBy_proxid_child)) pBestChildProxid  = BIPV2_Best_Proxid.best(pInBase).BestBy_proxid_child
   ,dataset(recordof(BIPV2_Best_Seleid.best(sInBase).BestBy_seleid_child)) pBestChildSeleid  = BIPV2_Best_Seleid.best(sInBase).BestBy_seleid_child
-  ,dataset(BIPv2_HRCHY.Layouts.HrchyBase                                ) pHrchyBase        = project(BIPV2.CommonBase.DS_CLEAN,BIPv2_HRCHY.Layouts.HrchyBase)
+	,dataset(BIPV2.CommonBase.Layout                                ) pHrchyBase        = project(BIPV2.CommonBase.DS_CLEAN,BIPV2.CommonBase.Layout)
   ,dataset(layfips                                                      ) pFips2County      = Census_Data.file_Fips2County
 ) := 
 function

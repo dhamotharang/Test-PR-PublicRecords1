@@ -1,0 +1,32 @@
+import doxie,standard;
+
+export Layout_Customer_Base := RECORD
+       string10  customer_id;       
+       string30  record_id;
+	  standard.Name_Slim;
+       string9   ssn;
+       string8   dob;
+       string10  phoneno;
+	  standard.Addr_Slim;
+       unsigned1 glb_purpose;
+       unsigned1 dppa_purpose;
+       boolean   market_restriction;
+       string8   addr_version_number;
+       string8   phone_version_number;
+ 	  unsigned1   best_address_number;
+	  unsigned1   best_phone_number;
+	  boolean   phone_level_ta;
+	  boolean   phone_level_tb;
+	  boolean   phone_level_td;
+	  boolean   phone_level_tg;
+	  boolean   phone_level_other1;
+	  boolean   phone_level_other2;
+	  boolean   phone_level_other3;
+	  string1   frequency_type;
+	  unsigned2 frequency_time;
+	  string1   delay_type;
+	  unsigned2 delay_time;
+	  string8   date_in;
+	  string8   date_to_run;
+	  DATASET(doxie.layout_references) Dids;	  
+END;

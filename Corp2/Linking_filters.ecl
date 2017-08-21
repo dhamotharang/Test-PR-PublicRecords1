@@ -1072,8 +1072,9 @@ module
 																(source = 'PA' or source = 'OR') and 
 																		trim(org_structure) in NameDesc => org_structure,
 																source = 'PA' or source = 'OR' => '',
+																source = 'TN' and name_type != '' => name_type,
 																source = 'TN' and trim(org_structure) in NameDesc => org_structure,
-																source = 'TN' => '',
+																//source = 'TN' => '',
 																source = 'LA' and trim(name_comment) in NameDesc => name_comment,
 																(source = 'ND' or source ='NE') and trim(org_structure) in NameDesc => org_structure,
 																(source = 'ND' or source ='NE') => '',

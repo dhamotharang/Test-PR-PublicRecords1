@@ -1,0 +1,1 @@
+export File_Sexoffender_MO := common_so('MO','~images::in::sexoffender_mo_all') : persist('images::base::sexoffender_MO');

@@ -7,10 +7,19 @@ export Function_AlphabetizeWithinName(
 	
 	tempdedup := dedup(indata,clean_company_name,repl_phrase,all,local);
 	
-	tempnormalize := normalize(tempdedup,ut.NoWords(trim(left.repl_phrase)),
-		transform({recordof(indata);string word;},
-			self.word := ut.Word(trim(left.repl_phrase),counter),
-			self := left));
+	pattern p_ws := ' ';
+	pattern p_word := pattern('[^ ]+');
+	pattern p_find := (p_word after (first or p_ws)) before (p_ws or last);
+	
+	tempnormalize := parse(tempdedup,repl_phrase,p_find,transform({recordof(indata);string word;},
+		self.word := matchtext(p_word),
+		self := left),
+		scan all);
+	
+	// tempnormalize := normalize(tempdedup,ut.NoWords(trim(left.repl_phrase)),
+		// transform({recordof(indata);string word;},
+			// self.word := ut.Word(trim(left.repl_phrase),counter),
+			// self := left));
 		
 	tempresort := sort(tempnormalize(word != ''),clean_company_name,repl_phrase,word,local);
 

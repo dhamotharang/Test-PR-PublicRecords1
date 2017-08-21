@@ -2,35 +2,28 @@ import DayBatchPCNSR,roxiekeybuild;
 
 export proc_build_keys(string file_date) := function
 
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_DID,'','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.did',did_key);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_LZ3,'','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.lz3',lz3_key);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_Nbr,'','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.zz4317_deduped',nbr_key);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_Phone,'','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.phone.area_code.st',phone_key);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_Surnames,'','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.lz3_deduped',sur_key);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_Z317LF,'','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.z137lf',z3_key);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_HHID,'','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.hhid',hhid_key);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_Address,'~thor_data400::key::daybatch_pcnsr::pcnsr.address','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.address',address_key);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_DID,'~thor_data400::key::daybatch_pcnsr::pcnsr.did','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.did',did_key);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_LZ3,'~thor_data400::key::daybatch_pcnsr::pcnsr.lz3','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.lz3',lz3_key);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_Nbr,'~thor_data400::key::daybatch_pcnsr::pcnsr.zz4317_deduped','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.zz4317_deduped',nbr_key);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_Phone,'~thor_data400::key::daybatch_pcnsr::pcnsr.phone.area_code.st','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.phone.area_code.st',phone_key);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_Surnames,'~thor_data400::key::daybatch_pcnsr::pcnsr.lz3_deduped','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.lz3_deduped',sur_key);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_Z317LF,'~thor_data400::key::daybatch_pcnsr::pcnsr.z137lf','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.z137lf',z3_key);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DayBatchPCNSR.Key_PCNSR_HHID,'~thor_data400::key::daybatch_pcnsr::pcnsr.hhid','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.hhid',hhid_key);
 
-mv1a := fileservices.addsuperfile('~thor_data::key::daybatch_pcnsr::built::pcnsr.did','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.did');
-mv2a := fileservices.addsuperfile('~thor_data::key::daybatch_pcnsr::built::pcnsr.lz3','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.lz3');
-mv3a := fileservices.addsuperfile('~thor_data::key::daybatch_pcnsr::built::pcnsr.zz4317_deduped','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.zz4317_deduped');
-mv4a := fileservices.addsuperfile('~thor_data::key::daybatch_pcnsr::built::pcnsr.phone.area_code.st','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.phone.area_code.st');
-mv5a := fileservices.addsuperfile('~thor_data::key::daybatch_pcnsr::built::pcnsr.lz3_deduped','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.lz3_deduped');
-mv6a := fileservices.addsuperfile('~thor_data::key::daybatch_pcnsr::built::pcnsr.z137lf','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.z137lf');
-mv7a := fileservices.addsuperfile('~thor_data::key::daybatch_pcnsr::built::pcnsr.hhid','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.hhid');
+Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::daybatch_pcnsr::pcnsr.address','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.address', mv_address_key);
+// Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data::key::daybatch_pcnsr::@version@::pcnsr.address','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.address', mv_address_key);
+Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data::key::daybatch_pcnsr::@version@::pcnsr.did','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.did', mv_did_key);
+Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data::key::daybatch_pcnsr::@version@::pcnsr.lz3','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.lz3', mv_lz3_key);
+Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data::key::daybatch_pcnsr::@version@::pcnsr.zz4317_deduped','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.zz4317_deduped', mv_nbr_key);
+Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data::key::daybatch_pcnsr::@version@::pcnsr.phone.area_code.st','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.phone.area_code.st', mv_phone_key);
+Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data::key::daybatch_pcnsr::@version@::pcnsr.lz3_deduped','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.lz3_deduped', mv_sur_key);
+Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data::key::daybatch_pcnsr::@version@::pcnsr.z137lf','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.z137lf', mv_z3_key);
+Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data::key::daybatch_pcnsr::@version@::pcnsr.hhid','~thor_data400::key::daybatch_pcnsr::'+file_date+'::pcnsr.hhid', mv_hhid_key);
 
-mv1b := fileservices.addsuperfile('~thor_data::key::daybatch_pcnsr::qa::pcnsr.did','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.did');
-mv2b := fileservices.addsuperfile('~thor_data::key::daybatch_pcnsr::qa::pcnsr.lz3','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.lz3');
-mv3b := fileservices.addsuperfile('~thor_data::key::daybatch_pcnsr::qa::pcnsr.zz4317_deduped','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.zz4317_deduped');
-mv4b := fileservices.addsuperfile('~thor_data::key::daybatch_pcnsr::qa::pcnsr.phone.area_code.st','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.phone.area_code.st');
-mv5b := fileservices.addsuperfile('~thor_data::key::daybatch_pcnsr::qa::pcnsr.lz3_deduped','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.lz3_deduped');
-mv6b := fileservices.addsuperfile('~thor_data::key::daybatch_pcnsr::qa::pcnsr.z137lf','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.z137lf');
-mv7b := fileservices.addsuperfile('~thor_data::key::daybatch_pcnsr::qa::pcnsr.hhid','~thor_data::key::daybatch_pcnsr::'+file_date+'::pcnsr.hhid');
-
-
-bk := sequential(parallel(did_key,lz3_key,nbr_key,phone_key,sur_key,z3_key, hhid_key),
-					parallel(mv1a,mv2a,mv3a,mv4a,mv5a,mv6a,mv7a),
-					parallel(mv1b,mv2b,mv3b,mv4b,mv5b,mv6b,mv7b));
-
+bk := sequential(parallel(address_key,did_key,lz3_key,nbr_key,phone_key,sur_key,z3_key, hhid_key),
+				  parallel(mv_address_key,mv_did_key,mv_lz3_key,mv_nbr_key,mv_phone_key, mv_sur_key,mv_z3_key,mv_hhid_key));
+					
 return bk;
 
 end;

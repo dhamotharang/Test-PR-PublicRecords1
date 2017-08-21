@@ -1,0 +1,1 @@
+export Basefile_Hospital_BDID_BIP := dataset('~thor_data400::base::ingenix_providers_hospital_bdid', ingenix_natlprof.Layout_Hospital_Base_BIP, flat);

@@ -9,7 +9,7 @@ EXPORT Delta(DATASET(Layout_POWID_Down)old_s, DATASET(Layout_POWID_Down) new_s) 
     SELF.Added := le.rcid = (TYPEOF(le.rcid))'';
     SELF.Deleted := ri.rcid = (TYPEOF(ri.rcid))'';
     SELF.Changed := MAP ( le.rcid = (TYPEOF(le.rcid))'' OR ri.rcid = (TYPEOF(ri.rcid))'' => FALSE,
-       le.orgid<>ri.orgid OR  le.prim_range<>ri.prim_range OR  le.prim_name<>ri.prim_name OR  le.st<>ri.st OR  le.zip<>ri.zip OR  le.v_city_name<>ri.v_city_name OR  le.company_name<>ri.company_name OR  le.dt_first_seen<>ri.dt_first_seen OR  le.dt_last_seen<>ri.dt_last_seen => TRUE,
+       le.company_name<>ri.company_name OR  le.orgid<>ri.orgid OR  le.prim_range<>ri.prim_range OR  le.prim_name<>ri.prim_name OR  le.st<>ri.st OR  le.v_city_name<>ri.v_city_name OR  le.zip<>ri.zip OR  le.dt_first_seen<>ri.dt_first_seen OR  le.dt_last_seen<>ri.dt_last_seen => TRUE,
       SKIP );
     SELF := if ( ri.rcid=(TYPEOF(ri.rcid))'', le, ri );
   END;

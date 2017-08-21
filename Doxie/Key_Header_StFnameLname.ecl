@@ -12,7 +12,7 @@ autokey.MAC_StName(t,fname,mname,lname,
 						rel_fname1,rel_fname2,rel_fname3,
 						lookups,
 						did,
-						'~thor_data400::key::header.st.fname.lname',
+						ut.Data_Location.Person_header + 'thor_data400::key::header.st.fname.lname',
 						k)
 						
 export key_header_StFnameLname := k;

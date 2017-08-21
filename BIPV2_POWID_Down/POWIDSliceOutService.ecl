@@ -7,7 +7,7 @@
 */
 /*--INFO-- Look to see if Basercid should be plucked out of BasePOWID. If a preferred POWID is provided it will be compared to the RID too.*/
 export POWIDSliceOutService := MACRO
-  IMPORT SALT27,BIPV2_POWID_Down;
+  IMPORT SALT30,BIPV2_POWID_Down;
 string20 rcidstr := ''  : stored('Basercid');
 string20 POWIDstr := ''  : stored('BasePOWID');
 string20 Pref_POWIDstr := ''  : stored('PreferredPOWID');

@@ -1,8 +1,8 @@
-import ut;
+import ut, address;
 norm_name 	 := ExperianCred.Normalize_Names;
-cached_names :=	distribute(Files.Cashed_Names_File, hash(Orig_lname, Orig_fname, Orig_mname)); 
+cached_names :=	distribute(Files.Cashed_Names_File, hash(Orig_lname, Orig_fname, Orig_mname)) :INDEPENDENT; 
 
-d_names		 := distribute(norm_name, hash(Orig_lname, Orig_fname, Orig_mname)); 
+d_names		 := distribute(norm_name, hash(Orig_lname, Orig_fname, Orig_mname)) :INDEPENDENT; 
 dedup_names  := dedup(sort(d_names,Orig_lname, Orig_fname, Orig_mname, Orig_suffix, LOCAL),Orig_lname, Orig_fname, Orig_mname, Orig_suffix,LOCAL) ; 
 
 //-----------------------------------------------------------------
@@ -29,22 +29,29 @@ names_to_clean  	:= names_cleaned_cache(Clean_Name = '');
 //-----------------------------------------------------------------
 //Clean remaining names and add them to cleaned cached names
 //-----------------------------------------------------------------
-Layouts.Layout_Clean_Name t_CleanName(names_to_clean le) := TRANSFORM
-	lfm_name 	:= StringLib.StringCleanSpaces((le.Orig_lname+', '+ le.Orig_fname+' '+ le.Orig_mname + ' ' + le.Orig_suffix));
-	fml_name 	:= StringLib.StringCleanSpaces((le.Orig_fname+' '+ le.Orig_mname + ' ' + le.Orig_lname + ' ' + le.Orig_suffix));
-	
-	CleanName1 := addrcleanlib.cleanpersonlfm73(lfm_name);
-	CleanName2 := addrcleanlib.cleanperson73(lfm_name);
-	CleanName3 := addrcleanlib.cleanpersonlfm73(StringLib.StringFindReplace(lfm_name, ',', ' '));
-	CleanName4 := addrcleanlib.cleanpersonfml73(fml_name);
-	CleanName5 := addrcleanlib.cleanperson73(fml_name);
 
-	self.Clean_Name := map((unsigned1)CleanName1[71..73] > 0  => CleanName1, 
-				     (unsigned1)CleanName2[71..73] > 0  => CleanName2,      
-					 (unsigned1)CleanName3[71..73] > 0  => CleanName3,
-					 (unsigned1)CleanName4[71..73] > 0  => CleanName4,
-					 (unsigned1)CleanName5[71..73] > 0  => CleanName5,
-					 CleanName1);
+bad_name := ['NMN', 'EST', 'ESTATE'];
+
+Layouts.Layout_Clean_Name t_CleanName(names_to_clean le) := TRANSFORM
+	get_suffix(string suffix, string gender) := map(suffix = 'J' and gender <> 'F' => 'JR',
+									 suffix = 'S'  and gender <> 'F' => 'SR',
+									 suffix = '2'  and gender <> 'F' => 'II',
+									 suffix = '3'  and gender <> 'F'=> 'III',
+									 suffix = '4'  and gender <> 'F'=> 'IV',
+									 '');
+									 
+									 
+ Orig_lname := if(le.Orig_lname not in bad_name, le.Orig_lname , '');
+ Orig_fname := if(le.Orig_fname not in bad_name, le.Orig_fname , '');
+ Orig_mname := if(le.Orig_mname not in bad_name, le.Orig_mname  , '');
+	
+	fml_name 	:= if(trim(Orig_lname, left, right) <> '' and  trim(Orig_fname, left, right) <> '',
+						  trim(Orig_fname, left, right)+' '+  trim(Orig_mname, left, right) + ' ' +  trim(Orig_lname, left, right) + ' ' + get_suffix(le.Orig_suffix,le.gender),
+						'');
+
+	CleanName := address.cleanpersonfml73(fml_name);
+
+	self.Clean_Name :=  CleanName;
 	SELF := le;
 END;
 

@@ -1,4 +1,4 @@
-import ut, Business_Header, did_add, DidVille, header_slimsort, Watchdog;
+import ut, Business_Header, did_add, DidVille, header_slimsort, Watchdog, NID;
 
 // Add principals to records with BDID and BDID_Score >= 33
 abn_amro_prin := abn_amro_test_prep;
@@ -106,7 +106,7 @@ abn_amro_prin_all := abn_amro_prin_bdid + bh_contacts_select;
 prin_append_dist := distribute(abn_amro_prin_all, hash(seq));
 prin_append_sort := sort(prin_append_dist, seq, local);
 prin_append_grp := group(prin_append_sort, seq, local);
-prin_append_grp_sort := sort(prin_append_grp, lname, datalib.PreferredFirst(fname), record_type, if(did <> 0, 0, 1), did, ut.TitleRank(company_title), mname);
+prin_append_grp_sort := sort(prin_append_grp, lname, NID.PreferredFirstVersionedStr(fname, NID.version), record_type, if(did <> 0, 0, 1), did, ut.TitleRank(company_title), mname);
 
 Layout_ABN_AMRO_Test_Prin_Append RollupPrincipals(Layout_ABN_AMRO_Test_Prin_Append l, Layout_ABN_AMRO_Test_Prin_Append r) := transform
 self := l;

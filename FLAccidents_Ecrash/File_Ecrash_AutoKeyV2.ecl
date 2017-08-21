@@ -1,7 +1,25 @@
-import standard,FLAccidents;
+/*2016-03-30T17:57:04Z (Srilatha Katukuri)
+Bug# 200197 - Modified to not to include blank orig last names
+*/
+/*2016-03-23T18:31:08Z (Srilatha Katukuri)
+Bug# 200197 - last name modification
+*/
+import standard,FLAccidents, std;
 
 base_file := FLAccidents_Ecrash.File_KeybuildV2.out;
 
+
+FLAccidents_Ecrash.Layout_keybuild_SSv2 copyNames(FLAccidents_Ecrash.Layout_keybuild_SSv2 le) := TRANSFORM
+		SELF.fname := le.orig_fname;
+		SELF.lname := le.orig_lname;
+		self.mname := le.orig_mname;
+		self := Le;
+	END;
+	 
+m_base_file:= PROJECT(base_file(trim(lname, left, right) <> trim(orig_lname, left, right) and  (STD.STr.CountWords(lname,' ') > 1 or STD.STr.CountWords(orig_lname,' ') > 1 ) and orig_lname <> '' ),copyNames(LEFT));
+	
+cmbnd_base_file := m_base_file + base_file;
+	
 // A record with all the fields needed to build the autokeys
 ak_rec := record
 	string8  dt_first_seen;
@@ -59,4 +77,4 @@ ak_rec slim_rec(base_file l) := transform
 	self.b_zip5        := if(is_company,l.zip,'');
 end;
 
-export File_Ecrash_AutoKeyV2 := distribute(project(base_file, slim_rec(left)), hash(accident_nbr));
+export File_Ecrash_AutoKeyV2 := distribute(project(cmbnd_base_file, slim_rec(left)), hash(accident_nbr));

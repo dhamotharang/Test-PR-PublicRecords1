@@ -1,4 +1,4 @@
-﻿import gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA;
+import gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA;
 
 EXPORT Search_Function(
 	dataset(RiskView.Layouts.layout_riskview_input) riskview_input, 
@@ -309,6 +309,7 @@ transform(riskview.layouts.layout_riskview5_search_results,
 	self.lnjliens					   					 := right.LnJLiens;
 	self.lnjJudgments				   				 := right.LnJJudgments;
 	self.ConfirmationSubjectFound			 := if(IncludeLnJ, right.ConfirmationSubjectFound, left.ConfirmationSubjectFound);
+  self.subjectdeceased							 := if(IncludeLnJ, right.subjectdeceased, left.subjectdeceased);
 	self := left,
 	self := []), LEFT OUTER, KEEP(1), ATMOST(100));
 
@@ -529,7 +530,11 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	boolean PrescreenOptOut :=  isPreScreenPurpose and risk_indicators.iid_constants.CheckFlag( risk_indicators.iid_constants.IIDFlag.IsPreScreen, rt.iid.iid_flags );
 	
 	hasScore (STRING score) := le.Auto_score = score OR le.Bankcard_score = score OR le.Short_term_lending_Score = score OR le.Telecommunications_score = score OR le.Custom_score = score;
-	boolean has200Score := hasScore('200');
+	
+	// instead of just using the le.SubjectDeceased, also calculate it here because sometimes attributes are not requested, and then the alert doesn't get triggered.
+	attr := models.Attributes_Master(rt, true);
+	boolean Alerts200 := if(le.SubjectDeceased='1' or attr.SubjectDeceased = '1', true, false) ;
+	boolean has200Score := hasScore('200') or Alerts200 ;
 	boolean has222Score := hasScore('222');
 	
 	boolean chapter7bankruptcy := trim(rt.bjl.bk_chapter)='7' AND (NOT isPreScreenPurpose and NOT isLnJRunningAlone);	
@@ -708,7 +713,7 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	self.SubjectActivityIndex06Month	 := if(suppress_condition, '', le.SubjectActivityIndex06Month	);
 	self.SubjectActivityIndex12Month	 := if(suppress_condition, '', le.SubjectActivityIndex12Month	);
 	self.SubjectAge	 := if(suppress_condition, '', le.SubjectAge	);
-	self.SubjectDeceased	 := if(suppress_condition, '', le.SubjectDeceased	);
+	self.SubjectDeceased	 := if(suppress_condition or isLnJRunningAlone or isReportAlone , '', le.SubjectDeceased	);
 	self.SubjectSSNCount	 := if(suppress_condition, '', le.SubjectSSNCount	);
 	self.SubjectStabilityIndex	 := if(suppress_condition, '', le.SubjectStabilityIndex	);
 	self.SubjectStabilityPrimaryFactor	 := if(suppress_condition, '', le.SubjectStabilityPrimaryFactor	);
@@ -1023,6 +1028,8 @@ riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, risk
 // output(attrLnJ, named('attrLnJ'));
 // output(clam_noScore, named('clam_noScore'));	
 	// output(isLnJRunningAlone, named('isLnJRunningAlone'));		
+// output(riskview5_search_results, named('riskview5_search_results'));
+// output(riskview5_search_results_tmp, named('riskview5_search_results_tmp'));
 
 return riskview5_final_results;
 #else // Else, output the model results directly

@@ -1,3 +1,6 @@
+import lib_fileservices;
+
+clear_raw_data                        := lib_fileservices.FileServices.ClearSuperFile('~thor_data400::in::ebr::RawData');
 clear_0010_Header_superfile						:= Clear_Input_Superfile(FileName_0010_Header_In);
 clear_1000_Executive_Summary_superfile				:= Clear_Input_Superfile(FileName_1000_Executive_Summary_In);
 clear_2000_Trade_superfile						:= Clear_Input_Superfile(FileName_2000_Trade_In);
@@ -21,7 +24,8 @@ clear_7000_SNP_Parent_Name_Address_superfile			:= Clear_Input_Superfile(FileName
 clear_7010_SNP_Data_superfile						:= Clear_Input_Superfile(FileName_7010_SNP_Data_In);
 
 export Clear_All_Input_Superfiles := sequential(
-	 clear_0010_Header_superfile
+   clear_raw_data
+	 ,clear_0010_Header_superfile
 	,clear_1000_Executive_Summary_superfile
 	,clear_2000_Trade_superfile
 	,clear_2015_Trade_Payment_Totals_superfile

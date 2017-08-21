@@ -1,8 +1,13 @@
 import ut;
 
-export fFixCorpDates(dataset(Layout_Corporate_Direct_Corp_Base) corp_data) := FUNCTION
+export fFixCorpDates(
 
-Layout_Corporate_Direct_Corp_Base FixDates(Layout_Corporate_Direct_Corp_Base l) := transform
+	 dataset(Layout_Corporate_Direct_Corp_AID	) corp_data
+	,dataset(Layout_Corporate_Direct_Event_Base	) pUpdate_Event	= Update_Event()
+
+) := FUNCTION
+
+Layout_Corporate_Direct_Corp_AID FixDates(Layout_Corporate_Direct_Corp_AID l) := transform
 // check for any dates less than 8 characters
 boolean partial_dates :=
   (length(trim(l.corp_filing_date)) between 1 and 7) or
@@ -35,10 +40,12 @@ unsigned4 dt_vendor_first_reported :=
   ut.EarliestDate((unsigned4)fCheckDate(l.corp_status_date), 
   ut.EarliestDate((unsigned4)fCheckDate(l.corp_ra_effective_date), (unsigned4)fCheckDate(l.corp_process_date))))));
 
-self.dt_first_seen := if(dt_first_seen < l.dt_first_seen, dt_first_seen, l.dt_first_seen);
-self.dt_last_seen := if(l.dt_last_seen = (unsigned4)l.corp_process_date or
-                        fCheckDate((string8)intformat(l.dt_last_seen, 8, 1)) = '' or
-                        (partial_dates and dt_last_seen < l.dt_last_seen), dt_last_seen, l.dt_last_seen);
+// self.dt_first_seen := if(dt_first_seen < l.dt_first_seen, dt_first_seen, l.dt_first_seen);
+self.dt_first_seen := ut.EarliestDate((unsigned4) dt_first_seen,(unsigned4) l.dt_first_seen);
+self.dt_last_seen := if((l.corp_state_origin <> 'MA') and
+						(l.dt_last_seen = (unsigned4)l.corp_process_date or
+                         fCheckDate((string8)intformat(l.dt_last_seen, 8, 1)) = '' or
+                         (partial_dates and dt_last_seen < l.dt_last_seen)), dt_last_seen, l.dt_last_seen);
 self.dt_vendor_first_reported := if(dt_vendor_first_reported < l.dt_vendor_first_reported, dt_vendor_first_reported, l.dt_vendor_first_reported);
 self := l;
 end;
@@ -58,12 +65,12 @@ layout_event_slim SlimEvents(Layout_Corporate_Direct_Event_Base l) := transform
 self := l;
 end;
 
-events_slim := project(Update_Event(record_type = 'C'), SlimEvents(left));
+events_slim := project(pUpdate_Event(record_type = 'C'), SlimEvents(left));
 events_slim_dist := distribute(events_slim, hash(corp_key));
 events_slim_sort := sort(events_slim_dist, corp_key, -dt_vendor_last_reported, -dt_last_seen, local);
 events_slim_dedup := dedup(events_slim_sort, corp_key, local);
 
-Layout_Corporate_Direct_Corp_Base UpdateDates(Layout_Corporate_Direct_Corp_Base l, layout_event_slim r) := transform
+Layout_Corporate_Direct_Corp_AID UpdateDates(Layout_Corporate_Direct_Corp_AID l, layout_event_slim r) := transform
 self.dt_vendor_last_reported := ut.LatestDate(l.dt_vendor_last_reported, r.dt_vendor_last_reported);
 self.dt_last_seen := if(fCheckDate(r.event_filing_date) <> '', ut.LatestDate(l.dt_last_seen, r.dt_last_seen), l.dt_last_seen);
 self := l;

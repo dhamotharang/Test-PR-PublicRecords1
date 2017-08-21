@@ -1,3 +1,6 @@
+/*2015-11-16T20:59:38Z (Srilatha Katukuri)
+#193680 - CR323
+*/
 /*2015-07-23T22:34:48Z (Srilatha Katukuri)
 #173799 removed the pref_fname from payload
 */
@@ -22,7 +25,7 @@ IMPORT NID, Data_Services, Doxie, NID;
 		SELF	:= L;
 	END;
  
-	dsSlimFile := project ( FLAccidents_Ecrash.File_KeybuildV2.out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and fname <> '') , ModifySlimLayout(LEFT)); 
+	dsSlimFile := project ( FLAccidents_Ecrash.File_KeybuildV2.out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and fname <> '' and trim(report_type_id,all) in ['A','DE']) , ModifySlimLayout(LEFT)); 
 	dsDedupFile := dedup(sort(distribute(dsSlimFile, hash64(accident_nbr)), fname,accident_nbr,report_code,jurisdiction_state,jurisdiction,accident_date, report_type_id, local ), fname,accident_nbr,report_code,jurisdiction_state,jurisdiction,accident_date, report_type_id, local);
 	EXPORT	Key_eCrashv2_PrefName_State:=	INDEX(dsDedupFile
 																							,{fname,jurisdiction_state,jurisdiction}

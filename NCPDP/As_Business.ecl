@@ -1,3 +1,4 @@
+#OPTION('multiplePersistInstances',FALSE);
 EXPORT As_Business := MODULE
 
   EXPORT Header := NCPDP.fAs_business.fHeader(Files().keybuild_base.BusinessHeader)

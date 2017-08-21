@@ -10,7 +10,7 @@ tools.Constants(
 	 pDatasetName					:= pDatasetName
 	,pUseOtherEnvironment	:= pUseOtherEnvironment
 	,pGroupname						:= ''
-	,pMaxRecordSize				:= 4096
+	,pMaxRecordSize				:= 5698
 	,pIsTesting						:= Tools._Constants.IsDataland
 	,pAutokey_Skipset			:= ['P', 'S','C', 'F']
 	,pAutokey_typestr			:= 'BC'

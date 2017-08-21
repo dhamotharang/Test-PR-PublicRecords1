@@ -1,4 +1,4 @@
-﻿import FCRA, Riskwise, _control, Gateway;
+import FCRA, Riskwise, _control, Gateway;
 
 USE_BOCA_SHELL_LIBRARY := not _Control.LibraryUse.ForceOff_Risk_Indicators__LIB_Boca_Shell_Function;
 

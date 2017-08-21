@@ -1,0 +1,1 @@
+export Layout_KY_Update	:= 	Drivers.Layout_KY_Full;		// same layout as full for now

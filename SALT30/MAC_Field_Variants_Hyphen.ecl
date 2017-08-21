@@ -5,20 +5,20 @@ EXPORT MAC_Field_Variants_Hyphen(fieldvals,ufield,infield,level) := FUNCTIONMACR
 NB(SALT30.StrType s) := SALT30.StringFilterOut(s,' -');
 TYPEOF(fieldvals) apfx(fieldvals le,UNSIGNED c) := TRANSFORM
   SELF.infield := NB(le.infield)[1..c];
-  SELF := le;
+  SELF.ufield := le.ufield;
   END;
 	
 n := DISTRIBUTED(NORMALIZE(fieldvals,LENGTH(NB(LEFT.infield)),apfx(LEFT,COUNTER))(infield[1]<>'',infield[1]<>'-'),ufield);	
 TYPEOF(fieldvals) apfx1(fieldvals le,UNSIGNED c) := TRANSFORM
   SELF.infield := NB(le.infield)[c+1..];
-  SELF := le;
+  SELF.ufield := le.ufield;
   END;
 	
 nr := DISTRIBUTED(NORMALIZE(fieldvals,IF(LENGTH(NB(LEFT.infield))=0,0,LENGTH(NB(LEFT.infield))-1),apfx1(LEFT,COUNTER))(infield[1]<>'',infield[1]<>'-'),ufield);	
 Fix(SALT30.StrType s) := SALT30.StringCleanSpaces(SALT30.StringSubstituteOut(s,'-',' '));
 TYPEOF(fieldvals) apfw(fieldvals le,UNSIGNED c) := TRANSFORM
   SELF.infield := SALT30.GetNthWord(Fix(le.infield),c);
-  SELF := le;
+  SELF.ufield := le.ufield;
   END;
 sw0 := DISTRIBUTED(NORMALIZE(fieldvals,SALT30.WordCount(Fix(LEFT.infield)),apfw(LEFT,COUNTER)),ufield); // Get each word
 swa := PROJECT(fieldvals,apfx1(LEFT,0)); // Get the full word too (no hyphen) in multi field case

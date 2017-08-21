@@ -1,8 +1,8 @@
-import gong, doxie;
+import gong_Neustar, doxie;
 
 f := File_Telcordia_tpm;
 
-gg := gong.File_Gong_full(LENGTH(((STRING)(INTEGER)phone10))=10, (INTEGER)z5<>0);
+gg := gong_Neustar.File_Gong_full(LENGTH(((STRING)(INTEGER)phone10))=10, (INTEGER)z5<>0 and phone10 <> '8052594368' ); /* Temp fix until Query has a perminent solution to the phone number being filtered out*/
 g_ddp := DEDUP(SORT(gg,phone10[1..6],z5),phone10[1..6],z5);
 
 xl := 

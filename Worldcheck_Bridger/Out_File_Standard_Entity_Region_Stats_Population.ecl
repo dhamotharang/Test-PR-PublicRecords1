@@ -7,16 +7,6 @@ export Out_File_Standard_Entity_Region_Stats_Population (string filedate) := fun
 
 //MAIN FILE//////////////////////////////////////////////////////////////////////	
 	//Flatten MAIN File
-	layout_aliases := RECORD
-		string type{xpath('Type')};
-		string category{xpath('Category')};
-		unicode first_name{xpath('First_Name')};
-		unicode middle_name{xpath('Middle_Name')};
-		unicode last_name{xpath('Last_Name')};
-		unicode generation{xpath('Generation')};
-		unicode full_name{xpath('Full_Name')};
-		string comments{xpath('Comments')};
-	   END;
 
 	aka_rollup := RECORD
 	   string id;
@@ -130,6 +120,7 @@ dsMain := dataset('~thor_200::persist::worldcheck::standard_worldcheck_bridger.m
 	dsMainFlatLayout dsMainFlatFix(dsMain l):= transform
 		self.region				:= trim(l.search_criteria[3..stringlib.stringfind(l.search_criteria,';',1)-1], left, right);
 		self.category 			:= trim(l.comments[stringlib.stringfind(l.comments, 'Category:', 1)+10..(stringlib.stringfind(l.comments, 'Category:', 1) + stringlib.stringfind(l.comments[stringlib.stringfind(l.comments, 'Category:', 1)..length(l.comments)], '||', 1)-2)], left, right); 
+		self.full_name := (string)l.full_name;
 		self 					:= l;
 	end;
 	

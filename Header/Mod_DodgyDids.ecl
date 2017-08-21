@@ -1,29 +1,44 @@
-
-import ut;
+import ut,mdr;
 
 export Mod_DodgyDids(dataset(header.Layout_Header) h0) :=
 MODULE
 
 //DodgyDids relies on the DID distribution in Fn_CleanFnameTranspose
-shared h := Header.Fn_CleanFnameTranspose(h0);
+shared h1 := Header.Fn_CleanFnameTranspose(h0);
+mc := project(h1, transform(header.Layout_MatchCandidates,
+														self := left,
+														self := []));
+shared h := project(Header.fn_StripExpiredDOBs(mc, h1),
+										transform(header.layout_header,
+															self := left,
+															self := []));
 
-r := record
-  h.fname;
-  h.did;
-  h.dob;
-  h.ssn;
-  h.valid_ssn;
-  h.st;
-  string18 vid := header.make_new_vendor(h.vendor_id);
-  end;
+shared mod_rt(dataset(header.Layout_Header) h) := 
+MODULE
+	r := record
+		h.fname;
+		h.did;
+		h.dob;
+		h.ssn;
+		h.valid_ssn;
+		h.st;
+		string18 vid := header.make_new_vendor(h.vendor_id);
+		end;
 
-shared rt_init := distribute(table(h,r),hash(did));
-shared rt := rt_init(dob>18000000);
+	export rt_init := distribute(table(h,r),hash(did));
+	export rt := rt_init(dob>18000000);
+END;
+
+shared rt  := 		mod_rt(h).rt;   					//for rules 1 and 5
+shared rt_init := mod_rt(h).rt_init;   			//for rule 5
+shared rt1 := 		mod_rt(h1).rt;  					//for rules 3 and 4
 
 shared highvid := 'ZZZZZZZZZZZZZZZZZZ';
 
 rroll := record
   rt.did;
+  male    := ~ count(group,	datalib.gender(trim(datalib.PreferredFirst(rt.fname)))='F'
+						and length(trim(datalib.PreferredFirst(rt.fname)))>1) / count(group) >= .90;
   dob_max := max(group,rt.dob);
   dob_min := min(group,rt.dob);
   vid_max := max(group, IF(rt.dob=0,'',rt.vid));
@@ -35,19 +50,10 @@ export did_tab := table(rt,rroll,did,local);
 shared too_wide := did_tab(dob_max < (integer4)ut.GetDate - 40000, 
                     abs(ut.MOB(dob_max)-ut.MoB(dob_min))>=1300,
 				~header.dob_similar(dob_max, dob_min),
+				male,
 				Header.Vendor_Id_Null(vid_max) or vid_max <> vid_min);	
 
-
-//rroll_days := record
-//  rt.did;
-//  day_dob_max := max(group,rt.dob % 100);
-//  day_dob_min := min(group,rt.dob % 100);
-//  end;
-
-//days_tab := table(rt(dob%100>1),rroll_days,did,local);
-
 shared did_rec := header.layout_DodgyDids;
-//b_dob := h(jflag1='B');
 
 did_rec bad_one(too_wide l) := transform 
  self.rule_number := '1';
@@ -56,14 +62,7 @@ end;
 
 shared bad_dob := project(too_wide,bad_one(left));
 
-//did_rec sli_day(days_tab le) := transform
-//  self.rule_number := '2';
-//  self := le;
-//  end;
-
-//days_wrong := project(days_tab(day_dob_max<>day_dob_min),sli_day(left));
-
-export rts := rt((unsigned8)ssn<>0);
+export rts := rt1((unsigned8)ssn<>0);
 
 ssns := record
   rts.did;
@@ -76,11 +75,10 @@ ssns := record
   day_max := max(group,rts.dob % 100);
   end;
 
-mac_ssn_overlap(h,wbna_j30);
+header.mac_ssn_overlap(h,wbna_j30);
 
 wbna_j3 := distribute(wbna_j30,hash(did));
 
-//export did_ssn := table(rts,ssns,did,ssn,local); //Don't export this one
 did_ssn0 := table(rts,ssns,did,ssn,local);
 
 ssns t_join(did_ssn0 le, wbna_j3 ri) := transform
@@ -106,7 +104,6 @@ j1 := join(did_ssn,did_ssn,left.did=right.did and
 							   left.mob_max>1 and right.mob_max>1 and 
                                       left.mob_max<>right.mob_max)  
                              or
-                             //ut.stringsimilar(left.ssn,right.ssn)>1 
 							 header.ssn_value(left.ssn, right.ssn) <= 0 
                            ) and
                            (
@@ -149,7 +146,6 @@ shared gender_sbad :=
 		 Header.Vendor_Id_Null(male_vid_min) 	or male_vid_min	<>female_vid_min, 
 		 Header.Vendor_Id_Null(female_vid_max) 	or female_vid_max <> male_vid_max),
 		sli_g(left));
-// gender_bad := project(did_question(ut.date_overlap(male_dob_min,male_dob_max,female_dob_min,female_dob_max)=0),sli_g(left));
 
 
 //=================== rule 5 ===================================
@@ -157,7 +153,6 @@ shared gender_sbad :=
 shared w_ssn := rt((unsigned8)ssn<>0, valid_ssn not in ['R', 'F']); // Don't filter out valid_ssn 'B': did 812696229 has 'B'.
 shared ssn_st := w_ssn(st != '');
   
-//j2_counter: dids with 2 or more ssn, shared address state between each ssn.
 recSsnSt := record
   ssn_st.did;
   ssn_st.ssn;
@@ -175,9 +170,7 @@ shared j2_counter := join(did_ssn_st_group,did_ssn_st_group,
     and left.ssn<> right.ssn and header.ssn_value(left.ssn, right.ssn) <= 0//ut.stringsimilar(left.ssn,right.ssn)>1 
     and left.st = right.st
   , sli_s10(left, right),local);
-//j2_counter_dedup :=  dedup(sort(j2_counter,did,local),did,local);
 
-//j2_pre: dids with 2 or more ssn, with non-overlapping dob. dob: day>0, but can be 01.
 // rt also has h.dob>18000000.
 recSsnStDob := record
   ssn_st.did;
@@ -199,7 +192,6 @@ j2_pre := join(did_ssn_group,did_ssn_group,
     and left.ssn<> right.ssn and header.ssn_value(left.ssn, right.ssn) <= 0//ut.stringsimilar(left.ssn,right.ssn)>1 
     and (left.dob8_max < right.dob8_min or right.dob8_max < left.dob8_min) //if year and month are the same
   , sli_s2(left, right),local);  //local: rt is distributed by did.
-//j2_pre_dedup := dedup(sort(j2_pre,did,local),did,local);
 
 //start of getting within a did, all SSNs share the same ST(DOB not considered)
 w_all_st := join(rt_init, j2_pre, left.did=right.did, 
@@ -242,21 +234,44 @@ shared namedodgy := project(nonid,
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+///////////////////////Find DIDs with splits on last name/SSN//////////////////// 
+
+lnSSN := header.fn_FindDodgyFnameSSN(h1);
+shared lnSSNdodgy := project(lnSSN, 
+														transform(did_rec,
+																			self.rule_number := '8',
+																			self.did := left.did));
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+fname_ssn_st_dodgy_prep := header.fn_FindDodgyFnameSSNSt(h1);
+shared fname_ssn_st_dodgy := project(fname_ssn_st_dodgy_prep,transform(did_rec,
+                                                                       self.rule_number := '9',
+																	   self.did         := left.did
+																	  ));
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+dead_alive_prep := header.fn_FindDodgyDead_and_alive(h1);
+shared dead_alive := project(dead_alive_prep,transform(did_rec,
+                                                                       self.rule_number := 'A',
+																	   self.did         := left.did
+																	  ));
+/////////////////////////////////////////////////////////////////////////////////////////////////
+ssn_and_source_based_overlinking_prep   := header.fn_FindDodgySSNandSourceBased(h1);
+shared ssn_and_source_based_overlinking := project(ssn_and_source_based_overlinking_prep,transform(did_rec,self.rule_number:='T',self.did:=left.did));
+
 np := dedup(sort(gender_sbad + 
 								 split_by_ssn + 
 								 bad_dob + 
 								 st_dob + 
-								 namedodgy, did, rule_number), did, local);
-
-// output(did_tab, named('did_tab'));
-// output(too_wide, named('too_wide'));
-
-// output(rts, named('rts'));
-// output(did_ssn, named('did_ssn_3'));
-
-// output(did_gender, named('did_gender4'));
-// output(did_question, named('did_question4'));
-// output(gender_sbad, named('gender_sbad4'));
+								 namedodgy +
+								 lnSSNdodgy +
+								 fname_ssn_st_dodgy +
+								 dead_alive +
+								 ssn_and_source_based_overlinking +
+								 //superfile populated via header.bwr_hardcode_dodgy
+								 //gets cleared in header.proc_acceptsk_toqa
+								 dataset('~thor_data400::base::hard_coded_dodgies',did_rec,flat,opt), did, rule_number), did, local);
 
 export result := np;
 

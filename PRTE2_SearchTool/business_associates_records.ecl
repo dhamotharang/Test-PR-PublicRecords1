@@ -1,4 +1,4 @@
-﻿import doxie_cbrs, business_header;
+import doxie_cbrs, business_header;
 
 doxie_cbrs.mac_Selection_Declare()
 

@@ -39,7 +39,7 @@ headerRecords := 0; // Number of header rows on the input file
 
 isCSV := TRUE; // Set to TRUE for CSV, FALSE for flat inFile layout
 
-outFile := '~bpahl::out::Address_Attributes__PRVersion_' + Address_Attributes_Version + '_PropInfoVersion_' + Property_Info_Attributes_Version + '_' + thorlib.wuid() + '.csv';
+outFile := '~bpahl::out::Address_Attributes_' + Address_Attributes_Version + '_PropInfoVersion_' + Property_Info_Attributes_Version + '_' + thorlib.wuid() + '.csv';
 
 GatewaysIn := DATASET([
 											{'erc', 'http://rw_score_dev:Password01@10.176.68.164:7726/WsGatewayEx?ver_=1.7'},
@@ -103,7 +103,7 @@ serviceInput intoRequest(layoutInput le, UNSIGNED c) := TRANSFORM
 																					SELF.User.AccountNumber := AccountNumber;
 																					SELF.User.GLBPurpose := '1';
 																					SELF.User.DLPurpose := '3';
-																					SELF.User.DataRestrictionMask := '0000000000000101000';
+																					SELF.User.DataRestrictionMask := '0000000000000101000000000';
 																					SELF := []));
 	
 	SELF.AddressAttributesReportRequest := aarr;

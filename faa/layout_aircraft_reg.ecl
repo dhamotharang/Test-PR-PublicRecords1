@@ -1,0 +1,80 @@
+import Address,NID;
+
+export Layout_aircraft_reg := module
+
+export temp := record
+   string8 date_first_seen;
+   string8 date_last_seen;
+   string1 current_flag;
+   string8 n_number;
+   string30 serial_number;
+   string12 mfr_mdl_code;
+   string11 eng_mfr_mdl;
+   string8 year_mfr;
+   string15 type_registrant;
+   string50 name;
+   string33 street;
+   string33 street2;
+   string18 city;
+   string5 state;
+   string10 zip_code;
+   string6 region;
+   string6 orig_county;
+   string7 country;
+   string16 last_action_date;
+   string15 cert_issue_date;
+   string13 certification;
+   string13 type_aircraft;
+   string11 type_engine;
+   string11 status_code;
+   string11 mode_s_code;
+   string11 fract_owner;
+   string30 aircraft_mfr_name;
+   string20 model_name;
+	 UNSIGNED8 raw_aid;
+	 UNSIGNED8 ace_aid;
+  Address.Layout_Clean182_fips clean_address;
+  Address.Layout_Clean_Name    clean_name;
+   string50 compname;
+	 NID.Common.xNameString fullnm;
+   string1 lf;
+end;
+
+export innew := record
+   string8 date_first_seen;
+   string8 date_last_seen;
+   string1 current_flag;
+   string8 n_number;
+   string30 serial_number;
+   string12 mfr_mdl_code;
+   string11 eng_mfr_mdl;
+   string8 year_mfr;
+   string15 type_registrant;
+   string50 name;
+   string33 street;
+   string33 street2;
+   string18 city;
+   string5 state;
+   string10 zip_code;
+   string6 region;
+   string6 orig_county;
+   string7 country;
+   string16 last_action_date;
+   string15 cert_issue_date;
+   string13 certification;
+   string13 type_aircraft;
+   string11 type_engine;
+   string11 status_code;
+   string11 mode_s_code;
+   string11 fract_owner;
+   string30 aircraft_mfr_name;
+   string20 model_name;
+	 UNSIGNED8 raw_aid;
+	 UNSIGNED8 ace_aid;
+  Address.Layout_Clean182_fips clean_address;
+  Address.Layout_Clean_Name    clean_name;
+   string50 compname;
+   string1 lf;
+end;
+
+end;

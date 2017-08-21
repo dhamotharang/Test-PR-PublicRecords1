@@ -30,11 +30,11 @@ self.dt_nonglb_last_seen := self.dt_last_seen;
 self.rec_type :=le.orig_record_type;
 self.vendor_id := le.orig_perm_id;
 self.ssn := le.orig_ssn;
-self.phone := le.orig_telephone;
+self.phone := '';
 integer dob1 := (integer)(trim(le.orig_birthdate_ccyymm));
 self.dob := map(dob1=0 => 0,
-			 dob1<10000 => (integer)(trim(le.orig_birthdate_ccyymm) + '0101'),
-			 (integer)(trim(le.orig_birthdate_ccyymm) + '01'));
+			 dob1<10000 => (integer)(trim(le.orig_birthdate_ccyymm) + '0000'),
+			 (integer)(trim(le.orig_birthdate_ccyymm) + '00'));
 self.title := le.clean_name[1..5];
 self.fname := le.clean_name[6..25];
 self.mname := le.clean_name[26..45];

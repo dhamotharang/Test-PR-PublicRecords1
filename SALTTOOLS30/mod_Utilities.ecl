@@ -173,16 +173,17 @@ module
 	export ConvertInput2SprayDataset(dataset(Layout_FilenameVersions.Inputs) pInput) :=
 		project(pInput, transform(Layout_Sprays.Info, self := left));
   // Pull out the parts when in the form: '192.1.2.1/mydirectory/myotherdirectory/*.csv'
-	IMPORT SALT37;
+	IMPORT SALT30;
 	export IpFromFull(STRING u) := FUNCTION
-	  ip := SALT37.GetNthWord(u,1,'/');
+	  ip := SALT30.GetNthWord(u,1,'/');
 		RETURN IF( (UNSIGNED)ip>0, ip, '' );
 		END;
 		
-	export WildCardFromFull(STRING u) := SALT37.GetNthWord(u,SALT37.WordCount(u,'/'),'/');	
+	export WildCardFromFull(STRING u) := SALT30.GetNthWord(u,SALT30.WordCount(u,'/'),'/');	
 	
 	export DirectoryFromFull(STRING u) := FUNCTION
 	  hasIP := IpFromFull(u) <> '';
-	  RETURN '/' + SALT37.GetRangeOfWords(u,IF(hasIP,2,1),SALT37.WordCount(u,'/')-1,'/');
+	  RETURN '/' + SALT30.GetRangeOfWords(u,IF(hasIP,2,1),SALT30.WordCount(u,'/')-1,'/');
 	END;
 end;
+

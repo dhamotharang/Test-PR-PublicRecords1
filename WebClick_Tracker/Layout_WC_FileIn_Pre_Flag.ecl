@@ -1,6 +1,6 @@
 export Layout_WC_FileIn_Pre_Flag := record
 	unsigned aid;
-	unsigned companyid;
+	string companyid;
 	string loginid;
 	string session_id;
 	string ip;

@@ -39,13 +39,19 @@ ut.MAC_Sequence_Records(%t%,xxx_unc,%nif%)
   self := le;
   end;	
 // Words are now joined to their specificities
-#uniquename(j1)
-// %j1% := join( %n%, PULL(keyname), left.s = right.keyfield, %tr2%(left,right), LOOKUP, left outer );
-%j1% := join( %n%, PULL(keyname), left.s = right.keyfield, %tr2%(left,right), HASH, left outer );
-#uniquename(j0)
-%j0% := join( %n%, keyname, left.s = right.keyfield, %tr2%(left,right), left outer );
+#uniquename(j_lookup)
+#uniquename(j_hash)
+#uniquename(j_keyed)
+%j_lookup% 	:= join( %n%, PULL(keyname), 	left.s = right.keyfield, %tr2%(left,right), LOOKUP, 	left outer );
+%j_hash% 		:= join( %n%, PULL(keyname), 	left.s = right.keyfield, %tr2%(left,right), HASH, 		left outer );
+%j_keyed% 	:= join( %n%, keyname, 				left.s = right.keyfield, %tr2%(left,right), 					left outer );
 #uniquename(j)
-%j% := IF(AsIndex,%j0%,%j1%);
+%j% := 
+MAP(
+	AsIndex																														=> 	%j_keyed%,
+	COUNT(keyname)*SIZEOF(keyname,MAX) < SALT27.Config.LookupMaxSize	=> 	%j_lookup%,
+																																				%j_hash%
+);
 
 #uniquename(addw)
 %ifp% %addw%(%ifp% le, %j% ri) := transform

@@ -1,4 +1,4 @@
-﻿export Constants := module
+export Constants := module
 
 	export void_gateway := dataset([], Gateway.layouts.config);
 	

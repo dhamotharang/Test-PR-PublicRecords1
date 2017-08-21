@@ -3,10 +3,10 @@ IMPORT VersionControl,_Control, ut, lib_fileservices,enclarity_facility_sanction
 EXPORT fSpray(
 	STRING		pVersion              				= '',
 	BOOLEAN   pUseProd              				= false,
-	STRING		pServerIP											= 'bctlpedata12.risk.regn.net',
+	STRING		pServerIP											= '10.121.149.194',
 	STRING		pFacilitySanctionsFileName		= '*facility_sanctions_' + pVersion[..8] + '.txt',
 	STRING		pDirectory										= '/data/enclarity/facility_sanctions/'+ pVersion[..8],
-	STRING		pGroupName										= IF((tools._Constants.IsDataland),'thor400_dev01','thor400_30'),
+	STRING		pGroupName										= IF((tools._Constants.IsDataland),'thor400_dev01','thor400_44'),
 	BOOLEAN		pIsTesting										= false,
 	BOOLEAN		pOverwrite										= true,
 	STRING		pNameOutput										= 'Enclarity Facility Sanctions Spray Report'

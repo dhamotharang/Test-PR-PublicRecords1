@@ -1,1 +1,1 @@
-export Name_Moxie_Party_Prod := '~thor_200::base::official_records_party_'+ Official_Records.Version_Production;
+export Name_Moxie_Party_Prod := '~thor_200::base::official_records_party';

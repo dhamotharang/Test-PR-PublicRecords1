@@ -291,6 +291,7 @@ MODULE
 		STRING36        model_description;
 		STRING25        series_description;
 		STRING25        body_style_description;
+		UNSIGNED8				source_rec_id := 0;	 	//Added for BIP project
   END;
 
 END;

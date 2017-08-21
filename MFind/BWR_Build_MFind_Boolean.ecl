@@ -28,9 +28,19 @@ end;
 //header.Mac_Set_Header_Source(indata,MFind.Layout_Clean_MFind,fpos_mfind,hash32(l.FILE_ID),mfind_withID)
 header.Mac_Set_Header_Source(indata,MFind.Layout_Clean_MFind,fpos_mfind,0,mfind_withID);
 
+// External key
+	
+	Text_Search.layout_DocSeg MakeKeySegs( mfind_withID l, unsigned2 segno ) := TRANSFORM
+		self.docref.doc := l.uid;
+        self.docref.src := l.src;
+		self.segment := segno;
+        self.content := l.trim_vid;
+        self.sect := 1;
+    END;
 
+    segkeys := PROJECT(mfind_withID,MakeKeySegs(LEFT,250));
 
-docs := MFIND.Convert_MFIND_Func(mfind_withID);
+docs := MFIND.Convert_MFIND_Func(mfind_withID) + segkeys;
 
 string_rec := record
 		unsigned2 src;
@@ -64,6 +74,7 @@ inskeyname := '~thor_data400::key::mfind::qa::docref.tmsid';
 
 retval := sequential
 					(
+					fileservices.clearsuperfile(inskeyname),
 					buildindex(tmsid_map,{src,doc,src2,doc2,__filepos},inlkeyname, OVERWRITE),
 					Text_Search.Build_From_DocSeg_Records(docs(
 								lib_stringlib.StringLib.StringFilterOut(content,';') <> ''),info),

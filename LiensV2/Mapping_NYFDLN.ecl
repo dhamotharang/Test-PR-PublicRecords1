@@ -69,7 +69,7 @@ self.atty_phone                      := '' ;
 //Filing Office
 self.agency                          := '' ;
 self.agency_city                     := L.LEVYING_OFFICE_CITY ;
-self.agency_state                    := '' ;
+self.agency_state                    := 'NY' ;
 self.agency_county                   := '' ;
 
 //Cleaned fields
@@ -114,7 +114,7 @@ self.clean_debtor_geo_match				:=		L.clean_debtor_address[178]				    ;
 self.clean_debtor_err_stat				:=		L.clean_debtor_address[179..182]		    ;
 
 self.clean_debtor_cname                 :=      L.clean_debtor_cname                        ;
-
+self := L;
 
 
 end;

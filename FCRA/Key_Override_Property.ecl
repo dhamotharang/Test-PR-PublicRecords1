@@ -4,9 +4,9 @@ EXPORT Key_Override_Property := MODULE
 
 // Any record definitions can be exported, if needed
 	
-	shared fname_prefix := Data_Services.Data_location.Prefix('property_overrides')+'thor_data400::base::override::fcra::qa::';
-	shared daily_prefix := Data_Services.Data_location.Prefix('property_overrides')+'thor_data400::base::override::fcra::daily::qa::';
-	shared keyname_prefix := Data_Services.Data_location.Prefix('property_overrides')+'thor_data400::key::override::fcra::';
+	shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
+	shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
+	shared keyname_prefix := data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::';
 	
 
 // Assessment Record
@@ -37,7 +37,7 @@ EXPORT Key_Override_Property := MODULE
 
 
 //Search Record
-	shared search_override_layout := record
+	export search_override_layout := record
 		string20 flag_file_id;
 		ln_propertyv2.layout_search_building;
 	end;

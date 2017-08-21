@@ -1,8 +1,6 @@
 export Mac_Delete_File(keyfilename,filedelete) := MACRO
+import roxiekeybuild;
 
+roxiekeybuild.Mac_Delete_File(keyfilename,filedelete);
 
-filedelete := if (lib_fileservices.fileservices.FileExists(KeyFileName),
-				lib_fileservices.FileServices.DeleteLogicalFile(KeyFileName),
-				output(KeyFileName + ' does not exist'));
-
-ENDMACRO;
+ENDMACRO : deprecated('use roxiekeybuild.Mac_Delete_File instead');

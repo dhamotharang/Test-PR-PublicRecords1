@@ -1,0 +1,1 @@
+export Str_SegmentName := 'MFind';

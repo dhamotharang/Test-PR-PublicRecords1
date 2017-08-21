@@ -73,7 +73,9 @@ tran_type_desc(string2 code)
 
 file_NY_filter := sort(dedup(watercraft.file_NY_clean_in, HULL_ID, MAKE,YEAR, NAME, REG_DATE), HULL_ID, MAKE,YEAR, NAME, REG_DATE);  
 
-watercraft.Macro_Is_hull_id_in_MIC(file_NY_filter,watercraft.layout_NY_clean_in,wDatasetwithflag)
+Watercraft.Macro_Clean_Hull_ID(file_NY_filter, watercraft.layout_NY_clean_in,hull_clean_in)
+
+watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in,watercraft.layout_NY_clean_in,wDatasetwithflag)
 
 watercraft.Layout_Watercraft_Main_Base main_mapping_format(wDatasetwithflag L) := transform
 

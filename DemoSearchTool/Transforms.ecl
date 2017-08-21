@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, BIPV2_Best, Business_Header, iesp, Infutor, Watchdog;
+IMPORT BIPV2, BIPV2_Best, Business_Header, iesp, Infutor, Watchdog;
 
 EXPORT Transforms := 
   MODULE

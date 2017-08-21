@@ -18,7 +18,7 @@ layout_final := record
 	layout_counts Other;
 end;
 
-filt := Inquiry_AccLogs.File_FCRA_Inquiry_Base( person_q.Appended_ADL > 0 );
+filt := Inquiry_AccLogs.File_FCRA_Inquiry_Base(bus_intel.industry <> '' and  person_q.Appended_ADL > 0 );
 
 layout_slim := record
 	did          := filt.person_q.Appended_ADL;

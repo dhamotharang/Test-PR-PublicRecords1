@@ -84,6 +84,7 @@ record
 	dBBAppendSeqNum.location_influence_code;
 	dBBAppendSeqNum.location_influence_desc;
 	dBBAppendSeqNum.living_area_square_footage;
+	dBBAppendSeqNum.garage_square_footage;
 	dBBAppendSeqNum.no_of_stories;
 	dBBAppendSeqNum.basement_square_footage;
 	dBBAppendSeqNum.no_of_baths;
@@ -114,20 +115,24 @@ string	vTradeID	:=	PropertyCharacteristics.Files.Codes.CodesV3(	field_name2	=	'B
 
 rSlim2CodeFields_layout	tIBMaterialCode(rSlim2CodeFields_layout	le,dMLS2IBCodeLookup	ri)	:=
 transform
-	string	vMaterialValue	:=	if(	ri.value	!=	'',
-																	ri.value,
-																	map(	ri.dynamic_value	=	'Y'	and	ri.trade_id	=	20	and	le.basement_square_footage	!=	''	=>	le.basement_square_footage,
-																				ri.dynamic_value	=	'F'	and	ri.trade_id	=	20	and	le.basement_square_footage	!=	''	=>	le.basement_square_footage,
-																				ri.dynamic_value	=	'P'	and	ri.trade_id	=	20	and	le.basement_square_footage	!=	''	=>	(string)round((0.5*(integer)le.basement_square_footage)),
-																				ri.dynamic_value	=	'Q'	and	ri.trade_id	=	20	and	le.basement_square_footage	!=	''	=>	(string)round((0.25*(integer)le.basement_square_footage)),
-																				ri.value
-																			)
-																);
+	real	vMaterialValue	:=	if(	ri.value	!=	'',
+																(real)ri.value,
+																map(	ri.dynamic_value	=	'Y'	and	ri.trade_id	=	20	and	le.basement_square_footage	!=	''																	=>	(integer)le.basement_square_footage,
+																			ri.dynamic_value	=	'Y'	and	ri.trade_id	=	20	and	le.living_area_square_footage	!=	''	and	le.no_of_stories	!=	''	=>	round((integer)le.living_area_square_footage/(real)le.no_of_stories),
+																			ri.dynamic_value	=	'F'	and	ri.trade_id	=	20	and	le.basement_square_footage	!=	''																	=>	(integer)le.basement_square_footage,
+																			ri.dynamic_value	=	'F'	and	ri.trade_id	=	20	and	le.living_area_square_footage	!=	''	and	le.no_of_stories	!=	''	=>	round((integer)le.living_area_square_footage/(real)le.no_of_stories),
+																			ri.dynamic_value	=	'P'	and	ri.trade_id	=	20	and	le.basement_square_footage	!=	''																	=>	round((0.5*(integer)le.basement_square_footage)),
+																			ri.dynamic_value	=	'P'	and	ri.trade_id	=	20	and	le.living_area_square_footage	!=	''	and	le.no_of_stories	!=	''	=>	round((0.5*((integer)le.living_area_square_footage/(real)le.no_of_stories))),
+																			ri.dynamic_value	=	'Q'	and	ri.trade_id	=	20	and	le.basement_square_footage	!=	''																	=>	round((0.25*(integer)le.basement_square_footage)),
+																			ri.dynamic_value	=	'Q'	and	ri.trade_id	=	20	and	le.living_area_square_footage	!=	''	and	le.no_of_stories	!=	''	=>	round((0.25*((integer)le.living_area_square_footage/(real)le.no_of_stories))),
+																			(real)ri.value
+																		)
+															);
 	
 	self.basement_finish	:=	if(le.basement_finish	!=	'',le.basement_finish,ri.material_code);
 	self.insurbase_codes	:=	if(	le.basement_finish	!=	'',
 																le.insurbase_codes,
-																if(	ri.material_code	!=	''	and	vMaterialValue	!=	'',
+																if(	ri.material_code	!=	''	and	vMaterialValue	!=	0,
 																		le.insurbase_codes	+	row({ri.category_code,ri.material_code,vMaterialValue,'','',''},PropertyCharacteristics.Layout_Codes.TradeMaterials),
 																		le.insurbase_codes
 																	)
@@ -214,8 +219,20 @@ end;
 
 dBBCleanAddr	:=	project(dBlueBookAppendAceAddr,tParseCleanAddr(left));
 
+// Filter out the dummy address records that bluebook has in their database
+dBBCleanAddrFilter	:=	dBBCleanAddr(	property_ace_aid	not	in	[	1022272108476,	//1012 HYDE PARK, SANTA ANA, CA 92705
+																																	1022287759181,	//2316 RAINER AVE, ROWLAND HEIGHTS, CA 91748
+																																	1138711923198,	//7293 PONDERA CIR, WEST HILLS, CA 91307
+																																	1022334929477,	//81ST AVE NE, BOTHELL, WA 98011
+																																	1022264780526		//12 RENSHAW PL, PALM COAST, FL 32164
+																																]
+																		);
+
+// Clean AID is assigned for each unique cleaned address, however small variations in fields p_city_name aren't collapsed into one clean aid
+// As all the rollup logic is being done on clean aid, collapsing all the different varaitions of one cleaned address into one clean aid
+dBBPropAddrCollapseAceAID	:=	PropertyCharacteristics.Functions.fnCollapseAceAID(dBBCleanAddrFilter);
+
 // Rollup records by property address
-PropertyCharacteristics.Mac_Property_Rollup(dBBCleanAddr,dBBRollup,true);
+PropertyCharacteristics.Mac_Property_Rollup(dBBPropAddrCollapseAceAID,dBBRollup,true);
 
 export	BlueBook2Base	:=	dBBRollup	:	persist('~thor_data400::persist::propertybluebook::bluebook2base');
-// export	BlueBook2Base	:=	dataset('~thor_data400::persist::propertybluebook::bluebook2base',PropertyCharacteristics.Layouts.TempBase,thor);

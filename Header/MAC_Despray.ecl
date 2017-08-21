@@ -109,9 +109,9 @@ string8 %convert_date8%(integer4 date) :=
            %convert_date6%(%int_header%.dt_last_seen),
            %convert_date6%(%int_header%.dt_vendor_last_reported));
 	string6     dt_vendor_first_reported := 
-      IF ( mdr.Source_is_DPPA(%int_header%.src) and %int_header%.dt_first_seen<>0,
-           %convert_date6%(%int_header%.dt_first_seen),
-           %convert_date6%(%int_header%.dt_vendor_first_reported));
+      Map ( mdr.Source_is_DPPA(%int_header%.src) and %int_header%.dt_first_seen<>0 => %convert_date6%(%int_header%.dt_first_seen),
+		  %convert_date6%(ut.Min2(%int_header%.dt_first_seen,%int_header%.dt_vendor_first_reported))[5..6]= '  ' => %convert_date6%(ut.Max2(%int_header%.dt_first_seen,%int_header%.dt_vendor_first_reported)),
+           %convert_date6%(ut.Min2(%int_header%.dt_first_seen,%int_header%.dt_vendor_first_reported)));
 	string6     dt_nonglb_last_seen := %convert_date6%(%int_header%.dt_nonglb_last_seen);
 
 	string1     rec_type := %int_header%.rec_type;
@@ -127,7 +127,7 @@ string8 %convert_date8%(integer4 date) :=
 	string20    fname := %int_header%.fname;
 	string20    mname := %int_header%.mname;
 	string20    lname := %int_header%.lname;
-	string5     name_suffix := if ( %int_header%.name_suffix = 'UNK','',%int_header%.name_suffix);
+	string5     name_suffix := if ( ut.is_unk(%int_header%.name_suffix),'',%int_header%.name_suffix);
 	string10    prim_range := %int_header%.prim_range;
 	string2     predir := %int_header%.predir;
 	string28    prim_name := if(%int_header%.src not in ['DE','DS'], %int_header%.prim_name, '');

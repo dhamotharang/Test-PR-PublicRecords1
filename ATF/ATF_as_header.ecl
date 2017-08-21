@@ -1,15 +1,12 @@
-/*2012-12-15T16:27:19Z (Jose Bello_Prod)
-
-*/
 import header,ut;
 
-export	ATF_as_header(dataset(atf.layout_firearms_explosives_out_Bid) pATF = dataset([],atf.layout_firearms_explosives_out_Bid), boolean pForHeaderBuild=false)
+export	ATF_as_header(dataset(layout_firearms_explosives_out_BIP) pATF = dataset([],layout_firearms_explosives_out_BIP), boolean pForHeaderBuild=false, boolean IsPRCT = false)
  :=
   function
-	dATFAsSource	:=	ATF.ATF_as_Source(pATF,pForHeaderBuild);
+	dATFAsSource	:=	if(pForHeaderBuild,header.Files_SeqdSrc().ATF,ATF.ATF_as_Source(pATF,pForHeaderBuild));
 
 	header.Layout_New_Records faslim(dATFAsSource Le, integer cnt) := transform
-	  self.did := 0;
+	  self.did := If(IsPRCT, (integer)Le.did_out, 0);
 	  self.rid := 0;
 	  self.dt_first_seen := (integer)le.date_first_seen div 100;
 	  self.dt_last_seen := (integer)le.date_last_seen div 100;
@@ -54,6 +51,4 @@ export	ATF_as_header(dataset(atf.layout_firearms_explosives_out_Bid) pATF = data
 				 all
 				);
 
-  end
- ;
-	
+  end;

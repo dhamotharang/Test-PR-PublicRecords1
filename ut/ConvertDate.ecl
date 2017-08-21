@@ -1,6 +1,7 @@
 /* 
  * Std.Date.ConvertDateFormat can be a replacement for this attribute
- * Std.Date.ConvertDateFormat returns same result except when no date
+ * Std.Date.ConvertDateFormat might not behave 100% same way, returns -ve values for few invalid dates  
+ * Std.Date.ConvertDateFormat wont give same results for partial dates see below 
  * November 2015 input to Std.Date.ConvertDateFormat returns 10/31/2015
  * November 2015 input to UT.ConvertDate returns 11/00/2015. 
 

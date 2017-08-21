@@ -78,4 +78,4 @@ layout_old :=
 	string3			Best_Major_Color_Code;
 	string3			Best_Minor_Color_Code;
 	end; 
-export irs_dummy_recs_main :=  project(dataset(ut.foreign_prod+'~thor_data400::vehv2::irs_main',layout_old,flat),transform(VehicleV2.Layout_Base_Main,self:=left,self :=[]));
+export irs_dummy_recs_main :=  project(dataset('~thor_data400::vehv2::irs_main',layout_old,flat),transform(VehicleV2.Layout_Base_Main,self:=left,self :=[]));

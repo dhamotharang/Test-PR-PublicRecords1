@@ -1,5 +1,5 @@
 /*
-  BIPV2_Tools.SetDuns()
+  BIPV2_Tools.SetDuns() 
     Refreshes the D&B fields; active_duns_number, hist_duns_number, deleted_key(duns_number), company_fein, deleted_fein.
     Explodes proxid and lgid3 clusters that contain a duns_number,cnp_name tuple that is deleted + that same duns_number
       with a different cnp_name that is not deleted.  After explosion of proxid to dotid for the offending clusters, 
@@ -22,6 +22,8 @@ export SetDuns(
     ,boolean                                              pIsTesting      = false
     ,boolean                                              pOverwrite      = false
     ,string                                               pEmailList      = BIPV2_Build.mod_email.emailList
+    ,unsigned6                                            pLgid3_example  = 0           
+    ,boolean                                              pDebug_Outputs  = true
   ) := 
 function
     l_dot := BIPV2.CommonBase.Layout;
@@ -99,7 +101,7 @@ function
       ,self.field_specificity := right.field_specificity
       ,self               := left
     ),left outer,hash);
-    ds_find_candidates_lgid3 := table(join(
+    ds_find_candidates_lgid3_prep := table(join(
                                table(ds_explode_get_bow_lgid3(deleted_key   = '' and duns_number      != ''    ) ,{lgid3,duns_number,cnp_name_bow,field_specificity},lgid3,duns_number,cnp_name_bow,field_specificity,merge)
                               ,table(ds_explode_get_bow_lgid3(deleted_key  != '' /*and prev_deleted_duns = ''*/) ,{lgid3,duns_number,cnp_name_bow,field_specificity},lgid3,duns_number,cnp_name_bow,field_specificity,merge)
                               ,left.lgid3 = right.lgid3 and left.duns_number = right.duns_number and left.cnp_name_bow != '' and right.cnp_name_bow != '' and left.cnp_name_bow != right.cnp_name_bow 
@@ -107,8 +109,29 @@ function
                                 or(     SALT30.HyphenMatch(left.cnp_name_bow,right.cnp_name_bow,1)<=1 
                                     and (MIN(left.field_specificity,right.field_specificity) * 100  < BIPV2_ProxID.Config.cnp_name_Force * 100)
                                 ))
-                              ,transform({unsigned6 lgid3},self := right),hash)
-                            ,{lgid3},lgid3,merge)  : persist('~persist::BIPV2_Files.tools_dotid.ds_find_candidates_lgid3'+ pPersistUnique);
+                              ,transform({unsigned6 lgid3,string duns_number,string cnp_name_bow_left  ,string cnp_name_bow_right,integer cnp_match_score}
+                            ,self.cnp_name_bow_left   := if(left.cnp_name_bow  > right.cnp_name_bow  ,left.cnp_name_bow  ,right.cnp_name_bow)
+                            ,self.cnp_name_bow_right  := if(left.cnp_name_bow  > right.cnp_name_bow  ,right.cnp_name_bow ,left.cnp_name_bow )
+                            ,self.cnp_match_score     := SALT30.MatchBagOfWords(left.cnp_name_bow,right.cnp_name_bow,46614,1)
+                            ,self := right),hash)
+                          ,{lgid3,duns_number,cnp_name_bow_left,cnp_name_bow_right,cnp_match_score},lgid3,duns_number,cnp_name_bow_left,cnp_name_bow_right,cnp_match_score,merge)  : persist('~persist::BIPV2_Files.tools_dotid.ds_find_candidates_lgid3'+ pPersistUnique);
+    
+    ds_corpkey_overrides_lgid3 := BIPV2_Tools.mac_IDs_with_ckey_overrides(ds_concat_pre_full,lgid3,,'ds_corpkey_overrides_lgid3');
+    // -- remove lgid3 explodes that also would have been linked by corpkey
+    ds_find_candidates_lgid3_prep2_inner := join(ds_find_candidates_lgid3_prep ,ds_corpkey_overrides_lgid3  ,
+          left.lgid3              = right.lgid3 
+      and left.cnp_name_bow_left  = right.cnp_name_bow_left 
+      and left.cnp_name_bow_right = right.cnp_name_bow_right 
+    ,transform({recordof(left) or recordof(right)},self := left,self := right),hash);
+
+    ds_find_candidates_lgid3_prep2 := join(ds_find_candidates_lgid3_prep ,ds_corpkey_overrides_lgid3  ,
+          left.lgid3              = right.lgid3 
+      and left.cnp_name_bow_left  = right.cnp_name_bow_left 
+      and left.cnp_name_bow_right = right.cnp_name_bow_right 
+    ,transform(left),left only,hash);
+    // -- needs to be cut down to only lgid in ds_find_candidates_lgid3
+    ds_find_candidates_lgid3 := table(ds_find_candidates_lgid3_prep2  ,{lgid3} ,lgid3,merge);
+    // ----------------------------------
     
     ds_non_candidates_lgid3     := join(ds_get_all_explode_recs_lgid3 ,ds_find_candidates_lgid3 ,left.lgid3 = right.lgid3 ,transform(left),left only,hash)  : persist('~persist::BIPV2_Files.tools_dotid.ds_non_candidates_lgid3'+ pPersistUnique);
     ds_reset_candidates_lgid3   := join(ds_get_all_explode_recs_lgid3 ,ds_find_candidates_lgid3 ,left.lgid3 = right.lgid3 ,transform(l_dot_temp2,self.lgid3_old := left.lgid3,self.lgid3 := left.proxid,self := left),hash): persist('~persist::BIPV2_Files.tools_dotid.ds_reset_candidates_lgid3'    + pPersistUnique);
@@ -157,7 +180,7 @@ function
       ,self.field_specificity := right.field_specificity
       ,self               := left
     ),left outer,hash);
-    ds_find_candidates := table(join(
+    ds_find_candidates_prep := table(join(
                                table(ds_explode_get_bow(deleted_key   = '' and duns_number      != ''    ) ,{proxid,duns_number,cnp_name_bow,field_specificity},proxid,duns_number,cnp_name_bow,field_specificity,merge)
                               ,table(ds_explode_get_bow(deleted_key  != '' /*and prev_deleted_duns = ''*/) ,{proxid,duns_number,cnp_name_bow,field_specificity},proxid,duns_number,cnp_name_bow,field_specificity,merge)
                               ,left.proxid = right.proxid and left.duns_number = right.duns_number and left.cnp_name_bow != '' and right.cnp_name_bow != '' and left.cnp_name_bow != right.cnp_name_bow and SALT30.MatchBagOfWords(left.cnp_name_bow,right.cnp_name_bow,46614,1) < BIPV2_ProxID.Config.cnp_name_Force * 100  //use cnp_name for a little fuzzy here
@@ -165,9 +188,36 @@ function
                                 or(     SALT30.HyphenMatch(left.cnp_name_bow,right.cnp_name_bow,1)<=1 
                                     and (MIN(left.field_specificity,right.field_specificity) * 100  < BIPV2_ProxID.Config.cnp_name_Force * 100)
                                 ))
-                              ,transform({unsigned6 proxid},self := right),hash)
-                          ,{proxid},proxid,merge)  : persist('~persist::BIPV2_Files.tools_dotid.ds_find_candidates'+ pPersistUnique);
+                              ,transform({unsigned6 proxid,string duns_number,string cnp_name_bow_left  ,string cnp_name_bow_right,integer cnp_match_score}
+                            ,self.cnp_name_bow_left   := if(left.cnp_name_bow  > right.cnp_name_bow  ,left.cnp_name_bow  ,right.cnp_name_bow)
+                            ,self.cnp_name_bow_right  := if(left.cnp_name_bow  > right.cnp_name_bow  ,right.cnp_name_bow ,left.cnp_name_bow )
+                            ,self.cnp_match_score     := SALT30.MatchBagOfWords(left.cnp_name_bow,right.cnp_name_bow,46614,1)
+                            ,self := right),hash)
+                          // ,{proxid},proxid,merge)  : persist('~persist::BIPV2_Files.tools_dotid.ds_find_candidates'+ pPersistUnique);
+// -------------------------------------
+                          ,{proxid,duns_number,cnp_name_bow_left,cnp_name_bow_right,cnp_match_score},proxid,duns_number,cnp_name_bow_left,cnp_name_bow_right,cnp_match_score,merge)  : persist('~persist::BIPV2_Files.tools_dotid.ds_find_candidates_proxid'+ pPersistUnique);
     
+    ds_corpkey_overrides_proxid := BIPV2_Tools.mac_IDs_with_ckey_overrides(ds_result_lgid3_full,proxid,,'ds_corpkey_overrides_proxid');
+    // -- remove proxid explodes that also would have been linked by corpkey
+    ds_find_candidates_proxid_prep2_inner := join(ds_find_candidates_prep ,ds_corpkey_overrides_proxid  ,
+          left.proxid             = right.proxid 
+      and left.cnp_name_bow_left  = right.cnp_name_bow_left 
+      and left.cnp_name_bow_right = right.cnp_name_bow_right 
+    ,transform({recordof(left) or recordof(right)},self := left,self := right),hash);
+
+    ds_find_candidates_proxid_prep2 := join(ds_find_candidates_prep ,ds_corpkey_overrides_proxid  ,
+          left.proxid             = right.proxid 
+      and left.cnp_name_bow_left  = right.cnp_name_bow_left 
+      and left.cnp_name_bow_right = right.cnp_name_bow_right 
+    ,transform(left),left only,hash);
+    // -- needs to be cut down to only lgid in ds_find_candidates_proxid
+    ds_find_candidates := table(ds_find_candidates_proxid_prep2  ,{proxid} ,proxid,merge);
+
+// -------------------------------------                        
+    // ds_corpkey_overrides_proxid := BIPV2_Tools.mac_IDs_with_ckey_overrides(ds_result_lgid3_full,proxid,,'ds_corpkey_overrides_proxid');
+    // -- remove lgid3 explodes that also would have been linked by corpkey
+    // ds_find_candidates := join(ds_find_candidates_prep ,ds_corpkey_overrides_proxid  ,left.proxid = right.proxid ,transform(left),left only,hash);
+
     ds_non_candidates    := join(ds_get_all_explode_recs ,ds_find_candidates ,left.proxid = right.proxid ,transform(left),left only,hash)                                       : persist('~persist::BIPV2_Files.tools_dotid.ds_non_candidates'+ pPersistUnique);
     
     ds_candidates1        := join(ds_get_all_explode_recs ,ds_find_candidates ,left.proxid = right.proxid ,transform(recordof(left),self.proxid := left.proxid,self := left),hash): persist('~persist::BIPV2_Files.tools_dotid.ds_candidates'    + pPersistUnique);
@@ -295,6 +345,7 @@ function
     ds_result_full := join(ds_result_pre(company_fein != '') ,table(ds_result_pre(deleted_fein != '',(mdr.sourcetools.sourceisDunn_Bradstreet(source) or mdr.sourcetools.SourceIsDunn_Bradstreet_Fein(source))),{proxid,deleted_fein},proxid,deleted_fein,merge) 
          ,left.proxid       = right.proxid
       and left.company_fein = right.deleted_fein
+      and (mdr.sourcetools.sourceisDunn_Bradstreet(left.source) or mdr.sourcetools.SourceIsDunn_Bradstreet_Fein(left.source))      
       ,transform(
          recordof(left)
         ,self.deleted_fein  := if(right.deleted_fein != ''  ,right.deleted_fein ,'')
@@ -441,11 +492,39 @@ function
     ds_result_lgid3_examples    := join(ds_result_ ,ds_get_exploded_lgid3s  ,left.lgid3_old  = right.lgid3_old   ,transform(left),hash): persist('~persist::BIPV2_Files.tools_dotid.ds_result_lgid3_examples' + pPersistUnique);
     ds_result_proxid_examples   := join(ds_result_ ,ds_get_exploded_proxids ,left.proxid_old = right.proxid_old  ,transform(left),hash): persist('~persist::BIPV2_Files.tools_dotid.ds_result_proxid_examples'+ pPersistUnique);
  
-  
-  
-    output_debug := parallel(
-      if(pDoStrata = true,Strata_explode_stats)
+    // -- get more descriptive examples of splits
+    ds_proxid_explodes_example  := ds_find_candidates_prep       (proxid = pLgid3_example);//{unsigned6 proxid,string duns_number,string cnp_name_bow_left  ,string cnp_name_bow_right,integer cnp_match_score}
+    ds_lgid3_explodes_example   := ds_find_candidates_lgid3_prep (lgid3  = pLgid3_example);//{unsigned6 lgid3 ,string duns_number,string cnp_name_bow_left  ,string cnp_name_bow_right,integer cnp_match_score}
+                               // {pID,active_domestic_corp_key,cnp_name_bow_left,cnp_name_bow_right,cnp_match_score}
+    
+    // -- proxid explodes removed because of corpkey link
+    ds_proxid_explodes_removed_example := ds_find_candidates_proxid_prep2_inner(proxid = pLgid3_example);
+    ds_lgid3_explodes_removed_example  := ds_find_candidates_lgid3_prep2_inner (lgid3  = pLgid3_example);
+    
+    // -- query the corpkey removes to see if the id is in there at all
+    ds_corpkey_overrides_proxid_example := ds_corpkey_overrides_proxid(proxid = pLgid3_example);
+    ds_corpkey_overrides_lgid3_example  := ds_corpkey_overrides_lgid3 (lgid3  = pLgid3_example);
+    
+    // -- output debug
+    output_debug := if(pDebug_Outputs = true
+    ,parallel(
+      if(pDoStrata = true,parallel(
+         Strata_explode_stats
+        ,output(records_affected_total ,,'~thor_data400::BIPV2_Tools.SetDuns::' + pversion + '::records_affected_total' ,compressed,overwrite)
+        ,output(ds_find_candidates_prep               ,,'~thor_data400::BIPV2_Tools.SetDuns::' + pversion + '::proxid_explodes'         ,compressed,overwrite)
+        ,output(ds_find_candidates_lgid3_prep         ,,'~thor_data400::BIPV2_Tools.SetDuns::' + pversion + '::lgid3_explodes'          ,compressed,overwrite)
+        ,output(ds_find_candidates_proxid_prep2_inner ,,'~thor_data400::BIPV2_Tools.SetDuns::' + pversion + '::proxid_explodes_removed' ,compressed,overwrite)
+        ,output(ds_find_candidates_lgid3_prep2_inner  ,,'~thor_data400::BIPV2_Tools.SetDuns::' + pversion + '::lgid3_explodes_removed'  ,compressed,overwrite)
+      ))
      ,output(ds_strata  ,named('ds_strata'),extend)
+     ,if(pLgid3_example != 0  ,parallel(
+        output(topn(ds_proxid_explodes_example          ,500  ,proxid,duns_number,cnp_name_bow_left) ,named('ds_proxid_explodes_example'),all)
+       ,output(topn(ds_lgid3_explodes_example           ,500  ,lgid3 ,duns_number,cnp_name_bow_left) ,named('ds_lgid3_explodes_example' ),all)
+       ,output(topn(ds_corpkey_overrides_proxid_example  ,500  ,proxid,active_domestic_corp_key,cnp_name_bow_left) ,named('ds_corpkey_overrides_proxid_example'),all)
+       ,output(topn(ds_corpkey_overrides_lgid3_example   ,500  ,lgid3 ,active_domestic_corp_key,cnp_name_bow_left) ,named('ds_corpkey_overrides_lgid3_example'  ),all)
+       ,output(topn(ds_proxid_explodes_removed_example  ,500  ,proxid,duns_number,active_domestic_corp_key,cnp_name_bow_left) ,named('ds_proxid_explodes_removed_example'),all)
+       ,output(topn(ds_lgid3_explodes_removed_example   ,500  ,lgid3 ,duns_number,active_domestic_corp_key,cnp_name_bow_left) ,named('ds_lgid3_explodes_removed_example' ),all)
+     ))
      // ,output(topn(fslim(ds_result_lgid3_full  (regexfind('^OLD HEIDELBERG PASTRY SHOP$',trim(cnp_name),nocase))),800,lgid3_old,lgid3,proxid,dotid) ,named('ds_result_lgid3' ),all)
      // ,output(topn(fslim(ds_result_proxid_full (regexfind('^OLD HEIDELBERG PASTRY SHOP$',trim(cnp_name),nocase))),800,lgid3_old,lgid3,proxid,dotid) ,named('ds_result_proxid'),all)
      // ,output(topn(fslim(ds_result             (regexfind('^OLD HEIDELBERG PASTRY SHOP$',trim(cnp_name),nocase))),800,lgid3_old,lgid3,proxid,dotid) ,named('ds_result'       ),all)
@@ -516,7 +595,7 @@ function
      // ,output(choosen(blank_proxid_recs_in     ,800)  ,named('choosen_blank_proxid_recs_in'     + pPersistUnique),all)
      // ,output(choosen(blank_proxid_recs_out    ,800)  ,named('choosen_blank_proxid_recs_out'    + pPersistUnique),all)
     
-    );
+    ));
       
 		return when(ds_result,output_debug);
     

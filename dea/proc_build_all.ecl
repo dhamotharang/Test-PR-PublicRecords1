@@ -1,14 +1,17 @@
-import ut;
+#workunit('name','DEA Weekly Build');
+#OPTION('multiplePersistInstances',FALSE);
+import ut, roxiekeybuild, tools, DEA, Orbit3;
 export proc_build_all(string sourceip,string filename,string filedate,string do_spray='true') :=
 function
 
-insize := 551;
+// insize := 551;
+insize := 246;
 
-ut.mac_file_spray_and_build(sourceip,filename,insize,filedate,'dea',pre);
+ut.mac_file_spray_and_build(sourceip,filename,insize,filedate,'dea',pre,tools.fun_Groupname());
 
 
 e_mail_success := fileservices.sendemail(
-													'roxiebuilds@seisint.com;mluber@seisint.com;tkirk@seisint.com;CPettola@seisint.com;vniemela@seisint.com',
+													'darren.knowles@lexisnexis.com;roxiebuilds@seisint.com;mluber@seisint.com;tkirk@seisint.com;CPettola@seisint.com;charlene.ros@lexisnexis.com',
 													'DEA Roxie Build Succeeded ' + filedate,
 													'keys: 1) thor_data400::key::dea::qa::did(thor_data400::key::dea::'+filedate+'::did),\n' + 
 													'	     2) thor_data400::key::dea::qa::bdid(thor_data400::key::dea::'+filedate+'::bdid),\n' + 
@@ -16,23 +19,34 @@ e_mail_success := fileservices.sendemail(
 													'	     4) thor_data400::key::dea::qa::linkids(thor_data400::key::dea::'+filedate+'::linkids),\n');
 							
 e_mail_fail := fileservices.sendemail(
-													'CPettola@seisint.com;avenkatachalam@seisint.com',
+													'darren.knowles@lexisnexis.com;CPettola@seisint.com;avenkatachalam@seisint.com;charlene.ros@lexisnexis.com',
 													'DEA Roxie Build FAILED',
 													failmessage);
 													
-spraystat := output('Spray done') : success(pre);
-
 build_dea_keys :=	dea.proc_build_key(filedate);
 
+
+update_dops := RoxieKeyBuild.updateversion('DEAKeys',(filedate),'Darren.Knowles@lexisnexis.com;charlene.ros@lexisnexis.com',,'N|B');
+
+orbit_update := Orbit3.proc_Orbit3_CreateBuild('DEA',(filedate),'N|B');
+
 e_mail_ret := if(do_spray='true',
-						sequential(spraystat,dea.proc_build_base(filedate),
+						sequential(pre,
+						           DEA.Scrub_DEA(filedate).All,
+						           dea.proc_build_base(filedate),
 											 build_dea_keys,									
 											 dea.proc_accept_sk_To_QA,
-											 dea.Proc_Build_Boolean_Keys(filedate)),
+											 dea.Proc_Build_Boolean_Keys(filedate),
+											 update_dops,
+											 dea.SampleRecs,
+											 orbit_update),
 						sequential(dea.proc_build_base(filedate),
 											 build_dea_keys,
 											 dea.proc_accept_sk_To_QA,
-											 dea.Proc_Build_Boolean_Keys(filedate))
+											 dea.Proc_Build_Boolean_Keys(filedate),
+											 update_dops,
+											 dea.SampleRecs,
+											 orbit_update)
 											 ) :
 						success(e_mail_success),
 						failure(e_mail_fail);

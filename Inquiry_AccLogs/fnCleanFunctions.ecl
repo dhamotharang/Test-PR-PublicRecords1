@@ -1,23 +1,141 @@
+/*2017-02-23T01:39:29Z (Fernando Incarnacao)
+DF-18515 - Update Inquiry Tracking vertical filters according to the current exclusion criteria
+*/
+
+/*2016-10-27T18:07:01Z (Fernando Incarnacao)
+RQ-13003 - Fix removing parenthesis from the ROLLPERSEARCH function description. 
+*/
+
 import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, lib_word;
 import standard, header_slimsort, didville, business_header,watchdog, mdr, header;
 
 export fnCleanFunctions := module
 
-export FCRA_ReappendDay := ['tuesday','wednesday'] : stored('FCRA_Append_Date');
+export FCRA_ReappendDay := ['friday'] : stored('FCRA_Append_Date');
 
 export fnCleanUp(string instring) := trim(stringlib.stringtouppercase(stringlib.stringfilterout(
 																			if(trim(stringlib.stringtouppercase(instring), all) = 'COLLECTION', 'COLLECTIONS', stringlib.stringtouppercase(instring)),
 																			'?')), left, right);
-																					
-export FilterCds := ['INTERNATIONAL VERTICAL','GOVERNMENT & ACADEMIC','GOVERNMENT HEALTHCARE','LNSSI','HEALTHCARE INITIATIVE','HEALTHCARE','GOVERNMENT','LEGAL','INSURANCE','USLM','DIRECT MARKETING','INTERNAL','BACKGROUND SCREENING'];
 
-export Industry_FilterCds := ['HEALTHCARE','GOVERNMENT','INSURANCE','TEST ACCOUNT','INTERNAL'];
+// Reviewed as per doc update of 03/31/2017																		
+export FilterCds := 
+['AUTO'
+,'AUTO CLAIMS SUMMARY'
+,'AUTO MARKETING'
+,'AUTO UNDERWRITING'
+,'BACKGROUND SCREENING'
+,'COMMERCIAL'
+,'COPLOGIC SOLUTIONS'
+,'CORE'
+,'DATA SERVICES'
+,'DATA/BULK OKC'
+,'DISCONTINUEDOPS'
+,'DIRECT MARKETING'
+,'ECLA INTERNATIONAL'
+,'GOVERNMENT'
+,'GOVERNMENT CORE'
+,'GOVERNMENT CORE FED'
+,'GOVERNMENT CORE SL'
+,'GOVERNMENT RISK'
+,'GOVERNMENT & ACADEMIC'
+,'GOVERNMENT HEALTHCARE'
+,'HEALTHCARE'
+,'HEALTHCARE â€“ COMMERCIAL'
+,'HEALTHCARE-GOV FED'
+,'HEALTHCARE-GOV SL'
+,'HEALTHCARE â€“ GOVERNMENT'
+,'HEALTHCARE â€“ INITIATIVE'
+,'HEALTHCARE ANALYTICS'
+,'HEALTHCARE INITIATIVE'
+,'HOME'
+,'HOME OWNERS'
+,'INSURANCE'
+,'INSURANCE EXCHANGE'
+,'INSURANCE INTERNATIONAL'
+,'INSURANCE-OTHER'
+,'INSURANCE OTHER'
+,'INSURANCE UNASSIGNED'
+,'INTERNAL'
+,'INTERNATIONAL VERTICAL'
+,'LIFE'
+,'LIFE INSURANCE'
+,'LIFE SCIENCES'
+,'LNSSI'
+,'PAYER'
+,'PENDING ASSIGNMENT'
+,'PHARMACY'
+,'PI/BACKGROUND'
+,'PROVIDER'
+,'SIGNATURE INFO SERVICES'
+,'USLM'
+,'VITALCHE'
+,''];
 
-export ProductCode_FilterCds := ['I','B','7'];
+export FilterCds_extra := 'HEALTH|AUTO|HOME|INSURANCE|INTERNATIONAL|UNDERWRITING|LIFE';
+
+export Industry_FilterCds := 
+['BACKGROUND SCREENING'
+,'CHILD SUPPORT'
+,'EMPLOYMENT SCREENING'
+,'GOVERNMENT'
+,'HEALTHCARE'
+,'HEATHCARE'
+,'INSURANCE'
+,'INTERNAL'
+,'TEST ACCOUNT'];
+
+export SubMarket_FilterCds := 
+['BACKGROUND SCREENING'
+,'HEALTH & HUMAN SERVICES'
+,'HEALTH & HUMAN SERVICES.FEDERAL'
+,'HEALTH & HUMAN SERVICES.LOCAL'
+,'HEALTH & HUMAN SERVICES.STATE'
+,'HEALTHCARE'
+,'INTERNAL'
+,'PRIVATE INVESTIGATORS'
+,'PUBLIC SAFETY'
+,'PUBLIC SAFETY.FEDERAL'
+,'PUBLIC SAFETY.LOCAL'
+,'PUBLIC SAFETY.STATE'
+,'REG & ADMIN'
+,'REG & ADMIN.FEDERAL'
+,'REG & ADMIN. LOCAL'
+,'REG & ADMIN.STATE'
+,'SM-BACKGROUND SCREENING'
+,'SM-HEALTHCARE'
+,'SM-PUBLIC SAFETY.FEDERAL'
+,'SM-PUBLIC SAFETY.LOCAL'
+,'SM-REG & ADMIN.FEDERAL'
+,'SM-REG & ADMIN.LOCAL'
+,'SM-TAX & REVENUE.FEDERAL'
+,'SM-HEALTH & HUMAN SERVICES.FED'
+,'SM-HEALTH & HUMAN SERVICES.LOC'
+,'SM-HEALTH & HUMAN SERVICES.STA'
+,'SM-HEALTHCARE'
+,'SM-PRIVATE INVESTIGATORS'
+,'SM-PUBLIC SAFETY.FEDERAL'
+,'SM-PUBLIC SAFETY.LOCAL'
+,'SM-PUBLIC SAFETY.STATE'
+,'SM-REG & ADMIN.FEDERAL'
+,'SM-REG & ADMIN.LOCAL'
+,'SM-REG & ADMIN.STATE'
+,'SM-TAX & REVENUE.FEDERAL'
+,'SM-TAX & REVENUE.LOCAL'
+,'SM-TAX & REVENUE.STATE'
+,'TAX & REVENUE'
+,'TAX & REVENUE.FEDERAL'
+,'TAX & REVENUE.LOCAL'
+,'TAX & REVENUE.STATE'];
+
+export healthcare_FilterCds_extra :=  'BLOOD CENTER|CANCER CENTER|CHIROPRACTIC|CLINIC|DENTAL|DOCTOR|HEALTH|HEALTHCARE|HOSPITAL |HOSPITAL$|HOSPITAL,|MEDICAL|MEDICINE|ONCOLOGY|PHARMACY|PHYSICAL THERAPY|PHYSICIAN|SURGERY|SURGERIES|SURGICAL|THERAPY|BLUE CROSS|BLUE SHIELD|BLUECROSS|BLUESHIELD';
+
+export ProductCode_FilterCds := ['I','B','7']; //not used anymore - 20131005. bridger is now the assigned product code from MBS ('1')
+
+export Source_FilterCds := ['IDM/BLS','IDM','IDM_BLS','BLS','BRIDGER']; //20131005 created for filtering in risk_indicators key without manipulating the product code field
 
 export nullset := ['none','NONE','','NULL','null','UNKNOWN','unknown', 'UKNOWN', 'Null','\'N', '\\N', '\'\\N'];
 
-export rll2months(DATASET(Inquiry_AccLogs.Layout.Common) base_file) := FUNCTION
+export rll2months(DATASET(Inquiry_AccLogs.Layout.Common_ThorAdditions) base_file) := FUNCTION
 
 HashBaseFile := project(base_file, 
 														transform({unsigned8 person_q_id, unsigned8 bus_q_id, unsigned8 bususer_q_id, 
@@ -61,7 +179,7 @@ iHashBaseFile := iterate(gsHashBaseFile, transform({recordof(gsHashBaseFile)},
 
 ddpBaseFile := dedup(iHashBaseFile, mbs.company_id, mbs.global_company_id, bus_intel.industry, bus_intel.sub_market, bus_intel.vertical, bus_INTEL.USE, allow_flags.allowflags, search_info.product_code, search_info.method, search_info.function_description, bususer_q_id, person_q_id, bus_q_id, seqcnt, right, local);
 
-prjBaseFile := project(ddpBaseFile, Inquiry_AccLogs.Layout.Common);
+prjBaseFile := project(ddpBaseFile, Inquiry_AccLogs.Layout.Common_ThorAdditions);
 
 RETURN prjBaseFile;
 
@@ -74,11 +192,14 @@ export CleanFields(inputFile,outputFile) := macro
 		#EXPORTXML(doCleanFieldMetaInfo, recordof(inputFile))
 
 		#uniquename(myCleanFunction)
-
-		string %myCleanFunction%(string x) := trim(stringlib.stringfindreplace(stringlib.stringfindreplace(stringlib.stringtouppercase(
-																					map(trim(x,all) in Inquiry_AccLogs.fnCleanFunctions.nullset => '', 
-																						  stringlib.stringcleanspaces(stringlib.stringfilterout(x,'{}|_><+=*~[]!@#$%^&*()?;\"`')))
-																					), '&amp;', '&'), '\\N',''), left, right);
+		string %myCleanFunction%(string x) := stringlib.stringcleanspaces(regexreplace('[^[:print:]]+',trim(stringlib.stringfindreplace(stringlib.stringfindreplace(stringlib.stringtouppercase(
+																					map(trim(x,all) in Inquiry_AccLogs.fnCleanFunctions.nullset => '',
+																					    if (stringlib.stringfind(x,'(ROLLUP)',1)>0,
+																									stringlib.stringcleanspaces(stringlib.stringfilterout(x,'{}|_><+=*~[]!@#$%^&*?;\"`')),
+																									stringlib.stringcleanspaces(stringlib.stringfilterout(x,'{}|_><+=*~[]!@#$%^&*()?;\"`'))
+																									)
+																							)		
+																					), '&amp;', '&'), '\\N',''), left, right),' '));
 
 		#uniquename(tra)
 		inputFile %tra%(inputFile le) :=
@@ -90,7 +211,7 @@ export CleanFields(inputFile,outputFile) := macro
 		#SET (doCleanFieldText, false)
 		#FOR (doCleanFieldMetaInfo)
 		 #FOR (Field)
-			#IF (%'@type'% = 'string')
+			#IF (%'@type'% = 'string' )
 			#SET (doCleanFieldText, 'SELF.' + %'@name'%)
 				#APPEND (doCleanFieldText, ':= ' + %'myCleanFunction'% + '(le.')
 			#APPEND (doCleanFieldText, %'@name'%)
@@ -189,106 +310,6 @@ export repflag(string function_description, string orig_lname, string orig_full_
 
 export fraudback(string function_description, string orig_ip_address) := map(stringlib.stringfind(function_description, 'CHARGEBACK',1) > 0 or  
 																																						 stringlib.stringfind(function_description, 'FRAUDPOINT',1) > 0 => ORIG_IP_ADDRESS, ''); // for PERSON_ORIG_IP_ADDRESS1
-
-export clean_and_parse(dataset(inquiry_acclogs.Layout_In_Common) longfile = dataset([], inquiry_acclogs.Layout_In_Common)) := function
-
-longfilehashed := distribute(project(longfile, transform({recordof(longfile), integer hashkey := 0}, 
-													self.hashkey := hash64(left.ORIG_FULL_NAME1 + left.ORIG_COMPANY_NAME1);
-													self := left)), hashkey);
-
-trimInfile1 := table(longfilehashed, {NAMETYPE, CNAMETYPE, string ORIG_NAME := ORIG_FULL_NAME1, ORIG_FULL_NAME1, ORIG_COMPANY_NAME1, NM := 'P', hashkey}, hashkey, local);													
-trimInfile2 := table(longfilehashed, {NAMETYPE, CNAMETYPE, string ORIG_NAME := ORIG_COMPANY_NAME1, ORIG_FULL_NAME1, ORIG_COMPANY_NAME1, NM := 'B', hashkey}, hashkey, local);
-
-trimInfile := trimInfile1 + trimInfile2;													
-
-Address.Mac_Is_Business(trimInfile(LIB_Word.Word(ORIG_NAME,2) <> ''), ORIG_NAME, OUTFILE1, NAMETYPE, false,false) 
-
-outfile1A := trimInfile(LIB_Word.Word(ORIG_NAME,2) = '') + outfile1;
-
-// / * causing issues with too many complex help classes - thor terminate */////
-// Address.Mac_Is_Business(OUTFILE1A(LIB_Word.Word(ORIG_COMPANY_NAME1,2) <> ''), ORIG_COMPANY_NAME1, OUTFILE2, CNAMETYPE, false,false)
-
-// outfile2A :=  OUTFILE1A(LIB_Word.Word(ORIG_COMPANY_NAME1,2) = '') + outfile2;
-
-outfile2A := join(outfile1A(NM = 'P'), outfile1A(NM = 'B' and NAMETYPE <> ''), left.hashkey = right.hashkey,
-											transform(recordof(left),
-																	self.cnametype := right.nametype,
-																	self := left), local);
-
-infile_typed := join(longfilehashed, outfile2A(nametype + cnametype <> ''), left.hashkey = right.hashkey, 
-											transform({recordof(longfilehashed)},
-																	self.nametype := right.nametype,
-																	self.cnametype := right.cnametype,
-																	self := left),
-											left outer, local);
-
-remapOutFile := project(infile_typed/*(nameType = 'B' or cNameType = 'P')*/, transform(inquiry_acclogs.Layout_In_Common,
-																						
-																						self.ORIG_FULL_NAME1 := map(left.cNameTYpe = 'P'  and left.orig_full_name1 = '' => 
-																																					left.orig_company_name1, 
-																																				left.NameType = 'B'=> '',
-																																					left.ORIG_FULL_NAME1);
-																						self.ORIG_FULL_NAME2 := map(left.nameType <> 'B' and left.cNameType <> 'P' => left.ORIG_FULL_NAME2, '');
-																						self.ORIG_FNAME := map(left.nameType <> 'B' and left.cNameType <> 'P' => left.ORIG_FNAME, '');
-																						self.ORIG_MNAME := map(left.nameType <> 'B' and left.cNameType <> 'P' => left.ORIG_MNAME, '');
-																						self.ORIG_LNAME := map(left.nameType <> 'B' and left.cNameType <> 'P' => left.ORIG_LNAME, '');
-																						self.ORIG_NAMESUFFIX := map(left.nameType <> 'B' and left.cNameType <> 'P' => left.ORIG_NAMESUFFIX, '');
-																						self.CLEAN_NAME := map(left.nameType <> 'B' and left.cNameType <> 'P' => left.CLEAN_NAME, '');
-																						
-																						self.ORIG_COMPANY_NAME1 :=  map(left.NameTYpe = 'B'  and left.orig_company_name1 = '' => 
-																																							left.orig_full_name1, 
-																																						left.cNameType = 'P' => '',
-																																							left.orig_company_name1);
-																						self.CLEAN_CNAME1 := trim(ut.CleanCompany(self.ORIG_COMPANY_NAME1), left,right);
-																						
-																						self := left)); 
-
-ToBeCleaned := remapOutFile; // results from mac is business where nametype = B
-							 // + outfile2A(nameType <> 'B' and cNameType <> 'P'); // results from mac is business where nametype <> B
-							 // InFile(ORIG_COMPANY_NAME1 <> '' or LIB_Word.Word(ORIG_FULL_NAME1,2) = ''); // records that do not need to go thru mac is business
-
-Inquiry_AccLogs.macNameCleaner(ToBeCleaned, CommonNameClean, ORIG_FULL_NAME1, 'F', ORIG_FULL_NAME2, 'F');
-Inquiry_AccLogs.macAddressCleaner(CommonNameClean, CommonNameAddrClean_1, CLEAN_ADDR1, Clean_ADDR, orig_addr1, orig_lastline1);
-Inquiry_AccLogs.macAddressCleaner(CommonNameAddrClean_1(ORIG_ADDR2 <> ''), CommonNameAddrClean_2, CLEAN_ADDR2, Clean_ADDR, orig_addr2, orig_lastline2);
-
-CommonNameAddrClean := CommonNameAddrClean_1(ORIG_ADDR2 = '') + CommonNameAddrClean_2;
-
-return project(CommonNameAddrClean, TRANSFORM(Inquiry_Acclogs.Layout_In_Common,
-
-														self.REPFLAG	:= RepFlag(left.FUNCTION_DESCRIPTION,left.orig_full_name1,left.fname+left.lname+left.orig_fname+left.orig_lname);
-
-														cleanname := left.clean_name;
-													self.title := stringlib.stringfilter(cleanName[1..5], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ-\' ');
-													self.fname := stringlib.stringfilter(cleanName[6..25], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ-\' ');
-													self.mname := stringlib.stringfilter(cleanName[26..45], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ-\' ');
-													self.lname := stringlib.stringfilter(cleanName[46..65], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ-\' ');
-													self.name_suffix := stringlib.stringfilter(cleanName[66..70], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ-\' ');
-
-														cleanaddr := left.CLEAN_ADDR1;
-													self.prim_range := address.CleanAddressFieldsFips(cleanaddr).prim_range;//[1..10];
-													self.predir := address.CleanAddressFieldsFips(cleanaddr).predir;
-													self.prim_name := address.CleanAddressFieldsFips(cleanaddr).prim_name;
-													self.addr_suffix := address.CleanAddressFieldsFips(cleanaddr).addr_suffix;
-													self.postdir := address.CleanAddressFieldsFips(cleanaddr).postdir;
-													self.unit_desig := address.CleanAddressFieldsFips(cleanaddr).unit_desig;
-													self.sec_range := address.CleanAddressFieldsFips(cleanaddr).sec_range;
-													self.v_city_name := stringlib.stringfindreplace(address.CleanAddressFieldsFips(cleanaddr).v_city_name, 'XXXXX YY', '');
-													self.st := address.CleanAddressFieldsFips(cleanaddr).st;
-													self.zip5 :=if( cleanaddr[117..121] <> '99999',  cleanaddr[117..121], '');
-													self.zip4 := address.CleanAddressFieldsFips(cleanaddr).zip4;
-													self.addr_rec_type := address.CleanAddressFieldsFips(cleanaddr).rec_type;
-													self.fips_state := address.CleanAddressFieldsFips(cleanaddr).fips_state;
-													self.fips_county := address.CleanAddressFieldsFips(cleanaddr).fips_county;
-													self.geo_lat := address.CleanAddressFieldsFips(cleanaddr).geo_lat;
-													self.geo_long := address.CleanAddressFieldsFips(cleanaddr).geo_long;
-													self.cbsa := '';
-													self.geo_blk := address.CleanAddressFieldsFips(cleanaddr).geo_blk;
-													self.geo_match := address.CleanAddressFieldsFips(cleanaddr).geo_match;
-													self.err_stat := address.CleanAddressFieldsFips(cleanaddr).err_stat;
-													
-													self := left));
-end;
-
 export common_clean_layout := record
 				STRING	SOURCE_FILE;
 				STRING	ORIG_IP_ADDRESS;

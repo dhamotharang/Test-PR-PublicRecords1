@@ -1,0 +1,1 @@
+EXPORT In_Property_Transaction := InsuranceHeader_Property_Transactions_DeedsMortgages.files().salt_input_qa;

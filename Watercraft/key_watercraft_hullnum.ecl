@@ -1,4 +1,4 @@
-import doxie,ut;
+import doxie,ut,data_services;
 
 in_sh := watercraft.File_Base_Search_Dev;
 in_mn := watercraft.File_Base_Main_Dev;
@@ -49,4 +49,4 @@ hullnum_slim_vld := join(hullnum_slim_dst2, in_sh_dep,
 
 export key_watercraft_hullnum := index(hullnum_slim_vld,
             {hull_number},{state_origin,watercraft_key,sequence_key},
-            ut.foreign_prod+'thor_data400::key::watercraft_hullnum_'+doxie.Version_SuperKey);
+            data_services.data_location.prefix('watercraft')+'thor_data400::key::watercraft_hullnum_'+doxie.Version_SuperKey);

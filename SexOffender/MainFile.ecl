@@ -1,7 +1,4 @@
-/*2009-12-01T16:53:41Z (Judy Tao)
-
-*/
-import doxie_build, codes, didville, did_add, header_slimsort, watchdog, ut, _control, header;
+import doxie_build, codes, didville, did_add, header_slimsort, watchdog, ut, _control, header, idl_header;
 
 // 'local'
 // 'hash'
@@ -11,7 +8,11 @@ did_how := 'local';
 //#stored('did_add_force','roxi'); // remove or set to 'thor' to put recs through thor
 #stored('did_add_force','thor'); // remove or set to 'thor' to put recs through thor
 
-df_orig := sexoffender.allpeople;
+df_original := sexoffender.allpeople;
+
+//Add FlipFlop Macro///////////////////
+ut.mac_flipnames(df_original, fname, mname, lname, df_orig);
+
 Layout_seq := record
 	unsigned seq;
 	df_orig;
@@ -22,6 +23,7 @@ didville.Layout_Did_InBatch prep_for_did(df l) := transform
   self.phone10 := '';
 	self.suffix := l.name_suffix;
 	self.z5 := l.zip5;
+	self.dob := if((unsigned)l.dob > 0,l.dob,l.age);
 	self := l;
 end;
 to_did := project(df, prep_for_did(LEFT));
@@ -158,9 +160,13 @@ hdr_slim_tbl_dep := dedup(hdr_slim_tbl_srt, did, prim_range, prim_name, sec_rang
 main_dst := distribute(main1, hash(did));
 
 sexoffender.Layout_Out_Main get_addr_dt(main_dst l, hdr_slim_tbl_dep r) := transform
-     self.addr_dt_last_seen := map(l.prim_name = '' => '',
-	                              r.dt_last_seen > (unsigned3)(l.reg_date_1[1..6]) => (string6)r.dt_last_seen, 
-							l.reg_date_1[1..6]);
+     self.addr_dt_last_seen := 	if(l.prim_name = '',
+									'',
+								if(r.dt_last_seen > (unsigned3)l.reg_date_1[1..6] and (unsigned3)ut.getdate[1..6] > r.dt_last_seen,
+									(string6)r.dt_last_seen,
+								if((unsigned3)ut.getdate[1..6] > (unsigned3)l.reg_date_1[1..6],
+									l.reg_date_1[1..6],
+									''))); 
 	self := l;
 end;
 
@@ -292,7 +298,25 @@ sexoffender.layout_out_main tr_set_flags(fix_file L) := TRANSFORM
 
 ds_fixed_data_flagged := PROJECT(fix_file,tr_set_flags(LEFT));
 
+//Suppress Records///////////////////////////////////////////////////////
+
+	//Bugzilla #80123
+	ds_fixed_data_flagged removeInfo(ds_fixed_data_flagged l):= transform
+		self.ssn_appended	:= if(l.ssn_appended='353561176' and l.did=2275932305,
+								'',
+								l.ssn_appended);
+		self.did			:= if(l.ssn_appended='353561176' and l.did=2275932305,
+								0,
+								l.did);
+		self.score			:= if(l.ssn_appended='353561176' and l.did=2275932305,
+								0,
+								l.score);
+		self 				:= l;
+	end;
+
+	suppressed_records := project(ds_fixed_data_flagged, removeInfo(left));
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 //export BWR_Produce_MainFile := output(ds_fixed_data,,'out::sex_offender_main'+ doxie_build.buildstate + sexOffender.version,overwrite) : persist('~thor_data400::Persist::Sex_Offender_With_did_ssn','thor_dell400_2');
-export MainFile := ds_fixed_data_flagged : persist('~thor_data400::Persist::Sex_Offender_With_did_ssn','thor400_92');
+export MainFile := suppressed_records : persist('~thor_data400::Persist::Sex_Offender_With_did_ssn','thor400_92');

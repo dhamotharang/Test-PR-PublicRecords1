@@ -1,58 +1,136 @@
-import Lib_AddrClean;
+import ut,address;
 
-Layout_Lobbyists_Common CleanLobbyists(Layout_Lobbyists_Common InputRecord) := transform
+pattern letter := pattern('[A-Z]');
+pattern number := pattern('[1-9][0-9]*');
+pattern anychr := pattern('[A-Z0-9]');
+pattern ws := ' '+;
+pattern word := repeat(letter,2,any);
+
+pattern primdir := (('N' or 'S' or 'E' or 'W') opt('.')) or 'NORTH' or 'SOUTH' or 'EAST' or 'WEST';
+pattern secdir := 'NE' or 'SE' or 'SW' or 'NW' or 'N.E.' or 'S.E.' or 'S.W.' or 'N.W.' or 'NORTHEAST' or 'SOUTHEAST' or 'NORTHWEST' or 'SOUTHWEST' or 'N E' or 'S E' or 'S W' or 'N W';
+pattern strdir := primdir or secdir;
+pattern poststrtype := (('ST' or 'RD' or ('AV' opt('E')) or 'CT' or ('DR' opt('V')) or 'PL' or 'LN' or 'BLVD' or 'CIR' or 'TERR') opt('.')) or 'WAY' or 'ROAD' or 'CIRCLE' or 'TERRACE' or 'LOOP' or 'STREET' or 'AVENUE' or 'COURT' or 'DRIVE' or 'PLACE' or 'PARKWAY' or 'LANE' or 'HIGHWAY' or 'FREEWAY' or 'EXPRESSWAY' or 'PATH' or 'PASS' or 'TRAIL' or 'PLAZA' or 'SQUARE' or 'PIKE' or 'TURNPIKE' or 'RUN' or 'ROW' or 'CURVE' or 'BOULEVARD' or 'TRACE' or 'PARK';
+pattern prestrtype := ('AVENUE' or ('AV' opt('E') opt('.')) or 'PASEO' or 'CALLE' or 'VIA' or 'AVENIDA' or ('AVDA' opt('.')) or 'CAMINO' or 'PLACITA' or 'RUE');
+pattern highwaytype := opt('OLD' ws) (('US' ws 'HIGHWAY') or ('US' ws 'HWY') or ('STATE' ws 'HIGHWAY') or ('STATE' ws 'HWY') or 'HWY' or ('STATE' ws 'ROUTE') or ('STATE' ws 'ROAD') or ('COUNTY' ws 'ROAD') or 'HIGHWAY' or ('COUNTY' ws 'RD') or ('CO' ws 'RD'));
+pattern poststrname := (((opt(('L' or 'D' or 'O') '\'') word) or 'MT.' or 'ST.') repeat(ws ((opt(('L' or 'D' or 'O') '\'') word) or 'MT.' or 'ST.'))) or (number ('ST' | 'ND' | 'RD' | 'TH')) or letter or (word ws letter opt('.') ws word) or (number ws 'MILE') or ('"' letter '"');
+pattern prestrname := (word repeat(ws word)) or letter or (word ws letter opt('.') ws word) or ('"' letter '"');
+pattern highwaynum := number opt(opt('-') letter);
+pattern notypestr := 'BROADWAY';
+pattern predir := strdir;
+pattern strname := (poststrname ws poststrtype) or (prestrtype ws prestrname) or (highwaytype ws highwaynum) or notypestr;
+pattern postdir := strdir;
+pattern unittype := (('APT' or 'STE' or 'FL' or 'BLDG' or 'TRLR' or 'SP') opt('.')) or 'UNIT' or 'SPACE' or 'LOT' or 'BOX' or 'SUITE';
+pattern unitnum := repeat(anychr,1,any) opt('-' repeat(anychr,1,any));
+pattern housenum := number opt(('-' number) or (opt('-') letter) or (('-' or ws) '1/2'));
+pattern roadway := (opt(predir ws) strname opt(opt(',') ws postdir)) or (predir ws number ws postdir);
+pattern subunit := (((unittype ws opt('#' opt(ws))) or ('#' opt(ws))) unitnum) or 'LOWR' or 'UPPR' or 'FRNT' or 'REAR' or 'BSMT';
+pattern boxnum := pattern('[1-9A-Z]') repeat(anychr);
+
+pattern straddr := housenum ws roadway opt((',' or (opt(',') ws)) subunit);
+pattern pobox := (('PO' ws 'BOX') or 'BOX' or ('P' ws 'O' ws 'BOX') or ('POST' ws 'OFFICE' ws 'BOX') or ('P.O.' ws 'BOX') or ('P.' ws 'O.' ws 'BOX') or 'POB' or 'P.O.B.') ws boxnum;
+
+pattern city := opt(primdir ws) opt('FT' opt('.') ws) opt('MT' opt('.') ws) opt('ST' opt('.') ws) opt(('L' or 'O' or 'D') '\'') word repeat(('-' or ws) opt(('L' or 'O' or 'D') '\'') word);
+pattern state := 'AK' | 'HI' | 'WA' | 'OR' | 'CA' | 'MT' | 'ID' | 'NV' | 'WY' | 'AZ' |
+                 'CO' | 'UT' | 'NM' | 'ND' | 'SD' | 'NE' | 'OK' | 'TX' | 'MN' | 'WI' |
+								 'IA' | 'IL' | 'MO' | 'IN' | 'AR' | 'LA' | 'MI' | 'OH' | 'KY' | 'TN' |
+								 'AL' | 'MS' | 'FL' | 'GA' | 'SC' | 'NC' | 'VA' | 'WV' | 'MD' | 'DC' |
+								 'ME' | 'VT' | 'NH' | 'RI' | 'CT' | 'MA' | 'NY' | 'PA' | 'NJ' | 'DE' | 'KS';
+pattern zip := pattern('[0-9]{5}') opt(opt('-') pattern('[0-9]{4}'));
+
+pattern addressrule := straddr or pobox;
+pattern cszrule := city ((opt(',') ws) or ',') state ((opt(',') ws) or ',') zip;
+
+pattern completerule := addressrule ((opt(',') ws) or ',') cszrule;
+
+Layout_WholeLobbyistAddress := record
+  Joined_Lobbyists;
+	string Lobbyist_Address_Whole_Delivery := matchtext(addressrule);
+	string Lobbyist_Address_Whole_CSZLine := matchtext(cszrule);
+end;
+
+RecordsWithSplitLobbyistAddress := parse(Joined_Lobbyists,Lobbyist_Address_Whole,completerule,Layout_WholeLobbyistAddress,noscan,best,not matched,nocase);
+
+Layout_WholeFirmAddress := record
+  RecordsWithSplitLobbyistAddress;
+	string Firm_Address_Whole_Delivery := matchtext(addressrule);
+	string Firm_Address_Whole_CSZLine := matchtext(cszrule);
+end;
+
+RecordsWithSplitFirmAddress := parse(RecordsWithSplitLobbyistAddress,Firm_Address_Whole,completerule,Layout_WholeFirmAddress,noscan,best,not matched,nocase);
+
+Layout_WholeAssociationAddress := record
+  RecordsWithSplitFirmAddress;
+	string Association_Address_Whole_Delivery := matchtext(addressrule);
+	string Association_Address_Whole_CSZLine := matchtext(cszrule);
+end;
+
+RecordsWithSplitAssociationAddress := parse(RecordsWithSplitFirmAddress,Association_Address_Whole,completerule,Layout_WholeAssociationAddress,noscan,best,not matched,nocase);
+
+Layout_Lobbyists_Common CleanLobbyists(Layout_WholeAssociationAddress InputRecord) := transform
 	string73 tempLobbyistName := stringlib.StringToUpperCase(if(trim(InputRecord.Lobbyist_Name_Full,left,right) <> '',
-	                                lib_AddrClean.AddrCleanLib.CleanPerson73(trim(InputRecord.Lobbyist_Name_Full,left,right)),
+	                                address.CleanPerson73(trim(InputRecord.Lobbyist_Name_Full,left,right)),
 																	if(trim(trim(InputRecord.Lobbyist_Name_First,left,right) + ' ' +
 																	        trim(InputRecord.Lobbyist_Name_Middle,left,right) + ' ' +
 																					trim(InputRecord.Lobbyist_Name_Last,left,right) + ' ' +
 																					trim(InputRecord.Lobbyist_Name_Suffix,left,right),left,right) <> '',
-																	   lib_AddrClean.AddrCleanLib.CleanPerson73(trim(trim(InputRecord.Lobbyist_Name_First,left,right) + ' ' +
+																	   address.CleanPerson73(trim(trim(InputRecord.Lobbyist_Name_First,left,right) + ' ' +
 																	                                                 trim(InputRecord.Lobbyist_Name_Middle,left,right) + ' ' +
 																					                                         trim(InputRecord.Lobbyist_Name_Last,left,right) + ' ' +
 																					                                         trim(InputRecord.Lobbyist_Name_Suffix,left,right),left,right)),
 																		 '')));
 	string182 tempLobbyistAddressReturn := stringlib.StringToUpperCase(if(InputRecord.Lobbyist_Address_CSZ_Line <> '',
-																						lib_AddrClean.AddrCleanLib.CleanAddress182(trim(InputRecord.Lobbyist_Address_Street_Line,left,right),
+																						address.CleanAddress182(trim(InputRecord.Lobbyist_Address_Street_Line,left,right),
 	                                                                                     trim(InputRecord.Lobbyist_Address_CSZ_Line,left,right)),
 																						if(InputRecord.Lobbyist_Address_Street_Line <> '' or
 																						   InputRecord.Lobbyist_Address_City <> '' or
 																							 InputRecord.Lobbyist_Address_State <> '' or
 																							 InputRecord.Lobbyist_Address_ZIP <> '',
-																							 lib_AddrClean.AddrCleanLib.CleanAddress182(trim(InputRecord.Lobbyist_Address_Street_Line,left,right),
+																							 address.CleanAddress182(trim(InputRecord.Lobbyist_Address_Street_Line,left,right),
 																							                                            trim(trim(InputRecord.Lobbyist_Address_City,left,right) + ', ' +
 																																													     trim(InputRecord.Lobbyist_Address_State,left,right) + ' ' +
 																																															 trim(InputRecord.Lobbyist_Address_ZIP,left,right),left,right)),
-																							 '')));
+																							 if(InputRecord.Lobbyist_Address_Whole_Delivery <> '' or
+																							    InputRecord.Lobbyist_Address_Whole_CSZLine <> '',
+																									address.CleanAddress182(trim(InputRecord.Lobbyist_Address_Whole_Delivery,left,right),
+																									                                           trim(InputRecord.Lobbyist_Address_Whole_CSZLine,left,right)),
+																									''))));
 	string182 tempFirmAddressReturn := stringlib.StringToUpperCase(if(InputRecord.Firm_Address_CSZ_Line <> '',
-																				lib_AddrClean.AddrCleanLib.CleanAddress182(trim(InputRecord.Firm_Address_Street_Line,left,right),
+																				address.CleanAddress182(trim(InputRecord.Firm_Address_Street_Line,left,right),
 	                                                                                 trim(InputRecord.Firm_Address_CSZ_Line,left,right)),
 																				if(InputRecord.Firm_Address_Street_Line <> '' or
 																				   InputRecord.Firm_Address_City <> '' or
 																					 InputRecord.Firm_Address_State <> '' or
 																					 InputRecord.Firm_Address_ZIP <> '',
-																					 lib_AddrClean.AddrCleanLib.CleanAddress182(trim(InputRecord.Firm_Address_Street_Line,left,right),
+																					 address.CleanAddress182(trim(InputRecord.Firm_Address_Street_Line,left,right),
 																					                                            trim(trim(InputRecord.Firm_Address_City,left,right) + ', ' +
 																																											     trim(InputRecord.Firm_Address_State,left,right) + ' ' +
 																																													 trim(InputRecord.Firm_Address_ZIP,left,right),left,right)),
-																					 '')));
+																					 if(InputRecord.Firm_Address_Whole_Delivery <> '' or
+																					    InputRecord.Firm_Address_Whole_CSZLine <> '',
+																							address.CleanAddress182(trim(InputRecord.Firm_Address_Whole_Delivery,left,right),
+																							                                           trim(InputRecord.Firm_Address_Whole_CSZLine,left,right)),
+																							''))));
 	string182 tempAssociationAddressReturn := stringlib.StringToUpperCase(if(InputRecord.Association_Address_CSZ_Line <> '',
-															        				 lib_AddrClean.AddrCleanLib.CleanAddress182(trim(InputRecord.Association_Address_Street_Line,left,right),
+															        				 address.CleanAddress182(trim(InputRecord.Association_Address_Street_Line,left,right),
 	                                                                                        trim(InputRecord.Association_Address_CSZ_Line,left,right)),
 																				       if(InputRecord.Association_Address_Street_Line <> '' or
 																				          InputRecord.Association_Address_City <> '' or
 																					        InputRecord.Association_Address_State <> '' or
 																					        InputRecord.Association_Address_ZIP <> '',
-																					        lib_AddrClean.AddrCleanLib.CleanAddress182(trim(InputRecord.Association_Address_Street_Line,left,right),
+																					        address.CleanAddress182(trim(InputRecord.Association_Address_Street_Line,left,right),
 																					                                                   trim(trim(InputRecord.Association_Address_City,left,right) + ', ' +
 																																											            trim(InputRecord.Association_Address_State,left,right) + ' ' +
 																																													        trim(InputRecord.Association_Address_ZIP,left,right),left,right)),
-																					        '')));
+																							    if(InputRecord.Association_Address_Whole_Delivery <> '' or
+																							       InputRecord.Association_Address_Whole_CSZLine <> '',
+																									   address.CleanAddress182(trim(InputRecord.Association_Address_Whole_Delivery,left,right),
+																									                                              trim(InputRecord.Association_Address_Whole_CSZLine,left,right)),
+																									   ''))));
 	string73 tempAssociationContactName := stringlib.StringToUpperCase(if(trim(InputRecord.Association_Contact_Name_Full,left,right) <> '',
-	                                          lib_AddrClean.AddrCleanLib.CleanPerson73(trim(InputRecord.Association_Contact_Name_Full)),
+	                                          address.CleanPerson73(trim(InputRecord.Association_Contact_Name_Full)),
 																						if(trim(trim(InputRecord.Association_Contact_Name_First,left,right) + ' ' +
 																						        trim(InputRecord.Association_Contact_Name_Last,left,right),left,right) <> '',
-																						   lib_AddrClean.AddrCleanLib.CleanPerson73(trim(trim(InputRecord.Association_Contact_Name_First,left,right) + ' ' +
+																						   address.CleanPerson73(trim(trim(InputRecord.Association_Contact_Name_First,left,right) + ' ' +
 																						                                                 trim(InputRecord.Association_Contact_Name_Last,left,right),left,right)),
 																							 '')));
 	self.Lobbyist_Name_Clean_title			:= tempLobbyistName[1..5];
@@ -153,6 +231,7 @@ Layout_Lobbyists_Common CleanLobbyists(Layout_Lobbyists_Common InputRecord) := t
 	self.Lobbyist_Name_First := stringlib.StringToUpperCase(InputRecord.Lobbyist_Name_First);
 	self.Lobbyist_Name_Middle := stringlib.StringToUpperCase(InputRecord.Lobbyist_Name_Middle);
 	self.Lobbyist_Name_Suffix := stringlib.StringToUpperCase(InputRecord.Lobbyist_Name_Suffix);
+	self.Lobbyist_Address_Whole := stringlib.StringToUpperCase(InputRecord.Lobbyist_Address_Whole);
 	self.Lobbyist_Address_Street_Line := stringlib.StringToUpperCase(InputRecord.Lobbyist_Address_Street_Line);
 	self.Lobbyist_Address_CSZ_Line := stringlib.StringToUpperCase(InputRecord.Lobbyist_Address_CSZ_Line);
 	self.Lobbyist_Address_City := stringlib.StringToUpperCase(InputRecord.Lobbyist_Address_City);
@@ -164,6 +243,7 @@ Layout_Lobbyists_Common CleanLobbyists(Layout_Lobbyists_Common InputRecord) := t
 	self.Lobbyist_Type := stringlib.StringToUpperCase(InputRecord.Lobbyist_Type);
 	self.Lobbyist_State_ID := stringlib.StringToUpperCase(InputRecord.Lobbyist_State_ID);
 	self.Firm_Name_Full := stringlib.StringToUpperCase(InputRecord.Firm_Name_Full);
+	self.Firm_Address_Whole := stringlib.StringToUpperCase(InputRecord.Firm_Address_Whole);
 	self.Firm_Address_Street_Line := stringlib.StringToUpperCase(InputRecord.Firm_Address_Street_Line);
 	self.Firm_Address_CSZ_Line := stringlib.StringToUpperCase(InputRecord.Firm_Address_CSZ_Line);
 	self.Firm_Address_City := stringlib.StringToUpperCase(InputRecord.Firm_Address_City);
@@ -171,6 +251,7 @@ Layout_Lobbyists_Common CleanLobbyists(Layout_Lobbyists_Common InputRecord) := t
 	self.Firm_Address_ZIP := stringlib.StringToUpperCase(InputRecord.Firm_Address_ZIP);
 	self.Firm_Phone := stringlib.StringToUpperCase(InputRecord.Firm_Phone);
 	self.Association_Name_Full := stringlib.StringToUpperCase(InputRecord.Association_Name_Full);
+	self.Association_Address_Whole := stringlib.StringToUpperCase(InputRecord.Association_Address_Whole);
 	self.Association_Address_Street_Line := stringlib.StringToUpperCase(InputRecord.Association_Address_Street_Line);
 	self.Association_Address_CSZ_Line := stringlib.StringToUpperCase(InputRecord.Association_Address_CSZ_Line);
 	self.Association_Address_City := stringlib.StringToUpperCase(InputRecord.Association_Address_City);
@@ -193,5 +274,9 @@ Layout_Lobbyists_Common CleanLobbyists(Layout_Lobbyists_Common InputRecord) := t
 	self.Lobby_Termination_Date := stringlib.StringToUpperCase(InputRecord.Lobby_Termination_Date);
 	self.Lobby_Legislative_Code := stringlib.StringToUpperCase(InputRecord.Lobby_Legislative_Code);
 end;
+clean_lobbyists := project(nofold(RecordsWithSplitAssociationAddress),CleanLobbyists(left));
 
-export Cleaned_Lobbyists := project(Joined_Lobbyists,CleanLobbyists(left));
+ut.mac_suppress_by_phonetype(clean_lobbyists, Lobbyist_Phone, Lobbyist_Address_State, clean_lobbyists_WA_suppressed, false, DID_field);
+
+export Cleaned_Lobbyists := clean_lobbyists_WA_suppressed :
+	persist('~thor_data200::persist::lobbyists::cleaned_lobbyists');

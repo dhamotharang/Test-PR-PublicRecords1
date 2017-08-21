@@ -3,7 +3,10 @@ import doxie, ut, Data_Services, Prof_License_Mari, fcra;
 
 export key_did(boolean IsFCRA = false) := function
 
-base_file_ := Prof_License_Mari.file_mari_search((unsigned6)did != 0);
+// base_file := Prof_License_Mari.file_mari_search((unsigned6)did != 0);
+base_file_ := if(IsFCRA,Prof_License_Mari.file_mari_search((unsigned6)did != 0 and std_source_upd != 'S0903'),
+												Prof_License_Mari.file_mari_search((unsigned6)did != 0)
+												);
 base_file := project(base_file_, {base_file_}-enh_did_src);
 
 KeyName 			:= 'thor_data400::key::proflic_mari::';

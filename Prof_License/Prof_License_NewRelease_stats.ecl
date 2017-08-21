@@ -1,11 +1,7 @@
-#workunit('name','Prolic Release Stats'); 
 
 import Prof_license;
-dPrev	:= dataset('~thor_data400::in::prof_license_20050811',Prof_License.layout_prolic_in,flat);
-dNew	:= dataset('~thor_data400::in::prof_license_20050818',Prof_License.layout_prolic_in,flat);
-
-//dNew	:= Prof_License.File_Doxie;
-
+dPrev	:= 	dataset('~thor_data400::base::prof_licenses_aid_father',layout_prolic_out_with_AID,flat);
+dNew :=   dataset('~thor_data400::base::prof_licenses_AID',layout_prolic_out_with_AID,flat);
 
 rSlim
  :=
@@ -141,7 +137,7 @@ dNewOnly	:= join(dPrevSort,dNewSort,
 					left.date_first_seen = right.date_first_seen and
 					left.date_last_seen = right.date_last_seen,
 					tNewOnly(left,right),
-					Right only
+					Right only, local
 				    );
 					
 
@@ -153,9 +149,10 @@ stat_rec :=  record
 d.source_st;
 d.vendor;
 d.profession_or_board;
+date_last_seen := MAX(group,d.date_last_seen);
 totalrecs := count(group);
-MINdate := MIN(group,if(d.issue_date<>'',d.issue_date,''));
-MAXdate := MAX(group,d.issue_date);
+MINdate := MIN(group,if(d.issue_date<>'',d.issue_date,'99999999'));
+MAXdate := MAX(group,if(d.issue_date<>'',d.issue_date,'00000000'));
 
 has_profession_or_board := AVE(group,IF(stringlib.stringfilterout(d.profession_or_board,'0')<>'',100,0));
 has_license_type := AVE(group,IF(stringlib.stringfilterout(d.license_type,'0')<>'',100,0));
@@ -248,4 +245,4 @@ stats := table(d,stat_rec,source_st,vendor,profession_or_board,few);
 
 stats_sorted := sort(stats,source_st,vendor,profession_or_board);
 
-output(choosen(stats_sorted,all)); 
+export Prof_License_NewRelease_stats := output(choosen(stats_sorted, 10000)); 

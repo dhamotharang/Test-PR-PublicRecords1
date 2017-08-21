@@ -1,0 +1,65 @@
+//FULL PAYLOAD
+bair.files().cfs_base.qa;
+bair.files().mo_base.qa;
+bair.files().persons_base.qa;
+bair.files().vehicle_base.qa;
+bair.files().mo_udf_base.qa;
+bair.files().persons_udf_base.qa;
+bair.files().crash_base.qa;
+bair.files().offenders_base.qa;
+bair.files().offenders_picture_base.qa;
+bair.files().intel_base.qa;
+bair.files().lpr_base.qa;
+bair.files().shotspotter_base.qa;
+bair.files().notes_base.qa;
+bair.files().images_base.qa;
+bair.files().geohash_base.qa;
+
+bair.files().cfs_base.built;
+bair.files().mo_base.built;
+bair.files().persons_base.built;
+bair.files().vehicle_base.built;
+bair.files().mo_udf_base.built;
+bair.files().persons_udf_base.built;
+bair.files().crash_base.built;
+bair.files().offenders_base.built;
+bair.files().offenders_picture_base.built;
+bair.files().intel_base.built;
+bair.files().lpr_base.built;
+bair.files().shotspotter_base.built;
+bair.files().notes_base.built;
+bair.files().images_base.built;
+bair.files().geohash_base.built;
+
+//DELTA PAYLOAD
+bair.files(,, true).cfs_base.qa;
+bair.files(,, true).mo_base.qa;
+bair.files(,, true).persons_base.qa;
+bair.files(,, true).vehicle_base.qa;
+bair.files(,, true).mo_udf_base.qa;
+bair.files(,, true).persons_udf_base.qa;
+bair.files(,, true).crash_base.qa;
+bair.files(,, true).offenders_base.qa;
+bair.files(,, true).offenders_picture_base.qa;
+bair.files(,, true).intel_base.qa;
+bair.files(,, true).lpr_base.qa;
+bair.files(,, true).shotspotter_base.qa;
+bair.files(,, true).notes_base.qa;
+bair.files(,, true).images_base.qa;
+bair.files(,, true).geohash_base.qa;
+
+bair.files(,, true).cfs_base.built;
+bair.files(,, true).mo_base.built;
+bair.files(,, true).persons_base.built;
+bair.files(,, true).vehicle_base.built;
+bair.files(,, true).mo_udf_base.built;
+bair.files(,, true).persons_udf_base.built;
+bair.files(,, true).crash_base.built;
+bair.files(,, true).offenders_base.built;
+bair.files(,, true).offenders_picture_base.built;
+bair.files(,, true).intel_base.built;
+bair.files(,, true).lpr_base.built;
+bair.files(,, true).shotspotter_base.built;
+bair.files(,, true).notes_base.built;
+bair.files(,, true).images_base.built;
+bair.files(,, true).geohash_base.built;

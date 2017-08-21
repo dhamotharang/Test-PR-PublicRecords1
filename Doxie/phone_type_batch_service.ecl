@@ -4,6 +4,7 @@
 </message>
 */
 /*--INFO-- This service returns phone type.*/
+/*--RESULT-- xslt.html */
 
 /*
 <message name="Phone_Type_Batch_Service" wuTimeout="300000">

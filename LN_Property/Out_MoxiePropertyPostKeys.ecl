@@ -4,7 +4,7 @@ import LN_Property;
 
 //string16 wuid := '' : stored('wuid'); 
 
-//#stored('wuid','w20050714')
+//#stored('wuid','w20051019')
 
 export Out_MoxiePropertyPostKeys := 
 
@@ -23,7 +23,7 @@ LN_Property.Out_MoxiePropertySupplementalKeys,
 
 LN_Property.Out_MoxiePropertySearchKeys_Part3
 
-): failure(FileServices.sendemail('wma@seisint.com','property Key Build Failure',failmessage));
+): failure(FileServices.sendemail('kgummadi@seisint.com','property Key Build Failure',failmessage));
 
 
 

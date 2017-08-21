@@ -27,6 +27,7 @@ self               := L;
 end;
 
 Mapping_OR_as_Search_temp1 := normalize(Watercraft.file_OR_clean_in,5,search_mapping_format_temp(left,counter));
+Watercraft.Macro_Clean_Hull_ID(Mapping_OR_as_Search_temp1, Layout_Watercraft_Search_Group_temp,hull_clean_in)
 
 Layout_OR_clean_temp2 := record
 
@@ -37,7 +38,7 @@ boolean is_hull_id_in_MIC;
     	
 end;
 
-Layout_OR_clean_temp2 main_mapping_temp1(Mapping_OR_as_Search_temp1 L, watercraft.file_MIC R)
+Layout_OR_clean_temp2 main_mapping_temp1(hull_clean_in L, watercraft.file_MIC R)
 
 := transform
 
@@ -47,7 +48,7 @@ self.is_hull_id_in_MIC := if(trim(L.hull_id, left, right)[1..3] = R.MIC, true, f
 
 end;
 
-Mapping_OR_as_Main_temp2 := join(Mapping_OR_as_Search_temp1, watercraft.file_MIC, trim(left.hull_id, left, right)[1..3] = right.MIC,
+Mapping_OR_as_Main_temp2 := join(hull_clean_in, watercraft.file_MIC, trim(left.hull_id, left, right)[1..3] = right.MIC,
 main_mapping_temp1(left, right), left outer, lookup);
 
 
@@ -79,7 +80,7 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Mapping_OR_as_Ma
 	self.orig_state					:=	L.STATE;
 	self.orig_zip					:=	L.ZIP;
 	self.orig_fips					:=	choose(C, L.FIPS, '');
-	self.dob						:=	choose(C, L.DOB, '');
+	self.dob						:=	'';
 	self.orig_ssn					:=	'';
 	self.orig_fein					:=	'';
 	self.gender						:=	'';
@@ -99,5 +100,3 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Mapping_OR_as_Ma
  
 export Mapping_OR_as_Search	:= (normalize(Mapping_OR_as_Main_temp2,2,search_mapping_format(left,counter)))
                                 (clean_pname <> '' or company_name <> '');
-								
-								

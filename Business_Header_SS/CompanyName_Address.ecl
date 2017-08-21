@@ -1,6 +1,14 @@
 IMPORT Business_Header, ut;
 
-bh := Business_Header.File_Business_Header_Base
+export CompanyName_Address(
+
+	 dataset(Business_Header.Layout_Business_Header_Base	)	pBusinessHeaders	= Business_Header.Files().Base.Business_Headers.Built
+	,string																									pPersistName			= business_header.persistnames().CompanyNameAddress
+
+) :=
+function
+
+bh := business_header.filters.keys.business_headers(pBusinessHeaders)
 (
     prim_name != '',
 	prim_name NOT IN Business_Header.Bad_Address_List,
@@ -25,7 +33,7 @@ END;
 bh_slim := PROJECT(bh, SlimBH(LEFT));
 
 bh_ded1 := DEDUP(bh_slim, bdid, company_name, prim_range, prim_name, sec_range, zip, state, ALL);
-bh_ded := bh_ded1 : PERSIST('adTEMP::BH_SS_cn_a_init');
+bh_ded := bh_ded1;
 
 bh_d_pr_zip_d := DISTRIBUTE(bh_ded(zip != 0), HASH(zip, prim_name, prim_range));
 ut.MAC_Remove_Withdups_Local(
@@ -81,7 +89,8 @@ ss_cn_pr_pn_zip := JOIN(bh_ded, cn_pr_pn_zip_stat,
 	LEFT.prim_range = RIGHT.prim_range AND
 	LEFT.prim_name = RIGHT.prim_name AND
 	LEFT.zip = RIGHT.zip,
-	JoinBackZip(LEFT, RIGHT), LEFT OUTER, HASH) : PERSIST('adTEMP::BH_SS_cn_pr_pn_zip');
+	JoinBackZip(LEFT, RIGHT), LEFT OUTER, HASH) 
+	: PERSIST(business_header.persistnames().CompanyNameAddressJoinBackZip);
 
 // Get a count of how many bdid's match within a certain
 // name similarity range for each name-pr-pn-sr-state combination.
@@ -306,10 +315,14 @@ all_info := JOIN(cn_addr_strict_pr_pn_zip, strict_cn_pr_pn_sr_st_stat,
 					LEFT.state = RIGHT.state,
 					JoinBackStrictSt(LEFT, RIGHT), LEFT OUTER, HASH);
 
-EXPORT CompanyName_Address := 
+CompanyName_Address_persisted := 
 		//leave out any recs with no valid (0 to 100) counts
 	all_info((pr_pn_zip_bdids > 0 and pr_pn_zip_bdids < 100) or
 					 (pr_pn_sr_st_bdids > 0 and pr_pn_sr_st_bdids < 100) or
 					 (cn_pr_pn_zip_bdids > 0 and cn_pr_pn_zip_bdids < 100) or
 					 (cn_pr_pn_sr_st_bdids > 0 and cn_pr_pn_sr_st_bdids < 100))
-		: PERSIST('adTEMP::BH_SS_cn_a');
+		: PERSIST(pPersistName);
+
+return CompanyName_Address_persisted;
+
+end;

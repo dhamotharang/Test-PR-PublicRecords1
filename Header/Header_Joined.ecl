@@ -1,78 +1,146 @@
-import header,ut,address,mdr;
+import header,ut,address,mdr,idl_header,watchdog,strata,AID;
 
-pre_header_file := header.ImprovedByUtil; // basic header file plus 
-										  // utility recs
+export header_joined(string versionBuild=Header.version_build) := module
 
-//fix any funky DOBs
-header.MAC_format_DOB(pre_header_file, header_file_better_dob )
+inNHR := header.New_Header_Records()(header.Blocked_data_new())
+        : persist ('~thor400_data::new_header_records_'+ versionBuild,expire(60)); // we need this for rid_srid key build
 
-//fix any funky prim_ranges
-header.MAC_Improve_Prim_Range(header_file_better_dob, hd )
+// First address re-clean is ONLY for ingested records
+header.macGetCleanAddr(inNHR, RawAID, true, inNHR_addr_recleaned);
+NHRin := distribute(inNHR_addr_recleaned,hash(prim_name,zip,lname));
 
-// new records enter header process here.
-dis_use := distribute(header.New_Header_Records(header.isPersonRec(fname, mname, lname, name_suffix) and
-								     prim_name <> ''),hash(fname,lname,zip,zip4));
+inPHR0 := Header.File_header_raw_latest.File(~header.IsOldUtil(versionBuild));
+inPHR  := inPHR0(header.Blocked_data_new());
+PHin   := distribute(inPHR,hash(prim_name,zip,lname));
 
-//Take latest date
-use_srt := sort(dis_use,fname,lname,zip,zip4,src,rec_type,phone,ssn,dob,mname,name_suffix,
-									 prim_range,predir,prim_name,suffix,postdir,unit_desig,
-									 sec_range,city_name,st,county,-dt_last_seen,local);
+header.Layout_New_Records add_rid_all(PHin l, NHRin r) := transform
+ self.rid            := l.rid;
+ self.did            := l.did;
+ self                := r;
+end;
 
-use_record_d := dedup(use_srt,fname,lname,zip,zip4,src,rec_type,phone,ssn,dob,mname,name_suffix,
-									 prim_range,predir,prim_name,suffix,postdir,unit_desig,
-									 sec_range,city_name,st,county,local);
+//Basic  Match - a one to one join - basic assumption here is:
+ //that there are absolutely no duplicates in the left nor the right side
+j_all :=  join(PHin, NHRin,
+				left.src        =right.src         and
+// Bug: 173413
+// this change is in conjunction with other changes made in:
+// Header.New_Header_Records
+// DriversV2.dls_as_header
+// Header.Mac_dedup_header
+				(~Mdr.SourceTools.SourceIsDL(left.src)
+					or 
+					(Mdr.SourceTools.SourceIsDL(left.src)
+					and left.vendor_id=right.vendor_id) ) and
+				left.fname      =right.fname       and
+				left.mname      =right.mname       and
+				left.lname      =right.lname       and
+				left.name_suffix=right.name_suffix and
+				left.phone      =right.phone       and
+				left.ssn        =right.ssn         and
+				left.dob        =right.dob         and
+				left.prim_range =right.prim_range  and
+				left.predir     =right.predir      and
+				left.prim_name  =right.prim_name   and
+				left.suffix     =right.suffix      and
+				left.postdir    =right.postdir     and
+				left.unit_desig =right.unit_desig  and
+				left.sec_range  =right.sec_range   and
+				left.city_name  =right.city_name   and
+				left.st         =right.st          and
+				left.zip        =right.zip         and
+				left.zip4       =right.zip4        and
+				left.county     =right.county
+				,add_rid_all(left,right)
+				,right outer
+				,local
+				): persist('~thor_data400::persist::hbm::'+ versionBuild,expire(60));
+			
+outf_noID := dedup(j_all,record,all,local);
+oNMNHR    := outf_noID(rid=0);
+oMNHR     := outf_noID(rid>0);
 
-ut.MAC_Sequence_Records(use_record_d,uid,outfile1)
-mdr.MAC_BasicMatch(outfile1,outf)
+r_nbm := record
+	oNMNHR.src;
+	string30 src_desc := mdr.sourcetools.translatesource(oNMNHR.src);
+	count_            := count(group);
+end;
 
+//these are the records not seen before
+ta1 := sort(table(oNMNHR, r_nbm, src, few), -count_);
+//Strata.modOrbitAdaptersForPersonHdrBld.fnGetNoBasicMatchAction(ta1, header.version_build);
+output(ta1, all, named('no_basic_match_incremental'));
+
+//these are the records not seen before since the previous monthly build
+mxr_monthly := max(Header.File_Latest_Header_Raw(FALSE),rid);
+oNMNHRM := oNMNHR+oMNHR(rid>mxr_monthly);
+
+r_nbm2 := record
+	oNMNHRM.src;
+	string30 src_desc := mdr.sourcetools.translatesource(oNMNHRM.src);
+	count_            := count(group);
+end;
+ta2 := sort(table(oNMNHRM, r_nbm2, src, few), -count_);
+Strata.modOrbitAdaptersForPersonHdrBld.fnGetNoBasicMatchAction(ta2,  versionBuild);
+output(ta2, all, named('no_basic_match_monthly'));
+
+ut.MAC_Sequence_Records(oNMNHR,uid,outfile1);
+
+outf := outfile1 + oMNHR;
+mxr:=max(Header.File_header_raw_latest.File,rid);
 header.Layout_Header to_form(outf l) := transform
-  self.rid := IF (l.rid=0,mdr.max_rid+l.uid,l.rid);
-  self.did := IF (l.did=0,mdr.max_rid+l.uid,l.did);
-  self.pflag1 := MAP(l.did=0=>'A',l.rid=0=>'P','+');
-  self := l;
-  end;
+	self.rid    := IF (l.rid=0,mxr+l.uid,l.rid);
+	self.did    := IF (l.did=0,mxr+l.uid,l.did);
+	self.pflag1 := MAP(l.did=0=>'A',l.rid=0=>'P','+');
+	self := l;
+end;
 
-new_month_joined := project(outf,to_form(left))(header.Blocked_data_new());
+new_month_joined := project(outf,to_form(left));
 
-Header.Layout_header blank_pflag(hd l) := transform
-  self.pflag1 := ''; // Header is now considered clean
-  self := l;
-  end;
+Header.Layout_header blank_pflag(inPHR l) := transform
+	self.pflag1 := ''; // old rolled header records - no longer Reported (NLR)
+	self        := l;
+end;
 
-pnew := project(hd,blank_pflag(left));
+//append NLR
+pnew := project(inPHR,blank_pflag(left))(header.Blocked_data_new()) + new_month_joined;
 
-rpp := record
-  pnew.did;
-  pnew.rid;
-  end;
-// fixes did > rid problems
-bad_rid_did := table(pnew(did>rid),rpp);
-brd := dedup(sort(distribute(bad_rid_did,hash(did)),did,rid,local),did,local);
-ut.MAC_Patch_Id(pnew,did,brd,did,rid,pnew1)
+duplicate_rids_with_bad_pii := table(dedup(sort(pnew,rid,zip,fname,lname)
+            ,(LEFT.zip='' OR RIGHT.zip='' OR LEFT.zip=RIGHT.zip) AND
+             (LEFT.fname='' OR RIGHT.fname='' OR LEFT.fname=RIGHT.fname) AND
+             (LEFT.lname='' OR RIGHT.lname='' OR LEFT.lname=RIGHT.lname)
+            
+            ),{rid,cnt:=count(group)},rid)(cnt>1);
 
-boolean do_patch := false : stored('DoPatch');
+output(duplicate_rids_with_bad_pii,named('duplicate_rids_with_bad_pii'));
+output(count(duplicate_rids_with_bad_pii),named('cnt_duplicate_rids_with_bad_pii'));
+assert(count(duplicate_rids_with_bad_pii)=0,'duplicate rids with mismatching pii found',fail);
 
-head := if (do_patch,pnew1,pnew);
+Header.MAC_Merge_ByRid(pnew, merged);
 
-o_and_n := head + new_month_joined;
+merged_with_prim := merged(  (prim_range<>'' OR prim_name<>''));
+merged_no_prim   := merged( ~(prim_range<>'' OR prim_name<>''));
 
-rldup := MDR.Rollup1;
+// Second address re-clean for all records going into base..raw
+header.macGetCleanAddr(merged_with_prim, RawAID, true, merged_with_prim_addr_recleaned); 
 
-ut.MAC_Patch_Id(o_and_n,rid,rldup,old_rid,new_rid,old_and_new)
+merged_addr_recleaned := merged_no_prim + merged_with_prim_addr_recleaned;
 
-//****** Remove some known bad names  city_name='OZ' and st
-kill_junk := old_and_new(~UT.BogusNames(FNAME, LNAME) and ~UT.BogusCities(city_name, st));
+OldUtil := Header.File_Latest_Header_Raw(TRUE)(header.IsOldUtil(versionBuild));
+patched:=Header.fn_clear_deletion_candidates(merged_addr_recleaned + OldUtil,versionBuild);//****** remove PII off deleted records
 
-Header.MAC_Merge_ByRid(kill_junk,merged)
+patched1:=header.fn_fix_dates(patched,,versionBuild);
+patched2:=header.fn_remove_post_header_joined(patched1);
 
-typeof(merged) fix_did(merged le,header.dodgydids ri) := transform
-  self.did := if ( ri.did=0, le.did, le.rid ); // Patch did back to rid if dodgy
-  self.pflag1 := IF( ri.did=0, le.pflag1, 'D' );
-  self.name_suffix := IF(~le.name_suffix IN ['','UNK','BOO'] or ri.did=0,le.name_suffix,'UNK');
-  self := le;
-  end;
+if ( count(patched2(did>rid)) <> 0, output('DID > RID constraint violated') );
+output(table(patched2(fname='',lname=''),{src,cnt:=count(group)},src,few),named('BlankedRecordsCountBySource'),all);
 
-neg_dids := join(merged,header.DodgyDids,left.did=right.did,fix_did(left,right),left outer,lookup);
-if ( count(neg_dids(did>rid)) <> 0, output('DID > RID constraint violated') );
-export header_joined := neg_dids : persist('Header_Joined');
-//export header_joined := dataset('temp::head_Match_base',header.layout_header,flat);
+newblanks := patched2(  (rid>mxr_monthly AND pflag1='A' AND fname='' AND lname='') ):persist('~persist::header::new_blanks::'+versionBuild); // new blanks
+patched3  := patched2( ~(rid>mxr_monthly AND pflag1='A' AND fname='' AND lname='') ); // not new blanks
+
+
+output(table(newblanks,{src,cnt:=count(group)},src,few),named('BlankedNewRecordsRemoved'),all);
+
+export final := patched3 : persist('Header_Joined::'+ versionBuild,expire(60));
+
+end;

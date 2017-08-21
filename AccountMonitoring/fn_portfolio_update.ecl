@@ -286,7 +286,15 @@ EXPORT fn_portfolio_update(UNSIGNED1 pseudo_environment,
 		mac_update_documents_file(pseudo_environment,phoneownership,spray_ip_address,spray_ip_path,fnms.documents.phoneownership.remote,write_updated_phoneownership_documents_file);
 		mac_update_documents_file(pseudo_environment,bipbestupdate,spray_ip_address,spray_ip_path,fnms.documents.bipbestupdate.remote,write_updated_bipbestupdate_documents_file);
 		mac_update_documents_file(pseudo_environment,sbfe,spray_ip_address,spray_ip_path,fnms.documents.sbfe.remote,write_updated_sbfe_documents_file);
-		
+		mac_update_documents_file(pseudo_environment,ucc,spray_ip_address,spray_ip_path,fnms.documents.ucc.remote,write_updated_ucc_documents_file);
+		mac_update_documents_file(pseudo_environment,govtdebarred,spray_ip_address,spray_ip_path,fnms.documents.govtdebarred.remote,write_updated_govtdebarred_documents_file);
+		mac_update_documents_file(pseudo_environment,inquiry,spray_ip_address,spray_ip_path,fnms.documents.inquiry.remote,write_updated_inquiry_documents_file);
+		mac_update_documents_file(pseudo_environment,corp,spray_ip_address,spray_ip_path,fnms.documents.corp.remote,write_updated_corp_documents_file);
+		mac_update_documents_file(pseudo_environment,mvr,spray_ip_address,spray_ip_path,fnms.documents.mvr.remote,write_updated_mvr_documents_file);
+		mac_update_documents_file(pseudo_environment,aircraft,spray_ip_address,spray_ip_path,fnms.documents.aircraft.remote,write_updated_aircraft_documents_file);
+		mac_update_documents_file(pseudo_environment,watercraft,spray_ip_address,spray_ip_path,fnms.documents.watercraft.remote,write_updated_watercraft_documents_file);
+
+
       main_files_to_update := PARALLEL( write_updated_portfolio_file,
 		                                  write_updated_archive_file,
 			                               write_updated_bankruptcy_documents_file,
@@ -306,7 +314,14 @@ EXPORT fn_portfolio_update(UNSIGNED1 pseudo_environment,
 																		 write_updated_bdidupdate_documents_file,
 																		 write_updated_phoneownership_documents_file,
 																		 write_updated_bipbestupdate_documents_file,
-																		 write_updated_sbfe_documents_file
+																		 write_updated_sbfe_documents_file,
+																		 write_updated_ucc_documents_file,
+																		 write_updated_govtdebarred_documents_file,
+																		 write_updated_inquiry_documents_file,
+																		 write_updated_corp_documents_file,
+																		 write_updated_mvr_documents_file,
+																		 write_updated_aircraft_documents_file,
+																		 write_updated_watercraft_documents_file
 										         );
 
 		write_updated_files := IF( Inq_Tracking, 

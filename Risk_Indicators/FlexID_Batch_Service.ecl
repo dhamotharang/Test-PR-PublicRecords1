@@ -135,7 +135,7 @@ RQ-12730: Emerging Identities
 </pre>
 */
 
-import address, iesp, identifier2, patriot, riskwise, ut, intliid, models, autostandardi, risk_indicators, ADVO, gateway;
+import address, iesp, identifier2, patriot, riskwise, ut, intliid, models, autostandardi, risk_indicators, ADVO, gateway, OFAC_XG5;
 
 export FlexID_Batch_Service := MACRO
 
@@ -353,7 +353,11 @@ boolean ExcludeWatchLists := false : stored('ExcludeWatchLists');
 unsigned1 OFACVersion :=2 :stored('OFACversion');
 boolean IncludeAdditionalWatchlists := FALSE: stored('IncludeAdditionalWatchlists');
 boolean IncludeOfac := FALSE: stored('IncludeOfac');
-real 		GlobalWatchListThreshold :=	.84 :stored('GlobalWatchlistThreshold');
+real GlobalWatchListThreshold_temp := 0 :stored('GlobalWatchlistThreshold');
+			GlobalWatchListThreshold := Map( 
+																		OFACVersion >= 4	and GlobalWatchListThreshold_temp = 0	 => OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,
+																		OFACVersion < 4  and GlobalWatchListThreshold_temp = 0  => OFAC_XG5.Constants.DEF_THRESHOLD_REAL,
+																		GlobalWatchListThreshold_temp);
 unsigned2 EverOccupant_PastMonths := 0;
 unsigned4 EverOccupant_StartDate  := 99999999;
 unsigned1 AppendBest := 1;		// search best file
@@ -665,7 +669,7 @@ IncludeDerogInfo := true;
 DoScore := false;
 FilterOutFares := false;
 
-clam := risk_indicators.Boca_Shell_Function(	ret, 
+clam :=  risk_indicators.Boca_Shell_Function(	ret, 
 															gateways, 
 															DPPAPurpose, 
 															GLBPurpose, 

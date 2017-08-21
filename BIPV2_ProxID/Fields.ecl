@@ -177,7 +177,7 @@ EXPORT InValid_dt_last_seen(SALT30.StrType s) := FALSE;
 EXPORT InValidMessage_dt_last_seen(UNSIGNED1 wh) := '';
 // This macro will compute and count field level differences based upon a pivot expression
 export MAC_CountDifferencesByPivot(in_left,in_right,pivot_exp,bad_pivots,out_counts) := MACRO
-  IMPORT SALT30,BIPV2_ProxID;
+  IMPORT SALT30,BIPV2_PROXID;
 //Find those highly occuring pivot values to remove them from consideration
 #uniquename(tr)
   %tr% := table(in_left+in_right,{ val := pivot_exp; });
@@ -350,24 +350,31 @@ EXPORT UIDConsistency(infile) := FUNCTIONMACRO
  // For deeper debugging; provide the unbased parents
     bases := f((UNSIGNED)Proxid=(UNSIGNED)rcid); // Get the bases
   EXPORT Proxid_Unbased := JOIN(f (Proxid<>0) ,bases,LEFT.Proxid=RIGHT.Proxid,TRANSFORM(LEFT),LEFT ONLY,HASH); // HACK Proxid Unbased.  Add filter
+
     bases := f((UNSIGNED)lgid3=(UNSIGNED)rcid); // Get the bases
   EXPORT lgid3_Unbased := JOIN(f (lgid3<>0) ,bases,LEFT.lgid3=RIGHT.lgid3,TRANSFORM(LEFT),LEFT ONLY,HASH); // HACK lgid3 Unbased.  Add filter
+
     bases := f((UNSIGNED)orgid=(UNSIGNED)rcid); // Get the bases
   EXPORT orgid_Unbased := JOIN(f (orgid<>0) ,bases,LEFT.orgid=RIGHT.orgid,TRANSFORM(LEFT),LEFT ONLY,HASH); // HACK orgid Unbased.  Add filter
+
     bases := f((UNSIGNED)ultid=(UNSIGNED)rcid); // Get the bases
   EXPORT ultid_Unbased := JOIN(f (ultid<>0) ,bases,LEFT.ultid=RIGHT.ultid,TRANSFORM(LEFT),LEFT ONLY,HASH); // HACK ultid Unbased.  Add filter
+
  // Children with two parents
     bases := f((UNSIGNED)rcid=(UNSIGNED)rcid); // Get the bases
   EXPORT rcid_Twoparents := DEDUP(JOIN(f,f,LEFT.rcid=RIGHT.rcid AND LEFT.Proxid>RIGHT.Proxid,TRANSFORM({SALT30.UIDType Proxid1,SALT30.UIDType rcid,SALT30.UIDType Proxid2},SELF.Proxid1:=LEFT.Proxid,SELF.Proxid2:=RIGHT.Proxid,SELF.rcid:=LEFT.rcid),HASH),WHOLE RECORD,ALL);
     bases := f((UNSIGNED)Proxid=(UNSIGNED)rcid); // Get the bases
   f_thin := TABLE(f(proxid<>0,lgid3<>0),{proxid,lgid3},proxid,lgid3,MERGE); // HACK Proxid two parents to dedup self join dataset
 EXPORT Proxid_Twoparents := DEDUP(JOIN( f_thin,f_thin, LEFT.Proxid=RIGHT.Proxid AND LEFT.lgid3>RIGHT.lgid3,TRANSFORM({SALT30.UIDType lgid31,SALT30.UIDType Proxid,SALT30.UIDType lgid32},SELF.lgid31:=LEFT.lgid3,SELF.lgid32:=RIGHT.lgid3,SELF.Proxid:=LEFT.Proxid),HASH),WHOLE RECORD,ALL); /* HACK - Proxid Two Parents to dedup dataset*/
+
     bases := f((UNSIGNED)lgid3=(UNSIGNED)rcid); // Get the bases
   f_thin := TABLE(f(lgid3<>0,orgid<>0),{lgid3,orgid},lgid3,orgid,MERGE); // HACK lgid3 two parents to dedup self join dataset
 EXPORT lgid3_Twoparents := DEDUP(JOIN( f_thin,f_thin, LEFT.lgid3=RIGHT.lgid3 AND LEFT.orgid>RIGHT.orgid,TRANSFORM({SALT30.UIDType orgid1,SALT30.UIDType lgid3,SALT30.UIDType orgid2},SELF.orgid1:=LEFT.orgid,SELF.orgid2:=RIGHT.orgid,SELF.lgid3:=LEFT.lgid3),HASH),WHOLE RECORD,ALL); /* HACK - lgid3 Two Parents to dedup dataset*/
+
     bases := f((UNSIGNED)orgid=(UNSIGNED)rcid); // Get the bases
   f_thin := TABLE(f(orgid<>0,ultid<>0),{orgid,ultid},orgid,ultid,MERGE); // HACK orgid two parents to dedup self join dataset
 EXPORT orgid_Twoparents := DEDUP(JOIN( f_thin,f_thin, LEFT.orgid=RIGHT.orgid AND LEFT.ultid>RIGHT.ultid,TRANSFORM({SALT30.UIDType ultid1,SALT30.UIDType orgid,SALT30.UIDType ultid2},SELF.ultid1:=LEFT.ultid,SELF.ultid2:=RIGHT.ultid,SELF.orgid:=LEFT.orgid),HASH),WHOLE RECORD,ALL); /* HACK - orgid Two Parents to dedup dataset*/
+
  // Now compute the more involved consistency checks
     r := RECORD
       {Basic0} AND NOT [rcid_atparent,Proxid_atparent,lgid3_atparent,orgid_atparent];

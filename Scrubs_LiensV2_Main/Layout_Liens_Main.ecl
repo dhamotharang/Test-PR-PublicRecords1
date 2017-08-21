@@ -1,0 +1,1 @@
+EXPORT Layout_Liens_Main := recordof(Scrubs_LiensV2_Main.File_Liens_main);

@@ -34,7 +34,7 @@ END;
 // rollup to get the best (most recent) date for any did/ssn pair
 hf_best_dt := ROLLUP(hf_grp, best_dt(LEFT,RIGHT),true);
 
-hf_lite := hf_best_dt(ut.DaysApart(((STRING6)best_date)+'01',ut.GetDate) > 18 * 30);
+hf_lite := hf_best_dt(ut.DaysApart(((STRING6)best_date)+'01',header.version_build[1..8]) > 18 * 30);
 
 hf_lite takeLeft(hf_lite l) := TRANSFORM
    SELF := l;
@@ -44,11 +44,6 @@ END;
 hf_nodeath1 := join(hf_lite, distribute(header.File_Did_Death_Master((unsigned) did > 0),hash((unsigned6)did)), LEFT.did = (unsigned6) RIGHT.did, 
                     takeLeft(LEFT), LEFT ONLY,local);
  
-/*hf_nodeath2 := join(hf_nodeath1, distribute(header.File_Did_StateDeath_Master((unsigned) did > 0),hash((unsigned6)did)), LEFT.did = (unsigned6)RIGHT.did, 
-                    takeLeft(LEFT), LEFT ONLY,local);*/
-
-//export DID_SSN_Date_FCRA := hf_nodeath2 : PERSIST('persist::did_ssn_date_fcra');
-
 return hf_nodeath1;
 
 end;

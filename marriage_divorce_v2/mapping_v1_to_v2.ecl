@@ -1,28 +1,41 @@
 import marriages_divorces;
 
+//this CA filter doesn't bring any records into the process
+//this is not a problem - it simply means we have restored all
+//raw data to the IN superfile
 ca_mar_v1       := marriages_divorces.file_marriage_divorce_base(process_date < '20060511' and state_origin='CA' and filing_type ='3');
-fl_div_v1       := marriages_divorces.file_marriage_divorce_base(process_date < '20070122' and state_origin='FL' and filing_type ='7');
-fl_mar_v1       := marriages_divorces.file_marriage_divorce_base(process_date < '20070122' and state_origin='FL' and filing_type ='3');
-ky_div_v1       := marriages_divorces.file_marriage_divorce_base(process_date < '20050429' and state_origin='KY' and filing_type ='7');
-ky_mar_v1       := marriages_divorces.file_marriage_divorce_base(process_date < '20050429' and state_origin='KY' and filing_type ='3');
-nc_div_v1       := marriages_divorces.file_marriage_divorce_base(process_date < '20070608' and state_origin='NC' and filing_type ='7');
-nc_mar_v1       := marriages_divorces.file_marriage_divorce_base(process_date < '20070608' and state_origin='NC' and filing_type ='3');
-tx_div_v1       := marriages_divorces.file_marriage_divorce_base(process_date < '20050804' and state_origin='TX' and filing_type ='7');
-tx_mar_v1       := marriages_divorces.file_marriage_divorce_base(process_date < '20050804' and state_origin='TX' and filing_type ='3');
-inghm_mi_mar_v1 := marriages_divorces.file_marriage_divorce_base(marriage_dt  < '20060101' and state_origin='MI' and trim(vendor)='INGHM' and filing_type ='3');
+fl_mar_div_v1   := marriages_divorces.file_marriage_divorce_base(process_date < '20070122' and state_origin='FL' and filing_type in ['3','7']);
+//had to remap the address field for party1 and party2 for KY and map them to county and state fields.
+ky_mar_div_v1   := marriage_divorce_v2.fn_addrMappingFix_v1(marriages_divorces.file_marriage_divorce_base(process_date < '20050429' and state_origin='KY' and filing_type in['3','7']));
+nc_mar_div_v1   := marriages_divorces.file_marriage_divorce_base(process_date < '20070306' and state_origin='NC' and filing_type in['3','7']);
+tx_mar_div_v1   := marriages_divorces.file_marriage_divorce_base(process_date < '20060703' and state_origin='TX' and filing_type in['3','7']);
+inghm_mi_mar_v1 := marriages_divorces.file_marriage_divorce_base(state_origin='MI' and trim(vendor)='INGHM' and filing_type ='3');
+co_mar_div_v1   := marriages_divorces.file_marriage_divorce_base(state_origin='CO' and filing_type in ['3','7']);
+ga_mar_div_v1   := marriages_divorces.file_marriage_divorce_base(state_origin='GA' and filing_type in ['3','7']);
+nv_mar_div_v1   := marriages_divorces.file_marriage_divorce_base(state_origin='NV' and filing_type in ['3','7']);
+oh_mar_div_v1   := marriages_divorces.file_marriage_divorce_base(state_origin='OH' and filing_type in ['3','7']);
+ct_mar_div_v1   := marriages_divorces.file_marriage_divorce_base(state_origin='CT' and filing_type in ['3','7']);
+me_mar_v1       := marriages_divorces.file_marriage_divorce_base(state_origin='ME' and filing_type ='3');
+mi_mar_v1       := marriages_divorces.file_marriage_divorce_base(state_origin='MI' and trim(vendor)='26055' and filing_type ='3');
 
-concat :=
-  ca_mar_v1
-+ fl_div_v1
-+ fl_mar_v1
-+ ky_div_v1
-+ ky_mar_v1
-+ nc_div_v1
-+ nc_mar_v1
-+ tx_div_v1
-+ tx_mar_v1
+
+concat0 :=
+//  ca_mar_v1
+  fl_mar_div_v1
++ ky_mar_div_v1
++ nc_mar_div_v1
++ tx_mar_div_v1
 + inghm_mi_mar_v1
++ co_mar_div_v1
++ ga_mar_div_v1
++ nv_mar_div_v1
++ oh_mar_div_v1
++ ct_mar_div_v1
++ me_mar_v1
++ mi_mar_v1
 ;
+
+concat := concat0(party1_orig_name<>'' and party2_orig_name<>'');
 
 marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriages_divorces.layout_marriage_divorces le) := transform
  
@@ -55,7 +68,7 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriages_divorc
  self.party1_age                     := le.party1_age;
  self.party1_race                    := le.party1_race;
  self.party1_addr1                   := le.party1_residence_address1;
- self.party1_csz                     := stringlib.stringcleanspaces(le.party1_residence_city+le.party1_residence_state+le.party1_orig_zip);
+ self.party1_csz                     := marriage_divorce_v2.fn_csz_format(le.party1_residence_city,le.party1_residence_state,le.party1_orig_zip);
  self.party1_county                  := le.party1_residence_county;
  self.party1_previous_marital_status := le.party1_status;
  self.party1_how_marriage_ended      := '';
@@ -71,7 +84,7 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriages_divorc
  self.party2_age                     := le.party2_age;
  self.party2_race                    := le.party2_race;
  self.party2_addr1                   := le.party2_residence_address1;
- self.party2_csz                     := stringlib.stringcleanspaces(le.party2_residence_city+le.party2_residence_state+le.party2_orig_zip);
+ self.party2_csz                     := marriage_divorce_v2.fn_csz_format(le.party2_residence_city,le.party2_residence_state,le.party2_orig_zip);
  self.party2_county                  := le.party2_residence_county;
  self.party2_previous_marital_status := le.party2_status;
  self.party2_how_marriage_ended      := '';
@@ -114,7 +127,11 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriages_divorc
  self.pname_party1_alias := le.p1a_title+le.p1a_fname+le.p1a_mname+le.p1a_lname+le.p1a_name_suffix+le.p1a_score_in;
  self.pname_party2_alias := le.p2a_title+le.p2a_fname+le.p2a_mname+le.p2a_lname+le.p2a_name_suffix+le.p2a_score_in;
 
- self.touched := 'Y';
+ //originally set to 'Y' so that we don't reclean
+ //however address improvements in the functions
+ //substantiate re-cleaning to, in most cases,
+ //extract the city and state
+ self.touched := '';
  
  self.ca_party1 := 
      le.prim_range_1
@@ -182,4 +199,4 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriages_divorc
  self := [];
 end;
 
-export mapping_v1_to_v2 := project(concat,t_map_to_common(left)) : persist('mar_div_v1_to_v2');
+export mapping_v1_to_v2 := project(concat,t_map_to_common(left));// : PERSIST('mar_div_v1_to_v2');

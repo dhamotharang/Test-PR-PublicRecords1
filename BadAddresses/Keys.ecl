@@ -1,6 +1,6 @@
 Import Data_Services, doxie;
 Export Keys(String Filedate = '') := module
-base := BadAddresses.File_BadAddresses_Base;
+base := BadAddresses.File_BadAddresses_Base(Status = 'C');
 BadAddresses.Layouts.Lay_KeyAddress xform(base L) := Transform
  Self.Address := L.Address; 
  Self.City := L.City; 

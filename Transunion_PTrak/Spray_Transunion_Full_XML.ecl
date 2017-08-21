@@ -12,13 +12,13 @@ EXPORT SprayTransunionXML := FileServices.SprayXML(sourceIP,sourcefile,,RowTag,,
 IMPORT VersionControl;
 
 FilesToSpray := DATASET([
- 	{'edata14-bld.br.seisint.com'										
+ 	{'edata11-bld.br.seisint.com'										
  	,'/load01/transunion_ptrak/xml_all_databases/20080730'                      
  	,'xml_all_databases.d00'                           
  	,0                                                             
  	,'~thor_data400::in::TransunionPtrak_200808'    
  	,[{'~thor_data400::in::TransunionPtrak'}]    
- 	,'thor400_84'                                                
+ 	,'thor400_44'                                                
  	,'20080804'                                                   
  	,''                                                            
  	,'XML'                                                         

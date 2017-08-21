@@ -1,3 +1,3 @@
-import BIPV2,BIPV2_Seleid_relative,tools;
+import BIPV2,BIPV2_Seleid_Relative,tools;
 
-BIPV2_Seleid_relative.Promote().built2QA;
+BIPV2_Seleid_Relative.Promote().built2QA;

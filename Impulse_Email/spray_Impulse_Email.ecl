@@ -8,13 +8,13 @@ EXPORT spray_Impulse_Email(string file_date_in, string version_date_in, string s
 	sprayImpulseEmail :=
 		IF(fileservices.fileexists(Impulse_Email.cluster + 'in::impulse_email::'+ file_date_in +'::temp'),
 			OUTPUT('Impulse Email file sprayed in previous run'),
-			FileServices.SprayVariable(_control.IPAddress.edata12, '/hds_2/impulse_email/data/'+ file_date_in +'/ImpulseEmail.csv',8192, '\\,', '\n'
-			, ,spray_cluster, Impulse_Email.cluster + 'in::impulse_email::'+ file_date_in +'::temp', , , , TRUE))
+			FileServices.SprayVariable(_control.IPAddress.bctlpedata10, '/data/hds_2/impulse_email/data/'+ file_date_in +'/ImpulseEmail.csv',8192, '\\,', '\n'
+			, '\"',spray_cluster, Impulse_Email.cluster + 'in::impulse_email::'+ file_date_in +'::temp', , , , TRUE))
 		;
 				
-	Impulse_Email_in_temp	:=	dataset(Impulse_Email.cluster + 'in::impulse_email::'+ file_date_in +'::temp', layouts.layout_Impulse_Email, CSV(terminator('\n'),separator(','),quote(''), MAXLENGTH(8192)));
+	Impulse_Email_in_temp	:=	dataset(Impulse_Email.cluster + 'in::impulse_email::'+ file_date_in +'::temp', layouts.layout_Impulse_Email_v2, CSV(terminator('\n'),separator(','),quote('\"'), MAXLENGTH(8192)));
 		
-	layouts.layout_Impulse_Email_Dates_append	lTransformAddDtVendorFirstReported(layouts.layout_Impulse_Email pInput)
+	layouts.layout_Impulse_Email_Dates_append	lTransformAddDtVendorFirstReported(layouts.layout_Impulse_Email_v2 pInput)
 		:=
 			TRANSFORM
 				self.version_date								:=	version_date_in;
@@ -23,6 +23,7 @@ EXPORT spray_Impulse_Email(string file_date_in, string version_date_in, string s
 				self.DateVendorLastReported			:=	(unsigned4)self.file_date;
 				self.RawAID											:=	0;
 				self														:=	pInput;
+				self														:=	[];
 			END
 	;
 	

@@ -1,0 +1,20 @@
+export string fn_cnameAbbr(string s0) := function
+	s1 := regexreplace('\\<SERVICE CORPORATION\\>', s0, 'SC');
+	s2 := regexreplace('\\<LIMITED LIABILITY PARTNERSHIP\\>', s1, 'LLP');
+	s3 := regexreplace('\\<LIMITED LIABILITY LIMITED PARTNERSHIP\\>', s2, 'LLLP');
+	s4 := regexreplace('\\<LIMITED PARTNERSHIP\\>', s3, 'LP');
+	s5 := regexreplace('\\<LIMITED LIABILITY CORPORATION\\>', s4, 'LLC');
+	s6 := regexreplace('\\<LIMITED LIABILITY COMPANY\\>', s5, 'LLC');
+	s7 := regexreplace('\\<PROPRIETARY LIMITED\\>', s6, 'PTY LTD');
+	s8 := regexreplace('\\<PUBLIC LIMITED COMPANY\\>', s7, 'PLC');
+	s9 := regexreplace('\\<INCORPORATED\\>', s8, 'INC');
+	s10 := regexreplace('\\<CORPORATION\\>', s9, 'CORP');
+	s11 := regexreplace('\\<LIMITED\\>', s10, 'LTD');
+	s12 := regexreplace('\\<SHOPPE\\>', s11, 'SHOP');
+	s13 := regexreplace('\\<TOWNE\\>', s12, 'TOWN');
+	s14 := regexreplace('\\<COMPANY\\>', s13, 'CO');
+	s15 := regexreplace('\\<MANUFACTURING\\>', s14, 'MFG');
+	s16 := regexreplace('\\<MANUFACTURERS\\>', s15, 'Mfrs');
+	s17 := regexreplace('\\<COOPERATIVE\\>', s16, 'COOP');
+	return s17;
+end;

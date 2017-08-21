@@ -566,7 +566,7 @@ end;
 																						,'ScrubsReport.csv'
 																						,
 																						,
-																						,'Ayeesha.kayttala@lexisnexis.com;sudhir.kasavajjala@lexisnexis.com');	
+																						,'sudhir.kasavajjala@lexisnexis.com');	
   //append bitmap to base
   dbuildbase := project (scrub_file_step1.BitmapInfile,FLAccidents_Ecrash.Layout_Basefile);
 
@@ -578,7 +578,7 @@ end;
 //sequential( buildphotoBaseFile);
 
 
- return sequential(  buildsuppBase
+ map_all := sequential(  buildsuppBase
                     ,submit_stats
 		                //output Scrubs Report
 		                ,output(Scrubs_report_with_examples, all, named('ScrubsReportWithExamples'))
@@ -587,7 +587,10 @@ end;
                     ,buildBase  
 										,buildDocumentBase
 										,buildBaseTMafterTF
-										 );
+										,fn_Validate			
+										,Proc_Build_Alpha(filedate)
+										 ) ;
 
+return map_all;
 end;
 

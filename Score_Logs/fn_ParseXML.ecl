@@ -1,20 +1,16 @@
 import std;
 
 pF := project(Score_Logs.Files.FCRA_Transaction, transform({string source, string filt, Score_Logs.Layouts.Input}, self.outputxml := trim(left.outputxml, left, right), self.inputxml := trim(left.inputxml, left, right), self.source := 'F', self.filt := left.inputxml[1..stringlib.stringfind(left.inputxml, '>', 1)], self := left));//changed
-pNF := project(Score_Logs.Files.NonFCRA_Transaction, transform({string source, string filt, Score_Logs.Layouts.Input}, self.outputxml := trim(left.outputxml, left, right), self.inputxml := trim(left.inputxml, left, right), self.source := 'NF', self.filt := left.inputxml[1..stringlib.stringfind(left.inputxml, '>', 1)], self := left));//changed
+pNF := project(Score_Logs.fn_uncompressXML(Score_Logs.Files.NonFCRA_Transaction), transform({string source, string filt, Score_Logs.Layouts.Input}, self.outputxml := trim(left.outputxml, left, right), self.inputxml := trim(left.inputxml, left, right), self.source := 'NF', self.filt := left.inputxml[1..stringlib.stringfind(left.inputxml, '>', 1)], self := left));//changed
 
-p0 := (pF + pNF)(filt <> '' and length(transaction_id) between 1 and 30 and input_recordtype = 'XML' and output_recordtype = 'XML' and datetime <> ''
-			and	STD.Str.FindCount(inputxml,'<') = STD.Str.FindCount(inputxml,'>')
-			and STD.Str.FindCount(inputxml,'>') = STD.Str.FindCount(inputxml,'</')*2 + STD.Str.FindCount(inputxml,'/>')
-			and STD.Str.FindCount(outputxml,'<') = STD.Str.FindCount(outputxml,'>')
-			and STD.Str.FindCount(outputxml,'>') = STD.Str.FindCount(outputxml,'</')*2 + STD.Str.FindCount(outputxml,'/>')
-			);
+p := (pF + pNF)(filt <> ''
+								and length(transaction_id) between 1 and 30
+								and input_recordtype in ['XML','B64CMPXML']
+								and output_recordtype in ['XML', 'B64CMPXML']
+								and datetime <> ''
+								);
 
-PATTERN BadTag := PATTERN('(<.* [^<>=\']+>)');
-p1:=PARSE(p0,inputxml,BadTag,{boolean do_not_use_input := MATCHTEXT(BadTag),p0},NOT MATCHED);
-p:=PARSE(p1,outputxml,BadTag,{boolean do_not_use_output := MATCHTEXT(BadTag),p1},NOT MATCHED);
-
-p_all := project(p(not do_not_use_input and not do_not_use_output),
+p_all := project(p,
 								transform({string filtA := '', string filtB := '', string filtC, string filtD, string filtE, string outputxml2,
 													 string filt1, string filt2, string filt3, string filt4, string filt5, string inputxml2,
 								            Score_Logs.Layouts.Input, string source}, 
@@ -42,12 +38,17 @@ p_all := project(p(not do_not_use_input and not do_not_use_output),
 									
 									self := left));
 
-p2 := PROJECT(p_all, TRANSFORM(Score_Logs.Layouts.Base_Transaction_Layout,
+//allow required SAO transactions in the build								
+p_all_filter :=p_all(stringlib.stringtouppercase(filt3) in Score_logs.set_product or trim(customer_id,left,right) = '4');
 
-											Score_Logs.Layouts_InputXML.rform1 fields1	:= FROMXML(Score_Logs.Layouts_InputXML.rform1, left.inputxml2);
+p2 := PROJECT(p_all_filter, TRANSFORM(Score_Logs.Layouts.Base_Transaction_Layout,
+
+											Score_Logs.Layouts_InputXML.rform1 fields1	:= FROMXML(Score_Logs.Layouts_InputXML.rform1, left.inputxml2
+														,trim, ONFAIL(transform(Score_Logs.Layouts_InputXML.rform1,self.product:=failmessage,SELF:=[])));
 											self.inputxml_parsed := fields1;
 											
-											Score_Logs.Layouts_OutputXML.rform1 fields2	:= FROMXML(Score_Logs.Layouts_OutputXML.rform1, left.outputxml2);
+											Score_Logs.Layouts_OutputXML.rform1 fields2	:= FROMXML(Score_Logs.Layouts_OutputXML.rform1, left.outputxml2
+														,trim, ONFAIL(transform(Score_Logs.Layouts_OutputXML.rform1,self.product:=failmessage,SELF:=[])));
 											self.outputxml_parsed := fields2;
 											
 											self.product := left.filt3;

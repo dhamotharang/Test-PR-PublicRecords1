@@ -1,0 +1,1 @@
+export File_SEC_Broker_Dealer_Raw := dataset('~thor_data400::in::sec_broker_dealer::raw', Layout_SEC_Broker_Dealer_Raw, CSV(separator('\t'),Quote('"'),Terminator('\n')));

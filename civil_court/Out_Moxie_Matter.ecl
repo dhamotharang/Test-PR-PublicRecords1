@@ -67,5 +67,7 @@ dInAsOutRollup :=
 		source_file,
 		case_key,
 	  local);
+
+df_Brevard_Matter := dataset('~thor_data400::in::civ_court::20071210::fl_brevard_matter', civil_court.Layout_Moxie_matter, flat);
 					   					   				   
-export Out_Moxie_Matter := output(dInAsOutRollup,,civil_court.Name_Moxie_Matter_Dev,__compressed__,overwrite);
+export Out_Moxie_Matter := output(dInAsOutRollup + df_Brevard_Matter,,civil_court.Name_Moxie_Matter_Dev,__compressed__,overwrite);

@@ -198,8 +198,9 @@ county_reg(string2 code)
 				'' );   
 
 string fFixHullID(string pHullIDIn) :=	lib_stringlib.StringLib.stringtouppercase(pHullIDIn);
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_GA_clean_in, watercraft.Layout_GA_clean_in,hull_clean_in)
 
-watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_GA_clean_in L) := transform
+watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := transform
 
 
     self.watercraft_key						:=	if(trim(L.year, left, right) >= '1972' and length(trim(fFixHullID(L.HULL_ID),left, right)) = 12, trim(fFixHullID(L.HULL_ID),left, right),
@@ -304,7 +305,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_GA_cl
 
 
 
-export Mapping_GA_as_Main := project(watercraft.file_GA_clean_in, main_mapping_format(left));
+export Mapping_GA_as_Main := project(hull_clean_in, main_mapping_format(left));
 
 
 

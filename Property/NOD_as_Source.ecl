@@ -1,28 +1,19 @@
 import property, header;
 
 export NOD_as_Source(
-       dataset(property.Layout_Fares_Foreclosure) pNoticeOfDefault=dataset([],property.Layout_Fares_Foreclosure),
+       dataset(Property.Layout_Fares_Foreclosure_v2) pNoticeOfDefault=dataset([],Property.Layout_Fares_Foreclosure_v2),
        boolean p4HdrBld=false) := function
 
-  dSourceData := dataset('~thor_data400::Base::ForeclosureHeader_Building',Property.Layout_Fares_Foreclosure, flat);
+  dSourceData := dataset('~thor_data400::Base::ForeclosureHeader_Building',Property.Layout_Fares_Foreclosure_v2, flat);
 
-  dSrcData := if(p4HdrBld, dSourceData, pNoticeOfDefault);
+  dSrcData := project(if(p4HdrBld, dSourceData, pNoticeOfDefault),Property.Layout_Fares_Foreclosure);
 
-  src_rec := record
-    header.layout_source_id;
-    property.Layout_Fares_Foreclosure;
-  end;
+  src_rec := header.layouts_SeqdSrc.ND_src_rec;
 
   header.Mac_Set_Header_Source(dSrcData(trim(deed_category)='N'),
-                               property.Layout_Fares_Foreclosure,
+                               Property.Layout_Fares_Foreclosure,
                                src_rec,'NT',withUID);
 
-  dNODHeader := withUID : persist('persist::headerbuild_nod_src');
-
-  dNODOther := withUID;
-
-  dsSrc := if(p4HdrBld, dNODHeader, dNODOther);
-
-  return dsSrc;
+  return withUID;
 
 end;

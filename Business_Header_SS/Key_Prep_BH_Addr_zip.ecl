@@ -1,7 +1,12 @@
-IMPORT Business_Header;
+Import Data_Services, Business_Header, PRTE2_Business_Header;
 
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+f_a := PRTE2_Business_Header.files().base.CompanynameAddressBroad.keybuild
+	((cn_zip_bdids > 0 and cn_zip_bdids < 100));
+#ELSE
 f_a := business_header.files().base.CompanynameAddressBroad.keybuild
 	((cn_zip_bdids > 0 and cn_zip_bdids < 100));
+#END;
 
 layout_address_index := RECORD
 	f_a.zip;

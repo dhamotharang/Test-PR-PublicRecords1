@@ -1,7 +1,6 @@
-export Layout_VA_clean_in := 
+export Layout_VA_clean_in := record
 
-
-record
+//rec lenght : 1911
 
 string2 	state_origin;
 string8	    process_date;

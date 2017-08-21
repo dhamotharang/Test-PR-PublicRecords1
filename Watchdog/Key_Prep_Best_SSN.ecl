@@ -1,3 +1,4 @@
+IMPORT Data_Services,PRTE2_Header,PRTE2_Watchdog;
 //Create best SSN key
 glb := watchdog.File_Best;
 non_glb := watchdog.File_Best_nonglb;
@@ -20,6 +21,10 @@ end;
 //Join setting the bits depends on what time of file you are looking at
 set_nonglb := join(glb_flags,non_glb,left.did=right.did,SSNflags(left,right,4),local);
 set_nonutil := join(set_nonglb,non_util,left.did=right.did,SSNflags(left,right,2),local);
-set_nonglb_nonutil := join(set_nonutil,nonglb_nonutil,left.did=right.did,SSNflags(left,right,8),local);
 
-export Key_Prep_Best_SSN := index(set_nonglb_nonutil,{set_nonglb_nonutil},'~thor_data400::key::watchdog_best.ssn'+thorlib.wuid());
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+set_nonglb_nonutil := project(PRTE2_Watchdog.files.file_best,watchdog.KeyType_Best_SSN);
+#ELSE
+set_nonglb_nonutil := join(set_nonutil,nonglb_nonutil,left.did=right.did,SSNflags(left,right,8),local);
+#END
+export Key_Prep_Best_SSN := index(set_nonglb_nonutil,{set_nonglb_nonutil},Data_Services.Data_location.Prefix('Watchdog_Best')+'thor_data400::key::watchdog_best.ssn'+thorlib.wuid());

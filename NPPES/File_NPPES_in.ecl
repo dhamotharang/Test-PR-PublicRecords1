@@ -1,0 +1,1 @@
+export File_NPPES_in := dataset(NPPES.Cluster+'in::nppes',NPPES.Layouts.Vendor,CSV(SEPARATOR([',']), quote('"'),maxlength(100000),heading(1), TERMINATOR(['\r\n', '\n'])));

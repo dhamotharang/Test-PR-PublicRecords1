@@ -60,7 +60,6 @@ rPopulationStats_file_in
     name_type_CountNonBlank                                := ave(group,if(file_in.name_type<>'',100,0));
     DID_CountNonBlank                                      := ave(group,if((unsigned6)file_in.DID<>0,100,0));
     BDID_CountNonBlank                                     := ave(group,if((unsigned6)file_in.BDID<>0,100,0));
-	 BID_CountNonBlank                                     := ave(group,if(file_in.BID<>0,100,0));
     date_first_seen_CountNonBlank                          := ave(group,if(file_in.date_first_seen<>'',100,0));
     date_last_seen_CountNonBlank                           := ave(group,if(file_in.date_last_seen<>'',100,0));
     date_vendor_first_reported_CountNonBlank               := ave(group,if(file_in.date_vendor_first_reported<>'',100,0));

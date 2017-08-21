@@ -14,8 +14,10 @@ end;
 propagate_did := join(distribute(without_did, hash(clean_email)), 
 											distribute(with_did, hash(clean_email)),
 											left.clean_email = right.clean_email and
-											ut.stringsimilar(left.clean_name.lname,right.clean_name.lname) < 3 and
-											ut.stringsimilar(left.clean_name.fname,right.clean_name.fname) < 3,
+											left.clean_name.lname = right.clean_name.lname and
+											left.clean_name.fname = right.clean_name.fname,
+											// ut.stringsimilar(left.clean_name.lname,right.clean_name.lname) < 3 and
+											// ut.stringsimilar(left.clean_name.fname,right.clean_name.fname) < 3,
 											t_propagate_did (left, right),
 											left outer,
 											keep (1),

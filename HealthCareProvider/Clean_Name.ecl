@@ -4,9 +4,11 @@ EXPORT Clean_Name (DATASET (HealthCareProvider.Layout_HealthProvider.HealthCareP
 		LNAME 			:= TRIM(L.LNAME);
 		FNAME 			:= TRIM(L.FNAME);		
 		MNAME 			:= TRIM(L.MNAME);
-		SELF.MNAME	:= 	CleanMedicalWords.CleanMedicalName(MName);
-		SELF.LNAME	:=	CleanMedicalWords.cleanMedicalName(LNAME);
-		SELF.FNAME	:=	CleanMedicalWords.cleanMedicalName(FNAME);
+		SELF.MNAME	:= CleanMedicalWords.CleanMedicalName(MName);
+		C_LNAME			:= CleanMedicalWords.cleanMedicalName(LNAME);
+		C_FNAME			:= CleanMedicalWords.cleanMedicalName(FNAME);
+		SELF.LNAME	:= IF (TRIM(C_LNAME) <> '',C_LNAME,LNAME);
+		SELF.FNAME	:= IF (TRIM(C_FNAME) <> '',C_FNAME,FNAME);
 		SELF 				:= L;
 		SELF				:=	[];
 	END;

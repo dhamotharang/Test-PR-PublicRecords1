@@ -1,4 +1,4 @@
-﻿IMPORT lib_stringlib;
+IMPORT lib_stringlib;
 
 EXPORT Constants := MODULE
 		EXPORT string DIRECT_hit := 'DIRECT';

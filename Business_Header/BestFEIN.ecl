@@ -3,7 +3,11 @@
 // that macro take a flag indicating business vs. person header,
 // but it would also be ugly.
 
-export BestFEIN(dataset(business_header.Layout_Business_Header_Base) bh) := FUNCTION
+export BestFEIN(
+
+	dataset(business_header.Layout_Business_Header_Base) bh = Files().Base.Business_Headers.Built
+
+) := FUNCTION
 
 bh_fein := bh(fein != 0);
 bh_d_bdid := DISTRIBUTE(bh_fein, HASH(bdid));
@@ -21,7 +25,7 @@ fein_g_stat := GROUP(SORT(fein_stat, bdid, LOCAL), bdid, LOCAL);
 fein_s_stat := SORT(fein_g_stat, -fein_ct, -fein);
 
 // Keep the most frequent FEIN, since there are so few that we have.
-bh_bestfein := GROUP(DEDUP(fein_s_stat, TRUE)) : persist('BH::BestFEIN');
+bh_bestfein := GROUP(DEDUP(fein_s_stat, TRUE));
 
 /*
 // Keep only 2 most frequent FEIN's per DID.

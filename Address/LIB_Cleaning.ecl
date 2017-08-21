@@ -1,6 +1,3 @@
-/*2012-04-06T17:41:33Z (Krishna Turlapathi_prod)
-
-*/
 /*--LIBRARY--*/
 
 // This library performs common cleaning / parsing.

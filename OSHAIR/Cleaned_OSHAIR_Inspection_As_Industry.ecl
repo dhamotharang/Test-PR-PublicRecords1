@@ -8,7 +8,7 @@ SKIP(C = 2 AND L.naics_secondary_code = '000000')
 	SELF.bdid_score								:=	L.bdid_score;
 	SELF.source       						:=	MDR.sourceTools.src_OSHAIR;
 	SELF.source_docid  						:=	'';
-	SELF.source_rec_id 						:=	'';
+	SELF.source_rec_id 						:=	L.source_rec_id;
 	SELF.siccode       						:=	(STRING)L.sic_code;
 	SELF.naics        						:=	CHOOSE(C,IF(L.naics_code='000000','',L.naics_code),L.naics_secondary_code);
 	SELF.industry_description 		:=	'';

@@ -215,6 +215,7 @@ export string1 fStandard_Offense_Level_From_Orig(string2 pVendor, string5 pCourt
 		pVendor='25' and pCourtOffLevel='FS'	=> 'F',
 		pVendor='25' and pCourtOffLevel='FT'	=> 'F',
 		pVendor='25' and pCourtOffLevel='IN'	=> 'I',
+		pVendor='25' and pCourtOffLevel='I'	    => 'I',
 		pVendor='25' and pCourtOffLevel='LN'	=> 'I',
 		pVendor='25' and pCourtOffLevel='M'		=> 'M',
 		pVendor='25' and pCourtOffLevel='MF'	=> 'M',

@@ -5,17 +5,19 @@ import VotersV2;
 //*** VotersV2.Mac_Spray_Voters
 //*** (
 //*** 	'edata12.br.seisint.com',     //edata12
+//*** 'bctlpedata11.br.seisint.com',  //bctlpedata11
 //***   '/data_build_1/emerges/ri/',  //File Path
 //*** 	'RI',                         //Source State
 //*** 	'20061220',                   //filedate
 //*** 	'RI_voter_689470_dec_20_2006_emerges_cass_v1_target.txt',  //File name
-//***	'thor_dataland_linux',        //Group name
+//***		'thor_dataland_linux',        //Group name
 //***   'N'                           //Clear Superfile
 //*** )
 //*******************************************************************************************
 
-export Mac_Spray_Voters(source_IP,source_path,source_state,filedate,file_name,group_name,clear_Super='N') := 
+export Mac_Spray_Voters(source_IP,source_path,source_state,filedate,file_name,group_name,clear_Super='\'N\'', do_spray) := 
 macro
+#uniquename(spray_IP)
 #uniquename(spray_main)
 #uniquename(super_main)
 #uniquename(super_main1)
@@ -32,60 +34,69 @@ macro
 
 #workunit('name',source_state+' Voter Reg Spray ');
 
+%spray_IP% := map(source_IP = 'bctlpedata11' => _control.IPAddress.bctlpedata11,
+									source_IP = 'edata14' => _control.IPAddress.edata14a,
+									source_IP = 'edata11' => _control.IPAddress.edata11b,
+									source_IP);
+
 %recSize% := 1888;
 
-
 %doCleanup% := sequential(FileServices.RemoveSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Old',
-														VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned'),
-						   FileServices.RemoveSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete',
-														VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned'),
-				           FileServices.RemoveSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Superfile',
-														VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned'),
-						   FileServices.DeleteLogicalFile(VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned'));
+																												VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned'),
+													 FileServices.RemoveSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete',
+																												VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned'),
+													 FileServices.RemoveSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Superfile',
+																														VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned'),
+													 FileServices.DeleteLogicalFile(VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned'));
 
-%deleteIfExist% := if(FileServices.FileExists(VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned'),
-					  %doCleanup%);
+%deleteIfExist% := if(FileServices.FileExists(VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned'),%doCleanup%);
 
-%spray_main% := FileServices.SprayFixed(Source_IP,source_path + file_name,%recSize%,group_name,VotersV2.cluster +'in::Voters::'+source_state+'::raw_'+filedate,-1,,,true,true);
+%spray_main% := FileServices.SprayFixed(%spray_IP%,source_path + file_name,%recSize%,group_name,VotersV2.cluster +'in::Voters::'+source_state+'::raw_'+filedate,-1,,,true,true);
 
 %raw_delete% := if (FileServices.FileExists(VotersV2.cluster + 'in::Voters::'+source_state+'::raw_'+ filedate), 
-					FileServices.DeleteLogicalFile(VotersV2.cluster + 'in::Voters::'+source_state+'::raw_'+ filedate));
+										FileServices.DeleteLogicalFile(VotersV2.cluster + 'in::Voters::'+source_state+'::raw_'+ filedate));
 
 
 %CreateSuperfiles% := sequential(FileServices.CreateSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Superfile',false),
                                   FileServices.CreateSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete',false),
-								  FileServices.CreateSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Old',false),
-								  FileServices.StartSuperFileTransaction(),
-								  FileServices.AddSuperFile(VotersV2.Cluster + 'in::Voters::main::Superfile'
-								                           ,VotersV2.Cluster + 'in::Voters::'+source_state+'::Superfile'),
-								  FileServices.FinishSuperFileTransaction()
-								 );
+																	FileServices.CreateSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Old',false),
+																	FileServices.StartSuperFileTransaction(),
+																	FileServices.AddSuperFile(VotersV2.Cluster + 'in::Voters::main::Superfile',
+																														VotersV2.Cluster + 'in::Voters::'+source_state+'::Superfile'),
+																	FileServices.FinishSuperFileTransaction()
+																 );
+																 
 %CreateSuperIfNotExist% := if (~FileServices.SuperFileExists(VotersV2.cluster + 'in::Voters::'+source_state+'::Superfile'),%CreateSuperfiles%); 
 			
 %cleaned_file% := output(VotersV2.Cleaned_Voters(source_state, filedate),,VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned',overwrite);
 
 %super_main% := sequential(FileServices.StartSuperFileTransaction(),
-				FileServices.AddSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete',
-				                          VotersV2.cluster + 'in::Voters::'+source_state+'::Old',, true),
-				FileServices.ClearSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Old'),
-				FileServices.AddSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Old', 
-				                          VotersV2.cluster + 'in::Voters::'+source_state+'::Superfile',, true),
-				FileServices.ClearSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Superfile'),
-				FileServices.AddSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Superfile', 
-				                          VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned'), 
-				FileServices.FinishSuperFileTransaction(),
-				FileServices.ClearSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete',true));
+														FileServices.AddSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete',
+																											VotersV2.cluster + 'in::Voters::'+source_state+'::Old',, true),
+														FileServices.ClearSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Old'),
+														FileServices.AddSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Old', 
+																											VotersV2.cluster + 'in::Voters::'+source_state+'::Superfile',, true),
+														FileServices.ClearSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Superfile'),
+														FileServices.AddSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Superfile', 
+																											VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned'), 
+														FileServices.FinishSuperFileTransaction(),
+														//FileServices.ClearSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete',true));
+														FileServices.RemoveOwnedSubFiles(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete',true),
+														FileServices.ClearSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete'));
+														
 
 %super_main1% := sequential(FileServices.StartSuperFileTransaction(),
-				FileServices.AddSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete',
-				                          VotersV2.cluster + 'in::Voters::'+source_state+'::Old',, true),
-				FileServices.ClearSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Old'),
-				FileServices.AddSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Old', 
-				                          VotersV2.cluster + 'in::Voters::'+source_state+'::Superfile',, true),
-				FileServices.AddSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Superfile', 
-				                          VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned'), 
-				FileServices.FinishSuperFileTransaction(),
-				FileServices.ClearSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete',true));
+															FileServices.AddSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete',
+																												VotersV2.cluster + 'in::Voters::'+source_state+'::Old',, true),
+															FileServices.ClearSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Old'),
+															FileServices.AddSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Old', 
+																												VotersV2.cluster + 'in::Voters::'+source_state+'::Superfile',, true),
+															FileServices.AddSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Superfile', 
+																												VotersV2.cluster + 'in::Voters::'+source_state+'::'+filedate+'::cleaned'), 
+															FileServices.FinishSuperFileTransaction(),
+															//FileServices.ClearSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete',true));
+														FileServices.RemoveOwnedSubFiles(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete',true),
+														FileServices.ClearSuperFile(VotersV2.cluster + 'in::Voters::'+source_state+'::Delete'));
 
 
 %do_super%  := sequential(output('do super 1...'),%CreateSuperIfNotExist%, %deleteIfExist%, %spray_main%, %cleaned_file%, %super_main%, %raw_delete%);
@@ -94,6 +105,6 @@ macro
 
 %out_super% := if(clear_Super = 'Y',sequential(%do_super%),sequential(%do_super1%));
 
-sequential(%out_super%);
+do_spray := sequential(%out_super%);
 
 endmacro;

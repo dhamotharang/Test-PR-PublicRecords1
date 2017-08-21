@@ -1,0 +1,1 @@
+EXPORT Notification_Email_Address := 'shannon.skumanich@lexisnexis.com; sudhir.kasavajjala@lexisnexis.com';

@@ -110,11 +110,17 @@ transform
 	self.ssn	:= (unsigned4)L.ssn;
 	self 	:= R;
 end;
+Layout_5610_Demographic_Data_Base tback2baseformat(withdid l) := 
+transform
+	self 	:= l;
+end;
 
-withdid_sort	:= sort(distribute(withdid,hash((integer)did)),did,local);
+withdid_sort	:= sort(distribute(withdid(did != 0),hash((integer)did)),did,local);
+withoutdid		:= project(withdid(did = 0), tback2baseformat(left));
+
 ssn_records	:= join(File_Watchdog_Best,withdid_sort,
 					left.did = right.did,
 					getssn(LEFT,RIGHT),
 					right outer,local);
 
-export DID_5610_Demographic_Data := ssn_records : persist(EBR_thor + 'TEMP::DID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code));
+export DID_5610_Demographic_Data := distribute(ssn_records + withoutdid, hash(FILE_NUMBER))/*: persist(EBR_thor + 'TEMP::DID_' + dataset_name + '_' + segment_code + '_' + decode_segments(segment_code))*/;

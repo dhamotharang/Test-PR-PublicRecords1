@@ -1,0 +1,76 @@
+MODULE:scrubs_sexoffender_def_raw
+FILENAME:sexoffender_def_raw
+//Uncomment up to NINES for internal or external adl
+//IDFIELD:EXISTS:<NameOfIDField>
+//RIDFIELD:<NameOfRidField>
+//RECORDS:<NumberOfRecordsInDataFile>
+//POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+//NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+//Uncomment Process if doing external adl
+//PROCESS:<ProcessName>
+//FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+//BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+//FUZZY can be used to create new types of FUZZY linking
+FIELDTYPE:firstName:WITHIN(scrubs_sexoffender_def_raw.file_valid_firstname,firstname)
+FIELDTYPE:lastName:WITHIN(scrubs_sexoffender_def_raw.file_valid_lastname,lastname)
+FIELD:recordid:TYPE(STRING40):0,0
+FIELD:sourcename:TYPE(STRING100):0,0
+FIELD:sourcetype:TYPE(STRING20):0,0
+FIELD:statecode:TYPE(STRING2):0,0
+FIELD:recordtype:TYPE(STRING20):0,0
+FIELD:recorduploaddate:TYPE(STRING8):0,0
+FIELD:docnumber:TYPE(STRING20):0,0
+FIELD:fbinumber:TYPE(STRING20):0,0
+FIELD:stateidnumber:TYPE(STRING20):0,0
+FIELD:inmatenumber:TYPE(STRING20):0,0
+FIELD:aliennumber:TYPE(STRING20):0,0
+FIELD:orig_ssn:TYPE(STRING9):0,0
+FIELD:nametype:TYPE(STRING1):0,0
+FIELD:name:TYPE(STRING115):0,0
+FIELD:lastname:LIKE(lastname):0,0
+FIELD:firstname:LIKE(firstname):0,0
+FIELD:middlename:TYPE(STRING40):0,0
+FIELD:suffix:TYPE(STRING15):0,0
+FIELD:defendantstatus:TYPE(STRING100):0,0
+FIELD:defendantadditionalinfo:TYPE(STRING200):0,0
+FIELD:dob:TYPE(STRING8):0,0
+FIELD:birthcity:TYPE(STRING50):0,0
+FIELD:birthplace:TYPE(STRING100):0,0
+FIELD:age:TYPE(STRING3):0,0
+FIELD:gender:TYPE(STRING10):0,0
+FIELD:height:TYPE(STRING10):0,0
+FIELD:weight:TYPE(STRING10):0,0
+FIELD:haircolor:TYPE(STRING10):0,0
+FIELD:eyecolor:TYPE(STRING10):0,0
+FIELD:race:TYPE(STRING20):0,0
+FIELD:ethnicity:TYPE(STRING20):0,0
+FIELD:skincolor:TYPE(STRING10):0,0
+FIELD:bodymarks:TYPE(STRING100):0,0
+FIELD:physicalbuild:TYPE(STRING20):0,0
+FIELD:photoname:TYPE(STRING50):0,0
+FIELD:dlnumber:TYPE(STRING20):0,0
+FIELD:dlstate:TYPE(STRING2):0,0
+FIELD:phone:TYPE(STRING20):0,0
+FIELD:phonetype:TYPE(STRING10):0,0
+FIELD:uscitizenflag:TYPE(STRING1):0,0
+FIELD:addresstype:TYPE(STRING20):0,0
+FIELD:street:TYPE(STRING150):0,0
+FIELD:unit:TYPE(STRING20):0,0
+FIELD:city:TYPE(STRING50):0,0
+FIELD:orig_state:TYPE(STRING2):0,0
+FIELD:orig_zip:TYPE(STRING9):0,0
+FIELD:county:TYPE(STRING50):0,0
+FIELD:institutionname:TYPE(STRING100):0,0
+FIELD:institutiondetails:TYPE(STRING200):0,0
+FIELD:institutionreceiptdate:TYPE(STRING8):0,0
+FIELD:releasetolocation:TYPE(STRING100):0,0
+FIELD:releasetodetails:TYPE(STRING200):0,0
+FIELD:deceasedflag:TYPE(STRING1):0,0
+FIELD:deceaseddate:TYPE(STRING8):0,0
+FIELD:healthflag:TYPE(STRING1):0,0
+FIELD:healthdesc:TYPE(STRING100):0,0
+FIELD:bloodtype:TYPE(STRING10):0,0
+FIELD:sexoffenderregistrydate:TYPE(STRING8):0,0
+FIELD:sexoffenderregexpirationdate:TYPE(STRING8):0,0
+FIELD:sexoffenderregistrynumber:TYPE(STRING100):0,0
+FIELD:sourceid:TYPE(STRING):0,0

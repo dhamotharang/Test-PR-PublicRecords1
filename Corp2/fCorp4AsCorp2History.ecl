@@ -1,6 +1,6 @@
 import ut;
 
-export fCorp4AsCorp2History(DATASET(Layout_Corporate_Direct_Corp_Base) corp_base) :=
+export fCorp4AsCorp2History(DATASET(Layout_Corporate_Direct_Corp_AID) corp_base) :=
 FUNCTION
 
 // Select the Historical Records from the Corp4 (Experian) data to be combined with direct Corp Data
@@ -22,7 +22,7 @@ corp_datefs_dedup := dedup(corp_datefs_sort, corp_key, local);
 // Select history from Experian corporate
 corp4_dist := distribute(corp4, hash(corp_key));
 
-Layout_Corporate_Direct_Corp_Base SelectHistory(Layout_Corporate_Direct_Corp_Base l, layout_corp_datefs r) := transform
+Layout_Corporate_Direct_Corp_AID SelectHistory(Layout_Corporate_Direct_Corp_AID l, layout_corp_datefs r) := transform
 self := l;
 end;
 

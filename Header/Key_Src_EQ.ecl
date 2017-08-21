@@ -5,7 +5,7 @@ src_rec:=header.layout_header_in;
 export Key_Src_EQ(boolean pFastHeader = false, boolean pCombo = true, dataset(src_rec) pDataset=dataset([],src_rec)) := function
 
 EQ_weekly		:=project(header.file_header_in(pFastHeader).eq_uid_weekly,header.layout_header_in);
-EQ_monthly	:=header.file_header_in(pFastHeader).eq_uid_monthly;
+EQ_monthly	:=header.Files_SeqdSrc(pFastHeader).EQ;
 
 EQ_as_source := if(pCombo,pDataset
 													,if(pFastHeader

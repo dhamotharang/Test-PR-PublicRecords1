@@ -1,3 +1,4 @@
+IMPORT SANCTN, Address;
 
 export proc_build_SANCTN_base(string filedate) := function
 
@@ -7,8 +8,10 @@ export proc_build_SANCTN_base(string filedate) := function
 
 //party := distribute(SANCTN.clean_party,hash(batch_number,incident_number));  (getting a wierd "way error")
 //incident := distribute(SANCTN.clean_incident,hash(batch_number,incident_number));
-
-party := distribute(SANCTN.file_out_party_cleaned,hash(batch_number,incident_number,party_number));
+//removed reclean of the party file as it is full file replacement
+j_party_toclean := SANCTN.file_out_party_cleaned;
+   
+party := distribute(j_party_toclean,hash(batch_number,incident_number,party_number));
 
 SANCTN.layout_SANCTN_base.layout_SANCTN_partyfull t_parent(party L) := transform
 

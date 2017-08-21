@@ -56,7 +56,8 @@ layout note_init7(layout le,Specificities(File_PersonHeader).MNAME_values_persis
   self := le;
 end;
 DataForKey7 := join(DataForKey2,Specificities(File_PersonHeader).MNAME_values_persisted(length(trim(MNAME))=1),left.MNAME[1]=right.MNAME[1],note_init7(left,right),lookup,left outer); // Append specificities for initials of MNAME
-export Key := index(DataForKey7,,ut.Data_Location.Person_header+'thor_data400::key::PersonLinkingADL2V3PersonHeaderDORefs_' + doxie.version_superkey);export RawFetch(UNSIGNED4 param_DOB, typeof(h.LNAME) param_LNAME, typeof(h.FNAME) param_FNAME) := 
+export Key := index(DataForKey7,,PersonLinkingADL2V3.Filename_keys.kDOB);
+export RawFetch(UNSIGNED4 param_DOB, typeof(h.LNAME) param_LNAME, typeof(h.FNAME) param_FNAME) := 
     STEPPED( LIMIT( Key(
           ( param_DOB <> 0 AND ( param_DOB div 10000 = DOB_year AND param_DOB div 10000<>0 ) AND ( param_DOB div 100 % 100 = DOB_month AND param_DOB div 100<>0 ) AND ( param_DOB % 100 = DOB_day AND param_DOB % 100<>0 ))
       AND ( LNAME = param_LNAME and param_LNAME <> (typeof(LNAME))'' )

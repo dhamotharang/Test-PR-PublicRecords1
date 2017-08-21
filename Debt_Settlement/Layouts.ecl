@@ -1,4 +1,4 @@
-import address, LiensV2;
+import address, LiensV2, bipv2;
 export Layouts :=
 module
 
@@ -46,24 +46,25 @@ module
 				
 		export CC := 
 		record
-			string BusinessName;
-			string DBA;
-			string OrgID;
-			string Address1;
-			string Address2;
-			string City;
-			string State;
-			string Zip;
-			string Zip4;
-			string Phone;
-			string Fax;
-			string Email;
-			string URL;
-			string Status;
-			string LicenseDateFrom;
-			string LicenseDateTo;
-			string OrgType;
-			string Source;
+      string ID             ;
+      string BusinessName   ;
+			string DBA            ;              
+      string OrgID          ;
+      string Address1       ;
+      string Address2       ;
+      string City           ;
+      string State          ;
+      string Zip            ;
+      string Zip4           ;
+      string Phone          ;
+      string Fax            ;
+      string Email          ;
+      string URL            ;
+      string Status         ;
+      string LicenseDateFrom;
+      string LicenseDateTo  ;
+      string OrgType        ;
+			string Source         ;              
 		end;
 		
 		export Common := 
@@ -107,6 +108,7 @@ module
 	////////////////////////////////////////////////////////////////////////
 	export Base :=
 	record
+	  bipv2.IDlayouts.l_xlink_ids;	//Added for BIP project
 		unsigned6														did											:= 0;
 		unsigned1														did_score										;
 		unsigned6														Bdid										:= 0;
@@ -185,8 +187,15 @@ module
 			string10		phone		  		    ;
 			unsigned6		bdid					:= 0;
 			unsigned1		bdid_score		:= 0;
+			string25    city               ;
+			string50    email         := '';
+			string50		URL						:= '';
+			string20		fname 				:= '';
+			string20    mname 				:= '';
+			string20  	lname					:= '';
+			 bipv2.IDlayouts.l_xlink_ids    ;
 	  end;
-		
+			  
 	  export UniqueId := 
 		record
  		  unsigned8		unique_id	;

@@ -31,4 +31,5 @@ export Layout_Transunion_Update_In := RECORD
 	STRING8 BIRTHDATE;
 	STRING1 BIRTHDATEIND;							               
 	STRING1 DECEASEDINDICATOR;
+	STRING10 DECEASEDDATE; //field added on 20120219 full update
 END;

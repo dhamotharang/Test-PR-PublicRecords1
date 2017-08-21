@@ -1,4 +1,6 @@
-import ut;
+import ut,RoxieKeybuild;
+
+export proc_build_ssn_key(string filedate) := function
 
 pre := sequential(
 		if (fileservices.getsuperfilesubcount('~thor_data400::base::hss_name_ssn_building') > 0,
@@ -6,7 +8,9 @@ pre := sequential(
 			fileservices.addsuperfile('~thor_data400::base::hss_name_ssn_building','~thor_data400::base::hss_name_ssn',0,true))
 		);
 
-ut.MAC_SK_BuildProcess(key_prep_name_ssn,'~thor_data400::key::file_name_ssn_','~thor_data400::key::file_name_ssn',ssnkey,2)
+RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(key_prep_name_ssn,'~thor_data400::key::file_name_ssn_','~thor_data400::key::header_slimsort::'+filedate+'::name_ssn',ssnkey);
+
+RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::file_name_ssn','~thor_data400::key::header_slimsort::'+filedate+'::name_ssn',mv_name_ssn);
 
 post := sequential(
 		fileservices.clearsuperfile('~thor_Data400::base::hss_name_ssn_BUILT'),
@@ -15,6 +19,7 @@ post := sequential(
 		);
 
 
-export proc_build_ssn_key := if (fileservices.getsuperfilesubname('~thor_Data400::base::hss_name_ssn_BUILT',1) = fileservices.getsuperfilesubname('~thor_data400::base::hss_name_ssn',1),
+return if (fileservices.getsuperfilesubname('~thor_Data400::base::hss_name_ssn_BUILT',1) = fileservices.getsuperfilesubname('~thor_data400::base::hss_name_ssn',1),
 			output('SSN Base = BUILT, nothing done.'),
-			sequential(pre,ssnkey,post));
+			sequential(pre,ssnkey,mv_name_ssn,post));
+end;

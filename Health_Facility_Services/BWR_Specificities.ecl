@@ -1,5 +1,5 @@
 //This is the code to execute in a builder window
-#workunit('name','Health_Facility_Services.BWR_Specificities - Specificities - SALT V2.9 Beta 1');
+#workunit('name','Health_Facility_Services.BWR_Specificities - Specificities - SALT V2.9 Gold SR1');
 IMPORT Health_Facility_Services,SALT29;
 IMPORT SALTTOOLS22;
 SpecMod := Health_Facility_Services.specificities(Health_Facility_Services.File_HealthFacility);

@@ -447,7 +447,7 @@ dlf.orig_state;
 dlf.did;
 end;
 
-tbl_dls := table(dlf,slim_dl,lname,fname,mname,dl_number,orig_state,did,few): persist('~thor_200::persist::tbl_dl');
+tbl_dls := table(dlf,slim_dl,lname,fname,mname,dl_number,orig_state,did,few): persist('~thor_200::persist::tbl_dl_ntl');
 
 natInq_noDID getDID(natInq_noDID L, tbl_dls R) :=transform
 self.did := map(L.DRIVERS_LICENSE = R.dl_number 
@@ -507,12 +507,11 @@ appndDID2 := join(appndDID,dedup(tbl_dls,dl_number,fname,all),
     getDID2(left,right),left outer,hash);
 
 
-natInq_all := appndDID2 + natInq_allothers :  persist('~thor_data400::persist::ecrash_ntlinq_did','thor400_20');								
-sfShuffle := sequential(
+natInq_all := appndDID2 + natInq_allothers :  persist('~thor_data400::persist::ecrash_ntlinq_did');								
+sfShuffle := sequential(	
+   fileservices.RemoveOwnedSubFiles('~thor_data400::base::ntlcrash_inquiry_delete',true),
 	fileservices.addsuperfile('~thor_data400::base::ntlcrash_inquiry_delete','~thor_data400::base::ntlcrash_inquiry_grandfather',0,true),
-	fileservices.deletesuperfile('~thor_data400::base::ntlcrash_inquiry_delete',true),
 	fileservices.startsuperfiletransaction(),
-	fileservices.createsuperfile('~thor_data400::base::ntlcrash_inquiry_delete'),
 	fileservices.clearsuperfile('~thor_data400::base::ntlcrash_inquiry_grandfather'),
 	fileservices.addsuperfile('~thor_data400::base::ntlcrash_inquiry_grandfather','~thor_data400::base::ntlcrash_inquiry_father',0,true),
 	fileservices.clearsuperfile('~thor_data400::base::ntlcrash_inquiry_father'),

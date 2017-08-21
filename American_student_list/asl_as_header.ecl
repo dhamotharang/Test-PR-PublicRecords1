@@ -1,9 +1,9 @@
 import property,lib_keylib,lib_fileservices,ut,Business_Header,Header;
 
-export	asl_as_header(dataset(american_student_list.layout_american_student_base) pASL = dataset([],american_student_list.layout_american_student_base), boolean pForHeaderBuild=false)
+export	asl_as_header(dataset(american_student_list.layout_american_student_base_v2) pASL = dataset([],american_student_list.layout_american_student_base_v2), boolean pForHeaderBuild=false)
  :=
   function
-	dASLAsSource	:=	american_student_list.asl_as_source(pASL,pForHeaderBuild);
+	dASLAsSource	:=	header.Files_SeqdSrc().SL;
 
 	Header.Layout_New_Records Translate_ASL_to_Header(dASLAsSource l) := transform
 	
@@ -13,10 +13,11 @@ export	asl_as_header(dataset(american_student_list.layout_american_student_base)
 		string2 v_dob_mm   := if(v_dob[5..6]='00','01',v_dob[5..6]);
 		string2 v_dob_dd   := if(v_dob[7..8]='00','01',v_dob[7..8]);
 		
+		//don't even populate vendor dates because they can eventually get used in watchdog.bestaddress
 		self.did                      := 0;
 		self.rid                      := 0;
-		self.dt_first_seen            := (unsigned3)(l.date_first_seen[1..6]);
-		self.dt_last_seen             := (unsigned3)(l.date_last_seen[1..6]);
+		self.dt_first_seen            := 0;
+		self.dt_last_seen             := 0;
 		self.dt_vendor_first_reported := (unsigned3)(l.date_vendor_first_reported[1..6]);
 		self.dt_vendor_last_reported  := (unsigned3)(l.date_vendor_last_reported[1..6]);
 		self.dt_nonglb_last_seen      := self.dt_last_seen;

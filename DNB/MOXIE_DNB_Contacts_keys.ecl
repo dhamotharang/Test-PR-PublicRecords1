@@ -1,5 +1,5 @@
 import dnb,Lib_KeyLib;
-#workunit ('name', 'Build DNB Contacts Keys ' + dnb.version);
+//#workunit ('name', 'Build DNB Contacts Keys ' + dnb.version);
 
 h := dnb.FILE_DNB_Contacts_keybuild;
 
@@ -22,17 +22,17 @@ end;
   
 t := table(h, MyFields);
 
-BUILDINDEX( t(lfmname <> ''), {lfmname,(big_endian unsigned8 )__filepos},
+key1 := BUILDINDEX( t(lfmname <> ''), {lfmname,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Contacts + 'lfmname.key', moxie,overwrite);
-BUILDINDEX( t, {dph_lname,fname,mname,lname,(big_endian unsigned8 )__filepos},
+key2 := BUILDINDEX( t, {dph_lname,fname,mname,lname,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Contacts + 'dph_lname.fname.mname.lname.key', moxie,overwrite);
-BUILDINDEX( t(nameasis <> ''), {nameasis,(big_endian unsigned8 )__filepos},
+key3 := BUILDINDEX( t(nameasis <> ''), {nameasis,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Contacts + 'nameasis.key', moxie,overwrite);
-BUILDINDEX( t, {did,(big_endian unsigned8 )__filepos},
+key4 := BUILDINDEX( t, {did,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Contacts + 'did.key', moxie,overwrite);
-BUILDINDEX( t, {bdid,(big_endian unsigned8 )__filepos},
+key5 := BUILDINDEX( t, {bdid,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Contacts + 'bdid.key', moxie,overwrite);
-BUILDINDEX( t, {duns_number,(big_endian unsigned8 )__filepos},
+key6 := BUILDINDEX( t, {duns_number,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Contacts + 'duns_number.key', moxie,overwrite);
 
 
@@ -53,7 +53,7 @@ end;
 
 cn_records := NORMALIZE(t, 8,Norm_cn(LEFT, COUNTER));
 
-BUILDINDEX(cn_records(cn <> ''), {cn,(big_endian unsigned8 )__filepos},
+key7 := BUILDINDEX(cn_records(cn <> ''), {cn,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Contacts + 'cn.key', moxie,overwrite);
 
 // ------------------
@@ -73,5 +73,17 @@ end;
 
 pcn_records := NORMALIZE(t, 8,Norm_pcn(LEFT, COUNTER));
 
-BUILDINDEX(pcn_records(pcn <> ''), {pcn,(big_endian unsigned8 )__filepos},
+key8 := BUILDINDEX(pcn_records(pcn <> ''), {pcn,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Contacts + 'pcn.key', moxie,overwrite);
+			
+export MOXIE_DNB_Contacts_keys :=
+parallel(
+	 key1
+	,key2
+	,key3
+	,key4
+	,key5
+	,key6
+	,key7
+	,key8
+);

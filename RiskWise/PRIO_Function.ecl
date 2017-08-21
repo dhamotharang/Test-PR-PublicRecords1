@@ -1,4 +1,4 @@
-﻿import ut, Risk_Indicators, Risk_Reporting, Models, gateway;
+import ut, Risk_Indicators, Risk_Reporting, Models, gateway;
 
 export PRIO_Function(DATASET(Layout_PRII) indata, dataset(Gateway.Layouts.Config) gateways, unsigned1 glb, unsigned1 dppa, 
 	string4 tribCode, string50 DataRestriction=risk_indicators.iid_constants.default_DataRestriction,

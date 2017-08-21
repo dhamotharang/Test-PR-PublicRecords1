@@ -124,7 +124,7 @@ export Address_Risk := MODULE
 			self := le;
 			self := [];
 		end;
-		crim_offender := join( dist_person, dist_offenders, left.did=(unsigned6)right.did, getOffender(LEFT,RIGHT), local );
+		crim_offender := join( dist_person, dedup(dist_offenders,record,all,local), left.did=(unsigned6)right.did, getOffender(LEFT,RIGHT), local );
 		
 		dist := distribute(crim_offender(arr_date!=0), hash( st, county, geo_blk ) );
 		

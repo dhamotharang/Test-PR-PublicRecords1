@@ -61,8 +61,7 @@ EXPORT Layouts := module
 	string1    is_available_for_public;
 	string20 report_status;
 	string3 Page_Count;
-
-
+	string12 Supplemental_Report;
 end;
 
 export l_hash := RECORD
@@ -74,6 +73,9 @@ export l_hash := RECORD
 		 string1  U_D_flag;
 		 string19 Sent_to_HPCC_DateTime,
 		 string2  report_code; 
+		 string3 page_count;
+		 string12 supplemental_report;
+		 string3 report_type_id
 	   
   END;
 	

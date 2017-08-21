@@ -1,9 +1,9 @@
 export mStdHandlers
  :=
   module
-		import lib_StringLib, lib_FileServices, ut, lib_ThorLib;
+		import lib_StringLib, lib_FileServices, std, lib_ThorLib;
 
-		shared	lCurrentDate	:=	ut.GetDate : global;	// just to prevent the transforms from calling the function for every record in any transforms below
+		shared	lCurrentDate	:=	(STRING8)Std.Date.Today() : global;	// just to prevent the transforms from calling the function for every record in any transforms below
 
 		/**************************************************************************************
 		 ** Append Std Cache record from records in RawCache with StdAID
@@ -12,7 +12,7 @@ export mStdHandlers
 		 :=
 			function
 				dStdMasterDist					:=	Files.StdCacheProdDist_AID;
-				dStdMasterDistSort			:=	sort(dStdMasterDist,AID,local);
+				dStdMasterDistSort			:=	sort(dStdMasterDist,AID, Line1, LineLast,local);
 
 				Layouts.rRawSlimSeqRawCacheStdCache tRawCacheInAddedStdCache(pDatasetIn pInput)
 				 :=
@@ -28,7 +28,7 @@ export mStdHandlers
 				dRawCacheInAddedStdCacheNoStdAID					:=	dRawCacheInAddedStdCache(rAIDWork_RawCache.StdAID = 0);			// to concat after join
 				dRawCacheInAddedStdCacheStdAID						:=	dRawCacheInAddedStdCache(rAIDWork_RawCache.StdAID <> 0);
 				dRawCacheInAddedStdCacheStdAIDDist				:=	distribute(dRawCacheInAddedStdCacheStdAID,hash(	rAIDWork_RawCache.StdAID));
-				dRawCacheInAddedStdCacheStdAIDDistSort		:=	sort(dRawCacheInAddedStdCacheStdAIDDist,		rAIDWork_RawCache.StdAID,local);
+				dRawCacheInAddedStdCacheStdAIDDistSort		:=	sort(dRawCacheInAddedStdCacheStdAIDDist, rAIDWork_RawCache.StdAID, local);
 				Layouts.rRawSlimSeqRawCacheStdCache tRawCacheInStdAIDAppended(dRawCacheInAddedStdCacheStdAIDDistSort pRawCacheIn, dStdMasterDistSort pStdMaster)
 				 :=
 					transform
@@ -128,8 +128,8 @@ export mStdHandlers
 						self       														:=	pInput;
 					end                                   			
 				 ;                                      			
-				dPrimeStdAddressFromRawStruct	:=	normalize(pDatasetIn,3,tPrimeStdAddressFromRawStruct(left,counter));
-				return	dPrimeStdAddressFromRawStruct;
+				dPrimeStdAddressFromRawStruct	:=	normalize(pDatasetIn(not rAIDWork_RawCache.IsNormalized),3,tPrimeStdAddressFromRawStruct(left,counter));
+				return	dPrimeStdAddressFromRawStruct + pDatasetIn(rAIDWork_RawCache.IsNormalized);
 			end
 		 ;
 
@@ -292,11 +292,14 @@ export mStdHandlers
 				dStdDuplicatesToFull	:=	project(pDuplicates,tStdDuplicatesToFull(left));
 				dDuplicatesDist				:=	distribute(dStdDuplicatesToFull,(AIDWork_StdStructSameAsRecordID - 1) % lib_ThorLib.ThorLib.nodes());
 				dCompletedDist				:=	distribute(pCompleted,(AIDWork_RecordID - 1) % lib_ThorLib.ThorLib.nodes());
-				dCombinedDistSort			:=	sort(dCompletedDist + dDuplicatesDist,AIDWork_StdStructSameAsRecordID,abs(AIDWork_RecordID - AIDWork_StdStructSameAsRecordID),(rAIDWork_RawCache.Flags & Common.eFlags.StdNormalized),local);
+				dCombinedDistSort			:=	sort(dCompletedDist + dDuplicatesDist,AIDWork_StdStructSameAsRecordID, rAIDWork_StdCache.Line1, rAIDWork_StdCache.LineLast, abs(AIDWork_RecordID - AIDWork_StdStructSameAsRecordID),(rAIDWork_RawCache.Flags & Common.eFlags.StdNormalized),local);
 				recordof(dCompletedDist)	tPropagateToStdDuplicates(recordof(dCombinedDistSort) pLeft, recordof(dCombinedDistSort) pRight)
 				 :=
 					transform
-						boolean	lShouldPropagate							:=	pRight.AIDWork_StdStructSameAsRecordID = pLeft.AIDWork_StdStructSameAsRecordID
+						boolean	lShouldPropagate							:=	(pRight.AIDWork_StdStructSameAsRecordID = pLeft.AIDWork_StdStructSameAsRecordID
+																									 and pRight.rAIDWork_StdCache.Line1 = pLeft.rAIDWork_StdCache.Line1
+																									 and pRight.rAIDWork_StdCache.LineLast = pLeft.rAIDWork_StdCache.LineLast
+																											)
 																									or	pRight.rAIDWork_RawCache.Flags & Common.eFlags.StdNormalized <> 0;
 						self.AIDWork_RecordID									:=	pRight.AIDWork_RecordID;
 						self.AIDWork_RawStructSameAsRecordID	:=	pRight.AIDWork_RawStructSameAsRecordID;

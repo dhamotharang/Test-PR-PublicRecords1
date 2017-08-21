@@ -76,7 +76,7 @@ function
 			self.company_naics_code3						:= if (length(trim(l.company_naics_code3)) = 6, trim(l.company_naics_code3), '');
 			self.company_naics_code4						:= if (length(trim(l.company_naics_code4)) = 6, trim(l.company_naics_code4), '');
 			self.company_naics_code5						:= if (length(trim(l.company_naics_code5)) = 6, trim(l.company_naics_code5), '');
-			self.company_url										:= if (ut.fnTrim2Upper(l.company_url) in bad_Urls, '', stringlib.stringcleanspaces(l.company_url));  //*** Bug: 153999  - DATA: URL showing partial information
+		  self.company_url										:= if (ut.CleanSpacesAndUpper(l.company_url) in bad_Urls, '', stringlib.stringcleanspaces(l.company_url));  //*** Bug: 153999  - DATA: URL showing partial information
 			self.company_phone									:= if (bad_phone, '', trim(l.company_phone));
 			self.phone_type											:= if (bad_phone, '', trim(l.phone_type));
 			self.phone_score										:= if (bad_phone, 0, l.phone_score);

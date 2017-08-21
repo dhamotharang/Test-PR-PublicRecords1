@@ -1,4 +1,4 @@
-import mdr;
+import mdr,PRTE2_Header;
 h := Header.File_Headers(header.Blocked_data());
 
 hslim := record
@@ -33,4 +33,8 @@ rup := rollup(gds,left.prim_range=right.prim_range and
                   left.did=right.did and
                   left.sec_range=right.sec_range,combine_time(left,right));
 
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export did_addresses := rup;
+#ELSE
 export did_addresses := rup : persist('DID_Addresses');
+#END

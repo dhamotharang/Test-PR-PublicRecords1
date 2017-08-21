@@ -33,13 +33,13 @@ macro
 							output(pDataset,,pfilename)
 				),
 				map(pCompress = true and pOverwrite = true =>
-							output(pDataset,,pfilename,csv(separator(pSeparator),terminator(pTerminator),quote(pQuote),#if(pHeading) heading(single)) #end	,__compressed__,overwrite),
-						pCompress = true =>
-							output(pDataset,,pfilename,csv(separator(pSeparator),terminator(pTerminator),quote(pQuote),#if(pHeading) heading(single)) #end	,__compressed__),
-						pOverwrite = true =>
-							output(pDataset,,pfilename,csv(separator(pSeparator),terminator(pTerminator),quote(pQuote),#if(pHeading) heading(single)) #end	,overwrite),
-							//else condition
-							output(pDataset,,pfilename,csv(separator(pSeparator),terminator(pTerminator),quote(pQuote),#if(pHeading) heading(single)) #end	)
+							output(pDataset,,pfilename,csv(separator(pSeparator),terminator(pTerminator),quote(pQuote) #if(pHeading) ,heading(single) #end	),__compressed__,overwrite),
+						pCompress = true =>                                                                                                              
+							output(pDataset,,pfilename,csv(separator(pSeparator),terminator(pTerminator),quote(pQuote) #if(pHeading) ,heading(single) #end	),__compressed__),
+						pOverwrite = true =>                                                                                                             
+							output(pDataset,,pfilename,csv(separator(pSeparator),terminator(pTerminator),quote(pQuote) #if(pHeading) ,heading(single) #end	),overwrite),
+							//else condition                                                                                                               
+							output(pDataset,,pfilename,csv(separator(pSeparator),terminator(pTerminator),quote(pQuote) #if(pHeading) ,heading(single) #end	))
 				)
 			))
 		,output('Not building ' + pfilename + ' because it already exists')

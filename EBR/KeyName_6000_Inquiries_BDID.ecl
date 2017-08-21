@@ -1,1 +1,1 @@
-export KeyName_6000_Inquiries_BDID := trim(GetSegmentKeyName_BDID('6000')) : global;
+export KeyName_6000_Inquiries_BDID := trim(GetSegmentKeyName_BDID('6000'));

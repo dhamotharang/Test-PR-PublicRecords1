@@ -8,7 +8,7 @@ export _Constants(
 	tools.Constants(
 		 pDatasetName					:= pDatasetname
 		,pUseOtherEnvironment	:= pUseOtherEnvironment
-		,pGroupname						:= '20'
+		,pGroupname						:= '44'
 		,pMaxRecordSize				:= 80000
 		,pIsTesting						:= Tools._Constants.IsDataland
 	))

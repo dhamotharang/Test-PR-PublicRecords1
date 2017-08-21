@@ -112,7 +112,7 @@ output(choosen(DCA.Key_DCA_Root_Sub,10));
 output(choosen(DCA.Key_DCA_Hierarchy_BDID,10));
 output(choosen(DCA.Key_DCA_Hierarchy_Root_Sub,10));
 //////////////////// DEA ////////////////////////////
-output(choosen(doxie_files.key_dea_did,10));
+output(choosen(dea.key_dea_did,10));
 output(choosen(dea.key_dea_bdid,10));
 //////////////////// Death_Weekly //////////////////
 output(choosen(doxie.Key_Death_Master_Did,10));
@@ -130,11 +130,11 @@ output(choosen(dnb.key_DNB_DunsNum,10));
 ///////////////////// DOC //////////////////////////
 output(choosen(doxie_files.key_offenders,10));
 output(choosen(doxie_files.key_offenders_docnum,10));
-output(choosen(doxie_files.key_offenders_OffenderKey,10));
+output(choosen(doxie_files.key_offenders_OffenderKey(),10));
 output(choosen(doxie_files.key_offenders_fdid,10));
 output(choosen(doxie_files.key_offenses,10));
-output(choosen(doxie_files.key_activity,10));
-output(choosen(doxie_files.Key_Court_Offenses,10));
+output(choosen(doxie_files.key_activity(),10));
+output(choosen(doxie_files.Key_Court_Offenses(),10));
 output(choosen(doxie_files.key_punishment,10));
 output(choosen(doxie_files.Key_BocaShell_Crim,10));
 output(choosen(AutoKey.Key_Address('~thor_data400::key::corrections_'+doxie_build.buildstate),10));
@@ -196,7 +196,7 @@ output(choosen(doxie_files.key_hunters_did,10));
 output(choosen(doxie_files.key_ccw_did,10));
 output(choosen(doxie_files.key_voters_did,10));
 ////////////////////// FAA ///////////////////////////
-output(choosen(faa.key_aircraft_did,10));
+output(choosen(doxie_files.key_Aircraft_did,10));
 output(choosen(faa.key_aircraft_info,10));
 output(choosen(faa.Key_Aircraft_Reg_BDID,10));
 output(choosen(faa.Key_Aircraft_Reg_NNum,10));
@@ -243,7 +243,7 @@ output(choosen(gong.Key_daily_History_Zip_Name,10));
 /////////////////////// Gong weekly //////////////////
 output(choosen(gong.key_did,10));
 output(choosen(gong.key_hhid,10));
-output(choosen(gong.key_address,10));
+//output(choosen(gong.key_address,10));
 output(choosen(doxie_cbrs.key_phone_gong,10));
 
 output(choosen(DayBatchEda.Key_gong_phone,10));
@@ -610,14 +610,14 @@ output(choosen(watchdog.Key_Watchdog_nonglb,10));
 output(choosen(watchdog.Key_Best_SSN,10));
 output(choosen(Suppress.Key_SSN_Bad,10));
 //////////////// Watercraft ///////////////////
-output(choosen(doxie.key_watercraft_cid,10));
-output(choosen(doxie.key_watercraft_bdid,10));
-output(choosen(doxie.key_watercraft_did,10));
-output(choosen(doxie.key_watercraft_sid,10));
-output(choosen(doxie.key_watercraft_wid,10));
-output(choosen(doxie.key_watercraft_hullnum,10));
-output(choosen(doxie.key_watercraft_offnum,10));
-output(choosen(doxie.key_watercraft_vslnam,10));
+output(choosen(watercraft.key_watercraft_cid(),10));
+output(choosen(watercraft.key_watercraft_bdid,10));
+output(choosen(watercraft.key_watercraft_did(),10));
+output(choosen(watercraft.key_watercraft_sid(),10));
+output(choosen(watercraft.key_watercraft_wid(),10));
+output(choosen(watercraft.key_watercraft_hullnum,10));
+output(choosen(watercraft.key_watercraft_offnum,10));
+output(choosen(watercraft.key_watercraft_vslnam,10));
 //////////////// WhoIs ///////////////////////
 output(choosen(domains.Key_Whois_Bdid,10));
 output(choosen(domains.Key_Whois_Did,10));

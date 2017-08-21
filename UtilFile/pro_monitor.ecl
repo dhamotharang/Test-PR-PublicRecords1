@@ -1,10 +1,14 @@
-import utilfile, Certegy , header,death_master,_control ; 
 
-export pro_monitor() := module 
+import utilfile, Certegy , header,death_master,_control,watchdog ; 
 
-shared DestinationIP       := _control.IPAddress.edata12; 
+export pro_monitor(string DestinationIP = _control.IPAddress.bctlpedata11) := module 
 
-certgy_update := Certegy.Files.certegy_base(date_vendor_last_reported = Certegy.version); 
+//shared DestinationIP       := _control.IPAddress.edata12; 
+
+string8 certegy_maxdate := max(Certegy.Files.certegy_base,Certegy.Files.certegy_base.date_vendor_last_reported); 
+
+certgy_update := Certegy.Files.certegy_base(date_vendor_last_reported = certegy_maxdate); 
+
 temp_rec_certegy := record 
 		 string	did       
 		,string	did_score 
@@ -85,57 +89,85 @@ self := l ;
 end; 
 v_certegy := project(certgy_update ,reformat(left)); 
 
-file_v_certegy := output(v_certegy,,'~thor_data::out::promonitor::certegy_'+Certegy.version,csv(
+file_v_certegy := output(v_certegy,,'~thor_data::out::promonitor::certegy_'+certegy_maxdate,csv(
 HEADING('did|did_score|orig_DL_State|orig_DL_Num|orig_SSN|orig_DL_Issue_Dte|orig_DL_Expire_Dte|orig_Professional_Title|orig_Functional_Title|orig_House_Bldg_Num|orig_Street_Suffix|orig_Apt_Num|orig_Unit_Desc|orig_Street_Post_Dir|orig_Street_Pre_Dir|orig_State|orig_Zip|orig_DOB|orig_Deceased_Dte|orig_Home_Tel_Area|orig_Home_Tel_Num|orig_Work_Tel_Area|orig_Work_Tel_Num|orig_Work_Tel_Ext|orig_First_Name|orig_Mid_Name|orig_Last_Name|orig_Street_Name|orig_City|clean_ssn|clean_DOB|clean_hphone|clean_wphone|date_first_seen|date_last_seen|date_vendor_first_reported|date_vendor_last_reported|title|fname|mname|lname|name_suffix|name_score|prim_range|predir|prim_name|addr_suffix|postdir|unit_desig|sec_range|p_city_name|v_city_name|st|zip|zip4|cart|cr_sort_sz|lot|lot_order|dbpc|chk_digit|rec_type|fips_county|county|geo_lat|geo_long|msa|geo_blk|geo_match|err_stat\n','',SINGLE)
 ,SEPARATOR('|'), TERMINATOR('\n')),OVERWRITE);
 
-certegy_d := fileservices.despray('~thor_data::out::promonitor::certegy_'+Certegy.version, DestinationIP, '/hds_180/pro_monitor/build/certegy/certegy_'+Certegy.version+'.txt',,,,TRUE); 
-export certegy_despray :=  sequential(file_v_certegy,certegy_d);  
+certegy_d := fileservices.despray('~thor_data::out::promonitor::certegy_'+certegy_maxdate, DestinationIP, '/data/hds_180/pro_monitor/build/certegy/certegy_'+certegy_maxdate+'.txt',,,,TRUE); 
+export certegy_despray := sequential(file_v_certegy,certegy_d);  
 
-death := Header.File_DID_Death_MasterV2(state_death_id=death_master.fn_fake_state_death_id(ssn,lname,dod8)) ; 
+/**********************************************************************************************/
+/*                                   Death Master                                             */
+/**********************************************************************************************/
+
+death := Header.File_DID_Death_MasterV3_SSA(death_rec_src='SSA'); 
 string8 death_filedate := max(death,death.filedate); 
 death_update := death(filedate = death_filedate);  
 
 temp_rec_death := RECORD
-  string did;
-  string did_score;
-  string filedate;
-  string rec_type;
-  string rec_type_orig;
-  string ssn;
-  string lname;
-  string name_suffix;
-  string fname;
-  string mname;
-  string vorp_code;
-  string dod8;
-  string dob8;
-  string st_country_code;
-  string zip_lastres;
-  string zip_lastpayment;
-  string state;
-  string fipscounty;
-  string state_death_id;
- END;
+	string	did;
+	string	did_score;
+	string	filedate;
+	string	rec_type;
+	string	rec_type_orig;
+	string	ssn;
+	string	lname;
+	string	name_suffix;
+	string	fname;
+	string	mname;
+	string	vorp_code;
+	string	dod8;
+	string	dob8;
+	string	st_country_code;
+	string	zip_lastres;
+	string	zip_lastpayment;
+	string	state;
+	string	fipscounty;
+	string	state_death_id;
+	string	src;
+	string	glb_flag;
+END;
 
 temp_rec_death reformat1( death_update l ) := transform 
-self.did_score := (string) l.did_score ; 
-self := l ; 
+	self.did_score	:=	(string) l.did_score ; 
+	self						:=	l; 
 end; 
 v_death := project(death_update ,reformat1(left)); 
 
 file_v_death := output(v_death,,'~thor_data::out::promonitor::death_'+death_filedate,csv(
-HEADING('did|did_score|filedate|rec_type|rec_type_orig|ssn|lname|name_suffix|fname|mname|vorp_code|dod8|dob8|st_country_code|zip_lastres|zip_lastpayment|state|fipscounty|state_death_id\n','',SINGLE)
+HEADING('did|did_score|filedate|rec_type|rec_type_orig|ssn|lname|name_suffix|fname|mname|vorp_code|dod8|dob8|st_country_code|zip_lastres|zip_lastpayment|state|fipscounty|state_death_id|src|glb_flag\n','',SINGLE)
 ,SEPARATOR('|'), TERMINATOR('\n')),OVERWRITE);
-death_d :=  fileservices.despray('~thor_data::out::promonitor::death_'+death_filedate, DestinationIP, '/hds_180/pro_monitor/build/dmaster/dmaster_'+death_filedate+'.txt',,,,TRUE); 
+death_d :=  fileservices.despray('~thor_data::out::promonitor::death_'+death_filedate, DestinationIP, '/data/hds_180/pro_monitor/build/dmaster/dmaster_'+death_filedate+'.txt',,,,TRUE); 
 
-export  death_despray := sequential(file_v_death,death_d);  
+export  death_despray := sequential(file_v_death,death_d); 
+ 
+/**********************************************************************************************/
+/*                                   End Death Master                                         */
+/**********************************************************************************************/
 
 //utility := utilfile.file_util_in ; 
 utility  := UtilFile.file_util_daily ; // changed to this file as full base file(utilfile.file_util_in)doesn't have update file dids. 
 string8 utility_date :=  max(utility,utility.record_date); 
 utility_update := utility(record_date = utility_date);  
- 
+// Append DOB 
+utility_update_dist := distribute(utility_update((unsigned)did<>0),hash((INTEGER)did)); 
+fbest := Watchdog.File_Best ; 
+recordof(utility_update_dist) tgetdob(recordof(utility_update_dist) l	,recordof(fbest) r) :=
+		transform
+		self.dob							:=(string)r.dob;
+		self 										:= l;
+		end;
+		
+		getdob	:= join( utility_update_dist
+											,fbest
+											,(unsigned6)left.did= right.did
+											,tgetdob(left,right)
+											,left outer
+											,local)
+								+ PROJECT(DISTRIBUTE(utility_update((unsigned)did=0)),TRANSFORM(recordof(utility_update_dist),
+											self.dob := '0';	// probably a bug, but it is here to be backwards compatible
+											self := LEFT));
+
 temp_rec_util := record 
 string        id;
 string       exchange_serial_number;
@@ -200,16 +232,16 @@ string         name_suffix;
 string         name_score;
 end; 
 	
-temp_rec_util reformat2( utility_update l ) := transform 
+temp_rec_util reformat2( getdob l ) := transform 
 self := l ; 
 end; 
-v_util := project(utility_update ,reformat2(left)); 	
+v_util := project(getdob ,reformat2(left)); 	
 
 file_v_util := output(v_util,,'~thor_data::out::promonitor::utility_'+utility_date,csv(
 HEADING('id|exchange_serial_number|date_added_to_exchange|connect_date|date_first_seen|record_date|util_type|orig_lname|orig_fname|orig_mname|orig_name_suffix|addr_type|addr_dual|address_street|address_street_Name|address_street_Type|address_street_direction|address_apartment|address_city|address_state|address_zip|ssn|work_phone|phone|dob|drivers_license_state_code|drivers_license|csa_indicator|prim_range|predir|prim_name|addr_suffix|postdir|unit_desig|sec_range|p_city_name|v_city_name|st|zip|zip4|cart|cr_sort_sz|lot|lot_order|dbpc|chk_digit|rec_type|county|geo_lat|geo_long|msa|geo_blk|geo_match|err_stat|did|title|name|mname|lname|name_suffix|name_score\n','',SINGLE)
 ,SEPARATOR('|'), TERMINATOR('\n')),OVERWRITE);
 
-util_d := fileservices.despray('~thor_data::out::promonitor::utility_'+utility_date, DestinationIP, '/hds_180/pro_monitor/build/utility/utility_'+utility_date+'.txt',,,,TRUE); 
+util_d := fileservices.despray('~thor_data::out::promonitor::utility_'+utility_date, DestinationIP, '/data/hds_180/pro_monitor/build/utility/utility_'+utility_date+'.txt',,,,TRUE); 
 
 export  util_despray := sequential(file_v_util,util_d);  
 

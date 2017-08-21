@@ -1,4 +1,4 @@
-import ut,did_add, property,drivers,vehlic,Bankrupt, lib_datalib, ngadl;
+import ut,did_add, ln_propertyv2,DriversV2,vehiclev2,Bankrupt, lib_datalib, ngadl;
 // Rules 6&7 code elsewhere
 // Rule 6 is TCOA match
 // Rule 7 is relative match 
@@ -12,8 +12,7 @@ import ut,did_add, property,drivers,vehlic,Bankrupt, lib_datalib, ngadl;
 export Did_Rules0(
 	dataset(recordof(header.Layout_MatchCandidates)) me_use2,
 	string persist_suffix = '',
-	boolean includeOutsideMatches = true,
-	dataset(header.Layout_Header) head = dataset([], header.Layout_Header)
+	boolean includeOutsideMatches = true
 	)  := 
 MODULE
 
@@ -77,7 +76,7 @@ j := join(j1ddpd,j1ddpd,
               -1 ) -
        ut.NameMatch(left.fname,left.mname,left.lname,right.fname,right.mname,right.lname)
        >= 0 
-     ),tra_ssn(left,right,1),atmost(left.ssn=right.ssn,100),local);
+     ),tra_ssn(left,right,1),atmost(left.ssn=right.ssn,200),local);
 
 
 name_valid := me_use2.fname<>'' and me_use2.lname<>'';
@@ -377,36 +376,15 @@ j8 := join(mu8,mu8,left.fname=right.fname and
                       left.mname=right.mname,2000),local);
 
 j14 := header.j14_phone(me_use2);
+j16 := header.j16_females(header.file_headers) : persist('~thor_data400::persist::j16'	+ persist_suffix);
 
 //***** Gather matches found in other datasets
 hrdm := header.relativedidmatches(me_use2);
 hrdm_pst := hrdm : persist('relativematches' 	+ persist_suffix);
-OutsideMatches := if(header.DoSkipPersist(persist_suffix),hrdm,hrdm_pst) + 
-					property.prop_did_matches + 
-					Drivers.DL_DID_matches + 
-					vehlic.Vehicle_DID_matches +
-					Bankrupt.Bankrupt_DID_matches + 
-					project(
-						NGADL.matches(head).Matches,  //ADL2
-						transform(
-							Header.Layout_PairMatch, 
-							self.new_rid := left.DID2,
-							self.old_rid := left.DID1,
-							self.pflag := 16
-						)
-					); 
+OutsideMatches := if(header.DoSkipPersist(persist_suffix),hrdm,hrdm_pst)
+					+ fn_did_match_sources(dataset([],recordof(Header.Layout_PairMatch)),,false);
 
-j_pst 	:= j 	 : persist('j1' 	+ persist_suffix);
-j2_pst 	:= j2  : persist('j2' 	+ persist_suffix);
-j3_pst 	:= j3  : persist('j3' 	+ persist_suffix);
-j4_pst 	:= j4  : persist('j4' 	+ persist_suffix);
-j5_pst 	:= j5  : persist('j5' 	+ persist_suffix);
-j8_pst 	:= j8  : persist('j8' 	+ persist_suffix);
-j14_pst := j14 : persist('j14' + persist_suffix);
-
-allj := if(header.DoSkipPersist(persist_suffix), 
-					 j		+	j2+			j3+			j4+			j5+			j8+			j14, 
-					 j_pst+	j2_pst+	j3_pst+	j4_pst+	j5_pst+	j8_pst+	j14_pst);
+allj := j + j2 + j3 + j4 + j5 + j8 + j14 + j16;
 
 export combined := allj+
 			if(includeOutsideMatches, OutsideMatches);

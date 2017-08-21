@@ -51,8 +51,8 @@ transform
 														unicodelib.unicodefind(GlobalWatchLists.Functions.unicodeClean2Upper(pInput.WatchlistName),'WORLD BANK INELIGIBLE FIRMS',1)											<>	0	=>	Patriot.Constants.wlWBIF,
 														trim(GlobalWatchLists.Functions.ustrClean2Upper(pInput.WatchlistName),all)[1..3]
 													);
-	self.ListID		:=	ut.fnTrim2Upper(vListID);
-	self.RecordID	:=		ut.fnTrim2Upper(vListID)
+	self.ListID		:=	ut.CleanSpacesAndUpper(vListID);
+	self.RecordID	:=		ut.CleanSpacesAndUpper(vListID)
 										+	hash32(regexreplace(u'!|@|#|$|%|-|\'|~',GlobalWatchLists.Functions.unicodeClean2Upper(pInput.FullName),''))
 										+	'-'
 										+	(string)(cnt%10000);

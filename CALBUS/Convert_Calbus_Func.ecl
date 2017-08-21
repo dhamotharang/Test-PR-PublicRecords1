@@ -1,5 +1,4 @@
-import calbus;
-import text_search;
+import calbus, text_search;
 
 export Convert_Calbus_Func := function
 	
@@ -18,10 +17,10 @@ export Convert_Calbus_Func := function
 							{2,0,l.business_street + ' ' + l.business_city + ' ' + l.business_state + ' ' +
 										l.business_country_name + ' ' + l.business_zip_5 + '-' + l.business_zip_plus_4 + ' ' + 
 										l.business_foreign_zip},
-							{3,0,l.business_city + ';' +  l.mailing_city},
-							{4,0,l.business_state + ';' + l.mailing_state},
-							{5,0,l.business_zip_5 + '-' + l.business_zip_plus_4 + ';' + 
-									l.mailing_zip_5 + '-' + l.mailing_zip_plus_4},
+							//{3,0,l.business_city + ';' +  l.mailing_city},
+							//{4,0,l.business_state + ';' + l.mailing_state},
+							//{5,0,l.business_zip_5 + '-' + l.business_zip_plus_4 + ';' + 
+								//	l.mailing_zip_5 + '-' + l.mailing_zip_plus_4},
 							{6,0,l.business_foreign_zip + ';' + l.mailing_foreign_zip},
 							{7,0,l.business_country_name + ';' + l.mailing_country_name},
 							{8,0, ';' + l.mailing_street + ' ' + l.mailing_city + ' ' + l.mailing_state + ' ' +
@@ -64,6 +63,21 @@ export Convert_Calbus_Func := function
 
 	iterate_out := iterate(sort_out,iterate_recs(left,right),local);
 
-	return iterate_out(trim(content) <> '' or trim(content) <> ';');
+	// External key
+	
+	layout_calbus_flat MakeKeySegs( iterate_out l, unsigned2 segno ) := TRANSFORM
+		self.account_number := l.account_number;
+        self.docref.doc := l.docref.doc;
+        self.docref.src := l.docref.src;
+		self.segment := segno;
+        self.content := l.account_number;
+        self.sect := 1;
+    END;
+
+    segkeys := PROJECT(iterate_out(trim(content) <> '' and trim(content) <> ';'),MakeKeySegs(LEFT,250));
+
+	full_ret := iterate_out(trim(content) <> '' and trim(content) <> ';') + segkeys;
+	
+	return full_ret;
 	
 end;

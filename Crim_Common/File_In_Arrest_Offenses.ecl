@@ -1,5 +1,45 @@
+import ut,ArrestLogs;
 export File_In_Arrest_Offenses
- := dataset('~thor_data400::in::arrest_log_offenses_' + Version_In_Arrest_Offenses,
-			Layout_In_Arrest_Offenses,
-			flat
-		   );
+ := dataset('~thor_data400::in::arrest_log_offenses_' + Version_In_Arrest_Offenses,Layout_In_Arrest_Offenses,flat)
+  + ArrestLogs.map_AL_CalhounOffenses
+  + ArrestLogs.map_AL_JeffersonOffenses
+	+ ArrestLogs.map_AR_BentonOffenses
+  + ArrestLogs.map_AZ_MaricopaOffenses
+  + ArrestLogs.map_CA_FresnoOffenses
+  + ArrestLogs.map_CA_KingsOffenses
+  + ArrestLogs.map_CA_LosAngelesOffenses
+  + ArrestLogs.map_CA_MarinOffenses
+  + ArrestLogs.Map_CA_OrangeOffenses
+  + ArrestLogs.map_CA_PlacerOffenses
+  + ArrestLogs.Map_CA_RiversideOffenses
+  + ArrestLogs.map_CA_SanBernardinoOffenses
+  + ArrestLogs.map_CA_TehamaOffenses
+  + ArrestLogs.map_CO_PitkinOffenses
+  + ArrestLogs.map_CO_WeldOffenses
+  + ArrestLogs.map_FL_Broward_Offenses
+  + ArrestLogs.map_FL_LakeOffenses
+  + ArrestLogs.map_FL_MartinOffenses
+  + ArrestLogs.map_FL_PalmBeachOffenses
+  + ArrestLogs.map_GA_BibbOffenses
+  + ArrestLogs.map_GA_DawsonOffenses
+  + ArrestLogs.map_GA_GwinnettOffenses
+  + ArrestLogs.MAP_ID_AdaOffenses
+  + ArrestLogs.map_ID_CanyonOffenses
+  + ArrestLogs.map_LA_LafayetteOffenses
+  + ArrestLogs.map_NM_BernalilloOffenses
+  + ArrestLogs.map_OK_carterOffenses
+  + ArrestLogs.map_OR_YamhillOffenses
+  + ArrestLogs.map_OR_linnOffenses
+  + ArrestLogs.map_OR_ClackamasOffenses
+  + ArrestLogs.map_OR_MultnomahOffenses
+  + ArrestLogs.map_TN_ShelbyOffenses
+  + ArrestLogs.map_TX_BrazoriaOffenses
+  + ArrestLogs.map_TX_DentonOffenses
+  + ArrestLogs.map_TX_CameronOffenses
+  + ArrestLogs.map_TX_MontgomeryOffenses
+  + ArrestLogs.map_WA_clarkOffenses
+  + ArrestLogs.map_WA_PierceOffenses
+  + ArrestLogs.map_WA_KitsapOffenses
+  + ArrestLogs.map_WA_ThurstonOffenses
+  + ArrestLogs.map_WV_RegionalOffenses;
+

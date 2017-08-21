@@ -445,7 +445,7 @@ rTempLayoutVehicles	tGetOwner(dTempOrigAsVehiclesSort pOrig, dNameAddressJoined 
 	self.own_1_state_2 				:=	pNameAddress.st;
 	self.own_1_zip5 				:=	pNameAddress.zip5;
 	self.own_1_zip4 				:=	pNameAddress.zip4;
-	self.own_1_county				:=	pNameAddress.County;
+	self.own_1_county				:=	pNameAddress.ace_fips_county;
 	self							:=	pOrig;
   end
  ;
@@ -512,7 +512,7 @@ rTempLayoutVehicles	tGetCoOwner(dOrigPlusOwner pOrig, dNameAddressJoined pNameAd
 	self.own_2_state_2 				:=	pNameAddress.st;
 	self.own_2_zip5 				:=	pNameAddress.zip5;
 	self.own_2_zip4 				:=	pNameAddress.zip4;
-	self.own_2_county				:=	pNameAddress.County;
+	self.own_2_county				:=	pNameAddress.ace_fips_county;
 	self							:=	pOrig;
   end
  ;
@@ -582,7 +582,7 @@ rTempLayoutVehicles	tGetRegistrant(dOrigPlusCoOwner pOrig, dNameAddressJoined pN
 	self.reg_1_state_2 				:=	pNameAddress.st;
 	self.reg_1_zip5 				:=	pNameAddress.zip5;
 	self.reg_1_zip4 				:=	pNameAddress.zip4;
-	self.reg_1_county				:=	pNameAddress.County;
+	self.reg_1_county				:=	pNameAddress.ace_fips_county;
 	self							:=	pOrig;
   end
  ;
@@ -649,7 +649,7 @@ rTempLayoutVehicles	tGetCoRegistrant(dOrigPlusRegistrant pOrig, dNameAddressJoin
 	self.reg_2_state_2 				:=	pNameAddress.st;
 	self.reg_2_zip5 				:=	pNameAddress.zip5;
 	self.reg_2_zip4 				:=	pNameAddress.zip4;
-	self.reg_2_county				:=	pNameAddress.County;
+	self.reg_2_county				:=	pNameAddress.ace_fips_county;
 	self							:=	pOrig;
   end
  ;
@@ -800,7 +800,7 @@ rTempLayoutVehicles	tGetLessor(dOrigPlusCoRegistrant pOrig, dNameAddressJoined p
 										  );
 	self.own_1_county				:=	if(lOwner1AlreadyFilled,
 										   pOrig.own_1_county,
-										   pNameAddress.County
+										   pNameAddress.ace_fips_county
 										  );
 	self							:=	pOrig;
   end
@@ -949,7 +949,7 @@ rTempLayoutVehicles	tGetLessee(dOrigPlusLessor pOrig, dNameAddressJoined pNameAd
 										  );
 	self.reg_1_county				:=	if(lRegistrant1AlreadyFilled,
 										   pOrig.reg_1_county,
-										   pNameAddress.County
+										   pNameAddress.ace_fips_county
 										  );
 	self							:=	pOrig;
   end
@@ -1098,7 +1098,7 @@ rTempLayoutVehicles	tGetCoLessee(dOrigPlusLessee pOrig, dNameAddressJoined pName
 										  );
 	self.reg_2_county				:=	if(lRegistrant2AlreadyFilled,
 										   pOrig.reg_2_county,
-										   pNameAddress.County
+										   pNameAddress.ace_fips_county
 										  );
 	self							:=	pOrig;
   end

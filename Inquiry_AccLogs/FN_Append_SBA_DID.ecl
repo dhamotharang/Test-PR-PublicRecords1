@@ -2,7 +2,8 @@ IMPORT Inquiry_AccLogs,bipV2;
 
 EXPORT FN_Append_SBA_DID(dataset(Inquiry_AccLogs.Layout.Common_ThorAdditions_non_fcra) pInFile) := function
 
-pInFile_dist := distribute(project(pInFile, transform(Inquiry_AccLogs.Layout.Common_ThorAdditions_SBA, self := left, self := [])), hash(search_info.transaction_id));
+pInFile_dist := distribute(project(pInFile(source = 'ACCURINT'), transform(Inquiry_AccLogs.Layout.Common_ThorAdditions_SBA, self := left, self := [])), hash(search_info.transaction_id));
+pInFile_not_dist := project(pInFile(source <> 'ACCURINT'), transform(Inquiry_AccLogs.Layout.Common_ThorAdditions_SBA, self := left, self := []));
 
 SBA_data_dist := distribute(Inquiry_AccLogs.File_SBA_Logs_Common, hash(transaction_id));
 
@@ -297,7 +298,7 @@ end;
 pInFile_append_SBA := join(pInFile_dist, SBA_data_dedup, 
 left.search_info.transaction_id = right.transaction_id and left.source = 'ACCURINT', tjoin(left,right), left outer, local);
 
-update_append_SBA := project(pInFile_append_SBA, Inquiry_AccLogs.Layout.Common_indexes_DID_SBA);
+update_append_SBA := project((pInFile_append_SBA + pInFile_not_dist), Inquiry_AccLogs.Layout.Common_indexes_DID_SBA);
 
 return update_append_SBA;
 

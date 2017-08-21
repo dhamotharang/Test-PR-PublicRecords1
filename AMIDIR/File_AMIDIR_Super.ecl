@@ -1,0 +1,1 @@
+export File_AMIDIR_Super := dataset(AMIDIR.Cluster + 'in::AMIDIR::Superfile',AMIDIR.Layout_AMIDIR_With_Processdate,flat);

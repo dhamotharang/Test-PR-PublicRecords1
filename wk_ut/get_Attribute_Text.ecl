@@ -1,4 +1,7 @@
-import tools,wk_ut,std;
+/*2014-12-02T21:56:59Z (vern_p bentley)
+Check-in for BIPV2 Sprint 23 version 20141113
+*/
+import wk_ut,std;
 EXPORT get_Attribute_Text(
 	 string  pAttribute
 	,boolean pSandbox					    = false											                                                // Get Sandboxed version?
@@ -16,9 +19,9 @@ function
   lespPort4WsWorkunits  := pESP + ':8010';
   
 	//Soapcall to Get SPC attribute
-	datt := tools.mod_Soapcalls.fFindAttributes(lmodule,lattribute,lespPort4findAtt) : global;
+	datt := wk_ut.get_Attributes.fFindAttributes(lmodule,lattribute,lespPort4findAtt) : global;
 
-  dreturn := if(pBackslashQuotes and regexfind('\'',datt[1].text)  ,STD.Str.FindReplace(
+  dreturn := '\'' + if(pBackslashQuotes and regexfind('\'',datt[1].text)  ,STD.Str.FindReplace(
                                                                       STD.Str.FindReplace(
                                                                         regexreplace('\'',datt[1].text,'\\\\\'')
                                                                       ,'\n'
@@ -28,7 +31,8 @@ function
                                                                     )
                                                                    
                                                                    ,datt[1].text
-               );
+               )
+               + '\'';
 
   return dreturn;
 end;

@@ -1,62 +1,62 @@
 EXPORT ValidateInput := MODULE
 
-  EXPORT fn_checkIfValid(FraudShared_Services.Layouts.batch_search_rec srchRec) := FUNCTION
-    boolean isAddress := (srchRec.zip5 <> '' OR srchRec.st <> '' OR srchRec.v_city_name <> '');
-    boolean isSSN := (srchRec.ssn <> '');
-    boolean isPhone := (srchRec.phone10 <> '');
-    boolean isPerson := (srchRec.did > 0);
-    boolean isBusiness := (srchRec.seleid > 0 AND srchRec.orgid > 0 AND srchRec.ultid > 0);
-    boolean isEmailAddress := (srchRec.emailaddress <> '');
-    boolean isDevice := (srchRec.deviceid <> '');
-    boolean isIpAddress := (srchRec.ipaddress <> '');
-    boolean isProfessionalid := (srchRec.professionalid <> '');
-    boolean isProvider := (srchRec.lnpid > 0) OR (srchRec.npi <> '') OR(srchRec.appendedproviderid > 0);
-    boolean isTin := (srchRec.tin <> '');
+  SHARED boolean hasTxt(string s1) := TRIM(s1)<>'';
+  SHARED boolean hasNum(integer n1) := n1>0;
 
-    FraudShared_Services.Layouts.batch_search_flags_rec xfm_checkSearch(FraudShared_Services.Layouts.batch_search_rec L) := TRANSFORM
-      SELF.isAddress := isAddress,
-      SELF.isSSN := isSSN,
-      SELF.isPhone := isPhone,
-      SELF.isPerson := isPerson,
-      SELF.isBusiness := isBusiness,
-      SELF.isEmailAddress := isEmailAddress,
-      SELF.isDevice := isDevice,
-      SELF.isIpAddress := isIpAddress,
-      SELF.isProfessionalid := isProfessionalid,
-      SELF.isTin := isTin,
-      SELF.isProvider := isProvider,
-      SELF.isValidSearchInput := (isAddress OR isSSN OR isPhone OR isPerson OR isBusiness 
-        OR isEmailAddress OR isDevice OR isIpAddress OR isProfessionalid OR isTin OR isProvider),
+  EXPORT BuildValidityRecs(
+    DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in
+  ) := FUNCTION
+
+    FraudShared_Services.Layouts.BatchIn_Valid_rec xfm_ValidRecs(FraudShared_Services.Layouts.BatchIn_rec L) := TRANSFORM
+
+      boolean hasFullName := hasTxt(L.name_first) AND hasTxt(L.name_last);
+      boolean hasPhysicalAddress := hasTxt(L.z5) OR hasTxt(L.st) OR hasTxt(L.p_city_name);
+      boolean hasMailingAddress := hasTxt(L.mailing_z5) OR hasTxt(L.mailing_st) OR hasTxt(L.mailing_p_city_name);
+      boolean hasSSN := hasTxt(L.ssn);
+      boolean hasDOB := hasTxt(L.dob);
+      boolean hasPhone := hasTxt(L.phoneno);
+      boolean hasPerson := hasNum(L.did);
+      boolean hasBusiness := hasNum(L.seleid) AND hasNum(L.orgid) AND hasNum(L.ultid);
+      boolean hasEmailAddress := hasTxt(L.email_address);
+      boolean hasDevice := hasTxt(L.device_id);
+      boolean hasIpAddress := hasTxt(L.ip_address);
+      boolean hasProfessionalid := hasTxt(L.professionalid);
+      boolean hasLnpid := hasNum(L.lnpid);
+      boolean hasNpi := hasTxt(L.npi);
+      boolean hasAppendedproviderid := hasNum(L.appendedproviderid);
+      boolean hasTin := hasTxt(L.tin);
+      boolean hasGeo := hasTxt(L.geo_lat) AND hasTxt(L.geo_long);
+      boolean hasBankAccount := hasTxt(L.bank_routing_number) AND hasTxt(L.bank_account_number);
+      boolean hasDL := hasTxt(L.dl_state) AND hasTxt(L.dl_number);
+
+      SELF.hasFullName           := hasFullName;
+      SELF.hasPhysicalAddress    := hasPhysicalAddress;
+      SELF.hasMailingAddress     := hasMailingAddress;
+      SELF.hasSSN                := hasSSN;
+      SELF.hasDOB                := hasDOB;
+      SELF.hasPhone              := hasPhone;
+      SELF.hasPerson             := hasPerson;
+      SELF.hasBusiness           := hasBusiness;
+      SELF.hasEmailAddress       := hasEmailAddress;
+      SELF.hasDevice             := hasDevice;
+      SELF.hasIpAddress          := hasIpAddress;
+      SELF.hasProfessionalid     := hasProfessionalid;
+      SELF.hasLnpid              := hasLnpid;
+      SELF.hasNpi                := hasNpi;
+      SELF.hasAppendedproviderid := hasAppendedproviderid;
+      SELF.hasTin                := hasTin;
+      SELF.hasGeo                := hasGeo;
+      SELF.hasBankAccount        := hasBankAccount;
+      SELF.hasDL                 := hasDL;
+      SELF.hasValidInput         := (hasFullName OR hasPhysicalAddress OR hasMailingAddress OR hasSSN OR hasDOB OR hasPhone 
+                                     OR hasPerson OR hasBusiness OR hasEmailAddress OR hasDevice OR hasIpAddress OR hasProfessionalid
+                                     OR hasLnpid OR hasNpi OR hasAppendedproviderid OR hasTin OR hasGeo OR hasBankAccount OR hasDL);
       SELF := L,    
-    END;      
-     
-    isValidSearchInput := (DATASET([xfm_checkSearch(srchRec)]));  //ROW??
-    
-    RETURN isValidSearchInput[1];
+    END;
+
+    ds_validRecs := PROJECT (ds_batch_in, xfm_ValidRecs(LEFT));
+    RETURN ds_validRecs;
+
   END;
-
-  EXPORT ValidateBatchSearchInput(
-    DATASET(FraudShared_Services.Layouts.batch_search_rec) srchRec = DATASET([],FraudShared_Services.Layouts.batch_search_rec)
-  ):= FUNCTION
-
-    ValidateBatchSearch := PROJECT (srchRec, 
-	  TRANSFORM(FraudShared_Services.Layouts.batch_search_flags_rec,
-        isvalidsearch := fn_checkIfValid(LEFT);
-        SELF.isValidSearchInput := isValidSearch.isValidSearchInput;
-        SELF.isAddress := isvalidsearch.isAddress;
-        SELF.isSSN := isvalidsearch.isSSN;
-        SELF.isPhone := isvalidsearch.isPhone;
-        SELF.isPerson := isvalidsearch.isPerson;
-        SELF.isBusiness := isvalidsearch.isBusiness;
-        SELF.isEmailAddress := isvalidsearch.isEmailAddress;
-        SELF.isDevice := isvalidsearch.isDevice;
-        SELF.isIpAddress := isvalidsearch.isIpAddress;
-        SELF.isProfessionalid := isvalidsearch.isProfessionalid;
-        SELF.isProvider := isvalidsearch.isProvider;
-        SELF.isTin := isvalidsearch.isTin;
-        SELF := LEFT));
-    
-    RETURN ValidateBatchSearch;
-  END;     
 
 END;

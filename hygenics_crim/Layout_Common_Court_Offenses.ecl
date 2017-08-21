@@ -94,6 +94,8 @@ export Layout_Common_Court_Offenses := record
   string15   sent_court_fine_orig;
   string15   sent_susp_court_fine_orig;
 	unsigned8  offense_persistent_id;
-	//unsigned8  offense_category;
+	// unsigned8  offense_category;
+	string8    Hyg_classification_code;
+  // string8    Old_ln_Offense_score;
 //	string test;
 end;

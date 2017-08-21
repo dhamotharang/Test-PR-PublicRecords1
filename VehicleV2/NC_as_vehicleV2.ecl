@@ -22,20 +22,20 @@ string8 fDateWithoutDashes(string pDashedDate) := pDashedDate[7..10]
     
 VehicleV2.Layout_NC_temp_module.Layout_NC_as_VehicleV2 NCToCommon(VehLic.Layout_NC_Update pLeft) := transform
 	self.state_origin:='NC';
-	self.dt_first_seen := (unsigned8)(pLeft.process_date[1..6]);
-    self.dt_last_seen := (unsigned8)(pLeft.process_date[1..6]);
-	self.dt_vendor_first_reported:=(unsigned8)(pLeft.process_date[1..6]);
-	self.dt_vendor_last_reported:=(unsigned8)(pLeft.process_date[1..6]);
+	self.dt_first_seen := (unsigned8)pLeft.process_date;
+    self.dt_last_seen := (unsigned8)pLeft.process_date;
+	self.dt_vendor_first_reported:=(unsigned8)pLeft.process_date;
+	self.dt_vendor_last_reported:=(unsigned8)pLeft.process_date;
 	self.ORIG_VIN := pLeft.VEHICLE_IDENTIFICATION;
 	self.YEAR_MAKE := pLeft.MODEL_YEAR;
 	self.MAKE_CODE := pLeft.MAKE_CODE;					//THOR cleanup, CODES_V3 lookup
 	self.BODY_CODE := pLeft.BODY_STYLE;					//CODES_V3 lookup
 	self.LICENSE_PLATE_NUMBERxBG4 := pLeft.PLATE_NUMBER;
-    self.REGISTRATION_Effective_DATE := if((unsigned4)fDateWithoutDashes(pLeft.REGISTRATION_EXPIRATION_DATE)[1..6] > (unsigned4)fDateWithoutDashes(pLeft.REGISTRATION_ISSUE_DATE)[1..6], fDateWithoutDashes(pLeft.REGISTRATION_ISSUE_DATE), '');
-	self.REGISTRATION_EXPIRATION_DATE := if((unsigned4)fDateWithoutDashes(pLeft.REGISTRATION_EXPIRATION_DATE)[1..6] > (unsigned4)fDateWithoutDashes(pLeft.REGISTRATION_ISSUE_DATE)[1..6], fDateWithoutDashes(pLeft.REGISTRATION_EXPIRATION_DATE), '');
+    self.REGISTRATION_Effective_DATE := if((unsigned4)fDateWithoutDashes(pLeft.REGISTRATION_EXPIRATION_DATE) > (unsigned4)fDateWithoutDashes(pLeft.REGISTRATION_ISSUE_DATE), fDateWithoutDashes(pLeft.REGISTRATION_ISSUE_DATE), '');
+	self.REGISTRATION_EXPIRATION_DATE := if((unsigned4)fDateWithoutDashes(pLeft.REGISTRATION_EXPIRATION_DATE) > (unsigned4)fDateWithoutDashes(pLeft.REGISTRATION_ISSUE_DATE), fDateWithoutDashes(pLeft.REGISTRATION_EXPIRATION_DATE), '');
 	self.REGISTRATION_STATUS_CODE := pLeft.REGISTRATION_STATUS_CODE[1];
 	self.TRUE_LICENSE_PLSTE_NUMBER := pLeft.PLATE_NUMBER;
-	self.history := if( self.REGISTRATION_EXPIRATION_DATE < ut.GetDate[1..6] and (unsigned4)(self.registration_expiration_date[1..6]) <> 0,'E', '');						 
+	self.history := if( self.REGISTRATION_EXPIRATION_DATE < ut.GetDate and (unsigned4)(self.registration_expiration_date) <> 0,'E', '');						 
 	self.REGISTRANT_1_CUSTOMER_type := map(trim(pLeft.owner1_name_first + pLeft.owner1_name_last) <> '' => 'I',trim(pLeft.owner1_company_name) <> '' => 'B','');
 	self.REG_1_CUSTOMER_NAME := pLeft.orig_OWNER1_LAST_NAME + pLeft.orig_OWNER1_FIRST_NAME + pLeft.orig_OWNER1_MIDDLE_NAME + pLeft.orig_OWNER1_NAME_SUFFIX;
 	self.REG_1_STREET_ADDRESS := pLeft.OWNER_RESIDENCE_MAIL_ADDRESS_1 + pLeft.OWNER_RESIDENCE_MAIL_ADDRESS_2;

@@ -53,21 +53,23 @@ string1      tnt := ' ';
 // D = Dead
 // these are computed at query time
 // TNT Verification levels
-// Bullseye – is currently the ‘best’ address and is a DID match to the gong file
+// B = Bullseye Â– is currently the Â‘bestÂ’ address and is a DID match to the gong file
 // *** The ultimate, full phone verification and other records pointing at that being best address too
-// Verified – is currently the ‘best’ address and is a HHID match to the gong file
+// V = Verified Â– is currently the Â‘bestÂ’ address and is a HHID match to the gong file
 // *** Other records support this as the best address and the HOUSEHOLD has a phone registered at this line. Will pick up women with different lname to husbands
-// Current – is best address but not validated by the gong file
+// C = Current Â– is best address but not validated by the gong file
 // *** Self evident, works even when there is no phone indicator
-// Probable – is not currently the best address, but is did verified or hhid verified with a dt_last_seen within 6 months
-// *** Most likely because the best address is a mailing (only) address. This annotates the address with the active phone line out of ‘lived in’ addresses
-// Relative – is not currently the best address, and has a dt_last_seen > 6 months ago but is HHID verified
+// P = Probable Â– is not currently the best address, but is did verified or hhid verified with a dt_last_seen within 6 months
+// *** Most likely because the best address is a mailing (only) address. This annotates the address with the active phone line out of Â‘lived inÂ’ addresses
+// R = Relative Â– is not currently the best address, and has a dt_last_seen > 6 months ago but is HHID verified
 // *** Probably identifies a situation where a family member moved out of the address
-// Historic – is not the best address and is not HHID or DID verified
+// H = Historic Â– is not the best address and is not HHID or DID verified
 // *** A dead, historic address
 string1	   valid_SSN := '';
-/*G=good; F=fatfingers(typo; one or two digits off in the same positions)
-;R=relative ; B=bad ; O=other , Z= ssn matches best_ssn, but someone else owns it */ 
+/* G=good; F=fatfingers(typo; one or two digits off in the same positions)
+;R=relative ; B=bad ; O=old (SSA issued before individual's DOB)
+;Z= ssn matches best_ssn, but someone else owns it
+U=unknown */ 
 // M=SSN in the records is manufactured; it cam from watchdog non-GLB best if available
 // M is populated in the keys only.  base file does not contain M.
 string1	   jflag1 := '';  //valid_DOB
@@ -86,7 +88,7 @@ string1      jflag2 := '';
 // AmbiguousPropertyMultiple := 'E';
 // NotAmbiguousPropertyMultiple := 'C';
 // NotAmbiguousPropertySingleton := 'B';
-string1	   jflag3 := ''; //ssn confirmed from EQ
+string1	   jflag3 := ''; //ssn confirmed from EQ or BA
 unsigned8   RawAID := 0; 
 string5    Dodgy_tracking:= '';  // UNK's from name_suffix
 unsigned8  NID:=0;  // name cleaner ID

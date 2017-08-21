@@ -2,8 +2,8 @@ import versioncontrol, _control;
 
 export Build_All(
     string	pversion
-   ,string	pDirectory	= '/hds_180/CourtLink/20090804'
-   ,string	pServerIP	= _control.IPAddress.edata12
+   ,string	pDirectory	= '/data/hds_180/CourtLink/20090804'
+   ,string	pServerIP	= _control.IPAddress.bctlpedata10
    ,string	pFilename	= 'docket.txt'
    ,string	pGroupName	= _Dataset().groupname                                                    
    ,boolean	pIsTesting	= false
@@ -44,14 +44,10 @@ export Build_All(
 								,Promote().Input.Using2Used
 								,Promote(pversion).New2Built
 								,Promote().Built2QA
-								,parallel(
-											sequential(
-														courtLink.proc_Build_Keys(pversion),
-														CourtLink.Proc_Build_AutoKeys(pversion)
-													  ),
-											CourtLink.Out_Strata_Population_Stats(pversion)
-										 )
-									) : success(send_email(pversion).buildsuccess), failure(send_email(pversion).buildfailure);
+								,CourtLink.Out_Strata_Population_Stats(pversion)
+								,output(choosen(sort(Files().Base.qa , -dt_vendor_last_reported), 1000), named ('SampleRecords'))
+								,notify('CourtLink BaseFile Complete','*')
+								 ) : success(send_email(pversion).buildsuccess), failure(send_email(pversion).buildfailure);
    
    export All := if(VersionControl.IsValidVersion(pversion)
 						,full_build

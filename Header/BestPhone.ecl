@@ -1,8 +1,25 @@
+/*2017-02-28T19:57:11Z (Wendy Ma)
+DF-18485
+*/
 // Best phone ... per the header data
 import gong,ut,watchdog;
 
-hin := watchdog.file_header_filtered((unsigned8)phone<>0);
+export bestphone(string build_type = '') := function
 
+string20 var1 := '' : stored('watchtype');
+
+hin := map(	var1='nonglb'			
+					=> (watchdog.file_header_filtered((unsigned8)phone<>0)),
+			var1='nonutility'
+					=> (watchdog.file_header_filtered((unsigned8)phone<>0 AND pflag3 not in ['W','X'])),
+			var1='nonglb_nonutility'
+					=> (watchdog.file_header_filtered((unsigned8)phone<>0 AND pflag3 not in ['W','X'])),
+			var1='marketing'
+					=> (watchdog.file_header_filtered((unsigned8)phone<>0 AND pflag3 not in ['W','X'])),
+      build_type='fcra_best_append' 
+		    	=> (watchdog.file_header_filtered((unsigned8)phone<>0 AND pflag3 not in ['W','X'])),
+			(watchdog.file_header_filtered((unsigned8) phone<>0)));
+//hin := watchdog.file_header_filtered((unsigned8)phone<>0);
 dig8 := 10000000;
 hi := record
   hin.fname;
@@ -51,8 +68,8 @@ ut.MAC_Remove_Withdups_Local(dd1,gp,500,dd)
 
 jt := join(h,dd,left.phone%dig8=right.gp and
                (datalib.namesimilar(left.lname,right.name_last,1)<2 or
-                ut.namematch(left.fname,left.mname,left.lname,
-                             right.name_first,right.name_middle,right.name_last)<2),
+                datalib.DoNamesMatch(left.fname,left.mname,left.lname,
+                                     right.name_first,right.name_middle,right.name_last,2)< 2),
                improve_quality(left,right),hash,left outer);
 
 hs := dedup(sort(distribute(jt,did),did,-(dt_last_seen+quality),-quality,dt_first_seen,local),did,local);
@@ -71,7 +88,7 @@ hh_t := header.File_HHID_Current(ver = 1);
 h_to_t := record
   hh_t.did;
   hh_t.hhid_relat;
-  unsigned8 phone := '';
+  unsigned8 phone := 0;
   unsigned1 quality := 0;
   end;
 
@@ -103,4 +120,8 @@ res move_down(res le, res ri) := transform
 
 i := iterate(hhid_tp_dist,move_down(left,right));
 
-export BestPhone :=  group(i(quality<>0)) : persist('Header_BestPhone');
+BestPhone_out :=  group(i(quality<>0)) : persist('Header_BestPhone');
+
+return BestPhone_out;
+
+end;

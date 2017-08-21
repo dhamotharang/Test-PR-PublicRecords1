@@ -2,6 +2,7 @@ export OptionsLayout := record
 	unsigned1 dppa_purpose;
 	unsigned1 glb_purpose;
 	boolean include_noncore;
+	boolean phoneticcompany;
 	boolean phonetics;
 	boolean strict;
 end;

@@ -1,9 +1,19 @@
-import ut, text;
+import address, ut, text;
+
+EXPORT BH_Match_Init(
+
+	 dataset(Layout_Business_Header_New)	pBH_Initial_Base					= BH_Initial_Base	()
+	,dataset(Layout_Business_Header_New)	pBH_Merged_Base						= BH_Merged_Base	()
+	,string														pPersistname							= persistnames().BHMatchInit													
+	,boolean													pShouldRecalculatePersist	= true													
+
+) :=
+function
 
 // Change the BH_Init_Flag to TRUE to re-initialize BDID values
-BH_File := if(Business_Header.BH_Init_Flag or Business_Header.BH_Reset_BDID_Flag,
-              Business_Header.BH_Initial_Base,
-			  Business_Header.BH_Merged_Base);
+BH_File := if(Flags.Building.Initialize or Flags.Building.ResetBdids,
+              pBH_Initial_Base,
+			  pBH_Merged_Base);
 
 // Parse geo info from company name
 MAC_Parse_Geo(BH_File,
@@ -42,4 +52,13 @@ BH_Temp1_BDID := GROUP(ITERATE(BH_Temp1_Group, CopyBDID(LEFT, RIGHT)));
 
 BH_Temp_BDID := BH_Temp1_BDID + BH_Temp_Init(zip = 0);
 
-export BH_Match_Init := BH_Temp_BDID : persist('TEMP::BH_Match_Init');
+BH_Match_Init_persist := BH_Temp_BDID 
+	: persist(pPersistname);
+	
+returndataset := if(pShouldRecalculatePersist = true, BH_Match_Init_persist
+																										, persists().BHMatchInit
+									);
+									
+return returndataset;
+
+end;

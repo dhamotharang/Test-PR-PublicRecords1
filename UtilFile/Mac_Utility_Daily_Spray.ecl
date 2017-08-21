@@ -1,5 +1,8 @@
-import RoxieKeybuild,misc2,idl_header;
-export Mac_Utility_Daily_Spray(sourceIP,sourcefile,filedate,group_name='\'thor400_92\'',email_target='\' \'') := 
+/*2015-05-29T23:55:02Z (Wendy Ma_prod)
+skip adding daily canadian file to the superfile if it is empty
+*/
+import RoxieKeybuild,misc2,idl_header,header,Orbit3;
+export Mac_Utility_Daily_Spray(sourceIP,sourcefile,filedate,group_name='\'thor400_44\'',email_target='\' \'') := 
 macro
 	#uniquename(spray_utils)
 	#uniquename(super_utils)
@@ -14,29 +17,48 @@ macro
 	#uniquename(daily_utils_clean_phone0)
 	#uniquename(clean_phone)
 	#uniquename(baseout)
-    #uniquename(ignore_compare)
+  #uniquename(ignore_compare)
 	#uniquename(daily_canadian)
-    #uniquename(daily_canadian_clean)
+  #uniquename(daily_canadian_clean)
+  #uniquename(canadian_file)
+	#uniquename(canadian_cnt)
 
-
-	#workunit('name','Utility Daily Spray '+filedate);
+  #workunit('protect',true);
+	#workunit('priority','high');
+	#workunit('priority',14);
+	//#OPTION('allowedClusters', 'thor400_44,thor400_20');
+	#option ('multiplePersistInstances',FALSE);
+	#workunit('name','Yogurt:Utility Daily Spray '+filedate);
   #stored('fail_switch', false);
 	
 	//source file changed to source data "exch2seisint.filedate.Z" in '/eq_utils_build/eq_utils/archive instead of .d00 file.
-	%recordsize% :=470;
-    %spray_utils% := FileServices.SprayFixed(sourceIP,sourcefile, %recordsize%, group_name,'~thor_data400::in::eq_utils_raw_'+filedate ,-1,,,true,true);
+	#if(utilfile.mod_newlayout.constant_usenewlayout)
+	%recordsize% := 466;
+	%spray_utils% := FileServices.SprayFixed(sourceIP,sourcefile, %recordsize%, group_name,'~thor_data400::in::eq_utils_new_'+filedate ,-1,,,true,true);
+	%daily_utils% := dataset('~thor_data400::in::eq_utils_new_'+filedate, UtilFile.layout_util.daily_in_new, flat);
+	%daily_clean% := UtilFile.map_util_daily_new(%daily_utils%).util_daily_clean;
+	%daily_canadian% := UtilFile.map_util_daily_new(%daily_utils%).util_daily_canadian;
+	#else
+	%recordsize% := 470;
+	%spray_utils% := FileServices.SprayFixed(sourceIP,sourcefile, %recordsize%, group_name,'~thor_data400::in::eq_utils_raw_'+filedate ,-1,,,true,true);
 	%daily_utils% := dataset('~thor_data400::in::eq_utils_raw_'+filedate, UtilFile.layout_util.daily_in, flat);
-    %daily_clean% := UtilFile.map_util_daily(%daily_utils%).util_daily_clean;
+	 %daily_clean% := UtilFile.map_util_daily(%daily_utils%).util_daily_clean;
+	 %daily_canadian% := UtilFile.map_util_daily(%daily_utils%).util_daily_canadian;
+	#end
 	header.MAC_555_phones(%daily_clean%, work_phone, %daily_utils_clean_workphone%);
 	header.MAC_555_phones(%daily_utils_clean_workphone%, phone, %daily_utils_clean_phone0%);
     ut.mac_flipnames(%daily_utils_clean_phone0%,fname,mname,lname,%daily_utils_clean_phone%);
 	%clean_phone% := output(%daily_utils_clean_phone%,,'~thor_data400::in::eq_utils_cleanphone_'+filedate,__compressed__,overwrite);
-    %daily_canadian% := UtilFile.map_util_daily(%daily_utils%).util_daily_canadian;
 	%daily_canadian_clean% := output(%daily_canadian%,,'~thor_data400::in::eq_utils_canadian_'+filedate,__compressed__,overwrite);
+	//skip adding daily canadian file to the superfile if daily canadian file is empty
+%canadian_file% := dataset('~thor_data400::in::eq_utils_canadian_'+filedate, utilfile.Layout_Util.base, flat);
+%canadian_cnt% := count(%canadian_file%);
 	%super_utils% := sequential(
+	                if(utilfile.mod_newlayout.constant_usenewlayout,FileServices.AddSuperFile('~thor_data400::in::utility::full_daily_new', '~thor_data400::in::eq_utils_new_'+filedate),
+									output('switch to old layout'));
 									FileServices.AddSuperFile('~thor_data400::base::utility_file', '~thor_data400::in::eq_utils_cleanphone_'+filedate), 
 									FileServices.AddSuperFile('~thor_data400::in::utility::sprayed::daily', '~thor_data400::in::eq_utils_cleanphone_'+filedate),
-								    FileServices.AddSuperFile('~thor_data400::base::utility_canadian_file', '~thor_data400::in::eq_utils_canadian_'+filedate),
+								  if(%canadian_cnt% > 0, FileServices.AddSuperFile('~thor_data400::base::utility_canadian_file', '~thor_data400::in::eq_utils_canadian_'+filedate), output('canadian file empty')),
 									FileServices.AddSuperFile('~thor_data400::in::utility::full_daily', '~thor_data400::in::eq_utils_cleanphone_'+filedate)
 								); 
 
@@ -44,20 +66,23 @@ macro
 	#uniquename(send_fail_msg)
 
 	RoxieKeyBuild.Mac_Daily_Email_Local('UTIL','SUCC', filedate, %send_succ_msg%,if(email_target<>' ',email_target,UtilFile.Spray_Notification_Email_Address));
-	RoxieKeyBuild.Mac_Daily_Email_Local('UTIL','FAIL', filedate, %send_fail_msg%,if(email_target<>' ',email_target,'kgummadi@seisint.com;skasavajjala@seisint.com;jfreibaum@seisint.com;wma@seisint.com'));
+	RoxieKeyBuild.Mac_Daily_Email_Local('UTIL','FAIL', filedate, %send_fail_msg%,if(email_target<>' ',email_target,'John.Freibaum@risk.lexisnexis.com, Michael.Gould@lexisnexis.com, Vesa.Niemela@lexisnexis.com, Sudhir.Kasavajjala@risk.lexisnexis.com'));
 
 	//Add DID to daily file then move into did superfile for keys
 	#uniquename(did_daily)
-	%did_daily% := output(UtilFile.Daily_with_did,,'~thor_data400::in::utility::'+filedate+'::daily_did',overwrite);
+	%did_daily% := output(UtilFile.Daily_with_did,,'~thor_data400::in::utility::'+filedate+'::daily_did',overwrite, __Compressed__);
+	
 	#uniquename(add_daily)
 	%add_daily% := fileservices.addsuperfile('~thor_data400::in::utility::daily_did','~thor_data400::in::utility::'+filedate+'::daily_did');
 	#uniquename(clear_daily)
-	%clear_daily% := sequential(FileServices.ClearSuperFile('~thor_data400::in::utility::father::daily',true),
+	%clear_daily% := sequential(FileServices.RemoveOwnedSubFiles('~thor_data400::in::utility::father::daily',true),
+															FileServices.ClearSuperFile('~thor_data400::in::utility::father::daily'),
 						FileServices.AddSuperFile('~thor_data400::in::utility::father::daily', '~thor_data400::in::utility::sprayed::daily',, true),
+						FileServices.RemoveOwnedSubFiles('~thor_data400::in::utility::sprayed::daily'),
 						FileServices.ClearSuperFile('~thor_data400::in::utility::sprayed::daily'));
    
    	//reDID if the prod header version is newer than the last utility
-    boolean isnewheader := ut.IsNewProdHeaderVersion('Utility');
+    boolean isnewheader := header.IsNewProdHeaderVersion('Utility');
 	#uniquename(util_redid)
 	%util_redid% := utilfile.utility_DID(filedate);
 	#uniquename(util_daily_redid)
@@ -73,8 +98,10 @@ macro
 	%run_daily_redid% := if(isnewheader, %util_daily_redid%, %add_daily_did_to_daily_redid%);
 	//update utility flag file
 	#uniquename(util_headerVer_update)
-    %util_headerVer_update% := if(isnewheader,ut.PostDID_HeaderVer_Update('Utility'),output('No re-did')); 
-    #uniquename(build_util_keys)
+    %util_headerVer_update% := if(isnewheader,header.PostDID_HeaderVer_Update('Utility'),output('No re-did')); 
+  #uniquename(build_phonetype)
+	%build_phonetype% := utilfile.proc_build_phonetype(filedate); 
+		#uniquename(build_util_keys)
 	%build_util_keys% := utilfile.proc_build_util_keys(filedate);
 	#uniquename(build_util_bus_base)
 	%build_util_bus_base% := utilfile.build_util_bus_base(filedate).all;
@@ -82,20 +109,20 @@ macro
 	%build_util_bus_keys% := utilfile.proc_build_util_bus_keys(filedate);
 	#uniquename(accept_keys)
 	%accept_keys% := utilfile.Proc_AcceptSK_toQA;
+	#uniquename(keys_relationship)
+	%keys_relationship% := UtilFile.Proc_Create_Relationships(filedate); 
+	
 	#uniquename(updatedops)
-	%updatedops% := RoxieKeyBuild.updateversion('UtilityDailyKeys',filedate,'jfreibaum@seisint.com');
-    
+	%updatedops% := RoxieKeyBuild.updateversion('UtilityDailyKeys',filedate,'Michael.Gould@lexisnexis.com;John.Freibaum@risk.lexisnexis.com;Sudhir.Kasavajjala@risk.lexisnexis.com',,'N');
+  #uniquename(updatefcradops)
+	%updatefcradops% := RoxieKeyBuild.updateversion('UtilityhvalKeys',filedate,'Michael.Gould@lexisnexis.com;John.Freibaum@risk.lexisnexis.com;Sudhir.Kasavajjala@risk.lexisnexis.com',,'N|F');
+	
 	#uniquename(despraydaily) 
 	%despraydaily% := utilfile.pro_monitor().util_despray ; 
 	
 	%ignore_compare% :=true;
 	// if file exists with filedate and is in superfile skip the whole job
 
-	#uniquename(do_despray)
-	%do_despray% := misc2.fn_do_both(filedate,%ignore_compare%);
-	
-	#uniquename(do_build_roxie)
-     %do_build_roxie% := misc2.fn_build_roxie_key(filedate);
 	 #uniquename(build_misc2b)
 	 #uniquename(move_tobuilt_misc2b)
 	 #uniquename(move_toqa_misc2b)
@@ -104,7 +131,7 @@ macro
      RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::misc2b::hval','~thor_data400::key::misc2b::'+filedate+'::hval',%move_tobuilt_misc2b%);
      RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::misc2b::hval','Q',%move_toqa_misc2b%);
 
-     %do_build_hval% := sequential(%build_misc2b%,%move_tobuilt_misc2b%,%move_toqa_misc2b%);
+     %do_build_hval% := sequential(%build_misc2b%, %move_tobuilt_misc2b%, %move_toqa_misc2b%);
 	 #uniquename(build_DateCorrect)
 	 #uniquename(move_tobuilt_DateCorrect)
 	 #uniquename(move_toqa_DateCorrect)
@@ -115,16 +142,44 @@ macro
     RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::DateCorrect::hval','Q',%move_toqa_DateCorrect%);
 
     %do_build_datecorrect% := sequential(%build_DateCorrect%, %move_tobuilt_DateCorrect%, %move_toqa_DateCorrect%);
-	 
-	 #uniquename(util_daily_stats)
+	
+///////////SCRUBS REPORTS//////////////
+	  #uniquename(util_didScrubsReport)
+	  %util_didScrubsReport% := UtilFile.UtilDid_Scrubs(filedate,'wenhong.ma@lexisnexis.com,gabriel.marcan@lexisnexis.com');
+	  
+///////////SCRUBS REPORTS//////////////
+	
+	#uniquename(util_daily_stats)
      %util_daily_stats% := UtilFile.Out_Base_Dev_Stats(filedate);
-        #uniquename(out_daily_samples)
-	%out_daily_samples% := UtilFile.out_util_samples(filedate);
+            #uniquename(out_daily_samples_util_type_1)
+					  #uniquename(out_daily_samples_util_type_2)
+						#uniquename(out_daily_samples_util_type_3)
 
-sequential(%spray_utils%,%clean_phone%,%daily_canadian_clean%,%super_utils%,%did_daily%,%add_daily%,%clear_daily%,%run_redid%,%run_daily_redid%,%util_headerVer_update%,
-          %build_util_keys%,%build_util_bus_base%,%build_util_bus_keys%,%accept_keys%,
-		  %despraydaily%,%do_despray%,%do_build_roxie%,%do_build_hval%,%do_build_datecorrect%,%util_daily_stats%,%out_daily_samples%,%updatedops%) 
+//	%out_daily_samples% := UtilFile.out_util_samples(filedate);
+	%out_daily_samples_util_type_1% := UtilFile.out_samples_util_type(filedate, '1');
+	%out_daily_samples_util_type_2% := UtilFile.out_samples_util_type(filedate, '2');
+	%out_daily_samples_util_type_3% := UtilFile.out_samples_util_type(filedate, '3');
+	
+	#uniquename(orbit_non_fcra)
+	#uniquename(orbit_fcra)
+	%orbit_non_fcra% := if(ut.Weekday((integer)filedate) <> 'SATURDAY' and ut.Weekday((integer)filedate) <> 'SUNDAY'
+											,Orbit3.proc_Orbit3_CreateBuild ( 'Utility',filedate,'N')
+											,output('No Orbit Entries Needed for weekend builds'));
+	%orbit_fcra% := if(ut.Weekday((integer)filedate) <> 'SATURDAY' and ut.Weekday((integer)filedate) <> 'SUNDAY'
+											,Orbit3.proc_Orbit3_CreateBuild ( 'FCRA_Utility',filedate,'F')
+											,output('No Orbit Entries Needed for weekend builds'));
+
+ sequential(%spray_utils%, %clean_phone%, %daily_canadian_clean%, %super_utils%, %did_daily%,
+ /*Scrubs Alerts and Reports*/					
+%util_didScrubsReport%,
+					%out_daily_samples_util_type_1%,%out_daily_samples_util_type_2%,%out_daily_samples_util_type_3%,
+					%add_daily%, %clear_daily%, %run_redid%, %run_daily_redid%, %util_headerVer_update%,%build_phonetype%,
+          %build_util_keys%, %build_util_bus_base%, %build_util_bus_keys%, %accept_keys%, %keys_relationship%,
+		  %despraydaily%, %do_build_hval%, %do_build_datecorrect%, %util_daily_stats%, %updatedops%, %updatefcradops%,
+			%orbit_non_fcra%, %orbit_fcra%)
 	 : success(%send_succ_msg%),
-		 failure(%send_fail_msg%);
+		 failure(%send_fail_msg%); 
+
+ 
 
 endmacro;

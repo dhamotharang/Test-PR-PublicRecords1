@@ -2,14 +2,14 @@
 import uccd,lib_keylib,lib_stringlib;
 
 Layout_WithExpFilingSummary_Filepos := record
-	uccd.rec_withEXpFilingSummary;
+	uccd.layout_moxie_withEXpFilingSummary;
     unsigned integer8 __filepos { virtual(fileposition)};
 end;
 
  
 h := uccd.File_WithExpSummary2_Base_Dev;
 
-base_key_Name := '~thor_data400::key::moxie_ucc_summary2.';
+base_key_Name := '~thor_data400::key::moxie.ucc2_summary.';
 
 //output(h);
 

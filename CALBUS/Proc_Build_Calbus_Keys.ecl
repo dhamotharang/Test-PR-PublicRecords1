@@ -10,14 +10,13 @@ RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(Calbus.Key_Calbus_Account_Nbr,
 RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(Calbus.Key_Calbus_BDID,
                        '~thor_data400::key::calbus::@version@::bdid','~thor_data400::key::calbus::'+filedate+'::bdid',
                        bld_bdid_key);
-/*					   
-RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(Calbus.Key_Calbus_DID,
-                       '~thor_data400::key::calbus::@version@::did','~thor_data400::key::calbus::'+filedate+'::did',
-                       bld_did_key);
-*/
+											 
+RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(Calbus.Key_Calbus_LinkIDS.Key,
+                       '~thor_data400::key::calbus::@version@::linkids','~thor_data400::key::calbus::'+filedate+'::linkids',
+                       bld_linkids_key);
 
-//start txbus autokeys
-File_Autokeys := Calbus.File_Calbus_Autokeys;
+//start calbus autokeys
+File_Autokeys := project(Calbus.File_Calbus_Autokeys, transform(Calbus.Layouts_Calbus.Layout_Autokeys, self := left));
 
 // holds logical base name for a autokeys.
 logicalname := Calbus.Constants.autokey_logical(filedate);
@@ -53,11 +52,11 @@ AutokeyB2.MAC_Build(File_Autokeys, OwnerCleanName.fname, OwnerCleanName.mname, O
 // Move BDID key to build
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::calbus::@version@::Account_Nbr','~thor_data400::key::calbus::'+filedate+'::Account_Nbr',mv_acc_nbr);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::calbus::@version@::bdid','~thor_data400::key::calbus::'+filedate+'::bdid',mv_bdid);
-//RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::calbus::@version@::did','~thor_data400::key::calbus::'+filedate+'::did',mv_did);
+RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::calbus::@version@::linkids','~thor_data400::key::calbus::'+filedate+'::linkids',mv_linkids);
 // Move BDID key to QA
 RoxieKeyBuild.MAC_SK_Move_v2('~thor_data400::key::calbus::@version@::Account_Nbr', 'Q', mv_acc_nbr_key);
 RoxieKeyBuild.MAC_SK_Move_v2('~thor_data400::key::calbus::@version@::bdid', 'Q', mv_bdid_key);
-//RoxieKeyBuild.MAC_SK_Move_v2('~thor_data400::key::calbus::@version@::did', 'Q', mv_did_key);
+RoxieKeyBuild.MAC_SK_Move_v2('~thor_data400::key::calbus::@version@::linkids', 'Q', mv_linkids_key);
 
 
 // Move autokeys to QA
@@ -76,9 +75,9 @@ RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::calbus::autokey::@version@::Ci
 RoxieKeyBuild.Mac_SK_Move_V2('~thor_data400::key::calbus::autokey::@version@::Zip','Q',mv_autokey_zip);
 
 
-Build_Calbus_Keys := sequential(parallel(bld_acc_nbr_key, bld_bdid_key, bld_auto_keys), 
-                                  parallel(mv_acc_nbr, mv_bdid),
-                                  parallel(mv_acc_nbr_key, mv_bdid_key, mv_fdids_key, mv_autokey_addrB2, 
+Build_Calbus_Keys := sequential(parallel(bld_acc_nbr_key, bld_bdid_key, bld_linkids_key, bld_auto_keys), 
+                                  parallel(mv_acc_nbr, mv_bdid, mv_linkids),
+                                  parallel(mv_acc_nbr_key, mv_bdid_key, mv_linkids_key, mv_fdids_key, mv_autokey_addrB2, 
 								            mv_autokey_nameB2, mv_autokey_stnamB2, mv_autokey_cityB2, 
 								            mv_autokey_zipB2, mv_autokey_Namewords2, mv_autokey_name, mv_autokey_addr,
 								            mv_autokey_stnam, mv_autokey_city, mv_autokey_zip

@@ -1,6 +1,10 @@
-Import Data_Services, risk_indicators,business_header,Data_Services;
+Import Data_Services, risk_indicators,business_header,Data_Services,PRTE2_Business_Header;
 
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+hri_base_file := PRTE2_Business_Header.Files_Prte_Addr_HRI_Keys().HRI_Addr_Sic;
+#ELSE
 hri_base_file := files().HRIAddressSicCode.built((integer)zip<>0);
+#END;
 
 Export Key_HRI_Address_To_Sic := index(hri_base_file, 
 																		   {z5 := zip, prim_name,

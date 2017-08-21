@@ -1,26 +1,32 @@
-import ut,did_add,mdr;
-inf := header.with_tnt;
+import ut,did_add,mdr,idl_header;
 
-// Have to have hard match on lname,prim_name,prim_range,zip
+inf := distribute(header.with_tnt,hash(did))(src<>'D$');
 
 //-- Slim record to ease the join burdone
 sm_rec := record
 	inf.did;
 	inf.rid;
+	inf.src;
+	inf.dt_first_seen;
+	inf.dt_last_seen;
+	inf.dt_vendor_first_reported;
+	inf.dt_vendor_last_reported;
+	inf.phone;
 	inf.ssn;
 	inf.dob;
-	inf.phone;
-    inf.src;
-	inf.vendor_id;
 	inf.fname;
+	inf.mname;
 	inf.lname;
 	inf.name_suffix;
-    inf.mname;
 	inf.prim_range;
 	inf.prim_name;
+	inf.sec_range;
+	inf.city_name;
+	inf.st;
 	inf.zip;
-    inf.sec_range;
-	end;
+	inf.county;
+	inf.RawAID; 
+end;
 
 //****** Slim down the infile
 sm_rec slimHead(header.layout_header L) := transform
@@ -38,44 +44,140 @@ header.Layout_PairMatch tra(me_use ll, me_use r) := transform
   end;
 
 //****** Join the infile to itself
+	j := join(me_use,me_use,
+						left.did=right.did
+					and left.rid < right.rid
+					and	left.src        =right.src
+					and	left.fname      =right.fname
+					and	left.lname      =right.lname
+					and	left.prim_range =right.prim_range
+					and	left.prim_name  =right.prim_name
+					and	left.sec_range  =right.sec_range
+					and	left.city_name  =right.city_name
+					and	left.st         =right.st
+					and	(
+								(left.ssn          =right.ssn
+							and	left.dob         =right.dob
+							and	left.phone       =right.phone
+							and	left.mname       =right.mname
+							and	left.name_suffix =right.name_suffix
+							and	left.zip         =right.zip
+							and	left.county      =right.county)
+								or (
+											(
+															left.ssn=''
+													or left.ssn=right.ssn 
+													or (
+																	ut.nneq(left.ssn, right.ssn)
+																and	(//all dates are populated
+																		(left.dt_first_seen>0 and	left.dt_last_seen>0
+																and right.dt_first_seen>0 and right.dt_last_seen>0
+																and	left.dt_vendor_first_reported>0 and	left.dt_vendor_last_reported>0
+																and right.dt_vendor_first_reported>0 and right.dt_vendor_last_reported>0)
+																or // or all dates are zero
+																	(left.dt_first_seen=0 and	left.dt_last_seen=0
+																and right.dt_first_seen=0 and right.dt_last_seen=0
+																and	left.dt_vendor_first_reported=0 and	left.dt_vendor_last_reported=0
+																and right.dt_vendor_first_reported=0 and right.dt_vendor_last_reported=0)
+																)// both seen and vendor date ranges overlap respectively
+															and (left.dt_first_seen between right.dt_first_seen and right.dt_last_seen
+																	or left.dt_last_seen between right.dt_first_seen and right.dt_last_seen
+															    or right.dt_first_seen between left.dt_first_seen and left.dt_last_seen
+																	or right.dt_last_seen between left.dt_first_seen and left.dt_last_seen)
+															and (left.dt_vendor_first_reported between right.dt_vendor_first_reported and right.dt_vendor_last_reported
+																	or left.dt_vendor_last_reported between right.dt_vendor_first_reported and right.dt_vendor_last_reported
+															    or right.dt_vendor_first_reported between left.dt_vendor_first_reported and left.dt_vendor_last_reported
+																	or right.dt_vendor_last_reported between left.dt_vendor_first_reported and left.dt_vendor_last_reported)
+															)
+													or (//one of the seen dates is missing
+																ut.nneq(left.ssn, right.ssn)
+															and	(left.dt_first_seen=0 or right.dt_first_seen=0 or left.dt_last_seen=0 or right.dt_last_seen=0)
+															and	left.dt_vendor_first_reported>0 and	left.dt_vendor_last_reported>0
+															and right.dt_vendor_first_reported>0 and right.dt_vendor_last_reported>0
+															// and vendor dates ranges overlap
+															and (left.dt_vendor_first_reported between right.dt_vendor_first_reported and right.dt_vendor_last_reported
+																	or left.dt_vendor_last_reported between right.dt_vendor_first_reported and right.dt_vendor_last_reported
+															    or right.dt_vendor_first_reported between left.dt_vendor_first_reported and left.dt_vendor_last_reported
+																	or right.dt_vendor_last_reported between left.dt_vendor_first_reported and left.dt_vendor_last_reported)
+															)
+													or (//one of the seen dates and one of the vendor dates are missing
+																ut.nneq(left.ssn, right.ssn)
+															and	(left.dt_first_seen=0 or right.dt_first_seen=0 or left.dt_last_seen=0 or right.dt_last_seen=0)
+															and	(left.dt_vendor_first_reported=0 or right.dt_vendor_first_reported=0 or left.dt_vendor_last_reported=0 or right.dt_vendor_last_reported=0)
+															)
+											)
+									and	(
+															left.dob=0
+													or left.dob=right.dob 
+													or (
+																	ut.NNEQ_Date(left.dob, right.dob)
+																and	(//all dates are populated or all dates are zero
+																		(left.dt_first_seen>0 and	left.dt_last_seen>0
+																and right.dt_first_seen>0 and right.dt_last_seen>0
+																and	left.dt_vendor_first_reported>0 and	left.dt_vendor_last_reported>0
+																and right.dt_vendor_first_reported>0 and right.dt_vendor_last_reported>0)
+																or
+																	(left.dt_first_seen=0 and	left.dt_last_seen=0
+																and right.dt_first_seen=0 and right.dt_last_seen=0
+																and	left.dt_vendor_first_reported=0 and	left.dt_vendor_last_reported=0
+																and right.dt_vendor_first_reported=0 and right.dt_vendor_last_reported=0)
+																)// both seen and vendor date ranges overlap respectively
+															and (left.dt_first_seen between right.dt_first_seen and right.dt_last_seen
+																	or left.dt_last_seen between right.dt_first_seen and right.dt_last_seen
+															    or right.dt_first_seen between left.dt_first_seen and left.dt_last_seen
+																	or right.dt_last_seen between left.dt_first_seen and left.dt_last_seen)
+															and (left.dt_vendor_first_reported between right.dt_vendor_first_reported and right.dt_vendor_last_reported
+																	or left.dt_vendor_last_reported between right.dt_vendor_first_reported and right.dt_vendor_last_reported
+															    or right.dt_vendor_first_reported between left.dt_vendor_first_reported and left.dt_vendor_last_reported
+																	or right.dt_vendor_last_reported between left.dt_vendor_first_reported and left.dt_vendor_last_reported)
+															)
+													or (
+																ut.NNEQ_Date(left.dob, right.dob)
+															and	(left.dt_first_seen=0 or right.dt_first_seen=0 or left.dt_last_seen=0 or right.dt_last_seen=0)
+															and	left.dt_vendor_first_reported>0 and	left.dt_vendor_last_reported>0
+															and right.dt_vendor_first_reported>0 and right.dt_vendor_last_reported>0
+															// and vendor dates ranges overlap
+															and (left.dt_vendor_first_reported between right.dt_vendor_first_reported and right.dt_vendor_last_reported
+																	or left.dt_vendor_last_reported between right.dt_vendor_first_reported and right.dt_vendor_last_reported
+															    or right.dt_vendor_first_reported between left.dt_vendor_first_reported and left.dt_vendor_last_reported
+																	or right.dt_vendor_last_reported between left.dt_vendor_first_reported and left.dt_vendor_last_reported)
+															)
+													or (//one of the seen dates and one of the vendor dates are missing
+																ut.NNEQ_Date(left.dob, right.dob)
+															and	(left.dt_first_seen=0 or right.dt_first_seen=0 or left.dt_last_seen=0 or right.dt_last_seen=0)
+															and	(left.dt_vendor_first_reported=0 or right.dt_vendor_first_reported=0 or left.dt_vendor_last_reported=0 or right.dt_vendor_last_reported=0)
+															)
+										)
+							and	ut.nneq(left.phone       ,right.phone)
+							and	(
+									ut.nneq(left.mname       ,right.mname)
+								or (if(left.mname[1]=right.mname[1] and (length(trim(left.mname))=1 or length(trim(right.mname))=1),true,false))
+								)
+							and	ut.nneq(left.name_suffix ,right.name_suffix)
+							and	ut.nneq(left.zip         ,right.zip)
+							and	ut.nneq(left.county      ,right.county)
 
-phones_match(string p1, string p2) := 
-	p1 = p2 or 
-	stringlib.stringfind(p1, p2, 1) > 0 or
-	stringlib.stringfind(p2, p1, 1) > 0;
-
-suffix_unk(string s1, string s2) := 
- s1='UNK' and s2='UNK' or 
- s1='UNK' and s2='' or
- s1='' and s2='UNK';
-
-
-j := join(me_use,me_use,
-                left.zip=right.zip and
-                left.prim_name=right.prim_name and
-                left.prim_range=right.prim_range and
-                left.lname=right.lname and
-                left.fname=right.fname and
-                left.did=right.did and
-                left.rid < right.rid and
-               (mdr.isSourceGroupMatch(left.src,right.src) or 
-			left.src=right.src and ~mdr.Source_is_on_Probation(left.src) and
-			left.vendor_id[1..2]=right.vendor_id[1..2])and
-               (ut.NNEQ_Suffix(left.name_suffix, right.name_suffix) or 
-					suffix_unk(left.name_suffix,right.name_suffix))and
-               header.near_dob(left.dob,right.dob) and
-			   ut.Firstname_Match(left.mname,right.mname)>0 and
-			   ut.NNEQ(left.ssn,right.ssn) and
-			   ut.NNEQ(left.sec_range,right.sec_range) and 
-			   phones_match(trim(left.phone,all), trim(right.phone,all)),
-                tra(left,right));
+							and	(left.dt_first_seen=right.dt_first_seen or left.dt_first_seen=0 or right.dt_first_seen=0)
+							)
+						)
+					,tra(left,right)
+					,local);
                 
 sj := sort(distribute(j,old_rid),old_rid,new_rid,local);
 
 rolled_rids := dedup(sj,old_rid,local);
 
-ut.MAC_Patch_Id(inf,rid,rolled_rids,old_rid,new_rid,old_and_new)
+ut.MAC_Patch_Id(inf, rid, rolled_rids, old_rid, new_rid, old_and_new);
 
-Header.MAC_Merge_ByRid(old_and_new,merged)
+dinfile := distribute(old_and_new,hash(rid));
 
-export Last_Rollup := merged : persist('persist::last_rollup');
+BR_s := sort(dinfile, rid,dt_vendor_last_reported,dt_vendor_first_reported,dt_last_seen,local);
+
+merged := rollup(BR_s,left.rid=right.rid,header.tra_merge_headers(left,right),local);
+
+fix_dates  := header.fn_fix_dates(merged);
+set_titles := header.fn_apply_title(fix_dates);
+
+if ( count(set_titles(did>rid)) <> 0, output('DID > RID constraint violated') );
+
+export Last_Rollup := (set_titles + Dummy_records.NonFCRAseed) : persist('persist::last_rollup');

@@ -1,0 +1,197 @@
+OPTIONS:-gh -ga -gs2
+
+FILENAME:DOT_Base
+
+IDFIELD:EXISTS:Proxid
+RIDFIELD:rcid
+RECORDS:1698496897
+POPULATION:200000000
+NINES:3
+THRESHOLD:21
+BLOCKTHRESHOLD:5
+HACK:MAXBLOCKSIZE:20000
+
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields 
+//FIELDTYPE:wordbag:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):SPACES( <>{}[]-^=!+&,./):ONFAIL(CLEAN)
+FIELDTYPE:alpha:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:number:ALLOW(0123456789)
+FIELDTYPE:upper:CAPS:ONFAIL(CLEAN)
+// FIELDTYPE:positive:ALLOW(0123456789):CUSTOM(fn_positive):ONFAIL(REJECT)
+//FIELDTYPE:cname:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):SPACES( <>{}[]-^=!+&,./):CUSTOM(fn_cname):ONFAIL(REJECT)
+
+// FUZZY can be used to create new types of FUZZY linking
+FUZZY:Right4:RST:CUSTOM(fn_Right4):TYPE(STRING4)
+FUZZY:PreferredName:RST:CUSTOM(fn_PreferredName):TYPE(STRING20)
+FUZZY:NormSuffix:RST:CUSTOM(fn_normSuffix):TYPE(STRING5)
+
+
+// ------------------------------------
+//  1. Company
+// ------------------------------------
+FIELD:company_name:CARRY:0,0
+//FIELD:corp_legal_name:LIKE(wordbag):BAGOFWORDS(MOST):PROP:ABBR:EDIT1:FORCE(--):TYPE(string250):18,24
+//FIELD:dba_name:LIKE(wordbag):BAGOFWORDS:ABBR:EDIT1:TYPE(string250):20,16
+//FIELD:cnp_name:BAGOFWORDS(MOST):EDIT1:FORCE(+13,OR(active_duns_number),OR(active_enterprise_number),OR(active_domestic_corp_key),OR(hist_enterprise_number),OR(hist_duns_number),OR(hist_domestic_corp_key),OR(foreign_corp_key),OR(unk_corp_key)):TYPE(string250):SWITCH0:18,22
+FIELD:cnp_name:BAGOFWORDS(MOST):EDIT1:FORCE(+13):TYPE(string250):25,67
+FIELD:cnp_hasnumber:CARRY:0,0
+FIELD:cnp_number:FORCE:PROP:12,0
+//FIELD:cnp_btype:FORCE(--):2,1  CO and inc for same name forced apart here
+FIELD:cnp_btype:3,24
+FIELD:cnp_lowv:CARRY:0,0
+FIELD:cnp_translated:CARRY:0,0
+FIELD:cnp_classid:CARRY:0,0
+//FIELD:source:CARRY:0,0
+//FIELD:company_org_structure_derived:FORCE(--):PROP:0,0
+
+FIELD:company_fein:PROP:EDIT1:25,34
+//FIELD:company_charter_state:PROP:7,72
+//FIELD:company_charter_number:CONTEXT(company_charter_state):PROP:EDIT1:18,25
+FIELD:company_foreign_domestic:CARRY:0,0
+
+FIELD:company_bdid:CARRY:0,0
+// -- could add this field as SWITCH0 
+FIELD:company_phone:SWITCH0:PROP:26,254
+//FIELD:current:PROP:FORCE(--):3,0
+FIELD:iscorp:SWITCH0:PROP:1,0
+
+// ------------------------------------
+//  2. Place
+// ------------------------------------
+FIELD:prim_range:FORCE:13,0
+FIELD:prim_name:FORCE(+):15,0
+FIELD:sec_range:PROP:SWITCH0:12,90
+FIELD:v_city_name:CONTEXT(st):11,6
+FIELD:st:LIKE(alpha):FORCE(+):5,0
+FIELD:zip:LIKE(number):14,6
+CONCEPT:company_csz:v_city_name:st:zip:FORCE(+-2):14,9
+CONCEPT:company_addr1:prim_range:prim_name:sec_range:23,106
+CONCEPT:company_address:company_addr1:company_csz:FORCE(+):25,114
+
+// ------------------------------------
+//  3. Contact
+// ------------------------------------
+// -- could add these fields as SWITCH0.  maybe just the concept...
+
+//FIELD:isContact:CARRY:0,0
+//FIELD:title:SWITCH0:1,13
+//FIELD:fname:SWITCH0:11,98
+//FIELD:mname:SWITCH0:8,56
+//FIELD:lname:SWITCH0:15,64
+//FIELD:name_suffix:SWITCH0:8,22
+//CONCEPT:contact_name:fname:mname:lname:BAGOFWORDS:23,158
+//CONCEPT:contact_fullname:contact_name:name_suffix:23,164
+//FIELD:contact_ssn:SWITCH0:28,5
+
+//FIELD:contact_phone:SWITCH0:23,44
+//FIELD:contact_email:LIKE(upper):SWITCH0:29,4
+//FIELD:contact_job_title_raw:SWITCH0:6,457
+//FIELD:company_department:SWITCH0:0,0
+
+
+// ------------------------------------
+//  Metadata
+// ------------------------------------
+FIELD:dt_first_seen:RECORDDATE(FIRST):0,0
+FIELD:dt_last_seen:RECORDDATE(LAST):0,0
+
+// Active ID fields from reliable sources
+FIELD:active_duns_number:FORCE(--):PROP:27,0
+FIELD:active_enterprise_number:FORCE(--):PROP:28,0
+
+// Historical and non-domestic IDs from reliable sources
+// If match, add to score, if not, don't care(SWITCH0)
+FIELD:hist_enterprise_number:SWITCH0:PROP:27,10
+FIELD:hist_duns_number:SWITCH0:PROP:27,20
+//FIELD:unk_corp_key:SWITCH0:PROP:27,13
+FIELD:ebr_file_number:SWITCH0:PROP:27,251
+
+//corpkey fields
+FIELD:domestic_corp_key:FORCE(--):PROP:26,1
+FIELD:AK_foreign_corp_key:FORCE(--):PROP:25,1
+FIELD:AL_foreign_corp_key:FORCE(--):PROP:26,1
+FIELD:AR_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:AZ_foreign_corp_key:FORCE(--):PROP:24,2
+FIELD:CA_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:CO_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:CT_foreign_corp_key:FORCE(--):PROP:25,2
+FIELD:DC_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:DE_foreign_corp_key:FORCE(--):PROP:0,0
+FIELD:FL_foreign_corp_key:FORCE(--):PROP:26,1
+FIELD:GA_foreign_corp_key:FORCE(--):PROP:26,1
+FIELD:HI_foreign_corp_key:FORCE(--):PROP:25,0
+FIELD:IA_foreign_corp_key:FORCE(--):PROP:25,3
+FIELD:ID_foreign_corp_key:FORCE(--):PROP:0,0
+FIELD:IL_foreign_corp_key:FORCE(--):PROP:26,0
+FIELD:IN_foreign_corp_key:FORCE(--):PROP:26,0
+FIELD:KS_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:KY_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:LA_foreign_corp_key:FORCE(--):PROP:25,1
+FIELD:MA_foreign_corp_key:FORCE(--):PROP:27,1
+FIELD:MD_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:ME_foreign_corp_key:FORCE(--):PROP:27,0
+
+FIELD:MI_foreign_corp_key:FORCE(--):PROP:27,1
+FIELD:MN_foreign_corp_key:FORCE(--):PROP:28,1
+FIELD:MO_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:MS_foreign_corp_key:FORCE(--):PROP:26,1
+FIELD:MT_foreign_corp_key:FORCE(--):PROP:25,0
+FIELD:NC_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:ND_foreign_corp_key:FORCE(--):PROP:27,0
+
+FIELD:NE_foreign_corp_key:FORCE(--):PROP:25,0
+FIELD:NH_foreign_corp_key:FORCE(--):PROP:26,1
+FIELD:NJ_foreign_corp_key:FORCE(--):PROP:28,0
+FIELD:NM_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:NV_foreign_corp_key:FORCE(--):PROP:26,0
+FIELD:NY_foreign_corp_key:FORCE(--):PROP:26,0
+FIELD:OH_foreign_corp_key:FORCE(--):PROP:0,0
+FIELD:OK_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:OR_foreign_corp_key:FORCE(--):PROP:26,1
+
+FIELD:PA_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:PR_foreign_corp_key:FORCE(--):PROP:0,0
+FIELD:RI_foreign_corp_key:FORCE(--):PROP:26,0
+FIELD:SC_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:SD_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:TN_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:TX_foreign_corp_key:FORCE(--):PROP:24,1
+FIELD:UT_foreign_corp_key:FORCE(--):PROP:26,5
+
+FIELD:VA_foreign_corp_key:FORCE(--):PROP:25,0
+FIELD:VI_foreign_corp_key:FORCE(--):PROP:0,0
+FIELD:VT_foreign_corp_key:FORCE(--):PROP:27,0
+FIELD:WA_foreign_corp_key:FORCE(--):PROP:26,28
+FIELD:WI_foreign_corp_key:FORCE(--):PROP:28,0
+
+FIELD:WV_foreign_corp_key:FORCE(--):PROP:26,4
+FIELD:WY_foreign_corp_key:FORCE(--):PROP:26,2
+
+// ------------------------------------
+//  Attribute Files
+// ------------------------------------
+//ATTRIBUTEFILE:SrcVlid:NAMED(file_SrcVlid):VALUES(vl_id):IDFIELD(Proxid):18,41
+//ATTRIBUTEFILE:Contact:NAMED(file_contact):VALUES(contact):IDFIELD(Proxid):KEEP(ALL):22,97
+
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking
+
+// DotID
+// ?	a contact name (or the absence of a contact) at a company name at a physical address.  Separate legal entities within an office will consist of separate Dots.
+// o	The only thing new here is the word ?physical?.  I want to allow for other address types to join in at the Dot level.
+// ProxID
+// 1.	A legal entity at a physical address. (fuzzy matching to account for typos and different representations of same name)
+// 2.	has no more than 1 active charter for a given state (fuzzy matching to account for typos).  Now this should allow for charters from different states
+//	  to be ok, but not two charters in the same state.
+// 3.	has no more than 1 active Duns or LNCA lowest level ID.
+// 4.	Has no more than 1 status (active vs defunct).
+// 5.	Has no more than 1 legal name.
+// 6.	FEIN is sometimes useful for pulling records together, but won?t be pushed to push records apart.
+// 7.	Unincorporated businesses will need more than just company name & address to bring them together into a Prox.  Address + contact is enough.
+// Beyond ProxID
+// 1.	LNCA hierarchy
+// 2.	Duns hierarchy
+// Business Relatives (outside of hierarchy - linkable from a report)
+// TBD, but essentially any other connection we come across in this process but do not feel is strong enough for ProxID linking.

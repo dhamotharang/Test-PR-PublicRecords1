@@ -1,0 +1,1 @@
+export file_bankruptcy_main_v3_daily := dataset('~thor_data400::base::bankruptcy::main_v3_daily',bankruptcyV2.Layout_bankruptcy_main_v3.layout_bankruptcy_main_filing_supp ,flat)(court_code+case_number not in bankruptcyv2.Suppress.court_code_caseno);

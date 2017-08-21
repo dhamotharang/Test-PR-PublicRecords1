@@ -14,7 +14,7 @@ export key_override_faa := MODULE
 
 
   // aircraft registration record
-  aircraft_rec := RECORD
+  export aircraft_rec := RECORD
     faa.layout_aircraft_registration_out_Persistent_ID;
     string20 flag_file_id;
   end;
@@ -61,7 +61,7 @@ export key_override_faa := MODULE
                           'thor_data400::key::override::fcra::pilot_';
 
   // main pilot registration
-  airmen_rec := RECORD
+  export airmen_rec := RECORD
     faa.layout_airmen_Persistent_ID;
     string20 flag_file_id;
   end;

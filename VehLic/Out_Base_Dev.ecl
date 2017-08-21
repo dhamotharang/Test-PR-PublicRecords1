@@ -22,5 +22,5 @@ if(VehLic.BuildType<>VehLic.BuildType_Accurint,
 if(ut.DaysApart(ut.GetDate,lVersionDate) >= 10,
    fail('Please check ' + lVersionAttr)
   );
-   
-export Out_Base_Dev := output(VehLic.Vehicles,,'~thor_data400::base::' + trim(lFileNamePrefix) + 'vehicles_' + lVersionDate,overwrite,__compressed__);
+
+export Out_Base_Dev := output(VehLic.Vehicles + vehlic.irs_dummy_recs,,'~thor_data400::base::' + trim(lFileNamePrefix) + 'vehicles_' + lVersionDate,overwrite,__compressed__);

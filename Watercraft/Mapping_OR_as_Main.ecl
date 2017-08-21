@@ -1,4 +1,3 @@
-
 import watercraft;
 
 
@@ -49,6 +48,9 @@ VEH_TYPE_DESC(string2 code) := case(code,
 '4' => 'OTHER',
 '5' => 'PERSONAL WATERCRAFT', '');
 
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_OR_clean_in, watercraft.Layout_OR_clean_in,hull_clean_in)
+
+
 Layout_OR_clean_temp1 := record
 
 watercraft.Layout_OR_clean_in;
@@ -57,7 +59,7 @@ watercraft.Layout_OR_source_code_desc;
     	
 end;
 
-Layout_OR_clean_temp1 main_mapping_temp1(watercraft.file_OR_clean_in L, watercraft.file_OR_source_code_desc R)
+Layout_OR_clean_temp1 main_mapping_temp1(hull_clean_in L, watercraft.file_OR_source_code_desc R)
 
 := transform
 
@@ -66,7 +68,7 @@ self := R;
 
 end;
 
-Mapping_OR_as_Main_temp1 := join(watercraft.file_OR_clean_in, watercraft.file_OR_source_code_desc, left.code_lien1 = right.Nmbr_Id_Tbl,
+Mapping_OR_as_Main_temp1 := join(hull_clean_in, watercraft.file_OR_source_code_desc, left.code_lien1 = right.Nmbr_Id_Tbl,
 main_mapping_temp1(left, right), left outer, lookup);
 
 Layout_OR_clean_temp2 := record
@@ -109,8 +111,8 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(Mapping_OR_as_Main_te
 	self.hull_number						:=	L.hull_id;
 	self.propulsion_code					:=	'';
 	self.propulsion_description				:=	L.PROP;
-	self.vehicle_type_Code					:=	L.CONSTRUCTION;
-	self.vehicle_type_Description			:=	VEH_TYPE_DESC(L.CONSTRUCTION);
+	self.vehicle_type_Code					:=	'';
+	self.vehicle_type_Description			:='';
 	self.fuel_code							:=	'';
 	self.fuel_description					:=	L.FUEL;
 	self.hull_type_code						:=	'';
@@ -158,7 +160,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(Mapping_OR_as_Main_te
 	self.registration_status_description	:=	'';
 	self.registration_status_date			:=	'';
 	self.registration_renewal_date			:=	'';
-	self.decal_number						:=	L.DECAL;
+	self.decal_number						:=	'';
 	self.transaction_type_code				:=	'';
 	self.transaction_type_description		:=	'';
 	self.title_state						:=	'';
@@ -177,7 +179,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(Mapping_OR_as_Main_te
 	self.lien_1_city						:=	L.Addr_City;
 	self.lien_1_state						:=	L.Code_State;
 	self.lien_1_zip							:=	L.Code_Zip;
-	self.lien_2_indicator					:=	if(L.CODE_LIEN2 <> '', 'Y', '');
+	self.lien_2_indicator					:=	'';
 	self.lien_2_name						:=	'';
 	self.lien_2_date						:=	'';
 	self.lien_2_address_1					:=	'';
@@ -203,8 +205,6 @@ export Mapping_OR_as_Main := project(Mapping_OR_as_Main_temp2, main_mapping_form
 
 
 	
-
-
 
 
 

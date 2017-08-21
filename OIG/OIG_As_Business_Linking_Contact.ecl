@@ -1,4 +1,4 @@
-IMPORT BIPV2, ut, mdr, _Validate;
+IMPORT BIPV2, ut, mdr, _Validate, OIG;
 
 EXPORT OIG_As_Business_Linking_Contact (
 	  DATASET(OIG.Layouts.KeyBuild) pKey = OIG.File_OIG_KeyBaseTemp_bid) := FUNCTION

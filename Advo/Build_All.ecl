@@ -1,22 +1,55 @@
-import ut, advo, VersionControl;
-export Build_all(string version=version) := function
+import ut, advo, VersionControl,RoxieKeybuild,uspis_hotlist,scrubs,_Control, Orbit3, tools, std;
+export Build_all(
 
-sprayf := VersionControl.fSprayInputFiles(Advo.Spray);
+	 string 		pversion
+	,string     pAdvoversion
+	,string 		pAdvoSprayDirectory				= '/data/hds_180/advo/spray'
+	,string 		pUSPISSprayDirectory			= '/data/hds_180/uspis_hotlist/out'
+	,string     pSourceIP                 = _Control.IPAddress.bctlpedata11
+	,boolean		pSkipAdvo									= false
+	,boolean		pSkipUSPIS								= true
+	,unsigned8	paprox_expected_rec_num		= 150000000
+	,string			emailList									=	''
 
-ut.MAC_SF_BuildProcess(Build_base,Superfile_List.Base_File_Out ,advobase,2,,true);
+) :=
+function
+//********************************Apply Scrubs before building the base file***************************
+  file_to_scrub := 	Build_base(pversion,pAdvoversion,Files().Input.using,Files().Base.qa);
+//Transform to the layout that scrubs is expecting	
+	file_to_scrub_t := project( file_to_scrub , Advo.Layout_Scrubs);
+//Apply Scrubs
+	
+//Submits stats to Orbit
+	submit_stats := Scrubs.ScrubsPlus_PassFile(file_to_scrub_t,'ADVO','ADVO','Scrubs_ADVO','',pversion,emailList,false);
 
-Build_all_keys := Build_keys(version);
+  //append bitmap to base
+  dbuildbase := dataset('~thor_data::Scrubs_ADVO::Scrubs_Bits',Advo.Layout_Scrubs,thor);
+	VersionControl.macBuildNewLogicalFile(filenames(pversion).base.new,dbuildbase,BuildAdvoBase	,pShouldExport := false);
+	// BuildAdvoBase:=output(dbuildbase,,'~thor_data400::base::ADVO::ScrubsTest::20170215',thor,overwrite);
+//*****************************************************************************************************	
 
-zDoPopulationStats:=Strata_Stat_Advo;
-
-built := sequential(
-					sprayf
-					,advobase
-					,Build_all_keys
-					,zDoPopulationStats
-					,FileServices.PromoteSuperFileList([Superfile_List.Source_File_In,Superfile_List.Source_File_In_Processed])
-					);
-
-return built;
-
+	build_Advo :=
+	sequential(
+		 Create_Supers()
+		,if(pAdvoSprayDirectory != '' and count(nothor(fileservices.superfilecontents(Filenames().Input.using))) = 0,VersionControl.fSprayInputFiles(Advo.Spray(pAdvoSprayDirectory),pEmailSubjectDataset := 'Advo ' + pversion),output('pAdvoSprayDirectory is blank, skipping spray' ))
+    ,promote().sprayed2using		
+		,if( count(Files().Input.using		) < paprox_expected_rec_num, FAIL(_Dataset().Name + ' ERROR: Not all input files have been loaded.....PLEASE VERIFY'))	
+		,submit_stats
+		,BuildAdvoBase
+		,Promote(pversion,'base').new2built
+		,Build_keys(pversion)
+		,Strata_Stat_Advo(pversion,files().base.built)
+		,Promote().using2used
+		,Promote().built2qa
+	);
+	
+	return sequential(
+	
+		 if(pSkipAdvo = false
+			,build_Advo
+			,Rename_Keys(pversion, false)
+		 )
+		,USPIS_HotList.Build_All(pversion,pUSPISSprayDirectory,pSkipUSPIS := pSkipUSPIS).all
+		,Send_Email(pversion).Roxie.all_packages
+	);
 end;

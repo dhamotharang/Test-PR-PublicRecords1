@@ -7,11 +7,11 @@ EXPORT CleanDualNameLFM140 (const string dualname,
                             const string server = '', 
                             unsigned2 port = 0)	:= FUNCTION
 
-	//CorrectPort := address.CleaningServer.CorrectPort(port); 
-	//CorrectServer := address.CleaningServer.CorrectServer(server);
+	cleanserver := if (server = '',Address.Constants.CorrectServer,server);
+	cleanport := if (port = 0,Address.Constants.CorrectPort,port);
 	
   //clean := AddrCleanLib.CleanDualNameLFM140 (dualname, CorrectServer, CorrectPort);  
-	clean := BO_Address.CleanDualNameLFM140 (dualname,address.Constants.CorrectServer,address.Constants.correctport);  
+	clean := BO_Address.CleanDualNameLFM140 (dualname,cleanserver,cleanport);  
   
   return clean; 
 END;

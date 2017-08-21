@@ -1,10 +1,10 @@
-import lib_addrclean;
+import Address;
 
 Drivers.Layout_Experian_XML_Fixed	tFixedFromXML(Drivers.File_In_Experian_XML pInput)
  :=
   transform
-	string73	lCleanName		:=	lib_addrclean.AddrCleanLib.CleanPersonFML73(pInput.full_name);
-	string182	lCleanAddress	:=	lib_addrclean.AddrCleanLib.CleanAddress182(pInput.CurrentAddress_street_1,
+	string73	lCleanName		:=	Address.CleanPersonFML73(pInput.full_name);
+	string182	lCleanAddress	:=	Address.CleanAddress182(pInput.CurrentAddress_street_1,
 																			   pInput.CurrentAddress_city + ' ' + pInput.CurrentAddress_state + ' ' + pInput.CurrentAddress_zip
 																			  );
 	self.title    				:=	lCleanName[01..05];

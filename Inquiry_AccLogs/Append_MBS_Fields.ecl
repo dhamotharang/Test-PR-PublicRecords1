@@ -101,9 +101,9 @@ export Append_MBS_Fields := module
 	
 	
 	return sequential(fileservices.startsuperfiletransaction();
-												fileservices.clearsuperfile('~thor10_11::in::accurint_acclog::mbs'),
-												output(jUniqueID,,'~thor10_11::in::accurint_acclog::'+version+'::mbs', overwrite),
-												fileservices.addsuperfile('~thor10_11::in::accurint_acclog::mbs','~thor10_11::in::accurint_acclog::'+version+'::mbs'),
+												fileservices.clearsuperfile('~thor100_21::in::accurint_acclog::mbs'),
+												output(jUniqueID,,'~thor100_21::in::accurint_acclog::'+version+'::mbs', overwrite),
+												fileservices.addsuperfile('~thor100_21::in::accurint_acclog::mbs','~thor10_11::in::accurint_acclog::'+version+'::mbs'),
 											fileservices.finishsuperfiletransaction());
 	end;
 

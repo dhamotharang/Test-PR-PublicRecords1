@@ -2,14 +2,6 @@ rec := RECORD
 	STRING32	word;
 END;
 
-rec pairup(rec l, rec r) := TRANSFORM
-	self.word := IF (TRIM(r.word)='', SKIP, TRIM(l.word) + ' ' + TRIM(r.word));
-END;
-
-// cannot use this because it causes unsupported "child queries"
-//export WordPairs(DATASET(rec) ds) := COMBINE(ds, ds[2..] + DATASET([{''}],rec), pairup(LEFT,RIGHT));
-
-
 
 export DATASET WordPairs(DATASET(rec) ds) := FUNCTION
 

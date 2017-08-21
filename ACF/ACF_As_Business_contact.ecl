@@ -1,3 +1,4 @@
+#OPTION('multiplePersistInstances',FALSE);
 IMPORT ut, Business_Header, acf,Business_HeaderV2;
 
 dInput :=Business_HeaderV2.Source_Files.acf.BusinessHeader((INTEGER)name_score<3 and company_title<>'');

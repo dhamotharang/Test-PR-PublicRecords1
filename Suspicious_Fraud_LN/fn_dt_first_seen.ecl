@@ -1,0 +1,1 @@
+EXPORT fn_dt_first_seen(unsigned3 dt_vendor_first_reported, unsigned3 dt_first_seen) :=IF(dt_first_seen = 0 and dt_vendor_first_reported > 0,dt_vendor_first_reported,if(dt_first_seen = 0,999999,dt_first_seen));

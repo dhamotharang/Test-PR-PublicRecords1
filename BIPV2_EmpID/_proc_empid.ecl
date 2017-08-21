@@ -1,4 +1,4 @@
-import BIPV2_Files, BIPV2, BIPV2_EmpID, BIPV2_Tools,tools,wk_ut,std,bipv2_build;
+import BIPV2_Files, BIPV2, BIPV2_EmpID, BIPV2_Tools,tools,wk_ut,std,bipv2_build,linkingtools;
 // Init receives a file in common layout, and widens it for use in all iterations. We thin
 // back to the common layout before promoting it to the base/father/grandfather superfiles.
 l_common := BIPV2.CommonBase.Layout;
@@ -120,9 +120,13 @@ export _proc_empid(
 	SHARED ds_empid_down := BIPV2_Files.files_empid_down().DS_BASE;
 	EXPORT initFromEmpID_Down(dataset(recordof(BIPV2_Files.files_empid_down().DS_BASE)) pdataset = BIPV2_Files.files_empid_down().DS_BASE) := 
   function
+    kick_copy2_storage_thor  := BIPV2_Tools.Copy2_Storage_Thor('~' + nothor(std.file.superfilecontents(BIPV2_Files.files_empid_down().FILE_BASE)[1].name) ,Build_Date ,'empid_preprocess');
+    copy2StorageThor         := if(not wk_ut._constants.IsDev ,output(kick_copy2_storage_thor ,named('copy2_Storage_Thor__html')));  //copy orig file to storage thor
+
     return sequential(
        init(pdataset)
-      ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(BIPV2_Files.files_empid_down().FILE_BASE)[1].name)  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
+      ,copy2StorageThor
+      // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(BIPV2_Files.files_empid_down().FILE_BASE)[1].name)  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
     );
   end;
 	/* ---------------------- Post-processing ---------------------------- */
@@ -147,14 +151,27 @@ export _proc_empid(
 	shared saltMod 	        := BIPV2_EmpID.Proc_Iterate(Build_Date,iter, input, f_out(''));
 	shared linking	        := parallel(saltmod.DoAllAgain/*, possibleMatches*/);
 	
+	/*-----------------------For Persistence stats of the emp cluster and records -------------*/
+  shared the_base:=	dataset(f_out(iter),l_base,thor);
+	shared the_father:=BIPV2.CommonBase.DS_BASE;
+	shared the_stat_ds :=BIPV2_Strata.PersistenceStats(the_base,the_father,rcid,empid); 
 	
 	/* ---------------------- SALT Output -------------------------------- */
 	shared updateBuilding(string fname=f_out(iter)) := _files_empid.updateBuilding(fname);
-	export updateSuperfiles(string fname=f_out(iter), DATASET(l_common) ds_common=ds_empid_down) := sequential(
-		 output(postProcess(dataset(fname,l_base,thor),ds_common),, f_post, compressed, overwrite)
-		,_files_empid.updateSuperfiles(f_post)
-    ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := fname  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
-	);
+	export updateSuperfiles(string fname=f_out(iter), DATASET(l_common) ds_common=ds_empid_down) := 
+  function
+  
+    kick_copy2_storage_thor  := BIPV2_Tools.Copy2_Storage_Thor(fname ,Build_Date ,'empid_postprocess');
+    copy2StorageThor         := if(not wk_ut._constants.IsDev ,output(kick_copy2_storage_thor ,named('copy2_Storage_Thor__html')));  //copy orig file to storage thor
+
+    return sequential(
+       output(postProcess(dataset(fname,l_base,thor),ds_common),, f_post, compressed, overwrite)
+      ,_files_empid.updateSuperfiles(f_post)
+      ,Strata.macf_CreateXMLStats(the_stat_ds ,'BIPV2','Persistence'	,BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'EMPID','Stats',false,false) //group on cluster_type, stat_desc
+      ,copy2StorageThor
+      // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := fname  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
+    );
+  end;
 	
 	
 	/* ---------------------- SALT History ------------------------------- */

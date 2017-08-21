@@ -1,4 +1,4 @@
-﻿// This module provides voters data in different formats.
+// This module provides voters data in different formats.
 import VotersV2, doxie, suppress, ut, census_data, codes,AutoStandardI;
 
 //IMPORTANT FCRA-NOTE: -- FCRA ISN't USED SO FAR, placeholders are reserved for future needs

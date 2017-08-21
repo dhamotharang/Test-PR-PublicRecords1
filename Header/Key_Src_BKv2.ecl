@@ -7,7 +7,7 @@ end;
 
 export Key_Src_bkv2(boolean pFastHeader = false, boolean pCombo = true, dataset(src_rec) pDataset=dataset([],src_rec)) := function
 
-dBK_as_Source	:=	if(pCombo,pDataset,project(BankruptcyV3.BKv3_as_source(if(pFastHeader,BankruptcyV2.file_bankruptcy_search_v3_supp), if(pFastHeader,BankruptcyV2.file_bankruptcy_main_v3_supplemented),~pFastHeader,pFastHeader),src_rec));
+dBK_as_Source	:=	if(pCombo,pDataset,project(header.Files_SeqdSrc(pFastHeader).BA,src_rec));
 
 mac_key_src(dBK_as_Source, {string50 tmsid}, 
 						bk_child, 

@@ -11,7 +11,7 @@ layout_autokeys := record
 	typeof(fedex.layout_fedex_base.first_name) fname;
 	typeof(fedex.layout_fedex_base.middle_initial) mname;
 	typeof(fedex.layout_fedex_base.last_name) lname;
-	fedex.layout_fedex_base	-	file_date;
+	fedex.layout_fedex_base	-	file_date - nametype;
 end;
 
 layout_autokeys add_field(ds l) := transform

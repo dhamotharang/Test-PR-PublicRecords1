@@ -1,16 +1,16 @@
-import VersionControl;
+import VersionControl, corp;
 
-export mBuild_BaseFiles :=
+export mBuild_BaseFiles(string pversion) :=
 module
 
 	export Pre_Build_Input_manipulation :=
-		nothor(Promote.Input.Sprayed2Using) : success(output('Pre build input superfile manipulation complete'));
+		Promote(pversion).Input.Sprayed2Using : success(output('Pre build input superfile manipulation complete'));
 
-	VersionControl.macBuildNewLogicalFile(Filenames.base.corp	,Update_Corp	,Update_Corp_Base	);
-	VersionControl.macBuildNewLogicalFile(Filenames.base.cont	,Update_Cont	,Update_Cont_Base	);
-	VersionControl.macBuildNewLogicalFile(Filenames.base.events	,BDID_Event		,Update_Event_Base	);
-	VersionControl.macBuildNewLogicalFile(Filenames.base.stock	,Update_Stock	,Update_Stock_Base	);
-	VersionControl.macBuildNewLogicalFile(Filenames.base.ar		,Update_AR		,Update_AR_Base		);
+	VersionControl.macBuildNewLogicalFile(Filenames(pversion).base.corp.new		,Update_Corp	,Update_Corp_Base	);
+	VersionControl.macBuildNewLogicalFile(Filenames(pversion).base.cont.new		,Update_Cont	,Update_Cont_Base	);
+	VersionControl.macBuildNewLogicalFile(Filenames(pversion).base.events.new	,BDID_Event		,Update_Event_Base	);
+	VersionControl.macBuildNewLogicalFile(Filenames(pversion).base.stock.new	,Update_Stock	,Update_Stock_Base	);
+	VersionControl.macBuildNewLogicalFile(Filenames(pversion).base.ar.new			,Update_AR		,Update_AR_Base		);
                                                               
 	export Update_Base_Files :=
 	parallel(
@@ -25,8 +25,9 @@ module
 
 	export Post_Build_Input_manipulation :=
 		sequential(
-			 nothor(Promote.Input.Using2Used)
-			,Promote.Base.New2Built
+			 Promote(pversion).Input.Using2Used
+			,if(flags.IsUsingV1Inputs and flags.UseV1CurrentSprayed and flags.ExistcorpV1CurrentSprayed, Corp.Clear_Input_Superfiles)
+			,Promote(pversion,'base').New2Built
 		
 		) : success(output('Post build input superfile manipulation complete'));
 

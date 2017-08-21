@@ -31,24 +31,25 @@ reg_status_desc(string2 code) := case(code,
 '07' => 'Temporary Registration',
 '08' => 'All Events Deleted','');
 
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_ME_clean_in, watercraft.Layout_ME_clean_in,hull_clean_in)
 
-watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_ME_clean_in L) := transform
+watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := transform
 
 
     self.watercraft_key				        :=	if(length(trim(L.HULL_ID, left, right)) = 12 and trim(L.year, left, right) >= '1972', trim(L.HULL_ID, left, right),
 	                                            (trim(L.HULL_ID, left, right) + trim(L.MAKE,left, right) + trim(L.YEAR, left, right))[1..30]);                                          
-	self.sequence_key				        :=	if(L.STATUS = '01', L.EXPIRATION_DATE, '30000000');
+	self.sequence_key				        :=	L.REG_DATE + L.ISSUE_TIME;
 	self.watercraft_id						:=	'';
 	self.state_origin						:=	'ME';
 	self.source_code						:=	'AW';
 	self.st_registration					:=	L.STATEABREV;
-	self.county_registration				:=	county_reg(trim(L.county,left,right));
+	self.county_registration				:=	L.county;
 	self.registration_number				:=	trim(L.REG_NUM, left, right);
 	self.hull_number						:=	L.hull_id;
 	self.propulsion_code					:=	'';
 	self.propulsion_description				:=	L.PROP;
 	self.vehicle_type_Code					:=	'';
-	self.vehicle_type_Description			:=	L.VEH_TYPE;
+	self.vehicle_type_Description			:=	L.VEH_TYPE+''+L.VEH_TYPE2;
 	self.fuel_code							:=	'';
 	self.fuel_description					:=	L.FUEL;
 	self.hull_type_code						:=	'';
@@ -59,21 +60,21 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_ME_cl
 	self.model_year							:=	L.YEAR;
 	self.watercraft_name					:=	'';
 	self.watercraft_class_code				:=	'';
-	self.watercraft_class_description		:=	'';
-	self.watercraft_make_code				:=	L.MAKE_CODE;
+	self.watercraft_class_description		:=	L.CLASS;
+	self.watercraft_make_code				:=	'';
 	self.watercraft_make_description		:=	L.MAKE;
 	self.watercraft_model_code				:=	'';
 	self.watercraft_model_description		:=	'';
 	self.watercraft_width					:=	'';
 	self.watercraft_weight					:=	'';
 	self.watercraft_color_1_code			:=	'';
-	self.watercraft_color_1_description		:=	'';
+	self.watercraft_color_1_description		:=	L.COLOR;
 	self.watercraft_color_2_code			:=	'';
 	self.watercraft_color_2_description		:=	'';
 	self.watercraft_toilet_code				:=	'';
 	self.watercraft_toilet_description		:=	'';
 	self.watercraft_number_of_engines		:=	'';
-	self.watercraft_hp_1					:=	L.HP;
+	self.watercraft_hp_1					:=	L.HSP;
 	self.watercraft_hp_2					:=	'';
 	self.watercraft_hp_3					:=	'';
 	self.engine_number_1					:=	'';
@@ -92,13 +93,13 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_ME_cl
 	self.coast_guard_number					:=	'';
 	self.registration_date					:=	L.REG_DATE;
 	self.registration_expiration_date		:=	L.EXPIRATION_DATE;
-	self.registration_status_code			:=	L.STATUS;
-	self.registration_status_description	:=	REG_STATUS_DESC(L.STATUS);
-	self.registration_status_date			:=	L.STATUS_DATE;
+	self.registration_status_code			:=	L.VEHICLE_STATUS;
+	self.registration_status_description	:=	REG_STATUS_DESC(L.VEHICLE_STATUS);
+	self.registration_status_date			:=	'';
 	self.registration_renewal_date			:=	'';
 	self.decal_number						:=	'';
 	self.transaction_type_code				:=	'';
-	self.transaction_type_description		:=	'';
+	self.transaction_type_description		:=	L.TRANSACTION_TYPE;
 	self.title_state						:=	'';
 	self.title_status_code					:=	'';
 	self.title_status_description			:=	'';
@@ -136,57 +137,6 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_ME_cl
   end;
 
 
-export Mapping_ME_as_Main := project(watercraft.file_ME_clean_in, main_mapping_format(left));
+export Mapping_ME_as_Main := project(hull_clean_in, main_mapping_format(left));
 
 		
-
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,0 +1,20 @@
+// PRS0889 / Commissioner of Financial Inst of Puerto Rico / Multiple Professions //
+
+export layout_PRS0889 := MODULE
+
+	EXPORT other_bank := RECORD
+		STRING100		ORG_NAME;
+		STRING100		DBA;
+		STRING100		ADDRESS1;
+		STRING			FILLER_1;
+		STRING50		CITY;
+		STRING10		ZIP;
+		STRING			FILLER_2;
+		STRING20		PHONE;
+		STRING			FILLER_3;
+		STRING			FILLER_4;
+		STRING20		ISSUE_DATE;
+		STRING30		SLNUM;
+	END;	
+
+END;

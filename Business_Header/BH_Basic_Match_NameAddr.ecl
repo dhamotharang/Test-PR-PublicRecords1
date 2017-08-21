@@ -1,12 +1,22 @@
-import ut;
+import ut,mdr;
+
+EXPORT BH_Basic_Match_NameAddr(
+
+	 dataset(Layout_Business_Header_Temp)	pBH_Add_AID								= BH_Add_AID	()
+	,string																pPersistname							= persistnames().BHBasicMatchNameAddr													
+	,boolean															pShouldRecalculatePersist	= true													
+
+) :=
+function
 
 // Initialize match file
-BH_File := Business_Header.BH_Match_Init;
+BH_File := pBH_Add_AID;
 
 Layout_BH_Match := record
 unsigned6 rcid;
 unsigned6 bdid;             // Seisint Business Identifier
 string2   source;           // Source file type
+qstring120 company_name;
 qstring120 match_company_name;
 qstring20 match_branch_unit;
 qstring25 match_geo_city;
@@ -44,10 +54,14 @@ ut.MAC_Remove_Withdups_Local(Company_Match_Dist, hash(zip, trim(prim_name), trim
 
 boolean CompanyMatchSource(string2 source1, string120 company1,
                            string2 source2, string120 company2) := 
-                            ( not(source1 = 'GG' or source2 = 'GG') and
+                            ( not(		MDR.sourceTools.SourceIsGong_Government	(source1)
+																	or 	MDR.sourceTools.SourceIsGong_Government	(source2)
+															) and
                               UT.CompanySimilar100(company1,company2) <= 10)
                             or
-                            ( (source1 = 'GG' or source2 = 'GG') and
+                            ( (			MDR.sourceTools.SourceIsGong_Government	(source1)
+																or 	MDR.sourceTools.SourceIsGong_Government	(source2)
+															) and
                               company1 = company2);
 
 NameAddr_Matches := join(Company_Match_Dist_Reduced,
@@ -62,7 +76,7 @@ NameAddr_Matches := join(Company_Match_Dist_Reduced,
                                             right.source, right.match_company_name),
                          MatchBH(left, right, 4),
                          local);
-
+		
 NameAddr_Matches_Dedup := dedup(NameAddr_Matches, new_rid, old_rid, all);
 
 // Transitive closure of match pairs
@@ -71,4 +85,12 @@ ut.MAC_Reduce_Pairs(NameAddr_Matches_Dedup, new_rid, old_rid, pflag, Business_He
 // Patch new BDIDs
 ut.MAC_Patch_Id(BH_File, bdid, NameAddr_Matches_Reduced, old_rid, new_rid, BH_File_Patched)
 
-export BH_Basic_Match_NameAddr := BH_File_Patched : persist('TEMP::BH_Basic_Match_NameAddr');
+BH_Basic_Match_NameAddr_persisted := BH_File_Patched : persist(pPersistname);
+
+returndataset := if(pShouldRecalculatePersist = true, BH_Basic_Match_NameAddr_persisted
+																										, persists().BHBasicMatchNameAddr
+									);
+									
+return returndataset;
+
+end;

@@ -1,6 +1,6 @@
-IMPORT Business_Header, ut,address;
+IMPORT Business_Header, ut,address,mdr;
 
-export fIDEXEC_as_Business_Header(dataset(InfoUSA.Layout_Cleaned_IDEXEC_file) pIDEXEC)
+export fIDEXEC_as_Business_Header(dataset(InfoUSA.Layout_IDEXEC_Base) pIDEXEC)
  :=
   function
 
@@ -12,7 +12,7 @@ export fIDEXEC_as_Business_Header(dataset(InfoUSA.Layout_Cleaned_IDEXEC_file) pI
 
 	Layout_IDEXEC_Local := RECORD
 	UNSIGNED6 record_id := 0;
-	InfoUSA.Layout_Cleaned_IDEXEC_file;
+	InfoUSA.Layout_IDEXEC_Base;
 	END;
 
 	//--------------------------------------------
@@ -26,14 +26,15 @@ export fIDEXEC_as_Business_Header(dataset(InfoUSA.Layout_Cleaned_IDEXEC_file) pI
 
 	ut.MAC_Sequence_Records(idexec_Init, record_id, idexec_Seq);
 
-	bh_layout := business_header.Layout_Business_Header;
+	bh_layout := business_header.Layout_Business_Header_New;
 
 	bh_layout Translate_idexec_To_BHF(idexec_Init L,integer CTR) := transform
 	  SELF.group1_id := L.record_id;
+		SELF.vl_id := L.idexec_key;
 	  SELF.vendor_id := L.idexec_key;
 	  SELF.phone := (UNSIGNED6)((UNSIGNED8)address.CleanPhone(L.Loc_Telephone));
 	  SELF.phone_score := IF((UNSIGNED8)L.Loc_Telephone = 0, 0, 1);
-	  SELF.source := 'II';
+	  SELF.source := MDR.sourceTools.src_INFOUSA_IDEXEC;
 	  SELF.source_group := '';
 	  SELF.company_name 				:=stringlib.StringToUpperCase(choose(CTR,L.firm_Name,L.Former_Name1,L.Former_Name2))		;
 	  SELF.dt_first_seen				:= 0				;
@@ -53,7 +54,7 @@ export fIDEXEC_as_Business_Header(dataset(InfoUSA.Layout_Cleaned_IDEXEC_file) pI
 	  SELF.postdir 						:= L.Firm_Address_Clean_postdir						;
 	  SELF.unit_desig 					:= L.Firm_Address_Clean_unit_desig					;
 	  SELF.sec_range 					:= L.Firm_Address_Clean_sec_range					;
-	  SELF.city 						:= L.Firm_Address_Clean_p_city_name					;
+	  SELF.city 						:= L.Firm_Address_Clean_v_city_name					;
 	  SELF.state 						:= L.Firm_Address_Clean_st							;
 	  SELF.zip 							:= (UNSIGNED3)L.Firm_Address_Clean_zip				;
 	  SELF.zip4 						:= (UNSIGNED2)L.Firm_Address_Clean_zip4				;
@@ -61,6 +62,7 @@ export fIDEXEC_as_Business_Header(dataset(InfoUSA.Layout_Cleaned_IDEXEC_file) pI
 	  SELF.msa 							:= L.Firm_Address_Clean_msa							;
 	  SELF.geo_lat 						:= L.Firm_Address_Clean_geo_lat						;
 	  SELF.geo_long						:= L.Firm_Address_Clean_geo_long					;
+		SELF.rawaid						:= L.raw_aid;
 	END;
 
 	//--------------------------------------------
@@ -111,6 +113,7 @@ export fIDEXEC_as_Business_Header(dataset(InfoUSA.Layout_Cleaned_IDEXEC_file) pI
 	SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 	SELF.company_name := IF(L.company_name = '', R.company_name, L.company_name);
 	SELF.group1_id := IF(L.group1_id = 0, R.group1_id, L.group1_id);
+	SELF.vl_id := IF(L.vl_id = '', R.vl_id, L.vl_id);
 	SELF.vendor_id := IF((L.group1_id = 0 AND R.group1_id <> 0) OR
 						 L.vendor_id = '', R.vendor_id, L.vendor_id);
 	SELF.source_group := IF((L.group1_id = 0 AND R.group1_id <> 0) OR

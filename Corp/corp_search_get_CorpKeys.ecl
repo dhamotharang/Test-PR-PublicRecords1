@@ -1,5 +1,5 @@
-import business_header,doxie,NID;
-
+import business_header,doxie,NID,Address;
+ 
 string30 	ck := ''  		: stored('CorpKey');
 string32 	chn := '' 		: stored('CharterNumber');
 string120	bname_val := ''  	: stored('CompanyName');
@@ -24,7 +24,7 @@ ckrec := layout_corpkey;
 
 string62 name := fn + ' ' + mn + ' ' + lan;
 
-string73 parsedname 	:= if (name = '', '', addrcleanlib.cleanperson73(name));
+string73 parsedname 	:= if (name = '', '', address.cleanperson73(name));
 string20 cfname_value 	:= if (parsedname != '', parsedname[6..25] ,'');
 string20 cmname_value	:= if (parsedname != '', parsedname[26..45],'');
 string20 clname_value 	:= if (parsedname != '', parsedname[46..65],'');
@@ -33,7 +33,7 @@ string20 pfname_value 	:= if (cfname_value = '', '', NID.PreferredFirstNew(cfnam
 string50	bname 	 := stringlib.stringtouppercase(bname_val);
 
 /*
-string182	clean_addr := if (street_addr = '', '', addrcleanlib.cleanaddress182(street_addr,city_val + ' ' + state_val + ' ' + zip));
+string182	clean_addr := if (street_addr = '', '', address.cleanaddress182(street_addr,city_val + ' ' + state_val + ' ' + zip));
 string10	prim_range := clean_addr[1..10];
 string28	prim_name	 := clean_addr[13..40];
 string2	state 	 := stringlib.stringtouppercase(state_val);

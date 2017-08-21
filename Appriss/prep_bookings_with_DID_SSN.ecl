@@ -8,7 +8,7 @@ lMatchSet := ['S','A','D'];
 
 did_Add.MAC_Match_Flex//_Sensitive  // NOTE <- removed sensitive macro 4/15/2008
 	(ds_clean_bookings, lMatchSet,						
-	 ap_ssn, dob, fname, mname, lname, name_suffix, 
+	 ap_ssn, date_of_birth, fname, mname, lname, name_suffix, 
 	 prim_range, prim_name, sec_range, zip5, state, fake_phone_field, 
 	 did,
 	 layout_prep_booking_rec, //bookings_rec_norm,

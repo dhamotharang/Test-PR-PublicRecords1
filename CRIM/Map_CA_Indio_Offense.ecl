@@ -1,0 +1,91 @@
+import Crim_Common, Crim;
+
+Input_RawFile := crim.File_CA_Indio;
+dInput_RawFile:= distribute(Input_RawFile(regexfind(('^A[ ]*1| I[ ]*NC[ ]*$|VFW POST| LODGE | LODGE$| LANDSCAPE| PL[ ]*UMB[ ]*ING| TRANSP| TEST| CORP | CORP[ ]*$| STORES| COMPANY| LLC | LLC[ ]*$| SPORTS | SPORT[ ]*$| AUTO | AUTO[ ]*$| TOWING | TOWING[ ]*$|GROUP| CAB | CAB[ ]*$| TRUCK | TRUCK[ ]*$'),Name,0) ='' and
+                                          convicted_charge <> '** No convicted charges found **'), hash(case_number));
+dsInput_RawFile := sort(dInput_RawFile,name,dob,case_number,date_filed,convicted_charge,probation_expires,key,local);
+Input_RawFile_dedup := dedup(dsInput_RawFile,name,dob,case_number,date_filed,convicted_charge,probation_expires,RIGHT,local);
+  
+Crim_Common.Layout_In_Court_Offenses Map_Offense(Input_RawFile_dedup L) := Transform
+														 
+															 
+	self.process_date 			:= Crim_Common.Version_In_Arrest_Offenses;
+	self.offender_key			:= Function_Offender_Key_Generator('3CA', L.Case_number,stringlib.stringfindreplace(L.Date_Filed,'/',''))+L.key;
+	self.vendor 						:= '3C';
+	self.state_origin 			:= 'CA';
+	self.source_file 				:= 'CA_INDIO_CRIM';
+	self.off_comp 				  := '';
+	self.off_delete_flag 		:= '';
+	self.off_date 				  := ''; 
+	self.arr_date 				  := '';
+	self.num_of_counts 			:= '';
+	self.le_agency_cd 			:= '';
+	self.le_agency_desc 		:= '';
+	self.le_agency_case_number 	:= '';
+	self.traffic_ticket_number 	:= '';
+	self.traffic_dl_no 			:= '';
+	self.traffic_dl_st 			:= '';
+	self.arr_off_code 			:= '';
+	self.arr_off_desc_1 		:= '';
+	self.arr_off_desc_2 		:= '';
+	self.arr_off_type_cd 		:= '';
+	self.arr_off_type_desc 	:= '';
+	self.arr_off_lev 			  := '';
+	self.arr_statute 			  := '';
+	self.arr_statute_desc 	:= '';
+	self.arr_disp_date 			:= '';
+	self.arr_disp_code 			:= '';
+	self.arr_disp_desc_1 		:= '';
+	self.arr_disp_desc_2 		:= '';
+	self.pros_refer_cd 			:= '';
+	self.pros_refer 			  := '';
+	self.pros_assgn_cd 			:= '';
+	self.pros_assgn 			  := '';
+	self.pros_chg_rej 			:= '';
+	self.pros_off_code 			:= '';
+	self.pros_off_desc_1 		:= '';
+	self.pros_off_desc_2 		:= '';
+	self.pros_off_type_cd 	:= '';
+	self.pros_off_type_desc := '';
+	self.pros_off_lev 			:= '';
+	self.pros_act_filed 		:= '';
+	self.court_case_number 	:= trim(L.Case_number);
+	self.court_cd 				  := '';
+	self.court_desc 			  := '';
+	self.court_appeal_flag 	:= '';
+	self.court_final_plea 	:= '';
+	self.court_off_code 		:= '';
+	self.court_off_desc_1 	:= '';
+	self.court_off_desc_2		:= '';
+	self.court_off_type_cd 	:= '';
+	self.court_off_type_desc:= '';
+	self.court_off_lev 			:= '';
+	integer FirstCommaLoc   := stringlib.stringfind(L.convicted_charge,',',1);
+	self.court_statute 			:= trim(IF(FirstCommaLoc =0, L.convicted_charge, trim(L.convicted_charge[1..FirstCommaLoc-1])));
+	self.court_additional_statutes:= trim(IF(FirstCommaLoc =0, '', trim(L.convicted_charge[FirstCommaLoc+1..],LEFT,RIGHT)),left,right);
+	self.court_statute_desc := '';
+	self.court_disp_date 		:= ''; 
+	self.court_disp_code 		:= '';
+	self.court_disp_desc_1	:= '';
+	self.court_disp_desc_2 	:= '';
+	self.sent_date 			    := '';
+	self.sent_jail 			    := '';																			
+	self.sent_susp_time 		:= '';
+	self.sent_court_cost 		:= '';
+	self.sent_court_fine 		:= '';
+	self.sent_susp_court_fine := '';
+	self.sent_probation 		  := If (L.probation_expires <> '00/00/00','Probation Expires: '+ Function_ParseDate(TRIM(L.probation_expires,right),'MM/DD/YY'),'' );
+	self.sent_addl_prov_code 	:= '';
+	self.sent_addl_prov_desc_1:= '';
+	self.sent_addl_prov_desc_2:= '';
+	self.sent_consec 			    := '';
+	self.sent_agency_rec_cust_ori := '';
+	self.sent_agency_rec_cust 	  := '';
+	self.appeal_date 			        := '';
+	self.appeal_off_disp 		      := '';
+	self.appeal_final_decision 	  := '';
+
+end;
+
+pTNRCC_Offense := project(Input_RawFile_dedup,Map_Offense(left));
+export Map_CA_Indio_Offense := pTNRCC_Offense :PERSIST('~thor_dell400::persist::Crim_CA_Indio_Offenses');

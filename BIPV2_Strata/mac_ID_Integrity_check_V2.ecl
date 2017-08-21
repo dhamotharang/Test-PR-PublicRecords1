@@ -17,30 +17,37 @@ functionmacro
 				return loutputEmpty;
 	#ELSEIF(  //For bipv2_proxid_preprocess_ID_Integrity_Check
 							STD.Str.ToLowerCase(#TEXT(pBuild_Step))='\'proxid\'' and STD.Str.ToLowerCase(#TEXT(pBuild_SubStep))='\'preprocess\'' and 
-							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='dotid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='proxid')
+							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='dotid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='proxid') 
 					 )
 				return loutputEmpty;
 	
 	#ELSEIF(	//For bipv2_proxidmj6_preprocess_ID_Integrity_Check
 							STD.Str.ToLowerCase(#TEXT(pBuild_Step))='\'proxidmj6\'' and STD.Str.ToLowerCase(#TEXT(pBuild_SubStep))='\'preprocess\'' and
 							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='dotid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='proxid') and 
-						  NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='seleid')
+						  NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='seleid') and
+							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='lgid3')
 					 ) 
 				return loutputEmpty;
 	#ELSEIF(  //For bipv2_proxid_PrePost_ID_Integrity_Check
 							STD.Str.ToLowerCase(#TEXT(pBuild_Step))='\'proxid\'' and STD.Str.ToLowerCase(#TEXT(pBuild_SubStep))='\'prepost\'' and
 							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='dotid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='proxid') and 
-						  NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='seleid')
+						  NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='seleid') and
+							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='lgid3')
 						) 
   			return loutputEmpty;
 	#ELSEIF(  //For bipv2_hrchy_infile_ID_Integrity_Check
 							STD.Str.ToLowerCase(#TEXT(pBuild_Step))='\'hrchy\'' and STD.Str.ToLowerCase(#TEXT(pBuild_SubStep))='\'infile\'' and
-					    NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='seleid')
+					    NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='seleid') and
+							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='lgid3')
 						)	
 				return loutputEmpty;
 	#ELSEIF(	//For bipv2_lgid3_preprocess_ID_Integrity_Check
 							STD.Str.ToLowerCase(#TEXT(pBuild_Step))='\'lgid3\'' and STD.Str.ToLowerCase(#TEXT(pBuild_SubStep))='\'preprocess\'' and
-							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='seleid')
+							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='seleid') and
+							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='lgid3')  and
+							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='lgid3' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='seleid')  and 
+							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='seleid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='orgid')  and
+							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='orgid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='ultid')  
 						) 
 				return loutputEmpty;
 	#ELSEIF(  //For bipv2_powid_preprocess_ID_Integrity_Check
@@ -48,7 +55,8 @@ functionmacro
 							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='lgid3' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='seleid') and
 						  NOT(STD.Str.ToLowerCase(#TEXT(pDid))='seleid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='orgid') and
 						  NOT(STD.Str.ToLowerCase(#TEXT(pDid))='orgid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='ultid')  and
-						  NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='seleid')
+						  NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='seleid') and
+							NOT(STD.Str.ToLowerCase(#TEXT(pDid))='proxid' and STD.Str.ToLowerCase(#TEXT(pParent_ID))='lgid3') 
 						) 
   			return loutputEmpty;
 	#ELSEIF(  //For bipv2_empid_preprocess_ID_Integrity_Check

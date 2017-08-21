@@ -1,7 +1,12 @@
 IMPORT doxie;
 
 
-EXPORT GetCleanAddress (string addr_first_line, string addr_second_line, unsigned1 region, boolean useGlobal = false) := MODULE
+EXPORT GetCleanAddress (string addr_first_line, string addr_second_line, unsigned1 region, boolean useGlobal = false,
+												string server = '',
+												unsigned2 port = 0,
+												string cserver = '',
+												unsigned2 cport = 0
+												) := MODULE
 	
 //************ For fixing issue with st Vs Saint and Address line1 suffix Bug 40030 
 
@@ -21,8 +26,8 @@ EXPORT GetCleanAddress (string addr_first_line, string addr_second_line, unsigne
 							// addr_second_line);
 	// shared US_Clean_2:=doxie.cleanaddress182(addr_first_line,Standard_addr_second_line);
 	// shared US:=if(Error_Code='E216' , US_Clean_2,US_Clean_1);
-	shared US := Address.CleanAddress182 (addr_first_line, addr_second_line);
-	shared CA := Address.CleanCanadaAddress109 (addr_first_line, addr_second_line);
+	shared US := Address.CleanAddress182 (addr_first_line, addr_second_line,server,port);
+	shared CA := Address.CleanCanadaAddress109 (addr_first_line, addr_second_line,cserver,cport);
   
 	shared cleaned := 
 		MAP(

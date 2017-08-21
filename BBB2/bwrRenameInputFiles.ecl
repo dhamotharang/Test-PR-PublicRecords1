@@ -1,0 +1,1 @@
+BBB2.procRenameInputFiles('20060605');

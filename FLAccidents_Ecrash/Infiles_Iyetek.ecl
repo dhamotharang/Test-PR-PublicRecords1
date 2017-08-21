@@ -1,5 +1,21 @@
-import ut;
+import ut,lib_fileservices;
 export Infiles_Iyetek := module 
+
+vIncident_tf  := if ( nothor (fileservices.FindSuperFileSubName('~thor_data400::in::iyetek::incident_raw','~thor_data400::in::iyetek::incident_raw_'+workunit)) = 0 ,
+                                 fail('Abort:  Iyetek Incident file spray skipped...'),Output('Iyetek Incident File Spray Success'));
+																 
+vCitation_tf  := if ( nothor (fileservices.FindSuperFileSubName('~thor_data400::in::iyetek::citation_new','~thor_data400::in::iyetek::citation_new_'+workunit)) = 0 ,
+                                 fail('Abort:  Iyetek Citation file spray skipped...'),Output('Iyetek Citation File Spray Success'));
+																 
+vPerson_tf  := if ( nothor (fileservices.FindSuperFileSubName('~thor_data400::in::iyetek::person_new','~thor_data400::in::iyetek::person_new_'+workunit)) = 0 ,
+                                 fail('Abort:  Iyetek Person file spray skipped...'),Output('Iyetek Person File Spray Success'));
+
+vVehicle_tf  := if ( nothor (fileservices.FindSuperFileSubName('~thor_data400::in::iyetek::vehicle_new','~thor_data400::in::iyetek::vehicle_new_'+workunit)) = 0 ,
+                                 fail('Abort:  Iyetek Vehicle file spray skipped...'),Output('Iyetek Vehicle File Spray Success'));
+
+Sequential(vIncident_tf ,vCitation_tf,vPerson_tf ,vVehicle_tf);
+																 
+
 
 export agency0     := dataset(ut.foreign_prod+'~thor_data400::in::ecrash::agency'
 													 ,FLAccidents_ecrash.Layout_Infiles.agency
@@ -10,19 +26,19 @@ export agency:= project(agency0, transform({agency0},
                             self.agency_id := IF(trim(Left.agency_id,left,right) <>'', Left.agency_id,ERROR('agency file bad')),
                             self:= left));
 														
-export citation := dataset(ut.foreign_prod+'~thor_data400::in::iyetek::citation'
+export citation := dataset(ut.foreign_prod+'~thor_data400::in::iyetek::citation_new'
 													 ,FLAccidents_Ecrash.Layout_metadata.citation
 													 ,csv(terminator('\n'), separator(','),quote('"')))(date_created != 'date_created');	
 													 
-export incident   := dataset(ut.foreign_prod+'~thor_data400::in::iyetek::incident'
+export incident   := dataset(ut.foreign_prod+'~thor_data400::in::iyetek::incident_raw'
 													,FLAccidents_Ecrash.Layout_metadata.incident
 													,csv(terminator('\n'), separator(','),quote('"'),maxlength(50000)))(date_created != 'date_created');
                  
-export persn      := dataset(ut.foreign_prod+'~thor_data400::in::iyetek::person'
+export persn      := dataset(ut.foreign_prod+'~thor_data400::in::iyetek::person_new'
 													,FLAccidents_Ecrash.Layout_metadata.person_record
 													,csv(terminator('\n'), separator(','),quote('"')))(date_created != 'date_created');
 
-export vehicl     := dataset(ut.foreign_prod+'~thor_data400::in::iyetek::vehicle'
+export vehicl     := dataset(ut.foreign_prod+'~thor_data400::in::iyetek::vehicle_new'
 													,FLAccidents_Ecrash.Layout_metadata.vehicle_record
 													,csv(terminator('\n'), separator(','),quote('"')))(date_created != 'date_created');
 													
@@ -30,7 +46,8 @@ export vehicl     := dataset(ut.foreign_prod+'~thor_data400::in::iyetek::vehicle
 
 export tcitation  := project(citation, transform(FLAccidents_Ecrash.Layout_metadata.citation_fixed
 													,self := left));	
-export tincident  := project(incident,transform(FLAccidents_Ecrash.Layout_metadata.incident_fixed
+//Filter out TM nassau. 													
+export tincident  := project(incident(mbs_agency_id <> '1603437'),transform(FLAccidents_Ecrash.Layout_metadata.incident_fixed
 													,self:= left));														
 export tpersn     := project(persn, transform(FLAccidents_Ecrash.Layout_metadata.person_fixed
 													,self:= left));												
@@ -39,17 +56,17 @@ export tvehicl    := project(vehicl, transform(FLAccidents_Ecrash.Layout_metadat
 
 dincident := 	dedup(sort(distribute(
 																		tincident,hash(report_number))
-															,report_number,agency_ori,state_abbr,report_type,Sent_to_HPCC_DateTime,local)
-													,report_number,agency_ori,state_abbr,report_type,right,local)
+															,report_number,agency_ori,mbs_agency_id,state_abbr,report_type,Sent_to_HPCC_DateTime,date_created,local)
+													,report_number,agency_ori,mbs_agency_id,state_abbr,report_type,right,local)
 											;			
 tincident trecs0(tincident L, agency R) := transform
 self.agency_name := if(L.mbs_agency_id = R.agency_id,R.Agency_Name,'');
 self := L;
 end;
 
-jrecs0 := join(dincident,agency,
+jrecs0 := distribute(join(dincident,agency,
 							left.mbs_agency_id = right.agency_id, // change to agency_ori 
-							trecs0(left,right),left outer,lookup);
+							trecs0(left,right),left outer,lookup),hash(iyetek_metadata_id));
 							
 FLAccidents_Ecrash.Layout_metadata.temp_vehicle  trecs1(jrecs0 L, tvehicl R) := transform
 
@@ -73,7 +90,7 @@ FLAccidents_Ecrash.Layout_metadata.temp_vehicle  trecs1(jrecs0 L, tvehicl R) := 
 		self := L;
 end;
 
-jVehcile := join(distribute(jrecs0,hash(iyetek_metadata_id)),	
+jVehcile := join(jrecs0,	
 	
 								dedup(sort(distribute(tvehicl(iyetek_metadata_id!=''),hash(iyetek_metadata_id))
 												,vin,iyetek_metadata_id,unit_number,date_created,local)
@@ -112,18 +129,25 @@ end;
 
 jperson := join(dd_jrecs1(Unit_Number != '0' and Unit_Number != ''),
 										
-										d_person,
+										d_person(vehicle_Unit_Number  != '0' or vehicle_Unit_Number  = ''),
 														left.iyetek_metadata_id = right.iyetek_metadata_id and 
 							              left.Unit_Number = right.vehicle_Unit_Number ,
 														trecs2(left,right),left outer,local);
-														
+	// this will get person if 0 veh rec found 													
 Jperson2 := 	join(dd_jrecs1(Unit_Number = '0' or Unit_Number = ''),
 										
 										d_person,
 														left.iyetek_metadata_id = right.iyetek_metadata_id ,
 							             	trecs2(left,right),left outer,local);						
 
-allrecs := jperson + Jperson2 ; 
+//get person record that have 0 vehicle or if one or more recs in same incident have veh//like witness , property owner etc..
+jrecs2b := join(jrecs0,
+											
+									d_person(vehicle_Unit_Number in [ '0' , '','NULL','NUL']),
+														left.iyetek_metadata_id = right.iyetek_metadata_id ,
+							            	transform(FLAccidents_Ecrash.Layout_metadata.temp_person, self := left , self:= right , self:=[]),local);		
+
+allrecs := dedup(jperson + Jperson2+jrecs2b,record,all) ; 
 
 FLAccidents_Ecrash.Layout_metadata.temp_citation trecs4(allrecs L, tcitation R) := transform
 
@@ -201,6 +225,7 @@ export cmbnd := project(dedup(jrecs4,record,all) , transform({FLAccidents_Ecrash
 		self.mbs_agency_id := if(stringlib.stringtouppercase(trim(left.mbs_agency_id,left,right)) = 'NULL', '',left.mbs_agency_id);
     self.vin_status := if(stringlib.stringtouppercase(trim(left.vin_status,left,right)) = 'NULL', '',left.vin_status);
 		self.damaged_areas1 := if(stringlib.stringtouppercase(trim(left.damaged_areas1,left,right)) = 'NULL', '',left.damaged_areas1);
+    self:= left; 
 )); 
  
 end; 

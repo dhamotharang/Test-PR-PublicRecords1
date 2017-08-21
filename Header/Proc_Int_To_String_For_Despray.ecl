@@ -93,7 +93,8 @@ Base_File_Append := project(Base_File_Append_In, reformat_header(left)); //REMOV
 
 //***********END*************************************************************
 // Filter out TS,CY 
-last_rollup_without_TS_CY := header.Last_Rollup(src not in mdr.sourceTools.filter_from_moxie); 
+h_last_rollup := dataset('~thor_data400::base::header',header.layout_header,flat);
+last_rollup_without_TS_CY := h_last_rollup(src not in mdr.sourceTools.filter_from_moxie); 
 
 ut.mac_suppress_by_phonetype(last_rollup_without_TS_CY,phone,st,suppress_wa_cellphones,true,did);
 
@@ -103,8 +104,11 @@ dsblank_ssn :=  Header.fn_blank_bogus_ssn(suppress_wa_cellphones);
 mini_in  := dataset('headerbuild_regression_new_smpl', header.layout_header, flat);
 full_in0 := doxie_build.header_blocked_data(dsblank_ssn) + Base_File_Append + doxie_build.header_blocked_data(header.transunion_did);
 full_in1 := header.fn_addr_suffix_corrections(full_in0);
-full_in3 := header.fn_remove_old_records(full_in1);
-full_in  := header.fn_patch_dob(full_in3);
+full_in2 := header.fn_remove_old_records(full_in1);
+full_in3 := header.fn_patch_dob(full_in2);
+full_in4 := header.fn_name_suffix_corrections(full_in3);
+full_in5 := full_in4(rid not in header.fraud_records);
+ut.mac_phone_areacode_corrections(full_in5,full_in,phone)
 
 addr1 := full_in(header.isPreGLB(full_in));
 addr2 := addr1(not mdr.Source_is_DPPA(src));

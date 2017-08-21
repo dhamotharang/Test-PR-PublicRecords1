@@ -1,4 +1,4 @@
-import lib_stringlib, ut,_Validate;
+import lib_stringlib,_Validate,Std;
 
 _Flag	:=	unsigned4;
 
@@ -105,7 +105,7 @@ export Date_New(lValidYearLow	=	1600, lValidYearHigh =	2999)
 		string8		lpDateForChronTest	:=	trim(lYearStringIfvalid + lMonthStringIfValid + lDayStringIfValid,right);
 		integer1	lLengthOfpDateChron	:=	length(trim(lpDateForChronTest));
 		_Flag		lChronStateUnknown	:=	if(lLengthOfpDateChron <> 0,0,Rules.ChronStateUnknown);
-		_Flag		lNotInPast			:=	if(lChronStateUnknown <> 0 or (unsigned4)lpDateForChronTest > (unsigned4)(ut.GetDate[1..lLengthOfpDateChron]),Rules.DateInPast,0);
+		_Flag		lNotInPast			:=	if(lChronStateUnknown <> 0 or (unsigned4)lpDateForChronTest > (unsigned4)(((STRING8)Std.Date.Today())[1..lLengthOfpDateChron]),Rules.DateInPast,0);
 		_Flag		lOptionalPossible	:=	if(lInvalidChars = 0 and lNotYearNonZero | lNotMonthNonZero | lNotDayNonZero = Rules.YearNonZero | Rules.MonthNonZero | Rules.DayNonZero,Rules.Optional,0);
 
 		unsigned8	lValidDateValue		:=	(((unsigned8)lYearStringIfValid)*10000)

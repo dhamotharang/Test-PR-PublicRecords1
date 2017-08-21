@@ -32,6 +32,7 @@ export SheilaGreco_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.clean_address.v_city_name),
 				self.state := left.clean_address.st,
 				self.zip := left.clean_address.zip,
+				self.zip4 := left.clean_address.zip4,
 				self.county_fips := left.clean_address.fips_county,
 				self.msa := left.clean_address.msa,
 				self.phone := left.clean_phones.phone,
@@ -71,6 +72,7 @@ export SheilaGreco_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.source := MDR.sourceTools.src_Sheila_Greco,
 				self.source_docid := left.rawfields.maincompanyid,
 				self.source_party := '',
+				self.ticker := left.rawfields.ticker,
 				self.annualsalesrevisiondate := intformat(left.clean_dates.lastupdate,8,1),
 				self.sales := (integer)left.rawfields.sales, // units ???, 1000s, 100,000Ks or millions ???
 				self := []));

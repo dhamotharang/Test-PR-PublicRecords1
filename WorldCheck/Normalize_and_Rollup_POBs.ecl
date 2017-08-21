@@ -1,6 +1,8 @@
 export Normalize_and_Rollup_POBs (string filedate) := function
 
-in_file := WorldCheck.File_WorldCheck_In;
+in_f 	:= WorldCheck.File_WorldCheck_In;
+
+in_file	:= distribute(in_f, random());
 
 // Shared parsing patterns for most
 pattern SingleValue   := pattern('[^;]+');
@@ -74,7 +76,7 @@ POB_out := rollup(sort(p_POB,record)
 count_ds_POBs_rollup := count(POB_out);
 output('Place of Birth rollup count: ' + count_ds_POBs_rollup);
 
-POB_out_dist := distribute(POB_out,hash32(UID)) : persist(WorldCheck.cluster_name + 'Persist::WorldCheck::POB::rollup');
+POB_out_dist := sort(distribute(POB_out,hash32(UID)), uid, local) : persist(WorldCheck.cluster_name + 'Persist::WorldCheck::POB::rollup');
 
 return POB_out_dist;
 

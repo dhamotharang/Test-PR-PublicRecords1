@@ -18,7 +18,7 @@ EXPORT Standardize_Name(DATASET(Layouts.Base) pPreProcessInput) := FUNCTION
   miPreProcessInput := pPreProcessInput(customer_id = _Constants().mi_cust_id);
 	ilPreProcessInput := pPreProcessInput(customer_id = _Constants().il_cust_id);
 
-	SHARED BaseExtra_Rec add_complete_name(Layouts.Base L) := TRANSFORM
+	BaseExtra_Rec add_complete_name(Layouts.Base L) := TRANSFORM
     SELF.complete_name := IF(L.company_name = '',
 		                         TRIM(L.name_first_middle + ' ' + L.name_last + ' ' + L.name_suffix),
 														 '');
@@ -26,16 +26,16 @@ EXPORT Standardize_Name(DATASET(Layouts.Base) pPreProcessInput) := FUNCTION
     SELF := L;
   END;
 
-	SHARED input_with_complete_name := PROJECT(miPreProcessInput, add_complete_name(LEFT));
+	input_with_complete_name := PROJECT(miPreProcessInput, add_complete_name(LEFT));
 
   // Cannot call the NID directly here, it gives an error saying "cannot associate a side effect with
 	// this type of definition - action must precede an expression."
-	SHARED cleaned_input := Clean_Name(input_with_complete_name);
+	cleaned_input := Clean_Name(input_with_complete_name);
 
   // Logic added to the transform to take care of those names the NID can't currently handle.
 	// "Bad" types will now be forced into the clean fields.  Hopefully, a better fix through the NID
 	// or another utility will take care of this hack in the future. (7/30/14)
-  SHARED Layouts.Base add_clean_name(cleaned_input L) := TRANSFORM
+  Layouts.Base add_clean_name(cleaned_input L) := TRANSFORM
 	  is_blank         := L.nametype = '';
 		// If the clean name portions are blank, it's not recognized as a person
 		force_fake_clean := L.cln_fname = '' AND NOT(is_blank);
@@ -53,7 +53,7 @@ EXPORT Standardize_Name(DATASET(Layouts.Base) pPreProcessInput) := FUNCTION
 
   // Requirements dictate that the names from the vendor are not to be cleaned at all.  So, we
 	// simply pass the information to the clean fields to be used by query, etc.
-  SHARED Layouts.Base add_clean_il_name(Layouts.Base L) := TRANSFORM
+  Layouts.Base add_clean_il_name(Layouts.Base L) := TRANSFORM
 	  SELF.clean_name.fname       := L.name_first;
 	  SELF.clean_name.mname       := L.name_middle;
 	  SELF.clean_name.lname       := L.name_last;

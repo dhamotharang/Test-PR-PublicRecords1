@@ -1,7 +1,7 @@
 /*2011-03-02T15:18:41Z (Jesse Shaw)
 
 */
-import advo, doxie, jshaw, addrfraud, LN_PropertyV2, property, ut, Risk_Indicators;
+Import Data_Services, advo, doxie,addrfraud, LN_PropertyV2, property, std, Risk_Indicators;
 
 //Data Declarations
 ADVO_BASE_GEOLINK := address_attributes.key_ADVO_Neighborhood_geolink;
@@ -392,7 +392,7 @@ layout_Hedonics_cnt addNeighborhoodHedonics(prop_address l) := TRANSFORM
 		self.geolink := clean_address[115..116]+clean_address[143..145]+clean_address[171..177];
 		self.occupant_owned_count := if(l.occupant_owned,1,0);
 		self.cnt_occupant_owned := if(l.occupant_owned,1,0);
-	 	self.ave_building_age := if(l.built_date !=0,(integer)ut.getdate[1..4] - (integer)l.built_date, 0);
+	 	self.ave_building_age := if(l.built_date !=0,(integer)((STRING8)Std.Date.Today())[1..4] - (integer)l.built_date, 0);
 		self.cnt_building_age := if(l.built_date !=0,1,0);
 	 	self.ave_purchase_amount := l.purchase_amount;
 		self.cnt_purchase_amount := if(l.purchase_amount !=0,1,0);
@@ -579,4 +579,5 @@ final_withBankruptcy := join(final_withHedonics, Neighborhood_Bankruptcies,
 
 export key_nbrhd_sfd_stats_geolink := index(final_withBankruptcy,{
 																	geolink},
-																	{final_withBankruptcy},'~thor_data400::key::neighborhood::' + doxie.Version_SuperKey + '::neighborhoodsfdstats::geolink');
+																	{final_withBankruptcy},Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::neighborhood::' + doxie.Version_SuperKey + '::neighborhoodsfdstats::geolink');
+

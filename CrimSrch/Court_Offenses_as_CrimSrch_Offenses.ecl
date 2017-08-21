@@ -1,4 +1,4 @@
-import CrimSrch, Crim_Common;
+import CrimSrch, Crim_Common, hygenics_search, hygenics_crim;
 
 string8 fMinDate2(string8 pDate1, string8 pDate2)
  := if(if((integer4)pDate1=0,'99999999',pDate1) < if((integer4)pDate2=0,'99999999',pDate2),
@@ -24,7 +24,7 @@ string fFixDollar(string pAmount)
  +	intformat((integer1)pAmount % 100,2,1),all)
  ;
 
-CrimSrch.Layout_Moxie_Offenses_temp tCourtOffensesandCourtOffendertoOffenses(Crim_Common.Layout_Moxie_Court_Offenses pCourtOffenses,Crim_Common.Layout_Moxie_Crim_Offender2.previous pCourtOffender)
+CrimSrch.Layout_Moxie_Offenses_temp tCourtOffensesandCourtOffendertoOffenses(hygenics_crim.Layout_Common_Court_Offenses pCourtOffenses, Crim_Common.Layout_Moxie_Crim_Offender2.previous pCourtOffender)
  :=
   transform
 	self.date_first_reported		:= pCourtOffenses.process_date;
@@ -124,9 +124,9 @@ CrimSrch.Layout_Moxie_Offenses_temp tCourtOffensesandCourtOffendertoOffenses(Cri
 
 //													  '1'=DOC, and we don't want them...  everything else
 dCourtOffenderCourt	:= /*CrimSrch.Crim_Court_FCRA_UT_Orem_Offender
-					 + */File_Crim_Offender2(data_type<>'1' and Vendor not in sCourt_Vendors_To_Omit);
+					 + */hygenics_search.File_Crim_Offender2(data_type<>'1' and Vendor not in sCourt_Vendors_To_Omit);
 dCourtOffensesDist 	:= distribute(/*CrimSrch.Crim_Court_FCRA_UT_Orem_Offenses 
-								+ */File_Court_Offenses,hash(Offender_Key));
+								+ */hygenics_search.File_Court_Offenses,hash(Offender_Key));
 								
 dCourtOffenderDist	:= distribute(dCourtOffenderCourt,hash(Offender_Key));
 dCourtOffensesSort	:= sort(dCourtOffensesDist,	Offender_Key,local);

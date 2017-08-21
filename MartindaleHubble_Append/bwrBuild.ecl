@@ -1,0 +1,10 @@
+sequential(
+	 MartindaleHubble_Append.proc_Build('20070523',true).build_all
+	,MartindaleHubble_Append.Stats('20070523').all
+);
+/*
+MartindaleHubble_Append.proc_Build('20070523').Build_AK_File;
+MartindaleHubble_Append.proc_Build('20070523').Build_AL_File;
+MartindaleHubble_Append.proc_Build('20070523').Build_AR_File;
+MartindaleHubble_Append.proc_Build('20070523').Build_AZ_File;
+*/

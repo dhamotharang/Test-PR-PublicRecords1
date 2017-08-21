@@ -18,8 +18,9 @@ all_images := hygenics_images.File_Images_KeyBuilding(did != 0, imglength != 0);
 		SELF := L;
 	END;
 	
-	noPhoto := PROJECT(all_images, removephoto(LEFT));
-
+	noPh 	:= PROJECT(all_images, removephoto(LEFT));
+    noPhoto	:= dedup(sort(noPh, state, -rtype, did), did);
+	
 	dist 	:= DISTRIBUTE(noPhoto, HASH(state, rtype, id));
 
 	// Sort by (basically) unique ID and newest date first

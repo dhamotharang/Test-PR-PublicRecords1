@@ -14,10 +14,10 @@ Layout_Clean_Name := record
 end;
 
 Layout_Clean_Name CleanName(LN_TU.File_In_Header_UID_SRC l) := Transform
-  self.clean_name1 := if(l.orig_first_name='' and l.orig_middle_name='' and l.orig_last_name='','',addrcleanlib.CleanPersonfml73(l.orig_first_name + ' ' + l.orig_middle_name + ' ' + l.orig_last_name + ' ' + l.orig_name_suffix));
-  self.clean_name2 := if(l.orig_aka_1='','',addrcleanlib.CleanPersonlfm73(l.orig_aka_1));
-  self.clean_name3 := if(l.orig_aka_2='','',addrcleanlib.CleanPersonlfm73(l.orig_aka_2));
-  self.clean_name4 := if(l.orig_aka_3='','',addrcleanlib.CleanPersonlfm73(l.orig_aka_3));
+  self.clean_name1 := if(l.orig_first_name='' and l.orig_middle_name='' and l.orig_last_name='','',address.CleanPersonfml73(l.orig_first_name + ' ' + l.orig_middle_name + ' ' + l.orig_last_name + ' ' + l.orig_name_suffix));
+  self.clean_name2 := if(l.orig_aka_1='','',address.CleanPersonlfm73(l.orig_aka_1));
+  self.clean_name3 := if(l.orig_aka_2='','',address.CleanPersonlfm73(l.orig_aka_2));
+  self.clean_name4 := if(l.orig_aka_3='','',address.CleanPersonlfm73(l.orig_aka_3));
   self.street_name := regexreplace('^0+',l.orig_street_name,'');
 	self.addr1 := Address.Addr1FromComponents(l.orig_house_number,l.orig_street_direction,self.street_name,
                         l.orig_street_suffix,',',',',l.orig_apartment_number);
@@ -25,7 +25,7 @@ Layout_Clean_Name CleanName(LN_TU.File_In_Header_UID_SRC l) := Transform
   
   //self.addr1 := l.orig_house_number+' '+l.orig_street_suffix+' '+l.orig_street_direction+' '+l.orig_street_name+' '+l.orig_apartment_number;
   //self.addr2 := l.orig_city+','+l.orig_state+','+l.orig_zip5;
-  //self.clean :=if(self.addr1='' and self.addr2='','',addrCleanLib.CleanAddress182(self.addr1,self.addr2));
+  //self.clean :=if(self.addr1='' and self.addr2='','',address.CleanAddress182(self.addr1,self.addr2));
   self := L;
 end;
 
@@ -49,7 +49,7 @@ end;
 
  
 clean_addr_record clean_others(invalid_addr_file l) := transform
-	self.clean := AddrCleanLib.CleanAddress182(l.addr1,l.addr2);
+	self.clean := Address.CleanAddress182(l.addr1,l.addr2);
 	self := l;
 end;
 

@@ -1,8 +1,8 @@
 import LiensV2, address;
 
-file_in := liensV2.NYFederal_DID;
+file_in := liensV2.Mapping_NYFDLN;
 
-liensV2.Layout_liens_party ttransform(liensv2.Layout_Liens_DID L) := transform
+liensV2.Layout_liens_party ttransform(liensV2.Layout_Liens_Temp_Base L) := transform
 
 self.orig_name :=  L.DEBTOR_NAME;
 self.orig_address1 := L.debtor_address1;
@@ -41,7 +41,7 @@ self.lot_order:=  L.clean_debtor_lot_order;
 self.dbpc:=  L.clean_debtor_dpbc;
 self.chk_digit:=  L.clean_debtor_chk_digit;
 self.rec_type:=  L.clean_debtor_record_type;
-self.county:=  L.clean_debtor_fipscounty;
+self.county:=  L.clean_debtor_ace_fips_st + L.clean_debtor_fipscounty;
 self.geo_lat:= L.clean_debtor_geo_lat;
 self.geo_long:= L.clean_debtor_geo_long ;
 self.msa:= L.clean_debtor_msa;
@@ -50,16 +50,31 @@ self.geo_match:=  L.clean_debtor_geo_match;
 self.err_stat:= L.clean_debtor_err_stat;
 self.phone := '' ;
 self.cname :=  L.clean_debtor_cname;
-self.DID  :=  L.def_did;
-self.BDID :=  L.def_bdid;
+self.date_first_seen                :=      L.filing_date;
+self.date_last_seen                 :=      L.filing_date;
+self.date_vendor_first_reported     :=      L.process_date;
+self.date_vendor_last_reported      :=      L.process_date;
+	
 self := L ;
 end;
 
 NY_xfr :=  project(file_in, ttransform(left)) ;
 
 //NY_dedup := sort(dedup(NY_xfr(orig_name <> ''), all),rmsid );
-NY_sort  := sort(NY_xfr(orig_name <> ''), rmsid, -date_vendor_last_reported );
+NYFDLN_dist := distribute(NY_xfr(lname <> '' or fname <> '' or mname <> '' or cname <> ''), hash(tmsid,rmsid));
 
-NY_dedup := dedup(NY_sort, except date_first_seen, date_last_seen, date_vendor_first_reported, date_vendor_last_reported);
+NYFDLN_sort  := sort(NYFDLN_dist,record,EXCEPT Date_First_Seen, Date_Last_Seen,
+			   Date_Vendor_First_Reported, Date_Vendor_Last_Reported,name_type, local);
 
-export Mapping_NYFDLN_party := NY_dedup  ;
+liensV2.Layout_liens_party  rollupXform(liensV2.Layout_liens_party l, liensV2.Layout_liens_party r) := transform
+		self.Date_First_Seen := if(l.Date_First_Seen > r.Date_First_Seen, r.Date_First_Seen, l.Date_First_Seen);
+		self.Date_Last_Seen  := if(l.Date_Last_Seen  < r.Date_Last_Seen,  r.Date_Last_Seen,  l.Date_Last_Seen);
+		self.Date_Vendor_First_Reported := if(l.Date_Vendor_First_Reported > r.Date_Vendor_First_Reported, r.Date_Vendor_First_Reported, l.Date_Vendor_First_Reported);
+		self.Date_Vendor_Last_Reported  := if(l.Date_Vendor_Last_Reported  < r.Date_Vendor_Last_Reported,  r.Date_Vendor_Last_Reported, l.Date_Vendor_Last_Reported);
+		self := l;
+end;
+
+export mapping_NYFDLN_party := rollup(NYFDLN_sort,rollupXform(LEFT,RIGHT),RECORD,
+                                EXCEPT Date_First_Seen, Date_Last_Seen,
+																Date_Vendor_First_Reported, Date_Vendor_Last_Reported, name_type,local);
+

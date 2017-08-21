@@ -48,9 +48,12 @@ export Convert_Stock_Func (DATASET(Layout_Corporate_Direct_Stock_Base_keyed)ds) 
 		{64,0,l.stock_shares_issued},
 		{65,0,l.stock_authorized_nbr},
 		{66,0,l.stock_par_value},
-		{67,0,l.stock_change_date},
-		{68,0,l.stock_tax_capital},
-		{69,0,l.stock_total_capital}		
+		{67,0,l.stock_nbr_par_shares},
+		{68,0,l.stock_change_date},
+		{69,0,l.stock_tax_capital},
+		{88,0,l.stock_total_capital},
+		{88,0,l.corp_state_origin},
+		{249,0,l.corp_process_date}
 		
 //vesa: doxie_build.key_prep_Vehicles
 

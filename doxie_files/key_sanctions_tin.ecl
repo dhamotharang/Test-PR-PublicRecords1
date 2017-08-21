@@ -1,7 +1,7 @@
 Import Data_Services, Ingenix_NatlProf, doxie, Data_Services, ut;
 
-base_file := Ingenix_NatlProf.file_sanctions_cleaned_dided_dates(
-								length(Stringlib.Stringfilterout(sanc_tin, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ-.^!$+<>@=%?*\''))=9, 
+base_file := Ingenix_NatlProf.Basefile_Sanctions_Bdid(
+								length(trim(Stringlib.Stringfilterout(sanc_tin, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ-.^!$+<>@=%?*\'')))=9, 
 								sanc_tin NOT IN ['','000000000']);
 
 	clean_base	:= DEDUP(base_file, RECORD, ALL, LOCAL);

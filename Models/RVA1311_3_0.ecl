@@ -1,4 +1,4 @@
-// RVA1311_3 RVA1311_3 – SAFCO – Southern Auto Finance Company project 4489 - 4.1. shell - FCRA
+// RVA1311_3 RVA1311_3 â€“ SAFCO â€“ Southern Auto Finance Company project 4489 - 4.1. shell - FCRA
 
 import risk_indicators, riskwise, RiskWiseFCRA, ut;
 

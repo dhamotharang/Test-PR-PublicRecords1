@@ -27,7 +27,7 @@ string50      DESCRIPTION;
 string10      STATUS;
 string8       EXPIRATION_DATE;
 string20      MODEL;
-string3       COLOR_TYP_CODE_PRIMARI;
+string3       COLOR_TYP_CODE_PRIMARY;
 string3       COLOR_TYP_CODE_SECONDARY;
 string15      PCTL_TYP_CODE;
 string15      STORAGE_TOWN_CODE;
@@ -37,5 +37,4 @@ string4       ENG_YEAR;
 string30      SERIAL_NUMBER;
 string10      HORSEPOWER;
 string2       LF;
-
 end;

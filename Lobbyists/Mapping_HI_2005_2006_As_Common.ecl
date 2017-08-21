@@ -21,4 +21,4 @@ Layout_Lobbyists_Common MyTransform(MyParsedRecord InputRecord) := transform
 	self := [];
 end;
 
-export Mapping_HI_2005_2006_As_Common := project(MyParsedDS,MyTransform(left));
+export Mapping_HI_2005_2006_As_Common := project(nofold(MyParsedDS),MyTransform(left));

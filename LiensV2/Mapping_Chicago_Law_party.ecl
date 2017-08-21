@@ -1,8 +1,8 @@
 import LiensV2, address, ut;
 
-file_in := liensV2.chicago_law_DID;
+file_in := liensV2.mapping_chicago_law;
 
-liensV2.Layout_liens_party tnormalize(liensv2.Layout_Liens_DID L, integer cnt) := transform
+liensV2.Layout_liens_party tnormalize(liensV2.Layout_Liens_temp_base L, integer cnt) := transform
 
 self.orig_name := choose(Cnt, L.DEBTOR_NAME, L.creditor_name, L.ATTY_name);
 self.orig_address1 := choose(cnt, L.debtor_address1, L.creditor_address1, L.atty_address1);
@@ -14,7 +14,7 @@ self.orig_zip4 := '';
 self.orig_county := '';
 self.orig_country :='';
 self.tax_id := choose(cnt, L.debtor_tax_id, '', '');
-self.ssn := choose(cnt, L.debtor_ssn, '', '');
+self.ssn := choose(cnt, if(l.debtor_ssn[1..5] in ['', 'XXXXX', 'xxxxx'] and l.debtor_ssn <> '', '00000'+l.debtor_ssn[6..9], l.debtor_ssn), '', '');
 self.name_type := choose(cnt, 'D', 'C', 'A');
 self.title := choose(cnt, L.clean_debtor_title, L.clean_creditor_title, L.clean_atty_title);
 self.fname := choose(cnt, L.clean_debtor_fname, L.clean_creditor_fname, L.clean_atty_fname);
@@ -41,7 +41,7 @@ self.lot_order:= choose(cnt, L.clean_debtor_lot_order, L.clean_creditor_lot_orde
 self.dbpc:= choose(cnt, L.clean_debtor_dpbc, L.clean_creditor_dpbc, L.clean_atty_dpbc);
 self.chk_digit:= choose(cnt, L.clean_debtor_chk_digit, L.clean_creditor_chk_digit, L.clean_atty_chk_digit);
 self.rec_type:= choose(cnt, L.clean_debtor_record_type, L.clean_creditor_record_type, L.clean_atty_record_type);
-self.county:= choose(cnt, L.clean_debtor_fipscounty, L.clean_creditor_fipscounty, L.clean_atty_fipscounty);
+self.county:= choose(cnt, L.clean_debtor_ace_fips_st + L.clean_debtor_fipscounty, L.clean_creditor_ace_fips_st + L.clean_creditor_fipscounty, L.clean_atty_ace_fips_st + L.clean_atty_fipscounty);
 self.geo_lat:= choose(cnt, L.clean_debtor_geo_lat, L.clean_creditor_geo_lat, L.clean_atty_geo_lat);
 self.geo_long:= choose(cnt, L.clean_debtor_geo_long, L.clean_creditor_geo_long, L.clean_atty_geo_long);
 self.msa:= choose(cnt, L.clean_debtor_msa, L.clean_creditor_msa, L.clean_atty_msa);
@@ -50,16 +50,21 @@ self.geo_match:= choose(cnt, L.clean_debtor_geo_match, L.clean_creditor_geo_matc
 self.err_stat:= choose(cnt, L.clean_debtor_err_stat, L.clean_creditor_err_stat, L.clean_atty_err_stat);
 self.phone := choose(cnt, '', '', L.atty_phone);
 self.cname := choose(cnt, L.clean_debtor_cname, L.clean_creditor_cname, L.clean_atty_cname);
-self.DID  := choose(cnt, L.def_did, L.creditor_did, L.atty_did);
-self.BDID := choose(cnt, L.def_bdid, L.creditor_bdid, L.atty_bdid);
+self.date_first_seen                :=      if(L.filing_date <> '', L.filing_date, L.orig_filing_date);
+self.date_last_seen                 :=      if(L.filing_date <> '', L.filing_date, L.orig_filing_date);
+self.date_vendor_first_reported     :=      L.process_date;
+self.date_vendor_last_reported      :=      L.process_date;
+//self.DID  := choose(cnt, L.def_did, L.creditor_did, L.atty_did);
+//self.BDID := choose(cnt, L.def_bdid, L.creditor_bdid, L.atty_bdid);
 self := L;
 end;
 
 chicago_law_norm := normalize(file_in, 3, tnormalize(left, counter));
 
-chicago_law_dist := distribute(chicago_law_norm(orig_name <> '' or orig_full_debtorname <> ''), hash(rmsid));
+chicago_law_dist := distribute(chicago_law_norm(lname <> '' or fname <> '' or mname <> '' or cname <> ''), hash(tmsid,rmsid));
 
-chicago_law_sort  := sort(chicago_law_dist, rmsid, local);
+chicago_law_sort  := sort(chicago_law_dist, record,EXCEPT Date_First_Seen, Date_Last_Seen,
+																Date_Vendor_First_Reported, Date_Vendor_Last_Reported,name_type, local);
 
 liensV2.Layout_liens_party  rollupXform(liensV2.Layout_liens_party l, liensV2.Layout_liens_party r) := transform
 		self.Date_First_Seen := if(l.Date_First_Seen > r.Date_First_Seen, r.Date_First_Seen, l.Date_First_Seen);
@@ -71,7 +76,7 @@ end;
 
 export mapping_chicago_law_party := rollup(chicago_law_sort,rollupXform(LEFT,RIGHT),RECORD,
                                 EXCEPT Date_First_Seen, Date_Last_Seen,
-																Date_Vendor_First_Reported, Date_Vendor_Last_Reported, local);
+																Date_Vendor_First_Reported, Date_Vendor_Last_Reported,name_type, local);
 
 
 

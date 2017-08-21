@@ -1,3 +1,6 @@
+/**
+ *   The test is for non-repeating "valid characters" (alpha, space and dash) and the returned score is 0-10 with zero being "best.
+ */
 export unsigned1 LabelValid(string s) := BEGINC++
 //unsigned char valid_label(unsigned lenS, char* s)
 //{
@@ -6,7 +9,7 @@ export unsigned1 LabelValid(string s) := BEGINC++
 	unsigned char non_ascii = 0;
 	unsigned char c_char_rep = 0;
 	while ( lenS > 0 && s[lenS-1] == ' ' ) lenS--;
-	for ( int i = 0; i < lenS; i++ )
+	for ( int i = 0; i < static_cast<int64_t>(lenS); i++ )
 	{
 		if ( s[i] == c_char )
 		{

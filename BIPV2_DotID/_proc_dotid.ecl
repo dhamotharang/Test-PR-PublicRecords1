@@ -1,4 +1,4 @@
-import BIPV2_Files, BIPV2, BIPV2_DOTID,wk_ut,tools,std;
+import BIPV2_Files, BIPV2, BIPV2_DOTID,wk_ut,tools,std, BIPV2_Strata,Strata,BIPV2_Build, linkingtools;
 // Init receives a file in common layout, and narrows it for use in all iterations. We widen
 // back to the common layout before promoting it to the base/father/grandfather superfiles.
 l_common  := BIPV2.CommonBase.Layout;
@@ -46,13 +46,17 @@ export _proc_dotid(
   ) :=
     BIPV2_Strata.mac_BIP_ID_Check(pPrep,'Dotid','Preprocess',pversion,pIsTesting);
   
+  export kick_copy2_storage_thor_init  := BIPV2_Tools.Copy2_Storage_Thor('~' + nothor(std.file.superfilecontents(BIPV2_Files.files_ingest.FILE_BASE)[1].name) ,Build_Date ,'dotid_preprocess');
+  export copy2StorageThor_init         := if(not wk_ut._constants.IsDev ,output(kick_copy2_storage_thor_init ,named('copy2_Storage_Thor_Preprocess_html')));  //copy orig file to storage thor
+
 	/* ----------------- Init (from Ingest by default) ------------------- */
 	EXPORT init(DATASET(l_common) ds=ds_ingest, BOOLEAN idReset=FALSE) := SEQUENTIAL(
 		 _files_dotid.clearDotIdBuilding
 		,OUTPUT(preProcess(ds,idReset),,f_init,COMPRESSED,OVERWRITE)
     ,if(not wk_ut._constants.IsDev ,preProcessStrata(,preProcess(ds,idReset)))
 		,_files_dotid.updateDotIdBuilding(f_init)
-    ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(BIPV2_Files.files_ingest.FILE_BASE)[1].name)  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
+    ,copy2StorageThor_init
+    // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(BIPV2_Files.files_ingest.FILE_BASE)[1].name)  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
 	);
 	/* ---------------------- Post-processing ---------------------------- */
 	EXPORT DATASET(l_common) postProcess(DATASET(l_base) ds, DATASET(l_common) ds_common=ds_ingest) := FUNCTION
@@ -73,13 +77,28 @@ export _proc_dotid(
 	shared saltMod 	:= BIPV2_DOTID.Proc_Iterate(Build_Date,iter, input, f_out(''));
 	shared linking	:= parallel(saltmod.DoAllAgain/*, possibleMatches*/);
 	
+	/*-----------------------For Persistence stats of the dot cluster and records -------------*/
+  shared the_base:=	dataset(f_out(iter),l_base,thor);
+	shared the_father:=BIPV2.CommonBase.DS_BASE;
+	shared the_stat_ds :=BIPV2_Strata.PersistenceStats(the_base,the_father,rcid,dotid);
+	
 	/* ---------------------- SALT Output -------------------------------- */
+
 	export updateBuilding(string fname=f_out(iter)) := _files_dotid.updateDotIDBuilding(fname);
-	export updateSuperfiles(string fname=f_out(iter),DATASET(l_common) ds=ds_ingest) := sequential(
-		 output(postProcess(dataset(fname,l_base,thor),ds),, fname+'_post', compressed, overwrite)
-		,_files_dotid.updateDotIdSuperfiles(fname+'_post')
-    ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := fname  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
-	);
+	export updateSuperfiles(string fname=f_out(iter),DATASET(l_common) ds=ds_ingest) :=
+  function
+  
+    kick_copy2_storage_thor_post  := BIPV2_Tools.Copy2_Storage_Thor(fname ,Build_Date ,'dotid_postprocess');
+    copy2StorageThor_post         := if(not wk_ut._constants.IsDev ,output(kick_copy2_storage_thor_post ,named('copy2_Storage_Thor_Postprocess_html')));  //copy orig file to storage thor
+
+    return sequential(
+       output(postProcess(dataset(fname,l_base,thor),ds),, fname+'_post', compressed, overwrite)
+      ,Strata.macf_CreateXMLStats(the_stat_ds ,'BIPV2','Persistence'	,BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'DOTID','Stats',false,false) //group on cluster_type, stat_desc
+      ,_files_dotid.updateDotIdSuperfiles(fname+'_post')
+      ,copy2StorageThor_post
+      // ,if(not wk_ut._constants.IsDev ,tools.Copy2_Storage_Thor(filename := fname  ,pDeleteSourceFile  := true))  //copy orig file to storage thor
+    );
+  end;
 	
 	/* ---------------------- SALT History ------------------------------- */
 	// export updateLinkHist   	:= _files_dotid.updateDotIDLinkHist(f_hist(iter));
@@ -97,7 +116,7 @@ export _proc_dotid(
 	/* ---------------------- Take Action -------------------------------- */
 	export runSpecBuild := sequential(specBuild, specDebug);
   import BIPV2_build;
-  export runSpecs(pversion = 'BIPV2.KeySuffix',pInputfile = 'BIPV2.CommonBase.DS_BASE',pDoSpecs = 'true') := 
+  export runSpecs(pversion = 'BIPV2.KeySuffix',pInputfile = 'BIPV2.CommonBase.DS_BUILT',pDoSpecs = 'true') := 
   functionmacro
 		eclSpec		:= 'import BIPV2_Files,BIPV2_build;\npversion  := \'@version@\';\nlih := project(' + #TEXT(pInputfile) + ',BIPV2_Files.files_dotid(\'BIPV2_DOTID\').l_DOTID);\n#OPTION(\'multiplePersistInstances\',FALSE);\n#workunit(\'name\',\'BIPV2 DotID \' + pversion + \' Specificities \');\n#workunit(\'priority\',\'high\');\nBIPV2_DOTID._proc_dotid(lih).runSpecBuild;';
 		cluster		:= BIPV2_build._Constants().Groupname; // NOTE: See if we can parameterize this

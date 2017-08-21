@@ -17,7 +17,7 @@ functionmacro
 		doit := sequential(
 
        output(pversion, named('Build_Date'))
-      ,if(pSkipDOTSpecsPost     = false ,BIPV2_Build.proc_dotid().runSpecs()                                )
+      ,if(pSkipDOTSpecsPost     = false ,BIPV2_Build.proc_dotid().runSpecs(pversion                        ))
       ,if(pSkipSeleRelSpecsPost = false ,BIPV2_Build.proc_Seleid_relatives(pversion,true,false,false       )) 
 
     )  

@@ -10,7 +10,7 @@ n := inquiry_acclogs.test_count; /* n - to test a sample set, 0 to run all */
 NullSet := inquiry_acclogs.fncleanfunctions.nullset;
 
 inputfile := distribute(choosen(inquiry_acclogs.File_Batch_Logs.input
-																				(orig_method <> 'METHOD' and orig_global_company_id <> '')  
+																				(orig_method <> 'METHOD' and orig_global_company_id <> '' and length(orig_datetime_stamp) < 20 and length(orig_domain_name) < 60)  
 																				// (orig_last_name not in nullset or
 																				 // orig_company_name not in nullset))
 																		,IF(n > 0, n, choosen:ALL)), random()) // choosen for testing purposes
@@ -26,7 +26,11 @@ inquiry_acclogs.File_MBSApp(cleaned_fields, 'BATCH', '', mbs_outfile)
 outfile := project(mbs_outfile,
 										transform(Inquiry_Acclogs.Layout_In_Common,
 															
-														self.ORIG_FULL_NAME1 := stringlib.stringcleanspaces(left.orig_first_name + ' ' + left.orig_middle_name + ' ' + left.orig_last_name);
+														self.ORIG_FULL_NAME1 := MAP(left.orig_FULL_NAME <> '' => left.orig_FULL_NAME, 
+																												left.orig_first_name + left.orig_middle_name + left.orig_last_name <> '' => stringlib.stringcleanspaces(left.orig_first_name + ' ' + left.orig_middle_name + ' ' + left.orig_last_name),
+																												stringlib.stringfind(left.orig_function_name, 'MODELS.ITA_BATCH_SERVICE', 1) > 0 => left.orig_reference_code,
+																												stringlib.stringfind(left.orig_function_name, 'MODELS.ITABATCHSERVICE', 1) > 0 => left.orig_reference_code,
+																												'');
 														self.ORIG_FULL_NAME2 :='';
 														
 														line1 := map(left.orig_address1_addressline1 <> '' => left.orig_address1_addressline1,
@@ -94,9 +98,9 @@ outfile := project(mbs_outfile,
 														self.transaction_type := left.orig_transaction_type;
 														self.job_id := left.orig_job_id;
 														
-														self.GLB_purpose := '1'; ////// - default used for other products
-														self.DPPA_purpose := '3'; ////// - default used for other products
-														self.FCRA_purpose := '';
+														self.GLB_purpose := MAP(left.orig_glb_purpose = ''=> '1', left.orig_glb_purpose);
+														self.DPPA_purpose := MAP(left.orig_dl_purpose = ''=> '3', left.orig_dl_purpose);
+														self.FCRA_purpose := left.orig_fcra_purpose;
 										
 														self.source_file := 'BATCH';
 														self := left,
@@ -114,8 +118,9 @@ export ready_File(dataset(inquiry_acclogs.layout_in_common) AppendForward, strin
 ///////////////// PROJECT INTO PERSON QUERY LAYOUT 
 							
 person_project := project(AppendForward(repflag = '' and domain_name + clean_cname1 + ucc_number + ein + charter_number = '' and source_file = select_source), 
-		transform(inquiry_acclogs.Layout.Common,
+		transform(inquiry_acclogs.Layout.Common_ThorAdditions,
 		
+			self.source := stringlib.stringtouppercase(left.source_file);
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
 			
@@ -128,7 +133,8 @@ person_project := project(AppendForward(repflag = '' and domain_name + clean_cna
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+			self.bus_intel.Use := left.use;
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
@@ -195,11 +201,13 @@ person_project := project(AppendForward(repflag = '' and domain_name + clean_cna
 			self.person_q.err_stat :=   left.err_stat;
 			self.person_q.Appended_SSN := left.appendssn;
 			self.person_q.Appended_ADL := left.appendadl;
-			
+			self := left;
 			self := []));
 
-bususer_project := project(AppendForward(repflag <> '' and source_file = select_source), transform(inquiry_acclogs.Layout.Common,
+bususer_project := project(AppendForward(repflag <> '' and source_file = select_source), 
+	transform(inquiry_acclogs.Layout.Common_ThorAdditions,
 		
+			self.source := stringlib.stringtouppercase(left.source_file);
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
 			
@@ -212,7 +220,8 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+			self.bus_intel.Use := left.use;
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
@@ -273,10 +282,12 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bususer_q.err_stat :=  left.err_stat;
 			self.bususer_q.Appended_SSN := left.appendssn;
 			self.bususer_q.Appended_ADL := left.appendadl;
+			self := left;
 			self := []));
 
 bus_project := project(AppendForward(repflag = '' and domain_name + clean_cname1 + ucc_number + ein + charter_number <> '' and source_file = select_source), 
-		transform(inquiry_acclogs.Layout.Common,
+		transform(inquiry_acclogs.Layout.Common_ThorAdditions,
+			self.source := stringlib.stringtouppercase(left.source_file);
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
 			
@@ -289,7 +300,9 @@ bus_project := project(AppendForward(repflag = '' and domain_name + clean_cname1
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+			self.bus_intel.Use := left.use;
+
+	
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
@@ -337,16 +350,8 @@ bus_project := project(AppendForward(repflag = '' and domain_name + clean_cname1
 			self.bus_q.appended_bdid := left.appendbdid;
 			self.bus_q.appended_ein := left.appendtaxid;
 
-
 			self := left;
 			self := []));
-
-
-// prev_base := inquiry_acclogs.file_MBSApp_Base.file(version);
-
-// baseMBS := project(prev_base(source = select_source),
-									// transform(inquiry_acclogs.Layout.Common,
-														// self := left))(mbs.company_id + mbs.global_company_id <> '');
 
 return dedup(sort(distribute(bususer_project + person_project + bus_project, 
 														hash(search_info.Sequence_Number))(mbs.company_id + mbs.global_company_id <> '')

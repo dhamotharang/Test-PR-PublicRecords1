@@ -1,14 +1,17 @@
-import DID_Add, Header_Slimsort, ut, Lib_Stringlib, WatchDog, didville;
+import DID_Add, Header_Slimsort, ut, Lib_Stringlib, WatchDog, didville,mdr,header;
 
 Lay_Voters_WithDID := record
-		VotersV2.Layouts_Voters.Layout_Voters_Common;
+		VotersV2.Layouts_Voters.Layout_Voters_Common_new;
 		unsigned6 DID       := 0;
 		unsigned1 did_score := 0;
 end;
 
 In_Base_File    := VotersV2.Updated_Voters;
 
-dist_In_Base_File := distribute(In_Base_File, hash64(source_state, lname, name_suffix, fname, mname, 
+ut.mac_flipnames(In_Base_File,fname,mname,lname, base_FlipNames);
+
+
+dist_In_Base_File := distribute(base_FlipNames, hash64(source_state, lname, name_suffix, fname, mname, 
 																dob, prim_range, prim_name, predir, addr_suffix, postdir,
 																unit_desig, sec_range, p_city_name, st, zip));
 
@@ -24,19 +27,29 @@ ded_In_base_file  := dedup(sort(dist_In_Base_File, vtid, -process_date, lname, n
 													 mail_sec_range, mail_p_city_name, mail_st, mail_ace_zip, local);
 
 //#stored('did_add_force','roxi'); // remove or set to 'thor' to put recs through thor
+//add src 
+src_rec := record
+header_slimsort.Layout_Source;
+Lay_Voters_WithDID;
+end;
+
+DID_Add.Mac_Set_Source_Code(ded_In_base_file, src_rec, 'VO', ded_In_base_file_src)
 
 matchSet := ['A','D','P'];
 
 DID_Add.MAC_Match_Flex            // regular did macro
-				(ded_In_base_file, matchSet, '',
+				(ded_In_base_file_src, matchSet, '',
 				 dob, fname, mname, lname, name_suffix,
 				 prim_range, prim_name, sec_range, zip, st, phone,
 				 DID,
-				 Lay_Voters_WithDID,
+				 src_rec,
 				 true, did_score,
 				 75,                 //dids with a score below here will be dropped
-				 Ds_Voters_WithDID					
+				 Ds_Voters_WithDID_src,true,src					
 				)
+
+//remove src
+Ds_Voters_WithDID := project(Ds_Voters_WithDID_src, transform(Lay_Voters_WithDID, self := left));
 
 Lay_Voters_WithDidSsn := record
 	Lay_Voters_WithDID;

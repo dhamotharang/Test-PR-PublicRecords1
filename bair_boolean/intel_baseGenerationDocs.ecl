@@ -6,26 +6,31 @@ FILENAME:intel_base
 RIDFIELD:newrid:GENERATE
 DOCFIELD:eid:HASH5
 IDNAME:newrid
-IDSPACE:MDR.sourceTools.src_Bair_Analytics
+IDSPACE:le.class_code
 FIELD:eid:0,0
 FIELD:gh12:0,0
+FIELD:gh4:0,0
+FIELD:gh5:0,0
+FIELD:gh6:0,0
 FIELD:etype:0,0
 FIELD:id:0,0
 FIELD:incident_id:0,0
 FIELD:name_type:0,0
 DATEFIELD:clean_incident_date:0,0
-NUMBERFIELD:incident_time:0,0
+FIELD:incident_time:SEGTYPE(NumericType):1,0
 FIELD:case_number:0,0
 FIELD:call_case_number:0,0
 FIELD:incident_address:0,0
 FIELD:incident_city:0,0
 FIELD:incident_state:0,0
 FIELD:incident_zip:0,0
+FIELD:wc_address_name:SEGTYPE(FieldDataType):0,0
 FIELD:address_name:0,0
+FIELD:wc_location_type:SEGTYPE(FieldDataType):0,0
 FIELD:location_type:0,0
 FIELD:source_reliability:0,0
 FIELD:incident_content_validity:0,0
-NUMBERFIELD:incident_source_score:0,0
+FIELD:incident_source_score:SEGTYPE(NumericType):1,0
 DATEFIELD:clean_incident_entry_date:0,0
 DATEFIELD:clean_incident_purge_date:0,0
 FIELD:reporting_officer_first_name:0,0
@@ -40,8 +45,8 @@ FIELD:sex:0,0
 FIELD:race:0,0
 FIELD:ethnicity:0,0
 FIELD:country_of_origin:0,0
-NUMBERFIELD:height:0,0
-NUMBERFIELD:weight:0,0
+FIELD:height:SEGTYPE(NumericType):1,0
+FIELD:weight:SEGTYPE(NumericType):1,0
 FIELD:eye_color:0,0
 FIELD:hair_color:0,0
 FIELD:hair_style:0,0
@@ -56,8 +61,8 @@ FIELD:entity_address:0,0
 FIELD:entity_city:0,0
 FIELD:entity_state:0,0
 FIELD:entity_zip:0,0
-NUMBERFIELD:person_x:0,0
-NUMBERFIELD:person_y:0,0
+FIELD:person_x:SEGTYPE(NumericType):1,0
+FIELD:person_y:SEGTYPE(NumericType):1,0
 FIELD:phone_number:0,0
 FIELD:phone_type:0,0
 FIELD:email_address:0,0
@@ -77,7 +82,7 @@ FIELD:organization_rank_role:0,0
 FIELD:entity_source_type:0,0
 FIELD:source_relaiability:0,0
 FIELD:entity_content_validity:0,0
-NUMBERFIELD:entity_source_score:0,0
+FIELD:entity_source_score:SEGTYPE(NumericType):1,0
 DATEFIELD:clean_entity_entry_date:0,0
 DATEFIELD:clean_entity_purge_date:0,0
 FIELD:vehicle_type:0,0
@@ -90,10 +95,17 @@ FIELD:vehicle_plate_state:0,0
 FIELD:entity_notes:0,0
 FIELD:incident_notes:0,0
 FIELD:vehicle_notes:0,0
+FIELD:agency:0,0
+FIELD:data_provider_ori:0,0
+FIELD:vehicle_color_secondary:0,0
+FIELD:vehicle_vin:0,0
+DATEFIELD:update_date:0,0
+DATEFIELD:purgedate_computed:0,0
+FIELD:duration_since:0,0
 CONCEPT:NOTES:entity_notes:incident_notes:vehicle_notes:SEGTYPE(GroupSeg):1,0
 CONCEPT:DATE:clean_incident_date:SEGTYPE(GroupSeg):1,0
  
-Total available specificity:2
+Total available specificity:9
 Search Threshold set at -4
 Use of PERSISTs in code set at:3
  

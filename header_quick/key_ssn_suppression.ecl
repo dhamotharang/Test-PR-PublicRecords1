@@ -9,7 +9,11 @@ r1 := record
  suppression_file0.rc;
 end;
 
-suppression_file := table(suppression_file0,r1);
+suppression_file1 := table(suppression_file0,r1);
+
+suppression_file := dataset([
+{'','',''}
+],r1);
 
 export 	key_ssn_suppression := 
 index(suppression_file,

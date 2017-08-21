@@ -5,40 +5,34 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
 	//The following macro defines the field sequence on WsECL page of query.
 	#WEBSERVICE(FIELDS(
                 'batch_in',
-                'GLBAPurpose',
-                'DPPAPurpose',
-								'DataRestriction',
-								'DataPermissionMask',
-                'AttributesVersion',
-                'IncludeNews',
-								'IncludeAllLevels',
-                'gateways',
-								'debugMode'
+                'glbaPurpose',
+                'dppaPurpose',
+								'dataRestriction',
+								'dataPermissionMask',
+                'attributesVersion',
+                'includeNews',
+                'gateways'
                 ));
-
+								
 
   batch_in  := DATASET([], DueDiligence.Layouts.BatchInLayout ) : STORED('batch_in');
-  unsigned1 glba := 5  : STORED('GLBAPurpose');
-	unsigned1 dppa := 3  : STORED('DPPAPurpose');
-	unsigned1 AttributesVersion := 3  : STORED('AttributesVersion'); 
-	Boolean  	IncludeNewsProfile := TRUE  : STORED('IncludeNewsProfile');
-	string50	DataRestriction := risk_indicators.iid_constants.default_DataRestriction : STORED('DataRestriction');
-  string50 	DataPermission := Risk_Indicators.iid_constants.default_DataPermission : STORED('DataPermissionMask');
+  unsigned1 glba := DueDiligence.Constants.DEFAULT_GLBA  : STORED('glbaPurpose');
+	unsigned1 dppa := DueDiligence.Constants.DEFAULT_DPPA  : STORED('dppaPurpose');
+	unsigned1 attributesVersion := DueDiligence.Constants.VERSION_3  : STORED('attributesVersion'); 
+	Boolean  	includeNewsProfile := TRUE  : STORED('includeNews');
+	string50	dataRestriction := risk_indicators.iid_constants.default_DataRestriction : STORED('dataRestriction');
+  string50 	dataPermission := Risk_Indicators.iid_constants.default_DataPermission : STORED('dataPermissionMask');
+
 	
-	//Get debugging indicator
-	BOOLEAN debugIndicator := FALSE : STORED('debugMode');
+	DueDiligence.Layouts.Input formatInput(DueDiligence.Layouts.BatchInLayout le, INTEGER cnt) := TRANSFORM
+	
+		customerType := StringLib.StringToUpperCase(le.custType);
+	
+		version := MAP(attributesVersion = DueDiligence.Constants.VERSION_3 AND customerType = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
+										attributesVersion = DueDiligence.Constants.VERSION_3 AND customerType = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
+										DueDiligence.Constants.INVALID);
 	
 	
-
-	wseq := PROJECT(batch_in, TRANSFORM(DueDiligence.Layouts.BatchInLayout, SELF.seq := COUNTER, SELF := left));
-
-	//Keep track of individual vs business requests
-	indRecs :=  wseq(StringLib.StringToUpperCase(CustType) = DueDiligence.Constants.INDIVIDUAL);
-  busRecs :=  wseq(StringLib.StringToUpperCase(CustType) = DueDiligence.Constants.BUSINESS);
-
-
-	DueDiligence.Layouts.Input formatIndData(DueDiligence.Layouts.BatchInLayout le) := TRANSFORM
-
 		address_in := DATASET([TRANSFORM(DueDiligence.Layouts.Address,
 																			SELF.streetAddress1 := TRIM(le.streetAddress1);
 																			SELF.streetAddress2 := TRIM(le.streetAddress2);
@@ -46,85 +40,104 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
 																			SELF.state := TRIM(le.state);
 																			SELF.zip5 := TRIM(le.zip5);
 																			SELF := [];)]);
-																			
-		name_in := DATASET([TRANSFORM(DueDiligence.Layouts.Name,
-																	SELF.firstName := TRIM(le.firstName);
-																	SELF.middleName := TRIM(le.middleName);
-																	SELF.lastName := TRIM(le.lastName);
-																	SELF.suffix := TRIM(le.suffix);
-																	SELF := [];)]);
 																				
-		ind_in := DATASET([TRANSFORM(DueDiligence.Layouts.Indv_Input,
-																	SELF.lexID := TRIM(le.lexID);
-																	SELF.name := name_in[1];
-																	SELF.address := address_in[1];
-																	SELF.phone := TRIM(le.phone);
-																	SELF.ssn := TRIM(le.taxID);
-																	SELF.accountNumber := TRIM(le.acctNo);
-																	SELF := [];)]);		
+		ind_in := IF(version IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, 
+												DATASET([TRANSFORM(DueDiligence.Layouts.Indv_Input,
+																						SELF.lexID := TRIM(le.lexID);
+																						SELF.name := DATASET([TRANSFORM(DueDiligence.Layouts.Name,
+																																						SELF.firstName := TRIM(le.firstName);
+																																						SELF.middleName := TRIM(le.middleName);
+																																						SELF.lastName := TRIM(le.lastName);
+																																						SELF.suffix := TRIM(le.suffix);
+																																						SELF := [];)])[1];
+																						SELF.address := address_in[1];
+																						SELF.phone := TRIM(le.phone);
+																						SELF.ssn := TRIM(le.taxID);
+																						SELF.accountNumber := TRIM(le.acctNo);
+																						SELF := [];)]),
+												DATASET([], DueDiligence.Layouts.Indv_Input));
+																	
+		bus_in := IF(version IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS, 
+												DATASET([TRANSFORM(DueDiligence.Layouts.Busn_Input,
+																						SELF.lexID := TRIM(le.lexID);
+																						SELF.accountNumber := TRIM(le.acctNo);
+																						SELF.companyName := TRIM(le.companyName);
+																						SELF.altCompanyName := TRIM(le.altCompanyName);
+																						SELF.address := address_in[1];
+																						SELF.fein := TRIM(le.taxID);
+																						SELF := [];,)]),
+												DATASET([], DueDiligence.Layouts.Busn_Input));
 																	
 																		
-		SELF.seq := le.seq;
+		SELF.seq := cnt;
 		SELF.individual := ind_in[1];
+		SELF.business := bus_in[1];
 		SELF.historyDateYYYYMMDD := IF((UNSIGNED4)le.HistoryDateYYYYMMDD = 0, DueDiligence.Constants.date8Nines, (UNSIGNED4)le.HistoryDateYYYYMMDD);
+		SELF.requestedVersion := version;
 		SELF := [];
 	END;
 
-
-	inIndData := PROJECT(indRecs, formatIndData(LEFT));
-	cleanIndData := DueDiligence.Common.GetCleanData(inIndData);
+	wseq := PROJECT(batch_in, formatInput(LEFT, COUNTER));
 	
-	consumerAttributes := inIndData;//DueDiligence.getIndAttributes();
+	validatedRequests := DueDiligence.Common.ValidateRequest(wseq, glba, dppa);
+
+	//Keep track of individual vs business requests
+	indRecs :=  validatedRequests(requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS);
+  busRecs :=  validatedRequests(requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS);
+
+
+	//clean and retrieve individual attributes
+	cleanIndData := DueDiligence.Common.GetCleanData(indRecs(validRequest));
+	consumerResults := DATASET([], DueDiligence.Layouts.Indv_Internal);//DueDiligence.getIndAttributes();
 																				 
 
-	STRING2 negOne := '-1';
-	STRING10 notFoundFlags := 'FFFFFFFFFF';
 																						 
-	DueDiligence.Layouts.BatchOut IndMapOut(consumerAttributes le, wseq ri) := TRANSFORM
-		SELF.acctNo := ri.acctNo;
-		SELF.IndLexID := (STRING)0;
-		SELF.IndAssetOwnProperty := 'IndAssetOwnProperty:' + ' ' + negOne;
-		SELF.IndAssetOwnProperty_Flags := 'IndAssetOwnProperty:' + ' ' + notFoundFlags;
-		SELF.IndAssetOwnAircraft := 'IndAssetOwnAircraft:' + ' ' + negOne;
-		SELF.IndAssetOwnAircraft_Flags := 'IndAssetOwnAircraft:' + ' ' + notFoundFlags;
-		SELF.IndAssetOwnWatercraft := 'IndAssetOwnWatercraft:' + ' ' + negOne;
-		SELF.IndAssetOwnWatercraft_Flags := 'IndAssetOwnWatercraft:' + ' ' + notFoundFlags;
-		SELF.IndAssetOwnVehicle := 'IndAssetOwnVehicle:' + ' ' + negOne;
-		SELF.IndAssetOwnVehicle_Flags := 'IndAssetOwnVehicle:' + ' ' + notFoundFlags;
-		SELF.IndAccessToFundsIncome := 'IndAccessToFundsIncome:' + ' ' + negOne;
-		SELF.IndAccessToFundsIncome_Flags := 'IndAccessToFundsIncome:' + ' ' + notFoundFlags;
-		SELF.IndAccessToFundsProperty := 'IndAccessToFundsProperty:' + ' ' + negOne;
-		SELF.IndAccessToFundsProperty_Flags := 'IndAccessToFundsProperty:' + ' ' + notFoundFlags;
-		SELF.IndGeographicRisk := 'IndGeographicRisk:' + ' ' + negOne;
-		SELF.IndGeographicRisk_Flags := 'IndGeographicRisk:' + ' ' + notFoundFlags;
-		SELF.IndMobility := 'IndMobility:' + ' ' + negOne;
-		SELF.IndMobility_Flags := 'IndMobility:' + ' ' + notFoundFlags;
-		SELF.IndLegalEvents := 'IndLegalEvents:' + ' ' + negOne;
-		SELF.IndLegalEvents_Flags := 'IndLegalEvents:' + ' ' + notFoundFlags;
-		SELF.IndLegalEventsFelonyType := 'IndLegalEventsFelonyType:' + ' ' + negOne;
-		SELF.IndLegalEventsFelonyType_Flags := 'IndLegalEventsFelonyType:' + ' ' + notFoundFlags;
-		SELF.IndHighRiskNewsProfiles := 'IndHighRiskNewsProfiles:' + ' ' + negOne;
-		SELF.IndHighRiskNewsProfiles_Flags := 'IndHighRiskNewsProfiles:' + ' ' + notFoundFlags;
-		SELF.IndAgeRange := 'IndAgeRange:' + ' ' + negOne;
-		SELF.IndAgeRange_Flags := 'IndAgeRange:' + ' ' + notFoundFlags;
-		SELF.IndIdentityRisk := 'IndIdentityRisk:' + ' ' + negOne;
-		SELF.IndIdentityRisk_Flags := 'IndIdentityRisk:' + ' ' + notFoundFlags;
-		SELF.IndResidencyRisk := 'IndResidenceyRisk:' + ' ' + negOne;
-		SELF.IndResidencyRisk_Flags := 'IndResidenceyRisk:' + ' ' + notFoundFlags;
-		SELF.IndMatchLevel := 'IndMatchLevel:' + ' ' + negOne;
-		SELF.IndMatchLevel_Flags := 'IndMatchLevel:' + ' ' + notFoundFlags;
-		SELF.IndAssociatesRisk := 'IndAssociatesRisk:' + ' ' + negOne;
-		SELF.IndAssociatesRisk_Flags := 'IndAssociatesRisk:' + ' ' + notFoundFlags;
-		SELF.IndProfessionalRisk := 'IndProfessionalRisk:' + ' ' + negOne;
-		SELF.IndProfessionalRisk_Flags := 'IndProfessionalRisk:' + ' ' + notFoundFlags;
+	DueDiligence.Layouts.BatchOut IndMapOut(DueDiligence.Layouts.Indv_Internal le, wseq ri) := TRANSFORM
+		SELF.acctNo := ri.individual.accountNumber;
+		SELF.IndLexID := (STRING)le.IndLexID;
+		
+		SELF.IndAssetOwnProperty 							:= le.IndAssetOwnProperty;
+		SELF.IndAssetOwnProperty_Flags 				:= le.IndAssetOwnProperty_Flags;
+		SELF.IndAssetOwnAircraft 							:= le.IndAssetOwnAircraft;
+		SELF.IndAssetOwnAircraft_Flags 				:= le.IndAssetOwnAircraft_Flags;
+		SELF.IndAssetOwnWatercraft 						:= le.IndAssetOwnWatercraft;
+		SELF.IndAssetOwnWatercraft_Flags 			:= le.IndAssetOwnWatercraft_Flags;
+		SELF.IndAssetOwnVehicle 							:= le.IndAssetOwnVehicle;
+		SELF.IndAssetOwnVehicle_Flags 				:= le.IndAssetOwnVehicle_Flags;
+		SELF.IndAccessToFundsIncome 					:= le.IndAccessToFundsIncome;
+		SELF.IndAccessToFundsIncome_Flags 		:= le.IndAccessToFundsIncome_Flags;
+		SELF.IndAccessToFundsProperty 				:= le.IndAccessToFundsProperty;
+		SELF.IndAccessToFundsProperty_Flags 	:= le.IndAccessToFundsProperty_Flags;
+		SELF.IndGeographicRisk 								:= le.IndGeographicRisk;
+		SELF.IndGeographicRisk_Flags 					:= le.IndGeographicRisk_Flags;
+		SELF.IndMobility 											:= le.IndMobility;
+		SELF.IndMobility_Flags 								:= le.IndMobility_Flags;
+		SELF.IndLegalEvents 									:= le.IndLegalEvents;
+		SELF.IndLegalEvents_Flags 						:= le.IndLegalEvents_Flags;
+		SELF.IndLegalEventsFelonyType 				:= le.IndLegalEventsFelonyType;
+		SELF.IndLegalEventsFelonyType_Flags 	:= le.IndLegalEventsFelonyType_Flags;
+		SELF.IndHighRiskNewsProfiles 					:= le.IndHighRiskNewsProfiles;
+		SELF.IndHighRiskNewsProfiles_Flags 		:= le.IndHighRiskNewsProfiles_Flags;
+		SELF.IndAgeRange 											:= le.IndAgeRange;
+		SELF.IndAgeRange_Flags 								:= le.IndAgeRange_Flags;
+		SELF.IndIdentityRisk 									:= le.IndIdentityRisk;
+		SELF.IndIdentityRisk_Flags 						:= le.IndIdentityRisk_Flags;
+		SELF.IndResidencyRisk 								:= le.IndResidencyRisk;
+		SELF.IndResidencyRisk_Flags 					:= le.IndResidencyRisk_Flags;
+		SELF.IndMatchLevel 										:= le.IndMatchLevel;
+		SELF.IndMatchLevel_Flags 							:= le.IndMatchLevel_Flags;
+		SELF.IndAssociatesRisk 								:= le.IndAssociatesRisk;
+		SELF.IndAssociatesRisk_Flags 					:= le.IndAssociatesRisk_Flags;
+		SELF.IndProfessionalRisk 							:= le.IndProfessionalRisk;
+		SELF.IndProfessionalRisk_Flags 				:= le.IndProfessionalRisk_Flags;
 		
 		SELF := [];
 	END;
 
 
-	indIndex := JOIN(consumerAttributes, indRecs, 
-							LEFT.seq = RIGHT.seq, 
-							IndMapOut(LEFT, RIGHT), LEFT OUTER);  
+	indIndex := JOIN(consumerResults, indRecs, 
+										LEFT.seq = RIGHT.seq, 
+										IndMapOut(LEFT, RIGHT), RIGHT OUTER);  
 
 
 
@@ -133,8 +146,8 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
 		// Clean up the Options and make sure that defaults are enforced
 		EXPORT UNSIGNED1	DPPA_Purpose 				:= dppa;
 		EXPORT UNSIGNED1	GLBA_Purpose 				:= glba;
-		EXPORT STRING50		DataRestrictionMask	:= DataRestriction;
-		EXPORT STRING50		DataPermissionMask	:= DataPermission;
+		EXPORT STRING50		DataRestrictionMask	:= dataRestriction;
+		EXPORT STRING50		DataPermissionMask	:= dataPermission;
 		EXPORT STRING10		IndustryClass				:= StringLib.StringToUpperCase(Business_Risk_BIP.Constants.Default_IndustryClass);
 		EXPORT UNSIGNED1	LinkSearchLevel			:= Business_Risk_BIP.Constants.LinkSearch.SeleID;
 		EXPORT UNSIGNED1	BusShellVersion			:= Business_Risk_BIP.Constants.Default_BusShellVersion;
@@ -157,102 +170,66 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
 	END;
 	
 	
-	DueDiligence.Layouts.Input formatBusData(DueDiligence.Layouts.BatchInLayout le) := TRANSFORM
-
-		address_in := DATASET([TRANSFORM(DueDiligence.Layouts.Address,
-																			SELF.streetAddress1 := TRIM(le.streetAddress1);
-																			SELF.streetAddress2 := TRIM(le.streetAddress2);
-																			SELF.city := TRIM(le.city);
-																			SELF.state := TRIM(le.state);
-																			SELF.zip5 := TRIM(le.zip5);
-																			SELF := [];)]);
-																				
-		bus_in := DATASET([TRANSFORM(DueDiligence.Layouts.Busn_Input,
-																	SELF.lexID := TRIM(le.lexID);
-																	SELF.companyName := TRIM(le.companyName);
-																	SELF.altCompanyName := TRIM(le.altCompanyName);
-																	SELF.address := address_in[1];
-																	SELF.phone := TRIM(le.phone);
-																	SELF.fein := TRIM(le.taxID);
-																	SELF.accountNumber := TRIM(le.acctNo);
-																	SELF := [];)]);		
-																				
-																				
-		SELF.seq := le.seq;
-		SELF.business := bus_in[1];
-		SELF.historyDateYYYYMMDD := (UNSIGNED4)le.HistoryDateYYYYMMDD;
-		SELF := [];
-	END;
-
-
-	inBusData := PROJECT(busRecs, formatBusData(LEFT));
-	cleanBusData := DueDiligence.Common.GetCleanData(inBusData);
-	
-	//get the business data
-	businessResults := inBusData; //DueDiligence.getBusAttributes(cleanBusData, options, linkingOptions);
+	//clean and retrieve business attributes
+	cleanBusData := DueDiligence.Common.GetCleanData(busRecs(validRequest));
+	businessResults := DueDiligence.getBusAttributes(cleanBusData, options, linkingOptions);
 														 
 
-
-	DueDiligence.Layouts.BatchOut BusMapOut(businessResults le, BusRecs ri) := TRANSFORM
-		SELF.acctNo := ri.acctNo;
-		SELF.BusLexID := (STRING)0;
-		SELF.BusAssetOwnProperty := 'BusAssetOwnProperty:' + ' ' + negOne;        
-		SELF.BusAssetOwnProperty_Flags := 'BusAssetOwnProperty:' + ' ' + notFoundFlags;         
-		SELF.BusAssetOwnAircraft := 'BusAssetOwnAircraft:' + ' ' + negOne;
-		SELF.BusAssetOwnAircraft_Flags := 'BusAssetOwnAircraft:' + ' ' + notFoundFlags;
-		SELF.BusAssetOwnWatercraft := 'BusAssetOwnWatercraft:' + ' ' + negOne;
-		SELF.BusAssetOwnWatercraft_Flags := 'BusAssetOwnWatercraft:' + ' ' + notFoundFlags;
-		SELF.BusAssetOwnVehicle := 'BusAssetOwnVehicle:' + ' ' + negOne;
-		SELF.BusAssetOwnVehicle_Flags := 'BusAssetOwnVehicle:' + ' ' + notFoundFlags;
-		SELF.BusAccessToFundsProperty := 'BusAccessToFundsProperty:' + ' ' + negOne;
-		SELF.BusAccessToFundsProperty_Flags := 'BusAccessToFundsProperty:' + ' ' + notFoundFlags;
-		SELF.BusGeographicRisk := 'BusGeographicRisk:' + ' ' + negOne;
-		SELF.BusGeographicRisk_Flags := 'BusGeographicRisk:' + ' ' + notFoundFlags;
-		SELF.BusValidityRisk := 'BusValidityRisk:' + ' ' + negOne;
-		SELF.BusValidityRisk_Flags := 'BusValidityRisk:' + ' ' + notFoundFlags;
-		SELF.BusStabilityRisk := 'BusStabilityRisk:' + ' ' + negOne;
-		SELF.BusStabilityRisk_Flags := 'BusStabilityRisk:' + ' ' + notFoundFlags;
-		SELF.BusIndustryRisk := 'BusIndustryRisk:' + ' ' + negOne;
-		SELF.BusIndustryRisk_Flags := 'BusIndustryRisk:' + ' ' + notFoundFlags;
-		SELF.BusStructureType := 'BusStructureType:' + ' ' + negOne;
-		SELF.BusStructureType_Flags := 'BusStructureType:' + ' ' + notFoundFlags;
-		SELF.BusSOSAgeRange := 'BusSOSAgeRange:' + ' ' + negOne;
-		SELF.BusSOSAgeRange_Flags := 'BusSOSAgeRange:' + ' ' + notFoundFlags;
-		SELF.BusPublicRecordAgeRange := 'BusPublicRecordAgeRange:' + ' ' + negOne;
-		SELF.BusPublicRecordAgeRange_Flags := 'BusPublicRecordAgeRange:' + ' ' + notFoundFlags;
-		SELF.BusShellShelfRisk := 'BusShellShelfRisk:' + ' ' + negOne;
-		SELF.BusShellShelfRisk_Flags := 'BusShellShelfRisk:' + ' ' + notFoundFlags;
-		SELF.BusMatchLevel := 'BusMatchLevel:' + ' ' + negOne;
-		SELF.BusMatchLevel_Flags := 'BusMatchLevel:' + ' ' + notFoundFlags;
-		SELF.BusLegalEvents := 'BusLegalEvents:' + ' ' + negOne;
-		SELF.BusLegalEvents_Flags := 'BusLegalEvents:' + ' ' + notFoundFlags;
-		SELF.BusLegalEventsFelonyType := 'BusLegalEventsFelonyType:' + ' ' + negOne;
-		SELF.BusLegalEventsFelonyType_Flags := 'BusLegalEventsFelonyType:' + ' ' + notFoundFlags;
-		SELF.BusHighRiskNewsProfiles := 'BusHighRiskNewsProfiles:' + ' ' + negOne;
-		SELF.BusHighRiskNewsProfiles_Flags := 'BusHighRiskNewsProfiles:' + ' ' + notFoundFlags;
-		SELF.BusLinkedBusRisk := 'BusLinkedBusRisk:' + ' ' + negOne; 
-		SELF.BusLinkedBusRisk_Flags := 'BusLinkedBusRisk:' + ' ' + notFoundFlags; 
-		SELF.BusExecOfficersRisk := 'BusExecOfficersRisk:' + ' ' + negOne;
-		SELF.BusExecOfficersRisk_Flags := 'BusExecOfficersRisk:' + ' ' + notFoundFlags;
-		SELF.BusExecOfficersResidencyRisk := 'BusExecOfficersResidencyRisk:' + ' ' + negOne;	
-		SELF.BusExecOfficersResidencyRisk_Flags := 'BusExecOfficersResidencyRisk:' + ' ' + notFoundFlags;	
+	DueDiligence.Layouts.BatchOut BusMapOut(DueDiligence.Layouts.Busn_Internal le, BusRecs ri) := TRANSFORM
+		SELF.acctNo := ri.business.accountNumber;
+		SELF.BusLexID := (STRING)le.busLexID;
+		
+		SELF.BusAssetOwnProperty 								:= le.BusAssetOwnProperty;        
+		SELF.BusAssetOwnProperty_Flags 					:= le.BusAssetOwnProperty_Flags;         
+		SELF.BusAssetOwnAircraft 								:= le.BusAssetOwnAircraft;
+		SELF.BusAssetOwnAircraft_Flags 					:= le.BusAssetOwnAircraft_Flags;
+		SELF.BusAssetOwnWatercraft 							:= le.BusAssetOwnWatercraft;
+		SELF.BusAssetOwnWatercraft_Flags 				:= le.BusAssetOwnWatercraft_Flags;
+		SELF.BusAssetOwnVehicle 								:= le.BusAssetOwnVehicle;
+		SELF.BusAssetOwnVehicle_Flags 					:= le.BusAssetOwnVehicle_Flags;
+		SELF.BusAccessToFundsProperty 					:= le.BusAccessToFundsProperty;
+		SELF.BusAccessToFundsProperty_Flags 		:= le.BusAccessToFundsProperty_Flags;
+		SELF.BusGeographicRisk 									:= le.BusGeographicRisk;
+		SELF.BusGeographicRisk_Flags 						:= le.BusGeographicRisk_Flags;
+		SELF.BusValidityRisk 										:= le.BusValidityRisk;
+		SELF.BusValidityRisk_Flags 							:= le.BusValidityRisk_Flags;
+		SELF.BusStabilityRisk 									:= le.BusStabilityRisk;
+		SELF.BusStabilityRisk_Flags 						:= le.BusStabilityRisk_Flags;
+		SELF.BusIndustryRisk 										:= le.BusIndustryRisk;
+		SELF.BusIndustryRisk_Flags 							:= le.BusIndustryRisk_Flags;
+		SELF.BusStructureType 									:= le.BusStructureType;
+		SELF.BusStructureType_Flags 						:= le.BusStructureType_Flags;
+		SELF.BusSOSAgeRange 										:= le.BusSOSAgeRange;
+		SELF.BusSOSAgeRange_Flags 							:= le.BusSOSAgeRange_Flags;
+		SELF.BusPublicRecordAgeRange 						:= le.BusPublicRecordAgeRange;
+		SELF.BusPublicRecordAgeRange_Flags 			:= le.BusPublicRecordAgeRange_Flags;
+		SELF.BusShellShelfRisk 									:= le.BusShellShelfRisk;
+		SELF.BusShellShelfRisk_Flags 						:= le.BusShellShelfRisk_Flags;
+		SELF.BusMatchLevel 											:= le.BusMatchLevel;
+		SELF.BusMatchLevel_Flags 								:= le.BusMatchLevel_Flags;
+		SELF.BusLegalEvents 										:= le.BusLegalEvents;
+		SELF.BusLegalEvents_Flags 							:= le.BusLegalEvents_Flags;
+		SELF.BusLegalEventsFelonyType 					:= le.BusLegalEventsFelonyType;
+		SELF.BusLegalEventsFelonyType_Flags 		:= le.BusLegalEventsFelonyType_Flags;
+		SELF.BusHighRiskNewsProfiles 						:= le.BusHighRiskNewsProfiles;
+		SELF.BusHighRiskNewsProfiles_Flags 			:= le.BusHighRiskNewsProfiles_Flags;
+		SELF.BusLinkedBusRisk 									:= le.BusLinkedBusRisk; 
+		SELF.BusLinkedBusRisk_Flags 						:= le.BusLinkedBusRisk_Flags; 
+		SELF.BusExecOfficersRisk 								:= le.BusExecOfficersRisk;
+		SELF.BusExecOfficersRisk_Flags 					:= le.BusExecOfficersRisk_Flags;
+		SELF.BusExecOfficersResidencyRisk 			:= le.BusExecOfficersResidencyRisk;	
+		SELF.BusExecOfficersResidencyRisk_Flags := le.BusExecOfficersResidencyRisk_Flags;	
 		SELF := [];
 	END;
 
-	busIndex := JOIN(businessResults, BusRecs,
-									LEFT.seq = RIGHT.seq, 
-									BusMapOut(LEFT, RIGHT), LEFT OUTER); 
+	busIndex := JOIN(businessResults, busRecs,
+										LEFT.seq = RIGHT.seq, 
+										BusMapOut(LEFT, RIGHT), RIGHT OUTER); 
 							
 
 	final :=  UNGROUP(indIndex) + UNGROUP(busIndex);
-	
-	
-	
-	IF(debugIndicator, output(cleanIndData, NAMED('clean_ind_data')));           //This is for debug mode 	
-	IF(debugIndicator, output(cleanBusData, NAMED('clean_bus_data')));           //This is for debug mode 	
-	
 		
-	RETURN final;
+	RETURN OUTPUT(final, NAMED('Results'));
 															 
 
 END;

@@ -48,7 +48,6 @@ output(flag_file_summary, named('flag_file_summary'));
 
 summary_rec := record
 	integer ADVO; 
-	integer Aircraft; 
 	integer Alloy; 
 	integer AVM; 
 	integer bk_main; 
@@ -59,8 +58,6 @@ summary_rec := record
 	integer faa_aircraft; 
 	integer Gong; 
 	integer Header; 
-	integer ibehavior_consumer; 
-	integer ibehavior_purchase; 
 	integer Impulse; 
 	integer Infutor; 
 	integer Inquiries; 
@@ -82,7 +79,6 @@ end;
 overrides_summary := project(ut.ds_oneRecord, 
 	transform(summary_rec,
 self.ADVO :=  count(FCRA.Key_Override_ADVO_ffid);
-self.Aircraft := count(FCRA.Key_Override_Aircraft_FFID);
 self.Alloy := count(FCRA.Key_Override_Alloy_FFID);
 self.AVM := count(FCRA.Key_Override_AVM_FFID);
 self.bk_main := count(FCRA.key_override_bkv3_main_ffid);
@@ -93,8 +89,6 @@ self.Email_Data := count(FCRA.Key_Override_Email_Data_ffid);
 self.faa_aircraft	:= count(FCRA.key_override_faa.aircraft);
 self.Gong := count(FCRA.Key_Override_Gong_FFID);
 self.Header	:= count(FCRA.Key_Override_Header_DID);
-self.ibehavior_consumer	:= count(FCRA.key_override_ibehavior.consumer);
-self.ibehavior_purchase	:= count(FCRA.key_override_ibehavior.purchase);
 self.Impulse := count(FCRA.Key_Override_Impulse_FFID);
 self.Infutor := count(FCRA.Key_Override_Infutor_FFID);
 self.Inquiries := count(FCRA.Key_Override_Inquiries_ffid);

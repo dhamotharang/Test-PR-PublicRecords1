@@ -1,11 +1,21 @@
-despray(STRING file, string server, string destination) := IF(FileServices.FileExists(file),
-		fileservices.despray(file,server,destination), 
-		OUTPUT('File "' + file + '" does not exist, so no despray performed'));
+import versioncontrol, _control;
 
-f1  := despray(Bus_Thor + 'OUT::Business_Header', MOXIE_BH_DESPRAY_SERVER,MOXIE_BH_MOUNT + 'bus_hdr/bus_hdr.d00');
-f2  := despray(Bus_Thor + 'OUT::Business_Relatives_Group', MOXIE_BH_DESPRAY_SERVER,MOXIE_BH_MOUNT + 'bus_relatives_group/bus_relatives_group.d00');
-f3  := despray(Bus_Thor + 'OUT::Business_Header_Best', MOXIE_BH_DESPRAY_SERVER,MOXIE_BH_MOUNT + 'bus_hdr_best/bus_hdr_best.d00');
-f4  := despray(Bus_Thor + 'OUT::Business_Header_Stat', MOXIE_BH_DESPRAY_SERVER,MOXIE_BH_MOUNT + 'bus_hdr_stat/bus_hdr_stat.d00');
+export Despray_Business_Header(
+	
+	 string		pServer			= _control.IPAddress.edata14a
+	,string		pMount			= '/bus_hdr_16/'
+	,boolean	pOverwrite	= false
+
+) := 
+function
 
 
-export Despray_Business_Header := sequential(f2);
+	myfilestodespray := dataset([
+		
+		{	 Bus_Thor() + 'OUT::Business_Relatives_Group_built',pServer,pMount + 'bus_relatives_group/bus_relatives_group.d00'}
+
+	], versioncontrol.Layout_DKCs.Input);
+
+	return versioncontrol.fDesprayFiles(myfilestodespray,,,'DesprayBusRelativesGroupInfo',pOverwrite);
+
+end;

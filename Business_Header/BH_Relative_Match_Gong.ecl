@@ -1,7 +1,17 @@
-import ut, Gong;
+import ut, Gong_Neustar, mdr;
+
+EXPORT BH_Relative_Match_Gong(
+
+	 dataset(Layout_Business_Header_Temp)	pBH_Basic_Match_ForRels		= BH_Basic_Match_ForRels	()
+	,dataset(Layout_Business_Header_New	)	pGong_As_Business_Header	= Gong_Neustar.As_Business_Header().GongV2
+	,string																pPersistname							= persistnames().BHRelativeMatchGong													
+	,boolean															pShouldRecalculatePersist	= true													
+
+) :=
+function
 
 // Initialize match file
-BH_File := BH_Basic_Match_ForRels;
+BH_File := pBH_Basic_Match_ForRels;
 
 Layout_Gong_Match := record
 unsigned6 bdid;             // Seisint Business Identifier
@@ -19,15 +29,15 @@ self := L;
 end;
 
 // Use only Gong Business (not government) listings
-Gong_Match_Init := project(BH_File(source = 'GB'), InitGongMatch(left));
+Gong_Match_Init := project(BH_File(MDR.sourceTools.SourceIsGong_Business(source)), InitGongMatch(left));
 Gong_Match_Init_Dedup := dedup(Gong_Match_Init, all);
 Gong_Match_Init_Dist := distribute(Gong_Match_Init_Dedup, hash(trim(company_name), trim(prim_name), zip));
 
-Layout_Gong_Match InitGongGroupMatch(Business_Header.Layout_Business_Header L) := transform
+Layout_Gong_Match InitGongGroupMatch(Business_Header.Layout_Business_Header_New L) := transform
 self := L;
 end;
 
-Gong_Group_Match_Init := project(Gong.Gong_As_Business_Header(source = 'GB'), InitGongGroupMatch(left));
+Gong_Group_Match_Init := project(pGong_As_Business_Header(MDR.sourceTools.SourceIsGong_Business(source)), InitGongGroupMatch(left));
 Gong_Group_Match_Init_Dedup := dedup(Gong_Group_Match_Init, all);
 Gong_Group_Match_Init_Dist := distribute(Gong_Group_Match_Init_Dedup, hash(trim(company_name), trim(prim_name), zip));
 
@@ -74,4 +84,12 @@ Gong_Matches := JOIN(Gong_Filing_Match_Dedup_Dist,
 
 Gong_Matches_Dedup := DEDUP(Gong_Matches, bdid1, bdid2, all);
 
-export BH_Relative_Match_Gong := Gong_Matches_Dedup : persist('TMTEMP::BH_Relative_Match_Gong');
+BH_Relative_Match_Gong_persisted := Gong_Matches_Dedup 
+	: persist(pPersistname);
+
+returndataset := if(pShouldRecalculatePersist = true, BH_Relative_Match_Gong_persisted
+																										, persists().BHRelativeMatchGong
+									);
+return returndataset;
+
+end;

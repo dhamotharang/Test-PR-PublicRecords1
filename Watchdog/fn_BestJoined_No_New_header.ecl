@@ -13,7 +13,7 @@ did_dups_pst := did_dups0 : persist('persist::watchdog_did_dedup_nonew_header_2'
 did_dups := if (isnewheader=false,did_dups_pst); 
 lbest := Watchdog.Layout_Best_Marketing_Flag;
 
-baddressweekly := watchdog.BestAddress;
+baddressweekly := watchdog.BestAddress();
 
 //getaddress
 lbest getaddress(did_dups l, baddressweekly r) := transform
@@ -46,14 +46,31 @@ end;
 
 wdeathweekly := join(waddressweekly, bdeathweekly, left.did = right.did,
 			 getdeath(left, right), left outer, local);
+
+//update ADL_IND
+bADL_ind := if (isnewheader = false,Header.fn_ADLSegmentation(header.file_headers).core_check_pst);
+
+lbest getADL_IND(wdeathweekly l, bADL_ind r) := transform
+    self.adl_ind := r.ind;
+ 	self := l;
+end;
+
+wADL_INDweekly := join(wdeathweekly, distribute(bADL_ind, hash(did)), left.did = right.did,
+			 getADL_IND(left, right), left outer, local);
 			 
-fbest := map(var1='nonglb'	          =>Watchdog.File_Best_nonglb,
-				  var1='marketing'    =>Watchdog.File_Best_marketing,
-				  var1='compid'	  => project(compID.file_compid_best, transform(watchdog.Layout_Best, self := left)),
-				  var1='compid_weekly' =>project(compID.file_compid_best_weekly,transform(watchdog.Layout_Best, self := left)),
-				  var1='glb_nonen'     =>Watchdog.File_Best_nonExperian,	
-				  var1='glb_noneq'     =>Watchdog.File_Best_nonEquifax,	
-				  Watchdog.File_Best
+fbest := map(
+           var1='nonglb'            => Watchdog.File_Best_nonglb
+					,var1='nonglb_noneq'			=> Watchdog.File_Best_nonglb_nonEquifax
+				  ,var1='marketing'         => Watchdog.File_Best_marketing
+					,var1='marketing_noneq'   => Watchdog.File_Best_marketing_nonEquifax
+				  ,var1='compid'            => project(compID.file_compid_best,watchdog.Layout_Best)
+				  ,var1='compid_weekly'     => project(compID.file_compid_best_weekly,watchdog.Layout_Best)
+				  ,var1='glb_nonen'         => Watchdog.File_Best_nonExperian
+				  ,var1='glb_noneq'         => Watchdog.File_Best_nonEquifax	
+				  ,var1='nonutility'        => watchdog.File_Best_nonutility
+				  ,var1='nonglb_nonutility' => watchdog.File_Best_nonglb_nonutility
+					,var1='glb_nonen_noneq' => Watchdog.File_Best_nonEquifax_nonExperian
+				  ,                            Watchdog.File_Best
 				 );	
 
 lbest getall(lbest l, fbest r) := transform
@@ -75,13 +92,24 @@ lbest getall(lbest l, fbest r) := transform
 	self.run_date := (integer)RunDate_build;
 	self.bdid := r.bdid;
 	self.title := r.title;
-	self.ADL_ind := r.ADL_ind;
 	self.valid_ssn := r.valid_ssn;
 	self := l;
 end;
 				 
-result := join( wdeathweekly, distribute(fbest,hash(did)),  left.did = right.did,
+result := join( wADL_INDweekly, distribute(fbest,hash(did)),  left.did = right.did,
 			 getall(left, right), left outer, local);
-			 
-return result; 
+
+bdob := watchdog.BestDob;
+
+
+//getdob
+lbest getdob(result l, bdob r) := transform
+	self.dob := r.dob;
+	self := l;
+end;
+
+result_wdob := join(result, bdob, left.did = right.did,
+			 getdob(left, right), left outer, local);
+
+return result_wdob; 
 end; 

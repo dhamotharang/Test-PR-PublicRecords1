@@ -1,0 +1,21 @@
+//-----------------------------------------------------------------------------
+// Gets the candidate records to be used in the main, which is the input data
+// and data for two degrees of separation of relatives.
+//-----------------------------------------------------------------------------
+EXPORT get_universe:=MODULE
+  // Start with a slim version of the original data from reunion_clean that 
+	// contains just the DID and an integer came_from='1'.
+  dOriginalDIDs:=DEDUP(SORT(DISTRIBUTE(PROJECT(reunion.reunion_clean(did>0),TRANSFORM(reunion.layouts.lIteration,SELF.came_from:='1';SELF:=LEFT;)),HASH(did)),did,LOCAL),did,LOCAL);
+
+  // Pass2 gives us the input data with first-degree relatives (came_from='2')
+  SHARED dFirstDegree:=reunion.mod_get_universe(dOriginalDIDs,'2').universe:PERSIST('~thor::persist::mylife::universe_pass2');
+
+  dFirstDegreeLimited:=reunion.fn_limit_iteration_2_relatives(dFirstDegree);
+
+  // Pass3 gives us the data from Pass 2 along with second-degree relatives
+	// (came_from='3')
+  SHARED dSecondDegree:=reunion.mod_get_universe(dFirstDegreeLimited,'3').universe:PERSIST('~thor::persist::mylife::universe_pass3');
+
+  EXPORT get_relative_pairs:=reunion.mod_get_universe(dFirstDegree,'2').relative_pairs;
+  EXPORT get_main:=dSecondDegree;
+END;

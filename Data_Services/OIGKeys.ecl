@@ -3,7 +3,7 @@ export OIGKeys := macro
 output(choosen(Autokey.Key_Address('~thor_data400::key::oig::qa::autokey::'),10));
 output(choosen(AutoKey.Key_CityStName('~thor_data400::key::oig::qa::autokey::'),10));
 output(choosen(AutoKey.Key_Name('~thor_data400::key::oig::qa::autokey::'),10));
-// output(choosen(AutoKey.Key_Phone2('~thor_data400::key::oig::qa::autokey::'),10));
+output(choosen(AutoKey.Key_Phone2('~thor_data400::key::oig::qa::autokey::'),10));
 output(choosen(AutoKey.Key_SSN2('~thor_data400::key::oig::qa::autokey::'),10));
 output(choosen(AutoKey.Key_StName('~thor_data400::key::oig::qa::autokey::'),10));
 output(choosen(AutoKey.Key_Zip('~thor_data400::key::oig::qa::autokey::'),10));

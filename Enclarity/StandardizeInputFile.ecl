@@ -541,10 +541,12 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 			SELF  :=  L;
 			SELF  :=  [];
 		END;
-		
+
 		tempBase	:= PROJECT(baseFile, tMapping(LEFT));
-		newBase		:= table(tempBase,{tempBase, cnt := count(group)}, prov_type_code, few) (cnt = 1); //do not accept ANY duplications
-		RETURN project(newBase,enclarity.Layouts.sanc_prov_type_base);
+		newBase		:= table(tempBase,{prov_type_code, cnt := count(group)}, prov_type_code, few) (cnt = 1); //do not accept ANY duplications
+		RETURN JOIN(tempBase, newBase,
+                LEFT.prov_type_code = RIGHT.prov_type_code,
+								TRANSFORM(enclarity.Layouts.sanc_prov_type_base, SELF := LEFT));
 	END;
 	
 	EXPORT Sanc_codes:= FUNCTION
@@ -565,8 +567,10 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 		END;
 
 		tempBase	:= PROJECT(baseFile, tMapping(LEFT));
-		newBase		:= table(tempBase,{tempBase, cnt := count(group)}, sanc_code, few) (cnt = 1); //do not accept ANY duplications
-		RETURN project(newBase, enclarity.Layouts.sanc_codes_base);
+		newBase		:= table(tempBase,{sanc_code, cnt := count(group)}, sanc_code, few) (cnt = 1); //do not accept ANY duplications
+		RETURN JOIN(tempBase, newBase,
+                LEFT.sanc_code = RIGHT.sanc_code,
+								TRANSFORM(enclarity.Layouts.sanc_codes_base, SELF := LEFT));
 
 	END;
 			

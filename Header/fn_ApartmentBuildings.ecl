@@ -1,6 +1,7 @@
-export fn_ApartmentBuildings(boolean isFCRA=false) := function
+IMPORT PRTE2_Header;
+export fn_ApartmentBuildings(boolean isEN=false) := function
 
-gds := header.fn_did_addresses(isFCRA);
+gds := header.fn_did_addresses(isEN);
 
 scnt := record
 	gds.prim_range;
@@ -91,8 +92,11 @@ j := join(a_numbers,d_numbers,left.prim_range=right.prim_range and
                               left.predir=right.predir,
                               join_them(left,right),local);
 
-ofile := j : persist(if(isFCRA,'fcra_','')+'ApartmentBuildings');
-
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+ofile := j ;
+#ELSE
+ofile := j : persist(if(isEN,'EN_','')+'fcra_ApartmentBuildings');
+#END;
 return ofile;
 
 end;

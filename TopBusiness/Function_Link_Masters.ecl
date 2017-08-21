@@ -3,14 +3,17 @@ import DID_Add,TopBusiness_External,header_slimsort;
 export Function_Link_Masters(
 	Interface_AsMasters.Unlinked.Base unlinked_data,
 	dataset(Layout_Linking.Linked) linkage,
-	dataset(Layout_LLID.Linked) old_llid = dataset([],Layout_LLID.Linked)) := module(Interface_AsMasters.Linked.Base)
+	dataset(Layout_LLID.LLID12.Linked) old_llid12 = dataset([],Layout_LLID.LLID12.Linked),
+	dataset(Layout_LLID.LLID9.Linked) old_llid9 = dataset([],Layout_LLID.LLID9.Linked)) := module(Interface_AsMasters.Linked.Base)
 
-	export dataset(Layout_LLID.Linked) As_LLID_Master := Function_LLID(linkage,old_llid);
+	export dataset(Layout_LLID.LLID12.Linked) As_LLID12_Master := Function_LLID(linkage,old_llid12,old_llid9).llid12s;
+	export dataset(Layout_LLID.LLID9.Linked) As_LLID9_Master := Function_LLID(linkage,old_llid12,old_llid9).llid9s;
 	
 	shared tempdeduplinking :=
 		dedup(sort(
 			distribute(linkage,hash64(source,source_docid)),
-			source,source_docid,source_party,bid,local),source,source_docid,source_party,local);
+			source,source_docid,source_party,bid,local),source,source_docid,source_party,local) : persist('~thor40_241_7::persist::brm::deduplinking');
+		// dataset('~thor40_241_7::persist::brm::deduplinking',Layout_Linking.Linked,thor);
 	
 	export dataset(Layout_Abstract.Linked) As_Abstract_Master := function
 
@@ -64,11 +67,24 @@ export Function_Link_Masters(
 	
 	end;
 	
-	export dataset(Layout_Bankruptcy.Party) As_Bankruptcy_Master_Party := unlinked_data.As_Bankruptcy_Master_Party;
+	export dataset(Layout_Bankruptcy.Party) As_Bankruptcy_Master_Party := function
+	
+		join_to_main := join(
+			distribute(unlinked_data.As_Bankruptcy_Master_Party,hash64(court_code,orig_case_number)),
+			dedup(distribute(As_Bankruptcy_Master,hash64(court_code,orig_case_number)),court_code,orig_case_number,local),
+			left.court_code = right.court_code and
+			left.orig_case_number = right.orig_case_number,
+			transform(left),
+			local);
+		
+		return join_to_main;
+
+	
+	end;
 	
 	export dataset(Layout_Contacts.Linked) As_Contact_Master := function
 
-		add_ids := join(
+		add_ids := dedup(join(
 			distribute(unlinked_data.As_Contact_Master,hash64(source,source_docid)),
 			tempdeduplinking,
 			left.source = right.source and
@@ -82,7 +98,7 @@ export Function_Link_Masters(
 				self.segment_bid := right.segment_bid,
 				self := left,
 				self := []),
-			local);
+			local),record,all,local);
 		
 		pattern p_split_chars := pattern('[,;/&]');
 		pattern p_nosplit_chars := pattern('[^,;/&]');
@@ -144,6 +160,8 @@ export Function_Link_Masters(
 				regexfind(' GENERAL (.* )?MANAGER ',tempaddspaces) => 'GENERAL MANAGER',
 				stringlib.StringFind(tempaddspaces,' DIRECTOR ',1) > 0 => 'DIRECTOR',
 				stringlib.StringFind(tempaddspaces,' MANAGER ',1) > 0 => 'MANAGER',
+				stringlib.StringFind(tempaddspaces,' SECRETARY ',1) > 0 => 'SECRETARY',
+				stringlib.StringFind(tempaddspaces,' TREASURER ',1) > 0 => 'TREASURER',
 				stringlib.StringFind(tempaddspaces,' SR EXECUTIVE VICE PRESIDENT ',1) > 0 => 'SR EXECUTIVE VICE PRESIDENT',
 				stringlib.StringFind(tempaddspaces,' EXECUTIVE VICE PRESIDENT ',1) > 0 => 'EXECUTIVE VICE PRESIDENT',
 				stringlib.StringFind(tempaddspaces,' SR VICE PRESIDENT ',1) > 0 => 'SR VICE PRESIDENT',
@@ -160,13 +178,13 @@ export Function_Link_Masters(
 			self := left));
 		
 		normalized_contacts := join(
-			distribute(add_ids(position_title != ''),hash64(position_title)),
-			distribute(tempselect(clean_position != ''),hash64(position_title)),
+			add_ids(position_title != ''),
+			tempselect(clean_position != ''),
 			left.position_title = right.position_title,
 			transform(recordof(add_ids),
 				self.ln_position_title := right.clean_position,
 				self := left),
-			left outer,
+			lookup,
 			local) + add_ids(position_title = '' or position_type != 'C');
 			
 			// pos_layout := recordof(constants.normalized_set);
@@ -197,18 +215,18 @@ export Function_Link_Masters(
 													 // self := left), left outer, lookup);														 
     
 														
-   													
+		// zero_did_normalized_contacts := normalized_contacts(did = 0);
 		
-		DID_Add.MAC_Match_Flex( normalized_contacts,['A','S','P','4','Z'],
-			ssn,'',name_first,name_middle,name_last,name_suffix,
-			prim_range,prim_name,sec_range,zip,state,phone,
-			did,
-			recordof(add_ids),
-			true,score,
-			75,
-			add_ids_dids)
+		// DID_Add.MAC_Match_Flex( zero_did_normalized_contacts,['A','S','P','4','Z'],
+			// ssn,'',name_first,name_middle,name_last,name_suffix,
+			// prim_range,prim_name,sec_range,zip,state,phone,
+			// did,
+			// recordof(add_ids),
+			// true,score,
+			// 75,
+			// add_ids_dids)
 			
-		return project(dedup(add_ids_dids,record,all),Layout_Contacts.Linked);
+		return project(dedup(dedup(normalized_contacts,record,all,local),record,all),Layout_Contacts.Linked);
 	
 	end;
 	
@@ -415,10 +433,27 @@ export Function_Link_Masters(
 	
 	export dataset(Layout_MotorVehicle.Registration) As_MotorVehicle_Master_Registration := unlinked_data.As_MotorVehicle_Master_Registration;
 	export dataset(Layout_MotorVehicle.Title) As_MotorVehicle_Master_Title := unlinked_data.As_MotorVehicle_Master_Title;
-	export dataset(Layout_MotorVehicle.Party) As_MotorVehicle_Master_Party := unlinked_data.As_MotorVehicle_Master_Party;
+	
+	export dataset(Layout_MotorVehicle.Party.Linked) As_MotorVehicle_Master_Party := function
+	
+		add_ids := join(
+			distribute(unlinked_data.As_MotorVehicle_Master_Party,hash64(source,source_docid)),
+			tempdeduplinking,
+			left.source = right.source and
+			left.source_docid = right.source_docid and
+			left.source_party = right.source_party,
+			transform(Layout_MotorVehicle.Party.Linked,
+				self.bid := right.bid,
+				self := left,
+				self := []),
+			local);
+		
+		return add_ids;
+		
+	end;
 	
 	shared tempmainids0 := join(
-		distribute(unlinked_data.As_Property_Master,hash64(source,source_docid)),
+		dedup(distribute(unlinked_data.As_Property_Master,hash64(source,source_docid)),record,all,local),
 		tempdeduplinking,
 		left.source = right.source and
 		left.source_docid = right.source_docid,
@@ -434,26 +469,39 @@ export Function_Link_Masters(
 			self := left),
 		local);
 	
+	addresseswithsingleapn :=
+		table(
+			table(
+				dedup(
+					dedup(
+						tempmainids0(property_id[1..3] = 'APN'),
+						property_address.StreetNumber,property_address.StreetPredirection,property_address.StreetName,property_address.StreetSuffix,property_address.StreetPostdirection,property_address.UnitNumber,property_address.Zip5,property_id,local),
+					property_address.StreetNumber,property_address.StreetPredirection,property_address.StreetName,property_address.StreetSuffix,property_address.StreetPostdirection,property_address.UnitNumber,property_address.Zip5,property_id),
+				{property_address.StreetNumber,property_address.StreetPredirection,property_address.StreetName,property_address.StreetSuffix,property_address.StreetPostdirection,property_address.UnitNumber,property_address.Zip5,max_property_id := max(group,property_id),unsigned cnt := count(group)},
+				property_address.StreetNumber,property_address.StreetPredirection,property_address.StreetName,property_address.StreetSuffix,property_address.StreetPostdirection,property_address.UnitNumber,property_address.Zip5,local),
+			{StreetNumber,StreetPredirection,StreetName,StreetSuffix,StreetPostdirection,UnitNumber,Zip5,max_max_property_id := max(group,max_property_id),unsigned cnt := sum(group,cnt)},
+			StreetNumber,StreetPredirection,StreetName,StreetSuffix,StreetPostdirection,UnitNumber,Zip5)(cnt = 1);
+	
 	shared tempmainids := join(
 		distribute(tempmainids0(property_id[1..3]='ADD'),hash64(property_address.StreetNumber,property_address.StreetPredirection,property_address.StreetName,property_address.StreetSuffix,property_address.StreetPostdirection,property_address.UnitNumber,property_address.Zip5)),
-		distribute(tempmainids0(property_id[1..3]='APN'),hash64(property_address.StreetNumber,property_address.StreetPredirection,property_address.StreetName,property_address.StreetSuffix,property_address.StreetPostdirection,property_address.UnitNumber,property_address.Zip5)),
-		left.property_address.StreetNumber = right.property_address.StreetNumber and
-		left.property_address.StreetPredirection = right.property_address.StreetPredirection and
-		left.property_address.StreetName = right.property_address.StreetName and
-		left.property_address.StreetSuffix = right.property_address.StreetSuffix and
-		left.property_address.StreetPostdirection = right.property_address.StreetPostdirection and
-		left.property_address.UnitNumber = right.property_address.UnitNumber and
-		left.property_address.Zip5 = right.property_address.Zip5,
+		addresseswithsingleapn,
+		left.property_address.StreetNumber = right.StreetNumber and
+		left.property_address.StreetPredirection = right.StreetPredirection and
+		left.property_address.StreetName = right.StreetName and
+		left.property_address.StreetSuffix = right.StreetSuffix and
+		left.property_address.StreetPostdirection = right.StreetPostdirection and
+		left.property_address.UnitNumber = right.UnitNumber and
+		left.property_address.Zip5 = right.Zip5,
 		transform(Layout_Property.Main.Linked,
-			self.property_id := if(right.property_id = '',left.property_id,right.property_id),
+			self.property_id := if(right.max_max_property_id = '',left.property_id,right.max_max_property_id),
 			self := left),
 		left outer,
-		local) + tempmainids0(property_id[1..3] != 'ADD');
+		local) + tempmainids0(property_id[1..3] != 'ADD') : independent;
 	
-	shared tempslimdedup := dedup(tempmainids,event_id,property_id,all);
+	shared tempslimdedup := dedup(tempmainids,event_id,property_id,all) : independent;
 	
 	shared tempassessments := join(
-		distribute(unlinked_data.As_Property_Master_Assessment,hash64(event_id)),
+		dedup(distribute(unlinked_data.As_Property_Master_Assessment,hash64(event_id)),record,all,local),
 		distribute(tempslimdedup,hash64(event_id)),
 		left.event_id = right.event_id,
 		transform(Layout_Property.Assessment.Linked,
@@ -462,16 +510,16 @@ export Function_Link_Masters(
 		local);
 		
 	shared tempdeeds := join(
-		distribute(unlinked_data.As_Property_Master_Deed,hash64(event_id)),
+		dedup(distribute(unlinked_data.As_Property_Master_Deed,hash64(event_id)),record,all,local),
 		distribute(tempslimdedup,hash64(event_id)),
 		left.event_id = right.event_id,
 		transform(Layout_Property.Deed.Linked,
 			self.property_id := right.property_id,
 			self := left),
-		local);
+		local) : independent;
 	
 	shared tempforeclosures := join(
-		distribute(unlinked_data.As_Property_Master_Foreclosure,hash64(foreclosure_event_id)),
+		dedup(distribute(unlinked_data.As_Property_Master_Foreclosure,hash64(foreclosure_event_id)),record,all,local),
 		distribute(tempslimdedup,hash64(event_id)),
 		left.foreclosure_event_id = right.event_id,
 		transform(Layout_Property.Foreclosure.Linked,
@@ -481,7 +529,7 @@ export Function_Link_Masters(
 		local);
 	
 	tempparties := join(
-		distribute(unlinked_data.As_Property_Master_Party,hash64(event_id)),
+		dedup(distribute(unlinked_data.As_Property_Master_Party,hash64(event_id)),record,all,local),
 		distribute(tempslimdedup,hash64(event_id)),
 		left.event_id = right.event_id,
 		transform({recordof(unlinked_data.As_Property_Master_Party);tempslimdedup.property_id;},
@@ -509,7 +557,8 @@ export Function_Link_Masters(
 		transform(Layout_Property.Party.Linked,
 			self.bid := right.bid,
 			self := left),
-		local);
+		left outer,
+		local) : independent;
 	
 	sorted_deeds := sort(tempdeeds,property_id,-if(contract_date != '',contract_date,recording_date),record);
 	most_recent_deeds := dedup(sorted_deeds,property_id);
@@ -528,7 +577,7 @@ export Function_Link_Masters(
 			self.bid := right.bid,
 			self := left),
 		left outer,
-		local);
+		local) : independent;
 	
 	parties_on_foreclosures := join(
 		distribute(tempforeclosures,hash64(foreclosure_event_id)),
@@ -570,7 +619,7 @@ export Function_Link_Masters(
 		left.deed_event_id = '' and
 		left.property_id = right.property_id and
 		(unsigned4)if(left.recordingdate != '',left.recordingdate,left.auction_date) > (unsigned4)if(right.contract_date != '',right.contract_date,right.recording_date),
-		transform({Layout_Property.Foreclosure.Linked;add_current_flag.owner_date;},
+		transform({Layout_Property.Foreclosure.Linked;unsigned4 owner_date;},
 			self.deed_event_id := if(left.deed_event_id != '',left.deed_event_id,right.event_id),
 			self.owner_date := (unsigned4)if(right.contract_date != '',right.contract_date,right.recording_date),
 			self := left),
@@ -619,9 +668,8 @@ export Function_Link_Masters(
 			tempdeduplinking,
 			left.source_1 = right.source and
 			left.source_docid_1 = right.source_docid and
-			(left.source_party_1 = '' or left.source_party_1 = right.source_party),
+			left.source_party_1 = right.source_party,
 			transform(Layout_Relationship.Linked,
-				self.source_party_1 := right.source_party,
 				self.bid_1 := right.bid,
 				self.bid_2 := 0,
 				self := left),
@@ -632,9 +680,8 @@ export Function_Link_Masters(
 			tempdeduplinking,
 			left.source_2 = right.source and
 			left.source_docid_2 = right.source_docid and
-			(left.source_party_2 = '' or left.source_party_2 = right.source_party),
+			left.source_party_2 = right.source_party,
 			transform(Layout_Relationship.Linked,
-				self.source_party_2 := right.source_party,
 				self.bid_2 := right.bid,
 				self := left),
 			local);

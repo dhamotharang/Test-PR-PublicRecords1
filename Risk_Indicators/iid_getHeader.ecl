@@ -1,4 +1,4 @@
-﻿import risk_indicators, doxie, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address;
+import risk_indicators, doxie, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address;
 
 export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
 							boolean isFCRA=false, boolean ln_branded, 

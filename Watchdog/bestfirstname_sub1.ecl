@@ -4,10 +4,10 @@ If the second most frequent is the 'preferredfirst' of the most frequent, pick i
 If not, pick the most frequent only if it is 1.5x as frequent as the next.
 If not, don't pick any -- we don't have a 'best' fname*/
 
-import header,mdr;
+import header,mdr,NID;
 
-f := file_header_filtered;
-
+f_ := file_header_filtered;
+watchdog.Mac_Exclude_as_Best(f_, f, 'fname');
 rfields := record
 unsigned6    did;
 qstring20    fname;
@@ -47,10 +47,10 @@ two_DID := dedup(group_sort,did,keep 2,local);
 //If fname count is 1.5x greater than the next, it is 'best'
 rfields fname_join(rfields le, rfields rt) := transform
 self.fname := MAP(length(trim(le.fname)) = 1 and le.fname[1] = rt.fname[1] => rt.fname,
-				  length(trim(rt.fname)) = 1 and le.fname[1] = rt.fname[1] => le.fname,
-				  datalib.preferredfirst(le.fname) = rt.fname => rt.fname,
-				  datalib.preferredfirst(rt.fname) = le.fname => le.fname,
-				  le.fname_count < 1.5*rt.fname_count => '',le.fname);
+				          length(trim(rt.fname)) = 1 and le.fname[1] = rt.fname[1] => le.fname,
+				          NID.PreferredFirstVersionedStr(le.fname, NID.version) = rt.fname => rt.fname,
+				          NID.PreferredFirstVersionedStr(rt.fname, NID.version) = le.fname => le.fname,
+				          le.fname_count < 1.5*rt.fname_count => '',le.fname);
 self := le;
 end;
 

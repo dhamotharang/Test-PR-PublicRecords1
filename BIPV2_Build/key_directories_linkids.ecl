@@ -36,7 +36,7 @@ module
 
   end;
  
-  shared concat_them       := fmakecommon(ds_contacts      ,ds_industry      );
+  export concat_them       := fmakecommon(ds_contacts      ,ds_industry      );
   shared concat_thembuilt  := fmakecommon(ds_contactsbuilt ,ds_industrybuilt );
   
   shared superfile_name := keynames().directories_linkids.QA;//vern can you create so that it's consistent with other business header keys?

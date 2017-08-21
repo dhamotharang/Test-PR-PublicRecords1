@@ -1,7 +1,7 @@
 import header,ut,did_add,mdr;
 // count dates, sort dates desc, and pick the greater count (or most recent if equals) of the two most recent dates.
 // opted to not just get the highest count b/c an old build may have an unusualy high count
-t:=sort(table(header.file_headers((integer)dt_last_seen[5..]>0,dt_last_seen>0,src in mdr.sourceTools.set_scoring_FCRA),{dt_last_seen,cnt:=count(group)},dt_last_seen,few),-dt_last_seen);
+t:=sort(table(header.file_headers(dt_last_seen>0,src in mdr.sourceTools.set_scoring_FCRA),{dt_last_seen,cnt:=count(group)},dt_last_seen,few),-dt_last_seen)(cnt>10000);
 max_date:=if(t[1].cnt >= t[2].cnt, t[1].dt_last_seen, t[2].dt_last_seen);
 
 dMax:=dataset([{max_date}],{unsigned3 max_date_last_seen});

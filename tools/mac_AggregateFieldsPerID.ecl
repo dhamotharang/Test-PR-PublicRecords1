@@ -13,13 +13,14 @@
 */
 EXPORT mac_AggregateFieldsPerID(
 
-	 pDataset								// Passed in Dataset
-	,pIdField								// Aggregate fields within this ID field
+	 pDataset								      // Passed in Dataset
+	,pIdField								      // Aggregate fields within this ID field
 	,pSetFields		      = '[]'		// Fields to Aggregate.  By default it will do all of them.
   ,pShouldSort        = 'true'  // Should sort dataset by descending number of unique values in all fields?
 	,pOutputEcl		      = 'false'	// Should output the ecl as a string(for testing) or actually run the ecl
 	,pRemoveCntFields		= 'false'	// Should Remove the cnt fields on the child datasets?
 	,pFew		            = 'false'	// Are the results going to be very few rows?(helps with optimization of the tables)
+	,pLimitChildDatasts = '0'	    // Limit on number of records in child datasets.  Default is zero which means unlimited.  anything else will do a choosen per dataset.
 
 ) :=
 functionmacro
@@ -38,6 +39,7 @@ functionmacro
 	#uniquename(dtable					)
 	#uniquename(dtableField			)
 	#uniquename(layrollup				)
+	#uniquename(layrollup2				)
 	#uniquename(dPrep						)
 	#uniquename(dPrepField			)
 	#uniquename(dmerge					)
@@ -97,12 +99,13 @@ functionmacro
     #SET(dtable			,'dtable 							:= table(' + #TEXT(pDataset) + ',{' + #TEXT(pIdField) + '	' + %'tablecnt'% + '},' + #TEXT(pIdField) + ',few);\n')
   #END
 	#SET(layrollup	,'layrollup := {' + #TEXT(pDataset) + '.' + #TEXT(pIdField) + %'laycnt'% + '\n')
+  #SET(layrollup2 ,'')
 	#SET(dPrep			,'dPrep						  	:= sort(distribute(project(dtable 							,transform(layrollup' + %'dprepselfcnt'% + ',self := left,self := [];)),hash64(' + #TEXT(pIdField) + ')),' + #TEXT(pIdField) + ',-cnt')
 	#SET(dmerge		,'dmerge := Merge(\n\tdPrep\n')
 	#SET(drollupsort,'drollup := group(rollup(dmerge,left.' + #TEXT(pIdField) + ' = right.' + #TEXT(pIdField) + '\n')
 	#SET(drolluptrans,',transform(recordof(left)\n')
 
-	#SET(dsort			,'dsort := sort(drollup	,-(count(')
+	#SET(dsort			,'dsort := sort(drollup	,-(')
 	#SET(sortfields	,'')
 	
 	#LOOP
@@ -114,20 +117,31 @@ functionmacro
 		#SET(lfields	,%lsetFields%[%lcounter%] + 's')
 
 		#IF(%lcounter% = 1)
-			#APPEND(dsort, %'lfields'% + ')')
+			#APPEND(dsort, 'count_' + %'lfields'% + '')
 		#ELSE
-			#APPEND(dsort, '+ count(' + %'lfields'% + ')')
+			#APPEND(dsort, '+ count_' + %'lfields'% + '')
 		#END
 		
 		#SET(dtableField	,'dtable' + %'lfields'%)
 		#SET(dPrepField		,'dPrep' 	+ %'lfields'%)
 
     #IF(pFew = false)
-      #APPEND(dtable		,%'dtableField'% + ' := table(' + #TEXT(pDataset) + '(' + %'lfield'% + '	!= (typeof(' + %'lfield'% + '))\'\'),{' + #TEXT(pIdField) + '	,' + %'lfield'% + '	' + %'tablecnt'% + '},' + #TEXT(pIdField) + ',' + %'lfield'% + ',merge);\n')
+      // #APPEND(dtable		,%'dtableField'% + ' := project(group(sort(table(' + #TEXT(pDataset) + '(' + %'lfield'% + '	!= (typeof(' + %'lfield'% + '))\'\'),{' + #TEXT(pIdField) + '	,' + %'lfield'% + '	' + %'tablecnt'% + '},' + #TEXT(pIdField) + ',' + %'lfield'% + ',merge),' + #TEXT(pIdField) + %'dpreptotalcnt'% + '),' + #TEXT(pIdField) + '),transform({recordof(left),unsigned sortcnt},self := left,self.sortcnt := counter))(sortcnt <= ' + #TEXT(pLimitChildDatasts) + ');\n')
+      #APPEND(dtable		,%'dtableField'% + '_raw := project(group(sort(table(' + #TEXT(pDataset) + '(' + %'lfield'% + '	!= (typeof(' + %'lfield'% + '))\'\'),{' + #TEXT(pIdField) + '	,' + %'lfield'% + '	' + %'tablecnt'% + '},' + #TEXT(pIdField) + ',' + %'lfield'% + ',merge),' + #TEXT(pIdField) + %'dpreptotalcnt'% + '),' + #TEXT(pIdField) + '),transform({recordof(left),unsigned sortcnt},self := left,self.sortcnt := counter));\n')
+      #APPEND(dtable		,%'dtableField'% + '_max := table(group(' + %'dtableField'% + '_raw) ,{' + #TEXT(pIdField) + ',unsigned8 max_cnt := count(group)} ,' + #TEXT(pIdField) + ' ,merge);\n')
+      #APPEND(dtable		,%'dtableField'% + ':= join(group(' + %'dtableField'% + '_raw) ,' + %'dtableField'% + '_max ,left.' + #TEXT(pIdField) + ' = right.' + #TEXT(pIdField) + '  ,transform({recordof(left),unsigned8 count_' + %'lfields'% + '}\n')
+      #APPEND(dtable		,'  ,self.count_' + %'lfields'% + ' := right.max_cnt,self := left),hash)\n')      
+      #IF(pLimitChildDatasts > 0)
+        #APPEND(dtable		,'(sortcnt <= ' + #TEXT(pLimitChildDatasts) + ');\n')
+      #ELSE
+        #APPEND(dtable		,';\n')
+      #END
+
     #ELSE
       #APPEND(dtable		,%'dtableField'% + ' := table(' + #TEXT(pDataset) + '(' + %'lfield'% + '	!= (typeof(' + %'lfield'% + '))\'\'),{' + #TEXT(pIdField) + '	,' + %'lfield'% + '	' + %'tablecnt'% + '},' + #TEXT(pIdField) + ',' + %'lfield'% + ',few);\n')
     #END
 		#APPEND(layrollup	,', dataset({typeof(' + #TEXT(pDataset) + '.' + %'lfield'% + ') ' + %'lfield'% + %'laycnt'% + '}) ' + %'lfields'% + '\n')
+    #APPEND(layrollup2  ,' ,unsigned8 count_' + %'lfields'%)
 		#APPEND(dPrep			,%'dPrepField'% + ' := sort(distribute(project(' + %'dtableField'% + '	,transform(layrollup,self.' + %'lfields'% + ' := dataset([{left.' + %'lfield'% + %'childdatasetcntfield'% + '}],{typeof(' + #TEXT(pDataset) + '.' + %'lfield'% + ') ' + %'lfield'% + %'laycnt'% + '}),self := left,self := [];)),hash64(' + #TEXT(pIdField) + ')),' + #TEXT(pIdField) + ',-cnt')
 		#APPEND(dmerge		,', ' + %'dPrepField'% + '\n')
     #IF(pRemoveCntFields = true)
@@ -137,11 +151,12 @@ functionmacro
     #END
     
 		#APPEND(drolluptrans,',self.' + %'lfields'% + ' 	:= left.' + %'lfields'% + ' + right.' + %'lfields'% + '\n')
-		
+		#APPEND(drolluptrans,',self.count_' + %'lfields'% + ' 	:= max(left.count_' + %'lfields'% + ' ,right.count_' + %'lfields'% + ')\n')
+
 		#SET(lcounter	,%lcounter% + 1)		
 	#END
 
-	#APPEND(layrollup	,'};\n')
+	#APPEND(layrollup	,%'layrollup2'% + '};\n')
 	#APPEND(dmerge	,',sorted(' + #TEXT(pIdField) + %'dpreptotalcnt'% + %'sortfields'% + '),local);\n')
 	#APPEND(sortfields	,',local)')
 //	#APPEND(drollupsort	,%'sortfields'% + ',true\n')

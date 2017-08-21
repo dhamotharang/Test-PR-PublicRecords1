@@ -462,7 +462,7 @@ export ToEdina_53( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.DIDdeceased := le.iid.diddeceased;
 	self.DIDdeceasedDate := le.iid.DIDdeceasedDate;
 	self.bjl.liens := le.liens;
-	self.bjl.lnj_attributes := le.lnj_attributes;  // JuLi attributes, new for 5.2
+	// self.bjl.lnj_attributes := le.lnj_attributes;  // JuLi attributes, new for 5.2
 		
 	// best_flags in internal_shell was broken into different sections in edina layout, map those all manually
 	self.best_pii_flags := le.best_flags;
@@ -484,43 +484,43 @@ export ToEdina_53( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.corr_risk_summary.corrssnname_sources := le.header_summary.corrssnname_sources;
 	self.corr_risk_summary.corrssnname_firstseen := le.header_summary.corrssnname_firstseen;
 	self.corr_risk_summary.corrssnname_lastseen := le.header_summary.corrssnname_lastseen;
-	self.corr_risk_summary.corrssnname_source_cnt := le.header_summary.corrssnname_source_cnt;
+	// self.corr_risk_summary.corrssnname_source_cnt := le.header_summary.corrssnname_source_cnt;
 	self.corr_risk_summary.corrssnaddr_sources := le.header_summary.corrssnaddr_sources;
 	self.corr_risk_summary.corrssnaddr_firstseen := le.header_summary.corrssnaddr_firstseen;
 	self.corr_risk_summary.corrssnaddr_lastseen := le.header_summary.corrssnaddr_lastseen;
-	self.corr_risk_summary.corrssnaddr_source_cnt := le.header_summary.corrssnaddr_source_cnt;
+	// self.corr_risk_summary.corrssnaddr_source_cnt := le.header_summary.corrssnaddr_source_cnt;
 	self.corr_risk_summary.corraddrname_sources := le.header_summary.corraddrname_sources;
 	self.corr_risk_summary.corraddrname_firstseen := le.header_summary.corraddrname_firstseen;
 	self.corr_risk_summary.corraddrname_lastseen := le.header_summary.corraddrname_lastseen;
-	self.corr_risk_summary.corraddrname_source_cnt := le.header_summary.corraddrname_source_cnt;
+	// self.corr_risk_summary.corraddrname_source_cnt := le.header_summary.corraddrname_source_cnt;
 	self.corr_risk_summary.corraddrphone_sources := le.header_summary.corraddrphone_sources;
 	self.corr_risk_summary.corraddrphone_firstseen := le.header_summary.corraddrphone_firstseen;
 	self.corr_risk_summary.corraddrphone_lastseen := le.header_summary.corraddrphone_lastseen;
-	self.corr_risk_summary.corraddrphone_source_cnt := le.header_summary.corraddrphone_source_cnt;
+	// self.corr_risk_summary.corraddrphone_source_cnt := le.header_summary.corraddrphone_source_cnt;
 	self.corr_risk_summary.corrphonelastname_sources := le.header_summary.corrphonelastname_sources;
 	self.corr_risk_summary.corrphonelastname_firstseen := le.header_summary.corrphonelastname_firstseen;
 	self.corr_risk_summary.corrphonelastname_lastseen := le.header_summary.corrphonelastname_lastseen;
-	self.corr_risk_summary.corrphonelastname_source_cnt := le.header_summary.corrphonelastname_source_cnt;
+	// self.corr_risk_summary.corrphonelastname_source_cnt := le.header_summary.corrphonelastname_source_cnt;
 	self.corr_risk_summary.corrnamedob_sources := le.header_summary.corrnamedob_sources;
 	self.corr_risk_summary.corrnamedob_firstseen := le.header_summary.corrnamedob_firstseen;
 	self.corr_risk_summary.corrnamedob_lastseen := le.header_summary.corrnamedob_lastseen;
-	self.corr_risk_summary.corrnamedob_source_cnt := le.header_summary.corrnamedob_source_cnt;
+	// self.corr_risk_summary.corrnamedob_source_cnt := le.header_summary.corrnamedob_source_cnt;
 	self.corr_risk_summary.corraddrdob_sources := le.header_summary.corraddrdob_sources;
 	self.corr_risk_summary.corraddrdob_firstseen := le.header_summary.corraddrdob_firstseen;
 	self.corr_risk_summary.corraddrdob_lastseen := le.header_summary.corraddrdob_lastseen;
-	self.corr_risk_summary.corraddrdob_source_cnt := le.header_summary.corraddrdob_source_cnt;
+	// self.corr_risk_summary.corraddrdob_source_cnt := le.header_summary.corraddrdob_source_cnt;
 	self.corr_risk_summary.corrssndob_sources := le.header_summary.corrssndob_sources;
 	self.corr_risk_summary.corrssndob_firstseen := le.header_summary.corrssndob_firstseen;
 	self.corr_risk_summary.corrssndob_lastseen := le.header_summary.corrssndob_lastseen;
-	self.corr_risk_summary.corrssndob_source_cnt := le.header_summary.corrssndob_source_cnt;
+	// self.corr_risk_summary.corrssndob_source_cnt := le.header_summary.corrssndob_source_cnt;
 	self.corr_risk_summary.corrssnphone_sources := le.header_summary.corrssnphone_sources;
 	self.corr_risk_summary.corrssnphone_firstseen := le.header_summary.corrssnphone_firstseen;
 	self.corr_risk_summary.corrssnphone_lastseen := le.header_summary.corrssnphone_lastseen;
-	self.corr_risk_summary.corrssnphone_source_cnt := le.header_summary.corrssnphone_source_cnt;
+	// self.corr_risk_summary.corrssnphone_source_cnt := le.header_summary.corrssnphone_source_cnt;
 	self.corr_risk_summary.corrdobphone_sources := le.header_summary.corrdobphone_sources;
 	self.corr_risk_summary.corrdobphone_firstseen := le.header_summary.corrdobphone_firstseen;
 	self.corr_risk_summary.corrdobphone_lastseen := le.header_summary.corrdobphone_lastseen;
-	self.corr_risk_summary.corrdobphone_source_cnt := le.header_summary.corrdobphone_source_cnt;
+	// self.corr_risk_summary.corrdobphone_source_cnt := le.header_summary.corrdobphone_source_cnt;
 	
 	//new credit derived performance fields for BS 5.3 (offset history date counters)
 	self.credit_derived_perf.acc_logs_collection_count12_6mos				:= le.acc_logs.collection.count12_6mos;
@@ -547,7 +547,7 @@ export ToEdina_53( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.credit_derived_perf.archive_date_6mo												:= le.archive_date_6mo;	
 	self.credit_derived_perf.archive_date_12mo											:= le.archive_date_12mo;	
 	self.credit_derived_perf.archive_date_24mo											:= le.archive_date_24mo;
-
+/* Exclude these from the Edina shell until they are approved for production
 	//new Inquiry PII corroboration counters for BS 5.3
 	self.inq_PII_corroboration.inq_corrnameaddrcount			:= le.acc_logs.inq_corrnameaddrcount;
 	self.inq_PII_corroboration.inq_corrnameaddrcount_adl	:= le.acc_logs.inq_corrnameaddrcount_adl;
@@ -573,7 +573,8 @@ export ToEdina_53( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.inq_PII_corroboration.inq_corrnamephonessn_adl		:= le.acc_logs.inq_corrnamephonessn_adl;
 	self.inq_PII_corroboration.inq_corrnameaddrssnphn			:= le.acc_logs.inq_corrnameaddrssnphn;
 	self.inq_PII_corroboration.inq_corrnameaddrssnphn_adl	:= le.acc_logs.inq_corrnameaddrssnphn_adl;
-
+*/
+/* Exclude these from the Edina layout until they are approved for production
 	//new Inquiry PII tumblings counters for BS 5.3
 	self.inq_PII_tumblings.inq_ssnsperadl_1subs						:= le.acc_logs.inq_ssnsperadl_1subs;
 	self.inq_PII_tumblings.inq_phnsperadl_1subs						:= le.acc_logs.inq_phnsperadl_1subs;
@@ -591,7 +592,7 @@ export ToEdina_53( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.inq_PII_tumblings.inq_primrangesperssn_1dig			:= le.acc_logs.inq_primrangesperssn_1dig;
 	self.inq_PII_tumblings.inq_dobsperssn_1dig						:= le.acc_logs.inq_dobsperssn_1dig;
 	self.inq_PII_tumblings.inq_ssnsperaddr_1dig						:= le.acc_logs.inq_ssnsperaddr_1dig;
-
+*/
 	self := le;
 	end;
 

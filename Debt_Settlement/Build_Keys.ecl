@@ -1,16 +1,20 @@
-import doxie, Tools;
+import doxie, Tools, versioncontrol;
 
 export Build_Keys(string pversion) :=
 module
 
 	tools.mac_WriteIndex('Keys(pversion).Bdid.New'	,BuildBdidKey	);
 	//tools.mac_WriteIndex('Keys(pversion).Did.New'		,BuildDidKey	);
+	VersionControl.macBuildNewLogicalKeyWithName(	Key_LinkIds.Key
+																						   ,Keynames(pversion).LinkIds.New
+																							 ,BuildLinkIdsKey);
 																		  
 	export full_build :=
 	sequential(
 		 parallel(
 			 BuildBdidKey
-			//,BuildDidKey
+			 //,BuildDidKey
+			 ,BuildLinkIdsKey
 		 )
 		,Promote(pversion).BuildFiles.New2Built
 	);

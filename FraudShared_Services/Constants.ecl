@@ -2,6 +2,11 @@ IMPORT Suppress;
 
 EXPORT Constants := MODULE
 
+	EXPORT Platform := MODULE
+		EXPORT FDN := 'FDN';
+		EXPORT FraudGov	:= 'FraudGov';
+	END;
+
   // Possible values for all the new fdn_***_ind fields being set in the 
   // 2 doxie.Header*SearchService and the 2 PersonSearch_Services.Person*Service queries
   // and in doxie.Comprehensive_Report_Service query.

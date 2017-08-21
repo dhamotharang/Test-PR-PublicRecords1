@@ -19,6 +19,8 @@ super6:=if(filedate<>'',if(fileservices.superfileexists(f6),FileServices.ClearSu
   roxiekeybuild.MAC_SK_BuildProcess_v2_Local(key_pullSSN_LE, '~thor_data400::key::pullSSN_LE', '~thor_data400::key::pullSSN_LE::'+filedate+'::ssn', a, true);
   roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::pullSSN_LE', '~thor_data400::key::pullSSN_LE::'+filedate+'::ssn', b, true);
   ut.MAC_SK_Move_v2('~thor_data400::key::pullSSN_LE', 'Q', c);
+  
+  update_dops := roxiekeybuild.updateversion('PullSSNLEKeys',filedate,'christopher.brodeur@lexisnexis.com');
 
-return sequential(parallel(super1,super2,super3,super4,super5,super6),a,b,c);
+return sequential(parallel(super1,super2,super3,super4,super5,super6),a,b,c,update_dops);
 end;

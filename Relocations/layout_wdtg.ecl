@@ -1,9 +1,9 @@
-import Gong;
+import Gong_Neustar;
 
 export layout_wdtg := module
 
 	// inherit types from current system
-	shared base := Gong.key_history_zip_name;
+	shared base := Gong_Neustar.key_history_zip_name;
 	
 	// subset of base data needed for wdtg-specific keys
 	export narrow := record

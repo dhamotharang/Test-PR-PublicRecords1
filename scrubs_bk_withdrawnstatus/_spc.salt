@@ -1,0 +1,81 @@
+OPTIONS:-gh
+MODULE:scrubs_bk_withdrawnstatus
+FILENAME:bk_withdrawnstatus
+
+// Uncomment up to NINES for internal or external adl
+// IDFIELD:EXISTS:<NameOfIDField>
+// RIDFIELD:<NameOfRidField>
+// RECORDS:<NumberOfRecordsInDataFile>
+// POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+// NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+// Uncomment Process if doing external adl
+// PROCESS:<ProcessName>
+// FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+// BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+// FUZZY can be used to create new types of FUZZY linking
+// Remember to generate specificities and update the 0,0 placeholders below before running any sort of linking.
+// If the actual specificity for a field is <1, round it up to 1 rather than down to 0.  If your cluster is running
+// a shared repository, calling SALTTOOLS30.mac_Patch_SPC from the bottom of BWR_Specificities may be a convenience.
+FIELDTYPE:logid:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(8,7,6,5,4,3,2,1):WORDS(1):ONFAIL(IGNORE)
+FIELDTYPE:logdate:SPACES( ):ALLOW( ./0123456789:):LEFTTRIM:LENGTHS(22):WORDS(2):ONFAIL(IGNORE)
+FIELDTYPE:caseid:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(8,7,6,5,4,3,2,1):WORDS(1):ONFAIL(IGNORE)
+FIELDTYPE:defendantid:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(8,7,6,5,4,3,2,1):WORDS(1):ONFAIL(IGNORE)
+FIELDTYPE:currentchapter:SPACES( ):ALLOW(1237):LEFTTRIM:LENGTHS(0,1,2):WORDS(0,1):ONFAIL(IGNORE)
+FIELDTYPE:previouschapter:SPACES( ):ALLOW(1237):LEFTTRIM:LENGTHS(0,2,1):WORDS(0,1):ONFAIL(IGNORE)
+FIELDTYPE:conversionid:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(0,7,6,5,4,3,2,1):WORDS(0,1):ONFAIL(IGNORE)
+FIELDTYPE:convertdate:SPACES( ):ALLOW( ./0123456789:):LEFTTRIM:LENGTHS(0,22):WORDS(0,2):ONFAIL(IGNORE)
+FIELDTYPE:currentdisposition:SPACES( ):ALLOW(ACDEFGHILMNOPRSTU_):LEFTTRIM:LENGTHS(4,6,10,9,12,14,16):WORDS(1):ONFAIL(IGNORE)
+FIELDTYPE:dcode:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(2,1):WORDS(1):ONFAIL(IGNORE)
+FIELDTYPE:currentdispositiondate:SPACES( ):ALLOW( ./0123456789:):LEFTTRIM:LENGTHS(22,0):WORDS(2,0):ONFAIL(IGNORE)
+FIELDTYPE:intseed:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(8,7,6,5,4,3,2,1,0):WORDS(0,1):ONFAIL(IGNORE)
+FIELDTYPE:pid:SPACES( ):ALLOW(-0123456789abcdef):LEFTTRIM:LENGTHS(36):WORDS(1):ONFAIL(IGNORE)
+FIELDTYPE:tmsid:SPACES( ):ALLOW(0123456789ABCDEFGHIJKLMNOPRSTUVWXYZ):LEFTTRIM:LENGTHS(12,13,14,15):WORDS(1):ONFAIL(IGNORE)
+FIELDTYPE:vacateid:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(0,6,5,4,3,2,1):WORDS(0,1):ONFAIL(IGNORE)
+FIELDTYPE:vacatedate:SPACES( ):ALLOW( ./0123456789:):LEFTTRIM:LENGTHS(0,22):WORDS(0,2):ONFAIL(IGNORE)
+FIELDTYPE:vacateddisposition:SPACES( ):ALLOW(ACDEFGHILMNOPRSTU_):LEFTTRIM:LENGTHS(0,6,9,12,14,10,16):WORDS(0,1):ONFAIL(IGNORE)
+FIELDTYPE:vacateddispositiondate:SPACES( ):ALLOW( ./0123456789:):LEFTTRIM:LENGTHS(0,22):WORDS(0,2):ONFAIL(IGNORE)
+FIELDTYPE:withdrawnid:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(0,2,1):WORDS(0,1):ONFAIL(IGNORE)
+FIELDTYPE:originalwithdrawndate:SPACES( ):ALLOW( ./0123456789:):LEFTTRIM:LENGTHS(0,22):WORDS(0,2):ONFAIL(IGNORE)
+FIELDTYPE:withdrawndate:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(0,8):WORDS(0,1):ONFAIL(IGNORE)
+FIELDTYPE:withdrawndisposition:SPACES( ):ALLOW(DEIMS):LEFTTRIM:LENGTHS(0,9):WORDS(0,1):ONFAIL(IGNORE)
+FIELDTYPE:withdrawndispositiondate:SPACES( ):ALLOW(0123456789):LEFTTRIM:LENGTHS(0,8):WORDS(0,1):ONFAIL(IGNORE)
+FIELDTYPE:originalwithdrawndispositiondate:SPACES( ):ALLOW( ./0123456789:):LEFTTRIM:LENGTHS(0,22):WORDS(0,2):ONFAIL(IGNORE)
+FIELDTYPE:filedinerror:SPACES( ):ALLOW(FalseTrue):LEFTTRIM:LENGTHS(4,5):WORDS(1):ONFAIL(IGNORE)
+FIELDTYPE:reopendate:SPACES( ):ALLOW():LEFTTRIM:LENGTHS(0):WORDS(0):ONFAIL(IGNORE)
+FIELDTYPE:lastupdateddate:SPACES( ):ALLOW( ./0123456789:):LEFTTRIM:LENGTHS(22):WORDS(2):ONFAIL(IGNORE)
+FIELDTYPE:iscurrent:SPACES( ):ALLOW(1):LEFTTRIM:LENGTHS(1):WORDS(1):ONFAIL(IGNORE)
+FIELDTYPE:__filename:SPACES( ):ALLOW(0123456789:_abcdhiknoprstuvwy):LEFTTRIM:LENGTHS(57,58,59,60):WORDS(1):ONFAIL(IGNORE)
+
+FIELD:logid:LIKE(logid):TYPE(INTEGER8):0,0
+FIELD:logdate:LIKE(logdate):TYPE(STRING22):0,0
+FIELD:caseid:LIKE(caseid):TYPE(STRING12):0,0
+FIELD:defendantid:LIKE(defendantid):TYPE(STRING12):0,0
+FIELD:currentchapter:LIKE(currentchapter):TYPE(STRING3):0,0
+FIELD:previouschapter:LIKE(previouschapter):TYPE(STRING3):0,0
+FIELD:conversionid:LIKE(conversionid):TYPE(STRING10):0,0
+FIELD:convertdate:LIKE(convertdate):TYPE(STRING22):0,0
+FIELD:currentdisposition:LIKE(currentdisposition):TYPE(STRING50):0,0
+FIELD:dcode:LIKE(dcode):TYPE(STRING2):0,0
+FIELD:currentdispositiondate:LIKE(currentdispositiondate):TYPE(STRING22):0,0
+FIELD:intseed:LIKE(intseed):TYPE(STRING12):0,0
+FIELD:pid:LIKE(pid):TYPE(STRING70):0,0
+FIELD:tmsid:LIKE(tmsid):TYPE(STRING50):0,0
+FIELD:vacateid:LIKE(vacateid):TYPE(STRING10):0,0
+FIELD:vacatedate:LIKE(vacatedate):TYPE(STRING22):0,0
+FIELD:vacateddisposition:LIKE(vacateddisposition):TYPE(STRING50):0,0
+FIELD:vacateddispositiondate:LIKE(vacateddispositiondate):TYPE(STRING22):0,0
+FIELD:withdrawnid:LIKE(withdrawnid):TYPE(STRING10):0,0
+FIELD:originalwithdrawndate:LIKE(originalwithdrawndate):TYPE(STRING22):0,0
+FIELD:withdrawndate:LIKE(withdrawndate):TYPE(STRING8):0,0
+FIELD:withdrawndisposition:LIKE(withdrawndisposition):TYPE(STRING35):0,0
+FIELD:withdrawndispositiondate:LIKE(withdrawndispositiondate):TYPE(STRING8):0,0
+FIELD:originalwithdrawndispositiondate:LIKE(originalwithdrawndispositiondate):TYPE(STRING22):0,0
+FIELD:filedinerror:LIKE(filedinerror):TYPE(STRING5):0,0
+FIELD:reopendate:LIKE(reopendate):TYPE(STRING22):0,0
+FIELD:lastupdateddate:LIKE(lastupdateddate):TYPE(STRING22):0,0
+FIELD:iscurrent:LIKE(iscurrent):TYPE(BOOLEAN1):0,0
+FIELD:__filename:LIKE(__filename):TYPE(STRING):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

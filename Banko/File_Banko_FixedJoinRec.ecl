@@ -10,13 +10,13 @@
 
 export File_Banko_FixedJoinRec(boolean isFCRA = false) := function
 	prefix :=  if(isFCRA, 
-						DATASET('~thor_data400::banko::fcra::filter::qa::additionalevents',
+						DATASET('~thor::banko::fcra::filter::qa::additionalevents',
 										{BankoJoinRecord,
 											UNSIGNED8 RecPos{virtual(fileposition)}}
-										,FLAT), 
-						DATASET('~thor_data400::banko::filter::qa::additionalevents',
+										,FLAT,__COMPRESSED__), 
+						DATASET('~thor::banko::filter::qa::additionalevents',
 										{BankoJoinRecord,
 											UNSIGNED8 RecPos{virtual(fileposition)}}
-										,FLAT));
+										,FLAT,__COMPRESSED__));
 	return prefix;
 end;

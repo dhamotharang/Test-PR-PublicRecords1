@@ -22,12 +22,10 @@ all_personheaderkeys := DATASET([
 ,{'~thor_data400::key::voters_src_index_qa','~thor_data400::key::header::'+new_date+'::voters_src'}
 ,{'~thor_data400::key::water_src_index_qa','~thor_data400::key::header::'+new_date+'::water_src'}
 ,{'~thor_data400::key::asl_src_index_qa','~thor_data400::key::header::'+new_date+'::asl_src'}
-,{'~thor_data400::key::certegy_src_index_qa','~thor_data400::key::header::'+new_date+'::certegy_src'}
-,{'~thor_data400::key::exprnph_src_index_qa','~thor_data400::key::header::'+new_date+'::exprnph_src'}
 
 ], ut.Layout_Superkeynames.inputlayout);
 
-return_this := ut.fLogicalKeyRenaming(all_personheaderkeys, false);
+return_this := nothor(ut.fLogicalKeyRenaming(all_personheaderkeys, false));
 
 return return_this;
 

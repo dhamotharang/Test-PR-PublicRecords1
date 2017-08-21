@@ -47,7 +47,7 @@ end;
 ENDMACRO;
 
 
-SHARED Cands := match_candidates(ih).ForeignCorpkey_candidates;
+SHARED Cands := dataset([],recordof(match_candidates(ih).ForeignCorpkey_candidates));
 SHARED s := Specificities(ih).Specificities[1];
  
 // Generate match candidates based upon this attribute file

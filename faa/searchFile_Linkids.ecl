@@ -12,10 +12,16 @@ ut.MAC_Sequence_Records_NewRec(f,Layout_Searchfile,aircraft_id,outf);
 
 // persistent record id 
 
-outf_dedup:= dedup(sort( project(outf, transform(Layout_Searchfile, self.name:= trim(left.name,left,right), self:= left)), n_number,serial_number, mfr_mdl_code, eng_mfr_mdl, year_mfr,
-type_registrant,name,street,street2,city,state,zip_code,region,orig_county,country,last_action_date,cert_issue_date,certification,
-type_aircraft,type_engine,status_code,mode_s_code,fract_owner,aircraft_mfr_name,model_name,- date_last_seen),except aircraft_id, date_first_seen, date_last_seen,lot) ; 
-
+outf_dedup:= dedup(sort(distribute(project(outf, transform(Layout_Searchfile, self.name:= trim(left.name,left,right), self:= left)), 
+														hash(n_number,serial_number, mfr_mdl_code, eng_mfr_mdl, year_mfr, type_registrant,name,
+																	street,street2,city,state,zip_code,region,orig_county,country,last_action_date,cert_issue_date,certification,
+																	type_aircraft,type_engine,status_code,mode_s_code,fract_owner,aircraft_mfr_name,model_name)),
+											n_number,serial_number, mfr_mdl_code, eng_mfr_mdl, year_mfr, type_registrant,name,
+												street,street2,city,state,zip_code,region,orig_county,country,last_action_date,cert_issue_date,certification,
+												type_aircraft,type_engine,status_code,mode_s_code,fract_owner,aircraft_mfr_name,model_name,- date_last_seen,local),
+												except aircraft_id, date_first_seen, date_last_seen,lot,local) ; 
+												
+												
   Layout_Searchfile_out := RECORD
   unsigned6 aircraft_id;
 	faa.layout_aircraft_registration_out_Persistent_ID;

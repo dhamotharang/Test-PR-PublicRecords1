@@ -1,0 +1,56 @@
+
+// OHS0654 / Ohio Department of Commerce / Multiple Professions //
+//Real Estate and Profession Licensing.csv
+export layout_OHS0654 := MODULE
+	export layout_profession := RECORD
+		STRING50  FIRST_NAME;
+		STRING20  MIDDLE_NAME;
+		STRING50  LAST_NAME;
+		STRING10  SUFFIX;
+		STRING150 FULL_NAME;            //Company Name 
+		STRING50  CREDENTIAL_NUMBER;
+		STRING100 ADDRESS1;
+		STRING100 ADDRESS2;
+		STRING50  CITY;
+		STRING10  STATE;
+		STRING20  ZIP;
+		STRING50  EMAIL;
+		STRING50  CREDENTIAL_TYPE;
+		STRING50  STATUS;	
+		STRING20  FIRST_ISSUANCE_DATE;
+		STRING20  EXPIRATION_DATE;
+		STRING20  CE_DUE_DATE;
+		STRING20	CURR_ISSUANCE_DATE;  //License Issued Date
+		STRING200	COMPLETE_ADDRESS;
+		STRING50  OFF_SLNUM;           //Employer/Supervisor Credential
+		STRING100 OFFICENAME;          //Employer/Supervisor Name
+		STRING200 EMPLOYER_ADDRESS;    //Employer/Supervisor Address
+		STRING100 OFFICENAME_DBA;      //Employer/Supervisor DBA
+		STRING30  EMPLOYER_STATUS; 
+		STRING50  addl1;  //Used for Data Skewing fixing
+		string50  addl2;  //Used for Data Skewing fixing
+    
+	END;
+	
+	//DFI.csv
+	EXPORT layout_mortgage := RECORD
+		STRING150 FULL_NAME;
+		STRING60  DBA1;
+		STRING60  DBA2;
+		STRING60  DBA3;
+		STRING50  CREDENTIAL_NUMBER;
+		STRING50  CREDENTIAL_TYPE;
+		STRING20  FIRST_ISSUANCE_DATE;
+		STRING100 EMAIL;
+		STRING20  PHONE;
+		STRING100 ADDRESS1;
+		STRING100 ADDRESS2;
+		STRING50  CITY;
+		STRING10  STATE;
+		STRING20  ZIP;
+		STRING50  COUNTY;
+		STRING50  OFF_SLNUM;   //Related Credential Number
+		STRING100 OFFICENAME;  //Related Credential Name
+	END;
+
+END;

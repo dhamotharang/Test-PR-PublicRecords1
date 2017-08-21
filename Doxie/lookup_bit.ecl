@@ -92,6 +92,7 @@ export lookup_bit(string10 b) := CASE(b,
 								header.Constants.DidType.NO_SSN			=> 28,
 								header.Constants.DidType.CORE				=> 29,
 
+								header.Constants.current_resident	=> 32,
 
 //**** Default
 									0);

@@ -24,8 +24,8 @@ end;
 
 Mapping_AK_as_Search_temp := normalize(Watercraft.file_AK_clean_in,5,search_mapping_format_temp(left,counter))(clean_pname1<> '' or clean_cname1<> '');
 
-
-watercraft.Macro_Is_hull_id_in_MIC(Mapping_AK_as_Search_temp, Layout_Watercraft_Search_Group_temp, wDatasetwithflag)
+Watercraft.Macro_Clean_Hull_ID(Mapping_AK_as_Search_temp,Layout_Watercraft_Search_Group_temp,hull_clean_in)
+watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, Layout_Watercraft_Search_Group_temp, wDatasetwithflag)
 
 
 Watercraft.Layout_Watercraft_Search_Group search_mapping_format(wDatasetwithflag L, integer1 C)

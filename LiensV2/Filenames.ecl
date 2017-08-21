@@ -1,3 +1,6 @@
+
+import LiensV2_preprocess;
+
 export Filenames(integer cnt = 0) :=
 module
 	//////////////////////////////////////////////////////////////////
@@ -22,6 +25,7 @@ module
     export judmentupdate    := thor_cluster + 'in::liensv2::sup::judment' ;
     export subjdmtupdate    := thor_cluster + 'in::liensv2::sup::subjdmt' ;
     export remarksupdate    := thor_cluster + 'in::liensv2::sup::remarks' ;
+		export hgn := LiensV2_preprocess.root+'hgn';
 	
 /*	shared layout_superfiles := 
 	record

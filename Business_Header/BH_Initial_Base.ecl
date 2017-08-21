@@ -1,24 +1,36 @@
-IMPORT Bankrupt, Gong, ut, UCC, Corporate, YellowPages, Domains;
+IMPORT Bankrupt, Gong, ut, UCC, Corporate, YellowPages, Domains, header, mdr;
 
-file_bh_previous := Business_Header.File_Business_Header_Previous;
+EXPORT BH_Initial_Base(
 
-Business_Header.Layout_Business_Header InitPrevious(file_bh_previous l) := transform
+	 dataset(Layout_Business_Header_Base)	pBusiness_Headers					= Files().Base.Business_Headers.QA
+	,dataset(Layout_Business_Header_New	)	pBH_Init									= BH_Init()
+	,dataset(Layout_Business_Header_New	)	pWhois_As_Business_Header	= Domains.Whois_As_Business_Header
+	,string																pPersistname							= persistnames().BHInitialBase													
+	,boolean															pShouldRecalculatePersist	= true													
+
+) :=
+function
+file_bh_previous := pBusiness_Headers(~header.IsOldUtil(header.Version_build,,,source));
+
+Business_Header.Layout_Business_Header_New InitPrevious(file_bh_previous l) := transform
 SELF.group1_id := 0;
 SELF.vendor_id := IF(L.source not in Set_Source_Vendor_Id_Unique, '', L.vendor_id);
+SELF.phone := if(l.phone >= 10000000000, 0, l.phone);  // Zero the phone if more than 10-digits
 self := l;
 end;
 
-BH_Previous := project(file_bh_previous(Business_Header.BH_Fix_Filter), InitPrevious(left));
+BH_Previous := project(filters.bases.business_headers(file_bh_previous), InitPrevious(left));
 
 // Business Header Combined Sources
-BH_Init_Sources := if(Business_Header.BH_Init_Flag,
-                      Business_Header.BH_Init,
-					  Business_Header.BH_Init + BH_Previous);
+BH_Init_Sources := map(Flags.Building.Initialize	=> 	pBH_Init,
+					   Flags.Building.NoUpdates		=> 	BH_Previous,
+														pBH_Init + BH_Previous
+					);
 
 // Select Matching Domain Records
-Domains_Init := Domains.Whois_As_Business_Header(zip<>0);
+Domains_Init := pWhois_As_Business_Header(zip<>0);
 
-COUNT(Domains_Init);
+//COUNT(Domains_Init);
 
 ut.MAC_Sequence_Records(Domains_Init, rcid, Domains_Seq)
 
@@ -30,7 +42,7 @@ ut.MAC_Remove_Withdups_Local(Domains_Dist, HASH(zip, TRIM(prim_name), TRIM(prim_
 BH_Init_Dedup := DEDUP(BH_Init_Sources(zip<>0), company_name, zip, prim_name, prim_range, sec_range, ALL);
 BH_Init_Dist := DISTRIBUTE(BH_Init_Dedup, HASH(zip, TRIM(prim_name), TRIM(prim_range)));
 
-Business_Header.Layout_Business_Header SelectDomains(Business_Header.Layout_Business_Header L, Business_Header.Layout_Business_Header R) := TRANSFORM
+Business_Header.Layout_Business_Header_New SelectDomains(Business_Header.Layout_Business_Header_New L, Business_Header.Layout_Business_Header_New R) := TRANSFORM
 SELF := L;
 END;
 
@@ -45,19 +57,19 @@ Domains_Match := JOIN(Domains_Dist_Reduced,
                       SelectDomains(LEFT, RIGHT),
                       LOCAL);
 
-COUNT(Domains_Match);
+//COUNT(Domains_Match);
 
 Domains_Match_Dedup := DEDUP(Domains_Match, rcid, ALL);
 
-COUNT(Domains_Match_Dedup);
+//COUNT(Domains_Match_Dedup);
 
 // Append Businesses and Domains
 BH_Append := BH_Init_Sources + Domains_Match_Dedup;
 
-COUNT(BH_Append);
+//COUNT(BH_Append);
 
 // Initialize IDs - Zero the RCID and BDID before initial sequencing
-Business_Header.Layout_Business_Header InitIDs(Business_Header.Layout_Business_Header L) := TRANSFORM
+Business_Header.Layout_Business_Header_New InitIDs(Business_Header.Layout_Business_Header_New L) := TRANSFORM
 SELF.rcid := 0;
 SELF.bdid := 0;
 SELF.fein := if(ValidFEIN(l.fein), l.fein, 0);  // Zero the FEIN if prefix is invalid
@@ -89,7 +101,7 @@ BH_Append_Rollup := ROLLUP(BH_Append_Sort,
                     Business_Header.TRA_Merge_Business_Headers(LEFT, RIGHT),
                     LOCAL);
 
-COUNT(BH_Append_Rollup);
+//COUNT(BH_Append_Rollup);
 
 // Distribute to get event distribution before sequencing
 BH_Append_Rollup_Dist := DISTRIBUTE(BH_Append_Rollup, HASH(TRIM(company_name), zip));
@@ -115,7 +127,7 @@ Layout_BH_Slim := RECORD
 END;
 
 //****** Slim down the business headers
-Layout_BH_Slim SlimBH(Business_Header.Layout_Business_Header L) := TRANSFORM
+Layout_BH_Slim SlimBH(Business_Header.Layout_Business_Header_New L) := TRANSFORM
 SELF := L;
 END;
 
@@ -150,11 +162,20 @@ BH_Match_Sort := SORT(DISTRIBUTE(BH_Match, old_rid), old_rid, new_rid, LOCAL);
 
 BH_RID_Rollup := DEDUP(BH_Match_Sort, old_rid, LOCAL);
 
-COUNT(BH_RID_Rollup);
+//COUNT(BH_RID_Rollup);
 
 ut.MAC_Patch_Id(BH_Seq, rcid, BH_RID_Rollup, old_rid, new_rid, BH_Patched)
 
 // Merge Business Header Records within Source
 Business_Header.MAC_Merge_ByRid(BH_Patched, BH_Merged)
 
-EXPORT BH_Initial_Base := BH_Merged : PERSIST('TEMP::BH_Initial_Base');
+BH_Initial_Base_persist := BH_Merged 
+	: PERSIST(pPersistname);
+
+returndataset := if(pShouldRecalculatePersist = true, BH_Initial_Base_persist
+																										, persists().BHInitialBase
+									);
+									
+return returndataset;
+
+end;

@@ -437,7 +437,7 @@ piyetek := project ( iyetekFile , slimiyetek(left));
 */
 
 allrecs := dedup(pflc4+pntl+pinq+pecrash,record,all)
-					 : persist('thor_data400::persist::ecrash4');
+					 : persist('~thor_data400::persist::ecrash4');
 					 
 														
 export Key_ECrash4 := index(allrecs

@@ -18,22 +18,22 @@ info := text_search.FileName_Info_Instance('~THOR_DATA400::BASE', 'SANCTN', file
 textType := Text_Search.Types.SegmentType.TextType;
 dateType := Text_Search.Types.SegmentType.DateType;
 numericType := Text_Search.Types.SegmentType.NumericType;
-
+keyType := Text_search.Types.SegmentType.ExternalKey;
 
 
 
 segmentMetaData := DATASET([
 		{'NAME',					textType,		[1]},
-		{'RESTITUTION',				textType,		[2]},
+		{'RESTITUTION',				numericType,		[2]},
 		{'NUMBER',					textType,		[3]},
-		{'DATE',					textType,		[4]},
+		{'DATE',					DateType,		[4]},
 		{'JURISDICTION',			textType,		[5]},
 		{'SOURCE',					textType,		[6]},
 		{'AGENCY',					textType,		[7]},
-		{'ALLEGED-AMT',				textType,		[8]},
-		{'EST-LOSS',				textType,		[9]},
-		{'INCIDENT_TEXT',		 	textType,		[10]}
-
+		{'ALLEGED-AMT',				numericType,		[8]},
+		{'EST-LOSS',				numericType,		[9]},
+		{'INCIDENT_TEXT',		 	textType,		[10]},
+		{'EXTERNALKEY',       keyType, [250]}
 		
 		], Text_Search.Layout_Segment_Definition);
 

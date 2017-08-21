@@ -52,56 +52,56 @@ layout_withpropvars take_NAME_SUFFIX(with_props le,NAME_SUFFIX_props ri) := TRAN
   SELF.NAME_SUFFIX_prop := le.NAME_SUFFIX_prop + IF ( le.NAME_SUFFIX IN SET(s.nulls_NAME_SUFFIX,NAME_SUFFIX) and ri.NAME_SUFFIX NOT IN SET(s.nulls_NAME_SUFFIX,NAME_SUFFIX) and ri.DID<>(TYPEOF(ri.DID))'', 1, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj0 := JOIN(with_props,NAME_SUFFIX_props,left.DID=right.DID,take_NAME_SUFFIX(left,right),LEFT OUTER);
+SHARED pj0 := JOIN(with_props,NAME_SUFFIX_props,left.DID=right.DID,take_NAME_SUFFIX(left,right),LEFT OUTER, HASH);
 SALT20.mac_prop_field_init(with_props(MNAME NOT IN SET(s.nulls_MNAME,MNAME)),MNAME,DID,MNAME_props); // For every DID find the best FULL MNAME
 layout_withpropvars take_MNAME(with_props le,MNAME_props ri) := TRANSFORM
   SELF.MNAME := IF ( le.MNAME = ri.MNAME[1..LENGTH(TRIM(le.MNAME))], ri.MNAME, le.MNAME );
   SELF.MNAME_prop := IF ( LENGTH(TRIM(le.MNAME)) < LENGTH(TRIM(ri.MNAME)) and le.MNAME=ri.MNAME[1..LENGTH(TRIM(le.MNAME))],LENGTH(TRIM(ri.MNAME)) - LENGTH(TRIM(le.MNAME)) , le.MNAME_prop ); // Store the amount propogated
   SELF := le;
   END;
-SHARED pj2 := JOIN(pj0,MNAME_props,left.DID=right.DID AND (left.MNAME='' OR left.MNAME[1]=right.MNAME[1]),take_MNAME(left,right),LEFT OUTER);
+SHARED pj2 := JOIN(pj0,MNAME_props,left.DID=right.DID AND (left.MNAME='' OR left.MNAME[1]=right.MNAME[1]),take_MNAME(left,right),LEFT OUTER, HASH);
 SALT20.mac_prop_field(with_props(SSN5 NOT IN SET(s.nulls_SSN5,SSN5)),SSN5,DID,SSN5_props); // For every DID find the best FULL SSN5
 layout_withpropvars take_SSN5(with_props le,SSN5_props ri) := TRANSFORM
   SELF.SSN5 := IF ( le.SSN5 IN SET(s.nulls_SSN5,SSN5) and ri.DID<>(TYPEOF(ri.DID))'', ri.SSN5, le.SSN5 );
   SELF.SSN5_prop := le.SSN5_prop + IF ( le.SSN5 IN SET(s.nulls_SSN5,SSN5) and ri.SSN5 NOT IN SET(s.nulls_SSN5,SSN5) and ri.DID<>(TYPEOF(ri.DID))'', 1, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj12 := JOIN(pj2,SSN5_props,left.DID=right.DID,take_SSN5(left,right),LEFT OUTER);
+SHARED pj12 := JOIN(pj2,SSN5_props,left.DID=right.DID,take_SSN5(left,right),LEFT OUTER, HASH);
 SALT20.mac_prop_field(with_props(SSN4 NOT IN SET(s.nulls_SSN4,SSN4)),SSN4,DID,SSN4_props); // For every DID find the best FULL SSN4
 layout_withpropvars take_SSN4(with_props le,SSN4_props ri) := TRANSFORM
   SELF.SSN4 := IF ( le.SSN4 IN SET(s.nulls_SSN4,SSN4) and ri.DID<>(TYPEOF(ri.DID))'', ri.SSN4, le.SSN4 );
   SELF.SSN4_prop := le.SSN4_prop + IF ( le.SSN4 IN SET(s.nulls_SSN4,SSN4) and ri.SSN4 NOT IN SET(s.nulls_SSN4,SSN4) and ri.DID<>(TYPEOF(ri.DID))'', 1, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj13 := JOIN(pj12,SSN4_props,left.DID=right.DID,take_SSN4(left,right),LEFT OUTER);
+SHARED pj13 := JOIN(pj12,SSN4_props,left.DID=right.DID,take_SSN4(left,right),LEFT OUTER, HASH);
 SALT20.mac_prop_field(with_props(DOB_year NOT IN SET(s.nulls_DOB_year,DOB_year)),DOB_year,DID,DOB_year_props); // For every DID find the best FULL DOB_year
 layout_withpropvars take_DOB_year(with_props le,DOB_year_props ri) := TRANSFORM
   SELF.DOB_year := IF ( le.DOB_year IN SET(s.nulls_DOB_year,DOB_year) and ri.DID<>(TYPEOF(ri.DID))'', ri.DOB_year, le.DOB_year );
   SELF.DOB_prop := le.DOB_prop + IF ( le.DOB_year IN SET(s.nulls_DOB_year,DOB_year) and ri.DOB_year NOT IN SET(s.nulls_DOB_year,DOB_year) and ri.DID<>(TYPEOF(ri.DID))'', 4, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj15000 := JOIN(pj13,DOB_year_props,left.DID=right.DID,take_DOB_year(left,right),LEFT OUTER);
+SHARED pj15000 := JOIN(pj13,DOB_year_props,left.DID=right.DID,take_DOB_year(left,right),LEFT OUTER, HASH);
 SALT20.mac_prop_field(with_props(DOB_month NOT IN SET(s.nulls_DOB_month,DOB_month)),DOB_month,DID,DOB_month_props); // For every DID find the best FULL DOB_month
 layout_withpropvars take_DOB_month(with_props le,DOB_month_props ri) := TRANSFORM
   SELF.DOB_month := IF ( le.DOB_month IN SET(s.nulls_DOB_month,DOB_month) and ri.DID<>(TYPEOF(ri.DID))'', ri.DOB_month, le.DOB_month );
   SELF.DOB_prop := le.DOB_prop + IF ( le.DOB_month IN SET(s.nulls_DOB_month,DOB_month) and ri.DOB_month NOT IN SET(s.nulls_DOB_month,DOB_month) and ri.DID<>(TYPEOF(ri.DID))'', 2, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj15001 := JOIN(pj15000,DOB_month_props,left.DID=right.DID,take_DOB_month(left,right),LEFT OUTER);
+SHARED pj15001 := JOIN(pj15000,DOB_month_props,left.DID=right.DID,take_DOB_month(left,right),LEFT OUTER, HASH);
 SALT20.mac_prop_field(with_props(DOB_day NOT IN SET(s.nulls_DOB_day,DOB_day)),DOB_day,DID,DOB_day_props); // For every DID find the best FULL DOB_day
 layout_withpropvars take_DOB_day(with_props le,DOB_day_props ri) := TRANSFORM
   SELF.DOB_day := IF ( le.DOB_day IN SET(s.nulls_DOB_day,DOB_day) and ri.DID<>(TYPEOF(ri.DID))'', ri.DOB_day, le.DOB_day );
   SELF.DOB_prop := le.DOB_prop + IF ( le.DOB_day IN SET(s.nulls_DOB_day,DOB_day) and ri.DOB_day NOT IN SET(s.nulls_DOB_day,DOB_day) and ri.DID<>(TYPEOF(ri.DID))'', 1, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj15002 := JOIN(pj15001,DOB_day_props,left.DID=right.DID,take_DOB_day(left,right),LEFT OUTER);
+SHARED pj15002 := JOIN(pj15001,DOB_day_props,left.DID=right.DID,take_DOB_day(left,right),LEFT OUTER, HASH);
 SALT20.mac_prop_field(with_props(PHONE NOT IN SET(s.nulls_PHONE,PHONE)),PHONE,DID,PHONE_props); // For every DID find the best FULL PHONE
 layout_withpropvars take_PHONE(with_props le,PHONE_props ri) := TRANSFORM
   SELF.PHONE := IF ( le.PHONE IN SET(s.nulls_PHONE,PHONE) and ri.DID<>(TYPEOF(ri.DID))'', ri.PHONE, le.PHONE );
   SELF.PHONE_prop := le.PHONE_prop + IF ( le.PHONE IN SET(s.nulls_PHONE,PHONE) and ri.PHONE NOT IN SET(s.nulls_PHONE,PHONE) and ri.DID<>(TYPEOF(ri.DID))'', 1, 0 ); // <>0 => propogation
   SELF := le;
   END;
-SHARED pj15 := JOIN(pj15002,PHONE_props,left.DID=right.DID,take_PHONE(left,right),LEFT OUTER);
+SHARED pj15 := JOIN(pj15002,PHONE_props,left.DID=right.DID,take_PHONE(left,right),LEFT OUTER, HASH);
 pj15 do_computes(pj15 le) := TRANSFORM
   self.MAINNAME := hash32((string)le.FNAME,(string)le.MNAME,(string)le.LNAME); // Combine child fields into 1 for specificity counting
   self.MAINNAME_prop := IF( le.MNAME_prop > 0, 2, 0 );

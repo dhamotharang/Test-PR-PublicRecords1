@@ -1,9 +1,21 @@
 import liensv2;
+format(string intext) := function
+
+//out_string := StringLib.StringFindReplace(trim(intext,left,right) ,'0000000000.' ,'') ;
+out_string := if(trim(intext ,left,right) = '0000000000.','' ,intext);
+out_string1 := StringLib.StringFindReplace(trim(out_string,left,right) ,'&ast;' ,'') ;
+out_string2 := StringLib.StringFindReplace(trim(out_string1,left,right) ,'&apos;' ,'') ;
+out_string3 := stringlib.stringfilterout(out_string2,',.+=$*!;^@%{}_"\'');
+return out_string3 ;
+end ;
+
+
+//mapping sample data
 
 liensV2.Layout_Liens_temp_base main_mapping_format(LiensV2.Layout_Liens_Service_Abstract L) := transform
 
-self.tmsid  						:= 		L.tmsid;
-self.rmsid  						:= 		L.rmsid;
+self.tmsid  						:= 		format(L.tmsid);
+self.rmsid  						:= 		format(L.rmsid);
 self.process_date 					:= 		L.process_date;
 self.record_code  					:= 		'';
 self.date_vendor_removed			:= 		L.delete_amended_code;
@@ -15,7 +27,7 @@ self.orig_filing_date   			:= 		L.filing_date;
 self.orig_filing_time   			:= 		'';
 self.filing_status      			:= 		'';
 self.filing_status_desc             :=      '';
-self.case_number        			:= 		L.docket_number;
+self.case_number        			:= 		format(L.docket_number);
 self.filing_number  				:= 		'';
 self.filing_type_desc 				:= 		L.Filing_type;
 self.filing_date 					:= 		'';
@@ -171,8 +183,331 @@ self.clean_atty_err_stat			:=		L.clean_atty_addr[179..182]		;
 self.clean_debtor_cname             := 		L.clean_debtor_cname;
 self.clean_creditor_cname           :=      L.clean_credtor_cname;
 self.clean_atty_cname 				:= 		L.clean_atty_cname;
+self := L;
+end;
+
+
+Mapping_Service_Abstract_new := project(liensv2.file_Service_Abstract_in, main_mapping_format(left));
+
+//mapping history file
+
+liensV2.Layout_Liens_temp_base main_mapping_format_history(LiensV2.Layout_Liens_Service_Abstarct_History L) := transform
+
+self.tmsid  						:= 		format(L.tmsid);
+self.rmsid  						:= 		format(L.rmsid);
+self.process_date 					:= 		L.process_date;
+self.record_code  					:= 		'';
+self.date_vendor_removed			:= 		'';
+self.filing_jurisdiction 			:= 		'';
+self.filing_state 					:= 		'';
+self.orig_filing_number 			:= 		'';
+self.orig_filing_type   			:= 		'';
+self.orig_filing_date   			:= 		L.filing_date;
+self.orig_filing_time   			:= 		'';
+self.filing_status      			:= 		'';
+self.filing_status_desc             :=      L.status;
+self.case_number        			:= 		format(L.docket_number);
+self.filing_number  				:= 		'';
+self.filing_type_desc 				:= 		L.type;
+self.filing_date 					:= 		L.STATUS_DATE;
+self.filing_time 					:= 		'';
+self.vendor_entry_date 				:= 		'';
+self.judge 							:= 		'';
+self.case_title 					:= 		'';
+self.filing_book  					:= 		'';
+self.filing_page  					:= 		'';
+self.release_date 					:= 		'';
+self.amount       					:= 		L.amount;
+self.eviction     					:= 		'';
+self.judg_satisfied_date 			:= 		'';
+self.judg_vacated_date 				:= 		'';
+self.tax_code 						:= 		L.tax_code;
+self.irs_serial_number 				:= 		if(StringLib.StringFilterOut(L.attorney,'0123456789') <> '' or L.serial_number <> '', L.serial_number, L.attorney);
+self.effective_date    				:= 		L.perfected_date;
+self.lapse_date        				:= 		'';
+self.orig_full_debtorname  			:= 		'';
+self.debtor_name 					:= 		L.debtor; 
+self.debtor_lname					:= 		'';
+self.debtor_fname					:= 		'';
+self.debtor_mname					:= 		'';
+self.debtor_suffix 					:= 		'';
+self.debtor_tax_id 					:= 		L.FEIN;
+self.debtor_ssn    					:= 		L.ssn;
+self.debtor_address1 				:= 		L.DEBTOR_ADDRESS;
+self.debtor_address2				:= 		L.DEBTOR_CITY_STATE_ZIP;
+self.debtor_city     				:= 		'';
+self.debtor_state    				:= 		'';
+self.debtor_zip5     				:= 		'';
+self.debtor_zip4     				:= 		'';
+self.debtor_country  				:= 		'';
+self.creditor_name   				:= 		L.creditor;
+self.creditor_lname					:= 		'';
+self.creditor_fname					:= 		'';
+self.creditor_mname					:= 		'' ;
+self.creditor_address1 				:= 		L.CREDITOR_ADDRESS;
+self.creditor_address2				:= 		L.CREDITOR_CITY_STATE_ZIP;
+self.creditor_city     				:= 		'';
+self.creditor_state    				:= 		'';
+self.creditor_zip5     				:= 		'';
+self.creditor_zip4     				:= 		'';
+self.creditor_country  				:= 		'';
+self.atty_Name         				:= 		L.ATTORNEY;
+self.atty_address1      			:= 		'';
+self.atty_address2      			:= 		'';
+self.atty_city         				:= 		'';
+self.atty_state        				:= 		'';
+self.atty_zip5          			:= 		'';
+self.atty_zip4                      :=      '' ;
+self.atty_phone        				:= 		'';
+self.agency            				:= 		'';
+self.agency_city      				:= 		'';
+self.agency_state     				:= 		L.file_id[1..2];
+self.agency_county     				:= 		'';
+self.clean_debtor_title				:= 		L.clean_debtor_pname[1..5]			    ;
+self.clean_debtor_fname				:=      L.clean_debtor_pname[6..25]			;
+self.clean_debtor_mname				:=      L.clean_debtor_pname[26..45]			;
+self.clean_debtor_lname				:=      L.clean_debtor_pname[46..65]			;
+self.clean_debtor_name_suffix	   	:=      L.clean_debtor_pname[66..70]			;
+self.clean_debtor_score				:=      L.clean_debtor_pname[71..73]			;
+self.clean_debtor_prim_range 		:= 		L.clean_debtor_addr[1..10]				;
+self.clean_debtor_predir     		:=		L.clean_debtor_addr[11..12]				;
+self.clean_debtor_prim_name			:= 		L.clean_debtor_addr[13..40]				;
+self.clean_debtor_addr_suffix		:= 		L.clean_debtor_addr[41..44]				;
+self.clean_debtor_postdir			:=		L.clean_debtor_addr[45..46]				;
+self.clean_debtor_unit_desig		:= 		L.clean_debtor_addr[47..56]				;
+self.clean_debtor_sec_range			:= 		L.clean_debtor_addr[57..64]				;
+self.clean_debtor_p_city_name		:= 		L.clean_debtor_addr[65..89]				;
+self.clean_debtor_v_city_name		:= 		L.clean_debtor_addr[90..114]				;
+self.clean_debtor_st				:= 		L.clean_debtor_addr[115..116]			;
+self.clean_debtor_zip				:=		L.clean_debtor_addr[117..121]			;
+self.clean_debtor_zip4				:=		L.clean_debtor_addr[122..125]			;
+self.clean_debtor_cart				:=		L.clean_debtor_addr[126..129]			;
+self.clean_debtor_cr_sort_sz		:=		L.clean_debtor_addr[130]					;
+self.clean_debtor_lot				:=		L.clean_debtor_addr[131..134]			;
+self.clean_debtor_lot_order			:=		L.clean_debtor_addr[135]					;
+self.clean_debtor_dpbc				:=		L.clean_debtor_addr[136..137]			;
+self.clean_debtor_chk_digit			:=		L.clean_debtor_addr[138]					;
+self.clean_debtor_record_type		:=		L.clean_debtor_addr[139..140]			;
+self.clean_debtor_ace_fips_st		:=		L.clean_debtor_addr[141..142]			;
+self.clean_debtor_fipscounty		:=		L.clean_debtor_addr[143..145]			;
+self.clean_debtor_geo_lat			:=		L.clean_debtor_addr[146..155]			;
+self.clean_debtor_geo_long			:=		L.clean_debtor_addr[156..166]			;
+self.clean_debtor_msa				:=		L.clean_debtor_addr[167..170]			;
+self.clean_debtor_geo_match			:=		L.clean_debtor_addr[178]					;
+self.clean_debtor_err_stat			:=		L.clean_debtor_addr[179..182]		;
+self.clean_creditor_title			:=      L.clean_credtor_pname[1..5]			    ;
+self.clean_creditor_fname			:= 		L.clean_credtor_pname[6..25]			;
+self.clean_creditor_mname			:= 		L.clean_credtor_pname[26..45]			;
+self.clean_creditor_lname			:= 		L.clean_credtor_pname[46..65]			;
+self.clean_creditor_name_suffix	   	:= 		L.clean_credtor_pname[66..70]			;
+self.clean_creditor_score			:= 		L.clean_credtor_pname[71..73]			;
+self.clean_creditor_prim_range 		:= 		L.clean_credtor_addr[1..10]				;
+self.clean_creditor_predir     		:=		L.clean_credtor_addr[11..12]				;
+self.clean_creditor_prim_name		:= 		L.clean_credtor_addr[13..40]				;
+self.clean_creditor_addr_suffix		:= 		L.clean_credtor_addr[41..44]				;
+self.clean_creditor_postdir			:=		L.clean_credtor_addr[45..46]				;
+self.clean_creditor_unit_desig		:= 		L.clean_credtor_addr[47..56]				;
+self.clean_creditor_sec_range		:= 		L.clean_credtor_addr[57..64]				;
+self.clean_creditor_p_city_name		:= 		L.clean_credtor_addr[65..89]				;
+self.clean_creditor_v_city_name		:= 		L.clean_credtor_addr[90..114]				;
+self.clean_creditor_st				:= 		L.clean_credtor_addr[115..116]			;
+self.clean_creditor_zip				:=		L.clean_credtor_addr[117..121]			;
+self.clean_creditor_zip4			:=		L.clean_credtor_addr[122..125]			;
+self.clean_creditor_cart			:=		L.clean_credtor_addr[126..129]			;
+self.clean_creditor_cr_sort_sz		:=		L.clean_credtor_addr[130]					;
+self.clean_creditor_lot				:=		L.clean_credtor_addr[131..134]			;
+self.clean_creditor_lot_order		:=		L.clean_credtor_addr[135]					;
+self.clean_creditor_dpbc			:=		L.clean_credtor_addr[136..137]			;
+self.clean_creditor_chk_digit		:=		L.clean_credtor_addr[138]					;
+self.clean_creditor_record_type		:=		L.clean_credtor_addr[139..140]			;
+self.clean_creditor_ace_fips_st		:=		L.clean_credtor_addr[141..142]			;
+self.clean_creditor_fipscounty		:=		L.clean_credtor_addr[143..145]			;
+self.clean_creditor_geo_lat			:=		L.clean_credtor_addr[146..155]			;
+self.clean_creditor_geo_long		:=		L.clean_credtor_addr[156..166]			;
+self.clean_creditor_msa				:=		L.clean_credtor_addr[167..170]			;
+self.clean_creditor_geo_match		:=		L.clean_credtor_addr[178]					;
+self.clean_creditor_err_stat		:=		L.clean_credtor_addr[179..182]		;
+self.clean_atty_title				:=      L.clean_atty_pname[1..5]			    ;
+self.clean_atty_fname				:=      L.clean_atty_pname[6..25]			;
+self.clean_atty_mname				:= 		L.clean_atty_pname[26..45]			;
+self.clean_atty_lname				:= 		L.clean_atty_pname[46..65]			;
+self.clean_atty_name_suffix	   		:= 		L.clean_atty_pname[66..70]			;
+self.clean_atty_score				:= 		L.clean_atty_pname[71..73]			;
+self.clean_debtor_cname             := 		L.clean_debtor_cname;
+self.clean_creditor_cname           :=      L.clean_credtor_cname;
+self.clean_atty_cname 				:= 		L.clean_atty_cname;
 
 end;
 
-export Mapping_Service_Abstract := project(liensv2.file_Service_Abstract_in, main_mapping_format(left));
 
+Mapping_Service_Abstract_history := project(LiensV2.file_in_Service_Abstract_History, main_mapping_format_history(left));
+
+
+//mapping history_20060526 file
+
+liensV2.Layout_Liens_temp_base main_mapping_format_history_20060526(LiensV2.Layout_Liens_Service_Abstarct_20060526_History L) := transform
+
+self.tmsid  						:= 		format(L.tmsid);
+self.rmsid  						:= 		format(L.rmsid);
+self.process_date 					:= 		L.process_date;
+self.record_code  					:= 		'';
+self.date_vendor_removed			:= 		'';
+self.filing_jurisdiction 			:= 		'';
+self.filing_state 					:= 		'';
+self.orig_filing_number 			:= 		'';
+self.orig_filing_type   			:= 		'';
+self.orig_filing_date   			:= 		L.filing_date;
+self.orig_filing_time   			:= 		'';
+self.filing_status      			:= 		'';
+self.filing_status_desc             :=      L.status;
+self.case_number        			:= 		format(L.docket_number);
+self.filing_number  				:= 		'';
+self.filing_type_desc 				:= 		L.type;
+self.filing_date 					:= 		L.STATUS_DATE;
+self.filing_time 					:= 		'';
+self.vendor_entry_date 				:= 		'';
+self.judge 							:= 		'';
+self.case_title 					:= 		'';
+self.filing_book  					:= 		'';
+self.filing_page  					:= 		'';
+self.release_date 					:= 		'';
+self.amount       					:= 		L.amount;
+self.eviction     					:= 		'';
+self.judg_satisfied_date 			:= 		'';
+self.judg_vacated_date 				:= 		'';
+self.tax_code 						:= 		L.tax_code;
+self.irs_serial_number 				:= 		if(StringLib.StringFilterOut(L.attorney,'0123456789') <> '' or L.serial_number <> '', L.serial_number, L.attorney);
+self.effective_date    				:= 		L.perfected_date;
+self.lapse_date        				:= 		'';
+self.orig_full_debtorname  			:= 		'';
+self.debtor_name 					:= 		L.debtor; 
+self.debtor_lname					:= 		'';
+self.debtor_fname					:= 		'';
+self.debtor_mname					:= 		'';
+self.debtor_suffix 					:= 		'';
+self.debtor_tax_id 					:= 		L.FEIN;
+self.debtor_ssn    					:= 		L.ssn;
+self.debtor_address1 				:= 		L.DEBTOR_ADDRESS;
+self.debtor_address2				:= 		L.DEBTOR_CITY_STATE_ZIP;
+self.debtor_city     				:= 		'';
+self.debtor_state    				:= 		'';
+self.debtor_zip5     				:= 		'';
+self.debtor_zip4     				:= 		'';
+self.debtor_country  				:= 		'';
+self.creditor_name   				:= 		L.creditor;
+self.creditor_lname					:= 		'';
+self.creditor_fname					:= 		'';
+self.creditor_mname					:= 		'' ;
+self.creditor_address1 				:= 		L.CREDITOR_ADDRESS;
+self.creditor_address2				:= 		L.CREDITOR_CITY_STATE_ZIP;
+self.creditor_city     				:= 		'';
+self.creditor_state    				:= 		'';
+self.creditor_zip5     				:= 		'';
+self.creditor_zip4     				:= 		'';
+self.creditor_country  				:= 		'';
+self.atty_Name         				:= 		L.ATTORNEY;
+self.atty_address1      			:= 		'';
+self.atty_address2      			:= 		'';
+self.atty_city         				:= 		'';
+self.atty_state        				:= 		'';
+self.atty_zip5          			:= 		'';
+self.atty_zip4                      :=      '' ;
+self.atty_phone        				:= 		'';
+self.agency            				:= 		'';
+self.agency_city      				:= 		'';
+self.agency_state     				:= 		L.file_id[1..2];
+self.agency_county     				:= 		'';
+self.clean_debtor_title				:= 		L.clean_debtor_pname[1..5]			    ;
+self.clean_debtor_fname				:=      L.clean_debtor_pname[6..25]			;
+self.clean_debtor_mname				:=      L.clean_debtor_pname[26..45]			;
+self.clean_debtor_lname				:=      L.clean_debtor_pname[46..65]			;
+self.clean_debtor_name_suffix	   	:=      L.clean_debtor_pname[66..70]			;
+self.clean_debtor_score				:=      L.clean_debtor_pname[71..73]			;
+self.clean_debtor_prim_range 		:= 		L.clean_debtor_addr[1..10]				;
+self.clean_debtor_predir     		:=		L.clean_debtor_addr[11..12]				;
+self.clean_debtor_prim_name			:= 		L.clean_debtor_addr[13..40]				;
+self.clean_debtor_addr_suffix		:= 		L.clean_debtor_addr[41..44]				;
+self.clean_debtor_postdir			:=		L.clean_debtor_addr[45..46]				;
+self.clean_debtor_unit_desig		:= 		L.clean_debtor_addr[47..56]				;
+self.clean_debtor_sec_range			:= 		L.clean_debtor_addr[57..64]				;
+self.clean_debtor_p_city_name		:= 		L.clean_debtor_addr[65..89]				;
+self.clean_debtor_v_city_name		:= 		L.clean_debtor_addr[90..114]				;
+self.clean_debtor_st				:= 		L.clean_debtor_addr[115..116]			;
+self.clean_debtor_zip				:=		L.clean_debtor_addr[117..121]			;
+self.clean_debtor_zip4				:=		L.clean_debtor_addr[122..125]			;
+self.clean_debtor_cart				:=		L.clean_debtor_addr[126..129]			;
+self.clean_debtor_cr_sort_sz		:=		L.clean_debtor_addr[130]					;
+self.clean_debtor_lot				:=		L.clean_debtor_addr[131..134]			;
+self.clean_debtor_lot_order			:=		L.clean_debtor_addr[135]					;
+self.clean_debtor_dpbc				:=		L.clean_debtor_addr[136..137]			;
+self.clean_debtor_chk_digit			:=		L.clean_debtor_addr[138]					;
+self.clean_debtor_record_type		:=		L.clean_debtor_addr[139..140]			;
+self.clean_debtor_ace_fips_st		:=		L.clean_debtor_addr[141..142]			;
+self.clean_debtor_fipscounty		:=		L.clean_debtor_addr[143..145]			;
+self.clean_debtor_geo_lat			:=		L.clean_debtor_addr[146..155]			;
+self.clean_debtor_geo_long			:=		L.clean_debtor_addr[156..166]			;
+self.clean_debtor_msa				:=		L.clean_debtor_addr[167..170]			;
+self.clean_debtor_geo_match			:=		L.clean_debtor_addr[178]					;
+self.clean_debtor_err_stat			:=		L.clean_debtor_addr[179..182]		;
+self.clean_creditor_title			:=      L.clean_credtor_pname[1..5]			    ;
+self.clean_creditor_fname			:= 		L.clean_credtor_pname[6..25]			;
+self.clean_creditor_mname			:= 		L.clean_credtor_pname[26..45]			;
+self.clean_creditor_lname			:= 		L.clean_credtor_pname[46..65]			;
+self.clean_creditor_name_suffix	   	:= 		L.clean_credtor_pname[66..70]			;
+self.clean_creditor_score			:= 		L.clean_credtor_pname[71..73]			;
+self.clean_creditor_prim_range 		:= 		L.clean_credtor_addr[1..10]				;
+self.clean_creditor_predir     		:=		L.clean_credtor_addr[11..12]				;
+self.clean_creditor_prim_name		:= 		L.clean_credtor_addr[13..40]				;
+self.clean_creditor_addr_suffix		:= 		L.clean_credtor_addr[41..44]				;
+self.clean_creditor_postdir			:=		L.clean_credtor_addr[45..46]				;
+self.clean_creditor_unit_desig		:= 		L.clean_credtor_addr[47..56]				;
+self.clean_creditor_sec_range		:= 		L.clean_credtor_addr[57..64]				;
+self.clean_creditor_p_city_name		:= 		L.clean_credtor_addr[65..89]				;
+self.clean_creditor_v_city_name		:= 		L.clean_credtor_addr[90..114]				;
+self.clean_creditor_st				:= 		L.clean_credtor_addr[115..116]			;
+self.clean_creditor_zip				:=		L.clean_credtor_addr[117..121]			;
+self.clean_creditor_zip4			:=		L.clean_credtor_addr[122..125]			;
+self.clean_creditor_cart			:=		L.clean_credtor_addr[126..129]			;
+self.clean_creditor_cr_sort_sz		:=		L.clean_credtor_addr[130]					;
+self.clean_creditor_lot				:=		L.clean_credtor_addr[131..134]			;
+self.clean_creditor_lot_order		:=		L.clean_credtor_addr[135]					;
+self.clean_creditor_dpbc			:=		L.clean_credtor_addr[136..137]			;
+self.clean_creditor_chk_digit		:=		L.clean_credtor_addr[138]					;
+self.clean_creditor_record_type		:=		L.clean_credtor_addr[139..140]			;
+self.clean_creditor_ace_fips_st		:=		L.clean_credtor_addr[141..142]			;
+self.clean_creditor_fipscounty		:=		L.clean_credtor_addr[143..145]			;
+self.clean_creditor_geo_lat			:=		L.clean_credtor_addr[146..155]			;
+self.clean_creditor_geo_long		:=		L.clean_credtor_addr[156..166]			;
+self.clean_creditor_msa				:=		L.clean_credtor_addr[167..170]			;
+self.clean_creditor_geo_match		:=		L.clean_credtor_addr[178]					;
+self.clean_creditor_err_stat		:=		L.clean_credtor_addr[179..182]		;
+self.clean_atty_title				:=      L.clean_atty_pname[1..5]			    ;
+self.clean_atty_fname				:=      L.clean_atty_pname[6..25]			;
+self.clean_atty_mname				:= 		L.clean_atty_pname[26..45]			;
+self.clean_atty_lname				:= 		L.clean_atty_pname[46..65]			;
+self.clean_atty_name_suffix	   		:= 		L.clean_atty_pname[66..70]			;
+self.clean_atty_score				:= 		L.clean_atty_pname[71..73]			;
+self.clean_debtor_cname             := 		L.clean_debtor_cname;
+self.clean_creditor_cname           :=      L.clean_credtor_cname;
+self.clean_atty_cname 				:= 		L.clean_atty_cname;
+
+end;
+
+Mapping_Service_Abstract_history_20060526 := project(LiensV2.file_in_Service_Abstract_20060526_History, main_mapping_format_history_20060526(left));
+
+
+export 	Mapping_Service_Abstract := Mapping_Service_Abstract_new;
+	
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

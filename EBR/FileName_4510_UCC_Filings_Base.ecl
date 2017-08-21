@@ -1,1 +1,1 @@
-export FileName_4510_UCC_Filings_Base := trim(GetSegmentFileName_Base('4510')) : global;
+export FileName_4510_UCC_Filings_Base := trim(GetSegmentFileName_Base('4510'));

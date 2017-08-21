@@ -21,7 +21,7 @@ import ut, doxie;
 #uniquename(recs)
 Autokey.Layout_Wild_CityStName %proj%(%indata% le) :=
 TRANSFORM
-	SELF.city_code := HASH((qstring25)le.incity_name);
+	SELF.city_code := doxie.Make_CityCodes(le.incity_name).tho;
 	SELF.st := le.inst;
 	SELF.lname := le.inlname;
 	SELF.fname := le.infname;

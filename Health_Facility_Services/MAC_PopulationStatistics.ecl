@@ -1,4 +1,4 @@
-EXPORT MAC_PopulationStatistics(infile,Ref='',Input_CNAME = '',Input_CNP_NAME = '',Input_CNP_NUMBER = '',Input_CNP_STORE_NUMBER = '',Input_CNP_BTYPE = '',Input_CNP_LOWV = '',Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_V_CITY_NAME = '',Input_ST = '',Input_ZIP = '',Input_TAX_ID = '',Input_FEIN = '',Input_PHONE = '',Input_LIC_STATE = '',Input_C_LIC_NBR = '',Input_DEA_NUMBER = '',Input_VENDOR_ID = '',Input_NPI_NUMBER = '',Input_CLIA_NUMBER = '',Input_MEDICARE_FACILITY_NUMBER = '',Input_BDID = '',Input_SRC = '',Input_SOURCE_RID = '',Input_ADDR1 = '',Input_LOCALE = '',Input_ADDRESS = '',OutFile) := MACRO
+EXPORT MAC_PopulationStatistics(infile,Ref='',Input_CNAME = '',Input_CNP_NAME = '',Input_CNP_NUMBER = '',Input_CNP_STORE_NUMBER = '',Input_CNP_BTYPE = '',Input_CNP_LOWV = '',Input_PRIM_RANGE = '',Input_PRIM_NAME = '',Input_SEC_RANGE = '',Input_V_CITY_NAME = '',Input_ST = '',Input_ZIP = '',Input_TAX_ID = '',Input_FEIN = '',Input_PHONE = '',Input_FAX = '',Input_LIC_STATE = '',Input_C_LIC_NBR = '',Input_DEA_NUMBER = '',Input_VENDOR_ID = '',Input_NPI_NUMBER = '',Input_CLIA_NUMBER = '',Input_MEDICARE_FACILITY_NUMBER = '',Input_MEDICAID_NUMBER = '',Input_NCPDP_NUMBER = '',Input_BDID = '',Input_SRC = '',Input_SOURCE_RID = '',Input_FAC_NAME = '',Input_ADDR1 = '',Input_LOCALE = '',Input_ADDRESS = '',OutFile) := MACRO
   IMPORT SALT29,Health_Facility_Services;
   #uniquename(of)
   %of% := RECORD
@@ -82,6 +82,11 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_CNAME = '',Input_CNP_NAME = 
     #ELSE
         IF( le.Input_PHONE = (TYPEOF(le.Input_PHONE))'','',':PHONE')
     #END
++    #IF( #TEXT(Input_FAX)='' )
+      '' 
+    #ELSE
+        IF( le.Input_FAX = (TYPEOF(le.Input_FAX))'','',':FAX')
+    #END
 +    #IF( #TEXT(Input_LIC_STATE)='' )
       '' 
     #ELSE
@@ -117,6 +122,16 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_CNAME = '',Input_CNP_NAME = 
     #ELSE
         IF( le.Input_MEDICARE_FACILITY_NUMBER = (TYPEOF(le.Input_MEDICARE_FACILITY_NUMBER))'','',':MEDICARE_FACILITY_NUMBER')
     #END
++    #IF( #TEXT(Input_MEDICAID_NUMBER)='' )
+      '' 
+    #ELSE
+        IF( le.Input_MEDICAID_NUMBER = (TYPEOF(le.Input_MEDICAID_NUMBER))'','',':MEDICAID_NUMBER')
+    #END
++    #IF( #TEXT(Input_NCPDP_NUMBER)='' )
+      '' 
+    #ELSE
+        IF( le.Input_NCPDP_NUMBER = (TYPEOF(le.Input_NCPDP_NUMBER))'','',':NCPDP_NUMBER')
+    #END
 +    #IF( #TEXT(Input_BDID)='' )
       '' 
     #ELSE
@@ -131,6 +146,11 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_CNAME = '',Input_CNP_NAME = 
       '' 
     #ELSE
         IF( le.Input_SOURCE_RID = (TYPEOF(le.Input_SOURCE_RID))'','',':SOURCE_RID')
+    #END
++    #IF( #TEXT(Input_FAC_NAME)='' )
+      '' 
+    #ELSE
+        IF( le.Input_FAC_NAME = (TYPEOF(le.Input_FAC_NAME))'','',':FAC_NAME')
     #END
 +    #IF( #TEXT(Input_ADDR1)='' )
       '' 

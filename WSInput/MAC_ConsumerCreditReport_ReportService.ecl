@@ -1,4 +1,4 @@
-﻿EXPORT MAC_ConsumerCreditReport_ReportService := MACRO
+EXPORT MAC_ConsumerCreditReport_ReportService := MACRO
 
 	#WEBSERVICE(FIELDS(
 		/*---- Compliance Fields ----*/

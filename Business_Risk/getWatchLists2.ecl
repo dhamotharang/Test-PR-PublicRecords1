@@ -10,8 +10,8 @@ export getWatchLists2(GROUPED DATASET(Layout_Output) inl, boolean ofac_only = fa
 											dataset(Gateway.Layouts.Config) gateways = dataset([], Gateway.Layouts.Config), dob_radius = -1) :=
 FUNCTION
 
-r_threshold_score := map(global_watchlist_threshold = 0.00 and ofac_version <= 3 => Patriot.Constants.DEF_THRESHOLD, 
-												global_watchlist_threshold = 0.00 => Patriot.Constants.DEF_THRESHOLD_V4,
+r_threshold_score := map(global_watchlist_threshold = 0.00 and ofac_version < 4 => OFAC_XG5.Constants.DEF_THRESHOLD_REAL, 
+												global_watchlist_threshold = 0.00 and ofac_version  >= 4 => OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL, 
 												global_watchlist_threshold < Patriot.Constants.MIN_THRESHOLD => Patriot.Constants.MIN_THRESHOLD,
 												global_watchlist_threshold > Patriot.Constants.MAX_THRESHOLD => Patriot.Constants.MAX_THRESHOLD,
 												global_watchlist_threshold);
@@ -208,7 +208,7 @@ END;
 
  XG5_ptys := OFAC_XG5.OFACXG5call(prep_XG5, 
 																	ofac_only ,
-																	(global_watchlist_threshold * 100) , 
+																	(r_threshold_score * 100) , 
 																	include_ofac,
 																	include_Additional_watchlists,
 																	DOBRadiusXG5 ,

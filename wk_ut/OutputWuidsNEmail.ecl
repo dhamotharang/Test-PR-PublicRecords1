@@ -25,7 +25,7 @@ function
   Run_Total_Thor_Time := wk_ut.ConvertSecs2ReadableTime((real8)Run_Total_Time_secs);
   
   //name, wuid, iteration#, version, thor time, etc
-  dWUDetails1 := dataset([{jobname1 ,pWuid ,pEsp,wk_ut._Constants.Esp2Name(pesp),getstate1 ,piteration ,pversion ,thor_time1,thor_time_secs,Run_Total_Thor_Time,Run_Total_Time_secs}] ,layouts.wks_slim);
+  dWUDetails1 := dataset([{jobname1 ,pWuid ,pEsp,wk_ut._Constants.Esp2Name(pesp),getstate1 ,piteration ,pversion ,thor_time1,thor_time_secs,Run_Total_Thor_Time,Run_Total_Time_secs,'',0,'',Errors}] ,layouts.wks_slim);
   jobname2 := if(jobname1 != '' ,jobname1 ,pWuid);
   sendemail1 := wk_ut.Send_Email(
                              pNotifyEmails
@@ -48,7 +48,7 @@ function
     ,self.Run_Total_Time_secs := if(counter = 1,Run_Total_Time_secs,left.Run_Total_Time_secs) + right.Run_Total_Time_secs
     ,self.Run_Total_Thor_Time := wk_ut.ConvertSecs2ReadableTime((real8)self.Run_Total_Time_secs),self := right));
 
-  doit :=  iff(pWuid != '',sequential(output(dWUDetails1 + iterwuids,named('Workunits'),OVERWRITE),if(pShouldEmail ,sendemail1)));
+  doit :=  iff(pWuid != '',sequential(output(dedup(dWUDetails1 + iterwuids,wuid,all),named('Workunits'),overwrite),if(pShouldEmail ,sendemail1)));
   
   return doit;
 

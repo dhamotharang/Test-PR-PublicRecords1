@@ -8,19 +8,28 @@ string county_name  ;
 string court_description ;
 end ;
 
-
+//New court source, MSHINC3, does not have description in the lookup file so adding it here
 Layout_Liens_Hogan_temp tjoin(liensv2.file_Hogan_in L, liensv2.file_lookup_in R) := transform
 
-self.county_name := R.county_name ;
-self.court_description := R.desc;
+self.county_name := IF(L.courtid = 'MSHINC3','',R.county_name);
+self.court_description := IF(L.courtid = 'MSHINC3','MISSISSIPPI DEPT OF REVENUE',R.desc);
 self := L ;
 end;
 
-filein_join := join(liensv2.file_Hogan_in, liensv2.file_lookup_in, left.COURTID = right.court_id, tjoin(left,right), left outer,many LOOKUP, local);
+filein_join := join(liensv2.file_Hogan_in, liensv2.file_lookup_in, left.COURTID = right.court_id, tjoin(left,right), left outer,many LOOKUP);
 
 liensV2.Layout_Liens_temp_base main_mapping_format(Layout_Liens_Hogan_temp L) := transform
 
-
+integer	position	:=	StringLib.StringFind(trim(L.AtyAddress,left,right), ' ', 1);
+string	block	:=	if (l.courtid[1..2] = 'NY',
+												l.atyAddress[1..position-1],
+												''
+											);
+string	lot		:=	if (l.courtid[1..2] = 'NY',
+												l.atyAddress[position+1..],
+												''
+											);		
+											
 self.tmsid  := trim(L.tmsid) ;
 self.rmsid  := L.rmsid;
 self.process_date := L.process_date;
@@ -161,8 +170,9 @@ self.clean_creditor_cname := L.clean_plaintiff_cname;
 self.clean_atty_cname := L.clean_atty_cname;
 self.orig_rmsid := l.orig_rmsid;
 self.certificate_number		:= L.othercase;
+self.legal_lot := lot;
+self.legal_block := block;
+self.bCBFlag	:=	IF(l.VOL_INVOL='1',TRUE,FALSE);
 end;
 
 export Mapping_Hogan := project(filein_join, main_mapping_format(left));
-
-

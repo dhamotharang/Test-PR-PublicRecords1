@@ -1,6 +1,6 @@
 import fcra, ut; 
 
-base_file := dataset('~thor_data400::base::override::fcra::qa::ssn_table',FCRA.Layout_Override_SSN_Table,flat);
+base_file := dataset('~thor_data400::base::override::fcra::qa::ssn_table',FCRA.Layout_Override_SSN_Table,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
 
 kf := dedup(sort(base_file,-flag_file_id),except flag_file_id,keep(1));
 

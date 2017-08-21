@@ -1,5 +1,5 @@
 //Defines full build process
-IMPORT _control, versioncontrol, hms_kop_trgt_harv,ut;
+IMPORT _control, versioncontrol, hms_kop_trgt_harv;
 
 EXPORT Build_Base := MODULE
 
@@ -8,7 +8,7 @@ EXPORT Build_Base := MODULE
    					,boolean			pUseProd		= false
    					,dataset(hms_kop_trgt_harv.Layouts.layout_base		)pBaseFile		= hms_kop_trgt_harv.Files().koptrgtharv_Base.qa	) := module
    	
-   					SHARED build_base_koptrgtharv := hms_kop_trgt_harv.Update_Base(pversion,pUseProd).KopTrgtHarv_Base;//dataset('~thor400_data::base::kop_trgt_harv::trgt_harv_results::temp::20170104',hms_kop_trgt_harv.Layouts.layout_base,thor);//dataset(hms_kop_trgt_harv.Filenames(,false).trgtharv_lInputTemplate, hms_kop_trgt_harv.layouts.layout_in, csv( separator('\t'),heading(single), terminator(['\n', '\r\n']), quote(['\'','"'])));
+   					SHARED build_base_koptrgtharv := hms_kop_trgt_harv.Update_Base(pversion,pUseProd).KopTrgtHarv_Base;//dataset(hms_kop_trgt_harv.Filenames(,false).trgtharv_lInputTemplate, hms_kop_trgt_harv.layouts.layout_in, csv( separator('\t'),heading(single), terminator(['\n', '\r\n']), quote(['\'','"'])));//dataset('~thor400_data::base::kop_trgt_harv::trgt_harv_results::20170531',hms_kop_trgt_harv.Layouts.LAYOUT_BASE,thor);
    					VersionControl.macBuildNewLogicalFile(
    																					 hms_kop_trgt_harv.Filenames(pversion, pUseProd).koptrgtharv_Base.new
    																				 	,build_base_koptrgtharv

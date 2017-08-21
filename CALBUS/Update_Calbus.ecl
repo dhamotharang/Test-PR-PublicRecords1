@@ -1,12 +1,8 @@
-import codes;
+import codes, ut, idl_header;
 
-in_file1 := project(Calbus.File_Calbus_In.File_Cleaned_Super,transform(Calbus.Layouts_Calbus.Layout_Common,
-																	   self := LEFT, self.naics_code := ''));
-in_file2 := Calbus.File_Calbus_In.File_Cleaned_Super2;
+in_file := Calbus.Cleaned_Calbus_Addr;
 
-in_file := in_file1 + in_file2;
-
-Layout_Out := Calbus.Layouts_Calbus.Layout_Common;
+Layout_Out := Calbus.Layouts_Calbus.Layout_AID_Common;
 
 Dist_Cleaned_Calbus := distribute(in_file, hash64(Account_Number));
 

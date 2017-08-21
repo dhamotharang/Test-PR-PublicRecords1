@@ -1,1 +1,1 @@
-export File_DEADCO_Base:=dataset('~thor_data400::base::infoUSA::deadco', Layout_deadco_Base, thor); 
+export File_DEADCO_Base	:=	PROJECT(Infousa.File_Deadco_Base_AID,TRANSFORM(Infousa.Layout_deadco_Base,SELF := LEFT;));

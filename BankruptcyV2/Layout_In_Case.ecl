@@ -37,5 +37,9 @@ string 	SplitCase;
 string 	CaseType;	
 string 	TransferIn;
 string	FiledInError;
-string  CaseStatus := '';
+string  CaseStatus;
+string  TrusteeEmail := '';
+string  PlanConfDate := ''; //Plan Confirmation Hearing Date
+string  ConfHearDate := ''; //Confirmation Hearing Date
+string255 filename;
 end;

@@ -32,6 +32,7 @@ export FDIC_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.v_city_name),
 				self.state := left.st,
 				self.zip := left.zip5,
+				self.zip4 := left.zip4,
 				self.county_fips := left.fipscounty,
 				self.msa := left.msa_code,
 				self.phone := '',

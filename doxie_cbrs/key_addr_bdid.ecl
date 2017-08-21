@@ -1,5 +1,10 @@
-import business_header,doxie, ut;
+Import Data_Services, business_header,doxie, ut, PRTE2_Business_Header;
+
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+bh := PRTE2_Business_Header.File_Business_Header_Base_For_Keybuild(prim_name!='' and zip!=0);
+#ELSE
 bh := Business_Header.File_Business_Header_Base_for_keybuild(prim_name!='' and zip!=0);
+#END;
 
 layout_bh_slim := 
 record

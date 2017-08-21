@@ -2,9 +2,9 @@ IMPORT Data_Services;
 EXPORT Files_Base := MODULE
 
 /* Accounting logs files processed list from logs and fcra logs thor */
-EXPORT Processed_Files := DATASET('~thor_data400::out::instantid_archive::processed_files', {string name{maxlength(256)}}, thor, __compressed__, opt);
+EXPORT Processed_Files := DATASET(Data_Services.Data_location.Prefix('INSTANTIDARCHIVING') + 'thor_data400::out::instantid_archive::processed_files', {string name{maxlength(256)}}, thor, __compressed__, opt);
 
-EXPORT Delta := DATASET('~thor_data400::base::InstantID_Archive::key_files', InstantID_Archiving.Layout_Base, thor, __compressed__, opt);
+EXPORT Delta := DATASET(Data_Services.Data_location.Prefix('INSTANTIDARCHIVING') + 'thor_data400::base::InstantID_Archive::key_files', InstantID_Archiving.Layout_Base, thor, __compressed__, opt);
 
 EXPORT InstantID_Model := InstantID_Archiving.Files.InstantID_Model;
 EXPORT InstantID_ModelRisk := InstantID_Archiving.Files.InstantID_ModelRisk;

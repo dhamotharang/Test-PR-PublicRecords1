@@ -9,7 +9,7 @@ EXPORT _proc_Multiple_Iterations(
   ,pdoPostProcess   = 'true'
   ,pcluster         = 'BIPV2_Build._Constants().Groupname'
   ,pUniqueOut       = '\'ProxidMJ6\''
-  ,pDotFilename     = 'BIPV2_Proxid.filenames().base.built'                        //'BIPV2_Files.files_dotid.FILE_BASE' //by default it will start where it left off
+  ,pDotFilename     = 'BIPV2_Proxid.filenames().out.built'                        //'BIPV2_Files.files_dotid.FILE_BASE' //by default it will start where it left off
   ,pMatchThreshold  = '\'0\''
 ) :=
 functionmacro

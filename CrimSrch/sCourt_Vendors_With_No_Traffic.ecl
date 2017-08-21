@@ -23,5 +23,11 @@ export sCourt_Vendors_With_No_Traffic :=
 	'71',	// OH-Portage
 	'74',	// OH-Greene
 	'81',	// GA
-	'86'	// TX-Collin
+	'86',	// TX-Collin
+	'90',	// AZ-Mohave
+	'91',	// OH-Monroe
+	'92',	// OH-Warren
+	'93',	// MS-Harrison
+	'94',	// TX-Brazoria
+	'3D'  // OH ATHENS
    ];

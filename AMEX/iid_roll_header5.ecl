@@ -621,7 +621,7 @@ gRemoveVer2 := group(sort(ugRemoveVer2,seq,did), seq);	// was sorted by seq, did
 // right here for multiple adl, we have up to 3 records.  populate the did2 and did3 fields
 AMEX.layouts.shell_with5 getMultADL(AMEX.layouts.shell_with5 le, integer C) := transform
 
-	// self.DIDCount- The total number of DIDÂ’s found	// need to get this right after mac did append
+	// self.DIDCount- The total number of DID’s found	// need to get this right after mac did append
 	self.DID2 := if(c=2, le.did, le.did2);	// - The second DID returned from the DID Append
 	self.DID3 := if(c=3, le.did, le.did3);	// - The third DID returned from the DID Append
 

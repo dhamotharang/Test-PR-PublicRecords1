@@ -31,7 +31,7 @@ EXPORT SearchService() := MACRO
   DeltaUse := ds_in.Options.DeltaUse;
   DeltaStrict := ds_in.Options.DeltaStrict;
   
-  FraudShared_Services.Layouts.batch_search_rec xform2(iesp.frauddefensenetwork.t_FDNSearchRequest L) := TRANSFORM
+  FraudDefenseNetwork_Services.Layouts.batch_search_rec xform2(iesp.frauddefensenetwork.t_FDNSearchRequest L) := TRANSFORM
   
     FullAddrInput := IF(L.SearchBy.Address.StreetAddress1 <> '', TRUE, FALSE);
     Clean_Address := IF(FullAddrInput, Address.CleanAddress182(TRIM(L.SearchBy.Address.StreetAddress1) + ' ' +
@@ -100,13 +100,11 @@ EXPORT SearchService() := MACRO
     SELF.filterby_Did := L.FilterBy.Did;
   END;  
   
-  ds_seq:= PROJECT(ds_input, xform2(LEFT));
-  
-  //Validate at least one search param is provided
-  validationMod:= FraudShared_Services.ValidateInput.fn_checkIfValid(ds_seq[1]);
+  ds_seq := PROJECT(ds_input, xform2(LEFT));
 
-  IF(~validationMod.isValidSearchInput,
-      FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FDN_NO_INPUT_PROVIDED));
+  // Validate at least one search param is provided  (It's coded as a batch, why only the first record checked)
+  IF (~FraudDefenseNetwork_Services.Functions.IsFirstRecordValid(ds_seq),
+    FraudShared_Services.Utilities.FailMeWithCode(ut.constants_MessageCodes.FDN_NO_INPUT_PROVIDED));
 
   // #store some standard input parameters (generally, for search purpose)
   iesp.ECL2ESP.SetInputBaseRequest(ds_in);

@@ -11,6 +11,7 @@ RoxieKeyBuild.MAC_SK_BuildProcess_Local(doxie_build.key_prep_offenses,'~thor_Dat
 
 RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_Data400::key::corrections_offenses::'+filedate+'::' + doxie_build.buildstate,'~thor_Data400::key::corrections_offenses_' + doxie_build.buildstate,mkey,2);
 
+
 postkey := sequential(
 		fileservices.clearsuperfile('~thor_Data400::base::corrections_offenses_' + doxie_build.buildstate + '_BUILT'),
 		fileservices.addsuperfile('~thor_Data400::base::corrections_offenses_' + doxie_build.buildstate + '_BUILT','~thor_Data400::base::corrections_offenses_' + doxie_build.buildstate + '_BUILDING',0,true),

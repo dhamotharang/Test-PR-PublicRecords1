@@ -27,7 +27,9 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(sexoffender.key_sexoffender_offenses(
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(sexoffender.Key_SexOffender_SPK(),'',	
 				'~thor_data400::key::sexoffender::'+filedate+'::spk'+ doxie_build.buildstate,key_spk);
 
+//Disable FCRA Keys - Bugzilla #78618
 //Build fcra-versions of the keys
+/*
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(sexoffender.Key_SexOffender_DID (true),'',
 				'~thor_data400::key::sexoffender::fcra::'+filedate+'::did',key_did_fcra);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(sexoffender.Key_SexOffender_SPK_Enh (true),'',	 
@@ -36,6 +38,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(sexoffender.key_sexoffender_offenses 
 				'~thor_data400::key::sexoffender::fcra::'+filedate+'::offenses',key_off_fcra);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(sexoffender.Key_SexOffender_SPK (true),'',	
 				'~thor_data400::key::sexoffender::fcra::'+filedate+'::spk',key_spk_fcra);
+*/
 						
 //Move to built			
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::sexoffender_did'+ doxie_build.buildstate,
@@ -47,6 +50,7 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::sexoffender_offenses_
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::sexoffender_spk'+ doxie_build.buildstate,
 				'~thor_data400::key::sexoffender::'+filedate+'::spk'+ doxie_build.buildstate,mv_spk);
 
+/*
 //Move fcra-versions to built			
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::sexoffender::fcra::did',
 				'~thor_data400::key::sexoffender::fcra::'+filedate+'::did',mv_did_fcra);
@@ -56,6 +60,7 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::sexoffender::fcra::of
 				'~thor_data400::key::sexoffender::fcra::'+filedate+'::offenses',mv_off_fcra);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::sexoffender::fcra::spk',
 				'~thor_data400::key::sexoffender::fcra::'+filedate+'::spk',mv_spk_fcra);
+*/
 
 f := file_SO_Enh_keybuilding;
 
@@ -139,8 +144,8 @@ post3 := if(util_populated, output('Dont clear utility super'),fileservices.clea
 
 
 return sequential(chk_build,
-  parallel(key_did,key_enh,key_spk,key_off,key_did_fcra,key_enh_fcra,key_spk_fcra,key_off_fcra),
-  parallel(mv_did,mv_enh,mv_spk,mv_off,mv_did_fcra,mv_enh_fcra,mv_spk_fcra,mv_off_fcra),
+  parallel(key_did,key_enh,key_spk,key_off/*,key_did_fcra,key_enh_fcra,key_spk_fcra,key_off_fcra*/),
+  parallel(mv_did,mv_enh,mv_spk,mv_off/*,mv_did_fcra,mv_enh_fcra,mv_spk_fcra,mv_off_fcra*/),
   outaction1,outaction2,key_fdid,mv_fdid,key_zip_type,mv_zip_type,parallel(post1,post2,post3));
 
 end;

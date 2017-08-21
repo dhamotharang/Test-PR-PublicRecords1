@@ -55,7 +55,7 @@ END;
 
 layout_cleanNames cleanNames(layout_names l):= TRANSFORM
 String nam:=TRIM((L.FNAME+' '+L.MIDDLE+' '+L.LNAME+' '+L.SUFFIX),LEFT,RIGHT);
-self.clean_name := AddrCleanLib.CleanPersonFML73(trim(regexreplace('^O ',nam,'O')));
+self.clean_name := Address.CleanPersonFML73(trim(regexreplace('^O ',nam,'O')));
 self :=l;
 END;
 

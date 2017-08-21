@@ -1,0 +1,16 @@
+
+EXPORT set_valid_filing := ['',
+					'ACAN', 'ACAP', 'ACAU', 'ACHG', 'ADIS', 'ADMS', 'AFLP',	'AG'  ,'AINT' , 'AMEL',
+					'AMLL','AMLR',	'AMDQ',	'AMEN',	'AMFQ',	'AMLP', 'AMPA',	'AMPR', 'ANAM',	'ANEX',	
+					'ANNR',	'AOTM',	'APAN',	'APPR',	'APPW',	'APRN',	'ARTC',	'ARTD', 'ARTI',	'ARTO',
+					'ASAR', 'ASTA', 'ASTK',	'ATRM', 'AUIN',	'BIEN', 'C486',	'C487',	'CANC',	'CAUT',
+					'CCLP', 'CFLL',	'CFLP',	'CFRP', 'CGPS', 'CHAR',	'CHGA',	'CHGO',	'CHOA', 'CICC',
+					'CODQ', 'COFQ', 'CONG',	'CONO', 'CONS',	'CORR', 'COTM',	'CRQS', 'DCDI', 'DCRE',
+					'DENI', 'DFIC',	'DISD', 'DISI', 'DISM', 'DISO', 'DISS', 'DSPA', 'FAMN', 'FFIC',
+					'FMER', 'FQUA', 'FREI',	'FRES',	'INSL', 'INSM', 'INSO', 'INTD',	'JDIS',	'LTDP',	
+					'MERG',	'MISC', 'NRRA', 'NTRN', 'PAUT', 'PMT' , 'POPA', 'POPD', 'QFLL',	'QUAL',
+					'RART', 'RASA', 'RASN', 'RCAP', 'RE-I', 'REEL', 'REIC', 'REIN',	'RENR',	'RENW',
+					'REOG',	'RERF',	'REVD',	'REVO', 'RFLP',	'RLLP',	'RNTM',	'ROAR', 'ROTM', 'RRES',
+					'RRLP', 'SCRS', 'SESS', 'SHEX', 'SMRG', 'STAM', 'STCH', 'STCO', 'STNR', 'STTM',
+					'STTN', 'STRA', 'VOLA', 'VOLE', 'VOLR', 'WOTW', 'ADMF', 'APAG', 'ARDO', 'CANA',
+					'CORG', 'RCLP', 'SRRA', 'STAG', 'STAU', 'STCA', 'STDI', 'STDP', 'STDS', 'STSU', 'MCON']; 

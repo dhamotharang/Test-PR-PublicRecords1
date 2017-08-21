@@ -8,6 +8,7 @@ export Layout_FLCrash5_v2 := record
 	string16  filler1,
 	string1   passenger_name_suffix,
 	// Expanded field from 40
+	string60  passenger_address,
 	string60  passenger_st_city,
 	string18  filler2,
 	string2   passenger_state,

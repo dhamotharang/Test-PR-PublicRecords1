@@ -4,9 +4,9 @@
 #option('skipFileFormatCrcCheck', 1);
 #option('maxLength', 131072);
 
-import ut, worldcheck;
+import ut, worldcheck, std;
 
-export Find_Companies_and_Linked_Tos(dataset(Layout_WorldCheck_Premium) in_f) := function
+export Find_Companies_and_Linked_Tos(dataset(Layout_Rectified) in_f) := function
 
 //FIND COMPANY NAMES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -37,7 +37,7 @@ ds2 	:= in_f(~regexfind(';',companies)):persist('~thor_200::persist::worldcheck:
 		self.names 		:= if(regexfind('[A-Z]',stringlib.stringtouppercase(l.companies)),
 								l.companies,
 								if(trim(l.last_name, left, right)<>'',
-								StringLib.StringToUpperCase(TRIM(r.last_name,left,right))+', '+r.uid,
+								STD.Str.ToUpperCase(TRIM(r.last_name,left,right))+', '+r.uid,
 								l.companies));	
 		self 			:= l;
 	end;
@@ -65,7 +65,7 @@ ds2 	:= in_f(~regexfind(';',companies)):persist('~thor_200::persist::worldcheck:
 
 	dedup_out 	:= dedup(denorm_out, uid, all);
 
-	Layout_WorldCheck_Premium proj_rec1(dedup_out l) := transform
+	Layout_Rectified proj_rec1(dedup_out l) := transform
 		self.companies := l.names;
 		self := l;
 	end;
@@ -76,7 +76,7 @@ proj_out_comp := proj_out1 + ds2;
 
 //FIND REMAINING COMPANY NAMES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	Layout_WorldCheck_Premium join_final1(proj_out_comp l, proj_out_comp r) := TRANSFORM
+	Layout_Rectified join_final1(proj_out_comp l, proj_out_comp r) := TRANSFORM
 		self.companies := if(~regexfind('[A-Z]',stringlib.stringtouppercase(l.companies)) and trim(l.companies, left, right)<>'',
 							StringLib.StringToUpperCase(TRIM(r.last_name,left,right))+', '+r.uid,
 							l.companies);				
@@ -149,7 +149,7 @@ ds4 := CompanyFind_Final(~regexfind(';',linked_tos)):persist('~thor_200::persist
 
 	dedup_out1 		:= dedup(denorm_out1, uid, all);
 
-	Layout_WorldCheck_Premium proj_rec2(dedup_out1 l) := transform
+	Layout_Rectified proj_rec2(dedup_out1 l) := transform
 		self.linked_tos := l.links;
 		self 			:= l;
 	end;
@@ -160,7 +160,7 @@ final_out1 := proj_out2 + ds4;
 
 //FIND REMAINING LINKED TOs~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	Layout_WorldCheck_Premium join_final(final_out1 l, final_out1 r) := TRANSFORM
+	Layout_Rectified join_final(final_out1 l, final_out1 r) := TRANSFORM
 		self.linked_tos := if(~regexfind('[A-Z]',stringlib.stringtouppercase(l.linked_tos)),
 								if(TRIM(r.first_name,left,right)='' and trim(r.last_name, left, right)<>'',
 								StringLib.StringToUpperCase(TRIM(r.last_name,left,right))+', '+r.uid,

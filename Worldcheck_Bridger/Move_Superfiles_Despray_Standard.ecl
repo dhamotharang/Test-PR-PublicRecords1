@@ -253,7 +253,7 @@ super_rg_8_ent 	:= sequential(FileServices.StartSuperFileTransaction(),
 							FileServices.FinishSuperFileTransaction(),
 							FileServices.ClearSuperFile(worldcheck_bridger.cluster_name   + 'base::worldcheck_bridger::region_8_entity::delete',true));
 
-
+/* Old Unix section
 //Despray Base Files - Standard Region Search Files//////////////////////////////////////////////////////////////////////////////////////////
 despray_rg_1_srch	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_1_search::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_region_1_build.xml',,,,true);
 despray_rg_2_srch	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_2_search::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_region_2_build.xml',,,,true);
@@ -274,14 +274,14 @@ despray_rg_8_srch	:= fileservices.Despray('~thor_data200::base::worldcheck_bridg
 //despray_rg_8_srch	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_8_search::'+filedate+'.xml', _Control.IPAddress.edata12, '/data_999/world_check_bridger/standard_output/'+filedate+'/worldcheck_region_8_build.xml',,,,true);
 
 //Despray Base Files - Standard Region Entity Files//////////////////////////////////////////////////////////////////////////////////////////
-despray_rg_1_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_1_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_entity_region_1.xml',,,,true);
-despray_rg_2_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_2_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_entity_region_2.xml',,,,true);
-despray_rg_3_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_3_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_entity_region_3.xml',,,,true);
-despray_rg_4_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_4_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_entity_region_4.xml',,,,true);
-despray_rg_5_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_5_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_entity_region_5.xml',,,,true);
-despray_rg_6_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_6_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_entity_region_6.xml',,,,true);
-despray_rg_7_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_7_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_entity_region_7.xml',,,,true);
-despray_rg_8_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_8_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_entity_region_8.xml',,,,true);
+despray_rg_1_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_1_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_1.xml',,,,true);
+despray_rg_2_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_2_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_2.xml',,,,true);
+despray_rg_3_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_3_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_3.xml',,,,true);
+despray_rg_4_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_4_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_4.xml',,,,true);
+despray_rg_5_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_5_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_5.xml',,,,true);
+despray_rg_6_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_6_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_6.xml',,,,true);
+despray_rg_7_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_7_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_7.xml',,,,true);
+despray_rg_8_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_8_entity::'+filedate+'.xml', _Control.IPAddress.edata11, '/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_8.xml',,,,true);
 
 //despray_rg_1_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_1_entity::'+filedate+'.xml', _Control.IPAddress.edata12, '/data_999/world_check_bridger/standard_output/'+filedate+'/worldcheck_entity_region_1.xml',,,,true);
 //despray_rg_2_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_2_entity::'+filedate+'.xml', _Control.IPAddress.edata12, '/data_999/world_check_bridger/standard_output/'+filedate+'/worldcheck_entity_region_2.xml',,,,true);
@@ -291,15 +291,31 @@ despray_rg_8_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridge
 //despray_rg_6_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_6_entity::'+filedate+'.xml', _Control.IPAddress.edata12, '/data_999/world_check_bridger/standard_output/'+filedate+'/worldcheck_entity_region_6.xml',,,,true);
 //despray_rg_7_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_7_entity::'+filedate+'.xml', _Control.IPAddress.edata12, '/data_999/world_check_bridger/standard_output/'+filedate+'/worldcheck_entity_region_7.xml',,,,true);
 //despray_rg_8_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_8_entity::'+filedate+'.xml', _Control.IPAddress.edata12, '/data_999/world_check_bridger/standard_output/'+filedate+'/worldcheck_entity_region_8.xml',,,,true);
+*/
 
-return	sequential(super_rg_1_srch,
-					super_rg_2_srch,
-					super_rg_3_srch,
-					super_rg_4_srch,
-					super_rg_5_srch,
-					super_rg_6_srch,
-					super_rg_7_srch,
-					super_rg_8_srch,
+// New Linux Section
+//Despray Base Files - Standard Region Search Files//////////////////////////////////////////////////////////////////////////////////////////
+despray_rg_1_srch	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_1_search::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_region_1_build.xml',,,,true);
+despray_rg_2_srch	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_2_search::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_region_2_build.xml',,,,true);
+despray_rg_3_srch	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_3_search::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_region_3_build.xml',,,,true);
+despray_rg_4_srch	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_4_search::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_region_4_build.xml',,,,true);
+despray_rg_5_srch	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_5_search::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_region_5_build.xml',,,,true);
+despray_rg_6_srch	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_6_search::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_region_6_build.xml',,,,true);
+despray_rg_7_srch	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_7_search::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_region_7_build.xml',,,,true);
+despray_rg_8_srch	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_8_search::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_region_8_build.xml',,,,true);
+
+
+//Despray Base Files - Standard Region Entity Files//////////////////////////////////////////////////////////////////////////////////////////
+despray_rg_1_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_1_entity::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_1.xml',,,,true);
+despray_rg_2_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_2_entity::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_2.xml',,,,true);
+despray_rg_3_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_3_entity::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_3.xml',,,,true);
+despray_rg_4_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_4_entity::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_4.xml',,,,true);
+despray_rg_5_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_5_entity::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_5.xml',,,,true);
+despray_rg_6_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_6_entity::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_6.xml',,,,true);
+despray_rg_7_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_7_entity::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_7.xml',,,,true);
+despray_rg_8_ent	:= fileservices.Despray('~thor_data200::base::worldcheck_bridger::region_8_entity::'+filedate+'.xml', _Control.IPAddress.bctlpedata10, '/data/bdb_82/wcb/output/'+filedate+'/worldcheck_standard_region_8.xml',,,,true);
+
+return	sequential(
 					super_rg_1_ent,
 					super_rg_2_ent,
 					super_rg_3_ent,
@@ -308,14 +324,6 @@ return	sequential(super_rg_1_srch,
 					super_rg_6_ent,
 					super_rg_7_ent,
 					super_rg_8_ent,
-					despray_rg_1_srch,
-					despray_rg_2_srch,
-					despray_rg_3_srch,
-					despray_rg_4_srch,
-					despray_rg_5_srch,
-					despray_rg_6_srch,
-					despray_rg_7_srch,
-					despray_rg_8_srch,
 					despray_rg_1_ent,
 					despray_rg_2_ent,
 					despray_rg_3_ent,

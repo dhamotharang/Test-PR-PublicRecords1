@@ -30,8 +30,10 @@ export source_is_marketing_eligible(
 			or	(MDR.sourceTools.SourceIsLiens_v2									(src) and st not in ['ID','IL','KS','WA','NM','SC']) 			//x Liens V2
 			or	(MDR.sourceTools.SourceIsBankruptcy								(src) and st not in ['ID','IL','KS','WA','NM','SC']) 			//x Bankruptcy FCRA?
 			or	(MDR.sourceTools.SourceIsProfessional_License			(src) and st not in ['ID','IL','KS','WA','NM','SC','UT']) 			//x Professional License, state exceptions ?? let em go for now
-			or	(MDR.sourceTools.SourceIsLnPropV2_Lexis_Deeds_Mtgs(src) and st not in ['ID','IL','KS','NM','SC'] and (st<>'PA' and county<>'001')) 	//x Lexis Deeds and Mortgages state/county exceptions ??
-			or	(MDR.sourceTools.SourceIsLnPropV2_Lexis_Asrs			(src) and st not in ['ID','IL','KS','WA','NM','SC'] and (st<>'PA' and county<>'001') and (st<>'SC' and county<>'091'))  //x Lexis Assessor state/county exceptions??
+			//or	(MDR.sourceTools.SourceIsLnPropV2_Lexis_Deeds_Mtgs(src) and st not in ['ID','IL','KS','NM','SC'] and (st<>'PA' and county<>'001')) 	//x Lexis Deeds and Mortgages state/county exceptions ??
+			//or	(MDR.sourceTools.SourceIsLnPropV2_Lexis_Asrs			(src) and st not in ['ID','IL','KS','WA','NM','SC'] and (st<>'PA' and county<>'001') and (st<>'SC' and county<>'091'))  //x Lexis Assessor state/county exceptions??
+			or	(MDR.sourceTools.SourceIsLnPropV2_Lexis_Deeds_Mtgs(src) and st not in ['ID','KS','SC'])
+			or	(MDR.sourceTools.SourceIsLnPropV2_Lexis_Asrs			(src) and st not in ['ID','KS','MT','SC','WA'])
 			or	(MDR.sourceTools.SourceIsDeath_State							(src) and st not in ['ID','IL','KS','WA','NM','SC'])	    		//x State Death, state exceptions ??
 			or	 MDR.sourceTools.SourceIsTUCS_Ptrack							(src)
 

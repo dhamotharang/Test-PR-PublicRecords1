@@ -12,6 +12,6 @@ export segmentation_keys := module
 
 	segmentation := dataset([],coreCheckLayout) ;
 	
-	sfile_key_did_ind := Data_Services.Data_Location.Prefix('SEGMENTATION') + 'thor_data400::key::insuranceheader_segmentation::did_ind_' + doxie.Version_SuperKey;
+	sfile_key_did_ind := Data_Services.Data_Location.Prefix('LAB_xLink') + 'key::insuranceheader_segmentation::did_ind_qa';
 	export key_did_ind := INDEX(segmentation, {did}, {segmentation}, sfile_key_did_ind	);	
 end;

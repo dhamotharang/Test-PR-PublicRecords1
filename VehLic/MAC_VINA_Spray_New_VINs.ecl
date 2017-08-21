@@ -6,10 +6,10 @@ zDo
  :=
   sequential
    (
-	lib_fileservices.FileServices.sprayfixed('10.150.12.240',
+	lib_fileservices.FileServices.sprayfixed(_control.IPAddress.edata12,
 											 '/data_999/vin_stuff/processed/' + pDateTimeStamp + '/vina_info.d00',
 											 420,
-											 'thor_dell400_2',
+											 _control.TargetGroup.ADL_400,
 											 '~thor_data400::in::vehreg_vina_info_' + pDateTimeStamp,
 											 ,
 											 ,

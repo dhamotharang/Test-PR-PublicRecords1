@@ -1,0 +1,31 @@
+//Executable code
+export Proc_Iterate(string iter) := module
+OMatchSamples := output(choosen(NGCDL2.matches(NGCDL2.In_HEADER).MatchSample,1000),named('MatchSample'));
+OBSamples := output(choosen(NGCDL2.matches(NGCDL2.In_HEADER).BorderlineMatchSample,10000),named('BorderlineMatchSample'));
+OAS := output(choosen(NGCDL2.matches(NGCDL2.In_HEADER).AlmostMatchSample,10000),named('AlmostMatchSample'));
+OSR := output(choosen(NGCDL2.matches(NGCDL2.In_HEADER).MatchSampleRecords,10000),named('MatchSampleRecords'));
+//export OutputSamples := PARALLEL(OMatchSamples,OBSamples,OAS,OSR);
+export OutputSamples := PARALLEL(OSR);// Most people only want the records!
+OS := output(NGCDL2.specificities(NGCDL2.In_HEADER).specificities,named('Specificities'));
+OPRP := output(NGCDL2.match_candidates(NGCDL2.In_HEADER).prepropogationstats,named('PrePopStats'));
+OPP := output(NGCDL2.match_candidates(NGCDL2.In_HEADER).postpropogationstats,named('PostPopStats'));
+PRPP := output(NGCDL2.matches(NGCDL2.In_HEADER).PrePatchIdCount,named('PrePatchIdCount'));
+PPP := output(NGCDL2.matches(NGCDL2.In_HEADER).PostPatchIdCount,named('PostPatchIdCount'));
+MP := output(NGCDL2.matches(NGCDL2.In_HEADER).MatchesPerformed,named('MatchesPerformed'));
+MPPA := output(NGCDL2.matches(NGCDL2.In_HEADER).MatchesPropAssisted * 100 / NGCDL2.matches(NGCDL2.In_HEADER).MatchesPerformed,named('PropogationAssisted_Pcnt'));
+MPPR := output(NGCDL2.matches(NGCDL2.In_HEADER).MatchesPropRequired * 100 / NGCDL2.matches(NGCDL2.In_HEADER).MatchesPerformed,named('PropogationRequired_Pcnt'));
+RE := output(choosen(matches(In_HEADER).RuleEfficacy,1000),named('RuleEfficacy'));
+CB := output(choosen(matches(In_HEADER).ConfidenceBreakdown,1000),named('ConfidenceLevels'));
+export ExecutionStats := PARALLEL(OS,OPRP,OPP,PRPP,PPP,MP,RE,CB,MPPA,MPPR);
+d := dataset([{NGCDL2.matches(NGCDL2.In_HEADER).PatchingError0,NGCDL2.matches(NGCDL2.In_HEADER).DidsNoRid0,NGCDL2.matches(NGCDL2.In_HEADER).DidsAboveRid0,NGCDL2.matches(NGCDL2.In_HEADER).DuplicateRids0,count(NGCDL2.match_candidates(NGCDL2.In_HEADER).Unlinkables)}],{integer PatchingError0, integer DidsNoRid0, integer DidsAboveRid0, integer DuplicateRids0, unsigned UnlinkableRecords0});
+export ValidityStats := output(d,named('ValidityStatistics'));
+KC := buildindex(keys.candidates,overwrite);
+KS := buildindex(keys.MatchSample,overwrite);
+KSS := buildindex(keys.Specificities_Key,overwrite,few);
+export DebugKeys := parallel(KC,KS,KSS);
+export OutputCandidates := buildindex(keys.PatchedCandidates,overwrite);
+export OutputFile := output(NGCDL2.matches(NGCDL2.In_HEADER).patched_infile,,'~thor_data400::temp::CDL::NGCDL2::it'+iter);// Change file for each iteration
+export OutputFileA := output(NGCDL2.matches(NGCDL2.In_HEADER).patched_infile,,'~thor_data400::temp::CDL::NGCDL2::it'+iter,overwrite);// Change file for each iteration
+export DoAll := PARALLEL(OutputSamples,ExecutionStats,ValidityStats,DebugKeys,OutputFile,OutputCandidates);
+export DoAllAgain := PARALLEL(OutputSamples,ExecutionStats,ValidityStats,DebugKeys,OutputFileA,OutputCandidates);
+end;

@@ -165,20 +165,21 @@ end;
 
 Mapping_WI_as_Search_temp := normalize(Watercraft.file_WI_clean_in,2,search_mapping_format_temp(left,counter));
 
+Watercraft.Macro_Clean_Hull_ID(Mapping_WI_as_Search_temp, Layout_Watercraft_Search_Group_temp,hull_clean_in)
 
-Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Layout_Watercraft_Search_Group_temp L, integer1 C)
+Watercraft.Layout_Watercraft_Search_Group search_mapping_format(hull_clean_in L, integer1 C)
  :=
   transform
-	self.date_first_seen			:=	L.reg_date;
-	self.date_last_seen				:=	L.reg_date;
+	self.date_first_seen			:=	if(L.reg_date<>'',l.reg_date,l.last_transaction_date);
+	self.date_last_seen				:=	if(L.reg_date<>'',l.reg_date,l.last_transaction_date);
 	self.date_vendor_first_reported	:=	L.process_date;
 	self.date_vendor_last_reported	:=	L.process_date;
 	self.watercraft_key				:=	trim(L.reg_num, left, right);
-	self.sequence_key				:=	trim(L.reg_date, left, right);
+	self.sequence_key				:=	if(trim(L.reg_date, left, right)<>'',L.reg_DATE,L.LAST_TRANSACTION_DATE);
 	self.state_origin				:=	'WI';
 	self.source_code				:=	'AW';
 	self.dppa_flag					:=	'';
-	self.orig_name					:=	choose(C,L.NAME, L.BUSINESS, L.CONTACT);
+	self.orig_name					:=	choose(C,if(trim(L.NAME,left,right)='NULL','',L.Name), if(trim(L.BUSINESS,left,right)='NULL','',L.BUSINESS), if(trim(L.CONTACT,left,right)='NULL','',L.CONTACT));
 	self.orig_name_type_code		:=	choose(C,'O','O','Z');
 	self.orig_name_type_description	:=	choose(C,'OWNER','OWNER','CONTACT');
 	self.orig_name_first			:=	choose(C,L.FIRST_NAME, '', '');
@@ -197,8 +198,8 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Layout_Watercraf
 	self.gender						:=	'';
 	self.phone_1					:=	'';
 	self.phone_2					:=	'';
-	self.clean_pname                :=  choose(C,L.clean_pname1,L.clean_pname2,L.clean_pname3);
-	self.company_name				:=	choose(C,L.cname1,L.BUSINESS_cname1, L.CONTACT_cname1);
+	self.clean_pname                :=  choose(C,if(trim(L.clean_pname1,left,right)[1..70]='NULL','',L.clean_pname1),if(trim(L.clean_pname2,left,right)[1..70]='NULL','',L.clean_pname2),if(trim(L.clean_pname3,left,right)[1..70]='NULL','',L.clean_pname3));
+	self.company_name				:=	choose(C,if(trim(L.cname1,left,right)='NULL','',L.cname1),if(trim(L.BUSINESS_cname1,left,right)='NULL','',L.BUSINESS_cname1), if(trim(L.CONTACT_cname1,left,right)='NULL','',L.CONTACT_cname1));
 	self.clean_address              :=  L.clean_address;            
 	self.bdid						:=	'';
 	self.fein						:=	'';
@@ -208,7 +209,7 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Layout_Watercraf
 	self.history_flag				:=	'';
   end
  ; 
- 
-export Mapping_WI_as_Search	:= (normalize(Mapping_WI_as_Search_temp,3,search_mapping_format(left,counter)))
+								
+export Mapping_WI_as_Search	:= (normalize(hull_clean_in,3,search_mapping_format(left,counter)))
                                 (clean_pname <> '' or company_name <> '');
 

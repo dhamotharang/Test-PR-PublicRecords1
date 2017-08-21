@@ -1,3 +1,13 @@
+/*2017-05-25T03:07:57Z (Srilatha Katukuri)
+ECH-4987 Production Bug
+*/
+/*2017-04-06T21:47:58Z (Srilatha Katukuri)
+DF-18925 - ClaimsCompass?Police Records -Addition of fields
+*/
+/*2016-09-21T17:27:53Z (Srilatha Katukuri)
+ECH4454 - Webcruiser Integration changes - For Review
+
+*/
 /*2015-08-08T00:07:58Z (Srilatha Katukuri)
 #181860 PRUS
 */
@@ -441,6 +451,8 @@ string10 report_agency_ori	;
 string20 report_status;
 string20 ReportLinkID; 
 string3 Page_Count;
+string1 is_delete;
+
 end;
 
 export persn := record
@@ -597,6 +609,7 @@ string64 transported_id_number;
 string10 witness_number	;
 string20 date_of_birth_derived;
 string Report_Injury_Status;
+string100 Address2;
 end;
 
 export vehicl := record
@@ -1238,6 +1251,7 @@ string40 Middle_Name;
 string3 Name_Suffx;
 string10 Date_of_Birth;
 string100 Address;
+string100 Address2;
 string50 City;
 string2 State;
 string10 Zip_Code;
@@ -1669,4 +1683,28 @@ export DidSlim := record
 	string15 temp_ssn ;
 	unsigned8 unique_id	;
 end;
+
+/* export SlimLayoutIncidents := record
+   	string40 accident_nbr;
+    string11 vehicle_incident_id_orig;
+    string8 creation_date;
+    string8 Sent_to_HPCC_DateTime;
+    string11 agency_id;
+    string2 report_code;
+    string11 Report_ID;
+    string2 jurisdiction_state;
+    string100 jurisdiction;
+    string8 accident_date;
+    string3 report_type;
+    string11 vehicle_incident_id_latest;
+   end;
+*/
+
+export suppress_incidents := record
+		string11 Incident_ID;
+		string9 ORI_Number;
+		string40 State_Report_Number;
+		string11 Agency_ID;
+end;
+
 end;

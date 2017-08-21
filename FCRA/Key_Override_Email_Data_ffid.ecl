@@ -1,6 +1,6 @@
 import fcra, ut; 
 
-base_file := dataset('~thor_data400::base::override::fcra::qa::email_data',FCRA.Layout_Override_Email_Data,flat);
+base_file := dataset('~thor_data400::base::override::fcra::qa::email_data',FCRA.Layout_Override_Email_Data,csv(separator('\t'),quote('\"'),terminator('\r\n')));
 
 kf := dedup(sort(base_file,-flag_file_id),except flag_file_id,keep(1));
 

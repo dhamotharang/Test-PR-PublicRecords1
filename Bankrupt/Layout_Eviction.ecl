@@ -72,7 +72,7 @@ export Layout_Eviction := record
    string4 err_stat;
    string12 did;
    string3 did_score;
-   string9 ssn;
+   string9 ssn_appended;
    string12 bdid;
    string1 glb_flag;
 end;

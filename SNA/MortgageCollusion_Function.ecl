@@ -212,7 +212,7 @@ deduped_property_addresses_with_fids := dedup(sort(property_addresses_with_fid, 
 		self.PropHighProf                      := bool(ri.high_profit); // Indicates a transaction where the current buyer paid 20% or greater than what the seller paid.
     self.PropFlipProfIndex                 := capr(if(nohit, -1, map(ri.flip => if(ri.price_change_percent<0,0.0,(ri.price_change_percent/100)),0.0)),99.9); // Indicates the percentage of profit derived from flipping a property
 //      use  1.75 net degree
-    self.PropNetwork                       := bool(ri.net_degree between 0 and network_degree_value); // Indicates a transaction between the participants, (such as a buyer and seller) where the parties are 1.75 degrees or less away.  This implies that they have multiple mutual associates or they are direct associates of each other.
+    self.PropNetwork                       := bool(ri.net_degree between 0 and network_degree_value); // Indicates a transaction between the participants, (such as a buyer and seller) where the parties are 1.75 degrees or less away.Â  This implies that they have multiple mutual associates or they are direct associates of each other.
     self.PropNetwHighProf                  := bool(ri.in_network_high_profit); // Indicates the property transfer occurred in-network and had high risk characteristics
     self.PropNetwProfIndex                 := capr(if(nohit, -1, map(ri.in_network_high_profit_flip  => if(ri.price_change_percent<0,0.0,(ri.price_change_percent/100)), 0.0)),99.9); // Percentage of profit derived from the in-network transaction
     self.PropNetwFlip                      := bool(ri.in_network_flip); // Indicates if the property was sold in-network for a profit within 6 months of the property purchase

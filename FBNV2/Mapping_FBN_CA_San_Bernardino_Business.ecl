@@ -1,21 +1,28 @@
-import ut,fbnv2;
+import ut,fbnv2,address,_validate;
 
 dFiling			            := dedup(FBNV2.File_CA_San_Bernardino_xml(bus_name<>''),all);
 
-layout_common.Business tFiling(dFiling pInput)
+layout_common.Business_AID tFiling(dFiling pInput)
    :=TRANSFORM
             self.tmsid					    := 'CAB'+trim(pInput.filing_number)+pInput.clean_address[1..10];
 			self.rmsid					    :=  pInput.filing_type[1]+hash(pInput.bus_name);
-			self.dt_first_seen      		:= (integer) pInput.FILing_DATE;
-			self.dt_last_seen       		:= (integer) pInput.date_last_trans;
-			self.dt_vendor_first_reported  	:= (integer) pInput.date_last_trans;
-			self.dt_vendor_last_reported  	:= (integer) pInput.date_last_trans;
+			self.dt_first_seen      		:= if(_validate.date.fIsValid((string)pInput.Filing_date),(integer) pInput.FILing_DATE,0);
+			self.dt_last_seen       		:= if(_validate.date.fIsValid((string)pInput.date_last_trans),(integer) pInput.date_last_trans,0);
+			self.dt_vendor_first_reported  	:= if(_validate.date.fIsValid((string)pInput.date_last_trans),(integer) pInput.date_last_trans,0);
+			self.dt_vendor_last_reported  	:= if(_validate.date.fIsValid((string)pInput.date_last_trans),(integer) pInput.date_last_trans,0);
 			self.Filing_Jurisdiction        := 'CAB';
 			self.FILING_NUMBER           	:= pInput.filing_number;           
-			self.Filing_date                := (integer) pInput.FILing_DATE ;          
+			self.Filing_date                := if(_validate.date.fIsValid((string)pInput.Filing_date),(integer) pInput.FILing_DATE,0);          
 			self.BUS_PHONE_NUM           	:= pInput.bus_PHONE ; 
 			SELF.LONG_BUS_NAME              := pInput.BUS_NAME;
-			self.BUS_ADDRESS1           	:= pInput.bus_ADDRESS;             
+			self.BUS_ADDRESS1           	:= pInput.bus_ADDRESS;  
+			self.BUS_STATE								:= 'CA';
+			self.BUS_COUNTY								:= 'SAN BERNARDI';
+			self.MAIL_Street                := Pinput.bus_ADDRESS; 
+			self.Mail_CITY					:= pInput.Bus_CITY;
+			self.Mail_state					:= pInput.Bus_state;
+			self.Mail_zip					:= pInput.Bus_zip;
+/*			
 			self.prim_range 				:=	pInput.clean_address[1..10];			
 			self.predir 					:=	pInput.clean_address[11..12];			
 			self.prim_name 					:=	pInput.clean_address[13..40];			
@@ -56,21 +63,48 @@ layout_common.Business tFiling(dFiling pInput)
 			self.mail_geo_blk 				:=	pInput.clean_address[171..177];			
 			self.mail_geo_match 			:=	pInput.clean_address[178];			
 			self.mail_err_stat 				:=	pInput.clean_address[179..182];
+*/
+
+			self.prep_addr_line1			:= address.Addr1FromComponents(
+																					stringlib.stringtouppercase(trim(pInput.bus_ADDRESS,left,right))
+																					,''
+																					,''
+																					,''
+																					,''
+																					,''
+																					,'');
+			self.prep_addr_line_last	:= address.Addr2FromComponents(
+																					stringlib.stringtouppercase(trim(pInput.Bus_CITY ))
+																					,stringlib.stringtouppercase(trim(pInput.Bus_state))
+																					,pInput.Bus_zip[1..5]);
+
+			self.prep_mail_addr_line1			:= address.Addr1FromComponents(
+																					stringlib.stringtouppercase(trim(pInput.Bus_ADDRESS,left,right))
+																					,''
+																					,''
+																					,''
+																					,''
+																					,''
+																					,'');
+			self.prep_mail_addr_line_last	:= address.Addr2FromComponents(
+																					stringlib.stringtouppercase(trim(pInput.Bus_CITY ))
+																					,stringlib.stringtouppercase(trim(pInput.Bus_STATE))
+																					,pInput.Bus_zip[1..5]);
+
 			self.bus_zip                    :=  (integer) pInput.bus_zip;
 			self                            :=  pInput;
+			self											:= [];
 
 	 end;
 
-layout_common.Business  rollupXform(layout_common.Business pLeft, layout_common.Business pRight) 
+layout_common.Business_AID  rollupXform(layout_common.Business_AID pLeft, layout_common.Business_AID pRight) 
 	:= transform
 		
-		self.Dt_First_Seen := IF(pLeft.dt_First_Seen > pRight.dt_First_Seen, pRight.dt_First_Seen, pLeft.dt_First_Seen);
-		self.Dt_Last_Seen  := IF(pLeft.dt_Last_Seen  < pRight.dt_Last_Seen,  pRight.dt_Last_Seen,  pLeft.dt_Last_Seen);
-		self.Dt_Vendor_First_Reported := IF(pLeft.dt_Vendor_First_Reported > pRight.dt_Vendor_First_Reported, 
-											pRight.dt_Vendor_First_Reported, pLeft.dt_Vendor_First_Reported);
-		self.Dt_Vendor_Last_Reported  := IF(pLeft.dt_Vendor_Last_Reported  < pRight.dt_Vendor_Last_Reported,  
-											pRight.dt_Vendor_Last_Reported, pLeft.dt_Vendor_Last_Reported);
-		self := pLeft;
+		self.Dt_First_Seen := ut.Min2(pLeft.dt_First_Seen,pRight.dt_First_Seen);
+		self.Dt_Last_Seen  := MAX(pLeft.dt_Last_Seen ,pRight.dt_last_seen);
+		self.Dt_Vendor_First_Reported := ut.min2(pLeft.dt_Vendor_First_Reported,pRight.dt_Vendor_First_Reported);
+		self.Dt_Vendor_Last_Reported  := MAX(pLeft.dt_Vendor_Last_Reported,pRight.dt_Vendor_Last_Reported);
+	    self := pLeft;
 	END;
 	
 

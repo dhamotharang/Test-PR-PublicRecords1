@@ -1,0 +1,3 @@
+import Scrubs_Property_Foreclosures;
+
+EXPORT Layout_Property_Foreclosures := recordof(Scrubs_Property_Foreclosures.In_Property_Foreclosures);

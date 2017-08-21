@@ -253,5 +253,8 @@ CASE(i,
 253 => 'VCTY',
 254 => 'WSTR',
 255 => 'ZONG',
+256 => 'JAYCO',
+257 => 'TITAN',
+258 => 'TERRY',
 'OTHER');
 

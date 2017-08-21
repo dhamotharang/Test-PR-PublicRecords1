@@ -1,4 +1,4 @@
-export REC_WithExpEvent := record
+export layout_Moxie_WithExpEvent := record
 
 
     string1 	record_type;  //current/historical

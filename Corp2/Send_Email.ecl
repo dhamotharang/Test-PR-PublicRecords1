@@ -1,29 +1,27 @@
-import VersionControl;
-export Send_Email :=
-module
-
-	export BuildSuccess	:= fileservices.sendemail(
-													Email_Notification_Lists.BuildSuccess,
-													'Corp2 Build ' + versions.building + ' Completed',
-													workunit);
-
-	export BuildFailure	:= fileservices.sendemail(
-													Email_Notification_Lists.BuildFailure,
-													'Corp2 Build ' + versions.building + ' Failed',
-													workunit + '\n' + failmessage);
-	export Roxie :=
-	module
+import tools;
+lay_builds 	:= tools.Layout_FilenameVersions.builds;
+export Send_Email(
 	
-		export QA := versioncontrol.fSendRoxieEmail( 
-						 Email_Notification_Lists.roxie
-						,Datasetname + ' Build completed ' + versions.building
-						,keynames.dAll_superkeynames(regexfind('^(.*)::[qQ][aA]::(.*)$', name)));
-		
-		export Prod := versioncontrol.fSendRoxieEmail( 
-						 Email_Notification_Lists.roxie
-						,Datasetname + ' Build completed ' + versions.building
-						,keynames.dAll_superkeynames(regexfind('^(.*)::[pP][rR][oO][dD]::(.*)$', name)));
-	
-	
-	end;
-end;
+	 string								pversion
+	,boolean							pUseOtherEnvironment 		= false
+	,boolean							pShouldUpdateRoxiePage	= true
+	,dataset(lay_builds)	pBuildFilenames					= keynames(pversion).dAll_filenames
+	,string								pEmailList							= Email_Notification_Lists.BuildSuccess
+	,string								pRoxieEmailList					= Email_Notification_Lists.Roxie
+	,string								pPackageName						= Datasetname + 'Keys'
+	,string								pBuildMessage						= 'Base Files Finished'
+	,string               pUseVersion             = 'qa'
+	,string               pEnvironment            = 'N|B'
+) := 
+	tools.mod_SendEmails(
+		 pversion
+		,pBuildFilenames					
+		,pEmailList							
+		,pRoxieEmailList					
+		,Datasetname							
+		,pPackageName			
+		,pBuildMessage
+		,pShouldUpdateRoxiePage	
+		,pUseVersion
+		,pEnvironment
+	);

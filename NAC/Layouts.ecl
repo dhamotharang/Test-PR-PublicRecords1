@@ -43,8 +43,8 @@ export Layouts := MODULE
 		,string10	State_Contact_Phone
 		,string10	State_Contact_Phone_Extension
 		,string256	State_Contact_Email
-		,string52	Filler
-		,string1 cr
+		,string52	Filler:=''
+		,string1 cr:='\n'
 	END;
 
 	export Input_Prepped := RECORD
@@ -95,6 +95,7 @@ export Layouts := MODULE
 		,unsigned  did_score:=0
 		,unsigned4 ProcessDate:=0
 		,unsigned4 NCF_FileDate:=0
+		,string6 NCF_FileTime:=''
 		,unsigned6 PrepRecSeq:=0
 		,string9   clean_ssn:=''
 		,string9   best_ssn:=''
@@ -102,6 +103,7 @@ export Layouts := MODULE
 		,integer4  age:=0
 		,integer4  best_dob:=0
 		,address.Layout_Clean_Name.title
+		,typeof(address.Layout_Clean_Name.fname) prefname:=''
 		,address.Layout_Clean_Name.fname
 		,address.Layout_Clean_Name.mname
 		,address.Layout_Clean_Name.lname
@@ -179,6 +181,8 @@ export Collisions := record
 	,string25 SearchMiddleName
 	,string9 SearchSSN
 	,string8 SearchDOB
+	,STRING8 SearchEligibilityDate
+	,string1 SearchEligibilityStatus
 	,string70 SearchAddress1StreetAddress1
 	,string70 SearchAddress1StreetAddress2
 	,string30 SearchAddress1City
@@ -232,7 +236,9 @@ export Collisions := record
 	,string256 StateContactEmail
 	,string3 LexIdScore
 	,string10 MatchCodes
+	,unsigned6 OrigSearchSequenceNumber
 	,string4 SearchSequenceNumber
+	,unsigned6 OrigClientSequenceNumber
 	,string4 ClientSequenceNumber
 	,unsigned4 SearchNCFFileDate
 	,unsigned4 ClientNCFFileDate
@@ -247,7 +253,11 @@ export DBC := RECORD
 						pri
 						,matchset
 						,LexID
+						,SearchEligibilityDate
+						,SearchEligibilityStatus
+						,OrigSearchSequenceNumber
 						,SearchSequenceNumber
+						,OrigClientSequenceNumber
 						,ClientSequenceNumber
 						,SearchNCFFileDate
 						,ClientNCFFileDate
@@ -266,6 +276,7 @@ export MSH:=record
 		,string10 MRFRecordNumber
 		,string20 DrupalUserLoginId
 		,string15 DrupalUserIP
+		,string2 DrupalUserState
 		,string20 EndUserName
 		,string15 EndUserIP
 		,string16 DrupalTransactionId
@@ -341,13 +352,205 @@ export MSH:=record
 		,string1 LF:='\n'
 	end;
 
-export fl_temp := RECORD
-		load - [
-			State_Contact_Name
-		,	State_Contact_Phone
-		,	State_Contact_Phone_Extension
-		,	State_Contact_Email
-		,	Filler ]
-	END;
+	// NCM Example:		GA_NCF_20131001_100915.dat,GA,20131001,100915,Y,292,0,0,981
+	export	NCM	:=
+	record
+		string		Filename;
+		string		State;
+		string		FileDate;
+		string		FileTime;
+		string		IsAccepted;
+		string		RecordsTotal;
+		string		RecordsRejected;
+		string		ErrorCount;
+		string		WarningCount;
+	end;
+
+	export	NCD	:=
+	record
+		string1		RecordType;					// C=Contribution, R=Record, F=Field
+		string2		Filler1	:=	'';
+		string4		Code;
+		string2		Filler2	:=	'';
+		string4		CodeValue;
+		string2		Filler3	:=	'';
+		string40	Description;
+		string2		Filler4	:=	'';
+		string12	CodeCount;
+		string2		Filler5	:=	'';
+		string8		CodePercent;
+		string2		Filler6	:=	'';
+		string12	SampleRecord;
+		string2		Filler7	:=	'';
+		string80	SampleValue;
+		string1		LF	:=	'\n';
+	end;
+
+	export	MRR :=
+	record
+		string1		ActivityType;
+		string8		BatchJobId;
+		string40	BatchFileName;
+		string10	BatchRecordNumber;
+		string20	RequestRecordID;
+		string20	SearchCaseID;
+		string20	SearchClientID;
+		string1		SearchBenefitType;
+		string6		SearchBenefitMonth;
+		string60	SearchFullName;
+		string30	SearchLastName;
+		string25	SearchFirstName;
+		string25	SearchMiddleName;
+		string5		SearchSuffix;
+		string9		SearchSSN;
+		string8		SearchDOB;
+		string70	SearchAddress1StreetAddress1;
+		string70	SearchAddress1StreetAddress2;
+		string30	SearchAddress1City;
+		string2		SearchAddress1State;
+		string9		SearchAddress1Zip;
+		string70	SearchAddress2StreetAddress1;
+		string70	SearchAddress2StreetAddress2;
+		string30	SearchAddress2City;
+		string2		SearchAddress2State;
+		string9		SearchAddress2Zip;
+		string1		IncludeTwelveMonthHistory;
+		string4		QueryStatus;
+		string70	QueryStatusMessage;
+		string2		CaseState;
+		string1		CaseBenefitType;
+		string6		CaseBenefitMonth;
+		string20	CaseID;
+		string30	CaseLastName;
+		string25	CaseFirstName;
+		string25	CaseMiddleName;
+		string10	CasePhone1;
+		string10	CasePhone2;
+		string256	CaseEmail;
+		string70	CasePhysicalStreet1;
+		string70	CasePhysicalStreet2;
+		string30	CasePhysicalCity;
+		string2		CasePhysicalState;
+		string9		CasePhysicalZip;
+		string70	CaseMailStreet1;
+		string70	CaseMailStreet2;
+		string30	CaseMailCity;
+		string2		CaseMailState;
+		string9		CaseMailZip;
+		string3		CaseCountyParishCode;
+		string25	CaseCountyParishName;
+		string20	ClientID;
+		string30	ClientLastName;
+		string25	ClientFirstName;
+		string25	ClientMiddleName;
+		string1		ClientGender;
+		string1		ClientRace;
+		string1		ClientEthnicity;
+		string9		ClientSSN;
+		string1		ClientSSNType;
+		string8		ClientDOB;
+		string1		ClientDOBType;
+		string1		ClientEligibilityStatus;
+		string8		ClientEligibilityDate;
+		string10	ClientPhone;
+		string256	ClientEmail;
+		string50	StateContactName;
+		string10	StateContactPhone;
+		string10	StateContactPhoneExtension;
+		string256	StateContactEmail;
+		string3		LexIdScore;
+		string10	MatchCodes;
+		string84	TwelveMonthHistory;
+		string4		SequenceNumber;
+		string1		LF;
+	end;
+
+	export	SSE	:=
+	record
+		string1		ActivityType;
+		string6		CaseBenefitMonth;
+		string1		CaseBenefitType;
+		string3		CaseCountyParishCode;
+		string25	CaseCountyParishName;
+		string256	CaseEmail;
+		string25	CaseFirstName;
+		string20	CaseID;
+		string30	CaseLastName;
+		string30	CaseMailCity;
+		string2		CaseMailState;
+		string70	CaseMailStreet1;
+		string70	CaseMailStreet2;
+		string9		CaseMailZip;
+		string25	CaseMiddleName;
+		string10	CasePhone1;
+		string10	CasePhone2;
+		string30	CasePhysicalCity;
+		string2		CasePhysicalState;
+		string70	CasePhysicalStreet1;
+		string70	CasePhysicalStreet2;
+		string9		CasePhysicalZip;
+		string2		CaseState;
+		string8		ClientDOB;
+		string1		ClientDOBType;
+		string8		ClientEligibilityDate;
+		string1		ClientEligibilityStatus;
+		string256	ClientEmail;
+		string1		ClientEthnicity;
+		string25	ClientFirstName;
+		string1		ClientGender;
+		string20	ClientID;
+		string30	ClientLastName;
+		string25	ClientMiddleName;
+		string10	ClientPhone;
+		string1		ClientRace;
+		string9		ClientSSN;
+		string1		ClientSSNType;
+		string16	DrupalTransactionId;
+		string15	DrupalUserIP;
+		string20	DrupalUserLoginId;
+		string2		DrupalUserState;
+		string16	ESPTransactionId;
+		string15	EndUserIP;
+		string20	EndUserName;
+		string1		IncludeTwelveMonthHistory;
+		string3		LexIdScore;
+		string2		MSHRecipientState;
+		string10	MatchCodes;
+		string4		QueryStatus;
+		string70	QueryStatusMessage;
+		string30	SearchAddress1City;
+		string2		SearchAddress1State;
+		string70	SearchAddress1StreetAddress1;
+		string70	SearchAddress1StreetAddress2;
+		string9		SearchAddress1Zip;
+		string30	SearchAddress2City;
+		string2		SearchAddress2State;
+		string70	SearchAddress2StreetAddress1;
+		string70	SearchAddress2StreetAddress2;
+		string9		SearchAddress2Zip;
+		string6		SearchBenefitMonth;
+		string1		SearchBenefitType;
+		string20	SearchCaseId;
+		string20	SearchClientId;
+		string8		SearchDOB;
+		string25	SearchFirstName;
+		string60	SearchFullName;
+		string30	SearchLastName;
+		string25	SearchMiddleName;
+		string9		SearchSSN;
+		string5		SearchSuffix;
+		string4		SequenceNumber;
+		string256	StateContactEmail;
+		string50	StateContactName;
+		string10	StateContactPhone;
+		string10	StateContactPhoneExtension;
+		string84	TwelveMonthHistory;
+		string1		InvestigativePurpose;
+		string2		SearchBenefitState;
+		string6		SearchBenefitMonthStart;
+		string6		SearchBenefitMonthEnd;
+		string1		SearchEligibilityStatus;
+		string1		LF;
+	end;
 
 END;

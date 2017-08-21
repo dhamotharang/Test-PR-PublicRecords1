@@ -8,11 +8,12 @@ export Keys(
 ) :=
 module
 
-	shared Base					:= project(Files(pversion).Base.Built, transform(layouts.keybuild, self := left));
+	shared Base					:= Files(pversion).Base.Built;
+	shared dkeybuild		:= project(base, transform(layouts.keybuild	,self := left));
 
-	shared FilterBdids	:= Base(bdid	!= 0);
-	shared FilterDids		:= Base(did		!= 0);
-	
+	shared FilterBdids	:= dkeybuild(bdid	!= 0);
+	shared FilterDids		:= dkeybuild(did	!= 0);
+		
 	versioncontrol.macBuildKeyVersions(FilterBdids	,{bdid}	  ,{FilterBdids	}	,keynames(pversion,pUseOtherEnvironment).Bdid		,Bdid  );
 	versioncontrol.macBuildKeyVersions(FilterDids		,{did	}	  ,{FilterDids	}	,keynames(pversion,pUseOtherEnvironment).Did		,Did	 );
 

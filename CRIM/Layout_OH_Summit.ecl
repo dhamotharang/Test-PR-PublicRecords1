@@ -1,0 +1,35 @@
+export Layout_OH_Summit := RECORD
+string ID; 
+string Defendant; 
+string FirstName; 
+string MiddleName; 
+string LastName; 
+string Suffix; 
+string CaseNumber; 
+string FileDate; 
+string Type; 
+string Judge; 
+string Defendant_Address; 
+string Defendant_City; 
+string Defendant_State; 
+string DefendantZip; 
+string DateOfBirth; 
+string Gender; 
+string Race; 
+string Defendant_Attorney; 
+string Defendant_AttorneyAddress; 
+string CoDefendant; 
+string CoDefendant_Address; 
+string CoDefendant_City; 
+string CoDefendant_State; 
+string CoDefendant_Zip; 
+string CoDefendant_Attorney; 
+string CoDefendant_AttorneyAddress; 
+string Offense_Type; 
+string Offense_Code; 
+string Offense_Description; 
+string Offense_Count; 
+string Offense_Class; 
+string Offense_Date; 
+
+end; 

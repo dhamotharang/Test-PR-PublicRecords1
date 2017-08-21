@@ -1,4 +1,4 @@
-import standard, ut, doxie; 
+import standard, ut, doxie, codes; 
 
 export file_SearchAutokey_bid(
 	dataset(LiensV2.Layout_liens_party_bid) party_files = dataset([],LiensV2.Layout_liens_party_bid),
@@ -14,8 +14,8 @@ strec := record
 end;
 
 strec mftra(main_files l) := transform
-	self.st := map(ut.valid_st(l.filing_jurisdiction) => l.filing_jurisdiction,
-				   ut.valid_st(l.filing_state) => 		 l.filing_state,
+	self.st := map(codes.valid_st(l.filing_jurisdiction) => l.filing_jurisdiction,
+				   codes.valid_st(l.filing_state) => 		 l.filing_state,
 				   '');
 	self := l;
 end;

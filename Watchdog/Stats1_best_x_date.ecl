@@ -1,4 +1,4 @@
-a := dataset('persist::watchdog_joined',layout_best,flat);
+a := dataset('persist::watchdog_joined',Watchdog.Layout_Best_Marketing_Flag,flat);
 
 stat1RecFmt := RECORD
 	run_date := a.run_date;

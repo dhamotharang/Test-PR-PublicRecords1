@@ -1,4 +1,4 @@
-import American_student_list, Doxie, ut;
+Import Data_Services, American_student_list, Doxie, ut;
 
 file_in := American_student_list.File_american_student_DID_PH_Suppressed;
 
@@ -13,4 +13,4 @@ export key_stu_address := index(file_in,
 								 l_lname := lname,
 								 string20 l_pfname := datalib.preferredfirst(fname),
 								 l_fname := fname},{file_in},
-								'~thor_data400::key::American_Student::' + Doxie.Version_SuperKey+'::Address');
+								Data_Services.Data_location.Prefix('american_student')+'thor_data400::key::American_Student::' + Doxie.Version_SuperKey+'::Address');

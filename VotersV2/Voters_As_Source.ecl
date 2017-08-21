@@ -1,6 +1,6 @@
 import header;
 
-Layout_in := VotersV2.Layouts_Voters.Layout_Voters_Base;
+Layout_in := VotersV2.Layouts_Voters.Layout_Voters_Base_new;
 
 export Voters_As_Source(dataset(Layout_in) pVoters = dataset([],Layout_in), boolean pForHeaderBuild=false)
  :=
@@ -10,19 +10,10 @@ export Voters_As_Source(dataset(Layout_in) pVoters = dataset([],Layout_in), bool
 					   pVoters
 					  );
 
-	src_rec := record
-	 header.Layout_Source_ID;
-	 Layout_in;
-	end;
+	src_rec := header.layouts_SeqdSrc.VO_src_rec;
 
 	header.Mac_Set_Header_Source(dSourceData,Layout_in,src_rec,'VO',withUID)
 
-	dForHeader	:=	withUID	: persist('persist::headerbuild_voters_src');
-	dForOther	:=	withUID;
-	ReturnValue	:=	if(pForHeaderBuild,
-					   dForHeader,
-					   dForOther
-					  );
-	return ReturnValue;
+	return withUID;
   end
  ;

@@ -1,0 +1,1 @@
+export Decode_Spclty := dataset('~thor_data400::upin_decode_spclty_20050701', UPIN.Layout_Spclty, flat);

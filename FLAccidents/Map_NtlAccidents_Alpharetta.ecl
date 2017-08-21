@@ -17,6 +17,7 @@ end;
 temp_layout2 trecsb(d L) := transform
 self.temp_addr1 := L.HOUSE_NBR+' '+L.STREET+' '+L.APT_NBR;
 self.temp_addr2 := L.inc_CITY+' '+L.STATE_ABBR+' '+L.ZIP5;
+self.edit_agency_name     := trim(regexreplace(';' ,trim(L.edit_agency_name),''));
 self := L;
 end;
 
@@ -428,7 +429,7 @@ dlf.orig_state;
 dlf.did;
 end;
 
-tbl_dls := table(dlf,slim_dl,lname,fname,mname,dl_number,orig_state,did,few): persist('~thor_200::persist::tbl_dl');
+tbl_dls := table(dlf,slim_dl,lname,fname,mname,dl_number,orig_state,did,few): persist('~thor_200::persist::tbl_dl_ntl');
 
 natAcc_noDID getDID(natAcc_noDID L, tbl_dls R) :=transform
 self.did := map(L.pty_DRIVERS_LICENSE = R.dl_number 
@@ -479,20 +480,25 @@ appndDID2 := join(appndDID,dedup(tbl_dls,dl_number,fname,all),
     left.pty_DRIVERS_LICENSE = right.dl_number and
        ut.NNEQ(left.drivers_license_st,right.orig_state) and
     ut.NNEQ((string)left.mname[1],(string)right.mname[1])
-    and (regexfind(
-      regexreplace(' +',right.fname,' ')
-        ,regexreplace(' +',left.fname+' '+left.inquiry_mname+' '+left.lname,' ')) or 
-         regexfind(
-      trim(right.fname,all)
-           ,regexreplace(' +',left.fname+' '+left.inquiry_mname+' '+left.lname,' '))),
+    and (StringLib.Stringfind(
+		                    regexreplace(' +',left.fname+' '+left.inquiry_mname+' '+left.lname,' '),
+												
+                          regexreplace(' +',right.fname,' ') , 1 
+											 ) <> 0
+											 or 
+         StringLib.Stringfind( 
+				             regexreplace(' +',left.fname+' '+left.inquiry_mname+' '+left.lname,' '),
+										     trim(right.fname,all), 1 
+										   ) <> 0
+      ),
     getDID2(left,right),left outer,hash);
 
-natAcc_all := appndDID2 + natAcc_allothers : persist('~thor_data400::persist::ntlcrash_did','thor400_92');						
+natAcc_all := appndDID2 + natAcc_allothers : persist('~thor_data400::persist::ntlcrash_did');						
 sfShuffle := sequential(
-	fileservices.addsuperfile('~thor_data400::base::ntlcrash_delete','~thor_data400::base::ntlcrash_grandfather',0,true),
-	fileservices.deletesuperfile('~thor_data400::base::ntlcrash_delete',true),
+
 	fileservices.startsuperfiletransaction(),
-	fileservices.createsuperfile('~thor_data400::base::ntlcrash_delete'),
+	fileservices.addsuperfile('~thor_data400::base::ntlcrash_delete','~thor_data400::base::ntlcrash_grandfather',0,true),
+	fileservices.RemoveOwnedSubFiles('~thor_data400::base::ntlcrash_delete',true),
 	fileservices.clearsuperfile('~thor_data400::base::ntlcrash_grandfather'),
 	fileservices.addsuperfile('~thor_data400::base::ntlcrash_grandfather','~thor_data400::base::ntlcrash_father',0,true),
 	fileservices.clearsuperfile('~thor_data400::base::ntlcrash_father'),

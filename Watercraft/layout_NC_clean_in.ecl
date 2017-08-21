@@ -1,6 +1,5 @@
-export layout_NC_clean_in :=
+export layout_NC_clean_in := record//rec_len=2161
 
-record
    string2 state_origin;
    string8 process_date;
    string3 STATEABREV;

@@ -1,7 +1,7 @@
 import strata, ut;
 
 export Strata_Pop_Base(string pVersion) := function
-dsBin := File_FBN_Business_Base;
+dsBin := FBNV2.File_FBN_Business_Base_AID;
 dsCin := File_FBN_contact_Base;
 
 layoutState:=record
@@ -46,12 +46,20 @@ end;
 dSB :=project(dSBin,transfm(left));
 dSC:=join(dSCin,dLookup,left.tmsid=right.tmsid and left.rmsid=right.rmsid, transf(left,right));
 
+rBDIDstats_dSC := record
+  integer countGroup := count(group);
+  dSC.sourceGroup;
+  dSC.StateGroup;
+  BDID_nonzero := sum(group, if(dSC.bdid <> 0, 1, 0));
+  //has_bdid   := sum(group,IF((unsigned6)dSC(lname = '').bdid <> 0,1,0))/sum(group,IF(dSC.lname = '',1,0)) * 100;
+end;
+
 rDIDstats_dSC := record
   integer countGroup := count(group);
   dSC.sourceGroup;
   dSC.StateGroup;
-  Has_DID 	 := sum(group,IF((unsigned6)dSC(lname <> '').did <> 0,1,0))/sum(group,IF(dSC.lname <> '',1,0)) * 100;
-  has_bdid   := sum(group,IF((unsigned6)dSC(lname = '').bdid <> 0,1,0))/sum(group,IF(dSC.lname = '',1,0)) * 100;
+  DID_nonzero := sum(group, if(dsc.did <> 0, 1, 0));
+  //Has_DID 	 := sum(group,IF((unsigned6)dSC(lname <> '').did <> 0,1,0))/sum(group,IF(dSC.lname <> '',1,0)) * 100;
 end;
 
 rPopulationStats_FBNV2_business
@@ -59,9 +67,9 @@ rPopulationStats_FBNV2_business
   record
    
     integer countGroup := count(group);
-	dSB.StateGroup  ;
+	  dSB.StateGroup  ;
     dSB.SourceGroup;  
-	Tmsid_CountNonZero                                   := sum(group,if(dsB.Tmsid<>'',1,0));
+	  Tmsid_CountNonZero                                   := sum(group,if(dsB.Tmsid<>'',1,0));
     Rmsid_CountNonZero                                   := sum(group,if(dsB.Rmsid<>'',1,0));
     dt_first_seen_CountNonZero                           := sum(group,if(dsb.dt_first_seen<>0,1,0));
     dt_last_seen_CountNonZero                            := sum(group,if(dsb.dt_last_seen<>0,1,0));
@@ -70,7 +78,6 @@ rPopulationStats_FBNV2_business
     Filing_Jurisdiction_CountNonZero                     := sum(group,if(dsb.Filing_Jurisdiction<>'',1,0));
     FILING_NUMBER_CountNonZero                           := sum(group,if(dsb.FILING_NUMBER<>'',1,0));
     Filing_date_CountNonZero                             := sum(group,if(dsb.Filing_date<>0,1,0));
-    
     EXPIRATION_DATE_CountNonZero                         := sum(group,if(dsb.EXPIRATION_DATE<>0,1,0));
     CANCELLATION_DATE_CountNonZero                       := sum(group,if(dsb.CANCELLATION_DATE<>0,1,0));
     ORIG_FILING_NUMBER_CountNonZero                      := sum(group,if(dsb.ORIG_FILING_NUMBER<>'',1,0));
@@ -84,7 +91,6 @@ rPopulationStats_FBNV2_business
     BUS_TYPE_DESC_CountNonZero                           := sum(group,if(dsb.BUS_TYPE_DESC<>'',1,0));
     BUS_ADDRESS1_CountNonZero                            := sum(group,if(dsb.BUS_ADDRESS1<>'',1,0));
     BUS_ADDRESS2_CountNonZero                            := sum(group,if(dsb.BUS_ADDRESS2<>'',1,0));
-    
     BUS_COUNTY_CountNonZero                              := sum(group,if(dsb.BUS_COUNTY<>'',1,0));
     BUS_STATE_CountNonZero                               := sum(group,if(dsb.BUS_STATE<>'',1,0));
     BUS_ZIP_CountNonZero                                 := sum(group,if(dsb.BUS_ZIP<>0,1,0));
@@ -95,22 +101,20 @@ rPopulationStats_FBNV2_business
     MAIL_STATE_CountNonZero                              := sum(group,if(dsb.MAIL_STATE<>'',1,0));
     MAIL_ZIP_CountNonZero                                := sum(group,if(dsb.MAIL_ZIP<>'',1,0));
     prim_range_CountNonBlank                             := sum(group,if(dsb.prim_range<>'',1,0));
-    
     prim_name_CountNonBlank                              := sum(group,if(dsb.prim_name<>'',1,0));
     addr_suffix_CountNonBlank                            := sum(group,if(dsb.addr_suffix<>'',1,0));
     postdir_CountNonBlank                                := sum(group,if(dsb.postdir<>'',1,0));
     unit_desig_CountNonBlank                             := sum(group,if(dsb.unit_desig<>'',1,0));
     sec_range_CountNonBlank                              := sum(group,if(dsb.sec_range<>'',1,0));
     v_city_name_CountNonBlank                            := sum(group,if(dsb.v_city_name<>'',1,0));
-    
-    
-    
+		st_CountNonBlank                                     := sum(group,if(dsb.st<>'',1,0));
+    zip5_CountNonBlank                                   := sum(group,if(dsb.zip5<>'',1,0));
+    zip4_CountNonBlank                                   := sum(group,if(dsb.zip4<>'',1,0));
     addr_rec_type_CountNonBlank                          := sum(group,if(dsb.addr_rec_type<>'',1,0));
     fips_state_CountNonBlank                             := sum(group,if(dsb.fips_state<>'',1,0));
     fips_county_CountNonBlank                            := sum(group,if(dsb.fips_county<>'',1,0));
     geo_lat_CountNonBlank                                := sum(group,if(dsb.geo_lat<>'',1,0));
     geo_long_CountNonBlank                               := sum(group,if(dsb.geo_long<>'',1,0));
-    
     geo_blk_CountNonBlank                                := sum(group,if(dsb.geo_blk<>'',1,0));
     geo_match_CountNonBlank                              := sum(group,if(dsb.geo_match<>'',1,0));
     err_stat_CountNonBlank                               := sum(group,if(dsb.err_stat<>'',1,0));
@@ -135,15 +139,39 @@ rPopulationStats_FBNV2_business
     mail_geo_match_CountNonBlank                         := sum(group,if(dsb.mail_geo_match<>'',1,0));
     mail_err_stat_CountNonBlank                          := sum(group,if(dsb.mail_err_stat<>'',1,0));
     bdid_CountNonZero                                    := sum(group,if(dsb.bdid<>0,1,0));
-    bdid_score_CountNonZero                              := sum(group,if(dsb.bdid_score<>0,1,0));
+    bdid_score_CountNonZero                              := sum(group,if(dsb.bdid_score<>0,1,0));	
+		//BIPV2 fields have been added for Strata
+		source_rec_id_CountNonZeros	   											 := sum(group,if(dsb.source_rec_id<>0,1,0));
+		DotID_CountNonZeros	 																 := sum(group,if(dsb.DotID<>0,1,0));
+		DotScore_CountNonZeros	  													 := sum(group,if(dsb.DotScore<>0,1,0));
+		DotWeight_CountNonZeros	 														 := sum(group,if(dsb.DotWeight<>0,1,0));
+		EmpID_CountNonZeros	   															 := sum(group,if(dsb.EmpID<>0,1,0));
+ 		EmpScore_CountNonZeros	 														 := sum(group,if(dsb.EmpScore<>0,1,0));
+		EmpWeight_CountNonZeros	 									           := sum(group,if(dsb.EmpWeight<>0,1,0));
+		POWID_CountNonZeros	                                 := sum(group,if(dsb.POWID<>0,1,0));
+		POWScore_CountNonZeros	                             := sum(group,if(dsb.POWScore<>0,1,0));
+		POWWeight_CountNonZeros	                             := sum(group,if(dsb.POWWeight<>0,1,0));
+		ProxID_CountNonZeros	                               := sum(group,if(dsb.ProxID<>0,1,0));
+		ProxScore_CountNonZeros	                             := sum(group,if(dsb.ProxScore<>0,1,0));
+		ProxWeight_CountNonZeros	                           := sum(group,if(dsb.ProxWeight<>0,1,0));
+		SELEID_CountNonZeros	                        			 := sum(group,if(dsb.SELEID<>0,1,0));
+		SELEScore_CountNonZeros	                      			 := sum(group,if(dsb.SELEScore<>0,1,0));
+		SELEWeight_CountNonZeros	                    			 := sum(group,if(dsb.SELEWeight<>0,1,0));
+		OrgID_CountNonZeros	                                 := sum(group,if(dsb.OrgID<>0,1,0));
+		OrgScore_CountNonZeros	                             := sum(group,if(dsb.OrgScore<>0,1,0));
+		OrgWeight_CountNonZeros	                             := sum(group,if(dsb.OrgWeight<>0,1,0));
+		UltID_CountNonZeros	                                 := sum(group,if(dsb.UltID<>0,1,0));
+		UltScore_CountNonZeros	                             := sum(group,if(dsb.UltScore<>0,1,0));
+		UltWeight_CountNonZeros	                             := sum(group,if(dsb.UltWeight<>0,1,0));
   end;
+		
 
 rPopulationStats_fbnv2_Contact
  :=
   record
     integer countGroup := count(group);
-	dSB.StateGroup  ;
-    dSB.SourceGroup;  
+	dSC.StateGroup  ;
+    dSC.SourceGroup;  
     Tmsid_CountNonZero                                   := sum(group,if(dsc.Tmsid<>'',1,0));
     Rmsid_CountNonZero                                   := sum(group,if(dsc.Rmsid<>'',1,0));
     dt_first_seen_CountNonZero                           := sum(group,if(dsc.dt_first_seen<>0,1,0));
@@ -162,7 +190,6 @@ rPopulationStats_fbnv2_Contact
     CONTACT_COUNTRY_CountNonBlank                        := sum(group,if(dsc.CONTACT_COUNTRY<>'',1,0));
     CONTACT_FEI_NUM_CountNonZero                         := sum(group,if(dsc.CONTACT_FEI_NUM<>0,1,0));
     CONTACT_CHARTER_NUM_CountNonBlank                    := sum(group,if(dsc.CONTACT_CHARTER_NUM<>'',1,0));
-    
     SEQ_NO_CountNonZero                                  := sum(group,if(dsc.SEQ_NO<>0,1,0));
     WITHDRAWAL_DATE_CountNonZero                         := sum(group,if(dsc.WITHDRAWAL_DATE<>0,1,0));
     title_CountNonZero                                   := sum(group,if(dsc.title<>'',1,0));
@@ -172,38 +199,30 @@ rPopulationStats_fbnv2_Contact
     name_suffix_CountNonZero                             := sum(group,if(dsc.name_suffix<>'',1,0));
     name_score_CountNonZero                              := sum(group,if(dsc.name_score<>'',1,0));
     prim_range_CountNonBlank                             := sum(group,if(dsc.prim_range<>'',1,0));
-    
     prim_name_CountNonBlank                              := sum(group,if(dsc.prim_name<>'',1,0));
     addr_suffix_CountNonBlank                            := sum(group,if(dsc.addr_suffix<>'',1,0));
     postdir_CountNonBlank                                := sum(group,if(dsc.postdir<>'',1,0));
     unit_desig_CountNonBlank                             := sum(group,if(dsc.unit_desig<>'',1,0));
     sec_range_CountNonBlank                              := sum(group,if(dsc.sec_range<>'',1,0));
     v_city_name_CountNonBlank                            := sum(group,if(dsc.v_city_name<>'',1,0));
-    
-    
-    
     addr_rec_type_CountNonBlank                          := sum(group,if(dsc.addr_rec_type<>'',1,0));
     fips_state_CountNonBlank                             := sum(group,if(dsc.fips_state<>'',1,0));
     fips_county_CountNonBlank                            := sum(group,if(dsc.fips_county<>'',1,0));
     geo_lat_CountNonBlank                                := sum(group,if(dsc.geo_lat<>'',1,0));
     geo_long_CountNonBlank                               := sum(group,if(dsc.geo_long<>'',1,0));
-    
     geo_blk_CountNonBlank                                := sum(group,if(dsc.geo_blk<>'',1,0));
     geo_match_CountNonBlank                              := sum(group,if(dsc.geo_match<>'',1,0));
-    err_stat_CountNonBlank                               := sum(group,if(dsc.err_stat<>'',1,0));
-    
+    err_stat_CountNonBlank                               := sum(group,if(dsc.err_stat<>'',1,0));    
     did_score_CountNonZero                               := sum(group,if(dsc.did_score<>0,1,0));
     bdid_CountNonZero                                    := sum(group,if(dsc.bdid<>0,1,0));
     bdid_score_CountNonZero                              := sum(group,if(dsc.bdid_score<>0,1,0));
   end;
 
- 	dPopulationStats_DSB := table(group(sort(distribute(DSB,hash( StateGroup)), StateGroup, sourceGroup, local)
-									  , StateGroup, sourceGroup, local) 
-	                                  ,rPopulationStats_FBNV2_business,StateGroup, sourceGroup,few,local);
+ 	dPopulationStats_DSB := table(DSB,rPopulationStats_FBNV2_business,StateGroup, sourceGroup,few);
 
 	STRATA.createXMLStats(dPopulationStats_DSB
 	                     ,'FBN  V2'
-						 ,'Business'
+						 ,'BusinessFile'
 						 ,pVersion
 						 ,''
 						 ,zBusinessStats
@@ -211,9 +230,7 @@ rPopulationStats_fbnv2_Contact
 						 ,'PopulationV2');
 
 //output Contact stats
-	dPopulationStats_dContact := table(group(sort(distribute(dSC,hash( StateGroup)), StateGroup, sourceGroup, local)
-									  ,StateGroup, sourceGroup, local) 
-	                                  ,rPopulationStats_fbnv2_Contact,StateGroup, sourceGroup,few,local);
+	dPopulationStats_dContact := table(dSC,rPopulationStats_fbnv2_Contact,StateGroup, sourceGroup,few);
                                     
 	STRATA.createXMLStats(dPopulationStats_dContact
 	                     ,'FBN  V2'
@@ -225,10 +242,9 @@ rPopulationStats_fbnv2_Contact
 					 ,'PopulationV2');
 					 
 //output Contact DID stats	
-				 
-	dDIDstats_dContact := table(group(sort(distribute(dSC,hash( StateGroup)), StateGroup, sourceGroup, local)
-									  ,StateGroup, sourceGroup, local)
-									  ,rPopulationStats_fbnv2_Contact,StateGroup, sourceGroup, few,local);
+	
+	dDIDstats_dContact := table(dSC(lname <> ''),rDIDstats_dSC ,StateGroup, sourceGroup, few);				
+	// dDIDstats_dContact := table(dSC,rDIDstats_dSC ,StateGroup, sourceGroup, few);
     
 	STRATA.createXMLStats(dDIDstats_dContact
 	                     ,'FBN  V2'
@@ -237,8 +253,8 @@ rPopulationStats_fbnv2_Contact
 						 ,''
 						 ,zContactDIDStats
 						 ,'view'
-					     ,'DIDStats');
+					     ,'DIDStats2');
 
-zOut := parallel(zBusinessStats,/*zContactStats,*/zContactDIDStats);
+zOut := parallel(zBusinessStats,zContactStats,zContactDIDStats);
 return zout; 
 end;

@@ -1,26 +1,26 @@
-import ut, header,doxie;
+import ut, header,doxie,RoxieKeybuild;
 
-pro := doxie.build_file_base_did_rid;
-ut.MAC_SF_BuildProcess(pro,'~thor_data400::base::file_did_rid',a1,2);
-ut.MAC_SK_BuildProcess(doxie.Key_prep_Did_Rid,'~thor_data400::key::rid_did','~thor_data400::key::rid_did',rid_did,2);
+export proc_buildkeys(string filedate) := function
 
-did_keys := proc_build_didkeys;
+add_superfile := Header_SlimSort.add_Superfile_for_keybuild;
 
-ut.MAC_SK_BuildProcess(header_slimsort.key_prep_probationary_dids,'~thor_data400::key::probationary_dids','~thor_data400::key::probationary_dids',out_key_probation,2);
+RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(header_slimsort.Key_Household,'~thor_data400::key::hhid','~thor_data400::key::header::'+filedate+'::hhid',out_household);
+RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(header_slimsort.key_ssn4_numerics,'~thor_data400::key::header::ssn4_zip_yob_fi','~thor_data400::key::header::'+filedate+'::ssn4_zip_yob_fi',out_ssn4_numerics);
 
-ssn_did_keys_4 := header_slimsort.did_ssn_keys;
+RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::hhid','~thor_data400::key::header::'+filedate+'::hhid',mv_hhid);
+RoxieKeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::header::ssn4_zip_yob_fi','~thor_data400::key::header::'+filedate+'::ssn4_zip_yob_fi',mv_ssn4_numerics);
 
-full_keys := parallel(
+ssn_did_keys_4 := header_slimsort.did_ssn_keys(filedate);
+
+
+
+full_keys := 
 	sequential(
-		proc_build_address_key,
-		proc_build_ssn_key,
-		proc_build_phone_key,
-		proc_build_dob_keys,
-		proc_build_agessn4zip_keys),
-	did_keys,
-	out_key_probation,
-	sequential(a1,rid_did),
-	ssn_did_keys_4
-);
+						add_superfile
+						,out_household,mv_hhid
+						,ssn_did_keys_4
+						,out_ssn4_numerics,mv_ssn4_numerics
+						);
 
-export proc_buildkeys := full_keys;
+return full_keys;
+end;

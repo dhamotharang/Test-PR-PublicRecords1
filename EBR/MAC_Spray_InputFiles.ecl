@@ -1,6 +1,6 @@
 import ut,ebr;
 
-export MAC_Spray_InputFiles(sourceIP,sourcefile,filedate,segmentcode,group_name='\'thor_dell400\'') := macro
+export MAC_Spray_InputFiles(sourceIP,sourcefile,filedate,segmentcode,group_name='\'thor400_92\'') := macro
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Declare value types
@@ -10,8 +10,10 @@ export MAC_Spray_InputFiles(sourceIP,sourcefile,filedate,segmentcode,group_name=
 #uniquename(output_Record_Size)
 #uniquename(output_Superfile_Name)
 #uniquename(output_Thor_Logical_Filename)
+#uniquename(Superfile_Subfiles)
+#uniquename(output_Superfile_Subfiles)
 #uniquename(spray_first)
-#uniquename(build_super)
+#uniquename(add_to_superfile)
 #uniquename(send_completion_email)
 
 #uniquename(segment_description)
@@ -38,8 +40,8 @@ string100 %thor_filename% 		:= trim(%superfilename%) + '_' + filedate;
 %output_value_types% := sequential(
 	 %output_Segment_Description%
 	,%output_Record_Size%
-	,%output_Superfile_Name%
 	,%output_Thor_Logical_Filename%
+	,%output_Superfile_Name%
 );
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,29 +53,26 @@ string100 %thor_filename% 		:= trim(%superfilename%) + '_' + filedate;
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Superfile manipulation
 //////////////////////////////////////////////////////////////////////////////////////////////
-%build_super% := sequential(
-                 FileServices.StartSuperFileTransaction(),
-			  FileServices.AddSuperFile(trim(%superfilename%) + '_delete', 
-                                           trim(%superfilename%) + '_father',, true),
-                 FileServices.ClearSuperFile(trim(%superfilename%) + '_father'),
-                 FileServices.AddSuperFile(trim(%superfilename%) + '_father', 
-                                           %superfilename%,, true),
-                 FileServices.ClearSuperFile(%superfilename%),
-                 FileServices.AddSuperFile(%superfilename%, 
-                                           %thor_filename%), 
-			  FileServices.FinishSuperFileTransaction(),
-                 FileServices.ClearSuperFile(trim(%superfilename%) + '_delete',true));
+%add_to_superfile% := FileServices.AddSuperFile(%superfilename%, 
+                                           %thor_filename%);
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// -- List the Superfile subfiles
+//////////////////////////////////////////////////////////////////////////////////////////////
+ut.MAC_ListSubFiles_seq(%superfilename%,%Superfile_Subfiles%)
+%output_Superfile_Subfiles% := output(%Superfile_Subfiles%, named('Current_List_of_Subfiles'),all);
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Send email notification
 //////////////////////////////////////////////////////////////////////////////////////////////
 %send_completion_email% := ebr.Send_Spray_Completion_Email(sourcefile, %thor_filename%, 
-						%superfilename%, %segment_description%);
+						%superfilename%, segmentcode, %segment_description%, filedate);
 
 sequential(
 	 %output_value_types%
 	,%spray_first%
-	,%build_super%
+	,%add_to_superfile%
+	,%output_Superfile_Subfiles%
 	,%send_completion_email%);
 
 endmacro;

@@ -1,0 +1,1 @@
+export File_magnifySICCodes_base := dataset('~thor_data400::base::magnify_Extract',Layouts.SIC_Code_Out_layout,flat);

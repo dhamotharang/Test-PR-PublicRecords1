@@ -1,37 +1,15 @@
+import LiensV2, LN_PropertyV2;
 // Rollup the bdid relative matches
 
+EXPORT BH_Relative_Match_Rollup(
 
-BH_Relative_Matches := BH_Relative_Match_ID +
-                       BH_Relative_Match_FBN +
-                       BH_Relative_Match_FEIN +
-                       BH_Relative_Match_Gong +
-                       BH_Relative_Match_NameAddr +
-                       BH_Relative_Match_Name_Phone +
-                       BH_Relative_Match_Phone +
-                       BH_Relative_Match_UCC +
-                       BH_Relative_Match_Name +
-                       BH_Relative_Match_Addr +
-                       BH_Relative_Match_Mail_Addr +
-				   BH_Relative_Match_DUNS_Tree +
-				   BH_Relative_Match_DCA_Hierarchy /*+
-				   BH_Relative_Match_ABI_Hierarchy*/;/*+
-											 BH_Relative_Match_Shared_Contacts*/;
+	 dataset(Layout_Relative_Match					)	pBH_Relative_Matches			= BH_Relative_Match_Combined()
+	,dataset(Layout_Business_Relative_Group	)	pBH_Relative_Group_Rollup	= BH_Relative_Group_Rollup	()
 
-/*
-BH_Relative_Matches := dataset('TMTEMP::BH_Relative_Match_ID',Layout_Relative_Match, flat) +
-                       dataset('TMTEMP::BH_Relative_Match_FBN',Layout_Relative_Match, flat) +
-                       dataset('TMTEMP::BH_Relative_Match_FEIN',Layout_Relative_Match, flat) +
-                       dataset('TMTEMP::BH_Relative_Match_Gong',Layout_Relative_Match, flat) +
-                       dataset('TMTEMP::BH_Relative_Match_NameAddr',Layout_Relative_Match, flat) +
-                       dataset('TMTEMP::BH_Relative_Match_Name_Phone',Layout_Relative_Match, flat) +
-                       dataset('TMTEMP::BH_Relative_Match_Phone',Layout_Relative_Match, flat) +
-                       dataset('TMTEMP::BH_Relative_Match_UCC',Layout_Relative_Match, flat) +
-                       dataset('TMTEMP::BH_Relative_Match_Name',Layout_Relative_Match, flat) +
-                       dataset('TMTEMP::BH_Relative_Match_Addr',Layout_Relative_Match, flat) +
-                       dataset('TMTEMP::BH_Relative_Match_Mail_Addr',Layout_Relative_Match, flat) +
-                       dataset('TEMP::BH_Relative_Match_DUNS_Tree',Layout_Relative_Match, flat);
-                       dataset('TEMP::BH_Relative_Match_DCA_Hierarchy',Layout_Relative_Match, flat);
-*/
+) :=
+function
+
+BH_Relative_Matches := pBH_Relative_Matches;
 
 // Reverse BDIDs
 Layout_Relative_Match Reverse_BDIDs(Layout_Relative_Match L) := transform
@@ -66,6 +44,8 @@ self.dca_company_number := L.match_type = 'DC';
 self.dca_hierarchy := L.match_type = 'DH';
 self.abi_number := L.match_type in ['IA', 'ID'];
 self.abi_hierarchy := L.match_type in ['IH'];
+self.lien_properties := L.match_type = 'LP';
+self.liens_v2:= L.match_type = 'L2'; 
 //self.shared_contacts := L.match_type = 'SC';
 self := L;
 end;
@@ -96,6 +76,8 @@ self.dca_hierarchy := if (R.dca_hierarchy, R.dca_hierarchy, L.dca_hierarchy);
 self.abi_number := if (R.abi_number, R.abi_number, L.abi_number);
 self.abi_hierarchy := if (R.abi_hierarchy, R.abi_hierarchy, L.abi_hierarchy);
 //self.shared_contacts := if (R.shared_contacts, R.shared_contacts, L.shared_contacts);
+self.lien_properties := if (R.lien_properties, R.lien_properties, L.lien_properties);
+self.liens_v2 := if (R.liens_v2, R.liens_v2, L.liens_v2); 
 self := L;
 end;
 
@@ -115,8 +97,12 @@ self.addr := l.group_type = 'AD';
 self.rel_group := true;
 end;
 
-Group_Rollup := project(BH_Relative_Group_Rollup, FormatGroups(left));
+Group_Rollup := project(pBH_Relative_Group_Rollup, FormatGroups(left));
 
 Match_Rollup_Combined := Match_Rollup + Group_Rollup;
 
-export BH_Relative_Match_Rollup := business_header.fun_RemoveBizRegAgents(Match_Rollup_Combined);
+BH_Relative_Match_Rollup_persisted := business_header.fun_RemoveBizRegAgents(Match_Rollup_Combined);
+
+return BH_Relative_Match_Rollup_persisted;
+
+end;

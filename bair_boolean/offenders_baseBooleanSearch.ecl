@@ -30,13 +30,21 @@ export NumCollisions_eid0 := count(Collisions_eid);
   SALT30.UIDType lid := (SALT30.UIDType)h.newrid;
     h.eid;
     h.gh12;
+    h.gh4;
+    h.gh5;
+    h.gh6;
     h.etype;
     h.agency_offender_id;
     h.address;
+    h.wc_first_name;
     h.first_name;
+    h.wc_middle_name;
     h.middle_name;
+    h.wc_last_name;
     h.last_name;
+    h.wc_moniker;
     h.moniker;
+    h.wc_name_type;
     h.name_type;
     h.clean_dob;
     h.race;
@@ -65,13 +73,13 @@ export NumCollisions_eid0 := count(Collisions_eid);
     h.height_2;
     h.age_1;
     h.age_2;
+    h.wc_offenders_sid;
     h.offenders_sid;
     h.dl_number;
     h.dl_state;
     h.fbi_number;
     h.offender_notes;
     h.clean_edit_date;
-    h.quarantined;
     h.admin_state;
     h.agency_name;
     h.user_text_1;
@@ -90,15 +98,18 @@ export NumCollisions_eid0 := count(Collisions_eid);
     h.warrant_type;
     h.warrant_number;
     h.gang_name;
+    h.agency;
+    h.data_provider_ori;
+    h.gang_role;
     h.clean_classification_date;
     h.clean_expiration_date;
   END;
 EXPORT TranslatedFile := TABLE(h,rf);
 // Compute the null for each field value
-  Def(INTEGER2 c) := CHOOSE(c,'','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','0','0','0','0','0','0','','','','','','','','','','','','','','','','','','','','','','','','','','','','');
+  Def(INTEGER2 c) := CHOOSE(c,'','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','');
  
 Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
-  SELF.word := CHOOSE(c,(SALT30.StrType)le.eid,(SALT30.StrType)le.eid,(SALT30.StrType)le.gh12,(SALT30.StrType)le.etype,(SALT30.StrType)le.agency_offender_id,(SALT30.StrType)le.address,(SALT30.StrType)le.first_name,(SALT30.StrType)le.middle_name,(SALT30.StrType)le.last_name,(SALT30.StrType)le.moniker,(SALT30.StrType)le.name_type,(SALT30.StrType)le.clean_dob,(SALT30.StrType)le.race,(SALT30.StrType)le.sex,(SALT30.StrType)le.hair,(SALT30.StrType)le.hair_length,(SALT30.StrType)le.eyes,(SALT30.StrType)le.hand_use,(SALT30.StrType)le.speech,(SALT30.StrType)le.teeth,(SALT30.StrType)le.physical_condition,(SALT30.StrType)le.build,(SALT30.StrType)le.complexion,(SALT30.StrType)le.facial_hair,(SALT30.StrType)le.hat,(SALT30.StrType)le.mask,(SALT30.StrType)le.glasses,(SALT30.StrType)le.appearance,(SALT30.StrType)le.shirt,(SALT30.StrType)le.pants,(SALT30.StrType)le.shoes,(SALT30.StrType)le.jacket,(SALT30.StrType)le.weight_1,(SALT30.StrType)le.weight_2,(SALT30.StrType)le.height_1,(SALT30.StrType)le.height_2,(SALT30.StrType)le.age_1,(SALT30.StrType)le.age_2,(SALT30.StrType)le.offenders_sid,(SALT30.StrType)le.dl_number,(SALT30.StrType)le.dl_state,(SALT30.StrType)le.fbi_number,(SALT30.StrType)le.offender_notes,(SALT30.StrType)le.clean_edit_date,(SALT30.StrType)le.quarantined,(SALT30.StrType)le.admin_state,(SALT30.StrType)le.agency_name,(SALT30.StrType)le.user_text_1,(SALT30.StrType)le.user_text_2,(SALT30.StrType)le.user_integer,(SALT30.StrType)le.user_float,(SALT30.StrType)le.clean_user_datetime,(SALT30.StrType)le.agency_category,(SALT30.StrType)le.agency_level,(SALT30.StrType)le.agency_score,(SALT30.StrType)le.bair_score,(SALT30.StrType)le.case_reference_number,(SALT30.StrType)le.charge_offense,(SALT30.StrType)le.probation_type,(SALT30.StrType)le.probation_officer,(SALT30.StrType)le.warrant_type,(SALT30.StrType)le.warrant_number,(SALT30.StrType)le.gang_name,(SALT30.StrType)le.clean_classification_date,(SALT30.StrType)le.clean_expiration_date,SKIP,SKIP);
+  SELF.word := CHOOSE(c,(SALT30.StrType)le.eid,(SALT30.StrType)le.eid,(SALT30.StrType)le.gh12,(SALT30.StrType)le.gh4,(SALT30.StrType)le.gh5,(SALT30.StrType)le.gh6,(SALT30.StrType)le.etype,(SALT30.StrType)le.agency_offender_id,(SALT30.StrType)le.address,(SALT30.StrType)le.wc_first_name,(SALT30.StrType)le.first_name,(SALT30.StrType)le.wc_middle_name,(SALT30.StrType)le.middle_name,(SALT30.StrType)le.wc_last_name,(SALT30.StrType)le.last_name,(SALT30.StrType)le.wc_moniker,(SALT30.StrType)le.moniker,(SALT30.StrType)le.wc_name_type,(SALT30.StrType)le.name_type,(SALT30.StrType)le.clean_dob,(SALT30.StrType)le.race,(SALT30.StrType)le.sex,(SALT30.StrType)le.hair,(SALT30.StrType)le.hair_length,(SALT30.StrType)le.eyes,(SALT30.StrType)le.hand_use,(SALT30.StrType)le.speech,(SALT30.StrType)le.teeth,(SALT30.StrType)le.physical_condition,(SALT30.StrType)le.build,(SALT30.StrType)le.complexion,(SALT30.StrType)le.facial_hair,(SALT30.StrType)le.hat,(SALT30.StrType)le.mask,(SALT30.StrType)le.glasses,(SALT30.StrType)le.appearance,(SALT30.StrType)le.shirt,(SALT30.StrType)le.pants,(SALT30.StrType)le.shoes,(SALT30.StrType)le.jacket,(SALT30.StrType)le.weight_1,(SALT30.StrType)le.weight_2,(SALT30.StrType)le.height_1,(SALT30.StrType)le.height_2,(SALT30.StrType)le.age_1,(SALT30.StrType)le.age_2,(SALT30.StrType)le.wc_offenders_sid,(SALT30.StrType)le.offenders_sid,(SALT30.StrType)le.dl_number,(SALT30.StrType)le.dl_state,(SALT30.StrType)le.fbi_number,(SALT30.StrType)le.offender_notes,(SALT30.StrType)le.clean_edit_date,(SALT30.StrType)le.admin_state,(SALT30.StrType)le.agency_name,(SALT30.StrType)le.user_text_1,(SALT30.StrType)le.user_text_2,(SALT30.StrType)le.user_integer,(SALT30.StrType)le.user_float,(SALT30.StrType)le.clean_user_datetime,(SALT30.StrType)le.agency_category,(SALT30.StrType)le.agency_level,(SALT30.StrType)le.agency_score,(SALT30.StrType)le.bair_score,(SALT30.StrType)le.case_reference_number,(SALT30.StrType)le.charge_offense,(SALT30.StrType)le.probation_type,(SALT30.StrType)le.probation_officer,(SALT30.StrType)le.warrant_type,(SALT30.StrType)le.warrant_number,(SALT30.StrType)le.gang_name,(SALT30.StrType)le.agency,(SALT30.StrType)le.data_provider_ori,(SALT30.StrType)le.gang_role,(SALT30.StrType)le.clean_classification_date,(SALT30.StrType)le.clean_expiration_date,SKIP,SKIP);
   SELF.len := LENGTH(TRIM(SELF.word));
   SELF.wip := IF(SELF.Word=Def(c-1),SKIP,1); // Adjusted later - also filters blank words
   SELF.nominal := 0; //Filled in later
@@ -107,9 +118,9 @@ Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
   SELF.kwp := 0; // Adjusted later
   SELF.docref.doc := 0; // Filled in later
   SELF.docref.src := 0; // Filled in later
-  SELF.src := TRANSFER(MDR.sourceTools.src_Bair_Analytics,UNSIGNED2); // Namespace for ID provided
+  SELF.src := TRANSFER(le.class_code,UNSIGNED2); // Namespace for ID provided
   SELF.seg := c; // Field number is seg; values filled in in segment definition
-  SELF.segName := Text_Search.MakeShortSeg(choose(c,text_search.constants.DocKeyField,'eid','gh12','etype','agency_offender_id','address','first_name','middle_name','last_name','moniker','name_type','clean_dob','race','sex','hair','hair_length','eyes','hand_use','speech','teeth','physical_condition','build','complexion','facial_hair','hat','mask','glasses','appearance','shirt','pants','shoes','jacket','weight_1','weight_2','height_1','height_2','age_1','age_2','offenders_sid','dl_number','dl_state','fbi_number','offender_notes','clean_edit_date','quarantined','admin_state','agency_name','user_text_1','user_text_2','user_integer','user_float','clean_user_datetime','agency_category','agency_level','agency_score','bair_score','case_reference_number','charge_offense','probation_type','probation_officer','warrant_type','warrant_number','gang_name','clean_classification_date','clean_expiration_date','DATE'));
+  SELF.segName := Text_Search.MakeShortSeg(choose(c,text_search.constants.DocKeyField,'eid','gh12','gh4','gh5','gh6','etype','agency_offender_id','address','wc_first_name','first_name','wc_middle_name','middle_name','wc_last_name','last_name','wc_moniker','moniker','wc_name_type','name_type','clean_dob','race','sex','hair','hair_length','eyes','hand_use','speech','teeth','physical_condition','build','complexion','facial_hair','hat','mask','glasses','appearance','shirt','pants','shoes','jacket','weight_1','weight_2','height_1','height_2','age_1','age_2','wc_offenders_sid','offenders_sid','dl_number','dl_state','fbi_number','offender_notes','clean_edit_date','admin_state','agency_name','user_text_1','user_text_2','user_integer','user_float','clean_user_datetime','agency_category','agency_level','agency_score','bair_score','case_reference_number','charge_offense','probation_type','probation_officer','warrant_type','warrant_number','gang_name','agency','data_provider_ori','gang_role','clean_classification_date','clean_expiration_date','DATE'));
   SELF.typ := text_search.types.WordType.TextStr; // May get changed later
   SELF.sect := 0; // Not needed
   SELF.pos := 0; // Not needed
@@ -117,17 +128,25 @@ Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
   self.sid := le.hashed_sid;
   self.lid := (SALT30.UIDType)le.newrid;
 END;
-SHARED FieldsAsPostings := NORMALIZE(h,66,into(left,counter));
+SHARED FieldsAsPostings := NORMALIZE(h,77,into(left,counter));
 EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Constants.DocKeyField),text_search.Constants.DocKeyField,text_search.types.SegmentType.ExternalKey,[text_search.MakeShortSeg(text_search.Constants.DocKeyField)]}
   ,{text_search.MakeShortSeg('eid'),'eid',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('eid')]}
   ,{text_search.MakeShortSeg('gh12'),'gh12',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gh12')]}
+  ,{text_search.MakeShortSeg('gh4'),'gh4',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gh4')]}
+  ,{text_search.MakeShortSeg('gh5'),'gh5',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gh5')]}
+  ,{text_search.MakeShortSeg('gh6'),'gh6',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gh6')]}
   ,{text_search.MakeShortSeg('etype'),'etype',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('etype')]}
   ,{text_search.MakeShortSeg('agency_offender_id'),'agency_offender_id',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('agency_offender_id')]}
   ,{text_search.MakeShortSeg('address'),'address',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('address')]}
+  ,{text_search.MakeShortSeg('wc_first_name'),'wc_first_name',text_search.types.SegmentType.FieldDataType,[text_search.MakeShortSeg('wc_first_name')]}
   ,{text_search.MakeShortSeg('first_name'),'first_name',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('first_name')]}
+  ,{text_search.MakeShortSeg('wc_middle_name'),'wc_middle_name',text_search.types.SegmentType.FieldDataType,[text_search.MakeShortSeg('wc_middle_name')]}
   ,{text_search.MakeShortSeg('middle_name'),'middle_name',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('middle_name')]}
+  ,{text_search.MakeShortSeg('wc_last_name'),'wc_last_name',text_search.types.SegmentType.FieldDataType,[text_search.MakeShortSeg('wc_last_name')]}
   ,{text_search.MakeShortSeg('last_name'),'last_name',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('last_name')]}
+  ,{text_search.MakeShortSeg('wc_moniker'),'wc_moniker',text_search.types.SegmentType.FieldDataType,[text_search.MakeShortSeg('wc_moniker')]}
   ,{text_search.MakeShortSeg('moniker'),'moniker',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('moniker')]}
+  ,{text_search.MakeShortSeg('wc_name_type'),'wc_name_type',text_search.types.SegmentType.FieldDataType,[text_search.MakeShortSeg('wc_name_type')]}
   ,{text_search.MakeShortSeg('name_type'),'name_type',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('name_type')]}
   ,{text_search.MakeShortSeg('clean_dob'),'clean_dob',text_search.types.SegmentType.DateType,[text_search.MakeShortSeg('clean_dob')]}
   ,{text_search.MakeShortSeg('race'),'race',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('race')]}
@@ -156,13 +175,13 @@ EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Cons
   ,{text_search.MakeShortSeg('height_2'),'height_2',text_search.types.SegmentType.NumericType,[text_search.MakeShortSeg('height_2')]}
   ,{text_search.MakeShortSeg('age_1'),'age_1',text_search.types.SegmentType.NumericType,[text_search.MakeShortSeg('age_1')]}
   ,{text_search.MakeShortSeg('age_2'),'age_2',text_search.types.SegmentType.NumericType,[text_search.MakeShortSeg('age_2')]}
+  ,{text_search.MakeShortSeg('wc_offenders_sid'),'wc_offenders_sid',text_search.types.SegmentType.FieldDataType,[text_search.MakeShortSeg('wc_offenders_sid')]}
   ,{text_search.MakeShortSeg('offenders_sid'),'offenders_sid',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('offenders_sid')]}
   ,{text_search.MakeShortSeg('dl_number'),'dl_number',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('dl_number')]}
   ,{text_search.MakeShortSeg('dl_state'),'dl_state',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('dl_state')]}
   ,{text_search.MakeShortSeg('fbi_number'),'fbi_number',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('fbi_number')]}
   ,{text_search.MakeShortSeg('offender_notes'),'offender_notes',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('offender_notes')]}
   ,{text_search.MakeShortSeg('clean_edit_date'),'clean_edit_date',text_search.types.SegmentType.DateType,[text_search.MakeShortSeg('clean_edit_date')]}
-  ,{text_search.MakeShortSeg('quarantined'),'quarantined',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('quarantined')]}
   ,{text_search.MakeShortSeg('admin_state'),'admin_state',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('admin_state')]}
   ,{text_search.MakeShortSeg('agency_name'),'agency_name',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('agency_name')]}
   ,{text_search.MakeShortSeg('user_text_1'),'user_text_1',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('user_text_1')]}
@@ -181,6 +200,9 @@ EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Cons
   ,{text_search.MakeShortSeg('warrant_type'),'warrant_type',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('warrant_type')]}
   ,{text_search.MakeShortSeg('warrant_number'),'warrant_number',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('warrant_number')]}
   ,{text_search.MakeShortSeg('gang_name'),'gang_name',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gang_name')]}
+  ,{text_search.MakeShortSeg('agency'),'agency',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('agency')]}
+  ,{text_search.MakeShortSeg('data_provider_ori'),'data_provider_ori',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('data_provider_ori')]}
+  ,{text_search.MakeShortSeg('gang_role'),'gang_role',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gang_role')]}
   ,{text_search.MakeShortSeg('clean_classification_date'),'clean_classification_date',text_search.types.SegmentType.DateType,[text_search.MakeShortSeg('clean_classification_date')]}
   ,{text_search.MakeShortSeg('clean_expiration_date'),'clean_expiration_date',text_search.types.SegmentType.DateType,[text_search.MakeShortSeg('clean_expiration_date')]}
   ,{text_search.MakeShortSeg('DATE'),'DATE',text_search.types.SegmentType.GroupSeg,[text_search.MakeShortSeg('clean_classification_date')]}

@@ -23,13 +23,15 @@ export Function_Matching_BID(
 			self.matchcode := Constants.MatchCodes.BID_ZIP_NAME));
 	
 	output(join_zip_name_match,,'~thor_data400::base::brm::joinzipnamematch::lheureux',overwrite);
-
+	
+	sfcn(string s) := stringlib.StringFilter(s,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+	
 	rec_addr_initss_0 :=
 		dedup(table(distribute(
 			// don't include property data, as it's too dirty to do this initial-substring matching with.
-			in_data(not MDR.sourceTools.SourceIsProperty(source) and length(trim(company_name)) >= 5 and zip != '' and prim_name != '' and (prim_name[1..7] = 'PO BOX ' or prim_range != '') and (sec_range != '' or not highrise_ind)),
-			hash64(zip,prim_name,prim_range,company_name[1..5],sec_range)),{unsigned hv := hash64(zip,prim_name,prim_range,company_name[1..5],sec_range),company_name,bid,beid}),
-			hv,company_name,bid,all,local);
+			in_data(not MDR.sourceTools.SourceIsProperty(source) and length(trim(sfcn(company_name))) >= 5 and zip != '' and prim_name != '' and (prim_name[1..7] = 'PO BOX ' or prim_range != '') and (sec_range != '' or not highrise_ind)),
+			hash64(zip,prim_name,prim_range,sfcn(company_name)[1..5])),{unsigned hv := hash64(zip,prim_name,prim_range,sfcn(company_name)[1..5]),sec_range,string filt_company_name := sfcn(company_name),bid,beid}),
+			hv,sec_range,filt_company_name,bid,all,local);
 	
 	over_10000_rec_addr_initss := table(table(rec_addr_initss_0,{hv,unsigned cnt := count(group)},hv,local),{hv,unsigned cnt := sum(group,cnt)},hv)(cnt > 10000);
 	
@@ -37,10 +39,11 @@ export Function_Matching_BID(
 
 	same_addr_initss_recs := join(rec_addr_initss,rec_addr_initss,
 		left.hv = right.hv and
+		(left.sec_range = '' or right.sec_range = '' or left.sec_range = right.sec_range) and
 		left.bid != right.bid and
-		left.company_name not in ['CORPORATION','NATIONAL'] and
-		length(trim(left.company_name)) < length(trim(right.company_name)) and
-		trim(left.company_name) = right.company_name[1..length(trim(left.company_name))],
+		left.filt_company_name not in ['CORPORATION','NATIONAL'] and
+		length(trim(left.filt_company_name)) < length(trim(right.filt_company_name)) and
+		trim(left.filt_company_name) = right.filt_company_name[1..length(trim(left.filt_company_name))],
 		transform(Layout_Linking.Match_BID,
 			self.beid_low := right.beid,
 			self.bid_low := right.bid,

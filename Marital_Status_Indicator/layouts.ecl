@@ -70,6 +70,7 @@ export Layouts := MODULE
 		BOOLEAN		rel_spouse;	//prim = -7
 		INTEGER4	rel_spouse_recent_dt;
 		BOOLEAN		rel_spouse_same_lname;	
+		INTEGER4	spouse_dod;
 		integer		parents;
 		unsigned6	hhid;
 		unsigned6 hhid_did1;

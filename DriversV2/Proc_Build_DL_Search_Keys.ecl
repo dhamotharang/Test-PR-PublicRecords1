@@ -3,7 +3,6 @@ import RoxieKeyBuild,ut,doxie_build;
 export Proc_Build_DL_Search_keys(string filedate) := 
 function
 
-pre := ut.SF_MaintBuilding('~thor_data400::base::DL2::DLSearch_' + doxie_build.buildstate);
 
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(DriversV2.key_dl,'~thor_data400::key::dl2::@version@::dl_'+doxie_build.buildstate,'~thor_data400::key::dl2::'+filedate+'::dl_'+doxie_build.buildstate, a);
 RoxieKeyBuild.MAC_SK_BuildProcess_v2_Local(DriversV2.key_dl_did,'~thor_data400::key::dl2::@version@::dl_did_'+doxie_build.buildstate, '~thor_data400::key::dl2::'+filedate+'::did_'+doxie_build.buildstate,a2);
@@ -29,11 +28,15 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::dl2::fcra::@version@:
 
 
 
-post := ut.SF_MaintBuilt('~thor_data400::base::DL2::DLSearch_' + doxie_build.buildstate);
+post := sequential(fileservices.startsuperfiletransaction(),
+									 fileservices.clearsuperfile('~thor_data400::base::DL2::DLSearch_' + doxie_build.buildstate + '_BUILT'),
+									 fileservices.addsuperfile('~thor_data400::base::DL2::DLSearch_' + doxie_build.buildstate + '_BUILT','~thor_data400::base::DL2::DLSearch_' + doxie_build.buildstate,0,true),
+									 fileservices.finishsuperfiletransaction()
+									);
 
 return if (fileservices.getsuperfilesubname('~thor_data400::base::DL2::DLSearch_'+doxie_build.buildstate,1) = fileservices.getsuperfilesubname('~thor_data400::base::DL2::DLSearch_' +  doxie_build.buildstate + '_BUILT',1),
 		output('BASE = BUILT, Nothing done.'),
-		sequential(pre,parallel(a,a2,b,c,c2,c3),
+		sequential(parallel(a,a2,b,c,c2,c3),
 					parallel(d,d2,e),
 					parallel(f,f2,g,h,h2,h3),post,
 					proc_build_wildcard_search(filedate)));		

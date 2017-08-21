@@ -7,7 +7,7 @@ string182 clean_address;
 end;
 
 layout_input_init CleanInput(Layout_Address l) := transform
-self.clean_address := AddrCleanLib.CleanAddress182(l.delivery_line, trim(l.city_name) + ' ' + l.state + ' ' + l.zip_code[1..5]);
+self.clean_address := Address.CleanAddress182(l.delivery_line, trim(l.city_name) + ' ' + l.state + ' ' + l.zip_code[1..5]);
 self.phone_number1 := Address.CleanPhone(l.phone_number1);
 self.phone_number2 := Address.CleanPhone(l.phone_number2);
 self.phone_number3 := Address.CleanPhone(l.phone_number3);

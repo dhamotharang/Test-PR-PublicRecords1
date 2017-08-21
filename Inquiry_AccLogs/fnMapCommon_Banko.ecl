@@ -49,7 +49,7 @@ cleanInput := project(mbs_outfile, transform(Inquiry_Acclogs.Layout_In_Common,
 				
 														self.ORIG_COMPANY_NAME1 := stringlib.stringcleanspaces(stringlib.stringfindreplace(left.ORIG_BUSINESS_NAME, ',', ', '));
 
-														self.BILLING_ID := left.billing_id;
+													//	self.BILLING_ID := left.billing_id;
 														self.ORIG_GLOBAL_COMPANY_ID := left.ORIG_GLOBAL_COMPANY_ID;
 														self.GLOBAL_COMPANY_ID := left.orig_global_company_id;
 														self.COMPANY_ID := left.orig_company_id;
@@ -89,7 +89,8 @@ export ready_File(dataset(Inquiry_Acclogs.Layout_In_Common) AppendForward, strin
 ///////////////// PROJECT INTO PERSON QUERY LAYOUT 
 							
 person_project := project(AppendForward(repflag = '' and source_file = select_source), 
-		transform(inquiry_acclogs.Layout.Common,
+		transform(inquiry_acclogs.Layout.Common_ThorAdditions,
+			self.source := stringlib.stringtouppercase(left.source_file);
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
 			
@@ -102,7 +103,8 @@ person_project := project(AppendForward(repflag = '' and source_file = select_so
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+			self.bus_intel.Use := left.use;
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
@@ -163,10 +165,12 @@ person_project := project(AppendForward(repflag = '' and source_file = select_so
 			self.person_q.err_stat :=   left.err_stat;
 			self.person_q.Appended_SSN := left.appendssn;
 			self.person_q.Appended_ADL := left.appendadl;
-			
+			self := left;
 			self := []));
 
-bususer_project := project(AppendForward(repflag <> '' and source_file = select_source), transform(inquiry_acclogs.Layout.Common,
+bususer_project := project(AppendForward(repflag <> '' and source_file = select_source), 
+	transform(inquiry_acclogs.Layout.Common_ThorAdditions,
+			self.source := stringlib.stringtouppercase(left.source_file);
 			self.mbs.Company_ID := left.Company_ID;
 			self.mbs.Global_Company_ID := left.Global_Company_ID;
 			
@@ -179,7 +183,8 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+			self.bus_intel.Use := left.use;
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
@@ -238,13 +243,7 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bususer_q.Appended_ADL := left.appendadl;
 
 			self := left;
-			self := []));							
-
-// prev_base := inquiry_acclogs.file_MBSApp_Base.file(version);
-
-// baseMBS := project(prev_base(source = select_source),
-									// transform(inquiry_acclogs.Layout.Common,
-														// self := left));
+			self := []));		
 
 // OUTPUT UPDATES ONLY - 														
 return dedup(sort(distribute(person_project + bususer_project, hash(search_info.Transaction_ID))

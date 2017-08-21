@@ -1,4 +1,4 @@
-import doxie,ut;
+import doxie,ut,data_services;
 
 base_file := watercraft.file_base_search_dev_bdid((unsigned6)bdid<>0);
 
@@ -13,4 +13,4 @@ export key_watercraft_bdid :=
        index(base_dep,
 	       {l_bdid := (unsigned6) bdid},
 		  {state_origin, watercraft_key,sequence_key},
-            ut.foreign_prod+'thor_data400::key::watercraft_bdid_'+doxie.Version_SuperKey);
+            data_services.data_location.prefix('watercraft') +'thor_data400::key::watercraft_bdid_'+doxie.Version_SuperKey);

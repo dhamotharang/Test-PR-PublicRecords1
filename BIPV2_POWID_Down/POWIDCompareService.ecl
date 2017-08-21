@@ -6,7 +6,7 @@
 */
 /*--INFO-- Compare two IDs to see if they should be joined.<p>If it is easier you may place the two IDs on the first line and they will be parsed into first and second.</p>*/
 EXPORT POWIDCompareService := MACRO
-  IMPORT SALT27,BIPV2_POWID_Down,ut;
+  IMPORT SALT35,BIPV2_POWID_Down,ut;
 STRING50 POWIDonestr := ''  : STORED('POWIDOne');
 STRING20 POWIDtwostr := '*'  : STORED('POWIDtwo');
 UNSIGNED8 POWIDone0 := (UNSIGNED8)ut.Word(POWIDonestr,1); // Allow for two token on a line input
@@ -21,7 +21,7 @@ s := GLOBAL(PROJECT(k,BIPV2_POWID_Down.Layout_Specificities.R)[1]);
 odlv := BIPV2_POWID_Down.Debug(BFile,s).RolledEntities(odl);
 odrv := BIPV2_POWID_Down.Debug(BFile,s).RolledEntities(odr);
 mtch := BIPV2_POWID_Down.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,POWIDone,POWIDtwo,0,0}],BIPV2_POWID_Down.match_candidates(BFile).layout_matches));
-// Put out easy to read versions of the 5092096 data
+// Put out easy to read versions of the POWID data
 OUTPUT( odlv,NAMED('POWIDOneFieldValues'));
 OUTPUT( odrv,NAMED('POWIDTwoFieldValues'));
 // Put out the actually matching information

@@ -1,0 +1,1 @@
+export attr2 := attr0 + attr1;

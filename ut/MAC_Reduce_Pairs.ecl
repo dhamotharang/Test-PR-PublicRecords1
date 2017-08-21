@@ -1,4 +1,4 @@
-export MAC_Reduce_Pairs(infile,new_field,old_field,flag_field,req_layout,outfile) := macro
+export MAC_Reduce_Pairs(infile,new_field,old_field,flag_field,req_layout,outfile, use_tertiary = false) := macro
 // The output from this macro should not need to be further deduped
 // In particular it can roll straight into PatchId
 
@@ -65,13 +65,12 @@ req_layout %MRP_Close%(infile MRl,infile MRr) := transform
 #uniquename(res1)
 %res1% := distribute(%new_upairs%,hash(old_field));
 
-/*  Temporarily disable Tertiary Pairs
-//****** Sort the groups of old_fields by new_field
-%sres% := sort(%res1%,old_field,new_field,local);
-*/
-
+//Allow use of tertiary pairs when specified by user
 #uniquename(sres)
-%sres% := sort(%res%,old_field,new_field,local);
+%sres% := 
+	sort(
+		if(use_tertiary, %res1%, %res%),
+			old_field,new_field,local);
 
 //****** Map each old field down to the lowest possible new field
 #uniquename(dres)

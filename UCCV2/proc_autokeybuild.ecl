@@ -1,5 +1,7 @@
 import AutoKeyB2; 
 
+export proc_autokeybuild(string filedate) := function
+
 b := UCCV2.file_SearchAutokey;
 
 AutoKeyB2.MAC_Build (b,
@@ -19,11 +21,16 @@ AutoKeyB2.MAC_Build (b,
 					zero,
 					company_addr.prim_name,company_addr.prim_range,company_addr.st,company_addr.v_city_name,company_addr.zip5,company_addr.sec_range,
 					bdid,
-					UCCV2.Constants.ak_keyname,
-					UCCV2.Constants.ak_logical,
+					UCCV2.Constants(filedate).ak_keyname,
+					UCCV2.Constants(filedate).ak_logical,
 					outaction,false,
-					[],true,UCCV2.Constants.ak_typeStr) 
+					[],true,UCCV2.Constants(filedate).ak_typeStr,true,,,zero) 
 
-AutoKeyB2.MAC_AcceptSK_to_QA(UCCV2.Constants.ak_keyname, mymove)
+AutoKeyB2.MAC_AcceptSK_to_QA(UCCV2.Constants(filedate).ak_keyname, mymove)
+
+retval := sequential(outaction,mymove);
+
  
-export proc_autokeybuild := sequential(outaction,mymove);
+return retval;
+
+end;

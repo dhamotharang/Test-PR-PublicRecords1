@@ -1,7 +1,11 @@
-export QueryGetSourceOnlyBdids(string pSource) :=
+export QueryGetSourceOnlyBdids(	 
+	 string																pSource
+	,dataset(Layout_Business_Header_base)	pBusinessHeaderBase	= Files().Base.Business_Headers.built
+) :=
 function
 
-	file := Business_Header.File_Business_Header;
+
+	file := pBusinessHeaderBase;
 
 	///////////////////////////////////////////////////////////
 	// -- Remove pSource records from the business header 

@@ -29,7 +29,7 @@ export SubmitStat (dataset pScrubResult, string pProfileName, string pProfileTyp
 	%thorFilename% := Orbit3SOA.EnvironmentVariables.statLogicalFilePrefix + %profileType% + '::' + %profileName% + '::' + %profileVersion% + '::' + thorlib.wuid() + '.csv';
 	%destFilename% := Orbit3SOA.EnvironmentVariables.statLandingZoneFilePrefix + %profileType% + '-' + %profileName% + '-' + %profileVersion% + '-' + thorlib.wuid() + '.csv';
 
-	%saveToFile% := output(pScrubResult,, %thorFilename%, csv(heading(single),separator(','),terminator('\r\n'),quote('"'),maxlength(65535)),named('StatData'+pFiletype),OVERWRITE); 	
+	%saveToFile% := output(pScrubResult,, %thorFilename%, csv(heading(single),separator(','),terminator('\r\n'),quote('"'),maxlength(65535),notrim),named('StatData'+pFiletype),OVERWRITE); 	
 	%desprayToServer% := Lib_FileServices.FileServices.Despray(%thorFilename%, Orbit3SOA.EnvironmentVariables.statLandingZoneServer, %destFilename%,,,,true);
 
 	inputRec := record

@@ -1,4 +1,4 @@
-import InfoUSA,address,did_add,didville,ut,header_slimsort,standard, header;
+import InfoUSA,address,did_add,didville,ut,header_slimsort,standard, header, idl_header;
 
 ebc_p_cnsr_in := InfoUSA.File_PCNSR_In;
 
@@ -227,7 +227,7 @@ namesList := PROJECT(normalizedPCNSR,getNames(LEFT));
 dedupedNames := DEDUP(SORT(distribute(namesList,hash(name_for_clean)),name_for_clean,local),name_for_clean,local);
 
 Layout_names cleanNames(dedupedNames l) := TRANSFORM
-		SELF.clean_name := addrcleanlib.CleanPersonfml73(l.name_for_clean);
+		SELF.clean_name := address.CleanPersonFML73(l.name_for_clean);
 
 		SELF.title := SELF.clean_name[1..5];
 		SELF.fname := SELF.clean_name[6..25];
@@ -275,7 +275,7 @@ pcnsrCleanNames_ := JOIN(dPCNSR2, cleanedNames,
 										addCleanName2(LEFT,RIGHT),LOCAL);
 
 //concate datasets for address cleaning
-pcnsrCleanNames := pcnsrCleanNames_ + dPCNSR2_no_name;
+pcnsrCleanNames := pcnsrCleanNames_ + dPCNSR2_no_name : persist('persist::daybatchPcnsr::proc_clean_names');
 //END: Clean Names
 
 //Clean Addresses
@@ -314,13 +314,17 @@ Layout_p_cnsr_for_clean getClean(clean182 l) := TRANSFORM
 	SELF := l;
 end;
 
-all_cleaned := PROJECT(clean182,getClean(LEFT));
+all_cleaned := PROJECT(clean182,getClean(LEFT)) : persist('persist::daybatchPcnsr::proc_clean_addr');
 //END: Clean Addresses
+
+//------------Apply Name Flipping Macro--------------------
+ut.mac_flipnames(all_cleaned,fname,mname,lname,names_flipped);
+//---------------------------------------------------------
 
 //build consumer hhid
 
 didville.MAC_HHID_Append_By_Address(
-	all_cleaned, pcnsr_hhid_out, hhid, lname,
+	names_flipped, pcnsr_hhid_out, hhid, lname,
 	prim_range, prim_name, sec_range, st, zip)
 
 //Append DIDs
@@ -347,6 +351,6 @@ f_out := join(out_no_hhid(did<>0), header.File_HHID_Current(ver=1),
                     left.did = right.did, get_hhid_by_did(left,right),
 left outer, hash) + out_no_hhid (did=0) + out_with_hhid; 
 
-ut.MAC_SF_BuildProcess(f_out,'~thor_data::base::daybatch_pcnsr',out_file,2)
+ut.MAC_SF_BuildProcess(f_out,'~thor_data400::base::daybatch_pcnsr',out_file,3)
 
 export Proc_clean_pcnsr := out_file;

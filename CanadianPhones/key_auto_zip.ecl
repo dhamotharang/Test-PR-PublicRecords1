@@ -1,4 +1,4 @@
-import doxie;
+import doxie, NID;
 
 layout_auto_zip := record
   STRING6 zip;
@@ -14,7 +14,7 @@ layout_auto_zip proj(file_cwp_with_fdid le) := TRANSFORM
 	SELF.zip := le.postalcode;
 	SELF.dph_lname := metaphonelib.DMetaPhone1(le.lastname);
 	SELF.lname := le.lastname;
-	SELF.pfname := datalib.preferredfirst(le.firstname);
+	SELF.pfname := NID.PreferredFirstVersionedStr(le.firstname, NID.version);
 	SELF.fname := le.firstname;
 	SELF.minit := le.middlename[1];
 	SELF.did := le.fdid;

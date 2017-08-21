@@ -1,6 +1,6 @@
 import Data_Services, infutor,doxie,ut;
 
-file_best := Infutor.file_infutor_best(did > 0);
+file_best := PROJECT(Infutor.file_infutor_best(did > 0), infutor.layout_best.lbest - name_suffix);
 
 export Key_infutor_best_DID := 
        index(file_best,{did},{file_best},

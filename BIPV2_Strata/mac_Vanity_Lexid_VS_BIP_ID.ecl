@@ -13,7 +13,7 @@ import bipv2_build,paw,bipv2,strata;
 EXPORT mac_Vanity_Lexid_VS_BIP_ID(
 
    pversion     = 'bipv2.KeySuffix'                           // build date
-  ,pBIP_Base    = 'bipv2.CommonBase.ds_base'
+  ,pBIP_Base    = 'bipv2.CommonBase.ds_built'
   ,pEmail_List  = 'BIPV2_Build.mod_email.emailList'           // email list 
   ,pIsTesting   = 'false'
   ,pOverwrite   = 'false'

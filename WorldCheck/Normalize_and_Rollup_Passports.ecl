@@ -1,6 +1,8 @@
 export Normalize_and_Rollup_Passports (string filedate) := function
 
-in_file := WorldCheck.File_WorldCheck_In;
+in_f 	:= WorldCheck.File_WorldCheck_In;
+
+in_file	:= distribute(in_f, random());
 
 // Shared parsing patterns for most
 pattern SingleValue   := pattern('[^;]+');
@@ -74,7 +76,7 @@ Passport_out := rollup(sort(p_Passport,record)
 count_ds_Passports_rollup := count(Passport_out);
 output('Passport rollup count: ' + count_ds_Passports_rollup);
 
-Passport_out_dist := distribute(Passport_out,hash32(UID)) : persist(WorldCheck.cluster_name + 'Persist::WorldCheck::Passport::rollup');
+Passport_out_dist := sort(distribute(Passport_out, hash32(UID)), uid, local) : persist(WorldCheck.cluster_name + 'Persist::WorldCheck::Passport::rollup');
 
 return Passport_out_dist;
 

@@ -1,6 +1,6 @@
-import doxie_build,ut,lib_date,Corrections;
+import doxie_build,ut,lib_date,Corrections, hygenics_search;
 
-export proc_build_Life_EIR_offenders_flagged(dataset(Corrections.layout_offender) infile):= function
+export proc_build_Life_EIR_offenders_flagged(dataset(hygenics_search.corrections_layout_offender) infile):= function
 
 //Flag inmates that are currently incarcerated curr_incar_flag = 'Y' or ''
 /*

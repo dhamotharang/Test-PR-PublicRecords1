@@ -1,4 +1,4 @@
-import doxie, watchdog, ut, doxie_files;
+Import Data_Services, doxie, watchdog, ut, doxie_files;
 
 layout_addr := record
 	qstring28	prim_name;
@@ -45,7 +45,7 @@ TRANSFORM
 	self.names := Le.names + ri.names;
 	self.addresses := Le.addresses + ri.addresses;
 	SELF.Issue_date := ut.Min2(le.Issue_date, ri.Issue_date);
-	SELF.Expire_date := ut.Max2(le.Expire_date, ri.Expire_date);
+	SELF.Expire_date := Max(le.Expire_date, ri.Expire_date);
 	SELF.roll_count := le.rolL_Count + Ri.roll_Count;
 	self := le;
 END;

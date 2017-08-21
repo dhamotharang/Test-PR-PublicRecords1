@@ -1,6 +1,6 @@
 import autokeyb2, ut, zz_cemtemp, standard, ut, doxie, autokey,AutoKeyI, RoxieKeyBuild;
 
-export proc_autokeybuild(string filedate = ut.getdate[1..8]) :=  FUNCTION
+export proc_autokeybuild :=  FUNCTION
 
 ds_forLayoutMaster_AKB := accurint_acclogs.file_SearchAutokey;
 
@@ -48,7 +48,7 @@ ds_forLayoutMaster_AKB := accurint_acclogs.file_SearchAutokey;
  mod_AKB := module(AutokeyB2.Fn_Build.params) 
 	export dataset(autokey.layouts.master) L_indata := ds_inLayoutMaster_AKB; 
 	export string L_inkeyname := 	Accurint_AccLogs.str_AutoKeyReference; 
-	export string L_inlogical := 	accurint_acclogs.str_AutokeyLogicalName(filedate); 
+	export string L_inlogical := 	accurint_acclogs.str_AutokeyLogicalName(trim(accurint_acclogs.version, all)); 
 	export boolean L_diffing := 	false; 
 	export boolean L_Biz_useAllLookups := 	true; 
 	export boolean L_Indv_useAllLookups := 	true; 

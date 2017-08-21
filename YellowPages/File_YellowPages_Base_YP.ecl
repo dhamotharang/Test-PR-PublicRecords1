@@ -1,1 +1,1 @@
-EXPORT File_YellowPages_Base_YP := DATASET('TEMP::YellowPages_Base_YP',Layout_YellowPages_Base,THOR);
+EXPORT File_YellowPages_Base_YP := PROJECT(File_YellowPages_Base_YP_V2,Layout_YellowPages_Base);

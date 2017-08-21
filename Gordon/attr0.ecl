@@ -1,0 +1,1 @@
+export attr0 := 'attr0';

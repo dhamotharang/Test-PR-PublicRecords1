@@ -42,4 +42,4 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriage_divorce
  
 end;
 
-export mapping_nc_divorce := project(marriage_divorce_v2.File_Divorce_NC_In,t_map_to_common(left)) : persist('mar_div_nc_div');
+export mapping_nc_divorce := project(marriage_divorce_v2.File_Divorce_NC_In,t_map_to_common(left));// : persist('mar_div_nc_div');

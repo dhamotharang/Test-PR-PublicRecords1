@@ -4,7 +4,7 @@ module
 
 	shared integer8 max_size := _Dataset().max_record_size;
 
-	export Miscellaneous :=
+	export Miscellaneous := 
 	module
 	
 		export Cleaned_Dates :=
@@ -30,118 +30,139 @@ module
 		export Sprayed :=
 		record
 		
-			string14					zoomID																		;
-			string50					Name_Last																	;
-			string50					Name_First																;
-			string50					Name_Middle																;
-			string200					Name_Prefix																;
-			string255					Name_Suffix																;
-			string255					Job_Title																	;
-			string4						Job_Title_Hierarchy_Level									;
-			string42					Job_Function            									; //NEW
-			string255					Company_Division_Name											;
-			string108					Phone																			;
-			string117					Email_Address															;
-			string509					Person_City             									; //NEW
-			string45					Person_State            									; //NEW
-			string123					Person_Zip              									; //NEW
-			string65					Person_Country           									; //NEW
-			string5						Source_Count															;
-			string10					Last_Updated_Date													;
-			string9						Zoom_Company_ID														;
-			string9						Acquiring_Company_ID											;
-			string9						Parent_Company_ID													;
-			string255					Company_Name															;
-			string255					Company_Domain_Name												;
-			string30					Company_Phone															;
-			string255					Company_Address_Street										;
-			string73					Company_Address_City											;
-			string61					Company_Address_State											;
-			string27					Company_Address_Postal										;
-			string43					Company_Address_Country										;
-			string73					Industry_Label														;
-			string34					Industry_Hierarchical_Category						;
-			string71					Secondary_Industry_Label									;
-			string34 					Secondary_Industry_Hierarchical_Category	;
-			string9						Revenue                                 	; //NEW
-			string8						Employees                                	; //NEW
-
+      string14  zoomID                                    ;
+			string50  Name_Last																	;
+			string50  Name_First																;
+			string50  Name_Middle																;
+			string200 Name_Prefix                               ;
+			string255 Name_Suffix                               ;
+			string255 Job_title																	;
+			string4   Job_title_hierarchy_level									;
+			string42  Job_Function															;
+			string11  Management_Level													;
+			string255 Company_division_name											;
+			string108 Phone																			;
+			string117 Email_address															;
+      string350 Person_Street                             ;
+			string509 Person_City																;
+			string45  Person_State															;
+			string123 Person_Zip																;
+			string65  Person_Country														;
+			string5   Source_count															;
+			string10  Last_updated_date													;
+			string9   Zoom_company_ID														;
+			string255 Company_name															;
+			string255 Company_domain_name												;
+			string30  Company_phone															;
+			string255 Company_Address_Street										;
+			string73  Company_Address_City											;
+			string61  Company_Address_State											;
+			string27  Company_Address_Postal										;
+			string43  Company_Address_Country										;
+			string73  Industry_label														;
+			string34  Industry_hierarchical_category						;
+			string71  Secondary_industry_label									;
+			string34  Secondary_industry_hierarchical_category	;
+			string9   Revenue																		;
+      string20  Revenue_Range                             ;
+			string8   Employees																	;
+      string20  Employees_Range                           ;
+			string4   SIC1																			;                                 
+			string4   SIC2																			;                               	 
+			string6   NAICS1																		;                               	 
+			string6   NAICS2																		;                               	 
+      string875 TitleCode																	;                            
+			string47  Highest_Level_Job_Fuction									;              
+			string92  Person_Pro_URL														;                         
+			string32  Encrypted_Email_Address										;              
+			string90  Email_Domain															;                         
+			string10  Query_Name																;   
 		end;
 		
 		export Sprayed2 :=
 		record, maxlength(max_size)
-		
-			string					zoomID																		;
-			string					Name_Last																	;
-			string					Name_First																;
-			string					Name_Middle																;
-			string					Name_Prefix																;
-			string					Name_Suffix																;
-			string					Job_Title																	;
-			string					Job_Title_Hierarchy_Level									;
-			string					Job_Function            									; //NEW
-			string					Company_Division_Name											;
-			string					Phone																			;
-			string					Email_Address															;
-			string					Blank                   									; //NEW
-			string					Person_City             									; //NEW
-			string					Person_State            									; //NEW
-			string					Person_Zip              									; //NEW
-			string					Person_Country           									; //NEW
-			string					Source_Count															;
-			string					Last_Updated_Date													;
-			string					Zoom_Company_ID														;
-			string					Acquiring_Company_ID											;
-			string					Parent_Company_ID													;
-			string					Company_Name															;
-			string					Company_Domain_Name												;
-			string					Company_Phone															;
-			string					Company_Address_Street										;
-			string					Company_Address_City											;
-			string					Company_Address_State											;
-			string					Company_Address_Postal										;
-			string					Company_Address_Country										;
-			string					Industry_Label														;
-			string					Industry_Hierarchical_Category						;
-			string					Secondary_Industry_Label									;
-			string					Secondary_Industry_Hierarchical_Category	;
-			string					Revenue                                 	; //NEW
-			string					Employees                                	; //NEW
-			string 					lf																				;
-
+      string zoomID                                       ;
+			string Name_Last                                    ;
+			string Name_First                                   ;
+			string Name_Middle                                  ;
+			string Name_Prefix                                  ;
+			string Name_Suffix                                  ;
+			string Job_title                                    ;
+			string Job_title_hierarchy_level                    ;
+			string Job_Function                                 ;
+			string Management_Level															;
+			string Company_division_name                        ;
+			string Phone                                        ;
+			string Email_address                                ;
+      string Person_Street                                ;
+			string Person_City                                  ;
+			string Person_State                                 ;
+			string Person_Zip                                   ;
+			string Person_Country                               ;
+			string Source_count                                 ;
+			string Last_updated_date                            ;
+			string Zoom_company_ID                              ;
+			string Acquiring_Company_ID:=''                     ;
+			string Parent_Company_ID:=''                        ;
+			string Company_name                                 ;
+			string Company_domain_name                          ;
+			string Company_Phone                                ;
+			string Company_Address_Street                       ;
+			string Company_Address_City                         ;
+			string Company_Address_State                        ;
+			string Company_Address_Postal                       ;
+			string Company_Address_Country                      ;
+			string Industry_label                               ;
+			string Industry_hierarchical_category               ;
+			string Secondary_industry_label                     ;
+			string Secondary_industry_hierarchical_category     ;
+			string Revenue                                      ;
+      string Revenue_Range                                ;
+			string Employees                                    ;
+      string Employees_Range                              ;
+			string SIC1                                         ;
+			string SIC2                                         ;
+			string NAICS1																				;                               	 
+			string NAICS2																				;                               	 
+			string TitleCode                                    ; 
+			string Highest_Level_Job_Fuction                    ;
+			string Person_Pro_URL                               ;
+			string Encrypted_Email_Address                      ;
+			string Email_Domain                                 ;
+			string Query_Name                                   ;
 		end;
 
 		export Keybuild :=
 		record
-			string14					zoomID																		;
-			string50					Name_Last																	;
-			string50					Name_First																;
-			string50					Name_Middle																;
-			string200					Name_Prefix																;
-			string255					Name_Suffix																;
-			string255					Job_Title																	;
-			string4						Job_Title_Hierarchy_Level									;
-			string255					Company_Division_Name											;
-			string108					Phone																			;
-			string117					Email_Address															;
-			string5						Source_Count															;
-			string10					Last_Updated_Date													;
-			string9						Zoom_Company_ID														;
-			string9						Acquiring_Company_ID											;
-			string9						Parent_Company_ID													;
-			string255					Company_Name															;
-			string255					Company_Domain_Name												;
-			string30					Company_Phone															;
-			string255					Company_Address_Street										;
-			string73					Company_Address_City											;
-			string61					Company_Address_State											;
-			string27					Company_Address_Postal										;
-			string43					Company_Address_Country										;
-			string73					Industry_Label														;
-			string34					Industry_Hierarchical_Category						;
-			string71					Secondary_Industry_Label									;
-			string34 					Secondary_Industry_Hierarchical_Category	;
-
+			
+      string14   zoomID                                   ;
+			string50   Name_Last                                ;
+			string50   Name_First                               ;
+			string50   Name_Middle                              ;
+			string200  Name_Prefix                              ;
+			string255  Name_Suffix                              ;
+			string255  Job_title                                ;
+			string4    Job_title_hierarchy_level                ;
+			string255  Company_division_name                    ;
+			string108  Phone                                    ;
+			string117  Email_address                            ;
+			string5    Source_count                             ;
+			string10   Last_updated_date                        ;
+			string9    Zoom_company_ID                          ;
+			string9    Acquiring_Company_ID	                    ;
+			string9    Parent_Company_ID		                    ;
+			string255  Company_name                             ;
+			string255  Company_domain_name                      ;
+			string30   Company_phone                            ;
+			string255  Company_Address_Street                   ;
+			string73   Company_Address_City                     ;
+			string61   Company_Address_State                    ;
+			string27   Company_Address_Postal                   ;
+			string43   Company_Address_Country                  ;
+			string73   Industry_label                           ;
+			string34   Industry_hierarchical_category           ;
+			string71   Secondary_industry_label                 ;
+			string34   Secondary_industry_hierarchical_category ;
 		end;
 
 		export rawxml := {,maxlength(max_size * 40) string line {maxlength(max_size * 40)}};
@@ -153,7 +174,7 @@ module
 			string education_degree					:= xmltext('education[1]/degree'				);
 			string education_institution		:= xmltext('education[1]/institution'		);
 			string email										:= xmltext('email'											);
-			string zoomID										:= xmltext('iD'													);
+			string zoomID										:= xmltext('id'													);
 			string name											:= xmltext('name'												);
 			string name_first								:= xmltext('name/first'									);
 			string name_last								:= xmltext('name/last'									);
@@ -310,11 +331,13 @@ module
 		BaseXML.dt_vendor_last_reported					;
 		BaseXML.record_type											;
 		
-		input.XML_keybuild and not [phone, 
-		                          reference_bio,
-															reference_lastDate,
-															reference_validDate,
-															validDate]	 rawfields  ;
+		input.XML_keybuild and 
+		not   [phone, 
+		      reference_bio,
+					reference_lastDate,
+					reference_validDate,
+					validDate]	           rawfields  ;
+		
 		Address.Layout_Clean_Name				clean_contact_name;
 
     BaseXML.clean_ref_last_date 					  ;
@@ -335,13 +358,16 @@ module
 		unsigned1												bdid_score									:= 0;
 		unsigned8							    			raw_aid											:= 0;
 		unsigned8							    			ace_aid											:= 0;
+		unsigned8							    			person_raw_aid							:= 0;
+		unsigned8							    			person_ace_aid							:= 0;
 		unsigned4 											dt_first_seen										;
 		unsigned4 											dt_last_seen										;
 		unsigned4 											dt_vendor_first_reported				;
 		unsigned4 											dt_vendor_last_reported					;
 		string1													record_type											;
 		
-		input.Sprayed2 - blank - lf			rawfields												;
+		input.Sprayed2                 	rawfields                       ;
+		
 		Address.Layout_Clean_Name				clean_contact_name							;
 		Address.Layout_Clean182_fips		Clean_Company_address						;
 		Address.Layout_Clean182_fips		Clean_Person_address						;
@@ -366,7 +392,8 @@ module
 		unsigned4 											dt_vendor_last_reported					;
 		string1													record_type											;
 		
-		input.keybuild									rawfields												;
+		input.keybuild                  rawfields  			                ;
+															
 		Address.Layout_Clean_Name				clean_contact_name							;
 		Address.Layout_Clean182_fips		Clean_Company_address						;
 

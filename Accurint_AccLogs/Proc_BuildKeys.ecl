@@ -1,6 +1,6 @@
 import autokeyb2, ut, zz_cemtemp, standard, ut, doxie, autokey,AutoKeyI, RoxieKeyBuild;
 
-export Proc_BuildKeys(string filedate) := function
+export Proc_BuildKeys := function
 
 ds_forLayoutMaster_AKB := accurint_acclogs.file_SearchAutokey;
 
@@ -25,27 +25,25 @@ ds_forLayoutMaster_AKB := accurint_acclogs.file_SearchAutokey;
 														   // stringlib.stringtouppercase(left.orig_searchdescription) in set_linkid => left.orig_unique_id, '');
 										// self := left));
 										
-mBuildkeys(ds, suffix, buildkey, filedate) := macro
+mBuildkeys(ds, suffix, buildkey, version) := macro
 	RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(ds,
 												Accurint_AccLogs.str_keylogicalname + '::@version@::' + suffix,
-												Accurint_AccLogs.str_keylogicalname + '::' + filedate +'::'+ suffix,
+												Accurint_AccLogs.str_keylogicalname + '::' + version +'::'+ suffix,
 												buildkey);
 
 endmacro;
 
-mMovekeys(ds, suffix, movekey, filedate) := macro
+mMovekeys(ds, suffix, movekey, version) := macro
 	Roxiekeybuild.Mac_SK_Move_to_Built_v2(Accurint_AccLogs.str_keylogicalname + '::@version@::' + suffix, 
-										  Accurint_AccLogs.str_keylogicalname + '::' + filedate +'::'+ suffix, 
+										  Accurint_AccLogs.str_keylogicalname + '::' + version +'::'+ suffix, 
 										  movekey);
 endmacro;
 
-mOutkeys(ds, suffix, outkey, filedate) := macro
-	RoxieKeyBuild.Mac_SK_Move_V3(Accurint_AccLogs.str_keylogicalname + '::@version@::' + suffix,
+mOutkeys(ds, suffix, outkey, version) := macro
+	RoxieKeyBuild.Mac_SK_Move_V2(Accurint_AccLogs.str_keylogicalname + '::@version@::' + suffix,
 								 'Q',
-								 OutKey,
-								 filedate);
+								 OutKey);
 endmacro;
-
 
 /////// PAYLOAD KEY
 
@@ -61,9 +59,9 @@ UserIDKey := index(tbrecord_idUserID, {user_ID, date_added}, {record_id}, Accuri
 /////// DOB
 
 DOBNameSlim := table(ds_forLayoutMaster_AKB(dob not in ['','00000000'] and lname <> '') ,
-						   {integer4 dob := (integer4)dob, lname, fname, record_id});
+						   {integer4 dob := (integer4)dob, orig_company_id, lname, fname, record_id});
 
-DOBKey := index(DOBNameSlim,{dob} , {lname, fname, record_id}, Accurint_AccLogs.str_keylogicalname + '::' + doxie.Version_SuperKey + '::dob');
+DOBKey := index(DOBNameSlim,{dob, orig_company_id} , {lname, fname, record_id}, Accurint_AccLogs.str_keylogicalname + '::' + doxie.Version_SuperKey + '::dob');
 
 
 /////// DRIVERS LICENSE
@@ -109,55 +107,55 @@ DateTimeKey := index(DateTimeTB(Date <> ''), {date, time, record_id}, Accurint_A
 
 /////// FEIN NUMBER
 
-FEINKey := index(ds_forLayoutMaster_AKB((unsigned6)orig_ein > 0 and ~regexfind('[a-zA-Z]', trim(orig_ein, all))), {unsigned6 fein := (unsigned6)regexreplace('[^0-9]', orig_ein, '') , record_id}, Accurint_AccLogs.str_keylogicalname + '::' + doxie.Version_SuperKey + '::fein');
+FEINKey := index(ds_forLayoutMaster_AKB((unsigned)orig_ein > 0 and trim(orig_ein, all) <> ''), {unsigned6 fein := (unsigned6)regexreplace('[^0-9]', orig_ein, '') , record_id}, Accurint_AccLogs.str_keylogicalname + '::' + doxie.Version_SuperKey + '::fein');
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-mBuildkeys(RecordIDKey, 'recordid', buildRecID, filedate);
-mMovekeys(RecordIDKey, 'recordid', moveRecID, filedate);
-mOutkeys(RecordIDKey, 'recordid', outRecID, filedate);
+mBuildkeys(RecordIDKey, 'recordid', buildRecID, version);
+mMovekeys(RecordIDKey, 'recordid', moveRecID, version);
+mOutkeys(RecordIDKey, 'recordid', outRecID, version);
 
-mBuildkeys(UserIDKey, 'userid', buildUserID, filedate);
-mMovekeys(UserIDKey, 'userid', moveUserID, filedate);
-mOutkeys(UserIDKey, 'userid', outUserID, filedate);
+mBuildkeys(UserIDKey, 'userid', buildUserID, version);
+mMovekeys(UserIDKey, 'userid', moveUserID, version);
+mOutkeys(UserIDKey, 'userid', outUserID, version);
 
-mBuildkeys(DOBKey, 'dob', buildDOB, filedate);
-mMovekeys(DOBKey, 'dob', moveDOB, filedate);
-mOutkeys(DOBKey, 'dob', outDOB, filedate);
+mBuildkeys(DOBKey, 'dob', buildDOB, version);
+mMovekeys(DOBKey, 'dob', moveDOB, version);
+mOutkeys(DOBKey, 'dob', outDOB, version);
 
-mBuildkeys(DLKey, 'dl', buildDl, filedate);
-mMovekeys(DLKey, 'dl', moveDl, filedate);
-mOutkeys(DLKey, 'dl', outDl, filedate);
+mBuildkeys(DLKey, 'dl', buildDl, version);
+mMovekeys(DLKey, 'dl', moveDl, version);
+mOutkeys(DLKey, 'dl', outDl, version);
 
-mBuildkeys(LinkIDKey, 'LinkID', buildLinkID, filedate);
-mMovekeys(LinkIDKey, 'LinkID', moveLinkID, filedate);
-mOutkeys(LinkIDKey, 'LinkID', outLinkID, filedate);
+mBuildkeys(LinkIDKey, 'LinkID', buildLinkID, version);
+mMovekeys(LinkIDKey, 'LinkID', moveLinkID, version);
+mOutkeys(LinkIDKey, 'LinkID', outLinkID, version);
 
-mBuildkeys(CharterKey, 'Charter', buildCharter, filedate);
-mMovekeys(CharterKey, 'Charter', moveCharter, filedate);
-mOutkeys(CharterKey, 'Charter', outCharter, filedate);
+mBuildkeys(CharterKey, 'Charter', buildCharter, version);
+mMovekeys(CharterKey, 'Charter', moveCharter, version);
+mOutkeys(CharterKey, 'Charter', outCharter, version);
 
-mBuildkeys(UCCKey, 'UCC', buildUCC, filedate);
-mMovekeys(UCCKey, 'UCC', moveUCC, filedate);
-mOutkeys(UCCKey, 'UCC', outUCC, filedate);
+mBuildkeys(UCCKey, 'UCC', buildUCC, version);
+mMovekeys(UCCKey, 'UCC', moveUCC, version);
+mOutkeys(UCCKey, 'UCC', outUCC, version);
 
-mBuildkeys(DomainKey, 'Domain', buildDomain, filedate);
-mMovekeys(DomainKey, 'Domain', moveDomain, filedate);
-mOutkeys(DomainKey, 'Domain', outDomain, filedate);
+mBuildkeys(DomainKey, 'Domain', buildDomain, version);
+mMovekeys(DomainKey, 'Domain', moveDomain, version);
+mOutkeys(DomainKey, 'Domain', outDomain, version);
 
-mBuildkeys(DateTimeKey, 'DateTime', buildDateTime, filedate);
-mMovekeys(DateTimeKey, 'DateTime', moveDateTime, filedate);
-mOutkeys(DateTimeKey, 'DateTime', outDateTime, filedate);
+mBuildkeys(DateTimeKey, 'DateTime', buildDateTime, version);
+mMovekeys(DateTimeKey, 'DateTime', moveDateTime, version);
+mOutkeys(DateTimeKey, 'DateTime', outDateTime, version);
 
 
-mBuildkeys(FEINKey, 'FEIN', buildFEIN, filedate);
-mMovekeys(FEINKey, 'FEIN', moveFEIN, filedate);
-mOutkeys(FEINKey, 'FEIN', outFEIN, filedate);
+mBuildkeys(FEINKey, 'FEIN', buildFEIN, version);
+mMovekeys(FEINKey, 'FEIN', moveFEIN, version);
+mOutkeys(FEINKey, 'FEIN', outFEIN, version);
 
-// mBuildkeys(FilingNbrKey, 'Filing', buildFiling, filedate);
-// mMovekeys(FilingNbrKey, 'Filing', moveFiling, filedate);
-// mOutkeys(FilingNbrKey, 'Filing', outFiling, filedate);
+// mBuildkeys(FilingNbrKey, 'Filing', buildFiling, version);
+// mMovekeys(FilingNbrKey, 'Filing', moveFiling, version);
+// mOutkeys(FilingNbrKey, 'Filing', outFiling, version);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

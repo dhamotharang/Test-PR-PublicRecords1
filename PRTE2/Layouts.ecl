@@ -2562,47 +2562,6 @@ end;
 		unsigned6 New_Seq_no;
 		foreclosure_batch_in;	
 	end;
-	EXPORT AID_Clean_Layout := Record
-			string city_st_zip_field_name := '';
-			string street_field_name := '';
-			string city_field_name := '';
-			string state_field_name := '';
-			string zip_field_name := '';
-			string clean_addr_field_name := '';
-			string raw_AID_field_name := '';
-	End;
-	
-	// export AID_Address := record
-		// string addr1_fieldname;
-		// string addr2_fieldname;
-		// string rawaid := '';
-		// string prim_range := '';
-		// string predir := '';
-		// string prim_name := '';
-		// string addr_suffix := '';
-		// string postdir := '';
-		// string unit_desig := '';
-		// string sec_range := '';
-		// string p_city_name := '';
-		// string v_city_name := '';
-		// string st := '';
-		// string zip := '';
-		// string zip4 := '';
-		// string cart := '';
-		// string cr_sort_sz := '';
-		// string lot := '';
-		// string lot_order := '';
-		// string dbpc := '';
-		// string chk_digit := '';
-		// string rec_type := '';
-		// string fips_state := '';
-		// string fips_county := '';
-		// string geo_lat := '';
-		// string geo_long := '';
-		// string msa := '';
-		// string geo_blk := '';
-		// string geo_match := '';
-		// string err_stat := '';
-// End;
+			
 		
 END;

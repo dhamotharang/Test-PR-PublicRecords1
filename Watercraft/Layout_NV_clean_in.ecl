@@ -1,6 +1,6 @@
-export Layout_NV_clean_in := 
+export Layout_NV_clean_in := record
 
-record
+//record length: 2084
 string2 state_origin;
 string8 process_date;
 watercraft.layout_NV;

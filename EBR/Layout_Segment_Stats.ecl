@@ -17,6 +17,9 @@ record
 	unsigned4 Total_base_records_with_ProxID 			:= 0;
 	unsigned4 Total_base_records_with_ProxScore 	:= 0;
 	unsigned4 Total_base_records_with_ProxWeight 	:= 0;
+	unsigned4 Total_base_records_with_SELEID 			:= 0;
+	unsigned4 Total_base_records_with_SELEScore 	:= 0;
+	unsigned4 Total_base_records_with_SELEWeight 	:= 0;	
 	unsigned4 Total_base_records_with_OrgID 			:= 0;
 	unsigned4 Total_base_records_with_OrgScore 		:= 0;
 	unsigned4 Total_base_records_with_OrgWeight 	:= 0;

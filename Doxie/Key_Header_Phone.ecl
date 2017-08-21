@@ -1,4 +1,4 @@
-import autokey, doxie_build, header, gong;
+import autokey, doxie_build, header, gong, ut;
 
 //t := dataset('~thor_data400::Base::HeaderKey_Building',header.Layout_Header,flat);
 //  Bug 12065, use blocked data filter on header instead of raw data
@@ -50,7 +50,7 @@ autokey.MAC_Phone(all_phone_recs,fname,mname,lname,
 						rel_fname1,rel_fname2,rel_fname3,
 						lookups,
 						did,
-						'~thor_data400::key::header.phone',
+						ut.Data_Location.Person_header + 'thor_data400::key::header.phone',
 						k)
 						
 export key_header_phone := k;

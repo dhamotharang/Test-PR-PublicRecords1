@@ -1,0 +1,1 @@
+export KeyName_Person_SSN_Fname := '~thor_data400::key.person.ssn.fname';

@@ -7,7 +7,7 @@ EXPORT isValidDOB (STRING8 InDate) := FUNCTION
 	Current_Year					:= (INTEGER) ut.getDate [1..4];
 	l_range 							:= Current_Year - 120;
 	lower_range						:= INTFORMAT (l_range,4,1);
-	BOOLEAN isValidYear 	:= IF ((INTEGER)InDate [1..4] >= (INTEGER) lower_range and (INTEGER)InDate [1..4] <= (INTEGER)ut.getDate [1..4], TRUE, FALSE);
+	BOOLEAN isValidYear 	:= IF ((INTEGER)InDate [1..4] >= (INTEGER) lower_range and (INTEGER)InDate [1..4] <= (INTEGER)ut.getDate [1..4] AND (INTEGER)InDate [1..4] > 1900, TRUE, FALSE);
 	BOOLEAN isValidMonth	:= IF (InDate [5..6] between '01' and '12', TRUE, FALSE);
 	BOOLEAN isValidDay 		:= MAP ((InDate [5..6] = '01') AND (InDate [7..8] between '01' and '31') => TRUE,
 													(ut.LeapYear(Year) and  InDate [5..6] = '02') AND (InDate [7..8] between '01' and '29') => TRUE,

@@ -1,0 +1,20 @@
+export Layout_Common := RECORD
+	string2 sourceCode;
+	unsigned6 bdid;
+	string exactSales;
+	string salesMin;
+	string salesMax;
+	integer salesWeight;
+	string4 sic;
+	integer sicWeight;
+	string exactEmplCnt;
+	string emplCntMin;
+	string emplCntMax;
+	string emplCntType;
+	integer emplCntWeight;
+	string taxLienAmount;
+	string taxLienTMSID;
+	string orgType;
+	integer orgTypeWeight;
+	string updateDate;
+END;

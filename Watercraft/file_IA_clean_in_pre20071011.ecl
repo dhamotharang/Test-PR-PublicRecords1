@@ -1,0 +1,1 @@
+export file_IA_clean_in_pre20071011	:=	dataset(watercraft.Cluster_In + 'in::watercraft_ia' + '_pre20071011', watercraft.layout_IA_clean_in_pre20071011, flat);

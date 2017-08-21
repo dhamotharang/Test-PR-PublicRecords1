@@ -1,18 +1,21 @@
 import _control;
 
-versionnum					:=	Certegy.version;
-sourceDIR					:=	'/load01/choicepoint_inbound/certegy/';
-Target						:=	'~thor_data400::in::certegy::dl';
-sourceIP					:=	_Control.IPAddress.edata14;
-filename					:=	versionnum[3..]+'_certextr.dat';
+export SpryInput(string filedate) := function
+
+versionnum					:=	filedate;
+sourceDIR						:=	'/data/hds_4/certegy/data/';
+Target							:=	'~thor_data400::in::certegy::dl';
+sourceIP						:=	_Control.IPAddress.bctlpedata11;
+filename						:=	versionnum[3..]+'_certextr.dat';
 sourcepath1					:=	sourceDIR + versionnum + '/' + filename;
 maxrecordsize				:=	371;
-destinationgroup			:=	_Control.ThisCluster.GroupName;
+//destinationgroup			:=	_Control.ThisCluster.GroupName;
+destinationgroup			:=	thorlib.cluster();
 destinationlogicalname1		:=	Target + versionnum + thorlib.wuid();
 
 clear_sf:=fileservices.clearsuperfile(Target);
 
-spry_file:=	fileservices.sprayfixed	(
+spry_file:=	fileservices.sprayfixed(
 									sourceIP
 									,sourcepath1
 									,maxrecordsize
@@ -23,4 +26,9 @@ spry_file:=	fileservices.sprayfixed	(
 
 add_to_sf:=	fileServices.AddSuperFile(Target,destinationlogicalname1);
 
-export SpryInput := sequential(	clear_sf,  spry_file,  add_to_sf );
+retval := sequential(clear_sf
+											,spry_file
+											,add_to_sf );
+
+return retval;
+end;

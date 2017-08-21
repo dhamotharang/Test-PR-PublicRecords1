@@ -1,4 +1,4 @@
-﻿IMPORT DemoSearchTool, iesp, ut;
+IMPORT DemoSearchTool, iesp, ut;
 
 EXPORT IParams := 
   MODULE

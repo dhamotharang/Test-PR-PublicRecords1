@@ -122,8 +122,8 @@ module
 		string3		default_value;
 	end;
 	
-	// Layout for property codes
-	export	LNPropertyCodes	:=
+	// Layout for property missing codes
+	export	LNPropertyMissingCodes	:=
 	record
 		string50	field_name;
 		string5		source_code;

@@ -11,6 +11,8 @@ import ut;
 //state_report_number is unique for TF.
 incident := project(FLAccidents_Ecrash.Infiles.incident(work_type_id in ['1', 'NULL','0'] and source_id in ['TF','EA']), transform({FLAccidents_Ecrash.Layout_Infiles.incident_new}, 
                                                      self.case_identifier := if(left.source_id = 'TF', left.state_report_number,left.case_identifier), 
+																										 SELF.ori_number := IF (left.ori_number = 'FL0130600','FL0130000',left.ori_number); //MDPD ORI correction remove this code after the historical update completed successfully
+													                           SELF.report_agency_ori := IF (left.report_agency_ori = 'FL0130600','FL0130000',left.report_agency_ori); //MDPD ORI correction remove this code after the historical update completed successfully
 																										 self:= left));
 																										 
 allrecs := sort(distribute(incident,hash(case_identifier))
@@ -313,13 +315,13 @@ return
 
 sequential(
 
-	 output(dedup(precs+dup_NotifyDE,record,all),,'~thor_data400::out::ecrash::'+fd+'::report_update'
+	 output(dedup(precs+dup_NotifyDE,record,all)(extra_data <> ''),,'~thor_data400::out::ecrash::'+fd+'::report_update'
 												,csv(terminator('\n')
 												,separator(','),quote('"'))
 												,overwrite) 
 	,fileservices.Despray('~thor_data400::out::ecrash::'+filedate+'::report_update'
-												, 'edata12-bld.br.seisint.com'
-												, '/super_credit/ecrash/account_monitoring/ecrash_'
+												, Constants.LandingZone
+												, '/data/super_credit/ecrash/account_monitoring/toprocess/ecrash_'
 																+filedate[1..4]+'-'+filedate[5..6]+'-'+filedate[7..8]+'_'+ 
 																timestamp[1..2]+'_'+timestamp[3..4]+'_'+timestamp[5..6]+'_report-update.csv'),
 			output(header_row+newdupes,,'~thor_data400::out::ecrash::'+fd+'::extract::caseDupes'
@@ -328,8 +330,8 @@ sequential(
 												 ,overwrite,__compressed__)
 				 ,fileservices.addsuperfile('~thor_data400::out::ecrash::dupes','~thor_data400::out::ecrash::'+filedate+'::extract::caseDupes')
 				 ,fileservices.Despray('~thor_data400::out::ecrash::'+filedate+'::extract::caseDupes'
-												  , 'edata12-bld.br.seisint.com'
-												  , '/super_credit/ecrash/dbdupes/ecrash_'+filedate+'_'+timestamp+'_extract_casedupes.csv',,,,true)
+												  , Constants.LandingZone
+												  , '/data/super_credit/ecrash/despray/dbdupes/ecrash_'+filedate+'_'+timestamp+'_extract_casedupes.csv',,,,true)
 					 );					
 
 end;

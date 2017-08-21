@@ -3,7 +3,7 @@ import address_attributes, doxie_build, doxie_files;
 //Append Geolink Population and crime data for a rolling 12 months
 //Pull geolink population for the last 12 months
 head 				:= doxie_build.file_header_building;
-earliest 		:= address_attributes.Constants.YearsAgo(1)[1..6];
+earliest 		:= ((string)address_attributes.Constants.YearsAgo(1))[1..6];
 head_valid 	:= head(dt_first_seen != 0, dt_last_seen > (unsigned3)earliest, prim_name[1..6] != 'PO BOX',trim(st)!='',trim(county)!='',trim(geo_blk)!='');
 a2d   			:= address_attributes.Functions.AddrToDid(head_valid, true);
 
@@ -49,8 +49,8 @@ rHeadCrim pullCriminal(a2d l, Crim2 r) := transform
 		self.felony_hit := if(r.felony_count > 0, true, false);
 		self.felony_count := r.felony_count;
 		self.crime_count := r.criminal_count;
-		self.Criminal := if((string)r.last_criminal_date[1..6] >= earliest or (string)r.last_felony_date[1..6] >= earliest, true, false);	
-		self.Felon := if((string)r.last_felony_date[1..6] >= earliest, true, false);	
+		self.Criminal := if(((string)r.last_criminal_date)[1..6] >= earliest or ((string)r.last_felony_date)[1..6] >= earliest, true, false);	
+		self.Felon := if(((string)r.last_felony_date)[1..6] >= earliest, true, false);	
 		self.geolink := l.st + l.county + l.geo_blk;
 		self := l;
 end;

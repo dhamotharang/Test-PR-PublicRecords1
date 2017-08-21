@@ -1,17 +1,9 @@
-export Layout_NY_clean_in := 
-
-record
-
-string2            state_origin;
-
-string8            process_date;
-
-watercraft.layout_NY;
-
-string130        concat_name;
-
- 
-
+export Layout_NY_clean_in := record
+//rec len: 1765
+  string2            state_origin;
+  string8            process_date;
+  watercraft.layout_NY;
+  string130        concat_name;
   string70 pname1;
 
   string3  pname1_score;
@@ -43,7 +35,5 @@ string130        concat_name;
   string100 cname5;
 
   string182 clean_address;
-
-  
 
 end;

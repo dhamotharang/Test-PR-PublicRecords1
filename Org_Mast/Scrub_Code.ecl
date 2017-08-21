@@ -40,8 +40,8 @@ EXPORT Scrub_Code (string filedate, boolean pUseProd = false) := MODULE
 				EyeballSomeErrors,
 				SomeErrorValues,
 				SubmitStats,
-				Alerts,
-				mailfile
+				Alerts
+				//mailfile
 			);
 
 			Return true;

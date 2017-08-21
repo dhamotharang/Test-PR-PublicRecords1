@@ -1,4 +1,4 @@
-import watercraft;
+import watercraft,lib_stringlib;
 
 
 county_reg(string2 code)
@@ -59,13 +59,14 @@ county_reg(string2 code)
 '53' => 'WILLIAMS',
 '54' => 'COUNTY UNKNOWN','' );   
 
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_ND_clean_in, watercraft.Layout_ND_clean_in,hull_clean_in)
 
-watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_ND_clean_in L) := transform
+watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := transform
 
 
-    self.watercraft_key						:=	if(trim(L.YEAR, left, right) >= '1972' and length(trim(L.HULL_ID, left, right)) = 12, trim(L.HULL_ID, left, right),
-	                                            if(trim(L.HULL_ID, left, right) <> '' and trim(L.HULL_ID, left, right) <> '*', (trim(L.HULL_ID, left, right) 
-												+ trim(L.MAKE, left, right) + trim(L.YEAR, left, right))[1..30], (trim(L.MAKE, left, right) + trim(L.YEAR, left, right) 
+    self.watercraft_key						:=	if(trim(L.YEAR, left, right) >= '1972' and length(trim(L.HULL_ID, left, right)) = 12, StringLib.StringToUpperCase(trim(L.HULL_ID, left, right)),
+	                                            if(trim(L.HULL_ID, left, right) <> '' and trim(L.HULL_ID, left, right) <> '*', (StringLib.StringToUpperCase(trim(L.HULL_ID, left, right) 
+												+ trim(L.MAKE, left, right) + trim(L.YEAR, left, right))[1..30]), StringLib.StringToUpperCase(trim(L.MAKE, left, right) + trim(L.YEAR, left, right) 
 												+ trim(L.NAME, left, right))[1..30]));
 	self.sequence_key						:=	trim(L.REG_DATE, left, right);
 	self.watercraft_id						:=	'';
@@ -74,7 +75,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_ND_cl
 	self.st_registration					:=	L.STATEDATA;
 	self.county_registration				:=	county_reg(trim(L.county,left,right));
 	self.registration_number				:=	trim(L.REG_NUM, left, right);
-	self.hull_number						:=	L.hull_id;
+	self.hull_number						:=	StringLib.StringToUpperCase(L.hull_id);
 	self.propulsion_code					:=	'';
 	self.propulsion_description				:=	L.PROP;
 	self.vehicle_type_Code					:=	'';
@@ -167,7 +168,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_ND_cl
 
 
 
-export Mapping_ND_as_Main := project(watercraft.file_ND_clean_in, main_mapping_format(left));
+export Mapping_ND_as_Main := project(hull_clean_in, main_mapping_format(left));
 
 
 	

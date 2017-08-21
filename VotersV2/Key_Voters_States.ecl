@@ -1,7 +1,10 @@
-Import ut, doxie, Data_Services;
+Import codes, doxie, Data_Services;
 
 export Key_Voters_States(boolean IsFCRA = false) := function
-VoterFile := VotersV2.File_Voters_Building(ut.valid_st(source_state));
+VoterFile := if (IsFCRA,
+									VotersV2.File_Voters_Building(codes.valid_st(source_state) and (source_state != 'HI' and source_state != 'NJ')),
+									VotersV2.File_Voters_Building(codes.valid_st(source_state))
+								 );
 
 VoterSrcStates_layout := RECORD
 	string2 state := VoterFile.source_state;

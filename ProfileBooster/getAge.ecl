@@ -55,7 +55,9 @@ EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, BOOLEAN onT
 	withQHeader := if(onThor, withQHeader_thor, withQHeader_roxie);
 	
 //sort header records by seq and DID2
-	sortHeader := sort(withHeader + withQHeader, seq, DID2, -dt_last_seen, -dt_first_seen);  //sort most recent first to get the most recent geoLink in the rollup below
+	sortHeader_roxie := sort(withHeader + withQHeader, seq, DID2, -dt_last_seen, -dt_first_seen);  //sort most recent first to get the most recent geoLink in the rollup below
+	sortHeader_thor := sort(distribute((withHeader_thor + withQHeader_thor), hash(seq)), seq, DID2, -dt_last_seen, -dt_first_seen, local);  //sort most recent first to get the most recent geoLink in the rollup below
+	sortHeader := if(onThor, sortHeader_thor, sortHeader_roxie);
 
 //rollup to keep the age and HHID from whichever record has it populated 
   ProfileBooster.Layouts.Layout_PB_Slim_header rollHeader(ProfileBooster.Layouts.Layout_PB_Slim_header le, ProfileBooster.Layouts.Layout_PB_Slim_header ri) := transform
@@ -74,13 +76,13 @@ EXPORT getAge(DATASET(ProfileBooster.Layouts.Layout_PB_Slim) PBslim, BOOLEAN onT
 									self.med_hhinc	:= (integer)right.med_hhinc,
 									self 						:= left), ATMOST(Riskwise.max_atmost), KEEP(1));	
 									
-	withCensus_thor := join(distribute(rolledHeader, hash64(geolink)), 
+	withCensus_thor1 := join(distribute(rolledHeader(geolink<>''), hash64(geolink)), 
 													distribute(pull(Easi.Key_Easi_Census), hash64(geolink)),
-								right.geolink=left.geoLInk and 
-								left.geoLink <> '',
+								right.geolink=left.geoLInk,
 								transform(ProfileBooster.Layouts.Layout_PB_Slim_header, 
 									self.med_hhinc	:= (integer)right.med_hhinc,
 									self 						:= left), ATMOST(Riskwise.max_atmost), KEEP(1), local);
+	withCensus_thor := withCensus_thor1 + rolledheader(geolink=''); // add back the records where geolink=''
 	withCensus := ungroup(if(onThor, withCensus_thor, withCensus_roxie));
 	
 

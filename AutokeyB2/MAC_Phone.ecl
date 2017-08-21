@@ -1,3 +1,6 @@
+/*2016-06-21T22:35:41Z (David Dittman)
+DF-16890 Removal of Substring Warnings
+*/
 export MAC_Phone (indataset,inbname,
 						infein,
 						inphone,
@@ -16,8 +19,8 @@ import doxie,autokey;
 #uniquename(recs)
 AutokeyB2.Layout_Phone %proj%(%indata% le) :=
 TRANSFORM
-  SELF.p7 := le.inphone[4..10];
-  SELF.p3 := le.inphone[1..3];
+  SELF.p7 := ((string)le.inphone)[4..10];
+  SELF.p3 := ((string)le.inphone)[1..3];
   SELF.cname_indic := business_header.CompanyCleanFields(le.inbname, true).indicative; 
   SELF.cname_sec := business_header.CompanyCleanFields(le.inbname, true).secondary;
   SELF.st := le.inst;

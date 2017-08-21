@@ -1,21 +1,21 @@
 EXPORT ShortCycleDataAsLinking := 
 MODULE
-import ut,Business_Header;
+import ut,Business_Header,Data_Services;
 
 shared rec := Business_Header.Layout_Business_Linking.Linking_Interface;
 
 export fullds :=
 MODULE
-	export bk := dataset(ut.foreign_prod + 'thor_data400::persist::bankruptcyv2::bankruptv2_as_business_linking', rec, thor);
+	export bk := dataset(Data_Services.foreign_prod + 'thor_data400::persist::bankruptcyv2::bankruptv2_as_business_linking', rec, thor);
 	// thor_data400::persist::bbb::bbb_as_business_linking
 	// thor_data400::persist::busdata::ska_as_business_linking
 	// thor_data400::persist::busreg::busreg_as_business_linking
-	export corp := dataset(ut.foreign_prod + 'thor_data400::persist::corp2::as_business_linking', rec, thor);
+	export corp := dataset(Data_Services.foreign_prod + 'thor_data400::persist::corp2::as_business_linking', rec, thor);
 	// thor_data400::persist::credit_unions::as_business_linking
-	export lnca := dataset(ut.foreign_prod + 'thor_data400::persist::dcav2::as_business_linking', rec, thor);
+	export lnca := dataset(Data_Services.foreign_prod + 'thor_data400::persist::dcav2::as_business_linking', rec, thor);
 	// thor_data400::persist::dea::dea_as_business_linking
-	export dbdmi := dataset(ut.foreign_prod + 'thor_data400::persist::dnb_dmi::as_business_linking', rec, thor);
-	export ebr := dataset(ut.foreign_prod + 'thor_data400::persist::ebr::ebr_as_business_linking', rec, thor);
+	export dbdmi := dataset(Data_Services.foreign_prod + 'thor_data400::persist::dnb_dmi::as_business_linking', rec, thor);
+	export ebr := dataset(Data_Services.foreign_prod + 'thor_data400::persist::ebr::ebr_as_business_linking', rec, thor);
 	// thor_data400::persist::faa::faa_aircraft_reg_as_business_linking', rec, thor);
 	// thor_data400::persist::frandx::as_business_linking', rec, thor);
 	// thor_data400::persist::gong_v2::as_business_linking', rec, thor);
@@ -26,13 +26,13 @@ MODULE
 	// thor_data400::persist::infousa::deadco_as_business_linking', rec, thor);
 	// thor_data400::persist::irs5500::irs5500_as_business_linking', rec, thor);
 	// thor_data400::persist::jigsaw::as_business_linking', rec, thor);
-	export lj := dataset(ut.foreign_prod + 'thor_data400::persist::liensv2::liensv2_as_business_linking', rec, thor);
-	export prop := dataset(ut.foreign_prod + 'thor_data400::persist::ln_propertyv2::ln_propertyv2_as_business_linking', rec, thor);
+	export lj := dataset(Data_Services.foreign_prod + 'thor_data400::persist::liensv2::liensv2_as_business_linking', rec, thor);
+	export prop := dataset(Data_Services.foreign_prod + 'thor_data400::persist::ln_propertyv2::ln_propertyv2_as_business_linking', rec, thor);
 	// thor_data400::persist::oshair::oshair_inspection_as_business_linking', rec, thor);
 	// thor_data400::persist::txbus::cleaned_txbus_as_business_linking', rec, thor);
-	export ucc := dataset(ut.foreign_prod + 'thor_data400::persist::uccv2::as_business_linking', rec, thor);
+	export ucc := dataset(Data_Services.foreign_prod + 'thor_data400::persist::uccv2::as_business_linking', rec, thor);
 	// thor_data400::persist::utilfile::as_business_linking', rec, thor);
-	export mvr := dataset(ut.foreign_prod + 'thor_data400::persist::vehiclev2::as_business_linking', rec, thor);
+	export mvr := dataset(Data_Services.foreign_prod + 'thor_data400::persist::vehiclev2::as_business_linking', rec, thor);
 	// thor_data400::persist::watercraft::watercraft_as_business_linking', rec, thor);
 	// thor_data400::persist::workers_compensation::as_business_linking', rec, thor);
 	// thor_data400::persist::yellowpages::as_business_linking', rec, thor);

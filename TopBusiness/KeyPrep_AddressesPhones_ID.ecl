@@ -5,7 +5,7 @@ export KeyPrep_AddressesPhones_ID(
 	string version,
 	boolean pUseOtherEnvironment = false) := function
 
-	projected_1 := rollup(sort(project(base,
+	projected_1 := rollup(sort(project(base(address_type not in [TopBusiness.Constants.ADDRESS_TYPES.PROPERTY,TopBusiness.Constants.ADDRESS_TYPES.REGAGENT]),
 		transform(KeyLayouts.AddressesPhones,
 			self.source_docid_1 := map(
 				MDR.SourceTools.SourceIsProperty(left.source) => left.source_docid[1],

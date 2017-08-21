@@ -13,6 +13,8 @@ export mod_SendEmails(
 	,string								pBuildMessage						= ''
 	,boolean							pShouldUpdateRoxiePage	= true
 	,string							  pUseVersion							= 'qa'
+	,string							  pEnvironment						= ''		//	'N' - nonfcra, 'F' - FCRA
+  ,string               pupdateflag             = 'F'
 
 ) :=
 module
@@ -20,22 +22,28 @@ module
 	export BuildSuccess	:= fun_SendEmail(
 													 pEmailList
 													,pBuildName + ' Build ' + pversion + ' Completed on ' + _Control.ThisEnvironment.Name
-													,workunit
+													,tools.fun_GetWUBrowserString()
 												);
 
 	export BuildFailure	:= fun_SendEmail(
 													 pEmailList
 													,pBuildName + ' Build ' + pversion + ' Failed on ' + _Control.ThisEnvironment.Name
-													,workunit + '\n' + failmessage
+													,tools.fun_GetWUBrowserString() + '\n' + failmessage
 												);
 
 	export BuildMessage := fun_SendEmail(
 													 pEmailList
 													,pBuildName + ': ' + pBuildMessage + ' : ' + pversion + ' on ' + _Control.ThisEnvironment.Name
-													,workunit
+													,tools.fun_GetWUBrowserString()
 												);
 
-	export Roxie	:= Tools.fCheckRoxiePackage(pRoxieEmailList,pPackageName	,pBuildFilenames	,pversion,pUseVersion,pShouldUpdateRoxiePage);
+	export BuildNote    := fun_SendEmail(
+													 pEmailList
+													,pBuildName + ': ' + pversion + ' on ' + _Control.ThisEnvironment.Name
+													,tools.fun_GetWUBrowserString() + '\n' + pBuildMessage
+												);
+                        
+	export Roxie	:= Tools.fCheckRoxiePackage(pRoxieEmailList,pPackageName	,pBuildFilenames	,pversion,pUseVersion,pShouldUpdateRoxiePage,pEnvironment,pupdateflag);
 	
 
 end;

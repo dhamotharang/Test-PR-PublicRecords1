@@ -1,4 +1,4 @@
-import Header,ut;
+import Header,ut,std;
 
 export	As_header(dataset(layout.base) pFile = dataset([],layout.base), boolean pForHeaderBuild=false)
  :=
@@ -9,18 +9,18 @@ export	As_header(dataset(layout.base) pFile = dataset([],layout.base), boolean p
 		self.did                      := 0;
 		self.rid                      := 0;
 		self.src:='EQ';
-		self.dt_first_seen:=(unsigned)l.dt_first_seen[1..6];
-		self.dt_last_seen:=(unsigned)l.dt_last_seen[1..6];
-		self.dt_vendor_first_reported:=(unsigned)l.dt_vendor_first_reported[1..6];
-		self.dt_vendor_last_reported:=(unsigned)l.dt_vendor_last_reported[1..6];
+		self.dt_first_seen:=(unsigned)((string)l.dt_first_seen)[1..6];
+		self.dt_last_seen:=(unsigned)((string)l.dt_last_seen)[1..6];
+		self.dt_vendor_first_reported:=(unsigned)((string)l.dt_vendor_first_reported)[1..6];
+		self.dt_vendor_last_reported:=(unsigned)((string)l.dt_vendor_last_reported)[1..6];
 		self.rec_type:=l.rec_tp;
 		self.phone:=l.clean_phone;
-		valid_dob                     := if((unsigned)l.clean_dob between 18000101 and (unsigned)ut.GetDate
+		valid_dob                     := if((unsigned)l.clean_dob between 18000101 and (unsigned)(STRING8)Std.Date.Today()
 																					,(unsigned)l.clean_dob
 																					,0);
 		self.dob:=valid_dob;
 		self.ssn:=if(l.clean_ssn in ut.Set_BadSSN ,'',l.clean_ssn);
-		self.dt_nonglb_last_seen:=if(l.file_date_min >= 20010600,0,(unsigned)l.file_date_min[1..6]);
+		self.dt_nonglb_last_seen:=if(self.dt_first_seen > 200106,0,(unsigned)self.dt_last_seen);
 		self.suffix:=l.addr_suffix;
 		self.city_name:=l.v_city_name;
 		self                          := L;
@@ -32,9 +32,9 @@ export	As_header(dataset(layout.base) pFile = dataset([],layout.base), boolean p
 
 	Header.Layout_New_Records t_rollup(srt_file_eq le, srt_file_eq ri) := transform
 		self.dt_first_seen := ut.Min2(le.dt_first_seen,ri.dt_first_seen);
-		self.dt_last_seen := ut.Max2(le.dt_last_seen,ri.dt_last_seen);
+		self.dt_last_seen := max(le.dt_last_seen,ri.dt_last_seen);
 		self.dt_vendor_first_reported := ut.Min2(le.dt_vendor_first_reported,ri.dt_vendor_first_reported);
-		self.dt_vendor_last_reported := ut.Max2(le.dt_vendor_last_reported,ri.dt_vendor_last_reported);
+		self.dt_vendor_last_reported := max(le.dt_vendor_last_reported,ri.dt_vendor_last_reported);
 		self.dt_nonglb_last_seen := ut.Min2(le.dt_nonglb_last_seen,ri.dt_nonglb_last_seen);
 		self:=le;
 	end;
@@ -81,7 +81,7 @@ export	As_header(dataset(layout.base) pFile = dataset([],layout.base), boolean p
 				,length(trim(zip4))=4
 				);
 
-	eq_hist_filtered	:=	eq_hist_filtered0 :persist('~thor_data400::persist::headerbuild_eq_hist_asheader');
+	eq_hist_filtered	:=	eq_hist_filtered0;
 
     return eq_hist_filtered;
   end;

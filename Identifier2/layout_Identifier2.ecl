@@ -16,7 +16,7 @@ export Layout_Identifier2 := record,MAXLENGTH(50000)
 	risk_indicators.Layout_InstandID_NuGen - extra_fields;
 	iesp.mod_identifier2.t_Identifier2Result - Models;
 
-	unsigned1 DIDCount := 0;	// - The total number of DID’s found	
+	unsigned1 DIDCount := 0;	// - The total number of DIDÂ’s found	
 	unsigned6 DID2 := 0;	// - The second DID returned from the DID Append
 	unsigned6 DID3 := 0;	// - The third DID returned from the DID Append
 	// Address Risk Fields

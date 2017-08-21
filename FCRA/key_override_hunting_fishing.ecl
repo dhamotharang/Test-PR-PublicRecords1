@@ -1,16 +1,16 @@
 import emerges, data_services;
 
 EXPORT key_override_hunting_fishing := module
-	fname_prefix := '~thor_data400::base::override::fcra::qa::';
-	daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-  keyname_prefix := '~thor_data400::key::override::fcra::hunting_fishing::qa::';
+	shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
+	shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
+  shared keyname_prefix := data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::hunting_fishing::qa::';
 
 //New	
 	// shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
 	// shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
 	// shared keyname_prefix := '~thor_data400::key::override::fcra::hunt:qa::';
 
-  hunt_rec := RECORD
+  export hunt_rec := RECORD
 		emerges.layout_hunters_out;
     string20 flag_file_id;
   end;

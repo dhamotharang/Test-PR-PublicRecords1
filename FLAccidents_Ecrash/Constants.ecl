@@ -1,47 +1,47 @@
 IMPORT _control;
 EXPORT CONSTANTS := MODULE
-   	EXPORT LandingZone		 								:= _Control.IPAddress.edata12;
+		EXPORT LandingZone		 								:= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 		
-		EXPORT InPathForIncident					  := '/super_credit/ecrash/noniyetek/incident/in';
-	EXPORT InPathForCommercial					  := '/super_credit/ecrash/noniyetek/commercial/in';
-	EXPORT InPathForVehicle					  := '/super_credit/ecrash/noniyetek/vehicle/in';
-	EXPORT InPathForCitation					  := '/super_credit/ecrash/noniyetek/citation/in';
-	EXPORT InPathForPerson					  := '/super_credit/ecrash/noniyetek/person/in';
-  EXPORT InPathForPtyDamage					  := '/super_credit/ecrash/noniyetek/propertyDamage/in';
+		export prefix                        :=   '/data/super_credit/ecrash/sla_build/';                
+		EXPORT InPathForIncident					  := prefix + 'noniyetek/incident/in';
+	EXPORT InPathForCommercial					  := prefix + 'noniyetek/commercial/in';
+	EXPORT InPathForVehicle					  := prefix + 'noniyetek/vehicle/in';
+	EXPORT InPathForCitation					  := prefix + 'noniyetek/citation/in';
+	EXPORT InPathForPerson					  := prefix + 'noniyetek/person/in';
+  EXPORT InPathForPtyDamage					  := prefix + 'noniyetek/propertyDamage/in';
 
 
-	EXPORT ProcessPathForIncident					  := '/super_credit/ecrash/noniyetek/incident/process';
-	EXPORT ProcessPathForCommercial					  := '/super_credit/ecrash/noniyetek/commercial/process';
-	EXPORT ProcessPathForVehicle					  := '/super_credit/ecrash/noniyetek/vehicle/process';
-	EXPORT ProcessPathForCitation					  := '/super_credit/ecrash/noniyetek/citation/process';
-	EXPORT ProcessPathForPerson					  := '/super_credit/ecrash/noniyetek/person/process';
-		EXPORT ProcessPathForPtyDamage					  := '/super_credit/ecrash/noniyetek/propertyDamage/process';
+	EXPORT ProcessPathForIncident					  := prefix + 'noniyetek/incident/process';
+	EXPORT ProcessPathForCommercial					  := prefix + 'noniyetek/commercial/process';
+	EXPORT ProcessPathForVehicle					  := prefix + 'noniyetek/vehicle/process';
+	EXPORT ProcessPathForCitation					  := prefix + 'noniyetek/citation/process';
+	EXPORT ProcessPathForPerson					  := prefix + 'noniyetek/person/process';
+		EXPORT ProcessPathForPtyDamage					  := prefix + 'noniyetek/propertyDamage/process';
 
 
- EXPORT BackupPathForIncident					  := '/super_credit/ecrash/noniyetek/incident/backup';
-	EXPORT BackupPathForCommercial					  := '/super_credit/ecrash/noniyetek/commercial/backup';
-	EXPORT BackupPathForVehicle					  := '/super_credit/ecrash/noniyetek/vehicle/backup';
-	EXPORT BackupPathForCitation					  := '/super_credit/ecrash/noniyetek/citation/backup';
-	EXPORT BackupPathForPerson					  := '/super_credit/ecrash/noniyetek/person/backup';
-		EXPORT BackupPathForPtyDamage					  := '/super_credit/ecrash/noniyetek/propertyDamage/backup';
+ EXPORT BackupPathForIncident					  := prefix + 'noniyetek/incident/backup';
+	EXPORT BackupPathForCommercial					  := prefix + 'noniyetek/commercial/backup';
+	EXPORT BackupPathForVehicle					  := prefix + 'noniyetek/vehicle/backup';
+	EXPORT BackupPathForCitation					  := prefix + 'noniyetek/citation/backup';
+	EXPORT BackupPathForPerson					  := prefix + 'noniyetek/person/backup';
+		EXPORT BackupPathForPtyDamage					  := prefix + 'noniyetek/propertyDamage/backup';
 
-
-	EXPORT DestinationCluster 		        := IF (_control.ThisEnvironment.Name = 'Prod_Thor', 'thor400_30', 'thor200_144');	
+	EXPORT DestinationCluster 		        := IF (_control.ThisEnvironment.Name = 'Prod_Thor', 'thor400_60', 'thor400_dev01');	
 	EXPORT SprayCompleteFile							:= '~thor::CD::Spray::Complete';
-	EXPORT IncidentFileMask												:= 'dbpec-ala.rs.lexisnexis.net.incident*';
-	EXPORT PersonFileMask												  := 'dbpec-ala.rs.lexisnexis.net.person*';
-	EXPORT CommercialFileMask											:= 'dbpec-ala.rs.lexisnexis.net.commercial*';
-	EXPORT CitationFileMask												:= 'dbpec-ala.rs.lexisnexis.net.citation*';
-	EXPORT VehicleFileMask												:= 'dbpec-ala.rs.lexisnexis.net.vehicle*';
-	EXPORT PtyDamageFileMask												:= 'dbpec-ala.rs.lexisnexis.net.propertyDamage*';
+	EXPORT IncidentFileMask												:= 'dbpeccl-???.risk.regn.net.incident*' ;
+	EXPORT PersonFileMask												  := 'dbpeccl-ala.risk.regn.net.person*';
+	EXPORT CommercialFileMask											:= 'dbpeccl-ala.risk.regn.net.commercial*';
+	EXPORT CitationFileMask												:= 'dbpeccl-ala.risk.regn.net.citation*';
+	EXPORT VehicleFileMask												:= 'dbpeccl-ala.risk.regn.net.vehicle*';
+	EXPORT PtyDamageFileMask												:= 'dbpeccl-ala.risk.regn.net.propertyDamage*';
 
   
-	EXPORT INCIDENT_SPRAYED_DAILY      := '~thor_data400::in::ecrash::incidnt_full';
-	EXPORT PERSON_SPRAYED_DAILY      := '~thor_data400::in::ecrash::persn_full';
-	EXPORT VEHICLE_SPRAYED_DAILY      := '~thor_data400::in::ecrash::vehicl_full';
-	EXPORT CITATION_SPRAYED_DAILY      := '~thor_data400::in::ecrash::citatn_full';
-	EXPORT COMMERCIAL_SPRAYED_DAILY      := '~thor_data400::in::ecrash::commercl_full';
-	EXPORT PTYDAMAGE_SPRAYED_DAILY      := '~thor_data400::in::ecrash::propertydamage_full';
+	EXPORT INCIDENT_SPRAYED_DAILY      := '~thor_data400::in::ecrash::incidnt_raw_new';
+	EXPORT PERSON_SPRAYED_DAILY      := '~thor_data400::in::ecrash::persn_raw';
+	EXPORT VEHICLE_SPRAYED_DAILY      := '~thor_data400::in::ecrash::vehicl_raw';
+	EXPORT CITATION_SPRAYED_DAILY      := '~thor_data400::in::ecrash::citatn_raw';
+	EXPORT COMMERCIAL_SPRAYED_DAILY      := '~thor_data400::in::ecrash::commercl_raw';
+	EXPORT PTYDAMAGE_SPRAYED_DAILY      := '~thor_data400::in::ecrash::propertydamage_raw';
 	
 	EXPORT FILE_DAILY_FILE_LIST := '~thor_data400::temp::ecrash_files_list';
 

@@ -130,33 +130,34 @@ module
 	//////////////////////////////////////////////////////////////////////////////////////
 	export fStandardizeName(dataset(Layouts.Temporary.StandardizeInput) pPreProcessInput) :=
 	function
-
-		Layouts.Temporary.StandardizeInput tStandardizeName(Layouts.Temporary.StandardizeInput l) :=
-		transform
-
-			//////////////////////////////////////////////////////////////////////////////////////
-			// -- Clean Name, determine if it is a person
-			//////////////////////////////////////////////////////////////////////////////////////
-			assembled_name 					:=					trim(l.rawfields.attorneyName		)
-																;                
-
-			clean_attorney_name			:= Address.CleanPersonLFM73_fields(assembled_name).CleanNameRecord;
-
-			                                                                
-			//////////////////////////////////////////////////////////////////////////////////////
-			// -- Map Fields
-			//////////////////////////////////////////////////////////////////////////////////////
-			self.clean_attorney_name									:= clean_attorney_name	;
-
-			self																			:= l									;
-		end;
-
-		dStandardizedName := project(pPreProcessInput, tStandardizeName(left));
 		
-		//ut.mac_flipnames(dStandardizedName, clean_attorney_name.fname, clean_attorney_name.mname, clean_attorney_name.lname, dStandardizedName_flipnames)
+		wrk_standard_layout := RECORD(Layouts.Temporary.StandardizeInput)
+			string tempName;
+		END;
+		
+		// Strip off Attorney and Atty from beggining of name.
+		StandardizedNameTemp := project(pPreProcessInput,TRANSFORM(wrk_standard_layout,SELF.tempName := regexreplace('^ATT(Y|ORNEY)[;.]?',trim(LEFT.rawfields.attorneyName),'')
+																																									,SELF := LEFT
+																																									,SELF := []));
+		
+		// Macro will identify if name is a person or company and only parse individual names.
+		Address.Mac_Is_Business(StandardizedNameTemp, tempName, fStandardizedNameClean, name_flag, false, true );
+		
+		Layouts.Temporary.StandardizeInput CleanupName(fStandardizedNameClean l) := TRANSFORM
+				SELF.clean_attorney_name.title := l.cln_title;
+				SELF.clean_attorney_name.fname := l.cln_fname;
+				SELF.clean_attorney_name.mname := l.cln_mname;
+				SELF.clean_attorney_name.lname := l.cln_lname;
+				SELF.clean_attorney_name.name_suffix := l.cln_suffix;
+				SELF := l;
+				SELF := [];
+		END;	
+		
+		dStandardizedName := project(fStandardizedNameClean,CleanupName(LEFT));
 
-		//return dStandardizedName_flipnames;
-		return dStandardizedName;
+		ut.mac_flipnames(dStandardizedName, clean_attorney_name.fname, clean_attorney_name.mname, clean_attorney_name.lname, dStandardizedName_flipnames)
+		
+		return dStandardizedName_flipnames;
 
 	end;
 

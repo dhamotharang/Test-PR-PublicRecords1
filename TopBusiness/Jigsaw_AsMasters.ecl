@@ -2,7 +2,7 @@ import Jigsaw,MDR;
 
 export Jigsaw_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 
-	shared base := Jigsaw.Files(,true).Base.QA;
+	shared base := Jigsaw.Files(,Jigsaw._Dataset().IsDataland).Base.QA;
 	
 	export dataset(Layout_Linking.Unlinked) As_Linking_Master := function
 	
@@ -33,6 +33,7 @@ export Jigsaw_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.clean_address.v_city_name),
 				self.state := left.clean_address.st,
 				self.zip := left.clean_address.zip,
+				self.zip4 := left.clean_address.zip4,
 				self.county_fips := left.clean_address.fips_county,
 				self.msa := left.clean_address.msa,
 				self.phone := left.rawfields.phone,
@@ -69,6 +70,7 @@ export Jigsaw_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.clean_address.v_city_name),
 				self.state := left.clean_address.st,
 				self.zip := left.clean_address.zip,
+				self.zip4 := left.clean_address.zip4,
 				self.county_fips := left.clean_address.fips_county,
 				self.msa := left.clean_address.msa,
 				self.phone := left.rawfields.phone,
@@ -96,6 +98,8 @@ export Jigsaw_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.date_first_seen := (unsigned4)left.dt_first_seen,
 				self.date_last_seen := (unsigned4)left.dt_last_seen,
 				self.ssn := '',
+				self.did := left.did,
+				self.score := left.did_score,
 				self.name_prefix := left.clean_name.title,
 				self.name_first := left.clean_name.fname,
 				self.name_middle := left.clean_name.mname,

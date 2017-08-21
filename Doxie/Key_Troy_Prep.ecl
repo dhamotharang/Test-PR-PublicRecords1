@@ -1,4 +1,4 @@
-import header, watchdog, ut;
+import header, watchdog, ut, Data_Services;
 h := header.prepped_for_keys;
 
 r := record
@@ -30,7 +30,7 @@ r rollit(r le,r ri) := transform
 st := rollup(sort(t,did,zip,local),left.did=right.did and left.zip=right.zip,rollit(left,right),local);
 
 r get_age(r le, watchdog.file_best ri) := transform
-	self.age := IF(ri.dob = 0, 0, ut.getage((STRING)ri.dob));
+	self.age := IF(ri.dob = 0, 0, ut.Age(ri.dob));
 	self := le;
 	end;
 
@@ -44,4 +44,4 @@ r correct_reversals(r le) := transform
 
 p:= project(ag,correct_reversals(left));
 
-export Key_Troy_Prep := INDEX(p,{p},'~thor_data400::key::troy' + thorlib.WUID());
+export Key_Troy_Prep := INDEX(p,{p},Data_Services.Data_location.person_header+'thor_data400::key::troy' + thorlib.WUID());

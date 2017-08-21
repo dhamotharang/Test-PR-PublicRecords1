@@ -1,4 +1,4 @@
-﻿// TODO: create common defaults to use in AutoStandardI.GlobalModule, here, etc.
+// TODO: create common defaults to use in AutoStandardI.GlobalModule, here, etc.
 
 // Encapsulates input parameters for each particular component
 // (probably will be split and moved to each correspondent service)

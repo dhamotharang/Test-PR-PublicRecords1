@@ -1,6 +1,7 @@
 import SANCTN;
 
 #uniquename(cluster);
+#OPTION('multiplePersistInstances',FALSE);
 
 layout_payload := record
 	string payload;
@@ -28,6 +29,8 @@ SANCTN.layout_SANCTN_incident_in inc_payload(incident_payload input) := Transfor
 	self.ESTIMATED_LOSS  := input.payload[376..385];
 	self.FCR_DATE        := input.payload[386..395];
 	self.OK_FOR_FCR      := input.payload[396];
+	self.MODIFIED_DATE	 := input.payload[397..406];
+	self.LOAD_DATE			 := input.payload[407..416];
 end;
 
 // Do the project and persist the result

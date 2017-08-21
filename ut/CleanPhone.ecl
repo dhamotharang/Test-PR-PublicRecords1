@@ -1,7 +1,7 @@
 // This function takes in a raw phone field, and will return a cleaned phone
 // only works for U.S. phones right now
 export CleanPhone(string pPhone) :=
-function
+define function
 
 	alpha		:= '[[:alpha:]]+';
 	whitespace	:= '[[:space:]]*';

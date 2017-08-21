@@ -33,6 +33,7 @@ export macf_FilesBase(
   ,pUseOld						= 'false'
   ,pOpt								= 'false'				// file exists optional?
   ,pFileType					= '\'\''
+  ,pLayout_new        = '\'\''
 ) :=
 functionmacro
 	
@@ -50,8 +51,12 @@ functionmacro
 			end;
 		#end
 		
-		shared fDataset(string name)			:= dataset(name, pLayout,			thor #if(pOpt) ,opt #end #if(pFileType != '') #EXPAND(pFileType) #END);
-		
+    #IF(#TEXT(pLayout_new) != '\'\'')
+      shared fDataset(string name)			:= project(dataset(name, pLayout,			thor #if(pOpt) ,opt #end #if(pFileType != '') #EXPAND(pFileType) #END),transform(pLayout_new,self := left,self :=  []));
+		#ELSE
+      shared fDataset(string name)			:= dataset(name, pLayout,			thor #if(pOpt) ,opt #end #if(pFileType != '') #EXPAND(pFileType) #END);
+    #END
+    
 		#if(pUseKeybuild = true)
 			shared fDatasetKeybuild(string name)	:= dataset(name, layout_keybuild,	thor #if(pOpt) ,opt #end);
 		#end

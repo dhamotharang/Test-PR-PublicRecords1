@@ -1,0 +1,2 @@
+import HealthCareProvider;
+export Layout_HealthProvider := HealthCareProvider.Layout_HealthProvider.HealthCareProvider_Header;

@@ -143,7 +143,9 @@ dealer_desc(string1 code)
 'B' => 'DEALER/MANUFACTURER',
 'N' => 'NOT A DEALER', '');
 
-file_MN_dedup := dedup(sort(watercraft.file_MN_clean_in, reg_date, reg_num), reg_date, reg_num);
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_MN_clean_in, watercraft.Layout_MN_clean_in,hull_clean_in)
+
+file_MN_dedup := dedup(sort(hull_clean_in, reg_date, reg_num), reg_date, reg_num);
 
 Layout_MN_clean_temp := record
 

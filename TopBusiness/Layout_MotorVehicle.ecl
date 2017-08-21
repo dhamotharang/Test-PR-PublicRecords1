@@ -56,8 +56,13 @@ export Layout_MotorVehicle := module
 	  string8  Title_Date;   // Ttl_Latest_Issue_Date
  end;
  
- export party := record
+ export party := module
+ 
+	export Unlinked := record
 	
+		string2   source;
+		string50  source_docid;						
+		string10  source_party;						
 		string30  event_id;
 		string2  vendor; // AE=Experian; DI=Direct, needed since reg/title info exists for both sources ???
 		// v--- fields from the base vehiclev2 party file
@@ -84,6 +89,13 @@ export Layout_MotorVehicle := module
 		unsigned4 ssn;
 		string1 history;
 	end;
+	
+	export Linked := record
+		unsigned6 bid;
+		Unlinked;
+	end;
+ 
+ end;
 	
 /*   // temp combined layout to assist in extracting data in MotorVehicle_AsMasters
      export party_main_slimmed := record

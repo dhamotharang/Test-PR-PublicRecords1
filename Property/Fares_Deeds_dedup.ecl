@@ -95,5 +95,5 @@ left.lender_address = right.lender_address and
 ut.nneq(trim(left.apn_parcel_number_unformatted,all),trim(right.apn_parcel_number_unformatted,all)), 
 rollFares(left,right),local);
 
-ut.MAC_SF_BuildProcess(dup,'~thor_data400::base::fares_1080',run_dup,2);
+ut.MAC_SF_BuildProcess(dup,'~thor_data400::base::fares_1080',run_dup,2,,true);
 export Fares_deeds_dedup := run_dup;

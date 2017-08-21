@@ -1,15 +1,15 @@
 
 
-import Lib_AddrClean,address;
+import address;
 
 Fictitious_Business_Names.Layout_All_Clean CleanFBN(File_Out_AllFlat InputRecord) := transform
 	string73 tempCCTName := 
 	stringlib.StringToUpperCase(if(trim(InputRecord.CCT_fullname,left,right) <> '',
-	   lib_AddrClean.AddrCleanLib.CleanPersonfml73(trim(InputRecord.CCT_fullname,left,right)) ,									
+	   address.CleanPersonfml73(trim(InputRecord.CCT_fullname,left,right)) ,									
 	'')
 	);
 
-	self.CCT1_Clean_title						:= if(trim(InputRecord.CCT_fullname,left,right) <> '' and tempCCTName[71..73]<='085' and regexfind(' & ',InputRecord.CCT_fullname)=false,lib_AddrClean.AddrCleanLib.CleanPerson73(trim(InputRecord.CCT_fullname,left,right))[1..5],tempCCTName[1..5]);
+	self.CCT1_Clean_title						:= if(trim(InputRecord.CCT_fullname,left,right) <> '' and tempCCTName[71..73]<='085' and regexfind(' & ',InputRecord.CCT_fullname)=false,Address.CleanPerson73(trim(InputRecord.CCT_fullname,left,right))[1..5],tempCCTName[1..5]);
 	self.CCT1_Clean_fname						:= tempCCTName[6..25]			;
 	self.CCT1_Clean_mname						:= tempCCTName[26..45]		;
 	self.CCT1_Clean_lname						:= tempCCTName[46..65]		;
@@ -17,7 +17,7 @@ Fictitious_Business_Names.Layout_All_Clean CleanFBN(File_Out_AllFlat InputRecord
 	self.CCT1_Clean_cleaning_score	:= tempCCTName[71..73]		;
 /*
 string73 tempCCTName2 := 
-if(self.CCT1_Clean_cleaning_score<'085'and self.CCT1_Clean_cleaning_score!='' ,lib_AddrClean.AddrCleanLib.CleanPerson73(trim(InputRecord.CCT_fullname,left,right)),'');
+if(self.CCT1_Clean_cleaning_score<'085'and self.CCT1_Clean_cleaning_score!='' ,Address.CleanPerson73(trim(InputRecord.CCT_fullname,left,right)),'');
 	self.CCT2_Clean_title			:= tempCCTName2[1..5] ;
 	self.CCT2_Clean_fname			:= tempCCTName2[6..25];
 	self.CCT2_Clean_mname			:= tempCCTName2[26..45];
@@ -28,7 +28,7 @@ if(self.CCT1_Clean_cleaning_score<'085'and self.CCT1_Clean_cleaning_score!='' ,l
 	string73 tempCCTName3 := 
 												if(
 												self.CCT2_Clean_cleaning_score<'085'and regexfind('&',InputRecord.CCT_fullname)=true ,
-												lib_AddrClean.AddrCleanLib.CleanPersonfml73(trim(InputRecord.CCT_fullname[1..StringLib.StringFind(InputRecord.CCT_fullname, '&',1)],left,right)+' '+trim(InputRecord.CCT_lastname,left,right)),
+												Address.CleanPersonfml73(trim(InputRecord.CCT_fullname[1..StringLib.StringFind(InputRecord.CCT_fullname, '&',1)],left,right)+' '+trim(InputRecord.CCT_lastname,left,right)),
 												 ''
 												  );
 
@@ -44,7 +44,7 @@ if(self.CCT1_Clean_cleaning_score<'085'and self.CCT1_Clean_cleaning_score!='' ,l
 	string73 tempCCTName4 := 
 												if(
 												regexfind('&',InputRecord.CCT_fullname)=true ,
-												lib_AddrClean.AddrCleanLib.CleanPersonfml73(trim(InputRecord.CCT_fullname[StringLib.StringFind(InputRecord.CCT_fullname, '&',1)+1..],left,right)),'');
+												Address.CleanPersonfml73(trim(InputRecord.CCT_fullname[StringLib.StringFind(InputRecord.CCT_fullname, '&',1)+1..],left,right)),'');
 
 
 	self.CCT4_Clean_title			:= tempCCTName4[1..5] ;
@@ -61,7 +61,7 @@ if(self.CCT1_Clean_cleaning_score<'085'and self.CCT1_Clean_cleaning_score!='' ,l
 										   InputRecord.ContactPersonAddress_CY <> '' or
 										   InputRecord.ContactPersonAddress_ST <> '' or
 										   InputRecord.ContactPersonAddress_ZP <> '',
-										   lib_AddrClean.AddrCleanLib.CleanAddress182(
+										   Address.CleanAddress182(
 										   trim(InputRecord.ContactPersonAddress_S1,left,right),
 										   trim(trim(InputRecord.ContactPersonAddress_CY,left,right) + ', ' +
 										   trim(InputRecord.ContactPersonAddress_ST,left,right) + ' ' +
@@ -73,7 +73,7 @@ if(self.CCT1_Clean_cleaning_score<'085'and self.CCT1_Clean_cleaning_score!='' ,l
 										   InputRecord.BusinessAddress_CY <> '' or
 										   InputRecord.BusinessAddress_ST <> '' or
 										   InputRecord.BusinessAddress_ZP <> '',
-										   lib_AddrClean.AddrCleanLib.CleanAddress182(
+										   Address.CleanAddress182(
 										   trim(InputRecord.BusinessAddress_S1,left,right),
 										   trim(trim(InputRecord.BusinessAddress_CY,left,right) + ', ' +
 										   trim(InputRecord.BusinessAddress_ST,left,right) + ' ' +

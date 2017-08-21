@@ -92,9 +92,9 @@ new_base_s := sort(new_base_d,
 						
 Layouts.base t_rollup (new_base_s  le, new_base_s ri) := transform
 	self.dt_first_seen            := ut.EarliestDate (le.dt_first_seen, ri.dt_first_seen);
-	self.dt_last_seen             := ut.LatestDate (le.dt_last_seen, ri.dt_last_seen);
+	self.dt_last_seen             := MAX(le.dt_last_seen, ri.dt_last_seen);
 	self.dt_vendor_first_reported := ut.EarliestDate(le.dt_vendor_first_reported, ri.dt_vendor_first_reported);
-	self.dt_vendor_last_reported  := ut.LatestDate(le.dt_vendor_last_reported, ri.dt_vendor_last_reported);
+	self.dt_vendor_last_reported  := MAX(le.dt_vendor_last_reported, ri.dt_vendor_last_reported);
 	self.persistent_record_id     := if(le.persistent_record_id < ri.persistent_record_id,le.persistent_record_id, ri.persistent_record_id); 
 	self.did 					:= 0;
 	self.bdid 				:= 0;

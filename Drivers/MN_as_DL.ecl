@@ -31,7 +31,7 @@ drivers.layout_dl com(r le) := transform
 	self.lic_issue_date := fFixDate(le.dl_date_issue);		                             
 	self.lic_endorsement := le.code_endors;		                             
 	//motorcycle_code		                                             		                             
-	self.dl_number := le.key_driver_license;		                             
+	self.dl_number := le.key_driver_license[1..13];		                             
 	//ssn		                                             		                             
 	//age		                                             		                             
 	self.privacy_flag := le.indc_restric;		                             
@@ -74,7 +74,8 @@ drivers.layout_dl com(r le) := transform
 	self.geo_match := le.geo_match;		                             
 	self.err_stat := le.err_stat;		                             
 	//status		                                             		                             
-	self.issuance := le._type;		                             
+	self.issuance := le._type;	
+	self.old_dl_number := if(le.key_driver_license[1..13] = le.soundex, '', le.soundex);
 	/*address_change		                                             		                             
 	name_change		                                             		                             
 	dob_change		                                             		                             

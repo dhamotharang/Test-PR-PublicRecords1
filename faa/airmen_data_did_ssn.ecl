@@ -36,12 +36,13 @@ outrec := layout_airmen_data_out;
 
 outrec forthem(src_rec l) := transform
 	self.record_type := map(L.current_flag = 'A' => 'ACTIVE',
-						L.current_flag = 'H' => 'HISTORICAL',
-						'UNK');						
+													L.current_flag = 'H' => 'HISTORICAL',
+													'UNK');						
 	self.DID_out := if (l.did = 0,'',intformat(l.did, 12, 1));
 	self.d_score := intformat(l.did_score,3,1);
 	self.best_ssn := '';
 	self.county_name := '';
+	self.source			 := MDR.sourceTools.src_Airmen;
 	self := l;
 end;
 	
@@ -67,5 +68,6 @@ county_in := ssn_records + withdid(did_out = '');
 final_out := join(county_in, census_data.file_fips2county, left.county = right.county_fips and
 				left.st = right.state_code,getCounty(LEFT,RIGHT),left outer, lookup);
 				
-count(final_out((integer)did_out > 0));
-export airmen_data_did_ssn := final_out;
+dedup_final := dedup(final_out, record, all);			
+				
+export airmen_data_did_ssn := dedup_final;

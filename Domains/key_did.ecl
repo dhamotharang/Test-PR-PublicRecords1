@@ -1,7 +1,7 @@
-import  doxie;
+import  doxie,Bipv2;
 
 KeyName_InternetServices  := Cluster.Cluster_out + 'key::internetservices::';
-sf := searchFileDomains;
+sf := PROJECT(searchFileDomains, TRANSFORM(RECORDOF(searchFileDomains) - BIPV2.IDlayouts.l_xlink_ids -source_rec_id, SELF := LEFT));
 
 // Filter to remove empty dids
 dbase := sf(did != 0);

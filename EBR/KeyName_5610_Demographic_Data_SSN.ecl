@@ -1,1 +1,1 @@
-export KeyName_5610_Demographic_Data_SSN := trim(GetSegmentKeyName_SSN('5610')) : global;
+export KeyName_5610_Demographic_Data_SSN := trim(GetSegmentKeyName_SSN('5610'));

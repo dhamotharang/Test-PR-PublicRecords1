@@ -1,6 +1,8 @@
 import lib_stringlib, watercraft;
 
-Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Watercraft.Layout_ND_clean_in L)
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_ND_clean_in, watercraft.Layout_ND_clean_in,hull_clean_in)
+
+Watercraft.Layout_Watercraft_Search_Group search_mapping_format(hull_clean_in L)
  :=
   transform
 	self.date_first_seen			:=	L.reg_date;
@@ -28,7 +30,7 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Watercraft.Layou
 	self.orig_state					:=	L.STATE;
 	self.orig_zip					:=	L.ZIP;
 	self.orig_fips					:=	L.FIPS;
-	self.dob						:=	'';
+	self.dob						:=	L.OWNER_DOB;
 	self.orig_ssn					:=	'';
 	self.orig_fein					:=	'';
 	self.gender						:=	'';
@@ -46,7 +48,7 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Watercraft.Layou
   end
  ; 
  
-Mapping_ND_as_Search_norm			:= project(Watercraft.file_ND_clean_in,search_mapping_format(left));
+Mapping_ND_as_Search_norm			:= project(hull_clean_in,search_mapping_format(left));
 
 export Mapping_ND_as_Search         := Mapping_ND_as_Search_norm(clean_pname <> '' or company_name <> '');
 

@@ -1,7 +1,7 @@
 import hygenics_images;
 
 //export MAC_OKC_Lookup_Spray(source_IP,source_path,file_name,group_name ='\'thor_dataland_linux\'') := 
-export MAC_IMG_Lookup_Spray(source_IP,source_path,file_name,group_name ='\'thor_200\'') := 
+export MAC_IMG_Lookup_Spray(source_IP,source_path,file_name,group_name ='\'thor400_20\'') := 
 macro
 #uniquename(spray_main)
 #uniquename(super_main)

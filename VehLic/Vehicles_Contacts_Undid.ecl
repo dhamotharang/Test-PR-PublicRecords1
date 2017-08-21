@@ -17,8 +17,8 @@ layout_slim_vehreg_v3 take_person(v l, unsigned8 cnt) := transform
 		self.lname := 	 choose(cnt,l.own_1_lname,l.own_2_lname,l.reg_1_lname,l.reg_2_lname);
 		self.name_suffix := choose(cnt,l.own_1_name_suffix,l.own_2_name_suffix,l.reg_1_name_suffix,l.reg_2_name_suffix);
 		self.company_name := choose(cnt,l.own_1_company_name, L.own_2_company_name, L.reg_1_company_name, L.reg_2_company_name);
-		self.bdid := 0;
 		self.DID := 0;
+		self.BDID := 0;
 		self.preGLB_DID := 0;
 		self.ssn := if((integer)self.feid_ssn > 999999 and self.fname <> '' and self.lname <> '', 
 					   self.feid_ssn, 
@@ -29,4 +29,4 @@ layout_slim_vehreg_v3 take_person(v l, unsigned8 cnt) := transform
 
 res := normalize(v,4,take_person(left,counter));
 
-export Vehicles_Contacts_Undid := res(fname<>'' or lname<>'');
+export Vehicles_Contacts_Undid := res(fname<>'' or lname<>'' or company_name != '');

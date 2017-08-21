@@ -1,4 +1,4 @@
-import	ExperianCred,Header,ut,TransUnionCred,Transunion_PTrak;
+import	ExperianCred,Header,ut,TransUnionCred,Transunion_PTrak, ut,codes;
 
 //**********************PROJECT EXPERIAN DATA****************************//
 ENbase0:=distribute(ExperianCred.files.Base_File_Out(did > 0 and current_experian_pin = 1 and current_rec_flag = 1 and deceased_ind = 1),hash(did));
@@ -12,7 +12,7 @@ transform
 	self.filedate					:=	(STRING)l.date_last_seen;
 	self.rec_type					:=	''; 
 	self.rec_type_orig		:=	'';
-	self.ssn							:=	l.social_security_number;
+	self.ssn							:=	if(l.social_security_number not in ut.set_badssn, l.social_security_number, '');
 	self.lname						:=	l.lname;
 	self.name_suffix			:=	l.name_suffix;
 	self.fname						:=	l.fname;
@@ -20,17 +20,17 @@ transform
 	self.vorp_code				:=	'';
 	self.dod8							:=	'';
 	self.dob8							:=	l.date_of_birth;
-	self.st_country_code	:=	'';
+	self.state						:=	l.st;
+	self.st_country_code	:=	IF(l.county[1..2]<>'',l.county[1..2],codes.St2FipsCode(self.state));
 	self.zip_lastres			:=	l.zip;
 	self.zip_lastpayment	:=	'';
-	self.state						:=	l.st;
-	self.fipscounty				:=	'';
+	self.fipscounty				:=	l.county[3..];
 	self.crlf							:=	'';
-	self.state_death_id		:=	death_master.fn_fake_state_death_id((STRING)intformat(l.did,12,1),l.orig_lname,(STRING)l.date_last_seen);
 	self.src							:=	'EN';
 	self.GLB_flag					:=	'Y';
-	self.state_death_flag := 'N';
-	self.death_rec_src		:= 'EXP';
+	self.state_death_flag :=	'N';
+	self.death_rec_src		:=	'EXP';
+	self.state_death_id		:=	self.did+self.lname[1]+self.death_rec_src;
 end;
 
 standardized_ExpercianCred	:=	project(ds_ExpercianCred_dedup,tStandardizeRecord(left));
@@ -47,7 +47,7 @@ transform
 	self.filedate					:=	(STRING)l.dt_last_seen;
 	self.rec_type					:=	''; 
 	self.rec_type_orig		:=	'';
-	self.ssn							:=	l.clean_ssn;
+	self.ssn							:=	if(l.clean_ssn not in ut.set_badssn, l.clean_ssn, '');
 	self.lname						:=	l.lname;
 	self.name_suffix			:=	l.name_suffix;
 	self.fname						:=	l.fname;
@@ -55,34 +55,34 @@ transform
 	self.vorp_code				:=	'';
 	self.dod8							:=	'';
 	self.dob8							:=	if(l.clean_dob > 0, (STRING) l.clean_dob, '');
-	self.st_country_code	:=	'';
 	self.zip_lastres			:=	l.zip;
 	self.zip_lastpayment	:=	'';
 	self.state						:=	l.st;
-	self.fipscounty				:=	'';
+	self.st_country_code	:=	codes.St2FipsCode(self.state);
+	self.fipscounty				:=	l.county;
 	self.crlf							:=	'';
-	self.state_death_id		:=	death_master.fn_fake_state_death_id((STRING)intformat(l.did,12,1),l.last_name,(STRING)l.dt_vendor_last_reported);
 	self.src							:=	'TN';
 	self.GLB_flag					:=	'Y';
-	self.state_death_flag := 'N';
-	self.death_rec_src		:= 'TUN';
+	self.state_death_flag :=	'N';
+	self.death_rec_src		:=	'TUN';
+	self.state_death_id		:=	self.did+self.lname[1]+self.death_rec_src;
 end;
 
 standardized_TransUnionCred	:=	project(ds_TransUnionCred_dedup,tStandardizeTransUnionRecord(left));
 
 //**********************PROJECT TUCS DATA****************************//
 TSbase0:=distribute(Transunion_PTrak.File_Transunion_DID_Out(did>0 and is_current and DECEASEDINDICATOR = 'Y' ),hash(did));
-ds_TransunionPTrak_srt	:=	sort(TSbase0,did,-dt_last_seen, -ssn_unformatted, -dob_no_conflict, -DECEASEDDATE, local);
+ds_TransunionPTrak_srt	:=	sort(TSbase0,did,-dt_vendor_last_reported, -ssn_unformatted, -dob_no_conflict, -DECEASEDDATE, local);
 ds_TransunionPTrak_dedup:=	DEDUP(ds_TransunionPTrak_srt,did,local);
  
 Header.Layout_Did_Death_MasterV3	tStandardizeTransUnionPTrackRecord(Transunion_PTrak.Layout_Transunion_Out.LayoutTransunionBaseOut	l)	:=
 transform
 	self.did							:=	(STRING) intformat(l.did,12,1);
 	self.did_score				:=	l.did_score_field;
-	self.filedate					:=	(STRING)l.dt_last_seen;
+	self.filedate					:=	(STRING)l.dt_vendor_last_reported;
 	self.rec_type					:=	''; 
 	self.rec_type_orig		:=	'';
-	self.ssn							:=	l.ssn_unformatted;
+	self.ssn							:=	if(l.ssn_unformatted not in ut.set_badssn, l.ssn_unformatted, '') ;
 	self.lname						:=	l.lname;
 	self.name_suffix			:=	l.name_suffix;
 	self.fname						:=	l.fname;
@@ -90,17 +90,17 @@ transform
 	self.vorp_code				:=	'';
 	self.dod8							:=	(STRING) l.DECEASEDDATE;;
 	self.dob8							:=	(STRING) l.dob_no_conflict;
-	self.st_country_code	:=	'';
+	self.state						:=	l.st;
+	self.st_country_code	:=	IF(l.county[1..2]<>'',l.county[1..2],codes.St2FipsCode(self.state));
 	self.zip_lastres			:=	l.zip;
 	self.zip_lastpayment	:=	'';
-	self.state						:=	l.st;
-	self.fipscounty				:=	'';
+	self.fipscounty				:=	l.county[3..];
 	self.crlf							:=	'';
-	self.state_death_id		:=	death_master.fn_fake_state_death_id((STRING)intformat(l.did,12,1),l.lname,(STRING)l.dt_last_seen);
 	self.src							:=	'TS';
 	self.GLB_flag					:=	'N';
-	self.state_death_flag := 'N';
-	self.death_rec_src		:= 'TCS';
+	self.state_death_flag :=	'N';
+	self.death_rec_src		:=	'TCS';
+	self.state_death_id		:=	self.did+self.lname[1]+self.death_rec_src;
 end;
 
 standardized_TransUnionCredPTrak	:=	project(ds_TransunionPTrak_dedup,tStandardizeTransUnionPTrackRecord(left));

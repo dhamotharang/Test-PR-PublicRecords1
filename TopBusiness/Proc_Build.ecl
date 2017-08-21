@@ -5,7 +5,8 @@ import TopBusiness_Search as TBS,TopBusiness_External as TBE;
 
 export Proc_Build(
 	string version,
-	boolean build_linking_from_scratch = false) := function
+	boolean build_linking_from_scratch = false,
+	boolean perform_purging_build = false) := function
 
 	// Get the unlinked data
 	unlinked_data := All_AsMasters;
@@ -13,7 +14,9 @@ export Proc_Build(
 	// Create linkage files
 	linkage_data := Function_Linking(
 		unlinked_data.As_Linking_Master,
-		if(not build_linking_from_scratch,Files(,true).Linking.Linked.QA));
+		if(not build_linking_from_scratch,
+			Files().Linking.Linked.QA),
+		perform_purging_build);
 	
 	// Write out the linkage files
 	build_linkage := Proc_Build_Files_Linkage(linkage_data,version);
@@ -22,7 +25,10 @@ export Proc_Build(
 	linked_data := Function_Link_Masters(
 		unlinked_data,
 		Files(version).Linking.Linked.Built,
-		if(not build_linking_from_scratch,Files(,true).LLID.Linked.QA));
+		if(not build_linking_from_scratch,
+			Files().LLID12.Linked.QA),
+		if(not build_linking_from_scratch,
+			Files().LLID9.Linked.QA));
 	
 	// Write out the linked master files
 	build_linked := Proc_Build_Files_Linked(linked_data,version);

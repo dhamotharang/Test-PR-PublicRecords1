@@ -1,4 +1,4 @@
-import AutoKeyB2; 
+import AutoKeyB2, DEA; 
 
 export proc_build_autokeys(string filedate) := function
 
@@ -58,13 +58,13 @@ AutoKeyB2.MAC_Build (b,
 					zero,
 					cprim_name,cprim_range,cst,cv_city_name,czip,csec_range,
 					inbdid,
-					Constants(filedate).ak_keyname,
-					Constants(filedate).ak_logical,
+					DEA.Constants(filedate).ak_keyname,
+					DEA.Constants(filedate).ak_logical,
 					outaction,false,
 					skip_set,true,,
 					true,,,zero) 
 
-AutoKeyB2.MAC_AcceptSK_to_QA(Constants(filedate).ak_keyname, mymove)
+AutoKeyB2.MAC_AcceptSK_to_QA(DEA.Constants(filedate).ak_keyname, mymove)
 
 retval := sequential(outaction,mymove);
 

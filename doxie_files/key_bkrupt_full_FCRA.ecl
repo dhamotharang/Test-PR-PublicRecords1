@@ -1,8 +1,8 @@
 //WARNING: THIS KEY IS AN FCRA KEY...
 
-import bankrupt,doxie;
+import bankrupt,doxie, ut;
 
-f := bankrupt.file_bk_main;
+f := bankrupt.file_bk_main_keybuild;
 
 //Old name:	 '~thor_data400::key::bkrupt_full_FCRA_' + doxie.version_superKey);
 export key_bkrupt_full_FCRA := 
@@ -12,5 +12,5 @@ export key_bkrupt_full_FCRA :=
           typeof(seq_number) s_seqnumber := seq_number}, 
 					{f},
 //         {case_number,date_filed,disposed_date, filing_type,disposition,date_modified}, 
-        '~thor_data400::key::bankrupt::fcra::full_' + doxie.version_superKey);
+        ut.foreign_prod+'thor_data400::key::bankrupt::fcra::full_' + doxie.version_superKey);
 							 

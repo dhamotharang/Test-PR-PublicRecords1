@@ -1,0 +1,1 @@
+export Failure_Notification_Email_Address := 'avenkatachalam@seisint.com;vniemela@seisint.com;cguyton@seisint.com;jwindle@seisint.com;jtrost@seisint.com';

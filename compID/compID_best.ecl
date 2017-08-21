@@ -1,4 +1,4 @@
-import ut, did_add, header_slimsort, didville,watchdog,doxie,header,DriversV2,codes;
+import ut, did_add, header_slimsort, didville,watchdog,doxie,header,DriversV2,codes,address;
 
 export compID_best(
 					string filedate
@@ -94,7 +94,7 @@ export compID_best(
 					,local);
 
 	r tr_addr_clean( ds_in l) :=transform
-		string182 caddr		:=	AddrCleanLib.CleanAddress182(l.Address_1+' '+l.Address_2
+		string182 caddr		:=	Address.CleanAddress182(l.Address_1+' '+l.Address_2
 											,l.City+' '+l.State+' '+l.Zip_Code);
 		self.prim_range		:= caddr[	1	..	10	];
 		self.predir			:= caddr[	11	..	12	];
@@ -136,7 +136,7 @@ export compID_best(
 
 	r tr( ds_in2 l) :=transform
 		name				:=	l.compid_in.Last_Name+' '+l.compid_in.First_Name+' '+l.compid_in.Middle_Name;
-		string73 cname		:=	if(trim(name)<>'',addrcleanlib.cleanpersonlfm73(stringlib.stringcleanspaces(name)),'');
+		string73 cname		:=	if(trim(name)<>'',address.cleanpersonlfm73(stringlib.stringcleanspaces(name)),'');
 		self.title     		:= cname[ 1.. 5];
 		self.fname   		:= cname[ 6..25];
 		self.mname			:= cname[26..45];

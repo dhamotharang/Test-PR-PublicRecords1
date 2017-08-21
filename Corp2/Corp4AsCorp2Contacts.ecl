@@ -1,4 +1,4 @@
-import ut, Corporate;
+import ut, Corporate, Address;
 
 // Determine if contact date range overlaps company date range
 BOOLEAN ValidDateRange(UNSIGNED4 contact_dt_first_seen,
@@ -18,7 +18,7 @@ string120 cont_company_name;
 string73  cont_clean_name;
 end;
 
-Layout_Corporate_Direct_Cont_Base TranslateCorp4ToCorpContacts(Layout_Corp4_Cont_Temp l) := transform
+Layout_Corporate_Direct_Cont_AID TranslateCorp4ToCorpContacts(Layout_Corp4_Cont_Temp l) := transform
 self.dt_first_seen := (unsigned4)fCheckDate(l.dt_first_seen);
 self.dt_last_seen := (unsigned4)fCheckDate(l.dt_last_seen);
 self.dt_vendor_first_reported := (unsigned4)fCheckDate(l.dt_first_seen);
@@ -38,6 +38,8 @@ self.corp_address1_line3 := '';
 self.corp_address1_line4 := '';
 self.corp_address1_line5 := '';
 self.corp_address1_line6 := '';
+self.corp_prep_addr_line1				:=	'';
+self.corp_prep_addr_last_line		:=	'';
 self.corp_address1_effective_date := '';
 self.corp_phone_number := '';
 self.corp_phone_number_type_cd := '';
@@ -116,6 +118,14 @@ self.cont_address_line3 := '';
 self.cont_address_line4 := '';
 self.cont_address_line5 := '';
 self.cont_address_line6 := '';
+self.cont_prep_addr_line1				:=	Stringlib.StringToUpperCase(l.officer_street);
+self.cont_prep_addr_last_line		:=	if (trim(l.officer_city,left,right) != '',
+																						StringLib.StringCleanSpaces(Stringlib.StringToUpperCase(	trim(l.officer_city,left,right) + ', ' +
+																																																			trim(l.officer_state,left,right) + ' ' + 
+																																																			trim(l.officer_zip,left,right)[1..5])), 
+																						 StringLib.StringCleanSpaces(Stringlib.StringToUpperCase(	trim(l.officer_state,left,right) + ' ' + 
+																																																			trim(l.officer_zip,left,right)[1..5]))
+                                            ); 						
 self.cont_address_effective_date := '';
 self.cont_phone_number := '';
 self.cont_phone_number_type_cd := '';
@@ -221,12 +231,16 @@ self.cont_effective_desc            := '';
 self.cont_addl_info                 := '';
 self.cont_address_county            := '';
 self.cont_fax_nbr                   := '';
+self.Append_Corp_Addr_RawAID				:=	0;
+self.Append_Corp_Addr_ACEAID				:=	0;
+self.Append_Cont_Addr_RawAID				:=	0;	
+self.Append_Cont_Addr_ACEAID				:=	0;	
 self := l;
 end;
 
 Layout_Corp4_Cont_Temp CleanContactName(Corporate.Layout_Corp_Contacts_DID l) := transform
 self.cont_company_name := Datalib.CompanyClean(l.officer_name);
-self.cont_clean_name := addrcleanlib.cleanPerson73(l.officer_name);
+self.cont_clean_name := Address.cleanPerson73(l.officer_name);
 self := l;
 end;
 
@@ -238,7 +252,7 @@ Corp_Cont_Init := project(Corp4_Cont_Init, TranslateCorp4ToCorpContacts(left));
 Corp_Cont_Dist := distribute(Corp_Cont_Init(cont_lname <> '' or cont_cname <> ''), hash(corp_key));
 Corp_Company_Dist := distribute(Corp4AsCorp2, hash(corp_key));
 
-Layout_Corporate_Direct_Cont_Base AppendCompanyToContact(Layout_Corporate_Direct_Cont_Base l, Layout_Corporate_Direct_Corp_Base r) := transform
+Layout_Corporate_Direct_Cont_AID AppendCompanyToContact(Layout_Corporate_Direct_Cont_AID l, Layout_Corporate_Direct_Corp_AID r) := transform
 self.corp_address1_type_cd := r.corp_address1_type_cd;
 self.corp_address1_type_desc := r.corp_address1_type_desc;
 self.corp_address1_line1 := r.corp_address1_line1;

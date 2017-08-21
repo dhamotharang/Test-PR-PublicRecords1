@@ -1,14 +1,21 @@
-import tools;
+import tools,FraudShared;
 
 export Build_Base(
 
 	 string																				pversion
+	,boolean                                      PSkipSuspectIP                    = false 
 	,boolean                                      PSkipGlb5Base                     = false 
 	,boolean                                      pSkipTigerBase                    = false
 	,boolean                                      pSkipCFNABase                     = false
-	,boolean                                      pSkipCrimBase                     = false
+	,boolean                                      pSkipTextMinedCrimBase            = false
+	,boolean                                      pSkipOIGBase                      = false
 	,boolean                                      pSkipAInspection                  = false
-	,dataset(Layouts.Base.Main)										pBaseMainFile										  =	Files().Base.Main.QA
+	,boolean                                      pSkipErieBase                     = false
+	,dataset(FraudShared.Layouts.Base.Main)				pBaseMainFile										  =	FraudShared.Files().Base.Main.QA
+
+  ,dataset(Layouts.Base.SuspectIP)						  pBaseSuspectIPFile							  =	Files().Base.SuspectIP.QA
+	,dataset(Layouts.Input.SuspectIP)	            pUpdateSuspectIPFile	            =	Files().Input.SuspectIP.Sprayed
+	,boolean                                      pUpdateSuspectIPflag              = _Flags.Update.SuspectIP
 
   ,dataset(Layouts.Base.Glb5)							      pBaseGlb5File							        =	Files().Base.Glb5.QA
 	,dataset(Layouts.Input.Glb5)	                pUpdateGlb5File	                  =	Files().Input.Glb5.Sprayed
@@ -22,13 +29,19 @@ export Build_Base(
 	,dataset(Layouts.Input.cfna)	                pUpdatecfnaFile	                  =	Files().Input.cfna.Sprayed
 	,boolean                                      pUpdatecfnaflag                   = _Flags.Update.cfna
   
-	,dataset(Layouts.Base.crim)							      pBasecrimFile							        =	Files().Base.crim.QA
-	//,dataset(Layouts.Input.crim)	              pUpdatecrimFile	                  =	Files().Input.crim.Sprayed
-	,boolean                                      pUpdatecrimflag                   = _Flags.Update.crim
+	,dataset(Layouts.Base.TextMinedCrim)					pBaseTextMinedCrimFile				    =	Files().Base.TextMinedCrim.QA
+	,boolean                                      pUpdateTextMinedCrimflag          = _Flags.Update.TextMinedCrim
+  
+	,dataset(Layouts.Base.OIG)				          	pBaseOIGFile				              =	Files().Base.OIG.QA
+	,boolean                                      pUpdateOIGflag                    = _Flags.Update.OIG
   
 	,dataset(Layouts.Base.AInspection)						pBaseAInspectionFile							=	Files().Base.AInspection.QA
 	,dataset(Layouts.Input.AInspection)	          pUpdateAInspectionFile	          =	Files().Input.AInspection.Sprayed
 	,boolean                                      pUpdateAInspectionflag            = _Flags.Update.AInspection
+  
+	,dataset(Layouts.Base.Erie)						        pBaseErieFile						         	=	Files().Base.Erie.QA
+	,dataset(Layouts.Input.Erie)	                pUpdateErieFile	                  =	Files().Input.Erie.Sprayed
+	,boolean                                      pUpdateErieflag                   = _Flags.Update.Erie
 
 ) :=
 module
@@ -37,7 +50,14 @@ module
 	if(tools.fun_IsValidVersion(pversion)
 		,sequential(
 			 parallel(
-				  if(PSkipGlb5Base , output('GLB5 base skipped')
+				  if(PSkipSuspectIP , output('SuspectIP base skipped')
+					,Build_Base_SuspectIP(
+					 pversion
+					,pBaseSuspectIPFile
+					,pUpdateSuspectIPFile
+					,pUpdateSuspectIPflag
+					).All)
+				  ,if(PSkipGlb5Base , output('GLB5 base skipped')
 					,Build_Base_Glb5(
 					 pversion
 					,pBaseGlb5File
@@ -58,12 +78,19 @@ module
 					,pUpdateCFNAFile
 					,pUpdateCFNAflag
 					).All)
-				,if(pSkipCrimBase , output('Crim base skipped')	
-				,Build_Base_Crim(
+				,if(pSkipTextMinedCrimBase , output('TextMinedCrim base skipped')	
+				,Build_Base_TextMinedCrim(
 				  pversion
-					,pBaseCrimFile
-					//,pUpdateCrimFile  // full replacement base files are fed in the build 
-					,pUpdateCrimflag
+					,pBaseTextMinedCrimFile
+					//,pUpdateTextMinedCrimFile  // full replacement base files are fed in the build 
+					,pUpdateTextMinedCrimflag
+					).All)
+				,if(pSkipOIGBase , output('OIG base skipped')	
+				,Build_Base_OIG(
+				  pversion
+					,pBaseOIGFile
+					//,pUpdateOIGFile  
+					,pUpdateOIGflag
 					).All)
 				,if(pSkipAInspection , output('AInspection base skipped')	
 				,Build_Base_AInspection(
@@ -72,11 +99,17 @@ module
 					,pUpdateAInspectionFile
 				//	,pUpdateAInspectionflag  its static file no updates 
 					).All)
+				,if(pSkipErieBase , output('Erie base skipped')
+				,Build_Base_Erie(
+				  pversion
+					,pBaseErieFile
+					,pUpdateErieFile
+					,pUpdateErieflag
+					).All)
 			 )
-			 ,Build_Base_Main(
+			 ,MapToCommon(
 					 pversion
-					,pBaseMainFile
-					).All
+			 ).Build_Base_Shared_Main.All
 			//,Promote().Inputfiles.Sprayed2Using
 		 )
 		,output('No Valid version parameter passed, skipping FDN.Build_Base atribute')

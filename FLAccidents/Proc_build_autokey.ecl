@@ -1,6 +1,7 @@
 import AutoKeyB2;
 
-export Proc_build_autokey(string filedate) := function
+export Proc_build_autokey := function
+filedate := FLAccidents.Version_Development;
 
 ak_dataset := Constants.ak_dataset;
 ak_keyname := Constants.ak_keyname;

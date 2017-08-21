@@ -1,6 +1,9 @@
+/*2005-04-26T11:37:17Z (Ananth Vankatachalam)
+Added a st,county,process_date,lfmname key for QA
+*/
 import Official_Records, lib_keylib, lib_stringlib, lib_metaphone;
 
-lBaseKeyName 	:= 'key::moxie.official_records_party.';
+lBaseKeyName 	:= '~thor_200::key::moxie.official_records_party.';
 
 rMoxieFileForKeybuildLayout
  :=
@@ -9,7 +12,7 @@ rMoxieFileForKeybuildLayout
     unsigned integer8 __filepos{virtual(fileposition)};
   end;
 
-dMoxieFileForKeybuild := dataset(Official_Records.Name_Moxie_Party_Dev,rMoxieFileForKeybuildLayout,flat);
+dMoxieFileForKeybuild := dataset('~thor_200::base::official_records_party',rMoxieFileForKeybuildLayout,flat);
 
 rKeyFieldsNormalizedLayout
  :=

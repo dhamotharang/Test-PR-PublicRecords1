@@ -1,0 +1,53 @@
+import _Control,RoxieKeyBuild;
+EXPORT run_build(string infiledate
+								,string eid
+								,string dserver = _control.IPAddress.bctlpedata10
+								,string desprayprefix = '/data/data_lib_2_hus2/overrides/logs') := module
+	
+	
+
+	shared overrideflagfile := '~override::despray::workunit';
+	shared distlist := if (_Control.ThisEnvironment.Name = 'Prod_Thor',
+												'Anantha.Venkatachalam@lexisnexis.com,Darren.Knowles@lexisnexis.com,Melanie.Jackson@lexisnexis.com,Charlene.Ros@lexisnexis.com',
+												'Anantha.Venkatachalam@lexisnexis.com'
+												);
+	shared fulldistlist := if (_Control.ThisEnvironment.Name = 'Prod_Thor',
+														'Anantha.Venkatachalam@lexisnexis.com,Darren.Knowles@lexisnexis.com,Melanie.Jackson@lexisnexis.com,Charlene.Ros@lexisnexis.com',
+														'Anantha.Venkatachalam@lexisnexis.com'
+														
+														);
+	shared send_email_with_eid := fileservices.sendemail(
+													fulldistlist,
+													'Override Build Succeeded ' + infiledate,
+													'Exportid used: '+ eid);
+							
+	shared email_fail := fileservices.sendemail(
+													
+													distlist,
+													'Override Keys Roxie Build FAILED',
+													failmessage);
+ 
+	export outflagfile := output(dataset([{WORKUNIT}],{string wuid}),,overrideflagfile,csv,overwrite);
+ 
+	export build_keys := Overrides.Build_Keys(infiledate);
+	export move_keys := Overrides.Move_Keys(infiledate);
+	export dops_update := if (_Control.ThisEnvironment.Name = 'Prod_Thor',
+														sequential(RoxieKeybuild.updateversion('OverrideKeys',infiledate,distlist,,'N'),
+																	RoxieKeybuild.updateversion('FCRA_OverrideKeys',infiledate,distlist,,'F')),
+																	output('Dops not updated')
+																	);
+	export comparecount := if (_Control.ThisEnvironment.Name = 'Prod_Thor',
+																					Overrides.CompareKeyCount(infiledate),
+																					output('Not Prod environment to compare count')
+																					);
+	export desprayflagfile := if (_Control.ThisEnvironment.Name = 'Prod_Thor', sequential(
+															outflagfile,
+															fileservices.despray(overrideflagfile,dserver,desprayprefix+'/overrideflagfile.txt',,,,TRUE)),
+															output('Not Prod environment to despray flag file')
+															);
+	export all := sequential(build_keys,move_keys,dops_update,comparecount,desprayflagfile) : success(send_email_with_eid),
+					failure(email_fail);
+ 
+	
+	
+end;

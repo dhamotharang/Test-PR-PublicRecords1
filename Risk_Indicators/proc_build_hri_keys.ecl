@@ -1,4 +1,4 @@
-import RoxieKeyBuild, business_header, ut, aca, versioncontrol;
+import RoxieKeyBuild, business_header, ut, aca, versioncontrol, Address_Attributes;
 
 export proc_build_hri_keys(
 
@@ -14,6 +14,12 @@ module
 	// -- Build ACA Key
 	/////////////////////////////////////////////////////////////////////////////////
 	VersionControl.macBuildNewLogicalKeyWithName(aca.key_aca_addr						,ACAKeyName.Address.New				,BuildACAkey					);
+	
+	/////////////////////////////////////////////////////////////////////////////////
+	// -- Build Address_Attributes business_risk_bdid Key
+	/////////////////////////////////////////////////////////////////////////////////
+	VersionControl.macBuildNewLogicalKeyWithName(Address_Attributes.key_business_risk_bdid		,KeyName.AddrAttrRiskBdid.New			,BuildAddrAttrBDIDkey				);
+	VersionControl.macBuildNewLogicalKeyWithName(Address_Attributes.key_business_risk_geolink	,KeyName.AddrAttrRiskGeolink.New	,BuildAddrAttrGeolinkkey		);
 
 	/////////////////////////////////////////////////////////////////////////////////
 	// -- Build Non-FCRA Keys
@@ -32,6 +38,8 @@ module
 
 	shared keygroupnames := 
 				ACAKeyName.Address.dAll_filenames
+			+ KeyName.AddrAttrRiskBdid.dAll_filenames
+			+ KeyName.AddrAttrRiskGeolink.dAll_filenames
 			+ KeyName.HRIAddress.dAll_filenames                                                                           
 			+ KeyName.HRISicZ5.dAll_filenames
 			+ KeyName.AddressSicCode.dAll_filenames
@@ -46,6 +54,8 @@ module
 			,parallel(
 			
 				 BuildACAkey
+				,BuildAddrAttrBDIDkey
+				,BuildAddrAttrGeolinkkey
 				,BuildHRIAddrkey
 				,BuildHRISICkey	
 				,BuildAddrSICkey

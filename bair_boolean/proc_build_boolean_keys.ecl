@@ -1,7 +1,8 @@
-//
 IMPORT Text_Search, RoxieKeybuild;
-EXPORT proc_build_boolean_keys(STRING filedate, Boolean pDelta=true) := FUNCTION
 
+EXPORT proc_build_boolean_keys(STRING fdate, Boolean pDelta=true) := FUNCTION
+
+	filedate:=if(pDelta,fdate+'_delta',fdate);
 	Frag := bair_boolean.Fragment_Builder(,,pDelta);
 
 	info := bair_boolean.constants(filedate).fileinfo;
@@ -15,24 +16,23 @@ EXPORT proc_build_boolean_keys(STRING filedate, Boolean pDelta=true) := FUNCTION
 	segList := Frag.SegmentDefinitions;
   ansList := Frag.AnswerRecords;
 	
-  //resolve collisions, not incremental
-	bld1 := Text_Search.Build_From_Postings(info, posting, segList, TRUE, pDelta); 
+	  Text_Search.Layout_Key_Filenames makeKNR(STRING pname, STRING aname) := TRANSFORM
+    SELF.physical := pname;
+    SELF.alias := aname;
+    SELF.backup := REGEXREPLACE('::QA::', aname, '::FATHER::', NOCASE);
+    SELF.past_backup := REGEXREPLACE('::QA::', aname, '::GRANDFATHER::', NOCASE);
+    SELF.obsolete_backup := REGEXREPLACE('::QA::', aname, '::DELETE::', NOCASE);
+    SELF.delete_obsolete := TRUE;
+  END;
+  ans_keys := DATASET([makeKNR(ansIndxName, ansIndxAlias)]);
 
-	bld2 := BUILD(bair_boolean.Indx_AnsRec(ansIndxName, ansList));
-
-	RoxieKeybuild.Mac_SK_Move_V3(regexreplace('::qa::',ansIndxAlias,'::@version@::',nocase),'D',mvansIndxAlias,filedate,'2');
-	
-	/*
-	MakeAXAlias := SEQUENTIAL(
-		IF(NOT FileServices.SuperFileExists(ansIndxAlias), 
-				FileServices.CreateSuperFile(ansIndxAlias)),
-		FileServices.ClearSuperFile(ansIndxAlias, TRUE),
-		FileServices.AddSuperFile(ansIndxAlias, ansIndxName)  );*/
+	bld0 := BUILD(bair_boolean.Indx_AnsRec(ansIndxName, ansList));
+  build_type := IF(pDelta, Text_Search.Types.BuildType.CumulativeIncrement, Text_Search.Types.BuildType.Regular);
+	bld1 := Text_Search.Build_From_Postings(info, posting, segList, TRUE, build_type, ans_keys); 
 
 	ex := SEQUENTIAL(
-		bld1,
-		bld2,
-		//Frag.Cleanup_Persist,
-		mvansIndxAlias);
+		bld0,
+		bld1
+		);
 	RETURN ex;
 END;

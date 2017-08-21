@@ -7,7 +7,7 @@ end;
 
 export key_src_experian(boolean pFastHeader = false, boolean pCombo = true, dataset(src_rec) pDataset=dataset([],src_rec)) := function
 
-Experian_in := if(pCombo,pDataset,ExperianCred.Experian_as_source(if(pFastHeader,ExperianCred.Files.Base_File_Out),~pFastHeader,pFastHeader));
+Experian_in := if(pCombo,pDataset,header.Files_SeqdSrc(pFastHeader).EN);
 
 mac_key_src(Experian_in, ExperianCred.Layouts.Layout_Out_old, 
 						Experian_child, 

@@ -7,7 +7,7 @@ layout_geo_ll := RECORD
 END;
 
 //change this once the census data and address cleaner have been updated file_Census2010_geoblks;
-base := Address_Attributes.file_blockgroup.file_Census2000_geoblks;
+base := Address_Attributes.file_blockgroup.file_Census2010_geoblks;
 
 layout_geo_ll makeInfo(base l) := transform
 	self := l;

@@ -41,6 +41,7 @@ export Liens_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.city_name       := choose(counter,left.p_city_name,left.v_city_name),
 				self.state           := left.st,
 				self.zip             := left.zip,
+				self.zip4            := left.zip4,
 				self.county_fips     := left.county[3..5],
 				self.msa             := left.msa,
 				self.phone           := left.phone, // length =20 on liens base party file  ???
@@ -57,6 +58,43 @@ export Liens_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 
 	end;
 	
+	export dataset(Layout_Contacts.Unlinked) As_Contact_Master := function
+
+		company_filtered := base_party(tmsid != '' and cname != '');
+		person_filtered := base_party(tmsid != '' and lname != '');
+		
+		codebtors := join(
+			company_filtered(name_type = 'D'),
+			person_filtered(name_type = 'D'),
+			left.tmsid = right.tmsid,
+			transform(Layout_Contacts.Unlinked,
+				self.source          := MDR.sourceTools.src_Liens_v2,
+				self.source_docid    := trim(left.tmsid,left,right), // NOTE: tmsid length is 50 
+				self.source_party    := left.name_type[1] + intformat(hash32(left.cname,left.orig_address1,left.orig_address2,left.orig_city,left.orig_state,left.orig_zip5) % 1000000000,9,1),
+				self.date_first_seen := (unsigned4) (left.date_first_seen),
+				self.date_last_seen  := (unsigned4) (left.date_last_seen),
+				self.ssn := right.ssn,
+				self.did := (unsigned)right.did,
+				self.score := 0,
+				self.name_prefix := right.title,
+				self.name_first := right.fname,
+				self.name_middle := right.mname,
+				self.name_last := right.lname,
+				self.name_suffix := right.name_suffix,
+				self.addr_suffix := right.addr_suffix,
+				self.city_name := right.p_city_name,
+				self.zip := right.zip,
+				self.state := right.st,
+				self.position_title := 'Co-Debtors',
+				self.position_type := 'O',
+				self.email := '',
+				self.phone := right.phone,
+				self := right));
+		
+		return codebtors;
+				
+	end;
+		
 	export dataset(TopBusiness.Layout_Liens.main.unlinked) As_Liens_Master := function
 		
 		filtered_main := base_main(tmsid != '');

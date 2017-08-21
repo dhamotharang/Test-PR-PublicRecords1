@@ -442,9 +442,9 @@ export string1 fStandard_Offense_Level_From_Orig(string5 pVendor, string5 pCourt
 		pVendor='60' and pCourtOffLevel='MTA'=> 'M',
 				
 	  pvendor ='IB' and   trim(pCourtOffLevel,all) IN	['F0','F5','F6','F7','F9','FF','FG','FM','FN','FO','FP','FS','FV','FW','FX','FZ'] =>'F',
-		
+		pvendor IN ['7A']                   and   trim(pCourtOffLevel,all) IN	['FBT','FCT','FET','FFT','FUT'] => 'F',
 		//added for all the other sources.
-         trim(pCourtOffLevel,all) IN ['FSJ',
+         trim(pCourtOffLevel,all) IN ['FSJ','SJF',
 				                          '1F',
 																	'2F',
 																	'3F',
@@ -628,13 +628,23 @@ export string1 fStandard_Offense_Level_From_Orig(string5 pVendor, string5 pCourt
 				 // pvendor ='OV' and   trim(pCourtOffLevel,all) IN	['F235','F233','F237','F21','F13','F157','F195','F175'] => 'F',
 				 pvendor ='IB' and   trim(pCourtOffLevel,all) IN	['M7','MF','ML','MN','MP','MR','MS','MT','MU','MX','MY','MZ'] =>'M',
 				
-         pvendor IN ['IB','7Y']      and   trim(pCourtOffLevel,all) IN	['MM'] =>'M',
-				 pvendor IN ['IB','UV','US'] and   trim(pCourtOffLevel,all) IN	['MO'] =>'M',
-         pvendor IN ['WS']           and   trim(pCourtOffLevel,all) IN	['MM1'] =>'M',
+         pvendor IN ['IB','7Y','FN','QM','HA']              and   trim(pCourtOffLevel,all) IN	['MM','PMT','PM'] =>'M',
 				 
-				 pvendor IN ['FV']           and   trim(pCourtOffLevel,all) IN	['MU','MU1','MU2','MU3'] =>'I',
+				 pvendor IN ['IB','UV','US','W0001','W0003','W0004'] and   trim(pCourtOffLevel,all) IN	['MO'] =>'M',
+				 pvendor IN ['W0002']                and   trim(pCourtOffLevel,all) IN	['GMT','MT'] =>'M',
+         pvendor IN ['WS']                   and   trim(pCourtOffLevel,all) IN	['MM1'] =>'M',
 				 
-         trim(pCourtOffLevel,all) IN ['AM',
+				 pvendor IN ['FV']                   and   trim(pCourtOffLevel,all) IN	['MU','MU1','MU2','MU3'] =>'I',
+				 
+				 pvendor IN ['7A']                   and   trim(pCourtOffLevel,all) IN	['MUM','MUMUN','MAM','MUORD','MCORD'] =>'M',
+				 pvendor IN ['7A']                   and   trim(pCourtOffLevel,all) IN	['MUM','MUMUN','MAM','MUORD','MCORD'] =>'M',
+				 
+         pvendor IN ['7A']                   and   trim(pCourtOffLevel,all) IN	['MAT','MBT','MCT','MUT'] => 'M', 
+
+				 
+         trim(pCourtOffLevel,all) IN ['M6',
+				                            'GMT',	
+																		'AM',
 																		'BM',
 																		'CM',
 																		'M',
@@ -664,7 +674,7 @@ export string1 fStandard_Offense_Level_From_Orig(string5 pVendor, string5 pCourt
 																		'MI',
 																		//'MT', uncomment for phase3
 																		//'TM', uncomment for phase3
-																			//'MM',
+																		//'MM', AS PER MARGARET THIS IS SOURCE SPECIFIC
 																		'MP',
 																		'MR',
 																		'MS',
@@ -694,12 +704,17 @@ export string1 fStandard_Offense_Level_From_Orig(string5 pVendor, string5 pCourt
 																		'M132',
 																		'MB)',  
                                     'MISDE',
-																		// 'PM','PM3','PM4','PM5',
+	                                  'M2N','M3R',
+                                    // 'PM','PM3','PM4','PM5',
+																		//'PM','PMT', 
 																		'MU3'] => 'M' ,
 																
   
+ 
+         pvendor IN ['8T','9L','W0155','W0157','W0156']  and trim(pCourtOffLevel,all) IN ['I','IN','NIN'] =>'I',
 
 				 trim(pCourtOffLevel,all) IN [//'I','IN','IA','IB','IC','ID','IF','IU','I1','I2','ICA',
+				                              'PM','PM3','PM4','PM5','PMT',
 				                              'MM1','MAM','MUM','MUMUN','MAMUN','ORD','MM','MO','CO','COR','MOR','MO1','MO2','OMU','MU1','MU2','CO2','OCO'] => 'I',
 				 pVendor='' and pCourtOffLevel=''=> 'U',
 'U');

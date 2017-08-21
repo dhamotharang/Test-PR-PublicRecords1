@@ -40,13 +40,18 @@ export MAC_Doc_Parse_Rule := MACRO
 	PATTERN wordDtNums		:= notNum dotNum+;
 	PATTERN wordHypNums		:= notNum hyphenNum+;
 	PATTERN specialString	:= dotNumbers OR hyphenNumbers OR wordDtNums OR wordHypNums;
+	// ssn pattern
+	PATTERN nineDigits := PATTERN('[[:digit:]]{9}');
+	PATTERN hyphenedSSN := PATTERN('[[:digit:]]{3}-[[:digit:]]{2}-[[:digit:]]{4}');
+	PATTERN s_stop := PATTERN('(?![[:alnum:]])');
+	PATTERN ssnPattern := (nineDigits | hyphenedSSN) s_stop;
 
 	PATTERN kwdWPuncts		:= Text_Search.Equivalence.KwdWithPuncts;
 	PATTERN begsep 				:= FIRST OR PATTERN('[^[:alnum:]]');
 	PATTERN endsep 				:= LAST OR PATTERN('[^[:alnum:]]');
 	TOKEN		MultiEquiv		:= NOCASE(Text_Search.Equivalence.MultiWrdEquivalents) AFTER begsep BEFORE endsep;
 	
-	RULE		Doc_Parse_Rule := datePattern OR decimalString OR specialString OR intg
+	RULE		Doc_Parse_Rule := ssnPattern OR datePattern OR decimalString OR specialString OR intg
 															OR MultiEquiv OR kwdWPuncts OR wordPattern
 															OR otherPattern OR paraPattern;
 

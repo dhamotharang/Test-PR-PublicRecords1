@@ -419,10 +419,19 @@ EXPORT Get_Dataset_Versions(
 				SELF.version := REGEXFIND(
 					AccountMonitoring.product_files.property.deeds_filename_raw + '(.*)$',
 					LEFT.name,1,NOCASE)));
-		
+	
+		Property_SearchLinkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.property.SearchLinkid_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'PROPERTY',
+				SELF.subfile := 'LINKID',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::ln_propertyv2::(.*)::search.linkids',
+					LEFT.name,1,NOCASE)));
+					
 		Property :=
 			Property_Search +
-			Property_Deeds;
+			Property_Deeds  +
+			Property_SearchLinkid;
 			
 		// PAW
 		PAW := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.people_at_work.main_filename),
@@ -546,7 +555,124 @@ EXPORT Get_Dataset_Versions(
 			Sbfe_Linkid + 
 			Sbfe_Trade + 
 			Sbfe_Score;
+		
+		// UCC
+		Ucc_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.ucc.uccLinkid_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'UCC',
+				SELF.subfile := 'LINKID',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::ucc::(.*)::linkids',
+					LEFT.name,1,NOCASE)));
+					
+		Ucc_Main := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.ucc.uccMain_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'UCC',
+				SELF.subfile := 'MAIN',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::ucc::(.*)::main_rmsid',
+					LEFT.name,1,NOCASE)));
+		
+		UCC :=
+			Ucc_Linkid + 
+			Ucc_Main; 
+		
+		// Govt Debarred
+		govtdebarred_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.govtdebarred.govtLinkid_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'GOVTDEBARRED',
+				SELF.subfile := 'LINKID',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::sam::(.*)::linkids',
+					LEFT.name,1,NOCASE)));
 			
+		govtDebarred := govtdebarred_Linkid;
+		
+		// Inquiry
+		Inquiry_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.inquiry.inquiryLinkid_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'INQUIRY',
+				SELF.subfile := 'LINKID',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::inquiry::(.*)::linkids',
+					LEFT.name,1,NOCASE)));
+					
+		InquiryUpdate_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.inquiry.inquiryUpdLinkid_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'INQUIRY',
+				SELF.subfile := 'LINKID_UPDATE',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::inquiry::(.*)::linkids_update',
+					LEFT.name,1,NOCASE)));
+		
+		Inquiry :=
+			Inquiry_Linkid + 
+			InquiryUpdate_Linkid; 
+		
+		// Corp
+		Corp_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.corp.corpLinkid_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'CORP',
+				SELF.subfile := 'LINKID',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::corp2::(.*)::corp::linkids',
+					LEFT.name,1,NOCASE)));
+					
+		Corp_corpKey := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.corp.corpKey_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'CORP',
+				SELF.subfile := 'CORP_KEY',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::corp2::(.*)::corp::corp_key.record_type',
+					LEFT.name,1,NOCASE)));
+		
+		Corp :=
+			Corp_Linkid + 
+			Corp_corpKey; 
+		
+		// Mvr
+		Mvr_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.mvr.mvrLinkid_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'MVR',
+				SELF.subfile := 'LINKID',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::vehiclev2::(.*)::linkids',
+					LEFT.name,1,NOCASE)));
+					
+		Mvr_MainKey := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.mvr.main_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'MVR',
+				SELF.subfile := 'MAIN_KEY',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::vehiclev2::(.*)::main_key',
+					LEFT.name,1,NOCASE)));
+		
+		Mvr :=
+			Mvr_Linkid + 
+			Mvr_MainKey; 
+		
+		// Aircraft
+		aircraft_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.aircraft.airLinkid_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'AIRCRAFT',
+				SELF.subfile := 'LINKID',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::faa::(.*)::aircraft_linkids',
+					LEFT.name,1,NOCASE)));
+		
+		aircraft := aircraft_Linkid;
+		
+		// watercraft
+		watercraft_Linkid := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.watercraft.waterLinkid_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'WATRERCRAFT',
+				SELF.subfile := 'LINKID',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::watercraft::(.*)::linkids',
+					LEFT.name,1,NOCASE)));
+			
+		watercraft := watercraft_Linkid;
+		
 		All_Records :=
 			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_address)
 					OR
@@ -566,8 +692,14 @@ EXPORT Get_Dataset_Versions(
 			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_didupdate), DIDUpdate ) +
 			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_bdidupdate), BDIDUpdate ) +
 			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_phoneownership), PhoneOwnership ) +
-			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_bipbestupdate), BipBestUpdate );
-			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_sbfe), SBFE );
+			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_bipbestupdate), BipBestUpdate ) +
+			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_sbfe), SBFE ) +
+			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_ucc), UCC ) +
+			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_govtdebarred), govtDebarred ) +
+			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_inquiry), Inquiry ) +
+			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_corp), Corp ) +
+			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_mvr), Mvr ) +
+			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_aircraft), Aircraft );
 			
  		valid_despray_criteria := despray_ip_address != '' AND despray_path != '';
 		ALLOW_OVERWRITE        := TRUE;

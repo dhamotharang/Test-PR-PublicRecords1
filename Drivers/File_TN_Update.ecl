@@ -62,11 +62,7 @@ rPre20040409Layout
 end ;
 
 dFile_TN_Update_Pre20040409
- := dataset(lTNUpdateBaseName + '20030901',rPre20040409Layout,flat)
- +	dataset(lTNUpdateBaseName + '20031201',rPre20040409Layout,flat)
- +	dataset(lTNUpdateBaseName + '20040131',rPre20040409Layout,flat)
- +	dataset(lTNUpdateBaseName + '20040201',rPre20040409Layout,flat)
- +	dataset(lTNUpdateBaseName + '20040229',rPre20040409Layout,flat)
+ := dataset(Drivers.Cluster + 'in::drvlic_tn_update', rPre20040409Layout,thor)
  ;
 
 string8 fPrependCentury(string6 pDateIn)
@@ -90,5 +86,4 @@ dPre20040409asCurrent	:= project(dFile_TN_Update_Pre20040409,tPre20040409toCurre
 
 export File_TN_Update
  :=	dPre20040409asCurrent
-// +	dataset(lTNUpdateBaseName + '20040409',drivers.Layout_TN_Full,flat)
  ;

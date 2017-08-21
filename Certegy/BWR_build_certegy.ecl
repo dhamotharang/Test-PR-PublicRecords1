@@ -1,3 +1,5 @@
+#workunit('name', 'Certegy Build') ;
+
 DoBuild := Certegy.Build_all(Certegy.version);
 
 SampleRecs := choosen(sort(Certegy.Files.certegy_base,record),1000);

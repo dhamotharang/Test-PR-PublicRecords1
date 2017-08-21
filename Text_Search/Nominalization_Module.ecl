@@ -11,7 +11,7 @@ EXPORT Nominalization_Module(BOOLEAN incremental, Filename_Info info,
 											 Types.WordType.MetaData, Types.WordType.SSN, Types.WordType.MultiEquiv];
 											 
   //the only persist file
-	SHARED inv_d := invFile:PERSIST(Persist_Name(info, Types.PersistType.Posting), SINGLE);
+	SHARED inv_d := invFile:PERSIST(Persist_Name(info, Types.PersistType.Posting,incremental), SINGLE);
 
 	// The old dictionary or an empty dictionary
   old_dict := PROJECT(PULL(Indx_Dictionary3(info)), Layout_Dictionary);

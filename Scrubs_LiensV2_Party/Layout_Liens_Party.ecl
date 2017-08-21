@@ -1,0 +1,1 @@
+EXPORT Layout_Liens_Party := recordof(File_Liens_party);

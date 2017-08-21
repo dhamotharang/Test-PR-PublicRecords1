@@ -1,4 +1,4 @@
-﻿import DriversV2, ut, AutoStandardI, Autokey, NID, STD;
+import DriversV2, ut, AutoStandardI, Autokey, NID, STD;
 
 export DLRaw := module
 

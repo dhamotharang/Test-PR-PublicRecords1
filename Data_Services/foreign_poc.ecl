@@ -1,1 +1,1 @@
-export foreign_poc := '~';
+export foreign_poc := '~foreign::10.194.10.1::';

@@ -1,4 +1,4 @@
-import lib_DataLib, lib_AddrClean, lib_StringLib, lib_FileServices, ut;
+import lib_DataLib, Address, lib_StringLib, lib_FileServices, ut;
 
 export mRawStructToStd(string pLine1, string pLine2='', string pLine3='', string pLineLast)
  :=
@@ -9,7 +9,7 @@ export mRawStructToStd(string pLine1, string pLine2='', string pLine3='', string
 		shared		string		fPOBPartString(string pString)
 								 :=
 									function
-										string	lPossiblePOB				:=	regexfind(' ' + Common.ePOBoxReplacement + ' [0-9|A-Z]+[\\-|/]?[0-9|A-Z|\\-|/]*? ',pString,0);
+										string	lPossiblePOB				:=	regexfind(' ' + Common.ePOBoxReplacement + ' [0-9|A-Z]+[\\-|/]?[0-9|A-Z|\\-|/]*?;?\\,? ?',pString,0);
 										string	lNoSlashAfterHyphen	:=	if(regexfind('.*\\-.*/',lPossiblePOB),
 																											 regexfind('(.*?)/',lPossiblePOB,1),
 																											 lPossiblePOB
@@ -44,10 +44,33 @@ export mRawStructToStd(string pLine1, string pLine2='', string pLine3='', string
 								 ;
 
 		// Prep line 1:  force to uppercase, compact all consecutive spaces to single spaces
-		shared		string		fPrepCommon(string pStringIn)	:=	lib_StringLib.StringLib.StringCleanSpaces(lib_StringLib.StringLib.StringToUpperCase(pStringIn));
+//		shared		string		fPrepCommon(string pStringIn)	:=	lib_StringLib.StringLib.StringCleanSpaces(lib_StringLib.StringLib.StringToUpperCase(pStringIn));
+		shared	string	fRawFixCommon(string pStringIn)	:=
+		function
+			string	lNoPeriod						:=	regexreplace('([^0-9])\\.',pStringIn,'\\1 ');
+			string	lNoComma						:=	lib_StringLib.StringLib.StringFindReplace(lNoPeriod,',',' ');
+			string	lCleanSpaces				:=	lib_StringLib.StringLib.StringCleanSpaces(lNoComma);
+			string	lUpperCase					:=	lib_StringLib.StringLib.StringToUpperCase(lCleanSpaces);
+			return	lUpperCase;
+		end;
+
+		shared	string	fRawFixLine1(string pStringIn)	:=
+		function
+			string	lFixedCommon				:=	fRawFixCommon(pStringIn);
+			string	lFixReversedPOBox		:=	regexreplace('^([0-9]+) (PO BOX)$',lFixedCommon,'\\2 \\1');		// Must be in form of "1234 PO BOX" only, with no extraneous chars
+			return	lFixReversedPOBox;
+		end;
+
+		shared	string	fRawFixLineLast(STRING pStringIn)	:=
+		function
+			string	lFixedCommon				:=	fRawFixCommon(pStringIn);
+			string	lSplitStateAndZip		:=	regexreplace('(^| )([A-Z]{2})([0-9]{5})(-?[0-9]{4})?$',lFixedCommon,'\\1\\2 \\3\\4');
+			string	lDropZip4						:=	regexreplace('(^| )([0-9]{5})-?[0-9]{4}$',lSplitStateAndZip,'\\1\\2');
+			return	lDropZip4;
+		end;
 
 		// Prep line 1:  upper, compact, adding leading/trailing space
-		shared		string		lLine1Prepped				:=	' ' + fPrepCommon(pLine1) + ' ';
+		shared		string		lLine1Prepped				:=	' ' + fRawFixLine1(pLine1) + ' ';
 		// Prep line 1:  convert dot-separated multi-directions (e.g. "S.W." or "N.E") by removing dot(s).  Note: "S. W." unaffected
 		shared		string		lLine1FixCommonDir	:=	regexreplace(' ([N|S])[\\.]([E|W])[\\.| ] ?([^ ]*)',lLine1Prepped,' \\1\\2 \\3');
 		// Prep line 1:  convert multi-hypened characters into double-hyphen
@@ -93,7 +116,7 @@ export mRawStructToStd(string pLine1, string pLine2='', string pLine3='', string
 		shared		string		lPrePOBPartComplete														:=	if(lPrePOBPart <> '',fPostFixCommon(lPrePOBPart),'');
 		shared		string		lPOBPartComplete															:=	if(lPOBPart <> '',fPostFixCommon(lPOBPart),'');
 		shared		string		lPostPOBPartComplete													:=	if(lPostPOBPart <> '',fPostFixCommon(lPostPOBPart),'');
-		shared		typeof(Layouts.rStdCache.LineLast)	lLineLast						:=	trim(lib_StringLib.StringLib.StringCleanSpaces(lib_StringLib.StringLib.StringFindReplace(fPrepCommon(pLineLast),'.',' ')),left,right);
+		shared		typeof(Layouts.rStdCache.LineLast)	lLineLast						:=	fRawFixLineLast(pLineLast);
 		shared		typeof(Common.eNormalizeFlag)				lPrePOBPartFilled		:=	if(lPrePOBPartComplete <> '',Common.eNormalizeFlag.PrePOBPart,0);
 		shared		typeof(Common.eNormalizeFlag)				lPOBPartFilled			:=	if(lPOBPartComplete <> '',Common.eNormalizeFlag.POBPart,0);
 		shared		typeof(Common.eNormalizeFlag)				lPostPOBPartFilled	:=	if(lPostPOBPartComplete <> '',Common.eNormalizeFlag.PostPOBPart,0);
@@ -106,7 +129,7 @@ export mRawStructToStd(string pLine1, string pLine2='', string pLine3='', string
 		export		typeof(Layouts.rStdCache.Line1)			fPOBPart						:=	lPOBPartComplete;
 		export		typeof(Layouts.rStdCache.Line1)			fPostPOBPart				:=	lPostPOBPartComplete;
 		export		typeof(Layouts.rStdCache.Line1)			fLine1Full					:=	trim(trim(lPrePOBPartComplete) + trim(' ' + lPOBPartComplete) + trim(' ' + lPostPOBPartComplete),left,right);
-		export		typeof(Layouts.rStdCache.LineLast)	fLineLast						:=	trim(lib_StringLib.StringLib.StringCleanSpaces(lib_StringLib.StringLib.StringFindReplace(fPrepCommon(pLineLast),'.',' ')),left,right);
+		export		typeof(Layouts.rStdCache.LineLast)	fLineLast						:=	fRawFixLineLast(pLineLast);
 		export		typeof(Layouts.rRawCache.StdVersion)	fStdVersion				:=	Common.eStdVersion;
 
 		/*************************************************************************************/

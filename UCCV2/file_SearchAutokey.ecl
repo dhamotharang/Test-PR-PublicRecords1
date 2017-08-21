@@ -61,6 +61,10 @@ dwr mdw(p l, c r) := transform
 	self := if(l.tmsid = '', r, l);
 end;
 
-b := join(p,c,left.tmsid = right.tmsid and left.rmsid = right.rmsid, mdw(left, right), full outer, local);
+b := join(p,c,left.tmsid = right.tmsid and 
+			  left.rmsid = right.rmsid and
+				left.party_type = right.party_type,
+				mdw(left, right), 
+				full outer, local);
 
 export file_SearchAutokey := b;

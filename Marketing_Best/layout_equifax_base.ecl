@@ -1,6 +1,6 @@
 export layout_equifax_base := record
  unsigned6      DID;
- marketing_best.layout_equifax;
+ Marketing_Best.Layout_Equifax_Infile.CombinedLayout;
  string5 		title;
  string20 		fname;
  string20 		mname;
@@ -34,4 +34,10 @@ export layout_equifax_base := record
  string1   		geo_match;
  string4   		err_stat;
  String10		telephone;
+ string1    gender;
+ string3 		Age;
+ string4 		Birth_Year;
+ string2 		Birth_Month;
+ string1 		Member_Code_of_Person;
+ string1 		household_member_cnt;
 end;

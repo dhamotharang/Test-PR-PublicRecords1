@@ -1,27 +1,17 @@
-import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS;
+import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, inquiry_acclogs;
 
 export MapAccLogs_Combine := module
 
-// shared test_set := ['8741248383139371391','863337017702536222','6982485239743102520']; // testing only - each contain 70k+ child records
+// dummyids := ['1385345',
+				// '1005199',// Accurint Admin
+				// '1006061',
+				// '1448650',
+				// '1488800',
+				// '1028725',
+				// '1104341',
+				// '1357055'];
 
-dummyids := ['1385345',
-				'1005199',// Accurint Admin
-				'1006061',
-				'1448650',
-				'1488800',
-				'1028725',
-				'1104341',
-				'1357055'];
-
-shared CleanInFile := Accurint_Acclogs.MapAccLogs_Clean
-										/* THIS WAS BEING USED for testing b/c there can be hundreds of records with no query information for 1 user */
-										// ( // must have at least one of the following and not dummy
-							// /*name populated*/ 	(fname + lname + mname + cname + orig_business_name + orig_full_name <> '' or
-							// /*personal info */	ssn + phone + dob <> '' or
-							// /*address info  */	orig_address + orig_city + orig_state + orig_zip + orig_zip4 <> '' or
-							// /*unique data   */	orig_unique_id <> '' or did + bdid > 0) and
-							// /*remove dummies*/	orig_company_id not in dummyids)
-							;
+shared CleanInFile := Accurint_Acclogs.MapAccLogs_Clean;
 
 ////// Place file in main layout + child dataset fields. Create hash key. INPUT only.
 shared trimCleanIn := project(cleaninfile, transform({accurint_acclogs.Layout_AccLogs_Base.Main, string orig_transaction_id, string orig_dateadded},
@@ -44,10 +34,10 @@ pre_hash_base_main := project(base, transform({accurint_acclogs.Layout_AccLogs_B
 hash_base_main := accurint_acclogs.MapAccLogs_ReAppendIDs(pre_hash_base_main);
 
 ////// Combine Sort and Dedup Base Files
-dstrcomb := distribute(trimCleanIn/* + hash_base_main */, hash(hash_key)); //distribute here
+dstrcomb := distribute(trimCleanIn + hash_base_main, hash(hash_key)); //distribute here
 
 combinedFilesMain := project(dedup(sort(dstrcomb, hash_key, dt_vendor_first_reported, hash_key, dt_vendor_first_reported, dt_vendor_last_reported, local), hash_key, dt_vendor_first_reported, dt_vendor_last_reported, local), 
-							transform(accurint_acclogs.Layout_AccLogs_Base.full_layout,
+							transform(accurint_acclogs.Layout_AccLogs_Base.main,
 										self := left;
 										self := []));
 
@@ -92,7 +82,7 @@ hash_new_trans := project(trimCleanIn,
 							self := left));
 
 ////// FULL Transactional Dataset with Transaction IDs
-shared srtTransFile := dedup(sort(distribute(hash_new_trans /*+ hash_base_trans*/, hash(hash_key)), record, local), record, local);
+shared srtTransFile := dedup(sort(distribute(hash_new_trans + hash_base_trans , hash(hash_key)), record, local), record, local);
 
 ////// FULL Transactional Dataset condensed for Child Dataset in Base
 
@@ -102,9 +92,8 @@ pre_combinedFilesTrans := table(srtTransFile, {string hash_key := trim(hash_key,
 combinedFilesTrans := project(pre_combinedFilesTrans, accurint_acclogs.Layout_AccLogs_Base.transaction);
 
 ////// Denormalize Main and Transational for Full Layout
-accurint_acclogs.Layout_AccLogs_Base.full_layout denormfiles(accurint_acclogs.Layout_AccLogs_Base.full_layout l, dataset(accurint_acclogs.Layout_AccLogs_Base.transaction) r) := transform
-					self.transactions := r;
-					self.transaction_count := count(self.transactions);
+accurint_acclogs.Layout_AccLogs_Base.main denormfiles(accurint_acclogs.Layout_AccLogs_Base.main l, dataset(accurint_acclogs.Layout_AccLogs_Base.transaction) r) := transform
+					self.transaction_count := 0;
 					self := l;
 end;
 
@@ -112,15 +101,49 @@ DeNormedRecs := DENORMALIZE(distribute(rllupMain, hash(hash_key)), combinedFiles
 								trim(LEFT.hash_key, all) = trim(RIGHT.hash_key, all), GROUP,
 									DeNormFiles(LEFT,ROWS(RIGHT)), local); /////
 									
-AssignFLDates := project(DeNormedRecs, transform(accurint_acclogs.Layout_AccLogs_Base.full_layout,
+AssignFLDates := project(DeNormedRecs, transform(accurint_acclogs.Layout_AccLogs_Base.main,
 														self.dt_first_seen := left.dt_vendor_first_reported;
-														self.dt_last_seen := left.dt_vendor_last_reported;
+														self.dt_last_seen  := left.dt_vendor_last_reported;
+														self.st 					 := if(left.st = '', stringlib.stringtouppercase(left.orig_state), left.st);
+														self.p_city_name 	 := if(left.p_city_name = '', stringlib.stringtouppercase(left.orig_city), left.p_city_name);
+														self.v_city_name 	 := if(left.v_city_name = '', stringlib.stringtouppercase(left.orig_city), left.v_city_name);
+														self.zip 					 := if(left.zip = '', stringlib.stringtouppercase(left.orig_zip), left.zip);
+														self.orig_dl			 := if(stringlib.stringtouppercase(left.orig_function_name) in ['ACCIDENTSEARCH','MVSEARCH','MVSEARCH2'] or
+																										 stringlib.stringtouppercase(left.orig_searchdescription) in ['ACCIDENTSEARCH','MVSEARCH','MVSEARCH2'] or
+																										 stringlib.stringtouppercase(left.search_description ) in ['ACCIDENTSEARCH','MVSEARCH','MVSEARCH2'],
+																										 '', left.orig_dl);
+														self.orig_charter_nbr	:= if(stringlib.stringtouppercase(left.orig_function_name) = 'CORPREPORTV2' or
+																												stringlib.stringtouppercase(left.orig_searchdescription) = 'CORPREPORTV2' or
+																												stringlib.stringtouppercase(left.search_description) = 'CORPREPORTV2', 
+																													regexreplace('^[A-Za-z0-9][A-Za-z0-9]-', trim(left.orig_unique_id, all), ''), left.orig_charter_nbr);
 														self := left));
 
+////// UPDATE user status for previous base file records
+			prep_user0 := AssignFLDates(orig_login_history_id = '0');
+			jUser0 := join(prep_user0, Inquiry_AccLogs.File_Lookups.user_info, 
+											stringlib.stringtouppercase(left.orig_loginid) = stringlib.stringtouppercase(right.login_id) and
+											left.orig_company_id = right.company_id,
+										transform({recordof(AssignFLDates)},
+											self.orig_user_status := right.status;
+											self := left), lookup, left outer);
+											
+			prep_user1 := AssignFLDates(orig_login_history_id > '0');
+			jUser1 := join(prep_user1, Inquiry_AccLogs.File_Lookups.user_info, 
+											stringlib.stringtouppercase(left.orig_billing_code) = stringlib.stringtouppercase(right.login_id) and
+											left.orig_company_id = right.company_id,
+										transform({recordof(AssignFLDates)},
+											self.orig_user_status := right.status;
+											self := left), lookup, left outer);
+
+updated_user := jUser0+jUser1;
+
 ////// Output Base File
-export Base := AssignFLDates;
+export Base := updated_user;
 
 ////// Output Transactional File
-export Transactions := srtTransFile;
+
+rmDupLegacy := dedup(sort(srtTransFile, hash_key, orig_transaction_id, -length(orig_dateadded)), hash_key, orig_transaction_id);
+
+export Transactions := rmDupLegacy;
 
 end;

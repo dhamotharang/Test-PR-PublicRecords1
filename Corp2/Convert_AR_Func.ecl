@@ -44,7 +44,9 @@ export Convert_AR_Func (DATASET(Layout_Corporate_Direct_ar_Base_keyed )ds) := FU
 		{78,0,l.ar_filed_dt},
 		{79,0,l.ar_report_nbr},
 		{80,0,l.ar_comment},
-		{81,0,l.ar_type}
+		{81,0,l.ar_type},
+		{89,0,l.corp_state_origin},
+		{249,0,l.corp_process_date}
 		
 //vesa: doxie_build.key_prep_Vehicles
 

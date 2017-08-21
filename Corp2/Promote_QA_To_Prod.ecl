@@ -1,6 +1,6 @@
 import versioncontrol;
 
-export Promote_QA_To_Prod := 
+export Promote_Built_To_QA := 
 	sequential(
-		 Promote.QA2Prod
+		 promote().buildfiles.QA2Prod
 	);

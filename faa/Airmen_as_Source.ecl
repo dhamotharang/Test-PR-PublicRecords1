@@ -8,19 +8,10 @@ export Airmen_as_Source(dataset(faa.layout_airmen_data_out) pAirmen = dataset([]
 					   pAirmen
 					  );
 
-	src_rec := record
-	 header.Layout_Source_ID;
-	 faa.layout_airmen_data_out;
-	end;
+	src_rec := header.layouts_SeqdSrc.AM_src_rec;
 	 
 	header.Mac_Set_Header_Source(dSourceData,faa.layout_airmen_data_out,src_rec,'AM',withUID)
 
-	dForHeader	:=	withUID	: persist('persist::headerbuild_airmen_src');
-	dForOther	:=	withUID;
-	ReturnValue	:=	if(pForHeaderBuild,
-					   dForHeader,
-					   dForOther
-					  );
-	return ReturnValue;
+	return withUID;
   end
  ;

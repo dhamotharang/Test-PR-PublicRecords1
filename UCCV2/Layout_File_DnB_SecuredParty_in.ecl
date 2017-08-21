@@ -1,0 +1,41 @@
+export Layout_File_DnB_SecuredParty_in :=
+
+record	
+	 string8              PROCESS_DATE;
+	 string6              ENTITY_ID;	
+	 string1              ACTION_CODE;	
+	 string1              DEF_GLOBAL_AGN;	
+	 string3              DEF_DATA_LENGTH;	
+	 string11             F_FING_ENTY_ID;
+	 // string11       UCC;	
+	 string3              SCRD_PRTY_SEQ_NBR;	
+	 string2              L_BUS_DUNS_NULL;	
+	 string9              BUS_DUNS_NBR;	
+	 string12             BUS_ENTY_ID;	
+	 string2              LHQ_BUS_DUNS_NULL;	
+	 string9              BUS_HQ_DUNS_NBR;	
+	 string11             BUS_HQ_ENTITY_ID;	
+	 string4              BUS_CITY_CD;	
+	 string3              BUS_ST_CD;	
+	 string01             ASGE_INDC;	
+	 string120            FILG_NME;	
+	 string64             FILG_STR_ADR;	
+	 string30             FILG_CITY_NME;	
+	 string02             FILG_ST_NAME;	
+	 string70             FILG_FOR_REG;	
+	 string40             FILG_CTRY_NME;	
+	 string9              FILG_POST_CD;	
+	 string1              MTCH_TYPE_CD;	
+	 string73             Personal_name1; 
+	 string120            Company_name1;
+	 string73             Personal_name2; 
+	 string120      	  	Company_name2;
+	 string73       	 		Personal_name3; 
+	 string120      	  	Company_name3;
+	 string73       	  	Personal_name4;  
+	 string120      	  	Company_name4;
+	 string73       	  	Personal_name5; 
+	 string120            Company_name5;	 
+	 string100		  			prep_addr_line1;
+   string50				  		prep_addr_last_line; 	 
+end;

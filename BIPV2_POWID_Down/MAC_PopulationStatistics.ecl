@@ -1,9 +1,12 @@
  
-EXPORT MAC_PopulationStatistics(infile,Ref='',Input_orgid = '',Input_prim_range = '',Input_prim_name = '',Input_st = '',Input_zip = '',Input_csz = '',Input_v_city_name = '',Input_company_name = '',Input_addr1 = '',Input_address = '',Input_dt_first_seen = '',Input_dt_last_seen = '',OutFile) := MACRO
-  IMPORT SALT27,BIPV2_POWID_Down;
+EXPORT MAC_PopulationStatistics(infile,Ref='',source='',Input_orgid = '',Input_prim_range = '',Input_prim_name = '',Input_st = '',Input_zip = '',Input_csz = '',Input_v_city_name = '',Input_company_name = '',Input_addr1 = '',Input_address = '',Input_dt_first_seen = '',Input_dt_last_seen = '',OutFile) := MACRO
+  IMPORT SALT35,BIPV2_POWID_Down;
   #uniquename(of)
   %of% := RECORD
-    SALT27.Str512Type fields;
+    #IF (#TEXT(source)<>'')
+    SALT35.StrType source;
+    #END
+    SALT35.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
@@ -80,13 +83,19 @@ EXPORT MAC_PopulationStatistics(infile,Ref='',Input_orgid = '',Input_prim_range 
         IF( le.Input_dt_last_seen = (TYPEOF(le.Input_dt_last_seen))'','',':dt_last_seen')
     #END
 ;
+    #IF (#TEXT(source)<>'')
+    SELF.source := le.source;
+    #END
   END;
   #uniquename(op)
   %op% := PROJECT(infile,%ot%(LEFT));
   #uniquename(ort)
   %ort% := RECORD
+    #IF (#TEXT(source)<>'')
+    %op%.source;
+    #END
     %op%.fields;
     UNSIGNED cnt := COUNT(GROUP);
   END;
-  outfile := TOPN( TABLE( %op%, %ort%, fields, FEW ), 1000, -cnt );
+  outfile := TOPN( TABLE( %op%, %ort%,#IF( #TEXT(source)<>'' ) source, #END fields, FEW ), 1000,#IF( #TEXT(source)<>'' ) source, #END -cnt );
 ENDMACRO;

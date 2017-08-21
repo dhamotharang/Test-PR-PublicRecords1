@@ -1,4 +1,4 @@
-import tools;
+import tools,_control;
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 export Send_Emails(
 	
@@ -8,8 +8,8 @@ export Send_Emails(
 	,dataset(lay_builds)	pBIPV2FullKeys					= keynames(pversion).BIPV2FullKeys
 	,dataset(lay_builds)	pBIPV2WeeklyKeys		  	= keynames(pversion).BIPV2WeeklyKeys
 	,dataset(lay_builds)	pBIPV2DatalandKeys    	= keynames(pversion).BIPV2DatalandKeys
-	,string								pEmailList							= 'laverne.bentley@lexisnexis.com,5615731227@txt.att.net'
-	,string								pRoxieEmailList					= 'laverne.bentley@lexisnexis.com,5615731227@txt.att.net'
+	,string								pEmailList							= BIPV2_Build.mod_email.emailList
+	,string								pRoxieEmailList					= BIPV2_Build.mod_email.emailList
 	,string								pBuildName							= 'BIPV2'
 	,string								pBuildMessage						= 'Base Files Finished'
 	,string							  pUseVersion							= 'qa'

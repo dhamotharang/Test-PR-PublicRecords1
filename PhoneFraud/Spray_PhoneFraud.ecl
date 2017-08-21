@@ -8,9 +8,9 @@ EXPORT Spray_PhoneFraud(string version, string dtype):= FUNCTION
 	root				:= '~thor_data400::in::phonefraud_';
 	suffix			:= dtype;
 	filename		:= if(dtype='otp',
-										'delta_' + dtype + '_delta_' + dtype + '_' + version + '.txt',
+										'delta_' + dtype + '_delta_' + dtype + '_' + version[1..8] + '.txt',
 									if(dtype='spoofing',
-										'delta_phonefinder_delta_phones_' + dtype + '_' + version + '.txt',	
+										'delta_phonefinder_delta_phones_' + dtype + '_' + version[1..8] + '.txt',	
 										'error'));
 	
 	sprayLR 		:= std.File.SprayVariable(_control.IPAddress.bctlpedata10,
@@ -19,7 +19,7 @@ EXPORT Spray_PhoneFraud(string version, string dtype):= FUNCTION
 																				'|',
 																				,
 																				'\t',
-																				'thor400_20',
+																				'thor400_44',
 																				root + suffix + '_' + version, 
 																				,
 																				,

@@ -1,0 +1,1 @@
+export File_NC_NonUpdating := dataset(VehLic.File_In_Cluster + 'in::vehreg_nc_nonupdating',vehlic.Layout_NC_Full,flat);

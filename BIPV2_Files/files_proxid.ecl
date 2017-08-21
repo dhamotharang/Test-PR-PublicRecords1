@@ -9,18 +9,19 @@ EXPORT files_proxid(string pversion = '') := module
 	export filenames  := BIPV2_ProxID.filenames(pversion);
   export files      := BIPV2_ProxID.Files(pversion);
 
-	EXPORT DS_PROXID_BUILT   			:= files.base.built;
+	EXPORT FILE_PROXID_BUILT			:= filenames.out.built;
+	EXPORT DS_PROXID_BUILT   			:= files.out.built;
 
-	EXPORT FILE_PROXID_BASE				:= filenames.base.qa;
-	EXPORT DS_PROXID_BASE   			:= files.base.qa;
+	EXPORT FILE_PROXID_BASE				:= filenames.out.qa;
+	EXPORT DS_PROXID_BASE   			:= files.out.qa;
 	
 	// Father
-	EXPORT FILE_PROXID_FATHER			:= filenames.base.father;
-	EXPORT DS_PROXID_FATHER   		:= files.base.father;
+	EXPORT FILE_PROXID_FATHER			:= filenames.out.father;
+	EXPORT DS_PROXID_FATHER   		:= files.out.father;
 
 	// GrandFather
-	EXPORT FILE_PROXID_GRANDFATHER:= filenames.base.grandfather;
-	EXPORT DS_PROXID_GRANDFATHER	:= files.base.grandfather;
+	EXPORT FILE_PROXID_GRANDFATHER:= filenames.out.grandfather;
+	EXPORT DS_PROXID_GRANDFATHER	:= files.out.grandfather;
 
 	/*----------------- BIPv2 ProxID - SALT Files ------------------------------------------ */
 	EXPORT FILE_PROX_SALT_OP       				:= filenames.salt_iter.root;

@@ -1,4 +1,4 @@
-import corrections, CrimSrch, hygenics_crim, crim_common, hygenics_search,ut;
+import corrections,Hygenics_crim  ;
 
 	
 string8 fMinDate2(string8 pDate1, string8 pDate2)
@@ -25,7 +25,7 @@ string fFixDollar(string pAmount)
  +	intformat((integer1)pAmount % 100,2,1),all)
  ;
 
-corrections.layout_courtoffenses tCourtOffensesandCourtOffendertoOffenses(hygenics_crim.layout_CourtOffenses pCourtOffenses, corrections.layout_offender pCourtOffender)
+hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory tCourtOffensesandCourtOffendertoOffenses(hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory pCourtOffenses, corrections.layout_offender pCourtOffender)
  := transform
 	self.fcra_offense_key			:= trim(pCourtOffenses.offender_key)+intformat(hash(pCourtOffenses.arr_date+pCourtOffenses.arr_off_desc_1+pCourtOffenses.court_disp_date+pCourtOffenses.Court_Off_Desc_1),20,1);
 	self.fcra_conviction_flag	:= 'U';
@@ -40,15 +40,15 @@ corrections.layout_courtoffenses tCourtOffensesandCourtOffendertoOffenses(hygeni
 																	'U'
 																	);	*/
 																	
-	self.fcra_date	          := Map(hygenics_crim._functions.Is_valid(ut.getdate, pCourtOffenses.court_disp_date) = 'Y' => pCourtOffenses.court_disp_date,
-	                                 hygenics_crim._functions.Is_valid(ut.getdate, pCourtOffenses.convict_dt)      = 'Y' => pCourtOffenses.convict_dt,
-																	 hygenics_crim._functions.Is_valid(ut.getdate, pCourtOffenses.sent_date)       = 'Y' => pCourtOffenses.sent_date,
-																	// Is_valid(ut.getdate, pCourtOffenses.inc_adm_date) = 'Y'    => pCourtOffenses.inc_adm_date,
+	self.fcra_date	          := Map(hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, pCourtOffenses.court_disp_date) = 'Y' => pCourtOffenses.court_disp_date,
+	                                 hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, pCourtOffenses.convict_dt)      = 'Y' => pCourtOffenses.convict_dt,
+																	 hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, pCourtOffenses.sent_date)       = 'Y' => pCourtOffenses.sent_date,
+																	// Is_valid(hygenics_crim._functions.getdate, pCourtOffenses.inc_adm_date) = 'Y'    => pCourtOffenses.inc_adm_date,
                                    '');
-  self.fcra_date_type	      := Map(hygenics_crim._functions.Is_valid(ut.getdate, pCourtOffenses.court_disp_date) = 'Y' => 'D',
-	                                 hygenics_crim._functions.Is_valid(ut.getdate, pCourtOffenses.convict_dt)      = 'Y' => 'C',
-																	 hygenics_crim._functions.Is_valid(ut.getdate, pCourtOffenses.sent_date)       = 'Y' => 'S',
-																	 //Valid_date(ut.getdate, pCourtOffenses.inc_adm_date) = 'Y'    => 'I',
+  self.fcra_date_type	      := Map(hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, pCourtOffenses.court_disp_date) = 'Y' => 'D',
+	                                 hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, pCourtOffenses.convict_dt)      = 'Y' => 'C',
+																	 hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, pCourtOffenses.sent_date)       = 'Y' => 'S',
+																	 //Valid_date(hygenics_crim._functions.getdate, pCourtOffenses.inc_adm_date) = 'Y'    => 'I',
                                    '');																	 
 
 	self.conviction_override_date		:= if((integer4)pCourtOffenses.court_disp_date<>0,

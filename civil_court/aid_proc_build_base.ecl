@@ -1,4 +1,4 @@
-import civil_court,lib_stringlib,AID;
+import civil_court,lib_stringlib,AID,Address;
 
 //layouts have changed with Date first reported and Date last reported instead of process date
 
@@ -42,6 +42,25 @@ dInAsOutAid := dInAsOutParsed + dInAsOut(entity_1_address_1
 							+entity_1_address_2
 							+entity_1_address_3
 							+entity_1_address_4 = '');
+							
+							
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Clean Name using Business Name Macro
+/////////////////////////////////////////////////////////////////////////////////////////////////////////							
+							
+Address.Mac_Is_Business(dInAsOutAid, entity_1, dInAsOutNameClean, nameType,false,true,
+	e1_title1,    // cleaned title field
+	e1_fname1,		// cleaned first name field
+	e1_mname1,		// cleaned middle name field
+	e1_lname1,		// cleaned last name field
+	e1_suffix1,		// cleaned suffix field
+	e1_title2,    // cleaned title field for name 2
+	e1_fname2,		// cleaned first name field for name 2
+	e1_mname2,		// cleaned middle name field for name 2
+	e1_lname2,		// cleaned last name field for name 2
+	e1_suffix2,		// cleaned suffix field for name 2
+);
+
 //Rollup to set Date first reported and Date last reported
 
 //Populate the last non blank value found in the fields
@@ -59,10 +78,11 @@ civil_court.aid_layouts tRollup(civil_court.aid_layouts L, civil_court.aid_layou
   self.court_code := 				if((R.dt_last_reported > L.dt_last_reported AND R.court<>''), R.court_code , L.court_code );
   self.court := 					if((R.dt_last_reported > L.dt_last_reported AND R.court<>''), R.court , L.court );
   self.case_number := 				if((R.dt_last_reported > L.dt_last_reported), R.case_number , L.case_number );
+	self.e1_cname1   := map(L.nameType = 'B' and L.e1_cname1 = '' => L.entity_1,L.e1_cname1);
   self := R;
 end;
 
-dInAsOutDist	:= distribute(dInAsOutAid,hash(vendor,state_origin,case_key));
+dInAsOutDist	:= distribute(dInAsOutNameClean,hash(vendor,state_origin,case_key));
 
 
 dInAsOutSorted	:= 

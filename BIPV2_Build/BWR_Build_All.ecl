@@ -1,13 +1,10 @@
-/*2016-06-17T21:56:59Z (Harrison Sun_prod)
-RR Bug: RR-10306 - Linking: BIP Sprint 39 Build
-*/
 import bipv2,bipv2_build,BIPV2_Files,BIPV2_DotID,wk_ut;
 //version
 lversion              := BIPV2.KeySuffix       ;
 //Start iterations
-DotStartIteration     := 154                   ;
-ProxStartIteration    := 266                   ;
-Lgid3StartIteration   := 83                    ;
+DotStartIteration     := 181                   ;
+ProxStartIteration    := 338                   ;
+Lgid3StartIteration   := 229                   ;
 PowDownStartIteration := 1                     ;
 PowStartIteration     := 1                     ;
 EmpDownStartIteration := 1                     ;
@@ -16,8 +13,8 @@ EmpStartIteration     := 1                     ;
 DotNumIterations      := 3                     ;
 ProxNumIterations     := 2                     ;
 ProxMj6NumIterations  := 3                     ;
-ProxPostNumIterations := 2                     ; //changed to 2 according to Vern's email 4/20/2016
-Lgid3NumIterations    := 15                    ;//change from 4 to 10 after 2/16/2016 BIP meeting. changed to 15 according to Vern's email 4/20/2016
+ProxPostNumIterations := 3                     ; //added 1 more iteration for more convergence 6/20/2017
+Lgid3NumIterations    := 15                    ;//For S47, use 15 and will back to 8 after S47!!! change from 4 to 10 after 2/16/2016 BIP meeting. changed to 15 according to Vern's email 4/20/2016; change to 8 on 20161215
 PowDownNumIterations  := 2                     ;
 PowNumIterations      := 2                     ;
 EmpDownNumIterations  := 6                     ;  //On 12/17/2015 BIP meeting, we agreed to +3 more iterations, so change from 3 to 6 
@@ -76,7 +73,8 @@ SkipIndustry          := SkipBest             ; // --
 SkipMisckeys          := SkipIndustry         ; // --
 SkipSegStats          := SkipMisckeys         ; // -- Thread 3
 SkipStrata            := SkipSegStats         ; // --
-SkipSeleidRelative    := SkipStrata           ; // -- Thread 4
+SkipOverlinking       := SkipStrata           ; // --
+SkipSeleidRelative    := SkipOverlinking      ; // -- Thread 4
 SkipCDWBuild          := SkipSeleidRelative   ; // -- back to Master
 SkipXAppend           := SkipCDWBuild         ; //
 SkipDataCard          := SkipXAppend          ;
@@ -89,7 +87,7 @@ SkipDOTSpecsPost      := SkipUpdateDOPS       ;
 SkipSeleRelSpecsPost  := SkipDOTSpecsPost     ;
 OmitDisposition       := 'preserve'            ;// NOTE: Set to 'preserve' or 'ghost' to recover from a missing source in the ingest file
 RenameKeysFilter         := 'bipv2_proxid|strnbrname|bipv2_relative|biz_preferred'  ;
-InputFilenameForProxMj6  := BIPV2_Proxid.filenames().base.built    ; //'BIPV2_Files.files_dotid.FILE_BASE'  //default is to start where we left off
+InputFilenameForProxMj6  := BIPV2_Proxid.filenames().out.built    ; //'BIPV2_Files.files_dotid.FILE_BASE'  //default is to start where we left off
 InputFilenameForProxPost := bipv2_proxid_mj6._filenames().out.built ; //'BIPV2_Files.files_dotid.FILE_BASE'  //default is to start where we left off
 #workunit('name'    ,'BIPV2 Full Build ' + lversion );
 #workunit('priority','high'                         );
@@ -163,6 +161,7 @@ BIPV2_Build.proc_build_all(
   ,pSkipMisckeys          := SkipMisckeys
   ,pSkipSegStats          := SkipSegStats
   ,pSkipStrata            := SkipStrata
+  ,pSkipOverlinking       := SkipOverlinking
   ,pSkipSeleidRelative    := SkipSeleidRelative
   ,pSkipCDWBuild          := SkipCDWBuild
   ,pSkipXAppend           := SkipXAppend

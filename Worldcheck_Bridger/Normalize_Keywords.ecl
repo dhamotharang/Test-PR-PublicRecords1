@@ -3,7 +3,7 @@
 
 import WorldCheck, lib_stringlib, ut;
 
-export Normalize_Keywords(dataset(Layout_WorldCheck_Premium) in_f):= function
+export Normalize_Keywords(dataset(Layout_Rectified) in_f):= function
 
 	//Reformat to Premium Layout
 	in_file := in_f;

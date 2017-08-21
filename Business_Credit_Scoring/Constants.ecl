@@ -13,8 +13,8 @@ MODULE
 	EXPORT	MonthsToKeep		:=	24;
 
 	//	Score MIN and MAX
-	EXPORT	Min_Score_Range	:=	0;
-	EXPORT	Max_Score_Range	:=	900;
+	EXPORT	Min_Score_Range	:=	BusinessCredit_Services.Constants.MIN_SCORE_RANGE;
+	EXPORT	Max_Score_Range	:=	BusinessCredit_Services.Constants.MAX_SCORE_RANGE;
 
 	//	DBT MIN and MAX
 	EXPORT	Min_DBT_range		:=	BusinessCredit_Services.Constants.DBT_MIN_RANGE;

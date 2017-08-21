@@ -10,6 +10,7 @@ EXPORT Phone_Shell.Layout_Modeling_Shell To_Modeling_Shell(DATASET(Phone_Shell.L
 		
 		// Phone Shell Fields
 		SELF.AcctNo := le.Phone_Shell.Input_Echo.AcctNo;
+		SELF.AccountNumber := le.Phone_Shell.Input_Echo.AcctNo;
 		SELF.ps_in_Fname := le.Phone_Shell.Input_Echo.in_Fname;
 		SELF.ps_in_StreetAddress := le.Phone_Shell.Input_Echo.in_StreetAddress;
 		SELF.ps_in_City := le.Phone_Shell.Input_Echo.in_City;

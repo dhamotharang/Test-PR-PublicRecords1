@@ -1,4 +1,15 @@
-IMPORT Gong, ut;
+IMPORT Gong_Neustar, ut, cellphone, Risk_indicators,mdr;
+
+EXPORT YellowPages_Base_Gong(
+   string																	  pversion
+  ,dataset(Gong_Neustar.Layout_Gong_Did   )	pGongFull = Gong_Neustar.File_Gong_full
+	,dataset(Layout_YellowPages_Base_V2_bip	)	pYpBase		= YellowPages.YellowPages_Base_YP(pversion)
+
+) :=
+function
+
+// Filter off the historical YP records
+dYpBase := pYpBase(record_type <> 'H');
 
 Layout_Gong_Slim := RECORD
 string1           listing_type_gov;
@@ -40,18 +51,18 @@ string5           name_suffix;
 END;
 
 // Initialize Gong Match file
-Layout_Gong_Slim InitGongMatch(Gong.Layout_bscurrent_raw L) := TRANSFORM
+Layout_Gong_Slim InitGongMatch(pGongFull L) := TRANSFORM
 SELF := L;
 END;
 
-Gong_Match_Init := PROJECT(Gong.File_Gong_full(listing_type_bus<>'', listed_name <> '', publish_code IN ['P','U']), InitGongMatch(LEFT));
+Gong_Match_Init := PROJECT(pGongFull(listing_type_bus<>'', listed_name <> '', publish_code IN ['P','U']), InitGongMatch(LEFT));
 
 // Keep Gong Records which do not match Yellow Pages
 // Join YellowPage Listings to Gong by phone
 Gong_Match_Phone_Dist := DISTRIBUTE(Gong_Match_Init(phone10<>''), HASH(phone10));
-Yellow_Pages_Phone_Dist := DISTRIBUTE(YellowPages.YellowPages_Base_YP(phone10<>''), HASH(phone10));
+Yellow_Pages_Phone_Dist := DISTRIBUTE(dYpBase(phone10<>''), HASH(phone10));
 
-Layout_Gong_Slim MatchGong(Layout_Gong_Slim L, YellowPages.Layout_YellowPages_Base R) := TRANSFORM
+Layout_Gong_Slim MatchGong(Layout_Gong_Slim L, YellowPages.Layout_YellowPages_Base_V2_bip R) := TRANSFORM
 SELF := L;
 END;
 
@@ -63,11 +74,11 @@ GongToYP_Phone_NoMatch := JOIN(Gong_Match_Phone_Dist,
                                LEFT ONLY,
                                LOCAL);
 
-COUNT(GongToYP_Phone_NoMatch);
+OUTPUT(COUNT(GongToYP_Phone_NoMatch), NAMED('COUNT_GongToYP_Phone_NoMatch_'+pversion));
 
 // Join YellowPage to Gong by Primary Address
 GongToYP_Phone_NoMatch_Dist := DISTRIBUTE(GongToYP_Phone_NoMatch((INTEGER)z5<>0, prim_name<>''), HASH(z5, prim_name, prim_range));
-YellowPages_Addr_Dist := DISTRIBUTE(YellowPages.YellowPages_Base_YP((INTEGER)zip<>0, prim_name<>''), HASH(zip, prim_name, prim_range));
+YellowPages_Addr_Dist := DISTRIBUTE(dYpBase((INTEGER)zip<>0, prim_name<>''), HASH(zip, prim_name, prim_range));
 
 GongToYP_Addr_Primary_NoMatch := JOIN(GongToYP_Phone_NoMatch_Dist,
                                       YellowPages_Addr_Dist,
@@ -80,7 +91,7 @@ GongToYP_Addr_Primary_NoMatch := JOIN(GongToYP_Phone_NoMatch_Dist,
                                       LEFT ONLY,
                                       LOCAL);
 
-COUNT(GongToYP_Addr_Primary_NoMatch);
+OUTPUT(COUNT(GongToYP_Addr_Primary_NoMatch), NAMED('COUNT_GongToYP_Addr_Primary_NoMatch_'+pversion));
 
 // Join YellowPages to Gong by Vanity Address
 GongToYP_Addr_Primary_NoMatch_Dist := DISTRIBUTE(GongToYP_Addr_Primary_NoMatch((INTEGER)z5<>0, v_prim_name<>'', v_prim_name <> prim_name), HASH(z5, v_prim_name, prim_range));
@@ -97,13 +108,15 @@ GongToYP_Addr_Vanity_NoMatch := JOIN(GongToYP_Addr_Primary_NoMatch_Dist,
                                      LEFT ONLY,
                                      LOCAL);
 
-COUNT(GongToYP_Addr_Vanity_NoMatch);
+OUTPUT(COUNT(GongToYP_Addr_Vanity_NoMatch), NAMED('COUNT_GongToYP_Addr_Vanity_NoMatch_'+pversion));
 
 // Create final output
 GongToYP_Addr_NoMatch := GongToYP_Addr_Primary_NoMatch((INTEGER)z5<>0, v_prim_name<>'', v_prim_name = prim_name) + GongToYP_Addr_Vanity_NoMatch;
+//append phone type
+YellowPages.NPA_PhoneType(GongToYP_Addr_NoMatch,phone10,phoneType,appnd_GongToYP_Addr_NoMatch);
 
 // Format non-matched Gong Business Records as pseudo-YellowPage records
-YellowPages.Layout_YellowPages_Base FormatGongToYP(Layout_Gong_Slim L) := TRANSFORM
+YellowPages.Layout_YellowPages_Base_V2_bip FormatGongToYP(appnd_GongToYP_Addr_NoMatch L) := TRANSFORM
 SELF.primary_key := '';
 SELF.business_name := L.listed_name;
 SELF.orig_street := StringLib.StringCleanSpaces(TRIM(L.prim_range) + ' ' + TRIM(L.predir) + ' ' + TRIM(L.prim_name) + ' ' +
@@ -120,7 +133,7 @@ SELF.heading_string := '';
 SELF.sic_code := '';
 SELF.toll_free_indicator := '';
 SELF.fax_indicator := '';
-SELF.pub_date := L.filedate[1..6];
+SELF.pub_date := L.filedate[1..8];
 SELF.index_value := '';
 SELF.naics_code := '';
 SELF.web_address := '';
@@ -183,13 +196,18 @@ SELF.nn_fix_alt_zip2 := '';
 SELF.n_fix_state := '';
 SELF.address_override := '';
 SELF.phone_override := '';    // 'G' if replaced from Gong phone
-SELF.phone_type := datalib.NPA_PhoneType(L.phone10);
+SELF.phone_type := L.phoneType;
 SELF.source := IF(L.listing_type_gov <> ''
-                   OR ut.GovName(ut.CleanCompany(L.listed_name)), 'GG', 'GB');
+                   OR ut.GovName(ut.CleanCompany(L.listed_name)), MDR.sourceTools.src_Gong_Government, MDR.sourceTools.src_Gong_Business);
+self		:= [];
 
 END;
 
-GongToYP_Formatted := PROJECT(GongToYP_Addr_NoMatch, FormatGongToYP(LEFT));
-COUNT(GongToYP_Formatted);
+GongToYP_Formatted := PROJECT(appnd_GongToYP_Addr_NoMatch, FormatGongToYP(LEFT));
+OUTPUT(COUNT(GongToYP_Formatted), NAMED('COUNT_GongToYP_Formatted_'+pversion));
 
-EXPORT YellowPages_Base_Gong := GongToYP_Formatted : PERSIST('TEMP::YellowPages_Base_Gong');
+returndataset := GongToYP_Formatted : PERSIST(persistnames().YellowPagesBaseGong);
+
+return returndataset;
+
+end;

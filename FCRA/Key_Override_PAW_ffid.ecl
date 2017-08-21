@@ -1,6 +1,6 @@
 import fcra, ut;
 
-base_file := dataset('~thor_data400::base::override::fcra::qa::PAW',FCRA.Layout_Override_PAW,flat);
+base_file := dataset('~thor_data400::base::override::fcra::qa::PAW',FCRA.Layout_Override_PAW,csv(separator('\t'),quote('\"'),terminator('\r\n')));
 
 kf := dedup(sort(base_file,-flag_file_id),except flag_file_id,keep(1));
 

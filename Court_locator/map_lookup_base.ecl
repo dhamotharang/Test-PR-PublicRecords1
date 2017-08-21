@@ -33,7 +33,7 @@ sfShuffle := sequential(
 	fileservices.clearsuperfile('~thor_data400::base::CourtLocatorLookup_grandfather'),
 	fileservices.addsuperfile('~thor_data400::base::CourtLocatorLookup_grandfather','~thor_data400::base::CourtLocatorLookup_father',0,true),
 	fileservices.clearsuperfile('~thor_data400::base::CourtLocatorLookup_father'),
-	fileservices.addsuperfile('~thor_data400::base::CourtLocatorLookup_father','~thor_data400::base::ntlcrash_inquiry',0,true),
+	fileservices.addsuperfile('~thor_data400::base::CourtLocatorLookup_father','~thor_data400::base::CourtLocatorLookup',0,true),
 	fileservices.clearsuperfile('~thor_data400::base::CourtLocatorLookup'),
 	fileservices.addsuperfile('~thor_data400::base::CourtLocatorLookup','~thor_data400::base::'+filedate+'::CourtLocatorLookup'),
 	fileservices.finishsuperfiletransaction()

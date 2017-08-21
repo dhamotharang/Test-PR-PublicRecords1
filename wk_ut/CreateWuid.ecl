@@ -1,4 +1,3 @@
-import tools,ut,_control;
 EXPORT CreateWuid(
 
    string  pEcl

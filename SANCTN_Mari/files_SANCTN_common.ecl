@@ -6,7 +6,7 @@ export incident_common	:= dataset(SANCTN_Mari.cluster_name +'out::SANCTN::NP::mi
 
 export incident_bip	:= dataset(SANCTN_Mari.cluster_name +'base::SANCTN::NP::incident_bip',SANCTN_Mari.layouts_SANCTN_common.SANCTN_incident_bip,thor);
 
-export party_common	:= dataset(SANCTN_Mari.cluster_name +'out::SANCTN::NP::midex_party_base',SANCTN_Mari.layouts_SANCTN_common.SANCTN_party_base,thor);
+export party_common	:= dataset(SANCTN_Mari.cluster_name +'out::SANCTN::NP::midex_party_base',SANCTN_Mari.layouts_SANCTN_common.SANCTN_party_base-enh_did_src,thor);
 								
 export incident_text	:= dataset(SANCTN_Mari.cluster_name +'base::SANCTN::NP::incidenttext',SANCTN_Mari.layouts_SANCTN_common.SANCTN_incident_text,thor);
 

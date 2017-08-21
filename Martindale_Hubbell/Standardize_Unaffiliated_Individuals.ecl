@@ -205,7 +205,7 @@ module
 		transform
 
 			self.dt_first_seen								:= ut.EarliestDate(	l.dt_first_seen	,r.dt_first_seen);
-			self.dt_last_seen									:= ut.LatestDate(		l.dt_last_seen	,r.dt_last_seen	);
+			self.dt_last_seen									:= max(		l.dt_last_seen	,r.dt_last_seen	);
 
 			self.ROSTERAUDIT_DATE							:= l.ROSTERAUDIT_DATE;
 			                                                                           

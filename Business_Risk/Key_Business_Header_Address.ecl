@@ -1,6 +1,10 @@
-import business_header, doxie, ut;
+import business_header, doxie, ut, Prte2_Business_Header;
 
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+f := Prte2_Business_Header.File_Business_Header_Base_for_keybuild( (prim_name!='' or prim_range!='') and zip!=0 and bdid!=0);
+#ELSE
 f := Business_Header.File_Business_Header_Base_for_keybuild( (prim_name!='' or prim_range!='') and zip!=0 and bdid!=0);
+#END;
 
 export Key_Business_Header_Address := index(f,{zip,prim_range,prim_name,sec_range},
 													{bdid,

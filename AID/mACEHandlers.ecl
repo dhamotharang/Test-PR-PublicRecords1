@@ -1,9 +1,9 @@
 export mACEHandlers
  :=
   module
-		import lib_StringLib, lib_FileServices, lib_addrclean, ut, lib_ThorLib;
+		import lib_StringLib, lib_FileServices, Address, std, lib_ThorLib;
 
-		shared	lCurrentDate	:=	ut.GetDate : global;	// just to prevent the transforms from calling the function for every record in any transforms below
+		shared	lCurrentDate	:=	(STRING8)Std.Date.Today() : global;	// just to prevent the transforms from calling the function for every record in any transforms below
 
 		/**************************************************************************************/
 		export	Layouts.rACEStruct	fACEStructRecordFromString182(string182 pACEAddress182)
@@ -92,7 +92,7 @@ export mACEHandlers
 						self.rAIDWork_ACECache.CountSeen			:=	1;
 						self.rAIDWork_ACECache.ReferAID				:=	0;
 						self.rAIDWork_ACECache.CreatedWUID		:=	'';
-						self.rAIDWork_ACECache								:=	row(fACEStructRecordFromString182(lib_addrclean.AddrCleanLib.cleanaddress182(pInput.rAIDWork_StdCache.Line1 ,pInput.rAIDWork_StdCache.LineLast)));
+						self.rAIDWork_ACECache								:=	row(fACEStructRecordFromString182(Address.cleanaddress182(pInput.rAIDWork_StdCache.Line1 ,pInput.rAIDWork_StdCache.LineLast)));
 						self.rAIDWork_StdCache.Cleaner				:=	Common.eAddressType.ACE;
 						self.rAIDWork_StdCache.CleanAID				:=	0;
 						self.rAIDWork_StdCache.ReturnCode			:=	''; // Calc in fAppendACECacheFromACEStruct to prevent recleaning by referencing self.rAIDWork_ACECache again
@@ -261,7 +261,19 @@ export mACEHandlers
 				recordof(dCombinedDistSort)	tPropagateToACEDuplicates(recordof(dCombinedDistSort) pLeft, recordof(dCombinedDistSort) pRight)
 				 :=
 					transform
-						boolean	lShouldPropagate							:=	pRight.AIDWork_ACEStructSameAsRecordID = pLeft.AIDWork_ACEStructSameAsRecordID
+						boolean	lShouldPropagate							:=	(pRight.AIDWork_ACEStructSameAsRecordID = pLeft.AIDWork_ACEStructSameAsRecordID
+																									 and pLeft.rAIDWork_ACECache.prim_range  = pRight.rAIDWork_ACECache.prim_range
+																									 and pLeft.rAIDWork_ACECache.predir      = pRight.rAIDWork_ACECache.predir
+																									 and pLeft.rAIDWork_ACECache.prim_name   = pRight.rAIDWork_ACECache.prim_name
+																									 and pLeft.rAIDWork_ACECache.addr_suffix = pRight.rAIDWork_ACECache.addr_suffix
+																									 and pLeft.rAIDWork_ACECache.postdir     = pRight.rAIDWork_ACECache.postdir
+																									 and pLeft.rAIDWork_ACECache.unit_desig  = pRight.rAIDWork_ACECache.unit_desig
+																									 and pLeft.rAIDWork_ACECache.sec_range   = pRight.rAIDWork_ACECache.sec_range
+																									 and pLeft.rAIDWork_ACECache.v_city_name = pRight.rAIDWork_ACECache.v_city_name
+																									 and pLeft.rAIDWork_ACECache.st          = pRight.rAIDWork_ACECache.st
+																									 and pLeft.rAIDWork_ACECache.zip5        = pRight.rAIDWork_ACECache.zip5
+																									 and pLeft.rAIDWork_ACECache.zip4        = pRight.rAIDWork_ACECache.zip4
+																											)
 																									or	pRight.rAIDWork_RawCache.Flags & Common.eFlags.ACENormalized <> 0;
 						self.AIDWork_RecordID									:=	pRight.AIDWork_RecordID;
 						self.AIDWork_RawStructSameAsRecordID	:=	pRight.AIDWork_RawStructSameAsRecordID;

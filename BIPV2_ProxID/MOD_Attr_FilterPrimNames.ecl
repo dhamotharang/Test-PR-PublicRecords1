@@ -41,7 +41,7 @@ end;
   RETURN D2_tokeep;
 ENDMACRO;
 
-SHARED Cands := match_candidates(ih).FilterPrimNames_candidates;
+SHARED Cands := dataset([],recordof(match_candidates(ih).FilterPrimNames_candidates));
 SHARED s := Specificities(ih).Specificities[1];
  
 // Generate match candidates based upon this attribute file

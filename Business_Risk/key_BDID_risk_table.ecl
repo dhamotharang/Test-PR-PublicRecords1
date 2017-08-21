@@ -1,6 +1,10 @@
-import doxie;
+Import Data_Services, doxie, Prte2_Business_Header;
 
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+r := Prte2_Business_Header.BDID_risk_Table;
+#ELSE
 r := business_risk.BDID_risk_Table;
+#END;
 
 layout_bdid_risk_table_temp := record
 unsigned6 bdid;

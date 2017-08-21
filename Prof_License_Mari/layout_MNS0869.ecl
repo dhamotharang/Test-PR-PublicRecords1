@@ -1,0 +1,138 @@
+// MNS0869 / Minnesotas Bookstore /	Real Estate //
+
+export layout_MNS0869 := module
+
+export rec := record
+	string10   LICTYPE;
+	string20   SLNUM;
+	string10   NAIC;
+	string10   BUSABBREV;
+	string200  BUSDBA;
+	string200  BUSNAME;
+	string50   ADDRESS1;
+	string50   ADDRESS2;
+	string25   CITY;
+	string25   STATE;
+	string10   ZIPCODE;
+	string10   FZIPCODE;
+	string10   LIMIT1;
+	string10   LIMIT2;
+	string10   LIMIT3;
+	string10   LIMIT4;
+	string20   ISSUEDT;
+	string20   CURISSUEDT;
+	string20   INTERRUPTDT;
+	string20   EXPDT;
+	string30   LICSTAT;
+	string20   TELEPHONE;
+	string10   QPFNAME;
+	string10   QPLNAME;
+	string10   QPMNAME;
+	string10   QPJRSR;   
+	//string		 dummy_field;		//extra field is added for  20131017 and 20131118
+	string10   CID;
+	string5    empty_field2;
+	string10   COUNTY_CD;
+	string10   COUNTY;
+	// string30   FNAME;
+	// string30   LNAME;
+	// string30   MNAME;
+	// string10   JRSR;
+	// string10   LIMIT5;
+	// string10   LIMIT6;
+	// string10   LIMIT7;
+	// string10   LIMIT8;
+	// string10   CEEXEMPT;
+	// string10   CEHOURS;
+	// string10   CEDUEDATE;
+	// string10   RECIPRICAL;
+	// string10   RESIDENT;
+	// string60   OFFICENAME;
+	
+END;
+
+
+export rea := record
+  string10   LICTYPE;
+	string20   SLNUM;
+  string30   LNAME;
+	string30   FNAME;
+	string30   MNAME;
+	string10   JRSR;
+	string50   ADDRESS1;
+	string50   ADDRESS2;
+	string25   CITY;
+	string25   STATE;
+	string10   ZIPCODE;
+	string10   FZIPCODE;
+	string20   TELEPHONE;
+	// string10   COUNTY;
+	string10   LIMIT1;
+	string10   LIMIT2;
+	string10   LIMIT3;
+	string10   LIMIT4;
+	string10   LIMIT5;
+	string10   LIMIT6;
+	string10   LIMIT7;
+	string10   LIMIT8;
+	string10   CEEXEMPT;
+	string10   CEHOURS;
+	string10   CEDUEDATE;
+	string10   RECIPRICAL;
+	string10   RESIDENT;
+	string20   ISSUEDT;
+	string20   CURISSUEDT;
+	string20   INTERRUPTDT;
+	string20   EXPDT;
+	string30   LICSTAT;
+	string60   OFFICENAME;
+	string10   CID;
+	string10   COUNTY_CD;
+	string10   COUNTY;
+	
+end;
+export common := record
+	string10   LICTYPE;
+	string20   SLNUM;
+	string10   NAIC;
+  string30   LNAME;
+	string30   FNAME;
+	string30   MNAME;
+	string10   JRSR;
+	string10   BUSABBREV;
+	string200  BUSDBA;
+	string200  BUSNAME;
+	string50   ADDRESS1;
+	string50   ADDRESS2;
+	string25   CITY;
+	string25   STATE;
+	string10   ZIPCODE;
+	string10   FZIPCODE;
+	string20   TELEPHONE;
+	string10   COUNTY;
+	string10   LIMIT1;
+	string10   LIMIT2;
+	string10   LIMIT3;
+	string10   LIMIT4;
+	string10   LIMIT5;
+	string10   LIMIT6;
+	string10   LIMIT7;
+	string10   LIMIT8;
+	string10   CEEXEMPT;
+	string10   CEHOURS;
+	string10   CEDUEDATE;
+	string10   RECIPRICAL;
+	string10   RESIDENT;
+	string20   ISSUEDT;
+	string20   CURISSUEDT;
+	string20   INTERRUPTDT;
+	string20   EXPDT;
+	string30   LICSTAT;
+	string60   OFFICENAME;
+	string10   CID;
+	string10   QPFNAME;
+	string10   QPLNAME;
+	string10   QPMNAME;
+	string10   QPJRSR;   
+end;
+end;

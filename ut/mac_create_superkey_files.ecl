@@ -2,31 +2,8 @@
 all for diffing superkeys
 */
 export mac_create_superkey_files(basename,num_gens = '3',diffing = 'false',diffonly = 'false') := macro
-	#uniquename(foo)
-	string1 %foo% := 'C';
+import roxiekeybuild;
 
-	#if(~diffonly)
-		fileservices.createsuperfile(basename + '_FATHER');
-		fileservices.createsuperfile(basename + '_BUILT');
-		fileservices.createsuperfile(basename + '_QA');
-		fileservices.createsuperfile(basename + '_PROD');
-	#end
-
-	#if(diffing)
-		fileservices.createsuperfile(basename + '_diff_FATHER');
-		fileservices.createsuperfile(basename + '_diff_BUILT');
-		fileservices.createsuperfile(basename + '_diff_QA');
-		fileservices.createsuperfile(basename + '_diff_PROD');
-	#end
-
-	#if(num_gens = 3)
-		#if(~diffonly)
-			fileservices.createsuperfile(basename + '_GRANDFATHER');
-		#end
-		#if(diffing)
-			fileservices.createsuperfile(basename + '_diff_GRANDFATHER');
-		#end
-	#end
+roxiekeybuild.mac_create_superkey_files(basename,num_gens,diffing,diffonly);
 	
-	
-endmacro;
+endmacro : deprecated('use roxiekeybuild.mac_create_superkey_files instead');

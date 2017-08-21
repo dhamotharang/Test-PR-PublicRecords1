@@ -17,7 +17,8 @@ DATASET(rLine) ListToDS(string itemlist) := FUNCTION
 		n := StringLib.StringFindCount(itemlist, ',') + 1;
 		dsItems := PROJECT(DATASET([itemlist], rLine), TRANSFORM(rLine,
 												SELF.line := TRIM(LEFT.line,RIGHT,LEFT)));
-		dsList := DEDUP(SORT(NORMALIZE(dsItems, n, XItem(LEFT,COUNTER)),line),line);
+					//dsList := SORT(NORMALIZE(dsItems, n, XItem(LEFT,COUNTER)),line);
+						dsList := DEDUP(SORT(NORMALIZE(dsItems, n, XItem(LEFT,COUNTER)),line),line);
 		return IF(n<=1,dsList(line<>''),dsList(line<>''));
 END;
 
@@ -26,6 +27,7 @@ rLine rollreferences(rLine L, rLine R) := TRANSFORM
 		sep := ' | ';
 		self.line := IF(L.line='',R.line,
 								IF(R.line='', L.line, L.line + sep + R.line));
+								//IF(R.line='', L.line, (IF ((R.Line='JR.' or R.line='SR.'),L.line + ' ' + R.Line, L.line + sep + R.line))));
 END;
 
 EXPORT TrimReferences(string crossreferences) := FUNCTION

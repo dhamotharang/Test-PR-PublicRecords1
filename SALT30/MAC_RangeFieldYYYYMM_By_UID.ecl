@@ -15,5 +15,5 @@ EXPORT MAC_RangeFieldYYYYMM_By_UID(infile,ufield,infield,low_infield,high_infiel
   END;
 #uniquename(n)
 %n% := NORMALIZE(%idata%,LEFT.xx_high-LEFT.xx_low+1,%tr%(LEFT,COUNTER+LEFT.xx_low-1));
-outfile := TABLE( %n%,{ufield,infield,Cnt := COUNT(GROUP)},ufield,infield,LOCAL);
+outfile := DEDUP( SORT( %n%,ufield,infield,LOCAL), ufield,infield,LOCAL );
   ENDMACRO;

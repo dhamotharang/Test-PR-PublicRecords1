@@ -32,6 +32,7 @@ export CreditUnion_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.clean_address.v_city_name),
 				self.state := left.clean_address.st,
 				self.zip := left.clean_address.zip,
+				self.zip4 := left.clean_address.zip4,
 				self.county_fips := left.clean_address.fips_county,
 				self.msa := left.clean_address.msa,
 				self.phone := '',
@@ -61,6 +62,8 @@ export CreditUnion_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.name_middle := left.clean_contact_name.mname,
 				self.name_last := left.clean_contact_name.lname,
 				self.name_suffix := left.clean_contact_name.name_suffix,
+				self.did := left.did,
+				self.score := left.did_score,
 				self := []));
 		
 		return extract;

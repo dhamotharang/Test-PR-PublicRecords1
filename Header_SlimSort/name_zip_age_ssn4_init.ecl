@@ -1,14 +1,14 @@
-import ut;
+import ut,std;
 
 ip := header_slimsort.propagated_matchrecs;
 hdrs := ip(lname <> '' AND fname <> '');
 
 IsValidDate(INTEGER i) := 
 	(STRING)i >= '19000000' AND 
-	(STRING)i <= ut.GetDate;
+	(STRING)i <= (STRING8)Std.Date.Today();
 
 Layout_Name_Age_Zip_SSN4 Proj(hdrs le) := TRANSFORM
-	SELF.age := IF (IsValidDate(le.dob), ut.GetAge((STRING) le.dob), 0);
+	SELF.age := IF (IsValidDate(le.dob), ut.Age((UNSIGNED)le.dob), 0);
 	SELF.ssn4 := (UNSIGNED2) (INTFORMAT((INTEGER) le.ssn, 9, 1)[6..9]);
 	SELF := le;
 END;

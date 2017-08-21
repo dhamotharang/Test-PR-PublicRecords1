@@ -1,0 +1,2 @@
+export Proc_Sanction_Boolean_Keys(string filedate) := sequential(Ingenix_natlprof.BWR_Build_Segment_Metadata('sanctions',filedate),
+																  Ingenix_natlprof.BWR_Build_Sanction_Boolean(filedate));

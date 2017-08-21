@@ -37,6 +37,7 @@ export IPAddress
 	// export	string	prod_watch_sasha := '';
 	
 	export  string NewLogTHOR_dali      := '10.241.50.45';
+	export  string FCRALogTHOR_dali      := '10.173.52.1';
 
 	export  string bair_prod_ESP       := '10.240.32.15';
 	export  string bair_Dev_ESP        := '10.240.32.16';
@@ -48,7 +49,7 @@ export IPAddress
 	export  string bair_dataland_dali  := '1.1.1.122';
 	export  string bair_LZ_VIP      := 'bair-batchlz.risk.regn.net';
 	export  string bair_batchlz01      := 'bair-batchlz.risk.regn.net';//10.240.0.47
-	export  string abair_batchlz01     := 'bair-batchlz.risk.regn.net';//10.240.128.41
+	export  string abair_batchlz01     := 'abair-batchlz.risk.regn.net';//10.240.128.41
 
   end
  ;

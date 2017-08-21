@@ -101,4 +101,7 @@ EXPORT layout_death_master_supplemental := RECORD
 	STRING76	orig_address2	:=	'';
 	STRING16	statefn				:=	'';	// State File Number used to associate this record with a state
 	STRING1		lf;
+	UNSIGNED8	ScrubsBits1		:=	0;
+	UNSIGNED8	ScrubsBits2		:=	0;
+	UNSIGNED8	ScrubsBits3		:=	0;
 END;

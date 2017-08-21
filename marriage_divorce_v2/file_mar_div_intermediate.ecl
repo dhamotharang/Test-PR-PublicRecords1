@@ -1,1 +1,1 @@
-export file_mar_div_intermediate := dataset('~thor_data400::base::mar_div::intermediate',marriage_divorce_v2.layout_mar_div_intermediate,flat);
+export file_mar_div_intermediate := dataset('~thor_data400::base::mar_div::intermediate_prod',marriage_divorce_v2.layout_mar_div_intermediate,flat);

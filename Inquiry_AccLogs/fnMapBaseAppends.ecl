@@ -2,7 +2,9 @@ import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, he
 
 /* hashes fields used to did, bdid. only outputs records that have changes (new or update) */
 
-export fnMapBaseAppends(dataset(recordof(inquiry_acclogs.fn_ProdHist().File)) Base_File = inquiry_acclogs.fn_ProdHist().File, boolean isFCRA = false, string pBuildDate = ut.getdate) := module
+export fnMapBaseAppends(dataset(recordof(inquiry_acclogs.fn_ProdHist().File)) Base_File = inquiry_acclogs.fn_ProdHist().File, 
+																					boolean isFCRA = false,
+																					string history_logs_version = ut.GetDate) := module
 
 export FCRAtag := if(isFCRA, 'FCRA::', '');
 
@@ -29,19 +31,19 @@ export reappend_layout := RECORD
  
 export file := dataset('~thor_data400::out::inquiry_acclogs::'+FCRAtag+'reappend_records', reappend_layout, thor);
 
-/* !!!!!!!!!!!!!!!!! CHECK UPDATES !!!!!!!!!!!!!!!!!!!!! */
+/* !!!!!!!!!!!!!!!!! CHECK UPDATES - Roxie SCOps having issue - Cause WU to crash !!!!!!!!!!!!!!!!!!!!! */
 
-export hversion := did_add.get_EnvVariable('header_file_version');
-export bversion := did_add.get_EnvVariable('bheader_file_version');
+// export hversion := did_add.get_EnvVariable('header_file_version');
+// export bversion := did_add.get_EnvVariable('bheader_file_version');
 
-export is_hversion_New := ut.IsNewProdHeaderVersion('inquiry_acclogs','header_file_version');
-export is_bversion_New := ut.IsNewProdHeaderVersion('inquiry_acclogs','bheader_file_version');
+// export is_hversion_New := ut.IsNewProdHeaderVersion('inquiry_acclogs','header_file_version');
+// export is_bversion_New := ut.IsNewProdHeaderVersion('inquiry_acclogs','bheader_file_version');
 
-export update_hversion := ut.PostDID_HeaderVer_Update('inquiry_acclogs','header_file_version');
-export update_bversion := ut.PostDID_HeaderVer_Update('inquiry_acclogs','bheader_file_version');
+// export update_hversion := ut.PostDID_HeaderVer_Update('inquiry_acclogs','header_file_version');
+// export update_bversion := ut.PostDID_HeaderVer_Update('inquiry_acclogs','bheader_file_version');
 
-export IQbuild_header_version := dataset(ut.foreign_prod + 'thor_data400::flag::inquiry_acclogs::'+FCRAtag+'prodheaderversion',{string10 prodheaderdate, string pkgvariable},thor)(pkgvariable = 'header_file_version')[1].prodheaderdate;
-export IQbuild_bheader_version := dataset(ut.foreign_prod + 'thor_data400::flag::inquiry_acclogs::'+FCRAtag+'prodheaderversion',{string10 prodheaderdate, string pkgvariable},thor)(pkgvariable = 'bheader_file_version')[1].prodheaderdate;
+// export IQbuild_header_version := dataset(ut.foreign_prod + 'thor_data400::flag::inquiry_acclogs::'+FCRAtag+'prodheaderversion',{string10 prodheaderdate, string pkgvariable},thor)(pkgvariable = 'header_file_version')[1].prodheaderdate;
+// export IQbuild_bheader_version := dataset(ut.foreign_prod + 'thor_data400::flag::inquiry_acclogs::'+FCRAtag+'prodheaderversion',{string10 prodheaderdate, string pkgvariable},thor)(pkgvariable = 'bheader_file_version')[1].prodheaderdate;
 
 /* !!!!!!!!!!!!!!!!! FIELD APPENDS !!!!!!!!!!!!!!!!!!!!! */
 
@@ -165,34 +167,73 @@ output_for_remote_read := project(concat_all,
 
 // output_for_remote_read := dedup(sort(dOutput_for_remote_read, bususer_q_id, person_q_id, bus_q_id, local), bususer_q_id, person_q_id, bus_q_id, local);
 
-buildDate := if(pBuildDate = '', ut.GetDate, pBuildDate);
+prev_reappend_version_filenf	:= nothor(fileservices.superfilecontents('~thor_data400::out::inquiry_acclogs::reappend_records')[1].name);
+prev_reappend_version_filef 	:= nothor(fileservices.superfilecontents('~thor_data400::out::inquiry_acclogs::fcra::reappend_records')[1].name);
+prev_reappend_version_file 		:= if(isFCRA,prev_reappend_version_filef,prev_reappend_version_filenf);
+prev_reappend_version 				:= prev_reappend_version_file[stringlib.stringfind(prev_reappend_version_file, '::', 3) + 2..stringlib.stringfind(prev_reappend_version_file, '::', 4) -1];
 
-export buildFile := 
+header_date := did_add.get_EnvVariable('header_file_version');
+
+buildDate := history_logs_version;
+
+export buildFile := if(header_date >= prev_reappend_version,
 					sequential(
 						output(output_for_remote_read,,'~thor_data400::out::inquiry_acclogs::' + buildDate + '::'+FCRAtag+'reappend_records',__compressed__, overwrite);
-						fileservices.promotesuperfilelist(['~thor_data400::out::inquiry_acclogs::'+FCRAtag+'reappend_records',
+						nothor(fileservices.promotesuperfilelist(['~thor_data400::out::inquiry_acclogs::'+FCRAtag+'reappend_records',
 																							 '~thor_data400::out::inquiry_acclogs::'+FCRAtag+'reappend_records::delete'],
-																							 '~thor_data400::out::inquiry_acclogs::' + buildDate + '::'+FCRAtag+'reappend_records', true);
-						update_bversion, update_hversion);			
+																							 '~thor_data400::out::inquiry_acclogs::' + buildDate + '::'+FCRAtag+'reappend_records', true))));
+						// update_bversion, update_hversion);			
 
 empty_hash := 14695981039346656037; // data fields to append IDs are empty
 
 HashBaseFile :=project(base_file, 
-// export HashBaseFile := distribute(project(choosen(inquiry_acclogs.fn_ProdHist().File(person_q.appended_adl > 0), 10000), 
-														transform({unsigned8 person_q_id, unsigned8 bus_q_id, unsigned8 bususer_q_id, recordof(base_file)},
+														transform({unsigned8 person_q_id, unsigned8 bus_q_id, unsigned8 bususer_q_id, 
+																			 integer8 seqcnt := 0, integer8 daysbetween := 0, boolean m2flag := false,
+																			 recordof(base_file)},
 															self.person_q_id := hash64(left.person_q.title + left.person_q.fname + left.person_q.mname + left.person_q.lname + left.person_q.name_suffix + left.person_q.Work_Phone + left.person_q.Personal_Phone + left.person_q.DOB + left.person_q.SSN + left.person_q.prim_range + left.person_q.prim_name + left.person_q.sec_range + left.person_q.st + left.person_q.zip5),
 															self.bus_q_id := hash64(left.bus_q.CName + left.bus_q.Company_Phone + left.bus_q.EIN + left.bus_q.prim_range + left.bus_q.prim_name + left.bus_q.sec_range + left.bus_q.st + left.bus_q.zip5),
 															self.bususer_q_id := hash64(left.bususer_q.title + left.bususer_q.fname + left.bususer_q.mname + left.bususer_q.lname + left.bususer_q.name_suffix + left.bususer_q.Personal_Phone + left.bususer_q.DOB + left.bususer_q.SSN + left.bususer_q.prim_range + left.bususer_q.prim_name + left.bususer_q.sec_range + left.bususer_q.st + left.bususer_q.zip5),
+															SELF.Search_info.start_monitor	:= if(left.bus_intel.use<>'' and left.search_info.datetime[..8] <> '', left.search_info.datetime[..8], left.search_info.start_monitor);
+															SELF.Search_info.stop_monitor	:= if(left.bus_intel.use<>'' and left.search_info.datetime[..8] <> '', left.search_info.datetime[..8], left.search_info.stop_monitor);
 															self := left));
 
-dHashBaseFile := distribute(HashBaseFile(bususer_q_id <> empty_hash or person_q_id <> empty_hash or bus_q_id <> empty_hash), 
-																hash(bususer_q_id, person_q_id, bus_q_id));
+dHashBaseFile := distribute(HashBaseFile(bus_intel.use <> ''), 
+																hash(bus_intel.industry, bus_intel.sub_market, bus_intel.vertical, bus_INTEL.USE, allow_flags.allowflags, search_info.product_code, search_info.method, search_info.function_description, bususer_q_id, person_q_id, bus_q_id));
+																
+gsHashBaseFile := sort(dHashBaseFile, 
+												bus_intel.industry, bus_intel.sub_market, bus_intel.vertical, bus_INTEL.USE, allow_flags.allowflags, search_info.product_code, search_info.method, search_info.function_description, bususer_q_id, person_q_id, bus_q_id ,search_info.datetime[..8], local);
+
+iHashBaseFile := iterate(gsHashBaseFile, transform({recordof(gsHashBaseFile)},
+												fDaysBetween(string dt_l, string dt_r) := ut.DaysApart(dt_l, dt_r);
+												matches := left.bus_intel.industry = right.bus_intel.industry and
+																		left.bus_intel.sub_market = right.bus_intel.sub_market and
+																		left.bus_intel.vertical = right.bus_intel.vertical and
+																		left.bus_INTEL.USE = right.bus_INTEL.USE and
+																		left.allow_flags.allowflags = right.allow_flags.allowflags and
+																		left.search_info.product_code = right.search_info.product_code and
+																		left.search_info.method = right.search_info.method and
+																		left.search_info.function_description = right.search_info.function_description and
+																		left.bususer_q_id = right.bususer_q_id and
+																		left.person_q_id = right.person_q_id and
+																		left.bus_q_id = right.bus_q_id;
+ 
+												self.DaysBetween 		:= fDaysBetween(if(~matches, right.search_info.datetime[..8], left.search_info.datetime[..8]), right.search_info.datetime[..8]);
+												self.M2flag 				:= self.DaysBetween > 60 or ~matches; //greater than 2 months or new record
+												self.seqcnt					:= map(~matches => 1, self.M2flag => counter, left.seqcnt);
+												self.search_info.start_monitor	:= map(self.M2flag => right.search_info.start_monitor[..8], (string)ut.Min2((integer)left.search_info.start_monitor[..8],(integer) right.search_info.start_monitor[..8]));
+												self.search_info.stop_monitor		:= map(self.M2flag => right.search_info.stop_monitor[..8], (string)ut.max2((integer)left.search_info.stop_monitor[..8],(integer) right.search_info.stop_monitor[..8]));
+												self := right), local);
+
+ddHashBaseFile := dedup(iHashBaseFile, bus_intel.industry, bus_intel.sub_market, bus_intel.vertical, bus_INTEL.USE, allow_flags.allowflags, search_info.product_code, search_info.method, search_info.function_description, bususer_q_id, person_q_id, bus_q_id, seqcnt, right, local);
+
+rolledHashBaseFile := HashBaseFile(bus_intel.use = '') + ddHashBaseFile;
+
+rdyHashBaseFile := distribute(rolledHashBaseFile(bususer_q_id <> empty_hash or person_q_id <> empty_hash or bus_q_id <> empty_hash), 
+												hash(bususer_q_id, person_q_id, bus_q_id));
 
 dFile := distribute(File, hash(bususer_q_id, person_q_id, bus_q_id));
 
-
-
-JoinIDedToHashedBase := join(dHashBaseFile, dFile,
+JoinIDedToHashedBase := join(rdyHashBaseFile, dFile,
 															left.person_q_id = right.person_q_id and
 															left.bus_q_id = right.bus_q_id and
 															left.bususer_q_id = right.bususer_q_id,
@@ -205,20 +246,19 @@ JoinIDedToHashedBase := join(dHashBaseFile, dFile,
 																	self.bus_q.appended_ein := if(right.person_q_id > 0, right.bus_q_apfein, left.bus_q.appended_ein);
 																	self := left), left outer, local, keep(1));
 
-concat_all := JoinIDedToHashedBase + HashBaseFile(person_q_id = empty_hash and bus_q_id = empty_hash and bususer_q_id = empty_hash);
+shared concat_all := JoinIDedToHashedBase + rolledHashBaseFile(person_q_id = empty_hash and bus_q_id = empty_hash and bususer_q_id = empty_hash);
 
-history_filename_old := fileservices.superfilecontents('~thor_data400::out::inquiry_tracking::weekly_historical')[1].name;
-history_filename_new := history_filename_old+'::'+ut.GetDate+'_reappend';
+history_filename_new := '~thor_data400::out::inquiry::'+history_logs_version+'::mbs::append_previous::'+ut.GetDate+'_reappend':INDEPENDENT;
 
 export AppendNewIDs := sequential(
-									output(project(concat_all, recordof(base_file)),,'~'+history_filename_new, __compressed__, overwrite, cluster('thor400_92'));
-									fileservices.promotesuperfilelist(['~thor_data400::out::inquiry_tracking::weekly_historical',
-																										 '~thor_data400::out::inquiry_tracking::weekly_historical_father'],
-																										 '~'+history_filename_new, true)
-									);
+												output(dedup(project(concat_all, recordof(base_file)),all),,'~'+history_filename_new, __compressed__, overwrite);
+												nothor(fileservices.promotesuperfilelist(['~thor_data400::out::inquiry_tracking::weekly_historical',
+																													 '~thor_data400::out::inquiry_tracking::weekly_historical_father'],
+																													 '~'+history_filename_new, true)));
+export AppendNewIDs_FCRA := concat_all;
 
 
-export Do_Appends := sequential(buildFile, AppendNewIDs);
+export Do_Appends := sequential(buildFile, AppendNewIDs); // build file will make file with all the append changes, append new ids will apply the new append file to history
 
 
 end;

@@ -4,7 +4,7 @@ export _Dataset(boolean pUseProd = false) := module
 
 	export Name										:= 'mprd';
 	export thor_cluster_Files			:= 	if(pUseProd 
-																			,Data_Services.Data_location.prefix('MPRD') + 'thor_data400::',
+																			,Data_Services.foreign_prod + 'thor_data400::',
 																			'~thor_data400::'
 																		);
 	export thor_cluster_Persists	:= thor_cluster_Files		;

@@ -1,4 +1,4 @@
-import ut;
+import ut,prte2_header;
 
 hd := header.File_Headers;
 
@@ -64,4 +64,8 @@ e_e := l_e+r_e;
 ut.MAC_Reduce_Pairs(e_e,ri_hhid,le_hhid,did,lname_equiv,led)
 //led := dedup(sort(distribute(l_e+r_e,le_hhid),le_hhid,ri_hhid,local),le_hhid,local);
 
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export HHID_Indiv_Joins := led;
+#ELSE
 export HHID_Indiv_Joins := led : persist('HHID_Indiv_Joins');
+#END

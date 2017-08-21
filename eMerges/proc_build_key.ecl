@@ -35,9 +35,6 @@ export proc_build_key(string filedate) := function
 	Roxiekeybuild.MAC_SK_BuildProcess_Local(doxie_files.key_hunters_did(),'~thor_Data400::key::emerges::'+filedate+'::hunters_doxie_did','~thor_Data400::key::hunters_doxie_did',key1);
 	RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(emerges.Key_huntfish_did(),SuperKeyName+'did',BaseKeyName+'::did',key2);
 	RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(emerges.Key_huntfish_rid(),SuperKeyName+'rid',BaseKeyName+'::rid',key3);
-	// Roxiekeybuild.MAC_SK_BuildProcess_Local(emerges.key_prep_hunters_did,'~thor_Data400::key::emerges::'+filedate+'::hunters_doxie_did','~thor_Data400::key::hunters_doxie_did',key1);
-	// RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Key_huntfish_did,SuperKeyName+'did',BaseKeyName+'::did',key2);
-	// RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Key_huntfish_rid,SuperKeyName+'rid',BaseKeyName+'::rid',key3);
 	roxiekeybuild.MAC_SK_BuildProcess_Local(doxie_files.key_ccw_did(),'~thor_Data400::key::emerges::'+filedate+'::ccw_doxie_did','~thor_Data400::key::ccw_doxie_did',key4);
 	RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(emerges.key_ccw_did(),SuperKeyName_CCW+'did',BaseKeyName_CCW+'::did',key5);
 	RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(emerges.key_ccw_rid(),SuperKeyName_CCW+'rid',BaseKeyName_CCW+'::rid',key6);
@@ -76,7 +73,8 @@ export proc_build_key(string filedate) := function
   build_CCW_autokeys						:= emerges.Proc_CCW_AutokeyBuild(filedate);
 	build_CCW_autokeys_fcra				:= emerges.Proc_CCW_AutokeyBuild_fcra(filedate);
 	
-	update_dops := roxiekeybuild.updateversion('EmergesKeys',filedate,'kgummadi@seisint.com;fhumayun@seisint.com');
+	update_dops := roxiekeybuild.updateversion('EmergesKeys',filedate,'kgummadi@seisint.com;fhumayun@seisint.com',,'N');
+  update_dops_fcra := roxiekeybuild.updateversion('FCRA_EmergesKeys',filedate,'kgummadi@seisint.com;fhumayun@seisint.com',,'F');
 	
 	build_roxie_keys := 
 	  if (fileservices.getsuperfilesubname('~thor_data400::base::emerges_hunt_vote_ccw',1) = fileservices.getsuperfilesubname('~thor_data400::base::emerges_BUILT',1),
@@ -85,18 +83,19 @@ export proc_build_key(string filedate) := function
 									 parallel(key1,key2,key3,key4,key5,key6),
 									 parallel(mv1,mv2,mv3,mv4,mv5,mv6),				
 									 parallel(key1_fcra,key2_fcra,key3_fcra,key4_fcra,key5_fcra,key6_fcra),
-									 parallel(key4_fcra,key5_fcra,key6_fcra),
+									 // parallel(key4_fcra,key5_fcra,key6_fcra),
 									 parallel(mv1_fcra,mv2_fcra,mv3_fcra,mv4_fcra,mv5_fcra,mv6_fcra),
-									 parallel(mv4_fcra,mv5_fcra,mv6_fcra),
+									 // parallel(mv4_fcra,mv5_fcra,mv6_fcra),
 									 move_qa,
 									 build_huntfish_autokeys,
 									 build_huntfish_autokeys_fcra,
 									 build_ccw_autokeys,
 									 build_ccw_autokeys_fcra,
-									 update_dops
+									 update_dops,
+                   update_dops_fcra                   
 									 )) : success(send_succ_msg), failure(send_fail_msg);
 
-	build_moxie_keys := emerges.proc_build_all_moxie_keys : success(output('moxie keys build completed')), failure(output('moxie key build failed'));
+	// build_moxie_keys := emerges.proc_build_all_moxie_keys : success(output('moxie keys build completed')), failure(output('moxie key build failed'));
 
 	post_build := sequential(
 													fileservices.startsuperfiletransaction(),
@@ -113,7 +112,7 @@ export proc_build_key(string filedate) := function
 													);	
 													
 	return sequential(build_roxie_keys,
-										build_moxie_keys,
+										// build_moxie_keys,
 										post_build);
 	
 end;

@@ -1,12 +1,26 @@
+import _control;
+
+admin_list := _control.MyInfo.EmailAddressNotify+';jbello@seisint.com;';							
+
 export Send_Email(string filedate):= module
-							
+						
 	export build_success := fileservices.sendemail(
-													'jbello@seisint.com',
+													admin_list,
 													'Certegy Build Succeeded ' + filedate,
-													'Sample records are in WUID:' + workunit);
+													'Sample records are in WUID: ' + workunit);
 
 	export build_failure := fileservices.sendemail(
-												'jbello@seisint.com',
+												admin_list,
 												'Certegy '+filedate+' Build FAILED',
-												workunit);						
+												workunit);
+												
+    export KeySuccess		:= fileservices.sendemail(
+                                       admin_list,									  
+                                       'CertegyKeys Build Succeeded ' + filedate,
+                                       'WUID: ' + workunit);
+									   
+	export KeyFailure		:= fileservices.sendemail(
+                                       admin_list,
+                                       'CertegyKeys Build Failed ' + filedate,
+                                       'WUID: ' + workunit + '\n' + failmessage);													
 end;

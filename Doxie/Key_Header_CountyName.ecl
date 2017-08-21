@@ -1,4 +1,4 @@
-import header, Census_data,doxie_build;
+import header, Census_data,doxie_build,ut;
 
 pf := doxie_build.file_header_building;
 
@@ -33,4 +33,4 @@ p := TABLE(f,slim);
 
 d := DEDUP(SORT(P,record),record);
 
-export Key_Header_CountyName := INDEX(d,{d},'~thor_data400::key::header.county_' + doxie.Version_SuperKey);
+export Key_Header_CountyName := INDEX(d,{d},ut.Data_Location.Person_header+'thor_data400::key::header.county_' + doxie.Version_SuperKey);

@@ -26,6 +26,8 @@ string	district;
 string	has_addendum;
 string	is_available_for_public;
 string  mbs_agency_id; 
+string  Cru_Agency_Id;
+string  Cru_Agency_Name;
 
 end; 
 
@@ -107,6 +109,8 @@ string25	district;
 string1	has_addendum;
 string1	is_available_for_public;
 string16  mbs_agency_id;
+string20 cru_agency_id;
+string100 cru_agency_name;
 end; 
 
 export person_fixed := record 
@@ -114,7 +118,7 @@ string11 iyetek_metadata_person_id ;
 string19 	date_created; 
 string11 iyetek_metadata_id;
 string11 vehicle_unit_number;
-string50 person_type;
+string100 person_type;
 string25 first_name;
 string25 middle_name;
 string100 last_name;
@@ -186,6 +190,9 @@ string25	district;
 string1	has_addendum;
 string1	is_available_for_public;
 string16  mbs_agency_id;
+string20 cru_agency_id;
+string100 cru_agency_name;
+
 // vehicle
 string11 iyetek_metadata_vehicle_id;
 string11	unit_number;
@@ -210,7 +217,7 @@ temp_vehicle;
 // person 
 string11 iyetek_metadata_person_id ; 	
 string11 vehicle_unit_number;
-string50 person_type;
+string100 person_type;
 string25 first_name;
 string25 middle_name;
 string100 last_name;
@@ -267,7 +274,7 @@ string25 Insurance_Policy_Number ;
 string20 Insurance_Expiration_Date ;
 string11 person_id ; 
 string11 Vehicle_Unit_Number ;
-string50 Person_Type ;
+string100 Person_Type ;
 string25 First_Name  ;
 string25 Middle_Name ;
 string100 Last_Name ;
@@ -290,6 +297,8 @@ string2 driver_license_jurisdiction;
 string16  mbs_agency_id;
 string5  vin_status; 
 string50 damaged_areas1; 
+string20 cru_agency_id;
+string100 cru_agency_name;
 end; 
 
 
@@ -338,7 +347,7 @@ string50 Insurance_Policy_Number ;
 string20 Insurance_Expiration_Date ;
 string11 person_id ; 
 string11 Vehicle_Unit_Number ;
-string50 Person_Type ;
+string100 Person_Type ;
 string25 First_Name  ;
 string25 Middle_Name ;
 string100 Last_Name ;
@@ -420,9 +429,10 @@ string50 damaged_areas1;
   unsigned8 rawaid;
 	
 	string60 orig_fname ;
-string100 orig_lname ;
-string60 orig_mname ;
-
+  string100 orig_lname ;
+  string60 orig_mname ;
+  string20 cru_agency_id;
+  string100 cru_agency_name;
 end; 
 
 end;

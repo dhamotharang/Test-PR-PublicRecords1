@@ -2,7 +2,7 @@ import YellowPages,MDR;
 
 export YellowPages_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 
-	shared base := YellowPages.Files.Base.QA;
+	shared base := YellowPages.Files().Base.QA;
 
   // Extract company_name/address/phone/url data for the linking layout.
   export dataset(Layout_Linking.Unlinked) As_Linking_Master := function
@@ -31,6 +31,7 @@ export YellowPages_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.city_name       := choose(counter,left.p_city_name,left.v_city_name),
 				self.state           := left.st,
 				self.zip             := left.zip,
+				self.zip4            := left.zip4,
 				self.county_fips     := left.county,
 				self.msa             := left.msa,
 				self.phone           := left.phone10,
@@ -87,6 +88,8 @@ export YellowPages_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.date_first_seen := (unsigned4)left.pub_date,
 				self.date_last_seen := (unsigned4)left.pub_date,
         self.ssn           := '',
+				self.did           := 0,
+				self.score         := 0,
 				self.name_prefix   := left.exec_title,
 				self.name_first    := left.exec_fname,
 				self.name_middle   := left.exec_mname,

@@ -1,0 +1,48 @@
+export Headers := dataset('headers', record
+  integer8 head_id;
+  integer2 head_score;
+  integer8 head_total_weight;
+  integer2 head_early_ssn;
+  integer2  head_late_ssn;
+  string32 head_state_name;
+  string6  head_first_seen_ever;
+  integer8 head_did;
+  integer8 head_rid;
+  string3  head_pflag;
+string2      head_src;
+integer4      head_dt_first_seen;
+integer4      head_dt_last_seen;
+integer4     head_dt_vendor_last_reported;
+integer4     head_dt_vendor_first_reported;
+integer4     head_tu_dt_file_since;
+string1      head_rec_type;
+string18      head_vendor_id;
+string10      head_phone;
+string9      head_ssn;
+integer4      head_dob;
+string5      head_title;
+string20      head_fname;
+string20      head_mname;
+string20      head_lname;
+string5      head_name_suffix;
+string10      head_prim_range;
+string2      head_predir;
+string28      head_prim_name;
+string4      head_suffix;
+string2      head_postdir;
+string10      head_unit_desig;
+string8      head_sec_range;
+string25      head_city_name;
+string2      head_st;
+string5      head_zip;
+string4      head_zip4;
+string3      head_county;
+string4      head_msa;
+string1      head_tnt;
+integer2     head_ssn_usage_count;
+string20     head_mcu_fname;
+string20     head_mcu_lname;
+string1      head_deceased;
+  end,
+  hole,
+  people );

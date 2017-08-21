@@ -533,31 +533,31 @@ layout_candidates add_hist_domestic_corp_key(layout_candidates le,Specificities(
   SELF := le;
 END;
 SALT30.MAC_Choose_JoinType(j7,s.nulls_hist_domestic_corp_key,Specificities(ih).hist_domestic_corp_key_values_persisted,hist_domestic_corp_key,hist_domestic_corp_key_weight100,add_hist_domestic_corp_key,j6);
-layout_candidates add_hist_duns_number(layout_candidates le,Specificities(ih).hist_duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
-  SELF.hist_duns_number_weight100 := MAP (le.hist_duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.hist_duns_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
-  SELF := le;
-END;
-SALT30.MAC_Choose_JoinType(j6,s.nulls_hist_duns_number,Specificities(ih).hist_duns_number_values_persisted,hist_duns_number,hist_duns_number_weight100,add_hist_duns_number,j5);
 layout_candidates add_hist_enterprise_number(layout_candidates le,Specificities(ih).hist_enterprise_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.hist_enterprise_number_weight100 := MAP (le.hist_enterprise_number_isnull => 0, patch_default and ri.field_specificity=0 => s.hist_enterprise_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(j5,s.nulls_hist_enterprise_number,Specificities(ih).hist_enterprise_number_values_persisted,hist_enterprise_number,hist_enterprise_number_weight100,add_hist_enterprise_number,j4);
+SALT30.MAC_Choose_JoinType(j6,s.nulls_hist_enterprise_number,Specificities(ih).hist_enterprise_number_values_persisted,hist_enterprise_number,hist_enterprise_number_weight100,add_hist_enterprise_number,j5);
 layout_candidates add_active_domestic_corp_key(layout_candidates le,Specificities(ih).active_domestic_corp_key_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.active_domestic_corp_key_weight100 := MAP (le.active_domestic_corp_key_isnull => 0, patch_default and ri.field_specificity=0 => s.active_domestic_corp_key_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(j4,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_active_domestic_corp_key,j3);
+SALT30.MAC_Choose_JoinType(j5,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_active_domestic_corp_key,j4);
 layout_candidates add_active_enterprise_number(layout_candidates le,Specificities(ih).active_enterprise_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.active_enterprise_number_weight100 := MAP (le.active_enterprise_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_enterprise_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(j3,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_active_enterprise_number,j2);
+SALT30.MAC_Choose_JoinType(j4,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_active_enterprise_number,j3);
 layout_candidates add_ebr_file_number(layout_candidates le,Specificities(ih).ebr_file_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.ebr_file_number_weight100 := MAP (le.ebr_file_number_isnull => 0, patch_default and ri.field_specificity=0 => s.ebr_file_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(j2,s.nulls_ebr_file_number,Specificities(ih).ebr_file_number_values_persisted,ebr_file_number,ebr_file_number_weight100,add_ebr_file_number,j1);
+SALT30.MAC_Choose_JoinType(j3,s.nulls_ebr_file_number,Specificities(ih).ebr_file_number_values_persisted,ebr_file_number,ebr_file_number_weight100,add_ebr_file_number,j2);
+layout_candidates add_hist_duns_number(layout_candidates le,Specificities(ih).hist_duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
+  SELF.hist_duns_number_weight100 := MAP (le.hist_duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.hist_duns_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
+  SELF := le;
+END;
+SALT30.MAC_Choose_JoinType(j2,s.nulls_hist_duns_number,Specificities(ih).hist_duns_number_values_persisted,hist_duns_number,hist_duns_number_weight100,add_hist_duns_number,j1);
 layout_candidates add_active_duns_number(layout_candidates le,Specificities(ih).active_duns_number_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.active_duns_number_weight100 := MAP (le.active_duns_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_duns_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
@@ -576,19 +576,19 @@ layout_SrcRidVlid_candidates add_SrcRidVlid_active_enterprise_number(layout_SrcR
   SELF.active_enterprise_number_weight100 := MAP (le.active_enterprise_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_enterprise_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jSrcRidVlid_0,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_SrcRidVlid_active_enterprise_number,jSrcRidVlid_2);
+SALT30.MAC_Choose_JoinType(jSrcRidVlid_0,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_SrcRidVlid_active_enterprise_number,jSrcRidVlid_3);
 layout_SrcRidVlid_candidates add_SrcRidVlid_active_domestic_corp_key(layout_SrcRidVlid_candidates le,Specificities(ih).active_domestic_corp_key_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.active_domestic_corp_key_weight100 := MAP (le.active_domestic_corp_key_isnull => 0, patch_default and ri.field_specificity=0 => s.active_domestic_corp_key_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jSrcRidVlid_2,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_SrcRidVlid_active_domestic_corp_key,jSrcRidVlid_3);
+SALT30.MAC_Choose_JoinType(jSrcRidVlid_3,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_SrcRidVlid_active_domestic_corp_key,jSrcRidVlid_4);
 layout_SrcRidVlid_candidates add_SrcRidVlid_company_fein(layout_SrcRidVlid_candidates le,Specificities(ih).company_fein_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.company_fein_cnt := ri.cnt;
   SELF.company_fein_e1_cnt := ri.e1_cnt;
   SELF.company_fein_weight100 := MAP (le.company_fein_isnull => 0, patch_default and ri.field_specificity=0 => s.company_fein_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jSrcRidVlid_3,s.nulls_company_fein,Specificities(ih).company_fein_values_persisted,company_fein,company_fein_weight100,add_SrcRidVlid_company_fein,jSrcRidVlid_9);
+SALT30.MAC_Choose_JoinType(jSrcRidVlid_4,s.nulls_company_fein,Specificities(ih).company_fein_values_persisted,company_fein,company_fein_weight100,add_SrcRidVlid_company_fein,jSrcRidVlid_9);
 layout_SrcRidVlid_candidates add_SrcRidVlid_cnp_name(layout_SrcRidVlid_candidates le,Specificities(ih).cnp_name_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.cnp_name_weight100 := MAP (le.cnp_name_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_name_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF.cnp_name := IF( ri.field_specificity<>0 or ri.word<>'',SELF.cnp_name_weight100+' '+ri.word,SALT30.Fn_WordBag_AppendSpecs_Fake(le.cnp_name, s.cnp_name_specificity) );// Copy in annotated wordstring
@@ -628,19 +628,19 @@ layout_ForeignCorpkey_candidates add_ForeignCorpkey_active_enterprise_number(lay
   SELF.active_enterprise_number_weight100 := MAP (le.active_enterprise_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_enterprise_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jForeignCorpkey_0,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_ForeignCorpkey_active_enterprise_number,jForeignCorpkey_2);
+SALT30.MAC_Choose_JoinType(jForeignCorpkey_0,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_ForeignCorpkey_active_enterprise_number,jForeignCorpkey_3);
 layout_ForeignCorpkey_candidates add_ForeignCorpkey_active_domestic_corp_key(layout_ForeignCorpkey_candidates le,Specificities(ih).active_domestic_corp_key_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.active_domestic_corp_key_weight100 := MAP (le.active_domestic_corp_key_isnull => 0, patch_default and ri.field_specificity=0 => s.active_domestic_corp_key_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jForeignCorpkey_2,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_ForeignCorpkey_active_domestic_corp_key,jForeignCorpkey_3);
+SALT30.MAC_Choose_JoinType(jForeignCorpkey_3,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_ForeignCorpkey_active_domestic_corp_key,jForeignCorpkey_4);
 layout_ForeignCorpkey_candidates add_ForeignCorpkey_company_fein(layout_ForeignCorpkey_candidates le,Specificities(ih).company_fein_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.company_fein_cnt := ri.cnt;
   SELF.company_fein_e1_cnt := ri.e1_cnt;
   SELF.company_fein_weight100 := MAP (le.company_fein_isnull => 0, patch_default and ri.field_specificity=0 => s.company_fein_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jForeignCorpkey_3,s.nulls_company_fein,Specificities(ih).company_fein_values_persisted,company_fein,company_fein_weight100,add_ForeignCorpkey_company_fein,jForeignCorpkey_9);
+SALT30.MAC_Choose_JoinType(jForeignCorpkey_4,s.nulls_company_fein,Specificities(ih).company_fein_values_persisted,company_fein,company_fein_weight100,add_ForeignCorpkey_company_fein,jForeignCorpkey_9);
 layout_ForeignCorpkey_candidates add_ForeignCorpkey_cnp_name(layout_ForeignCorpkey_candidates le,Specificities(ih).cnp_name_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.cnp_name_weight100 := MAP (le.cnp_name_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_name_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF.cnp_name := IF( ri.field_specificity<>0 or ri.word<>'',SELF.cnp_name_weight100+' '+ri.word,SALT30.Fn_WordBag_AppendSpecs_Fake(le.cnp_name, s.cnp_name_specificity) );// Copy in annotated wordstring
@@ -680,19 +680,19 @@ layout_RAAddresses_candidates add_RAAddresses_active_enterprise_number(layout_RA
   SELF.active_enterprise_number_weight100 := MAP (le.active_enterprise_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_enterprise_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jRAAddresses_0,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_RAAddresses_active_enterprise_number,jRAAddresses_2);
+SALT30.MAC_Choose_JoinType(jRAAddresses_0,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_RAAddresses_active_enterprise_number,jRAAddresses_3);
 layout_RAAddresses_candidates add_RAAddresses_active_domestic_corp_key(layout_RAAddresses_candidates le,Specificities(ih).active_domestic_corp_key_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.active_domestic_corp_key_weight100 := MAP (le.active_domestic_corp_key_isnull => 0, patch_default and ri.field_specificity=0 => s.active_domestic_corp_key_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jRAAddresses_2,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_RAAddresses_active_domestic_corp_key,jRAAddresses_3);
+SALT30.MAC_Choose_JoinType(jRAAddresses_3,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_RAAddresses_active_domestic_corp_key,jRAAddresses_4);
 layout_RAAddresses_candidates add_RAAddresses_company_fein(layout_RAAddresses_candidates le,Specificities(ih).company_fein_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.company_fein_cnt := ri.cnt;
   SELF.company_fein_e1_cnt := ri.e1_cnt;
   SELF.company_fein_weight100 := MAP (le.company_fein_isnull => 0, patch_default and ri.field_specificity=0 => s.company_fein_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jRAAddresses_3,s.nulls_company_fein,Specificities(ih).company_fein_values_persisted,company_fein,company_fein_weight100,add_RAAddresses_company_fein,jRAAddresses_9);
+SALT30.MAC_Choose_JoinType(jRAAddresses_4,s.nulls_company_fein,Specificities(ih).company_fein_values_persisted,company_fein,company_fein_weight100,add_RAAddresses_company_fein,jRAAddresses_9);
 layout_RAAddresses_candidates add_RAAddresses_cnp_name(layout_RAAddresses_candidates le,Specificities(ih).cnp_name_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.cnp_name_weight100 := MAP (le.cnp_name_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_name_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF.cnp_name := IF( ri.field_specificity<>0 or ri.word<>'',SELF.cnp_name_weight100+' '+ri.word,SALT30.Fn_WordBag_AppendSpecs_Fake(le.cnp_name, s.cnp_name_specificity) );// Copy in annotated wordstring
@@ -732,19 +732,19 @@ layout_FilterPrimNames_candidates add_FilterPrimNames_active_enterprise_number(l
   SELF.active_enterprise_number_weight100 := MAP (le.active_enterprise_number_isnull => 0, patch_default and ri.field_specificity=0 => s.active_enterprise_number_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jFilterPrimNames_0,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_FilterPrimNames_active_enterprise_number,jFilterPrimNames_2);
+SALT30.MAC_Choose_JoinType(jFilterPrimNames_0,s.nulls_active_enterprise_number,Specificities(ih).active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_weight100,add_FilterPrimNames_active_enterprise_number,jFilterPrimNames_3);
 layout_FilterPrimNames_candidates add_FilterPrimNames_active_domestic_corp_key(layout_FilterPrimNames_candidates le,Specificities(ih).active_domestic_corp_key_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.active_domestic_corp_key_weight100 := MAP (le.active_domestic_corp_key_isnull => 0, patch_default and ri.field_specificity=0 => s.active_domestic_corp_key_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jFilterPrimNames_2,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_FilterPrimNames_active_domestic_corp_key,jFilterPrimNames_3);
+SALT30.MAC_Choose_JoinType(jFilterPrimNames_3,s.nulls_active_domestic_corp_key,Specificities(ih).active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_weight100,add_FilterPrimNames_active_domestic_corp_key,jFilterPrimNames_4);
 layout_FilterPrimNames_candidates add_FilterPrimNames_company_fein(layout_FilterPrimNames_candidates le,Specificities(ih).company_fein_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.company_fein_cnt := ri.cnt;
   SELF.company_fein_e1_cnt := ri.e1_cnt;
   SELF.company_fein_weight100 := MAP (le.company_fein_isnull => 0, patch_default and ri.field_specificity=0 => s.company_fein_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF := le;
 END;
-SALT30.MAC_Choose_JoinType(jFilterPrimNames_3,s.nulls_company_fein,Specificities(ih).company_fein_values_persisted,company_fein,company_fein_weight100,add_FilterPrimNames_company_fein,jFilterPrimNames_9);
+SALT30.MAC_Choose_JoinType(jFilterPrimNames_4,s.nulls_company_fein,Specificities(ih).company_fein_values_persisted,company_fein,company_fein_weight100,add_FilterPrimNames_company_fein,jFilterPrimNames_9);
 layout_FilterPrimNames_candidates add_FilterPrimNames_cnp_name(layout_FilterPrimNames_candidates le,Specificities(ih).cnp_name_values_persisted ri,BOOLEAN patch_default) := TRANSFORM
   SELF.cnp_name_weight100 := MAP (le.cnp_name_isnull => 0, patch_default and ri.field_specificity=0 => s.cnp_name_max, ri.field_specificity) * 100; // If never seen before - must be rare
   SELF.cnp_name := IF( ri.field_specificity<>0 or ri.word<>'',SELF.cnp_name_weight100+' '+ri.word,SALT30.Fn_WordBag_AppendSpecs_Fake(le.cnp_name, s.cnp_name_specificity) );// Copy in annotated wordstring
@@ -774,7 +774,7 @@ END;
 jFilterPrimNames_21 := JOIN(jFilterPrimNames_18,PULL(Specificities(ih).st_values_persisted),LEFT.st=RIGHT.st,add_FilterPrimNames_st(LEFT,RIGHT,TRUE),LOOKUP,FEW,LEFT OUTER);
 EXPORT FilterPrimNames_candidates := jFilterPrimNames_21 : PERSIST('~temp::Proxid::BIPV2_ProxID::mc::FilterPrimNames',EXPIRE(Config.PersistExpire));
 //Now see if these records are actually linkable
-TotalWeight := Annotated.active_duns_number_weight100 + Annotated.ebr_file_number_weight100 + Annotated.active_enterprise_number_weight100 + Annotated.active_domestic_corp_key_weight100 + Annotated.hist_enterprise_number_weight100 + Annotated.hist_duns_number_weight100 + Annotated.hist_domestic_corp_key_weight100 + Annotated.foreign_corp_key_weight100 + Annotated.unk_corp_key_weight100 + Annotated.company_fein_weight100 + Annotated.company_phone_weight100 + Annotated.company_address_weight100 + Annotated.cnp_name_weight100 + Annotated.cnp_number_weight100 + Annotated.cnp_btype_weight100;
+TotalWeight := Annotated.active_duns_number_weight100 + Annotated.hist_duns_number_weight100 + Annotated.ebr_file_number_weight100 + Annotated.active_enterprise_number_weight100 + Annotated.active_domestic_corp_key_weight100 + Annotated.hist_enterprise_number_weight100 + Annotated.hist_domestic_corp_key_weight100 + Annotated.foreign_corp_key_weight100 + Annotated.unk_corp_key_weight100 + Annotated.company_fein_weight100 + Annotated.company_phone_weight100 + Annotated.company_address_weight100 + Annotated.cnp_name_weight100 + Annotated.cnp_number_weight100 + Annotated.cnp_btype_weight100;
 SHARED Linkable := TotalWeight >= Config.MatchThreshold;
 EXPORT Unlinkables := Annotated(~Linkable); // Insufficient data to ever get a match
 EXPORT Candidates := Annotated(); //Attribute Files might bring total score up to threshold

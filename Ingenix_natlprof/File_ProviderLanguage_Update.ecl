@@ -1,1 +1,0 @@
-export File_ProviderLanguage_Update := dataset(Ingenix_NatlProf.File_In_Cluster+'in::Ingenix_NatlProf_ProviderLanguage_Update',Ingenix_NatlProf.Layout_in_ProviderLanguage,CSV(quote(''),separator('|')));

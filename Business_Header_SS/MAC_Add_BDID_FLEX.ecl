@@ -39,6 +39,8 @@ EXPORT MAC_Add_BDID_Flex
   ,source                 = ''
   ,source_record_id       = ''
   ,src_matching_is_priority  = FALSE
+	,setofstrings = '[\'NA\',\'NA\',\'NA\']' // [<dopsdatasetname>,<buildversion>,<environmentflag - check dops.constants.environmentset>] set of strings used to track re-BIP in the following order 
+																					
 ) := MACRO
 
 // Need to have something in here besides just calling another macro.
@@ -71,6 +73,7 @@ Business_Header_SS.MAC_Match_Flex
   ,source
   ,source_record_id
   ,src_matching_is_priority
+	,setofstrings
 )
 
 ENDMACRO;

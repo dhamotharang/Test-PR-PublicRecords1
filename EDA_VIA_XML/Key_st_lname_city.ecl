@@ -1,20 +1,20 @@
-import gong, doxie;
+import gong_Neustar, doxie, ut;
 
-input_recs := gong.File_Gong_Full((listing_type_res = 'R') AND (TRIM(name_last)<>''));
+input_recs := gong_Neustar.File_Gong_Full_Prepped_For_Keys((listing_type_res = 'R') AND (TRIM(name_last)<>''));
 
 Layout_extra_city := RECORD
 	STRING25	city;
-	gong.Layout_bscurrent_raw;
+	gong_Neustar.Layout_bscurrent_raw;
 END;
 
-Layout_extra_city addOrig(gong.Layout_bscurrent_raw l) := TRANSFORM
+Layout_extra_city addOrig(recordof(input_recs) l) := TRANSFORM
 	SELF.city := l.p_city_name;
 	SELF := l;
 END;
 
 orig_cities := PROJECT(input_recs, addOrig(LEFT));
 
-Layout_extra_city addExtra(gong.Layout_bscurrent_raw l, integer c) := TRANSFORM
+Layout_extra_city addExtra(recordof(input_recs) l, integer c) := TRANSFORM
 	SELF.city := StringLib.StringExtract(ZipLib.ZipToCities(l.z5),c+1);
 	SELF := l;
 END;

@@ -1,7 +1,18 @@
-IMPORT DNB, ut;
+IMPORT DNB_dmi, ut,mdr;
+
+EXPORT BH_Relative_Match_DUNS_Tree(
+
+	 dataset(Layout_Business_Header_Temp					)	pBH_Basic_Match_ForRels		= BH_Basic_Match_ForRels				()
+	,dataset(DNB_dmi.Layouts.DUNS_2_Ultimate_DUNS	)	pDUNS_To_Ultimate_DUNS		= DNB_dmi.DUNS_To_Ultimate_DUNS	()
+	,string																					pPersistname							= persistnames().BHRelativeMatchDUNSTree													
+	,boolean																				pShouldRecalculatePersist	= true													
+
+) :=
+function
+
 
 // Initialize match file
-BH_File := Business_Header.BH_Basic_Match_ForRels;
+BH_File := pBH_Basic_Match_ForRels;
 
 Layout_DT_Match := RECORD
 	UNSIGNED6 bdid;           // Seisint Business Identifier
@@ -14,7 +25,7 @@ Layout_DT_Match InitMatchFile(BH_File L) := TRANSFORM
 	SELF := l;
 END;
 
-Match_Init := PROJECT(	BH_File(source = 'D', source_group <> '',
+Match_Init := PROJECT(	BH_File(MDR.sourceTools.SourceIsDunn_Bradstreet(source), source_group <> '',
 								source_group[1] != 'D'), 
 						InitMatchFile(LEFT));
 
@@ -23,12 +34,12 @@ Match_Init_Dedup := DISTRIBUTE(
 
 Layout_DT_Match AddUltimateDUNS(
 			Layout_DT_Match l, 
-			DNB.Layout_DUNS_To_Ultimate_DUNS r) := TRANSFORM
+			DNB_dmi.Layouts.DUNS_2_Ultimate_DUNS r) := TRANSFORM
 	SELF.ultimate_duns := r.ultimate_duns_number;
 	SELF := l;
 END;
 
-ud_joined := JOIN(Match_Init_Dedup, DNB.DUNS_To_Ultimate_DUNS,
+ud_joined := JOIN(Match_Init_Dedup, pDUNS_To_Ultimate_DUNS,
 				LEFT.duns = RIGHT.duns_number,
 				AddUltimateDUNS(LEFT, RIGHT), LOCAL);
 
@@ -54,5 +65,12 @@ dt_relatives := JOIN(ud_match, ud_match,
 
 dt_relatives_ded := DEDUP(dt_relatives, bdid1, bdid2, ALL);
 
-EXPORT BH_Relative_Match_DUNS_Tree := dt_relatives_ded
-				 : PERSIST('TEMP::BH_Relative_Match_DUNS_Tree');
+BH_Relative_Match_DUNS_Tree_persisted := dt_relatives_ded
+				 : PERSIST(pPersistname);
+
+returndataset := if(pShouldRecalculatePersist = true, BH_Relative_Match_DUNS_Tree_persisted
+																										, persists().BHRelativeMatchDUNSTree
+									);
+return returndataset;
+
+end;

@@ -5,6 +5,10 @@ export Layout_Finance := module;
 	  string2  source;
 		string50 source_docid;
 		string10 source_party;
+		
+		string10 exchange;
+		string10 ticker;
+		
 	  unsigned4  FiscalYearEnding;	
 		integer  Sales;
 		integer  Revenue;

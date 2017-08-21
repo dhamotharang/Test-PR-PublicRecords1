@@ -3,7 +3,7 @@ import ExperianIRSG_Build,lib_keylib,lib_fileservices,ut,Header,ut;
 export	ExperianIRSG_asHeader(dataset(ExperianIRSG_Build.Layouts.Layout_Out) pExperian = dataset([],ExperianIRSG_Build.Layouts.Layout_Out), boolean pForHeaderBuild=false)
  :=
   function
-	dExperianasSource	:=	ExperianIRSG_Build.ExperianIRSG_asSource(pExperian,pForHeaderBuild);
+	dExperianasSource	:=	header.Files_SeqdSrc().EL;
 
 	Header.Layout_New_Records Translate_Experian_to_Header(dExperianasSource l) := transform
 		self.did := 0;
@@ -12,10 +12,10 @@ export	ExperianIRSG_asHeader(dataset(ExperianIRSG_Build.Layouts.Layout_Out) pExp
 		self.pflag2 := '';
 		self.pflag3 := '';  
 		
-		self.dt_first_seen := (unsigned3) l.date_first_seen[1..6];
-	    self.dt_last_seen  := (unsigned3) l.date_last_seen[1..6] ; 
-		self.dt_vendor_first_reported := (unsigned3) l.date_vendor_first_reported[1..6];
-		self.dt_vendor_last_reported  := (unsigned3) l.date_vendor_last_reported[1..6];
+		self.dt_first_seen := (unsigned3) ((string)l.date_first_seen)[1..6];
+	  self.dt_last_seen  := (unsigned3) ((string)l.date_last_seen)[1..6] ; 
+		self.dt_vendor_first_reported := (unsigned3) ((string)l.date_vendor_first_reported)[1..6];
+		self.dt_vendor_last_reported  := (unsigned3) ((string)l.date_vendor_last_reported)[1..6];
 		self.dt_nonglb_last_seen      := 0;
 		
 		self.rec_type := '';
@@ -26,9 +26,9 @@ export	ExperianIRSG_asHeader(dataset(ExperianIRSG_Build.Layouts.Layout_Out) pExp
 										));
 		
 		
-		// self.phone := if(length(trim(l.Telephone_number,left,right)) not in [7,10] or 
-		                 // trim(l.Telephone_number,left,right) in ut.Set_BadPhones  ,'',l.Telephone_number);
-		self.phone := '';
+		self.phone := if(length(trim(l.Telephone_number,left,right)) not in [7,10] or 
+		                 trim(l.Telephone_number,left,right) in ut.Set_BadPhones  ,'',l.Telephone_number);
+		// self.phone := '';
 		
 		self.ssn := if(stringlib.stringfilterout(l.orig_SSN, '0') ='' or l.orig_SSN in ut.Set_BadSSN ,'',l.orig_SSN);
 		
@@ -98,9 +98,9 @@ dExperianasSource_sort := sort(dExperianasSource_dist,vendor_id,fname,mname,lnam
 
 Header.Layout_New_Records t_rollup(dExperianasSource_sort le, dExperianasSource_sort ri) := transform
  self.dt_first_seen            := ut.Min2(le.dt_first_seen,ri.dt_first_seen);
- self.dt_last_seen             := ut.Max2(le.dt_last_seen,ri.dt_last_seen);
+ self.dt_last_seen             := max(le.dt_last_seen,ri.dt_last_seen);
  self.dt_vendor_first_reported := ut.Min2(le.dt_vendor_first_reported,ri.dt_vendor_first_reported);
- self.dt_vendor_last_reported  := ut.Max2(le.dt_vendor_last_reported,ri.dt_vendor_last_reported);
+ self.dt_vendor_last_reported  := max(le.dt_vendor_last_reported,ri.dt_vendor_last_reported);
  self                          := le;
 end;
 
@@ -130,7 +130,7 @@ Experian_to_header := rollup(dExperianasSource_sort,
 				   local
 				  );
 
-	Experian_non_blank := Experian_to_header(fname<>'',lname<>'',prim_name <> ''):persist('~thor_data400::ExperianIRSG_as_header');
+	Experian_non_blank := Experian_to_header(fname<>'',lname<>'',prim_name <> '');
 					
     return Experian_non_blank;
 	

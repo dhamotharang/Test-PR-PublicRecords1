@@ -1,0 +1,20 @@
+export Delta := MODULE//Routines to compute the differences between two instances of a file
+export Differences(dataset(Layout_FileIN)old_s, dataset(Layout_FileIN) new_s) := function
+  Diff_Layout := RECORD(layout_FileIN)
+    boolean  Added;
+    boolean Deleted;
+  END;
+  Diff_Layout Take_Record(old_s le, new_s ri) := transform
+    boolean left_null := le.did=(typeof(le.did))'' AND le.src=(typeof(le.src))'' AND le.dt_first_seen=(typeof(le.dt_first_seen))'' AND le.dt_last_seen=(typeof(le.dt_last_seen))'' AND le.dt_vendor_first_reported=(typeof(le.dt_vendor_first_reported))'' AND le.dt_vendor_last_reported=(typeof(le.dt_vendor_last_reported))'' AND le.vendor_id=(typeof(le.vendor_id))'' AND le.phone=(typeof(le.phone))'' AND le.title=(typeof(le.title))'' AND le.fname=(typeof(le.fname))'' AND le.mname=(typeof(le.mname))'' AND le.lname=(typeof(le.lname))'' AND le.name_suffix=(typeof(le.name_suffix))'' AND le.prim_range=(typeof(le.prim_range))'' AND le.predir=(typeof(le.predir))'' AND le.prim_name=(typeof(le.prim_name))'' AND le.suffix=(typeof(le.suffix))'' AND le.postdir=(typeof(le.postdir))'' AND le.unit_desig=(typeof(le.unit_desig))'' AND le.sec_range=(typeof(le.sec_range))'' AND le.city_name=(typeof(le.city_name))'' AND le.st=(typeof(le.st))'' AND le.zip=(typeof(le.zip))'' AND le.zip4=(typeof(le.zip4))'' AND le.county=(typeof(le.county))'' AND le.msa=(typeof(le.msa))'' AND le.geo_blk=(typeof(le.geo_blk))'' AND le.RawAID=(typeof(le.RawAID))'';
+    boolean right_null := ri.did=(typeof(ri.did))'' AND ri.src=(typeof(ri.src))'' AND ri.dt_first_seen=(typeof(ri.dt_first_seen))'' AND ri.dt_last_seen=(typeof(ri.dt_last_seen))'' AND ri.dt_vendor_first_reported=(typeof(ri.dt_vendor_first_reported))'' AND ri.dt_vendor_last_reported=(typeof(ri.dt_vendor_last_reported))'' AND ri.vendor_id=(typeof(ri.vendor_id))'' AND ri.phone=(typeof(ri.phone))'' AND ri.title=(typeof(ri.title))'' AND ri.fname=(typeof(ri.fname))'' AND ri.mname=(typeof(ri.mname))'' AND ri.lname=(typeof(ri.lname))'' AND ri.name_suffix=(typeof(ri.name_suffix))'' AND ri.prim_range=(typeof(ri.prim_range))'' AND ri.predir=(typeof(ri.predir))'' AND ri.prim_name=(typeof(ri.prim_name))'' AND ri.suffix=(typeof(ri.suffix))'' AND ri.postdir=(typeof(ri.postdir))'' AND ri.unit_desig=(typeof(ri.unit_desig))'' AND ri.sec_range=(typeof(ri.sec_range))'' AND ri.city_name=(typeof(ri.city_name))'' AND ri.st=(typeof(ri.st))'' AND ri.zip=(typeof(ri.zip))'' AND ri.zip4=(typeof(ri.zip4))'' AND ri.county=(typeof(ri.county))'' AND ri.msa=(typeof(ri.msa))'' AND ri.geo_blk=(typeof(ri.geo_blk))'' AND ri.RawAID=(typeof(ri.RawAID))'';
+    self.Added := left_null;
+    self.Deleted := right_null;
+    self := if ( right_null, le, ri );
+  end;
+  return join(old_s,new_s,left.did=right.did AND left.src=right.src AND left.dt_first_seen=right.dt_first_seen AND left.dt_last_seen=right.dt_last_seen AND left.dt_vendor_first_reported=right.dt_vendor_first_reported AND left.dt_vendor_last_reported=right.dt_vendor_last_reported AND left.vendor_id=right.vendor_id AND left.phone=right.phone AND left.title=right.title AND left.fname=right.fname AND left.mname=right.mname AND left.lname=right.lname AND left.name_suffix=right.name_suffix AND left.prim_range=right.prim_range AND left.predir=right.predir AND left.prim_name=right.prim_name AND left.suffix=right.suffix AND left.postdir=right.postdir AND left.unit_desig=right.unit_desig AND left.sec_range=right.sec_range AND left.city_name=right.city_name AND left.st=right.st AND left.zip=right.zip AND left.zip4=right.zip4 AND left.county=right.county AND left.msa=right.msa AND left.geo_blk=right.geo_blk AND left.RawAID=right.RawAID,Take_Record(left,right),hash,full outer)(Added OR Deleted);
+end;
+export Difference_Summary(dataset(Layout_FileIN)old_s, dataset(Layout_FileIN) new_s) := function
+  d := Differences(old_s,new_s);
+  return  hygiene(old_s).Summary('Old')+ hygiene(new_s).Summary('New')+ hygiene(d(deleted)).Summary('Deletions')+ hygiene(d(added)).Summary('Additions');
+end;
+end;

@@ -93,5 +93,8 @@ fonlOnly	:= join(fonlSort,foldSort,
 					left only,
 					local
 				   );
-
-export Florida_As_Dl := Fold + fupd + FonlOnly;
+					 
+// Filtering records to drop all the 18th century records as per bug# 21076
+export Florida_As_Dl := Fold(dob not between 18000101 and 18991231) + 
+												fupd(dob not between 18000101 and 18991231) + 
+												FonlOnly(dob not between 18000101 and 18991231);

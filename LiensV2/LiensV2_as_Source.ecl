@@ -12,17 +12,10 @@ main_slim := project(main_all,transform(liensv2.Layout_as_source,self := left));
 
 main := dedup(sort(main_slim,tmsid),tmsid);
 
-src_rec := record
- header.Layout_Source_ID;
- liensv2.Layout_as_source;
-end;
+src_rec:=header.layouts_SeqdSrc.L2_src_rec;
 
 seed:=if(pFastHeader,999999999999,1);
 header.Mac_Set_Header_Source(main,liensv2.Layout_as_source,src_rec,MDR.sourceTools.src_Liens_v2,withUID,seed);
 
-dForHeader	:=	withUID	: persist('~thor_data400::persist::headerbuild_liensV2_src');
-dForOther	:=	withUID;
-ReturnValue	:=	if(pFastHeader, dForOther, dForHeader);
-
-return ReturnValue;
+return withUID;
 end;

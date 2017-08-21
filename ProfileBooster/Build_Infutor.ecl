@@ -12,6 +12,6 @@ export Build_Infutor := function
 																self.dob						:= left.clean_DOB),
 											local);
 											
-	return wInfutor;
+	return dedup(wInfutor,record,all);
 
 end;

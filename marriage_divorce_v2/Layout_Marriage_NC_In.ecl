@@ -14,8 +14,8 @@ export Layout_Marriage_NC_In := record
   string15 BRIDE_FIRST_NAME;
   string15 BRIDE_MIDDLE_NAME;
   string20 BRIDE_LAST_NAME;
-  string92 INFO_1998;
-  string1  crlf;
+  string6 INFO_1998;
+  string88  crlf;
 
 
 

@@ -1,3 +1,6 @@
+/*2013-11-12T00:37:32Z (Todd Steil)
+
+*/
 EXPORT key := module
 	
 		shared getIndexdataset := module
@@ -10,11 +13,16 @@ EXPORT key := module
 			end;
 			
 			export nonfcra(string indextype) := function
-				deduped := dedup(consumerstatement.ReadData.nonfcra,record,all);
+				ds := consumerstatement.ReadData.nonfcra;
 				return	map(
-												indextype = 'phone' => sort(deduped(phone <> ''), phone),
-												indextype = 'address' => sort(deduped(st <> ''), st, p_city_name, v_city_name, zip, prim_range, prim_name, sec_range),
-												indextype = 'statement_id' => sort(deduped(statement_id <> 0), statement_id)
+												/*indextype = 'phone' => dedup(sort(distribute(ds(phone <> ''),hash(phone)), phone,-date_submitted,-date_created),record,local) (override_flag <> 3),
+												indextype = 'address' => dedup(sort(distribute(ds(st <> ''),hash(st,  v_city_name, zip, prim_range, prim_name, sec_range)), st, v_city_name, zip, prim_range, prim_name, sec_range, -date_submitted,-date_created, local), record, local),
+												indextype = 'statement_id' => dedup(sort(distribute(ds(statement_id <> 0),hash(statement_id)), statement_id,-date_submitted,-date_created,local), record, local)*/
+												
+				
+												indextype = 'phone' =>  dedup(sort(distribute(ds(phone <> ''),hash(phone)), phone,-date_submitted,-date_created,local),record, local)(override_flag <> 3),
+												indextype = 'address' => dedup(sort(distribute(ds(st <> ''),hash(st,  p_city_name, v_city_name, zip, prim_range, prim_name, sec_range)), st, p_city_name, v_city_name, zip, prim_range, prim_name, sec_range, -date_submitted,-date_created, local), record, local)(override_flag <> 3),
+												indextype = 'statement_id' => dedup(sort(distribute(ds(statement_id <> 0),hash(statement_id)), statement_id,-date_submitted,-date_created,local), record, local)(override_flag <> 3)
 												
 										);
 			end;

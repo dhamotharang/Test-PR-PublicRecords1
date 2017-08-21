@@ -18,12 +18,13 @@ export get_DFUQuery(
   ,integer                  pFileSizeTo               = -1
   ,integer                  pFirstN                   = -1
   ,string                   pFirstNType               = ''
-  ,integer                  pPageSize                 = 0  
-  ,integer                  pPageStartFrom            = 0    
+  ,integer                  pPageSize                 = -1  
+  ,integer                  pPageStartFrom            = -1    
   ,string                   pSortby                   = ''        
   ,boolean                  pDescending               = false
   ,boolean                  pOneLevelDirFileReturn    = false
-  ,string                   pesp                      = _constants.LocalEsp
+	,string                   pesp                      = _constants.LocalEsp
+	,integer									pMaxNumberOfFiles					= -1
 ) :=                           
 module
 
@@ -31,8 +32,8 @@ module
 	record
 
     string    Prefix                    {xpath('Prefix'                 )} := pPrefix               ;
-    string    ClusterName               {xpath('ClusterName'            )} := pClusterName          ;
-    string    LogicalName               {xpath('LogicalName'            )} := ''          ;
+    string    ClusterName               {xpath('NodeGroup'              )} := pClusterName          ;
+    string    LogicalName               {xpath('LogicalName'            )} := pLogicalName          ;
     string    Description               {xpath('Description'            )} := pDescription          ;
     string    Owner                     {xpath('Owner'                  )} := pOwner                ;
     string    StartDate                 {xpath('StartDate'              )} := pStartDate            ;
@@ -47,13 +48,13 @@ module
     string    Sortby                    {xpath('Sortby'                 )} := pSortby               ;
     boolean   Descending                {xpath('Descending'             )} := pDescending           ;
     boolean   OneLevelDirFileReturn     {xpath('OneLevelDirFileReturn'  )} := pOneLevelDirFileReturn;
-
+		integer   MaxNumberOfFiles             {xpath('MaxNumberOfFiles'          )} := pMaxNumberOfFiles        ;
   end;
 
 	export lay_DFULogicalFiles :=
 	record
     string    Prefix                  {xpath('Prefix'                 )};
-    string    ClusterName             {xpath('ClusterName'            )};
+    string    ClusterName             {xpath('NodeGroup'            )};
     string    Directory               {xpath('Directory'              )};
     string    Description             {xpath('Description'            )};
     string    Parts                   {xpath('Parts'                  )};
@@ -62,12 +63,12 @@ module
     string    Totalsize               {xpath('Totalsize'              )};
     string    RecordCount             {xpath('RecordCount'            )};
     string    Modified                {xpath('Modified'               )};
-    integer   LongSize                {xpath('LongSize'               )};
-    integer   LongRecordCount         {xpath('LongRecordCount'        )};
+    unsigned8  LongSize                {xpath('LongSize'               )};
+    unsigned8  LongRecordCount         {xpath('LongRecordCount'        )};
     boolean   isSuperfile             {xpath('isSuperfile'            )};
     boolean   isZipfile               {xpath('isZipfile'              )};
     boolean   isDirectory             {xpath('isDirectory'            )};
-    boolean   Replicate               {xpath('Replicate'              )};
+    string    Replicate               {xpath('Replicate'              )};
     unsigned8 IntSize                 {xpath('IntSize'                )};
     unsigned8 IntRecordCount          {xpath('IntRecordCount'         )};
     boolean   FromRoxieCluster        {xpath('FromRoxieCluster'       )};
@@ -90,7 +91,7 @@ module
   
 
   esp				:= pesp + ':8010';
-
+//http://prod_esp.br.seisint.com:8010/WsDfu?ver_=1.52/DFUQuery
   dsoap_results := SOAPCALL(
     'http://' + esp + '/WsDfu?ver_=1.52'
     ,'DFUQuery'
@@ -103,16 +104,20 @@ module
   export results :=  dsoap_results  ;
 
 export dnorm := normalize(results,left.DFULogicalFiles,transform({lay_DFULogicalFiles,integer realsize}
-  ,self.longsize            := if(right.longsize            = -1,0,right.longsize           )
-  ,self.CompressedFileSize  := if(right.CompressedFileSize  = -1,0,right.CompressedFileSize )
-  ,self.realsize := if(self.CompressedFileSize != 0,self.CompressedFileSize,self.longsize  )
-  ,self.IsCompressed := right.IsCompressed or right.IsKeyFile
+  ,self.longsize            := if(right.intsize              = -1 ,0                      ,right.intsize            )
+  ,self.CompressedFileSize  := if(right.CompressedFileSize   = -1 ,0                      ,right.CompressedFileSize )
+  ,self.realsize            := if(self.CompressedFileSize   !=  0 ,self.CompressedFileSize,self.longsize            )
+  ,self.IsCompressed        := right.IsCompressed or right.IsKeyFile
   ,self := right))
-  ((pCompressed = 'U|C' or (pCompressed = 'U' and IsCompressed = false) or (pCompressed = 'C' and IsCompressed = true))
-  and (pLogicalName = '' or regexfind(pLogicalName,name,nocase))
+      (
+        (pCompressed = 'U|C' or (pCompressed = 'U' and IsCompressed = false) or (pCompressed = 'C' and IsCompressed = true))
+    and (pLogicalName = '' or regexfind(pLogicalName,name,nocase))
   
-  ) : independent;
+  ) ;
   
+
+export dnorm_replicate0     := dnorm(replicate  = '0');
+export dnorm_replicateNot0  := dnorm(replicate != '0');
 
 export total_size                     := sum(dnorm,realsize);
 export total_size_compressed          := sum(dnorm(IsCompressed = true),realsize);
@@ -130,7 +135,7 @@ export largest  := iterate(project(sort(dnorm, -realsize),transform({string name
             ,self.running_total_size := left.realsize
             ,self.running_total_sizepretty := ''
             ,self.running_total_percent := 0
-            ,self := left
+            // ,self := left
          )) 
          ,transform(recordof(left),self.running_total_size := left.running_total_size + right.running_total_size,self.running_total_sizepretty := ut.FHumanReadableSpace(self.running_total_size),self.running_total_percent := self.running_total_size / total_size * 100.0,self := right))
          

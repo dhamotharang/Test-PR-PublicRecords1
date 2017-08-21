@@ -1,4 +1,4 @@
-﻿import data_services, _Control;
+import data_services, _Control;
 EXPORT Constants := Module
   shared prefix := if(_Control.ThisEnvironment.Name = 'Dataland', Data_Services.foreign_prod, '~');
 	Export Key_Business_Header_Contacts_BDID := prefix + 'prte::key::business_header::20140206a::contacts::bdid';

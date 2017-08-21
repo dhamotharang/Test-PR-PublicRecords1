@@ -222,6 +222,38 @@ EXPORT layouts := MODULE
 			BIPV2.IDlayouts.l_header_ids;
 		END;
 		
+		SHARED ucc_documentid_record := RECORD
+			AccountMonitoring.product_files.ucc.uccMain_key.tmsid;
+		END;
+		
+		SHARED govtdebarred_documentid_record := RECORD
+			AccountMonitoring.product_files.govtdebarred.govtLinkid_key.samnumber;
+		END;
+		
+		SHARED inquiry_documentid_record := RECORD
+			AccountMonitoring.product_files.inquiry.inquiryLinkid_key.search_info.transaction_id;
+			AccountMonitoring.product_files.inquiry.inquiryLinkid_key.search_info.sequence_number;
+			AccountMonitoring.product_files.inquiry.inquiryLinkid_key.search_info.datetime;
+		END;
+		
+		SHARED corp_documentid_record := RECORD
+			AccountMonitoring.product_files.corp.corpKey_key.corp_key;
+		END;
+		
+		SHARED mvr_documentid_record := RECORD
+			AccountMonitoring.product_files.mvr.main_key.vehicle_key;
+			AccountMonitoring.product_files.mvr.main_key.iteration_key;
+		END;
+		
+		SHARED aircraft_documentid_record := RECORD
+			AccountMonitoring.product_files.aircraft.airLinkid_key.n_number;
+		END;
+		
+		SHARED watercraft_documentid_record := RECORD
+			AccountMonitoring.product_files.watercraft.waterLinkid_key.watercraft_key;
+			AccountMonitoring.product_files.watercraft.waterLinkid_key.sequence_key;
+			AccountMonitoring.product_files.watercraft.waterLinkid_key.state_origin;
+		END;
 		template(default,doxie.layout_references);
 		template(bankruptcy,bankruptcy_documentid_record);
 		template(deceased,deceased_documentid_record);
@@ -241,6 +273,13 @@ EXPORT layouts := MODULE
 		template(phoneownership,phoneownership_documentid_record);
 		template(bipbestupdate,bipbestupdate_documentid_record);
 		template(sbfe,sbfe_documentid_record);
+		template(ucc,ucc_documentid_record);
+		template(govtdebarred,govtdebarred_documentid_record);
+		template(inquiry,inquiry_documentid_record);
+		template(corp,corp_documentid_record);
+		template(mvr,mvr_documentid_record);
+		template(aircraft,aircraft_documentid_record);
+		template(watercraft,watercraft_documentid_record);
 	END;
 	
 	EXPORT results := RECORD

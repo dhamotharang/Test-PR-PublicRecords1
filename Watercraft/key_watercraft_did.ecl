@@ -4,13 +4,14 @@ export key_watercraft_did (boolean isFCRA = false) := function
 
   base_file := watercraft.file_base_search_dev((unsigned6)did<>0);
 
-  base_slim := table (base_file, {base_file.did, base_file.state_origin,
+  base_slim := table (base_file, {base_file.did, base_file.state_origin, base_file.source_code,
                                   base_file.watercraft_key, base_file.sequence_key});
 
   // fcra-restricted states:
   states := fcra.compliance.watercrafts.restricted_states;
+	source := fcra.compliance.watercrafts.restricted_sources;
 
-  base_srt := sort (base_slim (~isFCRA or state_origin NOT IN states), record);
+  base_srt := sort (base_slim (~isFCRA or (state_origin NOT IN states and source_code NOT IN source)), record);
   base_dep := dedup (base_srt, record);
 
   file_prefix := if (IsFCRA, 

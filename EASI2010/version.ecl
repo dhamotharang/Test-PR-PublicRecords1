@@ -1,0 +1,1 @@
+export version := '20120910';	//	'20120709A';	// change version date to match EASI version

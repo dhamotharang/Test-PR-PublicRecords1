@@ -1,0 +1,46 @@
+OPTIONS: -ga  
+OPTIONS: -gs2 
+THRESHOLD:30
+MODULE:InsuranceHeader_Property_Transactions_DeedsMortgages
+FILENAME:PROPERTY_TRANSACTION 
+IDFIELD:EXISTS:DPROPTXID 
+IDNAME:DPROPTXID
+RIDFIELD:rid
+RECORDS:629786819
+POPULATION:629786819
+NINES:3
+FIELDTYPE:WORDBAG:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):SPACES( <>{}[]-^=!+&,./):ONFAIL(CLEAN):
+FUZZY:InitialDoc:RS:CUSTOM(InsuranceHeader_Property_Transactions_Deeds.fn_document_number):TYPE(STRING20)
+FIELD:fips_code:8,0
+FIELD:apnt_or_pin_number:TYPE(STRING45):EDIT1:WEIGHT(0.5):25,0
+FIELD:ln_fares_id:CARRY
+FIELD:did:WEIGHT(0.5):26,0
+FIELD:name:TYPE(STRING80):EDIT1:HYPHEN2:ABBR:BAGOFWORDS(ALL):9,0
+FIELD:prim_range:CARRY
+FIELD:prim_range_alpha:10,0
+FIELD:prim_range_num:INITIAL:HYPHEN2:FORCE(+):6,0
+FIELD:prim_name:CARRY
+FIELD:prim_name_num:INITIAL:FORCE(--):8,0
+FIELD:prim_name_alpha:TYPE(STRING28):EDIT1:HYPHEN2:BAGOFWORDS(ALL):FORCE(+):8,0
+FIELD:sec_range:CARRY
+FIELD:sec_range_alpha:PROP:FORCE(--):10,0
+FIELD:sec_range_num:INITIAL:HYPHEN2:PROP:FORCE(--):8,0
+FIELD:city:TYPE(STRING25):BAGOFWORDS(MOST):EDIT2:HYPHEN2:6,0
+FIELD:st:6,0
+FIELD:zip:EDIT1:FORCE(+):13,0
+FIELD:recording_date:FORCE:12,0
+FIELD:contract_date:PROP:FORCE(--):12,0
+FIELD:document_number:SWITCH0:InitialDoc:12,0
+FIELD:document_number_rev:SWITCH0:InitialDoc:13,0
+FIELD:document_type_code:CARRY
+FIELD:recorder_book_number:16,0
+FIELD:recorder_page_number:CONTEXT(recorder_book_number):FORCE(+5,OR(document_number),OR(document_number_rev)):12,0
+FIELD:sales_price:PROP:FORCE(--):13,0
+FIELD:first_td_loan_amount:PROP:FORCE(--):13,0
+FIELD:lender_name:TYPE(STRING40):EDIT1:HYPHEN2:ABBR:BAGOFWORDS(ALL):SWITCH0:7,0
+FIELD:county_name:8,0
+CONCEPT:primrange:prim_range_alpha:prim_range_num:13,0
+CONCEPT:primname:prim_name_alpha:prim_name_num:14,0
+CONCEPT:secrange:sec_range_alpha:sec_range_num:13,0
+CONCEPT:locale:city:st:zip:13,0
+CONCEPT:address:primrange:primname:secrange:locale:FORCE(+):25,0

@@ -37,7 +37,7 @@ ds_inMasterLayout :=
 			self.inp.prim_range := left.prim_range;
 			self.inp.st := left.st;
 			self.inp.city_name := left.v_city_name;
-			self.inp.zip := (string6)left.zip6;
+			self.inp.zip := if (trim(left.country,left,right) ='CA',(string6)left.zip6,(string5)left.zip5); 
 			self.inp.sec_range := left.sec_range;
 			self.inp.states := 0;
 			self.inp.lname1 := 0;
@@ -95,9 +95,9 @@ OUTACTION :=
 	AutoKeyB2.MAC_AcceptSK_to_QA(super_keyname,move_qa,,fedex.fedex_autokey_constants.autokey_skip_set);
 
 	RoxieKeyBuild.Mac_Daily_Email_Local('FEDEX','SUCC', version_date, send_succ_msg, RoxieKeyBuild.Email_Notification_List);
-	RoxieKeyBuild.Mac_Daily_Email_Local('FEDEX','FAIL', version_date, send_fail_msg, 'kgummadi@seisint.com');
+	RoxieKeyBuild.Mac_Daily_Email_Local('FEDEX','FAIL', version_date, send_fail_msg, 'maichel.gould@lexisnexis.com,John.Freibaum@lexisnexis.com');
 	
-	update_dops := RoxieKeyBuild.updateversion('FedExKeys',version_date,'kgummadi@seisint.com');
+	update_dops := RoxieKeyBuild.updateversion('FedexKeys',version_date,'michael.gould@lexisnexis.com,John.Freibaum@lexisnexis.com',,'N');
 	build_keys	:= sequential(outaction, move_qa);
 	build_fedex_keys := sequential(build_keys, update_dops) : success(send_succ_msg), failure(send_fail_msg);
 	 

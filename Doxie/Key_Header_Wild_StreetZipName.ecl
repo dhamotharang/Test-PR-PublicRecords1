@@ -1,4 +1,4 @@
-import autokey, header;
+import autokey, header, ut;
 
 t := header.Prepped_For_Keys;
 
@@ -25,4 +25,4 @@ stflcrec := record
 
 recs := dedup( sort( table( t,stflcrec ), record), record );
 
-export Key_Header_Wild_StreetZipName := INDEX(recs, {recs},'~thor_data400::key::header.wild.pname.zip.name.range_'+doxie.Version_SuperKey);
+export Key_Header_Wild_StreetZipName := INDEX(recs, {recs},ut.Data_Location.Person_header + 'thor_data400::key::header.wild.pname.zip.name.range_'+doxie.Version_SuperKey);

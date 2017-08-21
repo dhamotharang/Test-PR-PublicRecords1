@@ -1,9 +1,9 @@
 import emerges, data_services;
 
 EXPORT key_override_ccw := module
-	fname_prefix := '~thor_data400::base::override::fcra::qa::';
-	daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-  keyname_prefix := '~thor_data400::key::override::fcra::concealed_weapons::qa::';
+	shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
+	shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
+  shared keyname_prefix := data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::concealed_weapons::qa::';
 	
 //New	
 	// shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
@@ -11,7 +11,7 @@ EXPORT key_override_ccw := module
 	// shared keyname_prefix := '~thor_data400::key::override::fcra::ccw:qa::';
 	
 
-  ccw_rec := RECORD
+	export ccw_rec := RECORD
     emerges.layout_ccw_out;
     string20 flag_file_id;
   end;

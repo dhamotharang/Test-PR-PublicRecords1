@@ -1,0 +1,23 @@
+export Layout_soff_address := RECORD , MAXLENGTH(4096)
+  string   Unique_id;
+  string   id;
+  string   street;
+  string   city;
+  string   state;
+  string   county;
+  string   asod_date;
+  string   zip;
+  string   name;
+  string   address_type;
+	string   address_verified;
+	string   home_phone;
+	String   cell_phone;
+	String   comments;
+	String   intnet_email_addr;
+	String   intnet_instant_msngr_addr;
+	String   intnet_user_name;
+	String   intnet_user_name_url;
+	String   address_serial_number;
+  string   address_refined_key;
+  //String2    eor;       
+end;

@@ -1,13 +1,10 @@
 import doxie, ingenix_natlprof;
 
-file_in := ingenix_natlprof.Basefile_Provider_Did;
-	
-dist_prov_base := distribute(file_in, hash(providerid));
-sort_prov_base := sort(dist_prov_base, except did, did_score, local);
-dedup_prov_base := dedup(sort_prov_base, except did, did_score, local) : persist('per_dedup_prov_base');
+file_in := ingenix_natlprof.Basefile_Provider_Did_keybuild;
+dedup_prov_base := distribute(file_in, hash(providerid));
 
 license_in := ingenix_natlprof.Basefile_ProviderLicense;
-license_in_dep := distribute(dedup(license_in,all), hash(providerid)) : persist('per_license_in_dep');
+license_in_dep := distribute(license_in, hash(providerid));
 
 //get provider id
 pid_rec := record
@@ -43,19 +40,39 @@ f_names_dep := dedup(f_names_srt, record, except ProviderNameTierID, local);
 pid_addr_rec := record
      unsigned6 providerid;
 	doxie.ingenix_provider_module.ingenix_addr_rec;
+	integer addr_date;
 end;
 
 pid_addr_rec get_addrs(dedup_prov_base l) := transform
      self.providerid := (unsigned6)l.providerid;
 	self.ProviderAddressTierTypeID := (unsigned2) l.ProviderAddressTierTypeID;
+	self.addr_date := (integer)l.dt_vendor_last_reported;
 	self.phone := [];
 	self := l;
 end;
 
 f_addrs := project(dedup_prov_base, get_addrs(left));
 
-f_addrs_srt := sort(f_addrs(Prov_Clean_prim_name<>''), record, local);
-f_addrs_dep := dedup(f_addrs_srt, record, except ProviderAddressTierTypeID, local);
+f_addrs_srt := sort(f_addrs(Prov_Clean_prim_name<>''), 
+                              providerid,
+						Prov_Clean_prim_range,
+						Prov_Clean_prim_name,
+						Prov_Clean_sec_range,
+						Prov_Clean_zip,
+						-addr_date, provideraddresstiertypeid, local);
+
+f_addrs_dep_ready := dedup(f_addrs_srt, providerid,
+                                  prov_clean_prim_range,
+                                  prov_clean_prim_name,
+						    Prov_Clean_sec_range,
+						    prov_clean_zip,local);
+
+f_addrs_dep_final := group(TOPN(group(f_addrs_dep_ready,providerid), 40,   /* was 80 */
+				       -addr_date, provideraddresstiertypeid));
+					 
+f_addrs_dep := project(f_addrs_dep_final, transform({unsigned6 providerid;
+	                                                doxie.ingenix_provider_module.ingenix_addr_rec},
+										   self := left));					 
 
 //get phone
 pid_phone_rec := record
@@ -91,8 +108,18 @@ f_phones_srt2 roll_phone_type(f_phones_srt2 l, f_phones_srt2 r) := transform
 	self := l;
 end;
 
-f_phones_rol := rollup(f_phones_srt2, roll_phone_type(left,right), 
-                       record, except PhoneType, PhoneNumberTierTypeID, local);
+f_phones_rol_ready := rollup(f_phones_srt2, roll_phone_type(left,right), 
+                             record, except PhoneType, PhoneNumberTierTypeID, local);
+					    
+f_phones_rol_final := sort(f_phones_rol_ready, providerid, Prov_Clean_prim_name,
+							            Prov_Clean_st, Prov_Clean_zip,
+							            Prov_Clean_prim_range, Prov_Clean_sec_range, local);   
+					 
+f_phones_rol := group(TOPN(group(f_phones_rol_final, providerid, Prov_Clean_prim_name,
+							                  Prov_Clean_st, Prov_Clean_zip,
+							                  Prov_Clean_prim_range, Prov_Clean_sec_range), 10, 
+			   	       PhoneNumberTierTypeID));
+
 
 //append phones to address
 f_addrs_dep app_phones(f_addrs_dep l,  f_phones_rol r) := transform

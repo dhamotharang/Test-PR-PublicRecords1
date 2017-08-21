@@ -27,4 +27,4 @@ email := fileservices.sendemail('mluber@seisint.com',
 						  'Stats at : http://10.150.28.12:8010/WsWorkunits/WUInfo?Wuid=' + workunit + '\r\n');
 
 
-export Proc_Build_DL_Search_Base := sequential(stats,dofirst,email);
+export Proc_Build_DL_Search_Base := sequential(dofirst);

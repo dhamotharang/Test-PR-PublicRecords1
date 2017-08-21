@@ -1,5 +1,5 @@
 //This is the code to execute in a builder window
-#workunit('name','Health_Facility_Services.BWR_Hygiene - Hygiene & Stats - SALT V2.9 Beta 1');
+#workunit('name','Health_Facility_Services.BWR_Hygiene - Hygiene & Stats - SALT V2.9 Gold SR1');
 IMPORT Health_Facility_Services,SALT29;
 // First create an instantiated hygiene module
   h := Health_Facility_Services.Hygiene(Health_Facility_Services.File_HealthFacility);

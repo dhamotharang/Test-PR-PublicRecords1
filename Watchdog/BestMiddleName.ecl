@@ -4,9 +4,10 @@ If the second most frequent is the 'preferredfirst' of the most frequent, pick i
 If not, pick the most frequent only if it is 1.5x as frequent as the next.
 If not, don't pick any -- we don't have a 'best' mname*/
 
-import header,mdr;
-
-f := file_header_filtered;
+import header,mdr,NID, address, ut;
+suffix_set := ['II', 'III','IV', 'VII', 'VIII', 'IX', 'IV', 'JR', 'SR'];
+f_ := file_header_filtered (mname<>'' and mname not in suffix_set);
+watchdog.Mac_Exclude_as_Best(f_, f, 'mname') ;
 
 rfields := record
 unsigned6    did;
@@ -18,8 +19,8 @@ rfields slim(f le) := transform
 self.mname := trim(le.mname);
 self := le;
   end;
-
-slim_h := project(f(mname<>''),slim(left));
+alphabet := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+slim_h := project(f((stringlib.stringfilterout(trim(mname,all), alphabet) = '' and  length(trim(mname,all)) < 3 or address.persons.IsPossibleName(trim(mname,all)))),slim(left));
 
 //Sort by DID and mname
 srt_h := sort(slim_h,did,mname,local);
@@ -75,10 +76,10 @@ two_DID := dedup(mname_ready,did,keep 2,local);
 //If mname count is 1.5x greater than the next, it is 'best'
 rfields mname_join(rfields le, rfields rt) := transform
 self.mname := MAP(length(trim(le.mname)) = 1 and le.mname[1] = rt.mname[1] => rt.mname,
-				  length(trim(rt.mname)) = 1 and le.mname[1] = rt.mname[1] => le.mname,
-				  datalib.preferredfirst(le.mname) = rt.mname => rt.mname,
-				  datalib.preferredfirst(rt.mname) = le.mname => le.mname,
-				  le.mname_count < 1.5*rt.mname_count => '',le.mname);
+				          length(trim(rt.mname)) = 1 and le.mname[1] = rt.mname[1] => le.mname,
+				          NID.PreferredFirstVersionedStr(le.mname, NID.version) = rt.mname => rt.mname,
+				          NID.PreferredFirstVersionedStr(rt.mname, NID.version) = le.mname => le.mname,
+				          le.mname_count < 1.5*rt.mname_count => '',le.mname);
 self := le;
 end;
 

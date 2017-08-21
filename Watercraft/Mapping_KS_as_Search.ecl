@@ -1,5 +1,7 @@
 import lib_stringlib, watercraft;
 
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_KS_clean_in, watercraft.Layout_KS_clean_in,hull_clean_in)
+
 Layout_KS_clean_temp := record
 
 watercraft.Layout_KS_clean_in;
@@ -9,7 +11,7 @@ boolean is_hull_id_in_MIC;
     	
 end;
 
-Layout_KS_clean_temp main_mapping_temp(watercraft.file_KS_clean_in L, watercraft.file_MIC R)
+Layout_KS_clean_temp main_mapping_temp(hull_clean_in L, watercraft.file_MIC R)
 
 := transform
 
@@ -19,7 +21,7 @@ self.is_hull_id_in_MIC := if(trim(L.hull_id, left, right)[1..3] = R.MIC, true, f
 
 end;
 
-Mapping_KS_as_Main_temp := join(watercraft.file_KS_clean_in, watercraft.file_MIC, trim(left.hull_id, left, right)[1..3] = right.MIC,
+Mapping_KS_as_Main_temp := join(hull_clean_in, watercraft.file_MIC, trim(left.hull_id, left, right)[1..3] = right.MIC,
 main_mapping_temp(left, right), left outer, lookup);
 
 

@@ -13,6 +13,7 @@ EXPORT proc_Kickoff_Phase_2(
   ,pSkipMisckeys          = 'false'
   ,pSkipSegStats          = 'false'
   ,pSkipStrata            = 'false'
+  ,pSkipOverlinking       = 'false'
   ,pSkipSeleidRelative    = 'false'
   ,pUniqueOutput          = '\'\''
   ,pOutputEcl             = 'false'
@@ -21,7 +22,7 @@ EXPORT proc_Kickoff_Phase_2(
 functionmacro
 
   ecl		  := '#workunit(\'name\',\'BIPV2_Build.proc_Build_Phase_2 @version@ ' + pUniqueOutput + '\');\n#workunit(\'priority\',\'high\');\n' 
-  + 'output(\'<a href="http://' + wk_ut._Constants.LocalEsp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit + '#/stub/Summary">Parent Workunit</a>\' ,named(\'Parent_Wuid__html\'));\n'
+  // + 'output(\'<a href="http://' + wk_ut._Constants.LocalEsp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit + '#/stub/Summary">Parent Workunit</a>\' ,named(\'Parent_Wuid__html\'));\n'
   + 'BIPV2_Build.proc_Build_Phase_2(\'@version@\'\n'
   + ',@pSkipXlink@\n'         
   + ',@pSkipCopyXlinkKeys@\n' 
@@ -32,6 +33,7 @@ functionmacro
   + ',@pSkipMisckeys@\n'      
   + ',@pSkipSegStats@\n'      
   + ',@pSkipStrata@\n'        
+  + ',@pSkipOverlinking@\n'        
   + ',@pSkipSeleidRelative@\n'
   + ');';
   
@@ -49,11 +51,12 @@ functionmacro
   ecl8    := regexreplace('@pSkipBest@'          ,ecl7 ,fbool(pSkipBest          ),nocase);
   ecl9    := regexreplace('@pSkipSegStats@'      ,ecl8 ,fbool(pSkipSegStats      ),nocase);
   ecl10   := regexreplace('@pSkipStrata@'        ,ecl9 ,fbool(pSkipStrata        ),nocase);
-  ecl11   := regexreplace('@pSkipSeleidRelative@',ecl10,fbool(pSkipSeleidRelative),nocase);
+  ecl11   := regexreplace('@pSkipOverlinking@'   ,ecl10,fbool(pSkipOverlinking   ),nocase);
+  ecl12   := regexreplace('@pSkipSeleidRelative@',ecl11,fbool(pSkipSeleidRelative),nocase);
                                                             
-  kickWuid	  := wk_ut.CreateWuid(ecl11,cluster);
+  kickWuid	  := wk_ut.CreateWuid(ecl12,cluster);
 //  kickXlink	  := wk_ut.CreateWuidNWait(ecl16,'1',pversion,cluster,,_control.MyInfo.EmailAddressNotify,,pUniqueOutput,pPollingFrequency,false);
   
-  return if(pOutputEcl = false  ,kickWuid  ,ecl11);
+  return if(pOutputEcl = false  ,kickWuid  ,ecl12);
 
 endmacro;

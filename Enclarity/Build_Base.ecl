@@ -407,29 +407,29 @@ export Build_Base := module
 						,output('No Valid version parameter passed, skipping sanc_codes build')
 					);
 	END;
-		EXPORT build_base_dea_BAcodes(
-					 string			pversion
-					,boolean		pUseProd		= false
-					,dataset(Layouts.dea_BAcodes_Base						) pBaseFile						= Files().dea_BAcodes_base.qa ) := module
+		// EXPORT build_base_dea_BAcodes(
+					 // string			pversion
+					// ,boolean		pUseProd		= false
+					// ,dataset(Layouts.dea_BAcodes_Base						) pBaseFile						= Files().dea_BAcodes_base ) := module
 			
-					export build_base_dea_BAcodes			:= Update_base(pversion, pUseProd).dea_BAcodes_base;
-					VersionControl.macBuildNewLogicalFile(
-															 Filenames(pversion,pUseProd).dea_BAcodes_base.new	
-															,build_base_dea_BAcodes
-															,Build_dea_BAcodes_Base
-					);
+					// export build_base_dea_BAcodes			:= Update_base(pversion, pUseProd).dea_BAcodes_base;
+					// VersionControl.macBuildNewLogicalFile(
+															 // Filenames(pversion,pUseProd).dea_BAcodes_base.new	
+															// ,build_base_dea_BAcodes
+															// ,Build_dea_BAcodes_Base
+					// );
 	
-					export full_build_dea_BAcodes	:=
-						sequential(
-									 Build_dea_BAcodes_base
-									,Promote.promote_dea_BAcodes(pversion, pUseProd).buildfiles.New2Built);
+					// export full_build_dea_BAcodes	:=
+						// sequential(
+									 // Build_dea_BAcodes_base
+									// ,Promote.promote_dea_BAcodes(pversion, pUseProd).buildfiles.New2Built);
 	
-					export dea_BAcodes_all	:=
-						 if(VersionControl.IsValidVersion(pversion)
-						,full_build_dea_BAcodes
-						,output('No Valid version parameter passed, skipping dea_BAcodes build')
-					);
-	END;
+					// export dea_BAcodes_all	:=
+						 // if(VersionControl.IsValidVersion(pversion)
+						// ,full_build_dea_BAcodes
+						// ,output('No Valid version parameter passed, skipping dea_BAcodes build')
+					// );
+	// END;
 
 	EXPORT build_base_prov_birthdate(
 					 string			pversion

@@ -4,7 +4,7 @@
 import models, Riskwise, Risk_Indicators;
 
 // new internal fields for debugging, set to false so they are excluded from the layout by default
-include_internal_extras := true;
+include_internal_extras := false;
 
 unsigned1 eyeball := 10;
 
@@ -34,7 +34,7 @@ prii_layout := RECORD
 end;
 
 infile_name := '~dvstemp::in::shell_4_0_barclay_1331_f_s';
-outfile_name := '~dvstemp::out::rvattributes_v4_barclay_1331_f_s_' + thorlib.wuid();
+outfile_name := '~dvstemp::out::rvattr40_' + thorlib.wuid();
 
 f := dataset(infile_name, prii_layout, csv(quote('"')));
 // f := choosen(dataset(infile_name,prii_layout, csv(quote('"'))),eyeball);  // for testing a few records first
@@ -76,7 +76,6 @@ layout_soap := record
 	string DataRestrictionMask;
 	string IntendedPurpose;
 	unsigned6 did;
-	boolean FilterLiens;
 end;
 
 fcraroxieIP := riskwise.shortcuts.prod_batch_fcra; 
@@ -91,17 +90,17 @@ layout_soap t_f(f le, INTEGER c) := TRANSFORM
 	SELF.Attributes := True;
 	SELF.RequestedAttributeGroups := dataset([{'version4'}], layout_attributes_in);
 
-	 self.HistoryDateYYYYMM := le.historydateyyyymm;
-	//self.HistoryDateYYYYMM := 999999;
+  SELF.HistoryDateYYYYMM := (Integer) le.historydateyyyymm[1..6];
+	// self.HistoryDateYYYYMM := le.historydateyyyymm;
+	// self.HistoryDateYYYYMM := 999999;
 	
 	self.gateways := dataset([{'neutralroxie', riskwise.shortcuts.prod_batch_neutral}], risk_indicators.Layout_Gateways_In);
 	// self.gateways := dataset([{'neutralroxie', riskwise.shortcuts.dev64b}], risk_indicators.Layout_Gateways_In);
 	// self.gateways := dataset([{'neutralroxie', riskwise.shortcuts.staging_neutral_roxieIP}], risk_indicators.Layout_Gateways_In);
-	self.DataRestrictionMask := '100001000100'; // to restrict fares, experian and transunion 
-
+	self.DataRestrictionMask := '10000100010001000000000000000000000000000'; // to restrict fares, experian and transunion -- returns liens and judgments
+	//self.DataRestrictionMask := '10000100010001000000000000000000000000001';//to restrict fares, LIENS/Jdgmts, experian and transunion 
 	// self.IntendedPurpose := 'PRESCREENING';	// to run in prescreen mode
 	self.IntendedPurpose := '';
-	self.FilterLiens := false;  // temporary input option, RQ-12867
 	SELF := le;
 	self := [];
 end;

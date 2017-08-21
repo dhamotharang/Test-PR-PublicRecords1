@@ -1,19 +1,21 @@
-import aca, business_header, header, fcra, versioncontrol,paw,corp2,mdr;
+import ut, aca, business_header, header, fcra, versioncontrol,paw,corp2,mdr;
 
 lbizpnames			:= business_header.persistnames().BHBDIDSIC			;
-pACAPersistname	:= '~thor_data400::persist::aca::file_aca_clean';
+pACAPersistname	:= '~thor_data400::persist::aca::file_aca_clean.fAll_Businesses';
 use_prod 				:= versioncontrol._Flags.IsDataland							;
 thor_cluster 		:= business_header._dataset().thor_cluster_Persists;
 
 export fAll_Businesses(
 
-	 string																								pPersistUnique	= ''
-	,boolean																							pUseDatasets		= false
-	,string																								pPersistname		= thor_cluster + 'persist::Risk_Indicators::fAll_Businesses::'
+	 boolean																							pUseDatasets		= false
+	,string																								pPersistUnique	= ''
+	,string																								pPersistname		= persistnames().fAllBusinesses + '::'
+	,string																								pBhVersion			= 'qa'
 	,dataset(corp2.Layout_Corporate_Direct_Corp_Base		)	pInactiveCorps 	= paw.fCorpInactives()
-	,dataset(business_header.layout_sic_code						)	pBh_bdid_sic		= business_header.bh_bdid_sic(pUseDatasets := pUseDatasets,pPersistname := lbizpnames + '::' + pPersistUnique[1..length(pPersistUnique) - 2],pInactiveCorps := pInactiveCorps)
+	,dataset(business_header.layout_sic_code						)	pBh_bdid_sic		= business_header.bh_bdid_sic(pBhVersion,pUseDatasets := pUseDatasets,pPersistname := lbizpnames + '::' + pPersistUnique[1..length(pPersistUnique) - 2],pInactiveCorps := pInactiveCorps)
 	,dataset(aca.Layout_ACA_Clean												) pAca_Clean 			= aca.File_ACA_Clean(pUseDatasets := pUseDatasets, pPersistname := pACAPersistname)
-	,dataset(business_header.Layout_Business_Header_base) pBH							= business_header.files(,use_prod).Base.business_headers.built
+	,dataset(business_header.Layout_Business_Header_base) pBH							= business_header.files(pBhVersion,use_prod).Base.business_headers.new
+	,dataset(risk_indicators.Layout_PBSA.base						) pPBSA_Clean 		= Risk_Indicators.File_PBSA.base
 //	,dataset(Layouts.SicLookup													) pSicLookup			= Files().SicLookup.qa
 	
 ) := function
@@ -55,19 +57,28 @@ export fAll_Businesses(
 	);
 	
 	// Add ACA addresses
-	out_rec get_ACAs(aca.Layout_ACA_Clean L) := transform
+	out_rec get_ACAs(pAca_Clean L) := transform
 		self.sic_code := '9223';
 		self.city := 	L.v_city_name;
+		Self.Source := MDR.sourceTools.src_ACA;
 		self := l;
 	end;
 
 	dAca_Sics := project(pAca_Clean, get_ACAs(LEFT));
+	
+	// Add PBSA addresses
+	dPBSA_Clean_ded := dedup(sort(project(pPBSA_Clean, Risk_Indicators.Layout_PBSA.base_slim),record),record);
+	
+	out_rec get_PBSAs(dPBSA_Clean_ded L) := transform
+		self.sic_code := '4311';
+		self.city 		:= L.v_city_name;
+		self.state		:= L.st;
+		self.Source := MDR.sourceTools.src_PBSA;
+		self 					:= l;
+	end;
+	dPBSA_Sics := project(dPBSA_Clean_ded, get_PBSAs(LEFT));
 
 	// concatenate
-	dall_sics := (dJoin4Sics + dAca_Sics)(prim_name != '');
-	
-	dall_sics_dedup := dedup(dall_sics, all);
-
-	return dall_sics_dedup;
-	
+	dall_sics := (dJoin4Sics + dAca_Sics + dPBSA_Sics)(prim_name != '');	
+	return dall_sics;
 end;

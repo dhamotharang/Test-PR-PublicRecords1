@@ -104,12 +104,12 @@ sequential(
 	 create_new_corp_base
 	,create_new_cont_base
 	,create_new_event_base
-	,versioncontrol.mUtilities.clear_add(corp2.filenames.base.corp.qa, '~thor_data400::base::corp2::' + Corp.Corp_Build_Date + '::main')
-	,versioncontrol.mUtilities.clear_add(corp2.filenames.base.cont.qa, '~thor_data400::base::corp2::' + Corp.Corp_Build_Date + '::cont')
-	,versioncontrol.mUtilities.clear_add(corp2.filenames.base.events.qa, '~thor_data400::base::corp2::' + Corp.Corp_Build_Date + '::event')
-	,fileservices.clearsuperfile(corp2.filenames.base.stock.qa)
-	,fileservices.clearsuperfile(corp2.filenames.base.ar.qa)
-	,rollback.input.Used2Sprayed
+	,versioncontrol.mUtilities.clear_add(corp2.filenames().base.corp.qa, '~thor_data400::base::corp2::' + Corp.Corp_Build_Date + '::main')
+	,versioncontrol.mUtilities.clear_add(corp2.filenames().base.cont.qa, '~thor_data400::base::corp2::' + Corp.Corp_Build_Date + '::cont')
+	,versioncontrol.mUtilities.clear_add(corp2.filenames().base.events.qa, '~thor_data400::base::corp2::' + Corp.Corp_Build_Date + '::event')
+	,fileservices.clearsuperfile(corp2.filenames().base.stock.qa)
+	,fileservices.clearsuperfile(corp2.filenames().base.ar.qa)
+	,rollback().input.Used2Sprayed()
 );
 /*
 	self.dt_first_seen					:= (unsigned4)pInput.dt_first_seen;

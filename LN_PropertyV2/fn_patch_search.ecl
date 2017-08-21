@@ -1,21 +1,52 @@
-import ut;
+import	address,idl_header,ut,watchdog;
 
-export fn_patch_search(dataset(recordof(ln_propertyv2.layout_deed_mortgage_property_search)) in_srch) :=
+export	fn_patch_search(dataset(LN_PropertyV2.layout_deed_mortgage_property_search_mod)	pInSearch)	:=
 function
+	dSearchDist	:=	distribute(pInSearch,hash32(ln_fares_id));
+	
+	// Property name cleaner issue (comma is tagged to the end of the last name or first name)
+	LN_PropertyV2.layout_deed_mortgage_property_search_mod	tPatchName(LN_PropertyV2.layout_deed_mortgage_property_search_mod	le)	:=
+	transform
+		self.dt_first_seen	:=	if(	le.dt_first_seen	>	(integer)le.process_date,
+																0,
+																le.dt_first_seen
+															);
+		self.dt_last_seen		:=	if(	le.dt_last_seen	>	(integer)le.process_date,
+																0,
+																le.dt_last_seen
+															);
+		self.fname					:=	regexreplace('[,]+$',stringlib.stringcleanspaces(ut.fn_KeepPrintableChars(le.fname)),'');
+		self.mname					:=	regexreplace('[,]+$',stringlib.stringcleanspaces(ut.fn_KeepPrintableChars(stringlib.stringfindreplace(le.mname,',ETAL',''))),'');
+		self.lname					:=	regexreplace('[,]+$',stringlib.stringcleanspaces(ut.fn_KeepPrintableChars(le.lname)),'');
+		self.cname					:=	stringlib.stringcleanspaces(ut.fn_KeepPrintableChars(le.cname));
+		self.nameasis				:=	stringlib.stringcleanspaces(ut.fn_KeepPrintableChars(ln_propertyv2.fn_patch_name_field(le.nameasis)));
+		self.p_city_name		:=	if(le.st	=	''	and	le.p_city_name	=	'SCHENECTADY','',le.p_city_name);
+		self								:=	le;
+	end;
 
-recordof(in_srch) t_patch_mname(recordof(in_srch) le) := transform
- 
- self.fname    := trim(ut.fn_KeepPrintableChars(le.fname));
- self.mname    := trim(ut.fn_KeepPrintableChars(stringlib.stringfindreplace(le.mname,',ETAL','')));
- self.lname    := trim(ut.fn_KeepPrintableChars(le.lname));
- self.cname    := trim(ut.fn_KeepPrintableChars(le.cname));
- self.nameasis := trim(ut.fn_KeepPrintableChars(ln_propertyv2.fn_patch_name_field(le.nameasis)));
- self          := le;
-end;
-
-patch_search0 := project(in_srch,t_patch_mname(left));
-patch_search  := patch_search0(fname<>'' or lname<>'' or cname<>'' or nameasis<>'');
-
-return patch_search;
+	dPatchName	:=	project(dSearchDist,tPatchName(left));
+	
+	// Bug 31994
+	dPropagatedRecs			:=	dPatchName(prop_addr_propagated_ind	=	'P');
+	dNotPropagatedRecs	:=	dPatchName(source_code[2]	=	'P'	and	prop_addr_propagated_ind	!=	'P');
+	dOthers							:=	dPatchName(~(source_code[2]	=	'P'	and	prop_addr_propagated_ind	!=	'P'));
+	
+	LN_PropertyV2.layout_deed_mortgage_property_search_mod	tRemovePropagatedRecs(dNotPropagatedRecs	le,dPropagatedRecs	ri)	:=
+	transform
+		self	:=	le;
+	end;
+	
+	dRemovePropagatedRecs	:=	join(	dNotPropagatedRecs,
+																	dPropagatedRecs,
+																	left.ln_fares_id	=	right.ln_fares_id	and
+																	left.source_code	=	right.source_code,
+																	tRemovePropagatedRecs(left,right),
+																	left only,
+																	local
+																);
+	
+	dSearchCombined	:=	dPropagatedRecs	+	dRemovePropagatedRecs	+	dOthers;
+	
+	return dSearchCombined;
 
 end;

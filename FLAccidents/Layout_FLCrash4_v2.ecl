@@ -8,6 +8,7 @@ export Layout_FLCrash4_v2 := record
 	string16  filler2,
 	string1   driver_name_suffix,
 	// Expanded field from 40
+	string60  driver_address,
 	string60  driver_st_city,
 	string18  filler3,
 	string2   driver_resident_state,
@@ -100,4 +101,6 @@ export Layout_FLCrash4_v2 := record
 	string5   suffix,
 	string3   score,
 	string25  cname,
+	string41  ins_company_name,
+	string25  ins_policy_nbr,	
 end;

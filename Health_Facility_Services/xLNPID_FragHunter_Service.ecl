@@ -15,6 +15,7 @@
 <part name="TAX_ID" type="xsd:string"/>
 <part name="FEIN" type="xsd:string"/>
 <part name="PHONE" type="xsd:string"/>
+<part name="FAX" type="xsd:string"/>
 <part name="LIC_STATE" type="xsd:string"/>
 <part name="C_LIC_NBR" type="xsd:string"/>
 <part name="DEA_NUMBER" type="xsd:string"/>
@@ -22,32 +23,42 @@
 <part name="NPI_NUMBER" type="xsd:string"/>
 <part name="CLIA_NUMBER" type="xsd:string"/>
 <part name="MEDICARE_FACILITY_NUMBER" type="xsd:string"/>
+<part name="MEDICAID_NUMBER" type="xsd:string"/>
+<part name="NCPDP_NUMBER" type="xsd:string"/>
 <part name="BDID" type="xsd:string"/>
 <part name="SRC" type="xsd:string"/>
 <part name="SOURCE_RID" type="xsd:string"/>
+<part name="FAC_NAME" type="xsd:string"/>
 <part name="ADDR1" type="xsd:string"/>
 <part name="LOCALE" type="xsd:string"/>
 <part name="ADDRESS" type="xsd:string"/>
 <part name="LNPID" type="unsignedInt"/>
 <part name="MaxIds" type="xsd:integer"/>
+<part name="LeadThreshold" type="xsd:integer"/>
 <part name="UniqueID" type="xsd:integer"/>
 </message>
 */
 /*--INFO-- Return all available data for LNPID with similar fields to the one provided</p><p>Input fields are cleaned according to the standard hygiene requirements of this file.</p>
 <p>The more data input the better; but unless one of the following field combinations are present the UBER key will be used:-</p>
 <p>CNP_NAME:ZIP
-</p><p>CNP_NAME:ST
 </p><p>CNP_NAME
+</p><p>CNP_NAME:ST
 </p><p>PRIM_NAME:PRIM_RANGE:ZIP
 </p><p>PRIM_NAME:ZIP
 </p><p>PRIM_NAME:V_CITY_NAME:ST
 </p><p>PHONE
+</p><p>FAX
 </p><p>C_LIC_NBR:LIC_STATE
 </p><p>VENDOR_ID
 </p><p>TAX_ID
 </p><p>FEIN
 </p><p>DEA_NUMBER
 </p><p>NPI_NUMBER
+</p><p>NPI_NUMBER
+</p><p>CLIA_NUMBER
+</p><p>MEDICARE_FACILITY_NUMBER
+</p><p>MEDICAID_NUMBER
+</p><p>NCPDP_NUMBER
 </p><p>BDID
 </p>*/
 EXPORT xLNPID_FragHunter_Service := MACRO
@@ -67,6 +78,7 @@ EXPORT xLNPID_FragHunter_Service := MACRO
   SALT29.StrType Input_TAX_ID := '' : STORED('TAX_ID');
   SALT29.StrType Input_FEIN := '' : STORED('FEIN');
   SALT29.StrType Input_PHONE := '' : STORED('PHONE');
+  SALT29.StrType Input_FAX := '' : STORED('FAX');
   SALT29.StrType Input_LIC_STATE := '' : STORED('LIC_STATE');
   SALT29.StrType Input_C_LIC_NBR := '' : STORED('C_LIC_NBR');
   SALT29.StrType Input_DEA_NUMBER := '' : STORED('DEA_NUMBER');
@@ -74,18 +86,22 @@ EXPORT xLNPID_FragHunter_Service := MACRO
   SALT29.StrType Input_NPI_NUMBER := '' : STORED('NPI_NUMBER');
   SALT29.StrType Input_CLIA_NUMBER := '' : STORED('CLIA_NUMBER');
   SALT29.StrType Input_MEDICARE_FACILITY_NUMBER := '' : STORED('MEDICARE_FACILITY_NUMBER');
+  SALT29.StrType Input_MEDICAID_NUMBER := '' : STORED('MEDICAID_NUMBER');
+  SALT29.StrType Input_NCPDP_NUMBER := '' : STORED('NCPDP_NUMBER');
   SALT29.StrType Input_BDID := '' : STORED('BDID');
   SALT29.StrType Input_SRC := '' : STORED('SRC');
   SALT29.StrType Input_SOURCE_RID := '' : STORED('SOURCE_RID');
+  SALT29.StrType Input_FAC_NAME := '' : STORED('FAC_NAME');
   SALT29.StrType Input_ADDR1 := '' : STORED('ADDR1');
   SALT29.StrType Input_LOCALE := '' : STORED('LOCALE');
   SALT29.StrType Input_ADDRESS := '' : STORED('ADDRESS');
   UNSIGNED Input_UniqueID := 0 : STORED('UniqueID');
   UNSIGNED InputMaxIds0 := 0 : STORED('MaxIds');
   UNSIGNED Input_MaxIds := IF(InputMaxIds0=0,50,InputMaxIds0);
+  UNSIGNED Input_LeadThreshold := 0 : STORED('LeadThreshold');
   UNSIGNED e_LNPID := 0 : STORED('LNPID');
   Template := DATASET([],Health_Facility_Services.Process_xLNPID_Layouts.InputLayout);
-  Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds
+  Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,Input_LeadThreshold
   ,(TYPEOF(Template.CNAME))Health_Facility_Services.Fields.Make_CNAME((SALT29.StrType)Input_CNAME)
   ,(TYPEOF(Template.CNP_NAME))Health_Facility_Services.Fields.Make_CNP_NAME((SALT29.StrType)Input_CNP_NAME)
   ,(TYPEOF(Template.CNP_NUMBER))Health_Facility_Services.Fields.Make_CNP_NUMBER((SALT29.StrType)Input_CNP_NUMBER)
@@ -101,6 +117,7 @@ EXPORT xLNPID_FragHunter_Service := MACRO
   ,(TYPEOF(Template.TAX_ID))Input_TAX_ID
   ,(TYPEOF(Template.FEIN))Input_FEIN
   ,(TYPEOF(Template.PHONE))Health_Facility_Services.Fields.Make_PHONE((SALT29.StrType)Input_PHONE)
+  ,(TYPEOF(Template.FAX))Health_Facility_Services.Fields.Make_FAX((SALT29.StrType)Input_FAX)
   ,(TYPEOF(Template.LIC_STATE))Health_Facility_Services.Fields.Make_LIC_STATE((SALT29.StrType)Input_LIC_STATE)
   ,(TYPEOF(Template.C_LIC_NBR))Health_Facility_Services.Fields.Make_C_LIC_NBR((SALT29.StrType)Input_C_LIC_NBR)
   ,(TYPEOF(Template.DEA_NUMBER))Health_Facility_Services.Fields.Make_DEA_NUMBER((SALT29.StrType)Input_DEA_NUMBER)
@@ -108,9 +125,12 @@ EXPORT xLNPID_FragHunter_Service := MACRO
   ,(TYPEOF(Template.NPI_NUMBER))Health_Facility_Services.Fields.Make_NPI_NUMBER((SALT29.StrType)Input_NPI_NUMBER)
   ,(TYPEOF(Template.CLIA_NUMBER))Health_Facility_Services.Fields.Make_CLIA_NUMBER((SALT29.StrType)Input_CLIA_NUMBER)
   ,(TYPEOF(Template.MEDICARE_FACILITY_NUMBER))Health_Facility_Services.Fields.Make_MEDICARE_FACILITY_NUMBER((SALT29.StrType)Input_MEDICARE_FACILITY_NUMBER)
+  ,(TYPEOF(Template.MEDICAID_NUMBER))Health_Facility_Services.Fields.Make_MEDICAID_NUMBER((SALT29.StrType)Input_MEDICAID_NUMBER)
+  ,(TYPEOF(Template.NCPDP_NUMBER))Health_Facility_Services.Fields.Make_NCPDP_NUMBER((SALT29.StrType)Input_NCPDP_NUMBER)
   ,(TYPEOF(Template.BDID))Health_Facility_Services.Fields.Make_BDID((SALT29.StrType)Input_BDID)
   ,(TYPEOF(Template.SRC))Health_Facility_Services.Fields.Make_SRC((SALT29.StrType)Input_SRC)
   ,(TYPEOF(Template.SOURCE_RID))Health_Facility_Services.Fields.Make_SOURCE_RID((SALT29.StrType)Input_SOURCE_RID)
+  ,(TYPEOF(Template.FAC_NAME))Health_Facility_Services.Fields.Make_FAC_NAME((SALT29.StrType)Input_FAC_NAME)
   ,(TYPEOF(Template.ADDR1))Health_Facility_Services.Fields.Make_ADDR1((SALT29.StrType)Input_ADDR1)
   ,(TYPEOF(Template.LOCALE))Health_Facility_Services.Fields.Make_LOCALE((SALT29.StrType)Input_LOCALE)
   ,(TYPEOF(Template.ADDRESS))Health_Facility_Services.Fields.Make_ADDRESS((SALT29.StrType)Input_ADDRESS)

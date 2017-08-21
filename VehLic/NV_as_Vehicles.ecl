@@ -133,7 +133,7 @@ VehLic.Layout_Vehicles tRegToCommon(VehLic.File_NV_Reg_Update pRegIn)
 	self.dt_vendor_first_reported		:= (unsigned8)(pRegIn.append_Process_Date[1..6]);
 	self.dt_vendor_last_reported		:= (unsigned8)(pRegIn.append_Process_Date[1..6]);
 
-	self.VEHICLE_NUMBERxBG1 			:= if(pRegIn.orig_VEHICLE_VIN[14] <> ' ',pRegIn.orig_VEHICLE_VIN[1..14],(string)(hash(pRegIn.orig_VEHICLE_VIN,pRegIn.orig_REGISTRANT_1,pRegIn.orig_REGISTRANT_2)));
+	self.VEHICLE_NUMBERxBG1 			:= if(pRegIn.orig_VEHICLE_VIN[14] <> ' ',pRegIn.orig_VEHICLE_VIN,(string)(hash(pRegIn.orig_VEHICLE_VIN,pRegIn.orig_REGISTRANT_1,pRegIn.orig_REGISTRANT_2)));
 	self.ORIG_VIN						:= pRegIn.orig_VEHICLE_VIN;
 	self.YEAR_MAKE 						:= fFixRegModelYear(pRegIn.orig_VEHICLE_YEAR);
 	self.MAKE_CODE 						:= pRegIn.orig_VEHICLE_MAKE;

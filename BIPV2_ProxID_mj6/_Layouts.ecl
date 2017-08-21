@@ -103,6 +103,30 @@ export wkhistory := RECORD
   DATASET(layout_names) fileswritten;
  END;                                                     
 
+export summary_report := 
+RECORD
+  string24 wuid;
+  string owner;
+  string cluster;
+  string job;
+  string10 state;
+  string7 priority;
+  boolean online;
+  boolean protected;
+  string totalthortime;
+  string description;
+  string version;
+  string iteration;
+  string preclustercount;
+  string postclustercount;
+  string matchesperformed;
+  string basicmatchesperformed;
+  string slicesperformed;
+  string proxidscreatedbycleave;
+  DATASET(layout_names) filesread;
+  DATASET(layout_names) fileswritten;
+END;
+
 export wkhistoryold := RECORD
   string24 wuid;
   string owner;

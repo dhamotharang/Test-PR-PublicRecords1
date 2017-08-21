@@ -31,7 +31,7 @@ EXPORT Mac_transform_license (pInputfile		// Input File
 		  transform(TopBusiness_BIPV2.Layouts.rec_license_combined_layout,
 	      self.source        := psource,
 			  self.source_docid  := (string) left.psource_docid,
-			  self.source_rec_id := (string) left.psource_rec_id,
+			  self.source_rec_id := left.psource_rec_id,
 
 				self.license_state := (string) left.plicense_state,
 				self.license_board := IF(blicense_board,(string) left.plicense_board, %sLicenseBoard%),

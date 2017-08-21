@@ -1,8 +1,6 @@
 IMPORT Business_Header, ut, roxiekeybuild, VersionControl;
 
 // Proc to build BDL2 keys
-// Note :- This is an independent process only used in case of building the BDL2 keys seperately with
-// out the business header build.
 export Proc_Build_BDL2_Keys(string pversion) :=
 module
 
@@ -30,7 +28,6 @@ module
 	export all := sequential(
 		 Build_Keys
 		,business_header.promote(pversion,'key::business_header.bdl2').new2built
-		,business_header.promote(pversion,'key::business_header.bdl2').new2qa
 	);
 	
 	

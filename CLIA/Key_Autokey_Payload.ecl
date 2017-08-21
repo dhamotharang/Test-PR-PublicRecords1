@@ -1,7 +1,6 @@
 IMPORT AutokeyB2;
 
-// fakepf := DATASET([], CLIA.Layouts.Base);
-fakepf := DATASET([], CLIA.Layouts.Keybuild); // Points to old layout until we do a RR or something
+fakepf := DATASET([], CLIA.Layouts.Keybuild);
 
 ak_qa_keyname := CLIA._Constants().ak_qa_keyname;
 

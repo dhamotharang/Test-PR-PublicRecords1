@@ -1,10 +1,10 @@
 import property, header;
 
 export NOD_as_header(
-       dataset(Property.Layout_Fares_Foreclosure) pNoticeOfDefault=dataset([],Property.Layout_Fares_Foreclosure),
+       dataset(Property.Layout_Fares_Foreclosure_v2) pNoticeOfDefault=dataset([],Property.Layout_Fares_Foreclosure_v2),
        boolean p4HdrBld=false) := function
 
-    dNODAsSource := property.NOD_as_Source(pNoticeOfDefault,p4HdrBld);
+    dNODAsSource := header.Files_SeqdSrc().ND;
 
     Layout_NOD_Change := record
         dNODAsSource;
@@ -31,7 +31,7 @@ export NOD_as_header(
     NOD_rec := NORMALIZE(dNODAsSource,4,norm_NOD(left,counter));
 
     header.Layout_New_Records Translate_NOD_to_Header(Layout_NOD_Change l, integer c) := TRANSFORM
-        self.did := (integer)l.did;
+        self.did := 0;
         self.rid := 0;
         self.pflag1 := '';
         self.pflag2 := '';

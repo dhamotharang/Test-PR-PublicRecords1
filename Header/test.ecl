@@ -1,0 +1,28 @@
+export test := RECORD
+  unsigned integer6 did;
+  unsigned integer6 rid;
+  qstring18 vendor_id;
+  qstring9 ssn;
+  string1 valid_ssn;
+  string9 best_ssn;
+  integer4 dob;
+  string1 jflag1;
+  integer4 best_dob;
+  qstring10 phone;
+  qstring20 fname;
+  qstring20 lname;
+  qstring20 mname;
+  qstring5 name_suffix;
+  qstring10 prim_range;
+  qstring28 prim_name;
+  qstring5 zip;
+  string2 st;
+  qstring25 city_name;
+  qstring8 sec_range;
+  unsigned integer3 dt_last_seen;
+  boolean good_ssn;
+  integer1 good_nmaddr;
+  unsigned integer1 rare_name;
+  unsigned integer1 head_cnt;
+  boolean prim_range_fraction;
+ END;

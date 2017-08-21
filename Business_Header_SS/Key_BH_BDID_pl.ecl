@@ -1,6 +1,10 @@
-IMPORT Business_Header,ut;
+IMPORT Business_Header,ut,mdr, Data_Services, PRTE2_Business_Header;
 
-f_bh := business_header.File_Business_Header;
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+f_bh := PRTE2_Business_Header.File_Business_Header_Base_For_Keybuild;
+#ELSE
+f_bh := Business_Header.File_Business_Header_Base_for_keybuild;
+#END;
 
 rec := RECORD
   unsigned6 bdid := 0;      
@@ -34,9 +38,29 @@ rec := RECORD
 	string2   vendor_st;
 END;
 
-rec  makerec(f_bh l) := transform
-	self.vendor_st := l.vendor_id[1..2];
-	self := l;
+rec  makerec(f_bh l) := 
+transform
+	
+	isdB := mdr.sourcetools.sourceisdunn_bradstreet(l.source);
+	
+	self.vendor_st 		:= l.vendor_id[1..2];
+	self.prim_range		:= if(isdB	,''	,l.prim_range		);
+	self.predir				:= if(isdB	,''	,l.predir				);
+	self.prim_name		:= if(isdB	,''	,l.prim_name		);
+	self.addr_suffix	:= if(isdB	,''	,l.addr_suffix	);
+	self.postdir			:= if(isdB	,''	,l.postdir			);
+	self.unit_desig		:= if(isdB	,''	,l.unit_desig		);
+	self.sec_range		:= if(isdB	,''	,l.sec_range		);
+	self.zip					:= if(isdB	,0	,l.zip					);
+	self.zip4					:= if(isdB	,0	,l.zip4					);
+	self.county				:= if(isdB	,''	,l.county				);
+	self.msa					:= if(isdB	,''	,l.msa					);
+	self.geo_lat			:= if(isdB	,''	,l.geo_lat			);
+	self.geo_long			:= if(isdB	,''	,l.geo_long			);
+	self.phone				:= if(isdB	,0	,l.phone				);
+	self.phone_score	:= if(isdB	,0	,l.phone_score	);
+	self 							:= l;                     
+
 end;
 
 p := project(f_bh, makerec(left));
@@ -82,4 +106,4 @@ EXPORT Key_BH_BDID_pl := INDEX(
 	r, 
 	{bdid},
 	{r},
-	'~thor_data400::key::business_header.BDID_pl_' + business_header_ss.key_version);
+	ut.foreign_prod+'thor_data400::key::business_header.BDID_pl_' + business_header_ss.key_version);

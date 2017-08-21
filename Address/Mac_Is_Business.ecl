@@ -9,13 +9,8 @@ export Mac_Is_Business(inFile, Field, outFile, nameType='nametype', dodedup=true
 		mname2 = 'cln_mname2',		// cleaned middle name field
 		lname2 = 'cln_lname2',		// cleaned last name field
 		suffix2 = 'cln_suffix2',	// cleaned suffix field
-		options = '[]'				// 'X' for experimental name cleaner (Dataland only)
-									// 'F' for force FML name order
-									// 'f' for prefer FML name order
-									// 'L' for force LFM name order
-									// 'l' for prefer LFM name order
-									// 'W' for watercraft format
-									
+		options = '[]'					
+								
 ) := MACRO
 /*****************************************************************
 
@@ -38,7 +33,7 @@ doclean		If true, clean the name, if it is determined to be a person name
 
 
 ******************************************************************/
-
+import nid;
 #UNIQUENAME(ind_layout)
 // layout for nameType
 	%ind_layout% := RECORD
@@ -68,66 +63,24 @@ doclean		If true, clean the name, if it is determined to be a person name
 #ELSE
 	%new_layout% := {RecordOf(inFile) OR %ind_layout%};
 #END
-  
-#UNIQUENAME(xform)
-	%new_layout% %xform%(RECORDOF(inFile) L) := TRANSFORM
-		nametype := Address.Business.GetNameType(L.Field, options);
-		self.nameType := nametype;
-#IF(doclean=true)
-		name := TRIM(L.Field,LEFT,RIGHT);		
-		hint := IF(nametype='D','D', MAP(
-			'F' in options => 'F',
-			'f' in options => 'f',
-			'L' in options => 'L',
-			'l' in options => 'l',
-			'U'));
-		
-#uniquename(use_experimental)
-%use_experimental% := 'X' in options;
-#if(%use_experimental%)
-		//string140 cln_name := Address.NameCleaner.CleanNameEx(name, hint);
-		string140 cln_name := IF(nametype IN ['P','D'],
-						Address.NameCleaner.CleanNameEx(name, hint),
-						'');
-#else
-	//cln_name := Address.Persons.CleanName(name, hint);
-		string140 cln_name := IF(nametype IN ['P','D'],
-						Address.Persons.CleanName(name, hint),
-						'');
-#end
-
-		self.title		:= cln_name[1..5];
-		self.fname		:= cln_name[6..25];
-		self.mname		:= cln_name[26..45];
-		self.lname		:= cln_name[46..65];
-		self.suffix	    := cln_name[66..70];
-		self.title2		:= cln_name[71..75];
-		self.fname2		:= cln_name[76..95];
-		self.mname2		:= cln_name[96..115];
-		self.lname2		:= cln_name[116..135];
-		self.suffix2    := cln_name[136..140];
-#END
-		self := L;
-	END;
 
 #UNIQUENAME(src)
 	%src% := inFile;
 #UNIQUENAME(dsin)
-	%dsin% := IF(dodedup,
-					DISTRIBUTE(%src%(TRIM(Field)<>''),HASH64(Field)),
-					inFile);
-					
-#UNIQUENAME(ds)
+#UNIQUENAME(dsx)
+#IF(dodedup=true)
+	%dsin% := DISTRIBUTE(%src%(TRIM(Field)<>''),HASH64(Field)) : INDEPENDENT;
+	%dsx% := DEDUP(SORT(%dsin%, Field, LOCAL), Field, LOCAL) : INDEPENDENT;
+#ELSE					
+	%dsx% :=	inFile;
+#END
 
-	%ds% := IF(dodedup,DEDUP(SORT(DISTRIBUTED(%dsin%,HASH64(Field)), Field, LOCAL),
-				 Field, LOCAL),
-				inFile);
-
-#UNIQUENAME(dsOut)
+#UNIQUENAME(dsOut1)
 	
-	%dsOut% := PROJECT(%ds%,  %xform%(LEFT)) : onwarning(4538,ignore);
+	%dsOut1% := PROJECT(Nid.fn_CleanFullNames(%dsx%, Field,,nameType), %new_layout%);
 
 	
+#IF(dodedup=true)
 #UNIQUENAME(xform2)
 	%new_layout% %xform2%(RECORDOF(inFile) L, %new_layout% R) := TRANSFORM
 		self.nameType := R.nameType;
@@ -146,12 +99,13 @@ doclean		If true, clean the name, if it is determined to be a person name
 		self := L;
 	END;
 	
-	outFile := IF(dodedup,
-					JOIN(DISTRIBUTED(%dsin%,HASH64(Field)),
-						DISTRIBUTED(%dsOut%,HASH64(Field)),
+	outFile := 	JOIN(%dsin%,
+										DISTRIBUTE(%dsOut1%,HASH64(Field)),
 						LEFT.Field=RIGHT.Field,
 							%xform2%(LEFT, RIGHT), LOCAL, LEFT OUTER, KEEP(1))
-					+ PROJECT(%src%(TRIM(Field)=''),%new_layout%),
-					%dsOut%);
+							+ PROJECT(%src%(TRIM(Field)=''),%new_layout%);
+#ELSE
+	outFile := %dsOut1%;
+#END
 
 ENDMACRO;

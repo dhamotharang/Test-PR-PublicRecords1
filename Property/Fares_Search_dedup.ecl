@@ -23,5 +23,5 @@ end;
 
 j1 := join(search_file,join_file,left.fares_id=right.fares_id,loseAsses(left,right),local);
 
-ut.MAC_SF_BuildProcess(j1,'~thor_data400::in::fares_search',run_dup,2);
+ut.MAC_SF_BuildProcess(j1,'~thor_data400::in::fares_search',run_dup,2,,true);
 export Fares_search_dedup := run_dup;

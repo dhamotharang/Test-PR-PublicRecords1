@@ -26,7 +26,11 @@ inquiry_acclogs.File_MBSApp(cleaned_fields, 'BATCH', 'Y', mbs_outfile)
 outfile := project(mbs_outfile,
 										transform(Inquiry_Acclogs.Layout_In_Common,
 															
-														self.ORIG_FULL_NAME1 := stringlib.stringcleanspaces(left.orig_first_name + ' ' + left.orig_middle_name + ' ' + left.orig_last_name);
+														self.ORIG_FULL_NAME1 := MAP(left.orig_FULL_NAME <> '' => left.orig_FULL_NAME, 
+																												left.orig_first_name + left.orig_middle_name + left.orig_last_name <> '' => stringlib.stringcleanspaces(left.orig_first_name + ' ' + left.orig_middle_name + ' ' + left.orig_last_name),
+																												stringlib.stringfind(left.orig_function_name, 'MODELS.ITA_BATCH_SERVICE', 1) > 0 => left.orig_reference_code,
+																												stringlib.stringfind(left.orig_function_name, 'MODELS.ITABATCHSERVICE', 1) > 0 => left.orig_reference_code,
+																												'');
 														self.ORIG_FULL_NAME2 :='';
 														
 														line1 := map(left.orig_address1_addressline1 <> '' => left.orig_address1_addressline1,
@@ -95,9 +99,9 @@ outfile := project(mbs_outfile,
 														self.transaction_type := left.orig_transaction_type;
 														self.job_id := left.orig_job_id;
 														
-														self.GLB_purpose := ''; ////// - default used for other products
-														self.DPPA_purpose := ''; ////// - default used for other products
-														self.FCRA_purpose := '';
+														self.GLB_purpose := left.orig_glb_purpose;
+														self.DPPA_purpose := left.orig_dl_purpose;
+														self.FCRA_purpose := left.orig_fcra_purpose;
 										
 														self.source_file := 'BATCH';
 														self := left,
@@ -110,7 +114,7 @@ end;
 
 /* !!!!!!!!!!!!!!!!! FINAL MAPPINGS !!!!!!!!!!!!!!!!!!!!! */
 
-export ready_File(dataset(inquiry_acclogs.layout_in_common) AppendForward, string select_source = 'BATCH') := function
+export ready_File(dataset(inquiry_acclogs.layout_in_common) AppendForward, string select_source = 'BATCH', boolean ReAppendDay) := function
 
 ///////////////// PROJECT INTO PERSON QUERY LAYOUT 
 							
@@ -129,6 +133,7 @@ person_project := project(AppendForward(repflag = '' and domain_name + clean_cna
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
+			self.bus_intel.Use := left.use;
 			
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
@@ -213,6 +218,7 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
+			self.bus_intel.Use := left.use;
 			
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
@@ -290,7 +296,8 @@ bus_project := project(AppendForward(repflag = '' and domain_name + clean_cname1
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+			self.bus_intel.Use := left.use;
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
@@ -348,13 +355,16 @@ prev_base_trans := project(prev_base, transform({inquiry_acclogs.Layout.Common, 
 														
 inquiry_acclogs.file_MBSApp_Base().FCRA_Append(prev_base_trans,prev_base_mbs);
 
-prev_base_ready := dedup(sort(distribute(project(prev_base_mbs, transform(inquiry_acclogs.Layout.Common, self := left)),hash(search_info.Sequence_Number)), record, local), record, local);
+is_old_date(string input_date) := //from over 90 days ago
+	(string)(unsigned)input_date[..4] + intformat((ut.DayOfYear((unsigned)input_date[..4],(unsigned)input_date[5..6],(unsigned)input_date[7..8])), 3, 1) <
+	(string)(unsigned)ut.GetDate[..4] + intformat((ut.DayOfYear((unsigned)ut.GetDate[..4],(unsigned)ut.GetDate[5..6],(unsigned)ut.GetDate[7..8])-90), 3, 1);
 
-ReAppendDay := stringlib.stringtolowercase(ut.Weekday((unsigned8)ut.getdate)) in ['friday'];
+prev_base_readyN := dedup(sort(distribute(project(prev_base_mbs(~is_old_date(search_info.datetime[..8])), transform(inquiry_acclogs.Layout.Common, self := left)), hash(search_info.datetime, search_info.transaction_id, search_info.sequence_number)), record, local), record, local);
+prev_base_readyO := project(prev_base_mbs(is_old_date(search_info.datetime[..8])), transform(inquiry_acclogs.Layout.Common, self := left));
+new_base_ready   := dedup(sort(distribute(bususer_project + person_project + bus_project, hash(search_info.datetime, search_info.transaction_id, search_info.sequence_number)), record, local), record, local);
 
-newFile := if(ReAppendDay, 
-							dedup(sort(distribute(bususer_project + person_project + bus_project + prev_base_ready, hash(search_info.sequence_number)), record, local), record, local),
-							bususer_project + person_project + bus_project)(mbs.company_id + mbs.global_company_id <> '');
+newFile := if(ReAppendDay, prev_base_readyN + prev_base_readyO + new_base_ready,							
+							new_base_ready)(mbs.company_id + mbs.global_company_id <> '');
 
 return newFile;
 

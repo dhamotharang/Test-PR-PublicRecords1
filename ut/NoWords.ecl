@@ -1,13 +1,11 @@
-export unsigned4 NoWords(string s,string1 c=' ') := BEGINC++
-  #option pure
-	unsigned score = 0;
-	while ( lenS > 0 && s[lenS-1] == *c ) lenS--;
-	for ( unsigned i = 1; i < lenS; i++ )
-	{
-		if ( s[i] == *c && s[i-1] != *c )
-		{
-			score++;
-		}
-	}
-	return score+1;
- ENDC++;
+IMPORT STD; 
+
+/**
+ * Returns the number of words that the string contains.  Words are separated by one or more separator strings. No 
+ * spaces are stripped from either string before matching.
+ * 
+ * @param src           The string being searched in.
+ * @param separator     The string used to separate words
+ */
+ 
+EXPORT UNSIGNED4 NoWords(STRING src,STRING1 separator =' ') := STD.Str.CountWords( src, separator) : DEPRECATED('Use STD.Str.CountWords with non empty separator instead.'); 

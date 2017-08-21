@@ -1,5 +1,5 @@
 //replicates person_models.FN_Person_Names to be used for data layer
-import doxie,doxie_raw,ut, header;
+import doxie,doxie_raw,ut, header,std;
 export FN_Person_Names(dataset(header.Layout_Header) d_) := function
 d_slim_l := record
 d_.did;
@@ -22,8 +22,8 @@ d := project(d_, d_slim_l);
 		unsigned4 last_seen :=  max(group,d.dt_last_seen);
 		// unsigned4 v_last_seen :=  max(group,d.dt_vendor_last_reported);
 		// today := ;
-		real8 av_fs := ave(group,if(d.dt_first_seen=0,(unsigned3)(ut.getdate[1..6]),d.dt_first_seen));
-		real8 av_ls := ave(group,if(d.dt_last_seen=0, (unsigned3)(ut.getdate[1..6]),d.dt_last_seen));
+		real8 av_fs := ave(group,if(d.dt_first_seen=0,(unsigned3)(((STRING8)Std.Date.Today())[1..6]),d.dt_first_seen));
+		real8 av_ls := ave(group,if(d.dt_last_seen=0, (unsigned3)(((STRING8)Std.Date.Today())[1..6]),d.dt_last_seen));
   end;
 
 	

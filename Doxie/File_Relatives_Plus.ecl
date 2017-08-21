@@ -22,8 +22,8 @@ Base_File_Append_In := attr();
 
 doxie.layout_relatives_plus reformat_header(Base_File_Append_In L) := 
  transform
-	self.person1 := (unsigned5) L.person1;
-	self.person2 := (unsigned5) L.person2;
+	self.person1 := (unsigned6) L.person1;
+	self.person2 := (unsigned6) L.person2;
 	self.recent_cohabit := (integer3) L.recent_cohabit;
 	self.zip := (integer3) L.zip;
 	self.prim_range := (integer2) L.prim_range;
@@ -66,10 +66,10 @@ ro_temp_rec := record
 end;
 
 ro_temp_rec tHash_vals(doxie.Layout_relatives_plus l) := transform                            
- self.hval1 := hashmd5(intformat(l.person1,12,1),intformat(l.person2,12,1));
- self.hval2 := hashmd5(intformat(l.person2,12,1),intformat(l.person1,12,1));
- self.hval3 := hashmd5(intformat(l.person1,12,1));
- self.hval4 := hashmd5(intformat(l.person2,12,1));
+ self.hval1 := hashmd5(intformat(l.person1,15,1),intformat(l.person2,15,1));
+ self.hval2 := hashmd5(intformat(l.person2,15,1),intformat(l.person1,15,1));
+ self.hval3 := hashmd5(intformat(l.person1,15,1));
+ self.hval4 := hashmd5(intformat(l.person2,15,1));
  self := l;
 end;
 

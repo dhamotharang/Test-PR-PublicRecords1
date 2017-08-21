@@ -1,4 +1,4 @@
-﻿export MAC_Selection_Declare := MACRO
+export MAC_Selection_Declare := MACRO
 
 boolean	  Always_Compute := false : stored('AlwaysCompute');
 boolean	  Select_Indiv := false : stored('SelectIndividually');

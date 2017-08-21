@@ -1,30 +1,30 @@
-import vehlic,ut;
-veh := vehlic.File_Vehicles(history='',source_code !='AE');
+import vehicleV2,ut;
+
+veh := VehicleV2.file_vehicleV2_party(source_code<>'AE' and append_did>0 and (history='' or trim(history)='E'));
 
 vehslim := record
 	unsigned6 did;
-	qstring22 vehnum;
-	integer8 dt_first_seen;
-	qstring8  First_Registration_Date;
-	qstring8  Registration_Effective_Date;
-	qstring8  Title_Issue_Date;
+	integer   date_;
+	string32  vehnum;
+end;
+										 
+vehslim normit(veh le) := transform
+ self.did    := le.append_DID;
+ //keep these individual state handlings to preserve what was done in original bestvehicle code
+ self.date_  := MAP(le.state_origin='TX' and le.source_code='DI' => ut.min2((integer)le.Ttl_latest_Issue_Date,(integer)le.Reg_latest_Effective_Date),
+                   le.state_origin='WI' and le.source_code='DI' => (integer)le.Reg_latest_Effective_Date,
+				   le.state_origin='MO' and le.source_code='DI' => ut.min2((integer)le.Ttl_latest_Issue_Date,(integer)le.Reg_latest_Effective_Date),
+				   le.state_origin='NC' and le.source_code='DI' => (integer)le.Ttl_latest_Issue_Date,
+				   ut.max2((integer)le.Reg_latest_Effective_Date,(integer)le.Ttl_latest_Issue_Date)
+				  );
+ self.vehnum := le.state_origin + trim(le.vehicle_key, left, right);
+ self        := le;
 end;
 
-vehslim normit(veh l, integer c) := transform
-	self.did := (unsigned6)(integer)choose(c, l.own_1_did, l.reg_1_did, l.own_2_did, l.reg_2_did);
-	self.vehnum := l.orig_state + l.VEHICLE_NUMBERxBG1;
-    self.dt_first_seen := MAP(l.orig_state='TX'=>ut.min2((integer)l.title_issue_date,(integer)l.registration_effective_date),
-										 l.orig_state='WI'=>(integer)l.registration_effective_date,
-										 l.orig_state='MO'=>ut.min2((integer)l.first_registration_date,(integer)l.title_issue_date),
-										 l.orig_state='NC'=>ut.min2((integer)l.title_issue_date,(integer)l.plate_issue_date),
-										 (integer)l.first_registration_date);
-	self := l;
-end;
+vehnorm := project(veh,normit(left));
 
-vehnorm := normalize(veh, 4, normit(left, counter));
-vehdist := distribute(vehnorm(did > 0), hash(did));
+vehdist  := distribute(vehnorm,hash(did));
+veh_sort := sort(vehdist,did,-date_, vehnum,local);
+veh_dedup := dedup(veh_sort,did,local);
 
-vehsrtd := sort(vehdist, did, -dt_first_seen, vehnum, local);
-vehddpd := dedup(vehsrtd, did, local);
-
-export bestvehicle := vehddpd : persist('persist::Watchdog_BestVehicle');
+export bestvehicle := veh_dedup: persist('persist::Watchdog_BestVehiclev2');

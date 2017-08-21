@@ -1,0 +1,1 @@
+export Basefile_Medschool_BDID := PROJECT(Ingenix_NatlProf.Basefile_Medschool_BDID_BIP,TRANSFORM(ingenix_natlprof.Layout_Medschool_Base,SELF := LEFT;));

@@ -27,7 +27,7 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriage_divorce
  													  trim(le.groom_last_name)+', '+le.groom_first_name+' '+le.groom_middle_name));	
  
  //wife
- self.party2_type        		:= 'W';
+ self.party2_type        		:= 'B';
  self.party2_name_format 		:= 'L';
  self.party2_name        		:= stringlib.stringcleanspaces( if(trim(le.bride_last_name)='' or trim(le.bride_first_name)='',
 														'UNKNOWN',
@@ -43,4 +43,4 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriage_divorce
  
 end;
 
-export mapping_nc_marriage := project(marriage_divorce_v2.File_Marriage_NC_In,t_map_to_common(left)) : persist('mar_div_nc_mar');
+export mapping_nc_marriage := project(marriage_divorce_v2.File_Marriage_NC_In,t_map_to_common(left));// : persist('mar_div_nc_mar');

@@ -147,7 +147,7 @@ proj_child := PROJECT(dchild(filing_desc <> ''), cvt_child(LEFT));
 // Bug# 32525
 get_recs := LiensV2.file_liens_party;
 
-liensv2.layout_liens_party tformat(liensv2.layout_liens_party_ssn_Bid L) := transform
+liensv2.layout_liens_party tformat(liensv2.layout_liens_party_ssn L) := transform
 
 self.ssn := if((unsigned6)L.ssn <> 0, if(L.ssn[1..5] = '00000', L.ssn[6..9], L.ssn), L.app_ssn);
 self.tax_id := if(L.tax_id <> '', if(L.tax_id[1..5] = '00000', L.tax_id[6..9], L.tax_id), L.app_tax_id);

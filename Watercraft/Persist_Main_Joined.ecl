@@ -1,5 +1,9 @@
-import Watercraft_UMF, ut, AK_Comm_Fish_Vessels;
+import Watercraft_UMF, ut, AK_Comm_Fish_Vessels, Watercraft_infutor,watercraft_preprocess, STD;
 
+//New raw input using ECL processing
+dJoined_new	:= dataset('~thor_data400::in::watercraft_main_common',watercraft.Layout_Watercraft_Main_Base,flat);
+
+//Previous process using AbInitio
 dJoined		:=	Watercraft.Mapping_AK_as_Main
 			+	Watercraft.Mapping_AL_as_Main
 			+	Watercraft.Mapping_AR_as_Main
@@ -41,15 +45,19 @@ dJoined		:=	Watercraft.Mapping_AK_as_Main
 			+	Watercraft.Mapping_FL_as_Main
 			+	Watercraft.Mapping_MO_as_Main
 			+	Watercraft.Mapping_KY_as_Main
-			+   Watercraft.Mapping_KY_infolink_main
+			+ Watercraft.Mapping_KY_infolink_main
 			+	Watercraft.Mapping_OR_as_Main_pre20080415
 			+	Watercraft.Mapping_OR_as_Main
-			+   AK_Comm_Fish_Vessels.Mapping_Watercraft_Main_Base_AK_Comm_Fishing_Vessels
+			+ AK_Comm_Fish_Vessels.Mapping_Watercraft_Main_Base_AK_Comm_Fishing_Vessels
 			+	Watercraft.Mapping_WY_new_as_Main
 			+Watercraft.Mapping_WA_as_Main
+			+ Watercraft.Map_watercraft_infutor_base
 			;
 
-dJoinedDist		:=	distribute(dJoined,hash(state_origin,watercraft_key));
+//Combine the new raw build process and previously processed files
+dCombineJoin	:=	dJoined + dJoined_new;
+
+dJoinedDist		:=	distribute(dCombineJoin,hash(state_origin,watercraft_key));
 dJoinedSort		:=	sort(dJoinedDist,state_origin,
                                      source_code,
 									 watercraft_key,
@@ -91,12 +99,13 @@ dJoinedDedup	:=	dedup(dJoinedSort,state_origin,
 						 
 dJoinedGrouped	:=	group(dJoinedDedup,state_origin,source_code,watercraft_key,local);
 
+CurrentDate := (string8)STD.Date.Today();
 Watercraft.Layout_Watercraft_Main_Base	tSetHistoryFlag(dJoinedGrouped pLeft, dJoinedGrouped pRight)
  :=
   transform
 	self.history_flag	:=	if((unsigned8)pRight.registration_expiration_date=0,
 							   'U',
-							   if((unsigned8)pRight.registration_expiration_date <> 0 and pRight.registration_expiration_date[1..6] < ut.GetDate[1..6],
+							   if((unsigned8)pRight.registration_expiration_date <> 0 and pRight.registration_expiration_date[1..6] < CurrentDate[1..6],
 								  'E',
 								  if(pLeft.state_origin='',
 									 ' ',
@@ -217,7 +226,8 @@ trim(left.watercraft_hp_3,left,right)+','+
 	
 	self:= left));
 	
+optout := ['CTC59611E505CORRECT CRAFT INC2','CTC59611E505CORRECT CRAFT2005']; //JIRA DF-16610 - Peter Kirn - CO address - opt out
 export Persist_Main_Joined
- :=	Out_main
+ :=	Out_main(watercraft_key not in optout)
  :	persist('persist::Watercraft_Main_Joined')
  ;

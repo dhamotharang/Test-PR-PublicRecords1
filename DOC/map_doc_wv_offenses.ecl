@@ -68,7 +68,11 @@ TRANSFORM
 		self.add_off_cd 		:= ''; 
 		self.add_off_desc		:= ''; 
 		self.off_typ			:= '';
-		self.off_lev			:= '';
+		self.off_lev			:= case(stringlib.stringtouppercase(L.ImprisonmentStatus),
+										'MISDEMEANOR SENTENCED' => 'M',
+										'DIV. OF CORRECTIONS OFFENDER' => 'F',
+										'CONVICTED FELON' => 'F',
+										'');
 		self.arr_disp_date		:= '';
 		self.arr_disp_cd		:= '';
 		self.arr_disp_desc_1	:= '';
@@ -87,9 +91,9 @@ TRANSFORM
 		self.ct_addl_desc_cd	:= '';
 		self.ct_off_lev			:= case(stringlib.stringtouppercase(L.ImprisonmentStatus),
 										'MISDEMEANOR SENTENCED' => 'M',
-										'DIV. OF CORRECTIONS OFFENDER' => 'O',
+										'DIV. OF CORRECTIONS OFFENDER' => 'F',
 										'CONVICTED FELON' => 'F',
-										'X');
+										'');
 
 		self.ct_disp_dt			:= ''; 
 		self.ct_disp_cd			:= '';

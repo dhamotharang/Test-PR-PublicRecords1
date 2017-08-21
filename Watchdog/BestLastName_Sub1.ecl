@@ -9,7 +9,9 @@ integer8 monthsever(string6 strdate) :=
 	((integer)(strdate[1..4])) * 12 + 
 	((integer)(strdate[5..6]));
 
-f := file_header_filtered;
+f := file_header_filtered(~(lname='INVEST' and src in mdr.sourceTools.set_Utility_sources));
+
+Mac_Bucket_Dates (f, dt_last_seen, ,dt_vendor_last_reported, ,3, date_bucket, date_bucket_f)
 
 rfields := record
 unsigned6     did;
@@ -18,14 +20,14 @@ integer4      dt_last_seen;
 qstring20     lname;
 end;
 
-rfields slim(f le) := transform
-self.dt_last_seen := ((integer)(ut.GetDate[1..6])-if(le.dt_last_seen=0,le.dt_vendor_last_reported,le.dt_last_seen))/3;
+rfields slim(date_bucket_f le) := transform
+self.dt_last_seen := le.date_bucket;
 self.dt_first_seen := if(le.dt_first_seen=0,le.dt_vendor_first_reported,le.dt_first_seen);
 self := le;
 end;
 
 //set the date last seen by finding how many quarters the max date is from today
-slim_h := project(f,slim(left));
+slim_h := project(date_bucket_f,slim(left));
 
 srt_h := sort(slim_h,did,lname,local);
 
@@ -137,8 +139,17 @@ end;
 
 set_bflag := iterate(set_score,bflag(left,right));
 
-//get rid of lname dups
-dup_lname := dedup(sort(set_bflag,-dt_last_seen,lname_count,dt_first_seen),did);
+//get rid of lname dups, float blanks for sub2, both non-blank keep the best
+dup_lname_usl := dedup(sort(set_bflag,dt_last_seen,-lname_count,-dt_first_seen),did);
+dup_lname_blk := dedup(sort(set_bflag,-dt_last_seen,lname_count,dt_first_seen),did)(lname='');
+
+new_rec get_usl_final(dup_lname_usl l) := transform
+	self := l;
+end;
+
+dup_lname := join(dup_lname_usl, dup_lname_blk, 
+                  left.did=right.did, get_usl_final(left), left only, local) 
+		   + dup_lname_blk; 	
 
 export BestLastName_sub1 := dup_lname : persist('persist::Watchdog_BestLastName_sub1');
 

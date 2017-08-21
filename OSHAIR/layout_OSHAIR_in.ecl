@@ -23,37 +23,37 @@ export layout_OSHAIR_in :=  module
           EBCDIC string1  Debt_Type;
 		  EBCDIC string71 Debt_Payload; // This may be either the Penalty/FTA record or the Miscellaneous record
           /* Penalty or FTA Debt sub-record type */
-          // IfBlock((string1)(ebcdic string1)self.Debt_Type = 'P' OR (string1)(ebcdic string1)self.Debt_Type = 'F')
-                // EBCDIC string1 Debt_Waived;
-                // EBCDIC string1 Debt_Waived_Reason;
-                // big_endian unsigned4       Ref_Date;
-                // decimal9_2      Debt_Interest;
-                // decimal9_2      Deliquent_Fees;
-                // big_endian unsigned4       DCA_Send_Date;
-                // big_endian unsigned4       DCA_Returned_Date;
-                // EBCDIC string1 DCA_Recommended;
-                // decimal9_2      DCA_Litigation_Amount;
-                // decimal9_2      DCA_Fee_Amount;
-                // EBCDIC string1 Case_Archived;
-                // decimal9_2      DCA_Interest;
-                // decimal9_2      DCA_Deliquent_Fees;
-                // big_endian unsigned4       DFO_Send_Date;
-                // big_endian unsigned4       DFO_Returned_Date;
-                // EBCDIC string1 DFO_Recommended;
-                // big_endian unsigned4       Area_Office_Send_Date;
-                // big_endian unsigned4       Credit_Bureau_Send_Date;
-                // big_endian unsigned4       IRS_Send_Date;
-                // big_endian unsigned4       Credit_Bureau_Returned_Date;
-          // end;
+          /*IfBlock((string1)(ebcdic string1)self.Debt_Type in ['P','F'])
+                EBCDIC string1 Debt_Waived;
+                EBCDIC string1 Debt_Waived_Reason;
+                big_endian unsigned4       Ref_Date;
+                decimal9_2      Debt_Interest;
+                decimal9_2      Deliquent_Fees;
+                big_endian unsigned4       DCA_Send_Date;
+                big_endian unsigned4       DCA_Returned_Date;
+                EBCDIC string1 DCA_Recommended;
+                decimal9_2      DCA_Litigation_Amount;
+                decimal9_2      DCA_Fee_Amount;
+                EBCDIC string1 Case_Archived;
+                decimal9_2      DCA_Interest;
+                decimal9_2      DCA_Deliquent_Fees;
+                big_endian unsigned4       DFO_Send_Date;
+                big_endian unsigned4       DFO_Returned_Date;
+                EBCDIC string1 DFO_Recommended;
+                big_endian unsigned4       Area_Office_Send_Date;
+                big_endian unsigned4       Credit_Bureau_Send_Date;
+                big_endian unsigned4       IRS_Send_Date;
+                big_endian unsigned4       Credit_Bureau_Returned_Date;
+          end;*/
           // /* Miscellaneous Debt sub-record type */
-          // IfBlock((string1)(ebcdic string1)self.Debt_Type = 'M')
-                // big_endian unsigned4        Next_Installment_Date;
-                // big_endian unsigned4        Last_Installment_Date;
-                // big_endian unsigned4        Solicitor_Date;
-                // EBCDIC string1  Solicitor_Reason;
-                // EBCDIC string1  Case_Hold_Flag;
-                // EBCDIC string57 FTA_Debt_Filler;
-          // end;
+          /*IfBlock((string1)(ebcdic string1)self.Debt_Type = 'M')
+                big_endian unsigned4        Next_Installment_Date;
+                big_endian unsigned4        Last_Installment_Date;
+                big_endian unsigned4        Solicitor_Date;
+                EBCDIC string1  Solicitor_Reason;
+                EBCDIC string1  Case_Hold_Flag;
+                EBCDIC string57 FTA_Debt_Filler;
+          end;*/
        end;
  
        export Violations_rec := record,maxlength(75000)
@@ -101,23 +101,23 @@ export layout_OSHAIR_in :=  module
           EBCDIC string7  History_Cit_ID;
 		  EBCDIC string16 Event_Payload; // This may be either the Penalty record or FTA record
           // /* Penalty History sub-record type */
-          // IfBlock((string1)(ebcdic string1)self.History_Type = 'P')
-                // big_endian unsigned4       Penalty_History_Date;
-                // EBCDIC string1 Penalty_History_Event;
-                // decimal9_2      Penalty_History_Penalty_Amount;
-                // big_endian unsigned4       Penalty_History_Abate_Date;
-                // EBCDIC string1 Penalty_History_VType;
-                // EBCDIC string1 Penalty_History_Action;
-          // end;
+          //IfBlock((string1)(ebcdic string1)self.History_Type = 'P')
+                //big_endian unsigned4       Penalty_History_Date;
+                //EBCDIC string1 Penalty_History_Event;
+                //decimal9_2      Penalty_History_Penalty_Amount;
+                //big_endian unsigned4       Penalty_History_Abate_Date;
+                //EBCDIC string1 Penalty_History_VType;
+                //EBCDIC string1 Penalty_History_Action;
+          //end;
           // /* FTA History sub-record type */
-          // IfBlock((string1)(ebcdic string1)self.History_Type = 'F')
-                // big_endian unsigned4       FTA_History_Insp_Number;
-                // big_endian unsigned4       FTA_History_Date;
-                // EBCDIC string1 FTA_History_Event;
-                // decimal9_2      FTA_History_Penalty;
-                // EBCDIC string1 FTA_History_Action;
-                // EBCDIC string1 History_Filler;
-          // end;
+          //IfBlock((string1)(ebcdic string1)self.History_Type = 'F')
+                //big_endian unsigned4       FTA_History_Insp_Number;
+                //big_endian unsigned4       FTA_History_Date;
+                //EBCDIC string1 FTA_History_Event;
+                //decimal9_2      FTA_History_Penalty;
+                //EBCDIC string1 FTA_History_Action;
+                //EBCDIC string1 History_Filler;
+          //end;
        end;
  
        export Hazardous_Substance_rec := record,maxlength(75000)
@@ -152,28 +152,22 @@ export layout_OSHAIR_in :=  module
           EBCDIC string1  Admin_Pay_Type;
 		  EBCDIC string20 Admin_Pay_Payload; // This may be either the Administrative record or the Payment record
           // /* Administrative sub-record type */
-          // IfBlock((string1)(ebcdic string1)self.Admin_Pay_Type = '1' OR (string1)(ebcdic string1)self.Admin_Pay_Type = '2'
-               // OR (string1)(ebcdic string1)self.Admin_Pay_Type = '3' OR (string1)(ebcdic string1)self.Admin_Pay_Type = '4'
-               // OR (string1)(ebcdic string1)self.Admin_Pay_Type = '5' OR (string1)(ebcdic string1)self.Admin_Pay_Type = '6'
-               // OR (string1)(ebcdic string1)self.Admin_Pay_Type = '7' OR (string1)(ebcdic string1)self.Admin_Pay_Type = '8'
-               // OR (string1)(ebcdic string1)self.Admin_Pay_Type = '9' OR (string1)(ebcdic string1)self.Admin_Pay_Type = 'M'
-               // OR (string1)(ebcdic string1)self.Admin_Pay_Type = 'N' OR (string1)(ebcdic string1)self.Admin_Pay_Type = 'I'
-               // OR (string1)(ebcdic string1)self.Admin_Pay_Type = 'D' OR (string1)(ebcdic string1)self.Admin_Pay_Type = 'F'
-               // OR (string1)(ebcdic string1)self.Admin_Pay_Type = 'G' OR (string1)(ebcdic string1)self.Admin_Pay_Type = 'O')
-                // big_endian unsigned4        Admin_Date;
-                // decimal9_2      Admin_Amount;
-                // EBCDIC string11 Admin_Filler;
-          // end;
+          /*IfBlock((string1)(ebcdic string1)self.Admin_Pay_Type in ['1','2','3','4','5','6','7','8','9',
+																   'M','N','I','D','F','G','O'])
+			   
+                big_endian unsigned4        Admin_Date;
+                decimal9_2      Admin_Amount;
+                EBCDIC string11 Admin_Filler;
+          end;*/
           // /* Payment sub-record type */
-          // IfBlock((string1)(ebcdic string1)self.Admin_Pay_Type = 'P' OR (string1)(ebcdic string1)self.Admin_Pay_Type = 'R'
-               // OR (string1)(ebcdic string1)self.Admin_Pay_Type = 'U' OR (string1)(ebcdic string1)self.Admin_Pay_Type = 'C')
-                // big_endian unsigned4 Payment_Date;
-                // decimal9_2 Payment_Penalty_Amount;
-                // decimal9_2 Payment_FTA_Amount;
-                // big_endian unsigned4 Payment_163_Number;
-                // EBCDIC string1 Payment_Origin;
-                // EBCDIC string1 Payment_Balanced;
-          // end;       
+          /*IfBlock((string1)(ebcdic string1)self.Admin_Pay_Type in ['P','R','U','C'])
+                big_endian unsigned4 Payment_Date;
+                decimal9_2 Payment_Penalty_Amount;
+                decimal9_2 Payment_FTA_Amount;
+                big_endian unsigned4 Payment_163_Number;
+                EBCDIC string1 Payment_Origin;
+                EBCDIC string1 Payment_Balanced;
+          end;*/      
        end;
  
        export Inspection_rec := record,maxlength(75000)
@@ -255,63 +249,64 @@ export layout_OSHAIR_in :=  module
           decimal5             Total_Violations;
           decimal5             Total_Serious_Violations;
           // Counts for child records
-          unsigned2 Number_Program;
-          unsigned2 Number_Rel_Activity;
-          unsigned2 Number_Optional_Info;
-          unsigned2 Number_Debt;
-          unsigned2 Number_Violations;
-          unsigned2 Number_Event;
-          unsigned2 Number_Hazardous_Substance;
-          unsigned2 Number_Accident;
-          unsigned2 Number_Admin_Pay;
+          big_endian unsigned2 Number_Program;
+          big_endian unsigned2 Number_Rel_Activity;
+          big_endian unsigned2 Number_Optional_Info;
+          big_endian unsigned2 Number_Debt;
+          big_endian unsigned2 Number_Violations;
+          big_endian unsigned2 Number_Event;
+          big_endian unsigned2 Number_Hazardous_Substance;
+          big_endian unsigned2 Number_Accident;
+          big_endian unsigned2 Number_Admin_Pay;
           // Program child dataset
           // IfBlock((big_endian unsigned2)self.Number_Program <> 0)
                 dataset(Program_rec
-                       ,count((big_endian unsigned2)self.Number_Program)) Programs;
+                       ,count(self.Number_Program)) Programs;
           // end;
           // Related Activity child dataset
           // IfBlock((big_endian unsigned2)self.Number_Rel_Activity <> 0)
                 dataset(Related_Activity_rec
-                       ,count((big_endian unsigned2)self.Number_Rel_Activity)) Related_Activties;
+                       ,count(self.Number_Rel_Activity)) Related_Activties;
           // end;
           // Optional Information child dataset
           // IfBlock((big_endian unsigned2)self.Number_Rel_Activity <> 0)
                 dataset(Optional_Info_rec
-                       ,count((big_endian unsigned2)self.Number_Optional_Info)) Optional_Information;
+                       ,count(self.Number_Optional_Info)) Optional_Information;
           // end;
           // Debt child dataset
           // IfBlock((big_endian unsigned2)self.Number_Debt <> 0)
                 dataset(Debt_rec
-                       ,count((big_endian unsigned2)self.Number_Debt)) Debts;
+                       ,count(self.Number_Debt)) Debts;
           // end;
           // Violations child dataset
           // IfBlock((big_endian unsigned2)self.Number_Violations <> 0)
                 dataset(Violations_rec
-                       ,count((big_endian unsigned2)self.Number_Violations)) Violations;
+                       ,count(self.Number_Violations)) Violations;
           // end;
           // Event child dataset
           // IfBlock((big_endian unsigned2)self.Number_Event <> 0)
                 dataset(Penalty_FTA_Event_rec
-                       ,count((big_endian unsigned2)self.Number_Event)) Events;
+                       ,count(self.Number_Event)) Events;
           // end;
           // Hazardous Substance child dataset
           // IfBlock((big_endian unsigned2)self.Number_Hazardous_Substance <> 0)
                 dataset(Hazardous_Substance_rec
-                       ,count((big_endian unsigned2)self.Number_Hazardous_Substance)) Hazardous_Substances;
+                       ,count(self.Number_Hazardous_Substance)) Hazardous_Substances;
           // end;
           // Accident child dataset
           // IfBlock((big_endian unsigned2)self.Number_Accident <> 0)
                 dataset(Accident_rec
-                       ,count((big_endian unsigned2)self.Number_Accident)) Accidents;
+                       ,count(self.Number_Accident)) Accidents;
           // end;
           // Administrative/Payment child dataset
           // IfBlock((big_endian unsigned2)self.Number_Admin_Pay <> 0)
                 dataset(Administrative_Payment_rec
-                       ,count((big_endian unsigned2)self.Number_Admin_Pay)) Admin_Payment;
+                       ,count(self.Number_Admin_Pay)) Admin_Payment;
           // end;
  
           // Filler at the end of each record
-          EBCDIC string2 Inspection_Filler;
+        // EBCDIC string2 Inspection_Filler;  //commented on 20090527 SNARRA
+		#warning('Note last field (EBCDIC string2 Inspection_Filler) in OSHAIR.layout_OSHAIR_in is commented out')
        end; // End of the parent record
  
 end;  // End of the whole module

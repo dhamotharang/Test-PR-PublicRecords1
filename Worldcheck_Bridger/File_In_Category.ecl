@@ -8,8 +8,7 @@ export file_in_category := dataset([
 	{'7','Crime - War','','2'},
 	{'8','Crime - Narcotics','','2'},
 	{'9','Crime - Financial','','2'},
-	{'10','Crime - Associated','1','2'},
-	//{'10','Crime - Associated','','2'},
+	//{'10','Crime - Associated','1','2'},
 	{'11','Diplomat','','2'},
 	{'12','Embargo','','2'},
 	{'13','Embargo Vessel','','2'},
@@ -25,4 +24,4 @@ export file_in_category := dataset([
 	{'23','Port','','2'},
 	{'24','Vessel','','2'}
 	],
-	{string5 category_id, string30 category, string1 x, string5 group_id});
+	Layout_Category);

@@ -21,16 +21,17 @@ EXPORT files_ingest := MODULE
 		STRING6		remedy; // BLANK/CLEAN/REJECT
 		STRING50	reason;
 	END;
-	EXPORT FILE_BUILDING		:= filePrefix + 'building';
-	EXPORT FILE_BASE				:= filePrefix + 'base';
-	EXPORT FILE_FATHER			:= filePrefix + 'father';
-	EXPORT FILE_GRANDFATHER	:= filePrefix + 'grandfather';
-	EXPORT FILE_ERR     		:= filePrefix + 'err';
-	EXPORT DS_BUILDING			:= DATASET(location + FILE_BUILDING, l_base, THOR, OPT);
-	EXPORT DS_BASE   				:= DATASET(location + FILE_BASE, l_base, THOR, OPT);
-	EXPORT DS_FATHER   			:= DATASET(location + FILE_FATHER, l_base, THOR, OPT);
-	EXPORT DS_GRANDFATHER		:= DATASET(location + FILE_GRANDFATHER, l_base, THOR, OPT);
-	EXPORT DS_ERR	   				:= DATASET(location + FILE_ERR, l_err_rec, THOR, OPT);
+	EXPORT FILE_BUILDING		  := filePrefix + 'building';
+	EXPORT FILE_BASE				  := filePrefix + 'base';
+	EXPORT FILE_FATHER			  := filePrefix + 'father';
+	EXPORT FILE_GRANDFATHER	  := filePrefix + 'grandfather';
+	EXPORT FILE_ERR     		  := filePrefix + 'err';
+	EXPORT FILE_DROPPED_RCIDS := filePrefix + 'dropped_rcids';
+	EXPORT DS_BUILDING			  := DATASET(location + FILE_BUILDING, l_base, THOR, OPT);
+	EXPORT DS_BASE   				  := DATASET(location + FILE_BASE, l_base, THOR, OPT);
+	EXPORT DS_FATHER   			  := DATASET(location + FILE_FATHER, l_base, THOR, OPT);
+	EXPORT DS_GRANDFATHER		  := DATASET(location + FILE_GRANDFATHER, l_base, THOR, OPT);
+	EXPORT DS_ERR	   				  := DATASET(location + FILE_ERR, l_err_rec, THOR, OPT);
 	
 	
   import tools;

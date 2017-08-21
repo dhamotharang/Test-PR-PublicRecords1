@@ -93,7 +93,7 @@ self.record_type := 'H';
 self := l;
 end;
 
-supp_current_init := project(Corp.File_Corp_Supp_Base(Corp.Corp_Supp_Base_Filter), InitCurrentBase(left));
+supp_current_init := project(Corp.File_Corp_Supp_Base(Filters.Base.Corp_Supp), InitCurrentBase(left));
 supp_current_init_dedup := dedup(supp_current_init, all);
 supp_current_init_dist := distribute(supp_current_init_dedup, hash(corp_key));
 

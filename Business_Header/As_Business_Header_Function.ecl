@@ -11,14 +11,14 @@ import ut;
 // --					to be run on incoming datasets that have been normalized
 /////////////////////////////////////////////////////////////////////////////////////////
 export As_Business_Header_Function(
-       dataset(business_header.Layout_Business_Header) bhdr_data, 
+       dataset(business_header.Layout_Business_Header_New) bhdr_data, 
 	  boolean use_filter = true, 
 	  boolean fix_company_name = true,
 	  boolean rollup_group1_id = true
 	  ) := FUNCTION
 
 numset := ['0','1','2','3','4','5','6','7','8','9'];
-bh_layout := business_header.Layout_Business_Header;
+bh_layout := business_header.Layout_Business_Header_New;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // -- RemoveEnd Function
@@ -211,8 +211,8 @@ transform
 	self.dt_first_seen 			:= 
             ut.EarliestDate(ut.EarliestDate(L.dt_first_seen,R.dt_first_seen),
 		    ut.EarliestDate(L.dt_last_seen,R.dt_last_seen));
-	self.dt_last_seen 			:= ut.LatestDate(L.dt_last_seen,				R.dt_last_seen);
-	self.dt_vendor_last_reported	:= ut.LatestDate(L.dt_vendor_last_reported, 		R.dt_vendor_last_reported);
+	self.dt_last_seen 			:= max(L.dt_last_seen,				R.dt_last_seen);
+	self.dt_vendor_last_reported	:= max(L.dt_vendor_last_reported, 		R.dt_vendor_last_reported);
 	self.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, 	R.dt_vendor_first_reported);
 	self.company_name 			:= if(L.company_name = '', 	R.company_name, L.company_name);
 	self.group1_id 			:= if(L.group1_id = 0, 		R.group1_id, L.group1_id);

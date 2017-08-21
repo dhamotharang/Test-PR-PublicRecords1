@@ -1,3 +1,5 @@
+import address;
+
 rOneField :=  record
  string OneField;
 end;
@@ -111,7 +113,7 @@ clean_name_rec := record
 end;
 
 clean_name_rec tCleanName(dUniqueName l) := transform
- self.pname := if(l.name_format='F',AddrCleanLib.CleanPersonFML73(l.orig_name),AddrCleanLib.CleanPersonLFM73(l.orig_name));
+ self.pname := if(l.name_format='F',address.CleanPersonFML73(l.orig_name),address.CleanPersonLFM73(l.orig_name));
  self := l;
 end;
 
@@ -162,8 +164,8 @@ output(dCleanAddr,,'out::infutor_clean_addr',__compressed__);
 /*
 infutor.Layout_Infutor_FixedLength_Clean tCleanNameAddr(infutor.Layout_Infutor_FixedLength l) := transform
  self.clean_dob  := if(trim(l.dob)<>'',l.dob+'00','');
- self.pname_name := AddrCleanLib.CleanPersonFML73(l.name);
- self.clean_addr := AddrCleanLib.CleanAddress182(l.street,l.csz);
+ self.pname_name := address.CleanPersonFML73(l.name);
+ self.clean_addr := address.CleanAddress182(l.street,l.csz);
  self := l;
  self := [];
 end;
@@ -176,9 +178,9 @@ p1_has_alias := p1(trim(alias1)<>'');
 p1_no_alias  := p1(trim(alias1)='');
 
 infutor.Layout_Infutor_FixedLength_Clean tCleanAlias(infutor.Layout_Infutor_FixedLength_Clean l) := transform 
- self.pname_alias1 := AddrCleanLib.CleanPersonLFM73(l.alias1);
- self.pname_alias2 := AddrCleanLib.CleanPersonLFM73(l.alias2);
- self.pname_alias3 := AddrCleanLib.CleanPersonLFM73(l.alias3);
+ self.pname_alias1 := address.CleanPersonLFM73(l.alias1);
+ self.pname_alias2 := address.CleanPersonLFM73(l.alias2);
+ self.pname_alias3 := address.CleanPersonLFM73(l.alias3);
  self := l;
 end;
  
@@ -188,11 +190,11 @@ p2_has_prev_addr := p2(trim(prev1_street)<>'' or trim(prev1_csz)<>'');
 p2_no_prev_addr  := p2(trim(prev1_street)='' and trim(prev1_csz)='');
  
 infutor.Layout_Infutor_FixedLength_Clean tCleanPrevAddr(infutor.Layout_Infutor_FixedLength_Clean l) := transform
- self.clean_prev1_addr := AddrCleanLib.CleanAddress182(l.prev1_street,l.prev1_csz);
- self.clean_prev2_addr := AddrCleanLib.CleanAddress182(l.prev2_street,l.prev2_csz);
- self.clean_prev3_addr := AddrCleanLib.CleanAddress182(l.prev3_street,l.prev3_csz);
- self.clean_prev4_addr := AddrCleanLib.CleanAddress182(l.prev4_street,l.prev4_csz);
- self.clean_prev5_addr := AddrCleanLib.CleanAddress182(l.prev5_street,l.prev5_csz);
+ self.clean_prev1_addr := address.CleanAddress182(l.prev1_street,l.prev1_csz);
+ self.clean_prev2_addr := address.CleanAddress182(l.prev2_street,l.prev2_csz);
+ self.clean_prev3_addr := address.CleanAddress182(l.prev3_street,l.prev3_csz);
+ self.clean_prev4_addr := address.CleanAddress182(l.prev4_street,l.prev4_csz);
+ self.clean_prev5_addr := address.CleanAddress182(l.prev5_street,l.prev5_csz);
  self := l;
 end;
  

@@ -19,20 +19,26 @@ export Mac_spray_csv_input_files(string sourcefile,string group_name=_control.Ta
 //////////////////////////////////////////
 // -- Set value types
 ///////////////////////////////////////////
-sourceIP := _control.IPAddress.edata12;
-string  superfilename 		:= LiensV2.Get_Upadte_CSVSuperFilename(updatetype);
+sourceIP := if ( _Control.ThisEnvironment.Name = 'Prod_Thor',  _control.IPAddress.bctlpedata10 , _control.IPAddress.bctlpedata12);
+string  superfilename 		:= if ( updatetype = 'caf', '~thor_data400::in::liensv2::caf', LiensV2.Get_Upadte_CSVSuperFilename(updatetype));
 
 
 //////////////////////////////////////////
 // -- Spray File
 /////////////////////////////////////////
-spray_first := FileServices.SprayVariable(sourceIP,sourcefile,16384,'\\',,,group_name, 
-				thor_filename ,-1,,,true,true);
+spray_first := if ( updatetype = 'caf', FileServices.SprayVariable(sourceIP,sourcefile,,'',,,group_name, 
+				                                           thor_filename ,-1,,,true,true),
+																 FileServices.SprayVariable(sourceIP,sourcefile,16384,'\\',,,group_name, 
+				                                           thor_filename ,-1,,,true,true)
+							);
+				
+				
 				
 				
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Superfile manipulation
 //////////////////////////////////////////////////////////////////////////////////////////////
+clear_superfile	:= FileServices.ClearSuperFile(superfilename);
 add_to_superfile := FileServices.AddSuperFile(superfilename, thor_filename);
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,6 +65,7 @@ return sequential
 (
 	 //output_value_types
 	spray_first
+	,clear_superfile
 	,add_to_superfile
 	//,output_Superfile_Subfiles
 	,send_completion_email

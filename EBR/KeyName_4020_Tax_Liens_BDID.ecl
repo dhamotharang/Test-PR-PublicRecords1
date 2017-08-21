@@ -1,1 +1,1 @@
-export KeyName_4020_Tax_Liens_BDID := trim(GetSegmentKeyName_BDID('4020')) : global;
+export KeyName_4020_Tax_Liens_BDID := trim(GetSegmentKeyName_BDID('4020'));

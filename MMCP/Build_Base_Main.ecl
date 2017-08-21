@@ -70,7 +70,7 @@ EXPORT Build_Base_Main(STRING pversion,
 
 	// Join base and update to determine what's new
 	combinedMain := Standardize_Addr(workingCurrentMainBase + workingHistoricalMainBase +
-	                                    workingMainUpdate_dist);
+	                                    workingMainUpdate_dist) : INDEPENDENT;
 	combinedMainCleanName := Standardize_Name(combinedMain);
 
 	// Add DID and BDID
@@ -105,7 +105,7 @@ EXPORT Build_Base_Main(STRING pversion,
 
 	Layouts.Base rollupMain(Layouts.Base L, Layouts.Base R) := TRANSFORM
     SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
-    SELF.dt_vendor_last_reported := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+    SELF.dt_vendor_last_reported := MAX(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 
 	  SELF := L;
 	END;

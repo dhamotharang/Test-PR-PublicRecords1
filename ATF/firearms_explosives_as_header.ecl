@@ -1,11 +1,11 @@
-import header,ut;
+import header,ut,mdr;
 fire_in := atf.file_firearms_explosives_in;
 
 header.Layout_New_Records faslim(fire_in Le, integer cnt) := transform
   self.did := 0;
   //self.preGLB_DID := 0;
   self.rid := 0;
-  self.src := if(le.record_type='F','FF','FE');
+  self.src := if(le.record_type='F',MDR.sourceTools.src_Federal_Firearms,MDR.sourceTools.src_Federal_Explosives);
   self.dt_first_seen := (integer)le.date_first_seen div 100;
   self.dt_last_seen := (integer)le.date_last_seen div 100;
   self.dt_vendor_last_reported := (integer)le.date_last_seen div 100;

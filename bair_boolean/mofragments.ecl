@@ -5,10 +5,16 @@ EXPORT mofragments(Types.StateList st_list=ALL, Boolean pDelta=true) := MODULE
 	SHARED Persist_mo	:= bair_boolean.constants('').persistfile('mo');
 
   bair_data := Bair.files(pUseDelta:=pDelta).mo_Base.built;
+	//bair_data := choosen(Bair.files(pUseDelta:=pDelta).mo_Base.built,10000);
 	SHARED mo_Base := DISTRIBUTE(bair_data(eid <> ''),HASH64(eid));
 	
 	// mo Business
-	Layout_mo_base xd(bair.layouts.dbo_event_mo_final_Base l) := TRANSFORM
+	Layout_mo_base xd(bair.Layouts.dbo_event_mo_final_Base l) := TRANSFORM
+	  SELF.Property_Value := (Real)l.Property_Value;
+		SELF.companions     := (Integer)l.companions;
+		SELF.Geocoded				:= IF(l.Geocoded ='1','True','False');
+		SELF.Raids					:= IF(l.Raids ='1','True','False');
+		SELF.Quarantined		:= IF(l.Quarantined ='1','True','False');
 		SELF := l;
 	END;
 	SHARED mo_File := PROJECT(mo_Base, xd(LEFT));

@@ -331,6 +331,7 @@ module
 		string100				Append_Reg2_PrepAddr1;
 		string50				Append_Reg2_PrepAddr2;
 		AID.Common.xAID	Append_Reg2_RawAID;
+		unsigned8 			source_rec_id;
 	end;
 
 
@@ -691,6 +692,7 @@ module
 		string100				Append_Reg2_PrepAddr1;
 		string50				Append_Reg2_PrepAddr2;
 		AID.Common.xAID	Append_Reg2_RawAID;
+		unsigned8 			source_rec_id;		
 	end;
 
 end;

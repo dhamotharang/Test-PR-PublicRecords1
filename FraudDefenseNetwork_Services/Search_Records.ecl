@@ -13,10 +13,10 @@
   FraudDefenseNetwork_Services.SearchService and BatchServices.trisv31_get_fdn 
  */ 
 
-IMPORT doxie, FraudShared, FraudShared_Services, iesp;
+IMPORT doxie, FraudShared_Services, iesp;
 
 EXPORT Search_Records(
-	DATASET(FraudShared_Services.Layouts.batch_search_rec) ds_batch_in,
+	DATASET(FraudDefenseNetwork_Services.Layouts.batch_search_rec) ds_in,
 	unsigned6 gc_id_in, 
 	unsigned2 ind_type_in, 
 	unsigned6 product_code_in, 
@@ -24,7 +24,7 @@ EXPORT Search_Records(
 	DATASET(iesp.frauddefensenetwork.t_FDNFileType) ds_file_types_in,
 	INTEGER DeltaUse = 0,
 	INTEGER DeltaStrict = 0,
-  string fraud_platform = FraudShared.Constants().Platform.FDN,
+  string fraud_platform = FraudShared_Services.Constants.Platform.FDN,
   boolean filterBy_entity_type = TRUE
   //,boolean ForceReturnContribData? = false // 03/2016 enhancement??? use some other/better parm name???
 	//  ^--- when added, this new parm & DPM 11 will need checked below to determine whether
@@ -32,15 +32,31 @@ EXPORT Search_Records(
 	// Then the DPM 11/contrib filter in FraudDefenseNetwork_Services.SearchService and BatchServices.trisv31_get_fdn
 	// could be removed.
   
-) := FUNCTION 
+) := FUNCTION
+
+  ds_in_seq := FraudDefenseNetwork_Services.Functions.SetSequences(ds_in);
+
+  ds_filterBys := PROJECT(ds_in_seq, FraudDefenseNetwork_Services.Layouts.FilterBy_With_Seq_rec);
+  
+  ds_batch_in := FraudDefenseNetwork_Services.StandardizeBatchInput(ds_in_seq);
 
 	ds_ids := FraudDefenseNetwork_Services.Search_IDs(ds_batch_in, fraud_platform, filterBy_entity_type);
 	
 	ds_Raw := FraudShared_Services.GetPayloadRecords(ds_ids, fraud_platform);
+  
+  ds_Raw_With_Filter := JOIN(
+    ds_Raw, ds_filterBys,
+    (integer)LEFT.acctno = RIGHT.seq,
+    TRANSFORM(FraudDefenseNetwork_Services.Layouts.Raw_Payload_rec,
+			SELF := RIGHT,
+      SELF := LEFT,
+			SELF := []));
 
-	ds_filtered:= FraudShared_Services.Filter.filterRecs(ds_Raw);
+	ds_filtered:= FraudDefenseNetwork_Services.Filter.filterRecs(ds_Raw_With_Filter);
+  
+  ds_x_filtered := PROJECT(ds_filtered, FraudShared_Services.Layouts.Raw_Payload_rec);
 		
-	ds_recs_pulled := FraudShared_Services.Common_Suppress(ds_filtered);
+	ds_recs_pulled := FraudShared_Services.Common_Suppress(ds_x_filtered);
 
   ds_appendDeltabase := FraudShared_Services.Common_Deltabase(ds_batch_in, ds_recs_pulled, ds_file_types_in, DeltaUse, DeltaStrict);
 															

@@ -1,4 +1,4 @@
-import ut, business_header;
+import ut, business_header,header;
 
 redis := BA_dist;
 srted := sort(redis,person1,person2,local);
@@ -21,12 +21,15 @@ end;
 
 rlup := rollup(grp,true,rollDates(left,right));
 
-header.Layout_relatives slimand4(rlup l) := transform
+header.Layout_relatives_v2.slim slimand4(rlup l) := transform
 	self.prim_range := -4;
 	self := l;
 end;
 	
 rlup_slim := project(rlup, slimand4(left));
 
-export Business_Associates := rlup_slim(number_cohabits > 6)
-	: persist('persist::business_associates');
+rlup_slim_5 := dedup(sort(join(rlup_slim , redis,left.person1=right.person1 and left.person2=right.person2,
+                            transform({header.layout_relatives_v2.temp},self.bdid := right.bdid ,self:=left),local),person1,person2,-number_cohabits,local),person1,person2,bdid,local);
+
+export Business_Associates := dedup(rlup_slim_5(number_cohabits > 6),person1,person2, keep 5,local)
+	                          : persist(persistnames().BusinessAssociates);

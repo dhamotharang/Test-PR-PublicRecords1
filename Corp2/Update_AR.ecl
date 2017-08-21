@@ -1,5 +1,18 @@
 import ut;
 
+export Update_AR(
+
+	 dataset(Layout_Corporate_Direct_ar_In			) parUsing			= files().input.ar.using
+//	,dataset(Layout_Corporate_Direct_ar_In			) pV1ar					= files().v1.ar
+//	,dataset(Layout_Corporate_Direct_ar_In			) pv1ar_Father	= files().v1.ar_father
+	,dataset(Layout_Corporate_Direct_ar_Base		) parBase				= files().Base.ar.QA
+	,dataset(Layout_Corporate_Direct_Corp_AID		) pUpdate_Corp	= Update_Corp	()
+	,dataset(Layout_Corporate_Direct_Event_Base	) pUpdate_Event	= Update_Event()
+	,string																				pPersistname	= persistnames.Updatear
+
+) := 
+function
+
 // Project AR Update to Base Format
 Layout_Corporate_Direct_AR_Base InitARUpdate(Layout_Corporate_Direct_AR_In l) := transform
 // Uppercase fields
@@ -13,11 +26,18 @@ self.record_type := 'H';
 self := l;
 end;
 
-AR_update_init := project(dedup(Files.Input.AR.Using, all), InitARUpdate(left));
+AR_update_files :=  if(flags.IsUsingV1Inputs = true, 
+								map(flags.UseV1CurrentSprayed = true	and flags.ExistEventsV1CurrentSprayed	=> parUsing,
+										flags.UseV1CurrentSprayed = false and flags.ExistEventsV1FatherSprayed	=> parUsing,
+										parUsing
+										)
+								, parUsing
+								);
+AR_update_init := project(dedup(AR_update_files, all), InitARUpdate(left));
 					   
 // Fix any dates necessary
-AR_update_init_fix := AR_update_init(corp_state_origin in setStatesNeedDatesFixed);
-AR_update_init_combined := AR_update_init(corp_state_origin not in setStatesNeedDatesFixed) + AR_update_init_fix;
+AR_update_init_fix := AR_update_init(corp_state_origin in Corp2.SetsofStates.setStatesNeedDatesFixed);
+AR_update_init_combined := AR_update_init(corp_state_origin not in Corp2.SetsofStates.setStatesNeedDatesFixed) + AR_update_init_fix;
 
 AR_update_init_dist := distribute(AR_update_init_combined, hash(corp_key));
 AR_update_init_sort := sort(AR_update_init_dist, except bdid, dt_first_seen, dt_last_seen,
@@ -44,14 +64,18 @@ self.record_type := 'H';
 self := l;
 end;
 
-AR_current_init := project(Files.Base.AR.QA(Filters.Base.AR), InitCurrentARBase(left));
+AR_current_init := project(Filters.Base.AR(parBase), InitCurrentARBase(left));
 AR_current_init_dedup := dedup(AR_current_init, all);
 AR_current_init_dist := distribute(AR_current_init_dedup, hash(corp_key));
 
 // Combine current base with update
-AR_update_combined := if(Flags.Update.AR,
-                           AR_current_init_dist + AR_update_init_rollup,
-						   AR_update_init_rollup);
+ar_update_combined := map(Flags.Update.ar and flags.ExistarV2CurrentSprayed =>
+															ar_current_init_dist + ar_update_init_rollup,
+														Flags.Update.ar =>
+															ar_current_init_dist,
+															ar_update_init_rollup
+													);
+
 						   
 // Rollup dates for identical records
 AR_update_combined_sort := sort(AR_update_combined, except bdid, dt_first_seen, dt_last_seen,
@@ -67,27 +91,40 @@ AR_update_combined_rollup_grpd := group(AR_update_combined_rollup_sort, corp_key
 AR_update_combined_rollup_grpd_sort := sort(AR_update_combined_rollup_grpd, -dt_vendor_last_reported, -dt_last_seen);
 
 Layout_Corporate_Direct_AR_Base SetRecordType(Layout_Corporate_Direct_AR_Base L, Layout_Corporate_Direct_AR_Base R) := transform
-self.record_type := if(l.record_type = ''or
-                       (l.record_type = 'C' and l.dt_last_seen = r.dt_last_seen), 'C', r.record_type);
-self := r;
+	isdatethesame := if(l.dt_vendor_last_reported != 0 and l.dt_vendor_last_reported = r.dt_vendor_last_reported, true,false);
+	ispreviousrecordcurrent := if(l.record_type = 'C',true, false);
+	isfirstrecord := if(l.record_type = '',true, false);
+	decision := if(isfirstrecord or (isdatethesame and ispreviousrecordcurrent), 'C', r.record_type);
+
+	self.record_type	:= decision;
+	// self.record_type := if(l.record_type = ''or
+                       // (l.record_type = 'C' and l.dt_last_seen = r.dt_last_seen), 'C', r.record_type);
+	self := r;
 end;
 
 AR_update := group(iterate(AR_update_combined_rollup_grpd_sort, SetRecordType(left, right)));
 
 //////////////////////////////
-//Assign BDIDs
+//Assign BDIDs 
 ///////////////////////////////
 Layout_Corp_BDID_List := record
 unsigned6 bdid;
 string30  corp_key;
+unsigned4 dt_vendor_first_reported;
+unsigned4 dt_vendor_last_reported;
 end;
 
-Layout_Corp_BDID_List InitCorpBDID(Layout_Corporate_Direct_Corp_Base l) := transform
+Layout_Corp_BDID_List InitCorpBDID(Layout_Corporate_Direct_Corp_AID l) := transform
 self := l;
 end;
 
-Corp_BDID_Init := project(Update_Corp, InitCorpBDID(left));
-Corp_BDID_Dedup := dedup(Corp_BDID_Init, bdid, corp_key, all);
+Corp_BDID_Init := sort(project(pUpdate_Corp, InitCorpBDID(left)), bdid, corp_key);
+Corp_BDID_Dedup := rollup(Corp_BDID_Init, transform(recordof(Corp_BDID_Init),
+	self.dt_vendor_first_reported := if(left.dt_vendor_first_reported < right.dt_vendor_first_reported	and left.dt_vendor_first_reported != 0, left.dt_vendor_first_reported	, right.dt_vendor_first_reported);
+	self.dt_vendor_last_reported 	:= if(left.dt_vendor_last_reported 	> right.dt_vendor_last_reported 	and left.dt_vendor_last_reported 	!= 0, left.dt_vendor_last_reported	, right.dt_vendor_last_reported	);
+	self := left;
+),bdid, corp_key);
+
 Corp_BDID_Dedup_Dist := distribute(Corp_BDID_Dedup, hash(corp_key));
 
 Corp_AR_Dist := distribute(AR_update, hash(corp_key));
@@ -100,9 +137,22 @@ end;
 
 Corp_AR_Base := join(Corp_AR_Dist,
                         Corp_BDID_Dedup_Dist,
-						left.corp_key = right.corp_key,
-						AssignARBDID(left, right),
+						left.corp_key = right.corp_key
+						and (right.bdid != 0)
+		and (	(			left.dt_vendor_first_reported				>= right.dt_vendor_first_reported
+						and left.dt_vendor_first_reported				<= right.dt_vendor_last_reported
+					)
+				or(			left.dt_vendor_last_reported					>= right.dt_vendor_first_reported
+						and left.dt_vendor_last_reported					<= right.dt_vendor_last_reported
+					)
+			)
+						,AssignARBDID(left, right),
 						left outer,
 						local);
 
-export Update_AR := Corp_AR_Base : persist(persistnames.UpdateAR);
+Corp_AR_Base_Sort  := sort (Corp_AR_Base,record,local);	
+returndataset      := dedup(Corp_AR_Base_Sort	,record,local) : persist(pPersistname);
+
+return returndataset;
+
+end;

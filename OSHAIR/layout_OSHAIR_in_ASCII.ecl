@@ -24,8 +24,38 @@ EXPORT layout_OSHAIR_in_ASCII := MODULE
 
     // Penalty/FTA or Miscellaneous Debt sub-record
 	EXPORT OSHAIR_debt_rec := RECORD,maxLength(75000)
-	   EBCDIC string1 debt_type;
+	   string1 debt_type;
 	   EBCDIC string71 debt_payload;
+	   /*IfBlock(self.Debt_Type in ['P','F'])
+			string1 debt_waived;
+			string1 debt_waived_reason;
+			big_endian unsigned integer4	ref_date;
+			decimal9_2 debt_interest;
+			decimal9_2 deliquent_fees;
+			big_endian unsigned integer4	dca_send_date;
+			big_endian unsigned integer4	dca_returned_date;
+			string1 dca_recommended;
+			decimal9_2 dca_litigation_amount;
+			decimal9_2 dca_fee_amount;
+			string1 case_archived;
+			decimal9_2 dca_interest;
+			decimal9_2 dca_deliquent_fees;
+			big_endian unsigned integer4 dfo_send_date;
+			big_endian unsigned integer4	dfo_returned_date;
+			string1 dfo_recommended;
+			big_endian unsigned integer4	area_office_send_date;
+			big_endian unsigned integer4	credit_bureau_send_date;
+			big_endian unsigned integer4	irs_send_date;
+			big_endian unsigned integer4	credit_bureau_returned_date; 
+		end;
+		IfBlock(self.Debt_Type = 'M')
+            big_endian unsigned integer4 next_Installment_date;
+            big_endian unsigned integer4 last_Installment_date;
+            big_endian unsigned integer4 solicitor_date;
+            string1  solicitor_reason;
+            string1  case_hold_flag;
+            string57 fta_debt_filler;
+        end;*/
 	END;
 
     // Violation sub-record
@@ -108,8 +138,25 @@ EXPORT layout_OSHAIR_in_ASCII := MODULE
 
     // Administrative or Payment sub-record
 	EXPORT OSHAIR_administrative_payment_rec := RECORD,maxLength(75000)
-	   EBCDIC string1  admin_pay_type;
-	   EBCDIC string20 admin_pay_payload;
+		//EBCDIC
+		string1  admin_pay_type;
+		EBCDIC string20 admin_pay_payload;
+		/*IfBlock(self.Admin_Pay_Type in ['1','2','3','4','5','6','7','8','9',
+									   'M','N','I','D','F','G','O'])
+																   
+			big_endian unsigned integer4 Admin_Date;
+            decimal9_2 Admin_Amount;
+            string11 Admin_Filler;
+        end;*/
+        // /* Payment sub-record type */
+        /*IfBlock(self.Admin_Pay_Type in ['P','R','U','C'])
+		    big_endian unsigned integer4 Payment_Date;
+            decimal9_2 Payment_Penalty_Amount;
+            decimal9_2 Payment_FTA_Amount;
+            big_endian unsigned integer4 Payment_163_Number;
+            string1 Payment_Origin;
+            string1 Payment_Balanced;
+        end;*/     
 	END;
 
     // Inspection record
@@ -191,32 +238,32 @@ EXPORT layout_OSHAIR_in_ASCII := MODULE
 	  decimal11_2                  total_fta;
 	  decimal5                     total_violations;
 	  decimal5                     total_serious_violations;
-	  unsigned integer2            number_program;
-	  unsigned integer2            number_rel_activity;
-	  unsigned integer2            number_optional_info;
-	  unsigned integer2            number_debt;
-	  unsigned integer2            number_violations;
-	  unsigned integer2            number_event;
-	  unsigned integer2            number_hazardous_substance;
-	  unsigned integer2            number_accident;
-	  unsigned integer2            number_admin_pay;
+	  big_endian unsigned2         number_program;
+	  big_endian unsigned2         number_rel_activity;
+	  big_endian unsigned2         number_optional_info;
+	  big_endian unsigned2         number_debt;
+	  big_endian unsigned2         number_violations;
+	  big_endian unsigned2         number_event;
+	  big_endian unsigned2         number_hazardous_substance;
+	  big_endian unsigned2         number_accident;
+	  big_endian unsigned2         number_admin_pay;
 	  DATASET(OSHAIR_program_rec
-	         ,count((big_endian unsigned integer2) SELF.number_program)) programs;
+	         ,count(SELF.number_program)) programs;
 	  DATASET(OSHAIR_related_activity_rec
-	         ,count((big_endian unsigned integer2) SELF.number_rel_activity)) related_activties;
+	         ,count(SELF.number_rel_activity)) related_activties;
 	  DATASET(OSHAIR_optional_info_rec
-	         , count((big_endian unsigned integer2) SELF.number_optional_info)) optional_information;
+	         , count(SELF.number_optional_info)) optional_information;
 	  DATASET(OSHAIR_debt_rec
-	         , count((big_endian unsigned integer2) SELF.number_debt)) debts;
+	         , count(SELF.number_debt)) debts;
 	  DATASET(OSHAIR_violations_rec
-	         , count((big_endian unsigned integer2) SELF.number_violations)) violations;
+	         , count(SELF.number_violations)) violations;
 	  DATASET(OSHAIR_penalty_fta_event_rec
-	         , count((big_endian unsigned integer2) SELF.number_event)) events;
+	         , count(SELF.number_event)) events;
 	  DATASET(OSHAIR_hazardous_substance_rec
-	         , count((big_endian unsigned integer2) SELF.number_hazardous_substance)) hazardous_substances;
+	         , count(SELF.number_hazardous_substance)) hazardous_substances;
 	  DATASET(OSHAIR_Accident_rec
-	         , count((big_endian unsigned integer2) SELF.number_accident)) accidents;
+	         , count(SELF.number_accident)) accidents;
 	  DATASET(OSHAIR_administrative_payment_rec
-	         , count((big_endian unsigned integer2) SELF.number_admin_pay)) admin_payment;
+	         , count(SELF.number_admin_pay)) admin_payment;
  END;
 END;

@@ -1,25 +1,33 @@
 // YellowPages Listing Stats by State
-#workunit('name', 'Yellow Pages Stats by State ' + yellowpages.YellowPages_Build_Date);
-YP_File := YellowPages.File_YellowPages_Base;
+export Query_YellowPages_State_Stats(
 
-Layout_YP_Slim := RECORD
-string2   st;
-STRING1   source;
-END;
+	dataset(Layout_YellowPages_Base_V2_BIP	)	pBaseFile	= Files().Base.built
 
-Layout_YP_Slim SlimYP(YellowPages.Layout_YellowPages_Base L) := TRANSFORM
-SELF := L;
-END;
+) := 
+function
 
-YP_Slim := PROJECT(YP_File, SlimYP(LEFT));
+	YP_File := pBaseFile;
 
-Layout_YP_Stat := RECORD
-YP_Slim.st;
-From_YP := COUNT(GROUP, YP_Slim.source = 'Y');
-From_GB := COUNT(GROUP, YP_Slim.source = 'G');
-Total_Cnt := COUNT(GROUP);
-END;
+	Layout_YP_Slim := RECORD
+	string2   st;
+	STRING1   source;
+	END;
 
-YP_Stat := TABLE(YP_Slim, Layout_YP_Stat, st, FEW);
+	Layout_YP_Slim SlimYP(YellowPages.Layout_YellowPages_Base_V2_BIP L) := TRANSFORM
+	SELF := L;
+	END;
 
-OUTPUT(YP_Stat);
+	YP_Slim := PROJECT(YP_File, SlimYP(LEFT));
+
+	Layout_YP_Stat := RECORD
+	YP_Slim.st;
+	From_YP := COUNT(GROUP, YP_Slim.source = 'Y');
+	From_GB := COUNT(GROUP, YP_Slim.source = 'G');
+	Total_Cnt := COUNT(GROUP);
+	END;
+
+	YP_Stat := TABLE(YP_Slim, Layout_YP_Stat, st, FEW);
+
+	return OUTPUT(YP_Stat);
+
+end;

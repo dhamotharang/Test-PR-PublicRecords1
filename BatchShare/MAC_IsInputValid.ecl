@@ -1,4 +1,4 @@
-﻿//This Function Macro validates the minimal input criteria per validMinInput_enum defined in BatchShare.Constants
+//This Function Macro validates the minimal input criteria per validMinInput_enum defined in BatchShare.Constants
 EXPORT MAC_IsInputValid(ds_in,valMinInput_enum):=FUNCTIONMACRO
 IMPORT BatchShare,ut,std;
 

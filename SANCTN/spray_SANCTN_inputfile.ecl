@@ -1,4 +1,4 @@
-import SANCTN;
+import SANCTN,_Control;
 
 export spray_SANCTN_inputfile(string filedate) := function
 
@@ -9,14 +9,17 @@ export spray_SANCTN_inputfile(string filedate) := function
 
 #workunit('name','SANCTN data spray');
 
-%groupname% := 'thor_dell400';
+// %groupname% := 'thor200_144';
+//%groupname% := 'thor20_241_10';
+%groupname% := 'thor400_30';
+%cluster_name% := SANCTN.cluster_name;
 
-%spray_data% := fileservices.SprayVariable('10.150.12.240'
-                                        ,'/thor_back5/sanctn/data/'+filedate+'/'+filedate+'_combined.dat'
+%spray_data% := fileservices.SprayVariable(_Control.IPAddress.edata12
+                                        ,'/thor_back5/sanctn/public/data/'+filedate+'/'+filedate+'_combined.dat'
 										,
 										,''
 										,'\n'
-										,
+										,'~~~'
 										,%groupname%
 										,SANCTN.cluster + 'in::sanctn::'+filedate+'::payload'
 										,

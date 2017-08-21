@@ -65,6 +65,7 @@ vehlic.Layout_Vehicles tMTSourceToCommon(Layout_MT_Full pInput)
 	self.TRUE_LICENSE_PLSTE_NUMBER	:= pInput.orig_PLATE_NUMBER;
 	self.PLATE_ISSUE_DATE			:= fFixDate(pInput.orig_REGISTRATION_DATE);
 	self.REGISTRATION_EXPIRATION_DATE := pInput.orig_PLATE_EXPIRATION_DATE;
+	self.REGISTRATION_EFFECTIVE_DATE:= fFixDate(pInput.orig_REGISTRATION_DATE);
 	self.TITLE_NUMBERxBG9			:= pInput.orig_TITLE_NUMBER;
 	self.TITLE_STATUS_CODE			:= pInput.orig_TITLE_STATUS;
 	self.TITLE_ISSUE_DATE			:= fFixDate(pInput.orig_TITLE_DATE);

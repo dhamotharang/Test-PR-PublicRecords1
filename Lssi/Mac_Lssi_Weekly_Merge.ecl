@@ -1,4 +1,4 @@
-import ut,lssi;
+import ut,lssi,RoxieKeyBuild;
 //Merge the lssi update file to the base file, clean the update files, keys
 //and build the new lssi keys. 
 
@@ -48,22 +48,42 @@ ut.Mac_SF_Clear('~thor_data400::base::lssi_remove', %clear_remove_base%)
 #uniquename(clear_did_add_key)
 #uniquename(clear_hhid_add_key)
 #uniquename(clear_remove_key)
-ut.Mac_SK_Clear('~thor_data400::key::lssi_did_add',%clear_did_add_key%,4)
-ut.Mac_SK_Clear('~thor_data400::key::lssi_hhid_add',%clear_hhid_add_key%,4)
-ut.Mac_SK_Clear('~thor_data400::key::lssi_remove',%clear_remove_key%,4)
+ut.Mac_SK_Clear('~thor_data400::key::lssi_did_add',%clear_did_add_key%,4, true)
+ut.Mac_SK_Clear('~thor_data400::key::lssi_hhid_add',%clear_hhid_add_key%,4, true)
+ut.Mac_SK_Clear('~thor_data400::key::lssi_remove',%clear_remove_key%,4, true)
 
-#if(ut.Weekday((unsigned) StringLib.GetDateYYYYMMDD())='SUNDAY')
+#uniquename(strata)
+#uniquename(send_succ_msg)
+#uniquename(send_fail_msg)
+#uniquename(LSSIWeekly_dops_update)
+
+//%strata% := Lssi.strata_popFileLSSIBase;
+
+RoxieKeyBuild.Mac_Daily_Email_Local('LSSI WEEKLY','SUCC',thorlib.wuid()[2..9],%send_succ_msg%,if(email_target<>' ',email_target,lssi.Notification_Email_Address));
+RoxieKeyBuild.Mac_Daily_Email_Local('LSSI WEEKLY','FAIL',thorlib.wuid()[2..9],%send_fail_msg%,if(email_target<>' ',email_target,lssi.Notification_Email_Address));
+
+
+%LSSIWeekly_dops_update% := RoxieKeybuild.updateversion('LSSIWeeklyKeys',ut.GetDate,'cbrodeur@seisint.com',,'N');
+
+
+//#if(ut.Weekday((unsigned) StringLib.GetDateYYYYMMDD())='Sunday')
    sequential(%update_base%,
               %build_new_keys%,
                parallel(%clear_add_base%,
                         %clear_remove_base%,
 		              %clear_did_add_key%,
                         %clear_hhid_add_key%,
-                        %clear_remove_key%)) : success(FileServices.sendemail(if(email_target<>' ',email_target,lssi.Notification_Email_Address),'LSSI Weekly Merge Succeeded',
-                        'lssi base file has been updated, new keys have been built.')),
-                        failure(FileServices.sendemail(if(email_target<>' ',email_target,lssi.Notification_Email_Address),'LSSI Weekly Merge Failure',
-                        FAILMESSAGE));
-#else
-   output('This program runs on Sunday only');
-#end				
+                        %clear_remove_key%),
+						Lssi.BWR_New_DIDs_Weekly,
+						%LSSIWeekly_dops_update%);
+												//,%strata%)
+											
+						//%LSSIWeekly_dops_update%:
+               //success(%send_succ_msg%),
+               //failure(%send_fail_msg%);
+				    
+//#else
+   //output('This program runs on Sunday only');
+//#end	
+
 endmacro;

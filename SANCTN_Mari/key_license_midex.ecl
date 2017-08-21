@@ -1,4 +1,4 @@
-import doxie_files, doxie,ut,sanctn_mari,Data_Services,Prof_License_Mari;	
+import doxie_files, doxie,ut,sanctn_mari,Data_Services,Prof_License_Mari,std;	
 
 f_sanctn_incidentcode :=	SANCTN_Mari.files_SANCTN_common.incident_codes(trim(FIELD_NAME) != 'INTERNALCODE' AND CLN_LICENSE_NUMBER<>'');
 
@@ -37,7 +37,7 @@ slim_license_nbr xformCODES(f_sanctn_incidentcode L)  := TRANSFORM
 		self.LICENSE_TYPE					:= L.CODE_TYPE;
 		self.CODE_VALUE						:= L.CODE_VALUE;
 		
-		filterInvalidChar := stringlib.stringfilter(stringlib.stringtouppercase(L.CODE_STATE),'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+		filterInvalidChar := STD.Str.Filter(STD.Str.ToUpperCase(L.CODE_STATE),'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 		self.LICENSE_STATE				:= if(L.FIELD_NAME = 'LICENSECODE' AND L.CODE_VALUE[1..2] in set_state_abbr and filterInvalidChar = '',L.CODE_VALUE[1..2],filterInvalidChar);
 		self.STD_TYPE_DESC				:= L.STD_TYPE_DESC;
 		self.CLN_LICENSE_NUMBER		:= L.CLN_LICENSE_NUMBER;
@@ -46,9 +46,9 @@ slim_license_nbr xformCODES(f_sanctn_incidentcode L)  := TRANSFORM
 		tmp_incident_number := ut.rmv_ld_zeros(l.INCIDENT_NUM);
 		tmp_party_number := ut.rmv_ld_zeros(L.NUMBER);
 	  cln_party_number := if(trim(tmp_party_number) = '0','',tmp_party_number);
-	  self.midex_rpt_nbr := StringLib.StringCleanSpaces(trim(L.BATCH)+'-' 
-																														+ tmp_incident_number +'-' 
-																														+ cln_party_number);
+	  self.midex_rpt_nbr := STD.Str.CleanSpaces(trim(L.BATCH)+'-'
+																							+ tmp_incident_number +'-' 
+																								+ cln_party_number);
 		self := L;
 END;          
 	

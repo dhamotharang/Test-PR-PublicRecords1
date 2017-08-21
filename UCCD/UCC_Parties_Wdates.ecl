@@ -9,15 +9,14 @@ rec := record
 end;
 
 rec tra(cn l, dt r) := transform
-			dfs := map((unsigned)r.dt_first_seen > 0 => r.dt_first_seen,
+
+
+	self.dt_first_seen :=  map((unsigned)r.dt_first_seen > 0 => r.dt_first_seen,
 					l.ucc_process_date > l.insert_date => l.ucc_process_date,
 					l.insert_date);
-			dls := map((unsigned)r.dt_last_seen > 0 => r.dt_last_seen,
+	self.dt_last_seen := map((unsigned)r.dt_last_seen > 0 => r.dt_last_seen,
 					l.ucc_process_date < l.insert_date and l.ucc_process_date <> '' => l.ucc_process_date,
 					l.insert_date);
-
-	self.dt_first_seen := dfs;
-	self.dt_last_seen := dls;
 	self := l;
 end;
 

@@ -13,8 +13,8 @@ self.orig_filing_number              :=  L.LIEN_DOC;
 self.orig_filing_type                :=  L.TYPE;
 self.orig_filing_date                :=  L.FILING_DATE ;
 self.orig_filing_time                :=  '';
-self.filing_status                   :=  L.STATUS;
-self.filing_status_desc              :=  '';
+self.filing_status                   :=  '';
+self.filing_status_desc              :=  L.STATUS;
 self.case_number                     :=  '';
 self.filing_number                   :=  L.RELEASE_DOC;
 self.filing_type_desc                := '' ;
@@ -69,7 +69,7 @@ self.atty_phone                      := '' ;
 //Filing Office
 self.agency                          := '' ;
 self.agency_city                     := '' ;
-self.agency_state                    := '' ;
+self.agency_state                    := 'IL' ;
 self.agency_county                   := L.COUNTY ;
 
 //Cleaned fields

@@ -1,6 +1,6 @@
 export Layout_ABN_AMRO_C2BTest_In := record
-string DESCRIPTION1; 
 string HOUSEHOLD_KEY;
+string DESCRIPTION1; 
 string INDIVIDUAL_KEY;
 string NAME_FULL;
 string MAILING_ADDRESS_1;

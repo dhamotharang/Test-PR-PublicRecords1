@@ -10,6 +10,13 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(OSHAIR.Key_OSHAIR_BDID
                                           ,'~thor_data400::key::oshair::bdid'
 										  ,'~thor_data400::key::oshair::'+filedate+'::bdid'
 										  ,bk_bdid);
+											
+/* Build the LINKIDS key */
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(OSHAIR.Key_OSHAIR_LinkIds.Key
+                                          ,'~thor_data400::key::oshair::linkids'
+										  ,'~thor_data400::key::oshair::'+filedate+'::linkids'
+										  ,bk_linkids);
+											
 /* Build the Inspection key */
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(OSHAIR.Key_OSHAIR_inspection
 										  ,'~thor_data400::key::oshair::inspection'
@@ -53,6 +60,9 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(OSHAIR.Key_OSHAIR_accident
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::oshair::bdid'
                                      ,'~thor_data400::key::oshair::'+filedate+'::bdid'
 									 ,mv2blt_bdid);
+Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::oshair::linkids'
+                                     ,'~thor_data400::key::oshair::'+filedate+'::linkids'
+									 ,mv2blt_linkids);									 
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::oshair::inspection'
                                      ,'~thor_data400::key::oshair::'+filedate+'::inspection'
 									 ,mv2blt_insp);
@@ -80,6 +90,7 @@ Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::oshair::accident'
 /////////////////////////////////////////////////////////////////////////////////
 
 ut.mac_sk_move('~thor_data400::key::oshair::bdid','Q',mv2qa_bdid);
+ut.mac_sk_move('~thor_data400::key::oshair::linkids','Q',mv2qa_linkids);
 ut.mac_sk_move('~thor_data400::key::oshair::inspection','Q',mv2qa_insp);
 ut.mac_sk_move('~thor_data400::key::oshair::program','Q',mv2qa_pgm);
 ut.mac_sk_move('~thor_data400::key::oshair::related_activity','Q',mv2qa_rel_act);
@@ -111,13 +122,14 @@ emailN := fileservices.sendemail('RoxieBuilds@seisint.com ; ehamel@seisint.com '
 								'      7) thor_data400::key::oshair::QA::autokey::stnameb2(thor_data400::key::oshair::'+ filedate +'::autokey::stnameb2),\n' +
 								'      8) thor_data400::key::oshair::QA::autokey::zipb2(thor_data400::key::oshair::'+ filedate +'::autokey::zipb2),\n' +
 								'      9) thor_data400::key::oshair::bdid_qa(thor_data400::key::oshair::'+ filedate +'::bdid),\n' +
-								'     10) thor_data400::key::oshair::accident_qa(thor_data400::key::oshair::'+ filedate +'::accident),\n' +
-								'     11) thor_data400::key::oshair::hazardous_substance_qa(thor_data400::key::oshair::'+ filedate +'::hazardous_substance),\n' +
-						        '     12) thor_data400::key::oshair::inspection_qa(thor_data400::key::oshair::'+ filedate +'::inspection),\n' +
-								'     13) thor_data400::key::oshair::optional_info_qa(thor_data400::key::oshair::'+ filedate +'::optional_info),\n' +
-								'     14) thor_data400::key::oshair::program_qa(thor_data400::key::oshair::'+ filedate +'::program),\n' +
-								'     15) thor_data400::key::oshair::related_activity_qa(thor_data400::key::oshair::'+ filedate +'::),\n' +
-								'     16) thor_data400::key::oshair::violations_qa(thor_data400::key::oshair::'+ filedate +'::violations),\n' +
+								'     10) thor_data400::key::oshair::linkids_qa(thor_data400::key::oshair::'+ filedate +'::linkids),\n' +
+								'     11) thor_data400::key::oshair::accident_qa(thor_data400::key::oshair::'+ filedate +'::accident),\n' +
+								'     12) thor_data400::key::oshair::hazardous_substance_qa(thor_data400::key::oshair::'+ filedate +'::hazardous_substance),\n' +
+						    '     13) thor_data400::key::oshair::inspection_qa(thor_data400::key::oshair::'+ filedate +'::inspection),\n' +
+								'     14) thor_data400::key::oshair::optional_info_qa(thor_data400::key::oshair::'+ filedate +'::optional_info),\n' +
+								'     15) thor_data400::key::oshair::program_qa(thor_data400::key::oshair::'+ filedate +'::program),\n' +
+								'     16) thor_data400::key::oshair::related_activity_qa(thor_data400::key::oshair::'+ filedate +'::),\n' +
+								'     17) thor_data400::key::oshair::violations_qa(thor_data400::key::oshair::'+ filedate +'::violations),\n' +
 								'         have been built and ready to be deployed to QA.'); 
 			
 
@@ -127,6 +139,7 @@ emailN := fileservices.sendemail('RoxieBuilds@seisint.com ; ehamel@seisint.com '
 
 build_keys := sequential(// Build the keys
 						  parallel(bk_bdid
+							         ,bk_linkids
 						           ,bk_pyld_insp
 								   ,bk_pyld_pgm
 								   ,bk_pyld_rel_act
@@ -136,6 +149,7 @@ build_keys := sequential(// Build the keys
 								   ,bk_pyld_acc)
 					     ,// Move the keys to built
 					 	  parallel(mv2blt_bdid
+							     ,mv2blt_linkids
 								   ,mv2blt_insp
 								   ,mv2blt_pgm
 								   ,mv2blt_rel_act
@@ -145,6 +159,7 @@ build_keys := sequential(// Build the keys
 								   ,mv2blt_acc)
 					     ,// Move the keys to qa
 					  	  parallel(mv2qa_bdid
+								   ,mv2qa_linkids
 								   ,mv2qa_insp
 								   ,mv2qa_pgm
 								   ,mv2qa_rel_act

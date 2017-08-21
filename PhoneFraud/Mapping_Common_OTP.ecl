@@ -49,7 +49,7 @@ inFile := PhoneFraud.File_OTP.Raw(trim(_Functions.rmNull(otp_id), left, right)<>
 	cmnMap 			:= project(inFile, fixFields(left));
 	
 //Populate Phone If Available
-	srt_phone 	:= sort(distribute(cmnMap, hash(otp_id)), otp_id, event_date, otp_phone, local);
+	srt_phone 	:= sort(distribute(cmnMap, hash(otp_id)), otp_id, event_date+event_time, otp_phone, local);
 		
 	PhoneFraud.Layout_OTP.Base fixFields2(srt_phone l, srt_phone r):= transform
 		self.otp_phone := if(trim(l.otp_phone, left, right)='', trim(r.otp_phone, left, right), l.otp_phone);	
@@ -63,7 +63,7 @@ inFile := PhoneFraud.File_OTP.Raw(trim(_Functions.rmNull(otp_id), left, right)<>
 	
 	concatF			:= fixField+cmnMap(otp_phone<>'');	
 	concatFile	:= concatF + PhoneFraud.File_OTP.Base;	
-	ddConcat 		:= dedup(sort(distribute(concatFile, hash(otp_phone)), record, local), record, local);
+	ddConcat 		:= dedup(sort(distribute(concatFile, hash(transaction_id)), transaction_id, date_file_loaded, local), transaction_id, local);
 	
 	RETURN ddConcat;
 

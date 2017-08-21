@@ -1,1 +1,1 @@
-export	fnTrim2Upper(string	pStr)	:=	stringlib.stringtouppercase(stringlib.stringcleanspaces(pStr));
+export	fnTrim2Upper(string	pStr)	:=	ut.CleanSpacesAndUpper(pStr): DEPRECATED('Use ut.CleanSpacesAndUpper instead');

@@ -1,0 +1,370 @@
+//*****************************************************************************************************/
+/* Converting District of Columbia  Real Estate Agents, Brokers & Firms License File to MARI common layout
+// Logic linking DBA to Corp needs additonal business logic which should be resolve with NMLS system
+//*****************************************************************************************************/
+IMPORT ut, Prof_License_Mari, lib_Stringlib, Lib_FileServices, Address;
+
+EXPORT  map_DCS0860_conversion(STRING pVersion) := FUNCTION
+#workunit('Name','Prof License MARI- DCS0860 ' + pVersion); 
+
+code 		:= 'DCS0860';
+src_cd				:= code[3..7];
+license_state := code[1..2];
+
+C_O_Ind    := '(C/O |ATTN:|ATTN: |ATTN|ATTENTION:|ATT:|CO/)';
+DBA_Ind    := '(^DBA | DBA|D/B/A | D/B/A|/DBA | A/K/A | AKA|T/A | DBA |DBA |DBA:)';
+
+AddressSet1 := '(SUITE|DRIVE| DR$| ROAD| RD$|BLVD| STREET$| ST$|APT |APT.| AVE | AVE$| AVENUE| COURT| LANE| PLACE | PLACE$| SUITE| PL$| PL.| WAY$| TER$|' +
+                'CIRCLE$| ISLE | PARKWAY| PIKE|PO BOX|LN$| NW$| NE$| CT$| CT.| DR.|CENTURY 21| HIGHWAY| NW$)';
+
+AddressSet2 := '(SUITE|DRIVE| DR$| ROAD| RD$|BLVD| STREET$| ST$|APT |APT.| AVE | AVE$| AVENUE| COURT| PLACE | PLACE$| SUITE| PL$| PL.| WAY$| TER$|' +
+                'CIRCLE$| ISLE | PARKWAY| PIKE|PO BOX|LN$| NW$| NE$| CT$| CT.| DR.)';
+
+CompNames  := '(DEVELOPMENT*|COMPANY|COMPANIES|^THE |FIRST FLOOR LOBBY|ONE WINDER COURT| COLDWELL| BANKER| GROUP| PROPERTIES|REALTY|'+
+							'INVESTMENT|CENTURY 21|CENTURY21| ASSOCIATES*| INC| INC | INC$|,INC| LLC$|,LLC$|L.P.|WASHINGTON FINE PROPERTIES*|WEST, LANE & SCHLAGER|'+
+							' PARTNER*|LONG AND FOSTER|JONES LANG LASALLE|NANCY ELLIS NEELY|NEWMARK KNIGHT FRANK| RE$|TANYA MARHEFKA|BETTY PELZER-SHARPER|'+ 
+							'TISHMAN SPEYER|TTR SOTHEBY|VORNADO/CHARLES E. SMITH|WC&AN MILLER|W.C. AND A.N. MILLER | REAL ESTATE|REMAX |RE/MAX|'+
+							'DISTRICT APARTMENTS - STEPHANIE ALMANZA|PROPERTIES|INTERNATIONAL|RETAIL| OF |&|CORPORATION|MAYFAIR MANSIONS|'+
+							'COMMERCIAL| CORP$|MANAGEMENT| MGMT |SERVICE|ASSET|APPRAISAL|ESTATE|NEWMARK KNIGHT FRANK|NEWMARK GRUBB KNIGHT FRANK|DEVELOPMENT|' +
+							'WEST, LANE & SCHLAGER|VORNADO)';
+							
+pobox      := '(P O BOX |P. O. BOX |P.O. BOX |P.O.BOX |PO BOX |PO BOX|POBOX |POST OFFICE BOX )';
+NameSuffix := '(JR.$| JR$| I$| SR.$| SR$| II$| III$| IV$| J$)';
+ValidStates:= ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN', 'MO', 'MS',
+							 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VI', 'VT', 'WA', 'WI', 'WV', 'WY'];
+
+in_File := Prof_License_Mari.file_dcs0860.rle;
+ut.CleanFields(in_File, cln_File);
+Ofile := OUTPUT(cln_File);
+
+//LOOKUPs
+cmvTransLkp	:= Prof_License_Mari.files_References.cmvtranslation(SOURCE_UPD = src_cd);
+OCmvLkp	:= OUTPUT(cmvTransLkp);
+
+maribase_plus_DBAs := RECORD, maxsize(8000)
+  Prof_License_Mari.layouts.base;
+	STRING60 DBA1;
+	STRING60 DBA2;
+	STRING60 DBA3;
+	STRING60 DBA4;
+	STRING60 DBA5;
+END;
+
+maribase_plus_DBAs	xformToCommon(Prof_License_Mari.layout_dcs0860.Common L):= TRANSFORM
+
+		SELF.Primary_Key	    := 0;  
+		SELF.DATE_FIRST_SEEN	:= thorlib.wuid()[2..9];;
+		SELF.DATE_LAST_SEEN		:= thorlib.wuid()[2..9];;
+		SELF.DATE_VENDOR_FIRST_REPORTED := pVersion;
+		SELF.DATE_VENDOR_LAST_REPORTED	:= pVersion;
+		SELF.CREATE_DTE				:= thorlib.wuid()[2..9]; //yyyymmdd
+		SELF.PROCESS_DATE			:= thorlib.wuid()[2..9];
+		SELF.LAST_UPD_DTE			:=  pVersion;
+		SELF.STAMP_DTE				:=  pVersion;//yyyymmdd
+		// SELF.EXPIRE_DTE				:= IF(L.Expr_Dte <> '', L.Expr_Dte,'17530101');
+		SELF.EXPIRE_DTE				:= IF(TRIM(L.Expr_Dte,LEFT,RIGHT)<>'', Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(L.Expr_Dte), '17530101');
+		// SELF.ORIG_ISSUE_DTE		:= IF(L.Orig_Iss_Dte <> '', L.Orig_Iss_Dte, '17530101');
+		SELF.ORIG_ISSUE_DTE	  := IF(TRIM(L.Orig_Iss_Dte,LEFT,RIGHT)<>'', Prof_License_Mari.DateCleaner.fmt_dateMMDDYYYY(L.Orig_Iss_Dte), '17530101');
+	
+		SELF.STD_PROF_CD			:= '';
+		SELF.STD_PROF_DESC    := '';
+		SELF.STD_SOURCE_UPD		:= src_cd;
+		SELF.STD_SOURCE_DESC  := '';
+		SELF.TYPE_CD					:= 'MD';
+    
+		SELF.LICENSE_NBR				:= IF(L.IL_LIC_NBR = '', 'NR', L.IL_LIC_NBR);
+		SELF.LICENSE_STATE			:= LICENSE_STATE;
+
+		SELF.RAW_LICENSE_TYPE   := IF(L.LIC_TYPE_CD <> '', ut.CleanSpacesAndUpper(L.LIC_TYPE_CD),'ABF');
+		SELF.STD_LICENSE_TYPE 	:= IF(L.LIC_TYPE_CD <> '', ut.CleanSpacesAndUpper(L.LIC_TYPE_CD),'ABF');		
+    
+		SELF.Provnote_2         := MAP(L.LIC_TYPE_CD = '' AND L.Status_Code = '' => '{LIC_TYPE AND LIC_STATUS ASSIGNED}',
+		                               L.LIC_TYPE_CD = '' AND L.Status_Code <> '' => '{LIC_TYPE ASSIGNED}',
+																	 L.LIC_TYPE_CD <> '' AND L.Status_Code = '' => '{LIC_STATUS ASSIGNED}',
+																	 '');		
+		
+		SELF.Std_License_Desc		:= ut.CleanSpacesAndUpper(L.Shrt_Dscr);
+		SELF.Raw_License_Status	:= ut.CleanSpacesAndUpper(L.Status_Code);
+		SELF.Std_License_Status	:= 'A';
+		SELF.Std_Status_Desc		:= 'ACTIVE';
+		
+		//Reformatting date to YYYYMMDD
+		SELF.CURR_ISSUE_DTE		  := '17530101';
+		SELF.RENEWAL_DTE			  := '';
+		SELF.NAME_FORMAT			  := 'L';		
+
+    //Clean and uppercase parsed input fields
+		TrimName_First		 := ut.CleanSpacesAndUpper(L.FName);
+		TrimName_Mid  		 := ut.CleanSpacesAndUpper(L.MName);
+		TrimName_Last			 := ut.CleanSpacesAndUpper(L.LName);
+    TrimAddr1          := TRIM(ut.CleanSpacesAndUpper(L.addr1),LEFT,RIGHT);
+    TrimAddr2	         := TRIM(ut.CleanSpacesAndUpper(L.addr2),LEFT,RIGHT);
+    TrimCity	         := ut.CleanSpacesAndUpper(L.City);
+		TrimState          := ut.CleanSpacesAndUpper(L.State);
+		TrimZipcode        := ut.CleanSpacesAndUpper(L.Zipcode);
+
+    // Identify NICKNAME in the various format 
+		tempFNick							:= Prof_License_Mari.fGetNickname(TrimName_First,'nick');
+		tempMNick							:= Prof_License_Mari.fGetNickname(TrimName_Mid,'nick');
+		tempLNick							:= Prof_License_Mari.fGetNickname(TrimName_Last,'nick');
+		removeFNick						:= Prof_License_Mari.fGetNickname(TrimName_First,'strip_nick');
+		removeMNick						:= Prof_License_Mari.fGetNickname(TrimName_Mid,'strip_nick');
+		removeLNick						:= Prof_License_Mari.fGetNickname(TrimName_Last,'strip_nick');
+		stripNickFName				:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(removeFNick));
+		stripNickMName				:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(removeMNick));
+		stripNickLName				:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(removeLNick));
+		
+		//Parsing Name 
+		GoodFirstName					:= IF(tempFNick != '',stripNickFName,TrimNAME_FIRST);
+		GoodLastName					:= IF(tempLNick != '',stripNickLName,TrimNAME_LAST);
+		GoodMidName           := IF(tempMNick != '',stripNickMName,TrimNAME_MID);
+		ConcatNAME_FULL 			:= StringLib.StringCleanSpaces(GoodLastName +' '+GoodFirstName);		
+		
+		SELF.Name_Prefx			:= '';
+		FirstName           := IF(REGEXFIND(NameSuffix,  GoodFirstName), REGEXREPLACE( NameSuffix, GoodFirstName, ''), GoodFirstName);
+		SELF.Name_First		  := FirstName;
+		SELF.Name_Mid				:= GoodMidName;					
+		LastName            := IF(REGEXFIND(NameSuffix,  GoodLastName), REGEXREPLACE( NameSuffix, GoodLastName, ''), GoodLastName);
+		SELF.Name_Last		 	:= LastName; 		
+		tempSufxName		  	:= IF(REGEXFIND('(.*) (SR|JR|I|II|III|IV)(\\.?)$', GoodLastName, NOCASE),
+																	REGEXFIND('(.*) (SR|JR|I|II|III|IV)(\\.?)$', GoodLastName, 2, NOCASE), '');	
+		SELF.Name_Sufx 		  := tempSufxName;
+		SELF.Name_Nick      :=  IF(tempLNick <> '',	tempLNick, 
+												    	 IF(tempFNick <>'', tempFNick, ''));		
+		
+		SELF.Name_Org_Prefx		:= ''; 
+		SELF.Name_Org		    	:= ConcatNAME_FULL;
+		SELF.Name_Org_Sufx		:= '';
+    SELF.Name_Org_Orig		:= ut.fn_FormatFullName(TrimName_Last, TrimName_First, TrimName_Mid);
+
+    //Parsing Office Name
+		getOFFICE_NAME				:= MAP(REGEXFIND(C_O_Ind, TrimAddr1) AND NOT REGEXFIND(AddressSet1, TrimAddr1)=> TrimAddr1,
+		                             REGEXFIND(C_O_Ind, TrimAddr2) AND NOT REGEXFIND(AddressSet1, TrimAddr2)=> TrimAddr2,
+																 REGEXFIND(CompNames, TrimAddr1) AND NOT REGEXFIND(AddressSet1, TrimAddr1)=> TrimAddr1,
+																 REGEXFIND(CompNames, TrimAddr2) AND NOT REGEXFIND(AddressSet1, TrimAddr2)=> TrimAddr2,
+																 NOT REGEXFIND('[0-9]',TrimAddr1) AND NOT REGEXFIND(AddressSet1,TrimAddr1) AND TrimAddr1 <>'' => TrimAddr1,																 
+																 '');
+		
+		rmvOfficeDBA 					:= MAP(REGEXFIND(DBA_Ind,getOFFICE_NAME) => Prof_License_Mari.mod_clean_name_addr.GetCorpName(getOFFICE_NAME),
+																 getOFFICE_NAME[1..4] = 'DBA ' => Prof_License_Mari.mod_clean_name_addr.GetCorpName(getOFFICE_NAME),
+																 REGEXFIND('^(.*) (C/O) (.*)', getOFFICE_NAME) => REGEXFIND('^(.*) (C/O) (.*)',getOFFICE_NAME,1),
+																 REGEXFIND(C_O_Ind,getOFFICE_NAME) AND PROF_LICENSE_MARI.FUNC_IS_COMPANY(getOFFICE_NAME) = TRUE => Prof_License_Mari.mod_clean_name_addr.GetCorpName(getOFFICE_NAME),
+																																		getOFFICE_NAME);
+																					
+		StdNAME_OFFICE				:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(rmvOfficeDBA);														
+		CleanNAME_OFFICE 			:= MAP(REGEXFIND('(.COM|.NET|.ORG)',StdNAME_OFFICE)=> Prof_License_Mari.mod_clean_name_addr.cleanInternetName(StdNAME_OFFICE),
+																 REGEXFIND('(%)',StdNAME_OFFICE)=> StdNAME_OFFICE,
+																 REGEXFIND('FLATS ',StdNAME_OFFICE) => '',
+																 REGEXFIND(C_O_Ind, StdNAME_OFFICE) => REGEXREPLACE(C_O_Ind, StdNAME_OFFICE,''),
+																 Prof_License_Mari.mod_clean_name_addr.strippunctMisc(StdNAME_OFFICE)); 
+																 
+		SELF.NAME_OFFICE		  := MAP(TRIM(CleanNAME_OFFICE,ALL) = TRIM(SELF.NAME_ORG,ALL) => '',
+																 TRIM(CleanNAME_OFFICE,ALL) = TRIM(SELF.NAME_ORG_ORIG,ALL) =>'', 
+																 TRIM(CleanNAME_OFFICE,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_LAST,ALL) =>'', 
+																 TRIM(CleanNAME_OFFICE,ALL) = TRIM(REGEXREPLACE(',',SELF.NAME_ORG_ORIG,' '),ALL) => '',
+																 StringLib.StringCleanSpaces(CleanNAME_OFFICE));			
+		
+		SELF.OFFICE_PARSE			:= IF(SELF.NAME_OFFICE != '' AND (Prof_License_Mari.func_is_company(SELF.NAME_OFFICE) OR REGEXFIND(CompNames, SELF.NAME_OFFICE)),'GR',
+																	IF(SELF.NAME_OFFICE != '' AND NOT Prof_License_Mari.func_is_company(SELF.NAME_OFFICE),'MD',
+																							''));
+																							
+    SELF.NAME_MARI_ORG	  := IF(SELF.TYPE_CD ='MD',SELF.NAME_OFFICE,' '); 
+
+    //Parsing DBA Name																 
+    getNAME_DBA						:=MAP(REGEXFIND(DBA_Ind,TrimAddr1)=>Prof_License_Mari.mod_clean_name_addr.GetDBAName(TrimAddr1),
+		                            REGEXFIND(DBA_Ind,TrimAddr2)=>Prof_License_Mari.mod_clean_name_addr.GetDBAName(TrimAddr2),
+																REGEXFIND('^(.*) (C/O) (.*)', TrimAddr1) => REGEXFIND('^(.*) (C/O) (.*)',TrimAddr1,3),
+																REGEXFIND('^(.*) (C/O) (.*)', TrimAddr2) => REGEXFIND('^(.*) (C/O) (.*)',TrimAddr2,3),
+																''); 		
+    StdNAME_DBA 					:= Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(getNAME_DBA);
+		CleanNAME_DBA					:= MAP(REGEXFIND('(.COM|.NET|.ORG)',StdNAME_DBA) => Prof_License_Mari.mod_clean_name_addr.cleanInternetName(StdNAME_DBA),
+																	REGEXFIND('^([A-Za-z ]*)(CORP)[ ](INC)',TRIM(StdNAME_DBA,LEFT,RIGHT))
+																		OR REGEXFIND('^([A-Za-z ]*)(CORP)[ ](LLC)',TRIM(StdNAME_DBA,LEFT,RIGHT)) => Prof_License_Mari.mod_clean_name_addr.cleanFName(StdNAME_DBA),
+																	REGEXFIND('^([A-Za-z ]*)(CORP)[ ]([A-Za-z ]*)',TRIM(StdNAME_DBA,LEFT,RIGHT))
+																		OR REGEXFIND('^([A-Za-z ]*)(INC)[ ]([A-Za-z ]*)',TRIM(StdNAME_DBA,LEFT,RIGHT)) => StdNAME_DBA,
+																												Prof_License_Mari.mod_clean_name_addr.cleanFName(StdNAME_DBA));
+		SELF.NAME_DBA_PREFX	  := Prof_License_Mari.mod_clean_name_addr.GetCorpPrefix(StdNAME_DBA);  
+		SELF.NAME_DBA					:=  StringLib.StringFindReplace(CleanNAME_DBA,'/',' ');
+		SELF.NAME_DBA_SUFX	  := Prof_License_Mari.mod_clean_name_addr.strippunctName(
+																	Prof_License_Mari.mod_clean_name_addr.GetCorpSuffix(StdNAME_DBA)); 
+		SELF.DBA_FLAG		    	:= If(SELF.NAME_DBA != '',1,0);
+    SELF.NAME_MARI_DBA		:= StdNAME_DBA;
+
+		//Populate contact information
+		tmpAddr1Contact				:= MAP(REGEXFIND(C_O_Ind,TrimAddr1) => 
+		                               Prof_License_Mari.mod_clean_name_addr.GetDBAName(TrimAddr1),
+																 REGEXFIND(DBA_Ind,TrimAddr1) => '','');
+																																							
+		prepAddr1Contact 			:= MAP(StringLib.stringfind(TRIM(tmpAddr1Contact),' ',1) = 0 => '',
+																 Prof_License_Mari.func_is_address(tmpAddr1Contact) => '',
+																 Prof_License_Mari.func_is_company(tmpAddr1Contact) => '',
+																 tmpAddr1Contact != '' => tmpAddr1Contact,
+																 '');
+																 
+		tmpAddr2Contact				:= MAP(REGEXFIND(C_O_Ind,TrimAddr2) => 
+		                               Prof_License_Mari.mod_clean_name_addr.GetDBAName(TrimAddr2),
+																 REGEXFIND(DBA_Ind,TrimAddr2) => '','');
+																																							
+		prepAddr2Contact 			:= MAP(StringLib.stringfind(TRIM(tmpAddr2Contact),' ',1) = 0 => '',
+																 Prof_License_Mari.func_is_address(tmpAddr2Contact) => '',
+																 Prof_License_Mari.func_is_company(tmpAddr2Contact) => '',
+																 tmpAddr2Contact != '' => tmpAddr2Contact,
+																 '');																 
+		ParseContact					:= MAP(prepAddr1Contact != '' AND Prof_License_Mari.func_is_company(prepAddr1Contact) => '',
+																 prepAddr1Contact != '' AND NOT Prof_License_Mari.func_is_company(prepAddr1Contact) =>
+																 Prof_License_Mari.mod_clean_name_addr.cleanFMLName(prepAddr1Contact),
+																 prepAddr2Contact != '' AND Prof_License_Mari.func_is_company(prepAddr2Contact) => '',
+																 prepAddr2Contact != '' AND NOT Prof_License_Mari.func_is_company(prepAddr2Contact) =>
+																 Prof_License_Mari.mod_clean_name_addr.cleanFMLName(prepAddr2Contact),
+																 '');
+															 																 
+		prepNAME_CONTACT_PREFX	:= TRIM(ParseContact[1..5],LEFT,RIGHT);														 
+		prepNAME_CONTACT_FIRST	:= TRIM(ParseContact[6..25],LEFT,RIGHT);
+		prepNAME_CONTACT_MID		:= TRIM(ParseContact[26..45],LEFT,RIGHT);  
+		prepNAME_CONTACT_LAST 	:= TRIM(ParseContact[46..65],LEFT,RIGHT);
+		prepNAME_CONTACT_SUFX 	:= TRIM(ParseContact[66..70],LEFT,RIGHT);  						
+		
+		Name_Contact_Full       := StringLib.StringCleanSpaces(prepNAME_CONTACT_LAST +' '+prepNAME_CONTACT_FIRST + ' ' + prepNAME_CONTACT_MID);
+		
+		SELF.NAME_CONTACT_PREFX:= IF(prepNAME_CONTACT_PREFX <> '' AND Name_Contact_Full <> ConcatNAME_FULL, prepNAME_CONTACT_PREFX,'');
+		SELF.NAME_CONTACT_FIRST:= IF(prepNAME_CONTACT_FIRST <> '' AND Name_Contact_Full <> ConcatNAME_FULL, prepNAME_CONTACT_FIRST,'');
+		SELF.NAME_CONTACT_MID	 := IF(prepNAME_CONTACT_MID <> '' AND Name_Contact_Full <> ConcatNAME_FULL, prepNAME_CONTACT_MID,'');
+		SELF.NAME_CONTACT_LAST := IF(prepNAME_CONTACT_LAST <> '' AND Name_Contact_Full <> ConcatNAME_FULL, prepNAME_CONTACT_LAST,'');
+		SELF.NAME_CONTACT_SUFX := IF(prepNAME_CONTACT_SUFX <> '' AND Name_Contact_Full <> ConcatNAME_FULL, prepNAME_CONTACT_SUFX,'');
+
+    //Clean and Populate address fields
+		//Use address cleaner to clean address
+		clnAddress1						:= MAP(REGEXFIND(C_O_Ind, TrimAddr1) => '',
+																 REGEXFIND(CompNames, TrimAddr1) AND NOT REGEXFIND(AddressSet2, TrimAddr1) => '', 
+																 REGEXFIND(DBA_Ind, TrimAddr1)=> '',
+																 NOT REGEXFIND('[0-9]',TrimAddr1) AND NOT REGEXFIND(AddressSet2,TrimAddr1) AND TrimAddr1 <>''=> '',
+																 TrimAddr1);
+	
+		clnAddress2						:= MAP(REGEXFIND(C_O_Ind, TrimAddr2) => '',
+																 REGEXFIND(CompNames, TrimAddr2) AND NOT REGEXFIND(AddressSet2, TrimAddr2) => '',
+																 REGEXFIND(DBA_Ind, TrimAddr2)=> '',
+																 TrimAddr2 = 'USA' => '',
+																 TrimAddr2 = TrimCity => '',
+																 TrimAddr2 = 'AVISON YOUNG' => '',
+																 TRIM(TrimAddr2,ALL) = TrimCity + TrimState=> '',
+																 TrimAddr2);
+		
+		temp_preaddr1 				:= StringLib.StringCleanSpaces(clnAddress1); 
+		temp_preaddr2 				:= StringLib.StringCleanSpaces(clnAddress2); 
+	    		
+		tmpADDR_ADDR1_1       := MAP(REGEXFIND('(^APT|^FLOOR|^SUITE|^STE|^UNIT|^ROOM|^#)', TRIM(temp_preaddr1)) AND temp_preaddr2 <> '' => temp_preaddr2,
+		                             REGEXFIND('^([0-9]+)*$', TRIM(temp_preaddr1)) AND temp_preaddr2 <> '' => temp_preaddr1 + ' ' + temp_preaddr2,
+															   REGEXFIND('(^DRIVE$|^NW$|^NORTH WEST$|^SE$|^NE$|^NORTHEAST$)', TRIM(temp_preaddr2)) AND temp_preaddr1 <> '' => temp_preaddr1 + ' ' +temp_preaddr2,
+																 temp_preaddr1);
+		tmpADDR_ADDR2_1       := MAP(REGEXFIND('(^APT|^FLOOR|^SUITE|^STE|^UNIT|^ROOM|^#)', TRIM(temp_preaddr1)) AND temp_preaddr2 <> '' => temp_preaddr1,
+		                             REGEXFIND('^([0-9]+)*$', TRIM(temp_preaddr1)) AND temp_preaddr2 <> '' => '',
+																 REGEXFIND('(^DRIVE|^NW$|^NORTH WEST$|^SE$|^NE$|^NORTHEAST$)', TRIM(temp_preaddr2)) AND temp_preaddr1 <> '' => '',
+															   temp_preaddr2);				
+															 
+	  GoodAddrAddr1       := MAP(REGEXFIND(TrimZipcode,tmpADDR_ADDR1_1)=>'',
+		                           tmpADDR_ADDR1_1 = TrimCity + ',' + TrimState => '',
+		                           tmpADDR_ADDR1_1);
+    GoodAddrAddr2       := MAP(REGEXFIND(Trimzipcode,tmpADDR_ADDR2_1)=>'',
+		                           tmpADDR_ADDR2_1 = TrimCity + ',' + TrimState => '',
+		                           tmpADDR_ADDR2_1);	  
+	
+  	//Uses addr_2 if addr_1 contains a contact name, then blanks addr_2
+		SELF.ADDR_ADDR1_1		:= IF(GoodAddrAddr1 <> '', TRIM(GoodAddrAddr1,LEFT,RIGHT), TRIM(GoodAddrAddr2,LEFT,RIGHT));
+		SELF.ADDR_ADDR2_1		:= IF(GoodAddrAddr1 <> '', TRIM(GoodAddrAddr2,LEFT,RIGHT), '');
+		
+		SELF.ADDR_ADDR3_1		:= '';
+		SELF.ADDR_ADDR4_1		:= '';
+		SELF.ADDR_CITY_1		:= TrimCity;
+		SELF.ADDR_STATE_1		:= IF(TRIM(L.STATE, LEFT, RIGHT)  IN ValidStates, L.State, '');
+		
+		ParsedZIP := REGEXFIND('[0-9]{5}(-[0-9]{4})?', TrimZipcode, 0);
+		SELF.ADDR_ZIP5_1		:= ParsedZIP[1..5];
+		SELF.ADDR_ZIP4_1		:= ParsedZIP[7..10];
+
+		SELF.Email					:= ut.CleanSpacesAndUpper(L.Email);
+		SELF.Addr_Bus_Ind		:= IF(SELF.ADDR_ADDR1_1	 <> '' OR SELF.ADDR_ADDR2_1 <> '', 'B', '');	
+				
+		//Clean phone and remove non-numerics		
+		TrimPhone               := StringLib.StringFilter(L.PHONE,'0123456789');
+		TrimPhone_Type          := MAP(ut.CleanSpacesAndUpper(L.PHONE_TYPE) = 'HOME'=> 'HOME PHONE',
+		                               ut.CleanSpacesAndUpper(L.PHONE_TYPE) = 'BUS'=> 'BUSINESS PHONE',
+																	 ut.CleanSpacesAndUpper(L.PHONE_TYPE) = 'CELL'=> 'CELL PHONE','');
+		SELF.PHN_MARI_1				  := ut.CleanPhone(TrimPhone); //Business Phone
+		SELF.PHN_PHONE_1        := SELF.PHN_MARI_1;
+		SELF.PROVNOTE_3         := 'PHONE TYPE: ' + ut.CleanSpacesAndUpper(TrimPhone_Type);
+		
+		// Business rules to standardize DBA(s) for splitting into multiple records
+		SELF.DBA1				:= '';
+		SELF.DBA2				:= '';
+		SELF.DBA3				:= '';
+		SELF.DBA4				:= '';
+		SELF.DBA5				:= '';
+		//Expected codes [CO,BR,IN], Set during business/individual filter
+		SELF.Affil_Type_CD	:= 'IN';
+		SELF.mltreckey			:= 0;
+		// Fields used to create unique key are: license number, license type, source update, Name, address,DBA 
+		SELF.CMC_SLPK      := HASH32(TRIM(SELF.license_nbr,LEFT,RIGHT) + ','
+																+TRIM(SELF.std_license_type,LEFT,RIGHT) + ','
+																+TRIM(SELF.std_source_upd,LEFT,RIGHT) + ','
+																+TRIM(SELF.Name_ORG,LEFT,RIGHT) + ','
+																+TRIM(L.ADDR1,LEFT,RIGHT) + ','
+																+TRIM(L.ADDR2,LEFT,RIGHT) + ','
+																+TRIM(L.City,LEFT,RIGHT) + ','
+																+TRIM(L.Zipcode,LEFT,RIGHT));
+		SELF.PCMC_SLPK		:= 0;
+		SELF.Provnote_1		:= '';
+		
+		SELF := L;	   
+		SELF := [];	
+END;
+		
+inFileLic	:= PROJECT(cln_File,xformToCommon(LEFT));
+
+// Populate STD_PROF_CD field via translation on license type field
+maribase_plus_DBAs 	trans_lic_type(inFileLic L, cmvTransLkp R) := TRANSFORM
+		SELF.Std_Prof_CD := R.DM_Value1;
+		SELF := L;
+END;
+
+ds_map_lic_trans := JOIN(inFileLic, cmvTransLkp,
+												TRIM(LEFT.std_license_type,  LEFT, RIGHT)= TRIM(RIGHT.fld_value, LEFT, RIGHT)
+												AND RIGHT.fld_Name='LIC_TYPE' 
+												AND RIGHT.dm_Name1 = 'PROFCODE',
+												trans_lic_type(LEFT, RIGHT),LEFT OUTER, LOOKUP);
+																		
+
+// Normalized DBA records
+MariBase_DBAs := RECORD,MAXLENGTH(5000)
+  MariBase_plus_DBAs;
+  STRING60 Tmp_DBA;
+END;
+
+MariBase_DBAs	NormIT(ds_map_lic_trans L, INTEGER C) := TRANSFORM
+		SELF := L;
+		SELF.Tmp_DBA := CHOOSE(C, L.DBA1, L.DBA2, L.DBA3, L.DBA4, L.DBA5);
+END;
+
+NormDBAs 	:= DEDUP(NORMALIZE(ds_map_lic_trans, 5, NormIT(LEFT, COUNTER)), ALL,RECORD);
+
+NoDBARecs	:= NormDBAs(Tmp_DBA = '' AND DBA1 = '' AND DBA2 = '' AND DBA3 = '' AND DBA4 = '' AND DBA5 = '');
+DBARecs 	:= NormDBAs(Tmp_DBA != '');
+
+FilteredRecs  := DBARecs + NoDBARecs;
+
+// Transform expanded dataset to MARIBASE layout and Dedup on complete record
+ds_map_base :=DEDUP(SORT(DISTRIBUTE(PROJECT(FilteredRecs, Prof_License_Mari.layouts.base), HASH32(STD_LICENSE_TYPE)), STD_LICENSE_TYPE, LOCAL), ALL, RECORD, LOCAL);
+
+// Adding to Superfile
+d_final := OUTPUT(ds_map_base, ,'~thor_data400::in::proflic_mari::'+pVersion+'::'+src_cd,__COMPRESSED__,OVERWRITE);
+
+add_super := Prof_License_Mari.fAddNewUpdate(ds_map_base(NAME_ORG_ORIG != ''));
+
+move_to_used := PARALLEL(Prof_License_Mari.func_move_file.MyMoveFile(code, 'rle_license','using', 'used'));
+
+notify_missing_codes := Prof_License_Mari.fNotifyError.MissingStdCodes(code,src_cd,pVersion, Prof_License_Mari.Email_Notification_Lists.BaseFileConversion);
+
+notify_invalid_address := Prof_License_Mari.fNotifyError.NameInAddressFields(code,src_cd,pVersion,Prof_License_Mari.Email_Notification_Lists.BaseFileConversion);
+
+RETURN SEQUENTIAL(OFile, OCmvLkp, d_final, add_super, move_to_used, notify_missing_codes, notify_invalid_address);
+
+END;

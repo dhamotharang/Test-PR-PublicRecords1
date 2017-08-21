@@ -1,0 +1,1 @@
+export AllPunishments := accurint_punishment_as_common;

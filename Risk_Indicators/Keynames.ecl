@@ -4,11 +4,13 @@ export Keynames(
 
 	 string		pversion							= ''
 	,boolean	pUseOtherEnvironment	= false
+	,string		pkeystring						= 'key'
+	,string		pPrefix								= 'thor_data400'
 
 ) :=
 module
 
-	export lOldRoot			:= _Dataset(pUseOtherEnvironment).thor_cluster_Files + 'key::';									
+	export lOldRoot			:= _Dataset(pUseOtherEnvironment,pPrefix).thor_cluster_Files + 'key::';									
 	shared lNewRoot			:= lOldRoot + 'business_header::';
 	shared lversiondate	:= pversion														;
 	shared lversion			:= '@version@::'											;
@@ -28,6 +30,9 @@ module
 	export laddressSicCode							:= lroot									+ 'address_SicCode'					;
 	export laddressSicCodeHRI						:= HRIroot								+ 'address_SicCode'					;
 	export lSicCodeDescription					:= lroot									+ 'SicCode_Description'			;
+	export lAddrAttrRiskBdid						:= lroot									+ 'business_risk_bdid'			;
+	export lAddrAttrRiskGeolink					:= lroot									+ 'business_risk_geolink'		;
+	
 
 	export HRIAddress									:= versioncontrol.mBuildFilenameVersions(lHRIOldAddress								,lversiondate	,lHRINewaddress						);
 	export HRIAddress_filtered				:= versioncontrol.mBuildFilenameVersions(lHRIOldAddress_filtered			,lversiondate	,lHRINewaddress_filtered	);
@@ -36,6 +41,8 @@ module
 	export AddressSicCode							:= versioncontrol.mBuildFilenameVersions(laddressSicCode							,lversiondate	);
 	export AddressSicCodeFullHRI			:= versioncontrol.mBuildFilenameVersions(laddressSicCodeHRI						,lversiondate	);
 	export SicCodeDesc								:= versioncontrol.mBuildFilenameVersions(lSicCodeDescription					,lversiondate	);
+	export AddrAttrRiskBdid						:= versioncontrol.mBuildFilenameVersions(lAddrAttrRiskBdid						,lversiondate	);
+	export AddrAttrRiskGeolink				:= versioncontrol.mBuildFilenameVersions(lAddrAttrRiskGeolink					,lversiondate	);
 
 	export NonFCRA_dAll_filenames := 
 			HRIAddress.dAll_filenames
@@ -44,6 +51,8 @@ module
 		+ AddressSicCode.dAll_filenames
 		+ AddressSicCodeFullHRI.dAll_filenames
 		+ SicCodeDesc.dAll_filenames
+		+ AddrAttrRiskBdid.dAll_filenames
+		+ AddrAttrRiskGeolink.dAll_filenames
 		;
 
 	export FCRA_dAll_filenames := 
@@ -58,6 +67,8 @@ module
 		+ AddressSicCode.dAll_filenames
 		+ AddressSicCodeFullHRI.dAll_filenames
 		+ SicCodeDesc.dAll_filenames
+		+ AddrAttrRiskBdid.dAll_filenames
+		+ AddrAttrRiskGeolink.dAll_filenames
 		;
 
 end;

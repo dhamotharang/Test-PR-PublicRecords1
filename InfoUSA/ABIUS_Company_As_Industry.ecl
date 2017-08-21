@@ -11,7 +11,7 @@ SKIP((C = 2 AND L.secondary_sic_1 = '') OR
 	SELF.bdid_score								:=	0;
 	SELF.source       						:=	MDR.sourceTools.src_INFOUSA_ABIUS_USABIZ;
 	SELF.source_docid  						:=	'';
-	SELF.source_rec_id 						:=	'';
+	SELF.source_rec_id 						:=	L.source_rec_id;
 	SELF.siccode       						:=	CHOOSE(C, L.primary_sic, L.secondary_sic_1, L.secondary_sic_2,
 					                                    L.secondary_sic_3, L.secondary_sic_4);
 	SELF.naics        						:=	'';

@@ -23,7 +23,7 @@ string12 offset_val := '0' : stored('Offset');
 UNSIGNED6 nth_value := IF((UNSIGNED6) nth_val < 1, 1, (UNSIGNED6) nth_val);
 UNSIGNED6 offset_value := IF((UNSIGNED6) offset_val >= nth_value, nth_value - 1, (UNSIGNED6) offset_val);
 
-bhf := Business_Header.File_Business_Header_Base_Plus;
+bhf := business_header.files().base.business_headers.keybuild;
 bhks := Business_Header_SS.Key_BH_Source;
 
 TYPEOF(bhf) Take(bhf l) := TRANSFORM

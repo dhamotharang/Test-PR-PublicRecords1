@@ -1,3 +1,5 @@
+import address;
+
 export MAC_Address_Clean(infile,addr1_expr,addr2_expr,clean_misses,out_file) := macro
 
 #uniquename(new_layout)
@@ -45,7 +47,7 @@ end;
 ut.MAC_Sequence_Records(%infile_pre_id%,temp_ID,%pre_infile_id%)	
 
 #uniquename(infile_dist)
-%infile_dist% := distribute(%pre_infile_id%,hash(addr1_expr,addr2_expr));
+%infile_dist% := %pre_infile_id%;
 
 #uniquename(infile_srtd)
 %infile_srtd% := sort(%infile_dist%,addr1_expr,addr2_expr,local);
@@ -66,8 +68,7 @@ end;
 
 #uniquename(clean_new)
 %id_layout% %clean_new%(%infile_dup% le) := transform
-//  self.clean := AddrCleanLib.CleanAddress182(le.addr1_expr,le.addr2_expr, '172.16.70.102:10000');
-  self.clean := AddrCleanLib.CleanAddress182(le.addr1_expr,le.addr2_expr);
+  self.clean := Address.CleanAddress182(le.addr1_expr,le.addr2_expr);
   self := le;
   end;
 
@@ -82,8 +83,8 @@ end;
 
 #uniquename(dis_whole)
 #uniquename(dis_part)
-%dis_whole% := distribute(group(%infile_iter%),hash(temp_id));
-%dis_part% := distribute(%do_misses%,hash(temp_id));
+%dis_whole% := group(%infile_iter%);
+%dis_part% := %do_misses%;
 
 #uniquename(cleaned_miss)
 %cleaned_miss% := join(%dis_whole%,%dis_part%,left.temp_id=right.temp_id,%j_back%(left,right),local);

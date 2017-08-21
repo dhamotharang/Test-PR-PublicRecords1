@@ -1,4 +1,4 @@
-IMPORT BIPV2,std;
+IMPORT BIPV2,std,Data_Services;
 EXPORT files_empid_down(string p_Emp_Module = 'bipv2_empid_down') := MODULE
 	/*----------------- SuperFiles --------------------------------- */
 	SHARED filePrefix				:= '~thor_data400::' + p_Emp_Module + '::';
@@ -12,7 +12,7 @@ EXPORT files_empid_down(string p_Emp_Module = 'bipv2_empid_down') := MODULE
 	EXPORT DS_GRANDFATHER		:= DATASET(FILE_GRANDFATHER,	BIPV2.CommonBase.Layout, THOR, OPT);
 	
 	IMPORT ut, _Control;
-	SHARED FILE_BASE_PROD		:= ut.foreign_prod+FILE_BASE[2..];
+	SHARED FILE_BASE_PROD		:= Data_Services.foreign_prod+FILE_BASE[2..];
 	EXPORT DS_BASE_PROD			:= DATASET(FILE_BASE_PROD, BIPV2.CommonBase.Layout_Static, THOR, OPT) : PERSIST('~persist::prod::' + p_Emp_Module + '::base');
 	
 	

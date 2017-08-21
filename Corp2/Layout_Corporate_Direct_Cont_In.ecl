@@ -53,7 +53,7 @@ string60  cont_status_desc;
 string8	  cont_effective_date;
 string1	  cont_effective_cd;
 string60  cont_effective_desc;
-string100 cont_addl_info;
+string350 cont_addl_info;   //modified length from 100 to 350
 	
 string8	  cont_address_type_cd;
 string60  cont_address_type_desc;
@@ -177,5 +177,10 @@ string4   cont_msa;
 string7   cont_geo_blk;
 string1   cont_geo_match;
 string4   cont_err_stat;
+// Adding the following fields for AID purposes
+string100	corp_prep_addr_line1;
+string50	corp_prep_addr_last_line;	
+string100	cont_prep_addr_line1;
+string50	cont_prep_addr_last_line;
 	
 end;

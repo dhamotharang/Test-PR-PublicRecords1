@@ -1,4 +1,4 @@
-﻿export layout_american_student_base := record
+export layout_american_student_base := record
 
 	integer8        KEY;
 	string9					SSN;

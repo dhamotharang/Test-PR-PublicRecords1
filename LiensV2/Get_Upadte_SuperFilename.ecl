@@ -18,5 +18,7 @@ map(updatetype = 'federal' => liensv2.Filenames().federalupdate,
         updatetype = 'debtorn' => LiensV2.Filenames().debtornupdate,
         updatetype = 'judment' => LiensV2.Filenames().judmentupdate,
         updatetype = 'subjdmt' => LiensV2.Filenames().subjdmtupdate,
-        updatetype = 'remarks' => LiensV2.Filenames().remarksupdate,					
+        updatetype = 'remarks' => LiensV2.Filenames().remarksupdate,	
+			  updatetype = 'hgn' => LiensV2.Filenames().hgn,
+
 		'');

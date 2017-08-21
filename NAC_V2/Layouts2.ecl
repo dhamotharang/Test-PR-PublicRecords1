@@ -94,7 +94,6 @@ export rException := RECORD
 	string2			MatchedState;
 	string1			MatchedProgramCode;
 	string20		MatchedClientId;
-	string4			MatchedGroupId;
 	string3			ReasonCode;			// A=Confirmed Multiple birth sibling, B=LexID Overlinking
 	string50		Comments;
 END;
@@ -122,23 +121,14 @@ EXPORT rNac2 := RECORD
 	string	eol := '\n';
 END;
 
-shared rCommonEx := RECORD
-		string4						GroupId := '';
-		STD.Date.Date_t		created := 0;
-		STD.Date.Date_t		updated := 0;
-		STD.Date.Date_t		replaced := 0;
-		unsigned4					errors := 0;
-		unsigned4					warnings := 0;
-		DATASET(nac_v2.ValidationCodes.rError)	dsErrs;
-		string4						OrigGroupId := '';
-		string32					filename := '';
-END;
-
 // extended records
 	export rAddressEx := RECORD
 		rAddress - RecordCode;
-
-		rCommonEx;
+		STD.Date.Date_t		created := 0;
+		STD.Date.Date_t		updated := 0;
+		STD.Date.Date_t		replaced := 0;
+		unsigned8					errors := 0;
+		unsigned4					warnings := 0;
 
 		String60  Prepped_addr1:='';
 		String45  Prepped_addr2:=''
@@ -175,8 +165,11 @@ END;
 
 	export rClientEx := RECORD
 		rClient - RecordCode;
-
-		rCommonEx;
+		STD.Date.Date_t		created := 0;
+		STD.Date.Date_t		updated := 0;
+		STD.Date.Date_t		replaced := 0;
+		unsigned8					errors := 0;
+		unsigned4					warnings := 0;
 
 		String75  Prepped_name:=''
 			,address.Layout_Clean_Name.title
@@ -197,19 +190,29 @@ END;
 	
 	export rCaseEx := RECORD
 		rCase - RecordCode;
-
-		rCommonEx;
-
+		STD.Date.Date_t		created := 0;
+		STD.Date.Date_t		updated := 0;
+		STD.Date.Date_t		replaced := 0;
+		unsigned8					errors := 0;
+		unsigned4					warnings := 0;
 	END;
 
 	export rStateContactEx := RECORD
 		rStateContact - RecordCode;
-		rCommonEx;
+		STD.Date.Date_t		created := 0;
+		STD.Date.Date_t		updated := 0;
+		STD.Date.Date_t		replaced := 0;
+		unsigned8					errors := 0;
+		unsigned4					warnings := 0;
 	END;
 	
 	export rExceptionEx := RECORD
 		rException - [RecordCode];
-		rCommonEx;
+		STD.Date.Date_t		created := 0;
+		STD.Date.Date_t		updated := 0;
+		STD.Date.Date_t		replaced := 0;
+		unsigned8					errors := 0;
+		unsigned4					warnings := 0;
 	END;
 
 END;

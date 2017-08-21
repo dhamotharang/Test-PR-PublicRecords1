@@ -1,4 +1,4 @@
-﻿import data_services, doxie_cbrs;
+import data_services, doxie_cbrs;
 EXPORT People_Owned_BDIDs := Module
 //read in busines_header_contacts_filepos
 

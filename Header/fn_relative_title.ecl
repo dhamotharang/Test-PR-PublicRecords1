@@ -1,7 +1,7 @@
 //Replicates logic in person_models.FN_Relative_Details for the data layer
-import doxie, ut, person_models, NID, header,doxie_raw, watchdog;
+import doxie, ut, person_models, NID, header,doxie_raw, watchdog,std;
 EXPORT fn_relative_title(rel,head):= functionmacro
-
+import std;
 con := header.relative_titles;
 
 set_gender_unks  := ut.GenderTools .set_gender_unks;
@@ -36,7 +36,7 @@ re xf_re(head l) := transform
   self.person2 := l.did;
 	self.person1 := l.did;
 	self.subject := true;
-	self.age := if(l.dob=0,0,ut.GetAgeI(l.dob));
+	self.age := if(l.dob=0,0,ut.Age(l.dob));
 	self.gender := gend(l.fname, l.mname);
 	self := l;
 	self := [];
@@ -60,8 +60,8 @@ re xf_en(re le, names ri) := transform
 	isMale := le.gender='M';
 	isNotFemale := le.gender<>'F';
 	hasMulipleLNames := ri.cnt>1;		
-	thisYear := (unsigned)ut.GetDate div 10000;
-	yearFirstSeen := ut.max2(ri.first_seen div 100,1980);
+	thisYear := (unsigned)((STRING8)Std.Date.Today()) div 10000;
+	yearFirstSeen := max(ri.first_seen div 100,1980);
 	
 	AgeOfData := ThisYear - yearFirstSeen;
 	yrsOlderThanData := le.age - AgeOfData;
@@ -184,8 +184,8 @@ GetRelationship(re2_ subject, re2_ other) := module
 		// count(his.person1_recs) = 1  and			   							//he has one lname
 		((exists(his.person1_recs(metaphonelib.DMetaPhone1(lname)[1..6] = get_current_phonetic_lname(her))) and	//they have the same lname now
 		  get_current_phonetic_lname(his) <> get_early_phonetic_lname(her))			//but they person1nt used to
-		 or ((her.number_cohabits > 50 and ut.GetAge(her.recent_cohabit + '00') < 2) or
-		     (his.number_cohabits > 50 and ut.GetAge(his.recent_cohabit + '00') < 2)));
+		 or ((her.number_cohabits > 50 and ut.Age((UNSIGNED)(her.recent_cohabit + '00')) < 2) or
+		     (his.number_cohabits > 50 and ut.Age((UNSIGNED)(his.recent_cohabit + '00')) < 2)));
 	
 	shared pare(re2_ kid, re2_ adult) := 
 		exists(adult.person1_recs(metaphonelib.DMetaPhone1(lname)[1..6] = get_early_Phonetic_lname(kid))) or
@@ -347,7 +347,7 @@ cp := if(count(j2_clr2(title = con.num_Parent)) = 1, //if we have one unknown
 
 
 
-final_rel := cp ;
-return final_rel;
+final_rel := cp  : persist('~persist::relative_title');
+return final_rel(title <> 0 );
 endmacro;
 

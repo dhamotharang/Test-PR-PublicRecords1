@@ -120,7 +120,7 @@ EXPORT Fetch_Stream(DATASET(id_stream_layout) d) := FUNCTION
       SELF := ri;
       SELF := le;
     END;
-    J0 := JOIN( d,k,(LEFT.DID = RIGHT.DID),tr(LEFT,RIGHT), LEFT OUTER, KEEP(10000), LIMIT(Config.JoinLimit)); // Ignore excess records without erroring
+    J0 := JOIN( d,k,(LEFT.DID = RIGHT.DID),tr(LEFT,RIGHT), LEFT OUTER, KEEP(10000), LIMIT(0)); // Ignore excess records without erroring
     J1 := SALT37.MAC_DatasetAsOf(J0, RID, DID, UniqueId, DT_EFFECTIVE_FIRST, DT_EFFECTIVE_LAST, , 'YYYYMMDD', FALSE);
     J  := J1(DID > 0) & JOIN(d, J1(DID > 0), LEFT.UniqueId = RIGHT.UniqueId AND LEFT.DID = RIGHT.DID, TRANSFORM(RECORDOF(RIGHT), SELF := LEFT, SELF := []), LEFT ONLY);
     RETURN J;

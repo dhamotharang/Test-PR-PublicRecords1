@@ -1,6 +1,10 @@
-export GetSegmentFile_Base(segcode, outfile) := macro
+export GetSegmentFile_Base(segcode, outfile, BaseType='B') := macro
 #if('0010' = segcode)
-	outfile := ebr.File_0010_Header_Base;
+	#if('B' = BaseType)
+		outfile := ebr.File_0010_Header_Base;
+	#else
+		outfile := ebr.File_0010_Header_Base_AID;
+	#end
 #end
 #if('1000' = segcode)
 	outfile := ebr.File_1000_Executive_Summary_Base;
@@ -42,7 +46,11 @@ export GetSegmentFile_Base(segcode, outfile) := macro
 	outfile := ebr.File_4510_UCC_Filings_Base;
 #end
 #if('5000' = segcode)
-	outfile := ebr.File_5000_Bank_Details_Base;
+	#if('B' = BaseType)
+		outfile := ebr.File_5000_Bank_Details_Base;
+	#else
+		outfile := ebr.File_5000_Bank_Details_Base_AID;
+	#end
 #end
 #if('5600' = segcode)
 	outfile := ebr.File_5600_Demographic_Data_Base;
@@ -57,7 +65,11 @@ export GetSegmentFile_Base(segcode, outfile) := macro
 	outfile := ebr.File_6500_Government_Trade_Base;
 #end
 #if('6510' = segcode)
-	outfile := ebr.File_6510_Government_Debarred_Contractor_Base;
+	#if('B' = BaseType)
+		outfile := ebr.File_6510_Government_Debarred_Contractor_Base;
+	#else
+		outfile := ebr.File_6510_Government_Debarred_Contractor_Base_AID;
+	#end
 #end
 #if('7000' = segcode)
 	outfile := ebr.File_7000_SNP_Parent_Name_Address_Base;

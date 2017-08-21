@@ -2,7 +2,8 @@ import tools;
 
 export Proc_Build_Files_Linked(Interface_AsMasters.Linked.Base in_masters,string version) := function
 	
-	tools.mac_WriteFile(Filenames(version).LLID.Linked.New,in_masters.As_LLID_Master,Build_Base_LLID_File,pShouldExport := false);
+	tools.mac_WriteFile(Filenames(version).LLID12.Linked.New,in_masters.As_LLID12_Master,Build_Base_LLID12_File,pShouldExport := false);
+	tools.mac_WriteFile(Filenames(version).LLID9.Linked.New,in_masters.As_LLID9_Master,Build_Base_LLID9_File,pShouldExport := false);
 	tools.mac_WriteFile(Filenames(version).URLs.Linked.New,in_masters.As_URL_Master,Build_Base_URL_File,pShouldExport := false);
 	tools.mac_WriteFile(Filenames(version).TradeLines.Linked.New,in_masters.As_TradeLine_Master,Build_Base_TradeLines_File,pShouldExport := false);
 	tools.mac_WriteFile(Filenames(version).Contacts.Linked.New,in_masters.As_Contact_Master,Build_Base_Contacts_File,pShouldExport := false);
@@ -33,7 +34,7 @@ export Proc_Build_Files_Linked(Interface_AsMasters.Linked.Base in_masters,string
 	tools.mac_WriteFile(Filenames(version).Watercraft.Party.New,in_masters.As_Watercraft_Master_Party,Build_Base_Watercraft_Party_File,pShouldExport := false);
 	tools.mac_WriteFile(Filenames(version).MotorVehicle.Registration.New,in_masters.As_MotorVehicle_Master_Registration,Build_Base_MotorVehicle_Registration_File,pShouldExport := false);
 	tools.mac_WriteFile(Filenames(version).MotorVehicle.Title.New,in_masters.As_MotorVehicle_Master_Title,Build_Base_MotorVehicle_Title_File,pShouldExport := false);
-	tools.mac_WriteFile(Filenames(version).MotorVehicle.Party.New,in_masters.As_MotorVehicle_Master_Party,Build_Base_MotorVehicle_Party_File,pShouldExport := false);
+	tools.mac_WriteFile(Filenames(version).MotorVehicle.Party.Linked.New,in_masters.As_MotorVehicle_Master_Party,Build_Base_MotorVehicle_Party_File,pShouldExport := false);
 
 	return
 		if(tools.fun_IsValidVersion(version)
@@ -49,10 +50,10 @@ export Proc_Build_Files_Linked(Interface_AsMasters.Linked.Base in_masters,string
 					Build_Base_MotorVehicle_Title_File,
 					Build_Base_MotorVehicle_Party_File,
 
-					Build_Base_LLID_File,
+					Build_Base_LLID12_File,
+					Build_Base_LLID9_File,
 					Build_Base_URL_File,
 					Build_Base_TradeLines_File,
-					Build_Base_Contacts_File,
 					Build_Base_Finance_File,
 					Build_Base_Industry_File,
 					Build_Base_Incorporation_File,
@@ -66,6 +67,7 @@ export Proc_Build_Files_Linked(Interface_AsMasters.Linked.Base in_masters,string
 					Build_Base_Aircraft_Main_File,
 					Build_Base_Watercraft_Main_File,
 					Build_Base_MotorVehicle_File,
+					Build_Base_Contacts_File,
 					Build_Base_Property_File,
 					Build_Base_Property_Party_File,
 					Build_Base_Property_Assessment_File,

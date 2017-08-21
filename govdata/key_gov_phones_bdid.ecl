@@ -1,5 +1,5 @@
-import doxie;
+import	BIPV2;
 
-df := govdata.File_Gov_Phones_Base(bdid != 0);
+df := project(govdata.File_Gov_Phones_Base(bdid != 0),transform(Layout_Gov_Phones_Base - BIPV2.IDlayouts.l_xlink_IDs,self:=left;));
 
-export key_gov_phones_bdid := index(df,{bdid},{df},'~thor_data400::key::gov_phones_bdid_' + doxie.Version_SuperKey);
+export key_gov_phones_bdid := index(df,{bdid},{df},govdata.keynames().EmployeeDirsbdid.qa);

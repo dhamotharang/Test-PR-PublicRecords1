@@ -1,0 +1,1 @@
+export File_raw_in := dataset('~thor_data400::raw_base::Magnify_SICCodes',Layouts.Sic_vendor_rec,flat);

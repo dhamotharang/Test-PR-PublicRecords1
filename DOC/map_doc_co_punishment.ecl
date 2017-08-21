@@ -1,3 +1,4 @@
+
 /*
 
 DRAFT IMPORTED from AL_DISTRIX to be used as a template
@@ -52,31 +53,48 @@ blnk:=['0','00','000',' ',''];
 punishment := file_doc_co;
 Crim_Common.Layout_Moxie_DOC_Punishment.previous transform_co_Punishment(RECORDOF(punishment) L) := 
 TRANSFORM
-	self.process_date 		:= L.received_date;
-	self.offender_key 		:= 'CO' + 'DOC'+ trim(L.ID,left, right);
-	self.vendor 			:= 'CO';
-	self.source_file 		:= 'CO-courtventures-DOC';
-	self.offense_key 		:= '';
-    self.event_dt 			:= CommonFn.DateToStandard(L.SentenceDate); // 
-    self.punishment_type 	:= 'I'; // changed to constant  if(stringLib.StringFind(L.CurrentFacilityAssignment,'PAROLE',1) <> 0,'P','I');
+	self.process_date 	 := L.received_date;
+	self.offender_key 	 := 'CO' + 'DOC'+ trim(L.ID,left, right);
+	self.vendor 			   := 'CO';
+	self.source_file 		 := 'CO-courtventures-DOC';
+	self.offense_key 		 := '';
+  self.event_dt 			 := IF (stringlib.stringfind(L.SentenceDate,'/',1) <> 0, CommonFn.DateToStandard(L.SentenceDate),stringlib.stringfindreplace(L.SentenceDate,'-','')); // 
+  self.punishment_type := 'I'; // changed to constant  if(stringLib.StringFind(L.CurrentFacilityAssignment,'PAROLE',1) <> 0,'P','I');
     // Note we are inferring that the person is on parole based on the word parole appearing in 
 	// Current Facility Assignment
-	self.sent_length 		:= ''; // 
+	self.sent_length 		 := ''; // 
     self.sent_length_desc   := ''; // this is not valid in this context and was commented. commonFn.sentence_descr(L.Sentence);// Long Description
-    self.cur_stat_inm 		:= '';
-    self.cur_stat_inm_desc  := if(stringLib.StringFind(L.CurrentFacilityAssignment,'PAROLE',1) <> 0,'ON PAROLE',''); // parole prob etc;
-    self.cur_loc_inm_cd 	:= '';
-    self.cur_loc_inm 		:= L.CurrentFacilityAssignment;
+    self.cur_stat_inm 	  	:= '';
+    self.cur_stat_inm_desc  := MAP(stringLib.StringFind(L.CurrentFacilityAssignment,'PAROLE',1) <> 0 =>'ON PAROLE',
+		                               L.estMandatoryReleaseDate = 'Death' or  
+																	 L.EstSentenceDischargeDate = 'Death' =>'DEATH',
+		                               L.estMandatoryReleaseDate = 'LIFE' or  
+																	 L.EstSentenceDischargeDate = 'LIFE' =>'LIFE',
+		                               L.estMandatoryReleaseDate = 'Life Without Parole' or  
+																	 L.EstSentenceDischargeDate = 'Life Without Parole' =>'Life Without Parole',
+																	 L.estMandatoryReleaseDate = 'Life with Parole' or  
+																	 L.EstSentenceDischargeDate = 'Life with Parole' =>'Life with Parole',
+		                               ''); // parole prob etc;
+    self.cur_loc_inm_cd 	  := '';
+    self.cur_loc_inm 		  := L.CurrentFacilityAssignment;
     self.inm_com_cty_cd 	:= '';
-    self.inm_com_cty 		:= ''; // left this out, the county can't be both the offense and commitment county, it was L.County;
-    self.cur_sec_class_dt   := '';
-    self.cur_loc_sec 		:= '';
-    self.gain_time 			:= '';     self.gain_time_eff_dt   := '';
-    self.latest_adm_dt 		:= ''; 
-    self.sch_rel_dt 		:= CommonFn.DateToStandard(L.EstSentenceDischargeDate);
-    self.act_rel_dt 		:= '';//actual release date
-    self.ctl_rel_dt 		:= CommonFn.DateToStandard(L.estMandatoryReleaseDate);
-    self.presump_par_rel_dt := CommonFn.DateToStandard(L.estParoleEligibilityDate);//parole release date
+    self.inm_com_cty 		  := ''; // left this out, the county can't be both the offense and commitment county, it was L.County;
+    self.cur_sec_class_dt := '';
+    self.cur_loc_sec 		  := '';
+    self.gain_time 			  := '';     
+		self.gain_time_eff_dt   := '';
+    self.latest_adm_dt 		  := ''; 
+    self.sch_rel_dt 		    := MAP (stringlib.stringfind(L.EstSentenceDischargeDate,'/',1) <> 0 => CommonFn.DateToStandard(L.EstSentenceDischargeDate),
+		                                regexfind('[a-zA-Z]',L.EstSentenceDischargeDate) => '', 
+																	  stringlib.stringfindreplace(L.EstSentenceDischargeDate,'-',''));
+    self.act_rel_dt 		    := '';//actual release date
+    self.ctl_rel_dt 		    := MAP (stringlib.stringfind(L.estMandatoryReleaseDate,'/',1) <> 0  => CommonFn.DateToStandard(L.estMandatoryReleaseDate),
+		                                regexfind('[a-zA-Z]',L.estMandatoryReleaseDate) => '',
+																		stringlib.stringfindreplace(L.estMandatoryReleaseDate,'-',''));
+																		
+    self.presump_par_rel_dt := MAP (stringlib.stringfind(L.estParoleEligibilityDate,'/',1) <> 0 => CommonFn.DateToStandard(L.estParoleEligibilityDate),
+		                                regexfind('[a-zA-Z]',L.estParoleEligibilityDate) => '',
+		                                stringlib.stringfindreplace(L.estParoleEligibilityDate,'-',''));//parole release date
     self.mutl_part_pgm_dt   := ''; 
     self.par_cur_stat 		:= '';						 
     self.par_cur_stat_desc  := '';
@@ -87,7 +105,9 @@ TRANSFORM
     self.par_cty 		    := '';
 END;
 activity_ds :=  project(punishment,transform_co_Punishment(left));
-activity_ds_sorted := sort(distribute(activity_ds,hash(offender_key)),offender_key,event_dt,process_date,local);
+//output(activity_ds(offender_key = 'CODOC100112'));
+activity_ds_sorted := sort(distribute(activity_ds,hash(offender_key)),offender_key,process_date,event_dt,local);
+//output(activity_ds_sorted(offender_key = 'CODOC100112'));
 punishment_dedup := dedup(activity_ds_sorted,offender_key,right,local);
 
 export map_doc_co_Punishment := punishment_dedup :PERSIST('~thor_data400::persist::doc::map_co_punishment');

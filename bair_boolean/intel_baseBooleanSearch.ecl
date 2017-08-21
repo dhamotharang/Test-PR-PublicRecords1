@@ -30,6 +30,9 @@ export NumCollisions_eid0 := count(Collisions_eid);
   SALT30.UIDType lid := (SALT30.UIDType)h.newrid;
     h.eid;
     h.gh12;
+    h.gh4;
+    h.gh5;
+    h.gh6;
     h.etype;
     h.id;
     h.incident_id;
@@ -42,7 +45,9 @@ export NumCollisions_eid0 := count(Collisions_eid);
     h.incident_city;
     h.incident_state;
     h.incident_zip;
+    h.wc_address_name;
     h.address_name;
+    h.wc_location_type;
     h.location_type;
     h.source_reliability;
     h.incident_content_validity;
@@ -111,13 +116,20 @@ export NumCollisions_eid0 := count(Collisions_eid);
     h.entity_notes;
     h.incident_notes;
     h.vehicle_notes;
+    h.agency;
+    h.data_provider_ori;
+    h.vehicle_color_secondary;
+    h.vehicle_vin;
+    h.update_date;
+    h.purgedate_computed;
+    h.duration_since;
   END;
 EXPORT TranslatedFile := TABLE(h,rf);
 // Compute the null for each field value
-  Def(INTEGER2 c) := CHOOSE(c,'','','','','','','','0','','','','','','','','','','','0','','','','','','','','','','','','','','','0','0','','','','','','','','','','','','','','','0','0','','','','','','','','','','','','','','','','','','','','0','','','','','','','','','','','','','','');
+  Def(INTEGER2 c) := CHOOSE(c,'','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','');
  
 Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
-  SELF.word := CHOOSE(c,(SALT30.StrType)le.eid,(SALT30.StrType)le.eid,(SALT30.StrType)le.gh12,(SALT30.StrType)le.etype,(SALT30.StrType)le.id,(SALT30.StrType)le.incident_id,(SALT30.StrType)le.name_type,(SALT30.StrType)le.clean_incident_date,(SALT30.StrType)le.incident_time,(SALT30.StrType)le.case_number,(SALT30.StrType)le.call_case_number,(SALT30.StrType)le.incident_address,(SALT30.StrType)le.incident_city,(SALT30.StrType)le.incident_state,(SALT30.StrType)le.incident_zip,(SALT30.StrType)le.address_name,(SALT30.StrType)le.location_type,(SALT30.StrType)le.source_reliability,(SALT30.StrType)le.incident_content_validity,(SALT30.StrType)le.incident_source_score,(SALT30.StrType)le.clean_incident_entry_date,(SALT30.StrType)le.clean_incident_purge_date,(SALT30.StrType)le.reporting_officer_first_name,(SALT30.StrType)le.reporting_officer_last_name,(SALT30.StrType)le.first_name,(SALT30.StrType)le.middle_name,(SALT30.StrType)le.last_name,(SALT30.StrType)le.moniker,(SALT30.StrType)le.ssn,(SALT30.StrType)le.clean_dob,(SALT30.StrType)le.sex,(SALT30.StrType)le.race,(SALT30.StrType)le.ethnicity,(SALT30.StrType)le.country_of_origin,(SALT30.StrType)le.height,(SALT30.StrType)le.weight,(SALT30.StrType)le.eye_color,(SALT30.StrType)le.hair_color,(SALT30.StrType)le.hair_style,(SALT30.StrType)le.facial_hair,(SALT30.StrType)le.tattoo_text_1,(SALT30.StrType)le.tattoo_location_1,(SALT30.StrType)le.tattoo_text_2,(SALT30.StrType)le.tattoo_location_2,(SALT30.StrType)le.occupation,(SALT30.StrType)le.place_of_employment,(SALT30.StrType)le.entity_address,(SALT30.StrType)le.entity_city,(SALT30.StrType)le.entity_state,(SALT30.StrType)le.entity_zip,(SALT30.StrType)le.person_x,(SALT30.StrType)le.person_y,(SALT30.StrType)le.phone_number,(SALT30.StrType)le.phone_type,(SALT30.StrType)le.email_address,(SALT30.StrType)le.social_media_type_1,(SALT30.StrType)le.user_name_site_1,(SALT30.StrType)le.social_media_type_2,(SALT30.StrType)le.user_name_site_2,(SALT30.StrType)le.social_media_type_3,(SALT30.StrType)le.user_name_site_3,(SALT30.StrType)le.social_media_type_4,(SALT30.StrType)le.user_name_site_4,(SALT30.StrType)le.organization_type,(SALT30.StrType)le.organization_sub_type,(SALT30.StrType)le.organization_name,(SALT30.StrType)le.number_of_members,(SALT30.StrType)le.organization_rank_role,(SALT30.StrType)le.entity_source_type,(SALT30.StrType)le.source_relaiability,(SALT30.StrType)le.entity_content_validity,(SALT30.StrType)le.entity_source_score,(SALT30.StrType)le.clean_entity_entry_date,(SALT30.StrType)le.clean_entity_purge_date,(SALT30.StrType)le.vehicle_type,(SALT30.StrType)le.vehicle_make,(SALT30.StrType)le.vehicle_model,(SALT30.StrType)le.vehicle_color,(SALT30.StrType)le.vehicle_year,(SALT30.StrType)le.vehicle_plate,(SALT30.StrType)le.vehicle_plate_state,(SALT30.StrType)le.entity_notes,(SALT30.StrType)le.incident_notes,(SALT30.StrType)le.vehicle_notes,SKIP,SKIP,SKIP);
+  SELF.word := CHOOSE(c,(SALT30.StrType)le.eid,(SALT30.StrType)le.eid,(SALT30.StrType)le.gh12,(SALT30.StrType)le.gh4,(SALT30.StrType)le.gh5,(SALT30.StrType)le.gh6,(SALT30.StrType)le.etype,(SALT30.StrType)le.id,(SALT30.StrType)le.incident_id,(SALT30.StrType)le.name_type,(SALT30.StrType)le.clean_incident_date,(SALT30.StrType)le.incident_time,(SALT30.StrType)le.case_number,(SALT30.StrType)le.call_case_number,(SALT30.StrType)le.incident_address,(SALT30.StrType)le.incident_city,(SALT30.StrType)le.incident_state,(SALT30.StrType)le.incident_zip,(SALT30.StrType)le.wc_address_name,(SALT30.StrType)le.address_name,(SALT30.StrType)le.wc_location_type,(SALT30.StrType)le.location_type,(SALT30.StrType)le.source_reliability,(SALT30.StrType)le.incident_content_validity,(SALT30.StrType)le.incident_source_score,(SALT30.StrType)le.clean_incident_entry_date,(SALT30.StrType)le.clean_incident_purge_date,(SALT30.StrType)le.reporting_officer_first_name,(SALT30.StrType)le.reporting_officer_last_name,(SALT30.StrType)le.first_name,(SALT30.StrType)le.middle_name,(SALT30.StrType)le.last_name,(SALT30.StrType)le.moniker,(SALT30.StrType)le.ssn,(SALT30.StrType)le.clean_dob,(SALT30.StrType)le.sex,(SALT30.StrType)le.race,(SALT30.StrType)le.ethnicity,(SALT30.StrType)le.country_of_origin,(SALT30.StrType)le.height,(SALT30.StrType)le.weight,(SALT30.StrType)le.eye_color,(SALT30.StrType)le.hair_color,(SALT30.StrType)le.hair_style,(SALT30.StrType)le.facial_hair,(SALT30.StrType)le.tattoo_text_1,(SALT30.StrType)le.tattoo_location_1,(SALT30.StrType)le.tattoo_text_2,(SALT30.StrType)le.tattoo_location_2,(SALT30.StrType)le.occupation,(SALT30.StrType)le.place_of_employment,(SALT30.StrType)le.entity_address,(SALT30.StrType)le.entity_city,(SALT30.StrType)le.entity_state,(SALT30.StrType)le.entity_zip,(SALT30.StrType)le.person_x,(SALT30.StrType)le.person_y,(SALT30.StrType)le.phone_number,(SALT30.StrType)le.phone_type,(SALT30.StrType)le.email_address,(SALT30.StrType)le.social_media_type_1,(SALT30.StrType)le.user_name_site_1,(SALT30.StrType)le.social_media_type_2,(SALT30.StrType)le.user_name_site_2,(SALT30.StrType)le.social_media_type_3,(SALT30.StrType)le.user_name_site_3,(SALT30.StrType)le.social_media_type_4,(SALT30.StrType)le.user_name_site_4,(SALT30.StrType)le.organization_type,(SALT30.StrType)le.organization_sub_type,(SALT30.StrType)le.organization_name,(SALT30.StrType)le.number_of_members,(SALT30.StrType)le.organization_rank_role,(SALT30.StrType)le.entity_source_type,(SALT30.StrType)le.source_relaiability,(SALT30.StrType)le.entity_content_validity,(SALT30.StrType)le.entity_source_score,(SALT30.StrType)le.clean_entity_entry_date,(SALT30.StrType)le.clean_entity_purge_date,(SALT30.StrType)le.vehicle_type,(SALT30.StrType)le.vehicle_make,(SALT30.StrType)le.vehicle_model,(SALT30.StrType)le.vehicle_color,(SALT30.StrType)le.vehicle_year,(SALT30.StrType)le.vehicle_plate,(SALT30.StrType)le.vehicle_plate_state,(SALT30.StrType)le.entity_notes,(SALT30.StrType)le.incident_notes,(SALT30.StrType)le.vehicle_notes,(SALT30.StrType)le.agency,(SALT30.StrType)le.data_provider_ori,(SALT30.StrType)le.vehicle_color_secondary,(SALT30.StrType)le.vehicle_vin,(SALT30.StrType)le.update_date,(SALT30.StrType)le.purgedate_computed,(SALT30.StrType)le.duration_since,SKIP,SKIP,SKIP);
   SELF.len := LENGTH(TRIM(SELF.word));
   SELF.wip := IF(SELF.Word=Def(c-1),SKIP,1); // Adjusted later - also filters blank words
   SELF.nominal := 0; //Filled in later
@@ -126,9 +138,9 @@ Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
   SELF.kwp := 0; // Adjusted later
   SELF.docref.doc := 0; // Filled in later
   SELF.docref.src := 0; // Filled in later
-  SELF.src := TRANSFER(MDR.sourceTools.src_Bair_Analytics,UNSIGNED2); // Namespace for ID provided
+  SELF.src := TRANSFER(le.class_code,UNSIGNED2); // Namespace for ID provided
   SELF.seg := c; // Field number is seg; values filled in in segment definition
-  SELF.segName := Text_Search.MakeShortSeg(choose(c,text_search.constants.DocKeyField,'eid','gh12','etype','id','incident_id','name_type','clean_incident_date','incident_time','case_number','call_case_number','incident_address','incident_city','incident_state','incident_zip','address_name','location_type','source_reliability','incident_content_validity','incident_source_score','clean_incident_entry_date','clean_incident_purge_date','reporting_officer_first_name','reporting_officer_last_name','first_name','middle_name','last_name','moniker','ssn','clean_dob','sex','race','ethnicity','country_of_origin','height','weight','eye_color','hair_color','hair_style','facial_hair','tattoo_text_1','tattoo_location_1','tattoo_text_2','tattoo_location_2','occupation','place_of_employment','entity_address','entity_city','entity_state','entity_zip','person_x','person_y','phone_number','phone_type','email_address','social_media_type_1','user_name_site_1','social_media_type_2','user_name_site_2','social_media_type_3','user_name_site_3','social_media_type_4','user_name_site_4','organization_type','organization_sub_type','organization_name','number_of_members','organization_rank_role','entity_source_type','source_relaiability','entity_content_validity','entity_source_score','clean_entity_entry_date','clean_entity_purge_date','vehicle_type','vehicle_make','vehicle_model','vehicle_color','vehicle_year','vehicle_plate','vehicle_plate_state','entity_notes','incident_notes','vehicle_notes','NOTES','DATE'));
+  SELF.segName := Text_Search.MakeShortSeg(choose(c,text_search.constants.DocKeyField,'eid','gh12','gh4','gh5','gh6','etype','id','incident_id','name_type','clean_incident_date','incident_time','case_number','call_case_number','incident_address','incident_city','incident_state','incident_zip','wc_address_name','address_name','wc_location_type','location_type','source_reliability','incident_content_validity','incident_source_score','clean_incident_entry_date','clean_incident_purge_date','reporting_officer_first_name','reporting_officer_last_name','first_name','middle_name','last_name','moniker','ssn','clean_dob','sex','race','ethnicity','country_of_origin','height','weight','eye_color','hair_color','hair_style','facial_hair','tattoo_text_1','tattoo_location_1','tattoo_text_2','tattoo_location_2','occupation','place_of_employment','entity_address','entity_city','entity_state','entity_zip','person_x','person_y','phone_number','phone_type','email_address','social_media_type_1','user_name_site_1','social_media_type_2','user_name_site_2','social_media_type_3','user_name_site_3','social_media_type_4','user_name_site_4','organization_type','organization_sub_type','organization_name','number_of_members','organization_rank_role','entity_source_type','source_relaiability','entity_content_validity','entity_source_score','clean_entity_entry_date','clean_entity_purge_date','vehicle_type','vehicle_make','vehicle_model','vehicle_color','vehicle_year','vehicle_plate','vehicle_plate_state','entity_notes','incident_notes','vehicle_notes','agency','data_provider_ori','vehicle_color_secondary','vehicle_vin','update_date','purgedate_computed','duration_since','NOTES','DATE'));
   SELF.typ := text_search.types.WordType.TextStr; // May get changed later
   SELF.sect := 0; // Not needed
   SELF.pos := 0; // Not needed
@@ -136,10 +148,13 @@ Text_Search.Layout_Posting Into(h le,UNSIGNED2 c) := TRANSFORM
   self.sid := le.hashed_sid;
   self.lid := (SALT30.UIDType)le.newrid;
 END;
-SHARED FieldsAsPostings := NORMALIZE(h,86,into(left,counter));
+SHARED FieldsAsPostings := NORMALIZE(h,98,into(left,counter));
 EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Constants.DocKeyField),text_search.Constants.DocKeyField,text_search.types.SegmentType.ExternalKey,[text_search.MakeShortSeg(text_search.Constants.DocKeyField)]}
   ,{text_search.MakeShortSeg('eid'),'eid',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('eid')]}
   ,{text_search.MakeShortSeg('gh12'),'gh12',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gh12')]}
+  ,{text_search.MakeShortSeg('gh4'),'gh4',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gh4')]}
+  ,{text_search.MakeShortSeg('gh5'),'gh5',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gh5')]}
+  ,{text_search.MakeShortSeg('gh6'),'gh6',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('gh6')]}
   ,{text_search.MakeShortSeg('etype'),'etype',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('etype')]}
   ,{text_search.MakeShortSeg('id'),'id',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('id')]}
   ,{text_search.MakeShortSeg('incident_id'),'incident_id',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('incident_id')]}
@@ -152,7 +167,9 @@ EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Cons
   ,{text_search.MakeShortSeg('incident_city'),'incident_city',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('incident_city')]}
   ,{text_search.MakeShortSeg('incident_state'),'incident_state',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('incident_state')]}
   ,{text_search.MakeShortSeg('incident_zip'),'incident_zip',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('incident_zip')]}
+  ,{text_search.MakeShortSeg('wc_address_name'),'wc_address_name',text_search.types.SegmentType.FieldDataType,[text_search.MakeShortSeg('wc_address_name')]}
   ,{text_search.MakeShortSeg('address_name'),'address_name',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('address_name')]}
+  ,{text_search.MakeShortSeg('wc_location_type'),'wc_location_type',text_search.types.SegmentType.FieldDataType,[text_search.MakeShortSeg('wc_location_type')]}
   ,{text_search.MakeShortSeg('location_type'),'location_type',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('location_type')]}
   ,{text_search.MakeShortSeg('source_reliability'),'source_reliability',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('source_reliability')]}
   ,{text_search.MakeShortSeg('incident_content_validity'),'incident_content_validity',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('incident_content_validity')]}
@@ -221,6 +238,13 @@ EXPORT SegmentDefinitions := DATASET([{text_search.MakeShortSeg(text_search.Cons
   ,{text_search.MakeShortSeg('entity_notes'),'entity_notes',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('entity_notes')]}
   ,{text_search.MakeShortSeg('incident_notes'),'incident_notes',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('incident_notes')]}
   ,{text_search.MakeShortSeg('vehicle_notes'),'vehicle_notes',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('vehicle_notes')]}
+  ,{text_search.MakeShortSeg('agency'),'agency',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('agency')]}
+  ,{text_search.MakeShortSeg('data_provider_ori'),'data_provider_ori',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('data_provider_ori')]}
+  ,{text_search.MakeShortSeg('vehicle_color_secondary'),'vehicle_color_secondary',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('vehicle_color_secondary')]}
+  ,{text_search.MakeShortSeg('vehicle_vin'),'vehicle_vin',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('vehicle_vin')]}
+  ,{text_search.MakeShortSeg('update_date'),'update_date',text_search.types.SegmentType.DateType,[text_search.MakeShortSeg('update_date')]}
+  ,{text_search.MakeShortSeg('purgedate_computed'),'purgedate_computed',text_search.types.SegmentType.DateType,[text_search.MakeShortSeg('purgedate_computed')]}
+  ,{text_search.MakeShortSeg('duration_since'),'duration_since',text_search.types.SegmentType.TextType,[text_search.MakeShortSeg('duration_since')]}
   ,{text_search.MakeShortSeg('NOTES'),'NOTES',text_search.types.SegmentType.GroupSeg,[text_search.MakeShortSeg('entity_notes'),text_search.MakeShortSeg('incident_notes'),text_search.MakeShortSeg('vehicle_notes')]}
   ,{text_search.MakeShortSeg('DATE'),'DATE',text_search.types.SegmentType.GroupSeg,[text_search.MakeShortSeg('clean_incident_date')]}
 ],Text_Search.Layout_Segment_ComposeDef );

@@ -42,18 +42,23 @@ string5  name_suffix;
 string3  name_score;
 // clean phone
 string10  phone10;
-// Associated Business info
+// Associated Business and name info
 unsigned6 bdid := 0;
 unsigned6 group_id := 0;
 unsigned1 confidence_level := 0;
-string10  best_phone := '';
-string9   best_fein := '';
 string120 best_CompanyName := '';
 string120 best_addr1 := '';
 string30	best_city := '';
 string2	best_state := '';
 string5	best_zip :='';
 string4	best_zip4 := '';
+string10  best_phone := '';
+string9   best_fein := '';
+string35 contact_title := '';   // Title of Contact at Company if available
+string20 contact_fname := '';
+string20 contact_mname := '';
+string20 contact_lname := '';
+string5  contact_name_suffix := '';
 // Associated Business Demographic Data
 string4  SIC_Code1 := '';
 string4  SIC_Code2 := '';

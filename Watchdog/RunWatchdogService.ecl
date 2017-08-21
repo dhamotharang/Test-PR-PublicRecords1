@@ -13,7 +13,7 @@ firstout := output('Building Watchdog files...');
 lastout := output('Done Building Watchdog files...');
 
 	sequential(firstout,
-			 watchdog.BWR_Best,
+			 watchdog.BWR_Best(),
 			 watchdog.BWR_Delta,
 			 watchdog.BWR_Moxie_Key,
 			 lastout)

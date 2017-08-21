@@ -1,4 +1,4 @@
-import doxie, VersionControl;
+import doxie, tools, versioncontrol;
 
 export Keys(
 
@@ -13,9 +13,9 @@ module
 	
 	shared FilterBdids	:= dproj(bdid	!= 0);
 	shared FilterDids		:= dproj(did	!= 0);
-	
-	versioncontrol.macBuildKeyVersions(FilterBdids	,{bdid}	  ,{FilterBdids	}	,keynames(pversion,pUseOtherEnvironment).Bdid		,Bdid  );
-	versioncontrol.macBuildKeyVersions(FilterDids		,{did	}	  ,{FilterDids	}	,keynames(pversion,pUseOtherEnvironment).Did		,Did	 );
-	
 
+	export Bdid    := tools.macf_FilesIndex('FilterBdids	,{bdid}	  ,{FilterBdids	  }'	,keynames(pversion,pUseOtherEnvironment).Bdid		  );
+	export Did	   := tools.macf_FilesIndex('FilterDids		,{did	}	  ,{FilterDids	  }'	,keynames(pversion,pUseOtherEnvironment).Did		  );	
+	VersionControl.macBuildNewLogicalKeyWithName(key_spoke_linkids.key									,keynames(pversion,pUseOtherEnvironment).LinkIDs.New, LinkID);
+	export LinkIDs := LinkID;
 end;

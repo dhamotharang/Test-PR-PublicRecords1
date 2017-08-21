@@ -1,4 +1,4 @@
-import ut;
+import ut, OIG;
 export Proc_Oig_KeyBase (string pVersion):= function
 
 in_file:=OIG.oig_did;

@@ -11,6 +11,6 @@ EXPORT Layout_LAB_Pairs
 		string5 addressstatus;
 		string3 addresstype;
 		string1 best_addr_ind;
-end;
-
+		string1 ambiguous;
+END;
 

@@ -6,4 +6,4 @@ rMoxieFileForKeybuildLayout
   end
  ;
 
-export File_Base_Search_Dev_Plus := dataset(Watercraft.Cluster + 'base::watercraft_search_' + Watercraft.Version_Development,rMoxieFileForKeybuildLayout,flat);
+export File_Base_Search_Dev_Plus := dataset(Watercraft.Cluster + 'base::watercraft_search',rMoxieFileForKeybuildLayout,flat);

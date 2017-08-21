@@ -151,7 +151,7 @@ FUNCTION
 
 	
 	// ACTIVE
-	active_fran := frand;//per Ellison: There’s nothing in the record layout to indicate whether a franchise is active or inactive.
+	active_fran := frand;//per Ellison: There's nothing in the record layout to indicate whether a franchise is active or inactive.
 
 	// SLIM
 	fran := project(active_fran, BIPv2_HRCHY.Layouts.franr);
@@ -246,6 +246,14 @@ FUNCTION
 				and left.parent_id = 0 
 				and left.ultimate_id = 0
 					=> 'G1',
+
+				left.src = 'D' 
+				and (unsigned1)left.biz_type = 3 
+				and left.id = left.ultimate_id 
+				and left.id <> left.parent_id 
+				and left.parent_id > 0 
+					=> 'D2',
+
 				left.id > 0 
 				and left.parent_id > 0 
 				and left.ultimate_id > 0
@@ -258,12 +266,7 @@ FUNCTION
 				and left.ultimate_id > 0 
 				and left.hq_id > 0
 					=> 'D1',		
-				left.src = 'D' 
-				and (unsigned1)left.biz_type = 3 
-				and left.id = left.ultimate_id 
-				and left.id <> left.parent_id 
-				and left.parent_id > 0 
-					=> 'D2',	
+	
 				left.src = 'D' 
 				and (unsigned1)left.biz_type = 1 
 				and left.id = left.ultimate_id 
@@ -331,7 +334,7 @@ FUNCTION
 				left.hrchy_type,
 				// 'D1' => left.ultimate_id, //OLD
 				'D1' => left.hq_id,					//NEW
-				'D2' => left.ultimate_id,
+				'D2' => 0,
 				// 'D3' => keep it blank
 				left.parent_id
 			);
@@ -353,35 +356,40 @@ export HandleDups(
 ) :=
 FUNCTION
 
-	//***** FIND SEMI DUPS FOR INVESTIGATION
-	duprec := record
-		d2.id;
-		cnt := count(group)
-	end;
+	// only keep most recent that has a proxid
+	recent := dedup(sort(distribute(d2, hash32(id, src)), id, src, if(proxid != 0, 0, 1), -dt_last_seen, local),
+	                left.id = right.id
+	                  and left.src = right.src
+	                  and left.dt_last_seen != right.dt_last_seen,
+	                local);
 
-	dupt := table(d2, duprec, id)(cnt > 1);
-	dupj :=
-	join(
-		d2,
-		dupt,
-		left.id = right.id,
-		transform(left)
-	);
+	// only keep ones with ultimate or parent
+	potentials := dedup(sort(recent, id, src, if(ultimate_id != 0, 0, 1), if(parent_id != 0, 0, 1)),
+	                    left.id = right.id
+	                      and left.src = right.src
+	                      and ((left.ultimate_id != 0 and right.ultimate_id = 0)
+	                          or (left.parent_id != 0 and right.parent_id = 0)));
 
-	// output(dupj(id in mybothi or parent_id in mybothi or ultimate_id in mybothi), all, named('dupj'));
-
-
-	//***** AND NOW GET RID OF THEM
-	// d3 := dedup(sort(d2, id, proxid, -ultimate_id, -parent_id), id);
-	d3v1 := dedup(sort(d2, id, src, if(ultimate_id > 0, 0, 1), if(parent_id > 0, 0, 1), -dt_last_seen, if(isLegalNameInHeader, 0, 1), proxid ), id, src);
-
-	//output(d3v1(id in mydunsids or proxid in myproxids), named('d3v1'));
+	// Prefer higher ids for parent/ultimate. Prefer sele level.
+	d3v1 := dedup(sort(potentials, id, src, -parent_id, -ultimate_id, if(is_sele_level, 0, 1), if(isLegalNameInHeader, 0, 1),
+	                   proxid),
+	              id, src);
 
 
 	//***** FIND DUPS THAT ARE OK BECAUSE THEY ARE NOT A PARENT TO ANYONE (duplicate nodes ok at bottom of hrchy but not in the middle)  tested in W20140404-134522
+	// If we already have the proxid, then we don't need it again.
+	noDupProx
+		:= join(d2(proxid != 0, parent_id != 0), d3v1(proxid != 0),
+		        left.src = right.src
+		          and left.proxid = right.proxid,
+		        transform(left),
+		        left only, hash);
+
 	deduped_out :=
 	join(
-		dedup(d2, proxid, id, parent_id, ultimate_id, all),
+		dedup(sort(noDupProx, proxid, id, parent_id, ultimate_id, src, -dt_last_seen, if(is_sele_level, 0, 1),
+		           if(isLegalNameInHeader, 0, 1)),
+		      proxid, id, parent_id, ultimate_id, src),
 		d3v1,
 		left.id = right.id and
 		left.src = right.src and
@@ -390,8 +398,6 @@ FUNCTION
 		hash
 	);
 
-	//output(deduped_out(id in mydunsids or proxid in myproxids), named('deduped_out'));
-
 	deduped_out_but_ok :=
 	join( //one join to clear it at the parent level
 		join( //one join to clear it at the ult level
@@ -399,20 +405,18 @@ FUNCTION
 				proxid > 0 //no reason to keep a 0 prox when it has a dup id already in there
 				,(parent_id > 0 and parent_id <> id) or (ultimate_id > 0 and ultimate_id <> id) //needs a parent for the dups to work
 				), 
-			dedup(d2, ultimate_id, all),
+			dedup(d2, ultimate_id, src, all),
 			left.id = right.ultimate_id and
 			left.src = right.src,
 			left only,
 			hash
 		),
-		dedup(d2, parent_id, all),
+		dedup(d2, parent_id, src, all),
 		left.id = right.parent_id and
 		left.src = right.src,
 		left only,
 		hash
 	);
-
-	//output(deduped_out_but_ok(id in mydunsids or proxid in myproxids), named('deduped_out_but_ok'));
 
 	return d3v1 + deduped_out_but_ok;
 

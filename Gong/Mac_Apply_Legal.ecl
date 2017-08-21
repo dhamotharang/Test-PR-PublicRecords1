@@ -46,7 +46,7 @@ export Mac_Apply_Legal(in_f, out_f) := macro
 							  left only,lookup);
 
 #uniquename(inf_flt)
-%inf_flt% := %out_suppress%(publish_code<>'N' or bell_id in ['BAN','LSI','LSP','QST','SWB','LSS']);
+%inf_flt% := %out_suppress%(publish_code<>'N' or bell_id in ['BAN','LSI','LSP','QST','SWB','LSS','NEU']);
 
 #uniquename(filtern)
 typeof(in_f) %filtern%(%inf_flt% l) := transform

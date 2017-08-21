@@ -34,8 +34,17 @@ payload := record
   string4 cmacode;
 end;
 
-f := project(d(phonenumber<>''), transform(payload, self := left));
 
-export Key_CWP_Phone := index(f,{phonenumber},
-								{f},
+payload slim(d le) :=  TRANSFORM 
+	self.firstname	 	:= le.fname;
+	self.middlename		:= le.mname;
+	self.lastname		:= le.lname;
+	SELF := le; 
+END;
+
+f := PROJECT(d(phonenumber<>''),slim(LEFT));
+ut.mac_suppress_by_phonetype(f,phonenumber,state,ph_out1,false);
+
+export Key_CWP_Phone := index(ph_out1,{phonenumber},
+								{ph_out1},
                                   '~thor_data400::key::canadianwp_phone_payload_'+doxie.Version_SuperKey);

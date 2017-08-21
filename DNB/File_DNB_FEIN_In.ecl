@@ -1,1 +1,2 @@
-export File_DNB_FEIN_In := dataset('~thor_data400::in::dnb_fein_20050406_clean_replacement', Layout_DNB_FEIN_In, flat);
+//Basefile for input files.
+export File_DNB_FEIN_In := dataset('~thor_data400::base::dnb_fein', Layout_DNB_FEIN_In, flat);

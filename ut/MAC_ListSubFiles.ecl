@@ -1,9 +1,5 @@
 export MAC_ListSubFiles(superfile_name) := macro
+import promotesupers;
 
-#uniquename(a)
-%a% := 1;
-#uniquename(outfile)
-ut.MAC_ListSubFiles_seq(superfile_name, %outfile%)
-output(%outfile%)
-
-endmacro;
+promotesupers.mac_listsubfiles(superfile_name);
+endmacro : deprecated('use promotesupers.mac_listsubfiles instead');

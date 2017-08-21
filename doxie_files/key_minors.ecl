@@ -1,11 +1,11 @@
-import header, _validate, ut, watchdog,doxie;
+import header, _validate, ut, watchdog, doxie,Data_Services;
 
 //take header records where a valid date shows them to be a minor
 h := 
 	header.File_Headers(
 		dob > 0 and 
 		_Validate.Date.fIsValid((string8)dob,,true,true) and 
-		ut.GetAgeI(dob) < 18
+		ut.Age(dob) < 18
 	);
 
 //just keep the higher of their DOBs, if multiple	
@@ -29,7 +29,7 @@ b :=
 	watchdog.File_Best(
 		dob > 0 and 
 		_Validate.Date.fIsValid((string8)dob,,true,true) and 
-		ut.GetAgeI(dob) >= 18
+		ut.Age(dob) >= 18
 	);		
 
 j := 
@@ -47,7 +47,7 @@ i :=
 		j,
 		{did},
 		{dob},
-		'~thor_data400::key::header::minors_'+doxie.Version_SuperKey
+		Data_Services.Data_location.person_header+'thor_data400::key::header::minors_'+doxie.Version_SuperKey
 	);
 
 export key_minors := i;

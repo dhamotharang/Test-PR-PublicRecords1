@@ -9,6 +9,7 @@ export MAC_isVanityName
    outfile2='outfile2',  // output dataset
    coname_id='coname_id',
    notthese_filter='\'\''    // optional regexp that filters out these patterns
+   ,pDebugOutputs   = 'true'
 ) := MACRO
 
 //Create company name token patterns for each company name in infile
@@ -168,8 +169,8 @@ END;
 
 #uniquename(vanity_patterns)
 %vanity_patterns% := PARSE(distribute(%tkcname%,random()), token_pattern, p, %people_pattern_rec%,FIRST) : independent;
-output(COUNT(%vanity_patterns%),NAMED('c_vanity_patterns'));
-output(choosen(%vanity_patterns%,100),NAMED('vanity_patterns'));
+if(pDebugOutputs  = true  ,output(COUNT(%vanity_patterns%),NAMED('c_vanity_patterns')));
+if(pDebugOutputs  = true  ,output(choosen(%vanity_patterns%,100),NAMED('vanity_patterns')));
 
 #uniquename(vanity_names0)
 %vanity_names0% := %vanity_patterns%( vanity=true );

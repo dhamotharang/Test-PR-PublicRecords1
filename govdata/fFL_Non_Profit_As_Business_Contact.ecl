@@ -21,10 +21,10 @@ function
 								 DDMMYYYY_2_YYYYMMDD(file.annual_report_date_2)),
 						 ut.Min2(DDMMYYYY_2_YYYYMMDD(file.annual_report_date_3),
 								 DDMMYYYY_2_YYYYMMDD(file.annual_cor_file_date)));
-	lastDate(r file)  := ut.Max2(
-						 ut.Max2(DDMMYYYY_2_YYYYMMDD(file.annual_report_date_1), 
+	lastDate(r file)  := Max(
+						 Max(DDMMYYYY_2_YYYYMMDD(file.annual_report_date_1), 
 								 DDMMYYYY_2_YYYYMMDD(file.annual_report_date_2)),
-						 ut.Max2(DDMMYYYY_2_YYYYMMDD(file.annual_report_date_3),
+						 Max(DDMMYYYY_2_YYYYMMDD(file.annual_report_date_3),
 								 DDMMYYYY_2_YYYYMMDD(file.annual_last_trx_date))); 
 
 	Business_Header.Layout_Business_Contact_Full_New cleaner(f L, INTEGER C) :=

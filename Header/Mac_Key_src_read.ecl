@@ -22,6 +22,6 @@ END;
 	self := l.cdName[1];
 end;
 
-srcOut  := project(%srcFile%, %get%(left)):persist('~thor_data400::temp::'+sffx);
+srcOut  := project(%srcFile%, %get%(left));
 
 endmacro;

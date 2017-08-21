@@ -1,6 +1,6 @@
 import tools;
 export KeyPrep_MotorVehicle_Party(
-	dataset(Layout_MotorVehicle.Party) prebase,
+	dataset(Layout_MotorVehicle.Party.Linked) prebase,
 	string version,
 	boolean pUseOtherEnvironment = false) := function
 

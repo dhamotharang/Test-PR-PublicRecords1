@@ -1,4 +1,4 @@
-IMPORT _control, Doxie, PromoteSupers, RoxieKeyBuild, std, ut;
+IMPORT _control, Doxie, PromoteSupers, RoxieKeyBuild, std, ut,Scrubs_PhoneFraud;
 
 //oType: populate 'otp', if file is available 'Y', else 'N'
 //sType: populate 'spoofing', if file is available 'Y', else 'N'
@@ -150,9 +150,10 @@ EXPORT Proc_Build_PhoneFraud_Keys(string version, string oType, string sType):= 
 																	mvBltPhoneFraudOTP, 
 																	mvBltPhoneFraudSpoofing,
 																	mvQAPhoneFraudOTP, 
-																	mvQAPhoneFraudSpoofing):
+																	mvQAPhoneFraudSpoofing,
 																	dopsUpdate,
-																	buildStrata):
+																	buildStrata,
+																	Scrubs_PhoneFraud.fn_RunScrubs(version,'Judy.Tao@lexisnexis.com')):
 																	Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhoneFraud Key Build Succeeded', workunit + ': Build completed.')),
 																	Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhoneFraud Key Build Failed', workunit + '\n' + FAILMESSAGE)
 																	);

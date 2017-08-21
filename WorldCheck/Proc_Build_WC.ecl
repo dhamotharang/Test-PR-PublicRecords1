@@ -1,5 +1,7 @@
 import WorldCheck,WorldCheckServices;
 
+#OPTION('multiplePersistInstances',FALSE);
+
 export Proc_Build_WC(string filedate) := function
 
 dofirst  := proc_build_WC_Base(filedate);

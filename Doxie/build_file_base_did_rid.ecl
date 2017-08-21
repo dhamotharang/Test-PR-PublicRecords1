@@ -1,4 +1,4 @@
-import header,doxie;
+import header,doxie,PRTE2_Header;
 
 
 // at runtime, should be NEW header, not same as
@@ -14,9 +14,9 @@ slimrec into_slim1(header.layout_header L) := transform
 	self := L;
 end;
 
-head := project(header.file_headers,into_slim1(LEFT));	  
-head2 := project(header.file_header_previous,into_slim1(LEFT));	 
-head3 := project(header.file_header_prev_prev,into_slim1(LEFT));	  
+head := project(header.file_header_raw_syncd,into_slim1(LEFT));	  
+head2 := project(header.file_header_raw_syncd_prev,into_slim1(LEFT));	 
+head3 := project(header.file_header_raw_syncd_prev_prev,into_slim1(LEFT));	  
 
 doxie.KeyType_Rid_Did into_parent(head L) := transform
 	self.rid := L.rid;
@@ -43,5 +43,8 @@ end;
 par3 := join(par2(stable),distribute(head3,hash(rid)),
 		left.rid = right.rid,
 		into_three(LEFT,RIGHT),local,left outer) + par2(~stable);
-
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export build_file_base_did_rid := project(PRTE2_Header.files.file_headers,transform(doxie.KeyType_Rid_Did,SELF.stable:=true,SELF:=LEFT));
+#ELSE
 export build_file_base_did_rid := par3 : independent;
+#END

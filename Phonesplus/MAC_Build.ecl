@@ -13,14 +13,19 @@ export MAC_Build (indataset,infname,inmname,inlname,
 						build_skip_set='[]') :=
 MACRO
 
+import standard;
+
 #uniquename(x)
 #uniquename(Address_Key)
 #uniquename(CityStName_Key)
 #uniquename(Name_Key)
 #uniquename(Phone_Key)
+#uniquename(Phone_Key2)
 #uniquename(SSN_Key)
+#uniquename(SSN_Key2)
 #uniquename(StName_Key)
 #uniquename(Zip_Key)
+#uniquename(ZipPRLname_Key)
 
 #uniquename(do_one)
 #uniquename(do_two)
@@ -44,7 +49,8 @@ AutoKey.Keys  (indataset,infname,inmname,inlname,
 					inlookups,
 					indid,
 					inkeyname,
-					%Address_Key%,%CityStName_Key%,%Name_Key%,%Phone_Key%,%SSN_Key%,%StName_Key%,%Zip_Key%)
+					%Address_Key%,%CityStName_Key%,%Name_Key%,%Phone_Key%,%Phone_Key2%,%SSN_Key%,%SSN_Key2%,%StName_Key%,%Zip_Key%,%ZipPRLname_Key%
+					,4,true,0,Phonesplus_v2)
 
 Cellphone.MAC_SK_BuildProcess_v2(%Address_Key%, '~thor_data400::key::phonesplus::' + Phonesplus.version + '::address',
 						  '~thor_data400::key::phonesplus_address', %do_one%, ,diffing)

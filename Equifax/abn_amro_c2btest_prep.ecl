@@ -22,8 +22,8 @@ string10  phone10;
 end;
 
 layout_abn_amro_c2btest_clean CleanInput(layout_abn_amro_c2btest_seq l) := transform
-self.clean_address := addrcleanlib.cleanAddress182(trim(l.MAILING_ADDRESS_1), trim(l.MAILING_CITY) + ', ' + trim(l.MAILING_STATE) + ' ' + trim(l.MAILING_ZIP_CODE[1..5]));
-self.clean_name := addrcleanlib.cleanPerson73(l.NAME_FULL);
+self.clean_address := address.cleanAddress182(trim(l.MAILING_ADDRESS_1), trim(l.MAILING_CITY) + ', ' + trim(l.MAILING_STATE) + ' ' + trim(l.MAILING_ZIP_CODE[1..5]));
+self.clean_name := address.cleanPerson73(l.NAME_FULL);
 self.phone10 := address.CleanPhone(l.PHONE);
 self := l;
 end;
@@ -84,7 +84,20 @@ end;
 abn_amro_c2btest_did_init := project(abn_amro_c2btest_clean(lname <> ''),InitDID(left));
 abn_amro_c2btest_to_did := abn_amro_c2btest_did_init((prim_name <> '' and z5 <> '') or ssn <> '');
 
-didville.MAC_DidAppend(abn_amro_c2btest_to_did, abn_amro_c2btest_did_match, true, 'Z4G')
+DID_Matchset := ['A','P','Z'];
+
+DID_Add.MAC_Match_Flex(abn_amro_c2btest_to_did, 
+	 DID_Matchset,
+	 NONE, NONE, fname, mname,lname, suffix, 
+	 prim_range, prim_name, sec_range, z5, st, phone10, 
+	 did,
+	 didville.Layout_Did_OutBatch, 
+	 TRUE, score, 
+      50,  //low score threshold
+	 abn_amro_c2btest_did_match)
+
+
+//didville.MAC_DidAppend(abn_amro_c2btest_to_did, abn_amro_c2btest_did_match, true, 'Z4G')
 
 didville.MAC_BestAppend(abn_amro_c2btest_did_match,'BEST_ALL','BEST_ALL',0,true,abn_amro_c2btest_did_best)
 

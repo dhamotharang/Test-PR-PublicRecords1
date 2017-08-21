@@ -3,10 +3,10 @@ export MAC_Vina_Unique_Candidates(pDateTimeStamp)
   macro
 
 // Spray vina candidates
-zSprayCandidates	:=	lib_fileservices.FileServices.sprayfixed('10.150.12.240',
+zSprayCandidates	:=	lib_fileservices.FileServices.sprayfixed(_control.IPAddress.edata12,
 																 '/data_999/vin_stuff/processed/' + pDateTimeStamp + '/vina_candidates.d00',
 																 23,
-																 'thor_dell400_2',
+																 _control.TargetGroup.ADL_400,
 																 '~thor_data400::in::vehreg_vina_candidates',
 																 ,
 																 ,
@@ -50,7 +50,7 @@ zOutputNewVINS	:=	output(dNewVINS,,'~thor_data400::out::vehreg_vina_candidates_n
 
 // Despray new vins
 zDesprayNewVINS		:=	lib_fileservices.FileServices.despray('~thor_data400::out::vehreg_vina_candidates_new',
-															  '10.150.12.240',
+															  _control.IPAddress.edata12,
 															  '/data_999/vin_stuff/processed/' + pDateTimeStamp + '/vins_to_process_new.d00',
 															  ,
 															  ,

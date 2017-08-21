@@ -1,4 +1,4 @@
-﻿IMPORT ut, FLAccidents_Ecrash;
+IMPORT ut, FLAccidents_Ecrash;
 
 EXPORT RawDeltaBaseSQL(IParam.searchrecords in_mod) := MODULE
 

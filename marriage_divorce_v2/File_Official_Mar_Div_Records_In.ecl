@@ -1,7 +1,7 @@
 import ut;
 
 
-filter1_ds := dataset('~thor_200::out::official_records_marriage_divorce_party',marriage_divorce_v2.Layout_Official_Mar_Div_Records_In,flat);
+filter1_ds := dataset('~thor_200::out::official_records_marriage_divorce_party',marriage_divorce_v2.Layout_Official_Mar_Div_Records_In,flat,OPT);
 
 
 
@@ -9,13 +9,13 @@ filter1_ds := dataset('~thor_200::out::official_records_marriage_divorce_party',
 
 
  filter2_ds:= filter1_ds( not(  state_origin = 'CO' or
-																state_origin = 'FL' or
 																state_origin = 'KY' or
 																state_origin = 'ME' or
 																state_origin = 'NC' or
 																state_origin = 'NV' or
 																state_origin = 'OH' or
 																state_origin = 'TX' or
+															(	regexfind('CIRCUIT',filter1_ds.entity_nm)) or 
 															( state_origin = 'CT' and filing_type = '3') or
 														  (	state_origin = 'CA' and stringlib.stringtouppercase(trim(county_name)) = 'EL DORADO'))); 
 
@@ -49,7 +49,7 @@ output(filter3_ds(official_record_key='171349348021' or
 													official_record_key='17133671021'));
 
 */													
-layout_rollup_record := record
+layout_join_record := record
   string8 process_date;
   string2 vendor;
   string2 state_origin;
@@ -88,48 +88,64 @@ layout_rollup_record := record
   string20 lname2:='';
 	string3 pname2_score:='';
   string1 master_party_type_cd2:='';	
+	boolean grantor:=false;
+	boolean grantee:=false;
 	end;
 
-
-
-
-layout_rollup_record t_map_to_rollup(marriage_divorce_v2.Layout_Official_Mar_Div_Records_In le) := transform
-
-self := le;
+distribFilterRecs := distribute(filter3_ds,hash(official_record_key));
+	
+//copy original dataset into rec structure below to later join and only keep records with pairs.
+r1 := record
+ distribFilterRecs.official_record_key;
+ integer official_record_key_ct := 1;
 end;
-rollup_ds := project(filter3_ds,t_map_to_rollup(left));
-
-//output(rollup_ds);
-/*
-need to add lookup stuff in the future. 
-Sample data did not have an instance where the entity_nm was giving county names instead.
-(regexfind(' ',trim(string_upcase(entity_nm)))= true or regexfind(',',entity_nm) = true) and
-*/
 
 
+r1 t1(distribFilterRecs le) := transform
+ self := le;
+end;
 
-distribRecords := distribute(rollup_ds,hash(official_record_key));
-sortedRecords := sort(distribRecords,official_record_key,local);
-//output(sortedRecords);
+p1 := project(distribFilterRecs,t1(left));
 
-layout_rollup_record trollupparties(layout_rollup_record l, layout_rollup_record r) :=
+r1 t2(p1 le, p1 ri) := transform
+ self.official_record_key_ct := le.official_record_key_ct+1;
+ self             := le;
+end;
+
+
+p2 := rollup(p1,left.official_record_key=right.official_record_key,t2(left,right),local);
+
+
+keep_those_with_only_2 := p2(official_record_key_ct=2);
+
+layout_join_record t_join_back_to_orig(marriage_divorce_v2.Layout_Official_Mar_Div_Records_In le, keep_those_with_only_2 ri) := transform
+ self := le;
+end;
+
+ds_with_only_2 := join(distribFilterRecs,keep_those_with_only_2,left.official_record_key=right.official_record_key,t_join_back_to_orig(left,right),local);
+
+
+
+layout_join_record tjoinupparties(layout_join_record l, layout_join_record r) :=
 transform
-
+  boolean left_Grantor 													:= (l.master_party_type_cd='1' and r.master_party_type_cd='5'); 
+  boolean right_Grantee 												:= (r.master_party_type_cd='5' and l.master_party_type_cd='1');
+	
   self.county_name															:= l.county_name;
 	self.official_record_key											:= l.official_record_key;
   self.doc_instrument_or_clerk_filing_num				:= l.doc_instrument_or_clerk_filing_num;
 	self.doc_filed_dt															:= l.doc_filed_dt;
 	self.doc_type_desc													  := l.doc_type_desc;
 	self.filing_type															:= l.filing_type;
-	self.entity_nm															  := l.entity_nm;
-	self.entity_nm_format													:= l.entity_nm_format;
-	self.entity_type_desc											    := l.entity_type_desc;
-	self.title1																		:= l.title1;
-  self.fname1																		:= l.fname1;
-  self.mname1																		:= l.mname1;
-  self.lname1																		:= l.lname1;
-	self.pname1_score															:= l.pname1_score	;
-  self.master_party_type_cd											:= l.master_party_type_cd;
+	self.entity_nm															  := if(left_Grantor,l.entity_nm,r.entity_nm);
+	self.entity_nm_format													:= if(left_Grantor,l.entity_nm_format,r.entity_nm_format);
+	self.entity_type_desc											    := if(left_Grantor,l.entity_type_desc,r.entity_type_desc);
+	self.title1																		:= if(left_Grantor,l.title1,r.title1);
+  self.fname1																		:= if(left_Grantor,l.fname1,r.fname1);
+  self.mname1																		:= if(left_Grantor,l.mname1,r.mname1);
+  self.lname1																		:= if(left_Grantor,l.lname1,r.lname1);
+	self.pname1_score															:= if(left_Grantor,l.pname1_score,r.pname1_score);
+  self.master_party_type_cd											:= if(left_Grantor,l.master_party_type_cd,r.master_party_type_cd);
 
 
 
@@ -139,26 +155,31 @@ transform
 	self.doc_filed_dt2														:= r.doc_filed_dt;
 	self.doc_type_desc2													  := r.doc_type_desc;
 	self.filing_type2															:= r.filing_type;
-	self.entity_nm2															  := r.entity_nm;
-	self.entity_nm_format2												:= r.entity_nm_format;
-	self.entity_type_desc2											  := r.entity_type_desc;
-	self.title2																		:= r.title1;
-  self.fname2																		:= r.fname1;
-  self.mname2																		:= r.mname1;
-  self.lname2																		:= r.lname1;
-	self.pname2_score															:= r.pname1_score	;
-  self.master_party_type_cd2										:= r.master_party_type_cd;
-self	:= l;
+	self.entity_nm2															  := if(right_Grantee,r.entity_nm,l.entity_nm);
+	self.entity_nm_format2												:= if(right_Grantee,r.entity_nm_format,l.entity_nm_format);
+	self.entity_type_desc2											  := if(right_Grantee,r.entity_type_desc,l.entity_type_desc);
+	self.title2																		:= if(right_Grantee,r.title1,l.title1);
+  self.fname2																		:= if(right_Grantee,r.fname1,l.fname1);
+  self.mname2																		:= if(right_Grantee,r.mname1,l.mname1);
+  self.lname2																		:= if(right_Grantee,r.lname1,l.lname1);
+	self.pname2_score															:= if(right_Grantee,r.pname1_score,l.pname1_score);
+  self.master_party_type_cd2										:= if(right_Grantee,r.master_party_type_cd,l.master_party_type_cd);
+  self.grantor																  := left_Grantor;
+	self.grantee																	:= right_Grantee;
+  self	:= l;
 end;
 
 
-rollup_parties := rollup(sortedRecords 
-												,left.official_record_key = right.official_record_key
-												,trollupparties(left,right)
-												,local
-												);
+join_parties := join(ds_with_only_2
+										 ,ds_with_only_2
+										 ,left.official_record_key = right.official_record_key and
+										  left.entity_nm != right.entity_nm
+										 ,tjoinupparties(left,right)
+										 ,local
+										);
 
 
+dedupedRecords := dedup(join_parties,official_record_key,local);
 
 
-export File_Official_Mar_Div_Records_In := rollup_parties;
+export File_Official_Mar_Div_Records_In := dedupedRecords;

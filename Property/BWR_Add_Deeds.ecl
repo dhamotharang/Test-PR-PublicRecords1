@@ -32,6 +32,9 @@ property.layout_fares_deeds new_file_date_tran(new_file L1) := Transform
                                        ((Integer)(L1.recording_date_yyyymmdd[5..6]) Between 1 And 12) And            
                                        ((Integer)(L1.recording_date_yyyymmdd[7..8]) Between 1 And 31)),
 				                   L1.recording_date_yyyymmdd, '');
+								   
+   self.apn_parcel_number_unformatted := stringlib.stringfilter(L1.apn_parcel_number_unformatted,
+										'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
    Self := L1;
 END;
@@ -39,7 +42,9 @@ END;
 valid_date_new_file := Project(new_file, new_file_date_tran(LEFT));
 //end of cleaning
 
-one := output(valid_date_new_file,,'~thor_data400::base::fares_1080'+thorlib.wuid());
-two := fileservices.addsuperfile('~thor_data400::base::fares_1080','~thor_data400::base::fares_1080'+thorlib.wuid());
+valid_date_new_file_dist := distribute(valid_date_new_file,hash(fares_id));
+
+one := output(valid_date_new_file_dist,,'~thor_data400::base::fares_1080_weekly_'+thorlib.wuid(),__compressed__);
+two := fileservices.addsuperfile('~thor_data400::base::fares_1080','~thor_data400::base::fares_1080_weekly_'+thorlib.wuid());
 three := fileservices.clearsuperfile('~thor_data400::in::fares_1080',true);
 sequential(one,two,three,property.Fares_Deeds_dedup,property.Fares_Search_dedup);

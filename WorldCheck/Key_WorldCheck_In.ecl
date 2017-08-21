@@ -9,7 +9,7 @@ END;
 f1_worldcheck := PROJECT(worldcheck.File_WorldCheck_In,r);
 
 f1_worldcheck worldtran(f1_worldcheck input) := transform
-self.E_I_Ind := if(input.e_i_ind in ['M','F'],'I',input.e_i_ind);
+self.E_I_Ind := if(input.e_i_ind in ['M','F','U'],'I',input.e_i_ind);
 self.locations := regexreplace('~,|~,~|~',input.Locations,'');
 self := input;
 end;

@@ -1,7 +1,7 @@
 /*2015-07-17T19:07:13Z (Harrison Sun)
 RR Bug: 182234 - LINKING: BIP Sprint 29 Build
 */
-import ut,SALT28;
+import ut,SALT28,STD;
 export functions := MODULE
 export classify(dataset(BIPV2_Company_Names.layouts.layout_names) names) :=
 FUNCTION
@@ -51,7 +51,7 @@ FUNCTION
 	n :=
 	normalize(
 		names,
-		ut.NoWords(left.cnp_name, ' '),
+		STD.Str.CountWords(left.cnp_name, ' '),
 		transform(
 			BIPV2_Company_Names.layouts.layout_words,
 			self.seq := counter,
@@ -86,7 +86,8 @@ FUNCTION
 	n :=
 	normalize(
 		names,
-		ut.NoWords(left.cnp_name, ' '),
+		//ut.NoWords(left.cnp_name, ' '),
+		STD.Str.CountWords(left.cnp_name, ' '),
 		transform(
 			BIPV2_Company_Names.layouts.layout_words,
 			self.seq := counter,
@@ -510,102 +511,9 @@ SHARED FR(string src, string find, string tobeReplaced, string replacewith) := f
 			 end;
 //       s1 :=FR(s0,find_real_1, '\\bI\\b', '1');
 // one may also need a replace of find '(\\w\\w\\s)I$' to '$1 1' // no need !
-SHARED string RemoveDiacritics(string s) := BEGINC++
-	char *t = (char *)rtlMalloc(lenS);
-	unsigned char	ch;
-	for (int i = 0; i < lenS; ++i)
-	{
-			switch(s[i] & 0xFF)
-			{
-				case 0xE0:			//'Ã '
-				case 0xE1:
-				case 0xE2:
-				case 0xE3:
-				case 0xE4:
-				case 0xE5:
-					ch = 'a';
-					break;
-				case 0xC3:			//'Ãƒî€šÃ‚î€š'
-				case 0xC2:
-				case 0xC1:
-				case 0xC4:
-				case 0xC5:
-					ch = 'A';
-					break;
-				case 0xE9:		//'Ã©'
-				case 0xE8:
-				case 0xEA:
-				case 0xEB:
-					ch = 'e';
-					break;
-				case 0xC8:		//'Ãƒî€š'
-				case 0xC9:
-				case 0xCA:
-				case 0xCB:
-					ch = 'E';
-					break;
-				case 0xF1:		//'Ã±'
-					ch = 'n';
-					break;
-				case 0xD1:		//'Ãƒî€š'
-					ch = 'N';
-					break;
-				case 0xD2:		//'Ãƒî€š'
-				case 0xD3:
-				case 0xD4:
-				case 0xD5:
-				case 0xD6:
-					ch = 'O';
-					break;
-				case 0xF2:	 //'Ã²'
-				case 0xF3:
-				case 0xF4:
-				case 0xF5:
-				case 0xF6:
-					ch = 'o';
-					break;
-				case 0xCC:				//'Ãƒî€š'
-				case 0xCD:
-				case 0xCE:
-				case 0xCF:
-					ch = 'I';
-					break;
-				case 0xEC:				//'Ã¬'
-				case 0xED:
-				case 0xEE:
-				case 0xEF:
-					ch = 'i';
-					break;
-				case 0xD9:				//'Ãƒî€š'
-				case 0xDA:
-				case 0xDB:
-				case 0xDC:
-					ch = 'U';
-					break;
-				case 0xF9:				//'Ã¹'
-				case 0xFA:
-				case 0xFB:
-				case 0xFC:
-					ch = 'u';
-					break;
-				case 0xDD:  //'Ã'
-					ch = 'Y';
-					break;
-				case 0xFD:  //'Ã½'
-				case 0xFF:
-					ch = 'y';
-					break;
-				default:
-					ch = s[i] & 0xFF;
-					break;
-			};
-			t[i] = ch;
-	}
-	__result = t;
-	__lenResult = lenS;
-ENDC++;
-//aaa:=RemoveDiacritics('dksdjÃ lll');
-//aaa;
+import std;
+export string RemoveDiacritics(string s) := (STRING) STD.Uni.Cleanaccents(s); 
+
 SHARED SFR(string src, string find, string replacewith) := regexreplace('\\b'+find+'\\b', src, replacewith);
 SHARED SFR0(string src, string find, string replacewith) := regexreplace(find, src, replacewith);
 Shared sReplacements:=''+

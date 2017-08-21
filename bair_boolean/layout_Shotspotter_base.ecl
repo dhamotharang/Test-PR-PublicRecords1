@@ -1,10 +1,8 @@
 import bair, BIPV2;
 EXPORT layout_Shotspotter_base := record
-	bair.layouts.gunop_dbo_shot_incident_Base;
-	// STRING2	source;
-	//UNSIGNED6	bdid := 0;
-	//UNSIGNED6 did := 0;
-	// UNSIGNED6 rid := 0;
-	// UNSIGNED6 sid := 0;
+	bair_boolean.Layout_Bair_Conv.gunop_dbo_shot_incident_Base;
 	BIPV2.IDlayouts.l_xlink_ids;
+	string4     gh4;
+	string5     gh5;
+	string6     gh6;
 end;

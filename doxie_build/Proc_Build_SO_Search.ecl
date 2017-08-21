@@ -6,7 +6,7 @@ dofirst := proc_build_SO_Search_Base;
 dosecond := proc_build_So_Search_Keys(filedate);
 dosecond2 := Sexoffender.Proc_Build_Autokey(filedate);
 dothird := proc_acceptSK_SO_ToQA;
-dofourth := fileservices.sendemail('roxiebuilds@seisint.com;vniemela@seisint.com;jtao@seisint.com;jtolbert@seisint.com'
+dofourth := fileservices.sendemail('roxiebuilds@seisint.com;vniemela@seisint.com;jtao@seisint.com;jtolbert@seisint.com,snarra@seisint.com'
                                   ,'SEX OFFENDER BUILD SUCCESS ' + filedate,
 							'keys: 1) thor_data400::key::sexoffender::spkpublic_qa (thor_data400::key::sexoffender::'+filedate+'::spkpublic)'           + '\n' +
 							'      2) thor_data400::key::sexoffender::offenses_public_qa (thor_data400::key::sexoffender::'+filedate+'::offenses_public)'     + '\n' +

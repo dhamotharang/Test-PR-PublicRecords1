@@ -1,8 +1,10 @@
 IMPORT Text_Search;
+IMPORT Lib_ThorLib;
 
 EXPORT fExternalKeys(Filename_Info info, DATASET(Layout_Posting) ps, 
                      BOOLEAN incremental=FALSE) := FUNCTION
   Work_exk := RECORD(Layout_ExternalKeyMap)
+    UNSIGNED4 node;
     BOOLEAN newKey;
   END;
   Work_exk get_exk(RECORDOF(Indx_ExtKeyOut2(info)) k) := TRANSFORM
@@ -10,6 +12,7 @@ EXPORT fExternalKeys(Filename_Info info, DATASET(Layout_Posting) ps,
     SELF.docRef.doc := k.doc;
     SELF.newKey := FALSE;
     SELF.hashKey := HASH64(TRIM(k.ExternalKey));
+    SELF.node := ThorLib.node();
     SELF := k;
   END;
   old_keys := IF(incremental,
@@ -21,6 +24,7 @@ EXPORT fExternalKeys(Filename_Info info, DATASET(Layout_Posting) ps,
     SELF.ExternalKey := TRIM(l.word);
     SELF.HashKey := HASH64(TRIM(l.word));
     SELF.newKey := TRUE;
+    SELF.node := ThorLib.node();
     SELF.ver := 0;
   END;
   new_keys := PROJECT(ps(typ=Types.WordType.ExtKey), cvt2KeyMap(LEFT));
@@ -32,6 +36,7 @@ EXPORT fExternalKeys(Filename_Info info, DATASET(Layout_Posting) ps,
     SELF := curr;
   END;
   marked_exk := UNGROUP(ROLLUP(grp_key_pairs, TRUE, set_ver(LEFT,RIGHT)));
-  rslt := PROJECT(marked_exk(newKey), Layout_ExternalKeyMap);
+  distributed_exk := DISTRIBUTE(marked_exk, node);
+  rslt := PROJECT(distributed_exk(newKey), Layout_ExternalKeyMap);
   RETURN rslt;
 END;

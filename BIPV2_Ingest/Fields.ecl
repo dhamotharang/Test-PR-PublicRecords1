@@ -1,6 +1,6 @@
 IMPORT ut,SALT35;
 EXPORT Fields := MODULE
- 
+  
 // Processing for each FieldType
 EXPORT SALT35.StrType FieldTypeName(UNSIGNED2 i) := CHOOSE(i,'EMAIL_FMT','SSN_FMT','WORDBAG','NAME','WORDSTR','CORPKEY_FMT','CITY','fld_contact','zip5','hasZip4','alpha_st','number','multiword','Noblanks','number09','number9','alpha02');
 EXPORT FieldTypeNum(SALT35.StrType fn) := CASE(fn,'EMAIL_FMT' => 1,'SSN_FMT' => 2,'WORDBAG' => 3,'NAME' => 4,'WORDSTR' => 5,'CORPKEY_FMT' => 6,'CITY' => 7,'fld_contact' => 8,'zip5' => 9,'hasZip4' => 10,'alpha_st' => 11,'number' => 12,'multiword' => 13,'Noblanks' => 14,'number09' => 15,'number9' => 16,'alpha02' => 17,0);

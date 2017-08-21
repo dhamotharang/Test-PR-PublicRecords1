@@ -1,4 +1,4 @@
-export Layout_MIC := record
+export Layout_MIC := record, maxlength(8192)
 string MIC;
 string Company;
 string Address;

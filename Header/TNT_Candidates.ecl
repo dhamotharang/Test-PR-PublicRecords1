@@ -1,23 +1,25 @@
 import gong,ut;
+export TNT_Candidates (dataset(recordof(header.layout_header)) file_in)  := function
+
 // Perform the GONG part of the final stages
-Gong_in := dataset('~thor_data400::base::gongheader_building',gong.Layout_bscurrent_raw,flat);
+Gong_in := dataset('~thor_data400::base::gongheader_building',gong.Layout_gong,flat);
 
 typeof(gong_in) filtern(gong_in l) := transform
-	self.phone10 := if(l.publish_code = 'N' or l.omit_phone='Y', '', l.phone10);
+	self.phoneno := if(l.publish_code = 'N' or l.omit_phone='Y', '', l.phoneno);
 	self := l;
 end;
 
 g := project(gong_in, filtern(left));
-h := Apt_Patch;
+h := file_in;
 
 sg := record
   g.prim_range;
   g.prim_name;
   g.z5;
   g.st;
-  g.phone10;
-  string20 name_first := if ( g.name_first <> '', g.name_first, ut.word(g.listed_name,2));
-  string20 name_last := if ( g.name_last <> '', g.name_last, ut.word(g.listed_name,1));
+  g.phoneno;
+  string20 name_first := if ( g.name_first <> '', g.name_first, ut.word(g.company_name,2));
+  string20 name_last := if ( g.name_last <> '', g.name_last, ut.word(g.company_name,1));
   boolean hi := true;
   end;
 
@@ -60,7 +62,7 @@ rid_to_go := record
 
 rid_to_go add_tnt(sh le, sg ri) := transform
   self.rid := le.rid;
-  self.phone10 := ri.phone10;
+  self.phone10 := ri.phoneno;
   end;
 
 rule1to3 := join(hd1,gd1,left.zip=right.z5 and
@@ -97,4 +99,5 @@ count(rule5);
 count(result);
 */
 
-export TNT_Candidates := result : persist('htemp::TNT_Candidates');
+return result;
+end; 

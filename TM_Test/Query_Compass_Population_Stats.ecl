@@ -1,0 +1,51 @@
+f := TM_Test.File_Compass_Test_In;
+
+layout_compass_stat := record
+unsigned4 cnt_total := count(group);
+unsigned4 cnt_Company := count(group, f.Company <> '');
+unsigned4 cnt_Address := count(group, f.Address <> '');
+unsigned4 cnt_City := count(group, f.City <> '');
+unsigned4 cnt_State := count(group, f.State <> '');
+unsigned4 cnt_Zip_Code := count(group, f.Zip_Code <> '');
+unsigned4 cnt_Phone := count(group, f.Phone <> '');
+unsigned4 cnt_Fax := count(group, f.Fax <> '');
+unsigned4 cnt_Sales_Volume := count(group, f.Sales_Volume <> '');
+unsigned4 cnt_Employee_Size := count(group, f.Employee_Size <> '');
+unsigned4 cnt_Contact_First_Name := count(group, f.Contact_First_Name <> '');
+unsigned4 cnt_Contact_Last_Name := count(group, f.Contact_Last_Name <> '');
+unsigned4 cnt_Contact_Title := count(group, f.Contact_Title <> '');
+unsigned4 cnt_SIC := count(group, f.SIC <> '');
+unsigned4 cnt_Credit_Rating := count(group, f.Credit_Rating <> '');
+unsigned4 cnt_Number_of_PCs := count(group, f.Number_of_PCs <> '');
+unsigned4 cnt_Square_Footage := count(group, f.Square_Footage <> '');
+unsigned4 cnt_County := count(group, f.County <> '');
+unsigned4 cnt_MSA_Area := count(group, f.MSA_Area <> '');
+unsigned4 cnt_Gender := count(group, f.Gender <> '');
+unsigned4 cnt_NACIS_Code := count(group, f.NACIS_Code <> '');
+unsigned4 cnt_NACIS_Description := count(group, f.NACIS_Description <> '');
+unsigned4 cnt_SIC2 := count(group, f.SIC2 <> '');
+unsigned4 cnt_SIC4 := count(group, f.SIC4 <> '');
+unsigned4 cnt_Ethnicity := count(group, f.Ethnicity <> '');
+unsigned4 cnt_Women_Owned := count(group, f.Women_Owned <> '');
+unsigned4 cnt_Ethnic_Owned := count(group, f.Ethnic_Owned <> '');
+unsigned4 cnt_SIC_Description := count(group, f.SIC_Description <> '');
+unsigned4 cnt_Start_Year := count(group, f.Start_Year <> '');
+unsigned4 cnt_Years_in_Business := count(group, f.Years_in_Business <> '');
+unsigned4 cnt_Franchise_Code := count(group, f.Franchise_Code <> '');
+unsigned4 cnt_Source_Code := count(group, f.Source_Code <> '');
+unsigned4 cnt_Business_Title_Category := count(group, f.Business_Title_Category <> '');
+unsigned4 cnt_FIPS_State_County_Code := count(group, f.FIPS_State_County_Code <> '');
+unsigned4 cnt_SOHO := count(group, f.SOHO <> '');
+unsigned4 cnt_ZipPlus4 := count(group, f.ZipPlus4 <> '');
+unsigned4 cnt_CRRT := count(group, f.CRRT <> '');
+unsigned4 cnt_Secondary_SIC := count(group, f.Secondary_SIC <> '');
+unsigned4 cnt_Secondary_SIC_Description := count(group, f.Secondary_SIC_Description <> '');
+unsigned4 cnt_Web_Address := count(group, f.Web_Address <> '');
+unsigned4 cnt_MSA_Code := count(group, f.MSA_Code <> '');
+unsigned4 cnt_New_Business_Flag := count(group, f.New_Business_Flag <> '');
+unsigned4 cnt_Unique_ID := count(group, f.Unique_ID <> '');
+end;
+
+fstat := table(f, layout_compass_stat, few);
+
+output(fstat, all);

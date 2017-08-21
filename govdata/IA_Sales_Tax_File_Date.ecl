@@ -1,1 +1,1 @@
-export IA_Sales_Tax_File_Date := '20050802';
+export IA_Sales_Tax_File_Date := '20070228';

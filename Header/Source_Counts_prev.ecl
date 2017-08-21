@@ -1,4 +1,5 @@
-v := header.file_headers(header.Blocked_data());
+import mdr;
+v := dataset('~thor_data400::base::header_prod',header.Layout_Header,flat)(header.Blocked_data());
 
 slimrec := record
 	v.src;

@@ -1,1 +1,6 @@
-export File_Base :=Dataset(cluster.cluster_in+'base::paw',layout.Employment_Out,flat)(score>'003');
+import ut;
+
+//filtering out low score records. It might change upto test results
+ut.mac_suppress_by_phonetype(files().base.built,phone,state,dsuppressWACellPhones,true,did);	
+
+export File_Base :=dsuppressWACellPhones(score>'003');

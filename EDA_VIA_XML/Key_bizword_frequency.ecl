@@ -1,6 +1,10 @@
-import gong, doxie;
+Import gong, doxie, prte2_gong, Prte2_Business_Header;
 
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+input_recs := prte2_gong.files.Gong_Raw((listing_type_bus = 'B') AND (TRIM(listed_name)<>''));
+#ELSE
 input_recs := gong.File_Gong_Full((listing_type_bus = 'B') AND (TRIM(listed_name)<>''));
+#END;
 
 Layout_extra := RECORD
   STRING30	word;

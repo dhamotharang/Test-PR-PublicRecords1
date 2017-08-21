@@ -121,9 +121,13 @@ VehLic.Layout_Vehicles lJoin_NE_RegTtl(l_NE_RegFiles pRegIn, l_NE_TtlFiles pTtlI
 	self.REG_2_CITY 					:= if(PRegIn.orig_REG_2_NAME <> '',pRegIn.orig_REG_CITY,'');
 	self.REG_2_STATE 					:= if(PRegIn.orig_REG_2_NAME <> '',pRegIn.orig_REG_STATE,'');
 	self.REG_2_ZIP5_ZIP4_FOREIGN_POSTAL	:= if(PRegIn.orig_REG_2_NAME <> '',pRegIn.orig_REG_ZIPCODE,'');
-	self.LH_1_CUSTOMER_NAME				:= 'NOT AVAILABLE';
+	self.LH_1_CUSTOMER_NAME				:= if(pTtlIn.orig_RELEASE_DATE[1..2] != '19' AND pTtlIn.orig_RELEASE_DATE[1..2] != '20', pTtlIn.orig_HOLDER_NAME, '');
+    self.LH_1_STREET_ADDRESS 			:= if(pTtlIn.orig_RELEASE_DATE[1..2] != '19' AND pTtlIn.orig_RELEASE_DATE[1..2] != '20', pTtlIn.orig_HOLDER_ADDRESS, '');
+    self.LH_1_CITY 						:= if(pTtlIn.orig_RELEASE_DATE[1..2] != '19' AND pTtlIn.orig_RELEASE_DATE[1..2] != '20', pTtlIn.orig_HOLDER_CITY, '');
+    self.LH_1_STATE 					:= if(pTtlIn.orig_RELEASE_DATE[1..2] != '19' AND pTtlIn.orig_RELEASE_DATE[1..2] != '20', pTtlIn.orig_HOLDER_STATE, '');
+	//No valid orig_HOLDER_ZIP1. 
+    //self.LH_1_ZIP5_ZIP4_FOREIGN_POSTAL 	:= if(pTtlIn.orig_RELEASE_DATE[1..2] != '19' AND pTtlIn.orig_RELEASE_DATE[1..2] != '20', pTtlIn.orig_HOLDER_ZIP1 + pTtlIn.orig_HOLDER_ZIP2, '');
 	self.TITLE_TYPE						:= pTtlIn.orig_TITLE_TYPE;
-
 	self.own_1_title 	        := pTtlIn.clean_OWNER_1_name_prefix;
 	self.own_1_fname 	        := pTtlIn.clean_OWNER_1_name_first;
 	self.own_1_mname 	        := pTtlIn.clean_OWNER_1_name_middle;
@@ -207,4 +211,4 @@ l_NE_Joined
 		 left.orig_TITLE_NUMBER = right.orig_TITLE_NUMBER,
 		 lJoin_NE_RegTtl(left, right),full outer,local);
 
-export NE_as_Vehicles := l_NE_Joined : persist('Persist::Vehreg_NE_as_Vehicles');
+export NE_as_Vehicles := l_NE_Joined : persist('~thor_data400::persist::vehreg_ne_as_vehicles');

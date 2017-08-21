@@ -31,7 +31,7 @@ AutoKeyB2.MAC_Build (b,
 					Constant(filedate).ak_logical,
 					outaction,false,
 					[],true,'BC',
-					true) 
+					true,,,zero) 
 					
 
 AutoKeyB2.MAC_AcceptSK_to_QA(Constant(filedate).ak_keyname, mymove)

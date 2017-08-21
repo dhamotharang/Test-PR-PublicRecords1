@@ -4,6 +4,9 @@ export FileName(FileName_Info info, Types.FileType dataType,
 	wgen := MAP(gen < 0           => 1,
               info.gens < gen+1 => info.gens,
               gen+1);
+  igen := MAP(gen < 0           => 1,
+              info.incrs< gen+1 => info.incrs,
+              gen+1);
 	STRING MapType(INTEGER fileType) := CASE(fileType,
 													Types.FileTypeEnum.Doc 				=> V'DOC',
 													Types.FileTypeEnum.Inv 				=> V'INV',
@@ -56,7 +59,9 @@ export FileName(FileName_Info info, Types.FileType dataType,
 													V'UNKNOWN');
 	STRING rslt := info.stem + '::' + mapClass(dataType) 
 					+ '::' + info.srcType
-					+ '::' + IF(fPhysical, info.qual, info.genSet[wgen])
+					+ '::' + MAP(fPhysical    => info.qual,
+                       info.incr    => info.incrSet[igen],
+                       info.genSet[wgen])
 					+ '::' + MapType(dataType);
 	RETURN rslt;
 END;

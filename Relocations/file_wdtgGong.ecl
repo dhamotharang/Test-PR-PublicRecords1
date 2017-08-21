@@ -5,11 +5,12 @@
 // doxie.key_nbr_headers_uid
 
 
-import Gong, ut;
+import Gong_Neustar, ut;
 
 
 // where to get the data
-gong_raw := gong.File_Gong_History_full;
+gong_raw := Gong_Neustar.File_History_Full_Prepped_for_Keys;
+
 
 
 // where to put the restructured data
@@ -63,7 +64,7 @@ gong_span_fl := join(
 		and left.prim_range=right.prim_range
 		and left.name_last=right.name_last,
 	transform(layout_span, self.span_last_seen:=right.dt_last_seen, self:=left),
-	keep(1), left outer
+	keep(1), left outer, skew(0.2)
 );
 gong_span := ungroup(gong_span_fl);
 

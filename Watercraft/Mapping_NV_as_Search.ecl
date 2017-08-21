@@ -1,7 +1,10 @@
 
 import lib_stringlib, watercraft;
 
-Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Watercraft.Layout_NV_clean_in L, integer1 C)
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_NV_clean_in, watercraft.Layout_NV_clean_in,hull_clean_in)
+
+
+Watercraft.Layout_Watercraft_Search_Group search_mapping_format(hull_clean_in L, integer1 C)
  :=
   transform
 	self.date_first_seen			:=	if(L.reg_date > L.title_issue_date, L.title_issue_date, L.reg_date);
@@ -48,7 +51,7 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Watercraft.Layou
   end
  ; 
  
-Mapping_NV_as_Search_norm			:= normalize(Watercraft.file_NV_clean_in,5,search_mapping_format(left,counter));
+Mapping_NV_as_Search_norm			:= normalize(hull_clean_in,5,search_mapping_format(left,counter));
 
 
 export Mapping_NV_as_Search         := Mapping_NV_as_Search_norm(clean_pname <> '' or company_name <> '');

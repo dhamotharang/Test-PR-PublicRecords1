@@ -8,4 +8,4 @@ end;
 
 header.Mac_Set_Header_Source(in_file,property.Layout_Fares_Assessor,src_rec,'FA',withUID)
 
-export Assessor_as_Source := withUID : persist('persist::headerbuild_asses_src');
+export Assessor_as_Source := withUID : persist('~thor_data400::persist::headerbuild_asses_src','thor_dell400_2');

@@ -1,0 +1,2 @@
+IMPORT HealthCareFacility;
+export Layout_HealthFacility := HealthCareFacility.Layout_HealthProvider.HealthCareProvider_Header;

@@ -38,7 +38,7 @@ dparty_diff_ssn_fein := dParty(((unsigned)orig_ssn <> (unsigned)append_ssn and (
 rec tra(dParty l) := transform
 	self.addr.st := l.Append_Clean_Address.st;
 	look1 := (unsigned4) ut.bit_set(0,if(l.orig_name_type = '2',0,1 ));
-	age := ut.getage(l.orig_dob);
+	age := ut.Age((UNSIGNED) l.orig_dob);
 	look2 := (unsigned4) ut.bit_set(look1,if(age=0 or age>=18,2,0));
 	self.lookup_bit := look2;
 	self.addr.zip5 := l.Append_Clean_Address.zip5;
@@ -60,7 +60,7 @@ dparty_out1 := project(dParty,tra(left));
 rec tra1(dParty l) := transform
 	self.addr.st := l.Append_Clean_Address.st;
 	look1 := (unsigned4) ut.bit_set(0,if(l.orig_name_type = '2',0,1 ));
-	age := ut.getage(l.orig_dob);
+	age := ut.Age((UNSIGNED) l.orig_dob);
 	look2 := (unsigned4) ut.bit_set(look1,if(age=0 or age>=18,2,0));
 	self.lookup_bit := look2;
 	self.addr.zip5 := l.Append_Clean_Address.zip5;
@@ -86,9 +86,9 @@ d3 :=
 			sort(d2,vehicle_key,iteration_key,sequence_key,local);
 
 rec get_dates(rec l,rec r):=transform
-	self.Reg_Latest_Effective_Date := ut.max2(L.Reg_Latest_Effective_Date,R.Reg_Latest_Effective_Date);
-	self.Reg_Latest_Expiration_Date := ut.max2(L.Reg_Latest_Expiration_Date,R.Reg_Latest_Expiration_Date);		
-	self.Ttl_Latest_Issue_Date := ut.max2(L.Ttl_Latest_Issue_Date, R.Ttl_Latest_Issue_Date);
+	self.Reg_Latest_Effective_Date := MAX(L.Reg_Latest_Effective_Date,R.Reg_Latest_Effective_Date);
+	self.Reg_Latest_Expiration_Date := MAX(L.Reg_Latest_Expiration_Date,R.Reg_Latest_Expiration_Date);		
+	self.Ttl_Latest_Issue_Date := MAX(L.Ttl_Latest_Issue_Date, R.Ttl_Latest_Issue_Date);
 	// self.SRC_FIRST_DATE := ut.min2(L.SRC_FIRST_DATE, R.SRC_FIRST_DATE);
 	// self.SRC_LAST_DATE	:= ut.max2(L.SRC_LAST_DATE, R.SRC_LAST_DATE);
 	self.orig_name_type := if(r.orig_name_type in ['4','5'], r.orig_name_type,l.orig_name_type);

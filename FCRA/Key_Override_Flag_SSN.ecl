@@ -13,7 +13,7 @@ end;
 ds_out := project(ds,proj_recs(left));
 
 kf1 := distribute(ds_out
-				(did <> '' and flag_file_id not in FCRA.Suppress_Flag_File_ID),hash(did,record_id,file_id));
+				((integer)did <> 0 and flag_file_id not in FCRA.Suppress_Flag_File_ID),hash(did,record_id,file_id));
 
 sortkf1 := sort(kf1,did,record_id,file_id,-flag_file_id,local);
 

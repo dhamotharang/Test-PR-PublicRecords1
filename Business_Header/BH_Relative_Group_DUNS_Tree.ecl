@@ -1,7 +1,16 @@
-IMPORT DNB, ut;
+IMPORT DNB_dmi, ut,mdr;
+
+export BH_Relative_Group_DUNS_Tree(
+
+	 dataset(Layout_Business_Header_Temp					)	pBH_Basic_Match_ForRels			= BH_Basic_Match_ForRels	()
+	,dataset(DNB_dmi.Layouts.DUNS_2_Ultimate_DUNS	)	pDUNS_To_Ultimate_DUNS			= DNB_dmi.DUNS_To_Ultimate_DUNS	()
+	,string																					pPersistname								= persistnames().BHRelativeGroupDUNSTree													
+	,boolean																				pShouldRecalculatePersist		= true													
+
+) := FUNCTION
 
 // Initialize match file
-BH_File := Business_Header.BH_Basic_Match_ForRels;
+BH_File := pBH_Basic_Match_ForRels;
 
 Layout_DT_Match := RECORD
 	UNSIGNED6 bdid;           // Seisint Business Identifier
@@ -14,7 +23,7 @@ Layout_DT_Match InitMatchFile(BH_File L) := TRANSFORM
 	SELF := l;
 END;
 
-Match_Init := PROJECT(	BH_File(source = 'D', source_group <> '',
+Match_Init := PROJECT(	BH_File(MDR.sourceTools.SourceIsDunn_Bradstreet(source), source_group <> '',
 								source_group[1] != 'D'), 
 						InitMatchFile(LEFT));
 
@@ -23,12 +32,12 @@ Match_Init_Dedup := DISTRIBUTE(
 
 Layout_DT_Match AddUltimateDUNS(
 			Layout_DT_Match l, 
-			DNB.Layout_DUNS_To_Ultimate_DUNS r) := TRANSFORM
+			DNB_dmi.Layouts.DUNS_2_Ultimate_DUNS r) := TRANSFORM
 	SELF.ultimate_duns := r.ultimate_duns_number;
 	SELF := l;
 END;
 
-ud_joined := JOIN(Match_Init_Dedup, DNB.DUNS_To_Ultimate_DUNS,
+ud_joined := JOIN(Match_Init_Dedup, pDUNS_To_Ultimate_DUNS,
 				LEFT.duns = RIGHT.duns_number,
 				AddUltimateDUNS(LEFT, RIGHT), LOCAL);
 
@@ -46,14 +55,14 @@ END;
 
 layout_id MakeIDLayout(Layout_DT_Match l) := TRANSFORM
 	SELF := l;
+	self.group_id := l.bdid;
 END;
 
 with_id := PROJECT(ud_remainder, MakeIDLayout(LEFT));
-ut.MAC_Sequence_Records(with_id, group_id, matches)
 
 // Take the remainder, and assign the groupid as the lowest bdid
 // with the same ultimate duns number.
-match_sort := SORT(matches, ultimate_duns, bdid, LOCAL);
+match_sort := SORT(with_id, ultimate_duns, group_id, LOCAL);
 match_group := GROUP(match_sort, ultimate_duns, LOCAL);
 
 layout_id AssignGroupId(layout_id l, layout_id r) := TRANSFORM
@@ -75,5 +84,12 @@ relatives_group_duns_tree := PROJECT(GROUP(matches_id),
 relatives_group_duns_tree_dist := DISTRIBUTE(relatives_group_duns_tree,
 								  HASH(bdid1));
 
-EXPORT BH_Relative_Group_DUNS_Tree := relatives_group_duns_tree_dist
-				: PERSIST('TEMP::BH_Relative_Group_DUNS_Tree');
+BH_Relative_Group_DUNS_Tree_persisted := relatives_group_duns_tree_dist
+				: PERSIST(pPersistname);
+
+returndataset := if(pShouldRecalculatePersist = true, BH_Relative_Group_DUNS_Tree_persisted
+																										, persists().BHRelativeGroupDUNSTree
+									);
+return returndataset;
+
+end;

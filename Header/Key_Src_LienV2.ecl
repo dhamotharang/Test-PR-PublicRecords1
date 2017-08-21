@@ -7,7 +7,7 @@ end;
 
 export Key_Src_LienV2(boolean pFastHeader = false, boolean pCombo = true, dataset(src_rec) pDataset=dataset([],src_rec)) := function
 
-liens_as_source := if(pCombo,pDataset,liensv2.LiensV2_as_Source(pFastHeader));
+liens_as_source := if(pCombo,pDataset,header.Files_SeqdSrc(pFastHeader).LiensV2);
 
 mac_key_src(liens_as_source, liensv2.Layout_as_source, 
 						lienv2_child, 

@@ -159,10 +159,41 @@ string10 pretty_zip(string10 pZipIn)
 		 )
 	  );
 
-layout_vehicles make_hist(layout_vehicles le,layout_vehicles ri) := transform
-  self.history := if (le.orig_state='','','H');
-  /*self.dt_last_seen := if(ri.dt_last_seen > 0 and le.dt_first_seen > ri.dt_last_seen,
-						  le.dt_first_seen, ri.dt_last_seen);*/
+rLayout_Vehicles_PlusOwnerRegFlags
+ :=
+  record
+	layout_vehicles;
+	boolean	OwnerFound		:=	false;
+	boolean RegistrantFound	:=	false;
+  end
+ ;
+
+rLayout_Vehicles_PlusOwnerRegFlags	tLayout_Vehicles_PlusOwnerRegFlags(vs_grpd pInput)
+ :=
+  transform
+	self	:=	pInput;
+  end
+ ;
+
+dLayout_Vehicles_PlusOwnerRegFlags	:=	project(vs_grpd,tLayout_Vehicles_PlusOwnerRegFlags(left));
+
+rLayout_Vehicles_PlusOwnerRegFlags make_hist(rLayout_Vehicles_PlusOwnerRegFlags le,rLayout_Vehicles_PlusOwnerRegFlags ri) := transform
+  unsigned1	lOwnerInRightRecord			:=	if(ri.own_1_customer_name <> '',0001b,0000b);
+  unsigned1	lRegistrantInRightRecord	:=	if(ri.reg_1_customer_name <> '',0010b,0000b);
+  unsigned1	lOwnerPreviouslyFound		:=	if(le.OwnerFound,				0100b,0000b);
+  unsigned1	lRegistrantPreviouslyFound	:=	if(le.RegistrantFound,			1000b,0000b);
+  unsigned1	lOwnerRegistrantFlags		:=	lOwnerInRightRecord + lRegistrantInRightRecord + lOwnerPreviouslyFound + lRegistrantPreviouslyFound;
+  self.history							:=	if(lOwnerRegistrantFlags in [0101b,		// Owner previously found, owner-only record
+																		 1010b,		// Registrant previous found, registrant-only record
+																		 1100b,		// Owner previous found, registrant previous found
+																		 1101b,		// Owner previously found, registrant previously found, owner-only record
+																		 1110b,		// Owner previously found, registrant previously found, registrant-only record
+																		 1111b],	// Owner previously found, registrant previously found, owner/registrant record
+											   'H',
+											   ri.history
+											  );
+  self.OwnerFound						:=	le.OwnerFound or (lOwnerInRightRecord <> 0);
+  self.RegistrantFound					:=	le.RegistrantFound or (lRegistrantInRightRecord <> 0);
   i_blank(own_1_prim_range,own_2_prim_range)
   i_blank(own_1_predir,own_2_predir)
   i_blank(own_1_prim_name,own_2_prim_name)
@@ -216,10 +247,19 @@ layout_vehicles make_hist(layout_vehicles le,layout_vehicles ri) := transform
   self := ri;
   end;
 
-res := iterate(vs_grpd,make_hist(left,right)) + vs_ddpd(history = 'E');
+pre_res := iterate(dLayout_Vehicles_PlusOwnerRegFlags,make_hist(left,right));
+
+layout_vehicles	tRemoveOwnerRegFlags(pre_res pInput)
+ :=
+  transform
+	self	:=	pInput;
+  end
+ ;
+
+res		:=	project(pre_res,tRemoveOwnerRegFlags(left))	 + vs_ddpd(history = 'E');
 
 #if(VehLic.BuildType = VehLic.BuildType_Accurint)
-export vehicles_joined := group(res): persist('Persist::VehReg_Vehicles_Joined');
+export vehicles_joined := group(res): persist('~thor_data400::persist::vehreg_vehicles_joined');
 #end
 #if(VehLic.BuildType = VehLic.BuildType_Matrix)
 export vehicles_joined := group(res): persist('Persist::Matrix_VehReg_Vehicles_Joined');

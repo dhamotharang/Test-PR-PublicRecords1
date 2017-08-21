@@ -35,10 +35,10 @@ export macNameCleaner(infile, outfile, fullname1, order1 = 'F', fullname2, order
 
 %prCleanname% := project(%name_key_file%, 
 											transform({recordof(%name_key_file%)},
-													%clean_nameF1F% := Address.CleanPersonFML73(left.fullname1, 'thorclean');
-													%clean_nameF1L% := Address.CleanPersonLFM73(left.fullname1, 'thorclean');
-													%clean_nameF2F% := Address.CleanPersonFML73(left.fullname2, 'thorclean');
-													%clean_nameF2L% := Address.CleanPersonLFM73(left.fullname2, 'thorclean');
+													%clean_nameF1F% := Address.CleanPersonFML73(left.fullname1);
+													%clean_nameF1L% := Address.CleanPersonLFM73(left.fullname1);
+													%clean_nameF2F% := Address.CleanPersonFML73(left.fullname2);
+													%clean_nameF2L% := Address.CleanPersonLFM73(left.fullname2);
 													
 													self.clean_name :=  map(order1 in ['F','f'] and left.fullname1 <> '' => %clean_nameF1F%,
 																									order1 in ['L','l'] and left.fullname1 <> '' => %clean_nameF1L%,
@@ -57,10 +57,10 @@ export macNameCleaner(infile, outfile, fullname1, order1 = 'F', fullname2, order
 #else
 %name_key_join% := project(%name_key_append%, 
 											transform({recordof(%name_key_append%)},
-													%clean_nameF1F% := Address.CleanPersonFML73(left.fullname1, 'thorclean');
-													%clean_nameF1L% := Address.CleanPersonLFM73(left.fullname1, 'thorclean');
-													%clean_nameF2F% := Address.CleanPersonFML73(left.fullname2, 'thorclean');
-													%clean_nameF2L% := Address.CleanPersonLFM73(left.fullname2, 'thorclean');
+													%clean_nameF1F% := Address.CleanPersonFML73(left.fullname1);
+													%clean_nameF1L% := Address.CleanPersonLFM73(left.fullname1);
+													%clean_nameF2F% := Address.CleanPersonFML73(left.fullname2);
+													%clean_nameF2L% := Address.CleanPersonLFM73(left.fullname2);
 													
 													self.clean_name :=  map(order1 in ['F','f'] and left.fullname1 <> '' => %clean_nameF1F%,
 																									order1 in ['L','l'] and left.fullname1 <> '' => %clean_nameF1L%,

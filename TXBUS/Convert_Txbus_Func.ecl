@@ -1,4 +1,4 @@
-import txbus;
+import txbus,mdr;
 import text_search;
 
 export Convert_txbus_Func := function
@@ -12,23 +12,23 @@ export Convert_txbus_Func := function
 	Layout_txbus_record convert_txbus(ds l) := transform
 		self.Taxpayer_Number := l.Taxpayer_Number;
 		self.docref.doc := 0;
-		self.docref.src := transfer('TX',integer2);
+		self.docref.src := transfer(MDR.sourceTools.src_TXBUS,integer2);
 		self.segs := dataset([
 							{1,0,l.taxpayer_name},
 							{2,0,l.taxpayer_address + ' ' + l.taxpayer_city + ' ' + l.taxpayer_state + ' ' +
 										l.taxpayer_zipcode + '-' +	l.taxpayer_county_code},
-							{3,0,l.taxpayer_city},
-							{4,0,l.taxpayer_state},
-							{5,0,l.taxpayer_zipcode + '-' + l.taxpayer_county_code},
+							//{3,0,l.taxpayer_city},
+							//{4,0,l.taxpayer_state},
+							//{5,0,l.taxpayer_zipcode + '-' + l.taxpayer_county_code},
 							{6,0,l.taxpayer_phone + ' ' + l.outlet_phone},
-							{7,0,l.Taxpayer_Org_Type},
+							{7,0,l.Taxpayer_Org_Type_desc},
 							{8,0,l.taxpayer_number },
 							{9,0,l.outlet_name},
 							{10,0,l.outlet_address + ' ' + l.outlet_city + ' ' + l.outlet_state + ' ' +
 										l.outlet_zipcode + '-' +	l.outlet_county_code},
-							{11,0,l.outlet_city },
-							{12,0,l.outlet_state},
-							{13,0,l.outlet_zipcode + '-' + l.outlet_county_code},
+							//{11,0,l.outlet_city },
+							//{12,0,l.outlet_state},
+							//{13,0,l.outlet_zipcode + '-' + l.outlet_county_code},
 							{14,0,l.outlet_naics_code},
 							{15,0,l.Outlet_Permit_Issue_Date},
 							{16,0,l.Outlet_First_Sales_Date},
@@ -62,6 +62,21 @@ export Convert_txbus_Func := function
 
 	iterate_out := iterate(sort_out,iterate_recs(left,right),local);
 
-	return iterate_out(trim(content) <> '' or trim(content) <> ';');
+	// External key
+	
+	layout_txbus_flat MakeKeySegs( iterate_out l, unsigned2 segno ) := TRANSFORM
+		self.Taxpayer_Number := l.Taxpayer_Number;
+        self.docref.doc := l.docref.doc;
+        self.docref.src := l.docref.src;
+		self.segment := segno;
+        self.content := l.Taxpayer_Number;
+        self.sect := 1;
+    END;
+
+    segkeys := PROJECT(iterate_out(trim(content) <> '' and trim(content) <> ';'),MakeKeySegs(LEFT,250));
+
+	full_ret := iterate_out(trim(content) <> '' and trim(content) <> ';') + segkeys;
+	
+	return full_ret;
 	
 end;

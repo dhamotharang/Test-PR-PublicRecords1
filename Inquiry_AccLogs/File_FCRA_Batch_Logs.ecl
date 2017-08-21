@@ -1,1 +1,1 @@
-export File_FCRA_Batch_Logs := dataset('~thor10_231::in::batch_acclogs',Inquiry_AccLogs.Layout_Batch_Logs, csv(separator('|'),quote('"')));
+export File_FCRA_Batch_Logs := dataset('~thor10_231::in::batch_acclogs',Inquiry_AccLogs.Layout_Batch_Logs, csv(separator('|'),quote('"')), opt);

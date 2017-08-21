@@ -44,7 +44,7 @@ EBR_Header_to_bdid := table(EBR_Header_seq, layout_EBR_Header_bdid);
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- BDID records First Pass
 //////////////////////////////////////////////////////////////////////////////////////////////
-Business_Header.MAC_Source_Match(EBR_Header_to_bdid, EBR_Header_bdid_init,
+Business_Header.MAC_Source_Match_BIPAlpha(EBR_Header_to_bdid, EBR_Header_bdid_init,
                         false, bdid,
                         false, 'EB',
                         true,  FILE_NUMBER,
@@ -61,7 +61,7 @@ EBR_Header_bdid_nomatch 	:= EBR_Header_bdid_init(bdid = 0);
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- BDID records Second Pass on address and phone
 //////////////////////////////////////////////////////////////////////////////////////////////
-Business_Header_SS.MAC_Add_BDID_Flex(EBR_Header_bdid_nomatch,
+Business_Header_SS.MAC_Add_BDID_FLEX_BIPAlpha(EBR_Header_bdid_nomatch,
                                   BDID_Matchset,
                                   company_name,
                                   prim_range, prim_name, z5,

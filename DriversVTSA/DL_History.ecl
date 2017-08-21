@@ -179,7 +179,12 @@ TRANSFORM
 	self.license_class := src.LIC_CLASS;
 	self.license_type := src.LICENSE_TYPE;
 	self.orig_state := src.DLSTATE;
-	self.old_dl_number := src.PREV_DL_NUMB;
+	//self.old_dl_number := src.PREV_DL_NUMB;
+	self.oos_previous_dl_number := src.PREV_DL_NUMB;	// modified 2010-05-26
+	self.oos_previous_st := src.PREV_STATE;
+	//
+	self.HAIR_COLOR := src.HAIR_COLOR;	// make this explicit
+	self.EYE_COLOR := src.EYE;
 	//
 	self.source_code := 'D';
 	self.dl_seq := c;
@@ -210,7 +215,7 @@ did_add.MAC_Match_Flex
 	 res)
 */
 
-DriversV2.Layout_DL tScankDLToDL(DL_Source.rScankDLMatrix src, INTEGER c) :=
+export DriversV2.Layout_DL tScankDLToDL(DL_Source.rScankDLMatrix src, INTEGER c) :=
 TRANSFORM
 	id := 'D';		// source id to process
 	// name
@@ -237,7 +242,6 @@ TRANSFORM
 	//self.dl_number := IF(regexfind(id, src.MATRIX_LIC), src.DL_NUMB, '');
 	self.SSN := IF(regexfind(id, src.MATRIX_SSN), src.SSN, '');
 	self.SSN_SAFE := self.SSN;
-	self.DOB := IF(regexfind(id, src.MATRIX_DOB), (unsigned4)src.DATE_CL_DOB, 0);
 	self.sex_flag := IF(regexfind(id, src.MATRIX_SEX), src.GENDER, '');
 	// address fields
 	boolean useaddr := regexfind(id, src.MATRIX_ADDR);
@@ -299,13 +303,182 @@ TRANSFORM
 	self.addr_fix_flag           := '';
 	
 	// other fields
-	self.expiration_date := (unsigned4)src.DATE_CL_EXP;
-	self.lic_issue_date := (unsigned4)src.DATE_CL_ISS;
+/*
+	As per Shannen Baddeley, 2010-07-27
+	For states CT, ME, MN and TN data (only) (orig_state) 
+                               where import date (dt_vendor_last_reported)  > 201001  
+                               and license issue date (lic_issue_date) ccyy = 1910                                
+                               and license expire date (expiration_date) ccyy is > 2000
+                               replace lic_issue_date cc from 19 to 20 
+
+*/
+	self.DOB := IF(regexfind(id, src.MATRIX_DOB), 
+				MAP(
+				// case 2
+				src.DLSTATE = 'TN' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_DOB[1..4] BETWEEN '1900' AND '1910' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_EXP <> '' AND
+				src.DATE_CL_EXP[1..4] > '1910' AND
+				src.LICENSE_TYPE = '70' =>	(unsigned4)src.DATE_CL_DOB + 1000000,
+				
+				
+				// case 4a
+				src.DLSTATE = 'MN' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_DOB[1..4] BETWEEN '1900' AND '1910' AND
+				src.DATE_CL_EXP <> '' AND
+				src.DATE_CL_EXP[1..4] > '1910' AND
+				src.LICENSE_TYPE = 'I' 	=>	(unsigned4)src.DATE_CL_DOB + 1000000,
+			
+				// case 5a
+				src.DLSTATE = 'ME' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_DOB[1..4] BETWEEN '1900' AND '1910' AND
+				src.DATE_CL_EXP <> '' AND
+				src.DATE_CL_EXP[1..4] > '1910' AND
+				src.LICENSE_TYPE = 'SID' 	=>	(unsigned4)src.DATE_CL_DOB + 1000000,
+				
+				(unsigned4)src.DATE_CL_DOB),	// default DOB
+	
+				0);		// dob not in matrix
+
+	self.expiration_date := MAP(
+				// case 2
+				src.DLSTATE = 'TN' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_DOB[1..4] BETWEEN '1900' AND '1910' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_EXP <> '' AND
+				src.DATE_CL_EXP[1..4] BETWEEN '1910' AND '1999' AND
+				src.LICENSE_TYPE = '70' =>	(unsigned4)src.DATE_CL_EXP + 1000000,
+	
+				// case 3
+				src.DLSTATE = 'CT' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_EXP <> '' AND
+				src.DATE_CL_EXP[1..4] BETWEEN '1910' AND '1999'
+														=>	(unsigned4)src.DATE_CL_EXP + 1000000,
+
+				// case 4a
+				src.DLSTATE = 'MN' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_DOB[1..4] BETWEEN '1900' AND '1910' AND
+				src.DATE_CL_EXP <> '' AND
+				src.DATE_CL_EXP[1..4] BETWEEN '1910' AND '1999' AND
+				src.LICENSE_TYPE = 'I' 	=>	(unsigned4)src.DATE_CL_EXP + 1000000,
+
+				// case 4b
+				src.DLSTATE = 'MN' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_DOB[1..4] > '1910' AND
+				src.DATE_CL_EXP <> '' AND
+				src.DATE_CL_EXP[1..4] BETWEEN '1910' AND '1999' AND
+				src.LICENSE_TYPE = 'D' 	=>	(unsigned4)src.DATE_CL_EXP + 1000000,
+				
+				// case 5a
+				src.DLSTATE = 'ME' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_DOB[1..4] BETWEEN '1900' AND '1910' AND
+				src.DATE_CL_EXP <> '' AND
+				src.DATE_CL_EXP[1..4] BETWEEN '1910' AND '1999' AND
+				src.LICENSE_TYPE = 'SID' 	=>	(unsigned4)src.DATE_CL_EXP + 1000000,
+				
+				// case 5b
+				src.DLSTATE = 'ME' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_DOB[1..4] > '1910' AND
+				src.DATE_CL_EXP <> '' AND
+				src.DATE_CL_EXP[1..4] BETWEEN '1910' AND '1999' AND
+				src.LICENSE_TYPE = 'SID' 	=>	(unsigned4)src.DATE_CL_EXP + 1000000,
+				
+						(unsigned4)src.DATE_CL_EXP);
+	
+	self.lic_issue_date := MAP(
+				// original case
+				src.DLSTATE in ['CT', 'ME', 'MN', 'TN','MO'] AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_EXP[1..2] = '20' =>	(unsigned4)src.DATE_CL_ISS + 1000000,
+									
+				// case 1
+				src.DLSTATE = 'TN' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_EXP = '' 	=>	(unsigned4)src.DATE_CL_ISS + 1000000,
+				
+				// case 2
+				src.DLSTATE = 'TN' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_DOB[1..4] BETWEEN '1900' AND '1910' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_EXP <> '' AND
+				src.DATE_CL_EXP[1..4] > '1910' AND
+				src.LICENSE_TYPE = '70' =>	(unsigned4)src.DATE_CL_ISS + 1000000,
+				
+				// case 3
+				src.DLSTATE = 'CT' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_EXP[1..4] > '1910' 	=>	(unsigned4)src.DATE_CL_ISS + 1000000,
+				
+				// case 4a
+				src.DLSTATE = 'MN' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_DOB[1..4] BETWEEN '1900' AND '1910' AND
+				src.DATE_CL_EXP <> '' AND
+				src.DATE_CL_EXP[1..4] > '1910' AND
+				src.LICENSE_TYPE = 'I' 	=>	(unsigned4)src.DATE_CL_ISS + 1000000,
+				
+				// case 4b
+				src.DLSTATE = 'MN' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_DOB[1..4] > '1910' AND
+				src.DATE_CL_EXP <> '' AND
+				src.DATE_CL_EXP[1..4] > '1910' AND
+				src.LICENSE_TYPE = 'D' 	=>	(unsigned4)src.DATE_CL_ISS + 1000000,
+				
+				// case 5a
+				src.DLSTATE = 'ME' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_DOB[1..4] BETWEEN '1900' AND '1910' AND
+				src.DATE_CL_EXP <> '' AND
+				src.DATE_CL_EXP[1..4] > '1910' AND
+				src.LICENSE_TYPE = 'SID' 	=>	(unsigned4)src.DATE_CL_ISS + 1000000,
+				
+				// case 5b
+				src.DLSTATE = 'ME' AND
+				src.IMPORT_DATE[5..8] = '2010' AND
+				src.DATE_CL_ISS[1..4] = '1910' AND
+				src.DATE_CL_DOB[1..4] > '1910' AND
+				src.DATE_CL_EXP <> '' AND
+				src.DATE_CL_EXP[1..4] > '1910' AND
+				src.LICENSE_TYPE = 'SID' 	=>	(unsigned4)src.DATE_CL_ISS + 1000000,
+				
+				// default
+				(unsigned4)src.DATE_CL_ISS);
+									
 	self.orig_issue_date := (unsigned4)src.DATE_CL_ORIG;
 	self.license_class := src.LIC_CLASS;
 	self.license_type := src.LICENSE_TYPE;
 	self.orig_state := src.DLSTATE;
-	self.old_dl_number := src.PREV_DL_NUMB;
+	//self.old_dl_number := src.PREV_DL_NUMB;
+	self.oos_previous_dl_number := src.PREV_DL_NUMB;	// modified 2010-05-26
+	self.oos_previous_st := src.PREV_STATE;
+	//
+	self.HAIR_COLOR := src.HAIR_COLOR;	// make this explicit
+	self.EYE_COLOR := src.EYE;
 	//
 	self.source_code := 'D';
 	self.dl_seq := c;
@@ -410,7 +583,12 @@ TRANSFORM
 	self.license_class := src.LIC_CLASS;
 	self.license_type := src.LICENSE_TYPE;
 	self.orig_state := src.DLSTATE;
-	self.old_dl_number := src.PREV_DL_NUMB;
+	//self.old_dl_number := src.PREV_DL_NUMB;
+	self.oos_previous_dl_number := src.PREV_DL_NUMB;	// modified 2010-05-26
+	self.oos_previous_st := src.PREV_STATE;
+	//
+	self.HAIR_COLOR := src.HAIR_COLOR;	// make this explicit
+	self.EYE_COLOR := src.EYE;
 	//
 	self.source_code := 'D';
 	self.dl_seq := c;
@@ -442,7 +620,8 @@ did_add.MAC_Match_Flex
 	 75,
 	 res)
 
-export DL := res;
+//export DL := res;
+export DL := distribute(res, hash(dl_seq));
 
 
 END;

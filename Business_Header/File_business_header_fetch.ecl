@@ -1,6 +1,13 @@
 import Business_Header,address,Business_Header_SS;
+export File_business_header_fetch(
 
-h := Business_Header.File_Business_Header_Base_for_keybuild;
+	 dataset(Layout_Business_Header_Base_Plus_Orig)	pbh						= Business_Header.File_Business_Header_Base_for_keybuild
+	,string																					pPersistname	= persistnames().FileBusinessHeaderFetch
+
+) :=
+function
+
+h := pbh;
 
 look := distribute(project(h,transform(Layouts.File_Hdr_Biz_Keybuild_Layout,
 	self.prim_name := left.prim_name,
@@ -39,21 +46,25 @@ j := JOIN(PostMultiCity, look, LEFT.rcid = RIGHT.rcid, rejoin(LEFT, RIGHT), HASH
 
 Business_Header_SS.layout_MakeCNameWords proj(j le, unsigned c) :=
 TRANSFORM
-	self.company_name := choose(c,le.cname,datalib.companyclean(le.cname)[1..40]);
+	self.company_name := choose(c,le.cname,datalib.companyclean(le.cname));
 	self.state := le.state;
 	self.__filepos := le.rcid;
+  self.bdid := le.rcid;
 	self 			:= le;
 END;
 
-p := NORMALIZE(j(cname<>''), 2, proj(LEFT,COUNTER));
-f := business_header_ss.Fn_MakeCNameWords(p);
+p1 := PROJECT(j(cname<>''), proj(LEFT,1));
+p2 := PROJECT(j(cname<>''), proj(LEFT,2));
+f1 := business_header_ss.Fn_MakeCNameWords(p1);
+f2 := business_header_ss.Fn_MakeCNameWords(p2);
 
-j3 := distribute(j,hash(bdid));
-f3 := distribute(f,hash(bdid));
+j3 := distribute(j,rcid);
+f3 := distribute(f1 + f2,bh_filepos);
 
 final := join(j3,f3,left.rcid = right.bh_filepos,transform(Layouts.File_Hdr_Biz_Keybuild_Layout,
 	self.word := right.word,
-	self := left),local);
-
-export File_business_header_fetch := final
-	: persist(persistnames().FileBusinessHeaderFetch);
+	self := left),local)
+	: persist(pPersistname)
+	;
+return final;
+end;

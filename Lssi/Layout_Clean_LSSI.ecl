@@ -1,6 +1,7 @@
 //Clean_In_LSSI is the record format of the cleaned LSSI file
 EXPORT Layout_Clean_LSSI := RECORD
        Lssi.Layout_In;                       //layout of the raw data
+			 unsigned8 rawAIDin := 0;
        STRING10        prim_range;           //fields prime_range to err_stat are parsed 
        STRING2         predir;               //from field clean 
        STRING28        prim_name;            

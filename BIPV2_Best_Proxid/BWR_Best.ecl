@@ -1,6 +1,7 @@
 //This is the code to execute in a builder window
-#workunit('name','BIPV2_Best_Proxid.BWR_Best - BEST - SALT V2.8 Gold SR1');
-IMPORT BIPV2_Best_Proxid,SALT28;
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','BIPV2_Best_Proxid.BWR_Best - BEST - SALT V3.0 Gold');
+IMPORT BIPV2_Best_Proxid,SALT30;
 //Best is generated automatically by proc_iterate - this file can perform best production independently//If you just want to test best - it is easier to build the keys and then use the best service
 // BIPV2_Best_Proxid.Keys(BIPV2_Best_Proxid.In_Base).BuildData;
 // The statistics for the best (also builds all the persists)

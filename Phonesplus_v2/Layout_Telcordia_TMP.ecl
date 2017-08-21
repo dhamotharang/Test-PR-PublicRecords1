@@ -1,0 +1,93 @@
+export Layout_Telcordia_TMP := module
+export Layout_in_TMP	:= record
+  string3 	npa;
+  string3 	nxx;
+  string1 	block_id;
+  string1 	filler1;
+  string8 	range;
+  string2 	nxx_type;
+  string1 	filler2;
+  string6 	eff_last_change;
+  string1 	change_code;
+  string1 	filler3;
+  string4 	ocn;
+  string4 	aocn;
+  string2 	company_code;
+  string1 	company_type;
+  string3 	bill_to_rao;
+  string3 	send_to_rao;
+  string1 	filler4;
+  string5 	major_vert_coord;
+  string5 	major_horiz_coord;
+  string3 	rate_center_lata;
+  string2 	rate_center_lata_sub;
+  string10 	rate_center_name_abb;
+  string1 	rate_center_type;
+  string10 	place_name;
+  string2 	state;
+  string1 	filler5;
+  string1 	tz;
+  string1 	daylight_savings;
+  string1 	portability;
+  string1 	thousand_block_pooling;
+  string1 	iddd_ind;
+  string1 	dialable_ind;
+  string2 	other_line_rate_step;
+  string1 	point_id;
+  string6 	eff_date_assign;
+  string11 	filler6;
+  string1  	crlf;
+end;
+
+export Layout_In_OCN	:= record
+  string4 	ocn;
+  string30 	co_name;
+  string1 	change_code;
+  string7 	filler;
+  string1	crlf;
+end;
+
+export Layout_In_PLNAME	:= record
+  string2 	state;
+  string1 	filler1;
+  string10 	place_abbr;
+  string1 	filler2;
+  string50 	place_name;
+  string1	crlf;
+end;
+
+export Layout_Out_TMP := record
+  string3 	npa;
+  string3 	nxx;
+  string1 	block_id;
+  string8 	range;
+  string2 	nxx_type;
+  string6 	eff_last_change;
+  string1 	change_code;
+  string4 	ocn;
+  string4 	aocn;
+  string2 	company_code;
+  string1 	company_type;
+  string3 	bill_to_rao;
+  string3 	send_to_rao;
+  string5 	major_vert_coord;
+  string5 	major_horiz_coord;
+  string3 	rate_center_lata;
+  string2 	rate_center_lata_sub;
+  string10 	rate_center_name_abb;
+  string1 	rate_center_type;
+  string10 	place_name;
+  string2 	state;
+  string1 	tz;
+  string1 	daylight_savings;
+  string1 	portability;
+  string1 	thousand_block_pooling;
+  string1 	iddd_ind;
+  string1 	dialable_ind;
+  string2 	other_line_rate_step;
+  string1 	point_id;
+  string6 	eff_date_assign;
+  string30 	co_name;
+  string10 	place_abbr := '';
+end;
+end;

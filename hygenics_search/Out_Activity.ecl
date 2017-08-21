@@ -1,4 +1,5 @@
-export Out_Activity := 
-					output(Activity_Joined(offender_key[1..4] not in Hygenics_Search.Sex_Offenders_Not_Updating.SO_By_Key
-							and vendor not in Hygenics_Search.Sex_Offenders_Not_Updating.SO_By_Source)
-							,,'~thor_data400::base::fcra_criminal_activity_' + Version.Development, overwrite, __compressed__);
+import PromoteSupers, doxie_build;
+
+	PromoteSupers.MAC_SF_BuildProcess(Activity_Joined,'~thor_data400::base::corrections_activity_' + doxie_build.buildstate, a, 2, , true)
+
+export Out_Activity := a;

@@ -1,0 +1,43 @@
+export Layout_OH_Hancock_Old := record
+
+string ID;
+string Name;
+string FirstName;
+string MiddleName;
+string LastName;
+string Suffix;
+string DOB;
+string Address;
+string City;
+string State;
+string Zip;
+string Alias;
+string Caption;
+string Prelim_Case_Num;
+string Jurisdiction;
+string Attorney;
+string Action_Code;
+string Descr;
+string Degree;
+string Charge_Descr;
+string Offense_Dt;
+string Arrest_Dt;
+string Officer;
+string Complainant;
+string Prosecutor;
+string Judge;
+string Case_Num;
+string Case_Filed;
+string Case_Status;
+string Trans_Filed;
+string MCArrest;
+string Case_Comments;
+string Party_Name;
+string Party_Type;
+string Disp_Status;
+string Disp_Status_Dt;
+string Disp_Code;
+string Disp_Dt;
+string Disp_Action_Code;
+
+end;

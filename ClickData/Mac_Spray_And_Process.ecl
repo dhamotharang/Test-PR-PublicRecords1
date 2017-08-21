@@ -13,7 +13,7 @@ export Mac_Spray_And_Process(srcIP,inpath, dstIP, outpath, appends = 'false') :=
 	#uniquename(spray)
 	#uniquename(build_super)
 	%pre_spray% := fileservices.clearSuperFile('~thor_data400::in::clickdata');
-	%spray% := FileServices.SprayVariable(srcIP,inpath, %insize%, ',','\\n,\\r\\n','\'','thor_dell400','~thor_data400::in::clickdata_' + %today% ,-1,,,true,true);
+	%spray% := FileServices.SprayVariable(srcIP,inpath, %insize%, ',','\\n,\\r\\n','\'','thor400_92','~thor_data400::in::clickdata_' + %today% ,-1,,,true,true);
 	%build_super% := sequential(
                  FileServices.StartSuperFileTransaction(),
 			  FileServices.ClearSuperFile('~thor_data400::in::clickdata'),

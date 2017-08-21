@@ -1,9 +1,9 @@
 import UCCD;
 
-p := dataset('~thor_data400::base::ucc_debtor_wexp_deduped_'+ uccd.version_development,{uccd.rec_WithExpParty,unsigned8 __filepos { virtual(fileposition)}}, flat);
+p := dataset('~thor_data400::base::ucc_debtor_wexp_deduped_'+ uccd.version_development,{uccd.layout_Moxie_WithExpParty,unsigned8 __filepos { virtual(fileposition)}}, flat);
 
 Layout_WithExpPartyExpanded_Filepos := record
-	uccd.layout_WithExpPartyExpanded;
+	uccd.layout_Moxie_WithExpPartyExpanded;
     unsigned integer8 __filepos { virtual(fileposition)};
 end;
 

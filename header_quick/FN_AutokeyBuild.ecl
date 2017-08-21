@@ -6,7 +6,9 @@ FUNCTION
 
 
 //***** Extra fields to make macro happy 
-go := project(head, header_quick.layout_Autokey - _Control.Layout_KeyExclusions);
+//map date_first_seen when date_last_seen is 0
+go := project(head,transform(header_quick.layout_Autokey - layout_header_exclusions, 
+self.dt_last_seen  := if(left.dt_last_seen = 0, left.dt_first_seen, left.dt_last_seen), self := left));
 
 //***** Build autokeys
 inkeyname := header_quick.str_AutokeyName;

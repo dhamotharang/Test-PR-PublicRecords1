@@ -1,1 +1,1 @@
-export file_CBDAttributes := dataset('~thor_data400::base::testseed_cbdattributes', Layout_CBDAttributes, csv(maxlength(8192)));
+export file_CBDAttributes := dataset('~thor_data400::base::testseed_cbdattributes', Layout_CBDAttributes, csv(maxlength(20000)));

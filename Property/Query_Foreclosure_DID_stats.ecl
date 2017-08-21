@@ -1,4 +1,4 @@
-import property,lib_keylib,lib_fileservices,ut;
+import property,lib_keylib,lib_fileservices,ut,_Control;
 
 // Dataset ****************************************************************************************
 
@@ -72,7 +72,7 @@ my_did_stats := JOIN(stat_table_did,stat_table, LEFT.st = RIGHT.st, GetCounts(LE
 
 stat_out := output(my_did_stats(str_st <> ''),,'out::foreclosure_did_stats',overwrite);
 
-file_despray := lib_fileservices.fileservices.Despray('~thor_data400::out::foreclosure_did_stats','192.168.0.39',
+file_despray := lib_fileservices.fileservices.Despray('~thor400_92::out::foreclosure_did_stats', _Control.IPAddress.edata12,
  									'/thor_back5/fares/foreclosure/build/foreclosure_stats',,,,TRUE);
 
 export Query_Foreclosure_DID_Stats := sequential(stat_out,file_despray);

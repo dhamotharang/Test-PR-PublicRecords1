@@ -7,8 +7,27 @@ function
 	 :=
 	  record
 	    Calbus.File_Calbus_Base.BUSINESS_STATE;
-		CountGroup 									      := count(group);
-		bdid_ContNonZero                                  := sum(group,if(Calbus.File_Calbus_Base.bdid<>0,1,0));
+		CountGroup 									      								:= count(group);
+		bdid_ContNonZero        	                        := sum(group,if(Calbus.File_Calbus_Base.bdid<>0,1,0));
+		DotID_CountNonZeros	 												 			:= sum(group,if(Calbus.File_Calbus_Base.DotID<>0,1,0));
+		DotScore_CountNonZeros	  									 			:= sum(group,if(Calbus.File_Calbus_Base.DotScore<>0,1,0));
+		DotWeight_CountNonZeros	 										 			:= sum(group,if(Calbus.File_Calbus_Base.DotWeight<>0,1,0));
+		EmpID_CountNonZeros	   											 			:= sum(group,if(Calbus.File_Calbus_Base.EmpID<>0,1,0));
+ 		EmpScore_CountNonZeros	 									   			:= sum(group,if(Calbus.File_Calbus_Base.EmpScore<>0,1,0));
+		EmpWeight_CountNonZeros	 				             			:= sum(group,if(Calbus.File_Calbus_Base.EmpWeight<>0,1,0));
+		POWID_CountNonZeros	                         			:= sum(group,if(Calbus.File_Calbus_Base.POWID<>0,1,0));
+		POWScore_CountNonZeros	                     			:= sum(group,if(Calbus.File_Calbus_Base.POWScore<>0,1,0));
+		POWWeight_CountNonZeros	                     			:= sum(group,if(Calbus.File_Calbus_Base.POWWeight<>0,1,0));
+		ProxID_CountNonZeros	                       			:= sum(group,if(Calbus.File_Calbus_Base.ProxID<>0,1,0));
+		ProxScore_CountNonZeros	                     			:= sum(group,if(Calbus.File_Calbus_Base.ProxScore<>0,1,0));
+		ProxWeight_CountNonZeros	                        := sum(group,if(Calbus.File_Calbus_Base.ProxWeight<>0,1,0));
+		OrgID_CountNonZeros	                         			:= sum(group,if(Calbus.File_Calbus_Base.OrgID<>0,1,0));
+		OrgScore_CountNonZeros	                     			:= sum(group,if(Calbus.File_Calbus_Base.OrgScore<>0,1,0));
+		OrgWeight_CountNonZeros	                     		  := sum(group,if(Calbus.File_Calbus_Base.OrgWeight<>0,1,0));
+		UltID_CountNonZeros	                         			:= sum(group,if(Calbus.File_Calbus_Base.UltID<>0,1,0));
+		UltScore_CountNonZeros	                     			:= sum(group,if(Calbus.File_Calbus_Base.UltScore<>0,1,0));
+		UltWeight_CountNonZeros	                     			:= sum(group,if(Calbus.File_Calbus_Base.UltWeight<>0,1,0));		
+		source_rec_id_CountNonZeros	                 			:= sum(group,if(Calbus.File_Calbus_Base.source_rec_id<>0,1,0));				
 		Process_date_CountNonBlank                        := sum(group,if(Calbus.File_Calbus_Base.Process_date<>'',1,0));
 		dt_first_seen_CountNonBlank                       := sum(group,if(Calbus.File_Calbus_Base.dt_first_seen<>'',1,0));
 		dt_last_seen_CountNonBlank                        := sum(group,if(Calbus.File_Calbus_Base.dt_last_seen<>'',1,0));
@@ -106,7 +125,7 @@ function
 
 	  STRATA.createXMLStats(dPopulationStats_Calbus__File_Calbus_Base,
 						    'Calbus V2',
-						    'data',
+						    'baseV1',
 						    filedate,
 						    '',
 						    resultsOut,

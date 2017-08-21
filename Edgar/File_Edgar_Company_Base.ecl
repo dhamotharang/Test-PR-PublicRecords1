@@ -1,1 +1,2 @@
-export File_Edgar_Company_Base := dataset('~thor_data400::BASE::Edgar_Company', Layout_Edgar_Company, flat);
+import ut;
+export File_Edgar_Company_Base := project(edgar.File_Edgar_Company_Base_BIP,transform(Layout_Edgar_Company,self := left));

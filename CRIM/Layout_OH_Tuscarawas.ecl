@@ -1,0 +1,47 @@
+export Layout_OH_Tuscarawas := record
+
+string ID;
+string Defendant;
+string FirstName;
+string MiddleName;
+string LastName;
+string Suffix;
+string DOB;
+string Address;
+string City;
+string State;
+string Zip;
+string Phone;
+string Caption;
+string DefendantAttorney;
+string Type1;
+string Type_Descr;
+string Case_Num;
+string Case_Status;
+string Case_Filed;
+string Party_Name;
+string Party_Type;
+string Disp_Status;
+string Disp_Status_Dt;
+string Disp_Code;
+string Disp_Dt;
+string Charge_Num;
+string Charge_PleaCode;
+string Charge_PleaCode_Dt;
+string Charge_Decision;
+string Charge_Decision_Dt;
+string Charge_Disp_Dt;
+string Charge_Disp_Code;
+string Charge_Ticket_Num;
+string Charge_Action_Code;
+string Charge_Offense_Descr;
+string Charge_Descr;
+string Charge_Degree_Offense;
+string Charge_Indict_Charge;
+string Charge_AMD_Charge;
+string Charge_AMD_Charge_DGOF;
+string Charge_ACNT_Change__Dt;
+string Charge_Counts;
+string Charge_Misc_Track;
+
+end;

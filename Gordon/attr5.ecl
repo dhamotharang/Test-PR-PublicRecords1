@@ -1,0 +1,1 @@
+export attr5 := attr4;//2

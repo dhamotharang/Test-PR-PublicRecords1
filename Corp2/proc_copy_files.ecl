@@ -4,8 +4,8 @@ export proc_copy_files(boolean pToDataland = true, boolean isTesting = true) :=
 function
 
 	all_files_to_copy :=  
-/*						  filenames.dBoth		// commented out because still can't copy compressed files
-						+ */keynames.dBoth
+/*						  filenames.dall_filenames		// commented out because still can't copy compressed files
+						+ */keynames().dall_filenames
 						;
 	
 	VersionControl.Layout_fCopyFiles.Input tgetsuperfiles(versioncontrol.layout_versions.builds l) :=

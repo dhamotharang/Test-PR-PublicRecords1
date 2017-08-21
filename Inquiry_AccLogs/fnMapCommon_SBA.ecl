@@ -4,7 +4,12 @@ export fnMapCommon_SBA := module
 
 export ready_file := function
 
-SBA_daily_in := inquiry_acclogs.File_SBA_Logs.input(regexfind('SMLLBUSANALYTICS|SMBUSAN_|RELIDENTSEARCH',stringlib.stringtouppercase(function_name)));
+SBA_daily_in := inquiry_acclogs.File_SBA_Logs.input
+           (regexfind(
+					            'SMLLBUSANALYTICS|SMBUSAN_|RELIDENTSEARCH|CP_RELIDENTRPT|VERIFICATION|AUTHENTICATION'
+					            ,stringlib.stringtouppercase(function_name)
+											)
+						);
 //clean fields
 inquiry_acclogs.fncleanfunctions.cleanfields(SBA_daily_in, cleaned_fields);
 

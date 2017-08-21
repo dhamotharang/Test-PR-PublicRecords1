@@ -1,13 +1,5 @@
-import ut;
-/*Uses super file.  To add a new file:
-SEQUENTIAL(
-FileServices.StartSuperFileTransaction(),
-FileServices.ClearSuperFile('~thor_data400::Base::Death_Master'),
-FileServices.AddSuperFile('~thor_data400::Base::Death_Master','~thor_data400::in::death_master_20040203'),
-FileServices.FinishSuperFileTransaction()
-);
-*/
-d := dataset('~thor_data400::Base::Death_Master_Plus',header.layout_death_master_plus,flat);
+import Data_Services,ut;
+d := dataset(Data_Services.Data_location.prefix('Death')+'~thor_data400::Base::Death_Master_Plus',header.layout_death_master_plus,flat);
 
 layout_death_master_plus clean(d le) := transform
   self.dod8 := le.dod8[5..8]+le.dod8[1..4];

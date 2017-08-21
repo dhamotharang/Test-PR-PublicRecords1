@@ -1,1 +1,1 @@
-export File_6500_Government_Trade_Base := dataset(FileName_6500_Government_Trade_Base, Layout_6500_Government_Trade_Base,flat) : global;
+export File_6500_Government_Trade_Base := dataset(FileName_6500_Government_Trade_Base, Layout_6500_Government_Trade_Base,flat);

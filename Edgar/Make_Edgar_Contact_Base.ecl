@@ -1,4 +1,4 @@
-import ut, did_add, didville, header_slimsort, Business_Header;
+import ut, did_add, didville, header_slimsort, Business_Header,address;
 
 // Clean person names
 edgar_contacts := Edgar.File_Edgar_Contact_In;
@@ -14,7 +14,7 @@ self.organization := stringlib.StringToUpperCase(l.organization);
 self.status := stringlib.StringToUpperCase(l.status);
 self.startdate := stringlib.StringToUpperCase(l.startdate);
 self.enddate := stringlib.StringToUpperCase(l.enddate);
-self.cleanName := addrcleanlib.cleanPerson73(TRIM(l.firstname) + IF(L.middlename <> '', (' ' + TRIM(l.middlename) + ' '), ' ') + TRIM(l.lastname) + ' ' + TRIM(l.suffix));
+self.cleanName := address.cleanPerson73(TRIM(l.firstname) + IF(L.middlename <> '', (' ' + TRIM(l.middlename) + ' '), ' ') + TRIM(l.lastname) + ' ' + TRIM(l.suffix));
 self := l;
 end;
 
@@ -50,7 +50,7 @@ edgar_contacts_combined := join(edgar_contacts_clean_dist,
 
 // Filter out bad names, company names
 edgar_contacts_filtered := edgar_contacts_combined(confidence in ['0','1'],
-                                                    (integer)name_score > 90,
+                                                    Address.Business.GetNameType(firstname + ' ' + middlename + ' ' + lastname + ' ' + suffix) in ['P','D'],
                                                     (integer)(Business_Header.CleanName(firstname,middlename,lastname,suffix)[142]) < 2,
                                                     Business_Header.CheckPersonName(firstname,middlename,lastname,suffix),
                                                     not (fname='U' and middlename = 'S'),

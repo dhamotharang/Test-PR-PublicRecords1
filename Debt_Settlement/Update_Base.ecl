@@ -19,8 +19,8 @@ function
 	dPrepRSIHFile								:= Prep_File().RSIH(pSprayedRSIHFile);
 	dStandardizedInputRSIHFile	:= Standardize_Input.fAllRSIH	(dPrepRSIHFile,pversion);
 	
-	// Build record set from the best businesee header file it pUseBusHeader is true, otherwise create empty record set
-	dPrepBusHeaderFile := if(pUseBusHeader,Prep_File().BusHeader(),dataset([],Layouts.base)); 
+	// Build record set from the best business header file if pUseBusHeader is true, otherwise create empty record set
+	dPrepBusHeaderFile := if(pUseBusHeader,Prep_File().BusHeader(,pBusHeaderBestFile,pBusSICRecs),dataset([],Layouts.base)); 
 
 	base_file								:= project(pBaseFile, transform(Layouts.Base, self.record_type := 'H'; self := left));
 	

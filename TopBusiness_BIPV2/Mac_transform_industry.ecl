@@ -27,9 +27,9 @@ EXPORT Mac_transform_industry (pInputfile		// Input File
 %sBlank%:='';
 		pOutputFile := project(pInputfile,
 		  transform(TopBusiness_BIPV2.Layouts.rec_industry_combined_layout,
-	      self.source        := psource,
+	      self.source        := left.psource,
 			  self.source_docid  := (string) left.psource_docid,
-			  self.source_rec_id := (string) left.psource_rec_id,
+			  self.source_rec_id := left.psource_rec_id,
 			  self.siccode       := IF(busesic,left.psiccode,''),
 				self.naics         := IF(busenaic,left.pnaics,''),
 				self.industry_description := IF(buseIndustry,left.pindustry_description,''),

@@ -1,4 +1,4 @@
-import WorldCheck, lib_stringlib, lib_AddrClean;
+import WorldCheck, lib_stringlib, address;
 
 export WorldCheck_child_datasets(string filedate) := function
 
@@ -19,9 +19,9 @@ end;
 Layout_out := 	WorldCheck.Layout_WorldCheck_Cleaned.Layout_WorldCheck_Main;
 
 // File from which to have the child datasets constructed
-in_file := WorldCheck.File_WorldCheck_In;
+in_file := sort(distribute(WorldCheck.File_WorldCheck_In, hash32(uid)), uid, local);
 // File to which the child datasets will be joined upon completion
-in_file_normalized := WorldCheck.File_WorldCheck_In_Normalized;
+in_file_normalized := sort(distribute(WorldCheck.File_WorldCheck_In_Normalized, hash32(uid)), uid, local);
 
 // Shared parsing patterns for most
 pattern SingleValue   := pattern('[^;]+');
@@ -82,12 +82,15 @@ end;
 	   self            := L;
 	end;
 
-	j_POB := JOIN(in_file_normalized
+	jn_POB := JOIN(in_file_normalized
 				 ,POB_out
 				 ,left.UID = right.UID
 				 ,join_POB(left,right)
 				 ,LOCAL
 				 ,LEFT OUTER);
+				 
+	j_POB	:= sort(distribute(jn_POB, hash32(uid)), uid, local);
+	
 /* End join of the POB data*/
 
 /* Join the Passport data to the normalized primary records */
@@ -102,12 +105,15 @@ end;
 	   self                 := L;
 	end;
 
-	j_Passport := JOIN(j_POB
+	jn_Passport := JOIN(j_POB
 					  ,Passport_out
 					  ,left.UID = right.UID
 					  ,join_Passport(left,right)
 				      ,LOCAL
 					  ,LEFT OUTER);
+					  
+	j_Passport	:= sort(distribute(jn_Passport, hash32(uid)), uid, local);
+	
 /* End join of the Passport data*/
 
 /* Join the Country data to the normalized primary records */
@@ -122,12 +128,15 @@ end;
 	   self                := L;
 	end;
 
-	j_Country := JOIN(j_Passport
+	jn_Country := JOIN(j_Passport
 					  ,Country_out
 					  ,left.UID = right.UID
 					  ,join_Country(left,right)
 				      ,LOCAL
 					  ,LEFT OUTER);
+	
+	j_Country	:= sort(distribute(jn_Country, hash32(uid)), uid, local);
+	
 /* End join of the Country data*/
 
 /* Join the Company data to the normalized primary records */
@@ -142,12 +151,15 @@ end;
 	   self                := L;
 	end;
 
-	j_Company := JOIN(j_Country
+	jn_Company := JOIN(j_Country
 					 ,Company_out
 					 ,left.UID = right.UID
 					 ,join_Company(left,right)
 				     ,LOCAL
 					 ,LEFT OUTER);
+					 
+	j_Company := sort(distribute(jn_Company, hash32(uid)), uid, local);				 
+	
 /* End join of the Company data*/
 
 /* Join the Linked To data to the normalized primary records */
@@ -162,12 +174,15 @@ end;
 	   self                  := L;
 	end;
 
-	j_Linked_To := JOIN(j_Company
+	jn_Linked_To := JOIN(j_Company
 					   ,Linked_To_out
 					   ,left.UID = right.UID
 					   ,join_Linked_To(left,right)
 				       ,LOCAL
 					   ,LEFT OUTER);
+					   
+	j_Linked_To := sort(distribute(jn_Linked_To, hash32(uid)), uid, local);				   
+	
 /* End join of the Linked To data*/
 
 /* Join the Keyword data to the normalized primary records */
@@ -195,7 +210,7 @@ end;
 Layout_out t_clean_out(j_all_data L) := TRANSFORM
     // Capture the clean name values
     string temp_pname  := if(L.e_i_ind = 'I'
-	                        ,lib_AddrClean.AddrCleanLib.CleanPersonLFM73(L.Name_Orig)
+	                        ,address.CleanPersonLFM73(L.Name_Orig)
 							,'');
     // Find the comma within the full names for parsing into first and last when not already parsed
     unsigned integer4 name_comma := if(L.e_i_ind = 'I'
@@ -226,9 +241,12 @@ Layout_out t_clean_out(j_all_data L) := TRANSFORM
     string30  temp_Address2 := if(lib_stringlib.StringLib.StringFind(temp_Address_1,',',1) > 0
 	                             ,trim(temp_Address_1[1..lib_stringlib.StringLib.StringFind(temp_Address_1,',',1)-1],left,right)
 				  				 ,temp_Address_2);
-	string30  temp_Address_Country := trim(L.location[tilda_two + 1..],left,right);
+		temp_Addr_Country := trim(L.location[tilda_two + 1..],left,right);
+	string30 temp_address_country := if(DataLib.StringFind(temp_Addr_Country, ',', 1) > 0,
+										trim(temp_Addr_Country[DataLib.StringFind(temp_Addr_Country, ',', 1)+1..length(trim(temp_Addr_Country, left, right))], left, right),
+										temp_Addr_Country);
 	// Capture the clean address values
-	string182 tempAddressReturn    := lib_AddrClean.AddrCleanLib.CleanAddress182(temp_Address1
+	string182 tempAddressReturn    := address.CleanAddress182(temp_Address1
 	                                                                            ,temp_Address2 + ' ' + temp_Address_3 + ' ' + temp_Address_Country);
 	
     self.UID             := (integer)L.UID;
@@ -238,7 +256,7 @@ Layout_out t_clean_out(j_all_data L) := TRANSFORM
 							and trim(L.age,left,right) between '18' and '95'
 							and (trim(L.age_as_of_date,left,right)[1..2] between '19' and '20') 
 							and length(trim(L.age_as_of_date[1..4],left,right))=4,
-							((integer)L.age_as_of_date[1..4]-(integer)L.age)+'0000',
+							(string)((integer)L.age_as_of_date[1..4]-(integer)L.age),
 							lib_stringlib.StringLib.StringFilterOut(L.date_of_birth,'/'));
 	self.date_of_death   := lib_stringlib.StringLib.StringFilterOut(L.date_of_death,'/');
 	self.entered         := lib_stringlib.StringLib.StringFilterOut(L.entered,'/');

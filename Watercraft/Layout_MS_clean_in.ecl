@@ -1,6 +1,4 @@
-export Layout_MS_clean_in := 
-
-record
+export Layout_MS_clean_in := record	//rec len=1075
 string2 	state_origin;
 string8	process_date;
 string3       STATEABREV;
@@ -25,10 +23,12 @@ string2       STATE;
 string10      ZIP;
 string50      COUNTY;
 string5       FIPS;
-string8       TRANSACTION;
+string8       TRANSACTION_DATE;
 string1       SALT_FISH;
 string1       CO_OWNER;
-string8       EXPIRE_DATE;
+string8       EXPIRATION_DATE;
+string18      BOAT_TYPE_CODE;
+string6       STATUS;
 string2       lf;
 string100      concat_name;
 integer2     is_company_flag;

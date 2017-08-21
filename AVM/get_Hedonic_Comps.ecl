@@ -17,6 +17,7 @@ layout_comp_calcs := record
 	string11 sales_price;
  
 	integer no_of_comps;
+	integer comp_radius;
 	real comp_distance;
 	integer sale_date_diff;
 	integer assessed_value_diff;
@@ -43,17 +44,17 @@ layout_geobox_base := record
 end;
 
 // radius in miles
-box_radius := 5.0000;
+box_radius := 10.0000;  // start with 6 miles, if that works, try expanding that to 10 in the next build
 high_population_radius := 1.0000;
 
 // Computes the LatLon coordinates of a box bounding a circle of a
 // certain radius in miles around a given LatLon coordinate	
-layout_geobox_base add_box(hedonic_base le) := transform
+layout_geobox_base add_box1(hedonic_base le) := transform
 	lat := (real)le.lat;
 	lon := (real)le.long;
 	radius := box_radius;
 	miPerLat := 69.055;	// miles per degree of latitude (24859.82mi/360)
-	miPerLong := miPerLat * cos(lon); 
+	miPerLong := abs(miPerLat * cos(lon)); 
 	deltaLat := radius / miPerLat;
 	deltaLon := radius / miPerLong;
 	self.n_lat := lat + deltaLat;
@@ -63,75 +64,177 @@ layout_geobox_base add_box(hedonic_base le) := transform
 	self := le;
 end;
 
-subject_props := project(hedonic_base, add_box(left));
-// output(subject_props);
-
-comp_counts_slim := record
-	unsigned seq;
-	integer no_of_comps;
+subject_props := project(hedonic_base, add_box1(left));
+// output(subject_props);											
+																		
+radius_calc_slim := record
+	unsigned integer8 seq;
+	string2 distance;
 end;
-	
-	
-comp_counts_slim identify_comps(subject_props le, comparable_candidates rt) := transform
-	dist := ut.ll_dist((real)le.lat, (real)le.long, (real)rt.lat, (real)rt.long);
-	self.no_of_comps := if(dist < high_population_radius, 1, skip);	
+														   
+
+radius_calc_slim add_distance(subject_props le, comparable_candidates rt) := transform
+	dist := round(ut.ll_dist((real)le.lat, (real)le.long, (real)rt.lat, (real)rt.long));
+	self.distance := if(dist > box_radius, skip, (string)dist);
 	self := le;
 end;
 
-temp_comps := join(subject_props, comparable_candidates, 
+d := join(subject_props, comparable_candidates, 
 			left.fips_code = right.fips_code and
-			left.land_use_code = right.land_use_code and
+			left.land_use_code = right.land_use_code and 
 			
 			( ((real)right.lat between left.s_lat and left.n_lat) and
 			  ((real)right.long between left.w_lon and left.e_lon) ) and
-			  
-			( left.seq != right.seq ),  // exclude the subject property from the list of comp candidates
-			identify_comps(left,right), many lookup);			
 			
-// output(temp_comps);
+			( left.seq != right.seq ),  // exclude the subject property from the list of comp candidates
+			add_distance(left,right), many lookup);			
+// output(d);			
 
-tc_distr := distribute(temp_comps, hash(seq));
-subject_grouping := group(sort(tc_distr, seq, local), seq, local);
 
-// table the counts,
-// join the table to the original subjects
-
-// comp_counts_table := record
-	// seq := temp_comps.seq;
-	// no_of_comps := count(group);
-// end;
-
-// subjects_w_comp_counts_temp := table(temp_comps, comp_counts_table, seq, few);
-
-subjects_w_comp_counts_temp := rollup(subject_grouping, true, 
-								transform(comp_counts_slim, 
-										self.no_of_comps := left.no_of_comps + right.no_of_comps, 
-										self := left));
-
-comp_counts := record
-	subject_props;
-	integer no_of_comps;
+stat_layout := record
+	seq := d.seq;
+	record_count := count(group);
+	mile0_ct := count(group,d.distance='0');
+	mile1_ct := count(group,d.distance='1');
+	mile2_ct := count(group,d.distance='2');
+	mile3_ct := count(group,d.distance='3');
+	mile4_ct := count(group,d.distance='4');
+	mile5_ct := count(group,d.distance='5');
+	mile6_ct := count(group,d.distance='6');
+	mile7_ct := count(group,d.distance='7');
+	mile8_ct := count(group,d.distance='8');
+	mile9_ct := count(group,d.distance='9');
+	mile10_ct := count(group,d.distance='10');
+	
+	
+	// mile11_ct := count(group,d.distance='11');
+	// mile12_ct := count(group,d.distance='12');
+	// mile13_ct := count(group,d.distance='13');
+	// mile14_ct := count(group,d.distance='14');
+	// mile15_ct := count(group,d.distance='15');
+	// mile16_ct := count(group,d.distance='16');
+	// mile17_ct := count(group,d.distance='17');
+	// mile18_ct := count(group,d.distance='18');
+	// mile19_ct := count(group,d.distance='19');
+	// mile20_ct := count(group,d.distance='20');
 end;
 
-subject_details := distribute(subject_props, hash(seq));
-subject_comp_counts := distribute(subjects_w_comp_counts_temp, hash(seq));
+// gather some stats about the # of comps at each mileage distance to determine the radius for the 'with_dist' join
+stats := table(d, stat_layout, seq, few);
 
-subjects_w_comp_counts1 := join(subject_details, subject_comp_counts, left.seq=right.seq,
-								transform(comp_counts, self.no_of_comps := right.no_of_comps, self := left),
+// output(stats);		
+
+swr := record
+	subject_props;
+	integer no_of_comps;
+	integer comp_radius;
+end;
+
+subject_prop_distr := distribute(subject_props, hash(seq));
+stats_distr := distribute(stats, hash(seq));
+
+swr add_box2(subject_prop_distr le, stats_distr rt) := transform
+	enough_comps := 20;
+	
+	m1 := rt.mile0_ct + rt.mile1_ct;
+	m2 := m1 + rt.mile2_ct;
+	m3 := m2 + rt.mile3_ct;
+	m4 := m3 + rt.mile4_ct;
+	m5 := m4 + rt.mile5_ct;
+	m6 := m5 + rt.mile6_ct;
+	m7 := m6 + rt.mile7_ct;
+	m8 := m7 + rt.mile8_ct;
+	m9 := m8 + rt.mile9_ct;
+	m10 := m9 + rt.mile10_ct;
+	
+	// m11 := m10 + rt.mile11_ct;
+	// m12 := m11 + rt.mile12_ct;
+	// m13 := m12 + rt.mile13_ct;
+	// m14 := m13 + rt.mile14_ct;
+	// m15 := m14 + rt.mile15_ct;
+	// m16 := m15 + rt.mile16_ct;
+	// m17 := m16 + rt.mile17_ct;
+	// m18 := m17 + rt.mile18_ct;
+	// m19 := m18 + rt.mile19_ct;
+	// m20 := m19 + rt.mile20_ct;
+
+	subject_radius := map(m1 >= enough_comps => 1,
+						  m2 >= enough_comps => 2,
+						  m3 >= enough_comps => 3,
+						  m4 >= enough_comps => 4,
+						  m5 >= enough_comps => 5,
+						  m6 >= enough_comps => 6,
+						  m7 >= enough_comps => 7,
+						  m8 >= enough_comps => 8,
+						  m9 >= enough_comps => 9,
+						  m10 >= enough_comps => 10,
+						  
+						  // m11 >= enough_comps => 11,
+						  // m12 >= enough_comps => 12,
+						  // m13 >= enough_comps => 13,
+						  // m14 >= enough_comps => 14,
+						  // m15 >= enough_comps => 15,
+						  // m16 >= enough_comps => 16,
+						  // m17 >= enough_comps => 17,
+						  // m18 >= enough_comps => 18,
+						  // m19 >= enough_comps => 19,
+						  // m20 >= enough_comps => 20,
+						  
+						  0);
+
+	lat := (real)le.lat;
+	lon := (real)le.long;
+	radius := subject_radius;
+	miPerLat := 69.055;	// miles per degree of latitude (24859.82mi/360)
+	miPerLong := abs(miPerLat * cos(lon)); 
+	deltaLat := radius / miPerLat;
+	deltaLon := radius / miPerLong;
+	self.n_lat := lat + deltaLat;
+	self.s_Lat := lat - deltaLat;
+	self.e_Lon := lon + deltaLon;
+	self.w_Lon := lon - deltaLon;
+
+	
+	self.no_of_comps := map(subject_radius=1 => m1,
+							subject_radius=2 => m2,
+							subject_radius=3 => m3,
+							subject_radius=4 => m4,
+							subject_radius=5 => m5,
+							subject_radius=6 => m6,
+							subject_radius=7 => m7,
+							subject_radius=8 => m8,
+							subject_radius=9 => m9,
+							subject_radius=10 => m10,
+							
+							// subject_radius=11 => m11,
+							// subject_radius=12 => m12,
+							// subject_radius=13 => m13,
+							// subject_radius=14 => m14,
+							// subject_radius=15 => m15,
+							// subject_radius=16 => m16,
+							// subject_radius=17 => m17,
+							// subject_radius=18 => m18,
+							// subject_radius=19 => m19,
+							// subject_radius=20 => m20,
+							
+							skip);
+	self.comp_radius := subject_radius;
+	self := le;
+	
+end;
+
+subjects_w_comp_radius := join(subject_prop_distr, stats_distr, left.seq=right.seq,
+								add_box2(left,right),								
 								left outer, local);
-subjects_w_comp_counts := subjects_w_comp_counts1(no_of_comps!=0);
-// output(subjects_w_comp_counts(no_of_comps!=0), named('with_comp_counts'));
 
-layout_comp_calcs add_distances(subjects_w_comp_counts le, comparable_candidates rt) := transform
 
-	//mile_selection(le.fips_code, le.land_use_code, le.n_lat, le.s_lat, le.w_lon, le.e_lon, comp_count)	
+layout_comp_calcs add_distances(subjects_w_comp_radius le, comparable_candidates rt) := transform
+
 	self.no_of_comps := le.no_of_comps;
-	
-	// if the comp count is less than 25 for a single property, expand the radius
-	dist_limit := if(le.no_of_comps < 25, box_radius, high_population_radius);
-	
+	self.comp_radius := le.comp_radius;
+
 	dist := ut.ll_dist((real)le.lat, (real)le.long, (real)rt.lat, (real)rt.long);
-	self.comp_distance := if(dist < dist_limit, dist, skip);
+	self.comp_distance := if(dist < le.comp_radius, dist, skip);
 	
 	self.sale_date_diff := abs((integer)rt.recording_date - (integer)le.recording_date);
 	self.assessed_value_diff := map((integer)le.assessed_total_value!=0 and (integer)rt.assessed_total_value!=0 =>
@@ -167,7 +270,7 @@ layout_comp_calcs add_distances(subjects_w_comp_counts le, comparable_candidates
 end;
 
 // use many lookup if the # of property records stays somewhere below 4 million
-with_dist := join(subjects_w_comp_counts , comparable_candidates, 
+with_dist := join(subjects_w_comp_radius , comparable_candidates, 
 			left.fips_code = right.fips_code and
 			left.land_use_code = right.land_use_code and
 		
@@ -185,6 +288,7 @@ layout_hedonic_vars := record
 	string5 subject_fips_code;
 	string4 subject_land_use_code;
 	integer no_of_comps;
+	integer comp_radius;
 	// start of comp details
 	unsigned integer8 seq;
 	string12 ln_fares_id;
@@ -262,14 +366,13 @@ layout_hedonic_vars add_weights(with_dist le, avm.File_Hedonic_Weights_Table rt)
 							 (le.comp_distance * rt.weight_physicaldistance);
 							 
 							 
-							 // try it without the weighting on time and physical distance 
+							 // try it without the weighting on time  
 							 // since those aren't truly property characteristics, we might 
 							 // get more accurate this way
 							 							 
 							 //	(assessed_year_val * rt.weight_assessedyear) +						 
 							 // (le.sale_date_diff * rt.weight_time) +
-							 
-							 
+													 
 							 // try it also without number of stories since the data in that field isn't always numeric,
 							 // could be throwing off the calculation and causing different comps to be selected
 							  // (stories_val * rt.weight_stories) +
@@ -280,7 +383,6 @@ layout_hedonic_vars add_weights(with_dist le, avm.File_Hedonic_Weights_Table rt)
 	self := [];
 end;
 
-
 with_all_weights := join(with_dist, avm.File_Hedonic_Weights_Table,
 					 left.subject_fips_code=right.fips_code and 
 						left.subject_land_use_code=right.land_use and
@@ -288,12 +390,9 @@ with_all_weights := join(with_dist, avm.File_Hedonic_Weights_Table,
 						add_weights(left,right), many lookup);
 
 
-with_all_weights_d := distribute(with_all_weights, hash(subject_seq, seq));
+with_all_weights_d := distribute(with_all_weights, hash(subject_seq));
 weights_deduped := dedup(sort(with_all_weights_d, subject_seq, seq, -zip_level_weights, local), subject_seq, seq, local);
-
-weights_deduped_dist := distribute(weights_deduped, hash(subject_seq));
-
-best_hedonics := sort(weights_deduped_dist, subject_seq, -same_zip, hedonic_distance, local);
+best_hedonics := dedup(sort(weights_deduped, subject_seq, -same_zip, hedonic_distance, local), subject_seq, local, keep(7));
 
 // output(best_hedonics, named('best_hedonics'));
 
@@ -310,8 +409,8 @@ hv_layout_w_comps := record
 end;
 
 
-subj_distr:= distribute(subject_props, hash(seq));
-best_hedonics_distr := distribute(best_hedonics, hash(subject_seq));
+// subj_distr:= distribute(subject_props, hash(seq));
+// best_hedonics_distr := distribute(best_hedonics, hash(subject_seq));
 
 hv_layout_w_comps add_comps(subject_props le, best_hedonics rt) := transform
 	self.comps := rt;
@@ -320,13 +419,13 @@ hv_layout_w_comps add_comps(subject_props le, best_hedonics rt) := transform
 end;
 
 // keep the best 7 comps to select the median sale price from
-with_comps := join(subj_distr, best_hedonics_distr, left.seq=right.subject_seq,
+with_comps := join(subject_prop_distr, best_hedonics, left.seq=right.subject_seq,
 					add_comps(left, right), keep(7), local);
 					
 
 // sort all property comps selected by their sales_prices, and select seq #4 as the median
-with_comps_distr := distribute(with_comps, hash(seq));
-props := group(sort(with_comps_distr, seq, comps.sales_price, local), seq, local);
+// with_comps_distr := distribute(with_comps, hash(seq));
+props := group(sort(with_comps, seq, comps.sales_price, local), seq, local);
 
 hv_layout_w_comps add_comp_seq(props le, props rt, integer C) := transform
 	// added middle comp logic just in case we get less than 7 comps, wouldn't want to just take seq #4 as our default	
@@ -353,12 +452,14 @@ hv_layout_slim := record
 	string12 comp4;
 	string12 comp5;
 	integer no_of_comps;  // overall number of hedonic comp_candidates at 1 mile
+	integer comp_radius;
     real sum_hedonic_distance; // sum of the comps' hedonic distance
 	real sum_physical_distance; // sum of the comps' physical distance to the subject property
 end;
 
 slim_recs := project(with_valuation(comps.no_of_comps >= 7), transform(hv_layout_slim, 	
 																		self.no_of_comps := left.comps.no_of_comps,
+																		self.comp_radius := left.comps.comp_radius,
 																		self.sum_hedonic_distance := left.comps.hedonic_distance,
 																		self.sum_physical_distance := left.comps.comp_distance,
 																		self := left));
@@ -383,7 +484,7 @@ rolled_comps := rollup( slim_recs , true, roll_comps(left,right));
 // sort all the comps by comp_distance first to get the 5 closest properties in the join
 
 with_dist_distr := distribute(with_dist, hash(subject_seq));
-closest_nearby := sort(with_dist_distr, subject_seq, comp_distance, local);
+closest_nearby := dedup(sort(with_dist_distr, subject_seq, comp_distance, local), subject_seq, keep(5), local);
 
 rolled_comps_distr:= distribute(rolled_comps, hash(seq));
 closest_nearby_distr := distribute(closest_nearby, hash(subject_seq));
@@ -397,9 +498,15 @@ hv_layout_final := record
 	string12 nearby4;
 	string12 nearby5;
 end;
-			
-hv_layout_final add_nearby_prop(rolled_comps_distr le, closest_nearby_distr rt) := transform
+
+temp_hv := record
+	real comp_distance;
+	hv_layout_final;
+end;
+
+temp_hv add_nearby_prop(rolled_comps_distr le, closest_nearby_distr rt) := transform
 	self.nearby_fares_id := rt.ln_fares_id;
+	self.comp_distance := rt.comp_distance;
 	self := le;
 	self := [];
 end;
@@ -409,9 +516,9 @@ with_nearby := join(rolled_comps_distr, closest_nearby_distr, left.seq=right.sub
 					add_nearby_prop(left, right), keep(5), local);
 
 
-// with_nearby_distr := distribute(with_nearby, hash(seq));
-with_nearby_grouped := group(sort(with_nearby, seq, local), seq, local);
-	
+with_nearby_sorted := group(sort(with_nearby, seq, comp_distance, local), seq, local);
+with_nearby_grouped := project(with_nearby_sorted, transform(hv_layout_final, self := left));
+
 hv_layout_final pop_nearby_ids(hv_layout_final le, hv_layout_final rt, integer c) := transform	
 	self.nearby1 := if(c=1, rt.nearby_fares_id, rt.nearby1);
 	self.nearby2 := if(c=2, rt.nearby_fares_id, rt.nearby2);

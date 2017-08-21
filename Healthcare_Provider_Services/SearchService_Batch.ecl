@@ -53,6 +53,7 @@ EXPORT SearchService_Batch := MACRO
 		self.includeCustomerData := true;
 		self.IncludeSanctions := req_Sanctions;
 		self.IncludeABMSBoardCertifiedSpecialty := req_ABMS;
+		self.excludeSourceNCPDP := gm.DataRestrictionMask[21] = '1';
 		// self:=[];Do not uncomment otherwise the default values will not get set.
 	end;
 	cfgData:=dataset([buildConfig()]);

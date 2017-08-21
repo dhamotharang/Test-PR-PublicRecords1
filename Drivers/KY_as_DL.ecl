@@ -9,7 +9,7 @@ Drivers.Layout_DL lTransform_KY_To_Common(Drivers.File_KY_Full pInput)
     self.orig_state 				:= 'KY';
 
 	self.name						:= trim(pInput.orig_FIRST_NAME)
-									 + trim(' ' + pInput.orig_MIDDLE_INITIAL)
+									 + trim(' ' + pInput.orig_MIDDLE_NAME)
 									 + trim(' ' + pInput.orig_LAST_NAME);
 	self.addr1						:= trim(pInput.orig_ADDRESS);
 	self.city 						:= pInput.orig_CITY;		                             
@@ -63,4 +63,4 @@ Drivers.Layout_DL lTransform_KY_To_Common(Drivers.File_KY_Full pInput)
 	self.issuance 					:= ''; // has no default
 end;
 
-export KY_as_DL := project(Drivers.File_KY_Full, lTransform_KY_To_Common(left));
+export KY_as_DL := project(Drivers.File_KY_Full	+	Drivers.File_KY_Update, lTransform_KY_To_Common(left));

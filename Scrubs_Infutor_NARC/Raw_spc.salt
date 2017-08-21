@@ -1,0 +1,138 @@
+OPTIONS:-gh
+MODULE:Scrubs_Infutor_NARC
+FILENAME:Infutor_NARC
+NAMESCOPE:Raw
+
+//Uncomment up to NINES for internal or external adl
+//IDFIELD:EXISTS:<NameOfIDField>
+//RIDFIELD:<NameOfRidField>
+//RECORDS:<NumberOfRecordsInDataFile>
+//POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+//NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+//Uncomment Process if doing external adl
+//PROCESS:<ProcessName>
+//FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+//BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+//FUZZY can be used to create new types of FUZZY linking
+
+
+FIELDTYPE:invalid_nums:ALLOW(0123456789):SPACES( )
+FIELDTYPE:invalid_residence_len:ALLOW(0123456789.):SPACES( )
+FIELDTYPE:invalid_gender:ENUM(M|F|)
+FIELDTYPE:invalid_gender_code:ENUM(1|2|)
+FIELDTYPE:invalid_alpha:SPACES( ):ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-):LENGTHS(1..)
+FIELDTYPE:invalid_address:SPACES( ):ALLOW(',./#-&/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ)
+FIELDTYPE:invalid_csz:SPACES( ):ALLOW( ,-'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789)
+FIELDTYPE:invalid_county_name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ'):SPACES( -):WORDS(1,2,3,4,5)
+FIELDTYPE:invalid_zip:ALLOW(0123456789):LENGTHS(5,9)
+FIELDTYPE:invalid_zip4:ALLOW(0123456789):LENGTHS(0,4)
+FIELDTYPE:invalid_date:CUSTOM(Scrubs.fn_valid_date>0)
+FIELDTYPE:invalid_suffix:SPACES( ):ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz):ENUM(SR|JR|I|II|III|IV|V|VI|VII|VIII|IX|X|8TH|)
+FIELDTYPE:invalid_indicator:ENUM(Y|N|)
+FIELDTYPE:invalid_validation_flag:ENUM(C|N|)
+FIELDTYPE:invalid_mhv:ENUM(A|B|C|D|E|F|G|H|I|)
+FIELDTYPE:invalid_penetration_percentage_ranges:ENUM(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|)
+FIELDTYPE:invalid_child_num:ENUM(0|1|2|3|4|5|6|7|8|9|)
+FIELDTYPE:invalid_dwelling_type:ENUM(A|B|C|D|)
+FIELDTYPE:invalid_homeowner:ENUM(H|R|)
+FIELDTYPE:invalid_time_zone:ENUM(2|3|4|5|6|7|8|)
+
+
+
+FIELD:orig_hhid:TYPE(STRING40):0,0
+FIELD:orig_pid:TYPE(STRING20):0,0
+FIELD:orig_fname:TYPE(STRING30):LIKE(invalid_alpha):0,0
+FIELD:orig_mname:TYPE(STRING1):LIKE(invalid_alpha):0,0
+FIELD:orig_lname:TYPE(STRING30):LIKE(invalid_alpha):0,0
+FIELD:orig_suffix:TYPE(STRING10):LIKE(invalid_suffix):0,0
+FIELD:orig_gender:TYPE(STRING1):LIKE(invalid_gender):0,0
+FIELD:orig_age:TYPE(STRING2):LIKE(invalid_nums):0,0
+FIELD:orig_dob:TYPE(STRING6):LIKE(invalid_date):0,0
+FIELD:orig_hhnbr:TYPE(STRING1):LIKE(invalid_nums):0,0
+FIELD:orig_tot_males:TYPE(STRING1):LIKE(invalid_nums):0,0
+FIELD:orig_tot_females:TYPE(STRING1):LIKE(invalid_nums):0,0
+FIELD:orig_addrid:TYPE(STRING20):0,0
+FIELD:orig_address:TYPE(STRING64):LIKE(invalid_address):0,0
+FIELD:orig_house:TYPE(STRING10):LIKE(invalid_address):0,0
+FIELD:orig_predir:TYPE(STRING2):LIKE(invalid_address):0,0
+FIELD:orig_street:TYPE(STRING28):LIKE(invalid_address):0,0
+FIELD:orig_strtype:TYPE(STRING4):LIKE(invalid_address):0,0
+FIELD:orig_postdir:TYPE(STRING2):LIKE(invalid_address):0,0
+FIELD:orig_apttype:TYPE(STRING4):LIKE(invalid_address):0,0
+FIELD:orig_aptnbr:TYPE(STRING8):LIKE(invalid_address):0,0
+FIELD:orig_city:TYPE(STRING28):LIKE(invalid_county_name):0,0
+FIELD:orig_state:TYPE(STRING2):0,0
+FIELD:orig_zip:TYPE(STRING5):LIKE(invalid_zip):0,0
+FIELD:orig_z4:TYPE(STRING4):LIKE(invalid_zip4):0,0
+FIELD:orig_dpc:TYPE(STRING3):0,0
+FIELD:orig_z4type:TYPE(STRING1):0,0
+FIELD:orig_crte:TYPE(STRING4):0,0
+FIELD:orig_dpv:TYPE(STRING1):0,0
+FIELD:orig_vacant:TYPE(STRING1):LIKE(invalid_indicator):0,0
+FIELD:orig_msa:TYPE(STRING4):0,0
+FIELD:orig_cbsa:TYPE(STRING5):0,0
+FIELD:orig_county_code:TYPE(STRING3):0,0
+FIELD:orig_time_zone:TYPE(STRING1):LIKE(invalid_time_zone):0,0
+FIELD:orig_daylight_savings:TYPE(STRING1):0,0
+FIELD:orig_lat_long_assignment_level:TYPE(STRING1):0,0
+FIELD:orig_latitude:TYPE(STRING11):0,0
+FIELD:orig_longitude:TYPE(STRING11):0,0
+FIELD:orig_telephonenumber_1:TYPE(STRING10):LIKE(invalid_nums):0,0
+FIELD:orig_validationflag_1:TYPE(STRING1):LIKE(invalid_validation_flag):0,0
+FIELD:orig_validationdate_1:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:orig_dma_tps_dnc_flag_1:TYPE(STRING1):LIKE(invalid_indicator):0,0
+FIELD:orig_telephonenumber_2:TYPE(STRING10):LIKE(invalid_nums):0,0
+FIELD:orig_validation_flag_2:TYPE(STRING1):LIKE(invalid_validation_flag):0,0
+FIELD:orig_validation_date_2:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:orig_dma_tps_dnc_flag_2:TYPE(STRING1):LIKE(invalid_indicator):0,0
+FIELD:orig_telephonenumber_3:TYPE(STRING10):LIKE(invalid_nums):0,0
+FIELD:orig_validationflag_3:TYPE(STRING1):LIKE(invalid_validation_flag):0,0
+FIELD:orig_validationdate_3:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:orig_dma_tps_dnc_flag_3:TYPE(STRING1):LIKE(invalid_indicator):0,0
+FIELD:orig_telephonenumber_4:TYPE(STRING10):LIKE(invalid_nums):0,0
+FIELD:orig_validationflag_4:TYPE(STRING1):LIKE(invalid_validation_flag):0,0
+FIELD:orig_validationdate_4:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:orig_dma_tps_dnc_flag_4:TYPE(STRING1):LIKE(invalid_indicator):0,0
+FIELD:orig_telephonenumber_5:TYPE(STRING10):LIKE(invalid_nums):0,0
+FIELD:orig_validationflag_5:TYPE(STRING1):LIKE(invalid_validation_flag):0,0
+FIELD:orig_validationdate_5:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:orig_dma_tps_dnc_flag_5:TYPE(STRING1):LIKE(invalid_indicator):0,0
+FIELD:orig_telephonenumber_6:TYPE(STRING10):LIKE(invalid_nums):0,0
+FIELD:orig_validationflag_6:TYPE(STRING1):LIKE(invalid_validation_flag):0,0
+FIELD:orig_validationdate_6:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:orig_dma_tps_dnc_flag_6:TYPE(STRING1):LIKE(invalid_indicator):0,0
+FIELD:orig_telephonenumber_7:TYPE(STRING10):LIKE(invalid_nums):0,0
+FIELD:orig_validationflag_7:TYPE(STRING1):LIKE(invalid_validation_flag):0,0
+FIELD:orig_validationdate_7:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:orig_dma_tps_dnc_flag_7:TYPE(STRING1):LIKE(invalid_indicator):0,0
+FIELD:orig_tot_phones:TYPE(STRING1):LIKE(invalid_nums):0,0
+FIELD:orig_length_of_residence:TYPE(STRING3):LIKE(invalid_residence_len):0,0
+FIELD:orig_homeowner:TYPE(STRING1):LIKE(invalid_homeowner):0,0
+FIELD:orig_estimatedincome:TYPE(STRING1):LIKE(invalid_mhv):0,0
+FIELD:orig_dwelling_type:TYPE(STRING1):LIKE(invalid_dwelling_type):0,0
+FIELD:orig_married:TYPE(STRING1):LIKE(invalid_indicator):0,0
+FIELD:orig_child:TYPE(STRING1):LIKE(invalid_indicator):0,0
+FIELD:orig_nbrchild:TYPE(STRING1):LIKE(invalid_child_num):0,0
+FIELD:orig_teencd:TYPE(STRING1):LIKE(invalid_indicator):0,0
+FIELD:orig_percent_range_black:TYPE(STRING1):LIKE(invalid_penetration_percentage_ranges):0,0
+FIELD:orig_percent_range_white:TYPE(STRING1):LIKE(invalid_penetration_percentage_ranges):0,0
+FIELD:orig_percent_range_hispanic:TYPE(STRING1):LIKE(invalid_penetration_percentage_ranges):0,0
+FIELD:orig_percent_range_asian:TYPE(STRING1):LIKE(invalid_penetration_percentage_ranges):0,0
+FIELD:orig_percent_range_english_speaking:TYPE(STRING1):LIKE(invalid_penetration_percentage_ranges):0,0
+FIELD:orig_percnt_range_spanish_speaking:TYPE(STRING1):LIKE(invalid_penetration_percentage_ranges):0,0
+FIELD:orig_percent_range_asian_speaking:TYPE(STRING1):LIKE(invalid_penetration_percentage_ranges):0,0
+FIELD:orig_percent_range_sfdu:TYPE(STRING1):LIKE(invalid_penetration_percentage_ranges):0,0
+FIELD:orig_percent_range_mfdu:TYPE(STRING1):LIKE(invalid_penetration_percentage_ranges):0,0
+FIELD:orig_mhv:TYPE(STRING1):LIKE(invalid_mhv):0,0
+FIELD:orig_mor:TYPE(STRING1):LIKE(invalid_penetration_percentage_ranges):0,0
+FIELD:orig_car:TYPE(STRING1):LIKE(invalid_penetration_percentage_ranges):0,0
+FIELD:orig_medschl:TYPE(STRING3):0,0
+FIELD:orig_penetration_range_whitecollar:TYPE(STRING1):LIKE(invalid_penetration_percentage_ranges):0,0
+FIELD:orig_penetration_range_bluecollar:TYPE(STRING1):LIKE(invalid_penetration_percentage_ranges):0,0
+FIELD:orig_penetration_range_otheroccupation:TYPE(STRING1):LIKE(invalid_penetration_percentage_ranges):0,0
+FIELD:orig_demolevel:TYPE(STRING1):0,0
+FIELD:orig_recdate:TYPE(STRING6):LIKE(invalid_date):0,0
+//CONCEPT statements should be used to group together interellated fields; such as address
+//RELATIONSHIP is used to find non-obvious relationships between the clusters
+//SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+//LINKPATH is used to define access paths for external linking

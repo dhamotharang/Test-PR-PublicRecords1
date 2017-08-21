@@ -19,7 +19,7 @@ header.Layout_New_Records into(df L,integer C) := transform
 	self.St := l.clean_address[115..116];
 	self.Zip := l.clean_address[117..121];
 	self.Zip4 := l.clean_address[122..125];
-	self.county := L.clean_address[141..145];
+	self.county := L.clean_address[143..145];
 	self.cbsa := if(L.clean_address[167..170]='','',L.clean_address[167..170] + '0');
 	self.geo_blk := l.clean_address[171..177];
 	self.did := 0;

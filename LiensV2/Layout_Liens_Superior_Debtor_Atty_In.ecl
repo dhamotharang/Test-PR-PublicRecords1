@@ -1,0 +1,35 @@
+export Layout_Liens_Superior_Debtor_Atty_In := record
+       string50 tmsid; 
+   string50 rmsid;
+   string50 vdi ;
+    string8 process_date ; 
+   string1 header_domain;
+   string2 header_filing_state;
+   string2 header_casenumber_num_prefix;
+   string8 header_casenumber_seq_num;
+   string4 header_casenumber_year;
+   string2 header_casenumber_suffix;
+   string3 header_venue_code;
+   string9 header_cji_action_number;
+   string3 header_cji_case_type_code;
+   string1 header_sort_context;
+   string3 header_subjudgement_num;
+   string1 header_sort_value;
+   string4 header_seq_number;
+   string1 header_rec_type;
+   string2 header_remarks_seq;
+   string11	STATE_ASSIGNED_LICENSE_NUMBER;
+   string50	ATTORNEY_NAME;
+   string60	FIRM_NAME;
+   string40	ADDRESS_LINE_1;
+   string40	ADDRESS_LINE_2;
+   string26	CITY;
+   string2	STATE;
+   string5	ZIP5;
+   string4	ZIP4;
+   string20	PHONE_NUMBER;
+   string73   clean_atty_pname ;
+   string60   clean_atty_cname ;
+   string182  clean_atty_address ;
+
+end;

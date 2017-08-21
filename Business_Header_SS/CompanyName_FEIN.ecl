@@ -1,6 +1,14 @@
 IMPORT Business_Header, ut;
 
-bh := Business_Header.File_Business_Header_Base(fein != 0);
+export CompanyName_FEIN(
+
+	 dataset(Business_Header.Layout_Business_Header_Base	)	pBusinessHeaders	= Business_Header.Files().Base.Business_Headers.Built
+	,string																									pPersistName			= business_header.persistnames().CompanyNameFein
+
+) :=
+function
+
+bh := business_header.filters.keys.business_headers(pBusinessHeaders)(fein != 0);
 
 // Project to slim record.
 layout_slim := RECORD
@@ -61,5 +69,9 @@ ss_cn_f := JOIN(bh_ded, scn_f_stat,
 					LEFT.fein = RIGHT.fein,
 					JoinBack(LEFT, RIGHT), LEFT OUTER, HASH);
 
-EXPORT CompanyName_FEIN := DISTRIBUTE(ss_cn_f(cn_f_bdids > 0 and cn_f_bdids < 100), HASH(fein))
-								: PERSIST('adTEMP::BH_SS_cn_f');
+CompanyName_FEIN_persisted := DISTRIBUTE(ss_cn_f(cn_f_bdids > 0 and cn_f_bdids < 100), HASH(fein))
+								: PERSIST(pPersistName);
+
+return CompanyName_FEIN_persisted;
+
+end;

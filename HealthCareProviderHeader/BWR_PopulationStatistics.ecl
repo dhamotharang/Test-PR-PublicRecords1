@@ -1,0 +1,6 @@
+//This is the code to execute in a builder window
+#workunit('name','HealthCareProviderHeader.BWR_PopulationStatistics - Population Statistics - SALT V2.9 Gold');
+IMPORT HealthCareProviderHeader,SALT29;
+// In the line below substitute the file you want statistics for; and substitute any field names you can
+  HealthCareProviderHeader.MAC_PopulationStatistics(YourFileName,/*Reference Field*/,/* SSN_field */,/* UPIN_field */,/* NPI_NUMBER_field */,/* DEA_NUMBER_field */,/* DID_field */,/* VENDOR_ID_field */,/* CNSMR_SSN_field */,/* MAINNAME_field */,/* FULLNAME_field */,/* FAX_field */,/* C_LIC_NBR_field */,/* ADDRESS_field */,/* ADDR1_field */,/* PHONE_field */,/* DOB_field */,/* CNSMR_DOB_field */,/* BILLING_TAX_ID_field */,/* BILLING_NPI_NUMBER_field */,/* PRIM_NAME_field */,/* ZIP_field */,/* LOCALE_field */,/* LNAME_field */,/* PRIM_RANGE_field */,/* V_CITY_NAME_field */,/* SNAME_field */,/* FNAME_field */,/* MNAME_field */,/* TAXONOMY_field */,/* SEC_RANGE_field */,/* LIC_TYPE_field */,/* ST_field */,/* GENDER_field */,/* DERIVED_GENDER_field */,/* SRC_field */,/* LIC_STATE_field */,/* ADDRESS_ID_field */,/* CNAME_field */,/* TAX_ID_field */,/* GEO_LAT_field */,/* GEO_LONG_field */,/* DT_FIRST_SEEN_field */,/* DT_LAST_SEEN_field */,/* DT_LIC_EXPIRATION_field */,/* DT_DEA_EXPIRATION_field */,outfile);
+  OUTPUT(outfile,NAMED('PopulationStatistics'));

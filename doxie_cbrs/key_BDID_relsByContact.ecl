@@ -1,10 +1,19 @@
-import business_header,doxie;
+Import Data_Services, business_header, doxie, PRTE2_Business_Header;
 
 set_notname := ['DOMAIN','REGISTERED','AGENT','ADMINISTRATOR'];
-c := business_header.File_Business_Contacts
-	(bdid > 0, did > 0, from_hdr = 'N', 
-	fname not in set_notname,
-	lname not in set_notname);
+
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+c := PRTE2_business_header.Files().Base.Business_Contacts.built
+			(bdid > 0, did > 0, from_hdr = 'N', 
+			fname not in set_notname,
+			lname not in set_notname);
+#ELSE
+c := business_header.Files().Base.Business_Contacts.built
+			(bdid > 0, did > 0, from_hdr = 'N', 
+			fname not in set_notname,
+			lname not in set_notname);
+#END;
+
 	
 //slim it	
 srec := record

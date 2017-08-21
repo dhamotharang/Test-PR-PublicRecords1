@@ -11,4 +11,4 @@
 	NOTE: because of #1 above, moxie info file had to change as well, as explained.
 */
 
-export File_Kydc_In := DATASET('~images::in::ky20040316', Layout_MoxieBigDC_In, flat);
+export File_Kydc_In := DATASET('~images::in::ky_dc_20050617', Layout_MoxieBigDC_In, flat);

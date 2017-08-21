@@ -1,4 +1,4 @@
-﻿import FLAccidents_Ecrash,codes,ut,AutoStandardI,iesp,AutoKeyI,lib_stringlib,doxie,Std,BatchShare;
+import FLAccidents_Ecrash,codes,ut,AutoStandardI,iesp,AutoKeyI,lib_stringlib,doxie,Std,BatchShare;
 
 //** Added the fix for bug 138974
 

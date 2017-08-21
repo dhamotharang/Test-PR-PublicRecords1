@@ -80,7 +80,7 @@ core_r1 := ROLLUP(group(sort(core_t1, id), id), GROUP, doRollup(LEFT, ROWS(LEFT)
 withCore := join(with_reccnt, core_r1, left.id = right.id, transform(recordof(left), self.core := right.core, self := left)); 
 // Append emerging core
 ecore_s1   	:= sort(input, id, -dt_last_seen, local);
-ecore_t1  	:= table(ecore_s1, {id, dt_last_seen, unsigned cnt := count(group)}, id, local);
+ecore_t1    := table(ecore_s1, {id, unsigned4 dt_last_seen :=Max(group,dt_last_seen), unsigned cnt := count(group)}, id, local);
 seg_layout xform_ecore(withCore l, ecore_t1 r) := transform
 	lastSeenDate 	:= (string8)r.dt_last_seen;
 	self.emergingCore := if(l.reccnt = 1 and ut.DaysApart(today, lastSeenDate) <= twoYears, constants.Ecore_SingleSrcSingleton, '');
@@ -139,7 +139,7 @@ stats0 := project(tcore,     transform(layouts.stats_layout, self.segSubType := 
 export stats := 
 sort(stats0, segType, segSubType) &
 project(
-	ut.ds_oneRecord,
+	dataset([{1}], {unsigned a}),
 	transform(
 		layouts.stats_layout,
 		self.segType := '  TOTAL';

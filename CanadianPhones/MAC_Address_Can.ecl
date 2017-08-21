@@ -7,6 +7,8 @@ export MAC_Address_Can (indataset,infname,inmname,inlname,
 						indid,
 						inkeyname,outkey,by_lookup=TRUE,rep_Addr=4) := MACRO
 
+import NID;
+
 #uniquename(indata)
 %indata% := indataset;
 
@@ -27,7 +29,7 @@ CanadianPhones.layouts.address %proj%(%indata% le) := TRANSFORM
 
 	SELF.dph_lname := metaphonelib.DMetaPhone1(le.inlname);
 	SELF.lname := le.inlname;
-	SELF.pfname := datalib.preferredfirst(le.infname);
+	SELF.pfname := NID.PreferredFirstVersionedStr(le.infname, NID.version);
 	SELF.fname := le.infname;
 
 	SELF.lookups := le.inlookups | ut.bit_set(0,0);

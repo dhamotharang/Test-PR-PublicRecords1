@@ -1,3 +1,9 @@
+/*2015-11-16T20:52:51Z (Srilatha Katukuri)
+#193680 - CR 323
+*/
+/*2015-08-07T18:13:16Z (Srilatha Katukuri)
+#186387  - Dedup field changes
+*/
 /*2015-07-24T21:33:22Z (Srilatha Katukuri)
 #173256 Rolled back dedup fields
 */
@@ -9,7 +15,7 @@ bug# 173256 - code review
 */
 Import Data_Services, doxie,FLAccidents;
 
-allrecs := FLAccidents_Ecrash.File_KeybuildV2.out(vin+driver_license_nbr+tag_nbr+lname <>'');
+allrecs := FLAccidents_Ecrash.File_KeybuildV2.out(vin+driver_license_nbr+tag_nbr+lname <>'' and trim(report_type_id,all) in ['A','DE']);
 
 slim_layout := RECORD
   string8 accident_date;
@@ -192,15 +198,16 @@ slim_layout := RECORD
 
 
 crash_base := project(allrecs
-						((accident_date<>'' and (unsigned) accident_date<>0)), slim_layout);
+						((accident_date<>'' and (unsigned) accident_date<>0) ), slim_layout);
 											 
 dst_base := distribute(crash_base, hash(accident_date));
 srt_base := sort(dst_base, except did, except b_did, local);
-dep_base := dedup(srt_base, except did, except b_did, local);
+//dep_base := dedup(srt_base, except did, except b_did, local);
+dep_base := dedup(srt_base, accident_nbr, accident_date, report_code, jurisdiction, jurisdiction_state, report_type_id, local);
 
 export key_ecrashV2_dol := index(dep_base
                                   ,{accident_date,report_code,jurisdiction_state, jurisdiction}
 
 								   ,{dep_base}
-							      ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_dol_' + doxie.Version_SuperKey);
- 
+							   ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_dol_' + doxie.Version_SuperKey);
+								

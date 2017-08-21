@@ -1,6 +1,6 @@
 Import Data_Services, Ingenix_NatlProf, doxie, Data_Services;
 
-base_file 	:= Ingenix_NatlProf.file_sanctions_cleaned_dided_dates(sanc_busnme<>'');
+base_file 	:= Ingenix_NatlProf.Basefile_Sanctions_Bdid(sanc_busnme<>'');
 dedup_base	:= DEDUP(base_file, RECORD, ALL, LOCAL);
 
 export key_sanctions_busname := index(dedup_base,

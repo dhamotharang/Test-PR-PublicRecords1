@@ -1,4 +1,7 @@
-import address, doxie, ut, header_services;
+/*2016-12-09T00:59:03Z (Wendy Ma)
+
+*/
+Import Data_Services, address, doxie, ut, header_services;
 
 layout_orig_util_in := record
 	string15        id;
@@ -43,16 +46,17 @@ layout_orig_util_in_TEMP := RECORD
 	unsigned6 did_temp;
 END;
 
-layout_orig_util_in_TEMP remove_csa_indicator(UtilFile.file_util.full_did l) := transform
+layout_orig_util_in_TEMP remove_csa_indicator(UtilFile.file_util.full_did_for_index l) := transform
 	self.did_temp := (unsigned6) l.did;
 	self := l;
 end;
 
-util := project(UtilFile.file_util.full_did((unsigned6)did<>0), remove_csa_indicator(left));
+util := project(UtilFile.file_util.full_did_for_index((unsigned6)did<>0), remove_csa_indicator(left));
 
-header_services.Supplemental_Data.mac_verify('file_utility_inj.thor',Utilfile.Layout_DID_Out,read);
+//blank out invalid phone
+utilfile.Mac_clean_phone(util,cleanphone_out);
  
-suppData := read();
+suppData := utilfile.file_supplemental.out_supp;
 
 layout_orig_util_in_TEMP reformat(utilfile.Layout_DID_Out l) := transform
 	self.did_temp := (unsigned6) l.did;
@@ -61,7 +65,7 @@ end;
 
 supp_ds := project(suppData, reformat(left));
 
-file_util_orig_in_TEMP := util + supp_ds;
+file_util_orig_in_TEMP := cleanphone_out + supp_ds;
 
 //***********************************CODE TO SUPRESS WA CELL PHONES********************************************
 //Supress WA Cell Phones
@@ -69,11 +73,11 @@ ut.mac_suppress_by_phonetype(file_util_orig_in_TEMP,work_phone,st,PhSuppressed1,
 ut.mac_suppress_by_phonetype(PhSuppressed1,phone,st,PhSuppressed2,true,did_temp);
 
 //Reformat back to the standard format layout of the Base search file 
-file_util_orig_in := PROJECT(PhSuppressed2,transform(layout_orig_util_in,self := left));
+file_util_orig_in := PROJECT(PhSuppressed2,transform(layout_orig_util_in, self.ssn := '', self := left));
 
 //************************************************************************************************************	
 export Key_DID := 
        index(file_util_orig_in,
              {unsigned6 s_did := (unsigned6)did},
 						 {file_util_orig_in},
-						 '~thor_data400::key::utility_did_' + doxie.Version_SuperKey);
+						 Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::utility_did_' + doxie.Version_SuperKey);

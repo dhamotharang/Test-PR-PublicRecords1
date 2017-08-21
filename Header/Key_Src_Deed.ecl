@@ -7,7 +7,7 @@ end;
 
 export Key_Src_Deed(boolean pFastHeader = false, boolean pCombo = true, dataset(src_rec) pDataset=dataset([],src_rec)) := function
 
-dDE_as_Source := if(pCombo,pDataset,ln_propertyv2.ln_propertyv2_as_source(pFastHeader).ln_propertyv2_deed_as_source);
+dDE_as_Source := if(pCombo,pDataset,header.Files_SeqdSrc(pFastHeader).FAD);
 
 mac_key_src(dDE_as_Source, ln_mortgage.Layout_Deed_Mortgage_Common_Model_Base, 
 						deeds_child, 

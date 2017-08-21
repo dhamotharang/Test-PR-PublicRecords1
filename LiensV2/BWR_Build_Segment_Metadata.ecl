@@ -14,6 +14,7 @@ numericType := Text_Search.Types.SegmentType.NumericType;
 groupType := Text_Search.Types.SegmentType.GroupSeg;
 ConcatSeg := Text_Search.Types.SegmentType.ConcatSeg;
 keyType := Text_search.Types.SegmentType.ExternalKey;
+ssnType := Text_search.Types.SegmentType.SSN;
 
 segmentMetaData := DATASET([
 		{'filing_state',											textType,		[1]},
@@ -38,7 +39,7 @@ segmentMetaData := DATASET([
 		{'lapsed-date', 									DateType,		[20]},
 		{'debtor',										textType,		[21]},
 		{'tax-id',										textType,		[22]},
-		{'ssn',											textType,		[23]},
+		{'ssn',											ssnType,		[23]},
 		{'debtor-address',											textType,		[24]},
 		//{'debtor-city',											TextType,		[25]},
 		//{'debtor-state',											TextType,		[26]},

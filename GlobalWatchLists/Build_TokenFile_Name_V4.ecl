@@ -1,4 +1,4 @@
-import	ut;
+import	RoxieKeyBuild,ut;
 
 export	Build_TokenFile_Name_V4(string	pFileDate)	:=
 function
@@ -18,7 +18,7 @@ function
 	
 	dNameTokens	:=	globalwatchlists.fn_NameTokens_V4(dPrep);
 	
-	ut.MAC_SF_BuildProcess(dNameTokens,'~thor_200::base::globalwatchlistsV2::name_tokens',bldNameTokens,,,true,pFileDate);
+	RoxieKeyBuild.Mac_SF_BuildProcess_V2(dNameTokens,'~thor_200::base::globalwatchlistsV2','name_tokens',pFileDate,bldNameTokens,,,true);
 	
 	return	bldNameTokens;
 end;

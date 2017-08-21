@@ -1,4 +1,4 @@
-﻿EXPORT Macros := 
+EXPORT Macros := 
   MODULE
     
     EXPORT mac_JoinPersonKeys() :=

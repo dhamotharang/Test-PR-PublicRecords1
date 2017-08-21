@@ -1,6 +1,6 @@
-import Crim_common, Address, Lib_AddrClean, Ut, lib_stringlib;
+import Crim_common, Address,Ut, lib_stringlib;
 // Transforms
-input := DOC.file_doc_fl(regexfind('[0-9]', dc_number));
+input := dedup(sort(distribute(DOC.file_doc_fl(regexfind('[0-9]', dc_number)),hash(dc_number)),dc_number,Current_As_Of,local),dc_number,right,local);
 
 String heightToInches(String s) := FUNCTION
 cleanheight := regexreplace('[^0-9]', s, '');
@@ -25,7 +25,8 @@ normedINPUT := NORMALIZE(input, stringlib.stringfindcount(left.aliases, ';') ,No
 crim_common.Layout_In_DOC_Offender.previous tFL(normedINPUT l) := transform
 
 self.process_date		:= Crim_Common.Version_In_DOC_Offender; 
-self.offender_key		:= 'FL' +  trim(l.DC_Number,left, right) + hash(trim(l.Birth_Date, left, right), trim(L.Name, left, right)); 
+//self.offender_key		:= 'FL' +  trim(l.DC_Number,left, right) + hash(trim(l.Birth_Date, left, right), trim(L.Name, left, right)); 
+self.offender_key		:= 'FL' +  trim(l.DC_Number,left, right); 
 self.vendor				:= 'FL';
 self.data_type			:= '1';   
 self.source_file		:= 'FL-doc';
@@ -104,7 +105,7 @@ end;
 infile := project(normedINPUT, tFL(left));
 
 DOC_clean(infile,outfile)
-
+/*
 history := dataset(ut.foreign_prod+'~thor_data400::in::fl_doc_offender_clean_history',
 			crim_common.Layout_In_DOC_Offender.previous, flat)(vendor = 'FL');
 
@@ -115,6 +116,13 @@ end;
 historyout := join(distribute(outfile, hash(doc_num)), distribute(history, hash(doc_num)), left.doc_num = right.doc_num, dojoin(right), right only, local);
 
 dedFile := dedup(sort(distribute(outfile + historyout, hash(offender_key)), offender_key, lname[1..length(lname)-1], fname, -mname, pty_typ,  dob, -street_address_1, -street_address_2, -street_address_3, -street_address_4, -party_status_desc[26..34], local), offender_key, lname[1..length(lname)-1], fname, dob, local);
+*/
 
+/*dedFile := dedup(sort(distribute(outfile, hash(offender_key))
+							,offender_key, pty_nm,pty_typ,local)
+							,offender_key, pty_nm,pty_typ,local):PERSIST('~thor_data400::persist::doc::map_fl_offender');*/
+dedFile := dedup(sort(distribute(outfile, hash(offender_key))
+							,offender_key, fname, mname, lname,pty_typ,local)
+							,offender_key, fname, mname, lname,local):PERSIST('~thor_data400::persist::doc::map_fl_offender');
 
-export map_doc_fl_offender := dedFile :PERSIST('~thor_data400::persist::doc::map_fl_offender');
+export map_doc_fl_offender := dedFile;

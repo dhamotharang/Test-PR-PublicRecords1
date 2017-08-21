@@ -1,0 +1,40 @@
+IMPORT	Scrubs_Business_Credit,	Business_Credit,	ut;
+EXPORT Scrubs_DailyReportFiles := MODULE
+SHARED STRING Monday		:='~thor_data400::in::sbfe::20150907::data';
+SHARED STRING Tuesday		:='~thor_data400::in::sbfe::20150908::data';
+SHARED STRING Wednesday	:='~thor_data400::in::sbfe::20150909::data';
+SHARED STRING Thursday	:='~thor_data400::in::sbfe::20150910::data';
+SHARED STRING Friday		:='~thor_data400::in::sbfe::20150911::data';
+
+EXPORT	AAScrubs_Dataset	:=	/*Business_Credit.Files(Monday).AA +*/ Business_Credit.Files(Tuesday).AA + Business_Credit.Files(Wednesday).AA + Business_Credit.Files(Thursday).AA + Business_Credit.Files(Friday).AA;
+EXPORT	ABScrubs_Dataset	:=  /*Business_Credit.Files(Monday).AB +*/ Business_Credit.Files(Tuesday).AB + Business_Credit.Files(Wednesday).AB + Business_Credit.Files(Thursday).AB + Business_Credit.Files(Friday).AB; 
+EXPORT	ADScrubs_Dataset	:=	/*Business_Credit.Files(Monday).AD +*/ Business_Credit.Files(Tuesday).AD + Business_Credit.Files(Wednesday).AD + Business_Credit.Files(Thursday).AD + Business_Credit.Files(Friday).AD;
+EXPORT	AHScrubs_Dataset	:=	/*Business_Credit.Files(Monday).AH +*/ Business_Credit.Files(Tuesday).AH + Business_Credit.Files(Wednesday).AH + Business_Credit.Files(Thursday).AH + Business_Credit.Files(Friday).AH;
+EXPORT	BIScrubs_Dataset	:=	/*Business_Credit.Files(Monday).BI +*/ Business_Credit.Files(Tuesday).BI + Business_Credit.Files(Wednesday).BI + Business_Credit.Files(Thursday).BI + Business_Credit.Files(Friday).BI;
+EXPORT	BSScrubs_Dataset	:=	/*Business_Credit.Files(Monday).BS +*/ Business_Credit.Files(Tuesday).BS + Business_Credit.Files(Wednesday).BS + Business_Credit.Files(Thursday).BS + Business_Credit.Files(Friday).BS;
+EXPORT	CLScrubs_Dataset	:=	/*Business_Credit.Files(Monday).CL +*/ Business_Credit.Files(Tuesday).CL + Business_Credit.Files(Wednesday).CL + Business_Credit.Files(Thursday).CL + Business_Credit.Files(Friday).CL;
+EXPORT	FAScrubs_Dataset	:=	/*Business_Credit.Files(Monday).FA +*/ Business_Credit.Files(Tuesday).FA + Business_Credit.Files(Wednesday).FA + Business_Credit.Files(Thursday).FA + Business_Credit.Files(Friday).FA;
+EXPORT	FZScrubs_Dataset	:=	/*Business_Credit.Files(Monday).FZ +*/ Business_Credit.Files(Tuesday).FZ + Business_Credit.Files(Wednesday).FZ + Business_Credit.Files(Thursday).FZ + Business_Credit.Files(Friday).FZ;
+EXPORT	ISScrubs_Dataset	:=	/*Business_Credit.Files(Monday).IS +*/ Business_Credit.Files(Tuesday).IS + Business_Credit.Files(Wednesday).IS + Business_Credit.Files(Thursday).IS + Business_Credit.Files(Friday).IS;
+EXPORT	MAScrubs_Dataset	:=	/*Business_Credit.Files(Monday).MA +*/ Business_Credit.Files(Tuesday).MA + Business_Credit.Files(Wednesday).MA + Business_Credit.Files(Thursday).MA + Business_Credit.Files(Friday).MA;
+EXPORT	MSScrubs_Dataset	:=	/*Business_Credit.Files(Monday).MS +*/ Business_Credit.Files(Tuesday).MS + Business_Credit.Files(Wednesday).MS + Business_Credit.Files(Thursday).MS + Business_Credit.Files(Friday).MS;
+EXPORT	PNScrubs_Dataset	:=	/*Business_Credit.Files(Monday).PN +*/ Business_Credit.Files(Tuesday).PN + Business_Credit.Files(Wednesday).PN + Business_Credit.Files(Thursday).PN + Business_Credit.Files(Friday).PN;
+EXPORT	TIScrubs_Dataset	:=	/*Business_Credit.Files(Monday).TI +*/ Business_Credit.Files(Tuesday).TI + Business_Credit.Files(Wednesday).TI + Business_Credit.Files(Thursday).TI + Business_Credit.Files(Friday).TI;
+EXPORT	ZZScrubs_Dataset	:=	/*Business_Credit.Files(Monday).ZZ +*/ Business_Credit.Files(Tuesday).ZZ + Business_Credit.Files(Wednesday).ZZ + Business_Credit.Files(Thursday).ZZ + Business_Credit.Files(Friday).ZZ;
+
+EXPORT	AAData	:=	AAScrubs_Dataset;
+EXPORT	ABData	:=	ABScrubs_Dataset;
+EXPORT	ADData	:=	ADScrubs_Dataset;
+EXPORT	AHData	:=	AHScrubs_Dataset;
+EXPORT	BIData	:=	BIScrubs_Dataset;
+EXPORT	BSData	:=	BSScrubs_Dataset;
+EXPORT	CLData	:=	CLScrubs_Dataset;
+EXPORT	FAData	:=	FAScrubs_Dataset;
+EXPORT	FZData	:=	FZScrubs_Dataset;
+EXPORT	ISData	:=	ISScrubs_Dataset;
+EXPORT	MAData	:=	MAScrubs_Dataset;
+EXPORT	MSData	:=	MSScrubs_Dataset;
+EXPORT	PNData	:=	PNScrubs_Dataset;
+EXPORT	TIData	:=	TIScrubs_Dataset;
+EXPORT	ZZData	:=	ZZScrubs_Dataset;
+end;

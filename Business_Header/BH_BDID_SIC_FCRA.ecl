@@ -1,11 +1,11 @@
-import Corp2, DNB_dmi, Busreg, Edgar, Vickers, versioncontrol,paw, mdr,ut;
+import Corp2, DNB_dmi, Busreg, Edgar, Vickers, versioncontrol, paw, mdr, ut, Std;
 
 use_prod := versioncontrol._Flags.IsDataland;
 
 export BH_BDID_SIC_FCRA(
 
 	 string																						pBhVersion						= 'qa'
-	,dataset(Corp2.Layout_Corporate_Direct_Corp_Base) pCorpFile							= Corp2.Files(,,use_prod).Base.Corp.QA
+	,dataset(Corp2.Layout_Corporate_Direct_Corp_Base) pCorpFile							= Corp2.Files(,,use_prod).Base.Corp.Prod
 	,dataset(dnb_dmi.Layouts.Base.CompaniesForBIP2	) pDNB_Base							= DNB_dmi.Files().base.companies.qa
 	,dataset(BusReg.Layout_BusReg_Company						) pBusregCompany_Base 	= BusReg.File_BusReg_Company
 	,dataset(Layout_Business_Header_Base						) pBusinessHeader_Base	= Business_Header.Files(pBhVersion, use_prod).Base.Business_Headers.new
@@ -86,7 +86,8 @@ dnb_sic_dedup := dedup(dnb_sic_init(sic_code <> ''), all);
 // Extract SIC Codes from Business Registrations
 Layout_SIC_Code_Internal SICFromBusreg(Busreg.Layout_BusReg_Company l) := transform
 self.source := MDR.sourceTools.src_Business_Registration;
-self.sic_code := l.sic + '0000';
+//self.sic_code := l.sic + '0000';
+self.sic_code := if(stringlib.stringcleanspaces(l.sic) = '70', stringlib.stringcleanspaces(l.sic) + '000000', l.sic + '0000');
 self.dt_last_seen := (unsigned4)l.dt_last_seen;
 self := l;
 end;
@@ -183,7 +184,7 @@ sic_combined := corp_sic_dedup + dnb_sic_dedup + busreg_sic_dedup + edgar_sic_de
 sic_filtered := Business_Header.Filters.BHBDIDSIC(sic_combined,pInactiveCorps,pBhVersion);
 
 	sic_filtered2				:= if(pShouldFilter = true, sic_filtered, sic_combined)(bdid <> 0, length(trim(sic_code)) = 8) ;
-	eight_years_ago 		:= (unsigned4)((string)((unsigned)ut.GetDate[1..4] - 8) + ut.GetDate[5..]);
+	eight_years_ago 		:= (unsigned4)((string)((unsigned)((STRING8)Std.Date.Today())[1..4] - 8) + ((STRING8)Std.Date.Today())[5..]);
 	sic_deduped					:= dedup(sort(sic_filtered2, source,sic_code, bdid,-dt_last_seen), source,sic_code, bdid,all)(dt_last_seen > eight_years_ago);
 	
 	sic_proj						:= project(sic_deduped, transform(layout_sic_code, self := left));

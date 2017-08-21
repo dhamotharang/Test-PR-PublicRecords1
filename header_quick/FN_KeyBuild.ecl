@@ -1,4 +1,4 @@
-import ut, header, doxie, autokey, autokeyb, RoxieKeyBuild, header_services, risk_indicators, mdr;
+import header, doxie, autokey, autokeyb, RoxieKeyBuild, header_services, risk_indicators, mdr,aid,PromoteSupers;
 
 export FN_KeyBuild(dataset(header.Layout_Header) header_in0, string filedate) := 
 FUNCTION
@@ -14,7 +14,7 @@ header_in := project(header_in0,t_set_src(left));
 
 Suppression_Layout := header_services.Supplemental_Data.layout_in;
 
-header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func);
+header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func); 
  
 Suppression_In := supp_ds_func();
 
@@ -30,7 +30,7 @@ end;
 //***//***// TEST CODE FOR SUPPRESSION - 20070605
 
 rFullOut_HashDIDAddress tHashDIDAddress(header_in l) := transform                            
- self.hval :=  hashmd5(intformat(l.did,12,1),(string)l.st,(string)l.zip,(string)l.city_name,
+ self.hval :=  hashmd5(intformat(l.did,15,1),(string)l.st,(string)l.zip,(string)l.city_name,
 									(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.suffix,(string)l.postdir,(string)l.sec_range);
  self := l;
 end;
@@ -44,7 +44,7 @@ end;
 full_out_suppress := join(dHeader_withMD5,dSuppressedIn,
                           left.hval=right.hval,
 						  tSuppress(left,right),
-						  left only,lookup); // : persist('~thor_data400::persist::Test_FN_KEYBUILD_Step_1');
+						  left only,lookup);
 
 ///%%%
 header_services.Supplemental_Data.mac_verify('driverslicense_sup.txt',Suppression_Layout, dl_supp_ds_func);
@@ -59,7 +59,7 @@ shortHashrec := record
 end;
 
 shortHashrec HashDID_DLnumber(header.Layout_Header l) := transform                            
-	self.hval := hashmd5(	intformat((unsigned6)l.did,12,1),TRIM((string14)l.vendor_id, left, right));
+	self.hval := hashmd5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right));
 	self := l;
 end;
 
@@ -70,7 +70,6 @@ self := l;
 end;
 
 full_ShortSuppress := join(hdr_withMD5,DLSuppressedIn,left.hval=right.hval,shortSuppress(left,right),left only,lookup);
-													 // : persist('~thor_data400::persist::Test_FN_KEYBUILD_Step_2');
 
 header_services.Supplemental_Data.mac_verify('driverslicenseall_sup.txt',Suppression_Layout,dl_supp_ALL_ds_func);																					
  
@@ -85,7 +84,7 @@ longHashrec := record
 end;
 
 longHashrec HashALL(header.Layout_Header l) := transform                            
- self.hval := HASHMD5(	intformat((unsigned6)l.did,12,1),TRIM((string14)l.vendor_id, left, right),intformat((unsigned4)l.dob,8,1),Trim((string9)l.ssn));
+ self.hval := HASHMD5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right),intformat((unsigned4)l.dob,8,1),Trim((string9)l.ssn));
  self := l;
 end;
 
@@ -96,7 +95,6 @@ header.layout_header longSuppress(hdrFull_withMD5 l, DLSuppressAllIn r) := trans
 end;
 
 j1 := join(	hdrFull_withMD5,DLSuppressAllIn,left.hval=right.hval,longSuppress(left,right),left only,lookup);
-					//	: persist('~thor_data400::persist::Test_FN_KEYBUILD_Step_3');
 
 string_header_layout := {
 			string15  did;
@@ -157,23 +155,61 @@ header.layout_header  ReformatInput(string_header_layout l) := TRANSFORM
 END;
 
 dsModified := PROJECT(supplementalData(), ReformatInput(LEFT));
-full_LongSuppress := j1 + dsModified;
 
+//// this is full dataset as of full_LongSuppress := j1 + dsModified;
+full_LongSuppress_pre := j1 + dsModified;
+/////////////////////////////////////////////////////////
+
+layout_ff := Record
+     data16 hval_did ;
+     data16 hval_ssn ;
+		 string1 nl := '\n' ;
+END ;
+
+header_services.Supplemental_Data.mac_verify('ff_sup.txt',layout_ff, ff_sup_attr); // 
+ 
+Base_ff_sup := ff_sup_attr();
+
+
+full_LongSuppress_1 := JOIN(full_LongSuppress_pre, Base_ff_sup,
+                    hashmd5((string9)left.ssn) = right.hval_ssn 
+                    AND
+						  hashmd5(intformat(left.did,15,1)) != right.hval_did, 
+						TRANSFORM(LEFT),
+						LEFT ONLY, ALL) ;
+						
+header_services.Supplemental_Data.mac_verify('ridrec_sup.txt',Suppression_Layout, base_sup_attr); // 
+ 
+Base_rid_sup_in := base_sup_attr() ;
+
+base_rid_sup := PROJECT(Base_rid_sup_in ,header_services.Supplemental_Data.in_to_out(left));
+
+rid_base := JOIN(full_LongSuppress_1, base_rid_sup,
+                 hashmd5(intformat((unsigned6)left.rid,15,1)) = right.hval,                    
+						     TRANSFORM(LEFT),
+						    LEFT ONLY, ALL) ;
+						 
+						  
+full_LongSuppress := 	rid_base ;						
+
+///////////////////////////////////////////////////////
 //append gender
-
-ut.Mac_Apply_Title(full_LongSuppress,title, fname, mname, apply_title_)
+header.Mac_Apply_Title(full_LongSuppress,title, fname, mname, apply_title_)
 
 //Supress Fname = 'BIRTHDATE' Bug 79470
-apply_title := apply_title_(header.Blocked_data_new());
-
-
-ut.mac_sf_buildprocess(apply_title,'~thor_data400::base::quick_header',build_qh_base,2);
+apply_title0 := apply_title_(header.Blocked_data_new());
+apply_title := dedup(distribute(Header.fn_blank_phone(apply_title0,true),hash(did)),all,local);
+apply_PID  := header.fn_persistent_record_ID(apply_title, true);
+fix_dates := header.fn_fix_dates(apply_PID,true);
+header.macGetCleanAddr(fix_dates, RawAID, true, head_out); 
+PromoteSupers.mac_sf_buildprocess(head_out,'~thor_data400::base::quick_header',build_qh_base,2,,true);
 
 //just keys
-autoKeys := header_quick.FN_AutokeyBuild(header_quick.file_header_quick, filedate); //  : persist('~thor_data400::persist::Test_FN_KEYBUILD_Step_4');
+autoKeys := header_quick.FN_AutokeyBuild(file_header_quick_skip_PID, filedate);
 
-     didkey := header_quick.FN_key_DID(file_header_quick,                                          '~thor_data400::key::HeaderQuick::'      +filedate+'::DID') ;
-fcra_didkey := header_quick.FN_key_DID(file_header_quick(src in mdr.sourceTools.set_scoring_FCRA), '~thor_data400::key::HeaderQuick::fcra::'+filedate+'::DID') ;
+     didkey := FN_key_DID(file_header_quick_skip_PID,                                 '~thor_data400::key::HeaderQuick::'      +filedate+'::DID') ;
+fcra_didkey := FN_key_DID(file_header_quick(src in mdr.sourceTools.set_scoring_FCRA,src not in mdr.sourceTools.set_scoring_FCRA_retro_test),
+																																											'~thor_data400::key::HeaderQuick::fcra::'+filedate+'::DID') ;
 
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(     didkey,           '',                                            '~thor_data400::key::HeaderQuick::'      +filedate+'::DID',         B1);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(fcra_didkey,           '',                                            '~thor_data400::key::HeaderQuick::fcra::'+filedate+'::DID',         B2);
@@ -185,15 +221,16 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::HeaderQuick::fcra::DI
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::HeaderQuick_SSN_validity', '~thor_data400::key::HeaderQuick::'      +filedate+'::SSN_validity', M3);
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::header_nlr::did.rid',      '~thor_data400::key::header_nlr::'       +filedate+'::did.rid',      M4);
 
-ut.MAC_SK_Move_v2('~thor_data400::key::HeaderQuickDID',          'Q',MQ1);
-ut.MAC_SK_Move_v2('~thor_data400::key::HeaderQuick::fcra::DID',  'Q',MQ2);
-ut.MAC_SK_Move_v2('~thor_data400::key::HeaderQuick_SSN_validity','Q',MQ3);
-ut.MAC_SK_Move_v2('~thor_data400::key::header_nlr::did.rid',     'Q',MQ4);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::HeaderQuickDID',          'Q',MQ1);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::HeaderQuick::fcra::DID',  'Q',MQ2);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::HeaderQuick_SSN_validity','Q',MQ3);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::header_nlr::did.rid',     'Q',MQ4);
 
 return sequential(
-									build_qh_base
+									build_source_key(filedate)
+									,build_qh_base
 									,notify('QuickHeader BaseFile Complete','*')
-									,doxie.proc_header_keys(filedate,true)
+									,build_rid_srid_keys(filedate)
 									,parallel(
 														autoKeys
 														,sequential(B1,M1,MQ1)
@@ -201,6 +238,7 @@ return sequential(
 														,sequential(B3,M3,MQ3)
 														,sequential(B4,M4,MQ4)
 														)
+									//,build_source_key_prep(filedate)
 								);
 
 END;

@@ -1,4 +1,4 @@
-import header, phonesplus, irs_Dummy, doxie, ut, PAW, corp2,mdr;
+import header, phonesplus, irs_Dummy, doxie, ut, PAW, corp2, mdr, STD;
 
 export Filters :=
 module
@@ -84,7 +84,9 @@ module
 				// -- Bug: 95843 - Overlinking of Barbara Griffith with Southern California Pipeline
 				or	(MDR.sourceTools.SourceIsEBR(pInput.source) and trim(pInput.vl_id,left,right) = '811133084' /*and pInput.did = 1000628853*/)
 				// -- Bug: 103804 - Questionable Company Names.
-				or	(MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id,left,right) = '1542124062')
+				// -- Bug: 145649 - Accurint 52354 - PAW Overlinking of LexID 2715613629 D. Williams
+				// -- Bug: 191918/JIRA: DF-14772 - Consumer Privacy Reports Incorrectly Linked PAW Record
+				or	(MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id,left,right) in ['1542124062','731821740','731821740C20895717','645546729     C352857954'])
 				// -- Bug: 107798 - Remove two Business Header records with wrong source codes.
 				//or	(MDR.sourceTools.SourceIsAK_Corporations(pInput.source) and pInput.bdid in [4994780, 412358992, 16952458])
 				or	(MDR.sourceTools.SourceIsAK_Corporations(pInput.source) and 
@@ -98,7 +100,21 @@ module
 				or  (MDR.sourceTools.SourceIsZoom(pInput.source) and pInput.source_group = '96813300')
 				// -- Bug:121240 -Hewlett Packard Bus Search Result on Portal returns D&B Report
 				or  ((MDR.sourceTools.SourceIsAZ_Corporations(pInput.source) or MDR.sourceTools.SourceIsUCCV2(pInput.source)) and pInput.source_group in ['04-F08167145','DNB000173979719961223'])
-				
+				// -- Bug:  - Flush the Jigsaw records as per Jason.
+				or	(MDR.sourceTools.SourceIsJigsaw(pInput.source))
+				// -- Bug # 146862 - These corp keys need to be filtered out of all base files
+				or	(MDR.sourceTools.SourceIsCA_Corporations(pInput.source) and trim(pInput.vendor_id,left,right) in ['06-03155932', '06-200820510058', '06-200620910099'])
+				// -- Bug: 162276  - API ESP: BusinessSearch returns hex characters as the Company Name
+				or	(MDR.sourceTools.SourceIsYellow_Pages(pInput.source) and ~regexfind(' ',trim(pInput.company_name,left,right),nocase) and trim(pInput.prim_name) = 'MARIETTA' and pInput.dt_last_seen in [20131104,20131105,20131108,20131111,20131113,20131114,20131118,20131119,20140324])
+				// -- Bug:98757 - Experian Business Report Filing Numbers are Overlinking Oregon Companies
+				or	(MDR.sourceTools.SourceIsEbr(pInput.source) and trim(pInput.source_group,left,right) = '809376459' and regexfind('HEALTHCARE|HOSPITAL',trim(pInput.company_name,left,right),nocase))
+				// -- Bug: 174042 - Remove Business Records for J. Vaziri per Privacy Programs Direction
+				or	(MDR.sourceTools.SourceIsUCCS(pInput.source) and trim(pInput.vendor_id,left,right) = 'UT28041200122' and trim(pInput.company_name) = 'JENNIFER VAZIRI')
+				// -- Bug: 162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+				or	(MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vl_id,left,right) = '74072915' and pInput.phone in [5053440663, 5053451176])
+				// -- JIRA:DF-16735 Per Privacy Programs - Remove PETER KIRN records.
+				or	(regexfind('CAMELBACK GROUP|PETER KIRN|PETERKIRN', pInput.company_name, nocase) and ((pInput.state = 'CO' and trim(pInput.city) in ['GREENWOOD VILLAGE','WINTER PARK','TABERNASH']) or pInput.phone in [3039186563,8702926547]))
+				or	(regexfind('PETER KIRN|PETERKIRN', pInput.company_name, nocase))
 				; 		
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -138,6 +154,10 @@ module
 												and l.fein					= 430915544 
 												;
 				
+				// JIRA - DF-8591 Cell Phone reassigned to Irene Pappas 
+				filter_DF8591 :=		trim(l.vendor_id) = '714726209'	and l.phone	= 2673125159 
+												;
+				
 				phone := (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.phone));  // Zero the phone if more than 10-digits
 				
 				// -- Bug: 63323 - Address report returns error when address begins with percentage sign
@@ -157,7 +177,7 @@ module
 				self.geo_lat			:= if(filterbug24219,'29.756396'	,l.geo_lat				);
 				self.geo_long			:= if(filterbug24219,'-095.364044',l.geo_long				);
 				self.phone				:= map(	 filterbug24219 => 7135126200
-																	,filterbug25304 or filterbug71237 => 0					
+																	,filterbug25304 or filterbug71237 or filter_DF8591 => 0																	
 																	,phone				
 																);
 				self.company_name := scrubcompanyname(l.company_name);
@@ -233,7 +253,9 @@ module
 				// -- Bug: 95843 - Overlinking of Barbara Griffith with Southern California Pipeline
 				or	(MDR.sourceTools.SourceIsEBR(pInput.source) and trim(pInput.vl_id,left,right) = '811133084' /*and pInput.bdid in [127094209, 1165497861]*/)
 				// -- Bug: 103804 - Questionable Company Names.
-				or	(MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id,left,right) = '1542124062')
+				// -- Bug: 145649 - Accurint 52354 - PAW Overlinking of LexID 2715613629 D. Williams
+				// -- Bug: 191918/JIRA: DF-14772 - Consumer Privacy Reports Incorrectly Linked PAW Record
+				or	(MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id,left,right) in ['1542124062','731821740','731821740C20895717','645546729     C352857954'])
 				// -- Bug: 107798 - Remove two Business Header records with wrong source codes.
 				//or	(MDR.sourceTools.SourceIsAK_Corporations(pInput.source) and pInput.bdid in [4994780, 412358992, 16952458])
 				or	(MDR.sourceTools.SourceIsAK_Corporations(pInput.source) and 
@@ -250,7 +272,8 @@ module
 						 trim(pInput.fname,left,right) <> 'NIAM' and trim(pInput.lname,left,right) <> 'LIN')
 				// -- Bug: 87127 - Overlinking of business contacts due to errorneous CP FBN Filing.
 				// -- Bug: 115130 - Unlink DID for Michael Hild from Serenity Home Care Agency
-				or	(MDR.sourceTools.SourceIsFBNV2_Hist_Choicepoint(pInput.source) and trim(pInput.vendor_id,left,right) in ['CP9627346981847888151','CP219395185453452160'])
+				// -- Bug: 120900 - Remove FBN Record from Business Header & Contacts for Al-Jarafi
+				or	(MDR.sourceTools.SourceIsFBNV2_Hist_Choicepoint(pInput.source) and trim(pInput.vendor_id,left,right) in ['CP9627346981847888151','CP219395185453452160','CP11910987965939266948'])
 				// -- Bug: 109269 - Remove 4 Employment Locator records for David Scott Tronson.
 				or  (mdr.sourceTools.SourceIsEq_Employer(pInput.source) and pInput.phone = 2534603191)
 				// -- Bug: 113227 - Business Header contains errorneous Corporation record.
@@ -273,7 +296,84 @@ module
 							trim(pInput.company_name) in ['MAPLEHURST REALTY INC','MAPLEHURST'])
 				// -- Bug: 119446 - Remove Zoom Records for LexID 1234490932 Tahir Javed 
 				or  (MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.company_name) in ['OMAHA WORLD-HERALD COMPANY','OMAHA WORLD-HERALD'] and trim(pInput.fname) = 'TAHIR' and trim(pInput.lname) = 'JAVED')
-				
+				// -- Bug: 119049 - Unlink Bradley Leighty from BOA Auto Sales
+				or  ((mdr.sourceTools.SourceIsDunn_Bradstreet(pInput.source) or mdr.sourceTools.SourceIsEBR(pInput.source)) and 
+							trim(pInput.vendor_id,left,right) in ['D092297238-BOA AUTO SALES INC','738365619'] and trim(pInput.fname) = 'BRADLEY' and trim(pInput.lname) = 'LEIGHTY')
+				// -- Bug: 131131 - Business Contact Information for Opt Out Consumer-Rush Request
+				or  ( trim(pInput.company_name,left,right) in ['BAKER & MCKENZIE LLP','JACKSON DEV & CONSTRUCTION INC','MEDIA CENTER PC',
+																											 'NATIONAL COLLEGE FOR DUI DEFENSE , INC.','OPPENHEIMER WOLFF DONNELLY LLP',
+																											 'SOUTH COAST LITIGATION GROUP','THE NATIONAL COLLEGE FOR DUI DEFENSE , INC.','UNIVERSITY OF PENNSYLVANIA'] and trim(pInput.fname) = 'VANIA' and trim(pInput.lname) = 'CHAKER')
+				// -- Bug:  - Flush the Jigsaw records as per Jason.
+				or	(MDR.sourceTools.SourceIsJigsaw(pInput.source))
+				// -- Bug: 139082 - Remove Ana Lane Gomez from FBN, Business Header and PAW files
+				or	(MDR.sourceTools.SourceIsFBNV2_Experian_Direct(pInput.source) and trim(pInput.vendor_id) = 'EXP6160690673128140760')
+				// -- Bug:146861 - Remove All Business Records Associate with David Peyman
+				// -- Bug:153300 - Remove Lexid 113261977728 for Peyman Shalah
+				or	(trim(pInput.lname) = 'PEYMAN' and trim(pInput.fname) in ['DAVID','SHALA','SHAHLA','SHALAH'])
+				// -- Bug:146862 - These corp keys need to be filtered out of all base files
+				or 	(MDR.sourceTools.SourceIsCA_Corporations(pInput.source) and trim(pInput.vendor_id,left,right) in ['06-03155932', '06-200820510058', '06-200620910099'])
+				// -- Bug: 157298  - Remove Contact Angela Farole from BDID 53982819 Avante Abstract Inc.
+				or 	(trim(pInput.company_name) in [	'AVANTE', 'AVANTE ABSTRACT', 'AVANTE\' ABSTRACT',	'AVANTE ABSTRACT INC',
+																						'AVANTE\' ABSTRACT, INC', 'AVANTE\' ABSTRACT, INC.'] and trim(pInput.fname) = 'ANGELA' and trim(pInput.lname) = 'FAROLE' and trim(pInput.mname) in ['','M'])
+				// -- Bug:98757 - Experian Business Report Filing Numbers are Overlinking Oregon Companies				
+				or 	(MDR.sourceTools.SourceIsEbr(pInput.source) and trim(pInput.vl_id) = '809376459' and (regexfind('HEALTHCARE|HOSPITAL',trim(pInput.company_name,left,right),nocase) or (trim(pInput.lname) = 'MARCHETTI' and trim(pInput.fname) ='MARK')))
+				// -- Bug:166661-Consumer Privacy Requesting PAW Record Removal for LexID 2281518533				
+				or 	(MDR.sourceTools.SourceIsDCA(pInput.source) and trim(pInput.vendor_id) = '1323416' and trim(pInput.lname) = 'SCHWARTZ' and trim(pInput.fname) ='DAVID' and pInput.phone = 4083742236)
+				// -- Bug: Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+				or	(MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.company_source_group,left,right) = '74072915' and (pInput.company_phone in [5053440663, 5053451176] or pInput.phone in [5053440663, 5053451176]))
+				// -- Bug: 174042 - Remove Business Records for J. Vaziri per Privacy Programs Direction
+				or	(trim(pInput.fname,left,right) = 'JENNIFER' and trim(pInput.lname) = 'VAZIRI' and trim(pInput.mname,left,right) in ['H','HOPE'])
+				// -- Bug: 176631 - Business Header Suppression 
+				// -- Bug: 197656 - Consumer Privacy Reports Incorrectly Linked PAW Record for Clayton
+				or	(MDR.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1671940052    C355405299','1817929485','1817929485    C61984972','1817929485    C35213276'])
+				or	(MDR.sourceTools.SourceIsEq_Employer(pInput.source) and trim(pInput.fname) = 'KIMBERLY' and trim(pInput.mname) = 'MICHELLE' and trim(pInput.lname) = 'CLAYTON' and trim(pInput.company_name) = 'GRADY HEALTH')
+				// -- Bug: 183422 - Unlink Daniel A Davenport from this father Daniel S 
+				or	(trim(pInput.vendor_id) in ['8090947','NYMVO0458830691'] and trim(pInput.lname) = 'DAVENPORT')
+				// -- Bug: 194125 - Consumer Dispute 
+				or	((trim(pInput.vl_id) in ['214475444','827237547'] or trim(pInput.company_source_group) in ['214475444','827237547']) and trim(pInput.fname) = 'LINDA')
+				// -- JIRA:DF-16735 Per Privacy Programs - Remove PETER KIRN records.
+				//or	(stringlib.stringfind(pInput.company_name, 'CAMELBACK GROUP', 1) > 0 and ((pInput.state = 'CO' and trim(pInput.city) in ['GREENWOOD VILLAGE','WINTER PARK','TABERNASH']) or pInput.company_phone=3039186563))
+				or	(regexfind('CAMELBACK GROUP|PETER KIRN|PETERKIRN',pInput.company_name, nocase) and trim(pInput.fname,left,right) = 'PETER' and trim(pInput.lname,left,right) = 'KIRN' and trim(pInput.mname,left,right) in ['A','ADAMS',''])
+				or	(trim(pInput.fname,left,right) = 'PETER' and trim(pInput.lname,left,right) = 'KIRN' and trim(pInput.mname,left,right) in ['A','ADAMS',''] and pInput.state = 'CO')
+				// -- Bug: 203666/JIRA: DF-16118 - Remove Accurtrend Record for INSANE HYDROGRAPHIX LLC
+				or	(stringlib.stringfind(pInput.company_name, 'INSANE HYDROGRAPHIX', 1) > 0 and trim(pInput.fname) = 'BRYAN' and trim(pInput.lname) = 'MYERS')
+				// -- JIRA - DF-16328 Consumer Dispute - record must be suppressed/deleted
+				or	(stringlib.stringfind(pInput.company_name, 'NATIONAL IRANIAN AMERICAN', 1) > 0 and trim(pInput.fname) = 'BABAK' and trim(pInput.lname) = 'BAGHERI')
+				// -- JIRA - DF-7752, Claude Blanc incorrectly listed as business owner 
+				or 	(mdr.sourceTools.SourceIsINFOUSA_ABIUS_USABIZ(pInput.source) and trim(pInput.vl_id) in ['849828736','986042075'])
+				// -- JIRA - DF-17422, Consumer Advocacy Complaint - PAW Linking LexID - BDID 43998720 
+				or 	(mdr.sourceTools.SourceIsWorkmans_Comp(pInput.source) and regexfind('YELLOW TRANSPORTATION',pInput.company_name, nocase) and STD.Str.CleanSpaces(pInput.fname + pInput.lname) in ['BOBBY PHILLIPS','INC YELLOW'])
+				// -- JIRA - DF-17991 Consumer Dispute - record must be suppressed/deleted
+				or  (mdr.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id) = '457217847     C6260365')
+				// -- JIRA - DF-18128 Consumer Advocacy - Unlink PAW Record for LexID 54872692 Amodeo
+				or  (mdr.sourceTools.SourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) = '3422833PATRICK M MCMATH LAW FIRM L' and trim(pInput.fname) = 'JAMES' and trim(pInput.lname) = 'AMODEO' and trim(pInput.mname) = 'E')
+				// -- JIRA - DF-18344 Remove Business Contacts and PAW Record for LexID 13957703, Allene A Traphan
+				or  (mdr.sourceTools.SourceIsTXBUS(pInput.source) and regexfind('ALLENE A TRAPHAN', pInput.company_name, nocase))
+				// -- JIRA - DF-18950 ZOOM records to be suppressed in PAW
+				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vl_id) = '1684933816')
+				// -- JIRA - DF-18955 PAW record to be supressed or deleted
+				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and pInput.phone = 7173042300 and trim(pInput.fname) = 'LORI' and trim(pInput.lname) = 'RICH')
+				// -- JIRA - DF-19021 Consumer Advocacy - Removal of PAW/Business Contacts for Praveen Sengar
+				or  (pInput.phone = 5088728200 and trim(pInput.fname) = 'PRAVEEN' and trim(pInput.lname) = 'SENGAR')
+				// -- JIRA - DF-19020 Consumer Advocacy - Removal of PAW/Business Contacts for Sappington
+				or  (regexfind('LANDGUARD EAGLE', pInput.company_name, nocase) and trim(pInput.vendor_id) in ['DZXWM0058497187','17-LLC-02958317'] and trim(pInput.fname) = 'CASSANDRA' and trim(pInput.lname) = 'SAPPINGTON')
+				// -- JIRA - DF-18970 Remove all PAW/Business Contacts for LexID 724864388 at Las Vegas Address
+				or  (trim(pInput.fname) = 'PASTORA' and trim(pInput.lname) = 'ROLDAN' and 
+						 ((trim(pInput.prim_name) = 'EASTERN' and pInput.zip = 89123) or (trim(pInput.company_prim_name) = 'EASTERN' and pInput.company_zip = 89123)))
+				// -- JIRA - DF-18931 Cons. Adv. Report - Business Contacts Removal for LexID 829850667 Andra Flynn
+				or  (trim(pInput.fname) = 'ANDREA' and trim(pInput.lname) = 'FLYNN' and regexfind('PC EXPRESS ENTERPRISES', trim(pInput.company_name), nocase))
+				// -- JIRA - DF-19165 Consumer Advocacy - Remove PAW/Business Contacts for LexID 1793247875
+				or  (mdr.sourceTools.SourceIsEq_Employer(pInput.source) and trim(pInput.fname) = 'BERNARD' and trim(pInput.lname) = 'THEIS' and regexfind('PAINE WEBER|PAYNE WEBER', pInput.company_name, nocase))
+				// -- JIRA - DF-19162 Remove PAW and Business Contact Records for LexID 1510111650
+				or  (trim(pInput.fname) in ['LEWIS','CHRIS','CHRISTOPHER'] and trim(pInput.lname) in ['LEWIS','RAND'] and trim(pInput.vendor_id) in ['RGXPY0536216046','01B7E3E6DE670600D8','4007701','IBTK 1 F     6X  P'])
+				// -- JIRA - DF-19683 Cons. Adv. - LexID 1063521771 Remove PAW & Business Contacts Record
+				// -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
+				// -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
+				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898'])
+				// -- JIRA - DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
+				or  (mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
+				// -- JIRA - DF-19305 Experian Business Report has incorrect Officer Name of Jon C Dawson 
+				or  (mdr.sourceTools.sourceIsEBR(pInput.source) and trim(pInput.vendor_id) in ['940772280'] and trim(pInput.lname) = 'DAWSON')
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -365,15 +465,18 @@ module
 				///////////////////////////////////////////////////////////////////
 				// -- Corporations with Blank addresses
 				///////////////////////////////////////////////////////////////////
-				(		MDR.sourceTools.SourceIsCorpV2(pInput.source)
-				 and	trim(pInput.prim_name)	= 	''
-				 and	pInput.zip				= 	0
-				)
-
+				//*** JIRA: DF-17629 PAW - Corp records changing the dt_first_seens to more recent date then before. 
+				//*** Removing the below code so the date_first/last_seens dates would retain the oldest dates in the 
+				//*** event of flush-n-fills of corp states at source builds
+			  //	(		MDR.sourceTools.SourceIsCorpV2(pInput.source)
+				// and	trim(pInput.prim_name)	= 	''
+				// and	pInput.zip				= 	0
+				//)
+			
 				///////////////////////////////////////////////////////////////////
 				// -- Corporations records with certain bad names
 				///////////////////////////////////////////////////////////////////
-			or	(		pInput.company_name		in [ 'X'
+				(		pInput.company_name		in [ 'X'
 													,'SAME'
 													,'NATIONAL REGISTERED AGENTS, INC.'
 													,'NATIONAL REGISTERED AGENTS'
@@ -427,7 +530,9 @@ module
 				// -- Bug: 95843 - Overlinking of Barbara Griffith with Southern California Pipeline
 				or	(MDR.sourceTools.SourceIsEBR(pInput.source) and trim(pInput.vl_id,left,right) = '811133084' /*and pInput.bdid in [127094209, 1165497861]*/)
 				// -- Bug: 103804 - Questionable Company Names.
-				or	(MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id,left,right) = '1542124062')
+				// -- Bug: 145649 - Accurint 52354 - PAW Overlinking of LexID 2715613629 D. Williams
+				// -- Bug: 191918/JIRA: DF-14772 - Consumer Privacy Reports Incorrectly Linked PAW Record
+				or	(MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id,left,right) in ['1542124062','731821740','731821740C20895717','645546729     C352857954'])				
 				// -- Bug: 107798 - Remove two Business Header records with wrong source codes.
 				or	(MDR.sourceTools.SourceIsAK_Corporations(pInput.source) and pInput.bdid in [4994780, 412358992, 16952458])
 				// -- Bug: 87127 - Overlinking of business contacts due to errorneous CP FBN Filing.
@@ -438,6 +543,33 @@ module
 				or  (MDR.sourceTools.SourceIsZoom(pInput.source) and pInput.source_group = '96813300')
 				// -- Bug:121240 -Hewlett Packard Bus Search Result on Portal returns D&B Report
 				or  ((MDR.sourceTools.SourceIsAZ_Corporations(pInput.source) or MDR.sourceTools.SourceIsUCCV2(pInput.source)) and pInput.source_group in ['04-F08167145','DNB000173979719961223'])
+				// -- Bug:  - Flush the Jigsaw records as per Jason.
+				or	(MDR.sourceTools.SourceIsJigsaw(pInput.source))
+				// -- Bug # 146862 - These corp keys need to be filtered out of all base files
+				or	(MDR.sourceTools.SourceIsCA_Corporations(pInput.source) and trim(pInput.vendor_id,left,right) in ['06-03155932', '06-200820510058', '06-200620910099'])
+				// -- Bug: 162276  - API ESP: BusinessSearch returns hex characters as the Company Name
+				or	(MDR.sourceTools.SourceIsYellow_Pages(pInput.source) and ~regexfind(' ',trim(pInput.company_name,left,right),nocase) and trim(pInput.prim_name) = 'MARIETTA' and pInput.dt_last_seen in [20131104,20131105,20131108,20131111,20131113,20131114,20131118,20131119,20140324])
+				// -- Bug:98757 - Experian Business Report Filing Numbers are Overlinking Oregon Companies
+				or	(MDR.sourceTools.SourceIsEbr(pInput.source) and trim(pInput.source_group,left,right) = '809376459' and regexfind('HEALTHCARE|HOSPITAL',trim(pInput.company_name,left,right),nocase))
+				// -- Bug: 174042 - Remove Business Records for J. Vaziri per Privacy Programs Direction
+				or	(MDR.sourceTools.SourceIsUCCS(pInput.source) and trim(pInput.vendor_id,left,right) = 'UT28041200122' and trim(pInput.company_name) = 'JENNIFER VAZIRI')
+				or  (pInput.bdid in [127231255, 615805461, 1132464520, 3298931063])
+				// -- Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+				or	(MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vl_id,left,right) = '74072915' and pInput.phone in [5053440663, 5053451176])
+				// -- Flush-N-Fill of Louisiana and Hawaii Corps as per Julie Franzer, Bug: 
+				//or	(MDR.sourceTools.SourceIsLA_Corporations(pInput.source))
+				//or	(MDR.sourceTools.SourceIsHI_Corporations(pInput.source))
+				// -- Bug: 182220 - Record (BDID) Suppression
+				or	(pInput.bdid = 1943474549)
+				// -- JIRA:DF-16735 Per Privacy Programs - Remove PETER KIRN records.
+				or	(regexfind('CAMELBACK GROUP|PETER KIRN|PETERKIRN', pInput.company_name, nocase) and ((pInput.state = 'CO' and trim(pInput.city) in ['GREENWOOD VILLAGE','WINTER PARK','TABERNASH']) or pInput.phone in [3039186563,8702926547]))
+				or	(regexfind('PETER KIRN|PETERKIRN', pInput.company_name, nocase))
+				// -- Bug:190608 - Flush-n-fill PA Corporations as per Julie.
+				//or	(MDR.sourceTools.SourceIsPA_Corporations(pInput.source))
+				// -- Bug:198128/202786 - Flush-n-fill Vickers.
+				//or	(MDR.sourceTools.SourceIsVickers(pInput.source))
+				// -- Jira DF-18364 - Business Header - Flush-n-fill Gong Neustar business records due to bad Source_group
+				//or	(MDR.sourceTools.sourceIsGong_Business(pInput.source) and pInput.source_group[1..4] = 'NEU-')
 				;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -481,6 +613,9 @@ module
 														)
 												and l.fein					= 430915544 
 												;
+				
+				// JIRA - DF-8591 Cell Phone reassigned to Irene Pappas 
+				filter_DF8591 :=		trim(l.vendor_id) = '714726209'	and l.phone	= 2673125159 ;
 
 				phone := (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.phone));  // Zero the phone if more than 10-digits
 				// -- Bug: 63323 - Address report returns error when address begins with percentage sign
@@ -500,7 +635,7 @@ module
 				self.geo_lat			:= if(filterbug24219,'29.756396'	,l.geo_lat				);
 				self.geo_long			:= if(filterbug24219,'-095.364044',l.geo_long				);
 				self.phone				:= map(	 filterbug24219 => 7135126200
-																	,filterbug25304 or filterbug71237 => 0					
+																	,filterbug25304 or filterbug71237 or filter_DF8591 => 0					
 																	,phone				
 																);
 				self.company_name := scrubcompanyname(l.company_name);
@@ -530,11 +665,14 @@ module
 				///////////////////////////////////////////////////////////////////
 				// -- Corporations with Blank addresses
 				///////////////////////////////////////////////////////////////////
-			or (		MDR.sourceTools.SourceIsCorpV2(pInput.source)
-				 and	trim(pInput.company_prim_name)	= 	''
-				 and	pInput.company_zip				= 	0
-				)
-
+				//***JIRA: DF-17629 PAW - Corp records changing the dt_first_seens to more recent date then before. 
+				//*** Removing the below code so the date_first/last_seens dates would retain the oldest dates in the 
+				//*** event of flush-n-fills of corp states at source builds
+				//or (		MDR.sourceTools.SourceIsCorpV2(pInput.source)
+				// and	trim(pInput.company_prim_name)	= 	''
+				// and	pInput.company_zip				= 	0
+				//)
+		
 				///////////////////////////////////////////////////////////////////
 				// -- Corporations records with certain bad names
 				///////////////////////////////////////////////////////////////////
@@ -623,7 +761,9 @@ module
 				// -- Bug: 95843 - Overlinking of Barbara Griffith with Southern California Pipeline
 				or	(MDR.sourceTools.SourceIsEBR(pInput.source) and trim(pInput.vl_id,left,right) = '811133084' /*and pInput.did = 1000628853*/)
 				// -- Bug: 103804 - Questionable Company Names.
-				or	(MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id,left,right) = '1542124062')
+				// -- Bug: 145649 - Accurint 52354 - PAW Overlinking of LexID 2715613629 D. Williams
+				// -- Bug: 191918/JIRA: DF-14772 - Consumer Privacy Reports Incorrectly Linked PAW Record
+				or	(MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id,left,right) in ['1542124062','731821740','731821740C20895717','645546729     C352857954'])
 				// -- Bug: 107798 - Remove two Business Header records with wrong source codes.
 				or	(MDR.sourceTools.SourceIsAK_Corporations(pInput.source) and pInput.bdid in [4994780, 412358992, 16952458])
 				// -- Bug: 98386 - Robert Spencer and Virginia Union University
@@ -634,7 +774,8 @@ module
 						 trim(pInput.fname,left,right) <> 'NIAM' and trim(pInput.lname,left,right) <> 'LIN')
 				// -- Bug: 87127 - Overlinking of business contacts due to errorneous CP FBN Filing.
 				// -- Bug: 115130 - Unlink DID for Michael Hild from Serenity Home Care Agency
-				or	(MDR.sourceTools.SourceIsFBNV2_Hist_Choicepoint(pInput.source) and trim(pInput.vendor_id,left,right) in ['CP9627346981847888151','CP219395185453452160'])
+				// -- Bug: 120900 - Remove FBN Record from Business Header & Contacts for Al-Jarafi
+				or	(MDR.sourceTools.SourceIsFBNV2_Hist_Choicepoint(pInput.source) and trim(pInput.vendor_id,left,right) in ['CP9627346981847888151','CP219395185453452160','CP11910987965939266948'])
 				// -- Bug: 109269 - Remove 4 Employment Locator records for David Scott Tronson.
 				or  (mdr.sourceTools.SourceIsEq_Employer(pInput.source) and pInput.phone = 2534603191)
 				// -- Bug: 113227 - Business Header contains errorneous Corporation record.
@@ -656,6 +797,93 @@ module
 							trim(pInput.company_name) in ['MAPLEHURST REALTY INC','MAPLEHURST'])
 				// -- Bug: 119446 - Remove Zoom Records for LexID 1234490932 Tahir Javed 
 				or  (MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.company_name) in ['OMAHA WORLD-HERALD COMPANY','OMAHA WORLD-HERALD'] and trim(pInput.fname) = 'TAHIR' and trim(pInput.lname) = 'JAVED')
+				// -- Bug: 119049 - Unlink Bradley Leighty from BOA Auto Sales
+				or  ((mdr.sourceTools.SourceIsDunn_Bradstreet(pInput.source) or mdr.sourceTools.SourceIsEBR(pInput.source)) and 
+							trim(pInput.vendor_id,left,right) in ['D092297238-BOA AUTO SALES INC','738365619'] and trim(pInput.fname) = 'BRADLEY' and trim(pInput.lname) = 'LEIGHTY')
+				// -- Bug: 131131 - Business Contact Information for Opt Out Consumer-Rush Request
+				or  ( trim(pInput.company_name,left,right) in ['BAKER & MCKENZIE LLP','JACKSON DEV & CONSTRUCTION INC','MEDIA CENTER PC',
+																											 'NATIONAL COLLEGE FOR DUI DEFENSE , INC.','OPPENHEIMER WOLFF DONNELLY LLP',
+																											 'SOUTH COAST LITIGATION GROUP','THE NATIONAL COLLEGE FOR DUI DEFENSE , INC.','UNIVERSITY OF PENNSYLVANIA'] and trim(pInput.fname) = 'VANIA' and trim(pInput.lname) = 'CHAKER')
+				// -- Bug:  - Flush the Jigsaw records as per Jason.
+				or	(MDR.sourceTools.SourceIsJigsaw(pInput.source))
+				// -- Bug: 139082 - Remove Ana Lane Gomez from FBN, Business Header and PAW files
+				or	(MDR.sourceTools.SourceIsFBNV2_Experian_Direct(pInput.source) and trim(pInput.vendor_id) = 'EXP6160690673128140760')
+				// -- Bug:146861 - Remove All Business Records Associate with David Peyman
+				// -- Bug:153300 - Remove Lexid 113261977728 for Peyman Shalah
+				or	(trim(pInput.lname) = 'PEYMAN' and trim(pInput.fname) in ['DAVID','SHALA','SHAHLA','SHALAH'])
+				// -- Bug:146862 - These corp keys need to be filtered out of all base files
+				or	(MDR.sourceTools.SourceIsCA_Corporations(pInput.source) and trim(pInput.vendor_id,left,right) in ['06-03155932', '06-200820510058', '06-200620910099'])
+				// -- Bug: 157298  - Remove Contact Angela Farole from BDID 53982819 Avante Abstract Inc.
+				or 	(trim(pInput.company_name) in [	'AVANTE', 'AVANTE ABSTRACT', 'AVANTE\' ABSTRACT',	'AVANTE ABSTRACT INC',
+																						'AVANTE\' ABSTRACT, INC', 'AVANTE\' ABSTRACT, INC.'] and trim(pInput.fname) = 'ANGELA' and trim(pInput.lname) = 'FAROLE' and trim(pInput.mname) in ['','M'])
+				// -- Bug:98757 - Experian Business Report Filing Numbers are Overlinking Oregon Companies				
+				or 	(MDR.sourceTools.SourceIsEbr(pInput.source) and trim(pInput.vl_id) = '809376459' and (regexfind('HEALTHCARE|HOSPITAL',trim(pInput.company_name,left,right),nocase) or (trim(pInput.lname) = 'MARCHETTI' and trim(pInput.fname) ='MARK')))
+				// -- Bug:166661-Consumer Privacy Requesting PAW Record Removal for LexID 2281518533				
+				or 	(MDR.sourceTools.SourceIsDCA(pInput.source) and trim(pInput.vendor_id) = '1323416' and trim(pInput.lname) = 'SCHWARTZ' and trim(pInput.fname) ='DAVID' and pInput.phone = 4083742236)
+				// -- Bug: Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+				or	(MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.company_source_group,left,right) = '74072915' and (pInput.company_phone in [5053440663, 5053451176] or pInput.phone in [5053440663, 5053451176]))
+				// -- Bug: 174042 - Remove Business Records for J. Vaziri per Privacy Programs Direction
+				or	(pInput.did = 2603985162 or (trim(pInput.fname,left,right) = 'JENNIFER' and trim(pInput.lname) = 'VAZIRI' and trim(pInput.mname,left,right) in ['H','HOPE']))
+				// -- Bug: 176631 - Business Header Suppression
+				// -- Bug: 197656 - Consumer Privacy Reports Incorrectly Linked PAW Record for Clayton
+				or	(MDR.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1671940052    C355405299','1817929485','1817929485    C61984972','1817929485    C35213276'])
+				or	(MDR.sourceTools.SourceIsEq_Employer(pInput.source) and trim(pInput.fname) = 'KIMBERLY' and trim(pInput.mname) = 'MICHELLE' and trim(pInput.lname) = 'CLAYTON' and trim(pInput.company_name) = 'GRADY HEALTH')
+				// -- Bug: 183422 - Unlink Daniel A Davenport from this father Daniel S 
+				or	(trim(pInput.vendor_id) in ['8090947','NYMVO0458830691'] and trim(pInput.lname) = 'DAVENPORT')
+				// -- Flush-N-Fill of Louisiana and Hawaii Corps as per Julie Franzer Bug: 
+				//or	(MDR.sourceTools.SourceIsLA_Corporations(pInput.source))			
+				//or	(MDR.sourceTools.SourceIsHI_Corporations(pInput.source))
+				// -- Bug: 182220 - Record (BDID) Suppression
+				or	(pInput.bdid = 1943474549)
+				// -- Bug: 194125 - Consumer Dispute 
+				or	((trim(pInput.vl_id) in ['214475444','827237547'] or trim(pInput.company_source_group) in ['214475444','827237547']) and trim(pInput.fname) = 'LINDA')
+				// -- JIRA:DF-16735 Per Privacy Programs - Remove PETER KIRN records.
+				//or	(stringlib.stringfind(pInput.company_name, 'CAMELBACK GROUP', 1) > 0 and ((pInput.state = 'CO' and trim(pInput.city) in ['GREENWOOD VILLAGE','WINTER PARK','TABERNASH']) or pInput.company_phone=3039186563))
+				or	(regexfind('CAMELBACK GROUP|PETER KIRN|PETERKIRN',pInput.company_name, nocase) and trim(pInput.fname,left,right) = 'PETER' and trim(pInput.lname,left,right) = 'KIRN' and trim(pInput.mname,left,right) in ['A','ADAMS',''])
+				or	(trim(pInput.fname,left,right) = 'PETER' and trim(pInput.lname,left,right) = 'KIRN' and trim(pInput.mname,left,right) in ['A','ADAMS',''] and pInput.state = 'CO')
+				// -- Bug:190608 - Flush-n-fill PA Corporations as per Julie.
+				//or	(MDR.sourceTools.SourceIsPA_Corporations(pInput.source))
+				// -- Bug:198128/202786 - Flush-n-fill Vickers.
+				//or	(MDR.sourceTools.SourceIsVickers(pInput.source))
+				// -- Bug: 203666/JIRA: DF-16118 - Remove Accurtrend Record for INSANE HYDROGRAPHIX LLC
+				or	(stringlib.stringfind(pInput.company_name, 'INSANE HYDROGRAPHIX', 1) > 0 and trim(pInput.fname) = 'BRYAN' and trim(pInput.lname) = 'MYERS')
+				// -- JIRA - DF-16328 Consumer Dispute - record must be suppressed/deleted
+				or	(stringlib.stringfind(pInput.company_name, 'NATIONAL IRANIAN AMERICAN', 1) > 0 and trim(pInput.fname) = 'BABAK' and trim(pInput.lname) = 'BAGHERI')
+				// -- JIRA - DF-7752, Claude Blanc incorrectly listed as business owner 
+				or 	(mdr.sourceTools.SourceIsINFOUSA_ABIUS_USABIZ(pInput.source) and trim(pInput.vl_id) in ['849828736','986042075'])
+				// -- JIRA - DF-17422, Consumer Advocacy Complaint - PAW Linking LexID - BDID 43998720 
+				or 	(mdr.sourceTools.SourceIsWorkmans_Comp(pInput.source) and regexfind('YELLOW TRANSPORTATION',pInput.company_name, nocase) and STD.Str.CleanSpaces(pInput.fname + pInput.lname) in ['BOBBY PHILLIPS','INC YELLOW'])
+				// -- JIRA - DF-17991 Consumer Dispute - record must be suppressed/deleted
+				or  (mdr.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id) = '457217847     C6260365')
+				// -- JIRA - DF-18128 Consumer Advocacy - Unlink PAW Record for LexID 54872692 Amodeo
+				or  (mdr.sourceTools.SourceIsBusiness_Registration(pInput.source) and trim(pInput.company_source_group) = '3422833PATRICK M MCMATH LAW FIRM L' and trim(pInput.fname) = 'JAMES' and trim(pInput.lname) = 'AMODEO' and trim(pInput.mname) = 'E')
+				// -- JIRA - DF-18344 Remove Business Contacts and PAW Record for LexID 13957703, Allene A Traphan
+				or  (mdr.sourceTools.SourceIsTXBUS(pInput.source) and regexfind('ALLENE A TRAPHAN', pInput.company_name, nocase))
+				// -- JIRA - DF-18950 ZOOM records to be suppressed in PAW
+				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vl_id) = '1684933816')
+				// -- JIRA - DF-18955 PAW record to be supressed or deleted
+				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and pInput.phone = 7173042300 and trim(pInput.fname) = 'LORI' and trim(pInput.lname) = 'RICH')
+				// -- JIRA - DF-19021 Consumer Advocacy - Removal of PAW/Business Contacts for Praveen Sengar
+				or  (pInput.phone = 5088728200 and trim(pInput.fname) = 'PRAVEEN' and trim(pInput.lname) = 'SENGAR')
+				// -- JIRA - DF-19020 Consumer Advocacy - Removal of PAW/Business Contacts for Sappington
+				or  (regexfind('LANDGUARD EAGLE', pInput.company_name, nocase) and trim(pInput.vendor_id) in ['DZXWM0058497187','17-LLC-02958317'] and trim(pInput.fname) = 'CASSANDRA' and trim(pInput.lname) = 'SAPPINGTON')
+				// -- JIRA - DF-18970 Remove all PAW/Business Contacts for LexID 724864388 at Las Vegas Address
+				or  (pInput.did = 724864388 or (trim(pInput.fname) = 'PASTORA' and trim(pInput.lname) = 'ROLDAN' and 
+						 ((trim(pInput.prim_name) = 'EASTERN' and pInput.zip = 89123) or (trim(pInput.company_prim_name) = 'EASTERN' and pInput.company_zip = 89123))))
+				// -- JIRA - DF-18931 Cons. Adv. Report - Business Contacts Removal for LexID 829850667 Andra Flynn
+				or  (trim(pInput.fname) = 'ANDREA' and trim(pInput.lname) = 'FLYNN' and regexfind('PC EXPRESS ENTERPRISES', trim(pInput.company_name), nocase))
+				// -- JIRA - DF-19165 Consumer Advocacy - Remove PAW/Business Contacts for LexID 1793247875
+				or  (mdr.sourceTools.SourceIsEq_Employer(pInput.source) and trim(pInput.fname) = 'BERNARD' and trim(pInput.lname) = 'THEIS' and regexfind('PAINE WEBER|PAYNE WEBER', pInput.company_name, nocase))
+				// -- JIRA - DF-19162 Remove PAW and Business Contact Records for LexID 1510111650
+				or  (trim(pInput.fname) in ['LEWIS','CHRIS','CHRISTOPHER'] and trim(pInput.lname) in ['LEWIS','RAND'] and trim(pInput.vendor_id) in ['RGXPY0536216046','01B7E3E6DE670600D8','4007701','IBTK 1 F     6X  P'])
+				// -- JIRA - DF-19683 Cons. Adv. - LexID 1063521771 Remove PAW & Business Contacts Record
+				// -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
+				// -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
+				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898'])
+				// -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
+				or  (mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
+				// -- JIRA - DF-19305 Experian Business Report has incorrect Officer Name of Jon C Dawson 
+				or  (mdr.sourceTools.sourceIsEBR(pInput.source) and trim(pInput.vendor_id) in ['940772280'] and trim(pInput.lname) = 'DAWSON')
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -705,6 +933,13 @@ module
 												and trim(l.company_name) = 'EAST LOS ANGELES BAKERY, INC.'
 												;
 				
+				// BBug: 114192 -Incorrect individual linked to Business
+				filterbug114192 := trimids(l.vl_id) in ['25-00FUD1','25-KD7XE6'] 
+												and mdr.sourcetools.SourceIsMA_Corporations(l.source)
+												and trim(l.fname) = 'CRISTOPHER' and trim(l.lname) = 'BARRET'
+												and l.did = 144086733
+												;
+				
 				phone 				:= (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.phone));  // Zero the phone if more than 10-digits
 				company_phone := (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.company_phone));  // Zero the companyphone if more than 10-digits
 				
@@ -727,7 +962,7 @@ module
 				self.company_fein					:= if(filterbug42740,0						,l.company_fein						);
 				self.vendor_id						:= if(blankbug48348,'',trimids(l.vendor_id));
 				self.company_source_group	:= trimids(l.company_source_group);
-				self.DID									:= if(filterbug30402, 0, l.did);
+				self.DID									:= if(filterbug30402 or filterbug114192, 0, l.did);
 				self.ssn									:= if(filterbug30402, 0, l.ssn);
 				//for bug 30494 & 30519.  20080424
 				self.dt_first_seen				:= (unsigned4)validatedate((string8)l.dt_first_seen						,if(length(trim((string8)l.dt_first_seen						)) = 8,0,1));
@@ -789,7 +1024,11 @@ module
 		function
 				
 			boolean lFilter 	:= // -- Bug: 113227 - Business Header contains errorneous Corporation record.
-													(		pInput.bdid						= 616279283	);
+													(		pInput.bdid						= 616279283	)
+													 // -- Bug: 182220 - Record (BDID) Suppression
+											or	(		pInput.bdid						= 1943474549)
+													 // -- JIRA:DL-16735 - Consumer Dispute, Drop PETER KIRN records from Business header file.
+											or	(		pInput.bdid						= 132614966);
 
 			boolean lFullFilter 		:= if(pFilterOut
 																		,not lFilter	//negate it 
@@ -863,8 +1102,24 @@ module
 				or  (mdr.sourceTools.SourceIsEq_Employer(pInput.source) and pInput.phone = 2534603191)
 				 // -- Bug: 106251 - Overlinking of Business Contacts to Michael McGovern
 				or	(		pInput.bdid in [3596011, 558650599] and pInput.did = 1671671138)
+				// -- Bug:146861 - Remove All Business Records Associate with David Peyman
+				// -- Bug:153300 - Remove Lexid 113261977728 for Peyman Shalah
+				or	(trim(pInput.lname) = 'PEYMAN' and trim(pInput.fname) in ['DAVID','SHALA','SHAHLA','SHALAH'])
+				// -- Bug: 157298  - Remove Contact Angela Farole from BDID 53982819 Avante Abstract Inc.
+				or 	(trim(pInput.company_name) in [	'AVANTE', 'AVANTE ABSTRACT', 'AVANTE\' ABSTRACT',	'AVANTE ABSTRACT INC',
+																						'AVANTE\' ABSTRACT, INC', 'AVANTE\' ABSTRACT, INC.'] and trim(pInput.fname) = 'ANGELA' and trim(pInput.lname) = 'FAROLE' and trim(pInput.mname) in ['','M'])
+				// -- Bug:98757 - Experian Business Report Filing Numbers are Overlinking Oregon Companies				
+				or 	(MDR.sourceTools.SourceIsEbr(pInput.source) and trim(pInput.vl_id) = '809376459' and (regexfind('HEALTHCARE|HOSPITAL',trim(pInput.company_name,left,right),nocase) or (trim(pInput.lname) = 'MARCHETTI' and trim(pInput.fname) ='MARK')))
+				// -- Bug: 182220 - Record (BDID) Suppression
+				or	(pInput.bdid = 1943474549)
+				// -- JIRA: DF-16735 Per Privacy Programs - Remove OH MVR Record for David Kirn in Business Header
+				//	Camelback Group, PETER KIRN * DAVID KIRN 
+				or	(pInput.did in [1400550559, 154640963692] or pInput.ssn = 273466389)
+				// -- JIRA: DF-19162 Remove PAW and Business Contact Records for LexID 1510111650
+				or	(pInput.did = 1510111650)
+				// -- JIRA: DF-18970 Remove all PAW/Business Contacts for LexID 724864388 at Las Vegas Address
+				or	(pInput.did = 724864388)
 			
-
 				;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -928,9 +1183,19 @@ module
 			{72240697		,1947802553},
 			{72240697		,1954168479},
 			{72240697		,1954159808},
-			{107800659,	 113490609}, //*** Bug:95843 - Overlinking of Barbara Griffith with Southern California Pipeline
+			{107800659,	 113490609}, 	//*** Bug:95843 - Overlinking of Barbara Griffith with Southern California Pipeline
 			{125686733,	 150732877},  //*** Bug:95843 - Overlinking of Barbara Griffith with Southern California Pipeline
-			{29095389,   32032819}
+			{29095389,   32032819},
+			{69701262,   95194575}, 	//*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+			{69701262,   105934715},  //*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+			{69701262,   167801849},  //*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+			{69701262,   545038389},  //*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+			{69701262,   1168297034}, //*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+			{69701262,   2452906262}, //*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+			{1221621646, 2452906262}, //*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+			{1221644272, 2452906262}, //*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+			{1770940086, 2452906262}, //*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+			{1878015099, 2452906262}  //*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
 			], filterRec);
 		
 		export Business_Relatives(dataset(Layout_Business_Relative) pInput,boolean pFilterOut = true) :=
@@ -1008,6 +1273,7 @@ module
 				(		pInput.did						= 1363114130
 				 and	pInput.bdid						= 14733991
 				)
+
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1062,15 +1328,22 @@ module
 		export PeopleAtWorkSeq(dataset(Layout_Business_Contact_Sequenced) pInput) := 
 		function
 			boolean lAdditionalFilter	:= 
-				(		MDR.sourceTools.SourceIsEBR(pInput.source)) 
+					// -- Bug: 184195 - DNB DMI Needs Removed from PAW	
+				(		MDR.sourceTools.SourceIsDunn_Bradstreet(pInput.source)) 
+			or
+				(		MDR.sourceTools.SourceIsEBR(pInput.source))
+			or // -- Bug:  - Flush the Jigsaw records as per Jason.
+				(	MDR.sourceTools.SourceIsJigsaw(pInput.source))
 			or
 				(		pInput.did						= 1363114130
 				 and	pInput.bdid						= 14733991
 				)
 			or	// -- Bug: 103804 - Questionable Company Names.
-				(		pInput.bdid 				= 2736997388
-				 or (MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id,left,right) = '1542124062')
-				)			
+				(		pInput.bdid 				= 2736997388)	
+			or	// -- Bug: 145649 - Accurint 52354 - PAW Overlinking of LexID 2715613629 D. Williams
+					// -- Bug: 191918/JIRA: DF-14772 - Consumer Privacy Reports Incorrectly Linked PAW Record
+				(	MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id,left,right) in ['1542124062','731821740','731821740C20895717','645546729     C352857954'])
+						
 			or	// -- Bug: 98386 - Robert Spencer and Virginia Union University
 				(		MDR.sourceTools.SourceIsZoom(pInput.source) 
 				 and pInput.bdid 			= 3564212 
@@ -1101,7 +1374,8 @@ module
 			or  // -- Bug: 106251 - Overlinking of Business Contacts to Michael McGovern
 				(		pInput.bdid in [3596011, 558650599] and pInput.did = 1671671138)
 			or	// -- Bug: 115130 - Unlink DID for Michael Hild from Serenity Home Care Agency
-				(		mdr.sourceTools.SourceIsFBNV2_Hist_Choicepoint(pInput.source) and trim(pInput.vendor_id,left,right) = 'CP219395185453452160')
+					// -- Bug: 120900 - Remove FBN Record from Business Header & Contacts for Al-Jarafi
+				(		mdr.sourceTools.SourceIsFBNV2_Hist_Choicepoint(pInput.source) and trim(pInput.vendor_id) in ['CP219395185453452160','CP11910987965939266948'])
 			or  // -- Bug:121240 -Hewlett Packard Bus Search Result on Portal returns D&B Report
 				(		(MDR.sourceTools.SourceIsAZ_Corporations(pInput.source) or MDR.sourceTools.SourceIsUCCV2(pInput.source)) and pInput.vendor_id in ['04-F08167145','DNB000173979719961223'])
 			or	// -- Bug: 125332 - People at Work Suppression
@@ -1109,6 +1383,77 @@ module
 							trim(pInput.company_name) in ['MAPLEHURST REALTY INC','MAPLEHURST'])
 			or	// -- Bug: 119446 - Remove Zoom Records for LexID 1234490932 Tahir Javed 
 				(		MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.company_name) in ['OMAHA WORLD-HERALD COMPANY','OMAHA WORLD-HERALD'] and trim(pInput.fname) = 'TAHIR' and trim(pInput.lname) = 'JAVED')
+			//or  // -- Bug: 119049 - Unlink Bradley Leighty from BOA Auto Sales
+			//  (		(mdr.sourceTools.SourceIsDunn_Bradstreet(pInput.source) or mdr.sourceTools.SourceIsEBR(pInput.source)) and 
+			//				trim(pInput.vendor_id,left,right) in ['D092297238-BOA AUTO SALES INC','738365619'] and trim(pInput.fname) = 'BRADLEY' and trim(pInput.lname) = 'LEIGHTY')
+			or	// -- Bug: 131131 - Business Contact Information for Opt Out Consumer-Rush Request
+				( trim(pInput.company_name,left,right) in ['BAKER & MCKENZIE LLP','JACKSON DEV & CONSTRUCTION INC','MEDIA CENTER PC',
+																									 'NATIONAL COLLEGE FOR DUI DEFENSE , INC.','OPPENHEIMER WOLFF DONNELLY LLP',
+																									 'SOUTH COAST LITIGATION GROUP','THE NATIONAL COLLEGE FOR DUI DEFENSE , INC.','UNIVERSITY OF PENNSYLVANIA'] and trim(pInput.fname) = 'VANIA' and trim(pInput.lname) = 'CHAKER')
+			or	// -- Bug: 139082 - Remove Ana Lane Gomez from FBN, Business Header and PAW files
+				(	MDR.sourceTools.SourceIsFBNV2_Experian_Direct(pInput.source) and trim(pInput.vendor_id) = 'EXP6160690673128140760')
+			or	// -- Bug:146861 - Remove All Business Records Associate with David Peyman	-- Bug:153300 - Remove Lexid 113261977728 for Peyman Shalah
+				(	trim(pInput.lname) = 'PEYMAN' and trim(pInput.fname) in ['DAVID','SHALA','SHAHLA','SHALAH'])
+			or	// -- Bug:146862 - These corp keys need to be filtered out of all base files
+				(	MDR.sourceTools.SourceIsCA_Corporations(pInput.source) and trim(pInput.vendor_id,left,right) in ['06-03155932', '06-200820510058', '06-200620910099'])
+			or 	// -- Bug: 157298  - Remove Contact Angela Farole from BDID 53982819 Avante Abstract Inc.
+				(	trim(pInput.company_name) in ['AVANTE', 'AVANTE ABSTRACT', 'AVANTE\' ABSTRACT',	'AVANTE ABSTRACT INC',
+																				'AVANTE\' ABSTRACT, INC', 'AVANTE\' ABSTRACT, INC.'] and trim(pInput.fname) = 'ANGELA' and trim(pInput.lname) = 'FAROLE' and trim(pInput.mname) in ['','M'])
+			//or 	// -- Bug:98757 - Experian Business Report Filing Numbers are Overlinking Oregon Companies				
+			//	(	MDR.sourceTools.SourceIsEbr(pInput.source) and trim(pInput.vendor_id) = '809376459' and (regexfind('HEALTHCARE|HOSPITAL',trim(pInput.company_name,left,right),nocase) or (trim(pInput.lname) = 'MARCHETTI' and trim(pInput.fname) ='MARK')))
+			or	// -- Bug:166661-Consumer Privacy Requesting PAW Record Removal for LexID 2281518533				
+				( MDR.sourceTools.SourceIsDCA(pInput.source) and trim(pInput.vendor_id) = '1323416' and trim(pInput.lname) = 'SCHWARTZ' and trim(pInput.fname) ='DAVID' and pInput.phone = 4083742236)
+			or	// -- Bug: 174042 - Remove Business Records for J. Vaziri per Privacy Programs Direction
+				( pInput.did = 2603985162 or (trim(pInput.fname,left,right) = 'JENNIFER' and trim(pInput.lname) = 'VAZIRI' and trim(pInput.mname,left,right) in ['H','HOPE']))
+			or	// -- Bug: 176631 - Business Header Suppression 
+					// -- Bug: 197656 - Consumer Privacy Reports Incorrectly Linked PAW Record for Clayton
+				(	MDR.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1671940052    C355405299','1817929485','1817929485    C61984972','1817929485    C35213276'])
+			or	(MDR.sourceTools.SourceIsEq_Employer(pInput.source) and trim(pInput.fname) = 'KIMBERLY' and trim(pInput.mname) = 'MICHELLE' and trim(pInput.lname) = 'CLAYTON' and trim(pInput.company_name) = 'GRADY HEALTH')
+			or	// -- Bug: 183422 - Unlink Daniel A Davenport from this father Daniel S 
+				(	trim(pInput.vendor_id) in ['8090947','NYMVO0458830691'] and trim(pInput.lname) = 'DAVENPORT') 
+			or	// -- Bug: 194125 - Consumer Dispute
+				( pInput.phone in [4042883458,4048636068] and trim(pInput.fname) = 'LINDA')
+			or	// -- JIRA:DF-16735 Per Privacy Programs - Remove PETER KIRN records.
+				//(	stringlib.stringfind(pInput.company_name, 'CAMELBACK GROUP', 1) > 0 and ((pInput.state = 'CO' and trim(pInput.city) in ['GREENWOOD VILLAGE','WINTER PARK','TABERNASH']) or pInput.company_phone=3039186563))
+				(	regexfind('CAMELBACK GROUP|PETER KIRN|PETERKIRN',pInput.company_name, nocase) and trim(pInput.fname,left,right) = 'PETER' and trim(pInput.lname,left,right) = 'KIRN' and trim(pInput.mname,left,right) in ['A','ADAMS',''])
+			or	(trim(pInput.fname,left,right) = 'PETER' and trim(pInput.lname,left,right) = 'KIRN' and trim(pInput.mname,left,right) in ['A','ADAMS',''] and pInput.state = 'CO')
+			or // -- Bug: 203666/JIRA: DF-16118 - Remove Accurtrend Record for INSANE HYDROGRAPHIX LLC
+				(	stringlib.stringfind(pInput.company_name, 'INSANE HYDROGRAPHIX', 1) > 0 and trim(pInput.fname) = 'BRYAN' and trim(pInput.lname) = 'MYERS')
+			or // -- JIRA - DF-16328 Consumer Dispute - record must be suppressed/deleted
+				(	stringlib.stringfind(pInput.company_name, 'NATIONAL IRANIAN AMERICAN', 1) > 0 and trim(pInput.fname) = 'BABAK' and trim(pInput.lname) = 'BAGHERI')
+			or // -- JIRA - DF-17422, Consumer Advocacy Complaint - PAW Linking LexID - BDID 43998720 
+			 	( mdr.sourceTools.SourceIsWorkmans_Comp(pInput.source) and regexfind('YELLOW TRANSPORTATION',pInput.company_name, nocase) and STD.Str.CleanSpaces(pInput.fname + pInput.lname) in ['BOBBY PHILLIPS','INC YELLOW'])
+			or // -- JIRA - DF-17991 Consumer Dispute - record must be suppressed/deleted
+				( mdr.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id) = '457217847     C6260365')
+			or // -- JIRA - DF-18128 Consumer Advocacy - Unlink PAW Record for LexID 54872692 Amodeo
+				( mdr.sourceTools.SourceIsBusiness_Registration(pInput.source) and regexfind('PATRICK M MCMATH LAW FIRM', pInput.company_name, nocase) and trim(pInput.fname) = 'JAMES' and trim(pInput.lname) = 'AMODEO' and trim(pInput.mname) = 'E')
+			or // -- JIRA - DF-18344 Remove Business Contacts and PAW Record for LexID 13957703, Allene A Traphan
+				( mdr.sourceTools.SourceIsTXBUS(pInput.source) and regexfind('ALLENE A TRAPHAN', pInput.company_name, nocase))
+			or // -- JIRA - DF-18950 ZOOM records to be suppressed in PAW
+				(	mdr.sourceTools.sourceIsZoom(pInput.source) and regexfind('1684933816', pInput.vendor_id, nocase))
+			or // -- JIRA - DF-18955 PAW record to be supressed or deleted
+				(	mdr.sourceTools.sourceIsZoom(pInput.source) and pInput.phone = 7173042300 and trim(pInput.fname) = 'LORI' and trim(pInput.lname) = 'RICH')
+			or // -- JIRA - DF-19021 Consumer Advocacy - Removal of PAW/Business Contacts for Praveen Sengar
+				(	pInput.phone = 5088728200 and trim(pInput.fname) = 'PRAVEEN' and trim(pInput.lname) = 'SENGAR')
+			or // -- JIRA - DF-19020 Consumer Advocacy - Removal of PAW/Business Contacts for Sappington
+				(	regexfind('LANDGUARD EAGLE', pInput.company_name, nocase) and trim(pInput.vendor_id) in ['DZXWM0058497187','17-LLC-02958317'] and trim(pInput.fname) = 'CASSANDRA' and trim(pInput.lname) = 'SAPPINGTON')
+			or // -- JIRA - DF-18970 Remove all PAW/Business Contacts for LexID 724864388 at Las Vegas Address
+				(	pInput.did = 724864388 or (trim(pInput.fname) = 'PASTORA' and trim(pInput.lname) = 'ROLDAN' and 
+					((trim(pInput.prim_name) = 'EASTERN' and pInput.zip = 89123) or (trim(pInput.company_prim_name) = 'EASTERN' and pInput.company_zip = 89123))))
+			or // -- JIRA - DF-18931 Cons. Adv. Report - Business Contacts Removal for LexID 829850667 Andra Flynn
+				( trim(pInput.fname) = 'ANDREA' and trim(pInput.lname) = 'FLYNN' and regexfind('PC EXPRESS ENTERPRISES', trim(pInput.company_name), nocase))
+			or // -- JIRA - DF-19165 Consumer Advocacy - Remove PAW/Business Contacts for LexID 1793247875
+				(	mdr.sourceTools.SourceIsEq_Employer(pInput.source) and trim(pInput.fname) = 'BERNARD' and trim(pInput.lname) = 'THEIS' and regexfind('PAINE WEBER|PAYNE WEBER', pInput.company_name, nocase))
+			or // -- JIRA - DF-19162 Remove PAW and Business Contact Records for LexID 1510111650
+				(	pInput.did = 1510111650	or (trim(pInput.fname) in ['LEWIS','CHRIS','CHRISTOPHER'] and trim(pInput.lname) in ['LEWIS','RAND'] and trim(pInput.vendor_id) in ['RGXPY0536216046','01B7E3E6DE670600D8','4007701','IBTK 1 F     6X  P']))
+			or // -- JIRA - DF-19683 Cons. Adv. - LexID 1063521771 Remove PAW & Business Contacts Record
+				 // -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
+				 // -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
+				( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898'])
+			or // -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
+				( mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
+			or // -- JIRA - DF-19305 Experian Business Report has incorrect Officer Name of Jon C Dawson 
+				( mdr.sourceTools.sourceIsEBR(pInput.source) and trim(pInput.vendor_id) in ['940772280'] and trim(pInput.lname) = 'DAWSON')
 				;
 
 			boolean lFullFilter 	:= not(lAdditionalFilter);	//negate it 
@@ -1195,7 +1540,12 @@ module
 			{1954168479, 1947852989},
 			{1954168479, 1954159808},
 			{107800659,	 113490609}, //*** Bug:95843 - Overlinking of Barbara Griffith with Southern California Pipeline
-			{125686733,	 150732877}  //*** Bug:95843 - Overlinking of Barbara Griffith with Southern California Pipeline
+			{125686733,	 150732877}, //*** Bug:95843 - Overlinking of Barbara Griffith with Southern California Pipeline
+			{69701262,   95194575}, 	//*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+			{69701262,   105934715},  //*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+			{69701262,   167801849},  //*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+			{69701262,   545038389},  //*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
+			{69701262,   1168297034}  //*** Bug:162910-Consumer Advocacy Reporting Business Overlinking in old Business Report
 			], filterRec);
 		
 		export Business_Relatives(dataset(Layout_Business_Relative) pInput) :=
@@ -1483,14 +1833,21 @@ module
 		export PeopleAtWork(dataset(paw.layout.Employment_Out) pInput) := 
 		function
 			boolean lAdditionalFilter	:= 
-				(		MDR.sourceTools.SourceIsEBR(pInput.source)) 
+					// -- Bug: 184195 - DNB DMI Needs Removed from PAW	
+				(		MDR.sourceTools.SourceIsDunn_Bradstreet(pInput.source)) 
+			or
+				(		MDR.sourceTools.SourceIsEBR(pInput.source))
+			or // -- Bug:  - Flush the Jigsaw records as per Jason.
+				(	MDR.sourceTools.SourceIsJigsaw(pInput.source))
 			or
 				(		(unsigned8)pInput.did			= 1363114130
 				 and	(unsigned8)pInput.bdid			= 14733991
 				)				
 			or	// -- Bug: 103804 - Questionable Company Names.
-				(		(unsigned8)pInput.bdid 	= 2736997388
-				)
+				(		(unsigned8)pInput.bdid 	= 2736997388)
+			or	// -- Bug: 145649 - Accurint 52354 - PAW Overlinking of LexID 2715613629 D. Williams
+					// -- Bug: 191918/JIRA: DF-14772 - Consumer Privacy Reports Incorrectly Linked PAW Record
+				(	MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id,left,right) in ['1542124062','731821740','731821740C20895717','645546729     C352857954'])
 			or	// -- Bug: 98386 - Robert Spencer and Virginia Union University
 				(		MDR.sourceTools.SourceIsZoom(pInput.source) 
 					and pInput.bdid 						= 3564212 
@@ -1506,8 +1863,9 @@ module
 					and pInput.bdid in [4994780, 412358992, 16952458])
 			or	// -- Bug: 87127 - Overlinking of business contacts due to errorneous CP FBN Filing.
 					// -- Bug: 115130 - Unlink DID for Michael Hild from Serenity Home Care Agency
+					// -- Bug: 120900 - Remove FBN Record from Business Header & Contacts for Al-Jarafi 
 				(		MDR.sourceTools.SourceIsFBNV2_Hist_Choicepoint(pInput.source) 
-					and trim(pInput.vendor_id,left,right) in ['CP9627346981847888151','CP219395185453452160'])							
+					and trim(pInput.vendor_id,left,right) in ['CP9627346981847888151','CP219395185453452160','CP11910987965939266948'])							
 			or  // -- Bug: 109269 - Remove 4 Employment Locator records for David Scott Tronson.
 				(		MDR.sourceTools.SourceIsEq_Employer(pInput.source) 
 					and pInput.DID = 2562729144 and pInput.bdid = 2988148887)
@@ -1528,6 +1886,77 @@ module
 							trim(pInput.company_name) in ['MAPLEHURST REALTY INC','MAPLEHURST'])
 			or	// -- Bug: 119446 - Remove Zoom Records for LexID 1234490932 Tahir Javed 
 				(		MDR.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.company_name) in ['OMAHA WORLD-HERALD COMPANY','OMAHA WORLD-HERALD'] and trim(pInput.fname) = 'TAHIR' and trim(pInput.lname) = 'JAVED')
+			//or  // -- Bug: 119049 - Unlink Bradley Leighty from BOA Auto Sales
+			//	(		(mdr.sourceTools.SourceIsDunn_Bradstreet(pInput.source) or mdr.sourceTools.SourceIsEBR(pInput.source)) and 
+			//				trim(pInput.vendor_id,left,right) in ['D092297238-BOA AUTO SALES INC','738365619'] and trim(pInput.fname) = 'BRADLEY' and trim(pInput.lname) = 'LEIGHTY')
+			or	// -- Bug: 131131 - Business Contact Information for Opt Out Consumer-Rush Request
+				( trim(pInput.company_name,left,right) in ['BAKER & MCKENZIE LLP','JACKSON DEV & CONSTRUCTION INC','MEDIA CENTER PC',
+																									 'NATIONAL COLLEGE FOR DUI DEFENSE , INC.','OPPENHEIMER WOLFF DONNELLY LLP',
+																									 'SOUTH COAST LITIGATION GROUP','THE NATIONAL COLLEGE FOR DUI DEFENSE , INC.','UNIVERSITY OF PENNSYLVANIA'] and trim(pInput.fname) = 'VANIA' and trim(pInput.lname) = 'CHAKER')
+			or	// -- Bug: 139082 - Remove Ana Lane Gomez from FBN, Business Header and PAW files
+				(	MDR.sourceTools.SourceIsFBNV2_Experian_Direct(pInput.source) and trim(pInput.vendor_id) = 'EXP6160690673128140760')
+			or	// -- Bug:146861 - Remove All Business Records Associate with DAVID & SHALA PEYMAN  -- Bug:153300 - Remove Lexid 113261977728 for Peyman Shalah
+				(	trim(pInput.lname) = 'PEYMAN' and trim(pInput.fname) in ['DAVID','SHALA','SHAHLA','SHALAH'])
+			or	// -- Bug:146862 - These corp keys need to be filtered out of all base files
+				(	MDR.sourceTools.SourceIsCA_Corporations(pInput.source) and trim(pInput.vendor_id,left,right) in ['06-03155932', '06-200820510058', '06-200620910099'])
+			or 	// -- Bug: 157298  - Remove Contact Angela Farole from BDID 53982819 Avante Abstract Inc.
+				(	trim(pInput.company_name) in ['AVANTE', 'AVANTE ABSTRACT', 'AVANTE\' ABSTRACT',	'AVANTE ABSTRACT INC',
+																				'AVANTE\' ABSTRACT, INC', 'AVANTE\' ABSTRACT, INC.'] and trim(pInput.fname) = 'ANGELA' and trim(pInput.lname) = 'FAROLE' and trim(pInput.mname) in ['','M'])
+			//or 	// -- Bug:98757 - Experian Business Report Filing Numbers are Overlinking Oregon Companies				
+			//	(	MDR.sourceTools.SourceIsEbr(pInput.source) and trim(pInput.vendor_id) = '809376459' and (regexfind('HEALTHCARE|HOSPITAL',trim(pInput.company_name,left,right),nocase) or (trim(pInput.lname) = 'MARCHETTI' and trim(pInput.fname) ='MARK')))
+			or	// -- Bug:166661-Consumer Privacy Requesting PAW Record Removal for LexID 2281518533				
+				( MDR.sourceTools.SourceIsDCA(pInput.source) and trim(pInput.vendor_id) = '1323416' and trim(pInput.lname) = 'SCHWARTZ' and trim(pInput.fname) ='DAVID' and trim(pInput.phone) = '4083742236')
+			or	// -- Bug: 174042 - Remove Business Records for J. Vaziri per Privacy Programs Direction
+				( pInput.did = 2603985162 or (trim(pInput.fname,left,right) = 'JENNIFER' and trim(pInput.lname) = 'VAZIRI' and trim(pInput.mname,left,right) in ['H','HOPE']))
+			or	// -- Bug: 176631 - Business Header Suppression 
+					// -- Bug: 197656 - Consumer Privacy Reports Incorrectly Linked PAW Record for Clayton
+				(	MDR.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1671940052    C355405299','1817929485','1817929485    C61984972','1817929485    C35213276'])
+			or	(MDR.sourceTools.SourceIsEq_Employer(pInput.source) and trim(pInput.fname) = 'KIMBERLY' and trim(pInput.mname) = 'MICHELLE' and trim(pInput.lname) = 'CLAYTON' and trim(pInput.company_name) = 'GRADY HEALTH')
+			or	// -- Bug: 183422 - Unlink Daniel A Davenport from this father Daniel S 
+				(	trim(pInput.vendor_id) in ['8090947','NYMVO0458830691'] and trim(pInput.lname) = 'DAVENPORT')
+			or	// -- Bug: 194125 - Consumer Dispute
+				( trim(pInput.phone) in ['4042883458','4048636068'] and trim(pInput.fname) = 'LINDA')
+			or	// -- JIRA:DF-16735 Per Privacy Programs - Remove PETER KIRN records.
+				//(	stringlib.stringfind(pInput.company_name, 'CAMELBACK GROUP', 1) > 0 and ((pInput.state = 'CO' and trim(pInput.city) in ['GREENWOOD VILLAGE','WINTER PARK','TABERNASH']) or (trim(pInput.company_phone) in ['3039186563','8702926547'] or trim(pInput.phone) in ['3039186563','8702926547'])))
+				(	regexfind('CAMELBACK GROUP|PETER KIRN|PETERKIRN',pInput.company_name, nocase) and trim(pInput.fname,left,right) = 'PETER' and trim(pInput.lname,left,right) = 'KIRN' and trim(pInput.mname,left,right) in ['A','ADAMS',''])
+			or	(trim(pInput.fname,left,right) = 'PETER' and trim(pInput.lname,left,right) = 'KIRN' and trim(pInput.mname,left,right) in ['A','ADAMS',''] and pInput.state = 'CO')
+			or // -- Bug: 203666/JIRA: DF-16118 - Remove Accurtrend Record for INSANE HYDROGRAPHIX LLC
+				(	stringlib.stringfind(pInput.company_name, 'INSANE HYDROGRAPHIX', 1) > 0 and trim(pInput.fname) = 'BRYAN' and trim(pInput.lname) = 'MYERS')
+			or // -- JIRA - DF-16328 Consumer Dispute - record must be suppressed/deleted
+				(	stringlib.stringfind(pInput.company_name, 'NATIONAL IRANIAN AMERICAN', 1) > 0 and trim(pInput.fname) = 'BABAK' and trim(pInput.lname) = 'BAGHERI')
+			or // -- JIRA - DF-17422, Consumer Advocacy Complaint - PAW Linking LexID - BDID 43998720 
+			 	( mdr.sourceTools.SourceIsWorkmans_Comp(pInput.source) and regexfind('YELLOW TRANSPORTATION',pInput.company_name, nocase) and STD.Str.CleanSpaces(pInput.fname + pInput.lname) in ['BOBBY PHILLIPS','INC YELLOW'])
+			or // -- JIRA - DF-17991 Consumer Dispute - record must be suppressed/deleted
+				( mdr.sourceTools.SourceIsZoom(pInput.source) and trim(pInput.vendor_id) = '457217847     C6260365')
+			or // -- JIRA - DF-18128 Consumer Advocacy - Unlink PAW Record for LexID 54872692 Amodeo
+				( mdr.sourceTools.SourceIsBusiness_Registration(pInput.source) and regexfind('PATRICK M MCMATH LAW FIRM', pInput.company_name, nocase) and trim(pInput.fname) = 'JAMES' and trim(pInput.lname) = 'AMODEO' and trim(pInput.mname) = 'E')
+			or // -- JIRA - DF-18344 Remove Business Contacts and PAW Record for LexID 13957703, Allene A Traphan
+				( mdr.sourceTools.SourceIsTXBUS(pInput.source) and regexfind('ALLENE A TRAPHAN', pInput.company_name, nocase))
+			or // -- JIRA - DF-18950 ZOOM records to be suppressed in PAW
+				(	mdr.sourceTools.sourceIsZoom(pInput.source) and regexfind('1684933816', pInput.vendor_id, nocase))
+			or // -- JIRA - DF-18955 PAW record to be supressed or deleted
+				(	mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.phone) = '7173042300' and trim(pInput.fname) = 'LORI' and trim(pInput.lname) = 'RICH')
+			or // -- JIRA - DF-19021 Consumer Advocacy - Removal of PAW/Business Contacts for Praveen Sengar
+				(	trim(pInput.phone) = '5088728200' and trim(pInput.fname) = 'PRAVEEN' and trim(pInput.lname) = 'SENGAR')
+			or // -- JIRA - DF-19020 Consumer Advocacy - Removal of PAW/Business Contacts for Sappington
+				(	regexfind('LANDGUARD EAGLE', pInput.company_name, nocase) and trim(pInput.vendor_id) in ['DZXWM0058497187','17-LLC-02958317'] and trim(pInput.fname) = 'CASSANDRA' and trim(pInput.lname) = 'SAPPINGTON')
+			or // -- JIRA - DF-18970 Remove all PAW/Business Contacts for LexID 724864388 at Las Vegas Address
+				(	pInput.did = 724864388 or (trim(pInput.fname) = 'PASTORA' and trim(pInput.lname) = 'ROLDAN' and 
+					((trim(pInput.prim_name) = 'EASTERN' and trim(pInput.zip) = '89123') or (trim(pInput.company_prim_name) = 'EASTERN' and trim(pInput.company_zip) = '89123'))))
+			or // -- JIRA - DF-18931 Cons. Adv. Report - Business Contacts Removal for LexID 829850667 Andra Flynn
+				( trim(pInput.fname) = 'ANDREA' and trim(pInput.lname) = 'FLYNN' and regexfind('PC EXPRESS ENTERPRISES', trim(pInput.company_name), nocase))
+			or // -- JIRA - DF-19165 Consumer Advocacy - Remove PAW/Business Contacts for LexID 1793247875
+				(	mdr.sourceTools.SourceIsEq_Employer(pInput.source) and trim(pInput.fname) = 'BERNARD' and trim(pInput.lname) = 'THEIS' and regexfind('PAINE WEBER|PAYNE WEBER', pInput.company_name, nocase))
+			or // -- JIRA - DF-19162 Remove PAW and Business Contact Records for LexID 1510111650
+				(	pInput.did = 1510111650	or (trim(pInput.fname) in ['LEWIS','CHRIS','CHRISTOPHER'] and trim(pInput.lname) in ['LEWIS','RAND'] and trim(pInput.vendor_id) in ['RGXPY0536216046','01B7E3E6DE670600D8','4007701','IBTK 1 F     6X  P']))
+			or // -- JIRA - DF-19683 Cons. Adv. - LexID 1063521771 Remove PAW & Business Contacts Record
+				 // -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
+				 // -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
+				( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898'])
+			or // -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
+				( mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
+			or // -- JIRA - DF-19305 Experian Business Report has incorrect Officer Name of Jon C Dawson 
+				( mdr.sourceTools.sourceIsEBR(pInput.source) and trim(pInput.vendor_id) in ['940772280'] and trim(pInput.lname) = 'DAWSON')
 				;
 
 			boolean lFullFilter 	:= not(lAdditionalFilter);	//negate it 

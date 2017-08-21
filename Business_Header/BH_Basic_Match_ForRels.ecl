@@ -1,11 +1,24 @@
-import dnb,ut;
-//1.  filter the D&B FEIN records from BH_Basic_Match_Clean (source = 'D', fein > 0)
-bmc := business_header.BH_Basic_Match_Clean;
-isbad := bmc.source = 'D' and bmc.fein > 0;
+import dnb_dmi,ut,mdr;
+
+EXPORT BH_Basic_Match_ForRels(
+
+	 dataset(Layout_Business_Header_Temp)	pBH_Basic_Match_Clean			= BH_Basic_Match_Clean	()
+	,dataset(Layout_Business_Header_New	)	pDNB_As_Business_Header		= dnb_dmi.As_Business_Header()
+	,string																pPersistname							= persistnames().BHBasicMatchForRels													
+	,boolean															pShouldRecalculatePersist	= true													
+
+) :=
+function
+
+
+bmc := filters.keys.business_headers_temp(pBH_Basic_Match_Clean);
+
+isbad := mdr.sourcetools.sourceisdunn_bradstreet_fein(bmc.source);
+
 bmc_bad := bmc(isbad); 
 
 //2.  Project the DNB_As_Business_Header to company_name, source_group, zip, prim_name, prim_range and dedup
-dbh_slim := table(dnb.DNB_As_Business_Header, {company_name, source_group, zip, prim_name, prim_range});
+dbh_slim := table(pDNB_As_Business_Header, {company_name, source_group, zip, prim_name, prim_range});
 dbh_ddp := dedup(dbh_slim, all); 
 
 	
@@ -29,4 +42,12 @@ bmc_cleaned := join(bmc_bad, dbh_ddp,
 //4.  Combine BH_Basic_Match_Clean(source <> 'D' or (source='D' and fein=0)) and records from (3)
 
 bmc_safe := bmc(not(isbad));
-export BH_Basic_Match_ForRels := bmc_safe + bmc_cleaned; 
+BH_Basic_Match_ForRels_persisted := bmc_safe + bmc_cleaned
+	: persist(pPersistname);
+
+returndataset := if(pShouldRecalculatePersist = true, BH_Basic_Match_ForRels_persisted
+																										, persists().BHBasicMatchForRels
+									);
+return returndataset;
+
+end;

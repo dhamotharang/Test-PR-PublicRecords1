@@ -8,7 +8,7 @@ MACRO
 import ut,doxie;
 
 #uniquename(indata)
-%indata% := indataset;
+%indata% := indataset(inbname != '');
 
 #uniquename(proj)
 #uniquename(p)

@@ -1,6 +1,10 @@
 import doxie;
 
-f_worldcheck := WorldCheck.File_Main;
+f_worldck 		:= WorldCheck.File_Main;
+
+f_worldcheck 	:=  f_worldck(trim(updated, left, right)[1..2] between '19' and '20' 
+								                 and length(trim(updated, left, right))>=4 
+								                 and updated<=stringlib.GetDateYYYYMMDD());
 
 m := max(f_worldcheck,updated);
 

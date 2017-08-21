@@ -1,5 +1,5 @@
 import ut;
-export fCombineContHistory(DATASET(Layout_Corporate_Direct_Cont_Base) cont_base) :=
+export fCombineContHistory(DATASET(Layout_Corporate_Direct_Cont_AID) cont_base) :=
 FUNCTION
 
 cont_all := cont_base + fCorp4AsCorp2ContHistory(cont_base);
@@ -10,7 +10,7 @@ cont_all_sort := sort(cont_all_dist, corp_key, local);
 cont_all_grpd := group(cont_all_sort, corp_key, local);
 cont_all_grpd_sort := sort(cont_all_grpd, if(corp_vendor = 'EX', 1, 0), -dt_vendor_last_reported, -dt_last_seen);
 
-Layout_Corporate_Direct_Cont_Base SetRecordType(Layout_Corporate_Direct_Cont_Base l, Layout_Corporate_Direct_Cont_Base r) := transform
+Layout_Corporate_Direct_Cont_AID SetRecordType(Layout_Corporate_Direct_Cont_AID l, Layout_Corporate_Direct_Cont_AID r) := transform
 self.record_type := if(l.record_type = '', 'C', 'H');
 self := r;
 end;
@@ -37,7 +37,7 @@ cont_all_final_list := join(cont_all_final_direct,
 						    SelectCorpKeysForRollup(left, right),
 						    local);
 						
-Layout_Corporate_Direct_Cont_Base SelectCorpKeys(Layout_Corporate_Direct_Cont_Base l, layout_corp_key r) := transform
+Layout_Corporate_Direct_Cont_AID SelectCorpKeys(Layout_Corporate_Direct_Cont_AID l, layout_corp_key r) := transform
 self := l;
 end;
 
@@ -123,7 +123,7 @@ corp_phone10,
 cont_phone10,
 local);
 
-Layout_Corporate_Direct_Cont_Base RollupExperian(Layout_Corporate_Direct_Cont_Base l, Layout_Corporate_Direct_Cont_Base r) := transform
+Layout_Corporate_Direct_Cont_AID RollupExperian(Layout_Corporate_Direct_Cont_AID l, Layout_Corporate_Direct_Cont_AID r) := transform
 SELF.dt_first_seen := 
             ut.EarliestDate(ut.EarliestDate(l.dt_first_seen,r.dt_first_seen),
 		    ut.EarliestDate(l.dt_last_seen,r.dt_last_seen));

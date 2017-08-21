@@ -1,0 +1,43 @@
+export Layout_UPIN_common := record
+    string8			Process_Date;
+	string8			Date_First_Seen;
+	string8			Date_Last_Seen;
+	string8			Date_Vendor_First_Reported;
+	string8			Date_Vendor_Last_Reported;
+    string5     Physician_Clean_name_title;
+	string20    Physician_Clean_fname;
+	string20    Physician_Clean_mname;
+	string20    Physician_Clean_lname;
+	string5     Physician_Clean_name_suffix;
+	string3     Physician_Clean_name_score;
+	string10  		physician_Clean_prim_range		;
+string2  			physician_Clean_predir			;
+string28 			physician_Clean_prim_name		;
+string4   			physician_Clean_addr_suffix	    ;
+string2  			physician_Clean_postdir			;
+string10  			physician_Clean_unit_desig		;
+string8   			physician_Clean_sec_range		;
+string25 			physician_Clean_p_city_name	    ;
+string25 			physician_Clean_v_city_name	    ;
+string2  			physician_Clean_st				;
+string5  			physician_Clean_zip			    ;
+string4  			physician_Clean_zip4			    ;
+string4  			physician_Clean_cart				;
+string1  			physician_Clean_cr_sort_sz		;
+string4   			physician_Clean_lot				;
+string1  			physician_Clean_lot_order	    ;
+string2  			physician_Clean_dpbc			  	;
+string1  			physician_Clean_chk_digit	    ;
+string2  			physician_Clean_record_type		;
+string2  			physician_Clean_ace_fips_st		;
+string3  			physician_Clean_fipscounty	    ;
+string10 			physician_Clean_geo_lat			;
+string11 			physician_Clean_geo_long			;
+string4 			physician_Clean_msa				;
+string7  			physician_Clean_geo_match	    ;
+string4  			physician_Clean_err_stat			;
+	string5     BUSINESS_ZIP_5;
+	UPIN.Layout_UPIN;
+	
+	end;
+	

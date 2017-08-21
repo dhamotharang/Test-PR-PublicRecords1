@@ -1,6 +1,6 @@
 import dnb,Lib_KeyLib,lib_stringlib;
 
-#workunit ('name', 'Build DNB Company Keys ' + dnb.version);
+//#workunit ('name', 'Build DNB Company Keys ' + dnb.version);
 
 h := dnb.FILE_DNB_Companies_Out_keybuild;
 
@@ -67,7 +67,7 @@ end;
 
 cn_records := NORMALIZE(t, 16,Norm_cn(LEFT, COUNTER));
 
-BUILDINDEX( cn_records(cn <> ''), {cn,(big_endian unsigned8 )__filepos},
+key1 := BUILDINDEX( cn_records(cn <> ''), {cn,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'cn.key', moxie,overwrite);
 
 // ------------------
@@ -86,7 +86,7 @@ st_cn_rec Norm_st_cn(cn_rec l, integer C) := transform
 	self := l;
 end;
 st_cn_records := NORMALIZE(cn_records, 2, Norm_st_cn(LEFT, COUNTER));
-BUILDINDEX( st_cn_records(cn <> ''), {st,cn,(big_endian unsigned8 )__filepos},
+key2 := BUILDINDEX( st_cn_records(cn <> ''), {st,cn,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'st.cn.key', moxie,overwrite);
 
 // ------------------
@@ -105,7 +105,7 @@ st_city_cn_rec Norm_st_city_cn(cn_rec l, integer C) := transform
 	self := l;
 end;
 st_city_cn_records := NORMALIZE(cn_records, 2, Norm_st_city_cn(LEFT, COUNTER));
-BUILDINDEX( st_city_cn_records(cn <> ''), {st,city,cn,(big_endian unsigned8 )__filepos},
+key3 := BUILDINDEX( st_city_cn_records(cn <> ''), {st,city,cn,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'st.city.cn.key', moxie,overwrite);
 
 // ------------------
@@ -122,7 +122,7 @@ z5_cn_rec Norm_z5_cn(cn_rec l, integer C) := transform
 	self := l;
 end;
 z5_cn_records := NORMALIZE(cn_records, 2, Norm_z5_cn(LEFT, COUNTER));
-BUILDINDEX( z5_cn_records(cn <> ''), {z5,cn,(big_endian unsigned8 )__filepos},
+key4 := BUILDINDEX( z5_cn_records(cn <> ''), {z5,cn,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'z5.cn.key', moxie,overwrite);
 
 
@@ -151,7 +151,7 @@ end;
 
 pcn_records := NORMALIZE(t, 16,Norm_pcn(LEFT, COUNTER));
 
-BUILDINDEX( pcn_records(pcn <> ''), {pcn,(big_endian unsigned8 )__filepos},
+key5 := BUILDINDEX( pcn_records(pcn <> ''), {pcn,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'pcn.key', moxie,overwrite);
 
 // ------------------
@@ -168,7 +168,7 @@ st_pcn_rec Norm_st_pcn(pcn_rec l, integer C) := transform
 	self := l;
 end;
 st_pcn_records := NORMALIZE(pcn_records, 2, Norm_st_pcn(LEFT, COUNTER));
-BUILDINDEX( st_pcn_records(pcn <> ''), {st,pcn,(big_endian unsigned8 )__filepos},
+key6 := BUILDINDEX( st_pcn_records(pcn <> ''), {st,pcn,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'st.pcn.key', moxie,overwrite);
 
 // ------------------
@@ -187,7 +187,7 @@ st_city_pcn_rec Norm_st_city_pcn(pcn_rec l, integer C) := transform
 	self := l;
 end;
 st_city_pcn_records := NORMALIZE(pcn_records, 2, Norm_st_city_pcn(LEFT, COUNTER));
-BUILDINDEX( st_city_pcn_records(pcn <> ''), {st,city,pcn,(big_endian unsigned8 )__filepos},
+key7 := BUILDINDEX( st_city_pcn_records(pcn <> ''), {st,city,pcn,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'st.city.pcn.key', moxie,overwrite);
 
 // ------------------
@@ -204,7 +204,7 @@ z5_pcn_rec Norm_z5_pcn(pcn_rec l, integer C) := transform
 	self := l;
 end;
 z5_pcn_records := NORMALIZE(pcn_records, 2, Norm_z5_pcn(LEFT, COUNTER));
-BUILDINDEX( z5_pcn_records(pcn <> ''), {z5,pcn,(big_endian unsigned8 )__filepos},
+key8 := BUILDINDEX( z5_pcn_records(pcn <> ''), {z5,pcn,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'z5.pcn.key', moxie,overwrite);
 
 
@@ -229,7 +229,7 @@ end;
 
 nameasis_records := NORMALIZE(t, 2,Norm_nameasis(LEFT, COUNTER));
 
-BUILDINDEX( nameasis_records(nameasis <> ''), {nameasis,(big_endian unsigned8 )__filepos},
+key9 := BUILDINDEX( nameasis_records(nameasis <> ''), {nameasis,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'nameasis.key', moxie,overwrite);
 
 // ------------------
@@ -246,7 +246,7 @@ st_nameasis_rec Norm_st_nameasis(nameasis_rec l, integer C) := transform
 	self := l;
 end;
 st_nameasis_records := NORMALIZE(nameasis_records, 2, Norm_st_nameasis(LEFT, COUNTER));
-BUILDINDEX( st_nameasis_records(nameasis <> ''), {st,nameasis,(big_endian unsigned8 )__filepos},
+key10 := BUILDINDEX( st_nameasis_records(nameasis <> ''), {st,nameasis,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'st.nameasis.key', moxie,overwrite);
 
 // ------------------
@@ -265,7 +265,7 @@ st_city_nameasis_rec Norm_st_city_nameasis(nameasis_rec l, integer C) := transfo
 	self := l;
 end;
 st_city_nameasis_records := NORMALIZE(nameasis_records, 2, Norm_st_city_nameasis(LEFT, COUNTER));
-BUILDINDEX( st_city_nameasis_records(nameasis <> ''), {st,city,nameasis,(big_endian unsigned8 )__filepos},
+key11 := BUILDINDEX( st_city_nameasis_records(nameasis <> ''), {st,city,nameasis,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'st.city.nameasis.key', moxie,overwrite);
 
 // ------------------
@@ -282,7 +282,7 @@ z5_nameasis_rec Norm_z5_nameasis(nameasis_rec l, integer C) := transform
 	self := l;
 end;
 z5_nameasis_records := NORMALIZE(nameasis_records, 2, Norm_z5_nameasis(LEFT, COUNTER));
-BUILDINDEX( z5_nameasis_records(nameasis <> ''), {z5,nameasis,(big_endian unsigned8 )__filepos},
+key12 := BUILDINDEX( z5_nameasis_records(nameasis <> ''), {z5,nameasis,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'z5.nameasis.key', moxie,overwrite);
 
 
@@ -311,14 +311,14 @@ z5_address_full_rec Norm_z5_address_full(MyFields l, integer C) := transform
 	self := l;
 end;
 z5_address_full_records := NORMALIZE(t, 2, Norm_z5_address_full(LEFT, COUNTER));
-BUILDINDEX( z5_address_full_records, {z5,prim_name,suffix,predir,postdir,prim_range,sec_range,
+key13 := BUILDINDEX( z5_address_full_records, {z5,prim_name,suffix,predir,postdir,prim_range,sec_range,
 			(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'z5.prim_name.suffix.predir.postdir.prim_range.sec_range.key', moxie,overwrite);
 
 // ------------------
 // -- Key #12
 // ------------------
-BUILDINDEX( z5_address_full_records, {z5,prim_name,prim_range,(big_endian unsigned8 )__filepos},
+key14 := BUILDINDEX( z5_address_full_records, {z5,prim_name,prim_range,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'z5.prim_name.prim_range.key', moxie,overwrite);
 
 // ------------------
@@ -337,11 +337,33 @@ duns_number_records := table(t(t.duns_number <> ''),simple_rec);
 bdid_records := table(t(t.bdid <> ''),simple_rec);
 phoneno_records := table(t(t.phone <> ''),simple_rec);
 trade_style_records := table(t(t.trade_style <> ''),simple_rec);
-BUILDINDEX( duns_number_records, {duns_number,(big_endian unsigned8 )__filepos},
+key15 := BUILDINDEX( duns_number_records, {duns_number,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'duns_number.key', moxie,overwrite);
-BUILDINDEX( bdid_records, {bdid,(big_endian unsigned8 )__filepos},
+key16 := BUILDINDEX( bdid_records, {bdid,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'bdid.key', moxie,overwrite);
-BUILDINDEX( phoneno_records, {phone,(big_endian unsigned8 )__filepos},
+key17 := BUILDINDEX( phoneno_records, {phone,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'phoneno.key', moxie,overwrite);
-BUILDINDEX( trade_style_records, {trade_style,(big_endian unsigned8 )__filepos},
+key18 := BUILDINDEX( trade_style_records, {trade_style,(big_endian unsigned8 )__filepos},
 			dnb.Base_Key_Name_Company + 'trade_style.key', moxie,overwrite);
+			
+export MOXIE_DNB_Companies_keys := 
+parallel(
+	 key1
+	,key2
+	,key3
+	,key4
+	,key5
+	,key6
+	,key7
+	,key8
+	,key9
+	,key10
+	,key11
+	,key12
+	,key13
+	,key14
+	,key15
+	,key16
+	,key17
+	,key18
+);

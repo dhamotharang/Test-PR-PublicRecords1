@@ -10,86 +10,48 @@ import Calbus;
 //***	'20070607',                 //file date
 //***	'Ca_20070607_FTACT.txt',    //File name
 //***	'thor_dataland_linux',      //Group name
-//***	'N'                         //Clear Superfile - should always be set to "N"
 //*** )
 //**********************************************************************************
-export Mac_Calbus_Spray(source_IP,source_path,process_date,filedate,file_name,group_name,clear_Super='N',retval) := 
+export Mac_Calbus_Spray(source_IP,source_path,process_date,filedate,file_name,group_name,retval) := 
 macro
 #uniquename(spray_main)
-#uniquename(super_main)
-#uniquename(super_main1)
+#uniquename(check_rawFile_exist)
 #uniquename(cleaned_ds)
-#uniquename(cleaned_file)
-#uniquename(raw_delete)
-#uniquename(deleteIfExist)
-#uniquename(doCleanup)
-#uniquename(recSize)
-#uniquename(CreateSuperfiles)
+#uniquename(CreateSuperfile)
 #uniquename(CreateSuperIfNotExist)
+#uniquename(super_Clean_main)
+#uniquename(add_Clean_super)
 #uniquename(do_super)
-#uniquename(do_super1)
-#uniquename(out_super)
+#uniquename(add_super)
+#uniquename(out_clen)
+#uniquename(recSize)
+#uniquename(Message_raw_file)
+#uniquename(Message_clean_file)
+#uniquename(Message_super_file)
+// Calbus input record lenght
+%recSize% := 396;
 
+%Message_raw_file%     := output(Calbus.Constants.Cluster +'in::Calbus::raw_'+filedate+'  --'  + '\n   Input spray File existed already, skipped the spray step');
+%Message_clean_file%   := output(Calbus.constants.cluster + 'in::Calbus::'+filedate+'::cleaned   --' + '\n Cleaned File existed already, skipped the Cleaned_Calbus step');
+%Message_super_file%   := output('Cleaned file version already exist in the superFile   --' + Calbus.Constants.Cluster + 'in::Calbus::Superfile2');
 
-//#workunit('name','Calbus Spray -' + process_date);
+%spray_main% 					 := FileServices.SprayFixed(Source_IP,source_path + file_name,%recSize%,group_name,Calbus.Constants.Cluster +'in::Calbus::raw_'+filedate,-1,,,true,true);
+%check_rawFile_exist%  := if (not FileServices.FileExists(Calbus.Constants.Cluster +'in::Calbus::raw_'+filedate),%spray_main%,%Message_raw_file% );
+%out_clen%   					 := output(Calbus.Cleaned_Calbus(process_date, filedate),,Calbus.constants.cluster + 'in::Calbus::'+filedate+'::cleaned',overwrite);
+%cleaned_ds% 					 := if (not FileServices.FileExists(Calbus.constants.cluster + 'in::Calbus::'+filedate+'::cleaned'),%out_clen%,%Message_clean_file%);
+                                     
 
-// Calbus input record length
-%recSize% := 396;  //New length with NAICS code
+%CreateSuperfile%      := FileServices.CreateSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Superfile2',false);
+%CreateSuperIfNotExist%:= if (~FileServices.SuperFileExists(Calbus.Constants.Cluster + 'in::Calbus::Superfile2'),%CreateSuperfile%); 
+%add_Clean_super% 		 := sequential(FileServices.StartSuperFileTransaction(),					
+																		 FileServices.AddSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Superfile2', 
+																															 Calbus.constants.cluster + 'in::Calbus::'+filedate+'::cleaned'), 
+																		 FileServices.FinishSuperFileTransaction(),
+																		 output(Calbus.constants.cluster +'in::Calbus::'+filedate+'::cleaned  --' + '\n Cleaned file has been added to the superFile')
+																		 );
 
-
-%doCleanup% := sequential(FileServices.RemoveSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Old',
-                                                        Calbus.Constants.Cluster + 'in::Calbus::'+filedate+'::cleaned'),
-						   FileServices.RemoveSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Delete',
-														Calbus.Constants.Cluster + 'in::Calbus::'+filedate+'::cleaned'),
-	                       FileServices.RemoveSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Superfile2',
-														Calbus.Constants.Cluster + 'in::Calbus::'+filedate+'::cleaned'),
-						   FileServices.DeleteLogicalFile(Calbus.Constants.Cluster + 'in::Calbus::'+filedate+'::cleaned'));
-
-%deleteIfExist% := if(FileServices.FileExists(Calbus.Constants.Cluster + 'in::Calbus::'+filedate+'::cleaned'),
-					  %doCleanup%);
-
-%spray_main% := FileServices.SprayFixed(Source_IP,source_path + file_name,%recSize%,group_name,Calbus.Constants.Cluster +'in::Calbus::raw_'+filedate,-1,,,true,true);
-
-%cleaned_ds% := output(Calbus.Cleaned_Calbus(process_date, filedate),,Calbus.constants.cluster + 'in::Calbus::'+filedate+'::cleaned',overwrite);
-
-%raw_delete% := if (FileServices.FileExists(Calbus.Constants.Cluster + 'in::Calbus::raw_'+ filedate), 
-					FileServices.DeleteLogicalFile(Calbus.Constants.Cluster + 'in::Calbus::raw_'+ filedate));
-
-%CreateSuperfiles% := sequential(FileServices.CreateSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Superfile2',false),
-								  FileServices.CreateSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Delete',false),
-								  FileServices.CreateSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Old',false)																	
-								  );
-%CreateSuperIfNotExist% := if (~FileServices.SuperFileExists(Calbus.Constants.Cluster + 'in::Calbus::Superfile2'),%CreateSuperfiles%); 
-			
-%super_main% := sequential(FileServices.StartSuperFileTransaction(),
-				FileServices.AddSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Delete',
-				                          Calbus.Constants.Cluster + 'in::Calbus::Old',, true),
-				FileServices.ClearSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Old'),
-				FileServices.AddSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Old', 
-				                          Calbus.Constants.Cluster + 'in::Calbus::Superfile2',, true),
-				FileServices.ClearSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Superfile2'),
-				FileServices.AddSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Superfile2', 
-				                          Calbus.Constants.Cluster + 'in::Calbus::'+filedate+'::cleaned'), 
-				FileServices.FinishSuperFileTransaction(),
-				FileServices.ClearSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Delete',true));
-
-%super_main1% := sequential(FileServices.StartSuperFileTransaction(),
-				FileServices.AddSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Delete',
-				                          Calbus.Constants.Cluster + 'in::Calbus::Old',, true),
-				FileServices.ClearSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Old'),
-				FileServices.AddSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Old', 
-				                          Calbus.Constants.Cluster + 'in::Calbus::Superfile2',, true),
-				FileServices.AddSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Superfile2', 
-				                          Calbus.Constants.Cluster + 'in::Calbus::'+filedate+'::cleaned'), 
-				FileServices.FinishSuperFileTransaction(),
-				FileServices.ClearSuperFile(Calbus.Constants.Cluster + 'in::Calbus::Delete',true));
-
-
-%do_super%  := sequential(output('do super 1...'),%CreateSuperIfNotExist%, %deleteIfExist%, %spray_main%, %cleaned_ds%, %super_main%, %raw_delete%);
-
-%do_super1% := sequential(output('do super 2...'),%CreateSuperIfNotExist%, %deleteIfExist%, %spray_main%, %cleaned_ds%, %super_main1%, %raw_delete%);
-%out_super% := if(clear_Super = 'Y',sequential(%do_super%),sequential(%do_super1%));
-
-retval := sequential(%out_super%);
+%super_Clean_main% 		 :=if(FileServices.FindSuperFileSubName(Calbus.Constants.Cluster + 'in::Calbus::Superfile2',Calbus.constants.cluster + 'in::Calbus::'+filedate+'::cleaned') = 0, %add_Clean_super%,%Message_super_file%);
+%do_super% 						 := sequential(%CreateSuperIfNotExist%, %check_rawFile_exist%, %cleaned_ds%, %super_Clean_main%);
+retval 						 	   := %do_super%;
 
 endmacro;

@@ -10,7 +10,7 @@ info := text_search.FileName_Info_Instance('~THOR_DATA400', 'FEINV2', filedate);
 textType := Text_Search.Types.SegmentType.TextType;
 dateType := Text_Search.Types.SegmentType.DateType;
 numericType := Text_Search.Types.SegmentType.NumericType;
-
+keyType := Text_search.Types.SegmentType.ExternalKey;
 
 
 
@@ -19,15 +19,15 @@ segmentMetaData := DATASET([
 		{'CompanyName',					textType,		[1]},
 		{'FEIN',						textType,		[2]},
 		{'source_duns_number',			textType,		[3]},
-		{'duns_number',					textType,		[4]},
-		{'Address_1',					textType,		[5]},
-		{'Address_2',					textType,		[6]},
-		{'city',						textType,		[7]},
-		{'state',						textType,		[8]},
-		{'zip5',						textType,		[9]},
-		{'zip4',						textType,		[10]},
-		{'address',						TextType,		[11]}
-
+		//{'duns_number',					textType,		[4]},
+		//{'Address_1',					textType,		[5]},
+		//{'Address_2',					textType,		[6]},
+		//{'city',						textType,		[7]},
+		//{'state',						textType,		[8]},
+		//{'zip5',						textType,		[9]},
+		//{'zip4',						textType,		[10]},
+		{'address',						TextType,		[11]},
+		{'EXTERNALKEY',       keyType, [250]}
 		], Text_Search.Layout_Segment_Definition);
 
 

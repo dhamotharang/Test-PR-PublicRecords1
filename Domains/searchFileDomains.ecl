@@ -2,7 +2,7 @@ import domains, ut, address;
 
    f := Domains.File_Whois_Base; 
 
-  Layout_Searchfile := RECORD (domains.layout_whois_base)
+  Layout_Searchfile := RECORD (domains.layout_whois_base_bip)
 	  unsigned6 internetservices_id;
 		string30 admin_fname;
 		string30 admin_mname;
@@ -28,7 +28,7 @@ import domains, ut, address;
 	
  
 	
-	layout_searchFile xform(Layout_Whois_Base l) := transform
+	layout_searchFile xform(Layout_Whois_Base_BIP l) := transform
 	
 		RegistrantName := Address.CleanNameFields(Address.CleanPerson73(l.registrant_name));
 		TechName := Address.CleanNameFields(Address.CleanPerson73(l.tech_name));

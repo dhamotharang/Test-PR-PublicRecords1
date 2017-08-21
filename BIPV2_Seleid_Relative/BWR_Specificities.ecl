@@ -1,7 +1,7 @@
 //This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','BIPV2_Seleid_Relative.BWR_Specificities - Specificities - SALT V3.0 Gold');
-IMPORT BIPV2_Seleid_Relative,SALT30;
+#workunit('name','BIPV2_Seleid_Relative.BWR_Specificities - Specificities - SALT V3.1.3');
+IMPORT BIPV2_Seleid_Relative,SALT31;
 IMPORT SALTTOOLS30;
 SpecMod := BIPV2_Seleid_Relative.specificities(BIPV2_Seleid_Relative.In_Base);
 // Use the build command to actually build the specificity indexes

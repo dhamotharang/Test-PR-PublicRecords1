@@ -8,6 +8,7 @@
 */
 /*--INFO-- This service is to retieve all Possible DIDs of the input subject,
            and should be post filtered depends on accuracy required */
+/*--RESULT-- xslt.html */
 
 import didville, doxie, monitoring;
 

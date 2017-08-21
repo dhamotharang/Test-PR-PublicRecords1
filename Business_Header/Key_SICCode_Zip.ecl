@@ -1,4 +1,4 @@
-Import Data_Services, doxie, ut, MDR, Risk_Indicators;
+Import Data_Services, doxie, ut, MDR, Risk_Indicators, PRTE2_Business_Header;
 
 dBH_BDID_SIC := Business_Header.BH_BDID_SIC();
 dBH_Best		 := business_header.files().Base.business_header_best.built;
@@ -89,7 +89,11 @@ layout_keyIndex getll(f_addr_slim le) := transform
 	self 			:= le;
 end;
 
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+p := dataset([],layout_keyIndex);
+#ELSE
 p := project(f_addr_slim, getll(LEFT))(~(lat=0 AND long=0));
+#END;
 
 export Key_SICCode_Zip := index(p, 
 																{sic_code, z5:= zip},

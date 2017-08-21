@@ -48,7 +48,6 @@ EXPORT NormNameAddressRec := RECORD
 	STRING6 SSNFirst5Digit		:= ''	;
 	STRING5 SSNLast4Digit		:= ''	;
 	STRING10 ConsumerUpdateDate	:= ''	;
-	STRING10 DateOfDeath		:= ''	;
 	STRING8 TelephoneNumber				;
 	STRING CitedID				:= ''	;
 	STRING FileID				:= ''	;
@@ -76,6 +75,7 @@ EXPORT NormNameAddressRec := RECORD
 	STRING8 COMPILATIONDATE		:= ''	;
 	STRING1 BIRTHDATEIND		:= ''	;							               
 	STRING1 Orig_DECEASEDINDICATOR:= ''	;
+	STRING8 DECEASEDDATE;
 	UNSIGNED1 AddressSeq				; 
 	AddressRec NormAddress				;
 	STRING73 Name 				:= ''	;
@@ -112,8 +112,10 @@ END;
 //-----------------------------------------------------------------
 
 EXPORT LayoutTransunionBaseOut := RECORD
-    UNSIGNED dt_first_seen;
+  UNSIGNED dt_first_seen;
 	UNSIGNED dt_last_seen;
+	UNSIGNED dt_vendor_first_reported;
+	UNSIGNED dt_vendor_last_reported;
 	//Data contained in the input layout
 	NormNameAddressRec;
 	//Additional clean Name and Address data
@@ -121,17 +123,18 @@ EXPORT LayoutTransunionBaseOut := RECORD
 	address.Layout_Clean182					; 
 	//Additional reformated date, ssn and telephone data
 	STRING8 TRANSFERDATE_Unformatted		; //YYYYMMDD
-	STRING8 DEATHDATE_unformatted			; //YYYYMMDD
 	STRING8 BIRTHDATE_unformatted			; //YYYYMMDD
+	string8 DOB_no_conflict := ''; //DOB does not conflict with DOB from other sources for the same individual
 	STRING8 UPDATEDATE_unformatted			; //YYYYMMDD
 	STRING8 CONSUMERUPDATEDATE_unformatted	; //YYYYMMDD	
 	STRING8 FILESINCEDATE_unformatted		; //YYYYMMDD	
     STRING8 COMPILATIONDATE_unformatted		; //YYYYMMDD	
 	STRING9 SSN_unformatted					;
+	string9 SSN_no_conflict := '';//SSN does not conflict with SSN from other sources for the same individual
 	STRING8 TELEPHONE_unformatted			;
 	STRING1 DECEASEDINDICATOR				;
-	
 	UNSIGNED6   did   				:=0		;
 	UNSIGNED	DID_Score_field 	:=0		;
+	boolean is_current;
 END;
 END;

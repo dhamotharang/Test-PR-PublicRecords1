@@ -143,6 +143,18 @@ export idIntegrity(dataset(l_base) ds_in_raw=ds_null, boolean verbose=false) := 
 			left outer, lookup);
 	endmacro;
 	
+	export rebase_all(ds) := functionmacro
+		local _fix1 := BIPV2_tools.idIntegrity().rebase(ds   ,rcid,dotid );
+		local _fix2 := BIPV2_tools.idIntegrity().rebase(_fix1,rcid,proxid);
+		local _fix3 := BIPV2_tools.idIntegrity().rebase(_fix2,rcid,lgid3 );
+		local _fix4 := BIPV2_tools.idIntegrity().rebase(_fix3,rcid,seleid);
+		local _fix5 := BIPV2_tools.idIntegrity().rebase(_fix4,rcid,empid );
+		local _fix6 := BIPV2_tools.idIntegrity().rebase(_fix5,rcid,powid );
+		local _fix7 := BIPV2_tools.idIntegrity().rebase(_fix6,rcid,orgid );
+		local _fix8 := BIPV2_tools.idIntegrity().rebase(_fix7,rcid,ultid );
+		return _fix8;
+	endmacro;
+
 	export rebase_prox_up(ds) := functionmacro
 		local _fix1 := BIPV2_tools.idIntegrity().rebase(ds,rcid,proxid);
 		local _fix2 := BIPV2_tools.idIntegrity().rebase(_fix1,rcid,lgid3);

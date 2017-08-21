@@ -1,0 +1,1 @@
+EXPORT git_migration_test := 'hello world';

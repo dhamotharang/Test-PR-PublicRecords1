@@ -18,16 +18,23 @@ ut.MAC_SK_Move('~thor_data400::key::header','P',out13);
 ut.MAC_SK_Move('~thor_data400::key::header_lookups','P',out14);
 ut.mac_sk_move('~thor_data400::key::lssi.determiner','Q',out14b)
 ut.mac_sk_move('~thor_data400::key::header_rid_srid','P',out23)
-ut.mac_sk_move('~thor_data400::key::header_sources','P',out24);
+//ut.mac_sk_move('~thor_data400::key::header_sources','P',out24);
 ut.MAC_SK_Move_v2('~thor_data400::key::rid_did','P',out25)
 ut.MAC_SK_Move_v2('~thor_data400::key::rid_did2','P',out26)
+ut.MAC_SK_Move_v2('~thor_data400::key::header.did.ssn.date','P',out28)
+ut.MAC_SK_Move_v2('~thor_data400::key::header.county','P',out29)
+ut.MAC_SK_Move_v2('~thor_data400::key::header.fname_small','P',out30)
+ut.MAC_SK_Move_v2('~thor_data400::key::hdr_apt_bldgs','P',out31)
+ut.MAC_SK_Move_v2('~thor_data400::key::header_ssn_address','P',out32)
+
 
 out15 := header_slimsort.Proc_AcceptSK_toProd;
+out24 := header.Proc_Accept_SRC_toProd;
 
 ut.mac_sk_move_v2('~thor_data400::key::nbr_address','P',out16,2);
 
 all_keys := sequential(out1,out2,out3,out4,out5,out6,out7,
 			out8,out9,out10,out11,out12,out13,out14,out14b,out15,out16,out20,out21,out23,out24,
-			out25,out26,out27);
+			out25,out26,out27,out28,out29,out30,out31,out32);
 
 export Proc_AcceptSK_toProd := all_keys;

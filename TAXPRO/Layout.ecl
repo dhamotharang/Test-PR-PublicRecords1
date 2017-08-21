@@ -1,9 +1,8 @@
-IMPORT Standard;
+IMPORT Standard, BIPV2;
 
-EXPORT Layout := 
-  MODULE
-	EXPORT practitioner_in 
-	:=RECORD
+EXPORT Layout :=  MODULE
+
+	EXPORT practitioner_in :=RECORD
 		STRING8 	vENDorUpdatedate;	
 		STRING26 	firstnm;	
 		STRING24 	midinit;	
@@ -15,13 +14,12 @@ EXPORT Layout :=
 		STRING28 	city;	
 		STRING2  	state;	
 		STRING20 	zip;	
-		STRING30  	country;
+		STRING30  country;
 		STRING182	clean_address; 
 		STRING73 	pname;
 	END;
    
-    EXPORT IRS_enrolled_agent_in 
-	:=RECORD 
+  EXPORT IRS_enrolled_agent_in :=RECORD 
 	   STRING8 		date_first_reported;
 	   STRING8 		date_last_reported;
 	   STRING30 	firstnm;
@@ -38,20 +36,17 @@ EXPORT Layout :=
 	   STRING35 	country;
 	   STRING10 	filler;
 	   STRING1 		lf;
-	   STRING182    clean_address;
-	   STRING73     pname;
-	 
-	END;
+	   STRING182  clean_address;
+	   STRING73   pname;
+ END;
     
-	EXPORT Taxpro_Base 
-	:=RECORD 
-	
+	EXPORT Taxpro_Base:=RECORD
 	   unsigned4 	dt_first_seen			:=0;    
 	   unsigned4 	dt_last_seen			:=0;     
 	   unsigned4 	dt_vendor_first_reported:=0;
 	   unsigned4 	dt_vendor_last_reported	:=0;
-	   string10     tmsid;
-	   STRING14     source;
+	   string10   tmsid;
+	   STRING14   source;
 	   STRING30 	firstnm;
 	   STRING15 	midinit;
 	   STRING30 	lastnm;
@@ -65,7 +60,7 @@ EXPORT Layout :=
 	   STRING20		state;
 	   STRING20 	zip;
 	   STRING35 	country;
-	   STRING5      title;
+	   STRING5    title;
 	   STRING20 	fname;
 	   STRING20 	mname;
 	   STRING20 	lname;
@@ -99,21 +94,21 @@ EXPORT Layout :=
 	   STRING7		geo_blk;
 	   STRING1		geo_match;
 	   STRING4		err_stat;
-	   STRING9 		ssn                     :='';
+	   STRING9 		ssn           :='';
 	   unsigned6 	did  					:=0 ;
-	   unsigned6	did_score 				:=0 ;
+	   unsigned6	did_score 		:=0 ;
 	   unsigned6	bdid 					:=0 ;
-	   unsigned6    bdid_score 				:=0 ;
-	 
+	   unsigned6  bdid_score 	:=0 ;
+		 Bipv2.IDlayouts.l_xlink_ids;
 	END;
-	EXPORT Taxpro_Standard_Base
-	:=RECORD 
+	
+	EXPORT Taxpro_Standard_Base:=RECORD 
 	   unsigned4 	dt_first_seen			:=0;    
 	   unsigned4 	dt_last_seen			:=0;     
 	   unsigned4 	dt_vendor_first_reported:=0;
 	   unsigned4 	dt_vendor_last_reported	:=0;
-	   string10     tmsid;
-	   STRING14     source;
+	   string10   tmsid;
+	   STRING14   source;
 	   STRING30 	firstnm;
 	   STRING15 	midinit;
 	   STRING30 	lastnm;
@@ -129,15 +124,15 @@ EXPORT Layout :=
 	   STRING35 	country;
 	   standard.Name name;
 	   Standard.L_Address.detailed addr;
-	   STRING9 		ssn                     :='';
+	   STRING9 		ssn           :='';
 	   unsigned6 	did  					:=0 ;
-	   unsigned6	did_score 				:=0 ;
+	   unsigned6	did_score 		:=0 ;
 	   unsigned6	bdid 					:=0 ;
-	   unsigned6    bdid_score 				:=0 ;
+	   unsigned6  bdid_score 	:=0 ;
+		 Bipv2.IDlayouts.l_xlink_ids;
 	 END;
 	
 	 EXPORT Payload:=RECORD
-			
 		taxpro_standard_base.company    	;
 		taxpro_standard_base.tmsid 		;
 		taxpro_standard_base.ssn			;
@@ -146,7 +141,6 @@ EXPORT Layout :=
 		standard.Name name;
 		Standard.L_Address.detailed addr;
 		unsigned1 zero 					:= 0;
-
 	 END;
 
 END;

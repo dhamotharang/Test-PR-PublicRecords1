@@ -1,7 +1,7 @@
 IMPORT tools, ut, _Validate;
 
-EXPORT Build_Base_Cert(STRING pversion,
-											 DATASET(Layouts.Base.Cert) inCertBase,
+EXPORT Build_Base_Cert(STRING 										 pversion,
+											 DATASET(Layouts.Base.Cert)  inCertBase,
 											 DATASET(Layouts.Input.Cert) inCertUpdate) := MODULE
 
 	TrimUpper(STRING s) := FUNCTION
@@ -90,15 +90,16 @@ EXPORT Build_Base_Cert(STRING pversion,
     SELF.cert_type_ind_desc := MAP(L.cert_type_ind = 'G' => 'GENERAL CERTIFICATE',
 		                               L.cert_type_ind = 'S' => 'SUBCERTIFICATE',
 																   '');
-    SELF.recert_ind_desc := MAP(L.recert_ind = 'I' => 'INITIAL CERTIFICATION',
+    SELF.recert_ind_desc    := MAP(L.recert_ind = 'I' => 'INITIAL CERTIFICATION',
 		                            L.recert_ind = 'R' => 'RECERTIFICATION',
 																'');
     SELF.duration_type_desc := MAP(L.duration_type = 'L' => 'LIFETIME CERTIFICATE (NEVER EXPIRES)',
 		                               L.duration_type = 'TL' => 'TIME LIMITED CERTIFICATE',
 		                               L.duration_type = 'M' => 'MAINTENANCE OF CERTIFICATION',
 																   '');
+		SELF.record_type      	:= IF((UNSIGNED)L.expiration_date<(UNSIGNED)ut.GetDate and (UNSIGNED)L.expiration_date>0, 'H','C');														 
 
-    SELF := L
+    SELF                    := L
 	END;
 
 	// Finally, get descriptions.

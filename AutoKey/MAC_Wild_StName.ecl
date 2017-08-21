@@ -25,7 +25,7 @@ TRANSFORM
 	SELF.lname := le.inlname;
 	SELF.fname := le.infname;
 	SELF.minit := le.inmname[1];
-	SELF.yob := (integer)le.indob div 10000;
+	SELF.yob := doxie.DOBTools((integer)le.indob).year_in;
 	SELF.s4 := (unsigned)(((string)le.inssn)[6..9]);
 	SELF.dob := (integer)le.indob;
 	SELF.zip := (unsigned4)le.inzip;

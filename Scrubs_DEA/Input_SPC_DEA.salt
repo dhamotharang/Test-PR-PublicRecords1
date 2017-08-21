@@ -1,0 +1,41 @@
+MODULE:Scrubs_DEA
+OPTIONS:-gh
+FILENAME:DEA
+NAMESCOPE:Input
+//Uncomment up to NINES for internal or external adl
+//IDFIELD:EXISTS:<NameOfIDField>
+//RIDFIELD:<NameOfRidField>
+//RECORDS:<NumberOfRecordsInDataFile>
+//POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+//NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+//Uncomment Process if doing external adl
+//PROCESS:<ProcessName>
+//FIELDTYPE statements can be used to clean up (or check the cleaning) of individual fields
+FIELDTYPE:invalid_activity:CAPS:ENUM(ACTIVE|INACTIVE)
+FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)
+FIELDTYPE:invalid_alphanumeric:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789)
+FIELDTYPE:invalid_date:ALLOW(0123456789):CUSTOM(Scrubs.fn_valid_GeneralDate>0)
+FIELDTYPE:invalid_drug_schedules:ALLOW( 12345LN)
+FIELDTYPE:invalid_exp_of_payment_indicator:ENUM(E|P)
+FIELDTYPE:invalid_numeric:ALLOW(0123456789)
+//BESTTYPE statements declare methods of generating the best value for a given cluster; this can also improve linking
+//FUZZY can be used to create new types of FUZZY linking
+FIELD:dea_registration_number:TYPE(STRING9):LIKE(invalid_alphanumeric):0,0
+FIELD:business_activity_code:TYPE(STRING1):LIKE(invalid_alpha):0,0
+FIELD:drug_schedules:TYPE(STRING16):LIKE(invalid_drug_schedules):0,0
+FIELD:expiration_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:address1:TYPE(STRING40):0,0
+FIELD:address2:TYPE(STRING40):0,0
+FIELD:address3:TYPE(STRING40):0,0
+FIELD:address4:TYPE(STRING40):0,0
+FIELD:address5:TYPE(STRING33):0,0
+FIELD:state:TYPE(STRING2):LIKE(invalid_alpha):0,0
+FIELD:zip_code:TYPE(STRING5):LIKE(invalid_numeric):0,0
+FIELD:bus_activity_sub_code:TYPE(STRING1):LIKE(invalid_alphanumeric):0,0
+FIELD:exp_of_payment_indicator:TYPE(STRING1):LIKE(invalid_exp_of_payment_indicator):0,0
+FIELD:activity:TYPE(STRING8):LIKE(invalid_activity):0,0
+FIELD:crlf:TYPE(STRING2):0,0
+//CONCEPT statements should be used to group together interellated fields; such as address
+//RELATIONSHIP is used to find non-obvious relationships between the clusters
+//SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+//LINKPATH is used to define access paths for external linking

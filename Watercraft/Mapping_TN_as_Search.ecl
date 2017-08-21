@@ -1,7 +1,8 @@
 
 import lib_stringlib, watercraft;
 
-watercraft.Macro_Is_hull_id_in_MIC(Watercraft.file_TN_clean_in, watercraft.Layout_TN_clean_in, wDatasetwithflag)
+Watercraft.Macro_Clean_Hull_ID(Watercraft.file_TN_clean_in, watercraft.Layout_TN_clean_in,hull_clean_in)
+watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.Layout_TN_clean_in, wDatasetwithflag)
 
 Watercraft.Layout_Watercraft_Search_Group search_mapping_format(wDatasetwithflag L)
  :=

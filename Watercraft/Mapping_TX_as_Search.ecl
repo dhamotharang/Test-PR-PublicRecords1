@@ -1,11 +1,13 @@
 import watercraft, lib_stringlib;
 
-watercraft.Macro_Is_hull_id_in_MIC(Watercraft.file_TX_clean_in, watercraft.Layout_TX_clean_in, wDatasetwithflag)
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_TX_clean_in, watercraft.layout_TX_clean_in,hull_clean_in)
+
+watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.Layout_TX_clean_in, wDatasetwithflag)
 
 string fFixHullID(string pHullIDIn)
  := lib_stringlib.StringLib.StringFilter(lib_stringlib.stringlib.stringtouppercase(pHullIDIn),'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ ');
 
-Watercraft.Layout_Watercraft_Search_Group search_mapping_format(wDatasetwithflag L, integer1 C) := transform
+Watercraft.Layout_Watercraft_Search_Group search_mapping_format(wDatasetwithflag L) := transform
  
 	self.date_first_seen			:=	L.REG_DATE;
 	self.date_last_seen				:=	L.REG_DATE;
@@ -21,15 +23,15 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(wDatasetwithflag
 	self.state_origin				:=	'TX';
 	self.source_code				:=	'AW';
 	self.dppa_flag					:=	'';
-	self.orig_name					:=	L.NAME + L.Name_2_of_Owner + L.Name2_Continuation ;
+	self.orig_name					:=	L.NAME;
 	self.orig_name_type_code		:=  'O';
 	self.orig_name_type_description	:=	'OWNER';
-	self.orig_name_first			:=	choose(C,L.FIRST_NAME, '', '');
-	self.orig_name_middle			:=	choose(C,L.MID, '', '');
-	self.orig_name_last				:=	choose(C,L.LAST_NAME, '', '');
-	self.orig_name_suffix			:=	'';
-	self.orig_address_1				:=	L.Pure_ADDRESS_1;
-	self.orig_address_2				:=	L.Address_2nd_Line;
+	self.orig_name_first			:=	L.FIRST_NAME;
+	self.orig_name_middle			:=	L.MID;
+	self.orig_name_last				:=	L.LAST_NAME;
+	self.orig_name_suffix			:=	L.PRIMARY_OWNER_SUFFIX;
+	self.orig_address_1				:=	L.ADDRESS_1;
+	self.orig_address_2				:=	'';
 	self.orig_city					:=	L.CITY;
 	self.orig_state					:=	L.STATE;
 	self.orig_zip					:=	L.ZIP;
@@ -40,8 +42,8 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(wDatasetwithflag
 	self.gender						:=	'';
 	self.phone_1					:=	'';
 	self.phone_2					:=	'';
-	self.clean_pname                :=  choose(C,L.pname1, L.pname2, L.pname3, L.pname4, L.pname5);
-	self.company_name				:=	choose(C,L.cname1, L.cname2, L.cname3, L.cname4, L.cname5);
+	self.clean_pname                :=  L.pname;
+	self.company_name				:=	L.cname;
 	self.clean_address              :=  L.clean_address;            
 	self.bdid						:=	'';
 	self.fein						:=	'';
@@ -53,5 +55,5 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(wDatasetwithflag
  ; 
  
  
-export Mapping_TX_as_Search	:= (normalize(wDatasetwithflag,5,search_mapping_format(left,counter)))(clean_pname <> '' or company_name <> '');
+export Mapping_TX_as_Search	:= project(wDatasetwithflag,search_mapping_format(left))(clean_pname <> '' or company_name <> '');
 

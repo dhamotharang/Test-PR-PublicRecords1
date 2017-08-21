@@ -1,9 +1,7 @@
-IMPORT Gong, Header, DNB, IRS5500, Corp, Business_Header, Business_Header_SS, ut;
+IMPORT Gong_Neustar, Header, DNB_DMI, IRS5500, corp, Corp2, Business_Header, Business_Header_SS, ut,mdr;
 
-bh := Business_Header.File_Business_Header_Base;
-bb := Business_Header.File_Business_Header_Best;
-//bh := Business_Header.BH_Basic_Match_Clean;
-//bb := Business_Header.BestAddress;
+bh := Business_Header.Files().Base.Business_Headers.built;
+bb := Business_Header.Files().Base.Business_Header_Best.built;
 
 bh_addr_all := DEDUP(
 	SORT(
@@ -27,7 +25,7 @@ bh_addr := TABLE(bh_addr_all, layout_full_stat, zip, prim_name, prim_range, sec_
 
 
 // Get residential phones per addr.
-gng_res := Gong.File_Gong_full(publish_code = 'P', listing_type_res <> '', z5 != '', prim_name != '');
+gng_res := Gong_Neustar.File_Gong_full(publish_code = 'P', listing_type_res <> '', z5 != '', prim_name != '');
 gong_res_dist := DEDUP(
 	SORT(
 	DISTRIBUTE(gng_res, HASH(z5, prim_name, prim_range)),
@@ -46,7 +44,7 @@ gong_r_phone_per_addr := TABLE(gong_res_dist, layout_res_phones_per_addr,
 		z5, prim_name, prim_range, sec_range, LOCAL);
 
 // Get business/gov phones per addr.
-gng_bus := Gong.File_Gong_full(publish_code IN ['P','U'], listing_type_bus <> '', z5 != '', prim_name != '');
+gng_bus := Gong_Neustar.File_Gong_full(publish_code IN ['P','U'], listing_type_bus <> '', z5 != '', prim_name != '');
 gong_bus_dist := DEDUP(
 	SORT(
 	DISTRIBUTE(gng_bus, HASH(z5, prim_name, prim_range)),
@@ -139,15 +137,15 @@ addr_all := DEDUP(
 	
 // Rollup by Primary Address
 addr_all_dist := DISTRIBUTE(addr_all, HASH(zip, TRIM(prim_name), TRIM(prim_range)));
-addr_all_sort := SORT(addr_all_dist, zip, prim_name, prim_range, LOCAL);
+addr_all_sort := SORT(addr_all_dist, zip, prim_name, prim_range,sec_range, LOCAL);
 addr_all_grp := GROUP(addr_all_sort, zip, prim_name, prim_range, LOCAL);
 
 layout_full_stat RollupAddrStats(layout_full_stat l, layout_full_stat r) := transform
-SELF.bdid_per_addr := l.bdid_per_addr + r.bdid_per_addr;
+SELF.bdid_per_addr := if(l.sec_range=r.sec_range, l.bdid_per_addr + r.bdid_per_addr, l.bdid_per_addr);
 SELF.apts := l.apts;  // Only count apts once for primary address
 SELF.ppl := l.ppl;    // Only count people once for primary address
-SELF.r_phone_per_addr := l.r_phone_per_addr + r.r_phone_per_addr;
-SELF.b_phone_per_addr := l.b_phone_per_addr + r.b_phone_per_addr;
+SELF.r_phone_per_addr := if(l.sec_range=r.sec_range, l.r_phone_per_addr + r.r_phone_per_addr, l.r_phone_per_addr);
+SELF.b_phone_per_addr := if(l.sec_range=r.sec_range, l.b_phone_per_addr + r.b_phone_per_addr, l.b_phone_per_addr);
 SELF := L;
 end;
 
@@ -172,22 +170,23 @@ END;
 
 bh_unique_bdid := TABLE(DISTRIBUTE(bh(bdid != 0), HASH(bdid)), layout_bs_join, bdid, LOCAL);
 
-bh_duns_recs := DEDUP(bh(source = 'D', vendor_id[1] != 'D'), vendor_id, ALL);
+bh_duns_recs := DEDUP(bh(MDR.sourceTools.SourceIsDunn_Bradstreet(source), vendor_id[1] != 'D'), vendor_id, ALL);
 
-layout_bs_join AddDNB(DNB.File_DNB_Base l, bh_duns_recs r) := TRANSFORM
+layout_bs_join AddDNB(DNB_DMI.Files().base.companies.qa l, bh_duns_recs r) := TRANSFORM
 	SELF.bdid := r.bdid;	
 	SELF.dnb_emps := 
-			IF((INTEGER4) (l.employees_total_sign + l.employees_total) > 0, 
-				(UNSIGNED4) l.employees_total,
-				IF((INTEGER4) (l.employees_here_sign + l.employees_here) > 0,
-					(UNSIGNED4) l.employees_here,
+			IF((INTEGER4) (l.rawfields.employees_total_sign + l.rawfields.employees_total) > 0, 
+				(UNSIGNED4) l.rawfields.employees_total,
+				IF((INTEGER4) (l.rawfields.employees_here_sign + l.rawfields.employees_here) > 0,
+					(UNSIGNED4) l.rawfields.employees_here,
 					1));
 END;
 
 bs_dnb_only := JOIN(
-		DISTRIBUTE(DNB.File_DNB_Base(duns_number != '', record_type = 'C', active_duns_number = 'Y'), HASH((STRING9) duns_number)),
+		//DISTRIBUTE(DNB.File_DNB_Base(duns_number != '', record_type = 'C', active_duns_number = 'Y'), HASH((STRING9) duns_number)),
+		DISTRIBUTE(DNB_DMI.Files().base.companies.qa(trim(rawfields.duns_number) <> '', record_type in [3,5], active_duns_number = 'Y'), HASH((STRING9)rawfields.duns_number)),
 		DISTRIBUTE(bh_duns_recs, HASH((STRING9) vendor_id)),
-	LEFT.duns_number = RIGHT.vendor_id,
+	LEFT.rawfields.duns_number = RIGHT.vendor_id,
 	AddDNB(LEFT, RIGHT), LOCAL);
 
 bs_dnb_dedup := DEDUP(
@@ -207,7 +206,7 @@ bs_dnb := JOIN(
 	LEFT.bdid = RIGHT.bdid, 
 	AddDNB2(LEFT, RIGHT), LEFT OUTER, LOCAL);
 
-bh_irs_recs := DEDUP(bh(source = 'I'), vendor_id, ALL);
+bh_irs_recs := DEDUP(bh(MDR.sourceTools.SourceIsIRS_5500(source)), vendor_id, ALL);
 
 layout_bs_join AddIRS(IRS5500.File_IRS5500_Base l, bh_irs_recs r) := TRANSFORM
 	SELF.bdid := r.bdid;
@@ -241,7 +240,7 @@ bs_dnb_irs5500 := JOIN(bs_dnb,
 	LEFT.bdid = RIGHT.bdid, 
 	AddIRS2(LEFT, RIGHT), LEFT OUTER, LOCAL);
 
-cnf := Business_Header_SS.File_BH_CompanyName_Plus;
+cnf := Business_Header.Files().Base.CompanyName.built;
 
 // Add company name frequency from the slimsorts.
 layout_bs_join AddCNScore(layout_bs_join l, cnf r) := TRANSFORM
@@ -264,7 +263,7 @@ layout_domain_count := RECORD
 END;
 
 domain_count := TABLE(
-			DISTRIBUTE(bh(source = 'W'), HASH(bdid)), 
+			DISTRIBUTE(bh(MDR.sourceTools.SourceIsWhois_domains(source)), HASH(bdid)), 
 			layout_domain_count, bdid, LOCAL);
 
 layout_bs_join AddDomainCt(bs_dnb_irs_cnf l, domain_count r) := TRANSFORM
@@ -298,7 +297,11 @@ bs_dnb_irs_cnf_whois_source := JOIN(bs_dnb_irs_cnf_whois, source_count,
 	AddSourceCt(LEFT, RIGHT), LEFT OUTER, LOCAL);
 
 // Does a gong or yellow pages record exist?
-bs_has_gong := DEDUP(bh_source_ded(source IN ['GB', 'GG', 'Y']), bdid, LOCAL);
+bs_has_gong := DEDUP(bh_source_ded(
+		MDR.sourceTools.SourceIsGong_Business		(source)
+or 	MDR.sourceTools.SourceIsGong_Government	(source)
+or	MDR.sourceTools.SourceIsYellow_Pages		(source)
+), bdid, LOCAL);
 
 layout_bs_join AddHasGong(bs_dnb_irs_cnf_whois_source l, bs_has_gong r) := TRANSFORM
 	SELF.has_gong_yp := r.bdid != 0;
@@ -311,7 +314,7 @@ JOIN(bs_dnb_irs_cnf_whois_source, bs_has_gong,
 	AddHasGong(LEFT, RIGHT), LEFT OUTER, LOCAL);
 
 // Check if we have a current corporate record for the bdid.
-corp_recs := bh(source = 'C', current);
+corp_recs := bh(MDR.sourceTools.SourceIsCorpV2(source), current);
 
 layout_corp_check := RECORD
 	UNSIGNED6 bdid;
@@ -321,7 +324,7 @@ layout_corp_check TakeCurrentCorpBDID(corp_recs l) := TRANSFORM
 	SELF := l;
 END;
 
-corp_base_recs := Corp.File_Corp_Base(business_header.is_ActiveCorp(record_type, corp_status_cd, corp_status_desc));
+corp_base_recs := corp2.files('').base.corp.prod(business_header.is_ActiveCorp(record_type, corp_status_cd, corp_status_desc));
 
 current_corp_recs := JOIN(
 	DISTRIBUTE(corp_recs, HASH((STRING34) vendor_id)),
@@ -401,4 +404,5 @@ END;
 
 scored_addr_stats := PROJECT(bh_addr_stats_combined, ScoreAddr(LEFT));
 
-EXPORT BH_BQI_Stats := scored_addr_stats : PERSIST('TEMP::BH_BQI_Stats');
+EXPORT BH_BQI_Stats := scored_addr_stats 
+	: PERSIST(persistnames().BHBQIStats);

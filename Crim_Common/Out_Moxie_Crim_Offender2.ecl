@@ -1,5 +1,5 @@
-import DID_Add, Header_Slimsort, ut, Lib_Stringlib, WatchDog;
-
+import DID_Add, Header_Slimsort, ut, Lib_Stringlib, WatchDog, didville;
+/*
 rCrimOffender2_WithDID
  :=
   record
@@ -17,7 +17,7 @@ dCombined_DOC_and_CrimOffender2
 
 lMatchSet := ['S','A','D'];
 
-did_Add.MAC_Match_Flex_Sensitive  // NOTE <- sensitive macro
+did_Add.MAC_Match_Flex//_Sensitive  // Removed sensitive macro
 	(dCombined_DOC_and_CrimOffender2, lMatchSet,						
 	 orig_ssn, dob, fname, mname,lname, name_suffix, 
 	 prim_range, prim_name, sec_range, zip5, state, phone_field, 
@@ -39,6 +39,7 @@ rCrimOffender2_WithDID_SSN
 rCrimOffender2_WithDID_SSN tUseSourceSSN(rCrimOffender2_WithDID pInput)
  :=
   transform
+    self.offender_key := StringLib.StringToUpperCase(pInput.offender_key);
 	self.ssn 	:= pInput.orig_ssn;
 	self 		:= pInput;
   end
@@ -138,8 +139,37 @@ Layout_Moxie_Crim_Offender2 tIterateTransform(Layout_Moxie_Crim_Offender2 pLeft,
 	self		  := pRight;
   end
  ;
+ 
 
 dGroupedPostDID_DL_Data_Filled := iterate(dSortedGroupedByDLData,tIterateTransform(left,right));
-dMoxieFile := group(dGroupedPostDID_DL_Data_Filled);
+dMoxieFile                     := ungroup(dGroupedPostDID_DL_Data_Filled);
+dMoxieFileDedup                := dedup(dMoxieFile,record,all);
 
-export Out_Moxie_Crim_Offender2 := output(dMoxieFile,,Crim_Common.Name_Moxie_Crim_Offender2_Dev,Overwrite);
+//--- EXPUNGE RECORDS 20070111 CNG
+
+expunge_offender_key_layout
+ :=
+  record
+	string60 offender_key;
+  end;
+
+expunge_offender_key := dataset('~thor_data400::in::expunge_offender_key', expunge_offender_key_layout, flat);
+
+//dedup_expunge_offender_key:= dedup(Crim_Common.Expunge_Offender_Key_List, ALL);
+dedup_expunge_offender_key:= dedup(expunge_offender_key, ALL);
+
+Crim_Common.Layout_Moxie_Crim_Offender2 JoinKeys(Crim_Common.Layout_Moxie_Crim_Offender2 L, expunge_offender_key_layout R) 
+ := TRANSFORM
+	self := L;
+ end;
+
+dMoxieFileDedup2 :=
+	JOIN(dMoxieFileDedup, dedup_expunge_offender_key, 
+			LEFT.offender_key=RIGHT.offender_key, JoinKeys(left, right), left only, lookup);
+			
+//END EXPUNGE
+
+hard_code_did_removals := crim_common.fn_blank_the_did(dMoxieFileDedup2);
+
+export Out_Moxie_Crim_Offender2 := output(hard_code_did_removals,,Crim_Common.Name_Moxie_Crim_Offender2_Dev,Overwrite);
+*/

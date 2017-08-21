@@ -17,15 +17,10 @@ EXPORT fFDIC_As_Business_Linking(DATASET(Layouts_FDIC.Base_AID) pBasefile) := FU
                                               (UNSIGNED4)(l.repdte[1..4] + l.repdte[6..7] + l.repdte[9..10]), 0),
                                            IF(_validate.date.fIsValid(l.endefymd[1..4] + l.endefymd[6..7] + l.endefymd[9..10]),
                                               (UNSIGNED4)(l.endefymd[1..4] + l.endefymd[6..7] + l.endefymd[9..10]), 0));
-    SELF.dt_vendor_first_reported    := IF(_validate.date.fIsValid(l.effdate[1..4] + l.effdate[6..7] + l.effdate[9..10]),
-                                           (UNSIGNED4)(l.effdate[1..4] + l.effdate[6..7] + l.effdate[9..10]), 0);
-    SELF.dt_vendor_last_reported     := IF(l.endefymd[1..4] = '9999' or l.active = '1',
-                                           IF(_validate.date.fIsValid(l.repdte[1..4] + l.repdte[6..7] + l.repdte[9..10]),
-                                              (UNSIGNED4)(l.repdte[1..4] + l.repdte[6..7] + l.repdte[9..10]), 0),
-                                           IF(_validate.date.fIsValid(l.endefymd[1..4] + l.endefymd[6..7] + l.endefymd[9..10]),
-                                              (UNSIGNED4)(l.endefymd[1..4] + l.endefymd[6..7] + l.endefymd[9..10]), 0));
+    SELF.dt_vendor_first_reported    := (UNSIGNED4)l.process_date;
+    SELF.dt_vendor_last_reported     := (UNSIGNED4)l.process_date;
  		SELF.company_bdid                :=	l.bdid;
-		SELF.company_name				         :=	ut.fnTrim2Upper(l.name);  
+		SELF.company_name				         :=	ut.CleanSpacesAndUpper(l.name);  
 		SELF.company_rawaid              := l.append_rawaid;   
 		SELF.company_address.prim_range  :=	l.prim_range;
 		SELF.company_address.predir      :=	l.predir;
@@ -69,9 +64,8 @@ EXPORT fFDIC_As_Business_Linking(DATASET(Layouts_FDIC.Base_AID) pBasefile) := FU
 	rNewBusinessLayout RollupFDIC(rNewBusinessLayout l, rNewBusinessLayout r) := TRANSFORM
 	  SELF.dt_first_seen               := ut.EarliestDate(ut.EarliestDate(l.dt_first_seen,r.dt_first_seen),
 				                                                ut.EarliestDate(l.dt_last_seen,r.dt_last_seen));
-	  SELF.dt_last_seen                := ut.LatestDate(l.dt_last_seen,r.dt_last_seen);
-	  SELF.dt_vendor_last_reported     := ut.LatestDate(l.dt_vendor_last_reported, 
-                                                      r.dt_vendor_last_reported);
+	  SELF.dt_last_seen                := max(l.dt_last_seen,r.dt_last_seen);
+	  SELF.dt_vendor_last_reported     := max(l.dt_vendor_last_reported, r.dt_vendor_last_reported);
 	  SELF.dt_vendor_first_reported    := ut.EarliestDate(l.dt_vendor_first_reported,
                                                         r.dt_vendor_first_reported);
 	  SELF.company_name                := IF(l.company_name = '', r.company_name, l.company_name);
@@ -129,6 +123,7 @@ EXPORT fFDIC_As_Business_Linking(DATASET(Layouts_FDIC.Base_AID) pBasefile) := FU
                                            r.company_address.geo_match, l.company_address.geo_match);
 	  SELF.company_address.err_stat    := IF(l.company_address.err_stat = '' AND l.company_address.zip4 = '',
                                            r.company_address.err_stat, l.company_address.err_stat);
+		SELF.source_record_id					   := if(l.dt_vendor_first_reported < r.dt_vendor_first_reported, l.source_record_id, r.source_record_id);
     SELF                             := L;
 	END;
 
@@ -136,7 +131,7 @@ EXPORT fFDIC_As_Business_Linking(DATASET(Layouts_FDIC.Base_AID) pBasefile) := FU
 	FDIC_Init_Sort   := SORT(FDIC_Init_Dist, company_address.zip, company_address.prim_range, 
                            company_address.prim_name, company_name, vl_id,
 						               IF(company_address.sec_range <> '', 0, 1), company_address.sec_range,
-						               dt_vendor_last_reported, dt_vendor_first_reported, dt_last_seen, LOCAL);
+						               dt_vendor_first_reported, LOCAL);
 	FDIC_Init_Rollup := ROLLUP(FDIC_Init_Sort,
 						            LEFT.company_address.zip = RIGHT.company_address.zip AND
 						            LEFT.company_address.prim_name = RIGHT.company_address.prim_name AND

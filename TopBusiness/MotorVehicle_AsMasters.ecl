@@ -2,7 +2,12 @@ import Address,VehicleV2,MDR;
 
 export MotorVehicle_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 
-	shared party_base       := VehicleV2.File_VehicleV2_Party; // party & title/registration info
+	shared party_base       := VehicleV2.File_VehicleV2_Party(
+		stringlib.StringFind(append_clean_cname,'%JR',1) = 0 and // these are all mis-parsed people names.
+		stringlib.StringFind(append_clean_cname,'%SR',1) = 0 and
+		stringlib.StringFind(append_clean_cname,'%IV',1) = 0 and
+		stringlib.StringFind(append_clean_cname,'%II',1) = 0 and
+		stringlib.StringFind(append_clean_cname,'% JR',1) = 0); // party & title/registration info
 	shared party_filtered_init   := party_base(Vehicle_key != '');
 
   shared main_base        := VehicleV2.File_VehicleV2_Main;  // vehicle characteristics info
@@ -15,10 +20,11 @@ export MotorVehicle_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 	
 	shared party_filtered :=
 		join(
-			party_filtered_init,
-			dedup(party_filtered_init(Append_Clean_cname != ''),vehicle_key,all),
+			distribute(party_filtered_init,hash64(vehicle_key)),
+			dedup(distribute(party_filtered_init,hash64(vehicle_key))(Append_Clean_cname != ''),vehicle_key,all,local),
 			left.vehicle_key = right.vehicle_key,
-			transform(left));
+			transform(left),
+			local);
 			
   // Extract company name/address info for linking from temp combined party file
 	export dataset(Layout_Linking.Unlinked) As_Linking_Master := function
@@ -26,7 +32,7 @@ export MotorVehicle_AsMasters := module(Interface_AsMasters.Unlinked.Default)
   linking_extracted := project(party_filtered(append_clean_cname != ''),
 			transform(Layout_Linking.Unlinked,
 				self.source          := MDR.sourceTools.fVehicles(left.state_origin,left.source_code),
-				self.source_docid    := left.vehicle_key;
+			  self.source_docid    := trim(left.vehicle_key,left,right) + '//' +  trim(left.iteration_key,left,right); // OR left.orig_vin; ???
 				self.source_party    := left.orig_name_type + 
 				                        intformat(hash32(left.orig_name,left.orig_address,
 																								 left.orig_city, left.orig_state,
@@ -48,6 +54,7 @@ export MotorVehicle_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.city_name       := left.Append_Clean_Address.v_city_name,
 				self.state           := left.Append_Clean_Address.st,
 				self.zip             := left.Append_Clean_Address.zip5,
+				self.zip4            := left.Append_Clean_Address.zip4,
 				self.county_fips     := left.Append_Clean_Address.fips_county,
 				self.msa             := '',
 				self.phone           := '', 
@@ -124,10 +131,16 @@ export MotorVehicle_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 	end;
 
   // Extract name/address info from the entire vehicle party/main combined file
-	export dataset(Layout_motorvehicle.Party) As_motorvehicle_Master_Party := function
+	export dataset(Layout_motorvehicle.Party.Unlinked) As_motorvehicle_Master_Party := function
 
    party_extracted_title := project(party_filtered(Ttl_Latest_Issue_Date != ''),
-		 transform(Layout_motorvehicle.party,
+		 transform(Layout_motorvehicle.party.Unlinked,
+				self.source          := MDR.sourceTools.fVehicles(left.state_origin,left.source_code),
+			  self.source_docid    := trim(left.vehicle_key,left,right) + '//' +  trim(left.iteration_key,left,right); // OR left.orig_vin; ???
+				self.source_party    := left.orig_name_type + 
+				                        intformat(hash32(left.orig_name,left.orig_address,
+																								 left.orig_city, left.orig_state,
+																								 left.orig_zip) % 1000000000,9,1),
 				self.event_id      := 'T' + hash64(left.vehicle_key,left.state_origin,if(left.ttl_number != '',left.ttl_number,left.ttl_latest_issue_date)),
 				self.vendor       := left.source_code;  // needed for linking ???
 				self.party_type             := left.orig_name_type;
@@ -160,7 +173,13 @@ export MotorVehicle_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 		));
 
    party_extracted_registration := project(party_filtered(Reg_Latest_Effective_Date != ''),
-		 transform(Layout_motorvehicle.party,
+		 transform(Layout_motorvehicle.party.Unlinked,
+				self.source          := MDR.sourceTools.fVehicles(left.state_origin,left.source_code),
+			  self.source_docid    := trim(left.vehicle_key,left,right) + '//' +  trim(left.iteration_key,left,right); // OR left.orig_vin; ???
+				self.source_party    := left.orig_name_type + 
+				                        intformat(hash32(left.orig_name,left.orig_address,
+																								 left.orig_city, left.orig_state,
+																								 left.orig_zip) % 1000000000,9,1),
 				self.event_id := 'R' + hash64(left.vehicle_key,left.state_origin,if(left.reg_latest_effective_date != '',left.reg_latest_effective_date,left.reg_first_date)),
 				self.vendor       := left.source_code;  // needed for linking ???
 				self.party_type             := left.orig_name_type;

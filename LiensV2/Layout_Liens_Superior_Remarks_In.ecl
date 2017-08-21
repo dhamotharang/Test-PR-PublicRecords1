@@ -1,0 +1,27 @@
+export Layout_Liens_Superior_Remarks_In := record
+  string50 rmsid0; 
+  string50 tmsid ;
+   string50 rmsid;
+   string50 vdi;
+   string8 process_date ;
+   string1 header_domain;
+   string2 header_filing_state;
+   string2 header_casenumber_num_prefix;
+   string8 header_casenumber_seq_num;
+   string4 header_casenumber_year;
+   string2 header_casenumber_suffix;
+   string3 header_venue_code;
+   string9 header_cji_action_number;
+   string3 header_cji_case_type_code;
+   string1 header_sort_context;
+   string3 header_subjudgement_num;
+   string1 header_sort_value;
+   string4 header_seq_number;
+   string1 header_rec_type;
+   string2 header_remarks_seq;
+   string8 RECORDED_DATE;
+   string8 EFFECTIVE_DATE;
+   string8 CJI_ENTRY_DATE;
+   string8 CJI_CHANGE_DATE;
+   string1000 remarks ;
+end;

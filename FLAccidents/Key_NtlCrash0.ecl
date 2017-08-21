@@ -95,7 +95,7 @@ end;
 
 pntl := project(ntlFile,slimrec(left));
 
-allrecs := pflc0+pntl : persist('~thor_data400::persist::ntlcrash0');
+allrecs := dedup(pflc0+pntl,record,all) : persist('~thor_data400::persist::ntlcrash0');
 
 export Key_NtlCrash0 := index(allrecs
                             ,{unsigned6 l_acc_nbr :=(integer)accident_nbr}

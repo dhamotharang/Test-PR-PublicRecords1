@@ -1,4 +1,4 @@
-﻿/*--SOAP--
+/*--SOAP--
 <message name="Healthcare_SocioEconomic_Batch_Service_V2">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="20"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>

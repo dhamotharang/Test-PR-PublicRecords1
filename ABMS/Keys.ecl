@@ -9,6 +9,7 @@ EXPORT Keys(STRING pversion = '',
 						DATASET(Layouts.Base.TypeOfPractice)	pBaseTypeOfPracticeBuilt	=	Files(pversion).Base.TypeOfPractice.Built) := MODULE
 
 	SHARED BaseMain           := PROJECT(pBaseMainBuilt(biog_number != ''), Layouts.Keybuild.Main);
+	shared BaseMain_LNPID     := dedup(sort(distribute(project(pBaseMainBuilt(lnpid>0),Layouts.KeyBuild.Main_Lnpid),lnpid),lnpid,biog_number,local),lnpid,biog_number,local);
 	SHARED BaseMain_DID       := BaseMain(did != 0);
 	SHARED BaseMain_BDID      := BaseMain(bdid != 0);
 	SHARED BaseMain_NPI       := BaseMain(npi != '');
@@ -71,6 +72,8 @@ EXPORT Keys(STRING pversion = '',
 		                        KeyNames(pversion).Main.DID, DID);
 		tools.mac_FilesIndex('BaseMain_BDID, {bdid, biog_number}, {BaseMain}',
 		                        KeyNames(pversion).Main.BDID, BDID);
+	  tools.mac_FilesIndex('BaseMain_LNPID,{lnpid},{biog_number}',
+		                        KeyNames(pversion).Main.LNPID,LNPID);	
 		tools.mac_FilesIndex('BaseMain_NPI, {npi, biog_number}, {BaseMain}',
 		                        KeyNames(pversion).Main.NPI, NPI);
 		tools.mac_FilesIndex('BaseMain_Specialty, ' +

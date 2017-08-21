@@ -2,7 +2,6 @@
 add dob_field
 */
 export MAC_format_DOB(infile, dob_field,outfile) := macro
-somethingialwasythingkabout := 0;
 
 #uniquename(dobFix)
 typeof(infile) %dobFix%(infile l) := transform

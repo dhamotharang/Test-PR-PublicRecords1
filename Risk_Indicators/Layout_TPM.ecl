@@ -1,0 +1,172 @@
+export Layout_TPM := module
+
+
+
+export TPM := record
+  string3 		npa;
+  string3 		nxx;
+  string1 		block_id;
+  string1 		filler1;
+  string8 		_range;
+  string2 		nxx_type;
+  string1 		filler2;
+  string6 		eff_last_change;
+  string1 		change_code;
+  string1 		filler3;
+  string4 		ocn;
+  string4 		aocn;
+  string2 		company_code;
+  string1 		company_type;
+  string3 		bill_to_rao;
+  string3 		send_to_rao;
+  string1 		filler4;
+  string5 		major_vert_coord;
+  string5 		major_horiz_coord;
+  string3 		rate_center_lata;
+  string2 		rate_center_lata_sub;
+  string10 		rate_center_name_abb;
+  string1 		rate_center_type;
+  string10 		place_name;
+  string2 		state;
+  string1 		filler5;
+  string1 		tz;
+  string1 		daylight_savings;
+  string1 		portability;
+  string1 		thousand_block_pooling;
+  string1 		iddd_ind;
+  string1 		dialable_ind;
+  string2 		other_line_rate_step;
+  string1 		point_id;
+  string6 		eff_date_assign;
+  string11 		filler6;
+  string1 		lf;
+end;
+
+export OCN := record
+  string4 		ocn;
+  string30 		co_name;
+  string1 		change_code;
+  string7 		filler;
+  string1 		crlf;
+end;
+
+export PLNAME := record
+  string2 		state;
+  string1 		filler1;
+  string10 		place_abbr;
+  string1 		filler2;
+  string50 		place_name;
+  string1 		crlf;
+end;
+
+export J_TPM_OCN := record
+  string3 		npa;
+  string3 		nxx;
+  string1 		block_id;
+  string1 		filler1;
+  string8 		_range;
+  string2 		nxx_type;
+  string1 		filler2;
+  string6 		eff_last_change;
+  string1 		change_code;
+  string1 		filler3;
+  string4 		ocn;
+  string4 		aocn;
+  string2 		company_code;
+  string1 		company_type;
+  string3 		bill_to_rao;
+  string3 		send_to_rao;
+  string1 		filler4;
+  string5 		major_vert_coord;
+  string5 		major_horiz_coord;
+  string3 		rate_center_lata;
+  string2 		rate_center_lata_sub;
+  string10 		rate_center_name_abb;
+  string1 		rate_center_type;
+  string10 		place_name;
+  string2 		state;
+  string1 		filler5;
+  string1 		tz;
+  string1 		daylight_savings;
+  string1 		portability;
+  string1 		thousand_block_pooling;
+  string1 		iddd_ind;
+  string1 		dialable_ind;
+  string2 		other_line_rate_step;
+  string1 		point_id;
+  string6 		eff_date_assign;
+  string11 		filler6;
+  string1 		lf;
+	string4 		ocn_ocn;
+  string30 		ocn_co_name;
+  string1 		ocn_change_code;
+  string7 		ocn_filler;
+  string1 		ocn_crlf;
+end;
+
+export J_TPM_PLNAME := record
+  string3 		npa;
+  string3 		nxx;
+  string1 		block_id;
+  string1 		filler1;
+  string8 		_range;
+  string2 		nxx_type;
+  string1 		filler2;
+  string6 		eff_last_change;
+  string1 		change_code;
+  string1 		filler3;
+  string4 		ocn;
+  string4 		aocn;
+  string2 		company_code;
+  string1 		company_type;
+  string3 		bill_to_rao;
+  string3 		send_to_rao;
+  string1 		filler4;
+  string5 		major_vert_coord;
+  string5 		major_horiz_coord;
+  string3 		rate_center_lata;
+  string2 		rate_center_lata_sub;
+  string10 		rate_center_name_abb;
+  string1 		rate_center_type;
+  string10 		place_name;
+  string2 		state;
+  string1 		filler5;
+  string1 		tz;
+  string1 		daylight_savings;
+  string1 		portability;
+  string1 		thousand_block_pooling;
+  string1 		iddd_ind;
+  string1 		dialable_ind;
+  string2 		other_line_rate_step;
+  string1 		point_id;
+  string6 		eff_date_assign;
+  string11 		filler6;
+  string1 		lf;
+	string4 		ocn_ocn;
+  string30 		ocn_co_name;
+  string1 		ocn_change_code;
+  string7 		ocn_filler;
+  string1 		ocn_crlf;
+	string2 		PLNAME_state;
+  string1 		PLNAME_filler1;
+  string10 		PLNAME_place_abbr;
+  string1 		PLNAME_filler2;
+  string50 		PLNAME_place_name;
+  string1 		PLNAME_crlf;
+end; 
+
+export TPM_OUT := record
+  string3 			npa;
+  string3 			nxx;
+  string1 			tb;
+  string50 			city;
+  string2 			st;
+  string30 			ocn;
+  string1 			company_type;
+  string2 			nxx_type;
+  string1 			dial_ind;
+  string1 			point_id;
+  string1 			lf;
+end;
+
+END; 

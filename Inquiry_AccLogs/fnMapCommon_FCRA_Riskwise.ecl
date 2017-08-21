@@ -19,6 +19,9 @@ inquiry_acclogs.fncleanfunctions.cleanfields(inputfile, cleaned_fields);
 normInputFile := normalize(cleaned_fields, 2, transform({inquiry_acclogs.Layout_Riskwise_Logs.denorm,
 																										string orig_transaction_type := '',
 																										string orig_global_company_id := ''}, 
+
+								self.sequence_number 			:= (string)counter;
+
 								self.orig_fname 			:= choose(counter, left.orig_fname, left.orig_fname_2);
 								self.orig_mname 			:= choose(counter, left.orig_mname, left.orig_mname_2);
 								self.orig_lname 			:= choose(counter, left.orig_lname, left.orig_lname_2);
@@ -51,8 +54,12 @@ removeNulls := project(mbs_outfile, transform(inquiry_acclogs.Layout_In_Common,
 								self.orig_full_name2 := left.orig_full_name;
 								self.orig_addr1 := left.orig_address;
 								self.orig_lastline1 := stringlib.stringcleanspaces(left.orig_CITY + ' ' + left.orig_state + ' ' + left.orig_zip + left.orig_zip4);
+								self.ORIG_CITY1 := left.orig_CITY;
+								self.ORIG_STATE1 := left.orig_state;
+								self.ORIG_ZIP1 := left.orig_zip+left.orig_zip4;
 
 								self.repflag	:= '';
+								self.sequence_number	:= left.sequence_number;
 
 								self.ssn := 		Inquiry_AccLogs.fncleanfunctions.clean_ssn(left.orig_ssn);
 								self.personal_phone := Inquiry_AccLogs.fncleanfunctions.clean_phone(left.orig_homephone);
@@ -79,7 +86,7 @@ removeNulls := project(mbs_outfile, transform(inquiry_acclogs.Layout_In_Common,
 								self.DPPA_purpose := '';
 								self.Login_History_ID 	:= left.orig_login_history_id;
 								self.Transaction_ID 		:= stringlib.stringtouppercase(left.orig_transaction_id);
-								self.Product_Code 			:= left.product_id;
+								self.Product_Code 			:= '2';//left.product_id;
 								self.Function_Description := map(left.description <> '' => left.description, left.orig_function_name);
 								self.PERSON_ORIG_IP_ADDRESS1 := Inquiry_Acclogs.fnCleanFunctions.fraudback(left.description, left.ORIG_IP_ADDRESS);				
 								self.ORIG_IP_ADDRESS2 := map(self.PERSON_ORIG_IP_ADDRESS1 = '' => left.ORIG_IP_ADDRESS, '');
@@ -96,7 +103,7 @@ return removenulls;
 end;
 
 
-export ready_File(dataset(inquiry_acclogs.Layout_In_Common) AppendForward, string select_source = 'RISKWISE') := function
+export ready_File(dataset(inquiry_acclogs.Layout_In_Common) AppendForward, string select_source = 'RISKWISE', boolean ReAppendDay) := function
 
 ///////////////// PROJECT INTO PERSON QUERY LAYOUT 
 							
@@ -114,6 +121,7 @@ person_project := project(AppendForward(repflag = '' and source_file = select_so
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
+			self.bus_intel.Use := left.use;
 			
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
@@ -192,6 +200,7 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
+			self.bus_intel.Use := left.use;
 			
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
@@ -256,7 +265,7 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 
 prev_base := inquiry_acclogs.File_FCRA_Riskwise_Logs_Common;
 
-prev_base_trans := project(prev_base, transform({inquiry_acclogs.Layout.Common, string source := 'RISKWISE'}, self := left));
+prev_base_trans := project(prev_base, transform({inquiry_acclogs.Layout.Common, string source := 'RISKWISE'}, self.search_info.product_code := '2', self := left));
 														
 inquiry_acclogs.file_MBSApp_Base().FCRA_Append(prev_base_trans,prev_base_mbs);
 
@@ -264,12 +273,10 @@ prev_base_ready := project(prev_base_mbs, transform(inquiry_acclogs.Layout.Commo
 
 update_records := bususer_project + person_project + prev_base_ready;
 
-ReAppendDay := stringlib.stringtolowercase(ut.Weekday((unsigned8)ut.getdate)) in ['friday'];
-
 newFile := if(ReAppendDay,
 							dedup(sort(distribute(bususer_project + person_project + prev_base_ready, hash(search_info.Transaction_ID)), 
 								record, local), record, local),
-							bususer_project + person_project)(mbs.company_id + mbs.global_company_id <> '');
+							bususer_project + person_project)(mbs.company_id + mbs.global_company_id <> '' and ~(mbs.company_id in ['108976'] and search_info.product_code = '2' and search_info.datetime[..8] between '20121031' and '20121105'));
 
 return newFile;
 end;		

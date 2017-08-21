@@ -1,29 +1,40 @@
-import header;
-apf := dataset('~thor_data400::Base::AKHeader_Building',layout_apf_in,flat);
-apf_pe := dataset('~thor_data400::Base::AKPEHeader_Building',layout_apf_pe_in,flat);
+import header,Data_Services;
 
-src_rec := record
-	header.Layout_Source_ID;
-	Layout_AK_Common;
-end;
+export APF_As_Source(dataset(layout_apf_in) pAPF = dataset([],layout_apf_in),
+					 dataset(layout_apf_pe_in) pAPFPE = dataset([],layout_apf_pe_in),
+					 boolean pForHeaderBuild=false
+					)
+ :=
+  function
+	dSourceAPF		:=	if(pForHeaderBuild,
+						   dataset(Data_Services.Data_location.prefix('AK_Perm_Fund')+'thor_data400::Base::AKHeader_Building',layout_apf_in,flat),
+						   pAPF
+						  );
+	dSourceAPFPE	:=	if(pForHeaderBuild,
+						   dataset(Data_Services.Data_location.prefix('AK_Perm_Fund')+'thor_data400::Base::AKPEHeader_Building',layout_apf_pe_in,flat),
+						   pAPFPE
+						  );
 
-src_rec asSrcAPF(apf L) := transform
- self.src := 'AK';
- self.uid := 0;
- self := l;
-end;
+	src_rec := header.layouts_SeqdSrc.AK_src_rec;
 
-src_rec asSrcPE(apf_PE L) := transform
- self.src := 'AK';
- self.uid := 0;
- self := l;
-end;
+	src_rec asSrcAPF(dSourceAPF L) := transform
+	 self.src := 'AK';
+	 self.uid := 0;
+	 self := l;
+	end;
 
-apf_out := project(apf,asSrcAPF(left));
-apf_pe_out := project(apf_pe,asSrcPE(left));
+	src_rec asSrcPE(dSourceAPFPE L) := transform
+	 self.src := 'AK';
+	 self.uid := 0;
+	 self := l;
+	end;
 
-all_recs := apf_out+apf_pe_out;
+	apf_out := project(dSourceAPF,asSrcAPF(left));
+	apf_pe_out := project(dSourceAPFPE,asSrcPE(left));
 
-header.Mac_Set_Header_Source(all_recs,src_rec,src_rec,'AK',withUID)
+	all_recs := apf_out+apf_pe_out;
 
-export APF_As_Source := withUID : persist('persist::headerbuild_ak_src');
+	header.Mac_Set_Header_Source(all_recs,src_rec,src_rec,'AK',withUID)
+
+	return withUID;
+  end;

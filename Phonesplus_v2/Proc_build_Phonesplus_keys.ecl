@@ -1,4 +1,4 @@
-import Address,doxie_files, ut, doxie, autokey,Cellphone,RoxieKeyBuild,Phonesplus;
+import Address,doxie_files, ut, doxie, autokey,Cellphone,RoxieKeyBuild,Phonesplus,Phonesplus_v2,NID;
 
 export proc_build_phonesplus_keys(string filedate) := 
 function
@@ -6,7 +6,11 @@ function
 /////////////////////////////////////////////////////////////////////////////////
 // -- Build Keys
 /////////////////////////////////////////////////////////////////////////////////
-
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(key_neustar_phone_history
+                                          ,'~thor_data400::key::neustar_phone_history'
+										  ,'~thor_data400::key::neustar::'+filedate+'::phone_history'
+										  ,bk_neustar_hist);
+											
 knp := CellPhone.key_neustar_phone;
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(knp
                                           ,'~thor_data400::key::neustar_phone'
@@ -41,8 +45,8 @@ xl_phonesplus xpand_phonesplus(multiCityPhonesplus le,integer phonesplus_cntr) :
 END;
 DS_phonesplus := PROJECT(multiCityPhonesplus,xpand_phonesplus(LEFT,COUNTER)) : PERSIST('~thor_data400::persist::phonesplusv2_fdids');
 
-//ut.mac_suppress_by_phonetype(DS_phonesplus,cellphone,state,phones1,true,did);
-//ut.mac_suppress_by_phonetype(phones1,homephone,state,phones2,true,did);
+// ut.mac_suppress_by_phonetype(DS_phonesplus,cellphone,state,phones1,true,did);
+// ut.mac_suppress_by_phonetype(phones1,homephone,state,phones2,true,did);
 
 dist_DSphonesplus := distribute(DS_phonesplus,random());
 
@@ -70,7 +74,7 @@ dist_DSphonesplus_rec slim_it(dist_DSphonesplus l) := transform
 	self := l;
 end;
 
-_dist_DSphonesplus_slim := project(dist_DSphonesplus, slim_it(left));
+_dist_DSphonesplus_slim := sort(project(dist_DSphonesplus, slim_it(left)),fdid,skew(1));
 
 phonesplus_fdids_key := index(_dist_DSphonesplus_slim,{fdid},{_dist_DSphonesplus_slim},
                         '~thor_data400::key::phonesplusv2_fdids');
@@ -83,6 +87,9 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(phonesplus_fdids_key
 /////////////////////////////////////////////////////////////////////////////////
 // -- Move Keys to Built
 /////////////////////////////////////////////////////////////////////////////////
+Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::neustar_phone_history'
+								     ,'~thor_data400::key::neustar::'+filedate+'::phone_history'
+									 ,mv2blt_neustar_hist);
 
 Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::neustar_phone'
 								     ,'~thor_data400::key::neustar::'+filedate+'::phone'
@@ -102,10 +109,11 @@ Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::phonesplusv2_companyn
 // -- Move Keys to QA
 /////////////////////////////////////////////////////////////////////////////////
 
-ut.mac_sk_move('~thor_data400::key::neustar_phone' ,'Q',mv2qa_phone);
-ut.mac_sk_move('~thor_data400::key::phonesplusv2_did','Q',mv2qa_did);
-ut.mac_sk_move('~thor_data400::key::phonesplusv2_fdids','Q',mv2qa_fdids);
-ut.mac_sk_move('~thor_data400::key::phonesplusv2_companyname','Q',mv2qa_pcname);
+ut.mac_sk_move_v2('~thor_data400::key::neustar_phone_history' ,'Q',mv2qa_neustar_hist);
+ut.mac_sk_move_v2('~thor_data400::key::neustar_phone' ,'Q',mv2qa_phone);
+ut.mac_sk_move_v2('~thor_data400::key::phonesplusv2_did','Q',mv2qa_did);
+ut.mac_sk_move_v2('~thor_data400::key::phonesplusv2_fdids','Q',mv2qa_fdids);
+ut.mac_sk_move_v2('~thor_data400::key::phonesplusv2_companyname','Q',mv2qa_pcname);
 CellPhone.MAC_AcceptSK_to_QA('~thor_data400::key::phonesplusv2_' ,mv_autokey,false);
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -138,8 +146,9 @@ build_keys :=
 
 sequential(
 	parallel(
-			  bk_did
-			 ,bld_fdids
+			 bk_did
+		   ,bld_fdids
+			 ,bk_neustar_hist
 			 ,bk_phone
 			 ,bk_pcname
 			 ,bld_phonesplus_auto
@@ -147,15 +156,18 @@ sequential(
 	parallel(
 			 mv2blt_did
 			,mv2blt_fdids
+			,mv2blt_neustar_hist
 			,mv2blt_phone
 			,mv2blt_pcname
 			),
 	parallel(
 			mv2qa_did
-		   ,mv2qa_fdids
-		   ,mv2qa_phone
-		   ,mv2qa_pcname
-		   ,mv_autokey
+		  ,mv2qa_fdids
+			,mv2qa_neustar_hist
+		  ,mv2qa_phone
+		  ,mv2qa_pcname
+		  ,mv_autokey
+			
 			 )
  
    
@@ -167,9 +179,3 @@ return sequential(build_keys
 				);
 
 end;
-
-
- 
- 
- 
- 

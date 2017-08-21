@@ -91,6 +91,7 @@ RECORD
   string7 geo_blk;
   string1 geo_match;
   string4 err_stat;
+  string2 pfrd_address_ind :='';
   string32 designation;
   string5 name_prefix;
   string20 name_first;

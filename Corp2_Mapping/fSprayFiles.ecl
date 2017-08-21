@@ -1,63 +1,63 @@
-import Versioncontrol, _control, corp2, ut;
+import tools, _control, corp2, std;
 
 export fSprayFiles(
 	 string		pCorpState									= ''																		//to spray a specific state, or set of states(delimited by pipes)
 	,string		pversion										= ''																		//to override the version
 	,boolean	pShouldIncludeLookups				= false
-	,string		pSourceIP										= 'edata10'
-	,string		pSourceDir									= '/data_build_4/corporate_filings/out'
+	,string		pSourceIP										= _Control.IPAddress.bctlpedata10
+	,string		pSourceDir									= '/data/data_build_4/corporate_filings/out'
 	,boolean	pOverwrite									= false
-	,string		pEmailAddress								= _control.MyInfo.emailaddressnotify
-	,string		pGroupName									= versioncontrol.Groupname('92')
+	,string		pEmailAddress								= _Control.MyInfo.emailaddressnotify
+	,string		pGroupName									= tools.fun_Groupname('44')
 	,boolean	pShouldClearSuperfileFirst	= true
 	,boolean	pIsTesting									= false
 	,boolean	pSplitEmails								= true
 	,boolean	pShouldSprayZeroByteFiles		= false
+	,string   pSuffix											= ''
 
 ) :=
 function
 
-	FilesToSpray := SprayDataset(pSourceIP,pSourceDir,pCorpState,pversion,pGroupName);
+	FilesToSpray 		:= Corp2_Mapping.SprayDataset(pSourceIP,pSourceDir,pCorpState,pversion,pGroupName,pSuffix);
 	
-	lookup_filter := if(	pShouldIncludeLookups = true 
-													//list of states where lookups are mandatory and come in each update
-											or regexfind('^.*?(ak|ga|ks|mo|ms|ne|nh|oh|pa)$'	, FilesToSpray.Thor_filename_template, nocase)
-											,true
-											,not regexfind('lookup'				, FilesToSpray.Thor_filename_template, nocase)
-									);
+	lookup_filter 	:= if(pShouldIncludeLookups = true or
+												//list of states where lookups are mandatory and come in each update
+												regexfind('^.*?(ak|ga|ks|mo|ms|ne|nh|oh|pa)$',FilesToSpray.Thor_filename_template,nocase)
+													,true
+													,not regexfind('lookup',FilesToSpray.Thor_filename_template, nocase)
+											 );
 									
-	lUpdateFreqency	:= if(regexfind('(daily|monthly|weekly)'	,pSourceDir)
-												,' ' + regexfind('(daily|monthly|weekly)'	,pSourceDir	,0) + ' '
-												,' '
-											);
+	lUpdateFreqency	:= if(regexfind('(daily|monthly|weekly)',pSourceDir),
+											  ' ' + regexfind('(daily|monthly|weekly)'	,pSourceDir	,0) + ' ',
+												' '
+											 );
 	
-	lVersion				:= map(pversion != ''																			=> pversion
-												,regexfind('[[:digit:]]{8}[[:alpha:]]?',pSourceDir) => regexfind('[[:digit:]]{8}[[:alpha:]]?',pSourceDir	,0)
-												,ut.GetDate
-											);
+	lVersion				:= map(pversion != ''																			=> pversion,
+												 regexfind('[[:digit:]]{8}[[:alpha:]]?',pSourceDir) => regexfind('[[:digit:]]{8}[[:alpha:]]?',pSourceDir	,0),
+												 (string)std.date.today()
+											  );
 											
-	lCorpState := if(pCorpState = ''
-										,'All States'
-										,regexreplace('\\|', pCorpState, ', ')
-								);
+	lStates 				:= if(pCorpState = '','All States',regexreplace('\\|', pCorpState, ', '));
 
-	lCorpStates_for_spray_log := if(pCorpState = ''
-										,'All_States'
-										,regexreplace('\\|', pCorpState, '_')
-								);
-	isks := if(regexfind('ks', pCorpState, nocase) or pCorpState = '', true, false);
+	lSprayLog		 		:= if(pCorpState = '','All_States',regexreplace('\\|', pCorpState, '_'));
 	
-	return 
-		VersionControl.fSprayInputFiles(
-			 FilesToSpray(lookup_filter)
-			,'~thor_data400::spraylogs::corp2'
-			,'~thor_data400::spraylogs::corp2::' + lVersion + '::' + lCorpStates_for_spray_log
-			,pOverwrite,,false,pIsTesting
-			,corp2.Email_Notification_Lists.spray + ';' + pEmailAddress
-			,'CorpV2 ' + stringlib.stringtouppercase(lCorpState) + lUpdateFreqency + lVersion
-			,,pShouldClearSuperfileFirst
-			,pSplitEmails
-			,isks
-	);
+	isKS 						:= if(regexfind('ks', pCorpState, nocase) or pCorpState = '', true, false);
+									  
+	return	tools.fun_Spray(FilesToSpray(lookup_filter)
+												 ,'~thor_data400::spraylogs::corp2'
+												 ,'~thor_data400::spraylogs::corp2::' + lVersion + '::' + lSprayLog
+												 ,pOverwrite
+												 ,
+												 ,false
+												 ,pIsTesting
+												 ,corp2.Email_Notification_Lists.spray + ';' + pEmailAddress
+												 ,'CorpV2 ' + stringlib.stringtouppercase(lStates) + lUpdateFreqency + lVersion
+												 ,
+												 ,pShouldClearSuperfileFirst
+												 ,pSplitEmails
+												 ,isKS //pShouldSprayZeroByteFiles
+												 ,
+												 ,pversion
+											);
 
 end;

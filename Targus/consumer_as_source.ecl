@@ -3,24 +3,15 @@ import header;
 export Consumer_as_Source(dataset(targus.layout_consumer_out) pTargusConsumer = dataset([],targus.layout_consumer_out), boolean pForHeaderBuild=false)
  :=
   function
-	dSourceData	:=	if(pForHeaderBuild,
-					   file_consumer_base,
-					   pTargusConsumer
+	dSourceData	:=	if(pForHeaderBuild
+					   ,dataset('~thor_data400::base::consumer_targusHeader_Building',layout_consumer_out,flat)
+					   ,pTargusConsumer
 					  );
 
-	src_rec := record
-	 header.Layout_Source_ID;
-	 targus.layout_consumer_out;
-	end;
+	src_rec := header.layouts_SeqdSrc.WP_src_rec;
 
 	header.Mac_Set_Header_Source(dSourceData,targus.layout_consumer_out,src_rec,'WP',withUID)
 
-	dForHeader	:=	withUID	: persist('persist::headerbuild_consumer_src');
-	dForOther	:=	withUID;
-	ReturnValue	:=	if(pForHeaderBuild,
-					   dForHeader,
-					   dForOther
-					  );
-	return ReturnValue;
+	return withUID;
   end
  ;

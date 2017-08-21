@@ -24,6 +24,9 @@ EXPORT Layouts := MODULE
 
 	EXPORT indv	:= RECORD
 		string9		SSN;
+		string20 	FNAME;
+		string25 	LNAME;
+		string50 	ADDR;
 		string28	CITY;
 		string2		STATE;
 		string5		ZIPCODE;

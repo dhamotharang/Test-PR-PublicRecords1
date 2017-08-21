@@ -11,7 +11,7 @@ export MAC_CityStName (indataset,infname,inmname,inlname,
 						indid,
 						inkeyname,outkey,by_lookup=TRUE,favor_lookup=0) :=
 MACRO
-import ut, doxie;
+import ut, doxie, NID;
 
 #uniquename(indata)
 %indata% := indataset;
@@ -21,11 +21,11 @@ import ut, doxie;
 #uniquename(recs)
 Autokey.Layout_CityStName %proj%(%indata% le) :=
 TRANSFORM
-	SELF.city_code := HASH((qstring25)le.incity_name);
+	SELF.city_code := doxie.Make_CityCodes(le.incity_name).tho;
 	SELF.st := le.inst;
 	SELF.dph_lname := metaphonelib.DMetaPhone1(le.inlname);
 	SELF.lname := le.inlname;
-	SELF.pfname := datalib.preferredfirst(le.infname);
+	SELF.pfname := NID.PreferredFirstVersionedStr(le.infname, NID.version);
 	SELF.fname := le.infname;
 	SELF.dob := (integer)le.indob;
 	SELF.states := le.instates;

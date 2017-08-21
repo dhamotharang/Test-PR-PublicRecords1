@@ -1,4 +1,4 @@
-﻿IMPORT FLAccidents_Ecrash,iesp;
+IMPORT FLAccidents_Ecrash,iesp;
 
 //** Added the fix for bug 138974
 

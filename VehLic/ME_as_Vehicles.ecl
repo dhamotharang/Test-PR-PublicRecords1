@@ -41,6 +41,8 @@ vehlic.Layout_Vehicles lMEFullToVehicles(Vehlic.Layout_ME_Full pInput) := transf
 										pInput.orig_VANITY_NEW_PLATE
 									   );
 	self.REGISTRATION_EXPIRATION_DATE := pInput.orig_EXPIRE_DATE;
+	self.REGISTRATION_EFFECTIVE_DATE := pInput.orig_EFFECTIVE_DATE;
+	
 	self.TRUE_LICENSE_PLSTE_NUMBER := if(pInput.orig_REG_PLATE<>'',
 										pInput.orig_REG_PLATE,
 										pInput.orig_VANITY_NEW_PLATE

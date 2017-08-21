@@ -1,9 +1,9 @@
 import ut;
 
 
-fl_mar_ds :=  dataset('~thor_data200::in::mar_div::fl::marriage',
+fl_mar_ds :=  dataset(ut.foreign_prod+'thor_200::in::mar_div::fl::marriage',
 									   marriage_divorce_v2.Layouts_Marriage_FL_In.Layout_Marriage_FL_Variable_In,
-										 csv(heading(2),terminator('\r\n')))(payload != ' ',stringlib.stringfind(payload,'row(s) affected',1)=0);
+										 csv(heading(1),terminator('\r\n')),OPT)(payload != ' ',stringlib.stringfind(payload,'row(s) affected',1)=0);
 
 
 
@@ -57,5 +57,8 @@ transform
 	
  end;
 
-export File_Marriage_FL_In := project(fl_mar_ds,trfProject(left));
+fl_mar_filter := project(fl_mar_ds,trfProject(left));
 
+
+export File_Marriage_FL_In := fl_mar_filter( (trim(groom_name_last)!=''  and trim(groom_name_last)!='') or 
+																						 (trim(bride_name_last)!=''  and trim(bride_name_first)!='')); 		

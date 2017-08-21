@@ -1,0 +1,21 @@
+EXPORT layout_ln_propertyv2_key_ownership_addr_true := RECORD
+  string10 prim_range;
+  string2 predir;
+  string28 prim_name;
+  string4 addr_suffix;
+  string2 postdir;
+  string8 sec_range;
+  string5 zip5;
+  unsigned8 rawaid;
+  unsigned8 aceaid;
+  string5 fips_code;
+  string45 unformatted_apn;
+  // DATASET(l_hist_thin) hist{maxcount(100)};
+	string12 ln_fares_id;
+  string7 dt_seen;
+  // DATASET(l_owner_thin) owners{maxcount(10)};
+  string3 did;
+  string10 which_orig;
+  string14 isbdid;
+  string __internal_fpos__;
+ END;

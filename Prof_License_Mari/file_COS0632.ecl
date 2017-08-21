@@ -1,0 +1,2 @@
+//Mortgage Lender from COS0632
+EXPORT file_COS0632 := dataset(Prof_License_Mari.thor_cluster + 'in::proflic_mari::'+ 'cos0632' + '::using::uccc' ,Prof_License_Mari.layout_COS0632.src,CSV(HEADING(1),SEPARATOR(','),QUOTE('"'),TERMINATOR('\r\n')));

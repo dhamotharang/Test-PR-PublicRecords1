@@ -1,9 +1,12 @@
-import ut, Address, business_header, business_header_ss, did_add;
+import ut, Address, business_header, business_header_ss, did_add,mdr;
 
 // Add temporary unique id to records
 layout_edgar_temp := record
-unsigned6 uid := 0;
-Edgar.Layout_Edgar_Company;
+	unsigned6 uid 	:= 0;
+  string20 fname 	:= '';
+  string20 mname 	:= '';
+  string20 lname 	:= '';
+	Edgar.Layout_Edgar_Company_BIP;
 end;
 
 layout_edgar_temp InitEdgar(Edgar.Layout_Edgar_Company_In L) := transform
@@ -109,33 +112,82 @@ edgar_denorm := denormalize(edgar_seq,
                             left.uid = right.uid,
                             DenormEdgar(left, right));
 
-Edgar.Layout_Edgar_Company FormatBase(layout_edgar_temp L) := transform
-self := L;
-end;
-
-edgar_company_base := project(edgar_denorm, FormatBase(left));
-
 myset := ['A','P'];
 
-business_header.MAC_Source_Match(edgar_company_base,outf1,
+business_header.MAC_Source_Match(edgar_denorm,outf1,
 						false,bdid,
-						false,'E',
+						false,MDR.sourceTools.src_Edgar,
 						false,foo,
 						companyname,
 						bus_prim_range,bus_prim_name,
 						bus_sec_range,bus_zip,
 						true,bus_phone10,
-						false,bus_fein)
+						false,bus_fein);
 
-o2 := outf1(bdid = 0);
+edgar_companies_dist 	:= distribute(outf1, hash(trim(accNumber)));
 
-business_header_ss.mac_match_flex(o2, myset,
-				companyname,bus_prim_range,bus_prim_name,bus_zip,bus_sec_range,bus_st,
-				bus_phone10,bus_fein,bdid,edgar.layout_edgar_company,false,foo,outf2)
+slim_contacts_base := record
+  string40 accession;
+  string20 fname;
+  string20 mname;
+  string20 lname;
+end;
+
+ds_slim_contact := project(Edgar.File_Edgar_Contacts_Base,transform(slim_contacts_base,self := left));
+
+// Bring in contacts to get name fields for MAC_Match_Flex macro
+edgar_contacts_dist := dedup(sort(distribute(ds_slim_contact, hash(trim(accession))),record,local),record,local);
+
+layout_edgar_temp CombineFiles(layout_edgar_temp l, slim_contacts_base r) := transform
+		self.fname  := r.fname;
+		self.mname	:= r.mname;
+		self.lname	:= r.lname;
+		self 			 	:= l;
+		self 				:= r;
+end;
+
+edgar_combined := join(edgar_companies_dist, //use sorted and dedup'ed slimmed contact file
+                       edgar_contacts_dist,
+                       trim(left.accNumber) = trim(right.accession),
+                       CombineFiles(left, right),
+                       left outer,
+                       local);
 				
-o3 := outf2 + outf1(bdid != 0);
+business_header_ss.MAC_Match_Flex(
+			 edgar_combined												// input dataset						
+			,myset				                				// bdid matchset what fields to match on           
+			,companyname	                  			// company_name	              
+			,bus_prim_range		                  	// prim_range		              
+			,bus_prim_name		                    // prim_name		              
+			,bus_zip					                    // zip5					              
+			,bus_sec_range		                   	// sec_range		              
+			,bus_st				        		          	// state				              
+			,bus_phone10						              // phone				              
+			,bus_fein            			          	// fein              
+			,bdid														  		// bdid												
+			,layout_edgar_temp										// output layout 
+			,false                                // output layout has bdid score field? 																	
+			,foo                     							// bdid_score                 
+			,outf2				          							// output dataset
+			,																			// keep count
+			,																			// default threshold
+			,																			// use prod version of superfiles
+			,																			// default is to hit prod from dataland, and on prod hit prod.		
+			,BIPV2.xlink_version_set							// create BIP keys only
+			,																			// url
+			,																			// email 
+			,bus_v_city_name											// city
+			,fname																// fname
+			,mname																// mname
+			,lname																// lname
+);					 
+
+ds_sort_linkids 	:= sort(outf2,uid,-dotid,-empid,-powid,-proxid,-seleid,-orgid,-ultid);
+ds_dedup_company	:= dedup(ds_sort_linkids,uid);
+
+edgar_company_base := project(ds_dedup_company, transform(Layout_Edgar_Company_BIP, self:=left));
 
 //output(o3,,'BASE::Edgar_Company_' + Edgar.Version_Edgar_Company, overwrite);
-ut.MAC_SF_BuildProcess(o3,'~thor_data400::base::edgar_company',do1,2);
+ut.MAC_SF_BuildProcess(edgar_company_base,'~thor_data400::base::edgar_company',do1,2);
 
 export make_edgar_company_base := do1;

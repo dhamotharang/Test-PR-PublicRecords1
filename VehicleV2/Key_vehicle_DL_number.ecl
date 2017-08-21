@@ -1,6 +1,6 @@
 import VehicleV2, VehLic, Doxie, ut;
 
-get_recs	:= VehicleV2.file_VehicleV2_Party;
+get_recs	:= VehicleV2.file_VehicleV2_Party_Clean_Sequence_Key;
 
 //slim_party := table(get_recs(Append_DL_number != '' or Orig_DL_number != ''), {orig_DL_number, Append_DL_number, Vehicle_Key, Iteration_Key, Sequence_Key, state_origin});
 
@@ -17,7 +17,7 @@ end;
 slim_rec tnormalize(get_recs L, integer cnt) := transform
 
 self.DL_number := choose(cnt, L.orig_DL_number, L.Append_DL_number);
-	age := ut.getage(l.orig_dob);
+	age := ut.Age((UNSIGNED) l.orig_dob);
 self.is_minor := if(age=0 or age>=18,FALSE,TRUE);
 self := L;
 

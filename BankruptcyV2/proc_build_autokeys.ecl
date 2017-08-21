@@ -91,21 +91,31 @@ ds_inLayoutMaster_AKB :=
 	export integer L_Rep_addr := 4; 
 	export set of string1 L_build_skip_set  := []; 
 	export boolean L_UseNewPreferredFirst:= true;
+	export boolean L_processCompoundNames:= true;
 	end; 
 	 
+	
+build_custom_ak := MODULE (AutoKeyI.BuildI_Indv.ibuild)
+	export BuildI_Indv_Custom1_keybuild(autokeyi.InterfaceForBuild in_mod)	:= BankruptcyV2.MCustomAutokeyBuild.RedactedSSNName.keybuild(in_mod);
+	export BuildI_Indv_Custom1_keymove(autokeyi.InterfaceForBuild in_mod)		:= BankruptcyV2.MCustomAutokeyBuild.RedactedSSNName.keymove(in_mod);
+	export BuildI_Indv_Custom1_keymoveQA(autokeyi.InterfaceForBuild in_mod)	:= BankruptcyV2.MCustomAutokeyBuild.RedactedSSNName.keymoveQA(in_mod);
+end;	
+
 	
 outaction :=  
 	parallel(
 		proc_build_payload_key_AKB, 
-		AutokeyB2.Fn_Build.Do(mod_AKB,AutoKeyI.BuildI_Indv.DoBuild,AutoKeyI.BuildI_Biz.DoBuild) 
+		AutokeyB2.Fn_Build.Do(mod_AKB, build_custom_ak, AutoKeyI.BuildI_Biz.DoBuild)
 	); 
+
 	 
 AutoKeyB2.MAC_AcceptSK_to_QA(BankruptcyV2.Constants(filedate, isFCRA).ak_keyname, mymove)
 
 retval := 
 	sequential(
 		outaction,
-		mymove
+		mymove,
+		MCustomAutokeyBuild.RedactedSSNName.keymoveQA(mod_AKB)
 	);
 
  

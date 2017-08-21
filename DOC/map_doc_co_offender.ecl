@@ -43,7 +43,7 @@ END;
 */
 // Imports
 import Crim_common;
-import Address, Lib_AddrClean, Ut, lib_stringlib;
+import Address, Ut, lib_stringlib;
 // Transforms
 ds_combo_offender := DOC.file_doc_co;
 
@@ -66,7 +66,7 @@ TRANSFORM
 //
 		// The following 2 fields used in party_status_desc;
 	nam:=TRIM((L.NAME),LEFT,RIGHT);
-	    String78 clean_name := AddrCleanLib.CleanPersonLFM73(trim(regexreplace('^O ',nam,'O')));
+	    String78 clean_name := Address.CleanPersonLFM73(trim(regexreplace('^O ',nam,'O')));
 		
 /*
 NOTE FIELD ORDER NOW MATCHES ArrestLOG Transsform order
@@ -101,7 +101,7 @@ self.id_num				:= L.ID;// OK?
 //self.dl_num				:= '';
 //self.dl_state			:= '';
 self.citizenship		:= '';
-self.dob				:= commonFn.DateToStandard(L.DOB);
+self.dob				    := IF (stringlib.stringfind(L.DOB,'/',1) <> 0, CommonFn.DateToStandard(L.DOB),stringlib.stringfindreplace(L.DOB,'-','')); //commonFn.DateToStandard(L.DOB);
 self.dob_alias			:= '';
 self.place_of_birth		:= '';
 self.street_address_1	:= '';
@@ -119,7 +119,7 @@ self.eye_color_desc		:= L.EyeColor;// Appears to be already mapped in the input!
 self.skin_color			:= '';
 self.skin_color_desc	:= '';
 self.height				:= heightToInches(L.Height);// Convert 5' 11'' format to inches! 
-self.weight				:= '';
+self.weight				:= L.weight;
 self.party_status		:= '';
 self.party_status_desc	:= 'Last reported on: ' + L.received_date[5..6]+'/'+L.received_date[7..8]+'/'+L.received_date[1..4];
 self.prim_range 		:= ''; 

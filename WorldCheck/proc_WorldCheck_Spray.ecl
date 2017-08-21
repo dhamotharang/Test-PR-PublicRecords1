@@ -10,6 +10,8 @@ export proc_WorldCheck_Spray (string filename
 #uniquename(groupname)
 #uniquename(Layout_In_File)
 #uniquename(outfile)
+#uniquename(Layout_In_File2)
+#uniquename(outfile2)
 #uniquename(ds)
 #uniquename(trfProject)
 #uniquename(temp_delete)
@@ -18,12 +20,13 @@ export proc_WorldCheck_Spray (string filename
 
 %sourceCsvSeparator% := '\\t';
 %sourceCsvTeminator% := '\\n,\\r\\n';
-%groupname% := 'thor_dell400';
+%groupname% := 'thor400_44';
 
-%spray_main% := fileservices.SprayVariable(_Control.IPAddress.edata12
+//used to remove oversized records
+%spray_main% := fileservices.SprayVariable(_Control.IPAddress.bctlpedata10
                                           //,'/data_999/world_check/data/'+filedate+'/'+filename
 										  ,filename
-										  ,
+										  ,100000
 										  ,'\t'
 										  ,'\\n,\\r\\n'
 										  ,'"'
@@ -36,12 +39,39 @@ export proc_WorldCheck_Spray (string filename
 										  ,true
 										  ,false);   										  
 
-%Layout_In_File% := record, maxlength(30000)
-	WorldCheck.Layout_WorldCheck_in;
+%Layout_In_File% := record, maxlength(70000)
+	WorldCheck.Layout_WorldCheck_in2;
 end;
 
-%Layout_In_File% %trfProject%(%Layout_In_File% l) := transform
-	self := l;
+%Layout_In_File% trfProject(%Layout_In_File% l) := transform
+   self.UID 				:= l.UID[1..10];
+    self.Last_Name			:= l.Last_Name[1..225];
+    self.First_Name			:= l.First_Name[1..225];
+    self.Aliases			:= l.Aliases[1..5000];               
+    self.Alternate_Spelling	:= l.Alternate_Spelling[1..225];     
+    self.Category			:= l.Category[1..225];
+    self.Title				:= l.Title[1..225];
+    self.Sub_Category		:= l.Sub_Category[1..32];
+    self.Position			:= l.Position[1..225];
+    self.Age				:= l.Age[1..3];
+    self.Date_Of_Birth		:= l.Date_Of_Birth[1..10];
+    self.Places_Of_Birth	:= l.Places_Of_Birth[1..225];        
+    self.Date_Of_Death		:= l.Date_Of_Death[1..10];
+    self.Passports			:= l.Passports[1..600];              
+    self.Social_Security_Number	:= l.Social_Security_Number[1..255]; 
+    self.Locations			:= l.Locations[1..3100];              
+    self.Countries			:= l.Countries[1..25];
+    self.Companies			:= l.Companies[1..4000];              
+    self.E_I_Ind			:= l.E_I_Ind[1];
+    self.Linked_Tos			:= l.Linked_Tos[1..2000];             
+    self.Further_Information	:= l.Further_Information[1..5000];
+    self.Keywords			:= l.Keywords[1..300];               
+    self.External_Sources	:= l.External_Sources[1..5000];       
+    self.Entered			:= l.Entered[1..10];
+    self.Updated			:= l.Updated[1..10];
+    self.Editor				:= l.Editor[1..20];
+    self.Age_As_Of_Date		:= l.Age_As_Of_Date[1..10];
+	self					:= l;
 end;
 
 %outfile% := distribute(project(dataset(WorldCheck.cluster_name + 'in::WorldCheck::'+filedate+'::temp_data'
@@ -49,13 +79,25 @@ end;
 							           ,csv(heading(1)
 							               ,separator('\t')
 							               ,terminator(['\r\n','\r','\n'])
-								           ,maxlength(30000)
+										   ,quote('"')
+								           ,maxlength(70000)
 								           )
-							           )
-					           ,%trfProject%(left))
+							           )//(uid<>'39165')
+					           ,trfProject(left))
 					   ,hash32(UID));
 
-%ds% := output(%outfile%,,WorldCheck.cluster_name + 'in::WorldCheck::'+filedate+'::Data',overwrite);
+
+%Layout_In_File2% := record, maxlength(30900)
+	WorldCheck.Layout_WorldCheck_in;
+end;
+
+%Layout_In_File2% trfProject2(%outfile% l) := transform
+	self := l;
+end;
+
+%outfile2% := project(%outfile%,trfProject2(left));
+
+%ds% := output(%outfile2%,,WorldCheck.cluster_name + 'in::WorldCheck::'+filedate+'::Data',overwrite);
 
 %temp_delete% := if (FileServices.FileExists(       WorldCheck.cluster_name + 'in::WorldCheck::'+filedate+'::temp_data')
                     ,FileServices.DeleteLogicalFile(WorldCheck.cluster_name + 'in::WorldCheck::'+filedate+'::temp_data'));

@@ -1,4 +1,4 @@
-﻿/*2016-07-11T18:11:51Z (Dmitriy Lazarenko)
+/*2016-07-11T18:11:51Z (Dmitriy Lazarenko)
 adding a comment on why we have limit of 7000 here
 */
 IMPORT FLAccidents_Ecrash, ut, doxie,lib_stringlib,std, iesp;

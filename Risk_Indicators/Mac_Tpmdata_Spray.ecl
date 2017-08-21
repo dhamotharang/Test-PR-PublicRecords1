@@ -1,31 +1,32 @@
-import roxiekeybuild,ut,strata;
+import roxiekeybuild,ut,strata,Risk_Indicators,_Control;
 
-export Mac_Tpmdata_Spray(sourceIP,sourcefile,filedate,group_name='\'thor400_92\'',email_target='\' \'') := 
+export Mac_Tpmdata_Spray(sourceIP,filedate,group_name) := 
 macro
 #uniquename(spray_tpmdata)
+#uniquename(preprocess_tpmdata)
 #uniquename(super_tpmdata)
 #uniquename(move_them)
-#uniquename(recordsize)
 #uniquename(fullfile)
 #uniquename(daily)
 #uniquename(dedup_daily)
 #uniquename(basefile)
 #uniquename(baseout)
 #uniquename(mail_list)
+#uniquename(strata_report)
 #uniquename(send_succ_msg)
 #uniquename(send_fail_msg)
 #uniquename(send_success_msg)
 #uniquename(send_failure_msg)
 #uniquename(updatedops)
-%updatedops% := RoxieKeyBuild.updateversion('TelcordiaTpmKeys',filedate,'jfreibaum@seisint.com');
+#uniquename(updatedops_fcra)
+#uniquename(TPM_Sample)
 
-#workunit('name','tpmdata Spray '+filedate);
-
-%recordsize% :=95;
-
-%spray_tpmdata% := FileServices.SprayFixed(sourceIP,sourcefile, %recordsize%, group_name,'~thor_data400::in::tpmdata_'+filedate ,-1,,,true,true);
-
-strata_report := Risk_Indicators.STRATA_XML_TPM(filedate);
+%updatedops% 				 := RoxieKeyBuild.updateversion('TelcordiaTpmKeys',filedate,'jfreibaum@seisint.com',,'N'); 			/*update DOPs*/
+%updatedops_fcra% 	 := RoxieKeyBuild.updateversion('FCRA_TelcordiaTpmKeys',filedate,'jfreibaum@seisint.com',,'F'); /*update FCRA DOPs*/
+%spray_tpmdata% 		 := Risk_Indicators.Spray_TPM_Inputs(filedate); 
+%preprocess_tpmdata% := Risk_Indicators.TPM_Map(filedate);
+%TPM_Sample%			 	 := Risk_Indicators.TPM_Sample; 
+%strata_report% 		 := Risk_Indicators.STRATA_XML_TPM(filedate);
 
 %super_tpmdata% := sequential(FileServices.StartSuperFileTransaction(),
 				FileServices.AddSuperFile('~thor_data400::base::tpmdata_delete','~thor_data400::base::tpmdata_grandfather',, true),
@@ -45,7 +46,8 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Risk_Indicators.Key_Telcordia_NPA_St,
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Risk_Indicators.Key_Telcordia_City_State,'~thor_data400::key::telcordia_npa_city_state','~thor_data400::key::telcordia::'+filedate+'::city_state',key4);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Risk_Indicators.Key_Telcordia_State,'~thor_data400::key::telcordia_state','~thor_data400::key::telcordia::'+filedate+'::state',key5);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Risk_Indicators.Key_Telcordia_Zip,'~thor_data400::key::telcordia_zip','~thor_data400::key::telcordia::'+filedate+'::zip',key6);
-
+//FCRA Key
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Risk_Indicators.Key_FCRA_Telcordia_tpm_Slim,'~thor_data400::key::fcra::telcordia_tpm_slim','~thor_data400::key::fcra::telcordia::'+filedate+'::tpm_slim',key7);
 
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::telcordia_tpm','~thor_data400::key::telcordia::'+filedate+'::tpm',key1_built);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::telcordia_tpm_slim','~thor_data400::key::telcordia::'+filedate+'::tpm_slim',key2_built);
@@ -53,6 +55,8 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::telcordia_npa_st','~t
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::telcordia_city_state','~thor_data400::key::telcordia::'+filedate+'::city_state',key4_built);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::telcordia_state','~thor_data400::key::telcordia::'+filedate+'::state',key5_built);
 RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::telcordia_zip','~thor_data400::key::telcordia::'+filedate+'::zip',key6_built);
+//FCRA Key
+RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::fcra::telcordia_tpm_slim','~thor_data400::key::fcra::telcordia::'+filedate+'::tpm_slim',key7_built);
 
 
 ut.MAC_SK_Move('~thor_data400::key::telcordia_tpm','Q',out1);
@@ -62,21 +66,22 @@ ut.MAC_SK_Move('~thor_data400::key::telcordia_city_state','Q',out4);
 ut.MAC_SK_Move('~thor_data400::key::telcordia_state','Q',out5);
 ut.MAC_SK_Move('~thor_data400::key::telcordia_zip','Q',out6);
 
-%move_them% := sequential(key1,key2,key3,key4,key5,key6, key1_built,key2_built,key3_built,key4_built,key5_built,key6_built,parallel(out1,out2,out3,out4,out5,out6));
+//FCRA Key
+ut.MAC_SK_Move('~thor_data400::key::fcra::telcordia_tpm_slim','Q',out7);
 
+%move_them% := sequential(key1,key2,key3,key4,key5,key6,key7, key1_built,key2_built,key3_built,key4_built,key5_built,key6_built,key7_built,parallel(out1,out2,out3,out4,out5,out6,out7));
 
 %mail_list% := 'roxiedeployment@seisint.com;vniemela@seisint.com';
-// %mail_list% := 'kgummadi@seisint.com';
 
-%send_success_msg% := FileServices.sendemail('kgummadi@seisint.com','tpmdata Spray Succeeded','tpmdata Spray Succeeded');
+%send_success_msg% := FileServices.sendemail('jfreibaum@seisint.com','tpmdata Spray Succeeded','tpmdata Spray Succeeded');
 
-%send_failure_msg% := FileServices.sendemail('kgummadi@seisint.com','tpmdata Spray Failed','tpmdata Spray Failed');
+%send_failure_msg% := FileServices.sendemail('jfreibaum@seisint.com','tpmdata Spray Failed','tpmdata Spray Failed');
 								
 RoxieKeyBuild.Mac_Daily_Email_Local('TELCORDIA_TPM','SUCC',filedate,%send_succ_msg%,%mail_list%);
 RoxieKeyBuild.Mac_Daily_Email_Local('TELCORDIA_TPM','FAIL',filedate,%send_fail_msg%,%mail_list%);
 
-sequential(%spray_tpmdata%,%super_tpmdata%,%move_them%,strata_report,%updatedops%)
- : success(parallel(%send_succ_msg%,%send_success_msg%)),
-   failure(parallel(%send_fail_msg%,%send_failure_msg%));
+sequential(%spray_tpmdata%,%preprocess_tpmdata%,%super_tpmdata%,%move_them%,%strata_report%,%updatedops%,%updatedops_fcra%,%TPM_Sample%)
+ : success(%send_success_msg%),
+   failure(%send_failure_msg%);
 
 endmacro;

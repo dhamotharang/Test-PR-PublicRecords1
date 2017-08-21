@@ -4,7 +4,6 @@ import ut,RoxieKeyBuild,DayBatchEda,EDA_VIA_XML,risk_indicators,doxie_cbrs, gong
 g_did := Watchdog.DID_Gong;
 ut.mac_SF_Move('~thor_data400::base::gong_did','P',mv_gong2prod);
 
-//#OPTION('allowedClusters', 'thor400_84,thor400_92,thor_200')
 
 export proc_build_history_keys_jtrost(string rundate) := function
 
@@ -137,8 +136,13 @@ bk := parallel(bk_addr,bk_phone,bk_did,bk_hhid,bk_bdid,bk_name,bk_clnname,bk_zip
 			,bk_fcra_addr,bk_fcra_phone,bk_fcra_did,bk_fcra_hhid,bk_fcra_bdid,bk_fcra_name,bk_fcra_companyname,bk_fcra_zip_name,bk_fcra_npa_nxx_line,bk_fcra_surname,bk_fcra_wdtg
 		);
 		
-non_FCRA_update := RoxieKeybuild.updateversion('GongKeys',rundate,'cbrodeur@seisint.com, cguyton@seisint.com,charles.salvo@lexisnexis.com');
-FCRA_update := RoxieKeybuild.updateversion('FCRA_GongKeys',rundate,'cbrodeur@seisint.com, cguyton@seisint.com');
+//non_FCRA_update := RoxieKeybuild.updateversion('GongKeys',rundate,'cbrodeur@seisint.com, cguyton@seisint.com,charles.salvo@lexisnexis.com');
+//FCRA_update := RoxieKeybuild.updateversion('FCRA_GongKeys',rundate,'cbrodeur@seisint.com, cguyton@seisint.com');
+
+non_FCRA_update := RoxieKeybuild.updateversion('GongKeys',rundate,'christopher.brodeur@lexisnexis.com, cguyton@seisint.com,charles.salvo@lexisnexis.com',,'N');
+FCRA_update := RoxieKeybuild.updateversion('FCRA_GongKeys',rundate,'christopher.brodeur@lexisnexis.com, cguyton@seisint.com',,'F');
+BIP_dops_update := RoxieKeyBuild.updateversion('GongKeys',rundate,'christopher.brodeur@lexisnexis.com',,'BN');
+
 
 mv1 := parallel(mv1_addr,mv1_phone,mv1_did,mv1_hhid,mv1_bdid,mv1_name,mv1_clnname,mv1_zip_name,mv1_npa_nxx_line,mv1_surname,mv1_wdtg,mv1_cmp_name,mv1_csn, mv1_wnzip, mv_did, mv_hhid, MoveKeyToBuilt6, mv_cn, mv_cn_to_company, mv1_linkids,/*MoveFCRAKeyToBuilt5,*/
 			Move2ndFCRAKeyToBuilt5
@@ -154,7 +158,7 @@ mk := parallel(mk_addr,mk_phone,mk_did,mk_hhid,mk_bdid,mk_name,mk_clnname,mk_zip
 build_keys := sequential(
 												g_did, //proc_create_FCRA_superkeys,
 												mv_gong2prod, 
-												bk, non_FCRA_update, FCRA_update, mv1, mk);
+												bk, non_FCRA_update, FCRA_update, BIP_dops_update, mv1, mk);
 		//RoxieKeybuild.updateversion('GongKeys',rundate,'cbrodeur@seisint.com, cguyton@seisint.com,charles.salvo@lexisnexis.com'));
 		//RoxieKeyBuild.updateversion('GongKeys',rundate,'cbrodeur@seisint.com',,'N',,,'A'),
 		//Gong_v2.Proc_OrbitI_CreateBuild(rundate,'nonfcra'));

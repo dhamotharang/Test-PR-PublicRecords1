@@ -205,13 +205,15 @@ module
 		unsigned1												did_score										:= 0;
 		unsigned6												Bdid												:= 0;
 		unsigned1												bdid_score									:= 0;
+		unsigned8							    			raw_aid											:= 0;
+		unsigned8							    			ace_aid											:= 0;
 		unsigned4 											dt_first_seen										;
 		unsigned4 											dt_last_seen										;
 		unsigned4 											dt_vendor_first_reported				;
 		unsigned4 											dt_vendor_last_reported					;
 		string1													record_type											;
 		
-		input.Sprayed										rawfields												;
+		input.Sprayed   								rawfields												;
 		Address.Layout_Clean_Name				clean_contact_name							;
 		Address.Layout_Clean182_fips		Clean_Company_address						;
 

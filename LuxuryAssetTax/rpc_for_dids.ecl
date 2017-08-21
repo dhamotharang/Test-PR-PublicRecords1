@@ -1,11 +1,11 @@
 IMPORT Didville, did_add;
 
-EXPORT rpc_for_dids( DATASET(DidVille.Layout_Did_Batch.Out) batch_in ) :=
+EXPORT rpc_for_dids( DATASET(DidVille.Layout_Did_OutBatch) batch_in ) :=
 	FUNCTION
 
 		UCase := StringLib.StringToUpperCase;
 		
-		DidVille.Layout_Did_Batch.In xfm_to_inbatch(DidVille.Layout_Did_Batch.Out l) :=
+		DidVille.Layout_Did_InBatch xfm_to_inbatch(DidVille.Layout_Did_OutBatch l) :=
 			TRANSFORM
 				SELF.seq         := l.seq;
 				SELF.ssn         := (qSTRING9) UCase(l.ssn);
@@ -27,17 +27,16 @@ EXPORT rpc_for_dids( DATASET(DidVille.Layout_Did_Batch.Out) batch_in ) :=
 				SELF.st          := (qSTRING2) UCase(l.st);
 				SELF.z5          := (qSTRING5) UCase(l.z5);
 				SELF.zip4        := (qSTRING4) UCase(l.zip4);
-				self.acctno      := '';
 			END;
 			
 		f_in     := PROJECT( batch_in, xfm_to_inbatch(LEFT) );
 
 		f_out := PIPE(f_in
 				, 'roxiepipe' +
-				' -iw ' + SIZEOF(DidVille.Layout_Did_Batch.In) +
+				' -iw ' + SIZEOF(DidVille.Layout_Did_InBatch) +
 				' -vip' +
 				' -t 10' +
-				' -ow ' + SIZEOF(DidVille.Layout_Did_Batch.Out) +
+				' -ow ' + SIZEOF(DidVille.Layout_Did_OutBatch) +
 				' -b 100' +
 				' -mr 2' +
 				' -h ' + ' roxiethor.sc.seisint.com:9856' + 
@@ -45,7 +44,7 @@ EXPORT rpc_for_dids( DATASET(DidVille.Layout_Did_Batch.Out) batch_in ) :=
 				' -q "<DidVille.DID_Batch_Service format=\'raw\'><Fuzzies>ZN</Fuzzies><Deduped>TRUE</Deduped>' +
 				'<did_batch_in id=\'id\' format=\'raw\'></did_batch_in>' +
 				'</DidVille.DID_Batch_Service>"'
-				, DidVille.Layout_Did_Batch.Out);
+				, DidVille.Layout_Did_OutBatch);
 		
 		RETURN f_out; 
 	END;

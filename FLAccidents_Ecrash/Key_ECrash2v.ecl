@@ -180,7 +180,7 @@ xpnd_layout := record
 	string30  point_of_impact_desc, 
 	string30  vehicle_use_desc,
   end;
-xpnd_layout xpndrecs(flc2v L,FLAccidents.Key_FlCrash0 R) := transform
+xpnd_layout xpndrecs(flc2v L,FLAccidents.BaseFile_FLCrash0 R) := transform
 self.report_code					:= 'FA';
 self.report_category				:= 'Auto Report';
 self.report_code_desc				:= 'Auto Accident';
@@ -199,7 +199,7 @@ self 								:= L;
 end;
 
 pflc2v := join(distribute(flc2v,hash(accident_nbr))
-			  ,distribute(pull(FLAccidents.Key_FlCrash0),hash(accident_nbr))
+			  ,distribute(pull(FLAccidents.BaseFile_FLCrash0),hash(accident_nbr))
 			  ,left.accident_nbr = right.accident_nbr,
 			   xpndrecs(left,right),left outer,local);
   

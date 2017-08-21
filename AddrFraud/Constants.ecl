@@ -1,7 +1,7 @@
-import ut;
+import ut,std;
 
 export Constants := module
-	export todayStr   := ut.GetDate;
+	export todayStr   := (STRING8)Std.Date.Today();
 	export today1900  := ut.DaysSince1900( todayStr[1..4], todayStr[5..6], todayStr[7..8] );
 	export today      := (unsigned4)todayStr;
 	export todayMinus( integer days ) := (unsigned4)ut.DateFrom_DaysSince1900(today1900 - days );

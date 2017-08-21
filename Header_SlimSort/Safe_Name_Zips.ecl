@@ -1,6 +1,6 @@
 import pgncoa, header, ut;
 nc := pgncoa.head_namecount(counted <= 50 and counted > 0);
-head := header.File_Headers(fname <> '', lname <> '');
+head := header_slimsort.propagated_matchrecs(fname <> '', lname <> '');
 
 head_slim_rec := record
 	head.did;

@@ -1,6 +1,20 @@
-import business_header, header, ut;
+import business_header, header, ut,paw,corp2;
 
-f_sic_addr_out := HRI_Businesses(true);
+laycorp := corp2.Layout_Corporate_Direct_Corp_Base;
+
+export BWR_Create_HRI_Addr_Sic_FCRA(
+
+	 boolean																pUseDatasets		= false
+	,string																	pPersistUnique	= 'fcra.hri::'
+	,dataset(laycorp											)	pInactiveCorps 	= paw.fCorpInactives()
+	,string																	pBhVersion			= 'qa'
+	,dataset(layouts.layout_HRI_Businesses)	pHri_Businesses	= HRI_Businesses(true,pUseDatasets,pPersistUnique := pPersistUnique,pInactiveCorps := pInactiveCorps,pBhVersion := pBhVersion)
+	,string																	pPersistname		= persistnames().BWRCreateHRIAddrSicFCRA
+
+) := 
+function
+
+f_sic_addr_out := pHri_Businesses;
 
 f_sic_addr_valid := f_sic_addr_out(prim_name<>'');
 
@@ -20,33 +34,20 @@ END;
 
 f_sic_addr_dedup := rollup(f_sic_addr_sort,roll_date(LEFT,RIGHT),prim_range,predir,prim_name,
 	                                     addr_suffix,postdir,unit_desig,
-                                          sec_range,city,state,zip,zip4,sic_code,local) : persist('per_f_sic_addr_dedup_fcra');
+                                          sec_range,city,state,zip,zip4,sic_code,local) ;
 
-out_addr_rec := record
-	string10 prim_range;
-	string2   predir;
-	string28 prim_name;
-	string4  addr_suffix;
-	string2   postdir;
-	string5  unit_desig;
-	string8  sec_range;
-	string25 city;
-	string2   state;
-	string5  zip;
-	string4  zip4;
-     string4   sic_code;
-     string4   addr_type;
-	unsigned3 dt_first_seen;
-	string120	company_name;
-end;
+out_addr_rec := Layout_HRI_Address_Sic;
 
 out_addr_rec slim_addr(f_sic_addr_dedup l) := transform
      self.addr_type := '2240';
 	self.zip := intformat(l.zip,5,1);
 	self.zip4 := intformat(l.zip4,4,1);
+	self.source := l.source;
 	self := l;
 end;
 
-f_addr_slim := project(f_sic_addr_dedup, slim_addr(left));
+f_addr_slim := project(f_sic_addr_dedup, slim_addr(left)): persist(pPersistname);
 
-export BWR_Create_HRI_Addr_Sic_FCRA := f_addr_slim;
+return f_addr_slim;
+
+end;

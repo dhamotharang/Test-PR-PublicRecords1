@@ -1,4 +1,4 @@
-export Layout_CG_clean_in := 
+export Layout_CG_clean_in := // rec length: 2627
 record
    string2 	state_origin;
    string8	process_date;
@@ -30,6 +30,7 @@ record
    string8 Call_Sign;
    string30 IMO_Number;
    string30 Hull_Identification_Number_2;
+   string30 Vessel_Service_Type;
    string2 Flag;
    string1 Self_Propelled_Indicator;
    string7 Registered_Gross_Tons;
@@ -38,6 +39,8 @@ record
    string6 Registered_Depth;
    string7 ITC_Gross_Tons;
    string7 ITC_Net_Tons;
+   string7 Dead_Weight_Tons;
+   string40 Dead_Weight_Tons_Measure_Unit;
    string7 ITC_Length;
    string6 ITC_Breadth;
    string6 ITC_Depth;
@@ -82,7 +85,6 @@ record
    string30 Hull_Configuration;
    string30 Hull_Shape;
    string30 COD_Status;
-   string8 COD_expire_date;
    string2 crlf;
    string73 clean_pname;
    string70 clean_cname;

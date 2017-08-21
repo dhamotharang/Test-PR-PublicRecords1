@@ -1,4 +1,4 @@
-import doxie;
+import doxie, NID;
 
 export layout_auto_name := record
   STRING6  dph_lname;
@@ -12,7 +12,7 @@ end;
 layout_auto_name proj(file_cwp_with_fdid le) := TRANSFORM
 	SELF.dph_lname := metaphonelib.DMetaPhone1(le.lastname);
 	SELF.lname := le.lastname;
-	SELF.pfname := datalib.preferredfirst(le.firstname);
+	SELF.pfname := NID.PreferredFirstVersionedStr(le.firstname, NID.version);
 	SELF.fname := le.firstname;
 	SELF.minit := le.middlename[1];
 	SELF.did := le.fdid;

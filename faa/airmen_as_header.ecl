@@ -1,12 +1,13 @@
 import property,lib_keylib,lib_fileservices,ut,Business_Header,Header;
 
-export	airmen_as_header(dataset(faa.layout_airmen_data_out) pAirmen = dataset([],faa.layout_airmen_data_out), boolean pForHeaderBuild=false)
- :=
-  function
-	dAirmenAsSource	:=	FAA.Airmen_as_Source(pAirmen,pForHeaderBuild);
+export	airmen_as_header(dataset(faa.layout_airmen_data_out) pAirmen = dataset([],faa.layout_airmen_data_out), 
+																	boolean pForHeaderBuild=false, 
+																	boolean isPRCT=false) :=  function
+																	
+	dAirmenAsSource	:=	if(pForHeaderBuild, header.Files_SeqdSrc().AM, FAA.Airmen_as_Source(pAirmen,pForHeaderBuild));
 
 	Header.Layout_New_Records Translate_Airmen_to_Header(dAirmenAsSource l) := transform
-		self.did := 0;
+		self.did := if(isPRCT, (unsigned6)l.did_out, 0);
 		self.rid := 0;
 		self.pflag1 := '';
 		self.pflag2 := '';

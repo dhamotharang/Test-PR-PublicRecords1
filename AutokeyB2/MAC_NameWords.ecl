@@ -39,7 +39,7 @@ END;
 %f% := business_header_ss.Fn_MakeCNameWords(%q%);
 
 
-%recs% := dedup( sort (project(%f%, AutokeyB2.Layout_NameWords)(word<>'') , record,except seq), record,except seq );
+%recs% := dedup( sort (project(%f%, AutokeyB2.Layout_NameWords)(word<>'') , record,except seq,local), record,except seq,local );
 
 
 outkey := INDEX(%recs%,//{%recs%.word,%recs%.state,%recs%.seq,%recs%.bdid}), 

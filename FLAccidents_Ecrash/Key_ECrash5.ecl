@@ -81,7 +81,7 @@ pflc5:= project(flc5,xpndrecs(left));
 //National file does not have information pertinent to this layout.  Therefore only passing FL records.
 ecrashFile := FLAccidents_Ecrash.BaseFile(StringLib.StringToUpperCase(trim(person_type)) in ['\\PASSENGER',
 '3PASSENGER',
-'â?¢THEY ENTERED: PASSENGER',
+'Ã¢?Â¢THEY ENTERED: PASSENGER',
 'BICYCLE',
 'BICYCLIST',
 'BYCICLIST',
@@ -158,7 +158,7 @@ pecrash :=project(ecrashFile, xpndecrash(left));
 /*
 iyetekFile := FLAccidents_Ecrash.BaseFile_Iyetek (StringLib.StringToUpperCase(trim(person_type)) in ['\\PASSENGER',
 '3PASSENGER',
-'â?¢THEY ENTERED: PASSENGER',
+'Ã¢?Â¢THEY ENTERED: PASSENGER',
 'BICYCLE',
 'BICYCLIST',
 'BYCICLIST',

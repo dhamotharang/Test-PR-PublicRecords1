@@ -7,6 +7,8 @@ export As_Business_Header(
 ) :=
 module
 
+	#OPTION('multiplePersistInstances',FALSE);
+	
 	dfile := if(pUsingInBusinessHeader	
 		,files(,pUseOtherEnvironment).base.Organizations.BusinessHeader
 		,files(,pUseOtherEnvironment).base.Organizations.qa

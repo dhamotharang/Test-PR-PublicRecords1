@@ -103,4 +103,4 @@ TRANSFORM
 END;
 tot := recs+PROJECT(i(fname_count>20000), xpand(LEFT));
 
-export Key_Header_DTS_FnameSmall := INDEX(tot, {tot}, '~thor_data400::key::header.dts.fname_small_'+doxie.Version_SuperKey);
+export Key_Header_DTS_FnameSmall := INDEX(tot, {tot}, ut.Data_Location.Person_header+'thor_data400::key::header.dts.fname_small_'+doxie.Version_SuperKey);

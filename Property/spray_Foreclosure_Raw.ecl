@@ -7,13 +7,13 @@ IMPORT lib_fileservices,_control, Property;
 EXPORT spray_Foreclosure_Raw(string file_date_in, string version_date_in, string spray_cluster, string file) := FUNCTION
 	
 	sprayForeclosureRaw :=
-		IF(fileservices.fileexists(cluster + 'in::foreclosure::'+ file_date_in +'::temp'),
+		IF(fileservices.fileexists(thor_cluster + 'in::foreclosure::'+ file_date_in +'::temp'),
 			OUTPUT('Foreclosure file sprayed in previous run'),
-			FileServices.SprayFixed(_control.IPAddress.edata12, file, 2762
-			,spray_cluster, cluster + 'in::foreclosure::'+ file_date_in +'::temp'))
+			FileServices.SprayFixed(_control.IPAddress.bctlpedata10, file, 2762
+			,spray_cluster, thor_cluster + 'in::foreclosure::'+ file_date_in +'::temp',,,,,true))
 		;
 				
-	Foreclosure_in_temp	:=	dataset(cluster + 'in::foreclosure::'+ file_date_in +'::temp', Layout_Foreclosure_Raw_In, FLAT);
+	Foreclosure_in_temp	:=	dataset(thor_cluster + 'in::foreclosure::'+ file_date_in +'::temp', Layout_Foreclosure_Raw_In, FLAT);
 		
 		//Format Raw Input by removing extraneous zeros
 	Layout_Foreclosure_Raw_In tForeclosureRawInFormat(Layout_Foreclosure_Raw_In pInput)
@@ -183,23 +183,23 @@ EXPORT spray_Foreclosure_Raw(string file_date_in, string version_date_in, string
 	rsForeclosureRawFormattedID				 												:=	PROJECT(rsForeclosureRawFormattedCoded, tForeclosureAddID(LEFT,COUNTER));
 	
 	FormatRaw	:=
-		IF(fileservices.fileexists(cluster + 'in::foreclosure::using::fares_update'+ file_date_in),
+		IF(fileservices.fileexists(thor_cluster + 'in::foreclosure::using::fares_update'+ file_date_in),
 			OUTPUT('Foreclosure file transformed in previous run'),
-			OUTPUT(rsForeclosureRawFormattedID, , cluster + 'in::foreclosure::using::fares_update'+ file_date_in, CLUSTER(spray_cluster), COMPRESSED)
+			OUTPUT(rsForeclosureRawFormattedID, , thor_cluster + 'in::foreclosure::using::fares_update'+ file_date_in, CLUSTER(spray_cluster), COMPRESSED)
 			)
 	;
 	
 	delTemp	:=
-		IF(fileservices.fileexists(cluster + 'in::foreclosure::'+ file_date_in +'::temp'),
-			FileServices.DeleteLogicalFile(cluster + 'in::foreclosure::'+ file_date_in +'::temp'),
+		IF(fileservices.fileexists(thor_cluster + 'in::foreclosure::'+ file_date_in +'::temp'),
+			FileServices.DeleteLogicalFile(thor_cluster + 'in::foreclosure::'+ file_date_in +'::temp'),
 			OUTPUT('Foreclosure Temp file deleted in previous run')
 			)
 	;
 
-	NewFile						:=	cluster + 'in::foreclosure::using::fares_update'+ file_date_in;
-	inFile						:=	cluster + 'in::foreclosure::using::fares_update';
-	usedInFile				:=	cluster + 'in::foreclosure::used::fares_update';
-	DeleteInFile			:=	cluster + 'in::foreclosure::delete::fares_update';
+	NewFile						:=	thor_cluster + 'in::foreclosure::using::fares_update'+ file_date_in;
+	inFile						:=	thor_cluster + 'in::foreclosure::using::fares_update';
+	usedInFile				:=	thor_cluster + 'in::foreclosure::used::fares_update';
+	DeleteInFile			:=	thor_cluster + 'in::foreclosure::delete::fares_update';
 		
 	addToSuper := sequential(
 									

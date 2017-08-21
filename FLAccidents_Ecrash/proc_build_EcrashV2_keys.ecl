@@ -1,3 +1,6 @@
+/*2015-10-23T17:59:26Z (Srilatha Katukuri)
+#181860
+*/
 /*2015-10-16T01:25:06Z (Sudhir Kasavajjala)
 
 */
@@ -82,7 +85,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_eCrashV2_ReportId
 												 
 RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_eCrashV2_DeltaDate
 									   ,'~thor_data400::key::ecrashv2::' +filedate+'::deltadate'
-					  			       ,'~thor_data400::key::ecrashv2_deltadate',bk_deltadate,2);	
+					  			       ,'~thor_data400::key::ecrashv2_deltadate',bk_deltadate,,true);	
 // Analytics keys 
 
 RoxieKeyBuild.Mac_SK_BuildProcess_Local(FLAccidents_Ecrash.Key_eCrash_ByAgencyID
@@ -293,8 +296,6 @@ move_qa_keys := parallel(moveq10
 
 
 do_all:= sequential(	
-          FLAccidents_Ecrash.fn_Validate,
-          FLAccidents_Ecrash.Proc_Build_Alpha(filedate),			
 					build_keys
 					,move_build_keys
 					,move_qa_keys

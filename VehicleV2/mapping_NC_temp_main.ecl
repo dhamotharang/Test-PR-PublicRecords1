@@ -15,7 +15,7 @@ dNCBaseSort	:=	sort(	dNCBaseDist,
 											VEHICLE_TYPE_desc,
 											MODEL_desc,
 											body_style_desc,
-											Orig_Net_Weight,
+											-Orig_Net_Weight,						//DF-8238 keep the highest net weight at the top
 											NUMBER_OF_AXLES,
 											MAJOR_COLOR_desc,
 											MINOR_COLOR_desc,
@@ -27,20 +27,21 @@ dNCBaseSort	:=	sort(	dNCBaseDist,
 										);
 		 
 dNCBaseDedup	:=	dedup(	dNCBaseSort,
-													vehicle_key,
-													state_origin,
-													source_code,
-													ORIG_VIN ,
-													model_year ,
-													make_desc ,
-													series_desc,
-													VEHICLE_TYPE_desc,
-													MODEL_desc,
-													body_style_desc,
-													Orig_Net_Weight,
-													NUMBER_OF_AXLES,
-													MAJOR_COLOR_desc,
-													MINOR_COLOR_desc,
+													left.vehicle_key=right.vehicle_key and
+													left.state_origin=right.state_origin and
+													left.source_code=right.source_code and
+													left.ORIG_VIN=right.ORIG_VIN and
+													left.model_year=right.model_year and
+													left.make_desc=right.make_desc and
+													left.series_desc=right.series_desc and
+													left.VEHICLE_TYPE_desc=right.VEHICLE_TYPE_desc and
+													left.MODEL_desc=right.MODEL_desc and
+													left.body_style_desc=right.body_style_desc and
+													//BUG DF-8238 - will only keep 1 record if the other record has net_weight is not present.
+													(left.Orig_Net_Weight=right.Orig_Net_Weight or right.Orig_Net_Weight='') and
+													left.NUMBER_OF_AXLES=right.NUMBER_OF_AXLES and
+													left.MAJOR_COLOR_desc=right.MAJOR_COLOR_desc and
+													left.MINOR_COLOR_desc=right.MINOR_COLOR_desc,
 													local
 												);
 

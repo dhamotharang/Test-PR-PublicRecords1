@@ -24,7 +24,7 @@ Infile := distribute(project(pInFile(fname + lname + clean_cname1 <> ''), transf
 																				self := left)), id);
 
 trimInfile := table(infile, {id, appendadl, appendssn, appendbdid, appendtaxid, 
-														 fname, mname, lname, name_suffix, clean_cname1,
+														 fname, mname, lname, name_suffix, clean_cname1, ein,
 														 ssn, dob, personal_phone, company_phone,
 														 prim_range, prim_name, sec_range, zip5, st}, local);																				
 														 
@@ -36,23 +36,21 @@ did_add.MAC_Match_Flex(dedInfile(fname <> '' and lname <> ''), did_match_set,
 						ssn, dob, fname, mname, lname, name_suffix,
 						prim_range, prim_name, sec_range, zip5, st, personal_phone,
 						appendadl, recordof(dedInfile),false,'',
-						75, DIDedFile,
-						true, appendssn);
+						75, DIDedFile);
 
 ForBDIDAppend := DIDedFile + dedInfile(fname = '' or lname = '');
 
-bdid_match_set := ['A','P']; 
+bdid_match_set := ['A','P','F']; 
 
-FiltForBDIDAppend :=  ForBDIDAppend(CLEAN_CNAME1 <> '');
+FiltForBDIDAppend :=  ForBDIDAppend(CLEAN_CNAME1 <> '' or ein <> '');
 
 Business_Header_SS.MAC_Match_Flex(FiltForBDIDAppend, bdid_match_set,
 									CLEAN_CNAME1,
 									prim_range, prim_name, zip5, sec_range, st, company_phone, ein,
 									appendbdid, recordof(dedInfile), 
-									false, '', BDIDFile,
-									true, appendtaxid);
+									false, '', BDIDFile);
 
-AppendedFile := BDIDFile + ForBDIDAppend(CLEAN_CNAME1 = '');
+AppendedFile := BDIDFile + ForBDIDAppend(CLEAN_CNAME1 = '' and ein = '');
 
 JnRecsBack := join(Infile, distribute(AppendedFile, id), left.id = right.id,
 										transform({recordof(pinfile)}, 
@@ -62,5 +60,5 @@ JnRecsBack := join(Infile, distribute(AppendedFile, id), left.id = right.id,
 															self.appendtaxid := right.appendtaxid;										
 															self := left), left outer, local);
 
-return JnRecsBack + pInFile(fname + lname + clean_cname1 = '');
+return project(JnRecsBack, layout_in_common) + project(pInFile(fname + lname + clean_cname1 = ''), layout_in_common);
 end;

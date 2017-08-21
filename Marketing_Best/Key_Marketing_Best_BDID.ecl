@@ -1,6 +1,6 @@
 import doxie;
 
-base := Marketing_Best.File_Marketing_Best_All(bdid <> 0);				   
+base := Files().Best_All.built(bdid <> 0);				   
 
 export Key_Marketing_Best_BDID := index(base,
 										{l_bdid := bdid},

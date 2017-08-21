@@ -370,7 +370,7 @@ final0 := sort(distribute(ds+j,hash(license_number))
 
 TempRec rollem(TempRec l, TempRec r) := transform
 	self.date_first_seen := (string)ut.min2((unsigned)l.date_first_seen,(unsigned)r.date_first_seen);
-	self.date_last_seen  := (string)ut.max2((unsigned)l.date_last_seen, (unsigned)r.date_last_seen);
+	self.date_last_seen  := (string)max((unsigned)l.date_last_seen, (unsigned)r.date_last_seen);
 	self := L;
 end;
 

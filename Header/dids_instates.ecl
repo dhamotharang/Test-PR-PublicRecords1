@@ -1,25 +1,61 @@
-import ut, doxie_build;
+import ut, doxie_build,address,NID,header,PRTE2_Header;
 
 //h := dataset('~thor_data400::Base::HeaderKey_Building',header.Layout_Header,flat);
 //  Bug 12065, use blocked data filter on header instead of raw data
 h := doxie_build.file_header_building; 
 
+// Bug 65425
+// CODE BLOCK BELOW REPLACED with the following lines to streamline the use
+// of mac_multi_city.  Old code passed a slim set of all base rows through the
+// macro indiscriminately and then joined the results back to the base.  New
+// code determines just the unique city_name/zip combinations in the base and
+// passes those through the macro, then does a MANY LOOKUP to join back to the
+// base.
+//   DHW, 01/26/2011
+//-----------------------------------------------------------------------------
+//// hijack the incoming records and explode them out by city name for b-map build.
+//SlimRec := RECORD    // trim away what we don't need
+//	h.rid;
+//	h.city_name;
+//	h.zip;
+//END;
+//
+//PreMultiCity := TABLE(h, SlimRec);
+//
+//address.mac_multi_city(PreMultiCity,city_name,zip,PostMultiCity)
+//
+////MyFields rejoin (SlimRec L, MyFields R) :=
+//header.Layout_Header rejoin (header.Layout_Header L, SlimRec R) :=
+//TRANSFORM
+//  self.city_name := R.city_name;
+//	SELF := L;
+//END;
+//
+//j := JOIN(h, PostMultiCity, LEFT.rid = RIGHT.rid, rejoin(LEFT, RIGHT), HASH, left outer);
+//-----------------------------------------------------------------------------
+
+PreMultiCity:=TABLE(h(TRIM(zip)<>''),{STRING orig_city_name:=h.city_name;h.city_name;h.zip},city_name,zip);
+
+address.mac_multi_city(PreMultiCity,city_name,zip,PostMultiCity)
+
+j:=join(h,PostMultiCity,LEFT.zip=RIGHT.zip AND LEFT.city_name=RIGHT.orig_city_name,TRANSFORM(RECORDOF(h),SELF.city_name:=RIGHT.city_name;SELF:=LEFT;),MANY LOOKUP,LEFT OUTER);
+
 
 ta := record
-  unsigned8 states := ut.bit_set(0,ut.St2Code(h.st));
-  unsigned4 lname1 := ut.bit_set(0,ut.Chr2Code(h.lname[1]));
-  unsigned4 lname2 := ut.bit_set(0,ut.Chr2Code(h.lname[2]));
-  unsigned4 lname3 := ut.bit_set(0,ut.Chr2Code(h.lname[3]));
-  unsigned4 fname1 := ut.bit_set(0,ut.Chr2Code(h.fname[1])) | ut.bit_set(0,ut.Chr2Code(datalib.PreferredFirst(h.fname)[1]));
-  unsigned4 fname2 := ut.bit_set(0,ut.Chr2Code(h.fname[2])) | ut.bit_set(0,ut.Chr2Code(datalib.PreferredFirst(h.fname)[2]));
-  unsigned4 fname3 := ut.bit_set(0,ut.Chr2Code(h.fname[3])) | ut.bit_set(0,ut.Chr2Code(datalib.PreferredFirst(h.fname)[3]));
-  unsigned4 city1 := ut.bit_set(0,ut.Chr2Code(h.city_name[1]));
-  unsigned4 city2 := ut.bit_set(0,ut.Chr2Code(h.city_name[2]));
-  unsigned4 city3 := ut.bit_set(0,ut.Chr2Code(h.city_name[3]));
-  h.did;
+  unsigned8 states := ut.bit_set(0,ut.St2Code(j.st));
+  unsigned4 lname1 := ut.bit_set(0,ut.Chr2Code(j.lname[1]));
+  unsigned4 lname2 := ut.bit_set(0,ut.Chr2Code(j.lname[2]));
+  unsigned4 lname3 := ut.bit_set(0,ut.Chr2Code(j.lname[3]));
+  unsigned4 fname1 := ut.bit_set(0,ut.Chr2Code(j.fname[1])) | ut.bit_set(0,ut.Chr2Code(datalib.PreferredFirst(j.fname)[1]));
+  unsigned4 fname2 := ut.bit_set(0,ut.Chr2Code(j.fname[2])) | ut.bit_set(0,ut.Chr2Code(datalib.PreferredFirst(j.fname)[2]));
+  unsigned4 fname3 := ut.bit_set(0,ut.Chr2Code(j.fname[3])) | ut.bit_set(0,ut.Chr2Code(datalib.PreferredFirst(j.fname)[3]));
+  unsigned4 city1 := ut.bit_set(0,ut.Chr2Code(j.city_name[1]));
+  unsigned4 city2 := ut.bit_set(0,ut.Chr2Code(j.city_name[2]));
+  unsigned4 city3 := ut.bit_set(0,ut.Chr2Code(j.city_name[3]));
+  j.did;
   end;
   
-res := sort(distribute(table(h,ta),hash(did)),did,local);
+res := sort(distribute(table(j,ta),hash(did)),did,local);
 
 ta add(ta le,ta ri) := transform
   self.states := le.states|ri.states;
@@ -90,4 +126,8 @@ taa add_again(taa le,taa ri) := transform
 
 rl2 := rollup( sort(with_rels,did,local), left.did=right.did, add_again(left,right), local );
 
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export dids_instates := rl2;
+#ELSE
 export dids_instates := rl2 : persist('dids_instates');
+#END

@@ -64,7 +64,7 @@ mk6 := buildindex(dedup(dd_lfmname(z5<>''),z5,lfmname,__filepos,all),{z5,lfmname
 mk7 := buildindex(dedup(dd_lfmname(z5<>''),z5,addr,lfmname,__filepos,all),{z5,addr,lfmname,
 								(big_endian unsigned8)__filepos},
 								base_key_Name + 'z5.addr.lfmname.key',moxie,overwrite);
-mk8 := buildindex(dedup(dd_lfmname(z5<>''),z5,neighbor,lfmname,__filepos,all),{z5,neighbor,lfmname,
+mk8 := buildindex(dedup(dd_lfmname,z5,neighbor,lfmname,__filepos,all),{z5,neighbor,lfmname,
 								(big_endian unsigned8)__filepos},
 								base_key_Name + 'z5.neighbor.lfmname.key',moxie,overwrite);
 mk9 := buildindex(dedup(dd_lfmname(z5<>''),z5,prim_name,prim_range,lfmname,__filepos,all),{z5,prim_name,prim_range,lfmname,

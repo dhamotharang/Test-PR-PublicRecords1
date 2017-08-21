@@ -18,7 +18,7 @@ EXPORT Strata_Population_Stats(
 	Strata.mac_Pops(pBaseMembershipBuilt	  , dMembershipPops);
 	Strata.mac_Pops(pBaseTypeOfPracticeBuilt, dTypeOfPracticePops);
 	
-	Strata.mac_CreateXMLStats(dMainPops, _Dataset().Name, 'main', pversion, Email_Notification_Lists().Stats,
+	Strata.mac_CreateXMLStats(dMainPops, _Dataset().Name, 'main_base', pversion, Email_Notification_Lists().Stats,
 	                             dMainPopsOut, 'View', 'Population', , pIsTesting, pOverwrite);
 	Strata.mac_CreateXMLStats(dCareerPops, _Dataset().Name, 'career', pversion, Email_Notification_Lists().Stats,
 	                             dCareerPopsOut, 'View', 'Population', , pIsTesting, pOverwrite);

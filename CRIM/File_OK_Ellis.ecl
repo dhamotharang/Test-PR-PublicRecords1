@@ -1,0 +1,1 @@
+export File_OK_Ellis := dataset('~thor_data400::in::crim_court::ok::ellis', layout_ok_adair, csv(separator('|'), quote(''), maxlength(6000)));

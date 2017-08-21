@@ -2,7 +2,7 @@ Import Data_Services, doxie,ut;
 
 SlimLayout	:= RECORD
 
-BusReg.Layout_BusReg_Company - [Append_MailRawAID,Append_MailACEAID,Append_LocRawAID,Append_LocACEAID,Append_RARawAID,
+BusReg.Layout_BusReg_Company - [ADCRecordNo,Append_MailRawAID,Append_MailACEAID,Append_LocRawAID,Append_LocACEAID,Append_RARawAID,
 																Append_RAACEAID,Append_Off1RawAID,Append_Off1ACEAID,Clean_mailing_address1,Clean_mailing_address2,
 																Clean_location_address1,Clean_location_address2,Clean_RA_address1,Clean_RA_address2,
 																Clean_officer1_address1,Clean_officer1_address2,source_rec_id];

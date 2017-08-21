@@ -18,6 +18,7 @@ TRANSFORM
 	SELF.num := 0;
 	SELF.imgLength := L.imgLength;
 	SELF.photo := L.photo;
+	self.image_link := self.state + l.filename;
 END;
 
 j := JOIN(DISTRIBUTE(rtrn, HASH(filename[1..jpgPos(filename)])), 

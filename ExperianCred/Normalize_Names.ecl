@@ -1,32 +1,5 @@
 import ut;
-input_files := Files.File_In /* (Encrypted_Experian_PIN in[
-'DZXWM0834945340',
-'JNPOU0836069114',
-'IRQDY0797242111',
-'DFFBY0833340393',
-'NLSXP0814422046',
-'URITM0831539955',
-'URITM0831394578',
-'RIJGM0832662550',
-'PQURO0834743336',
-'ZAZTU0835660119',
-'DFFBY0801053892',
-'MSRPO0961623807',
-'IGDUM0839703368',
-'NYMVO0903274793',
-'FEEKY0011418917',
-'FYKWD0357959839',
-'FLGBO0359285922',
-'NYMVO0903274793',
-'UZINY0000578555',
-'FEEKY0011418917',
-'FYKWD0357959839',
-'FLGBO0359285922',
-'TSVYD0734947769',
-'MSRPO0026391579',
-'PQURO0901905395'
- 
-])*/;
+input_files := Correct_Misparsed_Names;
 //----Assign a record sequence number;
 Layout_Temp_Sequence := record
 	unsigned Seq_Rec_Id :=0;
@@ -87,17 +60,10 @@ ut.MAC_Sequence_Records(input_files_t, Seq_Rec_Id, input_files_id);
 	*/
 	
 Layouts.Layout_Norm_Name t_norm_name (Layout_Temp_Sequence le, INTEGER C) := TRANSFORM
-	 get_suffix(string suffix) := map(suffix = 'J' => 'JR',
-							   suffix = 'S' => 'SR',
-							   suffix = '2' => 'II',
-							   suffix = '3' => 'III',
-							   suffix = '4' => 'IV',
-							   '');
-	 
 	 SELF.Orig_fname 				:= choose(C,le.First_Name, le.First_Name, le.First_Name2 ,le.First_Name2, le.First_Name3, le.First_Name3, le.First_Name4, le.First_Name4, le.Spouse_First_Name);
 	 SELF.Orig_mname 				:= choose(C,le.Middle_Name, le.Middle_Name, le.Middle_Name2, le.Middle_Name2, le.Middle_Name3, le.Middle_Name3, le.Middle_Name4, le.Middle_Name4, '');
 	 SELF.Orig_lname 				:= choose(C,le.Surname, le.Second_Surname, le.Surname2, le.Second_Surname2, le.Surname3, le.Second_Surname3, le.Surname4, le.Second_Surname4, le.Surname);
-	 SELF.Orig_suffix				:= choose(C,get_suffix(le.Generation_Code), get_suffix(le.Generation_Code), get_suffix(le.Generation_Code2), get_suffix(le.Generation_Code2), get_suffix(le.Generation_Code3), get_suffix(le.Generation_Code3), get_suffix(le.Generation_Code4), get_suffix(le.Generation_Code4), '');
+	 SELF.Orig_suffix				:= choose(C,le.Generation_Code, le.Generation_Code, le.Generation_Code2, le.Generation_Code2, le.Generation_Code3, le.Generation_Code3, le.Generation_Code4, le.Generation_Code4, '');
 	 SELF.NameType   				:= choose(C,'C1','C2','O11','O12', 'O21','O22', 'O31', 'O32','SP1');
 	 SELF.Orig_Consumer_Create_Date := choose(C, le.Consumer_Create_Date, le.Consumer_Create_Date, le.Consumer_Create_Date2, le.Consumer_Create_Date2, le.Consumer_Create_Date3, le.Consumer_Create_Date3, le.Consumer_Create_Date4, le.Consumer_Create_Date4, '');
 	 SELF 			 := le;

@@ -1,4 +1,4 @@
-﻿IMPORT ut, iesp, Gateway;
+IMPORT ut, iesp, Gateway;
 
 
 //TODO eCrash team is a bit concerned that failures will simply act as though no delta records are found.

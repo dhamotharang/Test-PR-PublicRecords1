@@ -1,4 +1,4 @@
-import address, Business_Header,Lib_AddrClean;
+import address, Business_Header;
 
 file_in := Fictitious_Business_Names.File_Clean_ContactNames;
 
@@ -102,7 +102,7 @@ Layout_clean_Addresses xform1(file_out_name_businessname_notblank InputRecord) :
 										   InputRecord.ContactPersonAddress_CY <> '' or
 										   InputRecord.ContactPersonAddress_ST <> '' or
 										   InputRecord.ContactPersonAddress_ZP <> '',
-										   lib_AddrClean.AddrCleanLib.CleanAddress182(
+										   address.CleanAddress182(
 										   trim(InputRecord.ContactPersonAddress_S1,left,right),
 										   trim(trim(InputRecord.ContactPersonAddress_CY,left,right) + ', ' +
 										   trim(InputRecord.ContactPersonAddress_ST,left,right) + ' ' +
@@ -114,7 +114,7 @@ Layout_clean_Addresses xform1(file_out_name_businessname_notblank InputRecord) :
 										   InputRecord.BusinessAddress_CY <> '' or
 										   InputRecord.BusinessAddress_ST <> '' or
 										   InputRecord.BusinessAddress_ZP <> '',
-										   lib_AddrClean.AddrCleanLib.CleanAddress182(
+										   address.CleanAddress182(
 										   trim(InputRecord.BusinessAddress_S1,left,right),
 										   trim(trim(InputRecord.BusinessAddress_CY,left,right) + ', ' +
 										   trim(InputRecord.BusinessAddress_ST,left,right) + ' ' +

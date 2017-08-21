@@ -9,6 +9,7 @@ EXPORT build_misc_keys(
 module
 
   export BuildLinkIds       := tools.macf_writeindex('BIPV2.Key_BH_Linking_Ids.key              ,keynames(pversion).linkids.new'      );
+	export BuildLinkIds_hidden:= tools.macf_writeindex('BIPV2.Key_BH_Linking_Ids.Key_hidden       ,keynames(pversion).linkids_hidden.new'      );
   export BuildTranslations  := tools.macf_writeindex('BIPV2_Company_Names.files.TranslationsKey ,keynames(pversion).translations.new' );
   export BuildAML_Addr      := tools.macf_writeindex('Address_Attributes.key_AML_addr           ,keynames(pversion).aml_addr.new'     );
   export BuildStatus        := tools.macf_writeindex('BIPV2.key_Status.lkey(pversion).new'                                            );
@@ -24,6 +25,7 @@ module
   sequential(
      parallel(
        BuildLinkIds     
+			,BuildLinkIds_hidden
       ,BuildTranslations
       ,BuildAML_Addr    
       ,BuildStatus      

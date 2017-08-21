@@ -356,23 +356,23 @@ SpcShiftR := RECORD
   integer1 Lgid3IfHrchy_shift0 := ROUND(Specificities[1].Lgid3IfHrchy_specificity - 27);
   integer2 Lgid3IfHrchy_switch_shift0 := ROUND(1000*Specificities[1].Lgid3IfHrchy_switch - 0);
   integer1 company_name_shift0 := ROUND(Specificities[1].company_name_specificity - 26);
-  integer2 company_name_switch_shift0 := ROUND(1000*Specificities[1].company_name_switch - 333);
+  integer2 company_name_switch_shift0 := ROUND(1000*Specificities[1].company_name_switch - 328);
   integer1 cnp_number_shift0 := ROUND(Specificities[1].cnp_number_specificity - 13);
   integer2 cnp_number_switch_shift0 := ROUND(1000*Specificities[1].cnp_number_switch - 1);
   integer1 active_duns_number_shift0 := ROUND(Specificities[1].active_duns_number_specificity - 27);
-  integer2 active_duns_number_switch_shift0 := ROUND(1000*Specificities[1].active_duns_number_switch - 44);
-  integer1 duns_number_shift0 := ROUND(Specificities[1].duns_number_specificity - 26);
-  integer2 duns_number_switch_shift0 := ROUND(1000*Specificities[1].duns_number_switch - 114);
-  integer1 duns_number_concept_shift0 := ROUND(Specificities[1].duns_number_concept_specificity - 26);
-  integer2 duns_number_concept_switch_shift0 := ROUND(1000*Specificities[1].duns_number_concept_switch - 172);
+  integer2 active_duns_number_switch_shift0 := ROUND(1000*Specificities[1].active_duns_number_switch - 55);
+  integer1 duns_number_shift0 := ROUND(Specificities[1].duns_number_specificity - 27);
+  integer2 duns_number_switch_shift0 := ROUND(1000*Specificities[1].duns_number_switch - 66);
+  integer1 duns_number_concept_shift0 := ROUND(Specificities[1].duns_number_concept_specificity - 27);
+  integer2 duns_number_concept_switch_shift0 := ROUND(1000*Specificities[1].duns_number_concept_switch - 110);
   integer1 company_fein_shift0 := ROUND(Specificities[1].company_fein_specificity - 26);
-  integer2 company_fein_switch_shift0 := ROUND(1000*Specificities[1].company_fein_switch - 178);
+  integer2 company_fein_switch_shift0 := ROUND(1000*Specificities[1].company_fein_switch - 184);
   integer1 company_inc_state_shift0 := ROUND(Specificities[1].company_inc_state_specificity - 6);
-  integer2 company_inc_state_switch_shift0 := ROUND(1000*Specificities[1].company_inc_state_switch - 29);
+  integer2 company_inc_state_switch_shift0 := ROUND(1000*Specificities[1].company_inc_state_switch - 32);
   integer1 company_charter_number_shift0 := ROUND(Specificities[1].company_charter_number_specificity - 26);
-  integer2 company_charter_number_switch_shift0 := ROUND(1000*Specificities[1].company_charter_number_switch - 95);
+  integer2 company_charter_number_switch_shift0 := ROUND(1000*Specificities[1].company_charter_number_switch - 106);
   integer1 cnp_btype_shift0 := ROUND(Specificities[1].cnp_btype_specificity - 3);
-  integer2 cnp_btype_switch_shift0 := ROUND(1000*Specificities[1].cnp_btype_switch - 51);
+  integer2 cnp_btype_switch_shift0 := ROUND(1000*Specificities[1].cnp_btype_switch - 54);
   END;
  
 EXPORT SpcShift := TABLE(Specificities,SpcShiftR);
@@ -390,4 +390,3 @@ EXPORT SpcShift := TABLE(Specificities,SpcShiftR);
 EXPORT AllProfiles := sbfe_id_specificity_profile + Lgid3IfHrchy_specificity_profile + company_name_specificity_profile + cnp_number_specificity_profile + active_duns_number_specificity_profile + duns_number_specificity_profile + company_fein_specificity_profile + company_inc_state_specificity_profile + company_charter_number_specificity_profile + cnp_btype_specificity_profile;
 END;
  
-

@@ -1,4 +1,4 @@
-export Layout_GA_clean_in := 
+export Layout_GA_clean_in := //rec length: 1729
 record
   string2 state_origin;
   string8 process_date;

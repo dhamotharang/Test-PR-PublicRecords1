@@ -1,4 +1,19 @@
 
+d := avm.file_ta_ratios;
+
+month_stat_layout := record
+	fips_code := d.fips_code;
+	land_use_code := d.land_use_code;
+	assessed_value_year := d.assessed_value_year;
+
+	month6_ct := count(group,d.recording_date >= avm.filters.days_ago_183);
+	month12_ct := count(group,d.recording_date >= avm.filters.days_ago_365);
+	month18_ct := count(group,d.recording_date >=  avm.filters.days_ago_548);
+end;
+
+// gather some stats about the # of sales for 3 time frames (6, 12 and 18 months)
+stats := table(d, month_stat_layout, fips_code, land_use_code, assessed_value_year, few);
+
 layout_ta_calcs := record
 	string12 ln_fares_id;
 	string5 fips_code;
@@ -30,18 +45,36 @@ layout_ta_calcs := record
 	real market_value_to_saleprice_ratio3;
 	real market_value_to_saleprice_ratio4;
 	integer county_seq;
+	string2 sales_months_filter;
 end;
 
- 
+
 //layout_ta_calcs append_calcs(layout_temp le) := transform 
-layout_ta_calcs append_calcs(avm.file_ta_ratios le) := transform
+layout_ta_calcs append_calcs(avm.file_ta_ratios le, stats rt) := transform
+	smf := map(rt.month6_ct > 200 => '6',
+			   rt.month12_ct > 200 => '12',
+			   '18');
+			   
+	
+	rdf := map(smf='6' => avm.filters.days_ago_183,
+			   smf='12' => avm.filters.days_ago_365,
+			   avm.filters.days_ago_548);
+	// we have over 200 records at rdf for this fips, skip any record that comes prior to rdf	   
+	self.sales_months_filter := if(le.recording_date > rdf, smf, skip); 
 	self.assessed_value_to_saleprice_ratio1 := (integer)le.sales_price/(integer)le.assessed_total_value;
 	self.market_value_to_saleprice_ratio1  := (integer)le.sales_price/(integer)le.market_total_value;
+	
 	self := le;
 	self := [];
 end; 
 
-f1 := project(avm.file_ta_ratios, append_calcs(left));
+f1 := join(d, stats, 
+			left.fips_code=right.fips_code and
+			left.land_use_code=right.land_use_code and
+			left.assessed_value_year=right.assessed_value_year,
+			append_calcs(left,right), left outer, lookup);
+							
+
 f := distribute(f1, hash(assessed_value_year,fips_code,land_use_code));
 
 // create median assessed to sales ratio per year, fips, land use and bin
@@ -295,6 +328,6 @@ w_both_ratios := join(Median_Assessed_Ratios, Median_Market_Ratios,
 // output(count(w_both_ratios), named('both_ratios_counts'));			  
 
 
-output(w_both_ratios,,'~thor_data400::avm_validate2::ta_update_table_' + thorlib.WUID(), __compressed__);
+output(w_both_ratios,,'~thor_data400::avm::ta_update_table', __compressed__, overwrite);
 
 export File_TA_UpdateTable := w_both_ratios;

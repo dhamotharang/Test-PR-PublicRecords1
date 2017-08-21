@@ -27,7 +27,7 @@ end;
 
 ds_Standardized_GSA_uniqueid := project(ds_Standardized_GSA,transform(layout_std_gsa_uniqueid,self.uniqueid := COUNTER, SELF:=LEFT));
 
-export Layout_Clean_Name := record
+Layout_Clean_Name := record
 		GSA.layouts_gsa.slim_clean_gsa;
 		string1         name_flag;
 		string5         cln_title;

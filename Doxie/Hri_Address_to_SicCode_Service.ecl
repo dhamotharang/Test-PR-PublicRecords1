@@ -8,13 +8,13 @@
 </message>
 */
 /*--INFO-- This service searches the sic_code description of a given address.*/
+/*--RESULT-- xslt.html */
 
 /*
 <message name="HriAddressToSiccodeService" wuTimeout="300000">
 */
 
 import risk_indicators, address, codes;
-
 
 export hri_address_to_siccode_service := macro
 

@@ -1,4 +1,4 @@
-import Address, Lib_AddrClean, Ut, lib_stringlib, _Control, business_header,_Validate,aid;
+import Address, Ut, lib_stringlib, _Control, business_header,_Validate,aid;
 
 export Add_AID :=
 module
@@ -115,8 +115,8 @@ module
 		
 		pCombinedRec 	:= project(pRawFileInput(DATE != '',DATE != 'DATE'), tPreProcessIndividuals(left,counter));
 		hotlist_dst 	:= distribute(pCombinedRec, hash(dt_first_reported, dt_last_reported, address, suffix, city, state, zip_code, comments));
-		hotlist_srt 	:= sort(hotlist_dst, dt_first_reported, dt_last_reported, address, suffix, city, state, zip_code, comments, local);
-		dPreProcess 	:= dedup(hotlist_srt, dt_first_reported, dt_last_reported, address, suffix, city, state, zip_code, comments, local);
+		hotlist_srt 	:= sort(hotlist_dst, dt_first_reported, dt_last_reported, address, suffix, state, zip_code, comments, local);
+		dPreProcess 	:= dedup(hotlist_srt, dt_first_reported, dt_last_reported, address, suffix, state, zip_code, comments, local);
 		
 			dPreProcess tr(dPreProcess L, dPreProcess R) := TRANSFORM
 				self.dt_last_reported := r.dt_last_reported;

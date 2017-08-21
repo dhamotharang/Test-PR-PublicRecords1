@@ -106,7 +106,7 @@ STRATA.createXMLStats(dPopulationStats_Transunion_TN_base
 					 ,'TN'
 					 ,'TransunionCred'
 					 ,pVersion
-					 ,'jose.bello@lexisnexis.com'
+					 ,'jose.bello@lexisnexis.com,michael.gould@lexisnexis.com'
 					 ,zTransunion_TN_base);
 
 EXPORT Strata := zTransunion_TN_base;

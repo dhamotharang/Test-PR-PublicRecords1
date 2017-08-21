@@ -147,15 +147,15 @@ k01	:= BUILDINDEX(	did_records,{orig_state,VEHICLE_NUMBERxBG1,(big_endian unsign
 			VehLic.base_key_name + 'state_origin.vehicle_number.key_' + vehlic.version_development,moxie,overwrite);
 k02	:= BUILDINDEX(	did_records,{VEHICLE_NUMBERxBG1,(big_endian unsigned8 )__filepos},
 			VehLic.base_key_name + 'vehicle_number.key_' + vehlic.version_development,moxie,overwrite);
-k03	:= BUILDINDEX(	did_records,{LICENSE_PLATE_NUMBERxBG4,(big_endian unsigned8 )__filepos},
+k03	:= BUILDINDEX(	did_records(LICENSE_PLATE_NUMBERxBG4<>''),{LICENSE_PLATE_NUMBERxBG4,(big_endian unsigned8 )__filepos},
 			VehLic.base_key_name + 'lic_plate.key_' + vehlic.version_development,moxie,overwrite);
-k04	:= BUILDINDEX(	did_records,{orig_state,LICENSE_PLATE_NUMBERxBG4,(big_endian unsigned8 )__filepos},
+k04	:= BUILDINDEX(	did_records(LICENSE_PLATE_NUMBERxBG4<>''),{orig_state,LICENSE_PLATE_NUMBERxBG4,(big_endian unsigned8 )__filepos},
 			VehLic.base_key_name + 'state_origin.lic_plate.key_' + vehlic.version_development,moxie,overwrite);
-k05	:= BUILDINDEX(	did_records,{ORIG_VIN,(big_endian unsigned8 )__filepos},
+k05	:= BUILDINDEX(	did_records(orig_VIN<>''),{ORIG_VIN,(big_endian unsigned8 )__filepos},
 			VehLic.base_key_name + 'vin.key_' + vehlic.version_development,moxie,overwrite);
-k06	:= BUILDINDEX(	lic_records,{reverse_lic_plate,(big_endian unsigned8 )__filepos},
+k06	:= BUILDINDEX(	lic_records(reverse_lic_plate<>''),{reverse_lic_plate,(big_endian unsigned8 )__filepos},
 			VehLic.base_key_name + 'reverse_lic_plate.key_' + vehlic.version_development,moxie,overwrite);
-k07	:= BUILDINDEX(	lic_records,{orig_state,reverse_lic_plate,(big_endian unsigned8 )__filepos},
+k07	:= BUILDINDEX(	lic_records(reverse_lic_plate<>''),{orig_state,reverse_lic_plate,(big_endian unsigned8 )__filepos},
 			VehLic.base_key_name + 'state_origin.reverse_lic_plate.key_' + vehlic.version_development,moxie,overwrite);
 
 // Simple keys, but 4 entries per record.

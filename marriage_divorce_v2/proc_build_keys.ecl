@@ -1,4 +1,3 @@
-
 import roxiekeybuild,autokey,doxie,marriage_divorce_v2;
 
 export proc_build_keys(string filedate) := function
@@ -50,7 +49,7 @@ build_keys := sequential(
 
 build_autokeys := marriage_divorce_v2.proc_build_autokeys(filedate);
 
-return parallel(build_keys,build_autokeys);
+return sequential(build_keys,build_autokeys);
 
 end;
 

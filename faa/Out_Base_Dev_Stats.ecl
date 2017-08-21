@@ -15,7 +15,6 @@ function
 			best_ssn_CountNonBlank                        := sum(group,if(ds_reg.best_ssn<>'',1,0));
 			did_out_CountNonBlank                         := sum(group,if(ds_reg.did_out<>'',1,0));
 			bdid_out_CountNonBlank                        := sum(group,if(ds_reg.bdid_out<>'',1,0));
-			bid_out_CountNonBlank                         := sum(group,if(ds_reg.bid_out<>'',1,0));
 			date_first_seen_CountNonBlank                 := sum(group,if(ds_reg.date_first_seen<>'',1,0));
 			date_last_seen_CountNonBlank                  := sum(group,if(ds_reg.date_last_seen<>'',1,0));
 			current_flag_CountNonBlank                    := sum(group,if(ds_reg.current_flag<>'',1,0));
@@ -78,6 +77,30 @@ function
 			name_suffix_CountNonBlank                     := sum(group,if(ds_reg.name_suffix<>'',1,0));
 			compname_CountNonBlank                        := sum(group,if(ds_reg.compname<>'',1,0));
 			lf_CountNonBlank                              := sum(group,if(ds_reg.lf<>'',1,0));
+			//BIPV2 fields have been added for Strata
+			source_rec_id_CountNonZeros	   								:= sum(group,if(ds_reg.source_rec_id<>0,1,0));
+			DotID_CountNonZeros	 													:= sum(group,if(ds_reg.DotID<>0,1,0));
+			DotScore_CountNonZeros	   										:= sum(group,if(ds_reg.DotScore<>0,1,0));
+			DotWeight_CountNonZeros	 											:= sum(group,if(ds_reg.DotWeight<>0,1,0));
+			EmpID_CountNonZeros	   												:= sum(group,if(ds_reg.EmpID<>0,1,0));
+			EmpScore_CountNonZeros	 											:= sum(group,if(ds_reg.EmpScore<>0,1,0));
+			EmpWeight_CountNonZeros	 									    := sum(group,if(ds_reg.EmpWeight<>0,1,0));
+			POWID_CountNonZeros	                          := sum(group,if(ds_reg.POWID<>0,1,0));
+			POWScore_CountNonZeros	                      := sum(group,if(ds_reg.POWScore<>0,1,0));
+			POWWeight_CountNonZeros	                      := sum(group,if(ds_reg.POWWeight<>0,1,0));
+			ProxID_CountNonZeros	                        := sum(group,if(ds_reg.ProxID<>0,1,0));
+			ProxScore_CountNonZeros	                      := sum(group,if(ds_reg.ProxScore<>0,1,0));
+			ProxWeight_CountNonZeros	                    := sum(group,if(ds_reg.ProxWeight<>0,1,0));
+      SELEID_CountNonZeros	                        := sum(group,if(ds_reg.SELEID<>0,1,0));
+		  SELEScore_CountNonZeros	                      := sum(group,if(ds_reg.SELEScore<>0,1,0));
+		  SELEWeight_CountNonZeros	                    := sum(group,if(ds_reg.SELEWeight<>0,1,0));
+			OrgID_CountNonZeros	                          := sum(group,if(ds_reg.OrgID<>0,1,0));
+			OrgScore_CountNonZeros	                      := sum(group,if(ds_reg.OrgScore<>0,1,0));
+			OrgWeight_CountNonZeros	                      := sum(group,if(ds_reg.OrgWeight<>0,1,0));
+			UltID_CountNonZeros	                          := sum(group,if(ds_reg.UltID<>0,1,0));
+			UltScore_CountNonZeros	                      := sum(group,if(ds_reg.UltScore<>0,1,0));
+			UltWeight_CountNonZeros	                      := sum(group,if(ds_reg.UltWeight<>0,1,0));
+
 		end;
 
 	rPopulationStats_ds_cert
@@ -172,7 +195,7 @@ function
 	zOrig_Stats_cert := output(choosen(tStats_cert,all));
 	zOrig_Stats_data := output(choosen(tStats_data,all));
 
-	STRATA.createXMLStats(tStats_reg ,'FAA','Aircraft Registration Data',version,'kgummadi@seisint.com,jtrost@seisint.com',zPopulation_Stats_reg, 'View','Population')
+	STRATA.createXMLStats(tStats_reg ,'FAA','Aircraft Registration BaseFile',version,'kgummadi@seisint.com,jtrost@seisint.com',zPopulation_Stats_reg, 'View','Population')
 	STRATA.createXMLStats(tStats_cert,'FAA','Airmen Certificate',   version,'kgummadi@seisint.com,jtrost@seisint.com',zPopulation_Stats_cert,'View','Population')
 	STRATA.createXMLStats(tStats_data,'FAA','Airmen Data',          version,'kgummadi@seisint.com,jtrost@seisint.com',zPopulation_Stats_data,'View','Population')
 

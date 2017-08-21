@@ -1,0 +1,1 @@
+EXPORT GetCollisionCode(string1 code) := IF(code='D', 'S', code); // consider Snap and D-Snap as a match;

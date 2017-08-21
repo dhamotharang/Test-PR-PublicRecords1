@@ -1,17 +1,26 @@
-import official_records;
+#workunit('name','Official Records');
 
-d := official_records.File_Moxie_Party_Dev;
 
-//d := distribute(outf,hash(vendor));
+import official_records,Business_Header;
 
-stat_rec :=  record
+d1 := official_records.File_Moxie_Party_Dev(doc_filed_dt <> '');
+ 
+Official_Records.Layout_Moxie_Party proj_rec(d1 l) := transform
+ self.doc_filed_dt := Business_Header.validatedate(l.doc_filed_dt);
+ self := l;
+end;
+ 
+
+d := project(d1,proj_rec(left));
+
+ stat_rec :=  record
 'official_records_party',
 d.vendor,
 d.state_origin,
 d.county_name,
-official_records.Version_Development;
-d.process_date;
-
+process_dt := max(group,d.process_date);
+start_date := min(group,d.doc_filed_dt);
+end_date := max(group,d.doc_filed_dt );
 total := count(group);
 process_date_count := count(group, d.process_date <> '');
 vendor_count := count(group, d.vendor <> '');
@@ -30,7 +39,9 @@ entity_dob_count := count(group, d.entity_dob <> '');
 entity_ssn_count := count(group, d.entity_ssn <> '');
 
 end;
+//dist1 := distribute(d,HASH(county_name));
+//sort_cty := sort(dist1,d.county_name,local);
+//dedp_cty := dedup(sort_cty,d.county_name,local);
+stats := table(d(doc_filed_dt <> ''),stat_rec,vendor,state_origin,county_name,few);
 
-stats := table(d,stat_rec,vendor,state_origin,county_name,d.process_date,few);
-
-output(choosen(stats,1000));
+export official_records_party_stats := output(topn(stats,100,county_name));

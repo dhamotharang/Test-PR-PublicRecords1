@@ -45,7 +45,7 @@ transform
 	SELF.p.prim_range := TRIM(ut.CleanPrimRange(l.inp.prim_range),LEFT);
 	SELF.p.st := l.inp.st;
 	SELF.p.city_name := l.inp.city_name;
-	SELF.p.city_code := doxie.Make_CityCode(l.inp.city_name); 
+	SELF.p.city_code := doxie.Make_CityCodes(l.inp.city_name).tho; 
 	SELF.p.zip_string6 := l.inp.zip;
 	SELF.p.zip := (unsigned4)l.inp.zip;	
 	SELF.p.sec_range := l.inp.sec_range;

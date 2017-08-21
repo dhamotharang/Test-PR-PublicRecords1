@@ -26,5 +26,6 @@ string5	FIPS;
 string2	TRANS_CODE;
 string1	FEE_CODE;
 string8	POSTING;
+string8 TITLE_DATE;
 string2	lf;
 end;

@@ -1,4 +1,4 @@
-import Crim_common, Address, Lib_AddrClean, Ut, lib_stringlib;
+import Crim_common, Address, Ut, lib_stringlib;
 
 input := DOC.file_doc_nv.cmbndFiles;
 
@@ -32,7 +32,7 @@ Crim_Common.Layout_Moxie_DOC_Punishment.previous tNV(input L) := TRANSFORM
     self.presump_par_rel_dt := '';
     self.mutl_part_pgm_dt   := ''; 
     self.par_cur_stat 		:= '';						 
-    self.par_cur_stat_desc  := '';
+    self.par_cur_stat_desc  := if(regexfind('PAROLE',stringlib.stringtouppercase(l.agy_loc_id)),l.release_desc,'');
     self.par_st_dt 			:= '';
     self.par_sch_end_dt		:= '';
     self.par_act_end_dt 	:= '';

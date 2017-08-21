@@ -1,4 +1,4 @@
-﻿import risk_indicators, gong, ut, targus, FCRA, Phonesplus_v2;
+import risk_indicators, gong, ut, targus, FCRA, Phonesplus_v2;
 
 export getDirsByAddr(dataset(Risk_Indicators.Layouts.Layout_Input_Plus_Overrides) input, boolean isFCRA=false, unsigned1 glb=0, unsigned8 BSOptions=0, boolean onThor=false) := function
 

@@ -1,7 +1,7 @@
 IMPORT _control,RoxieKeyBuild, enclarity_facility_sanctions;
 
 EXPORT Email_Notification_Lists := MODULE
-   developer := 'jennifer.hennigar@lexisnexis.com;';
+   developer := 'jennifer.hennigar@lexisnexisrisk.com; jason.allerdings@lexisnexisrisk.com;';
    tester := _Control.MyInfo.EmailAddressNotify;
 	 //quality_assurance := 'qualityassurance@seisint.com;';
 	 quality_assurance	:= _Control.MyInfo.EmailAddressNotify;

@@ -1,6 +1,6 @@
 import Crim_Common, Address, Gong;
 
-p	:= file_WA_Clark(name<>'Name' and name<>',');
+p	:= file_WA_Clark.cmbnd;
 
 Crim_Common.Layout_In_Court_Offenses  tCanyon(p input) 
 	:= TRANSFORM
@@ -14,6 +14,7 @@ Crim_Common.Layout_In_Court_Offenses  tCanyon(p input)
 		SELF.source_file				:= '(CV)WA-ClarkCtyArr';
 		SELF.arr_date 					:= IF(yearyy='','',Year+TRIM(input.book_date,ALL)[1..2] +TRIM(input.book_date,ALL)[4..5]);
 		SELF.le_agency_case_number 		:= input.ID;
+		SELF.arr_off_desc_1				:= regexreplace('\r',input.charge,'');
 		SELF.arr_disp_desc_1 			:= 'BOOKED';
 		SELF:=[];
 	 END;

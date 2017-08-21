@@ -5,13 +5,16 @@ src_ds := SNA.prop_transaction_base;
 deed_file := distribute(LN_PropertyV2.file_deed_building, hash(ln_fares_id)); 
 
 src_plus_deed := dedup(sort(join(src_ds, deed_file, left.ln_fares_id=right.ln_fares_id, 
-						transform({ recordof(src_ds), 
-												deed_file.contract_date, deed_file.recording_date, deed_file.fares_unformatted_apn, 
-												deed_file.title_company_name, deed_file.document_type_code, deed_file.sales_price, deed_file.first_td_loan_type_code}, 
-												self.recording_date := map(right.contract_date != '' => right.contract_date, right.recording_date), 
-												self := left, self := right),
-												local), ln_fares_id, source_code[1], did, bdid, local), 
-												ln_fares_id, source_code[1], did, bdid, local);
+    transform({ recordof(src_ds), 
+        deed_file.contract_date, deed_file.recording_date, deed_file.fares_unformatted_apn, 
+        deed_file.title_company_name, deed_file.document_type_code, deed_file.document_number,              
+        deed_file.recorder_book_number, deed_file.recorder_page_number,
+        deed_file.sales_price, deed_file.first_td_loan_type_code}, 
+        self.recording_date := map(right.contract_date != '' => right.contract_date, right.recording_date), 
+        self := left, self := right),
+        local), ln_fares_id, source_code[1], did, bdid, local), 
+    ln_fares_id, source_code[1], did, bdid, local);
+
 
 // rollup ln_fares_id to an append buyer combination.
 

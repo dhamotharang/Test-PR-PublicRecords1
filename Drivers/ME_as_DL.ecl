@@ -20,13 +20,14 @@ string8 lFixDOB(string6 pMDYIn)
 
 Drivers.Layout_DL lTransform_ME_To_Common(Drivers.File_ME_Full pInput)
  := transform
-    self.dt_first_seen 				:= (unsigned8)pInput.append_PROCESS_DATE div 100;
-    self.dt_last_seen 				:= (unsigned8)pInput.append_PROCESS_DATE div 100;
-    self.dt_vendor_first_reported 	:= (unsigned8)pInput.append_PROCESS_DATE div 100;
-    self.dt_vendor_last_reported 	:= (unsigned8)pInput.append_PROCESS_DATE div 100;
-    self.orig_state 				:= 'ME';
-
-	self.dob 						:= (unsigned4)lFixDOB(pInput.orig_DOB);
+  self.dt_first_seen 				:= (unsigned8)pInput.append_PROCESS_DATE div 100;
+  self.dt_last_seen 				:= (unsigned8)pInput.append_PROCESS_DATE div 100;
+  self.dt_vendor_first_reported 	:= (unsigned8)pInput.append_PROCESS_DATE div 100;
+  self.dt_vendor_last_reported 	:= (unsigned8)pInput.append_PROCESS_DATE div 100;
+  self.orig_state 				:= 'ME';
+ 	self.dob 						:= if(pInput.orig_DOB[7..8]<>'', 
+	                                     (unsigned4)(pInput.orig_DOB[5..8] + pInput.orig_DOB[1..2] + pInput.orig_DOB[3..4]),
+										 (unsigned4)lFixDOB(pInput.orig_DOB));
 	self.name						:= trim(pInput.orig_FName) + trim(' '+pInput.orig_MI) + trim(' '+pInput.orig_LName) + trim(' '+pInput.orig_NameSuf);
 	self.sex_flag					:= pInput.orig_Sex;
 	self.height						:= if((integer2)(pInput.orig_Height + pInput.orig_Height2)<>0,pInput.orig_Height + pInput.orig_Height2,'');
@@ -37,15 +38,23 @@ Drivers.Layout_DL lTransform_ME_To_Common(Drivers.File_ME_Full pInput)
 	self.city 						:= pInput.orig_City;
 	self.state						:= pInput.orig_State;
 	self.zip 						:= pInput.orig_Zip;
-	self.orig_expiration_date		:= if((unsigned1)pInput.orig_DLExpireDate<>0,(unsigned4)lFixMDY(pInput.orig_DLIssueDate[1..4]+pInput.orig_DLExpireDate),0);
-	self.lic_issue_date 			:= (unsigned4)lFixMDY(pInput.orig_DLIssueDate);
-	self.orig_issue_date			:= (unsigned4)lFixYMD(pInput.orig_OriginalIssueDate);
-	self.restrictions				:= lib_stringlib.stringlib.StringFilter(trim(pInput.orig_Restrictions,
+	self.orig_expiration_date		:= if((unsigned1)pInput.orig_DLExpireDate<>0 and pInput.orig_DLExpireDate[7..8] = '',(unsigned4)lFixMDY(pInput.orig_DLIssueDate[1..4]+pInput.orig_DLExpireDate),
+	                                       if((unsigned1)pInput.orig_DLExpireDate<>0 and pInput.orig_DLExpireDate[7..8] != '',
+								              (unsigned4)(pInput.orig_DLExpireDate[5..8] + pInput.orig_DLExpireDate[1..2] + pInput.orig_DLExpireDate[3..4]),
+	                                           0));
+	self.lic_issue_date 			:= if(pInput.orig_DLIssueDate[7..8]<>'', 
+										if((unsigned4)(pInput.orig_DLIssueDate[5..8] + pInput.orig_DLIssueDate[1..2] + pInput.orig_DLIssueDate[3..4]) < (unsigned4)Drivers.Version_Development,
+										   (unsigned4)(pInput.orig_DLIssueDate[5..8] + pInput.orig_DLIssueDate[1..2] + pInput.orig_DLIssueDate[3..4]), 0),
+											if((unsigned4)lFixMDY(pInput.orig_DLIssueDate) < (unsigned4)Drivers.Version_Development, (unsigned4)lFixMDY(pInput.orig_DLIssueDate), 0));
+	self.orig_issue_date			:= if(pInput.orig_OriginalIssueDate[7..8]<>'',
+											(unsigned4)(pInput.orig_OriginalIssueDate[5..8] + pInput.orig_OriginalIssueDate[1..2] + pInput.orig_OriginalIssueDate[3..4]),
+												(unsigned4)lFixYMD(pInput.orig_OriginalIssueDate));
+	self.restrictions				   := lib_stringlib.stringlib.StringFilter(trim(pInput.orig_Restrictions,
 																				 all
 																				),
 																			'ABCDEFGMQRSW'
 																		   );
-	self.lic_endorsement 			:= lib_stringlib.StringLib.stringfilter(trim(pInput.orig_Endorsements+
+	self.lic_endorsement 			 := lib_stringlib.StringLib.stringfilter(trim(pInput.orig_Endorsements+
 																				 pInput.orig_Endorsements2+
 																				 pInput.orig_Endorsements3+
 																				 pInput.orig_Endorsements4+
@@ -59,10 +68,8 @@ Drivers.Layout_DL lTransform_ME_To_Common(Drivers.File_ME_Full pInput)
 																			    ),
 																			 'HIJKLNPTXYZ'
 																			);
-
 	self.license_type 				:= pInput.orig_DLClass;
 	self.dl_number					:= pInput.orig_HistoryNum;
-
 	self.title 						:= pInput.clean_name_prefix;
 	self.fname 						:= pInput.clean_name_first;		                             
 	self.mname 						:= pInput.clean_name_middle;		                             
@@ -99,4 +106,10 @@ Drivers.Layout_DL lTransform_ME_To_Common(Drivers.File_ME_Full pInput)
 	self.issuance 					:= ''; // had to include explcitly because of...
 end;
 
-export ME_as_DL := project(Drivers.File_ME_Full, lTransform_ME_To_Common(left));
+ME_Transform := project(Drivers.File_ME_Full, lTransform_ME_To_Common(left));
+ME_Sort := sort(ME_Transform, dl_number, name, addr1, city, lic_issue_date, -orig_expiration_date);
+export ME_as_DL := dedup(ME_Sort, dl_number, name, addr1, city, lic_issue_date) : persist(Drivers.Cluster + 'Persist::DrvLic_ME_as_DL');;
+
+//export ME_as_DL := project(Drivers.File_ME_Full, lTransform_ME_To_Common(left));
+
+

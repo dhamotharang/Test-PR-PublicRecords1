@@ -1,4 +1,4 @@
-import _control,ut,fieldstats,STRATA;
+import ut,STRATA,PromoteSupers;
 
 export proc_build_base(string version_date) := function
 
@@ -192,7 +192,7 @@ export proc_build_base(string version_date) := function
 																				local
 																				);
 
-  ut.MAC_SF_BuildProcess(dHuntCCW_DenormAddr_RollUp, '~thor_data400::base::emerges_hunt_vote_ccw', buildBaseFiles,,,true)
+  PromoteSupers.MAC_SF_BuildProcess(dHuntCCW_DenormAddr_RollUp, '~thor_data400::base::emerges_hunt_vote_ccw', buildBaseFiles,,,true)
 
 	addPostBaseSuper	:=	sequential(	fileservices.startsuperfiletransaction(),
 																			fileservices.addsuperfile('~thor_data400::in::emerges::sprayed::hunt_delete', '~thor_data400::in::emerges::sprayed::hunt_father', 0, true),
@@ -208,9 +208,9 @@ export proc_build_base(string version_date) := function
 																			fileservices.addsuperfile('~thor_data400::in::emerges::hunt_ccw_father', '~thor_data400::in::emerges::hunt_ccw', 0, true),
 																			fileservices.clearsuperfile('~thor_data400::in::emerges::hunt_ccw'),
 																			fileservices.finishsuperfiletransaction(),
-																			fileservices.clearsuperfile('~thor_data400::in::emerges::sprayed::hunt_delete', true),
-																			fileservices.clearsuperfile('~thor_data400::in::emerges::sprayed::ccw_delete', true),
-																			fileservices.clearsuperfile('~thor_data400::in::emerges::hunt_ccw_delete', true)
+																			fileservices.RemoveOwnedSubFiles('~thor_data400::in::emerges::sprayed::hunt_delete', true),
+																			fileservices.RemoveOwnedSubFiles('~thor_data400::in::emerges::sprayed::ccw_delete', true),
+																			fileservices.RemoveOwnedSubFiles('~thor_data400::in::emerges::hunt_ccw_delete', true)
 																	)	:	success(output('Post-build superfile manipulation complete')),
 																			failure(output('Post-build superfile manipulation failed'));
 	

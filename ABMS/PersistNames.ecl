@@ -6,10 +6,11 @@ EXPORT PersistNames := MODULE
 
 	EXPORT AppendIdsDid	   := root + 'Append_Ids::Did';
 	EXPORT AppendIdsBdid   := root + 'Append_Ids::Bdid';
-
+  EXPORT AppendIdsLnpid  := root + 'Append_Ids::Lnpid';
 	EXPORT All := DATASET([
 												  {AppendIdsDid}
 												 ,{AppendIdsBdid}
+												 ,{AppendIdsLnpid}
 												], lib_fileservices.FsLogicalFileNameRecord);
 
 END;

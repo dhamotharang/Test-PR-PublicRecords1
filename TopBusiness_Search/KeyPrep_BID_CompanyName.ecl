@@ -6,9 +6,11 @@ export KeyPrep_BID_CompanyName(
 	boolean pUseOtherEnvironment = false) := function
 
 	// Remove property addresses - we don't want to find BIDs using property addresses
-	filtered := in_base(address_type != TopBusiness.Constants.Address_Types.PROPERTY);
+	filtered := in_base(address_type not in [TopBusiness.Constants.Address_Types.PROPERTY,TopBusiness.Constants.Address_Types.REGAGENT]);
 	
 	TopBusiness.Macro_CleanCompanyName(filtered,company_name,company_name,cleaned);
+	
+	cleanedpersist := cleaned;
 	
 	pattern p_word := pattern('[^ ]+');
 	pattern p_ws := pattern('[ ]+');
@@ -16,7 +18,7 @@ export KeyPrep_BID_CompanyName(
 	pattern p_find := (p_phrase after (first or p_ws)) before (p_ws or last);
 	
 	ds_parsed := parse(
-		dedup(dedup(project(cleaned,
+		dedup(dedup(project(cleanedpersist,
 			transform(KeyLayouts.CompanyName,
 				self.core := left.segment_bid in TopBusiness.Constants.SET_CORE_SEGMENTS,
 				self:=left,self:=[])),record,all,local),record,all),

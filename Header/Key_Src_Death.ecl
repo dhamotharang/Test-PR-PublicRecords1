@@ -1,6 +1,6 @@
 Import Data_Services, header,data_services;
 
-dDeath_as_Source	:=	header.Death_as_Source(,true);
+dDeath_as_Source	:=	header.Files_SeqdSrc().DE;
 
 mac_key_src(dDeath_as_Source, header.Layout_Did_Death_MasterV2 - [state_death_flag,death_rec_src], 
 						death_child, 

@@ -1,34 +1,38 @@
-import ut, _control;
+IMPORT ut, _control, tools;
 
-export proc_build_ia_sales_tax_BDID_all(string filedate) := function
+EXPORT proc_build_ia_sales_tax_BDID_all(STRING pfiledate) := FUNCTION
 
 //Spray File
-sprayfile := FileServices.SprayFixed(_control.IPAddress.edata10
-									,'/prod_data_build_10/production_data/business_headers/ia_sales_tax/out/ia_sales_tax.d00'
-									,813
-									, 'thor400_92',
-									'~thor_data400::in::ia::'+filedate+'::sales_tax_in',-1,,,true,true);
-									
+sprayfile := FileServices.SprayVariable(_control.IPAddress.bctlpedata11
+									,'/data/prod_data_build_10/production_data/business_headers/ia_sales_tax/out/ia_sales_tax.csv'
+									,,,,
+                  , tools.fun_Groupname(),
+									'~thor_data400::in::ia::sprayed::' + pfiledate + '::sales_tax',-1,,,TRUE,TRUE,TRUE);
+
 //Superfile Transactions
-superfile_transac := sequential(fileservices.addsuperfile('~thor_data400::in::ia::sprayed::delete::sales_tax','~thor_data400::in::ia::sprayed::grandfather::sales_tax',,true),
+superfile_transac := SEQUENTIAL( FileServices.StartSuperFileTransaction(),
+                fileservices.addsuperfile('~thor_data400::in::ia::sprayed::delete::sales_tax','~thor_data400::in::ia::sprayed::grandfather::sales_tax',,TRUE),
 								fileservices.clearsuperfile('~thor_data400::in::ia::sprayed::grandfather::sales_tax'),
-								fileservices.addsuperfile('~thor_data400::in::ia::sprayed::grandfather::sales_tax','~thor_data400::in::ia::sprayed::father::sales_tax',,true),
+								fileservices.addsuperfile('~thor_data400::in::ia::sprayed::grandfather::sales_tax','~thor_data400::in::ia::sprayed::father::sales_tax',,TRUE),
 								fileservices.clearsuperfile('~thor_data400::in::ia::sprayed::father::sales_tax'),
-								fileservices.addsuperfile('~thor_data400::in::ia::sprayed::father::sales_tax','~thor_data400::in::ia::sprayed::sales_tax',,true),
+								fileservices.addsuperfile('~thor_data400::in::ia::sprayed::father::sales_tax','~thor_data400::in::ia::sprayed::sales_tax',,TRUE),
 								fileservices.clearsuperfile('~thor_data400::in::ia::sprayed::sales_tax'),
-								fileservices.addsuperfile('~thor_data400::in::ia::sprayed::sales_tax','~thor_data400::in::ia::'+filedate+'::sales_tax_in'),
-								fileservices.clearsuperfile('~thor_data400::in::ia::sprayed::delete::sales_tax',true)																	
+								fileservices.addsuperfile('~thor_data400::in::ia::sprayed::sales_tax','~thor_data400::in::ia::sprayed::' + pfiledate + '::sales_tax'),
+								fileservices.clearsuperfile('~thor_data400::in::ia::sprayed::delete::sales_tax',true),
+								FileServices.FinishSuperFileTransaction()
 								);
 
 // Make BDID 
 make_bdid := govdata.Make_IA_SalesTax_BDID;
 
+
 //STRATA
 strata_counts := govdata.Strata_Population_Stats.IA_Sales_pop;
 
-retval := sequential(sprayfile
-					  ,superfile_transac
-					  ,make_bdid
-					  ,strata_counts);
-return retval;
-end;
+retval := SEQUENTIAL(sprayfile, 
+                     superfile_transac,                     
+                     make_bdid,
+				             strata_counts);
+
+RETURN retval;
+END;

@@ -1,3 +1,3 @@
-import ut;
+import ut, Data_Services;
 
-export File_Batch_Logs_Common := dataset(ut.foreign_logs + '~thor10_11::base::batch_acclogs_common', Inquiry_AccLogs.Layout.Common, thor);
+export File_Batch_Logs_Common := dataset(Data_Services.foreign_logs + 'thor100_21::base::batch_acclogs_common', Inquiry_AccLogs.Layout.Common_ThorAdditions, thor, opt);

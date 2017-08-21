@@ -123,5 +123,5 @@ dContactsWithMatchingAsBus	:=	join(dContactsOnlyDedup,asbus,
 
 export LN_Property_as_Business_Contact
  :=	dContactsWithMatchingAsBus((integer)name_score < 3, Business_Header.CheckPersonName(fname, mname, lname, name_suffix))
- :	persist('~thor_data400::persist::bushdr_ln_property_as_bus_con')
+	: persist(business_header._dataset().thor_cluster_Persists +  'persist::LN_Property::LN_Property_as_Business_Contact')
  ;

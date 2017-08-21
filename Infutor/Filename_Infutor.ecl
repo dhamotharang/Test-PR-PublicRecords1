@@ -1,1 +1,1 @@
-export Filename_Infutor := '~thor_dell400_2::in::infutor';
+export Filename_Infutor := '~thor_data400::in::infutor';

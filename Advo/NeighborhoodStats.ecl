@@ -1,8 +1,9 @@
 import address, risk_indicators;
 
+export NeighborhoodStats(dataset(Layouts.Layout_Common_Out)	pFile_Base	= Files().Base.built) := function	
 //Data Declarations
 // ADVO_BASE_PRE := advo.key_addr1;  // for building in dataland only
-ADVO_BASE_PRE := project(Files().Base.built(active_flag = 'Y'), transform(Layouts.Layout_Common_Out_k, self := left));
+ADVO_BASE_PRE := project(pFile_Base(active_flag = 'Y'), transform(Layouts.Layout_Common_Out_k, self := left));
 
 //Layouts
 layout_geolink := record
@@ -24,12 +25,8 @@ End;
 
 //Append ADVO Neighborhood Data
 layout_ADVO_Geolink addNeighborhoodAdvo(ADVO_BASE_PRE l) := TRANSFORM
-			// street_add := l.prim_range + ' ' + l.predir + ' ' + l.prim_name + ' ' + l.addr_suffix + ' ' +  l.postdir + ' ' + l.sec_range;
-			street_add := address.Addr1FromComponents(l.prim_range,l.predir,l.prim_name,l.addr_suffix,l.postdir,'',l.sec_range);
-			clean_address := Risk_Indicators.MOD_AddressClean.clean_addr(street_add, l.city_name, l.st, l.zip);
 			//build geolink for AddrRisk
-			self.geolink := clean_address[115..116]+clean_address[143..145]+clean_address[171..177];
-			
+			self.geolink := l.st+l.county+l.geo_blk;;
 			self.Neighborhood_Vacant_Properties := if(l.address_vacancy_indicator ='Y', 1,0);
 			self.Neighborhood_Business_Count := if(l.Address_Type ='0', 1,0);
 			self.Neighborhood_SFD_Count := if(l.Address_Type ='1', 1,0);
@@ -52,6 +49,7 @@ layout_ADVO_geolink rollADVO( layout_ADVO_geolink l, layout_ADVO_geolink r ) := 
 			self := l;
 		END;
 		
-Neighborhood_ADVO := rollup(sort(Neighborhood_ADVO_dist, geolink, local), rollADVO(left,right), geolink, local) : persist('temp::advo_neighborhood_stats');	
+Neighborhood_ADVO := rollup(sort(Neighborhood_ADVO_dist, geolink, local), rollADVO(left,right), geolink, local) : persist('~thor_data400::persist::advo::NeighborhoodStats');	
 
-export NeighborhoodStats := Neighborhood_ADVO;
+return Neighborhood_ADVO;
+end;

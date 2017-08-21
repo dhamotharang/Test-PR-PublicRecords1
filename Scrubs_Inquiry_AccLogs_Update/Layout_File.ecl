@@ -1,0 +1,1 @@
+EXPORT Layout_File := recordof(Scrubs_Inquiry_AccLogs_Update.In_File);

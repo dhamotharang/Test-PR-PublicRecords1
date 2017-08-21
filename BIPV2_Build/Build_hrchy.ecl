@@ -1,4 +1,4 @@
-import BIPv2_HRCHY, BIPV2_Files, DCAV2, DNB_DMI, Frandx,tools,BIPV2;
+import BIPv2_HRCHY, BIPV2_Files, DCAV2, DNB_DMI, Frandx,tools,BIPV2, BIPV2_PROXID, BIPV2_Blocklink,wk_ut,BIPV2_Tools;
 // Preprocess
 export build_hrchy(
    string                                           pversion    = BIPV2.KeySuffix
@@ -7,10 +7,27 @@ export build_hrchy(
 	,dataset(recordof(BIPV2_Files.files_hrchy.duns))  dunsd       = BIPV2_Files.files_hrchy.duns					
 	,dataset(Frandx.layouts.Base)										  frand       = BIPV2_Files.files_hrchy.fran
   ,boolean                                          pPromote2qa = true
+  ,string                              							headstring  = BIPV2_Files.files_proxid().FILE_PROXID_BUILT
   
 ) := module
-		/* ---------------------- Linking --------------------------------*/
-		shared _build			:= BIPv2_HRCHY.mod_Build(head, lncad, dunsd, frand);
+		/* ---------------------- Linking --------------------------------*/ 
+		
+		shared DATASET(BIPV2_Files.layout_proxid) ResetSomeLgid3(DATASET(BIPV2_Files.layout_proxid) ds) := FUNCTION
+		  ds_lgid:=BIPV2_Blocklink.ManualOverlinksProxID.lgid_to_reset;
+			ds_sele:=BIPV2_Blocklink.ManualOverlinksLGID3.sele_to_reset;
+			ds_all:=ds_lgid+ds_sele;
+			ds_f:=dedup(ds_all,orgid,all);
+			ds_f1:=join(BIPV2.CommonBase.ds_base, ds_f, left.orgid=right.orgid, transform({unsigned6 lgid3}, self.lgid3:=left.lgid3),lookup);
+			ds_f2:=dedup(ds_f1,lgid3,all);
+			JJ:=join(ds,ds_f2,left.lgid3=right.lgid3, transform(BIPV2_Files.layout_proxid,
+							self.lgid3 :=if(left.lgid3=right.lgid3, 0, left.lgid3);
+							self :=left), left outer, lookup);
+			return JJ;
+	  END;
+
+	  shared head1:=ResetSomeLgid3(head);
+		
+		shared _build			:= BIPv2_HRCHY.mod_Build(head1, lncad, dunsd, frand);
 		export Linking 		:= output(_build.PatchedFile,, BIPv2_HRCHY.filenames(pversion).base.logical, update, compressed);
     
     shared kys        := BIPv2_HRCHY.Keys(pversion,pLgidTable := _build.lgidtable);
@@ -56,11 +73,33 @@ export build_hrchy(
     shared doQAPromotion := if(pPromote2qa = true  ,lpromote2QA);
     
     /* ---------------------- Strata Quick ID Check --------------------------------*/
-    import BIPV2_Strata,strata;
-    export dostrata_ID_Check(boolean pIsTesting = false) := BIPV2_Strata.mac_BIP_ID_Check(head,'Hrchy','Infile',pversion,pIsTesting);
+    import BIPV2_Strata,strata,linkingtools;
+
+	  shared the_stat_ds :=BIPV2_Strata.PersistenceStats(BIPV2_Files.files_proxid().DS_PROXID_BUILT, BIPV2.CommonBase.DS_BASE,rcid,proxid);
+	
+    export dostrata_ID_Check(boolean pIsTesting = false) := BIPV2_Strata.mac_BIP_ID_Check(head1,'Hrchy','Infile',pversion,pIsTesting);
     
+    export kick_copy2_storage_thor := BIPV2_Tools.Copy2_Storage_Thor('~' + nothor(std.file.superfilecontents(headstring)[1].name),pversion,'Build_hrchy');
+
 		export runIter := 
-			sequential(dostrata_ID_Check(), parallel(DoBuild, DoStats), DoSuperFileMoves, doQAPromotion) 
+			sequential(BIPV2_Proxid._TraceBackKeys(pversion).out
+			,output('finished proxid key and super files')
+			,dostrata_ID_Check()
+			,Strata.macf_CreateXMLStats(the_stat_ds ,'BIPV2','Persistence'	,BIPV2.KeySuffix,BIPV2_Build.mod_email.emailList,'PROXID','Stats',false,false) //group on cluster_type, stat_desc
+			,output('finished strata')
+			, parallel(DoBuild, DoStats)
+			,output('finished DoBuild and DoStats')
+			, DoSuperFileMoves
+			,output('finished DoSuperFileMoves')
+			, doQAPromotion
+			,output('finished doQAPromotion')			
+			, BIPV2_Blocklink.ManualOverlinksProxID.removeLgidCandidate()
+			,output('finished proxblocklink cleanup')	
+			,BIPV2_Blocklink.ManualOverlinksLGID3.removeSeleCandidate()
+			,output('finished Lgid3blocklink cleanup')
+			,if(not wk_ut._constants.IsDev ,output(kick_copy2_storage_thor ,named('copy2_Storage_Thor__html')))  //copy orig file to storage thor			
+			
+			) 
 		: 
 			SUCCESS(mod_email.SendSuccessEmail(,'BIPv2', , 'HRCHY')), 
 			FAILURE(mod_email.SendFailureEmail(,'BIPv2', failmessage, 'HRCHY'));

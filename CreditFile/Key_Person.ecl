@@ -1,0 +1,1 @@
+export Key_Person := INDEX(File_Indic_Plus,creditfile.KeyType_Person,creditfile.KeyName_Person);

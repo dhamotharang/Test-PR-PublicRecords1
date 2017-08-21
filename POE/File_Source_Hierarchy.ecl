@@ -19,7 +19,7 @@ import MDR;
 		{MDR.sourceTools.src_PSS						,				0},
     {MDR.sourceTools.src_Spoke					,				1},
 		{MDR.sourceTools.src_Zoom						,				2},
-		{MDR.sourceTools.src_Jigsaw					,				3},
+		//{MDR.sourceTools.src_Jigsaw					,				3},  //*** Removed Jigsaw due to expiration of contract with the vendor -  as per Joe Lezcano
 		{MDR.sourceTools.src_Garnishments		,				4},
 		{MDR.sourceTools.src_AK_Corporations,				5},
 		{MDR.sourceTools.src_AL_Corporations,				5},
@@ -83,6 +83,7 @@ import MDR;
 		{MDR.sourceTools.src_Alloymedia_consumer,	  7}, // Email
 		{MDR.sourceTools.src_Thrive_LT_POE_Email,		7}, // Email data derived from Thrive LT data
 		{MDR.sourceTools.src_Thrive_PD_POE_Email,		7},	// Email data derived from Thrive PD data
+		{MDR.sourceTools.src_InfutorNare, 					7}, // Email
 		{MDR.sourceTools.src_SalesChannel,					8},
 		{MDR.sourceTools.src_Thrive_LT,	      			9},		
 		{MDR.sourceTools.src_Thrive_PD,	      			9},		

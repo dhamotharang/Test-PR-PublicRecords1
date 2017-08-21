@@ -1,6 +1,14 @@
-
-
+IMPORT	_control;
 export Constants(string filedate, boolean isFCRA = false) := module
+	//	Server IP to Spray from
+	EXPORT	serverIP	:=	IF(	_control.thisenvironment.name='Dataland',
+														'bctlpedata12.risk.regn.net',
+														'bctlpedata10.risk.regn.net');
+	
+	//	Directory to Spray from
+	EXPORT	Directory	:=	IF(	_control.thisenvironment.name='Dataland',
+														'/data/hds_180/bkv3/daily/'+filedate+'/',
+														'/data/hds_180/bkv3/daily/'+filedate+'/');
 	// autokey
 	export ak_keyname := if(isFCRA,
 													BankruptcyV2.cluster + 'key::bankruptcy::autokey::fcra::',

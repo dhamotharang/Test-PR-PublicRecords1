@@ -1,15 +1,15 @@
-/*2011-01-19T15:55:55Z (dlenz)
-C:\Documents and Settings\eucf817\Application Data\LexisNexis\querybuilder\dlenz\Dataland\American_student_list\Proc_build_base\2011-01-19T15_55_55Z.ecl
-*/
 import ut,
 			address,
+			PromoteSupers,
 			idl_header,
 			Header_Slimsort,
 			AID,
  		  DID_Add,
 			lib_StringLib,
 			Census_Data,
-			Watchdog;
+			Watchdog,
+			mdr			;
+			
 
 	//Map the incoming record fields
 	Layout_American_Student_Base_v2	tMapInput(Layout_American_Student_In pInput)
@@ -31,10 +31,13 @@ import ut,
 																								 TRIM(pInput.ADDRESS_TYPE,left,right) = 'P' => 'Post Office Box',
 																								 TRIM(pInput.ADDRESS_TYPE,left,right) = 'S' => 'Single Family Dwelling',
 																								 '');
-				self.GENDER_CODE									:= pInput.GENDER;
-				self.GENDER   			     					:= IF(TRIM(pInput.GENDER,left,right) = '1', 'MALE',
-																						 IF(TRIM(pInput.GENDER,left,right) = '2', 'FEMALE', 
-																						 ''));
+				self.GENDER_CODE									:= map(trim(pinput.GENDER,left,right) in ['1','M'] => '1',
+																			 trim(pinput.GENDER,left,right) in ['2','F'] => '2',
+																			 trim(pinput.GENDER,left,right) = 'U' => '',
+																			 '');
+				self.GENDER   			     					:= if(trim(self.GENDER_CODE,left,right) = '1', 'MALE',
+											  if(trim(self.GENDER_CODE,left,right) = '2', 'FEMALE', 
+											  ''));
 				self.DOB_FORMATTED        				:= MAP(LENGTH(TRIM(pInput.BIRTH_DATE,left,right)) = 2 => if (TRIM(pInput.BIRTH_DATE,left,right) > '40', 
 																										 '19' + TRIM(pInput.BIRTH_DATE,left,right) + '0000',
 																										 '20' + TRIM(pInput.BIRTH_DATE,left,right) + '0000'),
@@ -53,29 +56,79 @@ import ut,
 																								 TRIM(pInput.COLLEGE_TYPE,left,right) = 'P' => 'Private School',
 																								 TRIM(pInput.COLLEGE_TYPE,left,right) = 'R' => 'Church/Religious School',
 																						'');
-				self.HEAD_OF_HOUSEHOLD_GENDER_CODE	:=	pInput.HEAD_OF_HOUSEHOLD_GENDER;
-				self.HEAD_OF_HOUSEHOLD_GENDER   	:= IF(TRIM(pInput.HEAD_OF_HOUSEHOLD_GENDER,left,right) = '1', 'MALE',
-																							IF(TRIM(pInput.HEAD_OF_HOUSEHOLD_GENDER,left,right) = '2', 'FEMALE', 
-																						 ''));
-				self.INCOME_LEVEL_CODE        		:= pInput.INCOME_LEVEL;
-				self.INCOME_LEVEL        					:= MAP(TRIM(pInput.INCOME_LEVEL,left,right) = 'A' => '$1-$9,999',
-																								 TRIM(pInput.INCOME_LEVEL,left,right) = 'B' => '$10,000-$19,999',
-																								 TRIM(pInput.INCOME_LEVEL,left,right) = 'C' => '$20,000-$29,999',
-																								 TRIM(pInput.INCOME_LEVEL,left,right) = 'D' => '$30,000-$39,999',
-																								 TRIM(pInput.INCOME_LEVEL,left,right) = 'E' => '$40,000-$49,999',
-																								 TRIM(pInput.INCOME_LEVEL,left,right) = 'F' => '$50,000-$59,999',
-																								 TRIM(pInput.INCOME_LEVEL,left,right) = 'G' => '$60,000-$69,999',
-																								 TRIM(pInput.INCOME_LEVEL,left,right) = 'H' => '$70,000-$79,999',
-																								 TRIM(pInput.INCOME_LEVEL,left,right) = 'I' => '$80,000-$89,999',
-																								 TRIM(pInput.INCOME_LEVEL,left,right) = 'J' => '$90,000-$99,999',
-																								 TRIM(pInput.INCOME_LEVEL,left,right) = 'K' => '$100,000 + Over',
-																								'');
-				self.FULL_NAME 													:= pInput.NAME;																								
+				self.COLLEGE_MAJOR       			:= map(trim(pinput.COLLEGE_MAJOR,left,right) in ['0100','0101','0102','0103','0104','0105','0106','0108','0109','0110','0111','0112'] => 'A',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0200','0201','0202','0203','0208','0209','0210','0212','0215'] => 'B',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0300','0301','0302','0303','0304','0305','0306'] => 'C',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0400','0401','0402','0403','0404','0405','0406','0407','0409','0410'] => 'D',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0500','0501','0502','0503','0504','0505','0507','0510','0511','0514','0515','0516','0517','0519','0520','0522'] => 'E',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0600','0601','0602','0603','0604'] => 'F',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['1000','1001','1002','1003'] => 'G',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['1100','1101','1102','1103','1104','1105'] => 'H',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['1200','1201','1202','1203'] => 'I',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0900','0901','0902','0903','0904','0905','0906','0907','0908','0909','1300','1301','1302','1303','1304','1305','1306','1307','1308','1309','1310'] => 'J',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['1400'] => 'K',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0506'] => 'L',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['1600','1601','1602','1603','1604','1605','1606','1607','1608','1609','1610','1611','1612','1613','1614'] => 'M',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0408'] => 'N',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0702'] => 'O',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0204'] => 'P',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0107'] => 'Q',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0205'] => 'R',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0206'] => 'S',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0509','0512','0513','0518','0521'] => 'T',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['1500','1501','1502','1503','1504','1505','1700','1800','1801','1802','1900','1901','1902','1903','1904'] => 'U',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0508'] => 'V',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0700','0701','0703','0704','0705','0706','0707','0708'] => 'W',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0800','0801','0802','0803','0804','0805'] => 'Y',
+																			 trim(pinput.COLLEGE_MAJOR,left,right) in ['0207','0211','0213','0214'] => 'Z','');
+				self.NEW_COLLEGE_MAJOR := pinput.COLLEGE_MAJOR;
+				self.HEAD_OF_HOUSEHOLD_GENDER_CODE	:= map(trim(pinput.HEAD_OF_HOUSEHOLD_GENDER,left,right) in ['1','M'] => '1',
+																			 trim(pinput.HEAD_OF_HOUSEHOLD_GENDER,left,right) in ['2','F'] => '2',
+																			 trim(pinput.HEAD_OF_HOUSEHOLD_GENDER,left,right) = 'U' => '',
+																			 '');
+				self.HEAD_OF_HOUSEHOLD_GENDER   	:= if(trim(self.HEAD_OF_HOUSEHOLD_GENDER_CODE,left,right) = '1', 'MALE',
+											  if(trim(self.HEAD_OF_HOUSEHOLD_GENDER_CODE,left,right) = '2', 'FEMALE', 
+											  ''));
+				self.INCOME_LEVEL_CODE        		:= if(trim(pinput.INCOME_LEVEL,left,right)in ['K','L','M','N','O'],'K',trim(pinput.INCOME_LEVEL,left,right));
+				self.INCOME_LEVEL        					:= map(trim(pinput.INCOME_LEVEL,left,right) = 'A' => '$1-$9,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'B' => '$10,000-$19,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'C' => '$20,000-$29,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'D' => '$30,000-$39,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'E' => '$40,000-$49,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'F' => '$50,000-$59,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'G' => '$60,000-$69,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'H' => '$70,000-$79,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'I' => '$80,000-$89,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'J' => '$90,000-$99,999',
+												trim(pinput.INCOME_LEVEL,left,right) in ['K','L','M','N','O'] => '$100,000 + OVER',
+												'');
+				self.NEW_INCOME_LEVEL_CODE        		:= pinput.INCOME_LEVEL;
+				self.NEW_INCOME_LEVEL        					:= map(trim(pinput.INCOME_LEVEL,left,right) = 'A' => '$1-$9,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'B' => '$10,000-$19,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'C' => '$20,000-$29,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'D' => '$30,000-$39,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'E' => '$40,000-$49,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'F' => '$50,000-$59,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'G' => '$60,000-$69,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'H' => '$70,000-$79,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'I' => '$80,000-$89,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'J' => '$90,000-$99,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'K' => '$100,000-$124,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'L' => '$125,000-$149,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'M' => '$150,000-$174,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'N' => '$175,000-$199,999',
+												trim(pinput.INCOME_LEVEL,left,right) = 'O' => '$200,000 + OVER',
+												'');
+				self.FULL_NAME 													:= pInput.NAME;
 				self  												:= pInput;
 				self  												:= [];
 			END;
-	
+			
 	rsMappedInputFile	:=	PROJECT(File_American_student_In, tMapInput(left));
+	
+	CleanDOB	:=	PROJECT(rsMappedInputFile, transform(recordof(rsMappedInputFile),
+																							 self.dob_formatted:=if(left.dob_formatted[1..4]>thorlib.wuid()[2..5],'19'+left.dob_formatted[3..8],left.dob_formatted);
+																							 self:=left;));
 	
 	//Cleanup and format the incoming records
 	Layout_American_Student_Base_v2	tFormatInput(Layout_American_Student_Base_v2 pInput)
@@ -125,133 +178,10 @@ import ut,
 				self  															:= [];
 			END;
 	
-	rsFormattedInputFile	:=	PROJECT(rsMappedInputFile, tFormatInput(left)) + File_American_Student_DID_v2;
+	rsFormattedInputFile	:=	PROJECT(CleanDOB, tFormatInput(left));
 
-	// Add standardized LN college name
-	// Layout_American_Student_Base_v2	tAddLNCollegeName(Layout_American_Student_Base_v2 pLeft, layout_american_student_ln_college_lkp pLkp)
-		// :=
-			// TRANSFORM
-				// self.LN_COLLEGE_NAME	:=	pLkp.LN_COLLEGE_NAME;
-				// self									:=	pLeft;
-			// END
-		// ;
-	// rsFormattedInputPlusBaseFileLNCollege	:=	JOIN(rsFormattedInputFile, File_american_student_ln_college_lkp, StringLib.StringCleanSpaces(LEFT.COLLEGE_NAME) = StringLib.StringCleanSpaces(RIGHT.COLLEGE_NAME), tAddLNCollegeName(left,right), LEFT OUTER, LOOKUP);
-	
-	
-	//Add college metedata
-	Layout_American_Student_Base_v2	tAddCollegeMetadata(Layout_American_Student_Base_v2 pLeft, American_Student_list.layout_college_metadata_lkp pLkp)
-		:=
-			TRANSFORM
-				self.ln_college_name	:=	pLkp.ln_college_name;
-				self.tier							:=	pLkp.tier;
-				self.school_size_code	:=	pLkp.alloy_school_size_code;
-				self.competitive_code	:=	pLkp.alloy_competitive_code;
-				self.tuition_code			:=	pLkp.alloy_tuition_code;
-				self									:=	pLeft;
-			END;
-			
-	rsFormattedInputPlusBaseFileTiered	:=	JOIN(rsFormattedInputFile, American_Student_list.file_college_metadata_lkp, StringLib.StringCleanSpaces(LEFT.COLLEGE_NAME) = StringLib.StringCleanSpaces(RIGHT.asl_matchkey_cn), tAddCollegeMetadata(left,right), LEFT OUTER, LOOKUP);	
-	
-	//Check for orphan college_name fields
-	orphan_college_names	:=	rsFormattedInputPlusBaseFileTiered(TRIM(college_name) != '' AND TRIM(ln_college_name) = '');
-	
-	layout_college_name
-		:=
-			RECORD
-				string50        COLLEGE_NAME;
-				string1         COLLEGE_CODE;
-				string1         COLLEGE_TYPE;
-			END;
 
-	ProcessMissingCollegeName	:=	SEQUENTIAL(
-											OUTPUT(
-												DEDUP(
-													SORT(
-														DISTRIBUTE(
-															PROJECT(orphan_college_names, layout_college_name), 
-														HASH(COLLEGE_NAME)),
-													COLLEGE_NAME, LOCAL),
-												COLLEGE_NAME, LOCAL),
-											NAMED('MissingCollegeNames'), ALL
-											)
-											, fileservices.sendemail(Email_Notification_Lists.MissingCollege
-												, 'American Student List: Missing College Name'
-												, 'Please see ' + thorlib.wuid() + ' MissingCollegeNames output for details. Please use the code in American_Student_List.BWR_Update_ln_college_lkp to update the lookup file with the missing college names.')
-												);
-
-	checkOrphanNames	:=	IF(COUNT(orphan_college_names) > 0
-												, ProcessMissingCollegeName
-												, OUTPUT('No missing College Names'));
-												
-	//Check for orphan tier fields
-	orphan_tiers	:=	rsFormattedInputPlusBaseFileTiered(TRIM(college_name) != '' AND tier = '0');
 	
-	ProcessMissingCollegeTier	:=	SEQUENTIAL(
-											OUTPUT(
-												DEDUP(
-													SORT(
-														DISTRIBUTE(
-															PROJECT(orphan_tiers, layout_college_name), 
-														HASH(college_name)),
-													college_name, LOCAL),
-												college_name, LOCAL),
-											NAMED('MissingCollegeTiers'), ALL
-											)
-											, fileservices.sendemail(Email_Notification_Lists.MissingCollege
-												, 'American Student List: Missing College Tier'
-												, 'Please see ' + thorlib.wuid() + ' MissingCollegeTiers output for details.')
-												);
-
-	checkOrphanTiers	:=	IF(COUNT(orphan_tiers) > 0
-												, ProcessMissingCollegeTier
-												, OUTPUT('No missing College Tiers'));
-	
-	Layout_American_Student_Base_v2	tReKeyBase(Layout_American_Student_Base_v2 pInput)
-		:=
-			TRANSFORM
-				self.KEY                        		:= hash64(stringlib.StringToUpperCase(trim
-																																									(TRIM(pInput.LAST_NAME,left,right) + 
-																																										TRIM(pInput.FIRST_NAME,left,right) +
-																																										IF(pInput.DOB_FORMATTED = '',
-																																											lib_stringlib.stringlib.stringfilter(
-																																												TRIM(pInput.Z5,left,right)
-																																												,'0123456789'),
-																																											lib_stringlib.stringlib.stringfilter(
-																																												TRIM(pInput.DOB_FORMATTED,left,right)
-																																										,'0123456789')))));
-				self	:= pInput;
-			END;
-			
-	rsKeyedFormattedPlusBase	:=	PROJECT(rsFormattedInputPlusBaseFileTiered, tReKeyBase(left));
-	
-  rsFormattedPlusBaseDist := distribute(rsKeyedFormattedPlusBase, key);
-	
-	rsFormattedPlusBaseSort := sort(rsFormattedPlusBaseDist,FIRST_NAME, LAST_NAME, ADDRESS_1, ADDRESS_2, ZIP, -Process_Date,local);
-	
-	American_student_list.Layout_American_Student_Base_v2  rollupXform(American_student_list.Layout_American_Student_Base_v2 L, American_student_list.Layout_American_Student_Base_v2 R) := transform
-		self.Process_Date    := if(L.Process_Date > R.Process_Date, L.Process_Date, R.Process_Date);
-		self.Date_First_Seen := if(L.Date_First_Seen > R.Date_First_Seen, R.Date_First_Seen, L.Date_First_Seen);
-		self.Date_Last_Seen  := if(L.Date_Last_Seen  < R.Date_Last_Seen,  R.Date_Last_Seen,  L.Date_Last_Seen);
-		self.Date_Vendor_First_Reported := if(L.Date_Vendor_First_Reported > R.Date_Vendor_First_Reported, R.Date_Vendor_First_Reported, L.Date_Vendor_First_Reported);
-		self.Date_Vendor_Last_Reported  := if(L.Date_Vendor_Last_Reported  < R.Date_Vendor_Last_Reported,  R.Date_Vendor_Last_Reported, L.Date_Vendor_Last_Reported);
-		self.Age  := if(L.Process_Date > R.Process_Date, L.AGE,R.AGE);
-		self.COUNTY_NAME := if(R.COUNTY_NAME != '',R.COUNTY_NAME, L.COUNTY_NAME);
-		self := L;
-	end;
-
-  rsFormattedPlusBaseRollup := rollup(rsFormattedPlusBaseSort,rollupXform(LEFT,RIGHT),
-			LEFT.KEY = RIGHT.KEY AND
-			LEFT.COLLEGE_NAME[1..23] = RIGHT.COLLEGE_NAME[1..23] AND
-			// LEFT.COLLEGE_MAJOR = RIGHT.COLLEGE_MAJOR AND
-			(LEFT.COLLEGE_MAJOR != '' AND RIGHT.COLLEGE_MAJOR = '' OR (LEFT.COLLEGE_MAJOR = RIGHT.COLLEGE_MAJOR AND LEFT.COLLEGE_MAJOR != '' AND RIGHT.COLLEGE_MAJOR != '') OR LEFT.COLLEGE_MAJOR = '' AND RIGHT.COLLEGE_MAJOR = '') AND
-			// LEFT.TELEPHONE = RIGHT.TELEPHONE AND
-			(LEFT.TELEPHONE != '' AND RIGHT.TELEPHONE = '' OR (LEFT.TELEPHONE = RIGHT.TELEPHONE AND LEFT.TELEPHONE != '' AND RIGHT.TELEPHONE != '') OR LEFT.TELEPHONE = '' AND RIGHT.TELEPHONE = '') AND
-			LEFT.FIRST_NAME = RIGHT.FIRST_NAME AND
-			LEFT.LAST_NAME = RIGHT.LAST_NAME AND
-			LEFT.ADDRESS_1 = RIGHT.ADDRESS_1 AND
-			LEFT.ADDRESS_2 = RIGHT.ADDRESS_2,						
-	local);
-
 								 
 	unsigned4 lAIDFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
 
@@ -264,7 +194,7 @@ import ut,
 	unitMatchRegexString	:=	'#|APARTMENT|APT|BASEMENT|BLDG|BSMT|BUILDING|DEPARTMENT|DEPT|FL|FLOOR|FRNT|FRONT|HANGER|HNGR|KEY|LBBY|LOBBY|LOT|LOWER|LOWR|OFC|OFFICE|PENTHOUSE|PH|PIER|REAR|RM|ROOM|SIDE|SLIP|SPACE|SPC|STE|STOP|SUITE|TRAILER|TRLR|UNIT|UPPER|UPPR';
 
 	layout_AIDClean_prep tProjectAIDClean(Layout_American_Student_Base_v2 pInput) := TRANSFORM
-		clean_name:= Address.CleanPersonFML73(TRIM(pInput.full_name));
+		clean_name:= Address.CleanPersonFML73(TRIM(pInput.FULL_NAME));//
 		self.title				:=	clean_name[1..5];
 		self.fname				:=	clean_name[6..25];
 		self.mname				:=	clean_name[26..45];
@@ -272,16 +202,16 @@ import ut,
 		self.name_suffix	:=	clean_name[66..70];
 		self.name_score		:=	clean_name[71..73];
 		self.Append_Prep_Address_Situs				:=	IF(REGEXFIND(unitMatchRegexString, pInput.address_1),
-																									ut.fn_addr_clean_prep(pInput.address_2 + pInput.address_1, 'first'),
-																									ut.fn_addr_clean_prep(pInput.address_1 + pInput.address_2, 'first')
+																									Address.fn_addr_clean_prep(pInput.address_2 + pInput.address_1, 'first'),
+																									Address.fn_addr_clean_prep(pInput.address_1 + pInput.address_2, 'first')
 																									);
-		self.Append_Prep_Address_Last_Situs	:=	ut.fn_addr_clean_prep(pInput.city
+		self.Append_Prep_Address_Last_Situs	:=	Address.fn_addr_clean_prep(pInput.city
 																							+	IF(pInput.city <> '',', ','') + pInput.state
 																							+	' ' + pInput.z5, 'last');
 		self := pInput;
 	END;
 
-	rsAIDClean := PROJECT(rsFormattedPlusBaseRollup ,tProjectAIDClean(LEFT));
+	rsAIDClean := PROJECT(rsFormattedInputFile ,tProjectAIDClean(LEFT));
 						
 	AID.MacAppendFromRaw_2Line(rsAIDClean,Append_Prep_Address_Situs, Append_Prep_Address_Last_Situs, RawAID,
 																											rsCleanAID, lAIDFlags);
@@ -318,8 +248,11 @@ import ut,
 		
 	END;
 	
-	rsCleanAIDGood := PROJECT(rsCleanAID, tProjectClean(LEFT)) : INDEPENDENT;
-
+	rsCleanAIDGood := PROJECT(rsCleanAID, tProjectClean(LEFT)) + American_student_list.File_American_Student_DID_v2;
+	
+	
+  
+	
 	//Flip names before DID process
 	ut.mac_flipnames(rsCleanAIDGood,fname,mname,lname,rsAIDCleanFlipNames);
 
@@ -335,7 +268,7 @@ import ut,
 
 	did_Add.MAC_Match_Flex(rsCleanAIDSource, matchset,
 													 '', DOB_FORMATTED, fname, mname, lname, name_suffix, 
-													prim_range, prim_name, sec_range, z5, st, TELEPHONE,
+													prim_range, prim_name, sec_range, zip, st, TELEPHONE,
 													did,   			
 													src_rec, 
 													false, did_score_field,	//these should default to zero in definition
@@ -343,7 +276,7 @@ import ut,
 													rsCleanAID_DID,true,src);
 
 	did_add.MAC_Add_SSN_By_DID(rsCleanAID_DID, did, ssn, rsCleanAID_DID_SSN)
-	rsCleanAID_DID_SSN_final := PROJECT(rsCleanAID_DID_SSN, Layout_American_Student_Base_v2);
+	rsCleanAID_DID_SSN_final := PROJECT(rsCleanAID_DID_SSN, TRANSFORM(Layout_American_Student_Base_v2, self.source := left.src, self := left));
 	
 	//Re-populate ace_fips_st and fips_county by parsing the couty field
 	Layout_American_Student_Base_v2 tParseCounty(rsCleanAID_DID_SSN_final pInput) := TRANSFORM
@@ -353,32 +286,282 @@ import ut,
 	END;
 	
 	rsCleanAID_DID_SSN_final_ParsedCnty := PROJECT(rsCleanAID_DID_SSN_final, tParseCounty(LEFT));
+	
+		//DF17703 - Blank out DOB if it does not match the DOB in best file
+	best_file 									 := watchdog.File_Best;
+
+	//Dates are considered the same if 
+	//	1. MM DD YYYY are present and the same
+	//	2. One or both dates are partial, and the present part (YYYY, or YYYYMM) match
+	boolean isSameDOB(integer4 best_dob_int, string8 asl_dob) := function
+		best_dob				:= (STRING8) best_dob_int;
+		//determine how many chars is used to match
+		asl_dob_match 	:= map(best_dob[5..]='0000' or asl_dob[5..]='0000' => asl_dob[..4],
+													 best_dob[7..]='00'   or asl_dob[7..]='00'   => asl_dob[..6],
+													 asl_dob);
+		best_dob_match	:= map(best_dob[5..]='0000' or asl_dob[5..]='0000' => best_dob[..4],
+													 best_dob[7..]='00'   or asl_dob[7..]='00'   => best_dob[..6],
+													 best_dob);
+		result					:=	IF(REGEXFIND('^'+asl_dob_match,best_dob_match),true,false);
+		RETURN result;
+	END;
+
+	American_student_list.layout_american_student_base_v2 fixDOB(rsCleanAID_DID_SSN_final_ParsedCnty L, best_file R) := TRANSFORM
+
+		clearASLDOB							:= IF(R.dob<>0 and NOT isSameDOB(R.dob, L.dob_formatted), TRUE, FALSE);
+		SELF.birth_date		 			:= IF(R.dob=0,'',if(clearASLDOB,'',L.birth_date));
+		SELF.dob_formatted 			:= IF(R.dob=0,'',if(clearASLDOB,'',L.dob_formatted));
+		SELF 										:= L;
+
+	END; 
+
+	//
+		NewRecs:=rsCleanAID_DID_SSN_final_ParsedCnty(process_date=thorlib.wuid()[2..9]);
+		OldRecs:=rsCleanAID_DID_SSN_final_ParsedCnty(process_date<>thorlib.wuid()[2..9]);
+	
+	rsFormattedCleanDOB := join(distribute(NewRecs(did<>0 and birth_date<>''),did),
+																			 distribute(best_file,did),
+																			 left.did=right.did, 
+																			 fixDOB(left,right),
+																			 LEFT OUTER,KEEP(1), LOCAL);
+
+	rsFormattedFixDOB	:= 	OldRecs + NewRecs(did=0 OR birth_date='') + rsFormattedCleanDOB;
+	
+
+	//Add college metedata
+	Layout_American_Student_Base_v2	tAddCollegeMetadata(Layout_American_Student_Base_v2 pLeft, American_Student_list.layout_college_metadata_lkp pLkp)
+		:=
+			TRANSFORM
+				self.ln_college_name	:=	pLkp.ln_college_name;
+				self.tier							:=	pLkp.tier;
+				self.school_size_code	:=	pLkp.alloy_school_size_code;
+				self.competitive_code	:=	pLkp.alloy_competitive_code;
+				self.tuition_code			:=	pLkp.alloy_tuition_code;
+				//Assign tierv20 data
+				self.tier2						:=	pLkp.tierv20;
+				self									:=	pLeft;
+			END;
+			
+	rsFormattedInputPlusBaseFileTiered	:=	JOIN(rsFormattedFixDOB, American_Student_list.file_college_metadata_lkp, StringLib.StringCleanSpaces(LEFT.COLLEGE_NAME) != '' AND StringLib.StringCleanSpaces(LEFT.COLLEGE_NAME) = StringLib.StringCleanSpaces(RIGHT.asl_matchkey_cn), tAddCollegeMetadata(left,right), LEFT OUTER, LOOKUP);	
+	
+	//Check for orphan college_name fields
+	orphan_college_names	:=	rsFormattedInputPlusBaseFileTiered(TRIM(college_name) != '' AND TRIM(ln_college_name) = '');
+	
+	layout_college_name
+		:=
+			RECORD
+				string50        COLLEGE_NAME;
+				string1         COLLEGE_CODE;
+				string1         COLLEGE_TYPE;
+			END;
+
+	ProcessMissingCollegeName	:=	SEQUENTIAL(
+											OUTPUT(
+												DEDUP(
+													SORT(
+														DISTRIBUTE(
+															PROJECT(orphan_college_names, layout_college_name), 
+														HASH(COLLEGE_NAME)),
+													COLLEGE_NAME, LOCAL),
+												COLLEGE_NAME, LOCAL),
+											NAMED('MissingCollegeNames'), ALL
+											)
+											, fileservices.sendemail(Email_Notification_Lists.MissingCollege
+												, 'American Student List: Missing College Name'
+												, 'Please see ' + thorlib.wuid() + ' MissingCollegeNames output for details. Please use the code in American_Student_List.BWR_Update_ln_college_lkp to update the lookup file with the missing college names.')
+												);
+
+	checkOrphanNames	:=	IF(COUNT(orphan_college_names) > 0
+												, ProcessMissingCollegeName
+												, OUTPUT('No missing College Names'));
+												
+	//Check for orphan tier fields
+	orphan_tiers	:=	rsFormattedInputPlusBaseFileTiered(TRIM(college_name) != '' AND (tier = '0' OR tier = ''));
+	
+	ProcessMissingCollegeTier	:=	SEQUENTIAL(
+											OUTPUT(
+												DEDUP(
+													SORT(
+														DISTRIBUTE(
+															PROJECT(orphan_tiers, layout_college_name), 
+														HASH(college_name)),
+													college_name, LOCAL),
+												college_name, LOCAL),
+											NAMED('MissingCollegeTiers'), ALL
+											)
+											, fileservices.sendemail(Email_Notification_Lists.MissingCollege
+												, 'American Student List: Missing College Tier'
+												, 'Please see ' + thorlib.wuid() + ' MissingCollegeTiers output for details.')
+												);
+
+	checkOrphanTiers	:=	IF(COUNT(orphan_tiers) > 0
+												, ProcessMissingCollegeTier
+												, OUTPUT('No missing College Tiers'));
+	
+	//ReKey
+	PriorityLayout:=record
+		Layout_American_Student_Base_v2;
+		string flag;
+	end;
+	PriorityLayout	tReKeyBase(Layout_American_Student_Base_v2 pInput)
+		:=
+			TRANSFORM
+				self.KEY                        		:= hash64(stringlib.StringToUpperCase(trim
+																																									(TRIM(pInput.LAST_NAME,left,right) + 
+																																										TRIM(pInput.FIRST_NAME,left,right) +
+																																										IF(pInput.DOB_FORMATTED = '',
+																																											lib_stringlib.stringlib.stringfilter(
+																																												TRIM(pInput.Z5,left,right)
+																																												,'0123456789'),
+																																											lib_stringlib.stringlib.stringfilter(
+																																												TRIM(pInput.DOB_FORMATTED,left,right)
+																																										,'0123456789')))));
+				self.flag:=if(pInput.file_type='M','0','1');
+				self	:= pInput;
+			END;
+			
+	
+  rsKeyedFormattedPlusBase	:=	PROJECT(rsFormattedInputPlusBaseFileTiered, tReKeyBase(left));
+	
+	rsFormattedPlusBaseDist := distribute(rsKeyedFormattedPlusBase, hash(key));
+	
+	rsFormattedPlusBaseSort := sort(rsFormattedPlusBaseDist,key,-COLLEGE_NAME, -COLLEGE_MAJOR, FIRST_NAME, LAST_NAME,prim_range,prim_name,sec_range,z5,-telephone, -Process_Date,-flag,local);
+	output(rsFormattedPlusBaseSort,named('PreRollup'));
+	PriorityLayout  rollupXform(PriorityLayout L, PriorityLayout R) := transform
+		self.Process_Date    := if(L.Process_Date > R.Process_Date, L.Process_Date, R.Process_Date);
+		self.Date_First_Seen := if(L.Date_First_Seen > R.Date_First_Seen, R.Date_First_Seen, L.Date_First_Seen);
+		self.Date_Last_Seen  := if(L.Date_Last_Seen  < R.Date_Last_Seen,  R.Date_Last_Seen,  L.Date_Last_Seen);
+		self.Date_Vendor_First_Reported := if(L.Date_Vendor_First_Reported > R.Date_Vendor_First_Reported, R.Date_Vendor_First_Reported, L.Date_Vendor_First_Reported);
+		self.Date_Vendor_Last_Reported  := if(L.Date_Vendor_Last_Reported  < R.Date_Vendor_Last_Reported,  R.Date_Vendor_Last_Reported, L.Date_Vendor_Last_Reported);
+		self.COUNTY_NAME := if(R.COUNTY_NAME != '',R.COUNTY_NAME, L.COUNTY_NAME);
+		self.COLLEGE_NAME := if(R.COLLEGE_NAME != '',R.COLLEGE_NAME, L.COLLEGE_NAME);
+		self.COLLEGE_MAJOR := if(R.COLLEGE_MAJOR != '',R.COLLEGE_MAJOR, L.COLLEGE_MAJOR);
+		self.TELEPHONE := if(R.TELEPHONE != '',R.TELEPHONE, L.TELEPHONE);
+		Self.GENDER_CODE	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.GENDER_CODE,left,right)='',R.GENDER_CODE,L.GENDER_CODE),
+																if(trim(R.GENDER_CODE,left,right)='',L.GENDER_CODE,R.GENDER_CODE));
+		Self.GENDER	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.GENDER,left,right)='',R.GENDER,L.GENDER),
+																if(trim(R.GENDER,left,right)='',L.GENDER,R.GENDER));
+		Self.AGE	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.AGE,left,right)='',R.AGE,L.AGE),
+																if(trim(R.AGE,left,right)='',L.AGE,R.AGE));
+		Self.LN_COLLEGE_NAME	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.LN_COLLEGE_NAME,left,right)='',R.LN_COLLEGE_NAME,L.LN_COLLEGE_NAME),
+																if(trim(R.LN_COLLEGE_NAME,left,right)='',L.LN_COLLEGE_NAME,R.LN_COLLEGE_NAME));
+		Self.NEW_COLLEGE_MAJOR	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.NEW_COLLEGE_MAJOR,left,right)='',R.NEW_COLLEGE_MAJOR,L.NEW_COLLEGE_MAJOR),
+																if(trim(R.NEW_COLLEGE_MAJOR,left,right)='',L.NEW_COLLEGE_MAJOR,R.NEW_COLLEGE_MAJOR));
+		Self.CLASS	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.CLASS,left,right)='',R.CLASS,L.CLASS),
+																if(trim(R.CLASS,left,right)='',L.CLASS,R.CLASS));
+		Self.COLLEGE_CLASS	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.COLLEGE_CLASS,left,right)='',R.COLLEGE_CLASS,L.COLLEGE_CLASS),
+																if(trim(R.COLLEGE_CLASS,left,right)='',L.COLLEGE_CLASS,R.COLLEGE_CLASS));
+		Self.COLLEGE_CODE	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.COLLEGE_CODE,left,right)='',R.COLLEGE_CODE,L.COLLEGE_CODE),
+																if(trim(R.COLLEGE_CODE,left,right)='',L.COLLEGE_CODE,R.COLLEGE_CODE));
+		Self.COLLEGE_CODE_EXPLODED	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.COLLEGE_CODE_EXPLODED,left,right)='',R.COLLEGE_CODE_EXPLODED,L.COLLEGE_CODE_EXPLODED),
+																if(trim(R.COLLEGE_CODE_EXPLODED,left,right)='',L.COLLEGE_CODE_EXPLODED,R.COLLEGE_CODE_EXPLODED));
+		Self.COLLEGE_TYPE	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.COLLEGE_TYPE,left,right)='',R.COLLEGE_TYPE,L.COLLEGE_TYPE),
+																if(trim(R.COLLEGE_TYPE,left,right)='',L.COLLEGE_TYPE,R.COLLEGE_TYPE));
+		Self.COLLEGE_TYPE_EXPLODED	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.COLLEGE_TYPE_EXPLODED,left,right)='',R.COLLEGE_TYPE_EXPLODED,L.COLLEGE_TYPE_EXPLODED),
+																if(trim(R.COLLEGE_TYPE_EXPLODED,left,right)='',L.COLLEGE_TYPE_EXPLODED,R.COLLEGE_TYPE_EXPLODED));
+		Self.HEAD_OF_HOUSEHOLD_FIRST_NAME	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.HEAD_OF_HOUSEHOLD_FIRST_NAME,left,right)='',R.HEAD_OF_HOUSEHOLD_FIRST_NAME,L.HEAD_OF_HOUSEHOLD_FIRST_NAME),
+																if(trim(R.HEAD_OF_HOUSEHOLD_FIRST_NAME,left,right)='',L.HEAD_OF_HOUSEHOLD_FIRST_NAME,R.HEAD_OF_HOUSEHOLD_FIRST_NAME));
+		Self.HEAD_OF_HOUSEHOLD_GENDER_CODE	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.HEAD_OF_HOUSEHOLD_GENDER_CODE,left,right)='',R.HEAD_OF_HOUSEHOLD_GENDER_CODE,L.HEAD_OF_HOUSEHOLD_GENDER_CODE),
+																if(trim(R.HEAD_OF_HOUSEHOLD_GENDER_CODE,left,right)='',L.HEAD_OF_HOUSEHOLD_GENDER_CODE,R.HEAD_OF_HOUSEHOLD_GENDER_CODE));
+		Self.HEAD_OF_HOUSEHOLD_GENDER	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.HEAD_OF_HOUSEHOLD_GENDER,left,right)='',R.HEAD_OF_HOUSEHOLD_GENDER,L.HEAD_OF_HOUSEHOLD_GENDER),
+																if(trim(R.HEAD_OF_HOUSEHOLD_GENDER,left,right)='',L.HEAD_OF_HOUSEHOLD_GENDER,R.HEAD_OF_HOUSEHOLD_GENDER));
+		Self.INCOME_LEVEL_CODE	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.INCOME_LEVEL_CODE,left,right)='',R.INCOME_LEVEL_CODE,L.INCOME_LEVEL_CODE),
+																if(trim(R.INCOME_LEVEL_CODE,left,right)='',L.INCOME_LEVEL_CODE,R.INCOME_LEVEL_CODE));
+		Self.INCOME_LEVEL	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.INCOME_LEVEL,left,right)='',R.INCOME_LEVEL,L.INCOME_LEVEL),
+																if(trim(R.INCOME_LEVEL,left,right)='',L.INCOME_LEVEL,R.INCOME_LEVEL));
+		Self.NEW_INCOME_LEVEL_CODE	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.NEW_INCOME_LEVEL_CODE,left,right)='',R.NEW_INCOME_LEVEL_CODE,L.NEW_INCOME_LEVEL_CODE),
+																if(trim(R.NEW_INCOME_LEVEL_CODE,left,right)='',L.NEW_INCOME_LEVEL_CODE,R.NEW_INCOME_LEVEL_CODE));
+		Self.NEW_INCOME_LEVEL	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.NEW_INCOME_LEVEL,left,right)='',R.NEW_INCOME_LEVEL,L.NEW_INCOME_LEVEL),
+																if(trim(R.NEW_INCOME_LEVEL,left,right)='',L.NEW_INCOME_LEVEL,R.NEW_INCOME_LEVEL));
+		Self.FILE_TYPE	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.FILE_TYPE,left,right)='',R.FILE_TYPE,L.FILE_TYPE),
+																if(trim(R.FILE_TYPE,left,right)='',L.FILE_TYPE,R.FILE_TYPE));
+		Self.tier	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.tier,left,right)='',R.tier,L.tier),
+																if(trim(R.tier,left,right)='',L.tier,R.tier));
+		Self.school_size_code	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.school_size_code,left,right)='',R.school_size_code,L.school_size_code),
+																if(trim(R.school_size_code,left,right)='',L.school_size_code,R.school_size_code));
+		Self.competitive_code	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.competitive_code,left,right)='',R.competitive_code,L.competitive_code),
+																if(trim(R.competitive_code,left,right)='',L.competitive_code,R.competitive_code));
+		Self.tuition_code	:=	if(L.Process_Date>R.Process_Date,
+																if(trim(L.tuition_code,left,right)='',R.tuition_code,L.tuition_code),
+																if(trim(R.tuition_code,left,right)='',L.tuition_code,R.tuition_code));
+		
+		self := L;
+	end;
+
+  rsFormattedPlusBaseRollup := rollup(rsFormattedPlusBaseSort,rollupXform(LEFT,RIGHT),
+			LEFT.KEY = RIGHT.KEY AND
+			ut.NNEQ(LEFT.COLLEGE_NAME[1..23],RIGHT.COLLEGE_NAME[1..23]) AND
+			ut.NNEQ(LEFT.COLLEGE_MAJOR,RIGHT.COLLEGE_MAJOR) AND
+			LEFT.FIRST_NAME = RIGHT.FIRST_NAME AND
+			LEFT.LAST_NAME = RIGHT.LAST_NAME AND
+			Left.prim_range=right.prim_range AND
+			Left.prim_name=right.prim_name AND
+			Left.sec_range=right.sec_range AND
+			Left.z5=right.z5 and
+			ut.NNEQ(LEFT.TELEPHONE,RIGHT.TELEPHONE),
+	local): INDEPENDENT;
+
+	output(rsFormattedPlusBaseRollup,named('PostRollup'));
 
 	//Separate records without a DID and flag them as 'I' (invalid for keys)											
 	//Set C (current) or H (historical) for records that have DID
-	rsCleanAID_DID_SSN_final_no_DID	:=	rsCleanAID_DID_SSN_final_ParsedCnty(DID = 0);
-	rsCleanAID_DID_SSN_final_DID	:=	rsCleanAID_DID_SSN_final_ParsedCnty(DID <> 0);
+	rsCleanAID_DID_SSN_final_no_DID	:=	rsFormattedPlusBaseRollup(DID = 0);
+	rsCleanAID_DID_SSN_final_DID	:=	rsFormattedPlusBaseRollup(DID <> 0);
+	
+	
 											
-	dsSort			:= sort(rsCleanAID_DID_SSN_final_DID, DID);
+	// PriorityList:=project(rsCleanAID_DID_SSN_final_DID,transform(PriorityLayout,self.flag:=if(left.file_type='M','0','1');self:=left;));
+dsSort			:= sort(rsCleanAID_DID_SSN_final_DID, hash(DID));
 	dsGroup     := group(dsSort, DID);
-	dsSortGroup := sort(dsGroup, -process_date, -date_vendor_first_reported);									
+	dsSortGroup := sort(dsGroup, -process_date, -flag, -date_vendor_first_reported);									
 											
-	Layout_American_Student_Base_v2 SetRecordType(Layout_American_Student_Base_v2 L, Layout_American_Student_Base_v2 R) := transform
+	PriorityLayout SetRecordType(PriorityLayout L, PriorityLayout R) := transform
 			self.HISTORICAL_FLAG  	:= if(l.HISTORICAL_FLAG = '', 'C', 'H');
 			self										:= r;
 	end;
 	
-	rsCleanAID_DID_SSN_final_DID_flagged := group(iterate(dsSortGroup, SetRecordType(left, right)));		
+	rsCleanAID_DID_SSN_final_DID_flagged_with_priority := group(iterate(dsSortGroup, SetRecordType(left, right)));		
+	
+	rsCleanAID_DID_SSN_final_DID_flagged	:=	project(rsCleanAID_DID_SSN_final_DID_flagged_with_priority,transform(Layout_American_Student_Base_v2,self:=left;));
 								
-	Layout_American_Student_Base_v2 SetRecordTypeInvalid(Layout_American_Student_Base_v2 pInput) := transform
+	PriorityLayout SetRecordTypeInvalid(PriorityLayout pInput) := transform
 			self.HISTORICAL_FLAG  	:= 'I';
+			self.dob_formatted			:= '';
+			self.birth_date					:= '';
 			self										:= pInput;
 	end;								
 
-	rsCleanAID_DID_SSN_final_no_DID_flagged	:=	PROJECT(rsCleanAID_DID_SSN_final_no_DID, SetRecordTypeInvalid(left));
-
-	American_Student_List_base_flagged	:=	rsCleanAID_DID_SSN_final_DID_flagged + rsCleanAID_DID_SSN_final_no_DID_flagged;
+	rsCleanAID_DID_SSN_final_no_DID_with_priority	:=	PROJECT(rsCleanAID_DID_SSN_final_no_DID, SetRecordTypeInvalid(left));
 	
-	ut.MAC_SF_BuildProcess(American_Student_List_base_flagged,American_student_list.thor_cluster + 'base::american_student_list',build_base);
+	rsCleanAID_DID_SSN_final_no_DID_flagged	:=	project(rsCleanAID_DID_SSN_final_no_DID_with_priority,transform(Layout_American_Student_Base_v2,self:=left;));
 
-	export Proc_build_base := sequential(build_base, checkOrphanNames, checkOrphanTiers);
+	American_Student_List_base_flagged	:=	rsCleanAID_DID_SSN_final_DID_flagged + rsCleanAID_DID_SSN_final_no_DID_flagged; 
+	
+	
+	
+	
+	PromoteSupers.Mac_SF_BuildProcess(American_Student_List_base_flagged,American_student_list.thor_cluster + 'base::american_student_list',build_base,,,true);
+	// build_base:=output(American_Student_List_base_flagged,,'~thor_data400::base::american_student_list_'+workunit,all,thor,overwrite);
+	export Proc_build_base := sequential(build_base, checkOrphanNames, checkOrphanTiers);//, checkOrphanNames, checkOrphanTiers

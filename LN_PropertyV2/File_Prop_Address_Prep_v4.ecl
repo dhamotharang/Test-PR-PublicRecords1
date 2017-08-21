@@ -142,14 +142,16 @@ with_assess get_deeds(with_assess L, ln_propertyv2.File_Deed R) := transform
 	SELF.occupant_owned := if (r.ln_fares_id = '', l.occupant_owned, r.mailing_street=r.property_full_street_address or l.occupant_owned);
 	
 	// get the most recent purchase info, rather than the highest purchase info
-	purchasePicker := map(l.purchase_date = (unsigned)r.contract_date => 1, // both the same, use either one
-												(unsigned)r.contract_date > l.purchase_date => 2, // use the right one
+	deedPurchaseDate := if((integer)r.contract_date=0,(integer)r.recording_date, (integer)r.contract_date);
+
+	purchasePicker := map(l.purchase_date = deedPurchaseDate => 1, // both the same, use either one
+												deedPurchaseDate > l.purchase_date => 2, // use the right one
 												3);	// use the left one
 												
 	self.purchase_date := choose(purchasePicker, 	L.purchase_date,
-																								(unsigned)r.contract_date,
+																								deedPurchaseDate,
 																								l.purchase_date);
-	self.purchase_amount := choose(purchasePicker, 	ut.max2(L.purchase_amount, (unsigned)r.sales_price),
+	self.purchase_amount := choose(purchasePicker, 	max(L.purchase_amount, (unsigned)r.sales_price),
 																									(unsigned)r.sales_price,
 																									l.purchase_amount);
 
@@ -165,12 +167,12 @@ with_assess get_deeds(with_assess L, ln_propertyv2.File_Deed R) := transform
 												deedMortgageDate > l.purchase_date => 2, // use the right one
 												3);	// use the left one												
 	
-	SELF.mortgage_date := choose(mortgagePicker, 	ut.max2(deedMortgageDate, l.purchase_date),	// choosing between recording/sale date from assessment and recording/contract date from deed.... taking the most recent
+	SELF.mortgage_date := choose(mortgagePicker, 	max(deedMortgageDate, l.purchase_date),	// choosing between recording/sale date from assessment and recording/contract date from deed.... taking the most recent
 																								deedMortgageDate,
 																								l.purchase_date);		
 	
 	
-	SELF.mortgage_amount := choose(mortgagePicker, 	ut.max2(l.mortgage_amount,(INTEGER)r.first_td_loan_amount),
+	SELF.mortgage_amount := choose(mortgagePicker, 	max(l.mortgage_amount,(INTEGER)r.first_td_loan_amount),
 																									(INTEGER)r.first_td_loan_amount,
 																									l.mortgage_amount);
 																									
@@ -213,9 +215,22 @@ with_deeds := join(with_assess,
 ready_to_roll := group(sort(distribute(with_deeds, hash(prim_range, prim_name, sec_range, zip, suffix)),
 						prim_range, prim_name, sec_range, zip, suffix, predir, postdir, ln_fares_id/*, -sale_date1, -prev_purch_date1*/, local),
 					prim_range, prim_name, sec_Range, zip, suffix, predir, postdir, local);
+					
+					
+ready_to_roll_appcnt := record
+ready_to_roll;
+unsigned4 cntGroup;
+end;
+
+ready_to_roll_appcnt tAppendCnt( ready_to_roll L,integer cnt) := transform
+self.cntGroup := (cnt-1) DIV MAX_EMBEDDED;
+self := L;
+end;
+
+ready_to_roll_new := project(ready_to_roll,tAppendCnt(left,counter));
 			
 
-ready_to_roll pre_proc(ready_to_roll L) := transform
+ready_to_roll_new pre_proc(ready_to_roll_new L) := transform
   self.ln_fares_id := L.ln_fares_id;
 	SELF.property_count := 1;
 	SELF.property_total := 1;
@@ -228,11 +243,11 @@ ready_to_roll pre_proc(ready_to_roll L) := transform
 	self := L;
 end;
 
-really_ready_to_roll := project(ready_to_roll, pre_proc(LEFT));
+really_ready_to_roll := project(ready_to_roll_new, pre_proc(LEFT));
 
 
 
-myrec roll_props(really_ready_to_roll L, really_ready_to_roll R) := transform
+really_ready_to_roll roll_props(really_ready_to_roll L, really_ready_to_roll R) := transform
 	self.roll_count := L.roll_count + R.roll_count;
 	self.buyers := L.buyers +  R.buyers;
 	self.sellers := L.sellers + R.sellers;
@@ -248,7 +263,7 @@ myrec roll_props(really_ready_to_roll L, really_ready_to_roll R) := transform
 	self.purchase_date := choose(purchasePicker, 	L.purchase_date,
 																								r.purchase_date,
 																								l.purchase_date);
-	self.purchase_amount := choose(purchasePicker, 	ut.max2(L.purchase_amount, R.purchase_amount),
+	self.purchase_amount := choose(purchasePicker, 	max(L.purchase_amount, R.purchase_amount),
 																									r.purchase_amount,
 																									l.purchase_amount);
 	
@@ -261,7 +276,7 @@ myrec roll_props(really_ready_to_roll L, really_ready_to_roll R) := transform
 												
 	nonblank(string a, string b) := if(b='', a, b);	// return the populated one, or if both populated then the right one
 												
-	SELF.mortgage_amount := choose(mortgagePicker, ut.max2(l.mortgage_amount,r.mortgage_amount),
+	SELF.mortgage_amount := choose(mortgagePicker, max(l.mortgage_amount,r.mortgage_amount),
 																								 r.mortgage_amount,
 																								 l.mortgage_amount);
 	SELF.mortgage_date := choose(mortgagePicker, l.mortgage_date,
@@ -290,31 +305,31 @@ myrec roll_props(really_ready_to_roll L, really_ready_to_roll R) := transform
 	self.standardized_land_use_code := choose(assessPicker, nonblank(l.standardized_land_use_code, r.standardized_land_use_code),
 																													r.standardized_land_use_code,
 																													l.standardized_land_use_code);
-	self.building_area := choose(assessPicker, 	ut.max2(l.building_area, r.building_area),
+	self.building_area := choose(assessPicker, 	max(l.building_area, r.building_area),
 																							r.building_area,
 																							l.building_area);
-	self.no_of_buildings := choose(assessPicker, 	ut.max2(l.no_of_buildings, r.no_of_buildings),
+	self.no_of_buildings := choose(assessPicker, 	max(l.no_of_buildings, r.no_of_buildings),
 																								r.no_of_buildings,
 																								l.no_of_buildings);
-	self.no_of_stories := choose(assessPicker, 	ut.max2(l.no_of_stories, r.no_of_stories),
+	self.no_of_stories := choose(assessPicker, 	max(l.no_of_stories, r.no_of_stories),
 																							r.no_of_stories,
 																							l.no_of_stories);
-	self.no_of_rooms := choose(assessPicker, 	ut.max2(l.no_of_rooms, r.no_of_rooms),
+	self.no_of_rooms := choose(assessPicker, 	max(l.no_of_rooms, r.no_of_rooms),
 																						r.no_of_rooms,
 																						l.no_of_rooms);
-	self.no_of_bedrooms := choose(assessPicker, ut.max2(l.no_of_bedrooms, r.no_of_bedrooms),
+	self.no_of_bedrooms := choose(assessPicker, max(l.no_of_bedrooms, r.no_of_bedrooms),
 																							r.no_of_bedrooms,
 																							l.no_of_bedrooms);
-	self.no_of_baths := choose(assessPicker, 	ut.max2(l.no_of_baths, r.no_of_baths),
+	self.no_of_baths := choose(assessPicker, 	max(l.no_of_baths, r.no_of_baths),
 																						r.no_of_baths,
 																						l.no_of_baths);
-	self.no_of_partial_baths := choose(assessPicker, 	ut.max2(l.no_of_partial_baths, r.no_of_partial_baths),
+	self.no_of_partial_baths := choose(assessPicker, 	max(l.no_of_partial_baths, r.no_of_partial_baths),
 																										r.no_of_partial_baths,
 																										l.no_of_partial_baths);
 	self.garage_type_code := choose(assessPicker, nonblank(l.garage_type_code, r.garage_type_code),
 																								r.garage_type_code,
 																								l.garage_type_code);
-	self.parking_no_of_cars := choose(assessPicker, ut.max2(l.parking_no_of_cars, r.parking_no_of_cars),
+	self.parking_no_of_cars := choose(assessPicker, max(l.parking_no_of_cars, r.parking_no_of_cars),
 																									r.parking_no_of_cars,
 																									l.parking_no_of_cars);
 	self.style_code := choose(assessPicker, nonblank(l.style_code, r.style_code),
@@ -323,11 +338,11 @@ myrec roll_props(really_ready_to_roll L, really_ready_to_roll R) := transform
 	self.assessed_value_year := choose(assessPicker, 	l.assessed_value_year,
 																										r.assessed_value_year,
 																										l.assessed_value_year);	
-	self.assessed_amount := choose(assessPicker, 	ut.max2(l.assessed_amount,r.assessed_amount),
+	self.assessed_amount := choose(assessPicker, 	max(l.assessed_amount,r.assessed_amount),
 																								r.assessed_amount,
 																								l.assessed_amount);	
 	
-	self.assessed_total_value := choose(assessPicker, 	ut.max2(l.assessed_total_value,r.assessed_total_value),
+	self.assessed_total_value := choose(assessPicker, 	max(l.assessed_total_value,r.assessed_total_value),
 																								r.assessed_total_value,
 																								l.assessed_total_value);	
 																								
@@ -345,7 +360,7 @@ myrec roll_props(really_ready_to_roll L, really_ready_to_roll R) := transform
 	self := L;
 end;
 
-rolled := rollup(really_ready_to_roll, left.roll_count < MAX_EMBEDDED, roll_props(LEFT,RIGHT));
+rolled := rollup(really_ready_to_roll, left.cntGroup = right.cntGroup, roll_props(LEFT,RIGHT));
 rolled_props := PROJECT (rolled, transform (myrec, SELF.ln_fares_id := ''; SELF := Left));
 
 return rolled_props;

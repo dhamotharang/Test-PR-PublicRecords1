@@ -1,0 +1,26 @@
+sequential(FileServices.CreateSuperFile('~thor_data400::base::SIC4::Codes_Lookup::DELETE')
+           ,FileServices.CreateSuperFile('~thor_data400::base::SIC4::Codes_Lookup::FATHER')
+		   ,FileServices.CreateSuperFile('~thor_data400::base::SIC4::Codes_Lookup::GRANDFATHER')
+		   ,FileServices.CreateSuperFile('~thor_data400::base::SIC4::Codes_Lookup')
+		   );
+sequential(FileServices.CreateSuperFile('~thor_data400::base::NAICS::Codes_Lookup::DELETE')
+           ,FileServices.CreateSuperFile('~thor_data400::base::NAICS::Codes_Lookup::FATHER')
+		   ,FileServices.CreateSuperFile('~thor_data400::base::NAICS::Codes_Lookup::GRANDFATHER')
+		   ,FileServices.CreateSuperFile('~thor_data400::base::NAICS::Codes_Lookup')
+		   );
+sequential(FileServices.CreateSuperFile('~thor_data400::key::SIC4::Codes_Lookup')
+           ,FileServices.CreateSuperFile('~thor_data400::key::SIC4::Codes_Lookup_BUILT')
+           ,FileServices.CreateSuperFile('~thor_data400::key::SIC4::Codes_Lookup_DELETE')
+           ,FileServices.CreateSuperFile('~thor_data400::key::SIC4::Codes_Lookup_FATHER')
+           ,FileServices.CreateSuperFile('~thor_data400::key::SIC4::Codes_Lookup_GRANDFATHER')
+           ,FileServices.CreateSuperFile('~thor_data400::key::SIC4::Codes_Lookup_PROD')
+           ,FileServices.CreateSuperFile('~thor_data400::key::SIC4::Codes_Lookup_QA')
+		   );
+sequential(FileServices.CreateSuperFile('~thor_data400::key::NAICS::Codes_Lookup')
+           ,FileServices.CreateSuperFile('~thor_data400::key::NAICS::Codes_Lookup_BUILT')
+           ,FileServices.CreateSuperFile('~thor_data400::key::NAICS::Codes_Lookup_DELETE')
+           ,FileServices.CreateSuperFile('~thor_data400::key::NAICS::Codes_Lookup_FATHER')
+           ,FileServices.CreateSuperFile('~thor_data400::key::NAICS::Codes_Lookup_GRANDFATHER')
+           ,FileServices.CreateSuperFile('~thor_data400::key::NAICS::Codes_Lookup_PROD')
+           ,FileServices.CreateSuperFile('~thor_data400::key::NAICS::Codes_Lookup_QA')
+		   );

@@ -7,7 +7,7 @@ string16 wuid := '' : stored('wuid');
 
 //export moxie_ucc_post_key_steps := 
 
-sequential(
+export moxie_ucc_post_key_steps := sequential(
 UCCD.moxie_ucc_collateral_keys,
 
 UCCD.moxie_ucc_debtor_keys,

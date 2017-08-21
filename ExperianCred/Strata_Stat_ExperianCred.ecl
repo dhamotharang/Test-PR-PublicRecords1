@@ -5,7 +5,8 @@ pVersion:=Version;
 rPopulationStats_Experian_base
  :=
   record
-    CountGroup									:= count(group);
+  string3  grouping                                   := 'ALL';
+	CountGroup									:= count(group);
 	did_CountNonBlank							:= sum(group,if(pExperian_base.did<>0,1,0));
 	did_score_CountNonBlank						:= sum(group,if(pExperian_base.DID_Score_field<>0,1,0));
 	date_first_seen_CountNonBlank				:= sum(group,if(pExperian_base.date_first_seen<>0,1,0));
@@ -29,7 +30,8 @@ rPopulationStats_Experian_base
 	Orig_mname_CountNonBlank					:= sum(group,if(pExperian_base.Orig_mname<>'',1,0));	
 	Orig_lname_CountNonBlank					:= sum(group,if(pExperian_base.Orig_lname<>'',1,0));		
 	Orig_suffix_CountNonBlank					:= sum(group,if(pExperian_base.Orig_suffix<>'',1,0));	
-	Orig_Address_date_CountNonBlank				:= sum(group,if(pExperian_base.Orig_Address_date<>'',1,0));	
+	Orig_Address_create_date_CountNonBlank		:= sum(group,if(pExperian_base.Orig_Address_Create_date<>'',1,0));	
+	Orig_Address_update_date_CountNonBlank		:= sum(group,if(pExperian_base.Orig_Address_Update_date<>'',1,0));	
 	AddressSeq_CountNonBlank					:= sum(group,if(pExperian_base.AddressSeq > 0,1,0));
 	Orig_Prim_Range_CountNonBlank				:= sum(group,if(pExperian_base.Orig_Prim_Range<>'',1,0));
 	Orig_Predir_CountNonBlank					:= sum(group,if(pExperian_base.Orig_Predir<>'',1,0));
@@ -82,13 +84,12 @@ rPopulationStats_Experian_base
 
 dPopulationStats_Experian_base := table(pExperian_base
 							  	    ,rPopulationStats_Experian_base
-									,st
 									,few);
 STRATA.createXMLStats(dPopulationStats_Experian_base
-					 ,'EN'
-					 ,'Experian'
+					 ,'ENv3'
+					 ,'ExperianCred'
 					 ,pVersion
-					 ,'aherzberg@lexisnexis.com'
+					 ,'Angela.Herzberg@lexisnexis.com; Michael.Gould@lexisnexis.com;Gabriel.Marcan@lexisnexis.com'
 					 ,zExperian_base);
 
 EXPORT Strata_Stat_ExperianCred := zExperian_base;

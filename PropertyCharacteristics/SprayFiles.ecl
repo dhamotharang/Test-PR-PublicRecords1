@@ -2,9 +2,9 @@ import	_control;
 
 export SprayFiles	(	string		pFileDate,
 										string		pProcessDate,
-										string		pCSVQuote		=	',',
+										string		pCSVQuote		=	'',
 										unsigned	pMaxRecLen	=	12294,
-										string		pGroupName	=	_control.TargetGroup.ADL_400,/*'thor400_88_dev',*/
+										string		pGroupName	=	_control.TargetGroup.Thor400_92,/*'thor400_88_dev',*/
 										boolean		pOverwrite	=	false
 									)	:=
 function
@@ -49,11 +49,11 @@ function
 																				regexfind('MLS2',pInput.name,nocase)							=>	'MLS2',
 																				regexfind('VISIENT|MLS|MLS3',pInput.name,nocase)	=>	'MLS3',
 																				regexfind('MLS4',pInput.name,nocase)							=>	'MLS4',
-																				regexfind('INSURANCE',pInput.name,nocase)					=>	'INS1',
+																				regexfind('INSURANCE|^(IB)',pInput.name,nocase)		=>	'INS1',
 																				/*
 																				regexfind('INSURANCE2',pInput.name,nocase)				=>	'INS2',
 																				*/
-																				regexfind('APPRAISER',pInput.name,nocase)					=>	'APPR',
+																				regexfind('APPRAISER|^(AB)',pInput.name,nocase)		=>	'APPR',
 																				''
 																			);
 		self.FileDate							:=	pFileDate;
@@ -124,8 +124,13 @@ function
 	// Add to superfile
 	addSuperFile(string	pSuperFileName,string	pLogicalFileName)	:=
 		sequential(	FileServices.StartSuperfileTransaction(),
+								FileServices.AddSuperfile(pSuperFileName	+	'_delete',pSuperFileName	+	'_father',,true),
+								FileServices.ClearSuperfile(pSuperFileName	+	'_father'),
+								FileServices.AddSuperfile(pSuperFileName	+	'_father',pSuperFileName,,true),
+								FileServices.ClearSuperfile(pSuperFileName),
 								FileServices.AddSuperfile(pSuperFileName,pLogicalFileName),
-								FileServices.FinishSuperfileTransaction()
+								FileServices.FinishSuperfileTransaction(),
+								FileServices.ClearSuperFile(pSuperFileName	+	'_delete',true)
 							);
 	
 	// Remove from superfile
@@ -194,6 +199,6 @@ function
 	
 	output(dRemoteFiles_SprayInfo);
 	
-	return	sequential(sprayFiles,parallel(doPrepMLS1,doPrepMLS2,doPrepMLS3,doPrepMLS4,doPrepIns1,doPrepAppr));
+	return	sequential(sprayFiles,parallel(/*doPrepMLS1,doPrepMLS2,doPrepMLS3,doPrepMLS4,*/doPrepIns1,doPrepAppr));
 
 end;

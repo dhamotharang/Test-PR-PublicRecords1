@@ -16,7 +16,6 @@ export Copy_FCRA_Keys(string filedate) := function
 	ATF.Proc_Copy_FCRA_Keys(filedate,'atf::firearms','autokey::stnameb2'),
 	ATF.Proc_Copy_FCRA_Keys(filedate,'atf::firearms','autokey::zip'),
 	ATF.Proc_Copy_FCRA_Keys(filedate,'atf::firearms','autokey::zipb2'),
-	ATF.Proc_Copy_FCRA_Keys(filedate,'atf::firearms','atfid'),
 	ATF.Proc_Copy_FCRA_Keys(filedate,'atf::firearms','bdid'),
   ATF.Proc_Copy_FCRA_Keys(filedate,'atf::firearms','did'),
 	ATF.Proc_Copy_FCRA_Keys(filedate,'atf::firearms','lnum')//,

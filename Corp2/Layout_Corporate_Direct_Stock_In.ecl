@@ -24,6 +24,6 @@ string8   stock_convert_date;
 string8   stock_change_in_cap;
 string15  stock_tax_capital;
 string15  stock_total_capital;
-string98  stock_addl_info;
+string250 stock_addl_info;  //modified length from 98 to 250
 
 end;

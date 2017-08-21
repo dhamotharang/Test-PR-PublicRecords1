@@ -1,0 +1,32 @@
+export Proc_build_ingenix_input(string filedate) := function
+return
+          sequential( Ingenix_NatlProf.Map_In_Providers(filedate),
+					             Ingenix_NatlProf.Map_In_ProviderName(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderAddress(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderAddressType(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderBirthdate(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderTaxID(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderLanguage(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderSpeciality(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderHospital(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderMedSchool(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderResidency(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderDegree(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderUPIN(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderLicense(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderDEA(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderPhone(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderGroup(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderNPI(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderNPITaxonomy(filedate),
+											 Ingenix_NatlProf.Map_In_Speciality(filedate),
+											 Ingenix_NatlProf.Map_In_SpecialityGroup(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderGender(filedate),
+											 Ingenix_NatlProf.Map_In_HospitalAffiliation(filedate),
+											 Ingenix_NatlProf.Map_In_GroupAffiliation(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderSanctions(filedate),
+											 Ingenix_NatlProf.Map_In_ProvIDSanctions(filedate),
+											 Ingenix_NatlProf.Map_In_ProviderMedicareOptOut(filedate)/*,
+											 Ingenix_NatlProf.Map_In_ProviderDeceased(filedate)*/); // We no longer receive deceased data from Ingenix
+											 
+			END;

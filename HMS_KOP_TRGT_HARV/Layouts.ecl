@@ -1,4 +1,4 @@
-IMPORT hms_kop_trgt_harv,HC_Shared;
+IMPORT hms_kop_trgt_harv,HMS_STLIC;
 
 EXPORT Layouts := MODULE
 

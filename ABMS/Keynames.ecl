@@ -9,19 +9,22 @@ EXPORT Keynames(STRING pversion = '',
   EXPORT Main := MODULE
 		SHARED fTemplate(STRING tag) := lTemplate('Main') + '::' + tag;
 
-		EXPORT BIOGNumber := tools.mod_FilenamesBuild(fTemplate('BIOG_Number'), pversion);
-		EXPORT DID := tools.mod_FilenamesBuild(fTemplate('DID'), pversion);
-		EXPORT BDID := tools.mod_FilenamesBuild(fTemplate('BDID'), pversion);
-		EXPORT NPI := tools.mod_FilenamesBuild(fTemplate('NPI'), pversion);
+		EXPORT BIOGNumber 				 := tools.mod_FilenamesBuild(fTemplate('BIOG_Number'), pversion);
+		EXPORT DID 								 := tools.mod_FilenamesBuild(fTemplate('DID'), pversion);
+		EXPORT BDID 							 := tools.mod_FilenamesBuild(fTemplate('BDID'), pversion);
+		EXPORT LinkIDs 						 := tools.mod_FilenamesBuild(fTemplate('LinkIDs'), pversion);
+		EXPORT NPI 								 := tools.mod_FilenamesBuild(fTemplate('NPI'), pversion);
 		EXPORT LNameSpecialtyFName := tools.mod_FilenamesBuild(fTemplate('LName_Specialty_FName'), pversion);
-		EXPORT LNameCertFName := tools.mod_FilenamesBuild(fTemplate('LName_Cert_FName'), pversion);
-
+		EXPORT LNameCertFName 		 := tools.mod_FilenamesBuild(fTemplate('LName_Cert_FName'), pversion);
+    export LNPID               := tools.mod_FilenamesBuild(fTemplate('LNPID'),pversion);
 		EXPORT dAll_filenames := BIOGNumber.dAll_filenames +
 		                         DID.dAll_filenames +
 		                         BDID.dAll_filenames +
+														 LinkIDs.dAll_filenames +
 		                         NPI.dAll_filenames +
 														 LNameSpecialtyFName.dAll_filenames +
-														 LNameCertFName.dAll_filenames;
+														 LNameCertFName.dAll_filenames +
+														 LNPID.dAll_filenames;
 	END;
 
   EXPORT Career := MODULE

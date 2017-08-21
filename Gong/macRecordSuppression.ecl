@@ -50,7 +50,13 @@ end;
 														{'','FURNITU','RE','MUNIRE','','','55','','westbro','rd','','','','clifton','','nj','07012'},
 														{'','FURNITU','RE','MUNIRE','','','55','','webro','rd','','','','clifton','','nj','07012'},
 														{'','FURNITU','RE','MUNIRE','','','91','','new england','ave','','','','piscataway','','nj','08854'},
-														{'','Marjorie','Bing','Stanislaw','','7245275568','437','','Cedar','st','','','','JEANNETTE','','PA','15644'}
+														{'','Marjorie','Bing','Stanislaw','','7245275568','437','','Cedar','st','','','','JEANNETTE','','PA','15644'},
+														{'','James','','Hahn','','3103998213','2950','','Neilson','way','','','','Santa Monica','','CA','90405'},
+														{'MR','David','H','Souter','','','','','','','','','','EAST WEARE','WEARE','NH','03281'},
+														{'MR','David','H','Souter','','','','','','','','','','WEARE','WEARE','NH','03281'},
+														{'MR','David','H','Souter','','','','','','','','','','WEARE','WEARE','NH','03281'},
+														{'MR','David','H','Souter','','','','','','','','','','WEARE','EAST WEARE','NH','03281'},
+														{'MR','David','H','Souter','','','','','','','','','','WEARE','EAST WEARE','NH','03281'}
 														], %SuppressionLayout%); 
 
 %StandarizeField%(string %inField%) := stringlib.stringtouppercase(trim(%inField%, left, right));

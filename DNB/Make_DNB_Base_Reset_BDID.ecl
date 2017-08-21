@@ -1,4 +1,4 @@
-IMPORT ut, Business_Header, Business_Header_SS, did_add;
+IMPORT ut, Business_Header, Business_Header_SS, did_add,mdr;
 
 #workunit('name', 'D&B Base Reset BDID ' + DNB.DNB_Reset_Date);
 
@@ -28,7 +28,7 @@ DNB_Base_ToBDID := project(DNB_Base, InitDBNtoBDID(left));
 // First do a direct source match to the current Business Headers
 Business_Header.MAC_Source_Match(DNB_Base_ToBDID, DNB_Base_BDID_Init,
                         FALSE, bdid,
-                        FALSE, 'D',
+                        FALSE, MDR.sourceTools.src_Dunn_Bradstreet,
                         TRUE, source_group,
                         clean_business_name,
                         prim_range, prim_name, sec_range, zip,

@@ -4,7 +4,7 @@ export BWR_Build(string filedate) := FUNCTION
 
 //#workunit('name','Taxpro  Build' );
 
-leMailTarget      := 'zhuang@seisint.com';
+leMailTarget      := 'zhuang@seisint.com;skasavajjala@seisint.com';
 
 fSendMail(string pSubject, string pBody)
       := lib_fileservices.fileservices.sendemail(leMailTarget,pSubject,pBody);

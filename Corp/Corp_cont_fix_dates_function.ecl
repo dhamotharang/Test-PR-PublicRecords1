@@ -1,3 +1,4 @@
+import ut;
 export corp_cont_fix_dates_function(dataset(Corp.Layout_Corp_Cont_Temp) cont_data) := FUNCTION
 
 fc := Corp.Corp_Updated_Corp;

@@ -8,9 +8,11 @@ export Common_IMG_AL(STRING2 state, STRING fname) := FUNCTION
 		JPEG(SELF.imgLength) photo;
 	END;
 
-	ds1 := dataset(fname,injpg,flat);
-
-	images.MAC_ShrinkImage(ds1,filename,imgLength,photo,ds2);
+	ds1 	:= dataset(fname,injpg,flat);
+	//ds2 	:= ds1(imgLength <= 49000);
+	
+		images.MAC_ShrinkImage(ds1,filename,imgLength,photo,ds1b);
+	ds2 := sort(distribute(ds1b, hash(filename)), filename, local);
 
 	images.Layout_Common getspk(ds2 le, hygenics_images.File_IMG_CommonInfo ri) := TRANSFORM
 		SELF.did 		:= 0;
@@ -28,7 +30,7 @@ export Common_IMG_AL(STRING2 state, STRING fname) := FUNCTION
 	j := JOIN(ds2, hygenics_images.File_IMG_CommonInfo, 
 				LEFT.filename=RIGHT.filename AND 
 				RIGHT.state_origin=state, 
-				getspk(LEFT,RIGHT));
+				getspk(LEFT,RIGHT),local);
 																		
 RETURN j;
 

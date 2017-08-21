@@ -130,8 +130,9 @@ end;
 
 Mapping_AR_as_Search_temp := normalize(Watercraft.file_AR_clean_in,5,search_mapping_format_temp(left,counter));
 
+Watercraft.Macro_Clean_Hull_ID(Mapping_AR_as_Search_temp, Layout_Watercraft_Search_Group_temp,hull_clean_in)
 
-Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Layout_Watercraft_Search_Group_temp L, integer1 C)
+Watercraft.Layout_Watercraft_Search_Group search_mapping_format(hull_clean_in L, integer1 C)
  :=
   transform
 	self.date_first_seen			:=	L.REG_DATE;
@@ -174,7 +175,7 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Layout_Watercraf
   end
  ; 
  
-Mapping_AR_as_Search_norm	:= normalize(Mapping_AR_as_Search_temp,2,search_mapping_format(left,counter));
+Mapping_AR_as_Search_norm	:= normalize(hull_clean_in,2,search_mapping_format(left,counter));
 
 export Mapping_AR_as_Search := Mapping_AR_as_Search_norm(clean_pname <> '' or company_name <> '');
 

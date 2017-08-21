@@ -100,8 +100,8 @@ seq_name :=
 				if(diffing, FileServices.ClearSuperFile(%diffbuilt%)),
 				FileServices.FinishSuperFileTransaction(),
 				
-				FileServices.ClearSuperFile(%delete%,true),
-				if(diffing, FileServices.ClearSuperFile(%diffdelete%,true)),
+				FileServices.RemoveOwnedSubFiles(%delete%,true),
+				if(diffing, FileServices.RemoveOwnedSubFiles(%diffdelete%,true)),
 		
 		/*old way
 			FileServices.ClearSuperFile(%qa%),
@@ -116,7 +116,7 @@ seq_name :=
 				#end
 				
 				*/
-			FileServices.FinishSuperFileTransaction(),
+			//FileServices.FinishSuperFileTransaction(),
 			output('built moved into qa')));
 #end
 
@@ -162,8 +162,8 @@ seq_name :=
 				if(diffing, FileServices.AddSuperFile(%diffprod%, %diffqa%,, true)), 
 				FileServices.FinishSuperFileTransaction(),
 				
-				FileServices.ClearSuperFile(%delete%,true),
-				if(diffing, FileServices.ClearSuperFile(%diffdelete%,true)),
+				FileServices.RemoveOwnedSubFiles(%delete%,true),
+				if(diffing, FileServices.RemoveOwnedSubFiles(%diffdelete%,true)),
 				output('Updated Prod key '+kname))
 		);
 #end	
@@ -184,8 +184,8 @@ seq_name :=
 				if(diffing, FileServices.AddSuperFile(%diffqa%, %diffprod%,,true)),
 			FileServices.FinishSuperFileTransaction(),
 		
-			FileServices.ClearSuperFile(%delete%,true),
-			if(diffing, FileServices.ClearSuperFile(%diffdelete%,true)),
+			FileServices.RemoveOwnedSubFiles(%delete%,true),
+			if(diffing, FileServices.RemoveOwnedSubFiles(%diffdelete%,true)),
 			output('qa rolled back to prod')));
 #end
 

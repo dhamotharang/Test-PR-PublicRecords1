@@ -1,8 +1,8 @@
 
 
 export Out_Activity := 
-					output(Activity_Joined(offender_key[1..4] not in CrimSrch.Sex_Offenders_Not_Updating
-           and vendor not in CrimSrch.sCourt_Vendors_To_Omit
+					output(Activity_Joined(offender_key[1..4] not in CrimSrch.Sex_Offenders_Not_Updating.SO_By_Key
+           and vendor not in CrimSrch.Sex_Offenders_Not_Updating.SO_By_Source
 					 and vendor != '99'
 					 and source_file != 'AR-DOC              '
 					 and source_file != 'NJ-DOC-INMATE-OBCIS ' 

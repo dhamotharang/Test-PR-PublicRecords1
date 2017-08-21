@@ -1,4 +1,4 @@
-export Layout_AK_clean_in := 
+export Layout_AK_clean_in := //rec length = 3935
 record
 string2       state_origin;
 string8       process_date;

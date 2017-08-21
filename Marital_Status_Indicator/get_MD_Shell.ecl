@@ -316,6 +316,7 @@ export get_MD_shell(DATASET(recordof(marital_status_indicator.key_MSI_Best_did))
 					
 	dRecID := distribute(RecID, record_id);
 	marital_status_indicator.Layouts.rFinal_MD_Shell getMDDates(dRecID l, pkMD_main r) := transform
+		self.filing_type := r.filing_type;
 		self.div_dt := if(r.divorce_dt = '', (integer)r.divorce_filing_dt, (integer)r.divorce_dt);
 		self.mar_dt := if(r.marriage_dt = '', (integer)r.marriage_filing_dt, (integer)r.marriage_dt);
 		self := l;
@@ -382,7 +383,8 @@ export get_MD_shell(DATASET(recordof(marital_status_indicator.key_MSI_Best_did))
 	//get MDV1 indicator
 	Marital_Status_Indicator.layouts.rFinal_MD_Shell appendMDV1(HHID_final l, MDV1 r) := transform
 		self.did := l.did;
-		self.marital_status_v1 := r.marital_status;
+		self.spouse_dod := (integer)r.spouse_dod;
+		self.marital_status_v1 :=if(r.marital_status = '', 'A', r.marital_status);
 		self := l;
 	end;
 

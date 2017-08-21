@@ -1,0 +1,64 @@
+MODULE:Scrubs_InfutorCID
+FILENAME:InfutorCidBase
+//Uncomment up to NINES for internal or external adl
+//IDFIELD:EXISTS:<NameOfIDField>
+//RIDFIELD:<NameOfRidField>
+//RECORDS:<NumberOfRecordsInDataFile>
+//POPULATION:<ExpectedNumberOfEntitiesInDataFile>
+//NINES:<Precision required 3 = 99.9%, 2 = 99% etc>
+//Uncomment Process if doing external adl
+//PROCESS:<ProcessName>
+
+FIELDTYPE:invalid_numseq:ALLOW(abcd0123456789-_):LENGTHS(0..)
+FIELDTYPE:invalid_namealpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 _-,./:"&'!()#|;\*@`):LENGTHS(0..)
+FIELDTYPE:invalid_alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -_;,"*):LENGTHS(0..)
+FIELDTYPE:invalid_date:ALLOW(0123456789):LENGTHS(0,1,6,8)
+FIELDTYPE:invalid_num:ALLOW(0123456789):LENGTHS(0..)
+FIELDTYPE:invalid_orig_city:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 '()&-_;.:,/#+!):LENGTHS(0..)
+FIELDTYPE:invalid_state:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ):LENGTHS(0,2)
+FIELDTYPE:invalid_phone:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):LENGTHS(0,10)
+FIELDTYPE:invalid_zip:ALLOW(0123456789):LENGTHS(0,4,5)
+FIELDTYPE:invalid_recordtype:ALLOW(RBPU):LENGTHS(1)
+FIELDTYPE:invalid_phonetype:ALLOW(LVWO):LENGTHS(1)
+FIELDTYPE:invalid_directindial:ALLOW(Y):LENGTHS(0,1)
+FIELDTYPE:invalid_z4type:ALLOW(SHPFRG):LENGTHS(0,1)
+FIELDTYPE:invalid_dpbc:ALLOW(0123456789):LENGTHS(0..3)
+FIELDTYPE:invalid_crte:LENGTHS(0,4)
+FIELDTYPE:invalid_cnty:LENGTHS(0,3)
+FIELDTYPE:invalid_dpv:ALLOW(YDNS):LENGTHS(0,1)
+FIELDTYPE:invalid_maildeliverabilitycode:ALLOW(YN):LENGTHS(0,1)
+FIELDTYPE:invalid_directoryassistanceflag:ALLOW(YD):LENGTHS(0,1)
+FIELDTYPE:invalid_telephoneconfidencescore:ALLOW(12345):LENGTHS(0,1)
+
+FIELD:orig_phone:LIKE(invalid_phone):TYPE(STRING):0,0
+FIELD:orig_phonetype:LIKE(invalid_phonetype):TYPE(STRING):0,0
+FIELD:orig_directindial:LIKE(invalid_directindial):TYPE(STRING):0,0
+FIELD:orig_recordtype:LIKE(invalid_recordtype):TYPE(STRING):0,0
+FIELD:orig_firstdate:LIKE(invalid_date):TYPE(STRING):0,0
+FIELD:orig_lastdate:LIKE(invalid_date):TYPE(STRING):0,0
+FIELD:orig_telconame:LIKE(invalid_namealpha):TYPE(STRING):0,0
+FIELD:orig_businessname:LIKE(invalid_namealpha):TYPE(STRING):0,0
+FIELD:orig_firstname:LIKE(invalid_namealpha):TYPE(STRING):0,0
+FIELD:orig_mi:LIKE(invalid_namealpha):TYPE(STRING):0,0
+FIELD:orig_lastname:LIKE(invalid_namealpha):TYPE(STRING):0,0
+FIELD:orig_primaryhousenumber:TYPE(STRING):0,0
+FIELD:orig_primarypredirabbrev:TYPE(STRING):0,0
+FIELD:orig_primarystreetname:TYPE(STRING):0,0
+FIELD:orig_primarystreettype:TYPE(STRING):0,0
+FIELD:orig_primarypostdirabbrev:TYPE(STRING):0,0
+FIELD:orig_secondaryapttype:TYPE(STRING):0,0
+FIELD:orig_secondaryaptnbr:TYPE(STRING):0,0
+FIELD:orig_city:LIKE(invalid_orig_city):TYPE(STRING):0,0
+FIELD:orig_state:LIKE(invalid_state):TYPE(STRING):0,0
+FIELD:orig_zip:LIKE(invalid_zip):TYPE(STRING):0,0
+FIELD:orig_zip4:LIKE(invalid_zip):TYPE(STRING):0,0
+FIELD:orig_dpbc:LIKE(invalid_dpbc):TYPE(STRING):0,0
+FIELD:orig_crte:TYPE(STRING):0,0
+FIELD:orig_cnty:TYPE(STRING):0,0
+FIELD:orig_z4type:LIKE(invalid_z4type):TYPE(STRING):0,0
+FIELD:orig_dpv:LIKE(invalid_dpv):TYPE(STRING):0,0
+FIELD:orig_maildeliverabilitycode:LIKE(invalid_maildeliverabilitycode):TYPE(STRING):0,0
+FIELD:orig_addressvalidationdate:LIKE(invalid_date):TYPE(STRING):0,0
+FIELD:orig_filler1:TYPE(STRING):0,0
+FIELD:orig_directoryassistanceflag:LIKE(invalid_directoryassistanceflag):TYPE(STRING):0,0
+FIELD:orig_telephoneconfidencescore:LIKE(invalid_telephoneconfidencescore):TYPE(STRING):0,0

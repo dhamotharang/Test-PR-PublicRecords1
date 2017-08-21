@@ -1,30 +1,37 @@
+IMPORT FraudShared;
 EXPORT Functions := 
 	module 
 	
 Export     fSlashedMDYtoCYMD(string pDateIn) 
                :=          intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
                      +     intformat((integer1)regexreplace('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
-                     +     intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
-
-
+                     +     intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1); 
+										 
+Export     fHypenYMDtoCYMD(string pDateIn)
+               := if(pDateIn <> '',
+							             (intformat((integer2)regexreplace('([0-9]+)-.*-.*',pDateIn,'$1'),4,1) 
+                     +     intformat((integer1)regexreplace('.*-([0-9]+)-.*',pDateIn,'$1'),2,1)
+                     +     intformat((integer1)regexreplace('.*-.*-([0-9]+)',pDateIn,'$1'),2,1)),
+										 '');  
+	
 Export Classification (
 
-           dataset(Layouts.Base.Main) pBaseFile ) := 
+           dataset(FraudShared.Layouts.Base.Main) pBaseFile ) := 
 					 
 function 
 
-      MBSPrimary := Files().Input.MBS.Sprayed; 
-	
+      MBSPrimary := FraudShared.Files().Input.MBS.Sprayed; 
+			
 	JMbs  := join (pBaseFile , MBSPrimary(status = 1) , trim(StringLib.StringToUppercase(left.source),left,right) = trim(StringLib.StringToUppercase(right.fdn_file_code),left,right) , 
 	
-	               transform (Layouts.Base.Main , 
+	               transform (FraudShared.Layouts.Base.Main , 
 								  
-												self.classification_Permissible_use_access.fdn_file_info_id   := right.fdn_file_info_id ; 
-												self.classification_Permissible_use_access.fdn_file_code      := StringLib.StringToUppercase(right.fdn_file_code) ; 
-											  self.classification_Permissible_use_access.gc_id              := right.gc_id ; 
-												self.classification_Permissible_use_access.file_type          := right.file_type ; 
-												self.classification_Permissible_use_access.description        := StringLib.StringToUppercase(right.description) ; 
-												self.classification_Permissible_use_access.primary_source_entity := right.primary_source_entity; 
+												self.classification_Permissible_use_access.fdn_file_info_id                            := right.fdn_file_info_id ; 
+												self.classification_Permissible_use_access.fdn_file_code                               := StringLib.StringToUppercase(right.fdn_file_code) ; 
+											  self.classification_Permissible_use_access.gc_id                                       := right.gc_id ; 
+												self.classification_Permissible_use_access.file_type                                   := right.file_type ; 
+												self.classification_Permissible_use_access.description                                 := StringLib.StringToUppercase(right.description) ; 
+												self.classification_Permissible_use_access.primary_source_entity                       := right.primary_source_entity; 
 												self.classification_Permissible_use_access.Ind_type                                    := right.Ind_type; 
 											  self.classification_Permissible_use_access.update_freq                                 := right.update_freq;
 												self.classification_Permissible_use_access.Expiration_days                             := right.Expiration_days;
@@ -35,21 +42,25 @@ function
 												self.classification_Permissible_use_access.user_added                                  := StringLib.StringToUppercase(right.user_added ); 
 												self.classification_Permissible_use_access.date_changed                                := StringLib.StringToUppercase(right.date_changed)  ; 
 												self.classification_Permissible_use_access.user_changed                                := StringLib.StringToUppercase(right.user_changed); 
-												self.classification_Permissible_use_access.p_industry_segment                          := '' ;
+												self.classification_Permissible_use_access.p_industry_segment                          := '';
 												self.classification_Permissible_use_access.usage_term                                  := '';
 												self.classification_source.Source_type_id                                              := right.file_type;
 												self.classification_source.Primary_source_Entity_id                                    := right.Primary_source_Entity;
 												self.classification_source.Expectation_of_Victim_Entities_id                           := right.Expectation_of_Victim_Entities;
 												self.classification_Activity.Suspected_Discrepancy_id                                  := right.Suspected_Discrepancy;
-												self.classification_Activity.Confidence_that_activity_was_deceitful_id                 := right.Confidence_that_activity_was_deceitful;
+												self.classification_Activity.Confidence_that_activity_was_deceitful_id                 := if(left.source = 'ERIE', left.classification_Activity.Confidence_that_activity_was_deceitful_id,
+												                                                                                                                   right.Confidence_that_activity_was_deceitful);
 												self.classification_Activity.workflow_stage_committed_id                               := right.workflow_stage_committed;
 												self.classification_Activity.workflow_stage_detected_id                                := right.workflow_stage_detected;
 												self.classification_Activity.Channels_id                                               := right.Channels;
 												self.classification_Activity.Threat_id                                                 := right.Threat;
 												self.classification_Activity.Alert_level_id                                            := right.Alert_level;
-												self.classification_Entity.Entity_type_id                                              := right.Entity_type;
-												self.classification_Entity.Entity_sub_type_id                                          := right.Entity_sub_type;
-												self.classification_Entity.role_id                                                     := right.role;
+												self.classification_Entity.Entity_type_id                                              := if(left.source = 'ERIE', left.classification_Entity.Entity_type_id, 
+												                                                                                                                   right.Entity_type); 
+												self.classification_Entity.Entity_sub_type_id                                          := if(left.source = 'ERIE', left.classification_Entity.Entity_sub_type_id,
+												                                                                                                                   right.Entity_sub_type);
+												self.classification_Entity.role_id                                                     := if(left.source = 'ERIE', left.classification_Entity.role_id, 
+												                                                                                                                   right.role);
 												self.classification_Entity.Evidence_id                                                 := right.Evidence;
 												self:= left ) , left outer , lookup ); 
 	 
@@ -67,7 +78,7 @@ end;
 
 		#uniquename(myCleanFunction)
 
-		STRING %myCleanFunction%(STRING x) := if(TRIM(x,all) in FraudDefenseNetwork.Functions.nullset , '',stringlib.stringcleanspaces(stringlib.stringtouppercase(x)));
+		STRING %myCleanFunction%(STRING x) := if(TRIM(x,all) in Functions.nullset , '',stringlib.stringcleanspaces(stringlib.stringtouppercase(x)));
 		
 			#uniquename(tra)
 		inputFile %tra%(inputFile le) :=
@@ -178,6 +189,86 @@ end;
 
 return frd_typ;
 end;
-		
+
+ 	export Erie_IndustrySegment(string TypeOfLoss)  :=
+																			map(TypeOfLoss  = 'ABI'           => 'INSURANCE - AUTO',
+																					TypeOfLoss  = 'APD'           => 'INSURANCE - AUTO',
+																					TypeOfLoss  = 'AFB'           => 'INSURANCE - AUTO',
+																					TypeOfLoss  = 'AT'            => 'INSURANCE - AUTO',
+																					TypeOfLoss  = 'AFB'           => 'INSURANCE - AUTO',
+																					TypeOfLoss  = 'AC'            => 'INSURANCE - AUTO',
+																					TypeOfLoss  = 'AO'            => 'INSURANCE - AUTO',
+																					TypeOfLoss  = 'HT'            => 'INSURANCE - PROPERTY',
+																					TypeOfLoss  = 'HF'            => 'INSURANCE - PROPERTY',
+																					TypeOfLoss  = 'HO'            => 'INSURANCE - PROPERTY',
+																					TypeOfLoss  = 'CPT'           => 'INSURANCE - COMMERCIAL',
+																					TypeOfLoss  = 'CPF'           => 'INSURANCE - COMMERCIAL',
+																					TypeOfLoss  = 'CAT'           => 'INSURANCE - COMMERCIAL',
+																					TypeOfLoss  = 'CAF'           => 'INSURANCE - COMMERCIAL',
+																					TypeOfLoss  = 'CO'            => 'INSURANCE - COMMERCIAL',
+																					TypeOfLoss  = 'W/C'           => 'INSURANCE - WORKERS COMP',
+																					TypeOfLoss  = 'MU'            => 'INSURANCE - OTHER',
+																					TypeOfLoss  = 'ML'            => 'INSURANCE - OTHER',
+																					TypeOfLoss  = 'MF'            => 'INSURANCE - OTHER',
+																					TypeOfLoss  = 'MO'            => 'INSURANCE - OTHER',
+																					TypeOfLoss  = 'SUB'           => 'INSURANCE - OTHER',
+																					TypeOfLoss  = 'RE'            => 'INSURANCE - OTHER',
+																					'INSURANCE (UNSPECIFIED SEGMENT)'
+																					);
+
+ 	export Erie_SubType(string TypeOfLoss)  :=
+																			map(TypeOfLoss  = 'ABI'           => 'BODILY INJURY',
+																					TypeOfLoss  = 'APD'           => 'PROPERTY DAMAGE',
+																					TypeOfLoss  = 'AFB'           => 'FPF/PIP',
+																					TypeOfLoss  = 'AT'            => 'THEFT',
+																					TypeOfLoss  = 'AFB'           => 'FIRE',
+																					TypeOfLoss  = 'AC'            => 'COLLISON',
+																					TypeOfLoss  = 'AO'            => 'OTHER',
+																					TypeOfLoss  = 'HT'            => 'THEFT',
+																					TypeOfLoss  = 'HF'            => 'FIRE',
+																					TypeOfLoss  = 'HO'            => 'OTHER',
+																					TypeOfLoss  = 'CPT'           => 'THEFT',
+																					TypeOfLoss  = 'CPF'           => 'FIRE',
+																					TypeOfLoss  = 'CAT'           => 'THEFT',
+																					TypeOfLoss  = 'CAF'           => 'FIRE',
+																					TypeOfLoss  = 'CO'            => 'OTHER',
+																					TypeOfLoss  = 'W/C'           => '',
+																					TypeOfLoss  = 'MU'            => '',
+																					TypeOfLoss  = 'ML'            => '',
+																					TypeOfLoss  = 'MF'            => 'FORGERY',
+																					TypeOfLoss  = 'MO'            => '',
+																					TypeOfLoss  = 'SUB'           => '',
+																					TypeOfLoss  = 'RE'            => '',
+																					''
+																					);
+
+ 	export Erie_ConfActivityDeceitful(string Findings)  :=
+																			map(Findings  = 'F'/*'FRAUD'*/           => Mod_MbsContext.ErieConfActivityDeceitful_pr,//'PROBABLE',
+																					Findings  = 'I'/*'INCONCLUSIVE'*/    => Mod_MbsContext.ErieConfActivityDeceitful_po,//'POTENTIAL',
+																					Findings  = 'O'/*'OTHER'*/           => Mod_MbsContext.ErieConfActivityDeceitful_po,//'POTENTIAL',
+																					Findings  = 'V' /*'VALID'*/           => Mod_MbsContext.ErieConfActivityDeceitful_ne,//'NEUTRAL',
+																					Mod_MbsContext.ErieConfActivityDeceitful_ne
+																					);
+
+ 	export Erie_ConfActivityDeceitful_id(string Findings)  :=
+																			map(Findings  = 'F'/*'FRAUD'*/          => Mod_MbsContext.ErieConfActivityDeceitful_pr_id,//'PROBABLE',
+																					Findings  = 'I'/*'INCONCLUSIVE'*/   => Mod_MbsContext.ErieConfActivityDeceitful_po_id,//'POTENTIAL',
+																					Findings  = 'O'/*'OTHER'*/          => Mod_MbsContext.ErieConfActivityDeceitful_po_id,//'POTENTIAL',
+																					Findings  = 'V' /*'VALID'*/         => Mod_MbsContext.ErieConfActivityDeceitful_ne_id,//'NEUTRAL',
+																					Mod_MbsContext.ErieConfActivityDeceitful_ne_id
+																					);
+
+ 	export Erie_EntityType(string entity)  :=
+																			map(entity      = 'PERSON'        => Mod_MbsContext.ErieEntityType_person,//'PERSON',
+																					entity      = 'BUSINESS'      => Mod_MbsContext.ErieEntityType_business,//'BUSINESS',
+																					Mod_MbsContext.ErieEntityType_unknown //UNKNOWN
+																					);
+
+ 	export Erie_EntityType_id(string entity)  :=
+																			map(entity      = 'PERSON'        => Mod_MbsContext.ErieEntityType_person_id,//'PERSON',
+																					entity      = 'BUSINESS'      => Mod_MbsContext.ErieEntityType_business_id,//'BUSINESS',
+																					Mod_MbsContext.ErieEntityType_unknown_id //UNKNOWN
+																					);
+																		 
 end; 
 			

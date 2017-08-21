@@ -1,6 +1,44 @@
-IMPORT Address, BIPV2, DueDiligence, Risk_Indicators, ut, STD;
+IMPORT Address, BIPV2, Business_Header, Business_Risk_BIP, DueDiligence, Risk_Indicators, ut, STD;
 
 EXPORT Common := MODULE
+
+// Grabs just the linking ID's and Unique Seq Number - this is needed to use the BIP kFetch
+	EXPORT GetLinkIDsForKFetch(DATASET(DueDiligence.Layouts.Busn_Internal) BusnData) := FUNCTION
+		
+		BIPV2.IDlayouts.l_xlink_ids grabLinkIDsForKFetch(DueDiligence.Layouts.Busn_Internal le) := TRANSFORM
+			//SELF.UniqueID		:= le.seq;
+			SELF.PowID			:= le.Busn_info.BIP_IDs.PowID.LinkID;
+			SELF.PowScore		:= le.Busn_info.BIP_IDs.PowID.Score;
+			SELF.PowWeight	:= le.Busn_info.BIP_IDs.PowID.Weight;
+			
+			SELF.ProxID			:= le.Busn_info.BIP_IDs.ProxID.LinkID;
+			SELF.ProxScore	:= le.Busn_info.BIP_IDs.ProxID.Score;
+			SELF.ProxWeight	:= le.Busn_info.BIP_IDs.ProxID.Weight;
+			
+			SELF.SeleID			:= le.Busn_info.BIP_IDs.SeleID.LinkID;
+			SELF.SeleScore	:= le.Busn_info.BIP_IDs.SeleID.Score;
+			SELF.SeleWeight	:= le.Busn_info.BIP_IDs.SeleID.Weight;
+			
+			SELF.OrgID			:= le.Busn_info.BIP_IDs.OrgID.LinkID;
+			SELF.OrgScore		:= le.Busn_info.BIP_IDs.OrgID.Score;
+			SELF.OrgWeight	:= le.Busn_info.BIP_IDs.OrgID.Weight;
+			
+			SELF.UltID			:= le.Busn_info.BIP_IDs.UltID.LinkID;
+			SELF.UltScore		:= le.Busn_info.BIP_IDs.UltID.Score;
+			SELF.UltWeight	:= le.Busn_info.BIP_IDs.UltID.Weight;
+			
+			SELF := [];                                       // Don't populate DotID or EmpID
+		END;
+		
+		linkIDsOnlyForKFetch := PROJECT(BusnData, grabLinkIDsForKFetch(LEFT));
+		
+		RETURN linkIDsOnlyForKFetch;
+	END;
+
+
+
+
+
 	// Grabs just the linking ID's and Unique Seq Number - this is needed to use the BIP kFetch
 	EXPORT GetLinkIDs(DATASET(DueDiligence.Layouts.Busn_Internal) BusnData) := FUNCTION
 		
@@ -33,6 +71,61 @@ EXPORT Common := MODULE
 		
 		RETURN linkIDsOnly;
 	END;
+	
+	EXPORT ValidateRequest(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbPurpose, UNSIGNED1 dppaPurpose):= FUNCTION
+	
+		DueDiligence.Layouts.Input validateRequest(DueDiligence.Layouts.Input le) := TRANSFORM
+			//Validate the request
+			BOOLEAN IndFNamePopulated		  := le.individual.name.firstName <> '' OR le.individual.name.fullName <> '';
+			BOOLEAN IndLNamePopulated	  	:= le.individual.name.lastName <> '' OR le.individual.name.fullName <> '';
+			BOOLEAN IndAddrPopulated		  := le.Individual.address.streetaddress1 <> '' OR (le.Individual.address.prim_range <> '' AND le.Individual.address.prim_name <> '');
+			BOOLEAN IndCityStatePopulated := le.individual.address.city <> '' AND le.individual.address.state <> '';
+			BOOLEAN IndZipPopulated		    := le.individual.address.zip5 <> '';
+			BOOLEAN IndSSNPopulated		    := le.individual.ssn <> '';
+
+			BOOLEAN BusNamePopulated		  := le.business.companyName <> '' OR le.business.altCompanyName <> '';
+			BOOLEAN BusAddrPopulated		  := le.business.address.streetaddress1 <> '' OR (le.business.address.prim_range <> '' AND le.Business.address.prim_name <> '');
+			BOOLEAN BusCityStatePopulated := le.business.address.city <> '' AND le.business.address.state <> '';
+			BOOLEAN BusZipPopulated		    := le.business.address.zip5 <> '';
+			BOOLEAN BusTaxIDPopulated		  := le.business.fein <> '';
+			
+			BOOLEAN LexIDPopulated		  	:= le.individual.lexID <> '';
+			BOOLEAN SeleIDPopulated	  	  := le.business.lexID <> '';
+			BOOLEAN ValidGLB		  				:= Risk_Indicators.iid_constants.glb_ok((UNSIGNED)glbPurpose, FALSE );
+			BOOLEAN ValidDPPA	  					:= Risk_Indicators.iid_constants.dppa_ok((UNSIGNED)dppaPurpose, FALSE);
+			
+			BOOLEAN ValidIndividual := (IndFNamePopulated AND IndLNamePopulated AND
+																			(IndSSNPopulated OR 
+																			(IndAddrPopulated AND (IndCityStatePopulated OR IndZipPopulated)))) 
+																	OR LexIDPopulated;
+			
+			BOOLEAN ValidBusiness := (BusNamePopulated AND
+																		(BusTaxIDPopulated OR
+																		(BusAddrPopulated AND (BusCityStatePopulated OR BusZipPopulated)))) 
+																OR SeleIDPopulated;
+																
+			BOOLEAN ValidIndVersion := le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS;
+			BOOLEAN ValidBusVersion := le.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS;
+			
+			STRING OhNoMessage := MAP(ValidIndVersion = FALSE AND ValidBusVersion = FALSE => DueDiligence.Constants.VALIDATION_INVALID_VERSION,
+																ValidIndVersion AND ValidIndividual = FALSE => DueDiligence.Constants.VALIDATION_INVALID_INDIVIDUAL,
+																ValidBusVersion AND ValidBusiness = FALSE => DueDiligence.Constants.VALIDATION_INVALID_BUSINESS,
+																ValidGLB = FALSE => DueDiligence.Constants.VALIDATION_INVALID_GLB,
+																ValidDPPA = FALSE => DueDiligence.Constants.VALIDATION_INVALID_DPPA,
+																'');
+
+			
+			SELF.validRequest := IF(OhNoMessage = '', TRUE, FALSE);
+			SELF.errorMessage := OhNoMessage;
+			SELF := le;
+		END;
+		
+		validatedRequests := PROJECT(input, validateRequest(LEFT));
+
+		
+	
+		RETURN validatedRequests;
+	END;
 
 	//copied/modified from 	Business_Risk_BIP.Common.AppendSeq2
 	EXPORT AppendSeq(rawData, datasetToJoinTo, joinResult) := MACRO
@@ -42,8 +135,25 @@ EXPORT Common := MODULE
 																	SELF.Seq := RIGHT.Seq;
 																	SELF.HistoryDate := RIGHT.HistoryDate;
 																	SELF := LEFT), 
-												FEW); // Can use FEW because the RIGHT side should contain < 10000 rows (100 only average in batch)
+												FEW);                                                                    // Can use FEW because the RIGHT side should contain < 10000 rows (100 only average in batch)
 	ENDMACRO;
+	
+	
+ // -------                                                                                    -----
+ // -------  This is a common routine that joins the raw data to the Business Internal record  -----
+ // ------- Note:  this only works when the datasetToJoinTo is the Business Internal record    -----
+ // -------                                                                                    -----
+	EXPORT AppendSeqAndHistoryDate(rawData, datasetToJoinTo, joinResult) := MACRO
+		joinResult := JOIN(rawData, datasetToJoinTo, 
+												LEFT.UltID                 = RIGHT.Busn_info.BIP_IDS.UltID.LinkID AND
+												LEFT.OrgID                 = RIGHT.Busn_info.BIP_IDS.OrgID.LinkID AND
+												LEFT.SeleID                = RIGHT.Busn_info.BIP_IDS.SeleID.LinkID,
+												TRANSFORM({RECORDOF(LEFT), UNSIGNED4 Seq, UNSIGNED4 HistoryDate},
+																	SELF.Seq         := RIGHT.Seq;
+																	SELF.HistoryDate := RIGHT.HistoryDate;
+																	SELF             := LEFT), 
+												FEW);                                                                      // Can use FEW because the RIGHT side should contain < 10000 rows (100 only average in batch)
+	ENDMACRO;	
 	
 	
 	EXPORT fn_filterOnArchiveDate(INTEGER fieldDate, INTEGER archiveDate) := FUNCTION
@@ -77,7 +187,7 @@ EXPORT Common := MODULE
 	
 	//copied/modified from 	Business_Risk_BIP.Common.FilterRecords - used with 2 dates to filter
 	EXPORT FilterRecords(dataSetToFilter, dateFirstSeenField, secondaryDateFirstSeenField) := FUNCTIONMACRO
-	
+
 		//filter out invalid dates
 		tempDataset1 := DueDiligence.Common.CleanDateFields(dataSetToFilter, dateFirstSeenField);
 		tempDataset2 := DueDiligence.Common.CleanDateFields(tempDataset1, secondaryDateFirstSeenField);
@@ -169,86 +279,143 @@ EXPORT Common := MODULE
 	
 	
 	EXPORT CleanDateFields(datasetToCheck, dateFieldToCheck) := FUNCTIONMACRO
-		updatedField := PROJECT(datasetToCheck,
+	
+		//Make sure that the date fields can hold an 8 character field returned from checkInvalidDate
+		newLayout := RECORD
+			RECORDOF(datasetToCheck) -dateFieldToCheck;
+		END;
+			
+		updatedDS := PROJECT(datasetToCheck, TRANSFORM({RECORDOF(newLayout), UNSIGNED4 dateFieldToCheck}, 
+																										SELF.dateFieldToCheck := (UNSIGNED4)LEFT.dateFieldToCheck;
+																										SELF := LEFT;));
+
+		updatedField := PROJECT(updatedDS,
 														TRANSFORM({RECORDOF(LEFT)},
-																			SELF.dateFieldToCheck := (TYPEOF(datasetToCheck.dateFieldToCheck))DueDiligence.Common.checkInvalidDate((STRING)LEFT.dateFieldToCheck);
+																			SELF.dateFieldToCheck := (TYPEOF(updatedDS.dateFieldToCheck))DueDiligence.Common.checkInvalidDate((STRING)LEFT.dateFieldToCheck);
 																			SELF := LEFT));
 
 		RETURN updatedField;
 	ENDMACRO;
 	
+	
 	EXPORT GetCleanData(DATASET(DueDiligence.Layouts.Input) input) := FUNCTION
 	
 		DueDiligence.Layouts.CleanedData cleanIt(DueDiligence.Layouts.Input le) := TRANSFORM
 		
-			busAddress := le.business.address;
+			//Clean Address
+			addressToClean := IF(le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, le.individual.address, le.business.address);
 			
-			//Company Address Fields
-			companyAddress := Risk_Indicators.MOD_AddressClean.street_address(busAddress.streetAddress1 + ' ' + busAddress.streetAddress2, busAddress.prim_range, 
-																																				busAddress.predir, busAddress.prim_name, busAddress.addr_suffix, 
-																																				busAddress.postdir, busAddress.unit_desig, busAddress.sec_range);
+
+			addr := Risk_Indicators.MOD_AddressClean.street_address(addressToClean.streetAddress1 + ' ' + addressToClean.streetAddress2, addressToClean.prim_range, 
+																																				addressToClean.predir, addressToClean.prim_name, addressToClean.addr_suffix, 
+																																				addressToClean.postdir, addressToClean.unit_desig, addressToClean.sec_range);
 																																				
-			companyCleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(companyAddress, busAddress.city, busAddress.state, busAddress.zip5);											
+			cleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(addr, addressToClean.city, addressToClean.state, addressToClean.zip5);											
 		
-			cleanedCompanyAddress := Address.CleanFields(companyCleanAddr);
+			cleanedAddress := Address.CleanFields(cleanAddr);
 			
-			street1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedCompanyAddress.Prim_Range, cleanedCompanyAddress.Predir, cleanedCompanyAddress.Prim_Name, 
-																												cleanedCompanyAddress.Addr_Suffix, cleanedCompanyAddress.Postdir, cleanedCompanyAddress.Unit_Desig, cleanedCompanyAddress.Sec_Range);
+			street1 := Risk_Indicators.MOD_AddressClean.street_address('', cleanedAddress.Prim_Range, cleanedAddress.Predir, cleanedAddress.Prim_Name, 
+																												cleanedAddress.Addr_Suffix, cleanedAddress.Postdir, cleanedAddress.Unit_Desig, cleanedAddress.Sec_Range);
 			
 			addressClean := DATASET([TRANSFORM(DueDiligence.Layouts.Address,
 																					SELF.streetAddress1 := street1;
-																					SELF.streetAddress2 := TRIM(StringLib.StringToUppercase(busAddress.StreetAddress2));
-																					SELF.prim_range := cleanedCompanyAddress.prim_range;
-																					SELF.predir := cleanedCompanyAddress.predir;
-																					SELF.prim_name := cleanedCompanyAddress.prim_name;
-																					SELF.addr_suffix := cleanedCompanyAddress.addr_suffix;
-																					SELF.postdir := cleanedCompanyAddress.postdir;
-																					SELF.unit_desig := cleanedCompanyAddress.unit_desig;
-																					SELF.sec_range := cleanedCompanyAddress.sec_range;
-																					SELF.city := cleanedCompanyAddress.v_city_name;
-																					SELF.state := cleanedCompanyAddress.st;
-																					SELF.zip5 := cleanedCompanyAddress.zip;
-																					SELF.zip4 := cleanedCompanyAddress.zip4;
-																					SELF.cart := cleanedCompanyAddress.cart;
-																					SELF.cr_sort_sz := cleanedCompanyAddress.cr_sort_sz;
-																					SELF.lot := cleanedCompanyAddress.lot;
-																					SELF.lot_order := cleanedCompanyAddress.lot_order;
-																					SELF.dbpc := cleanedCompanyAddress.dbpc;
-																					SElF.chk_digit := cleanedCompanyAddress.chk_digit;
-																					SELF.rec_type := cleanedCompanyAddress.rec_type;
-																					SELF.county := cleanedCompanyAddress.county;
-																					SELF.geo_lat := cleanedCompanyAddress.geo_lat;
-																					SELF.geo_long := cleanedCompanyAddress.geo_long;
-																					SELF.msa := cleanedCompanyAddress.msa;
-																					SELF.geo_blk := cleanedCompanyAddress.geo_blk;
-																					SELF.geo_match := cleanedCompanyAddress.geo_match;
-																					SELF.err_stat := cleanedCompanyAddress.err_stat;
+																					SELF.streetAddress2 := TRIM(StringLib.StringToUppercase(addressToClean.StreetAddress2));
+																					SELF.prim_range := cleanedAddress.prim_range;
+																					SELF.predir := cleanedAddress.predir;
+																					SELF.prim_name := cleanedAddress.prim_name;
+																					SELF.addr_suffix := cleanedAddress.addr_suffix;
+																					SELF.postdir := cleanedAddress.postdir;
+																					SELF.unit_desig := cleanedAddress.unit_desig;
+																					SELF.sec_range := cleanedAddress.sec_range;
+																					SELF.city := cleanedAddress.v_city_name;
+																					SELF.state := cleanedAddress.st;
+																					SELF.zip5 := cleanedAddress.zip;
+																					SELF.zip4 := cleanedAddress.zip4;
+																					SELF.cart := cleanedAddress.cart;
+																					SELF.cr_sort_sz := cleanedAddress.cr_sort_sz;
+																					SELF.lot := cleanedAddress.lot;
+																					SELF.lot_order := cleanedAddress.lot_order;
+																					SELF.dbpc := cleanedAddress.dbpc;
+																					SElF.chk_digit := cleanedAddress.chk_digit;
+																					SELF.rec_type := cleanedAddress.rec_type;
+																					SELF.county := cleanedAddress.county;
+																					SELF.geo_lat := cleanedAddress.geo_lat;
+																					SELF.geo_long := cleanedAddress.geo_long;
+																					SELF.msa := cleanedAddress.msa;
+																					SELF.geo_blk := cleanedAddress.geo_blk;
+																					SELF.geo_match := cleanedAddress.geo_match;
+																					SELF.err_stat := cleanedAddress.err_stat;
 																					SELF := [];)])[1];
-																					
+			
+			//Clean Company Name
 			busName := le.business.companyName;
 			altBusName := le.business.altCompanyName;
 			
-			//Company Name Fields
+
 			companyName := IF(busName = '', ut.CleanCompany(altBusName), ut.CleanCompany(busName)); // If the customer didn't pass in a company but passed in an alt company name use the alt as the company name
 			altCompanyName := IF(busName = '', '', ut.CleanCompany(altBusName)); // Blank out the cleaned AltCompanyName if CompanyName wasn't populated, as we copied Alt into the Main CompanyName field on the previous line
 			
-			//remove any non-numeric fiends from taxID and lexID fields
+			//Clean Phone Number
+			phoneNumber := IF(le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, le.individual.phone, le.business.phone);
+			phoneToClean := StringLib.StringFilter(phoneNumber, '0123456789');
+			validPhone := IF(Business_Risk_BIP.Common.validPhone(phoneToClean), phoneToClean, ''); //If we do not have a valid phone, blank it out
 			
-			//valid history date passed - if invalid should return 99999999 for current mode
+			//Remove any non-numeric fiends from taxID and lexID fields
+			taxID := IF(le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, le.individual.ssn, le.business.fein);
+			taxIDToClean := StringLib.StringFilter(taxID, '0123456789');
+			validTaxID := IF(le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, IF(Business_Header.IsValidSsn((UNSIGNED)taxIDToClean), taxIDToClean, ''), 
+																																																	 IF(Business_Header.ValidFEIN((UNSIGNED)taxIDToClean), taxIDToClean, '' ));
+			
+			lexID := IF(le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, le.individual.lexID, le.business.lexID);
+			validLexID := StringLib.StringFilter(lexID, '0123456789');
+			
+			//Valid history date passed - if invalid should return 99999999 for current mode
 			validDate := checkInvalidDate((STRING)le.historyDateYYYYMMDD, (STRING)DueDiligence.Constants.date8Nines);
 			
-			
-			busClean := DATASET([TRANSFORM(DueDiligence.Layouts.Busn_Input,
-																			SELF.lexID := le.business.lexID;
-																			SELF.companyName := companyName;
-																			SELF.altCompanyName := altCompanyName;
-																			SELF.address := addressClean;
-																			SELF.phone := le.business.phone;
-																			SELF.fein := le.business.fein;
-																			SELF := [];)])[1];
+			//Populate appropriate cleaned data	
+			busClean := IF(le.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS, 
+												DATASET([TRANSFORM(DueDiligence.Layouts.Busn_Input,
+																						SELF.lexID := validLexID;
+																						SELF.companyName := companyName;
+																						SELF.altCompanyName := altCompanyName;
+																						SELF.address := addressClean;
+																						SELF.phone := validPhone;
+																						SELF.fein := validTaxID;
+																						SELF := le.business;
+																						SELF := [];)]),
+												DATASET([], DueDiligence.Layouts.Busn_Input));
+																			
+			indClean := IF(le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS,
+												DATASET([TRANSFORM(DueDiligence.Layouts.Indv_Input,
+																						SELF.lexID := validLexID;
+																						SELF.name := DATASET([TRANSFORM(DueDiligence.Layouts.Name,
+																																						unparsedName		:= StringLib.StringToUpperCase(TRIM(le.individual.name.fullName, LEFT, RIGHT));
+																																						fName 					:= StringLib.StringToUpperCase(TRIM(le.individual.name.firstName, LEFT, RIGHT));
+																																						mName						:= StringLib.StringToUpperCase(TRIM(le.individual.name.middleName, LEFT, RIGHT));
+																																						lName						:= StringLib.StringToUpperCase(TRIM(le.individual.name.lastName, LEFT, RIGHT));
+																																						sName						:= StringLib.StringToUpperCase(TRIM(le.individual.name.suffix, LEFT, RIGHT));
+																																						cleanedName			:= Address.CleanPerson73(unparsedName);
+																																						cleanedFirst		:= IF(unparsedName <> '', StringLib.StringToUpperCase(cleanedName[6..25]), '');
+																																						cleanedMiddle		:= IF(unparsedName <> '', StringLib.StringToUpperCase(cleanedName[26..45]), '');
+																																						cleanedLast			:= IF(unparsedName <> '', StringLib.StringToUpperCase(cleanedName[46..65]), '');
+																																						cleanedSuffix		:= IF(unparsedName <> '', StringLib.StringToUpperCase(cleanedName[66..70]), '');
+																														
+																																						SELF.fullName := unparsedName;
+																																						SELF.firstName := IF(fName = '', cleanedFirst, fName);
+																																						SELF.middleName := IF(mName = '', cleanedMiddle, mName);
+																																						SELF.lastName := IF(lName = '', cleanedLast, lName);
+																																						SELF.suffix := IF(sName = '', cleanedSuffix, sName);																															
+																																						SELF := [];)])[1];
+																						SELF.address := addressClean;
+																						SELF.phone := validPhone;
+																						SELF.ssn := validTaxID;
+																						SELF := le.individual;
+																						SELF := [];)]),
+												DATASET([], DueDiligence.Layouts.Indv_Input));
 
 			inputClean := DATASET([TRANSFORM(DueDiligence.Layouts.Input,
-																				SELF.business := busClean;
+																				SELF.business := busClean[1];
+																				SELF.individual := indClean[1];
 																				SELF.historyDateYYYYMMDD := (UNSIGNED)validDate;
 																				SELF := le;
 																				SELF := [];)])[1];
@@ -262,5 +429,161 @@ EXPORT Common := MODULE
 		RETURN PROJECT(input, cleanIt(LEFT));
 	END;
 	
+	EXPORT DaysApartWithZeroEmptyDate(STRING date) := FUNCTION
+		RETURN IF((UNSIGNED)date > 0, ut.DaysApart(date, (STRING8)Std.Date.Today()), 0); //return 0 days apart if date doesn't exist 
+	END;
 	
+	EXPORT rollSicNaicBySeqAndBIP(InputDataset) := FUNCTIONMACRO
+		sortedTempOutput := SORT(InputDataset, seq, #expand(DueDiligence.Constants.mac_ListTop3Linkids()), SICCode, NAICCode);
+		rollTempOutput := ROLLUP(sortedTempOutput,
+															LEFT.seq = RIGHT.seq AND
+															LEFT.ultID = RIGHT.ultID AND
+															LEFT.orgID = RIGHT.orgID AND
+															LEFT.seleID = RIGHT.seleID AND
+															LEFT.SICCode = RIGHT.SICCode AND
+															LEFT.NAICCode = RIGHT.NAICCode,
+															TRANSFORM({RECORDOF(sortedTempOutput)},
+																				SELF.FirstSeenDate := IF(LEFT.FirstSeenDate = 0, MAX(LEFT.FirstSeenDate, RIGHT.FirstSeenDate), MIN(LEFT.FirstSeenDate, RIGHT.FirstSeenDate));
+																				SELF.LastSeenDate := MAX(LEFT.LastSeenDate, RIGHT.LastSeenDate);
+																				SELF.RecordCount := LEFT.RecordCount + RIGHT.RecordCount;
+																				SELF.IsPrimary := LEFT.IsPrimary OR RIGHT.IsPrimary;
+																				SELF := LEFT;));
+
+		projectSources := PROJECT(rollTempOutput, TRANSFORM(DueDiligence.LayoutsInternal.SicNaicLayout,
+																												SELF.sources := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.LayoutSICNAIC,
+																																																SELF.DateFirstSeen := LEFT.FirstSeenDate;
+																																																SELF.DateLastSeen := LEFT.LastSeenDate;
+																																																
+																																																sic := LEFT.SICCode;
+																																																lengthOfSic := LENGTH(sic);
+																																																
+																																																SELF.SICIndustry := MAP(sic = '' => sic,
+																																																												sic IN DueDiligence.Constants.CIB_SIC => DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS,
+																																																												sic IN DueDiligence.Constants.MSB_SIC => DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS,
+																																																												sic IN DueDiligence.Constants.NBFI_SIC => DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS,
+																																																												sic IN DueDiligence.Constants.CASGAM_SIC => DueDiligence.Constants.INDUSTRY_CASINO_AND_GAMING,
+																																																												sic IN DueDiligence.Constants.LEGTRAV_SIC => DueDiligence.Constants.INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL,
+																																																												sic IN DueDiligence.Constants.AUTO_SIC => DueDiligence.Constants.INDUSTRY_AUTOMOTIVE,
+																																																												DueDiligence.Constants.INDUSTRY_OTHER);
+																																																																																																
+																																																SELF.SICRiskLevel := MAP(sic = '' => sic,
+																																																													lengthOfSic = 2 AND sic IN DueDiligence.Constants.SIC_LENGTH_2_RISK_HIGH => DueDiligence.Constants.RISK_LEVEL_HIGH,
+																																																													lengthOfSic = 4 AND (sic IN DueDiligence.Constants.SIC_LENGTH_4_RISK_HIGH OR 
+																																																																								sic[1..2] IN DueDiligence.Constants.SIC_LENGTH_4_2STAR_RISK_HIGH) => DueDiligence.Constants.RISK_LEVEL_HIGH,
+																																																													lengthOfSic = 6 AND (sic IN DueDiligence.Constants.SIC_LENGTH_6_RISK_HIGH OR 
+																																																																								sic[1..2] IN DueDiligence.Constants.SIC_LENGTH_6_4STAR_RISK_HIGH OR
+																																																																								sic[1..4] IN DueDiligence.Constants.SIC_LENGTH_6_2STAR_RISK_HIGH) => DueDiligence.Constants.RISK_LEVEL_HIGH,
+																																																													lengthOfSic = 8 AND (sic IN DueDiligence.Constants.SIC_LENGTH_8_RISK_HIGH OR
+																																																																								sic[1..2] IN DueDiligence.Constants.SIC_LENGTH_8_6STAR_RISK_HIGH OR
+																																																																								sic[1..4] IN DueDiligence.Constants.SIC_LENGTH_8_4STAR_RISK_HIGH OR
+																																																																								sic[1..6] IN DueDiligence.Constants.SIC_LENGTH_8_2STAR_RISK_HIGH) => DueDiligence.Constants.RISK_LEVEL_HIGH,
+																																																													DueDiligence.Constants.RISK_LEVEL_LOW);
+																																																												
+																																																naic := LEFT.NAICCode;
+																																																naic2 := naic[1..2];
+																																																
+																																																SELF.NAICIndustry := MAP(naic = '' => naic,
+																																																												naic IN DueDiligence.Constants.CIB_NAICS => DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS,
+																																																												naic IN DueDiligence.Constants.MSB_NAICS => DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS,
+																																																												naic IN DueDiligence.Constants.NBFI_NAICS => DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS,
+																																																												naic IN DueDiligence.Constants.CASGAM_NAISC => DueDiligence.Constants.INDUSTRY_CASINO_AND_GAMING,
+																																																												naic IN DueDiligence.Constants.LEGTRAV_NAISC => DueDiligence.Constants.INDUSTRY_LEGAL_ACCOUNTANT_TELEMARKETER_FLIGHT_TRAVEL,
+																																																												naic IN DueDiligence.Constants.AUTO_NAISC => DueDiligence.Constants.INDUSTRY_AUTOMOTIVE,
+																																																												DueDiligence.Constants.INDUSTRY_OTHER);
+																																																												
+																																																SELF.NAICRiskLevel := MAP(naic = '' => naic,
+																																																													naic2 IN DueDiligence.Constants.NAICS_RISK_HIGH OR
+																																																													naic IN DueDiligence.Constants.NAICS_RISK_HIGH_EXCEP => DueDiligence.Constants.RISK_LEVEL_HIGH,
+																																																													naic2 IN DueDiligence.Constants.NAICS_RISK_MED => DueDiligence.Constants.RISK_LEVEL_MEDIUM,
+																																																													naic2 IN DueDiligence.Constants.NAICS_RISK_LOW => DueDiligence.Constants.RISK_LEVEL_LOW,
+																																																													DueDiligence.Constants.RISK_LEVEL_UNKNOWN);
+																																																SELF := LEFT;
+																																																SELF :=[];));
+																												SELF := LEFT;
+																												SELF := [];));
+																												
+		sortSources := SORT(projectSources, seq, #expand(DueDiligence.Constants.mac_ListTop3Linkids()));
+		finalRoll := ROLLUP(sortSources,
+												LEFT.seq = RIGHT.seq AND
+												LEFT.ultID = RIGHT.ultID AND
+												LEFT.orgID = RIGHT.orgID AND
+												LEFT.seleID = RIGHT.seleID,
+												TRANSFORM(DueDiligence.LayoutsInternal.SicNaicLayout,
+																	SELF.sources := LEFT.sources + RIGHT.sources;
+																	SELF := LEFT;));
+
+	
+		RETURN finalRoll;
+
+	ENDMACRO;
+	
+	
+	EXPORT getSicNaicCodes(InDataset, SicNaicsField, IsSicField, PrimaryField, DateFirstSeenName, DateLastSeenName, SourceOfData) := FUNCTIONMACRO
+		
+		temp := TABLE(InDataset,{seq, ultID, orgID, seleID,
+																 STRING2 Source := SourceOfData,
+																 UNSIGNED4 FirstSeenDate := MIN(GROUP, DateFirstSeenName),
+																 UNSIGNED4 LastSeenDate := MAX(GROUP, DateLastSeenName),
+																 UNSIGNED4 RecordCount := COUNT(GROUP),
+																 STRING10 NAICCode := IF(IsSicField, '', (StringLib.StringFilter((STRING)SicNaicsField, '0123456789'))[1..6]),
+																 STRING10 SICCode := IF(IsSicField, (StringLib.StringFilter((STRING)SicNaicsField, '0123456789'))[1..8], ''),
+																 BOOLEAN IsPrimary := PrimaryField },
+									seq, #expand(DueDiligence.Constants.mac_ListTop3Linkids()), (STRING)SicNaicsField);
+													 
+		filterSic := temp(SICCode <> '');
+		filterNaic := temp(NAICCode <> '');
+		
+		results := IF(IsSicField, filterSic, filterNaic);
+
+		RETURN results;
+
+	ENDMACRO;
+	
+	
+	EXPORT GetCleanBIPShell(DATASET(DueDiligence.Layouts.CleanedData) cleanInput) := FUNCTION
+
+		cleanedInput := PROJECT(cleanInput, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
+																									SELF.Seq := LEFT.inputecho.seq;
+																									SELF.Clean_Input.Seq := LEFT.inputecho.seq;
+																									SELF.Clean_Input.AcctNo := LEFT.inputecho.business.accountNumber;
+																									
+																									//get the cleaned business data
+																									cleanData := LEFT.cleanedInput.business;
+																									//get the cleaned business address data
+																									cleanAddress := cleanData.address;
+																									
+																									SELF.Clean_Input.CompanyName := cleanData.companyName;
+																									SELF.Clean_Input.AltCompanyName := cleanData.altCompanyName;
+																									SELF.Clean_Input.FEIN := cleanData.fein;
+																									SELF.Clean_Input.Phone10 := cleanData.phone;
+																									
+																									SELF.Clean_Input.StreetAddress1 := cleanAddress.streetAddress1;
+																									SELF.Clean_Input.StreetAddress2 := cleanAddress.streetAddress2;
+																									SELF.Clean_Input.Prim_Range := cleanAddress.prim_range;
+																									SELF.Clean_Input.Predir := cleanAddress.predir;
+																									SELF.Clean_Input.Prim_Name := cleanAddress.prim_name;
+																									SELF.Clean_Input.Addr_Suffix := cleanAddress.addr_suffix;
+																									SELF.Clean_Input.Postdir := cleanAddress.postdir;
+																									SELF.Clean_Input.Unit_Desig := cleanAddress.unit_desig;
+																									SELF.Clean_Input.Sec_Range := cleanAddress.sec_range;
+																									SELF.Clean_Input.City := cleanAddress.city;  // use v_city_name 90..114 to match all other scoring products
+																									SELF.Clean_Input.State := cleanAddress.state;
+																									SELF.Clean_Input.Zip := cleanAddress.zip5 + cleanAddress.zip4;
+																									SELF.Clean_Input.Zip5 := cleanAddress.zip5;
+																									SELF.Clean_Input.Zip4 := cleanAddress.zip4;
+																									SELF.Clean_Input.Lat := cleanAddress.geo_lat;
+																									SELF.Clean_Input.Long := cleanAddress.geo_long;
+																									SELF.Clean_Input.Addr_Type := cleanAddress.rec_type;
+																									SELF.Clean_Input.Addr_Status := cleanAddress.err_stat;
+																									SELF.Clean_Input.County := cleanAddress.county[3..5];  // Address.CleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
+																									SELF.Clean_Input.Geo_Block := cleanAddress.geo_blk;
+																								
+																									SELF.Clean_Input.HistoryDate := LEFT.cleanedInput.historyDateYYYYMMDD;
+																									SELF.Clean_Input := cleanData; // Fill out the remaining fields with what was passed in
+																									
+																									SELF := [];)); // None of the remaining attributes have been populated yet));
+		
+		RETURN cleanedInput;
+	END;
+		
 END;

@@ -1,0 +1,22 @@
+export Layout_Input_File := record
+	string10	FILE_NUMBER;
+	string4		SEGMENT_CODE;
+	string5		SEQUENCE_NUMBER;
+	string6		FILLER1;
+	string8		EXTRACT_DATE_MDY;
+	string4		FILE_ESTAB_DATE_MMYY;
+	string1		FILE_ESTAB_FLAG;
+	string40	COMPANY_NAME;
+	string30	STREET_ADDRESS;
+	string28	CITY;
+	string2		STATE_CODE;
+	string20	STATE_NAME;
+	string5		ZIP;
+	string4		ZIP_4;
+	string10	PHONE_NUMBER;
+	string4		SIC_CODE;
+	string40	BUSINESS_DESC;
+	string1		DISPUTE_IND;
+	string278 FILLER2;
+	string3		crlf;
+end;

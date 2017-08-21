@@ -82,8 +82,10 @@ vehlic.Layout_Vehicles read_codes(veh l) := transform
                                               l.lh_2_customer_name <> '' => 'U', '' );
     self.lein_holder_3_customer_type := MAP ( l.lein_holder_3_customer_type <> '' => l.lein_holder_3_customer_type,
                                               l.lh_3_customer_name <> '' => 'U', '' );
-    self.history := MAP (  l.history<>'' => l.history,
-                           l.registration_expiration_date[1..6]<ut.GetDate[1..6] => 'E', '' );
+    self.history := MAP (  l.history<>'' 											=>	l.history,
+                           ((unsigned4)(l.registration_expiration_date[1..6])) = 0	=>	l.history,
+						   l.registration_expiration_date[1..6] < ut.GetDate[1..6]	=>	'E',
+						   ' ' );
 	self := l;
 end;
 

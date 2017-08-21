@@ -1,3 +1,5 @@
+
+//If size changes, please change in doxie.layout_bk_child as well
 export layout_bk_search_addr := record
      string10   prim_range;
 	string2   predir;

@@ -17,6 +17,7 @@ export macAppendStandardizedDate(
 	,pMDY						= 'false' // can be YMD, MDY, DMY
 	,pDMY						= 'false' // can be YMD, MDY, DMY
 	,pYM						= 'false' // can be YMD, MDY, DMY
+	,pMY						= 'false' // can be YMD, MDY, DMY
 ) :=
 macro
 
@@ -90,6 +91,18 @@ pattern date_ym_mname := date_year ws month;
 
 pattern date_ym := date_ym_num | nocase(date_ym_mname);
 
+pattern date_my_num := 		(date_month '/' date_year)
+                        | (date_month '.' date_year)
+                        | (date_month '-' date_year)
+												| (month			'/' date_year)
+                        | (month			'.' date_year)
+                        | (month			'-' date_year)
+												;
+
+pattern date_my_mname := month ws date_year;
+
+pattern date_my := nocase(date_my_num) | nocase(date_my_mname);
+
 pattern last_resort_full :=		(date_month date_mday 	date_year)
                         | (date_mday  date_month	date_year)
 												| (date_year 	date_month	date_mday)
@@ -98,6 +111,7 @@ pattern last_resort_full :=		(date_month date_mday 	date_year)
 												;
 
 pattern last_resort_dmy :=	(date_mday  date_month	date_year)
+														| (date_mday  month	date_year)
 												;
 
 pattern last_resort_mdy :=	(date_month date_mday 	date_year)
@@ -111,6 +125,8 @@ pattern last_resort_ym :=	(date_year 	date_month)
 												| (date_year)
 												;
 
+pattern last_resort_my :=	(date_month date_year)
+												;
 // American forms receive precedence
 //check month		day 	year
 //			day 		month year
@@ -121,6 +137,7 @@ pattern date_all_ymd := (((date_ymd | last_resort_ymd) after front) before back)
 pattern date_all_dmy := (((date_dmy | last_resort_dmy) after front) before back);
 pattern date_all_mdy := (((date_mdy | last_resort_mdy) after front) before back);
 pattern date_all_ym  := (((date_ym  | last_resort_ym ) after front) before back);
+pattern date_all_my  := (((date_my  | last_resort_my ) after front) before back);
                                                 
 
 #if(pYMD)
@@ -135,11 +152,15 @@ pattern date_all_ym  := (((date_ym  | last_resort_ym ) after front) before back)
 #if(pYM)
 	pattern date_all := date_all_ym		;
 #else    
+#if(pMY)
+	pattern date_all := date_all_my		;
+#else    
 	pattern date_all := (((date_mdy | date_dmy | date_ymd | last_resort_full) after front) before back)	;
 #end
 #end
 #end
-#end						
+#end		
+#end				
 string2 ConvertMonth(string3 mname) := map(mname = 'JAN' => '01',
                                           mname = 'FEB' => '02',
                                           mname = 'MAR' => '03',
@@ -167,7 +188,7 @@ record, maxlength(8192)
 	recordof(pDataset);
 	string4 yyyy := intformat((integer)AdjustYear(matchtext(date_all/date_year)),4,1);
 	string2 mm := if(matched(date_all/month), ConvertMonth(stringlib.stringtouppercase(matchtext(date_all/month))[1..3]), intformat((integer)matchtext(date_all/date_month),2,1));
-#if(pYM)
+#if(pYM or pMY)
 	string2 dd := '00';
 #else
 	string2 dd := intformat((integer)matchtext(date_all/date_mday),2,1);
@@ -180,7 +201,7 @@ transform
 	self := l;
 	self.yyyy :=  intformat((integer)AdjustYear(matchtext(date_all/date_year)),4,1);
 	self.mm := if(matched(date_all/month), ConvertMonth(stringlib.stringtouppercase(matchtext(date_all/month))[1..3]), intformat((integer)matchtext(date_all/date_month),2,1));
-#if(pYM)
+#if(pYM or pMY)
 	self.dd := '00';
 #else
 	self.dd := intformat((integer)matchtext(date_all/date_mday),2,1);

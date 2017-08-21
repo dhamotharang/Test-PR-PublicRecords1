@@ -1,0 +1,1 @@
+EXPORT UNSIGNED SetFlag(UNSIGNED field, UNSIGNED flag) := field | flag;

@@ -1,3 +1,6 @@
+/*2017-02-28T09:57:12Z (Wendy Ma)
+DF-18485
+*/
 import header,ut;
 
 export fn_BestJoined_New_header( dataset(recordof(header.layout_header))head,boolean isnewheader) := function 
@@ -12,10 +15,10 @@ end;
 did_dups0 := table(head, did_rec, did, local);
 did_dups_pst := did_dups0 : persist('persist::watchdog_did_dedup_2');
 did_dups := if (isnewheader=true,did_dups_pst); 
-bphone := if (isnewheader=true,watchdog.BestPhone) ;
+bphone := if (isnewheader=true,watchdog.BestPhone()) ;
 bssn := if (isnewheader=true,watchdog.BestSSN);
 bdob := if (isnewheader=true,watchdog.BestDob);
-baddress := if (isnewheader=true,watchdog.BestAddress);
+baddress := if (isnewheader=true,watchdog.BestAddress());
 btitle := if (isnewheader=true,Watchdog.BestTitle); 
 bfname := if (isnewheader=true,watchdog.BestFirstName);
 bmname := if (isnewheader=true,watchdog.BestMiddleName);
@@ -27,7 +30,7 @@ bvehicle := if (isnewheader=true,watchdog.BestVehicle);
 bankrupt1 := if (isnewheader=true,watchdog.Bankruptcy);
 dl := if (isnewheader=true,watchdog.BestDL);
 bpaw := if (isnewheader=true,watchdog.BestPeopleAtWork);
-bADL_ind := if (isnewheader=true,Header.fn_ADLSegmentation(head).core_check_pst);
+bADL_ind := if (isnewheader=true,Header.fn_ADLSegmentation(header.file_headers).core_check_pst);
 bValidSSN := if (isnewheader=true, watchdog.validSSN(head));
 lbest := Watchdog.Layout_Best_Marketing_Flag;
 //getphone
@@ -82,31 +85,31 @@ end;
 waddress := join(wdob, baddress, left.did = right.did,
 			     getaddress(left, right), left outer, local);
 
-//getfname
-lbest getfname(lbest l, bfname r) := transform
-	self.fname := r.fname;
-	self := l;
-end;
-
-wfname := join(waddress, bfname, left.did = right.did,
-			   getfname(left, right), left outer, local);
-
-//get mname
-lbest getmname(lbest l, bmname r) := transform
-	self.mname := r.mname;
-	self := l;
-end;
-
-wmname := join(wfname, bmname, left.did = right.did,
-			   getmname(left, right), left outer, local);
 //getlname
 lbest getlname(lbest l, blname r) := transform
 	self.lname := r.lname;
 	self := l;
 end;
 
-wlname := join(wmname, blname, left.did = right.did,
-			 getlname(left, right), left outer, local);
+wlname := join(waddress, blname, left.did = right.did,
+			   getlname(left, right), left outer, local);
+
+//get fname
+lbest getfname(lbest l, bfname r) := transform
+	self.fname := if(l.lname <> r.fname, r.fname, '');
+	self := l;
+end;
+
+wfname := join(wlname, bfname, left.did = right.did,
+			   getfname(left, right), left outer, local);
+//getmname
+lbest getmname(lbest l, bmname r) := transform
+	self.mname := if(l.lname <> r.mname and l.fname <> r.mname, r.mname, '');
+	self := l;
+end;
+
+wmname := join(wfname, bmname, left.did = right.did,
+			 getmname(left, right), left outer, local);
 
 //get suffix
 lbest getsuffix(lbest l, bsuffix r) := transform
@@ -114,7 +117,7 @@ lbest getsuffix(lbest l, bsuffix r) := transform
 	self := l;
 end;
 
-wsuffix := join(wlname, bsuffix, left.did = right.did,
+wsuffix := join(wmname, bsuffix, left.did = right.did,
 			 getsuffix(left, right), left outer, local);
 
 

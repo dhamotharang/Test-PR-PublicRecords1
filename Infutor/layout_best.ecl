@@ -16,6 +16,9 @@ export lscored := record
   qstring20 lname;
   integer4 lcnt := 0;
   integer4 blcnt := 0;
+  qstring5 name_suffix;
+  integer4 sfxcnt := 0;
+  integer4 bsfxcnt := 0;
   qstring9 ssn;
   integer8 scnt := 0;
   integer4 bscnt := 0;
@@ -45,6 +48,7 @@ export lscored := record
   integer4 fname_score := 0;
 	integer4 mname_score := 0;
   integer4 lname_score := 0;
+  integer4 sfxname_score := 0;
   integer4 ssn_score := 0;
   integer4 dob_score := 0;
 	integer4 phone_score := 0;
@@ -61,6 +65,7 @@ integer4     dob := 0;
 qstring20    fname := '';
 qstring20    mname := '';
 qstring20    lname := '';
+qstring5	   name_suffix := '';
 qstring10    prim_range := '';
 string2      predir := '';
 qstring28    prim_name := '';

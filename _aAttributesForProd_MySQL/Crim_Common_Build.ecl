@@ -1,0 +1,2 @@
+import crim_common;
+crim_common.bwr_build_all_moxie_files;

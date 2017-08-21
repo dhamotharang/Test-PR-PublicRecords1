@@ -11,7 +11,7 @@ ak_typeStr	:= c.ak_typeStr;
 
 AutoKeyB2.MAC_Build (ak_dataset,name.fname,name.mname,name.lname,
 						zero,
-						zero,
+						party_dob,
 						zero,
 						addr.prim_name,addr.prim_range,addr.st,addr.v_city_name,addr.zip5,addr.sec_range,
 						zero,
@@ -29,7 +29,7 @@ AutoKeyB2.MAC_Build (ak_dataset,name.fname,name.mname,name.lname,
 						ak_logical,
 						outaction,false,
 						ak_skipSet,true,ak_typeStr,
-						true); 
+						true,,,zero); 
 
 AutoKeyB2.MAC_AcceptSK_to_QA(ak_keyname, mymove)
 

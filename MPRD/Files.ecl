@@ -1,6 +1,6 @@
 IMPORT tools, MPRD, ut, data_services;
 
-EXPORT Files(STRING pversion = '', boolean pUseProd = false) := MODULE
+EXPORT Files(STRING pversion = '', boolean pUseProd = true) := MODULE
 
    /* Input File Versions */
 	 export idv_basc_file 		            := dataset(MPRD.Filenames(pversion,pUseProd).individual_lInputTemplate, MPRD.layouts.individual_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')))(taxonomy<>'taxonomy');
@@ -47,76 +47,78 @@ EXPORT Files(STRING pversion = '', boolean pUseProd = false) := MODULE
 	 export abms_cert_lu_file							:= dataset(MPRD.Filenames(pversion,pUseProd).abms_cert_lu_lInputTemplate, MPRD.layouts.abms_cert_lu_in,csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt);
 	 export abms_cooked_file							:= dataset(MPRD.Filenames(pversion,pUseProd).abms_cooked_lInputTemplate, MPRD.layouts.abms_cooked_in,csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt);
 	 
+	 /* No test cases on prod - per Miller 20160614
 	 //qa_test files
-	 export idv_basc_qa_test_file 		            	:= if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::individual::qa_test', MPRD.layouts.individual_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
-			dataset('~thor_data400::in::mprd::individual::qa_test', MPRD.layouts.individual_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt));
- 	 export fac_basc_qa_test_file 		            	:= if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::facility::qa_test', MPRD.layouts.facility_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
-			dataset('~thor_data400::in::mprd::facility::qa_test', MPRD.layouts.facility_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt));
-   export basc_cp_qa_test_file 		            	  := if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::basc_cp::qa_test', MPRD.layouts.choice_point_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
-			dataset('~thor_data400::in::mprd::basc_cp::qa_test', MPRD.layouts.choice_point_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt));;	 
-	 export basc_claims_qa_test_file		      	    := if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::basc_claims::qa_test', MPRD.layouts.basc_claims_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
-			dataset('~thor_data400::in::mprd::basc_claims::qa_test', MPRD.layouts.basc_claims_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt));
-	 export npi_extension_qa_test_file 		     		  := if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::npi_extension::qa_test', MPRD.layouts.npi_extension_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
-			dataset('~thor_data400::in::mprd::npi_extension::qa_test', MPRD.layouts.npi_extension_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt));
-	 export npi_extension_facility_qa_test_file 		:= if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::npi_extension_facility::qa_test', MPRD.layouts.npi_extension_facility_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
-			dataset('~thor_data400::in::mprd::npi_extension_facility::qa_test', MPRD.layouts.npi_extension_facility_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt));
-	 export claims_addr_master_qa_test_file 			  := if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::claims_addr_master::qa_test', MPRD.layouts.claims_address_master_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
-			dataset('~thor_data400::in::mprd::claims_addr_master::qa_test', MPRD.layouts.claims_address_master_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt));
-   export npi_tin_xref_qa_test_file 		    	    := if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::npi_tin_xref::qa_test',MPRD.layouts.npi_tin_xref_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
-			dataset('~thor_data400::in::mprd::npi_tin_xref::qa_test',MPRD.layouts.npi_tin_xref_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt));
-   export claims_by_month_qa_test_file    	      := if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::claims_by_moth::qa_test', MPRD.layouts.claims_by_month_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::claims_by_moth::qa_test', MPRD.layouts.claims_by_month_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt));
-   export basc_deceased_qa_test_file           		:= if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::basc_deceased::qa_test', MPRD.layouts.basc_deceased_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::basc_deceased::qa_test', MPRD.layouts.basc_deceased_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt));
-	 export office_attributes_qa_test_file        	:= if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::office_attributes::qa_test', MPRD.layouts.office_attributes_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::office_attributes::qa_test', MPRD.layouts.office_attributes_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt));
-	 export office_attributes_facility_qa_test_file := if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::office_attributes_facility::qa_test', MPRD.layouts.office_attributes_facility_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::office_attributes_facility::qa_test', MPRD.layouts.office_attributes_facility_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt));	 
-   export group_lu_qa_test_file              		  := if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::group_lu::qa_test', MPRD.layouts.group_lu_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::group_lu::qa_test', MPRD.layouts.group_lu_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt));
-   export hospital_lu_qa_test_file        	      := if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::hospital_lu::qa_test', MPRD.layouts.hospital_lu_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::hospital_lu::qa_test', MPRD.layouts.hospital_lu_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt));
-	 export basc_facility_mme_qa_test_file    	    := if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::basc_facility_mme::qa_test', MPRD.layouts.basc_facility_mme_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::basc_facility_mme::qa_test', MPRD.layouts.basc_facility_mme_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt));
-	 export lic_filedate_qa_test_file           	  := if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::lic_filedate::qa_test', MPRD.layouts.lic_filedate_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::lic_filedate::qa_test', MPRD.layouts.lic_filedate_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt));
-	 export nanpa_qa_test_file             		      := if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::nanpa::qa_test', MPRD.layouts.nanpa_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::nanpa::qa_test', MPRD.layouts.nanpa_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt));
-	 export best_hospital_qa_test_file     		      := if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::best_hospital::qa_test', MPRD.layouts.best_hospital_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::best_hospital::qa_test', MPRD.layouts.best_hospital_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt));
-	 export source_confidence_lu_qa_test_file 	    := if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::source_confidence_lu::qa_test', MPRD.layouts.source_confidence_lu_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::source_confidence_lu::qa_test', MPRD.layouts.source_confidence_lu_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt));
-	 export cms_ecp_qa_test_file										:= if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::cms_ecp::qa_test', MPRD.layouts.cms_ecp_in,csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::cms_ecp::qa_test', MPRD.layouts.cms_ecp_in,csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt));
-	 export opi_qa_test_file												:= if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::opi::qa_test', MPRD.layouts.opi_in, csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::opi::qa_test', MPRD.layouts.opi_in, csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt));
-	 export opi_facility_qa_test_file								:= if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::opi_facility::qa_test', MPRD.layouts.opi_facility_in,csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::opi_facility::qa_test', MPRD.layouts.opi_facility_in,csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt));
-	 export abms_cooked_qa_test_file								:= if(pUseProd = true,
-			dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::abms_cooked::qa_test', MPRD.layouts.abms_cooked_in,csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt),
-			dataset('~thor_data400::in::mprd::abms_cooked::qa_test', MPRD.layouts.abms_cooked_in,csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt));
+	 export idv_basc_qa_test_file 		            	:=// if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::individual::qa_test', MPRD.layouts.individual_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
+			dataset('~thor_data400::in::mprd::individual::qa_test', MPRD.layouts.individual_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt);//);
+ 	 export fac_basc_qa_test_file 		            	:=// if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::facility::qa_test', MPRD.layouts.facility_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
+			dataset('~thor_data400::in::mprd::facility::qa_test', MPRD.layouts.facility_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt);//);
+   export basc_cp_qa_test_file 		            	  := //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::basc_cp::qa_test', MPRD.layouts.choice_point_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
+			dataset('~thor_data400::in::mprd::basc_cp::qa_test', MPRD.layouts.choice_point_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt);//);;	 
+	 export basc_claims_qa_test_file		      	    :=// if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::basc_claims::qa_test', MPRD.layouts.basc_claims_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
+			dataset('~thor_data400::in::mprd::basc_claims::qa_test', MPRD.layouts.basc_claims_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt);//);
+	 export npi_extension_qa_test_file 		     		  :=// if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::npi_extension::qa_test', MPRD.layouts.npi_extension_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
+			dataset('~thor_data400::in::mprd::npi_extension::qa_test', MPRD.layouts.npi_extension_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt);//);
+	 export npi_extension_facility_qa_test_file 		:= //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::npi_extension_facility::qa_test', MPRD.layouts.npi_extension_facility_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
+			dataset('~thor_data400::in::mprd::npi_extension_facility::qa_test', MPRD.layouts.npi_extension_facility_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt);//);
+	 export claims_addr_master_qa_test_file 			  :=// if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::claims_addr_master::qa_test', MPRD.layouts.claims_address_master_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
+			dataset('~thor_data400::in::mprd::claims_addr_master::qa_test', MPRD.layouts.claims_address_master_In, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt);//);
+   export npi_tin_xref_qa_test_file 		    	    := //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::npi_tin_xref::qa_test',MPRD.layouts.npi_tin_xref_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt),
+			dataset('~thor_data400::in::mprd::npi_tin_xref::qa_test',MPRD.layouts.npi_tin_xref_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']),QUOTE('')),opt);//);
+   export claims_by_month_qa_test_file    	      := //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::claims_by_moth::qa_test', MPRD.layouts.claims_by_month_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::claims_by_moth::qa_test', MPRD.layouts.claims_by_month_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt);//);
+   export basc_deceased_qa_test_file           		:= //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::basc_deceased::qa_test', MPRD.layouts.basc_deceased_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::basc_deceased::qa_test', MPRD.layouts.basc_deceased_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt);//);
+	 export office_attributes_qa_test_file        	:= //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::office_attributes::qa_test', MPRD.layouts.office_attributes_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::office_attributes::qa_test', MPRD.layouts.office_attributes_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt);//);
+	 export office_attributes_facility_qa_test_file := //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::office_attributes_facility::qa_test', MPRD.layouts.office_attributes_facility_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::office_attributes_facility::qa_test', MPRD.layouts.office_attributes_facility_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt);//);	 
+   export group_lu_qa_test_file              		  := //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::group_lu::qa_test', MPRD.layouts.group_lu_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::group_lu::qa_test', MPRD.layouts.group_lu_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt);//);
+   export hospital_lu_qa_test_file        	      := //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::hospital_lu::qa_test', MPRD.layouts.hospital_lu_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::hospital_lu::qa_test', MPRD.layouts.hospital_lu_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt);//);
+	 export basc_facility_mme_qa_test_file    	    := //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::basc_facility_mme::qa_test', MPRD.layouts.basc_facility_mme_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::basc_facility_mme::qa_test', MPRD.layouts.basc_facility_mme_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt);//);
+	 export lic_filedate_qa_test_file           	  := //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::lic_filedate::qa_test', MPRD.layouts.lic_filedate_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::lic_filedate::qa_test', MPRD.layouts.lic_filedate_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt);//);
+	 export nanpa_qa_test_file             		      := //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::nanpa::qa_test', MPRD.layouts.nanpa_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::nanpa::qa_test', MPRD.layouts.nanpa_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt);//);
+	 export best_hospital_qa_test_file     		      := //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::best_hospital::qa_test', MPRD.layouts.best_hospital_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::best_hospital::qa_test', MPRD.layouts.best_hospital_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt);//);
+	 export source_confidence_lu_qa_test_file 	    := //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::source_confidence_lu::qa_test', MPRD.layouts.source_confidence_lu_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::source_confidence_lu::qa_test', MPRD.layouts.source_confidence_lu_in, csv( separator('|'),heading(0), terminator(['\n', '\r\n']), quote(['\'','"'])),opt);//);
+	 export cms_ecp_qa_test_file										:= //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::cms_ecp::qa_test', MPRD.layouts.cms_ecp_in,csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::cms_ecp::qa_test', MPRD.layouts.cms_ecp_in,csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt);//);
+	 export opi_qa_test_file												:=// if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::opi::qa_test', MPRD.layouts.opi_in, csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::opi::qa_test', MPRD.layouts.opi_in, csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt);//);
+	 export opi_facility_qa_test_file								:= //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::opi_facility::qa_test', MPRD.layouts.opi_facility_in,csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::opi_facility::qa_test', MPRD.layouts.opi_facility_in,csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt);//);
+	 export abms_cooked_qa_test_file								:= //if(pUseProd = true,
+			// dataset(data_services.foreign_dataland + 'thor_data400::in::mprd::abms_cooked::qa_test', MPRD.layouts.abms_cooked_in,csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt),
+			dataset('~thor_data400::in::mprd::abms_cooked::qa_test', MPRD.layouts.abms_cooked_in,csv(separator('|'),heading(0),terminator(['\n','\r\n']),quote(['\'','"'])),opt);//);
+	 */
 	 
 	 /* Base File Versions */
 	 tools.mac_FilesBase(MPRD.Filenames(pversion,pUseProd).facility_Base, MPRD.layouts.facility_Base, facility_base);

@@ -1,4 +1,4 @@
-import watchdog, didville, doxie, sexoffender, mdr, header, utilfile, drivers, codes;
+import watchdog, didville, doxie, sexoffender, mdr, header, utilfile, drivers, codes, ut;
 
 export file_so_Enh_keybuilding := function
 
@@ -13,6 +13,8 @@ RawFile     := file_so_main_keybuilding;
 
 RawFileDids := RawFile(did != 0);
 
+header_in_util := header.file_headers(zip4!='') + utilfile.DID_into_header(did>0 and zip4!='');
+
 //  Output layout **********
 AltLayout := record
 	unsigned6 alt_did;
@@ -21,11 +23,32 @@ AltLayout := record
 end;
 
 //  GLB Transform for Best Join
-file_header_nonprob := header.file_headers(~mdr.Source_is_on_Probation(src));
-drivers.state_dppa_ok_thor(file_header_nonprob, '3', src, file_header_glb_raw);
-drivers.state_dppa_ok_thor(file_header_glb_raw, '4', src, file_header_glb);
-header_in_glb := (file_header_glb(~(src[2]='E' and src[1] not in ['F','D'])) + utilfile.DID_into_header(did>0))(zip4!='');		  
-best_address_glb := watchdog.BestAddrFunc(header_in_glb, 0, false, false) : persist('persist::best_address_glb');
+best_address_glb_1 := watchdog.File_Best;
+
+best_layout := record
+ watchdog.Layout_Best;
+ unsigned3 dt_first_seen;
+ end;
+
+best_layout getDate(watchdog.Layout_Best L, header.Layout_Header R) := transform
+ self.dt_first_seen := if(r.did=0,0,r.dt_first_seen); 
+ self := l;
+ end;
+ 
+best_address_glb_2 := join(best_address_glb_1,header_in_util,left.did=right.did and 
+							left.prim_range=right.prim_range and left.prim_name=right.prim_name and
+							left.zip=right.zip and ut.NNEQ(left.sec_range,right.sec_range),getDate(left,right),
+							local,left outer);
+							
+best_layout rollDates(best_layout L, best_layout r) := transform
+ self.dt_first_seen := ut.Min2(l.dt_first_seen,r.dt_first_seen);
+ self := l;
+ end;
+ 
+best_address_glb := rollup(sort(best_address_glb_2,did,local),did,rollDates(left,right),local) : persist('~thor_data400::persist::sex_offender_best_glb');
+
+
+//Join to Header by DID and Address to find earliest dt_first_seen
 
 AltLayout AddAltDetailsGLB(RawFile le, best_address_glb ri) := transform
   self.alt_did               := ri.did;
@@ -50,9 +73,18 @@ AltLayout AddAltDetailsGLB(RawFile le, best_address_glb ri) := transform
 end;
 
 //  Non GLB Transform for Best Join
-file_header_nonglb := header.file_headers_NonGLB(~mdr.Source_is_on_Probation(src) and ~mdr.Source_is_DPPA(src));
-header_in_nonglb := (file_header_nonglb(~(src[2]='E' and src[1] not in ['F','D'])) + utilfile.DID_into_header(did>0))(zip4!='');	  
-best_address_nonglb := watchdog.BestAddrFunc(header_in_nonglb, 0, false, false) : persist('persist::best_address_nonglb');
+best_address_nonglb_1 := watchdog.File_Best_nonglb;
+
+//Join to header by DID and Address to find earliest date first seen
+
+
+best_address_nonglb_2 := join(best_address_nonglb_1,header_in_util,left.did=right.did and 
+							left.prim_range=right.prim_range and left.prim_name=right.prim_name and
+							left.zip=right.zip and ut.NNEQ(left.sec_range,right.sec_range),getDate(left,right),
+							local,left outer);
+							
+best_address_nonglb := rollup(sort(best_address_nonglb_2,did,local),did,rollDates(left,right),local) : persist('~thor_data400::persist::sex_offender_best_nonglb');
+
 
 AltLayout AddAltDetailsNonGLB(RawFile le, best_address_nonglb ri) := transform 
   self.alt_did               := ri.did;
@@ -163,7 +195,8 @@ HistoricalRecords1 := join(RawFileDids, doxie.Key_Header,
 													left.did = right.s_did AND
 													// no ln-branding
 													~(mdr.source_is_DPPA(RIGHT.src) AND RIGHT.src[2] IN ['E','X']), GetHistoricalRecords(left, right)); 
-HistoricalRecords2 := sort(HistoricalRecords1,  seisint_primary_key, alt_prim_range, alt_prim_name, alt_city_name, alt_st, alt_zip, alt_dppa);
+
+HistoricalRecords2 := sort(distribute(HistoricalRecords1,  hash(seisint_primary_key)), seisint_primary_key, alt_prim_range, alt_prim_name, alt_city_name, alt_st, alt_zip, alt_dppa, local);
 HistoricalRecords  := dedup(HistoricalRecords2, seisint_primary_key, alt_prim_range, alt_prim_name, alt_city_name, alt_st, alt_zip, alt_dppa);
 
 AltLayout CleanSORecs(RawFile ri) := transform

@@ -26,7 +26,7 @@ import Address, did_add, ut, header_slimsort, business_header_ss,Lib_FileService
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Email Notification Setup
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-%leMailTarget% := 'tgibson@seisint.com;jwindle@seisint.com';
+%leMailTarget% := 'cguyton@seisint.com;christopher.brodeur@lexisnexis.com';
 
 %fSendMail%(string pSubject,string pBody)
  := lib_fileservices.fileservices.sendemail(%leMailTarget%,pSubject,pBody);

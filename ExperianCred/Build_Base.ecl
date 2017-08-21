@@ -1,4 +1,5 @@
-import  address, ut, header_slimsort, did_add, didville,watchdog, ExperianCred;
+import  address, ut, header_slimsort, did_add, didville,watchdog, ExperianCred, _validate;
+
 name_clean := Files.Cashed_Names_File;
 addr_clean := Files.Cashed_Address_File;
 norm_addr :=  Normalize_Address;
@@ -12,7 +13,7 @@ Layouts.Layout_Out t_join_get_name (norm_addr le, name_clean ri) := TRANSFORM
 	//Blank middle names = 'NULL'
 	SELF.mname       	:= if(trim(ri.Clean_Name[26..45],all) = 'NULL', '',ri.Clean_Name[26..45]) ;
 	SELF.lname       	:= ri.Clean_Name[46..65];
-	SELF.name_suffix 	:= ri.Clean_Name[66..70];
+	SELF.name_suffix 	:= if(le.Gender <> 'F', ri.Clean_Name[66..70], '');
 	SELF.name_score  	:= ri.Clean_Name[71..73];
 	SELF				:= le;
 	SELF				:= [];
@@ -35,11 +36,11 @@ get_name := join (distribute(norm_addr, hash(Orig_lname, Orig_fname, Orig_mname)
 invalid_prim_name := ['NONE','UNKNOWN','UNKNWN','UNKNOWEN','UNKNONW','UNKNON','UNKNWON','UNKONWN','UNEKNOWN','UN KNOWN','GENERAL DELIVERY'];
 
 Layouts.Layout_Out t_join_get_address (get_name  le, addr_clean ri) := TRANSFORM
-	valid_dob   :=  			if((unsigned)le.Date_of_Birth between 18000101 and (unsigned) ut.GetDate, le.Date_of_Birth, '');
+	valid_dob   :=  			if(le.Date_of_Birth <> '', _validate.date.fCorrectedDateString(le.Date_of_Birth,false), '');
 	valid_snn	:= 				if((unsigned)le.Social_Security_Number > 0, le.Social_Security_Number, '');
 	
 	SELF.Social_Security_Number := if(le.NameType[..2] = 'SP', '', valid_snn);
-	SELF.Date_of_Birth			:= if(le.NameType[..2] = 'SP', '', valid_dob);
+	SELF.Date_of_Birth			:= if(le.NameType[..2] = 'SP' or valid_dob[..4] = '0000', '', valid_dob);
 	SELF.Telephone				:= if(le.NameType[..2] = 'C1' and le.AddressSeq = 1, le.Telephone, '');
 	SELF.Gender					:= if(le.NameType[..2] = 'SP', '', le.Gender);
 	STRING28  v_prim_name 		:= ri.Clean_Address[13..40];
@@ -76,19 +77,19 @@ Layouts.Layout_Out t_join_get_address (get_name  le, addr_clean ri) := TRANSFORM
 //---VERY IMPORTANT: Setting first/last date seen and current record flag
 //----------------------------------------------------------------
 	
-	valid_Address_Create_Date   :=  if((unsigned)le.Orig_Address_date between 18000101 and (unsigned) ut.GetDate, (unsigned) le.Orig_Address_date, 0);
+	valid_Address_Create_Date   :=  if((unsigned)le.Orig_Address_Create_date between 18000101 and (unsigned) ut.GetDate, (unsigned) le.Orig_Address_Create_date, 0);
+	valid_Address_Update_Date   :=  if((unsigned)le.Orig_Address_Update_date between 18000101 and (unsigned) ut.GetDate, (unsigned) le.Orig_Address_Update_date, 0);
 
 	SELF.date_first_seen 		   	   := 	(unsigned)valid_Address_Create_Date;
 
-	SELF.date_last_seen 			   :=   if(le.AddressSeq = 1 and le.NameType = 'C1', 
-												(unsigned)version, 
-												(unsigned)valid_Address_Create_Date);
+	SELF.date_last_seen 			   :=   (unsigned)valid_Address_Update_Date;
 	
 	SELF.date_vendor_first_reported    := 	(unsigned)version;
 	SELF.date_vendor_last_reported     :=   (unsigned)version;	
 	
 	SELF.current_rec_flag			   :=   if(le.AddressSeq = 1 and le.NameType = 'C1', 
 											   1,0);
+	SELF.current_experian_pin    := 1;											 
 	SELF							   := le;
 END;
 
@@ -135,16 +136,18 @@ delete_bad_names := join(experian_d,
 experian_clean_update:= delete_bad_names ((unsigned)name_score > 50 and st in valid_st);
 							
 //-----------------------------------------------------------------
-//Apply update to current base file
+//Reset currect_rec_flag = 0 for records in the prev base where we are receiving an update
 //-----------------------------------------------------------------
 
-cur_base_d   := distribute(Files.Base_File_Out, hash(Encrypted_Experian_PIN));
+cur_base_d   := distribute(project(Files.Base_File_Out, transform(recordof(Files.Base_File_Out), self.did := 0, self := left)), hash(Encrypted_Experian_PIN));
 
+#IF (IsFullUpdate = false)
 cur_update_d := dedup(sort(distribute(experian_clean_update, hash(Encrypted_Experian_PIN)),Encrypted_Experian_PIN, local),Encrypted_Experian_PIN, local);
 
 Layouts.Layout_Out t_apply_updates (cur_base_d le, cur_update_d ri) := transform
-	self.date_last_seen		:= if(ri.Encrypted_Experian_PIN = '' and le.current_rec_flag = 1, (unsigned)version, le.date_last_seen);
-	self.current_rec_flag	:= if(le.Encrypted_Experian_PIN = ri.Encrypted_Experian_PIN and le.current_rec_flag = 1, 0, le.current_rec_flag);
+	self.current_rec_flag	:= if(le.Encrypted_Experian_PIN = ri.Encrypted_Experian_PIN and 
+															le.current_rec_flag = 1, 
+															0, le.current_rec_flag);
 	self 					:= le;
 end;
 
@@ -157,18 +160,38 @@ apply_updates := join(cur_base_d,
 					  local);
 
 
-base_and_update := if(FileServices.GetSuperFileSubCount(Superfile_List.Base_File) = 0, 
+base_and_update := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base_File)) = 0, 
 					  experian_clean_update,  
 					  experian_clean_update + apply_updates);
+
+#ELSE
+reset_cur_base := project(cur_base_d , transform(Layouts.Layout_Out,
+										self.current_rec_flag	:= 0,
+										self.current_experian_pin := 0,
+										self := left));
+		
+
+
+base_and_update := if(nothor(FileServices.GetSuperFileSubCount(Superfile_List.Base_File)) = 0, 
+                   experian_clean_update,
+									 experian_clean_update + reset_cur_base);
+#END
 
 //-----------------------------------------------------------------
 //DID base file------ Temporately Disabled to same machine time 
 //-----------------------------------------------------------------
 	   
+src_rec := record
+header_slimsort.Layout_Source;
+Layouts.Layout_Out;
+end;
+
+DID_Add.Mac_Set_Source_Code(base_and_update, src_rec, 'EN', base_and_update_src)
+   
 matchset := ['A','Z','D','S'];
 
 did_add.MAC_Match_Flex
-	(base_and_update , 
+	(base_and_update_src , 
 	 matchset,					
 	 Social_Security_Number, 
 	 Date_of_Birth , 
@@ -182,17 +205,16 @@ did_add.MAC_Match_Flex
 	 st,
 	 Telephone, 
 	 DID, 
-	 Layouts.Layout_Out, 
+	 src_rec, 
 	 true, 
-	 DID_Score_field,
+	 DID_score_field,
 	 75, 
-	 d_did)
-
+	 d_did, true, src)
 //-----------------------------------------------------------------
 //Rollup to eliminate duplications
 //-----------------------------------------------------------------
 
-build_experian_base_d := distribute(d_did, hash(did, Encrypted_Experian_PIN));  
+build_experian_base_d := distribute(project(d_did,Layouts.Layout_Out), hash(did, Encrypted_Experian_PIN));  
 
 //build_experian_base_d := distribute(base_and_update, hash(did, Encrypted_Experian_PIN)); 
 
@@ -211,38 +233,27 @@ build_experian_base_s := sort(build_experian_base_d,
 					postdir,
 					unit_desig,
 					sec_range,
-					p_city_name,
 					v_city_name,
 					st,
 					zip,
 					zip4,
-					cart,
-					cr_sort_sz,
-					lot,
-					lot_order,
-					dbpc,
-					chk_digit,
-					rec_type,
-					county,
-					geo_lat,
-					geo_long,
-					msa,
-					geo_blk,
-					geo_match,
-					err_stat,
 					Telephone,
+					-current_rec_flag,
+					-date_vendor_last_reported,
 					local);
 
 Layouts.Layout_Out t_rollup (build_experian_base_s  le, build_experian_base_s ri) := transform
- self.AddressSeq				 := ut.max2(le.AddressSeq, ri.AddressSeq);
- self.Orig_Address_date		     := (string)ut.min2((unsigned)le.Orig_Address_date, (unsigned)ri.Orig_Address_date);
+ self.Orig_Address_Create_date   := (string)ut.min2((unsigned)le.Orig_Address_Create_date, (unsigned)ri.Orig_Address_Create_date);
+ self.Orig_Address_Update_date	 := (string)ut.max2((unsigned)le.Orig_Address_Update_date, (unsigned)ri.Orig_Address_Update_date);
  self.Orig_Consumer_Create_Date  := (string)ut.min2((unsigned)le.Orig_Consumer_Create_Date, (unsigned)ri.Orig_Consumer_Create_Date);
- self.NameType					 := if(le.NameType[..1] < ri.NameType[..1], le.NameType, ri.NameType);
- self.date_first_seen 			 := ut.min2(le.date_first_seen, ri.date_first_seen);
- self.date_last_seen 			 := ut.max2(le.date_last_seen, ri.date_last_seen);
+ self.date_first_seen 			 		 :=  ut.min2(le.date_first_seen, ri.date_first_seen);
+ self.date_last_seen 			   		 :=  if(le.date_vendor_last_reported = (unsigned)version,
+																		   le.date_last_seen,
+																			 ri.date_last_seen);
  self.date_vendor_first_reported := ut.min2(le.date_vendor_first_reported, ri.date_vendor_first_reported);
  self.date_vendor_last_reported  := ut.max2(le.date_vendor_last_reported, ri.date_vendor_last_reported);
  self.current_rec_flag		     := ut.max2(le.current_rec_flag, ri.current_rec_flag);
+ self.current_experian_pin		   := ut.max2(le.current_experian_pin, ri.current_experian_pin);
  self := le;
 end;
 
@@ -262,26 +273,105 @@ ExperianCred_base := rollup(build_experian_base_s,
 					postdir,
 					unit_desig,
 					sec_range,
-					p_city_name,
 					v_city_name,
 					st,
 					zip,
 					zip4,
-					cart,
-					cr_sort_sz,
-					lot,
-					lot_order,
-					dbpc,
-					chk_digit,
-					rec_type,
-					county,
-					geo_lat,
-					geo_long,
-					msa,
-					geo_blk,
-					geo_match,
-					err_stat,
 					Telephone,		
 					local);
-				   
-export Build_Base := ExperianCred_base;
+
+//-----------------------------------------------------------------
+//Append Delete File
+//-----------------------------------------------------------------					
+Experian_del 		 := Files.File_Delete_In;
+Experian_del_dedp   := dedup(sort(distribute(Experian_del, hash(Encrypted_Experian_PIN)),Encrypted_Experian_PIN, -Delete_Date, local) ,Encrypted_Experian_PIN, local) ;
+
+Experian_base_d1     := distribute(ExperianCred_base,  hash(Encrypted_Experian_PIN));
+
+Layouts.Layout_Out t_apply_deletes(Experian_base_d1 le, Experian_del_dedp ri) := transform
+	self.delete_flag 	  := if(ri.Encrypted_Experian_PIN <> '', 1, le.delete_flag);
+	self.delete_file_date := (unsigned) ri.Delete_Date;
+	self.suppression_code := (unsigned) ri.suppression_code;
+	SELF := le;
+end;
+
+#IF (IsFullUpdate = false)
+apply_deletes := join(Experian_base_d1, 
+						 Experian_del_dedp,
+						 left.Encrypted_Experian_PIN = right.Encrypted_Experian_PIN,
+						 t_apply_deletes(left, right),
+						 left outer,
+						 local);
+#ELSE
+apply_deletes := ExperianCred_base;
+#END
+						 
+//-----------------------------------------------------------------
+//Append Deceased File
+//-----------------------------------------------------------------			
+
+Experian_dec 			  := Files.File_Deceased_In;
+Experian_dec_dedp   := dedup(sort(distribute(Experian_dec , hash(Encrypted_Experian_PIN)),Encrypted_Experian_PIN, local) ,Encrypted_Experian_PIN, local) ;
+
+Experian_base_d2     := distribute(apply_deletes,  hash(Encrypted_Experian_PIN));
+
+Layouts.Layout_Out t_apply_deceased(Experian_base_d2 le, Experian_dec_dedp ri) := transform
+	self.deceased_ind     := if(ri.Encrypted_Experian_PIN <> '' and le.NameType[..2] <> 'SP', 1, 0);
+	SELF := le;
+end;
+
+apply_deceased := join(Experian_base_d2, 
+						 Experian_dec_dedp,
+						 left.Encrypted_Experian_PIN = right.Encrypted_Experian_PIN,
+						 t_apply_deceased(left, right),
+						 left outer,
+						 local);
+				 					 
+//---------------------------------------------------------------------------										
+//Update date last seen to version for current records with:
+//       name, address and ssn populated
+//       not deleted or deceased
+//       there is no other record for the same experian encripted pin with a more recent address
+//----------------------------------------------------------------------------
+pins_max_dt_layout := record
+ experian_clean_update.Encrypted_Experian_PIN;
+ unsigned max_dt_last_seen;
+end;
+
+pins_dt := project(apply_deceased(current_experian_pin = 1), transform(pins_max_dt_layout, 
+																					self.max_dt_last_seen := left.date_last_seen,
+																					self := left));
+ 
+pins_max_dt_last_seen :=  dedup(sort(distribute(pins_dt, hash(Encrypted_Experian_PIN)), Encrypted_Experian_PIN, -max_dt_last_seen, local), Encrypted_Experian_PIN, local);
+
+reset_dt_last_seen   := join (distribute(apply_deceased, hash(Encrypted_Experian_PIN)), 
+															distribute(pins_max_dt_last_seen, hash(Encrypted_Experian_PIN)),
+															left.Encrypted_Experian_PIN = right.Encrypted_Experian_PIN,
+															transform(recordof(experian_clean_update),
+															self.date_last_seen := if(left.current_rec_flag = 1 and
+																												left.lname <>'' and
+																												left.prim_range + left.prim_name + left.sec_range <> '' and
+																												left.Social_Security_Number not in ut.Set_BadSSN and
+																												(unsigned)left.Social_Security_Number > 0 and
+																												left.delete_flag  <> 1 and
+																												left.deceased_Ind <> 1 and
+																												left.date_last_seen >= right.max_dt_last_seen,
+																												ut.max2((unsigned)version, left.date_last_seen),
+																												left.date_last_seen),
+															 self := left),
+															 left outer,
+															 local);			
+			   
+#IF (IsFullUpdate = false)
+//Delete records from base where suppression code is in the list of codes to be deleted
+Apply_Delete_codes := join(distribute(reset_dt_last_seen, hash(Encrypted_Experian_PIN)),
+                    distribute(Experian_del((unsigned)Suppression_Code in experiancred.Delete_Suppression_Codes), hash(Encrypted_Experian_PIN)),
+					left.Encrypted_Experian_PIN = right.Encrypted_Experian_PIN,
+					transform(Layouts.Layout_Out, self := left),
+					left only,
+					local);
+					
+#ELSE
+Apply_Delete_codes := reset_dt_last_seen;
+#END					 
+export Build_Base := apply_delete_codes;

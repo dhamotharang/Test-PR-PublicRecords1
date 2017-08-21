@@ -5,8 +5,9 @@
 import ut,_Control;
 export Proc_spray(string filedate,string sourcefile,string source) := function
 	
-	sourceIP := _control.IPAddress.edata12;
-	group_name := _control.TargetGroup.Thor400_92;
+	sourceIP := _control.IPAddress.bctlpedata11;
+	group_name := 'thor400_44';
+	//group_name := _control.TargetGroup.Thor400_30;
 	// group_name := 'thor400_88';
 	filesuffix := regexreplace('.txt',ut.word(sourcefile,ut.NoWords(sourcefile,'/')+1,'/'),'');
 	tempfilename := '~thor_data400::temp::webclick::' + filedate + '::' + filesuffix;

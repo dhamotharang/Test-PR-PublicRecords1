@@ -27,7 +27,7 @@ export DKC_Liens_Keys(volume) := macro
 // Delete the existing keys on thor ****************************************************************
 
 //DestinationPath := '/thor_back5/fares/foreclosure/build';
-%DestinationIP% := '192.168.0.39';
+%DestinationIP% := _control.IPAddress.edata12;
 
 DKCKeys(string KeyFileName,string Destfilename)
  :=

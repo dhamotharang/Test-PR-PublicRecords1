@@ -66,7 +66,7 @@ function
 		self.willoverwrite	:= pOverwrite;
     self.filedescription  := pFileDescription;
     self.IsALocalCopy     := if(   (tools._Constants.IsDataland and l.srcdali = _Control.IPAddress.dataland_dali  )
-                                or (tools._Constants.IsBocaProd and l.srcdali = '10.241.20.205:7070'              ) //_Control.IPAddress.prod_thor_dali this didn't work
+                                or (tools._Constants.IsBocaProd and l.srcdali = 'prod_dali.br.seisint.com:7070'              ) //_Control.IPAddress.prod_thor_dali this didn't work
                                 , true              
                                 , false
                              );

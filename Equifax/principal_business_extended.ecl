@@ -1,4 +1,4 @@
-import ut, Business_Header;
+import ut, Business_Header, NID;
 
 // Combine principals (people) with business file to get a business name
 
@@ -139,7 +139,7 @@ principal_business_new_all := principal_busname + principal_business_new : persi
 prin_new_dist := distribute(principal_business_new_all(record_type='2'), hash(cid, pid));
 prin_new_sort := sort(prin_new_dist, cid, pid, bdid, local);
 prin_new_grp := group(prin_new_sort, cid, pid, bdid, local);
-prin_new_grp_sort := sort(prin_new_grp, lname, datalib.PreferredFirst(fname), record_type, if(did <> 0, 0, 1), did, ut.TitleRank(company_title), mname);
+prin_new_grp_sort := sort(prin_new_grp, lname, NID.PreferredFirstVersionedStr(fname, NID.version), record_type, if(did <> 0, 0, 1), did, ut.TitleRank(company_title), mname);
 
 Layout_Principal_Extended RollupPrincipals(Layout_Principal_Extended l, Layout_Principal_Extended r) := transform
 self := l;

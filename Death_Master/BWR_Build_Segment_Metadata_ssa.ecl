@@ -14,6 +14,7 @@ numericType := Text_Search.Types.SegmentType.NumericType;
 groupType := Text_Search.Types.SegmentType.GroupSeg;
 ConcatSeg := Text_Search.Types.SegmentType.ConcatSeg;
 keyType := Text_search.Types.SegmentType.ExternalKey;
+ssnType := Text_search.Types.SegmentType.SSN;
 
 segmentMetaData := DATASET([
          {'name',  TextType,       [1]},
@@ -23,7 +24,7 @@ segmentMetaData := DATASET([
        // {'address',       TextType,       [5]},
         //{'zip',   TextType,       [6]},
         //{'county',        TextType,       [7]},
-        {'ssn',   TextType,       [8]},
+        {'ssn',   ssnType,       [8]},
         {'dob',   DateType,       [9]},
         {'dod',   DateType,       [10]},
         {'gender',        TextType,       [11]},

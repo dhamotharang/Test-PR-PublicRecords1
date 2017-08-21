@@ -3,10 +3,12 @@ import VehLic, doxie_files;
 export doxie_files.Layout_VehicleContacts TRA_NormContacts(doxie_files.Layout_vehicles L, INTEGER C) :=
 TRANSFORM
 	// record ids
-	SELF.seq_no := L.seq_no + (C - 1); // makes the seq_no unique for roxie
+	SELF.seq_no := L.seq_no;// + (C - 1); // makes the seq_no unique for roxie
 	SELF.rec_source := CHOOSE(C, 'own_1', 'own_2', 'reg_1', 'reg_2');
-	SELF.DID := 0;	
-	SELF.bdid := 0;
+	SELF.DID := (unsigned6)CHOOSE(C, L.own_1_did, L.own_2_did, 
+								  L.reg_1_did, L.reg_2_did);	
+	SELF.bdid := (unsigned6)CHOOSE(C, L.own_1_bdid, L.own_2_bdid, 
+								  L.reg_1_bdid, L.reg_2_bdid);	
 	SELF.orig_state := L.orig_state;
 	SELF.record_type := L.record_type;
 	

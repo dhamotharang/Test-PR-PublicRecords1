@@ -1,0 +1,34 @@
+import _control,RoxieKeyBuild;
+
+export Email_Notification_Lists :=
+module
+	
+	export all_hands := 'lbentley@seisint.com;' +	_control.MyInfo.EmailAddressNotify	;
+											
+	export BuildSuccess := 
+		if(_Flags.IsTesting
+			,_control.MyInfo.EmailAddressNotify
+			,all_hands + ';qualityassurance@seisint.com'
+		);
+	
+		export ScrubsReport := 
+		if(_Flags.IsTesting
+			,_control.MyInfo.EmailAddressNotify
+			,all_hands + ';Rosemary.Murphy@lexisnexisrisk.com;Darren.Knowles@lexisnexisrisk.com,Saritha.Myana@lexisnexisrisk.com'
+		);
+	export BuildFailure := all_hands;
+	
+	export Spray							 := BuildSuccess;
+	
+	export Stats								:= BuildSuccess;
+	
+ export ScrubsPlus			:= ScrubsReport;
+ 
+	export Roxie :=
+		if(_Flags.IsTesting
+			,_control.MyInfo.EmailAddressNotify
+			,RoxieKeyBuild.Email_Notification_List + ';avenkata@seisint.com;vniemela@seisint.com;' + all_hands
+		);
+	
+	
+end;

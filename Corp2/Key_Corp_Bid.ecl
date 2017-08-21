@@ -1,0 +1,1 @@
+export Key_Corp_Bid := keys().Corp.Bid.qa;

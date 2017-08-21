@@ -12,7 +12,7 @@ module
 	//also have another flexible one to tailor to a specific application
 	shared filter				:= if(pFilter = ''	,true
 																					,		regexfind(pFilter,pfilenames.templatename		,nocase)
-																					or	regexfind(pFilter,pfilenames.templatenamenew,nocase)
+																					 or	(pfilenames.templatenamenew != '' and regexfind(pFilter,pfilenames.templatenamenew,nocase))
 												);
 
 	shared fullfilter := if(pNotFilter	,not(filter),filter);

@@ -26,11 +26,13 @@ end;
 
 Mapping_IA_as_Search_temp := normalize(Watercraft.file_IA_clean_in,5,search_mapping_format_temp(left,counter));
 
-Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Layout_Watercraft_Search_Group_temp L, integer1 C)
+Watercraft.Macro_Clean_Hull_ID(Mapping_IA_as_Search_temp, Layout_Watercraft_Search_Group_temp,hull_clean_in)
+
+Watercraft.Layout_Watercraft_Search_Group search_mapping_format(hull_clean_in L, integer1 C)
  :=
   transform
-	self.date_first_seen			:=	L.reg_date[1..6] + '01';
-	self.date_last_seen				:=	L.reg_date[1..6] + '01';
+	self.date_first_seen			:=	if ( L.reg_date[7..8] not in ['00',''],L.reg_date,L.reg_date[1..6] + '01');
+	self.date_last_seen				:=	if ( L.reg_date[7..8] not in ['00',''],L.reg_date,L.reg_date[1..6] + '01');
 	self.date_vendor_first_reported	:=	L.process_date;
 	self.date_vendor_last_reported	:=	L.process_date;
 	self.watercraft_key				:=	if(L.HULL_ID = '', trim(L.REG_NUM, left, right), if(trim(L.year, left, right) >= '1972' and length(trim(L.HULL_ID,left, right)) = 12, trim(L.HULL_ID,left, right),
@@ -70,7 +72,7 @@ Watercraft.Layout_Watercraft_Search_Group search_mapping_format(Layout_Watercraf
   end
  ; 
  
-export Mapping_IA_as_Search	:= (normalize(Mapping_IA_as_Search_temp,2,search_mapping_format(left,counter)))
+export Mapping_IA_as_Search	:= (normalize(hull_clean_in,2,search_mapping_format(left,counter)))
                                 (clean_pname <> '' or company_name <> '');
 
 

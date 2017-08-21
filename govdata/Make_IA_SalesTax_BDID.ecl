@@ -1,86 +1,103 @@
-import business_header,business_header_SS,did_add,ut;
+IMPORT business_header, business_header_SS, did_add, MDR, BIPV2, PromoteSupers;
 
-df := govdata.File_IA_Sales_Tax_In;
+dsIASalesTx_base := govdata.IA_Sales_Tax_Build_Base;
 
-seqrec := record
-	df;
-	unsigned4	seq := 0;
-end;
+myrec := RECORD
+	govdata.Layout_IA_SalesTax_Base;
+	UNSIGNED1		score := 0;
+	STRING10		prim_range;
+	STRING28		prim_name;
+	STRING10		sec_range;
+	STRING5			zip;
+	STRING2			st;
+	STRING25  	p_city_name;
+	STRING20 		owner_name_first;
+	STRING20 		owner_name_middle;
+	STRING20 		owner_name_last;
+END;
 
-seqrec into_seq(df L, integer C) := transform
-	self.seq := C;
-	self := L;
-end;
+// The macros will not accept multi-level attributes (mailingAddress, ownerName, etc.)
+// Casting the values in to 1-level attributes
+myrec fatten_for_macro(RECORDOF(dsIASalesTx_base) L) := TRANSFORM
+	SELF.score 			        := 0;
+	SELF.prim_range         := L.mailingAddress.prim_range;
+	SELF.prim_name 	        := L.mailingAddress.prim_name;
+	SELF.sec_range	        := L.mailingAddress.sec_range;
+	SELF.zip 				        := L.mailingAddress.zip;
+	SELF.st 				        := L.mailingAddress.st;
+	SELF.p_city_name        := L.mailingAddress.p_city_name;
+	SELF.owner_name_first   := L.ownerName.fname;
+	SELF.owner_name_middle  := L.ownerName.mname;
+	SELF.owner_name_last    := L.ownerName.lname;
+	SELF                    := L;
+	SELF                    := [];
+END;
 
-df2 := project(df,into_seq(LEFT,COUNTER));
+dsIASalesTx_base_fat := PROJECT(dsIASalesTx_base, fatten_for_macro(LEFT));
 
-myrec := record
-	unsigned4	seq;
-	unsigned6	bdid;
-	unsigned1	score;
-	string35	co_name;
-	string10	prim_range;
-	string28	prim_name;
-	string10	sec_range;
-	string5	zip;
-	string2	st;
-end;
-
-myrec into_norm(df2 L, integer C) := transform
-	self.seq := L.seq;
-	self.bdid := 0;
-	self.score := 0;
-	self.prim_range := choose(C,L.mailing_prim_range,L.mailing_prim_range,L.location_prim_Range,L.location_prim_Range);
-	self.prim_name := choose(C,L.mailing_prim_name,L.mailing_prim_name,L.location_prim_name,L.location_prim_name);
-	self.sec_range := choose(C,L.mailing_sec_range,L.mailing_sec_range,L.location_sec_Range,L.location_sec_Range);
-	self.zip := choose(C,L.mailing_zip,L.mailing_zip,L.location_zip,L.location_zip);
-	self.st := choose(C,L.mailing_st,L.mailing_st,L.location_st,L.location_st);
-	self.co_name := choose(C,L.company_name_1,L.company_name_2,L.company_name_1,L.company_name_2);
-end;
-
-df3 := normalize(df2,4,into_norm(LEFT,COUNTER));
-
-business_header.MAC_Source_Match(df3,o1,
-							false,bdid,
-							false,'',
-							false,foo,
-							co_name,
-							prim_range,prim_name,sec_range,zip,
-							false,foo,
-							false,foo)
+business_header.MAC_Source_Match(
+				 dsIASalesTx_base_fat 																// infile
+				,dPostSourceMatch												 						 // outfile
+				,FALSE																							// bool_bdid_field_is_string12
+				,bdid														 									 // bdid_field
+				,FALSE																						// bool_infile_has_source_field
+				,''						 		 															 // source_type_or_field
+				,FALSE																					// bool_infile_has_source_group
+				,foo										 									 		 // source_group_field
+				,company_name_1																// company_name_field
+				,prim_range								 	                 // prim_range_field
+				,prim_name										              // prim_name_field
+				,sec_range							 		               // sec_range_field
+				,zip												              // zip_field
+				,FALSE																	 // bool_infile_has_phone
+				,foo			  														// phone_field
+				,FALSE								 								 // bool_infile_has_fein
+				,foo     															// fein_field
+	);
 							
-mid1 := o1(bdid != 0);
-mid2 := o1(bdid = 0);
-
-//we want these at the top of the sort order later.
-mid1 fake_score(mid1 L) := transform
-	self.score := 101;
-	self := L;
-end;
-
-mid1_score := project(mid1, fake_score(LEFT));
+//we want these at the top of the SORT order later.
+myrec fake_score(myrec L) := TRANSFORM
+	SELF.score := IF(l.bdid != 0,	101,0);
+	SELF 			 := L;
+END;
+   
+mid1_score := PROJECT(dPostSourceMatch, fake_score(LEFT));
 
 myset := ['A'];
 
-business_header_ss.MAC_Match_Flex(mid2,myset,
-						co_name,
-						prim_range,prim_name,zip,sec_range,st,
-						foo,foo,bdid,myrec,
-						true,score,
-						o2)
+Business_Header_SS.MAC_Add_BDID_Flex(
+				 mid1_score 									 	  			        			// Input Dataset						
+				,myset                                 				    	 // BDID Matchset           
+				,company_name_1        		         									// company_name	              
+				,prim_range		                                     // prim_range		              
+				,prim_name		                                    // prim_name		              
+				,zip 					                                   // zip5					              
+				,sec_range		                                  // sec_range		              
+				,st				                                     // state				              
+				,foo			           										   		// phone				              
+				,foo                             			    	 // fein              
+				,bdid										 					       		// bdid												
+				,myrec    		 			     									 // Output Layout 
+				,TRUE                         			   		// output layout has bdid score field?                       
+				,Score                                	 // bdid_score                 
+				,dPostFlex             							 		// Output Dataset   
+				,																    	 // deafult threscold
+				,													 			   		// use prod version of superfiles
+				,															    	 // default is to hit prod from dataland, and on prod hit prod.		
+				,BIPV2.xlink_version_set 			   		// Create BIP Keys only
+				,           								    	 // Url
+				,								               		// Email
+				,p_city_name			               // City
+				,owner_name_first							  // first name
+				,owner_name_middle						 // middle name
+				,owner_name_last						  // last name
+);
 
-outf1 := dedup(sort(distribute(o2 + mid1_score,hash(seq)),seq,-score,bdid,local),seq,local);
+df3 := PROJECT(dPostFlex, govdata.Layout_IA_SalesTax_Base);
 
+outf1 := DEDUP(SORT(DISTRIBUTE(df3, HASH(permit_nbr)), bdid, -issue_date, LOCAL), permit_nbr, LOCAL);
 
-govdata.Layout_IA_SalesTax_Base into_final(df2 L, outf1 R) := transform
-	self.bdid := R.bdid;
-	self := L;
-end;
+PromoteSupers.MAC_SF_BuildProcess(outf1,'~thor_data400::base::IA_Sales_Tax_AID',do1,2);
 
-outfinal := join(distribute(df2,hash(seq)),outf1,left.seq = right.seq,
-			into_final(LEFT,RIGHT),local,left outer);
-
-ut.MAC_SF_BuildProcess(outfinal,'~thor_data400::base::IA_SaleS_Tax',do1,2);
-
-export Make_IA_SalesTax_BDID := do1;
+EXPORT Make_IA_SalesTax_BDID := do1;
 

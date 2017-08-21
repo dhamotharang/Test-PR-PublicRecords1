@@ -19,7 +19,7 @@ EXPORT fn_getDOCandCriminalRecs(DATASET(Layouts.batch_in) ds_batch_in, IParams.B
 
 		// Join back to the batch_in to compare SSN, name and DOB data to remove false positives.
 		// The YOB comparison addresses Jr./Sr. "mismatch" where "Jr" is incarcerated and is using
-		// "Sr"'s SSN with the same Name, but because the YOB’s 1970 vs. 1939 we would consider this 
+		// "Sr"'s SSN with the same Name, but because the YOBâ€™s 1970 vs. 1939 we would consider this 
 		//a miss. But if YOB is missing on DOC but populated on Input (or visa versa), then we should 
 		// drop the YOB comparison and only perform the SSN and Name comparison
 		ds_criminal_recs_filt := 

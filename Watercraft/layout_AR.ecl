@@ -27,9 +27,12 @@ string20	CONVLENGTH;
 string20	MOTOR;
 string4	  HP;
 string13	SERIAL;
-string41	Name2;
-string30	Add2;
+//New fields as of 7/2016
+string21	SecondOwner_LastName;
+string19	SecondOwner_FirstName;
+string1		SecondOwner_MidName;
+string8		ExpireDate;
+//string30	Add2; Removed as of 7/2016
 string2	  lf;
-
 end;
 

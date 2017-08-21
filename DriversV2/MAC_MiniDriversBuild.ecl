@@ -35,7 +35,7 @@ END;
 	%sequenced%.dt_last_seen;
 	%sequenced%.dt_vendor_first_reported;
 	%sequenced%.dt_vendor_last_reported;
-	%sequenced%.orig_expiration_date;
+	%sequenced%.expiration_date;
 	%sequenced%.history;
 	DATA16 record_hash := HASHMD5(
 		%sequenced%.orig_state,
@@ -89,7 +89,7 @@ END;
 //		 If it did, then zero out its dates
 
 #uniquename(drivers_exp)
-drivers.MAC_Check_Expire(%drivers_slim%, orig_expiration_date, %drivers_exp%)
+drivers.MAC_Check_Expire(%drivers_slim%, expiration_date, %drivers_exp%)
 
 //****** Get rid of recs that are just a state dumping the same thing again
 #uniquename(drivers_sort)
@@ -118,12 +118,12 @@ END;
 #uniquename(drivers_grp)
 %drivers_grp% := GROUP(
 		SORT(%drivers_deduped%(history != 'E'),
-			dl_number, orig_State, -dt_last_seen, -dt_first_seen, -orig_expiration_Date, LOCAL),
+			dl_number, orig_State, -dt_last_seen, -dt_first_seen, -expiration_Date, LOCAL),
 			dl_number, orig_State, LOCAL);
 
 #uniquename(make_hist)
 TYPEOF(%drivers_grp%) %make_hist%(%drivers_grp% l, %drivers_grp% r) := TRANSFORM
-  SELF.history := MAP(r.orig_expiration_Date > 0 AND r.orig_expiration_Date < (UNSIGNED4) ut.GetDate => 'E',
+  SELF.history := MAP(r.expiration_Date > 0 AND r.expiration_Date < (UNSIGNED4) ut.GetDate => 'E',
 					  l.orig_state = '' => r.history,
 					  'H');
   SELF.dt_last_seen := IF(r.dt_last_seen > 0 AND l.dt_first_seen > r.dt_last_seen,

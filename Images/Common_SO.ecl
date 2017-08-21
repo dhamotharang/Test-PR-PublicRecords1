@@ -23,7 +23,7 @@ TRANSFORM
 	SELF.seq := 0;
 	SELF.date := '';
 	SELF.num := 1;
-	self.image_link := state + ri.filename;
+	self.image_link := ri.filename;
 	SELF.imgLength := le.imgLength;
 	SELF.photo := le.photo;
 END;

@@ -1,10 +1,10 @@
-import Bankrupt,lib_keylib,lib_fileservices;
+import Bankrupt,lib_keylib,lib_fileservices, Property;
 
 Liens_stat_dis := Bankrupt.File_Liens_service(filing_date <> '' or filing_date <> '00000000');
 
 //Liens_stat_dis := distribute(Liens_file,hash(courtid));
 
-Liens_stat_rec :=  record
+/*Liens_stat_rec :=  record
  Liens_stat_dis.county;
  total := count(group);
  Max_filing_date := MAX(group,Liens_stat_dis.filing_date);
@@ -256,7 +256,62 @@ Liens_perc_rec_proj := project(Liens_stats,GetPerc(LEFT));
 Liens_stats_sort := sort(Liens_perc_rec_proj,stat1_courtid);
 
 output(Liens_stats_sort(stat1_courtid <> '   SCHU' and stat1_courtid <> '  Signa' and (stat1_Max_Filing_Date <> '' or stat1_Min_Filing_Date <> '')),,'out::Liens_full_service_stats',overwrite);
+*/
 
 /*Liens_file_despray := lib_fileservices.fileservices.Despray('~thor_dell400_2::out::Liens_full_stats','192.168.0.39',
  									'/thor_back5/liens/stats/fullstats/Liens_stats.d00',,,,TRUE);*/
+
+// Query to create a crosstab with counts by county name from the
+// Fares_Foreclosure property file
+
+//bankruptcy_service := DATASET(property.File_Fares_Foreclosure, property.Layout_Fares_Foreclosure, THOR);
+
+County_Rec := RECORD
+	string2 state;
+	string3 fips_county_code;
+	string10 min_filing_date;
+END;
+
+County_Rec GetCountyCodes(Liens_stat_dis L) := TRANSFORM
+	SELF.state := L.state;
+	SELF.fips_county_code := L.county;
+	self.min_filing_date := l.filing_date;
+END;
+	
+Layout_County_Stat := PROJECT(Liens_stat_dis,GetCountyCodes(LEFT));
+
+// Crosstab to count occurrences of each unique county code
+Layout_County_Code_Stat := RECORD
+	Layout_County_Stat.fips_county_code;
+	Layout_County_Stat.state;
+	string10 m_filing_date := min(group, Layout_County_Stat.min_filing_date);
+	reccnt := COUNT(GROUP);	
+END;
+
+County_Codes_Stat := TABLE(Layout_County_Stat, Layout_County_Code_Stat, state, fips_county_code, FEW);
+
+
+
+
+// Join to County Code Name file to get names
+Layout_County_Names := RECORD
+	Layout_County_Code_Stat;
+	string2 layout_state;
+	STRING18 county_name;
+END;
+
+// Join to County Code Name file to get names
+Layout_County_Names GetCountyNames(Layout_County_Code_Stat L, Property.Layout_County_Code_Names R) := TRANSFORM
+	SELF.county_name := R.county_name;
+	SELF.layout_state := R.state;
+	SELF := L;
+END;
+
+Fares_Foreclosure_County_Names := JOIN(County_Codes_Stat,
+                                 Property.File_County_Code_Names,
+								 LEFT.state = RIGHT.state_fips AND
+                                 (INTEGER)LEFT.fips_county_code = (INTEGER)RIGHT.fips_county_code,
+                                 GetCountyNames(LEFT, RIGHT));
+								 
+OUTPUT(CHOOSEN(Fares_Foreclosure_County_Names,ALL));
 

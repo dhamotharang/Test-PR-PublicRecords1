@@ -1,4 +1,4 @@
-IMPORT Header, ut, mdr;
+IMPORT Business_Header, Header, ut, mdr,business_headerv2;
 
 //********************************************
 // Create Contacts List From Person Headers
@@ -6,8 +6,18 @@ IMPORT Header, ut, mdr;
 
 // Dates are INTEGER3 of YYYYMM in headers
 // Dates are INTEGER4 of YYYYMMDD in business headers
+EXPORT Header_Contacts(
+	
+	 dataset(header.Layout_Header_v2		) pHeaders									= business_headerv2.Source_Files.header.BusinessHeader
+	,dataset(Layout_Business_Header_Base) pBusinessHeaders					= Files().Base.Business_Headers.built
+	,string																pPersistname							= persistnames().HeaderContacts													
+	,boolean															pShouldRecalculatePersist	= true													
 
-hdrs := Header.File_Headers;
+) :=
+function 
+
+hdrs_ := filters.headercontacts(pHeaders);
+hdrs := hdrs_(~header.IsOldUtil(header.Version_build));
 
 Layout_Header_Slim := RECORD
 	hdrs.did;
@@ -47,7 +57,7 @@ Layout_Header_Slim SlimHeaders(hdrs L) := TRANSFORM
 	SELF.phone := (UNSIGNED6) l.phone;
 	SELF.ssn := (UNSIGNED4) l.ssn;
 	SELF.date_first := ut.EarliestDate(L.dt_first_seen, L.dt_vendor_first_reported);
-	SELF.date_last := ut.LatestDate(L.dt_last_seen, L.dt_vendor_last_reported);
+	SELF.date_last := max(L.dt_last_seen, L.dt_vendor_last_reported);
 	SELF.glb := ~header.isPreGLB(L);
 	SELF.dppa := mdr.Source_is_DPPA(L.src);
 	self.vendor_id := if(mdr.Source_is_DPPA(l.src),   mdr.get_DPPA_st(l.src, l.st) + l.vendor_id, l.vendor_id);
@@ -56,18 +66,19 @@ END;
 
 Layout_Header_Slim RollHeaderDates(Layout_Header_Slim l, Layout_Header_Slim r) := TRANSFORM
 	SELF.date_first := ut.EarliestDate(l.date_first, r.date_first);
-	SELF.date_last := ut.LatestDate(l.date_last, r.date_last);
+	SELF.date_last := max(l.date_last, r.date_last);
 // A non-glb/dppa record "untaints" the entire rollup.
-	SELF.glb := IF(~l.glb, l.glb, r.glb);
-	SELF.dppa := IF(~l.dppa, l.dppa, r.dppa);
+	//SELF.glb := IF(~l.glb, l.glb, r.glb);
+	//SELF.dppa := IF(~l.dppa, l.dppa, r.dppa);
+	//self.src := if(l.src < r.src, l.src,r.src);
 	SELF := l;
 END;
 
 Headers_Init := hdrs(zip<>'', prim_range<>'', prim_name<>'');
 Headers_Proj := PROJECT(Headers_Init, SlimHeaders(LEFT));
 Headers_Dist := DISTRIBUTE(Headers_Proj, HASH(zip, prim_range, prim_name));
-Headers_Sort := SORT(Headers_Dist, zip, prim_range, prim_name, did, -sec_range, LOCAL);
-Headers_Group := GROUP(Headers_Sort, zip, prim_range, did, prim_name, LOCAL);
+Headers_Sort := SORT(Headers_Dist, zip, prim_range, prim_name, did, -sec_range,dppa, glb, src, LOCAL);
+Headers_Group := GROUP(Headers_Sort, zip, prim_range, prim_name, did, LOCAL);
 Headers_Dedup := GROUP(ROLLUP(Headers_Group, TRUE, RollHeaderDates(LEFT, RIGHT)));
 
 // Eliminate addresses with more than 100 people (did's)
@@ -83,8 +94,8 @@ Layout_Company_Slim := RECORD
 	qstring120 company_name;
 	qstring34 company_source_group;
 	qstring10 company_prim_range;
-	string2   company_predir;
 	qstring28 company_prim_name;
+	string2   company_predir;
 	qstring4  company_addr_suffix;
 	string2   company_postdir;
 	qstring5  company_unit_desig;
@@ -103,7 +114,7 @@ END;
 
 Layout_Company_Slim SlimCompanies(Business_Header.Layout_Business_Header_Base L) := TRANSFORM
 	SELF.company_date_first := ut.EarliestDate(L.dt_first_seen div 100, L.dt_vendor_first_reported div 100);
-	SELF.company_date_last := ut.LatestDate(L.dt_last_seen div 100, L.dt_vendor_last_reported div 100);
+	SELF.company_date_last := max(L.dt_last_seen div 100, L.dt_vendor_last_reported div 100);
 	SELF.company_source_group := L.source_group;
 	SELF.company_name := L.company_name;
 	SELF.company_prim_range := L.prim_range;
@@ -126,12 +137,12 @@ END;
 
 Layout_Company_Slim RollCompanyDates(Layout_Company_Slim l, Layout_Company_Slim r) := TRANSFORM
 	SELF.company_date_first := ut.EarliestDate(l.company_date_first, r.company_date_first);
-	SELF.company_date_last := ut.LatestDate(l.company_date_last, r.company_date_last);
+	SELF.company_date_last := max(l.company_date_last, r.company_date_last);
 	SELF.current := l.current OR r.current;
 	SELF := l;
 END;
 
-bh_file := Business_Header.File_Business_Header_Base;
+bh_file := pBusinessHeaders;
 
 // Longest company name at address wins for now......
 Companies_Proj := PROJECT(bh_file(zip<>0, prim_range<>'', prim_name<>''), SlimCompanies(LEFT));
@@ -171,8 +182,8 @@ Layout_Header_Contact_Match SelectContacts(Layout_Company_Slim l, Layout_Header_
 END;
 
 // Join Slim Headers to Slim Companies Master to obtain additional contacts
-Header_Contacts_Select := JOIN(Companies_Filtered,
-                              Headers_Filtered,
+Header_Contacts_Select := JOIN(	distribute(Companies_Filtered	,hash64(company_zip	,company_prim_range	,company_prim_name,company_sec_range)),
+																distribute(Headers_Filtered		,hash64(zip					,prim_range					,prim_name				,sec_range				)),
 							  LEFT.company_zip = RIGHT.zip AND 
 							  LEFT.company_prim_range = RIGHT.prim_range AND 
 							  LEFT.company_prim_name = RIGHT.prim_name AND
@@ -203,7 +214,7 @@ Business_Header.Layout_Business_Contacts_Temp ScoreContacts(
 	SELF.email_address := '';
 
 	// Use the date intersection   YYYYMMDD
-	SELF.dt_first_seen := (ut.LatestDate(l.date_first, l.company_date_first) * 100) + 1;
+	SELF.dt_first_seen := (max(l.date_first, l.company_date_first) * 100) + 1;
 	SELF.dt_last_seen := (ut.EarliestDate(l.date_last, l.company_date_last) * 100) + 1;
 	SELF.contact_score := IF(r.bdid_count < 5, 3, 2);
 	SELF := l;
@@ -221,5 +232,50 @@ Header_Contacts_Filt := Header_Contacts_Init(
 	(INTEGER)name_score < 3, 
 	Business_Header.CheckPersonName(fname, mname, lname, name_suffix));
 
-EXPORT Header_Contacts := 
-		Header_Contacts_Filt : PERSIST('TEMP::header_contacts');
+// Check for phone number matches to increase score
+layout_did_phone := record
+Headers_Proj.did;
+Headers_Proj.phone;
+end;
+
+Header_Phones := table(Headers_Proj(phone <> 0), layout_did_phone);
+Header_Phones_Dedup := dedup(Header_Phones, all);
+
+layout_bdid_phone := record
+Companies_Proj.bdid;
+unsigned6 phone := Companies_Proj.company_phone;
+end;
+
+Companies_Phones := table(Companies_Proj(company_phone <> 0), layout_bdid_phone);
+Companies_Phones_Dedup := dedup(Companies_Phones, all);
+
+layout_bdid_did := record
+unsigned6 bdid;
+unsigned6 did;
+end;
+
+Header_Company_Phone_Match := join(Header_Phones_Dedup,
+                                   Companies_Phones_Dedup,
+							left.phone = right.phone,
+							transform(layout_bdid_did, self.did := left.did, self.bdid := right.bdid),
+							hash);
+							
+Header_Company_Phone_Match_Dedup := dedup(Header_Company_Phone_Match, all);
+
+// Increase contact scores for company-person phone matches
+Header_Contacts_Out := join(Header_Contacts_Filt,
+                            Header_Company_Phone_Match_Dedup,
+					   left.bdid = right.bdid and
+					     left.did = right.did,
+					   transform(Business_Header.Layout_Business_Contacts_Temp,
+					             self.contact_score := left.contact_score + if(right.bdid <> 0, 5, 0),
+							   self := left),
+					   left outer,
+					   hash) : PERSIST(pPersistname);
+
+returndataset := if(pShouldRecalculatePersist = true, Header_Contacts_Out
+																										, persists().HeaderContacts
+									);
+return returndataset;
+
+end;

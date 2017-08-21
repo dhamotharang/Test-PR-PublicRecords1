@@ -1,5 +1,5 @@
-export Layout_MI_clean_in := 
-record
+export Layout_MI_clean_in := record	
+//rec length=1612
   string2 state_origin;
   string8 process_date;
   Watercraft.layout_MI;

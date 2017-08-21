@@ -1,10 +1,12 @@
-import doxie, fcra, header, gong, ut, header, doxie_build;
+import doxie, fcra, header, gong, ut, header, doxie_build, header_quick;
 
 export ADL_Risk_Table_v3(boolean isFCRA) := function
 
-hf1 := doxie_build.file_headerprod_building(did!=0 and ~iid_constants.filtered_source(src));
+hf1 := doxie_build.file_header_building(did!=0 and ~iid_constants.filtered_source(src));
+h_quick := project( header_quick.file_header_quick, transform(header.Layout_Header,  self.src := 'EQ', self := left));
+headerprod_building := ungroup(hf1 + h_quick);
 
-hf := project(hf1(dt_last_seen<>0),transform(header.Layout_Header, self := left));
+hf := project(headerprod_building(dt_last_seen<>0),transform(header.Layout_Header, self := left));
 
 base_hf := if(isFCRA, hf(~fcra.Restricted_Header_Src(src, vendor_id[1])), hf);
 
@@ -49,7 +51,7 @@ j2 := join(j, experian_recs, left.did=right.did,
 
 
 // now append the phones per DID 
-sysdate := ut.GetDate[1..6] + '31';
+sysdate := ut.GetDate[1..6] + '01';
 gh1 := Gong.File_Gong_History_full(did<>0 and (current_record_flag='Y' or ut.DaysApart(sysdate, deletion_date[1..6]+'31') < 365) );
 // gh1 := dataset([], recordof(Gong.File_Gong_History_full) );  // for testing the rest of this stuff if you don't care about the phone counts
 gh := distribute(gh1, hash(did));
@@ -69,7 +71,7 @@ phone_stats := record
 end;
 phone_counts := table(d_phone, phone_stats, did, local);
 
-
+														 
 // append the phone counts
 with_phone_counts := join(j2, phone_counts, left.did=right.did, 
 				transform(layout_adl_risk_v3, 
@@ -89,11 +91,12 @@ end;
 
 persist_name := IF (IsFCRA, 'persist::adl_risk_v3_filtered', 'persist::adl_risk_v3'); 
 	
-full_adl_risk_wCat := join(with_phone_counts, 
-													 adl_category, 
+full_adl_risk_wCat := join(distribute(with_phone_counts, hash(did)), 
+													 distribute(adl_category(did<>0), hash(did)), 
 													 left.did=right.did, 
-													 addCategory(left,right), left outer, keep(1)) : persist (persist_name);									
-								
+													 addCategory(left,right), left outer, keep(1), local) : persist (persist_name);									
+	
+	
 return full_adl_risk_wCat;
 
 end;

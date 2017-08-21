@@ -1,4 +1,4 @@
-﻿IMPORT iesp, DemoSearchTool;
+IMPORT iesp, DemoSearchTool;
 
 EXPORT Layouts := 
   MODULE
@@ -231,46 +231,45 @@ EXPORT People_Layout := RECORD
 	unsigned8 __internal_fpos__ := 0;
  END;
  
- slim_child_bdid_address := RECORD
-   unsigned6 bdid;
-   qstring120 company_name;
-   string2 predir;
-   qstring4 addr_suffix;
-   string2 postdir;
-   qstring5 unit_desig;
-   qstring25 city;
-   string2 state;
-   string4 zip4;
-   unsigned6 phone;
-   unsigned4 fein;
-  END;
+EXPORT layout_child_address := record
+	  qstring120 company_name;
+		qstring10 prim_range;
+		qstring28 prim_name;
+		qstring8 sec_range;
+		string5 zip;
+		string2 predir;
+		qstring4 addr_suffix;
+		string2 postdir;
+		qstring5 unit_desig;
+		qstring25 city;
+		string2 state;
+		string4 zip4;
+		unsigned6 phone;
+		unsigned4 fein;
+	end;
+	EXPORT layout_child_bdid_address := record
+		unsigned6 BDID;
+		layout_child_address;
+	end;
+	EXPORT slim_child_bdid_address := layout_child_bdid_address - [prim_range,prim_name,sec_range,zip];
 
-slim_child_seleid_address := RECORD
-   unsigned6 ultid;
-   unsigned6 orgid;
-   unsigned6 seleid;
-   unsigned6 bdid;
-   qstring120 company_name;
-   string2 predir;
-   qstring4 addr_suffix;
-   string2 postdir;
-   qstring5 unit_desig;
-   qstring25 city;
-   string2 state;
-   string4 zip4;
-   unsigned6 phone;
-   unsigned4 fein;
-  END;
-
-EXPORT Business_Address_Layout := RECORD
-  integer8 bdid_cnt;
-  integer8 seleid_cnt;
-  qstring10 prim_range;
-  qstring28 prim_name;
-  qstring8 sec_range;
-  string5 zip;
-  DATASET(slim_child_bdid_address) businesses_bdid{choosen(50)} :=  DATASET([],slim_child_bdid_address);
-  DATASET(slim_child_seleid_address) businesses_seleid{choosen(50)} := DATASET([], slim_child_seleid_address) ;
-	unsigned8 __internal_fpos__ := 0;
- END;
+	EXPORT layout_child_seleid_address := record
+		unsigned6 ultid;
+		unsigned6 orgid;
+		unsigned6 seleid;
+		unsigned6 bdid;
+		layout_child_address;
+	end;
+	EXPORT slim_child_seleid_address := layout_child_seleid_address - [prim_range,prim_name,sec_range,zip];
+	
+	EXPORT Business_Address_Layout := record
+		integer8 BDID_cnt:= 0;
+		integer8 seleid_cnt := 0;
+		qstring10 prim_range;
+		qstring28 prim_name;
+		qstring8 sec_range;
+		string5 zip;
+		dataset(slim_child_bdid_address,ChooseN(50)) Businesses_bdid := dataset([],slim_child_bdid_address) ;
+		dataset(slim_child_seleid_address,ChooseN(50)) Businesses_seleid := dataset([],slim_child_seleid_address) ;
+	end;
  END;

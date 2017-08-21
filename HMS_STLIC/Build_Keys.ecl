@@ -7,23 +7,23 @@ EXPORT Build_Keys
 	EXPORT Build_Keys_statelicense(string pversion, boolean pUseProd = false) := module
 
 			// state license keys - ln_key...
-				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).statelicense_lnk_key.New		,BuildStateLicenseLnKey	);
+				// VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).statelicense_lnk_key.New		,BuildStateLicenseLnKey	);
 				// VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).statelicense_lic_key.New		,BuildStateLicenseLic	);
 				// VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).statelicense_dea_key.New		,BuildStateLicenseDea	);
 				// VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).statelicense_npi_key.New		,BuildStateLicenseNpi	);
 				// VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).statelicense_zip_key.New		,BuildStateLicenseZip	);
 				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).statelicense_lnpid_key.New		,BuildStateLicenseLnpid	);
-				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).statelicense_sourcerid_key.New		,BuildStateLicenseSourcerid	);
+				// VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).statelicense_sourcerid_key.New		,BuildStateLicenseSourcerid	);
 					
 				SHARED full_build :=
 					sequential(
-						BuildStateLicenseLnKey,
+						// BuildStateLicenseLnKey,
 						// BuildStateLicenseLic,
 						// BuildStateLicenseDea,
 						// BuildStateLicenseNpi,
 						// BuildStateLicenseZip,
 						BuildStateLicenseLnpid,
-						BuildStateLicenseSourcerid,
+						// BuildStateLicenseSourcerid,
 						Promote.Promote_statelicense(pversion,pUseProd).buildfiles.New2Built
 					);
 		

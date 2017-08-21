@@ -2,8 +2,8 @@ import ut, WorldCheck, doxie_build;
 
 export Proc_Build_WC_Base (string filedate) := function
 
-out1 := output(WorldCheck.WorldCheck_child_datasets(filedate),,WorldCheck.cluster_name + 'base::worldcheck::main::' + filedate + '::Data');
-out2 := output(WorldCheck.Normalize_External_Sources(filedate),,WorldCheck.cluster_name + 'base::worldcheck::external_sources::' + filedate + '::Data');
+out1 := output(WorldCheck.WorldCheck_child_datasets(filedate),,WorldCheck.cluster_name + 'base::worldcheck::main::' + filedate + '::Data',compressed);
+out2 := output(WorldCheck.Normalize_External_Sources(filedate),,WorldCheck.cluster_name + 'base::worldcheck::external_sources::' + filedate + '::Data',compressed);
 
 super_main := sequential(FileServices.StartSuperFileTransaction(),
 				FileServices.AddSuperFile(  WorldCheck.cluster_name + 'base::worldcheck::main_Delete',
@@ -41,7 +41,7 @@ super_files := parallel(super_main,super_ext_srcs);
 
 
 qaSamples:= WorldCheck.sampleBaseFile(filedate);
-e_mail_success := FileServices.sendemail('qualityassurance@seisint.com;jwindle@seisint.com;tgibson@seisint.com','WORLD CHECK SAMPLE READY','at ' + thorlib.WUID());
+e_mail_success := FileServices.sendemail('qualityassurance@seisint.com;randy.reyes@lexisnexisrisk.com; manuel.tarectecan@lexisnexisrisk.com; abednego.escobal@lexisnexisrisk.com','WORLD CHECK SAMPLE READY','at ' + thorlib.WUID());
 
 
 all_tasks := sequential(build_files,super_files,qaSamples,e_mail_success);

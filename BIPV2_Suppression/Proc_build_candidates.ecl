@@ -1,4 +1,4 @@
-IMPORT lib_thorlib; 
+IMPORT lib_thorlib,RoxieKeyBuild; 
 EXPORT Proc_build_candidates (DATASET(Layouts.Inrec) datasetSuppression, STRING Version) := FUNCTION
 
 		oldData := IF(nothor(FileServices.FileExists(FileNames.Baseseleprox)), 
@@ -20,10 +20,15 @@ EXPORT Proc_build_candidates (DATASET(Layouts.Inrec) datasetSuppression, STRING 
     Build_Key  := BUILDINDEX(modSuppression.kSeleProx(Version),WIDTH(1));
     UpdateKey := CreateUpdateSuperFile.updateSuperFile(FileNames.Keyseleprox,	FileNames.Keyseleproxfather, FileNames.KeyLogicalF(Version));	
     
+    // Dops update 
+    
+    dopsupdate := RoxieKeyBuild.updateversion('BipV2SuppressionKeys',Version,'Sudhir.Kasavajjala@lexisnexisrisk.com;Ayeesha.kayttala@lexisnexisrisk.com',,'N') ;
+    
     RETURN SEQUENTIAL ( Build_base, 
                         Update_base,
                         Build_Key,
-                        UpdateKey
+                        UpdateKey,
+                        dopsupdate
                         );
                        
 END; 

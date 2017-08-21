@@ -123,12 +123,13 @@ title_status_desc(string1 code)
 'D' => 'INACTIVE',
 '0' => 'INACTIVE', '');
 
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_NC_clean_in, watercraft.Layout_NC_clean_in,hull_clean_in)
 
-watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_NC_clean_in L) := transform
+watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) := transform
 
 
-    self.watercraft_key				        :=	if(length(trim(L.HULL_ID, left, right)) = 12 and trim(L.year, left, right) >= '1972', trim(L.HULL_ID, left, right),
-	                                            (trim(L.HULL_ID, left, right) + trim(L.MAKE,left, right) + trim(L.YEAR, left, right))[1..30]);                                          
+    self.watercraft_key				        :=	if(length(trim(L.HULL_ID, left, right)) = 12 and trim(L.year, left, right) >= '1972', trim(L.HULL_ID, left, right) ,
+	                                            (trim(L.HULL_ID, left, right) + trim(L.MAKE,left, right) + trim(L.YEAR, left, right) + trim(L.reg_num, left, right))[1..30]);                                          
 	self.sequence_key				        :=	trim(L.RENEWNUM, left, right);
 	self.watercraft_id						:=	'';
 	self.state_origin						:=	'NC';
@@ -229,7 +230,7 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(watercraft.file_NC_cl
 
 
 
-export Mapping_NC_as_Main := project(watercraft.file_NC_clean_in, main_mapping_format(left));
+export Mapping_NC_as_Main := project(hull_clean_in, main_mapping_format(left));
 
 
 	

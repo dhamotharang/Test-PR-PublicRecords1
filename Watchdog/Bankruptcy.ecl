@@ -1,11 +1,11 @@
-//Find the most recent bankruptcy court code and case number for each DID
-import Bankrupt;
+//Find the most recent bankruptcy court code and case number for each debtor_did
+import Bankruptcyv2, bankrupt, ut;
 
-search_file := bankrupt.File_BK_Search((integer)debtor_did<>0);
-main_file := bankrupt.File_BK_Main;
+search_file:=BankruptcyV2.file_bankruptcy_search;
+main_file  :=BankruptcyV2.file_bankruptcy_main;
 
 search_rec := record
-search_file.debtor_did;
+debtor_did:=search_file.did;
 search_file.seq_number;
 search_file.court_code;
 search_file.case_number;
@@ -29,7 +29,7 @@ both_rec := record
 	string7   case_number;
 	string40   court_location;
     unsigned3  dt_last_seen;
-    unsigned6   DID;
+    unsigned6   did;
 end;
 
 both_rec getAll(slim_main L, slim_search R) := transform
@@ -42,7 +42,7 @@ withAll := join(slim_main,slim_search,left.case_number=right.case_number and
 									  left.court_code=right.court_code and
 									  left.seq_number=right.seq_number,getAll(left,right),hash);
 
-//Find the lastest case number per DID
+//Find the lastest case number per debtor_did
 slim_h := distribute(withAll,hash(did));
 srt_h  := sort(slim_h, did, -dt_last_seen, -seq_number, -court_code,-case_number, local);
 dup_h  := dedup(srt_h,did,local);
@@ -54,7 +54,7 @@ srt_case := sort(dis_case,court_code,case_number,-seq_number,local);
 dup_case := dedup(srt_case,court_code,case_number,local);
 
 final_rec := record
-  unsigned6   DID;
+  unsigned6   did;
   string5     court_code;
   string7     case_number;	
   qstring22   CourtCaseSeq;
@@ -117,7 +117,7 @@ withSearch := join(withMain,search_count_tbl,left.court_code=right.court_code an
 								     getSearch(left,right),left outer,local);
 
 out_rec := record
-  withSearch.DID;
+  withSearch.did;
   withSearch.CourtCaseSeq;
   withSearch.Main_Cnt;
   withSearch.Search_Cnt;

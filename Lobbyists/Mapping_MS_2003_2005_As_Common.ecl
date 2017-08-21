@@ -1,3 +1,5 @@
+import lib_stringlib;
+
 MyInitialDS := Lobbyists.File_Lobbyists_MS_2003_2005; 
 
 pattern SingleName := pattern('[^;]+');
@@ -9,9 +11,7 @@ end;
 	
 MyParsedDS := parse(MyInitialDS,Client_List,SingleName,MyParsedRecord,scan,first);
 
-import lib_stringlib;
-
-Layout_Lobbyists_Common MyTransform(MyParsedRecord input) := transform
+Layout_Lobbyists_Common MyTransform(MyParsedRecord input, unsigned c) := transform
 
 	self.Key := 'MS' + hash64(input.Year,input.SingleClient,input.Registration_Date);
 	self.Process_Date := '20050607';
@@ -34,4 +34,4 @@ Layout_Lobbyists_Common MyTransform(MyParsedRecord input) := transform
 	self := [];
 end;
 
-export Mapping_MS_2003_2005_As_Common := project(MyParsedDS,MyTransform(left));
+export Mapping_MS_2003_2005_As_Common := normalize(MyParsedDS,1,MyTransform(left,counter));

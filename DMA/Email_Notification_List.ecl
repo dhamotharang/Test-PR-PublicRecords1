@@ -1,0 +1,1 @@
+export Email_Notification_List := 'RoxieBuilds@seisint.com;kgummadi@seisint.com;christopher.brodeur@lexisnexis.com;randy.reyes@lexisnexis.com;manuel.tarectecan@lexisnexis.com';

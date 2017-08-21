@@ -1,6 +1,6 @@
-import gong, doxie;
+Import Data_Services, gong_Neustar, doxie, ut;
 
-valid_gong_full := gong.File_Gong_full(trim(phone10) <> '');
+valid_gong_full := gong_Neustar.File_Gong_Full_Prepped_For_Keys_1(trim(phone10) <> '');
 
 new_gong_record := record
 	valid_gong_full;
@@ -23,5 +23,6 @@ export key_gong_phone :=
 							st,
 						  boolean business_flag := if(listing_type_bus = 'B', true, false)},
 						 {gong_full_file},
-						 '~thor_data400::key::gong_phone_' + doxie.Version_SuperKey				
+					 '~thor_data400::key::gong_phone_' + doxie.Version_SuperKey				
+						// Data_Services.Data_location.Prefix('Gong_History') + 'thor_data400::key::gong_phone_' + doxie.Version_SuperKey				
 				);

@@ -1,0 +1,37 @@
+EXPORT Layout_Override_PCR_In := record
+	string UID;
+string date_created;
+string dt_first_seen;
+string dt_last_seen;
+string did;
+string fname;
+string mname;
+string lname;
+string name_suffix;
+string ssn;
+string dob;
+string predir;
+string prim_name;
+string prim_range;
+string suffix;
+string postdir;
+string unit_desig;
+string sec_range;
+string zip4;
+string address;
+string city_name;
+string st;
+string zip;
+string phone;
+string dl_number;
+string dl_state;
+string dispute_flag;
+string security_freeze;
+string security_freeze_PIN;
+string security_alert;
+string negative_alert;
+string id_theft_flag;
+string insuff_inqry_data;
+string consumer_statement_flag;
+
+end;

@@ -82,6 +82,6 @@ lssi.layout_hhid_did_lssi get_final(final_lssi l) := transform
 end;
 
 lssi_main_file := project(final_lssi, get_final(left));
-ut.mac_sf_buildprocess(lssi_main_file,'~thor_data400::base::lssi_main',build_full)
+ut.mac_sf_buildprocess(lssi_main_file,'~thor400_92::base::lssi_main',build_full)
 
 export bwr_better_id_full := sequential(build_full, lssi.Proc_Build_LSSI_Full_Keys);

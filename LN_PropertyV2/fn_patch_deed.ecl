@@ -1,10 +1,11 @@
 //bug 25396 - nameasis in search would begin w/ a leading ", "
 
-import ln_property,LN_PropertyV2;
+import ln_property,LN_PropertyV2,Data_Services;
 
 //fn_handle_zeroes(string in_field) := if(regexfind('^[0]{2,}$',in_field) or (integer)in_field=0,'',(string)(integer)in_field);
 //regexreplace useful for fields that have numeric value followed by some type of labeling (e.g. 8000 SF)
 fn_handle_zeroes(string in_field) := if((integer)in_field=0,'',regexreplace('^0*',trim(in_field,left,right),''));
+fn_handle_dates(string in_field) 	:= if((integer)in_field=0,'',in_field);
 
 export fn_patch_deed(dataset(recordof(LN_PropertyV2.layout_deed_mortgage_common_model_base)) in_deed0,
                      dataset(recordof(LN_PropertyV2.layout_addl_fares_deed)) in_addl_fares_deed0
@@ -13,6 +14,10 @@ function
 
 in_deed            := distribute(in_deed0,hash(ln_fares_id));
 in_addl_fares_deed := distribute(in_addl_fares_deed0(fares_mortgage_term<>''),hash(ln_fares_id));
+
+//x1 := output(in_deed);
+//x2 := output(in_addl_fares_deed);
+
 
 //bug 27829
 r1 := record
@@ -32,6 +37,22 @@ j1 := join(in_deed,in_addl_fares_deed,
 		   left outer, local
 		  );
  
+ //***************************
+// PICK COUNTY NAMES, STATE FROM LOOKUP FOR ONLY FARES DATA
+fips_rec := record
+ string2  state_alpha;
+ string2  state_code;
+ string3  county_code;
+ string40 county_alpha;
+ string2  class;
+ string1  crlf;
+end;
+
+fips_data_county_name := dataset(Data_Services.foreign_prod+'thor_data400::in::fips_code_lookup',fips_rec,flat);
+
+
+//********************************
+ 
 recordof(in_deed) t_suppress_zeroes(j1 l) := transform
 
     string v_fares_mortgage_term      := if(regexfind('[A-Z]',l.fares_mortgage_term),'',(string)(integer)l.fares_mortgage_term);
@@ -40,8 +61,9 @@ recordof(in_deed) t_suppress_zeroes(j1 l) := transform
 	//look for various values that mean MONTHLY value
 	string v_term2 := if(regexfind('M',v_fares_mortgage_term_code),(string)((integer)v_fares_mortgage_term div 12),v_fares_mortgage_term);
     
-	self.fips_code									   := fn_handle_zeroes(l.fips_code);
-	self.process_date								   := fn_handle_zeroes(l.process_date);
+	self.fips_code									   := if((integer)l.fips_code=0,'',l.fips_code);
+	self.process_date								   := fn_handle_dates(l.process_date);
+	self.county_name                                   := ln_propertyv2.fn_patch_county(l.county_name,l.state);
 	//important: lexis deed and mortage files have overlapping codes but different meanings.
 	//codes_v3 references a single field so we're manipulating the overlapping mortgage codes
 	//to define some uniqueness during the lookup
@@ -55,9 +77,9 @@ recordof(in_deed) t_suppress_zeroes(j1 l) := transform
 	self.tax_id_number								   := fn_handle_zeroes(l.tax_id_number);
 	self.excise_tax_number						       := fn_handle_zeroes(l.excise_tax_number);
 	self.phone_number								   := fn_handle_zeroes(l.phone_number);
-	self.contract_date								   := fn_handle_zeroes(l.contract_date);
-	self.recording_date								   := fn_handle_zeroes(l.recording_date);
-	self.arm_reset_date								   := fn_handle_zeroes(l.arm_reset_date);
+	self.contract_date								   := fn_handle_dates(l.contract_date);
+	self.recording_date								   := fn_handle_dates(l.recording_date);
+	self.arm_reset_date								   := fn_handle_dates(l.arm_reset_date);
 	self.document_number							   := fn_handle_zeroes(l.document_number);
 	self.loan_number								   := fn_handle_zeroes(l.loan_number);
 	self.recorder_book_number					       := fn_handle_zeroes(l.recorder_book_number);
@@ -70,6 +92,7 @@ recordof(in_deed) t_suppress_zeroes(j1 l) := transform
 	self.first_td_loan_amount					       := fn_handle_zeroes(l.first_td_loan_amount);
 	self.second_td_loan_amount				           := fn_handle_zeroes(l.second_td_loan_amount);
 	self.first_td_interest_rate				           := fn_handle_zeroes(l.first_td_interest_rate);
+	self.first_td_due_date                             := fn_handle_dates(l.first_td_due_date);
 	self.partial_interest_transferred                  := fn_handle_zeroes(l.partial_interest_transferred);
 	self.loan_term_months							   := fn_handle_zeroes(l.loan_term_months);
 	self.loan_term_years							   := fn_handle_zeroes(if(l.loan_term_years<>'',l.loan_term_years,v_term2));
@@ -82,6 +105,7 @@ end;
 patch_zeroes := project(j1, t_suppress_zeroes(left));
 
 recordof(in_deed) t_addl_handling(recordof(in_deed) le) := transform
+ self.apnt_or_pin_number    := if(le.apnt_or_pin_number<>'',le.apnt_or_pin_number,le.fares_unformatted_apn);
  self.name1                 := ln_property.fn_patch_name_field(le.name1);
  self.name2                 := ln_property.fn_patch_name_field(le.name2);
  self.seller1               := ln_property.fn_patch_name_field(le.seller1);
@@ -121,7 +145,21 @@ recordof(in_deed) t_insert_decimals(recordof(in_deed) le) := transform
 end;
 
 insert_decimals := project(addl_handling,t_insert_decimals(left));
- 
-return insert_decimals;
+
+
+//Bug 28548 
+LN_PropertyV2.layout_deed_mortgage_common_model_base reformat( insert_decimals l, fips_data_county_name r ) := transform 
+
+self.fips_code := if(trim(l.fips_code)='',r.state_code+r.county_code,l.fips_code); 
+self := l; 
+end ; 
+
+insert_decimals_fips := join(insert_decimals ,fips_data_county_name,  
+                       left.state = right.state_alpha
+                   and left.county_name = right.county_alpha,
+				   reformat(left,right) ,left outer,lookup);
+
+return insert_decimals_fips;
+
 
 end;

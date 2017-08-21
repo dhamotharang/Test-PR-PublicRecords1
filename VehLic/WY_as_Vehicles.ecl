@@ -160,4 +160,4 @@ l_WY_Joined
 		 left.orig_TITLE_NUMBER = right.orig_TITLE_NUMBER,
 		 lJoin_WY_RegTtl(left, right),full outer,local);
 
-export WY_as_Vehicles := l_WY_Joined : persist('Persist::Vehreg_WY_as_Vehicles');
+export WY_as_Vehicles := l_WY_Joined : persist('~thor_data400::persist::vehreg_wy_as_vehicles');

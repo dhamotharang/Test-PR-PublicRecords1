@@ -1,1 +1,1 @@
-export KeyName_7010_SNP_Data_BDID := trim(GetSegmentKeyName_BDID('7010')) : global;
+export KeyName_7010_SNP_Data_BDID := trim(GetSegmentKeyName_BDID('7010'));

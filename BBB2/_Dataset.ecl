@@ -1,10 +1,5 @@
 import _control, versioncontrol;
-export _Dataset(
-
-	boolean	pUseProd = false
-
-):=
-module
+export _Dataset( boolean	pUseProd = false ):= module
 
 	export Name										:= 'BBB'								;
 	export thor_cluster_Files			:= 	if(pUseProd 
@@ -14,8 +9,6 @@ module
 	export thor_cluster_Persists	:= thor_cluster_Files		;
 	export max_record_size				:= 4096									;
 
-	export Groupname	:= if(	_Control.ThisEnvironment.name		 = 'Dataland'	,'thor400_88'
-																																					,'thor400_92'
-											);
+	export Groupname := if( _Control.ThisEnvironment.name = 'Dataland', 'thor400_dev01', 'thor400_44' );
 
 end;

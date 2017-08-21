@@ -1,6 +1,10 @@
-import doxie;
+Import Data_Services, doxie, PRTE2_Business_Header;
 
-c := business_header.File_Business_Contacts;
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+c := PRTE2_Business_Header.File_Prep_Business_Contacts_Plus;
+#ELSE
+c := Business_Header.File_Prep_Business_Contacts_Plus;
+#END;
 
 d := business_header.format_CompanyTitle(c);
 

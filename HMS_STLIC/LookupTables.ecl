@@ -721,7 +721,8 @@ EXPORT LookupTables := MODULE
 								{'729','Harvest','WY','STLIC_WY_OCT(729)','No'},
 								{'4412','Harvest','WY','STLIC_WY_ODR(4412)','No'},
 								{'3686','Harvest','WY','STLIC_WY_PAS(3686)','No'},
-								{'512','Harvest','WY','STLIC_WY_RPH(512)','No'}
+								{'512','Harvest','WY','STLIC_WY_RPH(512)','No'},
+								{'12581','Harvest','AL','STLIC_AL_(12581)','No'}
 							],stlicsrclookupTable);
 							
 		TaxonomylookupLayout := RECORD

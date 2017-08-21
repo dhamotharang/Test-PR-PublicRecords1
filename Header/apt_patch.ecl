@@ -1,8 +1,8 @@
 import header,ut,did_add;
 
 apts := header.ApartmentBuildings(apt_cnt > 1);
-dh := header.with_did(prim_name != '', prim_range != '');
-dh_excl := header.with_did(prim_name = '' or prim_range = '');
+dh :=      header.file_header_raw_syncd(fname<>'',lname<>'',prim_name != '', prim_range != '');
+dh_excl := header.file_header_raw_syncd(fname<>'',lname<>'',(prim_name = '' or prim_range = ''));
 
 slimrec := record
 	dh.prim_name;
@@ -147,4 +147,4 @@ out1s := sort(distribute(out1,hash(rid)),rid,sec_range,local);
 out1d := dedup(out1s,rid,local);
 
 
-export apt_patch := out1d + dh_excl : persist('persist::apt_patch');
+export apt_patch := out1d + dh_excl;// : persist('persist::apt_patch');

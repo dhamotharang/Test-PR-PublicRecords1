@@ -35,7 +35,7 @@
 &lt;/dataset&gt;
 </pre>
 */
-
+/*--RESULT-- xslt.html */
 import AutoStandardI;
 export Clickdata_Bests_Service := macro
 

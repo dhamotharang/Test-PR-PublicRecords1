@@ -17,4 +17,4 @@ export Key_Did_Rid2 := index(
 outf(rid <> did),
 {rid},
 {did},
-'~thor_data400::key::rid_did2_'+ version_superkey);
+ut.Data_Location.Person_header + 'thor_data400::key::rid_did2_'+ version_superkey);

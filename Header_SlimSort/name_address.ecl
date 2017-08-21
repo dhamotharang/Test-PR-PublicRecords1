@@ -12,7 +12,7 @@ end;
 addressp into(h le) := transform 
   self.fname := datalib.preferredfirstNew(le.fname, Header_Slimsort.Constants.UsePFNew);
   self.mname := datalib.preferredfirstNew(le.mname, Header_Slimsort.Constants.UsePFNew);
-  self.name_suffix := if(ut.is_unk(le.name_suffix), '', ut.Translate_Suffix(le.name_suffix));
+  self.name_suffix := if(ut.is_unk(le.name_suffix), '', ut.fGetSuffix(le.name_suffix));
   self := le;
   end;
 
@@ -86,7 +86,7 @@ add_rec := record
   dt.did;
 end;
 
-add_calc := table(dc1,add_rec,fname,lname,prim_range,prim_name,zip,did, local);
+add_calc := table(dc1,add_rec,fname,lname,prim_range,prim_name,zip,did, local) :independent; // https://track.hpccsystems.com/browse/HPCC-14067
 
 jrec := record
 	add_rec;
@@ -204,7 +204,7 @@ join_Sts := join(join_add,state_count,left.fname = right.fname and
 								add_sts(LEFT,RIGHT),local,atmost(3000));//  : persist('persist::slimsort_break1_addr');
 
 
-dc1pz := dedup(sort(dc1,lname,fname,prim_name,zip,did),lname,fname,prim_name,zip,did);
+dc1pz := dedup(sort(dc1,lname,fname,prim_name,zip,did),lname,fname,prim_name,zip,did) :independent;
 
 add_pz_rec := record
 	dc1pz.fname;

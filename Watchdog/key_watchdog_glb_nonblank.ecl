@@ -1,4 +1,4 @@
-import ut,doxie,watchdog,header,mdr,header_services, _Control;
+import ut,doxie,watchdog,header,mdr,header_services, _Control,tools, Data_Services;
 
 string_rec := record
 	watchdog.Layout_Best;
@@ -39,16 +39,16 @@ record
 	string10     main_count := '0';
 	string10     search_count := '0';
 	string15	 DL_number := '';
-	string12     bdid := '';
+	string15     bdid := '';
 	string10     run_date := '0';
 	string10	 total_records := '0';
-	string10 RawAID := '0';
+	string20 RawAID := '0';
   string8 addr_dt_first_seen := '0';
   string10 ind := '';
 	string2      EOR := '';
 end;
 
-header_services.Supplemental_Data.mac_verify('file_best_inj.txt', drop_header_layout, attr);
+header_services.Supplemental_Data.mac_verify('file_bestv2_inj.txt', drop_header_layout, attr);
 
 Base_File_Append_In := attr();
 
@@ -86,7 +86,7 @@ Base_File_Append_out := project(Base_File_Append_In, reformat_layout(left));
 watchdog.mac_append_ADL_ind(Base_File_Append_out, Base_File_Append);
 //***********END*************************************************************
 
-wdog0 := dataset(ut.foreign_prod + 'thor_data400::BASE::Watchdog_best',string_rec,flat);
+wdog0 := dataset(Data_Services.foreign_prod + 'thor_data400::BASE::Watchdog_best',string_rec,flat);
 
 t0 := join(wdog0,
 					Base_File_Append,
@@ -152,5 +152,7 @@ concat1 := fb00+not_candidates1;
 _fb := project(concat1,watchdog.layout_key);
 ut.mac_suppress_by_phonetype(_fb,phone,st,fb,true,did);
 
-export key_watchdog_glb_nonblank := INDEX(fb,watchdog.layout_key,
-ut.foreign_prod+ 'thor_data400::key::watchdog_best.did_nonblank_'+doxie.Version_SuperKey);
+tools.mac_qualifyfields(fb,watchdog.layout_key,keyfields);
+
+export key_watchdog_glb_nonblank := INDEX(fb,keyfields,
+Data_Services.Data_location.Prefix('Watchdog_Best')+ 'thor_data400::key::watchdog_best.did_nonblank_'+doxie.Version_SuperKey);

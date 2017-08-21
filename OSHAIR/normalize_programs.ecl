@@ -1,22 +1,40 @@
-import OSHAIR,Business_Header,Lib_AddrClean,lib_stringlib;;
+import OSHAIR,Business_Header,Address,lib_stringlib,ut;
 
-export normalize_programs(string filedate) := FUNCTION
+export normalize_programs(string filedate, string process_date) := FUNCTION
 
-input_OSHAIR    := OSHAIR.File_in_OSHAIR;
+StrategicCodes := oshair.files().input.StrategicCodes.sprayed;
+
 program_cleaned := OSHAIR.layout_OSHAIR_program_clean;
 
-/* Normalize the program sub-records */
-program_cleaned normalize_program(input_OSHAIR L, OSHAIR.layout_OSHAIR_in_ASCII.OSHAIR_Program_Rec R) := TRANSFORM
-   self.Activity_Number    := L.Activity_Number;
-   self                    := R;
+program_cleaned normalize_program(StrategicCodes L) := TRANSFORM
+   self.dt_first_seen 						:=  (unsigned4)process_date;
+	 self.dt_last_seen  						:=  (unsigned4)process_date;
+	 self.dt_vendor_first_reported 	:=  (unsigned4)process_date;
+	 self.dt_vendor_last_reported 	:=  (unsigned4)process_date;
+   self.Activity_Number	:=	(integer)l.activity_nr;
+   self.program_type		:=	l.prog_type;
+   self.program_value		:=	l.prog_value;
 end;
 
-ds_programs := normalize(input_OSHAIR,Left.Programs,normalize_program(LEFT,RIGHT));
+ds_programs 	:= 	project(StrategicCodes,normalize_program(LEFT));
 
-return output(distribute(ds_Programs
-                         ,hash32(ds_Programs.Activity_Number))
-									,
-		      ,'~thor_data400::base::oshair::' + filedate + '::program'
-			  ,overwrite);
+dsAllPrograms	:=	distribute((OSHAIR.file_out_program_cleaned + ds_programs),hash32(Activity_Number));
+
+OSHAIR.layout_OSHAIR_program_clean RollupPrograms(OSHAIR.layout_OSHAIR_program_clean l, OSHAIR.layout_OSHAIR_program_clean r) := transform
+  self.dt_first_seen  := ut.EarliestDate(l.dt_first_seen ,r.dt_first_seen	);  
+	self.dt_last_seen 	:= ut.LatestDate  (l.dt_last_seen	 ,r.dt_last_seen	);
+	self.dt_vendor_first_reported := ut.EarliestDate(l.dt_vendor_first_reported	,r.dt_vendor_first_reported	);	
+  self.dt_vendor_last_reported 	:= ut.LatestDate	(l.dt_vendor_last_reported	,r.dt_vendor_last_reported	);
+	self := l;
+end;
+
+ProgramsRollup	:= rollup(sort(dsAllPrograms,record, except dt_first_seen,dt_last_seen, 
+														  dt_vendor_first_reported, dt_vendor_last_reported, local)
+										, RollupPrograms(left, right), record
+										,except dt_first_seen, dt_last_seen, 
+														dt_vendor_first_reported, dt_vendor_last_reported
+										, local);
+
+return output(ProgramsRollup,,'~thor_data400::base::oshair::' + filedate + '::program',overwrite);
 
 end;

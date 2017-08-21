@@ -1,9 +1,9 @@
-import corp;
+import corp,Std;
 export Filters :=
 module
 
-	shared Layout_CorpV2_Base		:= Corp2.Layout_Corporate_Direct_Corp_Base	;
-	shared Layout_ContV2_Base		:= Corp2.Layout_Corporate_Direct_Cont_Base	;
+	shared Layout_CorpV2_Base		:= Corp2.Layout_Corporate_Direct_Corp_AID		;
+	shared Layout_ContV2_Base		:= Corp2.Layout_Corporate_Direct_Cont_AID		;
 	shared Layout_EventsV2_Base	:= Corp2.Layout_Corporate_Direct_Event_Base	;
 	shared Layout_StockV2_Base	:= Corp2.Layout_Corporate_Direct_Stock_Base	;
 	shared Layout_ARV2_Base			:= Corp2.Layout_Corporate_Direct_AR_Base		;
@@ -576,4 +576,68 @@ module
 		end;
 
 	end;
+
+	getTodaysdate := (string8)Std.Date.Today();
+	one_year_ago  := (unsigned4)((unsigned)getTodaysdate[1..4] - 1 + getTodaysdate[5..]);
+
+	export fAs_POE(
+	
+		 dataset(Layout_ContV2_Base)	pContBase		= Files().AID.cont.qa
+		,dataset(Layout_CorpV2_Base) 	pCorpBase		= Files().AID.corp.qa
+		,boolean											pFilterOut	= true
+		
+	) := 
+	function
+
+		boolean lCorpFilter 	:=
+ 		
+			pCorpBase.corp_status_desc[1..6] not in  
+			['ACTIVE','CONSOL','CONVER','CURREN','EFFECT','EXISTS','EXISTI','FOR PR',
+			 'GOOD S','INCORP','IN EXI','IN GOO','IN USE','MERGED','MERGER','NEW CO',
+			 'NAME C','ORGANI','PRIOR ','QUALIF','REDOME','RE-INS','REINST','RESTOR'
+			 ,'REVIVE']
+			or pCorpBase.corp_status_desc[8..10] in ['(OU','OUT',' OU']
+			or pCorpBase.corp_status_desc[11..17] in 
+				['E RESER','ED - NO','ED -- N','ED INAC'
+				,'NON-SUR','- DELIN','ON-SURV','ESS PRE']
+			or trim(pCorpBase.corp_status_desc,left,right) = 'CONVERTED OUT'
+			or pCorpBase.record_type != 'C'
+			;
+			
+		boolean lContFilter	:=	 
+					pContBase.cont_lname	 = ''
+			or	pContBase.record_type != 'C'
+			or	regexfind('REGISTERED AGENT', pContBase.cont_title_desc, nocase)		
+			or 	pContBase.dt_last_seen			> one_year_ago	
+			;
+
+		boolean lFullCorpFilter 		:= if(pFilterOut
+																	,not(lCorpFilter)	//negate it 
+																	,lCorpFilter
+																);
+
+		boolean lFullContFilter 		:= if(pFilterOut
+																	,not(lContFilter)	//negate it 
+																	,lContFilter
+																);
+
+		dCorpBase_filt  := pCorpBase(lFullCorpFilter,bdid != 0);	//move bdid != 0 filter here so it doesn't get negated
+		dContBase_filt  := pContBase(lFullContFilter,bdid != 0);
+		dCorpBase_dedup := table(dCorpBase_filt, {bdid},bdid);
+		
+		djoin := join(
+			 distribute(dContBase_filt	,bdid)
+			,distribute(dCorpBase_dedup	,bdid)
+			,left.bdid = right.bdid
+			,transform(
+				 Layout_ContV2_Base
+				,self := left
+			)
+			,local
+		);
+		
+		return djoin;
+
+	end;
+	
 end;

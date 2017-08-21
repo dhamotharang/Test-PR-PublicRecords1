@@ -41,7 +41,7 @@ rollup_layout get_bkrupt_search(BankruptcyV2.file_bankruptcy_search_v3 L) := tra
 	SELF.disposition := L.disposition;
 	
  	hit := L.case_number<>'';
-  ds_count := DATASET ([{date_last_seen, L.court_code, L.case_number}], layout_date);
+  ds_count := DATASET ([{L.date_filed, L.court_code, L.case_number}], layout_date);
   days_apart := ut.DaysApart (L.discharged, myGetDate);
 	SELF.filing_count := IF (hit, ds_count);
 	SELF.bk_recent_count := IF(hit AND L.disposition='', ds_count);
@@ -82,8 +82,3 @@ bankrupt_slim := PROJECT (bankrupt_rolled, slimrec);
 
 export Key_bankruptcyV3_FCRA_bocashell := index (bankrupt_slim, {did}, {bankrupt_slim},
 		'~thor_data400::key::bankruptcyv3::fcra::bocashell_' + doxie.Version_SuperKey);
-
-
-
-
-

@@ -1,3 +1,4 @@
+//If size changes, please change in doxie.layout_bk_child as well
 export layout_bk_search_name := record
 	string5    debtor_title;
 	string20   debtor_fname;

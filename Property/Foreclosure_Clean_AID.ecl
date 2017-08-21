@@ -165,166 +165,134 @@ IMPORT ut
 																												expanded_legal,
 																												legal_2,
 																												legal_3,
-																												legal_4));
-																																																								
-	rsRawPlusBaseSort	:=	SORT(rsRawPlusBaseDist, RECORD, 
-																						EXCEPT	process_date, 
-																										foreclosure_id,
-																										name1_prefix,
-																										name1_first,
-																										name1_middle,
-																										name1_last,
-																										name1_suffix,
-																										name1_score,
-																										name1_company,
-																										// name1_ssn,
-																										// name1_did_score,
-																										// name1_did,
-																										// name1_bdid_score,
-																										// name1_bdid,
-																										name2_prefix,
-																										name2_first,
-																										name2_middle,
-																										name2_last,
-																										name2_suffix,
-																										name2_score,
-																										name2_company,
-																										// name2_ssn,
-																										// name2_did_score,
-																										// name2_did,
-																										// name2_bdid_score,
-																										// name2_bdid,
-																										name3_prefix,
-																										name3_first,
-																										name3_middle,
-																										name3_last,
-																										name3_suffix,
-																										name3_score,
-																										name3_company,
-																										// name3_ssn,
-																										// name3_did_score,
-																										// name3_did,
-																										// name3_bdid_score,
-																										// name3_bdid,
-																										name4_prefix,
-																										name4_first,
-																										name4_middle,
-																										name4_last,
-																										name4_suffix,
-																										name4_score,
-																										name4_company,
-																										// name4_ssn,
-																										// name4_did_score,
-																										// name4_did,
-																										// name4_bdid_score,
-																										// name4_bdid,
-																										situs1_prim_range,
-																										situs1_predir,
-																										situs1_prim_name,
-																										situs1_addr_suffix,
-																										situs1_postdir,
-																										situs1_unit_desig,
-																										situs1_sec_range,
-																										situs1_p_city_name,
-																										situs1_v_city_name,
-																										situs1_st,
-																										situs1_zip,
-																										situs1_zip4,
-																										situs1_cart,
-																										situs1_cr_sort_sz,
-																										situs1_lot,
-																										situs1_lot_order,
-																										situs1_dpbc,
-																										situs1_chk_digit,
-																										situs1_record_type,
-																										situs1_ace_fips_st,
-																										situs1_fipscounty,
-																										situs1_geo_lat,
-																										situs1_geo_long,
-																										situs1_msa,
-																										situs1_geo_blk,
-																										situs1_geo_match,
-																										situs1_err_stat,
-																										situs2_prim_range,
-																										situs2_predir,
-																										situs2_prim_name,
-																										situs2_addr_suffix,
-																										situs2_postdir,
-																										situs2_unit_desig,
-																										situs2_sec_range,
-																										situs2_p_city_name,
-																										situs2_v_city_name,
-																										situs2_st,
-																										situs2_zip,
-																										situs2_zip4,
-																										situs2_cart,
-																										situs2_cr_sort_sz,
-																										situs2_lot,
-																										situs2_lot_order,
-																										situs2_dpbc,
-																										situs2_chk_digit,
-																										situs2_record_type,
-																										situs2_ace_fips_st,
-																										situs2_fipscounty,
-																										situs2_geo_lat,
-																										situs2_geo_long,
-																										situs2_msa,
-																										situs2_geo_blk,
-																										situs2_geo_match,
-																										situs2_err_stat, LOCAL);
+																												legal_4));	
 	
-		rsRawPlusBaseDed	:=	DEDUP(rsRawPlusBaseSort, RECORD,
-																						EXCEPT	sequence,
-																										process_date, 
-																										foreclosure_id,
-																										name1_prefix,
-																										name1_first,
-																										name1_middle,
-																										name1_last,
-																										name1_suffix,
-																										name1_score,
-																										// name1_company,
-																										// name1_ssn,
-																										// name1_did_score,
-																										// name1_did,
-																										// name1_bdid_score,
-																										// name1_bdid,
-																										name2_prefix,
-																										name2_first,
-																										name2_middle,
-																										name2_last,
-																										name2_suffix,
-																										name2_score,
-																										name2_company,
-																										// name2_ssn,
-																										// name2_did_score,
-																										// name2_did,
-																										// name2_bdid_score,
-																										// name2_bdid,
-																										name3_prefix,
-																										name3_first,
-																										name3_middle,
-																										name3_last,
-																										name3_suffix,
-																										name3_score,
-																										name3_company,
-																										// name3_ssn,
-																										// name3_did_score,
-																										// name3_did,
-																										// name3_bdid_score,
-																										// name3_bdid,
-																										name4_prefix,
-																										name4_first,
-																										name4_middle,
-																										name4_last,
-																										name4_suffix,
-																										name4_score,
-																										name4_company,
-																										// name4_ssn,
-																										// name4_did_score,
-																										// name4_did,
-																										// name4_bdid_score,
-																										// name4_bdid,
+	rsRawPlusBaseSort	:=	SORT(rsRawPlusBaseDist,			state,
+																										county,
+																										batch_date_and_seq_nbr,
+																										deed_category,
+																										deed_desc,
+																										document_type,
+																										document_desc,
+																										recording_date,
+																										document_year,
+																										document_nbr,
+																										document_book,
+																										document_pages,
+																										title_company_code,
+																										title_company_name,
+																										attorney_name,
+																										attorney_phone_nbr,
+																										first_defendant_borrower_owner_first_name,
+																										first_defendant_borrower_owner_last_name,
+																										first_defendant_borrower_company_name,
+																										second_defendant_borrower_owner_first_name,
+																										second_defendant_borrower_owner_last_name,
+																										second_defendant_borrower_company_name,
+																										third_defendant_borrower_owner_first_name,
+																										third_defendant_borrower_owner_last_name,
+																										third_defendant_borrower_company_name,
+																										fourth_defendant_borrower_owner_first_name,
+																										fourth_defendant_borrower_owner_last_name,
+																										fourth_defendant_borrower_company_name,
+																										defendant_borrower_owner_et_al_indicator,
+																										et_al_desc,
+																										date_of_default,
+																										amount_of_default,
+																										filing_date,
+																										court_case_nbr,
+																										lis_pendens_type,
+																										plaintiff_1,
+																										plaintiff_2,
+																										final_judgment_amount,
+																										auction_date,
+																										auction_time,
+																										street_address_of_auction_call,
+																										city_of_auction_call,
+																										state_of_auction_call,
+																										opening_bid,
+																										tax_year,
+																										sales_price,
+																										situs_address_indicator_1,
+																										situs_house_number_prefix_1,
+																										situs_house_number_1,
+																										situs_house_number_suffix_1,
+																										situs_street_name_1,
+																										situs_mode_1,
+																										situs_direction_1,
+																										situs_quadrant_1,
+																										apartment_unit,
+																										property_city_1,
+																										property_state_1,
+																										property_address_zip_code_1,
+																										carrier_code,
+																										full_site_address_unparsed_1,
+																										lender_beneficiary_first_name,
+																										lender_beneficiary_last_name,
+																										lender_beneficiary_company_name,
+																										lender_beneficiary_mailing_address,
+																										lender_beneficiary_city,
+																										lender_beneficiary_state,
+																										lender_beneficiary_zip,
+																										lender_phone,
+																										trustee_name,
+																										trustee_mailing_address,
+																										trustee_city,
+																										trustee_state,
+																										trustee_zip,
+																										trustee_phone,
+																										trustee_sale_number,
+																										original_loan_date,
+																										original_loan_recording_date,
+																										original_loan_amount,
+																										original_document_number,
+																										original_recording_book,
+																										original_recording_page,
+																										parcel_number_parcel_id,
+																										parcel_number_unmatched_id,
+																										last_full_sale_transfer_date,
+																										transfer_value,
+																										situs_address_indicator_2,
+																										situs_house_number_prefix_2,
+																										situs_house_number_2,
+																										situs_house_number_suffix_2,
+																										situs_street_name_2,
+																										situs_mode_2,
+																										situs_direction_2,
+																										situs_quadrant_2,
+																										apartment_unit_2,
+																										property_city_2,
+																										property_state_2,
+																										property_address_zip_code_2,
+																										carrier_code_2,
+																										full_site_address_unparsed_2,
+																										property_indicator,
+																										property_desc,
+																										use_code,
+																										use_desc,
+																										number_of_units,
+																										living_area_square_feet,
+																										number_of_bedrooms,
+																										number_of_bathrooms,
+																										number_of_garages,
+																										zoning_code,
+																										lot_size,
+																										year_built,
+																										current_land_value,
+																										current_improvement_value,
+																										section,
+																										township,
+																										foreclosure_range,
+																										lot_orig,
+																										block,
+																										tract_subdivision_name,
+																										map_book,
+																										map_page,
+																										unit_nbr,
+																										expanded_legal,
+																										legal_2,
+																										legal_3,
+																										legal_4,
 																										old_situs1_prim_range,
 																										old_situs1_predir,
 																										old_situs1_prim_name,
@@ -352,33 +320,7 @@ IMPORT ut
 																										old_situs1_geo_blk,
 																										old_situs1_geo_match,
 																										old_situs1_err_stat,
-																										situs1_prim_range,
-																										situs1_predir,
-																										situs1_prim_name,
-																										situs1_addr_suffix,
-																										situs1_postdir,
-																										situs1_unit_desig,
-																										situs1_sec_range,
-																										situs1_p_city_name,
-																										situs1_v_city_name,
-																										situs1_st,
-																										situs1_zip,
-																										situs1_zip4,
-																										situs1_cart,
-																										situs1_cr_sort_sz,
-																										situs1_lot,
-																										situs1_lot_order,
-																										situs1_dpbc,
-																										situs1_chk_digit,
-																										situs1_record_type,
-																										situs1_ace_fips_st,
-																										situs1_fipscounty,
-																										situs1_geo_lat,
-																										situs1_geo_long,
-																										situs1_msa,
-																										situs1_geo_blk,
-																										situs1_geo_match,
-																										situs1_err_stat,
+																										situs1_RawAID,
 																										old_situs2_prim_range,
 																										old_situs2_predir,
 																										old_situs2_prim_name,
@@ -405,35 +347,149 @@ IMPORT ut
 																										old_situs2_msa,
 																										old_situs2_geo_blk,
 																										old_situs2_geo_match,
-																										old_situs2_err_stat,
-																										situs2_prim_range,
-																										situs2_predir,
-																										situs2_prim_name,
-																										situs2_addr_suffix,
-																										situs2_postdir,
-																										situs2_unit_desig,
-																										situs2_sec_range,
-																										situs2_p_city_name,
-																										situs2_v_city_name,
-																										situs2_st,
-																										situs2_zip,
-																										situs2_zip4,
-																										situs2_cart,
-																										situs2_cr_sort_sz,
-																										situs2_lot,
-																										situs2_lot_order,
-																										situs2_dpbc,
-																										situs2_chk_digit,
-																										situs2_record_type,
-																										situs2_ace_fips_st,
-																										situs2_fipscounty,
-																										situs2_geo_lat,
-																										situs2_geo_long,
-																										situs2_msa,
-																										situs2_geo_blk,
-																										situs2_geo_match,
-																										situs2_err_stat, LOCAL) : PERSIST(cluster + 'in::persist::foreclosure_base_dedup');
-																										
+																										old_situs2_err_stat,	
+																										situs2_RawAID,
+																										-process_date,
+																										LOCAL) : PERSIST(cluster + 'in::persist::foreclosure_base_sort');
+
+	Layout_Foreclosure_In_Sec RollupUpdate(Layout_Foreclosure_In_Sec l, Layout_Foreclosure_In_Sec r) := 
+	transform
+		self.process_date 						:= (STRING)MAX((INTEGER)l.process_date,(INTEGER)r.process_date);
+		SELF.source_rec_id						:= if(l.source_rec_id < r.source_rec_id, l.source_rec_id, r.source_rec_id);		
+		self 													:= l;
+	end;
+
+	rsRawPlusBaseDed	:=	ROLLUP(rsRawPlusBaseSort, RollupUpdate(left,right),
+																									state,
+																									county,
+																									batch_date_and_seq_nbr,
+																									deed_category,
+																									deed_desc,
+																									document_type,
+																									document_desc,
+																									recording_date,
+																									document_year,
+																									document_nbr,
+																									document_book,
+																									document_pages,
+																									title_company_code,
+																									title_company_name,
+																									attorney_name,
+																									attorney_phone_nbr,
+																									first_defendant_borrower_owner_first_name,
+																									first_defendant_borrower_owner_last_name,
+																									first_defendant_borrower_company_name,
+																									second_defendant_borrower_owner_first_name,
+																									second_defendant_borrower_owner_last_name,
+																									second_defendant_borrower_company_name,
+																									third_defendant_borrower_owner_first_name,
+																									third_defendant_borrower_owner_last_name,
+																									third_defendant_borrower_company_name,
+																									fourth_defendant_borrower_owner_first_name,
+																									fourth_defendant_borrower_owner_last_name,
+																									fourth_defendant_borrower_company_name,
+																									defendant_borrower_owner_et_al_indicator,
+																									et_al_desc,
+																									date_of_default,
+																									amount_of_default,
+																									filing_date,
+																									court_case_nbr,
+																									lis_pendens_type,
+																									plaintiff_1,
+																									plaintiff_2,
+																									final_judgment_amount,
+																									auction_date,
+																									auction_time,
+																									street_address_of_auction_call,
+																									city_of_auction_call,
+																									state_of_auction_call,
+																									opening_bid,
+																									tax_year,
+																									sales_price,
+																									situs_address_indicator_1,
+																									situs_house_number_prefix_1,
+																									situs_house_number_1,
+																									situs_house_number_suffix_1,
+																									situs_street_name_1,
+																									situs_mode_1,
+																									situs_direction_1,
+																									situs_quadrant_1,
+																									apartment_unit,
+																									property_city_1,
+																									property_state_1,
+																									property_address_zip_code_1,
+																									carrier_code,
+																									full_site_address_unparsed_1,
+																									lender_beneficiary_first_name,
+																									lender_beneficiary_last_name,
+																									lender_beneficiary_company_name,
+																									lender_beneficiary_mailing_address,
+																									lender_beneficiary_city,
+																									lender_beneficiary_state,
+																									lender_beneficiary_zip,
+																									lender_phone,
+																									trustee_name,
+																									trustee_mailing_address,
+																									trustee_city,
+																									trustee_state,
+																									trustee_zip,
+																									trustee_phone,
+																									trustee_sale_number,
+																									original_loan_date,
+																									original_loan_recording_date,
+																									original_loan_amount,
+																									original_document_number,
+																									original_recording_book,
+																									original_recording_page,
+																									parcel_number_parcel_id,
+																									parcel_number_unmatched_id,
+																									last_full_sale_transfer_date,
+																									transfer_value,
+																									situs_address_indicator_2,
+																									situs_house_number_prefix_2,
+																									situs_house_number_2,
+																									situs_house_number_suffix_2,
+																									situs_street_name_2,
+																									situs_mode_2,
+																									situs_direction_2,
+																									situs_quadrant_2,
+																									apartment_unit_2,
+																									property_city_2,
+																									property_state_2,
+																									property_address_zip_code_2,
+																									carrier_code_2,
+																									full_site_address_unparsed_2,
+																									property_indicator,
+																									property_desc,
+																									use_code,
+																									use_desc,
+																									number_of_units,
+																									living_area_square_feet,
+																									number_of_bedrooms,
+																									number_of_bathrooms,
+																									number_of_garages,
+																									zoning_code,
+																									lot_size,
+																									year_built,
+																									current_land_value,
+																									current_improvement_value,
+																									section,
+																									township,
+																									foreclosure_range,
+																									lot_orig,
+																									block,
+																									tract_subdivision_name,
+																									map_book,
+																									map_page,
+																									unit_nbr,
+																									expanded_legal,
+																									legal_2,
+																									legal_3,
+																									legal_4,
+																									name1_company,										
+																									situs1_RawAID,
+																									situs2_RawAID,
+																									LOCAL) : PERSIST(cluster + 'in::persist::foreclosure_base_rollup');
 
 	//Clean the addresses
 	
@@ -555,6 +611,7 @@ IMPORT ut
 	
 	//Only clean non-blank addresses
 	rsRawPreCleanNonBlank	:=	rsRawPreClean(TRIM(Append_Prep_Address_Situs) <> '');
+	
 	AID.MacAppendFromRaw_2Line(rsRawPreCleanNonBlank,
 		Append_Prep_Address_Situs, Append_Prep_Address_Last_Situs, situs_RawAID,
 		rsCleanSitus,
@@ -584,7 +641,8 @@ IMPORT ut
 				self.situs_dpbc					:=	pInput.aidwork_acecache.dbpc;
 				self.situs_chk_digit		:=	pInput.aidwork_acecache.chk_digit;
 				self.situs_record_type	:=	pInput.aidwork_acecache.rec_type;
-				self.situs_fipscounty		:=	pInput.aidwork_acecache.county;
+				self.situs_ace_fips_st	:=  pInput.aidwork_acecache.county[1..2];
+				self.situs_fipscounty		:=	pInput.aidwork_acecache.county[3..5];
 				self.situs_geo_lat			:=	pInput.aidwork_acecache.geo_lat;
 				self.situs_geo_long			:=	pInput.aidwork_acecache.geo_long;
 				self.situs_msa					:=	pInput.aidwork_acecache.msa;
@@ -593,7 +651,7 @@ IMPORT ut
 				self.situs_err_stat			:=	pInput.aidwork_acecache.err_stat;
 				self										:=	pInput;
 			END;
-				
+			
 	rsRawCleanSitus := PROJECT(rsCleanSitus ,tAppendCleanSitus(LEFT));
 	
 	//Combine cleaned records with blank address records
@@ -666,13 +724,40 @@ IMPORT ut
 				
 	//Clean the names	
 	//Only clean person names
+	ValidSuffix:=['JR','SR','I','II','III','IV','V','VI','VII','VIII','IX'];
 	Layout_Foreclosure_In	tCleanName(rsRawCleanSitusDeNorm pInput)
 		:=
 			TRANSFORM
 				clean_name1					:=	IF(pInput.first_defendant_borrower_company_name = '', address.CleanPersonFML73(lib_StringLib.StringLib.StringCleanSpaces(pInput.first_defendant_borrower_owner_first_name + ' ' + pInput.first_defendant_borrower_owner_last_name)), '');
-				clean_name2					:=	IF(pInput.second_defendant_borrower_company_name = '', address.CleanPersonFML73(lib_StringLib.StringLib.StringCleanSpaces(pInput.second_defendant_borrower_owner_first_name + ' ' + pInput.second_defendant_borrower_owner_last_name)), '');
+				//Pre-format name per Bug# 73391
+				clean_name2					:=	IF(TRIM(REGEXFIND('^([A-Za-z-]+)( .+)?$', pInput.second_defendant_borrower_owner_last_name, 2), LEFT, RIGHT) IN ValidSuffix,
+																	address.CleanPersonFML73(lib_StringLib.StringLib.StringCleanSpaces(pInput.second_defendant_borrower_owner_first_name
+																	+	' ' + pInput.second_defendant_borrower_owner_last_name)),
+																		IF(LENGTH(TRIM(REGEXFIND('^([A-Za-z-]+)( .+)?$', pInput.second_defendant_borrower_owner_last_name, 2), LEFT, RIGHT)) = 1,
+																			address.CleanPersonFML73(lib_StringLib.StringLib.StringCleanSpaces(pInput.second_defendant_borrower_owner_first_name
+																			+	' ' + TRIM(REGEXFIND('^([A-Za-z-]+)( .+)?$', pInput.second_defendant_borrower_owner_last_name, 2), LEFT, RIGHT)
+																			+	' ' + TRIM(REGEXFIND('^([A-Za-z-]+)( .+)?$', pInput.second_defendant_borrower_owner_last_name, 1), LEFT, RIGHT))),
+																			address.CleanPersonFML73(lib_StringLib.StringLib.StringCleanSpaces(pInput.second_defendant_borrower_owner_first_name
+																			+	' ' + pInput.second_defendant_borrower_owner_last_name))
+																		)
+																);
 				clean_name3					:=	IF(pInput.third_defendant_borrower_company_name = '', address.CleanPersonFML73(lib_StringLib.StringLib.StringCleanSpaces(pInput.third_defendant_borrower_owner_first_name + ' ' + pInput.third_defendant_borrower_owner_last_name)), '');
 				clean_name4					:=	IF(pInput.fourth_defendant_borrower_company_name = '', address.CleanPersonFML73(lib_StringLib.StringLib.StringCleanSpaces(pInput.fourth_defendant_borrower_owner_first_name + ' ' + pInput.fourth_defendant_borrower_owner_last_name)), '');
+
+				//Trim the raw names
+				self.first_defendant_borrower_owner_first_name	:=	TRIM(pInput.first_defendant_borrower_owner_first_name, LEFT, RIGHT);
+				self.first_defendant_borrower_owner_last_name		:=	TRIM(pInput.first_defendant_borrower_owner_last_name, LEFT, RIGHT);
+				self.first_defendant_borrower_company_name			:=	TRIM(pInput.first_defendant_borrower_company_name, LEFT, RIGHT);
+				self.second_defendant_borrower_owner_first_name	:=	TRIM(pInput.second_defendant_borrower_owner_first_name, LEFT, RIGHT);
+				self.second_defendant_borrower_owner_last_name	:=	TRIM(pInput.second_defendant_borrower_owner_last_name, LEFT, RIGHT);
+				self.second_defendant_borrower_company_name			:=	TRIM(pInput.second_defendant_borrower_company_name, LEFT, RIGHT);
+				self.third_defendant_borrower_owner_first_name	:=	TRIM(pInput.third_defendant_borrower_owner_first_name, LEFT, RIGHT);
+				self.third_defendant_borrower_owner_last_name		:=	TRIM(pInput.third_defendant_borrower_owner_last_name, LEFT, RIGHT);
+				self.third_defendant_borrower_company_name			:=	TRIM(pInput.third_defendant_borrower_company_name, LEFT, RIGHT);
+				self.fourth_defendant_borrower_owner_first_name	:=	TRIM(pInput.fourth_defendant_borrower_owner_first_name, LEFT, RIGHT);
+				self.fourth_defendant_borrower_owner_last_name	:=	TRIM(pInput.fourth_defendant_borrower_owner_last_name, LEFT, RIGHT);
+				self.fourth_defendant_borrower_company_name			:=	TRIM(pInput.fourth_defendant_borrower_company_name, LEFT, RIGHT);
+				
 				self.name1_prefix		:=	clean_name1[1..5];
 				self.name1_first		:=	clean_name1[6..25];
 				self.name1_middle		:=	clean_name1[26..45];
@@ -706,11 +791,88 @@ IMPORT ut
 
 	rsCleanNames := PROJECT(rsRawCleanSitusDeNorm ,tCleanName(LEFT));
 	
+	//Add plaintiff_1 and plaintiff_2 as names for autokeys per Bug# 58284
+	layoutForeclosureInPlusPlaintiff := record
+		Layout_Foreclosure_In;
+		string1		plaintiff_1_nametype;
+		string1		plaintiff_2_nametype;
+	end;
+
+	//Flag the records for nametype
+	PlaintiffBlank		:=	rsCleanNames(name5_prefix+name5_first+name5_middle+name5_last+name5_suffix+name5_company+
+																					name6_prefix+name6_first+name6_middle+name6_last+name6_suffix+name6_company+
+																					name7_prefix+name7_first+name7_middle+name7_last+name7_suffix+name7_company+
+																					name8_prefix+name8_first+name8_middle+name8_last+name8_suffix+name8_company
+																					='');
+	PlaintiffNotBlank	:=	rsCleanNames(name5_prefix+name5_first+name5_middle+name5_last+name5_suffix+name5_company+
+																					name6_prefix+name6_first+name6_middle+name6_last+name6_suffix+name6_company+
+																					name7_prefix+name7_first+name7_middle+name7_last+name7_suffix+name7_company+
+																					name8_prefix+name8_first+name8_middle+name8_last+name8_suffix+name8_company
+																					<>'');
+																					
+	Address.Mac_Is_Business(PlaintiffBlank, plaintiff_1, PlaintiffNT1, nametype, false, true);
+
+	layoutForeclosureInPlusPlaintiff tProjNametype1(PlaintiffNT1 pInput)
+		:=
+			TRANSFORM
+				self.plaintiff_1_nametype	:=	pInput.nametype;
+				self.name5_prefix					:=	IF(pInput.nametype = 'P' OR pInput.nametype = 'D', pInput.cln_title, '');
+				self.name5_first					:=	IF(pInput.nametype = 'P' OR pInput.nametype = 'D', pInput.cln_fname, '');
+				self.name5_middle					:=	IF(pInput.nametype = 'P' OR pInput.nametype = 'D', pInput.cln_mname, '');
+				self.name5_last						:=	IF(pInput.nametype = 'P' OR pInput.nametype = 'D', pInput.cln_lname, '');
+				self.name5_suffix					:=	IF(pInput.nametype = 'P' OR pInput.nametype = 'D', pInput.cln_suffix, '');
+				self.name5_company				:=	IF(pInput.nametype = 'B' OR pInput.nametype =	'U', pInput.plaintiff_1, '');
+				self.name6_prefix					:=	IF(pInput.nametype = 'D', pInput.cln_title2, '');
+				self.name6_first					:=	IF(pInput.nametype = 'D', pInput.cln_fname2, '');
+				self.name6_middle					:=	IF(pInput.nametype = 'D', pInput.cln_mname2, '');
+				self.name6_last						:=	IF(pInput.nametype = 'D', pInput.cln_lname2, '');
+				self.name6_suffix					:=	IF(pInput.nametype = 'D', pInput.cln_suffix2, '');
+				self											:=	pInput;
+				self											:=	[];
+			END;
+
+	 //NOFOLD required to run this attribute in dataland otherwise it will fail with a compiler error
+	PlaintiffNT2	:=	NOFOLD(PROJECT(PlaintiffNT1, tProjNametype1(left)));
+	
+	Address.Mac_Is_Business(PlaintiffNT2, plaintiff_2, PlaintiffNT3, nametype, false, true);
+
+	layoutForeclosureInPlusPlaintiff tProjNametype2(PlaintiffNT3 pInput)
+		:=
+			TRANSFORM
+				self.plaintiff_2_nametype	:=	pInput.nametype;
+				self.name7_prefix					:=	IF(pInput.nametype = 'P' OR pInput.nametype = 'D', pInput.cln_title, '');
+				self.name7_first					:=	IF(pInput.nametype = 'P' OR pInput.nametype = 'D', pInput.cln_fname, '');
+				self.name7_middle					:=	IF(pInput.nametype = 'P' OR pInput.nametype = 'D', pInput.cln_mname, '');
+				self.name7_last						:=	IF(pInput.nametype = 'P' OR pInput.nametype = 'D', pInput.cln_lname, '');
+				self.name7_suffix					:=	IF(pInput.nametype = 'P' OR pInput.nametype = 'D', pInput.cln_suffix, '');
+				self.name7_company				:=	IF(pInput.nametype = 'B' OR pInput.nametype =	'U', pInput.plaintiff_2, '');
+				self.name8_prefix					:=	IF(pInput.nametype = 'D', pInput.cln_title2, '');
+				self.name8_first					:=	IF(pInput.nametype = 'D', pInput.cln_fname2, '');
+				self.name8_middle					:=	IF(pInput.nametype = 'D', pInput.cln_mname2, '');
+				self.name8_last						:=	IF(pInput.nametype = 'D', pInput.cln_lname2, '');
+				self.name8_suffix					:=	IF(pInput.nametype = 'D', pInput.cln_suffix2, '');
+				self											:=	pInput;
+				self											:=	[];
+			END;
+
+	PlaintiffNT4	:=	PROJECT(PlaintiffNT3, tProjNametype2(left));
+
+	foreclosureInClnPlaint	:=	PROJECT(PlaintiffNotBlank, Layout_Foreclosure_In)
+														+ PROJECT(PlaintiffNT4, Layout_Foreclosure_In);
+														
 	//------------Apply Name Flipping Macro--------------------
-	ut.mac_flipnames(rsCleanNames,name1_first,name1_middle,name1_last,names_flipped1);
+	ut.mac_flipnames(foreclosureInClnPlaint,name1_first,name1_middle,name1_last,names_flipped1);
 	ut.mac_flipnames(names_flipped1,name2_first,name2_middle,name2_last,names_flipped2);
 	ut.mac_flipnames(names_flipped2,name3_first,name3_middle,name3_last,names_flipped3);
 	ut.mac_flipnames(names_flipped3,name4_first,name4_middle,name4_last,names_flipped4);
+	
+	ut.mac_flipnames(names_flipped4,name5_first,name5_middle,name5_last,names_flipped5);
+	ut.mac_flipnames(names_flipped5,name6_first,name6_middle,name6_last,names_flipped6);
+	ut.mac_flipnames(names_flipped6,name7_first,name7_middle,name7_last,names_flipped7);
+	ut.mac_flipnames(names_flipped7,name8_first,name8_middle,name8_last,names_flipped8);
 	//---------------------------------------------------------
+	
+	//Add the source_rec_id
+	UT.MAC_Append_Rcid(names_flipped8, source_rec_id, full_file_recid);	
 
-EXPORT Foreclosure_Clean_AID := names_flipped4;
+EXPORT Foreclosure_Clean_AID := full_file_recid;

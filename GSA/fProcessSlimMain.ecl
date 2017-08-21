@@ -1,7 +1,7 @@
 
 export fProcessSlimMain(dataset(GSA.Layouts_GSA.layout_GSA_ID) pRawFileInput) := function
 
-		export trimUpper(string s) := function
+		trimUpper(string s) := function
 				return trim(stringlib.StringToUppercase(s),left,right);
 		end;
 

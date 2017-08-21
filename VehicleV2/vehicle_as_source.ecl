@@ -1,4 +1,4 @@
-import header,ut,vehlic;
+import header,ut,vehlic,Data_Services,Std;
 
 export	Vehicle_as_Source(	dataset(VehicleV2.Layout_Base_Main)		pVehiclemain		=	dataset([],VehicleV2.Layout_Base_Main),
 														dataset(VehicleV2.Layout_Base.Party_bip)	pVehicleSearch	=	dataset([],VehicleV2.Layout_Base.Party_bip),
@@ -7,40 +7,38 @@ export	Vehicle_as_Source(	dataset(VehicleV2.Layout_Base_Main)		pVehiclemain		=	d
 													)
 	:=
   function
-	dSourceDatasearch_	:=	project(map(pForHeaderBuild => dataset(ut.foreign_prod+'~thor_data400::base::vehicles_v2_party_header_building',VehicleV2.Layout_Base.Party_bip,flat)
-																		,pFastHeader => dataset('~thor_data400::base::vehicles_v2_party_Quickheader_building',VehicleV2.Layout_Base.Party_bip,flat)
+	lc := Data_Services.Data_location.prefix('VehicleV2');
+	dSourceDatasearch_	:=	project(map(pForHeaderBuild => dataset(lc+'thor_data400::base::vehicles_v2_party_header_building',VehicleV2.Layout_Base.Party_bip,flat)
+																		,pFastHeader => dataset(lc+'thor_data400::base::vehicles_v2_party_Quickheader_building',VehicleV2.Layout_Base.Party_bip,flat)
 														,pvehicleSearch(append_did<999999000000)
 													),VehicleV2.Layout_Base.Party)
 													(lname<>'' and fname<>'' and ace_prim_name<>'')
 													;
 								
-	dSourceDataMain		:=	map(	pForHeaderBuild => dataset(ut.foreign_prod+'~thor_data400::base::vehicles_v2_main_header_building',VehicleV2.Layout_Base_Main,flat)
-														,pFastHeader => dataset('~thor_data400::base::vehicles_v2_main_Quickheader_building',VehicleV2.Layout_Base_Main,flat)
+	dSourceDataMain		:=	map(	pForHeaderBuild => dataset(lc+'thor_data400::base::vehicles_v2_main_header_building',VehicleV2.Layout_Base_Main,flat)
+														,pFastHeader => dataset(lc+'thor_data400::base::vehicles_v2_main_Quickheader_building',VehicleV2.Layout_Base_Main,flat)
 														,pvehicleMain
 													)
 													(Orig_Vehicle_Type_Code != 'VS')
 													;
 	
-	dSourceDatasearch     := if (pFastHeader, dSourceDatasearch_(ut.DaysApart(ut.GetDate, date_vendor_last_reported[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep) , dSourceDatasearch_);							
+	dSourceDatasearch     := if (pFastHeader, dSourceDatasearch_(ut.DaysApart((STRING8)Std.Date.Today(), ((string)date_vendor_last_reported)[..6] + '01') <= Header.Sourcedata_month.v_fheader_days_to_keep) , dSourceDatasearch_);							
 								
-								
-	dis_srch	:=	distribute(dSourceDatasearch,hash(state_origin,vehicle_key,iteration_key,source_code));
-	dis_main	:=	distribute(dSourceDataMain,hash(state_origin,vehicle_key,iteration_key,source_code));
 
-	src_rec	:=	record
-		header.layout_Source_ID;
-		vehicleV2.layout_vehicle_source;
-	end;
+	//Exclude infutor data
+	dis_srch	:=	distribute(dSourceDatasearch(source_code not in ['1V','2V']),hash(state_origin,vehicle_key,iteration_key,source_code));
+	dis_main	:=	distribute(dSourceDataMain(source_code not in ['1V','2V']),hash(state_origin,vehicle_key,iteration_key,source_code));
 
+	src_rec	:=	header.layouts_SeqdSrc.VH_src_rec;
 	
-	ConvertYYYYMMToNumberOfMonths(integer	pInput)	:=	(((integer)(pInput[1..4])*12)	+	((integer)(pInput[5..6])));
+	ConvertYYYYMMToNumberOfMonths(integer	pInput)	:=	(((integer)(((string)pInput)[1..4])*12)	+	((integer)(((string)pInput)[5..6])));
 	 
 	src_rec	getall(dis_srch L,dis_main R)	:=	transform
-		self.orig_DOB													:=	if(ConvertYYYYMMToNumberOfMonths((integer)ut.GetDate) - ConvertYYYYMMToNumberOfMonths((integer)L.orig_DOB) > 180, L.orig_DOB ,'');
-		self.Date_First_Seen									:=	(unsigned3)L.Date_First_Seen[1..6];
-		self.Date_Last_Seen										:=	(unsigned3)L.Date_Last_Seen[1..6];
-		self.Date_Vendor_First_Reported				:=	(unsigned3)L.Date_Vendor_First_Reported[1..6];
-		self.Date_Vendor_Last_Reported				:=	(unsigned3)L.Date_Vendor_Last_Reported[1..6];
+		self.orig_DOB													:=	if(ConvertYYYYMMToNumberOfMonths((integer)(STRING8)Std.Date.Today()) - ConvertYYYYMMToNumberOfMonths((integer)L.orig_DOB) > 180, L.orig_DOB ,'');
+		self.Date_First_Seen									:=	(unsigned3)((string)L.Date_First_Seen)[1..6];
+		self.Date_Last_Seen										:=	(unsigned3)((string)L.Date_Last_Seen)[1..6];
+		self.Date_Vendor_First_Reported				:=	(unsigned3)((string)L.Date_Vendor_First_Reported)[1..6];
+		self.Date_Vendor_Last_Reported				:=	(unsigned3)((string)L.Date_Vendor_Last_Reported)[1..6];
 		self.append_clean_name.title					:=	L.title;                                                                                                                      
 		self.append_clean_name.fname					:=	L.fname;                                                                                                                      
 		self.append_clean_name.mname					:=	L.mname;                                                                                                                      
@@ -82,12 +80,5 @@ export	Vehicle_as_Source(	dataset(VehicleV2.Layout_Base_Main)		pVehiclemain		=	d
 	seed:=if(pFastHeader,999999999999,1);
 	header.Mac_Set_Header_Source(j,src_rec,src_rec,vehlic.header_src(l.State_Origin,l.source_code),withID,seed)
 
-	dForHeader	:=	withID	:	persist('persist::headerbuild_vehicle_v2_src');
-	dForOther		:=	withID;
-	
-	ReturnValue	:=	if(	pForHeaderBuild,
-											dForHeader,
-											dForOther
-										);
-	return	ReturnValue;
+	return	withID;
 end;

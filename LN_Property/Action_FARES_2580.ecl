@@ -66,9 +66,9 @@ LN_Property.Layout_Property_Common_Model_BASE MapToCommonModel(source_file L) :=
 											      trim(L.prop_quadrant,left,right)
 										     ,left,right);
 
-  self.property_full_street_address       := if(trim(v_property_full_street_address,left,right)='0','',v_property_full_street_address);
+  self.property_full_street_address       := if(trim(v_property_full_street_address,left,right)='0','',trim(v_property_full_street_address,left,right));
   self.property_unit_number               := L.prop_apt_unit_num;
-  self.property_city_state_zip            := LN_Functions.Function_CombineCityStateZip(L.prop_city, L.prop_state, L.prop_zipcode, '');
+  self.property_city_state_zip            := trim(LN_Functions.Function_CombineCityStateZip(L.prop_city, L.prop_state, L.prop_zipcode, ''),left,right);
   self.property_address_code              := L.prop_address_indicator;
 
   self.legal_lot_number                 := L.lot_number;
@@ -87,6 +87,7 @@ LN_Property.Layout_Property_Common_Model_BASE MapToCommonModel(source_file L) :=
   self.legal_brief_description          := L.legal1;
   self.census_tract                     := L.census_tract;
   self.county_land_use_code              := L.county_use1;
+  self.standardized_land_use_code        := L.land_use;
   self.zoning                            := L.zoning;
   
   self.recorder_document_number             := L.document_number;
@@ -290,4 +291,4 @@ END;
 
 Result := project(source_file, MapToCommonModel(left));
 
-output(Result,,LN_Property.Filename_FARES_2580,overwrite);
+output(Result,,'~thor_data400::out::ln_fares_2580',overwrite);

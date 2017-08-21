@@ -8,7 +8,14 @@ emailservice.mac_append_domain_flags(with_email,domain_d,email);
 			
 //************Transform to a common email layout
 Email_Data.Layout_Email.Base t_map_to_common (domain_d input) := transform
-	self.email_src        					:= mdr.sourceTools.src_MediaOne;
+
+		dt_first_seen := StringLib.StringFindReplace(if(input.date_first_seen < ut.getdate and (unsigned)input.date_first_seen[5..] > 0 and input.date_first_seen[..4] >= '1972',
+																											_validate.date.fCorrectedDateString(input.date_first_seen),''), '00000000', '');
+
+		dt_last_seen :=  StringLib.StringFindReplace(if(input.date_last_seen < ut.getdate and (unsigned)input.date_last_seen[5..] > 0 and input.date_first_seen[..4] >= '1972',
+																											_validate.date.fCorrectedDateString(input.date_last_seen),''), '00000000', '');
+	
+	self.email_src        					:= mdr.sourceTools.src_OutwardMedia;
 	self.rec_src_all      					:= translation_codes.source_bitmap_code(mdr.sourceTools.src_OutwardMedia);
 	self.email_src_all    					:= translation_codes.source_bitmap_code(mdr.sourceTools.src_OutwardMedia);
 	self.email_src_num 							:= 1;
@@ -19,7 +26,7 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d input) := transform
 	self.orig_pmgindividual_id  		:= '';
 	self.orig_First_Name  					:= stringlib.stringtouppercase(TRIM(input.firstname,RIGHT,LEFT));
 	self.orig_Last_Name  						:= stringlib.stringtouppercase(TRIM(input.lastname,RIGHT,LEFT));
-	self.Orig_Address  							:= stringlib.stringtouppercase(TRIM(input.address, RIGHT,LEFT));
+	self.Orig_Address  							:= stringlib.stringtouppercase(TRIM(StringLib.StringCleanSpaces(input.address1 + input.address2), LEFT, RIGHT));
 	self.Orig_City  								:= input.city;
 	self.Orig_State  								:= input.state;
 	self.orig_ZIP  									:= input.zip;
@@ -64,10 +71,10 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d input) := transform
 	self.append_rawaid  						:= input.aid;
 	self.best_ssn  									:= '';
 	self.best_dob  									:= 0;
-	//***********Check the AcquireWeb to check the latest data setup (build is under development)
-	self.date_first_seen  					:= '';
-	self.date_last_seen  						:= '';
-	
+	self.date_first_seen  					:= if(dt_first_seen = '', dt_last_seen,
+																				if(dt_first_seen <= dt_last_seen or dt_last_seen = '', dt_first_seen, ''));
+	self.date_last_seen  						:= if(dt_last_seen = '', dt_first_seen,
+																				if(dt_first_seen <= dt_last_seen or dt_first_seen = '', dt_last_seen, ''));
 	self.Date_Vendor_First_Reported :=  input.date_vendor_first_reported;
 	self.Date_Vendor_Last_Reported  := input.date_vendor_last_reported;
 	self.append_email_username 						:= stringlib.stringtouppercase(Fn_Clean_Email_Username(self.orig_email));

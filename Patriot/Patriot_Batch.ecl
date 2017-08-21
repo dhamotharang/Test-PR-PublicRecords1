@@ -22,8 +22,12 @@ in_format := patriot.Layout_batch_in;
 
 f := dataset([],in_format) : stored('batch_in',few);
 unsigned1 OFAC_version := 1 :STORED('OFACversion');
-real threshold_val := if(OFAC_version <= 3, patriot.Constants.DEF_THRESHOLD, patriot.Constants.DEF_THRESHOLD_V4) : STORED('Threshold');
-real threshold_value := IF(threshold_val < patriot.Constants.MIN_THRESHOLD, patriot.Constants.MIN_THRESHOLD, threshold_val);
+real threshold_val_temp := 0 : STORED('Threshold');
+	threshold_value := MAP(
+													OFAC_version >= 4 and threshold_val_temp = 0 		=> OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL,  // All customers using XG5 - V4 should use .85 as threshold
+													OFAC_version < 4 and threshold_val_temp = 0 		=> OFAC_XG5.Constants.DEF_THRESHOLD_REAL, // V1-2 should use .84 as default
+													threshold_val_temp);
+
 boolean ofac_only_value := false : STORED('OfacOnly');
 string20 search_type := 'BOTH' : STORED('search_type');
 boolean Include_Additional_watchlists := FALSE: stored('IncludeAdditionalWatchlists');

@@ -29,8 +29,8 @@ EXPORT Orbit3GetProfileRules (string pProfileType, string pProfileName) := funct
 		string Name {xpath('Name')};
 		boolean IsEnabled {xpath('IsEnabled')};
 		string Description {xpath('Description')};
-		string Type {xpath('Type')};
-		integer4 PassPercentage {xpath(passPercentagePath)};
+		string RuleType {xpath('Type')};
+		string PassPercentage {xpath(passPercentagePath)};
 		string Code {xpath(codePath)};
 		string Severity {xpath(severityPath)};
 	end;

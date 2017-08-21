@@ -1,13 +1,12 @@
 import TopBusiness,tools;
 
 export KeyPrep_BID_LLID12(
-	dataset(TopBusiness.Layout_LLID.Linked) in_base,
+	dataset(TopBusiness.Layout_LLID.LLID12.Linked) in_base,
 	string version,
 	boolean pUseOtherEnvironment = false) := function
 
 	base := project(in_base(llid12 != 0),
 		transform(KeyLayouts.LLID12,
-			self.core := left.llid9 != 0,
 			self := left));
 	
 	deduped := dedup(dedup(base,record,all,local),record,all);

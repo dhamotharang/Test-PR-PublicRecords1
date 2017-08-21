@@ -1,5 +1,5 @@
-export proc_build_base_main_supp(dataset(recordof(BankruptcyV2.file_bankruptcy_main_v3)) infile) := function
-
+export proc_build_base_main_supp(dataset(recordof(BankruptcyV2.file_bankruptcy_main_v3_supplemented)) infile,string onlydeletes = 'no') := function
+import ut;
 ////////////////////////////////////////////////////////////////////////////
 //PATCH MAIN BASEFILE: 
 //_20100301 adding method_dismiss (Other field additions to come)
@@ -89,11 +89,35 @@ self.case_status    := if(l.tmsid=r.tmsid,R.caseStatus,'');
 self := L;
 end;
 
-outfile:= join(infile, cmbdTbl_supp,
+interimMain:= distribute(join(infile, cmbdTbl_supp,
 		left.tmsid = right.tmsid,
-		patchBase(left,right),left outer,lookup);
-		
+		patchBase(left,right),left outer,lookup),hash(tmsid));
+	
+srchfile := distribute(Bankruptcyv2.file_bankruptcy_search_v3_supp,hash(tmsid));
 
+//Add Status Information
+//Bug: 87672 - status information missing from bkv3 main 
+BankruptcyV2.Mac_getSearchStatus(3,interimMain,srchfile,outfile);
+
+// Add delete flag
+BankruptcyV2.layout_bankruptcy_main_v3.layout_bankruptcy_main_filing_supp apply_deletes(outfile l,srchfile r) := transform
+	self.delete_flag := 'D';
+	self := l;
+end;
+
+deleted_tmsids := join(outfile,srchfile(delete_flag <> 'D'),left.tmsid = right.tmsid,
+							apply_deletes(left,right),
+							left only,
+							local);
+
+BankruptcyV2.layout_bankruptcy_main_v3.layout_bankruptcy_main_filing_supp valid_tmsids(outfile l,srchfile r) := transform
+	//self.delete_flag := 'D';
+	self := l;
+end;
+
+good_tmsids := join(outfile,srchfile(delete_flag <> 'D'),left.tmsid = right.tmsid,
+							valid_tmsids(left,right),
+							local);
 							
-return outfile;		
+return if ( onlydeletes = 'no',outfile,dedup(sort(deleted_tmsids + good_tmsids,record,local),record,local));		
 end;

@@ -1,10 +1,15 @@
-IMPORT Business_Header, ut;
+Import Data_Services, Business_Header, ut, PRTE2_Business_Header;
 
 //***** CONSTANT
 ceiling_for_duplicates := 2000;
 
 //***** BUSINESS HEADER FILE 
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+fb := PRTE2_Business_Header.File_Business_Header_Base_for_keybuild;
+#ELSE
 fb :=  Business_Header.File_Business_Header_Base_for_keybuild;
+#END;
+
 
 //***** PREPARE TO CALL THE NEWER WORDS FUNCTION
 pfb2 :=

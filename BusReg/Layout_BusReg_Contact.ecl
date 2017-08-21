@@ -1,7 +1,10 @@
+import aid;
+
 EXPORT Layout_BusReg_Contact := RECORD
 UNSIGNED6 did;
 UNSIGNED6 bdid;
 UNSIGNED6 br_id;
+STRING25  ADCRecordNo;  // New persistent vendor field - 05/07/2014
 STRING8   dt_first_seen;
 STRING8   dt_last_seen;
 STRING1   record_type;
@@ -48,4 +51,8 @@ STRING4  msa;
 STRING7  geo_blk;
 STRING1  geo_match;
 STRING4  err_stat;
+string100				Prep_addr_line1;
+string50				prep_addr_line_last;			
+AID.Common.xAID	Append_RawAID		:=	0;
+AID.Common.xAID	Append_ACEAID		:=	0;
 END;

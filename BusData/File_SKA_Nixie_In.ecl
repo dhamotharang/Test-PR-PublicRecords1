@@ -1,1 +1,1 @@
-export File_SKA_Nixie_In := dataset('~thor_data400::base::ska_a', Layout_SKA_Nixie_In, flat);
+export File_SKA_Nixie_In := dataset('~thor_data400::base::ska_b', Layout_SKA_Nixie_In, flat);

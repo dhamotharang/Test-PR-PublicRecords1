@@ -1,5 +1,5 @@
 //define the key using hhid field
-
-export key_hhid := index(file_hhid_did_lssi(hhid<>0, trim(clean_phone)<>''),
-                         {unsigned6 l_hhid := hhid}, {file_hhid_did_lssi},
+base:=lssi.File_Lssi_Weekly_keybuild;
+export key_hhid := index(base,
+                         {unsigned6 l_hhid := hhid}, {base},
 					'~thor_data400::key::lssi_hhid' + thorlib.WUID());

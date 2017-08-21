@@ -6,10 +6,12 @@ ut.MAC_SK_Move_v2('~thor_data400::key::sexoffender_offenses_'+doxie_build.builds
 ut.MAC_SK_Move_v2('~thor_data400::key::sexoffender_did'+doxie_build.buildstate,'Q',out3,,false)
 ut.MAC_SK_Move_v2('~thor_data400::key::sexoffender_fdid_'+doxie_build.buildstate,'Q',out4,,false)
 ut.MAC_SK_Move_v2('~thor_data400::key::sexoffender_zip_type_'+doxie_build.buildstate,'Q',out5,,false)
-ut.MAC_SK_Move_v2('~thor_data400::key::sexoffender::fcra::did','Q',out6,,false)
-ut.MAC_SK_Move_v2('~thor_data400::key::sexoffender::fcra::enh','Q',out7,,false)
-ut.MAC_SK_Move_v2('~thor_data400::key::sexoffender::fcra::offenses','Q',out8,,false)
-ut.MAC_SK_Move_v2('~thor_data400::key::sexoffender::fcra::spk','Q',out9,,false)
+
+ut.MAC_SK_Move_v2('~thor_data400::key::sexoffender::fcra::didpublic','Q',out6,,false)
+ut.MAC_SK_Move_v2('~thor_data400::key::sexoffender::fcra::enhpublic','Q',out7,,false)
+ut.MAC_SK_Move_v2('~thor_data400::key::sexoffender::fcra::offenses_public','Q',out8,,false)
+ut.MAC_SK_Move_v2('~thor_data400::key::sexoffender::fcra::spkpublic','Q',out9,,false)
+
 autokey.MAC_AcceptSK_to_QA('~thor_data400::key::so_'+buildstate,autokeymove1,false);
 autokey.MAC_AcceptSK_to_QA('~thor_data400::key::so_enh'+buildstate,autokeymove2,false);
 

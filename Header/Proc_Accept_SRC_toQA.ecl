@@ -1,68 +1,69 @@
-import ut;
-ut.mac_sk_move_v2('~thor_data400::key::ak_src_index','Q',do1,2);
-ut.mac_sk_move_v2('~thor_data400::key::atf_src_index','Q',do2,2);
-ut.mac_sk_move_v2('~thor_data400::key::bkv2_src_index','Q',do3,2);
-ut.mac_sk_move_v2('~thor_data400::key::lien_src_index','Q',do4,2);
-ut.mac_sk_move_v2('~thor_data400::key::dlv2_src_index','Q',do5,2);
-ut.mac_sk_move_v2('~thor_data400::key::em_src_index','Q',do6,2);
-ut.mac_sk_move_v2('~thor_data400::key::ms_src_index','Q',do7,2);
-ut.mac_sk_move_v2('~thor_data400::key::death_src_index','Q',do8,2);
-ut.mac_sk_move_v2('~thor_data400::key::statedeath_src_index','Q',do9,2);
-ut.mac_sk_move_v2('~thor_data400::key::prof_src_index','Q',do10,2);
-ut.mac_sk_move_v2('~thor_data400::key::propasses_src_index','Q',do11,2);
-ut.mac_sk_move_v2('~thor_data400::key::propdeed_src_index','Q',do12,2);
-ut.mac_sk_move_v2('~thor_data400::key::util_src_index','Q',do13,2);
-ut.mac_sk_move_v2('~thor_data400::key::veh_src_index','Q',do14,2);
-ut.mac_sk_move_v2('~thor_data400::key::airm_src_index','Q',do15,2);
-ut.mac_sk_move_v2('~thor_data400::key::for_src_index','Q',do16,2);
-ut.mac_sk_move_v2('~thor_data400::key::dea_src_index','Q',do17,2);
-ut.mac_sk_move_v2('~thor_data400::key::water_src_index','Q',do18,2);
-ut.mac_sk_move_v2('~thor_data400::key::airc_src_index','Q',do19,2);
-ut.mac_sk_move_v2('~thor_data400::key::eq_src_index','Q',do20,2);
-ut.mac_sk_move_v2('~thor_data400::key::boater_src_index','Q',do21,2);
-ut.mac_sk_move_v2('~thor_data400::key::LNTU_src_index','Q',do22,2);
-ut.mac_sk_move_v2('~thor_data400::key::lienv2_src_index','Q',do23,2);
-ut.mac_sk_move_v2('~thor_data400::key::targ_src_index','Q',do24,2);
-ut.mac_sk_move_v2('~thor_data400::key::asl_src_index','Q',do25,2);
-ut.mac_sk_move_v2('~thor_data400::key::voters_src_index','Q',do26,2);
-ut.mac_sk_move_v2('~thor_data400::key::veh_v2_src_index','Q',do27,2);
-ut.mac_sk_move_v2('~thor_data400::key::certegy_src_index','Q',do28,2);
-ut.mac_sk_move_v2('~thor_data400::key::tucs_src_index','Q',do29,2);
-ut.mac_sk_move_v2('~thor_data400::key::nod_src_index','Q',do30,2);
-ut.mac_sk_move_v2('~thor_data400::key::experian_src_index','Q',do31,2);
-ut.mac_sk_move_v2('~thor_data400::key::exprnph_src_index','Q',do32,2);
+import PromoteSupers;
+export Proc_Accept_SRC_toQA(string filedate=header.version_build, boolean pFastHeader=false) := function
+
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::header.rid_header','QM',M1,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::header_rid_srid_header','QM',M2,2)
+
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::dlv2_src_index_header','QM',M3,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::bkv2_src_index_header','QM',M4,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::veh_v2_src_index_header','QM',M5,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::propasses_src_index_header','QM',M6,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::propdeed_src_index_header','QM',M7,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::lienv2_src_index_header','QM',M8,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::eq_src_index_header','QM',M9,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::experian_src_index_header','QM',M10,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::TN_src_index_header','QM',M11,2);
+
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::ak_src_index','QM',M12,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::atf_src_index','QM',M13,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::em_src_index','QM',M14,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::ms_src_index','QM',M15,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::death_src_index','QM',M16,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::statedeath_src_index','QM',M17,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::prof_src_index','QM',M18,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::util_src_index','QM',M19,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::airm_src_index','QM',M20,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::for_src_index','QM',M21,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::dea_src_index','QM',M22,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::water_src_index','QM',M23,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::airc_src_index','QM',M24,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::boater_src_index','QM',M25,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::targ_src_index','QM',M26,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::voters_src_index','QM',M27,2);
+PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::nod_src_index','QM',M28,2);
 
 
-export Proc_Accept_SRC_toQA := parallel(do1,
-do2,
-do3,
-do4,
-do5,
-do6,
-do7,
-do8,
-do9,
-do10,
-do11,
-do12,
-do13,
-do14,
-do15,
-do16,
-do17,
-do18,
-do19,
-do20,
-do21,
-do22,
-do23,
-do24,
-do25,
-do26,
-do27,
-do28,
-do29,
-do30,
-do31,
-do32
-);
+return parallel(
+								M1
+								,M2
+
+								,M3
+								,M4
+								,M5
+								,M6
+								,M7
+								,M8
+								,M9
+								,M10
+								,M11
+
+								,M12
+								,M13
+								,M14
+								,M15
+								,M16
+								,M17
+								,M18
+								,M19
+								,M20
+								,M21
+								,M22
+								,M23
+								,M24
+								,M25
+								,M26
+								,M27
+								,M28
+								);
+
+end;

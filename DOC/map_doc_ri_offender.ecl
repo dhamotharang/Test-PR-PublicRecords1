@@ -46,7 +46,7 @@ END;
 */
 // Imports
 import Crim_common;
-import Address, Lib_AddrClean, Ut, lib_stringlib;
+import Address, Ut, lib_stringlib;
 // Transforms
 ds_combo_offender := DOC.file_doc_ri;
 
@@ -69,9 +69,9 @@ TRANSFORM
 //
 		// The following 2 fields used in party_status_desc;
 	nam:=TRIM((L.LastName+' '+L.FirstName+' '+L.MiddleInitial ),LEFT,RIGHT);
-	    String78 clean_name := AddrCleanLib.CleanPersonLFM73(trim(regexreplace('^O ',nam,'O')));
+	    String78 clean_name := address.CleanPersonLFM73(trim(regexreplace('^O ',nam,'O')));
 
-   string182 cleanaddress:=	addrcleanlib.cleanaddress182('',L.lastresidence +', RI');	
+   string182 cleanaddress:=	address.cleanaddress182('',L.lastresidence +', RI');	
 /*
 NOTE FIELD ORDER NOW MATCHES ArrestLOG Transsform order
 */

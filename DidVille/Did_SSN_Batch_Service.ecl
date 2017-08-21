@@ -8,9 +8,8 @@ living sits added
 </message>
 */
 /*--INFO-- This service returns dids based upon a set of personal data.*/
-
+/*--RESULT-- xslt.html */
 import ut,watchdog;
-
 export Did_SSN_Batch_Service := macro
 unsigned1	thresh  := 0 : stored('ScoreThreshold');
 

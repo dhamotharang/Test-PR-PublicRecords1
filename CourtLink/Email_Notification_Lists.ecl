@@ -2,20 +2,20 @@ import _control,RoxieKeyBuild;
 
 export Email_Notification_Lists := module
    
-   export all_hands := 'julianne.franzer@lexisnexis.com;' + _control.MyInfo.EmailAddressNotify;
+   export all_hands := 'julianne.franzer@lexisnexisrisk.com;Darren.Knowles@lexisnexisrisk.com;' + _control.MyInfo.EmailAddressNotify;
                                  
    export BuildSuccess :=	if(_Flags.IsTesting
 									,all_hands
-									,all_hands
+									,'qualityassurance@seisint.com;' + all_hands
 							   );
    
-   export BuildFailure	:=	BuildSuccess;
+   export BuildFailure	:=	all_hands;
    
    export Spray			:=	BuildSuccess;
    
    export Stats			:=	BuildSuccess;
    export Roxie 		:=	if(_Flags.IsTesting
-									,'julianne.franzer@lexisnexis.com;' + _control.MyInfo.EmailAddressNotify
+									,'julianne.franzer@lexisnexisrisk.com;' + _control.MyInfo.EmailAddressNotify
 									,RoxieKeyBuild.Email_Notification_List + ';avenkata@seisint.com;vniemela@seisint.com;' + all_hands
 							   );
    

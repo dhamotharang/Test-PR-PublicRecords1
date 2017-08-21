@@ -55,7 +55,13 @@ EXPORT files(UNSIGNED1 pseudo_environment) := MODULE
 		documents_template(phoneownership);
 		documents_template(bipbestupdate);
 		documents_template(sbfe);
-	
+		documents_template(ucc);
+		documents_template(govtdebarred);
+		documents_template(inquiry);
+		documents_template(corp);
+		documents_template(mvr);
+		documents_template(aircraft);
+		documents_template(watercraft);
 	END;
 	
 	EXPORT history := MODULE
@@ -82,7 +88,13 @@ EXPORT files(UNSIGNED1 pseudo_environment) := MODULE
 		EXPORT phoneownership	 := history_template(filenames(pseudo_environment).history.phoneownership);
 		EXPORT bipbestupdate	 := history_template(filenames(pseudo_environment).history.bipbestupdate);
 		EXPORT sbfe	 					 := history_template(filenames(pseudo_environment).history.sbfe);
-	
+		EXPORT ucc	 					 := history_template(filenames(pseudo_environment).history.ucc);
+		EXPORT govtdebarred		 := history_template(filenames(pseudo_environment).history.govtdebarred);
+		EXPORT inquiry				 := history_template(filenames(pseudo_environment).history.inquiry);
+		EXPORT corp	 					 := history_template(filenames(pseudo_environment).history.corp);
+		EXPORT mvr	 					 := history_template(filenames(pseudo_environment).history.mvr);
+		EXPORT aircraft 			 := history_template(filenames(pseudo_environment).history.aircraft);
+		EXPORT watercraft			 := history_template(filenames(pseudo_environment).history.watercraft);
 	END;
 	
 	// Creates the dataset that the results will be written to

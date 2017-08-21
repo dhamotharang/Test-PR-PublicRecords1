@@ -37,7 +37,9 @@ vehlic.Layout_Vehicles tNDSourceToCommon(Layout_ND_Full pInput)
 	self.DECAL_NUMBER				:= pInput.orig_DECAL_NUMBER;
 	self.TRUE_LICENSE_PLSTE_NUMBER	:= pInput.orig_LICENSE_NUMBER;
 	self.REGISTRATION_EXPIRATION_DATE := pInput.orig_EXPIRATION_DATE;
+	self.REGISTRATION_EFFECTIVE_DATE:= pInput.orig_TRANSACTION_DATE;
 	self.TITLE_NUMBERxBG9			:= pInput.orig_TITLE_NUMBER;
+	self.TITLE_ISSUE_DATE := pInput.orig_purchase_date;
 	self.ODOMETER_MILEAGE			:= pInput.orig_ODOMETER_READING;
 	self.PRICE						:= pInput.orig_PURCHASE_PRICE;
     self.LH_1_LIEN_DATE				:= pInput.orig_LIEN_DATE;

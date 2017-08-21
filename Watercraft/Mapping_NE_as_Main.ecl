@@ -139,6 +139,8 @@ watercraft_color_desc(string3 code)
 		  
 file_NE_dedup := dedup(sort(watercraft.file_NE_clean_in, reg_date, reg_num), reg_date, reg_num);		  
 
+Watercraft.Macro_Clean_Hull_ID(file_NE_dedup, watercraft.Layout_NE_clean_in,hull_clean_in)
+
 Layout_NE_clean_temp := record
 
 watercraft.Layout_NE_clean_in;
@@ -148,7 +150,7 @@ boolean is_hull_id_in_MIC;
     	
 end;
 
-Layout_NE_clean_temp main_mapping_temp(file_NE_dedup L, watercraft.file_MIC R)
+Layout_NE_clean_temp main_mapping_temp(hull_clean_in L, watercraft.file_MIC R)
 
 := transform
 
@@ -158,7 +160,7 @@ self.is_hull_id_in_MIC := if(trim(L.hull_id, left, right)[1..3] = R.MIC, true, f
 
 end;
 
-Mapping_NE_as_Main_temp := join(file_NE_dedup, watercraft.file_MIC, trim(left.hull_id, left, right)[1..3] = right.MIC,
+Mapping_NE_as_Main_temp := join(hull_clean_in, watercraft.file_MIC, trim(left.hull_id, left, right)[1..3] = right.MIC,
 main_mapping_temp(left, right), left outer, lookup);
 
 

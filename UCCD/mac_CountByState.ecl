@@ -11,6 +11,6 @@ end;
 #uniquename(s)
 %t% := table(inf, %rec%, file_state, isdirect);
 %s% := sort(%t%, file_state, isdirect);
-outp := output(choosen(%s%, 1000), named(name));
+outp := output(choosen(%s%(counted > 1), 1000), named(name));
 
 endmacro;

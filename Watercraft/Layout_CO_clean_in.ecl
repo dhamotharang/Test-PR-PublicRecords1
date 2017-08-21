@@ -1,4 +1,4 @@
-export Layout_CO_clean_in := 
+export Layout_CO_clean_in := //rec length=911
 record
  string2      state_origin;
  string8      process_date;

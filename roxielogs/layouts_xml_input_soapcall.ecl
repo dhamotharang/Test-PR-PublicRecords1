@@ -1,0 +1,117 @@
+import doxie, iesp, Gong_Services, PhonesFeedback_Services;
+
+EXPORT LAYOUTS_XML_INPUT_SOAPCALL := MODULE
+
+//header file search service
+EXPORT COMMON_INPUT := RECORD
+    string Addr;
+	  string Addr2;
+		integer AgeLow;
+    integer AgeHigh;
+		boolean AllowDateSeen;
+		boolean AllowHeaderQuick;
+		boolean AllowNameWildCard;
+		boolean AllowNickNames;
+		boolean AllowNonPublish;
+		boolean AllowUseCNkey;
+		boolean AllowWildcard;
+		string AnyWord1;
+	  string AnyWord2;
+		string AreaCode;
+		boolean BestOnly;
+		string City;
+		string CompanyName;
+		string County;
+		boolean CurrentResidentsOnly;
+		string DataRestrictionMask;
+		integer DateFirstSeen;
+    integer DateLastSeen;
+		integer DialContactPrecision;
+		string DID;
+		boolean DIDOnly;
+		string DidTypeMask;
+		integer DistanceThreshold;
+		string DLMask;
+		integer DOB;
+		boolean DoNotFillBlanks; 
+		integer DPPAPurpose;
+		boolean ECL_NegateTrueDefaults;
+		boolean ExcludeBusiness;
+		boolean ExcludeGovernment;
+		integer ExcludeRadius;
+		boolean ExcludeResidence;
+	  boolean ExcludeResultsInGivenCity;
+		string FirstName;
+		string FirstWord;
+		integer GLBPurpose;
+		boolean Household;
+		boolean IncludeAllDIDRecords;
+		boolean IncludeDLInfo;
+		boolean IncludeHRI;
+		boolean IncludePhonesFeedback;
+		boolean IncludeSourceDocCounts;
+		boolean IncludeZeroDIDRefs;
+		string IndustryClass;
+		boolean KeepOldSsns;
+		string LastName; 
+		boolean LnBranded;
+		string LookupType;
+		integer MaxHriPer;
+		integer MaxResults;
+    integer MaxResultsThisTime;
+		string MiddleName;
+		boolean NoFallBack; 
+		boolean NoLookupSearch;
+		boolean NonExclusion;
+		string OtherCity1;
+		string OtherLastName1;
+		string OtherState1;
+    string OtherState2;
+		string phone;
+		boolean PhoneticMatch;
+		boolean PhoneticDistanceMatch;
+		string PrimRange;
+    string PrimName;
+		boolean ProbationOverride;
+		boolean Raw;
+		string RelativeFirstName1;
+    string RelativeFirstName2;
+		integer RestrictRollupInDays;
+		boolean ReturnAlsoFound;
+		string RID;
+		integer ScoreThreshold;
+		string SecRange;
+    integer seq;
+		integer SkipRecords;
+		boolean SourceDocView;
+		string SSN;
+		string SSNMask;
+    boolean SSNTypos;
+		string State;
+		string StateCityZip;
+		boolean StrictMatch;
+		boolean SuppressNonCurrent;
+		boolean UsingKeepSsns;
+		string UnParsedFullName;
+		string Zip;
+	  integer ZipRadius;
+END;
+
+EXPORT DOXIE_HEADERFILESEARCHSERVICE_OUTPUT := RECORD
+  doxie.Layout_HeaderFileSearch;
+  DATASET(PhonesFeedback_Services.Layouts.feedback_report) Feedback {MAXCOUNT(1)};
+  DATASET(PhonesFeedback_Services.Layouts.feedback_report) Listed_Feedback {MAXCOUNT(1)};
+  doxie.rid_cnt.l_ds; 
+	unsigned2 output_seq_no;
+END;
+
+EXPORT GONG_SERVICES_GONGHISTORYSEARCHSSERVICE_OUTPUT := RECORD
+   unsigned2 penlty;
+   Gong_Services.Layout_GongHistorySearchService;
+	 string18 county_name;
+	 string8 timezone := '';
+   iesp.share.t_duration TimePhoneInService;
+	 unsigned2 output_seq_no;
+END;
+
+END;

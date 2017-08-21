@@ -1,6 +1,7 @@
 import Bankrupt,lib_keylib,lib_fileservices,ut;
 
 #workunit('name','Liens Key Build');
+#workunit('priority','high');
 
 // Delete Keys
 ut.Mac_Delete_File('~thor_data400::key::moxie.liens.fpos.data.key',key1);

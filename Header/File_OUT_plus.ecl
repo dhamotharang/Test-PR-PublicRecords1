@@ -1,3 +1,4 @@
+#option('skipFileFormatCrcCheck', 1);
 string_rec := record
 
 	string12 	did;	//converted from int
@@ -42,7 +43,6 @@ string_rec := record
 	string1		valid_ssn;
     unsigned integer8 __filepos { virtual(fileposition)};
 end;
-
 
 
 export file_out_plus := dataset(header.Filename_Out,string_rec,flat);

@@ -17,7 +17,7 @@ p := PROJECT(f, form(LEFT));
 
 tokens := globalwatchlists.fn_Format_SearchFile(p);
 
-out := output(tokens,,WorldCheck.cluster_name + 'base::WorldCheck::' + filedate + '::tokens',overwrite);
+out := output(tokens,,WorldCheck.cluster_name + 'base::WorldCheck::' + filedate + '::tokens',overwrite,__compressed__);
 
 super_main := sequential(FileServices.StartSuperFileTransaction(),
 				FileServices.AddSuperFile(  WorldCheck.cluster_name + 'base::worldcheck::Delete::tokens',

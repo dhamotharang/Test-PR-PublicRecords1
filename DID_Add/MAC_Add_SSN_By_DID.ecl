@@ -1,4 +1,4 @@
-export MAC_Add_SSN_By_DID(infile, did_field, ssn_field, outfile,glb = 'true') := macro
+export MAC_Add_SSN_By_DID(infile, did_field, ssn_field, outfile,glb = 'true',use_ssn_validity='true') := macro
 
 #uniquename(should_join)
 %should_join% := infile.did_field > 0; // and (integer)infile.ssn_field = 0;
@@ -10,8 +10,13 @@ export MAC_Add_SSN_By_DID(infile, did_field, ssn_field, outfile,glb = 'true') :=
 
 #uniquename(dw)
 #uniquename(dwng)
+#if(use_ssn_validity)
+%dw% := watchdog.file_best(ssn != '' and valid_ssn='G');
+%dwng% := watchdog.File_Best_nonglb(ssn != '' and valid_ssn='G');
+#else
 %dw% := watchdog.file_best(ssn != '');
 %dwng% := watchdog.File_Best_nonglb(ssn != '');
+#end
 
 #uniquename(infile_dist)
 %infile_dist% := distribute(%infile_attempt%, hash((unsigned6)did_field));

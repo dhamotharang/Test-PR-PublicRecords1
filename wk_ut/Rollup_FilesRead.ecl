@@ -7,7 +7,7 @@ EXPORT Rollup_FilesRead(
 function
 
   dfilesread    := sort(global(nothor(wk_ut.get_FilesRead(pWuid)),few)(issuper = false,(pFileRegex = '' or regexfind(pFileRegex,name,nocase))),name);
-  dslim         := table(dfilesread,{string name := name},name);
+  dslim         := sort(table(dfilesread,{string name := name},name),-(unsigned)regexfind('[[:digit:]]{8}',name,0));
   drollupemail  := rollup(dslim,true,transform(recordof(left),self.name := left.name + '\n' + right.name));
 
   return drollupemail;

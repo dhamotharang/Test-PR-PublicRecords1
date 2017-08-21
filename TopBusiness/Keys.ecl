@@ -18,6 +18,7 @@ export Keys(
 		export Party := KeyPrep_Bankruptcy_Party(Files(pversion,pUseOtherEnvironment).Bankruptcy.Party.Built,pversion,pUseOtherEnvironment);
 	end;
 	export Contacts := KeyPrep_Contacts_ID(Files(pversion,pUseOtherEnvironment).Contacts.Linked.Built,pversion,pUseOtherEnvironment);
+	export ContactsDID := KeyPrep_Contacts_DID(Files(pversion,pUseOtherEnvironment).Contacts.Linked.Built,pversion,pUseOtherEnvironment);
 	export Finance := KeyPrep_Finance_ID(Files(pversion,pUseOtherEnvironment).Finance.Linked.Built,pversion,pUseOtherEnvironment);
 	export Incorporation := KeyPrep_Incorporation_ID(Files(pversion,pUseOtherEnvironment).Incorporation.Linked.Built,pversion,pUseOtherEnvironment);
 	export Industry := KeyPrep_Industry_ID(Files(pversion,pUseOtherEnvironment).Industry.Linked.Built,pversion,pUseOtherEnvironment);
@@ -27,13 +28,14 @@ export Keys(
 		export Party := KeyPrep_Liens_Party(Files(pversion,pUseOtherEnvironment).Liens.Party.Built,pversion,pUseOtherEnvironment);
 	end;
 	export LinkDiagnostic := KeyPrep_LinkDiagnostic_BEID(Files(pversion,pUseOtherEnvironment).Linking.Linked.Built,pversion,pUseOtherEnvironment);
-	export LLID := KeyPrep_LLID_ID(Files(pversion,pUseOtherEnvironment).LLID.Linked.Built,pversion,pUseOtherEnvironment);
+	export LLID12 := KeyPrep_LLID12_ID(Files(pversion,pUseOtherEnvironment).LLID12.Linked.Built,pversion,pUseOtherEnvironment);
+	export LLID9 := KeyPrep_LLID9_ID(Files(pversion,pUseOtherEnvironment).LLID9.Linked.Built,pversion,pUseOtherEnvironment);
 	export MatchDiagnostic := KeyPrep_MatchDiagnostic_BEID(Files(pversion,pUseOtherEnvironment).Match.Linked.Built,pversion,pUseOtherEnvironment);
   export MotorVehicle := module
 	  export Main := KeyPrep_MotorVehicle_ID(Files(pversion,pUseOtherEnvironment).MotorVehicle.Main.Linked.Built,pversion,pUseOtherEnvironment);
 	  export Title := KeyPrep_MotorVehicle_Title(Files(pversion,pUseOtherEnvironment).MotorVehicle.Title.Built,pversion,pUseOtherEnvironment);
 	  export Registration := KeyPrep_MotorVehicle_Registration(Files(pversion,pUseOtherEnvironment).MotorVehicle.Registration.Built,pversion,pUseOtherEnvironment);
-		export Party := KeyPrep_MotorVehicle_Party(Files(pversion,pUseOtherEnvironment).MotorVehicle.Party.Built,pversion,pUseOtherEnvironment);
+		export Party := KeyPrep_MotorVehicle_Party(Files(pversion,pUseOtherEnvironment).MotorVehicle.Party.Linked.Built,pversion,pUseOtherEnvironment);
 	end;
 	export NamesFEINs := KeyPrep_NamesFEINs_ID(Files(pversion,pUseOtherEnvironment).Linking.Linked.Built,pversion,pUseOtherEnvironment);
 	export Property := module

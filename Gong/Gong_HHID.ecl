@@ -1,4 +1,4 @@
-IMPORT ut, didville, header_slimsort;
+IMPORT ut, didville, header_slimsort, gong, PRTE2_Header;
 
 g_raw := Gong.File_Gong_full;
 	
@@ -21,4 +21,8 @@ didville.MAC_HHID_Append_By_Address(
 	g_dist, outf, hhid, name_last,
 	prim_range, prim_name, sec_range, st, z5)
 
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export Gong_HHID := dataset([],{outf});
+#ELSE
 export Gong_HHID := outf : persist('~thor400_84::persist::gong_hhid');
+#END;

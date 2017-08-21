@@ -87,12 +87,17 @@ ntlFile := FLAccidents.BaseFile_NtlAccidents_Alpharetta;
 
 pflc0 slimrec(ntlFile L) := transform
 
+string8     fSlashedMDYtoCYMD(string pDateIn) :=
+								intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
+					+     intformat((integer1)regexreplace('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
+					+     intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
+
 self.rec_type_o 			:= '0';
 t_accident_nbr 			:= (string40)((unsigned6)L.vehicle_incident_id+10000000000);
 t_scrub := stringlib.StringFilter(t_accident_nbr,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
 self.accident_nbr := if(t_scrub in ['UNK', 'UNKNOWN'], 'UNK'+l.vehicle_incident_id,t_scrub);  
 self.orig_accnbr := t_accident_nbr; 
-self.accident_date 			:= L.loss_date[7..10]+ L.loss_date[1..2]+ L.loss_date[4..5];
+self.accident_date						:= fSlashedMDYtoCYMD(L.loss_date[1..10]);
 self.city_town_name 		:= stringlib.stringtouppercase(L.inc_city);
 
        

@@ -484,7 +484,7 @@ common_groupings :=  proj_keyword + proj_deceased + proj_scategory + proj_catego
 
 p_Build 	:= project(slimInfo, t_Build(left)):persist('~thor_data200::persist::worldcheck_bridger::region_1_search::'+filedate);
 
-return output(p_Build,,'~thor_data200::base::worldcheck_bridger::region_1_search::'+filedate+'.xml', XML('', 
+return output(p_Build,,'~thor_data200::base::worldcheck_bridger::region_1_search::'+filedate+'.xml', XML('MYROW', 
 						HEADING('<?xml version="1.0" encoding="utf-8"?>'+
 						'<Watchlist>'
 						,''), TRIM, OPT), overwrite);

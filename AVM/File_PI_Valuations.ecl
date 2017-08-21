@@ -28,6 +28,9 @@ pi_calculation_layout get_ofheo_ratios(pi_deduped le, avm.File_OFHEO rt) := tran
 	self.quarter := q;
 	self.basetable_to_current_ofheo_ratio := rt.base_to_current_Ratio;
 	self.saleqtr_to_current_ofheo_ratio := rt.current_ratio;
+	
+	// inserted to test ofheo only
+	self.Price_Index_Valuation := (integer)((integer)le.sales_price * rt.current_ratio);
 	self := le;
 	self := [];
 end;
@@ -36,9 +39,8 @@ wOfheo := join(pi_deduped, avm.File_OFHEO,
 					left.fips_code[1..2]=right.state_fips 
 					and avm.filters.quarter_map(left.recording_date)=right.quarter,
 					get_ofheo_ratios(left,right), left outer, lookup);
-				
-// output(wOfheo);
 
+/*
 pi_calculation_layout add_base(pi_calculation_layout le, avm.File_PI_BaseTable rt) := transform
 	self.zip_level_multiplier := rt.zipcode!='';
 	self.base_quarter := if(le.quarter<'2005Q4','2005Q3',le.quarter);
@@ -124,21 +126,8 @@ end;
 w_coeff := join(with_base_table, avm.File_PI_Coefficients, left.fips_code=right.fips_code and left.land_use=right.land_use,
 				add_coefficients(left,right), left outer, lookup);
 //output(w_coeff);
+*/
 
-
-// r := RECORD
-  // string5 fips_code;
-  // string1 land_use;
-  // string6 quarter;
-  // string11 sales_price;
-  // string11 q3_2005_base_msp;
-  // string11 most_recent_quarter_msp;
-  // string6 most_recent_quarter;
-  // real8 q3_2005_to_most_recent_quarter_ratio;
-  // real8 sale_quarter_to_most_recent_ratio;
-  // integer8 county_seq;
- // END;
-//msp := dataset(ut.foreign_prod + 'thor_dell400_2::temp::avm_median_sales_price', r, thor);
 
 msp := avm.File_PI_Median_Sales;
 
@@ -150,37 +139,42 @@ pi_calculation_layout perform_valuation(pi_calculation_layout le, msp rt) := tra
 	self.q3_2005_to_most_recent_quarter_ratio := rt.q3_2005_to_most_recent_quarter_ratio;
 	self.sale_quarter_to_most_recent_ratio := rt.sale_quarter_to_most_recent_ratio;
 	
-	
-	base := le.recording_date[1..6] between '199601' and '200509';
-	self.Price_Index_Valuation := map(// recording date isn't during the basetable timeframe, do the update table logic only
-											  ~base and le.ofheo_coef1=0 and rt.sale_quarter_to_most_recent_ratio <> 0 =>
-													(integer)le.sales_price * rt.sale_quarter_to_most_recent_ratio * le.msp_coef1,
-											  ~base and le.ofheo_coef1=0 and rt.sale_quarter_to_most_recent_ratio = 0 =>
-													(integer)le.sales_price * le.saleqtr_to_current_ofheo_ratio,
-											  ~base and le.ofheo_coef1<>0 and le.ofheo_coef1<>9999 =>
-													(integer)le.sales_price * le.saleqtr_to_current_ofheo_ratio * le.ofheo_coef1,
-												~base and le.ofheo_coef1<>0 and le.ofheo_coef1=9999 =>
-													(integer)le.sales_price * le.saleqtr_to_current_ofheo_ratio,
+	self.Price_Index_Valuation := map(rt.sale_quarter_to_most_recent_ratio <> 0 =>
+									  (integer)le.sales_price * rt.sale_quarter_to_most_recent_ratio,
+									  (integer)le.sales_price * le.saleqtr_to_current_ofheo_ratio);
+									  
+		
+	// base := le.recording_date[1..6] between '199601' and '200509';
+	// self.Price_Index_Valuation := map(// recording date isn't during the basetable timeframe, do the update table logic only
+											  // ~base and le.ofheo_coef1=0 and rt.sale_quarter_to_most_recent_ratio <> 0 =>
+													// (integer)le.sales_price * rt.sale_quarter_to_most_recent_ratio * le.msp_coef1,
+											  // ~base and le.ofheo_coef1=0 and rt.sale_quarter_to_most_recent_ratio = 0 =>
+													// (integer)le.sales_price * le.saleqtr_to_current_ofheo_ratio,
+											  // ~base and le.ofheo_coef1<>0 and le.ofheo_coef1<>9999 =>
+													// (integer)le.sales_price * le.saleqtr_to_current_ofheo_ratio * le.ofheo_coef1,
+												// ~base and le.ofheo_coef1<>0 and le.ofheo_coef1=9999 =>
+													// (integer)le.sales_price * le.saleqtr_to_current_ofheo_ratio,
 											  
-											  // recording date is during the basetable timefram, use the base table logic combined with the update table logic
-											  base and le.ofheo_coef1=0 and rt.q3_2005_to_most_recent_quarter_ratio <>0 =>
-													(integer)le.Q3_2005_valuation * rt.q3_2005_to_most_recent_quarter_ratio * le.msp_coef1,
-											  base and le.ofheo_coef1=0 and rt.q3_2005_to_most_recent_quarter_ratio = 0 =>
-													(integer)le.Q3_2005_valuation * le.basetable_to_current_ofheo_ratio,
-											  base and le.ofheo_coef1<>0 and le.ofheo_coef1<>9999 =>
-													(integer)le.Q3_2005_valuation * le.basetable_to_current_ofheo_ratio * le.ofheo_coef1,
+											  // // recording date is during the basetable timefram, use the base table logic combined with the update table logic
+											  // base and le.ofheo_coef1=0 and rt.q3_2005_to_most_recent_quarter_ratio <>0 =>
+													// (integer)le.Q3_2005_valuation * rt.q3_2005_to_most_recent_quarter_ratio * le.msp_coef1,
+											  // base and le.ofheo_coef1=0 and rt.q3_2005_to_most_recent_quarter_ratio = 0 =>
+													// (integer)le.Q3_2005_valuation * le.basetable_to_current_ofheo_ratio,
+											  // base and le.ofheo_coef1<>0 and le.ofheo_coef1<>9999 =>
+													// (integer)le.Q3_2005_valuation * le.basetable_to_current_ofheo_ratio * le.ofheo_coef1,
 											
-											  le.Price_Index_Valuation = -1 => 0,	// set the final valuation to 0 if there was no sale from 1996-2005q3
+											  // le.Price_Index_Valuation = -1 => 0,	// set the final valuation to 0 if there was no sale from 1996-2005q3
 													
-											  (integer)le.Price_Index_Valuation);
+											  // (integer)le.Price_Index_Valuation);
 	
 	self := le;
 end;
 
 
-PI_Valuation := join(w_coeff, msp, left.fips_code=right.fips_code and left.land_use=right.land_use and left.base_quarter=right.quarter,
-				perform_valuation(left,right), left outer, lookup);
+PI_Valuation := join(wOfheo, msp, left.fips_code=right.fips_code and left.land_use=right.land_use and left.quarter=right.quarter,
+				perform_valuation(left,right), left outer, lookup);			
 
-output(PI_Valuation,,'~thor_data400::avm::pi_valuations_' + thorlib.WUID(), __compressed__);
+
+output(PI_Valuation,,'~thor_data400::avm::pi_valuations', __compressed__, overwrite);
 
 export File_PI_Valuations := PI_Valuation;

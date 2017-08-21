@@ -1,1 +1,1 @@
-export File_FBN_Contact_Base := DATASET(Cluster.Cluster_In + 'Base::FBNv2::Contact',Layout_Common.contact , flat);
+export File_FBN_Contact_Base := project(FBNV2.File_FBN_Contact_Base_AID(tmsid not in FBNV2.Suppress_TMSID), transform(layout_common.contact, self := left));

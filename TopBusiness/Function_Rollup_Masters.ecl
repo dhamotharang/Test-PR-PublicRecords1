@@ -23,7 +23,7 @@ export Function_Rollup_Masters(
 	export dataset(Layout_MotorVehicle.Main.Unlinked) As_MotorVehicle_Master := mod1.As_MotorVehicle_Master + mod2.As_MotorVehicle_Master;
 	export dataset(Layout_MotorVehicle.Registration) As_MotorVehicle_Master_Registration := mod1.As_MotorVehicle_Master_Registration + mod2.As_MotorVehicle_Master_Registration;
 	export dataset(Layout_MotorVehicle.Title) As_MotorVehicle_Master_Title := mod1.As_MotorVehicle_Master_Title + mod2.As_MotorVehicle_Master_Title;
-	export dataset(Layout_MotorVehicle.Party) As_MotorVehicle_Master_Party := mod1.As_MotorVehicle_Master_Party + mod2.As_MotorVehicle_Master_Party;
+	export dataset(Layout_MotorVehicle.Party.Unlinked) As_MotorVehicle_Master_Party := mod1.As_MotorVehicle_Master_Party + mod2.As_MotorVehicle_Master_Party;
 	export dataset(Layout_Watercraft.main.Unlinked) As_Watercraft_Master := mod1.As_Watercraft_Master + mod2.As_Watercraft_Master;
 	export dataset(Layout_Watercraft.Party) As_Watercraft_Master_Party := mod1.As_Watercraft_Master_Party + mod2.As_Watercraft_Master_Party;
   export dataset(Layout_Property.Main.Unlinked) As_Property_Master := mod1.As_Property_Master + mod2.As_Property_Master;

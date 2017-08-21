@@ -7,19 +7,10 @@ export Aircraft_as_Source(dataset(faa.layout_aircraft_registration_out) pAircraf
 					   dataset('~thor_data400::Base::AircraftHeader_Building',faa.layout_aircraft_registration_out,flat),
 					   pAircraft
 					  );
-	src_rec := record
-	 header.Layout_Source_ID;
-	 faa.layout_aircraft_registration_out;
-	end;
+	src_rec := header.layouts_SeqdSrc.AC_src_rec;
 
 	header.Mac_Set_Header_Source(dSourceData,faa.layout_aircraft_registration_out,src_rec,'AR',withUID)
 
-	dForHeader	:=	withUID	: persist('persist::headerbuild_aircraft_src');
-	dForOther	:=	withUID;
-	ReturnValue	:=	if(pForHeaderBuild,
-					   dForHeader,
-					   dForOther
-					  );
-	return ReturnValue;
+	return withUID;
   end
  ;

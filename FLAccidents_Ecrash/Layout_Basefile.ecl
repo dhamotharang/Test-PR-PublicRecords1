@@ -1,3 +1,8 @@
+/*2017-04-06T21:51:39Z (Srilatha Katukuri)
+
+DF-18925 - ClaimsCompass?Police Records - Incidents Extract
+
+*/
 /*2015-08-07T23:55:40Z (Srilatha Katukuri)
 #181860
 */
@@ -869,5 +874,6 @@ string   Report_Vehicle_Body_Type;
 	unsigned  scrubsbits1 := 0 ;
   string20  ReportLinkID ; 
   unsigned6 Idfield ; 
-	string3 Page_Count
+	string3 Page_Count;
+	string100 address2;
 end;

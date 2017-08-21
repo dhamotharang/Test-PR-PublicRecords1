@@ -32,6 +32,7 @@ export FCC_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.v_city_name),
 				self.state := left.st,
 				self.zip := left.zip5,
+				self.zip4 := left.zip4,
 				self.county_fips := left.fips_county,
 				self.msa := '',
 				self.phone := left.licensees_phone,
@@ -67,6 +68,7 @@ export FCC_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.v_city_name),
 				self.state := left.st,
 				self.zip := left.zip5,
+				self.zip4 := left.zip4,
 				self.county_fips := left.fips_county,
 				self.msa := '',
 				self.phone := left.licensees_phone,
@@ -102,6 +104,7 @@ export FCC_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.firm.v_city_name),
 				self.state := left.firm.st,
 				self.zip := left.firm.zip5,
+				self.zip4 := left.firm.zip4,
 				self.county_fips := left.firm.fips_county,
 				self.msa := '',
 				self.phone := left.contact_firms_phone_number,
@@ -137,6 +140,7 @@ export FCC_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.firm.v_city_name),
 				self.state := left.firm.st,
 				self.zip := left.firm.zip5,
+				self.zip4 := left.firm.zip4,
 				self.county_fips := left.firm.fips_county,
 				self.msa := '',
 				self.phone := left.contact_firms_fax_number,
@@ -206,6 +210,8 @@ export FCC_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.name_last         := left.attention_lname,
 				self.name_suffix       := left.attention_name_suffix,
 				self.position_title    := 'FCC License Contact',
+				self.did               := left.attention_did,
+				self.score             := 0,
 				self := []));
 		
 		return extract;

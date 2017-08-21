@@ -1,84 +1,86 @@
-import SANCTN;
+import SANCTN,RoxieKeyBuild,PromoteSupers,Scrubs_SANCTNKeys;
 
 export MAC_SANCTN_Build(filedate) := MACRO
+#workunit('name','SANCTN Build ' + filedate);
+
 
 #uniquename(spray_payload)
 #uniquename(parse_data)
 #uniquename(clean_data)
-#uniquename(super_incident)
-#uniquename(super_party)
-#uniquename(super_files)
-#uniquename(incident_transfer)
-#uniquename(party_transfer)
+// #uniquename(append_did)
 #uniquename(base_transfer)
 #uniquename(build_keys)
+#uniquename(updatedops)
+#uniquename(qa_samp)
 
-#workunit('name','SANCTN Build ' + filedate);
+
 
 // Spray the new file onto Thor
 %spray_payload% := SANCTN.spray_SANCTN_inputfile(filedate);
 
 // Parse each of the records types out of the combined file
-%parse_data%     := parallel(output(SANCTN.parse_SANCTN_incident_in)
-		                     ,output(SANCTN.parse_SANCTN_incident_varying_in)
-					         ,output(SANCTN.parse_SANCTN_party_in)
-					         ,output(SANCTN.parse_SANCTN_party_varying_in));
+%parse_data%     := parallel(output(choosen(SANCTN.parse_SANCTN_incident_in,100))
+														,output(choosen(SANCTN.parse_SANCTN_incident_varying_in,100))
+														,output(choosen(SANCTN.parse_SANCTN_party_in,100))
+														,output(choosen(SANCTN.parse_SANCTN_party_varying_in,100))
+														,output(choosen(SANCTN.parse_SANCTN_rebuttal_in,100))
+														,output(choosen(SANCTN.parse_SANCTN_license_in,100))
+														,output(choosen(SANCTN.parse_SANCTN_aka_dba,100))
+														);
 
 // Clean the incident and party data
 %clean_data%     := parallel(SANCTN.clean_incident(filedate)
-                             ,SANCTN.clean_party(filedate));
+                             ,SANCTN.clean_party(filedate)
+														 ,SANCTN.map_rebuttal_text(filedate)
+														 ,SANCTN.clean_license_nbr(filedate)
+														 ,SANCTN.map_party_aka_dba(filedate)
+														 );
 
-// Add the newly cleaned incident data to the superfile with the rest of the cleaned data
-%super_incident% := sequential(FileServices.StartSuperFileTransaction()
-                               ,FileServices.AddSuperFile(SANCTN.cluster_name + 'out::sanctn::incident_cleaned'
-							                             ,SANCTN.cluster_name + 'out::sanctn::' + filedate + '::incident_cleaned')
-							   ,FileServices.FinishSuperFileTransaction());
-%super_party% := sequential(FileServices.StartSuperFileTransaction()
-                               ,FileServices.AddSuperFile(SANCTN.cluster_name + 'out::sanctn::party_cleaned'
-							                             ,SANCTN.cluster_name + 'out::sanctn::' + filedate + '::party_cleaned')
-							   ,FileServices.FinishSuperFileTransaction());
 
-%super_files% := parallel(%super_incident%,%super_party%);
-						  
-%incident_transfer% := sequential(FileServices.StartSuperFileTransaction()
-                                   ,FileServices.AddSuperFile(SANCTN.cluster_name + 'base::SANCTN::incident_delete'
-                                                             ,SANCTN.cluster_name + 'base::SANCTN::incident_grandfather',, true)
-						       	   ,FileServices.ClearSuperFile(SANCTN.cluster_name + 'base::SANCTN::incident_grandfather')
-       							   ,FileServices.AddSuperFile(SANCTN.cluster_name + 'base::SANCTN::incident_grandfather'
-       							                             ,SANCTN.cluster_name + 'base::SANCTN::incident_father',, true)
-		       					   ,FileServices.ClearSuperFile(SANCTN.cluster_name + 'base::SANCTN::incident_father')
-				       			   ,FileServices.AddSuperFile(SANCTN.cluster_name + 'base::SANCTN::incident_father' 
-                                                                ,SANCTN.cluster_name + 'base::SANCTN::incident',, true)
-       							   ,FileServices.ClearSuperFile(SANCTN.cluster_name + 'base::SANCTN::incident')
-		       					   ,FileServices.AddSuperFile(SANCTN.cluster_name + 'base::SANCTN::incident'
-                                                             ,SANCTN.cluster_name + 'out::sanctn::' + filedate + '::incident_cleaned',,true)
-						           ,FileServices.FinishSuperFileTransaction()
-       							   ,FileServices.ClearSuperFile(SANCTN.cluster_name + 'base::SANCTN::incident_delete'));
-%party_transfer% := sequential(FileServices.StartSuperFileTransaction()
-                               ,FileServices.AddSuperFile(SANCTN.cluster_name + 'base::SANCTN::party_delete'
-                                                         ,SANCTN.cluster_name + 'base::SANCTN::party_grandfather',, true)
-							   ,FileServices.ClearSuperFile(SANCTN.cluster_name + 'base::SANCTN::party_grandfather')
-							   ,FileServices.AddSuperFile(SANCTN.cluster_name + 'base::SANCTN::party_grandfather'
-							                             ,SANCTN.cluster_name + 'base::SANCTN::party_father',, true)
-							   ,FileServices.ClearSuperFile(SANCTN.cluster_name + 'base::SANCTN::party_father')
-							   ,FileServices.AddSuperFile(SANCTN.cluster_name + 'base::SANCTN::party_father' 
-                                                         ,SANCTN.cluster_name + 'base::SANCTN::party',, true)
-							   ,FileServices.ClearSuperFile(SANCTN.cluster_name + 'base::SANCTN::party')
-							   ,FileServices.AddSuperFile(SANCTN.cluster_name + 'base::SANCTN::party'
-                                                         ,SANCTN.cluster_name + 'out::sanctn::' + filedate + '::party_cleaned',,true)
-						       ,FileServices.FinishSuperFileTransaction()
-							   ,FileServices.ClearSuperFile(SANCTN.cluster_name + 'base::SANCTN::party_delete'));
+combined_incident_data := SANCTN.file_out_incident_cleaned;
+combined_party_data    := SANCTN.Party_DID(SANCTN.file_out_party_cleaned);
+rebuttal_data					 := SANCTN.file_rebuttal_clean;
+license_data					 := SANCTN.file_license_clean;
+aka_dba_dba						 := SANCTN.file_aka_dba_clean;
 
-%base_transfer% := parallel(%incident_transfer%,%party_transfer%);
+
+PromoteSupers.MAC_SF_BuildProcess(aka_dba_dba, SANCTN.cluster_name +'base::SANCTN::party_aka_dba', base_aka_dba_out, 3, /*csvout*/false, /*compress*/false);
+PromoteSupers.MAC_SF_BuildProcess(license_data, SANCTN.cluster_name +'base::SANCTN::license_nbr', base_license_out, 3, /*csvout*/false, /*compress*/false);
+PromoteSupers.MAC_SF_BuildProcess(rebuttal_data, SANCTN.cluster_name +'base::SANCTN::rebuttal', base_rebuttal_out, 3, /*csvout*/false, /*compress*/false);
+PromoteSupers.MAC_SF_BuildProcess(combined_party_data , SANCTN.cluster_name +'base::SANCTN::party', base_party_out, 3, /*csvout*/false, /*compress*/false);
+PromoteSupers.MAC_SF_BuildProcess(combined_incident_data, SANCTN.cluster_name +'base::SANCTN::incident', base_incident_out, 3, /*csvout*/false, /*compress*/false);
+
+%base_transfer% := parallel(base_aka_dba_out,base_license_out,base_rebuttal_out, base_party_out,base_incident_out);
 
 %build_keys%  := SANCTN.proc_build_SANCTN_keys(filedate);
+							 
+%updatedops% := RoxieKeyBuild.updateversion('SanctnKeys',filedate,'skasavajjala@seisint.com',,'N|B');
 
-sequential(%spray_payload%
-           ,%parse_data%
-           ,%clean_data%
-		   ,%super_files%
-		   ,%base_transfer%
-		   ,%build_keys%
+%qa_samp%    := SANCTN.out_incident_party_samples;
+
+orbit_report.sanctn_stats(getretval);
+
+//V2 for the new layout change. 11/26/13 
+SANCTN.Out_File_SANCTN_Stats_Population_V2 (SANCTN.file_base_incident
+																						,SANCTN.file_base_party
+																						,SANCTN.file_base_rebuttal
+																						,SANCTN.file_base_license
+																						,SANCTN.file_base_party_aka_dba
+																						,filedate
+																						,do_STRATA);
+
+
+sequential(
+					%spray_payload%
+          ,%parse_data%
+          ,%clean_data%
+					,%base_transfer%
+					,%build_keys%
+					,%qa_samp%
+					,%updatedops%
+				  ,getretval
+					,do_STRATA
+					,Scrubs_SANCTNKeys.fn_RunScrubs(filedate,'Harry.Gist@lexisnexis.com,Terri.Hardy-George@lexisnexis.com')
 		   );
-		   
-ENDMACRO;
+
+endmacro;

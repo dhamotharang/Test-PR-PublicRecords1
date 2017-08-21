@@ -1,4 +1,4 @@
-import utilfile,address,poe;
+import bipv2,utilfile,address,poe;
 export Layouts :=
 module
 
@@ -34,7 +34,7 @@ module
 
 	export Base :=
 	record
-
+		BIPV2.IDlayouts.l_xlink_ids;
 		string2   									source										;
 		unsigned6 									did												;
 		unsigned1 									did_score									;
@@ -123,16 +123,22 @@ module
 	  export BdidSlim := 
 	  record
 			unsigned8		unique_id					;
+			BIPV2.IDlayouts.l_xlink_ids;			
+			unsigned6		bdid					:= 0;
+			unsigned1		bdid_score		:= 0;
+			string20 		fname							;
+			string20 		mname							;
+			string20 		lname							;
+			string9	  	ssn								;				
 			string100 	company_name			;
 			string10  	prim_range				;
 			string28		prim_name					;
 			string5			zip5							;
 			string8			sec_range					;
 			string2			state		 					;
+			string25    city_name					;			
 			string10		phone		  		    ;
 			string9			fein		  		    ;
-			unsigned6		bdid					:= 0;
-			unsigned1		bdid_score		:= 0;
 	  end;
 		
 	  export UniqueId := 

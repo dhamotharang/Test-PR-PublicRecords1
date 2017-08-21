@@ -1,0 +1,1 @@
+export File_MA_ALL_In := DATASET(Cluster.Cluster_In + 'in::uccv2::MA::ALL', UCCV2.Layout_File_MA_Temp,csv(HEADING(1),QUOTE('@@!!@@*'),SEPARATOR(['|']),TERMINATOR(['\n','\r\n'])));

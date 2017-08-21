@@ -25,11 +25,11 @@ export proc_WorldCheck_Bridger_Spray (string st_file,
 
 %sourceCsvSeparator% 	:= '\\t';
 %sourceCsvTeminator% 	:= '\\n,\\r\\n';
-%groupname% 			:= 'thor400_30';
+%groupname% 			:= 'thor400_44';
 
 //used to remove oversized records
-%spray_st_file% 	:= fileservices.SprayVariable(_Control.IPAddress.edata11
-                                          ,'/bdb_82/wcb/input/'+filedate+'/'+st_file
+%spray_st_file% 	:= fileservices.SprayVariable(_Control.IPAddress.bctlpedata10
+                                          ,'/data/bdb_82/wcb/input/'+filedate+'/'+st_file
 										  //,st_file
 										  ,100000
 										  ,'\t'
@@ -44,8 +44,8 @@ export proc_WorldCheck_Bridger_Spray (string st_file,
 										  ,true
 										  ,false);  
 
-%spray_pp_file% 	:= fileservices.SprayVariable(_Control.IPAddress.edata11
-                                          ,'/bdb_82/wcb/input/'+filedate+'/'+pp_file
+%spray_pp_file% 	:= fileservices.SprayVariable(_Control.IPAddress.bctlpedata10
+                                          ,'/data/bdb_82/wcb/input/'+filedate+'/'+pp_file
 										  //,pp_file
 										  ,100000
 										  ,'\t'
@@ -60,8 +60,8 @@ export proc_WorldCheck_Bridger_Spray (string st_file,
 										  ,true
 										  ,false); 
 
-%spray_pp_nchar_file% 	:= fileservices.SprayVariable(_Control.IPAddress.edata11
-                                          ,'/bdb_82/wcb/input/'+filedate+'/'+pp_nchar_file
+%spray_pp_nchar_file% 	:= fileservices.SprayVariable(_Control.IPAddress.bctlpedata10
+                                          ,'/data/bdb_82/wcb/input/'+filedate+'/'+pp_nchar_file
 										  //,pp_nchar_file
 										  ,100000
 										  ,'\t'

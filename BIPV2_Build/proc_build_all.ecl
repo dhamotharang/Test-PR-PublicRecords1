@@ -72,6 +72,7 @@ export proc_build_all(
   ,pSkipMisckeys          = 'false'
   ,pSkipSegStats          = 'false'
   ,pSkipStrata            = 'false'
+  ,pSkipOverlinking       = 'false'
   ,pSkipSeleidRelative    = 'false'
   ,pSkipCDWBuild          = 'false'
   ,pSkipXAppend           = 'false'
@@ -89,7 +90,7 @@ export proc_build_all(
   ,pRenameKeysFilter      = '\'bipv2_proxid|strnbrname|bipv2_relative|biz_preferred\''
 
   ,pDotFilenameForProx        = '\'\'' //'BIPV2_Files.files_dotid.FILE_BASE'  //default is to start where we left off
-  ,pInputFilenameForProxMj6   = 'BIPV2_Proxid.filenames().base.built' //'BIPV2_Files.files_dotid.FILE_BASE'  //default is to start where we left off
+  ,pInputFilenameForProxMj6   = 'BIPV2_Proxid.filenames().out.built' //'BIPV2_Files.files_dotid.FILE_BASE'  //default is to start where we left off
   ,pInputFilenameForProxPost  = 'bipv2_proxid_mj6._filenames().out.built' //'BIPV2_Files.files_dotid.FILE_BASE'  //default is to start where we left off
    
 ) := 
@@ -111,10 +112,10 @@ functionmacro
     xlinkCondition  := pSkipXlink = false or pSkipCopyXlinkKeys = false or pSkipXlinkSample = false or pSkipWeeklyKeys = false;
     bestCondition   := pSkipBest  = false or pSkipIndustry      = false or pSkipMisckeys    = false;
     
-    XlinkStuffWuid  := if(xlinkCondition                                    ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,pSkipXlink,pSkipCopyXlinkKeys,pSkipXlinkSample,pSkipWeeklyKeys  ,true               ,true         ,true          ,true         ,true         ,true                 ,'XlinkStuff'                      ),'');
-    BestWuid        := if(bestCondition                                     ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true            ,true             ,pSkipBest          ,pSkipIndustry,pSkipMisckeys ,true         ,true         ,true                 ,'BestAndMiscKeys'                 ),'');
-    StatsWuid       := if(pSkipSegStats       = false or pSkipStrata = false,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true            ,true             ,true               ,true         ,true          ,pSkipSegStats,pSkipStrata  ,true                 ,'Stats'                           ),'');
-    RelativesWuid   := if(pSkipSeleidRelative = false                       ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true            ,true             ,true               ,true         ,true          ,true         ,true         ,pSkipSeleidRelative  ,'SeleidRelative'                  ),'');
+    XlinkStuffWuid  := if(xlinkCondition                                                                  ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,pSkipXlink,pSkipCopyXlinkKeys,pSkipXlinkSample,pSkipWeeklyKeys  ,true               ,true         ,true          ,true         ,true         ,true             ,true                 ,'XlinkStuff'                      ),'');
+    BestWuid        := if(bestCondition                                                                   ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true            ,true             ,pSkipBest          ,pSkipIndustry,pSkipMisckeys ,true         ,true         ,true             ,true                 ,'BestAndMiscKeys'                 ),'');
+    StatsWuid       := if(pSkipSegStats       = false or pSkipStrata = false or pSkipOverlinking = false  ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true            ,true             ,true               ,true         ,true          ,pSkipSegStats,pSkipStrata  ,pSkipOverlinking ,true                 ,'Stats'                           ),'');
+    RelativesWuid   := if(pSkipSeleidRelative = false                                                     ,BIPV2_Build.proc_Kickoff_Phase_2(pversion,true      ,true              ,true            ,true             ,true               ,true         ,true          ,true         ,true         ,true             ,pSkipSeleidRelative  ,'SeleidRelative'                  ),'');
 
     Wait4Threads    := if(XlinkStuffWuid != '' or BestWuid != '' or StatsWuid != '' or RelativesWuid != ''   ,wk_ut.Wait4Workunits([XlinkStuffWuid,BestWuid,StatsWuid,RelativesWuid],'1',pversion,'Wait4Wuids',,BIPV2_Build.mod_email.emailList));
     
@@ -143,16 +144,16 @@ functionmacro
 
        output(pversion, named('Build_Date'))
       // ,BIPV2_Build.proc_Watch_This_Workunit (pversion,workunit) //watch this workunit, in case it fails in some weird way it will still email me.
-      ,output(dataset('~bipv2_build::qa::workunit_history',wk_ut.layouts.wks_slim,thor)(regexfind(pversion,version,nocase)),named('Workunits'),overwrite)
+      ,output(BIPV2_Build.files().workunit_history.qa(regexfind(pversion,version,nocase)),named('Workunits'),overwrite)
       ,if(pSkipSpaceUsage    = false ,BIPV2_Build.proc_Space_Usage          (pversion,pType := 1))
       ,if(pSkipCleanup       = false ,BIPV2_Build.proc_cleanup              (pversion)           )
       ,if(pSkipSourceIngest  = false ,BIPV2_Build.proc_Source_Ingest        (pversion)           )
       ,if(pSkipPrepIngest    = false ,BIPV2_Build.proc_ingest               ().prepIngest(pversion)           )
       ,if(pSkipRunIngest     = false ,BIPV2_Build.proc_ingest               ().runIngest(pversion,pOmitDisposition)           )
       ,if(pSkipDOT           = false ,BIPV2_Build.proc_dotid                ().MultIter_run (pDotStartIteration     ,pDotNumIterations      ,pdoDotidInit ,pdoDotidSpecs  ,pdoDotidIters  ,pdoDotidPost ))
-      ,if(pSkipProx          = false ,BIPV2_Build.proc_proxid                               (pProxStartIteration    ,pProxNumIterations     ,pversion     ,,pdoProxidpatch,,pDotFilenameForProx       ,pdoProxidSpecs                 ))
+      ,if(pSkipProx          = false ,BIPV2_Build.proc_proxid                               (pProxStartIteration    ,pProxNumIterations     ,pversion     ,                                     ,,pDotFilenameForProx       ,pdoProxidSpecs                 ))
       ,if(pSkipProxMj6       = false ,BIPV2_Build.proc_proxid_mj6                           ( ProxMj6StartIteration ,pProxMj6NumIterations  ,pversion     ,pdoProxidMj6Preprocess,pdoProxidMj6Specs, pdoProxidMj6Iters,pdoProxidMj6PostProcess,,,pInputFilenameForProxMj6              ))            
-      ,if(pSkipProxPost      = false ,BIPV2_Build.proc_proxid                               ( ProxPostStartIteration,pProxPostNumIterations ,pversion     ,,false         ,,pInputFilenameForProxPost ,false             ,'ProxidPost',,true))
+      ,if(pSkipProxPost      = false ,BIPV2_Build.proc_proxid                               ( ProxPostStartIteration,pProxPostNumIterations ,pversion     ,'bipv2_proxid_mj6._files().out.built',,pInputFilenameForProxPost ,false             ,'ProxidPost'))
       ,if(pSkipHierarchy     = false ,BIPV2_Build.proc_hrchy                (pversion                                                                                                                   ))
       ,if(pSkipLgid3         = false ,BIPV2_Build.proc_lgid3                ().MultIter_run (pLgid3StartIteration   ,pLgid3NumIterations  ,pdoLgid3Init  ,pdoLgid3Specs   ,pdoLgid3Iters  ,pdoLgid3Post ,pversion))
       ,if(pSkipPowDown       = false ,BIPV2_Build.proc_powid_down           ().MultIter_run (pPowDownStartIteration ,pPowDownNumIterations,pdoPowDownInit,pdoPowDownSpecs                               )) 
@@ -170,7 +171,7 @@ functionmacro
       ,if(pSkipXAppend       = false ,BIPV2_Build.proc_External_Append_Testing(pversion                                                                                                     )) // do external append testing
       ,if(pSkipDataCard      = false ,BIPV2_Build.proc_DataCard               (pversion                                                                                                     )) // do datacard
       ,if(pSkipDashboard     = false ,BIPV2_Build.proc_Dashboard              (pversion                                                                                                     )) // do dashboard
-      ,if(pSkipCopyOtherKeys = false ,BIPV2_Build.proc_copy_keys              (pversion ,'','bipv2_best|bipv2_seleid_relative','BestAndSeleRelative'                                        )) // Copy the rest of the BIPV2FullKeys package to dataland
+      ,if(pSkipCopyOtherKeys = false ,BIPV2_Build.proc_copy_keys              (pversion ,'','','BestAndSeleRelative',true                                                                   )) // Copy the rest of the BIPV2FullKeys package to dataland
       ,if(pSkipRenameKeys    = false ,BIPV2_Build.proc_rename_BIPV2FullKeys   (pversion,pRenameKeysFilter,false,,'built')                                                                    ) //only rename bipv2_proxid,strnbrname & bipv2_relative, rest should be correct
       ,if(pPromote2QA        = true  ,BIPV2_Build.proc_Promote2QA             (pversion)                                                                                                     )
       ,if(pSkipVerifyKeys    = false ,BIPV2_Build.BIPV2FullKeys_Package       (keyversion).outputpackage                                                                                     ) //double check that keys match layout
@@ -183,6 +184,7 @@ functionmacro
       
       // ,OutputThisWuidTimings
       ,outputSumTimingstotal
+      ,BIPV2_Build.proc_fullAndWeeklyKeys(pversion,false,false) // 
       
     )  
 		:	FAILURE(email.BIPV2FullKeys.buildfailure);

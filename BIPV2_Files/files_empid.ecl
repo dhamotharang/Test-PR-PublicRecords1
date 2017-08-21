@@ -1,4 +1,4 @@
-IMPORT BIPV2;
+IMPORT BIPV2,Data_Services;
 EXPORT files_empid(string p_Emp_Module = 'bipv2_empid') := MODULE
 	
 	/*----------------- Extended layout for internal use only -----------------*/
@@ -57,7 +57,7 @@ EXPORT files_empid(string p_Emp_Module = 'bipv2_empid') := MODULE
 	EXPORT DS_GRANDFATHER		:= DATASET(FILE_GRANDFATHER,	BIPV2.CommonBase.Layout, THOR, OPT);
 	
 	IMPORT ut, _Control;
-	SHARED FILE_BASE_PROD		:= ut.foreign_prod+FILE_BASE[2..];
+	SHARED FILE_BASE_PROD		:= Data_Services.foreign_prod+FILE_BASE[2..];
 	EXPORT DS_BASE_PROD			:= DATASET(FILE_BASE_PROD, BIPV2.CommonBase.Layout_Static, THOR, OPT) : PERSIST('~persist::prod::' + p_Emp_Module + '::base');
 	
 	

@@ -90,7 +90,7 @@ export Layout_UCC_Common
 			party;
 	      end;
 
-	export Layout_party_With_AID_old :=Record,maxlength(32767)
+	export Layout_party_With_AID :=Record,maxlength(32767)
 			Layout_party;			
 			unsigned8	source_rec_id  :=  0;
 			BIPV2.IDlayouts.l_xlink_ids;
@@ -98,13 +98,9 @@ export Layout_UCC_Common
 			string50	prep_addr_last_line; 			
 			unsigned8	RawAid	:= 0;
 			unsigned8	ACEAID	:= 0;	
-	end;
-	
-	export Layout_party_With_AID :=Record,maxlength(32767)
-			Layout_party_With_AID_old;				
 			unsigned8 persistent_record_id:=0;
 	end;
-
+	
 	export	Collateral
 	     :=Record
 		    
@@ -182,17 +178,13 @@ export Layout_UCC_Common
 		  // dataset(party)      party;
 		 
         end;
-	export	Layout_UCC_new_old		
+	export	Layout_UCC_new
 	    := 
 		Record   ,MAXLENGTH(32767)
 	       Layout_UCC;
 		   String3 volume:='';
+			 unsigned8 persistent_record_id:=0;
 		 
         end;
-
- export Layout_UCC_new := record, MAXLENGTH(32767)
-    Layout_UCC_new_old;
-		unsigned8 persistent_record_id:=0;
- end;
  
 END;

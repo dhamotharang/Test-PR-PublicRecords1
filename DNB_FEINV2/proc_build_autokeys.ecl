@@ -25,7 +25,7 @@ AutoKeyB2.MAC_Build (b,
 					dnb_feinv2.Constants(filedate).ak_logical,
 					outaction,false,
 					['C'],true,,
-					true) 
+					true,,,zero) 
 
 AutoKeyB2.MAC_AcceptSK_to_QA(dnb_feinv2.Constants(filedate).ak_keyname, mymove)
 

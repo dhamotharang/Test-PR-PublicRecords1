@@ -27,7 +27,7 @@ with_ssn_name_summary := join(rolled_header, Risk_Indicators.Correlation_Risk.ke
 	transform(risk_indicators.layout_output,
 		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.summary, left.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
-		self.header_summary.ssn_name_source_count := if(BSversion <= 51, count(right.summary), count(rolledSummary));
+		self.header_summary.ssn_name_source_count := count(rolledSummary);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
 		self.header_summary.corrssnname_sources := if(BSversion <= 51, '', trim(stringSources, left, right) + if(trim(stringSources, left, right) <> '', ',', ''));
@@ -48,7 +48,7 @@ with_ssn_addr_summary := join(with_ssn_name_summary, Risk_Indicators.Correlation
 	transform(risk_indicators.layout_output,
 		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.summary, left.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
-		self.header_summary.ssn_addr_source_count := if(BSversion <= 51, count(right.summary), count(rolledSummary));
+		self.header_summary.ssn_addr_source_count := count(rolledSummary);
 		setSources 			 := set(rolledSummary,src);
 		stringSources 	 := STD.Str.CombineWords(setSources, ',');
 		self.header_summary.corrssnaddr_sources := if(BSversion <= 51, '', trim(stringSources, left, right) + if(trim(stringSources, left, right) <> '', ',', ''));
@@ -70,7 +70,7 @@ with_addr_name_summary := join(with_ssn_addr_summary, Risk_Indicators.Correlatio
 	transform(risk_indicators.layout_output,
 		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.summary, left.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
-		self.header_summary.addr_name_source_count := if(BSversion <= 51, count(right.summary), count(rolledSummary)),
+		self.header_summary.addr_name_source_count := count(rolledSummary);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
 		self.header_summary.corraddrname_sources := if(BSversion <= 51, '', trim(stringSources, left, right) + if(trim(stringSources, left, right) <> '', ',', ''));
@@ -92,7 +92,7 @@ with_phone_addr_summary := join(with_addr_name_summary, Risk_Indicators.Correlat
 	transform(risk_indicators.layout_output,
 		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.Summary, left.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
-		self.header_summary.phone_addr_source_count := if(BSversion <= 51, count(right.summary), count(rolledSummary)), // BS <= 51 use raw source, else use converted source 
+		self.header_summary.phone_addr_source_count := count(rolledSummary);
 		self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 
 //this join for BS 5.2 and higher to populate the new phone/addr correlation fields based off of header sources
@@ -123,7 +123,7 @@ with_phone_lname_summary := join(with_phone_addr_header_summary, Risk_Indicators
 	transform(risk_indicators.layout_output,
 		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.summary, left.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
-		self.header_summary.phone_lname_source_count := if(BSversion <= 51, count(right.summary), count(rolledSummary)), // BS <= 51 use raw source, else use converted source
+		self.header_summary.phone_lname_source_count := count(rolledSummary);
 		self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 
 //this join for BS 5.3 and higher to populate the new phone/addr correlation fields based off of header sources

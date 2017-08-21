@@ -1,5 +1,5 @@
-import header,mdr,ut;
-head := header.file_headers(~mdr.Source_is_DPPA(src));
+import header,mdr,PromoteSupers,PRTE2_Header;
+head := header.file_headers(~mdr.Source_is_DPPA(src) and ~mdr.sourceTools.SourceIsTransUnion(src));
 head_good := head(did > 0, (INTEGER)ssn > 0);
 
 head_nonglb := head_good(header.isPreGlb(head_good));
@@ -94,10 +94,19 @@ p2 := PROJECT(r2(LENGTH(TRIM(ssn)) = 9), addone(LEFT));
 p3 := PROJECT(r3(LENGTH(TRIM(ssn)) = 9), addone(LEFT));
 p4 := PROJECT(r4(LENGTH(TRIM(ssn)) = 9), addone(LEFT));
 
-ut.MAC_SF_BuildProcess(p1,'~thor_data400::base::did_ssn_glb',a1,2)
-ut.MAC_SF_BuildProcess(p2,'~thor_data400::base::did_ssn_nonglb',a2,2)
-ut.MAC_SF_BuildProcess(p3,'~thor_data400::base::did_ssn_nonUtil',a3,2)
-ut.MAC_SF_BuildProcess(p4,'~thor_data400::base::did_ssn_nonglb_nonUtil',a4,2)
+PromoteSupers.Mac_SF_BuildProcess(p1,'~thor_data400::base::did_ssn_glb',a1,2,,true,pVersion:=Header.version_build)
+PromoteSupers.Mac_SF_BuildProcess(p2,'~thor_data400::base::did_ssn_nonglb',a2,2,,true,pVersion:=Header.version_build)
+PromoteSupers.Mac_SF_BuildProcess(p3,'~thor_data400::base::did_ssn_nonUtil',a3,2,,true,pVersion:=Header.version_build)
+PromoteSupers.Mac_SF_BuildProcess(p4,'~thor_data400::base::did_ssn_nonglb_nonUtil',a4,2,,true,pVersion:=Header.version_build)
 
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export did_ssn(string bFile) := case(bFile,
 
+                                            'did_ssn_glb' => p1,
+                                            'did_ssn_nonglb' => p2,
+                                            'did_ssn_nonUtil' => p3,
+                                            'did_ssn_nonglb_nonUtil' => p4
+);
+#ELSE
 export did_ssn := sequential(a1,a2,a3,a4);
+#END;

@@ -1,0 +1,2 @@
+export DistributionList := 
+	'jason.allerdings@lexisnexisrisk.com,kevin.ulrich@lexisnexisrisk.com,valerie.minnis@lexisnexisrisk.com,nicholas.rauch@lexisnexisrisk.com,Charles.Pettola@lexisnexisrisk.com,darren.knowles@lexisnexisrisk.com,charles.salvo@lexisnexisrisk.com,debendra.kumar@lexisnexisrisk.com';

@@ -1,7 +1,17 @@
-import ut, FBN, govdata;
+import ut, FBNv2, mdr;
+
+EXPORT BH_Relative_Match_FBN(
+
+	 dataset(Layout_Business_Header_Temp)	pBH_Basic_Match_ForRels		= BH_Basic_Match_ForRels	()
+	,dataset(Layout_Business_Header_New	)	pFBNV2_As_Business_Header	= FBNV2.FBNV2_As_Business_Header
+	,string																pPersistname							= persistnames().BHRelativeMatchFBN													
+	,boolean															pShouldRecalculatePersist	= true													
+
+) :=
+function
 
 // Initialize match file
-BH_File := BH_Basic_Match_ForRels;
+BH_File := pBH_Basic_Match_ForRels;
 
 Layout_FBN_Match := record
 unsigned6 bdid;             // Seisint Business Identifier
@@ -17,15 +27,15 @@ Layout_FBN_Match InitFBNMatch(Business_Header.Layout_Business_Header_Temp L) := 
 self := L;
 end;
 
-FBN_Match_Init := project(BH_File(source in ['FF']), InitFBNMatch(left));
+FBN_Match_Init := project(BH_File(MDR.sourceTools.SourceIsFBNV2(source)), InitFBNMatch(left));
 FBN_Match_Init_Dedup := dedup(FBN_Match_Init, all);
 FBN_Match_Init_Dist := distribute(FBN_Match_Init_Dedup, hash(trim(company_name), trim(vendor_id), trim(prim_name), zip));
 
-Layout_FBN_Match InitFBNFilingMatch(Business_Header.Layout_Business_Header L) := transform
+Layout_FBN_Match InitFBNFilingMatch(Business_Header.Layout_Business_Header_New L) := transform
 self := L;
 end;
 
-FBN_Filing_Match_Init := project(govdata.FL_FBN_As_Business_Header, InitFBNFilingMatch(left));
+FBN_Filing_Match_Init := project(FBNV2.FBNV2_As_Business_Header, InitFBNFilingMatch(left));
 FBN_Filing_Match_Init_Dedup := dedup(FBN_Filing_Match_Init, all);
 FBN_Filing_Match_Init_Dist := distribute(FBN_Filing_Match_Init_Dedup, hash(trim(company_name), trim(vendor_id), trim(prim_name), zip));
 
@@ -68,4 +78,12 @@ FBN_Matches := JOIN(FBN_Filing_Match_Dedup_Dist,
 
 FBN_Matches_Dedup := DEDUP(FBN_Matches, bdid1, bdid2, all);
 
-export BH_Relative_Match_FBN := FBN_Matches_Dedup: persist('TMTEMP::BH_Relative_Match_FBN');
+BH_Relative_Match_FBN_persisted := FBN_Matches_Dedup
+	: persist(pPersistname);
+
+returndataset := if(pShouldRecalculatePersist = true, BH_Relative_Match_FBN_persisted
+																										, persists().BHRelativeMatchFBN
+									);
+return returndataset;
+
+end;

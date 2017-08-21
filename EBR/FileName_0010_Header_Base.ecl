@@ -1,1 +1,1 @@
-export FileName_0010_Header_Base := trim(GetSegmentFileName_Base('0010')) : global;
+export FileName_0010_Header_Base := trim(GetSegmentFileName_Base('0010','B'));

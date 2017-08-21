@@ -8,19 +8,10 @@ export As_source(dataset(layouts.base) pCertegy = dataset([],layouts.base), bool
 					   pCertegy
 					  );
 
-	src_rec := record
-	 header.Layout_Source_ID;
-	 layouts.base;
-	end;
+	src_rec := header.layouts_SeqdSrc.CY_src_rec;
 	 
 	header.Mac_Set_Header_Source(dSourceData,layouts.base,src_rec,'CY',withUID)//picked CY - not in MDR.sourceTools
 
-	dForHeader	:=	withUID	: persist('persist::headerbuild_certegy_src');
-	dForOther	:=	withUID;
-	ReturnValue	:=	if(pForHeaderBuild,
-					   dForHeader,
-					   dForOther
-					  );
-	return ReturnValue;
+	return withUID;
   end
  ;

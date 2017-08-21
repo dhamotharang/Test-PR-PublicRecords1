@@ -1,15 +1,28 @@
-import ut;
+import doxie, VersionControl;
 
-pre1 := ut.SF_MaintBuilding('~thor_data400::base::busreg_company');
-pre2 := ut.sf_maintBuilding('~thor_data400::base::busreg_contact');
+export proc_build_keys(string pversion) :=
+module
 
-ut.MAC_SK_BuildProcess_v2(busreg.key_busreg_company_bdid,'~thor_data400::key::busreg_company_bdid',do1);
-ut.MAC_SK_BuildProcess_v2(busreg.key_busreg_contact_bdid,'~thor_data400::key::busreg_contact_bdid',do2);
+	shared names := keynames(pversion).roxie;
+	
+	VersionControl.macBuildNewLogicalKeyWithName(key_busreg_company_bdid	,names.companies.bdid.new		,BuildCompanyBdidKey	);
+	VersionControl.macBuildNewLogicalKeyWithName(key_busreg_contact_bdid	,names.contacts.bdid.new		,BuildContactBdidKey	);	
+	VersionControl.macBuildNewLogicalKeyWithName(key_busreg_company_linkids.key, names.LinkIDS.Company_Link_IDS.new, BuildCompanyLinkIdsKey);
+	
+	export full_build :=
+	sequential(
+		 parallel(
+							 BuildCompanyBdidKey
+							,BuildContactBdidKey
+							,BuildCompanyLinkIdsKey		
+						  )
+		,Promote(pversion, 'key').New2Built
+	);
 
-ut.MAC_SK_Move_v2('~thor_data400::key::busreg_company_bdid','Q',do3,2);
-ut.MAC_SK_Move_v2('~thor_Data400::key::busreg_contact_bdid','Q',do4,2);
+	export All :=
+	if(VersionControl.IsValidVersion(pversion)
+		,full_build
+		,output('No Valid version parameter passed, skipping BusReg.proc_build_keys atribute')
+	);
 
-post1 := ut.SF_MaintBuilt('~thor_data400::base::busreg_company');
-post2 := ut.SF_MaintBuilt('~thor_Data400::base::busreg_contact');
-
-export proc_build_keys := sequential(pre1,pre2,do1,do2,do3,do4,post1,post2);
+end;

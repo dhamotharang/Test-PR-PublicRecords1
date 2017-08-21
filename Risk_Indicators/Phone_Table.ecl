@@ -26,7 +26,7 @@ rec := RECORD
 	STRING2 	nxx_type := '';
 END;
 
-rec slimg(gong.File_Gong_History_Full le) := TRANSFORM
+rec slimg(gong.File_History_Full_Prepped_for_Keys le) := TRANSFORM
 	SELF.dt_first_seen := (unsigned3)(le.dt_first_seen[1..6]);
 	SELF.isCurrent := le.current_record_flag='Y';
 	SELF.potDisconnect := ~SELF.isCurrent;

@@ -3,7 +3,7 @@
 EXPORT MAC_Field_Initial_Specificities(infile,infield,outfile) := MACRO
 	#uniquename(init_record)
 		%init_record% := RECORD
-			STRING InitialChar := infile.infield[1]; // ask Edin if we need to do a lefttrim first?
+			SALT32.StrType InitialChar := infile.infield[1]; // ask Edin if we need to do a lefttrim first?
 			infile;
 		END;
 	#uniquename(Raw_Init)

@@ -1,0 +1,26 @@
+EXPORT Layout_MichiganStateDeath_data := RECORD
+	STRING6		fileno;
+	STRING2		occurrence_state;
+	STRING2		occurrence_county;
+	STRING4		occurrence_civil_division;
+	STRING2		residence_state;
+	STRING2		residence_county;
+	STRING4		residence_civil_division;
+	STRING15	lname;
+	STRING10	fname;
+	STRING10	mname;
+	STRING1		alias_code;
+	STRING4		dod_yr;
+	STRING2		dod_mth;
+	STRING2		dod_day;
+	STRING4		dob_yr;
+	STRING2		dob_mth;
+	STRING2		dob_day;
+	STRING1		decedent_sex;
+	STRING9		ssn;
+	STRING25	addr;
+	STRING15	city;
+	STRING2		state;
+	STRING15	father_surname;
+	STRING1		lf;
+END;

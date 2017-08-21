@@ -83,16 +83,21 @@ Business_Header_SS.MAC_Match_Flex
 	,fname	
 	,												//pContact_mname					= ''
 	,lname			
+	,												//,contact_ssn					  = ''
+	,src/*change to sub_source when available!*/												//,source					        = ''
+	,src_rcid												//,source_record_id				= ''
 )
 
-outfile_v2_p := outfile_v2_0 : persist('~thor_data400::cemtemp::outfile_v2');
+outfile_v2_p := outfile_v2_0 ;//: persist('~thor_data400::cemtemp::outfile_v2');
 
-outfile_v2 := 
+outfile_v2_many := 
 if(
 	UseBIPPersist,
 	dataset('~thor_data400::cemtemp::outfile_v2', recordof(outfile_v2_0), thor),
 	outfile_v2_p
 );
+
+outfile_v2 := dedup(sort(outfile_v2_many, rid, -proxscore, proxid), rid);
 
 // ** WORK FOR OUTPUTS
 
@@ -199,12 +204,69 @@ FUNCTION
 		,output(enth(lostNotInHeader, 100), named('lostNotInHeader' + s))
 		,output(tlnhsrc, named('lostNotInHeader_by_src_' + s))		
 		,output(count(lostNotInHeader), named('cnt_lostNotInHeader' + s))
-		,output(enth(lnhsmp, 100), named('sample_lostNotInHeader' + s))
+		,output(enth(lnhsmp, 100), named('sample_lostNotInHeader' + s))		
 		,output(outfile_v2(proxscore >= thresh),,'~thor_data_400::bipv2external.gte' + (string)thresh,overwrite)
 		,output(outfile_v2(proxscore < thresh),,'~thor_data_400::bipv2external.le' + (string)thresh,overwrite)
 		
 	);
 end;
+
+// ** SUPPORT FOR PRECISION REVIEW SAMPLES
+import tools;
+
+f(integer i, string s) :=
+function
+
+samps := 5;
+sampsize := 20;
+total := samps * sampsize;
+e := enth(outfile_v2(proxid >0), total);
+
+dsq := e[i*sampsize+1..(i+1)*sampsize];
+k := bizlinkfull.Process_Biz_Layouts.key;
+myk := k(proxid in set(dsq, proxid));
+
+cr := 
+{e.rid, e.src, myk.proxid, e.ProxScore, e.ProxWeight, string25 note; myk.company_name, myk.prim_range, myk.prim_name, myk.sec_range, myk.zip, myk.p_city_name, 
+	myk.st, myk.company_phone, myk.company_fein, myk.fname, myk.lname, myk.contact_email
+};
+str_ext_note := '--- external input ---';
+mykslim := 
+project(
+	myk,
+	transform(
+		cr,
+		self := left,
+		self.note := 'matching header data',
+		self := []
+	)
+)+
+project(
+	dsq,
+	transform(
+		cr,
+		self.proxid := left.proxid - 1, //this for sorting only and corrected before output
+		self.note := str_ext_note,
+		self.prim_range := left.company_prim_range,
+		self.prim_name := left.company_prim_name,	
+		self.zip := left.company_zip,
+		self.sec_range := left.company_sec_range,
+		self.p_city_name := left.company_city,
+		self.st := left.company_state,
+		self.contact_email := left.email_Address,
+		self := left
+
+	)
+);	
+krolled := tools.mac_AggregateFieldsPerID(mykslim, proxid,,,,TRUE);
+
+return output(sort(project(krolled, transform({krolled}, self.proxid := if(left.notes[1].note = str_ext_note, left.proxid + 1, left.proxid), self := left)), proxid, notes[1].note)
+, named(s+'_precision_reviews'));
+
+end;
+
+// ** END SUPPORT FOR PRECISION REVIEW SAMPLES
+
 
 // ** ACTUAL OUTPUTS
 
@@ -222,10 +284,18 @@ output(tbipsrc25, named('bips_by_src_thresh_25'));
 output(tbipsrc50, named('bips_by_src_thresh_50'));
 output(tbipsrc75, named('bips_by_src_thresh_75'));
 
-output(outfile_v2,,'~thor_data_400::bipv2external.'+version+workunit);
-output(outfile_v2(proxid <> seleid), named('prox_ne_sele'));
-output(outfile_v2(orgid <> seleid), named('org_ne_sele'));
-output(outfile_v2(ultid <> orgid), named('ult_ne_org'));
+output(outfile_v2(proxscore < ultscore), named('IDParentsLift'));
+output(outfile_v2_many,,'~thor_data_400::bipv2external.'+version+workunit);
+
+//output precision reviews - OFF by default just because they are slow
+// f(0, 'CM');
+// f(1, 'TL');
+// f(2, 'LB');
+// f(3, 'DW');
+// f(4, 'SS');
+
+
+// ** END PRECISION REVIEW SAMPLES
 
 //both
 // outputLost(wbdid, wbip, 0);

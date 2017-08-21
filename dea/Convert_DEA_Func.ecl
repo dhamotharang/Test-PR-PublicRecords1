@@ -55,8 +55,21 @@ layout_dea_flat iterate_dea(layout_dea_flat l,layout_dea_flat r) := transform
 	itr_out := iterate(sort_out,iterate_dea(left,right),local);
 
 
-retval := itr_out(trim(content) <> '' and trim(content) <> ';');
+// External key
+	
+	layout_dea_flat MakeKeySegs( itr_out l, unsigned2 segno ) := TRANSFORM
+		self.Dea_Registration_Number := l.Dea_Registration_Number;
+        self.docref.doc := l.docref.doc;
+        self.docref.src := l.docref.src;
+		self.segment := segno;
+        self.content := l.Dea_Registration_Number;
+        self.sect := 1;
+    END;
 
-return retval;
+    segkeys := PROJECT(itr_out(trim(content) <> '' and trim(content) <> ';'),MakeKeySegs(LEFT,250));
+
+	full_ret := itr_out(trim(content) <> '' and trim(content) <> ';') + segkeys;
+	
+	return full_ret;
 			
 end;

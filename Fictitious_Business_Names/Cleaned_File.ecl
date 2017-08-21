@@ -15,4 +15,4 @@ Fictitious_Business_Names.Layout_Cleaned_File xform(file_in l) := Transform
 	self.CCT2_Clean_cleaning_score		:= l.clean_cleaned_name_2[71..73]		;
 	self :=l;
 end;
-export Cleaned_File := Project(file_in,xform(left));
+export Cleaned_File := Project(file_in,xform(left)) : persist('persist::Ficititious_Business_Names::Cleaned_File');

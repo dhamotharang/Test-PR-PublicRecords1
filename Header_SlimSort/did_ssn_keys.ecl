@@ -1,10 +1,14 @@
-import ut;
+import ut, roxiekeybuild;
+
+export did_ssn_keys(string filedate) := 
+function
 
 pre1 := if (fileservices.getsuperfilesubcount('~thor_Data400::base::did_ssn_glb_BUILDING') > 0,
 		output('Nothing added to SSN_GLB Building superfile'),
 		fileservices.addsuperfile('~thor_Data400::base::did_ssn_glb_BUILDING','~thor_Data400::base::did_ssn_glb',0,true));
 
-ut.MAC_SK_BuildProcess(key_prep_did_ssn,'~thor_Data400::key::did_ssn_glb','~thor_Data400::key::did_ssn_glb',ssnglb,2)
+RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(key_prep_did_ssn,'~thor_Data400::key::did_ssn_glb','~thor_data400::key::header_slimsort::'+filedate+'::did_ssn_glb',ssnglb);
+RoxieKeybuild.Mac_SK_Move_to_Built_v2(                      '~thor_Data400::key::did_ssn_glb','~thor_data400::key::header_slimsort::'+filedate+'::did_ssn_glb',mv_ssnglb);
 
 post1 := sequential(
 		fileservices.clearsuperfile('~thor_Data400::base::did_ssn_glb_BUILT'),
@@ -15,7 +19,8 @@ pre2 := if (fileservices.getsuperfilesubcount('~thor_Data400::base::did_ssn_nong
 		output('Nothing added to SSN_NonGLB Building superfile'),
 		fileservices.addsuperfile('~thor_Data400::base::did_ssn_Nonglb_BUILDING','~thor_Data400::base::did_ssn_Nonglb',0,true));
 
-ut.MAC_SK_BuildProcess(key_prep_did_ssn_NonGlb,'~thor_Data400::key::did_ssn_nonglb','~thor_Data400::key::did_ssn_nonglb',ssnnonglb,2)
+RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(key_prep_did_ssn_NonGlb,'~thor_Data400::key::did_ssn_nonglb','~thor_data400::key::header_slimsort::'+filedate+'::did_ssn_nonglb',ssnnonglb);
+RoxieKeybuild.Mac_SK_Move_to_Built_v2(                             '~thor_Data400::key::did_ssn_nonglb','~thor_data400::key::header_slimsort::'+filedate+'::did_ssn_nonglb',mv_ssnnonglb);
 
 post2 := sequential(
 		fileservices.clearsuperfile('~thor_Data400::base::did_ssn_nonglb_BUILT'),
@@ -26,7 +31,8 @@ pre3 := if (fileservices.getsuperfilesubcount('~thor_Data400::base::did_ssn_nonU
 		output('Nothing added to SSN_NonUtil Building superfile'),
 		fileservices.addsuperfile('~thor_Data400::base::did_ssn_nonUtil_BUILDING','~thor_Data400::base::did_ssn_nonUtil',0,true));
 
-ut.MAC_SK_BuildProcess(key_prep_did_ssn_NonUtil,'~thor_Data400::key::did_ssn_NonUtil','~thor_Data400::key::did_ssn_NonUtil',ssnnonUtil,2)
+RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(key_prep_did_ssn_NonUtil,'~thor_Data400::key::did_ssn_nonutil','~thor_data400::key::header_slimsort::'+filedate+'::did_ssn_nonutil',ssnnonutil);
+RoxieKeybuild.Mac_SK_Move_to_Built_v2(                              '~thor_Data400::key::did_ssn_nonutil','~thor_data400::key::header_slimsort::'+filedate+'::did_ssn_nonutil',mv_ssnnonutil);
 
 post3 := sequential(
 		fileservices.clearsuperfile('~thor_Data400::base::did_ssn_NonUtil_BUILT'),
@@ -37,7 +43,8 @@ pre4 := if (fileservices.getsuperfilesubcount('~thor_Data400::base::did_ssn_NonG
 		output('Nothing added to SSN_NonGLB_NonUtil Building superfile'),
 		fileservices.addsuperfile('~thor_Data400::base::did_ssn_NonGlb_NonUtil_BUILDING','~thor_Data400::base::did_ssn_NonGlb_NonUtil',0,true));
 
-ut.MAC_SK_BuildProcess(key_prep_did_ssn_NonGlb_NonUtil,'~thor_Data400::key::did_ssn_NonGlb_NonUtil','~thor_Data400::key::did_ssn_NonGlb_NonUtil',ssnnonglbnonUtil,2)
+RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(key_prep_did_ssn_NonGlb_NonUtil,'~thor_Data400::key::did_ssn_NonGlb_NonUtil','~thor_data400::key::header_slimsort::'+filedate+'::did_ssn_NonGlb_NonUtil',ssnnonglbnonUtil);
+RoxieKeybuild.Mac_SK_Move_to_Built_v2(                                     '~thor_Data400::key::did_ssn_NonGlb_NonUtil','~thor_data400::key::header_slimsort::'+filedate+'::did_ssn_NonGlb_NonUtil',mv_ssnnonglbnonUtil);
 
 post4 := sequential(
 		fileservices.clearsuperfile('~thor_Data400::base::did_ssn_NonGlb_NonUtil_BUILT'),
@@ -46,18 +53,22 @@ post4 := sequential(
 
 full1 := if (fileservices.getsuperfilesubname('~thor_Data400::base::did_ssn_glb_BUILT',1) = fileservices.getsuperfilesubname('~thor_data400::base::did_ssn_glb',1),
 		output('SSN_GLB Base = BUILT. Nothing Done.'),
-		sequential(pre1,ssnglb,post1));
+		sequential(pre1,ssnglb,mv_ssnglb,post1));
 		
 full2 := if (fileservices.getsuperfilesubname('~thor_Data400::base::did_ssn_nonglb_BUILT',1) = fileservices.getsuperfilesubname('~thor_data400::base::did_ssn_nonglb',1),
 		output('SSN_NonGLB Base = BUILT. Nothing Done.'),
-		sequential(pre2,ssnnonglb,post2));
+		sequential(pre2,ssnnonglb,mv_ssnnonglb,post2));
 
 full3 := if (fileservices.getsuperfilesubname('~thor_Data400::base::did_ssn_nonUtil_BUILT',1) = fileservices.getsuperfilesubname('~thor_data400::base::did_ssn_nonUtil',1),
 		output('SSN_NonUtil Base = BUILT. Nothing Done.'),
-		sequential(pre3,ssnnonutil,post3));
+		sequential(pre3,ssnnonutil,mv_ssnnonutil,post3));
 
 full4 := if (fileservices.getsuperfilesubname('~thor_Data400::base::did_ssn_nonGLB_NonUtil_BUILT',1) = fileservices.getsuperfilesubname('~thor_data400::base::did_ssn_nonGlb_NonUtil',1),
 		output('SSN_NonGLB_NonUtil Base = BUILT. Nothing Done.'),
-		sequential(pre4,ssnnonglbnonutil,post4));
+		sequential(pre4,ssnnonglbnonutil,mv_ssnnonglbnonutil,post4));
 
-export did_ssn_keys := sequential(full1,full2,full3,full4);
+did_ssn_keys := sequential(full1,full2,full3,full4);
+
+return did_ssn_keys;
+
+end;

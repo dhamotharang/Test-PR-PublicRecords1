@@ -1,4 +1,4 @@
-export rec_WithExpParty :=  record
+export Layout_Moxie_WithExpParty :=  record
 	string1   	record_type; 		 // current/historical
 	string1   	isDirect;
 	string2   	ucc_vendor;

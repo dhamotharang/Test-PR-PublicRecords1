@@ -11,7 +11,7 @@ EXPORT proc_Kickoff_PostProcess(
 functionmacro
 
   ecl		  := '#workunit(\'name\',\'BIPV2_Build.proc_Build_PostProcess @version@ ' + pUniqueOutput + '\');\n#workunit(\'priority\',\'high\');\n' 
-  + 'output(\'<a href="http://' + wk_ut._Constants.LocalEsp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit + '#/stub/Summary">Parent Workunit</a>\' ,named(\'Parent_Wuid__html\'));\n'
+  // + 'output(\'<a href="http://' + wk_ut._Constants.LocalEsp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit + '#/stub/Summary">Parent Workunit</a>\' ,named(\'Parent_Wuid__html\'));\n'
   + 'BIPV2_Build.proc_Build_PostProcess(\'@version@\'\n'
   + ',@pSkipDOTSpecsPost@\n'         
   + ',@pSkipSeleRelSpecsPost@\n' 

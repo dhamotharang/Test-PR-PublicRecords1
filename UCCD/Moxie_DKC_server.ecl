@@ -1,1 +1,2 @@
-export Moxie_DKC_server := '10.150.13.201';
+import _control;
+export Moxie_DKC_server := _control.IPAddress.edata14a;

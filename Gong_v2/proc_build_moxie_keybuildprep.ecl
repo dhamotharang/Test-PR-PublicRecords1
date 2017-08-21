@@ -1,4 +1,4 @@
-import Gong,lib_metaphone,lib_KeyLib,Address,ut;
+import Gong,lib_metaphone,lib_KeyLib,Address,ut, lib_stringlib;
 
 #uniquename(keyPrepLayout)
 #uniquename(appndKeyFields)
@@ -74,13 +74,13 @@ string6 long10 		:= intformat((integer) ((longitude + 180) * milesperdegree / 10
 /* ------------------------------------------------------------------------------------------- */
 
 
-self.addr			:= stringlib.stringtouppercase(trim(L.prim_range)+' '+
+self.addr			:= StringLib.StringCleanSpaces(stringlib.stringtouppercase(trim(L.prim_range)+' '+
 					   trim(L.predir)+' '+
 					   trim(L.prim_name)+' '+
 					   trim(L.suffix)+' '+
 					   trim(L.postdir)+' '+
 					   trim(L.unit_desig)+' '+
-					   trim(L.sec_range));
+					   trim(L.sec_range)));
 self.area			:= L.phoneno[1..3];
 //self.cityd			:= stringlib.stringtouppercase(L.p_city_name)[1..13]; derived in Gong_v2.proc_build_moxie_phoneKeys
 self.cn				:= if(%isCompany%,keyLib.GongDacName(L.company_name+' '+L.caption_text),'');
@@ -116,8 +116,8 @@ self.neighbor		:= stringlib.stringtouppercase(L.prim_name
 					  +L.suffix
 					  +L.predir
 					  +L.postdir
-					  +L.prim_range
-					  +L.sec_range);
+					  +'          '[1..10-length(trim(l.prim_range, all))] + trim(l.prim_range, all)
+					  +'          '[1..8-length(trim(l.sec_range, all))] + trim(l.sec_range, all));
 
 self.pcn			:= if(%isCompany%,keyLib.GongDaphcName(L.company_name+' '+L.caption_text),'');
 self.pct    		:= lib_metaphone.MetaphoneLib.DMetaphone1(L.p_city_name);

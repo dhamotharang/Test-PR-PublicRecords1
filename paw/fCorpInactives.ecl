@@ -1,4 +1,4 @@
-IMPORT corp2;
+IMPORT corp2,ut;
 
 /* 	
 
@@ -35,8 +35,8 @@ The process for determining inactive Corporations
 EXPORT fCorpInactives(
 
 	 dataset(layout.StatusDescLayout								) pInactiveDescFile 				= dataset('~thor_data400::lookup::paw::inactive_desc::table',layout.StatusDescLayout,CSV(SEPARATOR([',']), quote('"'),TERMINATOR(['\r\n'])))
-	,dataset(corp2.Layout_Corporate_Direct_Corp_Base) pCorpBase									= corp2.files().base.corp.qa
-	,string																						pPersistname							= persistnames.f_CorpInactives
+	,dataset(corp2.Layout_Corporate_Direct_Corp_Base) pCorpBase									= corp2.files().base.corp.prod
+	,string																						pPersistname							= persistnames().f_CorpInactives
 	,boolean																					pShouldRecalculatePersist	= true
 )	:= 
 function

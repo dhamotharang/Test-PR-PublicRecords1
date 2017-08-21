@@ -19,7 +19,7 @@ export BKv2_as_source(dataset(BankruptcyV2.layout_bankruptcy_search) pBK_Search 
 	f_search := distribute(dSourceSearchData(case_number[1..3] <> '449'),hash(case_number,court_code));
 	f_main := distribute(dSourceMainData(case_number[1..3] <> '449'),hash(case_number,court_code));
 
-	src_rec := record
+	src_rec := record, maxlength(32766)
 	 header.layout_Source_ID;
 	 BankruptcyV2.layout_bk_source;
 	end;

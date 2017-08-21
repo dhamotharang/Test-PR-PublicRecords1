@@ -1,4 +1,4 @@
-import doxie, tools,autokeyb2;
+import doxie, tools,autokeyb2,mdr;
 
 export Keys(
 
@@ -9,7 +9,7 @@ export Keys(
 module
 
 	shared Base					:= Files(pversion).Base.Built;
-	shared dkeybuild		:= project(Base, transform(layouts.keybuild, self := left));
+	shared dkeybuild		:= project(Base, transform(layouts.keybuild, self.subject_ssn := if(mdr.sourceTools.sourceIsUtility(left.source), 0, left.subject_ssn), self := left));
 
 	shared FilterBdids	:= dkeybuild(bdid	!= 0);
 	shared FilterDids		:= dkeybuild(did		!= 0);

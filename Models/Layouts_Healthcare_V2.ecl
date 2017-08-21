@@ -1,4 +1,4 @@
-﻿Import Models;
+Import Models;
 Import Profilebooster;
 
 EXPORT Layouts_Healthcare_V2 := module 

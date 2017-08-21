@@ -1,0 +1,35 @@
+import liensv2, address;
+export layout_base_allsources_party := record
+
+string50 tmsid;
+string50 rmsid;
+string1830 orig_full_debtorname := '';
+string700 orig_name := ''; 
+string50 orig_lname := '';
+string50 orig_fname := '';
+string50 orig_mname := '';
+string10 orig_suffix := '';
+string9 tax_id := '';
+string9 ssn := '';
+address.Layout_Clean_Name;
+string500 cname := '';
+string200 orig_address1 := '';
+string200 orig_address2 := '';
+string75 orig_city := '';
+string50 orig_state := '';
+string25 orig_zip5 := '';
+string20 orig_zip4 := '';
+string5 orig_county := '';
+string5 orig_country :='';
+address.Layout_Clean182;
+string20 phone := '';
+string2 name_type := '';
+string12 DID  := '';
+string12 BDID := '';
+string8  date_first_seen := '';
+string8  date_last_seen := '';
+string8  date_vendor_first_reported := '';
+string8  date_vendor_last_reported := '';
+string9 app_SSN := '';
+string9 app_tax_id := '';
+end;

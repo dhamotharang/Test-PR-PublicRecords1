@@ -1,4 +1,4 @@
-﻿EXPORT Layouts := Module
+EXPORT Layouts := Module
 
 EXPORT business_bdid_layout := record
 	unsigned6 BDID:=0;
@@ -151,12 +151,12 @@ EXPORT	Layout_People 	:= Record
 	EXPORT slim_child_seleid_address := layout_child_seleid_address - [prim_range,prim_name,sec_range,zip];
 	
 	EXPORT layout_parent_address := record
+		integer BDID_cnt:= 0;
+		integer seleid_cnt := 0;
 		qstring10 prim_range;
 		qstring28 prim_name;
 		qstring8 sec_range;
 		string5 zip;
-		integer BDID_cnt:= 0;
-		integer seleid_cnt := 0;
 		dataset(slim_child_bdid_address,ChooseN(50)) Businesses_bdid := dataset([],slim_child_bdid_address) ;
 		dataset(slim_child_seleid_address,ChooseN(50)) Businesses_seleid := dataset([],slim_child_seleid_address) ;
 	end;

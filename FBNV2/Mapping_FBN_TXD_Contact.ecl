@@ -1,8 +1,8 @@
-import ut,fbnv2;
+import ut,fbnv2,address,_validate;
 
 dFiling			            := FBNV2.File_TX_Dallas_xml(filingnumber<>'' );
 
-layout_common.contact tFiling(dFiling pInput)
+layout_common.contact_AID tFiling(dFiling pInput)
    :=TRANSFORM
            
 		    string  clean_address           := if(pInput.owneraddress='',pInput.clean_address,pInput.clean_own_addres);
@@ -11,10 +11,10 @@ layout_common.contact tFiling(dFiling pInput)
 			self.tmsid					    := 'TXD'+ pInput.filingNumber;
 			self.rmsid                      := ''+if(pInput.FILingNUMBER<>'',hash(pInput.FILingNUMBER+pinput.BUSADDRESS),
 			                                    			if(pInput.filingDATE<>'',hash(pInput.filingDATE+pinput.BUSADDRESS),hash(pinput.BUSADDRESS)));
-			self.dt_first_seen      		:= (integer) pInput.filingdate ;
-			self.dt_last_seen       		:= (integer) pInput.filingdate ;
-			self.dt_vendor_first_reported  	:= (integer) pInput.filingdate ;
-			self.dt_vendor_last_reported  	:= (integer) pInput.filingdate ;
+			self.dt_first_seen      		:= if(_validate.date.fIsValid((string) pInput.filingdate), (integer) pInput.filingdate,0); 
+			self.dt_last_seen       		:= if(_validate.date.fIsValid((string) pInput.filingdate), (integer) pInput.filingdate,0); 
+			self.dt_vendor_first_reported  	:= if(_validate.date.fIsValid((string) pInput.DateLastTrans), (integer) pInput.DateLastTrans,0); 
+			self.dt_vendor_last_reported  	:= if(_validate.date.fIsValid((string) pInput.DateLastTrans), (integer) pInput.DateLastTrans,0); 
 			self.contact_type	    		:= 'O';
 			self.contact_name_format		:= IF(pinput.pname='','C','P');
 			self.contact_name			    := pInput.ownerflName ;
@@ -25,6 +25,7 @@ layout_common.contact tFiling(dFiling pInput)
 			self.lname					    :=	pInput.pname[46..65];
 			self.name_suffix				:=	pInput.pname[66..70];
 			self.name_score			        :=	pInput.pname[71..73];
+/*
 			self.prim_range 				:=	clean_address[1..10];			
 			self.predir 					:=	clean_address[11..12];			
 			self.prim_name 					:=	clean_address[13..40];			
@@ -44,18 +45,37 @@ layout_common.contact tFiling(dFiling pInput)
 			self.cbsa						:=	clean_address[167..170];			
 			self.geo_blk 					:=	clean_address[171..177];			
 			self.geo_match 					:=	clean_address[178];			
-			self.err_stat 					:=	clean_address[179..182];		
+			self.err_stat 					:=	clean_address[179..182];
+*/
+			self.prep_addr_line1			:= address.Addr1FromComponents(
+																					stringlib.stringtouppercase(if(trim(pInput.owneraddress,left,right)='',
+																																				 trim(pInput.BusAddress,left,right),trim(pInput.owneraddress,left,right)))
+																					,''
+																					,''
+																					,''
+																					,''
+																					,''
+																					,'');
+			self.prep_addr_line_last	:= address.Addr2FromComponents(
+																					stringlib.stringtouppercase(if(trim(pInput.ownerCity)='',
+																																				 trim(pInput.BusCity,left,right),
+																																				 trim(pInput.ownerCity,left,right)))
+																					,stringlib.stringtouppercase(if(trim(pInput.ownerState)='',
+																																					trim(pInput.BusState,left,right),
+																																					trim(pInput.ownerState,left,right)
+																																				 ))
+																					,if(trim(pInput.ownerZIP[1..5]) ='', pInput.BusZip[1..5], pInput.ownerZip[1..5]));
+			self                := pinput;
 
 	 end;
-layout_common.contact  rollupXform(layout_common.contact pLeft, layout_common.contact pRight) 
+layout_common.contact_AID  rollupXform(layout_common.contact_AID pLeft, layout_common.contact_AID pRight) 
 	:= transform
 		
-		self.Dt_First_Seen := IF(pLeft.dt_First_Seen > pRight.dt_First_Seen, pRight.dt_First_Seen, pLeft.dt_First_Seen);
-		self.Dt_Last_Seen  := IF(pLeft.dt_Last_Seen  < pRight.dt_Last_Seen,  pRight.dt_Last_Seen,  pLeft.dt_Last_Seen);
-		self.Dt_Vendor_First_Reported := IF(pLeft.dt_Vendor_First_Reported > pRight.dt_Vendor_First_Reported, 
-											pRight.dt_Vendor_First_Reported, pLeft.dt_Vendor_First_Reported);
-		self.Dt_Vendor_Last_Reported  := IF(pLeft.dt_Vendor_Last_Reported  < pRight.dt_Vendor_Last_Reported,  
-											pRight.dt_Vendor_Last_Reported, pLeft.dt_Vendor_Last_Reported);
+		self.Dt_First_Seen := ut.Min2(pLeft.dt_First_Seen,pRight.dt_First_Seen);
+		self.Dt_Last_Seen  := MAX(pLeft.dt_Last_Seen ,pRight.dt_last_seen);
+		self.Dt_Vendor_First_Reported := ut.min2(pLeft.dt_Vendor_First_Reported,pRight.dt_Vendor_First_Reported);
+		self.Dt_Vendor_Last_Reported  := MAX(pLeft.dt_Vendor_Last_Reported,pRight.dt_Vendor_Last_Reported);
+
 		self := pLeft;
 	END;
 	

@@ -49,4 +49,4 @@ self.party1_age							:=le.groom_age;
  
 end;
 
-export mapping_ca_marriage := project(marriage_divorce_v2.File_Marriage_CA_In,t_map_to_common(left)) : persist('mar_div_ca_mar');
+export mapping_ca_marriage := project(marriage_divorce_v2.File_Marriage_CA_In,t_map_to_common(left));// : persist('mar_div_ca_mar');

@@ -1,10 +1,8 @@
-import InfoUSA;
+import InfoUSA, Business_HeaderV2;
 
-file_in   := infousa.File_ABIUS_Company_Data_In;
-
-file_sort := sort(distribute(file_in, 
-	hash(ABI_NUMBER, PRIMARY_SIC, CONTACT_NAME, COMPANY_NAME, STREET1,  CITY1, STATE1, ZIP1_5, PHONE, CONTACT_LNAME, CONTACT_FNAME)), record, except process_date, local);  
-
+file_in   := Business_HeaderV2.Source_Files.abius.BusinessHeader;
+file_dist := distribute(file_in, hash(ABI_NUMBER, CONTACT_NAME, COMPANY_NAME, STREET1));
+file_sort := sort(file_dist, record, except process_date, local);  
 
 InfoUSA.Layout_ABIUS_Company_Data_In  rollupXform(InfoUSA.Layout_ABIUS_Company_Data_In l, InfoUSA.Layout_ABIUS_Company_Data_In r) := transform
 		

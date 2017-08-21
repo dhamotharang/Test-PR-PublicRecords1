@@ -1,6 +1,10 @@
-import doxie;
+import doxie, PRTE2_Business_Header;
 
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+r := prte2_business_header.BDID_Table;
+#ELSE
 r := business_risk.BDID_Table;
+#END;
 
 Layout_BDID_Risk_Table := 
  RECORD

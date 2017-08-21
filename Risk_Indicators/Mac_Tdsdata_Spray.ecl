@@ -1,6 +1,6 @@
 import roxiekeybuild,ut;
 
-export Mac_Tdsdata_Spray(sourceIP,sourcefile,filedate,group_name='\'thor_200\'',email_target='\' \'') := 
+export Mac_Tdsdata_Spray(sourceIP,sourcefile,filedate,group_name='\'thor400_20\'',email_target='\' \'') := 
 macro
 #uniquename(spray_tdsdata)
 #uniquename(super_tdsdata)
@@ -17,13 +17,11 @@ macro
 #uniquename(send_success_msg)
 #uniquename(send_failure_msg)
 #uniquename(updatedops)
-%updatedops% := RoxieKeyBuild.updateversion('TelcordiaTdsKeys',filedate,'john.freibaum@lexisnexis.com');
+#uniquename(TDS_transform)
 
-#workunit('name','tdsdata Spray '+filedate);
-
-%recordsize% :=21;
-
-%spray_tdsdata% := FileServices.SprayFixed(sourceIP,sourcefile, %recordsize%, group_name,'~thor_data400::in::tdsdata_'+filedate ,-1,,,true,true);
+%spray_tdsdata% 		:= fileservices.sprayvariable(sourceIP,sourcefile,,'\t',,'','thor400_20','~thor_data400::raw::tdsdata::'+filedate,-1,,,true,true);
+%TDS_transform% 		:= Risk_Indicators.TDS_Transform(filedate); /*transforms the raw file into the input file*/
+%updatedops% 				:= RoxieKeyBuild.updateversion('TelcordiaTdsKeys',filedate,'john.freibaum@lexisnexis.com',,'N|F|BN');
 
 
 %super_tdsdata% := sequential(FileServices.StartSuperFileTransaction(),
@@ -46,7 +44,6 @@ ut.MAC_SK_Move('~thor_data400::key::telcordia_tds','Q',out1)
 %move_them% := sequential(key1,key1_built,out1);
 
 %mail_list% := 'john.freibaum@lexisnexis.com';
-// %mail_list% := 'kgummadi@seisint.com';
 
 %send_success_msg% := FileServices.sendemail('john.freibaum@lexisnexis.com','tdsdata Spray Succeeded','tdsdata Spray Succeeded');
 
@@ -55,7 +52,7 @@ ut.MAC_SK_Move('~thor_data400::key::telcordia_tds','Q',out1)
 RoxieKeyBuild.Mac_Daily_Email_Local('TELCORDIA_TDS','SUCC',filedate,%send_succ_msg%,%mail_list%);
 RoxieKeyBuild.Mac_Daily_Email_Local('TELCORDIA_TDS','FAIL',filedate,%send_fail_msg%,%mail_list%);
 
-sequential(%spray_tdsdata%,%super_tdsdata%,%move_them%,%updatedops%)
+sequential(%spray_tdsdata%,%TDS_transform%,%super_tdsdata%,%move_them%,%updatedops%, Risk_Indicators.STRATA_TDS(filedate))
  : success(parallel(%send_succ_msg%,%send_success_msg%)),
    failure(parallel(%send_fail_msg%,%send_failure_msg%));
 

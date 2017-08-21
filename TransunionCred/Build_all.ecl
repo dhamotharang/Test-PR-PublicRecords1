@@ -1,22 +1,50 @@
-import ut, VersionControl;
+import VersionControl,lib_stringlib,lib_fileservices,_control,Orbit3,STD,PromoteSupers;
 export Build_all(string version=version) := function
 
 //-----------Spray input and delete files
 #IF (IsFullUpdate = false)
 spray_it := VersionControl.fSprayInputFiles(Spray.Updates);
+consolidate_them := TransunionCred.fn_consolidate_inputs.Updates;
 #ELSE
 spray_it := VersionControl.fSprayInputFiles(Spray.Load);
+consolidate_them := TransunionCred.fn_consolidate_inputs.Load;
 #END
 
-ut.MAC_SF_BuildProcess(Build_base,Superfile_List.Base, TransunionCred,2,,true);
+deletefilename := 'DPART1';
+
+checkfileexists(string deletefilename)
+ := if(count(FileServices.remotedirectory(_Control.IPAddress.bctlpedata11,'/data/hds_180/nb_temp/data/' + version ,deletefilename,false)(size <>0 )) = 1,
+	 true,
+	 false
+	);
+
+fail_on_no_deletes := sequential(STD.System.Email.SendEmail(_control.MyInfo.EmailAddressNotify,'',''),
+                                 output('no delete file spray')
+                        );
+
+spray_deletes := if(checkfileexists('DPART1'), VersionControl.fSprayInputFiles(Spray.deletes),fail_on_no_deletes);
+
+add_deletes   := if(FileServices.GetSuperFileSubCount(Superfile_List.deletes) = 0
+												,output('no_delete_this_time')
+,FileServices.AddSuperFile(Superfile_List.Deletes_father,Superfile_List.deletes,,true));
+
+delete_deletes := if(FileServices.GetSuperFileSubCount(Superfile_List.deletes) = 0
+												,output('no_delete_this_time')
+,FileServices.ClearSuperFile(Superfile_List.deletes));
+
+PromoteSupers.Mac_SF_BuildProcess(Build_base,Superfile_List.Base, TransunionCred,2,,true);
 
 zDoPopulationStats := Strata;
 
 built := sequential(
-					// spray_it
+					spray_it,
+          consolidate_them,
+					spray_deletes,
 					TransunionCred
 					,zDoPopulationStats
 					//Archive processed files in history
+					,add_deletes
+					,delete_deletes
 					,FileServices.StartSuperFileTransaction()
 #IF (IsFullUpdate = false)
 					,FileServices.AddSuperFile(Superfile_List.updates_history_compressed,Superfile_List.updates_father,,true)
@@ -29,6 +57,7 @@ built := sequential(
 					,FileServices.ClearSuperFile(Superfile_List.load)
 #END
 					,FileServices.FinishSuperFileTransaction()
+					,Orbit3.Proc_Orbit3_CreateBuild_npf(version,'TransunionCred')
 					);
 
 return built;

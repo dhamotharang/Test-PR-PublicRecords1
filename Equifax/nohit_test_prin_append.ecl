@@ -56,7 +56,7 @@ self.INQR_CITY := '';
 self.INQR_STATE := '';
 self.INQR_ZIP := '';
 self.INQR_TEL := '';
-//self.INQR_PRIN_BUS := '';
+self.INQR_PRIN_BUS := '';
 self.INQR_PRIN_TAX := '';
 self.INQR_PRIN_STREET := '';
 self.INQR_PRIN_CITY := '';
@@ -111,7 +111,7 @@ nh_prin_all := nh_prin_init + bh_contacts_select;
 prin_append_dist := distribute(nh_prin_all, hash(seq));
 prin_append_sort := sort(prin_append_dist, seq, local);
 prin_append_grp := group(prin_append_sort, seq, local);
-prin_append_grp_sort := sort(prin_append_grp, lname, datalib.PreferredFirst(fname), record_type, if(did <> 0, 0, 1), did, ut.TitleRank(company_title), mname);
+prin_append_grp_sort := sort(prin_append_grp, lname, NID.PreferredFirstVersionedStr(fname, NID.version), record_type, if(did <> 0, 0, 1), did, ut.TitleRank(company_title), mname);
 
 Layout_NoHit_Test_Prin_Append RollupPrincipals(Layout_NoHit_Test_Prin_Append l, Layout_NoHit_Test_Prin_Append r) := transform
 self := l;

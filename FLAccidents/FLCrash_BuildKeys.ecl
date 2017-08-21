@@ -234,8 +234,8 @@ pre1 := sequential(// Begin the file transaction process
 					fileservices.finishsuperfiletransaction()
 				   );
 					 
-email_send_list := 'jbello@seisint.com';
-// email_send_list := 'dqi@seisint.com,jbello@seisint.com,RoxieBuilds@seisint.com';
+email_send_list := '';
+// email_send_list := 'dqi@seisint.com,RoxieBuilds@seisint.com';
 
 
 RoxieKeyBuild.Mac_Daily_Email_Local('FLCRASH'
@@ -254,5 +254,4 @@ export flcrash_buildkeys := sequential(pre0,
 											 ,bk_did,bk_accnbr,bk_bdid,bk_dlnbr,bk_tagnbr,bk_vin,bk_linkids)
 										   ,move_build_keys
 										   ,move_qa_keys
-										   ,pre1) : success(send_succ_msg)
-										           ,failure(send_fail_msg); 
+										   ,pre1); 

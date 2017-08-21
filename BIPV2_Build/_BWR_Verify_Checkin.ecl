@@ -1,6 +1,7 @@
 /*
   make sure to run BIPV2_Build.Promote2QA before this so that the xlink keys are in the correct superfiles(QA).
 */
+import BIPV2,BIPV2_Build, wk_ut,BIPV2_Testing,Business_Header_SS,Debt_Settlement;
 ECL_Biz_Header_Service    := '#workunit(\'name\',\'bizlinkfull.Biz_Header_Service_2\');\n'                 + 'bizlinkfull.Biz_Header_Service_2();'                 ;
 ECL_svcWheelCity          := '#workunit(\'name\',\'bizlinkfull.svcWheelCity\');\n'                         + 'bizlinkfull.svcWheelCity();'                         ;
 ECL_svcBatch              := '#workunit(\'name\',\'bizlinkfull.svcBatch\');\n'                             + 'bizlinkfull.svcBatch();'                             ;
@@ -11,7 +12,7 @@ ECL_sourceservice         := '#workunit(\'name\',\'topbusiness_services.sourcese
 ECL_LGID3CompareService   := '#workunit(\'name\',\'BIPV2_LGID3.LGID3CompareService\');\n'                  + 'BIPV2_LGID3.LGID3CompareService();'                  ;
 ECL_ProxidCompareService  := '#workunit(\'name\',\'BIPV2_ProxID.ProxidCompareService\');\n'                + 'BIPV2_ProxID.ProxidCompareService();'                ;
 
-cluster := if(tools._Constants.IsDataland ,'infinband_hthor','hthor');
+cluster := wk_ut._Constants.LocalHthor;
 
 Kick_Biz_Header_Service    := wk_ut.CreateWuid(ECL_Biz_Header_Service  ,cluster);
 Kick_svcWheelCity          := wk_ut.CreateWuid(ECL_svcWheelCity        ,cluster);

@@ -1,6 +1,6 @@
 IMPORT Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
 Header, Header_Slimsort, didville, DID_Add,Business_Header_SS, NID, AID,Health_Provider_Services, 
-Health_Facility_Services, HealthCareFacility, HealthCare_Provider_Header, MPRD;
+Health_Facility_Services, HealthCareFacility, MPRD;
 
 EXPORT Update_Base (STRING filedate, BOOLEAN pUseProd = false) := MODULE
 
@@ -407,59 +407,38 @@ EXPORT Update_Base (STRING filedate, BOOLEAN pUseProd = false) := MODULE
 			,
 			);
 
-		Layout_In := RECORD
-			{d_bdid};
-      UNSIGNED8 UniqId;
-			UNSIGNED8 LNPID_Out := 0;
-      INTEGER2 xlink_distance;
-      STRING xlink_matches;
-      UNSIGNED xlink_keys;
-      INTEGER xlink_weight;
-      INTEGER xlink_score;
-      STRING xlink_segmentation;
-      INTEGER score;
-    END;
+		Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			d_bdid
+			,LNPID
+			,First_name
+			,Middle_name
+			,Last_NAME
+			,maturity_suffix
+			,//GENDER
+			,clean_prim_range
+			,clean_prim_name
+			,clean_sec_range
+			,clean_v_city_name
+			,clean_ST
+			,clean_ZIP
+			,//SSN
+			,//DOB
+			,clean_prac_phone1
+			,LIC1_STATE
+			,LIC1_num
+			,tin1
+			,DEA_NUM1
+			,group_key
+			,
+			,UPIN
+			,DID
+			,BDID
+			,//SRC
+			,//SOURCE_RID
+			,result,false,38
+			);
 
-    inFields := MODULE(HealthCare_Provider_Header.IxLinkInput)
-      EXPORT Input_UniqueID              := 'UniqId';
-      EXPORT Input_FNAME                 := 'First_name';
-      EXPORT Input_MNAME                 := 'Middle_name';
-      EXPORT Input_LNAME                 := 'Last_name';
-      EXPORT Input_SNAME                 := 'maturity_suffix';
-      EXPORT Input_GENDER                := 'gender';
-      EXPORT Input_TAXONOMY              := 'taxonomy';
-      EXPORT Input_LIC_TYPE              := 'lic1_type';
-      EXPORT Input_PRAC_PRIM_RANGE       := 'clean_prim_range';
-      EXPORT Input_PRAC_PRIM_NAME        := 'clean_prim_name';
-      EXPORT Input_PRAC_SEC_RANGE        := 'clean_sec_range';
-      EXPORT Input_PRAC_CITY             := 'clean_p_city_name';
-      EXPORT Input_PRAC_ST               := 'clean_st';
-      EXPORT Input_PRAC_ZIP              := 'clean_zip';
-      EXPORT Input_PRAC_PHONE            := 'clean_prac_phone1';
-      EXPORT Input_NPI_NUMBER            := 'npi_num';
-      EXPORT Input_UPIN                  := 'UPIN';
-      EXPORT Input_DEA_NUMBER            := 'dea_num1';
-      EXPORT Input_LIC_STATE             := 'lic1_state';
-      EXPORT Input_LIC_NBR               := 'lic1_num';
-      EXPORT Input_SSN                   := '';
-      EXPORT Input_DOB                   := '';
-		END;
-                                                
-    pDatasetPrep    := project(d_bdid, transform(layout_in, self := left, self := []));
-                                
-    ut.MAC_Sequence_Records(pDatasetPrep,UniqID,pDataset_seq);
-                                
-    pDataset_in := sort(distribute(pDataset_seq,hash(UniqID)),UniqID,local);
-                                
-    // uncomment for desired mode
-    HealthCare_Provider_Header.mac_xlinking_on_thor(pDataset_in, inFields, lnpid_results,
-							HealthCare_Provider_Header.Constants.XLinkMode.BestAppend,
-           // HealthCare_Provider_Header.Constants.XLinkMode.MatchesInclDetail,
-              // 'dummy_mode',
-              LNPID,
-              34, 6);                    
-                                                                
-		final_result:=MPRD.MAC_Derive_Sanctions(lnpid_results,mprd.layouts.individual_base,sanc1_complaint,lic1_status);
+		final_result:=MPRD.MAC_Derive_Sanctions(result,mprd.layouts.individual_base,sanc1_complaint,lic1_status);
 		RETURN final_result; 
 	END;
 
@@ -973,59 +952,38 @@ EXPORT Update_Base (STRING filedate, BOOLEAN pUseProd = false) := MODULE
 			,
 			,
 			);
-		Layout_In := RECORD
-			{d_bdid};
-      UNSIGNED8 UniqId;
-			UNSIGNED8 LNPID_Out := 0;
-      INTEGER2 xlink_distance;
-      STRING xlink_matches;
-      UNSIGNED xlink_keys;
-      INTEGER xlink_weight;
-      INTEGER xlink_score;
-      STRING xlink_segmentation;
-      INTEGER score;
-    END;
-
-    inFields := MODULE(HealthCare_Provider_Header.IxLinkInput)
-      EXPORT Input_UniqueID              := 'UniqId';
-      EXPORT Input_FNAME                 := 'First_name';
-      EXPORT Input_MNAME                 := 'Middle_name';
-      EXPORT Input_LNAME                 := 'Last_name';
-      EXPORT Input_SNAME                 := 'maturity_suffix';
-      EXPORT Input_GENDER                := 'gender';
-      EXPORT Input_TAXONOMY              := 'taxonomy';
-      EXPORT Input_LIC_TYPE              := 'lic1_type';
-      EXPORT Input_PRAC_PRIM_RANGE       := 'clean_prim_range';
-      EXPORT Input_PRAC_PRIM_NAME        := 'clean_prim_name';
-      EXPORT Input_PRAC_SEC_RANGE        := 'clean_sec_range';
-      EXPORT Input_PRAC_CITY             := 'clean_p_city_name';
-      EXPORT Input_PRAC_ST               := 'clean_st';
-      EXPORT Input_PRAC_ZIP              := 'clean_zip';
-      EXPORT Input_PRAC_PHONE            := 'clean_prac1_phone';
-      EXPORT Input_NPI_NUMBER            := 'npi_num';
-      EXPORT Input_UPIN                  := 'UPIN';
-      EXPORT Input_DEA_NUMBER            := 'dea_num1';
-      EXPORT Input_LIC_STATE             := 'lic1_state';
-      EXPORT Input_LIC_NBR               := 'lic1_num';
-      EXPORT Input_SSN                   := '';
-      EXPORT Input_DOB                   := '';
-		END;
-                                                
-    pDatasetPrep    := project(d_bdid, transform(layout_in, self := left, self := []));
-                                
-    ut.MAC_Sequence_Records(pDatasetPrep,UniqID,pDataset_seq);
-                                
-    pDataset_in := sort(distribute(pDataset_seq,hash(UniqID)),UniqID,local);
-                                
-    // uncomment for desired mode
-    HealthCare_Provider_Header.mac_xlinking_on_thor(pDataset_in, inFields, lnpid_results,
-							HealthCare_Provider_Header.Constants.XLinkMode.BestAppend,
-           // HealthCare_Provider_Header.Constants.XLinkMode.MatchesInclDetail,
-              // 'dummy_mode',
-              LNPID,
-              34, 6); 
-	
-		RETURN project(lnpid_results, mprd.layouts.choice_point_base); 
+			
+		Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			d_bdid
+			,LNPID
+			,first_name
+			,middle_name
+			,last_name
+			,maturity_suffix
+			,//GENDER
+			,clean_prim_range
+			,clean_prim_name
+			,clean_sec_range
+			,clean_v_city_name
+			,clean_st
+			,clean_zip
+			,//SSN
+			,//DOB
+			,clean_prac1_phone
+			,lic1_state
+			,lic1_num
+			,tin1
+			,dea_num1
+			,group_key
+			,
+			,upin
+			,did
+			,bdid
+			,//,SRC
+			,//SOURCE_RID
+			,result,false,38);
+			
+			RETURN result;
 	END;
 
 	EXPORT basc_claim_base:=FUNCTION
@@ -1205,59 +1163,37 @@ EXPORT Update_Base (STRING filedate, BOOLEAN pUseProd = false) := MODULE
 			,
 		);
 
-		Layout_In := RECORD
-			{d_bdid};
-      UNSIGNED8 UniqId;
-			UNSIGNED8 LNPID_Out := 0;
-      INTEGER2 xlink_distance;
-      STRING xlink_matches;
-      UNSIGNED xlink_keys;
-      INTEGER xlink_weight;
-      INTEGER xlink_score;
-      STRING xlink_segmentation;
-      INTEGER score;
-    END;
+		Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			d_bdid
+			,lnpid
+			,first_name
+			,middle_name
+			,last_name
+			,maturity_suffix
+			,//GENDER
+			,clean_prim_range
+			,clean_prim_name
+			,clean_sec_range
+			,clean_v_city_name
+			,clean_st
+			,clean_zip
+			,//SSN
+			,//DOB
+			,clean_prac_phone1
+			,lic1_state
+			,lic1_num
+			,tin1
+			,//DEA_NUM1
+			,//group_key
+			,//
+			,upin
+			,did
+			,bdid
+			,//SRC
+			,//SOURCE_RID
+			,result,false,38);
 
-    inFields := MODULE(HealthCare_Provider_Header.IxLinkInput)
-      EXPORT Input_UniqueID              := 'UniqId';
-      EXPORT Input_FNAME                 := 'First_name';
-      EXPORT Input_MNAME                 := 'Middle_name';
-      EXPORT Input_LNAME                 := 'Last_name';
-      EXPORT Input_SNAME                 := 'maturity_suffix';
-      EXPORT Input_GENDER                := 'gender';
-      EXPORT Input_TAXONOMY              := 'taxonomy';
-      EXPORT Input_LIC_TYPE              := 'lic1_type';
-      EXPORT Input_PRAC_PRIM_RANGE       := 'clean_prim_range';
-      EXPORT Input_PRAC_PRIM_NAME        := 'clean_prim_name';
-      EXPORT Input_PRAC_SEC_RANGE        := 'clean_sec_range';
-      EXPORT Input_PRAC_CITY             := 'clean_p_city_name';
-      EXPORT Input_PRAC_ST               := 'clean_st';
-      EXPORT Input_PRAC_ZIP              := 'clean_zip';
-      EXPORT Input_PRAC_PHONE            := 'clean_prac_Phone1';
-      EXPORT Input_NPI_NUMBER            := 'npi_num';
-      EXPORT Input_UPIN                  := 'UPIN';
-      EXPORT Input_DEA_NUMBER            := '';
-      EXPORT Input_LIC_STATE             := 'lic1_state';
-      EXPORT Input_LIC_NBR               := 'lic1_num';
-      EXPORT Input_SSN                   := '';
-      EXPORT Input_DOB                   := '';
-		END;
-                                                
-    pDatasetPrep    := project(d_bdid, transform(layout_in, self := left, self := []));
-                                
-    ut.MAC_Sequence_Records(pDatasetPrep,UniqID,pDataset_seq);
-                                
-    pDataset_in := sort(distribute(pDataset_seq,hash(UniqID)),UniqID,local);
-                                
-    // uncomment for desired mode
-    HealthCare_Provider_Header.mac_xlinking_on_thor(pDataset_in, inFields, lnpid_results,
-							HealthCare_Provider_Header.Constants.XLinkMode.BestAppend,
-           // HealthCare_Provider_Header.Constants.XLinkMode.MatchesInclDetail,
-              // 'dummy_mode',
-              LNPID,
-              34, 6); 
-	
-		RETURN project(lnpid_results, mprd.layouts.basc_claims_base); 
+		RETURN result;
 	END;
 
 	EXPORT claims_address_master_base:=FUNCTION
@@ -1436,59 +1372,37 @@ EXPORT Update_Base (STRING filedate, BOOLEAN pUseProd = false) := MODULE
 						AND LEFT.isTest									= RIGHT.isTest
 						,t_rollup(LEFT, RIGHT),LOCAL);
 						
-		Layout_In := RECORD
-			{base_f};
-      UNSIGNED8 UniqId;
-			UNSIGNED8 LNPID_Out := 0;
-      INTEGER2 xlink_distance;
-      STRING xlink_matches;
-      UNSIGNED xlink_keys;
-      INTEGER xlink_weight;
-      INTEGER xlink_score;
-      STRING xlink_segmentation;
-      INTEGER score;
-    END;
+		Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			base_f
+			,lnpid
+			,other_first_name//authorized_first_name
+			,other_middle_name//authorized_middle_name
+			,other_last_name//authorized_last_name
+			,other_maturity_suffix//authorized_maturity_suffix
+			,other_gender//GENDER
+			,//clean_prim_range
+			,//clean_prim_name
+			,//clean_sec_range
+			,//clean_v_city_name
+			,//clean_ST
+			,//clean_ZIP
+			,//SSN
+			,//DOB
+			,//clean_prac_phone1
+			,LIC1_STATE
+			,LIC1_num
+			,npi_num
+			,//DEA_NUM1
+			,//group_key
+			,//
+			,//UPIN
+			,did
+			,bdid
+			,//SRC
+			,//SOURCE_RID
+			,result,false,38);
 
-    inFields := MODULE(HealthCare_Provider_Header.IxLinkInput)
-      EXPORT Input_UniqueID              := 'UniqId';
-      EXPORT Input_FNAME                 := 'other_First_name';
-      EXPORT Input_MNAME                 := 'other_Middle_name';
-      EXPORT Input_LNAME                 := 'other_Last_name';
-      EXPORT Input_SNAME                 := 'other_maturity_suffix';
-      EXPORT Input_GENDER                := 'other_gender';
-      EXPORT Input_TAXONOMY              := 'taxonomy';
-      EXPORT Input_LIC_TYPE              := 'lic1_type';
-      EXPORT Input_PRAC_PRIM_RANGE       := '';
-      EXPORT Input_PRAC_PRIM_NAME        := '';
-      EXPORT Input_PRAC_SEC_RANGE        := '';
-      EXPORT Input_PRAC_CITY             := '';
-      EXPORT Input_PRAC_ST               := '';
-      EXPORT Input_PRAC_ZIP              := '';
-      EXPORT Input_PRAC_PHONE            := '';
-      EXPORT Input_NPI_NUMBER            := 'npi_num';
-      EXPORT Input_UPIN                  := '';
-      EXPORT Input_DEA_NUMBER            := '';
-      EXPORT Input_LIC_STATE             := 'lic1_state';
-      EXPORT Input_LIC_NBR               := 'lic1_num_in';
-      EXPORT Input_SSN                   := '';
-      EXPORT Input_DOB                   := '';
-		END;
-                                                
-    pDatasetPrep    := project(base_f, transform(layout_in, self := left, self := []));
-                                
-    ut.MAC_Sequence_Records(pDatasetPrep,UniqID,pDataset_seq);
-                                
-    pDataset_in := sort(distribute(pDataset_seq,hash(UniqID)),UniqID,local);
-                                
-    // uncomment for desired mode
-    HealthCare_Provider_Header.mac_xlinking_on_thor(pDataset_in, inFields, lnpid_results,
-							HealthCare_Provider_Header.Constants.XLinkMode.BestAppend,
-           // HealthCare_Provider_Header.Constants.XLinkMode.MatchesInclDetail,
-              // 'dummy_mode',
-              LNPID,
-              34, 6); 
-	
-		RETURN project(lnpid_results, mprd.layouts.npi_extension_base);
+		RETURN result;
 	END;	
 	
 	EXPORT npi_extension_facility_base:=FUNCTION
@@ -1679,59 +1593,37 @@ EXPORT Update_Base (STRING filedate, BOOLEAN pUseProd = false) := MODULE
 						AND LEFT.isTest						= RIGHT.isTest
 						,t_rollup(LEFT, RIGHT),LOCAL);
 			
-		Layout_In := RECORD
-			{base_f};
-      UNSIGNED8 UniqId;
-			UNSIGNED8 LNPID_Out := 0;
-      INTEGER2 xlink_distance;
-      STRING xlink_matches;
-      UNSIGNED xlink_keys;
-      INTEGER xlink_weight;
-      INTEGER xlink_score;
-      STRING xlink_segmentation;
-      INTEGER score;
-    END;
+		Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			base_f
+			,lnpid
+			,first_name
+			,middle_name
+			,last_name
+			,maturity_suffix
+			,gender
+			,//clean_prim_range
+			,//clean_prim_name
+			,//clean_sec_range
+			,//clean_v_city_name
+			,//clean_ST
+			,//clean_ZIP
+			,//SSN
+			,clean_birthdate
+			,//clean_prac_phone1
+			,//LIC1_STATE
+			,//LIC1_num
+			,//tin1
+			,//DEA_NUM1
+			,group_key
+			,
+			,//UPIN
+			,//DID
+			,//BDID
+			,//SRC
+			,//SOURCE_RID
+			,result,false,38);
 
-    inFields := MODULE(HealthCare_Provider_Header.IxLinkInput)
-      EXPORT Input_UniqueID              := 'UniqId';
-      EXPORT Input_FNAME                 := 'First_name';
-      EXPORT Input_MNAME                 := 'Middle_name';
-      EXPORT Input_LNAME                 := 'Last_name';
-      EXPORT Input_SNAME                 := 'maturity_suffix';
-      EXPORT Input_GENDER                := 'gender';
-      EXPORT Input_TAXONOMY              := '';
-      EXPORT Input_LIC_TYPE              := '';
-      EXPORT Input_PRAC_PRIM_RANGE       := '';
-      EXPORT Input_PRAC_PRIM_NAME        := '';
-      EXPORT Input_PRAC_SEC_RANGE        := '';
-      EXPORT Input_PRAC_CITY             := '';
-      EXPORT Input_PRAC_ST               := '';
-      EXPORT Input_PRAC_ZIP              := '';
-      EXPORT Input_PRAC_PHONE            := '';
-      EXPORT Input_NPI_NUMBER            := '';
-      EXPORT Input_UPIN                  := '';
-      EXPORT Input_DEA_NUMBER            := '';
-      EXPORT Input_LIC_STATE             := '';
-      EXPORT Input_LIC_NBR               := '';
-      EXPORT Input_SSN                   := '';
-      EXPORT Input_DOB                   := 'clean_birthdate';
-		END;
-                                                
-    pDatasetPrep    := project(base_f, transform(layout_in, self := left, self := []));
-                                
-    ut.MAC_Sequence_Records(pDatasetPrep,UniqID,pDataset_seq);
-                                
-    pDataset_in := sort(distribute(pDataset_seq,hash(UniqID)),UniqID,local);
-                                
-    // uncomment for desired mode
-    HealthCare_Provider_Header.mac_xlinking_on_thor(pDataset_in, inFields, lnpid_results,
-							HealthCare_Provider_Header.Constants.XLinkMode.BestAppend,
-           // HealthCare_Provider_Header.Constants.XLinkMode.MatchesInclDetail,
-              // 'dummy_mode',
-              LNPID,
-              34, 6); 
-	
-		RETURN project(lnpid_results, mprd.layouts.basc_deceased_base);
+		RETURN result;
 	END;
 
 	EXPORT basc_addr_base:=FUNCTION
@@ -2192,59 +2084,37 @@ EXPORT Update_Base (STRING filedate, BOOLEAN pUseProd = false) := MODULE
 			,
 			);
 
-		Layout_In := RECORD
-			{d_bdid};
-      UNSIGNED8 UniqId;
-			UNSIGNED8 LNPID_Out := 0;
-      INTEGER2 xlink_distance;
-      STRING xlink_matches;
-      UNSIGNED xlink_keys;
-      INTEGER xlink_weight;
-      INTEGER xlink_score;
-      STRING xlink_segmentation;
-      INTEGER score;
-    END;
+		Health_Provider_Services.mac_get_best_lnpid_on_thor (
+			d_bdid
+			,lnpid
+			,first_name
+			,middle_name
+			,last_name
+			,maturity_suffix
+			,//GENDER
+			,clean_prim_range
+			,clean_prim_name
+			,clean_sec_range
+			,clean_v_city_name
+			,clean_st
+			,clean_zip
+			,//SSN
+			,//DOB
+			,clean_prac_phone
+			,lic_state
+			,lic_num
+			,//tin
+			,dea_num
+			,group_key
+			,
+			,upin
+			,did
+			,bdid
+			,//SRC
+			,//SOURCE_RID
+			,result,false,38);
 
-    inFields := MODULE(HealthCare_Provider_Header.IxLinkInput)
-      EXPORT Input_UniqueID              := 'UniqId';
-      EXPORT Input_FNAME                 := 'First_name';
-      EXPORT Input_MNAME                 := 'Middle_name';
-      EXPORT Input_LNAME                 := 'Last_name';
-      EXPORT Input_SNAME                 := 'maturity_suffix';
-      EXPORT Input_GENDER                := '';
-      EXPORT Input_TAXONOMY              := 'taxonomy';
-      EXPORT Input_LIC_TYPE              := 'lic_type';
-      EXPORT Input_PRAC_PRIM_RANGE       := 'clean_prim_range';
-      EXPORT Input_PRAC_PRIM_NAME        := 'clean_prim_name';
-      EXPORT Input_PRAC_SEC_RANGE        := 'clean_sec_range';
-      EXPORT Input_PRAC_CITY             := 'clean_v_city_name';
-      EXPORT Input_PRAC_ST               := 'clean_st';
-      EXPORT Input_PRAC_ZIP              := 'clean_zip';
-      EXPORT Input_PRAC_PHONE            := 'clean_prac_phone';
-      EXPORT Input_NPI_NUMBER            := 'npi_num';
-      EXPORT Input_UPIN                  := 'upin';
-      EXPORT Input_DEA_NUMBER            := 'dea_num';
-      EXPORT Input_LIC_STATE             := 'lic_state';
-      EXPORT Input_LIC_NBR               := 'lic_num';
-      EXPORT Input_SSN                   := '';
-      EXPORT Input_DOB                   := 'clean_birthdate';
-		END;
-                                                
-    pDatasetPrep    := project(base_f, transform(layout_in, self := left, self := []));
-                                
-    ut.MAC_Sequence_Records(pDatasetPrep,UniqID,pDataset_seq);
-                                
-    pDataset_in := sort(distribute(pDataset_seq,hash(UniqID)),UniqID,local);
-                                
-    // uncomment for desired mode
-    HealthCare_Provider_Header.mac_xlinking_on_thor(pDataset_in, inFields, lnpid_results,
-							HealthCare_Provider_Header.Constants.XLinkMode.BestAppend,
-           // HealthCare_Provider_Header.Constants.XLinkMode.MatchesInclDetail,
-              // 'dummy_mode',
-              LNPID,
-              34, 6); 
-	
-		RETURN project(lnpid_results, mprd.layouts.client_data_base);
+		RETURN result;
 	END;
 	
 	EXPORT office_attributes_base := FUNCTION

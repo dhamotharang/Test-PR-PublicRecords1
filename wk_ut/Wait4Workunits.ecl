@@ -80,7 +80,7 @@ functionmacro
   result2 := sequential(
        output('______________________________________________________________________________')
       ,output(createwatcherworkunit2  ,named(pUniqueOutput + 'Get_Results_' + pversion + '_' + piteration))
-      ,output(createwatcherworkunit2  ,named(pUniqueOutput + 'Get_Results_' + pversion + '_' + piteration + '__html'))
+      ,output(createwatcherworkunit2_html  ,named(pUniqueOutput + 'Get_Results_' + pversion + '_' + piteration + '__html'))
       ,output(%'Wait4workunitevent'%  ,named(pUniqueOutput + 'Get_Results_NotifyEvent_' + pversion + '_' + piteration))
       // ,wait4it2
       ,output(wk_ut.do_WUWaitComplete(createwatcherworkunit2,,,pESP))
@@ -89,7 +89,7 @@ functionmacro
 
   
   // dooutputsNEmail := nothor(apply(global(dindepent,few),wk_ut.OutputWuidsNEmail(wuid,pversion,piteration,pNotifyEmails,pShouldEmail)));
-  dooutputsNEmail := %ECL%;
+  // dooutputsNEmail := %ECL%;
   
   // -- Get results from all Wuids in set
   getwuids            := wk_ut.get_DS_Result(createwatcherworkunit2,'Workunits',wk_ut.layouts.wks_slim,pESP); //--THIS FUNCTION NEEDS TO BE UPDATED FOR REMOTE CALLS(USING HTTPCALL). get workunit info for these wuids

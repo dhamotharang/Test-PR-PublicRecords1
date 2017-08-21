@@ -9,7 +9,7 @@ export MAC_Zip_Can (indataset,infname,inmname,inlname, inzip,
 						inlookups,
 						indid,
 						inkeyname,outkey,by_lookup=TRUE,favor_lookup=0) :=MACRO
-import ut,doxie;
+import ut,doxie, NID;
 #uniquename(indata)
 %indata% := indataset;
 
@@ -32,7 +32,7 @@ CanadianPhones.layouts.zip %proj% (indataset L) := TRANSFORM
 	SELF.zip := L.inzip;
 	SELF.dph_lname := metaphonelib.DMetaPhone1 (L.inlname);
 	SELF.lname := L.inlname;
-	SELF.pfname := datalib.preferredfirst (L.infname);
+	SELF.pfname := NID.PreferredFirstVersionedStr(L.infname, NID.version);
 	SELF.fname := L.infname;
 	SELF.minit := L.inmname [1];
 	SELF.did := L.indid;

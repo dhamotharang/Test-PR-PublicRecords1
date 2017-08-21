@@ -57,7 +57,7 @@ module
 		string MaxSkew                {xpath('FileDetail/Stat/MaxSkew'              )};	
     integer CompressedFileSize      {xpath('FileDetail/CompressedFileSize'     )};
     boolean IsCompressed            {xpath('FileDetail/IsCompressed'           )};
-    dataset(DFUFileParts_lay) DFUFileParts  {xpath('FileDetail/DFUFileParts/DFUPart')}
+    dataset(DFUFileParts_lay) DFUFileParts  {xpath('FileDetail/DFUFilePartsOnClusters/DFUFilePartsOnCluster/DFUFileParts/DFUPart')}
   
 	end;
 
@@ -86,9 +86,12 @@ module
   export Parts  := normalize(DFUInfo(),left.DFUFileParts(Copy = 1),transform(norm_lay,self := right,self := left
   ,self.PartSize_int := (unsigned)std.str.filterout(right.PartSize,',')
   ,self.PartSize_ := ut.FHumanReadableSpace(self.PartSize_int)));
-  export avg    := (real8)(sum(Parts,(real8)PartSize_int) / count(Parts));
   
-  export Parts_Lay := {norm_lay,real8 avg_part_size,string avg_part_size_,real8 diff_avg,string diff_avg_,real8 skew_};
+  export avg    := (real8)(sum(Parts,(real8)PartSize_int) / count(Parts));
+  export minpart := min(Parts,PartSize_int);
+  export maxpart := max(Parts,PartSize_int);
+  
+  export Parts_Lay := {norm_lay,real8 avg_part_size,string avg_part_size_,real8 diff_avg,string diff_avg_,real8 skew_,unsigned min_part_size,unsigned above_the_min,string min_part_size_,string above_the_min_};
   
   export Parts_ := project(Parts  ,transform(Parts_Lay
     ,self                 := left
@@ -96,7 +99,11 @@ module
     ,self.avg_part_size_  := ut.FHumanReadableSpace((unsigned)avg)
     ,self.diff_avg        := (real8)left.PartSize_int - avg;
     ,self.diff_avg_       := if(self.diff_avg > 0 ,ut.FHumanReadableSpace((unsigned)self.diff_avg)  ,'-' + ut.FHumanReadableSpace((unsigned)abs(self.diff_avg)));
-    ,self.skew_           := (unsigned)left.PartSize_int / avg)
-  );
+    ,self.skew_           := (unsigned)left.PartSize_int / avg;
+    ,self.min_part_size   := minpart; 
+    ,self.above_the_min   := left.PartSize_int - minpart; 
+    ,self.min_part_size_   := ut.FHumanReadableSpace(minpart); 
+    ,self.above_the_min_   := ut.FHumanReadableSpace(self.above_the_min); 
+  ));
   
 end;

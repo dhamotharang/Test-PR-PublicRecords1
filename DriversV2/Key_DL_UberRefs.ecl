@@ -7,6 +7,6 @@ tab:=DriversV2.File_uber_in;
        self := le;
      end;
    
-   inv_tab := JOIN(tab,word_tab,LEFT.word =RIGHT.word,add_id(LEFt,RIGHT),lookup);
+   inv_tab := JOIN(tab,word_tab,LEFT.word =RIGHT.word,add_id(LEFt,RIGHT),local);
  
 export Key_DL_UberRefs :=INDEX(inv_tab, {inv_tab},{}, DriversV2.Constants.autokey_qa_Keyname+'UberRefs',SORTED);

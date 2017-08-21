@@ -1,7 +1,7 @@
 export Layout_WC_FileIn := record
 	string source;
 	unsigned aid;
-	unsigned companyid;
+	string companyid;
 	string loginid;
 	string session_id;
 	string ip;

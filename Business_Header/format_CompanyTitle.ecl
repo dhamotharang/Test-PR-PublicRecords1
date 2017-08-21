@@ -1,5 +1,5 @@
 import text,ut;
-export format_CompanyTitle(dataset(Layout_Business_Contact_Full) contacts) := 
+export format_CompanyTitle(dataset(Layout_Business_Contact_Plus_orig) contacts) := 
 FUNCTION  //
 
 slimrec := record

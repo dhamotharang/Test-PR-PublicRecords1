@@ -1,4 +1,4 @@
-import aid, address, bipv2, SAM, standard, STD, ut, Worldcheck_Bridger;
+import aid, address, SAM, STD, ut;
 			 
 export StandardizeInputFile := module
 
@@ -58,6 +58,7 @@ export StandardizeInputFile := module
 		layouts_gsa.main_addrs_info_id_lo joinAdditionalInfo(main_addrs_projected L, dProcessAdditionalInfo R) := TRANSFORM
 			information 						:= trimUpper(R.information);
 			comments    						:= trimUpper(R.comments);
+			the_date                := STD.Date.ConvertDateFormat(comments);
 			SELF.TermDateIndefinite := IF(information = 'TERMINATION DATE',
 																		IF(REGEXFIND('indef', comments, NOCASE), 'Y', ''),
 																		L.TermDateIndefinite);
@@ -65,10 +66,10 @@ export StandardizeInputFile := module
 																		IF(REGEXFIND('perm', comments, NOCASE), 'Y', ''),
 																		L.TermDatePermanent);
 			SELF.ActionDate         := IF(information = 'ACTIVE DATE',
-																		ut.ConvertDate(comments),
+																		IF((INTEGER)the_date <= 0, '', the_date),
 																		L.ActionDate);
 			SELF.TermDate           := IF(information = 'TERMINATION DATE',
-																		ut.ConvertDate(comments),
+																		IF((INTEGER)the_date <= 0, '', the_date),
 																		L.TermDate);
 			SELF.Description        := IF(information = 'ADDITIONAL COMMENTS', comments, L.Description);
 			SELF.CTType             := IF(information = 'EXCLUDING PROGRAM', comments, L.CTType);

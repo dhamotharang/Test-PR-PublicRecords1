@@ -297,7 +297,7 @@ EXPORT R := RECORD,MAXLENGTH(32000)
   real4 DEA_NUMBER_specificity;
   real4 DEA_NUMBER_switch;
   real4 DEA_NUMBER_max;
-  dataset(DEA_NUMBER_ChildRec) nulls_DEA_NUMBER {MAXCOUNT(100)};
+  dataset(DEA_NUMBER_ChildRec) nulls_DEA_NUMBER {MAXCOUNT(999)};
   real4 VENDOR_ID_specificity;
   real4 VENDOR_ID_switch;
   real4 VENDOR_ID_max;

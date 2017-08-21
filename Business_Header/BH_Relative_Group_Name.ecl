@@ -1,7 +1,16 @@
-import ut;
+import ut,mdr;
+
+export BH_Relative_Group_Name(
+
+	 dataset(Layout_Business_Header_Temp)	pBH_Basic_Match_ForRels			= BH_Basic_Match_ForRels	()
+	,string																pPersistname								= persistnames().BHRelativeGroupName													
+	,boolean															pShouldRecalculatePersist		= true													
+
+) := FUNCTION
+
 
 // Initialize match file
-BH_File := Business_Header.BH_Basic_Match_ForRels;
+BH_File := pBH_Basic_Match_ForRels;
 
 Layout_BH_Match := record
 unsigned6 bdid;                // Seisint Business Identifier
@@ -13,7 +22,7 @@ self.clean_company_name := ut.CleanCompany(L.company_name);
 self := L;
 end;
 
-Name_Match_Init := project(BH_File(source<>'GG'), InitMatchFile(left));
+Name_Match_Init := project(BH_File(not MDR.sourceTools.SourceIsGong_Government(source)), InitMatchFile(left));
 Name_Match_Init_Dedup := dedup(Name_Match_Init, bdid, clean_company_name, all);
 
 Name_Match_Dist := distribute(Name_Match_Init_Dedup, hash(clean_company_name[1..8]));
@@ -53,4 +62,12 @@ end;
 
 Name_Relative_Group := project(Name_Match_Clean_Remainder_Iter, FormatRelativeGroup(left));
 
-export BH_Relative_Group_Name := Name_Relative_Group : persist('TMTEMP::BH_Relative_Group_Name');
+BH_Relative_Group_Name_persisted := Name_Relative_Group 
+	: persist(pPersistname);
+
+returndataset := if(pShouldRecalculatePersist = true, BH_Relative_Group_Name_persisted
+																										, persists().BHRelativeGroupName
+									);
+return returndataset;
+
+end;

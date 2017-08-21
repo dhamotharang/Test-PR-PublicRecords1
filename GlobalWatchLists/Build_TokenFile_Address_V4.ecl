@@ -1,4 +1,4 @@
-import	ut;
+import	RoxieKeyBuild,ut;
 
 export	Build_TokenFile_Address_V4(string	pFileDate)	:=
 function
@@ -16,7 +16,7 @@ function
 	
 	dAddressTokens	:=	Globalwatchlists.fn_AddressTokens_V4(dPrep);
 	
-	ut.MAC_SF_BuildProcess(dAddressTokens,'~thor_200::base::globalwatchlistsV2::address_tokens',bldAddressTokens,,,true,pFileDate);
+	RoxieKeyBuild.Mac_SF_BuildProcess_V2(dAddressTokens,'~thor_200::base::globalwatchlistsV2','address_tokens',pFileDate,bldAddressTokens,,,true);
 	
 	return	bldAddressTokens;
 end;

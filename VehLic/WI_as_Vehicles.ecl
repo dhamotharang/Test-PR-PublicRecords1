@@ -39,7 +39,8 @@ vehlic.layout_vehicles tAsVehicles(vehlic.File_WI_Full pInput)
 	self.OWN_1_CITY 					:=	pInput.Owner_Post_Office;
 	self.OWN_1_ZIP5_ZIP4_FOREIGN_POSTAL :=	if(pInput.Owner_Name <> '',pInput.Owner_Zip_Code,'');
 	self.LICENSE_PLATE_NUMBERxBG4 		:=	regexreplace('^0*', pInput.Plate_Number, '');
-	self.REGISTRATION_EFFECTIVE_DATE 	:=	if(pInput.Base_Year < '40','20','19') + pInput.Base_Year + '0000';
+    self.REGISTRATION_EFFECTIVE_DATE    :=  if(pInput.process_data[5..6] > ut.GetDate[3..4],'19','20') + pInput.process_data[5..6] + pInput.process_data[1..4];
+    self.FIRST_REGISTRATION_DATE        :=  if(pInput.Base_Year < '40','20','19') + pInput.Base_Year + '0000';
 	self.REGISTRATION_EXPIRATION_DATE 	:=	lYMtoYMD(pInput.Registration_Expiration_Year,pInput.Registration_Expiration_Month);
 	self.VEHICLE_CLASS_CODE 			:=	pInput.Plate_Type;
 	self.REGISTRANT_1_CUSTOMER_TYPExBG5 :=	map(pInput.Lessee_Name = '' => '',

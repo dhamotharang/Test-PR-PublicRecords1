@@ -1,7 +1,7 @@
 IMPORT _Control, tools;
 
-EXPORT SprayFiles(STRING	pServerIP									= _Control.IPAddress.edata12,
-	                STRING	pDirectory								= '/hds_3/ABMS/data',
+EXPORT SprayFiles(STRING	pServerIP									= _Control.IPAddress.bctlpedata11,
+	                STRING	pDirectory								= '/data/hds_3/ABMS/build',
 									STRING	pFilenameAddress					= 'address*.txt',
 									STRING	pFilenameBIOG			 				= 'biog*.txt',
 									STRING	pFilenameCareer		 				= 'career*.txt',
@@ -14,7 +14,7 @@ EXPORT SprayFiles(STRING	pServerIP									= _Control.IPAddress.edata12,
 									STRING	pFilenameTypeOfPractice		= 'typeofprac*.txt',
 									STRING	pFilenameSchools					= 'zschoolspi*.txt',
 									STRING	pFilenameSpecialty				= 'zspecialtypi*.txt',
-	                STRING	pversion,
+	                STRING8	pversion,
 	                STRING	pGroupName								= _Dataset().groupname,
 	                BOOLEAN	pIsTesting								= FALSE,
 	                BOOLEAN	pOverwrite								= FALSE,

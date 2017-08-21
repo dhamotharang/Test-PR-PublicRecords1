@@ -1,0 +1,1 @@
+export File_BK_AID := dataset('~thor_data400::base::bankruptcy::aid',bankruptcyv2.Layout_BK_AID,thor,__COMPRESSED__);

@@ -1,16 +1,20 @@
-import ut;
-export Build_all(string version=version) := function
+import PromoteSupers,UtilFile,Orbit3;
+export Build_all(string filedate) := function
 
-ut.MAC_SF_BuildProcess(Build_base,'~thor_data400::base::certegy',certegybase,2,,true);
+PromoteSupers.MAC_SF_BuildProcess(Build_base(filedate),'~thor_data400::base::certegy',certegybase,2,,true);
 
-Build_all_keys := Build_keys(version);
+Build_all_keys := Build_keys(filedate);
 
-zDoPopulationStats:=STRATA_Stats;
+zDoPopulationStats:=STRATA_Stats(filedate);
+zDoPopulationStats_newgrp := STRATA_Stats_new(filedate);
 
 built := sequential(
 					certegybase
-					// ,Build_all_keys
-					,zDoPopulationStats);
+					,Build_keys(filedate)
+					,zDoPopulationStats
+					,zDoPopulationStats_newgrp
+					,Orbit3.proc_Orbit3_CreateBuild('Driver\'s License - Certegy',filedate)
+					,UtilFile.pro_monitor().certegy_despray);
 
 return built;
 

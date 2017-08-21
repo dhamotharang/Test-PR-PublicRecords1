@@ -12,6 +12,8 @@ export MAC_Wild_Address_EN(indataset,infname,inmname,inlname,
 						inkeyname,outkey) :=
 MACRO
 
+import doxie;
+
 #uniquename(indata)
 %indata% := indataset;
 
@@ -23,7 +25,7 @@ TRANSFORM
 	SELF.prim_name := ut.StripOrdinal(le.inprim_name);
 	SELF.prim_range := TRIM(ut.CleanPrimRange(le.inprim_range),LEFT);
 	SELF.st := le.inst;
-	SELF.city_code := HASH((qstring25)le.incity_name);
+	SELF.city_code := doxie.Make_CityCodes(le.incity_name).tho;
 	SELF.zip := le.inzip;
 	SELF.sec_range := le.insec_range;
 

@@ -1,8 +1,8 @@
-import versioncontrol;
+import tools;
 export Files(
 
 	 string		pversion = ''
-	,boolean	pUseProd = false
+	,boolean	pUseOtherEnvironment = false
 
 ) :=
 module
@@ -10,14 +10,14 @@ module
 	//////////////////////////////////////////////////////////////////
 	// -- Input File Versions
 	//////////////////////////////////////////////////////////////////
-	versioncontrol.macInputFileVersions(Filenames(pversion,pUseProd).Input		,layouts.Input.Sprayed		,Input		,'CSV'											,pTerminator := '\n');
-	versioncontrol.macInputFileVersions(Filenames(pversion,pUseProd).InputXML	,layouts.Input.SprayedXML	,InputXML	,'personDataList/personData'										);	
+	tools.mac_FilesInput(Filenames(pversion,pUseOtherEnvironment).Input			,layouts.Input.Sprayed		,Input		,'CSV'											,pTerminator := '\n');
+	tools.mac_FilesInput(Filenames(pversion,pUseOtherEnvironment).InputXML	,layouts.Input.rawXML			,InputXML	,'CSV',pQuote := '~~~~~@@'	,pTerminator := '</personData>',pSeparator := '~~~~&&',pMaxLength := _Dataset().max_record_size * 40);	
 	
 	//////////////////////////////////////////////////////////////////
 	// -- Base File Versions
 	//////////////////////////////////////////////////////////////////
-	versioncontrol.macBuildFileVersions(Filenames(pversion,pUseProd).Base			,layouts.Base				,Base		);
-	versioncontrol.macBuildFileVersions(Filenames(pversion,pUseProd).BaseXML	,layouts.BaseXML		,BaseXML);
-	versioncontrol.macBuildFileVersions(Filenames(pversion,pUseProd).Base			,layouts_OLD.Base		,BaseOLD);
+	tools.mac_FilesBase(Filenames(pversion,pUseOtherEnvironment).Base			,layouts.Base				,Base		);
+	tools.mac_FilesBase(Filenames(pversion,pUseOtherEnvironment).BaseXML	,layouts.BaseXML		,BaseXML);
+	tools.mac_FilesBase(Filenames(pversion,pUseOtherEnvironment).Base			,layouts_OLD.Base		,BaseOLD);
 
 end;

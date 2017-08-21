@@ -4,7 +4,7 @@ export KeyPrep_LLID_ID(
 	string version,
 	boolean pUseOtherEnvironment = false) := function
 
-	projected := dedup(dedup(project(base,KeyLayouts.LLID),record,all,local),record,all);
+	projected := dedup(dedup(project(base(active12 or active9),KeyLayouts.LLID),record,all,local),record,all);
 	
 	tools.mac_FilesIndex('projected,{bid,brid,blid},{projected}',keynames(version,pUseOtherEnvironment).LLID,idx);
 	

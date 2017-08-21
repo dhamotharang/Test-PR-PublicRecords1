@@ -1,6 +1,7 @@
 //*****************************************************************************
 // Normalize Officer/Contacts from Corp4 Temp file to Corp Contacts Base format
 //*****************************************************************************
+import NID;
 
 STRING350 CheckRegAgentName(STRING350 name) :=
   MAP((INTEGER)((Datalib.NameClean(name))[142]) <= 5 => name,
@@ -74,14 +75,14 @@ END;
 
 Corp4_Contacts_Base_Init_Dist := DISTRIBUTE(Corp4_Contacts_Base_Init, HASH(state_origin, sos_ter_nbr));
 Corp4_Contacts_Base_Init_Sort := SORT(Corp4_Contacts_Base_Init_Dist, state_origin, sos_ter_nbr, officer_title,
-                               lname, DataLib.PreferredFirst(fname), mname, name_suffix,
+                               lname, NID.PreferredFirstVersionedStr(fname, NID.version), mname, name_suffix,
                                zip5, prim_name, prim_range, sec_range, -dt_last_seen, LOCAL);
 Corp4_Contacts_Base_Init_Rollup := ROLLUP(Corp4_Contacts_Base_Init_Sort,
                                           LEFT.state_origin = RIGHT.state_origin AND
                                             LEFT.sos_ter_nbr = RIGHT.sos_ter_nbr AND
                                             LEFT.officer_title = RIGHT.officer_title AND
                                             LEFT.lname = RIGHT.lname AND
-                                            DataLib.PreferredFirst(LEFT.fname) = DataLib.PreferredFirst(RIGHT.fname) AND
+                                            NID.PreferredFirstVersionedStr(LEFT.fname, NID.version) = NID.PreferredFirstVersionedStr(RIGHT.fname, NID.version) AND
                                             LEFT.mname = RIGHT.mname AND
                                             LEFT.name_suffix = RIGHT.name_suffix AND
                                             LEFT.zip5 = RIGHT.zip5 AND

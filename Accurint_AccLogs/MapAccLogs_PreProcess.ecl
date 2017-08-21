@@ -4,33 +4,25 @@ export MapAccLogs_PreProcess := function
 
 NullSet := ['NULL','null','UNKNOWN','unknown', 'UKNOWN', 'Null', ''];
 
-inFile := Accurint_Acclogs.File_AccLogs_In((unsigned)orig_login_history_id > 0 and (orig_lname not in Nullset or orig_fname not in Nullset or orig_business_name not in nullset));
-
+inFile := Accurint_Acclogs.File_AccLogs_In(orig_source_code = '3' or (unsigned)orig_login_history_id > 0 or stringlib.stringtouppercase(orig_function_name) = 'DECONCOMPREPORT')
+	;
+	
 //// join  mbs for gov and le only filters
 
-			jMBSFilter := join(Inquiry_AccLogs.File_Lookups.company_ext,Inquiry_AccLogs.File_Lookups.company_info, 
-								left.gc_id = right.gc_id, left outer)(stringlib.stringtouppercase(detail1) in ['GOV','LE']);
+			jMBSFilter := distribute(join(Inquiry_AccLogs.File_Lookups.company_ext,Inquiry_AccLogs.File_Lookups.company_info, 
+								left.gc_id = right.gc_id, left outer)(stringlib.stringtouppercase(detail1) in ['GOV','LE']), random());
 
 
 //// join to company info to retrieve global company id and customer company name
 
-			jCompanyInfoExt := join(inFile, jMBSFilter, 
+			jCompanyInfoExt := join(inFile, jMBSFilter(product_id = '1'), 
 										left.orig_company_id = right.company_id,
 										transform({recordof(inFile), recordof(jMBSFilter) - company_id},
 													self.gc_id := right.gc_id,
 													self.billing_id := right.billing_id,
 													self.product_id := right.product_id,
 													self := left,
-													self := right), lookup)(stringlib.stringtouppercase(detail1) in ['GOV','LE'] and orig_transaction_code = '110');
-
-/* //// join to company ext by global company to retrieve vertical
-   
-   			// jCompanyExt := join(jCompanyInfo, Inquiry_AccLogs.File_Lookups.company_ext,
-   													// left.gc_id = right.gc_id,
-   										// transform({recordof(jCompanyInfo), recordof(Inquiry_AccLogs.File_Lookups.company_ext) - gc_id},
-   														// self := left,
-   														// self := right), lookup, left outer) ); // 110 is online; TRUE - Filter for Law Enforcement and Government only	
-*/
+													self := right), lookup)(stringlib.stringtouppercase(detail1) in ['GOV','LE']);
 
 //// join to transactions to retrieve function full name
 
@@ -45,24 +37,14 @@ inFile := Accurint_Acclogs.File_AccLogs_In((unsigned)orig_login_history_id > 0 a
 														
 //// join to user table to retrieve user name and status
 	
-			prep_user0 := jTransactionDesc(orig_login_history_id = '0');
-			jUser0 := join(prep_user0, Inquiry_AccLogs.File_Lookups.user_info, 
-											left.orig_loginid = right.login_id and
+			// prep_user1 := jTransactionDesc(orig_login_history_id > '0');
+			jUserInfo := join(jTransactionDesc, Inquiry_AccLogs.File_Lookups.user_info, 
+											stringlib.stringtouppercase(left.orig_billing_code) = stringlib.stringtouppercase(right.login_id) and
 											left.orig_company_id = right.company_id,
 										transform({recordof(jTransactionDesc), recordof(Inquiry_AccLogs.File_Lookups.user_info) - [product_id, company_id, login_id]},
 											self := left,
 											self := right), lookup, left outer);
 											
-			prep_user1 := jTransactionDesc(orig_login_history_id > '0');
-			jUser1 := join(prep_user1, Inquiry_AccLogs.File_Lookups.user_info, 
-											left.orig_billing_code = right.login_id and
-											left.orig_company_id = right.company_id,
-										transform({recordof(jTransactionDesc), recordof(Inquiry_AccLogs.File_Lookups.user_info) - [product_id, company_id, login_id]},
-											self := left,
-											self := right), lookup, left outer);
-											
-			jUserInfo := jUser0 + jUser1;
-
 //// join to claudio's function table - does not directly map with function names. his are different
 
 			junique_id1 := join(jUserInfo, inquiry_acclogs.File_UniqueID(valuecnt = 1), 
@@ -97,36 +79,44 @@ inFile := Accurint_Acclogs.File_AccLogs_In((unsigned)orig_login_history_id > 0 a
 											self.orig_dl 				:= map(right.unique_id_code = '11' and left.orig_dl = '' 			=> left.orig_unique_id, left.orig_dl),
 											self := LEFT), left outer, lookup);
 											
-prInFile := project(distribute(junique_id2, random()),
+prInFile := project(junique_id2,
 							transform({Accurint_AccLogs.Layout_AccLogs},
 																
-								self.orig_User_CompanyName := left.company_name;
+								self.orig_User_CompanyName := left.mbs_company_name;
 								self.orig_User_FirstName := left.first_name;
 								self.orig_User_LastName := left.last_name;
 								self.orig_searchdescription := left.description;
 								self.orig_detail := left.detail1;
 								self.orig_user_status := left.status;
 
-									SET_DL := ['ACCIDENTSEARCH','DLREPORT2','DLSEARCH2','MVSEARCH','MVSEARCH2'];
-									SET_CHART := ['CORPREPORTV2'];
-									SET_FEIN := ['CORPSEARCHV2','ENHANCEDBUSSRCH','FEINSEARCH','LIENSEARCH','ROLLBUSSEARCH','UCCSEARCHV2'];
-									SET_LINKID := ['ADDRHISTREPORT','BANKRUPTREPORT2','BANKRUPTREPORT3','BANKRUPTSEARCH','BANKRUPTSEARCH2','COURTSEARCH','CRIMREPORT','DEA_REGISTRATION','DEATHREPORT','FICTITIOUSBIZSRH','FORECLOSEREPORT','STATEWIDEDOCCNTS','PROVIDERREPORT','PROVIDERSEARCH','SANCTIONSEARCH','LIENREPORT','MDSEARCH2','MVREPORT','MVREPORT2','PEOPLEATWORKV2','PROFLICSEARCH2','PROPERTYREPORT2','PROPERTYSEARCH2','SEXOFFREPORT','UCCREPORTV2','WATERCRAFTRPT2','WATERCRAFTSRH2'];
+									SET_UCC 		:= ['UCCSEARCHV2'];
+									SET_DL 			:= ['DLREPORT2','DLSEARCH2'];//['ACCIDENTSEARCH','MVSEARCH','MVSEARCH2'] - removed per Jennifer;
+									SET_CHART 	:= ['CORPREPORTV2'];
+									SET_FEIN 		:= ['CORPSEARCHV2','ENHANCEDBUSSRCH','FEINSEARCH','LIENSEARCH','ROLLBUSSEARCH','UCCSEARCHV2'];
+									SET_LINKID 	:= ['ADDRHISTREPORT','BANKRUPTREPORT2','BANKRUPTREPORT3','BANKRUPTSEARCH','BANKRUPTSEARCH2','COURTSEARCH','CRIMREPORT',
+																	'DEA_REGISTRATION','DEATHREPORT','DECONCOMPREPORT','FICTITIOUSBIZSRH','FORECLOSEREPORT','STATEWIDEDOCCNTS','PROVIDERREPORT','PROVIDERSEARCH',
+																	'SANCTIONSEARCH','LIENREPORT','MDSEARCH2','MVREPORT','MVREPORT2','PEOPLEATWORKV2','PROFLICSEARCH2','PROPERTYREPORT2',
+																	'PROPERTYSEARCH2','SEXOFFREPORT','UCCREPORTV2','WATERCRAFTRPT2','WATERCRAFTSRH2'];
 
-									cat_dl 		:= map(stringlib.stringtouppercase(left.orig_function_name) in set_dl => left.orig_unique_id,
+									cat_dl 			:= map(stringlib.stringtouppercase(left.orig_function_name) in set_dl => left.orig_unique_id,
 															stringlib.stringtouppercase(left.description) in set_dl => left.orig_unique_id, '');
-									cat_chart 	:= map(stringlib.stringtouppercase(left.orig_function_name) in set_chart => left.orig_unique_id,
+									cat_chart 	:= map(stringlib.stringtouppercase(left.orig_function_name) in set_chart => 
+																				regexreplace('^[A-Za-z0-9][A-Za-z0-9]-', trim(left.orig_unique_id, all), ''),
 															stringlib.stringtouppercase(left.description) in set_chart => left.orig_unique_id, '');
-									cat_fein 	:= map(stringlib.stringtouppercase(left.orig_function_name) in set_fein => left.orig_unique_id,
+									cat_fein 		:= map(stringlib.stringtouppercase(left.orig_function_name) in set_fein => left.orig_unique_id,
 															stringlib.stringtouppercase(left.description) in set_fein => left.orig_unique_id, '');
 									cat_linkid 	:= map(stringlib.stringtouppercase(left.orig_function_name) in set_linkid => left.orig_unique_id,
 															stringlib.stringtouppercase(left.description) in set_linkid => left.orig_unique_id, '');
+									cat_ucc			:= map(stringlib.stringtouppercase(left.orig_function_name) in set_ucc => left.orig_unique_id,
+															stringlib.stringtouppercase(left.description) in set_ucc => left.orig_unique_id, '');
 								
+								self.orig_ucc_nbr := map(left.orig_ucc_nbr = '' => cat_ucc, left.orig_ucc_nbr);
 								self.orig_ein			:= map(left.orig_ein = '' 			=> cat_fein, left.orig_ein),
 								self.orig_charter_nbr	:= map(left.orig_charter_nbr = '' 	=> cat_chart, left.orig_charter_nbr),
 								self.orig_did			:= map(left.orig_did = '' 			=> cat_linkid, left.orig_did),
 								self.orig_dl			:= map(left.orig_dl = '' 			=> cat_dl, left.orig_dl),
 								
-								self := left)) : persist('~accurint_acclogs::mbs');
+								self := left));
 
 return prInFile;																			
 end;

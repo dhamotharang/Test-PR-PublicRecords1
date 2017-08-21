@@ -4,7 +4,7 @@ export fSprayInputFiles( string pServerIP				= _control.IPAddress.edata10
 												,string pDirectory			= '/prod_data_build_13/eval_data/infousa/abius/out'
 												,string pFilenameExp		= 'abius_*.d00'
 												,string pFileType				= 'abius'				// could be 'abius', 'idexec', 'fbn', 'deadco'
-												,string pGroupName			= 'thor_dell400'
+												,string pGroupName			= 'thor400_92'
 												) :=
 function
 

@@ -3,7 +3,7 @@ import Header;
 export	As_header(dataset(layouts.base) pCertegy = dataset([],layouts.base), boolean pForHeaderBuild=false)
  :=
   function
-	dCertegyAsSource	:=	As_source(pCertegy,pForHeaderBuild);
+	dCertegyAsSource	:=	header.Files_SeqdSrc().CY;
 
 	Header.Layout_New_Records Translate_certegy_to_Header(dCertegyAsSource l) := transform
 	
@@ -16,8 +16,8 @@ export	As_header(dataset(layouts.base) pCertegy = dataset([],layouts.base), bool
 		//don't even populate vendor dates because they can eventually get used in watchdog.bestaddress
 		self.did                      := 0;
 		self.rid                      := 0;
-		self.dt_first_seen            := (unsigned3)l.date_first_seen[1..6];
-		self.dt_last_seen             := (unsigned3)l.date_last_seen[1..6];
+		self.dt_first_seen            := 0;
+		self.dt_last_seen             := 0;
 		self.dt_vendor_first_reported := (unsigned3)l.date_vendor_first_reported[1..6];
 		self.dt_vendor_last_reported  := (unsigned3)l.date_vendor_last_reported[1..6];
 		self.dt_nonglb_last_seen      := 0;
@@ -29,7 +29,7 @@ export	As_header(dataset(layouts.base) pCertegy = dataset([],layouts.base), bool
 		self.dob                      := if(l.clean_dob<>'',(integer)(v_dob_yyyy+v_dob_mm+v_dob_dd),0);
 		self.suffix                   := l.addr_suffix;
 		self.city_name                := l.v_city_name;
-		self.county                   := l.fips_county;
+		self.county                   := l.county;
 		self.cbsa                     := if(l.msa!='',l.msa + '0','');
 		self                          := L;
 	end;

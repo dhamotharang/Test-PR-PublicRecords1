@@ -2,7 +2,7 @@ IMPORT ingenix_natlprof,Healthcare_Provider_Services,NPPES;
 
 EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 
-		SHARED InSanc  := Enclarity_Facility_Sanctions.Files(,pUseProd).facility_sanctions_base.qa(record_type='C');
+		SHARED InSanc  := Enclarity_Facility_Sanctions.Files(,pUseProd).facility_sanctions_base.qa;
 		SHARED InSanCd := Enclarity_Facility_Sanctions.Sanction_Code_Lookup.dsSancLookup;
 		SHARED InSanBrd:= Enclarity_Facility_Sanctions.Sanction_Code_Lookup.dsBoardLookup;
 		
@@ -13,7 +13,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		OutLayout  := {string38 surrogate_key
 									,string38 group_key
 									,string20 prac1_key
-									,Ingenix_NatlProf.Sanctioned_providers_Bdid};
+									,Ingenix_NatlProf.layout_sanctions_bdid};
 
 		OutLayout tr1(InSanc l) 		:= transform
 			self.surrogate_key									:= 	l.surrogate_key;
@@ -28,7 +28,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 			self.date_last_reported							:=	(string)l.date_vendor_last_reported;
 			self.did														:=	'';
 			self.filetyp												:=	l.filecode; // temp hold for board info later - from lookup table <-------OVERLOADED FIELD
-			self.SANC_ID												:=	(string)l.lnfid;
+			self.SANC_ID												:=	(string)l.pid;
 			self.sanc_lnme											:=	'';
 			self.sanc_fnme											:=	'';
 			self.sanc_mid_i_nm									:=	'';
@@ -49,7 +49,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 			self.sanc_tin													:=	l.tin1;
 			self.sanc_upin												:=	'';
 			self.SANC_PROVTYPE										:=	l.facility_type	;
-			self.SANC_SANCDTE_form								:=	'';
+			self.SANC_SANCDTE_form								:=	l.clean_sanc1_date;
 			self.SANC_SANCDTE	 										:=	l.clean_sanc1_date;
 			self.SANC_SANCST											:=	l.sanc1_state	;
 			self.SANC_LICNBR											:=	if(length(stringlib.stringfilterout(trim(l.lic1_num,all),'0'))<>0,l.lic1_num,'')	;
@@ -157,11 +157,22 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// Sanctioned_facilities_Bdid
 		//////////////////////////////////////////////////////////
 
-		outlayout  := {Ingenix_NatlProf.Sanctioned_providers_Bdid};
+		outlayout  := Ingenix_NatlProf.layout_sanctions_bdid;
 
 		prep1 := project(Sanctions_All,outlayout);
 
 		EXPORT Sanctioned_facilities_Bdid := prep1;
+		
+		//////////////////////////////////////////////////////////
+		// update_BWR_Sanctions_Did_File
+		//////////////////////////////////////////////////////////
+
+		outlayout  := {ingenix_natlprof.layout_sanctions_DID_RecID};
+
+		prep1 := project(Sanctions_All,outlayout);
+
+		EXPORT update_BWR_Sanctions_Did_File := prep1;
+
 
 		//////////////////////////////////////////////////////////
 		// ProviderSanctions_all
@@ -169,7 +180,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 
 		OutLayout  := {string38 group_key
 									,string10 sanc_type
-									,Ingenix_NatlProf.update_ProviderSanctions};
+									,Ingenix_NatlProf.Layout_in_ProviderSanctions.raw_Allsrc};
 
 		OutLayout tr1(Sanctions_all l) := transform
 			self.processdate								:=	l.process_date;
@@ -203,7 +214,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = false) := MODULE
 		// update_ProviderSanctions
 		//////////////////////////////////////////////////////////
 
-		outlayout  := {Ingenix_NatlProf.update_ProviderSanctions};
+		outlayout  := Ingenix_NatlProf.Layout_in_ProviderSanctions.raw_Allsrc;
 
 		prep1 := project(ProviderSanctions_all,outlayout);
 

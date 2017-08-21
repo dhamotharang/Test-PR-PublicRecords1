@@ -1,4 +1,4 @@
-import _control, tools,ut;
+import _control, tools, Data_Services;
 
 export _Dataset(
 
@@ -11,8 +11,8 @@ module
 	export IsDataland 					:= Tools._Constants.IsDataland;
 	
 	export foreign_environment := if(IsDataland
-																	,ut.foreign_prod
-																	,ut.foreign_dataland
+																	,Data_Services.foreign_prod
+																	,Data_Services.foreign_dataland
 																);
 												
 	export Name										:= 'Business_Headers'		;

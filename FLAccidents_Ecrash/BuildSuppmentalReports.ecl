@@ -1,3 +1,19 @@
+/*2017-05-24T18:45:57Z (Srilatha Katukuri)
+ECH-4987 - Production bug Fix - to account for Suppressed TF reports
+
+*/
+/*2016-11-22T21:12:32Z (Srilatha Katukuri)
+Bug DF-17970 - Drop in Supplemental records
+*/
+/*2016-06-10T06:03:31Z (Srilatha Katukuri)
+DFF-16695 Final Check in
+*/
+/*2016-06-07T19:54:14Z (Srilatha Katukuri)
+DFF- 16695 - Coplogic DataIngestion2
+*/
+/*2016-03-04T02:36:53Z (Srilatha Katukuri)
+â€“ Bug: 201048  -- fixed the page count issue for supplemetal reports
+*/
 /*2015-10-13T00:45:04Z (Srilatha Katukuri)
 #181860 - accesing agency QC file
 */
@@ -18,11 +34,10 @@ Bug# 180852 - PIR 4710 Coplogic Data ingestion
 */
 import ut; 
 export BuildSuppmentalReports := module 
-
- agency     := FLAccidents_Ecrash.Infiles.agency	  ;																		
- tincident  := dedup(FLAccidents_Ecrash.Infiles.tincident	,all);													
- tpersn     := dedup(FLAccidents_Ecrash.Infiles.tpersn	,all)		;										
- tvehicl    := dedup(FLAccidents_Ecrash.Infiles.tvehicl	,all)		;	
+agency     := FLAccidents_Ecrash.Infiles.agency	  ;																		
+tpersn     := dedup(FLAccidents_Ecrash.Infiles.tpersn	,all)		;										
+tvehicl    := dedup(FLAccidents_Ecrash.Infiles.tvehicl	,all)		;	
+tIncident := FLAccidents_Ecrash.IncidentsAfterSuppression;
 
 //keep all incidents and flag updated or duplicate version of reports
 
@@ -144,13 +159,11 @@ updtdAllrecs:= join(allrecs,distribute(suppressAgencies(agency_id!=''),hash(agen
 							many lookup , left only );	
 
 //end
-
-	
 					
 // Supress reports
  
 allrecs0 := updtdAllrecs(~(trim(case_identifier,left,right) in  FLAccidents_Ecrash.Suppress_Id and source_id in ['EA', 'TF'])); 
-allrecsSupressed1 := allrecs0(trim(report_id,left,right) not in Suppress_report_d);
+allrecsSupressed1 := allrecs0(trim(report_id,left,right) not in FlAccidents_ecrash.Suppress_report_d);
 
 allrecsSupressed  := join(allrecsSupressed1 (incident_id not in FLAccidents_Ecrash.supress_incident_id), FLAccidents_Ecrash.Files.deletes, 
                          trim(left.case_identifier,left,right)     = trim(right.case_identifier,left,right) and 
@@ -202,6 +215,7 @@ allrecsSupressed  := join(allrecsSupressed1 (incident_id not in FLAccidents_Ecra
 	self:=left   )):persist('~thor_data400::ecrash_incident_combined');
 
 shared tref := tref0 : independent; 
+
 // Filter out TM's if TM came in accidently after TF.. All the TM's after TF are invalid.
 
 export IyetekFull := distribute(tref (report_code = 'TF'),hash(State_Report_Number));
@@ -245,9 +259,41 @@ t_sort t(t_sort L, t_sort R) := TRANSFORM
   self                          := l;
 END;
 
-troll  := ROLLUP(t_sort, LEFT.incident_id= RIGHT.incident_id,t(LEFT, RIGHT));
+shared troll  := ROLLUP(t_sort, LEFT.incident_id= RIGHT.incident_id,t(LEFT, RIGHT));
 
-grp    := group(sort(troll,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,source_id),case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,source_id);
+
+	grp_coplogic    := group(sort(troll(trim(vendor_code, left,right) = 'COPLOGIC'),case_identifier,agency_id,loss_state_abbr,crash_date,Supplemental_report),case_identifier,agency_id,loss_state_abbr,crash_date);
+
+grp_coplogic coplogic(grp_coplogic l, grp_coplogic r) := transform	
+															
+			is_supplemental             := if((trim(l.agency_id,left,right)           =  trim(r.agency_id ,left,right)       and
+                                      trim(l.loss_state_abbr,left,right)       				=  trim(r.loss_state_abbr ,left,right) and
+                                      trim(l.case_identifier,left,right)       		=  trim(r.case_identifier ,left,right) and
+                                      trim(l.crash_date,left,right)                = trim(r.crash_date ,left,right)and
+																			trim(r.Supplemental_Report, left, right) = 	'1'  )  , 'Y', 'N');  
+										
+
+/* if(is_supplemental = 'Y' and trim(r.Supplemental_Report, left, right) = 	'1' ,'U')
+   if (is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'1' ,'D')
+   if (is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'0' ,'')
+*/
+	self.U_D_flag								:= map(	is_supplemental = 'Y' and trim(r.Supplemental_Report, left, right) = 	'1' => 'U',
+																			is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'1' =>'D' , 
+																			is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'0'  =>'' , 'D');
+  //self.U_D_flag                :=if(is_supplemental = 'Y' and trim(r.Supplemental_Report, left, right) = 	'1' ,'U' ,''); //if ( l.incident_id = '' , '', if(is_supplemental ='Y' ,'U' , 'N')); 
+  self.changed_hashkey         :=  map(	is_supplemental = 'Y' and trim(r.Supplemental_Report, left, right) = 	'1' => 'U',
+																			is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'1' =>'D' , 
+																			is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'0'  =>'', 'D' );
+	self.changed_data_lev1       :=  map(	is_supplemental = 'Y' and trim(r.Supplemental_Report, left, right) = 	'1' => 'U',
+																			is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'1' =>'D' , 
+																			is_supplemental = 'N' and trim(r.Supplemental_Report, left, right) = 	'0'  =>'' , 'D' );
+  self                         := r;
+end;
+shared ds_coplogic := iterate(grp_coplogic,coplogic(left,right));
+
+
+
+grp    := group(sort(troll(trim(vendor_code, left,right) <> 'COPLOGIC'),case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,source_id),case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,source_id);
 
 // set a flag if Dupe or update 
 grp aflag(grp l, grp r) := transform	
@@ -274,27 +320,51 @@ grp aflag(grp l, grp r) := transform
   self                         := r;
 end;
 
-  compare_add := iterate(grp,aflag(left,right));
-								
-  tincident1  := sort(distribute(project(compare_add,transform(FLAccidents_Ecrash.Layouts.ReportVersionNested,
+
+ds_other := iterate(grp,aflag(left,right));
+//compare_add := ds_coplogic + ds_other;
+	
+	//Coplogic Reports
+tincident_c  := sort(distribute(project(ds_coplogic,transform(FLAccidents_Ecrash.Layouts.ReportVersionNested,
 												 
-													self.hash_				     :=	 dataset([{Left.Creation_Date,Left.Incident_ID,left.Report_ID,Left.Hash_Key,left.U_D_flag,left.Sent_to_HPCC_DateTime,left.report_code}],{FLAccidents_Ecrash.Layouts.l_hash});
+													self.hash_				     :=	 dataset([{Left.Creation_Date,Left.Incident_ID,left.Report_ID,Left.Hash_Key,left.U_D_flag,left.Sent_to_HPCC_DateTime,left.report_code,left.page_count,left.Supplemental_report, left.report_type_id}],{FLAccidents_Ecrash.Layouts.l_hash});
+													self.super_report_id   := left.Report_ID;
+													self:= left))	,hash(case_identifier))	,case_identifier,agency_id,loss_state_abbr,crash_date,source_id, -Sent_to_HPCC_DateTime,-creation_date, local);											
+
+ tincident_c tmakechildren_c(tincident_c L, tincident_c R) := transform
+
+     self.hash_						                  :=	L.hash_&R.hash_;
+     //self.super_report_ID		                :=	if((integer)L.super_Report_ID < (integer)R.super_Report_ID,l.super_Report_ID,r.super_Report_ID);
+		 self.super_report_ID		                :=	if(L.U_D_Flag = '',l.super_Report_ID,r.super_Report_ID);
+		 self := L;
+ end;
+//Non Coplogic reports
+tincident_other  := sort(distribute(project(ds_other,transform(FLAccidents_Ecrash.Layouts.ReportVersionNested,
+												 
+													self.hash_				     :=	 dataset([{Left.Creation_Date,Left.Incident_ID,left.Report_ID,Left.Hash_Key,left.U_D_flag,left.Sent_to_HPCC_DateTime,left.report_code,left.page_count,left.Supplemental_report, left.report_type_id}],{FLAccidents_Ecrash.Layouts.l_hash});
 													self.super_report_id   := left.Report_ID;
 													self:= left))	,hash(case_identifier))	,case_identifier,agency_id,loss_state_abbr,report_type_id,crash_date,source_id, -Sent_to_HPCC_DateTime,-creation_date, local);											
 
- tincident1 tmakechildren1(tincident1 L, tincident1 R) := transform
+ tincident_other tmakechildren_other(tincident_other L, tincident_other R) := transform
 
      self.hash_						                  :=	L.hash_&R.hash_;
      self.super_report_ID		                :=	if((integer)L.super_Report_ID < (integer)R.super_Report_ID,l.super_Report_ID,r.super_Report_ID);
 		 self := L;
  end;
 
-drollup_report_versionkey := rollup(tincident1,case_identifier+agency_id+loss_state_abbr+report_type_id+crash_date+source_id, tmakechildren1(left, right), local):persist('EA_report_version');
+
+drollup_report_versionkey_c := rollup(tincident_c,case_identifier+agency_id+loss_state_abbr+crash_date+source_id, tmakechildren_c(left, right), local):persist('~thor_data400::EA_report_version_Coplogic');			
+ 
+drollup_report_versionkey_other := rollup(tincident_other,case_identifier+agency_id+loss_state_abbr+report_type_id+crash_date+source_id, tmakechildren_other(left, right), local):persist('~thor_data400::EA_report_version');
 			
+// Add Coplogic and other reports
+
+cmbnd_drollup_report_versionkey := drollup_report_versionkey_c + drollup_report_versionkey_other;
+
 //Normalize hashes
-	hashTable := table(drollup_report_versionkey, 
+	hashTable := table(cmbnd_drollup_report_versionkey, 
 								{integer hashCount := count(hash_), 
-								drollup_report_versionkey});
+								cmbnd_drollup_report_versionkey});
 
 	FLAccidents_Ecrash.Layouts.ReportVersion gethash(hashTable l, integer c):= transform
 		
@@ -324,11 +394,5 @@ drollup_report_versionkey := rollup(tincident1,case_identifier+agency_id+loss_st
   end;
 	
 	export compare_add_new := iterate(get_new,tflag(left,right));
-	
-	//ut.MAC_SF_BuildProcess(compare_add_new,'~thor_data400::base::ecrash_supplemental',buildBase,,,true);
-	//ut.MAC_SF_BuildProcess(TMafterTF,'~thor_data400::base::ecrash_TMafterTF',buildBaseTMafterTF,,,true);
-
-	//return sequential(buildBaseTMafterTF,buildBase);
-//OUTPUT(compare_add_new)	;
-	
+		
 	end; 

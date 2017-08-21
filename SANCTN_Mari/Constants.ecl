@@ -13,5 +13,6 @@ export skipSet := [];
 
 export type_str := 'AK';
 export boolean USE_ALL_LOOKUPS  := TRUE;
+export boolean FIRST_TIME			  := TRUE;
 end;
 

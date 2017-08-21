@@ -21,21 +21,21 @@ mc	 := join(mc0, suff_ssns,
 //***** REMOVE THE DECEASED FROM CONSIDERATION
 
 
-dead_ssns := dedup(project(head(address.isDeathRecord(prim_name)), {head.ssn}), all);
-mcliv1 := join(mc, dead_ssns,
+dead_ssns := dedup(project(head(MDR.sourceTools.SourceIsDeath(src)), {head.ssn}), all);
+mcliv1 := join(distribute(mc,hash(ssn)), distribute(dead_ssns,hash(ssn)),
 					    left.ssn = right.ssn,
 							transform(header.layout_matchcandidates,
 											  self := left),
 							left only,
-							lookup);
+							local);
 							
-dead_dids := dedup(project(head(address.isDeathRecord(prim_name)), {head.did}), all);
-mcliv := join(mcliv1, dead_dids,
+dead_dids := dedup(project(head(MDR.sourceTools.SourceIsDeath(src)), {head.did}), all);
+mcliv := join(distribute(mcliv1,hash(did)), distribute(dead_dids,hash(did)),
 					    left.did = right.did,
 							transform(header.layout_matchcandidates,
 											  self := left),
 							left only,
-							lookup);
+							local);
 
 
 //***** ROLLUP DT BY DID/DOB/SRC AND APPEND TO MATCHRECS

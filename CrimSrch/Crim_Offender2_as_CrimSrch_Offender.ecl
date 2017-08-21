@@ -1,4 +1,4 @@
-import CrimSrch, Crim_Common;
+import CrimSrch, Crim_Common, hygenics_search;
 
 integer1 fGetScoreRank(string2 pScore)
  := case(pScore,
@@ -86,7 +86,7 @@ Layout_Moxie_Punishment tRollupPunishmentDates(Layout_Moxie_Punishment pLeft, La
  ;
 
 dCrimMinusVendorsToOmit	:= /*CrimSrch.Crim_Court_FCRA_UT_Orem_Offender 
-							+ */File_Crim_Offender2(Vendor not in sCourt_Vendors_To_Omit);
+							+ */hygenics_search.File_Crim_Offender2(Vendor not in sCourt_Vendors_To_Omit);
 dCrimOffender2Dist		:= distribute(dCrimMinusVendorsToOmit,hash(Offender_Key));
 dCrimOffender2Sorted	:= sort(dCrimOffender2Dist,Offender_Key,local);
 

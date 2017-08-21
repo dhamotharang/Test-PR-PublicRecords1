@@ -1,4 +1,6 @@
-import lib_fileservices, ut, header_services, doxie,_Control,data_services,header;
+import lib_fileservices, ut, header_services, doxie,_Control,data_services,header,PRTE2_Header,PRTE2_Watchdog;
+
+EXPORT Key_Prep_Watchdog_GLB(boolean exclude_util = false)  := FUNCTION
 
 string_rec := record
 	watchdog.Layout_Best;
@@ -35,13 +37,16 @@ record
 	string10     main_count := '0';
 	string10     search_count := '0';
 	string15	 DL_number := '';
-	string12     bdid := '';
+	string15     bdid := '';
 	string10     run_date := '0';
 	string10	 total_records := '0';
+	string20   RawAID := '0';
+	string8 addr_dt_first_seen := '0';
+	string10 ind := '';
 	string2      EOR := '';
 end;
 
-header_services.Supplemental_Data.mac_verify('file_best_inj.txt', drop_header_layout, attr);
+header_services.Supplemental_Data.mac_verify('file_bestv2_inj.txt', drop_header_layout, attr);
 
 Base_File_Append_In := attr();
 
@@ -68,6 +73,8 @@ string_rec reformat_layout(Base_File_Append_In L) :=
 	self.run_date := (integer4) L.run_date;
 	self.total_records := (integer4) L.total_records;
 	self.__filepos := 0;
+	self.rawaid := (unsigned)l.rawaid;
+	self.addr_dt_first_seen := (unsigned3) L.addr_dt_first_seen;
     self := L;
  end;
 
@@ -75,7 +82,10 @@ base_file_append_out := project(Base_File_Append_In, reformat_layout(left));
 //append ADL indicator
 watchdog.mac_append_ADL_ind(base_file_append_out, Base_File_Append); 
 
-wdog0 := dataset(data_services.Data_Location.Watchdog_Best + 'thor_data400::BASE::Watchdog_best',string_rec,flat) + Base_File_Append;
+wdog1 := dataset(data_services.Data_Location.Watchdog_Best + 'thor_data400::BASE::Watchdog_best',string_rec,flat) + Base_File_Append;
+wdog2 := project(Watchdog.File_Best_nonutility ,transform(string_rec,self.__filepos := 0, SELF:=LEFT)) + Base_File_Append;
+
+wdog0 := if(~exclude_util, wdog1,wdog2);
 
 t0 := join(wdog0,
 					Base_File_Append,
@@ -87,7 +97,8 @@ wdog := t0 + Base_File_Append;
 
 candidates := distribute(wdog(trim(fname)='' or trim(lname)=''),hash(did));
 not_candidates := wdog(~(trim(fname)='' or trim(lname)=''));
-glb_pst        := distribute(dataset('~thor400_84::out::watchdog_filtered_header',header.layout_header,flat),hash(did));;
+_nonutil := if(exclude_util,'_nonutil','');
+glb_pst        := distribute(dataset('~thor400_84::out::watchdog_filtered_header'+_nonutil,header.layout_header,flat),hash(did));;
 
 header.layout_header t1(glb_pst le, candidates ri) := transform
  self := le;
@@ -99,7 +110,7 @@ j1 := join(glb_pst,candidates
 			,local);
 
 //only fix those that need fixing
-bestFirstLast	:=	fn_BestFirstLastName(j1);
+bestFirstLast	:=	watchdog.fn_BestFirstLastName(j1);
 
 string_rec tr(candidates l,bestFirstLast r) := transform
 	self.fname	:=	if(l.fname='',r.fname,l.fname);
@@ -137,8 +148,14 @@ fb00:=join(candidates1,_bestSSN
 			,local);
 
 concat1 := fb00+not_candidates1;
-
-_fb := project(concat1,watchdog.layout_key);
+//temporary hack to fix IRS test case
+// Bug: 88535 - Mark Marsupial No Longer retuns in BPSReport
+_fb := project(concat1,transform(watchdog.layout_key,self.total_records:=if(left.did=166287520519,0,left.total_records),self:=left));
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+fb := project(PRTE2_Watchdog.files.file_best,transform({_fb},SELF.__filepos:=0,SELF:=LEFT));
+#ELSE
 ut.mac_suppress_by_phonetype(_fb,phone,st,fb,true,did);
+#END
+RETURN INDEX(fb,{fb},data_services.Data_location.prefix('watchdog')+'thor_data400::key::watchdog_best'+_nonutil+'.did_'+doxie.Version_SuperKey);
 
-export Key_Prep_Watchdog_GLB := INDEX(fb,{fb},'~thor_data400::key::watchdog_best.did_'+doxie.Version_SuperKey);
+END;

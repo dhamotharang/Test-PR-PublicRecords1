@@ -1,6 +1,10 @@
-IMPORT Business_Header;
+Import Data_Services, Business_Header, ut, PRTE2_Business_Header;
 
-f_cn := Business_Header_SS.File_BH_CompanyName;
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+f_cn := PRTE2_Business_Header.files().base.Companyname.keybuild;
+#ELSE
+f_cn := business_header.files().base.Companyname.keybuild;
+#END;
 
 layout_company_name_index := RECORD
 	STRING20 clean_company_name20 := f_cn.clean_company_name[1..20];

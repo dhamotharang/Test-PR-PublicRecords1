@@ -2,7 +2,7 @@ import WorldCheck, lib_stringlib, _Control;
 
 export MAC_WorldCheck_Keyword_Spray(filedate
                                    ,file_name
-								   ,group_name ='\'thor_dell400\'') := 
+								   ,group_name ='\'thor400_92\'') := 
 macro
 
 #uniquename(spray_keywords)

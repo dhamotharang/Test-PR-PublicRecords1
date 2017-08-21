@@ -13,6 +13,8 @@
  </message>
 */
 /*--INFO-- This service finds the best matching BDID, and optionally returns the best available info for that BDID and/or compares the best to the input data.*/
+/*--HTML-- xslt.bh */
+/*--RESULT-- xslt.bh */
 
 EXPORT BH_BDID_Service() := MACRO
 

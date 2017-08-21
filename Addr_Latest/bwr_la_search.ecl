@@ -95,7 +95,7 @@ layout_name_in := record
 end;
 
 layout_name_in get_clean_name(la_parse_addr l) := transform
-	self.clean_name := addrcleanlib.CleanPerson73(l.name);
+	self.clean_name := address.CleanPerson73(l.name);
 	self := l;
 end;
 

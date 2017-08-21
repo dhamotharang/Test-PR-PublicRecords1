@@ -1,9 +1,11 @@
 
-import versioncontrol, _control, ut, tools;
+import versioncontrol, _control, ut, tools, RoxieKeyBuild;
 export Build_all(string pversion, boolean pUseProd = false) := function
 
 spray_lt  		 := VersionControl.fSprayInputFiles(fSpray(pversion,pUseProd).lt);
 spray_pd  		 := VersionControl.fSprayInputFiles(fSpray(pversion,pUseProd).pd);
+
+dops_update  := sequential(RoxieKeybuild.updateversion('ThriveKeys',pversion,'angela.herzberg@lexisneis.com; Melanie.Jackson@lexisnexis.com',,'N'));
 
 built := sequential(
 					spray_lt
@@ -19,6 +21,7 @@ built := sequential(
 					,FileServices.ClearSuperFile(Filenames(pversion,pUseProd).lInputLtTemplate)
 					,FileServices.ClearSuperFile(Filenames(pversion,pUseProd).lInputPdTemplate)
 					,FileServices.FinishSuperFileTransaction()
+					,dops_update
 				): success(Send_Email(pversion,pUseProd).BuildSuccess), failure(send_email(pversion,pUseProd).BuildFailure
 
 );

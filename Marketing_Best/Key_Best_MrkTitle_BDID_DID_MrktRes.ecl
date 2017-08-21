@@ -1,6 +1,6 @@
 import doxie;
 
-base := Marketing_Best.File_Marketing_Title_Restricted(bdid <> 0 and did <> 0);				   
+base := Files().Titles_Restricted.built(bdid <> 0 and did <> 0);				   
 
 export Key_Best_MrkTitle_BDID_DID_MrktRes := index(base,
 											{l_bdid := bdid,

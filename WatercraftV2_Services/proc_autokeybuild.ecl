@@ -2,10 +2,12 @@ import autokeyb2,doxie,ut,corp2,address,watercraft;
 
 export proc_autokeybuild(string filedate) := FUNCTION
 
-dis_watercraft :=distribute(watercraft.File_Base_search_Dev(watercraft_key <> ''),hash(watercraft_key));
+Base_file := Watercraft.File_Base_Search_Dev_Ph_Supressed_bdid;
+
+dis_watercraft :=distribute(Base_file(watercraft_key <> ''),hash(watercraft_key));
 
 layout_watercraft := record
-Watercraft.Layout_Watercraft_Search_Base;
+Watercraft.Layout_Watercraft_Search_Base_slim;
 	unsigned6 ldid;
 	unsigned6 lbdid;
 	string10 phone :='';
@@ -25,7 +27,7 @@ END;
 
 
 
-layout_watercraft both_cities(Watercraft.Layout_Watercraft_Search_Base le,integer C):=transform
+layout_watercraft both_cities(dis_watercraft le,integer C):=transform
 self.city :=choose(C,le.p_city_name,if(le.v_city_name='' or le.v_city_name=le.p_city_name,skip,le.v_city_name ));
 self.ldid :=(unsigned6) le.did;
 self.lbdid :=(unsigned6) le.bdid;
@@ -129,7 +131,7 @@ AutoKeyB2.MAC_Build (autokey_ready,fname,mname,lname,
 						WatercraftV2_Services.Constants(filedate).ak_keyname,
 						WatercraftV2_Services.Constants(filedate).ak_logical,
 						outaction,false,
-						[],true,WatercraftV2_Services.Constants(filedate).ak_typeStr,true) 
+						[],true,WatercraftV2_Services.Constants(filedate).ak_typeStr,true,,,zero) 
 
 
 

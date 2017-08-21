@@ -21,7 +21,7 @@ EXPORT MAC_DatasetAsOf(dsIn, rid_field, did_field, uniqueid_field = '', dt_early
 	hasAsOfDateField := TRIM(#TEXT(asofdate_field)) > '';
 	nowDateUse := STD.Date.CurrentDate(TRUE);
 	nowTimeUse := STD.Date.CurrentTime(TRUE);
-	nowDateTimeUse := (UNSIGNED6)(INTFORMAT(nowDateUse,8,1) + INTFORMAT(nowTimeUse,6,1));
+	nowDateTimeUse := (UNSIGNED6)(((STRING)nowDateUse) + ((STRING)nowTimeUse));
 	
 	asofDateUse := MAP(dt_resolution = 'YYYYMMDDHHMMSS' => (UNSIGNED6)nowDateTimeUse,
 	                   dt_resolution = 'YYYYMMDD' => (UNSIGNED6)nowDateUse,

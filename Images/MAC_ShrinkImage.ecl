@@ -1,4 +1,7 @@
-export MAC_ShrinkImage(ds, filename, lengthfield, photofield, outf) := 
+/*2005-03-22T11:26:49Z (Mark Luber1)
+2004-03-31T16:56:07Z, Copied with AMT from Attribute Modified by Mark Luber
+*/
+export MAC_ShrinkImage(ds, filename, lengthfield, photofield, outfile) := 
 MACRO
 // separate out the big ones to convert
 #uniquename(toobig)
@@ -11,8 +14,10 @@ MACRO
 #uniquename(photo)
 #uniquename(seq)
 %plusSeq_Layout% :=
-RECORD, maxlength(10000000)
-	ds;
+RECORD
+	ds.filename;
+	ds.lengthfield;
+	DATA2000000 photofield;
 	INTEGER %seq%;
 END;
 
@@ -24,15 +29,14 @@ TRANSFORM
 	SELF.%seq% := C;
 	SELF := L;
 END;
-
-ut.MAC_Sequence_Records_NewRec(%toobig%, %plusSeq_Layout%, %seq%, %withSeq%);
+ut.MAC_Sequence_Records_NewRec(%toobig%, %plusSeq_Layout%, %seq%, %withSeq%)
+// %withSeq% := PROJECT(%toobig%, %addSeq%(LEFT, COUNTER));
 
 // pull out the photo
 #uniquename(justPhoto_Layout)
 #uniquename(justPhoto)
 %justPhoto_Layout% :=
-RECORD, maxlength(10000000)
-	%withSeq%.lengthfield;
+RECORD
 	%withSeq%.photofield;
 END;
 %justPhoto% := TABLE(%withSeq%, %justPhoto_Layout%);
@@ -42,16 +46,16 @@ END;
 #uniquename(justSmallPhoto)
 #uniquename(photo)
 %smallPhoto_Layout% :=
-RECORD, MAXLENGTH(50000)
+RECORD, MAXLENGTH(images.MaxLength_FullImage)
 	DATA photofield;
 END;
-%justSmallPhoto% := PIPE(%justPhoto%, '/mnt/usrbin/jpeg/doit.sh', %smallPhoto_Layout%, REPEAT);
+%justSmallPhoto% := PIPE(%justPhoto%, 'resizeimage.sh', %smallPhoto_Layout%, REPEAT);
 
 // add back the sequence number
 #uniquename(smallPhoto_Layout2)
 #uniquename(addSeq2)
 %smallPhoto_Layout2% :=
-RECORD, MAXLENGTH(50008)
+RECORD, MAXLENGTH(images.MaxLength_FullImage)
 	INTEGER %seq%;
 	DATA photofield;
 END;
@@ -61,7 +65,8 @@ TRANSFORM
 	SELF.photofield := L.photofield;
 END;
 #uniquename(SmallPhotoSeq)
-ut.MAC_Sequence_Records_NewRec(%justSmallPhoto%, %smallPhoto_Layout2%, %seq%, %SmallPhotoSeq%);
+ut.MAC_Sequence_Records_NewRec(%justSmallPhoto%, %smallPhoto_Layout2%, %seq%, %SmallPhotoSeq%)
+// %SmallPhotoSeq% := PROJECT(%justSmallPhoto%, %addSeq2%(LEFT, COUNTER));
 
 #uniquename(joiner)
 #uniquename(cleaner)
@@ -83,6 +88,6 @@ TRANSFORM
 END;
 %justRightInCommon% := PROJECT(%justright%, %cleaner%(LEFT));
 
-outf := %toobigInCommon% + %justRightInCommon%;
+outfile := %toobigInCommon% + %justRightInCommon%;
 
 ENDMACRO;

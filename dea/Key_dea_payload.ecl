@@ -1,4 +1,4 @@
-import doxie,autokeyb2;
+import doxie,autokeyb2,DEA;
 
 b_in := DEA.File_Dea_Doxie;
 

@@ -1,6 +1,6 @@
 Import Data_Services, Ingenix_NatlProf, doxie, Data_Services;
 
-base_file := Ingenix_NatlProf.file_sanctions_cleaned_dided_dates(SANC_UPIN<>'');
+base_file := Ingenix_NatlProf.Basefile_Sanctions_Bdid(SANC_UPIN<>'');
 
 slim_rec := record
 	unsigned6 SANC_ID;

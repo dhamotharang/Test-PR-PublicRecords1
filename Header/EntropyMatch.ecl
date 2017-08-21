@@ -1,4 +1,4 @@
-export EntropyMatch(infile,outfile) := macro
+export EntropyMatch(infile,outfile,outfile_amb) := macro
 
 h := distribute(infile,hash(did));
 
@@ -28,6 +28,7 @@ wh add_cnt(h le,ta ri) := transform
 jb := join(h,ta,left.did=right.did,add_cnt(left,right),local);
 
 rd(string le,string ri) := le=ri or ri='';
+rdi(unsigned le,unsigned ri) := le=ri or ri=0;	//same idea, but accounts for 0 as a null
 rdp(string le,string ri) := le=ri or ri='' or length(trim(ri))=1 and ri[1]=le[1];
 dob_sub(unsigned4 le,unsigned4 ri) := le=ri or ri=0 or
                                       le div 100 = ri div 100 and ri % 100 = 0 or
@@ -36,6 +37,7 @@ dob_sub(unsigned4 le,unsigned4 ri) := le=ri or ri=0 or
 lpe := record
   header.Layout_PairMatch;
   unsigned4 l_cnt;
+	boolean is_amb := false;
   end;
 
 lpe do_pair(jb le,jb ri) := transform
@@ -52,7 +54,7 @@ cj := join(jb_dist,jb_dist(cnt=1),
   left.lname=right.lname and
   left.prim_range=right.prim_range and
   left.prim_name=right.prim_name and
-  rd(left.phone,right.phone) and
+  rdi((unsigned)left.phone,(unsigned)right.phone) and		//account for 0000000000.  essentially a workaround for data bug 31571 
   rd(left.ssn,right.ssn) and
   dob_sub(left.dob,right.dob) and
   rd(left.title,right.title) and
@@ -68,14 +70,42 @@ cj := join(jb_dist,jb_dist(cnt=1),
   left.zip=right.zip and
   left.zip4=right.zip4,do_pair(left,right),local);
 
-o1 := dedup(sort(distribute(cj,old_rid),old_rid,-l_cnt,new_rid,local),old_rid,local);
+o1_pre := dedup(sort(distribute(cj,old_rid),old_rid,new_rid,local),old_rid,new_rid,local);
 
-layout_pairmatch swinto(o1 le) := transform
-  self.old_rid := IF(le.old_rid>le.new_rid,le.old_rid,le.new_rid);
-  self.new_rid := IF(le.old_rid<le.new_rid,le.old_rid,le.new_rid);
+lpe roll_ent(lpe le, lpe ri) :=
+TRANSFORM
+	SELF.is_amb := true;
+	SELF := le;
+END;
+
+o1 := nofold(rollup(sort(o1_pre,old_rid,-l_cnt,new_rid,local),
+						LEFT.old_rid=RIGHT.old_rid,roll_ent(LEFT,RIGHT),local)
+						) : independent;  //nofold is a bug workaround (31565) and independent just makes the graph consolidate some work
+
+hlpmp := record
+	header.layout_pairmatch;
+	boolean didswitch;
+end;
+
+hlpmp swinto(o1 le) := transform
+	boolean toswitch := le.old_rid<le.new_rid;
+  self.old_rid := IF(toswitch,le.new_rid,le.old_rid);
+  self.new_rid := IF(toswitch,le.old_rid,le.new_rid);
+  self.didswitch := toswitch;
   self := le;
   end;
 
-outfile := dedup(project(o1,swinto(left)),old_rid,new_rid,all) : persist('persist::EntropyMatch');
+ proj := distribute(project(o1(~is_amb),swinto(left)), hash(old_rid));
+ ddpd := dedup(sort(proj, old_rid, if(didswitch, 1, 0), local),old_rid,local);
+ outfile0 := project(ddpd, header.layout_pairmatch);
+ 
+ typeof(outfile0) take_left(outfile0 le) := transform
+  self := le;
+  end;
+
+outfile := join(outfile0,outfile0,left.new_rid=right.old_rid,take_left(left),hash,left only) : persist('persist::EntropyMatch');
+ 
+outfile_amb := o1(is_amb);
+
 
   endmacro;

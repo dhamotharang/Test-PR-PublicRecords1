@@ -3,5 +3,5 @@ string_rec := record
     unsigned integer8 __filepos { virtual(fileposition)};
 end;
 export File_Business_Header_Stats_Keybuild := 
-	dataset(bus_thor+'OUT::Business_Header_Stat',
+	dataset(_dataset().thor_cluster_files+'OUT::Business_Header_Stat_built',
 	string_rec,flat);

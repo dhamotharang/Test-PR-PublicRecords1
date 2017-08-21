@@ -35,19 +35,19 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriage_divorce
  //husband
  self.party1_name_format 		:= 'L';
  self.party1_type						:= 'H';
- self.party1_name        		:= stringlib.stringcleanspaces( if(trim(le.Husbands_Name)='','UNKNOWN',trim(le.Husbands_Name)));
- self.party1_age						:=le.Husbands_Age;
+ self.party1_name        		:= stringlib.stringcleanspaces( if(trim(le.Husbands_Name)='','UNKNOWN',REGEXREPLACE(',',trim(le.Husbands_Name),'')));
+ self.party1_age						:=REGEXREPLACE('([.?-~])',le.Husbands_Age,'');
    
 //wife 
  self.party2_name_format 		:= 'L';
  self.party2_type						:= 'W';
- self.party2_name        		:= stringlib.stringcleanspaces( if(trim(le.Wifes_Name)='','UNKNOWN',trim(le.Wifes_Name)));
- self.party2_age						:= le.Wifes_Age;
- self.number_of_children		:= le.Number_of_Children_Under_18;
+ self.party2_name        		:= stringlib.stringcleanspaces( if(trim(le.Wifes_Name)='','UNKNOWN',REGEXREPLACE(',',trim(le.Wifes_Name),'')));
+ self.party2_age						:= REGEXREPLACE('([.?-~])',le.Wifes_Age,'');
+ self.number_of_children		:= REGEXREPLACE('([.?-~])',le.Number_of_Children_Under_18,'');
  
  //marriage info
- v_marr_dt									 := stringlib.stringfindreplace(trim(le.Marriage_Date),'/',''); 
- self.marriage_dt        		 := v_marr_dt[5..]+v_marr_dt[1..2]+v_marr_dt[3..4];
+ //v_marr_dt									 := stringlib.stringfindreplace(REGEXREPLACE('([.?-~])',trim(le.Marriage_Date),''),'/',''); 
+ self.marriage_dt        		 := ut.date_slashed_MMDDYYYY_to_YYYYMMDD(le.Marriage_Date);
  
  
  
@@ -55,12 +55,12 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriage_divorce
  self.divorce_filing_number := trim(le.File_Number);
  self.divorce_county        := trim(le.County_Name_Where_Divorce_Occurred);
  
- v_div_dt									 := stringlib.stringfindreplace(trim(le.Divorce_Date),'/',''); 
- self.divorce_dt        		 := v_div_dt[5..]+v_div_dt[1..2]+v_div_dt[3..4];
+ //v_div_dt									 := stringlib.stringfindreplace(REGEXREPLACE('([.?-~])',trim(le.Divorce_Date),''),'/',''); 
+ self.divorce_dt        		 := ut.date_slashed_MMDDYYYY_to_YYYYMMDD(le.Divorce_Date);
  
  self := [];
 
  
 end;
 
-export mapping_tx_divorce := project(marriage_divorce_v2.File_Divorce_TX_In,t_map_to_common(left)) : persist('mar_div_tx_div');
+export mapping_tx_divorce := project(marriage_divorce_v2.File_Divorce_TX_In,t_map_to_common(left));// : persist('mar_div_tx_div');

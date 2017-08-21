@@ -33,6 +33,7 @@ export Edgar_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.bus_v_city_name),
 				self.state := left.bus_st,
 				self.zip := left.bus_zip,
+				self.zip4 := left.bus_zip4,
 				self.county_fips := left.bus_county[3..5],
 				self.msa := left.bus_msa,
 				self.phone := left.bus_phone10,
@@ -68,6 +69,7 @@ export Edgar_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.mail_v_city_name),
 				self.state := left.mail_st,
 				self.zip := left.mail_zip,
+				self.zip4 := left.mail_zip4,
 				self.county_fips := left.mail_county[3..5],
 				self.msa := left.mail_msa,
 				self.phone := left.mail_phone10,
@@ -126,6 +128,8 @@ export Edgar_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.zip4 := '',
 				self.position_title := left.position,		
 				self.position_type := 'C',
+				self.did := left.did,
+				self.score := 0,
 				self := []));
 		
 		return extract;

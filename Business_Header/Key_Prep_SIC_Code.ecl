@@ -1,4 +1,4 @@
-import header_services,paw;
+Import Data_Services, header_services, paw, PRTE2_Business_Header;
 
 Drop_Header_Layout := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
 Record
@@ -23,9 +23,9 @@ other_sic := project(Base_File_Append_In, reformat_layout(left));
 //========
 pPersistname := business_header.persistnames().BHBDIDSIC + '::sickey'; 
 
-dpawinactives := paw.fCorpInactives(pPersistname := paw.persistnames.f_CorpInactives + '::sickey');
+dpawinactives := paw.fCorpInactives(pPersistname := paw.persistnames().f_CorpInactives + '::sickey');
 
-base := Business_Header.BH_BDID_SIC(pPersistname := pPersistname,pInactiveCorps := dpawinactives);
+base := Business_Header.BH_BDID_SIC('built',pPersistname := pPersistname,pInactiveCorps := dpawinactives);
 
 Suppression_Layout := header_services.Supplemental_Data.layout_in;
 
@@ -67,7 +67,12 @@ f.sic_code;
 end;
 
 fprep := table(f, layout_sic_index);
+
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+fdedup := dataset([],layout_sic_index);
+#ELSE
 fdedup := dedup(fprep, all);
+#END;
 
 export Key_Prep_SIC_Code := index(
 	fdedup, {bdid}, {sic_code},

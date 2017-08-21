@@ -1,6 +1,9 @@
 export Constants := module
 	
 	export Cluster		 := '~thor_200';
+	// For testing on dataland, comment out the line above and uncomment the line below.
+	// Make the same change to: Key_Document_ORID, Key_Party_ORID and Key_Official_Record_Payload.
+	//export Cluster		 := '~thor_data400';
 	export ak_keyname  := Cluster + '::key::official_records::autokey::';
 	export ak_logical(string filedate='')	:= Cluster+'::key::official_records::'+
 	                                         filedate+'::autokey::';

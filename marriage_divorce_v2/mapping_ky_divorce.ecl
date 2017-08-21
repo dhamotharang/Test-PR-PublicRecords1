@@ -47,7 +47,7 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriage_divorce
 														'UNKNOWN',
 														trim(le.husband_last_name)+', '+le.husband_first_name+' '+le.husband_middle_initial));	
  
- self.party1_age         := le.husband_age;
+ self.party1_age         := if(le.husband_age<>'99',le.husband_age,'');
 
  self.party1_county        := stringlib.stringtouppercase(marriage_divorce_v2.get_ky_county(le.husband_place_of_residence));
  self.party1_race := case(le.husband_race,'1'=>'WHITE','2'=>'NEGRO','3'=>'OTHER','9'=>'UNKNOWN','');
@@ -59,7 +59,7 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriage_divorce
  self.party2_name        		:= stringlib.stringcleanspaces( if(trim(le.wife_maiden_name)='' or trim(le.wife_first_name)='',
 														'UNKNOWN',
 														trim(le.wife_maiden_name)+', '+le.wife_first_name+' '+le.wife_middle_initial));	
- self.party2_age         		:= le.wife_age;
+ self.party2_age         		:= if(le.wife_age<>'99',le.wife_age,'');
 
  self.party2_county        	:= stringlib.stringtouppercase(marriage_divorce_v2.get_ky_county(le.wife_place_of_residence));
  self.party2_race          	:= case(le.wife_race,'1'=>'WHITE','2'=>'NEGRO','3'=>'OTHER','9'=>'UNKNOWN','');
@@ -81,4 +81,4 @@ marriage_divorce_v2.layout_mar_div_intermediate t_map_to_common(marriage_divorce
 
 end;
 
-export mapping_ky_divorce := project(marriage_divorce_v2.File_Divorce_KY_In,t_map_to_common(left)) : persist('mar_div_ky_div');
+export mapping_ky_divorce := project(marriage_divorce_v2.File_Divorce_KY_In,t_map_to_common(left));// : persist('mar_div_ky_div');

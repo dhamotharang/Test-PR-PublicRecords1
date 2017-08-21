@@ -6,7 +6,7 @@ Take Sr. over Jr.*/
 
 import header, mdr, ut;
 
-f := file_header_filtered(name_suffix<>'UNK');
+f := file_header_filtered(~ut.is_unk(name_suffix));
 
 rfields := record
  f.did;

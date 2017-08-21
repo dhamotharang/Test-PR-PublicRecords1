@@ -1,4 +1,4 @@
-IMPORT ut,SALT33;
+IMPORT ut,SALT33, /*HACK*/SALT38;
 IMPORT BIPV2;
 EXPORT specificities(DATASET(layout_DOT) ih) := MODULE
  
@@ -75,13 +75,13 @@ EXPORT rejected_file := h0(reject);
  
 EXPORT input_file_np := h0; // No-persist version for remote_linking
  
-EXPORT input_file := h0(~Reject) : PERSIST('~temp::DOTid::BIPV2_DOTID::Specificities_Cache',EXPIRE(Config.PersistExpire));
+EXPORT input_file := h0(~Reject) : PERSIST('~temp::DOTid::BIPV2_DotID::Specificities_Cache',EXPIRE(Config.PersistExpire));
 //We have DOTid specified - so we can compute statistics on the cluster counts
   r0 := RECORD
     input_file.DOTid;
     UNSIGNED6 InCluster := COUNT(GROUP);
   end;
-EXPORT ClusterSizes := TABLE(input_file,r0,DOTid,LOCAL) : PERSIST('~temp::DOTid::BIPV2_DOTID::Cluster_Sizes',EXPIRE(Config.PersistExpire));
+EXPORT ClusterSizes := TABLE(input_file,r0,DOTid,LOCAL) : PERSIST('~temp::DOTid::BIPV2_DotID::Cluster_Sizes',EXPIRE(Config.PersistExpire));
 EXPORT TotalClusters := COUNT(ClusterSizes);
  
 EXPORT  cnp_name_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,cnp_name); // Reduce to field values by UID
@@ -93,8 +93,8 @@ EXPORT  cnp_name_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,cnp_name); 
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-  SALT33.mac_edit_distance_pairs(specs_added,cnp_name,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
-EXPORT cnp_name_values_persisted_temp := distance_computed : PERSIST('~temp::DOTid::BIPV2_DOTID::values::cnp_name',EXPIRE(Config.PersistExpire));
+  /*HACK*/SALT38.mac_edit_distance_pairs(specs_added,cnp_name,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
+EXPORT cnp_name_values_persisted_temp := distance_computed : PERSIST('~temp::DOTid::BIPV2_DotID::values::cnp_name',EXPIRE(Config.PersistExpire));
  
 EXPORT  corp_legal_name_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,corp_legal_name); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(corp_legal_name_deduped,corp_legal_name,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -112,7 +112,7 @@ SHARED corp_legal_name_sa := specs_added; // Hop over shared/export below
   SALT33.MAC_Field_Specificities(counted,wb_specs_added) // Compute specificity for each value
 SHARED corp_legal_name_ad := wb_specs_added; // Hop over export
  
-EXPORT corp_legal_nameValuesKeyName := '~'+'key::BIPV2_DOTID::DOTid::WordBag::corp_legal_name';
+EXPORT corp_legal_nameValuesKeyName := '~'+'key::BIPV2_DotID::DOTid::WordBag::corp_legal_name';
  
 EXPORT corp_legal_name_values_key := INDEX(corp_legal_name_ad,{corp_legal_name},{corp_legal_name_ad},corp_legal_nameValuesKeyName);
   SALT33.mac_wordbag_addweights(corp_legal_name_sa,corp_legal_name,corp_legal_name_ad,p);
@@ -127,7 +127,7 @@ EXPORT  cnp_number_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,cnp_numbe
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT cnp_number_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::cnp_number',EXPIRE(Config.PersistExpire));
+EXPORT cnp_number_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::cnp_number',EXPIRE(Config.PersistExpire));
  
 EXPORT  cnp_btype_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,cnp_btype); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(cnp_btype_deduped,cnp_btype,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -138,7 +138,7 @@ EXPORT  cnp_btype_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,cnp_btype)
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT cnp_btype_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::cnp_btype',EXPIRE(Config.PersistExpire));
+EXPORT cnp_btype_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::cnp_btype',EXPIRE(Config.PersistExpire));
  
 EXPORT  company_fein_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,company_fein); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(company_fein_deduped,company_fein,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -149,7 +149,7 @@ EXPORT  company_fein_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,company
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT company_fein_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::company_fein',EXPIRE(Config.PersistExpire));
+EXPORT company_fein_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::company_fein',EXPIRE(Config.PersistExpire));
  
 EXPORT  active_duns_number_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,active_duns_number); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(active_duns_number_deduped,active_duns_number,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -160,7 +160,7 @@ EXPORT  active_duns_number_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,a
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT active_duns_number_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::active_duns_number',EXPIRE(Config.PersistExpire));
+EXPORT active_duns_number_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::active_duns_number',EXPIRE(Config.PersistExpire));
  
 EXPORT  active_enterprise_number_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,active_enterprise_number); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(active_enterprise_number_deduped,active_enterprise_number,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -171,7 +171,7 @@ EXPORT  active_enterprise_number_deduped := SALT33.MAC_Field_By_UID(input_file,D
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT active_enterprise_number_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::active_enterprise_number',EXPIRE(Config.PersistExpire));
+EXPORT active_enterprise_number_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::active_enterprise_number',EXPIRE(Config.PersistExpire));
  
 EXPORT  active_domestic_corp_key_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,active_domestic_corp_key); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(active_domestic_corp_key_deduped,active_domestic_corp_key,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -182,7 +182,7 @@ EXPORT  active_domestic_corp_key_deduped := SALT33.MAC_Field_By_UID(input_file,D
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT active_domestic_corp_key_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::active_domestic_corp_key',EXPIRE(Config.PersistExpire));
+EXPORT active_domestic_corp_key_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::active_domestic_corp_key',EXPIRE(Config.PersistExpire));
  
 EXPORT  prim_range_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,prim_range); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(prim_range_deduped,prim_range,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -193,7 +193,7 @@ EXPORT  prim_range_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,prim_rang
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT prim_range_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::prim_range',EXPIRE(Config.PersistExpire));
+EXPORT prim_range_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::prim_range',EXPIRE(Config.PersistExpire));
  
 EXPORT  prim_name_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,prim_name); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(prim_name_deduped,prim_name,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -204,7 +204,7 @@ EXPORT  prim_name_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,prim_name)
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT prim_name_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::prim_name',EXPIRE(Config.PersistExpire));
+EXPORT prim_name_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::prim_name',EXPIRE(Config.PersistExpire));
  
 EXPORT  sec_range_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,sec_range); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(sec_range_deduped,sec_range,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -215,7 +215,7 @@ EXPORT  sec_range_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,sec_range)
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT sec_range_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::sec_range',EXPIRE(Config.PersistExpire));
+EXPORT sec_range_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::sec_range',EXPIRE(Config.PersistExpire));
  
 EXPORT  st_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,st); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(st_deduped,st,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -226,7 +226,7 @@ EXPORT  st_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,st); // Reduce to
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT st_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::st',EXPIRE(Config.PersistExpire));
+EXPORT st_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::st',EXPIRE(Config.PersistExpire));
  
 EXPORT  v_city_name_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,v_city_name); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(v_city_name_deduped,v_city_name,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -237,7 +237,7 @@ EXPORT  v_city_name_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,v_city_n
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT v_city_name_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::v_city_name',EXPIRE(Config.PersistExpire));
+EXPORT v_city_name_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::v_city_name',EXPIRE(Config.PersistExpire));
  
 EXPORT  zip_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,zip); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(zip_deduped,zip,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -248,7 +248,7 @@ EXPORT  zip_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,zip); // Reduce 
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT zip_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::zip',EXPIRE(Config.PersistExpire));
+EXPORT zip_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::zip',EXPIRE(Config.PersistExpire));
  
 EXPORT  csz_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,csz); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(csz_deduped,csz,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -259,7 +259,7 @@ EXPORT  csz_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,csz); // Reduce 
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT csz_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::csz',EXPIRE(Config.PersistExpire));
+EXPORT csz_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::csz',EXPIRE(Config.PersistExpire));
  
 EXPORT  addr1_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,addr1); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(addr1_deduped,addr1,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -270,7 +270,7 @@ EXPORT  addr1_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,addr1); // Red
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT addr1_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::addr1',EXPIRE(Config.PersistExpire));
+EXPORT addr1_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::addr1',EXPIRE(Config.PersistExpire));
  
 EXPORT  address_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,address); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(address_deduped,address,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -281,7 +281,7 @@ EXPORT  address_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,address); //
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT address_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::address',EXPIRE(Config.PersistExpire));
+EXPORT address_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::address',EXPIRE(Config.PersistExpire));
  
 EXPORT  isContact_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,isContact); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(isContact_deduped,isContact,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -292,7 +292,7 @@ EXPORT  isContact_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,isContact)
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT isContact_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::isContact',EXPIRE(Config.PersistExpire));
+EXPORT isContact_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::isContact',EXPIRE(Config.PersistExpire));
  
 EXPORT  fname_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,fname); // Reduce to field values by UID
   SALT33.MAC_Field_Variants_Initials(fname_deduped,DOTid,fname,expanded) // expand out all variants of initial
@@ -306,9 +306,9 @@ EXPORT  fname_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,fname); // Red
   SALT33.MAC_Field_Accumulate_Counts(with_id,fname_PreferredName,PreferredName_cnt,fuzzies_counted0)
   ut.MAC_Sequence_Records(fuzzies_counted0,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-  SALT33.mac_edit_distance_pairs(specs_added,fname,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
+  /*HACK*/SALT38.mac_edit_distance_pairs(specs_added,fname,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
   SALT33.MAC_Field_Initial_Specificities(distance_computed,fname,initial_specs_added) // add initial char specificities
-EXPORT fname_values_persisted_temp := initial_specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::fname',EXPIRE(Config.PersistExpire));
+EXPORT fname_values_persisted_temp := initial_specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::fname',EXPIRE(Config.PersistExpire));
  
 EXPORT  mname_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,mname); // Reduce to field values by UID
   SALT33.MAC_Field_Variants_Initials(mname_deduped,DOTid,mname,expanded) // expand out all variants of initial
@@ -320,9 +320,9 @@ EXPORT  mname_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,mname); // Red
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-  SALT33.mac_edit_distance_pairs(specs_added,mname,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
+  /*HACK*/SALT38.mac_edit_distance_pairs(specs_added,mname,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
   SALT33.MAC_Field_Initial_Specificities(distance_computed,mname,initial_specs_added) // add initial char specificities
-EXPORT mname_values_persisted_temp := initial_specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::mname',EXPIRE(Config.PersistExpire));
+EXPORT mname_values_persisted_temp := initial_specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::mname',EXPIRE(Config.PersistExpire));
  
 EXPORT  lname_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,lname); // Reduce to field values by UID
   expanded := SALT33.MAC_Field_Variants_Hyphen(lname_deduped,DOTid,lname,2); // expand out all variants when hyphenated
@@ -334,8 +334,8 @@ EXPORT  lname_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,lname); // Red
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-  SALT33.mac_edit_distance_pairs(specs_added,lname,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
-EXPORT lname_values_persisted_temp := distance_computed : PERSIST('~temp::DOTid::BIPV2_DOTID::values::lname',EXPIRE(Config.PersistExpire));
+  /*HACK*/SALT38.mac_edit_distance_pairs(specs_added,lname,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
+EXPORT lname_values_persisted_temp := distance_computed : PERSIST('~temp::DOTid::BIPV2_DotID::values::lname',EXPIRE(Config.PersistExpire));
  
 EXPORT  name_suffix_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,name_suffix); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(name_suffix_deduped,name_suffix,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -348,7 +348,7 @@ EXPORT  name_suffix_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,name_suf
   SALT33.MAC_Field_Accumulate_Counts(with_id,name_suffix_NormSuffix,NormSuffix_cnt,fuzzies_counted0)
   ut.MAC_Sequence_Records(fuzzies_counted0,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT name_suffix_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::name_suffix',EXPIRE(Config.PersistExpire));
+EXPORT name_suffix_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::name_suffix',EXPIRE(Config.PersistExpire));
  
 EXPORT  contact_ssn_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,contact_ssn); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(contact_ssn_deduped,contact_ssn,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -361,8 +361,8 @@ EXPORT  contact_ssn_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,contact_
   SALT33.MAC_Field_Accumulate_Counts(with_id,contact_ssn_Right4,Right4_cnt,fuzzies_counted0)
   ut.MAC_Sequence_Records(fuzzies_counted0,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-  SALT33.mac_edit_distance_pairs(specs_added,contact_ssn,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
-EXPORT contact_ssn_values_persisted_temp := distance_computed : PERSIST('~temp::DOTid::BIPV2_DOTID::values::contact_ssn',EXPIRE(Config.PersistExpire));
+  /*HACK*/SALT38.mac_edit_distance_pairs(specs_added,contact_ssn,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
+EXPORT contact_ssn_values_persisted_temp := distance_computed : PERSIST('~temp::DOTid::BIPV2_DotID::values::contact_ssn',EXPIRE(Config.PersistExpire));
  
 EXPORT  dt_first_seen_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,dt_first_seen); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(dt_first_seen_deduped,dt_first_seen,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -373,7 +373,7 @@ EXPORT  dt_first_seen_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,dt_fir
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT dt_first_seen_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::dt_first_seen',EXPIRE(Config.PersistExpire));
+EXPORT dt_first_seen_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::dt_first_seen',EXPIRE(Config.PersistExpire));
  
 EXPORT  dt_last_seen_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,dt_last_seen); // Reduce to field values by UID
   SALT33.Mac_Field_Count_UID(dt_last_seen_deduped,dt_last_seen,DOTid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -384,11 +384,11 @@ EXPORT  dt_last_seen_deduped := SALT33.MAC_Field_By_UID(input_file,DOTid,dt_last
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT33.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-EXPORT dt_last_seen_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DOTID::values::dt_last_seen',EXPIRE(Config.PersistExpire));
+EXPORT dt_last_seen_values_persisted_temp := specs_added : PERSIST('~temp::DOTid::BIPV2_DotID::values::dt_last_seen',EXPIRE(Config.PersistExpire));
  
 EXPORT BuildBOWFields := BUILDINDEX(corp_legal_name_values_key, OVERWRITE);
  
-EXPORT cnp_nameValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::cnp_name';
+EXPORT cnp_nameValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::cnp_name';
  
 EXPORT cnp_name_values_index := INDEX(cnp_name_values_persisted_temp,{cnp_name},{cnp_name_values_persisted_temp},cnp_nameValuesIndexKeyName);
 EXPORT cnp_name_values_persisted := cnp_name_values_index;
@@ -400,7 +400,7 @@ EXPORT cnp_name_max := MAX(cnp_name_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(cnp_name_values_persisted,cnp_name,cnp_name_nulls,ol) // Compute column level specificity
 EXPORT cnp_name_specificity := ol;
  
-EXPORT corp_legal_nameValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::corp_legal_name';
+EXPORT corp_legal_nameValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::corp_legal_name';
  
 EXPORT corp_legal_name_values_index := INDEX(corp_legal_name_values_persisted_temp,{corp_legal_name},{corp_legal_name_values_persisted_temp},corp_legal_nameValuesIndexKeyName);
 EXPORT corp_legal_name_values_persisted := corp_legal_name_values_index;
@@ -411,7 +411,7 @@ EXPORT corp_legal_name_max := MAX(corp_legal_name_values_persisted,field_specifi
 SALT33.MAC_Field_Specificity(corp_legal_name_values_persisted,corp_legal_name,corp_legal_name_nulls,ol) // Compute column level specificity
 EXPORT corp_legal_name_specificity := ol;
  
-EXPORT cnp_numberValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::cnp_number';
+EXPORT cnp_numberValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::cnp_number';
  
 EXPORT cnp_number_values_index := INDEX(cnp_number_values_persisted_temp,{cnp_number},{cnp_number_values_persisted_temp},cnp_numberValuesIndexKeyName);
 EXPORT cnp_number_values_persisted := cnp_number_values_index;
@@ -423,7 +423,7 @@ EXPORT cnp_number_max := MAX(cnp_number_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(cnp_number_values_persisted,cnp_number,cnp_number_nulls,ol) // Compute column level specificity
 EXPORT cnp_number_specificity := ol;
  
-EXPORT cnp_btypeValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::cnp_btype';
+EXPORT cnp_btypeValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::cnp_btype';
  
 EXPORT cnp_btype_values_index := INDEX(cnp_btype_values_persisted_temp,{cnp_btype},{cnp_btype_values_persisted_temp},cnp_btypeValuesIndexKeyName);
 EXPORT cnp_btype_values_persisted := cnp_btype_values_index;
@@ -434,7 +434,7 @@ EXPORT cnp_btype_max := MAX(cnp_btype_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(cnp_btype_values_persisted,cnp_btype,cnp_btype_nulls,ol) // Compute column level specificity
 EXPORT cnp_btype_specificity := ol;
  
-EXPORT company_feinValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::company_fein';
+EXPORT company_feinValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::company_fein';
  
 EXPORT company_fein_values_index := INDEX(company_fein_values_persisted_temp,{company_fein},{company_fein_values_persisted_temp},company_feinValuesIndexKeyName);
 EXPORT company_fein_values_persisted := company_fein_values_index;
@@ -446,7 +446,7 @@ EXPORT company_fein_max := MAX(company_fein_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(company_fein_values_persisted,company_fein,company_fein_nulls,ol) // Compute column level specificity
 EXPORT company_fein_specificity := ol;
  
-EXPORT active_duns_numberValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::active_duns_number';
+EXPORT active_duns_numberValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::active_duns_number';
  
 EXPORT active_duns_number_values_index := INDEX(active_duns_number_values_persisted_temp,{active_duns_number},{active_duns_number_values_persisted_temp},active_duns_numberValuesIndexKeyName);
 EXPORT active_duns_number_values_persisted := active_duns_number_values_index;
@@ -458,7 +458,7 @@ EXPORT active_duns_number_max := MAX(active_duns_number_values_persisted,field_s
 SALT33.MAC_Field_Specificity(active_duns_number_values_persisted,active_duns_number,active_duns_number_nulls,ol) // Compute column level specificity
 EXPORT active_duns_number_specificity := ol;
  
-EXPORT active_enterprise_numberValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::active_enterprise_number';
+EXPORT active_enterprise_numberValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::active_enterprise_number';
  
 EXPORT active_enterprise_number_values_index := INDEX(active_enterprise_number_values_persisted_temp,{active_enterprise_number},{active_enterprise_number_values_persisted_temp},active_enterprise_numberValuesIndexKeyName);
 EXPORT active_enterprise_number_values_persisted := active_enterprise_number_values_index;
@@ -470,7 +470,7 @@ EXPORT active_enterprise_number_max := MAX(active_enterprise_number_values_persi
 SALT33.MAC_Field_Specificity(active_enterprise_number_values_persisted,active_enterprise_number,active_enterprise_number_nulls,ol) // Compute column level specificity
 EXPORT active_enterprise_number_specificity := ol;
  
-EXPORT active_domestic_corp_keyValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::active_domestic_corp_key';
+EXPORT active_domestic_corp_keyValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::active_domestic_corp_key';
  
 EXPORT active_domestic_corp_key_values_index := INDEX(active_domestic_corp_key_values_persisted_temp,{active_domestic_corp_key},{active_domestic_corp_key_values_persisted_temp},active_domestic_corp_keyValuesIndexKeyName);
 EXPORT active_domestic_corp_key_values_persisted := active_domestic_corp_key_values_index;
@@ -482,7 +482,7 @@ EXPORT active_domestic_corp_key_max := MAX(active_domestic_corp_key_values_persi
 SALT33.MAC_Field_Specificity(active_domestic_corp_key_values_persisted,active_domestic_corp_key,active_domestic_corp_key_nulls,ol) // Compute column level specificity
 EXPORT active_domestic_corp_key_specificity := ol;
  
-EXPORT prim_rangeValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::prim_range';
+EXPORT prim_rangeValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::prim_range';
  
 EXPORT prim_range_values_index := INDEX(prim_range_values_persisted_temp,{prim_range},{prim_range_values_persisted_temp},prim_rangeValuesIndexKeyName);
 EXPORT prim_range_values_persisted := prim_range_values_index;
@@ -494,7 +494,7 @@ EXPORT prim_range_max := MAX(prim_range_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(prim_range_values_persisted,prim_range,prim_range_nulls,ol) // Compute column level specificity
 EXPORT prim_range_specificity := ol;
  
-EXPORT prim_nameValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::prim_name';
+EXPORT prim_nameValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::prim_name';
  
 EXPORT prim_name_values_index := INDEX(prim_name_values_persisted_temp,{prim_name},{prim_name_values_persisted_temp},prim_nameValuesIndexKeyName);
 EXPORT prim_name_values_persisted := prim_name_values_index;
@@ -506,7 +506,7 @@ EXPORT prim_name_max := MAX(prim_name_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(prim_name_values_persisted,prim_name,prim_name_nulls,ol) // Compute column level specificity
 EXPORT prim_name_specificity := ol;
  
-EXPORT sec_rangeValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::sec_range';
+EXPORT sec_rangeValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::sec_range';
  
 EXPORT sec_range_values_index := INDEX(sec_range_values_persisted_temp,{sec_range},{sec_range_values_persisted_temp},sec_rangeValuesIndexKeyName);
 EXPORT sec_range_values_persisted := sec_range_values_index;
@@ -518,7 +518,7 @@ EXPORT sec_range_max := MAX(sec_range_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(sec_range_values_persisted,sec_range,sec_range_nulls,ol) // Compute column level specificity
 EXPORT sec_range_specificity := ol;
  
-EXPORT stValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::st';
+EXPORT stValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::st';
  
 EXPORT st_values_index := INDEX(st_values_persisted_temp,{st},{st_values_persisted_temp},stValuesIndexKeyName);
 EXPORT st_values_persisted := st_values_index;
@@ -530,7 +530,7 @@ EXPORT st_max := MAX(st_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(st_values_persisted,st,st_nulls,ol) // Compute column level specificity
 EXPORT st_specificity := ol;
  
-EXPORT v_city_nameValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::v_city_name';
+EXPORT v_city_nameValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::v_city_name';
  
 EXPORT v_city_name_values_index := INDEX(v_city_name_values_persisted_temp,{v_city_name},{v_city_name_values_persisted_temp},v_city_nameValuesIndexKeyName);
 EXPORT v_city_name_values_persisted := v_city_name_values_index;
@@ -542,7 +542,7 @@ EXPORT v_city_name_max := MAX(v_city_name_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(v_city_name_values_persisted,v_city_name,v_city_name_nulls,ol) // Compute column level specificity
 EXPORT v_city_name_specificity := ol;
  
-EXPORT zipValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::zip';
+EXPORT zipValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::zip';
  
 EXPORT zip_values_index := INDEX(zip_values_persisted_temp,{zip},{zip_values_persisted_temp},zipValuesIndexKeyName);
 EXPORT zip_values_persisted := zip_values_index;
@@ -554,7 +554,7 @@ EXPORT zip_max := MAX(zip_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(zip_values_persisted,zip,zip_nulls,ol) // Compute column level specificity
 EXPORT zip_specificity := ol;
  
-EXPORT cszValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::csz';
+EXPORT cszValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::csz';
  
 EXPORT csz_values_index := INDEX(csz_values_persisted_temp,{csz},{csz_values_persisted_temp},cszValuesIndexKeyName);
 EXPORT csz_values_persisted := csz_values_index;
@@ -566,7 +566,7 @@ EXPORT csz_max := MAX(csz_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(csz_values_persisted,csz,csz_nulls,ol) // Compute column level specificity
 EXPORT csz_specificity := ol;
  
-EXPORT addr1ValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::addr1';
+EXPORT addr1ValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::addr1';
  
 EXPORT addr1_values_index := INDEX(addr1_values_persisted_temp,{addr1},{addr1_values_persisted_temp},addr1ValuesIndexKeyName);
 EXPORT addr1_values_persisted := addr1_values_index;
@@ -578,7 +578,7 @@ EXPORT addr1_max := MAX(addr1_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(addr1_values_persisted,addr1,addr1_nulls,ol) // Compute column level specificity
 EXPORT addr1_specificity := ol;
  
-EXPORT addressValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::address';
+EXPORT addressValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::address';
  
 EXPORT address_values_index := INDEX(address_values_persisted_temp,{address},{address_values_persisted_temp},addressValuesIndexKeyName);
 EXPORT address_values_persisted := address_values_index;
@@ -590,7 +590,7 @@ EXPORT address_max := MAX(address_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(address_values_persisted,address,address_nulls,ol) // Compute column level specificity
 EXPORT address_specificity := ol;
  
-EXPORT isContactValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::isContact';
+EXPORT isContactValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::isContact';
  
 EXPORT isContact_values_index := INDEX(isContact_values_persisted_temp,{isContact},{isContact_values_persisted_temp},isContactValuesIndexKeyName);
 EXPORT isContact_values_persisted := isContact_values_index;
@@ -601,7 +601,7 @@ EXPORT isContact_max := MAX(isContact_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(isContact_values_persisted,isContact,isContact_nulls,ol) // Compute column level specificity
 EXPORT isContact_specificity := ol;
  
-EXPORT fnameValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::fname';
+EXPORT fnameValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::fname';
  
 EXPORT fname_values_index := INDEX(fname_values_persisted_temp,{fname},{fname_values_persisted_temp},fnameValuesIndexKeyName);
 EXPORT fname_values_persisted := fname_values_index;
@@ -612,7 +612,7 @@ EXPORT fname_max := MAX(fname_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(fname_values_persisted,fname,fname_nulls,ol) // Compute column level specificity
 EXPORT fname_specificity := ol;
  
-EXPORT mnameValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::mname';
+EXPORT mnameValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::mname';
  
 EXPORT mname_values_index := INDEX(mname_values_persisted_temp,{mname},{mname_values_persisted_temp},mnameValuesIndexKeyName);
 EXPORT mname_values_persisted := mname_values_index;
@@ -623,7 +623,7 @@ EXPORT mname_max := MAX(mname_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(mname_values_persisted,mname,mname_nulls,ol) // Compute column level specificity
 EXPORT mname_specificity := ol;
  
-EXPORT lnameValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::lname';
+EXPORT lnameValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::lname';
  
 EXPORT lname_values_index := INDEX(lname_values_persisted_temp,{lname},{lname_values_persisted_temp},lnameValuesIndexKeyName);
 EXPORT lname_values_persisted := lname_values_index;
@@ -635,7 +635,7 @@ EXPORT lname_max := MAX(lname_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(lname_values_persisted,lname,lname_nulls,ol) // Compute column level specificity
 EXPORT lname_specificity := ol;
  
-EXPORT name_suffixValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::name_suffix';
+EXPORT name_suffixValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::name_suffix';
  
 EXPORT name_suffix_values_index := INDEX(name_suffix_values_persisted_temp,{name_suffix},{name_suffix_values_persisted_temp},name_suffixValuesIndexKeyName);
 EXPORT name_suffix_values_persisted := name_suffix_values_index;
@@ -647,7 +647,7 @@ EXPORT name_suffix_max := MAX(name_suffix_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(name_suffix_values_persisted,name_suffix,name_suffix_nulls,ol) // Compute column level specificity
 EXPORT name_suffix_specificity := ol;
  
-EXPORT contact_ssnValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::contact_ssn';
+EXPORT contact_ssnValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::contact_ssn';
  
 EXPORT contact_ssn_values_index := INDEX(contact_ssn_values_persisted_temp,{contact_ssn},{contact_ssn_values_persisted_temp},contact_ssnValuesIndexKeyName);
 EXPORT contact_ssn_values_persisted := contact_ssn_values_index;
@@ -659,7 +659,7 @@ EXPORT contact_ssn_max := MAX(contact_ssn_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(contact_ssn_values_persisted,contact_ssn,contact_ssn_nulls,ol) // Compute column level specificity
 EXPORT contact_ssn_specificity := ol;
  
-EXPORT dt_first_seenValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::dt_first_seen';
+EXPORT dt_first_seenValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::dt_first_seen';
  
 EXPORT dt_first_seen_values_index := INDEX(dt_first_seen_values_persisted_temp,{dt_first_seen},{dt_first_seen_values_persisted_temp},dt_first_seenValuesIndexKeyName);
 EXPORT dt_first_seen_values_persisted := dt_first_seen_values_index;
@@ -671,7 +671,7 @@ EXPORT dt_first_seen_max := MAX(dt_first_seen_values_persisted,field_specificity
 SALT33.MAC_Field_Specificity(dt_first_seen_values_persisted,dt_first_seen,dt_first_seen_nulls,ol) // Compute column level specificity
 EXPORT dt_first_seen_specificity := ol;
  
-EXPORT dt_last_seenValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::dt_last_seen';
+EXPORT dt_last_seenValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::dt_last_seen';
  
 EXPORT dt_last_seen_values_index := INDEX(dt_last_seen_values_persisted_temp,{dt_last_seen},{dt_last_seen_values_persisted_temp},dt_last_seenValuesIndexKeyName);
 EXPORT dt_last_seen_values_persisted := dt_last_seen_values_index;
@@ -697,11 +697,11 @@ EXPORT BuildFields := PARALLEL(BUILDINDEX(cnp_name_values_index, OVERWRITE),BUIL
     INTEGER2 Basis_weight100 := 0;
   END;
   t := TABLE(infile,r);
-SHARED ForeignCorpkey_attributes := DEDUP( SORT( DISTRIBUTE( t, DOTid ), DOTid, Basis, LOCAL), DOTid, Basis, LOCAL) : PERSIST('~temp::DOTid::BIPV2_DOTID::values::ForeignCorpkey',EXPIRE(Config.PersistExpire));
+SHARED ForeignCorpkey_attributes := DEDUP( SORT( DISTRIBUTE( t, DOTid ), DOTid, Basis, LOCAL), DOTid, Basis, LOCAL) : PERSIST('~temp::DOTid::BIPV2_DotID::values::ForeignCorpkey',EXPIRE(Config.PersistExpire));
   SALT33.Mac_Specificity_Local(ForeignCorpkey_attributes,Basis,DOTid,ForeignCorpkey_nulls,Layout_Specificities.ForeignCorpkey_ChildRec,ForeignCorpkey_specificity,ForeignCorpkey_switch,ForeignCorpkey_values);
 EXPORT ForeignCorpkey_max := MAX(ForeignCorpkey_values,field_specificity);
  
-EXPORT ForeignCorpkeyValuesIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Word::ForeignCorpkey';
+EXPORT ForeignCorpkeyValuesIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Word::ForeignCorpkey';
   TYPEOF(ForeignCorpkey_attributes) take(ForeignCorpkey_attributes le,ForeignCorpkey_values ri,BOOLEAN patch_default) := TRANSFORM
     SELF.Basis_cnt := ri.cnt;
     SELF.Basis_weight100 := ri.field_specificity*100;
@@ -718,7 +718,7 @@ EXPORT ForeignCorpkey_values_persisted := ForeignCorpkey_values_index;
 EXPORT BuildAttributes := BUILDINDEX(ForeignCorpkey_values_index, OVERWRITE);
 EXPORT BuildAll := PARALLEL(BuildFields, BuildAttributes);
  
-EXPORT SpecIndexKeyName := '~'+'key::BIPV2_DOTID::DOTid::Specificities';
+EXPORT SpecIndexKeyName := '~'+'key::BIPV2_DotID::DOTid::Specificities';
 iSpecificities := DATASET([{0,cnp_name_specificity,cnp_name_switch,cnp_name_max,cnp_name_nulls,corp_legal_name_specificity,corp_legal_name_switch,corp_legal_name_max,corp_legal_name_nulls,cnp_number_specificity,cnp_number_switch,cnp_number_max,cnp_number_nulls,cnp_btype_specificity,cnp_btype_switch,cnp_btype_max,cnp_btype_nulls,company_fein_specificity,company_fein_switch,company_fein_max,company_fein_nulls,active_duns_number_specificity,active_duns_number_switch,active_duns_number_max,active_duns_number_nulls,active_enterprise_number_specificity,active_enterprise_number_switch,active_enterprise_number_max,active_enterprise_number_nulls,active_domestic_corp_key_specificity,active_domestic_corp_key_switch,active_domestic_corp_key_max,active_domestic_corp_key_nulls,prim_range_specificity,prim_range_switch,prim_range_max,prim_range_nulls,prim_name_specificity,prim_name_switch,prim_name_max,prim_name_nulls,sec_range_specificity,sec_range_switch,sec_range_max,sec_range_nulls,st_specificity,st_switch,st_max,st_nulls,v_city_name_specificity,v_city_name_switch,v_city_name_max,v_city_name_nulls,zip_specificity,zip_switch,zip_max,zip_nulls,csz_specificity,csz_switch,csz_max,csz_nulls,addr1_specificity,addr1_switch,addr1_max,addr1_nulls,address_specificity,address_switch,address_max,address_nulls,isContact_specificity,isContact_switch,isContact_max,isContact_nulls,fname_specificity,fname_switch,fname_max,fname_nulls,mname_specificity,mname_switch,mname_max,mname_nulls,lname_specificity,lname_switch,lname_max,lname_nulls,name_suffix_specificity,name_suffix_switch,name_suffix_max,name_suffix_nulls,contact_ssn_specificity,contact_ssn_switch,contact_ssn_max,contact_ssn_nulls,dt_first_seen_specificity,dt_first_seen_switch,dt_first_seen_max,dt_first_seen_nulls,dt_last_seen_specificity,dt_last_seen_switch,dt_last_seen_max,dt_last_seen_nulls,ForeignCorpkey_specificity,ForeignCorpkey_switch,ForeignCorpkey_max,ForeignCorpkey_nulls}],Layout_Specificities.R);
  
 EXPORT Specificities_Index := INDEX(iSpecificities,{1},{iSpecificities},SpecIndexKeyName);
@@ -760,7 +760,7 @@ SpcShiftR := RECORD
   integer1 csz_shift0 := ROUND(Specificities[1].csz_specificity - 14);
   integer2 csz_switch_shift0 := ROUND(1000*Specificities[1].csz_switch - 16);
   integer1 addr1_shift0 := ROUND(Specificities[1].addr1_specificity - 23);
-  integer2 addr1_switch_shift0 := ROUND(1000*Specificities[1].addr1_switch - 63);
+  integer2 addr1_switch_shift0 := ROUND(1000*Specificities[1].addr1_switch - 64);
   integer1 address_shift0 := ROUND(Specificities[1].address_specificity - 25);
   integer2 address_switch_shift0 := ROUND(1000*Specificities[1].address_switch - 77);
   integer1 isContact_shift0 := ROUND(Specificities[1].isContact_specificity - 1);
@@ -774,7 +774,7 @@ SpcShiftR := RECORD
   integer1 name_suffix_shift0 := ROUND(Specificities[1].name_suffix_specificity - 9);
   integer2 name_suffix_switch_shift0 := ROUND(1000*Specificities[1].name_suffix_switch - 12);
   integer1 contact_ssn_shift0 := ROUND(Specificities[1].contact_ssn_specificity - 28);
-  integer2 contact_ssn_switch_shift0 := ROUND(1000*Specificities[1].contact_ssn_switch - 33);
+  integer2 contact_ssn_switch_shift0 := ROUND(1000*Specificities[1].contact_ssn_switch - 32);
   integer1 dt_first_seen_shift0 := ROUND(Specificities[1].dt_first_seen_specificity - 0);
   integer2 dt_first_seen_switch_shift0 := ROUND(1000*Specificities[1].dt_first_seen_switch - 0);
   integer1 dt_last_seen_shift0 := ROUND(Specificities[1].dt_last_seen_specificity - 0);
@@ -808,4 +808,3 @@ EXPORT SpcShift := TABLE(Specificities,SpcShiftR);
 EXPORT AllProfiles := cnp_name_specificity_profile + corp_legal_name_specificity_profile + cnp_number_specificity_profile + cnp_btype_specificity_profile + company_fein_specificity_profile + active_duns_number_specificity_profile + active_enterprise_number_specificity_profile + active_domestic_corp_key_specificity_profile + prim_range_specificity_profile + prim_name_specificity_profile + sec_range_specificity_profile + st_specificity_profile + v_city_name_specificity_profile + zip_specificity_profile + isContact_specificity_profile + fname_specificity_profile + mname_specificity_profile + lname_specificity_profile + name_suffix_specificity_profile + contact_ssn_specificity_profile;
 END;
  
-

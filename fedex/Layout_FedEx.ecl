@@ -1,7 +1,9 @@
+import	AID;
+
 export	Layout_FedEx	:=
 module
 
-	export	Raw	:=
+	export	Main	:=
 	record
 		string	file_date			{xpath('file_date')};
 		string	record_id			{xpath('record_id')};
@@ -18,6 +20,11 @@ module
 		string	zip						{xpath('address/postalcode')};
 		string	country				{xpath('address/countrycode')};
 		string	phone					{xpath('phone/phone10')};
+	end;
+	
+	export	Corrections	:=
+	record
+		Main	-	[file_date];
 	end;
 	
 	shared	rName_layout	:=
@@ -44,41 +51,46 @@ module
 		string	phone{xpath('phone10')};
 	end;
 	
-	export	PreppedOut	:=
+	export	Prepped	:=
 	record
-		string	file_date;
-		string	record_id;
-		string	record_type;
+		string										file_date;
+		string										record_id;
+		string										record_type;
 		recordof(rName_layout)		name		{xpath('name')};
 		recordof(rAddress_layout)	address	{xpath('address')};
 		recordof(rPhone_layout)		phone		{xpath('phone')};
-		string73									clean_name;
-		string182									clean_address;
+		string73									Append_CleanName;
+		string100									Append_PrepAddr1;
+		string50									Append_PrepAddr2;
+		AID.Common.xAID						Append_RawAID;
 	end;
 	
-	export	Prepped	:=
+	export	Clean	:=
 	record
-		string		file_date			{xpath('file_date')};
-		string		record_id			{xpath('record_id')};
-		string		record_type		{xpath('record_type')};
-		string		first_name		{xpath('name/firstname')};
-		string		middle_initial{xpath('name/middleinitial')};
-		string		last_name			{xpath('name/lastname')};
-		string		full_name			{xpath('name/fullname')};
-		string		company_name	{xpath('name/companyname')};
-		string		address_line1	{xpath('address/addressline1')};
-		string		address_line2	{xpath('address/addressline2')};
-		string		city					{xpath('address/city')};
-		string		state					{xpath('address/state')};
-		string		zip						{xpath('address/postalcode')};
-		string		country				{xpath('address/countrycode')};
-		string		phone					{xpath('phone/phone10')};
-		string73	clean_name		{xpath('clean_name')};
-		string182	clean_address	{xpath('clean_address')};
+		string					file_date				{xpath('file_date')};
+		string					record_id				{xpath('record_id')};
+		string					record_type			{xpath('record_type')};
+		string					first_name			{xpath('name/firstname')};
+		string					middle_initial	{xpath('name/middleinitial')};
+		string					last_name				{xpath('name/lastname')};
+		string					full_name				{xpath('name/fullname')};
+		string					company_name		{xpath('name/companyname')};
+		string					address_line1		{xpath('address/addressline1')};
+		string					address_line2		{xpath('address/addressline2')};
+		string					city						{xpath('address/city')};
+		string					state						{xpath('address/state')};
+		string					zip							{xpath('address/postalcode')};
+		string					country					{xpath('address/countrycode')};
+		string					phone						{xpath('phone/phone10')};
+		string73				Append_CleanName{xpath('append_cleanname')};
+		string100				Append_PrepAddr1{xpath('append_prepaddr1')};
+		string50				Append_PrepAddr2{xpath('append_prepaddr2')};
+		AID.Common.xAID	Append_RawAID		{xpath('append_rawaid')};
+		string1 				nametype        {xpath('nametype')};
 	end;
 	
 	export	Base	:=
-	record(Raw)
+	record(Clean	-	Append_CleanName)
 		string1		business_indicator	:=	'';
 		string10  prim_range;
 		string2   predir;
@@ -109,4 +121,54 @@ module
 		string4   err_stat;
 	end;
 	
+	export	FedExAdds	:=
+	record(Main)
+		string	business_indicator;
+	end;
+	
+export correctionsIn := record 
+	string address_changes_id;
+	string date_last_seen	;
+	string record_id	;
+	string is_deliverable_address	;
+	string first_name	;
+	string middle_name	;
+	string last_name	;
+	string company_name	;
+	string phone_number	;
+	string address_type	;
+	string processed	;
+	string street_address	;
+	string city	;
+	string state	;
+	string zip	;
+	string country	;
+	string status	;
+	string date_added	;
+	string user_added	;
+	string date_changed	;
+	string user_changed	;
+	string processed_on;
+end; 
+
+ export ReturnFiles := record
+  string similar_recs_ct;
+  string parent_record_id;
+	string file_date;
+	string record_id;
+	string record_type;
+	string first_name;
+	string middle_initial;
+	string last_name;
+	string full_name;
+	string company_name;
+	string address_line1;
+	string address_line2;
+	string city;
+	string state;
+	string zip;
+	string country;
+	string phone;
+ end;
+ 
 end;

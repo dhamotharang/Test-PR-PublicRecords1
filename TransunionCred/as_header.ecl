@@ -1,10 +1,10 @@
 import lib_keylib,lib_fileservices,ut,Header;
 
-export	as_header(dataset(Layouts.base) pFile = dataset([],Layouts.base), boolean pForHeaderBuild=false)
+export	as_header(dataset(Layouts.base) pFile = dataset([],Layouts.base), boolean pForHeaderBuild=false, boolean pFastHeader= false)
  :=
   function
+dtuasSource	:=	header.Files_SeqdSrc(pFastHeader).TN((unsigned)name_score>50 or name_score='');
 
-	dtuasSource	:=	as_source(pFile,pForHeaderBuild);
 
 	Header.Layout_New_Records tr(dtuasSource l) := transform
 // rec_type:
@@ -20,12 +20,12 @@ export	as_header(dataset(Layouts.base) pFile = dataset([],Layouts.base), boolean
 // D1=AKA3 name and current address
 // D2=AKA3 name and former1 address
 // D3=AKA3 name and former2 address
-		self.did := 0;
+		self.did := if(pFastHeader, l.did, 0);
 		self.rid := 0;
-		self.dt_first_seen            := (unsigned)l.dt_first_seen[1..6];
-		self.dt_last_seen             := (unsigned)l.dt_last_seen[1..6]; 
-		self.dt_vendor_first_reported := (unsigned)l.dt_vendor_first_reported[1..6];
-		self.dt_vendor_last_reported  := (unsigned)l.dt_vendor_last_reported[1..6];
+		self.dt_first_seen            := (unsigned)((string)l.dt_first_seen)[1..6];
+		self.dt_last_seen             := (unsigned)((string)l.dt_last_seen)[1..6]; 
+		self.dt_vendor_first_reported := (unsigned)((string)l.dt_vendor_first_reported)[1..6];
+		self.dt_vendor_last_reported  := (unsigned)((string)l.dt_vendor_last_reported)[1..6];
 		self.dt_nonglb_last_seen      := 0;
 		self.rec_type                 := if(l.IsCurrent,'1','2'); 
 		self.vendor_id                := l.Party_ID;
@@ -52,9 +52,9 @@ dtuasSource_sort := sort(dtuasSource_dist,record
 
 Header.Layout_New_Records t_rollup(dtuasSource_sort le, dtuasSource_sort ri) := transform
  self.dt_first_seen            := ut.Min2(le.dt_first_seen,ri.dt_first_seen);
- self.dt_last_seen             := ut.Max2(le.dt_last_seen,ri.dt_last_seen);
+ self.dt_last_seen             := Max(le.dt_last_seen,ri.dt_last_seen);
  self.dt_vendor_first_reported := ut.Min2(le.dt_vendor_first_reported,ri.dt_vendor_first_reported);
- self.dt_vendor_last_reported  := ut.Max2(le.dt_vendor_last_reported,ri.dt_vendor_last_reported);
+ self.dt_vendor_last_reported  := Max(le.dt_vendor_last_reported,ri.dt_vendor_last_reported);
  self                          := le;
 end;
 

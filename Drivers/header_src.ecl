@@ -7,6 +7,8 @@ export Header_Src(string2 pSource, string2 pState)
 			'OH' => 'OD',
 			'TX' => 'TD',
 			'NM' => 'ED',
+			'NV' => 'BD',
+			'LA' => 'GD',
 			'WI' => 'WD',
 			'ID' => 'ID',
 			'OR' => 'RD',
@@ -19,6 +21,8 @@ export Header_Src(string2 pSource, string2 pState)
 			'TN' => 'SD',
 			'WY' => 'YD',
 			'KY' => 'KD',
+			'CT' => 'DD',
+			'NC' => 'QD',
 			''
 		   ),
 	   case(pState,			//Experian

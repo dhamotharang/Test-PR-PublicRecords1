@@ -49,7 +49,7 @@ cleanInput := project(mbs_outfile, transform(Inquiry_Acclogs.Layout_In_Common,
 				
 														self.ORIG_COMPANY_NAME1 := stringlib.stringcleanspaces(stringlib.stringfindreplace(left.ORIG_BUSINESS_NAME, ',', ', '));
 
-														self.BILLING_ID := left.billing_id;
+													//	self.BILLING_ID := left.billing_id;
 														self.ORIG_GLOBAL_COMPANY_ID := left.ORIG_GLOBAL_COMPANY_ID;
 														self.GLOBAL_COMPANY_ID := left.orig_global_company_id;
 														self.COMPANY_ID := left.orig_company_id;
@@ -67,7 +67,7 @@ cleanInput := project(mbs_outfile, transform(Inquiry_Acclogs.Layout_In_Common,
 														self.FCRA_purpose := left.orig_fcra_purpose;
 														self.GLB_purpose  := left.orig_glb_purpose;
 														self.DPPA_purpose := left.orig_dppa_purpose;
-														SELF.PRODUCT_CODE := LEFT.PRODUCT_ID;
+														SELF.PRODUCT_CODE := '5';//LEFT.PRODUCT_ID;
 														SELF.PRIMARY_MARKET_CODE := LEFT.PRIMARY_MARKET_CODE;
 														SELF.SECONDARY_MARKET_CODE := LEFT.SECONDARY_MARKET_CODE;
 														SELF.SUB_MARKET := LEFT.SUB_MARKET;
@@ -82,7 +82,7 @@ end;
 
 
 
-export ready_File(dataset(Inquiry_Acclogs.Layout_In_Common) AppendForward, string select_source = 'BANKO') := function
+export ready_File(dataset(Inquiry_Acclogs.Layout_In_Common) AppendForward, string select_source = 'BANKO', boolean ReAppendDay) := function
 
 ///////////////// PROJECT INTO PERSON QUERY LAYOUT 
 							
@@ -100,7 +100,8 @@ person_project := project(AppendForward(repflag = '' and source_file = select_so
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
-			
+			self.bus_intel.Use := left.use;
+
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
 			self.Permissions.FCRA_purpose := left.fcra_purpose;
@@ -177,6 +178,7 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 			self.bus_intel.Industry_1_Code := left.Industry_1_Code;
 			self.bus_intel.Industry_2_Code := left.Industry_2_Code;
 			self.bus_intel.Vertical := left.vertical;
+			self.bus_intel.Use := left.use;
 			
 			self.Permissions.GLB_purpose := left.glb_purpose;
 			self.Permissions.DPPA_purpose := left.dppa_purpose;
@@ -240,13 +242,11 @@ bususer_project := project(AppendForward(repflag <> '' and source_file = select_
 
 prev_base := inquiry_acclogs.File_FCRA_Banko_Logs_Common;
 
-prev_base_trans := project(prev_base, transform({inquiry_acclogs.Layout.Common, string source := 'BANKO'}, self := left));
+prev_base_trans := project(prev_base, transform({inquiry_acclogs.Layout.Common, string source := 'BANKO'}, self.search_info.product_code := '5', self := left));
 														
 inquiry_acclogs.file_MBSApp_Base().FCRA_Append(prev_base_trans,prev_base_mbs);
 
 prev_base_ready := project(prev_base_mbs, transform(inquiry_acclogs.Layout.Common, self := left));
-
-ReAppendDay := stringlib.stringtolowercase(ut.Weekday((unsigned8)ut.getdate)) in ['friday'];
 
 newFile := if(ReAppendDay, 
 								dedup(sort(distribute(person_project + bususer_project + prev_base_ready, 

@@ -1,6 +1,6 @@
 import CourtLink, Doxie;
 
-file_in := courtlink.files().base.qa;
+file_in := courtlink.files().base.qa + CourtLink.irs_dummy_litigous_debtors;
 
 CourtLink.Layouts.keybuild2	trfkeybuild(file_in l)	:=	transform
 	self	:=	l;		

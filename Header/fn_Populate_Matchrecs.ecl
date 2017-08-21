@@ -2,182 +2,147 @@ import ut,header,watchdog;
 
 export fn_Populate_Matchrecs (
 	dataset(layout_header) inf,
-	dataset(watchdog.Layout_Best) bestfile0, 
+	dataset(watchdog.Layout_Best) bestfile0,
 	string persist_suffix = '',
 	boolean new_version = false,
 	boolean skipPreferredFirst = false):= function
+	
+	inf0 := if(persist_suffix ='_slimsort',header.fn_replace_alias_street(inf).alias_slimsorts , 
+					 header.fn_replace_alias_street(inf).alias_header );
 
+	inf1:=fn_void_src_vendor_id(inf0);
+	 
+	layout_matchcandidates intof(inf1 le) := transform
+	    string5   name_suffix_std := header.fn_std_name_suffix_for_linking(le.name_suffix);
+	    self.fname := if(skipPreferredFirst, le.fname, datalib.PreferredFirstNew(le.fname, new_version));
+		self.mname := if(skipPreferredFirst, le.mname, datalib.PreferredFirstNew(le.mname, new_version));
+		self.name_suffix := if(name_suffix_std='',le.dodgy_tracking,name_suffix_std);
+		SELF.head_cnt := 1;
+		self := le;
+	end;
 
-#uniquename(intof)
-layout_matchcandidates %intof%(inf le) := transform
-  self.fname := if(skipPreferredFirst, le.fname, datalib.PreferredFirstNew(le.fname, new_version));
-  self.mname := if(skipPreferredFirst, le.mname, datalib.PreferredFirstNew(le.mname, new_version));
-  self.name_suffix := ut.Translate_Suffix(le.name_suffix);
-	SELF.head_cnt := 1;
-	self.prim_range_fraction := regexfind(' [0-9]/[0-9]$',trim(le.prim_range));
-  self := le;
-  end;
+	// strip overly used or bad SSNs from Match_Candidates (MC) 
+	new := header.fn_StripNonSSNs(inf1).head;
+	me_use1 := project(new,intof(left));
 
-#uniquename(me_use1)
-new := header.fn_StripNonSSNs(inf).head;
-%me_use1% := project(new,%intof%(left));
+	// strip overly used or bad SSNs from watchdog best
+	bestfile := header.fn_StripNonSSNs(inf1).best(bestfile0);
 
+	dist_precount := distribute(me_use1,hash(did));
 
-bestfile := header.fn_StripNonSSNs(inf).best(bestfile0);
+	// count recs in each did
+	cnt_rec := RECORD
+		dist_precount.did;
+		cnt := COUNT(GROUP);
+	END;
+	cnt_tab := TABLE(dist_precount, cnt_rec, did, LOCAL);
 
-#uniquename(dist_precount)
-#uniquename(dist)
-%dist_precount% := distribute(%me_use1%,hash(did));
-// %dist% := group(sort(distribute(%me_use1%,hash(did)),did,local),did,local);
+	layout_matchcandidates tra(layout_matchcandidates le, cnt_tab ri) := TRANSFORM
+		SELF.head_cnt := IF(ri.cnt>255,255,ri.cnt);
+		SELF := le;
+	END;
 
-// get counts
-#uniquename(cnt_rec)
-#uniquename(cnt_tab)
-#uniquename(cnt)
-%cnt_rec% :=
-RECORD
-	%dist_precount%.did;
-	%cnt% := COUNT(GROUP);
-END;
-%cnt_tab% := TABLE(%dist_precount%, %cnt_rec%, did, LOCAL);
+	// set rec counts in each did to 255 where greater than 255 and append counts to MC
+	dist := JOIN(dist_precount, cnt_tab, LEFT.did=RIGHT.did, tra(LEFT,RIGHT), LOCAL);
 
-#uniquename(tra)
-layout_matchcandidates %tra%(layout_matchcandidates le, %cnt_tab% ri) :=
-TRANSFORM
-	SELF.head_cnt := IF(ri.%cnt%>255,255,ri.%cnt%);
-	SELF := le;
-END;
+	layout_matchcandidates prop_mname(layout_matchcandidates le,layout_matchcandidates ri) := transform
+		self.mname := if ( (	ri.mname=''
+							and ri.fname[1]<>le.mname[1]
+							and ri.lname[1]<>le.mname[1])
+						or (	length(trim(ri.mname)) = 1
+							and ri.mname[1] = le.mname[1])
+						,le.mname,ri.mname );
+		self := ri;
+	end;
 
-%dist% := JOIN(%dist_precount%, %cnt_tab%, LEFT.did=RIGHT.did, %tra%(LEFT,RIGHT), LOCAL);
+	layout_matchcandidates prop_phone(layout_matchcandidates le,layout_matchcandidates ri) := transform
+		self.phone := if (ri.phone = '',le.phone,ri.phone);
+		self := ri;
+	end;
 
-#uniquename(prop_ssn)
-#uniquename(prop_dob)
-#uniquename(prop_phone)
-#uniquename(prop_mname)
-#uniquename(prop_lname)
-#uniquename(prop_fname)
-#uniquename(prop_prim_range)
+	layout_matchcandidates prop_fname(layout_matchcandidates le,layout_matchcandidates ri) := transform
+		self.fname := if ( ri.fname='' or (length(trim(ri.fname)) = 1 and ri.fname[1] = le.fname[1])
+						,le.fname,ri.fname );
+		self := ri;
+	end;
 
-layout_matchcandidates %prop_ssn%(layout_matchcandidates le,layout_matchcandidates ri) := transform
-  self.ssn := if ( ri.ssn='', le.ssn, ri.ssn );
-  self := ri;
-end;
+	layout_matchcandidates prop_lname(layout_matchcandidates le,layout_matchcandidates ri) := transform
+		self.lname := if ( ri.lname='' or (length(trim(ri.lname)) = 1 and ri.lname[1] = le.lname[1])
+						,le.lname,ri.lname );
+		self := ri;
+	end;
 
-layout_matchcandidates %prop_dob%(layout_matchcandidates le,layout_matchcandidates ri) := transform
-	self.dob := map( (ri.dob % 10000 = 0 or ri.dob % 10000 = 101 or ri.dob % 10000 = 100)
-						and ri.dob div 10000 = le.dob div 10000 => le.dob,
-					 (ri.dob % 100 = 0 or ri.dob % 100 = 1 )
-						and ri.dob div 100 = le.dob div 100 => le.dob,
-					 ri.dob = 0 => le.dob,
-					 ri.dob);
-//( ri.dob=0, le.dob, ri.dob );
-	self := ri;
-end;
+	layout_matchcandidates remove_fraction(layout_matchcandidates le) := transform
+		self.prim_range := le.prim_range[1.. length(trim(le.prim_range))-4];
+		self := le;
+	end;
 
-layout_matchcandidates %prop_mname%(layout_matchcandidates le,layout_matchcandidates ri) := transform
-	self.mname := if ( ri.mname='' or (length(trim(ri.mname)) = 1 and ri.mname[1] = le.mname[1]),le.mname,ri.mname );
-	self := ri;
-end;
+	layout_matchcandidates remove_lname2nd(layout_matchcandidates le) := transform
+		self.lname := mod_hyphenated_lname(le.lname).lname1st;
+		self := le;
+	end;
 
+	layout_matchcandidates remove_lname1st(layout_matchcandidates le) := transform
+		self.lname := mod_hyphenated_lname(le.lname).lname2nd;
+		self := le;
+	end;
 
-layout_matchcandidates %prop_phone%(layout_matchcandidates le,layout_matchcandidates ri) := transform
-	self.phone := if (ri.phone = '',le.phone,ri.phone);
-	self := ri;
-end;
+	// propagate the better SSNs throughout ADLs with more than one rec in MC
+	sd1 := header.fn_Populate_SSN(dist(head_cnt > 1),bestfile);
+	// propagate the better DOBs throughout ADLs with more than one rec in MC
+	sd2 := header.fn_populate_dob(sd1,bestfile);
+	// group ADLs with more than one rec in MC
+	sd3 := group(sort(sd2,did,local),did,local);
+	// propagate the larger mname throughout ADLs with more than one rec in MC
+	sd5 := iterate(sort(sd3,-mname),prop_mname(left,right));
+	// propagate the larger phone throughout ADLs with more than one rec in MC
+	sd6 := iterate(sort(sd5,-phone),prop_phone(left,right));
+	// propagate the larger lname throughout ADLs with more than one rec in MC
+	sd7 := iterate(sort(sd6,-lname),prop_lname(left,right));
+	// propagate the larger fname throughout ADLs with more than one rec in MC then add singletons
+	sd8 := iterate(sort(sd7,-fname),prop_fname(left,right)) + dist (head_cnt = 1);
+	// gather recs with prim_range that looks like "... 1/2" and not "... A/B",etc... from full MC
+	sd9	:= sd8	(prim_range[length(trim(prim_range))-1]='/'
+				,prim_range[length(trim(prim_range))-3]=' '
+				,length(stringlib.stringfilter(
+						prim_range[length(trim(prim_range))],'0123456789'))>0
+				,length(stringlib.stringfilter(
+						prim_range[length(trim(prim_range))-2],'0123456789'))>0
+				,length(trim(prim_range))>4);
+	// create a copy of gathered recs with fraction part of prim_range striped
+	sd10:= project(sd9,remove_fraction(left));
+	// append copy of cleaned recs to full MC
+	sd11:= sd8 + sd10;
+	// gather recs with hyphenated lname from full MC
+	sd12:=	sd11(mod_hyphenated_lname(lname).is_hyphenated);
+	// create a copy of gathered recs with 2nd part of hyphenated lname striped
+	sd13:= project(sd12,remove_lname2nd(left));
+	// create a copy of gathered recs with 1st part of hyphenated lname striped
+	sd14:= project(sd12,remove_lname1st(left));
+	// append copied and cleaned recs to full MC
+	sd15:= sd11 + sd13 + sd14;
+	// outf1 := distribute(group(dedup(sd15,all)),hash(did));
+	outf1 := dedup(distribute(group(sd15),hash(did)),all,local);
 
-layout_matchcandidates %prop_fname%(layout_matchcandidates le,layout_matchcandidates ri) := transform
-	self.fname := if ( ri.fname='' or (length(trim(ri.fname)) = 1 and ri.fname[1] = le.fname[1]),le.fname,ri.fname );
-	self := ri;
-end;
+	slimrec := record
+		outf1.did;
+		outf1.lname;
+	end;
 
-layout_matchcandidates %prop_lname%(layout_matchcandidates le,layout_matchcandidates ri) := transform
-	self.lname := if ( ri.lname='' or (length(trim(ri.lname)) = 1 and ri.lname[1] = le.lname[1]),le.lname,ri.lname );
-    self := ri;
-end;
+	slim1 := table(outf1,slimrec,local);
+	slim2 := dedup(sort(slim1,did,lname,local),did,lname,local);
 
-layout_matchcandidates %prop_prim_range%(layout_matchcandidates le) := transform
-	self.prim_range := if(le.prim_range_fraction,
-                        le.prim_range[1..stringlib.stringfind(le.prim_range,regexfind(' [0-9]/[0-9]$',trim(le.prim_range),0),1)-1],
-			           le.prim_range);	
-    self := le;
-end;
+	outf1 crosspop(outf1 L, slim2 R) := transform
+		self.lname := R.lname;
+		self := L;
+	end;
 
-#uniquename(lname2nd)
-%lname2nd%		:=	'^[a-z]{3,}[ -/]{1,}([a-z]{3,}$)';
-#uniquename(hyphenated)
-%hyphenated%	:=	'(^[a-z]{3,})[ -/]{1,}([a-z]{3,}$)';
-#uniquename(lname_is_hyphenated)
-boolean %lname_is_hyphenated%(string lname) := regexfind(%hyphenated%,trim(lname),nocase);
+	// create a copy of each full MC record with each of the unique lnames per did and avoid creating fname=lname
+	outf2 := join(outf1,slim2,left.did=right.did,crosspop(left,right),local);
+	outf3 := outf2(fname<>lname) + outf1(fname=lname);
 
-#uniquename(prop_lname1st)
-layout_matchcandidates %prop_lname1st%(layout_matchcandidates le) := transform
-	self.lname := if(%lname_is_hyphenated%(le.lname)
-					,le.lname[1..stringlib.stringfind(le.lname,regexfind(%lname2nd%,trim(le.lname),1,nocase),1)-2]
-					,le.lname);
-    self := le;
-end;
+	d := dedup(sort(outf3,record,local),local);
+	d_pst := d;
 
-#uniquename(prop_lname2nd)
-layout_matchcandidates %prop_lname2nd%(layout_matchcandidates le) := transform
-	self.lname :=  if(%lname_is_hyphenated%(le.lname)
-					,le.lname[stringlib.stringfind(le.lname,regexfind(%lname2nd%,trim(le.lname),1,nocase),1)..]
-					,le.lname);
-    self := le;
-end;
-
-#uniquename(sd1)
-#uniquename(sd2)
-#uniquename(sd3)
-#uniquename(sd4)
-#uniquename(sd5)
-#uniquename(sd6)
-#uniquename(sd7)
-#uniquename(sd8)
-#uniquename(sd9)
-#uniquename(topopulate)
-#uniquename(not_topopulate)
-%topopulate%     := %dist%(head_cnt>1);
-%not_topopulate% := %dist%(head_cnt=1);
-
-%sd1% := header.fn_Populate_SSN(%topopulate%,bestfile);
-%sd2% := header.fn_populate_dob(%sd1%,bestfile) +  %not_topopulate%;
-// %sd1% := iterate(sort(%dist%,-ssn), %prop_ssn%(left,right));
-// %sd2% := iterate(sort(%sd1%,-dob),  %prop_dob%(left,right));
-#uniquename(sd_grouped)
-%sd_grouped% := group(sort(%sd2%,did,local),did,local);
-
-#uniquename(prim_range_fraction)
-%prim_range_fraction%	:= %dist%(prim_range_fraction);
-#uniquename(hyphenated_lname)
-%hyphenated_lname%	:= %dist%(%lname_is_hyphenated%(lname));
-
-%sd3% := iterate(sort(%sd_grouped%,-mname),%prop_mname%(left,right));
-%sd4% := iterate(sort(%sd3%,-phone),%prop_phone%(left,right));
-%sd5% := iterate(sort(%sd4%,-lname),%prop_lname%(left,right));
-%sd6% := iterate(sort(%sd5%,-fname),%prop_fname%(left,right));
-%sd7% := group(sort(project(sort(%sd6%,-prim_range),%prop_prim_range%(left))	+ %prim_range_fraction%,did,local),did,local);
-%sd8% := group(sort(project(sort(%sd7%,-lname),%prop_lname1st%(left))			+ %hyphenated_lname%,did,local),did,local);
-%sd9% := group(sort(project(sort(%sd8%,-lname),%prop_lname2nd%(left))			+ %hyphenated_lname%,did,local),did,local);
-
-outf1 := distribute(group(dedup(%sd9%,all)),hash(did));// : persist(psist);
-
-slimrec := record
-	outf1.did;
-	outf1.lname;
-end;
-
-slim1 := table(outf1,slimrec,local);
-slim2 := dedup(sort(slim1,did,lname,local),did,lname,local);
-
-outf1 crosspop(outf1 L, slim2 R) := transform
-	self.lname := R.lname;
-	self := L;
-end;
-
-outf2 := join(outf1,slim2,left.did = right.did, crosspop(left,right),local);
-
-d := dedup(sort(outf2,record,local),local);
-d_pst := d;// : persist('Populated_Matchrecs' + persist_suffix);
-return if ( header.DoSkipPersist(persist_suffix),d,d_pst);
-
+	return if ( header.DoSkipPersist(persist_suffix),d,d_pst);
 end;

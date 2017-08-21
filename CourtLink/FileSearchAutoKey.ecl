@@ -1,12 +1,14 @@
 export FileSearchAutoKey := function
 
-	base := courtlink.files().base.qa;
+	base := courtlink.irs_dummy_litigous_debtors + courtlink.files().base.qa;
+	
+	filteredBase := base(litigantlabel = 'PLAINTIFF');
 	
 	CourtLink.Layouts.keybuild	trfkeybuild(base l)	:=	transform
 		self	:=	l;		
 	end;
 		
-	akds := project(base,trfkeybuild(left));
+	akds := project(filteredBase, trfkeybuild(left));
 	
 	return akds;
 	

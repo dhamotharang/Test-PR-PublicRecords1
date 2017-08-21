@@ -1,4 +1,4 @@
-import doxie_files, doxie,ut,sanctn_mari,Data_Services,Prof_License_Mari;	
+import doxie_files, doxie,ut,sanctn_mari,Data_Services,Prof_License_Mari,std;	
 
 f_sanctn_incidentcode :=	SANCTN_Mari.files_SANCTN_common.incident_codes(trim(FIELD_NAME) = 'LICENSECODE' AND CLN_LICENSE_NUMBER<>'');
 
@@ -26,9 +26,9 @@ end;
 slim_license_nbr xformStateCD(f_sanctn_incidentcode L)  := TRANSFORM
 		self.PARTY_NUM					:= L.NUMBER;
 		self.LICENSE_NBR				:= trim(L.CODE_VALUE);
-		filterInvalidChar := stringlib.stringfilter(stringlib.stringtouppercase(L.CODE_STATE),'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+		filterInvalidChar 			:= STD.Str.Filter(STD.Str.ToUpperCase(L.CODE_STATE),'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 		self.LICENSE_STATE			:= if(L.CODE_VALUE[1..2] in set_state_abbr and filterInvalidChar = '',L.CODE_VALUE[1..2],filterInvalidChar);
-		self.LICENSE_TYPE				:= if(L.STD_TYPE_DESC != '', ut.fnTrim2Upper(L.STD_TYPE_DESC),L.CODE_TYPE);
+		self.LICENSE_TYPE				:= if(L.STD_TYPE_DESC != '', ut.CleanSpacesAndUpper(L.STD_TYPE_DESC),L.CODE_TYPE);
 		self.CLN_LICENSE_NUMBER	:= L.CLN_LICENSE_NUMBER;
 		self := L;
 END;          

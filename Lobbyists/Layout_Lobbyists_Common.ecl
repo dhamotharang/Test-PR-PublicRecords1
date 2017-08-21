@@ -7,6 +7,7 @@ export Layout_Lobbyists_Common := record
 	string15  Lobbyist_Name_First;
 	string15  Lobbyist_Name_Middle;
 	string5   Lobbyist_Name_Suffix;
+	string300 Lobbyist_Address_Whole;
 	string150 Lobbyist_Address_Street_Line;
 	string100 Lobbyist_Address_CSZ_Line;
 	string30  Lobbyist_Address_City;
@@ -18,6 +19,7 @@ export Layout_Lobbyists_Common := record
 	string20  Lobbyist_Type;
 	string12  Lobbyist_State_ID;
 	string120 Firm_Name_Full;
+	string300 Firm_Address_Whole;
 	string150 Firm_Address_Street_Line;
 	string100 Firm_Address_CSZ_Line;
 	string30  Firm_Address_City;
@@ -25,6 +27,7 @@ export Layout_Lobbyists_Common := record
 	string9   Firm_Address_ZIP;
 	string10  Firm_Phone;
 	string120 Association_Name_Full;
+	string300 Association_Address_Whole;
 	string150 Association_Address_Street_Line;
 	string100 Association_Address_CSZ_Line;
 	string30  Association_Address_City;

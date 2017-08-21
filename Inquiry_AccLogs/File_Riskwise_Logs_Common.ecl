@@ -1,3 +1,3 @@
-import ut;
+import ut, Data_Services;
 
-export File_Riskwise_Logs_Common :=  dataset(ut.foreign_logs + '~thor10_11::base::riskwise_acclogs_common', Inquiry_AccLogs.Layout.Common, thor);
+export File_Riskwise_Logs_Common :=  dataset(Data_Services.foreign_logs + 'thor100_21::base::riskwise_acclogs_common', Inquiry_AccLogs.Layout.Common_ThorAdditions, thor, opt);

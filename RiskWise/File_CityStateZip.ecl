@@ -18,7 +18,7 @@ layout_ctystzip_raw := record
 	string25 county;
 end;
 
-raw_citystatezip_data := dataset('~thor_data400::in::citystatezip', layout_ctystzip_raw, flat);
+raw_citystatezip_data := dataset('~thor_data400::in::usps::citystatezip', layout_ctystzip_raw, flat);
 
 detail_records := raw_citystatezip_data(copyrightdetailcode='D');  // filter out only the detail records
 

@@ -7,6 +7,8 @@ export Layout_Contacts := module
 		unsigned4 date_first_seen;
 		unsigned4 date_last_seen;
 		string9  ssn;
+		unsigned6 did;
+		unsigned2 score;
 		string5  name_prefix;
 		string20 name_first;
 		string20 name_middle;
@@ -35,8 +37,6 @@ export Layout_Contacts := module
 		unsigned6 blid;
 		unsigned1 segment_bid;
 		string40 ln_position_title;
-		unsigned6 did;
-		unsigned2 score;
 		Unlinked;
 	end;
 	

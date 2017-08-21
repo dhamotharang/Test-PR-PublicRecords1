@@ -1,6 +1,4 @@
-export Layout_IA_clean_in := 
-
-record
+export Layout_IA_clean_in := record  //rec length: 1981
   string2 state_origin;
   string8 process_date;
   Watercraft.layout_IA;

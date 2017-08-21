@@ -12,8 +12,7 @@ end;
 
 
 slim_SSN 		tSANCTN_key(f_sanctn_party L) := transform
-filterInvalidChar := stringlib.stringfilter(stringlib.stringtouppercase(L.SSNUMBER),'ABCDEFGHIJKLMNOPQRSTUVWXYZ-');
-// filterInvalidChar_append := stringlib.stringfilter(stringlib.stringtouppercase(L.SSN_APPENDED),'ABCDEFGHIJKLMNOPQRSTUVWXYZ-');
+filterInvalidChar := stringlib.stringfilterout(stringlib.stringtouppercase(L.SSNUMBER),'ABCDEFGHIJKLMNOPQRSTUVWXYZ-');
 self.SSNUMBER := if(filterInvalidChar != '',filterInvalidChar,L.SSN_APPENDED);
 self               := L;
 end;

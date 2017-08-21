@@ -1,0 +1,24 @@
+EXPORT layout_slimrec := record
+  unsigned8 did;  
+	string12  ln_fares_id;
+  string5   fips_code;
+  string2   state;
+  string18  county_name;
+  string45  fares_unformatted_apn;
+  string80  nameasis;
+  string10  prim_range;
+  string28  prim_name;
+  string8   sec_range;
+	string25  city;
+	string2   st;
+	string5   zip;
+  string8   contract_date; 
+  string8   recording_date; 
+  string20  document_number; 
+  string3   document_type_code; 
+  string10  recorder_book_number; 
+  string10  recorder_page_number; 
+  string11  sales_price;
+  string11  first_td_loan_amount;
+  string40  lender_name;
+end;

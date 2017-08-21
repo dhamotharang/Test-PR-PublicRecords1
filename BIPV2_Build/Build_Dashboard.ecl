@@ -33,17 +33,17 @@ BIPV2_Build.proc_Dashboard('20140529');
   looking at it.
 */
 
-import BIPV2_PostProcess,bipv2,wk_ut,tools,ut;
+import BIPV2_PostProcess,bipv2,wk_ut,tools,ut,std;
 
-thecurrentdate  := ut.getdate;      
+thecurrentdate  := (STRING8)Std.Date.Today();         
 highwuid        := 'W' + thecurrentdate + '-999999';
 
 EXPORT Build_Dashboard(
    string pversion  = bipv2.KeySuffix
   ,string pversion2 = pversion
-  ,string pSegWuid  = sort(wk_ut.get_Running_Workunits('W' + pversion2 + '-000001',highwuid,'completed')(job = 'BIPV2_PostProcess.proc_segmentation ' + pversion2),-wuid)[1].wuid   //'W20140817-221115'  //Segmentation status wuid  BIPV2_PostProcess.proc_segmentation 20140725
-  ,string pPRWuid   = sort(wk_ut.get_Running_Workunits('W' + pversion2 + '-000001',highwuid,'completed')(job = 'BIPV2 Xlink Sample '                  + pversion2),-wuid)[1].wuid   //'W20140819-135919'  //Xlink Sample Wuid         BIPV2 Xlink Sample 20140725
-  ,string pEAWuid   = sort(wk_ut.get_Running_Workunits('W' + pversion2 + '-000001',highwuid,'completed')(job = 'BIPV2_Build.External_Append_Testing ' + pversion2),-wuid)[1].wuid   //'W20140821-002729'  //External Append Wuid      BIPV2_Build.External_Append_Testing 20140725
+  ,string pSegWuid  = trim(sort(wk_ut.get_Running_Workunits('W' + pversion2 + '-000001',highwuid,'completed')(job = 'BIPV2_PostProcess.proc_segmentation ' + pversion2),-wuid)[1].wuid)   //'W20140817-221115'  //Segmentation status wuid  BIPV2_PostProcess.proc_segmentation 20140725
+  ,string pPRWuid   = trim(sort(wk_ut.get_Running_Workunits('W' + pversion2 + '-000001',highwuid,'completed')(job = 'BIPV2 Xlink Sample '                  + pversion2),-wuid)[1].wuid)   //'W20140819-135919'  //Xlink Sample Wuid         BIPV2 Xlink Sample 20140725
+  ,string pEAWuid   = trim(sort(wk_ut.get_Running_Workunits('W' + pversion2 + '-000001',highwuid,'completed')(job = 'BIPV2_Build.External_Append_Testing ' + pversion2),-wuid)[1].wuid)   //'W20140821-002729'  //External Append Wuid      BIPV2_Build.External_Append_Testing 20140725
  ) :=
  function
 
@@ -151,6 +151,9 @@ EXPORT Build_Dashboard(
     ,{'20141015',96,84} //22
     ,{'20141113',96,80} //23
     ,{'20141211',96,80} //24
+    ,{'20141211',96,81} //25
+    ,{'20141211',96,81} //26
+    ,{'20141211',96,82} //27
   
   ],{string version,integer4 Precision ,integer4 Recall });
   

@@ -174,6 +174,8 @@ EXPORT key := RECORD
 END;
 EXPORT key_static := RECORD
     BIPV2.IDlayouts.l_xlink_ids;
+    boolean isActive ; //seleid level
+    boolean isDefunct; //seleid level   
     unsigned6 company_bdid;
     DATASET(company_name_case_layout and not score) company_name;
     DATASET(company_address_case_layout  and not [score, state_fips, county_fips]) company_address;

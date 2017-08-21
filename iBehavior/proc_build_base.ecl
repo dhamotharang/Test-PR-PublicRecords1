@@ -1,20 +1,7 @@
-/*2012-03-26T18:21:26Z ()
-Sandboxed
-*/
-#workunit('name', 'iBehavior Build')
-
-IMPORT	ut
-				, AID
-				, iBehavior
-				, DID_Add
-				, header_slimsort
-				, address
-				, lib_StringLib
-				, idl_header
-				, NID;
+IMPORT	ut, AID, iBehavior, DID_Add, header_slimsort, address, lib_StringLib, idl_header, NID, PromoteSupers;
 																							
 EXPORT proc_build_base(STRING version) := FUNCTION
-
+#workunit('name', 'iBehavior Build' + version);
 
 pre_build := sequential(fileservices.addsuperfile('~thor_data400::in::ibehavior_using','~thor_data400::in::ibehavior::'+version+'::00');
 												fileservices.addsuperfile('~thor_data400::in::ibehavior_using','~thor_data400::in::ibehavior::'+version+'::01');
@@ -306,7 +293,7 @@ layout_base_tmp			tAppendRecordID(FormattedInputFile pInput)	:=
 																											SELF := LEFT));
 	
 	
-	BOOLEAN consumerfileexists	:=	fileservices.GetSuperFileSubCount(thor_cluster + 'base::iBehavior_consumer') > 0;
+	BOOLEAN consumerfileexists	:=	nothor(fileservices.GetSuperFileSubCount(thor_cluster + 'base::iBehavior_consumer')) > 0;
 	
 	ConsumerBasePlusIn	:=	IF(consumerfileexists, InputFileClnName + files.File_consumer, InputFileClnName);
 	
@@ -363,15 +350,15 @@ layout_base_tmp			tAppendRecordID(FormattedInputFile pInput)	:=
 		self.Append_Prep_Address					:=	IF(REGEXFIND(unitMatchRegexString,temp_addr1) and not regexfind(unitMatchRegexString,temp_addr2)
 																								and regexfind('[^0-9]$',trim(temp_addr2)) and temp_addr2 != ''
 																								and stringlib.stringfind(trim(temp_addr2),' ',1) >0,	
-																										ut.fn_addr_clean_prep(temp_addr2 + temp_addr1 
+																										Address.fn_addr_clean_prep(temp_addr2 + temp_addr1 
 																											+ if(regexfind(unitMatchRegexString,temp_apt),temp_apt,''), 'first'),
 																							IF(REGEXFIND(unitMatchRegexString,temp_addr1) and temp_addr2 = '',	
-																											ut.fn_addr_clean_prep(temp_apt + temp_addr1, 'first'),
-																													ut.fn_addr_clean_prep(temp_addr1 + temp_addr2
+																											Address.fn_addr_clean_prep(temp_apt + temp_addr1, 'first'),
+																													Address.fn_addr_clean_prep(temp_addr1 + temp_addr2
 																															+ if(regexfind(unitMatchRegexString,temp_apt),temp_apt,''), 'first')
 																									));
 	
-		self.Append_Prep_Address_Last			:=	ut.fn_addr_clean_prep(pInput.city
+		self.Append_Prep_Address_Last			:=	Address.fn_addr_clean_prep(pInput.city
 																								+	IF(pInput.city <> '',', ','') + pInput.state
 																								+	' ' + pInput.zip_code, 'last');
 		self.phone_1											:=	ut.CleanPhone(pInput.Primary_Phone_Number);
@@ -437,11 +424,11 @@ layout_base_tmp			tAppendRecordID(FormattedInputFile pInput)	:=
 													75,	  //dids with a score below here will be dropped 
 													rsCleanAID_DID);
 
-	ut.MAC_SF_BuildProcess(rsCleanAID_DID, thor_cluster + 'base::iBehavior_consumer', build_consumer_base, 3, /*csvout*/false, /*compress*/true);
+	PromoteSupers.MAC_SF_BuildProcess(rsCleanAID_DID, thor_cluster + 'base::iBehavior_consumer', build_consumer_base, 3, /*csvout*/false, /*compress*/true);
 	
 	//Process behavior file
 	rsBehavior_in								:=	PROJECT(dBehavior_RecordID, layouts.Layout_behavior);
-	BOOLEAN behaviorfileexists	:=	fileservices.GetSuperFileSubCount(thor_cluster + 'base::iBehavior_behavior') > 0;
+	BOOLEAN behaviorfileexists	:=	nothor(fileservices.GetSuperFileSubCount(thor_cluster + 'base::iBehavior_behavior')) > 0;
 	BehaviorBasePlusIn					:=	IF(behaviorfileexists, rsBehavior_in + files.File_behavior, rsBehavior_in);
 
 	layouts.Layout_behavior  BehaviorRollupXform(layouts.Layout_behavior L, layouts.Layout_behavior R) := transform
@@ -453,7 +440,7 @@ layout_base_tmp			tAppendRecordID(FormattedInputFile pInput)	:=
 	
 	BehaviorBasePlusInRollup := ROLLUP(SORT(BehaviorBasePlusIn,IB_Individual_ID,IB_Household_ID,First_Order_Date,date_first_seen), BehaviorRollupXform(LEFT,RIGHT), EXCEPT process_date, date_first_seen, date_last_seen);		
 	
-	ut.MAC_SF_BuildProcess(BehaviorBasePlusInRollup, thor_cluster + 'base::iBehavior_behavior', build_behavior_base, 3, /*csvout*/false, /*compress*/true);
+	PromoteSupers.MAC_SF_BuildProcess(BehaviorBasePlusInRollup, thor_cluster + 'base::iBehavior_behavior', build_behavior_base, 3, /*csvout*/false, /*compress*/true);
 	
 	post_build := sequential(
 													fileservices.startsuperfiletransaction(),
@@ -461,7 +448,8 @@ layout_base_tmp			tAppendRecordID(FormattedInputFile pInput)	:=
 													fileservices.finishsuperfiletransaction()
 													);	
 			
-	RETURN sequential(pre_build,
+	RETURN sequential(
+                    pre_build,
 										parallel(build_consumer_base, build_behavior_base),
 										post_build);
 											

@@ -46,7 +46,8 @@ seq_name := sequential(
 				FileServices.AddSuperFile(%dest%, %source%,,true),
 				
 			FileServices.FinishSuperFileTransaction(),
-			FileServices.RemoveOwnedSubFiles(%deleted%, move_type in %dfset%), 
+			FileServices.RemoveOwnedSubFiles(%deleted%, move_type in %dfset%),
+			FileServices.ClearSuperFile(%deleted%),
 			output(%source% + ' moved into ' + %dest%))
 	));
 	

@@ -9,7 +9,7 @@ ds_layout_new := RECORD
   string30 orig_middlename;
   string30 orig_lastname;
   string10 orig_suffix;
-  string16 seisint_primary_key;
+  string60 seisint_primary_key;
   string2 vendor_code;
   string320 intnet_email_address_1;
   string320 intnet_email_address_2;
@@ -38,6 +38,9 @@ ds_layout_new := RECORD
   string20 mname;
   string20 name_suffix;
   string1 name_type;
+  unsigned8 nid;
+  string1 ntype;
+  unsigned2 nindicator;
   string50 offender_status;
   string40 offender_category;
   string10 risk_level_code;
@@ -101,7 +104,7 @@ ds_layout_new := RECORD
   string140 school_comments;
   string30 offender_id;
   string30 doc_number;
-  string30 sor_number;
+  string40 sor_number;
   string30 st_id_number;
   string30 fbi_number;
   string30 ncic_number;
@@ -279,6 +282,8 @@ ds_layout_new := RECORD
   string8 palmprint_date;
   string150 image_link;
   string8 image_date;
+  unsigned8 offender_persistent_id;
+  unsigned8 offense_persistent_id;
   string2 newline;
  END;
 

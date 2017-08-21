@@ -5,7 +5,9 @@ IMPORT BankruptcyV2, Business_Header, CellPhone, CourtLink, Corrections, Did_Add
 			 Gong, Header, Header_Quick, Header_Services, LiensV2, LN_PropertyV2, NID, PAW, 
 			 PhonesFeedback, Phonesplus, POE, Property, Risk_Indicators, ut, UtilFile, Watchdog, 
 			 hygenics_crim, business_header_ss, Experian_Phones, PhonesInfo, BIPV2_Best, 
-			 Business_Credit, Business_Credit_Scoring;
+			 Business_Credit, Business_Credit_Scoring, UCCV2, SAM, Inquiry_AccLogs, Corp2,
+			 VehicleV2, FAA, Watercraft, Phonesplus_v2;
+			 
 EXPORT product_files := MODULE
 
 	EXPORT header_files := MODULE
@@ -85,7 +87,7 @@ EXPORT product_files := MODULE
 		
 		EXPORT Base_Header_file_slim := 
 			PROJECT(file_headers, Layout_Base_Header_V2_file)
-			      : PERSIST('acctmon::header::base_header_file');
+			      : INDEPENDENT; //PERSIST('acctmon::header::base_header_file');
 						
 		// =========================== ORIGINALLY: ===========================
 		// base_quick_header := header_quick.file_header_quick(did <> 0);
@@ -126,7 +128,7 @@ EXPORT product_files := MODULE
 		
 		EXPORT base_quick_header_slim :=
 			PROJECT(base_quick_header, layout_base_quick_header)
-				      : PERSIST('acctmon::header::base_quick_header');
+				      : INDEPENDENT; //PERSIST('acctmon::header::base_quick_header');
 						
 		// =========================== ORIGINALLY: ===========================
 		// base_file_util_daily :=  UtilFile.file_util_daily(did <> '');
@@ -150,7 +152,7 @@ EXPORT product_files := MODULE
 				
 		EXPORT base_file_util_daily_slim := 
 			PROJECT(base_file_util_daily, layout_base_file_util_daily)
-			        : PERSIST('acctmon::header::base_file_util_daily');
+			        : INDEPENDENT; //PERSIST('acctmon::header::base_file_util_daily');
 
 
 		// ||||||||||||||||||||||||||||  KEY FILES  ||||||||||||||||||||||||||
@@ -187,7 +189,7 @@ EXPORT product_files := MODULE
 		EXPORT doxie_key_header_slim := DEDUP(SORT(doxie_key_header, 
 																							 did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, -dt_last_seen, -dt_vendor_last_reported, LOCAL),
 																				  did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, LOCAL) 
-																		: PERSIST('acctmon::header::doxie_key_header_slim');
+																		: INDEPENDENT; //PERSIST('acctmon::header::doxie_key_header_slim');
 		
 		// DIDUPDATE FILES
 		EXPORT doxie_key_rid_did_keyname_raw := 'thor_data400::key::header::' + header_build_version + '::rid_did';
@@ -207,7 +209,7 @@ EXPORT product_files := MODULE
 			DISTRIBUTE(
 				doxie_key_rid_did_undist, 
 				HASH64(rid)
-			): PERSIST('acctmon::header::doxie_key_rid_did');
+			): INDEPENDENT; //PERSIST('acctmon::header::doxie_key_rid_did');
 
 
 		EXPORT doxie_key_rid_did_split_keyname_raw := 'thor_data400::key::header::' + header_build_version + '::rid_did_split';
@@ -227,7 +229,7 @@ EXPORT product_files := MODULE
 			DISTRIBUTE(
 				doxie_key_rid_did_split_undist, 
 				HASH64(rid)
-			): PERSIST('acctmon::header::doxie_key_rid_did_split');
+			): INDEPENDENT; //PERSIST('acctmon::header::doxie_key_rid_did_split');
 		
 		// BDIDUPDATE FILES
 		EXPORT bheader_build_version := TRIM(did_add.get_EnvVariable('bheader_build_version')):INDEPENDENT;
@@ -249,7 +251,7 @@ EXPORT product_files := MODULE
 			DISTRIBUTE(
 				business_header_key_rcid_undist, 
 				HASH64(rcid)
-			): PERSIST('acctmon::header::business_header_key_rcid');
+			): INDEPENDENT; //PERSIST('acctmon::header::business_header_key_rcid');
 		
 		
 		// BIP Best Header FILES
@@ -271,7 +273,7 @@ EXPORT product_files := MODULE
 			DISTRIBUTE(
 				bipbest_header_key_undist(seleid !=0),
 				HASH64(seleid)
-				): PERSIST('acctmon::bipbestheader::key_bipv2_best');
+				): INDEPENDENT; //PERSIST('acctmon::bipbestheader::key_bipv2_best');
 				
 		// In lieu of: header_quick.key_DID
 
@@ -303,7 +305,7 @@ EXPORT product_files := MODULE
 		EXPORT quick_header_key_DID_slim := DEDUP(SORT(quick_header_key_DID, 
 																								   did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, -dt_last_seen, -dt_vendor_last_reported, LOCAL),
 																						  did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, LOCAL) 
-																				: PERSIST('acctmon::header::quick_header_key_DID_slim');
+																				: INDEPENDENT; //PERSIST('acctmon::header::quick_header_key_DID_slim');
 							
 							
 		// In lieu of: utilfile.key_util_daily_did
@@ -336,7 +338,7 @@ EXPORT product_files := MODULE
 		EXPORT daily_utility_key_DID_slim := DEDUP(SORT(daily_utility_key_DID, 
 																									  did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, -record_date, LOCAL),
 																						   did, fname, lname, prim_range, prim_name, sec_range, st, zip, phone, LOCAL) 
-																				 : PERSIST('acctmon::header::daily_utility_key_DID_slim');
+																				 : INDEPENDENT; //PERSIST('acctmon::header::daily_utility_key_DID_slim');
 	END;
 	
 	EXPORT address := MODULE
@@ -375,7 +377,7 @@ EXPORT product_files := MODULE
 		EXPORT watchdog_file_best := DEDUP(SORT(watchdog_file_best_dist, 
 																						did, phone, -addr_dt_last_seen, LOCAL),
 																			 did, phone, LOCAL) 
-																 : PERSIST('acctmon::phone::base_file_neighbor');		
+																 : INDEPENDENT; //PERSIST('acctmon::phone::base_file_neighbor');		
 				
 		// =========================== ORIGINALLY: ===========================
 		// base_business_file := Business_Header.File_Business_Header_Best;
@@ -387,7 +389,7 @@ EXPORT product_files := MODULE
 		EXPORT business_best_filename_raw := 'thor_data400::BASE::Business_Header.Best';
 		EXPORT business_best_filename := AccountMonitoring.constants.DATA_LOCATION + business_best_filename_raw;
 		EXPORT base_business_file := DATASET(business_best_filename, Business_Header.Layout_BH_Best, THOR)
-		                                     : PERSIST('acctmon::address::business_file');
+		                                     : INDEPENDENT; //PERSIST('acctmon::address::business_file');
 					
 		EXPORT base_header_file := Header_Files.Base_Header_file_slim;
 		
@@ -499,7 +501,7 @@ EXPORT product_files := MODULE
 		EXPORT base_filename_restricted     := AccountMonitoring.constants.DATA_LOCATION + base_filename_raw_restricted;
 		EXPORT base_superfilename_raw_restricted := 'thor_data400::base::did_death_masterV3';
 		EXPORT base_superfilename_restricted     := AccountMonitoring.constants.DATA_LOCATION + base_superfilename_raw_restricted;
-		EXPORT base_file_restricted := DATASET(base_filename_restricted, Header.Layout_Did_Death_MasterV3, flat) : PERSIST('acctmon::deceased::by_DID_restricted');
+		EXPORT base_file_restricted := DATASET(base_filename_restricted, Header.Layout_Did_Death_MasterV3, flat) : INDEPENDENT; //PERSIST('acctmon::deceased::by_DID_restricted');
  		// FUTURE => EXPORT base_file_restricted := base_file(src != 'D$'):INDEPENDENT;
 		
 		// DeathMaster - Batch Deceased Monitoring DPM File Settings
@@ -547,7 +549,7 @@ EXPORT product_files := MODULE
 					HASH64(situs1_zip,situs1_prim_range,situs1_prim_name,situs1_addr_suffix,situs1_predir)
 				),
 				Layout_Base_Header_file_slim
-			) : PERSIST('acctmon::foreclosure::base_file_slim');
+			) : INDEPENDENT; //PERSIST('acctmon::foreclosure::base_file_slim');
 		
 	END;
 	
@@ -584,7 +586,7 @@ EXPORT product_files := MODULE
 		EXPORT base_file_b := DEDUP(SORT(base_file_b_dist, 
 																		 did, company_name, phone, -dt_last_seen, -score, LOCAL),
 																did, company_name, phone, LOCAL) 
-													: PERSIST('acctmon::paw::base_file_b');
+													: INDEPENDENT; //PERSIST('acctmon::paw::base_file_b');
 	END;
 	
 	
@@ -631,7 +633,7 @@ EXPORT product_files := MODULE
 
 		EXPORT gong_history_key_address_slim := 
 			PROJECT(gong_history_key_address, rec_gong_history_slim)
-			        : PERSIST('acctmon::gong::history_address_key_slim');		
+			        : INDEPENDENT; //PERSIST('acctmon::gong::history_address_key_slim');		
 		
 
 		// ||||||||||||||||||||||||||||  BASE FILES  ||||||||||||||||||||||||||
@@ -663,7 +665,7 @@ EXPORT product_files := MODULE
 					self.v_city_name := left.p_city_name;
 					self := left
 				)
-			) : PERSIST('acctmon::phone::gong_history_slim');
+			) : INDEPENDENT; //PERSIST('acctmon::phone::gong_history_slim');
 		
 		// SHARED Gong_hist_slim := Gong_hist_slim_persisted : INDEPENDENT;
 
@@ -761,35 +763,32 @@ EXPORT product_files := MODULE
 			
 			
 		// =========================== ORIGINALLY: ===========================
-		// base_file_cell := Phonesplus.file_phonesplus_base;
+		// base_file_cell := Phonesplus_v2.file_phonesplus_base;
 		// ===================================================================
 		
 		EXPORT plus_filename_subfile := 'out::phonesplus_did';
-		EXPORT plus_filename_raw := 'thor_data400::base::phonesplus';
+		EXPORT plus_filename_raw := 'thor_data400::base::phonesplusv2';
 		EXPORT plus_filename := AccountMonitoring.constants.DATA_LOCATION + plus_filename_raw;
 		EXPORT layout_base_file_cell := RECORD
-			Phonesplus.layoutCommonOut.fname;
-			Phonesplus.layoutCommonOut.mname;
-			Phonesplus.layoutCommonOut.lname;
-			Phonesplus.layoutCommonOut.prim_range;
-			Phonesplus.layoutCommonOut.prim_name;
-			Phonesplus.layoutCommonOut.sec_range;
-			Phonesplus.layoutCommonOut.v_city_name;
-			Phonesplus.layoutCommonOut.state;
-			Phonesplus.layoutCommonOut.zip5;
-			Phonesplus.layoutCommonOut.cellphone;
-			Phonesplus.layoutCommonOut.DateLastSeen;
-			Phonesplus.layoutCommonOut.did;
-			Phonesplus.layoutCommonOut.confidencescore;
-			Phonesplus.layoutCommonOut.vendor;
+			Phonesplus_v2.Layout_Phonesplus_Base.fname;
+			Phonesplus_v2.Layout_Phonesplus_Base.mname;
+			Phonesplus_v2.Layout_Phonesplus_Base.lname;
+			Phonesplus_v2.Layout_Phonesplus_Base.prim_range;
+			Phonesplus_v2.Layout_Phonesplus_Base.prim_name;
+			Phonesplus_v2.Layout_Phonesplus_Base.sec_range;
+			Phonesplus_v2.Layout_Phonesplus_Base.v_city_name;
+			Phonesplus_v2.Layout_Phonesplus_Base.state;
+			Phonesplus_v2.Layout_Phonesplus_Base.zip5;
+			Phonesplus_v2.Layout_Phonesplus_Base.cellphone;
+			Phonesplus_v2.Layout_Phonesplus_Base.DateLastSeen;
+			Phonesplus_v2.Layout_Phonesplus_Base.did;
+			Phonesplus_v2.Layout_Phonesplus_Base.confidencescore;
+			Phonesplus_v2.Layout_Phonesplus_Base.vendor;
 		END;
 		
 		SHARED base_file_cell_undist := 
 			PROJECT(
-				DATASET(
-					plus_filename, 
-					Phonesplus.layoutCommonOut, THOR
-				)(did <> 0, CellPhone <> '', confidencescore > 10, phonesplus.IsCellSource(vendor)),
+				Phonesplus_v2.File_Phonesplus_Base(did <> 0, CellPhone <> '', confidencescore > 10, phonesplus.IsCellSource(vendor)),
 				layout_base_file_cell
 			);
 
@@ -797,7 +796,7 @@ EXPORT product_files := MODULE
 			DISTRIBUTE(
 				base_file_cell_undist,
 				hash64(did)
-			) : PERSIST('acctmon::phone::base_file_cell');
+			) : INDEPENDENT; //PERSIST('acctmon::phone::base_file_cell');
 			
 			
 		EXPORT base_header_file := Header_Files.Base_Header_file_slim;
@@ -835,7 +834,7 @@ EXPORT product_files := MODULE
 					CellPhone.layoutNeuStar,CSV(TERMINATOR('\n'), SEPARATOR('|'))
 				),
 				HASH64(CellPhone)
-			) : PERSIST('acctmon::phone::base_file_neustar');
+			) : INDEPENDENT; //PERSIST('acctmon::phone::base_file_neustar');
 			
 		// Telcordia Settings - Switch Type / Phone Type
 		EXPORT SET OF STRING3 Toll_Free_Area_Codes := ['800','811','822','833','844','855','866','877','888','899'];
@@ -872,7 +871,7 @@ EXPORT product_files := MODULE
 																				 telcordia_tds_keyfilename);
 
 		EXPORT telcordia_tds := DISTRIBUTE(telcordia_tds_undist,
-																			 HASH64(npa, nxx, tb)) : PERSIST('acctmon::phone::telcordia_tds');
+																			 HASH64(npa, nxx, tb)) : INDEPENDENT; //PERSIST('acctmon::phone::telcordia_tds');
 																			 
 		// Experian Gateway Phones
 		SHARED rec_experian_phones_slim := RECORD
@@ -890,7 +889,7 @@ EXPORT product_files := MODULE
 		SHARED experian_phones_dist := DISTRIBUTE(PROJECT(experian_phones_undist, rec_experian_phones_slim),
 																				      HASH64(did, Phone_digits));
 
-		EXPORT experian_phones := DEDUP(SORT(experian_phones_dist, record, local), record, local) : PERSIST('acctmon::phone::experian_phones');
+		EXPORT experian_phones := DEDUP(SORT(experian_phones_dist, record, local), record, local) : INDEPENDENT; //PERSIST('acctmon::phone::experian_phones');
 		
 		
 	END; // Phone module
@@ -961,7 +960,7 @@ EXPORT product_files := MODULE
 						did, bdid, app_ssn, lname, fname, 
 						prim_range, prim_name, suffix, p_city_name, st, zip, 
 						LOCAL)
-			: PERSIST('acctmon::property::search_file_slim');
+			: /*INDEPENDENT;*/ PERSIST('acctmon::property::search_file_slim');
 	
 		// Deeds file.
 		EXPORT layout_deeds_file_b := RECORD
@@ -976,8 +975,30 @@ EXPORT product_files := MODULE
 		SHARED deeds_file_slim := PROJECT(deeds_file,layout_deeds_file_b);
 
 		EXPORT deeds_file_dist := 
-			DISTRIBUTE(deeds_file_slim, HASH64(ln_fares_id)) : PERSIST('acctmon::property::deeds_file_slim');
+			DISTRIBUTE(deeds_file_slim, HASH64(ln_fares_id)) : /*INDEPENDENT;*/ PERSIST('acctmon::property::deeds_file_slim');
 	
+		// Linkid key
+		property_build_version         := TRIM(did_add.get_EnvVariable('Property_Build_Version') ):INDEPENDENT;
+		
+		EXPORT SearchLinkid_keyname_raw := 'thor_data400::key::ln_propertyv2::' + property_build_version + '::search.linkids';
+		EXPORT SearchLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + SearchLinkid_keyname_raw;
+			
+		EXPORT SearchLinkid_superkeyname_raw 	:= 'thor_data400::key::ln_propertyv2' + doxie.Version_SuperKey + '::search.linkids';
+		EXPORT SearchLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + SearchLinkid_superkeyname_raw;
+
+		SHARED SearchLinkid_key_undist := 
+				INDEX(
+					LN_PropertyV2.Key_LinkIds.key,  
+					SearchLinkid_keyname
+				);
+
+		EXPORT SearchLinkid_key :=
+				DISTRIBUTE(
+					SearchLinkid_key_undist, 
+					HASH64(seleid)
+					): INDEPENDENT; //PERSIST('acctmon::property::search_linkid');
+		
+		
 	END;
 	
 	EXPORT litigiousdebtor := MODULE
@@ -994,7 +1015,7 @@ EXPORT product_files := MODULE
 		EXPORT litigiousdebtor_file            := DATASET(litigiousdebtor_filename, CourtLink.Layouts.Base, THOR);
 		
 		EXPORT litigiousdebtor_file_slim := DISTRIBUTE(litigiousdebtor_file, HASH32(debtor_lname, debtor_fname, CourtState, DocketNumber)) 
-		                                    : PERSIST('acctmon::litigiousdebtor::search_file_slim');
+		                                    : INDEPENDENT; //PERSIST('acctmon::litigiousdebtor::search_file_slim');
 	END;
 
 	EXPORT liens := MODULE
@@ -1006,47 +1027,47 @@ EXPORT product_files := MODULE
 		EXPORT main_HOGAN_filename_raw  := 'thor_data400::base::liens::main::Hogan';
 		EXPORT main_HOGAN_filename      := AccountMonitoring.constants.DATA_LOCATION + main_HOGAN_filename_raw;
 		EXPORT main_HOGAN_file          := PROJECT( DATASET(main_HOGAN_filename,LiensV2.layout_liens_main_module_for_hogan.layout_liens_main,THOR), liens_main_layout)
-		                                     : PERSIST('acctmon::liens::main::HOGAN');
+		                                     : INDEPENDENT; //PERSIST('acctmon::liens::main::HOGAN');
 																				 
 		EXPORT main_ILFDLN_filename_raw := 'thor_data400::base::liens::main::ILFDLN';
 		EXPORT main_ILFDLN_filename     := AccountMonitoring.constants.DATA_LOCATION + main_ILFDLN_filename_raw;
 		EXPORT main_ILFDLN_file         := DATASET(main_ILFDLN_filename,liens_main_layout,THOR)
-		                                     : PERSIST('acctmon::liens::main::ILFDLN');
+		                                     : INDEPENDENT; //PERSIST('acctmon::liens::main::ILFDLN');
 		
 		EXPORT main_NYC_filename_raw    := 'thor_data400::base::liens::main::NYC';
 		EXPORT main_NYC_filename        := AccountMonitoring.constants.DATA_LOCATION + main_NYC_filename_raw;
 		EXPORT main_NYC_file            := DATASET(main_NYC_filename,liens_main_layout,THOR)
-		                                     : PERSIST('acctmon::liens::main::NYC');
+		                                     : INDEPENDENT; //PERSIST('acctmon::liens::main::NYC');
 		
 		EXPORT main_NYFDLN_filename_raw := 'thor_data400::base::liens::main::NYFDLN';
 		EXPORT main_NYFDLN_filename     := AccountMonitoring.constants.DATA_LOCATION + main_NYFDLN_filename_raw;
 		EXPORT main_NYFDLN_file         := DATASET(main_NYFDLN_filename,liens_main_layout,THOR)
-		                                     : PERSIST('acctmon::liens::main::NYFDLN');
+		                                     : INDEPENDENT; //PERSIST('acctmon::liens::main::NYFDLN');
 		
 		EXPORT main_SA_filename_raw     := 'thor_data400::base::liens::main::SA';
 		EXPORT main_SA_filename         := AccountMonitoring.constants.DATA_LOCATION + main_SA_filename_raw;
 		EXPORT main_SA_file             := DATASET(main_SA_filename,liens_main_layout,THOR)
-		                                     : PERSIST('acctmon::liens::main::SA');
+		                                     : INDEPENDENT; //PERSIST('acctmon::liens::main::SA');
 		
 		EXPORT main_chicago_law_filename_raw := 'thor_data400::base::liens::main::chicago_law';
 		EXPORT main_chicago_law_filename     := AccountMonitoring.constants.DATA_LOCATION + main_chicago_law_filename_raw;
 		EXPORT main_chicago_law_file         := DATASET(main_chicago_law_filename,liens_main_layout,THOR)
-		                                          : PERSIST('acctmon::liens::main::chicago_law');
+		                                          : INDEPENDENT; //PERSIST('acctmon::liens::main::chicago_law');
 
 		EXPORT main_CA_federal_filename_raw := 'thor_data400::base::liens::main::CA_federal';
 		EXPORT main_CA_federal_filename     := AccountMonitoring.constants.DATA_LOCATION + main_CA_federal_filename_raw;
 		EXPORT main_CA_federal_file         := DATASET(main_CA_federal_filename,liens_main_layout,THOR)
-		                                         : PERSIST('acctmon::liens::main::CA_federal');
+		                                         : INDEPENDENT; //PERSIST('acctmon::liens::main::CA_federal');
 		
 		EXPORT main_superior_filename_raw  := 'thor_data400::base::liens::main::superior';
 		EXPORT main_superior_filename      := AccountMonitoring.constants.DATA_LOCATION + main_superior_filename_raw;
 		EXPORT main_superior_file          := DATASET(main_superior_filename,liens_main_layout,THOR)
-		                                        : PERSIST('acctmon::liens::main::superior');
+		                                        : INDEPENDENT; //PERSIST('acctmon::liens::main::superior');
 		
 		EXPORT main_MA_filename_raw  := 'thor_data400::base::liens::main::MA';
 		EXPORT main_MA_filename      := AccountMonitoring.constants.DATA_LOCATION + main_MA_filename_raw;
 		EXPORT main_MA_file          := DATASET(main_MA_filename,liens_main_layout,THOR)
-		                                  : PERSIST('acctmon::liens::main::MA');
+		                                  : INDEPENDENT; //PERSIST('acctmon::liens::main::MA');
 
 		SHARED liens_main_pre_file := 
 				main_HOGAN_file(tmsid NOT IN Liensv2.Suppress_TMSID)
@@ -1067,52 +1088,52 @@ EXPORT product_files := MODULE
 		
 		// For LiensV2.file_liens_party
 
-		EXPORT liens_party_layout := LiensV2.Layout_liens_party_ssn_BIPv2;
+		EXPORT liens_party_layout := LiensV2.Layout_liens_party_SSN_BIPV2_with_LinkFlags;
 		
 		EXPORT party_HOGAN_filename_raw  := 'thor_data400::base::liens::party::Hogan';
 		EXPORT party_HOGAN_filename      := AccountMonitoring.constants.DATA_LOCATION + party_HOGAN_filename_raw;
-		EXPORT party_HOGAN_file          := PROJECT( DATASET(party_HOGAN_filename,LiensV2.layout_liens_party_ssn_for_hogan_bipv2,THOR), liens_party_layout)
-		                                      : PERSIST('acctmon::liens::party::HOGAN');
+		EXPORT party_HOGAN_file          := PROJECT( DATASET(party_HOGAN_filename,LiensV2.layout_liens_party_ssn_for_hogan_bipv2_with_LinkFlags,THOR), liens_party_layout)
+		                                      : INDEPENDENT; //PERSIST('acctmon::liens::party::HOGAN');
 
 		EXPORT party_ILFDLN_filename_raw := 'thor_data400::base::liens::party::ILFDLN';
 		EXPORT party_ILFDLN_filename     := AccountMonitoring.constants.DATA_LOCATION + party_ILFDLN_filename_raw;
 		EXPORT party_ILFDLN_file         := DATASET(party_ILFDLN_filename,liens_party_layout,THOR)
-		                                      : PERSIST('acctmon::liens::party::ILFDLN');
+		                                      : INDEPENDENT; //PERSIST('acctmon::liens::party::ILFDLN');
 		
 		EXPORT party_NYC_filename_raw    := 'thor_data400::base::liens::party::NYC';
 		EXPORT party_NYC_filename        := AccountMonitoring.constants.DATA_LOCATION + party_NYC_filename_raw;
 		EXPORT party_NYC_file            := DATASET(party_NYC_filename,liens_party_layout,THOR)
-		                                      : PERSIST('acctmon::liens::party::NYC');
+		                                      : INDEPENDENT; //PERSIST('acctmon::liens::party::NYC');
 		
 		EXPORT party_NYFDLN_filename_raw := 'thor_data400::base::liens::party::NYFDLN';
 		EXPORT party_NYFDLN_filename     := AccountMonitoring.constants.DATA_LOCATION + party_NYFDLN_filename_raw;
 		EXPORT party_NYFDLN_file         := DATASET(party_NYFDLN_filename,liens_party_layout,THOR)
-		                                      : PERSIST('acctmon::liens::party::NYFDLN');
+		                                      : INDEPENDENT; //PERSIST('acctmon::liens::party::NYFDLN');
 		
 		EXPORT party_SA_filename_raw     := 'thor_data400::base::liens::party::SA';
 		EXPORT party_SA_filename         := AccountMonitoring.constants.DATA_LOCATION + party_SA_filename_raw;
 		EXPORT party_SA_file             := DATASET(party_SA_filename,liens_party_layout,THOR)
-		                                      : PERSIST('acctmon::liens::party::SA');
+		                                      : INDEPENDENT; //PERSIST('acctmon::liens::party::SA');
 		
 		EXPORT party_chicago_law_filename_raw := 'thor_data400::base::liens::party::chicago_law';
 		EXPORT party_chicago_law_filename     := AccountMonitoring.constants.DATA_LOCATION + party_chicago_law_filename_raw;
 		EXPORT party_chicago_law_file         := DATASET(party_chicago_law_filename,liens_party_layout,THOR)
-		                                           : PERSIST('acctmon::liens::party::chicago_law');
+		                                           : INDEPENDENT; //PERSIST('acctmon::liens::party::chicago_law');
 
 		EXPORT party_CA_federal_filename_raw := 'thor_data400::base::liens::party::CA_federal';
 		EXPORT party_CA_federal_filename     := AccountMonitoring.constants.DATA_LOCATION + party_CA_federal_filename_raw;
 		EXPORT party_CA_federal_file         := DATASET(party_CA_federal_filename,liens_party_layout,THOR)
-		                                          : PERSIST('acctmon::liens::party::CA_federal');
+		                                          : INDEPENDENT; //PERSIST('acctmon::liens::party::CA_federal');
 		
 		EXPORT party_superior_filename_raw  := 'thor_data400::base::liens::party::superior';
 		EXPORT party_superior_filename      := AccountMonitoring.constants.DATA_LOCATION + party_superior_filename_raw;
 		EXPORT party_superior_file          := DATASET(party_superior_filename,liens_party_layout,THOR)
-		                                         : PERSIST('acctmon::liens::party::superior');
+		                                         : INDEPENDENT; //PERSIST('acctmon::liens::party::superior');
 		
 		EXPORT party_MA_filename_raw  := 'thor_data400::base::liens::party::MA';
 		EXPORT party_MA_filename      := AccountMonitoring.constants.DATA_LOCATION + party_MA_filename_raw;
 		EXPORT party_MA_file          := DATASET(party_MA_filename,liens_party_layout,THOR)
-		                                   : PERSIST('acctmon::liens::party::MA');
+		                                   : INDEPENDENT; //PERSIST('acctmon::liens::party::MA');
 
 		EXPORT party_file := 
 				party_HOGAN_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
@@ -1170,7 +1191,7 @@ EXPORT product_files := MODULE
 			DISTRIBUTE(
 				offenders_file_deduped, 
 				HASH64(offender_key)
-			) : PERSIST('acctmon::criminal::offenders_file_slim');
+			) : INDEPENDENT; //PERSIST('acctmon::criminal::offenders_file_slim');
 		
 		// 2. Offenses file, sorted and deduped for record having most recent off_date and inc_adm_date.
 		EXPORT layout_offenses_slim := RECORD
@@ -1207,7 +1228,7 @@ EXPORT product_files := MODULE
 			DISTRIBUTE(
 				offenses_file_deduped, 
 				HASH64(offender_key)
-			) : PERSIST('acctmon::criminal::offenses_file_slim');
+			) : INDEPENDENT; //PERSIST('acctmon::criminal::offenses_file_slim');
 			
 		// 3. Punishments file, sorted and deduped for most recent event_dt.
 		EXPORT layout_punishments_slim := RECORD
@@ -1253,7 +1274,7 @@ EXPORT product_files := MODULE
 			DISTRIBUTE(
 				punishments_file_deduped, 
 				HASH64(offender_key)
-			) : PERSIST('acctmon::criminal::punishments_file_slim');
+			) : INDEPENDENT; //PERSIST('acctmon::criminal::punishments_file_slim');
 			
 	END; // criminal
 	
@@ -1270,7 +1291,7 @@ EXPORT product_files := MODULE
 					THOR
 				),
 				HASH64(did)
-			) : PERSIST('acctmon::phonefeedback::base_file');
+			) : INDEPENDENT; //PERSIST('acctmon::phonefeedback::base_file');
 			
 	END;
 
@@ -1351,7 +1372,7 @@ EXPORT product_files := MODULE
 	              SELF.company_zip4        := LEFT.company_address.zip4,
 								// all others have the same field name as left
 								SELF             := LEFT)) 
-							: PERSIST('acctmon::workplace::base_file_slim');
+							: INDEPENDENT; //PERSIST('acctmon::workplace::base_file_slim');
 
 	END; // end workplace module
 	
@@ -1360,7 +1381,6 @@ EXPORT product_files := MODULE
 		pphone_build_version         := TRIM( did_add.get_EnvVariable('pphones_build_version') ):INDEPENDENT;
 		key_pphone_keyname_raw := 'thor_data400::key::'+pphone_build_version+'::phones_ported_metadata';
 		key_pphone_keyname     := AccountMonitoring.constants.DATA_LOCATION + key_pphone_keyname_raw;
-
 		// Define a Duplicate Index; this points to the logical key file
 		EXPORT key_pphone := 
 			INDEX(
@@ -1389,14 +1409,14 @@ EXPORT product_files := MODULE
 		SHARED sbfeLinkid_key_undist := 
 			INDEX(
 				Business_Credit.Key_LinkIds().key,  
-				sbfeLinkid_superkeyname
+				sbfeLinkid_keyname
 			);
 
 		EXPORT sbfeLinkid_key :=
 			DISTRIBUTE(
 				sbfeLinkid_key_undist, 
 				HASH64(seleid)
-				): PERSIST('acctmon::sbfe::key_linkid');
+				): INDEPENDENT; //PERSIST('acctmon::sbfe::key_linkid');
 				
 		// Tradeline Key		
 		
@@ -1409,14 +1429,14 @@ EXPORT product_files := MODULE
 		SHARED sbfeTrade_key_undist := 
 			INDEX(
 				Business_Credit.key_tradeline(),  
-				sbfeTrade_superkeyname
+				sbfeTrade_keyname
 			);
 
 		EXPORT sbfeTrade_key :=
 			DISTRIBUTE(
 				sbfeTrade_key_undist, 
 				HASH64(sbfe_contributor_number,contract_account_number)
-				): PERSIST('acctmon::sbfe::key_tradeline');
+				): INDEPENDENT; //PERSIST('acctmon::sbfe::key_tradeline');
 		
 		// Credit Score Key	
 		
@@ -1431,14 +1451,269 @@ EXPORT product_files := MODULE
 		SHARED sbfeScore_key_undist := 
 			INDEX(
 				Business_Credit_Scoring.Key_ScoringIndex().Key,  
-				sbfeScore_superkeyname
+				sbfeScore_keyname
 			);
 
 		EXPORT sbfeScore_key :=
 			DISTRIBUTE(
 				sbfeScore_key_undist,
 				HASH64(seleid) 
-				): PERSIST('acctmon::sbfe::key_scoring');
+				): INDEPENDENT; //PERSIST('acctmon::sbfe::key_scoring');
 	END;
+		
+	EXPORT ucc := MODULE
 	
+		EXPORT ucc_build_version := TRIM(did_add.get_EnvVariable('ucc_build_version')):INDEPENDENT;
+
+		// Linkid key
+		EXPORT uccLinkid_keyname_raw := 'thor_data400::key::ucc::' + ucc_build_version + '::linkids';
+		EXPORT uccLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + uccLinkid_keyname_raw;
+		
+		EXPORT uccLinkid_superkeyname_raw  := 'thor_data400::key::ucc::linkids_' + doxie.Version_SuperKey;
+		EXPORT uccLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + uccLinkid_superkeyname_raw;
+
+		SHARED uccLinkid_key_undist := 
+			INDEX(
+				UCCV2.Key_LinkIds.key,  
+				uccLinkid_keyname
+			);
+
+		EXPORT uccLinkid_key :=
+			DISTRIBUTE(
+				uccLinkid_key_undist, 
+				HASH64(seleid)
+				): INDEPENDENT; //PERSIST('acctmon::ucc::key_linkid');
+				
+		// Main tmsid/rmsid Key	
+			
+		EXPORT uccMain_keyname_raw  := 'thor_data400::key::ucc::' + ucc_build_version + '::main_rmsid';
+		EXPORT uccMain_keyname     	:= AccountMonitoring.constants.DATA_LOCATION + uccMain_keyname_raw;
+		
+		EXPORT uccMain_superkeyname_raw := 'thor_data400::key::ucc::main_rmsid_' + doxie.Version_SuperKey;
+		EXPORT uccMain_superkeyname     := AccountMonitoring.constants.DATA_LOCATION + uccMain_superkeyname_raw;
+
+		SHARED uccMain_key_undist := 
+			INDEX(
+				UCCV2.Key_Rmsid_Main(),  
+				uccMain_keyname
+			);
+
+		EXPORT uccMain_key :=
+			DISTRIBUTE(
+				uccMain_key_undist,
+				HASH64(tmsid) 
+				): INDEPENDENT; //PERSIST('acctmon::ucc::key_main');
+	
+		END;
+		
+		EXPORT govtdebarred := MODULE
+	
+			EXPORT govt_build_version := TRIM(did_add.get_EnvVariable('sam_build_version')):INDEPENDENT;
+
+			// Linkid key
+			EXPORT govtLinkid_keyname_raw := 'thor_data400::key::sam::' + govt_build_version + '::linkids';
+			EXPORT govtLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + govtLinkid_keyname_raw;
+			
+			EXPORT govtLinkid_superkeyname_raw  := 'thor_data400::key::sam::linkids_' + doxie.Version_SuperKey;
+			EXPORT govtLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + govtLinkid_superkeyname_raw;
+
+			SHARED govtLinkid_key_undist := 
+				INDEX(
+					SAM.key_linkID.key,  
+					govtLinkid_keyname
+				);
+
+			EXPORT govtLinkid_key :=
+				DISTRIBUTE(
+					govtLinkid_key_undist, 
+					HASH64(seleid)
+					): INDEPENDENT; //PERSIST('acctmon::sam::key_linkid');
+					
+		END;
+		
+		EXPORT inquiry := MODULE
+	
+			EXPORT inquiry_build_version := TRIM(did_add.get_EnvVariable('inquiry_build_version')):INDEPENDENT;
+			
+			// Linkid key
+			EXPORT inquiryLinkid_keyname_raw := 'thor_data400::key::inquiry::' + inquiry_build_version + '::linkids';
+			EXPORT inquiryLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + inquiryLinkid_keyname_raw;
+			
+			EXPORT inquiryLinkid_superkeyname_raw  := 'thor_data400::key::inquiry_table::linkids_' + doxie.Version_SuperKey;
+			EXPORT inquiryLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + inquiryLinkid_superkeyname_raw;
+
+			SHARED inquiryLinkid_key_undist := 
+				INDEX(
+					Inquiry_AccLogs.Key_Inquiry_LinkIds.key,  
+					inquiryLinkid_keyname
+				);
+
+			EXPORT inquiryLinkid_key :=
+				DISTRIBUTE(
+					inquiryLinkid_key_undist, 
+					HASH64(seleid)
+					): INDEPENDENT; //PERSIST('acctmon::inquiry_table::key_linkid');
+							
+			// Update Linkid key
+				
+			EXPORT inquiry_update_version := TRIM(did_add.get_EnvVariable('inquiry_update_build_version')):INDEPENDENT;
+	
+			EXPORT inquiryUpdLinkid_keyname_raw := 'thor_data400::key::inquiry::' + inquiry_update_version + '::linkids_update';
+			EXPORT inquiryUpdLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + inquiryUpdLinkid_keyname_raw;
+			
+			EXPORT inquiryUpdLinkid_superkeyname_raw  := 'thor_data400::key::inquiry_table::' + doxie.Version_SuperKey + '::linkids_update';
+			EXPORT inquiryUpdLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + inquiryUpdLinkid_superkeyname_raw;
+
+			SHARED inquiryUpdLinkid_key_undist := 
+				INDEX(
+					Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.key,  
+					inquiryUpdLinkid_keyname
+				);
+
+			EXPORT inquiryUpdLinkid_key :=
+				DISTRIBUTE(
+					inquiryUpdLinkid_key_undist, 
+					HASH64(seleid)
+					): INDEPENDENT; //PERSIST('acctmon::inquiry_table::key_linkid_update');
+					
+		END;
+		
+		EXPORT corp := MODULE
+	
+			EXPORT corp_build_version := TRIM(did_add.get_EnvVariable('corp_build_version')):INDEPENDENT;
+			
+			// Linkid key
+			EXPORT corpLinkid_keyname_raw := 'thor_data400::key::corp2::' + corp_build_version + '::corp::linkids';
+			EXPORT corpLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + corpLinkid_keyname_raw;
+			
+			EXPORT corpLinkid_superkeyname_raw  := 'thor_data400::key::corp2::' + doxie.Version_SuperKey + '::corp::linkids';
+			EXPORT corpLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + corpLinkid_superkeyname_raw;
+
+			SHARED corpLinkid_key_undist := 
+				INDEX(
+					Corp2.Key_LinkIDs.corp.key,  
+					corpLinkid_keyname
+				);
+
+			EXPORT corpLinkid_key :=
+				DISTRIBUTE(
+					corpLinkid_key_undist, 
+					HASH64(seleid)
+					): INDEPENDENT; //PERSIST('acctmon::corp::key_linkid');
+							
+			// corp key
+				
+			EXPORT corpKey_keyname_raw := 'thor_data400::key::corp2::' + corp_build_version + '::corp::corp_key.record_type';
+			EXPORT corpKey_keyname     := AccountMonitoring.constants.DATA_LOCATION + corpKey_keyname_raw;
+			
+			EXPORT corpKey_superkeyname_raw  := 'thor_data400::key::corp2::' + doxie.Version_SuperKey + '::corp::corp_key.record_type';
+			EXPORT corpKey_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + corpKey_superkeyname_raw;
+
+			SHARED corpKey_key_undist := 
+				INDEX(
+					Corp2.Key_Corp_Corpkey,  
+					corpKey_keyname
+				);
+
+			EXPORT corpKey_key :=
+				DISTRIBUTE(
+					corpKey_key_undist, 
+					HASH64(corp_key)
+					): INDEPENDENT; //PERSIST('acctmon::corp2::corp_key.record_type');
+					
+		END;
+		
+		EXPORT mvr := MODULE
+	
+			EXPORT mvr_build_version := TRIM(did_add.get_EnvVariable('vehicle_build_version')):INDEPENDENT;
+			
+			// Linkid key
+			EXPORT mvrLinkid_keyname_raw := 'thor_data400::key::vehiclev2::' + mvr_build_version + '::linkids';
+			EXPORT mvrLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + mvrLinkid_keyname_raw;
+			
+			EXPORT mvrLinkid_superkeyname_raw  	:= 'thor_data400::key::vehiclev2::linkids_' + doxie.Version_SuperKey;
+			EXPORT mvrLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + mvrLinkid_superkeyname_raw;
+
+			SHARED mvrLinkid_key_undist := 
+				INDEX(
+					VehicleV2.Key_Vehicle_linkids.key,  
+					mvrLinkid_keyname
+				);
+
+			EXPORT mvrLinkid_key :=
+				DISTRIBUTE(
+					mvrLinkid_key_undist, 
+					HASH64(seleid)
+					): INDEPENDENT; //PERSIST('acctmon::vehiclev2::key_linkid');
+			
+			// Main key
+			EXPORT main_keyname_raw := 'thor_data400::key::vehiclev2::' + mvr_build_version + '::main_key';
+			EXPORT main_keyname     := AccountMonitoring.constants.DATA_LOCATION + main_keyname_raw;
+			
+			EXPORT main_superkeyname_raw 	:= 'thor_data400::key::vehiclev2::main_key_' + doxie.Version_SuperKey;
+			EXPORT main_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + main_superkeyname_raw;
+
+			SHARED main_key_undist := 
+				INDEX(
+					VehicleV2.Key_Vehicle_Main_Key,  
+					main_keyname
+				);
+
+			EXPORT main_key :=
+				DISTRIBUTE(
+					main_key_undist, 
+					HASH64(vehicle_key)
+					): INDEPENDENT; //PERSIST('acctmon::vehiclev2::main_key');
+					
+		END;
+
+		EXPORT aircraft := MODULE
+	
+			EXPORT air_build_version := TRIM(did_add.get_EnvVariable('Aircraft_build_version')):INDEPENDENT;
+			
+			// Linkid key
+			EXPORT airLinkid_keyname_raw := 'thor_data400::key::faa::' + air_build_version + '::aircraft_linkids';
+			EXPORT airLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + airLinkid_keyname_raw;
+			
+			EXPORT airLinkid_superkeyname_raw  	:= 'thor_data400::key::aircraft_linkids_' + doxie.Version_SuperKey;
+			EXPORT airLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + airLinkid_superkeyname_raw;
+
+			SHARED airLinkid_key_undist := 
+				INDEX(
+					faa.key_aircraft_linkids.key,  
+					airLinkid_keyname
+					);
+
+			EXPORT airLinkid_key :=
+				DISTRIBUTE(
+					airLinkid_key_undist, 
+					HASH64(seleid)
+					): INDEPENDENT; //PERSIST('acctmon::aircraft::key_linkid');
+		
+		END;
+		
+		EXPORT watercraft := MODULE
+	
+			EXPORT water_build_version := TRIM(did_add.get_EnvVariable('watercraft_build_version')):INDEPENDENT;
+			
+			// Linkid key
+			EXPORT waterLinkid_keyname_raw := 'thor_data400::key::watercraft::' + water_build_version + '::linkids';
+			EXPORT waterLinkid_keyname     := AccountMonitoring.constants.DATA_LOCATION + waterLinkid_keyname_raw;
+			
+			EXPORT waterLinkid_superkeyname_raw  	:= 'thor_data400::key::watercraft_linkids_' + doxie.Version_SuperKey;
+			EXPORT waterLinkid_superkeyname     	:= AccountMonitoring.constants.DATA_LOCATION + waterLinkid_superkeyname_raw;
+
+			SHARED waterLinkid_key_undist := 
+				INDEX(
+					Watercraft.Key_LinkIds.key,  
+					waterLinkid_keyname
+				);
+
+			EXPORT waterLinkid_key :=
+				DISTRIBUTE(
+					waterLinkid_key_undist, 
+					HASH64(seleid)
+					): INDEPENDENT; //PERSIST('acctmon::watercraft::key_linkid');
+		END;
+		
 END;

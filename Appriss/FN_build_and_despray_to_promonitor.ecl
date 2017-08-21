@@ -1,4 +1,4 @@
-import _control,RoxieKeybuild;
+import _control,RoxieKeybuild,Appriss_Image,ut;
 					
 export FN_build_and_despray_to_promonitor(String proc_date):= FUNCTION
 
@@ -27,15 +27,20 @@ build_all := proc_build_all_files;
 apply_updates := sequential(Appriss.proc_update_base_files,
                             Appriss.proc_build_all_keys(proc_date));
 
-//**    ---------- Image Processing  -----------------
-// image_proc   := if(fn_exist_agencyDeletes() or Appriss_Image.fn_exists_Images(), 
-                 // sequential( Appriss_Image.proc_build_base(proc_date),
-								             // Appriss_Image.proc_build_keys(proc_date),
-														 // Appriss_Image.proc_build_all(proc_date)
-													 // ),
-                 // output('No Deletes to apply and no new images to process')
-								// );
 
+//**    ---------- Image Processing  -----------------
+image_proc   := if(fn_exist_agencyDeletes() or Appriss_Image.fn_exists_Images(), 
+                 sequential( //Appriss_Image.Prod_build_base_Firsttimeuse(proc_date),
+								             Appriss_Image.proc_build_base(proc_date),
+								             Appriss_Image.proc_build_keys(proc_date),
+														 Appriss_Image.proc_build_all(proc_date)
+													 ),
+                 output('No Deletes to apply and no new images to process')
+								);
+update_image_dops := if(fn_exist_agencyDeletes() or Appriss_Image.fn_exists_Images(),
+									      RoxieKeybuild.updateversion('ApprissImageKeys',proc_date,'vani.chikte@lexisnexis.com'),
+												output('No Deletes to apply and no new images to process')
+												);
 //**    ---------  OUTPUT THE FILES as CSV -----------
 o1:=output(bookings_for_promonitor,,	booking_for_promonitor_file_name, 	CSV(HEADING(1),SEPARATOR('|'),TERMINATOR('\n')),OVERWRITE);
 o2:=output(charges_for_promonitor ,,	charges_for_promonitor_file_name, 	CSV(HEADING(1),SEPARATOR('|'),TERMINATOR('\n')),OVERWRITE);
@@ -72,11 +77,30 @@ c2:=if (fn_exist_agencyDeletes(),
       
 //CLEANUP
 cleanup:=_clear_raw_xml_SF;
+
+//--------------get the sample----------------
+ds := appriss.file_bookings_base;
+ds_image := appriss_image.File_Appriss_image_base;
+
+dsample := sample(ds(load_date=ut.GetDate),100000,1);
+imagesample := sample(ds_image(date=ut.GetDate),100000,1);
+
+data_sample := output(choosen(dsample,1000));
+image_sample := output(choosen(imagesample,1000),{did , state,rtype,Booking_sid,agencyKey,maxQueueSid,seq,date,num,image_link;});
+
+all_samp := parallel(data_sample, image_sample);
+
+emailqa := FileServices.sendemail('qualityassurance@seisint.com','DAILY APRRISS SAMPLES READY','at ' + thorlib.WUID());
+//------------------------------------------------------------------------------------------------------------------------
+//strata counts
+Out_File_Booking_stats_Population(appriss.file_bookings_base,appriss.file_charges_base,proc_date,strata_output);
+
 //DOIT
 do_it:=sequential(build_all,
-                  apply_updates,//image_proc,
-                  parallel(o1,o2),parallel(d1,d2),c1,c2,cleanup,
-									RoxieKeybuild.updateversion('ApprissKeys',proc_date,'vani.chikte@lexisnexis.com') );
+                  apply_updates,image_proc,update_image_dops,
+                  parallel(o1,o2),parallel(d1,d2),c1,c2,cleanup,strata_output,
+									RoxieKeybuild.updateversion('ApprissKeys',proc_date,'vani.chikte@lexisnexis.com'),
+									all_samp): success(emailqa);
 //do_it:=sequential(build_all,c1,c2,cleanup);
 
 //

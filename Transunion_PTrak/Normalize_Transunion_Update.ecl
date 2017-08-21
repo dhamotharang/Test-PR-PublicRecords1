@@ -4,7 +4,14 @@
 	//current name, alias, aka and former name
 
 Transunion_PTrak.Layout_Transunion_Out.NormNameAddressRec t_norm_name (Transunion_PTrak.Layout_Transunion_Update_In L, INTEGER C):= TRANSFORM
-	 current_name 						:= StringLib.StringCleanSpaces((L.LASTNAME+', '+L.FIRSTNAME+' '+ L.MIDDLENAME +' '+ L.SUFFIX + ' ' + L.PREFIX));
+	get_suffix(string suffix) := map(trim(suffix, left, right) IN ['JR', 'SR', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'] => trim(suffix, left, right),  
+																	 DataLib.StringFind(suffix,'RD',1) > 0 => 'III',
+																	 DataLib.StringFind(suffix,'ND',1) > 0 => 'II',
+                                   (unsigned) suffix = 2 => 'II',
+																   (unsigned) suffix = 3 => 'III',
+																	 '');
+
+	 current_name 						:= StringLib.StringCleanSpaces((L.LASTNAME+', '+L.FIRSTNAME+' '+ L.MIDDLENAME +' '+ get_suffix(L.SUFFIX)));
 	 SELF.Name       					:= CHOOSE(C,current_name,L.AKA1,L.AKA2,L.AKA3);
 	 SELF.NameType  					:= CHOOSE(C,'O','A1','A2','A3');
 	 SELF.FileType						:= 'U';
@@ -21,14 +28,15 @@ Transunion_PTrak.Layout_Transunion_Out.NormNameAddressRec t_norm_name (Transunio
 	 SELF.TelephoneNumber				:= TRIM(L.TELEPHONE,all);
 	 SELF.ZIP4U							:= L.ZIP4;
 	 SELF.AddressSeq					:= 1;
-	 SELF.NormAddress.Address1			:= StringLib.StringCleanSpaces(L.HOUSENUMBER + ' '+ L.STREETTYPE + ' ' + L.STREETDIRECTION + ' ' + L.STREETNAME);
-	 SELF.NormAddress.Address2			:= L.APARTMENTNUMBER;
+	 SELF.NormAddress.Address1			:= StringLib.StringCleanSpaces(L.HOUSENUMBER + ' ' + L.STREETDIRECTION + ' ' + L.STREETNAME  + ' '+ L.STREETTYPE );
+	 SELF.NormAddress.Address2			:= if(trim(L.APARTMENTNUMBER,all) <> '', '#' + L.APARTMENTNUMBER, L.APARTMENTNUMBER);
 	 SELF.NormAddress.City				:= L.CITY;
 	 SELF.NormAddress.State				:= L.STATE;
 	 SELF.NormAddress.ZipCode			:= L.ZIPCODE;
-     SELF.NormAddress.UpdatedDate		:= ''	;
+   SELF.NormAddress.UpdatedDate		:= ''	;
 	 SELF.PreviousAddress				:= DATASET([{'','','','','',''}], Transunion_PTrak.Layout_Transunion_Full_In.AddressRec);
 	 SELF.Orig_DECEASEDINDICATOR		:= L.DECEASEDINDICATOR;
+	 	SELF.DECEASEDDATE := StringLib.StringFindReplace(L.DECEASEDDATE, '-','');
 	 SELF           					:= L;
 END;
 

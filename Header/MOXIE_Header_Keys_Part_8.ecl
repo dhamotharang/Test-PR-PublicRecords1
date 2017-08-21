@@ -46,7 +46,8 @@ MyFields := record     // Fields needed to build all keys
   h.dt_last_seen;    
   h.dt_vendor_last_reported;    
   h.dt_vendor_first_reported; 
-  h.vendor_id;   
+  h.vendor_id;
+  h.valid_ssn;
   h.__filepos;
   end;
  
@@ -82,6 +83,7 @@ ZipCitiesRec2 := record
   t.dt_vendor_last_reported;    
   t.dt_vendor_first_reported;    
   t.vendor_id;
+  t.valid_ssn;
   VARSTRING citylist;
   t.__filepos;
 end;
@@ -125,6 +127,7 @@ ZipCityRec2 := RECORD
   t.dt_vendor_last_reported;    
   t.dt_vendor_first_reported;    
   t.vendor_id;
+  t.valid_ssn;
   t.__filepos;
 END;
  
@@ -133,17 +136,17 @@ ZipCityRec2 NormCityList2(ZipCitiesRec2 L, INTEGER C) := TRANSFORM
  SELF := L;
 END;
  
-ZipCityDist2	:= distribute(ZipCitiesSet2, hash(__filepos));
-ZipCityNorm2	:= normalize(ZipCityDist2,(INTEGER)Stringlib.StringExtract(LEFT.citylist, 1)+1, NormCityLIst2(LEFT, COUNTER));
-ZipCitySort2	:= sort(ZipCityNorm2, city_from_zip, st,__filepos, local);
-ZipCityDedup2	:= dedup(ZipCitySort2, city_from_zip, st,__filepos, local);
+//ZipCityDist2	:= distribute(ZipCitiesSet2, hash(__filepos));
+ZipCityNorm2	:= normalize(ZipCitiesSet2,(INTEGER)Stringlib.StringExtract(LEFT.citylist, 1)+1, NormCityLIst2(LEFT, COUNTER));
+ZipCitySort2	:= sort(ZipCityNorm2, __filepos,city_from_zip, st, local);
+ZipCityDedup2	:= dedup(ZipCitySort2, __filepos,city_from_zip, st, local);
  
-city_per := ZipCityDedup2  : persist('persist::header_key');
+city_per := ZipCityDedup2  : persist('~thor_data400::persist::really_long_key');
  
 export MOXIE_Header_Keys_Part_8
  :=
 BUILDINDEX(City_per,
 {st,city_from_zip,prim_name,prim_ranger,predir,postdir,suffix,lname,sec_range,fname,mname,name_suffix,
 zip,zip4,did,src,dt_first_seen,dt_last_seen,dt_vendor_last_reported,dt_vendor_first_reported,
-dt_nonglb_last_seen,phone,ssn,dob,unit_desig,county,tnt,vendor_id,(big_endian unsigned8 )__filepos},
+dt_nonglb_last_seen,phone,ssn,dob,unit_desig,county,tnt,vendor_id,valid_ssn,(big_endian unsigned8 )__filepos},
 header.base_key_name + 'really_long.key',moxie,overwrite);

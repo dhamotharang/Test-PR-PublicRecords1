@@ -22,6 +22,7 @@ r := record
 	h.sec_range;
 	h.zip;
 	{lab} - [did,rid];
+	h.RawAID
 end;
 
 
@@ -45,8 +46,9 @@ join_all_p := project(join_all_dis
 												,self:=left));
 
 r tr(r l,r r) := transform
-	self.dt_first_seen:=ut.Min2(l.dt_first_seen,r.dt_first_seen);
-	self.dt_last_seen:=ut.max2(l.dt_last_seen,r.dt_last_seen);
+	self.dt_first_seen  := ut.Min2(l.dt_first_seen,r.dt_first_seen);
+	self.dt_last_seen   :=     max(l.dt_last_seen,r.dt_last_seen);
+	self.RawAID         := ut.min2(l.RawAID,r.RawAID);
 	self:=l;
 end;
 
@@ -109,6 +111,7 @@ hierarchy_layout := record
 	unsigned2 vehicle_source_count;
 	unsigned2 dl_source_count;
 	unsigned2 voter_source_count;
+	unsigned8 RawAid;
 end;
 
 p:=project(join_all_rld
@@ -140,23 +143,27 @@ END;
 building  := distribute(if(isFCRA, doxie_build.File_FCRA_header_building, doxie_build.file_header_building),
 							hash32(prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,zip));
 
-b_thin    := dedup(sort(project(building,transform(layout_address_only,self:=LEFT)),
-                       prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,zip, -rawaid,local),
+b_thin    := dedup(sort(project(building(RawAID<>0),transform(layout_address_only,self:=LEFT)),
+                       prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,zip, rawaid,local),
                   except rawaid,local);
 
-p_with_RawAID := join(distribute(p,hash32(prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,zip))
-											,b_thin,
+p_with_RawAID := join(distribute(p,hash32(prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,zip)),
+											b_thin,
 
-                LEFT.prim_range = RIGHT.prim_range AND
-                LEFT.predir = RIGHT.predir AND
-                LEFT.prim_name = RIGHT.prim_name AND
-                LEFT.suffix = RIGHT.suffix AND
-                LEFT.postdir = RIGHT.postdir AND
-                LEFT.unit_desig = RIGHT.unit_desig AND
-                LEFT.sec_range = RIGHT.sec_range AND
-                LEFT.zip = RIGHT.zip
-                                          ,TRANSFORM({p, unsigned8   RawAID},SELF.RawAID := RIGHT.RawAID, SELF := LEFT), LEFT OUTER, KEEP(1)
-																					,local);
+                      LEFT.prim_range = RIGHT.prim_range AND
+                       LEFT.predir = RIGHT.predir AND
+                       LEFT.prim_name = RIGHT.prim_name AND
+                       LEFT.suffix = RIGHT.suffix AND
+                       LEFT.postdir = RIGHT.postdir AND
+                       LEFT.unit_desig = RIGHT.unit_desig AND
+                       LEFT.sec_range = RIGHT.sec_range AND
+                       LEFT.zip = RIGHT.zip,
+                      TRANSFORM({p},
+                                SELF.RawAID := if(RIGHT.RawAID <>0,RIGHT.RawAID,LEFT.RawAID),
+                                SELF := LEFT),
+                      LEFT OUTER,
+                      KEEP(1),
+                      local);
 
 RETURN p_with_RawAID;
 END;

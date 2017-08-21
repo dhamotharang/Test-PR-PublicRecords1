@@ -1,20 +1,20 @@
-import gong, doxie;
+import gong_Neustar, doxie, ut;
 
-input_recs := gong.File_Gong_Full(TRIM(st)<>'' AND TRIM(p_city_name)<>'' AND TRIM(prim_name)<>'');
+input_recs := gong_Neustar.File_Gong_Full_Prepped_For_Keys(TRIM(st)<>'' AND TRIM(p_city_name)<>'' AND TRIM(prim_name)<>'');
 
 Layout_extra_city := RECORD
 	STRING25	city;
-	gong.Layout_bscurrent_raw;
+	gong_Neustar.Layout_bscurrent_raw;
 END;
 
-Layout_extra_city addOrig(gong.Layout_bscurrent_raw l) := TRANSFORM
+Layout_extra_city addOrig(recordof(input_recs) l) := TRANSFORM
 	SELF.city := l.p_city_name;
 	SELF := l;
 END;
 
 orig_cities := PROJECT(input_recs, addOrig(LEFT));
 
-Layout_extra_city addExtra(gong.Layout_bscurrent_raw l, integer c) := TRANSFORM
+Layout_extra_city addExtra(recordof(input_recs) l, integer c) := TRANSFORM
 	SELF.city := StringLib.StringExtract(ZipLib.ZipToCities(l.z5),c+1);
 	SELF := l;
 END;
@@ -32,4 +32,4 @@ export Key_st_city_prim_name_prim_range :=
 							string28 prim_name := prim_name,
 							string10 prim_range := prim_range},
              {all_cities},
-		   '~thor_data400::key::gong_eda_st_city_prim_name_prim_range_' + doxie.Version_SuperKey);
+		  '~thor_data400::key::gong_eda_st_city_prim_name_prim_range_' + doxie.Version_SuperKey);

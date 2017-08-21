@@ -12,7 +12,7 @@ ssnp := record
 ssnp into(h le) := transform 
   self.fname := datalib.preferredfirstNew(le.fname, Header_Slimsort.Constants.UsePFNew);
   self.mname := datalib.preferredfirstNew(le.mname, Header_Slimsort.Constants.UsePFNew);
-  self.name_suffix := if(ut.is_unk(le.name_suffix), '', ut.Translate_Suffix(le.name_suffix));
+  self.name_suffix := if(ut.is_unk(le.name_suffix), '', ut.fGetSuffix(le.name_suffix));
   self := le;
   end;
 
@@ -165,7 +165,8 @@ g0 j1(g1 L, g2 R) := transform
 	self := l;
 end;
 
-m1 := join(g1,g2,left.mname[1] = right.mname[1] and 
+m1 := join(g1,g2, left.did <> right.did and
+              left.mname[1] = right.mname[1] and 
 			  left.fname = right.fname and
 			  left.lname = right.lname and
 			  left.name_suffix = right.name_suffix and 
@@ -175,7 +176,9 @@ m1 := join(g1,g2,left.mname[1] = right.mname[1] and
 m1d := dedup(sort(m1,lname,fname,mname,name_suffix,ssn,did,-ssn_fullname_dids,local),
 			lname,fname,mname,name_suffix,ssn,did,local);
 
-m2 := join(m1d,g3,left.fname = right.fname and
+m2 := join(m1d,g3,
+              left.did <> right.did and
+              left.fname = right.fname and
 			  left.lname = right.lname and
 			  left.name_suffix = right.name_suffix and
 			  left.ssn = right.ssn,
@@ -197,24 +200,29 @@ g1rec := record
 	string1 mi := g1_ddp.mname[1];
 	g1_ddp.name_suffix;
 	g1_ddp.ssn;
+	g1_ddp.did;
 	unsigned2 cnt := count(GROUP);
 end;
 
-g1tab := table(g1_ddp,g1rec,fname,lname,mname[1],name_suffix,ssn,local);
+g1tab := table(g1_ddp,g1rec,fname,lname,mname[1],name_suffix,ssn,did,local);
 
 g2 j2(g2 L, g1tab R) := transform
 	self.ssn_fullname_dids := L.ssn_fullname_dids + R.cnt;
 	self := L;
 end;
 
-m3 := join(g2,g1tab,left.mname[1] = right.mi and 
+m3 := join(g2,g1tab,
+              left.did <> right.did and
+              left.mname[1] = right.mi and 
 			  left.fname = right.fname and
 			  left.lname = right.lname and
 			  left.name_suffix = right.name_suffix and
 			  left.ssn = right.ssn,
 			  j2(LEFT,RIGHT),left outer,local);
 			  
-m4 := join(m3,g3,left.fname = right.fname and
+m4 := join(m3,g3,
+              left.did <> right.did and
+              left.fname = right.fname and
 			  left.lname = right.lname and
 			  left.name_suffix = right.name_suffix and
 			  left.ssn = right.ssn,
@@ -233,17 +241,20 @@ g1rec_2 := record
 	g1_ddp_2.fname;
 	g1_ddp_2.name_suffix;
 	g1_ddp_2.ssn;
+	g1_ddp_2.did;
 	unsigned2 cnt := count(GROUP);
 end;
 
-g1tab_2 := table(g1_ddp_2,g1rec_2,fname,lname,name_suffix,ssn,local);
+g1tab_2 := table(g1_ddp_2,g1rec_2,fname,lname,name_suffix,ssn,did,local);
 
 g2 j4(g3 L, g1tab_2 R) := transform
 	self.ssn_fullname_dids := L.ssn_fullname_dids + R.cnt;
 	self := L;
 end;
 
-m5 := join(g3,g1tab_2,left.fname = right.fname and
+m5 := join(g3,g1tab_2,
+               left.did <> right.did and
+              left.fname = right.fname and
 			  left.lname = right.lname and
 			  left.name_suffix = right.name_suffix and
 			  left.ssn = right.ssn,
@@ -257,23 +268,29 @@ g2rec := record
 	g2_ddp.fname;
 	g2_ddp.name_suffix;
 	g2_ddp.ssn;
+	g2_ddp.did;
 	unsigned2 cnt := count(GROUP);
 end;
 
-g2tab := table(g2_ddp,g2rec,fname,lname,name_suffix,ssn,local);
+g2tab := table(g2_ddp,g2rec,fname,lname,name_suffix,ssn,did,local);
 
 g2 j6(g3 L, g2tab R) := transform
 	self.ssn_fullname_dids := L.ssn_fullname_dids + R.cnt;
 	self := L;
 end;
 
-m6 := join(m5,g2tab,left.fname = right.fname and
+m6 := join(m5,g2tab,
+              left.did <> right.did and
+              left.fname = right.fname and
 			  left.lname = right.lname and
 			  left.name_suffix = right.name_suffix and
 			  left.ssn = right.ssn,
 			  j6(LEFT,RIGHT),left outer,local);
-			  
-final0 := m2d + m4d + m6;
+
+m6d := dedup(sort(m6,lname,fname,name_suffix,ssn,did,-ssn_fullname_dids,local),
+		lname,fname,name_suffix,ssn,did,local); // blank middles are done here
+
+final0 := m2d + m4d + m6d;
 
 final0 strip_probationary(final0 L, header_slimsort.Table_DID_OnProbation R) := transform
 	self := L;

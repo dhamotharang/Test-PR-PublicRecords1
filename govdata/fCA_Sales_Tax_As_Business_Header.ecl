@@ -111,11 +111,9 @@ function
 
 	// Rollup
 	Business_Header.Layout_Business_Header RollupCA_ST(Business_Header.Layout_Business_Header L, Business_Header.Layout_Business_Header R) := TRANSFORM
-	SELF.dt_first_seen := 
-				ut.EarliestDate(ut.EarliestDate(L.dt_first_seen,R.dt_first_seen),
-				ut.EarliestDate(L.dt_last_seen,R.dt_last_seen));
-	SELF.dt_last_seen := ut.LatestDate(L.dt_last_seen,R.dt_last_seen);
-	SELF.dt_vendor_last_reported := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+	SELF.dt_first_seen := ut.EarliestDate(ut.EarliestDate(L.dt_first_seen,R.dt_first_seen),	ut.EarliestDate(L.dt_last_seen,R.dt_last_seen));
+	SELF.dt_last_seen := max(L.dt_last_seen,R.dt_last_seen);
+	SELF.dt_vendor_last_reported := max(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 	SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 	SELF.company_name := IF(L.company_name = '', R.company_name, L.company_name);
 	SELF.group1_id := IF(L.group1_id = 0, R.group1_id, L.group1_id);

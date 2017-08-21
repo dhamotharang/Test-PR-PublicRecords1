@@ -1,0 +1,22 @@
+export Layout_Tax_Liens_4020_In := record
+string8  process_date;
+string10 FILE_NUMBER;
+string4  SEGMENT_CODE;
+string5  SEQUENCE_NUMBER;
+string6  FILLER1;
+string6 DATE_FILED_YYMMDD;
+string2 TYPE_CODE;
+string10 TYPE_DESC;
+string2 ACTION_CODE;
+string10 ACTION_DESC;
+string16 DOCUMENT_NUMBER;
+string20 FILING_LOCATION;
+string9 LIABILITY_AMT;
+string1 TAX_LIEN_CODE;
+string50 TAX_LIEN_DESC;
+string1 DISPUTE_IND;
+string2 DISPUTE_CODE;
+string346 FILLER2;
+string583 FILLER3;
+string1 lf;
+end;

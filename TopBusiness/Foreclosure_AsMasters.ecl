@@ -1,4 +1,4 @@
-import Property, iesp, MDR;
+import Property, iesp, MDR, census_data;
 export Foreclosure_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 
 	shared base := Property.File_Foreclosure_Base_v2;  // U foreclosure, N notice of Default
@@ -18,7 +18,7 @@ export Foreclosure_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.company_name :=  left.name1_company, // also left.title_company_name as well.
 				 // situs1 is property address, situs2 is mailing addr
 				self.company_name_type := Constants.Company_Name_Types.UNKNOWN;
-				self.address_type :=  Constants.Address_Types.UNKNOWN;
+				self.address_type :=  Constants.Address_Types.PROPERTY;
 				self.phone_type := Constants.Phone_Types.UNKNOWN,
 				self.aid        :=    left.situs1_rawaid,
 				self.prim_range :=    left.situs1_prim_range,
@@ -33,6 +33,7 @@ export Foreclosure_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 														 left.situs1_v_city_name),
 				self.state := left.situs1_st,
 				self.zip   := left.situs1_zip,
+				self.zip4  := left.situs1_zip4,
 				self.county_fips := left.situs1_fipscounty,
 				self.msa   := left.situs1_msa,
 				self.phone := '',
@@ -77,6 +78,11 @@ export Foreclosure_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.vendor       := '';
 				self.Documenttype := left.deed_desc,
 				self.recordingdate := left.recording_date,
+				self.attorneyname := left.attorney_name,
+				self.attorneyphonenumber := left.attorney_phone_nbr,
+				self.lenderfirstname := left.lender_beneficiary_first_name,
+				self.lenderlastname := left.lender_beneficiary_last_name,
+				self.lendercompanyname := left.lender_beneficiary_company_name,
 				self := left));
 				
 		return dedup(extract,record,all);
@@ -84,7 +90,9 @@ export Foreclosure_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 	end;
 	
 	export dataset(Layout_Property.Party.Unlinked) As_Property_Master_Party := function	  
-		extract := project(base,
+		extract := join(base,census_data.File_Fips2County,
+			left.situs1_fipscounty = right.county_fips and
+			left.situs1_st = right.state_code,
 			transform(Layout_Property.Party.Unlinked,
 				self.source :=  MDR.sourceTools.src_Foreclosures, // Foreclosure
 				self.source_docid := left.foreclosure_id;
@@ -110,10 +118,14 @@ export Foreclosure_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.city_name := left.situs1_v_city_name,
 				self.state := left.situs1_st,
 				self.zip := left.situs1_zip,
+				self.zip4 := left.situs1_zip4,
+				self.county_name := right.county_name,
 				self.sales_date := 0,
-				self.salesPrice := 0));
+				self.salesPrice := 0),
+			left outer,
+			lookup);
 
-			return extract;
+		return extract;
 			
 	end;
 	

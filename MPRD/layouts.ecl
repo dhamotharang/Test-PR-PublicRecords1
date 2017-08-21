@@ -1050,7 +1050,7 @@ export layouts:=module
 		unsigned8	profstat_st; 
 		string1		provstat; 
 		unsigned8	provstat_st; 
-		string10	date_of_death; //string8 one day
+		string10	date_of_death; //string8
 		unsigned8	date_of_death_st; 
 		string1		death_flag; 
 		unsigned8	death_flag_st; 

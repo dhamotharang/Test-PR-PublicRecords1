@@ -36,6 +36,11 @@ export mod_ownership := module
 //	0. Common constants and layouts
 // ---------------------------------
 
+// For the production build this should be an empty set, which means a complete
+// build of all states.  For debugging/testing, just add a list of the state codes
+// you want to build, to greatly reduce the size of the data generated.
+shared st_restrict := [];
+
 // We actually have as many as 56 owners/buyers in some records, but they are
 // are exceptional enough to not justify the huge increase in memory & space
 // necessary to store them all.  A max of 10 covers 99.9997% of the ln_fares_id
@@ -92,7 +97,7 @@ end;
 // -----------------------------------------------------------------------------
 
 // use owner records with DIDs or BDIDs, property address only (no mailing addrs)
-f_search := LN_PropertyV2.File_Search_DID(did<>0 or bdid<>0, source_code[1..2] in ['OP','BP']);
+f_search := LN_PropertyV2.File_Search_DID(did<>0 or bdid<>0, source_code[1..2] in ['OP','BP'], (st_restrict=[] or st in st_restrict));
 
 l_owner_thin toOwnerThin(f_search L) := transform
 	self.did				:= if(L.cname<>'', L.bdid, L.did);
@@ -136,7 +141,9 @@ l_work toWork(f_search L) := transform
 end;
 
 ds_search_dist		:= distribute(project(f_search, toWork(left)), hash32(hist[1].ln_fares_id));
-shared ds_search	:= dedup(ds_search_dist, record, all, hash, local);
+ds_search_srt			:= sort(ds_search_dist, hist[1].ln_fares_id, record, local);
+shared ds_search	:= dedup(ds_search_srt, hist[1].ln_fares_id, record, local);
+// output(choosen(ds_search,150),named('ds_search'));
 
 
 // --------------------------------------------------------------------------------
@@ -164,7 +171,7 @@ export dataset(l_work) fn_roll_owners(dataset(l_work) ds_in) := function
 end;
 
 // only records with a populated fips_code are useful
-f_assess := LN_PropertyV2.File_Assessment(fips_code<>'');
+f_assess := LN_PropertyV2.File_Assessment(fips_code<>'', (st_restrict=[] or state_code in st_restrict));
 
 l_assess := record
 	f_assess.ln_fares_id;
@@ -186,7 +193,7 @@ end;
 t_assess := distribute( project(f_assess,l_assess), hash32(ln_fares_id));
 
 l_work addAssess(l_work L, t_assess R) := transform
-	// date fields in search file are probably as good or better than the assessment file, but we'll make sure
+	// date fields in assessment file are probably better than the search file
 	dt := map(
 		R.tax_year<>''							=> R.tax_year+'0000',
 		R.assessed_value_year<>''		=> R.assessed_value_year+'0000',
@@ -195,9 +202,10 @@ l_work addAssess(l_work L, t_assess R) := transform
 		R.tape_cut_date<>''					=> R.tape_cut_date,
 		R.recording_date<>''				=> R.recording_date,
 		R.prior_recording_date<>''	=> R.prior_recording_date,
-		R.sale_date
+		R.sale_date<>''							=> R.sale_date,
+		''
 	);
-	self.hist						:= if(L.hist[1].dt_seen=0,
+	self.hist						:= if(dt<>'',
 														project(L.hist, transform({l_hist_thin}, self.dt_seen:=(unsigned4)dt, self:=left)),
 														L.hist);
 	
@@ -218,12 +226,13 @@ ds_assess_flat := join(
 );
 
 shared ds_assess := fn_roll_owners(ds_assess_flat);
+// output(choosen(ds_assess,150),named('ds_assess'));
 
 
 // --------------------------------------------------------------------------
 //	3. Extract data from deed file, join with search data, and rollup owners
 // --------------------------------------------------------------------------
-f_deed := LN_PropertyV2.File_Deed(fips_code<>'');
+f_deed := LN_PropertyV2.File_Deed(fips_code<>'', (st_restrict=[] or state in st_restrict));
 
 l_deed := record
 	f_deed.ln_fares_id;
@@ -259,14 +268,15 @@ l_work addDeed(l_work L, t_deed R) := transform
 end;
 
 // shared ds_deed := join(
-ds_deed_flat := join(
-	ds_search(hist[1].ln_fares_id[2]='D'), t_deed,
+ds_deed_flat := join(NOFOLD(
+	ds_search)(hist[1].ln_fares_id[2]='D'), t_deed,
 	left.hist[1].ln_fares_id = right.ln_fares_id,
 	addDeed(left,right),
 	local
 );
 
 shared ds_deed := fn_roll_owners(ds_deed_flat);
+// output(choosen(ds_deed,150),named('ds_deed'));
 
 
 // ----------------------------------------------------------
@@ -292,6 +302,9 @@ ds_deed_ace := join(	dist_deed, dist_aid,
 											transform(l_work, self.aceaid:=right.aceaid, self:=left),
 											left outer, keep(1), local
 										);
+
+// output(choosen(ds_assess_ace,150),named('ds_assess_ace'));
+// output(choosen(ds_deed_ace,150),named('ds_deed_ace'));
 
 
 // ---------------------------------------------------------------
@@ -434,7 +447,7 @@ shared l_rawaid := record
 	l_work.hist;
 end;
 
-shared ds_thinAID := project(ds_improved, l_rawaid);
+shared ds_thinAID := project(ds_improved(rawaid<>0), l_rawaid);
 
 shared l_rawaid rollHist(l_rawaid L, l_rawaid R) := transform
 	self.hist := if(count(L.hist)<max_hist, L.hist&R.hist, L.hist);
@@ -510,7 +523,7 @@ l_id rollDid(l_id L, l_id R) := transform
 	self								:=	L;
 end;
 
-ds_dist := distribute(ds_norm2, hash32(did));
+ds_dist := distribute(ds_norm2(did<>0), hash32(did));
 ds_sort := sort(ds_dist, did, isBDID, fips_code, unformatted_apn, -dt_first_seen, record, local);
 
 shared file_id	:= rollup(ds_sort, rollDid(left,right), did, isBDID, fips_code, unformatted_apn, local);
@@ -527,9 +540,7 @@ export file_bdid	:= project(file_id(isBDID), transform(l_bdid, self.bdid:=left.d
 // -------------------------------------------------------------------------
 // output(choosen(ds_rawA,150),named('ds_rawA'));
 // output(choosen(ds_rawD,150),named('ds_rawD'));
-// output(choosen(ds_assess,150),named('ds_assess'));
 // output(choosen(ds_assess_ace,150),named('ds_assess_ace'));
-// output(choosen(ds_deed,150),named('ds_deed'));
 // output(choosen(ds_deed_ace,150),named('ds_deed_ace'));
 // output(choosen(ds_curr,150),named('ds_curr'));
 // output(choosen(ds_curr(current),150),named('ds_curr_X'));

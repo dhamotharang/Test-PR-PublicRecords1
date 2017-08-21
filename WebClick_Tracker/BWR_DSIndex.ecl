@@ -11,11 +11,13 @@ export BWR_DSIndex(string filedate) := function
 
 	//sprayfile := webclick_tracker.Proc_spray(filedate,sourcefile);
 	// Mac_SF_BuildProcess_V2 automatically creates the necessary superfiles
-	Roxiekeybuild.Mac_SF_BuildProcess_V2(WebClick_Tracker.OrderedDS,'~thor_data400::base::webclick','access_log',filedate,Act1);
+	Roxiekeybuild.Mac_SF_BuildProcess_V2(WebClick_Tracker.OrderedDS,'~thor_data400::base::webclick','access_log',filedate,Act1,,,true);
 	buildroxiekeys := webclick_tracker.Proc_Build_Keys(filedate);
+	dops_update := Roxiekeybuild.updateversion('WebClickKeys',filedate,'randy.reyes@lexisnexisrisk.com,abednego.escobal@lexisnexisrisk.com,manuel.tarectecan@lexisnexisrisk.com',,'N');
 	
 	retval := sequential(Act1,
-					buildroxiekeys
+					buildroxiekeys,
+					dops_update
 				);
 	
 	return retval;

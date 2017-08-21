@@ -1,0 +1,59 @@
+EXPORT Layout_Bridger_Logs := MODULE
+
+	EXPORT Input := RECORD
+		STRING DateTime;
+		STRING Customer_ID;
+		STRING Search_Function_Name;
+		STRING Entity_Type;
+		STRING ID;
+		STRING field1 := '';
+		STRING field2 := '';
+		STRING field3 := '';
+		STRING field4 := '';
+		STRING field5 := '';
+		STRING field6 := '';
+		STRING field7 := '';
+		STRING field8 := '';
+		STRING field9 := '';
+		STRING field10 := '';
+		STRING field11 := '';
+		STRING field12 := '';
+		STRING field13 := '';
+		STRING field14 := '';
+		STRING field15 := '';
+		STRING field16 := '';
+	END;
+	
+	EXPORT Input_Parsed := RECORD
+			STRING DATETIME;
+			STRING ORIG_PRODUCT_ID;
+			STRING ORIG_TRANSACTION_TYPE;
+			STRING ORIG_GLOBAL_COMPANY_ID;
+			STRING SOURCE_FILE;
+			STRING ORIG_COMPANY_ID;
+			STRING LINKID;
+			STRING ORIG_FNAME;
+			STRING ORIG_LNAME;
+			STRING ORIG_MNAME;
+			STRING ORIG_COMPANY_NAME1;
+			STRING ORIG_ADDR1;
+			STRING ORIG_LASTLINE1;
+			STRING ORIG_CITY1;
+			STRING ORIG_STATE1;
+			STRING ORIG_ZIP1;
+			STRING COMPANY_PHONE;
+			STRING EIN;
+			STRING GLB_purpose;
+			STRING DPPA_purpose;
+			STRING FCRA_purpose;
+			STRING SSN;
+			STRING PERSONAL_PHONE;
+			STRING DOB;
+			STRING DL;
+			STRING DL_STATE;
+			STRING FUNCTION_DESCRIPTION;
+			STRING ORIG_FUNCTION_NAME;
+			STRING ORIG_REFERENCE_CODE;
+	END;
+
+END;

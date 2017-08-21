@@ -1,4 +1,7 @@
-h := Header.File_Headers;
+export Occupancy_Count(
+	dataset(header.Layout_Header) h
+	) :=
+FUNCTION
 
 hslim := record
   h.prim_range;
@@ -29,4 +32,6 @@ acnt := record
 
 a_numbers := table(ds,acnt,ds.prim_range,ds.prim_name,ds.zip,ds.sec_range,local);
 
-export Occupancy_Count := a_numbers : persist('Occupancy_Count');
+return a_numbers ;
+
+END;

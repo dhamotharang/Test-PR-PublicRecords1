@@ -148,7 +148,7 @@ string1 fMapOffenseLevelToScore(string2 pVendor, string2 pOffenseLevel, string8 
 		pVendor = 'ME' and pOffenseLevel = '  ' => 'U',
 		pVendor = 'MI' and pOffenseLevel = '  ' => 'F',
 		pVendor = 'MN' and pOffenseLevel = '  ' => 'F',
-		pVendor = 'MO' and pOffenseLevel = '  ' => 'F',
+		pVendor = 'MO' 													=> 'U',
 		pVendor = 'MS' and pOffenseLevel = '  ' => 'F',
 		pVendor = 'MT' and pOffenseLevel = 'F ' => 'F',
 		pVendor = 'MT' and pOffenseLevel = 'M ' => 'M',
@@ -185,7 +185,7 @@ string1 fMapOffenseLevelToScore(string2 pVendor, string2 pOffenseLevel, string8 
 		pVendor = 'NM' and pOffenseLevel = 'F ' => 'F',
 		pVendor = 'NM' and pOffenseLevel = '  ' => 'U',
 		pVendor = 'NM' and pOffenseLevel = 'M ' => 'M',
-		pVendor = 'NV'                          => 'F',
+		pVendor = 'NV'                          => 'U',
 		pVendor = 'NY'                          => 'F',
 		pVendor = 'OH' and pdate[1..4] >='1996' => 'F',
 		pVendor = 'OK' 													=> 'F',
@@ -221,7 +221,9 @@ string1 fMapOffenseLevelToScore(string2 pVendor, string2 pOffenseLevel, string8 
 	   )
  ;
 
-Layout_Moxie_Offenses_temp tDOCOffensesandDOCOffendertoOffenses(Crim_Common.Layout_Moxie_DOC_Offenses.previous pDOCOffenses,Crim_Common.Layout_Moxie_Crim_Offender2.previous pDOCOffender)
+//Layout_Moxie_Offenses_temp tDOCOffensesandDOCOffendertoOffenses(Crim_Common.Layout_Moxie_DOC_Offenses.previous pDOCOffenses,Crim_Common.Layout_Moxie_Crim_Offender2.previous pDOCOffender)
+Layout_Moxie_Offenses_temp tDOCOffensesandDOCOffendertoOffenses(File_DOC_Offenses pDOCOffenses,Crim_Common.Layout_Moxie_Crim_Offender2.previous pDOCOffender)
+
  :=
   transform
 	self.date_first_reported		:= pDOCOffenses.process_date;

@@ -1,3 +1,3 @@
 import doxie;
 
-EXPORT File_YellowPages_Base := DATASET('BASE::YellowPages',Layout_YellowPages_Base,THOR);
+EXPORT File_YellowPages_Base := project(Files().Base.qa, Layout_YellowPages_Base);

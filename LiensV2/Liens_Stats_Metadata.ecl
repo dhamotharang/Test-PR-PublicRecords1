@@ -67,7 +67,7 @@ join_out := join(first_ds,second_ds,
 
 export Liens_Stats_Metadata := if (count(join_out) > 0,
 														sequential(output(choosen(join_out,300),named('Liens_New_Updated_Records')),
-														fileservices.sendemail('avenkatachalam@seisint.com',
+														fileservices.sendemail('skasavajjala@seisint.com',
 																		'New/Updated Liens States ' + ut.GetDate,
 																		'New/Updated Liens States:  http://prod_esp:8010/WsWorkunits/WUInfo?Wuid=' + workunit + '\r\n')
 														),

@@ -1,9 +1,11 @@
-import doxie, NID;
+import doxie, NID, _Control;
 
-file_prefix := '~thor_data400';
+file_prefix := if(_Control.ThisEnvironment.Name='Dataland','~thor40_241','~thor_data400');
+//'~thor_data400';
 
 
-baserecset := Relocations.file_wdtgGong;
+baserecset := Relocations.file_FCRA_wdtgGong;	// cjs #86951
+
 indexfile := file_prefix + '::key::gong_history::fcra::qa::wdtg';
 
 // this index finds surnames showing up in the gong at a particular point in time,

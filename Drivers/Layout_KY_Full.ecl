@@ -5,7 +5,7 @@ export Layout_KY_Full
     string09    orig_DL_NUMBER;
     string25    orig_LAST_NAME;
     string15    orig_FIRST_NAME;
-    string01    orig_MIDDLE_INITIAL;
+    string10    orig_MIDDLE_NAME;
     string08    orig_DOB;
     string01    orig_SEX;
     string03    orig_HEIGHT;

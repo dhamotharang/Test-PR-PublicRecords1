@@ -1,9 +1,15 @@
+/*2014-04-01T15:20:48Z (mgould_prod)
+C:\Users\goulmi01\AppData\Roaming\HPCC Systems\eclide\mgould_prod\Boca_Prod\Corp2_Mapping\Filenames\2014-04-01T15_20_48Z.ecl
+*/
+/*2013-12-06T19:54:44Z (mgould_prod)
+C:\Users\goulmi01\AppData\Roaming\HPCC Systems\eclide\mgould_prod\Boca_Prod\Corp2_Mapping\Filenames\2013-12-06T19_54_44Z.ecl
+*/
 import VersionControl;
 
 export Filenames(
 
 	 string 	pversion							= ''
-	,string 	pGroupname						= VersionControl.Groupname('92')
+	,string 	pGroupname						= VersionControl.Groupname('31')
 	,boolean	pUseOtherEnvironment	= false
 
 ) :=
@@ -13,37 +19,12 @@ module
 	
 	export ak_raw :=
 	module
-
-		export address                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::address::ak','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export corporation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporation::ak','edata10',,,,,pGroupname,,,'VARIABLE',,1000,,'\\n',);
-		export name                      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::name::ak','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export StatusCode_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StatusCode_Table::ak','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export CorpType_Table            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorpType_Table::ak','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export DocumentTypeID_Table      := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::DocumentTypeID_Table::ak','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export filing                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filing::ak','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export merger                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::merger::ak','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export NameType_Table            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::NameType_Table::ak','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export officer                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::officer::ak','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export OffPartyType_Table        := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::OffPartyType_Table::ak','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export PartyType_Table           := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::PartyType_Table::ak','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export stock                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::stock::ak','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export StockClass_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StockClass_Table::ak','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export Corporations          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corporations::ak','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,',','\\n',);
+		export Officials                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Officials::ak','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,',','\\n',);
 
 		export dAll_filenames :=
-			  address.dAll_filenames
-			+ corporation.dAll_filenames
-			+ name.dAll_filenames
-			+ StatusCode_Table.dAll_filenames
-			+ CorpType_Table.dAll_filenames
-			+ DocumentTypeID_Table.dAll_filenames
-			+ filing.dAll_filenames
-			+ merger.dAll_filenames
-			+ NameType_Table.dAll_filenames
-			+ officer.dAll_filenames
-			+ OffPartyType_Table.dAll_filenames
-			+ PartyType_Table.dAll_filenames
-			+ stock.dAll_filenames
-			+ StockClass_Table.dAll_filenames
+			    Corporations.dAll_filenames
+			+ Officials.dAll_filenames
 			;
 
 	end;
@@ -51,14 +32,14 @@ module
 	export al_raw :=
 	module
 
-		export CRANLPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CRANLPF::al','edata10',,,956,,pGroupname,,,'FIXED',,,,,);
-		export CRBUSPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CRBUSPF::al','edata10',,,222,,pGroupname,,,'FIXED',,,,,);
-		export CRHSTPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CRHSTPF::al','edata10',,,192,,pGroupname,,,'FIXED',,,,,);
-		export CRINCPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CRINCPF::al','edata10',,,172,,pGroupname,,,'FIXED',,,,,);
-		export CRMSTPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CRMSTPF::al','edata10',,,663,,pGroupname,,,'FIXED',,,,,);
-		export CRNAMPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CRNAMPF::al','edata10',,,238,,pGroupname,,,'FIXED',,,,,);
-		export CROFFPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CROFFPF::al','edata10',,,134,,pGroupname,,,'FIXED',,,,,);
-		export CRSERPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CRSERPF::al','edata10',,,170,,pGroupname,,,'FIXED',,,,,);
+		export CRANLPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CRANLPF::al','bctlpedata10',,,956,,pGroupname,,,'FIXED',,,,,);
+		export CRBUSPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CRBUSPF::al','bctlpedata10',,,222,,pGroupname,,,'FIXED',,,,,);
+		export CRHSTPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CRHSTPF::al','bctlpedata10',,,192,,pGroupname,,,'FIXED',,,,,);
+		export CRINCPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CRINCPF::al','bctlpedata10',,,172,,pGroupname,,,'FIXED',,,,,);
+		export CRMSTPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CRMSTPF::al','bctlpedata10',,,663,,pGroupname,,,'FIXED',,,,,);
+		export CRNAMPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CRNAMPF::al','bctlpedata10',,,238,,pGroupname,,,'FIXED',,,,,);
+		export CROFFPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CROFFPF::al','bctlpedata10',,,134,,pGroupname,,,'FIXED',,,,,);
+		export CRSERPF                   := VersionControl.mInputFileNameVersions( lthor + 'in::corp2::@version@::CRSERPF::al','bctlpedata10',,,170,,pGroupname,,,'FIXED',,,,,);
                                                                                                                                
 		export dAll_filenames :=
 			  CRANLPF.dAll_filenames
@@ -76,9 +57,9 @@ module
 	export ar_raw :=
 	module
 
-		export CorpData                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpData::ar','edata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
-		export CorpNames                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpNames::ar','edata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
-		export CorpOfficer               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpOfficer::ar','edata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
+		export CorpData                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpData::ar','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
+		export CorpNames                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpNames::ar','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
+		export CorpOfficer               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpOfficer::ar','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
 
 		export dAll_filenames :=
 			  CorpData.dAll_filenames
@@ -91,11 +72,11 @@ module
 	export az_raw :=
 	module
 
-		export CHGEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CHGEXT::az','edata10',,,143,,pGroupname,,,'FIXED',,,,,);
-		export COREXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::COREXT::az','edata10',,,903,,pGroupname,,,'FIXED',,,,,);
-		export FLMEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::FLMEXT::az','edata10',,,143,,pGroupname,,,'FIXED',,,,,);
-		export OFFEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::OFFEXT::az','edata10',,,163,,pGroupname,,,'FIXED',,,,,);
-		export StatusCodeType_Table      := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StatusCodeType_Table::az','edata10',,,,, pGroupname,,,'VARIABLE',,100,'\\t','\\n',);
+		export CHGEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CHGEXT::az','bctlpedata10',,,143,,pGroupname,,,'FIXED',,,,,);
+		export COREXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::COREXT::az','bctlpedata10',,,903,,pGroupname,,,'FIXED',,,,,);
+		export FLMEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::FLMEXT::az','bctlpedata10',,,143,,pGroupname,,,'FIXED',,,,,);
+		export OFFEXT                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::OFFEXT::az','bctlpedata10',,,163,,pGroupname,,,'FIXED',,,,,);
+		export StatusCodeType_Table      := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StatusCodeType_Table::az','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,100,'\\t','\\n',);
 
 		export dAll_filenames :=
 			  CHGEXT.dAll_filenames
@@ -110,9 +91,9 @@ module
 	export ca_raw :=
 	module
 
-		export lp                        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::lp::ca'		,'edata10',,,1454,, pGroupname,,,'FIXED',,,,,);
-		export hist                      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::hist::ca'	,'edata10',,,423	,, pGroupname,,,'FIXED',,,,,);
-		export mast                      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::mast::ca'	,'edata10',,,1281,, pGroupname,,,'FIXED',,,,,);
+		export lp                        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::lp::ca'		,'bctlpedata10',,,1455	,,pGroupname,,,'FIXED',, ,,,);
+		export hist                      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::hist::ca'	,'bctlpedata10',,,424	,,pGroupname,,,'FIXED',, ,,,);
+		export mast                      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::mast::ca'	,'bctlpedata10',,,1282	,,pGroupname,,,'FIXED',, ,,,);
                                                                                                                             
 		export dAll_filenames :=
 			  lp.dAll_filenames
@@ -125,19 +106,21 @@ module
 	export co_raw :=
 	module
 
-		export corpHist                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpHist::co','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
-		export corpMstr                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpMstr::co','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
-		export corpTrdnm                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpTrdnm::co','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
-		export tmChange                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmChange::co','edata10',,,,,pGroupname,,,'VARIABLE',,3000,'|','\\r',);
-		export tmCorrection              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmCorrection::co','edata10',,,,,pGroupname,,,'VARIABLE',,3000,'|','\\r',);
-		export tmExpired                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmExpired::co','edata10',,,,,pGroupname,,,'VARIABLE',,3000,'|','\\r',);
-		export tmRegistration            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmRegistration::co','edata10',,,,,pGroupname,,,'VARIABLE',,3000,'|','\\r',);
-		export tmRenewal                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmRenewal::co','edata10',,,,,pGroupname,,,'VARIABLE',,3000,'|','\\r',);
-		export tmTransfer                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmTransfer::co','edata10',,,,,pGroupname,,,'VARIABLE',,3000,'|','\\r',);
-		export tmWithdraw                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmWithdraw::co','edata10',,,,,pGroupname,,,'VARIABLE',,3000,'|','\\r',);
+		export corpHist                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpHist::co','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',',');
+		export corpHist2                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpHist2::co','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',',');
+		export corpMstr                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpMstr::co','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',',');
+		export corpTrdnm                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpTrdnm::co','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',',');
+		export tmChange                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmChange::co','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,3000,'|','\\r',',');
+		export tmCorrection              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmCorrection::co','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,3000,'|','\\r',',');
+		export tmExpired                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmExpired::co','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,3000,'|','\\r',',');
+		export tmRegistration            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmRegistration::co','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,3000,'|','\\r',',');
+		export tmRenewal                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmRenewal::co','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,3000,'|','\\r',',');
+		export tmTransfer                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmTransfer::co','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,3000,'|','\\r',',');
+		export tmWithdraw                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmWithdraw::co','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,3000,'|','\\r',',');
 
 		export dAll_filenames :=
 			  corpHist.dAll_filenames
+			+ corpHist2.dAll_filenames				
 			+ corpMstr.dAll_filenames
 			+ corpTrdnm.dAll_filenames
 			+ tmChange.dAll_filenames
@@ -154,24 +137,25 @@ module
 	export ct_raw :=
 	module
 
-		export BusFiling              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpBusFiling::ct','edata10',,,125	,,pGroupname,,,'FIXED',, ,,,);
-		export BusMaster              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpBusMaster::ct','edata10',,,1158,,pGroupname,,,'FIXED',, ,,,);
-		export busmergr               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpbusmergr::ct'	,'edata10',,,40	,,pGroupname,,,'FIXED',, ,,,);
-		export busother               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpbusother::ct'	,'edata10',,,134	,,pGroupname,,,'FIXED',, ,,,);
-		export busrsvr                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpbusrsvr::ct'	,'edata10',,,360	,,pGroupname,,,'FIXED',, ,,,);
-		export corp                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpcorp::ct'			,'edata10',,,165	,,pGroupname,,,'FIXED',, ,,,);
-		export dlmlpart               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpdlmlpart::ct'	,'edata10',,,38	,,pGroupname,,,'FIXED',, ,,,);
-		export dlmtcorp               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpdlmtcorp::ct'	,'edata10',,,46	,,pGroupname,,,'FIXED',, ,,,);
-		export dlmtpart               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpdlmtpart::ct'	,'edata10',,,28	,,pGroupname,,,'FIXED',, ,,,);
-		export filmindx               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpfilmindx::ct'	,'edata10',,,64	,,pGroupname,,,'FIXED',, ,,,);
-		export flmlpart               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpflmlpart::ct'	,'edata10',,,151	,,pGroupname,,,'FIXED',, ,,,);
-		export flmtcorp               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpflmtcorp::ct'	,'edata10',,,352	,,pGroupname,,,'FIXED',, ,,,);
-		export flmtpart               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpflmtpart::ct'	,'edata10',,,335	,,pGroupname,,,'FIXED',, ,,,);
-		export forstat                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpforstat::ct'	,'edata10',,,326	,,pGroupname,,,'FIXED',, ,,,);
-		export generalp               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpgeneralp::ct'	,'edata10',,,228	,,pGroupname,,,'FIXED',, ,,,);
-		export namechng               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpnamechng::ct'	,'edata10',,,329	,,pGroupname,,,'FIXED',, ,,,);
-		export prncipal               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpprncipal::ct'	,'edata10',,,513	,,pGroupname,,,'FIXED',, ,,,);
-		export stock                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpstock::ct'		,'edata10',,,67	,,pGroupname,,,'FIXED',, ,,,);
+
+		export BusFiling              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpBusFiling::ct','bctlpedata10',,,125	,,pGroupname,,,'FIXED',, ,,,);
+		export BusMaster              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpBusMaster::ct','bctlpedata10',,,1158,,pGroupname,,,'FIXED',, ,,,);
+		export busmergr               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpbusmergr::ct'	,'bctlpedata10',,,40	,,pGroupname,,,'FIXED',, ,,,);
+		export busother               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpbusother::ct'	,'bctlpedata10',,,134	,,pGroupname,,,'FIXED',, ,,,);
+		export busrsvr                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpbusrsvr::ct'	,'bctlpedata10',,,360	,,pGroupname,,,'FIXED',, ,,,);
+		export corp                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpcorp::ct'			,'bctlpedata10',,,165	,,pGroupname,,,'FIXED',, ,,,);
+		export dlmlpart               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpdlmlpart::ct'	,'bctlpedata10',,,38	,,pGroupname,,,'FIXED',, ,,,);
+		export dlmtcorp               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpdlmtcorp::ct'	,'bctlpedata10',,,46	,,pGroupname,,,'FIXED',, ,,,);
+		export dlmtpart               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpdlmtpart::ct'	,'bctlpedata10',,,28	,,pGroupname,,,'FIXED',, ,,,);
+		export filmindx               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpfilmindx::ct'	,'bctlpedata10',,,64	,,pGroupname,,,'FIXED',, ,,,);
+		export flmlpart               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpflmlpart::ct'	,'bctlpedata10',,,151	,,pGroupname,,,'FIXED',, ,,,);
+		export flmtcorp               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpflmtcorp::ct'	,'bctlpedata10',,,352	,,pGroupname,,,'FIXED',, ,,,);
+		export flmtpart               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpflmtpart::ct'	,'bctlpedata10',,,335	,,pGroupname,,,'FIXED',, ,,,);
+		export forstat                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpforstat::ct'	,'bctlpedata10',,,326	,,pGroupname,,,'FIXED',, ,,,);
+		export generalp               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpgeneralp::ct'	,'bctlpedata10',,,228	,,pGroupname,,,'FIXED',, ,,,);
+		export namechng               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpnamechng::ct'	,'bctlpedata10',,,329	,,pGroupname,,,'FIXED',, ,,,);
+		export prncipal               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpprncipal::ct'	,'bctlpedata10',,,513	,,pGroupname,,,'FIXED',, ,,,);
+		export stock                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmpstock::ct'		,'bctlpedata10',,,67	,,pGroupname,,,'FIXED',, ,,,);
                                                                                                                                    
 		export dAll_filenames :=
 			  BusFiling.dAll_filenames
@@ -199,7 +183,7 @@ module
 	export dc_raw :=
 	module
 
-		export corporations              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporations::dc','edata10',,,,,pGroupname,,,'VARIABLE',,13000,,,'\"');
+		export corporations              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporations::dc','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,', '\\r\\n', '"',);
 
 		export dAll_filenames :=
 			  corporations.dAll_filenames
@@ -210,8 +194,8 @@ module
 	export fl_raw :=
 	module
 
-		export corpFile                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpFile::fl'	,'edata10',,,1172	,,pGroupname,,,'FIXED',,,,,);
-		export eventFile                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::eventFile::fl','edata10',,,664	,,pGroupname,,,'FIXED',,,,,);
+		export corpFile                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpFile::fl'	,'bctlpedata10',,,1442	,,pGroupname,,,'FIXED',,,,,);
+		export eventFile                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::eventFile::fl','bctlpedata10',,,664	,,pGroupname,,,'FIXED',,,,,);
                                                                                                                                 
 		export dAll_filenames :=
 			  corpFile.dAll_filenames
@@ -223,7 +207,7 @@ module
 	export fltm_raw :=
 	module
 
-		export tmFile                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmFile::fltm','edata10',,,1906,,pGroupname,,,'FIXED',,,,,);
+		export tmFile                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tmFile::fltm','bctlpedata10',,,1906,,pGroupname,,,'FIXED',,,,,);
 
 		export dAll_filenames :=
 			  tmFile.dAll_filenames
@@ -231,56 +215,36 @@ module
 
 	end;
 
+  //Added '\\' as the QUOTE input so that quotes in the data will be ignored.  Quotes in the data causes some data to be dropped.
 	export ga_raw :=
 	module
 
-		export address                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::address::ga'									,'edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export AddressTypeID_Table       := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::AddressTypeID_Table::ga'	,'edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export corporation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporation::ga'							,'edata10',,,,,pGroupname,,,'VARIABLE',,1000,,'\\n',);
-		export name                      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::name::ga'											,'edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export StatusCode_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StatusCode_Table::ga'			,'edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export CorpType_Table            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorpType_Table::ga'				,'edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export DocumentTypeID_Table      := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::DocumentTypeID_Table::ga'	,'edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export filing                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filing::ga'										,'edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export merger                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::merger::ga'										,'edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export NameType_Table            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::NameType_Table::ga'				,'edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export officer                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::officer::ga'									,'edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export OffPartyType_Table        := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::OffPartyType_Table::ga'		,'edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export PartyType_Table           := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::PartyType_Table::ga'			,'edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export ragent                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ragent::ga'										,'edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export stock                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::stock::ga'										,'edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export StockClass_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StockClass_Table::ga'			,'edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-
+		export address                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::address::ga','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n','\\',);
+		export corporation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporation::ga','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n','\\',);
+		export filing                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filing::ga','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n','\\',);
+		export officer                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::officer::ga','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n','\\',);
+		export ragent                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ragent::ga','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n','\\',);
+		export stock                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::stock::ga','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n','\\',);
+		
 		export dAll_filenames :=
-			  address.dAll_filenames
-			+ AddressTypeID_Table.dAll_filenames
-			+ corporation.dAll_filenames
-			+ name.dAll_filenames
-			+ StatusCode_Table.dAll_filenames
-			+ CorpType_Table.dAll_filenames
-			+ DocumentTypeID_Table.dAll_filenames
-			+ filing.dAll_filenames
-			+ merger.dAll_filenames
-			+ NameType_Table.dAll_filenames
-			+ officer.dAll_filenames
-			+ OffPartyType_Table.dAll_filenames
-			+ PartyType_Table.dAll_filenames
-			+ ragent.dAll_filenames
-			+ stock.dAll_filenames
-			+ StockClass_Table.dAll_filenames
-			;
+			    address.dAll_filenames
+				+ corporation.dAll_filenames
+			  + filing.dAll_filenames
+			  + officer.dAll_filenames
+			  + ragent.dAll_filenames
+			  + stock.dAll_filenames;
 
 	end;
 
 	export hi_raw :=
 	module
 
-		export companymaster             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::companymaster::hi','edata10',,,,,pGroupname       ,,,'VARIABLE',,800,,'\\n',);
-		export companyofficer            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::companyofficer::hi','edata10',,,,,pGroupname      ,,,'VARIABLE',,800,,'\\n',);
-		export companystock              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::companystock::hi','edata10',,,,,pGroupname        ,,,'VARIABLE',,800,,'\\n',);
-		export companytransaction        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::companytransaction::hi','edata10',,,,,pGroupname  ,,,'VARIABLE',,800,,'\\n',);
-		export ttsmaster                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ttsmaster::hi','edata10',,,,,pGroupname           ,,,'VARIABLE',,800,,'\\n',);
-		export ttstransaction            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ttstransaction::hi','edata10',,,,,pGroupname      ,,,'VARIABLE',,800,,'\\n',);
+		export companymaster             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::companymaster::hi','bctlpedata10',,,,,pGroupname       ,,,'VARIABLE',,8192,,'\\n',',');
+		export companyofficer            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::companyofficer::hi','bctlpedata10',,,,,pGroupname      ,,,'VARIABLE',,8192,,'\\n',',');
+		export companystock              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::companystock::hi','bctlpedata10',,,,,pGroupname        ,,,'VARIABLE',,8192,,'\\n',',');
+		export companytransaction        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::companytransaction::hi','bctlpedata10',,,,,pGroupname  ,,,'VARIABLE',,8192,,'\\n',',');
+		export ttsmaster                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ttsmaster::hi','bctlpedata10',,,,,pGroupname           ,,,'VARIABLE',,8192,,'\\n',',');
+		export ttstransaction            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ttstransaction::hi','bctlpedata10',,,,,pGroupname      ,,,'VARIABLE',,8192,,'\\n',',');
 
 		export dAll_filenames :=
 			  companymaster.dAll_filenames
@@ -296,22 +260,22 @@ module
 	export ia_raw :=
 	module
 
-		export crpAdd                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpAdd::ia','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
-		export crpAgt                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpAgt::ia','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
-		export crpDes                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpDes::ia','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
-		export crpFil                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpFil::ia','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
-		export crpHis                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpHis::ia','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
-		export crpNam                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpNam::ia','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
-		export crpOff                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpOff::ia','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
-		export crpPrt                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpPrt::ia','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
-		export crpRem                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpRem::ia','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
-		export crpStk                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpStk::ia','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
-		export ChapterCodes_Table        := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::ChapterCodes_Table::ia'	,'edata10',,,57	,,pGroupname,,,'FIXED',, ,,,);
-		export OfficerType_Table         := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::OfficerType_Table::ia'	,'edata10',,,28	,,pGroupname,,,'FIXED',, ,,,);
-		export PageNo_Table              := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::PageNo_Table::ia'				,'edata10',,,64	,,pGroupname,,,'FIXED',, ,,,);
-		export FilingType_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::FilingType_Table::ia'		,'edata10',,,88	,,pGroupname,,,'FIXED',, ,,,);
-		export CountryCodes_Table        := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CountryCodes_Table::ia'	,'edata10',,,164,,pGroupname,,,'FIXED',, ,,,);
-		export StateCodes_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StateCodes_Table::ia'		,'edata10',,,34	,,pGroupname,,,'FIXED',, ,,,);
+		export crpAdd                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpAdd::ia','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
+		export crpAgt                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpAgt::ia','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
+		export crpDes                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpDes::ia','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
+		export crpFil                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpFil::ia','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
+		export crpHis                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpHis::ia','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
+		export crpNam                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpNam::ia','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n','');
+		export crpOff                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpOff::ia','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
+		export crpPrt                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpPrt::ia','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
+		export crpRem                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpRem::ia','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
+		export crpStk                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpStk::ia','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\t','\\n',);
+		export ChapterCodes_Table        := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::ChapterCodes_Table::ia'	,'bctlpedata10',,,57	,,pGroupname,,,'FIXED',, ,,,);
+		export OfficerType_Table         := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::OfficerType_Table::ia'	,'bctlpedata10',,,28	,,pGroupname,,,'FIXED',, ,,,);
+		export PageNo_Table              := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::PageNo_Table::ia'				,'bctlpedata10',,,64	,,pGroupname,,,'FIXED',, ,,,);
+		export FilingType_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::FilingType_Table::ia'		,'bctlpedata10',,,88	,,pGroupname,,,'FIXED',, ,,,);
+		export CountryCodes_Table        := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CountryCodes_Table::ia'	,'bctlpedata10',,,164,,pGroupname,,,'FIXED',, ,,,);
+		export StateCodes_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StateCodes_Table::ia'		,'bctlpedata10',,,34	,,pGroupname,,,'FIXED',, ,,,);
                                                                                                                                             
 		export dAll_filenames :=
 			  crpAdd.dAll_filenames
@@ -337,7 +301,7 @@ module
 	export id_raw :=
 	module
 
-		export vendorRaw                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::vendorRaw::id','edata10',,,547,,pGroupname,,,'FIXED',,,,,);
+		export vendorRaw                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::vendorRaw::id','bctlpedata10',,,547,,pGroupname,,,'FIXED',,,,,);
 
 		export dAll_filenames :=
 			  vendorRaw.dAll_filenames
@@ -348,46 +312,48 @@ module
 	export il_raw :=
 	module
 
-      shared frequency(string pfrequency) :=
+      shared dailyraw(string pfrequency) :=
       module
-         export master     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::' + pfrequency +'_master::il','edata10',,,,,pGroupname,,,'VARIABLE');
-         export corpnames  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::' + pfrequency +'_corpnames::il','edata10',,,,,pGroupname,,,'VARIABLE');
-         export stock      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::' + pfrequency +'_stock::il','edata10',,,,,pGroupname,,,'VARIABLE');
+				 export master     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::' + pfrequency +'_master::il','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'',,'');
       end;
-      
-      export daily   := frequency('daily');
-      export monthly := frequency('monthly');
 
-			export llc     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::llc::il','edata10',,,,,pGroupname,,,'VARIABLE',,2000,,'\\r\\n',);
-			export lp      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::lp::il','edata10',,,,,pGroupname,,,'VARIABLE',,8192,,'\\n',);
+      shared monthlyraw(string pfrequency) :=
+      module
+				 export master     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::' + pfrequency +'_master::il','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'',,'');
+         export corpnames  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::' + pfrequency +'_corpnames::il','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,',');
+         export stock      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::' + pfrequency +'_stock::il','bctlpedata10',,,,,pGroupname,,,'VARIABLE');
+      end;
+			
+      export daily   := dailyraw('daily');
+      export monthly := monthlyraw('monthly');
+
+			export llc     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::llc::il','bctlpedata10',,,,,pGroupname,,,'VARIABLE','',8192,,'\\n',);
+			export lp      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::lp::il','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192,,'\\n',);
                                                                                         
       
       export dall_filenames :=
            daily.master.dall_filenames         
-         + daily.corpnames.dall_filenames             
-//       + daily.stock.dall_filenames             //no stock for daily files
          + monthly.master.dall_filenames             
          + monthly.corpnames.dall_filenames             
          + monthly.stock.dall_filenames             
 				 + llc.dAll_filenames
 				 + lp.dAll_filenames
-         ;        
-
+         ;
 
 	end;
 
 	export in_raw :=
 	module
 
-		export Corp_Agents               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Agents::in','edata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,);
-		export Corp_Corporations         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Corporations::in','edata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,);
-		export Corp_Filings              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Filings::in','edata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,);
-		export Corp_Mergers              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Mergers::in','edata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,);
-		export Corp_Names                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Names::in','edata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,);
-		export Corp_Officers             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Officers::in','edata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,);
-		export Corp_Reports              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Reports::in','edata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,);
-		export EntityType_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::EntityType_Table::in','edata10',,,,, pGroupname,,,'VARIABLE',,,'\\t',,);
-		export FilingType_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::FilingType_Table::in','edata10',,,,, pGroupname,,,'VARIABLE',,,'\\t',,);
+		export Corp_Agents               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Agents::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export Corp_Corporations         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Corporations::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export Corp_Filings              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Filings::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export Corp_Mergers              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Mergers::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export Corp_Names                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Names::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export Corp_Officers             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Officers::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export Corp_Reports              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Reports::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export EntityType_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::EntityType_Table::in','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,,'\\t',,',');
+		export FilingType_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::FilingType_Table::in','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,,'\\t',,',');
 
 		export dAll_filenames :=
 			  Corp_Agents.dAll_filenames
@@ -406,18 +372,18 @@ module
 	export ks_raw :=
 	module
 
-		export cpabrep                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::cpabrep::ks'		,'edata10',,,317,,pGroupname,,,'FIXED',,,,,);
-		export cpadrep                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::cpadrep::ks'		,'edata10',,,186,,pGroupname,,,'FIXED',,,,,);
-		export cpaerep                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::cpaerep::ks'		,'edata10',,,75	,,pGroupname,,,'FIXED',,,,,);
-		export cpahst                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::cpahst::ks'			,'edata10',,,83	,,pGroupname,,,'FIXED',,,,,);
-		export cpaqrep                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::cpaqrep::ks'		,'edata10',,,41	,,pGroupname,,,'FIXED',,,,,);
-		export cpbcrep                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::cpbcrep::ks'		,'edata10',,,148,,pGroupname,,,'FIXED',,,,,);
-		export Cpasrep                   := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Cpasrep::ks','edata10',,,58	,,pGroupname,,,'FIXED',,,,,);
-		export Cpakrep                   := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Cpakrep::ks','edata10',,,78	,,pGroupname,,,'FIXED',,,,,);
-		export Cpalrep                   := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Cpalrep::ks','edata10',,,68	,,pGroupname,,,'FIXED',,,,,);
-		export Cpanrep                   := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Cpanrep::ks','edata10',,,34	,,pGroupname,,,'FIXED',,,,,);
-		export Crptyp                    := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Crptyp::ks'	,'edata10',,,33	,,pGroupname,,,'FIXED',,,,,);
-                                                                                                                                 
+		export cpabrep                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::cpabrep::ks'		,'bctlpedata10',,,317,,pGroupname,,,'FIXED',,,,,);
+		export cpadrep                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::cpadrep::ks'		,'bctlpedata10',,,186,,pGroupname,,,'FIXED',,,,,);
+		export cpaerep                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::cpaerep::ks'		,'bctlpedata10',,,75	,,pGroupname,,,'FIXED',,,,,);
+		export cpahst                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::cpahst::ks'			,'bctlpedata10',,,83	,,pGroupname,,,'FIXED',,,,,);
+		export cpaqrep                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::cpaqrep::ks'		,'bctlpedata10',,,41	,,pGroupname,,,'FIXED',,,,,);
+		export cpbcrep                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::cpbcrep::ks'		,'bctlpedata10',,,148,,pGroupname,,,'FIXED',,,,,);
+		export Cpasrep                   := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Cpasrep::ks','bctlpedata10',,,58	,,pGroupname,,,'FIXED',,,,,);
+		export Cpakrep                   := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Cpakrep::ks','bctlpedata10',,,78	,,pGroupname,,,'FIXED',,,,,);
+		export Cpalrep                   := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Cpalrep::ks','bctlpedata10',,,68	,,pGroupname,,,'FIXED',,,,,);
+		export Cpanrep                   := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Cpanrep::ks','bctlpedata10',,,34	,,pGroupname,,,'FIXED',,,,,);
+		export Crptyp                    := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Crptyp::ks'	,'bctlpedata10',,,33	,,pGroupname,,,'FIXED',,,,,);
+                                                                                                                                                                                                                                                               
 		export dAll_filenames :=
 			  cpabrep.dAll_filenames
 			+ cpadrep.dAll_filenames
@@ -437,12 +403,14 @@ module
 	export ky_raw :=
 	module
 
-		export companies                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::companies::ky','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
-		export Officer                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Officer::ky','edata10',,,,,pGroupname,,,'VARIABLE',, 800,,'\\n',);
+		export companies                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::companies::ky','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export officer                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::officer::ky','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 800,,'\\n',);
+		export initialofficers					 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::initialofficers::ky','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 800,,'\\n',);
 
 		export dAll_filenames :=
 			  companies.dAll_filenames
-			+ Officer.dAll_filenames
+			+ officer.dAll_filenames
+			+ initialofficers.dAll_filenames
 			;
 
 	end;
@@ -450,28 +418,22 @@ module
 	export la_raw :=
 	module
 
-		export crpam                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpam::la'	,'edata10',,,43	,,pGroupname,,,'FIXED',,,,,);
-		export crpca                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpca::la'	,'edata10',,,228,,pGroupname,,,'FIXED',,,,,);
-		export crpcm                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpcm::la'	,'edata10',,,322,,pGroupname,,,'FIXED',,,,,);
-		export crppn                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crppn::la'	,'edata10',,,138,,pGroupname,,,'FIXED',,,,,);
-		export crprma                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crprma::la'	,'edata10',,,564,,pGroupname,,,'FIXED',,,,,);
-		export crpta                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpta::la'	,'edata10',,,43	,,pGroupname,,,'FIXED',,,,,);
-		export crptsa                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crptsa::la'	,'edata10',,,984,,pGroupname,,,'FIXED',,,,,);
-		export crpcc                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpcc::la','edata10',,,,,pGroupname,,,'VARIABLE',,75,'[^]','\\r\\n',);
-		export crpce                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crpce::la','edata10',,,,,pGroupname,,,'VARIABLE',,75,'[^]','\\r\\n',);
-		export crppe                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::crppe::la','edata10',,,,,pGroupname,,,'VARIABLE',,80,'[^]','\\r\\n',);
+		export entities                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corps_entities::la'	,'bctlpedata10',,,,,pGroupname,,,'XML','Entity',,,,);
+		export agents                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::agents::la'	,'bctlpedata10',,,,,pGroupname,,,'XML','Entity',,,,);
+		export filings                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filings::la'	,'bctlpedata10',,,,,pGroupname,,,'XML','Entity',,,,);
+		export mergers                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::mergers::la'	,'bctlpedata10',,,,,pGroupname,,,'XML','Entity',,,,);
+		export previous_names             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::previous_names::la','bctlpedata10',,,,,pGroupname,,,'XML','Entity',,,,);
+		export name_reservs               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::name_reservs::la'	,'bctlpedata10',,,,,pGroupname,,,'XML','NameReservationEntry',,,,);
+		export trade_services             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::trade_services::la','bctlpedata10',,,,,pGroupname,,,'XML','TradeServiceEntity',,,,);
 
 		export dAll_filenames :=
-			  crpam.dAll_filenames
-			+ crpca.dAll_filenames
-			+ crpcc.dAll_filenames
-			+ crpce.dAll_filenames
-			+ crpcm.dAll_filenames
-			+ crppe.dAll_filenames
-			+ crppn.dAll_filenames
-			+ crprma.dAll_filenames
-			+ crpta.dAll_filenames
-			+ crptsa.dAll_filenames
+			  entities.dAll_filenames
+			+ agents.dAll_filenames
+			+ filings.dAll_filenames
+			+ mergers.dAll_filenames
+			+ previous_names.dAll_filenames
+			+ name_reservs.dAll_filenames
+			+ trade_services.dAll_filenames
 			;
 
 	end;
@@ -479,12 +441,12 @@ module
 	export ma_raw :=
 	module
 
-		export corpdataexport            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpdataexport::ma'				,'edata10',,,,,pGroupname ,,,'VARIABLE',,8192,'|',,);
-		export corpindividualexport      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpindividualexport::ma'	,'edata10',,,,,pGroupname ,,,'VARIABLE',,8192,'|',,);
-		export corpstockexport           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpstockexport::ma'			,'edata10',,,,,pGroupname ,,,'VARIABLE',,8192,'|',,);
-		export corpdetailexport          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpdetailexport::ma'			,'edata10',,,,,pGroupname ,,,'VARIABLE',,8192,'|',,);
-		export corpmerger                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpmerger::ma'						,'edata10',,,,,pGroupname ,,,'VARIABLE',,8192,'|',,);
-		export corpnamechange            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpnamechange::ma'				,'edata10',,,,,pGroupname ,,,'VARIABLE',,8192,'|',,);
+		export corpdataexport            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpdataexport::ma'				,'bctlpedata10',,,,,pGroupname ,,,'VARIABLE',,8192,'|',,',');
+		export corpindividualexport      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpindividualexport::ma'	,'bctlpedata10',,,,,pGroupname ,,,'VARIABLE',,8192,'|',,',');
+		export corpstockexport           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpstockexport::ma'			,'bctlpedata10',,,,,pGroupname ,,,'VARIABLE',,8192,'|',,',');
+		export corpdetailexport          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpdetailexport::ma'			,'bctlpedata10',,,,,pGroupname ,,,'VARIABLE',,8192,'|',,',');
+		export corpmerger                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpmerger::ma'						,'bctlpedata10',,,,,pGroupname ,,,'VARIABLE',,8192,'|',,',');
+		export corpnamechange            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpnamechange::ma'				,'bctlpedata10',,,,,pGroupname ,,,'VARIABLE',,8192,'|',,',');
 
 		export dAll_filenames :=
 			  corpdataexport.dAll_filenames
@@ -500,18 +462,21 @@ module
 	export md_raw :=
 	module
 
-		export AmendHist                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::AmendHist::md'				,'edata10',,,154	,,pGroupname,,,'FIXED',, ,,,);
-		export BusAddr_clean             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::BusAddr_clean::md'		,'edata10',,,1196,,pGroupname,,,'FIXED',, ,,,);
-		export BusEntity                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::BusEntity::md'				,'edata10',,,98	,,pGroupname,,,'FIXED',, ,,,);
-		export BusNmIndx_clean           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::BusNmIndx_clean::md'	,'edata10',,,894	,,pGroupname,,,'FIXED',, ,,,);
-		export BusType_clean             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::BusType_clean::md'		,'edata10',,,77	,,pGroupname,,,'FIXED',, ,,,);
-		export BusComment_clean          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::BusComment_clean::md'	,'edata10',,,1062,,pGroupname,,,'FIXED',, ,,,);
-		export EntityStatus              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::EntityStatus::md'			,'edata10',,,54	,,pGroupname,,,'FIXED',, ,,,);
-		export FilingType_clean          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::FilingType_clean::md'	,'edata10',,,68	,,pGroupname,,,'FIXED',, ,,,);
-		export TradeName                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::TradeName::md'				,'edata10',,,83	,,pGroupname,,,'FIXED',, ,,,);
-		export FilmIndx                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::FilmIndx::md'					,'edata10',,,65	,,pGroupname,,,'FIXED',, ,,,);
-		export ReserveName               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ReserveName::md'			,'edata10',,,79	,,pGroupname,,,'FIXED',, ,,,);
-                                                                                                                                       
+		export AmendHist                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::AmendHist::md'		,'bctlpedata10',,,154,,pGroupname,,,'FIXED',, ,,,);
+		export BusAddr_clean             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::BusAddr::md'			,'bctlpedata10',,,698,,pGroupname,,,'FIXED',, ,,,);
+		export BusEntity                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::BusEntity::md'		,'bctlpedata10',,,101,,pGroupname,,,'FIXED',, ,,,);
+		export BusNmIndx_clean           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::BusNmIndx::md'	  ,'bctlpedata10',,,620,,pGroupname,,,'FIXED',, ,,,);
+		export BusType_clean             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::BusType::md'		  ,'bctlpedata10',,,77,,pGroupname,,,'FIXED',, ,,,);
+		export BusComment_clean          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::BusComment::md'	,'bctlpedata10',,,1062,,pGroupname,,,'FIXED',, ,,,);
+		export EntityStatus              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::EntityStatus::md','bctlpedata10',,,54,,pGroupname,,,'FIXED',, ,,,);
+		export FilingType_clean          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::FilingType::md'	,'bctlpedata10',,,68,,pGroupname,,,'FIXED',, ,,,);
+		export TradeName                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::TradeName::md'		,'bctlpedata10',,,86,,pGroupname,,,'FIXED',, ,,,);
+		export FilmIndx                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::FilmIndx::md'		,'bctlpedata10',,,65,,pGroupname,,,'FIXED',, ,,,);
+		export ReserveName               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ReserveName::md'	,'bctlpedata10',,,79,,pGroupname,,,'FIXED',, ,,,);
+ 		export ArcAmendHist              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ArcAmendHist::md','bctlpedata10',,,154,,pGroupname,,,'FIXED',, ,,,);
+		export ArcBusAddr_clean          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ArcBusAddr::md'	,'bctlpedata10',,,698,,pGroupname,,,'FIXED',, ,,,);
+    export ArcBusNmIndx_clean        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ArcBusNmIndx::md','bctlpedata10',,,620,,pGroupname,,,'FIXED',, ,,,);
+                                                                                                                                     
 		export dAll_filenames :=
 			  AmendHist.dAll_filenames
 			+ BusAddr_clean.dAll_filenames
@@ -524,6 +489,9 @@ module
 			+ TradeName.dAll_filenames
 			+ FilmIndx.dAll_filenames
 			+ ReserveName.dAll_filenames
+			+ ArcAmendHist.dAll_filenames
+			+ ArcBusAddr_clean.dAll_filenames
+			+ ArcBusNmIndx_clean.dAll_filenames
 			;
 
 	end;
@@ -531,7 +499,7 @@ module
 	export me_raw :=
 	module
 
-		export corp_bulk                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corp_bulk::me','edata10',,,910,,pGroupname,,,'FIXED',,,,,);
+		export corp_bulk                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corp_bulk::me','bctlpedata10',,,1210,,pGroupname,,,'FIXED',,,,,);
 
 		export dAll_filenames :=
 			  corp_bulk.dAll_filenames
@@ -542,7 +510,7 @@ module
 	export mi_raw :=
 	module
 
-		export master1                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::master1::mi','edata10',,,,,pGroupname,,,'VARIABLE',,8192,,,);
+				export master1                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::master1::mi','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192,,,',');
 
 		export dAll_filenames :=
 			  master1.dAll_filenames
@@ -550,58 +518,47 @@ module
 
 	end;
 
-	export mn_raw :=
-	module
-
-		export an                        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::an::mn','edata10',,,,,pGroupname,,,'VARIABLE',, 200,'|','\\r\\n',);
-		export bt                        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::bt::mn','edata10',,,,,pGroupname,,,'VARIABLE',, 200,'|','\\r\\n',);
-		export dc_mn                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::dc::mn','edata10',,,,,pGroupname,,,'VARIABLE',, 200,'|','\\r\\n',);
-		export fc                        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::fc::mn','edata10',,,,,pGroupname,,,'VARIABLE',, 200,'|','\\r\\n',);
-		export llc                       := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::llc::mn','edata10',,,,,pGroupname,,,'VARIABLE',, 200,'|','\\r\\n',);
-		export lp                        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::lp::mn','edata10',,,,,pGroupname,,,'VARIABLE',, 200,'|','\\r\\n',);
-		export np                        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::np::mn','edata10',,,,,pGroupname,,,'VARIABLE',, 200,'|','\\r\\n',);
-		export rn                        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::rn::mn','edata10',,,,,pGroupname,,,'VARIABLE',, 200,'|','\\r\\n',);
-		export tm                        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tm::mn','edata10',,,,,pGroupname,,,'VARIABLE',, 200,'|','\\r\\n',);
-
-		export dAll_filenames :=
-			  an.dAll_filenames
-			+ bt.dAll_filenames
-			+ dc_mn.dAll_filenames
-			+ fc.dAll_filenames
-			+ llc.dAll_filenames
-			+ lp.dAll_filenames
-			+ np.dAll_filenames
-			+ rn.dAll_filenames
-			+ tm.dAll_filenames
-			;
-
-	end;
-
+  export mn_raw := 
+  module
+		export fullfile       := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::fullfile::mn','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,',','\\r\\n',);
+		export dAll_filenames := fullfile.dAll_filenames;
+  end;
+  
 	export mo_raw :=
 	module
 
-		export address                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::address::mo','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export AddressType_Table         := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::AddressType_Table::mo','edata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export corporation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporation::mo','edata10',,,,,pGroupname,,,'VARIABLE',,1000,,'\\n',);
-		export name                      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::name::mo','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export CorporationStatus_Table   := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorporationStatus_Table::mo','edata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export CorporationType_Table     := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorporationType_Table::mo','edata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export DocumentType_Table        := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::DocumentType_Table::mo','edata10',,,,,pGroupname,,,'VARIABLE',,200,,'\\n',);
-		export filing                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filing::mo','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export merger                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::merger::mo','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export NameType_Table            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::NameType_Table::mo','edata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export address                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::address::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);		
+		export corporation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporation::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,,'\\n',);
+		export name                      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::name::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
+		export Officer                 	 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Officer::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
+		export Stock                   	 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Stock::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
+		export filing                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filing::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
+		export merger                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::merger::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
+		export AddressType_Table         := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::AddressType_Table::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export CorporationStatus_Table   := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorporationStatus_Table::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export CorporationType_Table     := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorporationType_Table::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export DocumentType_Table        := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::DocumentType_Table::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,200,,'\\n',);
+		export NameType_Table            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::NameType_Table::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export StockClass_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StockClass_Table::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export PartyType_Table           := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::PartyType_Table::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export officerpartyType_table    := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::officerpartyType_table::mo','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
 
 		export dAll_filenames :=
-			  address.dAll_filenames
-			+ AddressType_Table.dAll_filenames
+			  address.dAll_filenames			
 			+ corporation.dAll_filenames
 			+ name.dAll_filenames
+			+ Officer.dAll_filenames
+			+ Stock.dAll_filenames			
+			+ filing.dAll_filenames
+			+ merger.dAll_filenames
+			+ AddressType_Table.dAll_filenames
 			+ CorporationStatus_Table.dAll_filenames
 			+ CorporationType_Table.dAll_filenames
 			+ DocumentType_Table.dAll_filenames
-			+ filing.dAll_filenames
-			+ merger.dAll_filenames
 			+ NameType_Table.dAll_filenames
+			+ StockClass_Table.dAll_filenames
+			+ PartyType_Table.dAll_filenames
+			+ officerpartyType_table.dAll_filenames
 			;
 
 	end;
@@ -609,26 +566,13 @@ module
 	export ms_raw :=
 	module
 
-		export ADDRESS                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ADDRESS::ms','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export CORPORATION               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CORPORATION::ms','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export CORPORATIONNAME           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CORPORATIONNAME::ms','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export FILING                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::FILING::ms','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export MERGER                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::MERGER::ms','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export OFFICER                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::OFFICER::ms','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export OFFICERPARTYTYPE          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::OFFICERPARTYTYPE::ms','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export STOCK_FILE                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::STOCK_FILE::ms','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export DocumentType              := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::DocumentType::ms','edata10',,,,, pGroupname,,,'VARIABLE',,500,,'\\n',);
+		export PROFILES                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::PROFILES::ms','bctlpedata10',,,,,pGroupname,,,'XML','Document',,,,);
+		export FORMS                      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::FORMS::ms','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,);
+		
 
 		export dAll_filenames :=
-			  ADDRESS.dAll_filenames
-			+ CORPORATION.dAll_filenames
-			+ CORPORATIONNAME.dAll_filenames
-			+ FILING.dAll_filenames
-			+ MERGER.dAll_filenames
-			+ OFFICER.dAll_filenames
-			+ OFFICERPARTYTYPE.dAll_filenames
-			+ STOCK_FILE.dAll_filenames
-			+ DocumentType.dAll_filenames
+			  PROFILES.dAll_filenames
+			+ FORMS.dAll_filenames
 			;
 
 	end;
@@ -636,17 +580,17 @@ module
 	export mt_raw :=
 	module
 
-		export Iso_State                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Iso_State::mt','edata10',,,34,,pGroupname,,,'FIXED',,,,,);
-		export vendor_raw                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::vendor_raw::mt','edata10',,,200,,pGroupname,,,'FIXED',,,,,);
-		export Activity_Type             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Activity_Type::mt','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Bus_Entity_Type           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Bus_Entity_Type::mt','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Bus_Purpose_Type          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Bus_Purpose_Type::mt','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Change_Code               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Change_Code::mt','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Corp_Type                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Corp_Type::mt','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Owner_Type                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Owner_Type::mt','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Record_Type               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Record_Type::mt','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Status_Reason_Code        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Status_Reason_Code::mt','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Trademark_Class           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Trademark_Class::mt','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Iso_State                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Iso_State::mt','bctlpedata10',,,34,,pGroupname,,,'FIXED',,,,,);
+		export vendor_raw                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::vendor_raw::mt','bctlpedata10',,,200,,pGroupname,,,'FIXED',,,,,);
+		export Activity_Type             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Activity_Type::mt','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Bus_Entity_Type           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Bus_Entity_Type::mt','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Bus_Purpose_Type          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Bus_Purpose_Type::mt','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Change_Code               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Change_Code::mt','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Corp_Type                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Corp_Type::mt','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Owner_Type                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Owner_Type::mt','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Record_Type               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Record_Type::mt','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Status_Reason_Code        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Status_Reason_Code::mt','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Trademark_Class           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::Trademark_Class::mt','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
 
 		export dAll_filenames :=
 			  Iso_State.dAll_filenames
@@ -667,26 +611,24 @@ module
 	export nc_raw :=
 	module
 
-		export Addresses                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Addresses::nc','edata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,);
-		export Corporations              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corporations::nc','edata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,);
-		export Directors                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Directors::nc','edata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,);
-		export Filings                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Filings::nc','edata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,);
-		export NameReservations          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::NameReservations::nc','edata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,);
-		export Names                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Names::nc','edata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,);
-		export Officers                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Officers::nc','edata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,);
-		export Partners                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Partners::nc','edata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,);
-		export Stock                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Stock::nc','edata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,);
-		export DocumentType              := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::DocumentType::nc','edata10',,,,, pGroupname,,,'VARIABLE',,500,,'\\n',);
+		export Addresses                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Addresses::nc','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,',');
+		export Corporations              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corporations::nc','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,',');
+		export Filings                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Filings::nc','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,',');
+		export NameReservations          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::NameReservations::nc','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,',');
+		export Names                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Names::nc','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,);
+		export CorpOfficers              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpOfficers::nc','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,',');
+	  export PendingFilings            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::PendingFilings::nc','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,',');
+		export Stock                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Stock::nc','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\t',,',');
+		export DocumentType              := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::DocumentType::nc','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,500,,'\\n',',');
 
 		export dAll_filenames :=
 			  Addresses.dAll_filenames
 			+ Corporations.dAll_filenames
-			+ Directors.dAll_filenames
 			+ Filings.dAll_filenames
 			+ NameReservations.dAll_filenames
 			+ Names.dAll_filenames
-			+ Officers.dAll_filenames
-			+ Partners.dAll_filenames
+			+ CorpOfficers.dAll_filenames
+			+ PendingFilings.dAll_filenames
 			+ Stock.dAll_filenames
 			+ DocumentType.dAll_filenames
 			;
@@ -696,16 +638,16 @@ module
 	export nd_raw :=
 	module
 
-		export Corpa_Vendor              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corpa_Vendor::nd'				,'edata10',,,1901	,,pGroupname,,,'FIXED',,,,,);
-		export Corpb_Vendor              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corpb_Vendor::nd'				,'edata10',,,1901	,,pGroupname,,,'FIXED',,,,,);
-		export Fictitios1_Vendor         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Fictitios1_Vendor::nd'	,'edata10',,,2601	,,pGroupname,,,'FIXED',,,,,);
-		export Fictitios2_Vendor         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Fictitios2_Vendor::nd'	,'edata10',,,2601	,,pGroupname,,,'FIXED',,,,,);
-		export Partnership_Vendor        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Partnership_Vendor::nd'	,'edata10',,,15001,,pGroupname,,,'FIXED',,,,,);
-		export Trademarks1_Vendor        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Trademarks1_Vendor::nd'	,'edata10',,,2601	,,pGroupname,,,'FIXED',,,,,);
-		export Trademarks2_Vendor        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Trademarks2_Vendor::nd'	,'edata10',,,2601	,,pGroupname,,,'FIXED',,,,,);
-		export Tradename1_Vendor         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Tradename1_Vendor::nd'	,'edata10',,,2651	,,pGroupname,,,'FIXED',,,,,);
-		export Tradename2_Vendor         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Tradename2_Vendor::nd'	,'edata10',,,2651	,,pGroupname,,,'FIXED',,,,,);
-		export State_Country_Table       := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::State_Country_Table::nd','edata10',,,,, pGroupname,,,'VARIABLE',,350,,'\\n',);
+		export Corpa_Vendor              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corpa_Vendor::nd'				,'bctlpedata10',,,1901	,,pGroupname,,,'FIXED',,,,,);
+		export Corpb_Vendor              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corpb_Vendor::nd'				,'bctlpedata10',,,1901	,,pGroupname,,,'FIXED',,,,,);
+		export Fictitios1_Vendor         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Fictitios1_Vendor::nd'	,'bctlpedata10',,,2601	,,pGroupname,,,'FIXED',,,,,);
+		export Fictitios2_Vendor         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Fictitios2_Vendor::nd'	,'bctlpedata10',,,2601	,,pGroupname,,,'FIXED',,,,,);
+		export Partnership_Vendor        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Partnership_Vendor::nd'	,'bctlpedata10',,,15001,,pGroupname,,,'FIXED',,,,,);
+		export Trademarks1_Vendor        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Trademarks1_Vendor::nd'	,'bctlpedata10',,,2601	,,pGroupname,,,'FIXED',,,,,);
+		export Trademarks2_Vendor        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Trademarks2_Vendor::nd'	,'bctlpedata10',,,2601	,,pGroupname,,,'FIXED',,,,,);
+		export Tradename1_Vendor         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Tradename1_Vendor::nd'	,'bctlpedata10',,,2651	,,pGroupname,,,'FIXED',,,,,);
+		export Tradename2_Vendor         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Tradename2_Vendor::nd'	,'bctlpedata10',,,2651	,,pGroupname,,,'FIXED',,,,,);
+		export State_Country_Table       := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::State_Country_Table::nd','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,350,,'\\n',);
 
 		export dAll_filenames :=
 			  Corpa_Vendor.dAll_filenames
@@ -725,15 +667,15 @@ module
 	export ne_raw :=
 	module
 
-		export CorpAction                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpAction::ne','edata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
-		export CorpOfficers              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpOfficers::ne','edata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
-		export CorpEntity                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpEntity::ne','edata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
-		export CorporationType           := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorporationType::ne','edata10',,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
-		export NECountryCodes            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::NECountryCodes::ne','edata10',,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
-		export ListOfStates              := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::ListOfStates::ne','edata10',,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
-		export PositionHeld              := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::PositionHeld::ne','edata10',,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
-		export RegisterAgent             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::RegisterAgent::ne','edata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
-		export ServiceType               := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::ServiceType::ne','edata10',,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
+		export CorpAction                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpAction::ne','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
+		export CorpOfficers              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpOfficers::ne','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',',');
+		export CorpEntity                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpEntity::ne','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
+		export CorporationType           := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorporationType::ne','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
+		export NECountryCodes            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::NECountryCodes::ne','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
+		export ListOfStates              := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::ListOfStates::ne','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
+		export PositionHeld              := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::PositionHeld::ne','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
+		export RegisterAgent             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::RegisterAgent::ne','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'\\t','\\n',);
+		export ServiceType               := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::ServiceType::ne','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
 
 		export dAll_filenames :=
 			  CorpAction.dAll_filenames
@@ -752,44 +694,46 @@ module
 	export nh_raw :=
 	module
 
-		export address                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::address::nh','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export corporation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporation::nh','edata10',,,,,pGroupname,,,'VARIABLE',,1000,,'\\n',);
-		export name                      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::name::nh','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export filing                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filing::nh','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export merger                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::merger::nh','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export officer                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::officer::nh','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export stock                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::stock::nh','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export OffPartyType_Table        := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::OffPartyType_Table::nh','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export PartyType_Table           := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::PartyType_Table::nh','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export NameType_Table            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::NameType_Table::nh','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export StockClass_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StockClass_Table::nh','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export StatusCode_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StatusCode_Table::nh','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export CorpType_Table            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorpType_Table::nh','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export DocumentTypeID_Table      := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::DocumentTypeID_Table::nh','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export address                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::address::nh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
+		export corporation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporation::nh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,,'\\n',);
+		export name                      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::name::nh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
+		export filing                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filing::nh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
+		export merger                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::merger::nh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
+		export officer                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::officer::nh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
+		export stock                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::stock::nh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
+		export AddressType_Table	       := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::AddressType_Table::nh','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);		
+		export OffPartyType_Table        := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::OffPartyType_Table::nh','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export PartyType_Table           := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::PartyType_Table::nh','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export NameType_Table            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::NameType_Table::nh','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export StockClass_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StockClass_Table::nh','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export StatusCode_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StatusCode_Table::nh','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export CorpType_Table            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorpType_Table::nh','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export DocumentTypeID_Table      := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::DocumentTypeID_Table::nh','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
 
 		export dAll_filenames :=
-			  address.dAll_filenames
-			+ corporation.dAll_filenames
-			+ name.dAll_filenames
-			+ StatusCode_Table.dAll_filenames
-			+ CorpType_Table.dAll_filenames
-			+ DocumentTypeID_Table.dAll_filenames
-			+ filing.dAll_filenames
-			+ merger.dAll_filenames
-			+ NameType_Table.dAll_filenames
-			+ officer.dAll_filenames
-			+ OffPartyType_Table.dAll_filenames
-			+ PartyType_Table.dAll_filenames
-			+ stock.dAll_filenames
-			+ StockClass_Table.dAll_filenames
-			;
+					 address.dall_filenames
+				 + corporation.dall_filenames
+				 + name.dall_filenames
+				 + statuscode_table.dall_filenames
+				 + corptype_table.dall_filenames
+				 + documenttypeid_table.dall_filenames
+				 + filing.dall_filenames
+				 + merger.dall_filenames
+				 + nametype_table.dall_filenames
+				 + officer.dall_filenames
+				 + addresstype_table.dall_filenames
+				 + offpartytype_table.dall_filenames
+				 + partytype_table.dall_filenames
+				 + stock.dall_filenames
+				 + stockclass_table.dall_filenames
+				;
 
 	end;
 
 	export nj_raw :=
 	module
 
-		export Business                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Business::nj','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Business                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Business::nj','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,',');
 
 		export dAll_filenames :=
 			  Business.dAll_filenames
@@ -799,27 +743,20 @@ module
 
 	export nm_raw :=
 	module
-
-		export Import_Master             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Import_Master::nm'		,'edata10',,,680,,pGroupname,,,'FIXED',,,,,);
-		export Import2_directors         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Import2_directors::nm','edata10',,,48	,,pGroupname,,,'FIXED',,,,,);
-		export Import1_History           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Import1_History::nm'	,'edata10',,,357,,pGroupname,,,'FIXED',,,,,);
-                                                                                                                                        
-		export dAll_filenames :=
-			  Import_Master.dAll_filenames
-			+ Import2_directors.dAll_filenames
-			+ Import1_History.dAll_filenames
-			;  
+		//export Import_Master   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Import_Master::nm'		,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\t','\\r\\n',);
+		export Import_Master   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Import_Master::nm'		,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\t','\\n',);
+		export dAll_filenames  := Import_Master.dAll_filenames;
 
 	end;
 
 	export nv_raw :=
 	module
 
-		export ACTIONS                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ACTIONS::nv','edata10',,,,,pGroupname    ,,,'VARIABLE',,2000,,'\\n',);
-		export Corporation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corporation::nv','edata10',,,,,pGroupname,,,'VARIABLE',,2000,,'\\n',);
-		export OFFICERS                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::OFFICERS::nv','edata10',,,,,pGroupname      ,,,'VARIABLE',,2000,,'\\n',);
-		export RA                        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::RA::nv','edata10',,,,,pGroupname               ,,,'VARIABLE',,2000,,'\\n',);
-		export STOCK                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::STOCKs::nv','edata10',,,,,pGroupname  ,,,'VARIABLE',,2000,,'\\n',);
+		export ACTIONS                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ACTIONS::nv','bctlpedata10',,,,,pGroupname    ,,,'VARIABLE',,,'~','\\n',);
+		export Corporation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corporation::nv','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'~','\\n',);
+		export OFFICERS                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::OFFICERS::nv','bctlpedata10',,,,,pGroupname      ,,,'VARIABLE',,,'~','\\n',);
+		export RA                        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::RA::nv','bctlpedata10',,,,,pGroupname               ,,,'VARIABLE',,,'~','\\n',);
+		export STOCK                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::STOCKs::nv','bctlpedata10',,,,,pGroupname  ,,,'VARIABLE',,,'~','\\n',);
 
 		export dAll_filenames :=
 			  ACTIONS.dAll_filenames
@@ -833,42 +770,62 @@ module
 
 	export ny_raw :=
 	module
-
-		export master                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::master::ny','edata10',,,250,,pGroupname,,,'FIXED',,,,,);
-		export merger                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::merger::ny','edata10',,,250,,pGroupname,,,'FIXED',,,,,);
-		export Constituent               := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Constituent::ny','edata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export Country_Principal         := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Country_Principal::ny','edata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
-		export Document_Types            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Document_Types::ny','edata10',,,,,pGroupname,,,'VARIABLE',,500,,'\\n',);
-		export State_Possession          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::State_Possession::ny','edata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
-
-		export dAll_filenames :=
-			  master.dAll_filenames
-			+ merger.dAll_filenames
-			+ Constituent.dAll_filenames
-			+ Country_Principal.dAll_filenames
-			+ Document_Types.dAll_filenames
-			+ State_Possession.dAll_filenames
-			;
+	
+		export master                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::master::ny','bctlpedata10',,,252,,pGroupname,,,'FIXED',,,,,);
+		export merger                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::merger::ny','bctlpedata10',,,252,,pGroupname,,,'FIXED',,,,,);
+		export Constituent               := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Constituent::ny','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export Country_Principal         := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Country_Principal::ny','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export Document_Types            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Document_Types::ny','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,500,,'\\n',);
+		export State_Possession          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::State_Possession::ny','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
+		
+		export dAll_filenames := master.dAll_filenames
+														 + merger.dAll_filenames
+														 + Constituent.dAll_filenames
+														 + Country_Principal.dAll_filenames
+														 + Document_Types.dAll_filenames
+														 + State_Possession.dAll_filenames;
 
 	end;
+		export ny_raw_fullLoad :=
+	  module
+		
+    //Ny-Corp vendor notified that each quarterly, master file will be split into 3 small files because of huge data ,there is no change in merger file !
+		export master1                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@g1::master::ny','bctlpedata10',,,262,,pGroupname,,,'FIXED',,,,,);
+		export master2                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@g2::master::ny','bctlpedata10',,,262,,pGroupname,,,'FIXED',,,,,);
+		export master3                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@g3::master::ny','bctlpedata10',,,262,,pGroupname,,,'FIXED',,,,,);
+		export merger                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@g1::merger::ny','bctlpedata10',,,252,,pGroupname,,,'FIXED',,,,,);
+		export Constituent               := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Constituent::ny','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export Country_Principal         := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Country_Principal::ny','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export Document_Types            := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::Document_Types::ny','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,500,,'\\n',);
+		export State_Possession          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::State_Possession::ny','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,,'\\n',);
 
+		export dAll_filenames := master1.dAll_filenames
+														+ master2.dAll_filenames	
+														+ master3.dAll_filenames
+														+ merger.dAll_filenames
+														+ Constituent.dAll_filenames
+														+ Country_Principal.dAll_filenames
+														+ Document_Types.dAll_filenames
+														+ State_Possession.dAll_filenames;
+
+	end;
+	
 	export oh_raw :=
 	module
 
-		export Business_Address          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Business_Address::oh','edata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',);
-		export Agent_Contact             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Agent_Contact::oh','edata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',);
-		export Business_Associate        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Business_Associate::oh','edata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',);
-		export Business                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Business::oh','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export CountyCodeType_Table      := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CountyCodeType_Table::oh','edata10',,,,,pGroupname,,,'VARIABLE',,200,'|','\\n',);
-		export Explanation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Explanation::oh','edata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',);
-		export Text_Information          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Text_Information::oh','edata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',);
-		export Old_Name                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Old_Name::oh','edata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',);
-		export Authorized_Share          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Authorized_Share::oh','edata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',);
-		export StateCodeType_Table       := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StateCodeType_Table::oh','edata10',,,,,pGroupname,,,'VARIABLE',,100,'|','\\n',);
-		export TranCodeType_Table        := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::TranCodeType_Table::oh','edata10',,,,,pGroupname,,,'VARIABLE',,100,'|','\\n',);
-		export Document_Transaction      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Document_Transaction::oh','edata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',);
-		export shareType_Table		       := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::shareType_Table::oh','edata10',,,,,pGroupname,,,'VARIABLE',,100,'|','\\n',);
-
+		export Business_Address          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Business_Address::oh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',);
+		export Agent_Contact             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Agent_Contact::oh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',',');
+		export Business_Associate        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Business_Associate::oh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',);
+		export Business                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Business::oh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',',');
+		export CountyCodeType_Table      := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CountyCodeType_Table::oh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,200,'|','\\n',);
+		export Explanation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Explanation::oh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',);
+		export Text_Information          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Text_Information::oh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',',');
+		export Old_Name                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Old_Name::oh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',',');
+		export Authorized_Share          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Authorized_Share::oh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',);
+		export StateCodeType_Table       := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StateCodeType_Table::oh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,'|','\\n',);
+		export TranCodeType_Table        := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::TranCodeType_Table::oh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,'|','\\n',);
+		export Document_Transaction      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Document_Transaction::oh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'|','\\n',);
+		export shareType_Table		       := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::shareType_Table::oh','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,100,'|','\\n',);
 
 		export dAll_filenames :=
 			  Business_Address.dAll_filenames
@@ -891,57 +848,31 @@ module
 	export ok_raw :=
 	module
 
-		export Address                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Address::ok'		,'edata10',,,202,,pGroupname,,,'FIXED',,,,,);
-		export Agent                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Agent::ok'			,'edata10',,,511,,pGroupname,,,'FIXED',,,,,);
-		export AssocEntity               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::AssocEntity::ok','edata10',,,241,,pGroupname,,,'FIXED',,,,,);
-		export AuditLog                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::AuditLog::ok'		,'edata10',,,897,,pGroupname,,,'FIXED',,,,,);
-		export Capacity                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Capacity::ok'		,'edata10',,,66	,,pGroupname,,,'FIXED',,,,,);
-		export CorpFiling                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpFiling::ok'	,'edata10',,,175,,pGroupname,,,'FIXED',,,,,);
-		export CorpStatus                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpStatus::ok'	,'edata10',,,40	,,pGroupname,,,'FIXED',,,,,);
-		export CorpType                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorpType::ok'		,'edata10',,,96	,,pGroupname,,,'FIXED',,,,,);
-		export Entity                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Entity::ok'			,'edata10',,,515,,pGroupname,,,'FIXED',,,,,);
-		export FilingType                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::FilingType::ok'	,'edata10',,,112,,pGroupname,,,'FIXED',,,,,);
-		export NameStatus                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::NameStatus::ok'	,'edata10',,,96	,,pGroupname,,,'FIXED',,,,,);
-		export NameType                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::NameType::ok'		,'edata10',,,32	,,pGroupname,,,'FIXED',,,,,);
-		export Names                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Names::ok'			,'edata10',,,277,,pGroupname,,,'FIXED',,,,,);
-		export Officer                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Officer::ok'		,'edata10',,,550,,pGroupname,,,'FIXED',,,,,);
-		export StockType                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::StockType::ok'	,'edata10',,,80	,,pGroupname,,,'FIXED',,,,,);
-		export StockData                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::StockData::ok'	,'edata10',,,378,,pGroupname,,,'FIXED',,,,,);
-		export StockInfo                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::StockInfo::ok'	,'edata10',,,138,,pGroupname,,,'FIXED',,,,,);
-		export Suffix                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Suffix::ok'			,'edata10',,,66	,,pGroupname,,,'FIXED',,,,,);
-                                                                                                                                 
+		export AllRecs                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::all::ok','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'~');
+
 		export dAll_filenames :=
-			  Address.dAll_filenames
-			+ Agent.dAll_filenames
-			+ AssocEntity.dAll_filenames
-			+ AuditLog.dAll_filenames
-			+ Capacity.dAll_filenames
-			+ CorpFiling.dAll_filenames
-			+ CorpStatus.dAll_filenames
-			+ CorpType.dAll_filenames
-			+ Entity.dAll_filenames
-			+ FilingType.dAll_filenames
-			+ NameStatus.dAll_filenames
-			+ NameType.dAll_filenames
-			+ Names.dAll_filenames
-			+ Officer.dAll_filenames
-			+ StockType.dAll_filenames
-			+ StockData.dAll_filenames
-			+ StockInfo.dAll_filenames
-			+ Suffix.dAll_filenames
+			  AllRecs.dAll_filenames
 			;
 
 	end;
-
-	export or_raw :=
+	
+ export or_raw :=
 	module
 
-		export county_db_extract         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::county_db_extract::or','edata10',,,,,pGroupname          ,,,'VARIABLE',,8192,,,);
-		export entity_db_extract         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::entity_db_extract::or','edata10',,,,,pGroupname          ,,,'VARIABLE',,8192,,,);
-		export merger_share_db_extract   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::merger_share_db_extract::or','edata10',,,,,pGroupname   ,,,'VARIABLE',,8192,,,);
-		export name_db_extract           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::name_db_extract::or','edata10',,,,,pGroupname            ,,,'VARIABLE',,8192,,,);
-		export rel_assoc_name_db_extract := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::rel_assoc_name_db_extract::or','edata10',,,,,pGroupname  ,,,'VARIABLE',,8192,,,);
-		export tran_db_extract           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tran_db_extract::or','edata10',,,,,pGroupname            ,,,'VARIABLE',,8192,,,);
+   	//export county_db_extract         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::county_db_extract::or','bctlpedata10',,,51,,pGroupname,,,'FIXED',,,,,,false,false,false);  
+		//export entity_db_extract         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::entity_db_extract::or','bctlpedata10',,,241,,pGroupname,,,'FIXED',,,,,,false,false,false);  
+		//export merger_share_db_extract   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::merger_share_db_extract::or','bctlpedata10',,,162,,pGroupname,,,'FIXED',,,,,,false,false,false);  
+		//export name_db_extract           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::name_db_extract::or','bctlpedata10',,,336,,pGroupname,,,'FIXED',,,,,,false,false,false);      
+		//export rel_assoc_name_db_extract := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::rel_assoc_name_db_extract::or','bctlpedata10',,,484,,pGroupname,,,'FIXED',,,,,,false,false,false);  
+		//export tran_db_extract           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tran_db_extract::or','bctlpedata10',,,131,,pGroupname,,,'FIXED',,,,,,false,false,false);  
+
+    // From Dataland.
+	   export county_db_extract         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::county_db_extract::or','bctlpedata10',,,,,pGroupname          ,,,'VARIABLE',,8192,,,);
+		 export entity_db_extract         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::entity_db_extract::or','bctlpedata10',,,,,pGroupname          ,,,'VARIABLE',,8192,,,);
+		 export merger_share_db_extract   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::merger_share_db_extract::or','bctlpedata10',,,,,pGroupname   ,,,'VARIABLE',,8192,,,);
+		 export name_db_extract           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::name_db_extract::or','bctlpedata10',,,,,pGroupname            ,,,'VARIABLE',,8192,,,);
+		 export rel_assoc_name_db_extract := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::rel_assoc_name_db_extract::or','bctlpedata10',,,,,pGroupname  ,,,'VARIABLE',,8192,,,);
+		 export tran_db_extract           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tran_db_extract::or','bctlpedata10',,,,,pGroupname            ,,,'VARIABLE',,8192,,,);
 
 		export dAll_filenames :=
 			  county_db_extract.dAll_filenames
@@ -954,24 +885,25 @@ module
 
 	end;
 
+
 	export pa_raw :=
 	module
 
-		export Address                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Address::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
-		export AddressType               := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::AddressType::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
-		export Corporation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corporation::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
-		export CorporationName           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorporationName::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
-		export CorporationStatus         := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorporationStatus::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
-		export CorporationType           := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorporationType::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
-		export DocumentType              := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::DocumentType::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
-		export Filing                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Filing::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
-		export Merger                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Merger::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
-		export NameType                  := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::NameType::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
-		export Officer                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Officer::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
-		export OfficerPartyType          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::OfficerPartyType::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
-		export PartyType                 := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::PartyType::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
-		export StockOrig                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::StockOrig::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',,,,true);
-		export StockClass                := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StockClass::pa','edata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export Address                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Address::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export AddressType               := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::AddressType::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export Corporation               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corporation::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export CorporationName           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::CorporationName::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export CorporationStatus         := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorporationStatus::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export CorporationType           := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorporationType::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export DocumentType              := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::DocumentType::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export Filing                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Filing::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export Merger                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Merger::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export NameType                  := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::NameType::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export Officer                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Officer::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export OfficerPartyType          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::OfficerPartyType::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export PartyType                 := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::PartyType::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
+		export StockOrig                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::StockOrig::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',,,,true);
+		export StockClass                := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StockClass::pa','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 2000,,'\\n',);
 
 		export dAll_filenames :=
 			  Address.dAll_filenames
@@ -996,21 +928,21 @@ module
 	export ri_raw :=
 	module
 
-		export Amendments                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Amendments::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Inactive_Amendments       := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Inactive_Amendments::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Entities                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Entities::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Inactive_Entities         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Inactive_Entities::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Mergers                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Mergers::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Inactive_Mergers          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Inactive_Mergers::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Names                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Names::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Inactive_Names            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Inactive_Names::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Officers                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Officers::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Inactive_Officers         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Inactive_Officers::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Stocks                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Stocks::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export Inactive_Stocks           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Inactive_Stocks::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export corp_filings              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::corp_filings::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export country                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::country::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
-		export state                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::state::ri','edata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Amendments                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Amendments::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Inactive_Amendments       := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Inactive_Amendments::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Entities                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Entities::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Inactive_Entities         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Inactive_Entities::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Mergers                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Mergers::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Inactive_Mergers          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Inactive_Mergers::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Names                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Names::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Inactive_Names            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Inactive_Names::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Officers                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Officers::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Inactive_Officers         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Inactive_Officers::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Stocks                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Stocks::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export Inactive_Stocks           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Inactive_Stocks::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export corp_filings              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::corp_filings::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export country                   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::country::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
+		export state                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::lookup::@version@::state::ri','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,,,);
 
 		export dAll_filenames :=
 			  Amendments.dAll_filenames
@@ -1036,9 +968,9 @@ module
 	export sc_raw :=
 	module
 
-		export corpNameFile              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpNameFile::sc','edata10',,,,,pGroupname,,,'VARIABLE',, 800,,'\\n',);
-		export corpTxnFile               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpTxnFile::sc','edata10',,,,,pGroupname,,,'VARIABLE',, 800,,'\\n',);
-		export corpFile                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpFile::sc','edata10',,,,,pGroupname,,,'VARIABLE',, 800,,'\\n',);
+		export corpNameFile              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpNameFile::sc','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 800,,'\\n',);
+		export corpTxnFile               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpTxnFile::sc','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 800,,'\\n',);
+		export corpFile                  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corpFile::sc','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 800,,'\\n',);
 
 		export dAll_filenames :=
 			  corpNameFile.dAll_filenames
@@ -1047,36 +979,37 @@ module
 			;
 
 	end;
-
+		
 	export sd_raw :=
 	module
 
-		export Vender_Main               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Vender_Main::sd'				,'edata10',,,910,,pGroupname,,,'FIXED',,,,,);
-		export Vendor_Subordinate        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Vendor_Subordinate::sd'	,'edata10',,,531,,pGroupname,,,'FIXED',,,,,);
-		export StatusCodeType_Table      := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::StatusCodeType_Table::sd','edata10',,,,,pGroupname,,,'VARIABLE',,100,'\\t','\\n',);
-		export CorpFilingType_Table      := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CorpFilingType_Table::sd','edata10',,,,,pGroupname,,,'VARIABLE',,100,'\\t','\\n',);
-		export HistCodeType_Table        := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::HistCodeType_Table::sd','edata10',,,,,pGroupname,,,'VARIABLE',,100,'\\t','\\n',);
-
+		export vendor_main							 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::vendor_main::sd','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'|','\\n',);
+		export vendor_amendments				 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::vendor_amendments::sd','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'|','\\n',);
+		export vendor_ar  							 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::vendor_ar::sd','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'|','\\n',);
+	
 		export dAll_filenames :=
-			  Vender_Main.dAll_filenames
-			+ Vendor_Subordinate.dAll_filenames
-			+ StatusCodeType_Table.dAll_filenames
-			+ CorpFilingType_Table.dAll_filenames
-			+ HistCodeType_Table.dAll_filenames
-			;
+			  Vendor_Main.dAll_filenames
+			+ Vendor_amendments.dAll_filenames
+			+ Vendor_ar.dAll_filenames;
 
 	end;
 
 	export tn_raw :=
 	module
 
-		export MAIN                      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::tn_vendor::tn'				,'edata10',,,,,pGroupname,,,'VARIABLE',,450,'\\t','\\n',);
-		export BusinessTypeCode_Table    := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::BusinessTypeCode_Table::tn','edata10',,,,, pGroupname,,,'VARIABLE',,100,'\\t','\\n',);
-		export ChargeCodeDesc_Table      := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::ChargeCodeDesc_Table::tn','edata10',,,,, pGroupname,,,'VARIABLE',,350,'\\t','\\n',);
-		export CountyStateCode_Table     := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CountyStateCode_Table::tn','edata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
+		export Filing                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filing::tn'				,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'|','\\n',',');
+		export FilingName                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::filing_name::tn'		,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'|','\\n',);
+		export Party                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::party::tn'					,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'|','\\n',);
+		export AnnualReport              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::annual_report::tn'	,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'|','\\n',);
+		export BusinessTypeCode_Table    := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::BusinessTypeCode_Table::tn','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,100,'\\t','\\n',);
+		export ChargeCodeDesc_Table      := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::ChargeCodeDesc_Table::tn','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,350,'\\t','\\n',);
+		export CountyStateCode_Table     := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::CountyStateCode_Table::tn','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,100,,'\\n',);
 
 		export dAll_filenames :=
-			  MAIN.dAll_filenames
+			  Filing.dAll_filenames
+			+	FilingName.dAll_filenames
+			+	Party.dAll_filenames
+			+	AnnualReport.dAll_filenames
 			+ BusinessTypeCode_Table.dAll_filenames
 			+ ChargeCodeDesc_Table.dAll_filenames
 			+ CountyStateCode_Table.dAll_filenames
@@ -1087,9 +1020,9 @@ module
 	export tx_raw :=
 	module
 
-		export Master              			 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::master::tx','edata10',,,,,pGroupname,,,'VARIABLE',, ,,'\\n',);
-		export nonprofitsubtype          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::nonprofitsubtype::tx','edata10',,,,,pGroupname,,,'VARIABLE',, 100,,'\\n',);
-		export mem_part_offi_title       := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::mem_part_offi_title::tx','edata10',,,,,pGroupname,,,'VARIABLE',, 200,'\\|','\\n',);
+		export Master              			 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::master::tx','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, ,,'\\n',);
+		export nonprofitsubtype          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::nonprofitsubtype::tx','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 100,,'\\n',);
+		export mem_part_offi_title       := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::mem_part_offi_title::tx','bctlpedata10',,,,,pGroupname,,,'VARIABLE',, 200,'\\|','\\n',);
 
 		export dAll_filenames :=
 			  Master.dAll_filenames
@@ -1102,7 +1035,7 @@ module
 	export txbus_raw :=
 	module
 
-		export ftact                      := VersionControl.mInputFileNameVersions(lthor + 'in::Corp2::@version@::ftact::txbus'		,'edata10',,,218,,pGroupname,,,'FIXED',,,,,);
+		export ftact                      := VersionControl.mInputFileNameVersions(lthor + 'in::Corp2::@version@::ftact::txbus'		,'bctlpedata10',,,218,,pGroupname,,,'FIXED',,,,,);
 
 		export dAll_filenames :=
 			  ftact.dAll_filenames
@@ -1113,9 +1046,9 @@ module
 	export ut_raw :=
 	module
 
-		export Busentity1             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Busentity::ut','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export Busentity2             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Principals::ut','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
-		export Busentity3             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Businfo::ut','edata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
+		export Busentity1             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Busentity::ut','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
+		export Busentity2             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Principals::ut','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
+		export Busentity3             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Businfo::ut','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,,'\\n',);
           
 		export dAll_filenames :=
 			  Busentity1.dAll_filenames
@@ -1125,13 +1058,29 @@ module
 
 	end;
 
-	export va_raw :=
+		export va_raw :=
 	module
 
-		export corps                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corps::va','edata10',,,RECFMVB_RECSIZE,,pGroupname,,,'FIXED',,,,,);
+		export Corps          := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corps::va','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export LLC            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::LLC::va','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export LP             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::LP::va','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export Merger         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Merger::va','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export NamesHist      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::NamesHist::va','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export Officer        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Officer::va','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export Amendmt        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Amendment::va','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export ResrvdName     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::ResrvdName::va','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export Tables         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Tables::va','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
 
 		export dAll_filenames :=
-			  corps.dAll_filenames
+			  corps.dAll_filenames 
+			+ LLC.dAll_filenames
+			+ LP.dAll_filenames
+			+ Merger.dAll_filenames
+			+ NamesHist.dAll_filenames
+      + Officer.dAll_filenames
+			+ Amendmt.dAll_filenames
+			+ ResrvdName.dAll_filenames
+			+ Tables.dAll_filenames
 			;
 
 	end;
@@ -1139,35 +1088,65 @@ module
 	export vt_raw :=
 	module
 
-		export LLC_VendorData            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::LLC_VendorData::vt'				,'edata10',,,2600	,,pGroupname,,,'FIXED',,,,,);
-		export vendor_Data               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::vendor_Data::vt'					,'edata10',,,720	,,pGroupname,,,'FIXED',,,,,);
-		export Tradenames_VendorData     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Tradenames_VendorData::vt','edata10',,,495	,,pGroupname,,,'FIXED',,,,,);
-		export corpCountryState_table    := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::corpCountryState_table::vt','edata10',,,,,pGroupname,,,'VARIABLE',,250,'\\t','\\n',);
+		export Domestic_LLC_Bus     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::dom_llc_bus::vt'       ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+ 		export Domestic_MBE_Bus     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::dom_mbe_bus::vt'       ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export Domestic_NPC_Bus     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::dom_npc_bus::vt'       ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export Domestic_Prof_Bus    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::dom_prof_bus::vt'      ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export Domestic_LLC_Prin    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::dom_llc_prn::vt'       ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+ 		export Domestic_MBE_Prin    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::dom_mbe_prn::vt'       ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export Domestic_NPC_Prin    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::dom_npc_prn::vt'       ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export Domestic_Prof_Prin   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::dom_prof_prn::vt'      ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+ 		export Foreign_LLC_Bus      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::for_llc_bus::vt'       ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export Foreign_NPC_Bus      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::for_npc_bus::vt'       ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export Foreign_Prof_Bus     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::for_prof_bus::vt'      ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export Foreign_LLC_Prin     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::for_llc_prn::vt'       ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export Foreign_NPC_Prin     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::for_npc_prn::vt'       ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export Foreign_Prof_Prin    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::for_prof_prn::vt'      ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+    export Partnerships_Bus     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::pships_bus::vt'        ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export Partnerships_Prin    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::pships_prn::vt'        ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+    export TradeNames_Bus       := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::trade_names_bus::vt'   ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export TradeNames_Prin      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::trade_names_prn::vt'   ,'bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
+		export TradeNames_Owners    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::trade_names_owners::vt','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,,'\\,','\\n',);
 
 		export dAll_filenames :=
-			  LLC_VendorData.dAll_filenames
-			+ vendor_Data.dAll_filenames
-			+ Tradenames_VendorData.dAll_filenames
-			+ corpCountryState_table.dAll_filenames
+			 Domestic_LLC_Bus.dAll_filenames
+			+ Domestic_MBE_Bus.dAll_filenames
+			+ Domestic_NPC_Bus.dAll_filenames
+			+ Domestic_Prof_Bus.dAll_filenames
+			+ Domestic_LLC_Prin.dAll_filenames
+			+ Domestic_MBE_Prin.dAll_filenames
+			+ Domestic_NPC_Prin.dAll_filenames
+			+ Domestic_Prof_Prin.dAll_filenames
+			+ Foreign_LLC_Bus.dAll_filenames
+			+ Foreign_NPC_Bus.dAll_filenames
+			+ Foreign_Prof_Bus.dAll_filenames
+			+ Foreign_LLC_Prin.dAll_filenames
+			+ Foreign_NPC_Prin.dAll_filenames
+			+ Foreign_Prof_Prin.dAll_filenames
+			+ Partnerships_Bus.dAll_filenames
+			+ Partnerships_Prin.dAll_filenames
+			+ TradeNames_Bus.dAll_filenames
+			+ TradeNames_Prin.dAll_filenames
+			+ TradeNames_Owners.dAll_filenames
 			;
 
 	end;
 
 	export wa_raw :=
-	module
-
-		export Wa_Vendor_Data            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Wa_Vendor_Data::wa','edata10',,,467,,pGroupname,,,'FIXED',,,,,);
-
-		export dAll_filenames :=
-			  Wa_Vendor_Data.dAll_filenames
-			;
-
+		module
+	
+			export Wa_Vendor_Data            := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Wa_Vendor_Data::wa','bctlpedata10',,,,,pGroupname,,,'XML','Corporation',512*500,,,); 
+	
+			export dAll_filenames :=
+				  Wa_Vendor_Data.dAll_filenames
+				;
+	
 	end;
 
 	export wi_raw :=
 	module
 
-		export comfichex                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::comfichex::wi','edata10',,,,,pGroupname,,,'VARIABLE',,140,,,'\"');
+		export comfichex                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::comfichex::wi','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,140,,,',');
 
 		export dAll_filenames :=
 			  comfichex.dAll_filenames
@@ -1178,26 +1157,36 @@ module
 	export wv_raw :=
 	module
 
-		export Business	                 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::business::wv','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\|','\\n',);
-		export Party										 := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::party::wv','edata10',,,,,pGroupname,,,'VARIABLE',,800,'\\|','\\n',);
-		export Status                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::status::wv','edata10',,,,,pGroupname,,,'VARIABLE',,800,'\\|','\\n',);
-		export Stock                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::stock::wv','edata10',,,,,pGroupname,,,'VARIABLE',,800,'\\|','\\n',);
-
+		export ds_Addresses	     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::addresses::wv','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000000,'\\~','\\n',);
+		export ds_subsidiaries   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::subsidiaries::wv','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000000,'\\~','\\n',);
+		export ds_amendments     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::amendments::wv','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000000,'\\~','\\n',);
+		export ds_annualreports  := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::annualreports::wv','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000000,'\\~','\\n',);
+		export ds_corporations   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corporations::wv','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000000,'\\~','\\n',);
+		export ds_dbas           := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::dbas::wv','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000000,'\\~','\\n',);
+		export ds_mergers        := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::mergers::wv','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000000,'\\~','\\n',);
+		export ds_namechanges    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::namechanges::wv','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000000,'\\~','\\n',);
+		export ds_Dissolutions   := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::dissolutions::wv','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000000,'\\~','\\n',);
+		
 		export dAll_filenames :=
-			  Business.dAll_filenames
-			+ Party.dAll_filenames
-			+ Status.dAll_filenames
-			+ Stock.dAll_filenames
+			  ds_Addresses.dAll_filenames
+			+ ds_subsidiaries .dAll_filenames
+			+ ds_amendments.dAll_filenames
+			+ ds_annualreports.dAll_filenames
+			+ ds_corporations.dAll_filenames
+			+ ds_dbas.dAll_filenames
+			+ ds_mergers.dAll_filenames
+			+ ds_namechanges.dAll_filenames
+			+ ds_Dissolutions.dAll_filenames
 			;
 	
 	end;
 			
 	export wy_raw :=
 	module
-
-		export Filing                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Filing::wy','edata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\|','\\n',);
-		export Filing_Annual_Report      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Filing_Annual_Report::wy','edata10',,,,,pGroupname,,,'VARIABLE',,800,'\\|','\\n',);
-		export Party                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Party::wy','edata10',,,,,pGroupname,,,'VARIABLE',,800,'\\|','\\n',);
+	
+		export Filing                    := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Filing::wy','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,1000,'\\|','\\n',',');
+		export Filing_Annual_Report      := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Filing_Annual_Report::wy','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'\\|','\\n',',');
+		export Party                     := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Party::wy','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,800,'\\|','\\n',);
 
 		export dAll_filenames :=
 			  Filing.dAll_filenames
@@ -1244,6 +1233,7 @@ module
 		+ nm_raw.dAll_filenames
 		+ nv_raw.dAll_filenames
 		+ ny_raw.dAll_filenames
+		+ ny_raw_fullLoad.dAll_filenames
 		+ oh_raw.dAll_filenames
 		+ ok_raw.dAll_filenames
 		+ or_raw.dAll_filenames
@@ -1260,6 +1250,6 @@ module
 		+ wa_raw.dAll_filenames
 		+ wi_raw.dAll_filenames
 		+ wv_raw.dAll_filenames
-		+ wy_raw.dAll_filenames
+		+ wy_raw.dAll_filenames : INDEPENDENT;
 		;
 end;

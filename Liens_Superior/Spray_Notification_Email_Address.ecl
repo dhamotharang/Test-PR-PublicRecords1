@@ -1,1 +1,1 @@
-export Spray_Notification_Email_Address := 'avenkatachalam@seisint.com;dqi@seisint.com;vniemela@seisint.com';
+export Spray_Notification_Email_Address := 'roxiebuilds@seisint.com;kgummadi@seisint.com';

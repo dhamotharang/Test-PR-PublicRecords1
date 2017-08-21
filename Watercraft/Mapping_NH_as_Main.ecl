@@ -47,7 +47,9 @@ watercraft_toilet_desc(string1 code)
 
 file_in := DEDUP(SORT(Watercraft.file_NH_clean_in,reg_num, reg_date), reg_num, reg_date);
 
-watercraft.Macro_Is_hull_id_in_MIC(file_in, watercraft.Layout_NH_clean_in, wDatasetwithflag)
+Watercraft.Macro_Clean_Hull_ID(file_in, watercraft.Layout_NH_clean_in,hull_clean_in)
+
+watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.Layout_NH_clean_in, wDatasetwithflag)
 
 watercraft.Layout_Watercraft_Main_Base main_mapping_format(wDatasetwithflag L) := transform
 

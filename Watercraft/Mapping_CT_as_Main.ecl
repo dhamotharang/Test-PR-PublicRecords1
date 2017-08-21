@@ -28,8 +28,9 @@ reg_status_desc(string1 code)
 := case(code, 'A' => 'ACTIVE',
               'B' => 'INACTIVE', '');
 
+Watercraft.Macro_Clean_Hull_ID(Watercraft.file_CT_clean_in, watercraft.Layout_CT_clean_in,hull_clean_in)
 
-watercraft.Macro_Is_hull_id_in_MIC(Watercraft.file_CT_clean_in, watercraft.Layout_CT_clean_in, wDatasetwithflag)
+watercraft.Macro_Is_hull_id_in_MIC(hull_clean_in, watercraft.Layout_CT_clean_in, wDatasetwithflag)
 
 watercraft.Layout_Watercraft_Main_Base main_mapping_format(wDatasetwithflag L) := transform
 

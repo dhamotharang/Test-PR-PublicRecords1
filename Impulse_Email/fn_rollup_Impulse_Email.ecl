@@ -47,7 +47,7 @@ layouts.layout_Impulse_Email_Dates_append RollUpTrans(srtIERecAll L, srtIERecAll
 ruIERec	:=	ROLLUP(srtIERecAll, 
 												 TRIM(left.EMAIL) 			= TRIM(right.EMAIL)
 										 AND TRIM(left.FIRSTNAME) 	= TRIM(right.FIRSTNAME)
-										 AND TRIM(left.MIDDLENAME)	= TRIM(right.MIDDLENAME)
+										 // AND TRIM(left.MIDDLENAME)	= TRIM(right.MIDDLENAME)
 										 AND TRIM(left.LASTNAME) 		= TRIM(right.LASTNAME)
 										 AND TRIM(left.ADDRESS1) 		= TRIM(right.ADDRESS1)
 										 AND TRIM(left.ADDRESS2) 		= TRIM(right.ADDRESS2)

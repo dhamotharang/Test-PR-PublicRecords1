@@ -3,6 +3,7 @@ import aid;
 EXPORT Layout_BusReg_Company := RECORD
 UNSIGNED6 bdid;
 UNSIGNED6 br_id;     //Linking field to contact records
+STRING25  ADCRecordNo;  // New persistent vendor field - 05/07/2014
 STRING8   dt_first_seen;
 STRING8   dt_last_seen;
 STRING1   record_type;

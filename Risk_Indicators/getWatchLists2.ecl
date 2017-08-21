@@ -5,8 +5,8 @@ export getWatchLists2(GROUPED DATASET(Layout_Output) inl, boolean ofac_only = fa
 				dataset(iesp.share.t_StringArrayItem) watchlists_requested=dataset([], iesp.share.t_StringArrayItem), 
 				dataset(Gateway.Layouts.Config) gateways = dataset([], Gateway.Layouts.Config)) := FUNCTION
 
-r_threshold_score := map(global_watchlist_threshold = 0.00 and ofac_version <= 3 => Patriot.Constants.DEF_THRESHOLD, 
-												global_watchlist_threshold = 0.00 => Patriot.Constants.DEF_THRESHOLD_V4,
+r_threshold_score := map(global_watchlist_threshold = 0.00 and ofac_version < 4 => OFAC_XG5.Constants.DEF_THRESHOLD_REAL, 
+												global_watchlist_threshold = 0.00 and ofac_version  >= 4 => OFAC_XG5.Constants.DEF_THRESHOLD_KeyBank_REAL, 
 												global_watchlist_threshold < Patriot.Constants.MIN_THRESHOLD => Patriot.Constants.MIN_THRESHOLD,
 												global_watchlist_threshold > Patriot.Constants.MAX_THRESHOLD => Patriot.Constants.MAX_THRESHOLD,
 												global_watchlist_threshold);
@@ -197,28 +197,57 @@ OFAC_XG5.Layout.InputLayout XG5prep(inForm le) := TRANSFORM
 		dobTemp := if(le.dob = '', '', le.dob[5..6] + '/' + le.dob[7..8] + '/' + le.dob[1..4]);
 	SELF.DOB := dobTemp;
 	SELF.country := le.country;
-	SELF.searchType := le.search_type;
+	SELF.searchType := if(trim(search_string) = '', 'E', le.search_type);  // E search type means there is no value in the search string do not call gateway
 	SELF := [];
 	
 END;
  
  DDInform := dedup(sort(inForm, seq, name_first, name_middle, name_last, name_unparsed), seq,  name_first, name_middle, name_last, name_unparsed); 
- prep_XG5 := project(ungroup(DDInform), XG5prep(left));  
+ prep_XG5 := project(ungroup(DDInform), XG5prep(left)); 
+ 
+ boolean validSearch := count(prep_XG5(searchType <> 'E')) > 0 ;
+ 
+ gateways_XG5 := if(validSearch, gateways, dataset([], Gateway.Layouts.Config));
 
- XG5_ptys := OFAC_XG5.OFACXG5call(prep_XG5, 
+ XG5_ptys := OFAC_XG5.OFACXG5call(prep_XG5(searchType <> 'E'), 
 																	ofac_only ,
-																	(global_watchlist_threshold * 100) , 
+																	(r_threshold_score * 100) , 
 																	include_ofac,
 																	include_Additional_watchlists,
 																	dob_radius ,
 																	watchlists_requested,
-																	gateways);
+																	gateways_XG5);
 																	 
  XG5Parsed := OFAC_XG5.OFACXG5_Watchlist2_Response(XG5_ptys);
  
  XG5Formatted	:= OFAC_XG5.FormatXG5_Watchlist2(XG5Parsed);
  
- AddXG5back := join(inl, XG5Formatted, left.seq = right.seq,
+ BlankXG5 := Project(prep_XG5(searchType = 'E'), transform(Risk_Indicators.layout_output,
+												self := left;
+												self.watchlists := [];	
+												// keep these fields here for all of our legacy products still using them
+												SELF.watchlist_table := '';
+												SELF.watchlist_program := '';
+												SELF.watchlist_record_number := '';
+												SELF.watchlist_contry := '';
+												SELF.watchlist_fname := '';
+												SELF.watchlist_lname := '';
+												SELF.watchlist_address := '';
+												SELF.WatchlistPrimRange := '';
+												SELF.WatchlistPreDir := '';
+												SELF.WatchlistPrimName := '';
+												SELF.WatchlistAddrSuffix := '';
+												SELF.WatchlistPostDir := '';
+												SELF.WatchlistUnitDesignation := '';
+												SELF.WatchlistSecRange := '';
+												SELF.watchlist_city := '';
+												SELF.watchlist_state := '';
+												SELF.watchlist_zip := '';
+												SELF.watchlist_entity_name := '';
+	
+												self := [];));
+ 
+ AddXG5back := join(inl, (XG5Formatted + BlankXG5), left.seq = right.seq,
 										transform(Risk_Indicators.layout_output, 	
 	// keep these fields here for all of our legacy products still using them
 										SELF.watchlist_table := right.watchlist_table;
@@ -248,7 +277,6 @@ END;
  
 WLResults := if(ofac_version = 4, group(AddXG5back,seq), pj3);			
 		
-
 
 RETURN WLResults;
 

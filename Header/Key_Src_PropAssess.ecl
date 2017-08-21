@@ -7,7 +7,7 @@ end;
 
 export Key_Src_PropAssess(boolean pFastHeader = false, boolean pCombo = true, dataset(src_rec) pDataset=dataset([],src_rec)) := function
 
-dAS_as_Source := if(pCombo,pDataset,ln_propertyv2.ln_propertyv2_as_source(pFastHeader).ln_propertyv2_tax_as_source);
+dAS_as_Source := if(pCombo,pDataset,header.Files_SeqdSrc(pFastHeader).FAT);
 
 mac_key_src(dAS_as_Source, LN_Property.Layout_Property_Common_Model_BASE, 
 						asses_child, 

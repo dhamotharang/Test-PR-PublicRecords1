@@ -21,6 +21,7 @@ sm_rec := record
 	inf.prim_name;
 	inf.zip;
     inf.sec_range;
+	inf.RawAID; 
 	end;
 
 //****** Slim down the infile
@@ -44,34 +45,21 @@ header.Layout_PairMatch tra(me_use ll, me_use r) := transform
 //		 Loose dob, name_suffix, ssn, vendor_id
 //	     Keep the lower ID as the new_rid
 
-phones_match(string p1, string p2) := 
-	p1 = p2 or 
-	stringlib.stringfind(p1, p2, 1) > 0 or
-	stringlib.stringfind(p2, p1, 1) > 0;
-
-suffix_unk(string s1, string s2) := 
- s1='UNK' and s2='UNK' or 
- s1='UNK' and s2='' or
- s1='' and s2='UNK';
+//****** Join the infile to itself
 
 j := join(me_use,me_use,
-                left.zip=right.zip and
-                left.prim_name=right.prim_name and
-                left.prim_range=right.prim_range and
-                left.lname=right.lname and
-                left.fname=right.fname and
-                left.did=right.did and
-                left.rid < right.rid and
-               (mdr.isSourceGroupMatch(left.src,right.src) or 
-			left.src=right.src and ~mdr.Source_is_on_Probation(left.src) and
-			left.vendor_id[1..2]=right.vendor_id[1..2])and
-               (ut.NNEQ_Suffix(left.name_suffix, right.name_suffix) or 
-					suffix_unk(left.name_suffix,right.name_suffix))and
-               header.near_dob(left.dob,right.dob) and
-			   ut.Firstname_Match(left.mname,right.mname)>0 and
-			   ut.NNEQ(left.ssn,right.ssn) and
-			   ut.NNEQ(left.sec_range,right.sec_range) and 
-			   phones_match(left.phone, right.phone),
+                header.fn_bm_lr_commonality(left.fname,left.lname,left.prim_range,left.prim_name,left.zip,
+				                            right.fname,right.lname,right.prim_range,right.prim_name,right.zip,
+							                left.mname,right.mname,
+							                left.name_suffix,right.name_suffix,
+							                left.sec_range,right.sec_range,
+							                left.phone,right.phone,
+							                left.src,right.src,
+											left.RawAID,right.RawAID) and
+                left.did=right.did                  and
+                left.rid < right.rid                and
+                header.near_dob(left.dob,right.dob) and
+			    ut.NNEQ(left.ssn,right.ssn),
                 tra(left,right));
                 
 sj := sort(distribute(j,old_rid),old_rid,new_rid,local);

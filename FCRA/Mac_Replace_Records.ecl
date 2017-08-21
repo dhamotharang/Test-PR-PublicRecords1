@@ -6,7 +6,7 @@ export Mac_Replace_Records(fulldataset,updates,fieldstojoin,replaceds) := macro
 
 	// fulldataset - the superfile contains all historical updates
 	// updates - the superfile contains the most recent update
-	// fieldstojoin - 
+	// fieldstojoin - the field that uniquely identifies the record
 	#uniquename(replacerecs)
 	#uniquename(distfull)
 	#uniquename(distupdates)

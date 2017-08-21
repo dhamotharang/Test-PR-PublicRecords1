@@ -1,14 +1,22 @@
 import ut, did_add, header_slimsort, didville,watchdog,doxie,header,DriversV2,codes;
 
-File_Dl:=dedup(sort(distribute(DriversV2.File_Dl,hash(did)),did, history, -dt_last_seen, -dt_first_seen,local),did,local);
+// replace BestDL.curr with watchdog.BestDL.curr after Certegy and new logic is incorporated there
 
-cl:=distribute(File_compID_list,hash(did));
-cw:=distribute(file_compid_best,hash(did));
-cd:=distribute(File_delta,hash(did));
+cid_list	:=distribute(File_compID_list,hash(did));
+best_cid	:=distribute(file_compid_best,hash(did));
+// changes in delta records are labeled as follow:
+// assigned_did=0; the link id still exist in the new best_compid but at least one field changed
+// assigned_did=1; indicates a new link id
+// assigned_did=2; the link id no longer exist in watchdog nor the row id (rid) exist in header -possibly dedupped during header.last_rollup.
+// assigned_did>2 and did=assigned_did represents a splits of the previous link id; assigned_did is the new link id of the record with the lowest rid.
+// assigned_did>2 and did<>assigned_did indicates a collapses of the previous link id; assigned_did is the link id it collapsesd into.
+cid_delta	:=distribute(File_delta,hash(did));
 
-new_best:=join(cw, cd(assigned_did=0), left.did=right.did, transform(left), local);
+// create a best_cid record set for link ids that changed
+changes0:=join(best_cid, cid_delta(assigned_did=0), left.did=right.did, transform(left), local);
 
-Layout_compID_out tr1(cl l, new_best r) := transform
+// obtain the best info for link ids that changed that are in cid_list
+Layout_compID_out tr1(cid_list l, changes0 r) := transform
 	self.last_name			:=r.lname;
 	self.first_name			:=r.fname;
 	self.middle_name		:=r.mname;
@@ -16,13 +24,13 @@ Layout_compID_out tr1(cl l, new_best r) := transform
 	self.dob				:=(string8)r.dob[3..8];
 	self.ssn				:=r.ssn;
 	self.Zip_Code			:=r.zip;
-	self.Address_1			:=	trim(r.prim_range)
-							+' '+trim(r.predir)
-							+' '+trim(r.prim_name)
-							+' '+trim(r.suffix)
-							+' '+trim(r.postdir);
-	self.Address_2			:=	trim(r.unit_desig)
-							+' '+trim(r.sec_range);
+	self.Address_1			:=	stringlib.stringcleanspaces(trim(r.prim_range)
+														+' '+trim(r.predir)
+														+' '+trim(r.prim_name)
+														+' '+trim(r.suffix)
+														+' '+trim(r.postdir));
+	self.Address_2			:=	stringlib.stringcleanspaces(trim(r.unit_desig)
+														+' '+trim(r.sec_range));
 	self.City				:=r.city_name;
 	self.State				:=r.st;
 	self.ZIP4				:=r.zip4;
@@ -36,71 +44,55 @@ Layout_compID_out tr1(cl l, new_best r) := transform
 	self:=[];
 end;
 
-deltas:=join(cl, new_best, left.did=right.did, tr1(left,right), local);
+// create a record set of link ids that changed that are in cid_list
+changes:=join(cid_list, changes0, left.did=right.did, tr1(left,right), local);
 
-shifts:=join(cl, cd(assigned_did>2)
+// create a record set of link ids that splits or collapsesd that are in cid_list
+shifts:=join(cid_list, cid_delta(assigned_did>2)
 				,left.did=right.assigned_did
-				,transform({cd.did
-							,cd.assigned_did}
+				,transform({cid_delta.did
+							,cid_delta.assigned_did
+							,cid_delta.Original_State}
 								,self:=right)
 				,lookup
 				,local);
 
-split:=project(shifts(assigned_did=did)
+// create a record set of link ids that splits and are in cid_list
+splits:=project(shifts(assigned_did=did)
 								,transform({Layout_compID_out}
+										,self.state:=left.Original_State
+										,self.Original_State:=left.Original_State
 										,self.Original_CID_ADL:=(string16)intformat(left.did,16,1)
 										,self.adl_stability_flag:='S'
+										,self.cr:='\n'
 										,self:=[]
 												));
 
-Layout_compID_out tr2(cw l, shifts r) := transform
-	self.last_name			:=l.lname;
-	self.first_name			:=l.fname;
-	self.middle_name		:=l.mname;
-	self.Suffix				:=l.name_suffix;
-	self.dob				:=(string8)l.dob[3..8];
-	self.ssn				:=l.ssn;
-	self.Zip_Code			:=l.zip;
-	self.Address_1			:=	trim(l.prim_range)
-							+' '+trim(l.predir)
-							+' '+trim(l.prim_name)
-							+' '+trim(l.suffix)
-							+' '+trim(l.postdir);
-	self.Address_2			:=	trim(l.unit_desig)
-							+' '+trim(l.sec_range);
-	self.City				:=l.city_name;
-	self.State				:=l.st;
-	self.ZIP4				:=l.zip4;
-	self.DOD_Ind			:=if(l.DOD<>'','Y','');
-	self.DOD				:=l.DOD[3..6];
-	self.original_state		:='';
-	self.Original_CID_ADL	:=(string16)intformat(r.did,16,1);
-	self.new_cid_adl		:=(string16)intformat(r.assigned_did,16,1);
-	self.adl_stability_flag	:='C';
-	self.cr					:='\n';
-	self:=l;
-	self:=[];
-end;
-
-collapse:=join(cw, shifts(assigned_did<>did)
-					,left.did=right.assigned_did
-					,tr2(left,right)
-					,lookup
-					,local);
+// create a record set of link ids that collapsesd and are in cid_list
+collapses:=project(shifts(assigned_did<>did)
+								,transform({Layout_compID_out}
+										,self.state:=left.Original_State
+										,self.Original_State:=left.Original_State
+										,self.Original_CID_ADL:=(string16)intformat(left.did,16,1)
+										,self.adl_stability_flag:='C'
+										,self.cr:='\n'
+										,self:=[]
+												));
 
 h:=header.file_headers;
-segmented_wdog := distribute(Header.fn_ADLSegmentation(h).core_check,hash(did));
-wdog_with_ind := JOIN(distribute(file_compid_best,hash(did)),segmented_wdog
+segmented_header := distribute(Header.fn_ADLSegmentation(h).core_check,hash(did));
+// append segmentation indicator to best_cid
+bcid_with_ind := JOIN(best_cid, segmented_header
 					,left.did=right.did
-					,transform({file_compid_best,segmented_wdog.ind}
-								,self.ind:=right.ind
-								,self:=left)
+					,transform({best_cid
+								,segmented_header.ind}
+									,self:=left
+									,self:=right)
 					,LOCAL)
-					 :persist('~thor_data400::persist::compid::wdog_with_ind')
+					 :persist('~thor_data400::persist::compid::bcid_with_ind')
 					;
 
-Layout_compID_out tr_wdog(cl l, wdog_with_ind r) :=transform
-
+Layout_compID_out tr_wdog(cid_list l, bcid_with_ind r) :=transform
 	threshld :=15;
 	integer YYYYMMDDToDays(string pInput) :=	(((integer)(pInput[1..4])*365)
 											+	((integer)(pInput[5..6])*30)
@@ -108,9 +100,8 @@ Layout_compID_out tr_wdog(cl l, wdog_with_ind r) :=transform
 	today := YYYYMMDDToDays(ut.GetDate);
 	of_age :=(integer)((today - YYYYMMDDToDays((string) r.dob)) / 365) >= threshld;
 
-	//even if the record ADLd, do not send it back if it is not in watchdog
+	//send new CORES if it is of age and not dead
 	boolean new_core 		:= l.did=0 and r.ind='CORE' and r.dod='' and of_age;
-
 
 	self.last_name			:=r.lname;
 	self.first_name			:=r.fname;
@@ -119,19 +110,19 @@ Layout_compID_out tr_wdog(cl l, wdog_with_ind r) :=transform
 	self.dob				:=(string8)r.dob[3..8];
 	self.ssn				:=r.ssn;
 	self.Zip_Code			:=r.zip;
-	self.Address_1			:=	trim(r.prim_range)
-							+' '+trim(r.predir)
-							+' '+trim(r.prim_name)
-							+' '+trim(r.suffix)
-							+' '+trim(r.postdir);
-	self.Address_2			:=	trim(r.unit_desig)
-							+' '+trim(r.sec_range);
+	self.Address_1			:=	stringlib.stringcleanspaces(trim(r.prim_range)
+														+' '+trim(r.predir)
+														+' '+trim(r.prim_name)
+														+' '+trim(r.suffix)
+														+' '+trim(r.postdir));
+	self.Address_2			:=	stringlib.stringcleanspaces(trim(r.unit_desig)
+														+' '+trim(r.sec_range));
 	self.City				:=r.city_name;
 	self.State				:=r.st;
 	self.ZIP4				:=r.zip4;
 	self.DOD_Ind			:=if(r.DOD<>'','Y','');
 	self.DOD				:=r.DOD[3..6];
-	self.original_state		:='';
+	self.original_state		:=r.st;
 	self.Original_CID_ADL	:='';
 	self.new_cid_adl		:=if(new_core,(string16)intformat(r.did,16,1),'');
 	self.adl_stability_flag	:='';
@@ -140,18 +131,17 @@ Layout_compID_out tr_wdog(cl l, wdog_with_ind r) :=transform
 	self:=[];
 end;
 
-with_wdog :=join(cl,distribute(wdog_with_ind,hash(did))
+// obtain new qualifying CORES
+new_cores :=join(cid_list,distribute(bcid_with_ind,hash(did))
 				,left.did=right.did
 				,tr_wdog(left,right)
-				,right outer
-				,local)	:persist('~thor_data400::persist::compid::wdog');
+				,right only
+				,local)(new_cid_adl<>'')	:persist('~thor_data400::persist::compid::new_cores');
 
-new_cores:=with_wdog(new_cid_adl<>'');
-append_dl:=	deltas
-			+collapse
-			+new_cores;
+changes_n_new_cores0 := changes + new_cores;
 
-Layout_compID_out tr_dl(append_dl l,File_Dl r) :=transform
+// append DL to changes and new CORES
+Layout_compID_out tr_dl(changes_n_new_cores0 l,File_Curr_BestDL r) :=transform
 	self.Gender						:=r.sex_flag;
 	self.License_Number				:=r.dl_number;
 	self.License_Type				:=r.license_type;
@@ -162,17 +152,16 @@ Layout_compID_out tr_dl(append_dl l,File_Dl r) :=transform
 		and stringlib.stringfind(stringlib.stringtouppercase(type_desc+class_desc),'NON-COMMER',1)=0
 		,'Y','');
 	self.License_Restrictions		:=r.restrictions;
-	self.License_State				:=r.state;
+	self.License_State				:=stringlib.stringfilterout(r.state,'0123456789');
 	self.License_Issue_Date			:=r.lic_issue_date[3..8];
 	self.License_Expiration_Date	:=r.expiration_date[3..8];
 	self:=l;
 end;
 
-// append DL
-out0 := join(distribute(append_dl,hash((unsigned6)new_cid_adl)),File_Dl
-				,(unsigned6)left.new_cid_adl=right.did
-				,tr_dl(left,right)
-				,left outer
-				,local) + split  :persist('~thor_data400::persist::compid::out0');
+changes_n_new_cores := join(distribute(changes_n_new_cores0,hash((unsigned6)new_cid_adl)),File_Curr_BestDL
+												,(unsigned6)left.new_cid_adl=right.did
+												,tr_dl(left,right)
+												,left outer
+												,local);
 
-export compID_monthly := out0;
+export compID_monthly := changes_n_new_cores + splits + collapses :persist('persist::compid::compID_monthly');

@@ -1,9 +1,9 @@
 IMPORT tools, ut;
 
-EXPORT Build_Base_Education(STRING pversion,
-												    DATASET(Layouts.Base.Education) inEducationBase,
+EXPORT Build_Base_Education(STRING 													 pversion,
+												    DATASET(Layouts.Base.Education)  inEducationBase,
 												    DATASET(Layouts.Input.Education) inEducationUpdate,
-														DATASET(Layouts.Input.Schools) inSchoolCodes) := MODULE
+														DATASET(Layouts.Input.Schools) 	 inSchoolCodes) := MODULE
 
 	TrimUpper(STRING s) := FUNCTION
 		RETURN TRIM(StringLib.StringToUppercase(s), LEFT, RIGHT);
@@ -85,7 +85,8 @@ EXPORT Build_Base_Education(STRING pversion,
 																				LOOKUP);
 	
 	// Return
-	tools.mac_WriteFile(Filenames(pversion).Base.Education.New, baseEducationPlusDescriptions, Build_Base_File);
+	tools.mac_WriteFile(Filenames(pversion).Base.Education.New, baseEducationPlusDescriptions,
+	                       Build_Base_File);
 
 	EXPORT full_build := SEQUENTIAL(Build_Base_File,
 			                            Promote(pversion).buildfiles.New2Built);

@@ -1,4 +1,4 @@
-import drivers, crim_common, sexoffender;
+import drivers, crim_common, sexoffender, hygenics_crim, ut;
 
 // DL
 DLfiles := drivers.File_Dl(orig_state = 'FL');
@@ -13,17 +13,17 @@ END;
 justDLid := PROJECT(DLfiles, stripDLs(LEFT));
 
 // public
-DOCpublicFiles := Crim_Common.File_Moxie_Crim_Offender2_Prod;
+DOCpublicFiles := hygenics_crim.File_Moxie_Crim_Offender2_Dev;
+DOCFiles 				:= DOCpublicFiles(data_type='1');
 
-Images.Layout_idDID stripPublicDOCs (DOCpublicFiles L) :=
-TRANSFORM
-	SELF.state := L.state_origin;
-	SELF.rtype := 'DC';
-	SELF.id := L.doc_num;
-	SELF.did := (unsigned)L.did;
-END;
-justDOCid := PROJECT(DOCpublicFiles, stripPublicDOCs(LEFT));
-
+	Layout_idDID stripPublicDOCs(DOCFiles L) := TRANSFORM
+		SELF.state 	:= ut.st2abbrev(stringlib.stringtouppercase(l.orig_state));
+		SELF.rtype 	:= 'DC';
+		SELF.id 		:= L.doc_num;
+		SELF.did 		:= (unsigned)L.did;
+	END;
+	
+	justDOCid := PROJECT(DOCFiles, stripPublicDOCs(LEFT));
 
 SOpublicFiles := sexoffender.file_main;
 
@@ -37,9 +37,6 @@ Images.Layout_idDID strip_PublicSOs(SOPublicFiles L) := transform
 end;
 
 JustSOid := project(SOpublicFiles, strip_PublicSOs(LEFT));
-
-
-
 
 noBlankDIDs := (justDLid + justDOCid + justSOid)(did != 0);
 allids := DEDUP(noBlankDIDs, ALL);

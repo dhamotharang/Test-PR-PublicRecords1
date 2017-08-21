@@ -35,9 +35,18 @@ payload := record
 end;
 
 
-f := project(d(prim_name<>'' and zip <>''), transform(payload, self := left));
 
+payload slim(d le) :=  TRANSFORM 
+	self.firstname	 	:= le.fname;
+	self.middlename		:= le.mname;
+	self.lastname		:= le.lname;
+	SELF := le; 
+END;
 
-export Key_CWP_Addr := index(f,{zip, prim_name, prim_range, sec_range},
-								{f},
+f := PROJECT(d(prim_name<>'' and zip <>''),slim(LEFT));
+
+ut.mac_suppress_by_phonetype(f,phonenumber,state,ph_out1,false);
+
+export Key_CWP_Addr := index(ph_out1,{zip, prim_name, prim_range, sec_range},
+								{ph_out1},
                                   '~thor_data400::key::canadianwp_addr_'+doxie.Version_SuperKey);

@@ -24,6 +24,7 @@ export BWR_Oshair_Build_Boolean(string filedate) := function
 	build_key := buildindex(tmsid_map,{src,doc,__filepos},inlkeyname, OVERWRITE);
 
 	retval := sequential(
+									fileservices.clearsuperfile(inskeyname),
 									build_key,
 									Text_Search.Build_From_DocSeg_Records(ret,info),
 									Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname),

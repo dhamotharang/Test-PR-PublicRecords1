@@ -24,7 +24,7 @@ end;
 
 o1 := project(df(file_state not in uccd.set_DirectStates),into_withExp1(LEFT));
 
-df2 := uccd.File_Summary_Base;
+df2 := uccd.Summary;
 
 rec into_withExp2(df2 L) := transform
 	self.isDirect := true;

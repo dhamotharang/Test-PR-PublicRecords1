@@ -4,8 +4,8 @@ src_rec:=Layout_RID_SrcID;
 
 export Key_Rid_SrcID_Prep(boolean pFastHeader = false, boolean pCombo = true, dataset(src_rec) pDataset=dataset([],src_rec)) := function
 
-	final_header := distribute(if(pFastHeader,header_quick.file_header_quick,header.file_headers),hash(fname,lname,zip));
-	NHR_dis := distribute(if(pFastHeader,Header.File_New_FHeader_Records,header.File_New_Header_Records),hash(fname,lname,zip));
+	final_header := distribute(header.file_headers,hash(fname,lname,zip));
+	NHR_dis := distribute(header.File_New_Header_Records,hash(fname,lname,zip));
 	NHR_srt := sort(NHR_dis
 									,src
 									,fname
@@ -77,7 +77,8 @@ export Key_Rid_SrcID_Prep(boolean pFastHeader = false, boolean pCombo = true, da
 										,getID(left,right)
 										,local);			
 
-	get_recs := if(pCombo,pDataset,get_recs0 + if(~pFastHeader,header.file_transunion_rid_srcid + header.file_tn_rid_srcid));
+	dFheader:=project(dataset('~thor_data400::persist::qh_seqd',header.Layout_New_Records,flat),Layout_RID_SrcID);
+	get_recs := if(pCombo,pDataset,if(pFastHeader, dFheader, get_recs0 + header.file_transunion_rid_srcid + header.file_tn_rid_srcid));
 
 	return index(get_recs, {rid}, {get_recs},data_services.Data_location.prefix('Source')+'thor_data400::key::header_rid_srid'+if(pCombo,'',SF_suffix(pFastHeader))+'_' + doxie.Version_SuperKey,opt);
 

@@ -48,6 +48,8 @@ ut.MAC_SK_Move('~thor_data400::key::sna::property_transaction_stats','Q', moveq1
 
 move_qa_keys := parallel(moveq10
 							,moveq11,moveq12,moveq13,moveq14);
+							
+updatedops := Roxiekeybuild.updateversion('SNAKeys',filedate,'skasavajjala@seisint.com ; Melanie.Jackson@lexisnexis.com',,'N');
 
 
 do_all:= sequential(
@@ -55,7 +57,8 @@ do_all:= sequential(
 					build_keys
 					,move_build_keys
 					,move_qa_keys
-					
+					,updatedops
+					,Sample_QA.out
 					); 
 					//: success(send_succ_msg),failure(send_fail_msg);
 return do_all;

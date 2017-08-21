@@ -88,7 +88,8 @@ core_r1 := ROLLUP(group(sort(core_t1, id), id), GROUP, doRollup(LEFT, ROWS(LEFT)
 withCore := join(with_reccnt, core_r1, left.id = right.id, transform(recordof(left), self.core := right.core, self := left)); 
 // Append emerging core
 ecore_s1   	:= sort(input, id, -dt_last_seen, local);
-ecore_t1  	:= table(ecore_s1, {id, dt_last_seen, unsigned cnt := count(group)}, id, local);
+// ecore_t1  	:= table(ecore_s1, {id, dt_last_seen, unsigned cnt := count(group)}, id, local);
+ecore_t1  	:= table(ecore_s1, {id, unsigned4 dt_last_seen :=Max(group,dt_last_seen), unsigned cnt := count(group)}, id, local);
 seg_layout xform_ecore(withCore l, ecore_t1 r) := transform
 	lastSeenDate 	:= (string8)r.dt_last_seen;
 	self.emergingCore := if(l.reccnt = 1 and ut.DaysApart(today, lastSeenDate) <= twoYears, constants.Ecore_SingleSrcSingleton, '');
@@ -156,7 +157,7 @@ WithHeader0 :=
 				(right.source in BIPV2_PostProcess.constants.tricore 						=> '(**CORE**): ', 
 				 right.source in BIPV2_PostProcess.constants.secondTierSources  => '(*2nd Tier*): ',
 				'') + mdr.sourceTools.fTranslateSource(right.source),
-			self.company_status_derived_w_date := if(right.company_status_derived = '', '', trim(right.company_status_derived, left, right) + ' ' + right.dt_last_seen[1..6] + ' ' + mdr.sourceTools.fTranslateSource(right.source)),
+			self.company_status_derived_w_date := if(right.company_status_derived = '', '', trim(right.company_status_derived, left, right) + ' ' + ((string)right.dt_last_seen)[1..6] + ' ' + mdr.sourceTools.fTranslateSource(right.source)),
 			// self.fein := if(right.company_fein <> '', 'Y', ''); 
 			// self.ebr := if(right.ebr_file_number <> '', 'Y', ''); 
 			// self.duns := if(right.active_duns_number <> '', 'A', if(right.hist_duns_number <> '', 'H', '')); 
@@ -195,7 +196,7 @@ WithHeader_pull :=
 			left.sec_range = right.sec_range		
 		,whx(left, right),
 		keep(1),
-		left outer
+		left outer ,hash
 	);
 WithHeader_keyed := 
 	join(
@@ -326,16 +327,17 @@ sort(
 , -cnt
 );
 // *** this part looks duplicated.  its the same ECL but with a source breakdown.  i am not sure if there is a cleaner way to code this (macro?)
-shared msrc(i) := macro
-	sort(left.sources, source)[i].source + ' '
-endmacro;
+// shared msrc(i) := macro
+	// sort(left.sources, source)[i].source + ' '
+// endmacro;
 shared abn_src := 
 project(
 	abn,
 	transform(
 		{abn, string str_sources},
-		self.str_sources := msrc(1)+msrc(2)+msrc(3)+msrc(4)+msrc(5)+msrc(6)+msrc(7)+msrc(8)+msrc(9)+msrc(10)+msrc(11)+msrc(12)+msrc(13)+msrc(14)+msrc(15),
-		self := left
+    top15_sources     := topn(left.sources,15,source);
+		self.str_sources  := top15_sources[1].source+' '+top15_sources[2].source+' '+top15_sources[3].source+' '+top15_sources[4].source+' '+top15_sources[5].source+' '+top15_sources[6].source+' '+top15_sources[7].source+' '+top15_sources[8].source+' '+top15_sources[9].source+' '+top15_sources[10].source+' '+top15_sources[11].source+' '+top15_sources[12].source+' '+top15_sources[13].source+' '+top15_sources[14].source+' '+top15_sources[15].source,
+		self              := left
 	)
 );
 shared attrec_src := record
@@ -353,9 +355,9 @@ shared attrec_src := record
 	pct_of_gold 			:= (integer)(100 * count(group) / count(Gold));
 	pct_of_not_gold 	:= (integer)(100 * count(group) / count(NotGold));
 end;
-shared atttab0_src := table(abn_src, attrec_src, isGold, isActive, isNotJustPOBox, hasSuperCoreSrc, hasOtherCoreSrc, has2TSrc, hasMultipleSources, hasBizAddr, str_sources);
+shared atttab0_src := table(abn_src, attrec_src, isGold, isActive, isNotJustPOBox, hasSuperCoreSrc, hasOtherCoreSrc, has2TSrc, hasMultipleSources, hasBizAddr, str_sources,merge);
 shared atttab_src :=
-sort(
+// sort(
 	project(
 		atttab0_src,
 		transform(
@@ -374,8 +376,8 @@ sort(
 			;
 			self := left;
 		)
-	)
-, -cnt
+	// )
+// , -cnt
 );
 shared ostring := idName + ' ' + outputNameModifier;
 export _gold := gold;
@@ -397,8 +399,8 @@ parallel(
 	,output(atttab,all, named('Attribute_Table_'+ostring))	
 	,output(atttab(isGold),all, named('Attribute_Table_Gold_'+ostring))	
 	,output(atttab(~isGold),all, named('Attribute_Table_Not_Gold_'+ostring))	
-	,output(choosen(atttab_src(isGold),1000), named('Attribute_Table_Gold_BySource'+ostring))	
-	,output(choosen(atttab_src(~isGold),1000), named('Attribute_Table_Not_Gold_BySource'+ostring))		
+	,output(topn(atttab_src(isGold),1000,-cnt), named('Attribute_Table_Gold_BySource'+ostring))	
+	,output(topn(atttab_src(~isGold),1000,-cnt), named('Attribute_Table_Not_Gold_BySource'+ostring))		
 	
 	// ,output(_gold,,'~thor_data400::cemtemp::gold_new_'+ostring)
 	// ,output(AddBackNew(isActive),,'~thor_data400::cemtemp::active', overwrite)

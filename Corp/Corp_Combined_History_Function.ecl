@@ -1,3 +1,4 @@
+import ut;
 export Corp_Combined_History_Function(DATASET(Layout_Corp_Temp) corp_base) :=
 FUNCTION
 

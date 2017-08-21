@@ -12,7 +12,7 @@ autokey.MAC_Wild_Zip(t,fname,mname,lname,
 						rel_fname1,rel_fname2,rel_fname3,
 						lookups,
 						did,
-						'~thor_data400::key::header.wild.zip.lname.fname',
+						ut.Data_Location.Person_header + 'thor_data400::key::header.wild.zip.lname.fname',
 						k)
 						
 export Key_Header_Wild_Zip := k;

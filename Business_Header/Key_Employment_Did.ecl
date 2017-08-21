@@ -1,6 +1,6 @@
 import doxie;
 
-df := business_header.File_Employment_Keybuild((integer)did != 0);
+df := filters.keys.peopleatwork(business_header.File_Employment_Keybuild((integer)did != 0));
 
 export Key_Employment_Did := 
        index(df,{unsigned6 sdid := (integer)df.did}, {df}, 

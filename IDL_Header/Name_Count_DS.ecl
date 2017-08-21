@@ -4,7 +4,7 @@ Name_Count_DS0 := dataset(name_count_file, layout_name_count, flat);
 
 //remove binary's & leading spaces
 recordof(Name_Count_DS0) x1(Name_Count_DS0 le) := transform
- self.name := ut.fnTrim2Upper(regexreplace('[^ -~]+',stringlib.stringcleanspaces(le.name),''));
+ self.name := ut.CleanSpacesAndUpper(regexreplace('[^ -~]+',stringlib.stringcleanspaces(le.name),''));
  self      := le;
 end;
 

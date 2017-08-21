@@ -1,1 +1,1 @@
-export KeyName_4040_Bulk_Transfers_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('4040')) : global;
+export KeyName_4040_Bulk_Transfers_FILE_NUMBER := trim(GetSegmentKeyName_FILE_NUMBER('4040'));

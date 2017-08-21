@@ -11,8 +11,7 @@ EXPORT proc_Watch_This_Workunit(
 functionmacro
 
   Cluster  := map(pCluster != ''                                    => pCluster                      
-                 ,pESP in wk_ut._constants.DatalandEsps/*dataland*/ => 'infinband_hthor'
-                 ,                                                     'hthor'
+                 ,wk_ut._constants.Esp2Hthor(pESP)
               );
 
   import BIPV2,tools,BizLinkFull,wk_ut,bipv2_build;

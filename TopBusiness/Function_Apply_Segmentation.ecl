@@ -174,6 +174,9 @@ export Function_Apply_Segmentation(dataset(Layout_Linking.Linked) indata) := fun
 	bid_segmented := project(indictor_table_bid,transform(
 		{indictor_table_bid.bid;unsigned1 segment_bid;},
 		self.segment_bid := map(
+			/* ANY DEADCO RECORD */
+			left.hasdeadco =>
+				Constants.Segment_Types.DEAD,
 			/* ANY NUMBER OF SOURCES, BUT ALL ARE SELF-REPORT */
 			not left.hasnonselfrpt =>
 				Constants.Segment_Types.UNTRUSTED,

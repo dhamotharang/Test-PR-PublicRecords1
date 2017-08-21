@@ -13,6 +13,8 @@ dateType := Text_Search.Types.SegmentType.DateType;
 numericType := Text_Search.Types.SegmentType.NumericType;
 groupType := Text_Search.Types.SegmentType.GroupSeg;
 ConcatSeg := Text_Search.Types.SegmentType.ConcatSeg;
+keyType := Text_search.Types.SegmentType.ExternalKey;
+ssnType := Text_search.Types.SegmentType.SSN;
 
 segmentMetaData := DATASET([
 		{'filing_number',											textType,		[1]},
@@ -24,17 +26,17 @@ segmentMetaData := DATASET([
 		{'expiration-date',						DateType,		[7]},
 		{'contract-type',					textType,		[8]},
 		{'statements-filed',									textType,		[9]},
-		{'amount',							textType,		[10]},
-		{'irs-serial-number',										DateType,		[11]},
-		{'effective-date',										textType,		[12]},
+		{'amount',							numericType,		[10]},
+		{'irs-serial-number',										textType,		[11]},
+		{'effective-date',										DateType,		[12]},
 		{'debtors', 			textType,		[13]},
-		{'ssn',			DateType,		[14]},
-		{'fein',												DateType,		[15]},
-		{'debtor-address',		DateType,		[16]},
-		{'city-debtor-address',		textType,		[17]},
-		{'state-debtor-address',									textType,		[18]},
-		{'country',			DateType,		[19]},
-		{'province', 									DateType,		[20]},
+		{'ssn',			ssnType,		[14]},
+		{'fein',												textType,		[15]},
+		{'debtor-address',		textType,		[16]},
+		//{'city-debtor-address',		textType,		[17]},
+		//{'state-debtor-address',									textType,		[18]},
+		{'country',			textType,		[19]},
+		{'province', 									textType,		[20]},
 		{'secured-party',										textType,		[21]},
 		{'secured-prty-addr',										textType,		[22]},
 		//{'city-secured-prty-addr',											textType,		[23]},
@@ -50,15 +52,20 @@ segmentMetaData := DATASET([
 		{'borough',											textType,		[33]},
 		{'block',											textType,		[34]},
 		{'lot',											TextType,		[35]},
-		{'lot-address',											TextType,		[36]}
-		
+		{'lot-address',											TextType,		[36]},
+		{'filing-jurisdiction',											TextType,		[37]},
+		{'date', GroupType, [3,7,12]},
+		{'name', ConcatSeg, [13,21,23]},
+		{'address',ConcatSeg, [16,22,24]},
+		{'process-date', DateType, [249]},
+		{'EXTERNALKEY',       keyType, [250]}
 		], Text_Search.Layout_Segment_Definition);
 
 
 lfileName := Text_Search.FileName(info, Text_Search.Types.FileTypeEnum.SegList,true);
 sfileName := Text_Search.FileName(info, Text_Search.Types.FileTypeEnum.SegList);
 
-retval := if (fileservices.fileexists(lfilename),
+retval := if (NOTHOR(fileservices.fileexists(lfilename)),
 								output('Metadata file '+lfilename+' already exists'),
 								sequential(
 										OUTPUT(segmentMetaData,,lfileName, OVERWRITE),

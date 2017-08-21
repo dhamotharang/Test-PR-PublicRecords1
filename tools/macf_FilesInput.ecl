@@ -33,6 +33,7 @@ export macf_FilesInput(
   ,pShouldAddVirtualFilename  = 'false'
   ,pUnicode                   = 'false'
   ,pFilter                    = '\'\''
+  ,pNoTrim 		                = 'false'
 ) :=
 functionmacro
 #uniquename(lfilter)
@@ -84,7 +85,8 @@ functionmacro
 																						,heading(pHeading)
 																						,maxlength(pMaxLength)
 																						#if(pUnicode) ,UNICODE #end
-																						) #if(pOpt) ,opt #end)
+																						#if(pNoTrim ) ,NOTRIM  #end
+                                          ) #if(pOpt) ,opt #end)
 																						#if(%'lfilter'% != '') ( %lfilter% ) #END;
 		export Root									:= fDataset(pfilenameversions.Root);
 		export Sprayed								:= fDataset(pfilenameversions.sprayed);

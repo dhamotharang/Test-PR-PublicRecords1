@@ -1,4 +1,4 @@
-import ut;
+import ut, address;
 norm_name 	 := ExperianIRSG_Build.Normalize_Record;
 cached_names :=	distribute(Files.Cashed_Names_File, hash(Orig_lname, Orig_fname, Orig_mname)); 
 
@@ -44,11 +44,11 @@ Layouts.Layout_Cln_Name t_CleanName(names_to_clean le) := TRANSFORM
 	// lfm_name	:= StringLib.StringCleanSpaces((trim(le.Orig_lname)+', '+ trim(le.Orig_fname)+' '+ trim(le.Orig_mname) + ' ' + trim(le.Orig_suffix)));
 	// fml_name	:= StringLib.StringCleanSpaces((trim(le.Orig_fname)+' '+ trim(le.Orig_mname) +' '+ trim(le.Orig_lname) + ' ' + trim(le.Orig_suffix)));
 	
-	CleanName1	:= addrcleanlib.cleanpersonlfm73(lfm_name);
-	CleanName2	:= addrcleanlib.cleanperson73(lfm_name);
-	CleanName3	:= addrcleanlib.cleanpersonlfm73(StringLib.StringFindReplace(lfm_name, ',', ' '));
-	CleanName4	:= addrcleanlib.cleanpersonfml73(fml_name);
-	CleanName5	:= addrcleanlib.cleanperson73(fml_name);
+	CleanName1	:= address.cleanpersonlfm73(lfm_name);
+	CleanName2	:= address.cleanperson73(lfm_name);
+	CleanName3	:= address.cleanpersonlfm73(StringLib.StringFindReplace(lfm_name, ',', ' '));
+	CleanName4	:= address.cleanpersonfml73(fml_name);
+	CleanName5	:= address.cleanperson73(fml_name);
 
 	SELF.Clean_Name := map((unsigned1)CleanName4[71..73] > 0  => CleanName4, 
 					 (unsigned1)CleanName1[71..73] > 0  => CleanName1,      

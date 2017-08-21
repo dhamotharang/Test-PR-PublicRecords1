@@ -6,7 +6,7 @@
 	Normalize the Records by DID
 ****************************************************************/
 IMPORT MDR, DriversV2, hygenics_crim, hygenics_soff, marriage_divorce_v2, 
-FLAccidents, FLAccidents_Ecrash, VotersV2, eMerges, ut, _validate, Codes;
+FLAccidents, FLAccidents_Ecrash, VotersV2, eMerges, ut, _validate, Codes,Data_Services;
 
 #STORED ('_Validate_Year_Range_Low', '1900'); 
 #STORED ('_Validate_Year_Range_high', ut.GetDate[1..4]);
@@ -158,7 +158,7 @@ EXPORT BestSupplemental(STRING8 filedate) := FUNCTION
 
 	// Criminal
 	Crims		:=	hygenics_crim.File_Moxie_Crim_Offender2_Dev;
-	SexOff	:=	DATASET(ut.foreign_prod+'~thor_data400::persist::hd::sex_Offender_crossmain',hygenics_soff.layout_out_main_cross,FLAT);
+	SexOff	:=	DATASET(Data_Services.foreign_prod+'thor_data400::in::hd::sex_offender_crossmain::wd',hygenics_soff.layout_out_main_cross,FLAT);
 
 	// Marriage&Divorce
 	MarDiv	:=	marriage_divorce_v2.file_mar_div_search;

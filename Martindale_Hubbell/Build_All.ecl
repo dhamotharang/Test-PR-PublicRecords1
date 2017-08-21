@@ -3,8 +3,8 @@ import versioncontrol, _control;
 export Build_All(
 
 	 string		pversion
-	,string		pDirectory							= '/prod_data_build_10/production_data/business_headers/martindale_hubbell/data/'
-	,string		pServerIP								= _control.IPAddress.edata10
+	,string		pDirectory							= '/data/prod_data_build_10/production_data/business_headers/martindale_hubbell/data/'
+	,string		pServerIP								= _control.IPAddress.bctlpedata11
 	,string		pFilename								= '2*xml'
 	,string		pGroupName							= _dataset().groupname																		
 	,boolean	pIsTesting							= false

@@ -29,11 +29,12 @@ function
   diterate := iterate(dsort,transform(recordof(left),self.rtotal_secs := (string)((real8)left.rtotal_secs + (real8)right.rtotal_secs),self.rtotal_pretty := wk_ut.ConvertSecs2ReadableTime((real8)self.rtotal_secs),self := right));
 
   dgraphtimes := dcopytimes(regexfind('^graph'  ,name,nocase),subgraphid != '');
-  ddfutimes   := dcopytimes(regexfind('elapsed' ,name,nocase));
+  ddfutimes   := dcopytimes(regexfind('[(]elapsed[)]' ,name,nocase));
   
   total_time_secs   := thor_time_secs + if(thor_time_secs = 0.0  ,sum(dgraphtimes,(real8)total_seconds) ,0.0) + sum(ddfutimes,(real8)total_seconds);
   
-  total_time        := wk_ut.ConvertSecs2ThorTime(total_time_secs);
+  thor_time         := wk_ut.ConvertSecs2ReadableTime(thor_time_secs);
+  total_time        := wk_ut.ConvertSecs2ReadableTime(total_time_secs);
   total_graph_time  := wk_ut.ConvertSecs2ReadableTime(sum(dgraphtimes,(real8)total_seconds));
   total_dfu_time    := wk_ut.ConvertSecs2ReadableTime(sum(ddfutimes,(real8)total_seconds));
   
@@ -45,7 +46,9 @@ function
      // output(total_thor_time           ,named('total_thor_time'  ))
     // ,output(total_graph_time          ,named('total_graph_time' ))
     // ,output(total_dfu_time            ,named('total_dfu_time'   ))
+    // ,output(thor_time                 ,named('thor_time'        ))
     // ,output(total_time                ,named('total_time'       ))
+    // ,output(choosen(dtimes      ,1000),named('dtimes'           ),all)
     // ,output(choosen(dcopytimes  ,1000),named('dcopytimes'       ),all)
     // ,output(choosen(dgraphtimes ,1000),named('dgraphtimes'      ),all)
     // ,output(choosen(ddfutimes   ,1000),named('ddfutimes'        ),all)

@@ -1,0 +1,1 @@
+export Roxie_Email_List := 'roxiedeployment@seisint.com;vniemela@seisint.com;kgummadi@seisint.com';

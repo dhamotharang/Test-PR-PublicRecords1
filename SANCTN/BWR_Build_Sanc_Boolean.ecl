@@ -119,6 +119,29 @@ mac_append_key(party_data,SANCTN.layout_SANCTN_party_clean,
 inc_docs := SANCTN.Convert_Incident_Func(incident_data_keyed);
 party_docs := SANCTN.Convert_Party_Func(party_data_keyed);
 
+// External key incident
+	
+	Text_Search.layout_DocSeg MakeKeySegs( incident_data_keyed l, unsigned2 segno ) := TRANSFORM
+		self.docref.doc := l.doc;
+        self.docref.src := 0;
+		self.segment := segno;
+        self.content := l.BATCH_NUMBER+l.INCIDENT_NUMBER;
+        self.sect := 1;
+    END;
+
+    inc_segkeys := PROJECT(incident_data_keyed,MakeKeySegs(LEFT,250));
+
+// External key party
+	
+	Text_Search.layout_DocSeg party_MakeKeySegs( party_data_keyed l, unsigned2 segno ) := TRANSFORM
+		self.docref.doc := l.doc;
+        self.docref.src := 0;
+		self.segment := segno;
+        self.content := l.BATCH_NUMBER+l.INCIDENT_NUMBER;
+        self.sect := 1;
+    END;
+
+    party_segkeys := PROJECT(party_data_keyed,party_MakeKeySegs(LEFT,250));
 
 fileNameDoc := 'boolean_test::jmw::corp_test';
 //OUTPUT(docs(content <> ''),,fileNameDoc,OVERWRITE);
@@ -126,7 +149,7 @@ fileNameDoc := 'boolean_test::jmw::corp_test';
 // May need to change high level
 
 
-docs := inc_docs + party_docs : persist('~thor_data400::persist::sanctn::boolean');
+docs := inc_docs + party_docs + inc_segkeys + party_segkeys : persist('~thor_data400::persist::sanctn::boolean');
 
 	
   inlkeyname := '~thor_data400::key::sanctn::'+filename+'::docref.docref';

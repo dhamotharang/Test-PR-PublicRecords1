@@ -1,4 +1,4 @@
-import _control, versioncontrol,ut,Data_services;
+import _control, versioncontrol,Data_services;
 
 export _Dataset(
 
@@ -8,8 +8,8 @@ export _Dataset(
 module
 	export Name							:= 'OIG';
 	export foreign_environment 			:= if(VersionControl._Flags.IsDataland
-																	,ut.foreign_prod
-																	,ut.foreign_dataland
+																	,Data_services.foreign_prod
+																	,Data_services.foreign_dataland
 																);
 												
 	

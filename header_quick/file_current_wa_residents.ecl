@@ -1,0 +1,1 @@
+export file_current_wa_residents := dataset('~thor_data400::base::current_wa_residents',{unsigned6 did},flat);

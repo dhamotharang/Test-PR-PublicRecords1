@@ -19,7 +19,8 @@ module
 	export stats            := tools.mod_FilenamesBuild(lfileprefix + 'BIPV2_ProxID_mj6::stats::@version@'	          ,pversion);
 	export wkhistory        := tools.mod_FilenamesBuild(lfileprefix + 'BIPV2_ProxID_mj6::wkhistory::@version@::data'  ,pversion);
 	export precision        := tools.mod_FilenamesBuild(lfileprefix + 'BIPV2_ProxID_mj6::precision::@version@::data'  ,pversion);
-	
+	export summary_report   := tools.mod_FilenamesBuild(lfileprefix + 'bipv2_build::@version@::summary_report::proc_proxid_mj6.iterations'  ,pversion);
+  
   export dall_filenames := 
       base            .dall_filenames
     + out             .dall_filenames

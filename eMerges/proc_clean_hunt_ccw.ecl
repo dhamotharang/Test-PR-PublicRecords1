@@ -1,4 +1,4 @@
-import Address, AID, ut;
+import Address, AID, ut, mdr, STD;
 
 export proc_clean_hunt_ccw(	dataset(emerges.layout_hunt_ccw.rHuntCCWIn_layout) dHuntCCW_In,
 														string	version_date,
@@ -71,137 +71,138 @@ function
 	
 	rHuntCCWAppendID_layout	tAppendRecordID(dHuntCCW_In pInput)	:=
 	transform
-		self.persistent_record_id := HASH64(ut.fnTrim2Upper(pInput.EMIDNumber)
-																				+ ut.fnTrim2Upper(pInput.state_code)
-																				+ ut.fnTrim2Upper(pInput.source_code)
-																				+ ut.fnTrim2Upper(pInput.file_acquired_date)
-																				+ ut.fnTrim2Upper(pInput.use_code)
-																				+ ut.fnTrim2Upper(pInput.prefix_title)
-																				+ ut.fnTrim2Upper(pInput.last_name)
-																				+ ut.fnTrim2Upper(pInput.first_name)
-																				+ ut.fnTrim2Upper(pInput.middle_name)
-																				+ ut.fnTrim2Upper(pInput.maiden_prior)
-																				+ ut.fnTrim2Upper(pInput.suffix)
-																				+ ut.fnTrim2Upper(pInput.DateOfBirth)
-																				+ ut.fnTrim2Upper(pInput.AgeCat)
-																				+ ut.fnTrim2Upper(pInput.HeadHousehold)
-																				+ ut.fnTrim2Upper(pInput.place_of_birth)
-																				+ ut.fnTrim2Upper(pInput.occupation)
-																				+ ut.fnTrim2Upper(pInput.regSource)
-																				+ ut.fnTrim2Upper(pInput.RegDate)
-																				+ ut.fnTrim2Upper(pInput.race)
-																				+ ut.fnTrim2Upper(pInput.gender)
-																				+ ut.fnTrim2Upper(pInput.VoterHomePhone)
-																				+ ut.fnTrim2Upper(pInput.VoterWorkPhone)
-																				+ ut.fnTrim2Upper(pInput.ActiveOrInactive)
-																				+ ut.fnTrim2Upper(pInput.ResAddr1)
-																				+ ut.fnTrim2Upper(pInput.ResAddr2)
-																				+ ut.fnTrim2Upper(pInput.Res_city)
-																				+ ut.fnTrim2Upper(pInput.Res_state)
-																				+ ut.fnTrim2Upper(pInput.Res_zip)
-																				+ ut.fnTrim2Upper(pInput.Res_county)
-																				+ ut.fnTrim2Upper(pInput.MailAddr1)
-																				+ ut.fnTrim2Upper(pInput.MailAddr2)
-																				+ ut.fnTrim2Upper(pInput.mail_city)
-																				+ ut.fnTrim2Upper(pInput.mail_state)
-																				+ ut.fnTrim2Upper(pInput.mail_zip)
-																				+ ut.fnTrim2Upper(pInput.mail_county)
-																				+ ut.fnTrim2Upper(pInput.CASS_County)
-																				+ ut.fnTrim2Upper(pInput.ContributorParty)
-																				+ ut.fnTrim2Upper(pInput.RecipientParty)
-																				+ ut.fnTrim2Upper(pInput.DateOfCont)
-																				+ ut.fnTrim2Upper(pInput.DollarAmt)
-																				+ ut.fnTrim2Upper(pInput.OfficeContributedTo)
-																				+ ut.fnTrim2Upper(pInput.CumulDollarAmt)
-																				+ ut.fnTrim2Upper(pInput.ContFiller1)
-																				+ ut.fnTrim2Upper(pInput.ContFiller2)
-																				+ ut.fnTrim2Upper(pInput.ContType)
-																				+ ut.fnTrim2Upper(pInput.ContFiller3)
-																				+ ut.fnTrim2Upper(pInput.HuntFishPerm)
-																				+ ut.fnTrim2Upper(pInput.DateLicense)
-																				+ ut.fnTrim2Upper(pInput.HomeState)
-																				+ ut.fnTrim2Upper(pInput.Resident)
-																				+ ut.fnTrim2Upper(pInput.NonResident)
-																				+ ut.fnTrim2Upper(pInput.Hunt)
-																				+ ut.fnTrim2Upper(pInput.Fish)
-																				+ ut.fnTrim2Upper(pInput.ComboSuper)
-																				+ ut.fnTrim2Upper(pInput.Sportsman)
-																				+ ut.fnTrim2Upper(pInput.Trap)
-																				+ ut.fnTrim2Upper(pInput.Archery)
-																				+ ut.fnTrim2Upper(pInput.Muzzle)
-																				+ ut.fnTrim2Upper(pInput.Drawing)
-																				+ ut.fnTrim2Upper(pInput.Day1)
-																				+ ut.fnTrim2Upper(pInput.Day3)
-																				+ ut.fnTrim2Upper(pInput.Day7)
-																				+ ut.fnTrim2Upper(pInput.Day14to15)
-																				+ ut.fnTrim2Upper(pInput.DayFiller) //Guides
-																				+ ut.fnTrim2Upper(pInput.SeasonAnnual)
-																				+ ut.fnTrim2Upper(pInput.LifeTimePermit)
-																				+ ut.fnTrim2Upper(pInput.LandOwner)
-																				+ ut.fnTrim2Upper(pInput.Family)
-																				+ ut.fnTrim2Upper(pInput.Junior)
-																				+ ut.fnTrim2Upper(pInput.SeniorCitizen)
-																				+ ut.fnTrim2Upper(pInput.CrewMemeber)
-																				+ ut.fnTrim2Upper(pInput.Retarded)
-																				+ ut.fnTrim2Upper(pInput.Indian)
-																				+ ut.fnTrim2Upper(pInput.Serviceman)
-																				+ ut.fnTrim2Upper(pInput.Disabled)
-																				+ ut.fnTrim2Upper(pInput.LowIncome)
-																				+ ut.fnTrim2Upper(pInput.RegionCounty)
-																				+ ut.fnTrim2Upper(pInput.HuntType)		//Blind
-																				+ ut.fnTrim2Upper(pInput.HuntFiller)	//Location
-																				+ ut.fnTrim2Upper(pInput.Salmon)
-																				+ ut.fnTrim2Upper(pInput.Freshwater)
-																				+ ut.fnTrim2Upper(pInput.Saltwater)
-																				+ ut.fnTrim2Upper(pInput.LakesandResevoirs)
-																				+ ut.fnTrim2Upper(pInput.SetLineFish)
-																				+ ut.fnTrim2Upper(pInput.Trout)
-																				+ ut.fnTrim2Upper(pInput.FallFishing)
-																				+ ut.fnTrim2Upper(pInput.SteelHead)
-																				+ ut.fnTrim2Upper(pInput.WhiteJubHerring)
-																				+ ut.fnTrim2Upper(pInput.Sturgeon)   //otter
-																				+ ut.fnTrim2Upper(pInput.ShellfishCrab) //MussleRoe
-																				+ ut.fnTrim2Upper(pInput.ShellfishLobster) //ShellFish
-																				+ ut.fnTrim2Upper(pInput.Deer)
-																				+ ut.fnTrim2Upper(pInput.Bear)
-																				+ ut.fnTrim2Upper(pInput.Elk)
-																				+ ut.fnTrim2Upper(pInput.Moose)
-																				+ ut.fnTrim2Upper(pInput.Buffalo)
-																				+ ut.fnTrim2Upper(pInput.Antelope)
-																				+ ut.fnTrim2Upper(pInput.SikeBull)
-																				+ ut.fnTrim2Upper(pInput.BighornSheep) //SheepGoat
-																				+ ut.fnTrim2Upper(pInput.Javelina)
-																				+ ut.fnTrim2Upper(pInput.Cougar)
-																				+ ut.fnTrim2Upper(pInput.Anterless)
-																				+ ut.fnTrim2Upper(pInput.Pheasant)
-																				+ ut.fnTrim2Upper(pInput.Goose)
-																				+ ut.fnTrim2Upper(pInput.Duck)
-																				+ ut.fnTrim2Upper(pInput.Turkey)
-																				+ ut.fnTrim2Upper(pInput.Snowmobile) //Subscriber
-																				+ ut.fnTrim2Upper(pInput.BigGame)
-																				+ ut.fnTrim2Upper(pInput.MigratoryBirds)
-																				+ ut.fnTrim2Upper(pInput.SmallGame)
-																				+ ut.fnTrim2Upper(pInput.Sturgeon2)
-																				+ ut.fnTrim2Upper(pInput.Gun)
-																				+ ut.fnTrim2Upper(pInput.Bonus)
-																				+ ut.fnTrim2Upper(pInput.ApplicantLottery)
-																				+ ut.fnTrim2Upper(pInput.OtherBirds) //Waterfowl
-																				+ ut.fnTrim2Upper(pInput.huntfill1)		//email
-																				+ ut.fnTrim2Upper(pInput.BoatIndexNum) //ParkLake
-																				+ ut.fnTrim2Upper(pInput.BoatCoOwner)	//CCWPermitee
-																				+ ut.fnTrim2Upper(pInput.Len)					//TempHuntFish
-																				+ ut.fnTrim2Upper(pInput.HullConstruction)  //ComboSuperLifetime
-																				+ ut.fnTrim2Upper(pInput.RegExpiryDate)
-																				+ ut.fnTrim2Upper(pInput.BoatFill3)				//CCWRejectReason
-																				+ ut.fnTrim2Upper(pInput.CCWPermNum)
-																				+ ut.fnTrim2Upper(pInput.CCWWeaponType)
-																				+ ut.fnTrim2Upper(pInput.CCWRegDate)
-																				+ ut.fnTrim2Upper(pInput.CCWExpiryDate)
-																				+ ut.fnTrim2Upper(pInput.CCWPermType)
-																				+ ut.fnTrim2Upper(pInput.MiscFill5)
-																				+ ut.fnTrim2Upper(pInput.FillerOther1)   	//SourceCounty
-																				+ ut.fnTrim2Upper(pInput.FillerOther2)			//MailCountry
-																				+ ut.fnTrim2Upper(pInput.FillerOther4));			//ResZipPlusFour
+		Self.source_code := If(version_date = '20140520', MDR.sourceTools.src_EMerge_CCW_NY, pInput.Source_code);
+		self.persistent_record_id := HASH64(ut.CleanSpacesAndUpper(pInput.EMIDNumber)
+																				+ ut.CleanSpacesAndUpper(pInput.state_code)
+																				+ ut.CleanSpacesAndUpper(Self.source_code)
+																				+ ut.CleanSpacesAndUpper(pInput.file_acquired_date)
+																				+ ut.CleanSpacesAndUpper(pInput.use_code)
+																				+ ut.CleanSpacesAndUpper(pInput.prefix_title)
+																				+ ut.CleanSpacesAndUpper(pInput.last_name)
+																				+ ut.CleanSpacesAndUpper(pInput.first_name)
+																				+ ut.CleanSpacesAndUpper(pInput.middle_name)
+																				+ ut.CleanSpacesAndUpper(pInput.maiden_prior)
+																				+ ut.CleanSpacesAndUpper(pInput.suffix)
+																				+ ut.CleanSpacesAndUpper(pInput.DateOfBirth)
+																				+ ut.CleanSpacesAndUpper(pInput.AgeCat)
+																				+ ut.CleanSpacesAndUpper(pInput.HeadHousehold)
+																				+ ut.CleanSpacesAndUpper(pInput.place_of_birth)
+																				+ ut.CleanSpacesAndUpper(pInput.occupation)
+																				+ ut.CleanSpacesAndUpper(pInput.regSource)
+																				+ ut.CleanSpacesAndUpper(pInput.RegDate)
+																				+ ut.CleanSpacesAndUpper(pInput.race)
+																				+ ut.CleanSpacesAndUpper(pInput.gender)
+																				+ ut.CleanSpacesAndUpper(pInput.VoterHomePhone)
+																				+ ut.CleanSpacesAndUpper(pInput.VoterWorkPhone)
+																				+ ut.CleanSpacesAndUpper(pInput.ActiveOrInactive)
+																				+ ut.CleanSpacesAndUpper(pInput.ResAddr1)
+																				+ ut.CleanSpacesAndUpper(pInput.ResAddr2)
+																				+ ut.CleanSpacesAndUpper(pInput.Res_city)
+																				+ ut.CleanSpacesAndUpper(pInput.Res_state)
+																				+ ut.CleanSpacesAndUpper(pInput.Res_zip)
+																				+ ut.CleanSpacesAndUpper(pInput.Res_county)
+																				+ ut.CleanSpacesAndUpper(pInput.MailAddr1)
+																				+ ut.CleanSpacesAndUpper(pInput.MailAddr2)
+																				+ ut.CleanSpacesAndUpper(pInput.mail_city)
+																				+ ut.CleanSpacesAndUpper(pInput.mail_state)
+																				+ ut.CleanSpacesAndUpper(pInput.mail_zip)
+																				+ ut.CleanSpacesAndUpper(pInput.mail_county)
+																				+ ut.CleanSpacesAndUpper(pInput.CASS_County)
+																				+ ut.CleanSpacesAndUpper(pInput.ContributorParty)
+																				+ ut.CleanSpacesAndUpper(pInput.RecipientParty)
+																				+ ut.CleanSpacesAndUpper(pInput.DateOfCont)
+																				+ ut.CleanSpacesAndUpper(pInput.DollarAmt)
+																				+ ut.CleanSpacesAndUpper(pInput.OfficeContributedTo)
+																				+ ut.CleanSpacesAndUpper(pInput.CumulDollarAmt)
+																				+ ut.CleanSpacesAndUpper(pInput.ContFiller1)
+																				+ ut.CleanSpacesAndUpper(pInput.ContFiller2)
+																				+ ut.CleanSpacesAndUpper(pInput.ContType)
+																				+ ut.CleanSpacesAndUpper(pInput.ContFiller3)
+																				+ ut.CleanSpacesAndUpper(pInput.HuntFishPerm)
+																				+ ut.CleanSpacesAndUpper(pInput.DateLicense)
+																				+ ut.CleanSpacesAndUpper(pInput.HomeState)
+																				+ ut.CleanSpacesAndUpper(pInput.Resident)
+																				+ ut.CleanSpacesAndUpper(pInput.NonResident)
+																				+ ut.CleanSpacesAndUpper(pInput.Hunt)
+																				+ ut.CleanSpacesAndUpper(pInput.Fish)
+																				+ ut.CleanSpacesAndUpper(pInput.ComboSuper)
+																				+ ut.CleanSpacesAndUpper(pInput.Sportsman)
+																				+ ut.CleanSpacesAndUpper(pInput.Trap)
+																				+ ut.CleanSpacesAndUpper(pInput.Archery)
+																				+ ut.CleanSpacesAndUpper(pInput.Muzzle)
+																				+ ut.CleanSpacesAndUpper(pInput.Drawing)
+																				+ ut.CleanSpacesAndUpper(pInput.Day1)
+																				+ ut.CleanSpacesAndUpper(pInput.Day3)
+																				+ ut.CleanSpacesAndUpper(pInput.Day7)
+																				+ ut.CleanSpacesAndUpper(pInput.Day14to15)
+																				+ ut.CleanSpacesAndUpper(pInput.DayFiller) //Guides
+																				+ ut.CleanSpacesAndUpper(pInput.SeasonAnnual)
+																				+ ut.CleanSpacesAndUpper(pInput.LifeTimePermit)
+																				+ ut.CleanSpacesAndUpper(pInput.LandOwner)
+																				+ ut.CleanSpacesAndUpper(pInput.Family)
+																				+ ut.CleanSpacesAndUpper(pInput.Junior)
+																				+ ut.CleanSpacesAndUpper(pInput.SeniorCitizen)
+																				+ ut.CleanSpacesAndUpper(pInput.CrewMemeber)
+																				+ ut.CleanSpacesAndUpper(pInput.Retarded)
+																				+ ut.CleanSpacesAndUpper(pInput.Indian)
+																				+ ut.CleanSpacesAndUpper(pInput.Serviceman)
+																				+ ut.CleanSpacesAndUpper(pInput.Disabled)
+																				+ ut.CleanSpacesAndUpper(pInput.LowIncome)
+																				+ ut.CleanSpacesAndUpper(pInput.RegionCounty)
+																				+ ut.CleanSpacesAndUpper(pInput.HuntType)		//Blind
+																				+ ut.CleanSpacesAndUpper(pInput.HuntFiller)	//Location
+																				+ ut.CleanSpacesAndUpper(pInput.Salmon)
+																				+ ut.CleanSpacesAndUpper(pInput.Freshwater)
+																				+ ut.CleanSpacesAndUpper(pInput.Saltwater)
+																				+ ut.CleanSpacesAndUpper(pInput.LakesandResevoirs)
+																				+ ut.CleanSpacesAndUpper(pInput.SetLineFish)
+																				+ ut.CleanSpacesAndUpper(pInput.Trout)
+																				+ ut.CleanSpacesAndUpper(pInput.FallFishing)
+																				+ ut.CleanSpacesAndUpper(pInput.SteelHead)
+																				+ ut.CleanSpacesAndUpper(pInput.WhiteJubHerring)
+																				+ ut.CleanSpacesAndUpper(pInput.Sturgeon)   //otter
+																				+ ut.CleanSpacesAndUpper(pInput.ShellfishCrab) //MussleRoe
+																				+ ut.CleanSpacesAndUpper(pInput.ShellfishLobster) //ShellFish
+																				+ ut.CleanSpacesAndUpper(pInput.Deer)
+																				+ ut.CleanSpacesAndUpper(pInput.Bear)
+																				+ ut.CleanSpacesAndUpper(pInput.Elk)
+																				+ ut.CleanSpacesAndUpper(pInput.Moose)
+																				+ ut.CleanSpacesAndUpper(pInput.Buffalo)
+																				+ ut.CleanSpacesAndUpper(pInput.Antelope)
+																				+ ut.CleanSpacesAndUpper(pInput.SikeBull)
+																				+ ut.CleanSpacesAndUpper(pInput.BighornSheep) //SheepGoat
+																				+ ut.CleanSpacesAndUpper(pInput.Javelina)
+																				+ ut.CleanSpacesAndUpper(pInput.Cougar)
+																				+ ut.CleanSpacesAndUpper(pInput.Anterless)
+																				+ ut.CleanSpacesAndUpper(pInput.Pheasant)
+																				+ ut.CleanSpacesAndUpper(pInput.Goose)
+																				+ ut.CleanSpacesAndUpper(pInput.Duck)
+																				+ ut.CleanSpacesAndUpper(pInput.Turkey)
+																				+ ut.CleanSpacesAndUpper(pInput.Snowmobile) //Subscriber
+																				+ ut.CleanSpacesAndUpper(pInput.BigGame)
+																				+ ut.CleanSpacesAndUpper(pInput.MigratoryBirds)
+																				+ ut.CleanSpacesAndUpper(pInput.SmallGame)
+																				+ ut.CleanSpacesAndUpper(pInput.Sturgeon2)
+																				+ ut.CleanSpacesAndUpper(pInput.Gun)
+																				+ ut.CleanSpacesAndUpper(pInput.Bonus)
+																				+ ut.CleanSpacesAndUpper(pInput.ApplicantLottery)
+																				+ ut.CleanSpacesAndUpper(pInput.OtherBirds) //Waterfowl
+																				+ ut.CleanSpacesAndUpper(pInput.huntfill1)		//email
+																				+ ut.CleanSpacesAndUpper(pInput.BoatIndexNum) //ParkLake
+																				+ ut.CleanSpacesAndUpper(pInput.BoatCoOwner)	//CCWPermitee
+																				+ ut.CleanSpacesAndUpper(pInput.Len)					//TempHuntFish
+																				+ ut.CleanSpacesAndUpper(pInput.HullConstruction)  //ComboSuperLifetime
+																				+ ut.CleanSpacesAndUpper(pInput.RegExpiryDate)
+																				+ ut.CleanSpacesAndUpper(pInput.BoatFill3)				//CCWRejectReason
+																				+ ut.CleanSpacesAndUpper(pInput.CCWPermNum)
+																				+ ut.CleanSpacesAndUpper(pInput.CCWWeaponType)
+																				+ ut.CleanSpacesAndUpper(pInput.CCWRegDate)
+																				+ ut.CleanSpacesAndUpper(pInput.CCWExpiryDate)
+																				+ ut.CleanSpacesAndUpper(pInput.CCWPermType)
+																				+ ut.CleanSpacesAndUpper(pInput.MiscFill5)
+																				+ ut.CleanSpacesAndUpper(pInput.FillerOther1)   	//SourceCounty
+																				+ ut.CleanSpacesAndUpper(pInput.FillerOther2)			//MailCountry
+																				+ ut.CleanSpacesAndUpper(pInput.FillerOther4));			//ResZipPlusFour
 	
 	self								:=	pInput;
 	
@@ -282,35 +283,35 @@ function
 		self.FillerOther10								:=	'';
 		self.EOR													:=	'';
 		
-		string8 v_cens_date	  						:= if((self.RegDate_in between '19500101' and ut.GetDate) and
+		string8 v_cens_date	  						:= if((self.RegDate_in between '19500101' and (STRING8)STD.Date.Today()) and
 																						length(trim(self.RegDate_in)) = 8,
 																						self.RegDate_in,
 																						''
 																						);
-		string8 v_ccw_date								:= if((self.CCWRegDate_in between '19500101' and ut.GetDate) and
+		string8 v_ccw_date								:= if((self.CCWRegDate_in between '19500101' and (STRING8)STD.Date.Today()) and
 																						length(trim(self.CCWRegDate_in)) = 8,
 																						self.CCWRegDate_in,
 																						''
 																						);
-		string8 v_vote_date								:= if((self.LastDayVote_in	between '19500101' and ut.GetDate) and
+		string8 v_vote_date								:= if((self.LastDayVote_in	between '19500101' and (STRING8)STD.Date.Today()) and
 																						length(trim(self.LastDayVote_in)) = 8,
 																						self.LastDayVote_in,
-																						if(	(self.RegDate_in between '19500101' and ut.GetDate) and
+																						if(	(self.RegDate_in between '19500101' and (STRING8)STD.Date.Today()) and
 																								length(trim(self.RegDate_in)) = 8,
 																								self.RegDate_in,
 																								''
 																							)
 																						);
-		string8 v_hunt_date								:= if((self.DateLicense_in between '19500101' and ut.GetDate) and
+		string8 v_hunt_date								:= if((self.DateLicense_in between '19500101' and (STRING8)STD.Date.Today()) and
 																						length(trim(self.DateLicense_in)) = 8,
 																						self.DateLicense_in,
-																						if(	(self.RegDate_in between '19500101' and ut.GetDate) and
+																						if(	(self.RegDate_in between '19500101' and (STRING8)STD.Date.Today()) and
 																								length(trim(self.RegDate_in)) = 8,
 																								self.RegDate_in,
 																								''
 																							)
 																						);
-		string8 v_fish_date								:= if((self.DateLicense_in between '19500101' and ut.GetDate) and
+		string8 v_fish_date								:= if((self.DateLicense_in between '19500101' and (STRING8)STD.Date.Today()) and
 																						length(trim(self.DateLicense_in)) = 8,
 																						self.DateLicense_in,
 																						''
@@ -403,7 +404,22 @@ function
 	
 	rHuntCCWAppendAID_layout	tAppendPrepAddr(dHuntCCW_RecleanNames pInput)	:=
 	transform
-		self	:=	pInput;
+		Self.ResAddr1 :=If(regexfind('NULL',pinput.ResAddr1), RegexReplace('^NULL$', Trim(pinput.ResAddr1, left, right), ''), pinput.ResAddr1) ;
+		Self.Mail_Addr1 := If(regexfind('NULL',pinput.Mail_Addr1), RegexReplace('^NULL$', Trim(pinput.Mail_Addr1, left, right), ''), pinput.Mail_Addr1) ;
+		Self.CASS_Addr1 := If(regexfind('NULL',pinput.CASS_Addr1), RegexReplace('^NULL$', Trim(pinput.CASS_Addr1, left, right), ''), pinput.CASS_Addr1) ;
+		
+		Self.Res_City := If(regexfind('NULL',pinput.Res_City), RegexReplace('^NULL$', Trim(pinput.Res_City, left, right), ''), pinput.Res_City) ;
+		Self.Mail_City := If(regexfind('NULL',pinput.Mail_City), RegexReplace('^NULL$', Trim(pinput.Mail_City, left, right), ''), pinput.Mail_City) ;
+		Self.CASS_City := If(regexfind('NULL',pinput.CASS_City), RegexReplace('^NULL$', Trim(pinput.CASS_City, left, right), ''), pinput.CASS_City) ;
+		
+		Self.Res_State := If(regexfind('NULL',pinput.Res_State), RegexReplace('^NULL$', Trim(pinput.Res_State, left, right), ''), pinput.Res_State) ;
+		Self.Mail_State := If(regexfind('NULL',pinput.Mail_State), RegexReplace('^NULL$', Trim(pinput.Mail_State, left, right), ''), pinput.Mail_State) ;
+		Self.CASS_State := If(regexfind('NULL',pinput.CASS_State), RegexReplace('^NULL$', Trim(pinput.CASS_State, left, right), ''), pinput.CASS_State) ;
+		
+		Self.Res_Zip := If(regexfind('NULL',pinput.Res_Zip), RegexReplace('^NULL$', Trim(pinput.Res_Zip, left, right), ''), pinput.Res_Zip) ;
+		Self.Mail_Zip := If(regexfind('NULL',pinput.Mail_Zip), RegexReplace('^NULL$', Trim(pinput.Mail_Zip, left, right), ''), pinput.Mail_Zip) ;
+		Self.CASS_Zip := If(regexfind('NULL',pinput.CASS_Zip), RegexReplace('^NULL$',Trim(pinput.CASS_Zip, left, right), ''), pinput.CASS_Zip) ;
+		Self	:=	pInput;
 	end;
 	
 	dHuntCCW_AppendPrepAddr	:=	project(dHuntCCW_RecleanNames, tAppendPrepAddr(left));
@@ -413,13 +429,15 @@ function
 	// Normalize records on address
 	rHuntCCWAppendAID_layout	tNormalizeAddr(dHuntCCW_AppendPrepAddr_SeqNum pInput, integer addrCount)	:=
 	transform
-		self.addressInd						:=	choose(addrCount, 'R', 'M', 'C');
-		self.Append_Prep_Address1	:=	choose(	addrCount,
+		self.addressInd						 :=	choose(addrCount, 'R', 'M', 'C');
+		Append_Prep_Address1_tmp	 :=	choose(	addrCount,
 																					trim(StringLib.StringToUpperCase(trim(pInput.ResAddr1, left, right) + ' ' + trim(pInput.ResAddr2, left, right)),left,right),
 																					trim(StringLib.StringToUpperCase(trim(pInput.Mail_Addr1, left, right) + ' ' + trim(pInput.Mail_Addr2, left, right)),left,right),
 																					trim(StringLib.StringToUpperCase(trim(pInput.CASS_Addr1, left, right) + ' ' + trim(pInput.CASS_Addr2, left, right)),left,right)
 																				);
-		self.Append_Prep_Address2	:=	choose(	addrCount,
+    //Convert some invalid address chars to spaces		
+		Append_Prep_Address1_tmp2 := StringLib.StringTranslate(Address.fn_addr_clean_prep(Append_Prep_Address1_tmp,'first'), '|?()*_', '      ');
+		Append_Prep_Address2_tmp	:=	choose(	addrCount,
 																					trim(	StringLib.StringToUpperCase(		trim(pInput.Res_City, left, right)
 																																							+	if(	pInput.Res_City != '', ', '	+	trim(pInput.Res_State, left, right), trim(pInput.Res_State, left, right))
 																																							+ ' '
@@ -442,16 +460,50 @@ function
 																								left,right
 																							)
 																				);
-		self											:=	pInput;
+    //Convert some invalid address chars to spaces		
+		Append_Prep_Address2_tmp2 := StringLib.StringTranslate(Address.fn_addr_clean_prep(Append_Prep_Address2_tmp,'last'), '|?()*_', '      ');
+		clean_addr					      := Address.CleanAddress182(Append_Prep_Address1_tmp2, Append_Prep_Address2_tmp2);
+    self.Append_Prep_Address1 := Address.Addr1FromComponents(clean_addr[1..10],       //prim_range
+		                                                         clean_addr[11..12],      //predir
+																														 clean_addr[13..40],      //prim_name
+                                                             clean_addr[41..44],      //addr_suffix
+																														 clean_addr[45..46],      //postdir 
+																														 clean_addr[47..56],      //unit_desig 
+																														 clean_addr[57..64]);     //sec_range
+    self.Append_Prep_Address2 := Address.Addr2FromComponents(clean_addr[65..89],      //p_city_name
+		                                                         clean_addr[115..116],    //st
+																														 clean_addr[117..121]);   //zip		
+		self											:= pInput;
 	end;
-	
-	dHuntCCW_StandardizeAddr	:=	normalize(dHuntCCW_AppendPrepAddr_SeqNum, 3, tNormalizeAddr(left, counter));	
-	
+	dHuntCCW_StandardizeAddr	:=	normalize(dHuntCCW_AppendPrepAddr_SeqNum, 3, tNormalizeAddr(left, counter));
+		
 	dHuntCCW_AddrPopulated		:=	dHuntCCW_StandardizeAddr(Append_Prep_Address2	!=	'');
 	dHuntCCW_AddrNotPopulated	:=	dHuntCCW_StandardizeAddr(Append_Prep_Address2	=		'');
 
-	// Pass to the AddressID macro and get back the raw addressID
-	AID.MacAppendFromRaw_2Line(dHuntCCW_AddrPopulated, Append_Prep_Address1, Append_Prep_Address2, Append_RawAID, dHuntCCW_AppendAID, AID.Common.eReturnValues.RawAID);
+  Countries := ['AHO', 'ALB', 'AND', 'ANT', 'ARG', 'ARU', 'ASA', 'AUS', 'AUT', 'BAH', 'BAN', 'BAR', 'BEL', 'BEN',
+                'BER', 'BIH', 'BLR', 'BOL', 'BOT', 'BRA', 'BRU', 'BUL', 'BUR', 'CAF', 'CAN', 'CAY', 'CHA', 'CHI',
+	 						  'CHN', 'COL', 'CPV', 'CRC', 'CRO', 'CYP', 'CZE', 'DEN', 'DMA', 'DOM', 'ECU', 'ERI', 'ESA', 'ESP',
+								'EST', 'FIN', 'FRA', 'FRG', 'FSM', 'GAB', 'GAM', 'GBR', 'GEO', 'GER', 'GHA', 'GRE', 'GUA', 'GUM',
+								'HKG', 'HOL', 'HUN', 'INA', 'IND', 'IRL', 'ISL', 'ISR', 'ITA', 'IVB', 'JAM', 'JOR', 'JPN', 'KAZ',
+								'KEN', 'KOR', 'KSA', 'KUW', 'LAO', 'LAT', 'LAW', 'LIE', 'LTU', 'LUX', 'MAL', 'MAR', 'MAS', 'MDA',
+								'MDV', 'MEX', 'MKD', 'MLI', 'MLT', 'MON', 'MYA', 'NAM', 'NCA', 'NED', 'NEP', 'NGR', 'NIG', 'NOR',
+								'NZL', 'OMA', 'PAK', 'PAN', 'PAR', 'PER', 'PHI', 'PLE', 'POL', 'POR', 'PRK', 'PUR', 'QAT', 'ROM',
+								'ROU', 'RSA', 'RUS', 'SAF', 'SAU', 'SEN', 'SIN', 'SKN', 'SLO', 'SRB', 'SRI', 'STP', 'SUI', 'SUR',
+								'SVK', 'SWE', 'SWZ', 'TAI', 'THA', 'TOG', 'TPE', 'TRI', 'TUR', 'UAE', 'UGA', 'UKR', 'URS', 'URU',
+								'UZB', 'VAN', 'VEN', 'VIE', 'VIN', 'YAR', 'ZAI', 'ZAM', 'ZIM'];
+
+	dHuntCCW_AddrPopulated_nonUS	:=	dHuntCCW_AddrPopulated(TRIM(mail_county, ALL) IN Countries,
+                                                           TRIM(res_state, ALL) NOT IN ut.Set_State_Abbrev,
+																                           (UNSIGNED3)res_zip[1..5] NOT BETWEEN 1001 AND 99929,
+																                           TRIM(mail_addr1 + mail_city + mail_state + mail_zip, ALL) = '');
+
+	dHuntCCW_AddrPopulated_US	    :=	JOIN(dHuntCCW_AddrPopulated, dHuntCCW_AddrPopulated_nonUS,
+	                                       LEFT = RIGHT,
+																				 TRANSFORM(RECORDOF(dHuntCCW_AddrPopulated), SELF := LEFT),
+																				 LEFT ONLY);
+	
+// Pass to the AddressID macro and get back the raw addressID
+	AID.MacAppendFromRaw_2Line(dHuntCCW_AddrPopulated_US, Append_Prep_Address1, Append_Prep_Address2, Append_RawAID, dHuntCCW_AppendAID, AID.Common.eReturnValues.RawAID);
 
 	rHuntCCWAppendAID_layout	tAppendAID(dHuntCCW_AppendAID	pInput)	:=
 	transform
@@ -462,7 +514,7 @@ function
 	dHuntCCW_AID	:=	project(dHuntCCW_AppendAID,tAppendAID(left));
 	
 	// Combine the records which were not passed to the Address ID macro before denormalizing
-	dHuntCCW_AIDCombined	:=	dHuntCCW_AID	+	dHuntCCW_AddrNotPopulated;
+	dHuntCCW_AIDCombined	:=	dHuntCCW_AID	+	dHuntCCW_AddrNotPopulated + dHuntCCW_AddrPopulated_nonUS;
 		
 	// Denormalize on addresses once the AID is appended
 	emerges.layout_hunt_ccw.rHuntCCWCleanAddr_layout	tReformatBase(dHuntCCW_AIDCombined pInput)	:=
@@ -621,7 +673,6 @@ function
 	end;
 
 	dHuntCCW_CleanAddr_FixDates	:= project(dHuntCCW_CleanAddr,	tFormatDates(left));
-	
 	dHuntCCW_CleanOut			:=	output(dHuntCCW_CleanAddr_FixDates, , '~thor_data400::in::emerges::' + version_date + '::'	+	stringlib.stringtolowercase(file_type), __compressed__);
 
 	addHuntCCW_CleanSuper	:=	sequential(	fileservices.startsuperfiletransaction(),

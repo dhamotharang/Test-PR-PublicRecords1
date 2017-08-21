@@ -1,4 +1,4 @@
-import ut, doxie, vehlic, doxie_build,VehicleV2, doxie_files,RoxieKeyBuild, NID;
+import ut, doxie, vehlic, doxie_build,VehicleV2, doxie_files,RoxieKeyBuild,NID,PromoteSupers;
 
 export proc_build_strings(string filedate) := function
 
@@ -14,7 +14,10 @@ TRANSFORM
 										StringLib.StringToUpperCase(TRIM(TRIM(s, LEFT), RIGHT)))[1..len];
 END;
 
-model_descriptionTable := PROJECT(VehicleV2.file_VehicleV2_main, justString(if(LEFT.VINA_Model_Desc<>'', trim(LEFT.VINA_Model_Desc,left, right) + ' ' + trim(LEFT.VINA_Series_Desc,left, right), LEFT.Orig_Model_Desc),false, 36));
+//model_descriptionTable := PROJECT(VehicleV2.file_VehicleV2_main, justString(if(LEFT.VINA_Model_Desc<>'', trim(LEFT.VINA_Model_Desc,left, right) + ' ' + trim(LEFT.VINA_Series_Desc,left, right), LEFT.Orig_Model_Desc),false, 36));
+//Exclude Infutor data from wildcard search base file
+model_descriptionTable := PROJECT(VehicleV2.file_VehicleV2_main/*(source_code not in ['1V','2V'])*/, justString(if(LEFT.VINA_Model_Desc<>'', trim(LEFT.VINA_Model_Desc,left, right) + ' ' + trim(LEFT.VINA_Series_Desc,left, right), LEFT.Orig_Model_Desc),false, 36));
+
 /*
 fNameTable := PROJECT(VehicleV2.file_VehicleV2_Party, justString(LEFT.Append_Clean_Name.fname, true, 20));
 mNameTable := PROJECT(VehicleV2.file_VehicleV2_Party, justString(LEFT.Append_Clean_Name.mname, true, 20));
@@ -44,9 +47,9 @@ ut.MAC_Sequence_Records_NewRec(Body_style,   Layout_bodystyleIndex, i, basebodyI
 
 /* *************** Output Base Files and Indices ****************** */
 //ut.MAC_SF_BuildProcess(baseNameIndex,  '~thor_data400::WC_Vehicle::NameBase_' + doxie_build.buildstate,  do1)
-ut.MAC_SF_BuildProcess(baseModelIndex, '~thor_data400::WC_Vehicle::ModelBase_' + doxie_build.buildstate, do2)
-ut.MAC_SF_BuildProcess(baseMakeIndex,  '~thor_data400::base::WC_Vehicle::Make', do7)
-ut.MAC_SF_BuildProcess(basebodyIndex,  '~thor_data400::base::WC_Vehicle::BodyStyle', do10);
+PromoteSupers.MAC_SF_BuildProcess(baseModelIndex, '~thor_data400::WC_Vehicle::ModelBase_' + doxie_build.buildstate, do2)
+PromoteSupers.MAC_SF_BuildProcess(baseMakeIndex,  '~thor_data400::base::WC_Vehicle::Make', do7)
+PromoteSupers.MAC_SF_BuildProcess(basebodyIndex,  '~thor_data400::base::WC_Vehicle::BodyStyle', do10);
 
 
 // todo: make sure File_NameIndex and File_ModelIndex are full
@@ -68,8 +71,8 @@ RoxieKeyBuild.MAC_SK_BuildProcess_Local(Vehicle_Wildcard.Key_Make,'~thor_data400
 RoxieKeyBuild.MAC_SK_BuildProcess_Local(Vehicle_Wildcard.Key_BodyStyle,'~thor_data400::key::WC_Vehicle::'+filedate+'::BodyStyle' , 
 								 '~thor_data400::Key::WC_Vehicle::BodyStyle' , do11);
 								 
-RoxieKeyBuild.MAC_SK_Move_To_Built('~thor_data400::key::vehicle::'+filedate+'::keynameindex_' + doxie_build.buildstate, 
-								'~thor_data400::WC_Vehicle::KeyNameIndex_' + doxie_build.buildstate, do5);
+/*RoxieKeyBuild.MAC_SK_Move_To_Built('~thor_data400::key::vehicle::'+filedate+'::keynameindex_' + doxie_build.buildstate, 
+								'~thor_data400::WC_Vehicle::KeyNameIndex_' + doxie_build.buildstate, do5);*/
 
 RoxieKeyBuild.MAC_SK_Move_To_Built('~thor_data400::key::vehicle::'+filedate+'::keymodelindex_' + doxie_build.buildstate, 
 								 '~thor_data400::WC_Vehicle::KeyModelIndex_' + doxie_build.buildstate, do6);

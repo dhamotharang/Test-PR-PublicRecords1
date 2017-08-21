@@ -82,6 +82,53 @@ EXPORT new_layout_in := record
  string                flag5;*/
  end;
 
+export layout_in_20140204 := record
+
+string8 Sequence_Number;
+string1 filler1;
+string10 ECI_Number;
+string1 filler2;
+string9 SSN;
+string1 filler3;
+string8 DOB;
+string1 filler4;
+string32 Last_Name; 
+string1 filler5;
+string32 First_Name;
+string1 filler6;
+string32 Middle_Name;
+string1 filler7;
+string64 Current_Address_Street;
+string1 filler8;
+string25 Current_Address_City;
+string1 filler9;
+string2 Current_Address_State;
+string1 filler10;
+string5 Current_Address_Zip;
+string1 filler11;
+string5 Current_Address_Country_Code;
+string1 filler12;
+string4 Account_Number;
+string1 filler13;
+string32 Product_Type;
+string1 filler14;
+string10 Original_Open_Date;
+string1 filler15;
+string8 Branch_Location_Number;
+string2 filler16;
+
+end;
+
+export layout_branch_addr_lookup := record
+
+string branch_number;
+string address;
+string city;
+string state;
+string zip;
+
+end;
+
 export preclean := record
 
 string                ssn         ;
@@ -131,7 +178,13 @@ string                ssn         ;
  string Q17_bk_ctr_address2;
  string Q22_atm_most_visited_address1;
  string Q22_atm_most_visited_address2;
-// AID.Common.xAID							Append_RawAID;        
+ string8 open_date;
+// AID.Common.xAID							Append_RawAID;
+ string8         process_date := '';
+ string8         date_vendor_first_reported := '';
+ string8         date_vendor_last_reported := '';  
+ string8         date_first_seen := '';
+ string8         date_last_seen := '';      
 end;
 
 export base := record

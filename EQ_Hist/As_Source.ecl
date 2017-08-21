@@ -8,16 +8,18 @@ export As_Source(dataset(layout.base) pEquifax = dataset([],layout.base), boolea
 					   ,pEquifax 
 					  );
 
-  dist_file_eq0:=project(dSourceData,transform(header.layout_header_in,self.src:='EH',self:=left));
+	dist_file_eq0:=project(dSourceData
+						,transform({header.layout_header_in}
+							,self.src:='EH'
+							,self.current_address_date_reported:=left.current_address_date_reported[5..6]+left.current_address_date_reported[1..4]
+							,self.former1_address_date_reported:=left.former1_address_date_reported[5..6]+left.former1_address_date_reported[1..4]
+							,self.former2_address_date_reported:=left.former2_address_date_reported[5..6]+left.former2_address_date_reported[1..4]
+							,self:=left));
+
+
 	dist_file_eq := distribute(dist_file_eq0,hash(first_name,last_name,current_address,current_state,current_zip));
 	srt_file_eq := sort(dist_file_eq,record,local);
 	with_id := dedup(srt_file_eq,record,except uid,local);
 
-	dForHeader  :=	with_id	: persist('~thor_data400::persist::headerbuild_eq_hist_src');
-	dForOther   :=	with_id;
-	ReturnValue :=	if(pForHeaderBuild,
-					   dForHeader,
-					   dForOther
-					  );
-	return ReturnValue;
+	return with_id;
   end;

@@ -1069,7 +1069,7 @@ shared outs_future := outs(dstime = 'future');
 shared outs_future_aslinking := outs(dstime = 'future_aslinking');
 shared outs_sum :=
 project(
-	ut.ds_oneRecord,
+	dataset([{1}], {unsigned a}),
 	transform(
 		{outs},
 		self.dsname := '  ALL',
@@ -1084,7 +1084,7 @@ project(
 	)
 )
 +project(
-	ut.ds_oneRecord,
+	dataset([{1}], {unsigned a}),
 	transform(
 		{outs},
 		self.dsname := '  ALL',
@@ -1099,7 +1099,7 @@ project(
 	)
 )
 +project(
-	ut.ds_oneRecord,
+	dataset([{1}], {unsigned a}),
 	transform(
 		{outs},
 		self.dsname := '  ALL',

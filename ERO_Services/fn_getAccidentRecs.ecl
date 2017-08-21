@@ -132,15 +132,12 @@ export fn_getAccidentRecs( dataset(Layouts.LookupId) ids = dataset([],Layouts.Lo
 					self.city                   := r.vehicle_incident_city;
 					self.county                 := ERO_Services.fn_getCounty(r.vehicle_incident_city, r.vehicle_incident_st);
     end;					
-  	ds_pre :=  join(ds_acctno_did_accNbrs,FLAccidents_eCrash.Key_eCrashV2_accnbrV1,
+  	ds_accident_info_dups :=  join(ds_acctno_did_accNbrs,FLAccidents_eCrash.Key_eCrashV2_accnbrV1,
 	         									keyed((string)left.accident_nbr=right.l_accnbr and 
 														      left.report_code=right.report_code) and
 																	left.did = (integer)right.did,  
 														      fillAccident(left,right),
-        										      limit(10000, SKIP));
-
-		ds_accident_info_dups := limit (ds_pre, Accident_Services.Constants.MAX_RECS_ON_JOIN, skip);
-
+        										      limit(Accident_Services.Constants.MAX_RECS_ON_JOIN));
 		ds_accident_info := dedup(sort(ds_accident_info_dups,record),record);
 		// 2. Add Owner info.
 		layout_owner := record

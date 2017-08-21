@@ -56,8 +56,8 @@ export
 #end
 rOut := map(
 					_control.thisenvironment.name = 'Dataland' and pShouldSendToStrata = true =>	parallel(%rout2%,%rout6%)
-					,pShouldSendToStrata 					= true				=> 	parallel(%rout1%,%rout2%,%rout6%)
-					,																								parallel(%rout5%,%rout2%/*,%rout6%*/)	//to test stats without sending to strata
+					,pShouldSendToStrata 					= true				=> 	parallel(%rout2%,%rout6%)
+					,																								parallel(%rout2%/*,%rout6%*/)	//to test stats without sending to strata
 			);		
 
 endmacro;

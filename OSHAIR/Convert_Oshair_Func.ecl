@@ -43,18 +43,17 @@ export Convert_Oshair_Func := function
 		self.docref.src := TRANSFER(l.region_code, INTEGER2);
 		self.docref.doc := l.activity_number;
 		self.segs := dataset([
-				{1,0,l.Previous_Activity_Type},
+				{1,0,l.Prev_Activity_Type_Desc},
 				{2,0,l.Previous_Activity_Number},
 				{3,0,l.Activity_Number},
 				{4,0,l.Region_Code + ' ' + l.area_code + ' ' + l.office_code},
 				{5,0,l.Compl_Officer_Job_Title_Desc},
 				{6,0,l.Inspected_Site_Name},
-				{7,0,l.Inspected_Site_Street + ' ' + l.Inspected_Site_State + ' ' + l.Inspected_Site_Zip + ' ' +
-						l.Inspected_Site_City_Name},
-				{9,0,l.county_name},
-				{8,0,l.Inspected_Site_State},
-				{9,0,l.Inspected_Site_Zip},
-				{10,0,l.Inspected_Site_City_Name},
+				{7,0,l.Inspected_Site_Street + ' ' + l.Inspected_Site_City_Name + ' ' + l.Inspected_Site_State + ' ' + l.Inspected_Site_Zip},
+				// ??? {9,0,l.county_name},
+				//{8,0,l.Inspected_Site_State},
+				//{9,0,l.Inspected_Site_Zip},
+				//{10,0,l.Inspected_Site_City_Name},
 				{11,0,l.county_name},
 				{12,0,l.duns_number},
 				{13,0,l.Host_Establishment_key},
@@ -97,8 +96,21 @@ export Convert_Oshair_Func := function
 	iterate_out := iterate(sort_out,iterate_recs(left,right),local);
 	
 	retval := iterate_out(trim(content) <> '' and trim(content) <> ';');
+		// External key
 	
-	return retval;
+	text_search.Layout_DocSeg MakeKeySegs( retval l, unsigned2 segno ) := TRANSFORM
+	    self.docref.doc := l.docref.doc;
+        self.docref.src := l.docref.src;
+		self.segment := segno;
+        self.content := intformat(l.docref.doc,15,1);
+        self.sect := 1;
+    END;
+
+    segkeys := PROJECT(retval,MakeKeySegs(LEFT,250));
+
+	full_ret := segkeys + retval;
+	
+	return full_ret;
 	
 	
 end;

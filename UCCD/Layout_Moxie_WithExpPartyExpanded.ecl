@@ -1,4 +1,4 @@
-export Layout_WithExpPartyExpanded_Moxie := record
+export Layout_Moxie_WithExpPartyExpanded := record
 
 	string1   	record_type; 		 // current/historical
 	string1   	isDirect;

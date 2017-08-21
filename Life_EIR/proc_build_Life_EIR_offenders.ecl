@@ -1,6 +1,6 @@
-import ut,corrections,header_slimsort,watchdog,didville,fair_isaac,did_add,doxie_build,census_data,codes;
+import ut,corrections,header_slimsort,watchdog,didville,fair_isaac,did_add,doxie_build,hygenics_search,census_data,codes;
 
-export proc_build_Life_EIR_offenders(dataset(Corrections.layout_offender) infile):= function
+export proc_build_Life_EIR_offenders(dataset(hygenics_search.corrections_layout_offender) infile):= function
 
 df4 := infile;
 did_method := //'local';   // flex macro
@@ -9,7 +9,7 @@ did_method := //'local';   // flex macro
 		  'none';	// if did'ing is not needed.
 //-----------[ Simplified version ]------------------//
 
-corrections.layout_offender into_offender(df4 L) := transform
+hygenics_search.corrections_layout_offender into_offender(df4 L) := transform
 	self.st := IF(L.st='',L.orig_state,L.st);
 	self := l;
 end;
@@ -107,7 +107,7 @@ o1wd := o1_did + join(outf,o1_seq,left.seq = right.seq,into_orig(LEFT,RIGHT),has
 
 //--------------------------------------------------//
 
-corrections.layout_offender get_state_mapping1(o1wd L, codes.File_Codes_V3_In R) := transform
+hygenics_search.corrections_layout_offender get_state_mapping1(o1wd L, codes.File_Codes_V3_In R) := transform
 	self.place_of_birth := R.long_desc;
 	self := L;
 end;
@@ -117,7 +117,7 @@ o1a := join(o1wd,codes.File_Codes_V3_In(file_name = 'GENERAL', field_name= 'STAT
 	right.code = left.place_of_birth,
 	get_state_mapping1(LEFT,RIGHT),lookup, left outer);
 
-corrections.layout_offender get_state_mapping2(o1a L, codes.File_Codes_V3_In R) := transform
+hygenics_search.corrections_layout_offender get_state_mapping2(o1a L, codes.File_Codes_V3_In R) := transform
 	self.orig_state := R.long_desc;
 	self := L;
 end;
@@ -126,7 +126,7 @@ o1a2 := join(o1a,codes.File_Codes_V3_In(file_name = 'GENERAL', field_name= 'STAT
 		get_state_mapping2(LEFT,RIGHT),left outer, lookup);
 		
 
-corrections.layout_offender get_county_name(o1a2 L, Census_data.File_Fips2County r) := transform
+hygenics_search.corrections_layout_offender get_county_name(o1a2 L, Census_data.File_Fips2County r) := transform
 	self.county_name := R.county_name;
 	self := L;
 end;
@@ -150,7 +150,7 @@ string fRemoveLeadingZeros(string pStringIn) //expects numbers only--TRIM IT FIR
  + if(length(pStringIn)>=12,if(pStringIn[01..12]='000000000000','',pStringIn[12]),'')
  ;
 
-corrections.Layout_Offender tPostDIDPatch(corrections.Layout_Offender pInput)
+hygenics_search.corrections_layout_offender tPostDIDPatch(hygenics_search.corrections_layout_offender pInput)
  :=
   transform
 	//self.Case_Type_Desc := if(pInput.Vendor = '01','Statewide Court',pInput.Case_Type_Desc);

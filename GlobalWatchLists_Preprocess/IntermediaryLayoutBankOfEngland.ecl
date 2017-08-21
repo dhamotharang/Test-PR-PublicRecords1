@@ -1,0 +1,35 @@
+EXPORT IntermediaryLayoutBankOfEngland := MODULE
+	EXPORT BaseLayout := RECORD
+	  string20 ent_key;
+		string25 source;
+		string8 lst_vend_upd;
+		string80 lstd_entity;
+		string100 first_name;
+		string150 last_name;
+		string150 title;
+		string10 dob;
+		string250 Town_of_Birth;
+		string100 Country_of_Birth;
+		string100 Nationality;
+		string800 Passport_Details;
+		string125 NI_Number;
+		string300 position;
+		string150 Address_1;
+		string64 Address_2;
+		string64 Address_3;
+		string64 Address_4;
+		string64 Address_5;
+		string64 Address_6;
+		string13 Post_Zip_Code;
+		string100 Country;
+		string1000 address_addl_info;
+		string10 Group_Type;
+		string11 alias_type;
+		string80 Regime;
+		string10 Listed_On;
+		string10 Last_Updated;
+		string20 Group_ID;
+		rNameAddress.rName 		the_name;
+		rNameAddress.rAddress the_address;
+	END;
+END;

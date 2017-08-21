@@ -1,0 +1,1 @@
+export MOXIE_MOUNT_2 := '/property_vol03_19/';

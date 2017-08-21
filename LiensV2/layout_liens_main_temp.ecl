@@ -44,6 +44,7 @@ string legal_lot := '';
 string legal_block := '';
 string legal_borough := '';
 string certificate_number := '';
+BOOLEAN	bCBFlag	:=	FALSE;
 string filing_status := '';
 string filing_status_desc := '';
 

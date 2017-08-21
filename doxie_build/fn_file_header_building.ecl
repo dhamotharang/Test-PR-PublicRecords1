@@ -1,61 +1,76 @@
-import header, lib_fileservices;
+import doxie_build, header, header_services,ut, yellowpages, AID;
 
 export fn_file_header_building(dataset(recordof(header.Layout_Header)) in_hdr0) := 
 function
 
-in_hdr := in_hdr0;// + header.transunion_did;
+in_hdr1 := Header.fn_blank_phone(in_hdr0 + Header.file_TUCS_did + Header.File_TN_did) + Header.File_Transunion_did;
+
+not_from_raw := in_hdr1(  src in ['TS','TU','LT'] );
+yes_from_raw := in_hdr1(~(src in ['TS','TU','LT']));
+
+header.macGetCleanAddr(not_from_raw, RawAID, true, not_from_raw_recleaned);
+
+in_hdr2 := yes_from_raw + not_from_raw_recleaned;
+
+in_hdr3 := project(in_hdr2,transform(recordof(in_hdr2)
+									,self.name_suffix:=if(left.name_suffix[1..2]='UN','',left.name_suffix)
+									,self.prim_name:=map(
+																			 left.prim_name='WARRINGT0N' => 'WARRINGTON'
+																			,left.prim_name
+																			)
+									,self:=left));
+in_hdr  := in_hdr3(rid not in header.fraud_records);
+in_base_ := in_hdr;
+
+layout_hashed := {
+							data16 hval_id_1;
+							data16 hval_id_2 ;
+							data16 hval_address ;
+							header.Layout_Header ;							
+						} ;
+					
+layout_hashed xTohash(header.Layout_Header L) := transform
+       self.hval_id_1 := HASHMD5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right));     
+       self.hval_id_2 := HASHMD5(	intformat((unsigned6)l.did,15,1),TRIM((string14)l.vendor_id, left, right),intformat((unsigned4)l.dob,8,1),Trim((string9)l.ssn));      
+		 self.hval_address := hashmd5(intformat(l.did,15,1),(string)l.st,(string)l.zip,(string)l.city_name,
+									(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.suffix,(string)l.postdir,(string)l.sec_range);
+		 self := L ;
+end ;
+
+in_base := project (in_base_, xTohash(left)) ;
+
+Suppression_Layout 	:= header_services.Supplemental_Data.layout_in; 
+header_services.Supplemental_Data.mac_verify('driverslicense_sup.txt',Suppression_Layout, dl_supp_ds_func);
+DL_Suppression_In 	:= dl_supp_ds_func();
+DLSuppressedIn 			:= PROJECT(	DL_Suppression_In,header_services.Supplemental_Data.in_to_out(left));
+
+full_ShortSuppress := join(in_Base,DLSuppressedIn,left.hval_id_1=right.hval, left only,lookup);
 
 // Start of code to suppress data based on an MD5 Hash of DID+Address
-rHashDIDAddress := record
- data16 hash_did_address;
-end;
 
-dSuppressedIn := dataset('~thor_data400::base::md5::did_address', rHashDIDAddress,flat);
+header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func);
+ 
+Suppression_In := supp_ds_func();
 
-rFullOut_HashDIDAddress := record
- header.layout_header;
- rHashDIDAddress;
-end;
+dSuppressedIn := project(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
 
-rFullOut_HashDIDAddress tHashDIDAddress(header.Layout_Header l) := transform                            
- self.hash_did_address := hashmd5(intformat(l.did,12,1),(string)l.st,(string)l.zip,(string)l.city_name,
-									(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.suffix,(string)l.postdir,(string)l.sec_range);
+header.layout_header tSuppress(full_ShortSuppress l) := transform
  self := l;
 end;
+// dSuppressedIn substituted below with full_LongSuppress
 
-dHeader_withMD5 := project(in_hdr, tHashDIDAddress(left));
-
-header.layout_header tSuppress(dHeader_withMD5 l, dSuppressedIn r) := transform
- self := l;
-end;
-
-full_out_suppress := join(dHeader_withMD5,dSuppressedIn,
-                          left.hash_did_address=right.hash_did_address,
-						  tSuppress(left,right),
-						  left only,lookup);
-
+full_out_suppress := join(full_ShortSuppress, dSuppressedIn,
+                          left.hval_address=right.hval,
+													tSuppress(left),
+													left only,lookup);
+												
 fix_addr_suffix    := header.fn_addr_suffix_corrections(full_out_suppress);
-remove_companies   := header.fn_remove_companies(fix_addr_suffix);
-remove_old_records := header.fn_remove_old_records(remove_companies);
+remove_old_records := header.fn_remove_old_records(fix_addr_suffix);
 fix_dobs           := header.fn_patch_dob(remove_old_records);
+fix_name_suffix    := header.fn_name_suffix_corrections(fix_dobs)(fname<>'',lname<>'');
+													
+/////////////////////////////////////////////////////////////////////////////
 
-//************************************************************************
-//ADD INFORMATION - CNG 20070426 - W20070426-105426
-//************************************************************************
-
-IP_Loc := '10.150.12.240';
-Directory_Loc := '/data_999/lnfab/';
-Rec_Length := 315; //Rec_Length := sizeof(header.Layout_Header);  //*** USE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT - RIGHT NOW SET FOR STRING INPUTS
-dFilename_Loc	:=	nothor(lib_fileservices.FileServices.RemoteDirectory(IP_Loc,Directory_Loc)(size % Rec_Length = 0 and size / Rec_Length <> 0 and size <> 3465)) : independent(few);
-dFilename_LocOne:=	dFilename_Loc(modified=max(dFilename_Loc,modified));
-FileName_Loc := nothor(dFilename_LocOne[1].name):independent(few);
-available_flag := nothor(FileName_Loc <> '');
-/*
-FileServices.sendemail('cguyton@seisint.com', 'Upload from Drop Zone Status', if(available_flag, Thorlib.WUID() + ' Success - Header Records\r\n'+IP_Loc + ' ' + Directory_Loc + FileName_Loc+' is loaded.', 
-                                                'Header Failure\r\n Cluster: '+ Thorlib.Cluster() + '\r\n DaliServer: ' + Thorlib.DaliServers() + '\r\n Job Owner: ' +  Thorlib.JobOwner() + '\r\n Platform: ' + Thorlib.Platform() + ' ' + 
-                                                '\r\n\r\nFile Source. System Now Reading Alternative Records\r\n\r\n**Please Check Newest File Layout and Directory Structure**\r\n\r\n' +
-                                                IP_Loc + ' - IP Location\r\n' + Directory_Loc + ' - Directory Location\r\n' + (string4) Rec_Length + '- Desired Record Length ' + Thorlib.WUID()));
-*/
 Drop_Header_Layout := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
 Record
   string15  did;
@@ -98,25 +113,24 @@ Record
   string1   jflag1;
   string1   jflag2;
   string1   jflag3;
-  string2   eor;
+	string20  RawAID;
+  string1   eor; 
 end;
+
+header_services.Supplemental_Data.mac_verify('file_headersv2_inj.txt',Drop_Header_Layout,attr); // V2 added - KLM
  
-DummyRecord := dataset(
-            [{'','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''}],
-            Drop_Header_Layout); //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT if a dummy is already in attribute. Change to match correct layout
- 
-Base_File_Append_In := if(available_flag, dataset('~file::'+IP_Loc+'::'+Directory_Loc+FileName_Loc, Drop_Header_Layout, flat), dummyrecord);
+Base_File_Append_In := attr();
  
 header.Layout_Header reformat_header(Base_File_Append_In L) := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
  transform
     // FileName_Loc;
-            self.did := (unsigned6) L.did;
-            self.rid := (unsigned6) L.rid;
-            self.dt_first_seen := (unsigned3) L.dt_first_seen;
-            self.dt_last_seen := (unsigned3) L.dt_last_seen;
-            self.dt_vendor_last_reported := (unsigned3) L.dt_vendor_last_reported;
-            self.dt_vendor_first_reported := (unsigned3) L.dt_vendor_first_reported;
-            self.dt_nonglb_last_seen := (unsigned3) L.dt_nonglb_last_seen;
+			self.did := (unsigned6) L.did;
+			self.rid := (unsigned6) L.rid;
+			self.dt_first_seen := (unsigned3) L.dt_first_seen;
+			self.dt_last_seen := (unsigned3) L.dt_last_seen;
+			self.dt_vendor_last_reported := (unsigned3) L.dt_vendor_last_reported;
+			self.dt_vendor_first_reported := (unsigned3) L.dt_vendor_first_reported;
+			self.dt_nonglb_last_seen := (unsigned3) L.dt_nonglb_last_seen;
 			self.title := trim(L.title, left, right);
 			self.fname := trim(L.fname, left, right);
 			self.mname := trim(L.mname, left, right);
@@ -138,15 +152,55 @@ header.Layout_Header reformat_header(Base_File_Append_In L) := //REMOVE WHEN WE 
 			self.zip4 := trim(l.zip4,left,right);
 			self.county := trim(l.county,left,right);
             self.dob := (integer4) L.dob;
+			self.RawAID := (unsigned8) L.RawAID;			
     self := L;
  end;
  
 Base_File_Append := project(Base_File_Append_In, reformat_header(left)); //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
 
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+layout_ff := Record
+     data16 hval_did ;
+     data16 hval_ssn ;
+		 string1 nl := '\n' ;
+END ;
+
+header_services.Supplemental_Data.mac_verify('ff_sup.txt',layout_ff, ff_sup_attr); // 
+ 
+Base_ff_sup := ff_sup_attr();
+
+
+ff_base := JOIN(fix_name_suffix, Base_ff_sup,
+                    hashmd5((string9)left.ssn) = right.hval_ssn 
+                    AND
+						  hashmd5(intformat(left.did,15,1)) != right.hval_did,
+						  TRANSFORM(LEFT),
+						  LEFT ONLY, ALL) ;
+
+///
+
+header_services.Supplemental_Data.mac_verify('ridrec_sup.txt',Suppression_Layout, base_sup_attr); // 
+ 
+Base_rid_sup_in := base_sup_attr() ;
+
+base_rid_sup := PROJECT(Base_rid_sup_in ,header_services.Supplemental_Data.in_to_out(left));
+
+rid_base := JOIN(ff_base, base_rid_sup,
+                 hashmd5(intformat((unsigned6)left.rid,15,1)) = right.hval,                    
+						     TRANSFORM(LEFT),
+						    LEFT ONLY, ALL) ;
+						  
+base_file_inj := 	rid_base ;					   
+
 //***********END*************************************************************
 
-last_step := fix_dobs(doxie_build.header_blocked_data()) + Base_File_Append;
 
-return last_step;
+concat := doxie_build.header_blocked_data(base_file_inj) + Base_File_Append ;
 
-end;
+//correct phone areacode
+ut.mac_phone_areacode_corrections(concat, correct_phone_areacode,phone)
+return Header.fn_blank_bogus_ssn(correct_phone_areacode);
+
+end ;

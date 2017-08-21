@@ -1,5 +1,5 @@
 import RoxieKeyBuild, AutokeyB2, ut, autokey, doxie, header_services,AutoKeyI;
-
+       
 export proc_build_util_bus_keys(string filedate) := 
 function
 
@@ -7,7 +7,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(utilfile.key_bus_address,
                           '~thor_data400::key::utility::bus::address','~thor_data400::key::utility::bus::'+filedate+'::address',bk_addr);
 RoxieKeyBuild.Mac_SK_Move_to_Built_V2('~thor_data400::key::utility::bus::address','~thor_data400::key::utility::bus::'+filedate+'::address',mv_addr);
 
-Util_daily_bus_recs := UtilFile.Util_daily_bus_with_bdid;
+Util_daily_bus_recs := utilfile.file_util_bus.full_bdid_for_index;
 
 //start util bus autokeys
 r := RECORD
@@ -113,13 +113,27 @@ bld_auto_keys :=
 	AutokeyB2.Fn_Build.Do(mod_AKB,AutoKeyI.BuildI_Indv.DoBuild,AutoKeyI.BuildI_Biz.DoBuild) 
 ); 
 
+SuperKeyName  := '~thor_data400::Key::utility::'+'@version@::';
+BaseKeyName 	:= '~thor_data400::Key::utility::'+filedate;
 
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(utilfile.Key_Util_Daily_Bus_BDID,'~thor_data400::key::utility::daily::bus::bdid','~thor_data400::key::utility::'+filedate+'::daily::bus::bdid',bk_bdid);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(utilfile.Key_Util_Daily_Bus_Id,'~thor_data400::key::utility::daily::bus::id','~thor_data400::key::utility::'+filedate+'::daily::bus::id',bk_id);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Key_LinkIds.Key,SuperKeyName+'linkids',BaseKeyName+'::linkids',bk_link);														
 
 RoxieKeyBuild.Mac_SK_Move_To_Built_v2('~thor_data400::key::utility::daily::bus::bdid','~thor_data400::key::utility::'+filedate+'::daily::bus::bdid',mv_bdid);
 RoxieKeyBuild.Mac_SK_Move_To_Built_v2('~thor_data400::key::utility::daily::bus::id','~thor_data400::key::utility::'+filedate+'::daily::bus::id',mv_id);
+RoxieKeyBuild.Mac_SK_Move_To_Built_v2(SuperKeyName+'linkids',BaseKeyName+'::linkids',mv_link,2);
 
-return sequential(parallel(bk_addr, bld_auto_keys, bk_bdid, bk_id),
-									parallel(mv_addr, mv_bdid, mv_Id));
+return sequential(parallel(bk_addr, bld_auto_keys, bk_bdid, bk_id, bk_link),
+									parallel(mv_addr, mv_bdid, mv_Id, mv_link));
 end;
+
+
+
+
+
+              
+
+
+
+

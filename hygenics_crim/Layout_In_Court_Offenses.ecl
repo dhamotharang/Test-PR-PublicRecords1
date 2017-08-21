@@ -4,6 +4,8 @@ export Layout_In_Court_Offenses := record
     string2     vendor;
     string2     state_origin;
     string20    source_file;
+		//string50		off_name;
+		string1			data_type;
     string4     off_comp;
     string1     off_delete_flag;
     string8     off_date;

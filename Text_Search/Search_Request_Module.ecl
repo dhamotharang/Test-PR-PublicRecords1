@@ -97,7 +97,7 @@ export Search_Request_Module(FileName_Info info,
 	END;
 
 	// Parse the query
-	pn := IF(srchN != '',ParseQueryFuncUnicode(srchN, isSegName, isThisSeg, myF, kwd.dictVersion));
+	pn := ParseQueryFuncUnicode(srchN, isSegName, isThisSeg, myF, kwd.dictVersion);
 
 	// Update "Max" values
 	Layout_Search_RPN_Set m1(Layout_Search_RPN_Set l, Layout_Search_RPN_Set r):=TRANSFORM

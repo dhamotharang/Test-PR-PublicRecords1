@@ -1,7 +1,7 @@
 import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
 Header, Header_Slimsort, didville, DID_Add,Business_Header_SS, NID, AID, watchdog,
 VersionControl,lib_fileservices,Health_Provider_Services,Health_Facility_Services,
-BIPV2_Company_Names, HealthCareFacility,HMS_STLIC,Scrubs_HMS_STLIC,Scrubs,HealthCare_Provider_Header;
+BIPV2_Company_Names, HealthCareFacility,HMS_STLIC,Scrubs_HMS_STLIC,Scrubs;
 
 
 EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
@@ -60,7 +60,7 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 			
 			std_input := HMS_STLIC.StandardizeInputFile(filedate, pUseProd).StLicense;
 			
-			// std_input := dataset('~thor400_data::base::hms_stl::hms_statelicense::20160419',HMS_STLIC.Layouts.statelicense_base,Thor);
+			// std_input := dataset('~thor400_data::base::hms_stl::hms_statelicense::20151208',HMS_STLIC.Layouts.statelicense_base,Thor);
 		  		
 			cleanNames := Clean_name(std_input,HMS_STLIC.Layouts.statelicense_base,1)
 									:PERSIST('~thor400_data::persist::hms_stl::stlic_names');
@@ -105,12 +105,9 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 				SELF.err_stat    			:= Clean_Address[179..182];
 				SELF := L;
 			END;
-			
-			AddressClean := Clean_addr(UniqueAddresses,HMS_STLIC.Layouts.statelicense_base)
-														:PERSIST('~thor400_data::persist::hms_stl::stlic_uniq_addr');	
-			
-			// AddressClean := project(UniqueAddresses,tr4(left))
-										// :PERSIST('~thor400_data::persist::hms_stl::stlic_uniq_addr');
+
+			AddressClean := project(UniqueAddresses,tr4(left))
+										:PERSIST('~thor400_data::persist::hms_stl::stlic_uniq_addr');
 			
 			cleanAddr:=join(distribute(cleanNames,     hash(Prepped_addr1,Prepped_addr2))
 								,distribute(AddressClean, hash(Prepped_addr1,Prepped_addr2))
@@ -148,11 +145,11 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 								,left outer
 								,local);
 			
-				 
+
 						
-			base_and_update := IF(nothor(FileServices.GetSuperFileSubCount(HMS_STLIC.Filenames(filedate, pUseProd).statelicense_lBaseTemplate_built)) = 0
+			base_and_update := IF(nothor(FileServices.SuperFileExists(HMS_STLIC.Filenames(filedate, pUseProd).statelicense_lBaseTemplate_built))
+   												 ,cleanAddr  + hist_base
    												 ,cleanAddr
-   												 ,cleanAddr + hist_base
 													 );
 													 
 	 		base_f := DISTRIBUTE(base_and_update, HASH(ln_key,entityid,id,hms_src)); 
@@ -288,61 +285,61 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 			END;
    
    		stlic_base := ROLLUP(new_base_s
-											,trim(left.ln_key)=trim(right.ln_key)
-											AND trim(left.hms_src)=trim(right.hms_src)
-											AND trim(left.key)=trim(right.key)
-											AND trim(left.id)=trim(right.id)
-											AND trim(left.entityid)=trim(right.entityid)
-											AND trim(left.license_number)=trim(right.license_number)
-											and trim(left.license_state)=trim(right.license_state)
-											and trim(left.license_class_type)=trim(right.license_class_type)
-											and trim(left.status)=trim(right.status)
-											and trim(left.issue_date)=trim(right.issue_date)
-											and trim(left.expiration_date)=trim(right.expiration_date)
-											AND trim(left.name)=trim(right.name)
-											AND trim(left.last)=trim(right.last)
-											AND trim(left.middle)=trim(right.middle)
-											AND trim(left.first)=trim(right.first)
-											AND trim(left.suffix)=trim(right.suffix)
-											and trim(left.street1)=trim(right.street1)
-											and trim(left.street2)=trim(right.street2)
-											and trim(left.street3)=trim(right.street3)
-											and trim(left.city)=trim(right.city)
-											and trim(left.address_state)=trim(right.address_state)
-											and trim(left.orig_zip)=trim(right.orig_zip)
-											and trim(left.orig_county)=trim(right.orig_county)
-											AND trim(left.country)=trim(right.country)
-											and trim(left.phone_number)=trim(right.phone_number)
-											AND trim(left.phone_type)=trim(right.phone_type)
-											AND trim(left.phone1)=trim(right.phone1)
-											AND trim(left.phone2)=trim(right.phone2)
-											AND trim(left.phone3)=trim(right.phone3)
-											AND trim(left.fax1)=trim(right.fax1)
-											AND trim(left.fax2)=trim(right.fax2)
-											AND trim(left.fax3)=trim(right.fax3)
-											AND trim(left.other_phone1)=trim(right.other_phone1)
-											AND trim(left.cred)=trim(right.cred)
-											AND left.age=right.age
-											AND trim(left.dateofbirth)=trim(right.dateofbirth)
-											AND trim(left.email)=trim(right.email)
-											AND trim(left.gender)=trim(right.gender)
-											AND trim(left.dateofdeath)=trim(right.dateofdeath)
-											AND trim(left.csr_number)=trim(right.csr_number)
-											AND trim(left.npi_number)=trim(right.npi_number)
-											AND trim(left.dea_number)=trim(right.dea_number)
-											AND trim(left.specialty_class_type)=trim(right.specialty_class_type)
-											AND trim(left.school)=trim(right.school)
-											AND trim(left.graduated)=trim(right.graduated)
-											AND trim(left.board)=trim(right.board)
-											AND trim(left.offense)=trim(right.offense)
-											AND trim(left.offense_date)=trim(right.offense_date)
-											AND trim(left.action)=trim(right.action)
-											AND trim(left.action_date)=trim(right.action_date)
-											AND trim(left.action_start)=trim(right.action_start)
-											AND trim(left.action_end)=trim(right.action_end)
-											AND trim(left.location)=trim(right.location)
-											AND trim(left.language)=trim(right.language)
-											AND trim(left.description)=trim(right.description)
+												,trim(left.ln_key)=trim(right.ln_key)
+												AND trim(left.hms_src)=trim(right.hms_src)
+												AND trim(left.key)=trim(right.key)
+												AND trim(left.id)=trim(right.id)
+												AND trim(left.entityid)=trim(right.entityid)
+												AND trim(left.license_number)=trim(right.license_number)
+												and trim(left.license_state)=trim(right.license_state)
+												and trim(left.license_class_type)=trim(right.license_class_type)
+												and trim(left.status)=trim(right.status)
+												and trim(left.issue_date)=trim(right.issue_date)
+												and trim(left.expiration_date)=trim(right.expiration_date)
+												AND trim(left.name)=trim(right.name)
+												AND trim(left.last)=trim(right.last)
+												AND trim(left.middle)=trim(right.middle)
+												AND trim(left.first)=trim(right.first)
+												AND trim(left.suffix)=trim(right.suffix)
+												and trim(left.street1)=trim(right.street1)
+												and trim(left.street2)=trim(right.street2)
+												and trim(left.street3)=trim(right.street3)
+												and trim(left.city)=trim(right.city)
+												and trim(left.address_state)=trim(right.address_state)
+												and trim(left.orig_zip)=trim(right.orig_zip)
+												and trim(left.orig_county)=trim(right.orig_county)
+												AND trim(left.country)=trim(right.country)
+												and trim(left.phone_number)=trim(right.phone_number)
+												AND trim(left.phone_type)=trim(right.phone_type)
+												AND trim(left.phone1)=trim(right.phone1)
+												AND trim(left.phone2)=trim(right.phone2)
+												AND trim(left.phone3)=trim(right.phone3)
+												AND trim(left.fax1)=trim(right.fax1)
+												AND trim(left.fax2)=trim(right.fax2)
+												AND trim(left.fax3)=trim(right.fax3)
+												AND trim(left.other_phone1)=trim(right.other_phone1)
+												AND trim(left.cred)=trim(right.cred)
+												AND left.age=right.age
+												AND trim(left.dateofbirth)=trim(right.dateofbirth)
+												AND trim(left.email)=trim(right.email)
+												AND trim(left.gender)=trim(right.gender)
+												AND trim(left.dateofdeath)=trim(right.dateofdeath)
+												AND trim(left.csr_number)=trim(right.csr_number)
+												AND trim(left.npi_number)=trim(right.npi_number)
+												AND trim(left.dea_number)=trim(right.dea_number)
+												AND trim(left.specialty_class_type)=trim(right.specialty_class_type)
+												AND trim(left.school)=trim(right.school)
+												AND trim(left.graduated)=trim(right.graduated)
+												AND trim(left.board)=trim(right.board)
+												AND trim(left.offense)=trim(right.offense)
+												AND trim(left.offense_date)=trim(right.offense_date)
+												AND trim(left.action)=trim(right.action)
+												AND trim(left.action_date)=trim(right.action_date)
+												AND trim(left.action_start)=trim(right.action_start)
+												AND trim(left.action_end)=trim(right.action_end)
+												AND trim(left.location)=trim(right.location)
+												AND trim(left.language)=trim(right.language)
+												AND trim(left.description)=trim(right.description)
 											,t_rollup(LEFT,RIGHT),LOCAL);	
 											
 											
@@ -402,7 +399,36 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 				,
 				);
 				
-				dLnpidOut := hms_stlic.fAppendLnpid(d_bdid);
+				Health_Provider_Services.mac_get_best_lnpid_on_thor (
+									 d_bdid
+									,lnpid
+									,fname
+									,mname
+									,lname
+									,name_suffix
+									,gender
+									,prim_range
+									,prim_name
+									,sec_range
+									,v_city_name
+									,st
+									,zip 
+									,best_ssn
+									,best_dob
+									,clean_phone
+									,license_state
+									,license_number
+									,//tin1
+									,dea_Number
+									,//group_key
+									,npi_number
+									,//UPIN
+									,DID
+									,BDID
+									,SRC
+									,SOURCE_RID
+									,dLnpidOut,false,38 //38 for providers
+				);
 				
 				with_lnpid:=dLnpidOut(lnpid>0);
 				no_lnpid:=dLnpidOut(lnpid=0);
@@ -414,7 +440,7 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 										,prim_range
 										,prim_name
 										,sec_range
-										,p_city_name
+										,v_city_name
 										,st
 										,zip
 										,//sanc_tin
@@ -438,135 +464,9 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 										,false
 										,30 //30 for facilities
 										);
-				
-/*				
-				Health_Facility_Services.mac_get_best_lnpid_on_thor (
-										d_bdid
-										,lnpid
-										,clean_company_name											
-										,prim_range
-										,prim_name
-										,sec_range
-										,p_city_name
-										,st
-										,zip
-										,//sanc_tin
-										,//tin1
-										,phone1
-										,fax1
-										,license_state
-										,license_number
-										,dea_number
-										,//group_key
-										,npi_number
-										,//clia_num
-										,//medicare_fac_num
-										,//Input_MEDICAID_NUMBER
-										,//ncpdp_id
-										,taxonomy_code
-										,BDID
-										,SRC
-										,SOURCE_RID
-										,dLnpidOut
-										,false
-										,30 //30 for facilities
-										);
 					 
+				
 			
- 
-   				Health_Provider_Services.mac_get_best_lnpid_on_thor (
-   									 no_lnpid 
-   									,lnpid
-   									,fname
-   									,mname
-   									,lname
-   									,name_suffix
-   									,gender
-   									,prim_range
-   									,prim_name
-   									,sec_range
-   									,p_city_name
-   									,st
-   									,zip 
-   									,best_ssn
-   									,best_dob
-   									,clean_phone
-   									,license_state
-   									,license_number
-   									,//tin1
-   									,dea_Number
-   									,//group_key
-   									,npi_number
-   									,//UPIN
-   									,DID
-   									,BDID
-   									,SRC
-   									,SOURCE_RID
-   									,result,false,38 //38 for providers
-   				);
-*/
-
-/* 								EXPORT fAppendLnpid(DATASET(hms_stlic.layouts.statelicense_base) pDataset) := FUNCTION
-   
-   												Layout_In := RECORD
-   																				{pDataset};
-   																				UNSIGNED8 UniqId;
-   																				UNSIGNED8 LNPID_Out := 0;
-   																				INTEGER2 xlink_distance;
-   																				STRING xlink_matches;
-   																				UNSIGNED xlink_keys;
-   																				INTEGER xlink_weight;
-   																				INTEGER xlink_score;
-   																				STRING xlink_segmentation;
-   																				INTEGER score;
-   												END;
-   
-   												inFields := MODULE(HealthCare_Provider_Header.IxLinkInput)
-   																				EXPORT Input_UniqueID              := 'UniqId';
-   																				EXPORT Input_FNAME                 := 'fname';
-   																				EXPORT Input_MNAME                 := 'mname';
-   																				EXPORT Input_LNAME                 := 'lname';
-   																				EXPORT Input_SNAME                 := 'name_suffix';
-   																				EXPORT Input_GENDER                := 'gender';
-   																				EXPORT Input_TAXONOMY              := 'taxonomy_code';
-   																				EXPORT Input_LIC_TYPE              := 'license_class_type';
-   																				EXPORT Input_PRAC_PRIM_RANGE       := 'prim_range';
-   																				EXPORT Input_PRAC_PRIM_NAME        := 'prim_name';
-   																				EXPORT Input_PRAC_SEC_RANGE        := 'sec_range';
-   																				EXPORT Input_PRAC_CITY             := 'p_city_name';
-   																				EXPORT Input_PRAC_ST               := 'st';
-   																				EXPORT Input_PRAC_ZIP              := 'zip';
-   																				EXPORT Input_PRAC_PHONE            := 'clean_phone';
-   																				EXPORT Input_NPI_NUMBER            := 'npi_number';
-   																				EXPORT Input_UPIN                  := '';
-   																				EXPORT Input_DEA_NUMBER            := 'dea_number';
-   																				EXPORT Input_LIC_STATE             := 'license_state';
-   																				EXPORT Input_LIC_NBR               := 'license_number';
-   																				EXPORT Input_SSN                   := 'best_ssn';
-   																				EXPORT Input_DOB                   := 'best_dob';
-   												END;
-   												
-   												pDatasetPrep    := project(pDataset, transform(layout_in, self := left, self := []));
-   												
-   												ut.MAC_Sequence_Records(pDatasetPrep,UniqID,pDataset_seq);
-   												
-   												pDataset_in := sort(distribute(pDataset_seq,hash(UniqID)),UniqID,local);
-   												
-   												// uncomment for desired mode
-   												HealthCare_Provider_Header.mac_xlinking_on_thor(pDataset_in, inFields, results,
-   																				HealthCare_Provider_Header.Constants.XLinkMode.BestAppend,
-   																																																																																																																																																																																												// HealthCare_Provider_Header.Constants.XLinkMode.MatchesInclDetail,
-   																																																																																																																																																																																												// 'dummy_mode',
-   																																																																																																																																																																																												LNPID,
-   																																																																																																																																																																																												34, 6);                    
-   																												
-   											RETURN PROJECT(results, hms_stlic.layouts.statelicense_base);
-   								END;
-
-				with_lnpid:=dLnpidOut(lnpid>0);
-				no_lnpid:=dLnpidOut(lnpid=0);
-		*/			
-		
 				final_base := result + with_lnpid;
 				
 				// ********************************Set clean dates and phones to blank where all 0's and all 8's***************************
@@ -602,8 +502,102 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 	 
 	 EXPORT stlicrollup_Base := FUNCTION
    				
-			base := Files().statelicense_Base.Built;
-		 					
+			base_a := distribute(Files().statelicense_Base.Built,hash(license_number,license_state,license_class_type));
+			
+			// base_a := distribute(dataset('~thor400_data::base::hms_stl::hms_statelicense::' + filedate,HMS_STLIC.Layouts.statelicense_base,thor),hash(license_number,license_state,license_class_type));
+		 	
+			HMS_STLIC.Layouts.statelicense_base NullAddressesAndReset(HMS_STLIC.Layouts.statelicense_base L) := transform
+							self.Email := NullBadAddrValue(L.Email);
+							self.Street1 := NullBadAddrValue(L.Street1);
+							self.Street2 := NullBadAddrValue(L.Street2);
+							self.Street3 := NullBadAddrValue(L.Street3);
+							self.City := NullBadAddrValue(L.City);
+							self.Address_state := NullBadAddrValue(L.Address_state);
+							self.Orig_zip := NullBadAddrValue(L.Orig_zip);
+							self.Phone1 := NullBadAddrValue(L.Phone1);
+							self.prepped_addr1 := NullBadAddrValue(L.prepped_addr1);
+							self.prepped_addr2 := NullBadAddrValue(L.prepped_addr2);
+							self.prim_name := NullBadAddrValue(L.prim_name);
+							self.p_city_name := NullBadAddrValue(L.p_city_name);
+							self.v_city_name := NullBadAddrValue(L.v_city_name);
+							self.clean_zip5 := NullBadAddrValue(L.clean_zip5);
+							self.clean_company_name := NullBadAddrValue(L.clean_company_name);
+							self.Mapped_pdma := regexreplace('-',L.Mapped_pdma,'');
+							self.clean_issue_date := fn_IsValidDate(L.clean_issue_date);//if(L.clean_issue_date in ['19010101','19000101','18000101','18010101'],'0',L.clean_issue_date);
+							self.clean_expiration_date := fn_IsValidDate(L.clean_expiration_date);//if(L.clean_expiration_date in ['19010101','19000101','18000101','18010101'],'0',L.clean_expiration_date);
+							self.clean_dateofbirth := fn_IsValidDate(if(L.clean_dateofbirth[5..]='0000',_Validate.Date.fCorrectedDateString(L.clean_dateofbirth,true),L.clean_dateofbirth));
+							self.source_rid := 0;
+							// self.lnpid := 0;
+							self := L;
+			
+			end;
+				
+			base_t := project(base_a,NullAddressesAndReset(LEFT));
+			
+			HMS_STLIC.Layouts.statelicense_base  GetSourceRID(base_t L)	:= TRANSFORM
+   			SELF.source_rid 							:= HASH64(hashmd5(
+																					trim(L.license_number)+','
+																				 +trim(L.license_state)+','
+																				 +trim(L.license_class_type)+','
+																				 +trim(L.status)+','
+																				 +trim(L.qualifier1)+','
+																				 +trim(L.qualifier2)+','
+																				 +trim(L.qualifier3)+','
+																				 +trim(L.qualifier4)+','
+																				 +trim(L.qualifier5)+','
+																				 +trim(L.issue_date)+','
+																				 +trim(L.expiration_date)+','
+																				 +trim(L.name)+','
+																				 +trim(L.first)+','
+																				 +trim(L.middle)+','
+																				 +trim(L.last)+','
+																				 +trim(L.suffix)+','
+																				 +trim(L.cred)+','
+																				 +L.age+','
+																				 +trim(L.dateofbirth)+','
+																				 +trim(L.email)+','
+																				 +trim(L.gender)+','
+																				 +trim(L.dateofdeath)+','
+																				 +trim(L.street1)+','
+																				 +trim(L.street2)+','
+																				 +trim(L.street3)+','
+																				 +trim(L.city)+','
+																				 +trim(L.address_state)+','
+																				 +trim(L.address_type)+','
+																				 +trim(L.orig_zip)+','
+																				 +trim(L.orig_county)+','
+																				 +trim(L.country)+','
+																				 +trim(L.phone_number)+','
+																				 +trim(L.phone_type)+','
+																				 +trim(L.phone1)+','
+																				 +trim(L.phone2)+','
+																				 +trim(L.phone3)+','
+																				 +trim(L.fax1)+','
+																				 +trim(L.fax2)+','
+																				 +trim(L.fax3)+','
+																				 +trim(L.other_phone1)+','
+																				 +trim(L.csr_number)+','
+																				 +trim(L.npi_number)+','
+																				 +trim(L.dea_number)+','
+																				 +trim(L.school)+','
+																				 +trim(L.language)+','
+																				 +trim(L.graduated)+','
+																				 +trim(L.board)+','
+																				 +trim(L.offense)+','
+																				 +trim(L.offense_date)+','
+																				 +trim(L.action)+',' 
+																				 +trim(L.action_date)+','
+																				 +trim(L.action_start)+','
+																				 +trim(L.action_end)+','
+																				 +trim(L.location)+','
+																				 +trim(L.specialty_class_type)+','
+																				 +trim(L.description)
+																				 ));
+   			SELF	:= L;
+   		END;
+			
+   		base := project(base_t,GetSourceRID(left));
+			
 			new_base_s := SORT(base
    											,license_number
 												,license_state
@@ -655,7 +649,8 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 												,location
 												,language
 												,description
-											,LOCAL);
+											,LOCAL
+											);
    		
    		HMS_STLIC.layouts.statelicense_base t_rollup(new_base_s L, new_base_s R) := TRANSFORM
    			SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
@@ -664,13 +659,8 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
    			SELF 		 											:= IF(L.dt_vendor_last_reported>R.dt_vendor_last_reported,L,R);
 			END;
    
-   		stlic_base := ROLLUP(new_base_s
-											,trim(left.ln_key)=trim(right.ln_key)
-											AND trim(left.hms_src)=trim(right.hms_src)
-											AND trim(left.key)=trim(right.key)
-											AND trim(left.id)=trim(right.id)
-											AND trim(left.entityid)=trim(right.entityid)
-											AND trim(left.license_number)=trim(right.license_number)
+   		stlic_base_s := ROLLUP(new_base_s
+											,trim(left.license_number)=trim(right.license_number)
 											and trim(left.license_state)=trim(right.license_state)
 											and trim(left.license_class_type)=trim(right.license_class_type)
 											and trim(left.status)=trim(right.status)
@@ -720,10 +710,81 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 											AND trim(left.location)=trim(right.location)
 											AND trim(left.language)=trim(right.language)
 											AND trim(left.description)=trim(right.description)
-											,t_rollup(LEFT,RIGHT),LOCAL);	
-											
+											,t_rollup(LEFT,RIGHT)
+											,LOCAL
+											);	
+				
+/* 				Health_Provider_Services.mac_get_best_lnpid_on_thor (
+      									 stlic_base_s 
+      									,lnpid
+      									,fname
+      									,mname
+      									,lname
+      									,name_suffix
+      									,gender
+      									,prim_range
+      									,prim_name
+      									,sec_range
+      									,p_city_name
+      									,st
+      									,zip 
+      									,best_ssn
+      									,best_dob
+      									,clean_phone
+      									,license_state
+      									,license_number
+      									,//tin1
+      									,dea_Number
+      									,//group_key
+      									,npi_number
+      									,//UPIN
+      									,DID
+      									,BDID
+      									,SRC
+      									,SOURCE_RID
+      									,dLnpidOut,false,38 //38 for providers
+      				);
+   					
+   					
+   				with_lnpid:=dLnpidOut(lnpid>0);
+   				no_lnpid:=dLnpidOut(lnpid=0);
+   				
+   				Health_Facility_Services.mac_get_best_lnpid_on_thor (
+   										no_lnpid
+   										,lnpid
+   										,clean_company_name											
+   										,prim_range
+   										,prim_name
+   										,sec_range
+   										,v_city_name
+   										,st
+   										,zip
+   										,//sanc_tin
+   										,//tin1
+   										,phone1
+   										,fax1
+   										,license_state
+   										,license_number
+   										,dea_number
+   										,//group_key
+   										,npi_number
+   										,//clia_num
+   										,//medicare_fac_num
+   										,//Input_MEDICAID_NUMBER
+   										,//ncpdp_id
+   										,taxonomy_code
+   										,BDID
+   										,SRC
+   										,SOURCE_RID
+   										,result
+   										,false
+   										,30 //30 for facilities
+   										);
+   							
+   							stlic_base := with_lnpid + result;
+*/
 														
-				RETURN stlic_base;						
+				RETURN stlic_base_s;//stlic_base;						
 
    END;
 

@@ -1,0 +1,22 @@
+export Layout_OR_Amounts := record
+	string1 Court_Type;
+	string3 Court_Location;
+	string10 Case_Number;
+	string3 Record_Type;
+	string5 Amount_Id;
+	string3 Related_Record_Type;
+	string5 Related_Record_Id;
+	string4 Amount_Type;
+	string4 Amount_Modifier;
+	string1 Amount_Unit;
+	string11 Dollars;
+	string9 Non_Dollars;
+	string5 Related_Jgm_Amount_Id;
+	string9 Related_Receivable_Number;
+	string3 Related_Receivable_Sequence;
+	string1 Judgment_Flag;
+	string7 Record_Changed_Date;
+	string5 Record_Changed_Time;
+	string10 User_Id;
+	string10 Command_Name;
+end;

@@ -14,10 +14,13 @@ module
 		self.property_street_address			:=	pInput.Append_PrepAddr1;
 		self.property_city_state_zip			:=	pInput.Append_PrepAddr2;
 		self.property_raw_aid							:=	pInput.Append_RawAID;
-		self.building_square_footage			:=	stringlib.stringfilterout(pInput.SqFootage,',');
+		self.building_square_footage			:=	if(	PropertyCharacteristics.Functions.clean2Upper(pInput.PropertyType)	!=	'LAND PROPERTY',
+																							stringlib.stringfilterout(pInput.SqFootage,','),
+																							''
+																						);
 		self.air_conditioning_type_desc		:=	pInput.CoolingFeatures;
 		self.basement_finish_desc					:=	if(	regexfind(	'(BASEMENT IS )([0-9]+[ ]?SQ|[0-9]+[ ]?[X][ ]?[0-9]+|[0-9]+[ ]?)',
-																													Functions.fn_remove_zeroes(pInput.Basement),
+																													PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.Basement),
 																													nocase
 																												),
 																							'UNFINISHED BASEMENT',
@@ -37,13 +40,26 @@ module
 		self.garage_desc									:=	pInput.Carport;
 		self.first_floor_square_footage		:=	'';
 		self.heating_desc									:=	pInput.HeatingFeatures;
-		self.living_area_square_footage		:=	stringlib.stringfilterout(pInput.SqFootage,',');
+		self.living_area_square_footage		:=	if(	PropertyCharacteristics.Functions.clean2Upper(pInput.PropertyType)	!=	'LAND PROPERTY',
+																							stringlib.stringfilterout(pInput.SqFootage,','),
+																							''
+																						);
 		self.no_of_baths									:=	pInput.NumBaths;
 		self.no_of_bedrooms								:=	pInput.NumBeds;
 		self.no_of_fireplaces							:=	'';
 		self.no_of_full_baths							:=	'';
 		self.no_of_half_baths							:=	'';
-		self.no_of_stories								:=	pInput.NumStories;
+		self.no_of_stories								:=	case(	PropertyCharacteristics.Functions.clean2Upper(pInput.NumStories),
+																								'SINGLE STORY'						=>	'1',
+																								'STORY AND A HALF'				=>	'1.5',
+																								'TWO STORY'								=>	'2',
+																								'TWO AND A HALF STORY'		=>	'2.5',
+																								'THREE STORY'							=>	'3',
+																								'THREE AND A HALF STORY'	=>	'3.5',
+																								'THREE OR MORE STORIES'		=>	'3+',
+																								'FOUR OR MORE STORIES'		=>	'4+',
+																								''
+																						);
 		self.parking_type_desc						:=	if(	pInput.ParkingFeatures	!=	'',
 																							pInput.ParkingFeatures,
 																							pInput.ParkingFeatures1
@@ -54,11 +70,11 @@ module
 		self.year_built										:=	if((integer)pInput.YearBuilt	>	(integer)ut.GetDate[1..4],'',pInput.YearBuilt);
 		self.foundation_desc							:=	if(stringlib.stringfind(stringlib.stringtouppercase(pInput.ExteriorConstruction),'FOUNDATION',1)	>	0,pInput.ExteriorConstruction,'');
 		self.basement_square_footage			:=	if(	regexfind(	'(BASEMENT IS )([0-9]+[ ]?SQ|[0-9]+[ ]?[X][ ]?[0-9]+|[0-9]+[ ]?)',
-																													Functions.fn_remove_zeroes(pInput.Basement),
+																													stringlib.stringfilterout(PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.Basement),','),
 																													nocase
 																												),
-																							map(	regexfind('[0-9]+[ ]?[X][ ]?[0-9]+',Functions.fn_remove_zeroes(pInput.Basement),nocase)	=>	(string)((real4)regexfind('([0-9]+)([ ]?[X][ ]?)([0-9]+)',Functions.fn_remove_zeroes(pInput.Basement),1,nocase)*(real4)regexfind('([0-9]+)([ ]?[X][ ]?)([0-9]+)',Functions.fn_remove_zeroes(pInput.Basement),3,nocase)),
-																										regexfind('([0-9]+)',Functions.fn_remove_zeroes(pInput.Basement),1,nocase)
+																							map(	regexfind('[0-9]+[ ]?[X][ ]?[0-9]+',PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.Basement),nocase)	=>	(string)((real4)regexfind('([0-9]+)([ ]?[X][ ]?)([0-9]+)',Functions.fn_remove_zeroes(pInput.Basement),1,nocase)*(real4)regexfind('([0-9]+)([ ]?[X][ ]?)([0-9]+)',Functions.fn_remove_zeroes(pInput.Basement),3,nocase)),
+																										regexfind('([0-9]+)',PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.Basement),1,nocase)
 																									),
 																							''
 																						);
@@ -143,10 +159,13 @@ module
 		self.property_street_address			:=	pInput.Append_PrepAddr1;
 		self.property_city_state_zip			:=	pInput.Append_PrepAddr2;
 		self.property_raw_aid							:=	pInput.Append_RawAID;
-		self.building_square_footage			:=	stringlib.stringfilterout(pInput.SqFootage,',');
+		self.building_square_footage			:=	if(	PropertyCharacteristics.Functions.clean2Upper(pInput.PropertyType)	!=	'LAND PROPERTY',
+																							stringlib.stringfilterout(pInput.SqFootage,','),
+																							''
+																						);
 		self.air_conditioning_type_desc		:=	pInput.CoolingFeatures;
 		self.basement_finish_desc					:=	if(	regexfind(	'(BASEMENT IS )([0-9]+[ ]?SQ|[0-9]+[ ]?[X][ ]?[0-9]+|[0-9]+[ ]?)',
-																													Functions.fn_remove_zeroes(pInput.Basement),
+																													PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.Basement),
 																													nocase
 																												),
 																							'UNFINISHED BASEMENT',
@@ -166,13 +185,26 @@ module
 		self.garage_desc									:=	pInput.Carport;
 		self.first_floor_square_footage		:=	'';
 		self.heating_desc									:=	pInput.HeatingFeatures;
-		self.living_area_square_footage		:=	stringlib.stringfilterout(pInput.SqFootage,',');
+		self.living_area_square_footage		:=	if(	PropertyCharacteristics.Functions.clean2Upper(pInput.PropertyType)	!=	'LAND PROPERTY',
+																							stringlib.stringfilterout(pInput.SqFootage,','),
+																							''
+																						);
 		self.no_of_baths									:=	pInput.NumBaths;
 		self.no_of_bedrooms								:=	pInput.NumBeds;
 		self.no_of_fireplaces							:=	'';
 		self.no_of_full_baths							:=	'';
 		self.no_of_half_baths							:=	'';
-		self.no_of_stories								:=	pInput.NumStories;
+		self.no_of_stories								:=	case(	PropertyCharacteristics.Functions.clean2Upper(pInput.NumStories),
+																								'SINGLE STORY'						=>	'1',
+																								'STORY AND A HALF'				=>	'1.5',
+																								'TWO STORY'								=>	'2',
+																								'TWO AND A HALF STORY'		=>	'2.5',
+																								'THREE STORY'							=>	'3',
+																								'THREE AND A HALF STORY'	=>	'3.5',
+																								'THREE OR MORE STORIES'		=>	'3+',
+																								'FOUR OR MORE STORIES'		=>	'4+',
+																								''
+																						);
 		self.parking_type_desc						:=	if(	pInput.ParkingFeatures	!=	'',
 																							pInput.ParkingFeatures,
 																							pInput.ParkingFeatures1
@@ -183,11 +215,11 @@ module
 		self.year_built										:=	if((integer)pInput.YearBuilt	>	(integer)ut.GetDate[1..4],'',pInput.YearBuilt);
 		self.foundation_desc							:=	if(stringlib.stringfind(stringlib.stringtouppercase(pInput.ExteriorConstruction),'FOUNDATION',1)	>	0,pInput.ExteriorConstruction,'');
 		self.basement_square_footage			:=	if(	regexfind(	'(BASEMENT IS )([0-9]+[ ]?SQ|[0-9]+[ ]?[X][ ]?[0-9]+|[0-9]+[ ]?)',
-																													Functions.fn_remove_zeroes(pInput.Basement),
+																													stringlib.stringfilterout(PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.Basement),','),
 																													nocase
 																												),
-																							map(	regexfind('[0-9]+[ ]?[X][ ]?[0-9]+',Functions.fn_remove_zeroes(pInput.Basement),nocase)	=>	(string)((real4)regexfind('([0-9]+)([ ]?[X][ ]?)([0-9]+)',Functions.fn_remove_zeroes(pInput.Basement),1,nocase)*(real4)regexfind('([0-9]+)([ ]?[X][ ]?)([0-9]+)',Functions.fn_remove_zeroes(pInput.Basement),3,nocase)),
-																										regexfind('([0-9]+)',Functions.fn_remove_zeroes(pInput.Basement),1,nocase)
+																							map(	regexfind('[0-9]+[ ]?[X][ ]?[0-9]+',PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.Basement),nocase)	=>	(string)((real4)regexfind('([0-9]+)([ ]?[X][ ]?)([0-9]+)',Functions.fn_remove_zeroes(pInput.Basement),1,nocase)*(real4)regexfind('([0-9]+)([ ]?[X][ ]?)([0-9]+)',Functions.fn_remove_zeroes(pInput.Basement),3,nocase)),
+																										regexfind('([0-9]+)',PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.Basement),1,nocase)
 																									),
 																							''
 																						);
@@ -264,15 +296,41 @@ module
 	// Map MLS3 to common
 	PropertyCharacteristics.Layouts.Common	tMLS3_Map2Common(PropertyCharacteristics.Files.Prepped.MLS3	pInput)	:=
 	transform
+		string	vTaxYear									:=	if(	length(stringlib.stringcleanspaces(pInput.TaxYear))	=	2,
+																							if(	(integer)pInput.TaxYear	<=	20,
+																									'20'	+	stringlib.stringcleanspaces(pInput.TaxYear),
+																									'19'	+	stringlib.stringcleanspaces(pInput.TaxYear)
+																								),
+																							pInput.TaxYear
+																						);
+		string	vSoldDate									:=	map(	regexfind('[0-9]{1,2}[/][0-9]{1,2}[/](18|19|2[0-9])[0-9]{2}$',stringlib.stringcleanspaces(pInput.SoldDate))																																																																			=>	ut.ConvertDate(stringlib.stringcleanspaces(pInput.SoldDate)),
+																								regexfind('[0-9]{1,2}[/][0-9]{1,2}[/][0-9]{2}$',stringlib.stringcleanspaces(pInput.SoldDate))																																																																										=>	ut.ConvertDate(stringlib.stringcleanspaces(pInput.SoldDate),'%m/%d/%y'),
+																								regexfind('[0-9]{1,2}[-][0-9]{1,2}[-](18|19|2[0-9])[0-9]{2}$',stringlib.stringcleanspaces(pInput.SoldDate))																																																																			=>	ut.ConvertDate(stringlib.stringcleanspaces(pInput.SoldDate),'%m-%d-%Y'),
+																								regexfind('[0-9]{1,2}[-][0-9]{1,2}[-][0-9]{2}$',stringlib.stringcleanspaces(pInput.SoldDate))																																																																										=>	ut.ConvertDate(stringlib.stringcleanspaces(pInput.SoldDate),'%m-%d-%y'),
+																								regexfind('[0-9]{1,2}[-](JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)[-](18|19|2[0-9])[0-9]{2}$',stringlib.stringcleanspaces(pInput.SoldDate),nocase)	=>	ut.ConvertDate(stringlib.stringcleanspaces(pInput.SoldDate),'%d-%b-%Y'),
+																								regexfind('[0-9]{1,2}[-](JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)[-][0-9]{2}$',stringlib.stringcleanspaces(pInput.SoldDate),nocase)								=>	ut.ConvertDate(stringlib.stringcleanspaces(pInput.SoldDate),'%d-%b-%y'),
+																								regexfind('(18|19|2[0-9])[0-9]{6}$',stringlib.stringcleanspaces(pInput.SoldDate))																																																																																=>	stringlib.stringcleanspaces(pInput.SoldDate),
+																								''
+																						);
+		string	vListingDate							:=	map(	regexfind('[0-9]{1,2}[/][0-9]{1,2}[/](18|19|2[0-9])[0-9]{2}$',stringlib.stringcleanspaces(pInput.ListingDate))																																																																			=>	ut.ConvertDate(stringlib.stringcleanspaces(pInput.ListingDate)),
+																								regexfind('[0-9]{1,2}[/][0-9]{1,2}[/][0-9]{2}$',stringlib.stringcleanspaces(pInput.ListingDate))																																																																										=>	ut.ConvertDate(stringlib.stringcleanspaces(pInput.ListingDate),'%m/%d/%y'),
+																								regexfind('[0-9]{1,2}[-][0-9]{1,2}[-](18|19|2[0-9])[0-9]{2}$',stringlib.stringcleanspaces(pInput.ListingDate))																																																																			=>	ut.ConvertDate(stringlib.stringcleanspaces(pInput.ListingDate),'%m-%d-%Y'),
+																								regexfind('[0-9]{1,2}[-][0-9]{1,2}[-][0-9]{2}$',stringlib.stringcleanspaces(pInput.ListingDate))																																																																										=>	ut.ConvertDate(stringlib.stringcleanspaces(pInput.ListingDate),'%m-%d-%y'),
+																								regexfind('[0-9]{1,2}[-](JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)[-](18|19|2[0-9])[0-9]{2}$',stringlib.stringcleanspaces(pInput.ListingDate),nocase)	=>	ut.ConvertDate(stringlib.stringcleanspaces(pInput.ListingDate),'%d-%b-%Y'),
+																								regexfind('[0-9]{1,2}[-](JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC|JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)[-][0-9]{2}$',stringlib.stringcleanspaces(pInput.ListingDate),nocase)								=>	ut.ConvertDate(stringlib.stringcleanspaces(pInput.ListingDate),'%d-%b-%y'),
+																								regexfind('(18|19|2[0-9])[0-9]{6}$',stringlib.stringcleanspaces(pInput.ListingDate))																																																																																=>	stringlib.stringcleanspaces(pInput.ListingDate),
+																								''
+																						);
+		
 		self.vendor_source								:=	'MLS3';
 		self.vendor_preference						:=	3;
 		self.process_date									:=	pInput.ProcessDate;
-		self.tax_sortby_date							:=	map(	PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.TaxYear)			!=	''	=>	pInput.TaxYear	+	'0000',
-																								PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.SoldDate)		!=	''	=>	pInput.SoldDate,
-																								PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.ListingDate)	!=	''	=>	pInput.ListingDate,
+		self.tax_sortby_date							:=	map(	PropertyCharacteristics.Functions.fn_remove_zeroes(vTaxYear)			!=	''	=>	vTaxYear	+	'0000',
+																								PropertyCharacteristics.Functions.fn_remove_zeroes(vSoldDate)			!=	''	=>	vSoldDate,
+																								PropertyCharacteristics.Functions.fn_remove_zeroes(vListingDate)	!=	''	=>	vListingDate,
 																								''
 																							);
-		self.deed_sortby_date							:=	map(	PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.SoldDate)	!=	''	=>	pInput.SoldDate,
+		self.deed_sortby_date							:=	map(	PropertyCharacteristics.Functions.fn_remove_zeroes(vSoldDate)	!=	''	=>	vSoldDate,
 																								''
 																							);
 		self.property_street_address			:=	pInput.Append_PrepAddr1;
@@ -282,7 +340,7 @@ module
 		self.air_conditioning_type_desc		:=	pInput.Cooling;
 		self.basement_finish_desc					:=	if(	pInput.BasementFeature	!=	'',
 																							if(	regexfind(	'(BASEMENT IS )([0-9]+[ ]?SQ|[0-9]+[ ]?[X][ ]?[0-9]+|[0-9]+[ ]?)',
-																															Functions.fn_remove_zeroes(pInput.BasementFeature),
+																															PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.BasementFeature),
 																															nocase
 																														),
 																									'UNFINISHED BASEMENT',
@@ -295,22 +353,28 @@ module
 																						);
 		self.construction_type_desc				:=	pInput.Construction;
 		self.exterior_wall_desc						:=	'';
-		self.fireplace_ind								:=	if((integer)Functions.fn_remove_zeroes(pInput.Fireplaces)	>	0,'Y','N');
+		self.fireplace_ind								:=	if((integer)PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.Fireplaces)	>	0,'Y','N');
 		self.fireplace_type_desc					:=	'';
 		self.flood_zone_panel							:=	'';
 		self.garage_desc									:=	pInput.GarageDesc;
-		self.first_floor_square_footage		:=	pInput.FirstFloorSqFt;
+		self.first_floor_square_footage		:=	stringlib.stringfilterout(pInput.FirstFloorSqFt,',');
 		self.heating_desc									:=	pInput.Heating;
 		self.living_area_square_footage		:=	if(	pInput.GrossLivingArea	!=	'',
 																							stringlib.stringfilterout(pInput.GrossLivingArea,','),
-																							(string)((integer)pInput.FirstFloorSqFt	+	(integer)pInput.SecondFloorSqFt)
+																							(string)((integer)stringlib.stringfilterout(pInput.FirstFloorSqFt,',')	+	(integer)stringlib.stringfilterout(pInput.SecondFloorSqFt,','))
 																						);
 		self.no_of_baths									:=	pInput.BathsTotal;
 		self.no_of_bedrooms								:=	pInput.Bedrooms;
 		self.no_of_fireplaces							:=	pInput.Fireplaces;
 		self.no_of_full_baths							:=	pInput.FullBaths;
 		self.no_of_half_baths							:=	pInput.HalfBaths;
-		self.no_of_stories								:=	if(pInput.LivingLevels	!=	'',pInput.LivingLevels,pInput.Levels);
+		self.no_of_stories								:=	if(	pInput.LivingLevels	!=	''	and	~regexfind('FEATURES',stringlib.stringcleanspaces(pInput.LivingLevels),nocase),
+																							pInput.LivingLevels,
+																							if(	pInput.Levels	!=	''	and	~regexfind('FEATURES',stringlib.stringcleanspaces(pInput.Levels),nocase),
+																									pInput.Levels,
+																									''
+																								)
+																						);
 		self.parking_type_desc						:=	pInput.ParkingFeature;
 		self.pool_indicator								:=	if(	PropertyCharacteristics.Functions.clean2Upper(pInput.PoolYN)	in	['Y','N','U'],
 																							PropertyCharacteristics.Functions.clean2Upper(pInput.PoolYN),
@@ -321,17 +385,17 @@ module
 		self.year_built										:=	if((integer)pInput.YearBuilt	>	(integer)ut.GetDate[1..4],'',pInput.YearBuilt);
 		self.foundation_desc							:=	pInput.FoundationType;
 		self.basement_square_footage			:=	if(	regexfind(	'(BASEMENT IS )([0-9]+[ ]?SQ|[0-9]+[ ]?[X][ ]?[0-9]+|[0-9]+[ ]?)',
-																													Functions.fn_remove_zeroes(pInput.BasementFeature),
+																													stringlib.stringfilterout(PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.BasementFeature),','),
 																													nocase
 																												),
-																							map(	regexfind('[0-9]+[ ]?[X][ ]?[0-9]+',Functions.fn_remove_zeroes(pInput.BasementFeature),nocase)	=>	(string)((real4)regexfind('([0-9]+)([ ]?[X][ ]?)([0-9]+)',Functions.fn_remove_zeroes(pInput.BasementFeature),1,nocase)*(real4)regexfind('([0-9]+)([ ]?[X][ ]?)([0-9]+)',Functions.fn_remove_zeroes(pInput.BasementFeature),3,nocase)),
-																										regexfind('([0-9]+)',Functions.fn_remove_zeroes(pInput.BasementFeature),1,nocase)
+																							map(	regexfind('[0-9]+[ ]?[X][ ]?[0-9]+',PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.BasementFeature),nocase)	=>	(string)((real4)regexfind('([0-9]+)([ ]?[X][ ]?)([0-9]+)',Functions.fn_remove_zeroes(pInput.BasementFeature),1,nocase)*(real4)regexfind('([0-9]+)([ ]?[X][ ]?)([0-9]+)',Functions.fn_remove_zeroes(pInput.BasementFeature),3,nocase)),
+																										regexfind('([0-9]+)',PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.BasementFeature),1,nocase)
 																									),
 																							''
 																						);
 		self.effective_year_built					:=	'';
-		self.garage_square_footage				:=	if(	regexfind('^[0-9]*$',Functions.fn_remove_zeroes(pInput.GarageCapacity)),
-																							(string)(200*(integer)Functions.fn_remove_zeroes(pInput.GarageCapacity)),
+		self.garage_square_footage				:=	if(	regexfind('^[0-9]*$',PropertyCharacteristics.Functions.fn_remove_zeroes(pInput.GarageCapacity)),
+																							(string)(200*(integer)PropertyCharacteristics.Functions.fn_remove_zeroes(stringlib.stringfilterout(pInput.GarageCapacity,','))),
 																							''
 																						);
 		self.stories_type									:=	'';
@@ -364,13 +428,7 @@ module
 		self.sewer_desc										:=	pInput.Sewer;
 		self.water_desc										:=	pInput.SewerWater;
 		self.tax_amount										:=	pInput.TaxAmount;
-		self.tax_year											:=	if(	length(stringlib.stringcleanspaces(pInput.TaxYear))	=	2,
-																							if(	(integer)pInput.TaxYear	<=	20,
-																									'20'	+	stringlib.stringcleanspaces(pInput.TaxYear),
-																									'19'	+	stringlib.stringcleanspaces(pInput.TaxYear)
-																								),
-																							pInput.TaxYear
-																						);
+		self.tax_year											:=	vTaxYear;
 		self.assessed_land_value					:=	if(	pInput.LandValue	!=	'',
 																							pInput.LandValue,
 																							pInput.LandAssessment
@@ -391,18 +449,18 @@ module
 		self.no_of_rooms									:=	pInput.TotalRooms;
 		self.no_of_units									:=	pInput.UnitsInComplex;
 		self.assessment_document_number		:=	'';
-		self.assessment_recording_date		:=	if(	regexreplace('^[0]+$',stringlib.stringcleanspaces(pInput.SoldDate),'')	!=	'',
-																							stringlib.stringcleanspaces(pInput.SoldDate),
+		self.assessment_recording_date		:=	if(	regexreplace('^[0]+$',stringlib.stringcleanspaces(vSoldDate),'')	!=	'',
+																							stringlib.stringcleanspaces(vSoldDate),
 																							''
 																						);
 		self.deed_document_number					:=	'';
-		self.deed_recording_date					:=	if(	regexreplace('^[0]+$',stringlib.stringcleanspaces(pInput.SoldDate),'')	!=	'',
-																							stringlib.stringcleanspaces(pInput.SoldDate),
+		self.deed_recording_date					:=	if(	regexreplace('^[0]+$',stringlib.stringcleanspaces(vSoldDate),'')	!=	'',
+																							stringlib.stringcleanspaces(vSoldDate),
 																							''
 																						);;
 		self.full_part_sale								:=	'';
 		self.sale_amount									:=	pInput.SalePrice;
-		self.sale_date										:=	Functions.fFormatDate(pInput.SoldDate);
+		self.sale_date										:=	PropertyCharacteristics.Functions.fFormatDate(vSoldDate);
 		self.sale_type_code								:=	'';
 		self.loan_amount									:=	'';
 		self.second_loan_amount						:=	'';
@@ -439,7 +497,10 @@ module
 		self.property_street_address			:=	pInput.Append_PrepAddr1;
 		self.property_city_state_zip			:=	pInput.Append_PrepAddr2;
 		self.property_raw_aid							:=	pInput.Append_RawAID;
-		self.building_square_footage			:=	pInput.SqFootage;
+		self.building_square_footage			:=	if(	PropertyCharacteristics.Functions.clean2Upper(pInput.PropertyType)	!=	'LAND PROPERTY',
+																							stringlib.stringfilterout(pInput.SqFootage,','),
+																							''
+																						);
 		self.air_conditioning_type_desc		:=	pInput.CoolingFeatures;
 		self.basement_finish_desc					:=	'';
 		self.construction_type_desc				:=	pInput.ExteriorConstruction;
@@ -456,13 +517,26 @@ module
 		self.garage_desc									:=	pInput.Garage;
 		self.first_floor_square_footage		:=	'';
 		self.heating_desc									:=	pInput.HeatingFeatures;
-		self.living_area_square_footage		:=	pInput.SqFootage;
+		self.living_area_square_footage		:=	if(	PropertyCharacteristics.Functions.clean2Upper(pInput.PropertyType)	!=	'LAND PROPERTY',
+																							stringlib.stringfilterout(pInput.SqFootage,','),
+																							''
+																						);
 		self.no_of_baths									:=	pInput.NumBaths;
 		self.no_of_bedrooms								:=	pInput.NumBeds;
 		self.no_of_fireplaces							:=	'';
 		self.no_of_full_baths							:=	pInput.TotalFullBaths;
 		self.no_of_half_baths							:=	'';
-		self.no_of_stories								:=	pInput.NumStories;
+		self.no_of_stories								:=	case(	PropertyCharacteristics.Functions.clean2Upper(pInput.NumStories),
+																								'SINGLE STORY'						=>	'1',
+																								'STORY AND A HALF'				=>	'1.5',
+																								'TWO STORY'								=>	'2',
+																								'TWO AND A HALF STORY'		=>	'2.5',
+																								'THREE STORY'							=>	'3',
+																								'THREE AND A HALF STORY'	=>	'3.5',
+																								'THREE OR MORE STORIES'		=>	'3+',
+																								'FOUR OR MORE STORIES'		=>	'4+',
+																								''
+																						);
 		self.parking_type_desc						:=	if(	pInput.ParkingFeatures	!=	'',
 																							pInput.ParkingFeatures,
 																							pInput.ParkingFeatures1
@@ -515,7 +589,7 @@ module
 		self.floor_type_desc							:=	'';
 		self.frame_type_desc							:=	'';
 		self.style_type_desc							:=	pInput.Style;
-		self.fuel_type_desc								:=	pInput.HeatingFeatures;
+		self.fuel_type_desc								:=	'';
 		self.no_of_bath_fixtures					:=	'';
 		self.no_of_rooms									:=	'';
 		self.no_of_units									:=	pInput.NumUnits;
@@ -555,7 +629,7 @@ module
 		self	:=	ri;
 	end;
 	
-	Ins1IBCodes				:=	normalize(PropertyCharacteristics.Files.Prepped.Insurance1,left.IBCodes,tIns1IBCodes(right));
+	Ins1IBCodes				:=	normalize(PropertyCharacteristics.Files.Prepped.Insurance1(PolicyID	!=	0),left.IBCodes,tIns1IBCodes(right));
 	Ins1IBCodesDist		:=	distribute(Ins1IBCodes,PolicyID);
 	Ins1IBCodesSort		:=	sort(Ins1IBCodesDist,PolicyID,category,-Value,local);
 	Ins1IBCodesDedup	:=	dedup(Ins1IBCodesSort,PolicyID,category,local);
@@ -566,8 +640,9 @@ module
 		self.property_street_address			:=	pInput.Append_PrepAddr1;
 		self.property_city_state_zip			:=	pInput.Append_PrepAddr2;
 		self.property_raw_aid							:=	pInput.Append_RawAID;
+		self.county												:=	'';
 		
-		self.living_area_square_footage		:=	pInput.LivingArea;
+		self.living_area_square_footage		:=	stringlib.stringfilterout(pInput.LivingArea,',');
 		self.no_of_baths									:=	pInput.Baths;
 		self.no_of_bedrooms								:=	pInput.Bedrooms;
 		self.no_of_fireplaces							:=	(string)((integer)pInput.Fireplaces);
@@ -576,15 +651,22 @@ module
 		self.pool_indicator								:=	pInput.Pool;
 		self.year_built										:=	pInput.YearBuilt;
 		self.census_tract									:=	pInput.CensusTract;
-		self.county_name									:=	pInput.County;
-		self.fips_code										:=	pInput.FipsCode;
+		self.county_name									:=	if(	PropertyCharacteristics.Functions.clean2Upper(pInput.County)	!=	'NULL',
+																							PropertyCharacteristics.Functions.clean2Upper(pInput.County),
+																							''
+																						);
+		self.fips_code										:=	if(	PropertyCharacteristics.Functions.clean2Upper(pInput.FipsCode)	!=	'NULL',
+																							pInput.FipsCode,
+																							''
+																						);
 		self.no_of_rooms									:=	(string)((integer)pInput.TotalRooms);
 		self.lot_size											:=	pInput.LotArea;
 		self.insurbase_codes							:=	project(pInput.IBCodes,PropertyCharacteristics.Layout_Codes.TradeMaterials);
+		self															:=	pInput;
 		self															:=	[];
 	end;
 	
-	dIns1Prep2Common	:=	project(PropertyCharacteristics.Files.Prepped.Insurance1,tIns1Common(left));
+	dIns1Prep2Common	:=	project(PropertyCharacteristics.Files.Prepped.Insurance1(PolicyID	!=	0),tIns1Common(left));
 	
 	rBBTemp_layout	tIns1_Map2Common(rBBTemp_layout	le,PropertyCharacteristics.Layout_In.StructureDetail	ri)	:=
 	transform
@@ -592,17 +674,50 @@ module
 		self.vendor_preference						:=	2;
 		self.tax_sortby_date							:=	'';
 		self.deed_sortby_date							:=	'';
-		self.air_conditioning_type				:=	if(ri.category	=	'001',ri.material,le.air_conditioning_type);
-		self.basement_finish							:=	if(ri.category	=	'013',ri.material,le.basement_finish);
-		self.construction_type						:=	if(ri.category	=	'005',ri.material,le.construction_type);
-		self.exterior_wall								:=	if(ri.category	=	'005',ri.material,le.exterior_wall);
-		self.garage												:=	if(ri.category	=	'012',ri.material,le.garage);
-		self.heating											:=	if(ri.category	=	'001',ri.material,le.heating);
-		self.parking_type									:=	if(ri.category	=	'012',ri.material,le.parking_type);
-		self.roof_cover										:=	if(ri.category	=	'006',ri.material,le.roof_cover);
-		self.foundation										:=	if(ri.category	=	'007',ri.material,le.foundation);
-		self.floor_type										:=	if(ri.category	=	'003',ri.material,le.floor_type);
-		self.fuel_type										:=	if(ri.category	=	'001',ri.material,le.fuel_type);
+		self.air_conditioning_type				:=	if(	le.air_conditioning_type	!=	'',
+																							le.air_conditioning_type,
+																							if(ri.category	=	'001',ri.material,'')
+																						);
+		self.basement_finish							:=	if(	le.basement_finish	!=	'',
+																							le.basement_finish,
+																							if(ri.category	=	'013',ri.material,'')
+																						);
+		self.construction_type						:=	if(	le.construction_type	!=	'',
+																							le.construction_type,
+																							if(ri.category	=	'005',ri.material,'')
+																						);
+		self.exterior_wall								:=	if(	le.exterior_wall	!=	'',
+																							le.exterior_wall,
+																							if(ri.category	=	'005',ri.material,'')
+																						);
+		self.garage												:=	if(	le.garage	!=	'',
+																							le.garage,
+																							if(ri.category	=	'012',ri.material,'')
+																						);
+		self.heating											:=	if(	le.heating	!=	'',
+																							le.heating,
+																							if(ri.category	=	'001',ri.material,'')
+																						);
+		self.parking_type									:=	if(	le.parking_type	!=	'',
+																							le.parking_type,
+																							if(ri.category	=	'012',ri.material,'')
+																						);
+		self.roof_cover										:=	if(	le.roof_cover	!=	'',
+																							le.roof_cover,
+																							if(ri.category	=	'006',ri.material,'')
+																						);
+		self.foundation										:=	if(	le.foundation	!=	'',
+																							le.foundation,
+																							if(ri.category	=	'007',ri.material,'')
+																						);
+		self.floor_type										:=	if(	le.floor_type	!=	'',
+																							le.floor_type,
+																							if(ri.category	=	'003',ri.material,'')
+																						);
+		self.fuel_type										:=	if(	le.fuel_type	!=	'',
+																							le.fuel_type,
+																							if(ri.category	=	'001',ri.material,'')
+																						);
 		self															:=	le;
 	end;
 	
@@ -624,7 +739,7 @@ module
 		self	:=	ri;
 	end;
 	
-	Ins2IBCodes				:=	normalize(PropertyCharacteristics.Files.Prepped.Insurance2,left.IBCodes,tIns2IBCodes(right));
+	Ins2IBCodes				:=	normalize(PropertyCharacteristics.Files.Prepped.Insurance2(PolicyID	!=	0),left.IBCodes,tIns2IBCodes(right));
 	Ins2IBCodesDist		:=	distribute(Ins2IBCodes,PolicyID);
 	Ins2IBCodesSort		:=	sort(Ins2IBCodesDist,PolicyID,category,-Value,local);
 	Ins2IBCodesDedup	:=	dedup(Ins2IBCodesSort,PolicyID,category,local);
@@ -636,8 +751,9 @@ module
 		self.property_street_address			:=	pInput.Append_PrepAddr1;
 		self.property_city_state_zip			:=	pInput.Append_PrepAddr2;
 		self.property_raw_aid							:=	pInput.Append_RawAID;
+		self.county												:=	'';
 		
-		self.living_area_square_footage		:=	pInput.LivingArea;
+		self.living_area_square_footage		:=	stringlib.stringfilterout(pInput.LivingArea,',');
 		self.no_of_baths									:=	pInput.Baths;
 		self.no_of_bedrooms								:=	pInput.Bedrooms;
 		self.no_of_fireplaces							:=	(string)((integer)pInput.Fireplaces);
@@ -646,15 +762,22 @@ module
 		self.pool_indicator								:=	pInput.Pool;
 		self.year_built										:=	pInput.YearBuilt;
 		self.census_tract									:=	pInput.CensusTract;
-		self.county_name									:=	pInput.County;
-		self.fips_code										:=	pInput.FipsCode;
+		self.county_name									:=	if(	PropertyCharacteristics.Functions.clean2Upper(pInput.County)	!=	'NULL',
+																							PropertyCharacteristics.Functions.clean2Upper(pInput.County),
+																							''
+																						);
+		self.fips_code										:=	if(	PropertyCharacteristics.Functions.clean2Upper(pInput.FipsCode)	!=	'NULL',
+																							pInput.FipsCode,
+																							''
+																						);
 		self.no_of_rooms									:=	(string)((integer)pInput.TotalRooms);
 		self.lot_size											:=	pInput.LotArea;
 		self.insurbase_codes							:=	project(pInput.IBCodes,PropertyCharacteristics.Layout_Codes.TradeMaterials);
+		self															:=	pInput;
 		self															:=	[];
 	end;
 	
-	dIns2Prep2Common	:=	project(PropertyCharacteristics.Files.Prepped.Insurance2,tIns2Common(left));
+	dIns2Prep2Common	:=	project(PropertyCharacteristics.Files.Prepped.Insurance2(PolicyID	!=	0),tIns2Common(left));
 	
 	rIns2Temp_layout	tIns2_Map2Common(rBBTemp_layout	le,PropertyCharacteristics.Layout_In.StructureDetail	ri)	:=
 	transform
@@ -662,17 +785,50 @@ module
 		self.vendor_preference						:=	2;
 		self.tax_sortby_date							:=	'';
 		self.deed_sortby_date							:=	'';
-		self.air_conditioning_type				:=	if(ri.category	=	'001',ri.material,le.air_conditioning_type);
-		self.basement_finish							:=	if(ri.category	=	'013',ri.material,le.basement_finish);
-		self.construction_type						:=	if(ri.category	=	'005',ri.material,le.construction_type);
-		self.exterior_wall								:=	if(ri.category	=	'005',ri.material,le.exterior_wall);
-		self.garage												:=	if(ri.category	=	'012',ri.material,le.garage);
-		self.heating											:=	if(ri.category	=	'001',ri.material,le.heating);
-		self.parking_type									:=	if(ri.category	=	'012',ri.material,le.parking_type);
-		self.roof_cover										:=	if(ri.category	=	'006',ri.material,le.roof_cover);
-		self.foundation										:=	if(ri.category	=	'007',ri.material,le.foundation);
-		self.floor_type										:=	if(ri.category	=	'003',ri.material,le.floor_type);
-		self.fuel_type										:=	if(ri.category	=	'001',ri.material,le.fuel_type);
+		self.air_conditioning_type				:=	if(	le.air_conditioning_type	!=	'',
+																							le.air_conditioning_type,
+																							if(ri.category	=	'001',ri.material,'')
+																						);
+		self.basement_finish							:=	if(	le.basement_finish	!=	'',
+																							le.basement_finish,
+																							if(ri.category	=	'013',ri.material,'')
+																						);
+		self.construction_type						:=	if(	le.construction_type	!=	'',
+																							le.construction_type,
+																							if(ri.category	=	'005',ri.material,'')
+																						);
+		self.exterior_wall								:=	if(	le.exterior_wall	!=	'',
+																							le.exterior_wall,
+																							if(ri.category	=	'005',ri.material,'')
+																						);
+		self.garage												:=	if(	le.garage	!=	'',
+																							le.garage,
+																							if(ri.category	=	'012',ri.material,'')
+																						);
+		self.heating											:=	if(	le.heating	!=	'',
+																							le.heating,
+																							if(ri.category	=	'001',ri.material,'')
+																						);
+		self.parking_type									:=	if(	le.parking_type	!=	'',
+																							le.parking_type,
+																							if(ri.category	=	'012',ri.material,'')
+																						);
+		self.roof_cover										:=	if(	le.roof_cover	!=	'',
+																							le.roof_cover,
+																							if(ri.category	=	'006',ri.material,'')
+																						);
+		self.foundation										:=	if(	le.foundation	!=	'',
+																							le.foundation,
+																							if(ri.category	=	'007',ri.material,'')
+																						);
+		self.floor_type										:=	if(	le.floor_type	!=	'',
+																							le.floor_type,
+																							if(ri.category	=	'003',ri.material,'')
+																						);
+		self.fuel_type										:=	if(	le.fuel_type	!=	'',
+																							le.fuel_type,
+																							if(ri.category	=	'001',ri.material,'')
+																						);
 		self															:=	le;
 	end;
 	
@@ -695,7 +851,7 @@ module
 		self	:=	ri;
 	end;
 	
-	ApprIBCodes				:=	normalize(PropertyCharacteristics.Files.Prepped.Appraiser,left.IBCodes,tApprIBCodes(right));
+	ApprIBCodes				:=	normalize(PropertyCharacteristics.Files.Prepped.Appraiser(PolicyID	!=	0),left.IBCodes,tApprIBCodes(right));
 	ApprIBCodesDist		:=	distribute(ApprIBCodes,PolicyID);
 	ApprIBCodesSort		:=	sort(ApprIBCodesDist,PolicyID,category,-Value,local);
 	ApprIBCodesDedup	:=	dedup(ApprIBCodesSort,PolicyID,category,local);
@@ -706,8 +862,9 @@ module
 		self.property_street_address			:=	pInput.Append_PrepAddr1;
 		self.property_city_state_zip			:=	pInput.Append_PrepAddr2;
 		self.property_raw_aid							:=	pInput.Append_RawAID;
+		self.county												:=	'';
 		
-		self.living_area_square_footage		:=	pInput.LivingArea;
+		self.living_area_square_footage		:=	stringlib.stringfilterout(pInput.LivingArea,',');
 		self.no_of_baths									:=	pInput.Baths;
 		self.no_of_bedrooms								:=	pInput.Bedrooms;
 		self.no_of_fireplaces							:=	(string)((integer)pInput.Fireplaces);
@@ -716,15 +873,22 @@ module
 		self.pool_indicator								:=	pInput.Pool;
 		self.year_built										:=	pInput.YearBuilt;
 		self.census_tract									:=	pInput.CensusTract;
-		self.county_name									:=	pInput.County;
-		self.fips_code										:=	pInput.FipsCode;
+		self.county_name									:=	if(	PropertyCharacteristics.Functions.clean2Upper(pInput.County)	!=	'NULL',
+																							PropertyCharacteristics.Functions.clean2Upper(pInput.County),
+																							''
+																						);
+		self.fips_code										:=	if(	PropertyCharacteristics.Functions.clean2Upper(pInput.FipsCode)	!=	'NULL',
+																							pInput.FipsCode,
+																							''
+																						);
 		self.no_of_rooms									:=	(string)((integer)pInput.TotalRooms);
 		self.lot_size											:=	pInput.LotArea;
 		self.insurbase_codes							:=	project(pInput.IBCodes,PropertyCharacteristics.Layout_Codes.TradeMaterials);
+		self															:=	pInput;
 		self															:=	[];
 	end;
 	
-	dApprPrep2Common	:=	project(PropertyCharacteristics.Files.Prepped.Insurance1,tApprCommon(left));
+	dApprPrep2Common	:=	project(PropertyCharacteristics.Files.Prepped.Appraiser(PolicyID	!=	0),tApprCommon(left));
 	
 	rBBTemp_layout	tAppr_Map2Common(rBBTemp_layout	le,PropertyCharacteristics.Layout_In.StructureDetail	ri)	:=
 	transform
@@ -732,17 +896,50 @@ module
 		self.vendor_preference						:=	1;
 		self.tax_sortby_date							:=	'';
 		self.deed_sortby_date							:=	'';
-		self.air_conditioning_type				:=	if(ri.category	=	'001',ri.material,le.air_conditioning_type);
-		self.basement_finish							:=	if(ri.category	=	'013',ri.material,le.basement_finish);
-		self.construction_type						:=	if(ri.category	=	'005',ri.material,le.construction_type);
-		self.exterior_wall								:=	if(ri.category	=	'005',ri.material,le.exterior_wall);
-		self.garage												:=	if(ri.category	=	'012',ri.material,le.garage);
-		self.heating											:=	if(ri.category	=	'001',ri.material,le.heating);
-		self.parking_type									:=	if(ri.category	=	'012',ri.material,le.parking_type);
-		self.roof_cover										:=	if(ri.category	=	'006',ri.material,le.roof_cover);
-		self.foundation										:=	if(ri.category	=	'007',ri.material,le.foundation);
-		self.floor_type										:=	if(ri.category	=	'003',ri.material,le.floor_type);
-		self.fuel_type										:=	if(ri.category	=	'001',ri.material,le.fuel_type);
+		self.air_conditioning_type				:=	if(	le.air_conditioning_type	!=	'',
+																							le.air_conditioning_type,
+																							if(ri.category	=	'001',ri.material,'')
+																						);
+		self.basement_finish							:=	if(	le.basement_finish	!=	'',
+																							le.basement_finish,
+																							if(ri.category	=	'013',ri.material,'')
+																						);
+		self.construction_type						:=	if(	le.construction_type	!=	'',
+																							le.construction_type,
+																							if(ri.category	=	'005',ri.material,'')
+																						);
+		self.exterior_wall								:=	if(	le.exterior_wall	!=	'',
+																							le.exterior_wall,
+																							if(ri.category	=	'005',ri.material,'')
+																						);
+		self.garage												:=	if(	le.garage	!=	'',
+																							le.garage,
+																							if(ri.category	=	'012',ri.material,'')
+																						);
+		self.heating											:=	if(	le.heating	!=	'',
+																							le.heating,
+																							if(ri.category	=	'001',ri.material,'')
+																						);
+		self.parking_type									:=	if(	le.parking_type	!=	'',
+																							le.parking_type,
+																							if(ri.category	=	'012',ri.material,'')
+																						);
+		self.roof_cover										:=	if(	le.roof_cover	!=	'',
+																							le.roof_cover,
+																							if(ri.category	=	'006',ri.material,'')
+																						);
+		self.foundation										:=	if(	le.foundation	!=	'',
+																							le.foundation,
+																							if(ri.category	=	'007',ri.material,'')
+																						);
+		self.floor_type										:=	if(	le.floor_type	!=	'',
+																							le.floor_type,
+																							if(ri.category	=	'003',ri.material,'')
+																						);
+		self.fuel_type										:=	if(	le.fuel_type	!=	'',
+																							le.fuel_type,
+																							if(ri.category	=	'001',ri.material,'')
+																						);
 		self															:=	le;
 	end;
 	

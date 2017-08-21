@@ -1,5 +1,5 @@
 import ut;
-export fCombineCorpHistory(DATASET(Layout_Corporate_Direct_Corp_Base) corp_base) :=
+export fCombineCorpHistory(DATASET(Layout_Corporate_Direct_Corp_AID) corp_base) :=
 FUNCTION
 
 corp_all := corp_base + fCorp4AsCorp2History(corp_base);
@@ -10,7 +10,7 @@ corp_all_sort := sort(corp_all_dist, corp_key, local);
 corp_all_grpd := group(corp_all_sort, corp_key, local);
 corp_all_grpd_sort := sort(corp_all_grpd, if(corp_vendor = 'EX', 1, 0), -dt_vendor_last_reported, -dt_last_seen);
 
-Layout_Corporate_Direct_Corp_Base SetRecordType(Layout_Corporate_Direct_Corp_Base l, Layout_Corporate_Direct_Corp_Base r) := transform
+Layout_Corporate_Direct_Corp_AID SetRecordType(Layout_Corporate_Direct_Corp_AID l, Layout_Corporate_Direct_Corp_AID r) := transform
 self.record_type := if(l.record_type = '', 'C', 'H');
 self := r;
 end;
@@ -37,7 +37,7 @@ corp_all_final_list := join(corp_all_final_direct,
 						SelectCorpKeysForRollup(left, right),
 						local);
 						
-Layout_Corporate_Direct_Corp_Base SelectCorpKeys(Layout_Corporate_Direct_Corp_Base l, layout_corp_key r) := transform
+Layout_Corporate_Direct_Corp_AID SelectCorpKeys(Layout_Corporate_Direct_Corp_AID l, layout_corp_key r) := transform
 self := l;
 end;
 
@@ -123,7 +123,7 @@ corp_phone10,
 corp_ra_phone10,
 local);
 
-Layout_Corporate_Direct_Corp_Base RollupExperian(Layout_Corporate_Direct_Corp_Base l, Layout_Corporate_Direct_Corp_Base r) := transform
+Layout_Corporate_Direct_Corp_AID RollupExperian(Layout_Corporate_Direct_Corp_AID l, Layout_Corporate_Direct_Corp_AID r) := transform
 SELF.dt_first_seen := 
             ut.EarliestDate(ut.EarliestDate(l.dt_first_seen,r.dt_first_seen),
 		    ut.EarliestDate(l.dt_last_seen,r.dt_last_seen));

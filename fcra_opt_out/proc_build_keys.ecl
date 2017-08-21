@@ -34,9 +34,9 @@ Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::fcra::optout::address
 // -- Move Keys to QA
 /////////////////////////////////////////////////////////////////////////////////
 
-ut.mac_sk_move('~thor_data400::key::fcra::optout::did' ,'Q',mv2qa_did);
-ut.mac_sk_move('~thor_data400::key::fcra::optout::ssn' ,'Q',mv2qa_ssn);
-ut.mac_sk_move('~thor_data400::key::fcra::optout::address' ,'Q',mv2qa_address);
+ut.mac_sk_move_v2('~thor_data400::key::fcra::optout::did' ,'Q',mv2qa_did);
+ut.mac_sk_move_v2('~thor_data400::key::fcra::optout::ssn' ,'Q',mv2qa_ssn);
+ut.mac_sk_move_v2('~thor_data400::key::fcra::optout::address' ,'Q',mv2qa_address);
 
 
 //////////////////////////////

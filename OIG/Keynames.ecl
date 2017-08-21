@@ -1,4 +1,4 @@
-import versioncontrol;
+import versioncontrol, OIG;
 
 export Keynames(
 
@@ -7,8 +7,8 @@ export Keynames(
 
 ) :=
 module
-shared lautokeytemplate 				:= Constants(pUseOtherEnvironment).autokeytemplate	;
-shared LinkIDs_keytemplate 			:= Constants(pUseOtherEnvironment).keyTemplate	;
+shared lautokeytemplate 				:= OIG.Constants(pUseOtherEnvironment).autokeytemplate	;
+shared LinkIDs_keytemplate 			:= OIG.Constants(pUseOtherEnvironment).keyTemplate	;
 
 	export autokeyroot		        := versioncontrol.mBuildFilenameVersions(lautokeytemplate	,pversion);
 	export name										:= versioncontrol.mBuildFilenameVersions(lautokeytemplate + 'name'				,pversion);

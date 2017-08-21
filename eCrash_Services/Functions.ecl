@@ -1,4 +1,4 @@
-﻿/*2017-03-14T21:25:39Z (Dmitriy Lazarenko)
+/*2017-03-14T21:25:39Z (Dmitriy Lazarenko)
 checking if input params are populated for IsReportDeletedFromDeltabase() function and also changing vehicle_incident_id comparison since we can have situation where deleted and non deleted reports have the same incident_id
 */
 import iesp,lib_stringlib,ut,FLAccidents_Ecrash,AutoStandardI,doxie,Std;

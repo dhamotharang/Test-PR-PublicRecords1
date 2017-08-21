@@ -1,6 +1,7 @@
 export InputLayout := record
 	string25 acctno;
 	string120 company_name;
+	string120 clean_company_name;
 	string9 fein;
 	unsigned6 llid9;
 	unsigned6 llid12;

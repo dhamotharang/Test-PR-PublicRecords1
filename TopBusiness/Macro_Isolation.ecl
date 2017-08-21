@@ -49,7 +49,7 @@ export Macro_Isolation(infile,company_name_field,outfile) := macro
 	
 	// pattern p_dba := pattern('DBA|A DIVISION OF|FKA|DOING BUSINESS AS|FORMERLY KNOWN AS');
 	#uniquename(p_dba);
-	pattern %p_dba% := pattern('DBA|DOING BUSINESS AS|D/B/A|D/B/A/|D B A');
+	pattern %p_dba% := pattern('DBA|DOING BUSINESS AS|D/B/A|D/B/A/|D B A|FORMERLY KNOWN AS|TRADING AS|FKA|F/K/A|F K A|T/A|TA|T A');
 	#uniquename(p_other_name);
 	pattern %p_other_name% := %p_rest%;
 	#uniquename(p_complete_2);
@@ -101,6 +101,29 @@ export Macro_Isolation(infile,company_name_field,outfile) := macro
 		self.company_name_field := matchtext(%p_rest%),
 		self := left),best);
 	
-	outfile := %tempparse4%;
+	#uniquename(NULL_VALUE_SET);
+	%NULL_VALUE_SET% := ['NULL'];
+
+	#uniquename(tempremovenullvalues);
+	%tempremovenullvalues% := project(%tempparse4%,
+		transform(%temprec%,
+			self.company_name_field := if(trim(left.company_name_field,left,right) in %NULL_VALUE_SET%,
+				'',
+				left.company_name_field),
+			self := left));
+	
+	#uniquename(additional_junk_removal)
+	%additional_junk_removal% := project(%tempremovenullvalues%,
+		transform(%temprec%,
+			self.company_name_field := if(
+				stringlib.StringFind(left.company_name_field,' AND HOUSING AND URBAN DEVELOPMENT',1) > 0,
+				left.company_name_field[1..stringlib.StringFind(left.company_name_field,' AND HOUSING AND URBAN DEVELOPMENT',1) - 1],
+				if(
+					stringlib.StringFind(left.company_name_field,' AND URBAN DEVELOPMENT',1) > 0,
+					left.company_name_field[1..stringlib.StringFind(left.company_name_field,' AND URBAN DEVELOPMENT',1) - 1],
+					left.company_name_field)),
+			self := left));
+	
+	outfile := %additional_junk_removal%;
 
 endmacro;

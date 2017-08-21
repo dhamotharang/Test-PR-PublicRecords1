@@ -2,8 +2,8 @@ IMPORT SALT29,BIPV2_WAF;// Gather up the UID counts from each of the children - 
 
 EXPORT Key_BIPV2_WAF := Module
 
-SHARED AllEfr0 := Mod_Corps().EFR+Mod_UCC().EFR+Mod_Vehicle().EFR+Mod_PropertyV2().EFR+Mod_BizContacts().EFR;
-// Need to compute the 'rolled up' counts for parents in hierarchy
+	SHARED AllEfr0 := Mod_Corps().EFR+Mod_UCC().EFR+Mod_Vehicle().EFR+Mod_PropertyV2().EFR+Mod_BizContacts().EFR;
+	// Need to compute the 'rolled up' counts for parents in hierarchy
   R1 := RECORD
     AllEFR0.Child_Id;
     Cnt := SUM(GROUP,AllEFR0.Cnt);
@@ -35,19 +35,20 @@ SHARED AllEfr0 := Mod_Corps().EFR+Mod_UCC().EFR+Mod_Vehicle().EFR+Mod_PropertyV2
   m := GROUP(AllEfr4(~(proxid = 0 AND seleid = 0 AND orgid = 0 AND ultid = 0)),ultid,orgid,seleid,proxid,ALL);
   r := ROLLUP(m,GROUP,TRANSFORM(Ext_Layouts.EFR_Layout,SELF.Hits := PROJECT(ROWS(LEFT),Ext_Layouts.EFR_Child),SELF := LEFT));
 	
-	EXPORT Key := INDEX(r,{ultid,orgid,seleid,proxid},{r},'~thor_data400::key::BIPV2_WAF::qa::proxid::efr');
+	EXPORT Key := INDEX(r,{ultid,orgid,seleid,proxid},{r},'~thor_data400::key::BIPV2_WAF::QA::proxid::efr');
  
 	// Results will be aggregated by UniqueID from the idstream
 	EXPORT FetchEFR(DATASET(process_Biz_layouts.id_stream_layout) idstream,UNSIGNED User_Permits) := FUNCTION
-  Raw := JOIN(idstream,Key,(LEFT.ultid = RIGHT.ultid) AND (LEFT.orgid = 0 OR LEFT.orgid = RIGHT.orgid) AND (LEFT.seleid = 0 OR LEFT.seleid = RIGHT.seleid) AND (LEFT.proxid = 0 OR LEFT.proxid = RIGHT.proxid));
-  R := RECORD
-    UNSIGNED4 UniqueID;
-    UNSIGNED2 Child_Id;
-    UNSIGNED4 Cnt;
-    UNSIGNED2 Permits;
-  END;
-  N := NORMALIZE(Raw,COUNT(LEFT.Hits),TRANSFORM(R,SELF.UniqueID := LEFT.UniqueID, SELF := LEFT.Hits[COUNTER]))(((User_Permits|(~Permits))&1022 = 1022) and permits <> 0);
-  RETURN TABLE(N,{ UniqueID, Child_Id, UNSIGNED Cnt := SUM(GROUP,Cnt)},UniqueId,Child_Id,FEW);
-END;
+		Raw := JOIN(idstream,Key,(LEFT.ultid = RIGHT.ultid) AND (LEFT.orgid = 0 OR LEFT.orgid = RIGHT.orgid) AND (LEFT.seleid = 0 OR LEFT.seleid = RIGHT.seleid) AND (LEFT.proxid = 0 OR LEFT.proxid = RIGHT.proxid),keep(2500));
+		R := RECORD
+			UNSIGNED4 UniqueID;
+			UNSIGNED2 Child_Id;
+			UNSIGNED4 Cnt;
+			UNSIGNED2 Permits;
+		END;
+		N := NORMALIZE(Raw,COUNT(LEFT.Hits),TRANSFORM(R,SELF.UniqueID := LEFT.UniqueID, SELF := LEFT.Hits[COUNTER]))(((User_Permits|(~Permits))&1022 = 1022) and permits <> 0);
+		RETURN TABLE(N,{ UniqueID, Child_Id, UNSIGNED Cnt := SUM(GROUP,Cnt)},UniqueId,Child_Id,FEW);
+	END;
 
 end;
+

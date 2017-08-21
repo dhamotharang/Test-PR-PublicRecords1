@@ -1,7 +1,8 @@
 import watercraft;
 
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_VA_clean_in, watercraft.Layout_VA_clean_in,hull_clean_in)
 
-file_VA_filter  := watercraft.file_VA_clean_in(Fips_Used <> '' or Fips_Docked <> '');
+file_VA_filter  := hull_clean_in(Fips_Used <> '' or Fips_Docked <> '');
 
 
 Layout_VA_clean_temp := record

@@ -21,25 +21,25 @@ export Build_Strata( string	pversion, boolean pUseProd = false) := module
 	shared dSplitUpdate 			:= Strata_stats.Split(Files(pversion,pUseProd).Split_Base.Built);
 	shared dDropUpdate 			:= Strata_stats.Drop(Files(pversion,pUseProd).Drop_Base.Built);
 
-	Strata.createXMLStats(dAddressUpdate.dNoGrouping,'enclarity', 'address_base', pversion, email_notification_lists.BuildSuccess, BuildAddress_Strata		,'View','Population');
-	Strata.createXMLStats(dAssociateUpdate.dNoGrouping,'enclarity', 'associate_base', pversion, email_notification_lists.BuildSuccess, BuildAssociate_Strata		,'View','Population');
-	Strata.createXMLStats(dDEAUpdate.dNoGrouping,'enclarity', 'dea_base', pversion, email_notification_lists.BuildSuccess, BuildDEA_Strata		,'View','Population');
-	Strata.createXMLStats(dFacilityUpdate.dNoGrouping,'enclarity', 'facility_base', pversion, email_notification_lists.BuildSuccess, BuildFacility_Strata		,'View','Population');
-	Strata.createXMLStats(dIndividualUpdate.dNoGrouping,'enclarity', 'individual_base', pversion, email_notification_lists.BuildSuccess, BuildIndividual_Strata		,'View','Population');
-	Strata.createXMLStats(dLicenseUpdate.dNoGrouping,'enclarity', 'license_base', pversion, email_notification_lists.BuildSuccess, BuildLicense_Strata		,'View','Population');
-	Strata.createXMLStats(dMedschoolUpdate.dNoGrouping,'enclarity', 'medschool_base', pversion, email_notification_lists.BuildSuccess, BuildMedschool_Strata		,'View','Population');
-	Strata.createXMLStats(dNPIUpdate.dNoGrouping,'enclarity', 'npi_base', pversion, email_notification_lists.BuildSuccess, BuildNPI_Strata		,'View','Population');
-	Strata.createXMLStats(dProvBirthdateUpdate.dNoGrouping,'enclarity', 'prov_birthdate_base', pversion, email_notification_lists.BuildSuccess, BuildProvBirthdate_Strata		,'View','Population');
-	Strata.createXMLStats(dProvSSNUpdate.dNoGrouping,'enclarity', 'prov_ssn_base', pversion, email_notification_lists.BuildSuccess, BuildProvSSN_Strata		,'View','Population');
-	Strata.createXMLStats(dSancCodesUpdate.dNoGrouping,'enclarity', 'sanc_codes_base', pversion, email_notification_lists.BuildSuccess, BuildSancCodes_Strata		,'View','Population');
-	Strata.createXMLStats(dSancProvTypeUpdate.dNoGrouping,'enclarity', 'sanc_prov_type_base', pversion, email_notification_lists.BuildSuccess, BuildSancProvType_Strata		,'View','Population');
-	Strata.createXMLStats(dSanctionUpdate.dNoGrouping,'enclarity', 'sanction_base', pversion, email_notification_lists.BuildSuccess, BuildSanction_Strata		,'View','Population');
-	Strata.createXMLStats(dSpecialtyUpdate.dNoGrouping,'enclarity', 'specialty_base', pversion, email_notification_lists.BuildSuccess, BuildSpecialty_Strata		,'View','Population');
-	Strata.createXMLStats(dTaxCodesUpdate.dNoGrouping,'enclarity', 'tax_codes_base', pversion, email_notification_lists.BuildSuccess, BuildTaxCodes_Strata		,'View','Population');
-	Strata.createXMLStats(dTaxonomyUpdate.dNoGrouping,'enclarity', 'taxonomy_base', pversion, email_notification_lists.BuildSuccess, BuildTaxonomy_Strata		,'View','Population');
-	Strata.createXMLStats(dCollapseUpdate.dNoGrouping,'enclarity', 'collapse_base', pversion, email_notification_lists.BuildSuccess, Buildcollapse_Strata		,'View','Population');
-	Strata.createXMLStats(dsplitUpdate.dNoGrouping,'enclarity', 'split_base', pversion, email_notification_lists.BuildSuccess, Buildsplit_Strata		,'View','Population');
-	Strata.createXMLStats(ddropUpdate.dNoGrouping,'enclarity', 'drop_base', pversion, email_notification_lists.BuildSuccess, Builddrop_Strata		,'View','Population');
+	Strata.createXMLStats(dAddressUpdate.dNoGrouping,'enclarity_v2', 'address_base', pversion, email_notification_lists.BuildSuccess, BuildAddress_Strata		,'View','Population');
+	Strata.createXMLStats(dAssociateUpdate.dNoGrouping,'enclarity_v2', 'associate_base', pversion, email_notification_lists.BuildSuccess, BuildAssociate_Strata		,'View','Population');
+	Strata.createXMLStats(dDEAUpdate.dNoGrouping,'enclarity_v2', 'dea_base', pversion, email_notification_lists.BuildSuccess, BuildDEA_Strata		,'View','Population');
+	Strata.createXMLStats(dFacilityUpdate.dNoGrouping,'enclarity_v3', 'facility_base', pversion, email_notification_lists.BuildSuccess, BuildFacility_Strata		,'View','Population');
+	Strata.createXMLStats(dIndividualUpdate.dNoGrouping,'enclarity_v2', 'individual_base', pversion, email_notification_lists.BuildSuccess, BuildIndividual_Strata		,'View','Population');
+	Strata.createXMLStats(dLicenseUpdate.dNoGrouping,'enclarity_v2', 'license_base', pversion, email_notification_lists.BuildSuccess, BuildLicense_Strata		,'View','Population');
+	Strata.createXMLStats(dMedschoolUpdate.dNoGrouping,'enclarity_v2', 'medschool_base', pversion, email_notification_lists.BuildSuccess, BuildMedschool_Strata		,'View','Population');
+	Strata.createXMLStats(dNPIUpdate.dNoGrouping,'enclarity_v2', 'npi_base', pversion, email_notification_lists.BuildSuccess, BuildNPI_Strata		,'View','Population');
+	Strata.createXMLStats(dProvBirthdateUpdate.dNoGrouping,'enclarity_v2', 'prov_birthdate_base', pversion, email_notification_lists.BuildSuccess, BuildProvBirthdate_Strata		,'View','Population');
+	Strata.createXMLStats(dProvSSNUpdate.dNoGrouping,'enclarity_v2', 'prov_ssn_base', pversion, email_notification_lists.BuildSuccess, BuildProvSSN_Strata		,'View','Population');
+	Strata.createXMLStats(dSancCodesUpdate.dNoGrouping,'enclarity_v2', 'sanc_codes_base', pversion, email_notification_lists.BuildSuccess, BuildSancCodes_Strata		,'View','Population');
+	Strata.createXMLStats(dSancProvTypeUpdate.dNoGrouping,'enclarity_v2', 'sanc_prov_type_base', pversion, email_notification_lists.BuildSuccess, BuildSancProvType_Strata		,'View','Population');
+	Strata.createXMLStats(dSanctionUpdate.dNoGrouping,'enclarity_v2', 'sanction_base', pversion, email_notification_lists.BuildSuccess, BuildSanction_Strata		,'View','Population');
+	Strata.createXMLStats(dSpecialtyUpdate.dNoGrouping,'enclarity_v2', 'specialty_base', pversion, email_notification_lists.BuildSuccess, BuildSpecialty_Strata		,'View','Population');
+	Strata.createXMLStats(dTaxCodesUpdate.dNoGrouping,'enclarity_v2', 'tax_codes_base', pversion, email_notification_lists.BuildSuccess, BuildTaxCodes_Strata		,'View','Population');
+	Strata.createXMLStats(dTaxonomyUpdate.dNoGrouping,'enclarity_v2', 'taxonomy_base', pversion, email_notification_lists.BuildSuccess, BuildTaxonomy_Strata		,'View','Population');
+	Strata.createXMLStats(dCollapseUpdate.dNoGrouping,'enclarity_v2', 'collapse_base', pversion, email_notification_lists.BuildSuccess, Buildcollapse_Strata		,'View','Population');
+	Strata.createXMLStats(dsplitUpdate.dNoGrouping,'enclarity_v2', 'split_base', pversion, email_notification_lists.BuildSuccess, Buildsplit_Strata		,'View','Population');
+	Strata.createXMLStats(ddropUpdate.dNoGrouping,'enclarity_v2', 'drop_base', pversion, email_notification_lists.BuildSuccess, Builddrop_Strata		,'View','Population');
 	
 	full_build := 
 	parallel(

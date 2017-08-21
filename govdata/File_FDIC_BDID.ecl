@@ -1,1 +1,4 @@
-export File_FDIC_BDID := dataset('~thor_Data400::base::govdata_FDIC_BDID',layout_fdic_bdid,flat);
+base := govdata.File_FDIC_Base_AID;
+
+export File_FDIC_BDID := project(base, transform(layout_fdic_bdid, self := left));
+

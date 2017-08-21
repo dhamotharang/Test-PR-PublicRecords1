@@ -1,13 +1,20 @@
-import Corp2,MDR;
+import Corp2,MDR,VersionControl;
 
 export Incorporation_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 
-	shared base := corp2.files(,,true).aid.corp.qa;
+	shared base := corp2.files(,,VersionControl._Flags.IsDataland).aid.corp.qa;
 		
 	export dataset(Layout_Linking.Unlinked) As_Linking_Master := function
 	
 		filtered := base(corp_process_date != '' and corp_orig_sos_charter_nbr != '' and
-		                  corp_legal_name != '');
+		                  corp_legal_name != '' and not ((corp_ln_name_type_cd = '03' OR corp_ln_name_type_cd = '04')
+		                  and (corp_ln_name_type_desc = 'TRADEMARK'
+													OR corp_ln_name_type_desc = 'TRADESTYLE'
+													OR corp_ln_name_type_desc = 'BRANDNAME' 
+													OR corp_ln_name_type_desc = 'SLOGAN'
+													OR corp_ln_name_type_desc = 'TRADENAME'													
+													) 
+										 ));
 											// may be other rows having  corp_ln_name_type_desc
 											// other than "LEGAL" which we may want to include ???
 									  		
@@ -19,8 +26,11 @@ export Incorporation_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 				self.date_first_seen := left.dt_first_seen,
 				self.date_last_seen  := left.dt_last_seen,
 				self.company_name    := stringlib.StringToUpperCase(left.corp_legal_name),
-				self.company_name_type := Constants.Company_Name_Types.LEGAL,
-				self.address_type := Constants.Address_Types.UNKNOWN,
+				self.company_name_type := if(left.corp_ln_name_type_desc = 'LEGAL',Constants.Company_Name_Types.LEGAL,Constants.Company_Name_Types.UNKNOWN),
+				self.address_type := map(
+					left.corp_address1_type_desc = 'BUSINESS' => Constants.Address_Types.BUSINESS,
+					left.corp_address1_type_desc = 'MAILING' => Constants.Address_Types.MAILING,
+					Constants.Address_Types.UNKNOWN),
 				self.phone_type := Constants.Phone_Types.UNKNOWN,
 				self.aid             := left.append_addr1_rawaid,
 				self.prim_range      := left.corp_addr1_prim_range,
@@ -35,8 +45,86 @@ export Incorporation_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					left.corp_addr1_v_city_name),
 				self.state           := left.corp_addr1_state,
 				self.zip             := left.corp_addr1_zip5,
+				self.zip4            := left.corp_addr1_zip4,
 				self.county_fips     := left.corp_addr1_county,
 				self.msa             := left.corp_addr1_msa,
+				self.phone           := left.corp_phone10,
+				self.fein            :=  ''; 
+				self.url             := left.corp_web_address,
+				self.duns := '',
+				self.experian := '',
+				self.zoom := '',
+				self.incorp_state := left.corp_state_origin,
+				self.incorp_number := left.corp_orig_sos_charter_nbr;
+				));
+											
+		 extract_2 := normalize(filtered(corp_addr2_prim_name != ''),if(left.corp_addr2_v_city_name != left.corp_addr2_p_city_name,2,1),
+			transform(Layout_Linking.Unlinked,			 
+				self.source := MDR.sourceTools.fCorpV2(left.corp_key),
+				self.source_docid    := trim(left.corp_key) + '//' + left.corp_process_date,
+				self.source_party    := 'CORP',
+				self.date_first_seen := left.dt_first_seen,
+				self.date_last_seen  := left.dt_last_seen,
+				self.company_name    := stringlib.StringToUpperCase(left.corp_legal_name),
+				self.company_name_type := if(left.corp_ln_name_type_desc = 'LEGAL',Constants.Company_Name_Types.LEGAL,Constants.Company_Name_Types.UNKNOWN),
+				self.address_type := map(
+					left.corp_address2_type_desc = 'BUSINESS' => Constants.Address_Types.BUSINESS,
+					left.corp_address2_type_desc = 'MAILING' => Constants.Address_Types.MAILING,
+					Constants.Address_Types.UNKNOWN),
+				self.phone_type := Constants.Phone_Types.UNKNOWN,
+				self.aid             := left.append_addr2_rawaid,
+				self.prim_range      := left.corp_addr2_prim_range,
+				self.predir          := left.corp_addr2_predir,
+				self.prim_name       := left.corp_addr2_prim_name,
+				self.addr_suffix     := left.corp_addr2_addr_suffix,
+				self.postdir         := left.corp_addr2_postdir,
+				self.unit_desig      := left.corp_addr2_unit_desig,
+				self.sec_range       := left.corp_addr2_sec_range,
+				self.city_name       := choose(counter,
+					left.corp_addr2_p_city_name,
+					left.corp_addr2_v_city_name),
+				self.state           := left.corp_addr2_state,
+				self.zip             := left.corp_addr2_zip5,
+				self.zip4            := left.corp_addr2_zip4,
+				self.county_fips     := left.corp_addr2_county,
+				self.msa             := left.corp_addr2_msa,
+				self.phone           := left.corp_phone10,
+				self.fein            :=  ''; 
+				self.url             := left.corp_web_address,
+				self.duns := '',
+				self.experian := '',
+				self.zoom := '',
+				self.incorp_state := left.corp_state_origin,
+				self.incorp_number := left.corp_orig_sos_charter_nbr;
+				));
+											
+		 extract_corp_raaddr := normalize(filtered(corp_addr1_prim_name = '' and corp_addr1_zip5 = ''),if(left.corp_addr1_v_city_name != left.corp_addr1_p_city_name,2,1),
+			transform(Layout_Linking.Unlinked,			 
+				self.source := MDR.sourceTools.fCorpV2(left.corp_key),
+				self.source_docid    := trim(left.corp_key) + '//' + left.corp_process_date,
+				self.source_party    := 'CORP',
+				self.date_first_seen := left.dt_first_seen,
+				self.date_last_seen  := left.dt_last_seen,
+				self.company_name    := stringlib.StringToUpperCase(left.corp_legal_name),
+				self.company_name_type := Constants.Company_Name_Types.LEGAL,
+				self.address_type := Constants.Address_Types.REGAGENT,
+				self.phone_type := Constants.Phone_Types.UNKNOWN,
+				self.aid             := left.append_ra_rawaid;
+				self.prim_range      := left.corp_ra_prim_range;
+				self.predir          := left.corp_ra_predir;
+				self.prim_name       := left.corp_ra_prim_name;
+				self.addr_suffix     := left.corp_ra_addr_suffix;
+				self.postdir         := left.corp_ra_postdir;
+				self.unit_desig      := left.corp_ra_unit_desig;
+				self.sec_range       := left.corp_ra_sec_range;
+				self.city_name       := choose(counter,
+					left.corp_ra_p_city_name,
+					left.corp_ra_v_city_name),
+				self.state           := left.corp_ra_state;
+				self.zip             := left.corp_ra_zip5;
+				self.zip4            := left.corp_ra_zip4;
+				self.county_fips     := left.corp_ra_county;
+				self.msa             := left.corp_ra_msa;
 				self.phone           := left.corp_phone10,
 				self.fein            :=  ''; 
 				self.url             := left.corp_web_address,
@@ -72,6 +160,7 @@ export Incorporation_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 						left.corp_ra_v_city_name),
 					self.state           := left.corp_ra_state;
 					self.zip             := left.corp_ra_zip5;
+					self.zip4            := left.corp_ra_zip4;
 					self.county_fips     := left.corp_ra_county;
 					self.msa             := left.corp_ra_msa;
 					self.phone           := left.corp_ra_phone_number;
@@ -83,7 +172,7 @@ export Incorporation_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					self.incorp_state  := '';
 					self.incorp_number := '';
 					));					
-		return extract + extract_ra;	
+		return dedup(dedup(extract + extract_2 + extract_corp_raaddr + extract_ra,record,all,local),record,all);
 	end;
 		
 	export dataset(Layout_Incorporation.Unlinked) As_Incorporation_Master := function
@@ -130,7 +219,7 @@ export Incorporation_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 			
 		// Get the last 2 years of corp filing event(history) info (date & description) 
 		// from the base corp2 events file by filtering & denormalizing.
-    event_base := corp2.files(,,true).base.events.qa;
+    event_base := corp2.files(,,VersionControl._Flags.IsDataland).base.events.qa;
 
     // Get the current/run date
     integer4 run_yyyymmdd := (integer4) StringLib.GetDateYYYYMMDD();
@@ -186,11 +275,13 @@ export Incorporation_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 		    self.position_title := left.corp_ra_title_desc; // this is not right so commenting out stringlib.StringToUpperCase(left.corp_legal_name);
 				self.email         := left.corp_email_address;
 				self.ssn           := '';
+				self.did           := 0,
+				self.score         := 0,
 				self.phone         := left.corp_ra_phone10;
 				self.position_type := 'R';					    
 			));			
 			
-			contacts_base := corp2.files(,,true).base.cont.qa; // need to call macro somehow here ???
+			contacts_base := corp2.files(,,VersionControl._Flags.IsDataland).base.cont.qa; // need to call macro somehow here ???
 			filtered := contacts_base(cont_lname  != '');
 			contacts_extract := project(filtered,
 			  transform(Layout_contacts.Unlinked,
@@ -220,6 +311,8 @@ export Incorporation_AsMasters := module(Interface_AsMasters.Unlinked.Default)
 					self.position_type := 'C';		
 				  self.email         := left.cont_email_address;
 					self.ssn           := '';
+					self.did           := left.did,
+					self.score         := 0,
 					self.phone         := '';					
 			  ));
 		return corp_extract_ra + contacts_extract;

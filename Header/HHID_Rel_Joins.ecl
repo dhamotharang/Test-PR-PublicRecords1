@@ -1,4 +1,4 @@
-import ut;
+import ut,prte2_header;
 fin := header.file_relatives(number_cohabits>5);
 
 r := record
@@ -47,4 +47,8 @@ l_e := join(jn,hhid_table_i,left.address_id=right.addr_id and
 //led := dedup(sort(distribute(l_e,le_hhid),le_hhid,ri_hhid,local),le_hhid,local);
 ut.MAC_Reduce_Pairs(l_e,ri_hhid,le_hhid,flag,lname_equiv,led)
 
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export HHID_Rel_Joins := led;
+#ELSE
 export HHID_Rel_Joins := led : persist('HHID_Rel_Joins');
+#END

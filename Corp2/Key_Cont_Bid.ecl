@@ -1,0 +1,1 @@
+export Key_Cont_Bid := keys().Cont.Bid.qa;;

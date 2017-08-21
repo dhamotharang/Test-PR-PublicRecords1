@@ -33,12 +33,15 @@ o_act :=
 				   '      6) thor_data400::key::flcrash5_qa(thor_data400::key::flcrash5_' + %wuid_lower% + '),\n' + 
 				   '      7) thor_data400::key::flcrash6_qa(thor_data400::key::flcrash6_' + %wuid_lower% + '),\n' + 
 				   '      8) thor_data400::key::flcrash7_qa(thor_data400::key::flcrash7_' + %wuid_lower% + '),\n' + 
-				   '      9) thor_data400::key::flcrash_accnbr_qa(thor_data400::key::flcrash_accnbr_' + %wuid_lower% + '),\n' + 
-				   '      10) thor_data400::key::flcrash_bdid_qa(thor_data400::key::flcrash_bdid_' + %wuid_lower% + '),\n' + 
-				   '      11) thor_data400::key::flcrash_did_qa(thor_data400::key::flcrash_did_' + %wuid_lower% + '),\n' + 
-				   '      12) thor_data400::key::flcrash_dlnbr_qa(thor_data400::key::flcrash_dlnbr_' + %wuid_lower% + '),\n' + 
-				   '      13) thor_data400::key::flcrash_tagnbr_qa(thor_data400::key::flcrash_tagnbr_' + %wuid_lower% + '),\n' + 
-				   '      14) thor_data400::key::flcrash_vin_qa(thor_data400::key::flcrash_vin_' + %wuid_lower% + '),\n' + 
+				   '      9) thor_data400::key::flcrash_did_qa(thor_data400::key::flcrash_did_' + %wuid_lower% + '),\n' + 
+                   
+				   // The following keys have been commented out because they are not in use by the package
+				   // file or in any of the queries.
+				   // '      10) thor_data400::key::flcrash_accnbr_qa(thor_data400::key::flcrash_accnbr_' + %wuid_lower% + '),\n' + 
+				   // '      11) thor_data400::key::flcrash_bdid_qa(thor_data400::key::flcrash_bdid_' + %wuid_lower% + '),\n' + 
+				   // '      12) thor_data400::key::flcrash_dlnbr_qa(thor_data400::key::flcrash_dlnbr_' + %wuid_lower% + '),\n' + 
+				   // '      13) thor_data400::key::flcrash_tagnbr_qa(thor_data400::key::flcrash_tagnbr_' + %wuid_lower% + '),\n' + 
+				   // '      14) thor_data400::key::flcrash_vin_qa(thor_data400::key::flcrash_vin_' + %wuid_lower% + '),\n' + 
 		             '      have been built and ready to be deployed to QA.'),
 			 'FAIL' =>	   
 				   FileServices.sendemail(e_target,f_type + ' Build Failure - ' + ut.GetDate,
@@ -85,6 +88,8 @@ o_act :=
 				   '      16) thor_data400::key::gong_hist_bdid_qa(thor_data400::key::gong_hist_bdid' + %wuid_lower% + '),\n' + 
 				   '      17) thor_data400::key::gong_history_name_qa(thor_data400::key::gong_history_name' + %wuid_lower% + '),\n' + 
 				   '      18) thor_data400::key::gong_history_zip_name_qa(thor_data400::key::gong_history_zip_name' + %wuid_lower% + '),\n' + 
+				   '      19) thor_data400::key::cbrs.phone10_gong' + %wuid_lower% + '),\n' + 
+				   '      20) thor_data400::key::gong_history_surname_qa(thor_data400::key::gong_history::'+filedate+'::surnames),\n' + 
 				   '      have been built and ready to be deployed to QA.'),
 			 'FAIL' =>	   
 				   FileServices.sendemail(e_target,f_type + ' Build Failure - ' + ut.GetDate,
@@ -141,7 +146,18 @@ o_act :=
 				   FileServices.sendemail(e_target,f_type + ' Daily Build Failure - ' + ut.GetDate,
                                               failmessage),
 			        FileServices.sendemail(e_target,f_type + ' Daily Build Warning - ' + ut.GetDate,
-                                              'Invalid status parameter.')),								 
+                                              'Invalid status parameter.')),
+	'DEATH MASTER' =>
+	      case(b_status,
+		      'SUCC' =>
+			        FileServices.sendemail(e_target,f_type + ' Daily Build Succeeded - ' + ut.GetDate,
+                       'key: 1) thor_data400::key::did_death_master_qa(thor_data400::key::did_death_master' + %wuid_lower% + '),\n' + 
+		             '     has been built and ready to be deployed to QA.'),
+			 'FAIL' =>	   
+				   FileServices.sendemail(e_target,f_type + ' Daily Build Failure - ' + ut.GetDate,
+                                              failmessage),
+			        FileServices.sendemail(e_target,f_type + ' Daily Build Warning - ' + ut.GetDate,
+                                              'Invalid status parameter.')),  
 	FileServices.sendemail(e_target,'Daily Build Macro Warning',
                             'Invalid file type parameter.')		 
      ); 	

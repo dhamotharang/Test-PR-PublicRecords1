@@ -1,4 +1,4 @@
-import ut,tools,_control;
+import ut,tools,_control,std;
 export mod_email := module
 
 	// export emailList := 'Charles.Morton@LexisNexis.com' +
@@ -8,25 +8,31 @@ export mod_email := module
 											// ',David.Wheelock@lexisnexis.com';
 											
 	export emailList := if(tools._Constants.IsDataland  ,_control.myinfo.EmailAddressNotify
-                                                      ,   _control.myinfo.EmailAddressNotify
-                                                      +   ',Charles.Morton@LexisNexis.com'
-                                                      +   ',Todd.Leonard@LexisNexis.com'
+                                                      ,   if(_control.myinfo.EmailAddressNotify = 'nobody@seisint.com'  ,'',_control.myinfo.EmailAddressNotify + ',')
+                                                      +   'Charles.Morton@LexisNexis.com'
+                                                      // +   ',Todd.Leonard@LexisNexis.com'
                                                       +   ',Laverne.Bentley@LexisNexis.com'
                                                       +   ',Aleida.Lima@LexisNexis.com'
                                                       +   ',David.Wheelock@lexisnexis.com'
-                                                      +   ',Hongzhi.Sun@lexisnexis.com'
+                                                      +   ',Janet.Anderson@lexisnexisrisk.com'
+                                                      +   ',Paul.Wahbe@lexisnexis.com'
+                                                      +   ',dustin.skaggs@lexisnexis.com'
+                                                      +   ',Sudhir.Kasavajjala@lexisnexis.com'
+                                                      +   ',Ayeesha.Kayttala@lexisnexis.com'
                       );
 	 
 	SHARED String COMPLETED_STATUS 	:= 'COMPLETED';
 	SHARED String FAILED_STATUS 		:= 'FAILED';
-  SHARED String DateStr 					:= ut.GetDate + '-' +  ut.getTime();
+	SHARED String DateStr 					:= (string8)Std.Date.Today() + '-' +  Std.Date.SecondsToString(Std.date.CurrentSeconds(true), '%H%M%S'); //ut.getTime();
 	SHARED String WU			 					:= thorlib.wuid();
 
 	export saveToLogFile(String product, String subProduct, String date, String wu, String desc, String status) := FUNCTION
 
-    mydate := ut.GetDate : independent;
-    mytime := ut.getTime() : independent;
-
+    //mydate := ut.GetDate : independent;
+		mydate := (string8)Std.Date.Today() : independent;
+		
+    //mytime := ut.getTime() : independent;
+		mytime := Std.Date.SecondsToString(Std.date.CurrentSeconds(true), '%H%M%S') : independent;
 		STRING logFileName := '~thor400_log::bipv2::' + mydate + mytime + 
 		if(subProduct <> '', '::'+ subproduct, '') + '::buildinfo';
 		

@@ -1,1 +1,1 @@
-export File_2015_Trade_Payment_Totals_Base := dataset(FileName_2015_Trade_Payment_Totals_Base, Layout_2015_Trade_Payment_Totals_Base,flat) : global;
+export File_2015_Trade_Payment_Totals_Base := dataset(FileName_2015_Trade_Payment_Totals_Base, Layout_2015_Trade_Payment_Totals_Base,flat);

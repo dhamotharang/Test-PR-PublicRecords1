@@ -1,18 +1,45 @@
-import bankrupt,did_add,fair_isaac,didville,ut,header_slimsort,watchdog, Business_Header_SS, Business_Header;
+//////////////////////////////////////////////////////////////////////////////////////////
+// Attribute 	: BWR_DID_SEARCHFILE_V8
+
+// DEPENDENT ON : bankrupt.File_BKSearch_In,
+//				  did_add.MAC_Match_Flex,
+//				  did_add.Mac_Append_SSN_With_Restrictions,
+//				  Business_Header.MAC_Source_Match,
+//				  Business_Header_SS.MAC_Add_BDID_FLEX,
+//				  ut.IsNewProdHeaderVersion,
+//				  ut.PostDID_HeaderVer_Update
+//
+
+// PARAMETERS	: version (build version)
+
+// PURPOSE	 	: Re-DID/Re-BDID BanKrupt Search File if there is a new header version 
+//				  released to production. 
+//////////////////////////////////////////////////////////////////////////////////////////
+
+import bankrupt,did_add,fair_isaac,didville,ut,header_slimsort,watchdog, Business_Header_SS, Business_Header,lib_fileservices,_control;
+export BWR_DID_SearchFile_V8(string filedate) := 
+function
 
 #stored('did_add_force','thor');
 
-sequential(
+// Superfile transaction to move the base search file to did_in superfile.
+// did_in superfile is used for the entire re-DID process
+
+pre := sequential(
 		fileservices.startsuperfiletransaction(),
-		fileservices.clearsuperfile('~thor_data400::in::bk_search_did_FATHER',true),
-		fileservices.addsuperfile('~thor_data400::in::bk_search_did_FATHER','~thor_Data400::in::bk_search_did_IN'),
+		fileservices.clearsuperfile('~thor_data400::in::bk_search_did_FATHER'),
+		fileservices.addsuperfile('~thor_data400::in::bk_search_did_FATHER','~thor_Data400::in::bk_search_did_IN',,true),
 		fileservices.clearsuperfile('~thor_data400::in::bk_search_did_IN'),
-		fileservices.addsuperfile('~thor_data400::in::bk_search_did_IN','~thor_data400::in::bk_search'+bankrupt.version_search_doxie),
+		fileservices.addsuperfile('~thor_data400::in::bk_search_did_IN','~thor_data400::base::bankruptv2_search',,true),
 		fileservices.finishsuperfiletransaction()
 		);
 
+// Dataset created from did_in file. (same as base::bankrupt_search)
 
 df := bankrupt.File_BKSearch_In;
+
+// Temporary record set to add fields(temp) to the bankrupt_search layout
+// which is necessary for did/bdid process.
 
 temprec := record
 	df;
@@ -27,18 +54,27 @@ end;
 
 df2 := table(df,temprec);
 
+// Set used for creating DID. The process uses 
+// Address, 9 digit ssn, zip code and 4 digit ssn.
+
 myset := ['A','S','Z','4'];
 
 did_add.MAC_Match_Flex(df2,myset,orig_ssn,foo,debtor_fname,debtor_mname,debtor_lname,
             debtor_name_suffix,prim_range, prim_name, sec_range, z5,st,foo,
             did,temprec,true,did_score,75,outf)
 
+// Appends ssn based on the validity of the ssn in the 
+// Bankruptcy data
+
 did_add.Mac_Append_SSN_With_Restrictions(outf,out2,did,a_ssn,restr)
 
-to_bdid := out2;
+to_bdid := out2 : persist('~thor_data400::persist::bk_search_did');
+
+// Splits the data for BDID and DID
 to_bdid_company := to_bdid(debtor_company <> '');
 to_bdid_no_company := to_bdid(debtor_company = '');
 
+// Match the address BDID
 business_matchset := ['A'];
 
 Business_Header.MAC_Source_Match(to_bdid_company, bdid_init,
@@ -69,6 +105,7 @@ Business_Header_SS.MAC_Add_BDID_FLEX(
           
 out3 := to_bdid_no_company + bdid_match + bdid_rematch;
                                                
+// Validate SSN, DID, DID_SCORE, BDID and GLB_FLAG
 
 typeof(df) into(out3 L) := transform
 	boolean ssn_flag := If ((length(trim(L.orig_ssn)) = 4 AND length(trim(L.a_ssn)) = 9 AND l.orig_ssn[1..4] <> L.a_ssn[6..9]) OR 
@@ -86,5 +123,38 @@ end;
 
 out4 := project(out3,into(LEFT));
 
-output(out4,,'~thor_data400::out::bankrupt_search_v8_20050419',overwrite)
- 
+// Create a new file after re-DID/re-BDID
+
+out5 := output(out4,,'~thor_data400::out::bankruptv2::search_did_'+filedate,overwrite);
+
+// Superfile transaction to move the new reDID/reBDID'ed file to base::bankrupt_search
+
+super_search := sequential(FileServices.StartSuperFileTransaction(),
+				FileServices.AddSuperFile('~thor_data400::base::bankruptv2_search_Delete','~thor_data400::base::bankruptv2_search_father',, true),
+				FileServices.ClearSuperFile('~thor_data400::base::bankruptv2_search_father'),
+				FileServices.AddSuperFile('~thor_data400::base::bankruptv2_search_father', '~thor_data400::base::bankruptv2_search',, true),
+				FileServices.ClearSuperFile('~thor_data400::base::bankruptv2_search'),
+				FileServices.AddSuperFile('~thor_data400::base::bankruptv2_search', '~thor_data400::out::bankruptv2::search_did_'+filedate), 
+				FileServices.FinishSuperFileTransaction(),
+				FileServices.ClearSuperFile('~thor_data400::base::bankruptv2_search_delete',true));
+
+// Despray the base::bankrupt_search file to edata12, 
+// so that the file is ready for next update (since it is a daily).
+
+bk_file_despray := fileservices.Despray('~thor_data400::base::bankruptv2_search',_Control.IPAddress.edata12,
+ 									'/hds_180/bkv2/build/bk_search_redid.d00',,,,TRUE);
+
+
+// Run the DID/BDID process based on the availability of the new 
+// prod header version.
+
+// After the process is complete update the bk_search flag file with the
+// most recent prod version.
+
+retval := if(ut.IsNewProdHeaderVersion('bk_search'),
+					sequential(pre,out5,super_search,ut.PostDID_HeaderVer_Update('bk_search'),bk_file_despray),
+					output('Bk Search DID/BDID is up to date.'));
+
+return retval;
+
+end; 

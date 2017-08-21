@@ -1,4 +1,4 @@
-import corrections, CrimSrch, hygenics_crim, crim_common,ut;
+import corrections, hygenics_crim ;
 
 string8 fMinDate2(string8 pDate1, string8 pDate2)
  := if(if((integer4)pDate1=0,'99999999',pDate1) < if((integer4)pDate2=0,'99999999',pDate2),
@@ -371,7 +371,7 @@ string1 fMapOffenseLevelToScore(string5 pVendor, string2 pOffenseLevel, string8 
 		pVendor = 'WA' and pOffenseLevel = 'M ' => 'M',
 		'U');
 		
-corrections.layout_offense tDOCOffensesandDOCOffendertoOffenses(corrections.layout_offense pDOCOffenses, corrections.layout_offender pDOCOffender)
+hygenics_crim.Layout_Base_Offenses_with_OffenseCategory tDOCOffensesandDOCOffendertoOffenses(hygenics_crim.Layout_Base_Offenses_with_OffenseCategory pDOCOffenses, corrections.layout_offender pDOCOffender)
  := transform
 	self.offender_key					:= pDOCOffenses.offender_key;
 	self.vendor								:= pDOCOffenses.vendor;
@@ -390,17 +390,17 @@ corrections.layout_offense tDOCOffensesandDOCOffendertoOffenses(corrections.layo
 	*/															
 	
   sent_begin_date	          := regexreplace('(Sent Start Date: )([0-9]+)[ ]*',pDOCOffenses.stc_desc_2,'$2');
-	self.fcra_date	          := Map(hygenics_crim._functions.Is_valid(ut.getdate, pDOCOffenses.ct_disp_dt)     = 'Y' => pDOCOffenses.ct_disp_dt,
-	                                 hygenics_crim._functions.Is_valid(ut.getdate, pDOCOffenses.convict_dt)     = 'Y' => pDOCOffenses.convict_dt,
-																	 hygenics_crim._functions.Is_valid(ut.getdate, pDOCOffenses.stc_dt)         = 'Y' => pDOCOffenses.stc_dt,
-																	 hygenics_crim._functions.Is_valid(ut.getdate, pDOCOffenses.inc_adm_dt)     = 'Y' => pDOCOffenses.inc_adm_dt,
-																	 hygenics_crim._functions.Is_valid(ut.getdate, sent_begin_date)             = 'Y' => sent_begin_date,
+	self.fcra_date	          := Map(hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, pDOCOffenses.ct_disp_dt)     = 'Y' => pDOCOffenses.ct_disp_dt,
+	                                 hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, pDOCOffenses.convict_dt)     = 'Y' => pDOCOffenses.convict_dt,
+																	 hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, pDOCOffenses.stc_dt)         = 'Y' => pDOCOffenses.stc_dt,
+																	 hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, pDOCOffenses.inc_adm_dt)     = 'Y' => pDOCOffenses.inc_adm_dt,
+																	 hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, sent_begin_date)             = 'Y' => sent_begin_date,
                                    '');
-  self.fcra_date_type	      := Map(hygenics_crim._functions.Is_valid(ut.getdate, pDOCOffenses.ct_disp_dt)     = 'Y' => 'D',
-	                                 hygenics_crim._functions.Is_valid(ut.getdate, pDOCOffenses.convict_dt)     = 'Y' => 'C',
-																	 hygenics_crim._functions.Is_valid(ut.getdate, pDOCOffenses.stc_dt)         = 'Y' => 'S',
-																	 hygenics_crim._functions.Is_valid(ut.getdate, pDOCOffenses.inc_adm_dt)     = 'Y' => 'I',
-																	 hygenics_crim._functions.Is_valid(ut.getdate, sent_begin_date)             = 'Y' => 'B',
+  self.fcra_date_type	      := Map(hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, pDOCOffenses.ct_disp_dt)     = 'Y' => 'D',
+	                                 hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, pDOCOffenses.convict_dt)     = 'Y' => 'C',
+																	 hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, pDOCOffenses.stc_dt)         = 'Y' => 'S',
+																	 hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, pDOCOffenses.inc_adm_dt)     = 'Y' => 'I',
+																	 hygenics_crim._functions.Is_valid(hygenics_crim._functions.getdate, sent_begin_date)             = 'Y' => 'B',
                                    '');																	
 	self.conviction_override_date		:= if(pDOCOffenses.Vendor in sDOC_Vendors_Conviction_Unknown,
 																' ',
@@ -445,14 +445,14 @@ dDOCOffensesJoined	:= join(dDOCOffensesSort,dDOCOffenderDedup,
 												local
 												);
 
-corrections.layout_offense tScoreOffenseOnType(corrections.layout_offense pInput) := transform
+hygenics_crim.Layout_Base_Offenses_with_OffenseCategory tScoreOffenseOnType(hygenics_crim.Layout_Base_Offenses_with_OffenseCategory pInput) := transform
 	self.offense_score		:= fMapOffenseTypeToScore(pInput.vendor,pInput.off_typ);
 	self									:= pInput;
 end;
 
 dDOCOffensesScoredOnType	:= project(dDOCOffensesJoined,tScoreOffenseOnType(left));
 
-corrections.layout_offense tScoreOffenseOnLevel(corrections.layout_offense pInput) := transform
+hygenics_crim.Layout_Base_Offenses_with_OffenseCategory tScoreOffenseOnLevel(hygenics_crim.Layout_Base_Offenses_with_OffenseCategory pInput) := transform
 	self.offense_score		:= if(pInput.offense_score<>'U',pInput.offense_score,fMapOffenseLevelToScore(pInput.vendor,pInput.off_lev,pInput.inc_adm_dt));
 	self									:= pInput;
 end;
@@ -469,7 +469,7 @@ set_off := ['V',/*'I',*/'C','T'];
 		self 										:= L;
 	end;								
 
-#if(CrimSrch.Switch_ShouldUsePersists = CrimSrch.Switch_YesValue)
+#if(Switch_ShouldUsePersists = Switch_YesValue)
 export DOC_Offenses_as_CrimSrch_Offenses
  := project(dDOCOffensesScoredOnLevel,trecs(left))
  : persist('persist::DOC_Offenses_as_CrimSrch_Offenses')

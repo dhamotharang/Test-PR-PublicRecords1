@@ -14,7 +14,7 @@ module
 	export thor_cluster_Persists	:= thor_cluster_Files		;
 	
 	export Groupname	:= if(	_Control.ThisEnvironment.name		 = 'Dataland'	,'thor400_88_dev'
-																																					,'thor400_92'
+																																					,'thor400_20'
 											);
 
 end;

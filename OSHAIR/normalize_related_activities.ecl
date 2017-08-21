@@ -1,24 +1,45 @@
-import OSHAIR,Business_Header,Lib_AddrClean,lib_stringlib;;
+import OSHAIR,Business_Header,Address,lib_stringlib,ut;
 
-export normalize_related_activities(string filedate):= FUNCTION
+export normalize_related_activities(string filedate, string process_date):= FUNCTION
 
-input_OSHAIR             := OSHAIR.File_in_OSHAIR;
+RelatedActivity := oshair.files().input.RelatedActivity.sprayed;
+
 related_activity_cleaned := OSHAIR.layout_OSHAIR_related_activity_clean;
 
-/* Normalize the related activity sub-records */
-related_activity_cleaned normalize_related_activity(input_OSHAIR L, OSHAIR.layout_OSHAIR_in_ASCII.OSHAIR_related_activity_Rec R) := TRANSFORM
-   self.Activity_Number    := L.Activity_Number;
-   self.Rel_Activity_Desc  := OSHAIR.Lookup_OSHAIR_Mini.Related_Activity_lookup(R.Rel_Activity_Type);
-   self := R;
+related_activity_cleaned normalize_related_activity(RelatedActivity L) := TRANSFORM
+   self.dt_first_seen 						:=  (unsigned4)process_date;
+	 self.dt_last_seen  						:=  (unsigned4)process_date;
+	 self.dt_vendor_first_reported 	:=  (unsigned4)process_date;
+	 self.dt_vendor_last_reported 	:=  (unsigned4)process_date;
+   self.Activity_Number    				:=	(integer)l.activity_nr;
+   self.rel_Activity_Number 			:=	(integer)l.activity_nr;	
+	 self.rel_activity_type					:=	l.rel_type;
+	 self.rel_activity_safety_flag	:=	l.rel_safety;
+	 self.rel_activity_health_flag	:=	l.rel_health;
+   self.Rel_Activity_Desc  				:= 	OSHAIR.Lookup_OSHAIR_Mini.Related_Activity_lookup(l.Rel_Type);
+   self 													:= 	l;
+	 self														:=	[];
 end;
 
-ds_Related_Activities := normalize(input_OSHAIR,Left.Related_Activties,normalize_related_activity(LEFT,RIGHT));
+ds_Related_Activities := 	project(RelatedActivity,normalize_related_activity(LEFT));
 
+dsAllRelAct						:=	distribute((OSHAIR.file_out_related_activity_cleaned + ds_Related_Activities),hash32(Activity_Number));
 
-return output(distribute(ds_Related_Activities
-                         ,hash32(ds_Related_Activities.Activity_Number))
-	   ,
-	   ,'~thor_data400::base::oshair::' + filedate + '::related_activity'
-	   ,overwrite);
+OSHAIR.layout_OSHAIR_related_activity_clean RollupRelAct(OSHAIR.layout_OSHAIR_related_activity_clean l, OSHAIR.layout_OSHAIR_related_activity_clean r) := transform
+	self.dt_first_seen  := ut.EarliestDate(l.dt_first_seen ,r.dt_first_seen	);  
+	self.dt_last_seen 	:= ut.LatestDate  (l.dt_last_seen	 ,r.dt_last_seen	);
+	self.dt_vendor_first_reported := ut.EarliestDate(l.dt_vendor_first_reported	,r.dt_vendor_first_reported	);	
+  self.dt_vendor_last_reported 	:= ut.LatestDate	(l.dt_vendor_last_reported	,r.dt_vendor_last_reported	);
+	self := l;
+end;
+
+RelActRollup	:= rollup(sort(dsAllRelAct,record, except dt_first_seen,dt_last_seen, 
+														  dt_vendor_first_reported, dt_vendor_last_reported, local)
+										, RollupRelAct(left, right), record
+										,except dt_first_seen, dt_last_seen, 
+														dt_vendor_first_reported, dt_vendor_last_reported
+										, local);
+
+return output(RelActRollup,,'~thor_data400::base::oshair::' + filedate + '::related_activity',overwrite);
 
 end;

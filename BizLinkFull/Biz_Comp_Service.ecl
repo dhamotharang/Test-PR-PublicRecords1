@@ -3,9 +3,6 @@
 <part name="parent_proxid" type="xsd:string"/>
 <part name="ultimate_proxid" type="xsd:string"/>
 <part name="has_lgid" type="xsd:string"/>
-<part name="seleid" type="xsd:string"/>
-<part name="orgid" type="xsd:string"/>
-<part name="ultid" type="xsd:string"/>
 <part name="empid" type="xsd:string"/>
 <part name="powid" type="xsd:string"/>
 <part name="source" type="xsd:string"/>
@@ -35,8 +32,14 @@
 <part name="name_suffix" type="xsd:string"/>
 <part name="contact_ssn" type="xsd:string"/>
 <part name="contact_email" type="xsd:string"/>
+<part name="sele_flag" type="xsd:string"/>
+<part name="org_flag" type="xsd:string"/>
+<part name="ult_flag" type="xsd:string"/>
 <part name="CONTACTNAME" type="xsd:string"/>
 <part name="STREETADDRESS" type="xsd:string"/>
+<part name="ultid" type="unsignedInt"/>
+<part name="orgid" type="unsignedInt"/>
+<part name="seleid" type="unsignedInt"/>
 <part name="proxid" type="unsignedInt"/>
 <part name="rcid" type="unsignedInt"/>
 <part name="UniqueID" type="xsd:integer"/>
@@ -56,16 +59,12 @@
 </p><p>contact_email
 </p><p>contact_ssn
 </p><p>source_record_id:source
-</p><p>By default all records of all clusters where the CLUSTER matches the field will be returned. To force a single record to match use MatchAllInOneRecord. To only return matching records use RecordsOnly.</p>
-*/
+</p>*/
 EXPORT Biz_Comp_Service := MACRO
   IMPORT SALT26,BizLinkFull;
   SALT26.StrType Input_parent_proxid := '' : STORED('parent_proxid');
   SALT26.StrType Input_ultimate_proxid := '' : STORED('ultimate_proxid');
   SALT26.StrType Input_has_lgid := '' : STORED('has_lgid');
-  SALT26.StrType Input_seleid := '' : STORED('seleid');
-  SALT26.StrType Input_orgid := '' : STORED('orgid');
-  SALT26.StrType Input_ultid := '' : STORED('ultid');
   SALT26.StrType Input_empid := '' : STORED('empid');
   SALT26.StrType Input_powid := '' : STORED('powid');
   SALT26.StrType Input_source := '' : STORED('source');
@@ -95,9 +94,15 @@ EXPORT Biz_Comp_Service := MACRO
   SALT26.StrType Input_name_suffix := '' : STORED('name_suffix');
   SALT26.StrType Input_contact_ssn := '' : STORED('contact_ssn');
   SALT26.StrType Input_contact_email := '' : STORED('contact_email');
+  SALT26.StrType Input_sele_flag := '' : STORED('sele_flag');
+  SALT26.StrType Input_org_flag := '' : STORED('org_flag');
+  SALT26.StrType Input_ult_flag := '' : STORED('ult_flag');
   SALT26.StrType Input_CONTACTNAME := '' : STORED('CONTACTNAME');
   SALT26.StrType Input_STREETADDRESS := '' : STORED('STREETADDRESS');
   UNSIGNED Input_UniqueID := 0 : STORED('UniqueID');
+  UNSIGNED e_seleid := 0 : STORED('seleid');
+  UNSIGNED e_orgid := 0 : STORED('orgid');
+  UNSIGNED e_ultid := 0 : STORED('ultid');
   UNSIGNED e_proxid := 0 : STORED('proxid');
   UNSIGNED e_rcid := 0 : STORED('rcid');
 // Options to override the data-bomb fetch
@@ -106,9 +111,6 @@ EXPORT Biz_Comp_Service := MACRO
   ,(typeof(Template.parent_proxid))Input_parent_proxid
   ,(typeof(Template.ultimate_proxid))Input_ultimate_proxid
   ,(typeof(Template.has_lgid))Input_has_lgid
-  ,(typeof(Template.seleid))Input_seleid
-  ,(typeof(Template.orgid))Input_orgid
-  ,(typeof(Template.ultid))Input_ultid
   ,(typeof(Template.empid))Input_empid
   ,(typeof(Template.powid))Input_powid
   ,(typeof(Template.source))Input_source
@@ -138,9 +140,12 @@ EXPORT Biz_Comp_Service := MACRO
   ,(typeof(Template.name_suffix))BizLinkFull.Fields.Make_name_suffix((SALT26.StrType)Input_name_suffix)
   ,(typeof(Template.contact_ssn))Input_contact_ssn
   ,(typeof(Template.contact_email))Input_contact_email
+  ,(typeof(Template.sele_flag))Input_sele_flag
+  ,(typeof(Template.org_flag))Input_org_flag
+  ,(typeof(Template.ult_flag))Input_ult_flag
   ,(typeof(Template.CONTACTNAME))Input_CONTACTNAME
   ,(typeof(Template.STREETADDRESS))Input_STREETADDRESS
-  ,false,false,e_rcid,e_proxid}],BizLinkFull.Process_Biz_Layouts.InputLayout);
+  ,false,false,e_rcid,e_proxid,e_seleid,e_orgid,e_ultid}],BizLinkFull.Process_Biz_Layouts.InputLayout);
   pm := BizLinkFull.MEOW_Biz(Input_Data); // This module performs regular xproxid functions
   Options := MODULE(BizLinkFull.Externals.FetchParams) // Interface to pass parameters to fetch
     EXPORT SET OF INTEGER2 ToFetch := [];

@@ -1,4 +1,4 @@
-IMPORT iesp, FraudDefenseNetwork, FraudShared_Services;
+IMPORT iesp, FraudDefenseNetwork, FraudShared_Services, FraudShared;
 
 EXPORT GetResults(
   DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_in = DATASET([], FraudShared_Services.Layouts.Raw_Payload_rec)
@@ -114,7 +114,7 @@ EXPORT GetResults(
 
   //workflow
   iesp.frauddefensenetwork.t_FDNWorkflow workflow(
-    FraudDefenseNetwork.Layouts_Key.Classification.Activity L
+    FraudShared.Layouts_Key.Classification.Activity L
   ) := TRANSFORM
     SELF.CommittedId := L.workflow_stage_committed_id;
     SELF.Committed   := L.workflow_stage_committed;
@@ -125,7 +125,7 @@ EXPORT GetResults(
 
   //severity
   iesp.frauddefensenetwork.t_FDNSeverity severity(
-    FraudDefenseNetwork.Layouts_Key.Classification.Activity L
+    FraudShared.Layouts_Key.Classification.Activity L
   ) := TRANSFORM
     SELF.ThreatId     := L.Threat_id;
     SELF.Threat       := L.Threat;

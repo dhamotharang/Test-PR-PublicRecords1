@@ -1,4 +1,7 @@
-h := header.File_Headers;
+export name_frequencies(
+	dataset(header.Layout_Header) h
+	) :=
+FUNCTION
 
 t := record
   h.lname;
@@ -18,11 +21,13 @@ tc := record
 
 tct := table(ta,tc,lname,local);
 
-tad := count(dedup(tt,did,all)); // now fixed : stored('hack_this');
+tad := count(dedup(ta,did,all)); 
 
 O_Res := record
   tct.lname;
   real8 percentage := tct.cnt / tad;
   end;
 
-export name_frequencies := table(tct,O_Res) : persist('name_frequencies') ;
+return table(tct,O_Res);
+
+END;

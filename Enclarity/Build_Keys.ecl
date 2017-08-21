@@ -6,12 +6,12 @@ export Build_Keys := module
 
 				// facility keys - group_key and addr_key
 				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).facility_group_key.New		,BuildFacilityGroup	);
-				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).facility_addr_key.New		,BuildFacilityAddr	);
+				// VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).facility_addr_key.New		,BuildFacilityAddr	);
 															  
 				shared full_build :=
 					sequential(
 						BuildFacilityGroup,
-						BuildFacilityAddr,
+						// BuildFacilityAddr,
 						Promote.promote_facility(pversion,pUseProd).buildfiles.New2Built
 					);
 		
@@ -46,14 +46,14 @@ export Build_Keys := module
 
 			// associate keys - group_key, addr_key
 				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).associate_group_key.New		,BuildAssociateGroup	);
-				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).associate_addr_key.New		,BuildAssociateAddr	);
+				// VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).associate_addr_key.New		,BuildAssociateAddr	);
 				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).associate_bill_tin.New		,BuildAssociateBillTin	);
 				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).associate_bgk.New		,BuildAssociateBillGk	);
 															  
 				shared full_build :=
 					sequential(
 						BuildAssociateGroup,
-						BuildAssociateAddr,
+						// BuildAssociateAddr,
 						BuildAssociateBillTin,
 						BuildAssociateBillGk,
 						Promote.promote_associate(pversion,pUseProd).buildfiles.New2Built
@@ -108,12 +108,12 @@ export Build_Keys := module
 
 				// license keys - group_key, lic_num
 				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).license_group_key.New		,BuildLicenseGroup	);
-				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).license_lic_num.New		,BuildLicenseLicNum	);
+				// VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).license_lic_num.New		,BuildLicenseLicNum	);
 															  
 				shared full_build :=
 					sequential(
 						BuildLicenseGroup,
-						BuildLicenseLicNum,
+						// BuildLicenseLicNum,
 						Promote.promote_license(pversion,pUseProd).buildfiles.New2Built
 					);
 		
@@ -127,12 +127,12 @@ export Build_Keys := module
 
 				// taxonomy keys - group_key, taxonomy
 				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).taxonomy_group_key.New		,BuildTaxonomyGroup	);
-				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).taxonomy_taxonomy.New		,BuildTaxonomyTaxonomy	);
+				// VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).taxonomy_taxonomy.New		,BuildTaxonomyTaxonomy	);
 															  
 				shared full_build :=
 					sequential(
 						BuildTaxonomyGroup,
-						BuildTaxonomyTaxonomy,
+						// BuildTaxonomyTaxonomy,
 						Promote.promote_taxonomy(pversion,pUseProd).buildfiles.New2Built
 					);
 		
@@ -286,12 +286,12 @@ export Build_Keys := module
 
 				//specialty keys - group_key+spec_code, spec_desc+group_key
 				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).specialty_group_key_spec_code.New		,BuildSpecGroup	);
-				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).specialty_spec_desc_group_key.New		,BuildSpecDesc	);
+				// VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).specialty_spec_desc_group_key.New		,BuildSpecDesc	);
 															  
 				shared full_build :=
 					sequential(
 						BuildSpecGroup,
-						BuildSpecDesc,
+						// BuildSpecDesc,
 						Promote.promote_specialty(pversion,pUseProd).buildfiles.New2Built
 					);
 		
@@ -301,23 +301,23 @@ export Build_Keys := module
 					,output('No Valid version parameter passed, skipping specialty keys atribute')
 					);
 	end;
-	export Build_Keys_dea_bacodes(string pversion, boolean pUseProd = false) := module
+	// export Build_Keys_dea_bacodes(string pversion, boolean pUseProd = false) := module
 
 				//dea_bacodes keys - dea_bus_act_ind+dea_bus_act_ind_sub
-				VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).dea_bacodes_dea_bus_act_ind.New		,BuildDeaBACodes	);
+				// VersionControl.macBuildNewLogicalKey(Keys(pversion,pUseProd).dea_bacodes_dea_bus_act_ind.New		,BuildDeaBACodes	);
 															  
-				shared full_build :=
-					sequential(
-						BuildDeaBACodes,
-						Promote.promote_dea_bacodes(pversion,pUseProd).buildfiles.New2Built
-					);
+				// shared full_build :=
+					// sequential(
+						// BuildDeaBACodes,
+						// Promote.promote_dea_bacodes(pversion,pUseProd).buildfiles.New2Built
+					// );
 		
-				export dea_bacodes_All :=
-					if(VersionControl.IsValidVersion(pversion)
-					,full_build
-					,output('No Valid version parameter passed, skipping dea_bacodes keys atribute')
-					);
-	end;
+				// export dea_bacodes_All :=
+					// if(VersionControl.IsValidVersion(pversion)
+					// ,full_build
+					// ,output('No Valid version parameter passed, skipping dea_bacodes keys atribute')
+					// );
+	// end;
 	
 
 	export Build_autokeys_individual(string pversion)	:= function

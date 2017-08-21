@@ -17,9 +17,12 @@ did_Add.MAC_Match_Flex
 	 outf1)		//try the dedup DIDing
 
 
-outf1_psist := outf1 : persist('persist::vehlic_after_did');
+outf1_psist := outf1 : persist('~thor_data400::persist::vehreg_after_did');
+/*
+dCname		:=	outf1_psist(company_name <> '');
+dNoCName	:=	outf1_psist(company_name = '');
 
-business_header.MAC_Source_Match(outf1_psist,outf2,
+business_header.MAC_Source_Match(dCName,outf2,
 							false,bdid,
 							false,'MV',
 							false,foo,
@@ -28,11 +31,12 @@ business_header.MAC_Source_Match(outf1_psist,outf2,
 							false,foo,
 							false,foo);
 							
-o2_hasBDID := outf2(bdid != 0);
+o2_hasBDID := outf2(bdid != 0) + dNoCName;
 o2_noBDID := outf2(bdid = 0);
+*/
 bmatch := ['A'];
 
-business_header_ss.MAC_Match_Flex(o2_nobdid,bmatch,
+business_header_ss.MAC_Match_Flex(outf1_psist,bmatch,
 						company_name,
 						prim_range, prim_name, zip5,
 						sec_range, st,
@@ -43,10 +47,10 @@ business_header_ss.MAC_Match_Flex(o2_nobdid,bmatch,
 						outfile);
 
 #if(VehLic.BuildType = VehLic.BuildType_Accurint)
-  veh_matched := outfile(did > 0 or bdid > 0) + o2_hasBDID : persist('persist::vehreg_DID_before_ssn');
+  veh_matched := outfile(did > 0 or bdid > 0): persist('~thor_data400::persist::vehreg_did_before_ssn');
 #end
 #if(VehLic.BuildType = VehLic.BuildType_Matrix)
-  veh_matched := outfile(did > 0 or bdid > 0) + o2_hasBDID : persist('persist::matrix_mv_did_before_ssn');
+  veh_matched := outfile(did > 0 or bdid > 0): persist('persist::matrix_mv_did_before_ssn');
 #end
 
 veh_did := veh_matched(did > 0);
@@ -93,7 +97,7 @@ veh_did_bdid_out := veh_did_out + veh_matched(did = 0);
 
 
 #if(VehLic.BuildType = VehLic.BuildType_Accurint)
-  veh_contact_did_bdid := veh_did_bdid_out : persist('Persist::VehReg_Vehicles_Contacts');
+  veh_contact_did_bdid := veh_did_bdid_out : persist('~thor_data400::persist::vehreg_vehicles_contacts');
 #end
 #if(VehLic.BuildType = VehLic.BuildType_Matrix)
   veh_contact_did_bdid := veh_did_bdid_out : persist('Persist::Matrix_MV_Vehicles_Contacts');
@@ -115,13 +119,24 @@ vehlic.mac_Slim_to_V3(veh_contact_did_bdid, vund, veh_vin_out)					//v1.2
 VehLic.Layout_Vehicles_bdid tSetupMatrixSearchFields(VehLic.Layout_Vehicles_bdid pInput)
  :=
   transform
+    
+	string3 v_major := VehicleCodes.StateColorToNCICColor(pInput.ORIG_STATE,pInput.MAJOR_COLOR_CODE);
+	string3 v_minor := VehicleCodes.StateColorToNCICColor(pInput.ORIG_STATE,pInput.MINOR_COLOR_CODE);
+	
 	self.Best_Make_Code			:= if(pInput.NCIC_Make<>'',pInput.NCIC_Make,	pInput.MAKE_CODE);
 	self.Best_Series_Code		:= if(pInput.VINA_Series<>'',pInput.VINA_Series,pInput.MODEL);
 	self.Best_Model_Code		:= pInput.VINA_Model;  // we don't keep this separate from state
 	self.Best_Body_Code			:= if(pInput.VINA_Body_Style<>'',pInput.VINA_Body_Style,pInput.BODY_CODE);
 	self.Best_Model_Year		:= if(pInput.Model_Year<>'',pInput.Model_Year,pInput.Year_Make);
-	self.Best_Major_Color_Code	:= VehicleCodes.StateColorToNCICColor(pInput.ORIG_STATE,pInput.MAJOR_COLOR_CODE);
-	self.Best_Minor_Color_Code	:= VehicleCodes.StateColorToNCICColor(pInput.ORIG_STATE,pInput.MINOR_COLOR_CODE);
+	
+	self.Best_Major_Color_Code	:= if(trim(pInput.MAJOR_COLOR_CODE)='','UNK',
+	                               if(v_major<>'UNK',v_major,
+								   pInput.MAJOR_COLOR_CODE));
+	
+	self.Best_Minor_Color_Code	:= if(trim(pInput.MINOR_COLOR_CODE)='','UNK',
+	                               if(v_minor<>'UNK',v_minor,
+								   pInput.MINOR_COLOR_CODE));
+	
 	self 						:= pInput;
   end
  ;

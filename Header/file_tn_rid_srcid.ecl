@@ -1,6 +1,7 @@
 import TransUnionCred,ut;
 
-as_source := distribute(TransUnionCred.as_source(,true),hash((unsigned)party_id));
+dSrc      := header.Files_SeqdSrc().TN;
+as_source := distribute(dSrc,hash((unsigned)party_id));
 tn_did    := distribute(header.File_TN_did,hash((unsigned)vendor_id));
 
 header.Layout_RID_SrcID t(as_source l, tn_did r) := transform

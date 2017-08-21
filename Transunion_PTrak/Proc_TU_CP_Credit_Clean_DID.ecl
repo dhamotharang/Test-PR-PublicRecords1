@@ -33,7 +33,7 @@ d_names:= DISTRIBUTE(norm_names_filtered, HASH(Name));
 dedup_names := DEDUP(SORT(d_names,Name,LOCAL),Name, LOCAL) ; 
 
 Transunion_PTrak.Layout_TU_CP_Credit_Out.Norm_Cleand_NameRec t_CleanName(dedup_names L) := TRANSFORM
-	SELF.Clean_Name := addrcleanlib.cleanpersonfml73(L.Name);
+	SELF.Clean_Name := address.cleanpersonfml73(L.Name);
 	SELF := L;
 END;
 name_clean := PROJECT(dedup_names, t_CleanName(LEFT)); 
@@ -68,7 +68,7 @@ Transunion_PTrak.Layout_TU_CP_Credit_Out.Norm_Clean_Address_Rec t_Clean_Address(
 	SELF.City := L.exp_City;
 	SELF.State := L.exp_state;
 	SELF.ZipCode := L.exp_zip_code;
-	SELF.Clean_Address := addrcleanlib.CleanAddress182(L.Address1 + ' ' + L.Address2, L.exp_city + ' ' + L.exp_state+ ' ' + L.exp_zip_code);
+	SELF.Clean_Address := address.CleanAddress182(L.Address1 + ' ' + L.Address2, L.exp_city + ' ' + L.exp_state+ ' ' + L.exp_zip_code);
 	SELF := L;
 END;
 

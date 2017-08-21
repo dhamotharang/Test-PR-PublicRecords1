@@ -1,7 +1,7 @@
 import ut, crimSrch;
 
 ds_layout_new := RECORD
-  string16 seisint_primary_key;
+  string60 seisint_primary_key;
   string8 dt_last_reported;
   string8 src_upload_date;
   string2 vendor_code;
@@ -42,7 +42,9 @@ ds_layout_new := RECORD
   string20 mname;
   string20 lname;
   string5 name_suffix;
-  string3 cleaning_score;
+  unsigned8 nid;
+  string1 ntype;
+  unsigned2 nindicator;
   string10 prim_range;
   string2 predir;
   string28 prim_name;
@@ -74,6 +76,8 @@ ds_layout_new := RECORD
   string3 did_score;
   string9 ssn_appended;
   unsigned8 rawaid;
+  unsigned8 offender_persistent_id;
+  unsigned8 offense_persistent_id;
   string2 newline;
  END;
 
@@ -90,6 +94,7 @@ Layout_Sex_Pred_Search_DID oldFormat(inputFile l):= transform
 	self.score				:= l.did_score;
 	self.best_ssn			:= l.ssn_appended;
 	self.crlf				:= l.newline;
+	self.cleaning_score := '';
 	self := l;
 end;
 

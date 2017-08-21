@@ -2,21 +2,24 @@ import business_header;
 
 export mac_One_Field_Stats(
 
-	 pDataset					//Dataset to do stats on
-	,pDataset_Label		//String Label for dataset
-	,pBuild_Subset		//build subset, i.e. a specific file in the build
-	,pVersion					//String version of dataset
-	,pField						//Field name to do stats on(raw, not string)
-	,pField_Label			//String Label for above field
-	,pFieldType				//'integer', 'string', or 'boolean'
-	,pOutput					//output attribute
-	,pFieldFew				= 'true'
+	 pDataset										// -- Dataset to do stats on
+	,pDataset_Label							// -- String Label for dataset
+	,pBuild_Subset							// -- build subset string, i.e. a specific file in the build
+	,pVersion										// -- String version date of dataset
+	,pField											// -- Field name to do stats on(raw, not string)
+	,pField_Label								// -- String Label for above field
+	,pFieldType									// -- 'integer', 'string', 'boolean', 'string0'(string converted from integer)
+	,pOutput										// -- output attribute																	
+	,pFieldFew				= 'false'	// -- Does Field have few unique values(would you use ",few" in a table?)
+	,pHasBigSkew			= 'false'	// -- Is the field heavily skewed(has some values that occur way more frequently than other values)
 
 ) :=
 macro
+	#uniquename(pField_filter								)
 	#uniquename(pField_rec_count_layout			)
 	#uniquename(bh_stat_out									)
 	#uniquename(pField_rec_count						)
+	#uniquename(pField_rec_count_prep				)
 	#uniquename(countGroup									)
 	#uniquename(countPopulatedpFields				)
 	#uniquename(countBlankpFields						)
@@ -35,6 +38,7 @@ macro
 	#uniquename(fieldcountlay								)
 	#uniquename(tSamples										)
 	#uniquename(pDataset_slim								)
+	#uniquename(pDataset_slim_filter				)
 
 	%pDataset_slim%	:= table(pDataset, {pField});
 
@@ -49,25 +53,33 @@ macro
 	%fieldcountlay% := Statistics.Layouts.Field_count_layout;
 
 	%bh_stat_out% := Statistics.Layouts.standard_stat_out;
-/*	record
-		string								Dataset_Name									;
-		string								Version												;
-		string								Field_Label										;
-		dataset(%fcalclay%)		Calculated_stats							;
-		dataset(%fcountlay%)	Top_10_Most_Populous 					;
-	end;
-*/	
+	
+	// -- Define Filter
 	#if(pFieldType = 'integer')
-		%pField_rec_count%						:= table(%pDataset_slim%(pField != 0), %pField_rec_count_layout%, pField);
+		%pField_filter% := %pDataset_slim%.pField != 0;
 	#elseif(pFieldType = 'string')
-		%pField_rec_count%						:= table(%pDataset_slim%(pField != ''), %pField_rec_count_layout%, pField);
+		%pField_filter% := %pDataset_slim%.pField != '';
+	#elseif(pFieldType = 'string0')
+		%pField_filter% := %pDataset_slim%.pField != '' and (unsigned8)trim(%pDataset_slim%.pField) != 0;
 	#elseif(pFieldType = 'boolean')
-		%pField_rec_count%						:= table(%pDataset_slim%(pField != false), %pField_rec_count_layout%, pField,few);
+		%pField_filter% := %pDataset_slim%.pField != false;
 	#end
 
-	#if(pFieldFew = false)
+	#if(pHasBigSkew = false or pFieldType = 'boolean' or pFieldFew = true)
+		#if(pFieldFew = true or pFieldType = 'boolean')
+			%pField_rec_count%						:= table(%pDataset_slim%(%pField_filter%), %pField_rec_count_layout%, pField,few);
+		#else
+			%pField_rec_count%						:= table(%pDataset_slim%(%pField_filter%), %pField_rec_count_layout%, pField,merge);
+		#end
+	#else
+		%pDataset_slim_filter%	:= table(%pDataset_slim%(%pField_filter%), {pField, unsigned8 cnt := 1});
+		%pField_rec_count_prep% := table(distribute(%pDataset_slim_filter%	, random()			), {pfield,unsigned8 cnt := sum(group, cnt)}, pfield,local);
+		%pField_rec_count%			:= table(distribute(%pField_rec_count_prep%	, hash64(pfield)), {pfield,unsigned8 cnt := sum(group, cnt)}, pfield,local);
+	#end
+
+	#if(pFieldFew = true)
 		%Top10pFieldsWithMostRecords%	:= sort(%pField_rec_count%, -cnt);
-	#elsif(pFieldFew = true)
+	#else
 		%Top10pFieldsWithMostRecords%	:= topn(%pField_rec_count%, 10, -cnt);
 	#end
 
@@ -76,7 +88,7 @@ macro
 //		self.Field_Label	:= pField_Label;
 		self.Field_Value	:=  #if(pFieldType = 'integer')
 														(string)l.pField
-													#elseif(pFieldType = 'string')
+													#elseif(pFieldType = 'string' or pFieldType = 'string0')
 														l.pField
 													#elseif(pFieldType = 'boolean')
 														if(l.pField, 'true', 'false')
@@ -87,14 +99,14 @@ macro
 
 	%countGroup%								 		:= count(%pDataset_slim%);
 
-	#if(pFieldFew = false)
+	#if(pFieldFew = true)
 	%Top10FieldsWithMostRecords%		:= dataset([
 																				{'Count of Records per '+pField_Label
 																				,pField_Label
 																				,project(%Top10pFieldsWithMostRecords%, %top10transform%(left))
 																				}
 																			], %fcountlay%);
-	#elseif(pFieldFew = true)
+	#else
 	%Top10FieldsWithMostRecords%		:= dataset([
 																				{'Top 10 Most Populous ' + pField_Label + 's'
 																				,pField_Label
@@ -106,17 +118,22 @@ macro
 	#if(pFieldType = 'integer')
 		%countPopulatedpFields%        	:= count(%pDataset_slim%(pField != 0));
 		%countBlankpFields%            	:= count(%pDataset_slim%(pField = 0));
-		%countUniquepFields%           	:= count(table(%pDataset_slim%(pField != 0), {pField}, pField));
+		%countUniquepFields%           	:= count(%pField_rec_count%);
 		%NullValue%											:= 'Zero';
 	#elseif(pFieldType = 'string')
 		%countPopulatedpFields%        	:= count(%pDataset_slim%(pField !=''));
 		%countBlankpFields%            	:= count(%pDataset_slim%(pField = ''));
-		%countUniquepFields%           	:= count(table(%pDataset_slim%(pField != ''), {pField}, pField));
+		%countUniquepFields%           	:= count(%pField_rec_count%);
 		%NullValue%											:= 'Blank';
+	#elseif(pFieldType = 'string0')
+		%countPopulatedpFields%        	:= count(%pDataset_slim%(pField !='' and (unsigned8)trim(pField) != 0));
+		%countBlankpFields%            	:= count(%pDataset_slim%(not(pField != '' and (unsigned8)trim(pField) != 0)));
+		%countUniquepFields%           	:= count(%pField_rec_count%);
+		%NullValue%											:= 'Blank or Zero';
 	#elseif(pFieldType = 'boolean')
 		%countPopulatedpFields%        	:= count(%pDataset_slim%(pField !=false));
 		%countBlankpFields%            	:= count(%pDataset_slim%(pField = false));
-		%countUniquepFields%           	:= count(table(%pDataset_slim%(pField != false), {pField}, pField));
+		%countUniquepFields%           	:= count(%pField_rec_count%);
 		%NullValue%											:= 'False';
 	#end
 	

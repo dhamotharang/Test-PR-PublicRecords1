@@ -1,13 +1,13 @@
-import autokeyb2, ut, zz_cemtemp, standard, ut, doxie, autokey,AutoKeyI, RoxieKeyBuild, versioncontrol, BIPV2;
+import autokeyb2, ut, zz_cemtemp, standard, ut, doxie, autokey,AutoKeyI, RoxieKeyBuild, versioncontrol, BIPV2, OIG;
 
 export Proc_build_autoKeys(string	pversion
-													 ,dataset(Layouts.KeyBuild)	pBase = files().Keybase.qa) :=FUNCTION
+													 ,dataset(OIG.Layouts.KeyBuild)	pBase = OIG.files().Keybase.qa) :=FUNCTION
 
 zero 		:= 0;
-lskname	:= Constants().autokeytemplate	;
-llgname	:= Keynames(pversion).autokeyroot.new;
+lskname	:= OIG.Constants().autokeytemplate	;
+llgname	:= OIG.Keynames(pversion).autokeyroot.new;
 
-new_pBase:=project(pBase,transform(Layouts.KeyBuild_main-BIPV2.IDlayouts.l_xlink_IDs,self:=left;));
+new_pBase:=project(pBase,transform(OIG.Layouts.KeyBuild_main-BIPV2.IDlayouts.l_xlink_IDs,self:=left;));
 
 autokey.mac_useFakeIDs(
 												new_pBase
@@ -58,9 +58,9 @@ dBase_Prep_Autokey :=  project(pBase_withFakeID
 mod_AKB :=
 module(AutokeyB2.Fn_Build.params) 
 export dataset(autokey.layouts.master)	L_indata := dBase_Prep_Autokey; 
-export string	L_inkeyname						 						 := Constants().autokeytemplate;
-export string	L_inlogical						 						 := Keynames(pversion).autokeyroot.new;
-export set of string1 		L_build_skip_set			 := Constants().autokey_buildskipset; 
+export string	L_inkeyname						 						 := OIG.Constants().autokeytemplate;
+export string	L_inlogical						 						 := OIG.Keynames(pversion).autokeyroot.new;
+export set of string1 		L_build_skip_set			 := OIG.Constants().autokey_buildskipset; 
 end; 
 
 Build_autokeys := sequential(AutokeyB2.Fn_Build.Do(mod_AKB

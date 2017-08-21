@@ -1,4 +1,4 @@
-import RoxieKeyBuild, ut,doxie;
+import RoxieKeyBuild, PromoteSupers, doxie;
 
 export proc_build_cwp_keys(string filedate) := function
 
@@ -36,9 +36,9 @@ RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::canadianwp_phone_payl
 // -- Move Keys to QA
 /////////////////////////////////////////////////////////////////////////////////	
 
-ut.MAC_SK_Move_v2('~thor_data400::key::canadianwp_fdids', 'Q', mv_fdid_to_qa);
-ut.MAC_SK_Move_v2('~thor_data400::key::canadianwp_addr', 'Q', mv_addr_to_qa);
-ut.MAC_SK_Move_v2('~thor_data400::key::canadianwp_phone_payload', 'Q', mv_phone_payload_to_qa);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::canadianwp_fdids', 'Q', mv_fdid_to_qa);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::canadianwp_addr', 'Q', mv_addr_to_qa);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::canadianwp_phone_payload', 'Q', mv_phone_payload_to_qa);
 
 /////////////////////////////////////////////////////////////////////////////////
 // -- Build Autokeys
@@ -50,7 +50,7 @@ bld_autokeys := CanadianPhones.Proc_build_autokeys(filedate);
 // -- EMAIL ROXIE KEY COMPLETION NOTIFICATION 
 /////////////////////////////////////////////////////////////////////////////////
 
-emailN := fileservices.sendemail('vmyullyari@seisint.com;tgibson@seisint.com',
+emailN := fileservices.sendemail('tgibson@seisint.com',
 								 
 'CANADIAN PHONES: BUILD SUCCESS vs.'+ filedate,					
 'thor_data400::key::canadianwp_fdids_qa 					thor_data400::key::canadianwp::'+filedate+'::fdids,\n' +

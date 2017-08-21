@@ -1,14 +1,14 @@
 import Versioncontrol, _Control, fbn_new, ut;
 
-export fspray_accounting_logs(string pFilenameExp = 'accurint_*.cat', string pFileType = 'accurint', boolean fcra = false, string pVersion = '') := function
+export fspray_accounting_logs(string pFilenameExp = 'accurint_*.txt', string pFileType = 'accurint', boolean fcra = false, string pVersion = '') := function
 	
 	version 						:= if(pVersion = '', ut.GetDate, pVersion);
-	pServerIP				:= _control.IPAddress.edata12;
+	pServerIP				:= _control.IPAddress.bctlpedata10;
 	
-	pGroupName := if(~fcra, 'thor100_21','thor35_21');
+	pGroupName := if(~fcra, 'thor120_50_a','thor35_21');
 	pPrefix	 					:= if(~fcra, '~thor100_21','~thor10_231');
 	
-		directory := map( pFileType = 'mbs'	=>'/inquiry_data_01/mbs',	 '/riskview/sao/in/accounting_logs');
+		directory := map( pFileType = 'mbs'	=>'/data/inquiry_data_01/mbs',	 '/data/riskview/sao/in/accounting_logs');
 	
 	filename_template := map(
 																										pFileType = 'accurint_sl'							=> pPrefix + '::in::'+version+'::accurint_acclog_sl',  /*thor100_21::in::*::accurint_acclog_sl*/
@@ -28,6 +28,7 @@ export fspray_accounting_logs(string pFilenameExp = 'accurint_*.cat', string pFi
 																	pFileType = 'accurint_sl'		=> '~~',
 																	pFileType = 'custom_sl'			=> '~~',
 																	pFileType = 'riskwise_sl'			=> '~~',
+																	pFileType = 'riskwise_sl_FCRA'			=> '~~',
 															'');
 
 

@@ -30,11 +30,9 @@ watercraft_color_desc(string3 code)
 
 searchpattern := '^(.*)-(.*)$';
 
-file_sort  := sort(watercraft.file_MA_clean_in,serial_number, ENG_MN_TYP_CODE, ENG_YEAR,SERIAL_NUMBER,HORSEPOWER);
-file_dedup := dedup(file_sort,serial_number,ENG_MN_TYP_CODE, ENG_YEAR,SERIAL_NUMBER,HORSEPOWER);
- 
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_MA_clean_in, watercraft.Layout_MA_clean_in,hull_clean_in)
 
-watercraft.Layout_Watercraft_Main_Base main_mapping_format(file_dedup L) 
+watercraft.Layout_Watercraft_Main_Base main_mapping_format(hull_clean_in L) 
 
 := transform
 
@@ -70,8 +68,8 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(file_dedup L)
 	self.watercraft_model_description		:=	'';
 	self.watercraft_width					:=	'';
 	self.watercraft_weight					:=	'';
-	self.watercraft_color_1_code			:=	L.COLOR_TYP_CODE_PRIMARI;
-	self.watercraft_color_1_description		:=	watercraft_color_desc(L.COLOR_TYP_CODE_PRIMARI);
+	self.watercraft_color_1_code			:=	L.COLOR_TYP_CODE_PRIMARY;
+	self.watercraft_color_1_description		:=	watercraft_color_desc(L.COLOR_TYP_CODE_PRIMARY);
 	self.watercraft_color_2_code			:=	L.COLOR_TYP_CODE_SECONDARY;
 	self.watercraft_color_2_description		:=	watercraft_color_desc(L.COLOR_TYP_CODE_SECONDARY);
 	self.watercraft_toilet_code				:=	'';
@@ -140,10 +138,10 @@ watercraft.Layout_Watercraft_Main_Base main_mapping_format(file_dedup L)
   end;
 
 
-Mapping_MA_as_Main_temp := project(watercraft.file_MA_clean_in, main_mapping_format(left));
+Mapping_MA_as_Main_temp := project(hull_clean_in, main_mapping_format(left));
 
 
-watercraft.Layout_Watercraft_Main_Base denorm_main(watercraft.Layout_Watercraft_Main_Base L, file_dedup R, integer1 C) 
+watercraft.Layout_Watercraft_Main_Base denorm_main(watercraft.Layout_Watercraft_Main_Base L, hull_clean_in R, integer1 C) 
 
 := transform
 
@@ -163,7 +161,7 @@ watercraft.Layout_Watercraft_Main_Base denorm_main(watercraft.Layout_Watercraft_
 
 end;
 
-export Mapping_MA_as_Main := DENORMALIZE(Mapping_MA_as_Main_temp, file_dedup,
+export Mapping_MA_as_Main := DENORMALIZE(Mapping_MA_as_Main_temp, hull_clean_in,
                                LEFT.registration_number = RIGHT.reg_num,
                                 DeNorm_main(LEFT,RIGHT,COUNTER));
 

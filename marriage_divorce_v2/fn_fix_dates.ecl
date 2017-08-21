@@ -1,4 +1,4 @@
-import ut;
+import ut,Std;
 
 string8 fn_the_work(string8 pInput) := function
 
@@ -12,7 +12,7 @@ string8 fn_the_work(string8 pInput) := function
  string2 v_dd2 := if(v_dd>'31' or trim(v_dd)='','00',v_dd);
   
  string v_out := if(trim(pInput)='','',
-                 if(v_yy>(string)((integer)ut.GetDate[1..4]+(integer)1) or v_yy<'1900','',
+                 if(v_yy>(string)((integer)((string8)Std.Date.Today())[1..4]+(integer)1) or v_yy<'1900','',
 				 v_yy+v_mm2+v_dd2));
 				 
  
@@ -27,15 +27,20 @@ function
 
 recordof(int0) t_fix_dates(recordof(int0) le) := transform
 
+ string8 v_marriage_filing_dt := fn_the_work(le.marriage_filing_dt);
+ string8 v_marriage_dt        := fn_the_work(le.marriage_dt);
+ string8 v_divorce_filing_dt  := fn_the_work(le.divorce_filing_dt);
+ string8 v_divorce_dt         := fn_the_work(le.divorce_dt); 
+ 
  self.party1_dob                  := fn_the_work(le.party1_dob);
  self.party1_last_marriage_end_dt := fn_the_work(le.party1_last_marriage_end_dt);
  self.party2_dob                  := fn_the_work(le.party2_dob);
  self.party2_last_marriage_end_dt := fn_the_work(le.party2_last_marriage_end_dt);
  
- self.marriage_filing_dt          := fn_the_work(le.marriage_filing_dt);
- self.marriage_dt                 := fn_the_work(le.marriage_dt);
- self.divorce_filing_dt           := fn_the_work(le.divorce_filing_dt);
- self.divorce_dt                  := fn_the_work(le.divorce_dt);
+ self.marriage_filing_dt          := if(v_marriage_filing_dt<>'' and v_marriage_dt<>'' and v_marriage_filing_dt=v_marriage_dt,'',v_marriage_filing_dt);
+ self.marriage_dt                 := v_marriage_dt;
+ self.divorce_filing_dt           := if(v_divorce_filing_dt<>'' and v_divorce_dt<>'' and v_divorce_filing_dt=v_divorce_dt,'',v_divorce_filing_dt);
+ self.divorce_dt                  := v_divorce_dt;
 
  self := le;
  

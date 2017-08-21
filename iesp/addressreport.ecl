@@ -103,7 +103,7 @@ end;
 		
 export t_AddressReportNeighbors := record
 	string Remark {xpath('Remark')};
-	dataset(iesp.bpsreport.t_NeighborSlim) Neighbors2 {xpath('Neighbors2/Neighbor'), MAXCOUNT(iesp.constants.AR.MaxNeighbors)};
+	dataset(iesp.bpsreport.t_NeighborSlim) Neighbors2 {xpath('Neighbors/Neighbor'), MAXCOUNT(iesp.constants.AR.MaxNeighbors)};
 end;
 		
 export t_AddrReportPhone := record

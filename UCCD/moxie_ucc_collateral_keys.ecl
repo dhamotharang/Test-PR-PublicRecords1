@@ -1,7 +1,7 @@
 import uccd,lib_keylib,lib_stringlib;
 
 Layout_WithExpCollateral_Filepos := record
-	uccd.rec_withEXpCollateral;
+	uccd.layout_moxie_withEXpCollateral;
     unsigned integer8 __filepos { virtual(fileposition)};
 end;
  
@@ -17,7 +17,7 @@ end;
   
 t := table(h, MyFields);
 
-base_key_Name := '~thor_data400::key::moxie_ucc_collateral2.';
+base_key_Name := '~thor_data400::key::moxie.ucc2_collateral.';
 
 k1 := BUILDINDEX( t, {ucc_key,event_key,(big_endian unsigned8 )__filepos},
 			base_key_Name + 'ucc_key.event_key_' + uccd.version_development, moxie);

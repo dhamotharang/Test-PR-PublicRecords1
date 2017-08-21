@@ -35,12 +35,28 @@ EXPORT RelationshipKeys := PARALLEL(Rel8); // Build the relationship keys
 EXPORT OutputFileName := OutFileNameP+iter;
 EXPORT OutputFile := OUTPUT(MM.patched_infile,,OutputFileName,COMPRESSED);// Change file for each iteration
 EXPORT OutputFileA := OUTPUT(MM.patched_infile,,OutputFileName,OVERWRITE,COMPRESSED);// Change file for each iteration
-ChangeName := '~temp::Seleid::BIPV2_Seleid_Relative::changes_it'+iter;
+SHARED ChangeName := '~temp::Seleid::BIPV2_Seleid_Relative::changes_it'+iter;
 EXPORT OutputChanges := SEQUENTIAL( OUTPUT(MM.IdChanges,,ChangeName,OVERWRITE,COMPRESSED),FileServices.AddSuperFile(Keys(InFile).MatchHistoryName,ChangeName));
+EXPORT OutputChangesA := SEQUENTIAL( FileServices.RemoveSuperFile(BIPV2_Seleid_Relative.Keys(InFile).MatchHistoryName,ChangeName),OUTPUT(MM.IdChanges,,ChangeName,OVERWRITE,COMPRESSED),FileServices.AddSuperFile(BIPV2_Seleid_Relative.Keys(InFile).MatchHistoryName,ChangeName));
 //EXPORT LoopN(UNSIGNED N,UNSIGNED mt=Config.MatchThreshold) := LOOP(InFile,N,BIPV2_Seleid_Relative.matches(ROWS(LEFT),mt).patched_infile); // Loop N times
-//EXPORT LoopThisN(DATASET(BIPV2_Seleid_Relative.Layout_Base)d,UNSIGNED N,UNSIGNED mt=Config.MatchThreshold) := LOOP(d,N,BIPV2_Seleid_Relative.matches(ROWS(LEFT),mt).patched_infile);
-//EXPORT LoopThisK(DATASET(BIPV2_Seleid_Relative.Layout_Base)d,UNSIGNED K,UNSIGNED NMax=100) := LOOP(d,COUNTER<=NMax AND COUNT(DEDUP(ROWS(LEFT),Seleid,ALL))>K,BIPV2_Seleid_Relative.matches(ROWS(LEFT),0).patched_infile); // Loop until K clusters left
-SHARED LinkPhase(BOOLEAN again) := SEQUENTIAL(PARALLEL(RelationshipKeys,OutputSamples,ExecutionStats,ValidityStats/*,IF(again,OutputFileA,OutputFile),OutputChanges*/),IF(Debugging,DebugKeys));
+//EXPORT LoopThisN(d,N,mt=Config.MatchThreshold,ThinLoop=FALSE) := FUNCTIONMACRO
+//	IMPORT BIPV2_Seleid_Relative;
+//	#IF (ThinLoop=FALSE)
+//		RETURN LOOP(PROJECT(d,BIPV2_Seleid_Relative.Layout_Base),N,BIPV2_Seleid_Relative.matches(ROWS(LEFT),mt).patched_infile);
+//	#ELSE
+//		RETURN JOIN(d, LOOP(PROJECT(d,BIPV2_Seleid_Relative.Layout_Base),N,BIPV2_Seleid_Relative.matches(ROWS(LEFT),mt).patched_infile), LEFT.rcid=RIGHT.rcid, TRANSFORM(RECORDOF(LEFT),SELF:=RIGHT,SELF:=LEFT), KEEP(1), SMART);
+//	#END
+//ENDMACRO;
+//EXPORT LoopThisK(d,K,NMax=100,ThinLoop=FALSE) := FUNCTIONMACRO
+//	IMPORT BIPV2_Seleid_Relative;
+//	#IF (ThinLoop=FALSE)
+//		RETURN LOOP(PROJECT(d,BIPV2_Seleid_Relative.Layout_Base),COUNTER<=NMax AND COUNT(DEDUP(ROWS(LEFT),Seleid,ALL))>K,BIPV2_Seleid_Relative.matches(ROWS(LEFT),0).patched_infile);
+//	#ELSE
+//		RETURN JOIN(d, LOOP(PROJECT(d,BIPV2_Seleid_Relative.Layout_Base),COUNTER<=NMax AND COUNT(DEDUP(ROWS(LEFT),Seleid,ALL))>K,BIPV2_Seleid_Relative.matches(ROWS(LEFT),0).patched_infile), LEFT.rcid=RIGHT.rcid, TRANSFORM(RECORDOF(LEFT),SELF:=RIGHT,SELF:=LEFT), KEEP(1), SMART);
+//	#END
+//ENDMACRO;
+SHARED LinkPhase(BOOLEAN again) := SEQUENTIAL(PARALLEL(RelationshipKeys,OutputSamples,ExecutionStats,ValidityStats/*,IF(again,OutputFileA,OutputFile),IF(again,OutputChangesA,OutputChanges)*//*HACK*/ ),IF(Debugging,DebugKeys));
+
 EXPORT DoAll := LinkPhase(FALSE);
 EXPORT DoAllAgain := LinkPhase(TRUE);
 END;

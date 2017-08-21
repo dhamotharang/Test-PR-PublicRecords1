@@ -1,5 +1,4 @@
 import ut, header, business_header;
-#workunit('name', 'Business Header Regression');
 
 Base := business_header.File_Business_Header_father;
 

@@ -54,4 +54,4 @@ IH_relatives := JOIN(ud_match, ud_match,
 IH_relatives_ded := DEDUP(IH_relatives, bdid1, bdid2, ALL);
 
 EXPORT BH_Relative_Match_ABI_Hierarchy := IH_relatives_ded
-				 : PERSIST('TEMP::BH_Relative_Match_ABI_Hierarchy');
+				 : PERSIST(persistnames.BHRelativeMatchABIHierarchy);

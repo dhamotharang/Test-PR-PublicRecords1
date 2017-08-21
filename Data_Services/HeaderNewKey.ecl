@@ -1,4 +1,3 @@
 export HeaderNewKey := macro
-output(choosen(doxie.Key_Header_Piz,10));
-output(choosen(doxie_files.key_minors_hash,10));
+output(choosen(doxie.key_max_dt_last_seen,10));
 endmacro;

@@ -1,0 +1,2 @@
+import SANCTN_Mari;
+EXPORT incident_text_Layout_SANCTN_NPKeys := SANCTN_Mari.layouts_SANCTN_common.SANCTN_incident_text;

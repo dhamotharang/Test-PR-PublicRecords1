@@ -22,8 +22,8 @@ build_child_base := aVotersChildBuild : success(output('Vote History base file b
 
 build_keys  := VotersV2.Proc_build_voters_keys(VotersV2.Version) : success(output('roxie key build completed')), failure(output('roxie key build failed'));
 
-build_stats   := VotersV2.Out_Base_Stats_Population_Voters;
+build_stats := VotersV2.Out_Base_Stats_Population_Voters(VotersV2.Version);
 
-sequential(parallel(build_main_base, build_child_base)			
-				  ,parallel(build_keys, build_stats)
-          ,send_mail('Emerges Voters Build',' - building base files, keys & stats completed successfully '));
+sequential(parallel(build_main_base, build_child_base),
+			parallel(build_keys, build_stats),
+            send_mail('Emerges Voters Build',' - building base files, keys & stats completed successfully '));

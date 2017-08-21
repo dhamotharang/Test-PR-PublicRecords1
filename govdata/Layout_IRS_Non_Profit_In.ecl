@@ -16,8 +16,9 @@ string1  Deductibility_Code;
 string2  Foundation_Code;
 string9  Activity_Codes;
 string1  Organization_Code;
-string2  Univ_Loc_Code;
-string6  Advance_Ruling_Exp_Date;
+string2  Univ_Loc_Code;							//As of 2014-03-11 update, this field no longer exists
+string6  Advance_Ruling_Exp_Date;		//As of 2014-03-11 update, this field is beginning to be zeroed/blanked out
+string2  Exempt_Org_Status_Code;	//##Vendor layout change 3/2014 - new	
 string6  Tax_Period;
 string1  Asset_Code;
 string1  Income_Code;

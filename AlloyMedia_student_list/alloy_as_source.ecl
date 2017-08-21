@@ -4,23 +4,14 @@ export alloy_as_source(dataset(AlloyMedia_student_list.layouts.layout_base) pAll
  :=
   function
 	dSourceData	:=	project(if(pForHeaderBuild
-					   ,dataset('~thor_data400::base::alloymedia_student_list',AlloyMedia_student_list.layouts.layout_base,flat)
+					   ,dataset('~thor_data400::base::alloymedia_student_list_Header_Building',AlloyMedia_student_list.layouts.layout_base,flat)
 					   ,pAlloy
 					  ),AlloyMedia_student_list.layouts.layout_base);
 
-	src_rec := record
-	 header.Layout_Source_ID;
-	 AlloyMedia_student_list.layouts.layout_base;
-	end;
+	src_rec := header.layouts_SeqdSrc.AY_src_rec;
 	 
 	header.Mac_Set_Header_Source(dSourceData,AlloyMedia_student_list.layouts.layout_base,src_rec,'AY',withUID)
 
-	dForHeader	:=	withUID	: persist('persist::headerbuild_alloymedia_src');
-	dForOther	:=	withUID;
-	ReturnValue	:=	if(pForHeaderBuild,
-					   dForHeader,
-					   dForOther
-					  );
-	return ReturnValue;
+	return withUID;
   end
  ;

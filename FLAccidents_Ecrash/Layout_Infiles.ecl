@@ -1,3 +1,12 @@
+/*2017-06-01T19:28:00Z (Srilatha Katukuri)
+DF-18925 Claims Compass/Police Records
+*/
+/*2017-04-06T21:49:34Z (Srilatha Katukuri)
+DF-18925 - ClaimsCompass?Police Records -Layout change Addition of Address2
+*/
+/*2016-09-21T17:28:34Z (Srilatha Katukuri)
+ECH4454 - Webcruiser Integration changes - For Review
+*/
 /*2015-09-23T05:56:26Z (Srilatha Katukuri)
 #181860 - PRUS
 */
@@ -463,7 +472,7 @@ string report_agency_ori	;
 string report_status;
 string ReportLinkID;
 String Page_Count;
-
+string is_delete;
 end;
 
 export persn_NEW := record ,maxlength(20000)
@@ -621,7 +630,7 @@ string transported_id_number;
 string witness_number	;
 string date_of_birth_derived;
 string Report_Injury_Status; 
-
+string Address2;
 end;
 
 export vehicl_NEW:= record,maxlength(20000)
@@ -874,7 +883,7 @@ string FIRST_NAME;
 string MIDDLE_INITIAL  ;
 string LAST_NAME;         
 string ADDRESS1               ;
-string ADDRESS2;             
+//string ADDRESS2;             
 string CITY           ;
 string STATE       ;
 string ZIP             ;

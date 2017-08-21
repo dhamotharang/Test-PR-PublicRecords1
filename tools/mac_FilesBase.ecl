@@ -33,6 +33,7 @@ export mac_FilesBase( pfilenameversions
 														,pUseMaxLength			= false
 														,pUseOld						= 'false'
 														,pOpt								= 'false'				// file exists optional?
+														,pFileType					= '\'\''
 ) :=
 macro
 	
@@ -50,7 +51,7 @@ macro
 			end;
 		#end
 		
-		shared fDataset(string name)			:= dataset(name, pLayout,			thor #if(pOpt) ,opt #end);
+		shared fDataset(string name)			:= dataset(name, pLayout,			thor #if(pOpt) ,opt #end #if(pFileType != '') #EXPAND(pFileType) #END);
 		
 		#if(pUseKeybuild = true)
 			shared fDatasetKeybuild(string name)	:= dataset(name, layout_keybuild,	thor #if(pOpt) ,opt #end);

@@ -1,1 +1,1 @@
-export FileName_5000_Bank_Details_In := trim(GetSegmentFileName_In('5000')) : global;
+export FileName_5000_Bank_Details_In := trim(GetSegmentFileName_In('5000'));

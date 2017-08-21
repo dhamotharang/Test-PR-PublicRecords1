@@ -1,0 +1,2 @@
+IMPORT PropertyCharacteristics;
+EXPORT Layout_Property_Characteristics := recordof(In_Property_Characteristics);

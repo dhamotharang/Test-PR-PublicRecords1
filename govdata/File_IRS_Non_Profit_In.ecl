@@ -1,1 +1,2 @@
-export File_IRS_Non_Profit_In := dataset('~thor_data400::in::irs_non_profit_20050830', Layout_IRS_Non_Profit_In, flat);
+//export File_IRS_Non_Profit_In := dataset('~thor_data400::in::irs_non_profit_20050303', Layout_IRS_Non_Profit_In, flat);
+export File_IRS_Non_Profit_In := dataset('~thor_data400::in::irs::sprayed::non_profit', govdata.Layouts_IRS_NonProfit.Sprayed,CSV(HEADING(1),SEPARATOR(',')));

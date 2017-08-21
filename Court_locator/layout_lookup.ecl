@@ -1,4 +1,5 @@
 export layout_lookup := record
+
 /*
 string CourtID;
 string MasterID;
@@ -38,6 +39,8 @@ string MailState;
 string MailZip;
 string MailZipFour;
 */
+
+
 string fipscode;
 string CourtID;
 string MasterID;
@@ -59,3 +62,4 @@ string MailState;
 string MailZip;
 
 end;
+

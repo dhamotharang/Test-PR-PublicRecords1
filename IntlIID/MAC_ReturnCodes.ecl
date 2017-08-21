@@ -127,7 +127,7 @@ CHOOSEN(
 	//I29	Unable to verify passport number
 	IF(passportPop and ~isPassportVer,DATASET([{'I29',IntlIID.getRCDesc('I29')}],iesp.share.t_RiskIndicator)) &
 
-	//IDV	Unable to verify driver’s license number
+	//IDV	Unable to verify driverâ€™s license number
 	IF(driverPop and ~isDriverVer,DATASET([{'IDV',IntlIID.getRCDesc('IDV')}],iesp.share.t_RiskIndicator))
 	
 	//I08	The input phone number is potentially invalid

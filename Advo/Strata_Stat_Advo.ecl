@@ -1,11 +1,19 @@
 import STRATA;
-padvo_base:=advo.Files.File_Cleaned_Base;
-pVersion:=Version;
+
+export Strata_Stat_Advo(
+
+	 string															pversion
+	,dataset(Layouts.Layout_Common_Out) padvo_base	= Files().Base.built
+
+) :=
+function
 
 rPopulationStats_advo_base
  :=
   record
     CountGroup									 := count(group);
+	padvo_base.state_code;
+	Active_flag_CountTrue		                 := sum(group,if(padvo_base.Active_flag = 'Y',1,0));
 	date_first_seen_CountNonBlank				 := sum(group,if(padvo_base.date_first_seen<>'',1,0));
 	date_last_seen_CountNonBlank				 := sum(group,if(padvo_base.date_last_seen<>'',1,0));
 	date_vendor_first_reported_CountNonBlank 	 := sum(group,if(padvo_base.date_vendor_first_reported<>'',1,0));
@@ -76,11 +84,16 @@ dPopulationStats_advo_base := table(padvo_base
 							  	    ,rPopulationStats_advo_base
 									,state_code
 									,few);
-STRATA.createXMLStats(dPopulationStats_advo_base
+									
+Srt_dPopulationStats_advo_base := sort(dPopulationStats_advo_base,state_code);
+
+STRATA.createXMLStats(Srt_dPopulationStats_advo_base
 					 ,'DL'
-					 ,'advo DL'
+					 ,'advo'
 					 ,pVersion
-					 ,'aherzberg@seisint.com'
+					 ,'michael.gould@lexisnexis.com'
 					 ,zadvo_base);
 
-EXPORT Strata_Stat_Advo := zadvo_base;
+return zadvo_base;
+
+end;

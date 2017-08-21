@@ -14,7 +14,7 @@ export _Dataset(
 	export max_record_size				:= 4096								;
 
 	export Groupname	:= if(	_Control.ThisEnvironment.name		 = 'Dataland'	,'thor40_241'
-																																					,'thor400_92'
+																																					,'thor400_20'
 											);
 
 end;

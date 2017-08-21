@@ -1,0 +1,1 @@
+export Basefile_Group_BDID_extended := PROJECT(Ingenix_NatlProf.Basefile_Group_BDID_BIP,TRANSFORM(Ingenix_NatlProf.Layout_Group_Base,SELF := LEFT;));																									

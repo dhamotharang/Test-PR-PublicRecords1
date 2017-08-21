@@ -390,8 +390,7 @@ EXPORT functions := MODULE
 
     deeds_added := rollup (sort(pre_Deeds_added, did, prim_range, prim_name, zip5, sec_range),
             roll_prop_searched(LEFT,RIGHT, TRUE), did, prim_range, prim_name, zip5, sec_range);
-            
-            
+                        
     // distressed sale sorting and picking 2 most recent
     dd := distribute(deeds_added(applicant_sold), hash(did));
     sd := sort(dd, did, -sale_date1, -prev_purch_date1, local);
@@ -458,9 +457,13 @@ EXPORT functions := MODULE
       SELF.property_owned_purchase_total := IF(le.purchase_amount < 1000, 0,
                       le.purchase_amount);
       SELF.property_owned_purchase_count := (INTEGER)(le.purchase_amount >= 1000);
-      SELF.property_owned_assessed_total := IF(le.assessed_amount < 1000, 0,
-                      le.assessed_amount);
-      SELF.property_owned_assessed_count := (INTEGER)(le.assessed_amount >= 1000);
+
+			assessed_value := map(le.assessed_amount<>0 => le.assessed_amount,
+											le.assessed_total_value<>0 => le.assessed_total_value,
+											le.assessed_amount);
+			
+      SELF.property_owned_assessed_total := if(assessed_value < 1000, 0, assessed_value);
+      SELF.property_owned_assessed_count := (INTEGER)(assessed_value >= 1000);
       SELF.prim_name := le.prim_name;
       SELF.prim_range := le.prim_range;
       SELF.sec_range := le.sec_range;
@@ -474,8 +477,12 @@ EXPORT functions := MODULE
     END;
 
     Prop := project(wDistressed, to_relat_prop(LEFT));
+		
     return Prop;
   end;
+	
+
+
 
 	export getSexOffendersIDs (unsigned6 did, 
 														 dataset(fcra.Layout_override_flag) PUIDS) := function

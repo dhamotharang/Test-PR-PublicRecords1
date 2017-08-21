@@ -25,7 +25,7 @@ export Interface_AsMasters := module
 			export dataset(Layout_MotorVehicle.Main.Unlinked) As_MotorVehicle_Master;
 			export dataset(Layout_MotorVehicle.Registration) As_MotorVehicle_Master_Registration;
 			export dataset(Layout_MotorVehicle.Title) As_MotorVehicle_Master_Title;
-			export dataset(Layout_MotorVehicle.Party) As_MotorVehicle_Master_Party;
+			export dataset(Layout_MotorVehicle.Party.Unlinked) As_MotorVehicle_Master_Party;
 			export dataset(Layout_Watercraft.Main.Unlinked) As_Watercraft_Master;
 			export dataset(Layout_Watercraft.Party) As_Watercraft_Master_Party;
       export dataset(Layout_Property.Main.Unlinked) As_Property_Master;
@@ -59,7 +59,7 @@ export Interface_AsMasters := module
 			export dataset(Layout_MotorVehicle.Main.Unlinked) As_MotorVehicle_Master := dataset([],Layout_MotorVehicle.Main.Unlinked);
 			export dataset(Layout_MotorVehicle.Registration) As_MotorVehicle_Master_Registration := dataset([],Layout_MotorVehicle.Registration);
 			export dataset(Layout_MotorVehicle.Title) As_MotorVehicle_Master_Title := dataset([],Layout_MotorVehicle.Title);
-			export dataset(Layout_MotorVehicle.Party) As_MotorVehicle_Master_Party := dataset([],Layout_MotorVehicle.Party);
+			export dataset(Layout_MotorVehicle.Party.Unlinked) As_MotorVehicle_Master_Party := dataset([],Layout_MotorVehicle.Party.Unlinked);
 			export dataset(Layout_Watercraft.Main.Unlinked) As_Watercraft_Master := dataset([],Layout_Watercraft.Main.Unlinked);
 			export dataset(Layout_Watercraft.Party) As_Watercraft_Master_Party := dataset([],Layout_Watercraft.Party);
 			export dataset(Layout_Property.Main.Unlinked) As_Property_Master := dataset([],Layout_Property.Main.Unlinked);
@@ -88,7 +88,8 @@ export Interface_AsMasters := module
 	
 		export Base := interface
 		
-			export dataset(Layout_LLID.Linked) As_LLID_Master;
+			export dataset(Layout_LLID.LLID12.Linked) As_LLID12_Master;
+			export dataset(Layout_LLID.LLID9.Linked) As_LLID9_Master;
 			export dataset(Layout_Contacts.Linked) As_Contact_Master;
 			export dataset(Layout_TradeLines.Linked) As_TradeLine_Master;
 			export dataset(Layout_URLs.Linked) As_URL_Master;
@@ -108,7 +109,7 @@ export Interface_AsMasters := module
 			export dataset(Layout_MotorVehicle.Main.Linked) As_MotorVehicle_Master;
 			export dataset(Layout_MotorVehicle.Registration) As_MotorVehicle_Master_Registration;
 			export dataset(Layout_MotorVehicle.Title) As_MotorVehicle_Master_Title;
-			export dataset(Layout_MotorVehicle.Party) As_MotorVehicle_Master_Party;
+			export dataset(Layout_MotorVehicle.Party.Linked) As_MotorVehicle_Master_Party;
 			export dataset(Layout_Watercraft.Main.Linked) As_Watercraft_Master;
 			export dataset(Layout_Watercraft.Party) As_Watercraft_Master_Party;
 			export dataset(Layout_Relationship.Linked) As_Relationship_Master;

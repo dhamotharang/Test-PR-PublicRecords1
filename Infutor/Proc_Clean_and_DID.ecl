@@ -1,90 +1,57 @@
-import infutor, ut, header_slimsort, did_add, didville;
+import infutor, ut, header_slimsort, did_add, didville,watchdog,lib_StringLib,AID,idl_header,address, AID_Support, PromoteSupers;
+#constant(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
+#option('multiplePersistInstances',FALSE);
 
 ds := infutor.File_Infutor;
-
 output(choosen(enth(ds,1,30000,1),10000),named('Infutor_Raw_Sample'));
 
-r_slim := record
- string3  orig_name_prefix;
- string15 orig_first_name;
- string15 orig_middle_name;
- string25 orig_last_name;
- string3  orig_name_suffix;
- string40 orig_addr_street_blob;
- string10 orig_house_number;
- string2  orig_predir;
- string28 orig_street_name;
- string4  orig_street_suffix;
- string2  orig_postdir;
- string8  orig_apt_no;
- string27 orig_city;
- string2  orig_st;
- string5  orig_zip;
- string4  orig_zip4;
- string9  ssn1;
- string9  ssn2;
- string10 phone;
- //string6  orig_dob;
- string8  orig_dob_dd_appended;
- string1  orig_gender;
- string6  effective_dt;//Looks like it could be LOR
+fun_clean(string instring)   := function
+  v_replace1 := stringlib.stringfindreplace(instring,' PO BOX ST ',  ' ST PO BOX ');
+  v_replace2 := stringlib.stringfindreplace(v_replace1,             ' POB ST ',     ' ST PO BOX ');
+  v_replace3 := stringlib.stringfindreplace(v_replace2,             ' P O BOX ST ', ' ST PO BOX ');
+  v_replace4 := stringlib.stringfindreplace(v_replace3,             ' COUNTY RD # ',' COUNTY ROAD ');
+  v_replace5 := stringlib.stringfindreplace(v_replace4,             ' CNTY RD ',    ' COUNTY ROAD ');
+  v_replace6 := stringlib.stringfindreplace(v_replace5,             ' COUNTY RD ',  ' COUNTY ROAD ');
+return v_replace6 ;
+end ;
+
+infutor.infutor_layout_main.temp_rec t_slim(infutor.layout_in_fixed l, integer c) := transform
+
+ self.prev1_addr_street_blob   := fun_clean(trim(l.prev1_addr[1..54],left,right));
+ self.prev1_city               := trim(l.prev1_addr[55..81],left,right);
+ self.prev1_st                 := l.prev1_addr[82..83];
+ self.prev1_zip                := l.prev1_addr[84..88];
  
- unsigned6 boca_id:=0;
- string1   infutor_or_mktg_ind;
+ self.prev2_addr_street_blob   := fun_clean(trim(l.prev2_addr[1..54],left,right));
+ self.prev2_city               := trim(l.prev2_addr[55..81],left,right);
+ self.prev2_st                 := l.prev2_addr[82..83];
+ self.prev2_zip                := l.prev2_addr[84..88];
  
-end;
-
-r_slim t_slim(infutor.layout_in_fixed l, integer c) := transform
-
- string40 v_replace1 := stringlib.stringfindreplace(l.orig_addr_street_blob,' PO BOX ST ',  ' ST PO BOX ');
- string40 v_replace2 := stringlib.stringfindreplace(v_replace1,             ' POB ST ',     ' ST PO BOX ');
- string40 v_replace3 := stringlib.stringfindreplace(v_replace2,             ' P O BOX ST ', ' ST PO BOX ');
- string40 v_replace4 := stringlib.stringfindreplace(v_replace3,             ' COUNTY RD # ',' COUNTY ROAD ');
- string40 v_replace5 := stringlib.stringfindreplace(v_replace4,             ' CNTY RD ',    ' COUNTY ROAD ');
- string40 v_replace6 := stringlib.stringfindreplace(v_replace5,             ' COUNTY RD ',  ' COUNTY ROAD ');
-
- self.orig_addr_street_blob := v_replace6;
+ self.prev3_addr_street_blob   :=fun_clean(trim(l.prev3_addr[1..54],left,right));
+ self.prev3_city               :=trim(l.prev3_addr[55..81],left,right);  
+ self.prev3_st                 := l.prev3_addr[82..83]; 
+ self.prev3_zip                := l.prev3_addr[84..88];
+ 
+ self.prev4_addr_street_blob   :=fun_clean(trim(l.prev4_addr[1..54],left,right));
+ self.prev4_city               :=trim(l.prev4_addr[55..81],left,right); 
+ self.prev4_st                 := l.prev4_addr[82..83];
+ self.prev4_zip                := l.prev4_addr[84..88];
+ 
+ self.prev5_addr_street_blob   :=fun_clean(trim(l.prev5_addr[1..54],left,right));
+ self.prev5_city               :=trim(l.prev5_addr[55..81],left,right);
+ self.prev5_st                 :=l.prev5_addr[82..83]; 
+ self.prev5_zip                :=l.prev5_addr[84..88]; 
+  
+ self.orig_addr_street_blob := fun_clean(l.orig_addr_street_blob);
  self.orig_dob_dd_appended  := if(l.orig_dob<>'',l.orig_dob+'00','');
  self.boca_id               := c+1;
- self.infutor_or_mktg_ind   := '1';
  self                       := l;
 end;
 
-d_slim := project(infutor.File_Infutor(orig_first_name<>'',orig_last_name<>''),t_slim(left,counter));
-
-r_norm := record
- string3  orig_name_prefix;
- string15 orig_first_name;
- string15 orig_middle_name;
- string25 orig_last_name;
- string3  orig_name_suffix;
- string40 orig_addr_street_blob;
- string10 orig_house_number;
- string2  orig_predir;
- string28 orig_street_name;
- string4  orig_street_suffix;
- string2  orig_postdir;
- string8  orig_apt_no;
- string27 orig_city;
- string2  orig_st;
- string5  orig_zip;
- string4  orig_zip4;
- //string9  ssn1;
- //string9  ssn2;
- string9  ssn;
- string10 phone;
- //string6  orig_dob;
- string8  orig_dob_dd_appended;
- string1  orig_gender;
- string6  effective_dt;
+d_slim := project(infutor.File_Infutor(orig_first_name<>'' and orig_last_name<>''),t_slim(left,counter));
  
- unsigned6 boca_id:=0;
- string1   infutor_or_mktg_ind;
- 
- string1 which_ssn:='';
-end;
-
-r_norm t_norm(r_slim l, integer c) := transform
+// norm ssn 
+infutor.infutor_layout_main.r_norm_ssn t_norm(d_slim l, integer c) := transform
  self.ssn       := choose(c,l.ssn1,l.ssn2);
  self.which_ssn := choose(c,'1','2');
  self           := l;
@@ -94,8 +61,126 @@ d_norm := normalize(d_slim,2,t_norm(left,counter));
 
 d_ssn1 := d_norm(which_ssn='1');
 d_ssn2 := d_norm(which_ssn='2',ssn<>'');
-
 d_ssn1_ssn2 := d_ssn1+d_ssn2;
+
+// norm names  
+infutor.infutor_layout_main.r_norm_name  t_norm_name(d_ssn1_ssn2 l, integer c) := transform
+ 
+ orig_name := l.orig_first_name+' '+l.orig_middle_name+' '+l.orig_last_name+' '+l.orig_name_suffix;
+ self.name       := choose(c,orig_name,l.alias1,l.alias2,l.alias3);
+ self.name_type  := choose(c,'O','A1','A2','A3');
+ self           := l;
+end;
+
+d_norm_name := normalize(d_ssn1_ssn2,4,t_norm_name(left,counter));
+
+// norm addr
+infutor.infutor_layout_main.r_norm_name  t_norm_addr(d_norm_name l, integer c) := transform
+ 
+ self.addr_street_blob :=choose(c,l.orig_addr_street_blob,l.prev1_addr_street_blob,l.prev2_addr_street_blob,l.prev3_addr_street_blob,l.prev4_addr_street_blob,l.prev5_addr_street_blob);
+ self.city := choose(c,l.orig_city,l.prev1_city,l.prev2_city,l.prev3_city,l.prev4_city,l.prev5_city);
+ self.st := choose(c,l.orig_st,l.prev1_st,l.prev2_st,l.prev3_st,l.prev4_st,l.prev5_st);
+ self.zip := choose(c,l.orig_zip,l.prev1_zip,l.prev2_zip,l.prev3_zip,l.prev4_zip,l.prev5_zip);
+ self.zip4 := choose(c,l.orig_zip4,'','','','','');
+ self.addr_type := choose(c,'O','p1','P2','P3','P4','P5');
+ self.flag := choose(c,'Y',if(l.prev1_addr_street_blob <>'' ,'Y','N'), 
+                           if(l.prev2_addr_street_blob <>'' ,'Y','N'),
+						   if(l.prev3_addr_street_blob <>'' ,'Y','N'),
+						   if(l.prev4_addr_street_blob <>'' ,'Y','N'),
+						   if(l.prev5_addr_street_blob <>'' ,'Y','N'));
+self := l ;
+
+end;
+
+d_norm_aadr := normalize(d_norm_name(name<>''),6,t_norm_addr(left,counter));
+d_norm_aadr1 := d_norm_aadr(flag ='Y'); 
+
+// Dedup name, addr before seinding to cleaner
+d_norm_aadr1_n := distribute(d_norm_aadr1,hash(name)); 
+dedup_name := dedup(sort(d_norm_aadr1_n,name,local),name,local);
+
+d_norm_aadr1_a := distribute(d_norm_aadr1,hash(addr_street_blob,city,st,zip,zip4)); 
+dedup_addr0 := dedup(sort(d_norm_aadr1_a,addr_street_blob,city,st,zip,zip4,local),addr_street_blob,city,st,zip,zip4,local); 
+
+// Clean address for AID
+// l_CleanAddr	:= RECORD
+// recordof dedup_addr0;
+// string address_1;
+// string address_2;
+// unsigned8 RawAID := 0;
+// END;
+
+// lCleanAddr	tCleanAddress(dedup_addr0 l) := TRANSFORM
+
+dedup_addr  := project(dedup_addr0, transform({dedup_addr0, string address_1 , string address_2,unsigned8 RawAID:=0}, 
+                                    
+									searchpattern :='^([0-9]+) # ([0-9]+)$' ;
+									searchpattern2 := '^([0-9]+) (PO BOX |PO BOX| POB |P O B+)$';
+									searchpattern3 := '^([0-9]+) (TH +)';
+									searchpattern4 := '^([0-9]+[A-Z]) (PO BOX |PO BOX| POB |P O B+)$';
+									searchpattern5 := '^([1-9]+)(ST |ND |TH )';
+                                   
+								    // blank junk 
+									temp_address_0 := infutor.Mod_clean_addr.blankjunk(lib_StringLib.StringLib.StringCleanSpaces(left.addr_street_blob)); 
+									// remove leading zeros 
+									temp_address_1 := regexreplace('^[^A-Z1-9]+',temp_address_0, '');
+                                    
+									// Add space between direction and street number 
+                  temp_address_2:= if(infutor.Mod_clean_addr.StrIndexdir(temp_address_1)>0 and 
+                                        regexfind('^[0-9]',temp_address_1[infutor.Mod_clean_addr.StrIndexdir(temp_address_1)+3]), 
+                                        temp_address_1[1..infutor.Mod_clean_addr.StrIndexdir(temp_address_1)+2] + ' '+ 
+					                              temp_address_1[infutor.Mod_clean_addr.StrIndexdir(temp_address_1)+3..]
+                                       ,temp_address_1);  
+														
+				          // blank out bad addresses 
+									temp_address_3 := if(regexfind(searchpattern,temp_address_2),'',temp_address_2) ;
+									
+									// Reverse PO BOX addresses 
+									temp_address_4 := trim(if(regexfind(searchpattern2,temp_address_3)
+									                    ,temp_address_3[infutor.Mod_clean_addr.StrIndex(temp_address_3)..] + ' '+ temp_address_3[1..infutor.Mod_clean_addr.StrIndex(temp_address_3)-1]
+									                    ,temp_address_3),left,right) ;
+									
+                                     
+                  temp_address_5 := trim(if(regexfind(searchpattern4,temp_address_4)
+                                             ,temp_address_4[infutor.Mod_clean_addr.StrIndex(temp_address_4)..] 
+				                                     + ' '+ temp_address_4[1..infutor.Mod_clean_addr.StrIndex(temp_address_4)-1]
+                                             ,temp_address_4),left,right) ;
+													   
+				         // Blank out POBOX in the middle of street address 
+									temp_address_6 := infutor.Mod_clean_addr.StrcleanPOB(temp_address_5);
+									
+									//remove space btw TH and street number	
+									temp_address_7	:= REGEXREPLACE('^0 ',if(regexfind(searchpattern3,temp_address_6) ,  
+                                                           trim(temp_address_6[1..StringLib.StringFind(temp_address_6,' TH ',1)],left,right)+
+	                                                         trim(temp_address_6[StringLib.StringFind(temp_address_6,' TH ',1)..],left,right)
+	                                                         ,temp_address_6 ),'');
+									ClnAddress1	:= IF(regexfind(searchpattern5,temp_address_7),'',temp_address_7);
+									self.address_1 := IF(ClnAddress1 <> '',Address.fn_addr_clean_prep(ClnAddress1, 'first'),'');
+									
+									ClnAddress2		 := lib_StringLib.StringLib.StringCleanSpaces(If(left.city <> '' and left.st <> '' and left.zip <> '',
+																																								trim(left.CITY,left,right) + ', ' + trim(left.ST,left,right)
+																																								+ ' ' + trim(left.ZIP,left,right)[1..5],
+																																								'')); 
+																		
+									self.address_2 := IF(ClnAddress2 <> '',Address.fn_addr_clean_prep(ClnAddress2, 'last'),'');
+									self := left));
+
+infutor.infutor_layout_main.r_norm_name_clean  tclean( dedup_name l) := transform 
+
+self.clean_name := if(l.name_type ='O',Address.cleanpersonfml73(l.name),Address.cleanpersonlfm73(l.name));
+self:=l ; 
+end ; 
+name_clean := project(dedup_name, tclean(left)); 
+
+// Join back clean name 
+infutor.infutor_layout_main.r_final  tjoin (d_norm_aadr1 l, name_clean r ) := transform
+
+self.clean_name := r.clean_name ; 
+self:= l ;
+end; 
+
+getname := join(d_norm_aadr1_n,name_clean,left.name =right.name 
+                         ,tjoin(left,right), left outer,local); 
 
 invalid_prim_name := [
 'NONE',
@@ -111,73 +196,112 @@ invalid_prim_name := [
 'GENERAL DELIVERY'
 ];
 
-infutor.Layout_DID t_clean(r_norm l) := transform
- 
- string73  v_pname      := addrcleanlib.cleanpersonfml73(l.orig_first_name+' '+l.orig_middle_name+' '+l.orig_last_name+' '+l.orig_name_suffix);
- string182 v_clean_addr := addrcleanlib.cleanaddress182(l.orig_addr_street_blob,l.orig_city+' '+l.orig_st+' '+l.orig_zip+if(l.orig_zip<>'',l.orig_zip4,''));
- 
- string28  v_prim_name := v_clean_addr[13..40];
- string5   v_zip       := v_clean_addr[117..121];
- string4   v_zip4      := v_clean_addr[122..125];
- 
- self.title       := v_pname[ 1.. 5];
- self.fname       := v_pname[ 6..25];
- self.mname       := v_pname[26..45];
- self.lname       := v_pname[46..65];
- self.name_suffix := v_pname[66..70];
- self.name_score  := v_pname[71..73];
- self.prim_range  := v_clean_addr[ 1..  10];
- self.predir      := v_clean_addr[ 11.. 12];
- //self.prim_name   := v_clean_addr[ 13.. 40];
- self.prim_name   := if(trim(v_prim_name) in invalid_prim_name,'',v_prim_name);
- self.addr_suffix := v_clean_addr[ 41.. 44];
- self.postdir     := v_clean_addr[ 45.. 46];
- self.unit_desig  := v_clean_addr[ 47.. 56];
- self.sec_range   := v_clean_addr[ 57.. 64];
- self.p_city_name := v_clean_addr[ 65.. 89];
- self.v_city_name := v_clean_addr[ 90..114];
- self.st          := v_clean_addr[115..116];
- //self.zip         := v_clean_addr[117..121];
- self.zip         := if(v_zip='00000','',v_zip);
- //self.zip4        := v_clean_addr[122..125];
- self.zip4        := if(v_zip4='0000','',v_zip4);
- self.cart        := v_clean_addr[126..129];
- self.cr_sort_sz  := v_clean_addr[130..130];
- self.lot         := v_clean_addr[131..134];
- self.lot_order   := v_clean_addr[135..135];
- self.dbpc        := v_clean_addr[136..137];
- self.chk_digit   := v_clean_addr[138..138];
- self.rec_type    := v_clean_addr[139..140];
- self.county      := v_clean_addr[141..145];
- self.geo_lat     := v_clean_addr[146..155];
- self.geo_long    := v_clean_addr[156..166];
- self.msa         := v_clean_addr[167..170];
- self.geo_blk     := v_clean_addr[171..177];
- self.geo_match   := v_clean_addr[178..178];
- self.err_stat    := v_clean_addr[179..182];
- 
- self               := l;
+// Append AID
+//Only pass full addresses to AID
+HasAddr	:=  dedup_addr(trim(address_1,left,right) <> '' and trim(address_2,left,right) <> '');
 
-end;
+unsigned4	lFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords;
 
-d_clean := project(d_ssn1_ssn2,t_clean(left)) : persist('~thor_dell400_2::persist::infutor_clean');
+AID.MacAppendFromRaw_2Line(HasAddr, address_1, address_2, RawAID, addr_clean, lFlags);
 
-d_clean_filt := d_clean(fname<>'',
-                        lname<>'',
-						zip<>'',
-						(phone<>'' or (prim_range<>'' and prim_name<>'')),
-						~(stringlib.stringfind(prim_name,'PO BOX',1)>0 and trim(zip4)='')
-					   );
-					   
+// join back clean addr 
+infutor.infutor_layout_main.layout_base_tracker  tjoin1 (getname l, addr_clean r ) := transform
+
+ string28  v_prim_name := r.AIDWork_ACECache.prim_name;
+ string5   v_zip       := r.AIDWork_ACECache.zip5;
+ string4   v_zip4      := r.AIDWork_ACECache.zip4;
+ 
+ self.RawAID	   :=	r.AIDWork_RawAID;
+ self.prim_range       :=   r.AIDWork_ACECache.prim_range;
+ self.predir           :=   r.AIDWork_ACECache.predir;
+ self.prim_name        :=   if(trim(v_prim_name) in invalid_prim_name,'',v_prim_name);
+ self.addr_suffix      :=   r.AIDWork_ACECache.addr_suffix;
+ self.postdir          :=   r.AIDWork_ACECache.postdir;
+ self.unit_desig	   :=	r.AIDWork_AceCache.unit_desig;
+ self.sec_range        :=   r.AIDWork_ACECache.sec_range;
+ self.p_city_name      :=   r.AIDWork_ACECache.p_city_name;
+ self.v_city_name      :=   r.AIDWork_ACECache.v_city_name;
+ self.st               :=   r.AIDWork_ACECache.st;
+ self.zip              :=   if(v_zip='00000','',v_zip);
+ self.zip4             :=   if(v_zip4='0000','',v_zip4);
+ self.cart		       :=	r.AIDWork_AceCache.cart;
+ self.cr_sort_sz	   :=	r.AIDWork_AceCache.cr_sort_sz;
+ self.lot		       :=	r.AIDWork_AceCache.lot;
+ self.lot_order		   :=	r.AIDWork_AceCache.lot_order;
+ self.dbpc		       :=	r.AIDWork_AceCache.dbpc;
+ self.chk_digit		   :=	r.AIDWork_AceCache.chk_digit;
+ self.rec_type	       :=	r.AIDWork_AceCache.rec_type;
+ self.county	       :=	r.AIDWork_AceCache.county;
+ self.geo_lat		   :=	r.AIDWork_AceCache.geo_lat;
+ self.geo_long		   :=	r.AIDWork_AceCache.geo_long;
+ self.msa			   :=	r.AIDWork_AceCache.msa;
+ self.geo_blk		   :=	r.AIDWork_AceCache.geo_blk;
+ self.geo_match		   :=	r.AIDWork_AceCache.geo_match;
+ self.err_stat		   :=	r.AIDWork_AceCache.err_stat;
+ self.title       := l.clean_name[ 1.. 5];
+ self.fname       := l.clean_name[ 6..25];
+ self.mname       := l.clean_name[26..45];
+ self.lname       := l.clean_name[46..65];
+ self.name_suffix := l.clean_name[66..70];
+ self.name_score  := l.clean_name[71..73];
+ self.ssn         := if(REGEXFIND('^[[:digit:]]+$',l.ssn) =true ,l.ssn,'');
+ self:= l ;
+end; 
+
+getaddr := join(distribute(getname,hash(addr_street_blob,city,st,zip,zip4)),
+														addr_clean,
+                            left.addr_street_blob = right.addr_street_blob and
+                            left.city =right.city and
+														left.st = right.st and 
+														left.zip = right.zip and 
+														left.zip4 = right.zip4 
+               ,tjoin1(left,right), left outer,local): persist('~thor_data400::persist::infutor_clean');
+							 
+d_clean_filt := dedup(getaddr(fname<>'',
+															lname<>'',
+															zip<>'',
+															(phone<>'' or (prim_range<>'' and prim_name<>'')),
+															~(stringlib.stringfind(prim_name,'PO BOX',1)>0 and trim(zip4)='')
+															),
+											all); 
+
+// Apply Flip name macro
+ut.mac_flipnames(d_clean_filt,fname,mname,lname,flip_out);
+	 				   
 matchset := ['A','P','Z','D','S'];
 
 did_add.MAC_Match_Flex
-	(d_clean_filt, matchset,					
+	(flip_out, matchset,					
 	 ssn, orig_dob_dd_appended, fname, mname, lname, name_suffix, 
 	 prim_range, prim_name, sec_range, zip, st, phone, 
-	 DID, infutor.Layout_DID, false, DID_Score_field,
+	 DID, infutor.infutor_layout_main.layout_base_tracker, false, DID_Score_field,
 	 75, d_did)
 
-ut.mac_sf_buildprocess(d_did, '~thor_data400::base::infutor', build_infutor_base, 2);
 
-export Proc_Clean_and_DID := build_infutor_base;
+// append ssn 
+
+did_add.MAC_Add_SSN_By_DID(d_did, did, append_SSN, file_w_ssn, false);								 
+file_infutor_w_ssn := infutor_reflection(file_w_ssn) ;
+
+// Apply phone suppression, area code correction and blank out invalid phones. 
+
+ut.mac_suppress_by_phonetype(file_infutor_w_ssn,phone,st,inf_supp_out,true,did);
+
+// Correct phone numbers which have invalid area codes
+
+inf_supp_phone_populated	:=	inf_supp_out(trim(phone,left,right)	!=	'');
+inf_supp_phone_blank			:=	inf_supp_out(trim(phone,left,right)	=		'');
+
+ut.mac_phone_areacode_corrections(inf_supp_phone_populated,inf_areacode_corrections,phone);
+
+// Blank out phone numbers which we aren't able to correct where area code or exchange code is not valid
+yellowpages.NPA_PhoneType(inf_areacode_corrections,phone,phonetype,inf_phone_type);
+
+inf_invalid_areacode	:=	project(inf_phone_type(trim(phonetype,left,right)	  =		'INVALID-NPA/NXX/TB'), transform({file_infutor_w_ssn}, self.phone := '',self := left));
+inf_valid_areacode		:=	project(inf_phone_type(trim(phonetype,left,right)	 !=	  'INVALID-NPA/NXX/TB'), transform({file_infutor_w_ssn}, self := left));
+
+result_out := inf_invalid_areacode + inf_valid_areacode + inf_supp_phone_blank ;
+
+PromoteSupers.mac_sf_buildprocess(result_out, '~thor_data400::base::infutor', build_infutor_base, 2,,true);
+
+export Proc_Clean_and_DID := sequential(build_infutor_base, Infutor.New_records_sample);

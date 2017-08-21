@@ -24,7 +24,7 @@ RECORD
 	string30	lh_3_county_name := '';
 END;
 
-cdk := Codes.File_Codes_V3_In;
+cdk := codes.Key_Codes_V3;
 
 ExtendedLayout getHist(den L, cdk R) := transform
 	self.history_name := R.long_desc;
@@ -60,56 +60,66 @@ o2 := join(o1,cdk,	right.file_name = (STRING35)'VEHICLE_REGISTRATION' AND
 				right.field_name= (STRING50)'MAJOR_COLOR_CODE' AND
 				(string5)left.orig_state = right.field_name2 AND
 				(string15)left.major_color_code = right.code,
-			getDecode(LEFT, RIGHT, 'major_color_name'), left outer, lookup);
+			getDecode(LEFT, RIGHT, 'major_color_name'), left outer, KEEP(1));
 o3 := join(o2,cdk,	right.file_name = (STRING35)'VEHICLE_REGISTRATION' AND
 				right.field_name= (STRING50)'MINOR_COLOR_CODE' AND
 				(string5)left.orig_state = right.field_name2 AND
 				(string15)left.minor_color_code = right.code,
-			getDecode(LEFT,RIGHT, 'minor_color_name'),left outer, lookup);
+			getDecode(LEFT,RIGHT, 'minor_color_name'),left outer, KEEP(1));
 o4 := join(o3,cdk,	right.file_name = (STRING35)'VEHICLE_REGISTRATION' AND
 				right.field_name= (STRING50)'BODY_CODE' AND
+				(string5)left.orig_state = right.field_name2 AND
 				(string15)left.body_code = right.code,
-			getDecode(LEFT,RIGHT,'body_code_name'),left outer, lookup);
+			getDecode(LEFT,RIGHT,'body_code_name'),left outer, KEEP(1));
 o5 := join(o4,cdk,	right.file_name = (STRING35)'VEHICLE_REGISTRATION' AND
 				right.field_name= (STRING50)'FUEL_TYPE' AND
+				(string5)left.orig_state = right.field_name2 AND
 				(string15)left.fuel_type = right.code,
-			getDecode(LEFT,RIGHT,'fuel_type_name'),left outer, lookup);
+			getDecode(LEFT,RIGHT,'fuel_type_name'),left outer, KEEP(1));
 o6 := join(o5,cdk,	right.file_name = (STRING35)'VEHICLE_REGISTRATION' AND
 				right.field_name= (STRING50)'HULL_MATERIAL_TYPE' AND
+				(string5)left.orig_state = right.field_name2 AND
 				(string15)left.hull_material_type = right.code,
-			getDecode(LEFT,RIGHT,'hull_material_type_name'),left outer, lookup);
+			getDecode(LEFT,RIGHT,'hull_material_type_name'),left outer, KEEP(1));
 o7 := join(o6,cdk,	right.file_name = (STRING35)'VEHICLE_REGISTRATION' AND
 				right.field_name= (STRING50)'LICENSE_PLATE_CODE' AND
+				(string5)left.orig_state = right.field_name2 AND
 				(string15)left.license_plate_code = right.code,
-			getDecode(LEFT,RIGHT,'license_plate_code_name'),left outer, lookup);
+			getDecode(LEFT,RIGHT,'license_plate_code_name'),left outer, KEEP(1));
 o8 := join(o7,cdk,	right.file_name = (STRING35)'VEHICLE_REGISTRATION' AND
 				right.field_name= (STRING50)'ODOMETER_STATUS' AND
+				(string5)left.orig_state = right.field_name2 AND
 				(string15)left.odometer_status = right.code,
-			getDecode(LEFT,RIGHT,'odometer_status_name'),left outer, lookup);
+			getDecode(LEFT,RIGHT,'odometer_status_name'),left outer, KEEP(1));
 o9 := join(o8,cdk,	right.file_name = (STRING35)'VEHICLE_REGISTRATION' AND
 				right.field_name= (STRING50)'TITLE_STATUS_CODE' AND
+				(string5)left.orig_state = right.field_name2 AND
 				(string15)left.title_status_code = right.code,
-			getDecode(LEFT,RIGHT,'title_status_code_name'),left outer, lookup);
+			getDecode(LEFT,RIGHT,'title_status_code_name'),left outer, KEEP(1));
 o10 := join(o9,cdk,	right.file_name = (STRING35)'VEHICLE_REGISTRATION' AND
 				right.field_name= (STRING50)'VEHICLE_TYPE' AND
+				(string5)left.orig_state = right.field_name2 AND
 				(string15)left.vehicle_type = right.code,
-			getDecode(LEFT,RIGHT,'vehicle_type_name'),left outer, lookup);
+			getDecode(LEFT,RIGHT,'vehicle_type_name'),left outer, KEEP(1));
 o11 := join(o10,cdk,right.file_name = (STRING35)'VEHICLE_REGISTRATION' AND
 				right.field_name= (STRING50)'VEHICLE_USE' AND
+				(string5)left.orig_state = right.field_name2 AND
 				(string15)left.vehicle_use = right.code,
-			getDecode(LEFT,RIGHT,'vehicle_use_name'),left outer, lookup);
+			getDecode(LEFT,RIGHT,'vehicle_use_name'),left outer, KEEP(1));
 o12 := join(o11,cdk,right.file_name = (STRING35)'VEHICLE_REGISTRATION' AND
 				right.field_name= (STRING50)'VESSEL_PROPULSION_TYPE' AND
+				(string5)left.orig_state = right.field_name2 AND
 				(string15)left.vessel_propulsion_type = right.code,
-			getDecode(LEFT,RIGHT,'vessel_propulsion_type_name'),left outer, lookup);
+			getDecode(LEFT,RIGHT,'vessel_propulsion_type_name'),left outer, KEEP(1));
 o13 := join(o12,cdk,right.file_name = (STRING35)'VEHICLE_REGISTRATION' AND
 				right.field_name= (STRING50)'VESSEL_TYPE' AND
+				(string5)left.orig_state = right.field_name2 AND
 				(string15)left.vessel_type = right.code,
-			getDecode(LEFT,RIGHT,'vessel_type_name'),left outer, lookup);
+			getDecode(LEFT,RIGHT,'vessel_type_name'),left outer, KEEP(1));
 o14 := join(o13,cdk,right.file_name = (STRING35)'GENERAL' AND
 				right.field_name= (STRING50)'STATE_LONG' AND
 				(string15)left.orig_state = right.code,
-			getDecode(LEFT,RIGHT,'orig_state_name'),left outer, lookup);
+			getDecode(LEFT,RIGHT,'orig_state_name'),left outer, KEEP(1));
 
 o14 map_lein_holder_county_names(o14 L) := transform
 	self.lh_1_county_name := doxie.fl_counties((integer)L.lh_1_residence_county);

@@ -12,6 +12,7 @@ MACRO
 #uniquename(out5_2);
 #uniquename(out6);
 #uniquename(out7);
+#uniquename(out8);
 
 RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'Address','Q',%out1%,,diffing)
 RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'CityStName','Q',%out2%,,diffing)
@@ -22,10 +23,11 @@ RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'SSN','Q',%out5%,,diffing)
 RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'SSN2','Q',%out5_2%,,diffing)
 RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'StName','Q',%out6%,,diffing)
 RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'Zip','Q',%out7%,,diffing)
+RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'ZipPRLName','Q',%out8%,,diffing)
 
 
-
-outaction := parallel(%out1%,
+outaction := if('C' in accept_skip_set,output('AUTOKEY MOVE: All Contact keys skipped'),
+             parallel(%out1%,
                       %out2%,
 				  %out3%,
 				  if('P' in accept_skip_set, 
@@ -35,6 +37,8 @@ outaction := parallel(%out1%,
 				     output('AUTOKEY MOVE: SSN key skipped'),
 				     if(useAllLookups, %out5_2%, %out5%)),
 				  %out6%,
-				  %out7%);
+				  %out7%,
+					if('-' in accept_skip_set, %out8%)
+					));
 
 ENDMACRO;

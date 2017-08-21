@@ -128,7 +128,7 @@ string45 spouse_prof_license_status;
 string200 spouse_email1;
 string200 spouse_email2;
 string200 spouse_email3;
-string __filename { virtual(logicalfilename),maxlength(500)};
+string50 filename ;
 string15 jobid := '';
 end;
 
@@ -167,7 +167,6 @@ string phone_1_status;
 string phone1_notes;
 string phone_2_status; 
 string phone2_notes;
-string InputFileNamestring ;
 string acctno;
 end;
 
@@ -206,9 +205,8 @@ string1 phone_1_status;
 string120 phone1_notes;
 string1 phone_2_status; 
 string120 phone2_notes;
-string120 InputFileNamestring ;
 string15 acctno;
-string __filename { virtual(logicalfilename),maxlength(500)};
+string50 filename ;
 string15 jobid := '';
 end;
 

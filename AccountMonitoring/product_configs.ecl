@@ -81,5 +81,12 @@ EXPORT product_configs(
 	define_product_type_config(phoneownership,fn_cgm_phoneownership,product_mask,pseudo_environment);
 	define_product_type_config(bipbestupdate,fn_cgm_bipupdate,product_mask,pseudo_environment);
 	define_product_type_config(sbfe,fn_cgm_sbfe,product_mask,pseudo_environment);
+	define_product_type_config(ucc,fn_cgm_ucc,product_mask,pseudo_environment);
+	define_product_type_config(govtdebarred,fn_cgm_govtdebarred,product_mask,pseudo_environment);
+	define_product_type_config(inquiry,fn_cgm_inquiry,product_mask,pseudo_environment);
+	define_product_type_config(corp,fn_cgm_corp,product_mask,pseudo_environment);
+	define_product_type_config(mvr,fn_cgm_mvr,product_mask,pseudo_environment);
+	define_product_type_config(aircraft,fn_cgm_aircraft,product_mask,pseudo_environment);
+	define_product_type_config(watercraft,fn_cgm_watercraft,product_mask,pseudo_environment);
 	
 END;

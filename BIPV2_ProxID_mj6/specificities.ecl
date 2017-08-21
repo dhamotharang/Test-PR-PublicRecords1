@@ -59,7 +59,7 @@ EXPORT input_file := h0 : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::Specificitie
 EXPORT ClusterSizes := TABLE(input_file,r0,Proxid,LOCAL) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::Cluster_Sizes',EXPIRE(Config.PersistExpire));
 EXPORT TotalClusters := COUNT(ClusterSizes);
  
-SHARED  cnp_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,cnp_name) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::cnp_name',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  cnp_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,cnp_name) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::cnp_name',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(cnp_name_deduped,cnp_name,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -70,7 +70,7 @@ SHARED  cnp_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,cnp_name) 
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT cnp_name_values_persisted_temp := specs_added;
  
-SHARED  cnp_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,cnp_number) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::cnp_number',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  cnp_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,cnp_number) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::cnp_number',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(cnp_number_deduped,cnp_number,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -81,7 +81,7 @@ SHARED  cnp_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,cnp_numb
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT cnp_number_values_persisted_temp := specs_added;
  
-SHARED  active_duns_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,active_duns_number) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::active_duns_number',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  active_duns_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,active_duns_number) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::active_duns_number',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(active_duns_number_deduped,active_duns_number,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -92,7 +92,7 @@ SHARED  active_duns_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT active_duns_number_values_persisted_temp := specs_added;
  
-SHARED  active_enterprise_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,active_enterprise_number) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::active_enterprise_number',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  active_enterprise_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,active_enterprise_number) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::active_enterprise_number',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(active_enterprise_number_deduped,active_enterprise_number,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -103,7 +103,7 @@ SHARED  active_enterprise_number_deduped := SALT30.MAC_Field_By_UID(input_file,P
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT active_enterprise_number_values_persisted_temp := specs_added;
  
-SHARED  active_domestic_corp_key_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,active_domestic_corp_key) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::active_domestic_corp_key',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  active_domestic_corp_key_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,active_domestic_corp_key) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::active_domestic_corp_key',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(active_domestic_corp_key_deduped,active_domestic_corp_key,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -114,7 +114,7 @@ SHARED  active_domestic_corp_key_deduped := SALT30.MAC_Field_By_UID(input_file,P
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT active_domestic_corp_key_values_persisted_temp := specs_added;
  
-SHARED  hist_enterprise_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,hist_enterprise_number) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::hist_enterprise_number',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  hist_enterprise_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,hist_enterprise_number) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::hist_enterprise_number',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(hist_enterprise_number_deduped,hist_enterprise_number,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -125,7 +125,7 @@ SHARED  hist_enterprise_number_deduped := SALT30.MAC_Field_By_UID(input_file,Pro
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT hist_enterprise_number_values_persisted_temp := specs_added;
  
-SHARED  hist_duns_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,hist_duns_number) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::hist_duns_number',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  hist_duns_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,hist_duns_number) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::hist_duns_number',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(hist_duns_number_deduped,hist_duns_number,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -136,7 +136,7 @@ SHARED  hist_duns_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,hi
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT hist_duns_number_values_persisted_temp := specs_added;
  
-SHARED  hist_domestic_corp_key_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,hist_domestic_corp_key) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::hist_domestic_corp_key',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  hist_domestic_corp_key_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,hist_domestic_corp_key) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::hist_domestic_corp_key',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(hist_domestic_corp_key_deduped,hist_domestic_corp_key,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -147,7 +147,7 @@ SHARED  hist_domestic_corp_key_deduped := SALT30.MAC_Field_By_UID(input_file,Pro
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT hist_domestic_corp_key_values_persisted_temp := specs_added;
  
-SHARED  foreign_corp_key_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,foreign_corp_key) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::foreign_corp_key',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  foreign_corp_key_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,foreign_corp_key) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::foreign_corp_key',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(foreign_corp_key_deduped,foreign_corp_key,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -158,7 +158,7 @@ SHARED  foreign_corp_key_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,fo
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT foreign_corp_key_values_persisted_temp := specs_added;
  
-SHARED  unk_corp_key_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,unk_corp_key) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::unk_corp_key',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  unk_corp_key_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,unk_corp_key) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::unk_corp_key',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(unk_corp_key_deduped,unk_corp_key,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -169,7 +169,7 @@ SHARED  unk_corp_key_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,unk_co
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT unk_corp_key_values_persisted_temp := specs_added;
  
-SHARED  ebr_file_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,ebr_file_number) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::ebr_file_number',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  ebr_file_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,ebr_file_number) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::ebr_file_number',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(ebr_file_number_deduped,ebr_file_number,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -180,7 +180,7 @@ SHARED  ebr_file_number_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,ebr
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT ebr_file_number_values_persisted_temp := specs_added;
  
-SHARED  company_fein_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_fein) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::company_fein',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  company_fein_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_fein) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::company_fein',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(company_fein_deduped,company_fein,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -191,7 +191,7 @@ SHARED  company_fein_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,compan
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT company_fein_values_persisted_temp := specs_added;
  
-SHARED  company_phone_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_phone) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::company_phone',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  company_phone_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_phone) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::company_phone',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(company_phone_deduped,company_phone,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -202,7 +202,7 @@ SHARED  company_phone_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,compa
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT company_phone_values_persisted_temp := specs_added;
  
-SHARED  prim_range_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,prim_range) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::prim_range',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  prim_range_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,prim_range) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::prim_range',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(prim_range_deduped,prim_range,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -213,7 +213,7 @@ SHARED  prim_range_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,prim_ran
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT prim_range_values_persisted_temp := specs_added;
  
-SHARED  prim_name_derived_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,prim_name_derived) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::prim_name_derived',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  prim_name_derived_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,prim_name_derived) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::prim_name_derived',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(prim_name_derived_deduped,prim_name_derived,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -224,7 +224,7 @@ SHARED  prim_name_derived_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,p
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT prim_name_derived_values_persisted_temp := specs_added;
  
-SHARED  sec_range_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,sec_range) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::sec_range',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  sec_range_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,sec_range) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::sec_range',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(sec_range_deduped,sec_range,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -235,7 +235,7 @@ SHARED  sec_range_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,sec_range
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT sec_range_values_persisted_temp := specs_added;
  
-SHARED  v_city_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,v_city_name) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::v_city_name',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  v_city_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,v_city_name) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::v_city_name',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(v_city_name_deduped,v_city_name,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -246,7 +246,7 @@ SHARED  v_city_name_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,v_city_
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT v_city_name_values_persisted_temp := specs_added;
  
-SHARED  st_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,st) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::st',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  st_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,st) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::st',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(st_deduped,st,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -257,7 +257,7 @@ SHARED  st_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,st) : PERSIST('~
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT st_values_persisted_temp := specs_added;
  
-SHARED  zip_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,zip) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::zip',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  zip_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,zip) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::zip',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(zip_deduped,zip,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -268,7 +268,7 @@ SHARED  zip_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,zip) : PERSIST(
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT zip_values_persisted_temp := specs_added;
  
-SHARED  company_csz_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_csz) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::company_csz',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  company_csz_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_csz) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::company_csz',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(company_csz_deduped,company_csz,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -279,7 +279,7 @@ SHARED  company_csz_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT company_csz_values_persisted_temp := specs_added;
  
-SHARED  company_addr1_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_addr1) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::company_addr1',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  company_addr1_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_addr1) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::company_addr1',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(company_addr1_deduped,company_addr1,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -290,7 +290,7 @@ SHARED  company_addr1_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,compa
   SALT30.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
 EXPORT company_addr1_values_persisted_temp := specs_added;
  
-SHARED  company_address_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_address) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::company_address',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
+EXPORT  company_address_deduped := SALT30.MAC_Field_By_UID(input_file,Proxid,company_address) : PERSIST('~temp::Proxid::BIPV2_ProxID_mj6::dedups::company_address',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT30.Mac_Field_Count_UID(company_address_deduped,company_address,Proxid,counted,counted_clusters) // count the number of UIDs with each field value
   r1 := RECORD
     counted;
@@ -497,7 +497,8 @@ EXPORT v_city_nameValuesIndexKeyName := '~'+'key::BIPV2_ProxID_mj6::Proxid::Word
  
 EXPORT v_city_name_values_index := INDEX(v_city_name_values_persisted_temp,{v_city_name},{v_city_name_values_persisted_temp},v_city_nameValuesIndexKeyName);
 EXPORT v_city_name_values_persisted := v_city_name_values_index;
-EXPORT v_city_name_nulls := DATASET([{'',0,0}],Layout_Specificities.v_city_name_ChildRec); // Automated null spotting not applicable
+SALT30.MAC_Field_Nulls(v_city_name_values_persisted,Layout_Specificities.v_city_name_ChildRec,nv) // Use automated NULL spotting
+EXPORT v_city_name_nulls := nv;
 SALT30.MAC_Field_Bfoul(v_city_name_deduped,v_city_name,Proxid,v_city_name_nulls,ClusterSizes,false,false,bf) // Compute the chances of a field having 2 values for one entity
 EXPORT v_city_name_switch := bf;
 EXPORT v_city_name_max := MAX(v_city_name_values_persisted,field_specificity);
@@ -508,7 +509,8 @@ EXPORT stValuesIndexKeyName := '~'+'key::BIPV2_ProxID_mj6::Proxid::Word::st';
  
 EXPORT st_values_index := INDEX(st_values_persisted_temp,{st},{st_values_persisted_temp},stValuesIndexKeyName);
 EXPORT st_values_persisted := st_values_index;
-EXPORT st_nulls := DATASET([{'',0,0}],Layout_Specificities.st_ChildRec); // Automated null spotting not applicable
+SALT30.MAC_Field_Nulls(st_values_persisted,Layout_Specificities.st_ChildRec,nv) // Use automated NULL spotting
+EXPORT st_nulls := nv;
 SALT30.MAC_Field_Bfoul(st_deduped,st,Proxid,st_nulls,ClusterSizes,false,false,bf) // Compute the chances of a field having 2 values for one entity
 EXPORT st_switch := bf;
 EXPORT st_max := MAX(st_values_persisted,field_specificity);
@@ -604,52 +606,52 @@ END;
 EXPORT Specificities := PROJECT(Specificities_Index,Into(LEFT));
 // Let us see how accurate the SPC file is:-
 SpcShiftR := RECORD
-  integer1 cnp_name_shift0 := ROUND(Specificities[1].cnp_name_specificity - 20);
-  integer2 cnp_name_switch_shift0 := ROUND(1000*Specificities[1].cnp_name_switch - 165);
-  integer1 cnp_number_shift0 := ROUND(Specificities[1].cnp_number_specificity - 12);
+  integer1 cnp_name_shift0 := ROUND(Specificities[1].cnp_name_specificity - 25);
+  integer2 cnp_name_switch_shift0 := ROUND(1000*Specificities[1].cnp_name_switch - 213);
+  integer1 cnp_number_shift0 := ROUND(Specificities[1].cnp_number_specificity - 14);
   integer2 cnp_number_switch_shift0 := ROUND(1000*Specificities[1].cnp_number_switch - 0);
-  integer1 active_duns_number_shift0 := ROUND(Specificities[1].active_duns_number_specificity - 21);
-  integer2 active_duns_number_switch_shift0 := ROUND(1000*Specificities[1].active_duns_number_switch - 18);
-  integer1 active_enterprise_number_shift0 := ROUND(Specificities[1].active_enterprise_number_specificity - 21);
-  integer2 active_enterprise_number_switch_shift0 := ROUND(1000*Specificities[1].active_enterprise_number_switch - 4);
-  integer1 active_domestic_corp_key_shift0 := ROUND(Specificities[1].active_domestic_corp_key_specificity - 21);
+  integer1 active_duns_number_shift0 := ROUND(Specificities[1].active_duns_number_specificity - 27);
+  integer2 active_duns_number_switch_shift0 := ROUND(1000*Specificities[1].active_duns_number_switch - 19);
+  integer1 active_enterprise_number_shift0 := ROUND(Specificities[1].active_enterprise_number_specificity - 26);
+  integer2 active_enterprise_number_switch_shift0 := ROUND(1000*Specificities[1].active_enterprise_number_switch - 3);
+  integer1 active_domestic_corp_key_shift0 := ROUND(Specificities[1].active_domestic_corp_key_specificity - 27);
   integer2 active_domestic_corp_key_switch_shift0 := ROUND(1000*Specificities[1].active_domestic_corp_key_switch - 0);
-  integer1 hist_enterprise_number_shift0 := ROUND(Specificities[1].hist_enterprise_number_specificity - 21);
-  integer2 hist_enterprise_number_switch_shift0 := ROUND(1000*Specificities[1].hist_enterprise_number_switch - 5);
-  integer1 hist_duns_number_shift0 := ROUND(Specificities[1].hist_duns_number_specificity - 21);
-  integer2 hist_duns_number_switch_shift0 := ROUND(1000*Specificities[1].hist_duns_number_switch - 163);
-  integer1 hist_domestic_corp_key_shift0 := ROUND(Specificities[1].hist_domestic_corp_key_specificity - 21);
-  integer2 hist_domestic_corp_key_switch_shift0 := ROUND(1000*Specificities[1].hist_domestic_corp_key_switch - 9);
-  integer1 foreign_corp_key_shift0 := ROUND(Specificities[1].foreign_corp_key_specificity - 21);
-  integer2 foreign_corp_key_switch_shift0 := ROUND(1000*Specificities[1].foreign_corp_key_switch - 138);
-  integer1 unk_corp_key_shift0 := ROUND(Specificities[1].unk_corp_key_specificity - 21);
-  integer2 unk_corp_key_switch_shift0 := ROUND(1000*Specificities[1].unk_corp_key_switch - 16);
-  integer1 ebr_file_number_shift0 := ROUND(Specificities[1].ebr_file_number_specificity - 21);
-  integer2 ebr_file_number_switch_shift0 := ROUND(1000*Specificities[1].ebr_file_number_switch - 224);
-  integer1 company_fein_shift0 := ROUND(Specificities[1].company_fein_specificity - 20);
-  integer2 company_fein_switch_shift0 := ROUND(1000*Specificities[1].company_fein_switch - 85);
-  integer1 company_phone_shift0 := ROUND(Specificities[1].company_phone_specificity - 20);
-  integer2 company_phone_switch_shift0 := ROUND(1000*Specificities[1].company_phone_switch - 266);
-  integer1 prim_range_shift0 := ROUND(Specificities[1].prim_range_specificity - 12);
+  integer1 hist_enterprise_number_shift0 := ROUND(Specificities[1].hist_enterprise_number_specificity - 28);
+  integer2 hist_enterprise_number_switch_shift0 := ROUND(1000*Specificities[1].hist_enterprise_number_switch - 7);
+  integer1 hist_duns_number_shift0 := ROUND(Specificities[1].hist_duns_number_specificity - 27);
+  integer2 hist_duns_number_switch_shift0 := ROUND(1000*Specificities[1].hist_duns_number_switch - 171);
+  integer1 hist_domestic_corp_key_shift0 := ROUND(Specificities[1].hist_domestic_corp_key_specificity - 27);
+  integer2 hist_domestic_corp_key_switch_shift0 := ROUND(1000*Specificities[1].hist_domestic_corp_key_switch - 10);
+  integer1 foreign_corp_key_shift0 := ROUND(Specificities[1].foreign_corp_key_specificity - 27);
+  integer2 foreign_corp_key_switch_shift0 := ROUND(1000*Specificities[1].foreign_corp_key_switch - 122);
+  integer1 unk_corp_key_shift0 := ROUND(Specificities[1].unk_corp_key_specificity - 27);
+  integer2 unk_corp_key_switch_shift0 := ROUND(1000*Specificities[1].unk_corp_key_switch - 17);
+  integer1 ebr_file_number_shift0 := ROUND(Specificities[1].ebr_file_number_specificity - 28);
+  integer2 ebr_file_number_switch_shift0 := ROUND(1000*Specificities[1].ebr_file_number_switch - 229);
+  integer1 company_fein_shift0 := ROUND(Specificities[1].company_fein_specificity - 26);
+  integer2 company_fein_switch_shift0 := ROUND(1000*Specificities[1].company_fein_switch - 110);
+  integer1 company_phone_shift0 := ROUND(Specificities[1].company_phone_specificity - 27);
+  integer2 company_phone_switch_shift0 := ROUND(1000*Specificities[1].company_phone_switch - 275);
+  integer1 prim_range_shift0 := ROUND(Specificities[1].prim_range_specificity - 13);
   integer2 prim_range_switch_shift0 := ROUND(1000*Specificities[1].prim_range_switch - 0);
-  integer1 prim_name_derived_shift0 := ROUND(Specificities[1].prim_name_derived_specificity - 12);
-  integer2 prim_name_derived_switch_shift0 := ROUND(1000*Specificities[1].prim_name_derived_switch - 13);
-  integer1 sec_range_shift0 := ROUND(Specificities[1].sec_range_specificity - 11);
-  integer2 sec_range_switch_shift0 := ROUND(1000*Specificities[1].sec_range_switch - 152);
-  integer1 v_city_name_shift0 := ROUND(Specificities[1].v_city_name_specificity - 2);
-  integer2 v_city_name_switch_shift0 := ROUND(1000*Specificities[1].v_city_name_switch - 0);
-  integer1 st_shift0 := ROUND(Specificities[1].st_specificity - 1);
+  integer1 prim_name_derived_shift0 := ROUND(Specificities[1].prim_name_derived_specificity - 15);
+  integer2 prim_name_derived_switch_shift0 := ROUND(1000*Specificities[1].prim_name_derived_switch - 11);
+  integer1 sec_range_shift0 := ROUND(Specificities[1].sec_range_specificity - 12);
+  integer2 sec_range_switch_shift0 := ROUND(1000*Specificities[1].sec_range_switch - 112);
+  integer1 v_city_name_shift0 := ROUND(Specificities[1].v_city_name_specificity - 11);
+  integer2 v_city_name_switch_shift0 := ROUND(1000*Specificities[1].v_city_name_switch - 11);
+  integer1 st_shift0 := ROUND(Specificities[1].st_specificity - 5);
   integer2 st_switch_shift0 := ROUND(1000*Specificities[1].st_switch - 0);
-  integer1 zip_shift0 := ROUND(Specificities[1].zip_specificity - 6);
-  integer2 zip_switch_shift0 := ROUND(1000*Specificities[1].zip_switch - 6);
-  integer1 company_csz_shift0 := ROUND(Specificities[1].company_csz_specificity - 6);
-  integer2 company_csz_switch_shift0 := ROUND(1000*Specificities[1].company_csz_switch - 8);
-  integer1 company_addr1_shift0 := ROUND(Specificities[1].company_addr1_specificity - 17);
-  integer2 company_addr1_switch_shift0 := ROUND(1000*Specificities[1].company_addr1_switch - 169);
-  integer1 company_address_shift0 := ROUND(Specificities[1].company_address_specificity - 18);
-  integer2 company_address_switch_shift0 := ROUND(1000*Specificities[1].company_address_switch - 174);
-  INTEGER1 ForeignCorpkey_shift0 := ROUND(Specificities[1].ForeignCorpkey_specificity - 21);
-  INTEGER2 ForeignCorpkey_switch_shift0 := ROUND(1000*Specificities[1].ForeignCorpkey_switch - 51);
+  integer1 zip_shift0 := ROUND(Specificities[1].zip_specificity - 14);
+  integer2 zip_switch_shift0 := ROUND(1000*Specificities[1].zip_switch - 5);
+  integer1 company_csz_shift0 := ROUND(Specificities[1].company_csz_specificity - 14);
+  integer2 company_csz_switch_shift0 := ROUND(1000*Specificities[1].company_csz_switch - 23);
+  integer1 company_addr1_shift0 := ROUND(Specificities[1].company_addr1_specificity - 23);
+  integer2 company_addr1_switch_shift0 := ROUND(1000*Specificities[1].company_addr1_switch - 99);
+  integer1 company_address_shift0 := ROUND(Specificities[1].company_address_specificity - 25);
+  integer2 company_address_switch_shift0 := ROUND(1000*Specificities[1].company_address_switch - 115);
+  INTEGER1 ForeignCorpkey_shift0 := ROUND(Specificities[1].ForeignCorpkey_specificity - 27);
+  INTEGER2 ForeignCorpkey_switch_shift0 := ROUND(1000*Specificities[1].ForeignCorpkey_switch - 31);
   END;
  
 EXPORT SpcShift := TABLE(Specificities,SpcShiftR);

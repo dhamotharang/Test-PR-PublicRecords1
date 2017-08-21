@@ -1,4 +1,4 @@
-import header, ut, doxie, data_services;
+import header, ut, doxie, data_services, PRTE2_Header,PRTE2_Watchdog,PRTE2_Watchdog;
 
 EXPORT Key_Prep_Watchdog_teaser (boolean exclude_EQ = true ) := FUNCTION
 
@@ -45,10 +45,22 @@ EXPORT Key_Prep_Watchdog_teaser (boolean exclude_EQ = true ) := FUNCTION
 				self.pfname := datalib.preferredFirstNew(l.fname, true);
 				self := l;
 			END;
-
+            #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+            string_rec := record
+					watchdog.Layout_Best;
+					string1 		glb_name := 'Y';
+					string1 		glb_address := 'Y';
+					string1 		glb_dob := 'Y';
+					string1 		glb_ssn := 'Y';
+					string1 		glb_phone := 'Y';
+					unsigned8 filepos := 0;
+				end;
+            wdog_filt0 := project(PRTE2_Watchdog.Files.file_best,{{PRTE2_Watchdog.files.file_best} OR string_rec});
+            wdog_filt := project(wdog_filt0,{newrec});
+            #ELSE
 			wdog_filt := join(wdog_dist, hdr_ambig, left.did = right.did,
 												xform(left, right), left only, local);
-			
+			#END
 			non_eq := if(exclude_EQ,'_noneq','');
 			return index(wdog_filt, {lname, st, pfname, fname, zip}, {wdog_filt},
 																					'~thor_data400::key::watchdog_nonglb'+non_eq+'.teaser_'+ doxie.Version_SuperKey);

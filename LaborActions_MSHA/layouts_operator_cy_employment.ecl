@@ -3,9 +3,9 @@ export Layouts_Operator_CY_Employment := module
 	shared max_size := _Dataset().max_record_size;
 
 	export Input := record,maxlength(max_size)
-			string Dart_Id;						
-			string Sub_Unit;  
+			string Dart_Id;	
 			string Mine_Id;		
+			string Sub_Unit;  
 			string Calendar_Year;  
 			string Hours_Reported_for_Year;
 			string Annual_Coal_Production;

@@ -28,7 +28,7 @@ with_count1 := join(distribute(aggr_all, hash(fname, lname, city_name, st)),
 										transform(aggr_layout,
 															self.did_cnt_with_orig_nm := right.did_cnt_with_orig_nm,
 															self := left),
-										left outer);
+										left outer, local);
 															
 										
 with_count2 := join(distribute(with_count1, hash(preferred_fname, lname, city_name, st)),
@@ -40,7 +40,7 @@ with_count2 := join(distribute(with_count1, hash(preferred_fname, lname, city_na
 										transform(aggr_layout,
 															self.did_cnt_with_pref_nm := right.did_cnt_with_pref_nm,
 															self := left),
-										left outer);										
+										left outer, local);										
 
 
 

@@ -3,7 +3,10 @@ export RelativeDidMatches(
 	dataset(header.Layout_MatchCandidates) h) :=
 
 FUNCTION
-r := File_Relatives(number_cohabits>=4);
+r := File_Relatives(number_cohabits>=4
+										,relative_matches[1..2]<>'IR' // exclude pure iRelatives pairs
+										,(relatives_match_score[1..2]<>'IR' or number_cohabits > 11) //exclude pairs boosted by iRelatives
+										);
 
 layout_relatives swap(r le) := transform
   self.person1 := le.person2;

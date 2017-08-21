@@ -20,7 +20,7 @@ macro
 %sourceCsvTeminater% := '\\n';
 %recSize% := 700;
 
-%spray_main% := FileServices.SprayVariable(Source_IP,source_path + file_name,%recSize%,%sourceCsvSeparater%,%sourceCsvTeminater%,,group_name,American_student_list.thor_cluster + 'in::american_student_list_'+ filedate,-1,,,true,true);
+%spray_main% := FileServices.SprayVariable(Source_IP,source_path + file_name,%recSize%,%sourceCsvSeparater%,%sourceCsvTeminater%,,group_name,American_student_list.thor_cluster + 'in::american_student_list_'+ filedate,-1,,,true,true,true);
 
 %Create_Superfiles% := sequential(FileServices.CreateSuperFile(American_student_list.thor_cluster + 'in::american_student_list::Superfile',false),
 									FileServices.CreateSuperFile(American_student_list.thor_cluster + 'in::american_student_list::Delete',false),

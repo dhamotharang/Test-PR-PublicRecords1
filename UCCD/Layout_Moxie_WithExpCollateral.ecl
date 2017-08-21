@@ -1,4 +1,4 @@
-export rec_WithExpCollateral := record
+export layout_moxie_WithExpCollateral := record
 	string1		record_type; // current/historical
 	string1		isDirect;
 	string2 		ucc_vendor;

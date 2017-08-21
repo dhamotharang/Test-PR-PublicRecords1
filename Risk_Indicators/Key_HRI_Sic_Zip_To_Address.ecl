@@ -1,26 +1,30 @@
-import address, business_header, Data_Services;
+import address, business_header, Data_Services, PRTE2_Business_Header;
  
-hri_base_file :=  files().HRIAddressSicCode2.built((integer)zip<>0);
+#IF (PRTE2_Business_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Business_Header.constants.PRTE_BUILD_WARN_MSG);
+hri_base_file := PRTE2_Business_Header.Files_Prte_Addr_HRI_Keys().HRI_Sic_Zip_To_Addr;
+#ELSE
+hri_base_file := files().HRIAddressSicCode2.built((integer)zip<>0);
+#END;
 
 r :=
 RECORD
 	string10 prim_range;
-	string2   predir;
+	string2  predir;
 	string28 prim_name;
 	string4  addr_suffix;
-	string2   postdir;
+	string2  postdir;
 	string5  unit_desig;
 	string8  sec_range;
 	string25 city;
-	string2   state;
+	string2  state;
 	string5  zip;
 	string4  zip4;
-     string4   sic_code;
-	 string2 	source; //Added
-	string12  bdid;
-	string4   addr_type;
-	real lat;
-	real long;
+  string4  sic_code;
+	string2	 source; //Added
+	string12 bdid;
+	string4  addr_type;
+	real 		 lat;
+	real 		 long;
 END;
 r getll(hri_base_file le) :=
 TRANSFORM
@@ -39,7 +43,7 @@ p := PROJECT(hri_base_file, getll(LEFT))(~(lat=0 AND long=0));
 export Key_HRI_Sic_Zip_To_Address  := index(p, 
                                        {sic_code, z5:= zip},
                                        {lat,long,
-										prim_range,predir,prim_name,
+																				prim_range,predir,prim_name,
                                         suffix := addr_suffix,postdir,
-	                                   unit_desig,sec_range,city,state,z4:=zip4, bdid, source},
-                                      Data_Services.Data_Location.Prefix('HRI')+'thor_data400::key::hri_sic_zip_to_address_qa');
+																				unit_desig,sec_range,city,state,z4:=zip4, bdid, source},
+																				Data_Services.Data_Location.Prefix('HRI')+'thor_data400::key::hri_sic_zip_to_address_qa');

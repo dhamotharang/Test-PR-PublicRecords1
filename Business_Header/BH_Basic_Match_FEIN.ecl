@@ -1,7 +1,16 @@
-import ut;
+import ut, mdr;
+
+EXPORT BH_Basic_Match_FEIN(
+
+	 dataset(Layout_Business_Header_Temp)	pBH_Basic_Match_NameAddr	= BH_Basic_Match_NameAddr	()
+	,string																pPersistname							= persistnames().BHBasicMatchFEIN													
+	,boolean															pShouldRecalculatePersist	= true													
+
+) :=
+function
 
 // Initialize match file
-BH_File := Business_Header.BH_Basic_Match_NameAddr;
+BH_File := pBH_Basic_Match_NameAddr;
 
 Layout_BH_Match := record
 unsigned6 bdid;             // Seisint Business Identifier
@@ -19,7 +28,8 @@ Layout_BH_Match InitMatchFile(Business_Header.Layout_Business_Header_Temp L) := 
 self := L;
 end;
 
-FEIN_Match := project(BH_File(fein <> 0, zip<>0, prim_name <> '', prim_name not in Bad_Address_List,
+FEIN_Match := project(BH_File(fein <> 0 and ~mdr.sourceTools.SourceIsIRS_5500(source),
+															zip<>0, prim_name <> '', prim_name not in Bad_Address_List,															
                               (integer)prim_range <> 0 or 
                                  (prim_name[1..7] = 'PO BOX ' and
                                  (integer)(prim_name[8..LENGTH((string)prim_name)]) <> 0) or
@@ -56,4 +66,12 @@ ut.MAC_Reduce_Pairs(FEIN_Matches_Dedup, new_rid, old_rid, pflag, Business_Header
 // Patch new BDIDs
 ut.MAC_Patch_Id(BH_File, bdid, FEIN_Matches_Reduced, old_rid, new_rid, BH_File_Patched)
 
-export BH_Basic_Match_FEIN := BH_File_Patched : persist('TEMP::BH_Basic_Match_FEIN');
+BH_Basic_Match_FEIN_persisted := BH_File_Patched : persist(pPersistname);
+
+returndataset := if(pShouldRecalculatePersist = true, BH_Basic_Match_FEIN_persisted
+																										, persists().BHBasicMatchFEIN
+									);
+									
+return returndataset;
+
+end;

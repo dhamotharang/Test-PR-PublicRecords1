@@ -1,16 +1,20 @@
 import header, ut;
 inf := ln_property.Prop_Joined; //+ ln_property.Assessors_as_Deeds;
 
-goodr := inf(fname <> '', lname <> '', length(trim(fname)) > 1,
-			 dt_first_seen > 190000, 
-			 prim_name <> '',
-			 length(trim(mname)) = length(stringlib.StringFilterOut(mname, ' '))
+goodr_ := inf(fname <> '', lname <> '', length(trim(fname)) > 1,prim_name <> '',~(prim_range='' and zip4=''),
+			  length(trim(mname)) = length(stringlib.StringFilterOut(mname, ' ')),jflag3!='P'
 			 );
 
+//Filter IRS Dummy DID's
+goodr := goodr_((string12)did < ln_property.irs_dummy_cutoff);
+											 
 header.Layout_New_Records blankdids(inf l) := transform
 	self.prim_range := header.fixPrimRange(l.prim_range);
 	self.rid        := 0;
 	self.did        := 0;
+	
+	self.jflag3     :='';
+	
 	self            := l;
 end;
 

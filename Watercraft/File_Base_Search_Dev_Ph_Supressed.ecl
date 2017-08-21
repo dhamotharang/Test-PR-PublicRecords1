@@ -4,7 +4,7 @@ import ut;
 //Base search file needs to be reformated before using ut.mac_suppress_by_phonetype because does not accept the casting of did
 Base_File := Watercraft.File_Base_Search_Dev;
 
-Watercraft.Layout_Watercraft_Search_Base_TEMP t_reformat1 (Base_File L):= TRANSFORM
+{Watercraft.Layout_Watercraft_Search_Base, UNSIGNED6 did_temp} t_reformat1 (Base_File L):= TRANSFORM
 	SELF.did_temp := (UNSIGNED6) L.did;
 	SELF := L;
 END;

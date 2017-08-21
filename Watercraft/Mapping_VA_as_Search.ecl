@@ -1,6 +1,8 @@
 import lib_stringlib, watercraft;
 
-file_VA_dedup := dedup(sort(Watercraft.file_VA_clean_in, reg_num, FIRST_NAME, MID, LAST_NAME),reg_num, FIRST_NAME, MID, LAST_NAME); 
+Watercraft.Macro_Clean_Hull_ID(watercraft.file_VA_clean_in, watercraft.Layout_VA_clean_in,hull_clean_in)
+
+file_VA_dedup := dedup(sort(hull_clean_in, reg_num, FIRST_NAME, MID, LAST_NAME),reg_num, FIRST_NAME, MID, LAST_NAME); 
 
 Layout_VA_clean_temp := record
 

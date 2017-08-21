@@ -1,0 +1,14 @@
+FileServices.CreateSuperFile('~thor_data400::key::naturaldisaster_readiness::building::bdid',false);
+FileServices.CreateSuperFile('~thor_data400::key::naturaldisaster_readiness::built::bdid',false);
+FileServices.CreateSuperFile('~thor_data400::key::naturaldisaster_readiness::delete::bdid',false);
+FileServices.CreateSuperFile('~thor_data400::key::naturaldisaster_readiness::father::bdid',false);
+FileServices.CreateSuperFile('~thor_data400::key::naturaldisaster_readiness::grandfather::bdid',false);
+FileServices.CreateSuperFile('~thor_data400::key::naturaldisaster_readiness::prod::bdid',false);
+FileServices.CreateSuperFile('~thor_data400::key::naturaldisaster_readiness::qa::bdid',false);
+FileServices.CreateSuperFile('~thor_data400::key::naturaldisaster_readiness::building::linkid',false);
+FileServices.CreateSuperFile('~thor_data400::key::naturaldisaster_readiness::built::linkid',false);
+FileServices.CreateSuperFile('~thor_data400::key::naturaldisaster_readiness::delete::linkid',false);
+FileServices.CreateSuperFile('~thor_data400::key::naturaldisaster_readiness::father::linkid',false);
+FileServices.CreateSuperFile('~thor_data400::key::naturaldisaster_readiness::grandfather::linkid',false);
+FileServices.CreateSuperFile('~thor_data400::key::naturaldisaster_readiness::prod::linkid',false);
+FileServices.CreateSuperFile('~thor_data400::key::naturaldisaster_readiness::qa::linkid',false);

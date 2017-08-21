@@ -1,7 +1,7 @@
 IMPORT iesp;
 
 EXPORT Common_Deltabase(
-  DATASET(FraudShared_Services.Layouts.batch_search_rec) flatInput,
+  DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
   DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) recs_pulled,
   DATASET(iesp.frauddefensenetwork.t_FDNFileType) ds_file_types_in,
   integer DeltaUse = 0,
@@ -9,7 +9,7 @@ EXPORT Common_Deltabase(
 ) := FUNCTION
 
   //Calling deltabase if deltabase = 1
-  deltabaseResult := IF(DeltaUse = 1, FraudShared_Services.deltabase(flatInput, recs_pulled, ds_file_types_in, DeltaStrict));  
+  deltabaseResult := IF(DeltaUse = 1, FraudShared_Services.deltabase(ds_batch_in, recs_pulled, ds_file_types_in, DeltaStrict));  
 
   //Appending Keys and Deltabase results                
   AppendDeltaKey := IF(EXISTS(deltabaseResult),
@@ -17,4 +17,5 @@ EXPORT Common_Deltabase(
     recs_pulled);
 
   RETURN AppendDeltaKey;
+
 END;

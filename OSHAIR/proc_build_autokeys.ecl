@@ -3,7 +3,7 @@ autokey,doxie,ut,business_header,Business_Header_SS,RoxieKeyBuild;
 
 export proc_build_autokeys(string filedate) := function
 
-#workunit ('name', 'build OSHAIR autokeys');
+// #workunit ('name', 'build OSHAIR autokeys');
 dbase := OSHAIR.file_out_inspection_cleaned (Continuation_Flag = ''
                                           OR Continuation_Flag = '1');
 

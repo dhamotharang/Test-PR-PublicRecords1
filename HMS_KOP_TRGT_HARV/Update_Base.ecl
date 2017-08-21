@@ -1,7 +1,7 @@
 IMPORT Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
 Header, Header_Slimsort, didville, DID_Add,Business_Header_SS, NID, AID, watchdog,
 VersionControl,lib_fileservices,Health_Provider_Services,Health_Facility_Services,
-BIPV2_Company_Names, HealthCareFacility,hms_kop_trgt_harv,Scrubs,HealthCare_Provider_Header;
+BIPV2_Company_Names, HealthCareFacility,hms_kop_trgt_harv,Scrubs;
 
 
 EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
@@ -18,17 +18,18 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 			cleanNames := Fn_Clean.Parsed_name(std_input, hms_kop_trgt_harv.Layouts.LAYOUT_BASE, First, Middle, Last, Suffix);//Clean_name(std_input,hms_kop_trgt_harv.Layouts.layout_base,0)
 									// :PERSIST('~thor400_data::persist::hms_kop_trgt_harv::stlic_names');
 			
+/* 			HMS_KOP_TRGT_HARV.LAYOUTS.LAYOUT_BASE resetZip(HMS_KOP_TRGT_HARV.LAYOUTS.LAYOUT_BASE L) := transform
+   						self.zip := '';
+   						self := L;
+   			end;
+   			
+   			cleanNames := project(cleanNames_temp,resetZip(LEFT));
+*/
+			
 			cleanAddr :=  Fn_Clean.Address(cleanNames); //Clean_addr(UniqueAddresses,hms_kop_trgt_harv.Layouts.layout_base)
 														// :PERSIST('~thor400_data::persist::hms_kop_trgt_harv::stlic_uniq_addr');	
 			
-			
-/* 			base_and_update := IF(nothor(FileServices.GetSuperFileSubCount(hms_kop_trgt_harv.Filenames(filedate, pUseProd).koptrgtharv_lBaseTemplate_built)) = 0
-      												 ,cleanAddr
-      												 ,cleanAddr + hist_base
-   													 );
-*/
-						
-													 
+															 
 	 		base_f := DISTRIBUTE(cleanAddr); //DISTRIBUTE(base_and_update); 
 			
 			new_base_s := SORT(base_f,
@@ -137,45 +138,44 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
       									,dLnpidOut,false,38 //38 for providers
       				);
 			
-/* 			with_lnpid:=dLnpidOut(lnpid>0);
-   			no_lnpid:=dLnpidOut(lnpid=0);
-   			
-    			Health_Facility_Services.mac_get_best_lnpid_on_thor (
-      									no_lnpid
-      									,lnpid
-      									,											
-      									,prim_range
-      									,prim_name
-      									,sec_range
-      									,p_city_name
-      									,st
-      									,zip
-      									,//sanc_tin
-      									,//tin1
-      									,phone1
-      									,fax1
-      									,stlic_state
-      									,stlic_number
-      									,dea1
-      									,//group_key
-      									,npi
-      									,//clia_num
-      									,//medicare_fac_num
-      									,//Input_MEDICAID_NUMBER
-      									,//ncpdp_id
-      									,taxonomy_code
-      									,
-      									,
-      									,
-      									,result
-      									,false
-      									,30 //30 for facilities
-      									);
-*/
+			with_lnpid:=dLnpidOut(lnpid>0);
+			no_lnpid:=dLnpidOut(lnpid=0);
+			
+ 			Health_Facility_Services.mac_get_best_lnpid_on_thor (
+   									no_lnpid
+   									,lnpid
+   									,											
+   									,prim_range
+   									,prim_name
+   									,sec_range
+   									,p_city_name
+   									,st
+   									,zip
+   									,//sanc_tin
+   									,//tin1
+   									,phone1
+   									,fax1
+   									,stlic_state
+   									,stlic_number
+   									,dea1
+   									,//group_key
+   									,npi
+   									,//clia_num
+   									,//medicare_fac_num
+   									,//Input_MEDICAID_NUMBER
+   									,//ncpdp_id
+   									,taxonomy_code
+   									,
+   									,
+   									,
+   									,result
+   									,false
+   									,30 //30 for facilities
+   									);
 
 			
 		
-				final_base := dLnpidOut;//result + with_lnpid;
+				final_base := with_lnpid + result;
 				
 				
 				RETURN final_base;						

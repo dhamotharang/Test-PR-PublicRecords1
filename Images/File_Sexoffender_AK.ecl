@@ -1,1 +1,1 @@
-export File_Sexoffender_AK := common_so('AK','~images::in::sexoffender_ak') : persist('images::base::sexoffender_AK');
+export File_Sexoffender_AK := common_so('AK','~images::in::sexoffender_ak_all') : persist('images::base::sexoffender_AK');

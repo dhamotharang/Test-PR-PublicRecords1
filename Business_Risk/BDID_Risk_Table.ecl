@@ -1,4 +1,4 @@
-import ut, Business_Header, Business_Header_SS, Patriot, did_add;
+import ut, Business_Header, Business_Header_SS, Patriot, did_add, Std;
 
 bdid_stats := Business_Risk.BDID_Table;
 
@@ -142,7 +142,7 @@ bdid_risk_table_ofac := join(bdid_risk_table_init,
 					         left outer,
 					         lookup);
 
-bh_best := Business_Header.File_Business_Header_Best;
+bh_best := Business_Header.Files().Base.Business_Header_Best.built;
 
 os(STRING s) := IF(s = '', '', TRIM(s) + ' ');
 
@@ -155,7 +155,7 @@ self.best_addr1 :=
 			os(r.prim_name) +
 			os(r.addr_suffix) +
 			os(r.postdir) +
-				if(ut.tails(r.prim_name, os(r.unit_desig) + os(r.sec_range)),
+				if(Std.Str.EndsWith(r.prim_name, os(r.unit_desig) + os(r.sec_range)),
 					'',
 					os(r.unit_desig) + os(r.sec_range));
 
@@ -204,4 +204,4 @@ end;
 							 
 bdid_risk_table_score := project(bdid_risk_table_best, CalcScore(left));
 
-export BDID_Risk_Table := bdid_risk_table_score : persist('TEMP::bdid_profile_risk_table');
+export BDID_Risk_Table := bdid_risk_table_score : persist('~thor_data400::persist::business_risk::bdid_risk_table');

@@ -1,11 +1,14 @@
 //This is the code to execute in a builder window
-#workunit('name','BIPV2_ProxID_mj6.BWR_Hygiene - Hygiene & Stats - SALT V3.0 B1');
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','BIPV2_ProxID_mj6.BWR_Hygiene - Hygiene & Stats - SALT V3.0 Beta 2');
 IMPORT BIPV2_ProxID_mj6,SALT30;
 // First create an instantiated hygiene module
   infile := BIPV2_ProxID_mj6.In_DOT_Base;
   h := BIPV2_ProxID_mj6.Hygiene(infile);
   p := h.AllProfiles; // Detailed profile of every field
   OUTPUT(h.Summary('SummaryReport'),ALL);
+  OUTPUT(h.SourceCounts,ALL,NAMED('SourceCounts'));
+  OUTPUT(h.CrossLinkingPotential,ALL,NAMED('CrossLinkingPotential'));
   OUTPUT(h.invSummary,NAMED('InvertedSummary'),ALL);
   OUTPUT(p,NAMED('AllProfiles'),ALL); // Detailed profile of every field
   OUTPUT(h.Correlations,NAMED('Correlations'),ALL); // Which fields are related to which other fields
@@ -40,23 +43,23 @@ IMPORT BIPV2_ProxID_mj6,SALT30;
    Examples := 10;
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source,cnp_name,Examples),NAMED('cnp_nameBysource'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source,cnp_number,Examples),NAMED('cnp_numberBysource'));
-  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,prim_range,Examples),NAMED('prim_rangeBysource'));
-  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,prim_name_derived,Examples),NAMED('prim_name_derivedBysource'));
-  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,st,Examples),NAMED('stBysource'));
-  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,zip,Examples),NAMED('zipBysource'));
+  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,active_duns_number,Examples),NAMED('active_duns_numberBysource'));
+  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,active_enterprise_number,Examples),NAMED('active_enterprise_numberBysource'));
+  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,active_domestic_corp_key,Examples),NAMED('active_domestic_corp_keyBysource'));
+  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,hist_enterprise_number,Examples),NAMED('hist_enterprise_numberBysource'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source,hist_duns_number,Examples),NAMED('hist_duns_numberBysource'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source,hist_domestic_corp_key,Examples),NAMED('hist_domestic_corp_keyBysource'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source,foreign_corp_key,Examples),NAMED('foreign_corp_keyBysource'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source,unk_corp_key,Examples),NAMED('unk_corp_keyBysource'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source,ebr_file_number,Examples),NAMED('ebr_file_numberBysource'));
-  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,active_duns_number,Examples),NAMED('active_duns_numberBysource'));
-  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,active_enterprise_number,Examples),NAMED('active_enterprise_numberBysource'));
-  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,active_domestic_corp_key,Examples),NAMED('active_domestic_corp_keyBysource'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source,company_fein,Examples),NAMED('company_feinBysource'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source,company_phone,Examples),NAMED('company_phoneBysource'));
+  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,prim_range,Examples),NAMED('prim_rangeBysource'));
+  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,prim_name_derived,Examples),NAMED('prim_name_derivedBysource'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source,sec_range,Examples),NAMED('sec_rangeBysource'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source,v_city_name,Examples),NAMED('v_city_nameBysource'));
-  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,hist_enterprise_number,Examples),NAMED('hist_enterprise_numberBysource'));
+  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,st,Examples),NAMED('stBysource'));
+  //  OUTPUT(SALT30.MAC_CrossTab(infile,source,zip,Examples),NAMED('zipBysource'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source,company_csz,Examples),NAMED('company_cszBysource'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source,company_addr1,Examples),NAMED('company_addr1Bysource'));
   //  OUTPUT(SALT30.MAC_CrossTab(infile,source,company_address,Examples),NAMED('company_addressBysource'));

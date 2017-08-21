@@ -13,29 +13,29 @@ EXPORT BusinessCreditReports_files := MODULE
 //===============================================
 
   file_prefix := Data_Services.Data_location.Prefix('BCRTestSeed') + 'thor_data400';		
-	middle_name := 'testseed::businesscreditreport';
+	middle_name := 'testseed_';
 
 	
 		fn := case (section,
-									'InputEcho'						=> file_prefix + '::in::' + middle_name + '::inputecho',           
-									'BestInfo'        		=> file_prefix + '::in::' + middle_name + '::bestinfo',
-									'Scoring'	      			=> file_prefix + '::in::' + middle_name + '::scoring',
-									'Summary'		          => file_prefix + '::in::' + middle_name + '::summary',
-									'OwnerGuarantor'			=> file_prefix + '::in::' + middle_name + '::ownguartor',
-									'TopBusBankr'			  	=> file_prefix + '::in::' + middle_name + '::bankruptcy',
-									'TopBusLiens'				  => file_prefix + '::in::' + middle_name + '::topbusliens',
-									'TopBusUCC'				  	=> file_prefix + '::in::' + middle_name + '::topbusucc',
-									'TopBusProprty'			  => file_prefix + '::in::' + middle_name + '::topbusprop',
-									'TopBusMVehicle'      => file_prefix + '::in::' + middle_name + '::topbusmvehicle',
-									'TopBusWCraft'		    => file_prefix + '::in::' + middle_name + '::topbuswcraft',
-									'TopBusACraft'		    => file_prefix + '::in::' + middle_name + '::topbusacraft',
-									'TopBusLicense'	    	=> file_prefix + '::in::' + middle_name + '::topbuslicense',
-									'TopBusIncorp'        => file_prefix + '::in::' + middle_name + '::topbusincorp',
-									'TopBusOperations'    => file_prefix + '::in::' + middle_name + '::topbusoper',
-									'TopBusParent'        => file_prefix + '::in::' + middle_name + '::topbusparent',
-									'TopBusConnected'     => file_prefix + '::in::' + middle_name + '::topbusconnect',
-									'TopBusContacts'      => file_prefix + '::in::' + middle_name + '::topbuscontact',
-									'TopBusFinal'         => file_prefix + '::in::' + middle_name + '::topbusactivity',
+									'InputEcho'							=> file_prefix + '::base::' + middle_name + 'inputecho',           
+									'BestInfo'        					=> file_prefix + '::base::' + middle_name + 'bestinfo',
+									'Scoring'	      						=> file_prefix + '::base::' + middle_name + 'scoring',
+									'Summary'		          		=> file_prefix + '::base::' + middle_name + 'summary',
+									'OwnerGuarantor'			=> file_prefix + '::base::' + middle_name + 'ownguartor',
+									'TopBusBankr'			  	=> file_prefix + '::base::' + middle_name + 'bankruptcy',
+									'TopBusLiens'				  => file_prefix + '::base::' + middle_name + 'topbusliens',
+									'TopBusUCC'				  => file_prefix + '::base::' + middle_name + 'topbusucc',
+									'TopBusProprty'			  => file_prefix + '::base::' + middle_name + 'topbusprop',
+									'TopBusMVehicle'     => file_prefix + '::base::' + middle_name + 'topbusmvehicle',
+									'TopBusWCraft'		    => file_prefix + '::base::' + middle_name + 'topbuswcraft',
+									'TopBusACraft'		    => file_prefix + '::base::' + middle_name + 'topbusacraft',
+									'TopBusLicense'	    	  => file_prefix + '::base::' + middle_name + 'topbuslicense',
+									'TopBusIncorp'         => file_prefix + '::base::' + middle_name + 'topbusincorp',
+									'TopBusOperations'   => file_prefix + '::base::' + middle_name + 'topbusoper',
+									'TopBusParent'        	=> file_prefix + '::base::' + middle_name + 'topbusparent',
+									'TopBusConnected'    => file_prefix + '::base::' + middle_name + 'topbusconnect',
+									'TopBusContacts'      => file_prefix + '::base::' + middle_name + 'topbuscontacts',
+									'TopBusFinal'         		=> file_prefix + '::base::' + middle_name + 'topbusactivity',
 									'' );
 		if( fn='', FAIL('Unknown Section') );
 		return fn;

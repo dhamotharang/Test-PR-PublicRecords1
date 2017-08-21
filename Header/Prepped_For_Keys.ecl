@@ -1,7 +1,4 @@
-import address, doxie, doxie_build, ut, watchdog;
-
-//h := dataset('~thor_data400::Base::HeaderKey_Building',header.Layout_Header,flat);
-//  Bug 12065, use blocked data filter on header instead of raw data
+import address, doxie, doxie_build, header_services, ut, watchdog, prte, PRTE2_Header;
 h := doxie_build.file_header_building; 
 
 t1 := table(h,layout_prep_for_keys);
@@ -79,7 +76,18 @@ j2 := join(jforjoin, bffj,
 		local, left outer, keep(1));
 
 //here j2 is distributed by 'did'
-j3 := ProcessCompoundNames (j2);
+j3_prep := ProcessCompoundNames (j2);
 
-export Prepped_For_Keys := j3
-	: persist('Prepped_For_Keys');
+header.mac_mod_sup(j3_prep, j3) ;
+
+// the result is distributed by did;
+// if this is changed in the future, the following (at least) should be modified correspondingly:
+//   header.key_phonetic_lname
+//   doxie.Key_Header_DTS_Address
+//   doxie.Key_Header_DTS_FnameSmall
+//   doxie.Key_Header_DTS_StreetZipName
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export Prepped_For_Keys := prte2_header.files.header_prep_for_keys;
+#ELSE
+export Prepped_For_Keys := j3 : persist('Prepped_For_Keys');
+#END

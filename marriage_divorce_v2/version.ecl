@@ -1,1 +1,2 @@
-export version := '20070608';
+import ut;
+export version := ut.GetDate : stored('ProcessDate');

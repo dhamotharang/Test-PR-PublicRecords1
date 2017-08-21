@@ -1,5 +1,5 @@
 export Key_PersonHeader_FLST := MODULE
-import SALT20,ut,doxie;
+import SALT20,ut;
 import PersonLinkingADL2; // Import modules for  attribute definitions
 shared h := CandidatesForKey;//The input file - distributed by DID
 layout := record // project out required fields
@@ -42,7 +42,7 @@ layout note_init3(layout le,Specificities(File_PersonHeader).MNAME_values_persis
   self := le;
 end;
 DataForKey3 := join(DataForKey0,Specificities(File_PersonHeader).MNAME_values_persisted(length(trim(MNAME))=1),left.MNAME[1]=right.MNAME[1],note_init3(left,right),lookup,left outer); // Append specificities for initials of MNAME
-export Key := index(DataForKey0,,ut.Data_Location.Person_header+'thor_data400::key::PersonLinkingADL2V3PersonHeaderFLSTRefs_' + doxie.version_superkey);
+export Key := index(DataForKey3,,PersonLinkingADL2V3.Filename_keys.kFLST);
 export RawFetch( typeof(h.FNAME) param_FNAME, typeof(h.LNAME) param_LNAME, typeof(h.STATE) param_STATE, typeof(h.MNAME) param_MNAME) := 
     STEPPED( LIMIT( Key(
           ( FNAME = param_FNAME AND FNAME_PreferredName = PersonLinkingADL2.FNPreferName(param_FNAME)  AND param_FNAME <> (TYPEOF(FNAME))'' )

@@ -1,6 +1,14 @@
 IMPORT Business_Header, ut;
 
-bh := Business_Header.File_Business_Header_Base(phone != 0);
+export CompanyName_Phone(
+
+	 dataset(Business_Header.Layout_Business_Header_Base	)	pBusinessHeaders	= Business_Header.Files().Base.Business_Headers.Built
+	,dataset(Business_Header.Layout_BH_Best								)	pBH_Best					= Business_Header.Files().Base.Business_Header_Best.Built
+	,string																									pPersistName			= business_header.persistnames().CompanyNamePhone
+
+) :=
+function
+bh := business_header.filters.keys.business_headers(pBusinessHeaders)(phone != 0);
 
 // Project to slim record.
 layout_slim := RECORD
@@ -77,12 +85,16 @@ ss_cn_p get_best_addr(ss_cn_p L, business_header.File_Business_Header_Best R) :=
 end;
 
 outfinal := join(ss_cn_p,
-			  business_header.File_Business_Header_Best,
+			  pBH_Best,
 				left.bdid = right.bdid,
 			  get_best_addr(LEFT,RIGHT),
 			  left outer, hash);
 
 
-EXPORT CompanyName_Phone := 
+CompanyName_Phone_persisted := 
 	DISTRIBUTE(outfinal, HASH(phone))(cn_p_bdids > 0 and cn_p_bdids < 100)
-		: PERSIST('adTEMP::BH_SS_cn_p');
+		: PERSIST(pPersistName);
+
+return CompanyName_Phone_persisted;
+
+end;

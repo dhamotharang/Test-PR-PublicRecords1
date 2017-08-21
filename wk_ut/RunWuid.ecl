@@ -35,6 +35,7 @@ EXPORT RunWuid(
   ,pUniqueOutput      = '\'\''
   ,pPollingFrequency  = '\'5\''
   ,pForceRun          = 'false'                               // if true, then it will kick off the wuid even if it has already run.  FALSE will skip it if it has already run
+  ,pForceSkip         = 'false'                               // if true, then it will kick off the wuid even if it has already run.  FALSE will skip it if it has already run
 
 ) := 
 functionmacro
@@ -56,9 +57,13 @@ functionmacro
                   );
 
   reruns := parallel(
-                     output('<a href="http://' + localesp + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + pWaitEvent + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Rerun' + '%3C%2FAdvice%3E%3C%2FEvent%3E">Rerun Workunit</a>' ,named('Rerun__html'),overwrite)
-                    ,output('<a href="http://' + localesp + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + pWaitEvent + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Skip'  + '%3C%2FAdvice%3E%3C%2FEvent%3E">Skip Workunit</a>'  ,named('Skip__html' ),overwrite)
-                    ,output('<a href="http://' + localesp + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + pWaitEvent + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Fail'  + '%3C%2FAdvice%3E%3C%2FEvent%3E">Fail Workunit</a>'  ,named('Fail__html' ),overwrite)                              
+                     output('<a href="' + wk_ut.Push_Event_Result_Link(pWaitEvent,'Rerun',localesp) + '">Rerun Workunit</a>',named('Rerun__html'),overwrite)
+                    ,output('<a href="' + wk_ut.Push_Event_Result_Link(pWaitEvent,'Skip' ,localesp) + '">Skip Workunit</a>' ,named('Skip__html' ),overwrite)
+                    ,output('<a href="' + wk_ut.Push_Event_Result_Link(pWaitEvent,'Fail' ,localesp) + '">Fail Workunit</a>' ,named('Fail__html' ),overwrite)                              
+
+                     // output('<a href="http://' + localesp + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + pWaitEvent + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Rerun' + '%3C%2FAdvice%3E%3C%2FEvent%3E">Rerun Workunit</a>' ,named('Rerun__html'),overwrite)
+                    // ,output('<a href="http://' + localesp + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + pWaitEvent + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Skip'  + '%3C%2FAdvice%3E%3C%2FEvent%3E">Skip Workunit</a>'  ,named('Skip__html' ),overwrite)
+                    // ,output('<a href="http://' + localesp + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + pWaitEvent + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Fail'  + '%3C%2FAdvice%3E%3C%2FEvent%3E">Fail Workunit</a>'  ,named('Fail__html' ),overwrite)                              
                   );
            
 // myevent := '<a href="http://' + 'prod_esp.br.seisint.com' + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + 'VernEvent' + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Rerun' + '%3C%2FAdvice%3E%3C%2FEvent%3E">Rerun Workunit</a>';
@@ -68,12 +73,12 @@ functionmacro
 //  output('<a href="/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=W20150330-165839">W20150330-165839</a>'                ,named('RelativeWU__html'));   //works
   
   // -- Add this code to the Child/Iteration so you know what wuid kicked it off.
-  outputRunnerwuidcode  := 'output(\'<a href="http://' + localesp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit + '#/stub/Summary">Parent Workunit</a>\' ,named(\'Parent_Wuid__html\'));\n';
+  // outputRunnerwuidcode  := 'output(\'<a href="http://' + localesp + ':8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + workunit + '#/stub/Summary">Parent Workunit</a>\' ,named(\'Parent_Wuid__html\'));\n';
 
 // http://prod_esp.br.seisint.com:8010/?inner=../WsWorkunits/WUInfo%3FWuid%3DW20150331-151832#/stub/Main-DL/Activity-DL/DetailW20150331x101550-DL/Summary
 // http://10.241.3.241:8010/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=W20150330-165839#/stub/Summary
 
-  createworkunit        := wk_ut.CreateWuid_Raw( outputRunnerwuidcode + ECL  ,pcluster ,localesp ); 
+  createworkunit        := wk_ut.CreateWuid_Raw(/* outputRunnerwuidcode + */ECL  ,pcluster ,localesp ); 
   
   // -- Number of times this wuid called
   try_Number            := (unsigned)wk_ut.get_Scalar_Result(workunit,'Try_Number') + 1;
@@ -97,7 +102,11 @@ functionmacro
     ,localesp
   );
 
-  clickablewuid         := '<a href="/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + Child_Wuid + '">' + Child_Wuid + '</a>';
+  clickablewuid           := '<a href="/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + Child_Wuid + '">' + Child_Wuid + '</a>';
+  
+  Child_watcher_Wuid            := wk_ut.get_Scalar_Result(workunit ,pUniqueOutput + 'Watcher_for_' + pversion + '_' + piteration);
+
+  clickableWatcher_wuid   := '<a href="/esp/files/stub.htm?Widget=WUDetailsWidget&Wuid=' + Child_watcher_Wuid + '">' + Child_watcher_Wuid + '</a>';
 
   StartDataset          := dataset([{'',Child_Wuid,'','','',piteration,pversion,'',''}],wk_ut.layouts.wks_slim);
   
@@ -108,6 +117,7 @@ functionmacro
       ,output(clickablewuid                                     ,named(pUniqueOutput + 'Iteration_'   + pversion + '_' + piteration + '__html'),overwrite)
       ,if(pOutputFilename != '' and not DoesFileExist ,wk_ut.Update_File(StartFilename,StartExistingDataset + StartDataset,false,true,'wuid'))
       ,output(createwatcherworkunit                             ,named(pUniqueOutput + 'Watcher_for_' + pversion + '_' + piteration           ),overwrite)
+      ,output(clickableWatcher_wuid                             ,named(pUniqueOutput + 'Watcher_for_' + pversion + '_' + piteration + '__html'),overwrite)
       ,output(pWaitEvent                                        ,named(pUniqueOutput + 'NotifyEvent_' + pversion + '_' + piteration           ),overwrite)
   );
   
@@ -148,9 +158,9 @@ functionmacro
                             + iff(getstate in ['failed','aborted']
                                 , '\nThis workunit ' + getstate + '.  I am awaiting your advice on what to do next.\n'
                                 + 'Here are your options(Simply click the link beside your choice to advise the process.):\n\n'
-                                + 'Rerun iteration              : http://' + localesp + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + pWaitEvent + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Rerun' + '%3C%2FAdvice%3E%3C%2FEvent%3E\n'
-                                + 'Move on to the next iteration: http://' + localesp + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + pWaitEvent + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Skip'  + '%3C%2FAdvice%3E%3C%2FEvent%3E\n'
-                                + 'Fail workunit                : http://' + localesp + ':8010/WsWorkunits/WUPushEvent?ver_=1.48&.EventName=' + pWaitEvent + '&.EventText=%3CEvent%3E%3CAdvice%3E' + 'Fail'  + '%3C%2FAdvice%3E%3C%2FEvent%3E\n'                                
+                                + 'Rerun iteration              : ' + wk_ut.Push_Event_Result_Link(pWaitEvent,'Rerun',localesp) + '\n'
+                                + 'Move on to the next iteration: ' + wk_ut.Push_Event_Result_Link(pWaitEvent,'Skip' ,localesp) + '\n'
+                                + 'Fail workunit                : ' + wk_ut.Push_Event_Result_Link(pWaitEvent,'Fail' ,localesp) + '\n'                                
                               ,'')
                   );
 
@@ -170,7 +180,7 @@ functionmacro
              ,if(pOutputFilename != ''  ,wk_ut.Update_File(temp_wuid_bucket_fname,dWUDetails + iter_Child_Wuids,false,true,'wuid'))
              ,output(dWUDetails + iter_Child_Wuids,named('Workunits'),EXTEND    )
              ,output('Get Iteration Info'         ,named('LastWork' ),overwrite )
-             ,if(getstate in ['completed']         
+             ,if(getstate in ['completed'] or pForceSkip = true        
                 ,sequential(
                    iff(pOutputFilename != ''
                       ,sequential(
@@ -284,13 +294,13 @@ functionmacro
   doit := sequential(
      output(wk_ut.getTimeDate()                             ,named('DateTime'         ),overwrite)
     ,output(pParentWuid                                     ,named('ParentWuid'       ),overwrite)
-    ,output(clickable_parent_wuid                           ,named('ParentWuid__html' ),overwrite) //so can click back and forth between the parent and child
+    // ,output(clickable_parent_wuid                           ,named('ParentWuid__html' ),overwrite) //so can click back and forth between the parent and child
     ,output((unsigned)TimesCalled + 1                       ,named('TimesCalled'      ),overwrite)
-    ,output(Advice                                          ,named('Advice'           ),overwrite) // master will get this result to see what happened with the child
+    ,output(if(pForceSkip = false,Advice,'skip')            ,named('Advice'           ),overwrite) // master will get this result to see what happened with the child
     ,output(if((unsigned)TimesCalled + 1 > 1, childstate,''),named('ChildStatus'      ),overwrite)
     ,map(
        (LastWork in ['Get Iteration Info','Sending email--default'] and regexfind('run'       ,Advice,nocase)) or LastWork in ['','[undefined]']      => kickWuid           //Kick off new wuid(first time or rerun)
-      , LastWork =   'Kicked Off Iteration'                       /*and Advice = ''*//*need to do this no matter what*/                               => Gather_Child_Info  //Gather info on wuid after completed/failed/aborted.  if completed, fail this wuid and notify parent.
+      , LastWork =   'Kicked Off Iteration'                         or  trim(wk_ut.get_Scalar_Result(workunit ,'ChildStatus')) = 'completed'          => Gather_Child_Info  //Gather info on wuid after completed/failed/aborted.  if completed, fail this wuid and notify parent.
       , LastWork =   'Get Iteration Info'                           and regexfind('fail|skip' ,Advice,nocase)                                         => failOrSkip         //if advice to skip or fail, notify parent.
       ,                                                                                                                                                  default            //send default email.  shouldn't happen, but if does no biggie.
     )  

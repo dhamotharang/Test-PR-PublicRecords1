@@ -26,11 +26,11 @@ EXPORT LIB_RiskView_Models (
 	SHARED customInputs			:= arguments.Custom_Inputs;
 	
 	/* Model Validation -- Use this when trying to validate a new model through the RiskView.Search_Service */
-	 EXPORT TurnOnValidation := FALSE; // When TRUE allows for Layout_Debug to be OUTPUT in the Search_Service
+  EXPORT TurnOnValidation := FALSE; // When TRUE allows for Layout_Debug to be OUTPUT in the Search_Service
 	//EXPORT TurnOnValidation := TRUE; // When TRUE allows for Layout_Debug to be OUTPUT in the RiskView.Search_Service
 	
 	
-	EXPORT ValidatingModel := Models.RVG1705_1_0 (BocaShell); // Change this to the model you are tring to validate
+	EXPORT ValidatingModel := Models.RVB1610_1_0 (BocaShell); // Change this to the model you are tring to validate
 	
 	
 	// Version 4.0
@@ -133,7 +133,7 @@ EXPORT LIB_RiskView_Models (
 																			{'RVG1702_1', MType_G+'RVG1702_1', calcIndex( 61), '0-999', 0}, //Kinecta
 																			{'RVG1705_1', MType_G+'RVG1705_1', calcIndex( 62), '0-999', 0}, //Telecheck Gaming
 																			{'RVC1609_1', MType_G+'RVC1609_1', calcIndex( 63), '0-999', 0}, //TJR
-																			
+																			{'RVB1610_1', MType_B+'RVB1610_1', calcIndex( 64), '0-999', 0}, //USAA
 																		// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 																			{'RVA9999_9', MType_A+'RVA9999_9', 0, '0-999', 0},
 																			{'RVB9999_9', MType_B+'RVB9999_9', 0, '0-999', 0},
@@ -171,6 +171,7 @@ EXPORT LIB_RiskView_Models (
 											'RVC1609_1' => UNGROUP(Models.RVC1609_1_0(BocaShell)),
 											'RVG1702_1' => UNGROUP(Models.RVG1702_1_0(BocaShell)),
 											'RVG1705_1' => UNGROUP(Models.RVG1705_1_0(BocaShell)),
+											'RVB1610_1' => UNGROUP(Models.RVB1610_1_0(BocaShell)),
 											
 											
 											// ----------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-IMPORT Business_Header, ut,mdr;
+IMPORT Business_Header, codes, ut, mdr;
 
 export fGov_Phones_As_Business_Header(dataset(Layout_Gov_Phones_Base) pBasefile) :=
 function
@@ -14,8 +14,8 @@ function
 		SELF.dt_last_seen := (UNSIGNED4) l.record_date;    // Date record last (most recently seen) at Seisint
 		SELF.dt_vendor_first_reported := (UNSIGNED4) l.record_date;
 		SELF.dt_vendor_last_reported := (UNSIGNED4) l.record_date;
-		 SELF.company_name := if(l.state_origin = '' or StringLib.StringFind(Stringlib.StringToUpperCase(l.agency), trim(ut.St2Name(l.state_origin)), 1) > 0, Stringlib.StringToUpperCase(l.agency),
-								trim(ut.St2Name(l.state_origin)) + ' ' + Stringlib.StringToUpperCase(l.agency));
+		SELF.company_name := if(l.state_origin = '' or StringLib.StringFind(Stringlib.StringToUpperCase(l.agency), trim(codes.St2Name(l.state_origin)), 1) > 0, Stringlib.StringToUpperCase(l.agency),
+								trim(codes.St2Name(l.state_origin)) + ' ' + Stringlib.StringToUpperCase(l.agency));
 		SELF.city := l.v_city_name;
 		SELF.state := l.st;
 		SELF.zip := (UNSIGNED3) l.zip;
@@ -35,8 +35,8 @@ function
 	SELF.dt_first_seen := 
 				ut.EarliestDate(ut.EarliestDate(L.dt_first_seen,R.dt_first_seen),
 				ut.EarliestDate(L.dt_last_seen,R.dt_last_seen));
-	SELF.dt_last_seen := ut.LatestDate(L.dt_last_seen,R.dt_last_seen);
-	SELF.dt_vendor_last_reported := ut.LatestDate(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
+	SELF.dt_last_seen := max(L.dt_last_seen,R.dt_last_seen);
+	SELF.dt_vendor_last_reported := max(L.dt_vendor_last_reported, R.dt_vendor_last_reported);
 	SELF.dt_vendor_first_reported := ut.EarliestDate(L.dt_vendor_first_reported, R.dt_vendor_first_reported);
 	SELF.company_name := IF(L.company_name = '', R.company_name, L.company_name);
 	SELF.group1_id := IF(L.group1_id = 0, R.group1_id, L.group1_id);

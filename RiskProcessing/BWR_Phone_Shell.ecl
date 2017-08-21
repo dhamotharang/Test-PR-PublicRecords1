@@ -1,3 +1,4 @@
+//REMOVE DID field in layout and getting populated in soap input if wanting apples to apples with other scripts as NOT all scripts are sending this in.
 #WORKUNIT('name', 'Phone_Shell');
 
 IMPORT Phone_Shell, Relocations, Risk_Indicators, RiskWise, UT;
@@ -9,20 +10,26 @@ eyeball := 250; // Number of sample records to view
 RoxieIP := RiskWise.Shortcuts.Prod_Batch_Neutral; // Production Roxie
 // RoxieIP := RiskWise.Shortcuts.Staging_Neutral_RoxieIP; // Staging/Cert Roxie
 
-Threads := 33; // Number of Parallel threads to SOAPCALL with
+Threads := 30; // Number of Parallel threads to SOAPCALL with
 
 /* *****************************************
  * Input/Output File Names                 *
  *******************************************/
-InputFile := ut.foreign_prod + 'jpyon::in::sprint_1552_in';
-OutputFile := '~bpahl::out::phone_shell';
+//these WU will have the input data: PROD W20150702-110536 (First Party) and PROD W20150702-110602 (Third Party)
+//InputFile := '~dbraun::in::phone_shell_input_testcases';
+InputFile := '~bweiner::in::jan16_3p_pii';
+//InputFile := ut.foreign_prod + 'jpyon::in::sprint_1552_in';
+OutputFile := '~akoenen::out::phone_shell';
 
 /* *****************************************
  * Phone Shell Input Options               *
  *******************************************/
-DataRestrictionMask := '000000000000000000';
+DataRestrictionMask := '0000000000000000000000000'; //If bit 24 is 1 that means NO Equifax data can be used
+//set Premium A flag here
+PremiumAFlag := true;
+
 EnableInsuranceAttributes := TRUE; // Should probably always be TRUE - turns on the Insurance Verification Attributes
-ScoringModelName := 'PHONESCORE_V2'; // Set to BLANK to turn off the scoring model
+ScoringModelName := 'COLLECTIONSCORE_V3';//'PHONESCORE_V2' = OLD phone model; // Set to BLANK to turn off the scoring model
 Score_Threshold_In := 245;
 
 /* *****************************************
@@ -40,13 +47,12 @@ EnableMetronet_Experian_Gateway := FALSE; // Set to TRUE to run the Metronet Exp
 Metronet_Experian_Gateway_URL := '';
 // Metronet_Experian_Gateway_URL := 'http://rw_score_dev:Password01@10.176.68.164:7726/WsGateway?ver_=1.043';
 
-
-
 prii_layout := RECORD
      STRING Account;
      STRING FirstName;
      STRING MiddleName;
      STRING LastName;
+		 STRING SuffixName;
      STRING StreetAddress;
      STRING City;
      STRING State;
@@ -82,21 +88,21 @@ layoutSOAPIn := RECORD
 	STRING StreetAddress2_In := '';
 	STRING City_In := '';
 	STRING State_In := '';
-	UNSIGNED Zip_In := 0;
-	STRING Prim_Range := '';
-	STRING Predir := '';
-	STRING Prim_Name := '';
-	STRING Addr_Suffix := '';
-	STRING Postdir := '';
-	STRING Unit_Desig := '';
-	STRING Sec_Range := '';
-	STRING Zip5 := '';
-	STRING Zip4 := '';
-	UNSIGNED SSN_In := 0;
-	UNSIGNED DateOfBirth_In := 0;
-	UNSIGNED Age_In := 0;
-	UNSIGNED HomePhone_In := 0;
-	UNSIGNED WorkPhone_In := 0;
+	STRING Zip_In := '';
+	STRING Prim_Range_In := '';
+	STRING Predir_In := '';
+	STRING Prim_Name_In := '';
+	STRING Addr_Suffix_In := '';
+	STRING Postdir_In := '';
+	STRING Unit_Desig_In := '';
+	STRING Sec_Range_In := '';
+	STRING Zip5_In := '';
+	STRING Zip4_In := '';
+	STRING SSN_In := '';
+	STRING DateOfBirth_In := '';
+	STRING Age_In := '';
+	STRING HomePhone_In := '';
+	STRING WorkPhone_In := '';
 	BOOLEAN EnableExperianGateway := FALSE;
 	BOOLEAN EnableTransUnionGateway := FALSE;
 	BOOLEAN EnableInsuranceGateway := FALSE;
@@ -106,9 +112,10 @@ layoutSOAPIn := RECORD
 	UNSIGNED3 ExperianScoreThreshold := 632;
 	UNSIGNED1 ExperianMaxMetronetPhones := 3;
 	BOOLEAN ExperianAllowBatchUse := FALSE;
-	UNSIGNED GLB_Purpose := 0;
-	UNSIGNED DPPA_Purpose := 0;
-	STRING Data_Restriction_Mask := '';
+	UNSIGNED GLBPurpose := 0;
+	UNSIGNED DPPAPurpose := 0;
+	STRING DataRestrictionMask := '';
+	STRING DataPermissionMask := '';
 	INTEGER Phone_Restriction_Mask := 0;
 	UNSIGNED MaxNumberOfPhones := 0;
 	UNSIGNED InsuranceVerificationAgeLimit := 0;
@@ -136,6 +143,13 @@ layoutSOAPIn := RECORD
 	STRING BocaShell_Watchlist_Threshold := '';
 	STRING Phone_Score_Model := '';
 	UNSIGNED2 Score_Threshold := 245;
+	BOOLEAN Confirmation_GoToGateway := FALSE;
+	BOOLEAN UsePremiumSource_A := PremiumAFlag;
+	INTEGER PremiumSource_A_limit := 3;
+	boolean BlankOutDuplicatePhones := false;
+	BOOLEAN IncludePhonesFeedback := FALSE;
+	BOOLEAN DedupAgainstInputPhones := FALSE;
+	UNSIGNED8 DID; //REMOVE this field here and below to get apples to apples with other scripts as NOT all scripts are sending this in.
 END;
 
 layoutSOAPIn intoSOAP(Input le) := TRANSFORM
@@ -145,14 +159,15 @@ layoutSOAPIn intoSOAP(Input le) := TRANSFORM
 	SELF.FirstName_In := le.FirstName;
 	SELF.MiddleName_In := le.MiddleName;
 	SELF.LastName_In := le.LastName;
+	SELF.SuffixName_In := le.SuffixName;
 	SELF.StreetAddress1_In := le.StreetAddress;
 	SELF.City_In := le.City;
 	SELF.State_In := le.State;
-	SELF.Zip_In := (UNSIGNED)le.Zip;
-	SELF.SSN_In := (UNSIGNED)le.SSN;
-	SELF.DateOfBirth_In := (UNSIGNED)le.DateOfBirth;
-	SELF.HomePhone_In := (UNSIGNED)le.HomePhone;
-	SELF.WorkPhone_In := (UNSIGNED)le.WorkPhone;
+	SELF.Zip_In := le.Zip;
+	SELF.SSN_In := le.SSN;
+	SELF.DateOfBirth_In := le.DateOfBirth;
+	SELF.HomePhone_In := le.HomePhone;
+	SELF.WorkPhone_In := le.WorkPhone;
 	
 	// Options
 	SELF.Phone_Score_Model := ScoringModelName; // Set to blank to disable the phone score model and just run a Phone Shell
@@ -173,9 +188,10 @@ layoutSOAPIn intoSOAP(Input le) := TRANSFORM
 	SELF.ExperianMaxMetronetPhones := 3;
 	SELF.ExperianAllowBatchUse := TRUE;
 	
-	SELF.GLB_Purpose := 1;
-	SELF.DPPA_Purpose := 1;
-	SELF.Data_Restriction_Mask := DataRestrictionMask;
+	SELF.GLBPurpose := 1;
+	SELF.DPPAPurpose := 1;
+	SELF.DataRestrictionMask := DataRestrictionMask;
+	SELF.DataPermissionMask := Phone_Shell.Constants.Default_DataPermission;
 	SELF.Phone_Restriction_Mask := Phone_Shell.Constants.PRM.AllPhones;
 	SELF.MaxNumberOfPhones := 99;
 	SELF.InsuranceVerificationAgeLimit := Phone_Shell.Constants.Default_InsuranceVerificationAgeLimit;
@@ -202,8 +218,14 @@ layoutSOAPIn intoSOAP(Input le) := TRANSFORM
 	SELF.BocaShell_DOB_Radius := -1;
 	SELF.BocaShell_Watchlist_Threshold := '0.84';
 	SELF.Score_Threshold := Score_Threshold_In;
-	
-	SELF := le;
+	SELF.Confirmation_GoToGateway := FALSE; //if this is TRUE that means you'll see the fake metronet hits to the real gateway
+	SELF.UsePremiumSource_A := PremiumAFlag; //set to true if you want to use Equifax data
+	SELF.PremiumSource_A_limit := 3; //the maximum is 3 ....if you want less change this
+	SELF.BlankOutDuplicatePhones := FALSE;
+	self.DedupAgainstInputPhones := FALSE;
+	self.IncludePhonesFeedback := false;
+	SELF.DID := le.did;
+	//SELF := le; //sets other input variables that cause batch to be different
 	SELF := [];
 END;
 

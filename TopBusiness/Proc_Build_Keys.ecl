@@ -10,6 +10,7 @@ export Proc_Build_Keys(
 	tools.mac_WriteIndex('Keys(version).Bankruptcy.Main.New',BuildBankruptcyMainKey);
 	tools.mac_WriteIndex('Keys(version).Bankruptcy.Party.New',BuildBankruptcyPartyKey);
 	tools.mac_WriteIndex('Keys(version).Contacts.New',BuildContactsKey);
+	tools.mac_WriteIndex('Keys(version).ContactsDID.New',BuildContactsDIDKey);
 	tools.mac_WriteIndex('Keys(version).Finance.New',BuildFinanceKey);
 	tools.mac_WriteIndex('Keys(version).Incorporation.New',BuildIncorporationKey);
 	tools.mac_WriteIndex('Keys(version).Industry.New',BuildIndustryKey);
@@ -17,7 +18,8 @@ export Proc_Build_Keys(
 	tools.mac_WriteIndex('Keys(version).Liens.Main.New',BuildLiensMainKey);
 	tools.mac_WriteIndex('Keys(version).Liens.Party.New',BuildLiensPartyKey);
 	tools.mac_WriteIndex('Keys(version).LinkDiagnostic.New',BuildLinkDiagnosticKey);
-	tools.mac_WriteIndex('Keys(version).LLID.New',BuildLLIDKey);
+	tools.mac_WriteIndex('Keys(version).LLID12.New',BuildLLID12Key);
+	tools.mac_WriteIndex('Keys(version).LLID9.New',BuildLLID9Key);
 	tools.mac_WriteIndex('Keys(version).MatchDiagnostic.New',BuildMatchDiagnosticKey);
   tools.mac_WriteIndex('Keys(version).MotorVehicle.Main.New',BuildMotorVehicleMainKey);
 	tools.mac_WriteIndex('Keys(version).MotorVehicle.Title.New',BuildMotorVehicleTitleKey);
@@ -52,6 +54,7 @@ export Proc_Build_Keys(
 					,BuildBankruptcyMainKey
 					,BuildBankruptcyPartyKey
 					,BuildContactsKey
+					,BuildContactsDIDKey
 					,BuildFinanceKey
 					,BuildIncorporationKey
 					,BuildIndustryKey
@@ -59,7 +62,8 @@ export Proc_Build_Keys(
 					,BuildLiensMainKey
 					,BuildLiensPartyKey
 					,BuildLinkDiagnosticKey
-					,BuildLLIDKey
+					,BuildLLID12Key
+					,BuildLLID9Key
 					,BuildMatchDiagnosticKey
 					,BuildMotorVehicleMainKey
 					,BuildMotorVehicleTitleKey

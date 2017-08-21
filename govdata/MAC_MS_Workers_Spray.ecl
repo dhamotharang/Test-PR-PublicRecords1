@@ -5,7 +5,7 @@ macro
 #uniquename(build_super)
 #uniquename(recordsize)
 
-%recordsize%:=1017;
+%recordsize%:=1025;
 
 %spray_first% := FileServices.SprayFixed(sourceIP,sourcefile, %recordsize%, group_name,'~thor_data400::in::ms_workcomp_master_'+filedate ,-1,,,true,true);
 %build_super% := sequential(

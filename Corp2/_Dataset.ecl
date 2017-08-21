@@ -13,6 +13,8 @@ module
 																);
 												
 	export Name										:= 'corp2'		;
+	export NameMapped             := 'corp2::mapped';
+	
 	export thor_cluster_Files			:= 	if(pUseOtherEnvironment 
 																			,foreign_environment + 'thor_data400::'
 																			,'~thor_data400::'

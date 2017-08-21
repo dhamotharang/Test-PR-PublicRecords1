@@ -1,0 +1,22 @@
+EXPORT layout_Person_xADL1 := record
+				unsigned6   did := 0;
+				unsigned1   did_score := 0;
+				string20    fname;
+				string20    mname;
+				string20    lname;
+				string5     name_suffix;
+				string25    city;
+				string2     state;
+				string10    prim_range;
+				string28    prim_name;
+				string8     sec_range; 
+				string5     zip;
+				string4     zip4;
+				string3     county;
+				string9     ssn;
+				string5     ssn5;
+				string4     ssn4;
+				string8     dob;
+				string10    phone;
+				unsigned4   UniqueID;
+END;

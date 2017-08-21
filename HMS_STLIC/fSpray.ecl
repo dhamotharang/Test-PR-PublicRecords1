@@ -4,8 +4,7 @@ export fSpray(
 								//string version, boolean pUseProd = false
 								STRING		pVersion              = '',
 								BOOLEAN   pUseProd              = false,
-								//STRING		pServerIP							= _control.IPAddress.edata12, //'edata12-bld.br.seisint.com'
-								STRING		pServerIP							= _control.IPAddress.bctlpedata12, //'bctlpedata12.risk.regn.net'
+								STRING		pServerIP							= _control.IPAddress.bctlpedata10, //'bctlpedata10.br.seisint.com'
 								STRING		pAddressFilename			= '*address*.tab',
 								STRING		pCSRFilename					= '*csr*.tab',
 								STRING		pDEAFilename					= '*dea*.tab',
@@ -20,7 +19,7 @@ export fSpray(
 								STRING		pSpecialtyFilename			= '*specialty*.tab',
 								STRING		pStlicLookupFilename		= '*stliclookup*.tab',
 								STRING		pDirectory						= '/data/hms/hms_stl/data/',
-								STRING		pGroupName						= IF((tools._Constants.IsDataland),'thor400_dev01','thor400_30'),
+								STRING		pGroupName						= IF((tools._Constants.IsDataland),'thor400_dev01','thor400_44'),
 								BOOLEAN		pIsTesting						= false,
 								BOOLEAN		pOverwrite						= true,
 								STRING		pNameOutput						= 'HMS Provider Master Source Files Info Spray Report'

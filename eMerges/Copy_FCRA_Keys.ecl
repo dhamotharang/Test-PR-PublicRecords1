@@ -21,7 +21,7 @@ export Copy_FCRA_Keys(string filedate) := function
   emerges.Proc_Copy_FCRA_Keys(filedate,'hunting_fishing','did'),
 	emerges.Proc_Copy_FCRA_Keys(filedate,'hunting_fishing','rid'),
 	emerges.Proc_Copy_FCRA_Keys(filedate,'emerges','ccw_doxie_did'),
-	emerges.Proc_Copy_FCRA_Keys(filedate,'emerges','ccw_doxie_did')//,
+	emerges.Proc_Copy_FCRA_Keys(filedate,'emerges','hunters_doxie_did')//,
 	// RoxieKeybuild.updateversion('FCRA_EmergesKeys',filedate,'gavin.witz@lexisnexis.com')
 	);
 end;
