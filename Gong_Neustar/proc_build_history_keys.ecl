@@ -1,4 +1,4 @@
-import roxiekeybuild,relocations,ut,risk_indicators, doxie;
+﻿import roxiekeybuild,relocations,ut,risk_indicators, doxie;
 import ut,promotesupers,RoxieKeyBuild,DayBatchEda, risk_indicators, doxie_cbrs, watchdog;
 
 //g_did := Watchdog.DID_Gong;
@@ -42,11 +42,11 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Key_FCRA_History_Surname,'~thor_data4
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Relocations.key_FCRA_wdtgGong,'~thor_data400::key::gong_history::fcra::@version@::wdtg','~thor_data400::key::gong_history::fcra::'+rundate+'::wdtg',bk_fcra_wdtg);					 
 */
 // moved from full keys build - needs history completed to create 
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(key_did,'~thor_data400::key::gong_weekly::'+rundate+'::did','~thor_data400::key::gong_did',bk_did_curr,4);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(key_hhid,'~thor_data400::key::gong_weekly::'+rundate+'::hhid','~thor_data400::key::gong_hhid',bk_hhid_curr,4);
+RoxieKeyBuild.Mac_SK_BuildProcess_Local(key_did,'~thor_data400::key::gong_weekly::'+rundate+'::did','~thor_data400::key::gong_did',bk_did_curr,3);
+RoxieKeyBuild.Mac_SK_BuildProcess_Local(key_hhid,'~thor_data400::key::gong_weekly::'+rundate+'::hhid','~thor_data400::key::gong_hhid',bk_hhid_curr,3);
 //RoxieKeyBuild.Mac_SK_BuildProcess_Local(risk_indicators.Key_Phone_Table_v2, '~thor_data400::key::business_header::'+rundate+'::hri::phone10_v2','~thor_data400::key::phone_table_v2',Buildkey6);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(key_cn,'~thor_data400::key::gong_weekly::'+rundate+'::cn','~thor_data400::key::gong_cn',bk_cn,4);
-RoxieKeyBuild.Mac_SK_BuildProcess_Local(key_cn_to_company,'~thor_data400::key::gong_weekly::'+rundate+'::cn_to_company','~thor_data400::key::gong_cn_to_company',bk_cn_to_company,4);
+RoxieKeyBuild.Mac_SK_BuildProcess_Local(key_cn,'~thor_data400::key::gong_weekly::'+rundate+'::cn','~thor_data400::key::gong_cn',bk_cn,3);
+RoxieKeyBuild.Mac_SK_BuildProcess_Local(key_cn_to_company,'~thor_data400::key::gong_weekly::'+rundate+'::cn_to_company','~thor_data400::key::gong_cn_to_company',bk_cn_to_company,3);
 RoxieKeyBuild.Mac_SK_BuildProcess_Local(risk_indicators.Key_Phone_Table_v2, '~thor_data400::key::business_header::'+rundate+'::hri::phone10_v2','~thor_data400::key::phone_table_v2',Buildkey6);
 RoxieKeyBuild.Mac_SK_BuildProcess_Local(risk_indicators.key_phone_table_fcra_v2 ,'~thor_data400::key::business_header::filtered::'+rundate+'::hri::phone10_v2','~thor_data400::key::phone_table_filtered_v2',BuildFCRAkey5);
 // cjs
@@ -70,11 +70,11 @@ RoxieKeyBuild.Mac_SK_Move_To_Built_V2('~thor_data400::key::gong_history_LinkIDs'
 RoxieKeyBuild.Mac_SK_Move_To_Built_V2('~thor_data400::key::gong_history_cleanname','~thor_data400::key::gong_history::'+rundate+'::cleanname',mv1_clnname);
 
 // moved from full keys build - needs history completed to create 
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::did','~thor_data400::key::gong_did',mv_did,4);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::hhid','~thor_data400::key::gong_hhid',mv_hhid,4);
+RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::did','~thor_data400::key::gong_did',mv_did,3);
+RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::hhid','~thor_data400::key::gong_hhid',mv_hhid,3);
 RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::business_header::'+rundate+'::hri::phone10_v2', '~thor_data400::key::phone_table_v2',	MoveKeyToBuilt6);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::cn','~thor_data400::key::gong_cn',mv_cn,4);
-RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::cn_to_company','~thor_data400::key::gong_cn_to_company',mv_cn_to_company,4);
+RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::cn','~thor_data400::key::gong_cn',mv_cn,3);
+RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::gong_weekly::'+rundate+'::cn_to_company','~thor_data400::key::gong_cn_to_company',mv_cn_to_company,3);
 RoxieKeyBuild.Mac_SK_Move_To_Built('~thor_data400::key::business_header::filtered::'+rundate+'::hri::phone10_v2', '~thor_data400::key::phone_table_filtered_v2',	MoveFCRAKeyToBuilt5);
 
 
