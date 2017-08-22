@@ -1,4 +1,4 @@
-import ut, mdr, watchdog;
+﻿import ut, mdr, watchdog, PRTE2_Header;
 
 h := distribute(header.apt_patch(ssn <>''),hash(did)); // This will change
 
@@ -117,5 +117,8 @@ end;
 
 last_set := join(hard_g,dup_t,left.ssn=right.ssn and left.did=right.did,blankbadG2(left,right),left outer, local);
 
-
+#IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
+export SSN_Validities := non_Gs + easy_G_all(val='G')+last_set;
+#ELSE
 export SSN_Validities := non_Gs + easy_G_all(val='G')+last_set : persist('SSN_Validities');
+#END;
