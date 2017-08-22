@@ -1,4 +1,4 @@
-import std, _control;
+﻿import std, _control;
 EXPORT SprayFullRefresh(string version) := FUNCTION
 
 //srcdir := '/hds_3/gongneustar/FullRefresh/';
@@ -9,7 +9,7 @@ sfFull := '~thor::in::gong::targus::full::' + version;
 //sfFullPrev := '~thor::in::gong::targus::full::20141130';
 ip := _control.IPAddress.bctlpedata10;
 
-//target := 'thor400_dev01';				//dataland
+//target := 'thor50_dev';				//dataland
 target := 'thor400_44';				//production
 
 
@@ -33,8 +33,11 @@ fAddToSuper(string pSubName) :=
 
 						
 SprayFiles := 
-		NOTHOR(APPLY(List2, SprayFile( name)));
-
+SEQUENTIAL(
+			IF(EXISTS(list(size=0)) OR COUNT(list) < 10,
+			FAIL('Empty or missing file detected'),
+			NOTHOR(APPLY(List2, SprayFile( name)))));
+			
 AddToSuperFile := 
 		SEQUENTIAL
 		(
@@ -53,7 +56,7 @@ CreateSuperfile := SEQUENTIAL(
 
 
 doit :=  SEQUENTIAL
-(	
+(
 	OUTPUT(List2, named('files')),
 	sprayFiles,
 	CreateSuperfile,
