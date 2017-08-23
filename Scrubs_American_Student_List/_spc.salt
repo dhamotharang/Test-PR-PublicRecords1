@@ -1,5 +1,5 @@
-OPTIONS:-gh
-MODULE:Scrubs_American_Student_List
+﻿OPTIONS:-gh
+MODULE:Scrubs_American_Student_List 
 FILENAME:American_Student_List
 //Uncomment up to NINES for internal or external adl
 //IDFIELD:EXISTS:<NameOfIDField>
