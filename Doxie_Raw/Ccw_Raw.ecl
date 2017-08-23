@@ -4,7 +4,7 @@
 // Return value: dataset. Layout: plusdid.
 //============================================================================
 
-import emerges,doxie_files,codes,doxie_crs, Doxie, ut, suppress, Census_Data, FCRA, FFD;
+import emerges, doxie_files, codes, Doxie, ut, suppress, Census_Data, FCRA, FFD;
 
 export Ccw_Raw(
 							 dataset(Doxie.layout_references) dids,
