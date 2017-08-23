@@ -1,4 +1,4 @@
-IMPORT doxie, FraudDefenseNetwork_Services, FraudShared_Services;
+﻿IMPORT doxie, FraudDefenseNetwork_Services;
 
 // *** A function to check for the did(s), address(es), ssn(s) & phone(s) data (passed in from 
 // doxie.HeaderFileRollupService) within the FDN data and then populate 1-6 FDN indicator fields
@@ -35,7 +35,7 @@ EXPORT func_FdnCheckRollupRecs (dataset(doxie.Layout_Rollup.KeyRec) ds_in,
 		// Also transforming the data onto the layout needed to be passed into the new FraudDefenseNetwork_Services 
 		// function and converting the did field into the type expected by the function.
     ds_in_seq_dids := project(ds_in_seq,
-		                          transform(FraudShared_Services.Layouts.batch_search_rec,
+		                          transform(FraudDefenseNetwork_Services.Layouts.batch_search_rec,
 													     self.did := (unsigned6) left.did;
 															 self.seq := left.seq;
 															 self := [];  //to null rest of the addr/ssn/phone10 fields
@@ -79,7 +79,7 @@ EXPORT func_FdnCheckRollupRecs (dataset(doxie.Layout_Rollup.KeyRec) ds_in,
 																				sec_range,
 																				city_name, st, zip
 																			 ),
-		                              transform(FraudShared_Services.Layouts.batch_search_rec,
+		                              transform(FraudDefenseNetwork_Services.Layouts.batch_search_rec,
 			                              self.addr_suffix := left.suffix;
 			                              self.v_city_name := left.city_name;
 			                              self.zip5        := left.zip;
@@ -106,7 +106,7 @@ EXPORT func_FdnCheckRollupRecs (dataset(doxie.Layout_Rollup.KeyRec) ds_in,
     // Sort/dedup the normed "phoneRecs" children recs to only keep unique phone #s.
 		// Then project onto the layout needed to be passed into the new FraudDefenseNetwork_Services function.
 		ds_in_seq_pc_dedup := project(dedup(sort(ds_in_seq_phoneRecs_children(phone !=''),phone),phone),
-		                              transform(FraudShared_Services.Layouts.batch_search_rec,
+		                              transform(FraudDefenseNetwork_Services.Layouts.batch_search_rec,
 															      self.phone10 := left.phone, // only keep "phoneRecs" phone field
 																    self         := [] // null all other unused fields
 	   														  ));
@@ -127,7 +127,7 @@ EXPORT func_FdnCheckRollupRecs (dataset(doxie.Layout_Rollup.KeyRec) ds_in,
    // Sort/dedup the normed "ssnRecs" children recs to only keep unique ssn values.
 	 // Then project onto the layout needed to be passed into the new FraudDefenseNetwork_Services function.
 	 ds_in_seq_sc_dedup := project(dedup(sort(ds_in_seq_ssnRecs_children(ssn != ''),ssn),ssn),
-		                             transform(FraudShared_Services.Layouts.batch_search_rec,
+		                             transform(FraudDefenseNetwork_Services.Layouts.batch_search_rec,
 															      self.ssn := left.ssn, // only keep "ssnRecs" "ssn" field
 																    self     := [] // null all other unused fields
 	   														 ));
@@ -155,7 +155,7 @@ EXPORT func_FdnCheckRollupRecs (dataset(doxie.Layout_Rollup.KeyRec) ds_in,
 		// FDN did indicator and the FDN WAF Contrib data indicator.
     doxie.Layout_Rollup.KeyRec_seq_fdn tf_did_info(
       doxie.Layout_Rollup.KeyRec_seq_fdn l, 
-		  FraudShared_Services.Layouts.batch_response_rec r) := transform
+		  FraudDefenseNetwork_Services.Layouts.batch_response_rec r) := transform
 	      self.fdn_did_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type),
         self := l
@@ -190,7 +190,7 @@ EXPORT func_FdnCheckRollupRecs (dataset(doxie.Layout_Rollup.KeyRec) ds_in,
 		// the "addrRecs" child dataset layout.
     doxie.Layout_Rollup.addrRec_seq tf_addr_info(
       doxie.Layout_Rollup.addrRec_seq l, 
-			FraudShared_Services.Layouts.batch_response_rec  r) := transform  
+			FraudDefenseNetwork_Services.Layouts.batch_response_rec  r) := transform  
 			   self.fdn_addr_ind  := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			   self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 																	                 l.fdn_waf_contrib_data),
@@ -238,7 +238,7 @@ EXPORT func_FdnCheckRollupRecs (dataset(doxie.Layout_Rollup.KeyRec) ds_in,
 		// set the FDN phone indicator (and the FDN WAF indicator) on the phoneRecs child dataset layout
     doxie.Layout_Rollup.PhoneRec_seq tf_phone_info(
       doxie.Layout_Rollup.PhoneRec_seq l, 
-			FraudShared_Services.Layouts.batch_response_rec   r) := transform  
+			FraudDefenseNetwork_Services.Layouts.batch_response_rec   r) := transform  
         self.fdn_phone_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 				  													              l.fdn_waf_contrib_data),
@@ -276,7 +276,7 @@ EXPORT func_FdnCheckRollupRecs (dataset(doxie.Layout_Rollup.KeyRec) ds_in,
 		// set the FDN ssn indicator (and the FDN WAF indicator) on the ssns child dataset layout???
     doxie.Layout_Rollup.SsnRec_seq tf_ssn_info(
       doxie.Layout_Rollup.SsnRec_seq          l, 
-		  FraudShared_Services.Layouts.batch_response_rec r) := transform  
+		  FraudDefenseNetwork_Services.Layouts.batch_response_rec r) := transform  
         self.fdn_ssn_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 																	                l.fdn_waf_contrib_data),

@@ -1,4 +1,4 @@
-import iesp, codes, NPPES;
+﻿import iesp, codes, NPPES;
 export NPI_Transforms := MODULE
 	shared report_rec := iesp.npireport.t_NPIReport;
 	shared prov_tax_rec := iesp.npireport.t_ProviderTaxonomies;
@@ -89,7 +89,7 @@ export NPI_Transforms := MODULE
 				 L.provider_business_mailing_address_state_name, L.provider_business_mailing_address_postal_code[1..5], L.provider_business_mailing_address_postal_code[6..10], '', '', 
 				 L.provider_first_line_business_mailing_address, 
 				 L.provider_second_line_business_mailing_address, '');
-		self.ProviderMailingAddress.Phone10 := L.provider_business_mailing_address_telephone_number;
+		self.ProviderMailingAddress.Phone10 := l.cleanmailingphone;
 		self.ProviderMailingAddress.FaxNumber := L.provider_business_mailing_address_fax_number;
 		
 		self.ProviderPracticeAddress := iesp.ECL2ESP.SetAddress(L.clean_location_address.prim_name, L.clean_location_address.prim_range,L.clean_location_address.predir, L.clean_location_address.postdir,L.clean_mailing_address.addr_suffix, L.clean_location_address.unit_desig, L.clean_location_address.sec_range, 
@@ -97,7 +97,7 @@ export NPI_Transforms := MODULE
 				 L.provider_business_practice_location_address_state_name, L.provider_business_practice_location_address_postal_code[1..5], L.provider_business_practice_location_address_postal_code[6..10], '', '', 
 				 L.provider_first_line_business_practice_location_address, 
 				 L.provider_second_line_business_practice_location_address, '');
-		self.ProviderPracticeAddress.Phone10 := L.provider_business_practice_location_address_telephone_number;
+		self.ProviderPracticeAddress.Phone10 := L.cleanlocationphone;
 		self.ProviderPracticeAddress.FaxNumber := L.provider_business_practice_location_address_fax_number;
 		
 		l_ds := dataset(row(L, layouts.NPPES_Layouts.temp_layout));

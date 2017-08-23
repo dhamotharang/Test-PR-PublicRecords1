@@ -1,3 +1,4 @@
+﻿IMPORT FraudShared;
 EXPORT Functions := 
 	module 
 	
@@ -9,15 +10,15 @@ Export     fSlashedMDYtoCYMD(string pDateIn)
 
 Export Classification (
 
-           dataset(Layouts.Base.Main) pBaseFile ) := 
+           dataset(FraudShared.Layouts.Base.Main) pBaseFile ) := 
 					 
 function 
 
-      MBSPrimary := Files().Input.MBS.Sprayed; 
+      MBSPrimary := FraudShared.Files().Input.MBS.Sprayed; 
 	
 	JMbs  := join (pBaseFile , MBSPrimary(status = 1) , trim(StringLib.StringToUppercase(left.source),left,right) = trim(StringLib.StringToUppercase(right.fdn_file_code),left,right) , 
 	
-	               transform (Layouts.Base.Main , 
+	               transform (FraudShared.Layouts.Base.Main , 
 								  
 												self.classification_Permissible_use_access.fdn_file_info_id   := right.fdn_file_info_id ; 
 												self.classification_Permissible_use_access.fdn_file_code      := StringLib.StringToUppercase(right.fdn_file_code) ; 
@@ -67,7 +68,7 @@ end;
 
 		#uniquename(myCleanFunction)
 
-		STRING %myCleanFunction%(STRING x) := if(TRIM(x,all) in FraudDefenseNetwork.Functions.nullset , '',stringlib.stringcleanspaces(stringlib.stringtouppercase(x)));
+		STRING %myCleanFunction%(STRING x) := if(TRIM(x,all) in Functions.nullset , '',stringlib.stringcleanspaces(stringlib.stringtouppercase(x)));
 		
 			#uniquename(tra)
 		inputFile %tra%(inputFile le) :=

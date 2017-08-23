@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 	<message name="OrderScore_Service">
 		<part name="OrderScoreRequest" type="tns:XmlDataSet" cols="80"
   	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
@@ -551,10 +551,13 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	withIP_BTST := JOIN(mapped_results, clam, (left.seq*2) = right.bill_to_out.seq, 
 		addIP_BTSTFunc(left,right), left outer);
 	
-	productID := Risk_Reporting.ProductID.Models__OrderScore_Service;
-	intermediateLog1 := Risk_Reporting.To_LOG_Boca_Shell_BtSt(clam, productID, bsversion);  
-	intermediateLog2 := if(bsV5andAttrV4, Risk_Reporting.To_LOG_Boca_Shell_BtSt(clam4Attributes, productID, attrbsversion));
-	intermediateLog := intermediateLog1 + intermediateLog2;
+/* **************  REMOVING INTERMEDIATE LOGGING FOR NOW TO SPEED UP QUERY *******************
+	// productID := Risk_Reporting.ProductID.Models__OrderScore_Service;
+	// intermediateLog1 := Risk_Reporting.To_LOG_Boca_Shell_BtSt(clam, productID, bsversion);  
+	// intermediateLog2 := if(bsV5andAttrV4, Risk_Reporting.To_LOG_Boca_Shell_BtSt(clam4Attributes, productID, attrbsversion));
+	// intermediateLog := intermediateLog1 + intermediateLog2;
+*******************************************************************************************/	
+	
   // so far no clients wanting custom inputs for Order Score. If someone does want it look into the 
 	//transform 'getCustomInputs' until the code 'customModelInputs' is set in CBD
 
@@ -796,11 +799,14 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 #Else	
 	OUTPUT(final3,named('Results'));
 	OUTPUT(royalties,NAMED('RoyaltySet'));
-		// Note: All intermediate logs must have the following name schema:
+	
+/* **************  REMOVING INTERMEDIATE LOGGING FOR NOW TO SPEED UP QUERY *******************
+	// Note: All intermediate logs must have the following name schema:
 	// Starts with 'LOG_' (Upper case is important!!)
 	// Middle part is the database name, in this case: 'log__mbs'
 	// Must end with '_intermediate__log'
-   OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log'));
+  OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log'));
+*******************************************************************************************/	
 	 
 	 //Improved Scout Logging
 	IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));

@@ -1,4 +1,4 @@
-import drivers, FCRA, header, mdr, Risk_Indicators;
+﻿import drivers, FCRA, header, mdr, Risk_Indicators;
 
 export rollCorrRiskSummary(dataset(Risk_Indicators.Layouts.common_layout) summary = dataset([], Risk_Indicators.Layouts.common_layout),
 													 unsigned  historydate,
@@ -49,7 +49,7 @@ export rollCorrRiskSummary(dataset(Risk_Indicators.Layouts.common_layout) summar
 					 left.src = 'AY' 																									=> 'SL',	// treat alloy as american student
 					 left.src IN MDR.sourceTools.set_Death 														=> 'DE',	// set all new death sources to DE
 					 left.src);
-				self.src := converted_src;	
+				self.src := if(BSversion >= 52, converted_src, left.src);	 //only use converted source for BS version 52 and higher	
 				self.dt_last_seen := min(left.dt_last_seen, historydate);  //do not return last seen dates beyond the history date
 				self 							:= left));
 

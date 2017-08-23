@@ -1,4 +1,7 @@
-﻿
+﻿/*2017-08-10T19:30:48Z (laure fischer)
+RR-11566 - update the max # assets for Due Diligence
+*/
+
 // NOTE1: To assist in finding things, this attribute has been re-arranged to put things
 // in alphabetic product name order.  However the BR & AR modules refer to other modules,
 // so they have to be at the bottom.
@@ -421,7 +424,13 @@ EXPORT Constants := MODULE
 		
 	//Due Diligence
 	export DDRAttributesConst := MODULE
-		export unsigned2 MaxAttributes := 21;
+		export unsigned2 MaxAttributes      := 21;
+		export unsigned2 MaxDescriptions    := 210;
+		export unsigned2 MaxBusinesses      := 20;
+		export unsigned2 MaxActions         := 20;
+		export unsigned2 MaxAssets          := 20;
+    export unsigned2 MaxPersonNames     := 20;
+    export unsigned2 MaxRecords         := 20;
 	end;
 
   //Dun and Bradstreet (DNB)

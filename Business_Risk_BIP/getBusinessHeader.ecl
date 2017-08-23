@@ -1,4 +1,4 @@
-IMPORT BIPV2, Address, Business_Risk, Business_Risk_BIP, DID_Add, MDR, Risk_Indicators, SALT28, UT, ADVO, Doxie; 
+﻿IMPORT BIPV2, Address, Business_Risk, Business_Risk_BIP, DID_Add, MDR, Risk_Indicators, SALT28, UT, ADVO, Doxie; 
 
 EXPORT getBusinessHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 												 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -9,8 +9,13 @@ EXPORT getBusinessHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	BHBuildDate := Risk_Indicators.get_Build_date('bheader_build_version');
 	
 	// --------------- LexisNexis Business Header Searched By Ult ID ----------------
+	
+	// If running BIID2.0, search at input search level, since we don't use any UltID based attributes. 
+	// For other transactions, we search at UltID level to accurately calculate UltID-based attributes.
+	LSL := IF(~Options.IsBIID20, Business_Risk_BIP.Constants.LinkSearch.UltID, Options.LinkSearchLevel);
+	
 	BusinessHeaderUltRaw := BIPV2.Key_BH_Linking_Ids.kFetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
-																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Business_Risk_BIP.Constants.LinkSearch.UltID),
+																						 Business_Risk_BIP.Common.SetLinkSearchLevel(LSL),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							linkingOptions,
 																							Business_Risk_BIP.Constants.Limit_BusHeader,

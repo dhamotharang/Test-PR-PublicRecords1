@@ -1,4 +1,4 @@
-import tools,Data_Services,Inquiry_AccLogs, hygenics_search;
+﻿import tools,Data_Services,Inquiry_AccLogs, hygenics_search;
 
 export Files(
 
@@ -19,18 +19,6 @@ module
 		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.AInspection         ,Layouts.Input.AInspection        ,AInspection             );
     tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.TextMinedCrim       ,Layouts.Input.TextMinedCrim      ,TextMinedCrim      );
     tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.OIG                 ,Layouts.Input.OIG                ,OIG      );
-		tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.Mbs                 ,Layouts.Input.Mbs                ,Mbs , 'CSV'      ,,'|\n','|\t|'  ,,,true      );
-    tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsGcIdExclusion    ,Layouts.Input.MbsGcIdExclusion        ,MbsGcIdExclusion  , 'CSV'      ,,'|\n','|\t|'  ,,,true     );
-    tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsNewGcIdExclusion    ,Layouts.Input.MbsNewGcIdExclusion        ,MbsNewGcIdExclusion  , 'CSV'      ,,'|\n','|\t|'  ,,,true     );
-    tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsIndTypeExclusion ,Layouts.Input.MbsIndTypeExclusion               ,MbsIndTypeExclusion    , 'CSV'  ,,'|\n','|\t|'  ,,,true       );
-    tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MbsProductInclude   ,Layouts.Input.MbsProductInclude               ,MbsProductInclude    , 'CSV'  ,,'|\n','|\t|'   ,,,true       );
-    tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSSourceGcExclusion,Layouts.Input.MBSSourceGcExclusion               ,MBSSourceGcExclusion    , 'CSV'  ,,'|\n','|\t|'    ,,,true      );
-    tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSFdnIndType       ,Layouts.Input.MBSFdnIndType               ,MBSFdnIndType    , 'CSV'  ,,'|\n','|\t|'    ,,,true      );
-    tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSFdnCCID       ,Layouts.Input.MBSFdnCCID               ,MBSFdnCCID    , 'CSV',,'\n');
-    tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSFdnHHID       ,Layouts.Input.MBSFdnHHID               ,MBSFdnHHID    , 'CSV',,'\n');
-    tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSTableCol       ,Layouts.Input.MBSTableCol               ,MBSTableCol    , 'CSV'  ,,'|\n','|\t|'    ,,,true      );
-    tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSColValDesc       ,Layouts.Input.MBSColValDesc               ,MBSColValDesc    , 'CSV'  ,,'|\n','|\t|'    ,,,true      );
-    tools.mac_FilesInput(Filenames(pversion,pUseProd).Input.MBSmarketAppend     ,Layouts.Input.MBSmarketAppend              ,MBSmarketAppend    , 'CSV'  ,,['\n','\r\n','\n\r'],['|','\t']    ,,,true      );
 
 		end;
 	
@@ -38,7 +26,6 @@ module
 	// -- Base File Versions
 	//////////////////////////////////////////////////////////////////
 	export Base := module
-	  tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Main               ,Layouts.Base.Main                   ,Main                );
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.SuspectIP           ,Layouts.Base.SuspectIP               ,SuspectIP            );
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Glb5                ,Layouts.Base.Glb5                    ,Glb5                 );
 		tools.mac_FilesBase(Filenames(pversion,pUseProd).Base.Tiger              ,Layouts.Base.Tiger                  ,Tiger               );

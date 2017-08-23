@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Risk_BIP;
+﻿IMPORT BIPV2, Business_Risk_BIP;
 
 EXPORT mod_BusinessShell(DATASET(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo) ds_input,
                            Business_Risk_BIP.LIB_Business_Shell_LIBIN Options) := 
@@ -135,7 +135,8 @@ EXPORT mod_BusinessShell(DATASET(BusinessInstantID20_Services.layouts.InputCompa
 																																		 Options.Gateways,
 																																		 Options.RunTargusGatewayAnywayForTesting, /* for testing purposes only */
 																																		 Options.OverRideExperianRestriction, 
-                                   BusinessInstantID20_Services.Constants.INCLUDE_AUTHREP_IN_BIP_APPEND );			
+                                   BusinessInstantID20_Services.Constants.INCLUDE_AUTHREP_IN_BIP_APPEND,
+																	 BusinessInstantID20_Services.Constants.IS_BIID_20);						
 
 			SHARED BIPV2.IDlayouts.l_xlink_ids2 grabLinkIDs(Business_Risk_BIP.Layouts.Shell le) := 
 				TRANSFORM

@@ -1,9 +1,9 @@
-IMPORT doxie, FraudDefenseNetwork_Services, PersonSearch_Services, FraudShared_Services;
+﻿IMPORT doxie, FraudDefenseNetwork_Services, PersonSearch_Services;
 
 // *** A function to check for the did(s), address(es), ssn(s) & phone(s) data (passed in from 
 // doxie.HeaderFileSearchService) within the FDN data and then populate 1-7 FDN indicator fields
 // when applicable.
-EXPORT func_FdnCheckSearchRecs (dataset(doxie.Layout_Search.rec_with_feedback) ds_in,
+EXPORT func_FdnCheckSearchRecs (dataset(doxie.Layout_Search.rec_with_feedback) ds_in, 
 		                            unsigned6 in_gc_id,
 																unsigned2 in_ind_type,
 																unsigned6 in_product_code,
@@ -36,7 +36,7 @@ EXPORT func_FdnCheckSearchRecs (dataset(doxie.Layout_Search.rec_with_feedback) d
 		//                    when 3 assign ssn,  when 4 assign phone, when 5 assign listed_phone
 		// Also transforming the data onto the layout needed to be passed into the new FraudDefenseNetwork_Services 
 		// function and converting the did field into the type expected by the function.
-    FraudShared_Services.Layouts.batch_search_rec  tf_NormAndSlim(
+    FraudDefenseNetwork_Services.Layouts.batch_search_rec  tf_NormAndSlim(
      doxie.Layout_Search.rec_with_Feedback_inseq L, integer C) := transform
 		   self.did         := choose(C,(unsigned6)L.did,0,0,0,0);
 			 self.prim_range  := choose(C,'',L.prim_range,'','','');
@@ -75,7 +75,7 @@ EXPORT func_FdnCheckSearchRecs (dataset(doxie.Layout_Search.rec_with_feedback) d
 		// Then project onto the layout needed to be passed into the new FraudDefenseNetwork_Services function.
 		ds_in_seq_pc_dedup := project(dedup(sort(ds_in_seq_phones_children(phone10!=''),
 		                                    phone10),phone10),
-		                              transform(FraudShared_Services.Layouts.batch_search_rec,
+		                              transform(FraudDefenseNetwork_Services.Layouts.batch_search_rec,
 															      self.phone10 := left.phone10, // only keep "phones" phones10
 																    self         := [] // null all other unused fields
 	   														  ));
@@ -123,7 +123,7 @@ EXPORT func_FdnCheckSearchRecs (dataset(doxie.Layout_Search.rec_with_feedback) d
 		// FDN did indicator and the FDN WAF Contrib data indicator.
     doxie.Layout_Search.rec_with_Feedback_inseq tf_did_info(
 		  doxie.Layout_Search.rec_with_Feedback_inseq l, 
-			FraudShared_Services.Layouts.batch_response_rec r) := transform
+			FraudDefenseNetwork_Services.Layouts.batch_response_rec r) := transform
 	      self.fdn_did_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type),
         self := l
@@ -143,7 +143,7 @@ EXPORT func_FdnCheckSearchRecs (dataset(doxie.Layout_Search.rec_with_feedback) d
 		// set the FDN addr indicator or the FDN WAF indicator.
      doxie.Layout_Search.rec_with_Feedback_inseq tf_addr_info(
        doxie.Layout_Search.rec_with_Feedback_inseq l, 
-			 FraudShared_Services.Layouts.batch_response_rec  r) := transform  
+			 FraudDefenseNetwork_Services.Layouts.batch_response_rec  r) := transform  
 			   self.fdn_addr_ind  := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			   self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 																	                 l.fdn_waf_contrib_data),
@@ -174,7 +174,7 @@ EXPORT func_FdnCheckSearchRecs (dataset(doxie.Layout_Search.rec_with_feedback) d
 		// set the FDN ssn indicator and/or the FDN WAF indicator.
     doxie.Layout_Search.rec_with_Feedback_inseq tf_ssn_info(
       doxie.Layout_Search.rec_with_Feedback_inseq l, 
-		  FraudShared_Services.Layouts.batch_response_rec r) := transform
+		  FraudDefenseNetwork_Services.Layouts.batch_response_rec r) := transform
         self.fdn_ssn_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 																	                l.fdn_waf_contrib_data),
@@ -195,7 +195,7 @@ EXPORT func_FdnCheckSearchRecs (dataset(doxie.Layout_Search.rec_with_feedback) d
 		// set the FDN phone indicator and/or the FDN WAF indicator.
     doxie.Layout_Search.rec_with_Feedback_inseq tf_phone_info(
       doxie.Layout_Search.rec_with_Feedback_inseq l, 
-			FraudShared_Services.Layouts.batch_response_rec   r) := transform  
+			FraudDefenseNetwork_Services.Layouts.batch_response_rec   r) := transform  
         self.fdn_phone_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 				  													              l.fdn_waf_contrib_data),
@@ -216,7 +216,7 @@ EXPORT func_FdnCheckSearchRecs (dataset(doxie.Layout_Search.rec_with_feedback) d
 		// set the FDN listed_phone indicator and the FDN WAF indicator.
     doxie.Layout_Search.rec_with_Feedback_inseq tf_listed_phone_info(
       doxie.Layout_Search.rec_with_Feedback_inseq l, 
-			FraudShared_Services.Layouts.batch_response_rec   r) := transform  
+			FraudDefenseNetwork_Services.Layouts.batch_response_rec   r) := transform  
         self.fdn_listed_phone_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 																	                l.fdn_waf_contrib_data),
@@ -237,7 +237,7 @@ EXPORT func_FdnCheckSearchRecs (dataset(doxie.Layout_Search.rec_with_feedback) d
 		// set the FDN phone indicator (and FDN Waf indicator) on the "phones" child dataset layout
     PersonSearch_Services.Layouts.rec_layout_phones_seq tf_phone_child_info(
       PersonSearch_Services.Layouts.rec_layout_phones_seq l, 
-			FraudShared_Services.Layouts.batch_response_rec   r) := transform  
+			FraudDefenseNetwork_Services.Layouts.batch_response_rec   r) := transform  
         self.fdn_phone_ind := func_set_indicator(r.classification_Permissible_use_access.file_type),
 			  self.fdn_waf_contrib_data := func_set_waf(r.classification_Permissible_use_access.file_type,
 																	                l.fdn_waf_contrib_data),

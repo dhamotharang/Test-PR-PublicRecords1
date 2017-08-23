@@ -1,4 +1,4 @@
-IMPORT _Control, BIPV2, Business_Risk_BIP, Gateway, iesp, UT;
+﻿IMPORT _Control, BIPV2, Business_Risk_BIP, Gateway, iesp, UT;
 
 Use_Business_Shell_Library := NOT _Control.LibraryUse.ForceOff_Business_Risk_BIP__LIB_Business_Shell;
 
@@ -22,7 +22,8 @@ EXPORT LIB_Business_Shell_Function (
 											DATASET(Gateway.Layouts.Config) Gateways_in = Business_Risk_BIP.Constants.Default_Gateways_Requested,
 											BOOLEAN RunTargusGateway          = FALSE,
 											BOOLEAN OverrideExperianRestriction_In = FALSE,
-											BOOLEAN IncludeAuthRepInBIPAppend = FALSE
+											BOOLEAN IncludeAuthRepInBIPAppend = FALSE,
+											BOOLEAN IsBIID20_In								= FALSE
 																							) := FUNCTION
 
 options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
@@ -56,6 +57,7 @@ options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 	EXPORT BOOLEAN    RunTargusGatewayAnywayForTesting := RunTargusGateway;
 	EXPORT BOOLEAN    OverrideExperianRestriction := OverrideExperianRestriction_In;	
 	EXPORT BOOLEAN    DoNotUseAuthRepInBIPAppend  := NOT IncludeAuthRepInBIPAppend;
+	EXPORT BOOLEAN		IsBIID20										:= IsBIID20_In;	
 END;
 
 #if(Use_Business_Shell_Library)
