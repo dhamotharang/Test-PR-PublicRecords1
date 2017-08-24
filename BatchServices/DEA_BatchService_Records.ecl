@@ -1,4 +1,4 @@
-IMPORT AutokeyB2, Autokey_batch, Doxie, DEA, DEA_Services, autostandardI, census_data, batchServices, ut, Suppress;
+﻿IMPORT AutokeyB2, Autokey_batch, DEA, autostandardI, census_data, batchServices, ut, Suppress, Std;
 					  
 		    penalt_func_calculate(   Autokey_batch.Layouts.rec_inBatchMaster l,
 				                         BatchServices.Layouts.DEA.rec_results_raw r)  := FUNCTION
@@ -92,7 +92,7 @@ end;
 
 string splitUpDrugSchedule(string sched) := function
 
-   split_string := ut.Stringsplit(sched, ' ');
+   split_string := Std.Str.SplitWords(sched, ' ');
 	 
 	 	s_layout := record
 				string str_val;
@@ -103,10 +103,11 @@ string splitUpDrugSchedule(string sched) := function
 // this transform is needed to split out strings such as '22N' into '2 ; 2N'
 // this is a requirement from the product as per how drug schedule numbers are listed
 // when a string is 3 chars in length and contains an alpha char then it needs to be expanded as above.
+  string26 alphabet := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 	s_layout doTransform(s_layout l) := transform
 	  trim_val := trim(l.str_val, left, right);
-		self.str_val := if ((length(trim_val) = 3) AND (stringlib.stringFilter(trim_val, ut.alphabet) <> ''),	
+		self.str_val := if ((length(trim_val) = 3) AND (stringlib.stringFilter(trim_val, alphabet) <> ''),	
 											 trim_val[1] + ' ; ' + trim_val[2] + trim_val[3],
 											 l.str_val);             																
 	end;

@@ -1,24 +1,24 @@
+﻿
+IMPORT AutokeyB2, Autokey_batch, UCCV2, UCCV2_Services, batchservices, autostandardi, BIPV2;
 
-IMPORT AutokeyB2, Autokey_batch, Blackbaud, Doxie, UCCV2, UCCV2_Services, batchservices, autostandardi, BIPV2;
-
-SHARED rec_acctno_tmsid := RECORD
+rec_acctno_tmsid := RECORD
 	STRING30 acctno;
 	UCCv2_Services.layout_tmsid; // i.e. just tmsid
 END;
 
-SHARED rec_acctno_tmsid_rmsid := RECORD
+rec_acctno_tmsid_rmsid := RECORD
 	STRING30 acctno;
 	UCCv2_Services.layout_rmsid; // i.e. tmsid and rmsid
 	BIPV2.IDlayouts.l_key_ids_bare;
 END;
 
-SHARED rec_UCCs_slim := RECORD
+rec_UCCs_slim := RECORD
 	STRING30 acctno;
 	UCCV2.Layout_UCC_Common.Layout_ucc_new;
 END;
 
 
-SHARED fn_convert_to_yyyymmdd(STRING10 date_value) :=
+fn_convert_to_yyyymmdd(STRING10 date_value) :=
 	FUNCTION
 		searchpattern := '^(.*)/(.*)/(.*)$';
 		RETURN REGEXFIND(searchpattern, date_value, 3) + // i.e. '1968' in '10/12/1968'
@@ -43,7 +43,7 @@ SHARED fn_convert_to_yyyymmdd(STRING10 date_value) :=
 // So, at this juncture, even though 'amount' is specified as a filter criterion in the product spec, we'll 
 // ignore it as such. TODO: Get 'amount' removed as a requirement by Product Management.
 //
-SHARED fn_filter_UCC_recs(BatchServices.Interfaces.UCCV2.i_Query_Filters filters,
+fn_filter_UCC_recs(BatchServices.Interfaces.UCCV2.i_Query_Filters filters,
                           DATASET(rec_UCCs_slim) ds_recs) := 
 	FUNCTION
 	  // Modified to switch all IF statements to MAP statements, a performance boost of approx 30% was realized.

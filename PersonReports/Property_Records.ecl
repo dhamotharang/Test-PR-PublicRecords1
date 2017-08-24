@@ -1,31 +1,8 @@
-import iesp, doxie, LN_PropertyV2_Services, address, fcra, std, FFD;
+﻿import iesp, doxie, LN_PropertyV2_Services, address, fcra, std, FFD;
 
 iesp.share.t_Address SetPartyAddress (LN_PropertyV2_Services.layouts.parties.pparty P) := iesp.ECL2ESP.SetAddress (
   P.prim_name, P.prim_range, P.predir, P.postdir, P.suffix, P.unit_desig, P.sec_range,
   P.v_city_name,P.st, P.zip, P.zip4, P.county_name);
-/*
-// sort by date within each property (= parcel number) and calculate earliest date
-// TODO: MUST have simplier implementation
-MAC_SetMinDate (ds_in, ds_out) := MACRO
-  #uniquename (in_rec);
-  %in_rec% := recordof (ds_in);
-  // get properties in the order they were "acquired"
-  #uniquename (ds_ddp);
-  %ds_ddp% := dedup (sort (ds_in, ParcelId, srt_date), ParcelId);
-
-  // reuse same field for assigning the earliest date within each property
-  #uniquename (SetMinDate);
-  %in_rec% %SetMinDate% (%in_rec% L, %in_rec% R) := transform
-    Self.srt_date := (unsigned) R.srt_date;
-    Self := L;
-  end;
-
-  ds_out := join (ds_in, %ds_ddp%,
-                  Left.SourcePropertyRecordId = Right.SourcePropertyRecordId, 
-                  %SetMinDate% (Left, Right),
-                  atmost (1));
-ENDMACRO;
-*/
 
 EXPORT property_records (
   dataset (doxie.layout_references) dids,
@@ -357,8 +334,6 @@ EXPORT property_records (
   // ================================================================================================
 
   export property := dataset ([], iesp.bpsreport.t_BpsReportProperty);
-//doxie_ln.property_records(besr,addr(did = idid),,skipAddressRollup := true); ... ~base_property above
-	
 	
 	 
 	iesp.share.t_StringArrayItem xform_orig_names(LN_PropertyV2_Services.layouts.parties.orig L) := transform
@@ -801,8 +776,6 @@ EXPORT property_records (
 		Self := [];
   END;
 	
-	// export property_v2 := if (~IsFCRA, project(all_records ,FormatReport2Records(left)));
 	export property_v2 := project(all_records ,FormatReport2Records(left));
 	
-//LN_PropertyV2_Services.CRS_records(addr(did = idid)); ... ~base_property above
 END;
