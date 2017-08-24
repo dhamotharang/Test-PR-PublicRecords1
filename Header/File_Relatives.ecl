@@ -1,6 +1,6 @@
-import data_services,header,Relationship,PRTE2_Header;
+﻿import data_services,header,Relationship,PRTE2_Header;
 #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
-export File_Relatives := project(PRTE2_Header.files.file_headers,transform(header.layout_relatives,
+export File_Relatives := project(PRTE2_Header.file_header_base,transform(header.layout_relatives,
         SELF.zip:=(integer)left.zip,
         SELF.prim_range:=(integer)left.prim_range,
         SELF:=LEFT,

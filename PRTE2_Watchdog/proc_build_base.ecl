@@ -1,7 +1,7 @@
-IMPORT PRTE2_Header,infutor,PromoteSupers,Watchdog;
+﻿IMPORT PRTE2_Header,infutor,PromoteSupers,Watchdog;
 EXPORT proc_build_base(string filedate) := function
 
-        head:=PRTE2_Header.files.file_headers_base;
+        head:=PRTE2_Header.file_header_base;
         h_as_i := project(head,transform({infutor.infutor_header()},
         
         SELF.valid_dob:='',     SELF.hhid:=0,           SELF.county_name:='',

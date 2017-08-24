@@ -1,4 +1,4 @@
-// IMPORT 
+﻿IMPORT 
 
 // PRTE2_Death_Master,
 // prte2_DLV2,
@@ -18,7 +18,7 @@
 // PRTE2_EmergesKeys,
 // PRTE2_Gong,
 // PRTE2_Marriage_Divorce,
-// PRTE2_PhonesPlus;
+PRTE2_PhonesPlus;
 // PRTE2_SexOffender,
 // PRTE2_UCC,
 // PRTE2_Utility,
@@ -63,7 +63,7 @@
    // emal_in         := PRTE2_Email_Data.as_headers.person_header_email_recs;
    // gong_in         := dedup(sort(PRTE2_Gong.as_headers.person_header_gong_recs,record),record);
    // mrrg_in         := PRTE2_Marriage_Divorce.as_header.person_header_mar_div;
-   // phnp_in         := dedup(sort(PRTE2_PhonesPlus.as_headers.person_header_phones,record),record);
+   phnp_in         := dedup(sort(PRTE2_PhonesPlus.as_headers.person_header_phones,record),record);
    // sxof_in         := PRTE2_SexOffender.as_headers.person_header_SOF;
    // ucch_in         := PRTE2_UCC.as_headers.person_header_ucc;
 
@@ -106,7 +106,7 @@
             // + emal_in
             // + gong_in
             // + mrrg_in
-            // + phnp_in
+            + phnp_in
             // + sxof_in
             // + ucch_in
         ;
