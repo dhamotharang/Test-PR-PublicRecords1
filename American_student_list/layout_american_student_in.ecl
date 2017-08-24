@@ -1,4 +1,4 @@
-export layout_american_student_in := record
+﻿export layout_american_student_in := record
 
            string         NAME;
            string         FIRST_NAME;
@@ -29,4 +29,5 @@ export layout_american_student_in := record
            string         HEAD_OF_HOUSEHOLD_GENDER;
            string         INCOME_LEVEL;
            string         FILE_TYPE;
+					 string					COLLEGEUPDATE;
 end;
