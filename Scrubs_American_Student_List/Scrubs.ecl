@@ -1,9 +1,15 @@
-IMPORT SALT36;
+﻿IMPORT SALT38,STD;
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT  Expanded_Layout := RECORD(Layout_American_Student_List)
+  EXPORT NumRules := 48;
+  EXPORT NumRulesFromFieldType := 48;
+  EXPORT NumRulesFromRecordType := 0;
+  EXPORT NumFieldsWithRules := 41;
+  EXPORT NumFieldsWithPossibleEdits := 0;
+  EXPORT NumRulesWithPossibleEdits := 0;
+  EXPORT Expanded_Layout := RECORD(Layout_American_Student_List)
     UNSIGNED1 ssn_Invalid;
     UNSIGNED1 process_date_Invalid;
     UNSIGNED1 date_first_seen_Invalid;
@@ -51,47 +57,47 @@ EXPORT Scrubs := MODULE
   END;
 EXPORT FromNone(DATASET(Layout_American_Student_List) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.ssn_Invalid := Fields.InValid_ssn((SALT36.StrType)le.ssn);
-    SELF.process_date_Invalid := Fields.InValid_process_date((SALT36.StrType)le.process_date);
-    SELF.date_first_seen_Invalid := Fields.InValid_date_first_seen((SALT36.StrType)le.date_first_seen);
-    SELF.date_last_seen_Invalid := Fields.InValid_date_last_seen((SALT36.StrType)le.date_last_seen);
-    SELF.date_vendor_first_reported_Invalid := Fields.InValid_date_vendor_first_reported((SALT36.StrType)le.date_vendor_first_reported);
-    SELF.date_vendor_last_reported_Invalid := Fields.InValid_date_vendor_last_reported((SALT36.StrType)le.date_vendor_last_reported);
-    SELF.full_name_Invalid := Fields.InValid_full_name((SALT36.StrType)le.full_name);
-    SELF.first_name_Invalid := Fields.InValid_first_name((SALT36.StrType)le.first_name);
-    SELF.last_name_Invalid := Fields.InValid_last_name((SALT36.StrType)le.last_name);
-    SELF.address_1_Invalid := Fields.InValid_address_1((SALT36.StrType)le.address_1);
-    SELF.address_2_Invalid := Fields.InValid_address_2((SALT36.StrType)le.address_2);
-    SELF.city_Invalid := Fields.InValid_city((SALT36.StrType)le.city);
-    SELF.zip_Invalid := Fields.InValid_zip((SALT36.StrType)le.zip);
-    SELF.address_type_Invalid := Fields.InValid_address_type((SALT36.StrType)le.address_type);
-    SELF.county_number_Invalid := Fields.InValid_county_number((SALT36.StrType)le.county_number);
-    SELF.county_name_Invalid := Fields.InValid_county_name((SALT36.StrType)le.county_name);
-    SELF.gender_code_Invalid := Fields.InValid_gender_code((SALT36.StrType)le.gender_code);
-    SELF.gender_Invalid := Fields.InValid_gender((SALT36.StrType)le.gender);
-    SELF.age_Invalid := Fields.InValid_age((SALT36.StrType)le.age);
-    SELF.birth_date_Invalid := Fields.InValid_birth_date((SALT36.StrType)le.birth_date);
-    SELF.dob_formatted_Invalid := Fields.InValid_dob_formatted((SALT36.StrType)le.dob_formatted);
-    SELF.telephone_Invalid := Fields.InValid_telephone((SALT36.StrType)le.telephone);
-    SELF.college_class_Invalid := Fields.InValid_college_class((SALT36.StrType)le.college_class);
-    SELF.college_code_Invalid := Fields.InValid_college_code((SALT36.StrType)le.college_code);
-    SELF.college_code_exploded_Invalid := Fields.InValid_college_code_exploded((SALT36.StrType)le.college_code_exploded);
-    SELF.college_type_Invalid := Fields.InValid_college_type((SALT36.StrType)le.college_type);
-    SELF.college_type_exploded_Invalid := Fields.InValid_college_type_exploded((SALT36.StrType)le.college_type_exploded);
-    SELF.head_of_household_gender_code_Invalid := Fields.InValid_head_of_household_gender_code((SALT36.StrType)le.head_of_household_gender_code);
-    SELF.head_of_household_gender_Invalid := Fields.InValid_head_of_household_gender((SALT36.StrType)le.head_of_household_gender);
-    SELF.income_level_code_Invalid := Fields.InValid_income_level_code((SALT36.StrType)le.income_level_code);
-    SELF.new_income_level_code_Invalid := Fields.InValid_new_income_level_code((SALT36.StrType)le.new_income_level_code);
-    SELF.name_suffix_Invalid := Fields.InValid_name_suffix((SALT36.StrType)le.name_suffix);
-    SELF.prim_range_Invalid := Fields.InValid_prim_range((SALT36.StrType)le.prim_range);
-    SELF.predir_Invalid := Fields.InValid_predir((SALT36.StrType)le.predir);
-    SELF.prim_name_Invalid := Fields.InValid_prim_name((SALT36.StrType)le.prim_name);
-    SELF.addr_suffix_Invalid := Fields.InValid_addr_suffix((SALT36.StrType)le.addr_suffix);
-    SELF.postdir_Invalid := Fields.InValid_postdir((SALT36.StrType)le.postdir);
-    SELF.unit_desig_Invalid := Fields.InValid_unit_desig((SALT36.StrType)le.unit_desig);
-    SELF.sec_range_Invalid := Fields.InValid_sec_range((SALT36.StrType)le.sec_range);
-    SELF.p_city_name_Invalid := Fields.InValid_p_city_name((SALT36.StrType)le.p_city_name);
-    SELF.v_city_name_Invalid := Fields.InValid_v_city_name((SALT36.StrType)le.v_city_name);
+    SELF.ssn_Invalid := Fields.InValid_ssn((SALT38.StrType)le.ssn);
+    SELF.process_date_Invalid := Fields.InValid_process_date((SALT38.StrType)le.process_date);
+    SELF.date_first_seen_Invalid := Fields.InValid_date_first_seen((SALT38.StrType)le.date_first_seen);
+    SELF.date_last_seen_Invalid := Fields.InValid_date_last_seen((SALT38.StrType)le.date_last_seen);
+    SELF.date_vendor_first_reported_Invalid := Fields.InValid_date_vendor_first_reported((SALT38.StrType)le.date_vendor_first_reported);
+    SELF.date_vendor_last_reported_Invalid := Fields.InValid_date_vendor_last_reported((SALT38.StrType)le.date_vendor_last_reported);
+    SELF.full_name_Invalid := Fields.InValid_full_name((SALT38.StrType)le.full_name);
+    SELF.first_name_Invalid := Fields.InValid_first_name((SALT38.StrType)le.first_name);
+    SELF.last_name_Invalid := Fields.InValid_last_name((SALT38.StrType)le.last_name);
+    SELF.address_1_Invalid := Fields.InValid_address_1((SALT38.StrType)le.address_1);
+    SELF.address_2_Invalid := Fields.InValid_address_2((SALT38.StrType)le.address_2);
+    SELF.city_Invalid := Fields.InValid_city((SALT38.StrType)le.city);
+    SELF.zip_Invalid := Fields.InValid_zip((SALT38.StrType)le.zip);
+    SELF.address_type_Invalid := Fields.InValid_address_type((SALT38.StrType)le.address_type);
+    SELF.county_number_Invalid := Fields.InValid_county_number((SALT38.StrType)le.county_number);
+    SELF.county_name_Invalid := Fields.InValid_county_name((SALT38.StrType)le.county_name);
+    SELF.gender_code_Invalid := Fields.InValid_gender_code((SALT38.StrType)le.gender_code);
+    SELF.gender_Invalid := Fields.InValid_gender((SALT38.StrType)le.gender);
+    SELF.age_Invalid := Fields.InValid_age((SALT38.StrType)le.age);
+    SELF.birth_date_Invalid := Fields.InValid_birth_date((SALT38.StrType)le.birth_date);
+    SELF.dob_formatted_Invalid := Fields.InValid_dob_formatted((SALT38.StrType)le.dob_formatted);
+    SELF.telephone_Invalid := Fields.InValid_telephone((SALT38.StrType)le.telephone);
+    SELF.college_class_Invalid := Fields.InValid_college_class((SALT38.StrType)le.college_class);
+    SELF.college_code_Invalid := Fields.InValid_college_code((SALT38.StrType)le.college_code);
+    SELF.college_code_exploded_Invalid := Fields.InValid_college_code_exploded((SALT38.StrType)le.college_code_exploded);
+    SELF.college_type_Invalid := Fields.InValid_college_type((SALT38.StrType)le.college_type);
+    SELF.college_type_exploded_Invalid := Fields.InValid_college_type_exploded((SALT38.StrType)le.college_type_exploded);
+    SELF.head_of_household_gender_code_Invalid := Fields.InValid_head_of_household_gender_code((SALT38.StrType)le.head_of_household_gender_code);
+    SELF.head_of_household_gender_Invalid := Fields.InValid_head_of_household_gender((SALT38.StrType)le.head_of_household_gender);
+    SELF.income_level_code_Invalid := Fields.InValid_income_level_code((SALT38.StrType)le.income_level_code);
+    SELF.new_income_level_code_Invalid := Fields.InValid_new_income_level_code((SALT38.StrType)le.new_income_level_code);
+    SELF.name_suffix_Invalid := Fields.InValid_name_suffix((SALT38.StrType)le.name_suffix);
+    SELF.prim_range_Invalid := Fields.InValid_prim_range((SALT38.StrType)le.prim_range);
+    SELF.predir_Invalid := Fields.InValid_predir((SALT38.StrType)le.predir);
+    SELF.prim_name_Invalid := Fields.InValid_prim_name((SALT38.StrType)le.prim_name);
+    SELF.addr_suffix_Invalid := Fields.InValid_addr_suffix((SALT38.StrType)le.addr_suffix);
+    SELF.postdir_Invalid := Fields.InValid_postdir((SALT38.StrType)le.postdir);
+    SELF.unit_desig_Invalid := Fields.InValid_unit_desig((SALT38.StrType)le.unit_desig);
+    SELF.sec_range_Invalid := Fields.InValid_sec_range((SALT38.StrType)le.sec_range);
+    SELF.p_city_name_Invalid := Fields.InValid_p_city_name((SALT38.StrType)le.p_city_name);
+    SELF.v_city_name_Invalid := Fields.InValid_v_city_name((SALT38.StrType)le.v_city_name);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -210,15 +216,28 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     sec_range_ALLOW_ErrorCount := COUNT(GROUP,h.sec_range_Invalid=1);
     p_city_name_ALLOW_ErrorCount := COUNT(GROUP,h.p_city_name_Invalid=1);
     v_city_name_ALLOW_ErrorCount := COUNT(GROUP,h.v_city_name_Invalid=1);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.ssn_Invalid > 0 OR h.process_date_Invalid > 0 OR h.date_first_seen_Invalid > 0 OR h.date_last_seen_Invalid > 0 OR h.date_vendor_first_reported_Invalid > 0 OR h.date_vendor_last_reported_Invalid > 0 OR h.full_name_Invalid > 0 OR h.first_name_Invalid > 0 OR h.last_name_Invalid > 0 OR h.address_1_Invalid > 0 OR h.address_2_Invalid > 0 OR h.city_Invalid > 0 OR h.zip_Invalid > 0 OR h.address_type_Invalid > 0 OR h.county_number_Invalid > 0 OR h.county_name_Invalid > 0 OR h.gender_code_Invalid > 0 OR h.gender_Invalid > 0 OR h.age_Invalid > 0 OR h.birth_date_Invalid > 0 OR h.dob_formatted_Invalid > 0 OR h.telephone_Invalid > 0 OR h.college_class_Invalid > 0 OR h.college_code_Invalid > 0 OR h.college_code_exploded_Invalid > 0 OR h.college_type_Invalid > 0 OR h.college_type_exploded_Invalid > 0 OR h.head_of_household_gender_code_Invalid > 0 OR h.head_of_household_gender_Invalid > 0 OR h.income_level_code_Invalid > 0 OR h.new_income_level_code_Invalid > 0 OR h.name_suffix_Invalid > 0 OR h.prim_range_Invalid > 0 OR h.predir_Invalid > 0 OR h.prim_name_Invalid > 0 OR h.addr_suffix_Invalid > 0 OR h.postdir_Invalid > 0 OR h.unit_desig_Invalid > 0 OR h.sec_range_Invalid > 0 OR h.p_city_name_Invalid > 0 OR h.v_city_name_Invalid > 0);
+    FieldsChecked_WithErrors := 0;
+    FieldsChecked_NoErrors := 0;
+    Rules_WithErrors := 0;
+    Rules_NoErrors := 0;
   END;
-  EXPORT SummaryStats := TABLE(h,r);
+  SummaryStats0 := TABLE(h,r);
+  SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
+    SELF.FieldsChecked_WithErrors := IF(le.ssn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.full_name_Total_ErrorCount > 0, 1, 0) + IF(le.first_name_Total_ErrorCount > 0, 1, 0) + IF(le.last_name_Total_ErrorCount > 0, 1, 0) + IF(le.address_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.address_2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.city_Total_ErrorCount > 0, 1, 0) + IF(le.zip_Total_ErrorCount > 0, 1, 0) + IF(le.address_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.county_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.county_name_Total_ErrorCount > 0, 1, 0) + IF(le.gender_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.gender_ENUM_ErrorCount > 0, 1, 0) + IF(le.age_ALLOW_ErrorCount > 0, 1, 0) + IF(le.birth_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dob_formatted_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.telephone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.college_class_ENUM_ErrorCount > 0, 1, 0) + IF(le.college_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.college_code_exploded_ENUM_ErrorCount > 0, 1, 0) + IF(le.college_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.college_type_exploded_ENUM_ErrorCount > 0, 1, 0) + IF(le.head_of_household_gender_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.head_of_household_gender_ENUM_ErrorCount > 0, 1, 0) + IF(le.income_level_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.new_income_level_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.name_suffix_Total_ErrorCount > 0, 1, 0) + IF(le.prim_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prim_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addr_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.unit_desig_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sec_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.p_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.v_city_name_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
+    SELF.Rules_WithErrors := IF(le.ssn_ALLOW_ErrorCount > 0, 1, 0) + IF(le.process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.date_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.full_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.full_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.first_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.first_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.last_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.last_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.address_1_ALLOW_ErrorCount > 0, 1, 0) + IF(le.address_2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.city_ALLOW_ErrorCount > 0, 1, 0) + IF(le.city_LENGTH_ErrorCount > 0, 1, 0) + IF(le.zip_ALLOW_ErrorCount > 0, 1, 0) + IF(le.zip_LENGTH_ErrorCount > 0, 1, 0) + IF(le.address_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.county_number_ALLOW_ErrorCount > 0, 1, 0) + IF(le.county_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.county_name_WORDS_ErrorCount > 0, 1, 0) + IF(le.gender_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.gender_ENUM_ErrorCount > 0, 1, 0) + IF(le.age_ALLOW_ErrorCount > 0, 1, 0) + IF(le.birth_date_ALLOW_ErrorCount > 0, 1, 0) + IF(le.dob_formatted_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.telephone_ALLOW_ErrorCount > 0, 1, 0) + IF(le.college_class_ENUM_ErrorCount > 0, 1, 0) + IF(le.college_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.college_code_exploded_ENUM_ErrorCount > 0, 1, 0) + IF(le.college_type_ENUM_ErrorCount > 0, 1, 0) + IF(le.college_type_exploded_ENUM_ErrorCount > 0, 1, 0) + IF(le.head_of_household_gender_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.head_of_household_gender_ENUM_ErrorCount > 0, 1, 0) + IF(le.income_level_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.new_income_level_code_ENUM_ErrorCount > 0, 1, 0) + IF(le.name_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.name_suffix_ENUM_ErrorCount > 0, 1, 0) + IF(le.prim_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.predir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.prim_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.addr_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.postdir_ALLOW_ErrorCount > 0, 1, 0) + IF(le.unit_desig_ALLOW_ErrorCount > 0, 1, 0) + IF(le.sec_range_ALLOW_ErrorCount > 0, 1, 0) + IF(le.p_city_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.v_city_name_ALLOW_ErrorCount > 0, 1, 0);
+    SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
+    SELF := le;
+  END;
+  EXPORT SummaryStats := PROJECT(SummaryStats0, xAddErrSummary(LEFT));
   r := RECORD
     STRING10 Src;
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT36.StrType ErrorMessage;
-    SALT36.StrType FieldContents;
+    SALT38.StrType ErrorMessage;
+    SALT38.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -268,14 +287,15 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.v_city_name_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'ssn','process_date','date_first_seen','date_last_seen','date_vendor_first_reported','date_vendor_last_reported','full_name','first_name','last_name','address_1','address_2','city','zip','address_type','county_number','county_name','gender_code','gender','age','birth_date','dob_formatted','telephone','college_class','college_code','college_code_exploded','college_type','college_type_exploded','head_of_household_gender_code','head_of_household_gender','income_level_code','new_income_level_code','name_suffix','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'invalid_nums','invalid_date','invalid_date','invalid_date','invalid_date','invalid_date','invalid_alpha','invalid_alpha','invalid_alpha','invalid_address','invalid_address','invalid_alpha','invalid_zip','invalid_address_type','invalid_nums','invalid_county_name','invalid_gender_code','invalid_gender','invalid_nums','invalid_nums','invalid_date','invalid_nums','invalid_college_class','invalid_college_code','invalid_code_code_exploded','invalid_college_type','invalid_college_type_exploded','invalid_gender_code','invalid_gender','invalid_income_lvl_code','invalid_new_income_lvl_code','invalid_suffix','invalid_address','invalid_address','invalid_address','invalid_address','invalid_address','invalid_address','invalid_address','invalid_csz','invalid_csz','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT36.StrType)le.ssn,(SALT36.StrType)le.process_date,(SALT36.StrType)le.date_first_seen,(SALT36.StrType)le.date_last_seen,(SALT36.StrType)le.date_vendor_first_reported,(SALT36.StrType)le.date_vendor_last_reported,(SALT36.StrType)le.full_name,(SALT36.StrType)le.first_name,(SALT36.StrType)le.last_name,(SALT36.StrType)le.address_1,(SALT36.StrType)le.address_2,(SALT36.StrType)le.city,(SALT36.StrType)le.zip,(SALT36.StrType)le.address_type,(SALT36.StrType)le.county_number,(SALT36.StrType)le.county_name,(SALT36.StrType)le.gender_code,(SALT36.StrType)le.gender,(SALT36.StrType)le.age,(SALT36.StrType)le.birth_date,(SALT36.StrType)le.dob_formatted,(SALT36.StrType)le.telephone,(SALT36.StrType)le.college_class,(SALT36.StrType)le.college_code,(SALT36.StrType)le.college_code_exploded,(SALT36.StrType)le.college_type,(SALT36.StrType)le.college_type_exploded,(SALT36.StrType)le.head_of_household_gender_code,(SALT36.StrType)le.head_of_household_gender,(SALT36.StrType)le.income_level_code,(SALT36.StrType)le.new_income_level_code,(SALT36.StrType)le.name_suffix,(SALT36.StrType)le.prim_range,(SALT36.StrType)le.predir,(SALT36.StrType)le.prim_name,(SALT36.StrType)le.addr_suffix,(SALT36.StrType)le.postdir,(SALT36.StrType)le.unit_desig,(SALT36.StrType)le.sec_range,(SALT36.StrType)le.p_city_name,(SALT36.StrType)le.v_city_name,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT38.StrType)le.ssn,(SALT38.StrType)le.process_date,(SALT38.StrType)le.date_first_seen,(SALT38.StrType)le.date_last_seen,(SALT38.StrType)le.date_vendor_first_reported,(SALT38.StrType)le.date_vendor_last_reported,(SALT38.StrType)le.full_name,(SALT38.StrType)le.first_name,(SALT38.StrType)le.last_name,(SALT38.StrType)le.address_1,(SALT38.StrType)le.address_2,(SALT38.StrType)le.city,(SALT38.StrType)le.zip,(SALT38.StrType)le.address_type,(SALT38.StrType)le.county_number,(SALT38.StrType)le.county_name,(SALT38.StrType)le.gender_code,(SALT38.StrType)le.gender,(SALT38.StrType)le.age,(SALT38.StrType)le.birth_date,(SALT38.StrType)le.dob_formatted,(SALT38.StrType)le.telephone,(SALT38.StrType)le.college_class,(SALT38.StrType)le.college_code,(SALT38.StrType)le.college_code_exploded,(SALT38.StrType)le.college_type,(SALT38.StrType)le.college_type_exploded,(SALT38.StrType)le.head_of_household_gender_code,(SALT38.StrType)le.head_of_household_gender,(SALT38.StrType)le.income_level_code,(SALT38.StrType)le.new_income_level_code,(SALT38.StrType)le.name_suffix,(SALT38.StrType)le.prim_range,(SALT38.StrType)le.predir,(SALT38.StrType)le.prim_name,(SALT38.StrType)le.addr_suffix,(SALT38.StrType)le.postdir,(SALT38.StrType)le.unit_desig,(SALT38.StrType)le.sec_range,(SALT38.StrType)le.p_city_name,(SALT38.StrType)le.v_city_name,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,41,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
-  EXPORT OrbitStats(UNSIGNED examples = 10,UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(),STRING10 Src='UNK') := FUNCTION
-    SALT36.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+  EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(Layout_American_Student_List) prevDS = DATASET([], Layout_American_Student_List), STRING10 Src='UNK'):= FUNCTION
+  // field error stats
+    SALT38.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -320,7 +340,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'unit_desig:invalid_address:ALLOW'
           ,'sec_range:invalid_address:ALLOW'
           ,'p_city_name:invalid_csz:ALLOW'
-          ,'v_city_name:invalid_csz:ALLOW','UNKNOWN');
+          ,'v_city_name:invalid_csz:ALLOW'
+          ,'field:Number_Errored_Fields:SUMMARY'
+          ,'field:Number_Perfect_Fields:SUMMARY'
+          ,'rule:Number_Errored_Rules:SUMMARY'
+          ,'rule:Number_Perfect_Rules:SUMMARY'
+          ,'rule:Number_OnFail_Rules:SUMMARY'
+          ,'record:Number_Errored_Records:SUMMARY'
+          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
       SELF.ErrorMessage := CHOOSE(c
           ,Fields.InvalidMessage_ssn(1)
           ,Fields.InvalidMessage_process_date(1)
@@ -362,7 +389,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,Fields.InvalidMessage_unit_desig(1)
           ,Fields.InvalidMessage_sec_range(1)
           ,Fields.InvalidMessage_p_city_name(1)
-          ,Fields.InvalidMessage_v_city_name(1),'UNKNOWN');
+          ,Fields.InvalidMessage_v_city_name(1)
+          ,'Fields with errors'
+          ,'Fields without errors'
+          ,'Rules with errors'
+          ,'Rules without errors'
+          ,'Rules with possible edits'
+          ,'Records with at least one error'
+          ,'Records without errors','UNKNOWN');
       SELF.rulecnt := CHOOSE(c
           ,le.ssn_ALLOW_ErrorCount
           ,le.process_date_CUSTOM_ErrorCount
@@ -404,8 +438,15 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.unit_desig_ALLOW_ErrorCount
           ,le.sec_range_ALLOW_ErrorCount
           ,le.p_city_name_ALLOW_ErrorCount
-          ,le.v_city_name_ALLOW_ErrorCount,0);
-      SELF.rulepcnt := 100 * CHOOSE(c
+          ,le.v_city_name_ALLOW_ErrorCount
+          ,le.FieldsChecked_WithErrors
+          ,le.FieldsChecked_NoErrors
+          ,le.Rules_WithErrors
+          ,le.Rules_NoErrors
+          ,NumRulesWithPossibleEdits
+          ,le.AnyRule_WithErrorsCount
+          ,SELF.recordstotal - le.AnyRule_WithErrorsCount,0);
+      SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
           ,le.ssn_ALLOW_ErrorCount
           ,le.process_date_CUSTOM_ErrorCount
           ,le.date_first_seen_CUSTOM_ErrorCount
@@ -446,25 +487,368 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.unit_desig_ALLOW_ErrorCount
           ,le.sec_range_ALLOW_ErrorCount
           ,le.p_city_name_ALLOW_ErrorCount
-          ,le.v_city_name_ALLOW_ErrorCount,0) / le.TotalCnt + 0.5;
+          ,le.v_city_name_ALLOW_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
+          ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
+          ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
+          ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
+          ,IF(NumRules = 0, 0, le.Rules_NoErrors/NumRules * 100)
+          ,0
+          ,IF(SELF.recordstotal = 0, 0, le.AnyRule_WithErrorsCount/SELF.recordstotal * 100)
+          ,IF(SELF.recordstotal = 0, 0, (SELF.recordstotal - le.AnyRule_WithErrorsCount)/SELF.recordstotal * 100),0));
     END;
-    SummaryInfo := NORMALIZE(SummaryStats,48,Into(LEFT,COUNTER));
+    SummaryInfo := NORMALIZE(SummaryStats,NumRules + 7,Into(LEFT,COUNTER));
     orb_r := RECORD
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT36.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT38.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT36.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT38.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
     END;
-    j := JOIN(SummaryInfo,gt,LEFT.SourceCode=RIGHT.SRC AND LEFT.ruledesc=RIGHT.ruledesc,jn(LEFT,RIGHT),HASH,LEFT OUTER);
-    RETURN IF(examples>0,j,SummaryInfo);
+    j := JOIN(SummaryInfo,gt,LEFT.ruledesc=RIGHT.ruledesc,jn(LEFT,RIGHT),HASH,LEFT OUTER);
+    FieldErrorStats := IF(examples>0,j,SummaryInfo);
+ 
+    // field population stats
+    mod_hygiene := hygiene(PROJECT(h, Layout_American_Student_List));
+    hygiene_summaryStats := mod_hygiene.Summary('');
+    getFieldTypeText(infield) := FUNCTIONMACRO
+      isNumField := (STRING)((TYPEOF(infield))'') = '0';
+      RETURN IF(isNumField, 'nonzero', 'nonblank');
+    ENDMACRO;
+    SALT38.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+      SELF.recordstotal := le.NumberOfRecords;
+      SELF.processdate := Pdate;
+      SELF.sourcecode := src;
+      SELF.ruledesc := CHOOSE(c
+          ,'key:' + getFieldTypeText(h.key) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'ssn:' + getFieldTypeText(h.ssn) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'did:' + getFieldTypeText(h.did) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'process_date:' + getFieldTypeText(h.process_date) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'date_first_seen:' + getFieldTypeText(h.date_first_seen) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'date_last_seen:' + getFieldTypeText(h.date_last_seen) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'date_vendor_first_reported:' + getFieldTypeText(h.date_vendor_first_reported) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'date_vendor_last_reported:' + getFieldTypeText(h.date_vendor_last_reported) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'historical_flag:' + getFieldTypeText(h.historical_flag) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'full_name:' + getFieldTypeText(h.full_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'first_name:' + getFieldTypeText(h.first_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'last_name:' + getFieldTypeText(h.last_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'address_1:' + getFieldTypeText(h.address_1) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'address_2:' + getFieldTypeText(h.address_2) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'city:' + getFieldTypeText(h.city) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'state:' + getFieldTypeText(h.state) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'zip:' + getFieldTypeText(h.zip) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'zip_4:' + getFieldTypeText(h.zip_4) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'crrt_code:' + getFieldTypeText(h.crrt_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'delivery_point_barcode:' + getFieldTypeText(h.delivery_point_barcode) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'zip4_check_digit:' + getFieldTypeText(h.zip4_check_digit) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'address_type_code:' + getFieldTypeText(h.address_type_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'address_type:' + getFieldTypeText(h.address_type) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'county_number:' + getFieldTypeText(h.county_number) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'county_name:' + getFieldTypeText(h.county_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'gender_code:' + getFieldTypeText(h.gender_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'gender:' + getFieldTypeText(h.gender) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'age:' + getFieldTypeText(h.age) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'birth_date:' + getFieldTypeText(h.birth_date) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'dob_formatted:' + getFieldTypeText(h.dob_formatted) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'telephone:' + getFieldTypeText(h.telephone) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'class:' + getFieldTypeText(h.class) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'college_class:' + getFieldTypeText(h.college_class) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'college_name:' + getFieldTypeText(h.college_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'ln_college_name:' + getFieldTypeText(h.ln_college_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'college_major:' + getFieldTypeText(h.college_major) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'new_college_major:' + getFieldTypeText(h.new_college_major) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'college_code:' + getFieldTypeText(h.college_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'college_code_exploded:' + getFieldTypeText(h.college_code_exploded) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'college_type:' + getFieldTypeText(h.college_type) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'college_type_exploded:' + getFieldTypeText(h.college_type_exploded) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'head_of_household_first_name:' + getFieldTypeText(h.head_of_household_first_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'head_of_household_gender_code:' + getFieldTypeText(h.head_of_household_gender_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'head_of_household_gender:' + getFieldTypeText(h.head_of_household_gender) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'income_level_code:' + getFieldTypeText(h.income_level_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'income_level:' + getFieldTypeText(h.income_level) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'new_income_level_code:' + getFieldTypeText(h.new_income_level_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'new_income_level:' + getFieldTypeText(h.new_income_level) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'file_type:' + getFieldTypeText(h.file_type) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'tier:' + getFieldTypeText(h.tier) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'school_size_code:' + getFieldTypeText(h.school_size_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'competitive_code:' + getFieldTypeText(h.competitive_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'tuition_code:' + getFieldTypeText(h.tuition_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'title:' + getFieldTypeText(h.title) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'fname:' + getFieldTypeText(h.fname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'mname:' + getFieldTypeText(h.mname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'lname:' + getFieldTypeText(h.lname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'name_suffix:' + getFieldTypeText(h.name_suffix) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'name_score:' + getFieldTypeText(h.name_score) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'rawaid:' + getFieldTypeText(h.rawaid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'prim_range:' + getFieldTypeText(h.prim_range) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'predir:' + getFieldTypeText(h.predir) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'prim_name:' + getFieldTypeText(h.prim_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'addr_suffix:' + getFieldTypeText(h.addr_suffix) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'postdir:' + getFieldTypeText(h.postdir) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'unit_desig:' + getFieldTypeText(h.unit_desig) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'sec_range:' + getFieldTypeText(h.sec_range) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'p_city_name:' + getFieldTypeText(h.p_city_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'v_city_name:' + getFieldTypeText(h.v_city_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'st:' + getFieldTypeText(h.st) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'z5:' + getFieldTypeText(h.z5) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'zip4:' + getFieldTypeText(h.zip4) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'cart:' + getFieldTypeText(h.cart) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'cr_sort_sz:' + getFieldTypeText(h.cr_sort_sz) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'lot:' + getFieldTypeText(h.lot) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'lot_order:' + getFieldTypeText(h.lot_order) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'dpbc:' + getFieldTypeText(h.dpbc) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'chk_digit:' + getFieldTypeText(h.chk_digit) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'rec_type:' + getFieldTypeText(h.rec_type) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'county:' + getFieldTypeText(h.county) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'ace_fips_st:' + getFieldTypeText(h.ace_fips_st) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'fips_county:' + getFieldTypeText(h.fips_county) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'geo_lat:' + getFieldTypeText(h.geo_lat) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'geo_long:' + getFieldTypeText(h.geo_long) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'msa:' + getFieldTypeText(h.msa) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'geo_blk:' + getFieldTypeText(h.geo_blk) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'geo_match:' + getFieldTypeText(h.geo_match) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'err_stat:' + getFieldTypeText(h.err_stat) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'tier2:' + getFieldTypeText(h.tier2) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'source:' + getFieldTypeText(h.source) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
+      SELF.rulecnt := CHOOSE(c
+          ,le.populated_key_cnt
+          ,le.populated_ssn_cnt
+          ,le.populated_did_cnt
+          ,le.populated_process_date_cnt
+          ,le.populated_date_first_seen_cnt
+          ,le.populated_date_last_seen_cnt
+          ,le.populated_date_vendor_first_reported_cnt
+          ,le.populated_date_vendor_last_reported_cnt
+          ,le.populated_historical_flag_cnt
+          ,le.populated_full_name_cnt
+          ,le.populated_first_name_cnt
+          ,le.populated_last_name_cnt
+          ,le.populated_address_1_cnt
+          ,le.populated_address_2_cnt
+          ,le.populated_city_cnt
+          ,le.populated_state_cnt
+          ,le.populated_zip_cnt
+          ,le.populated_zip_4_cnt
+          ,le.populated_crrt_code_cnt
+          ,le.populated_delivery_point_barcode_cnt
+          ,le.populated_zip4_check_digit_cnt
+          ,le.populated_address_type_code_cnt
+          ,le.populated_address_type_cnt
+          ,le.populated_county_number_cnt
+          ,le.populated_county_name_cnt
+          ,le.populated_gender_code_cnt
+          ,le.populated_gender_cnt
+          ,le.populated_age_cnt
+          ,le.populated_birth_date_cnt
+          ,le.populated_dob_formatted_cnt
+          ,le.populated_telephone_cnt
+          ,le.populated_class_cnt
+          ,le.populated_college_class_cnt
+          ,le.populated_college_name_cnt
+          ,le.populated_ln_college_name_cnt
+          ,le.populated_college_major_cnt
+          ,le.populated_new_college_major_cnt
+          ,le.populated_college_code_cnt
+          ,le.populated_college_code_exploded_cnt
+          ,le.populated_college_type_cnt
+          ,le.populated_college_type_exploded_cnt
+          ,le.populated_head_of_household_first_name_cnt
+          ,le.populated_head_of_household_gender_code_cnt
+          ,le.populated_head_of_household_gender_cnt
+          ,le.populated_income_level_code_cnt
+          ,le.populated_income_level_cnt
+          ,le.populated_new_income_level_code_cnt
+          ,le.populated_new_income_level_cnt
+          ,le.populated_file_type_cnt
+          ,le.populated_tier_cnt
+          ,le.populated_school_size_code_cnt
+          ,le.populated_competitive_code_cnt
+          ,le.populated_tuition_code_cnt
+          ,le.populated_title_cnt
+          ,le.populated_fname_cnt
+          ,le.populated_mname_cnt
+          ,le.populated_lname_cnt
+          ,le.populated_name_suffix_cnt
+          ,le.populated_name_score_cnt
+          ,le.populated_rawaid_cnt
+          ,le.populated_prim_range_cnt
+          ,le.populated_predir_cnt
+          ,le.populated_prim_name_cnt
+          ,le.populated_addr_suffix_cnt
+          ,le.populated_postdir_cnt
+          ,le.populated_unit_desig_cnt
+          ,le.populated_sec_range_cnt
+          ,le.populated_p_city_name_cnt
+          ,le.populated_v_city_name_cnt
+          ,le.populated_st_cnt
+          ,le.populated_z5_cnt
+          ,le.populated_zip4_cnt
+          ,le.populated_cart_cnt
+          ,le.populated_cr_sort_sz_cnt
+          ,le.populated_lot_cnt
+          ,le.populated_lot_order_cnt
+          ,le.populated_dpbc_cnt
+          ,le.populated_chk_digit_cnt
+          ,le.populated_rec_type_cnt
+          ,le.populated_county_cnt
+          ,le.populated_ace_fips_st_cnt
+          ,le.populated_fips_county_cnt
+          ,le.populated_geo_lat_cnt
+          ,le.populated_geo_long_cnt
+          ,le.populated_msa_cnt
+          ,le.populated_geo_blk_cnt
+          ,le.populated_geo_match_cnt
+          ,le.populated_err_stat_cnt
+          ,le.populated_tier2_cnt
+          ,le.populated_source_cnt,0);
+      SELF.rulepcnt := CHOOSE(c
+          ,le.populated_key_pcnt
+          ,le.populated_ssn_pcnt
+          ,le.populated_did_pcnt
+          ,le.populated_process_date_pcnt
+          ,le.populated_date_first_seen_pcnt
+          ,le.populated_date_last_seen_pcnt
+          ,le.populated_date_vendor_first_reported_pcnt
+          ,le.populated_date_vendor_last_reported_pcnt
+          ,le.populated_historical_flag_pcnt
+          ,le.populated_full_name_pcnt
+          ,le.populated_first_name_pcnt
+          ,le.populated_last_name_pcnt
+          ,le.populated_address_1_pcnt
+          ,le.populated_address_2_pcnt
+          ,le.populated_city_pcnt
+          ,le.populated_state_pcnt
+          ,le.populated_zip_pcnt
+          ,le.populated_zip_4_pcnt
+          ,le.populated_crrt_code_pcnt
+          ,le.populated_delivery_point_barcode_pcnt
+          ,le.populated_zip4_check_digit_pcnt
+          ,le.populated_address_type_code_pcnt
+          ,le.populated_address_type_pcnt
+          ,le.populated_county_number_pcnt
+          ,le.populated_county_name_pcnt
+          ,le.populated_gender_code_pcnt
+          ,le.populated_gender_pcnt
+          ,le.populated_age_pcnt
+          ,le.populated_birth_date_pcnt
+          ,le.populated_dob_formatted_pcnt
+          ,le.populated_telephone_pcnt
+          ,le.populated_class_pcnt
+          ,le.populated_college_class_pcnt
+          ,le.populated_college_name_pcnt
+          ,le.populated_ln_college_name_pcnt
+          ,le.populated_college_major_pcnt
+          ,le.populated_new_college_major_pcnt
+          ,le.populated_college_code_pcnt
+          ,le.populated_college_code_exploded_pcnt
+          ,le.populated_college_type_pcnt
+          ,le.populated_college_type_exploded_pcnt
+          ,le.populated_head_of_household_first_name_pcnt
+          ,le.populated_head_of_household_gender_code_pcnt
+          ,le.populated_head_of_household_gender_pcnt
+          ,le.populated_income_level_code_pcnt
+          ,le.populated_income_level_pcnt
+          ,le.populated_new_income_level_code_pcnt
+          ,le.populated_new_income_level_pcnt
+          ,le.populated_file_type_pcnt
+          ,le.populated_tier_pcnt
+          ,le.populated_school_size_code_pcnt
+          ,le.populated_competitive_code_pcnt
+          ,le.populated_tuition_code_pcnt
+          ,le.populated_title_pcnt
+          ,le.populated_fname_pcnt
+          ,le.populated_mname_pcnt
+          ,le.populated_lname_pcnt
+          ,le.populated_name_suffix_pcnt
+          ,le.populated_name_score_pcnt
+          ,le.populated_rawaid_pcnt
+          ,le.populated_prim_range_pcnt
+          ,le.populated_predir_pcnt
+          ,le.populated_prim_name_pcnt
+          ,le.populated_addr_suffix_pcnt
+          ,le.populated_postdir_pcnt
+          ,le.populated_unit_desig_pcnt
+          ,le.populated_sec_range_pcnt
+          ,le.populated_p_city_name_pcnt
+          ,le.populated_v_city_name_pcnt
+          ,le.populated_st_pcnt
+          ,le.populated_z5_pcnt
+          ,le.populated_zip4_pcnt
+          ,le.populated_cart_pcnt
+          ,le.populated_cr_sort_sz_pcnt
+          ,le.populated_lot_pcnt
+          ,le.populated_lot_order_pcnt
+          ,le.populated_dpbc_pcnt
+          ,le.populated_chk_digit_pcnt
+          ,le.populated_rec_type_pcnt
+          ,le.populated_county_pcnt
+          ,le.populated_ace_fips_st_pcnt
+          ,le.populated_fips_county_pcnt
+          ,le.populated_geo_lat_pcnt
+          ,le.populated_geo_long_pcnt
+          ,le.populated_msa_pcnt
+          ,le.populated_geo_blk_pcnt
+          ,le.populated_geo_match_pcnt
+          ,le.populated_err_stat_pcnt
+          ,le.populated_tier2_pcnt
+          ,le.populated_source_pcnt,0);
+      SELF.ErrorMessage := '';
+    END;
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,90,xNormHygieneStats(LEFT,COUNTER,'POP'));
+ 
+  // record count stats
+    SALT38.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+      SELF.recordstotal := le.NumberOfRecords;
+      SELF.processdate := Pdate;
+      SELF.sourcecode := src;
+      SELF.ruledesc := inRuleDesc;
+      SELF.ErrorMessage := '';
+      SELF.rulecnt := le.NumberOfRecords;
+      SELF.rulepcnt := 0;
+    END;
+    TotalRecsStats := PROJECT(hygiene_summaryStats, xTotalRecs(LEFT, 'records:total_records:POP'));
+ 
+    mod_Delta := Delta(prevDS, PROJECT(h, Layout_American_Student_List));
+    deltaHygieneSummary := mod_Delta.DifferenceSummary;
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),90,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
+                                      'Updates:count_Updates:DELTA',
+                                      TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');
+    DeltaTotalRecsStats := PROJECT(deltaHygieneSummary(txt <> 'Updates_OldFile'), xTotalRecs(LEFT, deltaStatName(LEFT.txt)));
+    DeltaStats := IF(COUNT(prevDS) > 0, DeltaFieldPopStats + DeltaTotalRecsStats);
+ 
+    RETURN FieldErrorStats & FieldPopStats & TotalRecsStats & DeltaStats;
   END;
+END;
+ 
+EXPORT StandardStats(DATASET(Layout_American_Student_List) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
+  myTimeStamp := (UNSIGNED6)SALT38.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  expandedFile := FromNone(inFile).ExpandedInfile;
+  mod_fromexpandedOverall := FromExpanded(expandedFile);
+  scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
+ 
+  SALT38.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_American_Student_List, Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
+ 
+  allErrsOverall := mod_fromexpandedOverall.AllErrors;
+  tErrsOverall := TABLE(DISTRIBUTE(allErrsOverall, HASH(FieldName, ErrorType)), {FieldName, ErrorType, FieldContents, cntExamples := COUNT(GROUP)}, FieldName, ErrorType, FieldContents, LOCAL);
+ 
+  scrubsSummaryOverall_Standard_addErr   := IF(doErrorOverall,
+                                               DENORMALIZE(SORT(DISTRIBUTE(scrubsSummaryOverall_Standard, HASH(field, ruletype)), field, ruletype, LOCAL),
+  	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
+  	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
+  	                                                       TRANSFORM(RECORDOF(LEFT),
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT38.Layout_Stats_Standard.Examples);
+  	                                                       SELF := LEFT),
+  	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT38.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+ 
+  RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;
 END;
