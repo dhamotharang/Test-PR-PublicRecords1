@@ -1,9 +1,10 @@
-import header, ut;
+﻿import header, ut;
 
-export	proflic_as_header(dataset(layout_prolic_out_with_AID) pProfLic = dataset([],layout_prolic_out_with_AID), boolean pForHeaderBuild=false,boolean isPRCT=false)
+export	proflic_as_header(dataset(layout_prolic_out_with_AID) pProfLic = dataset([],layout_prolic_out_with_AID)
+, boolean pForHeaderBuild=false,boolean isPRCT=false,boolean pForFCRAHeaderBuild=false)
  :=
   function
-	dProfLicAsSource	:=	if(pForHeaderBuild,header.Files_SeqdSrc().PL,Prof_License.ProfLic_as_Source(pProfLic,pForHeaderBuild));
+	dProfLicAsSource	:=	if(pForHeaderBuild,header.Files_SeqdSrc().PL,Prof_License.ProfLic_as_Source(pProfLic,pForHeaderBuild,pForFCRAHeaderBuild));
 
 	Header.Layout_New_Records into(dProfLicAsSource L) := transform
 	  SELF.did := If(IsPRCT,(integer)l.DID,0);	

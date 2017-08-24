@@ -1,22 +1,3 @@
-export Inputs_Clear := sequential(
-fileservices.RemoveOwnedSubFiles('~thor_data400::Base::proflicMarisrchFCRAHeader_Building',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::Base::ProfLicFCRAHeader_Building',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::Base::GongFCRAHeader_Building',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::Base::WatercraftSrchfcraHeader_Building',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::Base::WatercraftMainfcraHeader_Building',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::Base::WatercraftCGfcraHeader_Building',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::Base::InfutorCIDFCRAHeader_Building',true)
-//,fileservices.RemoveOwnedSubFiles('~thor_data400::Base::ImpulseEmailFCRAHeader_Building',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::Base::CNLDPractitionerFCRAHeader_Building',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::Base::NCPDPFCRAHeader_Building',true)
-,fileservices.Clearsuperfile('~thor_data400::Base::proflicMarisrchFCRAHeader_Building')
-,fileservices.Clearsuperfile('~thor_data400::Base::ProfLicFCRAHeader_Building')
-,fileservices.Clearsuperfile('~thor_data400::Base::GongFCRAHeader_Building')
-,fileservices.Clearsuperfile('~thor_data400::Base::WatercraftSrchfcraHeader_Building')
-,fileservices.Clearsuperfile('~thor_data400::Base::WatercraftMainfcraHeader_Building')
-,fileservices.Clearsuperfile('~thor_data400::Base::WatercraftCGfcraHeader_Building')
-,fileservices.Clearsuperfile('~thor_data400::Base::InfutorCIDFCRAHeader_Building')
-//,fileservices.Clearsuperfile('~thor_data400::Base::ImpulseEmailFCRAHeader_Building')
-,fileservices.Clearsuperfile('~thor_data400::Base::CNLDPractitionerFCRAHeader_Building')
-,fileservices.Clearsuperfile('~thor_data400::Base::NCPDPFCRAHeader_Building')
-);
+﻿export Inputs_Clear := sequential(
+fileservices.RemoveOwnedSubFiles('~thor_data400::Base::ProfLicFCRAHeader_Building',true)
+,fileservices.Clearsuperfile('~thor_data400::Base::ProfLicFCRAHeader_Building'));
