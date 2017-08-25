@@ -1,4 +1,4 @@
-/*2016-09-22T21:05:18Z (Wendy Ma)
+﻿/*2016-09-22T21:05:18Z (Wendy Ma)
 DF-17551 add build_type for FCRA best append
 */
 /*This gives a best address
@@ -27,7 +27,7 @@ QH       :=header_quick.QH_DID_into_header;
 QH_ := watchdog.Fn_Reset_Tnt(QH);
 
 f := map(	 var1='nonutility'        => header_
-					,build_type='fcra_best_append'  => header_(~(src  = 'GN' and rec_type = '2'))
+					,build_type='fcra_best_append'  => header_
 					,var1='nonglb_nonutility' => header_
 					,var1='marketing'         => header_
 					,var1='nonglb'            => header_ //+ utilfile_ (utility became GLB with bug 118021)

@@ -1,8 +1,6 @@
-import std,RoxieKeyBuild,lib_fileservices;
+﻿import std,RoxieKeyBuild,lib_fileservices,watchdog;
 
-export proc_build_key(string pversion) := FUNCTION
-
-//string8 rundate := (STRING8)Std.Date.Today();
+export proc_build_key(string pversion = watchdog.RunDate_build) := FUNCTION
 
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(FCRA_list.key_best_did,'~thor_data400::key::watchdog_best_FCRA_list::@version@::DID','~thor_data400::key::watchdog_best_FCRA_list::'+pversion+'::DID',bk_best_did);
 

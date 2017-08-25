@@ -1,4 +1,4 @@
-import Prof_License, CNLD_Practitioner,Prof_License_Mari, NCPDP,_control;
+﻿import Prof_License, CNLD_Practitioner,Prof_License_Mari, NCPDP,_control;
 
 EXPORT constants := module
 
@@ -251,7 +251,7 @@ combine_proflic_vendor := set_al_vendor_all + set_ak_vendor_all + set_az_vendor_
 export proflic_approved_vendor := combine_proflic_vendor;
 export proflic_approved_vendor_ks := 'BEHAVORIAL SCIENCES REGULATORY BOARD';
 export proflic_profession_or_board := 'ALCOHOL & DRUG ABUSE';
-                                
+export proflic_approved_new_src_code := ['ALC','ENC','HMS','INF'];                                
 
 //***MARI approved sources ***
 
@@ -292,9 +292,9 @@ export FCRA_hdr_ApprovedSourcesExcludingOtherStates := ['LA','LP'];
 
 export SetStatesExexcluded := ['ID', 'IL', 'KS', 'NM', 'SC', 'WA'];
 
-export DestinationIP := _control.IPAddress.bctlpedata12;
+export DestinationIP := _control.IPAddress.bctlpedata11;
 
-export DestinationDirectoryMonthly := '/data/hds_2/watchdog/fcrabest/monthly/watchdog_best_fcra_';
+export DestinationDirectoryMonthly := '/data/hds_2/watchdog/fcrabest/monthly/watchdog_best_fcra_lexid_';
 
 export DestinationDirectoryWeekly := '/data/hds_2/watchdog/fcrabest/weekly/fcra_lexid_optout_';
 
