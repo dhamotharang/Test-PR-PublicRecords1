@@ -1,4 +1,4 @@
-import _control, VersionControl, Business_Header, tools, PRTE;
+﻿import _control, VersionControl, Business_Header, tools, PRTE;
 
 export Proc_Build_All(
 
@@ -41,9 +41,7 @@ export All :=
 			 ,PRTE2_Business_Header.promote().Inputfiles.Using2Used
 			 ,update_dops
 		 )
-		,output('No Valid version parameter passed, skipping Business_Header.proc_Build_All')
+		,output('No Valid version parameter passed, skipping PRTE2_Business_Header.proc_Build_All')
 	);
 																		 
 end;
-																		 
-														

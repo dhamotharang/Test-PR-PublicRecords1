@@ -1,4 +1,4 @@
-IMPORT Business_Header, ut, roxiekeybuild, VersionControl, PRTE2_Business_Header;
+﻿IMPORT Business_Header, ut, roxiekeybuild, VersionControl, PRTE2_Business_Header;
 
 // Proc to build BDL2 keys
 export Proc_Build_BDL2_Keys(string pversion) :=
@@ -23,7 +23,7 @@ module
 			,Build_BDL2_BDL_Key
 			,Build_BDL2_GroupId_Key
 
-		)) : success(output('Build BDL2 Keys Complete'));
+		)) : success(output('Build PRTE BDL2 Keys Complete'));
 	
 	export all := sequential(
 		 Build_Keys
