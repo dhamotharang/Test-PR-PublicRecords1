@@ -1,4 +1,4 @@
-import Business_Header, VersionControl;
+﻿import Business_Header, VersionControl;
 
 export Proc_Build_Business_Header_Base_Files(
 
@@ -27,7 +27,7 @@ module
 										 BuildSearch
 										,BuildRelatives
 										,BuildRelativesGroup
-										,promote(pversion,'^.*base::business_header.*?(search|relatives).*$').new2built
+										,promote(pversion,'^.*base::business_header.*?(search|relatives|stat).*$').new2built
 										,BuildStat
 								); 
 

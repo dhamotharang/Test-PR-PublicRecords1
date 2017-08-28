@@ -1,19 +1,19 @@
-import business_header, ut;
+﻿import business_header, ut;
 
 export BH_Super_Group(
 
 	 dataset(Layouts.Out.Layout_BH_Out										)	pInput_BusHdr_Init	= BH_Init()
 	,dataset(business_header.Layout_Business_Relative			)	pBusinessRelatives	= Files().Base.Business_Relatives.built
 	,dataset(business_header.Layout_Business_Header_Stat	)	pStat								= Files().Base.Stat.built
-	//,dataset(Layout_Relative_Match				) pDCAHierarchy				= BH_Rels_Group_Rollup(match_type = 'DH')
 	,dataset(Layouts.Temporary.Layout_Rel_Types						) pBH_DCAHierarchy		= BH_Relative_Groups()
 	,string																									pPersistName				= persistnames().BHSuperGroup	
-	,boolean																								pHistoricalRecs			= true
 
 ) :=
 function
 
-bh := pInput_BusHdr_Init(bdid <> 0 and trim(group_id) <> '');
+//*** Reading from BH_Init is for Historical records only.
+bh := pInput_BusHdr_Init(trim(cust_name) = '', bdid <> 0 and trim(group_id) <> '');
+
 br := pBusinessRelatives;
 		
 dbr_filtered_dca 		:= br(dca_hierarchy);
@@ -82,19 +82,20 @@ br_group_init := project(pStat, InitGroupID(left));
 // Patch Group IDs
 ut.MAC_Patch_Id(br_group_init, group_id, br_matches_reduced, old_rid, new_rid, br_group_patched)
 
-br_group_recs := project(bh, 
-												 transform(business_header.Layout_BH_Super_Group, 
-																	 self.group_id := (unsigned6)left.group_id,
-																	 self.bdid     := left.bdid)
-												);
+
+//*** The below project is for historical records only.
+br_hist_group_recs := project(bh, 
+															transform(business_header.Layout_BH_Super_Group, 
+																				self.group_id := (unsigned6)left.group_id,
+																				self.bdid     := left.bdid)
+														 );
 												
-br_group_recs_ded := dedup(sort(br_group_recs, record), record);
+br_hist_group_recs_ded := dedup(sort(br_hist_group_recs, record), record);
 
-//output(count(br_group_recs), named('cnt_br_group_recs'));
-//output(count(br_group_recs_ded), named('cnt_br_group_recs_ded'));
+//*** Combining the new entity group records with historical group records.
+br_out_groups := br_group_patched + br_hist_group_recs_ded;
 
-BH_Super_Group_persisted := if(pHistoricalRecs, br_group_recs_ded, br_group_patched)
-	: persist(pPersistName);
+BH_Super_Group_persisted := br_out_groups: persist(pPersistName);
 	
 return BH_Super_Group_persisted;
 
