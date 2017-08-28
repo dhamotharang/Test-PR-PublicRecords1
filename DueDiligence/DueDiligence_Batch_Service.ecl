@@ -2,7 +2,7 @@
 
 EXPORT DueDiligence_Batch_Service() := FUNCTION
 	
-	//The following macro defines the field sequence on WsECL page of query.
+	//The following macro defines the field sequence on WsECL page of query. 
 	#WEBSERVICE(FIELDS(
                 'batch_in',
                 'glbaPurpose',
@@ -44,7 +44,9 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
 		ind_in := IF(version IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, 
 												DATASET([TRANSFORM(DueDiligence.Layouts.Indv_Input,
 																						SELF.lexID := TRIM(le.lexID);
+																						SELF.nameInputOrder := TRIM(le.nameInputOrder);
 																						SELF.name := DATASET([TRANSFORM(DueDiligence.Layouts.Name,
+																																						SELF.fullName := TRIM(le.fullName);
 																																						SELF.firstName := TRIM(le.firstName);
 																																						SELF.middleName := TRIM(le.middleName);
 																																						SELF.lastName := TRIM(le.lastName);

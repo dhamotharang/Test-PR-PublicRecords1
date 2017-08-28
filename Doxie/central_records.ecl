@@ -1,4 +1,4 @@
-IMPORT doxie, doxie_crs, doxie_ln, moxie_phonesplus_server,gateway, 
+﻿IMPORT doxie, doxie_crs, doxie_ln, moxie_phonesplus_server,gateway, 
   LN_PropertyV2_Services, Business_Risk, iesp, CriminalRecords_Services,
   ATF_Services, American_Student_Services, AutoStandardI, suppress, fcra, doxie_raw, ut, EmailService,
 	FFD;
@@ -58,6 +58,9 @@ plrr := if(Include_ProfessionalLicenses_val, doxie.pl_records (dids, IsFCRA, ds_
 
 sanc := if(Include_Sanctions_val, doxie.Sanc_records(dids));
 prov := if(Include_Providers_val, doxie.Prov_records(dids));
+
+util := if(Include_Utility_val, doxie.Util_records(dids, ssn_mask_value, dl_mask_value, GLB_Purpose, industry_class_val));
+
 aMod := module(project (global_mod,ATF_Services.IParam.search_params,opt)) 
 	export string14 did := (string) dids[1].did;
 	export unsigned1 non_subject_suppression := nonSS;
@@ -150,6 +153,7 @@ doxie.layout_central_records tra (layout_central_header l) := transform
   self.professional_licenses_children := global(plrr);
   self.sanction_children                  := IF (~IsFCRA, global(sanc));
   self.provider_children                  := IF (~IsFCRA, global(prov)); 
+  self.utility_children                   := IF (~IsFCRA, global(util)); 
   self.firearms_and_explosives_children   := global(atfr);
   self.hunting_licenses_children          := global(hunr);
   self.pilot_licenses_children            := global(pilr);

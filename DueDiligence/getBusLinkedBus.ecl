@@ -1,6 +1,6 @@
 ﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
 
-/*
+/* 
 	Following Keys being used:
 			BIPV2.Key_BH_Linking_Ids.kFetch2
 */
@@ -39,99 +39,90 @@ EXPORT getBusLinkedBus(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	
 	
-	sortByKey := SORT(noInquiredBus, uniqueid, DueDiligence.Constants.mac_ListTop3Linkids());
-	dedupByKey := DEDUP(sortByKey, uniqueid, DueDiligence.Constants.mac_ListTop3Linkids());
-	
-		
-	Business_Risk_BIP.Layouts.Shell toBestAppend(dedupByKey le) := TRANSFORM
-			SELF.Seq := le.uniqueID;
-			SELF.Clean_Input.Seq := le.uniqueID;
-			
-			SELF.BIP_IDs.seq := le.uniqueID;
-			SELF.BIP_IDs.UltID.LinkID := le.ultid;
-			SELF.BIP_IDs.OrgID.LinkID := le.orgid;
-			SELF.BIP_IDs.SeleID.LinkID := le.seleid;
-			
-			
-			SELF.Clean_Input.CompanyName := le.company_Name;
-			SELF.Clean_Input.FEIN := le.company_fein;
-			SELF.Clean_Input.Phone10 := le.company_phone;
-			
-			SELF.Clean_Input.Prim_Range := le.prim_range;
-			SELF.Clean_Input.Predir := le.predir;
-			SELF.Clean_Input.Prim_Name := le.prim_name;
-			SELF.Clean_Input.Addr_Suffix := le.addr_suffix;
-			SELF.Clean_Input.Postdir := le.postdir;
-			SELF.Clean_Input.Unit_Desig := le.unit_desig;
-			SELF.Clean_Input.Sec_Range := le.sec_range;
-			SELF.Clean_Input.City := le.v_city_name;  // use v_city_name 90..114 to match all other scoring products
-			SELF.Clean_Input.State := le.st;
-			SELF.Clean_Input.Zip := le.zip + le.zip4;
-			SELF.Clean_Input.Zip5 := le.zip;
-			SELF.Clean_Input.Zip4 := le.zip4;
-			SELF.Clean_Input.Lat := le.geo_lat;
-			SELF.Clean_Input.Long := le.geo_long;
-			SELF.Clean_Input.Addr_Type := le.rec_type;
-			SELF.Clean_Input.Addr_Status := le.err_stat;
-			SELF.Clean_Input.Geo_Block := le.geo_blk;
-		
-			SELF.Clean_Input.HistoryDate := le.historyDate; // If HistoryDate no populated run in "realtime" mode
+	sortByKey := SORT(noInquiredBus, uniqueid, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+	dedupByKey := DEDUP(sortByKey, uniqueid, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 
-			SELF.Clean_Input := le; // Fill out the remaining fields with what was passed in
+	convertedToShell := PROJECT(dedupByKey, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
+																										SELF.Seq := LEFT.uniqueID;
+																										SELF.Clean_Input.Seq := LEFT.uniqueID;
+																										
+																										SELF.BIP_IDs.seq := LEFT.uniqueID;
+																										SELF.BIP_IDs.UltID.LinkID := LEFT.ultid;
+																										SELF.BIP_IDs.OrgID.LinkID := LEFT.orgid;
+																										SELF.BIP_IDs.SeleID.LinkID := LEFT.seleid;
+																										
+																										
+																										SELF.Clean_Input.CompanyName := LEFT.company_Name;
+																										SELF.Clean_Input.FEIN := LEFT.company_fein;
+																										SELF.Clean_Input.Phone10 := LEFT.company_phone;
+																										
+																										SELF.Clean_Input.Prim_Range := LEFT.prim_range;
+																										SELF.Clean_Input.Predir := LEFT.predir;
+																										SELF.Clean_Input.Prim_Name := LEFT.prim_name;
+																										SELF.Clean_Input.Addr_Suffix := LEFT.addr_suffix;
+																										SELF.Clean_Input.Postdir := LEFT.postdir;
+																										SELF.Clean_Input.Unit_Desig := LEFT.unit_desig;
+																										SELF.Clean_Input.Sec_Range := LEFT.sec_range;
+																										SELF.Clean_Input.City := LEFT.v_city_name;  // use v_city_name 90..114 to match all other scoring products
+																										SELF.Clean_Input.State := LEFT.st;
+																										SELF.Clean_Input.Zip := LEFT.zip + LEFT.zip4;
+																										SELF.Clean_Input.Zip5 := LEFT.zip;
+																										SELF.Clean_Input.Zip4 := LEFT.zip4;
+																										SELF.Clean_Input.Lat := LEFT.geo_lat;
+																										SELF.Clean_Input.Long := LEFT.geo_long;
+																										SELF.Clean_Input.Addr_Type := LEFT.rec_type;
+																										SELF.Clean_Input.Addr_Status := LEFT.err_stat;
+																										SELF.Clean_Input.Geo_Block := LEFT.geo_blk;
+																									
+																										SELF.Clean_Input.HistoryDate := LEFT.historyDate; // If HistoryDate no populated run in "realtime" mode
 
-			SELF := [];
-	END;
-	
-	convertedToShell := PROJECT(dedupByKey, toBestAppend(LEFT));
+																										SELF.Clean_Input := LEFT; // Fill out the remaining fields with what was passed in
+
+																										SELF := [];));
 
 
 
 	allowedSourcesSet := SET(DATASET([], Business_Risk_BIP.Layout_AllowedSources), Source); //as of 5/26/17 not used in BIP_Best_Append
 	
 	bestAppend := Business_Risk_BIP.BIP_Best_Append(convertedToShell, options, linkingOptions, allowedSourcesSet);
-	bestCleanAppend := bestAppend.Clean_Input;
-	
+
 	//keep top 100 linked business - has best fein, best phone
-	SortLinked := sort(bestAppend(Clean_Input.StreetAddress1 <> ''), seq, DueDiligence.Constants.mac_ListTop3Linkids(), if(Clean_Input.FEIN ='', '999999999', Clean_Input.FEIN), if(Clean_Input.Phone10 = '', '9999999999', Clean_Input.Phone10));
-	TopLinked := dedup(SortLinked, seq, DueDiligence.Constants.mac_ListTop3Linkids(), keep(100));		
-
-				
-	DueDiligence.Layouts.Busn_Internal fromAppend(Business_Risk_BIP.Layouts.Shell le) := TRANSFORM
-		SELF.busn_info.BIP_IDs := le.BIP_IDs;
-		SELF.historyDate := le.Clean_Input.HistoryDate;
-		SELF.relatedDegree := DueDiligence.Constants.LINKED_BUSINESS_DEGREE;
-		
-		SELF.busn_info.companyName := le.clean_input.companyName;
-		SELF.busn_info.altCompanyName := le.clean_input.altCompanyName;
-		SELF.busn_info.fein := le.clean_input.fein;
-		SELF.busn_info.phone := le.clean_input.phone10;
-		
-		SELF.busn_info.address := le.clean_input;
-		SELF.busn_info.address.geo_lat := le.clean_input.lat;
-		SELF.busn_info.address.geo_long := le.clean_input.long;
-		SELF.busn_info.address.rec_type := le.clean_input.addr_type;
-		SELF.busn_info.address.err_stat := le.clean_input.addr_status;
-		SELF.busn_info.address.geo_blk := le.clean_input.geo_block;
-		
-		//since we are getting the best data anyway just grab it from clean_input again
-		SELF.bestCompanyName := le.clean_input.companyName;
-		SELF.bestAddr := le.clean_input.streetAddress1;
-		SELF.bestCity := le.clean_input.city;
-		SELF.bestState := le.clean_input.state;
-		SELF.bestZip := le.clean_input.zip5;
-		SELF.bestZip4 := le.clean_input.zip4;
-		SELF.bestFEIN := le.clean_input.fein;
-		SELF.bestPhone := le.clean_input.phone10;
-
-		SELF := le.clean_input;
-		SELF := [];		
-	END;
+  SortLinked := sort(bestAppend(Clean_Input.StreetAddress1 <> ''), seq, BIP_IDs.UltID.LinkID, BIP_IDs.OrgID.LinkID, BIP_IDs.SeleID.LinkID, if(Clean_Input.FEIN = '', '999999999', Clean_Input.FEIN), if(Clean_Input.Phone10 = '', '9999999999', Clean_Input.Phone10));
+	TopLinked := dedup(SortLinked, seq, BIP_IDs.UltID.LinkID, BIP_IDs.OrgID.LinkID, BIP_IDs.SeleID.LinkID, keep(100));		
 
 	linkedBus := JOIN(inData, TopLinked,
 										LEFT.seq = RIGHT.seq AND
 										LEFT.Busn_Info.BIP_IDs.UltID.LinkID = RIGHT.BIP_IDs.UltID.LinkID AND
 										LEFT.Busn_Info.BIP_IDs.SeleID.LinkID <> RIGHT.BIP_IDs.SeleID.LinkID,
-										fromAppend(RIGHT));
+										TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+															SELF.busn_info.BIP_IDs := RIGHT.BIP_IDs;
+															SELF.historyDate := RIGHT.Clean_Input.HistoryDate;
+															SELF.relatedDegree := DueDiligence.Constants.LINKED_BUSINESS_DEGREE;
+															
+															SELF.busn_info.companyName := RIGHT.clean_input.companyName;
+															SELF.busn_info.altCompanyName := RIGHT.clean_input.altCompanyName;
+															SELF.busn_info.fein := RIGHT.clean_input.fein;
+															SELF.busn_info.phone := RIGHT.clean_input.phone10;
+															
+															SELF.busn_info.address := RIGHT.clean_input;
+															SELF.busn_info.address.geo_lat := RIGHT.clean_input.lat;
+															SELF.busn_info.address.geo_long := RIGHT.clean_input.long;
+															SELF.busn_info.address.rec_type := RIGHT.clean_input.addr_type;
+															SELF.busn_info.address.err_stat := RIGHT.clean_input.addr_status;
+															SELF.busn_info.address.geo_blk := RIGHT.clean_input.geo_block;
+															
+															//since we are getting the best data anyway just grab it from clean_input again
+															SELF.bestCompanyName := RIGHT.clean_input.companyName;
+															SELF.bestAddr := RIGHT.clean_input.streetAddress1;
+															SELF.bestCity := RIGHT.clean_input.city;
+															SELF.bestState := RIGHT.clean_input.state;
+															SELF.bestZip := RIGHT.clean_input.zip5;
+															SELF.bestZip4 := RIGHT.clean_input.zip4;
+															SELF.bestFEIN := RIGHT.clean_input.fein;
+															SELF.bestPhone := RIGHT.clean_input.phone10;
+
+															SELF := RIGHT.clean_input;
+															SELF := [];));
 
 	
 		
