@@ -1,4 +1,4 @@
-/* Converting New Mexico Real Estate Appraisers Board / Real Estate Appraisers Licenses File to MARI common layout
+﻿/* Converting New Mexico Real Estate Appraisers Board / Real Estate Appraisers Licenses File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib,STD;
@@ -341,6 +341,6 @@ EXPORT map_NMS0843_conversion(STRING pVersion) := FUNCTION
 	
 	notify_invalid_address := Prof_License_Mari.fNotifyError.NameInAddressFields(code,src_cd,pVersion,
 	                            Prof_License_Mari.Email_Notification_Lists.BaseFileConversion);	
-	RETURN SEQUENTIAL(ocmvTransLkp, /*move_to_using,*/ oAppr, d_final, add_super, /*move_to_used, */notify_missing_codes, notify_invalid_address);
+	RETURN SEQUENTIAL(ocmvTransLkp, move_to_using, oAppr, d_final, add_super, move_to_used, notify_missing_codes, notify_invalid_address);
 	
 END;
