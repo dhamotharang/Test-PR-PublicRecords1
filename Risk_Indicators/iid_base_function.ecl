@@ -1,4 +1,4 @@
-import doxie, ut, DID_Add, address, UtilFile, riskwise, Gong, iesp, fcra, gateway;
+﻿import doxie, ut, DID_Add, address, UtilFile, riskwise, Gong, iesp, fcra, gateway;
 
 export iid_base_function(DATASET(risk_indicators.layout_input) indata, dataset(Gateway.Layouts.Config) gateways,
 													unsigned1 dppa, unsigned1 glb, 
@@ -108,7 +108,7 @@ risk_indicators.layout_output add_flags(risk_indicators.Layout_output le) := TRA
 END;
 with_overrides := if( isFCRA, PROJECT(with_did, add_flags(LEFT)), with_did);
 
-with_PersonContext := if(isFCRA and ~onThor, Risk_Indicators.checkPersonContext(with_overrides, gateways), with_did);
+with_PersonContext := if(isFCRA, Risk_Indicators.checkPersonContext(with_overrides, gateways, onThor), with_did);
 
 commonstart := risk_indicators.iid_common_function(with_PersonContext, dppa, glb, isUtility, ln_branded, 
 															suppressNearDups, isFCRA, bsversion,

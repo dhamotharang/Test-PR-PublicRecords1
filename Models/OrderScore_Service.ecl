@@ -201,6 +201,8 @@ export OrderScore_Service := MACRO
 	string20 HistoryDateTimeStamp := '' : STORED('HistoryDateTimeStamp');
 	gateways_input := Gateway.Configuration.Get();
 
+	boolean skip_businessHeader := IF(genericModelName = 'osn1608_1', true, false);
+	
 	Gateway.Layouts.Config gwSwitch(gateways_input le) := transform
 		//notice this code is NOT the same as CBD!!!
 		//adding real time Inquiry searching
@@ -250,7 +252,7 @@ export OrderScore_Service := MACRO
 	layout_settings checkSettings( attributesIn le, integer c ) := TRANSFORM
 		name := trim(StringLib.StringToLowercase(le.name)); 
 		self.bsVersion    := map(
-			name in attributes_v4 => 4,
+			name in attributes_v4 => 51,
 			2
 		);
 		self.attrVersion    := map(
@@ -506,33 +508,10 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 		DataPermission, 
 		ScoresInput,
 		NetAcuity_v4, //true for CBD5.1 models
-		ipid_only
+		ipid_only,
+		skip_businessHeader
 	);
-	
-	//don't give imputed input to version 4 attributes - bsversion - running with 4 for attributes
-	iid_results2 := Models.ChargebackDefender_Function(indata, gateways_in, GLBPurpose, DPPAPurpose, ipid_only, dataRestriction, ofac_only,
-					suppressneardups, require2Ele, attrbsversion, dataPermission );
-	clam4Attributes := Risk_Indicators.BocaShell_BtSt_Function(
-		iid_results2,
-		gateways_in,
-		DPPAPurpose,
-		GLBPurpose,
-		isUtility,
-		false, 
-		includeRelatives,
-		includeDLInfo,
-		includeVehicles,
-		includeDerogs,
-		attrbsversion,//bsversion - running with 4 for attributes
-		false, // do score
-		true, // nugen
-		DataRestriction,
-		BSOptions,
-		DataPermission, 
-		ScoresInput,
-		NetAcuity_v4, //true for CBD5.1 models
-		ipid_only
-	);
+
 	
 	Risk_Indicators.Layout_BocaShell_BtSt.layout_OSMain_wAcct addIP_BTSTFunc(Risk_Indicators.Layout_BocaShell_BtSt.layout_OSMain_wAcct le, clam ri) := TRANSFORM
 			self.AccountNumber := le.AccountNumber;
@@ -664,8 +643,7 @@ ScoresInput := project(indata, transform(Risk_Indicators.Layout_BocaShell_BtSt.i
 	os_model := if( Test_Data_Enabled, seed_final, ret );
 	
 	// ****get attributes
-	//if running modeling shell 50 and want attributes then use the 4 clam output for attribtues
-	shell2Use := if(bsV5andAttrV4, clam4Attributes, clam);
+	shell2Use := clam;  
 
 	attributes := Models.getCBDAttributes(shell2Use, account_value, indata, attrversion);	
 

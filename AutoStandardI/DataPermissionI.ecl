@@ -27,6 +27,7 @@
 					BIT 19 => Surescripts
 				*/
 				EXPORT use_TrisContributoryData := in_mod.DataPermissionMask[20] NOT IN restrictedSet;
+				EXPORT use_ZumigoIdentity	:= in_mod.DataPermissionMask[21] NOT IN restrictedSet;
 				EXPORT STRING permission_mask := in_mod.DataPermissionMask;
 	END;
 END;

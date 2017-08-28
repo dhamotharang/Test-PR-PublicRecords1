@@ -1,4 +1,4 @@
-includeADLFields := FALSE; // If you set this to TRUE, make sure you set it to TRUE in Risk_Indicators.ToEdina_v4!
+﻿includeADLFields := FALSE; // If you set this to TRUE, make sure you set it to TRUE in Risk_Indicators.ToEdina_v4!
 
 layout_counts := RECORD
     unsigned2 counttotal;
@@ -1011,7 +1011,7 @@ Layout_Derogs_edina := RECORD
 	UNSIGNED1 liens_historical_released_count;
 	string8 last_liens_unreleased_date;
 	layout_liens Liens;
-	risk_indicators.Layouts_Derog_Info.LNJ_attrs LnJ_attributes;  // new JuLi fields for 5.2
+	// risk_indicators.Layouts_Derog_Info.LNJ_attrs LnJ_attributes;  // new JuLi fields for 5.2
 	UNSIGNED1 criminal_count;
 	UNSIGNED4 last_criminal_date;
 	UNSIGNED1 felony_count;
@@ -1142,7 +1142,7 @@ layout_pii_stability := record
 	string15	link_max_weight_element	;
 	string15	link_min_weight_element	;
 end;
-
+/* Exclude VOO attributes from the Edina shell layout until they are approved for release...
 // slimmed down version of VOO attributes they were interested in for MS-39
 Layout_VOOAttributes := RECORD
 	String2 	AddressReportingHistoryIndex;
@@ -1158,49 +1158,49 @@ Layout_VOOAttributes := RECORD
 	String2 	InferredOwnershipTypeIndex;
 	String5   OtherOwnedPropertyProximity;
 END;
-
+*/
 Layout_corr_risk_summary := RECORD
 		//these fields added in BS 5.3 and are based off of converted source code versus the raw source code
 	string50   corrssnname_sources;
 	qstring200 corrssnname_firstseen;
 	qstring200 corrssnname_lastseen;
-	string100	 corrssnname_source_cnt;
+	// string100	 corrssnname_source_cnt;
 	string50   corrssnaddr_sources;
 	qstring200 corrssnaddr_firstseen;
 	qstring200 corrssnaddr_lastseen;
-	string100	 corrssnaddr_source_cnt;
+	// string100	 corrssnaddr_source_cnt;
 	string50   corraddrname_sources;
 	qstring200 corraddrname_firstseen;
 	qstring200 corraddrname_lastseen;
-	string100	 corraddrname_source_cnt;
+	// string100	 corraddrname_source_cnt;
 	string50   corraddrphone_sources;
 	qstring200 corraddrphone_firstseen;
 	qstring200 corraddrphone_lastseen;
-	string100	 corraddrphone_source_cnt;
+	// string100	 corraddrphone_source_cnt;
 	string50   corrphonelastname_sources;
 	qstring200 corrphonelastname_firstseen;
 	qstring200 corrphonelastname_lastseen;
-	string100	 corrphonelastname_source_cnt;
+	// string100	 corrphonelastname_source_cnt;
 	string50   corrnamedob_sources;
 	qstring200 corrnamedob_firstseen;
 	qstring200 corrnamedob_lastseen;
-	string100	 corrnamedob_source_cnt;
+	// string100	 corrnamedob_source_cnt;
 	string50   corraddrdob_sources;
 	qstring200 corraddrdob_firstseen;
 	qstring200 corraddrdob_lastseen;
-	string100	 corraddrdob_source_cnt;
+	// string100	 corraddrdob_source_cnt;
 	string50   corrssndob_sources;
 	qstring200 corrssndob_firstseen;
 	qstring200 corrssndob_lastseen;
-	string100	 corrssndob_source_cnt;
+	// string100	 corrssndob_source_cnt;
 	string50   corrssnphone_sources;
 	qstring200 corrssnphone_firstseen;
 	qstring200 corrssnphone_lastseen;
-	string100	 corrssnphone_source_cnt;
+	// string100	 corrssnphone_source_cnt;
 	string50   corrdobphone_sources;
 	qstring200 corrdobphone_firstseen;
 	qstring200 corrdobphone_lastseen;
-	string100	 corrdobphone_source_cnt;
+	// string100	 corrdobphone_source_cnt;
 END;
 
 //new for BS 5.3 - these count fields must be defined as integer due to returning -1 in them when the offset archive date ends up being invalid or when DID is not found
@@ -1231,35 +1231,36 @@ Layout_credit_derived_perf := RECORD
 	string8	archive_date_24mo;	//history date + 2 years
 
 END;
-
+/*
 //new for BS 5.3 - PII corroboration counters based off of verified elements against inquiry keys
 Layout_inq_PII_corroboration := RECORD
-	integer	inq_corrnameaddrcount	;
-	integer	inq_corrnameaddrcount_adl	;
-	integer	inq_corrnamessncount	;
-	integer	inq_corrnamessncount_adl	;
-	integer	inq_corrnamephonecount	;
-	integer	inq_corrnamephonecount_adl	;
-	integer	inq_corraddrssncount	;
-	integer	inq_corraddrssncount_adl	;
-	integer	inq_corraddrdobcount	;
-	integer	inq_corraddrdobcount_adl	;
-	integer	inq_corraddrphonecount	;
-	integer	inq_corraddrphonecount_adl	;
-	integer	inq_corrssndobcount	;
-	integer	inq_corrssndobcount_adl	;
-	integer	inq_corrssnphonecount	;
-	integer	inq_corrssnphonecount_adl	;
-	integer	inq_corrdobphonecount	;
-	integer	inq_corrdobphonecount_adl	;
+	integer	inq_corrnameaddr	;
+	integer	inq_corrnameaddr_adl	;
+	integer	inq_corrnamessn	;
+	integer	inq_corrnamessn_adl	;
+	integer	inq_corrnamephone	;
+	integer	inq_corrnamephone_adl	;
+	integer	inq_corraddrssn	;
+	integer	inq_corraddrssn_adl	;
+	integer	inq_corrdobaddr	;
+	integer	inq_corrdobaddr_adl	;
+	integer	inq_corraddrphone	;
+	integer	inq_corraddrphone_adl	;
+	integer	inq_corrdobssn	;
+	integer	inq_corrdobssn_adl	;
+	integer	inq_corrphonessn	;
+	integer	inq_corrphonessn_adl	;
+	integer	inq_corrdobphone	;
+	integer	inq_corrdobphone_adl	;
 	integer	inq_corrnameaddrssn	;
 	integer	inq_corrnameaddrssn_adl	;
 	integer	inq_corrnamephonessn	;
 	integer	inq_corrnamephonessn_adl	;
-	integer	inq_corrnameaddrssnphn	;
-	integer	inq_corrnameaddrssnphn_adl	;
+	integer	inq_corrnameaddrphnssn	;
+	integer	inq_corrnameaddrphnssn_adl	;
 END;
-
+*/
+// Exclude PII tumblings counters from Edina shell layout until they are approved for release
 //new for BS 5.3 - PII tumblings in Inquiries
 Layout_inq_PII_tumblings := RECORD
 	integer	inq_ssnsperadl_1subs	;
@@ -1321,7 +1322,7 @@ export Layout_Boca_Shell_Edina_v53 := RECORD
 	layout_virtual_fraud																		Virtual_Fraud;	
 	risk_indicators.layouts.layout_test_fraud  							Test_Fraud;
 	risk_indicators.layouts.layout_contributory_fraud  			Contributory_Fraud;
-	risk_indicators.layouts.layout_fd_attributesv2					fdAttributesv2;	
+	risk_indicators.layouts.layout_fd_attributesv2 -CorrelationRiskLevel -CorrelationSSNNameCount -CorrelationSSNAddrCount -CorrelationAddrNameCount -CorrelationAddrPhoneCount -CorrelationPhoneLastNameCount	fdAttributesv2;	
 	Risk_Indicators.Layouts.layout_fp201_attributes 				fpAttributes201;
 	Layout_Derogs_edina 																		BJL;
 	risk_indicators.layouts.layout_hhid_summary  						hhid_summary;
@@ -1355,11 +1356,13 @@ export Layout_Boca_Shell_Edina_v53 := RECORD
 	string20	historyDateTimeStamp := '';  
 	STRING200 errorcode;
 
-	Layout_VOOAttributes             VOO_attributes; 
+	// Layout_VOOAttributes             VOO_attributes; 
 	Layout_corr_risk_summary         corr_risk_summary; 
 	Layout_credit_derived_perf       credit_derived_perf; 
-	Layout_inq_PII_corroboration     inq_PII_corroboration; 
+	// Layout_inq_PII_corroboration     inq_PII_corroboration; 
 	Layout_inq_PII_tumblings     		 inq_PII_tumblings; 
+	integer swappedNames;
+
 	
 
 END;

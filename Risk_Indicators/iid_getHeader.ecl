@@ -1,4 +1,7 @@
-﻿import risk_indicators, doxie, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address;
+﻿/*2017-08-23T18:15:39Z (Laura Weiner)
+RR-11601: RiskView 5.0 on thor
+*/
+import risk_indicators, doxie, header, mdr, did_add, ut, drivers, FCRA, header_quick, riskwise, NID, address;
 
 export iid_getHeader(grouped DATASET(risk_indicators.Layout_output) inrec, unsigned1 dppa, unsigned1 glb, 
 							boolean isFCRA=false, boolean ln_branded, 
@@ -1289,8 +1292,11 @@ iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM
 																												 
 	self.SSN5FullNameMatch := map(le.DIDcount <> 1								=> 0,
 																le.ssn[1..5] = ''								=> 1,
-																le.ssn[1..5] = le.h.ssn[1..5]		=> 2,
-																le.ssn[1..5] <> le.h.ssn[1..5]	=> 3,
+																le.ssn[1..5] = le.h.ssn[1..5] 
+																  and firstmatch and lastmatch	=> 2,
+																le.ssn[1..5] <> le.h.ssn[1..5]
+																  or not firstmatch
+																	or not lastmatch							=> 3,
 																																	 0);
 	self := le;
 end;
@@ -1622,7 +1628,7 @@ j_corrections := join (g_inrec, fake_header,
 
 j_combined_roxie := GROUP (SORT (UNGROUP(prison + j_corrections), seq, did), seq, did);
 
-j_combined_thor := GROUP (SORT( DISTRIBUTE(UNGROUP(prison + j_corrections), HASH64(seq, did)), seq, did, LOCAL), seq, did, LOCAL) : PERSIST('~BOCASHELLFCRA::iid_headerresults');
+j_combined_thor := GROUP (SORT( DISTRIBUTE(UNGROUP(prison + j_corrections), HASH64(seq, did)), seq, did, LOCAL), seq, did, LOCAL);
 
 j_combined := if(onThor, j_combined_thor, j_combined_roxie);
 

@@ -1,12 +1,47 @@
-﻿IMPORT Address, BIPV2, Business_Risk, Business_Risk_BIP, Gateway, Risk_Indicators, RiskWise, ut;
+﻿IMPORT Address, BIPV2, Business_Risk, Business_Risk_BIP, DueDiligence, Gateway, Risk_Indicators, RiskWise, STD, ut;
 
 EXPORT getBusBIPId(DATASET(DueDiligence.Layouts.CleanedData) indata,
 										Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
 										BIPV2.mod_sources.iParams linkingOptions,
 										BOOLEAN includeReport) := FUNCTION
 
+
+	//check to see if any of the input provided a seleid to search on 
+	inputLexID := indata((UNSIGNED)cleanedInput.business.lexID > 0);
 	
-	cleanedInput := DueDiligence.Common.GetCleanBIPShell(indata);
+	searchInputByLexID := PROJECT(inputLexID, TRANSFORM(BIPV2.IDFunctions.rec_SearchInput, SELF.inSeleid := LEFT.cleanedInput.business.lexID; SELF := [];));
+
+	// linkIDs := IF(EXISTS(inputLexID), BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(searchInputLayout).Data2_, indata);
+	linkIDs := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(searchInputByLexID).Data2_;
+	
+	joinFoundBipIDs := JOIN(inputLexID, linkIDs,
+													LEFT.cleanedInput.business.lexID = (STRING)RIGHT.seleID,
+													TRANSFORM({BOOLEAN lessSearchDate, RECORDOF(RIGHT)},
+																			lessThanDt := IF(LEFT.cleanedInput.historyDateYYYYMMDD = DueDiligence.Constants.date8Nines, STD.Date.Today(), LEFT.cleanedInput.historyDateYYYYMMDD);
+																			dateFirstSeen := (UNSIGNED)DueDiligence.Common.checkInvalidDate((STRING)RIGHT.dt_first_seen);
+																			SELF.lessSearchDate := IF(dateFirstSeen < lessThanDt AND dateFirstSeen > 0, TRUE, FALSE);
+																			SELF := RIGHT;
+																			SELF := [];),
+													LEFT OUTER);
+
+	sortFoundBipsByDate := SORT(joinFoundBipIDs(lessSearchDate), seleID, -dt_last_seen, -dt_vendor_last_reported);
+	rollFoundBips := ROLLUP(sortFoundBipsByDate,
+													LEFT.seleID = RIGHT.seleID,
+													TRANSFORM({RECORDOF(LEFT)}, SELF := LEFT;));
+	
+	
+	addFoundBipIDs := JOIN(indata, rollFoundBips,
+													LEFT.cleanedInput.business.lexID = (STRING)RIGHT.seleID,
+													TRANSFORM(DueDiligence.Layouts.CleanedData,
+																			SELF.cleanedInput.business.BIP_IDs.PowID.LinkID := RIGHT.powID;
+																			SELF.cleanedInput.business.BIP_IDs.ProxID.LinkID := RIGHT.proxID;
+																			SELF.cleanedInput.business.BIP_IDs.SeleID.LinkID := RIGHT.seleID;
+																			SELF.cleanedInput.business.BIP_IDs.OrgID.LinkID := RIGHT.orgID;
+																			SELF.cleanedInput.business.BIP_IDs.UltID.LinkID := RIGHT.ultID;
+																			SELF := LEFT;),
+													LEFT OUTER);
+	
+	cleanedInput := DueDiligence.Common.GetCleanBIPShell(addFoundBipIDs);
 	
 	//Grab just the clean input to pass to the BIP Linking Process
 	prepBIPAppend := PROJECT(cleanedInput, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input));
@@ -53,32 +88,47 @@ EXPORT getBusBIPId(DATASET(DueDiligence.Layouts.CleanedData) indata,
 	
 	//Return all businesses
 	allIDs := noLinkIDsFound + linkIDsFound;
-
-	final := PROJECT(allIDs, TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																			SELF.busn_info.BIP_IDs := LEFT.BIP_IDs;
-																			SELF.busn_info.lexID := (STRING)LEFT.BIP_IDs.SeleID.LinkID;
-																			SELF.historyDate := LEFT.Clean_Input.HistoryDate;
+	
+	final := JOIN(indata, allIDs,
+								LEFT.inputEcho.seq = RIGHT.clean_input.seq AND
+								LEFT.inputEcho.business.accountNumber = RIGHT.clean_input.acctNo,
+								TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+																			SELF.busn_info.BIP_IDs := RIGHT.BIP_IDs;
+																			SELF.busn_info.lexID := (STRING)RIGHT.BIP_IDs.SeleID.LinkID;
+																			SELF.historyDate := RIGHT.Clean_Input.HistoryDate;
 																			SELF.relatedDegree := DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE;
 																			
-																			SELF.busn_info.companyName := LEFT.clean_input.companyName;
-																			SELF.busn_info.altCompanyName := LEFT.clean_input.altCompanyName;
-																			SELF.busn_info.fein := LEFT.clean_input.fein;
-																			SELF.busn_info.phone := LEFT.clean_input.phone10;
-																			SELF.busn_info.accountNumber := LEFT.clean_input.acctNo;
+																			SELF.busn_info.companyName := RIGHT.clean_input.companyName;
+																			SELF.busn_info.altCompanyName := RIGHT.clean_input.altCompanyName;
+																			SELF.busn_info.fein := RIGHT.clean_input.fein;
+																			SELF.busn_info.phone := RIGHT.clean_input.phone10;
+																			SELF.busn_info.accountNumber := RIGHT.clean_input.acctNo;
 																			
-																			SELF.busn_info.address := LEFT.clean_input;
-																			SELF.busn_info.address.geo_lat := LEFT.clean_input.lat;
-																			SELF.busn_info.address.geo_long := LEFT.clean_input.long;
-																			SELF.busn_info.address.rec_type := LEFT.clean_input.addr_type;
-																			SELF.busn_info.address.err_stat := LEFT.clean_input.addr_status;
-																			SELF.busn_info.address.geo_blk := LEFT.clean_input.geo_block;
+																			SELF.busn_info.address := RIGHT.clean_input;
+																			SELF.busn_info.address.geo_lat := RIGHT.clean_input.lat;
+																			SELF.busn_info.address.geo_long := RIGHT.clean_input.long;
+																			SELF.busn_info.address.rec_type := RIGHT.clean_input.addr_type;
+																			SELF.busn_info.address.err_stat := RIGHT.clean_input.addr_status;
+																			SELF.busn_info.address.geo_blk := RIGHT.clean_input.geo_block;
+																																						
+																			SELF.busn_input := LEFT.inputEcho.business;
+																			SELF := RIGHT.clean_input;
+																			SELF := [];),
+								LEFT OUTER);
 
-																			SELF := LEFT.clean_input;
-																			
-																			SELF.businessReport.businessInformation.lexID := IF(includeReport, (STRING)LEFT.BIP_IDs.SeleID.LinkID, '');
-																			SELF := [];	));
+	
+	
 	
 	// OUTPUT(indata, NAMED('indata'));
+	// OUTPUT(inputLexID, NAMED('inputLexID'));
+	// OUTPUT(searchInputByLexID, NAMED('searchInputByLexID'));
+	// OUTPUT(linkIDs, NAMED('linkIDs'));
+	
+	// OUTPUT(joinFoundBipIDs, NAMED('joinFoundBipIDs'));
+	// OUTPUT(sortFoundBipsByDate, NAMED('sortFoundBipsByDate'));
+	// OUTPUT(rollFoundBips, NAMED('rollFoundBips'));
+	// OUTPUT(addFoundBipIDs, NAMED('addFoundBipIDs'));
+	
 	// OUTPUT(cleanedInput, NAMED('cleanedInput'));
 	// OUTPUT(prepBIPAppend, NAMED('prepBIPAppend'));
 	// OUTPUT(bipAppend, NAMED('bipAppend'));
