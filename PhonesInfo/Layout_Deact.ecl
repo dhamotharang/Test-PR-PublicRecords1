@@ -42,6 +42,8 @@ EXPORT Layout_Deact := MODULE
 		string2		is_react				:= '';
 		string2		is_deact				:= '';
 		unsigned8 porting_dt; 
+		string 		pk_carrier_name;
+		integer 	days_apart;
 	end;
 	
 END;
