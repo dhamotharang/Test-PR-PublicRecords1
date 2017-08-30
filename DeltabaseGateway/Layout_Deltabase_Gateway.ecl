@@ -52,7 +52,7 @@ EXPORT Layout_Deltabase_Gateway := MODULE
 			string	iccid;
 			string	subscriber_id;
 			integer	call_forwarding;
-			integer	call_forwarding_linked_toSubject;
+			string	call_forwarding_linked_toSubject;
 			string	line_type;
 			string	carrier_name;
 			string	carrier_original_name;
@@ -170,7 +170,7 @@ EXPORT Layout_Deltabase_Gateway := MODULE
 			string100 iccid;
 			string100 subscriber_id;
 			integer1 call_forwarding;
-			integer1 call_forwarding_linked_toSubject;
+			string10 call_forwarding_linked_toSubject;
 			string20 line_type;
 			string120 carrier_name;
 			string120 carrier_original_name;
@@ -232,7 +232,7 @@ EXPORT Layout_Deltabase_Gateway := MODULE
 			string50 sub_country;
 			string10 customer_bill_acct_type;
 			string25 customer_bill_acct;
-			string25 device_mgmt_status;
+			string100 device_mgmt_status;
 			string8  date_added;
 			string6  time_added;
 	end;	

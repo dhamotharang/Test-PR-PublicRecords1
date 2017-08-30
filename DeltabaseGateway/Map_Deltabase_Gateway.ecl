@@ -43,6 +43,7 @@ inFile := DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Raw;
 		self.imsi_trackedsince 					:= DeltabaseGateway._Functions.rmNull(trim(l.imsi_trackedsince, left, right));
 		self.iccid 											:= DeltabaseGateway._Functions.rmNull(trim(l.iccid, left, right));
 		self.subscriber_id 							:= DeltabaseGateway._Functions.rmNull(trim(l.subscriber_id, left, right));
+		self.call_forwarding_linked_toSubject := DeltabaseGateway._Functions.rmNull(trim(l.call_forwarding_linked_toSubject, left, right)); 	
 		self.line_type 									:= DeltabaseGateway._Functions.rmNull(trim(l.line_type, left, right));
 		self.carrier_name 							:= DeltabaseGateway._Functions.rmNull(trim(l.carrier_name, left, right));
 		self.carrier_original_name 			:= DeltabaseGateway._Functions.rmNull(trim(l.carrier_original_name, left, right));
