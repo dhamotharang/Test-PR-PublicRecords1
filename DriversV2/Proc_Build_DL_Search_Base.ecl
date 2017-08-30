@@ -1,4 +1,4 @@
-import doxie_build, Matrix_DL, ut, fieldstats, doxie_files, drivers, didville, did_add, fair_isaac, header_slimsort, watchdog, PromoteSupers, std;
+﻿import doxie_build, Matrix_DL, ut, fieldstats, doxie_files, drivers, didville, did_add, fair_isaac, header_slimsort, watchdog, PromoteSupers, std;
 
 st := distribute(DriversV2.File_DL_Extended,hash(dl_seq)) : persist('~thor_data400::persist::Dl2::Drvlic');
 
@@ -22,9 +22,9 @@ DriversV2.MAC_MiniDriversBuild(p, paout, true, 'local');
 
 ConvertToSearchLayout	:=	project(p, TRANSFORM(DriversV2.Layout_Drivers,SELF := LEFT;));
 
-PromoteSupers.MAC_SF_BuildProcess(p,'~thor_data400::base::DL2::DLSearchPlus_'+doxie_build.buildstate,dofirst)
+PromoteSupers.MAC_SF_BuildProcess(p,'~thor_data400::base::DL2::DLSearchPlus_'+doxie_build.buildstate,dofirst,,,true)
 
-PromoteSupers.MAC_SF_BuildProcess(ConvertToSearchLayout,'~thor_data400::base::DL2::DLSearch_'+doxie_build.buildstate,dosecond)
+PromoteSupers.MAC_SF_BuildProcess(ConvertToSearchLayout,'~thor_data400::base::DL2::DLSearch_'+doxie_build.buildstate,dosecond,,,true)
 
 email := fileservices.sendemail('giri.rajulapalli@lexisnexis',
 						  'DL2 Stats Available',
