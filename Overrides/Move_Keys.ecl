@@ -1,7 +1,7 @@
-import RoxieKeyBuild;
-EXPORT Move_Keys(string infiledate) := function
+﻿import RoxieKeyBuild;
+EXPORT Move_Keys(string infiledate, boolean isprte = false) := function
 	export move_key(datasetname,infiledate,environment,suffix,retval,legacy='false') := macro
-		RoxieKeyBuild.Mac_SK_Move_V3(overrides.getfilename(datasetname,environment,suffix,legacy).keyfile,'D',retval,infiledate,'1');
+		RoxieKeyBuild.Mac_SK_Move_V3(overrides.getfilename(datasetname,environment,suffix,legacy,isprte).keyfile,'D',retval,infiledate,'1');
 	endmacro;
 	
         move_key('bankrupt_filing',infiledate,'fcra','ffid_v3',bankrupt_filingretval);
@@ -51,8 +51,8 @@ EXPORT Move_Keys(string infiledate) := function
         move_key('ssn_table',infiledate,'fcra','ffid',ssn_tableretval);
         move_key('alloy',infiledate,'fcra','ffid',alloyretval);
         move_key('student_new',infiledate,'fcra','ffid',american_student_newretval);
-        move_key('ibehavior_consumer',infiledate,'fcra','ffid',ibehavior_consumerretval);
-        move_key('ibehavior_purchase',infiledate,'fcra','ffid',ibehavior_purchaseretval);
+        //move_key('ibehavior_consumer',infiledate,'fcra','ffid',ibehavior_consumerretval);
+        //move_key('ibehavior_purchase',infiledate,'fcra','ffid',ibehavior_purchaseretval);
         move_key('aircrafts',infiledate,'fcra','ffid',aircraftsretval);
         move_key('aircraft_details',infiledate,'fcra','ffid',aircraft_detailsretval);
         move_key('aircraft_engine',infiledate,'fcra','ffid',aircraft_engineretval);
@@ -130,8 +130,8 @@ EXPORT Move_Keys(string infiledate) := function
         ,alloyretval
         ,american_student_newretval
 				,studentretval
-        ,ibehavior_consumerretval
-        ,ibehavior_purchaseretval
+        //,ibehavior_consumerretval
+        //,ibehavior_purchaseretval
         ,aircraftsretval
         ,aircraft_detailsretval
         ,aircraft_engineretval
