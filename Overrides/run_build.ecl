@@ -1,8 +1,9 @@
-import _Control,RoxieKeyBuild;
+﻿import _Control,RoxieKeyBuild,PRTE,Orbit3;
 EXPORT run_build(string infiledate
 								,string eid
 								,string dserver = _control.IPAddress.bctlpedata10
-								,string desprayprefix = '/data/data_lib_2_hus2/overrides/logs') := module
+								,string desprayprefix = '/data/data_lib_2_hus2/overrides/logs'
+								,boolean isprte = false) := module
 	
 	
 
@@ -18,24 +19,28 @@ EXPORT run_build(string infiledate
 														);
 	shared send_email_with_eid := fileservices.sendemail(
 													fulldistlist,
-													'Override Build Succeeded ' + infiledate,
+													if (isprte, 'PRTE ', '' ) + 'Override Build Succeeded ' + infiledate,
 													'Exportid used: '+ eid);
 							
 	shared email_fail := fileservices.sendemail(
 													
 													distlist,
-													'Override Keys Roxie Build FAILED',
+													if (isprte, 'PRTE ', '' ) + 'Override Keys Roxie Build FAILED',
 													failmessage);
  
 	export outflagfile := output(dataset([{WORKUNIT}],{string wuid}),,overrideflagfile,csv,overwrite);
  
-	export build_keys := Overrides.Build_Keys(infiledate);
-	export move_keys := Overrides.Move_Keys(infiledate);
+	export build_keys := Overrides.Build_Keys(infiledate, isprte);
+	export move_keys := Overrides.Move_Keys(infiledate, isprte);
 	export dops_update := if (_Control.ThisEnvironment.Name = 'Prod_Thor',
-														sequential(RoxieKeybuild.updateversion('OverrideKeys',infiledate,distlist,,'N'),
-																	RoxieKeybuild.updateversion('FCRA_OverrideKeys',infiledate,distlist,,'F')),
-																	output('Dops not updated')
-																	);
+													if (~isprte
+														,sequential(RoxieKeybuild.updateversion('OverrideKeys',infiledate,distlist,,'N'),
+																	RoxieKeybuild.updateversion('FCRA_OverrideKeys',infiledate,distlist,,'F'))
+														,sequential(PRTE.updateversion('OverrideKeys',infiledate,distlist,,'N'),
+																	PRTE.updateversion('FCRA_OverrideKeys',infiledate,distlist,,'F'))
+															)
+														,output('Dops not updated')
+													);
 	export comparecount := if (_Control.ThisEnvironment.Name = 'Prod_Thor',
 																					Overrides.CompareKeyCount(infiledate),
 																					output('Not Prod environment to compare count')
@@ -45,7 +50,24 @@ EXPORT run_build(string infiledate
 															fileservices.despray(overrideflagfile,dserver,desprayprefix+'/overrideflagfile.txt',,,,TRUE)),
 															output('Not Prod environment to despray flag file')
 															);
-	export all := sequential(build_keys,move_keys,dops_update,comparecount,desprayflagfile) : success(send_email_with_eid),
+		
+		     orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild('RiskWise Overrides',(infiledate),'N'),
+																		Orbit3.proc_Orbit3_CreateBuild('FCRA RiskWise Overrides',(infiledate),'F')
+																		);
+																			
+	export all := sequential
+											(
+													build_keys
+													,move_keys
+													,dops_update
+													,orbit_update
+													,if (~isprte
+														, sequential(
+																	comparecount
+																	,desprayflagfile
+																	)
+														)
+											) : success(send_email_with_eid),
 					failure(email_fail);
  
 	
