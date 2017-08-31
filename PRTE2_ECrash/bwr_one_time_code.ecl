@@ -1,4 +1,4 @@
-//This file was generated as a starting point only.  
+﻿//This file was generated as a starting point only.  
 //You must check and customize this process BEFORE running it.
 import promotesupers;
 
@@ -74,6 +74,7 @@ MakeSuperKeys ('~prte::key::ecrashv2::@version@::supplemental');
 MakeSuperKeys ('~prte::key::ecrashv2::@version@::tagnbr');
 MakeSuperKeys ('~prte::key::ecrashv2::@version@::vin7');
 MakeSuperKeys ('~prte::key::ecrashv2::@version@::vin');
+MakeSuperKeys ('~prte::key::ecrashv2::@version@::agency');
 
 
 // MakeSuperFiles ('~PRTE::BASE::ecrashv2@version@');
