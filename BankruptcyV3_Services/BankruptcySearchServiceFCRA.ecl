@@ -99,14 +99,14 @@ export BankruptcySearchServiceFCRA(
 		//if more than one DID is found this call will fail the service with desired error message
     unsigned6 input_did := (unsigned6) did_value;
 
-		// gateways := Gateway.Constants.void_gateway : stored ('gateways', few);
+		EnableCaseNumFilter := CaseNumber_value != '';
+    // gateways := Gateway.Constants.void_gateway : stored ('gateways', few);
 		gateways := Gateway.Configuration.Get();
-		picklist_res := FCRA.PickListSoapcall.non_esdl(gateways, true, returnByDidOnly and (input_did = 0)); 
+		picklist_res := FCRA.PickListSoapcall.non_esdl(gateways, true, ~EnableCaseNumFilter and returnByDidOnly and (input_did = 0)); 
 		unsigned6 subj_did := if(returnByDidOnly  and (input_did = 0), (unsigned6) picklist_res[1].Records[1].UniqueId, input_did);
 		//------------------------------------------------------------------------------------
 		
-    EnableCaseNumFilter := CaseNumber_value != '';
-		recs	 := bankruptcyv3_Services.bankruptcy_raw(true).search_view(in_ssn_mask := ssn_mask_value,
+    recs	 := bankruptcyv3_Services.bankruptcy_raw(true).search_view(in_ssn_mask := ssn_mask_value,
 																																		 in_party_type := party_type_adj, 
 																																		 in_filing_jurisdiction := FilingJurisdiction_value,
 																																		 suppress_withdrawn_bankruptcy := suppress_withdrawn_bankruptcy,
@@ -198,7 +198,7 @@ export BankruptcySearchServiceFCRA(
     if(CaseNumberErrorCode != 0,  
        FAIL(CaseNumberErrorCode, ut.MapMessageCodes(CaseNumberErrorCode)));
 
-    if(EnableCaseNumFilter and count(final) > 1,  
+    if(EnableCaseNumFilter and count(final(matched_party.did != final[1].matched_party.did)) > 0,  
        FAIL(ut.constants_MessageCodes.FCRA_CASE_NUM_MORE_THAN_1_REC_RETURNED, 
             ut.MapMessageCodes(ut.constants_MessageCodes.FCRA_CASE_NUM_MORE_THAN_1_REC_RETURNED)));
 

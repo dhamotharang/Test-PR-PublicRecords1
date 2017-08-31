@@ -70,9 +70,8 @@ export LiensSearchServiceFCRA() := macro
 	boolean liens_only := false : stored('LiensOnly');
 	boolean judgments_only := false : stored('JudgmentsOnly');	
 	doxie.MAC_Header_Field_Declare(isFCRA);
-  gm := AutoStandardI.GlobalModule(isFCRA);
-	
-  	// FFD				 
+
+	// FFD				 
 	integer8 valFFDOptionsMask := FFD.FFDMask.Get();
 
 	//------------------------------------------------------------------------------------	
@@ -91,10 +90,10 @@ export LiensSearchServiceFCRA() := macro
 	// for FCRA version, set isFCRA boolean to true
 	nss_default := if(fcra_subj_only or isCollections, Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription, Suppress.Constants.NonSubjectSuppression.doNothing);
 	nss := ut.GetNonSubjectSuppression(nss_default);
-  EnableCaseNumFilter := liencasenumber_value != '';
+	gm := AutoStandardI.GlobalModule(isFCRA);
 	liens_params := module(project(gm, LiensV2_Services.IParam.search_params, opt))
 		export string14 DID := rdid;
-    export unsigned2 pt := 10 			: stored('PenaltThreshold');
+		export unsigned2 pt := 10 			: stored('PenaltThreshold');
 		export string CertificateNumber := '' : stored('CertificateNumber');
 		export unsigned8 maxresults := maxresults_val;
 		export string1 partyType := party_type;
@@ -110,7 +109,6 @@ export LiensSearchServiceFCRA() := macro
 		export boolean subject_only := returnByDidOnly;
 		export integer8 FFDOptionsMask := valFFDOptionsMask;		 
 	  export integer FCRAPurpose := FCRA.Constants.FCRAPurpose.NoValueProvided : stored('FCRAPurpose');
-    export boolean EnableCaseNumberFilter := EnableCaseNumFilter;
 	END;
 	all_recs_and_statements := LiensV2_Services.LiensSearchService_records(liens_params, isFCRA);
 	all_recs := all_recs_and_statements.records;
@@ -127,19 +125,7 @@ export LiensSearchServiceFCRA() := macro
 
 	out_recs := if(need_filter, recs_filt, all_recs);
 	
-  CaseNumberErrorCode := 
-    FCRA.Functions.fn_checkCaseNumMinInput(liencasenumber_value,gm.firstname,gm.lastname,
-                                           gm.ssn,gm.state);
-       
-  if(CaseNumberErrorCode != 0,  
-     FAIL(CaseNumberErrorCode, ut.MapMessageCodes(CaseNumberErrorCode)));
-
-  if(EnableCaseNumFilter and count(out_recs) > 1,  
-     FAIL(ut.constants_MessageCodes.FCRA_CASE_NUM_MORE_THAN_1_REC_RETURNED, 
-          ut.MapMessageCodes(ut.constants_MessageCodes.FCRA_CASE_NUM_MORE_THAN_1_REC_RETURNED)));
-	
 	doxie.MAC_Marshall_Results(out_recs, recs_marshalled);
-
 	OUTPUT(recs_marshalled, NAMED('Results'));
 	OUTPUT(statements,NAMED('ConsumerStatements'));
 
