@@ -1,11 +1,11 @@
-// MDS0834 / Maryland Commission of Real Estate App & Home Insp / Real Estate Appraisers //
+﻿// MDS0834 / Maryland Commission of Real Estate App & Home Insp / Real Estate Appraisers //
 
 EXPORT LAYOUT_MDS0834 := MODULE
  EXPORT RAW := RECORD
+ 	STRING     LIC_TYPE;   //CAT
+ 	STRING     SLNUM;      //REG#	 
   STRING	   FIRST_NAME;
 	STRING     LAST_NAME; 
- 	STRING     LIC_TYPE;   //CAT
- 	STRING     SLNUM;      //REG#	
 	STRING     ADDRESS1_1;
 	STRING     ADDRESS2_1;
 	STRING     CITY_1;
