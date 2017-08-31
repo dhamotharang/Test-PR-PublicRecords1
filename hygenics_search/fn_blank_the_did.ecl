@@ -1,4 +1,4 @@
-import ut, corrections;
+﻿import ut, corrections;
 
 //bug 29753 highlights a very rare case of 2 individuals with the same name and DOB
 
@@ -417,7 +417,13 @@ import ut, corrections;
 		'NF000551468371',
 		'AT038535481224',
 		'5W002300166171',
-		'CL000498310548'
+		'CL000498310548',
+		'EL000730909747',
+		'MV000730909747',
+		'TB000730909747',
+		'TJ000730909747',
+		'FN000714272992',
+		'CG063132961784'
 		// 'DD002168500989',
 		// 'RG002168500989'
 		];
