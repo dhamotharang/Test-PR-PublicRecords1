@@ -1,4 +1,4 @@
-import FLAccidents, FLAccidents_Ecrash, STD, prte2_ecrash;
+﻿import FLAccidents, FLAccidents_Ecrash, STD, prte2_ecrash;
 
 EXPORT files := module
 
@@ -12,6 +12,9 @@ EXPORT base_supplemental 	:= dataset([], FLAccidents_Ecrash.Layouts.ReportVersio
 EXPORT base_tmafterf			:= dataset([], FLAccidents_Ecrash.Layouts.slim_layout);
 EXPORT base_alpharetta    := dataset([], FLAccidents.Layout_NtlAccidents_Alpharetta.clean);
 EXPORT base_cru_inquired	:= dataset([], FLAccidents_Ecrash.Layout_CRU_inquiries);
+
+//New File for BuyCash KY Integration
+EXPORT base_agencycmbnd		:= dataset([], FLAccidents_Ecrash.Layout_Infiles_Fixed.agency_cmbnd);
 
 
 EXPORT basefile 			:= DATASET(Constants.base_prefix_name, Layouts.Base, thor );
