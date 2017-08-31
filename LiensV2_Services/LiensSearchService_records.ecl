@@ -1,5 +1,4 @@
-﻿import doxie, iesp, Alerts, AutoStandardI, Gateway, fcra, suppress, 
-       FFD, NID, std, ut;
+﻿import doxie, iesp, Alerts, AutoStandardI, Gateway, fcra, suppress, FFD, ut;
  
 export LiensSearchService_records(LiensV2_Services.IParam.search_params in_params,
 																	boolean isFCRA=false) := function
@@ -69,24 +68,8 @@ export LiensSearchService_records(LiensV2_Services.IParam.search_params in_param
 
 	//output(ut.PrintLayout(rpen),named('rpen'),EXTEND);	
 
-  rsrt2_org := LiensV2_Services.fn_applyFcraOverrides(rpen, ds_flags, in_params.ssnmask, in_params.includeCriminalIndicators ,
+  rsrt2 := LiensV2_Services.fn_applyFcraOverrides(rpen, ds_flags, in_params.ssnmask, in_params.includeCriminalIndicators ,
 																									slim_pc_recs,in_params.FFDOptionsMask);
-  // Using fname/lname/state for "if" condition because the user could enter that plus 
-  // an ssn and the ssn field is not always populated with a full ssn (many times it's 
-  // ssnLast4).
-  rsrt2_org_filtered_for_case_num_input := 
-      IF(in_params.firstname != '' AND in_params.lastname != '' AND in_params.state != '',
-         rsrt2_org((case_number = in_params.liencasenumber OR EXISTS(filings(filing_number = in_params.liencasenumber))) AND 
-                   (NID.PreferredFirstNew(matched_party.parsed_party.fname, TRUE) = NID.PreferredFirstNew(in_params.firstname, TRUE)) AND 
-                    matched_party.parsed_party.lname = in_params.lastname AND 
-                   (matched_party.address.st = in_params.state OR filing_jurisdiction = in_params.state)),
-         rsrt2_org((case_number = in_params.liencasenumber OR EXISTS(filings(filing_number = in_params.liencasenumber))) AND 
-                    EXISTS(debtors.parsed_parties(ssn = in_params.ssn))));
-
-  rsrt2 := 
-    if(in_params.EnableCaseNumberFilter,
-       rsrt2_org_filtered_for_case_num_input,
-       rsrt2_org);
 
 	rsrt_choose := if(isFCRA, rsrt2, rsrt1);
 			
@@ -114,9 +97,6 @@ export LiensSearchService_records(LiensV2_Services.IParam.search_params in_param
 
   	
 		// ============ START DEBUG ===================== 
-    // OUTPUT(in_params);    
-    // OUTPUT(rsrt2_org, named('rsrt2_org'));
-    // OUTPUT(rsrt2, named('rsrt2'));
     // output(ids_pre, named('ids_pre'));		
 		// output(ids, named('ids'));	
 		// output(tmsids, named('tmsids'));	

@@ -147,8 +147,9 @@ EXPORT TaxRefundISv3_BatchService_Records(
 
 	// *--- Run input subjects through the Criminal Batch Services ---* //
 	ds_crim_res := BatchServices.TaxRefundISv3_BatchService_Functions.getCriminalRecords(ds_clean_batch_w_did);
-
-	ds_crim_felony_res := BatchServices.TaxRefundISv3_BatchService_Functions.getFeloniesAtAddressRecords(ds_clean_batch_w_did);
+	
+	// TRIS v3.2 Enhancement : Req# 3.1.3.1 : Following field is no longer required and needs to be blanked out.
+	// ds_crim_felony_res := BatchServices.TaxRefundISv3_BatchService_Functions.getFeloniesAtAddressRecords(ds_clean_batch_w_did);
 
 	 // Get phone info
   ds_phone_res := BatchServices.TaxRefundISv3_BatchService_Functions.getPhoneRecords(
@@ -267,8 +268,8 @@ EXPORT TaxRefundISv3_BatchService_Records(
 		self.deceased_first_name := if(isDeceased, death_rec[1].fname, '');
 		self.deceased_last_name  := if(isDeceased, death_rec[1].lname, '');
 		temp_dod                 := if(isDeceased, death_rec[1].dod8, '');
-		string8 temp_dod60  		 := ut.date_math(temp_dod,60);  // will add 60 days to the dod
-		string8 temp_dod180      := ut.date_math(temp_dod,180); // will add 180 days to the dod
+		// string8 temp_dod60  		 := ut.date_math(temp_dod,60);  // will add 60 days to the dod
+		// string8 temp_dod180      := ut.date_math(temp_dod,180); // will add 180 days to the dod
 		self.dod                 := temp_dod;
 		self.deceased_matchcode  := if(isDeceased, death_rec[1].matchcode, '');
 

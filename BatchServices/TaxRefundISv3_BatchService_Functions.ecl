@@ -347,6 +347,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		return filt_crim_res_sorted;
 	end;
 	
+	/* Tris 3.2 Enhancement : Since InputAddrFelonyCount is blanked out, this function will not be used, so commenting out....
 	// * --- Function to get criminal batch records at input address --- * //
 	export getFeloniesAtAddressRecords(dataset(rec_in_wdid) in_clean_batch) := function
 
@@ -436,7 +437,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 																	
 		return ds_felonies_at_addr;
 	end;
-
+	*/
 	
 	// *--- Function to get phone recs ---* //
 	EXPORT getPhoneRecords(DATASET(rec_in_wdid) in_clean_batch,
@@ -1594,30 +1595,33 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		
 			contrib_recs_rtn := join(recs_in, contributory_key, 
 																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.RTNbr) and 
-																right.contrib_risk_value = left.routing_transit_nbr,
+																StringLib.StringToUpperCase(right.contrib_risk_value) = left.routing_transit_nbr,
 																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
 																									
 			contrib_recs_abrn:= join(recs_in, contributory_key, 
-																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.ARNbr) and 
-																right.contrib_risk_value = left.aba_rout_nbr, 
+																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.ARNbr) and
+																StringLib.StringToUpperCase(right.contrib_risk_value) = left.aba_rout_nbr, 
 																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
 																									
 			contrib_recs_prep:= join(recs_in, contributory_key, 
-																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.PrepID) and 
-																right.contrib_risk_value = left.prep_id2, 
+																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.PrepID) and
+																StringLib.StringToUpperCase(right.contrib_risk_value) = left.prep_id2, 
 																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
 
 			contrib_recs_email:= join(recs_in, contributory_key, 
 																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.EmailAdd) and 
-																right.contrib_risk_value = left.email_address, 
+																StringLib.StringToUpperCase(right.contrib_risk_value) = left.email_address, 
 																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
 																									
-			contrib_recs_isp:= join(recs_in, contributory_key, 
-															keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName) and 
-																(right.contrib_risk_value = left.isp_name1
-																	OR right.contrib_risk_value = left.isp_name2
-																	OR right.contrib_risk_value = left.isp_name3),
-																		appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+			contrib_recs_isp	:= join(recs_in, contributory_key, 
+																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName OR
+																			right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName2 OR
+																			right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName3)
+																AND 
+																(StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name1) OR 
+																 StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name2) OR 
+																 StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name3)),
+																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
 
 			contrib_recs := contrib_recs_rtn + contrib_recs_abrn + contrib_recs_prep + contrib_recs_email + contrib_recs_isp;
 			
