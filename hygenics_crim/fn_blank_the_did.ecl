@@ -1,4 +1,4 @@
-//bug 29753 highlights a very rare case of 2 individuals with the same name and DOB
+﻿//bug 29753 highlights a very rare case of 2 individuals with the same name and DOB
 
 	did_st_set := ['WA000137071458'];
 
@@ -415,7 +415,13 @@
 		'NF000551468371',
 		'AT038535481224',
 		'5W002300166171',
-		'CL000498310548'
+		'CL000498310548',
+		'EL000730909747',
+		'MV000730909747',
+		'TB000730909747',
+		'TJ000730909747',
+		'FN000714272992',
+		'CG063132961784'
 		// 'DD002168500989', //bug 198566
 		// 'RG002168500989'
 		];
