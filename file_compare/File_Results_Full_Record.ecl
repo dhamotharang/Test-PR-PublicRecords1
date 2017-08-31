@@ -1,0 +1,1 @@
+﻿EXPORT File_Results_Full_Record := dataset('~thor_data400::file_compare::FullRecordResults',file_compare.Layouts.ImportantFieldsResultsLayout,thor,opt);

@@ -1,4 +1,4 @@
-Import Data_Services, American_student_list, Doxie;
+﻿Import Data_Services, American_student_list, Doxie;
 
 file_in := American_student_list.File_american_student_DID_PH_Suppressed_v2;
 
@@ -7,6 +7,7 @@ American_student_DID_base	:=	PROJECT(file_in((unsigned8)did<>0), transform(Ameri
 	self.income_level_code := '',
 	self.new_income_level := '';
 	self.new_income_level_code := '',
+	Self.collegeupdate :=	'';
 	self := left));
 
 export key_DID_FCRA := index(American_student_DID_base, 
