@@ -1,4 +1,4 @@
-import header, phonesplus, irs_Dummy, doxie, ut, PAW, corp2, mdr, STD;
+﻿import header, phonesplus, irs_Dummy, doxie, ut, PAW, corp2, mdr, STD;
 
 export Filters :=
 module
@@ -152,10 +152,14 @@ module
 				// Bug: 42740 - Business FEIN #'s transposed
 				filterbug42740 :=		regexfind('ELDORADO MANAGEMENT',l.company_name,nocase) 
 												and l.fein					= 430915544 
-												;
-				
+												;				
 				// JIRA - DF-8591 Cell Phone reassigned to Irene Pappas 
 				filter_DF8591 :=		trim(l.vendor_id) = '714726209'	and l.phone	= 2673125159 
+												;				
+				// JIRA: DF-20009 - Remove FEIN 32-0153283 from BDID 004315292869 Carriage House
+				filterbugDF20009 := trimids(l.vl_id) in ['12-M17000000132'] 
+												and mdr.sourcetools.SourceIsFL_Corporations(l.source)
+												and l.fein = 320153283
 												;
 				
 				phone := (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.phone));  // Zero the phone if more than 10-digits
@@ -181,7 +185,7 @@ module
 																	,phone				
 																);
 				self.company_name := scrubcompanyname(l.company_name);
-				self.fein					:= if(filterbug42740,0						,l.fein						);
+				self.fein					:= if(filterbug42740 or filterbugDF20009,0						,l.fein);
 	
 				self.vendor_id		:= if(blankbug48348,'',trimids(l.vendor_id));
 				self.source_group	:= if(blankbug48348,'',trimids(l.source_group));
@@ -369,7 +373,8 @@ module
 				// -- JIRA - DF-19683 Cons. Adv. - LexID 1063521771 Remove PAW & Business Contacts Record
 				// -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
 				// -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
-				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898'])
+				// -- JIRA - DF-19818 - Consumer Adv - PAW Record Lex ID: 1974474589 Pickens
+				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898','1645018152   C345926789'])
 				// -- JIRA - DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				or  (mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
 				// -- JIRA - DF-19305 Experian Business Report has incorrect Officer Name of Jon C Dawson 
@@ -411,6 +416,11 @@ module
 												and mdr.sourcetools.SourceIsDunn_Bradstreet(l.source)
 												and trim(l.company_name) = 'EAST LOS ANGELES BAKERY, INC.'
 												;
+				// JIRA: DF-20009 - Remove FEIN 32-0153283 from BDID 004315292869 Carriage House
+				filterbugDF20009 := trimids(l.vl_id) in ['12-M17000000132'] 
+												and mdr.sourcetools.SourceIsFL_Corporations(l.source)
+												and l.company_fein = 320153283
+												;
 
 				phone 				:= (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.phone));  // Zero the phone if more than 10-digits
 				company_phone := (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.company_phone));  // Zero the companyphone if more than 10-digits
@@ -430,7 +440,7 @@ module
 				self.prim_name					:= prim_name				;
 				self.company_prim_name	:= company_prim_name;
 				self.company_name := scrubcompanyname(l.company_name);
-				self.company_fein	:= if(filterbug42740,0						,l.company_fein						);
+				self.company_fein	:= if(filterbug42740 or filterbugDF20009,0						,l.company_fein);
 				self.vendor_id		:= if(blankbug48348,'',trimids(l.vendor_id));
 				self.company_source_group	:= trimids(l.company_source_group);
 				self.dt_first_seen						:= (unsigned4)validatedate((string8)l.dt_first_seen						,if(length(trim((string8)l.dt_first_seen						)) = 8,0,1));
@@ -613,6 +623,12 @@ module
 														)
 												and l.fein					= 430915544 
 												;
+												
+				// JIRA: DF-20009 - Remove FEIN 32-0153283 from BDID 004315292869 Carriage House
+				filterbugDF20009 := trimids(l.vl_id) in ['12-M17000000132'] 
+												and mdr.sourcetools.SourceIsFL_Corporations(l.source)
+												and l.fein = 320153283
+												;
 				
 				// JIRA - DF-8591 Cell Phone reassigned to Irene Pappas 
 				filter_DF8591 :=		trim(l.vendor_id) = '714726209'	and l.phone	= 2673125159 ;
@@ -639,7 +655,7 @@ module
 																	,phone				
 																);
 				self.company_name := scrubcompanyname(l.company_name);
-				self.fein					:= if(filterbug42740,0						,l.fein						);
+				self.fein					:= if(filterbug42740 or filterbugDF20009,0						,l.fein						);
 				self.vendor_id		:= if(blankbug48348,'',trimids(l.vendor_id));
 				self.source_group	:= if(blankbug48348,'',trimids(l.source_group));
 				//for bug 30494 & 30519.  20080424
@@ -879,7 +895,8 @@ module
 				// -- JIRA - DF-19683 Cons. Adv. - LexID 1063521771 Remove PAW & Business Contacts Record
 				// -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
 				// -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
-				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898'])
+				// -- JIRA - DF-19818 - Consumer Adv - PAW Record Lex ID: 1974474589 Pickens
+				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898','1645018152   C345926789'])
 				// -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				or  (mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
 				// -- JIRA - DF-19305 Experian Business Report has incorrect Officer Name of Jon C Dawson 
@@ -940,6 +957,19 @@ module
 												and l.did = 144086733
 												;
 				
+				// JIRA: LNK-563 - Consumer Advocacy - PAW Linking Questioned
+				filterbugLNK563 := trimids(l.vl_id) in ['12-552868'] 
+												and mdr.sourcetools.SourceIsFL_Corporations(l.source)
+												and trim(l.fname) = 'SHEILA' and trim(l.lname) = 'BORLAND'
+												and l.did = 2323167047
+												;
+												
+				// JIRA: DF-20009 - Remove FEIN 32-0153283 from BDID 004315292869 Carriage House
+				filterbugDF20009 := trimids(l.vl_id) in ['12-M17000000132'] 
+												and mdr.sourcetools.SourceIsFL_Corporations(l.source)
+												and l.company_fein = 320153283
+												;
+				
 				phone 				:= (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.phone));  // Zero the phone if more than 10-digits
 				company_phone := (unsigned6)ut.CleanPhone(header.fn_blank_bogus_phones((string)l.company_phone));  // Zero the companyphone if more than 10-digits
 				
@@ -959,11 +989,11 @@ module
 																);
 
 				self.company_name 				:= scrubcompanyname(l.company_name);
-				self.company_fein					:= if(filterbug42740,0						,l.company_fein						);
+				self.company_fein					:= if(filterbug42740 or filterbugDF20009,0	,l.company_fein);
 				self.vendor_id						:= if(blankbug48348,'',trimids(l.vendor_id));
 				self.company_source_group	:= trimids(l.company_source_group);
-				self.DID									:= if(filterbug30402 or filterbug114192, 0, l.did);
-				self.ssn									:= if(filterbug30402, 0, l.ssn);
+				self.DID									:= if(filterbug30402 or filterbug114192 or filterbugLNK563, 0, l.did);
+				self.ssn									:= if(filterbug30402 or filterbugLNK563, 0, l.ssn);
 				//for bug 30494 & 30519.  20080424
 				self.dt_first_seen				:= (unsigned4)validatedate((string8)l.dt_first_seen						,if(length(trim((string8)l.dt_first_seen						)) = 8,0,1));
 				self.dt_last_seen					:= (unsigned4)validatedate((string8)l.dt_last_seen						,if(length(trim((string8)l.dt_last_seen							)) = 8,0,1));
@@ -1449,7 +1479,8 @@ module
 			or // -- JIRA - DF-19683 Cons. Adv. - LexID 1063521771 Remove PAW & Business Contacts Record
 				 // -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
 				 // -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
-				( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898'])
+				 // -- JIRA - DF-19818 - Consumer Adv - PAW Record Lex ID: 1974474589 Pickens
+				( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898','1645018152   C345926789'])
 			or // -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				( mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
 			or // -- JIRA - DF-19305 Experian Business Report has incorrect Officer Name of Jon C Dawson 
@@ -1952,7 +1983,8 @@ module
 			or // -- JIRA - DF-19683 Cons. Adv. - LexID 1063521771 Remove PAW & Business Contacts Record
 				 // -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
 				 // -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
-				( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898'])
+				 // -- JIRA - DF-19818 - Consumer Adv - PAW Record Lex ID: 1974474589 Pickens
+				( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898','1645018152   C345926789'])
 			or // -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				( mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
 			or // -- JIRA - DF-19305 Experian Business Report has incorrect Officer Name of Jon C Dawson 
