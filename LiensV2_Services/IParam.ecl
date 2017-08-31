@@ -7,7 +7,6 @@ EXPORT IParam := MODULE
 	shared common_params := interface(it.did_value.params,
 																		it.bdid_value.params,
 																		it.lname_value.params,
-                                    it.fname_value.params,
 																		it.state_value.params
 																		)
 		export string CertificateNumber := '';
@@ -38,12 +37,11 @@ EXPORT IParam := MODULE
 																		it.tmsid_value.params,
 																		TopBusiness_Services.iParam.BIDParams,
 																		FCRA.iRules)
-			export integer1 non_subject_suppression := Suppress.Constants.NonSubjectSuppression.doNothing;
+			export integer1 non_subject_suppression 	:= Suppress.Constants.NonSubjectSuppression.doNothing;
 			export string person_filter_id := '';
 			export boolean includeCriminalIndicators := false;
 			export boolean subject_only := false;
 			export integer FCRAPurpose := FCRA.Constants.FCRAPurpose.NoValueProvided;
-      export boolean EnableCaseNumberFilter := false;
 	END;
 
 	EXPORT batch_params := INTERFACE (BatchShare.IParam.BatchParams,FCRA.iRules)
