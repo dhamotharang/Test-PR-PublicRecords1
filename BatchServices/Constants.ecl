@@ -187,7 +187,6 @@ EXPORT Constants := MODULE
 		//Tris v3.2 Enhancement : Following Constants are added for Req # 3.1.6
 		EXPORT SET OF STRING15 IP_Country := ['US','USA','United States'];
 		EXPORT Contributory_Rec_Join_Limit := 100;
-		EXPORT Max_Contributory_Rec_Limit := 3;
 		EXPORT RTNbr 		:= 'ROUTING_TRANSIT_NBR';
 		EXPORT ARNbr 		:= 'ABA_ROUT_NBR';
 		EXPORT PrepID 	:= 'PREP_ID2';

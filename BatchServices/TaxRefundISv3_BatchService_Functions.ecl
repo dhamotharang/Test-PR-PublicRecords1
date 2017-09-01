@@ -1629,13 +1629,12 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 																		contrib_recs(st not in [Std.Str.SplitWords(contrib_state_excl,',')] and contrib_risk_value <> ''), 
 																		dataset([], slim_input_fields)); 
 		
-			pre_contrib_recs:= CHOOSEN( dedup(sort(contrib_recs_to_return, acctno,(contrib_risk_field	= BatchServices.Constants.TRISv3.RTNbr), 
-																																						(contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName),
-																																						(contrib_risk_field	= BatchServices.Constants.TRISv3.ARNbr), 
-																																						(contrib_risk_field	= BatchServices.Constants.TRISv3.PrepID),
-																																						(contrib_risk_field	= BatchServices.Constants.TRISv3.EmailAdd)), 
-
-																  acctno, contrib_risk_value), BatchServices.Constants.TRISv3.Max_Contributory_Rec_Limit); 
+			pre_contrib_recs:= dedup(sort(contrib_recs_to_return,acctno,(contrib_risk_field	= BatchServices.Constants.TRISv3.RTNbr), 
+																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName),
+																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.ARNbr), 
+																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.PrepID),
+																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.EmailAdd)), 
+																acctno, contrib_risk_value);
 			
 			rec_final deNorm (rec_final L, slim_input_fields R, INTEGER C) := transform
 				self.Contrib_Risk_Field1	:= if(C=1, R.Contrib_Risk_field, L.Contrib_Risk_field1);
