@@ -10,8 +10,8 @@ export collections_vertical_set := ['COLLECTIONS','RECEIVABLES MANAGEMENT','1PC'
 // for FCRA, we need to cap records at 1 years from the history date
 // for non-fcra, allow anything as long as the log_date is populated
 export	inquiry_is_ok(unsigned3 historydate, STRING8 log_date, boolean isFCRA, string historyDateTimeStamp = '') := function
-			today := risk_indicators.iid_constants.mygetdatefull(historyDateTimeStamp, historydate);
-			inquiryOK_fcra := ut.DaysApart(today,log_date) < ut.DaysInNYears(1);
+			today := risk_indicators.iid_constants.mygetdatetimestamp(historyDateTimeStamp, historydate);
+			inquiryOK_fcra := ut.DaysApart(today[1..8],log_date) < ut.DaysInNYears(1);
 			inquiryOK := if(isFCRA, inquiryOK_fcra, log_date<>'');
 			return inquiryOK;
 end;

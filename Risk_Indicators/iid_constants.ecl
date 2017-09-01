@@ -70,20 +70,10 @@ export myGetDateTimestamp(string historydateTimeStamp, unsigned3 history_date) :
 	
 	ts := map(historydateTimeStamp_trim='' and history_date=999999 => todays_date + ' ' + ut.getTimeStamp()[1..8],
 						historydateTimeStamp_trim='' and history_date<>999999 => (string)history_date + defaultTimeStamp  , // hard code 01 as the day, and hard code the time
+						historydateTimeStamp_trim[1..6] = '999999' => todays_date + ' ' + ut.getTimeStamp()[1..8],	//even though this should be an 8 digit date, account for if only 6 nines are passed in to indicate current
 					  historydateTimeStamp_trim<>'' and length(historydateTimeStamp_trim)=6 => historydatetimestamp[1..6] + defaultTimeStamp, // YYYYMM support for historydatetimestamp
 						historydatetimestamp);  // otherwise, simply use the full timestamp the user sent in
 	return ts;
-end;
-
-//for MS-160 - needed to code this function due to 'myGetDateTimeStamp' causing deployment issues - the 'ut.getTimeStamp' caused the deployment to hang
-export myGetDateFull(string historydateTimeStamp, unsigned3 history_date) := function
-	historydateTimeStamp_trim := trim(historydateTimeStamp);
-	
-	fullDate := map(historydateTimeStamp_trim='' and history_date=999999 => todays_date,
-									historydateTimeStamp_trim='' and history_date<>999999 => (string)history_date + '01', // hard code 01 as the day
-									historydateTimeStamp_trim<>'' and length(historydateTimeStamp_trim)=6 => historydatetimestamp[1..6] + '01',
-									historydatetimestamp[1..8]);  // otherwise, simply use the full date the user sent in
-	return fullDate;
 end;
 
 export fiveMonths := 153;
