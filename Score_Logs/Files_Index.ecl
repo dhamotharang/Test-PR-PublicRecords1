@@ -1,4 +1,4 @@
-EXPORT Files_Index := module
+﻿EXPORT Files_Index := module
 
 IMPORT DOXIE;
 #option('multiplePersistInstances',FALSE);
@@ -11,6 +11,7 @@ export File_TransactionID := JOIN(Base, Score_Logs.Files_Base.Transaction_IDs, L
 																	 SELF.login_id := RIGHT.login_id;
 																	 SELF.billing_code := RIGHT.billing_code;
 																	 SELF.customer_id := RIGHT.customer_id;
+																	 SELF.product := trim(stringlib.StringFindReplace(stringlib.StringFindReplace(left.product, 'Request',''), 'Reques', ''),left,right);
 																	 SELF.inputxml := stringlib.stringcleanspaces(LEFT.inputxml);
 																	 SELF.outputxml := stringlib.stringcleanspaces(LEFT.outputxml);
 																	 SELF := LEFT), LEFT OUTER, LOCAL)
