@@ -1,12 +1,11 @@
+﻿
 EXPORT layout_fdn_keys_main_qa := RECORD
+
 //source 
-   // unsigned2 source_type_id;
-   string25 classification_source_source_type;
-   // unsigned2 primary_source_entity_id;
-   string10 classification_source_primary_source_entity;
-   // unsigned2 expectation_of_victim_entities_id;
-   string10 classification_source_expectation_of_victim_entities;
-   string100 classification_source_industry_segment;
+string25	classification_source_source_type;
+string10	classification_source_primary_source_entity;
+string10	classification_source_expectation_of_victim_entities;
+string100	classification_source_industry_segment;
 
 //activity 
    // unsigned2 suspected_discrepancy_id;
@@ -261,6 +260,4 @@ string10	clean_phones_work_phone;
   unsigned2 ultweight;
   // clean_phones clean_phones;
   unsigned8 __internal_fpos__;
-
-
 END;	

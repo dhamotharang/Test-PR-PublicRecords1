@@ -1,4 +1,4 @@
-import riskwise, AML, VerificationOfOccupancy, iesp;
+﻿import riskwise, AML, VerificationOfOccupancy, iesp;
 
 Layout_Address_Validation :=
 RECORD
@@ -480,6 +480,7 @@ RECORD
 	
 	boolean targusgatewayused := false;
 	string2 targustype := ''; // defined in Phones.Constants.TargusType
+	integer swappedNames;
 	
 END;
 

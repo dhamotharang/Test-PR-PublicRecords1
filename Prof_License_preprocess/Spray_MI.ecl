@@ -1,4 +1,4 @@
-EXPORT Spray_MI(dataset({string ftype,string fdate})infile) := module
+﻿EXPORT Spray_MI(dataset({string ftype,string fdate})infile) := module
 
 import VersionControl,_control;
 
@@ -15,7 +15,7 @@ import VersionControl,_control;
 
 	spry_trade_raw:=DATASET([
 
-		 {pServer,pDir('TradeLic'),'*.txt' 			,0 ,lfile('trade_license'				),[{sfile('trade_license'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\t','\\n,\\r\\n','"'}
+		 {pServer,pDir('TradeLic'),'*.csv' 			,0 ,lfile('trade_license'				),[{sfile('trade_license'			)}],pGroupName,'','[0-9]{12}','VARIABLE','',8192,'\t','\\n,\\r\\n','"'}
 		
 		 	], VersionControl.Layout_Sprays.Info);
 	

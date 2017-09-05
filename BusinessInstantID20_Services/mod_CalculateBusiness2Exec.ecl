@@ -1,4 +1,4 @@
-IMPORT Business_Risk_BIP;
+﻿IMPORT Business_Risk_BIP;
 
 EXPORT mod_CalculateBusiness2Exec( Business_Risk_BIP.Layouts.Shell le, BOOLEAN useSBFE = FALSE ) := 
 	MODULE
@@ -46,7 +46,7 @@ EXPORT mod_CalculateBusiness2Exec( Business_Risk_BIP.Layouts.Shell le, BOOLEAN u
 				_e2b_rep_match_bus_in_first    := e2b_rep_match_bus_in_first = '1';
 				_e2b_rep_match_bus_in_last     := e2b_rep_match_bus_in_last = '1';    
 				_e2b_rep_match_bus_in_addr     := e2b_rep_match_bus_in_addr = '1';  
-				_e2b_rep_match_bus_in_phn      := in_bus_phone10 = in_rep_phone10;
+				_e2b_rep_match_bus_in_phn      := TRIM(in_bus_phone10) != '' AND TRIM(in_rep_phone10) != '' AND TRIM(in_bus_phone10) = TRIM(in_rep_phone10);
 				_e2b_rep_match_bus_in_fein     := TRIM(in_bus_fein) != '' AND TRIM(in_bus_fein) = TRIM(in_rep_ssn); 
 				
 				_sbfe_e2b_rep_name_on_file_f   := sbfe_e2b_rep_name_on_file IN ['1','3'];
@@ -116,7 +116,7 @@ EXPORT mod_CalculateBusiness2Exec( Business_Risk_BIP.Layouts.Shell le, BOOLEAN u
 		
 		// Rep 1 info
 		SHARED in_rep1_ssn                   := le.Input_Echo.Rep_SSN;
-		SHARED in_rep1_phone10               := le.Input_Echo.rep_phone10;
+		SHARED in_rep1_phone10               := le.Clean_Input.rep_phone10;
 		SHARED e2b_rep1_name_on_file         := le.Business_To_Executive_Link.BusExecLinkAuthRepNameOnFile;
 		SHARED e2b_rep1_paw_match            := le.Business_To_Executive_Link.AR2BBusPAWRep1;
 		SHARED e2b_rep1_idsearch_name        := le.Business_To_Executive_Link.AR2BRep1NameBusHeaderLexID;
@@ -137,7 +137,7 @@ EXPORT mod_CalculateBusiness2Exec( Business_Risk_BIP.Layouts.Shell le, BOOLEAN u
 
 		// Rep 2 info
 		SHARED in_rep2_ssn                   := le.Input_Echo.Rep2_SSN;
-		SHARED in_rep2_phone10               := le.Input_Echo.rep2_phone10;
+		SHARED in_rep2_phone10               := le.Clean_Input.rep2_phone10;
 		SHARED e2b_rep2_name_on_file         := le.Business_To_Executive_Link.BusExecLinkAuthRep2NameOnFile;
 		SHARED e2b_rep2_paw_match            := le.Business_To_Executive_Link.AR2BBusPAWrep2;
 		SHARED e2b_rep2_idsearch_name        := le.Business_To_Executive_Link.AR2Brep2NameBusHeaderLexID;
@@ -158,7 +158,7 @@ EXPORT mod_CalculateBusiness2Exec( Business_Risk_BIP.Layouts.Shell le, BOOLEAN u
 
 		// Rep 3 info
 		SHARED in_rep3_ssn                   := le.Input_Echo.rep3_SSN;
-		SHARED in_rep3_phone10               := le.Input_Echo.rep3_phone10;
+		SHARED in_rep3_phone10               := le.Clean_Input.rep3_phone10;
 		SHARED e2b_rep3_name_on_file         := le.Business_To_Executive_Link.BusExecLinkAuthrep3NameOnFile;
 		SHARED e2b_rep3_paw_match            := le.Business_To_Executive_Link.AR2BBusPAWrep3;
 		SHARED e2b_rep3_idsearch_name        := le.Business_To_Executive_Link.AR2Brep3NameBusHeaderLexID;
@@ -179,7 +179,7 @@ EXPORT mod_CalculateBusiness2Exec( Business_Risk_BIP.Layouts.Shell le, BOOLEAN u
 
 		// Rep 4 info
 		SHARED in_rep4_ssn                   := le.Input_Echo.rep4_SSN;
-		SHARED in_rep4_phone10               := le.Input_Echo.rep4_phone10;
+		SHARED in_rep4_phone10               := le.Clean_Input.rep4_phone10;
 		SHARED e2b_rep4_name_on_file         := le.Business_To_Executive_Link.BusExecLinkAuthrep4NameOnFile;
 		SHARED e2b_rep4_paw_match            := le.Business_To_Executive_Link.AR2BBusPAWrep4;
 		SHARED e2b_rep4_idsearch_name        := le.Business_To_Executive_Link.AR2Brep4NameBusHeaderLexID;
@@ -200,7 +200,7 @@ EXPORT mod_CalculateBusiness2Exec( Business_Risk_BIP.Layouts.Shell le, BOOLEAN u
 
 		// Rep 5 info
 		SHARED in_rep5_ssn                   := le.Input_Echo.rep5_SSN;
-		SHARED in_rep5_phone10               := le.Input_Echo.rep5_phone10;
+		SHARED in_rep5_phone10               := le.Clean_Input.rep5_phone10;
 		SHARED e2b_rep5_name_on_file         := le.Business_To_Executive_Link.BusExecLinkAuthrep5NameOnFile;
 		SHARED e2b_rep5_paw_match            := le.Business_To_Executive_Link.AR2BBusPAWrep5;
 		SHARED e2b_rep5_idsearch_name        := le.Business_To_Executive_Link.AR2Brep5NameBusHeaderLexID;

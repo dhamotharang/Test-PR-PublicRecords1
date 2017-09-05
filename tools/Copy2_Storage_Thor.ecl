@@ -1,4 +1,4 @@
-IMPORT STD, ut,wk_ut,tools;
+﻿IMPORT STD, ut,wk_ut,tools;
 //works on thor and hthor now
 export  Copy2_Storage_Thor(
 
@@ -22,7 +22,7 @@ Function
   dstcluster  := 'dstcluster=thor400_31_store '                               ;
   over        := 'overwrite=1 '                                               ;
   repl        := 'replicate=1 '                                               ;
-  comp        := if (ut.isCompressed(lfilename),'compress=1 ','compressed=0 '); 
+  comp        := 'compress=1 ';//if (ut.isCompressed(lfilename),'compress=1 ','compressed=0 '); 
   action      := 'action=copy '                                               ;
   wrap        := 'wrap=1 '                                                    ;
   srcname     := 'srcname='+lfilename + ' '                                   ;

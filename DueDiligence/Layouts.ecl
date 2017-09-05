@@ -1,4 +1,4 @@
-IMPORT iesp, SALT28;
+﻿IMPORT iesp, SALT28;
 
 EXPORT Layouts := MODULE
 
@@ -77,6 +77,7 @@ EXPORT LinkIDs := RECORD
 	EXPORT Indv_Input := RECORD
 		STRING lexID;
 		STRING30 accountNumber;
+		STRING3 nameInputOrder;
 		Name name;
 		Address address;
 		STRING phone;
@@ -168,7 +169,7 @@ EXPORT LinkIDs := RECORD
 		STRING10  BusAssetOwnWatercraft_Flags   := ' ';               
 		
 		STRING2  BusAssetOwnVehicle;
-		STRING10 BusAssetOwnVehicle_Flags       := ' ';
+		STRING10 BusAssetOwnVehicle_Flags       := 'XXXXXXXXXXX';
 		
 		STRING2  BusAccessToFundsProperty;
 		STRING10 BusAccessToFundsProperty_Flags := 'XXXXXXXXXXX';
@@ -345,7 +346,7 @@ EXPORT LinkIDs := RECORD
 	END;
 	
 	EXPORT LayoutSICNAIC := RECORD
-		STRING2 Source;
+		STRING3 Source;
 		UNSIGNED4 DateFirstSeen;
 		UNSIGNED4 DateLastSeen;
 		UNSIGNED4 RecordCount;
@@ -359,7 +360,8 @@ EXPORT LinkIDs := RECORD
 	END;
 	
 	EXPORT SicNaicRiskLayout := RECORD
-		BOOLEAN cibExists;
+		BOOLEAN cibRetailExists;
+		BOOLEAN cibNonRetailExists;
 		BOOLEAN msbExists;
 		BOOLEAN nbfiExists;
 		BOOLEAN cagExists;
@@ -368,6 +370,8 @@ EXPORT LinkIDs := RECORD
 		BOOLEAN otherHighRiskIndustExists;
 		BOOLEAN moderateRiskIndustExists;
 		BOOLEAN lowRiskIndustExists;
+		STRING sicCodes;
+		STRING naicCodes;
 	END;
 
 	
@@ -375,6 +379,7 @@ EXPORT LinkIDs := RECORD
 		unsigned4	  seq := 0;
 		UNSIGNED4	  historydate;
 		Busn_Input  Busn_info;             // This all of this information has been cleaned.
+		Busn_Input	busn_input;
 		STRING2			relatedDegree;					 //IB = Inquired Bus, LB = Linked Bus, RB = Related Bus, IE = Inquired Bus Exec, 
 		unsigned3 	LinkedBusncount := 0;
 		unsigned3 	BusnRelatDegree := 0;  
@@ -386,58 +391,67 @@ EXPORT LinkIDs := RECORD
 		unsigned2 	CountOwnProp;                           //populated in DueDiligence.getBusProperty - 
 		/* BusAssetOwnWatercraft */ 
 		unsigned2 	WatercraftCount;                        //populated in DueDiligence.getBusWatercraft 
-		unsigned2   Watercraftlength;                       //populated in DueDiligence.getBusWatercraft - this is the longest length boat found 
+		unsigned2   Watercraftlength;                       //populated in DueDiligence.getBusWatercraft 
 		/* BusAssetOwnAircraft */
 		unsigned2 	AircraftCount;                          //populated in DueDiligence.getBusAircraft 
 		/* BusAssetOwnVehicle */
 		unsigned2 	VehicleCount;                           //populated in DueDiligence.getBusVehicle
 		unsigned6   VehicleBaseValue;
 		/*BusSOSAgeRange*/  
-		unsigned4   SOSIncorporationDate;										//populated in DueDiligence.getBusSOSDetail
+		UNSIGNED4   sosIncorporationDate;										//populated in DueDiligence.getBusSOSDetail
+		BOOLEAN   	noSOSFilingEver;												//populated in DueDiligence.getBusSOSDetail
+		UNSIGNED4		filingDate;	
 		/*BusPublicRecordAgeRange*/ 	
-		unsigned4 	BusnHdrDtFirstSeen;											//populated in DueDiligence.getBusHeader
-		
-		
-		string2   	LastCorpStatus;													
-		/*BusSOSAgeRange*/
-		boolean   	NoSOSFilingEver;												//populated in DueDiligence.getBusSOSDetail
-		unsigned4		filingDate;
-		unsigned4   SOSLastReported;												
-		unsigned4   lastReinstatDate;												
-		unsigned4   lastDissolvedDate;											
-		boolean   	BusnNameChangeSOS;											
-		boolean   	contactChangeSOS;												
-		boolean   	addressChangeSOS;												
+		UNSIGNED4 	busnHdrDtFirstSeen;											//populated in DueDiligence.getBusHeader
+		UNSIGNED3 	srcCount;																//populated in DueDiligence.getBusHeader
 		/*BusValidityRisk*/
-		unsigned2 	SOSAddrLocationCount;										//populated in DueDiligence.getBusSOSDetail
+		UNSIGNED2 	sosAddrLocationCount;										//populated in DueDiligence.getBusSOSDetail
+		UNSIGNED2 	hdAddrCount;														//populated in DueDiligence.getBusHeader 
+		UNSIGNED2 	creditSrcCnt;														//populated in DueDiligence.getBusHeader
+		BOOLEAN     noFein;																	//populated in DueDiligence.getBusHeader			
+		BOOLEAN     busRegHit;															//populated in DueDiligence.getBusRegistration
+		/*BusStabilityRisk*/
+		BOOLEAN			sosFilingExists;												//populated in DueDiligence.getBusSOSDetail
+		BOOLEAN			sosAllDissolveInactiveSuspend;					//populated in DueDiligence.getBusSOSDetail
+		BOOLEAN			sosHasAtleastOneDissolvedFiling;					
+		BOOLEAN			sosHasAtleastOneInactiveFiling;					
+		BOOLEAN			sosHasAtleastOneSuspendedFiling;					
+		BOOLEAN			sosHasAtleastOneOtherStatusFiling;					
+		BOOLEAN			sosHasAtleastOneActiveFiling;						//populated in DueDiligence.getBusSOSDetail
+		UNSIGNED4   sosLastReinstateDate;										//populated in DueDiligence.getBusSOSDetail
+		UNSIGNED4   firstReportedAtInputAddress;						//populated in DueDiligence.getBusSOSDetail
+		BOOLEAN   	sosBusNameChange;												//populated in DueDiligence.getBusSOSDetail																				
+		BOOLEAN   	sosBusAddressChange;										//populated in DueDiligence.getBusSOSDetail
+		BOOLEAN   	sosContactNameChange;										//populated in DueDiligence.getBusSOSDetail			
+		BOOLEAN   	sosContactAddressChange;								//populated in DueDiligence.getBusSOSDetail		
+		BOOLEAN			feinIsSSN;															//populated in DueDiligence.getBusAsInd
+		BOOLEAN			busIsSOHO;															//populated in DueDiligence.getBusAsInd
+		STRING2			residentialAddr;												//populated in DueDiligence.getBusAsInd
+		UNSIGNED1		personNameSSN;													//populated in DueDiligence.getBusAsInd
+		UNSIGNED1		personAddrSSN;													//populated in DueDiligence.getBusAsInd
+		/*BusStructureType*/
+		STRING60    hdBusnType;															//populated in DueDiligence.getBusHeader
+		STRING60    adrBusnType;														//populated in DueDiligence.getBusHeader
+		/*BusIndustryRisk*/
+		SicNaicRiskLayout sicNaicRisk;											//populated in DueDiligence.getBusSicNaic
+		DATASET(LayoutSICNAIC) sicNaicSources;							//populated in DueDiligence.getBusSicNaic, DueDiligence.getBusHeader, DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
+		/*BusShellShelfRisk*/
+		UNSIGNED 		numOfBusFoundAtAddr;
+		UNSIGNED		numOfBusIncInStateLooseLaws;
+		UNSIGNED		numOfBusNoReportedFein;
+		
+		
+		
+		unsigned4   SOSLastReported;																								
 		unsigned2 	CorpStateCount;													
-		/*BusPublicRecordAgeRange*/ 	
-		unsigned3 	srcCount := 0;													//populated in DueDiligence.getBusHeader
-		/*BusValidityRisk*/
-		unsigned2 	CreditSrcCnt := 0;											//populated in DueDiligence.getBusHeader
 		unsigned2 	ShellHdrSrcCnt := 0;										//populated in DueDiligence.getBusHeader
-		unsigned4 	BusnHdrDtFirstNonCredit;								//populated in DueDiligence.getBusHeader
+		unsigned4 	BusnHdrDtFirstNonCredit;								
 		unsigned4	  BusnHdrDtLastSeen;											//populated in DueDiligence.getBusHeader
-		integer8 	  FirstSeenInputAddr;											//populated in DueDiligence.getBusHeader
-		/*BusValidityRisk*/
-		unsigned2 	HDAddrCount;														//populated in DueDiligence.getBusHeader  
-		unsigned2 	HDStateCount;														//populated in DueDiligence.getBusHeader  
-		
+		unsigned2 	HDStateCount;														//populated in DueDiligence.getBusHeader  		
 		STRING1     dwelltype := '';
 		STRING1     hriskaddrflag := '';
 		string5     FIPsCode;
-		string9   	fein := '';
-		string10  	phone10 := '';
 		string2	    src := '';
-		
-		/*BusIndustryRisk*/
-		SicNaicRiskLayout sicNaicRisk;											//populated in DueDiligence.getBusSicNaic
-		DATASET(LayoutSICNAIC) SicNaicSources;							//populated in DueDiligence.getBusSicNaic, DueDiligence.getBusHeader, DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
-		
-		/*BusStructureType*/
-		STRING60    busnType;																//populated in DueDiligence.getBusHeader
-		/*BusValidityRisk*/
-		boolean     NoFein;																	//populated in DueDiligence.getBusAddrData
 		string1   	AddressVacancyInd;
 		string3	    EasiTotCrime;
 		boolean     CountyBordersForgeinJur;
@@ -453,9 +467,7 @@ EXPORT LinkIDs := RECORD
 		unsigned1   ShellIndCount;
 		boolean     ShelfBusn;
 		BOOLEAN		  PotentialNIS;
-		boolean     RAShelfBusn;
-		/*BusValidityRisk*/
-		boolean     BusRegHit := false;										//populated in DueDiligence.getBusRegistration
+		boolean     RAShelfBusn;		
 		BOOLEAN		  RAPotentialNIS;
 		boolean     HasCurrRA;
 		boolean		  inc_st_loose;
@@ -483,17 +495,17 @@ EXPORT LinkIDs := RECORD
 		unsigned2		UnreleasedLienCount12    := 0;
 		unsigned2		ReleasedLienCount12	     := 0;
 		unsigned2		LinkedBusnValidityCount	 := 0;	
-		string120		bestCompanyName	         := '';										//populated in DueDiligence.getBusBIPId
+		string120		bestCompanyName	         := '';										//populated in DueDiligence.getBusBestData
 		UNSIGNED1 	bestCompanyNamescore     := 0;
-		string50		bestAddr			           := '';										//populated in DueDiligence.getBusBIPId
-		string25		bestCity			           := '';										//populated in DueDiligence.getBusBIPId
-		string2			bestState			           := '';										//populated in DueDiligence.getBusBIPId
-		string5			bestZip			             := '';										//populated in DueDiligence.getBusBIPId
-		string4			bestZip4			           := '';										//populated in DueDiligence.getBusBIPId
+		string50		bestAddr			           := '';										//populated in DueDiligence.getBusBestData
+		string25		bestCity			           := '';										//populated in DueDiligence.getBusBestData
+		string2			bestState			           := '';										//populated in DueDiligence.getBusBestData
+		string5			bestZip			             := '';										//populated in DueDiligence.getBusBestData
+		string4			bestZip4			           := '';										//populated in DueDiligence.getBusBestData
 		unsigned1		bestAddrScore		         := 0;
-		string9			bestFEIN			           := '';										//populated in DueDiligence.getBusBIPId
+		string9			bestFEIN			           := '';										//populated in DueDiligence.getBusBestData
 		unsigned1		bestFEINScore		         := 0;
-		string10		bestPhone			           := '';										//populated in DueDiligence.getBusBIPId
+		string10		bestPhone			           := '';										//populated in DueDiligence.getBusBestData
 		unsigned1		bestPhoneScore		       := 0;
 		BusAttributes_KRI;
 		iesp.duediligencereport.t_DDRBusinessReport BusinessReport;

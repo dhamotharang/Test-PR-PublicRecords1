@@ -1,4 +1,4 @@
-EXPORT Map_AR(dataset({string ftype,string fdate})infile) := module
+﻿EXPORT Map_AR(dataset({string ftype,string fdate})infile) := module
   import Prof_License, lib_StringLib, ut,Std;
 
 //DDS
@@ -222,11 +222,11 @@ superfile_trans := Sequential(    FileServices.RemoveSuperFile('~thor_data400::i
 
 export buildprep := Sequential( prep,
                          superfile_trans,
-                         output( outfile,,'~thor_data400::in::prolic_ar',overwrite),
+                         output( outfile,,'~thor_data400::in::prolic_ar',compressed,overwrite),
 												             validate_prep,
                          FileServices.StartSuperfiletransaction(),
 	                         FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ar'),
-													             FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ar_old'), 											   
+													             FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old::cmp','~thor_data400::in::prolic_ar_old'), 											   
 													           FileServices.FinishSuperfiletransaction()
 											       );
 

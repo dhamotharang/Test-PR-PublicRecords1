@@ -1,10 +1,12 @@
-EXPORT File_MI := module
+﻿EXPORT File_MI := module
 
-tlrec := record                                       
+tlrec := record  
+ string RecordType;                                     
  string LICENSE;       
- string  Name;         
- string  Address;      
- string  City_State;   
+ string  LastName; 
+ string FirstName;
+ string  Address_1;      
+ string  City;   
  string  Zip;          
  string  Date_Expired; 
  string Status;        

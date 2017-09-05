@@ -1,4 +1,4 @@
-import lib_StringLib,Prof_License,ut;
+﻿import lib_StringLib,Prof_License,ut;
 
 
 EXPORT Map_OK_Medical(string fdate) := module
@@ -195,12 +195,12 @@ export buildprep := Sequential( dOKMedicalSF,
 								        if ( FileServices.FileExists( '~thor_data400::in::prolic_ok_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_ok_old')),
                         FileServices.RenameLogicalfile( '~thor_data400::in::prolic_ok','~thor_data400::in::prolic_ok_old'),   
                          
-											output( outfile,,'~thor_data400::in::prolic_ok',overwrite),
+											output( outfile,,'~thor_data400::in::prolic_ok',compressed,overwrite),
                          FileServices.StartSuperfiletransaction(),
 							
 												 
 												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ok'),
-	FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ok_old'),
+	FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old::cmp','~thor_data400::in::prolic_ok_old'),
 											   FileServices.FinishSuperfiletransaction()
 											 );
 

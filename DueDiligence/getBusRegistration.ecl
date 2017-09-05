@@ -1,6 +1,6 @@
-import Address_Attributes, Business_Risk, BIPV2, BusReg, Business_Risk_BIP, DueDiligence, Corp2, Riskwise, Risk_Indicators, business_header;
+﻿import Address_Attributes, Business_Risk, BIPV2, BusReg, Business_Risk_BIP, DueDiligence, Corp2, Riskwise, Risk_Indicators, business_header;
 
-/*
+/* 
 	Following Keys being used:
 			BusReg.key_busreg_company_linkids.kFetch2
 */
@@ -31,8 +31,8 @@ EXPORT getBusRegistration(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	regBusFilt := cleanRB_dateLastSeen;
 	
 	//sort current registered business
-	regBusSort := SORT(regBusFilt, seq, #expand(DueDiligence.Constants.mac_ListTop3Linkids()), -record_date);
-	regBusDedup := DEDUP(regBusSort, seq, #expand(DueDiligence.Constants.mac_ListTop3Linkids()), record_date);
+	regBusSort := SORT(regBusFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -record_date);
+	regBusDedup := DEDUP(regBusSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), record_date);
 	
 	rollForRegBusHit := ROLLUP(regBusDedup, 
 															LEFT.seq = RIGHT.seq AND

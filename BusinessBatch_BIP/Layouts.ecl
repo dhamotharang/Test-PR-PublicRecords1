@@ -1,4 +1,4 @@
-IMPORT Address,Batchshare,BIPV2,BIPV2_Best,BizLinkFull,Corp2, UCCV2;
+﻿IMPORT Address,Batchshare,BIPV2,BIPV2_Best,BizLinkFull,Corp2, UCCV2;
 
 EXPORT Layouts := MODULE
 
@@ -244,6 +244,52 @@ EXPORT Layouts := MODULE
 		STRING15 sales;
   END;
   
+	EXPORT DivCertInfo :=
+	RECORD
+	  STRING20 acctno;
+		BIPV2.IDlayouts.l_header_ids;
+		STRING8  div_dt_first_seen;
+		STRING8  div_dt_last_seen;
+		STRING2  div_state;
+		STRING80 div_minorityAffiliation;
+	  STRING80 div_certificationtype1;
+    STRING8  div_certificatedatefrom1;
+	  STRING8  div_certificatedateto1;
+    STRING80 div_certificatestatus1;
+		STRING60 div_certificatenumber1;
+    STRING80 div_certificationtype2;
+    STRING8  div_certificatedatefrom2;
+		STRING8  div_certificatedateto2;
+    STRING80 div_certificatestatus2;
+		STRING60 div_certificatenumber2;
+    STRING80 div_certificationtype3;
+		STRING8  div_certificatedatefrom3;
+		STRING8  div_certificatedateto3;
+    STRING80 div_certificatestatus3;
+    STRING60 div_certificatenumber3;
+    STRING80 div_certificationtype4;
+		STRING8  div_certificatedatefrom4;
+		STRING8  div_certificatedateto4;
+    STRING80 div_certificatestatus4;
+    STRING60 div_certificatenumber4;
+	END;
+	
+	EXPORT LaborActionsWHDInfo :=
+	RECORD
+	  STRING20 acctno;
+		BIPV2.IDlayouts.l_header_ids;
+		STRING15 laborActionViolations;
+		STRING15 laborActionBackWages;
+		STRING15 laborActionMoneyPenalties;		
+	END;
+	
+	EXPORT OSHAInspectionInfo :=
+	RECORD
+	  STRING20 acctno;
+		BIPV2.IDlayouts.l_header_ids;		
+		unsigned2 OshaViolations;		
+  END;		
+		
 	EXPORT PARENT_FINAL := record	  
 		STRING120 parent_company_name;
 		STRING10  parent_prim_range;
@@ -523,7 +569,7 @@ EXPORT Layouts := MODULE
 		STRING50  url;
 		STRING50  email;
 		STRING3   Years_in_business;
-		STRING20 Business_Type;
+		STRING20 Business_Type; // pulled from bip v2 header.. similar to corp_filing_type below 
 		STRING1 Input_residential;
 		UNSIGNED2  Input_total_businesses_active;
 		UNSIGNED2  Input_total_businesses_history;
@@ -612,7 +658,7 @@ EXPORT Layouts := MODULE
 	EXPORT Final := RECORD
 		STRING20  acctno;
 		BusHeaderMetaDataFinal - [acctno];
-		                               //ultid, orgiid,seleid];
+		                              
     
 		Flags - [acctno] - BIPV2.IDlayouts.l_header_ids;
 		
@@ -621,6 +667,9 @@ EXPORT Layouts := MODULE
 		UCCInfoLayout - [acctno] - BIPV2.IDLayouts.l_header_ids;		
 		PropertyInfo - [acctno,sproperty_owned_size] - BIPV2.IDLayouts.l_header_ids;
 		watchListInfo - [acctno] - BIPV2.IDLayouts.l_header_ids;
+		DivCertInfo - [acctno] - BIPV2.IDlayouts.l_header_ids;
+		LaborActionsWHDInfo - [acctno] - BIPV2.IDlayouts.l_header_ids;
+		OSHAInspectionInfo - [acctno] - BIPV2.idlayouts.l_header_ids;
 		STRING5   ra_title;
 		STRING20  ra_fname;
 		STRING20  ra_mname;
@@ -629,8 +678,7 @@ EXPORT Layouts := MODULE
 		STRING120 ra_cname;
 		STRING10  ra_phone;
 		
-		//STRING20  Business_type // (values of active, dissolved, Merged)
-		 // get this from BH key.
+		 // same as corp_filing_type below 
 	  STRING10  Foreign_domestic_status; // (values of foreign or domestic)
 		                                 // Case on F or D (field: corp_foreign_domestic_ind)
 	  STRING3   Profit;    // values of 'yes' (for profit) or 'no' (not for profit).
@@ -652,42 +700,52 @@ EXPORT Layouts := MODULE
 		STRING20  corp_var1;
 		STRING10  corp_var1_first_seen;
 		STRING10  corp_var1_last_seen;
+		STRING3   corp_var1_state_origin;
 		
 	  STRING20  corp_var2;
 		STRING10  corp_var2_first_seen;
 		STRING10  corp_var2_last_seen;
+		STRING3   corp_var2_state_origin;
 		
 		STRING20  corp_var3;
 		STRING10  corp_var3_first_seen;
 		STRING10  corp_var3_last_seen;
+		STRING3   corp_var3_state_origin;
 		
 		STRING20  corp_var4;
 		STRING10  corp_var4_first_seen;
 		STRING10  corp_var4_last_seen;
+		STRING3   corp_var4_state_origin;
 		
 		STRING20  corp_var5;
 		STRING10  corp_var5_first_seen;
 		STRING10  corp_var5_last_seen;
+		STRING3   corp_var5_state_origin;
 		
 		STRING20  corp_var6;
 		STRING10  corp_var6_first_seen;
 		STRING10  corp_var6_last_seen;
+		STRING3   corp_var6_state_origin;
 		
 		STRING20  corp_var7;
 		STRING10  corp_var7_first_seen;
 		STRING10  corp_var7_last_seen;
+		STRING3   corp_var7_state_origin;
 		
 		STRING20  corp_var8;
 		STRING10  corp_var8_first_seen;
 		STRING10  corp_var8_last_seen;
+		STRING3   corp_var8_state_origin;
 		
 		STRING20  corp_var9;
 		STRING10  corp_var9_first_seen;
 		STRING10  corp_var9_last_seen;
+		STRING3   corp_var9_state_origin;
 		
 		STRING20  corp_var10;
 		STRING10  corp_var10_first_seen;
 		STRING10  corp_var10_last_seen;			
+		STRING3   corp_var10_state_origin;
 		
 		UNSIGNED2 total_Corp;
 		

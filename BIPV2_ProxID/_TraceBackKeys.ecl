@@ -1,4 +1,4 @@
-import STD; 
+﻿import STD; 
 EXPORT _TraceBackKeys(string pversion) := module
 
 
@@ -151,5 +151,15 @@ export addToSuper :=SEQUENTIAL(
  STD.File.FinishSuperFileTransaction()
 );
 
-export out:=sequential(BldProxChangeKey,BldProxMj6ChangeKey, BldProxMatchScoreKey,BldProxMj6MatchScoreKey, addToSuper);
+export removeFromSuper :=SEQUENTIAL(
+ STD.File.StartSuperFileTransaction(),
+ if(STD.File.FileExists(KeyChangePath   ) ,STD.File.removeSuperFile('~key::bipv2_proxid::prox_changes::super'              ,KeyChangePath    )),
+ if(STD.File.FileExists(KeyMJ6ChangePath) ,STD.File.removeSuperFile('~key::bipv2_proxid::proxmj6_changes::super'           ,KeyMJ6ChangePath )),
+ if(STD.File.FileExists(matchKeyPath    ) ,STD.File.removeSuperFile('~key::bipv2_proxid::prox_match::match_score::super'   ,matchKeyPath     )),
+ if(STD.File.FileExists(matchMJ6KeyPath ) ,STD.File.removeSuperFile('~key::bipv2_proxid::proxmj6_match::match_score::super',matchMJ6KeyPath  )),
+ STD.File.FinishSuperFileTransaction()
+);
+
+
+export out:=sequential(removeFromSuper,BldProxChangeKey,BldProxMj6ChangeKey, BldProxMatchScoreKey,BldProxMj6MatchScoreKey, addToSuper);
 end;

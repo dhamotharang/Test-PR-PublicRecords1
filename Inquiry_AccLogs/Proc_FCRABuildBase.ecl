@@ -1,4 +1,4 @@
-import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, Inquiry_AccLogs_Append;
+﻿import ut, address, aid, lib_stringlib, address, did_add, Business_Header_SS, Inquiry_AccLogs_Append;
 import standard, header_slimsort, didville, business_header,watchdog, mdr, header;
 
 export 	proc_fcrabuildbase(string param_version = '', boolean override_doreappend = false) := function
@@ -145,10 +145,10 @@ FCRA_Weekly_STATs :=  if(ReAppendDay,Inquiry_AccLogs._SCH_FCRAComprehensiveStats
 return sequential(
 			moveallpreprocess,
 			buildall,
-			moveall,
+		 moveall,
 			moveallpostprocess,
-			//BillgroupsCreateAndMove,
-			//FCRA_Weekly_STATs
+			BillgroupsCreateAndMove,
+			FCRA_Weekly_STATs
 			);
 					
 end;

@@ -1,4 +1,4 @@
-EXPORT Map_NJ_All_Available(string fdate) := module
+﻿EXPORT Map_NJ_All_Available(string fdate) := module
 
 Import Prof_License,ut;
 
@@ -96,10 +96,10 @@ export buildprep := Sequential(dout,
                         if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_nj_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_nj_old')),
 								        if ( FileServices.FileExists( '~thor_data400::in::prolic_nj_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_nj_old')),
                      	  FileServices.RenameLogicalfile( '~thor_data400::in::prolic_nj','~thor_data400::in::prolic_nj_old'),                         
-											  output( outfile,,'~thor_data400::in::prolic_nj',overwrite),
+											  output( outfile,,'~thor_data400::in::prolic_nj',compressed,overwrite),
                          FileServices.StartSuperfiletransaction(),											 
 												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_nj'),
-												  FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_nj_old'),	
+												  FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old::cmp','~thor_data400::in::prolic_nj_old'),	
 											   FileServices.FinishSuperfiletransaction()
 											 );
 

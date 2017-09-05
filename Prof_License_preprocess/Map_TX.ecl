@@ -1,4 +1,4 @@
-import Prof_License,ut;
+﻿import Prof_License,ut;
 
 EXPORT Map_TX (dataset({string ftype,string fdate})infile) := module
 
@@ -391,10 +391,10 @@ export buildprep := Sequential(dout,
                            if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_tx_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_tx_old')),
 								           if ( FileServices.FileExists( '~thor_data400::in::prolic_tx_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_tx_old')),
                    				FileServices.RenameLogicalfile( '~thor_data400::in::prolic_tx','~thor_data400::in::prolic_tx_old'),                         
-											 output( outfile,,'~thor_data400::in::prolic_tx',overwrite),
+											 output( outfile,,'~thor_data400::in::prolic_tx',compressed,overwrite),
                          FileServices.StartSuperfiletransaction(),											 
 												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_tx'),
-												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_tx_old'),  
+												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old::cmp','~thor_data400::in::prolic_tx_old'),  
 											   FileServices.FinishSuperfiletransaction()
 											 );
 

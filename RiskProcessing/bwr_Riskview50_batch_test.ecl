@@ -1,4 +1,4 @@
-/*2017-05-24T17:14:51Z (Andrea Koenen)
+﻿/*2017-05-24T17:14:51Z (Andrea Koenen)
 checkin in changes to keep insufficient hits on stream and sort output by order on input
 */
 //*to run Juli - make IncludeLNJReport uncommented and set to true
@@ -204,6 +204,7 @@ roxie_result := soapcall(soap_input,
 				'Riskview.Batch_Service',				
 				{soap_input}, 
 				DATASET(roxie_output_layout),
+				XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
 				parallel(parallel_calls),
 				onFail(myFail(LEFT)));
 	

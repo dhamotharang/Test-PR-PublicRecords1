@@ -1,4 +1,4 @@
-IMPORT Prof_License;
+﻿IMPORT Prof_License;
 
 //***** Usage :-
 //*****Prof_License.Mac_Prof_License_Update_Spray
@@ -117,11 +117,11 @@ EXPORT Mac_Prof_License_Update_Spray(source_IP, source_path, file_name, state, f
 	                         'IN' => OUTPUT(Prof_License.Mapping_IN_As_ProfLic,
 													                ,
 																					Prof_License.Constants.cluster + 'in::prolic_' +
-																					   %subname% + '_new', OVERWRITE),
+																					   %subname% + '_new',compressed, OVERWRITE),
 						               'WY' => OUTPUT(Prof_License.Mapping_WY_As_ProfLic,
 													                ,
 																					Prof_License.Constants.cluster + 'in::prolic_' +
-																					   %subname% + '_new', OVERWRITE));
+																					   %subname% + '_new', compressed,OVERWRITE));
 
 		%remove_file% :=
 		  SEQUENTIAL(FileServices.StartSuperFileTransaction(),

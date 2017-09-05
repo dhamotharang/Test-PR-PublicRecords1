@@ -1,4 +1,4 @@
-import inquiry_acclogs, ut, did_add, riskwise, risk_indicators, NID, STD;
+﻿import inquiry_acclogs, ut, did_add, riskwise, risk_indicators, NID, STD;
 
 // change notes
 // 1.  add fcra purpose of 164 - collections
@@ -162,7 +162,7 @@ layout_temp trans_name(risk_indicators.layout_output le, key_did rt) := transfor
 
 	function_is_ok := if(isfcra, func in Inquiry_AccLogs.shell_constants.set_valid_fcra_functions(bsversion), func in Inquiry_AccLogs.shell_constants.set_valid_nonfcra_functions(BSversion));
 	
-	inquiry_hit := Inquiry_AccLogs.shell_constants.inquiry_is_ok(le.historydate, logdate, isFCRA) and
+	inquiry_hit := Inquiry_AccLogs.shell_constants.inquiry_is_ok(le.historydate, logdate, isFCRA, le.historydatetimestamp) and
 								 function_is_ok and
 								 not is_banko_inquiry and
 								 trim(rt.bus_intel.use)='' and
@@ -276,7 +276,7 @@ layout_temp trans_name(risk_indicators.layout_output le, key_did rt) := transfor
 	self.historydatetimestamp := le.historydatetimestamp;
 	
 	// only increment the velocity counters if it meets the criteria in the valid_velocity_inquiry function
-	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(vertical, industry, func, logdate, le.historydate, sub_market, rt.bus_intel.use, rt.search_info.product_code, rt.permissions.fcra_purpose, isfcra, BSversion,rt.search_info.method);
+	good_inquiry := Inquiry_AccLogs.shell_constants.Valid_Velocity_Inquiry(vertical, industry, func, logdate, le.historydate, sub_market, rt.bus_intel.use, rt.search_info.product_code, rt.permissions.fcra_purpose, isfcra, BSversion,rt.search_info.method, le.historydatetimestamp);
 	self.good_inquiry     := good_inquiry;
 	
 	self.inquiryPerADL := if(good_inquiry, 1, 0);
@@ -576,7 +576,8 @@ layout_temp add_ssn_raw(layout_temp le, key_ssn rt) := transform
 															rt.permissions.fcra_purpose,
 															isFCRA,
 															BSversion,
-															rt.search_info.method);  														
+															rt.search_info.method, 
+															le.historydatetimestamp);  														
 	self.inquiryPerSSN := if(good_inquiry, 1, 0);   // any search at all by SSN that meets the good_inquiry criteria														
 	self.inquiryADLsPerSSN:= if(good_inquiry and rt.person_q.appended_adl<>0, 1, 0);  
 	self.inquiryADLsFromSSN := if(good_inquiry and rt.person_q.appended_adl<>0, rt.person_q.appended_adl, 0);  
@@ -692,7 +693,8 @@ layout_temp add_addr_raw(layout_temp le, key_address rt) := transform
 															rt.permissions.fcra_purpose, 
 															isFCRA,
 															BSversion,
-															rt.search_info.method);  														
+															rt.search_info.method, 
+															le.historydatetimestamp);  														
 	self.inquiryPerAddr := if(good_inquiry, 1, 0);   // any search at all by Addr that meets the good_inquiry criteria														
 	self.inquiryADLsPerAddr:= if(good_inquiry and rt.person_q.appended_adl<>0, 1, 0);  	
 	self.inquiryADLsFromAddr := if(good_inquiry and rt.person_q.appended_adl<>0, rt.person_q.appended_adl, 0);  
@@ -804,7 +806,8 @@ layout_temp add_Phone_raw(layout_temp le, Key_Phone rt) := transform
 															rt.permissions.fcra_purpose, 
 															isFCRA,
 															BSversion,
-															rt.search_info.method);  														
+															rt.search_info.method, 
+															le.historydatetimestamp);  														
 	self.inquiryPerPhone := if(good_inquiry, 1, 0);   // any search at all by Phone that meets the good_inquiry criteria														
 	self.inquiryADLsPerPhone:= if(good_inquiry and rt.person_q.appended_adl<>0, 1, 0);  
 	self.inquiryADLsFromPhone := if(good_inquiry and rt.person_q.appended_adl<>0, rt.person_q.appended_adl, 0);  

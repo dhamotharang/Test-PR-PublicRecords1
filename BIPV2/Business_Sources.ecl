@@ -1,4 +1,4 @@
-IMPORT  mdr,  //mdr to handle the corp2 filtering case  --HS comment. See Corp2 below. 7/29/16   
+﻿IMPORT  mdr,  //mdr to handle the corp2 filtering case  --HS comment. See Corp2 below. 7/29/16   
 	 bankruptcyv2
 	,bbb2
   ,Business_Credit
@@ -44,7 +44,7 @@ Business_Sources1 :=
   +	bbb2.BBB_As_Business_Linking //Need to comment out from sprint36.  put back into sprint 49
   // + BusData.SKA_As_Business_Linking  //on blacklist of ingest sources, filtered out completely
   + Business_Credit.Business_Credit_As_Business_Linking
-  // + BusReg.BusReg_As_Business_Linking(false).Busreg  //*** set to false to use the dataland base files for input.
+  + BusReg.BusReg_As_Business_Linking(false).Busreg  //*** set to false to use the dataland base files for input.
   + CClue.As_Business_Linking()  
   + Corp2.Corp2_As_Business_Linking()
   // + CrashCarrier.As_Business_Linking       //on blacklist of ingest sources, filtered out completely

@@ -1,4 +1,4 @@
-export File_In_Keyword :=  dataset([
+﻿export File_In_Keyword :=  dataset([
 	{'9999','No Value','','5'},
 	{'409','561LIST','','5'},
 	{'1','ACB','','5'},
@@ -149,6 +149,7 @@ export File_In_Keyword :=  dataset([
 	{'42','CNMV','','5'},
 	{'672','CNSAIC','','5'},
 	{'617','CNSAT','','5'},
+	{'694','CNSPC','','5'},
 	{'673','CNSPP','','5'},
 	{'578','CNSSE','','5'},
 	{'572','COANLA','','5'},
@@ -685,6 +686,7 @@ export File_In_Keyword :=  dataset([
 	//{'251','USTREASURY','1','5'},
 	{'329','VCNV','','5'},
 	{'547','VECGR','','5'},
+	{'693','VEPTRE-WC','','5'},
 	{'665','VNMPS-MW','','5'},
 	{'664','VNMPS-TERR','','5'},
 	{'253','WISCONSIN DT','','5'},

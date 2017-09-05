@@ -1,4 +1,4 @@
-//ECrash Morning deployments
+﻿//ECrash Morning deployments
 // The following flags to be set to Y
 // isprodready is set to Y and Autopkg is set to Y only on Sunday.
 import RoxieKeybuild,ut,orbit_report,Orbit3;
@@ -56,6 +56,8 @@ alpha_dependent := sequential(
 																			                                          ) 
 																								
 																	));
+																	
+orbit_report.areport_Stats(nationalgetretval);
 
 build_key := sequential(
 			 FLAccidents_Ecrash.fn_Inputstats.sentemail
@@ -70,7 +72,8 @@ build_key := sequential(
 			,FLAccidents_Ecrash.proc_build_dupe_extract(filedate,timestamp)
 			,FLAccidents_Ecrash.Proc_build_Accident_watch(filedate,timestamp)
 			,FLAccidents_Ecrash.InFilesList
-			,getretval) : success(Send_Email(filedate,'V2').buildsuccess), failure(Send_Email(filedate,'V1').buildfailure);
+			,getretval
+			,nationalgetretval) : success(Send_Email(filedate,'V2').buildsuccess), failure(Send_Email(filedate,'V1').buildfailure);
 
 return if (ut.Weekday(orbit_date)  in [  'SATURDAY','SUNDAY' ]    and morning = 'no' ,Spray_ECrash, Sequential(alpha_dependent, build_key));
 

@@ -1,4 +1,4 @@
-import corp2,mdr,bipv2;
+﻿import corp2,mdr,bipv2;
 
 EXPORT _Test_Ingest(
 
@@ -7,14 +7,17 @@ EXPORT _Test_Ingest(
   ,pBase_File                 = 'bipv2.commonbase.ds_built'
   ,pReturn_Code               = 'false'
   ,pPreserve_Ingest_Statuses  = 'false'
+  ,pShould_Output_Src_samples = 'true'
   
 ) :=
 functionmacro
 
+  import ut, business_header,business_header_ss, address, BIPV2;
+
   #OPTION('multiplePersistInstances',true);
 
   ds_as_linking             := pAs_Linking_Mappers      ;  
-  ds_as_linking_filtered    := ds_as_linking      (count(pSet_Test_Sources) = 0 or source in pSet_Test_Sources);
+  ds_as_linking_filtered    := ds_as_linking      (count(pSet_Test_Sources) = 0 or source in pSet_Test_Sources)  : persist('~persist::BIPV2_Ingest._Test_Ingest::ds_as_linking_filtered');
 
 
   ds_base_Filtered          := pBase_File(count(pSet_Test_Sources) = 0 or source in pSet_Test_Sources) : persist('~persist::BIPV2_Ingest._Test_Ingest::ds_base_Filtered');
@@ -27,7 +30,7 @@ functionmacro
   
   
   ds_as_linking_prep_ingest := if(count(pAs_Linking_Mappers) != 0
-                                  ,BIPV2_Files.tools_dotid(project(ds_as_linking_filtered,BIPV2_Files.layout_ingest)).base_NoDebug
+                                  ,BIPV2_Files.tools_dotid(BIPV2.BL_Init(ds_as_linking_filtered)).base_NoDebug
                                   ,dataset([],RECORDOF(BIPV2_Ingest.In_INGEST))
                                );
   do_ingest                 := BIPV2_Ingest.Ingest(false,,ds_base_Filtered,ds_as_linking_prep_ingest,'~persist::BIPV2_Ingest._Test_Ingest::do_ingest');
@@ -78,13 +81,65 @@ functionmacro
   ds_ingest_statuses_by_source  := sort(ds_ingest_statuses_by_source_prep1 + ds_ingest_statuses_by_source_alert1 ,source,cnt);
 
   /////////////////////////////////
+  // -- Do a xlink append on the new records to see how much lift we might get
+  lay_append    := {BIPV2.CommonBase.Layout or BIPV2.IDlayouts.l_xlink_ids};
+  ds_ingest_new := project(ingest_results(trim(ingest_status) = 'New')  ,transform(lay_append,self := left,self := []));
+  Matchset      := ['A','F','P'];
+
+  Business_Header_SS.MAC_Match_Flex
+  (
+     ds_ingest_new
+    ,matchset
+    ,company_name
+    ,prim_range
+    ,prim_name
+    ,zip
+    ,sec_range
+    ,st
+    ,company_phone
+    ,company_fein
+    ,company_bdid
+    ,lay_append
+    ,FALSE
+    ,BDID_score_field
+    ,ds_new_xlink_append
+    ,												
+    ,												//score_threshold				= '75'
+    ,												//pFileVersion						= '\'prod\''														// default to use prod version of superfiles
+    ,												//pUseOtherEnvironment		= business_header._Dataset().IsDataland	// default is to hit prod on dataland, and on prod hit prod.
+    // ,[BIPV2.IDconstants.xlink_version_BIP_dev]
+    ,[BIPV2.IDconstants.xlink_version_BIP]
+    ,												//pURL										=	''
+    email_address,									
+    ,v_city_name						//pCity									= ''	
+    ,fname	
+    ,mname												//pContact_mname					= ''
+    ,lname			
+    ,												//,contact_ssn					  = ''
+    ,source/*change to sub_source when available!*/												//,source					        = ''
+    ,source_record_id												//,source_record_id				= ''
+  );
+
+  ds_xlink_stats := dataset([
+    
+    {'New'  ,count(ds_new_xlink_append) ,count(ds_new_xlink_append(proxid != 0))  ,count(ds_new_xlink_append(seleid != 0))    
+        ,realformat((count(ds_new_xlink_append(proxid != 0)) / count(ds_new_xlink_append)) * 100.0,8,3)
+        ,count(table(ds_new_xlink_append(proxid = 0)  ,{cnp_name,prim_range,prim_name,v_city_name}  ,cnp_name,prim_range,prim_name,v_city_name ,merge)  )
+    }
   
+  ],{string ingest_status ,unsigned cnt ,unsigned cnt_proxids ,unsigned cnt_seleids ,string pct_append  ,unsigned cnt_max_new_proxids});
+  
+  
+  /////////////////////////////////
+
   #uniquename(gen_work_code   )
   #uniquename(gen_output_code11 )
   #uniquename(gen_output_code1 )
   #uniquename(gen_output_code2 )
   #uniquename(gen_output_code3 )
   #uniquename(gen_output_code4 )
+  #uniquename(gen_output_code5 )
+  #uniquename(gen_output_code6 )
   #uniquename(gen_as_linking_outputs )
   #uniquename(current_source  )
   #uniquename(current_source4condition  )
@@ -98,6 +153,8 @@ functionmacro
   #SET(gen_output_code2  ,'')
   #SET(gen_output_code3  ,'')
   #SET(gen_output_code4  ,'')
+  #SET(gen_output_code5  ,'')
+  #SET(gen_output_code6  ,'')
   #SET(cnt              ,1 )
 
   #APPEND(gen_work_code  ,'fdedupright(pDs_Dedup) := \n')
@@ -142,6 +199,11 @@ functionmacro
     #APPEND(gen_output_code3 ,',output(enth (ds_diff_srid_' + %'current_source_desc'% + ',500)  ,named(\'Example__' + %'current_source_desc'% + '\'),all)\n')
     #APPEND(gen_output_code4 ,',output(count(ds_diff_srid_' + %'current_source_desc'% + '    )  ,named(\'Count__'   + %'current_source_desc'% + '\')    )\n')
 
+
+
+    #APPEND(gen_output_code5 ,',output(enth (ingest_results_' + %'current_source_desc'% + '_new ,500)  ,named(\'Example_New_' + %'current_source_desc'% + '\'),all)\n')
+    #APPEND(gen_output_code6 ,',output(count(ingest_results_' + %'current_source_desc'% + '_new    )  ,named(\'Count_New_'   + %'current_source_desc'% + '\')    )\n')
+
     #APPEND(gen_as_linking_outputs ,',output(choosen(ds_as_linking(source = \'' + %'current_source4condition'% + '\') ,300)  ,named(\'as_linking_' + %'current_source_desc'% + '\'            ))\n')
     
     #SET(cnt  ,%cnt% + 1)
@@ -157,28 +219,40 @@ functionmacro
     ,output(ds_ingest_statuses_by_source_alert      ,named('Ingest_statuses_by_source_ALERT'          ),all)
     ,output(ds_ingest_statuses_by_source_name_type  ,named('Ingest_statuses_by_source_and_name_type'  ),all)
 
-    ,output('Counts of As Linking and Base File records'  ,named('_____'))
+
+    ,output('Results of Xlink Append on New Records'  ,named('__________'))
+    ,output(ds_xlink_stats                         ,named('Xlink_Stats_New_Records'                  ),all)
+    ,output(choosen(ds_new_xlink_append      ,100)  ,named('Examples_Xlink_Append_For_New_Records'         ))
+
+    ,output('Counts of As Linking and Base File records'  ,named('_'))
     ,output(count(ds_as_linking_filtered             )  ,named('Count_ds_as_linking_filtered'    ))
     ,output(count(ds_base_Filtered                   )  ,named('Count_ds_base_Filtered'          ))
     ,output(count(ds_as_linking_prep_ingest          )  ,named('Count_ds_as_linking_prep_ingest' ))
 
-    ,output('Examples of As Linking and Base File records'  ,named('____'))
+    ,output('Examples of As Linking and Base File records'  ,named('__'))
     ,output(choosen(ds_as_linking            ,100)  ,named('Examples_ds_as_linking'            ))
     ,output(choosen(ds_as_linking_prep_ingest,100)  ,named('Examples_ds_as_linking_prep_ingest'))
     ,output(choosen(ds_base_Filtered         ,100)  ,named('Examples_ds_base_Filtered'         ))
+    
+#IF(pShould_Output_Src_samples = true)   
     #IF(count(pSet_Test_Sources) != 0 and pReturn_Code = false) %gen_as_linking_outputs% #END
 
-    ,output('Examples of base file records for each source'  ,named('__________'))
+    ,output('Examples of base file records for each source'  ,named('___'))
     #IF(count(pSet_Test_Sources) != 0 and pReturn_Code = false) %gen_output_code11% #END
 
-    ,output('Examples of Same source record id but different Ingest status Follows for each source'  ,named('__'))
+    ,output('Examples of Same source record id but different Ingest status Follows for each source'  ,named('____'))
     #IF(count(pSet_Test_Sources) != 0 and pReturn_Code = false) %gen_output_code1% #END
-    ,output('Counts of Same source record id but different Ingest status Follows'  ,named('___'))
+    ,output('Counts of Same source record id but different Ingest status Follows'  ,named('_____'))
     #IF(count(pSet_Test_Sources) != 0 and pReturn_Code = false) %gen_output_code2% #END
-    ,output('Examples of Different source record id but same data Follows for each source'  ,named('_______'))
+    ,output('Examples of Different source record id but same data Follows for each source'  ,named('______'))
     #IF(count(pSet_Test_Sources) != 0 and pReturn_Code = false) %gen_output_code3% #END
-    ,output('Counts of Different source record id but same data Follows'  ,named('________'))
+    ,output('Counts of Different source record id but same data Follows'  ,named('_______'))
     #IF(count(pSet_Test_Sources) != 0 and pReturn_Code = false) %gen_output_code4% #END
+    ,output('Examples of New Records Follow'  ,named('________'))
+    #IF(count(pSet_Test_Sources) != 0 and pReturn_Code = false) %gen_output_code5% #END
+    ,output('Counts of New Records Follow'  ,named('_________'))
+    #IF(count(pSet_Test_Sources) != 0 and pReturn_Code = false) %gen_output_code6% #END
+#END
  );
 
 /*  

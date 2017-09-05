@@ -1,10 +1,10 @@
-import bipv2,bipv2_build,BIPV2_Files,BIPV2_DotID,wk_ut;
+﻿import bipv2,bipv2_build,BIPV2_Files,BIPV2_DotID,wk_ut;
 //version
 lversion              := BIPV2.KeySuffix       ;
 //Start iterations
-DotStartIteration     := 181                   ;
-ProxStartIteration    := 338                   ;
-Lgid3StartIteration   := 229                   ;
+DotStartIteration     := 184                   ;
+ProxStartIteration    := 346                   ;
+Lgid3StartIteration   := 244                   ;
 PowDownStartIteration := 1                     ;
 PowStartIteration     := 1                     ;
 EmpDownStartIteration := 1                     ;
