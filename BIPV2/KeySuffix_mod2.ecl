@@ -1,4 +1,4 @@
-/*2016-06-22T18:47:08Z (Harrison Sun_prod)
+﻿/*2016-06-22T18:47:08Z (Harrison Sun_prod)
 Temp check in
 */
 export KeySuffix_mod2 :=
@@ -51,7 +51,8 @@ end;
 //export constant_ThisBuild_versionDate := '20170315'; // S46
 //export constant_ThisBuild_versionDate := '20170526'; // S47
 // export constant_ThisBuild_versionDate := '20170622'; // S48
-export constant_ThisBuild_versionDate := '20170801'; // S49
+// export constant_ThisBuild_versionDate := '20170801'; // S49
+export constant_ThisBuild_versionDate := '20170901'; // S50
 
 
 
@@ -110,6 +111,7 @@ dataset([
 ,{  47, '',   '20170526' ,  '20170526', '', '', 				'', 			  'Ingested S46 base. RR-11124'}
 ,{  48, '',   '20170622' ,  '20170622', '', '', 				'', 			  'Ingested S47 base. RR-11251'}
 ,{  49, '',   '20170801' ,  '20170801', '', '', 				'', 			  'Ingested S48 base. BH-316 -- BIP Build 49 - August 2017'}
+,{  50, '',   '20170901' ,  '20170901', '', '', 				'', 			  'Ingested S49 base. BH-328 -- BIP Build 50 - September 2017'}
 
 
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.

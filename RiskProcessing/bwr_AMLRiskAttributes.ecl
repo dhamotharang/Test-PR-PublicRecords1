@@ -1,4 +1,4 @@
-#workunit('name','AML Batch');
+﻿#workunit('name','AML Batch');
 
 import Models, risk_indicators, aml, ut, RiskWise, Gateway;
 
@@ -147,6 +147,7 @@ AMLResults := soapcall(p_f, roxieIP,
 				{p_f}, 
 				DATASET(xlayout),
 				PARALLEL(threads), 
+				XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
 				onFail(myFail(LEFT)));
 				
 output(count(AMLResults), named('countAMLResults'));

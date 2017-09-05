@@ -1,4 +1,4 @@
-EXPORT Layouts := MODULE
+﻿EXPORT Layouts := MODULE
 
 export rEntity := RECORD
 	unsigned8		Ent_ID;
@@ -86,6 +86,12 @@ export rAddress := RECORD
 	unicode			PostalCode {maxlength(15)};
 	unicode			Remarks {maxlength(255)};
 	string			NameSource {maxlength(20)};
+END;
+
+export rSanctionsDOB := RECORD
+	unsigned8		SanctionsDobId;
+	unsigned8		Ent_ID;
+	string			Dob {maxlength(75)};
 END;
 
 export rRelationship := RECORD

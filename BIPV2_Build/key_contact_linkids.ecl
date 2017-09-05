@@ -1,7 +1,7 @@
-import Business_Header_SS,corp2,BIPV2,business_header,ut,AutoStandardI,tools
+﻿import Business_Header_SS,corp2,BIPV2,business_header,ut,AutoStandardI,tools
        ,acf,diversity_certification,govdata,gsa,insurance_certification,martindale_hubbell
 			 ,ncpdp,oig,one_click_data,poesfromemails,poesfromutilities,redbooks,saleschannel,sda_sdaa
-			 ,teletrack,thrive,mdr,BIPV2_Suppression,bipv2_files,BIPV2_Tools;
+			 ,teletrack,thrive,mdr,BIPV2_Suppression,bipv2_files,BIPV2_Tools,Suppress;
 EXPORT key_contact_linkids :=
 module
 													 //BIPV2.File_Business_Sources(source not in [mdr.sourcetools.src_Dunn_Bradstreet,mdr.sourcetools.src_zoom])
@@ -353,7 +353,7 @@ dAssignBdids_commonbase := project(j_add_exec_ind_commonbase  ,transform(layoutO
   shared superfile_name := keynames(, tools._Constants.IsDataland).contact_linkids.QA;
 	//shared superfile_name := keynames().contact_linkids.QA;  //////Temp use only!!!!?????
 		
-  export dkeybuild      := contacts_bipd_pst;
+  export dkeybuild      := Suppress.applyRegulatory.applyContactBIPV2(contacts_bipd_pst);
   
   BIPV2.IDmacros.mac_IndexWithXLinkIDs(dkeybuild, k, superfile_name)
   export Key := k;

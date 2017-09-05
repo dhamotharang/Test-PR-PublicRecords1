@@ -1,10 +1,10 @@
-import Gateway, PersonContext, risk_indicators, iesp, ut;
+﻿import Gateway, PersonContext, risk_indicators, iesp, ut;
 
 // this function will be used by every FCRA transaction coming in from a scoring product.  
 // Search PersonContext.GetPersonContext by LexID to find out if the consumer has any disputes on file.  
 // Eventually PersonContext will also contain information about security freeze, fraud alert, id theft flag as well
 
-EXPORT checkPersonContext(grouped DATASET(risk_indicators.layout_output) input_with_DID, DATASET (Gateway.Layouts.Config) gateways) := function
+EXPORT checkPersonContext(grouped DATASET(risk_indicators.layout_output) input_with_DID, DATASET (Gateway.Layouts.Config) gateways, BOOLEAN onThor=FALSE) := function
 
 URL := gateways(stringlib.StringToLowerCase(trim(servicename))=gateway.constants.ServiceName.delta_personcontext)[1].url;
 
@@ -24,10 +24,15 @@ dsRequest := DATASET ([prepRequest()]);
 // GetPersonContext accpets just a row now instead of a dataset, so use dsRequest[1]
 dsResponse := PersonContext.GetPersonContext(dsRequest[1]);
 
-dsResponseRecords := TOPN(dsResponse[1].records,
+dsResponseRecords_roxie := TOPN(dsResponse[1].records,
 	iesp.Constants.MAX_CONSUMER_STATEMENTS, 
 	dsResponse[1].records.LexID,
 	-(integer) stringLib.StringFilter(dsResponse[1].records.dateadded[1..10], '0123456789'));
+
+// When running on thor, GetPersonContext takes in multiple rows of data and returns multiple rows of data, instead of using child datasets like the roxie version in order to avoid errors 
+dsResponseRecords_thor := SORT(PersonContext.GetPersonContext_thor(PCKeys), LexID, -(integer) stringLib.StringFilter(dateadded[1..10], '0123456789'));
+
+dsResponseRecords := if(onThor, dsResponseRecords_thor, dsResponseRecords_roxie);
 
 temp_statements := record
 	unsigned LexID;

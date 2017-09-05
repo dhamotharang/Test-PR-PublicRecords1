@@ -1,4 +1,4 @@
-import Prof_License,ut;
+﻿import Prof_License,ut;
 
 EXPORT Map_IA(dataset({string ftype,string fdate})infile) := module
 
@@ -198,10 +198,10 @@ doutfinal1 := dataset('~thor_data400::in::prolic::ia::medical',Prof_License.Layo
 																	 if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ia_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ia_old')),
 								                   if ( FileServices.FileExists( '~thor_data400::in::prolic_ia_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_ia_old')),
                                    FileServices.RenameLogicalfile( '~thor_data400::in::prolic_ia','~thor_data400::in::prolic_ia_old'),                         
-											             output( outfile,,'~thor_data400::in::prolic_ia',overwrite),
+											             output( outfile,,'~thor_data400::in::prolic_ia',compressed,overwrite),
                                    FileServices.StartSuperfiletransaction(),												 
 												               FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ia'),
-												               FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ia_old'),
+												               FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old::cmp','~thor_data400::in::prolic_ia_old'),
 												           FileServices.FinishSuperfiletransaction()
 
 											 );

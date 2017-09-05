@@ -1,4 +1,4 @@
-IMPORT Corrections,iesp;
+﻿IMPORT BatchServices, Corrections;
 
 EXPORT TaxRefundISv3_BatchService_Layouts := MODULE
 
@@ -14,9 +14,17 @@ EXPORT TaxRefundISv3_BatchService_Layouts := MODULE
       string15  refund_amount := '';
 			string45  ip_address    := '';
 			string30  filer_type     := ''; 
-			
-		
-    end;
+
+			// TRIS v3.2 Enhancement : Req # 3.3.1
+			string50 	aba_rout_nbr := '';
+			string50 	txpy_bank_acct_nbr := '';
+			string50 	routing_transit_nbr := '';
+			string50 	depositor_account_num := '';
+			string45 	device_ini_ip_address := '';
+			string45 	device_submit_ip_address := '';
+			string50 	email_address := '';
+			string50 	prep_id2 := '';
+		end;
 
     export rec_batch_in_wdid := record
       rec_batch_in;
@@ -105,6 +113,9 @@ EXPORT TaxRefundISv3_BatchService_Layouts := MODULE
 			string6   InputAddrZipDate; // YYYYMM format or YYYYMMDD???
 			string1   InputAddrState;   // Y or N
 
+			// TRIS v3.2 Enhancement : Req # 3.1.11 & 3.1.12
+			string6			InputAddrFirst_Seen;
+			string6   InputAddrLast_Seen;
 
 			//from deceased
 			string30  deceased_first_name;
@@ -129,13 +140,13 @@ EXPORT TaxRefundISv3_BatchService_Layouts := MODULE
 			Corrections.Layout_Offender.curr_incar_flag;
 			Corrections.Layout_Offender.curr_parole_flag;
 			Corrections.Layout_Offender.curr_probation_flag;
-      string75 off_desc_1_1;
-	    string50 cur_stat_inm_desc_1;
-      string8  in_event_dt_1;
-	    string8  latest_adm_dt_1;
-	    string8  sch_rel_dt_1;
-	    string8  act_rel_dt_1;
-	    string8  ctl_rel_dt_1;
+			string75 off_desc_1_1;
+			string50 cur_stat_inm_desc_1;
+			string8  in_event_dt_1;
+			string8  latest_adm_dt_1;
+			string8  sch_rel_dt_1;
+			string8  act_rel_dt_1;
+			string8  ctl_rel_dt_1;
 
 			//from criminal DOC data based on best SSN
 			string2   doc_state_origin_BestSSN;
@@ -149,49 +160,56 @@ EXPORT TaxRefundISv3_BatchService_Layouts := MODULE
 			string1	  curr_incar_flag_BestSSN;
 			string1	  curr_parole_flag_BestSSN;
 			string1	  curr_probation_flag_BestSSN;
-	    string75	off_desc_1_1_BestSSN;
-	  	string50  cur_stat_inm_desc_1_BestSSN;
+			string75	off_desc_1_1_BestSSN;
+			string50  cur_stat_inm_desc_1_BestSSN;
 			string8   in_event_dt_1_BestSSN;
-	    string8	  latest_adm_dt_1_BestSSN;
-	    string8	  sch_rel_dt_1_BestSSN;
-	    string8	  act_rel_dt_1_BestSSN;
-	    string8	  ctl_rel_dt_1_BestSSN;
+			string8	  latest_adm_dt_1_BestSSN;
+			string8	  sch_rel_dt_1_BestSSN;
+			string8	  act_rel_dt_1_BestSSN;
+			string8	  ctl_rel_dt_1_BestSSN;
 
-      // from High Risk Address service
+			// from High Risk Address service
 			string1   InputAddrPrison;  // Y or blank
 
-      // from Relatives, Neighbors & Associates
+			// from Relatives, Neighbors & Associates
 			string1   InputAddrRel;     // Y or N
-      string1   InputRelLastName; // Y or N/blank???
+			string1   InputRelLastName; // Y or N/blank???
 
-      //from Identity Risk
-      string3   VariationSSNCount;   //(0-255)
-      string3   DivSSNIdentityCount; //(0-255)
-      string2   IDVerSSN;            // Y or N?
-      string1   SourcePublicRecord;  // Y or N
-      string3   DivSSNLNameCount;    //(0-255)
-      string1   IDVerName;           // Y or N
+			//from Identity Risk
+			string3   VariationSSNCount;   //(0-255)
+			string3   DivSSNIdentityCount; //(0-255)
+			string2   IDVerSSN;            // Y or N?
+			string1   SourcePublicRecord;  // Y or N
+			string3   DivSSNLNameCount;    //(0-255)
+			string1   IDVerName;           // Y or N
 
-      //from Address Risk
-      string2   ValidationAddrProblem; // Y or N?
-      string2   InputAddrDwellType;    
-      string2   IDVerAddress;          // Y or N?
-      string3   DivAddrIdentityCount;  // (0-255)
-      string3   DivAddrIdentityCountNew; // (0-255)
-      string4   AddrChangeDistance;    // (0-9999)
-      string3   InputAddrFelonyCount;  // (0-255)
+			//from Address Risk
+			string2   ValidationAddrProblem; // Y or N?
+			string2   InputAddrDwellType;    
+			string2   IDVerAddress;          // Y or N?
+			string3   DivAddrIdentityCount;  // (0-255)
+			string3   DivAddrIdentityCountNew; // (0-255)
+			string4   AddrChangeDistance;    // (0-9999)
+			string3   InputAddrFelonyCount;  // (0-255)
 
-      // next 2 from NetAcuity gateway, i.e. Risk_Indicators.getNetAcuity
-      string2   ValidationIpProblems;   // -1, 0, 1 or 2 - see Models.Attributes_Master
-      string1   IPAddrExceedsInputAddr; // 1 or blank
+			string2   ValidationIpProblems;   // -1, 0, 1 or 2 - see Models.Attributes_Master
+			string1   IPAddrExceedsInputAddr; // 1 or blank
 
-      string1   phone_number;           // 1 or blank
-		
+			// New Input Fields added for TRIS v3.2 Enhancement Project.
+			string2   ValidationIpProblems1;   // -1, 0, 1 or 2 
+			string1   IPAddrExceedsInputAddr1; // 1 or blank
+			string2   ValidationIpProblems2;   // -1, 0, 1 or 2 
+			string1   IPAddrExceedsInputAddr2; // 1 or blank
+			string2   ValidationIpProblems3;   // -1, 0, 1 or 2 
+			string1   IPAddrExceedsInputAddr3; // 1 or blank
+
+			string1   phone_number;           // 1 or blank
+
 			//from FraudPoint 2.0
-      string3   score; // (0-999)the higher the score, the better the person.  see FraudPoint custom model
-			
+			string3   score; // (0-999)the higher the score, the better the person.  see FraudPoint custom model
+
 			// from liens & judgments.
-  		// up to 30 occurrences per req 4.1.49
+			// up to 30 occurrences per req 4.1.49
 			// where possible, field info cloned from LiensV2.layout_liens_main_module
 			string50 filing_jurisdiction_01; //length per xls/per salt rpt longest is 46; has 2 char state abbrev or full county/court/district name
       string21 filing_jurisdiction_name_01; //length per xls; 
@@ -641,31 +659,36 @@ EXPORT TaxRefundISv3_BatchService_Layouts := MODULE
       string8  judg_satisfied_date_30;
       string8  judg_vacated_date_30;
       string100 judge_30;
-      string100 filing_status_30;	
-			
+      string100 filing_status_30;
+
 			string20 output_status :=''; // Note: Can't use just "output" for 
-			                             // field name as listed multiple places in reqs. 
-                                   // Contains: Manual Review, Quiz, Diversionary Quiz, 
-																   //           No Quiz, Debt Evasion or Rejected
+																	 // field name as listed multiple places in reqs. 
+																	 // Contains: Manual Review, Quiz, Diversionary Quiz, 
+																	 //	No Quiz, Debt Evasion or Rejected
 
 			unsigned2 Royalty_NAG; // Royalty.RoyaltyNetAcuity.IPData.Royalty_NAG;
 
-		  // TRIS v3 2015 enhancement, new field ---v
-      string4   BestAddrChangeDistance; // "-1" or 0-9999 // TRIS v3 2015 enhancements req 4.1.10
+			// TRIS v3 2015 enhancement, new field ---v
+			string4   BestAddrChangeDistance; // "-1" or 0-9999 // TRIS v3 2015 enhancements req 4.1.10
 			// v3.1 with fdn
 			boolean fdn_id_risk; 
-			
+
 			string15 risk_status;
 			string1 identity_risk;
 			string1 address_risk;
 			string4 hri_1_code;
 			string100 hri_1_desc1;
-		  string4 hri_2_code;
+			string4 hri_2_code;
 			string100 hri_2_desc2;
+
+			// New Fields for hri_3_code & hri_4_code added for TRIS v3.2 Enhancement Project.
+			string4 hri_3_code;
+			string4 hri_4_code;
+
 			unsigned3 derogatory_count;
-      unsigned3 asset_count;
-      unsigned3 professional_count;
-			
+			unsigned3 asset_count;
+			unsigned3 professional_count;
+
 			String25  Suspected_Discrepancy1 ;
 			string10  Confidence_that_activity_was_deceitful1;
 			string10  Channels1 ;
@@ -673,7 +696,7 @@ EXPORT TaxRefundISv3_BatchService_Layouts := MODULE
 			string25 Entity_type1 ;
 			string25 role1 ;
 			string10 Evidence1 ;
-			
+
 			String25  Suspected_Discrepancy2 ;
 			string10  Confidence_that_activity_was_deceitful2;
 			string10  Channels2;
@@ -681,7 +704,7 @@ EXPORT TaxRefundISv3_BatchService_Layouts := MODULE
 			string25 Entity_type2;
 			string25 role2;
 			string10 Evidence2;
-			
+
 			String25  Suspected_Discrepancy3;
 			string10  Confidence_that_activity_was_deceitful3;
 			string10  Channels3;
@@ -689,9 +712,73 @@ EXPORT TaxRefundISv3_BatchService_Layouts := MODULE
 			string25 Entity_type3;
 			string25 role3;
 			string10 Evidence3;
-			
-			
+
+			// New Fields added for TRIS v3.2 Enhancement Project.
+			string5  edge_country1;
+			string10 edge_region1;
+			string60 edge_city1;
+			string10 edge_conn_speed1;
+			string10 edge_latitude1;
+			string10 edge_longitude1;
+			string10 edge_postal_code1;
+			unsigned edge_continent_code1;
+			unsigned edge_country_conf1;
+			unsigned edge_region_conf1;
+			unsigned edge_city_conf1;
+			unsigned edge_postal_conf1;
+			string200 isp_name1;
+			integer  edge_gmt_offset1;
+			string70 domain_name1;
+			string15 proxy_type1;
+			string15 proxy_description1;
+			unsigned asn1;
+			string200 asn_name1;
+			string5  edge_country2;
+			string10 edge_region2;
+			string60 edge_city2;
+			string10 edge_conn_speed2;
+			string10 edge_latitude2;
+			string10 edge_longitude2;
+			string10 edge_postal_code2;
+			unsigned edge_continent_code2;
+			unsigned edge_country_conf2;
+			unsigned edge_region_conf2;
+			unsigned edge_city_conf2;
+			unsigned edge_postal_conf2;
+			string200 isp_name2;
+			integer  edge_gmt_offset2;
+			string70 domain_name2;
+			string15 proxy_type2;
+			string15 proxy_description2;
+			unsigned asn2;
+			string200 asn_name2;
+			string5  edge_country3;
+			string10 edge_region3;
+			string60 edge_city3;
+			string10 edge_conn_speed3;
+			string10 edge_latitude3;
+			string10 edge_longitude3;
+			string10 edge_postal_code3;
+			unsigned edge_continent_code3;
+			unsigned edge_country_conf3;
+			unsigned edge_region_conf3;
+			unsigned edge_city_conf3;
+			unsigned edge_postal_conf3;
+			string200 isp_name3;
+			integer  edge_gmt_offset3;
+			string70 domain_name3;
+			string15 proxy_type3;
+			string15 proxy_description3;
+			unsigned asn3;
+			string200 asn_name3;
+			string25 Contrib_Risk_Field1;
+			string50 Contrib_Risk_Value1;
+			string  Contrib_Risk_Attr1;
+			string25 Contrib_Risk_Field2;
+			string50 Contrib_Risk_Value2;
+			string  Contrib_Risk_Attr2;
+			string25 Contrib_Risk_Field3;
+			string50 Contrib_Risk_Value3;
+			string  Contrib_Risk_Attr3;		
 		end;
-		
-		
 END;

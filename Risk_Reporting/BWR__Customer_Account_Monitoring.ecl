@@ -1,6 +1,6 @@
-#workunit('name', 'Scoring_Account_Monitoring');
+﻿#workunit('name', 'Scoring_Account_Monitoring');
 
-// #option('allowedClusters', 'thor400_20,thor400_30,thor400_60'); // This workunit can run on these clusters
+// #option('allowedClusters', 'thor400_20,thor400_44,thor400_60'); // This workunit can run on these clusters
 // #option('AllowAutoQueueSwitch', TRUE); // If the current queue is full, use an available cluster from above
 
 IMPORT Risk_Reporting, RiskWise, Score_Logs, STD, UT;

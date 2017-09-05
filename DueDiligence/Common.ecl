@@ -1,4 +1,4 @@
-IMPORT Address, BIPV2, Business_Header, Business_Risk_BIP, DueDiligence, Risk_Indicators, ut, STD;
+﻿IMPORT Address, BIPV2, Business_Header, Business_Risk_BIP, DueDiligence, Risk_Indicators, ut, STD;
 
 EXPORT Common := MODULE
 
@@ -384,17 +384,22 @@ EXPORT Common := MODULE
 																						SELF := le.business;
 																						SELF := [];)]),
 												DATASET([], DueDiligence.Layouts.Busn_Input));
-																			
+		
 			indClean := IF(le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS,
 												DATASET([TRANSFORM(DueDiligence.Layouts.Indv_Input,
 																						SELF.lexID := validLexID;
 																						SELF.name := DATASET([TRANSFORM(DueDiligence.Layouts.Name,
-																																						unparsedName		:= StringLib.StringToUpperCase(TRIM(le.individual.name.fullName, LEFT, RIGHT));
-																																						fName 					:= StringLib.StringToUpperCase(TRIM(le.individual.name.firstName, LEFT, RIGHT));
-																																						mName						:= StringLib.StringToUpperCase(TRIM(le.individual.name.middleName, LEFT, RIGHT));
-																																						lName						:= StringLib.StringToUpperCase(TRIM(le.individual.name.lastName, LEFT, RIGHT));
-																																						sName						:= StringLib.StringToUpperCase(TRIM(le.individual.name.suffix, LEFT, RIGHT));
-																																						cleanedName			:= Address.CleanPerson73(unparsedName);
+																																						unparsedName		:= StringLib.StringToUpperCase(le.individual.name.fullName);
+																																						fName 					:= StringLib.StringToUpperCase(le.individual.name.firstName);
+																																						mName						:= StringLib.StringToUpperCase(le.individual.name.middleName);
+																																						lName						:= StringLib.StringToUpperCase(le.individual.name.lastName);
+																																						sName						:= StringLib.StringToUpperCase(le.individual.name.suffix);
+																																						
+																																						
+																																						cleanedName := MAP(Stringlib.StringToUppercase(le.individual.nameInputOrder) = 'FML' => Address.CleanPersonFML73(unparsedName),
+																																															 Stringlib.StringToUppercase(le.individual.nameInputOrder) = 'LFM' => Address.CleanPersonLFM73(unparsedName),
+																																															 Address.CleanPerson73(unparsedName));	
+			
 																																						cleanedFirst		:= IF(unparsedName <> '', StringLib.StringToUpperCase(cleanedName[6..25]), '');
 																																						cleanedMiddle		:= IF(unparsedName <> '', StringLib.StringToUpperCase(cleanedName[26..45]), '');
 																																						cleanedLast			:= IF(unparsedName <> '', StringLib.StringToUpperCase(cleanedName[46..65]), '');
@@ -429,12 +434,17 @@ EXPORT Common := MODULE
 		RETURN PROJECT(input, cleanIt(LEFT));
 	END;
 	
-	EXPORT DaysApartWithZeroEmptyDate(STRING date) := FUNCTION
-		RETURN IF((UNSIGNED)date > 0, ut.DaysApart(date, (STRING8)Std.Date.Today()), 0); //return 0 days apart if date doesn't exist 
+	EXPORT DaysApartWithZeroEmptyDate(STRING date, STRING historyDate) := FUNCTION
+		
+		histDate := MAP(historyDate = '' => (STRING8)Std.Date.Today(),
+										(INTEGER)historyDate = DueDiligence.Constants.date8Nines => (STRING8)Std.Date.Today(),
+										historyDate);
+		
+		RETURN IF((UNSIGNED)date > 0, ut.DaysApart(date, histDate), 0); //return 0 days apart if date doesn't exist 
 	END;
 	
 	EXPORT rollSicNaicBySeqAndBIP(InputDataset) := FUNCTIONMACRO
-		sortedTempOutput := SORT(InputDataset, seq, #expand(DueDiligence.Constants.mac_ListTop3Linkids()), SICCode, NAICCode);
+		sortedTempOutput := SORT(InputDataset, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), SICCode, NAICCode);
 		rollTempOutput := ROLLUP(sortedTempOutput,
 															LEFT.seq = RIGHT.seq AND
 															LEFT.ultID = RIGHT.ultID AND
@@ -454,11 +464,12 @@ EXPORT Common := MODULE
 																																																SELF.DateFirstSeen := LEFT.FirstSeenDate;
 																																																SELF.DateLastSeen := LEFT.LastSeenDate;
 																																																
-																																																sic := LEFT.SICCode;
+																																																sic := TRIM(LEFT.SICCode, ALL);
 																																																lengthOfSic := LENGTH(sic);
 																																																
 																																																SELF.SICIndustry := MAP(sic = '' => sic,
-																																																												sic IN DueDiligence.Constants.CIB_SIC => DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS,
+																																																												sic IN DueDiligence.Constants.CIB_SIC_RETAIL => DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL,
+																																																												sic IN DueDiligence.Constants.CIB_SIC_NON_RETAIL => DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL,
 																																																												sic IN DueDiligence.Constants.MSB_SIC => DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS,
 																																																												sic IN DueDiligence.Constants.NBFI_SIC => DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS,
 																																																												sic IN DueDiligence.Constants.CASGAM_SIC => DueDiligence.Constants.INDUSTRY_CASINO_AND_GAMING,
@@ -469,21 +480,22 @@ EXPORT Common := MODULE
 																																																SELF.SICRiskLevel := MAP(sic = '' => sic,
 																																																													lengthOfSic = 2 AND sic IN DueDiligence.Constants.SIC_LENGTH_2_RISK_HIGH => DueDiligence.Constants.RISK_LEVEL_HIGH,
 																																																													lengthOfSic = 4 AND (sic IN DueDiligence.Constants.SIC_LENGTH_4_RISK_HIGH OR 
-																																																																								sic[1..2] IN DueDiligence.Constants.SIC_LENGTH_4_2STAR_RISK_HIGH) => DueDiligence.Constants.RISK_LEVEL_HIGH,
+																																																																								sic[1..2] IN DueDiligence.Constants.SIC_FIRST_2_STAR_RISK_HIGH) => DueDiligence.Constants.RISK_LEVEL_HIGH,
 																																																													lengthOfSic = 6 AND (sic IN DueDiligence.Constants.SIC_LENGTH_6_RISK_HIGH OR 
-																																																																								sic[1..2] IN DueDiligence.Constants.SIC_LENGTH_6_4STAR_RISK_HIGH OR
-																																																																								sic[1..4] IN DueDiligence.Constants.SIC_LENGTH_6_2STAR_RISK_HIGH) => DueDiligence.Constants.RISK_LEVEL_HIGH,
+																																																																								sic[1..2] IN DueDiligence.Constants.SIC_FIRST_2_STAR_RISK_HIGH OR
+																																																																								sic[1..4] IN DueDiligence.Constants.SIC_FIRST_4_STAR_RISK_HIGH) => DueDiligence.Constants.RISK_LEVEL_HIGH,
 																																																													lengthOfSic = 8 AND (sic IN DueDiligence.Constants.SIC_LENGTH_8_RISK_HIGH OR
-																																																																								sic[1..2] IN DueDiligence.Constants.SIC_LENGTH_8_6STAR_RISK_HIGH OR
-																																																																								sic[1..4] IN DueDiligence.Constants.SIC_LENGTH_8_4STAR_RISK_HIGH OR
-																																																																								sic[1..6] IN DueDiligence.Constants.SIC_LENGTH_8_2STAR_RISK_HIGH) => DueDiligence.Constants.RISK_LEVEL_HIGH,
+																																																																								sic[1..2] IN DueDiligence.Constants.SIC_FIRST_2_STAR_RISK_HIGH OR
+																																																																								sic[1..4] IN DueDiligence.Constants.SIC_FIRST_4_STAR_RISK_HIGH OR
+																																																																								sic[1..6] IN DueDiligence.Constants.SIC_FIRST_6_STAR_RISK_HIGH) => DueDiligence.Constants.RISK_LEVEL_HIGH,
 																																																													DueDiligence.Constants.RISK_LEVEL_LOW);
 																																																												
-																																																naic := LEFT.NAICCode;
+																																																naic := TRIM(LEFT.NAICCode, ALL);
 																																																naic2 := naic[1..2];
 																																																
 																																																SELF.NAICIndustry := MAP(naic = '' => naic,
-																																																												naic IN DueDiligence.Constants.CIB_NAICS => DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS,
+																																																												naic IN DueDiligence.Constants.CIB_NAICS_RETAIL => DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL,
+																																																												naic IN DueDiligence.Constants.CIB_NAICS_NON_RETAIL => DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL,
 																																																												naic IN DueDiligence.Constants.MSB_NAICS => DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS,
 																																																												naic IN DueDiligence.Constants.NBFI_NAICS => DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS,
 																																																												naic IN DueDiligence.Constants.CASGAM_NAISC => DueDiligence.Constants.INDUSTRY_CASINO_AND_GAMING,
@@ -502,7 +514,7 @@ EXPORT Common := MODULE
 																												SELF := LEFT;
 																												SELF := [];));
 																												
-		sortSources := SORT(projectSources, seq, #expand(DueDiligence.Constants.mac_ListTop3Linkids()));
+		sortSources := SORT(projectSources, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 		finalRoll := ROLLUP(sortSources,
 												LEFT.seq = RIGHT.seq AND
 												LEFT.ultID = RIGHT.ultID AND
@@ -521,14 +533,14 @@ EXPORT Common := MODULE
 	EXPORT getSicNaicCodes(InDataset, SicNaicsField, IsSicField, PrimaryField, DateFirstSeenName, DateLastSeenName, SourceOfData) := FUNCTIONMACRO
 		
 		temp := TABLE(InDataset,{seq, ultID, orgID, seleID,
-																 STRING2 Source := SourceOfData,
+																 STRING3 Source := SourceOfData,
 																 UNSIGNED4 FirstSeenDate := MIN(GROUP, DateFirstSeenName),
 																 UNSIGNED4 LastSeenDate := MAX(GROUP, DateLastSeenName),
 																 UNSIGNED4 RecordCount := COUNT(GROUP),
 																 STRING10 NAICCode := IF(IsSicField, '', (StringLib.StringFilter((STRING)SicNaicsField, '0123456789'))[1..6]),
 																 STRING10 SICCode := IF(IsSicField, (StringLib.StringFilter((STRING)SicNaicsField, '0123456789'))[1..8], ''),
 																 BOOLEAN IsPrimary := PrimaryField },
-									seq, #expand(DueDiligence.Constants.mac_ListTop3Linkids()), (STRING)SicNaicsField);
+									seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), (STRING)SicNaicsField);
 													 
 		filterSic := temp(SICCode <> '');
 		filterNaic := temp(NAICCode <> '');
@@ -577,6 +589,13 @@ EXPORT Common := MODULE
 																									SELF.Clean_Input.Addr_Status := cleanAddress.err_stat;
 																									SELF.Clean_Input.County := cleanAddress.county[3..5];  // Address.CleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
 																									SELF.Clean_Input.Geo_Block := cleanAddress.geo_blk;
+																									
+																									//set BIP IDs if we have them
+																									SELF.Clean_Input.PowID := cleanData.BIP_IDs.PowID.LinkID;
+																									SELF.Clean_Input.ProxID := cleanData.BIP_IDs.ProxID.LinkID;
+																									SELF.Clean_Input.SeleID := cleanData.BIP_IDs.SeleID.LinkID;
+																									SELF.Clean_Input.OrgID := cleanData.BIP_IDs.OrgID.LinkID;
+																									SELF.Clean_Input.UltID := cleanData.BIP_IDs.UltID.LinkID;
 																								
 																									SELF.Clean_Input.HistoryDate := LEFT.cleanedInput.historyDateYYYYMMDD;
 																									SELF.Clean_Input := cleanData; // Fill out the remaining fields with what was passed in

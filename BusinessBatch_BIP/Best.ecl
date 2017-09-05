@@ -1,4 +1,4 @@
-IMPORT ADVO, BIPV2, BIPV2_BEST, Business_Risk_BIP, Census_Data,
+﻿IMPORT ADVO, BIPV2, BIPV2_BEST, Business_Risk_BIP, Census_Data,
        Gong, MDR, STD,  ut;
 
 EXPORT Best := MODULE
@@ -94,10 +94,7 @@ EXPORT Best := MODULE
 												TRANSFORM({BusinessBatch_BIP.Layouts.Best_Final; INTEGER2 record_score;},
 													SELF.acctno := LEFT.acctno;
 													SELF.record_score := LEFT.record_score;
-													// tmpULTID := LEFT.ULTID;
-													// tmpORGID := LEFT.ORGID;
-													// tmpSELEID := LEFT.SELEID;
-													
+												
 													SELF.ultid := LEFT.ultid;
 													SELF.orgid := LEFT.orgid;
 													SELF.seleid := LEFT.seleid;
@@ -577,8 +574,7 @@ END;
 																						
 																								isLLC := STD.Str.Find(right.company_org_structure_derived,
 																								       'LIMITED LIABILITY CORPORATION',1) > 0;
-																	                    SELF.BUSINESS_TYPE := IF (IsCorp, 'Corporation', 
-																		                          IF (isLLC, 'LLC', ''));
+																	                    
 																											SELF := RIGHT;
 																											SELF := []), LEFT OUTER, LIMIT(0), KEEP(1));
    																									 
@@ -711,7 +707,7 @@ END;
 	                              LEFT.acctno = RIGHT.acctno AND
 																  BIPV2.IDmacros.mac_JoinTop3Linkids(),
 																	TRANSFORM(BusinessBatch_BIP.Layouts.BestLayout,																	 
-																	  SELF.BUSINESS_TYPE := RIGHT.BUSINESS_TYPE;
+																	 
 																		SELF := LEFT,
 																		SELF := []),
 																		LEFT OUTER);
@@ -746,8 +742,7 @@ END;
 	                                 LEFT.acctno = RIGHT.acctno AND
 																	  BIPV2.IDmacros.mac_JoinTop3Linkids(),
 																	 TRANSFORM(BusinessBatch_BIP.Layouts.BestLayoutWithFeinVarsTmp,
-																	 SELF.years_in_business :=  RIGHT.Years_in_business;																	 
-																	 SELF.business_type := RIGHT.business_type;
+																	 SELF.years_in_business :=  RIGHT.Years_in_business;																	 	                                 																 
 																	 SELF.Input_residential := RIGHT.Input_residential;
 																	 SELF.Input_total_businesses_Active := RIGHT.Input_Total_businesses_active;
 																	 SELF.Input_total_businesses_history := RIGHT.Input_total_businesses_history;
@@ -755,7 +750,7 @@ END;
 																	                                          right.total_fein);
 																	 SELF := LEFT,
 																	 SELF := RIGHT,
-																	 SELF :=[];
+																	 SELF :=[]; // self.business_type set later from corp data
 																	 )), acctno,record), BusinessBatch_BIP.Layouts.BestLayoutWithFeinVars);	  																		  
    
 	 // output(DS_SeleBestGrouped, named('DS_SeleBestGrouped'));

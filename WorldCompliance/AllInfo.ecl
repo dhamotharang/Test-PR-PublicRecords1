@@ -1,6 +1,4 @@
-
-
-EXPORT AllInfo := FUNCTION
+﻿EXPORT AllInfo := FUNCTION
 	addlInfo := GetAddlInfo(Files.dsMasters);
 	links := GetAddlInfoLinks(Files.dsEntities);
 	sanctions := GetSanctionsAsAddlInfo;
@@ -12,7 +10,15 @@ EXPORT AllInfo := FUNCTION
 							self.parsed := LEFT.parsed,
 							self := [];)),
 					Ent_id, -parsed);
-	AddlSorted := SORT(DISTRIBUTE(addlInfo&links&dob, Ent_id), ent_id, Type, -parsed, information, comments, LOCAL);
+AddDOB := SORT(
+						PROJECT(AdditionalDOB(Files.dsSanctionsDOB), TRANSFORM({unsigned8 Ent_ID,Layout_XG.layout_addlinfo},
+							self.Ent_ID := LEFT.Ent_id;
+							self.Type := 'DOB';
+							self.information := LEFT.dob,
+							self.parsed := LEFT.parsed,
+							self := [];)),
+					Ent_id, -parsed);
+	AddlSorted := SORT(DISTRIBUTE(addlInfo&links&dob&AddDOB, Ent_id), ent_id, Type, -parsed, information, comments, LOCAL);
 							
 	pAddl := 
 			project(AddlSorted,					// leave out sanctions

@@ -1,4 +1,4 @@
-import doxie, ut, mdr, header, drivers, census_data, address, FCRA, riskwise, doxie_files, Utilfile, models;
+﻿import doxie, ut, mdr, header, drivers, census_data, address, FCRA, riskwise, doxie_files, Utilfile, models;
 
 export Boca_Shell_FCRA_Neutral_Function_AML(grouped DATASET(Layout_output) iid,
 								unsigned1 dppa, unsigned1 glb,
@@ -56,6 +56,9 @@ TRANSFORM
 	self.iid.altlast2pop := le.altlast2<>'';
 	self.iid.watchlisthit := le.watchlist_table<>'';
 	self.iid.iid_flags := le.iid_flags;
+	self.iid.swappedNames := map(le.fname = '' or le.lname = ''	=> -1,
+															 le.swappedNames 								=> 1,
+																																 0);
 	self.iid := le;
 
 	SELF.Available_Sources.DL := Source_Available.DL(IF(le.dl_state<>'',le.dl_state,le.st));

@@ -1,6 +1,10 @@
+﻿/*2017-03-30T05:36:16Z (Fernando Incarnacao)
+modify vertical filter 
+*/
 /*2014-05-09T22:37:47Z (Wendy Ma)
 additional healthcare account detection
 */
+import ut;
 export File_FCRA_Inquiry_BaseSourced :=  module
 
 Blank_IDs(infile, outfile) := macro 
@@ -18,7 +22,7 @@ endmacro;
 
 base_files :=	distribute((fnAddSource(inquiry_acclogs.File_FCRA_Riskwise_Logs_Common, 'RISKWISE') +
 													fnAddSource(inquiry_acclogs.File_FCRA_Accurint_Logs_Common, 'COLLECTION') + 
-													fnAddSource(Inquiry_AccLogs.File_FCRA_BankoBatch_Logs_Common, 'BANKO BATCH') +
+												  fnAddSource(Inquiry_AccLogs.File_FCRA_BankoBatch_Logs_Common, 'BANKO BATCH') +
 													fnAddSource(Inquiry_AccLogs.File_FCRA_Batch_Logs_Common, 'BATCH') + 
 													fnAddSource(Inquiry_AccLogs.File_FCRA_ProdR3_Logs_Common, 'PROD R3') + 
 													fnAddSource(Inquiry_AccLogs.File_FCRA_Banko_Logs_Common, 'BANKO'))
@@ -50,7 +54,8 @@ shared remove_dupes := project(dedup(sort(Correct_Function_Descriptions,
 														source, search_info.transaction_id,search_info.login_history_id,search_info.datetime,search_info.sequence_number,search_info.function_description,person_q.ssn, local) 
 														,inquiry_acclogs.layout.common_thoradditions);
 
-create_append_file := fnMapBaseAppends(remove_dupes, true).buildFile;		
+string history_logs_version := ut.GetDate:INDEPENDENT;
+create_append_file := fnMapBaseAppends(remove_dupes, true, history_logs_version ).buildFile;		
 
 export create_appends := create_append_file;
 
@@ -63,6 +68,7 @@ export build_file := PROJECT(reappend_ids, TRANSFORM(Inquiry_Acclogs.Layout.Comm
 																			LEFT.search_info.DateTime,
 																			LEFT.search_info.Transaction_Type,
 																			LEFT.search_info.Function_Description);
+																			self.bus_intel.sub_market := if (left.bus_intel.sub_market='CARD','CARDS',left.bus_intel.sub_market);
 															self := left));
 															
 export file := dataset('~persist::inquiry::fcra_base', inquiry_acclogs.layout.Common_ThorAdditions_FCRA, thor);

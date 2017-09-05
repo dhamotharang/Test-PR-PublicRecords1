@@ -1,4 +1,4 @@
-IMPORT BIPV2, BIPV2_Files,BIPV2_PostProcess,wk_ut,tools,std,BIPV2_Tools;
+﻿IMPORT BIPV2, BIPV2_Files,BIPV2_PostProcess,wk_ut,tools,std,BIPV2_Tools;
 l_base					:= BIPV2.CommonBase.Layout;
 in_default			:= PROJECT(BIPV2_Files.files_empid().DS_BASE, l_base);
 // f_default				:= BIPV2_Files.files_CommonBase.filePrefix   + '::' + BIPV2.KeySuffix;  //so superfile and logical files have the same naming convention
@@ -49,7 +49,7 @@ MODULE
 	// Take action
 	ds1 := descendant_counts(input);
   ds  := BIPV2_PostProcess.proc_segmentation(pversion,ds1,pPopulateStatus := true ).patched; //put in seg stats into file itself.  do this for now.  the output of the stats will come later
-  ds_filter := table(ds,{seleid,st,v_city_name,prim_range,prim_name,cnp_name,fname,lname})( 
+  ds_filter := table(ds,{seleid,st,v_city_name,prim_range,prim_name,cnp_name,fname,lname,company_fein})( 
   (    seleid = 22731126692 
   or (
             st          = 'UT'
@@ -95,6 +95,11 @@ MODULE
 				and lname = 'ROLDAN'
 			) or regexfind('PASTORA ROLDAN', cnp_name)
 		)
+	)
+	or ( // LNK-823
+		company_fein = '320153283'
+		and regexfind('CARRIAGE HOUSE PROPERTIES PARTNERS', cnp_name)
+
 	)
   );  //hack filter for Bug: 166172 - Privacy Office Directing Record Removal from BIP Header.  Will make this better later
   set_filt_seleids := set(table(ds_filter,{seleid},seleid,few),seleid);

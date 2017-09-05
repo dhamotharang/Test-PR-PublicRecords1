@@ -1,4 +1,4 @@
-// -- BIPV2_Seleid_Relative._ApplyHacks('BIPV2_Seleid_Relative',,true).do_all_hacks;
+﻿// -- BIPV2_Seleid_Relative._ApplyHacks('BIPV2_Seleid_Relative',,true).do_all_hacks;
 import SALTTOOLS22,STD,wk_ut,tools;
 EXPORT _ApplyHacks(
    string   pModule               = 'BIPV2_Seleid_Relative'
@@ -25,6 +25,7 @@ module
     ],tools.layout_attribute_hacks);
     RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
   END;
+
   export fHackspecificities(
   
      string   pAttribute            = 'specificities' 
@@ -32,16 +33,24 @@ module
     
   ) :=
   function
-  
+
     dme := dataset([{
-       'KeyInfix'
-      ,'BIPV2_Seleid_Relative[.]config[.]keyinfix_specificities'
-      ,'BIPV2_Seleid_Relative.config.keyinfix_specificities/*HACK*/'
-      ,'replace keyinfix with config.keyinfix_specificities for specs keys to allow for 2 step specificities to not have to be run each time \n'
+          'SALT3[1234567].mac_edit_distance_pairs'
+      ,''
+      ,   '/*HACK*/SALT38.mac_edit_distance_pairs'
+      ,'use newer version of macro for performance\n'
+    }
+		,{
+          '(IMPORT ut,SALT3[1234567])'
+      ,''
+      ,   '$1, /*HACK*/SALT38'
+      ,'use newer version of macro for performance\n'
     }
     ],tools.layout_attribute_hacks);
+
     RETURN tools.HackAttribute(pModule,pAttribute,dme,pShouldSaveAttribute).saveit;
   END;
+
   export fHackConfig(
   
      string   pAttribute            = 'Config' 
@@ -174,7 +183,7 @@ relationships:
   export do_all_hacks := 
     sequential(
        fHackProc_Iterate    ('Proc_Iterate'     ,pShouldSaveAttributes)
-      // ,fHackspecificities   ('specificities'    ,pShouldSaveAttributes)
+      ,fHackspecificities   ('specificities'    ,pShouldSaveAttributes)
       // ,fHackConfig          ('Config'           ,pShouldSaveAttributes)
       ,fHackKeys            ('Keys'             ,pShouldSaveAttributes)
       ,fHackRelationships   ('relationships'    ,pShouldSaveAttributes)

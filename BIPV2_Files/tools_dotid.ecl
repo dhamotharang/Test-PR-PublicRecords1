@@ -1,4 +1,4 @@
-import BIPV2_Files, BIPV2, ut, BIPV2_Company_Names, MDR, _Control, Advo, Data_Services, BIPV2_Tools; 
+﻿import BIPV2_Files, BIPV2, ut, BIPV2_Company_Names, MDR, _Control, Advo, Data_Services, BIPV2_Tools; 
 l_as_linking := BIPV2_Files.layout_ingest;
 EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking)) := module
 	shared l_dot := BIPV2.CommonBase.Layout;
@@ -610,10 +610,13 @@ EXPORT tools_dotid(dataset(l_as_linking) ds_as_linking = dataset([],l_as_linking
 
     import BIPV2;
     
+		isDunns(string src) := (mdr.sourcetools.sourceisDunn_Bradstreet(src) or 
+                            mdr.sourcetools.SourceIsDunn_Bradstreet_Fein(src));
+															
     ds_updates_with_fein    := pDs_Fein(company_fein != '');
     ds_updates_without_fein := pDs_Fein(company_fein  = '');
-    
-    ds_base_with_deleted_fein    := pDs_Base(deleted_fein != '');
+		
+    ds_base_with_deleted_fein    := pDs_Base(deleted_fein != '' and isDunns(source));
 
     ds_refresh_fein := join(ds_updates_with_fein  ,ds_base_with_deleted_fein  
       ,     left.source           = right.source 

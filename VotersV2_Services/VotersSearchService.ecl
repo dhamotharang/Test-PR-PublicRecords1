@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="VotersSearch" wuTimeout="300000">
 	<part name="DID" type = 'xsd:string'/>
   <part name="SSN" type="xsd:string"/>
@@ -37,11 +37,10 @@
 
 EXPORT VotersSearchService := MACRO
 
-	#constant('SearchGoodSSNOnly',true)
-	#constant('SearchIgnoresAddressOnly',true)
-	#stored('ScoreThreshold',10)
-	#stored('PenaltThreshold',10)
-
+	#constant('SearchGoodSSNOnly',true);
+	#constant('SearchIgnoresAddressOnly',true);
+	#stored('ScoreThreshold',10);
+	#stored('PenaltThreshold',10);
 	// output(VotersV2_Services.VotersSearchService_records, named('Results'));
 
 	recs := VotersV2_Services.VotersSearchService_records;

@@ -1,4 +1,4 @@
-export _Functions := module
+﻿export _Functions := module
 
 	export Fix_Date(string dtentered) := function
 	
@@ -94,7 +94,7 @@ export _Functions := module
 				trim(cname, left, right) in ['Cote D\'Ivoire','COTE D\'IVOIRE'] =>SubGroup_Constants.numCountryID.COTE_D_IVOIRE ,
 				trim(cname, left, right) in ['Croatia','CROATIA'] =>SubGroup_Constants.numCountryID.CROATIA ,
 				trim(cname, left, right) in ['Cuba','CUBA'] =>SubGroup_Constants.numCountryID.CUBA ,
-				trim(cname, left, right) in ['CuraÃ§ao','CURAÃ‡AO'] =>SubGroup_Constants.numCountryID.CURACAO ,
+				trim(cname, left, right) in ['Curaçao','CURAÇAO'] =>SubGroup_Constants.numCountryID.CURACAO ,
 				trim(cname, left, right) in ['Cyprus','CYPRUS'] =>SubGroup_Constants.numCountryID.CYPRUS ,
 				trim(cname, left, right) in ['Czech Republic','CZECH REPUBLIC'] =>SubGroup_Constants.numCountryID.CZECH_REPUBLIC ,
 				trim(cname, left, right) in ['Denmark','DENMARK'] =>SubGroup_Constants.numCountryID.DENMARK ,
@@ -1104,6 +1104,8 @@ export _Functions := module
 				trim(kword, left, right) = 'UZMVD' =>SubGroup_Constants.numKeywordsID.KEYWORD_UZMVD,
 				trim(kword, left, right) = 'UZGUVD' =>SubGroup_Constants.numKeywordsID.KEYWORD_UZGUVD,
 				trim(kword, left, right) = 'IDPWMD' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDPWMD,
+				trim(kword, left, right) = 'VEPTRE-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_VEPTRE_WC,
+				trim(kword, left, right) = 'CNSPC' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNSPC,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

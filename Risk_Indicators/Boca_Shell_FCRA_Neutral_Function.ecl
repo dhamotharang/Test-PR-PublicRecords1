@@ -1,4 +1,4 @@
-import doxie, ut, mdr, header, drivers, census_data, riskwise, VotersV2, 
+﻿import doxie, ut, mdr, header, drivers, census_data, riskwise, VotersV2, 
 	models, AID_Build;
 
 export Boca_Shell_FCRA_Neutral_Function(grouped DATASET(Layout_output) iid,
@@ -63,6 +63,9 @@ TRANSFORM
 	self.iid.altlast2pop := le.altlast2<>'';
 	self.iid.watchlisthit := le.watchlist_table<>'';
 	self.iid.iid_flags := le.iid_flags;
+	self.iid.swappedNames := map(le.fname = '' or le.lname = ''	=> -1,
+															 le.swappedNames 								=> 1,
+																																 0);
 	self.iid := le;
 
 	SELF.Available_Sources.DL := Risk_Indicators.Source_Available.DL(IF(le.dl_state<>'',le.dl_state,le.st)); 

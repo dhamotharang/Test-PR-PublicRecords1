@@ -1,4 +1,4 @@
-EXPORT Map_AL_Medical(string fdate) := module
+﻿EXPORT Map_AL_Medical(string fdate) := module
 
  import Prof_License,Lib_StringLib,ut;
 
@@ -106,7 +106,7 @@ dWithPA := project( File_AL_Medical.phya, map2pa(left));
 
   export buildprep := Sequential( dALMedout,
                          superfile_trans,
-                         output( outfile,,'~thor_data400::in::prolic_al',overwrite),
+                         output( outfile,,'~thor_data400::in::prolic_al',compressed,overwrite),
 												 validate_prep,
                          FileServices.StartSuperfiletransaction(),
 					                 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_al'),
