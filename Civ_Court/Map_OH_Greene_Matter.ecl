@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut, lib_StringLib, STD; 
+﻿IMPORT Civ_Court, civil_court, ut, lib_StringLib, STD; 
 
 #option('multiplePersistInstances',FALSE);
 
@@ -6,8 +6,11 @@ IMPORT Civ_Court, civil_court, ut, lib_StringLib, STD;
 
 fGreene := Civ_court.File_In_OH_Greene;
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Matter tGreene(fGreene input) := TRANSFORM
 self.process_date				:= civil_court.Version_Development;
@@ -21,7 +24,7 @@ self.court							:= 'GREENE COUNTY';
 self.case_number				:= UpperCaseNum;
 self.case_type					:= ut.CleanSpacesAndUpper(input.charge);
 self.case_title					:= REGEXREPLACE('JTC|SAW',ut.CleanSpacesAndUpper(input.case_name),'');
-TempFileDte							:= IF(trim(input.file_date,all) <> '', ut.ConvertDate(input.file_date,fmtsin,fmtout), '');
+TempFileDte							:= IF(trim(input.file_date,all) <> '', Std.Date.ConvertDateFormatMultiple(input.file_date,fmtsin,fmtout), '');
 self.filing_date				:= IF(STD.DATE.IsValidDate((INTEGER) TempFileDte),TempFileDte,'');
 self := [];
 END;

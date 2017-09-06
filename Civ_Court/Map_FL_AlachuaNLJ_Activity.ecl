@@ -1,12 +1,15 @@
-IMPORT Civ_Court, civil_court, crim_common, ut, Address; 
+﻿IMPORT Civ_Court, civil_court, crim_common, ut, Address, Std; 
 
 #option('multiplePersistInstances',FALSE);
 
 //original AbInitio mapping /stub_cleaning/court/work/mp/fl_civil_county_alachua__nlj_02_upd.mp
 fAlachua_nlj := Civ_Court.Files_In_FL_Alachua.nlj;
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m-%d-%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Case_Activity tFLAlachuaNLJ(fAlachua_nlj input) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -17,7 +20,7 @@ UpperCaseNum						:= ut.CleanSpacesAndUpper(input.case_number);
 self.case_key					  := '46'+UpperCaseNum;
 self.court						  := 'ALACHUA COUNTY - CIRCUIT CIVIL';
 self.case_number				:= UpperCaseNum;
-self.event_date					:= ut.ConvertDate(input.Docket_date);
+self.event_date					:= Std.Date.ConvertDateFormatMultiple(input.Docket_date,fmtsin,fmtout);
 self.event_type_code		:='';
 self.event_type_description_1	:= 'DOCKET INFORMATION - CIRCUIT CIVIL VERDICT';
 self.event_type_description_2	:= ut.CleanSpacesAndUpper(input.Docket_text);

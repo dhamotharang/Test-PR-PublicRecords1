@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, crim_common, ut, Address, lib_StringLib; 
+﻿IMPORT Civ_Court, civil_court, crim_common, ut, Address, lib_StringLib, Std; 
 
 #option('multiplePersistInstances',FALSE);
 //original AbInitio mapping /stub_cleaning/court/work/mp/ak_civil_02_ffreplace.mp
@@ -30,8 +30,13 @@ lAlaskaAtty2	:= join(lAlaskaAtty1, lkp_Attorney,
 										trim(left.attorney2,all) = trim(right.attorney_code,all),
 										lkpAtty2(left,right),left outer, lookup);
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+
+
+fmtsin := [
+		'%m/%d/%Y',
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Party tAlaska(lAlaskaAtty2 input, integer1 C) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -77,7 +82,7 @@ self.entity_type_code_1_master := map(self.entity_type_code_1_orig = 'AKA' => '5
 																			self.entity_type_code_1_orig = '6PL' => '10',
 																			self.entity_type_code_1_orig = 'RSPND' => '70', '90');
 self.entity_1_dob	:= IF(input.birth_date <> '', 
-                        ut.ConvertDate(input.birth_date),
+                        Std.date.ConvertDateFormatMultiple(input.birth_date,fmtsin,fmtout),
 															'');
 self := [];
 end;

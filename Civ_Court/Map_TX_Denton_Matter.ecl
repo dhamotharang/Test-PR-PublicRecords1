@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut, lib_StringLib;
+﻿IMPORT Civ_Court, civil_court, ut, lib_StringLib, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -17,7 +17,7 @@ Civil_Court.Layout_In_Matter tDenton(fTXDenton input) := Transform
 	self.vendor						  := '39';
 	self.state_origin				:= 'TX';
 	self.source_file				:= 'TX_DENTON_COUNTY';
-	StdFileDate							:= ut.ConvertDateMultiple(input.FiledDate,fmtsin,fmtout);
+	StdFileDate							:= Std.date.ConvertDateFormatMultiple(input.FiledDate,fmtsin,fmtout);
 	self.case_key						:= '39'+ut.CleanSpacesAndUpper(input.CaseNumber)+StdFileDate;
 	self.parent_case_key		:='';
 	self.court_code					:='';
@@ -26,9 +26,9 @@ Civil_Court.Layout_In_Matter tDenton(fTXDenton input) := Transform
 	self.case_type_code			:= '';
 	self.case_type					:= ut.CleanSpacesAndUpper(input.CaseType);
 	self.case_title					:= ut.CleanSpacesAndUpper(input.CaseTitle);
-	self.filing_date				:= ut.ConvertDateMultiple(input.FiledDate,fmtsin,fmtout);
+	self.filing_date				:= Std.date.ConvertDateFormatMultiple(input.FiledDate,fmtsin,fmtout);
 	self.disposition_description	:=  ut.CleanSpacesAndUpper(input.CaseStatus);
-	self.disposition_date		:= ut.ConvertDateMultiple(input.CaseStatusDate,fmtsin,fmtout);
+	self.disposition_date		:= Std.date.ConvertDateFormatMultiple(input.CaseStatusDate,fmtsin,fmtout);
 	self	:= [];
 end;
 

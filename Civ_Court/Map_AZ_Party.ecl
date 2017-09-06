@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut,  Address, lib_StringLib;
+﻿IMPORT Civ_Court, civil_court, ut,  Address, lib_StringLib, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -7,6 +7,12 @@ IMPORT Civ_Court, civil_court, ut,  Address, lib_StringLib;
 fAZ := Civ_Court.Files_In_AZ.Civil_in;
 
 BadName	:= ['CONVERTED','BASKET','UNKNOWN'];
+
+fmtsin := [
+		'%m/%d/%Y',
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Party tAZ(fAZ input, integer1 C) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -43,7 +49,7 @@ self.entity_type_code_1_master := CHOOSE(C, map(input.source_system_prty_descrip
 self.entity_1_address_1 := CHOOSE(C,trim(input.address_1,left,right),'');
 self.entity_1_address_2 := CHOOSE(C,trim(input.address_2,left,right),'');
 self.entity_1_address_3 := CHOOSE(C,trim(input.city,left,right)+' '+trim(input.state,left,right)+' '+trim(input.zip,left,right),'');
-self.entity_1_dob				:= CHOOSE(C,ut.ConvertDate(input.party_birth_date),'');
+self.entity_1_dob				:= CHOOSE(C,Std.date.ConvertDateFormatMultiple(input.party_birth_date,fmtsin,fmtout),'');
 self := [];
 end;
 

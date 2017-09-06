@@ -1,8 +1,14 @@
-import civil_court, crim_common, ut;
+﻿import civil_court, crim_common, ut, Std;
 
 //CA Santa Barbara Matter Mapping
 
 fSantaBarbara := Civ_court.File_In_CA_SantaBarbara(party_type <> 'Extended Connection');
+
+fmtsin := [
+		'%m/%d/%Y',
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Matter tSantaBarbara(fSantaBarbara input) := Transform
 
@@ -18,7 +24,7 @@ self.case_type					:= input.case_type;
 self.case_title					:= input.case_title;
 self.case_cause_code		:= '';
 self.case_cause					:= '';
-self.filing_date				:= If(trim(input.case_filing_date,left,right) <> '',ut.ConvertDate(input.case_status_date),'');
+self.filing_date				:= If(trim(input.case_filing_date,left,right) <> '',Std.Date.ConvertDateFormatMultiple(input.case_status_date,fmtsin,fmtout),'');
 self.manner_of_judgmt_code		:= '';
 self.manner_of_judgmt		:= '';
 self.judgmt_date				:= '';

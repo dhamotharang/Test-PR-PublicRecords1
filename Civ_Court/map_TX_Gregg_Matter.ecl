@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut, lib_StringLib;
+﻿IMPORT Civ_Court, civil_court, ut, lib_StringLib, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -25,9 +25,9 @@ Civil_Court.Layout_In_Matter tTXGregg(fTXGregg input) := Transform
 	self.case_type_code			:= '';
 	self.case_type					:= ut.CleanSpacesAndUpper(input.CaseType);
 	self.case_title					:= ut.CleanSpacesAndUpper(input.CaseTitle);
-	self.filing_date				:= ut.ConvertDateMultiple(input.FileDate,fmtsin,fmtout);
+	self.filing_date				:= Std.date.ConvertDateFormatMultiple(input.FileDate,fmtsin,fmtout);
 	self.disposition_description	:=  ut.CleanSpacesAndUpper(input.ActiveCaseStatus);
-	self.disposition_date		:= ut.ConvertDateMultiple(input.CaseStatusDate,fmtsin,fmtout);
+	self.disposition_date		:= Std.date.ConvertDateFormatMultiple(input.CaseStatusDate,fmtsin,fmtout);
 	self	:= [];
 end;
 
