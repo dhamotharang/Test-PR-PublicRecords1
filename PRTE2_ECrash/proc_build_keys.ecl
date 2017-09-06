@@ -134,7 +134,7 @@ RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'lastname_state',
 RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'photoid', 									'Q', 	move_qa_key_ecrashv2_photoid);
 RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'prefname_state', 						'Q', 	move_qa_key_ecrashv2_prefname_state);
 RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'reportid', 									'Q', 	move_qa_key_ecrashv2_reportid);
-RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'reportid', 									'Q', 	move_qa_key_ecrashv2_reportlinkid);
+RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'reportlinkid', 							'Q', 	move_qa_key_ecrashv2_reportlinkid);
 RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'standlocation', 						'Q', 	move_qa_key_ecrashv2_standlocation);
 RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'supplemental', 							'Q', 	move_qa_key_ecrashv2_supplemental);
 RoxieKeyBuild.MAC_SK_Move_v2(Constants.SuperKeyname_ecrashV2 + 'tagnbr', 										'Q', 	move_qa_key_ecrashv2_tagnbr);
@@ -152,10 +152,10 @@ To_QA := sequential(move_qa_key_ecrash0,move_qa_key_ecrash1, move_qa_key_ecrash2
 										move_qa_key_ecrashv2_did, move_qa_key_ecrashv2_dlnbr, move_qa_key_ecrashv2_dol, 
 										move_qa_key_ecrashv2_lastname_state,  
 										move_qa_key_ecrashv2_photoid, move_qa_key_ecrashv2_prefname_state, 
-										move_qa_key_ecrashv2_reportid, move_qa_key_ecrashv2_standlocation, 
-										move_qa_key_ecrashv2_supplemental, move_qa_key_ecrashv2_tagnbr, 
-										move_qa_key_ecrashv2_vin, move_qa_key_ecrashv2_linkids,
-										move_qa_key_ecrashv2_agency
+										move_qa_key_ecrashv2_reportid, move_qa_key_ecrashv2_reportlinkid,
+										move_qa_key_ecrashv2_standlocation, move_qa_key_ecrashv2_supplemental, 
+										move_qa_key_ecrashv2_tagnbr, move_qa_key_ecrashv2_vin, 
+										move_qa_key_ecrashv2_linkids,	move_qa_key_ecrashv2_agency
 										);
 
 AutoKeyB2.MAC_Build (file_Autokey
