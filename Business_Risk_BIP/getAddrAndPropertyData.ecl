@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, BIPV2, BIPV2_Best, Business_Risk_BIP, Corp2, Doxie, EBR, EBR_Services, 
+﻿IMPORT AutoStandardI, BIPV2, BIPV2_Best, Business_Risk_BIP, Corp2, Doxie, EBR, EBR_Services, 
        LN_propertyV2, LN_PropertyV2_Services, MDR, Risk_Indicators, SALT28, UT;
 
 EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
@@ -394,8 +394,18 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Add back our Seq numbers.
 	Business_Risk_BIP.Common.AppendSeq2(CorpFilings_raw, Shell, CorpFilings_seq);
 
+ // Calculate the source code by state to restrict records for Marketing properly. We'll 
+ // borrow corp_src_type for the state source code.
+ CorpFilings_withSrcCode := 
+  PROJECT(
+    CorpFilings_seq,
+    TRANSFORM( RECORDOF(CorpFilings_seq),
+      SELF.corp_src_type := MDR.sourceTools.fCorpV2( LEFT.corp_key, LEFT.corp_state_origin ),
+      SELF := LEFT
+    ) );
+    
 	// Filter out records after our history date.
-	CorpFilings_recs := Business_Risk_BIP.Common.FilterRecords(CorpFilings_seq, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_ID_Corporations, AllowedSourcesSet);
+	CorpFilings_recs := Business_Risk_BIP.Common.FilterRecords(CorpFilings_withSrcCode, dt_first_seen, dt_vendor_first_reported, corp_src_type, AllowedSourcesSet);
 	
 	CorpFilings_sorted :=
 		SORT(
