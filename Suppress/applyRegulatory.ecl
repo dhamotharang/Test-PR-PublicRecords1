@@ -351,7 +351,8 @@ endmacro ;
 																													   trim((string)l.sequence_key,  left, right),
 																														 trim((string)l.fname,         left, right),
 																														 trim((string)l.lname,         left, right));
-							ds1 := Suppress.applyRegulatory.simple_sup(ds, 'file_vehicle_party_sup.txt', VehiclePartySupHash);
+//						ds1 := Suppress.applyRegulatory.simple_sup(ds, 'file_vehicle_party_sup.txt', VehiclePartySupHash);
+							ds1 := Suppress.applyRegulatory.simple_sup(ds, 'file_vehicle_party_sup.txt', VehiclePartySupHash): persist('~thor_data400::persist::vehiclev2::interm_party', single);
 							return suppress.applyRegulatory.simple_append(ds1, 'file_vehicle_party_inj.thor', VehicleV2.Layout_Base.Party_bip); 
 
 					endmacro;
@@ -406,5 +407,3 @@ endmacro ;
 
 
 end;
-
-
