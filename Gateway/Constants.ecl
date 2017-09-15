@@ -55,7 +55,9 @@
 		export String40 delta_personcontext	:= 'delta_personcontext';				//FCRA Full File Disclosure
 		export String40 AttIapQuery	:= 'att_iap';				// ATT DQ_IRS - Information Retrieval Service
 		export String40 ConsumerCreditReport := 'consumercreditreport';			//FCRA Consumer Credit Report
-		
+		export String40 DeltabaseSql := 'DeltaBaseSql';	
+		export String40 EcrashImageRetrieval := 'AccidentImage';	
+		export String40 ZumigoIdentity := 'zumigoidentity';			//Zumigo Line Identity
 	end;
 	
 	export ConfigProperties := module
