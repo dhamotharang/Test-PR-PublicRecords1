@@ -1,4 +1,4 @@
-IMPORT iesp, Gateway, lib_stringlib;
+﻿IMPORT iesp, Gateway, eCrash_Services;
 
 EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 	
@@ -15,64 +15,86 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 	END;
 	
 		EXPORT GetAccidentImageRequest(
-		DATASET(Layouts.eCrashRecordStructure) SuperReportRow, 
+		DATASET(eCrash_Services.Layouts.eCrashRecordStructure) SuperReportRow, 
 		DATASET(iesp.accident_image.t_AccidentImageCRUImageHash) ImageHashes, 
 		STRING RequestReportId,
-		BOOLEAN IncludeCoverPage,
+		BOOLEAN RequestIncludeCoverPage,
 		STRING RoyaltyType,
 		STRING TransactionId,
-		BOOLEAN IyetekRedactFlag) := FUNCTION
+		BOOLEAN IyetekRedactFlag,
+		STRING RequestAgencyOri,
+		STRING RequestVendorCode,
+		iesp.share.t_Date RequestDateOfCrash) := FUNCTION
 		
-		//StringLib.StringToTitleCase is not working, so this is the workaround for it
-		vendorCode := SuperReportRow[1].vendor_code;
-		formatedVendorCode := vendorCode[1] + lib_stringlib.StringLib.StringToLowerCase(vendorCode[2..LENGTH(vendorCode)]); 
+		//special logic for 'KYCrashLogic'
+		IsVendorCrashLogic := RequestVendorCode = Constants.VENDOR_CRASHLOGIC;
+		VendorCode := IF(IsVendorCrashLogic, Constants.VENDOR_CRASHLOGIC_ESP, SuperReportRow[1].vendor_code);
+		ReportNumber := IF(IsVendorCrashLogic, RequestReportId, SuperReportRow[1].vendor_report_id);
+		ReportType := IF(IsVendorCrashLogic, Constants.REPORT_CODE_ACCIDENT, SuperReportRow[1].report_type_id);
+		AgencyOri := IF(IsVendorCrashLogic, RequestAgencyOri, SuperReportRow[1].agency_ori);
+		IncludeCoverPage := IF(IsVendorCrashLogic, FALSE, RequestIncludeCoverPage);
+		DataSourceExternal := IF(IsVendorCrashLogic, Constants.VENDOR_CRASHLOGIC_ESP, Constants.DATA_SOURCE_IYETEK);	
+		State := IF(IsVendorCrashLogic, 'KY', SuperReportRow[1].jurisdiction_state);
 		
-		iesp.accident_image.t_AccidentImageRequest TmLayout := TRANSFORM
+		DateOfCrash := IF(
+			IsVendorCrashLogic, 
+			RequestDateOfCrash,
+			iesp.ECL2ESP.toDate((UNSIGNED4)SuperReportRow[1].accident_date)
+		);		
+		
+		iesp.accident_image.t_AccidentImageRequest CreateRequestTm := TRANSFORM
 			SELF.Options.IncludeCoverPage := IncludeCoverPage;
-			SELF.Options.DataSource := 'IyeTek';
-			SELF.Options.DataSource2 := formatedVendorCode;
+			SELF.Options.DataSource := DataSourceExternal;
+			SELF.Options.DataSource2 := VendorCode;
 			SELF.Options.IyetekRoyaltyType := RoyaltyType; 
 			SELF.Options.IyetekRedact := IyetekRedactFlag; 
 			SELF.SearchBy.TransactionID := TransactionId; //This is used for external vendor Iyetek
 			//orig_accnbr is state_report_number which is being copied over original_case_ident in the deltabase and it's not cleaned from special characters
-			SELF.SearchBy.ReportNumber := SuperReportRow[1].orig_accnbr;
-			SELF.SearchBy.AgencyORI := SuperReportRow[1].agency_ori;
+			// ECH - 4998 - Sprint 11 Apriss Integration - VIYER - assign vendor_report_id instead of orig_accnbr
+			SELF.SearchBy.ReportNumber := ReportNumber;
+			SELF.SearchBy.AgencyORI := AgencyORI;
 			SELF.SearchBy.ReportID := RequestReportId;
-			SELF.SearchBy.ReportType := SuperReportRow[1].report_type_id;
+			SELF.SearchBy.ReportType := ReportType;
+			SELF.SearchBy.DateOfCrash := DateOfCrash;
+			SELF.SearchBy.State := State;
+			
 			SELF := [];	
 		END;	
 			
-		iesp.accident_image.t_AccidentImageRequest Layout := TRANSFORM
-			SELF.Options.DataSource := 'CRU';
-			SELF.Options.DataSource2 := 'CRU';
+		iesp.accident_image.t_AccidentImageRequest CreateRequest := TRANSFORM
+			SELF.Options.DataSource := eCrash_Services.Constants.DATA_SOURCE_CRU;
+			SELF.Options.DataSource2 := eCrash_Services.Constants.DATA_SOURCE_CRU;
 			SELF.Options.IncludeCoverPage := IncludeCoverPage;
 			SELF.SearchBy.ImageHashes := ImageHashes;
 			SELF.SearchBy.ReportID := RequestReportId;
 			SELF := [];	
 		END;	
 		
-		RETURN MAP(
-			NOT EXISTS(SuperReportRow) => DATASET(
-				[TRANSFORM(iesp.accident_image.t_AccidentImageRequest, SELF := [])]
-			),
-			EXISTS(ImageHashes) => DATASET([Layout]),
-			NOT EXISTS(ImageHashes) => DATASET([TmLayout])
+		Result := 
+			MAP(
+				NOT EXISTS(SuperReportRow) AND NOT IsVendorCrashLogic => DATASET(
+					[TRANSFORM(iesp.accident_image.t_AccidentImageRequest, SELF := [])]
+				),
+				EXISTS(ImageHashes) => DATASET([CreateRequest]),
+				NOT EXISTS(ImageHashes) => DATASET([CreateRequestTm])
 		);
+		
+		RETURN Result;
 	END;
 	
 	EXPORT GetDocumentImageRequest(
 		DATASET(iesp.accident_image.t_AccidentImageCRUImageHash) ImageHashes, STRING RequestReportId) := FUNCTION
 			
-		iesp.accident_image.t_AccidentImageRequest Layout := TRANSFORM
-			SELF.Options.DataSource := 'CRU';
-			SELF.Options.DataSource2 := 'CRU';
+		iesp.accident_image.t_AccidentImageRequest CreateRequest := TRANSFORM
+			SELF.Options.DataSource := eCrash_Services.Constants.DATA_SOURCE_CRU;
+			SELF.Options.DataSource2 := eCrash_Services.Constants.DATA_SOURCE_CRU;
 			SELF.Options.IncludeCoverPage := true;
 			SELF.SearchBy.ImageHashes := ImageHashes;
 			SELF.SearchBy.ReportID := RequestReportId;
 			SELF := [];	
 		END;	  
 		
-		RETURN DATASET([Layout]);
+		RETURN DATASET([CreateRequest]);
 	END;
 	
 END;
