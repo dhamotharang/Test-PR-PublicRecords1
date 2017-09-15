@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut, lib_StringLib;
+﻿IMPORT Civ_Court, civil_court, ut, lib_StringLib, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -8,9 +8,9 @@ fTXGregg	:= Civ_Court.File_In_TX_Gregg(trim(CaseNumber,left,right) <> 'test');
 
 fmtsin := [
 		'%m/%d/%Y',
-		'%m/%d/%y'
-];
-fmtout := '%Y%m%d';
+		'%m-%d-%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Case_Activity tTX(fTXGregg input, integer1 C) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -20,7 +20,7 @@ self.source_file				:= 'TX Gregg County Ct';
 self.case_key						:= '41'+ut.CleanSpacesAndUpper(input.CaseNumber);
 self.court							:= 'GREGG COUNTY COURT';
 self.case_number				:= input.CaseNumber;
-self.event_date					:= CHOOSE(C,ut.ConvertDateMultiple(input.FileDate,fmtsin,fmtout),ut.ConvertDateMultiple(input.LastEventDate,fmtsin,fmtout));
+self.event_date					:= CHOOSE(C,Std.date.ConvertDateFormatMultiple(input.FileDate,fmtsin,fmtout),Std.date.ConvertDateFormatMultiple(input.LastEventDate,fmtsin,fmtout));
 self.event_type_description_1:= ut.CleanSpacesAndUpper(CHOOSE(C,'FILING DATE',input.LastEventType));
 self := [];
 end;

@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut,  Address, lib_StringLib, STD;
+﻿IMPORT Civ_Court, civil_court, ut,  Address, lib_StringLib, STD;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -6,8 +6,11 @@ IMPORT Civ_Court, civil_court, ut,  Address, lib_StringLib, STD;
 
 fIA := Civ_Court.Files_In_IA.Civil_in;
 
-fmtsin := '%d-%b-%y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%d-%b-%y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Party tIA(fIA input, integer1 C)	:= TRANSFORM
 self.process_date				:= civil_court.Version_Development;
@@ -87,7 +90,7 @@ self.entity_type_code_1_master := CHOOSE(C,map(self.entity_type_code_1_orig = 'A
 																								self.entity_type_code_1_orig = 'WITS' => '70', '70'),
 																						map(self.entity_type_code_1_orig = 'ATPL' => '20',
 																								self.entity_type_code_1_orig = 'ATDF' => '40','50'));
-tempDOB							:= CHOOSE(C,ut.ConvertDate(input.birth_date,fmtsin,fmtout),'');
+tempDOB							:= CHOOSE(C,Std.date.ConvertDateFormatMultiple(input.birth_date,fmtsin,fmtout),'');
 self.entity_1_dob		:= IF(STD.DATE.IsValidDate((INTEGER)tempDOB),tempDOB,'');
 self := [];
 end;

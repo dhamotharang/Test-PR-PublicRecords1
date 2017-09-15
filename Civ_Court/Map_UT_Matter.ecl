@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut, lib_StringLib;
+﻿IMPORT Civ_Court, civil_court, ut, lib_StringLib, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -7,8 +7,11 @@ IMPORT Civ_Court, civil_court, ut, lib_StringLib;
 filter_CaseType	:= ['FS','IF','MD','MO','PC','PN','TC','TN'];
 fUT := Civ_Court.Files_In_UT.Civil_in(case_type not in filter_CaseType);
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Matter tUT(fUT input) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -21,13 +24,13 @@ self.court						  := REGEXREPLACE('[0-9]',input.locn_descr,'');
 self.case_number				:= trim(input.case_num,left,right);
 self.case_type_code			:= input.case_type;
 self.case_type					:= '';
-self.filing_date				:= ut.ConvertDate(input.filing_date);
+self.filing_date				:= Std.Date.ConvertDateFormatMultiple(input.filing_date,fmtsin,fmtout);
 self.judgmt_type_code		:= input.jdmt_code;
 self.judgmt_type				:= '';
-self.judgmt_disposition_date	:= ut.ConvertDate(input.jdmt_filing_date);
+self.judgmt_disposition_date	:= Std.Date.ConvertDateFormatMultiple(input.jdmt_filing_date,fmtsin,fmtout);
 self.disposition_code		:= input.disp_code;
 self.disposition_description	:= '';
-self.disposition_date		:= ut.ConvertDate(input.disp_date);
+self.disposition_date		:= Std.Date.ConvertDateFormatMultiple(input.disp_date,fmtsin,fmtout);
 self := [];
 end;
 

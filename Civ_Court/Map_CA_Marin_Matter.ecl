@@ -1,11 +1,14 @@
-IMPORT Civ_Court, civil_court, crim_common, ut, lib_StringLib; 
+﻿IMPORT Civ_Court, civil_court, crim_common, ut, lib_StringLib, Std; 
 
 #option('multiplePersistInstances',FALSE);
 
 fMarin := Civ_court.File_In_CA_Marin;
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Matter tMarin(fMarin input) := TRANSFORM
 self.process_date				:= civil_court.Version_Development;
@@ -17,9 +20,9 @@ self.case_key					  := '38'+UpperCaseNum;
 self.court						  := 'MARIN COUNTY, CA MUNICIPAL COURT';
 self.case_number				:= UpperCaseNum;
 self.case_type					:= ut.CleanSpacesAndUpper(input.case_type);
-self.filing_date				:= ut.ConvertDate(input.date_filed);
+self.filing_date				:= Std.Date.ConvertDateFormatMultiple(input.date_filed,fmtsin,fmtout);
 self.disposition_description	:= ut.CleanSpacesAndUpper(input.disposition);
-self.disposition_date		:= ut.ConvertDate(input.disposition_date);
+self.disposition_date		:= Std.Date.ConvertDateFormatMultiple(input.disposition_date,fmtsin,fmtout);
 self := [];
 END;
 
