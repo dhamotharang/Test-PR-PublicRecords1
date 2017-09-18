@@ -1,9 +1,9 @@
- 
+﻿ 
 EXPORT MAC_PopulationStatistics(infile,Ref='',Input_fname = '',Input_lname = '',Input_title = '',Input_company = '',Input_address1 = '',Input_address2 = '',Input_city = '',Input_state = '',Input_zip = '',Input_zip4 = '',Input_cart = '',Input_bar = '',Input_gender = '',Input_country = '',Input_postal_cd = '',Input_dpv = '',Input_addr_type = '',Input_business_ind = '',Input_county_cd = '',Input_msa = '',Input_nielsen_county_cd = '',Input_number_of_lawyers_range = '',Input_practice_area = '',Input_title_cd = '',Input_phone = '',Input_list_id = '',Input_scno = '',Input_keycode = '',Input_custno = '',OutFile) := MACRO
-  IMPORT SALT32,Scrubs_ALC_LAWYERS;
+  IMPORT SALT37,Scrubs_ALC_LAWYERS;
   #uniquename(of)
   %of% := RECORD
-    SALT32.Str512Type fields;
+    SALT37.Str512Type fields;
   END;
   #uniquename(ot)
   %of% %ot%(infile le) := TRANSFORM
