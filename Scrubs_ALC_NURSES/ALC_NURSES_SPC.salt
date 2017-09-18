@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_ALC_NURSES
 FILENAME:ALC_NURSES
 //Uncomment up to NINES for internal or external adl
@@ -51,8 +51,8 @@ FIELD:nielsen_county_cd:TYPE(STRING1):LIKE(invalid_alphanumeric):0,0
 FIELD:nurse_type:TYPE(STRING80):LIKE(invalid_numericpound):0,0
 FIELD:reg_state:TYPE(STRING120):LIKE(invalid_alphapound):0,0
 FIELD:specialty:TYPE(STRING50):LIKE(invalid_numericpound):0,0
-FIELD:email:TYPE(STRING60):0,0
-FIELD:phone:TYPE(STRING10):LIKE(invalid_numeric):0,0
+FIELD:email:TYPE(STRING132):0,0
+FIELD:phone:TYPE(STRING20):LIKE(invalid_numeric):0,0
 FIELD:list_id:TYPE(STRING10):LIKE(invalid_numeric):0,0
 FIELD:scno:TYPE(STRING10):LIKE(invalid_numeric):0,0
 FIELD:keycode:TYPE(STRING35):0,0
