@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="HeaderFileAdvanceAddressSearch">
   <part name="did" type="xsd:string"/>
   <part name="RandR" type="xsd:boolean"/>
@@ -32,7 +32,10 @@
 		LNBranded. Switch for specific behavior for dayton apps
 */
 export HeaderFileAdvancedAddressSearch := MACRO
-#CONSTANT('UsingKeepSSNs',true);
+  #CONSTANT('UsingKeepSSNs',true);
+  // v-- Added for RQ-13563 to purposely force off the use of FDN keys
+  #CONSTANT('IncludeFraudDefenseNetwork',FALSE);
+
 	MatchingRecs := Header_Services.Fetch_Header_File_Advanced_Address;
   OUTPUT(MatchingRecs, NAMED('MatchingRecs'));
 ENDMACRO;
