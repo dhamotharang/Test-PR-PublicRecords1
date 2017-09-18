@@ -1,24 +1,10 @@
-/*2015-08-28T21:20:33Z (Srilatha Katukuri)
-#181860 - Changed Base name to Documents
-*/
-/*2015-08-28T21:17:20Z (Srilatha Katukuri)
-#181860 - hcanged the base file name to documents
-*/
-/*2015-08-08T00:11:43Z (Srilatha Katukuri)
-#181860 - PRUS
-*/
-/*2015-04-15T20:00:39Z (Srilatha Katukuri)
-#173256 Check in
-*/
-/*2015-02-11T00:48:03Z (Ayeesha Kayttala)
-bug# 173256 - code review 
-*/
-export map_basefile(string filedate) := function
+﻿export map_basefile(string filedate) := function
 
-import FLAccidents, Address, ut, did_add, header_slimsort, driversv2,lib_StringLib,AID,scrubs,scrubs_ecrash,nid;
+import FLAccidents, Address, ut, did_add, header_slimsort, driversv2,lib_StringLib,AID,scrubs,scrubs_ecrash,nid,PromoteSupers;
 
  d      := FLAccidents_Ecrash.Infiles.cmbnd;
  dvina	:= FLAccidents.File_VINA;
+ acmbnd := FLAccidents_Ecrash.Infiles.agencycmbnd;
  
 ////////////////////////////////////////////////////////////////////////////
 //Clean names and addresses then append vina info
@@ -566,19 +552,20 @@ end;
 																						,'ScrubsReport.csv'
 																						,
 																						,
-																						,'Ayeesha.kayttala@lexisnexis.com;sudhir.kasavajjala@lexisnexis.com');	
+																						,'sudhir.kasavajjala@lexisnexis.com');	
   //append bitmap to base
   dbuildbase := project (scrub_file_step1.BitmapInfile,FLAccidents_Ecrash.Layout_Basefile);
 
- 	ut.MAC_SF_BuildProcess(dbuildbase,'~thor_data400::base::ecrash',buildBase,,,true);
-  ut.MAC_SF_BuildProcess(FLAccidents_Ecrash.BuildSuppmentalReports.compare_add_new,'~thor_data400::base::ecrash_supplemental',buildsuppBase,,,true);
-	ut.MAC_SF_BuildProcess(FLAccidents_Ecrash.BuildSuppmentalReports.TMafterTF,'~thor_data400::base::ecrash_TMafterTF',buildBaseTMafterTF,,,true);
-	ut.MAC_SF_BuildProcess(FLAccidents_Ecrash.BuildPhotoFile.CmbndPhotos,'~thor_data400::base::ecrash_documents',buildDocumentBase,,,true);
+ 	PromoteSupers.Mac_SF_BuildProcess(dbuildbase,'~thor_data400::base::ecrash',buildBase,,,true);
+  PromoteSupers.Mac_SF_BuildProcess(FLAccidents_Ecrash.BuildSuppmentalReports.compare_add_new,'~thor_data400::base::ecrash_supplemental',buildsuppBase,,,true);
+	PromoteSupers.Mac_SF_BuildProcess(FLAccidents_Ecrash.BuildSuppmentalReports.TMafterTF,'~thor_data400::base::ecrash_TMafterTF',buildBaseTMafterTF,,,true);
+	PromoteSupers.Mac_SF_BuildProcess(FLAccidents_Ecrash.BuildPhotoFile.CmbndPhotos,'~thor_data400::base::ecrash_documents',buildDocumentBase,,,true);
+	PromoteSupers.Mac_SF_BuildProcess(acmbnd,'~thor_data400::base::agency_cmbnd',buildAgencyCmbndBase,,,true);
 
 //sequential( buildphotoBaseFile);
 
 
- return sequential(  buildsuppBase
+return sequential(  buildsuppBase
                     ,submit_stats
 		                //output Scrubs Report
 		                ,output(Scrubs_report_with_examples, all, named('ScrubsReportWithExamples'))
@@ -587,7 +574,10 @@ end;
                     ,buildBase  
 										,buildDocumentBase
 										,buildBaseTMafterTF
-										 );
+										,buildAgencyCmbndBase
+									);
 
 end;
+
+
 
