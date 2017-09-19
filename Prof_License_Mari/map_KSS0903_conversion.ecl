@@ -1,3 +1,6 @@
+﻿/*2017-09-19T22:47:27Z (Xia Sheng_prod)
+Jira Ticket DF-20062
+*/
 
 //**************************************************************************************************************/
 //  The purpose of this development is take Kansas Real Estate Professional License raw files AND convert them to a common
@@ -36,7 +39,7 @@ RemovePattern	    := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.*NET$|^%.*$|^
 											'^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES' +
 											'^.* REALTORS$|^.* PROPERTIES$|^ATTN:.*$|^UNKNOWN$|^#N/A$' +
 											')';
-Sufx_Pattern      := '( SR.| SR| JR.| JR| III| II| IV| VI| VII)';
+Sufx_Pattern      := '( SR.| SR| JR.| JR|^JR$| III| II| IV| VI| VII)';
 FilterNullRecord	:= ValidRLEFile(NOT REGEXFIND('[\\x00-\\x1F\\x7F]', TRIM(last_name)));
 ut.CleanFields(FilterNullRecord, ClnFilterNullRecord);
 O_Filter          := OUTPUT(ClnFilterNullRecord);
@@ -61,7 +64,7 @@ Prof_License_Mari.layouts.base	TRANSFORMToCommon(layout_KSS0903.common pInput) :
 			
 			//License Information 
 			tmpLicenseNbr := IF(LENGTH(TRIM(pInput.LICENSE_NUMBER)) < 8, (STRING)INTFORMAT((UNSIGNED)pInput.LICENSE_NUMBER,8,1), pInput.LICENSE_NUMBER);
-			tmpCmpnyNbr	:= IF(LENGTH(TRIM(pInput.COMPANY_LICENSE_NUMBER)) < 8, (STRING)INTFORMAT((UNSIGNED)pInput.COMPANY_LICENSE_NUMBER,8,1), pInput.COMPANY_LICENSE_NUMBER);
+			tmpCmpnyNbr	  := IF(LENGTH(TRIM(pInput.COMPANY_LICENSE_NUMBER)) < 8, (STRING)INTFORMAT((UNSIGNED)pInput.COMPANY_LICENSE_NUMBER,8,1), pInput.COMPANY_LICENSE_NUMBER);
 			SELF.LICENSE_NBR				:= IF(pInput.LICENSE_NUMBER != '',pInput.LICENSE_TYPE+tmpLicenseNbr,'NR');
 			SELF.OFF_LICENSE_NBR		:= IF(pInput.COMPANY_LICENSE_NUMBER != '', 'CO'+tmpCmpnyNbr,'');
 			SELF.OFF_LICENSE_NBR_TYPE := IF(SELF.OFF_LICENSE_NBR != '', 'COMPANY NUMBER','');
@@ -85,23 +88,32 @@ Prof_License_Mari.layouts.base	TRANSFORMToCommon(layout_KSS0903.common pInput) :
 	
 			// If individual AND NOT identified as a corporation names, parse into (FMLS) fmt
 			TrimNAME_LAST			:= ut.CleanSpacesAndUpper(pInput.LAST_NAME);
-			TmpNAME_LAST			:= IF(Regexfind(Sufx_Pattern,TrimNAME_LAST),REGEXREPLACE(Sufx_Pattern,TrimNAME_LAST,''),TrimNAME_LAST);
-			TmpSuffix         := TRIM(Regexfind(Sufx_Pattern,TrimNAME_LAST,0),LEFT,RIGHT);
+			TmpNAME_LAST			:= IF(REGEXFIND(Sufx_Pattern,TrimNAME_LAST),REGEXREPLACE(Sufx_Pattern,TrimNAME_LAST,''),TrimNAME_LAST);
+		
 			TrimNAME_FIRST		:= ut.CleanSpacesAndUpper(pInput.FIRST_NAME);
+			TmpNAME_FIRST 		:= IF(REGEXFIND(Sufx_Pattern,TrimNAME_FIRST),REGEXREPLACE(Sufx_Pattern,TrimNAME_FIRST,''),TrimNAME_FIRST);
+
 			TrimNAME_MID			:= ut.CleanSpacesAndUpper(pInput.MIDDLE_NAME);
+			TmpNAME_MID 			:= IF(REGEXFIND(Sufx_Pattern,TrimNAME_MID),REGEXREPLACE(Sufx_Pattern,TrimNAME_MID,''),TrimNAME_MID);
+
 			TrimNAME_SUFX			:= ut.CleanSpacesAndUpper(pInput.SUFFIX);
+			TmpSuffix         := MAP(REGEXFIND(Sufx_Pattern,TrimNAME_LAST)=>TRIM(REGEXFIND(Sufx_Pattern,TrimNAME_LAST,0),LEFT,RIGHT),
+			                         REGEXFIND(Sufx_Pattern,TrimNAME_MID)=>TRIM(REGEXFIND(Sufx_Pattern,TrimNAME_MID,0),LEFT,RIGHT),
+			                         REGEXFIND(Sufx_Pattern,TrimNAME_FIRST)=>TRIM(REGEXFIND(Sufx_Pattern,TrimNAME_FIRST,0),LEFT,RIGHT),
+			                         TrimNAME_SUFX);
+			
 			TrimNAME_FULL     := ut.CleanSpacesAndUpper(pInput.FULLNAME);
 			TrimNAME_BUS			:= ut.CleanSpacesAndUpper(pInput.COMPANY_NAME);
 			
 			// Identify NICKNAME IN the various format 
-			tempFNick							:= Prof_License_Mari.fGetNickname(TrimNAME_FIRST,'nick');
+			tempFNick							:= Prof_License_Mari.fGetNickname(TmpNAME_FIRST,'nick');
 			tempLNick							:= Prof_License_Mari.fGetNickname(TmpNAME_LAST,'nick');
-			tempMNick							:= Prof_License_Mari.fGetNickname(TrimNAME_MID,'nick');
+			tempMNick							:= Prof_License_Mari.fGetNickname(TmpNAME_MID,'nick');
 			tempFullNick          := Prof_License_Mari.fGetNickname(TrimNAME_FULL,'nick');
 			
-			removeFNick						:= Prof_License_Mari.fGetNickname(TrimNAME_FIRST,'strip_nick');
+			removeFNick						:= Prof_License_Mari.fGetNickname(TmpNAME_FIRST,'strip_nick');
 			removeLNick						:= Prof_License_Mari.fGetNickname(TmpNAME_LAST,'strip_nick');
-			removeMNick						:= Prof_License_Mari.fGetNickname(TrimNAME_MID,'strip_nick');
+			removeMNick						:= Prof_License_Mari.fGetNickname(TmpNAME_MID,'strip_nick');
 			removeFullNick        := Prof_License_Mari.fGetNickname(TrimNAME_Full,'strip_nick');
 
 			stripNickFName				:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(removeFNick));
@@ -113,13 +125,13 @@ Prof_License_Mari.layouts.base	TRANSFORMToCommon(layout_KSS0903.common pInput) :
 			ParsedName						:= Prof_License_Mari.mod_clean_name_addr.cleanFMLName(GoodFullName);			
 			
 			GoodFirstName					:= IF(TmpNAME_LAST != '' AND tempFNick != '',stripNickFName,
-			                           IF(TmpNAME_LAST != '' AND tempFNick = '',TrimNAME_FIRST,
+			                           IF(TmpNAME_LAST != '' AND tempFNick = '',TmpNAME_FIRST,
 																 TRIM(ParsedName[6..25],LEFT,RIGHT)));
 			GoodMidName   				:= IF(TmpNAME_LAST != '' AND tempMNick != '',stripNickMName,
-                                 IF(TrimNAME_MID != '' AND tempMNick = '',TrimNAME_Mid,			                           
+                                 IF(TmpNAME_MID != '' AND tempMNick = '',TmpNAME_MID,			                           
 																 TRIM(ParsedName[26..45],LEFT,RIGHT)));													 
 			GoodLastName					:= IF(TmpNAME_LAST != '' AND tempLNick != '',stripNickLName,
-			                           IF(TmpNAME_LAST != '' AND tempFNick = '',TmpNAME_LAST,
+			                           IF(TmpNAME_LAST != '' AND tempLNick = '',TmpNAME_LAST,
 																 TRIM(ParsedName[46..65],LEFT,RIGHT)));		
 			ConcatNAME_FULL 			:= StringLib.StringCleanSpaces(GoodLastName +' '+GoodFirstName);
 
@@ -134,7 +146,7 @@ Prof_License_Mari.layouts.base	TRANSFORMToCommon(layout_KSS0903.common pInput) :
 																   TmpNAME_LAST != '' AND tempMNick != '' => StringLib.StringCleanSpaces(tempMNick),
 																   TmpNAME_LAST = '' AND tempFullNick ='' => StringLib.StringCleanSpaces(tempFullNick),
 																   '');
-			SELF.NAME_SUFX				:= IF(TmpSuffix != '', TmpSuffix, TRIM(STD.Str.FilterOut(TrimNAME_SUFX,'.\\]\''),LEFT,RIGHT));
+			SELF.NAME_SUFX				:= TRIM(TmpSuffix,LEFT,RIGHT);
 				
 			//Remove DBA Name																 
 			getNAME_DBA						:= IF(REGEXFIND(DBA_Ind,TrimNAME_BUS),Prof_License_Mari.mod_clean_name_addr.GetDBAName(TrimNAME_BUS),''); 
@@ -175,7 +187,7 @@ Prof_License_Mari.layouts.base	TRANSFORMToCommon(layout_KSS0903.common pInput) :
 			SELF.NAME_ORG_ORIG			:= StringLib.StringCleanSpaces(TRIM(TRIM('',LEFT,RIGHT) + IF(TrimNAME_LAST <> '',TrimNAME_LAST,''),LEFT)
 																																	+ IF(TrimNAME_SUFX <> '',' ' + TrimNAME_SUFX + ', ', ', ')
 																																	+ TRIM(TRIM('',LEFT,RIGHT) + IF(TrimNAME_FIRST <> '',TrimNAME_FIRST + ' ',''),LEFT)
-																																	+ TRIM(TRIM('',LEFT,RIGHT) + IF(TrimNAME_MID <> '',TrimNAME_MID,''),LEFT));
+																																	+ TRIM(TRIM('',LEFT,RIGHT) + IF(TmpNAME_MID <> '',TmpNAME_MID,''),LEFT));
 	
 					
 			SELF.NAME_DBA_ORIG			:= '';
@@ -194,11 +206,14 @@ Prof_License_Mari.layouts.base	TRANSFORMToCommon(layout_KSS0903.common pInput) :
 		prepAddress2 := IF(TrimCity != '' AND TRIM(prepAddress1[1..STD.Str.Find(prepAddress1, ' ', 1) -1], RIGHT) = TrimCity, '', prepAddress1);
 		prepAddress3 := IF(STD.Str.Find(prepAddress2, 'UNKNOWN', 1) = 1, '', prepAddress2);
 		repl_Nonprnt := REGEXREPLACE('[\\x00-\\x1F\\x7F]', prepAddress3, ';');
-		tmpAddress1	 := IF(REGEXFIND('(.*);;(.*)$', repl_Nonprnt), REGEXFIND('(.*);;(.*)$', repl_Nonprnt,1),
-											IF(REGEXFIND('(.*);(.*)$', repl_Nonprnt), REGEXFIND('(.*);(.*)$', repl_Nonprnt,1),
-												prepAddress3));	
-		tmpAddress2	 := IF(REGEXFIND('(.*);;(.*)$', repl_Nonprnt), REGEXFIND('(.*);;(.*)$', repl_Nonprnt,2),
-												IF(REGEXFIND('(.*);(.*)$', repl_Nonprnt), REGEXFIND('(.*);(.*)$', repl_Nonprnt,2),''));
+		tmpAddress1	 := MAP(REGEXFIND('(.*);;(.*)$', repl_Nonprnt)=> REGEXFIND('(.*);;(.*)$', repl_Nonprnt,1),
+											  REGEXFIND('(.*);(.*)$', repl_Nonprnt)=> REGEXFIND('(.*);(.*)$', repl_Nonprnt,1),
+											  REGEXFIND('(.*)[|](.*)$', repl_Nonprnt)=> REGEXFIND('(.*)[|](.*)$', repl_Nonprnt,1),
+												prepAddress3);	
+		tmpAddress2	 := MAP(REGEXFIND('(.*);;(.*)$', repl_Nonprnt)=> REGEXFIND('(.*);;(.*)$', repl_Nonprnt,2),
+												REGEXFIND('(.*);(.*)$', repl_Nonprnt)=> REGEXFIND('(.*);(.*)$', repl_Nonprnt,2),
+                        REGEXFIND('(.*)[|](.*)$', repl_Nonprnt)=> REGEXFIND('(.*)[|](.*)$', repl_Nonprnt,2),												 
+												  '');											
 		tmpNameContact1		:= IF(REGEXFIND('^(C/O (35 .*|EL TOVAR HOTEL|GENERAL DELIVERY)+).*$',tmpAddress1), '', 
 															Prof_License_Mari.mod_clean_name_addr.extractNameFromAddr(tmpAddress1, CoPattern));
 		clnAddress1				:= 	IF(REGEXFIND('^(C/O (35 .*|EL TOVAR HOTEL|GENERAL DELIVERY)+).*$',tmpAddress1), tmpAddress1[5..], 
