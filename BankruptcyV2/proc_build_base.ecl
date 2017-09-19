@@ -1,4 +1,4 @@
-import scrubs_bk_search, scrubs,  Scrubs_bk_main, ut;
+﻿import scrubs_bk_search, scrubs,  Scrubs_bk_main, ut;
 #OPTION('multiplePersistInstances',FALSE);
 
 export proc_build_base(string filedate) := function
@@ -107,8 +107,8 @@ export proc_build_base(string filedate) := function
 											bld_bk_search_v2),
 											dbld_bk_main_v2,					
 											dbld_bk_search_v2,	
-											notify('Yogurt:BANKRUPTCY BASE BUILD COMPLETE','*'),
-											bankruptcyv2.daily_count_stats_for_banko('nonfcra',,true,true,'build')
+											notify('Yogurt:BANKRUPTCY BASE BUILD COMPLETE','*')/*,
+											bankruptcyv2.daily_count_stats_for_banko('nonfcra',,true,true,'build')*/
 											
 											);
 											
