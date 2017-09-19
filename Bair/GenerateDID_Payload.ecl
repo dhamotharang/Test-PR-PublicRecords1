@@ -1,4 +1,4 @@
-import std,address,bair,ut,VehicleV2_Services,DID_Add,bair_composite,bair_importer;
+﻿import std,address,bair,ut,VehicleV2_Services,DID_Add,bair_composite,bair_importer;
 
 EXPORT GenerateDID_Payload (string version, boolean pUseProd = false, boolean pDelta = false) := function
 
@@ -75,13 +75,13 @@ EXPORT GenerateDID_Payload (string version, boolean pUseProd = false, boolean pD
 					,left.data_provider_id = right.dataProviderID
 						,transform(r
 							,self.eid_hash:=bair_composite.fn_scale_eid(trim(left.eid,left,right))
-							,self.orig_City:= if(left.Prepped_rec_type <> Bair._Constant.Offenders_
+							,self.orig_City:= if(left.Prepped_rec_type not in [Bair._Constant.Offenders_, Bair._Constant.Events_Mo_address_of_crime]
 																	,if(right.dataProviderID>0 and right.city<>'',right.city,left.orig_City)
 																	,if(left.orig_City<>'',left.orig_City,right.City)
 																	)
-							,self.orig_st:= if(left.Prepped_rec_type <> Bair._Constant.Offenders_
+							,self.orig_st:= if(left.Prepped_rec_type not in [Bair._Constant.Offenders_, Bair._Constant.Events_Mo_address_of_crime]
 																,if(right.dataProviderID>0   and right.state<>''  ,right.state,left.orig_st)
-																,if(left.orig_City<>'',left.orig_City,right.City)
+																,if(left.orig_st<>'',left.orig_st,right.state)
 																)
 							,SELF.Prepped_addr1 := trim(StringLib.StringCleanSpaces(left.orig_address))
 							,SELF.Prepped_addr2 := trim(StringLib.StringCleanSpaces(	trim(self.orig_City) + if(self.orig_city <> '',',','')
