@@ -1,9 +1,10 @@
-IMPORT _control;
+﻿IMPORT _control;
 EXPORT CONSTANTS := MODULE
 		EXPORT LandingZone		 								:= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
 		
 		export prefix                        :=   '/data/super_credit/ecrash/sla_build/';                
 		EXPORT InPathForIncident					  := prefix + 'noniyetek/incident/in';
+		EXPORT InPathForBillingAgency					  := prefix + 'noniyetek/BillingAgencies/in';
 	EXPORT InPathForCommercial					  := prefix + 'noniyetek/commercial/in';
 	EXPORT InPathForVehicle					  := prefix + 'noniyetek/vehicle/in';
 	EXPORT InPathForCitation					  := prefix + 'noniyetek/citation/in';
@@ -12,6 +13,8 @@ EXPORT CONSTANTS := MODULE
 
 
 	EXPORT ProcessPathForIncident					  := prefix + 'noniyetek/incident/process';
+		EXPORT ProcessPathForBillingAgency					  := prefix + 'noniyetek/BillingAgencies/process';
+
 	EXPORT ProcessPathForCommercial					  := prefix + 'noniyetek/commercial/process';
 	EXPORT ProcessPathForVehicle					  := prefix + 'noniyetek/vehicle/process';
 	EXPORT ProcessPathForCitation					  := prefix + 'noniyetek/citation/process';
@@ -20,6 +23,7 @@ EXPORT CONSTANTS := MODULE
 
 
  EXPORT BackupPathForIncident					  := prefix + 'noniyetek/incident/backup';
+  EXPORT BackupPathForBillingAgency					  := prefix + 'noniyetek/BillingAgencies/backup';
 	EXPORT BackupPathForCommercial					  := prefix + 'noniyetek/commercial/backup';
 	EXPORT BackupPathForVehicle					  := prefix + 'noniyetek/vehicle/backup';
 	EXPORT BackupPathForCitation					  := prefix + 'noniyetek/citation/backup';
@@ -29,6 +33,7 @@ EXPORT CONSTANTS := MODULE
 	EXPORT DestinationCluster 		        := IF (_control.ThisEnvironment.Name = 'Prod_Thor', 'thor400_60', 'thor400_dev01');	
 	EXPORT SprayCompleteFile							:= '~thor::CD::Spray::Complete';
 	EXPORT IncidentFileMask												:= 'dbpeccl-???.risk.regn.net.incident*' ;
+		EXPORT BillingAgencyFileMask												:= 'dbpeccl-???.risk.regn.net.BillingAgencies*' ;
 	EXPORT PersonFileMask												  := 'dbpeccl-ala.risk.regn.net.person*';
 	EXPORT CommercialFileMask											:= 'dbpeccl-ala.risk.regn.net.commercial*';
 	EXPORT CitationFileMask												:= 'dbpeccl-ala.risk.regn.net.citation*';
@@ -37,6 +42,7 @@ EXPORT CONSTANTS := MODULE
 
   
 	EXPORT INCIDENT_SPRAYED_DAILY      := '~thor_data400::in::ecrash::incidnt_raw_new';
+	EXPORT BILLINGAGENCY_SPRAYED_DAILY      := '~thor_data400::in::ecrash::billingagency_raw';
 	EXPORT PERSON_SPRAYED_DAILY      := '~thor_data400::in::ecrash::persn_raw';
 	EXPORT VEHICLE_SPRAYED_DAILY      := '~thor_data400::in::ecrash::vehicl_raw';
 	EXPORT CITATION_SPRAYED_DAILY      := '~thor_data400::in::ecrash::citatn_raw';
