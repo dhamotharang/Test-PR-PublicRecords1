@@ -7,7 +7,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 												BOOLEAN debugMode = FALSE) := FUNCTION
 
 
-	//Get the BIP IDs of the business passed in
+	//Get the BIP IDs of the business passed in 
 	inquiredBus := DueDiligence.getBusBIPId(cleanedInput, options, linkingOptions, includeReport);
 	
 	//seperate those with BIP IDs and those without/not found
@@ -63,7 +63,9 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	
 	
 	/*attributes that must be called after all other attributes*/
-	busSicNaic := DueDiligence.getBusSicNaic(busSOS, options, linkingOptions);
+	busAsInd := DueDiligence.getBusAsInd(busSOS, options);  //must be called after getBusSOSDetail
+	
+	busSicNaic := DueDiligence.getBusSicNaic(busAsInd, options, linkingOptions);  //must be called after getBusRegistration & getBusHeader & getBusSOSDetail
 
 
 
@@ -93,6 +95,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	IF(debugMode, OUTPUT(busHeader, NAMED('busHeader')));
 	IF(debugMode, OUTPUT(busSOS, NAMED('busSOS')));
 	
+	IF(debugMode, OUTPUT(busAsInd, NAMED('busAsInd')));
 	IF(debugMode, OUTPUT(busSicNaic, NAMED('busSicNaic')));
 	
 	IF(debugMode, OUTPUT(busKRI, NAMED('busKRI')));

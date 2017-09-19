@@ -1970,6 +1970,20 @@ EXPORT Constants := MODULE
 		export unsigned1 MaxPossibleOccupants := 4;
   end;
 
+	// Consumer Disclosure Data Service -  ConsumerDisclosure/Constants/Limits
+	export DataService := module
+		export unsigned1 MaxDefault         := 100;
+		export unsigned1 MaxAircrafts       := 1000;
+		export unsigned1 MaxATF             := 200;
+		export unsigned1 MaxBankruptcies    := 1000;  
+		export unsigned1 MaxDeathDid        := 100;
+		export unsigned1 MaxGong            := 100;
+		export unsigned1 MaxHunters         := 350;
+		export unsigned1 MaxPAW             := 100;
+		export unsigned1 MaxPilots          := 200;
+		export unsigned1 MaxStudent         := 100;
+	end;
+
 
   // Google Pony express
   export MailMatch := MODULE

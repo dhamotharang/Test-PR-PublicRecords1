@@ -1,4 +1,4 @@
-IMPORT _Control, ut, iesp, Insurance_iesp, InsuranceContext_iesp, 
+﻿IMPORT _Control, ut, iesp, Insurance_iesp, InsuranceContext_iesp, 
 			InsuranceLog_iesp,iesp.Constants, PersonContext;
 
 EXPORT FUNCTIONS := MODULE
@@ -32,6 +32,37 @@ EXPORT FUNCTIONS := MODULE
 
     // if we can't find any search records with at least a LexID or RecID1 populated then we have an empty search dataset. 
     EXPORT isEmptySearchds := ~EXISTS(rowPCReq.SearchBy.Keys(LexID > '' OR RecID1 > ''));	
+
+    // After passing validation transform, do we have any valid search keys? Valid ones are the ones that weren't assigned a SearchStatus error.
+		EXPORT isNoValidSearchKeys := ~EXISTS(dsPCReqValidated(SearchStatus = ''));
+
+    //now, export a dataset of only the search keys that didn't generate an error status. These will be the ones we will send through the
+		//soap service to the deltabase and to the roxie keys for the joins.
+		EXPORT dsPCValidSearchRecs := dsPCReqValidated(SearchStatus = '');
+	END; // ValidateSearchKeys
+
+  EXPORT ValidateSearchKeys_Thor(DATASET(PersonContext.Layouts.Layout_PCSearchKey) ThorInputs) := MODULE
+    
+		//spin through the search key records and mark a search status error on those which fail scrutiny.
+		//Also, get them out of the insurance_iesp child dataset structure and make it a simpler dataset structure that we can use outside.
+		PCL.Layout_PCRequestStatus ValidateKeys(PersonContext.Layouts.Layout_PCSearchKey L) := TRANSFORM			
+      SELF.SearchStatus			:= MAP(L.LexID != '' AND (L.RecID1 != '' OR L.RecID2 != '' OR L.RecID3 != '' OR L.RecID4 != '')
+			                                                                                                  => CS.LexidRecidCombinationError,
+			                             L.LexID = '' AND L.RecId1 = '' AND L.RecId2 = '' AND L.RecId3 = '' AND L.RecId4 = '' 
+																																																				=> CS.NoSearchRecords,
+			                             L.RecId2 != '' AND L.RecId1 = '' 																			=> CS.RecIDOutOfSequence,
+																	 L.RecId3 != '' AND (L.RecId2 = '' OR L.RecId1 = '') 									=> CS.RecIDOutOfSequence,
+																	 L.RecID4 != '' AND (L.RecId3 = '' OR L.RecId2 = '' OR L.RecId3 = '') 	=> CS.RecIDOutOfSequence,
+																	 '');
+			SELF := L;
+		END;
+		
+		 // now we have a dataset of search keys that have been validated.
+		//EXPORT dsPCReqValidated := PROJECT(dsPCReq[1].SearchBy.Keys, ValidateKeys(LEFT));
+		EXPORT dsPCReqValidated := PROJECT(ThorInputs, ValidateKeys(LEFT));
+
+    // if we can't find any search records with at least a LexID or RecID1 populated then we have an empty search dataset. 
+    EXPORT isEmptySearchds := ~EXISTS(ThorInputs(LexID > '' OR RecID1 > ''));	
 
     // After passing validation transform, do we have any valid search keys? Valid ones are the ones that weren't assigned a SearchStatus error.
 		EXPORT isNoValidSearchKeys := ~EXISTS(dsPCReqValidated(SearchStatus = ''));
@@ -89,28 +120,47 @@ EXPORT FUNCTIONS := MODULE
     
   END;//PerformDeltabaseCall
   
-	EXPORT PerformGetRoxieKeyData(DATASET(PCL.Layout_PCRequestStatus) dsPCValidSearchRecs) := FUNCTION
+	EXPORT PerformGetRoxieKeyData(DATASET(PCL.Layout_PCRequestStatus) dsPCValidSearchRecs, BOOLEAN onThor = FALSE) := FUNCTION
 		
 		dsSearchLexID := dsPCValidSearchRecs(LexID > ''); //filter out from the search dataset all search records that do not have LexID.
 		dsSearchRecID := dsPCValidSearchRecs(RecID1 > ''); //filter out all from the search dataset all search records that don't have at least RecID1
 		
 		//perform a join only on LexID key to get all matches that match the search LexID. This join will grab all Consumer Level and Record level records.
-		dsResultLexID := JOIN(dsSearchLexID, PersonContext.Keys.KEY_LexID,
+		dsResultLexID_roxie := JOIN(dsSearchLexID, PersonContext.Keys.KEY_LexID,
 		                      KEYED(LEFT.LexID = RIGHT.LexID),
 										      TRANSFORM(PersonContext.Layouts.layout_deltakey_personcontext,SELF:=RIGHT,SELF:=[]),
                           KEEP(iesp.Constants.PersonContext.MAX_RECORDS),LIMIT(0));
 
+		dsResultLexID_thor := JOIN(DISTRIBUTE(dsSearchLexID, HASH64(LexID)), 
+													DISTRIBUTE(PULL(PersonContext.Keys.KEY_LexID), HASH64(LexID)),
+		                      (LEFT.LexID = RIGHT.LexID),
+										      TRANSFORM(PersonContext.Layouts.layout_deltakey_personcontext,SELF:=RIGHT,SELF:=[]),
+                          KEEP(iesp.Constants.PersonContext.MAX_RECORDS),LIMIT(0), LOCAL);
+			
+		dsResultLexID := if(onThor, dsResultLexID_thor, dsResultLexID_roxie);
+		
     //perform a join on RecID1 - RecID4 to get all matches that match on the search key RecID1 - 4.
 		//This key is needed to find all record level matching on RecID1 - 4 searches when we don't know the LexID
 		//they belong too.
-		dsResultRecID := JOIN(dsSearchRecID, PersonContext.Keys.KEY_RecID,
+		dsResultRecID_roxie := JOIN(dsSearchRecID, PersonContext.Keys.KEY_RecID,
 													KEYED(LEFT.RecID1 = RIGHT.RecID1 AND
 																LEFT.RecID2 = RIGHT.RecID2 AND
 																LEFT.RecID3 = RIGHT.RecID3 AND
 																LEFT.RecID4 = RIGHT.RecID4),
 													TRANSFORM(PersonContext.Layouts.layout_deltakey_personcontext,SELF:=RIGHT,SELF:=[]),
 													KEEP(iesp.Constants.PersonContext.MAX_RECORDS),LIMIT(0));
-
+													
+		dsResultRecID_thor := JOIN(DISTRIBUTE(dsSearchRecID, HASH64(RecID1, RecID2, RecID3, RecID4)), 
+													DISTRIBUTE(PULL(PersonContext.Keys.KEY_RecID), HASH64(RecID1, RecID2, RecID3, RecID4)),
+																LEFT.RecID1 = RIGHT.RecID1 AND
+																LEFT.RecID2 = RIGHT.RecID2 AND
+																LEFT.RecID3 = RIGHT.RecID3 AND
+																LEFT.RecID4 = RIGHT.RecID4,
+													TRANSFORM(PersonContext.Layouts.layout_deltakey_personcontext,SELF:=RIGHT,SELF:=[]),
+													KEEP(iesp.Constants.PersonContext.MAX_RECORDS),LIMIT(0), LOCAL);
+		
+		dsResultRecID := if(onThor, dsResultRecID_thor, dsResultRecID_roxie);
+		
     //combine the results from the two joins and then sort and dedup on the key fields. 
 		//We will have duplicates in the two joins we need to get rid of.
     dsSrtRoxieKeyRecs := SORT(dsResultLexID + dsResultRecID,LexID,RecID1,RecID2,RecID3,RecID4,StatementId);
@@ -247,4 +297,17 @@ EXPORT FUNCTIONS := MODULE
 		
 	END;   //PerformCreateFinalOutput
 
+  EXPORT PerformCreateFinalOutput_thor(DATASET(PCL.Layout_PCResponseRec) Results) := FUNCTION
+																	
+    //now, lets take our results and put them back into the overall final response structure that gets returned from the function or Roxie Service.
+       PCL.Layout_PCResponseRec LoadFinalResponse(Results R) := TRANSFORM
+         SELF.Content := TRIM(R.Content,LEFT,RIGHT);         
+				 SELF := R;
+				END; 
+				 
+		dsFinalResponse := PROJECT(Results, LoadFinalResponse(LEFT));
+		RETURN dsFinalResponse;
+		
+	END;   //PerformCreateFinalOutput_thor
+	
 END; // FUNCTIONS  

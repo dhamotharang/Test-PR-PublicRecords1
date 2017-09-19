@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, iesp;
+﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, DueDiligence, iesp;
 
 EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 											DATASET(DueDiligence.Layouts.Busn_Internal) busInfo,
@@ -6,7 +6,7 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 											BIPV2.mod_sources.iParams linkingOptions,
 											BOOLEAN includeReport) := FUNCTION
 
-	//creating a new options to pass into the BIP_Best_Append to overwite the BIPBestAppend passed in
+//** creating a new options to pass into the BIP_Best_Append to overwite the BIPBestAppend passed in
 	tempOptions := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 		EXPORT UNSIGNED1	DPPA_Purpose 				:= options.DPPA_Purpose;
 		EXPORT UNSIGNED1	GLBA_Purpose 				:= options.GLBA_Purpose;
@@ -39,47 +39,46 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 	// Append "Best" Company information if only BIP ID's were passed in and it was requested in the Options that we perform the BIPBestAppend process, otherwise this function just returns what was sent to it
 	linkIDsFound := Business_Risk_BIP.BIP_Best_Append(withBIP, tempOptions, linkingOptions, allowedSourcesSet);
 	
-	final := JOIN(busInfo, linkIDsFound, 
-									LEFT.seq = RIGHT.seq AND
-									LEFT.Busn_info.BIP_IDS.UltID.LinkID = (UNSIGNED)RIGHT.Verification.InputIDMatchUltID AND
-									LEFT.Busn_info.BIP_IDS.OrgID.LinkID = (UNSIGNED)RIGHT.Verification.InputIDMatchOrgID AND
-									LEFT.Busn_info.BIP_IDS.SeleID.LinkID = (UNSIGNED)RIGHT.Verification.InputIDMatchSeleID,		
-									TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-														SELF.bestCompanyName := RIGHT.Input_Echo.CompanyName;
-														SELF.bestAddr := RIGHT.Input_Echo.streetAddress1;
-														SELF.bestCity := RIGHT.Input_Echo.city;
-														SELF.bestState := RIGHT.Input_Echo.state;
-														SELF.bestZip := RIGHT.Input_Echo.zip5;
-														SELF.bestZip4 := RIGHT.Input_Echo.zip4;
-														SELF.bestFEIN := RIGHT.Input_Echo.fein;
-														SELF.bestPhone := RIGHT.Input_Echo.phone10;
-														SELF.businessReport.businessInformation.bestFEIN := IF(includeReport, RIGHT.Input_Echo.fein, '');
-														SELF.businessReport.businessInformation.bestAddress := IF(includeReport, DATASET([TRANSFORM(iesp.share.t_Address,
-																																																							SELF.StreetAddress1 := RIGHT.Input_Echo.streetAddress1;
-																																																							SELF.StreetAddress2 := RIGHT.Input_Echo.streetAddress2;
-																																																							// SELF.StreetNumber := RIGHT.Input_Echo.prim_range;
-																																																							// SELF.StreetPreDirection := RIGHT.Input_Echo.predir;
-																																																							// SELF.StreetName := RIGHT.Input_Echo.prim_name;
-																																																							// SELF.StreetSuffix := RIGHT.Input_Echo.addr_suffix;
-																																																							// SELF.StreetPostDirection := RIGHT.Input_Echo.postdir;
-																																																							// SELF.UnitDesignation := RIGHT.Input_Echo.unit_desig;
-																																																							// SELF.UnitNumber := RIGHT.Input_Echo.sec_range;
-																																																							SELF.City := RIGHT.Input_Echo.city;
-																																																							SELF.State := RIGHT.Input_Echo.state;
-																																																							SELF.Zip5 := RIGHT.Input_Echo.zip5;
-																																																							SELF.Zip4 := RIGHT.Input_Echo.zip4;
-																																																							SELF := [];)]),
-																																																		 DATASET([], iesp.share.t_Address))[1];
-														SELF  := LEFT;),
+	bestData := JOIN(busInfo, linkIDsFound, 
+										LEFT.seq = RIGHT.seq AND
+										LEFT.Busn_info.BIP_IDS.UltID.LinkID = (UNSIGNED)RIGHT.Verification.InputIDMatchUltID AND
+										LEFT.Busn_info.BIP_IDS.OrgID.LinkID = (UNSIGNED)RIGHT.Verification.InputIDMatchOrgID AND
+										LEFT.Busn_info.BIP_IDS.SeleID.LinkID = (UNSIGNED)RIGHT.Verification.InputIDMatchSeleID,		
+										TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+															SELF.bestCompanyName := RIGHT.Input_Echo.CompanyName;
+															SELF.bestAddr := RIGHT.Input_Echo.streetAddress1;
+															SELF.bestCity := RIGHT.Input_Echo.city;
+															SELF.bestState := RIGHT.Input_Echo.state;
+															SELF.bestZip := RIGHT.Input_Echo.zip5;
+															SELF.bestZip4 := RIGHT.Input_Echo.zip4;
+															SELF.bestFEIN := RIGHT.Input_Echo.fein;
+															SELF.bestPhone := RIGHT.Input_Echo.phone10;
+															SELF.businessReport.businessInformation.bestFEIN := IF(includeReport, RIGHT.Input_Echo.fein, '');
+															SELF.businessReport.businessInformation.bestAddress := IF(includeReport, DATASET([TRANSFORM(iesp.share.t_Address,
+																																																								SELF.StreetAddress1 := RIGHT.Input_Echo.streetAddress1;
+																																																								SELF.StreetAddress2 := RIGHT.Input_Echo.streetAddress2;
+																																																								// SELF.StreetNumber := RIGHT.Input_Echo.prim_range;
+																																																								// SELF.StreetPreDirection := RIGHT.Input_Echo.predir;
+																																																								// SELF.StreetName := RIGHT.Input_Echo.prim_name;
+																																																								// SELF.StreetSuffix := RIGHT.Input_Echo.addr_suffix;
+																																																								// SELF.StreetPostDirection := RIGHT.Input_Echo.postdir;
+																																																								// SELF.UnitDesignation := RIGHT.Input_Echo.unit_desig;
+																																																								// SELF.UnitNumber := RIGHT.Input_Echo.sec_range;
+																																																								SELF.City := RIGHT.Input_Echo.city;
+																																																								SELF.State := RIGHT.Input_Echo.state;
+																																																								SELF.Zip5 := RIGHT.Input_Echo.zip5;
+																																																								SELF.Zip4 := RIGHT.Input_Echo.zip4;
+																																																								SELF := [];)]),
+																																																			 DATASET([], iesp.share.t_Address))[1];
+															SELF  := LEFT;),
 										LEFT OUTER);
 	
-	
-	
+
 	// OUTPUT(withBIP, NAMED('withBIP'));
 	// OUTPUT(linkIDsFound, NAMED('linkIDsFound'));
-	// OUTPUT(final, NAMED('final'));
+	// OUTPUT(bestData, NAMED('bestData'));
 	
-	
-	RETURN final;
+
+	RETURN bestData;
 	
 END;

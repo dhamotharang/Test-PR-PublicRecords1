@@ -1,4 +1,4 @@
-import riskwise, gateway, BizLinkFull, Models, Risk_Indicators;
+﻿import riskwise, gateway, BizLinkFull, Models, Risk_Indicators;
 //Old legacy RISKWISE services will not be shouldn't be sending in new score input fields...as otherwise
 //they should be updated to use our newer services.
 export BocaShell_BtSt_Function(grouped dataset(risk_indicators.layout_ciid_btst_Output) iid_btst, dataset(Gateway.Layouts.Config) gateways,
@@ -9,7 +9,8 @@ export BocaShell_BtSt_Function(grouped dataset(risk_indicators.layout_ciid_btst_
 													string50 DataRestriction=iid_constants.default_DataRestriction, unsigned8 inBSOptions = 0,
 													string50 DataPermission = risk_indicators.iid_constants.default_DataPermission,
 													dataset(Risk_Indicators.Layout_BocaShell_BtSt.input_Scores) input_Scores = dataset( [], Risk_Indicators.Layout_BocaShell_BtSt.input_Scores),
-													boolean NetAcuity_v4 = true, boolean ipid_only = false) := FUNCTION 
+													boolean NetAcuity_v4 = true, boolean ipid_only = false,
+													boolean skip_businessHeader = false) := FUNCTION 
 
 risk_indicators.Layout_Output norm(iid_btst L, integer C) := transform
 	self.seq := L.Bill_To_Output.seq + C - 1;
@@ -106,9 +107,23 @@ WithNeg1s := join(iid_btst, iid_btst_filtered,
 		self := left;
 		self := []), atmost(riskwise.max_atmost), left only, parallel);
 
+// skip the business header searching to make the query faster for OSN1608 for vivid seats
+btst_without_busHeader := project(iid_btst,
+transform(risk_indicators.layout_bocashell_btst_out,
+		self.btst_did_summary := map(
+																left.bill_to_output.did != 0 and left.ship_to_output.did = 0 => 1,
+																left.bill_to_output.did = 0 and left.ship_to_output.did != 0 => 2,
+																left.bill_to_output.did != 0 and left.ship_to_output.did = left.bill_to_output.did  => 3,
+																left.bill_to_output.did != 0 and left.ship_to_output.did != left.bill_to_output.did  => 4,
+																		0);
+		self.Bill_To_Out := left.Bill_To_Output;
+		self.Ship_To_Out := left.Ship_To_Output;
+		self := [];
+				));
+
 btst_wBusHdr := Boca_Shell_BtSt_Bus_Header(iid_btst, glb, dppa, DataRestriction, DataPermission);
 //verify if did is populated that this works
-btst_wDidSum := JOIN(btst_wBusHdr, btst_wBusHdr,
+btst_wDidSum_original := JOIN(btst_wBusHdr, btst_wBusHdr,
 	left.bill_to_out.seq = right.ship_to_out.seq - 1,
 	transform(risk_indicators.layout_bocashell_btst_out,
 		self.btst_did_summary := map(
@@ -124,6 +139,8 @@ btst_wDidSum := JOIN(btst_wBusHdr, btst_wBusHdr,
 		self.bill_to_out := left.bill_to_out;
 		self.ship_to_out := left.ship_to_out,
 		self := left), atmost(riskwise.max_atmost), left outer, parallel);
+
+btst_wDidSum := if(skip_businessHeader, ungroup(btst_without_busHeader), btst_wDidSum_original);
 
 btst_header := Risk_Indicators.Boca_Shell_BtSt_Header(iid_btst_filtered);
 btst_wHeader := join(btst_wDidSum, btst_header,

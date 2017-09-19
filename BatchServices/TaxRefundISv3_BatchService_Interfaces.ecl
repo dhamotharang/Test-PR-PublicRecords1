@@ -1,5 +1,4 @@
-import iesp;
-EXPORT TaxRefundISv3_BatchService_Interfaces := MODULE
+﻿EXPORT TaxRefundISv3_BatchService_Interfaces := MODULE
 
 	EXPORT Input := INTERFACE
 		// common input options	
@@ -28,9 +27,10 @@ EXPORT TaxRefundISv3_BatchService_Interfaces := MODULE
 		EXPORT unsigned2 DIDScoreThreshold; // 0-100; default 80
 		EXPORT string30  Creditor;
 		EXPORT unsigned3 RefundThreshold;   // 0-0000000; default 0
-		// TRIS v3 specific, new 2015 enhancements input options ---v
-		EXPORT boolean   IncludeIPAddrGW;    // defaults to true in TaxRefundISv3_BatchService
-		EXPORT boolean   IncludeDebtEvasion; // defaults to true in TaxRefundISv3_BatchService
+		// TRIS v3.2 Enhancement: IncludeIPAddrGW & IncludeDebtEvasion are no longer to be used. 
+		// EXPORT boolean   IncludeIPAddrGW;    // defaults to true
+		// EXPORT boolean   IncludeDebtEvasion; // defaults to true
+		
 		// TRIS v3.1 with fdn
 		EXPORT boolean includeDependantID;   // default false
 		EXPORT Integer IPAddrExceedsRange; // default 100

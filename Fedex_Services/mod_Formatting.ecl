@@ -1,4 +1,4 @@
-import doxie,ut,Address,Address_file,did_add,mdr;
+import doxie,ut,Address,did_add,mdr;
 
 //NOTE: address_type gets set here, but then updated later by Fedex_Services.fn_CheckAddrType
 

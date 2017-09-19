@@ -1,4 +1,7 @@
-﻿import risk_indicators, ut;
+﻿/*2017-08-09T23:16:44Z (Kevin Huls)
+MS-160 - correctly use the full date from 'HistoryDateTimeStamp' when it is provided on input.
+*/
+import risk_indicators, ut;
 
 EXPORT shell_constants :=  module
 
@@ -6,9 +9,9 @@ export collections_vertical_set := ['COLLECTIONS','RECEIVABLES MANAGEMENT','1PC'
 
 // for FCRA, we need to cap records at 1 years from the history date
 // for non-fcra, allow anything as long as the log_date is populated
-export	inquiry_is_ok(unsigned3 historydate, STRING8 log_date, boolean isFCRA) := function
-			today := risk_indicators.iid_constants.mygetdate(historydate);
-			inquiryOK_fcra := ut.DaysApart(today,log_date) < ut.DaysInNYears(1);
+export	inquiry_is_ok(unsigned3 historydate, STRING8 log_date, boolean isFCRA, string historyDateTimeStamp = '') := function
+			today := risk_indicators.iid_constants.mygetdatetimestamp(historyDateTimeStamp, historydate);
+			inquiryOK_fcra := ut.DaysApart(today[1..8],log_date) < ut.DaysInNYears(1);
 			inquiryOK := if(isFCRA, inquiryOK_fcra, log_date<>'');
 			return inquiryOK;
 end;
@@ -1457,7 +1460,7 @@ export Valid_Suspicious_Fraud_Inquiry(UNSIGNED3 ArchiveDate, STRING8 LogDate, ST
 		TRIM(Use) = '';
 
 export Valid_Velocity_Inquiry(string vertical, string industry, string func, string logdate, unsigned3 historydate, 
-											string sub_market, string use, string product_code, string fcra_purpose, boolean isFCRA, integer bsVersion, string method) := function
+											string sub_market, string use, string product_code, string fcra_purpose, boolean isFCRA, integer bsVersion, string method, string historyDateTimeStamp = '') := function
 		collections_bucket := if(bsversion>=50, collections_vertical_set, 	['COLLECTIONS','1PC','3PC']);											 
 		isCollection := (~isFCRA or trim(fcra_purpose) = '164') and
 										trim(StringLib.StringToUpperCase(vertical)) in collections_bucket or 
@@ -1465,7 +1468,7 @@ export Valid_Velocity_Inquiry(string vertical, string industry, string func, str
 										StringLib.StringFind(StringLib.StringToUpperCase(sub_market),'FIRST PARTY', 1) > 0;
 										
 		func_desc := trim(StringLib.StringToUpperCase(func));
-		agebucket := risk_indicators.iid_constants.age_bucket(logdate, historydate);
+		agebucket := risk_indicators.iid_constants.age_bucket(logdate, historydate, historyDateTimeStamp);
 		
 		// for ticket MS-97, filter out batch inquiries for anything >= 52.  changing it for shell 50 was going to impact over 30% of existing customer transactions
 		method_ok := bsversion < 52 or trim(StringLib.StringToUpperCase(method)) not in ['BATCH','MONITORING'];
@@ -1483,7 +1486,7 @@ end;
 
 // this function is the same as Valid_Velocity_Inquiry with the exception of the fact that they want to keep Batch and Monitoring inquiries included in the VirtualFraud counts
 export Valid_VirtualFraud_Velocity_Inquiry(string vertical, string industry, string func, string logdate, unsigned3 historydate, 
-											string sub_market, string use, string product_code, string fcra_purpose, boolean isFCRA, integer bsVersion) := function
+											string sub_market, string use, string product_code, string fcra_purpose, boolean isFCRA, integer bsVersion, string historyDateTimeStamp = '') := function
 		collections_bucket := if(bsversion>=50, collections_vertical_set, 	['COLLECTIONS','1PC','3PC']);											 
 		isCollection := (~isFCRA or trim(fcra_purpose) = '164') and
 										trim(StringLib.StringToUpperCase(vertical)) in collections_bucket or 
@@ -1491,7 +1494,7 @@ export Valid_VirtualFraud_Velocity_Inquiry(string vertical, string industry, str
 										StringLib.StringFind(StringLib.StringToUpperCase(sub_market),'FIRST PARTY', 1) > 0;
 										
 		func_desc := trim(StringLib.StringToUpperCase(func));
-		agebucket := risk_indicators.iid_constants.age_bucket(logdate, historydate);
+		agebucket := risk_indicators.iid_constants.age_bucket(logdate, historydate, historyDateTimeStamp);
 		
 		return logdate<>'' and
 										agebucket <= 12 and
@@ -1503,9 +1506,9 @@ export Valid_VirtualFraud_Velocity_Inquiry(string vertical, string industry, str
 end;
 
 
-export ValidCBDInquiry(string func, string logdate, unsigned3 historydate, string use,string product_code) :=
+export ValidCBDInquiry(string func, string logdate, unsigned3 historydate, string use,string product_code, string historyDateTimeStamp = '') :=
 	logdate != ''
-	and risk_indicators.iid_constants.age_bucket(logdate, historydate) <= 12
+	and risk_indicators.iid_constants.age_bucket(logdate, historydate, historyDateTimeStamp) <= 12
 	and trim(StringLib.StringToUpperCase(func)) in chargeback_functions
 	and trim(use)='' and
 	trim(product_code) in valid_product_codes;	
@@ -1582,7 +1585,7 @@ export Valid_BillGroup_Inquiry(string vertical,
 															 string use,
 															 string product_code, 
 															 string fcra_purpose, 
-															 boolean isFCRA, integer bsVersion) :=function
+															 boolean isFCRA, integer bsVersion, string historyDateTimeStamp = '') :=function
 															 
         collections_bucket := if(bsversion>=50, collections_vertical_set,['COLLECTIONS','1PC','3PC']);                                             
         isCollection := (~isFCRA or trim(fcra_purpose) = '164') and 
@@ -1591,7 +1594,7 @@ export Valid_BillGroup_Inquiry(string vertical,
 												StringLib.StringFind(StringLib.StringToUpperCase(sub_market),'FIRST PARTY', 1)> 0;
 
         func_desc := trim(StringLib.StringToUpperCase(func));
-        agebucket := risk_indicators.iid_constants.age_bucket(logdate,historydate);
+        agebucket := risk_indicators.iid_constants.age_bucket(logdate,historydate, historyDateTimeStamp);
 
         return logdate<>'' and  inquiry_is_ok(historydate,logdate, isFCRA) and
                                 not isCollection and 
