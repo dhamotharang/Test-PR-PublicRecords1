@@ -1,4 +1,4 @@
-IMPORT bair,ut, mdr, tools, _validate, Address, Ut, lib_stringlib, _Control, business_header, Enclarity,
+﻿IMPORT bair,ut, mdr, tools, _validate, Address, Ut, lib_stringlib, _Control, business_header, Enclarity,
 Header, Header_Slimsort, didville, ut, DID_Add, Business_Header_SS, NID, AID,STD,Vehicle_Wildcard, Bair_composite, SALT32;
 
 EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
@@ -153,9 +153,14 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self.recordid_raids			:=L.recordid_raids;
 				self.Prepped_rec_type		:=Bair._Constant.Events_Mo_address_of_crime;
 				self.orig_address				:=L.address_of_crime;
-				self.orig_City					:=L.city;
-				self.orig_st						:=L.state;
-				self.orig_zip						:=L.zip;
+
+				temp_adddr 	:= trim(regexreplace('USA$', L.address_of_crime, ' ' ), left, right);
+				goodAddr 		:= if(count(STD.STr.SplitWords(temp_adddr,',')) = 3, true, false);
+				
+				self.orig_City					:=trim(if(goodAddr, STD.STr.SplitWords(temp_adddr,',')[2], ''), left, right);
+				self.orig_st						:=trim(if(goodAddr, regexfind('[a-z]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				self.orig_zip						:=trim(if(goodAddr, regexfind('[0-9]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				
 				self.dt_first_seen			:=L.clean_First_Date_Time;
 				self.dt_last_seen				:=L.clean_Last_Date_Time;
 				self.class_code					:=Bair.MapClassCodeNum(1, (string)L.ucr_group);
@@ -197,9 +202,14 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self.recordid_raids			:=L.recordid_raids;
 				self.Prepped_rec_type		:=Bair._Constant.Events_Mo_address_of_crime;
 				self.orig_address				:=L.address_of_crime;
-				self.orig_City					:=L.city;
-				self.orig_st						:=L.state;
-				self.orig_zip						:=L.zip;
+				
+				temp_adddr 	:= trim(regexreplace('USA$', L.address_of_crime, ' ' ), left, right);
+				goodAddr 		:= if(count(STD.STr.SplitWords(temp_adddr,',')) = 3, true, false);
+				
+				self.orig_City					:=trim(if(goodAddr, STD.STr.SplitWords(temp_adddr,',')[2], ''), left, right);
+				self.orig_st						:=trim(if(goodAddr, regexfind('[a-z]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				self.orig_zip						:=trim(if(goodAddr, regexfind('[0-9]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				
 				self.dt_first_seen			:=L.clean_First_Date_Time;
 				self.dt_last_seen				:=L.clean_Last_Date_Time;
 				self.class_code					:=Bair.MapClassCodeNum(1, (string)L.ucr_group);
