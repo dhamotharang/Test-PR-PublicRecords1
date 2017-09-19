@@ -1,4 +1,4 @@
-export procPreProcess_CA(string filedate) := function
+﻿export procPreProcess_CA(string filedate) := function
 
 dsInput	:=	UCCV2.File_CA_ALL_In;
 
@@ -337,7 +337,21 @@ ucc3									:=	output(UCC3In,,'~thor_data400::in::uccv2::'+filedate+'::ca::ucc3
 AddSuperucc3					:=	fileservices.addsuperfile('~thor_data400::in::uccv2::ca::ucc3','~thor_data400::in::uccv2::'+filedate+'::ca::ucc3');
 AddSuperucc3Processed	:=	fileservices.addsuperfile('~thor_data400::in::uccv2::ca::ucc3::processed','~thor_data400::in::uccv2::'+filedate+'::ca::ucc3');
 
-UCCV2.Layout_File_CA_Collateral_in	trfCollateral(UCCV2.Layout_File_Variable_All	pInput)	:=	transform
+// This temporary layout was added to correct an issue with Collateral being truncated. 
+// The Layout_File_CA_Collateral_in layout has all_collateral defined as a string 512, but it
+// needs to be a varying string until after the rollup.  JIRA DF-19839.
+tempCollateralLay := record						
+	string8    process_date;
+	string1    record_type;
+	string14   initial_filing_number;
+	string12   static;
+	string10   ucc3_filing_number;
+	string6    collateral_line_seq_no;
+	string80   collateral_desc;
+	string     all_collateral; // needs to not be restricted to 512 characters until after rollup
+end;
+
+tempCollateralLay	trfCollateral(UCCV2.Layout_File_Variable_All	pInput)	:=	transform
 	self.process_date								:=	filedate;
 	self.record_type								:=	pInput.line[1];
 	self.initial_filing_number			:=	pInput.line[2..15];
@@ -352,20 +366,27 @@ UCCV2.Layout_File_CA_Collateral_in	trfCollateral(UCCV2.Layout_File_Variable_All	
 end;
 	
 CollateralIn							:=	project(dsInput(line[1]='7'),trfCollateral(left));
-srtedCollateralIn					:=	sort(CollateralIn,initial_filing_number,ucc3_filing_number,collateral_line_seq_no);
+srtedCollateralIn					:=	sort(CollateralIn,initial_filing_number,ucc3_filing_number,(integer)collateral_line_seq_no);
 
-UCCV2.Layout_File_CA_Collateral_in trfRollupCollateral(UCCV2.Layout_File_CA_Collateral_in l, UCCV2.Layout_File_CA_Collateral_in r) := transform
-	self.all_collateral			:=	(l.collateral_desc + ' ' + r.collateral_desc);
+tempCollateralLay trfRollupCollateral(tempCollateralLay l, tempCollateralLay r) := transform
+	self.all_collateral			:=	(l.all_collateral + ' ' + r.all_collateral);
 	self										:=	l;
 end;
 
 rolledCollateralIn				:=	rollup(	srtedCollateralIn
+																			,left.initial_filing_number = right.initial_filing_number and
+																			 left.ucc3_filing_number = right.ucc3_filing_number
 																			,trfRollupCollateral(left,right)
-																			,initial_filing_number
-																			,ucc3_filing_number
 																		 );
 
-Collateral									:=	output(rolledCollateralIn,,'~thor_data400::in::uccv2::'+filedate+'::ca::Collateral',overwrite);
+UCCV2.Layout_File_CA_Collateral_in	trfCollOut(rolledCollateralIn	l)	:=	transform
+	self.all_collateral			:=	StringLib.StringCleanSpaces(l.all_collateral);
+	self										:=	l;
+end;
+	
+CollateralOut							:=	project(rolledCollateralIn,trfCollOut(left));
+
+Collateral									:=	output(CollateralOut,,'~thor_data400::in::uccv2::'+filedate+'::ca::Collateral',overwrite);
 AddSupercollateral					:=	fileservices.addsuperfile('~thor_data400::in::uccv2::ca::Collateral','~thor_data400::in::uccv2::'+filedate+'::ca::Collateral');
 AddSupercollateralProcessed	:=	fileservices.addsuperfile('~thor_data400::in::uccv2::ca::Collateral::processed','~thor_data400::in::uccv2::'+filedate+'::ca::Collateral');
 
