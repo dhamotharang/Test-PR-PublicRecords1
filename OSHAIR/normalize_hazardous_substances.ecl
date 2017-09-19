@@ -1,4 +1,4 @@
-import OSHAIR,Business_Header,Address,lib_stringlib,ut;
+﻿import OSHAIR,Business_Header,Address,lib_stringlib,ut;
 
 export normalize_hazardous_substances(string filedate, string process_date) := FUNCTION
 
@@ -48,6 +48,6 @@ HazSubRollup := rollup(sort(dsAllHazardous_Substances, record, except dt_first_s
 														dt_vendor_first_reported, dt_vendor_last_reported
 										, local);
 
-return output(HazSubRollup,,'~thor_data400::base::oshair::' + filedate + '::hazardous_substance',overwrite);
+return output(HazSubRollup,,'~thor_data400::base::oshair::' + filedate + '::hazardous_substance',compressed,overwrite);
 
 end;
