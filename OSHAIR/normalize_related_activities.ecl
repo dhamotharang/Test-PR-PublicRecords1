@@ -1,4 +1,4 @@
-import OSHAIR,Business_Header,Address,lib_stringlib,ut;
+﻿import OSHAIR,Business_Header,Address,lib_stringlib,ut;
 
 export normalize_related_activities(string filedate, string process_date):= FUNCTION
 
@@ -40,6 +40,6 @@ RelActRollup	:= rollup(sort(dsAllRelAct,record, except dt_first_seen,dt_last_see
 														dt_vendor_first_reported, dt_vendor_last_reported
 										, local);
 
-return output(RelActRollup,,'~thor_data400::base::oshair::' + filedate + '::related_activity',overwrite);
+return output(RelActRollup,,'~thor_data400::base::oshair::' + filedate + '::related_activity',compressed,overwrite);
 
 end;

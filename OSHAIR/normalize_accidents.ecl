@@ -1,4 +1,4 @@
-#option('skipFileFormatCrcCheck', 1);
+﻿#option('skipFileFormatCrcCheck', 1);
 import OSHAIR,Business_Header,Address,lib_stringlib,ut;
 
 export normalize_accidents(string filedate, string process_date) := FUNCTION
@@ -57,6 +57,6 @@ AccidentRollup := rollup(sort(dsAll,activity_number,record,except dt_first_seen,
 														dt_vendor_first_reported, dt_vendor_last_reported
 										, local);
 
-return output(AccidentRollup,,'~thor_data400::base::oshair::' + filedate + '::accident',overwrite);
+return output(AccidentRollup,,'~thor_data400::base::oshair::' + filedate + '::accident',compressed,overwrite);
 
 end;

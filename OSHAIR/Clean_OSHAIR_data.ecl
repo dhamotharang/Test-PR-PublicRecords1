@@ -1,4 +1,4 @@
-import did_add,fair_isaac,didville,ut,header_slimsort,watchdog, Business_Header, Business_Header_SS,OSHAIR, Census_Data, lib_stringlib, address, mdr, BIPV2, _validate;
+﻿import did_add,fair_isaac,didville,ut,header_slimsort,watchdog, Business_Header, Business_Header_SS,OSHAIR, Census_Data, lib_stringlib, address, mdr, BIPV2, _validate;
 
 export Clean_OSHAIR_data (string filedate, string process_date) := function
 
@@ -196,7 +196,7 @@ InspectionRollup := rollup(srtOSHAIR, RollupInspection(left, right), record
 /* Generate the other OSHA base files */
 OSHAIR.normalize_child_datasets(filedate, process_date);
 
-return output(InspectionRollup,,'~thor_data400::base::oshair::' + filedate + '::inspection',overwrite);
+return output(InspectionRollup,,'~thor_data400::base::oshair::' + filedate + '::inspection',compressed, overwrite);
 						  
 end;
 
