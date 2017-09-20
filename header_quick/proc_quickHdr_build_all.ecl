@@ -91,7 +91,8 @@ export proc_quickHdr_build_all (string sourceIP, string filedate) := function
 	
 	return sequential( 
                      check_superfiles_are_in_sync
-                    ,doWeekly,doMonthly
+                    ,doWeekly
+                    ,doMonthly
                     ,Inputs_Clear
                     ,Inputs_Set(filedate)
                     ,buildAll
