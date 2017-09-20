@@ -1,4 +1,4 @@
-// Kansas Real Estate Agents, Brokers, & Firms
+﻿// Kansas Real Estate Agents, Brokers, & Firms
 export layout_KSS0903 := MODULE
 EXPORT raw := RECORD
 	string  LAST_NAME;
@@ -13,7 +13,7 @@ EXPORT raw := RECORD
 	string	EXPIRATION_DATE;		//fmt: YYYYMMDD, MM/DD/YYYY
 	string	SUM_OF_HOURS;
 	string	LICENSE_STATUS;
-	string	STATUS_CODE;
+	// string	STATUS_CODE;
 	string	COMPANY_LICENSE_NUMBER;	
 	string	COMPANY_NAME;		
 	string	BUSINESS_PHONE;
