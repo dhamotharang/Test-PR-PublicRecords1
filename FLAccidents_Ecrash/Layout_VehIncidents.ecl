@@ -106,7 +106,7 @@
 		STRING8 Policy_Expiration_Date;
 		STRING25  v_city_name;
     //BuyCrash project KY Integration
-		STRING3  contrb_source;
+		STRING3  contrib_source;
 		UNSIGNED8 	__internal_fpos__;
 	END;
 
