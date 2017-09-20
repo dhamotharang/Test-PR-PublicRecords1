@@ -1,4 +1,4 @@
-import scrubs_bk_search, scrubs,  Scrubs_bk_main, ut;
+﻿import scrubs_bk_search, scrubs,  Scrubs_bk_main, ut;
 #OPTION('multiplePersistInstances',FALSE);
 
 export proc_build_base(string filedate) := function
