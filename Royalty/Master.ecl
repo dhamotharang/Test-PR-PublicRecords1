@@ -52,6 +52,7 @@ export Master := dataset(
 			{'ROYALTY', 'EN_RTPERSON_SRCH', '142'		, 'G', ''			, 'Experian Realtime Person Search'},
 			{'ROYALTY', 'EXP_NC_CRIM',      '143'		, 'G', ''			, 'Experian North Carolina Criminal Records'},
 			{'ROYALTY', 'EXPERIAN_PLATE_VIN', '144'		, 'G', ''		, 'Experian plate to VIN'},
+			{'ROYALTY', 'EXPERIAN_AUTO_CHECK', '145'	, 'G', ''		, 'Experian AutoCheck auto history'},
 			// RESERVED: 150-159 - Inview Business Report 
 			{'ROYALTY', 'INVIEW_DEFAULT'		, '150', 'G', ''			, 'Business InView - Default'}, 
 			{'ROYALTY', 'INVIEW_REPORT'			, '151', 'G', ''			, 'Business InView - BCRCI, BFRLEVL, BCIR Custom'}, 
@@ -221,6 +222,8 @@ export Master := dataset(
       {'ROYALTY', 'EFX_TWN_VOI',                      '622', 'G', '' , 'Equifax TWN Verification of Income'},	
       {'ROYALTY', 'EFX_TWN_EI',                       '623', 'G', '' , 'Equifax TWN Employment Indicator'},	
       {'ROYALTY', 'EFX_TWN_EI_ENH',                   '624', 'G', '' , 'Equifax TWN Enhanced Employment Indicator'},
+			{'ROYALTY', 'DMD',                              '640', 'I', '' , 'Health Care Practitioner email addresses'},
+			{'ROYALTY', 'FDNCORR',                          '650', 'I', '' , 'LexisNexis internal FDN logging'},
 			{'ROYALTY', 'CORTERA_REPORT',                   '700', 'G', '' , 'Cortera business info gateway'},
 			{'ROYALTY', 'ACCUDATA_DEFAULT',                 '710', 'G', '' , 'Accudata standard request'},
 			{'ROYALTY', 'ACCUDATA_CNAM_CNM2',               '711', 'G', '' , 'Accudata phone number calling name'},

@@ -1,4 +1,4 @@
-import MDR, codes;
+﻿import MDR, codes;
 
 EXPORT Constants := module
 	
@@ -67,9 +67,10 @@ EXPORT Constants := module
 		export unsigned2 FICOSCOREXD		:= 429;	
 		export unsigned2 GG2						:= 450;
 		export unsigned2 GDC						:= 500;
-		export unsigned2 MLAALERT				:= 590;	 
+		export unsigned2 MLAALERT				:= 590;	
 		export unsigned2 ATT_IAP_DQ_IRS	:= 611;	 
 		export unsigned2 EFX_CCR        := 620;
+		export unsigned2 FDNCORR   := 650;
 		export unsigned2 ACCUDATA_CNAM_CNM2   := 711;
  		export unsigned2 ACCUDATA_OCN_LNP   := 712;  
 	end;		
@@ -143,6 +144,7 @@ EXPORT Constants := module
 		export GDC						:= _TYPE(RoyaltyCode.GDC);
 		export ATT_IAP_DQ_IRS	:= _TYPE(RoyaltyCode.ATT_IAP_DQ_IRS);
 		export EFX_CCR        := _TYPE(RoyaltyCode.EFX_CCR);
+		export FDNCORR					:= _TYPE(RoyaltyCode.FDNCORR);  
 		export ACCUDATA_CNAM_CNM2				:= _TYPE(RoyaltyCode.ACCUDATA_CNAM_CNM2); 
 		export ACCUDATA_OCN_LNP					:= _TYPE(RoyaltyCode.ACCUDATA_OCN_LNP);  
 	end;
