@@ -621,6 +621,7 @@ EXPORT TaxRefundISv3_BatchService_Records(
 														(L.hri_3_code in ACCEPTABLE_HRI_CODES_ADDR_risk) or
 														(L.hri_4_code in ACCEPTABLE_HRI_CODES_ADDR_risk)
 														,'Y','');
+		SELF.FDN_COUNT := COUNT(R);
 	  SELF := L;
 	  SELF := [];
 	END;
