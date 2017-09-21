@@ -1,4 +1,4 @@
-#workunit('name', 'V12 Build');
+﻿#workunit('name', 'V12 Build');
 
 IMPORT	ut
 				, AID
@@ -105,11 +105,11 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 	BOOLEAN basefileexists	:=	nothor(fileservices.GetSuperFileSubCount(V12.thor_cluster + 'base::V12')) > 0; 
 	
 	BasePlusIn	:=	IF(basefileexists, combinedInputFileClnName + V12.files.V12_base, combinedInputFileClnName);
-	srtBasePlus	:= sort(distribute(BasePlusIn,hash(email)), email, local);
+	srtBasePlus	:= sort(distribute(BasePlusIn,hash(StringLib.StringToUpperCase(TRIM(email,ALL)))), StringLib.StringToUpperCase(TRIM(email,ALL)), local);
 	
 	//Mark records for optout
-	srt_optout := sort(distribute(V12.files.V12_optout_in,hash(email)),email, local);
-	optoutInputFile := dedup(srt_optout);
+	srt_optout := sort(distribute(V12.files.V12_optout_in,hash(StringLib.StringToUpperCase(TRIM(email,ALL)))),StringLib.StringToUpperCase(TRIM(email,ALL)), local);
+	optoutInputFile := dedup(srt_optout, StringLib.StringToUpperCase(TRIM(email,ALL)), local);
 	V12.layouts.V12_base	tMarkOptOuts(BasePlusIn pLeft, optoutInputFile pLkp)
 		:=
 			TRANSFORM
@@ -120,7 +120,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 		
 	BasePlusInOptOuts			:=	JOIN(srtBasePlus, optoutInputFile, 
 															StringLib.StringToUpperCase(TRIM(LEFT.email,ALL)) = StringLib.StringToUpperCase(TRIM(RIGHT.email,ALL)), 
-															tMarkOptOuts(left,right), LEFT OUTER, LOOKUP, LOCAL);
+															tMarkOptOuts(left,right), LEFT OUTER, LOCAL);
 															
 	// BasePlusInNonOptOuts	:=	JOIN(BasePlusIn, files.V12_optout_in, 
 															// StringLib.StringToUpperCase(TRIM(LEFT.email, ALL)) = StringLib.StringToUpperCase(TRIM(RIGHT.email, ALL)), 
@@ -129,8 +129,8 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 	//rsOOMarked							:=	BasePlusInOptOuts + BasePlusInNonOptOuts;
 
 	//Mark records for hardbounce
-	srt_hbInput	:= sort(distribute(V12.files.V12_hb_in,hash(email)),email, local);
-	hbInputFile := dedup(srt_hbInput);
+	srt_hbInput	:= sort(distribute(V12.files.V12_hb_in,hash(StringLib.StringToUpperCase(TRIM(email,ALL)))),StringLib.StringToUpperCase(TRIM(email,ALL)), local);
+	hbInputFile := dedup(srt_hbInput, StringLib.StringToUpperCase(TRIM(email,ALL)), local);
 	V12.layouts.V12_base	tMarkHBs(BasePlusInOptOuts pLeft, hbInputFile pLkp)
 		:=
 			TRANSFORM
@@ -141,7 +141,7 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 		
 	rsHBs									:=	JOIN(BasePlusInOptOuts, hbInputFile, 
 															StringLib.StringToUpperCase(TRIM(LEFT.email,ALL)) = StringLib.StringToUpperCase(TRIM(RIGHT.email,ALL)), 
-															tMarkHBs(left,right), LEFT OUTER, LOOKUP, LOCAL);
+															tMarkHBs(left,right), LEFT OUTER, LOCAL);
 															
 	// rsNonHBs							:=	JOIN(rsOOMarked, files.V12_hb_in, 
 															// StringLib.StringToUpperCase(TRIM(LEFT.email, ALL)) = StringLib.StringToUpperCase(TRIM(RIGHT.email, ALL)), 
