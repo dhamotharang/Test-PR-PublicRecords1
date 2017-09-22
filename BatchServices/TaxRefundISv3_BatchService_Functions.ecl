@@ -143,6 +143,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 																											//TRISv3.2 Enhancement : As per requirement, GBA should not be used for both 3.1 and 3.2 versions. Switching it back to Traditional Best.
 				export isV2Score										:= TRUE;  //RQ-13614: Switching to use V2 scores as defined in "AddrBest.BestAddr_common", for improving name_score & ssn_score results
 																											// ..to be used later on for returning "inputaddrdate" and other significant fields.
+				export IncludeHistoricRecords				:= TRUE;  //RQ-13700 : Defaulting to TRUE, so we get address/dates older than 10 years.																											
 			end;
 
 			addrBest_res := AddrBest.Records(addrBest_batch, addrBest_mod).best_records;
@@ -154,6 +155,8 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 				string6 InputZipMatchDate;
 				boolean InputZipMatch;
 				boolean InputStateMatch;
+				string6 InputAddrFirstSeen;
+				string6 InputAddrLastSeen;				
       end;
      
       address_record xformFindMatch(addrBest_res L) := transform
@@ -167,6 +170,9 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 																						and prim_name_in = L.prim_name 
 																						and (zip_in = L.z5 or (city_in = L.p_city_name and state_in = L.st)));
         self.InputAddrDate := L.addr_dt_last_seen;
+        self.InputAddrFirstSeen := L.addr_dt_first_seen;
+        self.InputAddrLastSeen := L.addr_dt_last_seen;
+				
 				inputZipMatch := L.z5 = zip_in;
 				inputStateMatch := L.st = args_in.input_state;
        	self.InputStateMatch := inputStateMatch;	
@@ -182,6 +188,12 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
         self.InputAddrDate := map(L.hasInputAddr => L.InputAddrDate,
                                   R.hasInputAddr => R.InputAddrDate,
                                   '');
+        self.InputAddrFirstSeen :=	map(L.hasInputAddr => L.InputAddrFirstSeen,
+																				R.hasInputAddr => R.InputAddrFirstSeen,
+																				'');
+        self.InputAddrLastSeen :=		map(L.hasInputAddr => L.InputAddrLastSeen,
+																				R.hasInputAddr => R.InputAddrLastSeen,
+																				'');																	
         leftZipDate := if (L.InputZipMatch, l.InputZipMatchDate,'');
 				rightZipDate := if (R.InputZipMatch, R.InputZipMatchDate,''); 
         self.InputZipMatchDate	:= max(leftZipDate, rightZipDate);																
