@@ -1,4 +1,4 @@
-import ut,_Control,Address;
+﻿import ut,_Control,Address;
 export Proc_BK_Preprocess(string filedate) := function
 	inCase := Bankruptcyv2.File_In_Case;
 	inDefendants := Bankruptcyv2.File_In_Defendants;
@@ -765,7 +765,7 @@ export Proc_BK_Preprocess(string filedate) := function
 									fileservices.clearsuperfile('~thor_data400::in::bankruptcyv3::main'),
 									fileservices.removesuperfile('~thor_data400::in::bankruptcyv3::main_full','~thor_data400::in::bankruptcyv3::'+filedate+'::main')
 									)),
-							output(court_case_out,,'~thor_data400::in::bankruptcyv3::'+filedate+'::main',overwrite)),
+							output(court_case_out,,'~thor_data400::in::bankruptcyv3::'+filedate+'::main',overwrite,COMPRESSED)),
 							sequential(
 							if (fileservices.findsuperfilesubname('~thor_data400::in::bankruptcyv3::search','~thor_data400::in::bankruptcyv3::'+filedate+'::search') > 0 or
 							fileservices.findsuperfilesubname('~thor_data400::in::bankruptcyv3::search_full','~thor_data400::in::bankruptcyv3::'+filedate+'::search') > 0,
@@ -773,7 +773,7 @@ export Proc_BK_Preprocess(string filedate) := function
 									fileservices.clearsuperfile('~thor_data400::in::bankruptcyv3::search'),
 									fileservices.removesuperfile('~thor_data400::in::bankruptcyv3::search_full','~thor_data400::in::bankruptcyv3::'+filedate+'::search')
 									)),
-							output(court_search_out,,'~thor_data400::in::bankruptcyv3::'+filedate+'::search',overwrite))
+							output(court_search_out,,'~thor_data400::in::bankruptcyv3::'+filedate+'::search',overwrite,COMPRESSED))
 							);
 	
 	super_main := sequential(
