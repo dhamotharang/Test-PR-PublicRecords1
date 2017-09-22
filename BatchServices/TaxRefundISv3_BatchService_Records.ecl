@@ -254,8 +254,8 @@ EXPORT TaxRefundISv3_BatchService_Records(
 
 		// end req 4.1.24
 				
-		self.InputAddrFirst_Seen := if(isInputAddrMatch, addr_rec.addr_dt_first_seen, '');
-		self.InputAddrLast_Seen  := if(isInputAddrMatch, addr_rec.addr_dt_last_seen, '');
+		self.InputAddrFirst_Seen := addr_rec.InputAddrFirstSeen;
+		self.InputAddrLast_Seen  := addr_rec.InputAddrLastSeen;
 
 		// req 4.1.25
 		self.InputAddrState := if(addr_rec.InputStateMatch, 'Y', 'N');
