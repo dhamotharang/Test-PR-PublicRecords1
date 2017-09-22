@@ -1,4 +1,4 @@
-export Proc_Misc_Tasks(filedate) := macro
+﻿export Proc_Misc_Tasks(filedate) := macro
 import Bankruptcyv3,BankruptcyV2,RoxieKeyBuild,orbit_report,_Control;	
 
 dummy_rec := record
@@ -55,8 +55,8 @@ despraymoxiefiles := sequential(
 
 Bankruptcyv2.Consolidate_SubFiles(BankruptcyV2.Layout_In_Case,'~thor_data400::in::bankruptcyv3::case_full',true,caseret);
 Bankruptcyv2.Consolidate_SubFiles(BankruptcyV2.Layout_In_Defendants,'~thor_data400::in::bankruptcyv3::defendants_full',true,defret);
-/*Bankruptcyv2.Consolidate_SubFiles(BankruptcyV2.layout_bankruptcy_main_in,'~thor_data400::in::bankruptcyv3::main_full',false,mainret);
-Bankruptcyv2.Consolidate_SubFiles(BankruptcyV2.layout_bankruptcy_search_in,'~thor_data400::in::bankruptcyv3::search_full',false,searchret);*/
+Bankruptcyv2.Consolidate_SubFiles(BankruptcyV2.layout_bankruptcy_main_in,'~thor_data400::in::bankruptcyv3::main_full',false,mainret);
+Bankruptcyv2.Consolidate_SubFiles(BankruptcyV2.layout_bankruptcy_search_in,'~thor_data400::in::bankruptcyv3::search_full',false,searchret);
 	
 sequential(/*dops_update
 		,*/build_relationships
@@ -72,7 +72,7 @@ sequential(/*dops_update
 		,orbitreport
 		,addfullfilestosuper
 		,BIP_dops_update
-		,parallel(caseret,defret/*,mainret,searchret*/)
+		,parallel(caseret,defret,mainret,searchret)
 		) : WHEN(event('Yogurt:BANKRUPTCY ROXIE KEY BUILD COMPLETE','*'), count(1));
 
 endmacro;
