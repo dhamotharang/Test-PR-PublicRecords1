@@ -1,19 +1,22 @@
-IMPORT UT, doxie, standard, ut, doxie_ln, NID,census_data, LN_Propertyv2,AID, AID_Build,BIPV2,LN_PropertyV2_Fast,std, PRTE2_LNProperty_Ins;
+﻿IMPORT UT, doxie, standard, ut, doxie_ln, NID,census_data, LN_Propertyv2,AID, AID_Build,BIPV2,LN_PropertyV2_Fast,std, PRTE2_LNProperty_Ins;
 EXPORT files := module
 
 	EXPORT ln_propertyv2_deed_in := DATASET('~PRTE::IN::ln_propertyv2::deed', Layouts.prte__ln_propertyV2__base__deed, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 
-	EXPORT ln_propertyv2_tax_in := DATASET('~PRTE::IN::ln_propertyv2::tax', Layouts.prte__ln_propertyV2__base__tax, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );//
+	EXPORT ln_propertyv2_tax_in := DATASET('~PRTE::IN::ln_propertyv2::tax', Layouts.prte__ln_propertyV2__base__tax, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 
 	EXPORT ln_propertyv2_search_in := DATASET('~PRTE::IN::ln_propertyv2::search', Layouts.prte__ln_propertyV2__base__search, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 
-	ln_propertyv2_deed_base := DATASET('~PRTE::BASE::ln_propertyv2::deed', Layouts.layout_deed_mortgage_common_model_base, THOR );
+	ln_propertyv2_deed_base := DATASET('~PRTE::BASE::ln_propertyv2::deed', Layouts.deed_mortgage_common_model_base_out, THOR );
 	EXPORT ln_propertyv2_deed := Project(ln_propertyv2_deed_base, Layouts.layout_deed_mortgage_common_model_base - [bug_num, cust_name]);
-	ln_propertyv2_tax_base := DATASET('~PRTE::BASE::ln_propertyv2::tax', Layouts.layout_property_common_model_base, THOR );
+	
+	ln_propertyv2_tax_base := DATASET('~PRTE::BASE::ln_propertyv2::tax', Layouts.property_common_model_base_out, THOR );
 	EXPORT ln_propertyv2_tax := Project(ln_propertyv2_tax_base, Layouts.layout_property_common_model_base - [bug_num, cust_name]);
-	ln_propertyv2_search_base := DATASET('~PRTE::BASE::ln_propertyv2::search', Layouts.layout_search_building, THOR );
+
+	Shared ln_propertyv2_search_base := DATASET('~PRTE::BASE::ln_propertyv2::search', Layouts.New_Search_Layout, THOR );
 	EXPORT ln_propertyv2_search := Project(ln_propertyv2_search_base, Layouts.layout_search_building - [bug_num, cust_name]);
-	EXPORT file_deed_common_model_base_scrubs := Project(ln_propertyv2_deed, Layouts.layout_deed_mortgage_common_model_base_scrubs);
+
+  EXPORT file_deed_common_model_base_scrubs := Project(ln_propertyv2_deed, Layouts.layout_deed_mortgage_common_model_base_scrubs);
 	
 	EXPORT file_property_common_model_base_scrubs := Project(ln_propertyv2_tax, Layouts.layout_property_common_model_base_scrubs);
 	
@@ -40,9 +43,7 @@ EXPORT files := module
 
 	EXPORT DS_addlnames_fid := DATASET([],Layouts.layout_addl_names );
 
-	//EXPORT ln_propertyv2_search := Project(ln_propertyv2_search, TRANSFORM(Layouts.layout_search_building, self := left, self := []));
-
-	EXPORT file_search_fid_linkid := PROJECT(ln_propertyv2_search, TRANSFORM(Layouts.layout_search_fid, self := left, self := []));
+	EXPORT file_search_fid_linkid := PROJECT(ln_propertyv2_search_base, TRANSFORM(Layouts.layout_search_fid, self := left, self := []));
 
 	EXPORT file_search_building_did_out := Project(ln_propertyv2_search, TRANSFORM(Layouts.Layout_DID_Out, self := left, self := []));
 

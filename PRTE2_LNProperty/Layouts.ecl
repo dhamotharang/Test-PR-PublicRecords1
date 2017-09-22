@@ -1,4 +1,4 @@
-IMPORT ln_propertyv2, BIPV2, AID, Standard,Risk_Indicators,Business_header;
+﻿IMPORT ln_propertyv2, BIPV2, AID, Standard,Risk_Indicators,Business_header;
 
 EXPORT Layouts := module
 
@@ -595,6 +595,12 @@ EXPORT Layouts := module
 	string3 ln_seller_mailing_country_code;
 	string100 cust_name;
 	string20 bug_num;
+	string9 name1_link_ssn;
+  string8 name1_link_dob;
+  string9 name2_link_ssn;
+  string8 name2_link_dob;
+  string8 link_inc_date;
+  string9 link_fein;
 	END;
 
 
@@ -819,6 +825,12 @@ EXPORT Layouts := module
 	string1 ln_old_apn_indicator;
 	string100 cust_name;
 	string20 bug_num;
+	string9 assessee_name_link_ssn;
+  string8 assessee_name_link_dob;
+  string9 second_assessee_name_link_ssn;
+  string8 second_assessee_name_link_dob;
+  string8 link_inc_date;
+  string9 link_fein;
 	END;
 
 	EXPORT rCleanZip_layout	:= record
@@ -1804,6 +1816,339 @@ EXPORT Layouts := module
 		string2 edition_number;
 	END;
 
+Export layout_property_common_model_base_ext :=record
+ln_propertyv2.layout_property_common_model_base;
+   string10 tax_mail_prim_range;
+	 string2 tax_mail_predir;
+   string28 tax_mail_prim_name;
+   string4 tax_mail_addr_suffix;
+   string2 tax_mail_postdir;
+   string10 tax_mail_unit_desig;
+   string8 tax_mail_sec_range;
+   string25 tax_mail_p_city_name;
+   string25 tax_mail_v_city_name; 
+   string2 tax_mail_state;
+   string5 tax_mail_zip5;
+   string4 tax_mail_zip4;
+   string4 tax_mail_cart;
+	 string1 tax_mail_cr_sort_sz;
+   string4 tax_mail_lot;
+   string1 tax_mail_lot_order;
+   string2 tax_mail_dpbc;
+   string1 tax_mail_chk_digit;
+   string2 tax_mail_rec_type;
+   string2 tax_mail_fips_st;
+   string3 tax_mail_fips_county;
+   string10 tax_mail_geo_lat;
+   string11 tax_mail_geo_long;
+   string4 tax_mail_msa;
+   string7 tax_mail_geo_blk;
+   string1 tax_mail_geo_match;
+   string4 tax_mail_err_stat;
+   unsigned8 tax_mail_rawaid;
+	 
+	 string10 tax_property_prim_range;
+	 string2 tax_property_predir;
+   string28 tax_property_prim_name;
+   string4 tax_property_addr_suffix;
+   string2 tax_property_postdir;
+   string10 tax_property_unit_desig;
+   string8 tax_property_sec_range;
+   string25 tax_property_p_city_name;
+   string25 tax_property_v_city_name; 
+   string2 tax_property_state;
+   string5 tax_property_zip5;
+   string4 tax_property_zip4;
+   string4 tax_property_cart;
+	 string1 tax_property_cr_sort_sz;
+   string4 tax_property_lot;
+   string1 tax_property_lot_order;
+   string2 tax_property_dpbc;
+   string1 tax_property_chk_digit;
+   string2 tax_property_rec_type;
+   string2 tax_property_fips_st;
+   string3 tax_property_fips_county;
+   string10 tax_property_geo_lat;
+   string11 tax_property_geo_long;
+   string4 tax_property_msa;
+   string7 tax_property_geo_blk;
+   string1 tax_property_geo_match;
+   string4 tax_property_err_stat;
+   unsigned8 tax_property_rawaid;
+	 string100 cust_name;
+	 string20 bug_num;
+	 string9 assessee_name_link_ssn;
+	 string8 assessee_name_link_dob;
+	 string9 second_assessee_name_link_ssn;
+	 string8 second_assessee_name_link_dob;
+   string8 link_inc_date;
+   string9 link_fein;
+	 unsigned8 tax_row_id:=0;
+   end;
 
+ Export property_common_model_base_out:= {layout_property_common_model_base_ext - tax_row_id}; 
+	 
+  Export layout_deed_mortgage_common_model_base_ext :=record
+	 ln_propertyv2.layout_deed_mortgage_common_model_base;
+	 
+	 string10 deed_mail_prim_range;
+	 string2 deed_mail_predir;
+   string28 deed_mail_prim_name;
+   string4 deed_mail_addr_suffix;
+   string2 deed_mail_postdir;
+   string10 deed_mail_unit_desig;
+   string8 deed_mail_sec_range;
+   string25 deed_mail_p_city_name;
+   string25 deed_mail_v_city_name; 
+   string2 deed_mail_state;
+   string5 deed_mail_zip5;
+   string4 deed_mail_zip4;
+   string4 deed_mail_cart;
+	 string1 deed_mail_cr_sort_sz;
+   string4 deed_mail_lot;
+   string1 deed_mail_lot_order;
+   string2 deed_mail_dpbc;
+   string1 deed_mail_chk_digit;
+   string2 deed_mail_rec_type;
+   string2 deed_mail_fips_st;
+   string3 deed_mail_fips_county;
+   string10 deed_mail_geo_lat;
+   string11 deed_mail_geo_long;
+   string4 deed_mail_msa;
+   string7 deed_mail_geo_blk;
+   string1 deed_mail_geo_match;
+   string4 deed_mail_err_stat;
+   unsigned8 deed_mail_rawaid;
+	 
+	 string10 deed_seller_prim_range;
+	 string2 deed_seller_predir;
+   string28 deed_seller_prim_name;
+   string4 deed_seller_addr_suffix;
+   string2 deed_seller_postdir;
+   string10 deed_seller_unit_desig;
+   string8 deed_seller_sec_range;
+   string25 deed_seller_p_city_name;
+   string25 deed_seller_v_city_name; 
+   string2 deed_seller_state;
+   string5 deed_seller_zip5;
+   string4 deed_seller_zip4;
+   string4 deed_seller_cart;
+	 string1 deed_seller_cr_sort_sz;
+   string4 deed_seller_lot;
+   string1 deed_seller_lot_order;
+   string2 deed_seller_dpbc;
+   string1 deed_seller_chk_digit;
+   string2 deed_seller_rec_type;
+   string2 deed_seller_fips_st;
+   string3 deed_seller_fips_county;
+   string10 deed_seller_geo_lat;
+   string11 deed_seller_geo_long;
+   string4 deed_seller_msa;
+   string7 deed_seller_geo_blk;
+   string1 deed_seller_geo_match;
+   string4 deed_seller_err_stat;
+   unsigned8 deed_seller_rawaid;
+	 
+	 string10 deed_property_prim_range;
+	 string2 deed_property_predir;
+   string28 deed_property_prim_name;
+   string4 deed_property_addr_suffix;
+   string2 deed_property_postdir;
+   string10 deed_property_unit_desig;
+   string8 deed_property_sec_range;
+   string25 deed_property_p_city_name;
+   string25 deed_property_v_city_name; 
+   string2 deed_property_state;
+   string5 deed_property_zip5;
+   string4 deed_property_zip4;
+   string4 deed_property_cart;
+	 string1 deed_property_cr_sort_sz;
+   string4 deed_property_lot;
+   string1 deed_property_lot_order;
+   string2 deed_property_dpbc;
+   string1 deed_property_chk_digit;
+   string2 deed_property_rec_type;
+   string2 deed_property_fips_st;
+   string3 deed_property_fips_county;
+   string10 deed_property_geo_lat;
+   string11 deed_property_geo_long;
+   string4 deed_property_msa;
+   string7 deed_property_geo_blk;
+   string1 deed_property_geo_match;
+   string4 deed_property_err_stat;
+   unsigned8 deed_property_rawaid;
+	 
+	 string10 deed_lender_prim_range;
+	 string2 deed_lender_predir;
+   string28 deed_lender_prim_name;
+   string4 deed_lender_addr_suffix;
+   string2 deed_lender_postdir;
+   string10 deed_lender_unit_desig;
+   string8 deed_lender_sec_range;
+   string25 deed_lender_p_city_name;
+   string25 deed_lender_v_city_name; 
+   string2 deed_lender_state;
+   string5 deed_lender_zip5;
+   string4 deed_lender_zip4;
+   string4 deed_lender_cart;
+	 string1 deed_lender_cr_sort_sz;
+   string4 deed_lender_lot;
+   string1 deed_lender_lot_order;
+   string2 deed_lender_dpbc;
+   string1 deed_lender_chk_digit;
+   string2 deed_lender_rec_type;
+   string2 deed_lender_fips_st;
+   string3 deed_lender_fips_county;
+   string10 deed_lender_geo_lat;
+   string11 deed_lender_geo_long;
+   string4 deed_lender_msa;
+   string7 deed_lender_geo_blk;
+   string1 deed_lender_geo_match;
+   string4 deed_lender_err_stat;
+   unsigned8 deed_lender_rawaid;
+	 string100 cust_name;
+	 string20 bug_num;
+	 string9 name1_link_ssn;
+   string8 name1_link_dob;
+   string9 name2_link_ssn;
+   string8 name2_link_dob;
+   string8 link_inc_date;
+   string9 link_fein;
+	 unsigned8 deed_row_id :=0;
+	  end;
 
+Export deed_mortgage_common_model_base_out :=  {layout_deed_mortgage_common_model_base_ext - deed_row_id};
+
+EXPORT temp_address_layout := RECORD 
+    STRING70  mailing_street;
+    STRING70  mailing_csz;
+    STRING70  seller_mailing_full_street_address;
+    STRING70  seller_mailing_address_citystatezip;
+    STRING70  property_full_street_address;
+    STRING70  property_address_citystatezip;
+		STRING70  lender_full_street_address;
+		STRING70  lender_address_citystatezip;
+    STRING70  tax_mailing_full_street_address;
+    STRING70  tax_mailing_city_state_zip; 
+		STRING70  tax_property_full_street_address;
+		STRING70  tax_property_city_state_zip;
+    UNSIGNED8 deed_row_id;
+    UNSIGNED8 tax_row_id;
+		end;
+
+Export Layout_Norm_Search := RECORD
+   string	name;
+    unsigned3 dt_first_seen; //new
+	  unsigned3 dt_last_seen; //new
+	  unsigned3 dt_vendor_first_reported; //new
+	  unsigned3 dt_vendor_last_reported; //new
+	  string1   vendor_source_flag; //previously string5 -> new values 'F' for 'FAR_F', 'S' for 'FAR_S', 'O' for 'OKCTY', and 'D' for 'DAYTN'
+	  string12  ln_fares_id;
+	  string8   process_date;
+    string	   source_code;
+	  string1   which_orig :='';      //remove default when build logic accounts for this field
+	  string80  nameasis;
+	 string10  prim_range;
+	 string2   predir;
+	 string28  prim_name;
+	 string4   suffix;
+	 string2   postdir;
+	 string10  unit_desig;
+	 string8   sec_range;
+	 string25  p_city_name;
+	 string25  v_city_name;
+	 string2   st;
+	 string5   zip;
+	 string4   zip4;
+	 string4   cart;
+	 string1   cr_sort_sz;
+	 string4   lot;
+	 string1   lot_order;
+	 string2   dbpc;
+	 string1   chk_digit;
+	 string2   rec_type;
+	 string5   county;
+	 string10  geo_lat;
+	 string11  geo_long;
+	 string4   msa;
+	 string7   geo_blk;
+	 string1   geo_match;
+	 string4   err_stat;
+	 string10  phone_number;
+	  string9   app_SSN; 
+	  string9   app_tax_id; 
+		string8   app_DOB;
+		string100 cust_name;
+		string8 link_inc_date;
+		unsigned6 powid;
+		unsigned6 proxid;
+		unsigned6 seleid;
+		unsigned6 orgid;
+		unsigned6 ultid;
+	  unsigned8 persistent_record_id := 0;
+		 End;
+	 
+	 Export New_Search_Layout := RECORD
+   string	name;
+    unsigned3 dt_first_seen; //new
+	  unsigned3 dt_last_seen; //new
+	  unsigned3 dt_vendor_first_reported; //new
+	  unsigned3 dt_vendor_last_reported; //new
+	  string1   vendor_source_flag; //previously string5 -> new values 'F' for 'FAR_F', 'S' for 'FAR_S', 'O' for 'OKCTY', and 'D' for 'DAYTN'
+	  string12  ln_fares_id;
+	  string8   process_date;
+    string	   source_code;
+	  string1   which_orig :='';      //remove default when build logic accounts for this field
+	  string1   conjunctive_name_seq; //new
+	  string5   title;
+	  string20  fname;
+	  string20  mname;
+	  string20  lname;
+	  string5   name_suffix;
+	  string80  cname;
+	 string80  nameasis;
+	 string10  prim_range;
+	 string2   predir;
+	 string28  prim_name;
+	 string4   suffix;
+	 string2   postdir;
+	 string10  unit_desig;
+	 string8   sec_range;
+	 string25  p_city_name;
+	 string25  v_city_name;
+	 string2   st;
+	 string5   zip;
+	 string4   zip4;
+	 string4   cart;
+	 string1   cr_sort_sz;
+	 string4   lot;
+	 string1   lot_order;
+	 string2   dbpc;
+	 string1   chk_digit;
+	 string2   rec_type;
+	 string5   county;
+	 string10  geo_lat;
+	 string11  geo_long;
+	 string4   msa;
+	 string7   geo_blk;
+	 string1   geo_match;
+	 string4   err_stat;
+	 string10  phone_number;
+	  unsigned6 did;
+	  unsigned6 bdid;
+	  string9   app_SSN; 
+	  string9   app_tax_id;
+		string8 app_dob;
+	  unsigned8 persistent_record_id := 0;
+	  string2	 ln_party_status; 
+	  string6	 ln_percentage_ownership; 
+    string2	 ln_entity_type; 
+    string8	 ln_estate_trust_date; 
+    string1	 ln_goverment_type; 
+    integer2	xadl2_weight;
+		BIPV2.IDlayouts.l_xlink_ids;
+		string100 cust_name;
+		string8 link_inc_date;
+	END;
+ 
 END;
