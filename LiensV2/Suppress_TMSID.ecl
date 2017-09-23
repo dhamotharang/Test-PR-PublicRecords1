@@ -7721,5 +7721,7 @@
 'HG11SC610715ILCOLM1',
 'HGCVOC15103451606IDADAM1',
 'HGCV14052261032IDCANM2',
-'HG12131715159WASPOM1'
+'HG12131715159WASPOM1',
+'HGFTL14000805665PAALLC1',
+'HGGD13010587493466PAALLC1'
 ];																																																																																																																					
