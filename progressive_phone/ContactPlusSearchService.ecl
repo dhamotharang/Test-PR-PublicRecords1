@@ -74,9 +74,7 @@ IMPORT progressive_phone, addrbest,iesp,PhonesFeedback_Services,ut,
 				doxie,PersonSearch_Services, AutoStandardi,EmailService,Suppress, Royalty;
 
 EXPORT ContactPlusSearchService := MACRO
-    // v-- Added for RQ-13563 to purposely force off the use of FDN keys
-    #CONSTANT('IncludeFraudDefenseNetwork',FALSE);
-
+    #constant('IncludeFraudDefenseNetwork',false)
 		rec_in := iesp.contactplus.t_ContactPlusSearchRequest;
     ds_in := DATASET ([], rec_in) : STORED ('ContactPlusSearchRequest', FEW);
 		first_row := ds_in[1] : independent;

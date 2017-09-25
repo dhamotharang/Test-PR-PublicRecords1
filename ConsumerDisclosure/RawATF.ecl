@@ -51,9 +51,9 @@ EXPORT RawATF := MODULE
 	suppressed_ids := SET(suppressed_recs, combined_record_id);
 
 	id_recs := JOIN(in_dids,ATF.Key_atf_did(isFCRA),
-		KEYED(left.did=right.did),
+		KEYED(LEFT.did=RIGHT.did),
 		TRANSFORM(RIGHT),
-		LIMIT(ConsumerDisclosure.Constants.Limits.MaxATFPerDID)); 
+		LIMIT(0),KEEP(ConsumerDisclosure.Constants.Limits.MaxATFPerDID)); 
 									
 	// join to payload key.
 	main_recs := JOIN(id_recs, ATF.key_ATF_id(isFCRA),

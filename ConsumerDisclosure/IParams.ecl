@@ -24,6 +24,7 @@ EXPORT IParams := MODULE
 		EXPORT BOOLEAN IncludeProfLicense;		
 		EXPORT BOOLEAN IncludeProperties;		
 		EXPORT BOOLEAN IncludeStudent;		
+		EXPORT BOOLEAN IncludeThrive;		
 		EXPORT BOOLEAN IncludeUCC;		
 		EXPORT BOOLEAN IncludeWatercraft;		
 	END;
@@ -65,6 +66,7 @@ EXPORT IParams := MODULE
 			EXPORT BOOLEAN IncludeProfLicense := options.DatasetSelection.IncludeProfessionalLicenses;		
 			EXPORT BOOLEAN IncludeProperties := options.DatasetSelection.IncludeProperties;		
 			EXPORT BOOLEAN IncludeStudent := options.DatasetSelection.IncludeStudents;		
+			EXPORT BOOLEAN IncludeThrive := options.DatasetSelection.IncludeThrive;		
 			EXPORT BOOLEAN IncludeUCC := options.DatasetSelection.IncludeUCC;		
 			EXPORT BOOLEAN IncludeWatercraft := options.DatasetSelection.IncludeWatercraft;		
 		END;

@@ -117,7 +117,8 @@ export BankruptcySearchServiceFCRA(
                                                                      in_ssn := ssn_value,
                                                                      in_lname := lname_value,
                                                                      in_fname := fname_value,
-                                                                     in_case_number := CaseNumber_value);
+                                                                     in_case_number := CaseNumber_value,
+                                                                     in_did := input_did);
 		rec_out := record
 			bankruptcyv3_services.layouts.layout_rollup, 
 			Text_Search.Layout_ExternalKey,
@@ -195,8 +196,8 @@ export BankruptcySearchServiceFCRA(
 										self:= left));
 										
     CaseNumberErrorCode := 
-      FCRA.Functions.fn_CheckCaseNumMinInput(CaseNumber_value, fname_value,
-                                             lname_value,ssn_value,state_val);
+      FCRA.Functions.CheckCaseNumMinInput(CaseNumber_value, fname_value,
+                                             lname_value,ssn_value,state_val,(unsigned6)did_value);
                                              
     if(Enable_CaseNumFilterSrch and CaseNumberErrorCode != 0,  
        FAIL(CaseNumberErrorCode, ut.MapMessageCodes(CaseNumberErrorCode)));

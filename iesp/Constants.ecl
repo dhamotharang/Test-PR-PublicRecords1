@@ -589,6 +589,7 @@ EXPORT Constants := MODULE
 		export unsigned2 MAX_UPINS 							 	:= Max_Small_Cnt;
 		export unsigned2 MAX_DEGREES 							:= Max_Small_Cnt;
 		export unsigned2 MAX_NPIS									:= Max_Small_Cnt;
+		export unsigned2 MAX_TAXONOMIES						:= Max_Small_Cnt;
 		export unsigned2 MAX_RESIDENCIES 					:= Max_Small_Cnt;
 		export unsigned2 MAX_MEDICALSCHOOLS 			:= Max_Small_Cnt;
 		export unsigned2 MAX_SPECIALTIES 					:= Max_Small_Cnt;  //DID=002369276991 has over 60 specialities
@@ -1972,16 +1973,34 @@ EXPORT Constants := MODULE
 
 	// Consumer Disclosure Data Service -  ConsumerDisclosure/Constants/Limits
 	export DataService := module
-		export unsigned1 MaxDefault         := 100;
-		export unsigned1 MaxAircrafts       := 1000;
-		export unsigned1 MaxATF             := 200;
-		export unsigned1 MaxBankruptcies    := 1000;  
-		export unsigned1 MaxDeathDid        := 100;
-		export unsigned1 MaxGong            := 100;
-		export unsigned1 MaxHunters         := 350;
-		export unsigned1 MaxPAW             := 100;
-		export unsigned1 MaxPilots          := 200;
-		export unsigned1 MaxStudent         := 100;
+		export unsigned2 MaxDefault         := 100;
+		export unsigned2 MaxAircrafts       := 1000;
+		export unsigned2 MaxATF             := 200;
+		export unsigned2 MaxAVM             := 1000;
+		export unsigned2 MaxBankruptcies    := 1000;  
+		export unsigned2	MaxCrimOffenders	:= 1000;
+		export unsigned2	MaxCrimOffenses				:= CRIM.MaxOffenses;
+		export unsigned2	MaxCrimCourtOffenses	:= CRIM.MaxCourtOffenses;
+		export unsigned2	MaxCrimPunishment	:= (CRIM.MaxPrisons + CRIM.MaxParoles);
+		export unsigned2	MaxCrimActivities	:= CRIM.MaxEvents;
+		export unsigned2 MaxDeathDid        := 100;
+		export unsigned2 MaxEmail           := 100;
+		export unsigned2 MaxGong            := 100;
+		export unsigned2 MaxHeader          := 1000;
+		export unsigned2 MaxHunters         := 350;
+		export unsigned2 MaxInfutor         := 100;
+		export unsigned2 MaxLiens           := 100;
+		export unsigned2 MaxMarriageDiv     := 100;
+		export unsigned2 MaxPAW             := 100;
+		export unsigned2 MaxPersonContext   := PersonContext.MAX_RECORDS;
+		export unsigned2 MaxPilots          := 200;
+		export unsigned2 MaxProfLicense     := 100;
+		export unsigned2 MaxProperties      := 200;
+		export unsigned2 MaxStudent         := 100;
+		export unsigned2 MaxSOffenders      := 200;
+		export unsigned2 MaxUCCFilings      := 1000;
+		export unsigned2 MaxThrive          := 1000;
+		export unsigned2 MaxWatercrafts     := 1000;
 	end;
 
 

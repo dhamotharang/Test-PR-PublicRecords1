@@ -1,7 +1,4 @@
-﻿/*2017-04-06T23:35:52Z (laure fischer)
-RR-11164 - RVT1608_2 - added to list of valid v50 models
-*/
-// This MODULE EXPORTs all of our model calls.  By doing this, each library can request a specific module and thus only those models are compiled.
+﻿// This MODULE EXPORTs all of our model calls.  By doing this, each library can request a specific module and thus only those models are compiled.
 
 IMPORT Models, Risk_Indicators, RiskView;
 
@@ -107,6 +104,15 @@ EXPORT LIB_RiskView_Models (
    ***************************************************************************** */
 
 
+/*
+FCRA Logger is used for Batch and XML. For FCRA we need to use the calcIndex(which adds 70).
+As the Logger does this code:
+if( modelIdentifier >= 100 ){
+		position = (modelIdentifier % 100) + 30; 
+By us adding 70 in ECL, the logger will convert it to be the same value that ESP has and the value
+that is sent INTO calcindex for ECL.
+*/
+
 	EXPORT ValidV50Models := DATASET([// Model Name |    Output Name     | Model Index   | Model Type
                                     //     v      |         v          |    v          |    v
 																			{'RVA1503_0', MType_A+'RVA1503_0', calcIndex( 40), '0-999', 0},
@@ -134,6 +140,10 @@ EXPORT LIB_RiskView_Models (
 																			{'RVG1705_1', MType_G+'RVG1705_1', calcIndex( 62), '0-999', 0}, //Telecheck Gaming
 																			{'RVC1609_1', MType_G+'RVC1609_1', calcIndex( 63), '0-999', 0}, //TJR
 																			{'RVB1610_1', MType_B+'RVB1610_1', calcIndex( 64), '0-999', 0}, //USAA
+																			{'RVG1706_1', MType_G+'RVG1706_1', calcIndex( 65), '0-999', 0}, //Telecheck nonGaming
+																			{'RVA1611_1', MType_A+'RVA1611_1', calcIndex( 66), '0-999', 0}, //Ford Motor Credit
+																			{'RVA1611_2', MType_A+'RVA1611_2', calcIndex( 67), '0-999', 0}, //Ford Motor Credit
+																			
 																		// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 																			{'RVA9999_9', MType_A+'RVA9999_9', 0, '0-999', 0},
 																			{'RVB9999_9', MType_B+'RVB9999_9', 0, '0-999', 0},
@@ -172,8 +182,9 @@ EXPORT LIB_RiskView_Models (
 											'RVG1702_1' => UNGROUP(Models.RVG1702_1_0(BocaShell)),
 											'RVG1705_1' => UNGROUP(Models.RVG1705_1_0(BocaShell)),
 											'RVB1610_1' => UNGROUP(Models.RVB1610_1_0(BocaShell)),
-											
-											
+											'RVG1706_1' => UNGROUP(Models.RVG1706_1_0(BocaShell)),		
+											// 'RVA1611_1' => UNGROUP(Models.RVA1611_1_0(BocaShell)),	
+											// 'RVA1611_2' => UNGROUP(Models.RVA1611_2_0(BocaShell)),	
 											// ----------------------------------------------------------------------------------
 											// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 											'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),
