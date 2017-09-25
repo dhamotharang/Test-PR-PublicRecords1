@@ -1,4 +1,7 @@
-﻿IMPORT BIPV2,BIPV2_Build, BusinessBatch_BIP,
+﻿/*2017-08-21T16:06:34Z (dlingle)
+C:\Users\lingledg\AppData\Roaming\HPCC Systems\eclide\dlingle\OSS_Dataland\BusinessBatch_BIP\Functions\2017-08-21T16_06_34Z.ecl
+*/
+IMPORT BIPV2,BIPV2_Build, BusinessBatch_BIP,
 	Corp2,DCAV2,Gong,LiensV2,LN_PropertyV2,
        Suppress,TopBusiness_Services,UCCV2,FAA,Watercraft,VehicleV2,ut, 
 			 SAM,Business_Risk,Business_Risk_BIP,Codes,bankruptcyV3, STD,
@@ -28,16 +31,7 @@ EXPORT getLINkidsAtProxidLevel( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Fo
 	
   ds_bestInfoProxIdNonRestricted := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(ds_Format2SearchInput).data2_;
 	
-	tmp_ds_bestInfoBatchProxIdNonRestricted := PROJECT(ds_bestInfoProxIdNonRestricted,
-		                        TRANSFORM({string30 acctno; unsigned6 ultid; unsigned6 orgid;
-														           unsigned6 seleid; unsigned6 proxid; integer proxweight;
-																			 integer record_score; unsigned4 dt_first_seen; unsigned4 dt_last_seen;
-																			 string10 company_phone; string9 company_fein; string2 source;
-																			 string34 vl_id;},
-														   SELF := LEFT;
-															 ));
-	
-	TopBusiness_Services.functions.MAC_IsRestricted(tmp_ds_bestInfoBatchProxIdNonRestricted,
+	TopBusiness_Services.functions.MAC_IsRestricted(ds_bestInfoProxIdNonRestricted,
 															 ds_bestInfoBatchProxIdRestricted, 															
 	                             source, // field name
 															 vl_id, // field name
@@ -74,7 +68,8 @@ END;
   EXPORT GetPhones( DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,
                     DATASET(BIPV2.IDlayouts.l_xlink_ids)                 dLinkIds) :=
   FUNCTION
-    dGongPhones := Gong.key_History_LinkIDs.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID)(phone10 != '');
+    dGongPhones := Gong.key_History_LinkIDs.kFetch(dLinkIds,
+		     BIPV2.IDconstants.Fetch_Level_SELEID)(phone10 != '');
     
     // Dedup phones
     dGongPhonesDedup := DEDUP(DEDUP(SORT( dGongPhones,
@@ -555,8 +550,7 @@ END;
 	
 	EXPORT getLiensLinkids(DATASET(BIPV2.IDlayouts.l_xlink_ids) dLinkIds) :=
 	FUNCTION
-      dLiens := LiensV2.Key_Linkids.KeyFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID);												 
-												 
+      dLiens := LiensV2.Key_Linkids.KeyFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID);											 												 
    RETURN(dliens);
   END;												 
 	
@@ -863,8 +857,8 @@ END;
 	
 	  // Fetch MVR and filter only 
 		// Owner(type=1), Registrant(type=4) or Lessee(type=5) of the vehicle, 
-		dVehicles := VehicleV2.Key_Vehicle_Linkids.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID)(
-													  orig_name_type = BusinessBatch_BIP.Constants.MVR.VEH_OWNER OR
+		dVehicles := VehicleV2.Key_Vehicle_Linkids.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID)
+													 (orig_name_type = BusinessBatch_BIP.Constants.MVR.VEH_OWNER OR
 														orig_name_type = BusinessBatch_BIP.Constants.MVR.VEH_REGISTRANT OR
 														orig_name_type = BusinessBatch_BIP.Constants.MVR.VEH_LESSEE);
 	 // Join by link ids to get the acctno
@@ -1106,8 +1100,10 @@ END;
 	
 	   dDiversityCertInfo := Diversity_Certification.Key_LinkIds.keyFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID,,
 		                                                                  BusinessBatch_BIP.Constants.Limits.MAXDivCert);   
+  
+	   dDivsersityCertInfoSorted := sort(dDiversityCertInfo, -dt_last_seen, record);
 																																			
-	   dDiversityCertInfoWithAcctNo := JOIN(dLinkIDsWithAcctNo,dDiversityCertInfo,
+	   dDiversityCertInfoWithAcctNo := JOIN(dLinkIDsWithAcctNo,dDivsersityCertInfoSorted,
 																					BIPV2.IDmacros.mac_JoinTop3Linkids(),
 															     TRANSFORM(BusinessBatch_BIP.Layouts.DivCertInfo,
 																			SELF.acctno := LEFT.acctno;      
