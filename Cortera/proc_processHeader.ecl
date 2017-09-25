@@ -1,4 +1,4 @@
-import ut, std;
+﻿import ut, std;
 EXPORT proc_processHeader(dataset(cortera.Layout_Header) hdr, string8 version) := FUNCTION
 
 
@@ -7,8 +7,8 @@ EXPORT proc_processHeader(dataset(cortera.Layout_Header) hdr, string8 version) :
 									self.processdate := STD.Date.Today( );
 									self.version := version;
 									self.current := true;
-									self.dt_first_seen := left.LOC_DATE_LAST_SEEN;
-									self.dt_last_seen := left.LOC_DATE_LAST_SEEN;
+									self.dt_first_seen := (unsigned4)left.LOC_DATE_LAST_SEEN;
+									self.dt_last_seen := (unsigned4)left.LOC_DATE_LAST_SEEN;
 									self.dt_vendor_first_reported := (unsigned4)version;
 									self.dt_vendor_last_reported := (unsigned4)version;
 									self.clean_phone := ut.CleanPhone(left.PHONE);
