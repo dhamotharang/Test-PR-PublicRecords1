@@ -1,4 +1,4 @@
-EXPORT Layout_Header := RECORD
+﻿EXPORT Layout_Header := RECORD
 	integer4		LINK_ID;		//	NUMBER(9)	9-digit unique number assigned by Cortera to a company in its database.
 	string100		NAME;				//	VARCHAR2(100)	Business/Company name 
 	string100		ALTERNATE_BUSINESS_NAME;	//	VARCHAR2(100)	Alternate name on file 
@@ -17,7 +17,7 @@ EXPORT Layout_Header := RECORD
 	string1			POSITION_TYPE;	//	CHAR(1)	Location in the corporate hierarchy.  Possible Values: 'S' - Single Location, 'B' - Branch, 'H' - Headquarters
 	integer4		ULTIMATE_LINKID;	//	NUMBER(20)	9-digit unique number of the ultimate parent location.
 	string100		ULTIMATE_NAME;	//	VARCHAR2(100)	Name of the ultimate parent
-	unsigned4		LOC_DATE_LAST_SEEN;	//	YYYYMMDD	Date of last update to the location
+	string8			LOC_DATE_LAST_SEEN;	//	YYYYMMDD	Date of last update to the location
 	string20		PRIMARY_SIC;		//	VARCHAR2(20)	Primary SIC for the business
 	string100		SIC_DESC;		//	VARCHAR2(100)	SIC description
 	string20		PRIMARY_NAICS;	//	VARCHAR2(20)	Primary NAICS for the business
@@ -52,4 +52,5 @@ EXPORT Layout_Header := RECORD
 	string250		TITLE10;		//	VARCHAR2(250)	Executive Title
 	string1			STATUS;			//	CHAR(1)	Possible Values: 'A' - Active, 'D' - Dormant  (Dormant means we have not seen any activity within 30 months)
 	string1			IS_CLOSED;		//	CHAR(1)	Possible Values: 'Y' - Yes
+	string9			CLOSED_DATE;
 END;

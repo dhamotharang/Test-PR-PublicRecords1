@@ -1,7 +1,8 @@
 ﻿import	std, ut;
 
-EXPORT proc_merge_attr(dataset(Cortera.Layout_Attributes_Out) current, dataset(Cortera.Layout_Attributes_Out) allprevious, string8 version) := FUNCTION
-	previous := allprevious(current_rec);			// previously current
+EXPORT proc_merge_attr(dataset(Cortera.Layout_Attributes_Out) allcurrent, dataset(Cortera.Layout_Attributes_Out) allprevious, string8 version) := FUNCTION
+	previous := DISTRIBUTE(allprevious(current_rec),ULTIMATE_LINKID);			// previously current
+	current := DISTRIBUTE(allcurrent,ULTIMATE_LINKID);			// now current
 	curr := DISTRIBUTE(PROJECT(current, cortera.Layout_Attributes),ULTIMATE_LINKID);
 	prev := DISTRIBUTE(PROJECT(previous, cortera.Layout_Attributes),ULTIMATE_LINKID);
 	not_curr := allprevious(NOT current_rec);
