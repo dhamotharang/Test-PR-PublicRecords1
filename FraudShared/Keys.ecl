@@ -1,3 +1,6 @@
+﻿/*2017-08-15T23:40:28Z (Oscar Barrientos)
+PROJOTTO-166
+*/
 import doxie, tools,FraudShared;
 
 export Keys(
@@ -21,7 +24,6 @@ export Keys(
 	shared BaseMain_NPI            				:= BaseMain(NPI != '');
 	shared BaseMain_AppProviderID  				:= BaseMain(Appended_Provider_ID != 0);
 	shared BaseMain_LNPID          				:= BaseMain(LNPID != 0);
-	shared MbsGcExclusion          				:= project(Files().Input.MbsGcIdExclusion.Sprayed ,FraudShared.Layouts_Key.MbsGcIdExclusion)(status=1);  
 	shared MbsIndTypExclusion      				:= project(Files().Input.MbsIndtypeExclusion.Sprayed,FraudShared.Layouts_Key.MbsindtypeExclusion)(status=1);  
 	shared MbsProdutInclude        				:= project(Files().Input.MbsProductInclude.Sprayed,FraudShared.Layouts_Key.MbsProductInclude)(status=1);  
 	shared MbsFDNMasterID          				:= project(pFileKeyFDNMasterID,FraudShared.Layouts_Key.FDNMasterID);  
@@ -40,9 +42,9 @@ export Keys(
 	  tools.mac_FilesIndex('BaseMain_NPI,{NPI , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.NPI,NPI);
 	  tools.mac_FilesIndex('BaseMain_AppProviderID,{Appended_Provider_ID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.AppProviderID,AppProviderID);
 	  tools.mac_FilesIndex('BaseMain_LNPID,{LNPID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.LNPID,LNPID);
+		
     // MBS exclusions 
 		tools.mac_FilesIndex('BaseMbs,{classification_Permissible_use_access.fdn_file_info_id},{record_id , UID}',KeyNames(pversion).Main.Mbs,Mbs);
-    tools.mac_FilesIndex('MbsGcExclusion,{fdn_file_info_id},{MbsGcExclusion}',KeyNames(pversion).Main.MbsGcIdExclusion,MbsGcIdExclusion);
     tools.mac_FilesIndex('MbsIndTypExclusion,{fdn_file_info_id},{MbsIndTypExclusion}',KeyNames(pversion).Main.MbsIndTypeExclusion,MbsIndTypeExclusion);
 	  tools.mac_FilesIndex('MbsProdutInclude,{fdn_file_info_id},{MbsProdutInclude}',KeyNames(pversion).Main.MbsProductInclude,MbsProductInclude);
 	  tools.mac_FilesIndex('MbsFDNMasterID,{gc_id},{MbsFDNMasterID}',KeyNames(pversion).Main.MbsFDNMasterID,MbsFDNMasterIDKey);

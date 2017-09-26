@@ -1,4 +1,4 @@
-import Address , bipv2, Inquiry_Acclogs, corrections;
+﻿import Address , bipv2, Inquiry_Acclogs, corrections;
 EXPORT Layouts := 
 module
 
@@ -36,17 +36,6 @@ module
 	string20    date_changed ; 
 	string30    user_changed; 
 end; 
-
-Export MbsGcIdExclusion := record 
-	unsigned6  fdn_file_gc_exclusion_id ; 
-	unsigned6  fdn_file_info_id; 
-	unsigned6  gc_id; 
-	unsigned3   status; // 1=Active, 2=Expired/not-active',
-	string20    date_added; 
-	string30    user_added; 
-	string20    date_changed; 
-	string30    user_changed; 	
-End; 
 
 Export MbsNewGcIdExclusion := record 
 	unsigned6  fdn_file_gc_exclusion_id ; 
