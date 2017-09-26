@@ -1,8 +1,25 @@
-EXPORT	Layout_States	:=
+﻿EXPORT	Layout_States	:=
 MODULE
 		
 	// California Death Records
 	EXPORT California := 
+	RECORD
+		STRING		fname;
+		STRING 		mname;
+		STRING		lname;
+		STRING1		gender;
+		STRING		dob;
+		STRING		POB_StateOrCountry;
+		STRING		dod;
+		STRING		POD_Facility_Name_Location;
+		STRING		POD_StreetNumber;
+		STRING		POD_StreetAddress;
+		STRING		POD_City;
+		STRING		POD_County;
+		STRING		lname_father;
+	END;
+		
+	EXPORT California_20170409 := 
 	RECORD
 		STRING		fname;
 		STRING 		mname;
@@ -659,11 +676,11 @@ MODULE
 		STRING20	birthplace;
 		STRING10	dob;
 		STRING10	dod;
-		STRING28	res_addr_2;
-		STRING45	res_addr_1;
+		STRING28	res_addr;
+		STRING45	res_city;
 		STRING5		res_zip;
 		STRING10	res_county;
-		STRING54	funeral_home_name := '';
+		// STRING54	funeral_home_name := '';
 	END;
 	
 	// Virginia Death Records

@@ -1,4 +1,4 @@
-IMPORT HEADER, ADDRESS, NID,	STD,	ut;
+﻿IMPORT HEADER, ADDRESS, NID,	STD,	ut;
 
 // We only want records with First and Last names
 file_in := Death_Master.Files.California((	StringLib.StringToUpperCase(TRIM(fname)) NOT IN ['','-','UNIDENTIFIED MALE','UNIDENTIFIED FEMALE','UNKNOWN INDIVIDUAL','UNKNOWN','FIRSTNAME','FIRST_NAME'] AND
@@ -39,9 +39,11 @@ TRANSFORM
 	
 	SELF.source_state  			:=	'CA';
 	SELF.decedent_sex				:= 	Lookup_States.lkp_ca_gender(StringLib.StringToUpperCase(pInput.gender));
-	SELF.decedent_age 			:=	(STRING)clean_age + ' YEARS OLD';
+	SELF.decedent_age 			:= 	IF(clean_dob<>'' AND clean_dod<>'',
+																(STRING)clean_age+IF(clean_age=1,' YEAR OLD',' YEARS OLD'),
+																''
+															);
 	SELF.birthplace					:=	clean_POB_StateOrCountry;
-	SELF.ssn  							:=	IF(pInput.ssn IN ['','000000000','999999999'],'',pInput.ssn);
 	SELF.dob 								:=	clean_dob[5..6]+clean_dob[7..8]+clean_dob[1..4];
 	SELF.dod 								:=	clean_dod[5..6]+clean_dod[7..8]+clean_dod[1..4];
 	SELF.fname							:=	TRIM(pInput.fname);
@@ -49,8 +51,6 @@ TRANSFORM
 	SELF.lname							:=	TRIM(pInput.lname);
 	lname_father_clean			:=	IF(TRIM(pInput.lname_father,ALL)[1..3] IN ['','-','--','---','UNK'],'',TRIM(pInput.lname_father,LEFT,RIGHT));
 	SELF.father							:=	ut.CleanSpacesAndUpper(NID.CleanPerson73(lname_father_clean));
-	lname_mother_clean			:=	IF(TRIM(pInput.lname_mother,ALL)[1..3] IN ['','-','--','---','UNK'],'',TRIM(pInput.lname_mother,LEFT,RIGHT));
-	SELF.mother							:=	ut.CleanSpacesAndUpper(NID.CleanPerson73(lname_mother_clean));
 	county_death_clean			:=	IF(TRIM(pInput.POD_County,ALL)[1..3] IN ['','-','--','---','UNK'],'',TRIM(pInput.POD_County,LEFT,RIGHT));
 	SELF.county_death				:=	ut.CleanSpacesAndUpper(county_death_clean+' COUNTY');
 	SELF.facility_death			:=	ut.CleanSpacesAndUpper(pInput.POD_Facility_Name_Location);

@@ -1,4 +1,4 @@
-IMPORT tools, _control;
+﻿IMPORT tools, _control;
 
 EXPORT fSprayStateFiles(
 	STRING		pVersionDate		=	'',
@@ -22,7 +22,7 @@ function
 		{
 			pServerIP, 															// SourceIP
 			pDirectory+'ca', 												// SourceDirectory
-			'*csv',																	// directory_filter
+			'*txt',																	// directory_filter
 			0, 																			// record_size
 			Filenames('CA').input.Template, 				// Thor_filename_template
 			[ {Filenames('CA').input.sprayed	}	], 	// dSuperfilenames
@@ -32,9 +32,9 @@ function
 			'VARIABLE', 														// file_type
 			'', 																		// sourceRowTagXML
 			_Constants().max_record_size, 					// sourceMaxRecordSize
-			',', 																		// sourceCsvSeparate
+			'\t',																		// sourceCsvSeparate
 			'\\n,\\r\\n', 													// sourceCsvTerminate
-			'"', 																		// sourceCsvQuote
+			'', 																		// sourceCsvQuote
 			FALSE, 																	// compress
 			pOverwrite, 														// shouldoverwrite
 			FALSE, 																	// ShouldSprayZeroByteFiles
