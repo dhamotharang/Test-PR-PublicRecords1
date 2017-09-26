@@ -451,6 +451,7 @@
 		STRING ReportLinkID;
 		STRING Page_Count;
 		STRING is_delete;
+		string last_update_date;
 		STRING Contrib_source;
 	END;
 

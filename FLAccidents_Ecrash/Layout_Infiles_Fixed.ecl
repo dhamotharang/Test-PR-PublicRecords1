@@ -439,6 +439,7 @@
 		STRING20 ReportLinkID; 
 		STRING3 Page_Count;
 		STRING1 is_delete;
+		STRING8 last_update_date;
 		STRING3 Contrib_source;
 	END;
 
