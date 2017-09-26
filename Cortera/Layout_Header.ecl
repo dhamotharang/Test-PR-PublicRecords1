@@ -52,4 +52,5 @@
 	string250		TITLE10;		//	VARCHAR2(250)	Executive Title
 	string1			STATUS;			//	CHAR(1)	Possible Values: 'A' - Active, 'D' - Dormant  (Dormant means we have not seen any activity within 30 months)
 	string1			IS_CLOSED;		//	CHAR(1)	Possible Values: 'Y' - Yes
+	string9			CLOSED_DATE;
 END;

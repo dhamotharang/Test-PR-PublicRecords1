@@ -26,7 +26,7 @@ EXPORT proc_processHeader(dataset(cortera.Layout_Header) hdr, string8 version) :
 		
 		restored := linked + ds(country<>'US');		// get all records
 		
-		dated := cortera.proc_merge_hdr(restored, cortera.Files.Hdr_Out);	// set dt_first_seen
+		dated := cortera.proc_merge_hdr(restored, cortera.Files.Hdr_Out, version);	// set dt_first_seen
 		
 		return dated;
 END;
