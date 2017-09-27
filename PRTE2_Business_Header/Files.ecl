@@ -1,4 +1,4 @@
-import tools, Business_header, business_header_ss;
+﻿import tools, Business_header, business_header_ss;
 
 export Files(
 
@@ -24,7 +24,6 @@ module
 					
 			shared basenames	:= Filenames(pversion,pUseOtherEnvironment).Base;
 			
-			tools.mac_FilesBase(basenames.search									,Business_header.Layout_Business_Header_base_orig		,Business_headers_old			, built);
 			tools.mac_FilesBase(basenames.search									,Business_header.Layout_Business_Header_base				,Business_headers					, built);
 			tools.mac_FilesBase(basenames.contacts								,Business_header.Layout_Business_Contact_Full_new		,Business_Contacts				, built);
 			tools.mac_FilesBase(basenames.contactsPlus						,Business_header.Layout_Business_Contact_Full_new		,Business_Contacts_Plus		, built);
@@ -33,8 +32,7 @@ module
 			tools.mac_FilesBase(basenames.RelativesGroup					,Business_header.Layout_Business_Relative_Group			,Business_Relatives_Group	, built);
 			tools.mac_FilesBase(basenames.SuperGroup							,Business_header.Layout_BH_Super_Group							,Super_Group							, built);
 			tools.mac_FilesBase(basenames.BDL2										,Business_header.Layout_BDL2												,BDL2											, built);
-			//tools.mac_FilesBase(basenames.Eq_Employer							,Business_header.layout_eq_employer									,Eq_Employer							, built);
-			
+						
 			tools.mac_FilesBase(basenames.Stat										,Business_header.Layout_Business_Header_Stat						,Stat													, built);
 			tools.mac_FilesBase(basenames.Companyname							,business_header_ss.Layout_CompanyName_SS								,Companyname									, built);
 			tools.mac_FilesBase(basenames.CompanynameAddress			,business_header_ss.Layout_CompanyName_Address_SS				,CompanynameAddress						, built);
@@ -45,7 +43,7 @@ module
 			tools.mac_FilesBase(basenames.Bdid										,business_header_ss.Layout_BH_BDID_City_Plus						,Bdid													, built);
 			
 			tools.mac_FilesBase(basenames.PeopleAtWorkStats				,Business_header.Layout_Business_Contacts_Stats					,PeopleAtWorkStats						, built, false);
-			//tools.mac_FilesBase(basenames.StatOverflow						,Business_header.Layout_Business_Header_Stat						,StatOverflow													);			
+			
 		end;
 
 end;
