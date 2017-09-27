@@ -1,4 +1,4 @@
-import AID, Business_Header, Address, NID, ut, PRTE2, STD;
+﻿import AID, Business_Header, Address, NID, ut, PRTE2, STD;
 
 export BC_Init (
 	 
@@ -149,6 +149,7 @@ function
 	//*** Appending cleaned contact address fields in this join
 	Layouts.Out.Layout_BC_out MapClnContAddr(dBC_w_Uniq_id l, dWithAID r) := transform
 		self.contact_rawaid              				:= r.AIDWork_RawAID;
+		self.contact_aceaid              				:= r.AIDWork_ACECache.aid;
 		self.contact_clean_addr.prim_range     	:= r.AIDWork_ACECache.prim_range;
 		self.contact_clean_addr.predir         	:= r.AIDWork_ACECache.predir;
 		self.contact_clean_addr.prim_name				:= r.AIDWork_ACECache.prim_name;
