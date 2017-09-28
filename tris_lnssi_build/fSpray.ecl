@@ -7,7 +7,7 @@ IPAddress          := IF(_control.ThisEnvironment.Name='Prod_Thor',
 export fSpray(string version, boolean pUseProd = false)   :=   DATASET([
 
     {IPAddress																			                       //SourceIP          Remote Server's IP address
-    ,'/data/data_build_4/tris_lnssi'                    //SourceDirectory    Absolute path of directory on Remote Server where files are located
+    ,'/data/data_build_4/tris_lnssi/data'                    //SourceDirectory    Absolute path of directory on Remote Server where files are located
     ,'*.csv'                                            //directory_filter   Regular expression filter for files to be sprayed, default = '*'
     ,0                                                  //record_size        record length of files to be sprayed(for fixed length files only)
     ,tris_lnssi_build._Dataset(pUseProd).thor_cluster_Files+ 'in::' + tris_lnssi_build._Dataset().Name + '::@version@' //Thor_filename_template   -- template filename for files to be sprayed, ex. '~thor_data400::in::corp2::@version@::cont'
