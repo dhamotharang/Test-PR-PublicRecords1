@@ -1,4 +1,4 @@
-IMPORT PRTE2_Bankruptcy, BankruptcyV2, PromoteSupers, Address, PRTE2, ut, STD, PRTE2_Common, Prte2, AID, AID_Support;
+﻿IMPORT PRTE2_Bankruptcy, BankruptcyV2, PromoteSupers, Address, PRTE2, ut, STD, PRTE2_Common, Prte2, AID, AID_Support;
 #constant(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
 
 EXPORT proc_build_base := FUNCTION
@@ -155,9 +155,15 @@ PRTE2_Bankruptcy.Layouts.Main_BaseV3_ext tClnMain(Layouts.Main_BaseV3_ext L) := 
 	SELF.name_suffix	:= tempTName.name_suffix;
 	SELF.name_score		:= tempTName.name_score;
 	
-	//Linking ID
+//Link_SSN can not be used to populate app_ssn field if vendor did not provide SSNbut Link_SSN field should be used for DID'g
+	temp_ssn :=  IF(L.app_ssn = '' and L.link_ssn <> '', l.link_ssn, l.app_ssn);
+
+//On;y valid for internal test records	
+	self.app_ssn := if(L.cust_name = 'LN_PR' and L.app_ssn = '' and L.link_ssn <> '', L.link_ssn, L.app_ssn);
+	
+//Linking ID
 	SELF.did					:= IF(trim(L.DID) != '',L.DID,
-													(string12)prte2.fn_AppendFakeID.did(SELF.fname, SELF.lname, L.app_SSN, L.link_dob, L.cust_name));
+													(string12)prte2.fn_AppendFakeID.did(SELF.fname, SELF.lname, temp_ssn, L.link_dob, L.cust_name));
 	SELF 	:= L;
 	SELF	:= [];
 END;
@@ -166,7 +172,7 @@ pCleanMain	:= PROJECT(ded_jMain, tClnMain(LEFT));
 
 //Append new records to previous records
 fMainAll	:= j_AllV3(trim(cust_name) = '' or (trim(cust_name) != '' and trim(DID) != '')) + pCleanMain;
-dedMain		:= DEDUP(SORT(fMainAll,TMSID),ALL);
+dedMain		:= DEDUP(SORT(fMainAll,TMSID),record, ALL);
 
 PromoteSupers.Mac_SF_BuildProcess(dedMain, Constants.BASE_PREFIX +'main', build_main_base);
 
@@ -182,14 +188,23 @@ PRTE2_Bankruptcy.Layouts.Search_Base_ext tCleanNAddr(ded_jSearch L) := TRANSFORM
 	SELF.name_suffix	:= tempName.name_suffix;
 	SELF.name_score		:= tempName.name_score;
 	SELF.cname				:= ut.CleanSpacesAndUpper(L.orig_company);
+
+//Link_SSN can not be used to populate fields if vendor did not provide SSN	but Link_SSN field should be used for DID'g	
+	temp_ssn := IF(L.app_ssn = '' and L.ssn <> '', L.ssn, 
+									IF(L.app_ssn = '' and L.link_ssn <> '', L.link_ssn, L.app_ssn));
+
+//On;y valid for internal test records										
+	SELF.app_ssn			:= if(L.cust_name = 'LN_PR' and  L.app_ssn = '' and L.ssn <> '', L.ssn,
+													if(L.cust_name = 'LN_PR' and  L.app_ssn = '' and L.link_ssn <> '', L.link_ssn,
+															L.app_ssn));
 	
 	//Linking ID's
 	SELF.DID  				:= IF(trim(L.DID) != '',L.DID,
-													(string12)prte2.fn_AppendFakeID.did(SELF.fname, SELF.lname, L.ssn, L.link_dob, L.cust_name)); 
+													(string12)prte2.fn_AppendFakeID.did(SELF.fname, SELF.lname, temp_ssn, L.link_dob, L.cust_name)); 
 	SELF.BDID 				:= IF(trim(L.BDID) != '', L.BDID,
 													(string12)prte2.fn_AppendFakeID.bdid(SELF.cname, L.prim_range, L.prim_name, L.v_city_name, L.st, L.zip, L.cust_name));
 	
-	vLinkingIds 			:= Prte2.fn_AppendFakeID.LinkIds(L.orig_company, L.tax_id, L.link_inc_date, L.prim_range, L.prim_name, L.sec_range, L.v_city_name, L.st, L.zip, L.cust_name);
+	vLinkingIds 			:= Prte2.fn_AppendFakeID.LinkIds(L.orig_company, L.link_fein, L.link_inc_date, L.prim_range, L.prim_name, L.sec_range, L.v_city_name, L.st, L.zip, L.cust_name);
 	SELF.powid				:= vLinkingIds.powid;
 	SELF.proxid				:= vLinkingIds.proxid;
 	SELF.seleid				:= vLinkingIds.seleid;
@@ -203,7 +218,7 @@ pCleanSearch	:= PROJECT(ded_jSearch, tCleanNAddr(LEFT));
 
 //Append new records to previous records
 fSearchAll	:= Search_in(trim(cust_name) = '' or (trim(cust_name) != '' and (trim(DID) != '' or trim(bdid) != ''))) + pCleanSearch;
-dedSearch		:= DEDUP(SORT(fSearchAll,TMSID,orig_lname,orig_company),ALL);
+dedSearch		:= DEDUP(SORT(fSearchAll,TMSID,orig_lname,orig_company),record, ALL);
 
 PromoteSupers.Mac_SF_BuildProcess(dedSearch, Constants.BASE_PREFIX +'search', build_search_base);
 
