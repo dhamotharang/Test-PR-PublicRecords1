@@ -1,9 +1,9 @@
-IMPORT corp2, corp2_mapping;
+﻿IMPORT corp2, corp2_mapping;
 
 EXPORT Functions := Module
 
 	 EXPORT status_desc(string code) := case( trim(code,left,right),
-	                                          '0'		=>'',
+	                                          '0'=>'GOOD STANDING',
 																						'1'=>'ADMIN DISSOLVED - OTHER',
 																						'2'=>'CANCELED',
 																						'3'=>'INACTIVE - CONSOLIDATED',
