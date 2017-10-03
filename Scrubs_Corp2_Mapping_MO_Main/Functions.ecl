@@ -1,4 +1,4 @@
-﻿IMPORT corp2;
+﻿IMPORT corp2; 
 	
 EXPORT Functions := MODULE
 
