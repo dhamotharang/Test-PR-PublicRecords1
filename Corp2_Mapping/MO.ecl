@@ -4,7 +4,7 @@ Export MO:=MODULE;
 
 Export Update( string fileDate,string version, boolean pShouldSpray = _Dataset().bShouldSpray, boolean pOverwrite = false,pUseProd = Tools._Constants.IsDataland) :=Function
 		
-	state_origin 							:= 'MO';
+	state_origin 							:= 'MO';   
 	state_fips	 							:= '29';	
 	state_desc	 							:= 'MISSOURI';
 	ds_Address   	 						:= dedup(sort(distribute(corp2_raw_mo.files(filedate,pUseProd).Input.Address.logical,hash(CorpID)),record,local),record,local) 				: independent;
