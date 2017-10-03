@@ -1,4 +1,4 @@
-
+﻿
 import ut, aid, data_services,AID_Support,PromoteSupers,RoxieKeyBuild,prte2,address,header, prte2, std;
 
 export proc_build_base(string filedate) := function
@@ -212,12 +212,14 @@ prepAddress := project(total_us_records, gwlTrans(left));
 	
 	  string73 tempname            :=ut.CleanSpacesAndUpper(pinput.orig_pty_name);
     pname                        := Address.CleanPersonFML73_fields(tempName);
-    self.title          			 	 := pname.title;
-    self.fname          				 := pname.fname;        
-    self.mname 			           	 := pname.mname;
-    self.lname 			 		         := pname.lname;		  
-    self.suffix 			           := pname.name_suffix;
-    self.a_score			   	       := pname.name_score;
+		SELF.title                   := IF(pInput.link_ssn !='', pname.title, '');
+	  self.fname          				 := IF(pInput.link_ssn !='', pname.fname, '');      
+    
+    self.mname 			           	 := IF(pInput.link_ssn !='', pname.mname, ''); 
+    self.lname 			 		         := IF(pInput.link_ssn !='', pname.lname, ''); 
+    self.suffix 			           := IF(pInput.link_ssn !='', pname.name_suffix, ''); 
+    self.a_score			   	       := IF(pInput.link_ssn !='', pname.name_score, '');
+		self.cname                   := IF(pInput.link_fein != '',pInput.orig_pty_name,''); 
 		self.Append_RawAID		       := pInput.AIDWork_RawAID;
 		self.prim_range 	           := pInput.AIDWork_ACECache.prim_range;
 		self.predir 		             := pInput.AIDWork_ACECache.predir;
@@ -246,8 +248,8 @@ prepAddress := project(total_us_records, gwlTrans(left));
 		self.geo_blk 		             := pInput.AIDWork_ACECache.geo_blk;
 		self.geo_match 		           := pInput.AIDWork_ACECache.geo_match;
 		self.err_stat 		           := pInput.AIDWork_ACECache.err_stat;
-		self.bdid := prte2.fn_AppendFakeID.bdid(pInput.source, self.prim_range, self.prim_name, self.v_city_name, self.st, self.zip, pInput.cust_name);
-    SELF.did  := prte2.fn_AppendFakeID.did(self.fname, self.lname, pInput.link_ssn, pInput.link_dob, pInput.cust_name);		
+		self.bdid := if(pInput.link_fein != '', prte2.fn_AppendFakeID.bdid(self.cname, self.prim_range, self.prim_name, self.v_city_name, self.st, self.zip, pInput.cust_name),0);
+    SELF.did  := if(pInput.link_ssn  != '', prte2.fn_AppendFakeID.did(self.fname, self.lname, pInput.link_ssn, pInput.link_dob, pInput.cust_name),0);		
  		self			:= pInput;
 	 	end;
 		
