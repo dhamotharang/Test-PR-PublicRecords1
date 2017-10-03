@@ -1,6 +1,6 @@
-Import corp2, corp2_raw_ri, scrubs, scrubs_corp2_mapping_ri_main, tools, ut, versioncontrol, _validate,std;
+﻿Import corp2, corp2_raw_ri, scrubs, scrubs_corp2_mapping_ri_main, tools, ut, versioncontrol, _validate,std;
 
-export RI := module
+export RI := module 
 
 	export Update(string fileDate, string version, boolean pShouldSpray = _Dataset().bShouldSpray, boolean pOverwrite = false ,pUseProd = Tools._Constants.IsDataland) := function
 
@@ -25,19 +25,20 @@ export RI := module
 		//Per CI: layout is different for Active & Inactive Entities .Vendor is not sending "CountryOfIncorp" field for Inactive Entity data !
 		ds_InACTEntities    := project(Inactive_Entities,transform(Corp2_Raw_RI.Layouts.EntitiesIN,self:=left;self:=[];));
 		
-		ds_full_Entities		:= dedup(sort(distribute(Entities   + ds_InACTEntities,hash(Entity_id)),record,local),record,local): independent;
-		ds_full_amendments	:= dedup(sort(distribute(Amendments +	Inactive_amendments,hash(Entity_id)),record,local),record,local): independent;
-		ds_full_Names				:= dedup(sort(distribute(Names			+	Inactive_Names,hash(Entity_id)),record,local),record,local): independent;
-		ds_full_Officers		:= dedup(sort(distribute(Officers	  +	Inactive_Officers,hash(Entity_id)),record,local),record,local): independent;
-		ds_full_Stocks			:= dedup(sort(distribute(Stocks 		+	Inactive_Stocks,hash(Entity_id)),record,local),record,local): independent;
-		Merger_SurvivingID  := dedup(sort(distribute(Merger,hash(SurvivingEntity_ID)),record,local),record,local): independent; 
-		Merger_EntityID     := dedup(sort(distribute(Merger,hash(MergedEntity_ID)),record,local),record,local): independent; 
+		ds_full_Entities		:= dedup(sort(distribute(Entities   + ds_InACTEntities,hash((string)(integer)corp2.t2u(Entity_ID))),record,local),record,local): independent;
+		ds_full_amendments	:= dedup(sort(distribute(Amendments +	Inactive_amendments,hash((string)(integer)corp2.t2u(Entity_ID))),record,local),record,local): independent;
+		ds_full_Names				:= dedup(sort(distribute(Names			+	Inactive_Names,hash((string)(integer)corp2.t2u(Entity_ID))),record,local),record,local): independent;
+		ds_full_Officers		:= dedup(sort(distribute(Officers	  +	Inactive_Officers,hash((string)(integer)corp2.t2u(Entity_ID))),record,local),record,local): independent;
+		ds_full_Stocks			:= dedup(sort(distribute(Stocks 		+	Inactive_Stocks,hash((string)(integer)corp2.t2u(Entity_ID))),record,local),record,local): independent;
+		Merger_SurvivingID  := dedup(sort(distribute(Merger,hash((string)(integer)corp2.t2u(SurvivingEntity_ID))),record,local),record,local): independent; 
+		Merger_EntityID     := dedup(sort(distribute(Merger,hash((string)(integer)corp2.t2u(MergedEntity_ID))),record,local),record,local): independent; 
 	
+		Foreign_Type			  :=[ 'FOREIGN BUSINESS CORPORATION','FOREIGN CORPORATION','FOREIGN LIMITED LIABILITY COMPANY',
+														'FOREIGN LIMITED LIABILITY PARTNERSHIP','FOREIGN LIMITED PARTNERSHIP','FOREIGN NON-PROFIT CORPORATION',
+														'FOREIGN REGISTERED LIMITED LIABILITY PARTNERSHIP','FOREIGN TRUST'];
+
 		corp2_mapping.LayoutsCommon.Main  trfCorpEntity(Corp2_Raw_RI.Layouts.EntitiesIN l) := transform		
 		
-			Foreign_Type											  :=[ 'FOREIGN BUSINESS CORPORATION','FOREIGN CORPORATION','FOREIGN LIMITED LIABILITY COMPANY',
-																							'FOREIGN LIMITED LIABILITY PARTNERSHIP','FOREIGN LIMITED PARTNERSHIP','FOREIGN NON-PROFIT CORPORATION',
-																							'FOREIGN REGISTERED LIMITED LIABILITY PARTNERSHIP','FOREIGN TRUST'];
 			self.dt_vendor_first_reported				:=(integer)fileDate;
 			self.dt_vendor_last_reported				:=(integer)fileDate;
 			self.dt_first_seen									:=(integer)fileDate;
@@ -173,7 +174,17 @@ export RI := module
 												
 		RI_MapCorp			:= dedup(sort(distribute(ds_RI_corps ,hash(corp_key)),record,local),record,local):independent; 
 
-		corp2_mapping.LayoutsCommon.Main  trfCorpNames(Corp2_Raw_RI.Layouts.NamesIn l) := transform,
+
+    jds_full_Names	:= join(ds_full_Names, ds_full_Entities, 
+													(string)(integer)corp2.t2u(left.Entity_ID) = (string)(integer)corp2.t2u(right.Entity_ID),
+													transform(Corp2_Raw_RI.Layouts.NamesIn_TempLay, 
+																		 self.StateOfIncorp       := right.StateOfIncorp;
+																		 self.Charter             := right.Charter;
+																		 self.DateOfOrganization  := right.DateOfOrganization;
+																		 self := left; self := right; self := [];),
+													left outer,local) : independent;
+													
+		corp2_mapping.LayoutsCommon.Main  trfCorpNames(Corp2_Raw_RI.Layouts.NamesIn_TempLay l) := transform,
 		skip(corp2_mapping.fCleanBusinessName(state_origin,state_desc,l.Name).BusinessName='')
 
 			self.dt_vendor_first_reported				:=(integer)fileDate;
@@ -205,12 +216,19 @@ export RI := module
 			self.corp_orig_org_structure_desc   := if(self.corp_ln_name_type_cd not in['09' ,'07'],corp2.t2u(l.EntityTypeDescriptor),'');
 			self.Corp_Name_Effective_Date       := if(corp2.t2u(l.Name_Type) <> 'RESERVATION' and corp2_mapping.fValidateDate(l.File_Dt).GeneralDate<>'' ,corp2_mapping.fValidateDate(l.File_Dt).GeneralDate,'');		
 			self.Corp_Name_Reservation_Date     := if(corp2.t2u(l.Name_Type) = 'RESERVATION' and corp2_mapping.fValidateDate(l.File_Dt).pastDate<>'',corp2_mapping.fValidateDate(l.File_Dt).pastDate,'');		 
+			valid_Date                          := corp2_mapping.fValidateDate(l.DateOfOrganization).PastDate;
+			self.corp_inc_date									:= map(corp2.t2u(l.StateOfIncorp)in[ state_origin,''] and corp2.t2u(l.charter) not in foreign_type=>valid_Date,
+																								 corp2.t2u(l.charter) not in foreign_type																									  =>valid_Date, 
+																							   '');
+			self.corp_forgn_date								:= map(corp2.t2u(l.StateOfIncorp)<> state_origin and corp2.t2u(l.charter) in foreign_type=>valid_Date,
+																								 corp2.t2u(l.charter) in foreign_type																							 =>valid_Date,
+																								 '');	
 			self.recordOrigin										:= 'C';			
 			self 																:= [];
 
 		end;
 
-		MapCorpNames  := project(ds_full_Names,  trfCorpNames(left)):independent;
+		MapCorpNames  := project(jds_full_Names,  trfCorpNames(left)):independent;
 
 		AllCorps			:= dedup(sort(distribute(RI_MapCorp  + 
 																					 MapCorpNames ,hash(corp_key)),
@@ -218,133 +236,101 @@ export RI := module
 
 		/*Per CI:"the merger data has three types of records - there is a code in the mergertype field: m for merger;  c for consolidation;  v for conversion
 			the active entity data uses active merger file and mapped according to ci*/
-		Join_Entiti_Merger 		 := join(Entities ,Merger_SurvivingID ,
-																	 (integer)corp2.t2u(left.Entity_ID) =(integer)corp2.t2u(right.SurvivingEntity_ID),
+		Join_Entiti_Merger 		 := join(Entities ,Merger_SurvivingID(corp2.t2u(MergerType) in ['M','C','V']),
+																	 (string)(integer)corp2.t2u(left.Entity_ID) =(string)(integer)corp2.t2u(right.SurvivingEntity_ID),
 																	 transform(Corp2_Raw_RI.Layouts.Temp_Entity_Merger,
 																						 self:=left;
 																						 self:=right;),
-																		left outer,local):independent;
+																		inner,local):independent;
 
-		ds_Entiti_Merger             :=dedup(sort(Join_Entiti_Merger(corp2.t2u(MergerType) = 'M'),record),record);
-		ds_Entiti_MergConsolidation  :=dedup(sort(Join_Entiti_Merger(corp2.t2u(MergerType) = 'C'),record),record);
-		ds_Entiti_MergConversion     :=dedup(sort(Join_Entiti_Merger(corp2.t2u(MergerType) = 'V'),record),record);
+		ds_Entiti_MCV             :=dedup(sort(Join_Entiti_Merger,record),record);
 														
-		corp2_mapping.LayoutsCommon.Main  trfEntityMerger(Corp2_Raw_RI.Layouts.Temp_Entity_Merger l) := transform
+		corp2_mapping.LayoutsCommon.Main  trfEntityMCV(Corp2_Raw_RI.Layouts.Temp_Entity_Merger l) := transform
 
 			self.corp_key												:=state_fips +'-' + (string)(integer)corp2.t2u(l.Entity_ID);
-			self.Corp_Merger_Indicator    			:='S';
-			self.Corp_Merger_Id    						  :=(string)(integer)corp2.t2u(l.SurvivingEntity_ID);
-			self.Corp_Merger_Date   					  :=corp2_mapping.fValidateDate(l.MergerDate).PastDate;
-			self.Corp_Organizational_Comments   :='MERGED WITH ' + corp2.t2u(l.MergedEntityName)+', '+ (string)(integer)corp2.t2u(l.MergedEntity_ID);
+			self.Corp_Survivor_Corporation_Id   :=if(corp2.t2u(l.MergerType) in ['C','V'], (string)(integer)corp2.t2u(l.SurvivingEntity_ID), '');
+		  self.corp_filing_date   					  :=if(corp2.t2u(l.MergerType) in ['C','V'], corp2_mapping.fValidateDate(l.MergerDate).PastDate, '');
+			self.corp_filing_cd                 :=if(corp2.t2u(l.MergerType) in ['C','V'], 'X', '');
+			self.corp_filing_desc								:=map(corp2.t2u(l.MergerType) = 'C' => 'CONSOLIDATION', 
+			                                          corp2.t2u(l.MergerType) = 'V' => 'CONVERSION',
+																								'');
+			self.Corp_Organizational_Comments   :=map(corp2.t2u(l.MergerType) = 'C' => 'CONSOLIDATED WITH ' + corp2.t2u(l.MergedEntityName)+', '+ (string)(integer)corp2.t2u(l.MergedEntity_ID),
+																								corp2.t2u(l.MergerType) = 'V' => 'CONVERTED FROM ' + corp2.t2u(l.MergedEntityName)+', '+ (string)(integer)corp2.t2u(l.MergedEntity_ID),
+																								corp2.t2u(l.MergerType) = 'M' => 'MERGED WITH ' + corp2.t2u(l.MergedEntityName)+', '+ (string)(integer)corp2.t2u(l.MergedEntity_ID),
+																								'');
+			self.Corp_Merger_Indicator    			:=if(corp2.t2u(l.MergerType) = 'M', 'S', ''); 
+			self.Corp_Merger_Id    						  :=if(corp2.t2u(l.MergerType) = 'M', (string)(integer)corp2.t2u(l.SurvivingEntity_ID), '');
+			self.Corp_Merger_Date   					  :=if(corp2.t2u(l.MergerType) = 'M', corp2_mapping.fValidateDate(l.MergerDate).PastDate, '');
+			self.Corp_Converted			  					:=if(corp2.t2u(l.MergerType) = 'V', 'N', '');
+			valid_Date                          := corp2_mapping.fValidateDate(l.DateOfOrganization).PastDate;
+			self.corp_inc_date									:= map(corp2.t2u(l.StateOfIncorp)in[ state_origin,''] and corp2.t2u(l.charter) not in foreign_type=>valid_Date,
+																								 corp2.t2u(l.charter) not in foreign_type																									  =>valid_Date, 
+																							   '');
+			self.corp_forgn_date								:= map(corp2.t2u(l.StateOfIncorp)<> state_origin and corp2.t2u(l.charter) in foreign_type=>valid_Date,
+																								 corp2.t2u(l.charter) in foreign_type																							 =>valid_Date,
+																								 '');	
 			self.recordOrigin										:='C';			
 			self 																:=[];
 
 		end;
+		
+		All_Entiti_Mergers := project(ds_Entiti_MCV   , trfEntityMCV(left));
 
-		MapEntiti_Merger := project(ds_Entiti_Merger, trfEntityMerger(left));
-
-		corp2_mapping.LayoutsCommon.Main  trfEntityConsolidation(Corp2_Raw_RI.Layouts.Temp_Entity_Merger l) := transform
-
-			self.corp_key												:=state_fips +'-' + (string)(integer)corp2.t2u(l.Entity_ID);
-			self.Corp_Survivor_Corporation_Id		:=(string)(integer)corp2.t2u(l.SurvivingEntity_ID);
-			self.corp_filing_date   					  :=corp2_mapping.fValidateDate(l.MergerDate).PastDate; 
-			self.corp_filing_cd                 :='X';
-			self.corp_filing_desc								:='CONSOLIDATION';
-			self.Corp_Organizational_Comments		:='CONSOLIDATED WITH ' + corp2.t2u(l.MergedEntityName)+', '+ (string)(integer)corp2.t2u(l.MergedEntity_ID);
-			self.recordOrigin										:='C';			
-			self 																:=[];
-			
-		end;
-
-		MapEntiti_Consolidation := project(ds_Entiti_MergConsolidation   , trfEntityConsolidation(left));		
-
-		corp2_mapping.LayoutsCommon.Main  trfEntityConversion(Corp2_Raw_RI.Layouts.Temp_Entity_Merger l) := transform
-
-			self.corp_key												:=state_fips +'-' + (string)(integer)corp2.t2u(l.Entity_ID);
-			self.Corp_Survivor_Corporation_Id		:=(string)(integer)corp2.t2u(l.SurvivingEntity_ID);
-			self.Corp_Converted			  					:='N';	
-			self.corp_filing_date   					  :=corp2_mapping.fValidateDate(l.MergerDate).PastDate;
-			self.corp_filing_cd                 :='X';
-			self.corp_filing_desc								:='CONVERSION';
-			self.Corp_Organizational_Comments		:='CONVERTED FROM ' + corp2.t2u(l.MergedEntityName)+', '+ (string)(integer)corp2.t2u(l.MergedEntity_ID);
-			self.recordOrigin										:='C';			
-			self 																:=[];
-
-		end;
-
-		MapEntiti_Conversion := project(ds_Entiti_MergConversion   , trfEntityConversion(left));
-		All_Entiti_Mergers	 := MapEntiti_Merger + MapEntiti_Consolidation + MapEntiti_Conversion;
-
+		
 		/*Per CI:"the merger data has three types of records - there is a code in the mergertype field: m for merger;  c for consolidation;  v for conversion
 			the Inactive entity file and merger data join and mapped according to ci */			
-		Join_InactEntiti_Merger 		 := join(Inactive_Entities ,Merger_EntityID ,
-																				 (integer)corp2.t2u(left.Entity_ID) =(integer)corp2.t2u(right.MergedEntity_ID),
+		Join_InactEntiti_Merger 		 := join(Inactive_Entities ,Merger_EntityID(corp2.t2u(MergerType) in ['M','C','V']),
+																				 (string)(integer)corp2.t2u(left.Entity_ID) =(string)(integer)corp2.t2u(right.MergedEntity_ID),
 																					transform(Corp2_Raw_RI.Layouts.Temp_Entity_Merger,
 																										self:=left;
 																										self:=right;
 																										self:=[];
 																										),
-																				 left outer,local):independent;
+																				 inner,local):independent;
 																	 
-		ds_InactEntitiMerger	:= distribute(Join_InactEntiti_Merger,hash(SurvivingEntity_ID));
+		ds_InactEntitiMerger	:= distribute(Join_InactEntiti_Merger,hash((string)(integer)corp2.t2u(SurvivingEntity_ID)));
 		
 		//InactEntitiMerger join back to orginal Active Entity file to track back ActiveEntityName		
 		Join_AEnti_InactEntitiMerger := join(ds_InactEntitiMerger,Entities , 
-																				(integer)corp2.t2u(left.SurvivingEntity_ID) =(integer)corp2.t2u(right.Entity_ID),
+																				(string)(integer)corp2.t2u(left.SurvivingEntity_ID) =(string)(integer)corp2.t2u(right.Entity_ID),
 																				 transform(Corp2_Raw_RI.Layouts.Temp_InActEntity_Merger,
 																									 self.ActiveEntity_Name		:=right.EntityName;
 																									 self											:=left;
 																									 ),
 																				 left outer,local):independent;
 
-		ds_InactEntiti_Merger               :=dedup(sort(Join_AEnti_InactEntitiMerger (corp2.t2u(MergerType) = 'M'),record),record);
-		ds_InactEntiti_MergConsolidation 		:=dedup(sort(Join_AEnti_InactEntitiMerger (corp2.t2u(MergerType) = 'C'),record),record);
-		ds_InactEntiti_MergConversion       :=dedup(sort(Join_AEnti_InactEntitiMerger (corp2.t2u(MergerType) = 'V'),record),record);
-
-		corp2_mapping.LayoutsCommon.Main  trfInact_EntityMerger(Corp2_Raw_RI.Layouts.Temp_InActEntity_Merger l) := transform
-
+		ds_InactEntiti_MCV               :=dedup(sort(Join_AEnti_InactEntitiMerger,record),record);
+	
+		corp2_mapping.LayoutsCommon.Main  trfInact_EntityMCV(Corp2_Raw_RI.Layouts.Temp_InActEntity_Merger l) := transform
+                           
 			self.corp_key												:=state_fips +'-' + (string)(integer)corp2.t2u(l.Entity_ID);
-			self.Corp_Merger_Indicator    			:='N';
-			self.Corp_Merger_Date   					  :=corp2_mapping.fValidateDate(l.MergerDate).PastDate;
-			self.corp_merger_name   					  :=corp2.t2u(l.ActiveEntity_Name);
-			self.Corp_Organizational_Comments   :='MERGED INTO ' +  corp2.t2u(l.ActiveEntity_Name)+', '+ (string)(integer)corp2.t2u(l.SurvivingEntity_ID);
+			self.corp_filing_date   					  :=if(corp2.t2u(l.MergerType) in ['C','V'], corp2_mapping.fValidateDate(l.MergerDate).PastDate, '');
+			self.corp_filing_cd  					  		:=if(corp2.t2u(l.MergerType) in ['C','V'], 'X', '');
+			self.corp_filing_desc  					  	:=map(corp2.t2u(l.MergerType) = 'C' => 'CONSOLIDATION',
+																								corp2.t2u(l.MergerType) = 'V' => 'CONVERSION',
+																								'');
+			self.Corp_Organizational_Comments   :=map(corp2.t2u(l.MergerType) = 'M' => 'MERGED INTO ' +  corp2.t2u(l.ActiveEntity_Name)+', '+ (string)(integer)corp2.t2u(l.SurvivingEntity_ID),
+																								corp2.t2u(l.MergerType) = 'C' => 'CONSOLIDATED INTO ' +  corp2.t2u(l.ActiveEntity_Name)+', '+(string)(integer)corp2.t2u(l.SurvivingEntity_ID),
+																								corp2.t2u(l.MergerType) = 'V' => 'CONVERTED INTO ' + corp2.t2u(l.ActiveEntity_Name)+', '+(string)(integer)corp2.t2u(l.SurvivingEntity_ID),
+																						    '');
+    	self.Corp_Merger_Indicator    			:=if(corp2.t2u(l.MergerType) = 'M', 'N', '');
+    	self.Corp_Merger_Date   					  :=if(corp2.t2u(l.MergerType) = 'M', corp2_mapping.fValidateDate(l.MergerDate).PastDate, '');
+    	self.corp_merger_name   					  :=if(corp2.t2u(l.MergerType) = 'M', corp2.t2u(l.ActiveEntity_Name), '');
+			self.Corp_Converted			  				  :=if(corp2.t2u(l.MergerType) = 'V', 'Y', '');
+			valid_Date                          := corp2_mapping.fValidateDate(l.DateOfOrganization).PastDate;
+			self.corp_inc_date									:= map(corp2.t2u(l.StateOfIncorp)in[ state_origin,''] and corp2.t2u(l.charter) not in foreign_type=>valid_Date,
+																								 corp2.t2u(l.charter) not in foreign_type																									  =>valid_Date, 
+																							   '');
+			self.corp_forgn_date								:= map(corp2.t2u(l.StateOfIncorp)<> state_origin and corp2.t2u(l.charter) in foreign_type=>valid_Date,
+																								 corp2.t2u(l.charter) in foreign_type																							 =>valid_Date,
+																								 '');	
 			self.recordOrigin										:='C';			
 			self 																:=[];
 
 		end;
 
-		MapInactEntiti_Merger:= project(ds_InactEntiti_Merger  , trfInact_EntityMerger(left));
-
-		corp2_mapping.LayoutsCommon.Main  trfInact_EntityConsolidation(Corp2_Raw_RI.Layouts.Temp_InActEntity_Merger l) := transform
-
-			self.corp_key												:=state_fips +'-' + (string)(integer)corp2.t2u(l.Entity_ID);
-			self.corp_filing_date   					  :=corp2_mapping.fValidateDate(l.MergerDate).PastDate;
-			self.corp_filing_cd  					  		:='X';
-			self.corp_filing_desc  					  	:='CONSOLIDATION';
-			self.Corp_Organizational_Comments   :='CONSOLIDATED INTO ' +  corp2.t2u(l.ActiveEntity_Name)+', '+(string)(integer)corp2.t2u(l.SurvivingEntity_ID);
-			self.recordOrigin										:='C';			
-			self 																:=[];
-
-		end;
-
-		MapInactEntiti_Consolidation:= project(ds_InactEntiti_MergConsolidation  , trfInact_EntityConsolidation(left));
-
-		corp2_mapping.LayoutsCommon.Main  trfInact_EntityConversion(Corp2_Raw_RI.Layouts.Temp_InActEntity_Merger l) := transform
-
-			self.corp_key												:=state_fips +'-' + (string)(integer)corp2.t2u(l.Entity_ID);
-			self.Corp_Converted			  				  :='Y';
-			self.corp_filing_date			  				:=corp2_mapping.fValidateDate(l.MergerDate).PastDate;
-			self.corp_filing_cd			  				  :='X';
-			self.corp_filing_desc			  				:='CONVERSION';
-			self.Corp_Organizational_Comments		:='CONVERTED INTO ' + corp2.t2u(l.ActiveEntity_Name)+', '+(string)(integer)corp2.t2u(l.SurvivingEntity_ID);
-			self.recordOrigin										:='C';			
-			self 																:=[];
-
-		end;
-
-		MapInactEntiti_MergConversion := project(ds_InactEntiti_MergConversion  , trfInact_EntityConversion(left));
-
-		All_InactEntiti_Mergers		    := MapInactEntiti_Merger + MapInactEntiti_Consolidation + MapInactEntiti_MergConversion ;
+		All_InactEntiti_Mergers:= project(ds_InactEntiti_MCV  , trfInact_EntityMCV(left));
+		
 		dsMapMergers									:= dedup(sort(distribute(All_Entiti_Mergers + 
 																													 All_InactEntiti_Mergers,hash(corp_key)),
 																								record,local),record,local) : independent;
@@ -371,7 +357,7 @@ export RI := module
 															left outer,local):independent;
 				
 		ds_EntitieOfficer	:= join(ds_full_Entities,ds_full_Officers,
-															(integer)corp2.t2u(left.Entity_ID) = (integer)corp2.t2u(right.Entity_id),
+															(string)(integer)corp2.t2u(left.Entity_ID) = (string)(integer)corp2.t2u(right.Entity_ID),
 															transform(Corp2_Raw_RI.Layouts.Temp_Officer_Entities,
 																				self:= left;
 																				self:= right;),
@@ -608,7 +594,7 @@ export RI := module
 		VersionControl.macBuildNewLogicalFile(corp2_mapping._dataset().thor_cluster_Files + 'fail::corp2::'+version+'::Main_' 	+ state_origin	,Main_F	 ,write_fail_main  ,,,pOverwrite); 
 
 		mapRI:= sequential( if(pshouldspray = true,corp2_mapping.fSprayFiles(state_origin,version,pOverwrite := pOverwrite))
-											  ,Corp2_Raw_RI.Build_Bases(filedate,version,pUseProd).All
+											  //,Corp2_Raw_RI.Build_Bases(filedate,version,pUseProd).All  // Determined build bases is not needed
 												,main_out
 												,event_out
 												,Ar_out	
