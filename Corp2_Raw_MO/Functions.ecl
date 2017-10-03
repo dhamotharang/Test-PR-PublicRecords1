@@ -1,7 +1,7 @@
 ﻿IMPORT corp2, corp2_mapping;      
 
 EXPORT Functions := Module
-
+     
 	 EXPORT status_desc(string code) := case( trim(code,left,right),
 	                                          '0'=>'GOOD STANDING',
 																						'1'=>'ADMIN DISSOLVED - OTHER',

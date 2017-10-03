@@ -1,7 +1,7 @@
 ﻿IMPORT corp2;   
 	
 EXPORT Functions := MODULE
-
+      
 		//****************************************************************************
 		//invalid_ln_name_type_cd: 	returns true or false based upon the incoming
 		//													code.
@@ -20,7 +20,7 @@ EXPORT Functions := MODULE
 
 			 RETURN if(isValidCD,1,0);
 
-		END;
+		END;     
 		
 		EXPORT set_valid_Org_struct_cd :=['4','6','7','8','10','11','13','14','15','26','1002','1003','1004','1005',
 																			'1006','1007','1008','1009','1010','1012','1013','1014','1015','1016','1017',
