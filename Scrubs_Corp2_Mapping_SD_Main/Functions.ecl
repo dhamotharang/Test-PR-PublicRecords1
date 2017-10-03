@@ -25,8 +25,8 @@ EXPORT Functions := MODULE
 		//Below table needs to be updated when we see new Org_Struc codes in Raw updates!
 
 		EXPORT set_valid_orgStruc_codes := ['BK','BL','CH','CI','CO','DA','DB','DF','DL','DM','DP',
-																				'DR','DT','EM','FA','FB','FC','FF','FG','FK','FL','FM',
+																				'DR','DT','EM','FA','FB','FC','FD','FF','FG','FK','FL','FM',
 																				'FN','FP','FR','FT','GP','ID','IN','MP','NS','PF','PU',
-																				'RA','RN','SD','SG','TD','WD',''];																	
+																				'RA','RD','RN','SD','SG','TD','WD',''];																	
 																		
 END;
