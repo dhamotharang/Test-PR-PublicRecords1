@@ -14,7 +14,7 @@ filedate	:=	filename[9..16];
 																												',',
 																												'\r\n',
 																												,						
-																												thor_name,
+																												STD.System.Thorlib.Group(),
 																												'~thor_data400::in::phones::iconectiv_dailydelta::' + filename,
 																												,
 																												,
