@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Phone_NoReconn_Service">
    <part name="IncludeRealTimePhones" type="xsd:boolean"/>
    <part name="Acctno" type="xsd:string"/>
@@ -51,7 +51,6 @@
 	 <part name="SuppressNewPorting" type="xsd:boolean"/>
    <part name="SuppressPortedTestDate" type="xsd:string"/>
    <part name="excludeLandlines" type="xsd:boolean"/>
-   <part name="SuppressTelcordiaOnly" type="xsd:boolean"/>
    <part name="SuppressBlankNameAddress" type="xsd:boolean"/>
 </message>
 */
@@ -80,8 +79,7 @@ EXPORT phone_noreconn_search := MACRO
 	boolean excludeBusiness := false : stored('ExcludeBusiness');
 	boolean excludeLandlines := false : stored('ExcludeLandlines');	
 	boolean SuppressNewPorting := excludeLandlines : stored('SuppressNewPorting');
-  boolean SuppressTelcordiaOnly := false : stored('SuppressTelcordiaOnly');
-  boolean SuppressBlankNameAddress := false : stored('SuppressBlankNameAddress');
+ boolean SuppressBlankNameAddress := false : stored('SuppressBlankNameAddress');
 
 	doxie.MAC_Header_Field_Declare();
 	globalmod := AutoStandardI.GlobalModule();
@@ -129,13 +127,9 @@ EXPORT phone_noreconn_search := MACRO
 
 	resultOut_w_tzone_no_suppress := doxie.phone_noreconn_records(srchMod).val(filteredDids, gateways_in);
   
-  // Suppress telcordia only records if those are the only records we return
-  resultOut_w_tzone_tel := if(~SuppressTelcordiaOnly or (SuppressTelcordiaOnly and exists(resultOut_w_tzone_no_suppress(telcordia_only = 'N'))),
-                          resultOut_w_tzone_no_suppress);
-	
 	// Suppress records without full name and address 
-	resultOut_w_tzone := if(~SuppressBlankNameAddress or (SuppressBlankNameAddress and exists(resultOut_w_tzone_tel(listed_name != '' OR (fname != '' AND lname!= '') OR (prim_name != '' AND ((city_name != '' AND st != '' ) OR zip != ''))))),
-                          resultOut_w_tzone_tel);
+	resultOut_w_tzone := if(~SuppressBlankNameAddress or (SuppressBlankNameAddress and exists(resultOut_w_tzone_no_suppress(listed_name != '' OR (fname != '' AND lname!= '') OR (prim_name != '' AND ((city_name != '' AND st != '' ) OR zip != ''))))),
+                          resultOut_w_tzone_no_suppress);
 
 	boolean  batch_friendly := false : stored('BatchFriendly');
 	boolean  IncludePhonesFeedback := false : stored('IncludePhonesFeedback');

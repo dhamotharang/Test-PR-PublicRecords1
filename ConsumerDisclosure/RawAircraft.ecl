@@ -97,7 +97,7 @@ EXPORT RawAircraft := MODULE
 	aircraft_id_recs := JOIN(in_dids,FAA.key_aircraft_did(isFCRA),
 			            KEYED(LEFT.did = RIGHT.did),
 									TRANSFORM(RIGHT),
-									LIMIT(ConsumerDisclosure.Constants.Limits.MaxAircraftsPerDID)); 
+									LIMIT(0),KEEP(ConsumerDisclosure.Constants.Limits.MaxAircraftsPerDID)); 
 									
 	aircraft_main_recs := JOIN(aircraft_id_recs, FAA.key_aircraft_id(IsFCRA),
 												KEYED(LEFT.aircraft_id = RIGHT.aircraft_id),

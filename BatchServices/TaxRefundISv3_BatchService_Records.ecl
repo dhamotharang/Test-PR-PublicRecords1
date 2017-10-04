@@ -254,8 +254,8 @@ EXPORT TaxRefundISv3_BatchService_Records(
 
 		// end req 4.1.24
 				
-		self.InputAddrFirst_Seen := if(isInputAddrMatch, addr_rec.addr_dt_first_seen, '');
-		self.InputAddrLast_Seen  := if(isInputAddrMatch, addr_rec.addr_dt_last_seen, '');
+		self.InputAddrFirst_Seen := addr_rec.InputAddrFirstSeen;
+		self.InputAddrLast_Seen  := addr_rec.InputAddrLastSeen;
 
 		// req 4.1.25
 		self.InputAddrState := if(addr_rec.InputStateMatch, 'Y', 'N');
@@ -621,7 +621,8 @@ EXPORT TaxRefundISv3_BatchService_Records(
 														(L.hri_3_code in ACCEPTABLE_HRI_CODES_ADDR_risk) or
 														(L.hri_4_code in ACCEPTABLE_HRI_CODES_ADDR_risk)
 														,'Y','');
-	  SELF := L;
+	  SELF.FDN_COUNT := COUNT(R);
+		SELF := L;
 	  SELF := [];
 	END;
 		 

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="HeaderSource_Service" wuTimeout="300000">
   <part name="header_src_in" type="tns:XmlDataSet" cols="70" rows="25"/>
   <part name="RecordByDate" type="xsd:string"/>
@@ -32,7 +32,8 @@
 </message>
 */
 /*--INFO-- Search by RID, DID, Location or bdid.*/
-import Doxie_Raw, Header, doxie_cbrs, Property, Doxie_LN, doxie_crs, Location_Services, iesp, DriversV2_Services, Royalty;
+import Doxie_Raw, Header, Property, Doxie_LN, doxie_crs, Location_Services,
+  iesp, DriversV2_Services, Royalty;
 
 export HeaderSource_Service := macro
 

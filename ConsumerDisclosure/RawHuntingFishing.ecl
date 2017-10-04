@@ -49,9 +49,9 @@ EXPORT RawHuntingFishing := MODULE
 	suppressed_ids := SET(suppressed_recs, combined_record_id);
 
 	id_recs := JOIN(in_dids,eMerges.Key_HuntFish_Did(isFCRA),
-			            KEYED(left.did=right.did),
+			            KEYED(LEFT.did = RIGHT.did),
 									TRANSFORM(RIGHT),
-									LIMIT(ConsumerDisclosure.Constants.Limits.MaxHuntersPerDID)); 
+									LIMIT(0),KEEP(ConsumerDisclosure.Constants.Limits.MaxHuntersPerDID)); 
 									
 	// join to payload key.
 	main_recs := JOIN(id_recs,eMerges.Key_HuntFish_Rid(isFCRA),

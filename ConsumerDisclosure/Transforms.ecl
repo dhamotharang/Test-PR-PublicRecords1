@@ -52,7 +52,28 @@ EXPORT Transforms := MODULE
 		SELF.GroupBy.tmsid := l.tmsid;
 	END;
 	
-//----------Pilot-------------
+//----------Marriage-Divorce-------------
+	iesp.fcradataservice.t_FcraDataServiceMarriageDivMainData xfMDMain(
+										ConsumerDisclosure.RawMarriageDivorce.MD_main_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	iesp.fcradataservice.t_FcraDataServiceMarriageDivPartyData xfMDParty(
+											ConsumerDisclosure.RawMarriageDivorce.MD_party_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	EXPORT iesp.fcradataservice.t_FcraDataServiceMarriageDivData xformMDData(
+																				ConsumerDisclosure.RawMarriageDivorce.MD_out l) 
+	:= TRANSFORM
+		SELF.Main := PROJECT(l.Main, xfMDMain(LEFT));
+		SELF.Search := PROJECT(l.Parties, xfMDParty(LEFT));
+		SELF.GroupBy.record_id := l.record_id;
+	END;
+	
+	//----------Pilot-------------
 	iesp.fcradataservice.t_FcraDataServicePilotRegistrationData xfPilotReg(
 										ConsumerDisclosure.RawPilot.Pilot_reg_out reg) := TRANSFORM
 		SELF.MetaData := reg.MetaData;
@@ -71,6 +92,57 @@ EXPORT Transforms := MODULE
 		SELF.Certificate := PROJECT(l.Certificate, xfPilotCert(LEFT));
 		SELF.Registration := PROJECT(l.Registration, xfPilotReg(LEFT));
 		SELF.GroupBy.unique_id := l.unique_id;
+	END;
+	
+//----------UCC-------------
+	iesp.fcradataservice.t_FcraDataServiceUCCMainData xformUCCMain(
+										ConsumerDisclosure.RawUCC.UCC_main_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	iesp.fcradataservice.t_FcraDataServiceUCCPartyData xformUCCParty(
+											ConsumerDisclosure.RawUCC.UCC_party_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	EXPORT iesp.fcradataservice.t_FcraDataServiceUCCData xformUCCData(
+																				ConsumerDisclosure.RawUCC.UCC_out l) 
+	:= TRANSFORM
+		SELF.Main := PROJECT(l.UCCMain, xformUCCMain(LEFT));
+		SELF.Party := PROJECT(l.UCCParty, xformUCCParty(LEFT));
+		SELF.GroupBy.tmsid := l.tmsid;
+	END;
+	
+	//----------Watercraft-------------
+	iesp.fcradataservice.t_FcraDataServiceWatercraftOwnerData xfWatercraftOwners(
+										ConsumerDisclosure.RawWatercraft.Watercraft_owners_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	iesp.fcradataservice.t_FcraDataServiceWatercraftInfoData xfWatercraftInfo(
+											ConsumerDisclosure.RawWatercraft.Watercraft_info_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	iesp.fcradataservice.t_FcraDataServiceWatercraftCoastguardData xfCoastguard(
+											ConsumerDisclosure.RawWatercraft.Coastguard_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	EXPORT iesp.fcradataservice.t_FcraDataServiceWatercraftData xformWatercraftData(
+																				ConsumerDisclosure.RawWatercraft.Watercraft_out l) 
+	:= TRANSFORM
+		SELF.Owners := PROJECT(l.Owners, xfWatercraftOwners(LEFT));
+		SELF.Details := PROJECT(l.Details, xfWatercraftInfo(LEFT));
+		SELF.Coastguard := PROJECT(l.Coastguard, xfCoastguard(LEFT));
+		SELF.GroupBy.state_origin := l.state_origin;
+		SELF.GroupBy.watercraft_key := l.watercraft_key;
+		SELF.GroupBy.sequence_key := l.sequence_key;
 	END;
 	
 END;
