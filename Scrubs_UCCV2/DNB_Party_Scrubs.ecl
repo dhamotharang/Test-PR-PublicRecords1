@@ -1,9 +1,15 @@
-IMPORT SALT37;
+﻿IMPORT SALT38,STD;
 IMPORT Scrubs_UCCV2,Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT DNB_Party_Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
-  EXPORT  Expanded_Layout := RECORD(DNB_Party_Layout_UCCV2)
+  EXPORT NumRules := 104;
+  EXPORT NumRulesFromFieldType := 104;
+  EXPORT NumRulesFromRecordType := 0;
+  EXPORT NumFieldsWithRules := 95;
+  EXPORT NumFieldsWithPossibleEdits := 0;
+  EXPORT NumRulesWithPossibleEdits := 0;
+  EXPORT Expanded_Layout := RECORD(DNB_Party_Layout_UCCV2)
     UNSIGNED1 tmsid_Invalid;
     UNSIGNED1 rmsid_Invalid;
     UNSIGNED1 orig_name_Invalid;
@@ -106,101 +112,101 @@ EXPORT DNB_Party_Scrubs := MODULE
   END;
 EXPORT FromNone(DATASET(DNB_Party_Layout_UCCV2) h) := MODULE
   SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
-    SELF.tmsid_Invalid := DNB_Party_Fields.InValid_tmsid((SALT37.StrType)le.tmsid);
-    SELF.rmsid_Invalid := DNB_Party_Fields.InValid_rmsid((SALT37.StrType)le.rmsid);
-    SELF.orig_name_Invalid := DNB_Party_Fields.InValid_orig_name((SALT37.StrType)le.orig_name);
-    SELF.orig_lname_Invalid := DNB_Party_Fields.InValid_orig_lname((SALT37.StrType)le.orig_lname);
-    SELF.orig_fname_Invalid := DNB_Party_Fields.InValid_orig_fname((SALT37.StrType)le.orig_fname);
-    SELF.orig_mname_Invalid := DNB_Party_Fields.InValid_orig_mname((SALT37.StrType)le.orig_mname);
-    SELF.orig_suffix_Invalid := DNB_Party_Fields.InValid_orig_suffix((SALT37.StrType)le.orig_suffix);
-    SELF.duns_number_Invalid := DNB_Party_Fields.InValid_duns_number((SALT37.StrType)le.duns_number);
-    SELF.hq_duns_number_Invalid := DNB_Party_Fields.InValid_hq_duns_number((SALT37.StrType)le.hq_duns_number);
-    SELF.ssn_Invalid := DNB_Party_Fields.InValid_ssn((SALT37.StrType)le.ssn);
-    SELF.fein_Invalid := DNB_Party_Fields.InValid_fein((SALT37.StrType)le.fein);
-    SELF.incorp_state_Invalid := DNB_Party_Fields.InValid_incorp_state((SALT37.StrType)le.incorp_state);
-    SELF.corp_number_Invalid := DNB_Party_Fields.InValid_corp_number((SALT37.StrType)le.corp_number);
-    SELF.corp_type_Invalid := DNB_Party_Fields.InValid_corp_type((SALT37.StrType)le.corp_type);
-    SELF.orig_address1_Invalid := DNB_Party_Fields.InValid_orig_address1((SALT37.StrType)le.orig_address1,(SALT37.StrType)le.orig_city,(SALT37.StrType)le.orig_state);
-    SELF.orig_address2_Invalid := DNB_Party_Fields.InValid_orig_address2((SALT37.StrType)le.orig_address2);
-    SELF.orig_city_Invalid := DNB_Party_Fields.InValid_orig_city((SALT37.StrType)le.orig_city);
-    SELF.orig_state_Invalid := DNB_Party_Fields.InValid_orig_state((SALT37.StrType)le.orig_state);
-    SELF.orig_zip5_Invalid := DNB_Party_Fields.InValid_orig_zip5((SALT37.StrType)le.orig_zip5);
-    SELF.orig_zip4_Invalid := DNB_Party_Fields.InValid_orig_zip4((SALT37.StrType)le.orig_zip4);
-    SELF.orig_country_Invalid := DNB_Party_Fields.InValid_orig_country((SALT37.StrType)le.orig_country);
-    SELF.orig_province_Invalid := DNB_Party_Fields.InValid_orig_province((SALT37.StrType)le.orig_province);
-    SELF.foreign_indc_Invalid := DNB_Party_Fields.InValid_foreign_indc((SALT37.StrType)le.foreign_indc);
-    SELF.party_type_Invalid := DNB_Party_Fields.InValid_party_type((SALT37.StrType)le.party_type);
-    SELF.dt_first_seen_Invalid := DNB_Party_Fields.InValid_dt_first_seen((SALT37.StrType)le.dt_first_seen);
-    SELF.dt_last_seen_Invalid := DNB_Party_Fields.InValid_dt_last_seen((SALT37.StrType)le.dt_last_seen);
-    SELF.dt_vendor_last_reported_Invalid := DNB_Party_Fields.InValid_dt_vendor_last_reported((SALT37.StrType)le.dt_vendor_last_reported);
-    SELF.dt_vendor_first_reported_Invalid := DNB_Party_Fields.InValid_dt_vendor_first_reported((SALT37.StrType)le.dt_vendor_first_reported);
-    SELF.process_date_Invalid := DNB_Party_Fields.InValid_process_date((SALT37.StrType)le.process_date);
-    SELF.title_Invalid := DNB_Party_Fields.InValid_title((SALT37.StrType)le.title);
-    SELF.fname_Invalid := DNB_Party_Fields.InValid_fname((SALT37.StrType)le.fname,(SALT37.StrType)le.mname,(SALT37.StrType)le.lname,(SALT37.StrType)le.company_name);
-    SELF.mname_Invalid := DNB_Party_Fields.InValid_mname((SALT37.StrType)le.mname,(SALT37.StrType)le.fname,(SALT37.StrType)le.lname,(SALT37.StrType)le.company_name);
-    SELF.lname_Invalid := DNB_Party_Fields.InValid_lname((SALT37.StrType)le.lname,(SALT37.StrType)le.fname,(SALT37.StrType)le.mname,(SALT37.StrType)le.company_name);
-    SELF.name_suffix_Invalid := DNB_Party_Fields.InValid_name_suffix((SALT37.StrType)le.name_suffix);
-    SELF.name_score_Invalid := DNB_Party_Fields.InValid_name_score((SALT37.StrType)le.name_score);
-    SELF.company_name_Invalid := DNB_Party_Fields.InValid_company_name((SALT37.StrType)le.company_name,(SALT37.StrType)le.fname,(SALT37.StrType)le.mname,(SALT37.StrType)le.lname);
-    SELF.prim_range_Invalid := DNB_Party_Fields.InValid_prim_range((SALT37.StrType)le.prim_range);
-    SELF.predir_Invalid := DNB_Party_Fields.InValid_predir((SALT37.StrType)le.predir);
-    SELF.prim_name_Invalid := DNB_Party_Fields.InValid_prim_name((SALT37.StrType)le.prim_name);
-    SELF.suffix_Invalid := DNB_Party_Fields.InValid_suffix((SALT37.StrType)le.suffix);
-    SELF.postdir_Invalid := DNB_Party_Fields.InValid_postdir((SALT37.StrType)le.postdir);
-    SELF.unit_desig_Invalid := DNB_Party_Fields.InValid_unit_desig((SALT37.StrType)le.unit_desig);
-    SELF.sec_range_Invalid := DNB_Party_Fields.InValid_sec_range((SALT37.StrType)le.sec_range);
-    SELF.p_city_name_Invalid := DNB_Party_Fields.InValid_p_city_name((SALT37.StrType)le.p_city_name);
-    SELF.v_city_name_Invalid := DNB_Party_Fields.InValid_v_city_name((SALT37.StrType)le.v_city_name);
-    SELF.st_Invalid := DNB_Party_Fields.InValid_st((SALT37.StrType)le.st);
-    SELF.zip5_Invalid := DNB_Party_Fields.InValid_zip5((SALT37.StrType)le.zip5);
-    SELF.zip4_Invalid := DNB_Party_Fields.InValid_zip4((SALT37.StrType)le.zip4);
-    SELF.county_Invalid := DNB_Party_Fields.InValid_county((SALT37.StrType)le.county);
-    SELF.cart_Invalid := DNB_Party_Fields.InValid_cart((SALT37.StrType)le.cart);
-    SELF.cr_sort_sz_Invalid := DNB_Party_Fields.InValid_cr_sort_sz((SALT37.StrType)le.cr_sort_sz);
-    SELF.lot_Invalid := DNB_Party_Fields.InValid_lot((SALT37.StrType)le.lot);
-    SELF.lot_order_Invalid := DNB_Party_Fields.InValid_lot_order((SALT37.StrType)le.lot_order);
-    SELF.dpbc_Invalid := DNB_Party_Fields.InValid_dpbc((SALT37.StrType)le.dpbc);
-    SELF.chk_digit_Invalid := DNB_Party_Fields.InValid_chk_digit((SALT37.StrType)le.chk_digit);
-    SELF.rec_type_Invalid := DNB_Party_Fields.InValid_rec_type((SALT37.StrType)le.rec_type);
-    SELF.ace_fips_st_Invalid := DNB_Party_Fields.InValid_ace_fips_st((SALT37.StrType)le.ace_fips_st);
-    SELF.ace_fips_county_Invalid := DNB_Party_Fields.InValid_ace_fips_county((SALT37.StrType)le.ace_fips_county);
-    SELF.geo_lat_Invalid := DNB_Party_Fields.InValid_geo_lat((SALT37.StrType)le.geo_lat);
-    SELF.geo_long_Invalid := DNB_Party_Fields.InValid_geo_long((SALT37.StrType)le.geo_long);
-    SELF.msa_Invalid := DNB_Party_Fields.InValid_msa((SALT37.StrType)le.msa);
-    SELF.geo_blk_Invalid := DNB_Party_Fields.InValid_geo_blk((SALT37.StrType)le.geo_blk);
-    SELF.geo_match_Invalid := DNB_Party_Fields.InValid_geo_match((SALT37.StrType)le.geo_match);
-    SELF.err_stat_Invalid := DNB_Party_Fields.InValid_err_stat((SALT37.StrType)le.err_stat);
-    SELF.bdid_Invalid := DNB_Party_Fields.InValid_bdid((SALT37.StrType)le.bdid);
-    SELF.did_Invalid := DNB_Party_Fields.InValid_did((SALT37.StrType)le.did);
-    SELF.did_score_Invalid := DNB_Party_Fields.InValid_did_score((SALT37.StrType)le.did_score);
-    SELF.bdid_score_Invalid := DNB_Party_Fields.InValid_bdid_score((SALT37.StrType)le.bdid_score);
-    SELF.source_rec_id_Invalid := DNB_Party_Fields.InValid_source_rec_id((SALT37.StrType)le.source_rec_id);
-    SELF.dotid_Invalid := DNB_Party_Fields.InValid_dotid((SALT37.StrType)le.dotid);
-    SELF.dotscore_Invalid := DNB_Party_Fields.InValid_dotscore((SALT37.StrType)le.dotscore);
-    SELF.dotweight_Invalid := DNB_Party_Fields.InValid_dotweight((SALT37.StrType)le.dotweight);
-    SELF.empid_Invalid := DNB_Party_Fields.InValid_empid((SALT37.StrType)le.empid);
-    SELF.empscore_Invalid := DNB_Party_Fields.InValid_empscore((SALT37.StrType)le.empscore);
-    SELF.empweight_Invalid := DNB_Party_Fields.InValid_empweight((SALT37.StrType)le.empweight);
-    SELF.powid_Invalid := DNB_Party_Fields.InValid_powid((SALT37.StrType)le.powid);
-    SELF.powscore_Invalid := DNB_Party_Fields.InValid_powscore((SALT37.StrType)le.powscore);
-    SELF.powweight_Invalid := DNB_Party_Fields.InValid_powweight((SALT37.StrType)le.powweight);
-    SELF.proxid_Invalid := DNB_Party_Fields.InValid_proxid((SALT37.StrType)le.proxid);
-    SELF.proxscore_Invalid := DNB_Party_Fields.InValid_proxscore((SALT37.StrType)le.proxscore);
-    SELF.proxweight_Invalid := DNB_Party_Fields.InValid_proxweight((SALT37.StrType)le.proxweight);
-    SELF.seleid_Invalid := DNB_Party_Fields.InValid_seleid((SALT37.StrType)le.seleid);
-    SELF.selescore_Invalid := DNB_Party_Fields.InValid_selescore((SALT37.StrType)le.selescore);
-    SELF.seleweight_Invalid := DNB_Party_Fields.InValid_seleweight((SALT37.StrType)le.seleweight);
-    SELF.orgid_Invalid := DNB_Party_Fields.InValid_orgid((SALT37.StrType)le.orgid);
-    SELF.orgscore_Invalid := DNB_Party_Fields.InValid_orgscore((SALT37.StrType)le.orgscore);
-    SELF.orgweight_Invalid := DNB_Party_Fields.InValid_orgweight((SALT37.StrType)le.orgweight);
-    SELF.ultid_Invalid := DNB_Party_Fields.InValid_ultid((SALT37.StrType)le.ultid);
-    SELF.ultscore_Invalid := DNB_Party_Fields.InValid_ultscore((SALT37.StrType)le.ultscore);
-    SELF.ultweight_Invalid := DNB_Party_Fields.InValid_ultweight((SALT37.StrType)le.ultweight);
-    SELF.prep_addr_line1_Invalid := DNB_Party_Fields.InValid_prep_addr_line1((SALT37.StrType)le.prep_addr_line1);
-    SELF.prep_addr_last_line_Invalid := DNB_Party_Fields.InValid_prep_addr_last_line((SALT37.StrType)le.prep_addr_last_line);
-    SELF.rawaid_Invalid := DNB_Party_Fields.InValid_rawaid((SALT37.StrType)le.rawaid);
-    SELF.aceaid_Invalid := DNB_Party_Fields.InValid_aceaid((SALT37.StrType)le.aceaid);
-    SELF.persistent_record_id_Invalid := DNB_Party_Fields.InValid_persistent_record_id((SALT37.StrType)le.persistent_record_id);
+    SELF.tmsid_Invalid := DNB_Party_Fields.InValid_tmsid((SALT38.StrType)le.tmsid);
+    SELF.rmsid_Invalid := DNB_Party_Fields.InValid_rmsid((SALT38.StrType)le.rmsid);
+    SELF.orig_name_Invalid := DNB_Party_Fields.InValid_orig_name((SALT38.StrType)le.orig_name);
+    SELF.orig_lname_Invalid := DNB_Party_Fields.InValid_orig_lname((SALT38.StrType)le.orig_lname);
+    SELF.orig_fname_Invalid := DNB_Party_Fields.InValid_orig_fname((SALT38.StrType)le.orig_fname);
+    SELF.orig_mname_Invalid := DNB_Party_Fields.InValid_orig_mname((SALT38.StrType)le.orig_mname);
+    SELF.orig_suffix_Invalid := DNB_Party_Fields.InValid_orig_suffix((SALT38.StrType)le.orig_suffix);
+    SELF.duns_number_Invalid := DNB_Party_Fields.InValid_duns_number((SALT38.StrType)le.duns_number);
+    SELF.hq_duns_number_Invalid := DNB_Party_Fields.InValid_hq_duns_number((SALT38.StrType)le.hq_duns_number);
+    SELF.ssn_Invalid := DNB_Party_Fields.InValid_ssn((SALT38.StrType)le.ssn);
+    SELF.fein_Invalid := DNB_Party_Fields.InValid_fein((SALT38.StrType)le.fein);
+    SELF.incorp_state_Invalid := DNB_Party_Fields.InValid_incorp_state((SALT38.StrType)le.incorp_state);
+    SELF.corp_number_Invalid := DNB_Party_Fields.InValid_corp_number((SALT38.StrType)le.corp_number);
+    SELF.corp_type_Invalid := DNB_Party_Fields.InValid_corp_type((SALT38.StrType)le.corp_type);
+    SELF.orig_address1_Invalid := DNB_Party_Fields.InValid_orig_address1((SALT38.StrType)le.orig_address1,(SALT38.StrType)le.orig_city,(SALT38.StrType)le.orig_state);
+    SELF.orig_address2_Invalid := DNB_Party_Fields.InValid_orig_address2((SALT38.StrType)le.orig_address2);
+    SELF.orig_city_Invalid := DNB_Party_Fields.InValid_orig_city((SALT38.StrType)le.orig_city);
+    SELF.orig_state_Invalid := DNB_Party_Fields.InValid_orig_state((SALT38.StrType)le.orig_state);
+    SELF.orig_zip5_Invalid := DNB_Party_Fields.InValid_orig_zip5((SALT38.StrType)le.orig_zip5);
+    SELF.orig_zip4_Invalid := DNB_Party_Fields.InValid_orig_zip4((SALT38.StrType)le.orig_zip4);
+    SELF.orig_country_Invalid := DNB_Party_Fields.InValid_orig_country((SALT38.StrType)le.orig_country);
+    SELF.orig_province_Invalid := DNB_Party_Fields.InValid_orig_province((SALT38.StrType)le.orig_province);
+    SELF.foreign_indc_Invalid := DNB_Party_Fields.InValid_foreign_indc((SALT38.StrType)le.foreign_indc);
+    SELF.party_type_Invalid := DNB_Party_Fields.InValid_party_type((SALT38.StrType)le.party_type);
+    SELF.dt_first_seen_Invalid := DNB_Party_Fields.InValid_dt_first_seen((SALT38.StrType)le.dt_first_seen);
+    SELF.dt_last_seen_Invalid := DNB_Party_Fields.InValid_dt_last_seen((SALT38.StrType)le.dt_last_seen);
+    SELF.dt_vendor_last_reported_Invalid := DNB_Party_Fields.InValid_dt_vendor_last_reported((SALT38.StrType)le.dt_vendor_last_reported);
+    SELF.dt_vendor_first_reported_Invalid := DNB_Party_Fields.InValid_dt_vendor_first_reported((SALT38.StrType)le.dt_vendor_first_reported);
+    SELF.process_date_Invalid := DNB_Party_Fields.InValid_process_date((SALT38.StrType)le.process_date);
+    SELF.title_Invalid := DNB_Party_Fields.InValid_title((SALT38.StrType)le.title);
+    SELF.fname_Invalid := DNB_Party_Fields.InValid_fname((SALT38.StrType)le.fname,(SALT38.StrType)le.mname,(SALT38.StrType)le.lname,(SALT38.StrType)le.company_name);
+    SELF.mname_Invalid := DNB_Party_Fields.InValid_mname((SALT38.StrType)le.mname,(SALT38.StrType)le.fname,(SALT38.StrType)le.lname,(SALT38.StrType)le.company_name);
+    SELF.lname_Invalid := DNB_Party_Fields.InValid_lname((SALT38.StrType)le.lname,(SALT38.StrType)le.fname,(SALT38.StrType)le.mname,(SALT38.StrType)le.company_name);
+    SELF.name_suffix_Invalid := DNB_Party_Fields.InValid_name_suffix((SALT38.StrType)le.name_suffix);
+    SELF.name_score_Invalid := DNB_Party_Fields.InValid_name_score((SALT38.StrType)le.name_score);
+    SELF.company_name_Invalid := DNB_Party_Fields.InValid_company_name((SALT38.StrType)le.company_name,(SALT38.StrType)le.fname,(SALT38.StrType)le.mname,(SALT38.StrType)le.lname);
+    SELF.prim_range_Invalid := DNB_Party_Fields.InValid_prim_range((SALT38.StrType)le.prim_range);
+    SELF.predir_Invalid := DNB_Party_Fields.InValid_predir((SALT38.StrType)le.predir);
+    SELF.prim_name_Invalid := DNB_Party_Fields.InValid_prim_name((SALT38.StrType)le.prim_name);
+    SELF.suffix_Invalid := DNB_Party_Fields.InValid_suffix((SALT38.StrType)le.suffix);
+    SELF.postdir_Invalid := DNB_Party_Fields.InValid_postdir((SALT38.StrType)le.postdir);
+    SELF.unit_desig_Invalid := DNB_Party_Fields.InValid_unit_desig((SALT38.StrType)le.unit_desig);
+    SELF.sec_range_Invalid := DNB_Party_Fields.InValid_sec_range((SALT38.StrType)le.sec_range);
+    SELF.p_city_name_Invalid := DNB_Party_Fields.InValid_p_city_name((SALT38.StrType)le.p_city_name);
+    SELF.v_city_name_Invalid := DNB_Party_Fields.InValid_v_city_name((SALT38.StrType)le.v_city_name);
+    SELF.st_Invalid := DNB_Party_Fields.InValid_st((SALT38.StrType)le.st);
+    SELF.zip5_Invalid := DNB_Party_Fields.InValid_zip5((SALT38.StrType)le.zip5);
+    SELF.zip4_Invalid := DNB_Party_Fields.InValid_zip4((SALT38.StrType)le.zip4);
+    SELF.county_Invalid := DNB_Party_Fields.InValid_county((SALT38.StrType)le.county);
+    SELF.cart_Invalid := DNB_Party_Fields.InValid_cart((SALT38.StrType)le.cart);
+    SELF.cr_sort_sz_Invalid := DNB_Party_Fields.InValid_cr_sort_sz((SALT38.StrType)le.cr_sort_sz);
+    SELF.lot_Invalid := DNB_Party_Fields.InValid_lot((SALT38.StrType)le.lot);
+    SELF.lot_order_Invalid := DNB_Party_Fields.InValid_lot_order((SALT38.StrType)le.lot_order);
+    SELF.dpbc_Invalid := DNB_Party_Fields.InValid_dpbc((SALT38.StrType)le.dpbc);
+    SELF.chk_digit_Invalid := DNB_Party_Fields.InValid_chk_digit((SALT38.StrType)le.chk_digit);
+    SELF.rec_type_Invalid := DNB_Party_Fields.InValid_rec_type((SALT38.StrType)le.rec_type);
+    SELF.ace_fips_st_Invalid := DNB_Party_Fields.InValid_ace_fips_st((SALT38.StrType)le.ace_fips_st);
+    SELF.ace_fips_county_Invalid := DNB_Party_Fields.InValid_ace_fips_county((SALT38.StrType)le.ace_fips_county);
+    SELF.geo_lat_Invalid := DNB_Party_Fields.InValid_geo_lat((SALT38.StrType)le.geo_lat);
+    SELF.geo_long_Invalid := DNB_Party_Fields.InValid_geo_long((SALT38.StrType)le.geo_long);
+    SELF.msa_Invalid := DNB_Party_Fields.InValid_msa((SALT38.StrType)le.msa);
+    SELF.geo_blk_Invalid := DNB_Party_Fields.InValid_geo_blk((SALT38.StrType)le.geo_blk);
+    SELF.geo_match_Invalid := DNB_Party_Fields.InValid_geo_match((SALT38.StrType)le.geo_match);
+    SELF.err_stat_Invalid := DNB_Party_Fields.InValid_err_stat((SALT38.StrType)le.err_stat);
+    SELF.bdid_Invalid := DNB_Party_Fields.InValid_bdid((SALT38.StrType)le.bdid);
+    SELF.did_Invalid := DNB_Party_Fields.InValid_did((SALT38.StrType)le.did);
+    SELF.did_score_Invalid := DNB_Party_Fields.InValid_did_score((SALT38.StrType)le.did_score);
+    SELF.bdid_score_Invalid := DNB_Party_Fields.InValid_bdid_score((SALT38.StrType)le.bdid_score);
+    SELF.source_rec_id_Invalid := DNB_Party_Fields.InValid_source_rec_id((SALT38.StrType)le.source_rec_id);
+    SELF.dotid_Invalid := DNB_Party_Fields.InValid_dotid((SALT38.StrType)le.dotid);
+    SELF.dotscore_Invalid := DNB_Party_Fields.InValid_dotscore((SALT38.StrType)le.dotscore);
+    SELF.dotweight_Invalid := DNB_Party_Fields.InValid_dotweight((SALT38.StrType)le.dotweight);
+    SELF.empid_Invalid := DNB_Party_Fields.InValid_empid((SALT38.StrType)le.empid);
+    SELF.empscore_Invalid := DNB_Party_Fields.InValid_empscore((SALT38.StrType)le.empscore);
+    SELF.empweight_Invalid := DNB_Party_Fields.InValid_empweight((SALT38.StrType)le.empweight);
+    SELF.powid_Invalid := DNB_Party_Fields.InValid_powid((SALT38.StrType)le.powid);
+    SELF.powscore_Invalid := DNB_Party_Fields.InValid_powscore((SALT38.StrType)le.powscore);
+    SELF.powweight_Invalid := DNB_Party_Fields.InValid_powweight((SALT38.StrType)le.powweight);
+    SELF.proxid_Invalid := DNB_Party_Fields.InValid_proxid((SALT38.StrType)le.proxid);
+    SELF.proxscore_Invalid := DNB_Party_Fields.InValid_proxscore((SALT38.StrType)le.proxscore);
+    SELF.proxweight_Invalid := DNB_Party_Fields.InValid_proxweight((SALT38.StrType)le.proxweight);
+    SELF.seleid_Invalid := DNB_Party_Fields.InValid_seleid((SALT38.StrType)le.seleid);
+    SELF.selescore_Invalid := DNB_Party_Fields.InValid_selescore((SALT38.StrType)le.selescore);
+    SELF.seleweight_Invalid := DNB_Party_Fields.InValid_seleweight((SALT38.StrType)le.seleweight);
+    SELF.orgid_Invalid := DNB_Party_Fields.InValid_orgid((SALT38.StrType)le.orgid);
+    SELF.orgscore_Invalid := DNB_Party_Fields.InValid_orgscore((SALT38.StrType)le.orgscore);
+    SELF.orgweight_Invalid := DNB_Party_Fields.InValid_orgweight((SALT38.StrType)le.orgweight);
+    SELF.ultid_Invalid := DNB_Party_Fields.InValid_ultid((SALT38.StrType)le.ultid);
+    SELF.ultscore_Invalid := DNB_Party_Fields.InValid_ultscore((SALT38.StrType)le.ultscore);
+    SELF.ultweight_Invalid := DNB_Party_Fields.InValid_ultweight((SALT38.StrType)le.ultweight);
+    SELF.prep_addr_line1_Invalid := DNB_Party_Fields.InValid_prep_addr_line1((SALT38.StrType)le.prep_addr_line1);
+    SELF.prep_addr_last_line_Invalid := DNB_Party_Fields.InValid_prep_addr_last_line((SALT38.StrType)le.prep_addr_last_line);
+    SELF.rawaid_Invalid := DNB_Party_Fields.InValid_rawaid((SALT38.StrType)le.rawaid);
+    SELF.aceaid_Invalid := DNB_Party_Fields.InValid_aceaid((SALT38.StrType)le.aceaid);
+    SELF.persistent_record_id_Invalid := DNB_Party_Fields.InValid_persistent_record_id((SALT38.StrType)le.persistent_record_id);
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -432,15 +438,28 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     rawaid_ENUM_ErrorCount := COUNT(GROUP,h.rawaid_Invalid=1);
     aceaid_ENUM_ErrorCount := COUNT(GROUP,h.aceaid_Invalid=1);
     persistent_record_id_ENUM_ErrorCount := COUNT(GROUP,h.persistent_record_id_Invalid=1);
+    AnyRule_WithErrorsCount := COUNT(GROUP, h.tmsid_Invalid > 0 OR h.rmsid_Invalid > 0 OR h.orig_name_Invalid > 0 OR h.orig_lname_Invalid > 0 OR h.orig_fname_Invalid > 0 OR h.orig_mname_Invalid > 0 OR h.orig_suffix_Invalid > 0 OR h.duns_number_Invalid > 0 OR h.hq_duns_number_Invalid > 0 OR h.ssn_Invalid > 0 OR h.fein_Invalid > 0 OR h.incorp_state_Invalid > 0 OR h.corp_number_Invalid > 0 OR h.corp_type_Invalid > 0 OR h.orig_address1_Invalid > 0 OR h.orig_address2_Invalid > 0 OR h.orig_city_Invalid > 0 OR h.orig_state_Invalid > 0 OR h.orig_zip5_Invalid > 0 OR h.orig_zip4_Invalid > 0 OR h.orig_country_Invalid > 0 OR h.orig_province_Invalid > 0 OR h.foreign_indc_Invalid > 0 OR h.party_type_Invalid > 0 OR h.dt_first_seen_Invalid > 0 OR h.dt_last_seen_Invalid > 0 OR h.dt_vendor_last_reported_Invalid > 0 OR h.dt_vendor_first_reported_Invalid > 0 OR h.process_date_Invalid > 0 OR h.title_Invalid > 0 OR h.fname_Invalid > 0 OR h.mname_Invalid > 0 OR h.lname_Invalid > 0 OR h.name_suffix_Invalid > 0 OR h.name_score_Invalid > 0 OR h.company_name_Invalid > 0 OR h.prim_range_Invalid > 0 OR h.predir_Invalid > 0 OR h.prim_name_Invalid > 0 OR h.suffix_Invalid > 0 OR h.postdir_Invalid > 0 OR h.unit_desig_Invalid > 0 OR h.sec_range_Invalid > 0 OR h.p_city_name_Invalid > 0 OR h.v_city_name_Invalid > 0 OR h.st_Invalid > 0 OR h.zip5_Invalid > 0 OR h.zip4_Invalid > 0 OR h.county_Invalid > 0 OR h.cart_Invalid > 0 OR h.cr_sort_sz_Invalid > 0 OR h.lot_Invalid > 0 OR h.lot_order_Invalid > 0 OR h.dpbc_Invalid > 0 OR h.chk_digit_Invalid > 0 OR h.rec_type_Invalid > 0 OR h.ace_fips_st_Invalid > 0 OR h.ace_fips_county_Invalid > 0 OR h.geo_lat_Invalid > 0 OR h.geo_long_Invalid > 0 OR h.msa_Invalid > 0 OR h.geo_blk_Invalid > 0 OR h.geo_match_Invalid > 0 OR h.err_stat_Invalid > 0 OR h.bdid_Invalid > 0 OR h.did_Invalid > 0 OR h.did_score_Invalid > 0 OR h.bdid_score_Invalid > 0 OR h.source_rec_id_Invalid > 0 OR h.dotid_Invalid > 0 OR h.dotscore_Invalid > 0 OR h.dotweight_Invalid > 0 OR h.empid_Invalid > 0 OR h.empscore_Invalid > 0 OR h.empweight_Invalid > 0 OR h.powid_Invalid > 0 OR h.powscore_Invalid > 0 OR h.powweight_Invalid > 0 OR h.proxid_Invalid > 0 OR h.proxscore_Invalid > 0 OR h.proxweight_Invalid > 0 OR h.seleid_Invalid > 0 OR h.selescore_Invalid > 0 OR h.seleweight_Invalid > 0 OR h.orgid_Invalid > 0 OR h.orgscore_Invalid > 0 OR h.orgweight_Invalid > 0 OR h.ultid_Invalid > 0 OR h.ultscore_Invalid > 0 OR h.ultweight_Invalid > 0 OR h.prep_addr_line1_Invalid > 0 OR h.prep_addr_last_line_Invalid > 0 OR h.rawaid_Invalid > 0 OR h.aceaid_Invalid > 0 OR h.persistent_record_id_Invalid > 0);
+    FieldsChecked_WithErrors := 0;
+    FieldsChecked_NoErrors := 0;
+    Rules_WithErrors := 0;
+    Rules_NoErrors := 0;
   END;
-  EXPORT SummaryStats := TABLE(h,r);
+  SummaryStats0 := TABLE(h,r);
+  SummaryStats0 xAddErrSummary(SummaryStats0 le) := TRANSFORM
+    SELF.FieldsChecked_WithErrors := IF(le.tmsid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rmsid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_name_Total_ErrorCount > 0, 1, 0) + IF(le.orig_lname_LENGTH_ErrorCount > 0, 1, 0) + IF(le.orig_fname_LENGTH_ErrorCount > 0, 1, 0) + IF(le.orig_mname_LENGTH_ErrorCount > 0, 1, 0) + IF(le.orig_suffix_LENGTH_ErrorCount > 0, 1, 0) + IF(le.duns_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.hq_duns_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ssn_LENGTH_ErrorCount > 0, 1, 0) + IF(le.fein_LENGTH_ErrorCount > 0, 1, 0) + IF(le.incorp_state_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_number_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_type_LENGTH_ErrorCount > 0, 1, 0) + IF(le.orig_address1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_address2_Total_ErrorCount > 0, 1, 0) + IF(le.orig_city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_zip5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_zip4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_country_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_province_ALLOW_ErrorCount > 0, 1, 0) + IF(le.foreign_indc_ENUM_ErrorCount > 0, 1, 0) + IF(le.party_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_Total_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_Total_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_Total_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_Total_ErrorCount > 0, 1, 0) + IF(le.process_date_Total_ErrorCount > 0, 1, 0) + IF(le.title_Total_ErrorCount > 0, 1, 0) + IF(le.fname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.lname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.name_suffix_Total_ErrorCount > 0, 1, 0) + IF(le.name_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prim_range_LENGTH_ErrorCount > 0, 1, 0) + IF(le.predir_LENGTH_ErrorCount > 0, 1, 0) + IF(le.prim_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.suffix_LENGTH_ErrorCount > 0, 1, 0) + IF(le.postdir_LENGTH_ErrorCount > 0, 1, 0) + IF(le.unit_desig_LENGTH_ErrorCount > 0, 1, 0) + IF(le.sec_range_LENGTH_ErrorCount > 0, 1, 0) + IF(le.p_city_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.v_city_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.st_LENGTH_ErrorCount > 0, 1, 0) + IF(le.zip5_LENGTH_ErrorCount > 0, 1, 0) + IF(le.zip4_LENGTH_ErrorCount > 0, 1, 0) + IF(le.county_LENGTH_ErrorCount > 0, 1, 0) + IF(le.cart_LENGTH_ErrorCount > 0, 1, 0) + IF(le.cr_sort_sz_LENGTH_ErrorCount > 0, 1, 0) + IF(le.lot_LENGTH_ErrorCount > 0, 1, 0) + IF(le.lot_order_LENGTH_ErrorCount > 0, 1, 0) + IF(le.dpbc_LENGTH_ErrorCount > 0, 1, 0) + IF(le.chk_digit_LENGTH_ErrorCount > 0, 1, 0) + IF(le.rec_type_LENGTH_ErrorCount > 0, 1, 0) + IF(le.ace_fips_st_LENGTH_ErrorCount > 0, 1, 0) + IF(le.ace_fips_county_LENGTH_ErrorCount > 0, 1, 0) + IF(le.geo_lat_LENGTH_ErrorCount > 0, 1, 0) + IF(le.geo_long_LENGTH_ErrorCount > 0, 1, 0) + IF(le.msa_LENGTH_ErrorCount > 0, 1, 0) + IF(le.geo_blk_LENGTH_ErrorCount > 0, 1, 0) + IF(le.geo_match_LENGTH_ErrorCount > 0, 1, 0) + IF(le.err_stat_LENGTH_ErrorCount > 0, 1, 0) + IF(le.bdid_ENUM_ErrorCount > 0, 1, 0) + IF(le.did_ENUM_ErrorCount > 0, 1, 0) + IF(le.did_score_ENUM_ErrorCount > 0, 1, 0) + IF(le.bdid_score_ENUM_ErrorCount > 0, 1, 0) + IF(le.source_rec_id_ENUM_ErrorCount > 0, 1, 0) + IF(le.dotid_ENUM_ErrorCount > 0, 1, 0) + IF(le.dotscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.dotweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.empid_ENUM_ErrorCount > 0, 1, 0) + IF(le.empscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.empweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.powid_ENUM_ErrorCount > 0, 1, 0) + IF(le.powscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.powweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.proxid_ENUM_ErrorCount > 0, 1, 0) + IF(le.proxscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.proxweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.seleid_ENUM_ErrorCount > 0, 1, 0) + IF(le.selescore_ENUM_ErrorCount > 0, 1, 0) + IF(le.seleweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.orgid_ENUM_ErrorCount > 0, 1, 0) + IF(le.orgscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.orgweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.ultid_ENUM_ErrorCount > 0, 1, 0) + IF(le.ultscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.ultweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.prep_addr_line1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prep_addr_last_line_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawaid_ENUM_ErrorCount > 0, 1, 0) + IF(le.aceaid_ENUM_ErrorCount > 0, 1, 0) + IF(le.persistent_record_id_ENUM_ErrorCount > 0, 1, 0);
+    SELF.FieldsChecked_NoErrors := NumFieldsWithRules - SELF.FieldsChecked_WithErrors;
+    SELF.Rules_WithErrors := IF(le.tmsid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rmsid_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_name_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.orig_lname_LENGTH_ErrorCount > 0, 1, 0) + IF(le.orig_fname_LENGTH_ErrorCount > 0, 1, 0) + IF(le.orig_mname_LENGTH_ErrorCount > 0, 1, 0) + IF(le.orig_suffix_LENGTH_ErrorCount > 0, 1, 0) + IF(le.duns_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.hq_duns_number_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.ssn_LENGTH_ErrorCount > 0, 1, 0) + IF(le.fein_LENGTH_ErrorCount > 0, 1, 0) + IF(le.incorp_state_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_number_LENGTH_ErrorCount > 0, 1, 0) + IF(le.corp_type_LENGTH_ErrorCount > 0, 1, 0) + IF(le.orig_address1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_address2_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_address2_LENGTH_ErrorCount > 0, 1, 0) + IF(le.orig_city_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_state_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_zip5_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_zip4_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.orig_country_ALLOW_ErrorCount > 0, 1, 0) + IF(le.orig_province_ALLOW_ErrorCount > 0, 1, 0) + IF(le.foreign_indc_ENUM_ErrorCount > 0, 1, 0) + IF(le.party_type_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_first_seen_LENGTH_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_last_seen_LENGTH_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_last_reported_LENGTH_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.dt_vendor_first_reported_LENGTH_ErrorCount > 0, 1, 0) + IF(le.process_date_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.process_date_LENGTH_ErrorCount > 0, 1, 0) + IF(le.title_ALLOW_ErrorCount > 0, 1, 0) + IF(le.title_LENGTH_ErrorCount > 0, 1, 0) + IF(le.fname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.mname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.lname_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.name_suffix_ALLOW_ErrorCount > 0, 1, 0) + IF(le.name_suffix_LENGTH_ErrorCount > 0, 1, 0) + IF(le.name_score_ALLOW_ErrorCount > 0, 1, 0) + IF(le.company_name_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prim_range_LENGTH_ErrorCount > 0, 1, 0) + IF(le.predir_LENGTH_ErrorCount > 0, 1, 0) + IF(le.prim_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.suffix_LENGTH_ErrorCount > 0, 1, 0) + IF(le.postdir_LENGTH_ErrorCount > 0, 1, 0) + IF(le.unit_desig_LENGTH_ErrorCount > 0, 1, 0) + IF(le.sec_range_LENGTH_ErrorCount > 0, 1, 0) + IF(le.p_city_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.v_city_name_LENGTH_ErrorCount > 0, 1, 0) + IF(le.st_LENGTH_ErrorCount > 0, 1, 0) + IF(le.zip5_LENGTH_ErrorCount > 0, 1, 0) + IF(le.zip4_LENGTH_ErrorCount > 0, 1, 0) + IF(le.county_LENGTH_ErrorCount > 0, 1, 0) + IF(le.cart_LENGTH_ErrorCount > 0, 1, 0) + IF(le.cr_sort_sz_LENGTH_ErrorCount > 0, 1, 0) + IF(le.lot_LENGTH_ErrorCount > 0, 1, 0) + IF(le.lot_order_LENGTH_ErrorCount > 0, 1, 0) + IF(le.dpbc_LENGTH_ErrorCount > 0, 1, 0) + IF(le.chk_digit_LENGTH_ErrorCount > 0, 1, 0) + IF(le.rec_type_LENGTH_ErrorCount > 0, 1, 0) + IF(le.ace_fips_st_LENGTH_ErrorCount > 0, 1, 0) + IF(le.ace_fips_county_LENGTH_ErrorCount > 0, 1, 0) + IF(le.geo_lat_LENGTH_ErrorCount > 0, 1, 0) + IF(le.geo_long_LENGTH_ErrorCount > 0, 1, 0) + IF(le.msa_LENGTH_ErrorCount > 0, 1, 0) + IF(le.geo_blk_LENGTH_ErrorCount > 0, 1, 0) + IF(le.geo_match_LENGTH_ErrorCount > 0, 1, 0) + IF(le.err_stat_LENGTH_ErrorCount > 0, 1, 0) + IF(le.bdid_ENUM_ErrorCount > 0, 1, 0) + IF(le.did_ENUM_ErrorCount > 0, 1, 0) + IF(le.did_score_ENUM_ErrorCount > 0, 1, 0) + IF(le.bdid_score_ENUM_ErrorCount > 0, 1, 0) + IF(le.source_rec_id_ENUM_ErrorCount > 0, 1, 0) + IF(le.dotid_ENUM_ErrorCount > 0, 1, 0) + IF(le.dotscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.dotweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.empid_ENUM_ErrorCount > 0, 1, 0) + IF(le.empscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.empweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.powid_ENUM_ErrorCount > 0, 1, 0) + IF(le.powscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.powweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.proxid_ENUM_ErrorCount > 0, 1, 0) + IF(le.proxscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.proxweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.seleid_ENUM_ErrorCount > 0, 1, 0) + IF(le.selescore_ENUM_ErrorCount > 0, 1, 0) + IF(le.seleweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.orgid_ENUM_ErrorCount > 0, 1, 0) + IF(le.orgscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.orgweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.ultid_ENUM_ErrorCount > 0, 1, 0) + IF(le.ultscore_ENUM_ErrorCount > 0, 1, 0) + IF(le.ultweight_ENUM_ErrorCount > 0, 1, 0) + IF(le.prep_addr_line1_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.prep_addr_last_line_CUSTOM_ErrorCount > 0, 1, 0) + IF(le.rawaid_ENUM_ErrorCount > 0, 1, 0) + IF(le.aceaid_ENUM_ErrorCount > 0, 1, 0) + IF(le.persistent_record_id_ENUM_ErrorCount > 0, 1, 0);
+    SELF.Rules_NoErrors := NumRules - SELF.Rules_WithErrors;
+    SELF := le;
+  END;
+  EXPORT SummaryStats := PROJECT(SummaryStats0, xAddErrSummary(LEFT));
   r := RECORD
     STRING10 Src;
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT37.StrType ErrorMessage;
-    SALT37.StrType FieldContents;
+    SALT38.StrType ErrorMessage;
+    SALT38.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  ''; // Source not provided
@@ -544,14 +563,15 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.persistent_record_id_Invalid,'ENUM','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'tmsid','rmsid','orig_name','orig_lname','orig_fname','orig_mname','orig_suffix','duns_number','hq_duns_number','ssn','fein','incorp_state','corp_number','corp_type','orig_address1','orig_address2','orig_city','orig_state','orig_zip5','orig_zip4','orig_country','orig_province','foreign_indc','party_type','dt_first_seen','dt_last_seen','dt_vendor_last_reported','dt_vendor_first_reported','process_date','title','fname','mname','lname','name_suffix','name_score','company_name','prim_range','predir','prim_name','suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','st','zip5','zip4','county','cart','cr_sort_sz','lot','lot_order','dpbc','chk_digit','rec_type','ace_fips_st','ace_fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','bdid','did','did_score','bdid_score','source_rec_id','dotid','dotscore','dotweight','empid','empscore','empweight','powid','powscore','powweight','proxid','proxscore','proxweight','seleid','selescore','seleweight','orgid','orgscore','orgweight','ultid','ultscore','ultweight','prep_addr_line1','prep_addr_last_line','rawaid','aceaid','persistent_record_id','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'invalid_tmsid','invalid_rmsid','invalid_wordbag','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_duns_number','invalid_duns_number','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_orig_address1','invalid_wordbag','invalid_mandatory','invalid_mandatory','invalid_zip_code5','invalid_zip_code4','invalid_alpha_blank','invalid_alpha_blank','invalid_boolean_yn_empty','invalid_party_type','invalid_pastdate06','invalid_pastdate06','invalid_pastdate06','invalid_pastdate06','invalid_08pastdate','invalid_wordbag','invalid_fname','invalid_mname','invalid_lname','invalid_wordbag','invalid_numeric_blank','invalid_company_name','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_empty','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','invalid_mandatory','invalid_mandatory','invalid_zero_integer','invalid_zero_integer','invalid_zero_integer','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT37.StrType)le.tmsid,(SALT37.StrType)le.rmsid,(SALT37.StrType)le.orig_name,(SALT37.StrType)le.orig_lname,(SALT37.StrType)le.orig_fname,(SALT37.StrType)le.orig_mname,(SALT37.StrType)le.orig_suffix,(SALT37.StrType)le.duns_number,(SALT37.StrType)le.hq_duns_number,(SALT37.StrType)le.ssn,(SALT37.StrType)le.fein,(SALT37.StrType)le.incorp_state,(SALT37.StrType)le.corp_number,(SALT37.StrType)le.corp_type,(SALT37.StrType)le.orig_address1,(SALT37.StrType)le.orig_address2,(SALT37.StrType)le.orig_city,(SALT37.StrType)le.orig_state,(SALT37.StrType)le.orig_zip5,(SALT37.StrType)le.orig_zip4,(SALT37.StrType)le.orig_country,(SALT37.StrType)le.orig_province,(SALT37.StrType)le.foreign_indc,(SALT37.StrType)le.party_type,(SALT37.StrType)le.dt_first_seen,(SALT37.StrType)le.dt_last_seen,(SALT37.StrType)le.dt_vendor_last_reported,(SALT37.StrType)le.dt_vendor_first_reported,(SALT37.StrType)le.process_date,(SALT37.StrType)le.title,(SALT37.StrType)le.fname,(SALT37.StrType)le.mname,(SALT37.StrType)le.lname,(SALT37.StrType)le.name_suffix,(SALT37.StrType)le.name_score,(SALT37.StrType)le.company_name,(SALT37.StrType)le.prim_range,(SALT37.StrType)le.predir,(SALT37.StrType)le.prim_name,(SALT37.StrType)le.suffix,(SALT37.StrType)le.postdir,(SALT37.StrType)le.unit_desig,(SALT37.StrType)le.sec_range,(SALT37.StrType)le.p_city_name,(SALT37.StrType)le.v_city_name,(SALT37.StrType)le.st,(SALT37.StrType)le.zip5,(SALT37.StrType)le.zip4,(SALT37.StrType)le.county,(SALT37.StrType)le.cart,(SALT37.StrType)le.cr_sort_sz,(SALT37.StrType)le.lot,(SALT37.StrType)le.lot_order,(SALT37.StrType)le.dpbc,(SALT37.StrType)le.chk_digit,(SALT37.StrType)le.rec_type,(SALT37.StrType)le.ace_fips_st,(SALT37.StrType)le.ace_fips_county,(SALT37.StrType)le.geo_lat,(SALT37.StrType)le.geo_long,(SALT37.StrType)le.msa,(SALT37.StrType)le.geo_blk,(SALT37.StrType)le.geo_match,(SALT37.StrType)le.err_stat,(SALT37.StrType)le.bdid,(SALT37.StrType)le.did,(SALT37.StrType)le.did_score,(SALT37.StrType)le.bdid_score,(SALT37.StrType)le.source_rec_id,(SALT37.StrType)le.dotid,(SALT37.StrType)le.dotscore,(SALT37.StrType)le.dotweight,(SALT37.StrType)le.empid,(SALT37.StrType)le.empscore,(SALT37.StrType)le.empweight,(SALT37.StrType)le.powid,(SALT37.StrType)le.powscore,(SALT37.StrType)le.powweight,(SALT37.StrType)le.proxid,(SALT37.StrType)le.proxscore,(SALT37.StrType)le.proxweight,(SALT37.StrType)le.seleid,(SALT37.StrType)le.selescore,(SALT37.StrType)le.seleweight,(SALT37.StrType)le.orgid,(SALT37.StrType)le.orgscore,(SALT37.StrType)le.orgweight,(SALT37.StrType)le.ultid,(SALT37.StrType)le.ultscore,(SALT37.StrType)le.ultweight,(SALT37.StrType)le.prep_addr_line1,(SALT37.StrType)le.prep_addr_last_line,(SALT37.StrType)le.rawaid,(SALT37.StrType)le.aceaid,(SALT37.StrType)le.persistent_record_id,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT38.StrType)le.tmsid,(SALT38.StrType)le.rmsid,(SALT38.StrType)le.orig_name,(SALT38.StrType)le.orig_lname,(SALT38.StrType)le.orig_fname,(SALT38.StrType)le.orig_mname,(SALT38.StrType)le.orig_suffix,(SALT38.StrType)le.duns_number,(SALT38.StrType)le.hq_duns_number,(SALT38.StrType)le.ssn,(SALT38.StrType)le.fein,(SALT38.StrType)le.incorp_state,(SALT38.StrType)le.corp_number,(SALT38.StrType)le.corp_type,(SALT38.StrType)le.orig_address1,(SALT38.StrType)le.orig_address2,(SALT38.StrType)le.orig_city,(SALT38.StrType)le.orig_state,(SALT38.StrType)le.orig_zip5,(SALT38.StrType)le.orig_zip4,(SALT38.StrType)le.orig_country,(SALT38.StrType)le.orig_province,(SALT38.StrType)le.foreign_indc,(SALT38.StrType)le.party_type,(SALT38.StrType)le.dt_first_seen,(SALT38.StrType)le.dt_last_seen,(SALT38.StrType)le.dt_vendor_last_reported,(SALT38.StrType)le.dt_vendor_first_reported,(SALT38.StrType)le.process_date,(SALT38.StrType)le.title,(SALT38.StrType)le.fname,(SALT38.StrType)le.mname,(SALT38.StrType)le.lname,(SALT38.StrType)le.name_suffix,(SALT38.StrType)le.name_score,(SALT38.StrType)le.company_name,(SALT38.StrType)le.prim_range,(SALT38.StrType)le.predir,(SALT38.StrType)le.prim_name,(SALT38.StrType)le.suffix,(SALT38.StrType)le.postdir,(SALT38.StrType)le.unit_desig,(SALT38.StrType)le.sec_range,(SALT38.StrType)le.p_city_name,(SALT38.StrType)le.v_city_name,(SALT38.StrType)le.st,(SALT38.StrType)le.zip5,(SALT38.StrType)le.zip4,(SALT38.StrType)le.county,(SALT38.StrType)le.cart,(SALT38.StrType)le.cr_sort_sz,(SALT38.StrType)le.lot,(SALT38.StrType)le.lot_order,(SALT38.StrType)le.dpbc,(SALT38.StrType)le.chk_digit,(SALT38.StrType)le.rec_type,(SALT38.StrType)le.ace_fips_st,(SALT38.StrType)le.ace_fips_county,(SALT38.StrType)le.geo_lat,(SALT38.StrType)le.geo_long,(SALT38.StrType)le.msa,(SALT38.StrType)le.geo_blk,(SALT38.StrType)le.geo_match,(SALT38.StrType)le.err_stat,(SALT38.StrType)le.bdid,(SALT38.StrType)le.did,(SALT38.StrType)le.did_score,(SALT38.StrType)le.bdid_score,(SALT38.StrType)le.source_rec_id,(SALT38.StrType)le.dotid,(SALT38.StrType)le.dotscore,(SALT38.StrType)le.dotweight,(SALT38.StrType)le.empid,(SALT38.StrType)le.empscore,(SALT38.StrType)le.empweight,(SALT38.StrType)le.powid,(SALT38.StrType)le.powscore,(SALT38.StrType)le.powweight,(SALT38.StrType)le.proxid,(SALT38.StrType)le.proxscore,(SALT38.StrType)le.proxweight,(SALT38.StrType)le.seleid,(SALT38.StrType)le.selescore,(SALT38.StrType)le.seleweight,(SALT38.StrType)le.orgid,(SALT38.StrType)le.orgscore,(SALT38.StrType)le.orgweight,(SALT38.StrType)le.ultid,(SALT38.StrType)le.ultscore,(SALT38.StrType)le.ultweight,(SALT38.StrType)le.prep_addr_line1,(SALT38.StrType)le.prep_addr_last_line,(SALT38.StrType)le.rawaid,(SALT38.StrType)le.aceaid,(SALT38.StrType)le.persistent_record_id,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,95,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
-  EXPORT OrbitStats(UNSIGNED examples = 10,UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(),STRING10 Src='UNK') := FUNCTION
-    SALT37.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+  EXPORT OrbitStats(UNSIGNED examples = 10, UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD(), DATASET(DNB_Party_Layout_UCCV2) prevDS = DATASET([], DNB_Party_Layout_UCCV2), STRING10 Src='UNK'):= FUNCTION
+  // field error stats
+    SALT38.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := src;
@@ -650,7 +670,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'prep_addr_last_line:invalid_mandatory:CUSTOM'
           ,'rawaid:invalid_zero_integer:ENUM'
           ,'aceaid:invalid_zero_integer:ENUM'
-          ,'persistent_record_id:invalid_zero_integer:ENUM','UNKNOWN');
+          ,'persistent_record_id:invalid_zero_integer:ENUM'
+          ,'field:Number_Errored_Fields:SUMMARY'
+          ,'field:Number_Perfect_Fields:SUMMARY'
+          ,'rule:Number_Errored_Rules:SUMMARY'
+          ,'rule:Number_Perfect_Rules:SUMMARY'
+          ,'rule:Number_OnFail_Rules:SUMMARY'
+          ,'record:Number_Errored_Records:SUMMARY'
+          ,'record:Number_Perfect_Records:SUMMARY','UNKNOWN');
       SELF.ErrorMessage := CHOOSE(c
           ,DNB_Party_Fields.InvalidMessage_tmsid(1)
           ,DNB_Party_Fields.InvalidMessage_rmsid(1)
@@ -746,7 +773,14 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,DNB_Party_Fields.InvalidMessage_prep_addr_last_line(1)
           ,DNB_Party_Fields.InvalidMessage_rawaid(1)
           ,DNB_Party_Fields.InvalidMessage_aceaid(1)
-          ,DNB_Party_Fields.InvalidMessage_persistent_record_id(1),'UNKNOWN');
+          ,DNB_Party_Fields.InvalidMessage_persistent_record_id(1)
+          ,'Fields with errors'
+          ,'Fields without errors'
+          ,'Rules with errors'
+          ,'Rules without errors'
+          ,'Rules with possible edits'
+          ,'Records with at least one error'
+          ,'Records without errors','UNKNOWN');
       SELF.rulecnt := CHOOSE(c
           ,le.tmsid_CUSTOM_ErrorCount
           ,le.rmsid_CUSTOM_ErrorCount
@@ -842,8 +876,15 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.prep_addr_last_line_CUSTOM_ErrorCount
           ,le.rawaid_ENUM_ErrorCount
           ,le.aceaid_ENUM_ErrorCount
-          ,le.persistent_record_id_ENUM_ErrorCount,0);
-      SELF.rulepcnt := 100 * CHOOSE(c
+          ,le.persistent_record_id_ENUM_ErrorCount
+          ,le.FieldsChecked_WithErrors
+          ,le.FieldsChecked_NoErrors
+          ,le.Rules_WithErrors
+          ,le.Rules_NoErrors
+          ,NumRulesWithPossibleEdits
+          ,le.AnyRule_WithErrorsCount
+          ,SELF.recordstotal - le.AnyRule_WithErrorsCount,0);
+      SELF.rulepcnt := IF(c <= NumRules, 100 * CHOOSE(c
           ,le.tmsid_CUSTOM_ErrorCount
           ,le.rmsid_CUSTOM_ErrorCount
           ,le.orig_name_ALLOW_ErrorCount,le.orig_name_LENGTH_ErrorCount
@@ -938,25 +979,386 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,le.prep_addr_last_line_CUSTOM_ErrorCount
           ,le.rawaid_ENUM_ErrorCount
           ,le.aceaid_ENUM_ErrorCount
-          ,le.persistent_record_id_ENUM_ErrorCount,0) / le.TotalCnt + 0.5;
+          ,le.persistent_record_id_ENUM_ErrorCount,0) / le.TotalCnt + 0.5, CHOOSE(c - NumRules
+          ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_WithErrors/NumFieldsWithRules * 100)
+          ,IF(NumFieldsWithRules = 0, 0, le.FieldsChecked_NoErrors/NumFieldsWithRules * 100)
+          ,IF(NumRules = 0, 0, le.Rules_WithErrors/NumRules * 100)
+          ,IF(NumRules = 0, 0, le.Rules_NoErrors/NumRules * 100)
+          ,0
+          ,IF(SELF.recordstotal = 0, 0, le.AnyRule_WithErrorsCount/SELF.recordstotal * 100)
+          ,IF(SELF.recordstotal = 0, 0, (SELF.recordstotal - le.AnyRule_WithErrorsCount)/SELF.recordstotal * 100),0));
     END;
-    SummaryInfo := NORMALIZE(SummaryStats,104,Into(LEFT,COUNTER));
+    SummaryInfo := NORMALIZE(SummaryStats,NumRules + 7,Into(LEFT,COUNTER));
     orb_r := RECORD
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT37.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT38.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT37.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT38.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
       SELF := le;
     END;
-    j := JOIN(SummaryInfo,gt,LEFT.SourceCode=RIGHT.SRC AND LEFT.ruledesc=RIGHT.ruledesc,jn(LEFT,RIGHT),HASH,LEFT OUTER);
-    RETURN IF(examples>0,j,SummaryInfo);
+    j := JOIN(SummaryInfo,gt,LEFT.ruledesc=RIGHT.ruledesc,jn(LEFT,RIGHT),HASH,LEFT OUTER);
+    FieldErrorStats := IF(examples>0,j,SummaryInfo);
+ 
+    // field population stats
+    mod_hygiene := DNB_Party_hygiene(PROJECT(h, DNB_Party_Layout_UCCV2));
+    hygiene_summaryStats := mod_hygiene.Summary('');
+    getFieldTypeText(infield) := FUNCTIONMACRO
+      isNumField := (STRING)((TYPEOF(infield))'') = '0';
+      RETURN IF(isNumField, 'nonzero', 'nonblank');
+    ENDMACRO;
+    SALT38.ScrubsOrbitLayout xNormHygieneStats(hygiene_summaryStats le, UNSIGNED c, STRING suffix) := TRANSFORM
+      SELF.recordstotal := le.NumberOfRecords;
+      SELF.processdate := Pdate;
+      SELF.sourcecode := src;
+      SELF.ruledesc := CHOOSE(c
+          ,'tmsid:' + getFieldTypeText(h.tmsid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'rmsid:' + getFieldTypeText(h.rmsid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orig_name:' + getFieldTypeText(h.orig_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orig_lname:' + getFieldTypeText(h.orig_lname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orig_fname:' + getFieldTypeText(h.orig_fname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orig_mname:' + getFieldTypeText(h.orig_mname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orig_suffix:' + getFieldTypeText(h.orig_suffix) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'duns_number:' + getFieldTypeText(h.duns_number) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'hq_duns_number:' + getFieldTypeText(h.hq_duns_number) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'ssn:' + getFieldTypeText(h.ssn) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'fein:' + getFieldTypeText(h.fein) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'incorp_state:' + getFieldTypeText(h.incorp_state) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'corp_number:' + getFieldTypeText(h.corp_number) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'corp_type:' + getFieldTypeText(h.corp_type) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orig_address1:' + getFieldTypeText(h.orig_address1) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orig_address2:' + getFieldTypeText(h.orig_address2) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orig_city:' + getFieldTypeText(h.orig_city) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orig_state:' + getFieldTypeText(h.orig_state) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orig_zip5:' + getFieldTypeText(h.orig_zip5) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orig_zip4:' + getFieldTypeText(h.orig_zip4) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orig_country:' + getFieldTypeText(h.orig_country) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orig_province:' + getFieldTypeText(h.orig_province) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orig_postal_code:' + getFieldTypeText(h.orig_postal_code) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'foreign_indc:' + getFieldTypeText(h.foreign_indc) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'party_type:' + getFieldTypeText(h.party_type) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'dt_first_seen:' + getFieldTypeText(h.dt_first_seen) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'dt_last_seen:' + getFieldTypeText(h.dt_last_seen) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'dt_vendor_last_reported:' + getFieldTypeText(h.dt_vendor_last_reported) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'dt_vendor_first_reported:' + getFieldTypeText(h.dt_vendor_first_reported) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'process_date:' + getFieldTypeText(h.process_date) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'title:' + getFieldTypeText(h.title) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'fname:' + getFieldTypeText(h.fname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'mname:' + getFieldTypeText(h.mname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'lname:' + getFieldTypeText(h.lname) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'name_suffix:' + getFieldTypeText(h.name_suffix) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'name_score:' + getFieldTypeText(h.name_score) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'company_name:' + getFieldTypeText(h.company_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'prim_range:' + getFieldTypeText(h.prim_range) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'predir:' + getFieldTypeText(h.predir) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'prim_name:' + getFieldTypeText(h.prim_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'suffix:' + getFieldTypeText(h.suffix) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'postdir:' + getFieldTypeText(h.postdir) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'unit_desig:' + getFieldTypeText(h.unit_desig) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'sec_range:' + getFieldTypeText(h.sec_range) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'p_city_name:' + getFieldTypeText(h.p_city_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'v_city_name:' + getFieldTypeText(h.v_city_name) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'st:' + getFieldTypeText(h.st) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'zip5:' + getFieldTypeText(h.zip5) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'zip4:' + getFieldTypeText(h.zip4) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'county:' + getFieldTypeText(h.county) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'cart:' + getFieldTypeText(h.cart) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'cr_sort_sz:' + getFieldTypeText(h.cr_sort_sz) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'lot:' + getFieldTypeText(h.lot) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'lot_order:' + getFieldTypeText(h.lot_order) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'dpbc:' + getFieldTypeText(h.dpbc) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'chk_digit:' + getFieldTypeText(h.chk_digit) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'rec_type:' + getFieldTypeText(h.rec_type) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'ace_fips_st:' + getFieldTypeText(h.ace_fips_st) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'ace_fips_county:' + getFieldTypeText(h.ace_fips_county) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'geo_lat:' + getFieldTypeText(h.geo_lat) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'geo_long:' + getFieldTypeText(h.geo_long) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'msa:' + getFieldTypeText(h.msa) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'geo_blk:' + getFieldTypeText(h.geo_blk) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'geo_match:' + getFieldTypeText(h.geo_match) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'err_stat:' + getFieldTypeText(h.err_stat) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'bdid:' + getFieldTypeText(h.bdid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'did:' + getFieldTypeText(h.did) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'did_score:' + getFieldTypeText(h.did_score) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'bdid_score:' + getFieldTypeText(h.bdid_score) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'source_rec_id:' + getFieldTypeText(h.source_rec_id) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'dotid:' + getFieldTypeText(h.dotid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'dotscore:' + getFieldTypeText(h.dotscore) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'dotweight:' + getFieldTypeText(h.dotweight) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'empid:' + getFieldTypeText(h.empid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'empscore:' + getFieldTypeText(h.empscore) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'empweight:' + getFieldTypeText(h.empweight) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'powid:' + getFieldTypeText(h.powid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'powscore:' + getFieldTypeText(h.powscore) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'powweight:' + getFieldTypeText(h.powweight) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'proxid:' + getFieldTypeText(h.proxid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'proxscore:' + getFieldTypeText(h.proxscore) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'proxweight:' + getFieldTypeText(h.proxweight) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'seleid:' + getFieldTypeText(h.seleid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'selescore:' + getFieldTypeText(h.selescore) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'seleweight:' + getFieldTypeText(h.seleweight) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orgid:' + getFieldTypeText(h.orgid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orgscore:' + getFieldTypeText(h.orgscore) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'orgweight:' + getFieldTypeText(h.orgweight) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'ultid:' + getFieldTypeText(h.ultid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'ultscore:' + getFieldTypeText(h.ultscore) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'ultweight:' + getFieldTypeText(h.ultweight) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'prep_addr_line1:' + getFieldTypeText(h.prep_addr_line1) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'prep_addr_last_line:' + getFieldTypeText(h.prep_addr_last_line) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'rawaid:' + getFieldTypeText(h.rawaid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'aceaid:' + getFieldTypeText(h.aceaid) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix
+          ,'persistent_record_id:' + getFieldTypeText(h.persistent_record_id) + IF(TRIM(le.txt) > '', '_' + TRIM(le.txt), '') + ':' + suffix,'UNKNOWN');
+      SELF.rulecnt := CHOOSE(c
+          ,le.populated_tmsid_cnt
+          ,le.populated_rmsid_cnt
+          ,le.populated_orig_name_cnt
+          ,le.populated_orig_lname_cnt
+          ,le.populated_orig_fname_cnt
+          ,le.populated_orig_mname_cnt
+          ,le.populated_orig_suffix_cnt
+          ,le.populated_duns_number_cnt
+          ,le.populated_hq_duns_number_cnt
+          ,le.populated_ssn_cnt
+          ,le.populated_fein_cnt
+          ,le.populated_incorp_state_cnt
+          ,le.populated_corp_number_cnt
+          ,le.populated_corp_type_cnt
+          ,le.populated_orig_address1_cnt
+          ,le.populated_orig_address2_cnt
+          ,le.populated_orig_city_cnt
+          ,le.populated_orig_state_cnt
+          ,le.populated_orig_zip5_cnt
+          ,le.populated_orig_zip4_cnt
+          ,le.populated_orig_country_cnt
+          ,le.populated_orig_province_cnt
+          ,le.populated_orig_postal_code_cnt
+          ,le.populated_foreign_indc_cnt
+          ,le.populated_party_type_cnt
+          ,le.populated_dt_first_seen_cnt
+          ,le.populated_dt_last_seen_cnt
+          ,le.populated_dt_vendor_last_reported_cnt
+          ,le.populated_dt_vendor_first_reported_cnt
+          ,le.populated_process_date_cnt
+          ,le.populated_title_cnt
+          ,le.populated_fname_cnt
+          ,le.populated_mname_cnt
+          ,le.populated_lname_cnt
+          ,le.populated_name_suffix_cnt
+          ,le.populated_name_score_cnt
+          ,le.populated_company_name_cnt
+          ,le.populated_prim_range_cnt
+          ,le.populated_predir_cnt
+          ,le.populated_prim_name_cnt
+          ,le.populated_suffix_cnt
+          ,le.populated_postdir_cnt
+          ,le.populated_unit_desig_cnt
+          ,le.populated_sec_range_cnt
+          ,le.populated_p_city_name_cnt
+          ,le.populated_v_city_name_cnt
+          ,le.populated_st_cnt
+          ,le.populated_zip5_cnt
+          ,le.populated_zip4_cnt
+          ,le.populated_county_cnt
+          ,le.populated_cart_cnt
+          ,le.populated_cr_sort_sz_cnt
+          ,le.populated_lot_cnt
+          ,le.populated_lot_order_cnt
+          ,le.populated_dpbc_cnt
+          ,le.populated_chk_digit_cnt
+          ,le.populated_rec_type_cnt
+          ,le.populated_ace_fips_st_cnt
+          ,le.populated_ace_fips_county_cnt
+          ,le.populated_geo_lat_cnt
+          ,le.populated_geo_long_cnt
+          ,le.populated_msa_cnt
+          ,le.populated_geo_blk_cnt
+          ,le.populated_geo_match_cnt
+          ,le.populated_err_stat_cnt
+          ,le.populated_bdid_cnt
+          ,le.populated_did_cnt
+          ,le.populated_did_score_cnt
+          ,le.populated_bdid_score_cnt
+          ,le.populated_source_rec_id_cnt
+          ,le.populated_dotid_cnt
+          ,le.populated_dotscore_cnt
+          ,le.populated_dotweight_cnt
+          ,le.populated_empid_cnt
+          ,le.populated_empscore_cnt
+          ,le.populated_empweight_cnt
+          ,le.populated_powid_cnt
+          ,le.populated_powscore_cnt
+          ,le.populated_powweight_cnt
+          ,le.populated_proxid_cnt
+          ,le.populated_proxscore_cnt
+          ,le.populated_proxweight_cnt
+          ,le.populated_seleid_cnt
+          ,le.populated_selescore_cnt
+          ,le.populated_seleweight_cnt
+          ,le.populated_orgid_cnt
+          ,le.populated_orgscore_cnt
+          ,le.populated_orgweight_cnt
+          ,le.populated_ultid_cnt
+          ,le.populated_ultscore_cnt
+          ,le.populated_ultweight_cnt
+          ,le.populated_prep_addr_line1_cnt
+          ,le.populated_prep_addr_last_line_cnt
+          ,le.populated_rawaid_cnt
+          ,le.populated_aceaid_cnt
+          ,le.populated_persistent_record_id_cnt,0);
+      SELF.rulepcnt := CHOOSE(c
+          ,le.populated_tmsid_pcnt
+          ,le.populated_rmsid_pcnt
+          ,le.populated_orig_name_pcnt
+          ,le.populated_orig_lname_pcnt
+          ,le.populated_orig_fname_pcnt
+          ,le.populated_orig_mname_pcnt
+          ,le.populated_orig_suffix_pcnt
+          ,le.populated_duns_number_pcnt
+          ,le.populated_hq_duns_number_pcnt
+          ,le.populated_ssn_pcnt
+          ,le.populated_fein_pcnt
+          ,le.populated_incorp_state_pcnt
+          ,le.populated_corp_number_pcnt
+          ,le.populated_corp_type_pcnt
+          ,le.populated_orig_address1_pcnt
+          ,le.populated_orig_address2_pcnt
+          ,le.populated_orig_city_pcnt
+          ,le.populated_orig_state_pcnt
+          ,le.populated_orig_zip5_pcnt
+          ,le.populated_orig_zip4_pcnt
+          ,le.populated_orig_country_pcnt
+          ,le.populated_orig_province_pcnt
+          ,le.populated_orig_postal_code_pcnt
+          ,le.populated_foreign_indc_pcnt
+          ,le.populated_party_type_pcnt
+          ,le.populated_dt_first_seen_pcnt
+          ,le.populated_dt_last_seen_pcnt
+          ,le.populated_dt_vendor_last_reported_pcnt
+          ,le.populated_dt_vendor_first_reported_pcnt
+          ,le.populated_process_date_pcnt
+          ,le.populated_title_pcnt
+          ,le.populated_fname_pcnt
+          ,le.populated_mname_pcnt
+          ,le.populated_lname_pcnt
+          ,le.populated_name_suffix_pcnt
+          ,le.populated_name_score_pcnt
+          ,le.populated_company_name_pcnt
+          ,le.populated_prim_range_pcnt
+          ,le.populated_predir_pcnt
+          ,le.populated_prim_name_pcnt
+          ,le.populated_suffix_pcnt
+          ,le.populated_postdir_pcnt
+          ,le.populated_unit_desig_pcnt
+          ,le.populated_sec_range_pcnt
+          ,le.populated_p_city_name_pcnt
+          ,le.populated_v_city_name_pcnt
+          ,le.populated_st_pcnt
+          ,le.populated_zip5_pcnt
+          ,le.populated_zip4_pcnt
+          ,le.populated_county_pcnt
+          ,le.populated_cart_pcnt
+          ,le.populated_cr_sort_sz_pcnt
+          ,le.populated_lot_pcnt
+          ,le.populated_lot_order_pcnt
+          ,le.populated_dpbc_pcnt
+          ,le.populated_chk_digit_pcnt
+          ,le.populated_rec_type_pcnt
+          ,le.populated_ace_fips_st_pcnt
+          ,le.populated_ace_fips_county_pcnt
+          ,le.populated_geo_lat_pcnt
+          ,le.populated_geo_long_pcnt
+          ,le.populated_msa_pcnt
+          ,le.populated_geo_blk_pcnt
+          ,le.populated_geo_match_pcnt
+          ,le.populated_err_stat_pcnt
+          ,le.populated_bdid_pcnt
+          ,le.populated_did_pcnt
+          ,le.populated_did_score_pcnt
+          ,le.populated_bdid_score_pcnt
+          ,le.populated_source_rec_id_pcnt
+          ,le.populated_dotid_pcnt
+          ,le.populated_dotscore_pcnt
+          ,le.populated_dotweight_pcnt
+          ,le.populated_empid_pcnt
+          ,le.populated_empscore_pcnt
+          ,le.populated_empweight_pcnt
+          ,le.populated_powid_pcnt
+          ,le.populated_powscore_pcnt
+          ,le.populated_powweight_pcnt
+          ,le.populated_proxid_pcnt
+          ,le.populated_proxscore_pcnt
+          ,le.populated_proxweight_pcnt
+          ,le.populated_seleid_pcnt
+          ,le.populated_selescore_pcnt
+          ,le.populated_seleweight_pcnt
+          ,le.populated_orgid_pcnt
+          ,le.populated_orgscore_pcnt
+          ,le.populated_orgweight_pcnt
+          ,le.populated_ultid_pcnt
+          ,le.populated_ultscore_pcnt
+          ,le.populated_ultweight_pcnt
+          ,le.populated_prep_addr_line1_pcnt
+          ,le.populated_prep_addr_last_line_pcnt
+          ,le.populated_rawaid_pcnt
+          ,le.populated_aceaid_pcnt
+          ,le.populated_persistent_record_id_pcnt,0);
+      SELF.ErrorMessage := '';
+    END;
+    FieldPopStats := NORMALIZE(hygiene_summaryStats,96,xNormHygieneStats(LEFT,COUNTER,'POP'));
+ 
+  // record count stats
+    SALT38.ScrubsOrbitLayout xTotalRecs(hygiene_summaryStats le, STRING inRuleDesc) := TRANSFORM
+      SELF.recordstotal := le.NumberOfRecords;
+      SELF.processdate := Pdate;
+      SELF.sourcecode := src;
+      SELF.ruledesc := inRuleDesc;
+      SELF.ErrorMessage := '';
+      SELF.rulecnt := le.NumberOfRecords;
+      SELF.rulepcnt := 0;
+    END;
+    TotalRecsStats := PROJECT(hygiene_summaryStats, xTotalRecs(LEFT, 'records:total_records:POP'));
+ 
+    mod_Delta := DNB_Party_Delta(prevDS, PROJECT(h, DNB_Party_Layout_UCCV2));
+    deltaHygieneSummary := mod_Delta.DifferenceSummary;
+    DeltaFieldPopStats := NORMALIZE(deltaHygieneSummary(txt <> 'New'),96,xNormHygieneStats(LEFT,COUNTER,'DELTA'));
+    deltaStatName(STRING inTxt) := IF(STD.Str.Find(inTxt, 'Updates_') > 0,
+                                      'Updates:count_Updates:DELTA',
+                                      TRIM(inTxt) + ':count_' + TRIM(inTxt) + ':DELTA');
+    DeltaTotalRecsStats := PROJECT(deltaHygieneSummary(txt <> 'Updates_OldFile'), xTotalRecs(LEFT, deltaStatName(LEFT.txt)));
+    DeltaStats := IF(COUNT(prevDS) > 0, DeltaFieldPopStats + DeltaTotalRecsStats);
+ 
+    RETURN FieldErrorStats & FieldPopStats & TotalRecsStats & DeltaStats;
   END;
+END;
+ 
+EXPORT StandardStats(DATASET(DNB_Party_Layout_UCCV2) inFile, BOOLEAN doErrorOverall = TRUE) := FUNCTION
+  myTimeStamp := (UNSIGNED6)SALT38.Fn_Now('YYYYMMDDHHMMSS') : INDEPENDENT;
+  expandedFile := FromNone(inFile).ExpandedInfile;
+  mod_fromexpandedOverall := FromExpanded(expandedFile);
+  scrubsSummaryOverall := mod_fromexpandedOverall.SummaryStats;
+ 
+  SALT38.mod_StandardStatsTransforms.mac_scrubsSummaryStatsFieldErrTransform(Scrubs_UCCV2, DNB_Party_Fields, 'RECORDOF(scrubsSummaryOverall)', '');
+  scrubsSummaryOverall_Standard := NORMALIZE(scrubsSummaryOverall, (NumRulesFromFieldType + NumFieldsWithRules) * 4, xSummaryStats(LEFT, COUNTER, myTimeStamp, 'all', 'all'));
+ 
+  allErrsOverall := mod_fromexpandedOverall.AllErrors;
+  tErrsOverall := TABLE(DISTRIBUTE(allErrsOverall, HASH(FieldName, ErrorType)), {FieldName, ErrorType, FieldContents, cntExamples := COUNT(GROUP)}, FieldName, ErrorType, FieldContents, LOCAL);
+ 
+  scrubsSummaryOverall_Standard_addErr   := IF(doErrorOverall,
+                                               DENORMALIZE(SORT(DISTRIBUTE(scrubsSummaryOverall_Standard, HASH(field, ruletype)), field, ruletype, LOCAL),
+  	                                                       SORT(tErrsOverall, FieldName, ErrorType, -cntExamples, FieldContents, LOCAL),
+  	                                                       LEFT.field = RIGHT.FieldName AND LEFT.ruletype = RIGHT.ErrorType AND LEFT.MeasureType = 'CntRecs',
+  	                                                       TRANSFORM(RECORDOF(LEFT),
+  	                                                       SELF.dsExamples := LEFT.dsExamples & DATASET([{RIGHT.FieldContents, RIGHT.cntExamples, IF(LEFT.StatValue > 0, RIGHT.cntExamples/LEFT.StatValue * 100, 0)}], SALT38.Layout_Stats_Standard.Examples);
+  	                                                       SELF := LEFT),
+  	                                                       KEEP(10), LEFT OUTER, LOCAL, NOSORT));
+  scrubsSummaryOverall_Standard_GeneralErrs := IF(doErrorOverall, SALT38.mod_StandardStatsTransforms.scrubsSummaryStatsGeneral(scrubsSummaryOverall,, myTimeStamp, 'all', 'all'));
+ 
+  RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;
 END;

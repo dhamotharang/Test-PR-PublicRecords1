@@ -1,10 +1,15 @@
-IMPORT ut, Scrubs, Codes;
+﻿IMPORT ut, Scrubs, Codes;
 
 EXPORT Functions := MODULE
+
+
+
 
 //*********************************************************//
 //***************BEGIN GENERAL PURPOSE SECTION*************//
 //*********************************************************//
+
+
 
 
 
@@ -40,11 +45,15 @@ EXPORT Functions := MODULE
 
 
 
+
+
 //*********************************************************//
 //***************END GENERAL PURPOSE SECTION***************//
 //*********************************************************//
 //***************BEGIN ADDRESS SECTION*********************//
 //*********************************************************//
+
+
 
 
 
@@ -144,7 +153,19 @@ EXPORT Functions := MODULE
                        FALSE);
     RETURN IF(isValidTerm,1,0);
   END;
+
+   //****************************************************************************
+  //fn_wa_address: 	returns true or false based upon the incoming
+  //							        address.
+  //****************************************************************************
+  EXPORT fn_wa_address(STRING term) := FUNCTION
+	   uc_term := ut.CleanSpacesAndUpper(term);
+		  isValidTerm := IF(uc_term = '405 BLACK LAKE BLVD SW', 1, 0);
+    RETURN isValidTerm;
+  END;  
   
+
+
 
 
 //*********************************************************//
@@ -152,6 +173,8 @@ EXPORT Functions := MODULE
 //*********************************************************//
 //***************BEGIN DATE/TIME SECTION*******************//
 //*********************************************************//
+
+
 
 
 
@@ -280,11 +303,15 @@ EXPORT Functions := MODULE
   END;
 
 
+
+
 //*********************************************************//
 //***************END DATE/TIME SECTION*********************//
 //*********************************************************//
 //***************BEGIN ID SECTION**************************//
 //*********************************************************//
+
+
 
 
   //*************************************************************************************
@@ -351,11 +378,14 @@ EXPORT Functions := MODULE
   END;
 
 
+
+
 //*********************************************************//
 //***************END ID SECTION****************************//
 //*********************************************************//
 //***************BEGIN FILING_NUMBER SECTION***************//
 //*********************************************************//
+
 
 
 
@@ -368,11 +398,14 @@ EXPORT Functions := MODULE
 
 
 
+
 //*********************************************************//
 //***************END FILING_NUMBER SECTION*****************//
 //*********************************************************//
 //***************BEGIN FILING_TYPE SECTION*****************//
 //*********************************************************//
+
+
 
 
   //****************************************************************************
@@ -549,7 +582,78 @@ EXPORT Functions := MODULE
                         FALSE);
     RETURN IF(isValidTerm,1,0);
   END;
-  
+
+  //****************************************************************************
+  //fn_tx_orig_filing_type: 	returns true or false based upon the incoming
+  //							                 type.
+  //****************************************************************************
+  EXPORT fn_tx_orig_filing_type(STRING term) := FUNCTION
+	   uc_term := ut.CleanSpacesAndUpper(term);
+		  isValidTerm := IF(uc_term = 'ORIGINAL FILING', 1, 0);
+    RETURN isValidTerm;
+  END;  
+
+  //****************************************************************************
+  //fn_tx_filing_type: 	returns true or false based upon the incoming
+  //							             type.
+  //****************************************************************************
+  EXPORT fn_tx_filing_type(STRING term) := FUNCTION
+	  uc_term := ut.CleanSpacesAndUpper(term);
+		 isValidTerm := CASE(uc_term,
+                       'UCC STANDARD'                                    => TRUE,
+                       'MASTER RECORD (ORIGINAL FILING UCC-1)'           => TRUE,
+                       'CONTINUATION'                                    => TRUE,
+                       'TERMINATION'                                     => TRUE,
+                       'AMENDMENT, MASTER AMENDMENT'                     => TRUE,
+                       'ASSIGNMENT, FULL MASTER ASSIGNMENT'              => TRUE,
+                       'CORRECTION'                                      => TRUE,
+                       'REVOKED, REVOKED EDIT'                           => TRUE,
+                       '(MASTER) AMENDMENT'                              => TRUE,
+                       'JUDICIAL FINDINGS OF FACT'                       => TRUE,
+                       '(FULL MASTER|PARTIAL MASTER) ASSIGNMENT'         => TRUE,
+                       ''                                                => TRUE,
+                       FALSE);
+    RETURN IF(isValidTerm,1,0);
+  END;
+
+  //****************************************************************************
+  //fn_th_orig_filing_type: 	returns true or false based upon the incoming
+  //							                 type.
+  //****************************************************************************
+  EXPORT fn_th_orig_filing_type(STRING term) := FUNCTION
+	   uc_term := ut.CleanSpacesAndUpper(term);
+		  isValidTerm := IF(uc_term = 'INITIAL FILING', 1, 0);
+    RETURN isValidTerm;
+  END;  
+
+  //****************************************************************************
+  //fn_wa_orig_filing_type: 	returns true or false based upon the incoming
+  //							                 type.
+  //****************************************************************************
+  EXPORT fn_wa_orig_filing_type(STRING term) := FUNCTION
+	   uc_term := ut.CleanSpacesAndUpper(term);
+		  isValidTerm := IF(uc_term = 'INITIAL FILING', 1, 0);
+    RETURN isValidTerm;
+  END;  
+
+  //****************************************************************************
+  //fn_wa_filing_type: 	returns true or false based upon the incoming
+  //							             type.
+  //****************************************************************************
+  EXPORT fn_wa_filing_type(STRING term) := FUNCTION
+	  uc_term := ut.CleanSpacesAndUpper(term);
+		 isValidTerm := CASE(uc_term,
+                       'INITIAL FILING'                                => TRUE,
+                       'TERMINATION'                                   => TRUE,
+                       'CONTINUATION'                                  => TRUE,
+                       'AMENDMENT'                                     => TRUE,
+                       'ASSIGNMENT'                                    => TRUE,
+                       'FILING OFFICER STATEMENT'                      => TRUE,
+                       'CORRECTION'                                    => TRUE,
+                       FALSE);
+    RETURN IF(isValidTerm,1,0);
+  END;
+
 
   
 //*********************************************************//
@@ -557,6 +661,8 @@ EXPORT Functions := MODULE
 //*********************************************************//
 //***************BEGIN STATUS_TYPE SECTION*****************//
 //*********************************************************//
+
+
 
 
   //****************************************************************************
@@ -588,13 +694,38 @@ EXPORT Functions := MODULE
     RETURN IF(isValidTerm,1,0);
   END;
   
-  
+ 
+
 
 //*********************************************************//
 //***************END STATUS_TYPE SECTION*******************//
 //*********************************************************//
+//***************BEGIN AGENCY SECTION**********************//
+//*********************************************************//
+
+
+
+
+   //****************************************************************************
+  //fn_wa_filing_agency: 	returns true or false based upon the incoming
+  //							               agency.
+  //****************************************************************************
+  EXPORT fn_wa_filing_agency(STRING term) := FUNCTION
+	   uc_term := ut.CleanSpacesAndUpper(term);
+		  isValidTerm := IF(uc_term = 'SECRETARY OF STATE/UCC DIVISION', 1, 0);
+    RETURN isValidTerm;
+  END;  
+ 
+
+
+
+
+//*********************************************************//
+//***************END AGENCY SECTION************************//
+//*********************************************************//
 //***************BEGIN GENERAL SECTION*********************//
 //*********************************************************//
+
 
 
 
@@ -723,7 +854,7 @@ EXPORT Functions := MODULE
                        'CHE'=>'SWITZERLAND',
                        'CHL'=>'CHILE',
                        'CHN'=>'CHINA',
-                       'CIV'=>'CÃ”TE D`IVOIRE',
+                       'CIV'=>'CÔTE D`IVOIRE',
                        'CMR'=>'CAMEROON',
                        'COD'=>'CONGO (KINSHASA)',
                        'COG'=>'CONGO (BRAZZAVILLE)',
@@ -938,262 +1069,270 @@ EXPORT Functions := MODULE
 	 EXPORT fn_country2(STRING country_code) := FUNCTION
 		  cntry_code := ut.CleanSpacesAndUpper(TRIM(country_code,ALL));
 		  country    := case(cntry_code,
-                       'AD'=>'Andorra',
-                       'AE'=>'United Arab Emirates (the)',
-                       'AF'=>'Afghanistan',
-                       'AG'=>'Antigua and Barbuda',
-                       'AI'=>'Anguilla',
-                       'AL'=>'Albania',
-                       'AM'=>'Armenia',
-                       'AO'=>'Angola',
-                       'AQ'=>'Antarctica',
-                       'AR'=>'Argentina',
-                       'AS'=>'American Samoa',
-                       'AT'=>'Austria',
-                       'AU'=>'Australia',
-                       'AW'=>'Aruba',
-                       'AX'=>'Ã…land Islands',
-                       'AZ'=>'Azerbaijan',
-                       'BA'=>'Bosnia and Herzegovina',
-                       'BB'=>'Barbados',
-                       'BD'=>'Bangladesh',
-                       'BE'=>'Belgium',
-                       'BF'=>'Burkina Faso',
-                       'BG'=>'Bulgaria',
-                       'BH'=>'Bahrain',
-                       'BI'=>'Burundi',
-                       'BJ'=>'Benin',
-                       'BL'=>'Saint BarthÃ©lemy',
-                       'BM'=>'Bermuda',
-                       'BN'=>'Brunei Darussalam',
-                       'BO'=>'Bolivia (Plurinational State of)',
-                       'BQ'=>'Bonaire, Sint Eustatius and Saba',
-                       'BR'=>'Brazil',
-                       'BS'=>'Bahamas (the)',
-                       'BT'=>'Bhutan',
-                       'BV'=>'Bouvet Island',
-                       'BW'=>'Botswana',
-                       'BY'=>'Belarus',
-                       'BZ'=>'Belize',
-                       'CA'=>'Canada',
-                       'CC'=>'Cocos (Keeling) Islands (the)',
-                       'CD'=>'Congo (the Democratic Republic of the)',
-                       'CF'=>'Central African Republic (the)',
-                       'CG'=>'Congo (the)',
-                       'CH'=>'Switzerland',
-                       'CI'=>'CÃ´te dIvoire',
-                       'CK'=>'Cook Islands (the)',
-                       'CL'=>'Chile',
-                       'CM'=>'Cameroon',
-                       'CN'=>'China',
-                       'CO'=>'Colombia',
-                       'CR'=>'Costa Rica',
-                       'CU'=>'Cuba',
-                       'CV'=>'Cabo Verde',
-                       'CW'=>'CuraÃ§ao',
-                       'CX'=>'Christmas Island',
-                       'CY'=>'Cyprus',
-                       'CZ'=>'Czechia',
-                       'DE'=>'Germany',
-                       'DJ'=>'Djibouti',
-                       'DK'=>'Denmark',
-                       'DM'=>'Dominica',
-                       'DO'=>'Dominican Republic (the)',
-                       'DZ'=>'Algeria',
-                       'EC'=>'Ecuador',
-                       'EE'=>'Estonia',
-                       'EG'=>'Egypt',
-                       'EH'=>'Western Sahara*',
-                       'ER'=>'Eritrea',
-                       'ES'=>'Spain',
-                       'ET'=>'Ethiopia',
-                       'FI'=>'Finland',
-                       'FJ'=>'Fiji',
-                       'FK'=>'Falkland Islands (the) [Malvinas]',
-                       'FM'=>'Micronesia (Federated States of)',
-                       'FO'=>'Faroe Islands (the)',
-                       'FR'=>'France',
-                       'GA'=>'Gabon',
-                       'GB'=>'United Kingdom of Great Britain and Northern Ireland (the)',
-                       'GD'=>'Grenada',
-                       'GE'=>'Georgia',
-                       'GF'=>'French Guiana',
-                       'GG'=>'Guernsey',
-                       'GH'=>'Ghana',
-                       'GI'=>'Gibraltar',
-                       'GL'=>'Greenland',
-                       'GM'=>'Gambia (the)',
-                       'GN'=>'Guinea',
-                       'GP'=>'Guadeloupe',
-                       'GQ'=>'Equatorial Guinea',
-                       'GR'=>'Greece',
-                       'GS'=>'South Georgia and the South Sandwich Islands',
-                       'GT'=>'Guatemala',
-                       'GU'=>'Guam',
-                       'GW'=>'Guinea-Bissau',
-                       'GY'=>'Guyana',
-                       'HK'=>'Hong Kong',
-                       'HM'=>'Heard Island and McDonald Islands',
-                       'HN'=>'Honduras',
-                       'HR'=>'Croatia',
-                       'HT'=>'Haiti',
-                       'HU'=>'Hungary',
-                       'ID'=>'Indonesia',
-                       'IE'=>'Ireland',
-                       'IL'=>'Israel',
-                       'IM'=>'Isle of Man',
-                       'IN'=>'India',
-                       'IO'=>'British Indian Ocean Territory (the)',
-                       'IQ'=>'Iraq',
-                       'IR'=>'Iran (Islamic Republic of)',
-                       'IS'=>'Iceland',
-                       'IT'=>'Italy',
-                       'JE'=>'Jersey',
-                       'JM'=>'Jamaica',
-                       'JO'=>'Jordan',
-                       'JP'=>'Japan',
-                       'KE'=>'Kenya',
-                       'KG'=>'Kyrgyzstan',
-                       'KH'=>'Cambodia',
-                       'KI'=>'Kiribati',
-                       'KM'=>'Comoros (the)',
-                       'KN'=>'Saint Kitts and Nevis',
-                       'KP'=>'Korea (the Democratic Peoples Republic of)',
-                       'KR'=>'Korea (the Republic of)',
-                       'KW'=>'Kuwait',
-                       'KY'=>'Cayman Islands (the)',
-                       'KZ'=>'Kazakhstan',
-                       'LA'=>'Lao Peoples Democratic Republic (the)',
-                       'LB'=>'Lebanon',
-                       'LC'=>'Saint Lucia',
-                       'LI'=>'Liechtenstein',
-                       'LK'=>'Sri Lanka',
-                       'LR'=>'Liberia',
-                       'LS'=>'Lesotho',
-                       'LT'=>'Lithuania',
-                       'LU'=>'Luxembourg',
-                       'LV'=>'Latvia',
-                       'LY'=>'Libya',
-                       'MA'=>'Morocco',
-                       'MC'=>'Monaco',
-                       'MD'=>'Moldova (the Republic of)',
-                       'ME'=>'Montenegro',
-                       'MF'=>'Saint Martin (French part)',
-                       'MG'=>'Madagascar',
-                       'MH'=>'Marshall Islands (the)',
-                       'MK'=>'Macedonia (the former Yugoslav Republic of)',
-                       'ML'=>'Mali',
-                       'MM'=>'Myanmar',
-                       'MN'=>'Mongolia',
-                       'MO'=>'Macao',
-                       'MP'=>'Northern Mariana Islands (the)',
-                       'MQ'=>'Martinique',
-                       'MR'=>'Mauritania',
-                       'MS'=>'Montserrat',
-                       'MT'=>'Malta',
-                       'MU'=>'Mauritius',
-                       'MV'=>'Maldives',
-                       'MW'=>'Malawi',
-                       'MX'=>'Mexico',
-                       'MY'=>'Malaysia',
-                       'MZ'=>'Mozambique',
-                       'NA'=>'Namibia',
-                       'NC'=>'New Caledonia',
-                       'NE'=>'Niger (the)',
-                       'NF'=>'Norfolk Island',
-                       'NG'=>'Nigeria',
-                       'NI'=>'Nicaragua',
-                       'NL'=>'Netherlands (the)',
-                       'NO'=>'Norway',
-                       'NP'=>'Nepal',
-                       'NR'=>'Nauru',
-                       'NU'=>'Niue',
-                       'NZ'=>'New Zealand',
-                       'OM'=>'Oman',
-                       'PA'=>'Panama',
-                       'PE'=>'Peru',
-                       'PF'=>'French Polynesia',
-                       'PG'=>'Papua New Guinea',
-                       'PH'=>'Philippines (the)',
-                       'PK'=>'Pakistan',
-                       'PL'=>'Poland',
-                       'PM'=>'Saint Pierre and Miquelon',
-                       'PN'=>'Pitcairn',
-                       'PR'=>'Puerto Rico',
-                       'PS'=>'Palestine, State of',
-                       'PT'=>'Portugal',
-                       'PW'=>'Palau',
-                       'PY'=>'Paraguay',
-                       'QA'=>'Qatar',
-                       'RE'=>'RÃ©union',
-                       'RO'=>'Romania',
-                       'RS'=>'Serbia',
-                       'RU'=>'Russian Federation (the)',
-                       'RW'=>'Rwanda',
-                       'SA'=>'Saudi Arabia',
-                       'SB'=>'Solomon Islands',
-                       'SC'=>'Seychelles',
-                       'SD'=>'Sudan (the)',
-                       'SE'=>'Sweden',
-                       'SG'=>'Singapore',
-                       'SH'=>'Saint Helena, Ascension and Tristan da Cunha',
-                       'SI'=>'Slovenia',
-                       'SJ'=>'Svalbard and Jan Mayen',
-                       'SK'=>'Slovakia',
-                       'SL'=>'Sierra Leone',
-                       'SM'=>'San Marino',
-                       'SN'=>'Senegal',
-                       'SO'=>'Somalia',
-                       'SR'=>'Suriname',
-                       'SS'=>'South Sudan',
-                       'ST'=>'Sao Tome and Principe',
-                       'SV'=>'El Salvador',
-                       'SX'=>'Sint Maarten (Dutch part)',
-                       'SY'=>'Syrian Arab Republic',
-                       'SZ'=>'Swaziland',
-                       'TC'=>'Turks and Caicos Islands (the)',
-                       'TD'=>'Chad',
-                       'TF'=>'French Southern Territories (the)',
-                       'TG'=>'Togo',
-                       'TH'=>'Thailand',
-                       'TJ'=>'Tajikistan',
-                       'TK'=>'Tokelau',
-                       'TL'=>'Timor-Leste',
-                       'TM'=>'Turkmenistan',
-                       'TN'=>'Tunisia',
-                       'TO'=>'Tonga',
-                       'TR'=>'Turkey',
-                       'TT'=>'Trinidad and Tobago',
-                       'TV'=>'Tuvalu',
-                       'TW'=>'Taiwan (Province of China)',
-                       'TZ'=>'Tanzania, United Republic of',
-                       'UA'=>'Ukraine',
-                       'UG'=>'Uganda',
-                       'UM'=>'United States Minor Outlying Islands (the)',
-                       'US'=>'United States of America (the)',
-                       'UY'=>'Uruguay',
-                       'UZ'=>'Uzbekistan',
-                       'VA'=>'Holy See (the)',
-                       'VC'=>'Saint Vincent and the Grenadines',
-                       'VE'=>'Venezuela (Bolivarian Republic of)',
-                       'VG'=>'Virgin Islands (British)',
-                       'VI'=>'Virgin Islands (U.S.)',
-                       'VN'=>'Viet Nam',
-                       'VU'=>'Vanuatu',
-                       'WF'=>'Wallis and Futuna',
-                       'WS'=>'Samoa',
-                       'YE'=>'Yemen',
-                       'YT'=>'Mayotte',
-                       'ZA'=>'South Africa',
-                       'ZM'=>'Zambia',
-                       'ZW'=>'Zimbabwe',
+                       'AD'=>'ANDORRA',
+                       'AE'=>'UNITED ARAB EMIRATES (THE)',
+                       'AF'=>'AFGHANISTAN',
+                       'AG'=>'ANTIGUA AND BARBUDA',
+                       'AI'=>'ANGUILLA',
+                       'AL'=>'ALBANIA',
+                       'AM'=>'ARMENIA',
+                       'AO'=>'ANGOLA',
+                       'AQ'=>'ANTARCTICA',
+                       'AR'=>'ARGENTINA',
+                       'AS'=>'AMERICAN SAMOA',
+                       'AT'=>'AUSTRIA',
+                       'AU'=>'AUSTRALIA',
+                       'AW'=>'ARUBA',
+                       'AX'=>'ÅLAND ISLANDS',
+                       'AZ'=>'AZERBAIJAN',
+                       'BA'=>'BOSNIA AND HERZEGOVINA',
+                       'BB'=>'BARBADOS',
+                       'BD'=>'BANGLADESH',
+                       'BE'=>'BELGIUM',
+                       'BF'=>'BURKINA FASO',
+                       'BG'=>'BULGARIA',
+                       'BH'=>'BAHRAIN',
+                       'BI'=>'BURUNDI',
+                       'BJ'=>'BENIN',
+                       'BL'=>'SAINT BARTHÉLEMY',
+                       'BM'=>'BERMUDA',
+                       'BN'=>'BRUNEI DARUSSALAM',
+                       'BO'=>'BOLIVIA (PLURINATIONAL STATE OF)',
+                       'BQ'=>'BONAIRE, SINT EUSTATIUS AND SABA',
+                       'BR'=>'BRAZIL',
+                       'BS'=>'BAHAMAS (THE)',
+                       'BT'=>'BHUTAN',
+                       'BV'=>'BOUVET ISLAND',
+                       'BW'=>'BOTSWANA',
+                       'BY'=>'BELARUS',
+                       'BZ'=>'BELIZE',
+                       'CA'=>'CANADA',
+                       'CC'=>'COCOS (KEELING) ISLANDS (THE)',
+                       'CD'=>'CONGO (THE DEMOCRATIC REPUBLIC OF THE)',
+                       'CF'=>'CENTRAL AFRICAN REPUBLIC (THE)',
+                       'CG'=>'CONGO (THE)',
+                       'CH'=>'SWITZERLAND',
+                       'CI'=>'CÔTE DIVOIRE',
+                       'CK'=>'COOK ISLANDS (THE)',
+                       'CL'=>'CHILE',
+                       'CM'=>'CAMEROON',
+                       'CN'=>'CHINA',
+                       'CO'=>'COLOMBIA',
+                       'CR'=>'COSTA RICA',
+                       'CU'=>'CUBA',
+                       'CV'=>'CABO VERDE',
+                       'CW'=>'CURAÇAO',
+                       'CX'=>'CHRISTMAS ISLAND',
+                       'CY'=>'CYPRUS',
+                       'CZ'=>'CZECHIA',
+                       'DE'=>'GERMANY',
+                       'DJ'=>'DJIBOUTI',
+                       'DK'=>'DENMARK',
+                       'DM'=>'DOMINICA',
+                       'DO'=>'DOMINICAN REPUBLIC (THE)',
+                       'DZ'=>'ALGERIA',
+                       'EC'=>'ECUADOR',
+                       'EE'=>'ESTONIA',
+                       'EG'=>'EGYPT',
+                       'EH'=>'WESTERN SAHARA*',
+                       'ER'=>'ERITREA',
+                       'ES'=>'SPAIN',
+                       'ET'=>'ETHIOPIA',
+                       'FI'=>'FINLAND',
+                       'FJ'=>'FIJI',
+                       'FK'=>'FALKLAND ISLANDS (THE) [MALVINAS]',
+                       'FM'=>'MICRONESIA (FEDERATED STATES OF)',
+                       'FO'=>'FAROE ISLANDS (THE)',
+                       'FR'=>'FRANCE',
+                       'GA'=>'GABON',
+                       'GB'=>'UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND (THE)',
+                       'GD'=>'GRENADA',
+                       'GE'=>'GEORGIA',
+                       'GF'=>'FRENCH GUIANA',
+                       'GG'=>'GUERNSEY',
+                       'GH'=>'GHANA',
+                       'GI'=>'GIBRALTAR',
+                       'GL'=>'GREENLAND',
+                       'GM'=>'GAMBIA (THE)',
+                       'GN'=>'GUINEA',
+                       'GP'=>'GUADELOUPE',
+                       'GQ'=>'EQUATORIAL GUINEA',
+                       'GR'=>'GREECE',
+                       'GS'=>'SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS',
+                       'GT'=>'GUATEMALA',
+                       'GU'=>'GUAM',
+                       'GW'=>'GUINEA-BISSAU',
+                       'GY'=>'GUYANA',
+                       'HK'=>'HONG KONG',
+                       'HM'=>'HEARD ISLAND AND MCDONALD ISLANDS',
+                       'HN'=>'HONDURAS',
+                       'HR'=>'CROATIA',
+                       'HT'=>'HAITI',
+                       'HU'=>'HUNGARY',
+                       'ID'=>'INDONESIA',
+                       'IE'=>'IRELAND',
+                       'IL'=>'ISRAEL',
+                       'IM'=>'ISLE OF MAN',
+                       'IN'=>'INDIA',
+                       'IO'=>'BRITISH INDIAN OCEAN TERRITORY (THE)',
+                       'IQ'=>'IRAQ',
+                       'IR'=>'IRAN (ISLAMIC REPUBLIC OF)',
+                       'IS'=>'ICELAND',
+                       'IT'=>'ITALY',
+                       'JE'=>'JERSEY',
+                       'JM'=>'JAMAICA',
+                       'JO'=>'JORDAN',
+                       'JP'=>'JAPAN',
+                       'KE'=>'KENYA',
+                       'KG'=>'KYRGYZSTAN',
+                       'KH'=>'CAMBODIA',
+                       'KI'=>'KIRIBATI',
+                       'KM'=>'COMOROS (THE)',
+                       'KN'=>'SAINT KITTS AND NEVIS',
+                       'KP'=>'KOREA (THE DEMOCRATIC PEOPLES REPUBLIC OF)',
+                       'KR'=>'KOREA (THE REPUBLIC OF)',
+                       'KW'=>'KUWAIT',
+                       'KY'=>'CAYMAN ISLANDS (THE)',
+                       'KZ'=>'KAZAKHSTAN',
+                       'LA'=>'LAO PEOPLES DEMOCRATIC REPUBLIC (THE)',
+                       'LB'=>'LEBANON',
+                       'LC'=>'SAINT LUCIA',
+                       'LI'=>'LIECHTENSTEIN',
+                       'LK'=>'SRI LANKA',
+                       'LR'=>'LIBERIA',
+                       'LS'=>'LESOTHO',
+                       'LT'=>'LITHUANIA',
+                       'LU'=>'LUXEMBOURG',
+                       'LV'=>'LATVIA',
+                       'LY'=>'LIBYA',
+                       'MA'=>'MOROCCO',
+                       'MC'=>'MONACO',
+                       'MD'=>'MOLDOVA (THE REPUBLIC OF)',
+                       'ME'=>'MONTENEGRO',
+                       'MF'=>'SAINT MARTIN (FRENCH PART)',
+                       'MG'=>'MADAGASCAR',
+                       'MH'=>'MARSHALL ISLANDS (THE)',
+                       'MK'=>'MACEDONIA (THE FORMER YUGOSLAV REPUBLIC OF)',
+                       'ML'=>'MALI',
+                       'MM'=>'MYANMAR',
+                       'MN'=>'MONGOLIA',
+                       'MO'=>'MACAO',
+                       'MP'=>'NORTHERN MARIANA ISLANDS (THE)',
+                       'MQ'=>'MARTINIQUE',
+                       'MR'=>'MAURITANIA',
+                       'MS'=>'MONTSERRAT',
+                       'MT'=>'MALTA',
+                       'MU'=>'MAURITIUS',
+                       'MV'=>'MALDIVES',
+                       'MW'=>'MALAWI',
+                       'MX'=>'MEXICO',
+                       'MY'=>'MALAYSIA',
+                       'MZ'=>'MOZAMBIQUE',
+                       'NA'=>'NAMIBIA',
+                       'NC'=>'NEW CALEDONIA',
+                       'NE'=>'NIGER (THE)',
+                       'NF'=>'NORFOLK ISLAND',
+                       'NG'=>'NIGERIA',
+                       'NI'=>'NICARAGUA',
+                       'NL'=>'NETHERLANDS (THE)',
+                       'NO'=>'NORWAY',
+                       'NP'=>'NEPAL',
+                       'NR'=>'NAURU',
+                       'NU'=>'NIUE',
+                       'NZ'=>'NEW ZEALAND',
+                       'OM'=>'OMAN',
+                       'PA'=>'PANAMA',
+                       'PE'=>'PERU',
+                       'PF'=>'FRENCH POLYNESIA',
+                       'PG'=>'PAPUA NEW GUINEA',
+                       'PH'=>'PHILIPPINES (THE)',
+                       'PK'=>'PAKISTAN',
+                       'PL'=>'POLAND',
+                       'PM'=>'SAINT PIERRE AND MIQUELON',
+                       'PN'=>'PITCAIRN',
+                       'PR'=>'PUERTO RICO',
+                       'PS'=>'PALESTINE, STATE OF',
+                       'PT'=>'PORTUGAL',
+                       'PW'=>'PALAU',
+                       'PY'=>'PARAGUAY',
+                       'QA'=>'QATAR',
+                       'RE'=>'RÉUNION',
+                       'RO'=>'ROMANIA',
+                       'RS'=>'SERBIA',
+                       'RU'=>'RUSSIAN FEDERATION (THE)',
+                       'RW'=>'RWANDA',
+                       'SA'=>'SAUDI ARABIA',
+                       'SB'=>'SOLOMON ISLANDS',
+                       'SC'=>'SEYCHELLES',
+                       'SD'=>'SUDAN (THE)',
+                       'SE'=>'SWEDEN',
+                       'SG'=>'SINGAPORE',
+                       'SH'=>'SAINT HELENA, ASCENSION AND TRISTAN DA CUNHA',
+                       'SI'=>'SLOVENIA',
+                       'SJ'=>'SVALBARD AND JAN MAYEN',
+                       'SK'=>'SLOVAKIA',
+                       'SL'=>'SIERRA LEONE',
+                       'SM'=>'SAN MARINO',
+                       'SN'=>'SENEGAL',
+                       'SO'=>'SOMALIA',
+                       'SR'=>'SURINAME',
+                       'SS'=>'SOUTH SUDAN',
+                       'ST'=>'SAO TOME AND PRINCIPE',
+                       'SV'=>'EL SALVADOR',
+                       'SX'=>'SINT MAARTEN (DUTCH PART)',
+                       'SY'=>'SYRIAN ARAB REPUBLIC',
+                       'SZ'=>'SWAZILAND',
+                       'TC'=>'TURKS AND CAICOS ISLANDS (THE)',
+                       'TD'=>'CHAD',
+                       'TF'=>'FRENCH SOUTHERN TERRITORIES (THE)',
+                       'TG'=>'TOGO',
+                       'TH'=>'THAILAND',
+                       'TJ'=>'TAJIKISTAN',
+                       'TK'=>'TOKELAU',
+                       'TL'=>'TIMOR-LESTE',
+                       'TM'=>'TURKMENISTAN',
+                       'TN'=>'TUNISIA',
+                       'TO'=>'TONGA',
+                       'TR'=>'TURKEY',
+                       'TT'=>'TRINIDAD AND TOBAGO',
+                       'TV'=>'TUVALU',
+                       'TW'=>'TAIWAN (PROVINCE OF CHINA)',
+                       'TZ'=>'TANZANIA, UNITED REPUBLIC OF',
+                       'UA'=>'UKRAINE',
+                       'UG'=>'UGANDA',
+                       'UM'=>'UNITED STATES MINOR OUTLYING ISLANDS (THE)',
+                       'US'=>'UNITED STATES OF AMERICA (THE)',
+                       'UY'=>'URUGUAY',
+                       'UZ'=>'UZBEKISTAN',
+                       'VA'=>'HOLY SEE (THE)',
+                       'VC'=>'SAINT VINCENT AND THE GRENADINES',
+                       'VE'=>'VENEZUELA (BOLIVARIAN REPUBLIC OF)',
+                       'VG'=>'VIRGIN ISLANDS (BRITISH)',
+                       'VI'=>'VIRGIN ISLANDS (U.S.)',
+                       'VN'=>'VIET NAM',
+                       'VU'=>'VANUATU',
+                       'WF'=>'WALLIS AND FUTUNA',
+                       'WS'=>'SAMOA',
+                       'YE'=>'YEMEN',
+                       'YT'=>'MAYOTTE',
+                       'ZA'=>'SOUTH AFRICA',
+                       'ZM'=>'ZAMBIA',
+                       'ZW'=>'ZIMBABWE',
                        ''   =>'EMPTY',
                        '');
     RETURN IF(country != '',1,0);
   END;
   
+  //*******************************************************************************
+  //fn_country_2_or_3_code: 	returns true if it is a valid 2 or 3-char country code 
+  //*******************************************************************************
+  EXPORT fn_country_2_or_3_code(STRING country) := FUNCTION
+    RETURN IF(fn_country2(country) > 0 OR fn_country(country) > 0,1,0);
+  END;
+
   
-  
+ 
+ 
 //*********************************************************//
 //***************END GENERAL SECTION***********************//
 //*********************************************************//
