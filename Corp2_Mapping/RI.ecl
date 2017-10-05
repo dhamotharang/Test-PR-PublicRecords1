@@ -488,8 +488,12 @@ export RI := module
 		//Outputs files
 		Main_CreateBitMaps				:= output(Main_N.BitmapInfile,,'~thor_data::corp_RI_main_scrubs_bits',overwrite,compressed);	//long term storage
 		Main_TranslateBitMap			:= output(Main_T);
+		//Creates Profile's alert template for Orbit - can be copied and imported into Orbit; Only required if rules in Orbit change
+		Main_AlertsCSVTemplate		:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').ProfileAlertsTemplate;
+		//Submits Profile's stats to Orbit
+		Main_SubmitStats 			  	:= Scrubs.OrbitProfileStats('Scrubs_Corp2_Mapping_'+state_origin+'_Main','ScrubsAlerts', Main_OrbitStats, version,'Corp2_'+state_origin+'_Main').SubmitStats;
 		Main_ScrubsWithExamples		:= Scrubs.OrbitProfileStats('Scrubs_Corp_MappingMain_RI_' + filedate,'ScrubsAlerts', Main_OrbitStats, version,'Corp_RI_Main').CompareToProfile_with_Examples;
-
+		
 		Main_ScrubsAlert					:= Main_ScrubsWithExamples(RejectWarning = 'Y');
 		Main_ScrubsAttachment			:= Scrubs.fn_email_attachment(Main_ScrubsAlert);
 		Main_SendEmailFile				:= FileServices.SendEmailAttachData( corp2.Email_Notification_Lists.spray
@@ -584,7 +588,9 @@ export RI := module
 																		,Main_ErrorSummary
 																		,Main_ScrubErrorReport
 																		,Main_SomeErrorValues																		 
-															   );
+																		//,Main_AlertsCSVTemplate
+																		,Main_SubmitStats				
+																	);
 		//==========================================VERSION CONTROL====================================================
 		VersionControl.macBuildNewLogicalFile(corp2_mapping._dataset().thor_cluster_Files + 'in::corp2::' + version + '::Main_' 	+ state_origin, Main_ApprovedRecords , main_out,,,pOverwrite);
 		VersionControl.macBuildNewLogicalFile(corp2_mapping._dataset().thor_cluster_Files + 'in::corp2::' + version + '::Event_' 	+ state_origin, mapEvent						 , event_out,,,pOverwrite);
@@ -607,13 +613,15 @@ export RI := module
 																				,if (count(Main_BadRecords) <> 0
 																						 ,corp2_mapping.Send_Email(state_origin ,version,count(Main_BadRecords)<>0,,,,count(Main_BadRecords),,count(mapEvent),,count(Main_ApprovedRecords),count(mapAR),count(mapEvent),count(mapStock)).RecordsRejected																				 
 																						 ,corp2_mapping.Send_Email(state_origin ,version,count(Main_BadRecords)<>0,,,,count(Main_BadRecords),,count(mapEvent),,count(Main_ApprovedRecords),count(mapAR),count(mapEvent),count(mapStock)).MappingSuccess																				 
-																						 )	 
+																						 )
+																				 ,if( Main_IsScrubErrors
+																						 ,Corp2_Mapping.Send_Email(state_origin,version,Main_IsScrubErrors,false,false,false).FieldsInvalidPerScrubs
+																						)		 
 																				)
 														 ,sequential( write_fail_main  //if it fails on  main file threshold ,still writing mapped file!
 																				 ,corp2_mapping.Send_Email(state_origin,version).MappingFailed
 																				)
 													)
-												,corp2_mapping.Send_Email(state_origin,version,Main_IsScrubErrors,false,false,false).FieldsInvalidPerScrubs
 												,Main_All	
 										 );
 						
