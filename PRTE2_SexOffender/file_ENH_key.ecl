@@ -1,10 +1,10 @@
-IMPORT SexOffender, PRTE2_SexOffender, Doxie, Header, PRTE2_Header, Watchdog, PRTE2_Watchdog, MDR, ut, autokey, Address;
+﻿IMPORT SexOffender, PRTE2_SexOffender, Doxie, Header, PRTE2_Header, Watchdog, PRTE2_Watchdog, MDR, ut, autokey, Address;
 
 	//This function builds the dataset needed for the enhanced sex offender search keys
 EXPORT file_ENH_key := FUNCTION
 
   	RawFileDids := Files.SexOffender_base(did != 0);
-		header_in := prte2_header.files.file_headers_base(zip4!='');
+		header_in := prte2_header.file_header_base(zip4!='');
 
 	//  GLB Transform for Best Join
 		best_address_glb_1 := PRTE2_Watchdog.Files.file_best;
