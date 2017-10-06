@@ -1,7 +1,7 @@
 ﻿import _control,Versioncontrol,tris_lnssi_build;
 
 IPAddress          := IF(_control.ThisEnvironment.Name='Prod_Thor',
-																	_Control.IPAddress.bctlpedata12,  // Use if in prod
+																	_Control.IPAddress.bctlpedata10,  // Use if in prod
 																	_Control.IPAddress.bctlpedata12); // Use if in dataland
 
 export fSpray(string version, boolean pUseProd = false)   :=   DATASET([
