@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ReportService">
 
 	<!-- User Section -->
@@ -36,7 +36,7 @@ EXPORT ReportService := MACRO
  //The following macro defines the field sequence on WsECL page of query.
   WSInput.MAC_Accident_Services_ReportService();
 																			
-	#CONSTANT('StrictMatch', TRUE)
+	#CONSTANT('StrictMatch', TRUE);
 
 	//get XML input 
 	rec_in := iesp.accident.t_AccidentReportRequest;

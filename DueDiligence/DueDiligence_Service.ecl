@@ -1,6 +1,16 @@
-IMPORT AutoStandardI, DueDiligence, Gateway, iesp, WSInput;
+﻿IMPORT AutoStandardI, DueDiligence, Gateway, iesp, WSInput;
+
+/*--SOAP-- 
+<message name="duediligence.duediligence_service">
+	<part name="duediligencereportrequest" sequence="1" type="tns:XmlDataset"/>
+	<part name="debugmode" sequence="2" type="xsd:boolean"/>
+	<part name="intermediatevariables" sequence="3" type="xsd:boolean"/>
+</message>
+*/
 
 EXPORT DueDiligence_Service := MACRO
+
+	STRING EMPTY := '';
 
 	//The following macro defines the field sequence on WsECL page of query.
   WSInput.MAC_DueDiligence_Service();
@@ -18,10 +28,17 @@ EXPORT DueDiligence_Service := MACRO
 	userIn 			:= GLOBAL(firstRow.user);
 	search 			:= GLOBAL(firstRow.reportBy);
 	
-	dppa := 	(UNSIGNED1)userIn.DLPurpose;
-	glba := 	(UNSIGNED1)userIn.GLBPurpose;	
-	requestedVersion := TRIM(StringLib.StringToUpperCase(optionsIn.AttributesVersionRequest));
+	//get outer band data - to use if customer data is not populated
+	outerBandDPPA := EMPTY : STORED('DPPAPurpose');
+	outerBandGLBA := EMPTY : STORED('GLBPurpose');
+	outerBandHistoryDate := 0 : STORED('HistoryDateYYYYMMDD');
 	
+	drm	:= IF(TRIM(userIn.DataRestrictionMask) <> EMPTY, userIn.DataRestrictionMask, AutoStandardI.GlobalModule().DataRestrictionMask);
+	dpm	:= IF(TRIM(userIn.DataPermissionMask) <> EMPTY, userIn.DataPermissionMask, AutoStandardI.GlobalModule().DataPermissionMask);
+	dppa := IF((UNSIGNED1)userIn.DLPurpose > 0, (UNSIGNED1)userIn.DLPurpose, (UNSIGNED1)outerBandDPPA);
+	glba := IF((UNSIGNED1)userIn.GLBPurpose > 0, (UNSIGNED1)userIn.GLBPurpose, (UNSIGNED1)outerBandGLBA);	
+	
+	requestedVersion := TRIM(StringLib.StringToUpperCase(optionsIn.AttributesVersionRequest));
 	includeReport := optionsIn.IncludeReport;
 	
 	//gateways				:= Gateway.Configuration.Get();
@@ -86,12 +103,14 @@ EXPORT DueDiligence_Service := MACRO
 																						SELF.fein := TRIM(reportBy.business.fein);
 																						SELF := [];,)]),
 												DATASET([], DueDiligence.Layouts.Busn_Input));
-																	
+		
+		useHistDate := (UNSIGNED4)(INTFORMAT(le.options.HistoryDate.Year, 4, 1) + INTFORMAT(le.options.HistoryDate.Month, 2, 1) + INTFORMAT(le.options.HistoryDate.Day, 2, 1));
+		histDate := IF(useHistDate > 0, useHistDate, (UNSIGNED4)outerBandHistoryDate);
 																		
 		SELF.seq := le.seq;
 		SELF.individual := ind_in[1];
 		SELF.business := bus_in[1];
-		SELF.historyDateYYYYMMDD := (UNSIGNED4)(INTFORMAT(le.options.HistoryDate.Year, 4, 1) + INTFORMAT(le.options.HistoryDate.Month, 2, 1) + INTFORMAT(le.options.HistoryDate.Day, 2, 1));
+		SELF.historyDateYYYYMMDD := histDate;
 		SELF.requestedVersion := version;
 		SELF := [];
 	END;
@@ -215,9 +234,9 @@ EXPORT DueDiligence_Service := MACRO
 		// Clean up the Options and make sure that defaults are enforced
 		EXPORT UNSIGNED1	DPPA_Purpose 				:= DPPA;
 		EXPORT UNSIGNED1	GLBA_Purpose 				:= GLBA;
-		EXPORT STRING50		DataRestrictionMask	:= IF(TRIM(userIn.DataRestrictionMask) <> '', userIn.DataRestrictionMask, Business_Risk_BIP.Constants.Default_DataRestrictionMask);
-		EXPORT STRING50		DataPermissionMask	:= IF(TRIM(userIn.DataPermissionMask) <> '', userIn.DataPermissionMask, Business_Risk_BIP.Constants.Default_DataPermissionMask);
-		EXPORT STRING10		IndustryClass				:= StringLib.StringToUpperCase(IF(TRIM(userIn.IndustryClass) <> '', userIn.IndustryClass, Business_Risk_BIP.Constants.Default_IndustryClass));
+		EXPORT STRING50		DataRestrictionMask	:= TRIM(drm);
+		EXPORT STRING50		DataPermissionMask	:= TRIM(dpm);
+		EXPORT STRING10		IndustryClass				:= StringLib.StringToUpperCase(IF(TRIM(userIn.IndustryClass) <> EMPTY, userIn.IndustryClass, Business_Risk_BIP.Constants.Default_IndustryClass));
 		EXPORT UNSIGNED1	LinkSearchLevel			:= Business_Risk_BIP.Constants.LinkSearch.SeleID;
 		EXPORT UNSIGNED1	BusShellVersion			:= Business_Risk_BIP.Constants.Default_BusShellVersion;
 		EXPORT UNSIGNED1	MarketingMode				:= Business_Risk_BIP.Constants.Default_MarketingMode;

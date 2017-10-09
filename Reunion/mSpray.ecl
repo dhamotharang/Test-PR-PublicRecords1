@@ -1,4 +1,4 @@
-EXPORT mSpray:=MODULE
+﻿EXPORT mSpray:=MODULE
   EXPORT actionSprayFiles(STRING sVersion = constants.sVersion):=FUNCTION
     sLocalDirectory:=constants.sLocationIn+sVersion+'::';
 	  sRemoteDirectory:=constants.sRemoteLocation+sVersion+'/';
@@ -42,7 +42,7 @@ EXPORT mSpray:=MODULE
   );
   
   EXPORT actionDesprayRelatives:=SEQUENTIAL(
-    OUTPUT(Reunion.files.dRelatives,,sLocalLocation+'relatives',CSV(SEPARATOR('|'),TERMINATOR('')),OVERWRITE),
+    OUTPUT(Reunion.files.dRelatives,,sLocalLocation+'relatives',CSV(SEPARATOR('|'),TERMINATOR('')),OVERWRITE,COMPRESSED),
     fileservices.Despray(sLocalLocation+'relatives',constants.sRemoteIPAddress,constants.sOutputLocation+'relatives.dat',,,,TRUE)
   );
   
@@ -58,27 +58,27 @@ EXPORT mSpray:=MODULE
 
   EXPORT actionDesprayCollege:=SEQUENTIAL(
     OUTPUT(Reunion.files.dCollege,,sLocalLocation+'college',CSV(SEPARATOR('|'),TERMINATOR('')),OVERWRITE,COMPRESSED),
-    fileservices.Despray(sLocalLocation+'adl_score',constants.sRemoteIPAddress,constants.sOutputLocation+'college.dat',,,,TRUE)
+    fileservices.Despray(sLocalLocation+'college',constants.sRemoteIPAddress,constants.sOutputLocation+'college.dat',,,,TRUE)
   );
 
   EXPORT actionDesprayEmail:=SEQUENTIAL(
     OUTPUT(Reunion.files.dEmail,,sLocalLocation+'email',CSV(SEPARATOR('|'),TERMINATOR('')),OVERWRITE,COMPRESSED),
-    fileservices.Despray(sLocalLocation+'adl_score',constants.sRemoteIPAddress,constants.sOutputLocation+'email.dat',,,,TRUE)
+    fileservices.Despray(sLocalLocation+'email',constants.sRemoteIPAddress,constants.sOutputLocation+'email.dat',,,,TRUE)
   );
 
   EXPORT actionDesprayTax:=SEQUENTIAL(
     OUTPUT(Reunion.files.dTax,,sLocalLocation+'tax',CSV(SEPARATOR('|'),TERMINATOR('')),OVERWRITE,COMPRESSED),
-    fileservices.Despray(sLocalLocation+'adl_score',constants.sRemoteIPAddress,constants.sOutputLocation+'tax.dat',,,,TRUE)
+    fileservices.Despray(sLocalLocation+'tax',constants.sRemoteIPAddress,constants.sOutputLocation+'tax.dat',,,,TRUE)
   );
 
   EXPORT actionDesprayDeed:=SEQUENTIAL(
-    OUTPUT(Reunion.files.dDeed,,sLocalLocation+'deed',CSV(SEPARATOR('|'),TERMINATOR('')),OVERWRITE,COMPRESSED),
-    fileservices.Despray(sLocalLocation+'adl_score',constants.sRemoteIPAddress,constants.sOutputLocation+'deed.dat',,,,TRUE)
+    OUTPUT(Reunion.files.dDeed,,sLocalLocation+'deeds',CSV(SEPARATOR('|'),TERMINATOR('')),OVERWRITE,COMPRESSED),
+    fileservices.Despray(sLocalLocation+'deeds',constants.sRemoteIPAddress,constants.sOutputLocation+'deeds.dat',,,,TRUE)
   );
 
   EXPORT actionDesprayFlags:=SEQUENTIAL(
-    OUTPUT(Reunion.files.dAdlScore,,sLocalLocation+'flags',CSV(SEPARATOR('|'),TERMINATOR('')),OVERWRITE,COMPRESSED),
-    fileservices.Despray(sLocalLocation+'adl_score',constants.sRemoteIPAddress,constants.sOutputLocation+'flags.dat',,,,TRUE)
+    OUTPUT(Reunion.files.dFlags,,sLocalLocation+'flags',CSV(SEPARATOR('|'),TERMINATOR('')),OVERWRITE,COMPRESSED),
+    fileservices.Despray(sLocalLocation+'flags',constants.sRemoteIPAddress,constants.sOutputLocation+'flags.dat',,,,TRUE)
   );
 
   EXPORT actionDesprayAll:=PARALLEL(

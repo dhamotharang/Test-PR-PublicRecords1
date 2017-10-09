@@ -1,4 +1,4 @@
-import tools, FraudShared; 
+﻿import tools, FraudShared; 
 EXPORT MapToCommon  (
 	 string pversion
 	,dataset(Layouts.Base.IdentityData)         inBaseIdentityData        = Files().Base.IdentityData.Built
@@ -42,31 +42,48 @@ module
 			self.Rawlinkid              := 0; //???????? 
 			//IdentityData
 			self.transaction_id					:= left.Transaction_ID_Number;
-			self.clean_address.geo_lat 	:= left.geo_lat;
-			self.clean_address.geo_long	:= left.geo_long; 
 			self.investigation_referral_case_id := left.Case_ID;
-			//self.did                                                                := if(left.did = 0 ,self.Rawlinkid, left.did);  
-		 // classification hardcode mapping is used instead of inline dataset ?  	
-		  self.classification_source.source_type                                  := Mod_MbsContext.IdentityDataFileType; 
-			self.classification_source.Primary_source_Entity                        := Mod_MbsContext.IdentityDataPrimarySrcEntity; 
-			self.classification_source.Expectation_of_Victim_Entities               := Mod_MbsContext.IdentityDataExpOfVicEntities;
+			
+			self.additional_address.Street_1			:= left.Mailing_Address_1; 
+			self.additional_address.Street_2			:= left.Mailing_Address_2;
+			self.additional_address.City					:= left.Mailing_City;
+			self.additional_address.State					:= left.Mailing_State;
+			self.additional_address.Zip						:= left.Mailing_Zip;
+			self.additional_address.Address_Type	:= 'Mailing';
+			self.additional_address.address_1			:= tools.AID_Helpers.fRawFixLine1(
+		                                          trim(left.Mailing_Address_1) + ' ' +
+		                                          trim(left.Mailing_Address_2));;
+			self.additional_address.address_2			:= tools.AID_Helpers.fRawFixLineLast(
+									                           stringlib.stringtouppercase(trim(left.Mailing_City)
+									                            + if(left.Mailing_State != '', ', ', '')
+									                            + trim(left.Mailing_State)
+									                            + ' '
+									                            + trim(left.Mailing_Zip)[1..5]));     
+		  gc_id 					:= (unsigned6) left.Client_ID; 
+			file_code 			:= left.Source; 
+		  self.classification_source.source_type                                  := Mod_MbsContext(gc_id,file_code).FileType; 
+			self.classification_source.Primary_source_Entity                        := Mod_MbsContext(gc_id,file_code).PrimarySrcEntity; 
+			self.classification_source.Expectation_of_Victim_Entities               := Mod_MbsContext(gc_id,file_code).ExpOfVicEntities;
 			self.classification_source.Industry_segment                             := ''; //????????
-			self.classification_Activity.Suspected_Discrepancy                      := Mod_MbsContext.IdentityDataSuspDiscrepancy;
-			self.classification_Activity.Confidence_that_activity_was_deceitful     := Mod_MbsContext.IdentityDataConfActivityDeceitful;
-			self.classification_Activity.workflow_stage_committed                   := Mod_MbsContext.IdentityDataWrkFlowStgComtd;
-			self.classification_Activity.workflow_stage_detected                    := Mod_MbsContext.IdentityDataWrkFlowStgDetected;
-			self.classification_Activity.Channels                                   := Mod_MbsContext.IdentityDataChannels;
+			self.classification_source.Customer_State																:= Mod_MbsContext(gc_id,file_code).CustomerState;
+			self.classification_source.Customer_County															:= Mod_MbsContext(gc_id,file_code).CustomerCounty;
+			self.classification_source.Customer_Vertical														:= Mod_MbsContext(gc_id,file_code).CustomerVertical;			
+			self.classification_Activity.Suspected_Discrepancy                      := Mod_MbsContext(gc_id,file_code).SuspDiscrepancy;
+			self.classification_Activity.Confidence_that_activity_was_deceitful     := Mod_MbsContext(gc_id,file_code).ConfActivityDeceitful;
+			self.classification_Activity.workflow_stage_committed                   := Mod_MbsContext(gc_id,file_code).WrkFlowStgComtd;
+			self.classification_Activity.workflow_stage_detected                    := Mod_MbsContext(gc_id,file_code).WrkFlowStgDetected;
+			self.classification_Activity.Channels                                   := Mod_MbsContext(gc_id,file_code).Channels;
 			self.classification_Activity.category_or_fraudtype                      := 'GENERAL';
 			self.classification_Activity.description                                := 'This individual was investigated for potential fraud by professionals from the industry shown against "INDUSTRY SEGMENT" on the date shown against "DATE EVENT REPORTED"';
-			self.classification_Activity.Threat                                     := Mod_MbsContext.IdentityDataThreat; 
+			self.classification_Activity.Threat                                     := Mod_MbsContext(gc_id,file_code).Threat; 
 			self.classification_Activity.Exposure                                   := '';
 			self.classification_Activity.write_off_loss                             := '';
 			self.classification_Activity.Mitigated                                  := '';
-			self.classification_Activity.Alert_level                                := Mod_MbsContext.IdentityDataAlertLevel;
-			self.classification_Entity.Entity_type                                  := Mod_MbsContext.IdentityDataEntityType;
-			self.classification_Entity.Entity_sub_type                              := Mod_MbsContext.IdentityDataEntitySubType;
-			self.classification_Entity.role                                         := Mod_MbsContext.IdentityDataRole;
-			self.classification_Entity.Evidence                                     := Mod_MbsContext.IdentityDataEvidence;
+			self.classification_Activity.Alert_level                                := Mod_MbsContext(gc_id,file_code).AlertLevel;
+			self.classification_Entity.Entity_type                                  := Mod_MbsContext(gc_id,file_code).EntityType;
+			self.classification_Entity.Entity_sub_type                              := Mod_MbsContext(gc_id,file_code).EntitySubType;
+			self.classification_Entity.role                                         := Mod_MbsContext(gc_id,file_code).Role;
+			self.classification_Entity.Evidence                                     := Mod_MbsContext(gc_id,file_code).Evidence;
 			self.classification_Entity.investigated_count                           := '';
 		  self:= left; 
   	  self:= [];
@@ -99,34 +116,50 @@ module
 									                            + ' '
 									                            + trim(left.zip)[1..5]));                                  
 			self.Rawlinkid              := 0; //???????? 
-			//IdentityData
 			self.transaction_id					:= left.customer_event_id;
 			self.Drivers_License 				:= left.drivers_license_number;
-			self.clean_address.geo_lat 	:= ''; //???????? 
-			self.clean_address.geo_long	:= ''; //???????? 
 			self.investigation_referral_case_id := left.investigation_referral_case_id;
-			//self.did                                                                := if(left.did = 0 ,self.Rawlinkid, left.did);  
-		 // classification hardcode mapping is used instead of inline dataset ?  	
-		  self.classification_source.source_type                                  := Mod_MbsContext.KnownFraudFileType; 
-			self.classification_source.Primary_source_Entity                        := Mod_MbsContext.KnownFraudPrimarySrcEntity; 
-			self.classification_source.Expectation_of_Victim_Entities               := Mod_MbsContext.KnownFraudExpOfVicEntities;
+
+			self.additional_address.Street_1			:= left.Mailing_Address_1; 
+			self.additional_address.Street_2			:= left.Mailing_Address_2;
+			self.additional_address.City					:= left.Mailing_City;
+			self.additional_address.State					:= left.Mailing_State;
+			self.additional_address.Zip						:= left.Mailing_Zip;
+			self.additional_address.Address_Type	:= 'Mailing';
+			self.additional_address.address_1			:= tools.AID_Helpers.fRawFixLine1(
+		                                          trim(left.Mailing_Address_1) + ' ' +
+		                                          trim(left.Mailing_Address_2));;
+			self.additional_address.address_2			:= tools.AID_Helpers.fRawFixLineLast(
+									                           stringlib.stringtouppercase(trim(left.Mailing_City)
+									                            + if(left.Mailing_State != '', ', ', '')
+									                            + trim(left.Mailing_State)
+									                            + ' '
+									                            + trim(left.Mailing_Zip)[1..5]));
+		  gc_id 					:= (unsigned6) left.Client_ID; 
+			file_code 			:= left.Source; 	
+		  self.classification_source.source_type                                  := Mod_MbsContext(gc_id,file_code).FileType; 
+			self.classification_source.Primary_source_Entity                        := Mod_MbsContext(gc_id,file_code).PrimarySrcEntity; 
+			self.classification_source.Expectation_of_Victim_Entities               := Mod_MbsContext(gc_id,file_code).ExpOfVicEntities;
 			self.classification_source.Industry_segment                             := ''; //????????
-			self.classification_Activity.Suspected_Discrepancy                      := Mod_MbsContext.KnownFraudSuspDiscrepancy;
-			self.classification_Activity.Confidence_that_activity_was_deceitful     := Mod_MbsContext.KnownFraudConfActivityDeceitful;
-			self.classification_Activity.workflow_stage_committed                   := Mod_MbsContext.KnownFraudWrkFlowStgComtd;
-			self.classification_Activity.workflow_stage_detected                    := Mod_MbsContext.KnownFraudWrkFlowStgDetected;
-			self.classification_Activity.Channels                                   := Mod_MbsContext.KnownFraudChannels;
+			self.classification_source.Customer_State																:= Mod_MbsContext(gc_id,file_code).CustomerState;
+			self.classification_source.Customer_County															:= Mod_MbsContext(gc_id,file_code).CustomerCounty;
+			self.classification_source.Customer_Vertical														:= Mod_MbsContext(gc_id,file_code).CustomerVertical;
+			self.classification_Activity.Suspected_Discrepancy                      := Mod_MbsContext(gc_id,file_code).SuspDiscrepancy;
+			self.classification_Activity.Confidence_that_activity_was_deceitful     := Mod_MbsContext(gc_id,file_code).ConfActivityDeceitful;
+			self.classification_Activity.workflow_stage_committed                   := Mod_MbsContext(gc_id,file_code).WrkFlowStgComtd;
+			self.classification_Activity.workflow_stage_detected                    := Mod_MbsContext(gc_id,file_code).WrkFlowStgDetected;
+			self.classification_Activity.Channels                                   := Mod_MbsContext(gc_id,file_code).Channels;
 			self.classification_Activity.category_or_fraudtype                      := 'GENERAL';
 			self.classification_Activity.description                                := 'This individual was investigated for potential fraud by professionals from the industry shown against "INDUSTRY SEGMENT" on the date shown against "DATE EVENT REPORTED"';
-			self.classification_Activity.Threat                                     := Mod_MbsContext.KnownFraudThreat; 
+			self.classification_Activity.Threat                                     := Mod_MbsContext(gc_id,file_code).Threat; 
 			self.classification_Activity.Exposure                                   := '';
 			self.classification_Activity.write_off_loss                             := '';
 			self.classification_Activity.Mitigated                                  := '';
-			self.classification_Activity.Alert_level                                := Mod_MbsContext.KnownFraudAlertLevel;
-			self.classification_Entity.Entity_type                                  := Mod_MbsContext.KnownFraudEntityType;
-			self.classification_Entity.Entity_sub_type                              := Mod_MbsContext.KnownFraudEntitySubType;
-			self.classification_Entity.role                                         := Mod_MbsContext.KnownFraudRole;
-			self.classification_Entity.Evidence                                     := Mod_MbsContext.KnownFraudEvidence;
+			self.classification_Activity.Alert_level                                := Mod_MbsContext(gc_id,file_code).AlertLevel;
+			self.classification_Entity.Entity_type                                  := Mod_MbsContext(gc_id,file_code).EntityType;
+			self.classification_Entity.Entity_sub_type                              := Mod_MbsContext(gc_id,file_code).EntitySubType;
+			self.classification_Entity.role                                         := Mod_MbsContext(gc_id,file_code).Role;
+			self.classification_Entity.Evidence                                     := Mod_MbsContext(gc_id,file_code).Evidence;
 			self.classification_Entity.investigated_count                           := '';
 		  self:= left; 
   	  self:= [];
@@ -139,8 +172,8 @@ module
 	
 	typeof(CombinedClassification)  to_form(CombinedClassification l) := transform
 	
-	 prefix                      := MAP( l.source= 'IDDT'             =>  1000000000000,
-																			 l.source= 'KNFD'             =>  2000000000000,
+	 prefix                      := MAP( regexfind('IDDT',l.source)             =>  1000000000000,
+																			 regexfind('KNFD',l.source)             =>  2000000000000,
 								                      0);
 	SELF.Record_ID               := prefix +  L.source_rec_id;  
 	self := l;

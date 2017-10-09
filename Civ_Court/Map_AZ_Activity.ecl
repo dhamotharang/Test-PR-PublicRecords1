@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut, lib_StringLib;
+﻿IMPORT Civ_Court, civil_court, ut, lib_StringLib, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -7,8 +7,11 @@ IMPORT Civ_Court, civil_court, ut, lib_StringLib;
 fAZ_Civil := Civ_Court.Files_In_AZ.Civil_in;
 fAZ_Event	:= Civ_Court.Files_In_AZ.CS_Event;
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m-%d-%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Case_Activity tAZ(fAZ_Event L, fAZ_Civil R) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -19,7 +22,7 @@ self.case_key					  := '11'+trim(R.court_id,all)+trim(R.party_case_search_key,al
 self.court_code					:= R.court_id;
 self.court						  := '';
 self.case_number				:= R.full_case_num;
-self.event_date					:= ut.ConvertDate(L.evnt_date);
+self.event_date					:= Std.Date.ConvertDateFormatMultiple(L.evnt_date,fmtsin,fmtout);
 self.event_type_code		:= '';
 self.event_type_description_1	:= ut.CleanSpacesAndUpper(REGEXREPLACE('\\*|!',L.evnt_description,''));
 self.event_type_description_2	:= '';

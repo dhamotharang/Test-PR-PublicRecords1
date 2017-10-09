@@ -1,4 +1,4 @@
-Import _Control, Corp2, Corp2_Raw_SD, lib_stringlib, Scrubs, Scrubs_Corp2_Mapping_SD_Main, Scrubs_Corp2_Mapping_SD_Event, Tools, UT, VersionControl, std;
+﻿Import _Control, Corp2, Corp2_Raw_SD, lib_stringlib, Scrubs, Scrubs_Corp2_Mapping_SD_Main, Scrubs_Corp2_Mapping_SD_Event, Tools, UT, VersionControl, std;
 
 Export SD	:= Module
 	
@@ -15,8 +15,13 @@ Export SD	:= Module
 
 		foreign_list												:= ['FA','FB','FC','FF','FG','FL','FM','FN','FP','FR','FT','RG'];
 		domestic_list												:= ['BK','BL','CH','CI','CO','DA','DB','DF','DL','DM','DP','DR',
-																						'DT','FK','GP','ID','IN','MP','NS','PF','PU','RA','RL','RP',
-																						'RS','SD','WD'];
+																						'DT','EM','FD','FK','GP','ID','IN','MP','NS','PF','PU','RA',
+																						'RD','RL','RN','RP','RS','SD','SG','TD','UB','WD'];
+	 legal_list														:= ['BK','BL','CH','CI','CO','DA','DB','DF',
+																						'DL','DM','DP','DR','DT','EM','FA','FB',
+																						'FC','FD','FF','FG','FK','FL','FM','FN','FP',
+																						'FR','FT','GP','ID','IN','MP','NS','PF',
+																						'PU','RA','RD','SD','SG','TD','WD'];																											
 		corporateID_Type 										:= corp2.t2u(l.org_corporate_id[1..2]);// Two digit Alpha character code 
 		
 		self.dt_vendor_first_reported		 	  := (integer)fileDate;
@@ -30,14 +35,18 @@ Export SD	:= Module
 		self.corp_vendor								    := state_fips;
 		self.corp_state_origin							:= state_origin;
 		self.corp_legal_name                := Corp2_Mapping.fCleanBusinessName(state_origin,state_desc,l.org_name).BusinessName;
-		self.corp_ln_name_type_cd           := map(corporateID_Type = 'RG'											      => '09', 
-																							 corporateID_Type in ['RL','RN','RP','RS']				  => '07',
-																							 '01');
-		self.corp_ln_name_type_desc         := map(corporateID_Type = 'RG'											      => 'REGISTRATION', 
-																							 corporateID_Type in ['RL','RN','RP','RS']			    => 'RESERVED',
-																							'LEGAL');
+		self.corp_ln_name_type_cd           := map(corporateID_Type in legal_list				     => '01', 
+																							 corporateID_Type = 'UB'				       		 => '02', 
+																							 corporateID_Type = 'RG'									 => '09', 
+																							 corporateID_Type in ['RL','RN','RP','RS'] => '07',
+																							 corporateID_Type);
+		self.corp_ln_name_type_desc         := map(corporateID_Type in legal_list					   => 'LEGAL', 
+																							 corporateID_Type = 'UB'				       		 => 'DBA', 
+																							 corporateID_Type = 'RG'									 => 'REGISTRATION', 
+																						   corporateID_Type in ['RL','RN','RP','RS'] => 'RESERVED',
+																							 '');
 		self.corp_orig_sos_charter_nbr      := corp2.t2u(l.org_corporate_id);
-		self.corp_orig_org_structure_cd  	  := if(corp2.t2u(l.entity_type) not in ['RG','RL','RN','RP','RS'],corp2.t2u(l.entity_type),'');
+		self.corp_orig_org_structure_cd  	  := if(corp2.t2u(l.entity_type) not in ['RG','RL','RN','RP','RS','UB'],corp2.t2u(l.entity_type),'');
 		self.corp_orig_org_structure_desc  	:= Corp2_Raw_SD.Functions.CorpOrigOrgStructDesc(l.entity_type);
 		self.corp_foreign_domestic_ind			:= map(corp2.t2u(l.entity_type) in domestic_list and corp2.t2u(l.corp_home_state) in [state_origin,'']     => 'D',
 																							 corp2.t2u(l.entity_type) in foreign_list and corp2.t2u(l.corp_home_state) not in [state_origin,''] => 'F',
@@ -135,7 +144,7 @@ Export SD	:= Module
 		self.corp_agent_commercial          := if(corp2.t2u(l.craid) <> '','Y','');
 		/* Two digit Alpha character codes (New/vendor sent) will be caught through scrubs!
 			 those get a chance to examine add them to[foreign_list or domestic_list] for date's */
-		self.InternalField1                 := if(corporateID_Type not in [domestic_list,foreign_list,'RN'] ,'**|'+corporateID_Type,'') ;	
+		self.InternalField1                 := if(corporateID_Type not in [domestic_list,foreign_list] ,'**|'+corporateID_Type,'') ;	
 		self.recordorigin									  := 'C';	
 		self																:= [];
 
@@ -167,7 +176,7 @@ Export SD	:= Module
 	MapAR  := dedup(sort(distribute(sd_AR,hash(corp_key)),record,local),record,local) : independent;
 	
 	corp2_Mapping.LayoutsCommon.EVENTS sd_amendTransform(Corp2_Raw_SD.Layouts.vendor_amendLayout  L):=	transform,
-  skip(corp2.t2u(l.change_type) = 'AR' or corp2.t2u(l.org_corporate_id) = '')
+  skip(corp2.t2u(l.change_type) in ['AR','ARA'] or corp2.t2u(l.org_corporate_id) = '')
 
 		self.corp_key	                  := state_fips + '-' +  corp2.t2u(l.org_corporate_id);
 		self.corp_vendor	              := state_fips;

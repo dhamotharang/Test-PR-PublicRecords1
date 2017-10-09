@@ -1,7 +1,7 @@
-import _Control;
+﻿import _Control;
 EXPORT constants := MODULE
 
-  EXPORT sVersion:='20170327';
+  EXPORT sVersion:='20170816';
 
   EXPORT threshold_ := 166000000;
  

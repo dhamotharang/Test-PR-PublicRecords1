@@ -1,4 +1,4 @@
-IMPORT PRTE2_Bankruptcy, BankruptcyV2, bipv2, BankruptcyV3;
+﻿IMPORT PRTE2_Bankruptcy, BankruptcyV2, bipv2, BankruptcyV3;
 
 EXPORT Layouts := MODULE
 	//Input Layouts
@@ -21,6 +21,7 @@ EXPORT Layouts := MODULE
 		STRING10	bug_num;
 		STRING10	cust_name;
 		STRING8		link_dob;
+		STRING9		link_ssn;
 	END;
 	
 	EXPORT Search := RECORD
@@ -28,6 +29,8 @@ EXPORT Layouts := MODULE
 		STRING10	bug_num;
 		STRING10	cust_name;
 		STRING8	 	link_dob;
+		STRING9		link_ssn;
+		STRING9		link_fein;
 		STRING8		link_inc_date;
 	END;
 	
@@ -41,6 +44,7 @@ EXPORT Layouts := MODULE
 		STRING10	bug_num;
 		STRING10	cust_name;
 		STRING8		link_dob;
+		STRING9		link_ssn;
 	END;
 	
 	EXPORT Main_BaseV3 := RECORD
@@ -52,6 +56,8 @@ EXPORT Layouts := MODULE
 		STRING10	bug_num;
 		STRING10	cust_name;
 		STRING8	 	link_dob;
+		STRING9		link_ssn;
+		STRING9		link_fein;
 		STRING8		link_inc_date;
 	END;
 	

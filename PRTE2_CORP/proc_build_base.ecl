@@ -1,4 +1,4 @@
-IMPORT  UT, PromoteSupers, std, Prte2, PRTE2_Corp, Address, AID, AID_Support;
+﻿IMPORT  UT, PromoteSupers, std, Prte2, PRTE2_Corp, Address, AID, AID_Support;
 
 EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 
@@ -164,6 +164,8 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
                                             SELF.corp_ra_name_suffix1	:= CleanName.name_suffix;
                                             SELF.corp_ra_score1		    := CleanName.name_score;                                            
                                             
+                                            SELF.corp_ra_cname1   := RIGHT.corp_legal_name;
+                                            
                                             SELF.corp_phone10     := Address.CleanPhone(RIGHT.corp_phone_number);
                                             SELF.corp_ra_phone10  := Address.CleanPhone(RIGHT.corp_ra_phone_number);
                                             
@@ -179,6 +181,8 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
                                             SELF.orgid	:= vLinkingIds.orgid;
                                             SELF.ultid	:= vLinkingIds.ultid;	   
                                          
+                                            SELF.record_type := 'C';
+                                            
                                             SELF := RIGHT;
                                             SELF := [];
                           
@@ -284,6 +288,8 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
                                             
                                             SELF.did :=  prte2.fn_AppendFakeID.did(CleanName.fname, CleanName.lname, RIGHT.cont_ssn, RIGHT.cont_dob, RIGHT.cust_name);
                                          
+                                            SELF.record_type := 'C';
+                                            
                                             SELF := RIGHT;
                                             SELF := [];
                                           )                                  
@@ -312,7 +318,7 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
   d_event_NewRecords := JOIN(d_event_InClean(cust_name <> '' AND corp_key <> ''),
                              d_corp_Base,
                              LEFT.corp_key=RIGHT.corp_key,
-                             TRANSFORM(Layouts.Event_Base_Layout,SELF.bdid := RIGHT.bdid, SELF := LEFT));
+                             TRANSFORM(Layouts.Event_Base_Layout,SELF.bdid := RIGHT.bdid, SELF.record_type := 'C', SELF := LEFT));
 
 
   //Concatenating Original & New Records
@@ -337,7 +343,7 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
   d_stock_NewRecords := JOIN(d_stock_InClean(cust_name <> '' AND corp_key <> ''),
                              d_corp_Base,
                              LEFT.corp_key=RIGHT.corp_key,
-                             TRANSFORM(Layouts.stock_Base_Layout,SELF.bdid := RIGHT.bdid, SELF := LEFT));
+                             TRANSFORM(Layouts.stock_Base_Layout,SELF.bdid := RIGHT.bdid, SELF.record_type := 'C', SELF := LEFT));
 
 
   //Concatenating Original & New Records
@@ -361,7 +367,7 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
   d_ar_NewRecords := JOIN(d_ar_InClean(cust_name <> '' AND corp_key <> ''),
                              d_corp_Base,
                              LEFT.corp_key=RIGHT.corp_key,
-                             TRANSFORM(Layouts.AR_Base_Layout,SELF.bdid := RIGHT.bdid, SELF := LEFT));
+                             TRANSFORM(Layouts.AR_Base_Layout,SELF.bdid := RIGHT.bdid, SELF.record_type := 'C', SELF := LEFT));
 
 
   //Concatenating Original & New Records

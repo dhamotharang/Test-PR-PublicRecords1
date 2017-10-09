@@ -1,4 +1,4 @@
-import OSHAIR,Business_Header,Address,lib_stringlib,ut;
+﻿import OSHAIR,Business_Header,Address,lib_stringlib,ut;
 
 export normalize_violations(string filedate, string process_date):= FUNCTION
 
@@ -60,6 +60,6 @@ ViolationsRollup	:= rollup(sort(dsAllViolations,record, except dt_first_seen,dt_
 														dt_vendor_first_reported, dt_vendor_last_reported
 										, local);
 
-return output(ViolationsRollup,,'~thor_data400::base::oshair::' + filedate + '::violations',overwrite);
+return output(ViolationsRollup,,'~thor_data400::base::oshair::' + filedate + '::violations',compressed,overwrite);
 
 end;

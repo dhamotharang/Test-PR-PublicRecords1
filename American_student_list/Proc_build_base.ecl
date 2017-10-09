@@ -38,6 +38,7 @@
 				self.GENDER   			     					:= if(trim(self.GENDER_CODE,left,right) = '1', 'MALE',
 											  if(trim(self.GENDER_CODE,left,right) = '2', 'FEMALE', 
 											  ''));
+				self.BIRTH_DATE										:=	TRIM(pInput.BIRTH_DATE,left,right)[3..];
 				self.DOB_FORMATTED        				:= MAP(LENGTH(TRIM(pInput.BIRTH_DATE,left,right)) = 4 => TRIM(pInput.BIRTH_DATE,left,right) + '0000', 
 																										 
 																								 LENGTH(TRIM(pInput.BIRTH_DATE,left,right)) = 6 => TRIM(pInput.BIRTH_DATE,left,right) + '00',

@@ -1,4 +1,4 @@
-import OSHAIR,Business_Header,Address,lib_stringlib,ut;
+﻿import OSHAIR,Business_Header,Address,lib_stringlib,ut;
 
 export normalize_programs(string filedate, string process_date) := FUNCTION
 
@@ -35,6 +35,6 @@ ProgramsRollup	:= rollup(sort(dsAllPrograms,record, except dt_first_seen,dt_last
 														dt_vendor_first_reported, dt_vendor_last_reported
 										, local);
 
-return output(ProgramsRollup,,'~thor_data400::base::oshair::' + filedate + '::program',overwrite);
+return output(ProgramsRollup,,'~thor_data400::base::oshair::' + filedate + '::program',compressed,overwrite);
 
 end;

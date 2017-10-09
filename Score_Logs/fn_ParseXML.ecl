@@ -1,6 +1,6 @@
-import std;
+﻿import std;
 
-pF := project(Score_Logs.Files.FCRA_Transaction, transform({string source, string filt, Score_Logs.Layouts.Input}, self.outputxml := trim(left.outputxml, left, right), self.inputxml := trim(left.inputxml, left, right), self.source := 'F', self.filt := left.inputxml[1..stringlib.stringfind(left.inputxml, '>', 1)], self := left));//changed
+pF := project(Score_Logs.fn_uncompressXML(Score_Logs.Files.FCRA_Transaction), transform({string source, string filt, Score_Logs.Layouts.Input}, self.outputxml := trim(left.outputxml, left, right), self.inputxml := trim(left.inputxml, left, right), self.source := 'F', self.filt := left.inputxml[1..stringlib.stringfind(left.inputxml, '>', 1)], self := left));//changed
 pNF := project(Score_Logs.fn_uncompressXML(Score_Logs.Files.NonFCRA_Transaction), transform({string source, string filt, Score_Logs.Layouts.Input}, self.outputxml := trim(left.outputxml, left, right), self.inputxml := trim(left.inputxml, left, right), self.source := 'NF', self.filt := left.inputxml[1..stringlib.stringfind(left.inputxml, '>', 1)], self := left));//changed
 
 p := (pF + pNF)(filt <> ''

@@ -67,9 +67,9 @@ EXPORT Map_Ported_Metadata_DeltaFile(string version):= FUNCTION
 		PhonesInfo.Layout_iConectiv.Intermediate roll(aggrTrans_s l, aggrTrans_s r) := transform
 				self.is_ported										:= if(l.is_ported or r.is_ported, true, 														r.is_ported);
 				self.vendor_first_reported_dt 		:= (string)ut.min2((unsigned)l.vendor_first_reported_dt, 						(unsigned)r.vendor_first_reported_dt);
-				self.vendor_last_reported_dt 			:= (string)ut.max2((unsigned)l.vendor_last_reported_dt, 						(unsigned)r.vendor_last_reported_dt);
+				self.vendor_last_reported_dt 			:= (string)max((unsigned)l.vendor_last_reported_dt, 								(unsigned)r.vendor_last_reported_dt);
 				self.port_start_dt								:= (string)ut.min2((unsigned)l.port_start_dt, 											(unsigned)r.port_start_dt);
-				self.port_end_dt									:= if(self.is_ported, '', (string)ut.max2((unsigned)l.port_end_dt, 	(unsigned)r.port_end_dt));
+				self.port_end_dt									:= if(self.is_ported, '', (string)max((unsigned)l.port_end_dt, 			(unsigned)r.port_end_dt));
 				self.porting_dt										:= if(l.porting_dt > r.porting_dt, l.porting_dt, 										r.porting_dt);
 				self 															:= r;
 		end;
@@ -95,10 +95,10 @@ EXPORT Map_Ported_Metadata_DeltaFile(string version):= FUNCTION
 		
 		rllUpdate newDate(rllUpdate l, rllUpdate r) := transform
 				
-				minDate	:= ut.min2((unsigned)l.vendor_first_reported_dt, 	(unsigned)r.vendor_first_reported_dt);
-				maxDate	:= ut.max2((unsigned)l.vendor_last_reported_dt, 	(unsigned)r.vendor_last_reported_dt);
-				minStart:= ut.min2((unsigned)l.port_start_dt, 						(unsigned)r.port_start_dt);
-				maxEnd	:= ut.max2((unsigned)l.port_end_dt, 							(unsigned)r.port_end_dt);
+				minDate	:= ut.min2((unsigned)l.vendor_first_reported_dt,(unsigned)r.vendor_first_reported_dt);
+				maxDate	:= max((unsigned)l.vendor_last_reported_dt, 		(unsigned)r.vendor_last_reported_dt);
+				minStart:= ut.min2((unsigned)l.port_start_dt, 					(unsigned)r.port_start_dt);
+				maxEnd	:= max((unsigned)l.port_end_dt, 								(unsigned)r.port_end_dt);
 
 			self.vendor_first_reported_dt 	:= (string)minDate;
 			self.vendor_last_reported_dt  	:= (string)maxDate;
@@ -122,48 +122,83 @@ EXPORT Map_Ported_Metadata_DeltaFile(string version):= FUNCTION
 																			newDate(left, right), local);
 																			
 	//Map to Common Layout
-	PhonesInfo.Layout_Common.portedMain iConectM(applyRollupDates l):= transform
-		self.source 											:= 'PK';
-		self.porting_dt										:= (unsigned) stringlib.stringfilter(l.porting_dt, '0123456789')[1..8];
-		self.porting_time									:= stringlib.stringfilter(l.porting_dt, '0123456789')[9..14];
-		self.phoneType										:= '';
-		self.vendor_first_reported_dt 		:= (unsigned) l.vendor_first_reported_dt[1..8];
-		self.vendor_first_reported_time		:= l.vendor_first_reported_dt[9..14];
-		self.vendor_last_reported_dt			:= (unsigned) l.vendor_last_reported_dt[1..8];
-		self.vendor_last_reported_time		:= l.vendor_last_reported_dt[9..14];
-		self.port_start_dt								:= (unsigned) l.port_start_dt[1..8];
-		self.port_start_time							:= l.port_start_dt[9..14];
-		self.port_end_dt									:= (unsigned) l.port_end_dt[1..8];
-		self.port_end_time								:= l.port_end_dt[9..14];
-		self.remove_port_dt								:= (unsigned) l.remove_port_dt[1..8];
-		self 															:= l;
-	end;
+		PhonesInfo.Layout_Common.portedMain iConectM(applyRollupDates l):= transform
+			self.source 											:= 'PK';
+			self.porting_dt										:= (unsigned) stringlib.stringfilter(l.porting_dt, '0123456789')[1..8];
+			self.porting_time									:= stringlib.stringfilter(l.porting_dt, '0123456789')[9..14];
+			self.phoneType										:= '';
+			self.vendor_first_reported_dt 		:= (unsigned) l.vendor_first_reported_dt[1..8];
+			self.vendor_first_reported_time		:= l.vendor_first_reported_dt[9..14];
+			self.vendor_last_reported_dt			:= (unsigned) l.vendor_last_reported_dt[1..8];
+			self.vendor_last_reported_time		:= l.vendor_last_reported_dt[9..14];
+			self.port_start_dt								:= (unsigned) l.port_start_dt[1..8];
+			self.port_start_time							:= l.port_start_dt[9..14];
+			self.port_end_dt									:= (unsigned) l.port_end_dt[1..8];
+			self.port_end_time								:= l.port_end_dt[9..14];
+			self.remove_port_dt								:= (unsigned) l.remove_port_dt[1..8];
+			self 															:= l;
+		end;
 
 	iConectComm := dedup(sort(project(applyRollupDates, iConectM(left)), record, local), record, local);
-
+		
 	//Map Ported Base to Common Layout - Append Serv/Line/Carrier Names from Reference Table
 	//Adapted from PhonesInfo.Map_Ported_Metadata_Main
+		srcRef			:= PhonesInfo.File_Source_Reference.Main(is_current=TRUE);
 
-		sortSPID		:= sort(distribute(PhonesInfo.File_Source_Reference.Main(is_current=TRUE), hash(spid)), spid, serv, line, carrier_name, local);//Lookup Supplied Internally	
+		sortSPID		:= sort(distribute(srcRef, hash(spid)), spid, serv, line, carrier_name, local);//Lookup Supplied Internally	
+
 		sortiCon		:= sort(distribute(iConectComm(source='PK'), hash(spid)), spid, local);
-		
+			
 		//iConectiv File
 		PhonesInfo.Layout_Common.portedMetadata_Main addiConSL(sortiCon l, sortSPID r):= transform
 			self.serv 							:= r.serv;
 			self.line								:= r.line;	
 			self.high_risk_indicator:= r.high_risk_indicator;
 			self.prepaid						:= r.prepaid;	
-			self.operator_fullname 	:= r.carrier_name;
+			self.operator_fullname 	:= PhonesInfo._Functions.fn_CarrierName(r.operator_full_name);
+
 			self.is_ported					:= if(l.port_end_dt not in [0], false, l.is_ported);
 			self 										:= l;
 		end;
 			
-		addiConFields 						:= join(sortiCon, sortSPID,
-																			left.spid = right.spid,
-																			addiConSL(left, right), left outer, local, keep(1));
-
-		ddiConAddFields 					:= dedup(sort(distribute(addiConFields, hash(phone)), record, local), record, local);
+		addiConON 				:= join(sortiCon, sortSPID,
+														left.spid = right.spid,
+														addiConSL(left, right), left outer, local, keep(1));
+																			
+	//Append OCN and Carrier Name to Port Recs By Joining to Ref Table (where carrier_name = operator_full_name) By SPID
+	//There are a few instances where there are multiple ocns for a spid
+		srtAddiCOFN				:= sort(distribute(addiConON, hash(spid)), spid, operator_fullname, local);
+		srtRefOFN_match		:= sort(distribute(srcRef(carrier_name=operator_full_name), hash(spid)), spid, carrier_name, local);
+			
+		PhonesInfo.Layout_Common.portedMetadata_Main addiCOFNTr(srtAddiCOFN l, srtRefOFN_match r):= transform
+			self.account_owner			:= r.ocn;
+			self.carrier_name				:= PhonesInfo._Functions.fn_CarrierName(r.carrier_name);
+			self 										:= l;
+		end;
 		
+		addiOCN_match 		:= join(srtAddiCOFN, srtRefOFN_match,
+															left.spid = right.spid and
+															PhonesInfo._Functions.fn_CarrierName(left.operator_fullname) = PhonesInfo._Functions.fn_CarrierName(right.carrier_name),
+															addiCOFNTr(left, right), left outer, local, keep(1));	
+		
+		//Append OCN and Carrier Name to Remaining Port Recs (where account_owner='') By Joining to Ref Table (where carrier_name <> operator_full_name) By SPID
+		srtAddiCRem				:= sort(distribute(addiOCN_match(account_owner=''), hash(spid)), spid, operator_fullname, local);
+		srtRefRem					:= sort(distribute(srcRef(carrier_name<>operator_full_name), hash(spid)), spid, operator_full_name, carrier_name, local);
+	
+		PhonesInfo.Layout_Common.portedMetadata_Main addiRemTr(srtAddiCRem l, srtRefRem r):= transform
+			self.account_owner			:= r.ocn;
+			self.carrier_name				:= PhonesInfo._Functions.fn_CarrierName(r.carrier_name);
+			self 										:= l;
+		end;	
+	
+		addiCRem 					:= join(srtAddiCRem, srtRefRem,
+															left.spid = right.spid,
+															addiRemTr(left, right), left outer, local, keep(1));
+	
+	//Concat Appended OCN/Carrier Name Results
+	ddiConAddFields 	:= dedup(sort(distribute(addiOCN_match(account_owner<>'')+addiCRem, hash(phone)), record, local), record, local);
+
+
 		//Reformat to Key Layout
 		keyLayout := record
 			string10 phone;

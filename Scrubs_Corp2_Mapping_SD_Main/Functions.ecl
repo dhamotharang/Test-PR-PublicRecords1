@@ -1,4 +1,4 @@
-IMPORT corp2;
+﻿IMPORT corp2;
 	
 EXPORT Functions := MODULE
 
@@ -12,7 +12,7 @@ EXPORT Functions := MODULE
 			uc_ro 		:= corp2.t2u(recordorigin);
 			
 			isValidCD := if(uc_ro = 'C',
-											map( uc_s in ['01','09','07'] => true, 
+											map( uc_s in ['01','02','09','07'] => true, 
 													 false
 												 ),
 												true //For contact records, corp_ln_name_type_cd doesn't have to exist
@@ -24,8 +24,9 @@ EXPORT Functions := MODULE
 		
 		//Below table needs to be updated when we see new Org_Struc codes in Raw updates!
 
-		EXPORT set_valid_orgStruc_codes := ['BK','BL' ,'CH' ,'CI','CO','DA','DB','DF','DL','DP','DR','DT'
-																				,'DM','FA','FB','FC','FF','FG','FK','FL','FM','FN','FP'
-																				,'FR' ,'FT','GP','ID','IN','MP','NS','PF','PU','RA','RN','SD','WD',''];																	
+		EXPORT set_valid_orgStruc_codes := ['BK','BL','CH','CI','CO','DA','DB','DF','DL','DM','DP',
+																				'DR','DT','EM','FA','FB','FC','FD','FF','FG','FK','FL','FM',
+																				'FN','FP','FR','FT','GP','ID','IN','MP','NS','PF','PU',
+																				'RA','RD','RN','SD','SG','TD','WD',''];																	
 																		
 END;

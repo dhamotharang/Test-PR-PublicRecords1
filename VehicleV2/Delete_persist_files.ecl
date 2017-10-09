@@ -1,4 +1,4 @@
-import	vehicleV2,lib_fileservices;
+﻿import	vehicleV2,lib_fileservices;
 
 DeletePersistfiles(string	filename)	:=	if(fileservices.FileExists(filename),fileservices.DeleteLogicalFile(filename),output('No persist file need delete. (' +filename + ')' ));
 
@@ -43,7 +43,7 @@ delete30	:=	DeletePersistfiles('~thor_data400::persist::vehiclev2::ma_temp_main'
 delete31	:=	DeletePersistfiles('~thor_data400::persist::vehiclev2::ma_main');
 delete32	:=	DeletePersistfiles('~thor_data400::persist::vehiclev2::ma_temp_party');
 delete33	:=	DeletePersistfiles('~thor_data400::persist::vehiclev2::ma_party');
-
+delete34  :=	DeletePersistfiles('~thor_data400::persist::vehiclev2::interm_party');
 
 export	Delete_persist_files	:=	parallel( delete01,delete02,delete03,delete04,
 																						delete05,delete06,delete07,delete08,
@@ -53,5 +53,5 @@ export	Delete_persist_files	:=	parallel( delete01,delete02,delete03,delete04,
 																						delete21,delete22,delete23,delete24,
 																						delete25,delete26,delete27,delete28,
 																						delete29,delete30,delete31,delete32,
-																						delete33
+																						delete33,delete34
 																						);

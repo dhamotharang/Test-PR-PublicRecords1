@@ -1,10 +1,10 @@
-EXPORT Mod_Sets := Module
+﻿EXPORT Mod_Sets := Module
 
 EXPORT threshld:=0.05;
 EXPORT validDelimiter := '~|~';
 EXPORT validTerminators := ['~<EOL>~','\n'];
 EXPORT IdentityData_numberOfColumns := 58;
-EXPORT KnownFraud_numberOfColumns := 116;
+EXPORT KnownFraud_numberOfColumns := 117;
 
 EXPORT CriticalFieldError_IdentityData	:= [
 															'Customer_Name'

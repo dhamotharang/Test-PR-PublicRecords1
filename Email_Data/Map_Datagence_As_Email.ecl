@@ -1,7 +1,7 @@
-import V12, address, ut,emailservice, mdr, _validate, Entiera, lib_StringLib, std;
+﻿import V12, address, ut,emailservice, mdr, _validate, Entiera, lib_StringLib, std;
 export Map_Datagence_As_Email(version) := function
 
-with_email := V12.Files.V12_Base(length(trim(email,left, right)) > 4 and StringLib.StringFindCount(email,  '@') > 0 /*AND optout != TRUE*/and STD.Str.Find(first_name, '|', 1) =0 and  STD.Str.Find(last_name, '|', 1) = 0 and STD.Str.Find(city, '|', 1) = 0 );
+with_email := V12.Files.V12_Base(length(trim(email,left, right)) > 4 and StringLib.StringFindCount(email,  '@') > 0 AND optout != TRUE and STD.Str.Find(first_name, '|', 1) =0 and  STD.Str.Find(last_name, '|', 1) = 0 and STD.Str.Find(city, '|', 1) = 0 );
 
 //apply macro to obtain email domain fields
 emailservice.mac_append_domain_flags(with_email,domain_d,email);

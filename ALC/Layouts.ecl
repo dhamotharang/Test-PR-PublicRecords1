@@ -1,4 +1,4 @@
-IMPORT Address, BIPV2;
+﻿IMPORT Address, BIPV2;
 
 EXPORT Layouts := MODULE
 
@@ -29,8 +29,8 @@ EXPORT Layouts := MODULE
 		  STRING4   msa;
 		  STRING100 source_code;
 		  STRING4   company_type;
-		  STRING10  phone;
-		  STRING60  email;
+		  STRING20  phone;
+		  STRING132 email;
 		  STRING10  list_id;
 		  STRING10  scno;
 		  STRING35  keycode;
@@ -66,12 +66,12 @@ EXPORT Layouts := MODULE
 		  STRING15  orig_date;
 		  STRING30  exp_date;
 		  STRING50  license_state;
-		  STRING30  license_type;
+		  STRING254 license_type;
 		  STRING4   msa;
 		  STRING1   nielsen_county_cd;
 		  STRING30  specialty_code;
-		  STRING10  phone;
-		  STRING60  email;
+		  STRING20  phone;
+		  STRING132 email;
 		  STRING10  list_id;
 		  STRING10  scno;
 		  STRING35  keycode;
@@ -136,9 +136,9 @@ EXPORT Layouts := MODULE
 		  STRING4   msa;
 		  STRING1   nielsen_county_cd;
 		  STRING10  number_of_lawyers_range;
-		  STRING255 practice_area;
-		  STRING25  title_cd;
-		  STRING10  phone;
+		  STRING254 practice_area;
+		  STRING50  title_cd;
+		  STRING20  phone;
 		  STRING10  list_id;
 		  STRING10  scno;
 		  STRING35  keycode;
@@ -172,8 +172,8 @@ EXPORT Layouts := MODULE
 		  STRING80  nurse_type;
 		  STRING120 reg_state;
 		  STRING50  specialty;
-		  STRING60  email;
-		  STRING10  phone;
+		  STRING132 email;
+		  STRING20  phone;
 		  STRING10  list_id;
 		  STRING10  scno;
 		  STRING35  keycode;
@@ -207,12 +207,12 @@ EXPORT Layouts := MODULE
 		  STRING15  county_cd;
 		  STRING15  orig_date;
 		  STRING30  exp_date;
-		  STRING10  fax;
+		  STRING1   fax;
 		  STRING50  license_state;
 		  STRING30  license_type;
 		  STRING4   msa;
 		  STRING1   nielsen_county_cd;
-		  STRING60  email;
+		  STRING132 email;
 		  STRING10  list_id;
 		  STRING10  scno;
 		  STRING35  keycode;
@@ -221,7 +221,7 @@ EXPORT Layouts := MODULE
 		  STRING20  dob;
 		  STRING20  degree;
 		  STRING20  specialty;
-		  STRING10  phone;
+		  STRING20  phone;
 		END;
 
 		EXPORT Pilots := RECORD
@@ -242,7 +242,7 @@ EXPORT Layouts := MODULE
 		  STRING20  postal_cd;
 		  STRING1   dpv;
 		  STRING15  addr_type;
-		  STRING255 cert_lvl;
+		  STRING254 cert_lvl;
 		  STRING50  cert_type;
 		  STRING1   nielsen_county_cd;
 		  STRING80  rating;
@@ -277,11 +277,11 @@ EXPORT Layouts := MODULE
 		  STRING15  county_cd;
 		  STRING15  license_class;
 		  STRING50  license_state;
-		  STRING255 license_type;
+		  STRING254 license_type;
 		  STRING4   msa;
 		  STRING1   nielsen_county_cd;
-		  STRING10  phone;
-		  STRING60  email;
+		  STRING20  phone;
+		  STRING132 email;
 		  STRING10  list_id;
 		  STRING10  scno;
 		  STRING35  keycode;

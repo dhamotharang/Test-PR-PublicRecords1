@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP-- 
 <message name="ComprehensiveReport" wuTimeout="300000">
   <part name="ENTRP_Month_Value" type="xsd:string"/>
   <part name="IndustryCLASS" type="xsd:string"/>
@@ -69,6 +69,7 @@
 	<part name="IncludeProfessionalLicenses" type="xsd:boolean"/>
 	<part name="IncludeSanctions" type="xsd:boolean"/>
 	<part name="IncludeProviders" type="xsd:boolean"/>
+	<part name="IncludeUtility" type="xsd:boolean"/>
 	<part name="IncludeEmailAddresses" type="xsd:boolean"/>
 	<part name="IncludePeopleAtWork" type = "xsd:boolean"/>
 	<part name="IncludeVoterRegistrations" type="xsd:boolean"/>

@@ -1,4 +1,4 @@
-import OSHAIR,Business_Header,Address,lib_stringlib,ut;
+﻿import OSHAIR,Business_Header,Address,lib_stringlib,ut;
 
 export normalize_optional_information(string filedate, string process_date):= FUNCTION
 
@@ -37,6 +37,6 @@ OptInfoRollup := rollup(sort(dsAllOptInfo,record, except dt_first_seen,dt_last_s
 														dt_vendor_first_reported, dt_vendor_last_reported
 										, local);
 
-return output(OptInfoRollup,,'~thor_data400::base::oshair::' + filedate + '::optional_info',overwrite);
+return output(OptInfoRollup,,'~thor_data400::base::oshair::' + filedate + '::optional_info',compressed,overwrite);
 
 end;												

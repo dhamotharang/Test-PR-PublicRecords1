@@ -1,4 +1,4 @@
-import bankruptcyv2, ut;
+﻿import bankruptcyv2, ut;
 
 export Mac_spray_BK_input_files(Casefile,Defendantsfile,filedate,group_name = '') := macro
 
@@ -13,9 +13,9 @@ export Mac_spray_BK_input_files(Casefile,Defendantsfile,filedate,group_name = ''
 %sourceIP% := _control.IPAddress.bctlpedata10;
 
 %spray_Case% := FileServices.SprayVariable(%sourceIP%,Casefile,,,,,group_name,
-						'~thor_data400::in::bankruptcyv3::'+filedate+'::Case::sprayed',-1,,,true,true);
+						'~thor_data400::in::bankruptcyv3::'+filedate+'::Case::sprayed',-1,,,true,false,true);
 %spray_Defendants% := FileServices.SprayVariable(%sourceIP%,Defendantsfile,,,,,group_name,
-						'~thor_data400::in::bankruptcyv3::'+filedate+'::Defendants::sprayed',-1,,,true,true);
+						'~thor_data400::in::bankruptcyv3::'+filedate+'::Defendants::sprayed',-1,,,true,false,true);
 
 //////////////////////// Add filename to each record
 //Case
@@ -35,7 +35,7 @@ BankruptcyV2.Layout_In_Case %proj_case_recs%(%caseds% l) := transform
 	self := l;
 end;						
 
-%proj_case_out% := output(project(%caseds%,%proj_case_recs%(left)),,'~thor_data400::in::bankruptcyv3::'+filedate+'::Case',csv(quote('\"')),overwrite);
+%proj_case_out% := output(project(%caseds%,%proj_case_recs%(left)),,'~thor_data400::in::bankruptcyv3::'+filedate+'::Case',csv(quote('\"')),overwrite,COMPRESSED);
 
 
 //Defendant
@@ -55,7 +55,7 @@ BankruptcyV2.Layout_In_defendants %proj_def_recs%(%defds% l) := transform
 	self := l;
 end;						
 
-%proj_def_out% := output(project(%defds%,%proj_def_recs%(left)),,'~thor_data400::in::bankruptcyv3::'+filedate+'::defendants',csv(quote('\"')),overwrite);
+%proj_def_out% := output(project(%defds%,%proj_def_recs%(left)),,'~thor_data400::in::bankruptcyv3::'+filedate+'::defendants',csv(quote('\"')),overwrite,COMPRESSED);
 
 //////////////////////// Add filename to each record - End //////////////////////
 

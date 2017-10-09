@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut, lib_StringLib , STD; 
+﻿IMPORT Civ_Court, civil_court, ut, lib_StringLib , STD; 
 
 #option('multiplePersistInstances',FALSE);
 
@@ -32,18 +32,18 @@ self.court							:= 'COUNTY OF SAGINAW 70TH DISTRICT STATE COURT';
 self.case_number				:= UpperCaseNum;
 self.case_type					:= ut.CleanSpacesAndUpper(input.case_type);
 self.case_title					:= ut.CleanSpacesAndUpper(input.case_title);
-TempFileDte							:= IF(trim(input.filed_date,all) <> '', ut.ConvertDateMultiple(input.filed_date,fmtsin,fmtout), '');
+TempFileDte							:= IF(trim(input.filed_date,all) <> '', Std.date.ConvertDateFormatMultiple(input.filed_date,fmtsin,fmtout), '');
 self.filing_date				:= IF(STD.DATE.IsValidDate((INTEGER) TempFileDte),TempFileDte,'');
-TempJgmtDispDate				:= IF(REGEXFIND('FINAL DISPOSITION',input.activity1),ut.ConvertDateMultiple(input.activity_date1,fmtsin,fmtout),
-														IF(REGEXFIND('FINAL DISPOSITION',input.activity2),ut.ConvertDateMultiple(input.activity_date1,fmtsin,fmtout),
-															IF(REGEXFIND('FINAL DISPOSITION',input.activity3),ut.ConvertDateMultiple(input.activity_date1,fmtsin,fmtout),
-															 IF(REGEXFIND('FINAL DISPOSITION',input.activity4),ut.ConvertDateMultiple(input.activity_date1,fmtsin,fmtout),''))));
+TempJgmtDispDate				:= IF(REGEXFIND('FINAL DISPOSITION',input.activity1),Std.date.ConvertDateFormatMultiple(input.activity_date1,fmtsin,fmtout),
+														IF(REGEXFIND('FINAL DISPOSITION',input.activity2),Std.date.ConvertDateFormatMultiple(input.activity_date1,fmtsin,fmtout),
+															IF(REGEXFIND('FINAL DISPOSITION',input.activity3),Std.date.ConvertDateFormatMultiple(input.activity_date1,fmtsin,fmtout),
+															 IF(REGEXFIND('FINAL DISPOSITION',input.activity4),Std.date.ConvertDateFormatMultiple(input.activity_date1,fmtsin,fmtout),''))));
 self.judgmt_disposition_date := IF(STD.DATE.IsValidDate((INTEGER) TempJgmtDispDate),TempJgmtDispDate,'');
 self.judgmt_disposition	:= IF(REGEXFIND('FINAL DISPOSITION',input.activity1),trim(REGEXFIND('(.*) - (.*)',input.activity1,2),left,right),
 														IF(REGEXFIND('FINAL DISPOSITION',input.activity2),trim(REGEXFIND('(.*) - (.*)',input.activity2,2),left,right),
 															IF(REGEXFIND('FINAL DISPOSITION',input.activity3),trim(REGEXFIND('(.*) - (.*)',input.activity3,2),left,right),
 															 IF(REGEXFIND('FINAL DISPOSITION',input.activity4),trim(REGEXFIND('(.*) - (.*)',input.activity4,2),left,right),''))));
-TempDispDate					:= IF(trim(input.disposition_date,all) <> '',ut.ConvertDateMultiple(input.disposition_date,fmtsin,fmtout), '');
+TempDispDate					:= IF(trim(input.disposition_date,all) <> '',Std.date.ConvertDateFormatMultiple(input.disposition_date,fmtsin,fmtout), '');
 StdDispDate						 := IF(LENGTH(TempDispDate)<8,
 														(string)Date_YY_to_YYYY((integer)TempDispDate[1..2])+TempDispDate[3..4]+TempDispDate[5..6],
 														TempDispDate);

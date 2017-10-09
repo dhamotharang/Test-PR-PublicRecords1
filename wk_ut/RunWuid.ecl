@@ -1,4 +1,4 @@
-/*
+﻿/*
 
   TODO:  compile list of most common "fluke" errors and allow this process to kick those wuids off again without intervention.
 
@@ -92,7 +92,7 @@ functionmacro
   // -- Get new child wuid, or previous one(could be any status;running, aborted,queued, etc)
   StartExistingDataset  := dataset(StartFilename  ,wk_ut.layouts.wks_slim ,flat,opt);
   child_wuid1           := StartExistingDataset[if(count(StartExistingDataset) = 0,1,count(StartExistingDataset))].wuid;
-  Child_Wuid            := iff(STD.File.FileExists(StartFilename) and DoesFileExist  ,child_wuid1  ,wk_ut.get_Scalar_Result(workunit ,pUniqueOutput + 'Iteration_'   + pversion + '_' + piteration));
+  Child_Wuid            := iff(STD.File.FileExists(StartFilename) and DoesFileExist and trim(child_wuid1) != '' ,child_wuid1  ,wk_ut.get_Scalar_Result(workunit ,pUniqueOutput + 'Iteration_'   + pversion + '_' + piteration));
  
   //use child wuid so it doesn't reevaluate it and create another workunit
   createwatcherworkunit := wk_ut.CreateWuid_Raw(
@@ -113,7 +113,7 @@ functionmacro
   kick_Off_Child := sequential(
        output(try_Number                                        ,named('Try_Number'                                                           ),overwrite)
       ,output('Kicked Off Iteration'                            ,named('LastWork'                                                             ),overwrite)
-      ,output(iff(DoesFileExist ,Child_Wuid ,createworkunit  )  ,named(pUniqueOutput + 'Iteration_'   + pversion + '_' + piteration           ),overwrite)
+      ,output(iff(DoesFileExist and trim(child_wuid1) != '' ,Child_Wuid ,createworkunit  )  ,named(pUniqueOutput + 'Iteration_'   + pversion + '_' + piteration           ),overwrite)
       ,output(clickablewuid                                     ,named(pUniqueOutput + 'Iteration_'   + pversion + '_' + piteration + '__html'),overwrite)
       ,if(pOutputFilename != '' and not DoesFileExist ,wk_ut.Update_File(StartFilename,StartExistingDataset + StartDataset,false,true,'wuid'))
       ,output(createwatcherworkunit                             ,named(pUniqueOutput + 'Watcher_for_' + pversion + '_' + piteration           ),overwrite)

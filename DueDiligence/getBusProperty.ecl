@@ -1,4 +1,4 @@
-
+﻿
 IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, SALT28, iesp;
 
 EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
@@ -8,7 +8,7 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 											 boolean DebugMode = FALSE
 											 ) := FUNCTION
 
-  // ------                                                                            ------
+  // ------                                                                             ------
 	// ------ Get the LinkIDs for this Business                                          ------
 	// ------                                                                            ------
 	BusnKeys    := DueDiligence.Common.GetLinkIDs(BusnData);
@@ -68,73 +68,107 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																		          self := left),
 										                          left only);
   
+	
+		
+ // ----- Get the assessed value and other details for each property in the list --------
+ // ----- LN_PropertyV2.key_assessor_fid                                         --------	
+ PropertyAssessmentFidNonFCRA	:= LN_PropertyV2.key_assessor_fid();
+		
+		
+ BusPropertyOwnedWithDetails := join(Property_currently_owned, PropertyAssessmentFidNonFCRA,  
+									              Keyed(left.ln_fares_id = right.ln_fares_id),
+									                TRANSFORM(DueDiligence.LayoutsInternal.PropertySlimLayout,
+																			SELF.PropertyReportData.seq    := LEFT.Seq,
+																			SELF.PropertyReportData.ultID  := LEFT.ultID,
+																			SELF.PropertyReportData.orgID  := LEFT.orgID,
+																			SELF.PropertyReportData.seleID := LEFT.seleID,
+																			SELF.LNFaresId                 := RIGHT.ln_fares_id,
+										                  SELF.TaxAssdValue              := (INTEGER)RIGHT.assessed_total_value,
+															        SELF.TaxAmount                 := (INTEGER)RIGHT.tax_amount, 
+																			SELF.TaxYear                   := RIGHT.tax_year,  
+															        SELF.OwnerOccupied             := RIGHT.owner_occupied,
+																			SELF.PurchasePrice             := (INTEGER)RIGHT.sales_price,
+																			SELF.AssesseeName              := RIGHT.assessee_name,
+																			SELF.SaleDate                  := RIGHT.sale_date,
+																			SELF.LengthOfOwnership         := DueDiligence.Common.DaysApartWithZeroEmptyDate(RIGHT.sale_date, (STRING)LEFT.historydate)/30,        //store the value in months. 
+																			SELF.BusinessType              := RIGHT.county_land_use_description,
+																			//SELF.CountyFIPS                := LEFT.County,
+																			SELF.CountyName                := RIGHT.county_name,   
+										                  self := left),
+									              left outer, 
+									              ATMOST(keyed(LEFT.LN_fares_id=RIGHT.ln_fares_id), 100));
+	
 	// ------                                                                                    ------
 	// ----- Summarize the results to get the Current owned Property Count for this business     ------
 	// ------                                                                                    ------
-	Summary_Current_Prop := table(Property_currently_owned, {seq, ultid, orgid, seleid, cname, HistoryDate, OwnPropCnt := count(group)}, seq, ultid, orgid, seleid);
+	Summary_Current_Prop := table(BusPropertyOwnedWithDetails,
+	                               /* columns in the table */  
+	                              {PropertyReportData.seq, 
+																PropertyReportData.ultid, 
+																PropertyReportData.orgid, 
+																PropertyReportData.seleid, 
+																cname, 
+																HistoryDate, 
+																TotalAssessedValue := SUM(GROUP, TaxAssdValue), 
+																OwnPropCnt := count(group)},
+																/* Grouped by */  
+																PropertyReportData.seq, PropertyReportData.ultid, PropertyReportData.orgid, PropertyReportData.seleid);
+	
+  // ------                                                                                    ------
+	// ----- Summarize the results to get the SOLD Property Count for this business     ------
+	// ------                                                                                    ------
+	Summary_SOLD_Prop := table(Property_sold, 
+	                              {seq, ultid, orgid, seleid, cname, HistoryDate, 
+																SOLDPropCnt := count(group)}, 
+																seq, ultid, orgid, seleid);	
+		
 	
   // ------                                                                                    ------	
 	// ----- Add the property count to Busn_Internal layout                                      ------
 	// ------                                                                                    ------
-	UpdateBusnProperty := JOIN(BusnData, Summary_Current_Prop,
+	UpdateBusnOwnedProperty := JOIN(BusnData, Summary_Current_Prop,
 												LEFT.seq = RIGHT.seq AND
 												LEFT.Busn_info.BIP_IDS.UltID.LinkID  = RIGHT.ultID AND
 												LEFT.Busn_info.BIP_IDS.OrgID.LinkID  = RIGHT.orgID AND
 												LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,												
 												TRANSFORM(DueDiligence.Layouts.Busn_Internal, 
 																	SELF.CurrPropOwnedCount := RIGHT.OwnPropCnt,
+																	SELF.PropTaxValue       := RIGHT.TotalAssessedValue,
+																	SELF := LEFT),
+																	LEFT OUTER);
+
+
+  // ------                                                                                    ------	
+	// ----- Add the property SOLD count to Busn_Internal layout                                ------
+	// ------                                                                                    ------
+	UpdateBusnPropertyForAttributeLogic := JOIN(UpdateBusnOwnedProperty, Summary_SOLD_Prop,
+												LEFT.seq = RIGHT.seq AND
+												LEFT.Busn_info.BIP_IDS.UltID.LinkID  = RIGHT.ultID AND
+												LEFT.Busn_info.BIP_IDS.OrgID.LinkID  = RIGHT.orgID AND
+												LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,												
+												TRANSFORM(DueDiligence.Layouts.Busn_Internal, 
+																	SELF.CountSoldProp      := RIGHT.SOLDPropCnt,
+																	SELF.CountOwnProp       := LEFT.CurrPropOwnedCount + RIGHT.SOLDPropCnt,
 																	SELF := LEFT),
 																	LEFT OUTER);
 
    // ------                                                                                    ------   
-	 // ------ Start building the sections of the report that are available at this point         ------ 
+	 // ------ START BUILDING SECTIONS of the REPORT                                              ------ 
 	 // ------ Note next release the report will be optional                                      ------
+	 // ------                                                                                    ------ 
+	 // ------ Limit the number of property for each business listed in the report                ------
+	 // ------ Start by sorting them in seleid sequence and getting the property with the         ------
+	 // ------ highest property value at the top                                                  ------
+	 // ------ Note:  think about changing this to ROLLUP  so that we can be more thoughtful      ------
 	 // ------                                                                                    ------
+	 PropertyCurrentlyOwnedButLimited   := dedup(sort(BusPropertyOwnedWithDetails,  PropertyReportData.seleid, -TaxAssdValue), PropertyReportData.seleid,  KEEP(iesp.constants.DDRAttributesConst.MaxAssets)); 
+  
+	//UpdateBusnPropertyWithReport  := UpdateBusnPropertyForAttributeLogic; 
+	 UpdateBusnPropertyWithReport  := DueDiligence.reportBusProperty(UpdateBusnPropertyForAttributeLogic,
+	                                                                PropertyCurrentlyOwnedButLimited,
+																																	DebugMode);   
 	 
-	 // ------                                                                                    ------
-	 // ------ Limit the number of property for each business listed in the report                ------ 
-	 // ------                                                                                    ------
-	 PropertyCurrentlyOwnedButLimited   := dedup(sort(Property_currently_owned,  seleid), seleid, KEEP(iesp.constants.DDRAttributesConst.MaxAssets)); 
-
-	 
-	// ------                                                                                    ------
-  // ------ create the ChildDataset of Property                                                ------
-	// ------                                                                                    ------
-	PropertyChildDatasetLayout    := RECORD
-	  unsigned2                      seq;                                                        //*  This is the seqence number of the parent  
-	  DATASET(iesp.duediligencereport.t_DDRProperty) PropChild;
-	END;
-	 
-	PropertyChildDataset  :=   
-		PROJECT(PropertyCurrentlyOwnedButLimited,
-			TRANSFORM(PropertyChildDatasetLayout,
-				SELF.seq             := LEFT.seq,
-				SELF.PropChild       := PROJECT (LEFT, TRANSFORM (iesp.duediligencereport.t_DDRProperty,  
-				       
-				                                         SELF.Address.StreetNumber          := LEFT.prim_range;
-																								 SELF.Address.StreetPreDirection    := LEFT.predir; 
-				                                         SELF.Address.StreetName            := LEFT.prim_name;
-																								 SELF.Address.StreetSuffix          := LEFT.suffix;
-																								 SELF.Address.StreetPostDirection   := LEFT.postdir;
-																								 SELF.Address.UnitDesignation       := LEFT.unit_desig;
-																								 SELF.Address.UnitNumber            := LEFT.sec_range;
-																								 SELF.Address.City                  := LEFT.p_city_name;
-																								 SELF.Address.State                 := LEFT.st;
-																								 SELF.Address.Zip5                  := LEFT.zip; 
-				                                         SELF                               := []))));  
 	
-	 /*  define the TRANSFORM used by the DENORMALIZE FUNCTION                        */  
-	  DueDiligence.Layouts.Busn_Internal CreateNestedData(UpdateBusnProperty le, PropertyChildDataset ri, Integer PropCount) := TRANSFORM
-												          SELF.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.PropertyOwnerShip.PropertyCurrentCount  := le.CurrPropOwnedCount,
-																	SELF.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.PropertyOwnerShip.Properties := le.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.PropertyOwnerShip.Properties + ri.PropChild;
-																	SELF := le;
-																	END; 
-																	
-	 /* perform the DENORMALIZE (join) by Seq #                                        */   															 															
-	 UpdateBusnPropertyWithReport := DENORMALIZE(UpdateBusnProperty, PropertyChildDataset,
-	                                             LEFT.seq = RIGHT.seq, 
-												                       CreateNestedData(Left, Right, Counter));  
-																							
 	// ********************
 	//   DEBUGGING OUTPUTS
 	// *********************
@@ -144,21 +178,25 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	 IF(DebugMode,     OUTPUT(CHOOSEN(PropertyRaw_with_seq, 100),  NAMED('Sample_PropertyStep1_ALL')));
 	 IF(DebugMode,     OUTPUT(COUNT  (PropertyRaw_with_seq),       NAMED('HowManyPropertyStep1')));
 	 
-	 IF(DebugMode,     OUTPUT(CHOOSEN(Property_Filtered, 100),     NAMED('Sample_Property_Filtered_Step2')));
-	 IF(DebugMode,     OUTPUT(COUNT  (Property_Filtered),          NAMED('HowManyPropertyStep2')));
+	 //IF(DebugMode,     OUTPUT(CHOOSEN(Property_Filtered, 100),     NAMED('Sample_Property_Filtered_Step2')));
+	 IF(DebugMode,     OUTPUT(COUNT  (Property_Filtered),          NAMED('HowManyPropertyAfterFilterStep2')));
 	 
 	 IF(DebugMode,     OUTPUT(CHOOSEN(Property_owned_at_some_point, 100),    NAMED('Sample_Property_owned_Step3')));
 	 IF(DebugMode,     OUTPUT(COUNT  (Property_owned_at_some_point),         NAMED('HowManyPropertyStep3')));
 	 
-	 IF(DebugMode,     OUTPUT(CHOOSEN(Property_sold, 50),          NAMED('Sample_Property_sold_Step4')));
+	 IF(DebugMode,     OUTPUT(CHOOSEN(Property_sold, 100),          NAMED('Sample_Property_sold_Step4')));
 	 IF(DebugMode,     OUTPUT(COUNT  (Property_sold),              NAMED('HowManyPropertyStep4')));
 	 
 	 IF(DebugMode,     OUTPUT(CHOOSEN(Property_currently_owned, 50),     NAMED('Sample_Property_currently_owned_Step5')));
 	 IF(DebugMode,     OUTPUT(COUNT  (Property_currently_owned),         NAMED('HowManyPropertyStep5')));
 	 
-	 IF(DebugMode,     OUTPUT(CHOOSEN(Summary_Current_Prop, 100),  NAMED('Summary_Property')));
+   IF(DebugMode,     OUTPUT(CHOOSEN(BusPropertyOwnedWithDetails, 100),     NAMED('Sample_BusPropertyOwnedWithDetails_Step6')));
+	 IF(DebugMode,     OUTPUT(COUNT  (BusPropertyOwnedWithDetails),          NAMED('HowManyBusPropertyOwnedWithDetailsStep6')));	 
 	 
-	 IF(DebugMode,     OUTPUT(CHOOSEN(PropertyChildDataset, 100),  NAMED('PropertyChildDataset')));
+	 IF(DebugMode,     OUTPUT(CHOOSEN(PropertyCurrentlyOwnedButLimited, 50),     NAMED('Sample_PropertyCurrentlyOwnedButLimited_Step6')));
+	 IF(DebugMode,     OUTPUT(COUNT  (PropertyCurrentlyOwnedButLimited),         NAMED('HowManyPropertyCurrentlyOwnedButLimitedStep6')));
+	 
+	 IF(DebugMode,     OUTPUT(CHOOSEN(Summary_Current_Prop, 100),  NAMED('Summary_Property')));
 	 
 	 IF(DebugMode,     OUTPUT(CHOOSEN(UpdateBusnPropertyWithReport, 100),  NAMED('UpdateBusnPropertyWithReport')));  
 	

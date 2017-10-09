@@ -1,10 +1,13 @@
-// Output(jmills.file_base_fdn_qa_main);
+﻿// Output(jmills.file_base_fdn_qa_main);
 
 // Output(FCRA.Key_Override_Student_FFID);
+#CONSTANT('Platform','FDN');
+import FraudShared;
+key_in := FraudShared.Keys().main.id.qa;
 
-#CONSTANT('DataLocationCC', 'NONAME');  
-import FraudDefenseNetwork;
-key_in := FraudDefenseNetwork.Keys().main.id.qa;
+// #CONSTANT('DataLocationCC', 'NONAME');  
+// import FraudDefenseNetwork;
+// key_in := FraudDefenseNetwork.Keys().main.id.qa;
 //FDN_base_orig := FraudDefenseNetwork.Keys().main.id.qa; 
 // key_in := ln_propertyv2.Key_Assessor_FID(true);
 

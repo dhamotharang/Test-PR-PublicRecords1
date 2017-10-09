@@ -1,6 +1,22 @@
-import _control,ut,RoxieKeyBuild,header,PromoteSupers;
+﻿import _control,ut,RoxieKeyBuild,header,PromoteSupers;
 export proc_quickHdr_build_all (string sourceIP, string filedate) := function
 
+   EXPORT getVname (string superfile, string v_end = ':') := FUNCTION
+
+        FileName:= fileservices.GetSuperFileSubName(superfile,1);
+        v_strt  := stringlib.stringfind(FileName,'20',1);
+        v_endd	:= if(v_end='',length(FileName),stringlib.stringfind(FileName[v_strt..],v_end,1));
+        v_name  := FileName[v_strt..v_strt+if(v_endd<1,length(FileName),v_endd)-2];
+
+        RETURN v_name;
+
+    END;
+
+  xlink_superfile_ver := getVname('~thor_data400::key::insuranceheader_xlink::qa::did::refs::name')[1..8];
+  header_raw_prod_ver := getVname('~thor_data400::base::header_raw_Prod','')[1..8];
+  
+  check_superfiles_are_in_sync := if ( xlink_superfile_ver <> header_raw_prod_ver
+                                    ,fail('Superfiles are not in sync!'));
 	sprayIP := map(
 									sourceIP = 'bctlpedata10' => _control.IPAddress.bctlpedata10,
 									sourceIP
@@ -73,5 +89,13 @@ export proc_quickHdr_build_all (string sourceIP, string filedate) := function
 	
 	Source_Check_rep := header_quick.Proc_source_check_report();
 	
-	return sequential(doWeekly,doMonthly,Inputs_Clear,Inputs_Set(filedate),buildAll,QA_sample/*,Source_Check_rep*/);
+	return sequential( 
+                     check_superfiles_are_in_sync
+                    ,doWeekly
+                    ,doMonthly
+                    ,Inputs_Clear
+                    ,Inputs_Set(filedate)
+                    ,buildAll
+                    ,QA_sample/*,Source_Check_rep*/
+                    );
 end;

@@ -1,11 +1,11 @@
-Number := integer4;
-Ratio := REAL8;
+﻿Number := string;
+Ratio := string;
 EXPORT Layout_Attributes := RECORD
 
   integer4	ULTIMATE_LINKID;
-  integer2	CORTERA_SCORE;
-  integer2	CPR_SCORE;
-  integer1	CPR_SEGMENT;
+  string		CORTERA_SCORE;
+  string		CPR_SCORE;
+  string		CPR_SEGMENT;
   Ratio			DBT;
   Number		AVG_BAL;
   Number		AIR_SPEND;

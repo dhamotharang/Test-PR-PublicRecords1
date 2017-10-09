@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, crim_common, ut, lib_StringLib;
+﻿IMPORT Civ_Court, civil_court, crim_common, ut, lib_StringLib, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -6,8 +6,11 @@ IMPORT Civ_Court, civil_court, crim_common, ut, lib_StringLib;
 fWAJud := Civ_Court.Files_In_WA.CivJud_in;
 fWAPar := Civ_Court.Files_In_WA.CivPar_in;
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m-%d-%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Case_Activity tWA(fWAJud input, integer1 C) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -19,8 +22,8 @@ self.case_key					  := '03'+input.dist_mncp_court_code+input.case_type+ClnCase;
 self.court_code					:= input.dist_mncp_court_code;
 self.court						  := '';
 self.case_number				:= ClnCase;
-self.event_date					:= CHOOSE(C,ut.ConvertDate(input.filing_date),ut.ConvertDate(input.judgement_date),
-																		ut.ConvertDate(input.judgement_disposition_date),ut.ConvertDate(input.case_disposition_date));
+self.event_date					:= CHOOSE(C,Std.Date.ConvertDateFormatMultiple(input.filing_date,fmtsin,fmtout),Std.Date.ConvertDateFormatMultiple(input.judgement_date,fmtsin,fmtout),
+																		Std.Date.ConvertDateFormatMultiple(input.judgement_disposition_date,fmtsin,fmtout),Std.Date.ConvertDateFormatMultiple(input.case_disposition_date,fmtsin,fmtout));
 self.event_type_code		:= CHOOSE(C,'',input.judgement_type_code, input.judgement_disposition_code, input.case_disposition_code);
 self.event_type_description_1	:= CHOOSE(C,'FILING DATE','','','');
 self := [];

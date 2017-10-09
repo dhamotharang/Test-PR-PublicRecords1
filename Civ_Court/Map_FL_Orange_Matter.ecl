@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, crim_common, ut;
+﻿IMPORT Civ_Court, civil_court, crim_common, ut, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -6,8 +6,11 @@ IMPORT Civ_Court, civil_court, crim_common, ut;
 
 fOrange := Civ_Court.Files_In_FL_Orange.Raw_RecType_1;
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Matter tFLOrange(fOrange input) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -18,11 +21,11 @@ UpperCaseNum						:= ut.CleanSpacesAndUpper(input.case_no);
 self.case_key					  := '42'+UpperCaseNum;
 self.court						  := 'ORANGE COUNTY COURT: '+ut.CleanSpacesAndUpper(input.court);
 self.case_number				:= UpperCaseNum;
-self.filing_date				:= IF(trim(input.filing_date,all) <> '', ut.ConvertDate(input.filing_date), '');
+self.filing_date				:= IF(trim(input.filing_date,all) <> '', Std.Date.ConvertDateFormatMultiple(input.filing_date,fmtsin,fmtout), '');
 self.disposition_description	:= If(trim(input.disposition_desc,left,right) = '', ut.CleanSpacesAndUpper(input.case_status_desc),
 																		ut.CleanSpacesAndUpper(input.disposition_desc));
-self.disposition_date		:= If(trim(input.disposition_desc,left,right) = '',ut.ConvertDate(input.case_status_date),
-															ut.ConvertDate(input.disposition_date));
+self.disposition_date		:= If(trim(input.disposition_desc,left,right) = '',Std.Date.ConvertDateFormatMultiple(input.case_status_date,fmtsin,fmtout),
+															Std.Date.ConvertDateFormatMultiple(input.disposition_date,fmtsin,fmtout));
 self := [];
 end;
 

@@ -1,4 +1,4 @@
-EXPORT layouts:=MODULE
+﻿EXPORT layouts:=MODULE
 
   EXPORT lCustomerDB:=RECORD
     STRING1 record_type :='1';
@@ -177,7 +177,7 @@ EXPORT layouts:=MODULE
    STRING1 record_type:='S';
    STRING12 adl;
    STRING3 adl_score;
-   STRING1 source_record_type;//â€™1â€™ or â€˜2â€™
+   STRING1 source_record_type;//’1’ or ‘2’
    STRING20 orig_user_num;//map the user_num depending on where this ADL match is from (1 or 2)
    STRING2 crlf:='\r\n';
   END;
@@ -325,6 +325,7 @@ EXPORT layouts:=MODULE
 			string1			curr_incar_flag;
 			string1			foreclosures;
 			string1			bankruptcy;
+    STRING2 crlf :='\r\n';
   end;		
 	
 END;

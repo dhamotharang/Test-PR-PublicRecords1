@@ -1,4 +1,4 @@
-import std, header_services, vehiclev2, Watercraft;
+﻿import std, header_services, vehiclev2, Watercraft;
 
 export applyRegulatory := module
                 shared IP := header_services.ProductionLZ.IP_Loc; 
@@ -126,25 +126,58 @@ export applyRegulatory := module
                 endmacro; // simple_sup
 
                 export applyBIPV2(ds) := functionmacro
-                                bdidAddrSupHash(recordof(ds) rec) := hashmd5(intformat(rec.company_bdid, 12, 1), rec.st, rec.zip,
+                                bdidAddrSupHash(recordof(ds) rec) := hashmd5(intformat(rec.seleID, 12, 1), rec.st, rec.zip,
                                                                              rec.v_city_name, rec.prim_name, rec.prim_range, rec.predir,
                                                                              rec.addr_suffix, rec.postdir, rec.sec_range);
-                                bdidAddrSup := Suppress.applyRegulatory.simple_sup(ds, 'didaddressbusiness_sup.txt', bdidAddrSupHash);
+                                bdidAddrSup := Suppress.applyRegulatory.simple_sup(ds, 'bip_didaddress_sup.txt', bdidAddrSupHash);
 
-                                contactsAllSupHash(recordof(ds) rec) := hashmd5(intformat(rec.company_bdid, 12, 1));
+                                contactsAllSupHash(recordof(ds) rec) := hashmd5(intformat(rec.seleID, 12, 1));
                                 contactsAllSup := bdidAddrSup(isContact != 'T')
-                                                + Suppress.applyRegulatory.simple_sup(bdidAddrSup(isContact = 'T'), 'businesscontactsall_sup.txt', contactsAllSupHash);
+                                                + Suppress.applyRegulatory.simple_sup(bdidAddrSup(isContact = 'T'), 'bip_contactsall_sup.txt', contactsAllSupHash);
 
-                                contactsSupHash(recordof(ds) rec) := hashmd5(intformat(rec.company_bdid, 12, 1), intformat(rec.contact_did, 12, 1));
+                                contactsSupHash(recordof(ds) rec) := hashmd5(intformat(rec.seleID, 12, 1), intformat(rec.contact_did, 12, 1));
                                 contactsSup := contactsAllSup(isContact != 'T')
-                                             + Suppress.applyRegulatory.simple_sup(contactsAllSup(isContact = 'T'), 'businesscontacts_sup.txt', contactsSupHash);
+                                             + Suppress.applyRegulatory.simple_sup(contactsAllSup(isContact = 'T'), 'bip_contacts_sup.txt', contactsSupHash);
 
-                                contactsTitleSupHash(recordof(ds) rec) := hashmd5(intformat(rec.company_bdid, 12, 1), rec.contact_job_title_raw, rec.lname, rec.fname);
+                                contactsTitleSupHash(recordof(ds) rec) := hashmd5(intformat(rec.seleID, 12, 1), rec.contact_job_title_raw, rec.lname, rec.fname);
                                 contactsTitleSup := contactsSup(isContact != 'T')
-                                                  + Suppress.applyRegulatory.simple_sup(contactsSup(isContact = 'T'), 'businesscontactsbytitle_sup.txt', contactsTitleSuphash);
+                                                  + Suppress.applyRegulatory.simple_sup(contactsSup(isContact = 'T'), 'bip_contactsbytitle_sup.txt', contactsTitleSuphash);
 
                                 return Suppress.applyRegulatory.simple_append(contactsTitleSup, 'file_bipv2_inj.txt', BIPV2.CommonBase_mod.Layout_S18);
                 endmacro;
+								
+								
+								
+                export applyContactBIPV2(ds) := functionmacro
+                                bdidAddrSupHash(recordof(ds) rec) := hashmd5(intformat(rec.seleID, 12, 1), rec.company_address.st, rec.company_address.zip,
+                                                                             rec.company_address.v_city_name, rec.company_address.prim_name, rec.company_address.prim_range, rec.company_address.predir,
+                                                                             rec.company_address.addr_suffix, rec.company_address.postdir, rec.company_address.sec_range);
+																																						 
+                                bdidAddrSup := Suppress.applyRegulatory.simple_sup(ds, 'bip_didaddress_sup.txt', bdidAddrSupHash);
+
+                                contactsAllSupHash(recordof(ds) rec) := hashmd5(intformat(rec.seleID, 12, 1));
+                                contactsAllSup := bdidAddrSup(is_Contact != true)
+                                                + Suppress.applyRegulatory.simple_sup(bdidAddrSup(is_Contact = true), 'bip_contactsall_sup.txt', contactsAllSupHash);
+
+                                contactsSupHash(recordof(ds) rec) := hashmd5(intformat(rec.seleID, 12, 1), intformat(rec.contact_did, 12, 1));
+                                contactsSup := contactsAllSup(is_Contact != true)
+                                             + Suppress.applyRegulatory.simple_sup(contactsAllSup(is_Contact = true), 'bip_contacts_sup.txt', contactsSupHash);
+
+                                contactsTitleSupHash(recordof(ds) rec) := hashmd5(intformat(rec.seleID, 12, 1), rec.contact_job_title_raw, rec.contact_name.lname, rec.contact_name.fname);
+                                contactsTitleSup := contactsSup(is_Contact != true)
+                                                  + Suppress.applyRegulatory.simple_sup(contactsSup(is_Contact = true), 'bip_contactsbytitle_sup.txt', contactsTitleSuphash);
+
+																contact_layout := record
+																			unsigned8 rid:=0;
+																			BIPV2.IDlayouts.l_xlink_ids; 
+																			BIPV2.Layout_Business_Linking_Full ;
+																			boolean executive_ind:=False;
+																			integer executive_ind_order:=0;
+																	end;
+                                return Suppress.applyRegulatory.simple_append(contactsTitleSup, 'file_business_contact_bip_inj.txt', contact_layout);
+                endmacro;
+
+
 
                 export relativesSup(ds,hashes) := functionmacro
                                 ro_temp_rec := record
@@ -279,16 +312,17 @@ endmacro;
 							              Base_file_append := project(Base_File_Append_In, reformat_append(left, COUNTER));	
 														
 	                          return base_ds + Base_file_append;
-        endmacro; // simple_append Watercraft
+ endmacro; // simple_append Watercraft
 //
 
 export applyWatercraftS(ds) := functionmacro
 								
 							WatercraftHash(recordof(ds) L) := hashmd5(trim((string)l.watercraft_key, left, right), 
 																													   trim((string)l.sequence_key, left, right),
-																														 trim((string)l.state_origin, left, right)) ;						  
+																														 trim((string)l.fname, left, right),
+																														 trim((string)l.lname, left, right)) ;						  
 							
-						  ds1 := Suppress.applyRegulatory.simple_sup(ds, 'file_watercraft_sup.txt', WatercraftHash);
+						  ds1 := Suppress.applyRegulatory.simple_sup(ds, 'file_watercraft_search_sup.txt', WatercraftHash);
 														
 							return suppress.applyRegulatory.simple_append_WC(ds1, 'file_watercraft_search_inj.txt', Watercraft.Layout_Scrubs.Search_Base); 
 
@@ -296,7 +330,13 @@ endmacro;
 
 export applyWatercraftMain (ds) := functionmacro
 
-					return ds ;
+		
+							WatercraftHash(recordof(ds) L) := hashmd5(trim((string)l.watercraft_key, left, right), 
+																													   trim((string)l.sequence_key, left, right)) ;						  
+							
+						  ds1 := Suppress.applyRegulatory.simple_sup(ds, 'file_watercraft_main_sup.txt', WatercraftHash);
+														
+							return suppress.applyRegulatory.simple_append(ds1, 'file_watercraft_main_inj.txt', Watercraft.Layout_Scrubs.Main_Base); 
 					
 endmacro ;
 

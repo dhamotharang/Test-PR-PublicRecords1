@@ -1,4 +1,4 @@
-export SubGroup_Constants := module
+﻿export SubGroup_Constants := module
 
 	export numCountryID := module
 		export string AFGHANISTAN 					:= '1';
@@ -244,7 +244,7 @@ export SubGroup_Constants := module
 		//additions
 		export string COCOS_KEELING_IS 				:= '240';
 		export string SINT_MAARTEN 					:= '241';
-		export string CURACAO 						:= '242';//special character CURAÃ‡AO
+		export string CURACAO 						:= '242';//special character CURAÇAO
 	end;
 	
 	export numCategoryID := module
@@ -1002,6 +1002,8 @@ export SubGroup_Constants := module
 		export string KEYWORD_UZMVD									:= '690';
 		export string KEYWORD_UZGUVD								:= '691';
 		export string KEYWORD_IDPWMD								:= '692';
+		export string KEYWORD_VEPTRE_WC							:= '693';		
+		export string KEYWORD_CNSPC									:= '694';		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	

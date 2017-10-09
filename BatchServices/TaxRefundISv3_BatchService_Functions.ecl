@@ -1,8 +1,5 @@
-IMPORT AddrBest, AutoStandardI, Address, Autokey_batch, BatchShare, CriminalRecords_BatchService, 
-			 Didville, Gateway, Models, NID, progressive_phone, Risk_Indicators, RiskWise, 
-			 batchservices, ut, codes, LiensV2_Services, 
-       DriversV2, DriversV2_Services, LN_PropertyV2_Services,
-			 Suppress, VehicleV2_Services, VotersV2_Services, Std;
+﻿IMPORT AddrBest, Address, Address_Attributes, Autokey_batch, AutoStandardI, batchservices, BatchShare, 
+			 CriminalRecords_BatchService, Didville, Models, Gateway, NID, progressive_phone,Std, tris_lnssi_build;
 
 EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 
@@ -14,16 +11,24 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
     string1  addr_type := '';
     string4  addr_status := '';
   end;
-
+	
 	shared rec_in_batch := record
-    Autokey_batch.Layouts.rec_inBatchMaster; //why this one???
-    rec_extra_address_info; //???
+    Autokey_batch.Layouts.rec_inBatchMaster;
+    rec_extra_address_info;
     BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in.county_name;
     BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in.refund_amount;
 		BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in.ip_address;
+		BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in.aba_rout_nbr;
+		BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in.txpy_bank_acct_nbr;
+		BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in.routing_transit_nbr;
+		BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in.depositor_account_num;
+		BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in.device_ini_ip_address;
+		BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in.device_submit_ip_address;
+		BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in.email_address;
+		BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in.prep_id2;
 		BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in.filer_type;
 		boolean is_rejected_rec;
-  end;
+	end;
 
   // layout name aliases to use in multiple functions
   shared rec_in  			:= BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in;
@@ -41,6 +46,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 				addr1_final 			:= if (addr1 = '', l.address, addr1);
 				clean_addr 				:= address.GetCleanAddress(addr1_final,addr2,address.Components.country.US);
 				ca								:= clean_addr.results;
+
 				self.prim_range 	:= ca.prim_range;
 				self.prim_name 		:= ca.prim_name;
 				self.sec_range 		:= ca.sec_range;
@@ -63,6 +69,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 				ssn_filtered      := Stringlib.StringFilterOut(l.ssn, '0');
 				self.ssn					:= if(ssn_filtered <> '', 
 				                        stringlib.stringfilter(l.ssn,'0123456789'), '');
+
 				self.name_first := Stringlib.StringFilter(Stringlib.StringToUpperCase(L.name_first), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ -\'');
 				self.name_middle := Stringlib.StringFilter(Stringlib.StringToUpperCase(L.name_middle), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ -\'');
 				self.name_last := Stringlib.StringFilter(Stringlib.StringToUpperCase(L.name_last), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ -\'');
@@ -93,7 +100,8 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		END;
 
 
-	// *--- Function to use netAcuity gateway to get ip address data ---* //
+	// Tris 3.2 Enhancement : Since Net Acuity is no longer in used, commenting out this function....
+	/*
 	EXPORT getIPAddressRecords(DATASET(rec_in_wdid) in_clean_batch,
 														 UNSIGNED1 glb_purpose_value,
 												     UNSIGNED1 dppa_purpose_value,
@@ -111,8 +119,8 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 	
 		RETURN netAcuityResults;
 	END;
+	*/
 	
-
 	// *--- Function to get BestAddress batch records ---* //
 	export getBestAddress(dataset(rec_in_wdid) in_clean_batch,
 												BatchServices.TaxRefundISv3_BatchService_Interfaces.Input args_in) := function
@@ -122,15 +130,19 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 				self := L;
 				self := [];
 			end;
+			
 			addrBest_batch := project(in_clean_batch, makeAddrBestBatch(left));
 			    
 			addrBest_mod := module(AddrBest.Iparams.SearchParams) 
-				export ReturnLatLong        := TRUE; // added for 2015 enhancements
-				export HistoricMatchCodes   := TRUE;
-				export ReturnConfidenceFlag := TRUE;
-				export MaxRecordsToReturn 	:= 20;
-				export IncludeBlankDateLastSeen := TRUE;
-				export IncludeRanking 			:= TRUE; //automatically applied to GOV applications to always get best ranked addr
+				export ReturnLatLong        				:= TRUE; // added for 2015 enhancements
+				export HistoricMatchCodes   				:= TRUE;
+				export ReturnConfidenceFlag 				:= TRUE;
+				export MaxRecordsToReturn						:= 20;
+				export IncludeBlankDateLastSeen 		:= TRUE;
+				export IncludeRanking								:= FALSE; //automatically applied to GOV applications to always get best ranked addr
+																											//TRISv3.2 Enhancement : As per requirement, GBA should not be used for both 3.1 and 3.2 versions. Switching it back to Traditional Best.
+				export isV2Score										:= TRUE;  //RQ-13614: Switching to use V2 scores as defined in "AddrBest.BestAddr_common", for improving name_score & ssn_score results
+																											// ..to be used later on for returning "inputaddrdate" and other significant fields.
 			end;
 
 			addrBest_res := AddrBest.Records(addrBest_batch, addrBest_mod).best_records;
@@ -152,8 +164,8 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
         string city_in := addrBest_batch(acctno = acct_no)[1].p_city_name;
         string state_in := addrBest_batch(acctno = acct_no)[1].st;
         self.hasInputAddr := L.is_input or (prim_range_in = L.prim_range 
-                            and prim_name_in = L.prim_name 
-                            and (zip_in = L.z5 or (city_in = L.p_city_name and state_in = L.st)));
+																						and prim_name_in = L.prim_name 
+																						and (zip_in = L.z5 or (city_in = L.p_city_name and state_in = L.st)));
         self.InputAddrDate := L.addr_dt_last_seen;
 				inputZipMatch := L.z5 = zip_in;
 				inputStateMatch := L.st = args_in.input_state;
@@ -179,18 +191,17 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
       end;
       
       addrBest_res_final := rollup(with_input_indicator_recs, left.acctno = right.acctno, //previously sorted by acctno in AddrBest.records.best_records
-                                                              xformRollup(left, right));
+																		xformRollup(left, right));
                                                              
-      // // *--- DEBUG ---* //
-			//output(addrBest_batch, named('addrBest_batch'));
+      // *--- DEBUG ---* //
+			// output(addrBest_batch, named('addrBest_batch'));
 			// output(addrBest_res, named('addrBest_res'));
 			// output(with_input_indicator_recs, named('with_input_indicator_recs'));   
       // output(addrBest_res_final, named('addrBest_res_final'));
-			
 			return addrBest_res_final;
 	end;
 
-// *--- Function to get BestSSN from ADLBest -> DidVille.Did_Batch_Service_Raw ---* //
+	// *--- Function to get BestSSN from ADLBest -> DidVille.Did_Batch_Service_Raw ---* //
 	export getBestSSNInfo(dataset(rec_in_batch) in_clean_batch,
 												BatchServices.TaxRefundISv3_BatchService_Interfaces.Input args_in) := function
 
@@ -240,8 +251,8 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
   // *--- Function to get SSNIssuance issued start date ---* //
   export getSSNIssuanceRecords(dataset(rec_final) in_data) := function
   
-      //Get the records that do not have a possible_age_dob and project to SSNIssuance batch input layout (acctno + ssn)
-			no_dob_recs := project(in_data(possible_age_dob = ''), BatchServices.Layouts.SsnIssuance.batch_in);
+			//Tris 3.2 Enhancement : Per req 3.1.10, removing possible_age_dob = '' condition and project to SSNIssuance batch input layout (acctno + ssn)
+			no_dob_recs := project(in_data, BatchServices.Layouts.SsnIssuance.batch_in);
     
       ssn_issuance_res := BatchServices.SSN_Issuance_BatchService_Records (no_dob_recs);
 
@@ -271,11 +282,14 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 			self.ssn := L.ssn;
 			self := [];
 		end;
+
 		crim_batch := project(in_clean_batch, xformToCrimBatch(left));
 		batch_params		:= BatchShare.IParam.getBatchParams();
+
 		crim_batch_params := module(project(batch_params, CriminalRecords_BatchService.IParam.batch_params, opt))	
 			unsigned2 MaxResults_val := 50 : stored('MaxResults');
 		end;
+
 		crim_res_all := CriminalRecords_BatchService.BatchRecords(crim_batch_params, crim_batch); 
 		crim_res := crim_res_all.Records;
         
@@ -287,6 +301,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 													(StringLib.StringToUpperCase(left.fname[1]) = right.name_first[1] or
 														NID.PreferredFirstNew(left.fname) = right.name_first),
 													transform(recordof(crim_res), self := left), limit(0), keep(100));
+
 		CriminalRecordsSort := record
 			crim_res;
 			unsigned2 sFlag; 
@@ -300,6 +315,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 			string8 sDate8 ;
 			string8 sDate9 ;
 		end;
+
 		CriminalRecordsSort  fillSortFields(filt_crim_res L) := transform
 			self.sFlag   := flag_value(L.curr_probation_flag, L.curr_parole_flag, L.curr_incar_flag); 
 			self.sDate1  := max(L.in_event_dt_1,L.in_event_dt_2,L.in_event_dt_3,L.in_event_dt_4,L.in_event_dt_5,L.in_event_dt_6,
@@ -314,8 +330,10 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 			self.sDate9  := max(L.inc_adm_dt_1,L.inc_adm_dt_2,L.inc_adm_dt_3,L.inc_adm_dt_4,L.inc_adm_dt_5,L.inc_adm_dt_6);			 
 		 self := l;
 		end;
+
 		filt_crim_res_w_dates := project(filt_crim_res, fillSortFields(LEFT));
 		filt_crim_res_sorted := SORT(filt_crim_res_w_dates, -sDate1, sFlag, 
+
 																												-sDate2, sFlag, 
 																												-sDate3, sFlag, 
 																												-sDate4, sFlag, 
@@ -329,6 +347,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		return filt_crim_res_sorted;
 	end;
 	
+	/* Tris 3.2 Enhancement : Since InputAddrFelonyCount is blanked out, this function will not be used, so commenting out....
 	// * --- Function to get criminal batch records at input address --- * //
 	export getFeloniesAtAddressRecords(dataset(rec_in_wdid) in_clean_batch) := function
 
@@ -375,9 +394,6 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
                   add_off_desc_1 + add_off_desc_2 + add_off_desc_3 + add_off_desc_4 + add_off_desc_5 + add_off_desc_6 +
                   off_typ_1 +off_typ_2 + off_typ_3 + off_typ_4 + off_typ_5 + off_typ_6 +
                   off_lev_1 +off_lev_2 + off_lev_3 + off_lev_4 + off_lev_5 + off_lev_6), 'FELONY') > 0 );
-
-
-			
 			
 			crim_felony_recs_deduped := dedup(sort(filt_crim_res_felony, acctno, did), did);
 			
@@ -395,9 +411,9 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 			addrBest_batch := project(crim_felony_recs_deduped, makeAddrBestBatch(left, counter));
 			    
 			addrBest_mod := module(AddrBest.Iparams.SearchParams) 
-				// export HistoricMatchCodes   := TRUE;
-				// export ReturnConfidenceFlag := TRUE;
-				export IncludeRanking 			:= TRUE; //automatically applied to GOV applications to always get best ranked addr
+				export IncludeRanking 				 := FALSE; //automatically applied to GOV applications to always get best ranked addr
+																								 //TRISv3.2 Enhancement : As per requirement, GBA should not be used for both 3.1 and 3.2 versions. Switching it back to Traditional Best.
+
 			end;
 			addrBest_res := AddrBest.Records(addrBest_batch, addrBest_mod).best_records;
 			
@@ -421,7 +437,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 																	
 		return ds_felonies_at_addr;
 	end;
-
+	*/
 	
 	// *--- Function to get phone recs ---* //
 	EXPORT getPhoneRecords(DATASET(rec_in_wdid) in_clean_batch,
@@ -471,7 +487,10 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 			self := [];
 		 end;
 	   inputRecs := project(in_clean_batch, fillInput(LEFT));
-	   bestRecs := DidVille.RAN_BestInfo_Batch_Service_Records(inputRecs, TRUE, TRUE);
+	   bestRecs := DidVille.RAN_BestInfo_Batch_Service_Records(inputRecs,
+																														 CompareInputAddrWithRel := TRUE,
+																														 CompareInputAddrNameWithRel := TRUE, 
+  																													 UseBlankPhoneNumberRecords := TRUE);
 		
 	   //only need to keep 2 fields for lookup purposes later on.	 
 		 slimRec := record
@@ -571,7 +590,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		return wModel;
 	end;
 
-
+	/* Tris 3.2 Enhancement : Since dod_bkr_flag is blanked out, this function will not be used, so commenting out....
   // *--- Function to get Bankruptcy data for the min input and did for req 4.1.31 ---* // 
 	export func_get_bankr_data(dataset(rec_in_wdid) ds_batch_in_wdid) := function
 
@@ -616,9 +635,10 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 
 		 return ds_bankr_data_returned;
 
-	 end; // end of func_get_bankr_data
+	end; // end of func_get_bankr_data
+	*/
 
-
+	/* Tris 3.2 Enhancement : Since dod_dl_flag is blanked out, this function will not be used, so commenting out....
   // *--- Function to get Driver's License data for the min input and did for req 4.1.32 ---* // 
 	export func_get_dl_data(dataset(rec_in_wdid) ds_batch_in_wdid) := function
 
@@ -685,9 +705,10 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 
 		 return ds_dl_data_returned;
 
-	 end; // end of func_get_dl_data
-
-
+	end; // end of func_get_dl_data
+	*/
+		
+	/* Tris 3.2 Enhancement : Since dod_deed_flag is blanked out, this function will not be used, so commenting out....
   // *--- Function to get Property deeds data for the min input and did for req 4.1.33 ---* // 
 	export func_get_propdeed_data(dataset(rec_in_wdid) ds_batch_in_wdid) := function
 
@@ -807,9 +828,10 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 
 		 return ds_propdeed_data_returned;
 
-	 end; // end of func_get_propdeed_data
-
-
+	end; // end of func_get_propdeed_data
+	*/
+	
+	/* Tris 3.2 Enhancement : Since dod_mvr_flag is blanked out, this function will not be used, so commenting out....
   // *--- Function to get vehicle/mvr data for the min input and did for req 4.1.34 ---* // 
 	export func_get_mvr_data(dataset(rec_in_wdid) ds_batch_in_wdid) := function
 
@@ -976,9 +998,10 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 
 		 return ds_mvr_data_returned;
 
-	 end; // end of func_get_mvr_data
-
-
+	end; // end of func_get_mvr_data
+	*/
+	
+	/* Tris 3.2 Enhancement : Since dod_voter_flag is blanked out, this function will not be used, so commenting out....
   // *--- Function to get voter data for the min input and did for req 4.1.35 ---* // 
 	export func_get_voter_data(dataset(rec_in_wdid) ds_batch_in_wdid) := function
 
@@ -1030,9 +1053,9 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 
 		 return ds_voter_data_returned;
 
-	 end; // end of func_get_voter_data
+	end; // end of func_get_voter_data
 
-
+	
   // *--- Functions related to getting Liens data ---* //
 	EXPORT LJcleanName(string Name) := FUNCTION
 				stripNameAnp := stringlib.stringfindreplace(Name,             '&',' ');
@@ -1068,7 +1091,8 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 	
 	// SHARED TRISv3out := BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_out;
   //SHARED TRISv3in_wDID  := BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in_wdid;
-
+	
+	// Tris 3.2 Enhancement : Since All 30 J&L fields are blanked out, this function will not be used, so commenting out....
   EXPORT rec_final getLienRecords(Dataset(rec_final) trisOut, Dataset(rec_in_wdid) trisIn, BatchServices.TaxRefundISv3_BatchService_Interfaces.Input args_in) := function
 
     LiensV2_Services.Batch_Layouts.batch_in fillinLien(trisIn l) := TRANSFORM
@@ -1184,281 +1208,268 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		
 		RETURN liensFlat30;
   END; //end of getLienRecords function		
-	
+	*/	
 	
 	//*******************************************************************************************
 	//***********   V3_1  FILTER   ****************************************************************
 	//*******************************************************************************************
 	
 	
-	string30 v3_1Filter( string10 curr_incar_flag, string10 curr_incar_flag_BestSSN,string10 act_rel_date_1,
-	                            string10 ctrl_rel_date_1,string10 sch_rel_dt_1,string10 act_rel_dt_1_BestSSN,
-										          string10 ctl_rel_dt_1_BestSSN,string10 sch_rel_dt_1_BestSSN,string10 Input_Address_Prison,
-															string10 DOD, string10 deceased_matchcode,string10 score, string10 VariationSSNCount,
-															string10 IdentityRecordCount,string10 addr_outside_of_agency_state,string10 IDVerSSN,
-															string10 Best_SSN, string10 InputAddrRel,string10 possible_age_dob,
-															string10 possible_age_ssn_issuance,string10 LexID ,
-															string10 DivSSNLNameCount, string10 IDVerName,string10 ValidationAddrProblems, 
-															string10 InputAddrFelonyCount, string10 InputAddrDwellType, string10 IDVerAddress, 
-															string10 InputAddrDate, string10 MatchedInputAddr, string10 DivAddrIdentityCount,
-															string10 DivAddrIdentityCountNew,	string10 InputAddrZipDate, string10 BestAddrChangeDistance,
-															string10 InputAddrState, string10 ValidationIPProblems,string10 IPAddrExceedsInputAdd,
-															string10 phone_number_1, string10 Refund_Amount, 
-															string10 scorecut, unsigned3 RefundThreshold, string20 modelname, string50 filing_jurisdiction_01) 
+	string30 v3_1Filter(string10 curr_incar_flag, string10 curr_incar_flag_BestSSN,string10 act_rel_date_1,
+											string10 ctrl_rel_date_1,string10 sch_rel_dt_1,string10 act_rel_dt_1_BestSSN,
+											string10 ctl_rel_dt_1_BestSSN,string10 sch_rel_dt_1_BestSSN,string10 Input_Address_Prison,
+											string10 DOD, string10 deceased_matchcode,string10 score, string10 VariationSSNCount,
+											string10 IdentityRecordCount,string10 addr_outside_of_agency_state,string10 IDVerSSN,
+											string10 Best_SSN, string10 InputAddrRel,string10 possible_age_dob,
+											string10 possible_age_ssn_issuance,string10 LexID ,
+											string10 DivSSNLNameCount, string10 IDVerName,string10 ValidationAddrProblems, 
+											string10 InputAddrFelonyCount, string10 InputAddrDwellType, string10 IDVerAddress, 
+											string10 InputAddrDate, string10 MatchedInputAddr, string10 DivAddrIdentityCount,
+											string10 DivAddrIdentityCountNew,	string10 InputAddrZipDate, string10 BestAddrChangeDistance,
+											string10 InputAddrState, string10 ValidationIPProblems,string10 IPAddrExceedsInputAdd,
+											string10 phone_number_1, string10 Refund_Amount, 
+											string10 scorecut, unsigned3 RefundThreshold, string20 modelname, string50 filing_jurisdiction_01) 
 						         := FUNCTION; 
 
-				boolean lienFound    := filing_jurisdiction_01 <> '';
-				string8 today        := StringLib.getdateYYYYMMDD();
-				integer2 CurrentYear := (INTEGER4)(today[1..4]);
-				integer2 CYearMinus1 := CurrentYear -1;
-				boolean isDOD        := DOD <> ''; 
-				integer2 dodYear     := if (isDOD, (INTEGER2)dod[1..4], 0);
-				boolean isDOD_greater_2_years := isDOD and ((CYearMinus1 - dodYear) >= 2);
+		boolean lienFound    := filing_jurisdiction_01 <> '';
+		string8 today        := StringLib.getdateYYYYMMDD();
+		integer2 CurrentYear := (INTEGER4)(today[1..4]);
+		integer2 CYearMinus1 := CurrentYear -1;
+		boolean isDOD        := DOD <> ''; 
+		integer2 dodYear     := if (isDOD, (INTEGER2)dod[1..4], 0);
+		boolean isDOD_greater_2_years := isDOD and ((CYearMinus1 - dodYear) >= 2);
 
-				SET OF INTEGER2 SetRelDates := [(integer2)act_rel_date_1[1..4],(integer2)ctrl_rel_date_1[1..4], (integer2)sch_rel_dt_1[1..4]];	
-				SET OF INTEGER2 setRelBestDates := [(integer2)act_rel_dt_1_BestSSN[1..4], (integer2)ctl_rel_dt_1_BestSSN[1..4],(integer2)sch_rel_dt_1_BestSSN[1..4]];
-				
-				UNSIGNED2 scoreNum    := (unsigned2) score;
-				UNSIGNED2 scoreCutNum := (unsigned2) scoreCut;
-				
-				boolean scoreFailed    := (scoreNum <= scoreCutNum) or (modelname = '') or (scoreCutNum = 0);
-				boolean noInputRelAddr := InputAddrRel = 'N';
-				set of string2 set15to21 := ['15','16','17','18','19','20','21'];
-				boolean dobAge15to21   := possible_age_dob in set15to21 ;
-				boolean ssnAge15to21   := possible_age_ssn_issuance in set15to21;
-				//====================   R  U  L  E  S      ===========================================================================
-				boolean isCrimManual1 :=  stringlib.StringToUpperCase(curr_incar_flag) ='Y'  OR 
-															 	  stringlib.StringToUpperCase(curr_incar_flag_BestSSN) ='Y';
-				boolean isCrimManual2 := stringlib.stringcontains(deceased_matchcode,'SN',true) and isDOD_greater_2_years;
-	
-				boolean isCrimRisk1 := curr_incar_flag in ['U','N'] AND CYearMinus1 in SetRelDates AND Input_Address_Prison = 'Y' AND scoreFailed;
-				boolean isCrimRisk2 := curr_incar_flag_BestSSN in['U','N'] AND CYearMinus1 in setRelBestDates AND Input_Address_Prison = 'Y' AND 
-															 scoreFailed;
-				boolean isCrimRisk3 := curr_incar_flag  in ['U','N'] AND CYearMinus1 in SetRelDates AND scoreFailed;
-				boolean isCrimRisk4 := curr_incar_flag_BestSSN in ['U','N'] AND CYearMinus1 in setRelBestDates AND scoreFailed; 
-				boolean isCrimRisk5 := deceased_matchcode ='S'; 
-				//==================
-				boolean isCrimRiskQuiz := isCrimRisk1 or isCrimRisk2 or isCrimRisk3 or isCrimRisk4 or isCrimRisk5; 
-
-				//==================
-			
-				boolean isIdRisk1  := (integer)VariationSSNCount >= (integer)'3';
-				boolean isIdRisk2  := VariationSSNCount = '2' AND scoreFailed;
-				boolean isIdRisk3  := (integer)IdentityRecordCount >= (integer)'4';
-				boolean isIdRisk4  := IdentityRecordCount = '2' AND addr_outside_of_agency_state = 'OS';
-				boolean isIdRisk5  := IdentityRecordCount = '2' AND scoreFailed;
-			//=============================================================== 
-			  boolean isIdRiskQuiz1	:= isIdRisk1 or isIdRisk2 or isIdRisk3 or isIdRisk4 or isIdRisk5;
-
-				boolean isIdRisk6  := IDVerSSN in ['0','1','2','3'] AND lienFound ; 
-				boolean isIdRisk10 := Best_SSN <> '' AND lienFound;
-			//	===================
-				boolean isIdRiskDebt := isIdRisk6 or isIdRisk10;
-
-        boolean isIdRiskQuiz3  := IDVerSSN in ['0','1','2','3'] AND ~lienFound ; 
-			//	====================
-	      boolean isIDRiskDivQuiz  := ((possible_age_dob = ''	and possible_age_ssn_issuance = '')	
-				                             OR NOT (dobAge15to21 OR ssnAge15to21))
-																	       AND
-					                          ((LexID = '' AND  noInputRelAddr)
-																				 );
-	
-				boolean isIdRisk15 := (integer)DivSSNLNameCount >= (integer)'3';
-				boolean isIdRisk16 := DIVSSNLNameCount = '2' AND scoreFailed;
-				boolean isIdRisk17 := Best_SSN <> '' AND ~lienFound AND scoreFailed;
-				boolean isIdRisk18 := IDVerName = '0';
-			//	===================
-				boolean isIdRiskQuiz2 := isIdRisk15 or isIdRisk16 or isIdRisk17 or isIdRisk18; 
-
-				boolean isAddrRiskValid  := ValidationAddrProblems = '3';
-				boolean isAddrRiskFelony := (integer)InputAddrFelonyCount >= (integer)'3' AND InputAddrDwellType in ['R','S'];
-				boolean isAddrRiskId     := (IDVerAddress = '0' OR InputAddrZipDate = '') AND MatchedInputAddr <> 'Y' AND InputAddrRel = 'N'; 
-				boolean isAddrRiskDivCnt := (integer)DivAddrIdentityCount >= (integer)'100' AND scoreFailed;     
-				boolean isAddrRiskDivNew := (integer)DivAddrIdentityCountNew >= (integer)'20' AND scoreFailed; 
-				boolean isAddrRiskProb   := ValidationAddrProblems = '4' AND scoreFailed; 
-				boolean isAddrRiskZipDate:= InputAddrZipDate = '';
-				boolean isAddrRiskDist   := (integer)BestAddrChangeDistance >= (integer)'50'; 
-				boolean isAddrRiskSt     := InputAddrState = 'N' AND scoreFailed;
-				//=========================
-				boolean isAddrRiskQuiz    := isAddrRiskValid or isAddrRiskFelony or isAddrRiskId or isAddrRiskDivCnt or isAddrRiskDivNew or 
-				                             isAddrRiskProb or isAddrRiskZipDate or isAddrRiskDist or isAddrRiskSt;
-
-				boolean isIPrisk       := ValidationIPProblems = '1' ;
-				boolean isIPaddrRisk   := IPAddrExceedsInputAdd = 'Y' ;
-				boolean isTechRiskAge  := (possible_age_dob <> '') and (integer)possible_age_dob <= (integer)'50' AND phone_number_1 = '' AND scoreFailed;
-				boolean isTechRiskSSn  :=  if (((possible_age_dob = '') and (possible_age_ssn_issuance <>'')),((integer)possible_age_ssn_issuance <= (integer)'50') AND phone_number_1 = '' AND scoreFailed, FALSE); 
-				//=================
-				boolean isTechRiskQuiz     := isIPrisk or isIPaddrRisk or isTechRiskAge or isTechRiskSSn;													
-				
-				boolean isRefundManual := ((unsigned3)Refund_Amount >= RefundThreshold) and 
-				                          (RefundThreshold <> 0); 
-       
-			 //MAP picks the first assignment that is TRUE so the order is important.				
-        string30 identity_filter := MAP( isCrimManual1   => 'Manual Review',
-				                                 isCrimManual2   => 'Manual Review',
-				                                 isCrimRiskQuiz  => 'Quiz',
-																				 isIdRiskQuiz1   => 'Quiz',
-																				 isIdRiskDebt    => 'Debt Evasion',
-																				 isIdRiskQuiz3   => 'Quiz',
-																				 isIDRiskDivQuiz => 'Diversionary Quiz',
-																				 isIdRiskQuiz2   => 'Quiz',
-																				 isAddrRiskQuiz  => 'Quiz',
-																				 isTechRiskQuiz  => 'Quiz',
-																			   isRefundManual  => 'Manual Review',  					    
-     																		 'No Quiz');																				
-	      																		
-	      												
-	      return identity_filter;
-	end;
-	
-string30 v3fdn_Filter( string10 curr_incar_flag, string10 curr_incar_flag_BestSSN,string10 act_rel_date_1,
-	                            string10 ctrl_rel_date_1,string10 sch_rel_dt_1,string10 act_rel_dt_1_BestSSN,
-										          string10 ctl_rel_dt_1_BestSSN,string10 sch_rel_dt_1_BestSSN,string10 Input_Address_Prison,
-															string10 DOD, string10 deceased_matchcode,string10 score, string10 VariationSSNCount,
-															string10 IdentityRecordCount,string10 addr_outside_of_agency_state,string10 IDVerSSN,
-															string10 Best_SSN, string10 InputAddrRel,string10 possible_age_dob,
-															string10 possible_age_ssn_issuance,string10 LexID ,
-															string10 DivSSNLNameCount, string10 IDVerName,string10 ValidationAddrProblems, 
-															string10 InputAddrFelonyCount, string10 InputAddrDwellType, string10 IDVerAddress, 
-															string10 InputAddrDate, string10 MatchedInputAddr, string10 DivAddrIdentityCount,
-															string10 DivAddrIdentityCountNew,	string10 InputAddrZipDate, string10 BestAddrChangeDistance,
-															string10 InputAddrState, string10 ValidationIPProblems,string10 IPAddrExceedsInputAdd,
-															string10 phone_number_1, string10 Refund_Amount, 
-															string10 scorecut, unsigned3 RefundThreshold, string20 modelname, string50 filing_jurisdiction_01,
-															string1 address_risk,string1 identity_risk,boolean FDN_ID_Risk,string4 hri_1_code,string4 hri_2_code) 
-						         := FUNCTION; 
-
-				boolean lienFound    := filing_jurisdiction_01 <> '';
-				string8 today        := StringLib.getdateYYYYMMDD();
-				string10 curr_u_incar_flag  := stringlib.StringToUpperCase(curr_incar_flag);
-				string10 curr_u_incar_flag_BestSSN  := stringlib.StringToUpperCase(curr_incar_flag_BestSSN);
-				integer2 CurrentYear := (INTEGER4)(today[1..4]);
-				integer2 CYearMinus1 := CurrentYear -1;
-				integer2 CYearMinus5 := CurrentYear -5;
-				integer2 AddrDtYr    := (INTEGER2)(InputAddrDate[1..4]);
-				boolean isDOD        := DOD <> ''; 
-				integer2 dodYear     := if (isDOD, (INTEGER2)dod[1..4], 0);
-				boolean isDOD_greater_2_years := isDOD and ((CYearMinus1 - dodYear) >= 2);
-				boolean Hri71        := hri_1_code = '71' or hri_2_code ='71';
-
-				SET OF INTEGER2 SetRelDates := [(integer2)act_rel_date_1[1..4],(integer2)ctrl_rel_date_1[1..4], (integer2)sch_rel_dt_1[1..4]];	
-				SET OF INTEGER2 setRelBestDates := [(integer2)act_rel_dt_1_BestSSN[1..4], (integer2)ctl_rel_dt_1_BestSSN[1..4],(integer2)sch_rel_dt_1_BestSSN[1..4]];
-				SET OF INTEGER2 set_Rel_Dates := [(integer2)act_rel_date_1[1..4],(integer2)act_rel_dt_1_BestSSN[1..4]];
-			
-			
-				boolean noInputRelAddr := InputAddrRel = 'N';
-				set of string2 set15to21 := ['15','16','17','18','19','20','21'];
-				boolean dobAge15to21   := possible_age_dob in set15to21 ;
-				boolean ssnAge15to21   := possible_age_ssn_issuance in set15to21;
-				//====================   R  U  L  E  S      ===========================================================================
-				
-				//====================== v3.1 1.8.3 & appendix cond B==========================================================================
-				boolean isincarcerated1 := curr_u_incar_flag ='Y'  OR curr_u_incar_flag_BestSSN ='Y';
-				boolean isincarcerated2 := (curr_u_incar_flag in ['U','N'] OR curr_u_incar_flag_BestSSN in['U','N']) AND 
-																	  (CYearMinus1 in set_Rel_Dates OR CurrentYear in set_Rel_Dates);
-				
-				boolean isDeceased := stringlib.stringcontains(deceased_matchcode,'SN',true) and isDOD_greater_2_years;
-				
-   		  boolean isCrimRisk1 := Input_Address_Prison = 'Y';
-   			boolean isCrimRisk2 := deceased_matchcode ='S'; 
-   			
-				boolean isincarcerated := isincarcerated1 or isincarcerated2;
-   		  boolean isCrimRisk     := isCrimRisk1 or isCrimRisk2; 
- 	      
-			 //=========================== v3.1 req 1.4.2 & appendix cond C ===========================================================
-		    boolean isIdRiskv1  := (integer)VariationSSNCount > 4; // v3.1 req 1.4.2 & 1.10																	
-	      boolean isIdRiskv2  := (integer)IdentityRecordCount > 4;													
-	      boolean isIDRiskv3  := (LexID = '' AND Hri71 AND noInputRelAddr);
-			  boolean isIDRisk1   := identity_risk = 'Y';
-			 																
-			  boolean isIDRisk := isIdRiskv1 OR isIdRiskv2 OR isIDRiskv3 OR isIDRisk1;
-			
-       //=========================== v3.1 req 1.4.1 & appendix cond D ===============================
-				boolean isAddrRiskFelony := (integer)InputAddrFelonyCount > 3 AND InputAddrDwellType in ['R','S'];
-				boolean isAddrRiskId     := InputAddrDate = '' AND MatchedInputAddr <> 'Y' AND noInputRelAddr; 
-				boolean isAddrRiskZipDate := InputAddrDate <> '' AND AddrDtYr < CYearMinus5 AND noInputRelAddr;
-				boolean isAddrRiskDivNew := (integer)DivAddrIdentityCountNew >= 10 AND InputAddrDwellType <> 'H';
-				boolean isAddrRiskProb   := ValidationAddrProblems = '4'; 
-								//boolean isAddrRiskDist   := (integer)BestAddrChangeDistance >= 100; 
-		    boolean isAddrRisk1       := address_risk = 'Y';
-				
-				boolean isAddrRisk    := isAddrRiskFelony or isAddrRiskId or isAddrRiskDivNew or 
-				                             isAddrRiskProb or isAddrRiskZipDate or isAddrRisk1;  //isAddrRiskQuiz or isAddrRiskDist
-        //=========================== appendix cond E ===============================================================
-
-				boolean isIPrisk       := ValidationIPProblems = '1' ;
-				boolean isIPaddrRisk   := IPAddrExceedsInputAdd = 'Y' ;
-				
-			  boolean isTechRisk    := isIPrisk or isIPaddrRisk;													
-				
-				//MAP picks the first assignment that is TRUE so the order is important.				
-     
-			 
-			  string30 risk_status := MAP( isincarcerated  => 'INCARCERATED',
-				                             isDeceased      => 'DECEASED',
-				                             isCrimRisk      => 'HIGH RISK',
-												             isIDRisk        => 'HIGH RISK',
-												             isAddrRisk      => 'HIGH RISK',
-												             isTechRisk      => 'HIGH RISK',				    
-     											           'LOW RISK');				  
-	      																		
-	     return risk_status;
-	end;
-	
-   // The main filter. 
-      // - This calls the required filter function. 
-      // - In the future, there will be more than one filters. 
-      // - This returns the result batch or nothing.
-  // 
-		export MainFilter(dataset(rec_final) batch_res_before_filter, 
-	                  BatchServices.TaxRefundISv3_BatchService_Interfaces.Input args_in) 
-										:=	function
-										
-					// for default and version v3					
-			
-	
-				 
-			rec_final xformBatchOut( rec_final l) := TRANSFORM
-			  self.output_status :=  if (l.output_status = '', 
-				v3_1Filter( l.curr_incar_flag, l.curr_incar_flag_BestSSN,l.act_rel_dt_1,l.ctl_rel_dt_1,l.sch_rel_dt_1,l.act_rel_dt_1_BestSSN,
-										l.ctl_rel_dt_1_BestSSN,l.sch_rel_dt_1_BestSSN,l.InputAddrPrison,l.DOD,l.deceased_matchcode,l.score,
-										l.VariationSSNCount,l.DivSSNIdentityCount,l.address_outside_of_agency_state,l.IDVerSSN,l.Best_SSN,
-										l.InputAddrRel,l.possible_age_dob,l.possible_age_ssn_issuance,l.did,
-										l.DivSSNLNameCount,l.IDVerName,l.ValidationAddrProblem,l. InputAddrFelonyCount,l.InputAddrDwellType,l.IDVerAddress,
-										l.InputAddrDate,l.MatchedInputAddr,l.DivAddrIdentityCount,l.DivAddrIdentityCountNew,l.InputAddrZipDate,
-										l.BestAddrChangeDistance,l.InputAddrState,l.ValidationIPProblems, l.IPAddrExceedsInputAddr,l.phone_number,
-										l.Refund_Amount, args_in.scorecut, args_in.RefundThreshold, args_in.modelname, l.filing_jurisdiction_01),
-										l.output_status); 
-				self := l;
-				self := [];
-		  END;
+		SET OF INTEGER2 SetRelDates := [(integer2)act_rel_date_1[1..4],(integer2)ctrl_rel_date_1[1..4], (integer2)sch_rel_dt_1[1..4]];	
+		SET OF INTEGER2 setRelBestDates := [(integer2)act_rel_dt_1_BestSSN[1..4], (integer2)ctl_rel_dt_1_BestSSN[1..4],(integer2)sch_rel_dt_1_BestSSN[1..4]];
 		
-		  v3_1Filter_res    		 :=  project(batch_res_before_filter, xformBatchOut(left));
-			
+		UNSIGNED2 scoreNum    := (unsigned2) score;
+		UNSIGNED2 scoreCutNum := (unsigned2) scoreCut;
+		
+		boolean scoreFailed    := (scoreNum <= scoreCutNum) or (modelname = '') or (scoreCutNum = 0);
+		boolean noInputRelAddr := InputAddrRel = 'N';
+		set of string2 set15to21 := ['15','16','17','18','19','20','21'];
+		boolean dobAge15to21   := possible_age_dob in set15to21 ;
+		boolean ssnAge15to21   := possible_age_ssn_issuance in set15to21;
+		//====================   R  U  L  E  S      ===========================================================================
+		boolean isCrimManual1 :=  stringlib.StringToUpperCase(curr_incar_flag) ='Y'  OR 
+															stringlib.StringToUpperCase(curr_incar_flag_BestSSN) ='Y';
+		boolean isCrimManual2 := stringlib.stringcontains(deceased_matchcode,'SN',true) and isDOD_greater_2_years;
+
+		boolean isCrimRisk1 := curr_incar_flag in ['U','N'] AND CYearMinus1 in SetRelDates AND Input_Address_Prison = 'Y' AND scoreFailed;
+		boolean isCrimRisk2 := curr_incar_flag_BestSSN in['U','N'] AND CYearMinus1 in setRelBestDates AND Input_Address_Prison = 'Y' AND 
+													 scoreFailed;
+		boolean isCrimRisk3 := curr_incar_flag  in ['U','N'] AND CYearMinus1 in SetRelDates AND scoreFailed;
+		boolean isCrimRisk4 := curr_incar_flag_BestSSN in ['U','N'] AND CYearMinus1 in setRelBestDates AND scoreFailed; 
+		boolean isCrimRisk5 := deceased_matchcode ='S'; 
+		//==================
+		boolean isCrimRiskQuiz := isCrimRisk1 or isCrimRisk2 or isCrimRisk3 or isCrimRisk4 or isCrimRisk5; 
+
+		//==================
 	
-      // for version v3.1 with fdn
-			rec_final v31fdnBatchOut( rec_final l) := TRANSFORM
-			  
-			   self.risk_status :=  if (l.output_status = '', 
-				 v3fdn_Filter(l.curr_incar_flag, l.curr_incar_flag_BestSSN,l.act_rel_dt_1,l.ctl_rel_dt_1,l.sch_rel_dt_1,l.act_rel_dt_1_BestSSN,
-   										l.ctl_rel_dt_1_BestSSN,l.sch_rel_dt_1_BestSSN,l.InputAddrPrison,l.DOD,l.deceased_matchcode,l.score,
-   										l.VariationSSNCount,l.DivSSNIdentityCount,l.address_outside_of_agency_state,l.IDVerSSN,l.Best_SSN,
-   										l.InputAddrRel,l.possible_age_dob,l.possible_age_ssn_issuance,l.did,
-   										l.DivSSNLNameCount,l.IDVerName,l.ValidationAddrProblem,l. InputAddrFelonyCount,l.InputAddrDwellType,l.IDVerAddress,
-   										l.InputAddrDate,l.MatchedInputAddr,l.DivAddrIdentityCount,l.DivAddrIdentityCountNew,l.InputAddrZipDate,
-   										l.BestAddrChangeDistance,l.InputAddrState,l.ValidationIPProblems, l.IPAddrExceedsInputAddr,l.phone_number,
-   										l.Refund_Amount, args_in.scorecut, args_in.RefundThreshold, args_in.modelname, l.filing_jurisdiction_01,l.address_risk,l.identity_risk,
-											l.fdn_id_risk, l.hri_1_code, l.hri_2_code),
-											l.output_status); 
-				self := l;
-		  END;
+		boolean isIdRisk1  := (integer)VariationSSNCount >= (integer)'3';
+		boolean isIdRisk2  := VariationSSNCount = '2' AND scoreFailed;
+		boolean isIdRisk3  := (integer)IdentityRecordCount >= (integer)'4';
+		boolean isIdRisk4  := IdentityRecordCount = '2' AND addr_outside_of_agency_state = 'OS';
+		boolean isIdRisk5  := IdentityRecordCount = '2' AND scoreFailed;
+		//=============================================================== 
+		boolean isIdRiskQuiz1	:= isIdRisk1 or isIdRisk2 or isIdRisk3 or isIdRisk4 or isIdRisk5;
+
+		boolean isIdRisk6  := IDVerSSN in ['0','1','2','3'] AND lienFound ; 
+		boolean isIdRisk10 := Best_SSN <> '' AND lienFound;
+		//===================
+		boolean isIdRiskDebt := isIdRisk6 or isIdRisk10;
+
+		boolean isIdRiskQuiz3  := IDVerSSN in ['0','1','2','3'] AND ~lienFound ; 
+		//====================
+		boolean isIDRiskDivQuiz  := ((possible_age_dob = ''	and possible_age_ssn_issuance = '')	OR NOT (dobAge15to21 OR ssnAge15to21))
+																 AND
+																((LexID = '' AND  noInputRelAddr));
+
+		boolean isIdRisk15 := (integer)DivSSNLNameCount >= (integer)'3';
+		boolean isIdRisk16 := DIVSSNLNameCount = '2' AND scoreFailed;
+		boolean isIdRisk17 := Best_SSN <> '' AND ~lienFound AND scoreFailed;
+		boolean isIdRisk18 := IDVerName = '0';
+		//===================
+		boolean isIdRiskQuiz2 := isIdRisk15 or isIdRisk16 or isIdRisk17 or isIdRisk18; 
+
+		boolean isAddrRiskValid  := ValidationAddrProblems = '3';
+		boolean isAddrRiskFelony := (integer)InputAddrFelonyCount >= (integer)'3' AND InputAddrDwellType in ['R','S'];
+		boolean isAddrRiskId     := (IDVerAddress = '0' OR InputAddrZipDate = '') AND MatchedInputAddr <> 'Y' AND InputAddrRel = 'N'; 
+		boolean isAddrRiskDivCnt := (integer)DivAddrIdentityCount >= (integer)'100' AND scoreFailed;     
+		boolean isAddrRiskDivNew := (integer)DivAddrIdentityCountNew >= (integer)'20' AND scoreFailed; 
+		boolean isAddrRiskProb   := ValidationAddrProblems = '4' AND scoreFailed; 
+		boolean isAddrRiskZipDate:= InputAddrZipDate = '';
+		boolean isAddrRiskDist   := (integer)BestAddrChangeDistance >= (integer)'50'; 
+		boolean isAddrRiskSt     := InputAddrState = 'N' AND scoreFailed;
+		//=========================
+		boolean isAddrRiskQuiz    := isAddrRiskValid or isAddrRiskFelony or isAddrRiskId or isAddrRiskDivCnt or isAddrRiskDivNew or 
+																 isAddrRiskProb or isAddrRiskZipDate or isAddrRiskDist or isAddrRiskSt;
+
+		boolean isIPrisk       := ValidationIPProblems = '1' ;
+		boolean isIPaddrRisk   := IPAddrExceedsInputAdd = 'Y' ;
+		boolean isTechRiskAge  := (possible_age_dob <> '') and (integer)possible_age_dob <= (integer)'50' AND phone_number_1 = '' AND scoreFailed;
+		boolean isTechRiskSSn  :=  if (((possible_age_dob = '') and (possible_age_ssn_issuance <>'')),((integer)possible_age_ssn_issuance <= (integer)'50') AND phone_number_1 = '' AND scoreFailed, FALSE); 
+		//=================
+		boolean isTechRiskQuiz     := isIPrisk or isIPaddrRisk or isTechRiskAge or isTechRiskSSn;													
+		boolean isRefundManual := ((unsigned3)Refund_Amount >= RefundThreshold) and (RefundThreshold <> 0); 
+	 
+		//MAP picks the first assignment that is TRUE so the order is important.				
+		string30 identity_filter := MAP( isCrimManual1   => 'Manual Review',
+																		 isCrimManual2   => 'Manual Review',
+																		 isCrimRiskQuiz  => 'Quiz',
+																		 isIdRiskQuiz1   => 'Quiz',
+																		 isIdRiskDebt    => 'Debt Evasion',
+																		 isIdRiskQuiz3   => 'Quiz',
+																		 isIDRiskDivQuiz => 'Diversionary Quiz',
+																		 isIdRiskQuiz2   => 'Quiz',
+																		 isAddrRiskQuiz  => 'Quiz',
+																		 isTechRiskQuiz  => 'Quiz',
+																		 isRefundManual  => 'Manual Review',  					    
+																		 'No Quiz');																				
+		return identity_filter;
+	end;
+	
+	string30 v3fdn_Filter(string10 curr_incar_flag, string10 curr_incar_flag_BestSSN,string10 act_rel_date_1,
+												string10 ctrl_rel_date_1,string10 sch_rel_dt_1,string10 act_rel_dt_1_BestSSN,
+												string10 ctl_rel_dt_1_BestSSN,string10 sch_rel_dt_1_BestSSN,string10 Input_Address_Prison,
+												string10 DOD, string10 deceased_matchcode,string10 score, string10 VariationSSNCount,
+												string10 IdentityRecordCount,string10 addr_outside_of_agency_state,string10 IDVerSSN,
+												string10 Best_SSN, string10 InputAddrRel,string10 possible_age_dob,
+												string10 possible_age_ssn_issuance,string10 LexID ,
+												string10 DivSSNLNameCount, string10 IDVerName,string10 ValidationAddrProblems, 
+												string10 InputAddrFelonyCount, string10 InputAddrDwellType, string10 IDVerAddress, 
+												string10 InputAddrDate, string10 MatchedInputAddr, string10 DivAddrIdentityCount,
+												string10 DivAddrIdentityCountNew,	string10 InputAddrZipDate, string10 BestAddrChangeDistance,
+												string10 InputAddrState, string10 ValidationIPProblems,string10 IPAddrExceedsInputAdd,
+												string10 phone_number_1, string10 Refund_Amount,
+												string10 scorecut, unsigned3 RefundThreshold, string20 modelname, string50 filing_jurisdiction_01,
+												string1 address_risk,string1 identity_risk,boolean FDN_ID_Risk,string4 hri_1_code,string4 hri_2_code,
+												string4 hri_3_code,string4 hri_4_code, string8 in_event_dt_1) := FUNCTION; 
+
+		boolean lienFound									:= filing_jurisdiction_01 <> '';
+		string8 today											:= StringLib.getdateYYYYMMDD();
+		string10 curr_u_incar_flag				:= stringlib.StringToUpperCase(curr_incar_flag);
+		string10 curr_u_incar_flag_BestSSN:= stringlib.StringToUpperCase(curr_incar_flag_BestSSN);
+		integer2 CurrentYear 							:= (INTEGER4)(today[1..4]);
+		integer2 CYearMinus1 							:= CurrentYear -1;
+		integer2 CYearMinus5 							:= CurrentYear -5;
+		integer2 AddrDtYr    							:= (INTEGER2)(InputAddrDate[1..4]);
+		boolean isDOD        							:= DOD <> ''; 
+		integer2 dodYear     							:= if (isDOD, (INTEGER2)dod[1..4], 0);
+		boolean isDOD_greater_2_years 		:= isDOD and ((CYearMinus1 - dodYear) >= 2);
+		boolean Hri71        							:= hri_1_code = '71' or hri_2_code ='71' or hri_3_code = '71' or hri_4_code ='71';
+
+		SET OF INTEGER2 SetRelDates 			:= [(integer2)act_rel_date_1[1..4],(integer2)ctrl_rel_date_1[1..4], (integer2)sch_rel_dt_1[1..4]];	
+		SET OF INTEGER2 setRelBestDates   := [(integer2)act_rel_dt_1_BestSSN[1..4],	(integer2)ctl_rel_dt_1_BestSSN[1..4],(integer2)sch_rel_dt_1_BestSSN[1..4]];
+		// SET OF INTEGER2 set_Rel_Dates 	:= [(integer2)act_rel_date_1[1..4],(integer2)act_rel_dt_1_BestSSN[1..4]];
+	
+		boolean noInputRelAddr	:= InputAddrRel = 'N';
+		set of string2 set15to21:= ['15','16','17','18','19','20','21'];
+		boolean dobAge15to21   	:= possible_age_dob in set15to21 ;
+		boolean ssnAge15to21   	:= possible_age_ssn_issuance in set15to21;
+		//====================   R  U  L  E  S      ===========================================================================
+		
+		//====================== v3.1 1.8.3 & appendix cond B==========================================================================
+		//====================== Revised logic for "isincarcerated2" as required in TRIS v3.2 Enhancement project, Requirement # 3.1.9============
+		boolean isincarcerated1 := curr_u_incar_flag ='Y'  OR curr_u_incar_flag_BestSSN ='Y';
+		boolean isincarcerated2 := (curr_u_incar_flag in ['U','N'] OR curr_u_incar_flag_BestSSN in['U','N']) AND 
+															 ((integer2)act_rel_date_1[1..4] > CYearMinus1 OR (integer2)ctl_rel_dt_1_BestSSN[1..4] > CYearMinus1) AND
+															 ((integer2)in_event_dt_1[1..4] < CYearMinus1);
+		
+		boolean isDeceased 	:= stringlib.stringcontains(deceased_matchcode,'SN',true) and isDOD_greater_2_years;
+		boolean isCrimRisk1 := Input_Address_Prison = 'Y';
+		boolean isCrimRisk2 := deceased_matchcode ='S'; 
+		
+		boolean isincarcerated := isincarcerated1 or isincarcerated2;
+		boolean isCrimRisk     := isCrimRisk1 or isCrimRisk2; 
+		
+		//=========================== v3.1 req 1.4.2 & appendix cond C ===========================================================
+		boolean isIdRiskv1  := (integer)VariationSSNCount > 4; // v3.1 req 1.4.2 & 1.10																	
+		boolean isIdRiskv2  := (integer)IdentityRecordCount > 4;													
+		boolean isIDRiskv3  := (LexID = '' AND Hri71 AND noInputRelAddr);
+		boolean isIDRisk1   := identity_risk = 'Y';
+																	
+		boolean isIDRisk := isIdRiskv1 OR isIdRiskv2 OR isIDRiskv3 OR isIDRisk1;
+	
+		//=========================== v3.1 req 1.4.1 & appendix cond D ===============================
+		boolean isAddrRiskFelony 	:= (integer)InputAddrFelonyCount > 3 AND InputAddrDwellType in ['R','S'];
+		boolean isAddrRiskId     	:= InputAddrDate = '' AND MatchedInputAddr <> 'Y' AND noInputRelAddr; 
+		boolean isAddrRiskZipDate := InputAddrDate <> '' AND AddrDtYr < CYearMinus5 AND noInputRelAddr;
+		boolean isAddrRiskDivNew 	:= (integer)DivAddrIdentityCountNew >= 10 AND InputAddrDwellType <> 'H';
+		boolean isAddrRiskProb   	:= ValidationAddrProblems = '4'; 
+		// boolean isAddrRiskDist	:= (integer)BestAddrChangeDistance >= 100; 
+		boolean isAddrRisk1       := address_risk = 'Y';
+		boolean isAddrRisk				:= isAddrRiskFelony or 
+																 isAddrRiskId or 
+																 isAddrRiskDivNew or 
+																 isAddrRiskProb or 
+																 isAddrRiskZipDate or 
+																 isAddrRisk1;  //isAddrRiskQuiz or isAddrRiskDist
+		//=========================== appendix cond E ===============================================================
+		boolean isIPrisk			:= ValidationIPProblems = '1' ;
+		boolean isIPaddrRisk	:= IPAddrExceedsInputAdd = 'Y' ;
+		boolean isTechRisk		:= isIPrisk or isIPaddrRisk;													
+		
+		//MAP picks the first assignment that is TRUE so the order is important.				
+		string30 risk_status := MAP(isincarcerated  => 'INCARCERATED',
+																isDeceased      => 'DECEASED',
+																isCrimRisk      => 'HIGH RISK',
+																isIDRisk        => 'HIGH RISK',
+																isAddrRisk      => 'HIGH RISK',
+																isTechRisk      => 'HIGH RISK',				    
+																'LOW RISK');				  
+		return risk_status;
+	end;
+	
+	// The main filter. 
+		// - This calls the required filter function. 
+		// - In the future, there will be more than one filters. 
+		// - This returns the result batch or nothing.
+	// 
+	export MainFilter(dataset(rec_final) batch_res_before_filter, 
+										BatchServices.TaxRefundISv3_BatchService_Interfaces.Input args_in ):=	function
+									
+		// for default and version v3					
+		rec_final xformBatchOut( rec_final l) := TRANSFORM
+			self.output_status :=	if(l.output_status = '', 
+																v3_1Filter( l.curr_incar_flag, l.curr_incar_flag_BestSSN,l.act_rel_dt_1,l.ctl_rel_dt_1,l.sch_rel_dt_1,l.act_rel_dt_1_BestSSN,
+																				l.ctl_rel_dt_1_BestSSN,l.sch_rel_dt_1_BestSSN,l.InputAddrPrison,l.DOD,l.deceased_matchcode,l.score,
+																				l.VariationSSNCount,l.DivSSNIdentityCount,l.address_outside_of_agency_state,l.IDVerSSN,l.Best_SSN,
+																				l.InputAddrRel,l.possible_age_dob,l.possible_age_ssn_issuance,l.did,
+																				l.DivSSNLNameCount,l.IDVerName,l.ValidationAddrProblem,l. InputAddrFelonyCount,l.InputAddrDwellType,l.IDVerAddress,
+																				l.InputAddrDate,l.MatchedInputAddr,l.DivAddrIdentityCount,l.DivAddrIdentityCountNew,l.InputAddrZipDate,
+																				l.BestAddrChangeDistance,l.InputAddrState,l.ValidationIPProblems, l.IPAddrExceedsInputAddr,l.phone_number,
+																				l.Refund_Amount, args_in.scorecut, args_in.RefundThreshold, args_in.modelname, l.filing_jurisdiction_01),
+																l.output_status); 
+			self := l;
+			self := [];
+		END;
+
+		v3_1Filter_res	:=  project(batch_res_before_filter, xformBatchOut(left));
+
+		// for version v3.1 with fdn
+		rec_final v31fdnBatchOut( rec_final l) := TRANSFORM
+		self.risk_status :=  if (l.output_status = '', 
+														 v3fdn_Filter(l.curr_incar_flag, l.curr_incar_flag_BestSSN,l.act_rel_dt_1,l.ctl_rel_dt_1,l.sch_rel_dt_1,l.act_rel_dt_1_BestSSN,
+																					l.ctl_rel_dt_1_BestSSN,l.sch_rel_dt_1_BestSSN,l.InputAddrPrison,l.DOD,l.deceased_matchcode,l.score,
+																					l.VariationSSNCount,l.DivSSNIdentityCount,l.address_outside_of_agency_state,l.IDVerSSN,l.Best_SSN,
+																					l.InputAddrRel,l.possible_age_dob,l.possible_age_ssn_issuance,l.did,
+																					l.DivSSNLNameCount,l.IDVerName,l.ValidationAddrProblem,l. InputAddrFelonyCount,l.InputAddrDwellType,l.IDVerAddress,
+																					l.InputAddrDate,l.MatchedInputAddr,l.DivAddrIdentityCount,l.DivAddrIdentityCountNew,l.InputAddrZipDate,
+																					l.BestAddrChangeDistance,l.InputAddrState,l.ValidationIPProblems, l.IPAddrExceedsInputAddr,l.phone_number,
+																					l.Refund_Amount, args_in.scorecut, args_in.RefundThreshold, args_in.modelname, l.filing_jurisdiction_01,l.address_risk,l.identity_risk,
+																					l.fdn_id_risk, l.hri_1_code, l.hri_2_code, l.hri_3_code, l.hri_4_code, l.in_event_dt_1),
+															l.output_status); 
+			self := l;
+		END;
 			
-	    v3fdn_Filter_res    		 :=  project(batch_res_before_filter, v31fdnBatchOut(left));
-			batch_res_after_filter :=  map(StringLib.StringToUpperCase(args_in.FilterRule)='V3FDN_FILTER' => v3fdn_Filter_res, 
-			                               StringLib.StringToUpperCase(args_in.FilterRule)='V3_FILTER' => v3_1Filter_res, 
-			                               batch_res_before_filter); 
-			
-			return batch_res_after_filter;
+		v3fdn_Filter_res    		 :=  project(batch_res_before_filter, v31fdnBatchOut(left));
+		
+		batch_res_after_filter :=  map(StringLib.StringToUpperCase(args_in.FilterRule)='V3FDN_FILTER' => v3fdn_Filter_res, 
+																	 StringLib.StringToUpperCase(args_in.FilterRule)='V3_FILTER' => v3_1Filter_res, 
+																	 batch_res_before_filter); 
+		
+		return batch_res_after_filter;
 	end;
 	
 	EXPORT ProcessHRICodes(BatchServices.TaxRefundISv3_BatchService_Interfaces.Input mod_args) := FUNCTION 
@@ -1471,9 +1482,10 @@ string30 v3fdn_Filter( string10 curr_incar_flag, string10 curr_incar_flag_BestSS
 		rOnly := Std.Str.ToUppercase(TRIM(mod_args.ReportOnlyHRICodes, ALL));
 		boolean allFieldsBlank := aRisk='' AND iRisk='' AND rOnly='';
 		
-		aRisk2 := IF(allFieldsBlank, '11', aRisk);
-		iRisk2 := IF(allFieldsBlank, '03,72,IS', iRisk);
-		rOnly2 := IF(allFieldsBlank, '14,29,71,CA,CO,RS', rOnly);
+		// TRIS v3.2 Enhancement : Updated HRI codes per Req # 3.1.3.8
+		aRisk2 := IF(allFieldsBlank, '11,14', aRisk);
+		iRisk2 := IF(allFieldsBlank, '03,72,IS,QD,QA,QE,BO,S5,S2,S1',iRisk);
+		rOnly2 := IF(allFieldsBlank, '71,RS,MO', rOnly);
 		
 		finalResults := MODULE(PROJECT(mod_args, BatchServices.TaxRefundISv3_BatchService_Interfaces.Input))
 			EXPORT string AddressRiskHRICodes  := aRisk2;
@@ -1484,7 +1496,164 @@ string30 v3fdn_Filter( string10 curr_incar_flag, string10 curr_incar_flag_BestSS
 		
 		RETURN finalResults;
 	END;
-	
-	
-END;
 
+	EXPORT getIPMetaDataRecords(DATASET(rec_in_wdid) in_clean_batch) := FUNCTION
+		
+			ds_IP_Metadata_batch_in := PROJECT(in_clean_batch , TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_in_raw,
+																														SELF.acctno			:= LEFT.acctno,
+																														SELF.ip_address1:= LEFT.ip_address,
+																														SELF.ip_address2:= LEFT.device_ini_ip_address,
+																														SELF.ip_address3:= LEFT.device_submit_ip_address));
+
+			BatchServices.IP_Metadata_Layouts.batch_in normBatchRecs(ds_IP_Metadata_batch_in L,INTEGER C) := TRANSFORM
+				STRING IP_address	:=CHOOSE(C,L.IP_address1,L.IP_address2,L.IP_address3);
+				SELF.orig_acctno 	:= L.acctno;
+				SELF.IP_address		:=IF(IP_address!='',Std.Str.ToUpperCase(IP_address),SKIP);
+				SELF:=L;
+			END;
+
+			ds_batch_in_normalized := NORMALIZE(ds_IP_Metadata_batch_in,3,normBatchRecs(LEFT,COUNTER));
+
+			ds_child_recs := BatchServices.IP_Metadata_Records(ds_batch_in_normalized);
+
+			ds_parent_recs := PROJECT(DEDUP(SORT(ds_batch_in_normalized,acctno),acctno),TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_out_flat_acctno,SELF:=LEFT,SELF:=[]));
+
+			ds_batch_out_denormalized := BatchShare.MAC_ExpandLayout.Denorm(ds_parent_recs,ds_child_recs,BatchServices.IP_Metadata_Layouts.batch_out_raw,'');
+			
+			RETURN ds_batch_out_denormalized;
+	END;
+	
+	EXPORT getValidationIpProblems(string45 input_ip_address , string45 ip_metadata_ip_address, string5 country_code) := FUNCTION
+	
+		string50 ip_addr_trimmed 	:= trim(ip_metadata_ip_address);
+		string2 ipcountry				  := if(ip_addr_trimmed = '', '', trim(StringLib.StringToUpperCase(country_code)));
+		
+		validationIpProblems 		:= map(	input_ip_address = ''	=> '-1',
+																		ipcountry IN BatchServices.Constants.TRISv3.IP_Country	=> '0',
+																		ipcountry NOT IN BatchServices.Constants.TRISv3.IP_Country and ipcountry <>'' => '1',
+																		// anything else is '2'
+																		'2');
+		RETURN validationIpProblems;
+	END;
+
+	EXPORT getIPAddrExceedsInputAddr(	REAL input_lat, 
+																		REAL input_long,
+																		string45 ipaddress, 
+																		string10 latitude,
+																		string10 longitude, 
+																		BatchServices.TaxRefundISv3_BatchService_Interfaces.Input args_in) := FUNCTION
+																																		
+			//TRIS v3.0 : IP Address indicator req. 4.1.47
+			ip_lat     := (REAL)latitude;
+			ip_long    := (REAL)longitude;
+			geo_dist   := IF(	ipaddress <> '',
+												Address_Attributes.functions.GeoDist(	input_lat,
+																															input_long,
+																															ip_lat,
+																															ip_long),
+												0);
+
+			ipInvalid := if(// line below added due to 2015 enhancements, req 4.1.7 new input option
+											Stringlib.StringFilterOut(ipaddress[1],'0123456789') <> '' or 
+											ipaddress = '' or ipaddress = '0' or
+											(ip_lat = 0 and ip_long = 0), TRUE, FALSE);	
+								
+			IPAddrExceedsInputAddr := MAP(ipInvalid	=> '',
+																		StringLib.StringToUpperCase(args_in.FilterRule)='V3FDN_FILTER' and geo_dist >= args_in.IPAddrExceedsRange => '1', 
+																		(NOT StringLib.StringToUpperCase(args_in.FilterRule)='V3FDN_FILTER') and geo_dist >= 100 => '1',
+																		'');
+			RETURN IPAddrExceedsInputAddr;
+	END;
+	
+	EXPORT getContribRecs (dataset(rec_final) recs_in, string in_DataPermissionMask) := FUNCTION
+			contributory_key := tris_lnssi_build.key_field_value;
+
+			dataPermissionTempMod := module (AutoStandardI.DataPermissionI.params)
+				export dataPermissionMask := in_DataPermissionMask;
+			end;
+			boolean use_ContributoryData := AutoStandardI.DataPermissionI.val(dataPermissionTempMod).use_TrisContributoryData;
+			
+			slim_input_fields :=  record
+				string30 acctno;
+				string2	st	:= '';
+				string200 isp_name1	:= '';
+				string200 isp_name2	:= '';
+				string200 isp_name3	:= '';
+				string25 Contrib_Risk_field:='';
+				string50 Contrib_Risk_Value:='';
+				string Contrib_Risk_Attr:='';
+				string Contrib_State_Excl:='';					
+			end;
+
+			slim_input_fields appendAcctNo(rec_final L, recordof(contributory_key) R) := transform
+				self.Contrib_Risk_field := R.Contrib_Risk_field;
+				self.Contrib_Risk_Value	:= R.Contrib_Risk_Value;
+				self.Contrib_Risk_Attr  := R.Contrib_Risk_Attr;
+				self.Contrib_State_Excl	:= R.Contrib_State_Excl;	
+				self := L;
+			end;
+		
+			contrib_recs_rtn := join(recs_in, contributory_key, 
+																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.RTNbr) and 
+																StringLib.StringToUpperCase(right.contrib_risk_value) = left.routing_transit_nbr,
+																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+																									
+			contrib_recs_abrn:= join(recs_in, contributory_key, 
+																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.ARNbr) and
+																StringLib.StringToUpperCase(right.contrib_risk_value) = left.aba_rout_nbr, 
+																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+																									
+			contrib_recs_prep:= join(recs_in, contributory_key, 
+																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.PrepID) and
+																StringLib.StringToUpperCase(right.contrib_risk_value) = left.prep_id2, 
+																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+
+			contrib_recs_email:= join(recs_in, contributory_key, 
+																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.EmailAdd) and 
+																StringLib.StringToUpperCase(right.contrib_risk_value) = left.email_address, 
+																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+																									
+			contrib_recs_isp	:= join(recs_in, contributory_key, 
+																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName OR
+																			right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName2 OR
+																			right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName3)
+																AND 
+																(StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name1) OR 
+																 StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name2) OR 
+																 StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name3)),
+																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+
+			contrib_recs := contrib_recs_rtn + contrib_recs_abrn + contrib_recs_prep + contrib_recs_email + contrib_recs_isp;
+			
+			contrib_recs_to_return := if(	use_ContributoryData, 
+																		contrib_recs(st not in [Std.Str.SplitWords(contrib_state_excl,',')] and contrib_risk_value <> ''), 
+																		dataset([], slim_input_fields)); 
+		
+			pre_contrib_recs:= dedup(sort(contrib_recs_to_return,acctno,(contrib_risk_field	= BatchServices.Constants.TRISv3.RTNbr), 
+																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName),
+																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.ARNbr), 
+																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.PrepID),
+																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.EmailAdd)), 
+																acctno, contrib_risk_value);
+			
+			rec_final deNorm (rec_final L, slim_input_fields R, INTEGER C) := transform
+				self.Contrib_Risk_Field1	:= if(C=1, R.Contrib_Risk_field, L.Contrib_Risk_field1);
+				self.Contrib_Risk_Value1 	:= if(C=1, R.Contrib_Risk_Value, L.Contrib_Risk_Value1);
+				self.Contrib_Risk_Attr1		:= if(C=1, R.Contrib_Risk_Attr, L.Contrib_Risk_Attr1);
+
+				self.Contrib_Risk_Field2  := if(C=2, R.Contrib_Risk_field, L.Contrib_Risk_Field2);
+				self.Contrib_Risk_Value2  := if(C=2, R.Contrib_Risk_Value, L.Contrib_Risk_Value2);
+				self.Contrib_Risk_Attr2 	:= if(C=2, R.Contrib_Risk_Attr, L.Contrib_Risk_Attr2);
+
+				self.Contrib_Risk_Field3  := if(C=3, R.Contrib_Risk_field, L.Contrib_Risk_Field3);
+				self.Contrib_Risk_Value3  := if(C=3, R.Contrib_Risk_Value, L.Contrib_Risk_Value3);
+				self.Contrib_Risk_Attr3		:= if(C=3, R.Contrib_Risk_Attr, L.Contrib_Risk_Attr3);
+				self := L;
+			end;
+
+			final_recs_flat := denormalize(recs_in , pre_contrib_recs,
+																			left.acctno = right.acctno,
+																			deNorm(left, right, counter));
+		return final_recs_flat;
+	END;	
+END;

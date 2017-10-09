@@ -1,6 +1,6 @@
-EXPORT FCRA_Transaction_Constants := module
+﻿EXPORT FCRA_Transaction_Constants := module
 
-export product := ['RISKVIEW', 'RISKVIEWATTRIBUTES', 'RISKVIEWREPORT', 'RISKVIEW2']; 
+export product := ['RISKVIEW', 'RISKVIEWATTRIBUTES', 'RISKVIEWREPORT', 'RISKVIEW2', 'RISKWISE.RISKWISEMAINSC1O']; 
 
 export source := 'F';
 

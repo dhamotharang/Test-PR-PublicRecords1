@@ -1,4 +1,4 @@
-EXPORT BuildData(string version) := FUNCTION
+﻿EXPORT BuildData(string version) := FUNCTION
 
 		hdrin := cortera.File_Header_In(version);
 
@@ -23,11 +23,11 @@ EXPORT BuildData(string version) := FUNCTION
 				OUTPUT(attr,,lfnAttributes, COMPRESSED, OVERWRITE)
 			),
 			PARALLEL(
-				Cortera.Promote.CorteraHeader(lfnHdr),
-				Cortera.Promote.Executives(lfnexecutives),
-				Cortera.Promote.CorteraAsLinking(lfnLinking),
-				Cortera.Promote.industry(lfnIndustry),
-				Cortera.Promote.Attributes(lfnAttributes)
+				Cortera.Promote().CorteraHeader(lfnHdr),
+				Cortera.Promote().Executives(lfnexecutives),
+				Cortera.Promote().CorteraAsLinking(lfnLinking),
+				Cortera.Promote().industry(lfnIndustry),
+				Cortera.Promote().Attributes(lfnAttributes)
 			)
 		);
 	

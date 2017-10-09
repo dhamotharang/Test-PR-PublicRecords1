@@ -1,4 +1,4 @@
-IMPORT doxie_ln, doxie, ut, fcra, doxie_crs, suppress, ffd;
+﻿IMPORT doxie_ln, doxie, fcra, doxie_crs, suppress, ffd;
 
 
 EXPORT property_records (
@@ -50,7 +50,7 @@ srt_property_o := sort(
 dep_property_o := rollup(
 	srt_property_o,
 	transform(recordof(srt_property_o),
-						self.address_seq_no := ut.max2(left.address_seq_no, right.address_seq_no),
+						self.address_seq_no := MAX (left.address_seq_no, right.address_seq_no),
 						self := left),
 	address_ace_zip,address_prim_name,address_prim_range,
 	address_suffix,address_predir,address_postdir,address_sec_range,

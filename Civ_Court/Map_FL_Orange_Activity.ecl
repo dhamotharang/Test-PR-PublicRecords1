@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, crim_common, ut;
+﻿IMPORT Civ_Court, civil_court, crim_common, ut, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -6,8 +6,11 @@ IMPORT Civ_Court, civil_court, crim_common, ut;
 
 fOrange := Civ_Court.Files_In_FL_Orange.Raw_RecType_3;
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m-%d-%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Case_Activity tFLOrange(fOrange input) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -18,7 +21,7 @@ UpperCaseNum						:= ut.CleanSpacesAndUpper(input.case_no);
 self.case_key					  := '42'+UpperCaseNum;
 self.court						  := 'ORANGE COUNTY COURT: '+ut.CleanSpacesAndUpper(input.court);
 self.case_number				:= UpperCaseNum;
-self.event_date					:= ut.ConvertDate(input.event_date);
+self.event_date					:= Std.Date.ConvertDateFormatMultiple(input.event_date,fmtsin,fmtout);
 self.event_type_code		:= ut.CleanSpacesAndUpper(input.event_code);
 self.event_type_description_1	:= ut.CleanSpacesAndUpper(input.event_code_desc);
 self := [];

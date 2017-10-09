@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="TaxRefundISv3_BatchService">
 
 	<!-- Common input options -->
@@ -23,13 +23,13 @@
   <part name="DIDScoreThreshold"    type="xsd:unsigned2"/>
   <part name="Creditor"             type="xsd:string"/>
   <part name="RefundThreshold"      type="xsd:unsigned3"/>
-  <part name="IncludeIPAddrGW"      type="xsd:boolean"/>
-  <part name="IncludeDebtEvasion"   type="xsd:boolean"/>
+  <!-- <part name="IncludeIPAddrGW"      type="xsd:boolean"/> -->
+  <!-- <part name="IncludeDebtEvasion"   type="xsd:boolean"/> -->
 	<part name="GetSSNBest"           type="xsd:boolean"/>
 
   <part name="TaxRefund_batch_in"      type="tns:XmlDataSet" cols="70" rows="25"/> 
 
- 	<part name="Gateways"                type="tns:XmlDataSet" cols="70" rows="25"/>
+ 	<!-- <part name="Gateways"                type="tns:XmlDataSet" cols="70" rows="25"/> -->
 	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
 	<part name="includeDependantID"      type="xsd:boolean"/>	
 	<part name="IPAddrExceedsRange"      type="xsd:integer"/>	
@@ -81,17 +81,22 @@
 </pre>
 */
 
-IMPORT BatchServices,ut,BatchShare,Royalty;
+IMPORT BatchServices, BatchShare, Royalty, ut, WSInput;
 
   
 EXPORT TaxRefundISv3_BatchService := MACRO
-#constant('penaltthreshold','10');
+
+	//The following macro defines the field sequence on WsECL page of query. 
+	WSInput.MAC_TaxRefundISv3_BatchService();
+	
+	#constant('penaltthreshold','10');
+	
 	rec_layout_in := BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in;
 	
 	ds_batch := dataset([], rec_layout_in) : stored('TaxRefund_batch_in');
 	
 	gateways_in := Gateway.Configuration.Get();
-	
+
 	doxie.MAC_Header_Field_Declare();
 	
 	BatchShare.MAC_SequenceInput(ds_batch, ds_sequenced);
@@ -100,13 +105,13 @@ EXPORT TaxRefundISv3_BatchService := MACRO
 	mod_args := MODULE (BatchServices.TaxRefundISv3_BatchService_Interfaces.Input)
 		// common input options
 		EXPORT string32  ApplicationType  	:= application_type_value;
-		EXPORT unsigned1 DPPAPurpose 				:= DPPA_Purpose;
+		EXPORT unsigned1 DPPAPurpose				:= DPPA_Purpose;
 		EXPORT unsigned1 GLBPurpose  				:= GLB_Purpose;
 		EXPORT string  	 DataPermission 		:= AutoStandardI.GlobalModule().DataPermissionMask;
 		EXPORT string    DataRestriction    := doxie.DataRestriction.fixed_DRM;
 		EXPORT string5   IndustryClass			:= industry_class_value;
 		EXPORT boolean   IncludeBlankDOD	  := 0 : stored('IncludeBlankDOD');
-		EXPORT boolean   PhoneticMatch	    := phonetics; 
+		EXPORT boolean   PhoneticMatch	   	:= phonetics; 
 		EXPORT boolean   AllowNickNames		  := nicknames; 
 		EXPORT boolean   IncludeMinors		  := false : stored('IncludeMinors');
 		// TRIS specific, v2 & v3 shared input options
@@ -123,22 +128,22 @@ EXPORT TaxRefundISv3_BatchService := MACRO
 		EXPORT unsigned2 DIDScoreThreshold  := 0 : stored('DIDScoreThreshold'); // 0 - 100 are valid values. default=80 in TRIS KTR Layouts xls "Input Options" tab???
 		EXPORT string30  Creditor           := '' : stored('Creditor'); // text, i.e. State of Georgia
 		EXPORT unsigned3 RefundThreshold    := 0 : stored('RefundThreshold'); // 0 - 9999999 are valid values
-		// TRIS v3 specific, new 2015 enhancements input options ---v
-		EXPORT boolean   IncludeIPAddrGW	:= true : stored('IncludeIPAddrGW'); // default to true
-		EXPORT boolean   IncludeDebtEvasion := true : stored('IncludeDebtEvasion'); // default to false for reqv3.1 1.9
+		// TRIS v3.2 Enhancement: IncludeIPAddrGW & IncludeDebtEvasion are no longer to be used. 
+		// EXPORT boolean   IncludeIPAddrGW				:= true : stored('IncludeIPAddrGW'); // default to true
+		// EXPORT boolean   IncludeDebtEvasion 	:= true : stored('IncludeDebtEvasion'); // default to false
 		  
 		// TRIS V3.1 with fdn
-		EXPORT boolean	 IncludeDependantID := false : stored('IncludeDependantID');
-		EXPORT integer   IPAddrExceedsRange := 100 : stored('IPAddrExceedsRange');
-		EXPORT unsigned6 GlobalCompanyId    := 0 : stored('GlobalCompanyId');
-		EXPORT unsigned2 IndustryType   	:= 0 : stored('IndustryType');
-		EXPORT unsigned6 ProductCode   		:= 0 : stored('ProductCode');
+		EXPORT boolean	 IncludeDependantID		:= false : stored('IncludeDependantID');
+		EXPORT integer   IPAddrExceedsRange 	:= 100 : stored('IPAddrExceedsRange');
+		EXPORT unsigned6 GlobalCompanyId    	:= 0 : stored('GlobalCompanyId');
+		EXPORT unsigned2 IndustryType					:= 0 : stored('IndustryType');
+		EXPORT unsigned6 ProductCode					:= 0 : stored('ProductCode');
 
 		// HRI codes externalized
 		EXPORT string	 AddressRiskHRICodes  := '' : stored('AddressRiskHRICodes');		
 		EXPORT string	 IdentityRiskHRICodes := '' : stored('IdentityRiskHRICodes');
 		EXPORT string	 ReportOnlyHRICodes   := '' : stored('ReportOnlyHRICodes');
-		EXPORT string    AllHRICodes 		  := '';
+		EXPORT string	 AllHRICodes					:= '';
 	END;
 
 	gc_id        := mod_args.GlobalCompanyId;
@@ -163,31 +168,29 @@ EXPORT TaxRefundISv3_BatchService := MACRO
 	mod_args2 := BatchServices.TaxRefundISv3_BatchService_Functions.ProcessHRICodes(mod_args);
 
 	Results_temp := IF(isv3fdn, 
-		BatchServices.TaxRefundISv3_BatchService_Records(ds_batch_in, mod_args2, gateways_in),
-		BatchServices.TaxRefundISv3_BatchService_Records(ds_batch_in, mod_args, gateways_in));
-   
-    dIPIn := PROJECT(ds_batch_in, TRANSFORM(Royalty.RoyaltyNetAcuity.IPData,
-                     																			SELF.AcctNo := LEFT.AcctNo;
-                     																			SELF.IPAddr := LEFT.IP_Address));
-                     																                           
-      BOOLEAN  ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
-      dRoyaltiesByAcctno 	:= Royalty.RoyaltyNetAcuity.GetBatchRoyaltiesByAcctno(gateways_in, dIPIn, Results_temp, TRUE);
-      dRoyalties 					:= Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, ReturnDetailedRoyalties);
-      								 
-      BatchShare.MAC_RestoreAcctno(ds_batch_in,Results_temp,ds_output,,false);
-      Royalty.MAC_RestoreAcctno(ds_batch_in,dRoyalties, royalties);    
-   
-   		
-      ds_results := PROJECT(ds_output, TRANSFORM(BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_out
-                     																			- royalty_nag,
-                     																			SELF := LEFT));
-   
-     
-   	ut.mac_TrimFields(ds_results, 'ds_results', Results);
-     
-	OUTPUT(royalties,NAMED('RoyaltySet'));
-	
-	OUTPUT(Results,NAMED('Results'));
+											BatchServices.TaxRefundISv3_BatchService_Records(ds_batch_in, mod_args2),
+											BatchServices.TaxRefundISv3_BatchService_Records(ds_batch_in, mod_args));
 
+	// ****TRIS v3.2 Enhancement: Req 3.1.3.14 Since NetAcutiy gateway call is removed from query, royalty calculation is not needed....
+	// ****....However completely removing it may causes issues at ESP end, so projecting dRoyalties below to blank dataset
+		 
+	// dIPIn := PROJECT(ds_batch_in, TRANSFORM(Royalty.RoyaltyNetAcuity.IPData,
+																	// SELF.AcctNo := LEFT.AcctNo;
+																	// SELF.IPAddr := LEFT.IP_Address));
+																																						 
+	BOOLEAN  ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
+
+	// dRoyaltiesByAcctno	:= Royalty.RoyaltyNetAcuity.GetBatchRoyaltiesByAcctno(gateways_in, dIPIn, Results_temp, TRUE);
+	dRoyalties	:= dataset([], Royalty.Layouts.RoyaltyForBatch);
+
+	BatchShare.MAC_RestoreAcctno(ds_batch_in,Results_temp,ds_output,,false);
+	Royalty.MAC_RestoreAcctno(ds_batch_in,dRoyalties, royalties);    
+
+	ds_results := PROJECT(ds_output, BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_out - royalty_nag);
+
+	ut.mac_TrimFields(ds_results, 'ds_results', Results);
+
+	OUTPUT(royalties,NAMED('RoyaltySet'));
+	OUTPUT(Results,NAMED('Results'));
 
 ENDMACRO;

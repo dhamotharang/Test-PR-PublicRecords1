@@ -1,10 +1,9 @@
-import Business_Header, MDR;
+﻿import Business_Header, MDR;
 EXPORT fAs_Business_Header(dataset(Cortera.Layout_Header_Out) hdr) := FUNCTION
 
 	Business_Header.Layout_Business_Header_New xBiz(Cortera.Layout_Header_Out hdr) := TRANSFORM
 
 		self.source := Mdr.sourceTools.src_Cortera;
-		self.current := true;
 		SELF.dt_first_seen						:= hdr.dt_first_seen;
 		SELF.dt_last_seen							:= hdr.dt_last_seen;
 		SELF.dt_vendor_first_reported := hdr.dt_first_seen;

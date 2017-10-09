@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut, lib_StringLib;
+﻿IMPORT Civ_Court, civil_court, ut, lib_StringLib, Std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -9,8 +9,12 @@ court	:= sort(Civ_court.Files_In_NY_Upstate.county_lkp,code);
 case_status := sort(Civ_court.Files_In_NY_Upstate.Case_status_lkp,code);
 action_type	:= dedup(sort(Civ_court.Files_In_NY_Upstate.Action_type_lkp,action_type));
 
-fmtsin := '%m-%d-%Y';
-fmtout := '%Y%m%d';
+
+fmtsin := [
+		'%m/%d/%Y',
+		'%m-%d-%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Matter tNY(fNY L, court R) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -30,7 +34,7 @@ self.case_type					:= '';
 self.case_title					:= IF(L.plaintiff <> '',ut.CleanSpacesAndUpper(L.plaintiff)+' VS '+ ut.CleanSpacesAndUpper(L.defendant),'');
 self.disposition_code 	:= ut.CleanSpacesAndUpper(L.case_status);
 self.disposition_description := '';
-self.disposition_date 	:= ut.ConvertDate(L.disposition_date, fmtsin, fmtout);
+self.disposition_date 	:= Std.Date.ConvertDateFormatMultiple(L.disposition_date, fmtsin, fmtout);
 self := [];
 end;
 

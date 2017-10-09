@@ -1,4 +1,4 @@
-/* *********************************************************************************************
+﻿/* *********************************************************************************************
 Please inform the Insurance team if any significant data preparation changes are done
 in here.  They may need to imitate data-prep in their PRTE2_Liens_Ins.proc_build_base
 ********************************************************************************************* */
@@ -15,14 +15,6 @@ Base_Party_Ins	:= DATASET(PRTE2_Common.Cross_Module_Files.LiensV2_Base_SF_Party,
 
 //Create TMSID/RMSID, Persist ID
 PRTE2_Liens.Layouts.main_base_ext PopulateID(Base_Main_in L) := TRANSFORM
-		
-		// self.RMSID	:= SourceCD+'R'+HASH(trim(L.ORIG_FILING_NUMBER,left,right),trim(L.AMOUNT,left,right),trim(L.AGENCY,left,right),trim(L.ORIG_FILING_DATE,left,right),
-		//																		trim(L.FILING_BOOK,left,right),trim(L.FILING_PAGE,left,right),trim(L.ORIG_FILING_TYPE,left,right));
-							
-		// self.TMSID	:= SourceCD+HASH(trim(L.ORIG_FILING_NUMBER,left,right),trim(L.AMOUNT,left,right),trim(L.AGENCY,left,right),
-		//																		trim(L.ORIG_FILING_DATE,left,right),trim(L.FILING_BOOK,left,right),trim(L.FILING_PAGE,left,right));
-	
-		self.process_date					:= (STRING8)Std.Date.Today();
 		self.persistent_record_id := 	HASH64(trim(L.tmsid,left,right)+ ','+
 																					trim(L.rmsid,left,right)+  ','+
 																					trim(L.filing_jurisdiction,left,right)+  ','+
@@ -129,9 +121,9 @@ PRTE2_Liens.Layouts.party_base_ext xfmNamesAddr(addr_clean L) := TRANSFORM
 		
 	//Linking ID's
 	self.bdid						:= IF(trim(self.cname) != '', (string)Prte2.fn_AppendFakeID.bdid(self.cname, self.prim_range, self.prim_name, self.v_city_name, self.st, self.zip, L.cust_name),'');
-	self.DID						:= IF(trim(self.lname) != '', (string)prte2.fn_AppendFakeID.did(self.fname, self.lname, L.ssn, L.link_dob, L.cust_name), '');
+	self.DID						:= IF(trim(self.lname) != '', (string)prte2.fn_AppendFakeID.did(self.fname, self.lname, L.link_ssn, L.link_dob, L.cust_name), '');
 
-	vLinkingIds := Prte2.fn_AppendFakeID.LinkIds(L.orig_full_debtorname, L.tax_id, L.link_inc_date, L.prim_range, L.prim_name, L.sec_range, L.v_city_name, L.st, L.zip, L.cust_name);
+	vLinkingIds := Prte2.fn_AppendFakeID.LinkIds(L.orig_full_debtorname, L.link_fein, L.link_inc_date, L.prim_range, L.prim_name, L.sec_range, L.v_city_name, L.st, L.zip, L.cust_name);
 	self.powid	:= vLinkingIds.powid;
 	self.proxid	:= vLinkingIds.proxid;
 	self.seleid	:= vLinkingIds.seleid;

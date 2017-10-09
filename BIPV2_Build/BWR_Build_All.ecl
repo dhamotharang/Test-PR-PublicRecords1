@@ -1,10 +1,10 @@
-import bipv2,bipv2_build,BIPV2_Files,BIPV2_DotID,wk_ut;
+﻿import bipv2,bipv2_build,BIPV2_Files,BIPV2_DotID,wk_ut;
 //version
 lversion              := BIPV2.KeySuffix       ;
 //Start iterations
-DotStartIteration     := 181                   ;
-ProxStartIteration    := 338                   ;
-Lgid3StartIteration   := 229                   ;
+DotStartIteration     := 187                   ;
+ProxStartIteration    := 354                   ;
+Lgid3StartIteration   := 259                   ;
 PowDownStartIteration := 1                     ;
 PowStartIteration     := 1                     ;
 EmpDownStartIteration := 1                     ;
@@ -66,7 +66,8 @@ SkipEmp               := SkipEmpDown          ;
 SkipCommonBase        := SkipEmp              ;
 SkipXlink             := SkipCommonBase       ; // -- Thread 1
 SkipCopyXlinkKeys     := SkipXlink            ; // --
-SkipXlinkSample       := SkipCopyXlinkKeys    ; // --
+SkipXlinkValidation   := SkipCopyXlinkKeys    ; // --
+SkipXlinkSample       := SkipXlinkValidation  ; // --
 SkipWeeklyKeys        := SkipXlinkSample      ; // --
 SkipBest              := SkipWeeklyKeys       ; // -- Thread 2
 SkipIndustry          := SkipBest             ; // --
@@ -154,6 +155,7 @@ BIPV2_Build.proc_build_all(
   ,pSkipCommonBase        := SkipCommonBase
   ,pSkipXlink             := SkipXlink
   ,pSkipCopyXlinkKeys     := SkipCopyXlinkKeys
+  ,pSkipXlinkValidation   := SkipXlinkValidation
   ,pSkipXlinkSample       := SkipXlinkSample
   ,pSkipWeeklyKeys        := SkipWeeklyKeys
   ,pSkipBest              := SkipBest

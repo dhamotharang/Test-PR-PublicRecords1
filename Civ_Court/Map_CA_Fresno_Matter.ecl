@@ -1,11 +1,14 @@
-IMPORT Civ_Court, civil_court, crim_common, ut, lib_StringLib; 
+﻿IMPORT Civ_Court, civil_court, crim_common, ut, lib_StringLib, Std; 
 
 #option('multiplePersistInstances',FALSE);
 
 fFresno := Civ_court.File_In_CA_Fresno(trim(case_title,all) <> '' and not regexfind('In re: [0-9]+',case_title,nocase));
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Matter tFresno(fFresno input) := TRANSFORM
 self.process_date				:= civil_court.Version_Development;
@@ -27,10 +30,10 @@ self.court						  :=	map(self.court_code = 'CE' => 'FRESNO COUNTY: CENTRAL DIVIS
 self.case_number				:= UpperCaseNum;
 self.case_type_code			:= ut.CleanSpacesAndUpper(input.case_type)[1..2];
 self.case_type					:= StringLib.StringCleanSpaces(REGEXREPLACE('LIMITED -|UNLIMITED -',ut.CleanSpacesAndUpper(input.case_type)[3..],''));
-CleanFileDate						:= ut.ConvertDate(input.file_date);
+CleanFileDate						:= Std.date.ConvertDateFormatMultiple(input.file_date,fmtsin,fmtout);
 self.filing_date				:= IF(trim(input.file_date,all) <> '', CleanFileDate, '');
 self.disposition_description	:= ut.CleanSpacesAndUpper(input.current_case_status);
-CleanStatusDte					:= ut.ConvertDate(input.case_status_date);
+CleanStatusDte					:= Std.date.ConvertDateFormatMultiple(input.case_status_date,fmtsin,fmtout);
 self.disposition_date		:= IF(trim(input.case_status_date,all) <> '', CleanStatusDte,'');
 self := [];
 END;

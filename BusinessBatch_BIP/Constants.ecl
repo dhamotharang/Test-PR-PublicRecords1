@@ -1,4 +1,4 @@
-EXPORT Constants :=
+﻿EXPORT Constants :=
 MODULE
 
   // Defaults
@@ -22,6 +22,8 @@ MODULE
     EXPORT INTEGER2 TwoYearsInDays        := -730;
 		EXPORT UNSIGNED4 MAXProps             := 10000;
 		EXPORT UNSIGNED4 MAXUccs              := 10000;
+		EXPORT UNSIGNED4 MAXDivCert           := 10000;
+		EXPORT UNSIGNED4 MAXOshair            := 10000;
   END;
 	
 	EXPORT MVR :=

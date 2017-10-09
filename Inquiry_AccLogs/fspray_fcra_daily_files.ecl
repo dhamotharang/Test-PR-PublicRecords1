@@ -1,4 +1,4 @@
-import Versioncontrol, _Control, std;
+﻿import Versioncontrol, _Control, std;
 
 EXPORT fspray_fcra_daily_files := module
 	
@@ -30,8 +30,8 @@ EXPORT fspray_fcra_daily_files := module
 				 ,Inquiry_AccLogs.fSprayInputFiles(GetFiles(sprayingDir), true)
 				 ,nothor(apply(GetFiles(sprayingDir), STD.File.MoveExternalFile(pServerIP, sprayingDir + name, doneDir + name)))				 
 				 ,notify('Spray Complete','*')
-					) : SUCCESS(FileServices.SendEmail('jose.bello@lexisnexis.com, debendra.kumar@lexisnexis.com, Sudhir.Kasavajjala@lexisnexis.com,john.freibaum@lexisnexis.com, Fernando.Incarnacao@lexisnexis.com, Wenhong.Ma@lexisnexis.com','FCRA Logs Spray Complete - Inquiry Tracking, Score and Attribute', thorlib.wuid())),
-								Failure(FileServices.SendEmail('jose.bello@lexisnexis.com, debendra.kumar@lexisnexis.com, Sudhir.Kasavajjala@lexisnexis.com,john.freibaum@lexisnexis.com, Fernando.Incarnacao@lexisnexis.com, Wenhong.Ma@lexisnexis.com', 'FCRA Input Logs Spray Fail', thorlib.wuid()
+					) : SUCCESS(FileServices.SendEmail('jose.bello@lexisnexis.com, debendra.kumar@lexisnexis.com, Sudhir.Kasavajjala@lexisnexis.com, Fernando.Incarnacao@lexisnexis.com, Wenhong.Ma@lexisnexis.com','FCRA Logs Spray Complete - Inquiry Tracking, Score and Attribute', thorlib.wuid())),
+								Failure(FileServices.SendEmail('jose.bello@lexisnexis.com, debendra.kumar@lexisnexis.com, Sudhir.Kasavajjala@lexisnexis.com, Fernando.Incarnacao@lexisnexis.com, Wenhong.Ma@lexisnexis.com', 'FCRA Input Logs Spray Fail', thorlib.wuid()
                 + '\n  *  Please go to bctlpedata10 inquiry_data_01 spray_ready to see what files need to be sprayed. May need gunzip. Resubmit WU.'+'\n' + FAILMESSAGE));
 								
 end;

@@ -1,11 +1,14 @@
-IMPORT Civ_Court, civil_court, crim_common, ut, lib_StringLib; 
+﻿IMPORT Civ_Court, civil_court, crim_common, ut, lib_StringLib, Std; 
 
 #option('multiplePersistInstances',FALSE);
 
 fLake := Civ_court.File_In_FL_Lake;
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 	
 Civil_Court.Layout_In_Matter tLake(fLake input) := TRANSFORM
 self.process_date				:= civil_court.Version_Development;
@@ -18,7 +21,7 @@ self.court_code					:= '';
 self.court							:= 'FLORIDA CIVIL COURT: LAKE COUNTY';
 self.case_number				:= UpperCaseNum;
 self.case_type					:= 'EVICTIONS';
-self.disposition_date		:= IF(trim(input.date_of_eviction,all) <> '', ut.ConvertDate(input.date_of_eviction), '');
+self.disposition_date		:= IF(trim(input.date_of_eviction,all) <> '', Std.date.ConvertDateFormatMultiple(input.date_of_eviction,fmtsin,fmtout), '');
 self := [];
 END;
 

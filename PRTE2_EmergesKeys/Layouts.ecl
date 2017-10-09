@@ -1,4 +1,4 @@
-Import header, emerges;
+﻿Import header, emerges;
 
 EXPORT Layouts := module
 
@@ -216,6 +216,8 @@ unsigned8 persistent_record_id;
 string PreyType;
 string cust_name;
 string bug_num;
+string8 link_dob;
+string9 link_ssn;
 END;
 
 Export CCW_Base_Layout := RECORD

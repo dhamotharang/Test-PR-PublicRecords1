@@ -12,7 +12,7 @@ EXPORT Spray_LIDB_Response(string version, const varstring eclsourceip, string t
 																				'\t',
 																				'\r\n',
 																				,
-																				thor_name,
+																				STD.System.Thorlib.Group(),
 																				root + version, 
 																				,
 																				,
