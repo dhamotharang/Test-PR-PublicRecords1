@@ -1997,6 +1997,7 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxProfLicense     := 100;
 		export unsigned2 MaxProperties      := 200;
 		export unsigned2 MaxStudent         := 100;
+		export unsigned2 MaxSSN             := 100;
 		export unsigned2 MaxSOffenders      := 200;
 		export unsigned2 MaxUCCFilings      := 1000;
 		export unsigned2 MaxThrive          := 1000;

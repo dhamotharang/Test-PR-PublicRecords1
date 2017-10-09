@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="proxidSliceOutService">
 <part name="Baseproxid" type="xsd:string"/>
 <part name="Basercid" type="xsd:string"/>
@@ -7,7 +7,7 @@
 */
 /*--INFO-- Look to see if Basercid should be plucked out of Baseproxid. If a preferred proxid is provided it will be compared to the RID too.*/
 export proxidSliceOutService := MACRO
-  IMPORT SALT33,BizLinkFull;
+  IMPORT SALT28,BizLinkFull;
 string20 rcidstr := ''  : stored('Basercid');
 string20 proxidstr := ''  : stored('Baseproxid');
 string20 Pref_proxidstr := ''  : stored('Preferredproxid');
@@ -37,4 +37,4 @@ output( odr,named('PreferredproxidValues'));
 output( odl_noprop,named('proxidValues_NoProp'));
 output( odr_noprop,named('PreferredproxidValues_NoProp'));
 endmacro;
- 
+

@@ -11,13 +11,8 @@
 EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 										Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := FUNCTION
 
-
-	//get unique addrress for businesses coming in
-	sortInData := SORT(inData, seq, Busn_info.BIP_IDs.UltID.LinkID, Busn_info.BIP_IDs.OrgID.LinkID, Busn_info.BIP_IDs.SeleID.LinkID, Busn_info.address.prim_range, Busn_info.address.prim_name, Busn_info.address.addr_suffix, Busn_info.address.postdir, Busn_info.address.zip5);
-	dedupInData  :=  DEDUP(sortInData, seq, Busn_info.BIP_IDs.UltID.LinkID, Busn_info.BIP_IDs.OrgID.LinkID, Busn_info.BIP_IDs.SeleID.LinkID, Busn_info.address.prim_range, Busn_info.address.prim_name, Busn_info.address.addr_suffix, Busn_info.address.postdir, Busn_info.address.zip5);
-
 	/*Taken from Business_Risk_BIP.getBusinessHeader*/
-	withAdvoRaw := JOIN(dedupInData, Advo.Key_Addr1_history,
+	withAdvoRaw := JOIN(indata, Advo.Key_Addr1_history,
 											LEFT.Busn_info.address.zip5 != '' AND 
 											LEFT.Busn_info.address.prim_range != '' AND
 											KEYED(LEFT.Busn_info.address.zip5 = RIGHT.zip) AND

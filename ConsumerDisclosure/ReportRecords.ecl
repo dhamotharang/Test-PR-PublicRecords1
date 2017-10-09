@@ -3,12 +3,6 @@
 EXPORT ReportRecords(dataset(doxie.layout_references) in_dids, ConsumerDisclosure.IParams.IParam in_mod) := 
 FUNCTION
 	
-	boolean inc_all := in_mod.IncludeAll;	
-	boolean inc_atf := inc_all or in_mod.IncludeATF;
-	boolean inc_bk := inc_all or in_mod.IncludeBankruptcy;
-	boolean inc_death := inc_all or in_mod.IncludeDeath;
-	boolean inc_gong := inc_all or in_mod.IncludeGong;
-	
 	// person context/consumer statements
 	in_pc := project(in_dids, transform(FFD.Layouts.DidBatch, self.acctno := (string) counter; self.did := left.did;));
 	pc_recs := FFD.FetchPersonContext(in_pc, in_mod.gateways);
@@ -17,35 +11,29 @@ FUNCTION
 		
 	in_uniqids := PROJECT(in_dids, doxie.layout_best);
 	
-	// Do we need best records? 
-	//best_recs := doxie.best_records(in_dids, IsFCRA := TRUE);
-
-	// In cases when best recs is not returned for LexId, 
-	// For ex, in case when all header records are suppressed
-	//best_recs_for_flag_file := IF(EXISTS(best_recs), best_recs, in_uniqids);
-  
-	// FCRA overrides flag file - maybe use just input LexId?  
-	// Do we need to support SSN for override flags ?
   flag_file := FFD.GetFlagFile(in_uniqids, pc_recs);
 	
-	aircraft_recs := if(inc_all or in_mod.IncludeAircraft, ConsumerDisclosure.RawAircraft.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-	american_student_recs := if(inc_all or in_mod.IncludeStudent, ConsumerDisclosure.RawStudent.GetASLData(in_dids, flag_file, slim_pc_recs, in_mod));
-	alloy_media_student_recs := if(inc_all or in_mod.IncludeStudent, ConsumerDisclosure.RawStudent.GetAlloyMSData(in_dids, flag_file, slim_pc_recs, in_mod));
-  atf_recs := if(inc_atf, ConsumerDisclosure.RawATF.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-	bk_recs := if(inc_bk, ConsumerDisclosure.RawBankruptcy.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-	death_recs := if(inc_death, ConsumerDisclosure.RawDeathDID.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-	email_recs := if(inc_all or in_mod.IncludeEmail, ConsumerDisclosure.RawEmail.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-	gong_recs := if(inc_gong, ConsumerDisclosure.RawGong.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-	huntfish_recs := if(inc_all or in_mod.IncludeHuntingFishing, ConsumerDisclosure.RawHuntingFishing.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-	infutor_recs := if(inc_all or in_mod.IncludeInfutor, ConsumerDisclosure.RawInfutor.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-	marriage_recs := if(inc_all or in_mod.IncludeMarriageDivorce, ConsumerDisclosure.RawMarriageDivorce.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-	paw_recs := if(inc_all or in_mod.IncludePAW, ConsumerDisclosure.RawPeopleAtWork.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-	pilot_recs := if(inc_all or in_mod.IncludePilot, ConsumerDisclosure.RawPilot.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-	proflic_recs := if(inc_all or in_mod.IncludeProfLicense, ConsumerDisclosure.RawProfLicense.GetV2Data(in_dids, flag_file, slim_pc_recs, in_mod));
-	proflic_mari_recs := if(inc_all or in_mod.IncludeProfLicense, ConsumerDisclosure.RawProfLicense.GetMariData(in_dids, flag_file, slim_pc_recs, in_mod));
-	watercraft_recs := if(inc_all or in_mod.IncludeWatercraft, ConsumerDisclosure.RawWatercraft.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-	thrive_recs := if(inc_all or in_mod.IncludeThrive, ConsumerDisclosure.RawThrive.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
-	ucc_recs := if(inc_all or in_mod.IncludeUCC, ConsumerDisclosure.RawUCC.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	aircraft_recs := if(in_mod.IncludeAircraft, ConsumerDisclosure.RawAircraft.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	american_student_recs := if(in_mod.IncludeStudent, ConsumerDisclosure.RawStudent.GetASLData(in_dids, flag_file, slim_pc_recs, in_mod));
+	alloy_media_student_recs := if(in_mod.IncludeStudent, ConsumerDisclosure.RawStudent.GetAlloyMSData(in_dids, flag_file, slim_pc_recs, in_mod));
+  atf_recs := if(in_mod.IncludeATF, ConsumerDisclosure.RawATF.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	bk_recs := if(in_mod.IncludeBankruptcy, ConsumerDisclosure.RawBankruptcy.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	crim_recs := if(in_mod.IncludeCriminal, ConsumerDisclosure.RawCriminal.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	death_recs := if(in_mod.IncludeDeath, ConsumerDisclosure.RawDeathDID.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	email_recs := if(in_mod.IncludeEmail, ConsumerDisclosure.RawEmail.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	gong_recs := if(in_mod.IncludeGong, ConsumerDisclosure.RawGong.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	huntfish_recs := if(in_mod.IncludeHuntingFishing, ConsumerDisclosure.RawHuntingFishing.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	infutor_recs := if(in_mod.IncludeInfutor, ConsumerDisclosure.RawInfutor.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	marriage_recs := if(in_mod.IncludeMarriageDivorce, ConsumerDisclosure.RawMarriageDivorce.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	paw_recs := if(in_mod.IncludePAW, ConsumerDisclosure.RawPeopleAtWork.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	pilot_recs := if(in_mod.IncludePilot, ConsumerDisclosure.RawPilot.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	proflic_recs := if(in_mod.IncludeProfLicense, ConsumerDisclosure.RawProfLicense.GetV2Data(in_dids, flag_file, slim_pc_recs, in_mod));
+	proflic_mari_recs := if(in_mod.IncludeProfLicense, ConsumerDisclosure.RawProfLicense.GetMariData(in_dids, flag_file, slim_pc_recs, in_mod));
+	property_recs := if(in_mod.IncludeProperties, ConsumerDisclosure.RawProperty.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	thrive_recs := if(in_mod.IncludeThrive, ConsumerDisclosure.RawThrive.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	so_recs := if(in_mod.IncludeOffenders, ConsumerDisclosure.RawOffender.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	ucc_recs := if(in_mod.IncludeUCC, ConsumerDisclosure.RawUCC.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
+	watercraft_recs := if(in_mod.IncludeWatercraft, ConsumerDisclosure.RawWatercraft.GetData(in_dids, flag_file, slim_pc_recs, in_mod));
 
 	// ------- OUTPUT section ----------------
 	iesp.fcradataservice.t_FcraDataServiceReport xformResult() := TRANSFORM
@@ -54,6 +42,7 @@ FUNCTION
 		SELF.AmericanStudent := PROJECT(american_student_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceAmericanStudentData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
 		SELF.ATF := PROJECT(atf_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceATFData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
 		SELF.Bankruptcy := PROJECT(bk_recs, ConsumerDisclosure.Transforms.xformBKData(LEFT));
+		SELF.Criminal := PROJECT(crim_recs, ConsumerDisclosure.Transforms.xformCriminalData(LEFT));
 		SELF.DeathDid := PROJECT(death_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceDeathDidData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
 		SELF.Email := PROJECT(email_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceEmailData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
 		SELF.Gong := PROJECT(gong_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceGongData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
@@ -64,9 +53,11 @@ FUNCTION
 		SELF.Pilot := PROJECT(pilot_recs, ConsumerDisclosure.Transforms.xformPilotData(LEFT));
 		SELF.ProfessionalLicense := PROJECT(proflic_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceProfLicenseData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
 		SELF.ProfLicenseMari := PROJECT(proflic_mari_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceProfLicenseMariData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
-		SELF.Watercraft := PROJECT(watercraft_recs, ConsumerDisclosure.Transforms.xformWatercraftData(LEFT));
+		SELF.Property := PROJECT(property_recs, ConsumerDisclosure.Transforms.xformPropertyData(LEFT));
 		SELF.Thrive := PROJECT(thrive_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceThriveData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
+		SELF.SexOffenders := PROJECT(so_recs, ConsumerDisclosure.Transforms.xformSexOffenderData(LEFT));
 		SELF.UCC := PROJECT(ucc_recs, ConsumerDisclosure.Transforms.xformUCCData(LEFT));
+		SELF.Watercraft := PROJECT(watercraft_recs, ConsumerDisclosure.Transforms.xformWatercraftData(LEFT));
 		SELF.PersonContext := PROJECT(pc_recs, iesp.fcradataservice.t_FcraDataServicePersonContextRecord); // --> maybe this should be the raw records as returned from person context instead?
 		SELF:=[];
 	END;

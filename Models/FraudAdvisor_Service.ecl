@@ -1,4 +1,4 @@
-/*2016-04-23T00:03:40Z (Dave Schlangen_Prod)
+﻿/*2016-04-23T00:03:40Z (Dave Schlangen_Prod)
 uncommented billing index for fp1511_1
 */
 //=============================================
@@ -317,22 +317,22 @@ isWFS34 := (cmNameValue = 'ain801_1');
 	
 Grade_Value := cmGradeValue; // To mask wfs3/4 using Grade.
 
-// The â€˜fraudpoint2_modelsâ€™ set are models that return risk indicies and so need the expanded layout.
+// The ‘fraudpoint2_models’ set are models that return risk indicies and so need the expanded layout.
 fraudpoint2_models := ['fp1109_0', 'fp1109_9', 'fp1307_2', 'fp1307_1', 'fp31310_2',
 	'fp1509_2','fp1512_1','fp31604_0', 'fp1303_1','fp1404_1','fp1407_1','fp1407_2'];
 
-// The â€˜fraudpoint3_modelsâ€™ set are the FraudPoint 3.0 flagship models only.
+// The ‘fraudpoint3_models’ set are the FraudPoint 3.0 flagship models only.
 fraudpoint3_models := ['fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9'];
 
-fraudpoint3_custom_models := ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1'];
+fraudpoint3_custom_models := ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1'];
 
-// The â€˜custom_modelsâ€™ set are all possible models and so add any new model name to this set.  The model requested must be in this set or the query will return an â€œInvalid modelâ€ error. 
+// The ‘custom_models’ set are all possible models and so add any new model name to this set.  The model requested must be in this set or the query will return an “Invalid model” error. 
 custom_models := ['fp3710_0', 'fp3904_1', 'fp3905_1', 'idn6051', 'fd5609_2', 'fp3710_9', 'fp1109_0', 'fp1109_9', 'fp31203_1', 'fp31105_1',
 									'fp1303_1', 'fp1310_1', 'fp1401_1', 'fp31310_2', 'fp1307_1', 'fp1307_2', 'fp1404_1', 'fp1407_1', 'fp1407_2', 'fp1406_1',
 									'fp1403_2',	'fp1409_2', 'fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1509_2','fp1509_1',
-									'fp1510_2', 'fp1511_1', 'fp1512_1','fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1'];
+									'fp1510_2', 'fp1511_1', 'fp1512_1','fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1'];
 
-// The â€˜bill_to_ship_to_modelsâ€™ set are models that use the new second input address that was introduced in Fraudpoint 3.0.
+// The ‘bill_to_ship_to_models’ set are models that use the new second input address that was introduced in Fraudpoint 3.0.
 bill_to_ship_to_models := ['fp1409_2', 'fp1509_2'];
 
 invalidCustomRequest := (((cmModelName = 'customfa_service' AND ~isWFS34) AND
@@ -522,7 +522,10 @@ test_prep := PROJECT(d,into_test_prep(LEFT));
 //  options
 doRelatives      := true;
 doDL             := false;
-doVehicle        := (model_name IN ['fp31105_1','fp3904_1', 'fp1407_1', 'fp1407_2', 'fp1506_1','fp1509_2', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1']) or doAttributesVersion2;
+doVehicle        := (model_name IN ['fp31105_1','fp3904_1', 'fp1407_1', 'fp1407_2', 'fp1506_1','fp1509_2', 
+                                    'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1610_1', 
+																		'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1']) 
+																or doAttributesVersion2;
 doDerogs         := true;
 isLn             := false;     // set ln branded to activate exp dl sources in iid getheader in < 5 shells.
 suppressNearDups := model_name in ['idn6051', 'fd5609_2'] OR isWFS34 OR doIDAttributes;
@@ -542,7 +545,7 @@ isUtility					:= IF(isWFS34 OR doIDAttributes, FALSE, inIsUtility);
 IncludeDLverification := if(doAttributesVersion2, true, false);
 bsVersion := map(
 	model_name IN ['fp1506_1', 'fp31505_0', 'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9','fp1509_1','fp1512_1',
-		'fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1'] => 51, 
+		'fp31604_0', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1'] => 51, 
 	doAttributesVersion201 => 50,
 	model_name IN ['fp1509_2','fp1510_2','fp1511_1'] => 50,
 	model_name IN ['fp1303_1', 'fp1310_1', 'fp1401_1', 'fp31310_2', 'fp1307_1', 'fp1307_2', 'fp1404_1', 'fp1407_1', 'fp1407_2', 'fp1406_1', 'fp1403_2', 'fp1409_2'] => 41,
@@ -561,7 +564,8 @@ unsigned8 BSOptions := map(model_name='fp31604_0' and input_ok   => Risk_indicat
 																																	+ risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary ,
 													 model_name IN ['fp31203_1', 'fp1303_1', 'fp1310_1', 'fp1401_1', 'fp31310_2', 'fp1307_1','fp1404_1',
 																					'fp1407_1', 'fp1407_2', 'fp1406_1', 'fp1506_1', 'fp1509_2','fp1509_1', 'fp31505_0',
-																					'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1511_1','fp1512_1', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1']
+																					'fp3fdn1505_0', 'fp31505_9', 'fp3fdn1505_9', 'fp1511_1','fp1512_1', 'fp1610_1', 
+																					'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1']
 													 or doAttributesVersion2               => Risk_indicators.iid_constants.BSOptions.IncludeDoNotMail
 																																	+ Risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity
 																																	+ risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary
@@ -599,8 +603,8 @@ clam_BtSt :=
 	
 	
 /* Validation Mode - Uncomment the two lines below and hit your model */
-	  //ModelValidationResults := Models.FP1610_2_0(ungroup(clam), 6);
-	  //OUTPUT(ModelValidationResults, named('Results'));
+	  // ModelValidationResults := Models.FP1702_2_0(ungroup(clam), 6);
+	  // OUTPUT(ModelValidationResults, named('Results'));
 	
 //================================================================
 //===   Comment out all remaining for debug/validation mode   ====
@@ -609,7 +613,7 @@ clam_BtSt :=
  /* *************************************
   *   Boca Shell Logging Functionality  *
   ***************************************/
-  
+ 
 		productID := Risk_Reporting.ProductID.Models__FraudAdvisor_Service;
 	
     intermediate_Log := Risk_Reporting.To_LOG_Boca_Shell(clam, productID, bsVersion);
@@ -625,6 +629,7 @@ attributes := Models.getFDAttributes(clam, iid, account_value, ipdata, model_nam
 attr_test_seed := Risk_Indicators.FDAttributes_TestSeed_Function(test_prep, account_value, Test_Data_Table_Name);																						
 // choose either test seed or real
 pick_attr := if(Test_Data_Enabled, attr_test_seed, ungroup(attributes));			
+//pick_attr := ungroup(attributes);			
 
 
 checkBoolean(boolean x) := if(x, '1', '0');									
@@ -1905,6 +1910,8 @@ ret_fraudpoint3 := case( model_name,
 	'fp1609_1' => Models.FP1609_1_0( ungroup(clam), 6),
 	'fp1611_1' => Models.FP1611_1_0( ungroup(clam), 6),
 	'fp1606_1' => Models.FP1606_1_0( ungroup(clam), 6),
+	'fp1702_2' => Models.FP1702_2_0( ungroup(clam), 6),
+	'fp1702_1' => Models.FP1702_1_0( ungroup(clam), 6),
 	dataset( [], Models.Layouts.layout_fp1109 )
 );
 
@@ -1950,7 +1957,9 @@ TRANSFORM
 	reason_codes_temp :=
 		PROJECT(le,form_rc(LEFT)) + PROJECT(le,form_rc2(LEFT)) + PROJECT(le,form_rc3(LEFT)) + PROJECT(le,form_rc4(LEFT))
 		+ if( model_name in ['fp3710_0', 'fp3904_1', 'fp3905_1', 'fp3710_9', 'fp31203_1', 'fp31105_1', 'fp1310_1', 'fp1401_1', 'fp31310_2', 'fp1404_1',
-		                     'fp1407_1', 'fp1407_2', 'fp1406_1', 'fp1403_2', 'fp1506_1', 'fp1509_2','fp1509_1','fp1510_2','fp1511_1', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1606_1'], 
+		                     'fp1407_1', 'fp1407_2', 'fp1406_1', 'fp1403_2', 'fp1506_1', 'fp1509_2','fp1509_1',
+												 'fp1510_2','fp1511_1', 'fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1606_1','fp1702_2',
+												 'fp1702_1'], 
 		PROJECT(le,form_rc5(LEFT)) + PROJECT(le,form_rc6(LEFT)) );
 	risk_indicators.MAC_add_sequence(reason_codes_temp(reason_code<>''), reason_codes_with_seq);
 	self.reason_codes := reason_codes_with_seq;
@@ -2060,6 +2069,7 @@ TRANSFORM
 END;
 fraudpoint2_model := if(input_ok, 
 	project(if(test_data_enabled, fp_test_seed, ret_fraudpoint2), form_fraudpoint2_model(LEFT)), 
+//	project( ret_fraudpoint2, form_fraudpoint2_model(LEFT)), 
 	dataset([], models.layouts.FP_layout_model) );
 
 //new for FraudPoint 3.0
@@ -2082,10 +2092,12 @@ TRANSFORM
 		'fp1609_1' => Risk_Indicators.BillingIndex.FP1609_1,
 		'fp1611_1' => Risk_Indicators.BillingIndex.FP1611_1,
 		'fp1606_1' => Risk_Indicators.BillingIndex.FP1606_1,
+		'fp1702_2' => Risk_Indicators.BillingIndex.FP1702_2,
+		'fp1702_1' => Risk_Indicators.BillingIndex.FP1702_1,
 		''
 	);
 
-	IncludeRiskIndicesFinal := if( model_name in ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1'], true, IncludeRiskIndices);	
+	IncludeRiskIndicesFinal := if( model_name in ['fp1610_1', 'fp1610_2', 'fp1609_1', 'fp1611_1', 'fp1606_1','fp1702_2','fp1702_1'], true, IncludeRiskIndices);	
 	self.StolenIdentityIndex        := if(IncludeRiskIndicesFinal, le.StolenIdentityIndex, '');
 	self.SyntheticIdentityIndex     := if(IncludeRiskIndicesFinal, le.SyntheticIdentityIndex, '');
 	self.ManipulatedIdentityIndex   := if(IncludeRiskIndicesFinal, le.ManipulatedIdentityIndex, '');
@@ -2106,12 +2118,15 @@ TRANSFORM
 													model_name = 'fp1609_1'	=> 'FraudPointFP1609_1',
 													model_name = 'fp1611_1'	=> 'FraudPointFP1611_1',
 													model_name = 'fp1606_1'	=> 'FraudPointFP1606_1',
+													model_name = 'fp1702_2'	=> 'FraudPointFP1702_2',
+													model_name = 'fp1702_1'	=> 'FraudPointFP1702_1',
 																												 'FraudPoint');	
 	self.scores := project(le, form_fp3score(left));
 
 END;
 fraudpoint3_model := if(input_ok, 
 	project(if(test_data_enabled, fp_test_seed, ret_fraudpoint3), form_fraudpoint3_model(LEFT)), 
+//	project(ret_fraudpoint3, form_fraudpoint3_model(LEFT)), 
 	dataset([], models.layouts.FP_layout_model) );
 
 //end FP 3.0 code
@@ -2130,6 +2145,7 @@ fd_seeds := seed_files.GetFraudDefender(test_prep, account_value, Test_Data_Tabl
 
 
 final_v1 := if(Test_Data_Enabled, fd_seeds, final2);
+//final_v1 := final2;
 
 //=============================================
 //===  custom model descriptions            ===

@@ -1,8 +1,9 @@
-IMPORT EmailService, codes, Suppress;
+﻿IMPORT EmailService, codes, Suppress;
 EXPORT fn_dedup_email(Dataset(doxie.layout_references) dids,
-  string6 ssn_mask = '', string32 appType = Suppress.Constants.ApplicationTypes.DEFAULT) := FUNCTION
+  string6 ssn_mask = '', string32 appType = Suppress.Constants.ApplicationTypes.DEFAULT,
+	string5 industry_class = '') := FUNCTION
  
-  inRecs := doxie.email_records(dids,ssn_mask,appType);
+  inRecs := doxie.email_records(dids,ssn_mask,appType,,industry_class);
 	
   in_Layout_w_seq := record
 	  integer seq;

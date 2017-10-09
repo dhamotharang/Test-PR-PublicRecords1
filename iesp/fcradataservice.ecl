@@ -201,8 +201,20 @@ export t_FcraDataServiceEmailData := record
 	iesp.fcradataservice_raw.t_FcraDataServiceRawEmail Rawdata {xpath('Rawdata')};
 end;
 		
+export t_FcraDataServiceHeaderComplianceFlags := record (iesp.fcradataservice_common.t_FcraDataServiceComplianceFlags)
+	boolean isPropagatedCorrection {xpath('isPropagatedCorrection')};
+end;
+		
+export t_FcraDataServiceHeaderMetadata := record
+	string12 LexId {xpath('LexId')};
+	string20 Datagroup {xpath('Datagroup')};
+	iesp.fcradataservice_common.t_FcraDataServiceRecID RecID {xpath('RecID')};
+	unsigned StatementId {xpath('StatementId')};
+	t_FcraDataServiceHeaderComplianceFlags ComplianceFlags {xpath('ComplianceFlags')};
+end;
+		
 export t_FcraDataServiceHeaderData := record
-	iesp.fcradataservice_common.t_FcraDataServiceMetadata Metadata {xpath('Metadata')};
+	t_FcraDataServiceHeaderMetadata Metadata {xpath('Metadata')};
 	iesp.fcradataservice_raw.t_FcraDataServiceRawHeader Rawdata {xpath('Rawdata')};
 end;
 		
@@ -256,11 +268,13 @@ end;
 export t_FcraDataServicePropertyAssessmentData := record
 	iesp.fcradataservice_common.t_FcraDataServiceMetadata Metadata {xpath('Metadata')};
 	iesp.fcradataservice_raw.t_FcraDataServiceRawPropertyAssessment Rawdata {xpath('Rawdata')};
+	iesp.fcradataservice_raw.t_FcraDataServiceRawPropertyAddlLegal AddlLegalDescription {xpath('AddlLegalDescription')};
 end;
 		
 export t_FcraDataServicePropertyDeedData := record
 	iesp.fcradataservice_common.t_FcraDataServiceMetadata Metadata {xpath('Metadata')};
 	iesp.fcradataservice_raw.t_FcraDataServiceRawPropertyDeed Rawdata {xpath('Rawdata')};
+	dataset(iesp.fcradataservice_raw.t_FcraDataServiceRawPropertyAddlNames) AdditionalNames {xpath('AdditionalNames/Row'), MAXCOUNT(iesp.Constants.DataService.MaxDefault)};
 end;
 		
 export t_FcraDataServicePropertySearchData := record
@@ -278,6 +292,12 @@ end;
 export t_FcraDataServiceThriveData := record
 	iesp.fcradataservice_common.t_FcraDataServiceMetadata Metadata {xpath('Metadata')};
 	iesp.fcradataservice_raw.t_FcraDataServiceRawThrive Rawdata {xpath('Rawdata')};
+end;
+		
+export t_FcraDataServiceSSNData := record
+	iesp.fcradataservice_common.t_FcraDataServiceMetadata Metadata {xpath('Metadata')};
+	iesp.fcradataservice_raw.t_FcraDataServiceRawSSN Rawdata {xpath('Rawdata')};
+	iesp.fcradataservice_raw.t_FcraDataServiceRawSSNSources SourceData {xpath('SourceData')};
 end;
 		
 export t_FcraDataServiceSOffenderMainData := record
@@ -358,6 +378,7 @@ export t_FcraDataServiceReport := record
 	dataset(t_FcraDataServicePersonContextRecord) PersonContext {xpath('PersonContext/Row'), MAXCOUNT(iesp.Constants.DataService.MaxPersonContext)};
 	dataset(t_FcraDataServicePropertyData) Property {xpath('Property/Row'), MAXCOUNT(iesp.Constants.DataService.MaxProperties)};
 	dataset(t_FcraDataServiceSOData) SexOffenders {xpath('SexOffenders/Row'), MAXCOUNT(iesp.Constants.DataService.MaxSOffenders)};
+	dataset(t_FcraDataServiceSSNData) SSN {xpath('SSN/Row'), MAXCOUNT(iesp.Constants.DataService.MaxSSN)};
 	dataset(t_FcraDataServiceThriveData) Thrive {xpath('Thrive/Row'), MAXCOUNT(iesp.Constants.DataService.MaxThrive)};
 	dataset(t_FcraDataServiceUCCData) UCC {xpath('UCC/Row'), MAXCOUNT(iesp.Constants.DataService.MaxUCCFilings)};
 	dataset(t_FcraDataServiceWatercraftData) Watercraft {xpath('Watercraft/Row'), MAXCOUNT(iesp.Constants.DataService.MaxWatercrafts)};
