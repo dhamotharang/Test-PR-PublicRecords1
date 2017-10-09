@@ -256,10 +256,15 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self.incident						:=L.ir_number;
 				self.Prepped_rec_type		:=Bair._Constant.Events_Persons_persons_address;
 				self.name_type					:=L.name_type;
-				self.orig_address				:=L.persons_address;														
-				self.orig_City					:=L.city;
-				self.orig_st						:=L.state;
-				self.orig_zip						:=L.zip;
+				self.orig_address				:=L.persons_address;
+				
+				temp_adddr 	:= trim(regexreplace('USA$', L.persons_address, ' ' ), left, right);
+				goodAddr 		:= if(count(STD.STr.SplitWords(temp_adddr,',')) = 3, true, false);
+				
+				self.orig_City					:=trim(if(goodAddr, STD.STr.SplitWords(temp_adddr,',')[2], ''), left, right);
+				self.orig_st						:=trim(if(goodAddr, regexfind('[a-z]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				self.orig_zip						:=trim(if(goodAddr, regexfind('[0-9]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				
 				self.age								:=bair.fnAge((unsigned4)L.clean_dob);
 				self.orig_moniker				:=trim(L.moniker, left, right);
 				self.name_hint					:='FML';
@@ -305,10 +310,15 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self.incident						:=L.ir_number;
 				self.Prepped_rec_type		:=Bair._Constant.Events_Persons_persons_address;
 				self.name_type					:=L.name_type;
-				self.orig_address				:=L.persons_address;														
-				self.orig_City					:=L.city;
-				self.orig_st						:=L.state;
-				self.orig_zip						:=L.zip;
+				self.orig_address				:=L.persons_address;
+				
+				temp_adddr 	:= trim(regexreplace('USA$', L.persons_address, ' ' ), left, right);
+				goodAddr 		:= if(count(STD.STr.SplitWords(temp_adddr,',')) = 3, true, false);
+				
+				self.orig_City					:=trim(if(goodAddr, STD.STr.SplitWords(temp_adddr,',')[2], ''), left, right);
+				self.orig_st						:=trim(if(goodAddr, regexfind('[a-z]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				self.orig_zip						:=trim(if(goodAddr, regexfind('[0-9]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				
 				self.age								:=bair.fnAge((unsigned4)L.clean_dob);
 				self.orig_moniker				:=trim(L.moniker, left, right);
 				self.name_hint					:='FML';
@@ -359,9 +369,14 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self.incident						:=L.ir_number;
 				self.Prepped_rec_type		:=Bair._Constant.Events_Vehicle_vehicle_address;
 				self.orig_address				:=L.vehicle_address;
-				self.orig_City					:=L.city;
-				self.orig_st						:=L.state;
-				self.orig_zip						:=L.zip;
+				
+				temp_adddr 	:= trim(regexreplace('USA$', L.vehicle_address, ' ' ), left, right);
+				goodAddr 		:= if(count(STD.STr.SplitWords(temp_adddr,',')) = 3, true, false);
+				
+				self.orig_City					:=trim(if(goodAddr, STD.STr.SplitWords(temp_adddr,',')[2], ''), left, right);
+				self.orig_st						:=trim(if(goodAddr, regexfind('[a-z]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				self.orig_zip						:=trim(if(goodAddr, regexfind('[0-9]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				
 				self.plate							:=STD.Str.ToUpperCase(trim(L.plate, left, right));
 				self.plate_st						:=Bair_composite.fn_st2abbrev(trim(L.plate_state, left, right));
 				self.make								:=STD.Str.ToUpperCase(trim(L.make, left, right));
@@ -412,9 +427,14 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self.incident						:=L.ir_number;
 				self.Prepped_rec_type		:=Bair._Constant.Events_Vehicle_vehicle_address;
 				self.orig_address				:=L.vehicle_address;
-				self.orig_City					:=L.city;
-				self.orig_st						:=L.state;
-				self.orig_zip						:=L.zip;
+				
+				temp_adddr 	:= trim(regexreplace('USA$', L.vehicle_address, ' ' ), left, right);
+				goodAddr 		:= if(count(STD.STr.SplitWords(temp_adddr,',')) = 3, true, false);
+				
+				self.orig_City					:=trim(if(goodAddr, STD.STr.SplitWords(temp_adddr,',')[2], ''), left, right);
+				self.orig_st						:=trim(if(goodAddr, regexfind('[a-z]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				self.orig_zip						:=trim(if(goodAddr, regexfind('[0-9]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				
 				self.plate							:=STD.Str.ToUpperCase(trim(L.plate, left, right));
 				self.plate_st						:=Bair_composite.fn_st2abbrev(trim(L.plate_state, left, right));
 				self.make								:=STD.Str.ToUpperCase(trim(L.make, left, right));

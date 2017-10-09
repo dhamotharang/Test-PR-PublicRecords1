@@ -1,10 +1,11 @@
-IMPORT Text_Search, Codes, Header, MDR, bair;
+﻿IMPORT Text_Search, Codes, Header, MDR, bair;
 // Should inherit IFragmentSource, but needs fix for 51580
 EXPORT eventsfragments(Types.StateList st_list=ALL, Boolean pDelta=true) := MODULE
 	//SHARED Persist_Stem 		:= '~THOR_DATA400::PERSIST::FRAGS_';
 	SHARED Persist_events	:= bair_boolean.constants('').persistfile('events');
 
-			mo_file := Bair.files(pUseDelta:=pDelta).mo_Base.built(eid not in set(bair_boolean.temp,ExternalKey));
+			mo_file := Bair.files(pUseDelta:=pDelta).mo_Base.built;
+			// mo_file := Bair.files(pUseDelta:=pDelta).mo_Base.built(eid not in set(bair_boolean.temp,ExternalKey));
 		  mo_base := DISTRIBUTE(mo_file(eid <> '',ir_number<>''),HASH64(eid));
 			
 			mo		:=	project(mo_base,transform(bair_boolean.layout_events_base, 
@@ -47,7 +48,8 @@ EXPORT eventsfragments(Types.StateList st_list=ALL, Boolean pDelta=true) := MODU
 				Self := L;
 			END;
 			
-			persons_file	:= Bair.files(pUseDelta:=pDelta).persons_Base.built(eid not in set(bair_boolean.temp,ExternalKey));
+			persons_file	:= Bair.files(pUseDelta:=pDelta).persons_Base.built;
+			// persons_file	:= Bair.files(pUseDelta:=pDelta).persons_Base.built(eid not in set(bair_boolean.temp,ExternalKey));
 			persons_base	:= DISTRIBUTE(persons_file(eid <> '',ir_number<>''),HASH64(eid));		
 			
 			persons			:=	project(persons_base,
@@ -84,7 +86,8 @@ EXPORT eventsfragments(Types.StateList st_list=ALL, Boolean pDelta=true) := MODU
 					self :=L;
 			END;
 			
-			veh_file := Bair.files(pUseDelta:=pDelta).vehicle_Base.built(eid not in set(bair_boolean.temp,ExternalKey));
+			veh_file := Bair.files(pUseDelta:=pDelta).vehicle_Base.built;
+			// veh_file := Bair.files(pUseDelta:=pDelta).vehicle_Base.built(eid not in set(bair_boolean.temp,ExternalKey));
 				
 			veh_data := PROJECT(veh_file,
 														TRANSFORM(bair_boolean.layout_events_base,
