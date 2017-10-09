@@ -26,7 +26,7 @@ dsRequest := DATASET ([prepRequest()]);
 dsResponse := PersonContext.GetPersonContext(dsRequest[1]);
 
 dsResponseRecords_roxie := TOPN(dsResponse[1].records,
-	iesp.Constants.MAX_CONSUMER_STATEMENTS, 
+	1000, 
 	dsResponse[1].records.LexID,
 	-(integer) stringLib.StringFilter(dsResponse[1].records.dateadded[1..10], '0123456789'));
 

@@ -1,13 +1,15 @@
-﻿IMPORT doxie, FCRA, FFD, Email_Data, ConsumerDisclosure;
+﻿IMPORT doxie, FCRA, FFD, Email_Data, ConsumerDisclosure, STD, UT;
+
+Email_Data_raw := RECORD(Email_Data.Layout_Email.Keys)  
+END;
+
+Email_Data_rawrec := RECORD(Email_Data_raw)
+	ConsumerDisclosure.Layouts.InternalMetadata;
+END;
+	
+
 EXPORT RawEmail := MODULE
 
-	SHARED Email_Data_raw := RECORD(Email_Data.Layout_Email.Keys)  
-	END;
-
-	SHARED Email_Data_rawrec := RECORD(Email_Data_raw)
-		ConsumerDisclosure.Layouts.InternalMetadata;
-	END;
-	
 	EXPORT Email_Data_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
 		Email_Data_raw;
 	END;
@@ -16,9 +18,10 @@ EXPORT RawEmail := MODULE
 								DATASET (fcra.Layout_override_flag) flag_file,
 								DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,														 
 							 ConsumerDisclosure.IParams.IParam in_mod) := 
- FUNCTION
+	FUNCTION
 
 	BOOLEAN showDisputedRecords := in_mod.ReturnDisputed;
+	todaysdate := (STRING8) STD.Date.Today();
 	
 	pc_flags := slim_pc_recs(datagroup = FFD.Constants.DataGroups.EMAIL_DATA);
 	all_flags := flag_file(file_id = FCRA.FILE_ID.EMAIL_DATA);
@@ -63,10 +66,9 @@ EXPORT RawEmail := MODULE
 	
 	recs_filt:= recs_all(
 		in_mod.ReturnOverwritten or ~compliance_flags.isOverwritten,
-		in_mod.ReturnSuppressed or ~compliance_flags.isSuppressed
+		in_mod.ReturnSuppressed or ~compliance_flags.isSuppressed,
+		ut.daysApart(date_last_seen, todaysdate) < ut.DaysInNYears(7)
 		);
-	
-	// - no groupping/rolling of records by prolic_key
 	
 		Email_Data_rawrec xformStatements(Email_Data_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)

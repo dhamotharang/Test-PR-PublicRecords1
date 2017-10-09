@@ -2108,6 +2108,20 @@ export t_FcraDataServiceRawPropertyGroupBy := record
 	string ln_fares_id {xpath('ln_fares_id')};
 end;
 		
+export t_FcraDataServiceRawPropertyAddlLegal := record
+	string ln_fares_id {xpath('ln_fares_id')};
+	string addl_legal {xpath('addl_legal')};
+end;
+		
+export t_FcraDataServiceRawPropertyAddlNames := record
+	string ln_fares_id {xpath('ln_fares_id')};
+	string apnt_or_pin_number {xpath('apnt_or_pin_number')};
+	string buyer_or_seller {xpath('buyer_or_seller')};
+	string name_seq {xpath('name_seq')};
+	string name {xpath('name')};
+	string id_code {xpath('id_code')};
+end;
+		
 export t_FcraDataServiceRawPropertyAssessment := record
 	string ln_fares_id {xpath('ln_fares_id')};
 	unsigned proc_date {xpath('proc_date')};
@@ -3202,6 +3216,62 @@ export t_FcraDataServiceRawSOffense := record
 	string conviction_override_date_type {xpath('conviction_override_date_type')};
 	string offense_score {xpath('offense_score')};
 	unsigned offense_persistent_id {xpath('offense_persistent_id')};
+end;
+		
+export t_FcraDataServiceRawSSNName := record
+	string fname {xpath('fname')};
+	string lname {xpath('lname')};
+	unsigned first_seen {xpath('first_seen')};
+	unsigned last_seen {xpath('last_seen')};
+end;
+		
+export t_FcraDataServiceRawSSNCommon := record
+	unsigned header_first_seen {xpath('header_first_seen')};
+	unsigned header_last_seen {xpath('header_last_seen')};
+	integer headercount {xpath('headercount')};
+	integer eqcount {xpath('eqcount')};
+	integer encount {xpath('encount')};
+	integer tncount {xpath('tncount')};
+	integer tucount {xpath('tucount')};
+	integer srccount {xpath('srccount')};
+	integer didcount {xpath('didcount')};
+	integer didcount_c6 {xpath('didcount_c6')};
+	integer didcount_s18 {xpath('didcount_s18')};
+	integer addr_ct {xpath('addr_ct')};
+	integer addr_ct_c6 {xpath('addr_ct_c6')};
+	integer bestcount {xpath('bestcount')};
+	integer recentcount {xpath('recentcount')};
+	unsigned bestdid {xpath('bestdid')};
+	t_FcraDataServiceRawSSNName lname1 {xpath('lname1')};
+	t_FcraDataServiceRawSSNName lname2 {xpath('lname2')};
+	t_FcraDataServiceRawSSNName lname3 {xpath('lname3')};
+	t_FcraDataServiceRawSSNName lname4 {xpath('lname4')};
+end;
+		
+export t_FcraDataServiceRawSSNSources := record
+	string death_sources {xpath('death_sources')};
+end;
+		
+export t_FcraDataServiceRawSSN := record
+	string ssn {xpath('ssn')};
+	unsigned official_first_seen {xpath('official_first_seen')};
+	unsigned official_last_seen {xpath('official_last_seen')};
+	boolean isvalidformat {xpath('isvalidformat')};
+	boolean issequencevalid {xpath('issequencevalid')};
+	boolean isbankrupt {xpath('isbankrupt')};
+	unsigned dt_first_bankrupt {xpath('dt_first_bankrupt')};
+	boolean isdeceased {xpath('isdeceased')};
+	unsigned dt_first_deceased {xpath('dt_first_deceased')};
+	unsigned decs_dob {xpath('decs_dob')};
+	string decs_zip_lastres {xpath('decs_zip_lastres')};
+	string decs_zip_lastpayment {xpath('decs_zip_lastpayment')};
+	string decs_last {xpath('decs_last')};
+	string decs_first {xpath('decs_first')};
+	string issue_state {xpath('issue_state')};
+	t_FcraDataServiceRawSSNCommon combo {xpath('combo')};
+	t_FcraDataServiceRawSSNCommon eq {xpath('eq')};
+	t_FcraDataServiceRawSSNCommon en {xpath('en')};
+	t_FcraDataServiceRawSSNCommon tn {xpath('tn')};
 end;
 		
 export t_FcraDataServiceRawThrive := record

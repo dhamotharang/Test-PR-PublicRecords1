@@ -1,4 +1,4 @@
-IMPORT Address, Business_Risk_BIP, BusinessCredit_Services, Gateway, IESP, 
+﻿IMPORT Address, Business_Risk_BIP, BusinessCredit_Services, Gateway, IESP, 
        Models, Risk_Indicators, Risk_Reporting, RiskWise, Suspicious_Fraud_LN, 
        UT, Royalty, Address;
 
@@ -33,7 +33,14 @@ EXPORT SmallBusiness_BIP_Function (
 /* ************************************************************************
 	 *                    Set common Business Shell Options                 *
 	 ************************************************************************ */
-	UNSIGNED1	BusShellVersion	:= Business_Risk_BIP.Constants.Default_BusShellVersion;
+	// UNSIGNED1	BusShellVersion	:= Business_Risk_BIP.Constants.Default_BusShellVersion;
+	UNSIGNED1	BusShellVersion	:= if(ModelsRequested[1].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
+			ModelsRequested[2].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
+			ModelsRequested[3].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
+			ModelsRequested[4].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
+			ModelsRequested[5].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB],	
+		Business_Risk_BIP.Constants.BusShellVersion_v22,
+		Business_Risk_BIP.Constants.Default_BusShellVersion);
 	
 	// Create a datarow to add to the intermediate log.
 	Risk_Reporting.Layouts.Business_Risk_Job_Options xfm_options := TRANSFORM
@@ -239,7 +246,7 @@ EXPORT SmallBusiness_BIP_Function (
 	IncludeDL           := TRUE;
 	IncludeVeh          := TRUE;
 	IncludeDerog        := TRUE;
-	BSVersion           := 50;
+	BSVersion           := if(BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v22, 51, 50);
 	IsFCRA              := FALSE;
 	LN_Branded          := FALSE;
 	OFAC_Only           := TRUE;
@@ -338,7 +345,7 @@ EXPORT SmallBusiness_BIP_Function (
 	
 	Blank_Boca_Shell := GROUP(DATASET([], Risk_Indicators.Layout_Boca_Shell), Seq);
 	
-	Boca_Shell_Grouped := IF(EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL)), Clam, Blank_Boca_Shell); //don't call the boca shell if a model doesn't need it
+	Boca_Shell_Grouped := IF(EXISTS(ModelsRequested(ModelName in [BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL,BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB])), Clam, Blank_Boca_Shell); //don't call the boca shell if a model doesn't need it
 	
 /* ************************************************************************
 	 *                       Prepare Attribute Outputs                      *
@@ -378,6 +385,11 @@ EXPORT SmallBusiness_BIP_Function (
 				setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, boca_shell_grouped)) ) + 
 		IF( EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL)), 
 				setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL)) ) + 		
+		IF( EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB)), 
+				setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, boca_shell_grouped)) ) + 
+		IF( EXISTS(ModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)), 
+				setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)) ) + 		
+
 		DATASET([], Layout_ModelOut_Plus);
 
 	Model_Results_sorted := 
@@ -510,8 +522,8 @@ EXPORT SmallBusiness_BIP_Function (
 	// Attach the PhoneSources child dataset to the intermediateLayout for royalty purposes,
 	// and calculate BillingHit.
 	getBillingHitFromScores( DATASET(iesp.smallbusinessanalytics.t_SBAModelHRI) ModelResults ) := FUNCTION
-		BlendedScore := ModelResults(Name = BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL)[1].Scores[1].Value;
-		CreditScore  := ModelResults(Name = BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL)[1].Scores[1].Value;
+		BlendedScore := ModelResults(Name in [BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB])[1].Scores[1].Value;
+		CreditScore  := ModelResults(Name in [BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO])[1].Scores[1].Value;
 		isBillingHit := BlendedScore NOT IN [0,222] OR CreditScore NOT IN [0,222];
 		RETURN isBillingHit;
 	END;

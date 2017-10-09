@@ -21,13 +21,14 @@ EXPORT LIB_RiskView_Models (
 	SHARED returnCode				:= arguments.returnCode;
 	SHARED payFrequency			:= arguments.payFrequency;
 	SHARED customInputs			:= arguments.Custom_Inputs;
+	shared isPreScreenPurpose := StringLib.StringToUpperCase(intendedPurpose) = 'PRESCREENING';
 	
 	/* Model Validation -- Use this when trying to validate a new model through the RiskView.Search_Service */
   EXPORT TurnOnValidation := FALSE; // When TRUE allows for Layout_Debug to be OUTPUT in the Search_Service
 	//EXPORT TurnOnValidation := TRUE; // When TRUE allows for Layout_Debug to be OUTPUT in the RiskView.Search_Service
 	
 	
-	EXPORT ValidatingModel := Models.RVB1610_1_0 (BocaShell); // Change this to the model you are tring to validate
+	EXPORT ValidatingModel := Models.RVA1611_2_0 (BocaShell, False); // Change this to the model you are tring to validate
 	
 	
 	// Version 4.0
@@ -183,8 +184,8 @@ that is sent INTO calcindex for ECL.
 											'RVG1705_1' => UNGROUP(Models.RVG1705_1_0(BocaShell)),
 											'RVB1610_1' => UNGROUP(Models.RVB1610_1_0(BocaShell)),
 											'RVG1706_1' => UNGROUP(Models.RVG1706_1_0(BocaShell)),		
-											// 'RVA1611_1' => UNGROUP(Models.RVA1611_1_0(BocaShell)),	
-											// 'RVA1611_2' => UNGROUP(Models.RVA1611_2_0(BocaShell)),	
+											'RVA1611_1' => UNGROUP(Models.RVA1611_1_0(BocaShell, isPreScreenPurpose)),	
+											'RVA1611_2' => UNGROUP(Models.RVA1611_2_0(BocaShell, isPreScreenPurpose)),	
 											// ----------------------------------------------------------------------------------
 											// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 											'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),

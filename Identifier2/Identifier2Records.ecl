@@ -1,4 +1,4 @@
-import iesp,identifier2,address,models,ut,codes,Suppress,AutoStandardI, seed_files, risk_indicators,doxie, PersonReports, IntlIID, header, mdr, drivers;
+﻿import iesp,identifier2,address,models,ut,codes,Suppress,AutoStandardI, seed_files, risk_indicators,doxie, PersonReports, IntlIID, header, mdr, drivers;
 	
 	inputParams := project(AutoStandardI.GlobalModule(),input.params,opt);
 	finderParams := project (AutoStandardI.GlobalModule(), PersonReports.input._finderreport, opt);
@@ -69,6 +69,7 @@ import iesp,identifier2,address,models,ut,codes,Suppress,AutoStandardI, seed_fil
 	#stored('InstantIDVersion','1');// ID2 wants all new CIID functionality by default (01/2014)
 	#stored('DisallowInsurancePhoneHeaderGateway', true);	
 	#stored('DisableCustomerNetworkOptionInCVI', true);
+	#stored('IsIdentifier2', true);
 	    
 	
 	//get iid results

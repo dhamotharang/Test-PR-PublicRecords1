@@ -91,6 +91,20 @@ EXPORT Constants := MODULE
 																         '30'];//NY-UPSTATE-CIV-COURT
 
 //------------------------------------------------------------------------------------------------------//
+/*  EmailDataKeys :-  
+		Key : thor_200::key::email_data::qa::did 
+					thor_200::key::email_data::autokey::qa::payload 
+					thor_200::key::email_data::qa::email_addresses 
+		Source field : email_src
+*/	
+	EXPORT EmailRestrictedSources := [MDR.sourceTools.src_Entiera,
+																		MDR.sourceTools.src_Impulse,
+																		MDR.sourceTools.src_Wired_Assets_Email
+																		//18259
+																		];
+ 
+
+//------------------------------------------------------------------------------------------------------//
 /*	PersonHeaderKeys 
 		Keys :  
 			thor_data400::key::header::dmv_restricted_qa

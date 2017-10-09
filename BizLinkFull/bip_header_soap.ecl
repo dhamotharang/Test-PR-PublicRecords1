@@ -1,4 +1,4 @@
-IMPORT BizLinkFull;
+﻿IMPORT BizLinkFull;
 EXPORT bip_header_soap := MACRO
   LOADXML(BizLinkFull._Search.sFieldNames);
   #DECLARE(input_fields)
@@ -26,6 +26,7 @@ EXPORT bip_header_soap := MACRO
   #SET(maps,REGEXREPLACE('(I_maxids:=)[^;]+',%'maps'%,'$1 50'))
   #SET(input_dataset,'DATASET([{'+%'input_dataset'%[2..]+'}],{'+%'input_layout'%+'});')
   #EXPAND(%'input_fields'%);
+
   BOOLEAN GroupProxID:=FALSE: stored('GroupProxID');
   BOOLEAN bDebug:=FALSE:STORED('DebugMode');
   BOOLEAN bBatch:=FALSE:STORED('BatachMode');
@@ -33,12 +34,15 @@ EXPORT bip_header_soap := MACRO
   #SET(maps,REGEXREPLACE('(STRING Input_soapcallmode := )(\'\')([^;]+);',%'maps'%,'$1\'TRUE\'$2'))
   #EXPAND(%'maps'%);
   dInput:=#EXPAND(%'input_dataset'%);
+
   dFormalized:=BizLinkFull._Search.macFormalize(dInput);
   dInputFormatted:=PROJECT(dFormalized,BizLinkFull.Process_Biz_Layouts.InputLayout);
+
   dResults:=BizLinkFull.MEOW_Biz(dInputFormatted).Data_;
   dProxids:=SORT(TABLE(dResults,{proxid;weight;KeysUsed;KeysFailed;UNSIGNED proxid_count:=COUNT(GROUP);},proxid,KeysFailed),-weight,proxid,KeysFailed);
   dNamesAddresses:=TABLE(dResults,{company_name;prim_range;prim_name;city;st;zip;},company_name,prim_range,prim_name,city,st,zip);
   dAggregated:=SORT(tools.mac_AggregateFieldsPerID(dResults,proxid),-weights[1].weight);
+
   dInputData:=PROJECT(dInputFormatted,TRANSFORM({RECORDOF(LEFT) AND NOT [zip_cases];STRING city_entered;STRING state_entered;STRING derived_city;STRING derived_state;STRING zip_entered;UNSIGNED zip_radius;UNSIGNED zip_count;},
     SELF.city_entered:=Input_city;
     SELF.state_entered:=Input_st;
@@ -61,6 +65,7 @@ EXPORT bip_header_soap := MACRO
     SELF:=LEFT;
   ));
     
+
   IF((BOOLEAN)Input_soapcallmode,
     OUTPUT(dRawResultsClipped,NAMED('soap_results')),
     SEQUENTIAL(
@@ -73,5 +78,8 @@ EXPORT bip_header_soap := MACRO
     )
   );
     // OUTPUT(dRawResultsClipped,NAMED('soap_results'));
+
 ENDMACRO;
+
   
+

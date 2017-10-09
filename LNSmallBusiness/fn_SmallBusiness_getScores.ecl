@@ -1,4 +1,4 @@
-IMPORT Address, BusinessCredit_Services, Business_Risk_BIP, Gateway, iesp, Models, Risk_Indicators, Riskwise, ut;
+﻿IMPORT Address, BusinessCredit_Services, Business_Risk_BIP, Gateway, iesp, Models, Risk_Indicators, Riskwise, ut;
 
 EXPORT fn_SmallBusiness_getScores( DATASET(Business_Risk_BIP.Layouts.Input) Shell_Input, 
                                    Business_Risk_BIP.LIB_Business_Shell_LIBIN options, 
@@ -171,6 +171,11 @@ EXPORT fn_SmallBusiness_getScores( DATASET(Business_Risk_BIP.Layouts.Input) Shel
 					setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL)) ) + 		
 			IF( BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL IN set_model_names, // blended model
 					setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL, Boca_Shell_Grouped)) ) + 
+			IF( BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO IN set_model_names, // non-blended or Business Only model
+					setModelName(BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)) ) + 		
+			IF( BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB IN set_model_names, // blended model
+					setModelName(BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, Models.LIB_BusinessRisk_Function(shell_res_grpd, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB, Boca_Shell_Grouped)) ) + 
+
 			DATASET([], Layout_ModelOut_pre);
 
 		Model_Results := IF( allow_scores, Model_Results_pre, DATASET([], Layout_ModelOut_pre) );
