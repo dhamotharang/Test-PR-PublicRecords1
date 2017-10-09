@@ -35,6 +35,9 @@ module
 	string30    user_added; 
 	string20    date_changed ; 
 	string30    user_changed; 
+	string2			Customer_State := '';
+	string3			Customer_County := '';	
+	string 			Customer_Vertical := '';
 end; 
 
 Export MbsNewGcIdExclusion := record 
@@ -195,6 +198,20 @@ export clean_phones :=
 	string10            cell_phone   ; 
 	string10            Work_phone   ; 
 	end;
+
+
+export address_cleaner :=
+	record
+	string100						Street_1 := '';
+	string50						Street_2 := '';
+	string100						City := '';
+	string10						State := '';
+	string10						Zip := '';
+	string10						Address_Type := '';
+	string100         	address_1 := '';   
+	string50          	address_2 := '';
+	Address.Layout_Clean182_fips				clean_address;
+	end;
 	
 export Classification := module 
 
@@ -207,6 +224,10 @@ export Source := record
 	unsigned2 Expectation_of_Victim_Entities_id;
 	string10  Expectation_of_Victim_Entities;
 	string100 Industry_segment ;
+	string2		Customer_State := '';
+	string3		Customer_County := '';	
+	string 		Customer_Vertical := '';
+	
 end; 
 
 export Activity := record 
@@ -272,7 +293,6 @@ end;
 
 export Base         := 
     module 
-
 export Main         :=  
    record ,maxLength(60000)
 // primary record 
@@ -400,7 +420,7 @@ export Main         :=
 	Classification.Entity                  classification_Entity;
 	Classification.Permissible_use_access  classification_Permissible_use_access;
   unsigned8         UID ; 
-	string50		      Source;
+	string100		      Source;
 	unsigned4         process_date ; 
 	unsigned4         dt_first_seen;
 	unsigned4         dt_last_seen;
@@ -426,7 +446,43 @@ export Main         :=
 	unsigned1					bdid_score ; 
 	bipv2.IDlayouts.l_xlink_ids;
 	clean_phones      clean_phones ; 
-	
+// FraudGovPlatform	IDDT & KNFD 	
+	string1						head_of_household_indicator := '';
+	string20					relationship_indicator := '';
+	string3						county := ''; //   County/Parish ???
+	address_cleaner		additional_address;	
+
+// FraudGovPlatform	IdentityData
+	string1						Race := '';
+	string1						Ethnicity := '';
+	string20					bank_routing_number_1 := '';
+	string20					bank_account_number_1 := '';
+	string20					bank_routing_number_2 := '';
+	string20					bank_account_number_2 := '';
+
+// FraudGovPlatform	KnownFraud
+	string30					reported_by := '';
+	string60					name_risk_code := '';
+	string60					ssn_risk_code := '';
+	string60					dob_risk_code := '';
+	string60					drivers_license_risk_code := '';
+	string60					physical_address_risk_code := '';
+	string60					phone_risk_code := '';
+	string60					cell_phone_risk_code := '';
+	string60					work_phone_risk_code := '';
+	string60					bank_account_1_risk_code := '';
+	string60					bank_account_2_risk_code := '';
+	string60					email_address_risk_code := '';
+	string30					ip_address_fraud_code := '';
+	string60					business_risk_code := '';
+	string60					mailing_address_risk_code := '';
+	string60	 				device_risk_code := '';
+	string10					tax_preparer_id := '';
+	string8						start_date := '';
+	string8						end_date := '';
+	string10  				amount_paid := '';
+	string10					region_code := '';
+	string10					investigator_id := '';	
 end; 
 
 end; 
@@ -559,7 +615,7 @@ export keybuild
 	Classification.Entity                  classification_Entity;
 	Classification.Permissible_use_access  classification_Permissible_use_access;
   unsigned8         UID ; 
-	string50		      Source; 
+	string100		      Source; 
 	unsigned4         process_date ; 
 	unsigned4         dt_first_seen;
 	unsigned4         dt_last_seen;
@@ -584,8 +640,44 @@ export keybuild
 	unsigned6 				Bdid ; 
 	unsigned1					bdid_score ; 
 	bipv2.IDlayouts.l_xlink_ids;
-	clean_phones      clean_phones ; 
-	
+	clean_phones      clean_phones ; 	
+// FraudGovPlatform	IDDT & KNFD 	
+	string1						head_of_household_indicator := '';
+	string20					relationship_indicator := '';
+	string3						county := ''; //   County/Parish ???
+	address_cleaner		additional_address;	
+
+// FraudGovPlatform	IdentityData
+	string1						Race := '';
+	string1						Ethnicity := '';
+	string20					bank_routing_number_1 := '';
+	string20					bank_account_number_1 := '';
+	string20					bank_routing_number_2 := '';
+	string20					bank_account_number_2 := '';
+
+// FraudGovPlatform	KnownFraud
+	string30					reported_by := '';
+	string60					name_risk_code := '';
+	string60					ssn_risk_code := '';
+	string60					dob_risk_code := '';
+	string60					drivers_license_risk_code := '';
+	string60					physical_address_risk_code := '';
+	string60					phone_risk_code := '';
+	string60					cell_phone_risk_code := '';
+	string60					work_phone_risk_code := '';
+	string60					bank_account_1_risk_code := '';
+	string60					bank_account_2_risk_code := '';
+	string60					email_address_risk_code := '';
+	string30					ip_address_fraud_code := '';
+	string60					business_risk_code := '';
+	string60					mailing_address_risk_code := '';
+	string60	 				device_risk_code := '';	
+	string10					tax_preparer_id := '';
+	string8						start_date := '';
+	string8						end_date := '';
+	string10  				amount_paid := '';
+	string10					region_code := '';
+	string10					investigator_id := '';
 end; 
 
 export temp := module 
