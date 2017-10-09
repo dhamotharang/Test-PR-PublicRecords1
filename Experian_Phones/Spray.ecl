@@ -1,9 +1,9 @@
-import versioncontrol;
+﻿import versioncontrol;
 EXPORT Spray(string version) := module
 
 export Input := DATASET([
  	{'bctlpedata11.risk.regn.net'										
- 	,'/data/hds_180/experian_index_phone/' + version   //Location to be determined                  
+ 	,'/data/hds_180/experian_index_phone/data/'+version   //Location to be determined                  
  	,'*.txt'                           
  	,'82'                                                             
  	,'~thor_data400::in::experian_phone::@version@'    
