@@ -1490,10 +1490,10 @@ self.fp1609_1_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
 self := left), keep(1), left outer);
 // output(with_FP1609_1_0, named('with_FP1609_1_0'));
 
-FP1702_2_0 := Models.FP1702_2_0	( ungroup(clam), 6);
+FP1702_2_0_score := Models.FP1702_2_0	( ungroup(clam), 6);
 // output(FP1606_1_0_score, named('FP1606_1_0_score'));
 
-with_FP1702_2_0	:= join(with_FP1609_1_0, FP1702_2_0	score,
+with_FP1702_2_0	:= join(with_FP1609_1_0, FP1702_2_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
 self.FP1702_2_0_score := right.score;
@@ -1506,10 +1506,10 @@ self.FP1702_2_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
 self := left), keep(1), left outer);
 // output(with_FP1702_2_0, named('with_FP1702_2_0'));
 
-FP1702_1_0 := Models.FP1702_1_0	( ungroup(clam), 6);
+FP1702_1_0_score := Models.FP1702_1_0	( ungroup(clam), 6);
 // output(FP1702_1_0_score, named('FP1702_1_0_score'));
 
-with_FP1702_1_0	:= join(with_FP1702_2_0, FP1702_1_0	score,
+with_FP1702_1_0	:= join(with_FP1702_2_0, FP1702_1_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
 self.FP1702_1_0_score := right.score;
