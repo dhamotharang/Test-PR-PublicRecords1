@@ -1,16 +1,16 @@
-import Std, HEADER, BankruptcyV2, hygenics_crim, LiensV2, Civil_court, D2C;
+﻿import Std, HEADER, BankruptcyV2, hygenics_crim, LiensV2, Civil_court, D2C;
 
 /**
 
 Compute the following indicator flags based on input data
 
-  Deceased (join by LexID, â€œYâ€ if you got a hit)
-  Judgments & Liens (join by LexID, â€œYâ€ if you got a hit)
-  Civil Court Records (no LexID on the data, â€œ1â€ if you get a match on Name+City+State, â€œ2â€ if you get a match on Name+State, â€œ3â€ if you get a match on Name.  Waterfall into these match criteria.)
+  Deceased (join by LexID, “Y” if you got a hit)
+  Judgments & Liens (join by LexID, “Y” if you got a hit)
+  Civil Court Records (no LexID on the data, “1” if you get a match on Name+City+State, “2” if you get a match on Name+State, “3” if you get a match on Name.  Waterfall into these match criteria.)
   Criminal Court Records (join by LexID, )
   Possible Incarceration (join by LexID)
   Foreclosure (only when commercially available) (not in scope at the moment)
-  Bankruptcy (join by LexID, â€œYâ€ if you got a hit)
+  Bankruptcy (join by LexID, “Y” if you got a hit)
 	
 	Filter out non direct-to-consumer sources where necessary
 
@@ -70,7 +70,7 @@ fn_getLiens(dataset(Infutor.rIndicatorFlags) srcin) := FUNCTION
 										NOT d2c.Constants.LiensRestrictedSources(tmsid)),
 								TRANSFORM(rLiens,
 									self.LexId := (unsigned6)left.did;
-								)), LexId) : PERSIST('~thor::persist::liens');
+								)), LexId);
 							
 		liens := DEDUP(SORT(liens1, LexId, LOCAL), LexId, LOCAL);
 							
@@ -82,7 +82,7 @@ fn_getLiens(dataset(Infutor.rIndicatorFlags) srcin) := FUNCTION
 		return result;
 END;
 
-		civilCourtRecords := Civil_court.file_in_civil_court_party;	//(vendor not in D2C.Constants.CivilCourtRestrictedSources);
+		civilCourtRecords := Civil_court.file_in_civil_court_party(vendor not in D2C.Constants.CivilCourtRestrictedSources);
 
 rCivilCourt := RECORD
 	string80	name;
