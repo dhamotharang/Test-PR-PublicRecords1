@@ -219,6 +219,15 @@ import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;
 //////////////////////////////////////////////////////////////////////////////////////////
 //Concat Reformatted Files////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
-	concatComm 	:= cmnPort + cmnLidb + cmnDisc + cmnLidbDelt;
+	concatC 		:= cmnPort + cmnLidb + cmnDisc + cmnLidbDelt;
+	
+	//Set Blank Serv/Line Types to "UNKNOWN"
+	concatC addSL(concatC l):= transform
+		self.serv := if(l.serv='', '3', l.serv);
+		self.line	:= if(l.line='', '3', l.line);
+		self := l;
+	end;
+	
+	concatComm	:= project(concatC, addSL(left));
 
 EXPORT Map_Ported_Metadata_Main := dedup(sort(concatComm(phone<>''), record, local), record, local);
