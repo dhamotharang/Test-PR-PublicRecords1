@@ -1,4 +1,4 @@
-IMPORT autostandardI, BIPV2, BIPV2_Best, BIPV2_Best_SBFE, 
+﻿IMPORT autostandardI, BIPV2, BIPV2_Best, BIPV2_Best_SBFE, 
 			  BIPV2_WAF, BusinessCredit_Services, Census_Data, 
        gong, iesp, MDR, std, Suppress, TopBusiness_Services, ut;
       
@@ -40,7 +40,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 		possible_LAFN := exists(ds_linkIDsRestricted(keysfailed != 0));
 		// set this here and used farther down to indicate of a search result set
 		// could have more results but does not.															 															                 																						
-		possible_Truncation := exists(ds_linkIDsRestricted(is_Truncated));
+		possible_Truncation := exists(ds_linkIDsRestricted(isTruncated));
 																 
     ResultSetSlim :=  ds_linkIDsRestricted(proxid <> 0); 
 		
