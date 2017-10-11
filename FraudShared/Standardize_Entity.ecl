@@ -9,10 +9,8 @@ function
 
 		prepped_Addresses := dedup(table(pBaseFile,{address_1, address_2}) + table(pBaseFile,{additional_address.address_1,additional_address.address_2}),all);
 		
-		//dist_Addresses := DISTRIBUTED(prepped_Addresses,HASH32(prepped_Addresses.address_1,prepped_Addresses.address_2));
-
 		Clean_Addresses := project( prepped_Addresses ,transform( Layouts.address_cleaner,
-				Clean_Address_182 								:= if(left.address_1 != '' AND left.address_2 != '',address.CleanAddress182(left.address_1, left.address_2),'');
+				Clean_Address_182 								:= if (left.address_2 != '', address.CleanAddress182(left.address_1, left.address_2), '');
 				self.address_1										:= left.address_1;
 				self.address_2										:= left.address_2;
 				self.clean_address.prim_range			:= Clean_Address_182[1..10]					; //prim_range
