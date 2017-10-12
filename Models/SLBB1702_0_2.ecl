@@ -2,12 +2,11 @@
 
 EXPORT SLBB1702_0_2 (GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell, GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam ) := FUNCTION
 
-	MODEL_DEBUG := False;
+	MODEL_DEBUG := false;
 
 	#if(MODEL_DEBUG)
 		Layout_Debug := RECORD
-        INTEGER sysdate                          ;
-				//INTEGER sysdate_days                     ;
+    INTEGER sysdate                          ;
 				String _ver_src_id_fsrc_fdate           ;
 				INTEGER _ver_src_id_fsrc_fdate2          ;
 				INTEGER yr__ver_src_id_fsrc_fdate        ;
@@ -883,7 +882,7 @@ EXPORT SLBB1702_0_2 (GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell, 
 			REAL bv_ver_src_derog_ratio           ;
 			REAL bv_mth_ver_src_p_ls              ;
 			Integer rv_d34_attr_liens_recency        ;
-			INTEGER bv_lien_avg_amount               ;
+			decimal10_2 bv_lien_avg_amount               ;
 			INTEGER bv_lien_total_amount             ;
 			integer nf_fp_varrisktype                ;
 			Integer bv_ver_src_id_mth_since_fs       ;
@@ -1511,7 +1510,6 @@ NULL := -999999999;
 INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 
 sysdate      := common.sas_date(if(historydate=999999, (string)std.date.today(), (string6)historydate+'01'));
-// sysdate_days := common.sas_date(if(historydate=999999, (string)std.date.today, (string8)history_datetime[1..8]));
 
 _ver_src_id_fsrc_fdate := Models.Common.getw(ver_src_id_firstseen_list, 1);
 
@@ -1531,15 +1529,15 @@ _ver_src_id_fdate_br2 := common.sas_date((string)(_ver_src_id_fdate_br));
 
 yr__ver_src_id_fdate_br := if(min(sysdate, _ver_src_id_fdate_br2) = NULL, NULL, (sysdate - _ver_src_id_fdate_br2) / 365.25);
 
-mth__ver_src_id_fdate_br := if(min(sysdate, _ver_src_id_fdate_br2) = NULL, NULL, (sysdate - _ver_src_id_fdate_br2) / 30.5);
+mth__ver_src_id_fdate_br := if(min(sysdate, _ver_src_id_fdate_br2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_br2) / 30.5));
 
 _ver_src_id_ldate_br := if(_ver_src_id_br_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_br_pos), '0');
 
 _ver_src_id_ldate_br2 := common.sas_date((string)(_ver_src_id_ldate_br));
 
-yr__ver_src_id_ldate_br := if(min(sysdate, _ver_src_id_ldate_br2) = NULL, NULL, (sysdate - _ver_src_id_ldate_br2) / 365.25);
+yr__ver_src_id_ldate_br := if(min(sysdate, _ver_src_id_ldate_br2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_br2) / 365.25));
 
-mth__ver_src_id_ldate_br := if(min(sysdate, _ver_src_id_ldate_br2) = NULL, NULL, (sysdate - _ver_src_id_ldate_br2) / 30.5);
+mth__ver_src_id_ldate_br := if(min(sysdate, _ver_src_id_ldate_br2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_br2) / 30.5));
 
 _ver_src_id_c_pos := Models.Common.findw_cpp(ver_src_id_list, 'C' , '  ,', 'ie');
 
@@ -1549,17 +1547,17 @@ _ver_src_id_fdate_c := if(_ver_src_id_c_pos > 0, Models.Common.getw(ver_src_id_f
 
 _ver_src_id_fdate_c2 := common.sas_date((string)(_ver_src_id_fdate_c));
 
-yr__ver_src_id_fdate_c := if(min(sysdate, _ver_src_id_fdate_c2) = NULL, NULL, (sysdate - _ver_src_id_fdate_c2) / 365.25);
+yr__ver_src_id_fdate_c := if(min(sysdate, _ver_src_id_fdate_c2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_c2) / 365.25));
 
-mth__ver_src_id_fdate_c := if(min(sysdate, _ver_src_id_fdate_c2) = NULL, NULL, (sysdate - _ver_src_id_fdate_c2) / 30.5);
+mth__ver_src_id_fdate_c := if(min(sysdate, _ver_src_id_fdate_c2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_c2) / 30.5));
 
 _ver_src_id_ldate_c := if(_ver_src_id_c_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_c_pos), '0');
 
 _ver_src_id_ldate_c2 := common.sas_date((string)(_ver_src_id_ldate_c));
 
-yr__ver_src_id_ldate_c := if(min(sysdate, _ver_src_id_ldate_c2) = NULL, NULL, (sysdate - _ver_src_id_ldate_c2) / 365.25);
+yr__ver_src_id_ldate_c := if(min(sysdate, _ver_src_id_ldate_c2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_c2) / 365.25));
 
-mth__ver_src_id_ldate_c := if(min(sysdate, _ver_src_id_ldate_c2) = NULL, NULL, (sysdate - _ver_src_id_ldate_c2) / 30.5);
+mth__ver_src_id_ldate_c := if(min(sysdate, _ver_src_id_ldate_c2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_c2) / 30.5));
 
 _ver_src_id_d_pos := Models.Common.findw_cpp(ver_src_id_list, 'D' , '  ,', 'ie');
 
@@ -1569,17 +1567,17 @@ _ver_src_id_fdate_d := if(_ver_src_id_d_pos > 0, Models.Common.getw(ver_src_id_f
 
 _ver_src_id_fdate_d2 := common.sas_date((string)(_ver_src_id_fdate_d));
 
-yr__ver_src_id_fdate_d := if(min(sysdate, _ver_src_id_fdate_d2) = NULL, NULL, (sysdate - _ver_src_id_fdate_d2) / 365.25);
+yr__ver_src_id_fdate_d := if(min(sysdate, _ver_src_id_fdate_d2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_d2) / 365.25));
 
-mth__ver_src_id_fdate_d := if(min(sysdate, _ver_src_id_fdate_d2) = NULL, NULL, (sysdate - _ver_src_id_fdate_d2) / 30.5);
+mth__ver_src_id_fdate_d := if(min(sysdate, _ver_src_id_fdate_d2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_d2) / 30.5));
 
 _ver_src_id_ldate_d := if(_ver_src_id_d_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_d_pos), '0');
 
 _ver_src_id_ldate_d2 := common.sas_date((string)(_ver_src_id_ldate_d));
 
-yr__ver_src_id_ldate_d := if(min(sysdate, _ver_src_id_ldate_d2) = NULL, NULL, (sysdate - _ver_src_id_ldate_d2) / 365.25);
+yr__ver_src_id_ldate_d := if(min(sysdate, _ver_src_id_ldate_d2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_d2) / 365.25));
 
-mth__ver_src_id_ldate_d := if(min(sysdate, _ver_src_id_ldate_d2) = NULL, NULL, (sysdate - _ver_src_id_ldate_d2) / 30.5);
+mth__ver_src_id_ldate_d := if(min(sysdate, _ver_src_id_ldate_d2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_d2) / 30.5));
 
 _ver_src_id_df_pos := Models.Common.findw_cpp(ver_src_id_list, 'DF' , '  ,', 'ie');
 
@@ -1589,17 +1587,17 @@ _ver_src_id_fdate_df := if(_ver_src_id_df_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_df2 := common.sas_date((string)(_ver_src_id_fdate_df));
 
-yr__ver_src_id_fdate_df := if(min(sysdate, _ver_src_id_fdate_df2) = NULL, NULL, (sysdate - _ver_src_id_fdate_df2) / 365.25);
+yr__ver_src_id_fdate_df := if(min(sysdate, _ver_src_id_fdate_df2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_df2) / 365.25));
 
-mth__ver_src_id_fdate_df := if(min(sysdate, _ver_src_id_fdate_df2) = NULL, NULL, (sysdate - _ver_src_id_fdate_df2) / 30.5);
+mth__ver_src_id_fdate_df := if(min(sysdate, _ver_src_id_fdate_df2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_df2) / 30.5));
 
 _ver_src_id_ldate_df := if(_ver_src_id_df_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_df_pos), '0');
 
 _ver_src_id_ldate_df2 := common.sas_date((string)(_ver_src_id_ldate_df));
 
-yr__ver_src_id_ldate_df := if(min(sysdate, _ver_src_id_ldate_df2) = NULL, NULL, (sysdate - _ver_src_id_ldate_df2) / 365.25);
+yr__ver_src_id_ldate_df := if(min(sysdate, _ver_src_id_ldate_df2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_df2) / 365.25));
 
-mth__ver_src_id_ldate_df := if(min(sysdate, _ver_src_id_ldate_df2) = NULL, NULL, (sysdate - _ver_src_id_ldate_df2) / 30.5);
+mth__ver_src_id_ldate_df := if(min(sysdate, _ver_src_id_ldate_df2) = NULL, NULL,roundup( (sysdate - _ver_src_id_ldate_df2) / 30.5));
 
 _ver_src_id_dn_pos := Models.Common.findw_cpp(ver_src_id_list, 'DN' , '  ,', 'ie');
 
@@ -1609,17 +1607,17 @@ _ver_src_id_fdate_dn := if(_ver_src_id_dn_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_dn2 := common.sas_date((string)(_ver_src_id_fdate_dn));
 
-yr__ver_src_id_fdate_dn := if(min(sysdate, _ver_src_id_fdate_dn2) = NULL, NULL, (sysdate - _ver_src_id_fdate_dn2) / 365.25);
+yr__ver_src_id_fdate_dn := if(min(sysdate, _ver_src_id_fdate_dn2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_dn2) / 365.25));
 
-mth__ver_src_id_fdate_dn := if(min(sysdate, _ver_src_id_fdate_dn2) = NULL, NULL, (sysdate - _ver_src_id_fdate_dn2) / 30.5);
+mth__ver_src_id_fdate_dn := if(min(sysdate, _ver_src_id_fdate_dn2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_dn2) / 30.5));
 
 _ver_src_id_ldate_dn := if(_ver_src_id_dn_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_dn_pos), '0');
 
 _ver_src_id_ldate_dn2 := common.sas_date((string)(_ver_src_id_ldate_dn));
 
-yr__ver_src_id_ldate_dn := if(min(sysdate, _ver_src_id_ldate_dn2) = NULL, NULL, (sysdate - _ver_src_id_ldate_dn2) / 365.25);
+yr__ver_src_id_ldate_dn := if(min(sysdate, _ver_src_id_ldate_dn2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_dn2) / 365.25));
 
-mth__ver_src_id_ldate_dn := if(min(sysdate, _ver_src_id_ldate_dn2) = NULL, NULL, (sysdate - _ver_src_id_ldate_dn2) / 30.5);
+mth__ver_src_id_ldate_dn := if(min(sysdate, _ver_src_id_ldate_dn2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_dn2) / 30.5));
 
 _ver_src_id_fb_pos := Models.Common.findw_cpp(ver_src_id_list, 'FB' , '  ,', 'ie');
 
@@ -1629,17 +1627,17 @@ _ver_src_id_fdate_fb := if(_ver_src_id_fb_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_fb2 := common.sas_date((string)(_ver_src_id_fdate_fb));
 
-yr__ver_src_id_fdate_fb := if(min(sysdate, _ver_src_id_fdate_fb2) = NULL, NULL, (sysdate - _ver_src_id_fdate_fb2) / 365.25);
+yr__ver_src_id_fdate_fb := if(min(sysdate, _ver_src_id_fdate_fb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fb2) / 365.25));
 
-mth__ver_src_id_fdate_fb := if(min(sysdate, _ver_src_id_fdate_fb2) = NULL, NULL, (sysdate - _ver_src_id_fdate_fb2) / 30.5);
+mth__ver_src_id_fdate_fb := if(min(sysdate, _ver_src_id_fdate_fb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fb2) / 30.5));
 
 _ver_src_id_ldate_fb := if(_ver_src_id_fb_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_fb_pos), '0');
 
 _ver_src_id_ldate_fb2 := common.sas_date((string)(_ver_src_id_ldate_fb));
 
-yr__ver_src_id_ldate_fb := if(min(sysdate, _ver_src_id_ldate_fb2) = NULL, NULL, (sysdate - _ver_src_id_ldate_fb2) / 365.25);
+yr__ver_src_id_ldate_fb := if(min(sysdate, _ver_src_id_ldate_fb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fb2) / 365.25));
 
-mth__ver_src_id_ldate_fb := if(min(sysdate, _ver_src_id_ldate_fb2) = NULL, NULL, (sysdate - _ver_src_id_ldate_fb2) / 30.5);
+mth__ver_src_id_ldate_fb := if(min(sysdate, _ver_src_id_ldate_fb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fb2) / 30.5));
 
 _ver_src_id_l0_pos := Models.Common.findw_cpp(ver_src_id_list, 'L0' , '  ,', 'ie');
 
@@ -1649,17 +1647,17 @@ _ver_src_id_fdate_l0 := if(_ver_src_id_l0_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_l02 := common.sas_date((string)(_ver_src_id_fdate_l0));
 
-yr__ver_src_id_fdate_l0 := if(min(sysdate, _ver_src_id_fdate_l02) = NULL, NULL, (sysdate - _ver_src_id_fdate_l02) / 365.25);
+yr__ver_src_id_fdate_l0 := if(min(sysdate, _ver_src_id_fdate_l02) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_l02) / 365.25));
 
-mth__ver_src_id_fdate_l0 := if(min(sysdate, _ver_src_id_fdate_l02) = NULL, NULL, (sysdate - _ver_src_id_fdate_l02) / 30.5);
+mth__ver_src_id_fdate_l0 := if(min(sysdate, _ver_src_id_fdate_l02) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_l02) / 30.5));
 
 _ver_src_id_ldate_l0 := if(_ver_src_id_l0_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_l0_pos), '0');
 
 _ver_src_id_ldate_l02 := common.sas_date((string)(_ver_src_id_ldate_l0));
 
-yr__ver_src_id_ldate_l0 := if(min(sysdate, _ver_src_id_ldate_l02) = NULL, NULL, (sysdate - _ver_src_id_ldate_l02) / 365.25);
+yr__ver_src_id_ldate_l0 := if(min(sysdate, _ver_src_id_ldate_l02) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_l02) / 365.25));
 
-mth__ver_src_id_ldate_l0 := if(min(sysdate, _ver_src_id_ldate_l02) = NULL, NULL, (sysdate - _ver_src_id_ldate_l02) / 30.5);
+mth__ver_src_id_ldate_l0 := if(min(sysdate, _ver_src_id_ldate_l02) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_l02) / 30.5));
 
 _ver_src_id_l2_pos := Models.Common.findw_cpp(ver_src_id_list, 'L2' , '  ,', 'ie');
 
@@ -1669,17 +1667,17 @@ _ver_src_id_fdate_l2 := if(_ver_src_id_l2_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_l22 := common.sas_date((string)(_ver_src_id_fdate_l2));
 
-yr__ver_src_id_fdate_l2 := if(min(sysdate, _ver_src_id_fdate_l22) = NULL, NULL, (sysdate - _ver_src_id_fdate_l22) / 365.25);
+yr__ver_src_id_fdate_l2 := if(min(sysdate, _ver_src_id_fdate_l22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_l22) / 365.25));
 
-mth__ver_src_id_fdate_l2 := if(min(sysdate, _ver_src_id_fdate_l22) = NULL, NULL, (sysdate - _ver_src_id_fdate_l22) / 30.5);
+mth__ver_src_id_fdate_l2 := if(min(sysdate, _ver_src_id_fdate_l22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_l22) / 30.5));
 
 _ver_src_id_ldate_l2 := if(_ver_src_id_l2_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_l2_pos), '0');
 
 _ver_src_id_ldate_l22 := common.sas_date((string)(_ver_src_id_ldate_l2));
 
-yr__ver_src_id_ldate_l2 := if(min(sysdate, _ver_src_id_ldate_l22) = NULL, NULL, (sysdate - _ver_src_id_ldate_l22) / 365.25);
+yr__ver_src_id_ldate_l2 := if(min(sysdate, _ver_src_id_ldate_l22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_l22) / 365.25));
 
-mth__ver_src_id_ldate_l2 := if(min(sysdate, _ver_src_id_ldate_l22) = NULL, NULL, (sysdate - _ver_src_id_ldate_l22) / 30.5);
+mth__ver_src_id_ldate_l2 := if(min(sysdate, _ver_src_id_ldate_l22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_l22) / 30.5));
 
 _ver_src_id_u2_pos := Models.Common.findw_cpp(ver_src_id_list, 'U2' , '  ,', 'ie');
 
@@ -1689,17 +1687,17 @@ _ver_src_id_fdate_u2 := if(_ver_src_id_u2_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_u22 := common.sas_date((string)(_ver_src_id_fdate_u2));
 
-yr__ver_src_id_fdate_u2 := if(min(sysdate, _ver_src_id_fdate_u22) = NULL, NULL, (sysdate - _ver_src_id_fdate_u22) / 365.25);
+yr__ver_src_id_fdate_u2 := if(min(sysdate, _ver_src_id_fdate_u22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_u22) / 365.25));
 
-mth__ver_src_id_fdate_u2 := if(min(sysdate, _ver_src_id_fdate_u22) = NULL, NULL, (sysdate - _ver_src_id_fdate_u22) / 30.5);
+mth__ver_src_id_fdate_u2 := if(min(sysdate, _ver_src_id_fdate_u22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_u22) / 30.5));
 
 _ver_src_id_ldate_u2 := if(_ver_src_id_u2_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_u2_pos), '0');
 
 _ver_src_id_ldate_u22 := common.sas_date((string)(_ver_src_id_ldate_u2));
 
-yr__ver_src_id_ldate_u2 := if(min(sysdate, _ver_src_id_ldate_u22) = NULL, NULL, (sysdate - _ver_src_id_ldate_u22) / 365.25);
+yr__ver_src_id_ldate_u2 := if(min(sysdate, _ver_src_id_ldate_u22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_u22) / 365.25));
 
-mth__ver_src_id_ldate_u2 := if(min(sysdate, _ver_src_id_ldate_u22) = NULL, NULL, (sysdate - _ver_src_id_ldate_u22) / 30.5);
+mth__ver_src_id_ldate_u2 := if(min(sysdate, _ver_src_id_ldate_u22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_u22) / 30.5));
 
 _ver_src_id_ar_pos := Models.Common.findw_cpp(ver_src_id_list, 'AR' , '  ,', 'ie');
 
@@ -1709,17 +1707,17 @@ _ver_src_id_fdate_ar := if(_ver_src_id_ar_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_ar2 := common.sas_date((string)(_ver_src_id_fdate_ar));
 
-yr__ver_src_id_fdate_ar := if(min(sysdate, _ver_src_id_fdate_ar2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ar2) / 365.25);
+yr__ver_src_id_fdate_ar := if(min(sysdate, _ver_src_id_fdate_ar2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ar2) / 365.25));
 
-mth__ver_src_id_fdate_ar := if(min(sysdate, _ver_src_id_fdate_ar2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ar2) / 30.5);
+mth__ver_src_id_fdate_ar := if(min(sysdate, _ver_src_id_fdate_ar2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ar2) / 30.5));
 
 _ver_src_id_ldate_ar := if(_ver_src_id_ar_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ar_pos), '0');
 
 _ver_src_id_ldate_ar2 := common.sas_date((string)(_ver_src_id_ldate_ar));
 
-yr__ver_src_id_ldate_ar := if(min(sysdate, _ver_src_id_ldate_ar2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ar2) / 365.25);
+yr__ver_src_id_ldate_ar := if(min(sysdate, _ver_src_id_ldate_ar2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ar2) / 365.25));
 
-mth__ver_src_id_ldate_ar := if(min(sysdate, _ver_src_id_ldate_ar2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ar2) / 30.5);
+mth__ver_src_id_ldate_ar := if(min(sysdate, _ver_src_id_ldate_ar2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ar2) / 30.5));
 
 _ver_src_id_ba_pos := Models.Common.findw_cpp(ver_src_id_list, 'BA' , '  ,', 'ie');
 
@@ -1729,17 +1727,17 @@ _ver_src_id_fdate_ba := if(_ver_src_id_ba_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_ba2 := common.sas_date((string)(_ver_src_id_fdate_ba));
 
-yr__ver_src_id_fdate_ba := if(min(sysdate, _ver_src_id_fdate_ba2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ba2) / 365.25);
+yr__ver_src_id_fdate_ba := if(min(sysdate, _ver_src_id_fdate_ba2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ba2) / 365.25));
 
-mth__ver_src_id_fdate_ba := if(min(sysdate, _ver_src_id_fdate_ba2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ba2) / 30.5);
+mth__ver_src_id_fdate_ba := if(min(sysdate, _ver_src_id_fdate_ba2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ba2) / 30.5));
 
 _ver_src_id_ldate_ba := if(_ver_src_id_ba_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ba_pos), '0');
 
 _ver_src_id_ldate_ba2 := common.sas_date((string)(_ver_src_id_ldate_ba));
 
-yr__ver_src_id_ldate_ba := if(min(sysdate, _ver_src_id_ldate_ba2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ba2) / 365.25);
+yr__ver_src_id_ldate_ba := if(min(sysdate, _ver_src_id_ldate_ba2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ba2) / 365.25));
 
-mth__ver_src_id_ldate_ba := if(min(sysdate, _ver_src_id_ldate_ba2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ba2) / 30.5);
+mth__ver_src_id_ldate_ba := if(min(sysdate, _ver_src_id_ldate_ba2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ba2) / 30.5));
 
 _ver_src_id_bm_pos := Models.Common.findw_cpp(ver_src_id_list, 'BM' , '  ,', 'ie');
 
@@ -1749,17 +1747,17 @@ _ver_src_id_fdate_bm := if(_ver_src_id_bm_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_bm2 := common.sas_date((string)(_ver_src_id_fdate_bm));
 
-yr__ver_src_id_fdate_bm := if(min(sysdate, _ver_src_id_fdate_bm2) = NULL, NULL, (sysdate - _ver_src_id_fdate_bm2) / 365.25);
+yr__ver_src_id_fdate_bm := if(min(sysdate, _ver_src_id_fdate_bm2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_bm2) / 365.25));
 
-mth__ver_src_id_fdate_bm := if(min(sysdate, _ver_src_id_fdate_bm2) = NULL, NULL, (sysdate - _ver_src_id_fdate_bm2) / 30.5);
+mth__ver_src_id_fdate_bm := if(min(sysdate, _ver_src_id_fdate_bm2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_bm2) / 30.5));
 
 _ver_src_id_ldate_bm := if(_ver_src_id_bm_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_bm_pos), '0');
 
 _ver_src_id_ldate_bm2 := common.sas_date((string)(_ver_src_id_ldate_bm));
 
-yr__ver_src_id_ldate_bm := if(min(sysdate, _ver_src_id_ldate_bm2) = NULL, NULL, (sysdate - _ver_src_id_ldate_bm2) / 365.25);
+yr__ver_src_id_ldate_bm := if(min(sysdate, _ver_src_id_ldate_bm2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_bm2) / 365.25));
 
-mth__ver_src_id_ldate_bm := if(min(sysdate, _ver_src_id_ldate_bm2) = NULL, NULL, (sysdate - _ver_src_id_ldate_bm2) / 30.5);
+mth__ver_src_id_ldate_bm := if(min(sysdate, _ver_src_id_ldate_bm2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_bm2) / 30.5));
 
 _ver_src_id_bn_pos := Models.Common.findw_cpp(ver_src_id_list, 'BN' , '  ,', 'ie');
 
@@ -1769,17 +1767,17 @@ _ver_src_id_fdate_bn := if(_ver_src_id_bn_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_bn2 := common.sas_date((string)(_ver_src_id_fdate_bn));
 
-yr__ver_src_id_fdate_bn := if(min(sysdate, _ver_src_id_fdate_bn2) = NULL, NULL, (sysdate - _ver_src_id_fdate_bn2) / 365.25);
+yr__ver_src_id_fdate_bn := if(min(sysdate, _ver_src_id_fdate_bn2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_bn2) / 365.25));
 
-mth__ver_src_id_fdate_bn := if(min(sysdate, _ver_src_id_fdate_bn2) = NULL, NULL, (sysdate - _ver_src_id_fdate_bn2) / 30.5);
+mth__ver_src_id_fdate_bn := if(min(sysdate, _ver_src_id_fdate_bn2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_bn2) / 30.5));
 
 _ver_src_id_ldate_bn := if(_ver_src_id_bn_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_bn_pos), '0');
 
 _ver_src_id_ldate_bn2 := common.sas_date((string)(_ver_src_id_ldate_bn));
 
-yr__ver_src_id_ldate_bn := if(min(sysdate, _ver_src_id_ldate_bn2) = NULL, NULL, (sysdate - _ver_src_id_ldate_bn2) / 365.25);
+yr__ver_src_id_ldate_bn := if(min(sysdate, _ver_src_id_ldate_bn2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_bn2) / 365.25));
 
-mth__ver_src_id_ldate_bn := if(min(sysdate, _ver_src_id_ldate_bn2) = NULL, NULL, (sysdate - _ver_src_id_ldate_bn2) / 30.5);
+mth__ver_src_id_ldate_bn := if(min(sysdate, _ver_src_id_ldate_bn2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_bn2) / 30.5));
 
 _ver_src_id_cu_pos := Models.Common.findw_cpp(ver_src_id_list, 'CU' , '  ,', 'ie');
 
@@ -1789,17 +1787,17 @@ _ver_src_id_fdate_cu := if(_ver_src_id_cu_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_cu2 := common.sas_date((string)(_ver_src_id_fdate_cu));
 
-yr__ver_src_id_fdate_cu := if(min(sysdate, _ver_src_id_fdate_cu2) = NULL, NULL, (sysdate - _ver_src_id_fdate_cu2) / 365.25);
+yr__ver_src_id_fdate_cu := if(min(sysdate, _ver_src_id_fdate_cu2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_cu2) / 365.25));
 
-mth__ver_src_id_fdate_cu := if(min(sysdate, _ver_src_id_fdate_cu2) = NULL, NULL, (sysdate - _ver_src_id_fdate_cu2) / 30.5);
+mth__ver_src_id_fdate_cu := if(min(sysdate, _ver_src_id_fdate_cu2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_cu2) / 30.5));
 
 _ver_src_id_ldate_cu := if(_ver_src_id_cu_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_cu_pos), '0');
 
 _ver_src_id_ldate_cu2 := common.sas_date((string)(_ver_src_id_ldate_cu));
 
-yr__ver_src_id_ldate_cu := if(min(sysdate, _ver_src_id_ldate_cu2) = NULL, NULL, (sysdate - _ver_src_id_ldate_cu2) / 365.25);
+yr__ver_src_id_ldate_cu := if(min(sysdate, _ver_src_id_ldate_cu2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_cu2) / 365.25));
 
-mth__ver_src_id_ldate_cu := if(min(sysdate, _ver_src_id_ldate_cu2) = NULL, NULL, (sysdate - _ver_src_id_ldate_cu2) / 30.5);
+mth__ver_src_id_ldate_cu := if(min(sysdate, _ver_src_id_ldate_cu2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_cu2) / 30.5));
 
 _ver_src_id_da_pos := Models.Common.findw_cpp(ver_src_id_list, 'DA' , '  ,', 'ie');
 
@@ -1809,17 +1807,17 @@ _ver_src_id_fdate_da := if(_ver_src_id_da_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_da2 := common.sas_date((string)(_ver_src_id_fdate_da));
 
-yr__ver_src_id_fdate_da := if(min(sysdate, _ver_src_id_fdate_da2) = NULL, NULL, (sysdate - _ver_src_id_fdate_da2) / 365.25);
+yr__ver_src_id_fdate_da := if(min(sysdate, _ver_src_id_fdate_da2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_da2) / 365.25));
 
-mth__ver_src_id_fdate_da := if(min(sysdate, _ver_src_id_fdate_da2) = NULL, NULL, (sysdate - _ver_src_id_fdate_da2) / 30.5);
+mth__ver_src_id_fdate_da := if(min(sysdate, _ver_src_id_fdate_da2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_da2) / 30.5));
 
 _ver_src_id_ldate_da := if(_ver_src_id_da_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_da_pos), '0');
 
 _ver_src_id_ldate_da2 := common.sas_date((string)(_ver_src_id_ldate_da));
 
-yr__ver_src_id_ldate_da := if(min(sysdate, _ver_src_id_ldate_da2) = NULL, NULL, (sysdate - _ver_src_id_ldate_da2) / 365.25);
+yr__ver_src_id_ldate_da := if(min(sysdate, _ver_src_id_ldate_da2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_da2) / 365.25));
 
-mth__ver_src_id_ldate_da := if(min(sysdate, _ver_src_id_ldate_da2) = NULL, NULL, (sysdate - _ver_src_id_ldate_da2) / 30.5);
+mth__ver_src_id_ldate_da := if(min(sysdate, _ver_src_id_ldate_da2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_da2) / 30.5));
 
 _ver_src_id_ef_pos := Models.Common.findw_cpp(ver_src_id_list, 'EF' , '  ,', 'ie');
 
@@ -1829,17 +1827,17 @@ _ver_src_id_fdate_ef := if(_ver_src_id_ef_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_ef2 := common.sas_date((string)(_ver_src_id_fdate_ef));
 
-yr__ver_src_id_fdate_ef := if(min(sysdate, _ver_src_id_fdate_ef2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ef2) / 365.25);
+yr__ver_src_id_fdate_ef := if(min(sysdate, _ver_src_id_fdate_ef2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ef2) / 365.25));
 
-mth__ver_src_id_fdate_ef := if(min(sysdate, _ver_src_id_fdate_ef2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ef2) / 30.5);
+mth__ver_src_id_fdate_ef := if(min(sysdate, _ver_src_id_fdate_ef2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ef2) / 30.5));
 
 _ver_src_id_ldate_ef := if(_ver_src_id_ef_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ef_pos), '0');
 
 _ver_src_id_ldate_ef2 := common.sas_date((string)(_ver_src_id_ldate_ef));
 
-yr__ver_src_id_ldate_ef := if(min(sysdate, _ver_src_id_ldate_ef2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ef2) / 365.25);
+yr__ver_src_id_ldate_ef := if(min(sysdate, _ver_src_id_ldate_ef2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ef2) / 365.25));
 
-mth__ver_src_id_ldate_ef := if(min(sysdate, _ver_src_id_ldate_ef2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ef2) / 30.5);
+mth__ver_src_id_ldate_ef := if(min(sysdate, _ver_src_id_ldate_ef2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ef2) / 30.5));
 
 _ver_src_id_fi_pos := Models.Common.findw_cpp(ver_src_id_list, 'FI' , '  ,', 'ie');
 
@@ -1849,17 +1847,17 @@ _ver_src_id_fdate_fi := if(_ver_src_id_fi_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_fi2 := common.sas_date((string)(_ver_src_id_fdate_fi));
 
-yr__ver_src_id_fdate_fi := if(min(sysdate, _ver_src_id_fdate_fi2) = NULL, NULL, (sysdate - _ver_src_id_fdate_fi2) / 365.25);
+yr__ver_src_id_fdate_fi := if(min(sysdate, _ver_src_id_fdate_fi2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fi2) / 365.25));
 
-mth__ver_src_id_fdate_fi := if(min(sysdate, _ver_src_id_fdate_fi2) = NULL, NULL, (sysdate - _ver_src_id_fdate_fi2) / 30.5);
+mth__ver_src_id_fdate_fi := if(min(sysdate, _ver_src_id_fdate_fi2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fi2) / 30.5));
 
 _ver_src_id_ldate_fi := if(_ver_src_id_fi_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_fi_pos), '0');
 
 _ver_src_id_ldate_fi2 := common.sas_date((string)(_ver_src_id_ldate_fi));
 
-yr__ver_src_id_ldate_fi := if(min(sysdate, _ver_src_id_ldate_fi2) = NULL, NULL, (sysdate - _ver_src_id_ldate_fi2) / 365.25);
+yr__ver_src_id_ldate_fi := if(min(sysdate, _ver_src_id_ldate_fi2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fi2) / 365.25));
 
-mth__ver_src_id_ldate_fi := if(min(sysdate, _ver_src_id_ldate_fi2) = NULL, NULL, (sysdate - _ver_src_id_ldate_fi2) / 30.5);
+mth__ver_src_id_ldate_fi := if(min(sysdate, _ver_src_id_ldate_fi2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fi2) / 30.5));
 
 _ver_src_id_i_pos := Models.Common.findw_cpp(ver_src_id_list, 'I' , '  ,', 'ie');
 
@@ -1869,17 +1867,17 @@ _ver_src_id_fdate_i := if(_ver_src_id_i_pos > 0, Models.Common.getw(ver_src_id_f
 
 _ver_src_id_fdate_i2 := common.sas_date((string)(_ver_src_id_fdate_i));
 
-yr__ver_src_id_fdate_i := if(min(sysdate, _ver_src_id_fdate_i2) = NULL, NULL, (sysdate - _ver_src_id_fdate_i2) / 365.25);
+yr__ver_src_id_fdate_i := if(min(sysdate, _ver_src_id_fdate_i2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_i2) / 365.25));
 
-mth__ver_src_id_fdate_i := if(min(sysdate, _ver_src_id_fdate_i2) = NULL, NULL, (sysdate - _ver_src_id_fdate_i2) / 30.5);
+mth__ver_src_id_fdate_i := if(min(sysdate, _ver_src_id_fdate_i2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_i2) / 30.5));
 
 _ver_src_id_ldate_i := if(_ver_src_id_i_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_i_pos), '0');
 
 _ver_src_id_ldate_i2 := common.sas_date((string)(_ver_src_id_ldate_i));
 
-yr__ver_src_id_ldate_i := if(min(sysdate, _ver_src_id_ldate_i2) = NULL, NULL, (sysdate - _ver_src_id_ldate_i2) / 365.25);
+yr__ver_src_id_ldate_i := if(min(sysdate, _ver_src_id_ldate_i2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_i2) / 365.25));
 
-mth__ver_src_id_ldate_i := if(min(sysdate, _ver_src_id_ldate_i2) = NULL, NULL, (sysdate - _ver_src_id_ldate_i2) / 30.5);
+mth__ver_src_id_ldate_i := if(min(sysdate, _ver_src_id_ldate_i2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_i2) / 30.5));
 
 _ver_src_id_ia_pos := Models.Common.findw_cpp(ver_src_id_list, 'IA' , '  ,', 'ie');
 
@@ -1889,17 +1887,17 @@ _ver_src_id_fdate_ia := if(_ver_src_id_ia_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_ia2 := common.sas_date((string)(_ver_src_id_fdate_ia));
 
-yr__ver_src_id_fdate_ia := if(min(sysdate, _ver_src_id_fdate_ia2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ia2) / 365.25);
+yr__ver_src_id_fdate_ia := if(min(sysdate, _ver_src_id_fdate_ia2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ia2) / 365.25));
 
-mth__ver_src_id_fdate_ia := if(min(sysdate, _ver_src_id_fdate_ia2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ia2) / 30.5);
+mth__ver_src_id_fdate_ia := if(min(sysdate, _ver_src_id_fdate_ia2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ia2) / 30.5));
 
 _ver_src_id_ldate_ia := if(_ver_src_id_ia_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ia_pos), '0');
 
 _ver_src_id_ldate_ia2 := common.sas_date((string)(_ver_src_id_ldate_ia));
 
-yr__ver_src_id_ldate_ia := if(min(sysdate, _ver_src_id_ldate_ia2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ia2) / 365.25);
+yr__ver_src_id_ldate_ia := if(min(sysdate, _ver_src_id_ldate_ia2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ia2) / 365.25));
 
-mth__ver_src_id_ldate_ia := if(min(sysdate, _ver_src_id_ldate_ia2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ia2) / 30.5);
+mth__ver_src_id_ldate_ia := if(min(sysdate, _ver_src_id_ldate_ia2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ia2) / 30.5));
 
 _ver_src_id_in_pos := Models.Common.findw_cpp(ver_src_id_list, 'IN' , '  ,', 'ie');
 
@@ -1909,17 +1907,17 @@ _ver_src_id_fdate_in := if(_ver_src_id_in_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_in2 := common.sas_date((string)(_ver_src_id_fdate_in));
 
-yr__ver_src_id_fdate_in := if(min(sysdate, _ver_src_id_fdate_in2) = NULL, NULL, (sysdate - _ver_src_id_fdate_in2) / 365.25);
+yr__ver_src_id_fdate_in := if(min(sysdate, _ver_src_id_fdate_in2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_in2) / 365.25));
 
-mth__ver_src_id_fdate_in := if(min(sysdate, _ver_src_id_fdate_in2) = NULL, NULL, (sysdate - _ver_src_id_fdate_in2) / 30.5);
+mth__ver_src_id_fdate_in := if(min(sysdate, _ver_src_id_fdate_in2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_in2) / 30.5));
 
 _ver_src_id_ldate_in := if(_ver_src_id_in_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_in_pos), '0');
 
 _ver_src_id_ldate_in2 := common.sas_date((string)(_ver_src_id_ldate_in));
 
-yr__ver_src_id_ldate_in := if(min(sysdate, _ver_src_id_ldate_in2) = NULL, NULL, (sysdate - _ver_src_id_ldate_in2) / 365.25);
+yr__ver_src_id_ldate_in := if(min(sysdate, _ver_src_id_ldate_in2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_in2) / 365.25));
 
-mth__ver_src_id_ldate_in := if(min(sysdate, _ver_src_id_ldate_in2) = NULL, NULL, (sysdate - _ver_src_id_ldate_in2) / 30.5);
+mth__ver_src_id_ldate_in := if(min(sysdate, _ver_src_id_ldate_in2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_in2) / 30.5));
 
 _ver_src_id_os_pos := Models.Common.findw_cpp(ver_src_id_list, 'OS' , '  ,', 'ie');
 
@@ -1929,17 +1927,17 @@ _ver_src_id_fdate_os := if(_ver_src_id_os_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_os2 := common.sas_date((string)(_ver_src_id_fdate_os));
 
-yr__ver_src_id_fdate_os := if(min(sysdate, _ver_src_id_fdate_os2) = NULL, NULL, (sysdate - _ver_src_id_fdate_os2) / 365.25);
+yr__ver_src_id_fdate_os := if(min(sysdate, _ver_src_id_fdate_os2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_os2) / 365.25));
 
-mth__ver_src_id_fdate_os := if(min(sysdate, _ver_src_id_fdate_os2) = NULL, NULL, (sysdate - _ver_src_id_fdate_os2) / 30.5);
+mth__ver_src_id_fdate_os := if(min(sysdate, _ver_src_id_fdate_os2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_os2) / 30.5));
 
 _ver_src_id_ldate_os := if(_ver_src_id_os_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_os_pos), '0');
 
 _ver_src_id_ldate_os2 := common.sas_date((string)(_ver_src_id_ldate_os));
 
-yr__ver_src_id_ldate_os := if(min(sysdate, _ver_src_id_ldate_os2) = NULL, NULL, (sysdate - _ver_src_id_ldate_os2) / 365.25);
+yr__ver_src_id_ldate_os := if(min(sysdate, _ver_src_id_ldate_os2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_os2) / 365.25));
 
-mth__ver_src_id_ldate_os := if(min(sysdate, _ver_src_id_ldate_os2) = NULL, NULL, (sysdate - _ver_src_id_ldate_os2) / 30.5);
+mth__ver_src_id_ldate_os := if(min(sysdate, _ver_src_id_ldate_os2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_os2) / 30.5));
 
 _ver_src_id_p_pos := Models.Common.findw_cpp(ver_src_id_list, 'P' , '  ,', 'ie');
 
@@ -1949,17 +1947,17 @@ _ver_src_id_fdate_p := if(_ver_src_id_p_pos > 0, Models.Common.getw(ver_src_id_f
 
 _ver_src_id_fdate_p2 := common.sas_date((string)(_ver_src_id_fdate_p));
 
-yr__ver_src_id_fdate_p := if(min(sysdate, _ver_src_id_fdate_p2) = NULL, NULL, (sysdate - _ver_src_id_fdate_p2) / 365.25);
+yr__ver_src_id_fdate_p := if(min(sysdate, _ver_src_id_fdate_p2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_p2) / 365.25));
 
-mth__ver_src_id_fdate_p := if(min(sysdate, _ver_src_id_fdate_p2) = NULL, NULL, (sysdate - _ver_src_id_fdate_p2) / 30.5);
+mth__ver_src_id_fdate_p := if(min(sysdate, _ver_src_id_fdate_p2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_p2) / 30.5));
 
 _ver_src_id_ldate_p := if(_ver_src_id_p_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_p_pos), '0');
 
 _ver_src_id_ldate_p2 := common.sas_date((string)(_ver_src_id_ldate_p));
 
-yr__ver_src_id_ldate_p := if(min(sysdate, _ver_src_id_ldate_p2) = NULL, NULL, (sysdate - _ver_src_id_ldate_p2) / 365.25);
+yr__ver_src_id_ldate_p := if(min(sysdate, _ver_src_id_ldate_p2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_p2) / 365.25));
 
-mth__ver_src_id_ldate_p := if(min(sysdate, _ver_src_id_ldate_p2) = NULL, NULL, (sysdate - _ver_src_id_ldate_p2) / 30.5);
+mth__ver_src_id_ldate_p := if(min(sysdate, _ver_src_id_ldate_p2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_p2) / 30.5));
 
 _ver_src_id_pl_pos := Models.Common.findw_cpp(ver_src_id_list, 'PL' , '  ,', 'ie');
 
@@ -1969,17 +1967,17 @@ _ver_src_id_fdate_pl := if(_ver_src_id_pl_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_pl2 := common.sas_date((string)(_ver_src_id_fdate_pl));
 
-yr__ver_src_id_fdate_pl := if(min(sysdate, _ver_src_id_fdate_pl2) = NULL, NULL, (sysdate - _ver_src_id_fdate_pl2) / 365.25);
+yr__ver_src_id_fdate_pl := if(min(sysdate, _ver_src_id_fdate_pl2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_pl2) / 365.25));
 
-mth__ver_src_id_fdate_pl := if(min(sysdate, _ver_src_id_fdate_pl2) = NULL, NULL, (sysdate - _ver_src_id_fdate_pl2) / 30.5);
+mth__ver_src_id_fdate_pl := if(min(sysdate, _ver_src_id_fdate_pl2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_pl2) / 30.5));
 
 _ver_src_id_ldate_pl := if(_ver_src_id_pl_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_pl_pos), '0');
 
 _ver_src_id_ldate_pl2 := common.sas_date((string)(_ver_src_id_ldate_pl));
 
-yr__ver_src_id_ldate_pl := if(min(sysdate, _ver_src_id_ldate_pl2) = NULL, NULL, (sysdate - _ver_src_id_ldate_pl2) / 365.25);
+yr__ver_src_id_ldate_pl := if(min(sysdate, _ver_src_id_ldate_pl2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_pl2) / 365.25));
 
-mth__ver_src_id_ldate_pl := if(min(sysdate, _ver_src_id_ldate_pl2) = NULL, NULL, (sysdate - _ver_src_id_ldate_pl2) / 30.5);
+mth__ver_src_id_ldate_pl := if(min(sysdate, _ver_src_id_ldate_pl2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_pl2) / 30.5));
 
 _ver_src_id_q3_pos := Models.Common.findw_cpp(ver_src_id_list, 'Q3' , '  ,', 'ie');
 
@@ -1989,17 +1987,17 @@ _ver_src_id_fdate_q3 := if(_ver_src_id_q3_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_q32 := common.sas_date((string)(_ver_src_id_fdate_q3));
 
-yr__ver_src_id_fdate_q3 := if(min(sysdate, _ver_src_id_fdate_q32) = NULL, NULL, (sysdate - _ver_src_id_fdate_q32) / 365.25);
+yr__ver_src_id_fdate_q3 := if(min(sysdate, _ver_src_id_fdate_q32) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_q32) / 365.25));
 
-mth__ver_src_id_fdate_q3 := if(min(sysdate, _ver_src_id_fdate_q32) = NULL, NULL, (sysdate - _ver_src_id_fdate_q32) / 30.5);
+mth__ver_src_id_fdate_q3 := if(min(sysdate, _ver_src_id_fdate_q32) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_q32) / 30.5));
 
 _ver_src_id_ldate_q3 := if(_ver_src_id_q3_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_q3_pos), '0');
 
 _ver_src_id_ldate_q32 := common.sas_date((string)(_ver_src_id_ldate_q3));
 
-yr__ver_src_id_ldate_q3 := if(min(sysdate, _ver_src_id_ldate_q32) = NULL, NULL, (sysdate - _ver_src_id_ldate_q32) / 365.25);
+yr__ver_src_id_ldate_q3 := if(min(sysdate, _ver_src_id_ldate_q32) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_q32) / 365.25));
 
-mth__ver_src_id_ldate_q3 := if(min(sysdate, _ver_src_id_ldate_q32) = NULL, NULL, (sysdate - _ver_src_id_ldate_q32) / 30.5);
+mth__ver_src_id_ldate_q3 := if(min(sysdate, _ver_src_id_ldate_q32) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_q32) / 30.5));
 
 _ver_src_id_sk_pos := Models.Common.findw_cpp(ver_src_id_list, 'SK' , '  ,', 'ie');
 
@@ -2009,17 +2007,17 @@ _ver_src_id_fdate_sk := if(_ver_src_id_sk_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_sk2 := common.sas_date((string)(_ver_src_id_fdate_sk));
 
-yr__ver_src_id_fdate_sk := if(min(sysdate, _ver_src_id_fdate_sk2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sk2) / 365.25);
+yr__ver_src_id_fdate_sk := if(min(sysdate, _ver_src_id_fdate_sk2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sk2) / 365.25));
 
-mth__ver_src_id_fdate_sk := if(min(sysdate, _ver_src_id_fdate_sk2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sk2) / 30.5);
+mth__ver_src_id_fdate_sk := if(min(sysdate, _ver_src_id_fdate_sk2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sk2) / 30.5));
 
 _ver_src_id_ldate_sk := if(_ver_src_id_sk_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sk_pos), '0');
 
 _ver_src_id_ldate_sk2 := common.sas_date((string)(_ver_src_id_ldate_sk));
 
-yr__ver_src_id_ldate_sk := if(min(sysdate, _ver_src_id_ldate_sk2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sk2) / 365.25);
+yr__ver_src_id_ldate_sk := if(min(sysdate, _ver_src_id_ldate_sk2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sk2) / 365.25));
 
-mth__ver_src_id_ldate_sk := if(min(sysdate, _ver_src_id_ldate_sk2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sk2) / 30.5);
+mth__ver_src_id_ldate_sk := if(min(sysdate, _ver_src_id_ldate_sk2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sk2) / 30.5));
 
 _ver_src_id_tx_pos := Models.Common.findw_cpp(ver_src_id_list, 'TX' , '  ,', 'ie');
 
@@ -2029,17 +2027,17 @@ _ver_src_id_fdate_tx := if(_ver_src_id_tx_pos > 0, Models.Common.getw(ver_src_id
 
 _ver_src_id_fdate_tx2 := common.sas_date((string)(_ver_src_id_fdate_tx));
 
-yr__ver_src_id_fdate_tx := if(min(sysdate, _ver_src_id_fdate_tx2) = NULL, NULL, (sysdate - _ver_src_id_fdate_tx2) / 365.25);
+yr__ver_src_id_fdate_tx := if(min(sysdate, _ver_src_id_fdate_tx2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_tx2) / 365.25));
 
-mth__ver_src_id_fdate_tx := if(min(sysdate, _ver_src_id_fdate_tx2) = NULL, NULL, (sysdate - _ver_src_id_fdate_tx2) / 30.5);
+mth__ver_src_id_fdate_tx := if(min(sysdate, _ver_src_id_fdate_tx2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_tx2) / 30.5));
 
 _ver_src_id_ldate_tx := if(_ver_src_id_tx_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_tx_pos), '0');
 
 _ver_src_id_ldate_tx2 := common.sas_date((string)(_ver_src_id_ldate_tx));
 
-yr__ver_src_id_ldate_tx := if(min(sysdate, _ver_src_id_ldate_tx2) = NULL, NULL, (sysdate - _ver_src_id_ldate_tx2) / 365.25);
+yr__ver_src_id_ldate_tx := if(min(sysdate, _ver_src_id_ldate_tx2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_tx2) / 365.25));
 
-mth__ver_src_id_ldate_tx := if(min(sysdate, _ver_src_id_ldate_tx2) = NULL, NULL, (sysdate - _ver_src_id_ldate_tx2) / 30.5);
+mth__ver_src_id_ldate_tx := if(min(sysdate, _ver_src_id_ldate_tx2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_tx2) / 30.5));
 
 _ver_src_id_v2_pos := Models.Common.findw_cpp(ver_src_id_list, 'V2' , '  ,', 'ie');
 
@@ -2051,7 +2049,7 @@ _ver_src_id_fdate_v22 := common.sas_date((string)(_ver_src_id_fdate_v2_1));
 
 yr__ver_src_id_fdate_v2 := if(min(sysdate, _ver_src_id_fdate_v22) = NULL, NULL, (sysdate - _ver_src_id_fdate_v22) / 365.25);
 
-mth__ver_src_id_fdate_v2 := if(min(sysdate, _ver_src_id_fdate_v22) = NULL, NULL, (sysdate - _ver_src_id_fdate_v22) / 30.5);
+mth__ver_src_id_fdate_v2 := if(min(sysdate, _ver_src_id_fdate_v22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_v22) / 30.5));
 
 _ver_src_id_ldate_v2_1 := if(_ver_src_id_v2_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_v2_pos), '0');
 
@@ -2059,7 +2057,7 @@ _ver_src_id_ldate_v22 := common.sas_date((string)(_ver_src_id_ldate_v2_1));
 
 yr__ver_src_id_ldate_v2 := if(min(sysdate, _ver_src_id_ldate_v22) = NULL, NULL, (sysdate - _ver_src_id_ldate_v22) / 365.25);
 
-mth__ver_src_id_ldate_v2 := if(min(sysdate, _ver_src_id_ldate_v22) = NULL, NULL, (sysdate - _ver_src_id_ldate_v22) / 30.5);
+mth__ver_src_id_ldate_v2 := if(min(sysdate, _ver_src_id_ldate_v22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_v22) / 30.5));
 
 _ver_src_id_wa_pos := Models.Common.findw_cpp(ver_src_id_list, 'WA' , '  ,', 'ie');
 
@@ -2071,7 +2069,7 @@ _ver_src_id_fdate_wa2 := common.sas_date((string)(_ver_src_id_fdate_wa));
 
 yr__ver_src_id_fdate_wa := if(min(sysdate, _ver_src_id_fdate_wa2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wa2) / 365.25);
 
-mth__ver_src_id_fdate_wa := if(min(sysdate, _ver_src_id_fdate_wa2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wa2) / 30.5);
+mth__ver_src_id_fdate_wa := if(min(sysdate, _ver_src_id_fdate_wa2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wa2) / 30.5));
 
 _ver_src_id_ldate_wa := if(_ver_src_id_wa_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wa_pos), '0');
 
@@ -2079,7 +2077,7 @@ _ver_src_id_ldate_wa2 := common.sas_date((string)(_ver_src_id_ldate_wa));
 
 yr__ver_src_id_ldate_wa := if(min(sysdate, _ver_src_id_ldate_wa2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wa2) / 365.25);
 
-mth__ver_src_id_ldate_wa := if(min(sysdate, _ver_src_id_ldate_wa2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wa2) / 30.5);
+mth__ver_src_id_ldate_wa := if(min(sysdate, _ver_src_id_ldate_wa2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wa2) / 30.5));
 
 _ver_src_id_by_pos := Models.Common.findw_cpp(ver_src_id_list, 'BY' , '  ,', 'ie');
 
@@ -2091,7 +2089,7 @@ _ver_src_id_fdate_by2 := common.sas_date((string)(_ver_src_id_fdate_by));
 
 yr__ver_src_id_fdate_by := if(min(sysdate, _ver_src_id_fdate_by2) = NULL, NULL, (sysdate - _ver_src_id_fdate_by2) / 365.25);
 
-mth__ver_src_id_fdate_by := if(min(sysdate, _ver_src_id_fdate_by2) = NULL, NULL, (sysdate - _ver_src_id_fdate_by2) / 30.5);
+mth__ver_src_id_fdate_by := if(min(sysdate, _ver_src_id_fdate_by2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_by2) / 30.5));
 
 _ver_src_id_ldate_by := if(_ver_src_id_by_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_by_pos), '0');
 
@@ -2099,7 +2097,7 @@ _ver_src_id_ldate_by2 := common.sas_date((string)(_ver_src_id_ldate_by));
 
 yr__ver_src_id_ldate_by := if(min(sysdate, _ver_src_id_ldate_by2) = NULL, NULL, (sysdate - _ver_src_id_ldate_by2) / 365.25);
 
-mth__ver_src_id_ldate_by := if(min(sysdate, _ver_src_id_ldate_by2) = NULL, NULL, (sysdate - _ver_src_id_ldate_by2) / 30.5);
+mth__ver_src_id_ldate_by := if(min(sysdate, _ver_src_id_ldate_by2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_by2) / 30.5));
 
 _ver_src_id_cf_pos := Models.Common.findw_cpp(ver_src_id_list, 'CF' , '  ,', 'ie');
 
@@ -2111,7 +2109,7 @@ _ver_src_id_fdate_cf2 := common.sas_date((string)(_ver_src_id_fdate_cf));
 
 yr__ver_src_id_fdate_cf := if(min(sysdate, _ver_src_id_fdate_cf2) = NULL, NULL, (sysdate - _ver_src_id_fdate_cf2) / 365.25);
 
-mth__ver_src_id_fdate_cf := if(min(sysdate, _ver_src_id_fdate_cf2) = NULL, NULL, (sysdate - _ver_src_id_fdate_cf2) / 30.5);
+mth__ver_src_id_fdate_cf := if(min(sysdate, _ver_src_id_fdate_cf2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_cf2) / 30.5));
 
 _ver_src_id_ldate_cf := if(_ver_src_id_cf_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_cf_pos), '0');
 
@@ -2119,7 +2117,7 @@ _ver_src_id_ldate_cf2 := common.sas_date((string)(_ver_src_id_ldate_cf));
 
 yr__ver_src_id_ldate_cf := if(min(sysdate, _ver_src_id_ldate_cf2) = NULL, NULL, (sysdate - _ver_src_id_ldate_cf2) / 365.25);
 
-mth__ver_src_id_ldate_cf := if(min(sysdate, _ver_src_id_ldate_cf2) = NULL, NULL, (sysdate - _ver_src_id_ldate_cf2) / 30.5);
+mth__ver_src_id_ldate_cf := if(min(sysdate, _ver_src_id_ldate_cf2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_cf2) / 30.5));
 
 _ver_src_id_e_pos := Models.Common.findw_cpp(ver_src_id_list, 'E' , '  ,', 'ie');
 
@@ -2131,7 +2129,7 @@ _ver_src_id_fdate_e2 := common.sas_date((string)(_ver_src_id_fdate_e));
 
 yr__ver_src_id_fdate_e := if(min(sysdate, _ver_src_id_fdate_e2) = NULL, NULL, (sysdate - _ver_src_id_fdate_e2) / 365.25);
 
-mth__ver_src_id_fdate_e := if(min(sysdate, _ver_src_id_fdate_e2) = NULL, NULL, (sysdate - _ver_src_id_fdate_e2) / 30.5);
+mth__ver_src_id_fdate_e := if(min(sysdate, _ver_src_id_fdate_e2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_e2) / 30.5));
 
 _ver_src_id_ldate_e := if(_ver_src_id_e_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_e_pos), '0');
 
@@ -2139,7 +2137,7 @@ _ver_src_id_ldate_e2 := common.sas_date((string)(_ver_src_id_ldate_e));
 
 yr__ver_src_id_ldate_e := if(min(sysdate, _ver_src_id_ldate_e2) = NULL, NULL, (sysdate - _ver_src_id_ldate_e2) / 365.25);
 
-mth__ver_src_id_ldate_e := if(min(sysdate, _ver_src_id_ldate_e2) = NULL, NULL, (sysdate - _ver_src_id_ldate_e2) / 30.5);
+mth__ver_src_id_ldate_e := if(min(sysdate, _ver_src_id_ldate_e2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_e2) / 30.5));
 
 _ver_src_id_ey_pos := Models.Common.findw_cpp(ver_src_id_list, 'EY' , '  ,', 'ie');
 
@@ -2151,7 +2149,7 @@ _ver_src_id_fdate_ey2 := common.sas_date((string)(_ver_src_id_fdate_ey));
 
 yr__ver_src_id_fdate_ey := if(min(sysdate, _ver_src_id_fdate_ey2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ey2) / 365.25);
 
-mth__ver_src_id_fdate_ey := if(min(sysdate, _ver_src_id_fdate_ey2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ey2) / 30.5);
+mth__ver_src_id_fdate_ey := if(min(sysdate, _ver_src_id_fdate_ey2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ey2) / 30.5));
 
 _ver_src_id_ldate_ey := if(_ver_src_id_ey_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ey_pos), '0');
 
@@ -2159,7 +2157,7 @@ _ver_src_id_ldate_ey2 := common.sas_date((string)(_ver_src_id_ldate_ey));
 
 yr__ver_src_id_ldate_ey := if(min(sysdate, _ver_src_id_ldate_ey2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ey2) / 365.25);
 
-mth__ver_src_id_ldate_ey := if(min(sysdate, _ver_src_id_ldate_ey2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ey2) / 30.5);
+mth__ver_src_id_ldate_ey := if(min(sysdate, _ver_src_id_ldate_ey2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ey2) / 30.5));
 
 _ver_src_id_f_pos := Models.Common.findw_cpp(ver_src_id_list, 'F' , '  ,', 'ie');
 
@@ -2171,7 +2169,7 @@ _ver_src_id_fdate_f2 := common.sas_date((string)(_ver_src_id_fdate_f));
 
 yr__ver_src_id_fdate_f := if(min(sysdate, _ver_src_id_fdate_f2) = NULL, NULL, (sysdate - _ver_src_id_fdate_f2) / 365.25);
 
-mth__ver_src_id_fdate_f := if(min(sysdate, _ver_src_id_fdate_f2) = NULL, NULL, (sysdate - _ver_src_id_fdate_f2) / 30.5);
+mth__ver_src_id_fdate_f := if(min(sysdate, _ver_src_id_fdate_f2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_f2) / 30.5));
 
 _ver_src_id_ldate_f := if(_ver_src_id_f_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_f_pos), '0');
 
@@ -2179,7 +2177,7 @@ _ver_src_id_ldate_f2 := common.sas_date((string)(_ver_src_id_ldate_f));
 
 yr__ver_src_id_ldate_f := if(min(sysdate, _ver_src_id_ldate_f2) = NULL, NULL, (sysdate - _ver_src_id_ldate_f2) / 365.25);
 
-mth__ver_src_id_ldate_f := if(min(sysdate, _ver_src_id_ldate_f2) = NULL, NULL, (sysdate - _ver_src_id_ldate_f2) / 30.5);
+mth__ver_src_id_ldate_f := if(min(sysdate, _ver_src_id_ldate_f2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_f2) / 30.5));
 
 _ver_src_id_fk_pos := Models.Common.findw_cpp(ver_src_id_list, 'FK' , '  ,', 'ie');
 
@@ -2191,7 +2189,7 @@ _ver_src_id_fdate_fk2 := common.sas_date((string)(_ver_src_id_fdate_fk));
 
 yr__ver_src_id_fdate_fk := if(min(sysdate, _ver_src_id_fdate_fk2) = NULL, NULL, (sysdate - _ver_src_id_fdate_fk2) / 365.25);
 
-mth__ver_src_id_fdate_fk := if(min(sysdate, _ver_src_id_fdate_fk2) = NULL, NULL, (sysdate - _ver_src_id_fdate_fk2) / 30.5);
+mth__ver_src_id_fdate_fk := if(min(sysdate, _ver_src_id_fdate_fk2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fk2) / 30.5));
 
 _ver_src_id_ldate_fk := if(_ver_src_id_fk_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_fk_pos), '0');
 
@@ -2199,7 +2197,7 @@ _ver_src_id_ldate_fk2 := common.sas_date((string)(_ver_src_id_ldate_fk));
 
 yr__ver_src_id_ldate_fk := if(min(sysdate, _ver_src_id_ldate_fk2) = NULL, NULL, (sysdate - _ver_src_id_ldate_fk2) / 365.25);
 
-mth__ver_src_id_ldate_fk := if(min(sysdate, _ver_src_id_ldate_fk2) = NULL, NULL, (sysdate - _ver_src_id_ldate_fk2) / 30.5);
+mth__ver_src_id_ldate_fk := if(min(sysdate, _ver_src_id_ldate_fk2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fk2) / 30.5));
 
 _ver_src_id_fr_pos := Models.Common.findw_cpp(ver_src_id_list, 'FR' , '  ,', 'ie');
 
@@ -2211,7 +2209,7 @@ _ver_src_id_fdate_fr2 := common.sas_date((string)(_ver_src_id_fdate_fr));
 
 yr__ver_src_id_fdate_fr := if(min(sysdate, _ver_src_id_fdate_fr2) = NULL, NULL, (sysdate - _ver_src_id_fdate_fr2) / 365.25);
 
-mth__ver_src_id_fdate_fr := if(min(sysdate, _ver_src_id_fdate_fr2) = NULL, NULL, (sysdate - _ver_src_id_fdate_fr2) / 30.5);
+mth__ver_src_id_fdate_fr := if(min(sysdate, _ver_src_id_fdate_fr2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fr2) / 30.5));
 
 _ver_src_id_ldate_fr := if(_ver_src_id_fr_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_fr_pos), '0');
 
@@ -2219,7 +2217,7 @@ _ver_src_id_ldate_fr2 := common.sas_date((string)(_ver_src_id_ldate_fr));
 
 yr__ver_src_id_ldate_fr := if(min(sysdate, _ver_src_id_ldate_fr2) = NULL, NULL, (sysdate - _ver_src_id_ldate_fr2) / 365.25);
 
-mth__ver_src_id_ldate_fr := if(min(sysdate, _ver_src_id_ldate_fr2) = NULL, NULL, (sysdate - _ver_src_id_ldate_fr2) / 30.5);
+mth__ver_src_id_ldate_fr := if(min(sysdate, _ver_src_id_ldate_fr2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fr2) / 30.5));
 
 _ver_src_id_ft_pos := Models.Common.findw_cpp(ver_src_id_list, 'FT' , '  ,', 'ie');
 
@@ -2231,7 +2229,7 @@ _ver_src_id_fdate_ft2 := common.sas_date((string)(_ver_src_id_fdate_ft));
 
 yr__ver_src_id_fdate_ft := if(min(sysdate, _ver_src_id_fdate_ft2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ft2) / 365.25);
 
-mth__ver_src_id_fdate_ft := if(min(sysdate, _ver_src_id_fdate_ft2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ft2) / 30.5);
+mth__ver_src_id_fdate_ft := if(min(sysdate, _ver_src_id_fdate_ft2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ft2) / 30.5));
 
 _ver_src_id_ldate_ft := if(_ver_src_id_ft_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ft_pos), '0');
 
@@ -2239,7 +2237,7 @@ _ver_src_id_ldate_ft2 := common.sas_date((string)(_ver_src_id_ldate_ft));
 
 yr__ver_src_id_ldate_ft := if(min(sysdate, _ver_src_id_ldate_ft2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ft2) / 365.25);
 
-mth__ver_src_id_ldate_ft := if(min(sysdate, _ver_src_id_ldate_ft2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ft2) / 30.5);
+mth__ver_src_id_ldate_ft := if(min(sysdate, _ver_src_id_ldate_ft2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ft2) / 30.5));
 
 _ver_src_id_gr_pos := Models.Common.findw_cpp(ver_src_id_list, 'GR' , '  ,', 'ie');
 
@@ -2251,7 +2249,7 @@ _ver_src_id_fdate_gr2 := common.sas_date((string)(_ver_src_id_fdate_gr));
 
 yr__ver_src_id_fdate_gr := if(min(sysdate, _ver_src_id_fdate_gr2) = NULL, NULL, (sysdate - _ver_src_id_fdate_gr2) / 365.25);
 
-mth__ver_src_id_fdate_gr := if(min(sysdate, _ver_src_id_fdate_gr2) = NULL, NULL, (sysdate - _ver_src_id_fdate_gr2) / 30.5);
+mth__ver_src_id_fdate_gr := if(min(sysdate, _ver_src_id_fdate_gr2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_gr2) / 30.5));
 
 _ver_src_id_ldate_gr := if(_ver_src_id_gr_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_gr_pos), '0');
 
@@ -2259,7 +2257,7 @@ _ver_src_id_ldate_gr2 := common.sas_date((string)(_ver_src_id_ldate_gr));
 
 yr__ver_src_id_ldate_gr := if(min(sysdate, _ver_src_id_ldate_gr2) = NULL, NULL, (sysdate - _ver_src_id_ldate_gr2) / 365.25);
 
-mth__ver_src_id_ldate_gr := if(min(sysdate, _ver_src_id_ldate_gr2) = NULL, NULL, (sysdate - _ver_src_id_ldate_gr2) / 30.5);
+mth__ver_src_id_ldate_gr := if(min(sysdate, _ver_src_id_ldate_gr2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_gr2) / 30.5));
 
 _ver_src_id_h7_pos := Models.Common.findw_cpp(ver_src_id_list, 'H7' , '  ,', 'ie');
 
@@ -2271,7 +2269,7 @@ _ver_src_id_fdate_h72 := common.sas_date((string)(_ver_src_id_fdate_h7));
 
 yr__ver_src_id_fdate_h7 := if(min(sysdate, _ver_src_id_fdate_h72) = NULL, NULL, (sysdate - _ver_src_id_fdate_h72) / 365.25);
 
-mth__ver_src_id_fdate_h7 := if(min(sysdate, _ver_src_id_fdate_h72) = NULL, NULL, (sysdate - _ver_src_id_fdate_h72) / 30.5);
+mth__ver_src_id_fdate_h7 := if(min(sysdate, _ver_src_id_fdate_h72) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_h72) / 30.5));
 
 _ver_src_id_ldate_h7 := if(_ver_src_id_h7_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_h7_pos), '0');
 
@@ -2279,7 +2277,7 @@ _ver_src_id_ldate_h72 := common.sas_date((string)(_ver_src_id_ldate_h7));
 
 yr__ver_src_id_ldate_h7 := if(min(sysdate, _ver_src_id_ldate_h72) = NULL, NULL, (sysdate - _ver_src_id_ldate_h72) / 365.25);
 
-mth__ver_src_id_ldate_h7 := if(min(sysdate, _ver_src_id_ldate_h72) = NULL, NULL, (sysdate - _ver_src_id_ldate_h72) / 30.5);
+mth__ver_src_id_ldate_h7 := if(min(sysdate, _ver_src_id_ldate_h72) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_h72) / 30.5));
 
 _ver_src_id_ic_pos := Models.Common.findw_cpp(ver_src_id_list, 'IC' , '  ,', 'ie');
 
@@ -2291,7 +2289,7 @@ _ver_src_id_fdate_ic2 := common.sas_date((string)(_ver_src_id_fdate_ic));
 
 yr__ver_src_id_fdate_ic := if(min(sysdate, _ver_src_id_fdate_ic2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ic2) / 365.25);
 
-mth__ver_src_id_fdate_ic := if(min(sysdate, _ver_src_id_fdate_ic2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ic2) / 30.5);
+mth__ver_src_id_fdate_ic := if(min(sysdate, _ver_src_id_fdate_ic2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ic2) / 30.5));
 
 _ver_src_id_ldate_ic := if(_ver_src_id_ic_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ic_pos), '0');
 
@@ -2299,7 +2297,7 @@ _ver_src_id_ldate_ic2 := common.sas_date((string)(_ver_src_id_ldate_ic));
 
 yr__ver_src_id_ldate_ic := if(min(sysdate, _ver_src_id_ldate_ic2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ic2) / 365.25);
 
-mth__ver_src_id_ldate_ic := if(min(sysdate, _ver_src_id_ldate_ic2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ic2) / 30.5);
+mth__ver_src_id_ldate_ic := if(min(sysdate, _ver_src_id_ldate_ic2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ic2) / 30.5));
 
 _ver_src_id_ip_pos := Models.Common.findw_cpp(ver_src_id_list, 'IP' , '  ,', 'ie');
 
@@ -2311,7 +2309,7 @@ _ver_src_id_fdate_ip2 := common.sas_date((string)(_ver_src_id_fdate_ip));
 
 yr__ver_src_id_fdate_ip := if(min(sysdate, _ver_src_id_fdate_ip2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ip2) / 365.25);
 
-mth__ver_src_id_fdate_ip := if(min(sysdate, _ver_src_id_fdate_ip2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ip2) / 30.5);
+mth__ver_src_id_fdate_ip := if(min(sysdate, _ver_src_id_fdate_ip2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ip2) / 30.5));
 
 _ver_src_id_ldate_ip := if(_ver_src_id_ip_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ip_pos), '0');
 
@@ -2319,7 +2317,7 @@ _ver_src_id_ldate_ip2 := common.sas_date((string)(_ver_src_id_ldate_ip));
 
 yr__ver_src_id_ldate_ip := if(min(sysdate, _ver_src_id_ldate_ip2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ip2) / 365.25);
 
-mth__ver_src_id_ldate_ip := if(min(sysdate, _ver_src_id_ldate_ip2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ip2) / 30.5);
+mth__ver_src_id_ldate_ip := if(min(sysdate, _ver_src_id_ldate_ip2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ip2) / 30.5));
 
 _ver_src_id_is_pos := Models.Common.findw_cpp(ver_src_id_list, 'IS' , '  ,', 'ie');
 
@@ -2331,7 +2329,7 @@ _ver_src_id_fdate_is2 := common.sas_date((string)(_ver_src_id_fdate_is));
 
 yr__ver_src_id_fdate_is := if(min(sysdate, _ver_src_id_fdate_is2) = NULL, NULL, (sysdate - _ver_src_id_fdate_is2) / 365.25);
 
-mth__ver_src_id_fdate_is := if(min(sysdate, _ver_src_id_fdate_is2) = NULL, NULL, (sysdate - _ver_src_id_fdate_is2) / 30.5);
+mth__ver_src_id_fdate_is := if(min(sysdate, _ver_src_id_fdate_is2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_is2) / 30.5));
 
 _ver_src_id_ldate_is := if(_ver_src_id_is_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_is_pos), '0');
 
@@ -2339,7 +2337,7 @@ _ver_src_id_ldate_is2 := common.sas_date((string)(_ver_src_id_ldate_is));
 
 yr__ver_src_id_ldate_is := if(min(sysdate, _ver_src_id_ldate_is2) = NULL, NULL, (sysdate - _ver_src_id_ldate_is2) / 365.25);
 
-mth__ver_src_id_ldate_is := if(min(sysdate, _ver_src_id_ldate_is2) = NULL, NULL, (sysdate - _ver_src_id_ldate_is2) / 30.5);
+mth__ver_src_id_ldate_is := if(min(sysdate, _ver_src_id_ldate_is2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_is2) / 30.5));
 
 _ver_src_id_it_pos := Models.Common.findw_cpp(ver_src_id_list, 'IT' , '  ,', 'ie');
 
@@ -2351,7 +2349,7 @@ _ver_src_id_fdate_it2 := common.sas_date((string)(_ver_src_id_fdate_it));
 
 yr__ver_src_id_fdate_it := if(min(sysdate, _ver_src_id_fdate_it2) = NULL, NULL, (sysdate - _ver_src_id_fdate_it2) / 365.25);
 
-mth__ver_src_id_fdate_it := if(min(sysdate, _ver_src_id_fdate_it2) = NULL, NULL, (sysdate - _ver_src_id_fdate_it2) / 30.5);
+mth__ver_src_id_fdate_it := if(min(sysdate, _ver_src_id_fdate_it2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_it2) / 30.5));
 
 _ver_src_id_ldate_it := if(_ver_src_id_it_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_it_pos), '0');
 
@@ -2359,7 +2357,7 @@ _ver_src_id_ldate_it2 := common.sas_date((string)(_ver_src_id_ldate_it));
 
 yr__ver_src_id_ldate_it := if(min(sysdate, _ver_src_id_ldate_it2) = NULL, NULL, (sysdate - _ver_src_id_ldate_it2) / 365.25);
 
-mth__ver_src_id_ldate_it := if(min(sysdate, _ver_src_id_ldate_it2) = NULL, NULL, (sysdate - _ver_src_id_ldate_it2) / 30.5);
+mth__ver_src_id_ldate_it := if(min(sysdate, _ver_src_id_ldate_it2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_it2) / 30.5));
 
 _ver_src_id_j2_pos := Models.Common.findw_cpp(ver_src_id_list, 'J2' , '  ,', 'ie');
 
@@ -2371,7 +2369,7 @@ _ver_src_id_fdate_j22 := common.sas_date((string)(_ver_src_id_fdate_j2));
 
 yr__ver_src_id_fdate_j2 := if(min(sysdate, _ver_src_id_fdate_j22) = NULL, NULL, (sysdate - _ver_src_id_fdate_j22) / 365.25);
 
-mth__ver_src_id_fdate_j2 := if(min(sysdate, _ver_src_id_fdate_j22) = NULL, NULL, (sysdate - _ver_src_id_fdate_j22) / 30.5);
+mth__ver_src_id_fdate_j2 := if(min(sysdate, _ver_src_id_fdate_j22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_j22) / 30.5));
 
 _ver_src_id_ldate_j2 := if(_ver_src_id_j2_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_j2_pos), '0');
 
@@ -2379,7 +2377,7 @@ _ver_src_id_ldate_j22 := common.sas_date((string)(_ver_src_id_ldate_j2));
 
 yr__ver_src_id_ldate_j2 := if(min(sysdate, _ver_src_id_ldate_j22) = NULL, NULL, (sysdate - _ver_src_id_ldate_j22) / 365.25);
 
-mth__ver_src_id_ldate_j2 := if(min(sysdate, _ver_src_id_ldate_j22) = NULL, NULL, (sysdate - _ver_src_id_ldate_j22) / 30.5);
+mth__ver_src_id_ldate_j2 := if(min(sysdate, _ver_src_id_ldate_j22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_j22) / 30.5));
 
 _ver_src_id_kc_pos := Models.Common.findw_cpp(ver_src_id_list, 'KC' , '  ,', 'ie');
 
@@ -2391,7 +2389,7 @@ _ver_src_id_fdate_kc2 := common.sas_date((string)(_ver_src_id_fdate_kc));
 
 yr__ver_src_id_fdate_kc := if(min(sysdate, _ver_src_id_fdate_kc2) = NULL, NULL, (sysdate - _ver_src_id_fdate_kc2) / 365.25);
 
-mth__ver_src_id_fdate_kc := if(min(sysdate, _ver_src_id_fdate_kc2) = NULL, NULL, (sysdate - _ver_src_id_fdate_kc2) / 30.5);
+mth__ver_src_id_fdate_kc := if(min(sysdate, _ver_src_id_fdate_kc2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_kc2) / 30.5));
 
 _ver_src_id_ldate_kc := if(_ver_src_id_kc_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_kc_pos), '0');
 
@@ -2399,7 +2397,7 @@ _ver_src_id_ldate_kc2 := common.sas_date((string)(_ver_src_id_ldate_kc));
 
 yr__ver_src_id_ldate_kc := if(min(sysdate, _ver_src_id_ldate_kc2) = NULL, NULL, (sysdate - _ver_src_id_ldate_kc2) / 365.25);
 
-mth__ver_src_id_ldate_kc := if(min(sysdate, _ver_src_id_ldate_kc2) = NULL, NULL, (sysdate - _ver_src_id_ldate_kc2) / 30.5);
+mth__ver_src_id_ldate_kc := if(min(sysdate, _ver_src_id_ldate_kc2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_kc2) / 30.5));
 
 _ver_src_id_mh_pos := Models.Common.findw_cpp(ver_src_id_list, 'MH' , '  ,', 'ie');
 
@@ -2411,7 +2409,7 @@ _ver_src_id_fdate_mh2 := common.sas_date((string)(_ver_src_id_fdate_mh));
 
 yr__ver_src_id_fdate_mh := if(min(sysdate, _ver_src_id_fdate_mh2) = NULL, NULL, (sysdate - _ver_src_id_fdate_mh2) / 365.25);
 
-mth__ver_src_id_fdate_mh := if(min(sysdate, _ver_src_id_fdate_mh2) = NULL, NULL, (sysdate - _ver_src_id_fdate_mh2) / 30.5);
+mth__ver_src_id_fdate_mh := if(min(sysdate, _ver_src_id_fdate_mh2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_mh2) / 30.5));
 
 _ver_src_id_ldate_mh := if(_ver_src_id_mh_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_mh_pos), '0');
 
@@ -2419,7 +2417,7 @@ _ver_src_id_ldate_mh2 := common.sas_date((string)(_ver_src_id_ldate_mh));
 
 yr__ver_src_id_ldate_mh := if(min(sysdate, _ver_src_id_ldate_mh2) = NULL, NULL, (sysdate - _ver_src_id_ldate_mh2) / 365.25);
 
-mth__ver_src_id_ldate_mh := if(min(sysdate, _ver_src_id_ldate_mh2) = NULL, NULL, (sysdate - _ver_src_id_ldate_mh2) / 30.5);
+mth__ver_src_id_ldate_mh := if(min(sysdate, _ver_src_id_ldate_mh2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_mh2) / 30.5));
 
 _ver_src_id_mw_pos := Models.Common.findw_cpp(ver_src_id_list, 'MW' , '  ,', 'ie');
 
@@ -2431,7 +2429,7 @@ _ver_src_id_fdate_mw2 := common.sas_date((string)(_ver_src_id_fdate_mw));
 
 yr__ver_src_id_fdate_mw := if(min(sysdate, _ver_src_id_fdate_mw2) = NULL, NULL, (sysdate - _ver_src_id_fdate_mw2) / 365.25);
 
-mth__ver_src_id_fdate_mw := if(min(sysdate, _ver_src_id_fdate_mw2) = NULL, NULL, (sysdate - _ver_src_id_fdate_mw2) / 30.5);
+mth__ver_src_id_fdate_mw := if(min(sysdate, _ver_src_id_fdate_mw2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_mw2) / 30.5));
 
 _ver_src_id_ldate_mw := if(_ver_src_id_mw_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_mw_pos), '0');
 
@@ -2439,7 +2437,7 @@ _ver_src_id_ldate_mw2 := common.sas_date((string)(_ver_src_id_ldate_mw));
 
 yr__ver_src_id_ldate_mw := if(min(sysdate, _ver_src_id_ldate_mw2) = NULL, NULL, (sysdate - _ver_src_id_ldate_mw2) / 365.25);
 
-mth__ver_src_id_ldate_mw := if(min(sysdate, _ver_src_id_ldate_mw2) = NULL, NULL, (sysdate - _ver_src_id_ldate_mw2) / 30.5);
+mth__ver_src_id_ldate_mw := if(min(sysdate, _ver_src_id_ldate_mw2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_mw2) / 30.5));
 
 _ver_src_id_np_pos := Models.Common.findw_cpp(ver_src_id_list, 'NP' , '  ,', 'ie');
 
@@ -2451,7 +2449,7 @@ _ver_src_id_fdate_np2 := common.sas_date((string)(_ver_src_id_fdate_np));
 
 yr__ver_src_id_fdate_np := if(min(sysdate, _ver_src_id_fdate_np2) = NULL, NULL, (sysdate - _ver_src_id_fdate_np2) / 365.25);
 
-mth__ver_src_id_fdate_np := if(min(sysdate, _ver_src_id_fdate_np2) = NULL, NULL, (sysdate - _ver_src_id_fdate_np2) / 30.5);
+mth__ver_src_id_fdate_np := if(min(sysdate, _ver_src_id_fdate_np2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_np2) / 30.5));
 
 _ver_src_id_ldate_np := if(_ver_src_id_np_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_np_pos), '0');
 
@@ -2459,7 +2457,7 @@ _ver_src_id_ldate_np2 := common.sas_date((string)(_ver_src_id_ldate_np));
 
 yr__ver_src_id_ldate_np := if(min(sysdate, _ver_src_id_ldate_np2) = NULL, NULL, (sysdate - _ver_src_id_ldate_np2) / 365.25);
 
-mth__ver_src_id_ldate_np := if(min(sysdate, _ver_src_id_ldate_np2) = NULL, NULL, (sysdate - _ver_src_id_ldate_np2) / 30.5);
+mth__ver_src_id_ldate_np := if(min(sysdate, _ver_src_id_ldate_np2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_np2) / 30.5));
 
 _ver_src_id_nr_pos := Models.Common.findw_cpp(ver_src_id_list, 'NR' , '  ,', 'ie');
 
@@ -2471,7 +2469,7 @@ _ver_src_id_fdate_nr2 := common.sas_date((string)(_ver_src_id_fdate_nr));
 
 yr__ver_src_id_fdate_nr := if(min(sysdate, _ver_src_id_fdate_nr2) = NULL, NULL, (sysdate - _ver_src_id_fdate_nr2) / 365.25);
 
-mth__ver_src_id_fdate_nr := if(min(sysdate, _ver_src_id_fdate_nr2) = NULL, NULL, (sysdate - _ver_src_id_fdate_nr2) / 30.5);
+mth__ver_src_id_fdate_nr := if(min(sysdate, _ver_src_id_fdate_nr2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_nr2) / 30.5));
 
 _ver_src_id_ldate_nr := if(_ver_src_id_nr_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_nr_pos), '0');
 
@@ -2479,7 +2477,7 @@ _ver_src_id_ldate_nr2 := common.sas_date((string)(_ver_src_id_ldate_nr));
 
 yr__ver_src_id_ldate_nr := if(min(sysdate, _ver_src_id_ldate_nr2) = NULL, NULL, (sysdate - _ver_src_id_ldate_nr2) / 365.25);
 
-mth__ver_src_id_ldate_nr := if(min(sysdate, _ver_src_id_ldate_nr2) = NULL, NULL, (sysdate - _ver_src_id_ldate_nr2) / 30.5);
+mth__ver_src_id_ldate_nr := if(min(sysdate, _ver_src_id_ldate_nr2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_nr2) / 30.5));
 
 _ver_src_id_sa_pos := Models.Common.findw_cpp(ver_src_id_list, 'SA' , '  ,', 'ie');
 
@@ -2491,7 +2489,7 @@ _ver_src_id_fdate_sa2 := common.sas_date((string)(_ver_src_id_fdate_sa));
 
 yr__ver_src_id_fdate_sa := if(min(sysdate, _ver_src_id_fdate_sa2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sa2) / 365.25);
 
-mth__ver_src_id_fdate_sa := if(min(sysdate, _ver_src_id_fdate_sa2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sa2) / 30.5);
+mth__ver_src_id_fdate_sa := if(min(sysdate, _ver_src_id_fdate_sa2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sa2) / 30.5));
 
 _ver_src_id_ldate_sa := if(_ver_src_id_sa_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sa_pos), '0');
 
@@ -2499,7 +2497,7 @@ _ver_src_id_ldate_sa2 := common.sas_date((string)(_ver_src_id_ldate_sa));
 
 yr__ver_src_id_ldate_sa := if(min(sysdate, _ver_src_id_ldate_sa2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sa2) / 365.25);
 
-mth__ver_src_id_ldate_sa := if(min(sysdate, _ver_src_id_ldate_sa2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sa2) / 30.5);
+mth__ver_src_id_ldate_sa := if(min(sysdate, _ver_src_id_ldate_sa2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sa2) / 30.5));
 
 _ver_src_id_sb_pos := Models.Common.findw_cpp(ver_src_id_list, 'SB' , '  ,', 'ie');
 
@@ -2511,7 +2509,7 @@ _ver_src_id_fdate_sb2 := common.sas_date((string)(_ver_src_id_fdate_sb));
 
 yr__ver_src_id_fdate_sb := if(min(sysdate, _ver_src_id_fdate_sb2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sb2) / 365.25);
 
-mth__ver_src_id_fdate_sb := if(min(sysdate, _ver_src_id_fdate_sb2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sb2) / 30.5);
+mth__ver_src_id_fdate_sb := if(min(sysdate, _ver_src_id_fdate_sb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sb2) / 30.5));
 
 _ver_src_id_ldate_sb := if(_ver_src_id_sb_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sb_pos), '0');
 
@@ -2519,7 +2517,7 @@ _ver_src_id_ldate_sb2 := common.sas_date((string)(_ver_src_id_ldate_sb));
 
 yr__ver_src_id_ldate_sb := if(min(sysdate, _ver_src_id_ldate_sb2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sb2) / 365.25);
 
-mth__ver_src_id_ldate_sb := if(min(sysdate, _ver_src_id_ldate_sb2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sb2) / 30.5);
+mth__ver_src_id_ldate_sb := if(min(sysdate, _ver_src_id_ldate_sb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sb2) / 30.5));
 
 _ver_src_id_sg_pos := Models.Common.findw_cpp(ver_src_id_list, 'SG' , '  ,', 'ie');
 
@@ -2531,7 +2529,7 @@ _ver_src_id_fdate_sg2 := common.sas_date((string)(_ver_src_id_fdate_sg));
 
 yr__ver_src_id_fdate_sg := if(min(sysdate, _ver_src_id_fdate_sg2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sg2) / 365.25);
 
-mth__ver_src_id_fdate_sg := if(min(sysdate, _ver_src_id_fdate_sg2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sg2) / 30.5);
+mth__ver_src_id_fdate_sg := if(min(sysdate, _ver_src_id_fdate_sg2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sg2) / 30.5));
 
 _ver_src_id_ldate_sg := if(_ver_src_id_sg_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sg_pos), '0');
 
@@ -2539,7 +2537,7 @@ _ver_src_id_ldate_sg2 := common.sas_date((string)(_ver_src_id_ldate_sg));
 
 yr__ver_src_id_ldate_sg := if(min(sysdate, _ver_src_id_ldate_sg2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sg2) / 365.25);
 
-mth__ver_src_id_ldate_sg := if(min(sysdate, _ver_src_id_ldate_sg2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sg2) / 30.5);
+mth__ver_src_id_ldate_sg := if(min(sysdate, _ver_src_id_ldate_sg2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sg2) / 30.5));
 
 _ver_src_id_sj_pos := Models.Common.findw_cpp(ver_src_id_list, 'SJ' , '  ,', 'ie');
 
@@ -2551,7 +2549,7 @@ _ver_src_id_fdate_sj2 := common.sas_date((string)(_ver_src_id_fdate_sj));
 
 yr__ver_src_id_fdate_sj := if(min(sysdate, _ver_src_id_fdate_sj2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sj2) / 365.25);
 
-mth__ver_src_id_fdate_sj := if(min(sysdate, _ver_src_id_fdate_sj2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sj2) / 30.5);
+mth__ver_src_id_fdate_sj := if(min(sysdate, _ver_src_id_fdate_sj2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sj2) / 30.5));
 
 _ver_src_id_ldate_sj := if(_ver_src_id_sj_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sj_pos), '0');
 
@@ -2559,7 +2557,7 @@ _ver_src_id_ldate_sj2 := common.sas_date((string)(_ver_src_id_ldate_sj));
 
 yr__ver_src_id_ldate_sj := if(min(sysdate, _ver_src_id_ldate_sj2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sj2) / 365.25);
 
-mth__ver_src_id_ldate_sj := if(min(sysdate, _ver_src_id_ldate_sj2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sj2) / 30.5);
+mth__ver_src_id_ldate_sj := if(min(sysdate, _ver_src_id_ldate_sj2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sj2) / 30.5));
 
 _ver_src_id_sp_pos := Models.Common.findw_cpp(ver_src_id_list, 'SP' , '  ,', 'ie');
 
@@ -2571,7 +2569,7 @@ _ver_src_id_fdate_sp2 := common.sas_date((string)(_ver_src_id_fdate_sp));
 
 yr__ver_src_id_fdate_sp := if(min(sysdate, _ver_src_id_fdate_sp2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sp2) / 365.25);
 
-mth__ver_src_id_fdate_sp := if(min(sysdate, _ver_src_id_fdate_sp2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sp2) / 30.5);
+mth__ver_src_id_fdate_sp := if(min(sysdate, _ver_src_id_fdate_sp2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sp2) / 30.5));
 
 _ver_src_id_ldate_sp := if(_ver_src_id_sp_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sp_pos), '0');
 
@@ -2579,7 +2577,7 @@ _ver_src_id_ldate_sp2 := common.sas_date((string)(_ver_src_id_ldate_sp));
 
 yr__ver_src_id_ldate_sp := if(min(sysdate, _ver_src_id_ldate_sp2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sp2) / 365.25);
 
-mth__ver_src_id_ldate_sp := if(min(sysdate, _ver_src_id_ldate_sp2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sp2) / 30.5);
+mth__ver_src_id_ldate_sp := if(min(sysdate, _ver_src_id_ldate_sp2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sp2) / 30.5));
 
 _ver_src_id_ut_pos := Models.Common.findw_cpp(ver_src_id_list, 'UT' , '  ,', 'ie');
 
@@ -2591,7 +2589,7 @@ _ver_src_id_fdate_ut2 := common.sas_date((string)(_ver_src_id_fdate_ut));
 
 yr__ver_src_id_fdate_ut := if(min(sysdate, _ver_src_id_fdate_ut2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ut2) / 365.25);
 
-mth__ver_src_id_fdate_ut := if(min(sysdate, _ver_src_id_fdate_ut2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ut2) / 30.5);
+mth__ver_src_id_fdate_ut := if(min(sysdate, _ver_src_id_fdate_ut2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ut2) / 30.5));
 
 _ver_src_id_ldate_ut := if(_ver_src_id_ut_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ut_pos), '0');
 
@@ -2599,7 +2597,7 @@ _ver_src_id_ldate_ut2 := common.sas_date((string)(_ver_src_id_ldate_ut));
 
 yr__ver_src_id_ldate_ut := if(min(sysdate, _ver_src_id_ldate_ut2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ut2) / 365.25);
 
-mth__ver_src_id_ldate_ut := if(min(sysdate, _ver_src_id_ldate_ut2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ut2) / 30.5);
+mth__ver_src_id_ldate_ut := if(min(sysdate, _ver_src_id_ldate_ut2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ut2) / 30.5));
 
 _ver_src_id_v_pos := Models.Common.findw_cpp(ver_src_id_list, 'V' , '  ,', 'ie');
 
@@ -2611,7 +2609,7 @@ _ver_src_id_fdate_v2 := common.sas_date((string)(_ver_src_id_fdate_v));
 
 yr__ver_src_id_fdate_v := if(min(sysdate, _ver_src_id_fdate_v2) = NULL, NULL, (sysdate - _ver_src_id_fdate_v2) / 365.25);
 
-mth__ver_src_id_fdate_v := if(min(sysdate, _ver_src_id_fdate_v2) = NULL, NULL, (sysdate - _ver_src_id_fdate_v2) / 30.5);
+mth__ver_src_id_fdate_v := if(min(sysdate, _ver_src_id_fdate_v2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_v2) / 30.5));
 
 _ver_src_id_ldate_v := if(_ver_src_id_v_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_v_pos), '0');
 
@@ -2619,7 +2617,7 @@ _ver_src_id_ldate_v2 := common.sas_date((string)(_ver_src_id_ldate_v));
 
 yr__ver_src_id_ldate_v := if(min(sysdate, _ver_src_id_ldate_v2) = NULL, NULL, (sysdate - _ver_src_id_ldate_v2) / 365.25);
 
-mth__ver_src_id_ldate_v := if(min(sysdate, _ver_src_id_ldate_v2) = NULL, NULL, (sysdate - _ver_src_id_ldate_v2) / 30.5);
+mth__ver_src_id_ldate_v := if(min(sysdate, _ver_src_id_ldate_v2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_v2) / 30.5));
 
 _ver_src_id_wb_pos := Models.Common.findw_cpp(ver_src_id_list, 'WB' , '  ,', 'ie');
 
@@ -2631,7 +2629,7 @@ _ver_src_id_fdate_wb2 := common.sas_date((string)(_ver_src_id_fdate_wb));
 
 yr__ver_src_id_fdate_wb := if(min(sysdate, _ver_src_id_fdate_wb2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wb2) / 365.25);
 
-mth__ver_src_id_fdate_wb := if(min(sysdate, _ver_src_id_fdate_wb2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wb2) / 30.5);
+mth__ver_src_id_fdate_wb := if(min(sysdate, _ver_src_id_fdate_wb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wb2) / 30.5));
 
 _ver_src_id_ldate_wb := if(_ver_src_id_wb_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wb_pos), '0');
 
@@ -2639,7 +2637,7 @@ _ver_src_id_ldate_wb2 := common.sas_date((string)(_ver_src_id_ldate_wb));
 
 yr__ver_src_id_ldate_wb := if(min(sysdate, _ver_src_id_ldate_wb2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wb2) / 365.25);
 
-mth__ver_src_id_ldate_wb := if(min(sysdate, _ver_src_id_ldate_wb2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wb2) / 30.5);
+mth__ver_src_id_ldate_wb := if(min(sysdate, _ver_src_id_ldate_wb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wb2) / 30.5));
 
 _ver_src_id_wc_pos := Models.Common.findw_cpp(ver_src_id_list, 'WC' , '  ,', 'ie');
 
@@ -2651,7 +2649,7 @@ _ver_src_id_fdate_wc2 := common.sas_date((string)(_ver_src_id_fdate_wc));
 
 yr__ver_src_id_fdate_wc := if(min(sysdate, _ver_src_id_fdate_wc2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wc2) / 365.25);
 
-mth__ver_src_id_fdate_wc := if(min(sysdate, _ver_src_id_fdate_wc2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wc2) / 30.5);
+mth__ver_src_id_fdate_wc := if(min(sysdate, _ver_src_id_fdate_wc2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wc2) / 30.5));
 
 _ver_src_id_ldate_wc := if(_ver_src_id_wc_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wc_pos), '0');
 
@@ -2659,7 +2657,7 @@ _ver_src_id_ldate_wc2 := common.sas_date((string)(_ver_src_id_ldate_wc));
 
 yr__ver_src_id_ldate_wc := if(min(sysdate, _ver_src_id_ldate_wc2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wc2) / 365.25);
 
-mth__ver_src_id_ldate_wc := if(min(sysdate, _ver_src_id_ldate_wc2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wc2) / 30.5);
+mth__ver_src_id_ldate_wc := if(min(sysdate, _ver_src_id_ldate_wc2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wc2) / 30.5));
 
 _ver_src_id_wk_pos := Models.Common.findw_cpp(ver_src_id_list, 'WK' , '  ,', 'ie');
 
@@ -2671,7 +2669,7 @@ _ver_src_id_fdate_wk2 := common.sas_date((string)(_ver_src_id_fdate_wk));
 
 yr__ver_src_id_fdate_wk := if(min(sysdate, _ver_src_id_fdate_wk2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wk2) / 365.25);
 
-mth__ver_src_id_fdate_wk := if(min(sysdate, _ver_src_id_fdate_wk2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wk2) / 30.5);
+mth__ver_src_id_fdate_wk := if(min(sysdate, _ver_src_id_fdate_wk2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wk2) / 30.5));
 
 _ver_src_id_ldate_wk := if(_ver_src_id_wk_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wk_pos), '0');
 
@@ -2679,7 +2677,7 @@ _ver_src_id_ldate_wk2 := common.sas_date((string)(_ver_src_id_ldate_wk));
 
 yr__ver_src_id_ldate_wk := if(min(sysdate, _ver_src_id_ldate_wk2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wk2) / 365.25);
 
-mth__ver_src_id_ldate_wk := if(min(sysdate, _ver_src_id_ldate_wk2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wk2) / 30.5);
+mth__ver_src_id_ldate_wk := if(min(sysdate, _ver_src_id_ldate_wk2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wk2) / 30.5));
 
 _ver_src_id_wx_pos := Models.Common.findw_cpp(ver_src_id_list, 'WX' , '  ,', 'ie');
 
@@ -2691,7 +2689,7 @@ _ver_src_id_fdate_wx2 := common.sas_date((string)(_ver_src_id_fdate_wx));
 
 yr__ver_src_id_fdate_wx := if(min(sysdate, _ver_src_id_fdate_wx2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wx2) / 365.25);
 
-mth__ver_src_id_fdate_wx := if(min(sysdate, _ver_src_id_fdate_wx2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wx2) / 30.5);
+mth__ver_src_id_fdate_wx := if(min(sysdate, _ver_src_id_fdate_wx2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wx2) / 30.5));
 
 _ver_src_id_ldate_wx := if(_ver_src_id_wx_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wx_pos), '0');
 
@@ -2699,7 +2697,7 @@ _ver_src_id_ldate_wx2 := common.sas_date((string)(_ver_src_id_ldate_wx));
 
 yr__ver_src_id_ldate_wx := if(min(sysdate, _ver_src_id_ldate_wx2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wx2) / 365.25);
 
-mth__ver_src_id_ldate_wx := if(min(sysdate, _ver_src_id_ldate_wx2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wx2) / 30.5);
+mth__ver_src_id_ldate_wx := if(min(sysdate, _ver_src_id_ldate_wx2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wx2) / 30.5));
 
 _ver_src_id_zo_pos := Models.Common.findw_cpp(ver_src_id_list, 'ZO' , '  ,', 'ie');
 
@@ -2711,7 +2709,7 @@ _ver_src_id_fdate_zo2 := common.sas_date((string)(_ver_src_id_fdate_zo));
 
 yr__ver_src_id_fdate_zo := if(min(sysdate, _ver_src_id_fdate_zo2) = NULL, NULL, (sysdate - _ver_src_id_fdate_zo2) / 365.25);
 
-mth__ver_src_id_fdate_zo := if(min(sysdate, _ver_src_id_fdate_zo2) = NULL, NULL, (sysdate - _ver_src_id_fdate_zo2) / 30.5);
+mth__ver_src_id_fdate_zo := if(min(sysdate, _ver_src_id_fdate_zo2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_zo2) / 30.5));
 
 _ver_src_id_ldate_zo := if(_ver_src_id_zo_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_zo_pos), '0');
 
@@ -2719,7 +2717,7 @@ _ver_src_id_ldate_zo2 := common.sas_date((string)(_ver_src_id_ldate_zo));
 
 yr__ver_src_id_ldate_zo := if(min(sysdate, _ver_src_id_ldate_zo2) = NULL, NULL, (sysdate - _ver_src_id_ldate_zo2) / 365.25);
 
-mth__ver_src_id_ldate_zo := if(min(sysdate, _ver_src_id_ldate_zo2) = NULL, NULL, (sysdate - _ver_src_id_ldate_zo2) / 30.5);
+mth__ver_src_id_ldate_zo := if(min(sysdate, _ver_src_id_ldate_zo2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_zo2) / 30.5));
 
 _ver_src_id_y_pos := Models.Common.findw_cpp(ver_src_id_list, 'Y' , '  ,', 'ie');
 
@@ -2731,7 +2729,7 @@ _ver_src_id_fdate_y2 := common.sas_date((string)(_ver_src_id_fdate_y));
 
 yr__ver_src_id_fdate_y := if(min(sysdate, _ver_src_id_fdate_y2) = NULL, NULL, (sysdate - _ver_src_id_fdate_y2) / 365.25);
 
-mth__ver_src_id_fdate_y := if(min(sysdate, _ver_src_id_fdate_y2) = NULL, NULL, (sysdate - _ver_src_id_fdate_y2) / 30.5);
+mth__ver_src_id_fdate_y := if(min(sysdate, _ver_src_id_fdate_y2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_y2) / 30.5));
 
 _ver_src_id_ldate_y := if(_ver_src_id_y_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_y_pos), '0');
 
@@ -2739,7 +2737,7 @@ _ver_src_id_ldate_y2 := common.sas_date((string)(_ver_src_id_ldate_y));
 
 yr__ver_src_id_ldate_y := if(min(sysdate, _ver_src_id_ldate_y2) = NULL, NULL, (sysdate - _ver_src_id_ldate_y2) / 365.25);
 
-mth__ver_src_id_ldate_y := if(min(sysdate, _ver_src_id_ldate_y2) = NULL, NULL, (sysdate - _ver_src_id_ldate_y2) / 30.5);
+mth__ver_src_id_ldate_y := if(min(sysdate, _ver_src_id_ldate_y2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_y2) / 30.5));
 
 _ver_src_id_gb_pos := Models.Common.findw_cpp(ver_src_id_list, 'GB' , '  ,', 'ie');
 
@@ -2751,7 +2749,7 @@ _ver_src_id_fdate_gb2 := common.sas_date((string)(_ver_src_id_fdate_gb));
 
 yr__ver_src_id_fdate_gb := if(min(sysdate, _ver_src_id_fdate_gb2) = NULL, NULL, (sysdate - _ver_src_id_fdate_gb2) / 365.25);
 
-mth__ver_src_id_fdate_gb := if(min(sysdate, _ver_src_id_fdate_gb2) = NULL, NULL, (sysdate - _ver_src_id_fdate_gb2) / 30.5);
+mth__ver_src_id_fdate_gb := if(min(sysdate, _ver_src_id_fdate_gb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_gb2) / 30.5));
 
 _ver_src_id_ldate_gb := if(_ver_src_id_gb_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_gb_pos), '0');
 
@@ -2759,7 +2757,7 @@ _ver_src_id_ldate_gb2 := common.sas_date((string)(_ver_src_id_ldate_gb));
 
 yr__ver_src_id_ldate_gb := if(min(sysdate, _ver_src_id_ldate_gb2) = NULL, NULL, (sysdate - _ver_src_id_ldate_gb2) / 365.25);
 
-mth__ver_src_id_ldate_gb := if(min(sysdate, _ver_src_id_ldate_gb2) = NULL, NULL, (sysdate - _ver_src_id_ldate_gb2) / 30.5);
+mth__ver_src_id_ldate_gb := if(min(sysdate, _ver_src_id_ldate_gb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_gb2) / 30.5));
 
 _ver_src_id_cs_pos := Models.Common.findw_cpp(ver_src_id_list, 'C#' , ' ,', 'ie');
 
@@ -2771,7 +2769,7 @@ _ver_src_id_ldate_cs2 := common.sas_date((string)(_ver_src_id_ldate_cs));
 
 yr__ver_src_id_ldate_cs := if(min(sysdate, _ver_src_id_ldate_cs2) = NULL, NULL, (sysdate - _ver_src_id_ldate_cs2) / 365.25);
 
-mth__ver_src_id_ldate_cs := if(min(sysdate, _ver_src_id_ldate_cs2) = NULL, NULL, (sysdate - _ver_src_id_ldate_cs2) / 30.5);
+mth__ver_src_id_ldate_cs := if(min(sysdate, _ver_src_id_ldate_cs2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_cs2) / 30.5));
 
 _ver_src_id_fdate_cs := if(_ver_src_id_cs_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_cs_pos), '0');
 
@@ -2779,7 +2777,7 @@ _ver_src_id_fdate_cs2 := common.sas_date((string)(_ver_src_id_fdate_cs));
 
 yr__ver_src_id_fdate_cs := if(min(sysdate, _ver_src_id_fdate_cs2) = NULL, NULL, (sysdate - _ver_src_id_fdate_cs2) / 365.25);
 
-mth__ver_src_id_fdate_cs := if(min(sysdate, _ver_src_id_fdate_cs2) = NULL, NULL, (sysdate - _ver_src_id_fdate_cs2) / 30.5);
+mth__ver_src_id_fdate_cs := if(min(sysdate, _ver_src_id_fdate_cs2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_cs2) / 30.5));
 
 vs_ver_src_id__gb := _ver_src_id__gb;
 
@@ -2899,7 +2897,9 @@ vs_email_domain_edu_count := if(not(truedid), -1, email_domain_EDU_count);
 
 vs_historical_count := if(not(truedid), -1, historical_count);
 
-vs_college_tier := if(not(truedid), -1, (integer) college_tier);
+vs_college_tier := map(not(truedid) => -1,
+	college_tier = '' => NULL,
+	(integer) college_tier);
 
 vs_prof_license_flag := if(not(truedid), -1, (integer) prof_license_flag);
 
@@ -2913,7 +2913,7 @@ ver_src_cons_fsrc_fdate2 := common.sas_date((string)(ver_src_cons_fsrc_fdate));
 
 yr_ver_src_cons_fsrc_fdate := if(min(sysdate, ver_src_cons_fsrc_fdate2) = NULL, NULL, (sysdate - ver_src_cons_fsrc_fdate2) / 365.25);
 
-mth_ver_src_cons_fsrc_fdate := if(min(sysdate, ver_src_cons_fsrc_fdate2) = NULL, NULL, (sysdate - ver_src_cons_fsrc_fdate2) / 30.5);
+mth_ver_src_cons_fsrc_fdate := if(min(sysdate, ver_src_cons_fsrc_fdate2) = NULL, NULL, roundup((sysdate - ver_src_cons_fsrc_fdate2) / 30.5));
 
 ver_src_cons_vo_pos := Models.Common.findw_cpp(ver_sources, 'VO' , '  ,', 'ie');
 
@@ -2925,7 +2925,7 @@ ver_src_cons_fdate_vo2 := common.sas_date((string)(ver_src_cons_fdate_vo));
 
 yr_ver_src_cons_fdate_vo := if(min(sysdate, ver_src_cons_fdate_vo2) = NULL, NULL, (sysdate - ver_src_cons_fdate_vo2) / 365.25);
 
-mth_ver_src_cons_fdate_vo := if(min(sysdate, ver_src_cons_fdate_vo2) = NULL, NULL, (sysdate - ver_src_cons_fdate_vo2) / 30.5);
+mth_ver_src_cons_fdate_vo := if(min(sysdate, ver_src_cons_fdate_vo2) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_vo2) / 30.5));
 
 ver_src_cons_ldate_vo := if(ver_src_cons_vo_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_vo_pos), '0');
 
@@ -2933,7 +2933,7 @@ ver_src_cons_ldate_vo2 := common.sas_date((string)(ver_src_cons_ldate_vo));
 
 yr_ver_src_cons_ldate_vo := if(min(sysdate, ver_src_cons_ldate_vo2) = NULL, NULL, (sysdate - ver_src_cons_ldate_vo2) / 365.25);
 
-mth_ver_src_cons_ldate_vo := if(min(sysdate, ver_src_cons_ldate_vo2) = NULL, NULL, (sysdate - ver_src_cons_ldate_vo2) / 30.5);
+mth_ver_src_cons_ldate_vo := if(min(sysdate, ver_src_cons_ldate_vo2) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_vo2) / 30.5));
 
 ver_src_cons_wp_pos := Models.Common.findw_cpp(ver_sources, 'WP' , '  ,', 'ie');
 
@@ -2945,7 +2945,7 @@ ver_src_cons_fdate_wp2 := common.sas_date((string)(ver_src_cons_fdate_wp));
 
 yr_ver_src_cons_fdate_wp := if(min(sysdate, ver_src_cons_fdate_wp2) = NULL, NULL, (sysdate - ver_src_cons_fdate_wp2) / 365.25);
 
-mth_ver_src_cons_fdate_wp := if(min(sysdate, ver_src_cons_fdate_wp2) = NULL, NULL, (sysdate - ver_src_cons_fdate_wp2) / 30.5);
+mth_ver_src_cons_fdate_wp := if(min(sysdate, ver_src_cons_fdate_wp2) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_wp2) / 30.5));
 
 ver_src_cons_ldate_wp := if(ver_src_cons_wp_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_wp_pos), '0');
 
@@ -2953,7 +2953,7 @@ ver_src_cons_ldate_wp2 := common.sas_date((string)(ver_src_cons_ldate_wp));
 
 yr_ver_src_cons_ldate_wp := if(min(sysdate, ver_src_cons_ldate_wp2) = NULL, NULL, (sysdate - ver_src_cons_ldate_wp2) / 365.25);
 
-mth_ver_src_cons_ldate_wp := if(min(sysdate, ver_src_cons_ldate_wp2) = NULL, NULL, (sysdate - ver_src_cons_ldate_wp2) / 30.5);
+mth_ver_src_cons_ldate_wp := if(min(sysdate, ver_src_cons_ldate_wp2) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_wp2) / 30.5));
 
 ver_src_cons_am_pos := Models.Common.findw_cpp(ver_sources, 'AM' , '  ,', 'ie');
 
@@ -2965,7 +2965,7 @@ ver_src_cons_fdate_am2 := common.sas_date((string)(ver_src_cons_fdate_am));
 
 yr_ver_src_cons_fdate_am := if(min(sysdate, ver_src_cons_fdate_am2) = NULL, NULL, (sysdate - ver_src_cons_fdate_am2) / 365.25);
 
-mth_ver_src_cons_fdate_am := if(min(sysdate, ver_src_cons_fdate_am2) = NULL, NULL, (sysdate - ver_src_cons_fdate_am2) / 30.5);
+mth_ver_src_cons_fdate_am := if(min(sysdate, ver_src_cons_fdate_am2) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_am2) / 30.5));
 
 ver_src_cons_ldate_am := if(ver_src_cons_am_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_am_pos), '0');
 
@@ -2973,7 +2973,7 @@ ver_src_cons_ldate_am2 := common.sas_date((string)(ver_src_cons_ldate_am));
 
 yr_ver_src_cons_ldate_am := if(min(sysdate, ver_src_cons_ldate_am2) = NULL, NULL, (sysdate - ver_src_cons_ldate_am2) / 365.25);
 
-mth_ver_src_cons_ldate_am := if(min(sysdate, ver_src_cons_ldate_am2) = NULL, NULL, (sysdate - ver_src_cons_ldate_am2) / 30.5);
+mth_ver_src_cons_ldate_am := if(min(sysdate, ver_src_cons_ldate_am2) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_am2) / 30.5));
 
 ver_src_cons_e1_pos := Models.Common.findw_cpp(ver_sources, 'E1' , '  ,', 'ie');
 
@@ -2985,7 +2985,7 @@ ver_src_cons_fdate_e12 := common.sas_date((string)(ver_src_cons_fdate_e1));
 
 yr_ver_src_cons_fdate_e1 := if(min(sysdate, ver_src_cons_fdate_e12) = NULL, NULL, (sysdate - ver_src_cons_fdate_e12) / 365.25);
 
-mth_ver_src_cons_fdate_e1 := if(min(sysdate, ver_src_cons_fdate_e12) = NULL, NULL, (sysdate - ver_src_cons_fdate_e12) / 30.5);
+mth_ver_src_cons_fdate_e1 := if(min(sysdate, ver_src_cons_fdate_e12) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_e12) / 30.5));
 
 ver_src_cons_ldate_e1 := if(ver_src_cons_e1_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_e1_pos), '0');
 
@@ -2993,7 +2993,7 @@ ver_src_cons_ldate_e12 := common.sas_date((string)(ver_src_cons_ldate_e1));
 
 yr_ver_src_cons_ldate_e1 := if(min(sysdate, ver_src_cons_ldate_e12) = NULL, NULL, (sysdate - ver_src_cons_ldate_e12) / 365.25);
 
-mth_ver_src_cons_ldate_e1 := if(min(sysdate, ver_src_cons_ldate_e12) = NULL, NULL, (sysdate - ver_src_cons_ldate_e12) / 30.5);
+mth_ver_src_cons_ldate_e1 := if(min(sysdate, ver_src_cons_ldate_e12) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_e12) / 30.5));
 
 ver_src_cons_e2_pos := Models.Common.findw_cpp(ver_sources, 'E2' , '  ,', 'ie');
 
@@ -3005,7 +3005,7 @@ ver_src_cons_fdate_e22 := common.sas_date((string)(ver_src_cons_fdate_e2));
 
 yr_ver_src_cons_fdate_e2 := if(min(sysdate, ver_src_cons_fdate_e22) = NULL, NULL, (sysdate - ver_src_cons_fdate_e22) / 365.25);
 
-mth_ver_src_cons_fdate_e2 := if(min(sysdate, ver_src_cons_fdate_e22) = NULL, NULL, (sysdate - ver_src_cons_fdate_e22) / 30.5);
+mth_ver_src_cons_fdate_e2 := if(min(sysdate, ver_src_cons_fdate_e22) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_e22) / 30.5));
 
 ver_src_cons_ldate_e2 := if(ver_src_cons_e2_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_e2_pos), '0');
 
@@ -3013,7 +3013,7 @@ ver_src_cons_ldate_e22 := common.sas_date((string)(ver_src_cons_ldate_e2));
 
 yr_ver_src_cons_ldate_e2 := if(min(sysdate, ver_src_cons_ldate_e22) = NULL, NULL, (sysdate - ver_src_cons_ldate_e22) / 365.25);
 
-mth_ver_src_cons_ldate_e2 := if(min(sysdate, ver_src_cons_ldate_e22) = NULL, NULL, (sysdate - ver_src_cons_ldate_e22) / 30.5);
+mth_ver_src_cons_ldate_e2 := if(min(sysdate, ver_src_cons_ldate_e22) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_e22) / 30.5));
 
 ver_src_cons_e3_pos := Models.Common.findw_cpp(ver_sources, 'E3' , '  ,', 'ie');
 
@@ -3025,7 +3025,7 @@ ver_src_cons_fdate_e32 := common.sas_date((string)(ver_src_cons_fdate_e3));
 
 yr_ver_src_cons_fdate_e3 := if(min(sysdate, ver_src_cons_fdate_e32) = NULL, NULL, (sysdate - ver_src_cons_fdate_e32) / 365.25);
 
-mth_ver_src_cons_fdate_e3 := if(min(sysdate, ver_src_cons_fdate_e32) = NULL, NULL, (sysdate - ver_src_cons_fdate_e32) / 30.5);
+mth_ver_src_cons_fdate_e3 := if(min(sysdate, ver_src_cons_fdate_e32) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_e32) / 30.5));
 
 ver_src_cons_ldate_e3 := if(ver_src_cons_e3_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_e3_pos), '0');
 
@@ -3033,7 +3033,7 @@ ver_src_cons_ldate_e32 := common.sas_date((string)(ver_src_cons_ldate_e3));
 
 yr_ver_src_cons_ldate_e3 := if(min(sysdate, ver_src_cons_ldate_e32) = NULL, NULL, (sysdate - ver_src_cons_ldate_e32) / 365.25);
 
-mth_ver_src_cons_ldate_e3 := if(min(sysdate, ver_src_cons_ldate_e32) = NULL, NULL, (sysdate - ver_src_cons_ldate_e32) / 30.5);
+mth_ver_src_cons_ldate_e3 := if(min(sysdate, ver_src_cons_ldate_e32) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_e32) / 30.5));
 
 _ver_src_cons_fdate_vo := common.sas_date((string)(ver_src_cons_fdate_vo));
 
@@ -3618,7 +3618,7 @@ iv_curr_add_mortgage_type := map(
     (mortgage_type in ['H', 'J'])                         => 'HIGH-RISK      ',
     (mortgage_type in ['PMM', 'PP', 'S', 'L'])            => 'NON-TRADITIONAL',
     (mortgage_type in ['U'])                              => 'UNKNOWN        ',
-    mortgage_type = ''				                            => 'OTHER          ',
+    not(mortgage_type = '')				                            => 'OTHER          ',
     mortgage_present                                      => 'UNKNOWN        ',
                                                              'NO MORTGAGE');
 
@@ -4101,7 +4101,8 @@ s0_v10_w := map(
 
 s0_aa_code_10 := map(
     s0_v10_w = -0.0367536943766163 => '     ',
-    bv_sos_current_standing = NULL => 'B031',
+    s0_v10_w = 0.49084339045106 => '     ',
+		bv_sos_current_standing = NULL => 'B031',
     bv_sos_current_standing = -1   => 'B034',
     bv_sos_current_standing <= 0   => 'B035',
     bv_sos_current_standing <= 1   => 'B059',
@@ -6986,9 +6987,56 @@ slbb1702_0_2 := if(iv_rv5_unscorable = 1, 222, slbb1702_0_2_1);
 
 ds_layout := {STRING rc, REAL value};
 
+Null_ds := dataset([{'00', NULL}, {'00', NULL}, {'00', NULL}, {'00', NULL}], ds_layout);
 
- 
 //*************************************************************************************//
+s_aa_code_set:= [
+s0_aa_code_01,
+s0_aa_code_02,
+s0_aa_code_03,
+s0_aa_code_04,
+s0_aa_code_05,
+s0_aa_code_06,
+s0_aa_code_07,
+s0_aa_code_08,
+s0_aa_code_09,
+s0_aa_code_10,
+s0_aa_code_02,
+s0_aa_code_11,
+s0_aa_code_12,
+s0_aa_code_13,
+s0_aa_code_14,
+s0_aa_code_15,
+s0_aa_code_16,
+s0_aa_code_17,
+s0_aa_code_18,
+s0_aa_code_19,
+s0_aa_code_20,
+s0_aa_code_21,
+s0_aa_code_22,
+s0_aa_code_23,
+s0_aa_code_24,
+s0_aa_code_25,
+s0_aa_code_26,
+s0_aa_code_27,
+s0_aa_code_28,
+s0_aa_code_29,
+s0_aa_code_30,
+s0_aa_code_31,
+s0_aa_code_32,
+s0_aa_code_33,
+s0_aa_code_34,
+s0_aa_code_35,
+s0_aa_code_36,
+s0_aa_code_37,
+s0_aa_code_38,
+s0_aa_code_39,
+s0_aa_code_40,
+s0_aa_code_41,
+s0_aa_code_42,
+s0_aa_code_43
+];
+             
 rc_dataset_s0 := DATASET([
     {'B017', s0_rcvalueB017},
     {'B026', s0_rcvalueB026},
@@ -7020,67 +7068,93 @@ rc_dataset_s0 := DATASET([
     {'P565', s0_rcvalueP565},
     {'P566', s0_rcvalueP566},
     {'P567', s0_rcvalueP567}
-    ], ds_layout);
+    ], ds_layout)(rc in s_aa_code_set);
 
 //*************************************************************************************//
 // IMPORTANT NOTE:  Select ONLY reason codes with an RCValue < 0.  I'll leave the 
 //   implementation of this to the Engineer
 //*************************************************************************************//
-rc_dataset_s0_sorted := sort(rc_dataset_s0, rc_dataset_s0.value);
+rc_dataset_0_sorted_new := sort(rc_dataset_s0, value, rc);
 
-
-baseBLS0_rc1  := rc_dataset_s0_sorted[1].rc;
-baseBLS0_rc2  := rc_dataset_s0_sorted[2].rc;
-baseBLS0_rc3  := rc_dataset_s0_sorted[3].rc;
-baseBLS0_rc4  := rc_dataset_s0_sorted[4].rc;
-baseBLS0_rc5  := rc_dataset_s0_sorted[5].rc;
-baseBLS0_rc6  := rc_dataset_s0_sorted[6].rc;
-baseBLS0_rc7  := rc_dataset_s0_sorted[7].rc;
-baseBLS0_rc8  := rc_dataset_s0_sorted[8].rc;
-baseBLS0_rc9  := rc_dataset_s0_sorted[9].rc;
-baseBLS0_rc10  := rc_dataset_s0_sorted[10].rc;
-baseBLS0_rc11  := rc_dataset_s0_sorted[11].rc;
-baseBLS0_rc12  := rc_dataset_s0_sorted[12].rc;
-baseBLS0_rc13  := rc_dataset_s0_sorted[13].rc;
-baseBLS0_rc14  := rc_dataset_s0_sorted[14].rc;
-baseBLS0_rc15  := rc_dataset_s0_sorted[15].rc;
-baseBLS0_rc16  := rc_dataset_s0_sorted[16].rc;
-baseBLS0_rc17  := rc_dataset_s0_sorted[17].rc;
-baseBLS0_rc18  := rc_dataset_s0_sorted[18].rc;
-baseBLS0_rc19  := rc_dataset_s0_sorted[19].rc;
-baseBLS0_rc20  := rc_dataset_s0_sorted[20].rc;
-baseBLS0_rc21  := rc_dataset_s0_sorted[21].rc;
-baseBLS0_rc22  := rc_dataset_s0_sorted[22].rc;
-baseBLS0_rc23  := rc_dataset_s0_sorted[23].rc;
-baseBLS0_rc24  := rc_dataset_s0_sorted[24].rc;
-baseBLS0_rc25  := rc_dataset_s0_sorted[25].rc;
-baseBLS0_rc26  := rc_dataset_s0_sorted[26].rc;
-baseBLS0_rc27  := rc_dataset_s0_sorted[27].rc;
-baseBLS0_rc28  := rc_dataset_s0_sorted[28].rc;
-baseBLS0_rc29  := rc_dataset_s0_sorted[29].rc;
-baseBLS0_rc30  := rc_dataset_s0_sorted[30].rc;
-baseBLS0_rc31  := rc_dataset_s0_sorted[31].rc;
-baseBLS0_rc32  := rc_dataset_s0_sorted[32].rc;
-baseBLS0_rc33  := rc_dataset_s0_sorted[33].rc;
-baseBLS0_rc34  := rc_dataset_s0_sorted[34].rc;
-baseBLS0_rc35  := rc_dataset_s0_sorted[35].rc;
-baseBLS0_rc36  := rc_dataset_s0_sorted[36].rc;
-baseBLS0_rc37  := rc_dataset_s0_sorted[37].rc;
-baseBLS0_rc38  := rc_dataset_s0_sorted[38].rc;
-baseBLS0_rc39  := rc_dataset_s0_sorted[39].rc;
-baseBLS0_rc40  := rc_dataset_s0_sorted[40].rc;
-baseBLS0_rc41  := rc_dataset_s0_sorted[41].rc;
-baseBLS0_rc42  := rc_dataset_s0_sorted[42].rc;
-baseBLS0_rc43  := rc_dataset_s0_sorted[43].rc;
-baseBLS0_rc44  := rc_dataset_s0_sorted[44].rc;
-baseBLS0_rc45  := rc_dataset_s0_sorted[45].rc;
-baseBLS0_rc46  := rc_dataset_s0_sorted[46].rc;
-baseBLS0_rc47  := rc_dataset_s0_sorted[47].rc;
-baseBLS0_rc48  := rc_dataset_s0_sorted[48].rc;
-baseBLS0_rc49  := rc_dataset_s0_sorted[49].rc;
-baseBLS0_rc50  := rc_dataset_s0_sorted[50].rc;
+baseBLS0_rc1  := rc_dataset_0_sorted_new[1].rc;
+baseBLS0_rc2  := rc_dataset_0_sorted_new[2].rc;
+baseBLS0_rc3  := rc_dataset_0_sorted_new[3].rc;
+baseBLS0_rc4  := rc_dataset_0_sorted_new[4].rc;
+baseBLS0_rc5  := rc_dataset_0_sorted_new[5].rc;
+baseBLS0_rc6  := rc_dataset_0_sorted_new[6].rc;
+baseBLS0_rc7  := rc_dataset_0_sorted_new[7].rc;
+baseBLS0_rc8  := rc_dataset_0_sorted_new[8].rc;
+baseBLS0_rc9  := rc_dataset_0_sorted_new[9].rc;
+baseBLS0_rc10  := rc_dataset_0_sorted_new[10].rc;
+baseBLS0_rc11  := rc_dataset_0_sorted_new[11].rc;
+baseBLS0_rc12  := rc_dataset_0_sorted_new[12].rc;
+baseBLS0_rc13  := rc_dataset_0_sorted_new[13].rc;
+baseBLS0_rc14  := rc_dataset_0_sorted_new[14].rc;
+baseBLS0_rc15  := rc_dataset_0_sorted_new[15].rc;
+baseBLS0_rc16  := rc_dataset_0_sorted_new[16].rc;
+baseBLS0_rc17  := rc_dataset_0_sorted_new[17].rc;
+baseBLS0_rc18  := rc_dataset_0_sorted_new[18].rc;
+baseBLS0_rc19  := rc_dataset_0_sorted_new[19].rc;
+baseBLS0_rc20  := rc_dataset_0_sorted_new[20].rc;
+baseBLS0_rc21  := rc_dataset_0_sorted_new[21].rc;
+baseBLS0_rc22  := rc_dataset_0_sorted_new[22].rc;
+baseBLS0_rc23  := rc_dataset_0_sorted_new[23].rc;
+baseBLS0_rc24  := rc_dataset_0_sorted_new[24].rc;
+baseBLS0_rc25  := rc_dataset_0_sorted_new[25].rc;
+baseBLS0_rc26  := rc_dataset_0_sorted_new[26].rc;
+baseBLS0_rc27  := rc_dataset_0_sorted_new[27].rc;
+baseBLS0_rc28  := rc_dataset_0_sorted_new[28].rc;
+baseBLS0_rc29  := rc_dataset_0_sorted_new[29].rc;
+baseBLS0_rc30  := rc_dataset_0_sorted_new[30].rc;
+baseBLS0_rc31  := rc_dataset_0_sorted_new[31].rc;
+baseBLS0_rc32  := rc_dataset_0_sorted_new[32].rc;
+baseBLS0_rc33  := rc_dataset_0_sorted_new[33].rc;
+baseBLS0_rc34  := rc_dataset_0_sorted_new[34].rc;
+baseBLS0_rc35  := rc_dataset_0_sorted_new[35].rc;
+baseBLS0_rc36  := rc_dataset_0_sorted_new[36].rc;
+baseBLS0_rc37  := rc_dataset_0_sorted_new[37].rc;
+baseBLS0_rc38  := rc_dataset_0_sorted_new[38].rc;
+baseBLS0_rc39  := rc_dataset_0_sorted_new[39].rc;
+baseBLS0_rc40  := rc_dataset_0_sorted_new[40].rc;
+baseBLS0_rc41  := rc_dataset_0_sorted_new[41].rc;
+baseBLS0_rc42  := rc_dataset_0_sorted_new[42].rc;
+baseBLS0_rc43  := rc_dataset_0_sorted_new[43].rc;
+baseBLS0_rc44  := rc_dataset_0_sorted_new[44].rc;
+baseBLS0_rc45  := rc_dataset_0_sorted_new[45].rc;
+baseBLS0_rc46  := rc_dataset_0_sorted_new[46].rc;
+baseBLS0_rc47  := rc_dataset_0_sorted_new[47].rc;
+baseBLS0_rc48  := rc_dataset_0_sorted_new[48].rc;
+baseBLS0_rc49  := rc_dataset_0_sorted_new[49].rc;
+baseBLS0_rc50  := rc_dataset_0_sorted_new[50].rc;
  
 //*************************************************************************************//
+s1_code_set := [s1_aa_code_01,
+s1_aa_code_02,
+s1_aa_code_03,
+s1_aa_code_04,
+s1_aa_code_05,
+s1_aa_code_06,
+s1_aa_code_07,
+s1_aa_code_08,
+s1_aa_code_09,
+s1_aa_code_10,
+s1_aa_code_02,
+s1_aa_code_11,
+s1_aa_code_12,
+s1_aa_code_13,
+s1_aa_code_14,
+s1_aa_code_15,
+s1_aa_code_16,
+s1_aa_code_17,
+s1_aa_code_18,
+s1_aa_code_19,
+s1_aa_code_20,
+s1_aa_code_21,
+s1_aa_code_22,
+s1_aa_code_23,
+s1_aa_code_24,
+s1_aa_code_25,
+s1_aa_code_26];
 rc_dataset_s1 := DATASET([
     {'B067', s1_rcvalueB067},
     {'P502', s1_rcvalueP502},
@@ -7096,65 +7170,65 @@ rc_dataset_s1 := DATASET([
     {'P540', s1_rcvalueP540},
     {'P566', s1_rcvalueP566},
     {'P567', s1_rcvalueP567}
-    ], ds_layout);
+    ], ds_layout)(rc in s1_code_set);
 
 //*************************************************************************************//
-// IMPORTANT NOTE:  Select ONLY reason codes with an RCValue < 0.  I'll leave the 
-//   implementation of this to the Engineer
+// If none of the first four RCs are a business reason code (rc[1] = 'B'), find the first 
+// business reason code, and make that the fourh reason code. Then shift everything down
+// one position to make room for that reason code.  
 //*************************************************************************************//
-rc_dataset_s1_sorted := sort(rc_dataset_s1, rc_dataset_s1.value);
+rc_dataset_s_sorted_new := sort(rc_dataset_s1, value, rc);
 
-
-baseBLS1_rc1  := rc_dataset_s1_sorted[1].rc;
-baseBLS1_rc2  := rc_dataset_s1_sorted[2].rc;
-baseBLS1_rc3  := rc_dataset_s1_sorted[3].rc;
-baseBLS1_rc4  := rc_dataset_s1_sorted[4].rc;
-baseBLS1_rc5  := rc_dataset_s1_sorted[5].rc;
-baseBLS1_rc6  := rc_dataset_s1_sorted[6].rc;
-baseBLS1_rc7  := rc_dataset_s1_sorted[7].rc;
-baseBLS1_rc8  := rc_dataset_s1_sorted[8].rc;
-baseBLS1_rc9  := rc_dataset_s1_sorted[9].rc;
-baseBLS1_rc10  := rc_dataset_s1_sorted[10].rc;
-baseBLS1_rc11  := rc_dataset_s1_sorted[11].rc;
-baseBLS1_rc12  := rc_dataset_s1_sorted[12].rc;
-baseBLS1_rc13  := rc_dataset_s1_sorted[13].rc;
-baseBLS1_rc14  := rc_dataset_s1_sorted[14].rc;
-baseBLS1_rc15  := rc_dataset_s1_sorted[15].rc;
-baseBLS1_rc16  := rc_dataset_s1_sorted[16].rc;
-baseBLS1_rc17  := rc_dataset_s1_sorted[17].rc;
-baseBLS1_rc18  := rc_dataset_s1_sorted[18].rc;
-baseBLS1_rc19  := rc_dataset_s1_sorted[19].rc;
-baseBLS1_rc20  := rc_dataset_s1_sorted[20].rc;
-baseBLS1_rc21  := rc_dataset_s1_sorted[21].rc;
-baseBLS1_rc22  := rc_dataset_s1_sorted[22].rc;
-baseBLS1_rc23  := rc_dataset_s1_sorted[23].rc;
-baseBLS1_rc24  := rc_dataset_s1_sorted[24].rc;
-baseBLS1_rc25  := rc_dataset_s1_sorted[25].rc;
-baseBLS1_rc26  := rc_dataset_s1_sorted[26].rc;
-baseBLS1_rc27  := rc_dataset_s1_sorted[27].rc;
-baseBLS1_rc28  := rc_dataset_s1_sorted[28].rc;
-baseBLS1_rc29  := rc_dataset_s1_sorted[29].rc;
-baseBLS1_rc30  := rc_dataset_s1_sorted[30].rc;
-baseBLS1_rc31  := rc_dataset_s1_sorted[31].rc;
-baseBLS1_rc32  := rc_dataset_s1_sorted[32].rc;
-baseBLS1_rc33  := rc_dataset_s1_sorted[33].rc;
-baseBLS1_rc34  := rc_dataset_s1_sorted[34].rc;
-baseBLS1_rc35  := rc_dataset_s1_sorted[35].rc;
-baseBLS1_rc36  := rc_dataset_s1_sorted[36].rc;
-baseBLS1_rc37  := rc_dataset_s1_sorted[37].rc;
-baseBLS1_rc38  := rc_dataset_s1_sorted[38].rc;
-baseBLS1_rc39  := rc_dataset_s1_sorted[39].rc;
-baseBLS1_rc40  := rc_dataset_s1_sorted[40].rc;
-baseBLS1_rc41  := rc_dataset_s1_sorted[41].rc;
-baseBLS1_rc42  := rc_dataset_s1_sorted[42].rc;
-baseBLS1_rc43  := rc_dataset_s1_sorted[43].rc;
-baseBLS1_rc44  := rc_dataset_s1_sorted[44].rc;
-baseBLS1_rc45  := rc_dataset_s1_sorted[45].rc;
-baseBLS1_rc46  := rc_dataset_s1_sorted[46].rc;
-baseBLS1_rc47  := rc_dataset_s1_sorted[47].rc;
-baseBLS1_rc48  := rc_dataset_s1_sorted[48].rc;
-baseBLS1_rc49  := rc_dataset_s1_sorted[49].rc;
-baseBLS1_rc50  := rc_dataset_s1_sorted[50].rc;
+baseBLS1_rc1  := rc_dataset_s_sorted_new[1].rc;
+baseBLS1_rc2  := rc_dataset_s_sorted_new[2].rc;
+baseBLS1_rc3  := rc_dataset_s_sorted_new[3].rc;
+baseBLS1_rc4  := rc_dataset_s_sorted_new[4].rc;
+baseBLS1_rc5  := rc_dataset_s_sorted_new[5].rc;
+baseBLS1_rc6  := rc_dataset_s_sorted_new[6].rc;
+baseBLS1_rc7  := rc_dataset_s_sorted_new[7].rc;
+baseBLS1_rc8  := rc_dataset_s_sorted_new[8].rc;
+baseBLS1_rc9  := rc_dataset_s_sorted_new[9].rc;
+baseBLS1_rc10  := rc_dataset_s_sorted_new[10].rc;
+baseBLS1_rc11  := rc_dataset_s_sorted_new[11].rc;
+baseBLS1_rc12  := rc_dataset_s_sorted_new[12].rc;
+baseBLS1_rc13  := rc_dataset_s_sorted_new[13].rc;
+baseBLS1_rc14  := rc_dataset_s_sorted_new[14].rc;
+baseBLS1_rc15  := rc_dataset_s_sorted_new[15].rc;
+baseBLS1_rc16  := rc_dataset_s_sorted_new[16].rc;
+baseBLS1_rc17  := rc_dataset_s_sorted_new[17].rc;
+baseBLS1_rc18  := rc_dataset_s_sorted_new[18].rc;
+baseBLS1_rc19  := rc_dataset_s_sorted_new[19].rc;
+baseBLS1_rc20  := rc_dataset_s_sorted_new[20].rc;
+baseBLS1_rc21  := rc_dataset_s_sorted_new[21].rc;
+baseBLS1_rc22  := rc_dataset_s_sorted_new[22].rc;
+baseBLS1_rc23  := rc_dataset_s_sorted_new[23].rc;
+baseBLS1_rc24  := rc_dataset_s_sorted_new[24].rc;
+baseBLS1_rc25  := rc_dataset_s_sorted_new[25].rc;
+baseBLS1_rc26  := rc_dataset_s_sorted_new[26].rc;
+baseBLS1_rc27  := rc_dataset_s_sorted_new[27].rc;
+baseBLS1_rc28  := rc_dataset_s_sorted_new[28].rc;
+baseBLS1_rc29  := rc_dataset_s_sorted_new[29].rc;
+baseBLS1_rc30  := rc_dataset_s_sorted_new[30].rc;
+baseBLS1_rc31  := rc_dataset_s_sorted_new[31].rc;
+baseBLS1_rc32  := rc_dataset_s_sorted_new[32].rc;
+baseBLS1_rc33  := rc_dataset_s_sorted_new[33].rc;
+baseBLS1_rc34  := rc_dataset_s_sorted_new[34].rc;
+baseBLS1_rc35  := rc_dataset_s_sorted_new[35].rc;
+baseBLS1_rc36  := rc_dataset_s_sorted_new[36].rc;
+baseBLS1_rc37  := rc_dataset_s_sorted_new[37].rc;
+baseBLS1_rc38  := rc_dataset_s_sorted_new[38].rc;
+baseBLS1_rc39  := rc_dataset_s_sorted_new[39].rc;
+baseBLS1_rc40  := rc_dataset_s_sorted_new[40].rc;
+baseBLS1_rc41  := rc_dataset_s_sorted_new[41].rc;
+baseBLS1_rc42  := rc_dataset_s_sorted_new[42].rc;
+baseBLS1_rc43  := rc_dataset_s_sorted_new[43].rc;
+baseBLS1_rc44  := rc_dataset_s_sorted_new[44].rc;
+baseBLS1_rc45  := rc_dataset_s_sorted_new[45].rc;
+baseBLS1_rc46  := rc_dataset_s_sorted_new[46].rc;
+baseBLS1_rc47  := rc_dataset_s_sorted_new[47].rc;
+baseBLS1_rc48  := rc_dataset_s_sorted_new[48].rc;
+baseBLS1_rc49  := rc_dataset_s_sorted_new[49].rc;
+baseBLS1_rc50  := rc_dataset_s_sorted_new[50].rc;
 
 
 /* Note for Engineering:  I did not implement this logic as described
@@ -7169,82 +7243,82 @@ in the SAS model code:
     5. put the original fourth RC in the fifth position
 */
 
-bus_mod_rc25 := map(
+bus_mod_rc25_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc25,
                              basebls1_rc25);
 
-bus_mod_rc31 := map(
+bus_mod_rc31_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc31,
                              basebls1_rc31);
 
-bus_mod_rc8 := map(
+bus_mod_rc8_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc8,
                              basebls1_rc8);
 
-bus_mod_rc36 := map(
+bus_mod_rc36_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc36,
                              basebls1_rc36);
 
-bus_mod_rc41 := map(
+bus_mod_rc41_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc41,
                              basebls1_rc41);
 
-bus_mod_rc10 := map(
+bus_mod_rc10_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc10,
                              basebls1_rc10);
 
-bus_mod_rc50 := map(
+bus_mod_rc50_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc50,
                              basebls1_rc50);
 
-bus_mod_rc46 := map(
+bus_mod_rc46_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc46,
                              basebls1_rc46);
 
-bus_mod_rc34 := map(
+bus_mod_rc34_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc34,
                              basebls1_rc34);
 
-bus_mod_rc13 := map(
+bus_mod_rc13_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc13,
                              basebls1_rc13);
 
-bus_mod_rc30 := map(
+bus_mod_rc30_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc30,
                              basebls1_rc30);
 
-bus_mod_rc9 := map(
+bus_mod_rc9_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc9,
                              basebls1_rc9);
 
-bus_mod_rc29 := map(
+bus_mod_rc29_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc29,
                              basebls1_rc29);
 
-bus_mod_rc24 := map(
+bus_mod_rc24_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc24,
                              basebls1_rc24);
 
-bus_mod_rc35 := map(
+bus_mod_rc35_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc35,
                              basebls1_rc35);
 
-bus_mod_rc48 := map(
+bus_mod_rc48_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc48,
                              basebls1_rc48);
@@ -7254,67 +7328,62 @@ bus_mod_rc2 := map(
     rep_only = 0          => basebls0_rc2,
                              basebls1_rc2);
 
-bus_mod_rc14 := map(
+bus_mod_rc14_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc14,
                              basebls1_rc14);
 
-bus_mod_rc26 := map(
+bus_mod_rc26_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc26,
                              basebls1_rc26);
 
-bus_mod_rc6 := map(
+bus_mod_rc6_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc6,
                              basebls1_rc6);
 
-bus_mod_rc44 := map(
+bus_mod_rc44_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc44,
                              basebls1_rc44);
 
-bus_mod_rc21 := map(
+bus_mod_rc21_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc21,
                              basebls1_rc21);
 
-bus_mod_rc43 := map(
+bus_mod_rc43_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc43,
                              basebls1_rc43);
 
-bus_mod_rc19 := map(
+bus_mod_rc19_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc19,
                              basebls1_rc19);
 
-bus_mod_rc32 := map(
+bus_mod_rc32_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc32,
                              basebls1_rc32);
 
-bus_mod_rc38 := map(
+bus_mod_rc38_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc38,
                              basebls1_rc38);
 
-bus_mod_rc15 := map(
+bus_mod_rc15_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc15,
                              basebls1_rc15);
 
-bus_mod_rc5 := map(
-    iv_rv5_unscorable = 1 => '',
-    rep_only = 0          => basebls0_rc5,
-                             basebls1_rc5);
-
-bus_mod_rc37 := map(
+bus_mod_rc37_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc37,
                              basebls1_rc37);
 
-bus_mod_rc33 := map(
+bus_mod_rc33_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc33,
                              basebls1_rc33);
@@ -7324,57 +7393,57 @@ bus_mod_rc1 := map(
     rep_only = 0          => basebls0_rc1,
                              basebls1_rc1);
 
-bus_mod_rc28 := map(
+bus_mod_rc28_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc28,
                              basebls1_rc28);
 
-bus_mod_rc22 := map(
+bus_mod_rc22_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc22,
                              basebls1_rc22);
 
-bus_mod_rc42 := map(
+bus_mod_rc42_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc42,
                              basebls1_rc42);
 
-bus_mod_rc7 := map(
+bus_mod_rc7_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc7,
                              basebls1_rc7);
 
-bus_mod_rc18 := map(
+bus_mod_rc18_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc18,
                              basebls1_rc18);
 
-bus_mod_rc49 := map(
+bus_mod_rc49_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc49,
                              basebls1_rc49);
 
-bus_mod_rc16 := map(
+bus_mod_rc16_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc16,
                              basebls1_rc16);
 
-bus_mod_rc27 := map(
+bus_mod_rc27_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc27,
                              basebls1_rc27);
 
-bus_mod_rc40 := map(
+bus_mod_rc40_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc40,
                              basebls1_rc40);
 
-bus_mod_rc47 := map(
+bus_mod_rc47_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc47,
                              basebls1_rc47);
 
-bus_mod_rc45 := map(
+bus_mod_rc45_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc45,
                              basebls1_rc45);
@@ -7384,40 +7453,147 @@ bus_mod_rc3 := map(
     rep_only = 0          => basebls0_rc3,
                              basebls1_rc3);
 
-bus_mod_rc12 := map(
+bus_mod_rc12_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc12,
                              basebls1_rc12);
 
-bus_mod_rc11 := map(
+bus_mod_rc11_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc11,
                              basebls1_rc11);
 
-bus_mod_rc39 := map(
+bus_mod_rc39_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc39,
                              basebls1_rc39);
 
-bus_mod_rc17 := map(
+bus_mod_rc17_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc17,
                              basebls1_rc17);
 
-bus_mod_rc4 := map(
+bus_mod_rc4_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc4,
                              basebls1_rc4);
 
-bus_mod_rc23 := map(
+bus_mod_rc5_tmp := map(
+    iv_rv5_unscorable = 1 => '',
+    rep_only = 0          => basebls0_rc5,
+                             basebls1_rc5);
+														 
+bus_mod_rc23_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc23,
                              basebls1_rc23);
 
-bus_mod_rc20 := map(
+bus_mod_rc20_tmp := map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc20,
-                             basebls1_rc20);
+                             basebls1_rc20);														 
+
+b_rc_rc := dataset([
+{bus_mod_rc5_tmp, 1},
+{bus_mod_rc6_tmp, 2},
+{bus_mod_rc7_tmp, 3},
+{bus_mod_rc8_tmp, 4},
+{bus_mod_rc9_tmp, 5},
+{bus_mod_rc10_tmp, 6},
+{bus_mod_rc11_tmp, 7},
+{bus_mod_rc12_tmp, 8},
+{bus_mod_rc13_tmp, 9},
+{bus_mod_rc14_tmp, 10},
+{bus_mod_rc15_tmp, 11},
+{bus_mod_rc16_tmp, 12},
+{bus_mod_rc17_tmp, 13},
+{bus_mod_rc18_tmp, 14},
+{bus_mod_rc19_tmp, 15},
+{bus_mod_rc20_tmp, 16},
+{bus_mod_rc21_tmp, 17},
+{bus_mod_rc22_tmp, 18},
+{bus_mod_rc23_tmp, 19},
+{bus_mod_rc24_tmp, 20},
+{bus_mod_rc25_tmp, 21},
+{bus_mod_rc26_tmp, 22},
+{bus_mod_rc27_tmp, 23},
+{bus_mod_rc28_tmp, 24},
+{bus_mod_rc29_tmp, 25},
+{bus_mod_rc30_tmp, 26},
+{bus_mod_rc31_tmp, 27},
+{bus_mod_rc32_tmp, 28},
+{bus_mod_rc33_tmp, 29},
+{bus_mod_rc34_tmp, 30},
+{bus_mod_rc35_tmp, 31},
+{bus_mod_rc36_tmp, 32},
+{bus_mod_rc37_tmp, 33},
+{bus_mod_rc38_tmp, 34},
+{bus_mod_rc39_tmp, 35},
+{bus_mod_rc40_tmp, 36},
+{bus_mod_rc41_tmp, 37},
+{bus_mod_rc42_tmp, 38},
+{bus_mod_rc43_tmp, 39},
+{bus_mod_rc44_tmp, 40},
+{bus_mod_rc45_tmp, 41},
+{bus_mod_rc46_tmp, 42},
+{bus_mod_rc47_tmp, 43},
+{bus_mod_rc48_tmp, 44},
+{bus_mod_rc49_tmp, 45},
+{bus_mod_rc50_tmp, 46}], ds_layout);
+
+do_new_sort := bus_mod_rc1[1..1] <> 'B' and bus_mod_rc2[1..1] <> 'B' and 
+							 bus_mod_rc3[1..1] <> 'B' and bus_mod_rc4_tmp[1..1] <> 'B';
+rc4_business := b_rc_rc(rc[1] = 'B')[1];
+brc := b_rc_rc(rc <> rc4_business.rc); //gives us all except new B reason code
+rc_dataset_s2_sorted_new := if(do_new_sort, brc, b_rc_rc); 
+
+bus_mod_rc4  := if(do_new_sort, rc4_business.rc, bus_mod_rc4_tmp);
+bus_mod_rc5  := if(do_new_sort, bus_mod_rc4_tmp, rc_dataset_s2_sorted_new[1].rc);
+bus_mod_rc6  := if(do_new_sort,rc_dataset_s2_sorted_new[1].rc, rc_dataset_s2_sorted_new[2].rc);
+bus_mod_rc7  := if(do_new_sort,rc_dataset_s2_sorted_new[2].rc,rc_dataset_s2_sorted_new[3].rc);
+bus_mod_rc8  := if(do_new_sort,rc_dataset_s2_sorted_new[3].rc,rc_dataset_s2_sorted_new[4].rc);
+bus_mod_rc9  := if(do_new_sort,rc_dataset_s2_sorted_new[4].rc,rc_dataset_s2_sorted_new[5].rc);
+bus_mod_rc10 := if(do_new_sort,rc_dataset_s2_sorted_new[5].rc,rc_dataset_s2_sorted_new[6].rc);
+bus_mod_rc11 := if(do_new_sort,rc_dataset_s2_sorted_new[6].rc,rc_dataset_s2_sorted_new[7].rc);
+bus_mod_rc12 := if(do_new_sort,rc_dataset_s2_sorted_new[7].rc,rc_dataset_s2_sorted_new[8].rc);
+bus_mod_rc13 := if(do_new_sort,rc_dataset_s2_sorted_new[8].rc,rc_dataset_s2_sorted_new[9].rc);
+bus_mod_rc14 := if(do_new_sort,rc_dataset_s2_sorted_new[9].rc,rc_dataset_s2_sorted_new[10].rc);
+bus_mod_rc15 := if(do_new_sort,rc_dataset_s2_sorted_new[10].rc,rc_dataset_s2_sorted_new[11].rc);
+bus_mod_rc16 := if(do_new_sort,rc_dataset_s2_sorted_new[11].rc,rc_dataset_s2_sorted_new[12].rc);
+bus_mod_rc17 := if(do_new_sort,rc_dataset_s2_sorted_new[12].rc,rc_dataset_s2_sorted_new[13].rc);
+bus_mod_rc18 := if(do_new_sort,rc_dataset_s2_sorted_new[13].rc,rc_dataset_s2_sorted_new[14].rc);
+bus_mod_rc19 := if(do_new_sort,rc_dataset_s2_sorted_new[14].rc,rc_dataset_s2_sorted_new[15].rc);
+bus_mod_rc20 := if(do_new_sort,rc_dataset_s2_sorted_new[15].rc,rc_dataset_s2_sorted_new[16].rc);
+bus_mod_rc21 := if(do_new_sort,rc_dataset_s2_sorted_new[16].rc,rc_dataset_s2_sorted_new[17].rc);
+bus_mod_rc22 := if(do_new_sort,rc_dataset_s2_sorted_new[17].rc,rc_dataset_s2_sorted_new[18].rc);
+bus_mod_rc23 := if(do_new_sort,rc_dataset_s2_sorted_new[18].rc,rc_dataset_s2_sorted_new[19].rc);
+bus_mod_rc24 := if(do_new_sort,rc_dataset_s2_sorted_new[19].rc,rc_dataset_s2_sorted_new[20].rc);
+bus_mod_rc25 := if(do_new_sort,rc_dataset_s2_sorted_new[20].rc,rc_dataset_s2_sorted_new[21].rc);
+bus_mod_rc26 := if(do_new_sort,rc_dataset_s2_sorted_new[21].rc,rc_dataset_s2_sorted_new[22].rc);
+bus_mod_rc27 := if(do_new_sort,rc_dataset_s2_sorted_new[22].rc,rc_dataset_s2_sorted_new[23].rc);
+bus_mod_rc28 := if(do_new_sort,rc_dataset_s2_sorted_new[23].rc,rc_dataset_s2_sorted_new[24].rc);
+bus_mod_rc29 := if(do_new_sort,rc_dataset_s2_sorted_new[24].rc,rc_dataset_s2_sorted_new[25].rc);
+bus_mod_rc30 := if(do_new_sort,rc_dataset_s2_sorted_new[25].rc,rc_dataset_s2_sorted_new[26].rc);
+bus_mod_rc31 := if(do_new_sort,rc_dataset_s2_sorted_new[26].rc,rc_dataset_s2_sorted_new[271].rc);
+bus_mod_rc32 := if(do_new_sort,rc_dataset_s2_sorted_new[27].rc,rc_dataset_s2_sorted_new[28].rc);
+bus_mod_rc33 := if(do_new_sort,rc_dataset_s2_sorted_new[28].rc,rc_dataset_s2_sorted_new[29].rc);
+bus_mod_rc34 := if(do_new_sort,rc_dataset_s2_sorted_new[29].rc,rc_dataset_s2_sorted_new[30].rc);
+bus_mod_rc35 := if(do_new_sort,rc_dataset_s2_sorted_new[30].rc,rc_dataset_s2_sorted_new[31].rc);
+bus_mod_rc36 := if(do_new_sort,rc_dataset_s2_sorted_new[31].rc,rc_dataset_s2_sorted_new[32].rc);
+bus_mod_rc37 := if(do_new_sort,rc_dataset_s2_sorted_new[32].rc,rc_dataset_s2_sorted_new[33].rc);
+bus_mod_rc38 := if(do_new_sort,rc_dataset_s2_sorted_new[33].rc,rc_dataset_s2_sorted_new[34].rc);
+bus_mod_rc39 := if(do_new_sort,rc_dataset_s2_sorted_new[34].rc,rc_dataset_s2_sorted_new[35].rc);
+bus_mod_rc40 := if(do_new_sort,rc_dataset_s2_sorted_new[35].rc,rc_dataset_s2_sorted_new[36].rc);
+bus_mod_rc41 := if(do_new_sort,rc_dataset_s2_sorted_new[36].rc,rc_dataset_s2_sorted_new[37].rc);
+bus_mod_rc42 := if(do_new_sort,rc_dataset_s2_sorted_new[37].rc,rc_dataset_s2_sorted_new[38].rc);
+bus_mod_rc43 := if(do_new_sort,rc_dataset_s2_sorted_new[38].rc,rc_dataset_s2_sorted_new[39].rc);
+bus_mod_rc44 := if(do_new_sort,rc_dataset_s2_sorted_new[39].rc,rc_dataset_s2_sorted_new[40].rc);
+bus_mod_rc45 := if(do_new_sort,rc_dataset_s2_sorted_new[40].rc,rc_dataset_s2_sorted_new[41].rc);
+bus_mod_rc46 := if(do_new_sort,rc_dataset_s2_sorted_new[41].rc,rc_dataset_s2_sorted_new[42].rc);
+bus_mod_rc47 := if(do_new_sort,rc_dataset_s2_sorted_new[42].rc,rc_dataset_s2_sorted_new[43].rc);
+bus_mod_rc48 := if(do_new_sort,rc_dataset_s2_sorted_new[43].rc,rc_dataset_s2_sorted_new[44].rc);
+bus_mod_rc49 := if(do_new_sort,rc_dataset_s2_sorted_new[44].rc,rc_dataset_s2_sorted_new[45].rc);
+bus_mod_rc50 := if(do_new_sort,rc_dataset_s2_sorted_new[45].rc,rc_dataset_s2_sorted_new[46].rc);
 
 slbb_rc1_1 := bus_mod_rc1;
 
@@ -7449,7 +7625,6 @@ reasonCodes := CHOOSEN(reasons & zeros, 4); // Keep up to 4 reason codes
 
 	#if(MODEL_DEBUG)
    self.sysdate                          := sysdate;
-                    //self.sysdate_days                     := sysdate_days;
                     self._ver_src_id_fsrc_fdate           := _ver_src_id_fsrc_fdate;
                     self._ver_src_id_fsrc_fdate2          := _ver_src_id_fsrc_fdate2;
                     self.yr__ver_src_id_fsrc_fdate        := yr__ver_src_id_fsrc_fdate;
@@ -8789,7 +8964,6 @@ reasonCodes := CHOOSEN(reasons & zeros, 4); // Keep up to 4 reason codes
 	#end
 	END;
 
-	//model := PROJECT(clam, doModel(LEFT));
 		model := JOIN(BusShell, Clam, LEFT.Input_Echo.seq = RIGHT.seq, doModel(LEFT, RIGHT), LEFT OUTER, KEEP(1));
 	RETURN(model);
 END;

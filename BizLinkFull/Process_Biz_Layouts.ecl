@@ -159,7 +159,7 @@ EXPORT Fetch_Stream(DATASET(id_stream_layout) d) := FUNCTION
       SELF := ri;
       SELF := le;
     END;
-    J := JOIN( d,k,(LEFT.ultid = RIGHT.ultid) AND (LEFT.orgid = 0 OR LEFT.orgid = RIGHT.orgid) AND (LEFT.seleid = 0 OR LEFT.seleid = RIGHT.seleid) AND (LEFT.proxid = 0 OR LEFT.proxid = RIGHT.proxid) AND (LEFT.powid = 0 OR LEFT.powid = RIGHT.powid),tr(LEFT,RIGHT), LEFT OUTER, KEEP(10000), LIMIT(Config_BIP.JoinLimit)); // Ignore excess records without erroring
+    J := JOIN( d,k,(LEFT.ultid = RIGHT.ultid) AND (LEFT.orgid = 0 OR LEFT.orgid = RIGHT.orgid) AND (LEFT.seleid = 0 OR LEFT.seleid = RIGHT.seleid) AND (LEFT.proxid = 0 OR LEFT.proxid = RIGHT.proxid) AND (LEFT.powid = 0 OR LEFT.powid = RIGHT.powid),tr(LEFT,RIGHT), LEFT OUTER, KEEP(10000), LIMIT(0)); // Ignore excess records without erroring
     RETURN J;
 END;
  
