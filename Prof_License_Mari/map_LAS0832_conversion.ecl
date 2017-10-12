@@ -1,4 +1,4 @@
-// LAS0832 / Louisiana Real Estate Commission / Real Estate raw data to common layout for MARI and PL use
+﻿// LAS0832 / Louisiana Real Estate Commission / Real Estate raw data to common layout for MARI and PL use
 #workunit('name','map_LAS0832_conversion'); 
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
@@ -117,15 +117,18 @@ EXPORT map_LAS0832_conversion(STRING pVersion) := FUNCTION
 																 tempMariParse);
 			
 		prepNAME_ORG					:= 	trimNAME_ORG;
-		
-		tempNick							:= IF(StringLib.stringfind(prepNAME_ORG,'"',1) >0 AND StringLib.stringfind(prepNAME_ORG,'(',1) >0,
-																REGEXFIND('^([A-Za-z ][^("]+)[\\(][\\"]([A-Za-z ][^\\"]+)[\\"][\\)]',prepNAME_ORG,2),'');
-		
-		//Removing NickName and Suffix Name from Corporate NAME field
-		removeNick						:= IF(tempNick != ' ',REGEXREPLACE(tempNick,prepNAME_ORG,''), prepNAME_ORG);
+				
+		tmpNick_Name					:= Prof_License_Mari.fGetNickname(prepNAME_ORG,'nick');
+		rmv_NickName					:= Prof_License_Mari.fGetNickname(prepNAME_ORG,'strip_nick');		
+	
+		tempNick							:= IF(StringLib.stringfind(prepNAME_ORG,'\'',2) >0,
+																REGEXFIND('^(.*)\'(.*)\'(.*)$',prepNAME_ORG,2),tmpNick_Name);
 
-		removeSuffix          := stringlib.stringcleanspaces(Stringlib.Stringfindreplace(REGEXREPLACE(SUFFIX_PATTERN, removeNick,''),'"',''));
-		TmpSufx               := REGEXFIND(SUFFIX_PATTERN, removeNick,0);		
+	  rmvNickName					:= IF(StringLib.stringfind(prepNAME_ORG,'\'',2) >0,
+																REGEXREPLACE('\'(.*)\'',prepNAME_ORG,''),rmv_NickName);;
+	
+		removeSuffix          := stringlib.stringcleanspaces(Stringlib.Stringfindreplace(REGEXREPLACE(SUFFIX_PATTERN, rmvNickName,''),'"',''));
+		TmpSufx               := REGEXFIND(SUFFIX_PATTERN, rmvNickName,0);		
 		
 		StdNAME_ORG						:= IF(removeSuffix != ' ' AND NOT Prof_License_Mari.func_is_company(removeSuffix), 
 																removeSuffix, Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(removeSuffix));
@@ -184,8 +187,9 @@ EXPORT map_LAS0832_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_LAST				:= IF(mariParse='MD',TRIM(CleanNAME_ORG[46..65],LEFT,RIGHT),'');
 		SELF.NAME_SUFX				:= IF(mariParse='MD' and TRIM(TmpSufx,LEFT,RIGHT) <> '',TRIM(TmpSufx,LEFT,RIGHT),TRIM(CleanNAME_ORG[66..70],LEFT,RIGHT));
 		
-		SELF.NAME_NICK				:= MAP(StringLib.stringfind(tempNick,'A/K/A',1)> 0 => REGEXREPLACE('(A/K/A)',tempNick,''),
-																StringLib.stringfind(tempNick,'AKA',1)> 0 => REGEXREPLACE('(AKA)',tempNick,''),
+		SELF.NAME_NICK				:= MAP(StringLib.stringfind(tempNick,'A/K/A',1)> 0 => REGEXREPLACE('(A/K/A)',tmpNick_Name,''),
+																StringLib.stringfind(tempNick,'AKA',1)> 0 => REGEXREPLACE('(AKA)',tmpNick_Name,''),
+																SELF.type_cd = 'GR' => '',
 																tempNick);
 		//Use address cleaner to clean address
 		trimAddress1          := ut.CleanSpacesAndUpper(pInput.ADDRESS1_1);
