@@ -52,7 +52,7 @@ EXPORT SLBO1702_0_2 (GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell) 
 			REAL bv_bus_only_source_profile       	;
 			BOOLEAN truebiz_ln                       	;
 			INTEGER bx_addr_assessed_value           	;
-			INTEGER bv_assoc_derog_pct               	;
+			real bv_assoc_derog_pct               	;
 			INTEGER _lien_filed_lastseen             	;
 			INTEGER bv_lien_filed_mth_ls             	;
 			INTEGER bv_sos_current_standing          	;
