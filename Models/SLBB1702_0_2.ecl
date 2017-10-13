@@ -882,7 +882,7 @@ EXPORT SLBB1702_0_2 (GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell, 
 			REAL bv_ver_src_derog_ratio           ;
 			REAL bv_mth_ver_src_p_ls              ;
 			Integer rv_d34_attr_liens_recency        ;
-			decimal10_2 bv_lien_avg_amount               ;
+			real bv_lien_avg_amount               ;
 			INTEGER bv_lien_total_amount             ;
 			integer nf_fp_varrisktype                ;
 			Integer bv_ver_src_id_mth_since_fs       ;
@@ -7547,8 +7547,8 @@ rc4_business := b_rc_rc(rc[1] = 'B')[1];
 brc := b_rc_rc(rc <> rc4_business.rc); //gives us all except new B reason code
 rc_dataset_s2_sorted_new := if(do_new_sort, brc, b_rc_rc); 
 
-bus_mod_rc4  := if(do_new_sort, rc4_business.rc, bus_mod_rc4_tmp);
-bus_mod_rc5  := if(do_new_sort, bus_mod_rc4_tmp, rc_dataset_s2_sorted_new[1].rc);
+bus_mod_rc4  := if(do_new_sort and rc4_business.rc != '', rc4_business.rc, bus_mod_rc4_tmp);
+bus_mod_rc5  := if(do_new_sort and rc4_business.rc != '', bus_mod_rc4_tmp, rc_dataset_s2_sorted_new[1].rc);
 bus_mod_rc6  := if(do_new_sort,rc_dataset_s2_sorted_new[1].rc, rc_dataset_s2_sorted_new[2].rc);
 bus_mod_rc7  := if(do_new_sort,rc_dataset_s2_sorted_new[2].rc,rc_dataset_s2_sorted_new[3].rc);
 bus_mod_rc8  := if(do_new_sort,rc_dataset_s2_sorted_new[3].rc,rc_dataset_s2_sorted_new[4].rc);
