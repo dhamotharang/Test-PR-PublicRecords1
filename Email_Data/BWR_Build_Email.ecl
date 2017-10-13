@@ -1,4 +1,4 @@
-import ut, RoxieKeyBuild, PromoteSupers;
+﻿import ut, RoxieKeyBuild, PromoteSupers, Orbit3, DOPS;
 
 #OPTION('multiplePersistInstances',FALSE);
 
@@ -15,21 +15,26 @@ Build_all_keys := Build_keys(version);
 zDoPopulationStats:=Strata_Stat_Email(version,File_Email_Base);
 zDoPopulationVendorStats:=Strata_Stat_Vendor(version,File_Email_Base);
 
-non_FCRA_update :=  RoxieKeyBuild.updateversion('EmailDataKeys',(string)version,'randy.reyes@lexisnexis.com',,'N');
-FCRA_update :=  RoxieKeyBuild.updateversion('FCRA_EmailDataKeys',(string)version,'randy.reyes@lexisnexis.com',,'F');
+dops_update :=  sequential(DOPS.updateversion('EmailDataKeys',(string)version,'Manila-DataOps@lexisnexisrisk.com',,'N')
+													,DOPS.updateversion('FCRA_EmailDataKeys',(string)version,'Manila-DataOps@lexisnexisrisk.com',,'F'));
+
+orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild_AddItem ('Email Data',(string)version,'N')
+														,Orbit3.proc_Orbit3_CreateBuild_AddItem ('FCRA Email Data',(string)version,'F')
+														);
+
 
 SampleRecs := choosen(sort(File_Email_Base,record),1000);
 					
 built := sequential(
 			Email_data.proc_Scrubs_base((string)version,emailList)
-			//build_email_base
+			// ,build_email_base
 			,build_email_base_fcra
 			,Build_all_keys
 			,zDoPopulationStats
 			,zDoPopulationVendorStats
 			,output(SampleRecs)
-			,non_FCRA_update
-			,FCRA_update
+			,dops_update
+			,orbit_update
 			)
 			: success(Send_Email(Version).Build_Success)
 			, failure(Send_Email(Version).Build_Failure)
