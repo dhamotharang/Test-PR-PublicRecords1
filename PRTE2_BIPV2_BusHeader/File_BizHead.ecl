@@ -9,7 +9,8 @@ IMPORT lib_date;
 //*
  // dBase:=PROJECT(BIPV2.CommonBase.DS_CLEAN, TRANSFORM(BIPV2.CommonBase.Layout, SELF:=LEFT, SELF:=[]));
  dBase:=PROJECT(PRTE2_BIPV2_BusHeader.CommonBase.ds_xlink, TRANSFORM(PRTE2_BIPV2_BusHeader.CommonBase.Layout, SELF:=LEFT, SELF:=[]));
-// dBase:=PRTE2_BIPV2_BusHeader.CommonBase.DS_OMNI(prod);
+// dBase:=BIPV2.CommonBase.DS_OMNI(prod);
+
 // Deduping after removing the fields that are not needed for any searching or reporting purposes
 dSlimmed:=TABLE(dBase(rec_type!='Ol'),{proxid;seleid;orgid;ultid;empid;powid;dotid;parent_proxid;sele_proxid;org_proxid;ultimate_proxid;has_lgid;company_name;
   title;fname;mname;lname;name_suffix;iscontact;contact_ssn;contact_email;prim_range;predir;prim_name;addr_suffix;postdir;
@@ -17,6 +18,7 @@ dSlimmed:=TABLE(dBase(rec_type!='Ol'),{proxid;seleid;orgid;ultid;empid;powid;dot
   company_bdid;company_fein;active_duns_number;company_phone;phone_type;company_url;company_sic_code1;company_status_derived;vl_id;source_record_id;source_docid;contact_did;contact_email_domain;
   contact_job_title_derived;err_stat;is_sele_level;is_org_level;is_ult_level;rcid;address_type_derived;});
 dDeduped:=DEDUP(SORT(DISTRIBUTE(dSlimmed,HASH32(proxid)),RECORD,LOCAL),RECORD,EXCEPT rcid,LOCAL);
+
 // Distributing the HRCHY file and "pre-cleaning" targeted fields
 dPreCleaned:=PROJECT(dDeduped,TRANSFORM({RECORDOF(LEFT);UNSIGNED rid;},
   sSSN:=REGEXREPLACE('[^0-9]',LEFT.contact_ssn,'');
@@ -37,11 +39,14 @@ dPreCleaned:=PROJECT(dDeduped,TRANSFORM({RECORDOF(LEFT);UNSIGNED rid;},
   SELF.rid:=LEFT.rcid;
   SELF:=LEFT;
 ));
+
 BIPV2_Company_Names.functions.mac_go(dPreCleaned,dCnpName,rid,company_name,,FALSE);
+
 // Re-joining the cleaned company name information to the HRCHY file.  At the
 // same time, addingi
 lFileBizHead:=RECORD
-  RECORDOF(dSlimmed) AND NOT [err_stat,is_sele_level,is_org_level,is_ult_level] OR RECORDOF(dCnpName) AND NOT [rid,cnp_nameid];
+  RECORDOF(dSlimmed) AND NOT [err_stat,is_sele_level,is_org_level,is_ult_level] OR RECORDOF(dCnpName) AND NOT [rid,cnp_nameid,cnp_name];
+  STRING250 cnp_name;
   STRING5 company_name_prefix;
   STRING25 city;
   STRING25 city_clean;
@@ -54,6 +59,7 @@ lFileBizHead:=RECORD
   STRING1 ult_flag;
   UNSIGNED1 fallback_value;
 END;
+
 dWithCnpName:=PROJECT(dCnpName,TRANSFORM(lFileBizHead,
   phone_cleaned:=REGEXREPLACE('[^0-9]',LEFT.company_phone,'');
   SELF.company_name_prefix:=BizLinkFull.fn_company_name_prefix(LEFT.cnp_name);//[..5];
@@ -73,13 +79,16 @@ dWithCnpName:=PROJECT(dCnpName,TRANSFORM(lFileBizHead,
   );
   SELF:=LEFT;
 ))(cnp_name!='');
+
 // Adding in rows where there is a different v_city_name
 dAdditionalCity:=PROJECT(dWithCnpName(v_city_name<>'' AND v_city_name<>city),TRANSFORM(RECORDOF(LEFT),
   SELF.city:=LEFT.v_city_name;
   SELF:=LEFT;
 ));
+
 dBaseFile:=dWithCnpName+dAdditionalCity:PERSIST('~prte::persist::PRTE2_BIPV2_BusHeader::file_bizhead',EXPIRE(60));
 //dBaseFile:=dWithCnpName+dAdditionalCity:PERSIST('~dhw::persist::file_bizhead',EXPIRE(60));
+
 EXPORT File_BizHead:=dBaseFile;
 /*/
 l:=RECORD
@@ -136,6 +145,7 @@ l:=RECORD
   string30 contact_email_domain;
   string50 contact_job_title_derived;
   unsigned6 rcid;
+  string1 address_type_derived;
   string4 err_stat;
   boolean is_sele_level;
   boolean is_org_level;
@@ -160,6 +170,8 @@ l:=RECORD
   string1 ult_flag;
   unsigned1 fallback_value;
  END;
+
+
 // EXPORT File_BizHead:=DATASET('~BizLinkFull::persist::file_bizhead',l,THOR);
 EXPORT File_BizHead:=DATASET('~dhw::persist::file_bizhead',l,THOR);
 //*/
