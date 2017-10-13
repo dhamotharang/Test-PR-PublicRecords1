@@ -1,4 +1,4 @@
-import crim_common;
+﻿import crim_common;
 
 def := sort(distribute(hygenics_crim.file_in_defendant, hash(recordid)), recordid, local);
 cha := sort(distribute(hygenics_crim.file_in_charge, hash(recordid)), recordid, local);
@@ -918,6 +918,7 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
   self.court_disp_desc_1		:= IF(temp_disp = '' and length(trim(l.chargedisposed)) >= 3 and regexfind('[A-Z]+', trim(l.chargedisposed)[1..3], 0)<>'',
 											            l.ChargeDisposed,
 																	If(l.ln_vendor = 'W0001' and regexfind('(.*) - (.*)',temp_disp) , regexreplace('(.*) - (.*)',temp_disp,'$2'),
+																	IF(l.ln_vendor = 'W0320' , 'CONVICTED', //As per hygenics everyone in the registry is convicted.
 																	If(trim(l.ln_vendor) ='TB' , //TXDPS - strip the court dispo out to match the disp lookup
 																	    MAP(regexfind('(COURT DISPOSITION:[ ]*)([A-Z ]+)[ ]*[, ]+(.*)',temp_disp) =>  regexreplace('(COURT DISPOSITION:[ ]*)([A-Z ]+)[ ]*[, ]+(.*)',temp_disp,'$2'),
 																					regexfind('(COURT DISPOSITION:[ ]*)([A-Z ]+)[ ]*$',temp_disp) =>  regexreplace('(COURT DISPOSITION:[ ]*)([A-Z ]+)[ ]*$',temp_disp,'$2'),
@@ -1020,7 +1021,7 @@ Layout_Common_Court_Offenses_orig to_court_offenses(j_final l) := transform
 												if(length(trim(temp_disp)) >= 3, 		temp_disp,
 												if(l.statecode = 'HI' and stringlib.stringfind(temp_offense, '|', 2) <> 0,
 													temp_offense[stringlib.stringfind(temp_offense, '|', 1)+1..stringlib.stringfind(temp_offense, '|', 2)-1],
-													''))))));
+													'')))))));
   self.court_disp_desc_2		    := Map(l.ln_vendor = 'NF' => l.dispositionstatus,
 	                                     l.trialtype);
   self.sent_date				    := MAP(l.SentenceDate <> '' => l.SentenceDate,

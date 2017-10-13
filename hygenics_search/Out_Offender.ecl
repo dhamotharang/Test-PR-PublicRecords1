@@ -1,7 +1,7 @@
-/*2013-06-17T15:49:44Z (vchikte)
+﻿	/*2013-06-17T15:49:44Z (vchikte)
 C:\Documents and Settings\ChikteVP\Application Data\HPCC Systems\eclide\vchikte\Dataland_EOSS_Proxy\hygenics_search\Out_Offender\2013-06-17T15_49_44Z.ecl
 */
-import PromoteSupers, Lib_Date, LiensV2, CrimSrch, Crim_Common, Corrections, Life_EIR, doxie_build;
+import PromoteSupers, Lib_Date, hygenics_crim, CrimSrch, Crim_Common, Corrections, Life_EIR, doxie_build;
 
 fcra_v1 			:= Offender_Joined;
 
@@ -153,10 +153,11 @@ corrections.layout_offender RemF(dCrimOffender2FixedReady l):= transform
 ////////////////////////////////////////////////////////////////////////////////////
 
   PromoteSupers.MAC_SF_BuildProcess(NonFCRA_records,'~thor_Data400::base::corrections_offenders_' + doxie_build.buildstate, outOffnd, 2,,TRUE);
-	PromoteSupers.MAC_SF_BuildProcess(FCRA_records,'~thor_data400::base::fcra_corrections_offenders_' + doxie_build.buildstate, outOffnd2, 2,,TRUE);
-					 
+	PromoteSupers.MAC_SF_BuildProcess(FCRA_records,'~thor_data400::base::fcra_corrections_offenders_' + doxie_build.buildstate, outOffnd2, 2,,TRUE);			 
+	PromoteSupers.MAC_SF_BuildProcess(hygenics_crim.File_AddressCacheInput,'~thor_data400::base::crim::address_cache_' + doxie_build.buildstate, outOffnd3, 2,,TRUE);
 							 
 export Out_Offender := sequential(
 												outOffnd,
 												//output(all_files,,'~thor_data400::base::fcra::life_eir::criminal_offenders_20130410'/* + Version.Development*/, overwrite, __compressed__),
-												outOffnd2);		 
+												outOffnd2,
+												outOffnd3);		 

@@ -574,6 +574,53 @@
 'W0266', // CALIFORNIA_PLACER_COUNTY_TRAFFIC_CW                                                                 
 'W0267', // ARIZONA_DEPARTMENT_OF_PUBLIC_SAFETY_CW                                                              
                                                                  
+'W0269',//	CALIFORNIA_MENDOCINO_COUNTY_BOOKINGS_CW                                                             
+'W0270',//	CALIFORNIA_TEHAMA_COUNTY_BOOKINGS_CW                                                                
+'W0271',//	FLORIDA_CITRUS_COUNTY_SHERIFFS_OFFICE_CW                                                            
+'W0272',//	FLORIDA_DIXIE_COUNTY_SHERIFFS_OFFICE_CW                                                             
+'W0273',//	FLORIDA_LEE_COUNTY_SHERIFFS_OFFICE_CW                                                               
+'W0274',//	FLORIDA_ST_JOHNS_COUNTY_SHERIFFS_OFFICE_CW                                                          
+'W0275',//	FLORIDA_ST_LUCIE_COUNTY_SHERIFFS_OFFICE_CW                                                          
+'W0276',//	LOUISIANA_SLIDELL_POLICE_CW                                                                         
+'W0277',//	MASSACHUSETTS_BOURNE_ARRESTS_CW                                                                     
+'W0278',//	MASSACHUSETTS_BRIDGEWATER_ARRESTS_CW                                                                
+'W0279',//	MASSACHUSETTS_CHICOPEE_ARRESTS_CW                                                                   
+'W0280',//	MASSACHUSETTS_COHASSET_ARRESTS_CW                                                                   
+'W0281',//	MASSACHUSETTS_DALTON_ARRESTS_CW                                                                     
+'W0282',//	MASSACHUSETTS_DENNIS_ARRESTS_CW                                                                     
+'W0283',//	MASSACHUSETTS_DUXBURY_ARRESTS_CW                                                                    
+'W0284',//	MASSACHUSETTS_FITCHBURG_ARRESTS_CW                                                                  
+'W0285',//	MASSACHUSETTS_FOXBORO_ARRESTS_CW                                                                    
+'W0286',//	MASSACHUSETTS_GARDNER_ARRESTS_CW                                                                    
+'W0287',//	MASSACHUSETTS_LEOMINSTER_ARRESTS_CW                                                                 
+'W0288',//	MASSACHUSETTS_LONGMEADOW_ARRESTS_CW                                                                 
+'W0289',//	MASSACHUSETTS_MASHPEE_ARRESTS_CW                                                                    
+'W0291',//	MASSACHUSETTS_MIDDLETON_POLICE_DEPARTMENT_CW                                                        
+'W0292',//	MASSACHUSETTS_MILFORD_ARRESTS_CW                                                                    
+'W0293',//	MASSACHUSETTS_NORTH_ATTLEBORO_ARRESTS_CW                                                            
+'W0294',//	MASSACHUSETTS_NORTHAMPTON_ARRESTS_CW                                                                
+'W0295',//	MASSACHUSETTS_ORLEANS_ARRESTS_CW                                                                    
+'W0296',//	MASSACHUSETTS_PALMER_ARRESTS_CW                                                                     
+'W0297',//	MASSACHUSETTS_PLYMPTON_ARRESTS_CW                                                                   
+'W0298',//	MASSACHUSETTS_ROCHESTER_ARRESTS_CW                                                                  
+'W0299',//	MASSACHUSETTS_SOUTHWICK_ARRESTS_CW                                                                  
+'W0300',//	MASSACHUSETTS_TEWKSBURY_POLICE_CW                                                                   
+'W0301',//	MASSACHUSETTS_TRURO_ARRESTS_CW                                                                      
+'W0302',//	MASSACHUSETTS_WAYLAND_ARRESTS_CW                                                                    
+'W0303',//	MASSACHUSETTS_WEST_BRIDGEWATER_ARRESTS_CW                                                           
+'W0304',//	MASSACHUSETTS_WESTFIELD_ARRESTS_CW                                                                  
+'W0306',//	MASSACHUSETTS_WRENTHAM_ARRESTS_CW                                                                   
+'W0307',//	MASSACHUSETTS_YARMOUTH_ARRESTS_CW                                                                   
+'W0308',//	MINNESOTA_BROWN_COUNTY_SHERIFF_CW                                                                   
+'W0309',//	MONTANA_YELLOWSTONE_COUNTY_DETENTION_CW                                                             
+'W0311',//	ARIZONA_AVONDALE_CW                                                                                 
+'W0312',//	ARIZONA_BUCKEYE_CW                                                                                  
+'W0313',//	ARIZONA_EL_MIRAGE_CW                                                                                
+'W0314',//	ARIZONA_GOODYEAR_CW                                                                                 
+'W0315',//	ARIZONA_SURPRISE_CW                                                                                 
+'W0316',//	ARIZONA_TOLLESON_CW                                                                                 
+'W0317',//	ARIZONA_WICKENBURG_CW                                                                               
+'W0318',//	OHIO_CHAMPAIGN_COUNTY_MUNICIPAL_COURT_CW                                                            
                                                      
           
 ////////////////////////////////////////////////////////

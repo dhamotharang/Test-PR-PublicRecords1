@@ -1,4 +1,4 @@
-/*sVendor08TrafficSet := ['T'];
+﻿/*sVendor08TrafficSet := ['T'];
 
 export fTraffic_Flag_From_Vendor_and_Offense_Level(string2 pVendor, string5 pOffenseLevel) :=
   case(pVendor, '' => if(trim(pOffenseLevel,right) in sVendor08TrafficSet,'Y','N'),
@@ -368,7 +368,11 @@ export fTraffic_Flag_From_Vendor_and_Offense_Level(string5 pVendor, string5 pOff
 	pVendor =	'W0002' => if(trim(pOffenseLevel,right) in ['MT','GMT','T','PMT','FT'],'Y','N'),
 	pVendor IN ['W0016'] => if(trim(pOffenseLevel,right) in ['TI','CT'],'Y','N'),
   pVendor IN ['W0017'] => if(trim(pOffenseLevel,right) in ['T','TI'],'Y','N'),
-	pVendor IN ['W0027','8R'] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
+
+	pVendor IN ['W0027','8R',	'W0271','W0272','W0273','W0274','W0275','W0277','W0278','W0279',
+	            'W0280','W0281','W0282','W0283','W0284','W0285','W0286','W0287','W0288','W0289',
+							'W0292','W0294','W0295','W0296','W0297','W0298','W0299','W0301','W0302','W0304',
+							'W0306','W0307','W0309'] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
 	pVendor IN ['W0037'] => if(trim(pOffenseLevel,right) in ['T'],'Y','N'),
   pVendor IN ['W0038'] => if(trim(pOffenseLevel,right) in ['T','TA'],'Y','N'),  
 	pVendor IN ['W0156'] => if(trim(pOffenseLevel,right) in ['T','MT'],'Y','N'),
