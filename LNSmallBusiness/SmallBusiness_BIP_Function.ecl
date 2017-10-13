@@ -268,6 +268,15 @@ EXPORT SmallBusiness_BIP_Function (
 	UNSIGNED8 BSOptions := Risk_Indicators.iid_constants.BSOptions.IncludeFraudVelocity +
 												 Risk_Indicators.iid_constants.BSOptions.RetainInputDID;
 
+/* Need this used if want same results as a separate boca shell
+boolean RetainInputDID := false;
+unsigned8 BSOptions := 
+	if(Include_DL_Verification, risk_indicators.iid_constants.BSOptions.IncludeDoNotMail +
+										 risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity,
+											0) +
+	if(RetainInputDID, Risk_Indicators.iid_constants.BSOptions.RetainInputDID, 0 ) +
+	if(bsVersion >= 50, risk_indicators.iid_constants.BSOptions.IncludeHHIDSummary, 0);
+*/
 	Layout_AcctNo := RECORD
 		UNSIGNED4 input_seq;
 		STRING30 acctno;
@@ -400,7 +409,14 @@ EXPORT SmallBusiness_BIP_Function (
 			ModelName 
 		);
 	
-	Model_Results := IF( allow_scores, Model_Results_sorted, DATASET([], Layout_ModelOut_Plus) );
+	Model_Results := IF( allow_scores or 
+		(ModelsRequested[1].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
+			ModelsRequested[2].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
+			ModelsRequested[3].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
+			ModelsRequested[4].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
+			ModelsRequested[5].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB]),
+																	Model_Results_sorted, 
+																	DATASET([], Layout_ModelOut_Plus) );
 	
 /* ************************************************************************
 	 *             Flatten Model results for Intermediate Log               *

@@ -7,8 +7,6 @@ EXPORT RVA1611_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, boo
 	
 	MODEL_DEBUG := False;
 	
-	isPreScreenPurpose := False;
-
 	#if(MODEL_DEBUG)
 	Layout_Debug := RECORD
 	
@@ -38,7 +36,7 @@ EXPORT RVA1611_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, boo
    String	addrinputtaxmarketvalue;          
    String	addrcurrentdwelltype;             
    String	addrcurrenttaxmarketvalue;        
-   String	inputtaxmarket;                   
+   Integer	inputtaxmarket;                   
    String	addrinputcountyratio;             
    String	addrcurrentcountyratio;           
    String	subjectabilityindex;              
@@ -175,7 +173,7 @@ EXPORT RVA1611_1_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, boo
 	addrinputtaxmarketvalue          := le.addrinputtaxmarketvalue;
 	addrcurrentdwelltype             := le.addrcurrentdwelltype;
 	addrcurrenttaxmarketvalue        := le.addrcurrenttaxmarketvalue;
-	inputtaxmarket                   := le.AddrInputTaxMarketValue;
+	//inputtaxmarket                   := le.AddrInputTaxMarketValue;
 	addrinputcountyratio             := le.addrinputcountyratio;
 	addrcurrentcountyratio           := le.addrcurrentcountyratio;
 	subjectabilityindex              := le.subjectabilityindex;
@@ -235,6 +233,10 @@ currenttaxmarket := map(
     (addrcurrentdwelltype in ['-1']) or ((integer)addrcurrenttaxmarketvalue in [-1]) => -1,
     not((addrcurrentdwelltype in ['S']))                   => -9999,
                             (Integer)addrcurrenttaxmarketvalue);
+		inputtaxmarket := map(
+		(addrinputdwelltype in ['-1']) or (addrinputtaxmarketvalue in ['-1'])  => -1,                                                                                                                                                                                                                                                                                                                                                                                                                     
+   not(( addrinputdwelltype in ['S']))                             => -9999,                                                                                                                                                                                                                                                                                                                                                                                                                  
+                                                                   (Integer)addrinputtaxmarketvalue);
 
 iv_inputcurrtaxmarketvaluesfdmax := max((integer)inputtaxmarket, currenttaxmarket);
 //iv_inputcurrtaxmarketvaluesfdmax := if (max((integer)inputtaxmarket, currenttaxmarket)= 0, -9999, max((integer)inputtaxmarket, currenttaxmarket));
@@ -249,8 +251,7 @@ Inputcountyratio := map(
 not ((addrinputdwelltype in ['S'])) => -9999,
 										(Real)addrinputcountyratio);
 
-//iv_inputcurrctyratiosfdavg := if(inputcountyratio > 0 and (String)currentcountyratio > '0', ((inputcountyratio + currentcountyratio) / 2/0.01), inputcountyratio);
-iv_inputcurrctyratiosfdavg := if(inputcountyratio > 0 and (Real)currentcountyratio > 0,((inputcountyratio + currentcountyratio) / 2/0.01)*0.01, inputcountyratio);
+iv_inputcurrctyratiosfdavg := if(inputcountyratio > 0 and (Real)currentcountyratio > 0, roundup((inputcountyratio + currentcountyratio) / 2/0.01)*0.01, inputcountyratio);
 
 tn_subscore0 := map(
     (ca_m2_inquiryindex in [1]) => 0.327385,
@@ -539,6 +540,135 @@ tn_aacd_14 := map(
 
 tn_dist_14 := tn_subscore14 - 0.828318;
 
+
+tn_rcvaluea40 := (integer)(tn_aacd_0 = 'A40') * tn_dist_0 +
+    (integer)(tn_aacd_1 = 'A40') * tn_dist_1 +
+    (integer)(tn_aacd_2 = 'A40') * tn_dist_2 +
+    (integer)(tn_aacd_3 = 'A40') * tn_dist_3 +
+    (integer)(tn_aacd_4 = 'A40') * tn_dist_4 +
+    (integer)(tn_aacd_5 = 'A40') * tn_dist_5 +
+    (integer)(tn_aacd_6 = 'A40') * tn_dist_6 +
+    (integer)(tn_aacd_7 = 'A40') * tn_dist_7 +
+    (integer)(tn_aacd_8 = 'A40') * tn_dist_8 +
+    (integer)(tn_aacd_9 = 'A40') * tn_dist_9 +
+    (integer)(tn_aacd_10 = 'A40') * tn_dist_10 +
+    (integer)(tn_aacd_11 = 'A40') * tn_dist_11 +
+    (integer)(tn_aacd_12 = 'A40') * tn_dist_12 +
+    (integer)(tn_aacd_13 = 'A40') * tn_dist_13 +
+    (integer)(tn_aacd_14 = 'A40') * tn_dist_14;
+		
+tn_rcvaluea41 := (integer)(tn_aacd_0 = 'A41') * tn_dist_0 +
+    (integer)(tn_aacd_1 = 'A41') * tn_dist_1 +
+    (integer)(tn_aacd_2 = 'A41') * tn_dist_2 +
+    (integer)(tn_aacd_3 = 'A41') * tn_dist_3 +
+    (integer)(tn_aacd_4 = 'A41') * tn_dist_4 +
+    (integer)(tn_aacd_5 = 'A41') * tn_dist_5 +
+    (integer)(tn_aacd_6 = 'A41') * tn_dist_6 +
+    (integer)(tn_aacd_7 = 'A41') * tn_dist_7 +
+    (integer)(tn_aacd_8 = 'A41') * tn_dist_8 +
+    (integer)(tn_aacd_9 = 'A41') * tn_dist_9 +
+    (integer)(tn_aacd_10 = 'A41') * tn_dist_10 +
+    (integer)(tn_aacd_11 = 'A41') * tn_dist_11 +
+    (integer)(tn_aacd_12 = 'A41') * tn_dist_12 +
+    (integer)(tn_aacd_13 = 'A41') * tn_dist_13 +
+    (integer)(tn_aacd_14 = 'A41') * tn_dist_14;
+		
+tn_rcvaluea50 := (integer)(tn_aacd_0 = 'A50') * tn_dist_0 +
+    (integer)(tn_aacd_1 = 'A50') * tn_dist_1 +
+    (integer)(tn_aacd_2 = 'A50') * tn_dist_2 +
+    (integer)(tn_aacd_3 = 'A50') * tn_dist_3 +
+    (integer)(tn_aacd_4 = 'A50') * tn_dist_4 +
+    (integer)(tn_aacd_5 = 'A50') * tn_dist_5 +
+    (integer)(tn_aacd_6 = 'A50') * tn_dist_6 +
+    (integer)(tn_aacd_7 = 'A50') * tn_dist_7 +
+    (integer)(tn_aacd_8 = 'A50') * tn_dist_8 +
+    (integer)(tn_aacd_9 = 'A50') * tn_dist_9 +
+    (integer)(tn_aacd_10 = 'A50') * tn_dist_10 +
+    (integer)(tn_aacd_11 = 'A50') * tn_dist_11 +
+    (integer)(tn_aacd_12 = 'A50') * tn_dist_12 +
+    (integer)(tn_aacd_13 = 'A50') * tn_dist_13 +
+    (integer)(tn_aacd_14 = 'A50') * tn_dist_14;
+		
+tn_rcvaluea51 := (integer)(tn_aacd_0 = 'A51') * tn_dist_0 +
+    (integer)(tn_aacd_1 = 'A51') * tn_dist_1 +
+    (integer)(tn_aacd_2 = 'A51') * tn_dist_2 +
+    (integer)(tn_aacd_3 = 'A51') * tn_dist_3 +
+    (integer)(tn_aacd_4 = 'A51') * tn_dist_4 +
+    (integer)(tn_aacd_5 = 'A51') * tn_dist_5 +
+    (integer)(tn_aacd_6 = 'A51') * tn_dist_6 +
+    (integer)(tn_aacd_7 = 'A51') * tn_dist_7 +
+    (integer)(tn_aacd_8 = 'A51') * tn_dist_8 +
+    (integer)(tn_aacd_9 = 'A51') * tn_dist_9 +
+    (integer)(tn_aacd_10 = 'A51') * tn_dist_10 +
+    (integer)(tn_aacd_11 = 'A51') * tn_dist_11 +
+    (integer)(tn_aacd_12 = 'A51') * tn_dist_12 +
+    (integer)(tn_aacd_13 = 'A51') * tn_dist_13 +
+    (integer)(tn_aacd_14 = 'A51') * tn_dist_14;
+		
+tn_rcvaluec10 := (integer)(tn_aacd_0 = 'C10') * tn_dist_0 +
+    (integer)(tn_aacd_1 = 'C10') * tn_dist_1 +
+    (integer)(tn_aacd_2 = 'C10') * tn_dist_2 +
+    (integer)(tn_aacd_3 = 'C10') * tn_dist_3 +
+    (integer)(tn_aacd_4 = 'C10') * tn_dist_4 +
+    (integer)(tn_aacd_5 = 'C10') * tn_dist_5 +
+    (integer)(tn_aacd_6 = 'C10') * tn_dist_6 +
+    (integer)(tn_aacd_7 = 'C10') * tn_dist_7 +
+    (integer)(tn_aacd_8 = 'C10') * tn_dist_8 +
+    (integer)(tn_aacd_9 = 'C10') * tn_dist_9 +
+    (integer)(tn_aacd_10 = 'C10') * tn_dist_10 +
+    (integer)(tn_aacd_11 = 'C10') * tn_dist_11 +
+    (integer)(tn_aacd_12 = 'C10') * tn_dist_12 +
+    (integer)(tn_aacd_13 = 'C10') * tn_dist_13 +
+    (integer)(tn_aacd_14 = 'C10') * tn_dist_14;
+		
+tn_rcvalued31 := (integer)(tn_aacd_0 = 'D31') * tn_dist_0 +
+    (integer)(tn_aacd_1 = 'D31') * tn_dist_1 +
+    (integer)(tn_aacd_2 = 'D31') * tn_dist_2 +
+    (integer)(tn_aacd_3 = 'D31') * tn_dist_3 +
+    (integer)(tn_aacd_4 = 'D31') * tn_dist_4 +
+    (integer)(tn_aacd_5 = 'D31') * tn_dist_5 +
+    (integer)(tn_aacd_6 = 'D31') * tn_dist_6 +
+    (integer)(tn_aacd_7 = 'D31') * tn_dist_7 +
+    (integer)(tn_aacd_8 = 'D31') * tn_dist_8 +
+    (integer)(tn_aacd_9 = 'D31') * tn_dist_9 +
+    (integer)(tn_aacd_10 = 'D31') * tn_dist_10 +
+    (integer)(tn_aacd_11 = 'D31') * tn_dist_11 +
+    (integer)(tn_aacd_12 = 'D31') * tn_dist_12 +
+    (integer)(tn_aacd_13 = 'D31') * tn_dist_13 +
+    (integer)(tn_aacd_14 = 'D31') * tn_dist_14;
+		
+tn_rcvaluea42 := (integer)(tn_aacd_0 = 'A42') * tn_dist_0 +
+    (integer)(tn_aacd_1 = 'A42') * tn_dist_1 +
+    (integer)(tn_aacd_2 = 'A42') * tn_dist_2 +
+    (integer)(tn_aacd_3 = 'A42') * tn_dist_3 +
+    (integer)(tn_aacd_4 = 'A42') * tn_dist_4 +
+    (integer)(tn_aacd_5 = 'A42') * tn_dist_5 +
+    (integer)(tn_aacd_6 = 'A42') * tn_dist_6 +
+    (integer)(tn_aacd_7 = 'A42') * tn_dist_7 +
+    (integer)(tn_aacd_8 = 'A42') * tn_dist_8 +
+    (integer)(tn_aacd_9 = 'A42') * tn_dist_9 +
+    (integer)(tn_aacd_10 = 'A42') * tn_dist_10 +
+    (integer)(tn_aacd_11 = 'A42') * tn_dist_11 +
+    (integer)(tn_aacd_12 = 'A42') * tn_dist_12 +
+    (integer)(tn_aacd_13 = 'A42') * tn_dist_13 +
+    (integer)(tn_aacd_14 = 'A42') * tn_dist_14;
+		
+tn_rcvalued34 := (integer)(tn_aacd_0 = 'D34') * tn_dist_0 +
+    (integer)(tn_aacd_1 = 'D34') * tn_dist_1 +
+    (integer)(tn_aacd_2 = 'D34') * tn_dist_2 +
+    (integer)(tn_aacd_3 = 'D34') * tn_dist_3 +
+    (integer)(tn_aacd_4 = 'D34') * tn_dist_4 +
+    (integer)(tn_aacd_5 = 'D34') * tn_dist_5 +
+    (integer)(tn_aacd_6 = 'D34') * tn_dist_6 +
+    (integer)(tn_aacd_7 = 'D34') * tn_dist_7 +
+    (integer)(tn_aacd_8 = 'D34') * tn_dist_8 +
+    (integer)(tn_aacd_9 = 'D34') * tn_dist_9 +
+    (integer)(tn_aacd_10 = 'D34') * tn_dist_10 +
+    (integer)(tn_aacd_11 = 'D34') * tn_dist_11 +
+    (integer)(tn_aacd_12 = 'D34') * tn_dist_12 +
+    (integer)(tn_aacd_13 = 'D34') * tn_dist_13 +
+    (integer)(tn_aacd_14 = 'D34') * tn_dist_14;
+
 tn_rcvaluep89 := (integer)(tn_aacd_0 = 'P89') * tn_dist_0 +
     (integer)(tn_aacd_1 = 'P89') * tn_dist_1 +
     (integer)(tn_aacd_2 = 'P89') * tn_dist_2 +
@@ -793,6 +923,14 @@ ds_layout := {STRING rc, REAL value};
  
 //*************************************************************************************//
 rc_dataset_tn := DATASET([
+    {'A40', tn_rcvalueA40},
+    {'A41', tn_rcvalueA41},
+    {'A50', tn_rcvalueA50},
+    {'A51', tn_rcvalueA51},
+    {'C10', tn_rcvalueC10},
+    {'D31', tn_rcvalueD31},
+    {'A42', tn_rcvalueA42},
+    {'D34', tn_rcvalueD34},
     {'P89', tn_rcvalueP89},
     {'L79', tn_rcvalueL79},
     {'C20', tn_rcvalueC20},
