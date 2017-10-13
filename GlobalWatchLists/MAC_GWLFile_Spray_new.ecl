@@ -1,4 +1,4 @@
-EXPORT MAC_GWLFile_Spray_new(filedate,OFAC_build = '\'N\'',group_name='\'thor400_44\'',email_target='\' \'') := 
+﻿EXPORT MAC_GWLFile_Spray_new(filedate,OFAC_build = '\'N\'',group_name='\'thor400_44\'',email_target='\' \'') := 
 MACRO
 
 #workunit('name','Global Watch Lists')
@@ -52,17 +52,18 @@ RoxieKeyBuild.Mac_Daily_Email_Local('GLOBAL WATCH LISTS','FAIL',filedate,%send_f
 
 #uniquename(update_version)
 
-%update_version% := RoxieKeyBuild.updateversion('GlobalWatchListKeys',filedate,'jtao@seisint.com, kgummadi@seisint.com, skasavajjala@seisint.com',,'N|BN');
+%update_version% := DOPS.updateversion('GlobalWatchListKeys',filedate,'jtao@seisint.com, kgummadi@seisint.com, skasavajjala@seisint.com',,'N|BN');
 
 #uniquename(update_alpha_version)
 
-%update_alpha_version% := RoxieKeyBuild.updateversion('GlobalWatchListKeys',filedate,'skasavajjala@seisint.com',,'N',,,'A'); 
+%update_alpha_version% := DOPS.updateversion('GlobalWatchListKeys',filedate,'skasavajjala@seisint.com',,'N',,,'A'); 
 
 #uniquename(create_orbitI)
 
 %create_orbitI% := GlobalWatchLists.Proc_OrbitI_CreateBuild(filedate);
 
 #uniquename(create_orbit)
+
 
 %create_orbit% := if ( trim(filedate)[9] <> 'o',Orbit3.proc_Orbit3_CreateBuild_AddItem( 'Global Watch Lists',filedate),Orbit3.proc_Orbit3_CreateOFACBuild( 'Global Watch Lists',filedate));
 
