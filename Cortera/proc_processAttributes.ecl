@@ -1,4 +1,4 @@
-import	std, ut;
+﻿import	std, ut;
 
 EXPORT proc_processAttributes(dataset(Cortera.Layout_Header_Out) hdr, dataset(Cortera.Layout_Attributes) attr, string8 version) := FUNCTION
 
@@ -12,7 +12,7 @@ EXPORT proc_processAttributes(dataset(Cortera.Layout_Header_Out) hdr, dataset(Co
 			self := hdr;
 	END;
 
-	j := JOIN(DISTRIBUTE(attr, ULTIMATE_LINKID), DISTRIBUTE(hdr, LINK_ID),
+	j := JOIN(DISTRIBUTE(attr, ULTIMATE_LINKID), DISTRIBUTE(hdr(current), LINK_ID),
 								left.ULTIMATE_LINKID=right.LINK_ID, xAttr(left,right), LEFT OUTER, LOCAL);
 	
 	// 
