@@ -1,0 +1,96 @@
+﻿IMPORT SALT37;
+EXPORT CCID_hygiene(dataset(CCID_layout_CCID) h) := MODULE
+ 
+//A simple summary record
+EXPORT Summary(SALT37.Str30Type txt) := FUNCTION
+  SummaryLayout := RECORD
+    txt;
+    NumberOfRecords := COUNT(GROUP);
+    populated_cc_id_pcnt := AVE(GROUP,IF(h.cc_id = (TYPEOF(h.cc_id))'',0,100));
+    maxlength_cc_id := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.cc_id)));
+    avelength_cc_id := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.cc_id)),h.cc_id<>(typeof(h.cc_id))'');
+    populated_gc_id_pcnt := AVE(GROUP,IF(h.gc_id = (TYPEOF(h.gc_id))'',0,100));
+    maxlength_gc_id := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.gc_id)));
+    avelength_gc_id := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.gc_id)),h.gc_id<>(typeof(h.gc_id))'');
+    populated_account_id_pcnt := AVE(GROUP,IF(h.account_id = (TYPEOF(h.account_id))'',0,100));
+    maxlength_account_id := MAX(GROUP,LENGTH(TRIM((SALT37.StrType)h.account_id)));
+    avelength_account_id := AVE(GROUP,LENGTH(TRIM((SALT37.StrType)h.account_id)),h.account_id<>(typeof(h.account_id))'');
+  END;
+    T := TABLE(h,SummaryLayout);
+  R1 := RECORD
+    UNSIGNED LinkingPotential :=  + T.Populated_cc_id_pcnt *   0.00 / 100 + T.Populated_gc_id_pcnt *   0.00 / 100 + T.Populated_account_id_pcnt *   0.00 / 100;
+    T;
+  END;
+  RETURN TABLE(T,R1);
+END;
+ 
+summary0 := Summary('Summary');
+invRec := RECORD
+  UNSIGNED  FldNo;
+  SALT37.StrType FieldName;
+  UNSIGNED NumberOfRecords;
+  REAL8  populated_pcnt;
+  UNSIGNED  maxlength;
+  REAL8  avelength;
+END;
+invRec invert(summary0 le, INTEGER C) := TRANSFORM
+  SELF.FldNo := C;
+  SELF.NumberOfRecords := le.NumberOfRecords;
+  SELF.FieldName := CHOOSE(C,'cc_id','gc_id','account_id');
+  SELF.populated_pcnt := CHOOSE(C,le.populated_cc_id_pcnt,le.populated_gc_id_pcnt,le.populated_account_id_pcnt);
+  SELF.maxlength := CHOOSE(C,le.maxlength_cc_id,le.maxlength_gc_id,le.maxlength_account_id);
+  SELF.avelength := CHOOSE(C,le.avelength_cc_id,le.avelength_gc_id,le.avelength_account_id);
+END;
+EXPORT invSummary := NORMALIZE(summary0, 3, invert(LEFT,COUNTER));
+// The character counts
+// Move everything into 'inverted list' form so processing can be done 'in library'
+SALT37.MAC_Character_Counts.X_Data_Layout Into(h le,unsigned C) := TRANSFORM
+  SELF.Fld := TRIM(CHOOSE(C,IF (le.cc_id <> 0,TRIM((SALT37.StrType)le.cc_id), ''),IF (le.gc_id <> 0,TRIM((SALT37.StrType)le.gc_id), ''),TRIM((SALT37.StrType)le.account_id)));
+  SELF.FldNo := C;
+END;
+SHARED FldInv0 := NORMALIZE(h,3,Into(LEFT,COUNTER));
+// Move everything into 'pairs' form so processing can be done 'in library'
+SALT37.MAC_Correlate.Data_Layout IntoP(h le,UNSIGNED C) := TRANSFORM
+  SELF.FldNo1 := 1 + (C / 3);
+  SELF.FldNo2 := 1 + (C % 3);
+  SELF.Fld1 := TRIM(CHOOSE(SELF.FldNo1,IF (le.cc_id <> 0,TRIM((SALT37.StrType)le.cc_id), ''),IF (le.gc_id <> 0,TRIM((SALT37.StrType)le.gc_id), ''),TRIM((SALT37.StrType)le.account_id)));
+  SELF.Fld2 := TRIM(CHOOSE(SELF.FldNo2,IF (le.cc_id <> 0,TRIM((SALT37.StrType)le.cc_id), ''),IF (le.gc_id <> 0,TRIM((SALT37.StrType)le.gc_id), ''),TRIM((SALT37.StrType)le.account_id)));
+  END;
+SHARED Pairs0 := NORMALIZE(ENTH(h,Config.CorrelateSampleSize),3*3,IntoP(LEFT,COUNTER))(FldNo1<FldNo2);
+SHARED FldIds := DATASET([{1,'cc_id'}
+      ,{2,'gc_id'}
+      ,{3,'account_id'}],SALT37.MAC_Character_Counts.Field_Identification);
+EXPORT AllProfiles := SALT37.MAC_Character_Counts.FN_Profile(FldInv0,FldIds);
+ 
+EXPORT SrcProfiles := SALT37.MAC_Character_Counts.Src_Profile(FldInv0,FldIds);
+ 
+EXPORT Correlations := SALT37.MAC_Correlate.Fn_Profile(Pairs0,FldIds);
+ 
+ErrorRecord := RECORD
+  UNSIGNED1 FieldNum;
+  UNSIGNED1 ErrorNum;
+END;
+ErrorRecord NoteErrors(h le,UNSIGNED1 c) := TRANSFORM
+  SELF.ErrorNum := CHOOSE(c,
+    CCID_Fields.InValid_cc_id((SALT37.StrType)le.cc_id),
+    CCID_Fields.InValid_gc_id((SALT37.StrType)le.gc_id),
+    CCID_Fields.InValid_account_id((SALT37.StrType)le.account_id),
+    0);
+  SELF.FieldNum := IF(SELF.ErrorNum=0,SKIP,c); // Bail early to avoid creating record
+END;
+Errors := NORMALIZE(h,3,NoteErrors(LEFT,COUNTER));
+ErrorRecordsTotals := RECORD
+  Errors.FieldNum;
+  Errors.ErrorNum;
+  UNSIGNED Cnt := COUNT(GROUP);
+END;
+TotalErrors := TABLE(Errors,ErrorRecordsTotals,FieldNum,ErrorNum,FEW);
+PrettyErrorTotals := RECORD
+  FieldNme := CCID_Fields.FieldName(TotalErrors.FieldNum);
+  FieldType := CHOOSE(TotalErrors.FieldNum,'invalid_numeric','invalid_numeric','invalid_alphanumeric');
+  ErrorMessage := CHOOSE(TotalErrors.FieldNum,CCID_Fields.InValidMessage_cc_id(TotalErrors.ErrorNum),CCID_Fields.InValidMessage_gc_id(TotalErrors.ErrorNum),CCID_Fields.InValidMessage_account_id(TotalErrors.ErrorNum));
+  TotalErrors.Cnt;
+END;
+ValErr := TABLE(TotalErrors,PrettyErrorTotals);
+EXPORT ValidityErrors := ValErr;
+END;
