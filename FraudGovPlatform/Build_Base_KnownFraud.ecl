@@ -1,4 +1,4 @@
-Import ut,tools,inquiry_acclogs,FraudShared,Address; 
+﻿Import ut,tools,inquiry_acclogs,FraudShared,Address; 
 
 EXPORT Build_Base_KnownFraud (
    string pversion
@@ -17,7 +17,6 @@ module
 				
 				    self.process_date                    := (unsigned) pversion, 
 						self.Unique_Id                       := 0; 
-						self.Source                          := 'KNFD'; 
 						self.dt_first_seen                   := (unsigned)pInput.start_date; 
 						self.dt_last_seen                    := (unsigned)pInput.end_date;
 						self.dt_vendor_last_reported         := (unsigned) pversion;
@@ -37,11 +36,21 @@ module
    end; 
 		
 	KnownFraudUpdate	:=	project(dedup(inKnownFraudUpdateUpper ,all),tPrep(left,counter));
+	
+	Mbs_ds := FraudShared.Files().Input.MBS.sprayed(status = 1);
+	
+	KnownFraudSource  := join(KnownFraudUpdate,
+														Mbs_ds, 
+															(unsigned6) left.Client_ID = right.gc_id and 
+															right.file_type = Functions.file_type_fn('KNFD') and 
+															Functions.ind_type_fn(left.customer_program) = right.ind_type and 
+															left.customer_state = right.Customer_State,  
+														TRANSFORM(Layouts.Base.KnownFraud,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT));
 
 	//Standardize_Name(KnownFraudUpdate, first_name, middle_name, last_name, orig_suffix, KnownFraudUpdateCleaned); 
 
   // Rollup Update and previous base 
-	Pcombined     := If(UpdateKnownFraud , inBaseKnownFraud + KnownFraudUpdate , KnownFraudUpdate); 	
+	Pcombined     := If(UpdateKnownFraud , inBaseKnownFraud + KnownFraudSource , KnownFraudSource); 	
 	pDataset_Dist := distribute(Pcombined, hash(customer_event_id));	
 	pDataset_sort := sort(pDataset_Dist , -customer_event_id, -dt_last_seen,-process_date,record  ,local);
 			

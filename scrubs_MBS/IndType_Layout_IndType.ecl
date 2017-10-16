@@ -1,0 +1,1 @@
+﻿EXPORT IndType_Layout_IndType := {Scrubs_MBS.IndType_In_IndType};

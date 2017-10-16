@@ -1,0 +1,1 @@
+﻿EXPORT CCID_Layout_CCID := {Scrubs_MBS.CCID_In_CCID};
