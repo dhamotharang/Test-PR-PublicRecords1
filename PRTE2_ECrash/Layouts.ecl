@@ -1542,7 +1542,15 @@ EXPORT ecrashv2_accnbrv1 := RECORD
   unsigned6 idfield;
   string20 	reportlinkid;
   string3 	page_count;
+	//Buycrash project KY integration		
 	string3		contrib_source;
+	string8 	creation_date;
+	
+	//Buycrash Release 4		
+	string12 	officer_id;
+	
+	//Appriss Integration
+	STRING1 Releasable;
   unsigned8 __internal_fpos__;
  END;
  
@@ -2308,5 +2316,8 @@ END;
 		
 	EXPORT linkids := FLAccidents_Ecrash.Layout_Keybuild_Linkids;
 	
+	EXPORT key_search_rec := FLAccidents_Ecrash.Layouts.key_search_layout;
+	
+	EXPORT key_slim_rec := FLAccidents_Ecrash.Layouts.key_slim_layout;
 	
 END;

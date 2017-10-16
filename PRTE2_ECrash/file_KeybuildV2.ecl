@@ -1,4 +1,4 @@
-import FLAccidents_Ecrash, ut, std, prte2_Ecrash;
+﻿import FLAccidents_Ecrash, ut, std, prte2_Ecrash;
 
 export File_KeybuildV2 := module 
 
@@ -128,7 +128,7 @@ layouts.keybuild_SSv2 	slimrecs(ddrecs L) := transform
 																				 trim(l.policy_effective_date)[8] = '-' =>  trim(l.policy_effective_date)[1..7],
 																				 trim(l.policy_effective_date)
 																				);
-		 
+  self.releasable		 					:= '1';
 self 								:= L;
 end;
 
@@ -145,4 +145,6 @@ AlphaCoplogic 		:= AlphaCmbnd(trim(vendor_code, left,right) = 'COPLOGIC' and ((t
 export Alpha  		:= AlphaOtherVendors + AlphaCoplogic;
 export out   			:= outrecs0(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports and trim(vendor_code, left,right) <> 'COPLOGIC');
 
+shared searchRecs := out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']);
+export eCrashSearchRecs := distribute(project(searchRecs, Layouts.key_search_rec), hash64(accident_nbr)):independent;
 end; 
