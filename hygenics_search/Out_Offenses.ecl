@@ -1,4 +1,4 @@
-import hygenics_crim,Crim_Common, Corrections,codes, crimsrch, lib_fileservices, doxie_build, PromoteSupers;
+﻿import hygenics_crim,Crim_Common, Corrections,codes, crimsrch, lib_fileservices, doxie_build, PromoteSupers,STD;
 
 fcra_v1 				:= Offenses_Joined(data_type<>'1');
 
@@ -117,8 +117,8 @@ hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory addCOPID(all_files 
 																								Varr_off_desc_1 +
 																								Varr_off_desc_2));// +
 																								//Voffense_town));
-		self.offense_category                   := MAP(l.data_type ='5' and l.arr_off_desc_1   = 'NOT SPECIFIED' => 0,
-		                                               l.data_type ='2' and l.court_off_desc_1 = 'NOT SPECIFIED' => 0,
+		self.offense_category                   := MAP(l.data_type ='5' and l.arr_off_desc_1   = 'NOT SPECIFIED' => hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Other),
+		                                               l.data_type ='2' and l.court_off_desc_1 = 'NOT SPECIFIED' => hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Other),
 		                                               l.data_type ='5' and l.arr_off_desc_1   <> 'NOT SPECIFIED' => hygenics_crim._fns_offense_category.set_offense_category(stringlib.stringtouppercase(l.arr_off_desc_1)),
 		                                               hygenics_crim._fns_offense_category.set_offense_category(stringlib.stringtouppercase(l.court_off_desc_1))
 																							 );
@@ -127,7 +127,22 @@ hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory addCOPID(all_files 
 
 fcra_v1_as_v1 := project(all_files, addCOPID(left));
 
-	PromoteSupers.MAC_SF_BuildProcess(fcra_v1_as_v1,'~thor_data400::base::corrections_court_offenses_' + doxie_build.buildstate,aout,2,,true)
+fcra_v1_as_v1 tJoinForOffensecategory(fcra_v1_as_v1 L, hygenics_search.Offense_Category.Layout_Lookup R) := transform
+    self.offense_category   := MAP(R.Category = 'GLOBAL' => hygenics_crim._functions.category_to_bitmap('OTHER'),
+		                               hygenics_crim._functions.category_to_bitmap(STD.Str.Filter(R.Category, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'))
+																	 );  
+		self										:=	L;
+end;
+	
+fcra_v1_as_v2	:= join(fcra_v1_as_v1(offense_category =0),
+                      hygenics_search.Offense_Category.File_Lookup,
+																					trim(left.court_off_desc_1) = trim(right.Offese_desc),
+																					tJoinForOffensecategory(left,right),
+																					left outer, lookup);
+																					
+fcra_v1_as_v3 := fcra_v1_as_v2 + fcra_v1_as_v1(offense_category <>0);
+
+	PromoteSupers.MAC_SF_BuildProcess(fcra_v1_as_v3,'~thor_data400::base::corrections_court_offenses_' + doxie_build.buildstate,aout,2,,true)
 			 
 export Out_Offenses := aout;	
 							

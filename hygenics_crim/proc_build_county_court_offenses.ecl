@@ -1,4 +1,4 @@
-/*2014-04-23T19:31:32Z (Vani Chikte)
+﻿/*2014-04-23T19:31:32Z (Vani Chikte)
 
 */
 import address, crim_common,STD;
@@ -947,10 +947,13 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 																		 vVendor ='W0027' and l.classification_code <>'TV' and trim(l.casetype) IN ['TRAFFIC','PARKING'] => '' ,
 																		 vVendor ='W0041' and l.classification_code <>'TV' and trim(l.casetype) IN ['CRIMINAL TRAFFIC']  => '' ,
 																		 
-                                     (stringlib.stringfind(temp_offense,'FELONY',1) >0  or regexfind('FELONY|FEL0NY|FELONIOUS|FELONEOUS|FELONIOS|FELONOUS|CRIM-FEL', temp_offense) ) and 
+                                     (stringlib.stringfind(temp_offense,'FELONY',1) >0  or regexfind('FELONY|FEL0NY|FELONIOUS|FELONEOUS|FELONIOS|FELONOUS|CRIM-FEL|FEL:', temp_offense) ) and 
                                       regexfind('REDU[U]*CED|AMEND[DED]* TO|NON-FELONY|ACCESSORY|ATTEMPT TO COMMIT|FACILITATION',temp_offense,0) ='' => 'F',
-																																						
-                                     trim(l.casetype) IN ['CRIMINAL FELONY','FELONY'] => 'F' ,
+																			
+																		 regexfind('MISD:', temp_offense)  and 
+                                     regexfind('REDU[U]*CED|AMEND[DED]* TO|NON-FELONY|ACCESSORY|ATTEMPT TO COMMIT|FACILITATION',temp_offense,0) ='' => 'M',  																				
+                                     
+																		 trim(l.casetype) IN ['CRIMINAL FELONY','FELONY'] => 'F' ,
 																		 trim(l.casetype) IN ['FELONY II']      => 'F2' ,
 																		 trim(l.casetype) IN ['FELONY I']       => 'F1' ,
 																		 trim(l.casetype) IN ['CAPITAL FELONY'] => 'CF' ,
@@ -1028,10 +1031,10 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
                 //use disposition from charge table when value in offense table is null
   self.court_disp_desc_1    := MAP( trim(temp_disp) ='G'=>'GUILTY',                                            
                                     trim(temp_disp) ='D'=>'DISMISS',
-																		trim(temp_disp) ='PLEA OF GUILTY Â–NO JURY **'  => 'PLEA OF GUILTY NO JURY', 
-																		trim(temp_disp) ='TYPE:P  PLEA OF GUILTY Â–NO JURY **'  => 'PLEA OF GUILTY NO JURY',    
-                                    trim(temp_disp) ='TYPE:S  PLEA OF GUILTY Â–NO JURY **'  => 'PLEA OF GUILTY NO JURY',    
-                                    trim(temp_disp) ='TYPE:J  PLEA OF GUILTY Â–NO JURY **'  => 'PLEA OF GUILTY NO JURY',    
+																		trim(temp_disp) ='PLEA OF GUILTY NO JURY **'  => 'PLEA OF GUILTY NO JURY', 
+																		trim(temp_disp) ='TYPE:P  PLEA OF GUILTY NO JURY **'  => 'PLEA OF GUILTY NO JURY',    
+                                    trim(temp_disp) ='TYPE:S  PLEA OF GUILTY NO JURY **'  => 'PLEA OF GUILTY NO JURY',    
+                                    trim(temp_disp) ='TYPE:J  PLEA OF GUILTY NO JURY **'  => 'PLEA OF GUILTY NO JURY',    
 
 																		regexfind('&NBS',temp_disp) => regexreplace('(.*)&NBSP;',temp_disp,'$1'),
                                     vVendor IN ['US','8I','8K','9G','9U'] and regexfind('(.*) - (.*)',temp_disp) => regexreplace('(.*) - (.*)',temp_disp,'$2'),                                                                                                                                                        

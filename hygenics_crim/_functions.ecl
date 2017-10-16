@@ -1,4 +1,4 @@
-/*2015-01-30T16:17:48Z (vchikte)
+﻿/*2015-01-30T16:17:48Z (vchikte)
 C:\Users\ChikteVP\AppData\Roaming\HPCC Systems\eclide\vchikte\DATALAND_EOSS_Proxy\hygenics_crim\_functions\2015-01-30T16_17_48Z.ecl
 */
 import ut,STD,_validate;
@@ -12,7 +12,7 @@ export StreetAddressToFilter := ['0 05181992','0 BONITA SPRINGS','0 GIVEN','0 IM
                                  '0 NOT GIVEN','1 NO ADDRESS','0 IN HOUSE JAIL','0 NOTGIVEN','1 NO ADDDRESS','1 NO ADDESSS',
                                  'HOMELESS','HOMELESSS','CURRENTLY HOMELESS','HOMELESS MOBILE, AL','HOMELESS CURRENT','HOMELESS CURRENT ADDRESS',
                                  '0 NOT ILSTED','0 NOT ISTED','0 NOT L ISTED','0 NOT LISED','0 NOT LIST','0 NOT LISTE',
-		                             '0 NOT LISTED','0 HOMELESS','0 UNKNOWN ','HOMELESS','9999 HOMELES','AT LARGE-HOMELESS','(HOMELESS)', 
+		                             '0 NOT LISTED','0 HOMELESS','0 UNKNOWN ','HOMELESS','9999 HOMELES','AT LARGE-HOMELESS','(HOMELESS)','AT LARGE', 
 																 '? UNKNOWN	','ADD UNKNOWN','ADDRES S UNKNOWN','ADDRESS UNKNOW N','ADDRESS UNKNOWN','ADDRESS UNKNOWN, # EAST L','N/A NONE',
 		                             'N/A UNKNOWN N/A','NA UNKNWON','NCHOR MOTEL #3','NEW ADDRESS UNKNOWN, # TE','0 NO GIVEN',
 																 'NEW UNKNOWN ADDRESS','NO ADDRESS','NO ADDRESS, # 27','NO ADDRESS, # DEF STATED',
@@ -22,7 +22,7 @@ export StreetAddressToFilter := ['0 05181992','0 BONITA SPRINGS','0 GIVEN','0 IM
 																 'NONE AT PRESENT','NONE AT THIS TI ME','NONE AT THIS TIME, # 13','NONE CLAIMS HOMELESS','NONE DID NOT KNOW','NONE ENTERED',
 		                             'NONE GIVEN','NONE GIVEN TO O FFICER',';NONE HOMELESS','NONE - HOMELESS','NONE / HOMELESS','NONE HOMELESS',
 																 'NONE LISTED','NONE LISTED NONE','NONE NEW','NONE NONE','NONE NONE AT THIS TI ME','NONE NONE GIVEN',
-		                             'NONE NOWHERE','NONE PER DEF','NONE PROVIDED','NONE STATED','NONE UNKNOWN','NONE/AT','NOT LISTED','NUMBER AND ST UNKNOWN',
+		                             'NONE NOWHERE','NONE PER DEF','NONE PROVIDED','NONE STATED','NONE UNKNOWN','NONE/AT','NOT LISTED','NUMBER AND ST UNKNOWN','UNKNOWN',
 																 'OO UNKNOWN','OOO NONE','OOO UNKNOWN','OOOO NONE','OOOO UNKNOWN','OOOOOO UNKNOWN','UN UNKNOWN','UNK NONE','UNK NONE AT THIS TI ME',
 		                             'UNK NONE GIVEN','UNK UNKNOWN','UNK UNKNOWN UNK','UNKN','UNKN #2208','UNKN ANYWHERE','UNKN UKNOWNN','UNKN UNKNOWN','UNKNIOWN ADDRESS',
 																 'UNKNNOWN','UNKNO UNKNOWN','UNKNO WN','UNKNOE W UNK','UNKNON','UNKNON W','UNKNONW','UNKNONW,','UNKNONWN','UNKNOW','UNKNOW HARBOR','UNKNOW ADDRESS',
@@ -48,15 +48,21 @@ export StreetAddressToFilter := ['0 05181992','0 BONITA SPRINGS','0 GIVEN','0 IM
 																 '0000 UNKN APTS','0000 UNKNOWN','0000 UNKNOWN ST','0000 UNKNOWN / LOCAL AREA','0000 UNKNOWN ON STRE ETS','0000 UNKNOWN SO HE C LAIM',
 		                             '0000 UNKNOWN (SO HE STATE','0000 UNKNOWNM','0000 UNKNWON','00000 NONE','00000 UNKNONW','00000 UNKNOWN','00000 UNKNOWN # BECKE R 4',
 																 '00000 UNKNOWN ADDRESS','00000 UNKNOWN (ANYWHE RE)','000000 NONE','000000 UNKNONW','000000 UNKNOWN','000000 UNKNOWN,','000000 UNKNOWNW',
-                                 '000000 UNKNWON','\\ UNKNOWN'];
+                                 '000000 UNKNWON','\\ UNKNOWN','NO PERMANENT','SALVATION ARMY'];
 																 
+StreetAddressToFilter2 := 'UNKNOWN ADDRESS|ADDRESS UNKNOW[N]*|MOVED - LEFT NO ADDRESS|NO CURRENT ADDRESS|NO ADDRESS GIVEN|NO ADDRESS AVAILABLE|NO FORWARDING ADDRESS|'+
+                          'NO KNOWN ADDRESS|NO PERMANANT ADDR|^NPA [0-9]+[ ]*$|PUBLIC SAFETY BLD|PROTECTIVE ORDER SEALING|UNDELIVERABLE|UNABLE TO FORWARD|'+
+													'^WSP [0-9]+[ ]*$|^UNKNOWN [0-9]*$|DOES NOT KNOW ADDRESS|FORWARDING ORDER EXPIRED';
+
 export CleanAddress(string pcitystzip) := FUNCTION
  step1 := MAP(stringlib.stringfind('PRJ REL DATE',pcitystzip,1)>0 => '',
               pcitystzip);
  step2 := Std.Str.CleanSpaces(step1); //clean extra spaces
  step3 := stringlib.stringfindreplace(step2,' ,',','); 
  step4 := regexreplace('(.*)( [0-9]{5})([-]*[0-9]+)',(step3),'$1$2');//remove zip4
- clnAddress := MAP( trim(step4,left,right) =',' => '',
+ clnAddress := MAP( regexfind('(SC)( SC)( [0-9]{5})',step4)=> regexreplace('(SC)( SC)( [0-9]{5})',step4,'$1$3'),
+                    regexfind('(.*)( FL)[A]([0-9]{5})',step4)=> regexreplace('(.*)( FL)[A]([0-9]{5})',step4,'$1$2 $3'),
+                    trim(step4,left,right) =',' => '',
                     step4
                    );
  return clnAddress;
@@ -1039,7 +1045,7 @@ step1 := MAP( p_case_number[1..4] ='ARR:' => p_case_number[5..],
 						 );
 clean_case_num := stringlib.stringfilter(stringlib.stringtouppercase(step1),'abcdefABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890');
 
-//clean_case_num2 := unicodelib.unicodefilterout(clean_case_num,U'î€œ' );
+//clean_case_num2 := unicodelib.unicodefilterout(clean_case_num,U'' );
 
 No_leading_Zero  := regexreplace('^[0]+(.*)',(string)clean_case_num,'$1');
 
@@ -1580,6 +1586,10 @@ export fn_shorten_sourcename(string psourcename) := function
 								 psourcename = 'OHIO_JEFFERSON_COUNTY_DILLONVALE_MUNICIPAL_COURT_CW'    => 'OH_JEFERSNDILNVLE_MC',
 								 psourcename = 'ARIZONA_DEPARTMENT_OF_PUBLIC_SAFETY_CW             '    => 'AZ_DOPUB_SAFETY',
                  psourcename = 'TEXAS_DEPARTMENT_OF_CRIMINAL_JUSTICE_INMATES_CW    '    => 'TX_DO_CRM_JUSTINMATS',
+								 psourcename = 'MASSACHUSETTS_NORTH_ATTLEBORO_ARRESTS_CW           '    => 'MA_NRTH_ATTLEBOO_ARR',
+								 psourcename = 'MASSACHUSETTS_WEST_BRIDGEWATER_ARRESTS_CW          '    => 'MA_WES_BRDGEWATR_ARR',
+								 psourcename = 'MONTANA_YELLOWSTONE_COUNTY_DETENTION_CW            '    => 'MT_YELLOWSTONCTY_DET', 
+								 psourcename = 'FLORIDA_OSCEOLA_COUNTY_CORRECTIONS_CW              '    => 'FL_OSCEOLA_CTY_CORR', 
 
 								 
 								 
@@ -1985,7 +1995,7 @@ map(
   psourcename = 'OHIO_CLERMONT_TRAFFIC'                               	=> '6K',
   psourcename = 'OHIO_PREBLE_COUNTY_COMMON_PLEAS_COURT'                 => 'YO',
   psourcename = 'OHIO_PREBLE_COUNTY_EATON_MUNICIPAL_COURT'              => '6J',
-  psourcename = 'OHIO_SENECA_COUNTY_TIFFIN_MUNICIPAL_COURT'            	=> 'YS',
+  //psourcename = 'OHIO_SENECA_COUNTY_TIFFIN_MUNICIPAL_COURT'            	=> 'YS', //comment this later
   psourcename = 'OHIO_SHELBY_COUNTY_SIDNEY_MUNICIPAL_COURT'             => 'YT',
   psourcename = 'OHIO_TRUMBULL_COUNTY_GIRARD_MUNICIPAL_COURT'           => 'YU',
   psourcename = 'OHIO_WASHINGTON_COUNTY_MARIETTA_MUNICIPAL_COURT'      	=> 'YW',
@@ -2596,7 +2606,7 @@ map(
                     
  //County
  psourcename = 'TEXAS_COLLIN_COUNTY_DISTRICT_COURT_CW                                  ' =>'W0251',
- psourcename = 'OHIO_AUGLAIZE_COUNTY_MUNICIPAL_COURT_CW                                ' =>'W0252',                
+ // psourcename = 'OHIO_AUGLAIZE_COUNTY_MUNICIPAL_COURT_CW                                ' =>'W0252',    // most of the rec are in OHIO_AUGLAIZE_COUNTY           
  psourcename = 'FLORIDA_ESCAMBIA_COUNTY_CW                                             ' =>'W0253',
  psourcename = 'TEXAS_FORT_BEND_COUNTY_DISTRICT_COURT_CW                               ' =>'W0254',                                    
  psourcename = 'OHIO_PUTNAM_COUNTY_COMMON_PLEAS_COURT_CW                               ' =>'W0255',
@@ -2615,12 +2625,69 @@ map(
  psourcename = 'ARIZONA_DEPARTMENT_OF_PUBLIC_SAFETY_CW                                 ' =>'W0267',
  //DOC
  psourcename = 'TEXAS_DEPARTMENT_OF_CRIMINAL_JUSTICE_INMATES_CW                        ' =>'W0268',
- '');                                                                                                         
-                                                                                                  
- return vendor;                                                                                 
-end; 
-                                                                       
-                                                                                                 
+ 
+ //Batch5----------------------------------------------------------------------------------20170627
+ //Arrest 
+ psourcename = 'CALIFORNIA_MENDOCINO_COUNTY_BOOKINGS_CW                                ' => 'W0269',
+ psourcename = 'CALIFORNIA_TEHAMA_COUNTY_BOOKINGS_CW                                   ' => 'W0270',
+ psourcename = 'FLORIDA_CITRUS_COUNTY_SHERIFFS_OFFICE_CW                               ' => 'W0271',
+ psourcename = 'FLORIDA_DIXIE_COUNTY_SHERIFFS_OFFICE_CW                                ' => 'W0272',
+ psourcename = 'FLORIDA_LEE_COUNTY_SHERIFFS_OFFICE_CW                                  ' => 'W0273',
+ psourcename = 'FLORIDA_ST_JOHNS_COUNTY_SHERIFFS_OFFICE_CW                             ' => 'W0274',
+ psourcename = 'FLORIDA_ST_LUCIE_COUNTY_SHERIFFS_OFFICE_CW                             ' => 'W0275',
+ psourcename = 'LOUISIANA_SLIDELL_POLICE_CW                                            ' => 'W0276',
+ psourcename = 'MASSACHUSETTS_BOURNE_ARRESTS_CW                                        ' => 'W0277',
+ psourcename = 'MASSACHUSETTS_BRIDGEWATER_ARRESTS_CW                                   ' => 'W0278',
+ psourcename = 'MASSACHUSETTS_CHICOPEE_ARRESTS_CW                                      ' => 'W0279',
+ psourcename = 'MASSACHUSETTS_COHASSET_ARRESTS_CW                                      ' => 'W0280',
+ psourcename = 'MASSACHUSETTS_DALTON_ARRESTS_CW                                        ' => 'W0281',
+ psourcename = 'MASSACHUSETTS_DENNIS_ARRESTS_CW                                        ' => 'W0282',
+ psourcename = 'MASSACHUSETTS_DUXBURY_ARRESTS_CW                                       ' => 'W0283',
+ psourcename = 'MASSACHUSETTS_FITCHBURG_ARRESTS_CW                                     ' => 'W0284',
+ psourcename = 'MASSACHUSETTS_FOXBORO_ARRESTS_CW                                       ' => 'W0285',
+ psourcename = 'MASSACHUSETTS_GARDNER_ARRESTS_CW                                       ' => 'W0286',
+ psourcename = 'MASSACHUSETTS_LEOMINSTER_ARRESTS_CW                                    ' => 'W0287',
+ psourcename = 'MASSACHUSETTS_LONGMEADOW_ARRESTS_CW                                    ' => 'W0288',
+ psourcename = 'MASSACHUSETTS_MASHPEE_ARRESTS_CW                                       ' => 'W0289',
+ // psourcename = 'MASSACHUSETTS_MELROSE_POLICE_DEPARTMENT_CW                             ' => 'W0290',
+ psourcename = 'MASSACHUSETTS_MIDDLETON_POLICE_DEPARTMENT_CW                           ' => 'W0291',
+ psourcename = 'MASSACHUSETTS_MILFORD_ARRESTS_CW                                       ' => 'W0292',
+ psourcename = 'MASSACHUSETTS_NORTH_ATTLEBORO_ARRESTS_CW                               ' => 'W0293',
+ psourcename = 'MASSACHUSETTS_NORTHAMPTON_ARRESTS_CW                                   ' => 'W0294',
+ psourcename = 'MASSACHUSETTS_ORLEANS_ARRESTS_CW                                       ' => 'W0295',
+ psourcename = 'MASSACHUSETTS_PALMER_ARRESTS_CW                                        ' => 'W0296',
+ psourcename = 'MASSACHUSETTS_PLYMPTON_ARRESTS_CW                                      ' => 'W0297',
+ psourcename = 'MASSACHUSETTS_ROCHESTER_ARRESTS_CW                                     ' => 'W0298',
+ psourcename = 'MASSACHUSETTS_SOUTHWICK_ARRESTS_CW                                     ' => 'W0299',
+ psourcename = 'MASSACHUSETTS_TEWKSBURY_POLICE_CW                                      ' => 'W0300', 
+ psourcename = 'MASSACHUSETTS_TRURO_ARRESTS_CW                                         ' => 'W0301',
+ psourcename = 'MASSACHUSETTS_WAYLAND_ARRESTS_CW                                       ' => 'W0302',
+ psourcename = 'MASSACHUSETTS_WEST_BRIDGEWATER_ARRESTS_CW                              ' => 'W0303',
+ psourcename = 'MASSACHUSETTS_WESTFIELD_ARRESTS_CW                                     ' => 'W0304',
+ psourcename = 'MASSACHUSETTS_WRETNAM_ARRESTS_CW                                       ' => 'W0305',
+ psourcename = 'MASSACHUSETTS_WRENTHAM_ARRESTS_CW                                      ' => 'W0306', 
+ psourcename = 'MASSACHUSETTS_YARMOUTH_ARRESTS_CW                                      ' => 'W0307',
+ psourcename = 'MINNESOTA_BROWN_COUNTY_SHERIFF_CW                                      ' => 'W0308',
+ psourcename = 'MONTANA_YELLOWSTONE_COUNTY_DETENTION_CW                                ' => 'W0309',
+ psourcename = 'FLORIDA_OSCEOLA_COUNTY_CORRECTIONS_CW                                  ' => 'W0310',
+//County                                                                               
+ psourcename = 'ARIZONA_AVONDALE_CW                                                    ' => 'W0311',
+ psourcename = 'ARIZONA_BUCKEYE_CW                                                     ' => 'W0312',
+ psourcename = 'ARIZONA_EL_MIRAGE_CW                                                   ' => 'W0313',
+ psourcename = 'ARIZONA_GOODYEAR_CW                                                    ' => 'W0314',
+ psourcename = 'ARIZONA_SURPRISE_CW                                                    ' => 'W0315',
+ psourcename = 'ARIZONA_TOLLESON_CW                                                    ' => 'W0316',
+ psourcename = 'ARIZONA_WICKENBURG_CW                                                  ' => 'W0317',
+ psourcename = 'OHIO_CHAMPAIGN_COUNTY_MUNICIPAL_COURT_CW                               ' => 'W0318',
+ psourcename = 'OHIO_SENECA_COUNTY_TIFFIN_MUNICIPAL_COURT_CW                           ' => 'W0319',
+ //AOC                                                                                 
+ psourcename = 'KANSAS_OFFENDER_REGISTRY_CW                                            ' => 'W0320',
+ '');                                                                                                               
+                                                                                                        
+ return vendor;                                                                                       
+end;                                                                                   
+                                                                                       
+                                                                                                       
 export fn_vendorcode_sourcename(string5 vendor_code, string8 src_upload_date) := function
 	string sourcename :=                                                             
 	map(                                                                             
@@ -3596,6 +3663,60 @@ vendor_code = '9X' => 'TEXAS_RANDALL_COUNTY'                                  ,
  vendor_code = 'W0267' =>'ARIZONA_DEPARTMENT_OF_PUBLIC_SAFETY              ' ,
  vendor_code = 'W0268' =>'TEXAS_DEPARTMENT_OF_CRIMINAL_JUSTICE_INMATES     ' ,
 
+ vendor_code = 'W0269' =>'CALIFORNIA_MENDOCINO_COUNTY_BOOKINGS          ' ,
+ vendor_code = 'W0270' =>'CALIFORNIA_TEHAMA_COUNTY_BOOKINGS             ' ,
+ vendor_code = 'W0271' =>'FLORIDA_CITRUS_COUNTY_SHERIFFS_OFFICE         ' ,
+ vendor_code = 'W0272' =>'FLORIDA_DIXIE_COUNTY_SHERIFFS_OFFICE          ' ,
+ vendor_code = 'W0273' =>'FLORIDA_LEE_COUNTY_SHERIFFS_OFFICE            ' ,
+ vendor_code = 'W0274' =>'FLORIDA_ST_JOHNS_COUNTY_SHERIFFS_OFFICE       ' ,
+ vendor_code = 'W0275' =>'FLORIDA_ST_LUCIE_COUNTY_SHERIFFS_OFFICE       ' ,
+ vendor_code = 'W0276' =>'LOUISIANA_SLIDELL_POLICE                      ' ,
+ vendor_code = 'W0277' =>'MASSACHUSETTS_BOURNE_ARRESTS                  ' ,
+ vendor_code = 'W0278' =>'MASSACHUSETTS_BRIDGEWATER_ARRESTS             ' ,
+ vendor_code = 'W0279' =>'MASSACHUSETTS_CHICOPEE_ARRESTS                ' ,
+ vendor_code = 'W0280' =>'MASSACHUSETTS_COHASSET_ARRESTS                ' ,
+ vendor_code = 'W0281' =>'MASSACHUSETTS_DALTON_ARRESTS                  ' ,
+ vendor_code = 'W0282' =>'MASSACHUSETTS_DENNIS_ARRESTS                  ' ,
+ vendor_code = 'W0283' =>'MASSACHUSETTS_DUXBURY_ARRESTS                 ' ,
+ vendor_code = 'W0284' =>'MASSACHUSETTS_FITCHBURG_ARRESTS               ' ,
+ vendor_code = 'W0285' =>'MASSACHUSETTS_FOXBORO_ARRESTS                 ' ,
+ vendor_code = 'W0286' =>'MASSACHUSETTS_GARDNER_ARRESTS                 ' ,
+ vendor_code = 'W0287' =>'MASSACHUSETTS_LEOMINSTER_ARRESTS              ' ,
+ vendor_code = 'W0288' =>'MASSACHUSETTS_LONGMEADOW_ARRESTS              ' ,
+ vendor_code = 'W0289' =>'MASSACHUSETTS_MASHPEE_ARRESTS                 ' ,
+ // vendor_code = 'W0290' =>'MASSACHUSETTS_MELROSE_POLICE_DEPARTMENT       ' ,
+ vendor_code = 'W0291' =>'MASSACHUSETTS_MIDDLETON_POLICE_DEPARTMENT     ' ,
+ vendor_code = 'W0292' =>'MASSACHUSETTS_MILFORD_ARRESTS                 ' ,
+ vendor_code = 'W0293' =>'MASSACHUSETTS_NORTH_ATTLEBORO_ARRESTS         ' ,
+ vendor_code = 'W0294' =>'MASSACHUSETTS_NORTHAMPTON_ARRESTS             ' ,
+ vendor_code = 'W0295' =>'MASSACHUSETTS_ORLEANS_ARRESTS                 ' ,
+ vendor_code = 'W0296' =>'MASSACHUSETTS_PALMER_ARRESTS                  ' ,
+ vendor_code = 'W0297' =>'MASSACHUSETTS_PLYMPTON_ARRESTS                ' ,
+ vendor_code = 'W0298' =>'MASSACHUSETTS_ROCHESTER_ARRESTS               ' ,
+ vendor_code = 'W0299' =>'MASSACHUSETTS_SOUTHWICK_ARRESTS               ' ,
+ vendor_code = 'W0300' =>'MASSACHUSETTS_TEWKSBURY_POLICE                ' , 
+ vendor_code = 'W0301' =>'MASSACHUSETTS_TRURO_ARRESTS                   ' ,
+ vendor_code = 'W0302' =>'MASSACHUSETTS_WAYLAND_ARRESTS                 ' ,
+ vendor_code = 'W0303' =>'MASSACHUSETTS_WEST_BRIDGEWATER_ARRESTS        ' ,
+ vendor_code = 'W0304' =>'MASSACHUSETTS_WESTFIELD_ARRESTS               ' ,
+ vendor_code = 'W0305' =>'MASSACHUSETTS_WRETNAM_ARRESTS                 ' ,
+ vendor_code = 'W0306' =>'MASSACHUSETTS_WRENTHAM_ARRESTS                ' , 
+ vendor_code = 'W0307' =>'MASSACHUSETTS_YARMOUTH_ARRESTS                ' ,
+ vendor_code = 'W0308' =>'MINNESOTA_BROWN_COUNTY_SHERIFF                ' ,
+ vendor_code = 'W0309' =>'MONTANA_YELLOWSTONE_COUNTY_DETENTION          ' ,
+ vendor_code = 'W0310' =>'FLORIDA_OSCEOLA_COUNTY_CORRECTIONS            ' ,
+//County                                                                   
+ vendor_code = 'W0311' =>'ARIZONA_AVONDALE                              ' ,
+ vendor_code = 'W0312' =>'ARIZONA_BUCKEYE                               ' ,
+ vendor_code = 'W0313' =>'ARIZONA_EL_MIRAGE                             ' ,
+ vendor_code = 'W0314' =>'ARIZONA_GOODYEAR                              ' ,
+ vendor_code = 'W0315' =>'ARIZONA_SURPRISE                              ' ,
+ vendor_code = 'W0316' =>'ARIZONA_TOLLESON                              ' ,
+ vendor_code = 'W0317' =>'ARIZONA_WICKENBURG                            ' ,
+ vendor_code = 'W0318' =>'OHIO_CHAMPAIGN_COUNTY_MUNICIPAL_COURT         ' ,
+ vendor_code = 'W0319' =>'OHIO_SENECA_COUNTY_TIFFIN_MUNICIPAL_COURT     ' ,
+ //AOC                                                                     
+ vendor_code = 'W0320' =>'KANSAS_OFFENDER_REGISTRY                      ' ,
  //************************LN Sources****************************/
  vendor_code = '3N' => 'LOUSIANA - EAST BATON ROUGE',
  vendor_code = '3O' => 'LOUISIANA - JEFFERSON COUNTY ',
@@ -3650,7 +3771,7 @@ vendor_code = '9X' => 'TEXAS_RANDALL_COUNTY'                                  ,
  vendor_code = '2C' => 'OKLAHOMA PUSHMATAHA COUNTY',
  vendor_code = '2F' => 'OKLAHOMA ROGER MILLS COUNTY',
  vendor_code = '2D' => 'OKLAHOMA ROGERS COUNTY',
- vendor_code = '2E' => 'OKLAHOMA TULSA COUNTYÂ  ',
+ vendor_code = '2E' => 'OKLAHOMA TULSA COUNTY  ',
  // vendor_code = 'OR' => 'OREGON DEPARTMENT OF CORRECTIONS',
  // vendor_code = '2Q' => 'SOUTH CAROLINA GREENVILLE COUNTY',
  // vendor_code = '2X' => 'SOUTH CAROLINA YORK COUNTY',

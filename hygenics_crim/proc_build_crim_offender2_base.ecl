@@ -1,4 +1,4 @@
-import crim_common,did_add,didville,header,header_slimsort,ut,watchdog, address,nid, AID,AID_Support;
+﻿import crim_common,did_add,didville,header,header_slimsort,ut,watchdog, address,nid, AID,AID_Support;
 
 def 	:= sort(distribute(hygenics_crim.file_in_defendant(statecode not in ['NC','PA','OR']),hash(recordid)), recordid, local);
 ah		:= dedup(sort(distribute(hygenics_crim.file_in_addresshistory(statecode not in ['NC','PA','OR']),hash(recordid)), recordid, local), record);
@@ -58,21 +58,14 @@ all_unique_names_dedup	:= dedup(sort(all_names, record,local), record,local);
 		
 all_names_addresses := def_with_ahist+ all_unique_names_dedup;
 
-	//Populate Address fields
-	addAddress_layout := record
-		all_names_addresses;
-		string street_address_1;
-		string street_address_2;
-		unsigned8 	append_Rawaid;
-	end;
-
-	addAddress_layout addrPop(all_names_addresses l):= transform
+	layout_temp_offender addrPop(all_names_addresses l):= transform
 		self.street_address_1 := if(regexfind('[A-Z]+', stringlib.stringtouppercase(l.street), 0)<>'',
 									              trim(l.street+if(l.unit<>'', ' '+l.unit, ''), left, right),
 									              '');
-		self.street_address_2 := l.city+', '+l.orig_state+' '+l.orig_zip;
-		self.append_Rawaid := 0;
+		self.street_address_2 := _functions.CleanAddress(l.city+', '+l.orig_state+' '+l.orig_zip);
+		// self.append_Rawaid := 0;
 		self := l;
+		self := [];
 	end;
 
 addrProject 	:= project(all_names_addresses, addrPop(left),local);
@@ -100,159 +93,20 @@ rollupAddrOut := ROLLUP(sorted_rcommon,
 						            trim(left.dob) = trim(Right.dob), 
 						            rollupCrim(LEFT,RIGHT)) ;
 						 
-layout_temp_offender := record
- 
- hygenics_crim.layout_in_defendant;
- 
- string40	 j_RecordID;
- string2	 j_StateCode;
- string1   name_type_hd;
- string115 j_Name;
- string50	 j_LastName;
- string50	 j_FirstName;
- string40	 j_MiddleName; 
- string15	 j_Suffix;
- string8	 j_DOB;
- 
- string20	 j_AddressType;
- string150 j_Street;
- string20	 j_Unit;
- string50	 j_City;
- string2	 j_State;
- string9	 j_Zip;
- 
- string5  	title;
- string20 	fname;
- string20 	mname;
- string20 	lname;
- string5  	name_suffix;
- string3  	cleaning_score;
-	
- string10 	prim_range;
- string2  	predir;
- string28 	prim_name;
- string4  	addr_suffix;
- string2  	postdir;
- string10 	unit_desig;
- string8  	sec_range;
- string25 	p_city_name;
- string25 	v_city_name;
- string2 	  state;
- string5  	zip5;
- string4  	zip4;
- string4  	cart;
- string1  	cr_sort_sz;
- string4  	lot;
- string1  	lot_order;
- string2  	dpbc;
- string1  	chk_digit;
- string2  	rec_type;
- string2  	ace_fips_st;
- string3	  ace_fips_county;
- string10 	geo_lat;
- string11 	geo_long;
- string4  	msa;
- string7  	geo_blk;
- string1  	geo_match;
- string4  	err_stat;
- 
- unsigned6 	did	:= 0;
- unsigned1 	did_score := 0;
- string9 	  ssn := '';
 
-end;
 //Address Cleaner	
-/* Commented for AID change
 layout_temp_offender clean_name_add (rollupAddrOut l) := transform
  self.j_RecordID 			:= l.recordid;
  self.j_StateCode 		:= l.statecode;
  self.name_type_hd    := l.nametype; // added this b/c NID cleaner over writes this field.	
  self.name            := MAP(l.name ='' => l.firstname+' '+l.middlename+' '+l.lastname+' '+l.suffix ,
-                             l.name);
-												 
- clean_addr 				  := Address.CleanAddress182(l.street_address_1, l.street_address_2);
+                             l.name);	
+ SELF 							      := L; 
  
- self.prim_range 		  := clean_addr[1..10];
- self.predir 			    := clean_addr[11..12];
- self.prim_name 		  := clean_addr[13..40];
- self.addr_suffix 		:= clean_addr[41..44];
- self.postdir 			  := clean_addr[45..46];
- self.unit_desig 		  := clean_addr[47..56];
- self.sec_range 		  := clean_addr[57..64];
- self.p_city_name 		:= clean_addr[65..89];
- self.v_city_name 		:= clean_addr[90..114];
- self.state 			    := clean_addr[115..116];
- self.zip5 				    := clean_addr[117..121];
- self.zip4 				    := clean_addr[122..125];
- self.cart 				    := clean_addr[126..129];
- self.cr_sort_sz 		  := clean_addr[130];
- self.lot 				    := clean_addr[131..134];
- self.lot_order 		  := clean_addr[135];
- self.dpbc 				    := clean_addr[136..137];
- self.chk_digit 		  := clean_addr[138];
- self.rec_type 			  := clean_addr[139..140];
- self.ace_fips_st 		:= clean_addr[141..142];
- self.ace_fips_county	:= clean_addr[143..145];
- self.geo_lat 			  := clean_addr[146..155];
- self.geo_long 			  := clean_addr[156..166];
- self.msa 				    := clean_addr[167..170];
- self.geo_blk 			  := clean_addr[171..177];
- self.geo_match 		 	:= clean_addr[178];
- self.err_stat 			  := clean_addr[179..182];
- self 						    := l;
- self 						    := [];
 end;
 
-cleanAddress := project(rollupAddrOut, clean_name_add(left)):INDEPENDENT;
-*/
-//AID Address cleaner
-	unsigned4 lAIDAppendFlags		:= AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords| AID.Common.eReturnValues.NoNewCacheFiles;
-  #constant(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);			
-	AID.MacAppendFromRaw_2Line(rollupAddrOut, street_address_1, street_address_2,append_Rawaid , addressCleaned, lAIDAppendFlags);
-layout_temp_offender addressAppended(addressCleaned pInput) := transform
-
-	self.j_RecordID 			    := pInput.recordid;
-	self.j_StateCode 			    := pInput.statecode;
-	self.name_type_hd         := pInput.nametype; // added this b/c NID cleaner over writes this field.
-	 self.name                := MAP(pInput.name ='' => pInput.firstname+' '+pInput.middlename+' '+pInput.lastname+' '+pInput.suffix ,
-                                   regexfind('(.*) #VALUE! (.*)',pInput.name) => regexreplace('(.*) #VALUE! (.*)',pInput.name,'$1 $2'),
-												           regexfind('(.*) [0-9]+ (.*)',pInput.name) => regexreplace('(.*) [0-9]+ (.*)',pInput.name,'$1 $2'),
-                                  pInput.name);
-	//self.Append_RawAID				:= pInput.AIDWork_RawAID;
-	self.prim_range 					:= pInput.AIDWork_ACECache.prim_range;
-	self.predir 							:= pInput.AIDWork_ACECache.predir;
-	self.prim_name 						:= pInput.AIDWork_ACECache.prim_name;
-	self.addr_suffix 					:= pInput.AIDWork_ACECache.addr_suffix;
-	self.postdir 							:= pInput.AIDWork_ACECache.postdir;
-	self.unit_desig 					:= pInput.AIDWork_ACECache.unit_desig;
-	self.sec_range 						:= pInput.AIDWork_ACECache.sec_range;
-	self.p_city_name 					:= pInput.AIDWork_ACECache.p_city_name;
-	self.v_city_name 					:= pInput.AIDWork_ACECache.v_city_name;
-	self.state 								:= pInput.AIDWork_ACECache.st;
-	self.zip5 								:= pInput.AIDWork_ACECache.zip5;
-	self.zip4 								:= pInput.AIDWork_ACECache.zip4;
-	self.cart 								:= pInput.AIDWork_ACECache.cart;
-	self.cr_sort_sz 					:= pInput.AIDWork_ACECache.cr_sort_sz;
-	self.lot 									:= pInput.AIDWork_ACECache.lot;
-	self.lot_order 						:= pInput.AIDWork_ACECache.lot_order;
-	self.dpbc 								:= pInput.AIDWork_ACECache.dbpc;
-	self.chk_digit 						:= pInput.AIDWork_ACECache.chk_digit;
-	self.rec_type 						:= pInput.AIDWork_ACECache.rec_type;
-  self.ace_fips_st          := pInput.AIDWork_ACECache.county[1..2];
-	self.ace_fips_county 			:= pInput.AIDWork_ACECache.county[3..];
-	self.geo_lat 							:= pInput.AIDWork_ACECache.geo_lat;
-	self.geo_long 						:= pInput.AIDWork_ACECache.geo_long;
-	self.msa 									:= pInput.AIDWork_ACECache.msa;
-	self.geo_blk 							:= pInput.AIDWork_ACECache.geo_blk;
-	self.geo_match 						:= pInput.AIDWork_ACECache.geo_match;
-	self.err_stat 						:= pInput.AIDWork_ACECache.err_stat;
-	self											:= pInput;
-	self 									    := [];
-	end;
-				
-cleanAddress 		:= project(addressCleaned,addressAppended(left)): INDEPENDENT ;
-//End Address clean
-
+cleanAddress_prep := project(rollupAddrOut, clean_name_add(left)):INDEPENDENT;
+cleanAddress := hygenics_crim._fns_AddressCleaner(cleanAddress_prep):persist ('~thor_data200::persist::crim::AOCaddresscache');
 //NID Name cleaner/////////////////////////////////
 	nid.mac_cleanfullnames(cleanAddress, cleanfullnames, name);
 // nid.mac_cleanfullnames(cleanAddress, cleanfullnames, name,useV2:=true);
@@ -486,7 +340,7 @@ result_comm := join(sort_slim_off, sort_with_ssn,
 
 result_common1	:= distribute(result_comm, hash(recordid, state_origin));
 
-//output(result_common1(recordid ='GAAOCBOI146779'));
+// output(result_common1(vendor = 'VB' and case_number in ['711GC0801962000','711GC0301647000']));
 
 //Following code requird if we are using persistent offender_key - based on DOC numbers etc					
 hygenics_crim.Layout_Common_Crim_Offender_orig transferkey (result_common1 L, result_common1 R) := transform
@@ -505,18 +359,31 @@ result_aliases := join(result_common1(pty_typ ='2'),result_common1(pty_typ ='0')
 					             local);
 
 result_common2 := project(result_common1(pty_typ ='0'),hygenics_crim.Layout_Common_Crim_Offender_orig)+result_aliases;	
-					
+// output(result_common2(vendor = 'VB' and case_number in ['711GC0801962000','711GC0301647000']));					
 //REMOVE RECORDS WITH NO VENDOR CODE ASSIGNED//////////////////////
 
 //Rollup Other Fields
 sorted_r2common	:= sort(distribute(result_common2(trim(vendor, left, right)<>''), hash(offender_key)), offender_key, state_origin, pty_nm, dob,  
-						-case_court,local);
+						            street_address_1,street_address_2,-case_court,local);
 
 //output(sorted_r2common(vendor ='GD' and pty_nm ='RALPH BERNARD FAVORS'));
 ///////////////////////////////////////////////////////////////////
 						
 sorted_r2common rollupCrim2(sorted_r2common L, sorted_r2common R) := TRANSFORM
 	self.case_court					:= if(l.case_court = '', r.case_court, l.case_court);
+	self.street_address_1	:= if(l.street_address_1  = '', r.street_address_1 , l.street_address_1 );
+	self.street_address_2	:= if(l.street_address_2  = '', r.street_address_2 , l.street_address_2 );
+	self.prim_range 		  := if(l.prim_range 		  = '', r.prim_range 		 , l.prim_range 	  );	
+	self.predir 				  := if(l.predir 				  = '', r.predir 				 , l.predir 			  );
+  self.prim_name 		    := if(l.prim_name 			= '', r.prim_name 		 , l.prim_name 		  );
+	self.addr_suffix 		  := if(l.addr_suffix 		= '', r.addr_suffix 	 , l.addr_suffix 	  );	
+	self.postdir 				  := if(l.postdir 				= '', r.postdir 			 , l.postdir 			  );
+  self.unit_desig 		  := if(l.unit_desig 			= '', r.unit_desig 		 , l.unit_desig 	  );
+	self.sec_range 			  := if(l.sec_range 			= '', r.sec_range 		 , l.sec_range 		  );
+	self.p_city_name 		  := if(l.p_city_name 		= '', r.p_city_name 	 , l.p_city_name 	  );	
+	self.v_city_name 			:= if(l.v_city_name 		= '', r.v_city_name 	 , l.v_city_name 	  );
+  self.state 		        := if(l.state 			    = '', r.state 		     , l.state 	        );
+	self.zip5 			      := if(l.zip5 			      = '', r.zip5 		       , l.zip5 		      );
 	SELF 							:= L; 
 END;
 
@@ -524,9 +391,11 @@ rollupOthOut := ROLLUP(sorted_r2common,
                        left.offender_key = right.offender_key and 
 						           trim(left.state_origin) = trim(right.state_origin) and 
 						           trim(left.pty_nm) = trim(Right.pty_nm) and 
-						           trim(left.dob) = trim(Right.dob), 
+						           trim(left.dob) = trim(Right.dob) and
+											 (left.street_address_1 =	right.street_address_1 	or  right.street_address_1  =''	or left.street_address_1 	='') and 	
+											 (left.street_address_2 =	right.street_address_2 	or  right.street_address_2  =''	or left.street_address_2 	='') ,											 
 						           rollupCrim2(LEFT,RIGHT));//:persist ('~thor_data200::persist::crim::aoc::offender');
-								
-result_common := dedup(sort(distribute(rollupOthOut + proc_build_crim_offender2_base_others, hash(offender_key)), record, local), record, local, except pty_typ, left) : persist ('~thor_data200::persist::crim::aoc::offender');
+// output(rollupOthOut(vendor = 'VB' and case_number in ['711GC0801962000','711GC0301647000']));								
+result_common := dedup(sort(distribute(rollupOthOut + proc_build_crim_offender2_base_others, hash(offender_key)), record, local), record, local, except pty_typ, left) : persist ('~thor_data200::persist::crim::aoc::offender1');
 
-export proc_build_crim_offender2_base := result_common;  //sequential(o1);
+export proc_build_crim_offender2_base := result_common;		
