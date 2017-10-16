@@ -24,7 +24,7 @@ END;
 
 //Only need to check valid records for DOD criteria to see if further filtering is needed
 jDeathInd	:= JOIN(SORT(DISTRIBUTE(pValidEmail(SkipRec = FALSE and DID <> 0),HASH(DID)),DID,LOCAL),
-									SORT(DISTRIBUTE(fDeathMaster((unsigned6)DID <> 0),HASH(DID)),DID, LOCAL),
+									SORT(DISTRIBUTE(fDeathMaster((unsigned6)DID <> 0),HASH((unsigned6)DID)),DID, LOCAL),
 									LEFT.DID = (unsigned6)RIGHT.DID,
 									DeathInd(LEFT,RIGHT),LEFT OUTER, LOOKUP, LOCAL);
 									
