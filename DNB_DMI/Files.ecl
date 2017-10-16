@@ -1,4 +1,4 @@
-import tools,dnb;
+﻿import tools,dnb,scrubs_dnb_dmi;
 
 export Files(
 
@@ -14,8 +14,9 @@ module
 	export Input := 
 	module
 
-		tools.mac_FilesInput(lfns.Input.raw					,layouts.Input.raw						,Raw						,'CSV','"','\n','',0,pMaxLength := 100000, pOpt := true);
-		tools.mac_FilesInput(lfns.Input.raw					,layouts.Input.sprayed				,Sprayed				);
+		tools.mac_FilesInput(lfns.Input.raw	   ,layouts.Input.raw						      ,Raw						,'CSV','"','\n','',0,pMaxLength := 100000, pOpt := true);
+		tools.mac_FilesInput(lfns.Input.raw	   ,layouts.Input.sprayed				      ,Sprayed				);
+		tools.mac_FilesInput(lfns.Input.raw	   ,Scrubs_DNB_DMI.Raw_Layout_DNB_DMI ,Flattened			);  //Added for Scrubs
 		tools.mac_FilesInput(lfns.Input.oldcompanies,layouts.Input.oldcompanies		,oldcompanies		);	//old DNB V1 input files
 		tools.mac_FilesInput(lfns.Input.oldcontacts	,layouts.Input.oldcontacts		,oldcontacts		);	//old DNB V1 input files
 

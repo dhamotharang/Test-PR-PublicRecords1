@@ -1,0 +1,389 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_DNB_DMI
+FILENAME:DNB_DMI
+NAMESCOPE:Raw
+//--------------------------
+//FIELDTYPE DEFINITIONS
+//--------------------------
+FIELDTYPE:invalid__duns:CUSTOM(Scrubs_DNB_DMI.Functions.invalid_duns > 0)
+FIELDTYPE:invalid__mandatory:LENGTHS(1..)
+FIELDTYPE:invalid__street:ALLOW(0123456789 AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz'-&(),./#)
+FIELDTYPE:invalid__city:ALLOW( AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz-0123456789)
+FIELDTYPE:invalid__state:ENUM(Scrubs_DNB_DMI.Functions.set_valid_states)
+FIELDTYPE:invalid__zip:CUSTOM(Scrubs_DNB_DMI.Functions.invalid_zip > 0)
+FIELDTYPE:invalid__phone:ALLOW(0123456789):LENGTHS(10)
+FIELDTYPE:invalid__county:ALLOW( AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz'-&.)
+FIELDTYPE:invalid__msa:ALLOW(0123456789):LENGTHS(4)
+FIELDTYPE:invalid__sic:CUSTOM(Scrubs_DNB_DMI.Functions.invalid_sic > 0)
+FIELDTYPE:invalid__industry:ENUM(Scrubs_DNB_DMI.Functions.set_valid_industry)
+FIELDTYPE:invalid__year:ALLOW(0123456789):LENGTHS(0,4)
+FIELDTYPE:invalid__chars:ALLOW( 0123456789/)
+FIELDTYPE:invalid__optional_date:CUSTOM(Scrubs_DNB_DMI.Functions.invalid_optional_date > 0)
+FIELDTYPE:invalid__code:ENUM(0|1|2|3| )
+FIELDTYPE:invalid__square_ft:ALLOW( 0123456789)
+FIELDTYPE:invalid__code5:ENUM(0|1|2|3|4|5| )
+FIELDTYPE:invalid__owns_rent:ENUM(0|1|2| )
+FIELDTYPE:invalid__all_digits:CUSTOM(Scrubs_DNB_DMI.Functions.invalid_all_digits > 0)
+FIELDTYPE:invalid__hierarchy:CUSTOM(Scrubs_DNB_DMI.Functions.invalid_hierarchy > 0)
+FIELDTYPE:invalid__yes_no:ENUM(Y|N| )
+FIELDTYPE:invalid__4orBlank:ENUM(4| )
+FIELDTYPE:invalid__5orBlank:ENUM(5| )
+FIELDTYPE:invalid__6orBlank:ENUM(6| )
+FIELDTYPE:invalid__7orBlank:ENUM(7| )
+FIELDTYPE:invalid__8orBlank:ENUM(8| )
+FIELDTYPE:invalid__report_date:CUSTOM(Scrubs_DNB_DMI.Functions.invalid_report_date>0)
+FIELDTYPE:invalid__delete_indicator:ENUM(D| )
+
+//-----------------------------
+//FIELDS BEING SCRUBBED
+//-----------------------------
+FIELD:duns_number:TYPE(STRING9):LIKE(invalid__duns):0,0
+FIELD:business_name:TYPE(STRING90):LIKE(invalid__mandatory):0,0  
+FIELD:street:TYPE(STRING25):LIKE(invalid__street):0,0
+FIELD:city:TYPE(STRING20):LIKE(invalid__city):0,0
+FIELD:state:TYPE(STRING2):LIKE(invalid__state):0,0
+FIELD:zip_code:TYPE(STRING9):LIKE(invalid__zip):0,0
+FIELD:mail_address:TYPE(STRING17):LIKE(invalid__street):0,0
+FIELD:mail_city:TYPE(STRING14):LIKE(invalid__city):0,0
+FIELD:mail_state:TYPE(STRING2):LIKE(invalid__state):0,0
+FIELD:mail_zip_code:TYPE(STRING5):LIKE(invalid__zip):0,0
+FIELD:telephone_number:TYPE(STRING10):LIKE(invalid__phone):0,0
+FIELD:county_name:TYPE(STRING21):LIKE(invalid__county):0,0
+FIELD:msa_code:TYPE(STRING4):LIKE(invalid__msa):0,0
+FIELD:sic1:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic1a:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic1b:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic1c:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic1d:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic2:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic2a:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic2b:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic2c:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic2d:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic3:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic3a:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic3b:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic3c:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic3d:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic4:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic4a:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic4b:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic4c:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic4d:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic5:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic5a:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic5b:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic5c:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic5d:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic6:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic6a:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic6b:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic6c:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:sic6d:TYPE(STRING8):LIKE(invalid__sic):0,0
+FIELD:industry_group:TYPE(STRING1):LIKE(invalid__industry):0,0
+FIELD:year_started:TYPE(STRING4):LIKE(invalid__year):0,0
+FIELD:date_of_incorporation:TYPE(STRING10):LIKE(invalid__chars):0,0
+FIELD:state_of_incorporation_abbr:TYPE(STRING2):LIKE(invalid__state):0,0
+FIELD:annual_sales_code:TYPE(STRING1):LIKE(invalid__code):0,0
+FIELD:employees_here_code:TYPE(STRING1):LIKE(invalid__code):0,0
+FIELD:annual_sales_revision_date:TYPE(STRING10):LIKE(invalid__optional_date):0,0
+FIELD:square_footage:TYPE(STRING9):LIKE(invalid__square_ft):0,0
+FIELD:sals_territory:TYPE(STRING1):LIKE(invalid__code5):0,0
+FIELD:owns_rents:TYPE(STRING1):LIKE(invalid__owns_rent):0,0
+FIELD:number_of_accounts:TYPE(STRING9):LIKE(invalid__all_digits):0,0
+FIELD:small_business_indicator:TYPE(STRING1):LIKE(invalid__yes_no):0,0
+FIELD:minority_owned:TYPE(STRING1):LIKE(invalid__yes_no):0,0
+FIELD:cottage_indicator:TYPE(STRING1):LIKE(invalid__yes_no):0,0
+FIELD:foreign_owned:TYPE(STRING1):LIKE(invalid__yes_no):0,0
+FIELD:manufacturing_here_indicator:TYPE(STRING1):LIKE(invalid__yes_no):0,0
+FIELD:public_indicator:TYPE(STRING1):LIKE(invalid__yes_no):0,0
+FIELD:importer_exporter_indicator:TYPE(STRING1):LIKE(invalid__code):0,0
+FIELD:structure_type:TYPE(STRING1):LIKE(invalid__code):0,0
+FIELD:type_of_establishment:TYPE(STRING1):LIKE(invalid__code5):0,0
+FIELD:parent_duns_number:TYPE(STRING9):LIKE(invalid__duns):0,0
+FIELD:ultimate_duns_number:TYPE(STRING9):LIKE(invalid__duns):0,0
+FIELD:headquarters_duns_number:TYPE(STRING9):LIKE(invalid__duns):0,0
+FIELD:dias_code:TYPE(STRING9):LIKE(invalid__all_digits):0,0
+FIELD:hierarchy_code:TYPE(STRING3):LIKE(invalid__hierarchy):0,0
+FIELD:ultimate_indicator:TYPE(STRING1):LIKE(invalid__yes_no):0,0
+FIELD:hot_list_new_indicator:TYPE(STRING1):LIKE(invalid__code):0,0
+FIELD:hot_list_ownership_change_indicator:TYPE(STRING1):LIKE(invalid__4orBlank):0,0
+FIELD:hot_list_ceo_change_indicator:TYPE(STRING1):LIKE(invalid__5orBlank):0,0
+FIELD:hot_list_company_name_change_ind:TYPE(STRING1):LIKE(invalid__6orBlank):0,0
+FIELD:hot_list_address_change_indicator:TYPE(STRING1):LIKE(invalid__7orBlank):0,0
+FIELD:hot_list_telephone_change_indicator:TYPE(STRING1):LIKE(invalid__8orBlank):0,0
+FIELD:hot_list_new_change_date:TYPE(STRING4):LIKE(invalid__year):0,0
+FIELD:hot_list_ownership_change_date:TYPE(STRING4):LIKE(invalid__year):0,0
+FIELD:hot_list_ceo_change_date:TYPE(STRING4):LIKE(invalid__year):0,0
+FIELD:hot_list_company_name_chg_date:TYPE(STRING4):LIKE(invalid__year):0,0
+FIELD:hot_list_address_change_date:TYPE(STRING4):LIKE(invalid__year):0,0
+FIELD:hot_list_telephone_change_date:TYPE(STRING4):LIKE(invalid__year):0,0
+FIELD:report_date:TYPE(STRING6):LIKE(invalid__report_date):0,0
+FIELD:delete_record_indicator:TYPE(STRING1):LIKE(invalid__delete_indicator):0,0
+
+//--------------------------------
+//FIELDS NOT BEING SCRUBBED
+//--------------------------------
+// FIELD:trade_style:TYPE(STRING30):0,0  
+// FIELD:msa_name:TYPE(STRING40):0,0  												  
+// FIELD:line_of_business_description:TYPE(STRING128):0,0   
+// FIELD:sic1desc:TYPE(STRING60):0,0  												 
+// FIELD:sic1adesc:TYPE(STRING60):0,0  											
+// FIELD:sic1bdesc:TYPE(STRING60):0,0  											
+// FIELD:sic1cdesc:TYPE(STRING60):0,0  											
+// FIELD:sic1ddesc:TYPE(STRING60):0,0  											
+// FIELD:sic2desc:TYPE(STRING60):0,0  												
+// FIELD:sic2adesc:TYPE(STRING60):0,0  											
+// FIELD:sic2bdesc:TYPE(STRING60):0,0  
+// FIELD:sic2cdesc:TYPE(STRING60):0,0  
+// FIELD:sic2ddesc:TYPE(STRING60):0,0  
+// FIELD:sic3desc:TYPE(STRING60):0,0  
+// FIELD:sic3adesc:TYPE(STRING60):0,0  
+// FIELD:sic3bdesc:TYPE(STRING60):0,0  
+// FIELD:sic3cdesc:TYPE(STRING60):0,0  
+// FIELD:sic3ddesc:TYPE(STRING60):0,0  
+// FIELD:sic4desc:TYPE(STRING60):0,0  
+// FIELD:sic4adesc:TYPE(STRING60):0,0  
+// FIELD:sic4bdesc:TYPE(STRING60):0,0  
+// FIELD:sic4cdesc:TYPE(STRING60):0,0  
+// FIELD:sic4ddesc:TYPE(STRING60):0,0  
+// FIELD:sic5desc:TYPE(STRING60):0,0  
+// FIELD:sic5adesc:TYPE(STRING60):0,0  
+// FIELD:sic5bdesc:TYPE(STRING60):0,0  
+// FIELD:sic5cdesc:TYPE(STRING60):0,0  
+// FIELD:sic5ddesc:TYPE(STRING60):0,0  
+// FIELD:sic6desc:TYPE(STRING60):0,0  
+// FIELD:sic6adesc:TYPE(STRING60):0,0  
+// FIELD:sic6bdesc:TYPE(STRING60):0,0  
+// FIELD:sic6cdesc:TYPE(STRING60):0,0  
+// FIELD:sic6ddesc:TYPE(STRING60):0,0
+// FIELD:annual_sales_volume:TYPE(STRING15):0,0
+// FIELD:employees_here:TYPE(STRING10):0,0
+// FIELD:employees_total:TYPE(STRING10):0,0
+// FIELD:internal_use:TYPE(STRING1):0,0
+// FIELD:net_worth:TYPE(STRING12):0,0
+// FIELD:trend_sales:TYPE(STRING15):0,0
+// FIELD:trend_employment_total:TYPE(STRING10):0,0
+// FIELD:base_sales:TYPE(STRING15):0,0
+// FIELD:base_employment_total:TYPE(STRING10):0,0
+// FIELD:percentage_sales_growth:TYPE(STRING4):0,0
+// FIELD:percentage_employment_growth:TYPE(STRING4):0,0
+// FIELD:bank_duns_number:TYPE(STRING9):0,0
+// FIELD:bank_name:TYPE(STRING30):0,0
+// FIELD:accounting_firm_name:TYPE(STRING30):0,0
+// FIELD:parent_company_name:TYPE(STRING30):0,0
+// FIELD:ultimate_company_name:TYPE(STRING30):0,0
+// FIELD:exec1_first_name:TYPE(STRING13):0,0
+// FIELD:exec1_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec1_last_name:TYPE(STRING15):0,0
+// FIELD:exec1_suffix:TYPE(STRING3):0,0
+// FIELD:exec1_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec1_title:TYPE(STRING30):0,0
+// FIELD:exec1_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec2_first_name:TYPE(STRING13):0,0
+// FIELD:exec2_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec2_last_name:TYPE(STRING15):0,0
+// FIELD:exec2_suffix:TYPE(STRING3):0,0
+// FIELD:exec2_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec2_title:TYPE(STRING30):0,0
+// FIELD:exec2_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec3_first_name:TYPE(STRING13):0,0
+// FIELD:exec3_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec3_last_name:TYPE(STRING15):0,0
+// FIELD:exec3_suffix:TYPE(STRING3):0,0
+// FIELD:exec3_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec3_title:TYPE(STRING30):0,0
+// FIELD:exec3_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec4_first_name:TYPE(STRING13):0,0
+// FIELD:exec4_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec4_last_name:TYPE(STRING15):0,0
+// FIELD:exec4_suffix:TYPE(STRING3):0,0
+// FIELD:exec4_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec4_title:TYPE(STRING30):0,0
+// FIELD:exec4_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec5_first_name:TYPE(STRING13):0,0
+// FIELD:exec5_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec5_last_name:TYPE(STRING15):0,0
+// FIELD:exec5_suffix:TYPE(STRING3):0,0
+// FIELD:exec5_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec5_title:TYPE(STRING30):0,0
+// FIELD:exec5_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec6_first_name:TYPE(STRING13):0,0
+// FIELD:exec6_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec6_last_name:TYPE(STRING15):0,0
+// FIELD:exec6_suffix:TYPE(STRING3):0,0
+// FIELD:exec6_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec6_title:TYPE(STRING30):0,0
+// FIELD:exec6_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec7_first_name:TYPE(STRING13):0,0
+// FIELD:exec7_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec7_last_name:TYPE(STRING15):0,0
+// FIELD:exec7_suffix:TYPE(STRING3):0,0
+// FIELD:exec7_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec7_title:TYPE(STRING30):0,0
+// FIELD:exec7_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec8_first_name:TYPE(STRING13):0,0
+// FIELD:exec8_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec8_last_name:TYPE(STRING15):0,0
+// FIELD:exec8_suffix:TYPE(STRING3):0,0
+// FIELD:exec8_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec8_title:TYPE(STRING30):0,0
+// FIELD:exec8_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec9_first_name:TYPE(STRING13):0,0
+// FIELD:exec9_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec9_last_name:TYPE(STRING15):0,0
+// FIELD:exec9_suffix:TYPE(STRING3):0,0
+// FIELD:exec9_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec9_title:TYPE(STRING30):0,0
+// FIELD:exec9_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec10_first_name:TYPE(STRING13):0,0
+// FIELD:exec10_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec10_last_name:TYPE(STRING15):0,0
+// FIELD:exec10_suffix:TYPE(STRING3):0,0
+// FIELD:exec10_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec10_title:TYPE(STRING30):0,0
+// FIELD:exec10_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec11_first_name:TYPE(STRING13):0,0
+// FIELD:exec11_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec11_last_name:TYPE(STRING15):0,0
+// FIELD:exec11_suffix:TYPE(STRING3):0,0
+// FIELD:exec11_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec11_title:TYPE(STRING30):0,0
+// FIELD:exec11_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec12_first_name:TYPE(STRING13):0,0
+// FIELD:exec12_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec12_last_name:TYPE(STRING15):0,0
+// FIELD:exec12_suffix:TYPE(STRING3):0,0
+// FIELD:exec12_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec12_title:TYPE(STRING30):0,0
+// FIELD:exec12_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec13_first_name:TYPE(STRING13):0,0
+// FIELD:exec13_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec13_last_name:TYPE(STRING15):0,0
+// FIELD:exec13_suffix:TYPE(STRING3):0,0
+// FIELD:exec13_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec13_title:TYPE(STRING30):0,0
+// FIELD:exec13_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec14_first_name:TYPE(STRING13):0,0
+// FIELD:exec14_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec14_last_name:TYPE(STRING15):0,0
+// FIELD:exec14_suffix:TYPE(STRING3):0,0
+// FIELD:exec14_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec14_title:TYPE(STRING30):0,0
+// FIELD:exec14_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec15_first_name:TYPE(STRING13):0,0
+// FIELD:exec15_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec15_last_name:TYPE(STRING15):0,0
+// FIELD:exec15_suffix:TYPE(STRING3):0,0
+// FIELD:exec15_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec15_title:TYPE(STRING30):0,0
+// FIELD:exec15_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec16_first_name:TYPE(STRING13):0,0
+// FIELD:exec16_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec16_last_name:TYPE(STRING15):0,0
+// FIELD:exec16_suffix:TYPE(STRING3):0,0
+// FIELD:exec16_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec16_title:TYPE(STRING30):0,0
+// FIELD:exec16_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec17_first_name:TYPE(STRING13):0,0
+// FIELD:exec17_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec17_last_name:TYPE(STRING15):0,0
+// FIELD:exec17_suffix:TYPE(STRING3):0,0
+// FIELD:exec17_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec17_title:TYPE(STRING30):0,0
+// FIELD:exec17_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec18_first_name:TYPE(STRING13):0,0
+// FIELD:exec18_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec18_last_name:TYPE(STRING15):0,0
+// FIELD:exec18_suffix:TYPE(STRING3):0,0
+// FIELD:exec18_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec18_title:TYPE(STRING30):0,0
+// FIELD:exec18_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec19_first_name:TYPE(STRING13):0,0
+// FIELD:exec19_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec19_last_name:TYPE(STRING15):0,0
+// FIELD:exec19_suffix:TYPE(STRING3):0,0
+// FIELD:exec19_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec19_title:TYPE(STRING30):0,0
+// FIELD:exec19_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec20_first_name:TYPE(STRING13):0,0
+// FIELD:exec20_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec20_last_name:TYPE(STRING15):0,0
+// FIELD:exec20_suffix:TYPE(STRING3):0,0
+// FIELD:exec20_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec20_title:TYPE(STRING30):0,0
+// FIELD:exec20_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec21_first_name:TYPE(STRING13):0,0
+// FIELD:exec21_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec21_last_name:TYPE(STRING15):0,0
+// FIELD:exec21_suffix:TYPE(STRING3):0,0
+// FIELD:exec21_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec21_title:TYPE(STRING30):0,0
+// FIELD:exec21_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec22_first_name:TYPE(STRING13):0,0
+// FIELD:exec22_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec22_last_name:TYPE(STRING15):0,0
+// FIELD:exec22_suffix:TYPE(STRING3):0,0
+// FIELD:exec22_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec22_title:TYPE(STRING30):0,0
+// FIELD:exec22_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec23_first_name:TYPE(STRING13):0,0
+// FIELD:exec23_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec23_last_name:TYPE(STRING15):0,0
+// FIELD:exec23_suffix:TYPE(STRING3):0,0
+// FIELD:exec23_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec23_title:TYPE(STRING30):0,0
+// FIELD:exec23_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec24_first_name:TYPE(STRING13):0,0
+// FIELD:exec24_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec24_last_name:TYPE(STRING15):0,0
+// FIELD:exec24_suffix:TYPE(STRING3):0,0
+// FIELD:exec24_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec24_title:TYPE(STRING30):0,0
+// FIELD:exec24_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec25_first_name:TYPE(STRING13):0,0
+// FIELD:exec25_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec25_last_name:TYPE(STRING15):0,0
+// FIELD:exec25_suffix:TYPE(STRING3):0,0
+// FIELD:exec25_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec25_title:TYPE(STRING30):0,0
+// FIELD:exec25_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec26_first_name:TYPE(STRING13):0,0
+// FIELD:exec26_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec26_last_name:TYPE(STRING15):0,0
+// FIELD:exec26_suffix:TYPE(STRING3):0,0
+// FIELD:exec26_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec26_title:TYPE(STRING30):0,0
+// FIELD:exec26_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec27_first_name:TYPE(STRING13):0,0
+// FIELD:exec27_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec27_last_name:TYPE(STRING15):0,0
+// FIELD:exec27_suffix:TYPE(STRING3):0,0
+// FIELD:exec27_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec27_title:TYPE(STRING30):0,0
+// FIELD:exec27_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec28_first_name:TYPE(STRING13):0,0
+// FIELD:exec28_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec28_last_name:TYPE(STRING15):0,0
+// FIELD:exec28_suffix:TYPE(STRING3):0,0
+// FIELD:exec28_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec28_title:TYPE(STRING30):0,0
+// FIELD:exec28_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec29_first_name:TYPE(STRING13):0,0
+// FIELD:exec29_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec29_last_name:TYPE(STRING15):0,0
+// FIELD:exec29_suffix:TYPE(STRING3):0,0
+// FIELD:exec29_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec29_title:TYPE(STRING30):0,0
+// FIELD:exec29_vanity_title:TYPE(STRING30):0,0
+// FIELD:exec30_first_name:TYPE(STRING13):0,0
+// FIELD:exec30_middle_initial:TYPE(STRING1):0,0
+// FIELD:exec30_last_name:TYPE(STRING15):0,0
+// FIELD:exec30_suffix:TYPE(STRING3):0,0
+// FIELD:exec30_mrc_title_code:TYPE(STRING2):0,0
+// FIELD:exec30_title:TYPE(STRING30):0,0
+// FIELD:exec30_vanity_title:TYPE(STRING30):0,0
+// FIELD:internal_use1:TYPE(STRING30):0,0
+// FIELD:internal_use2:TYPE(STRING10):0,0
+// FIELD:internal_use3:TYPE(STRING1):0,0
+// FIELD:lf:TYPE(STRING1):0,0
