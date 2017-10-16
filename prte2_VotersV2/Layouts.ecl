@@ -1,4 +1,4 @@
-Import Prte2_VotersV2,VotersV2;
+﻿Import Prte2_VotersV2,VotersV2;
 
 EXPORT Layouts := module
 
@@ -218,6 +218,13 @@ string1 addr_type;
 string30 cust_name;
 string30 bug_num;
 End;
+
+EXPORT Base_ext	:= RECORD	
+	Base_Layout;
+	STRING8		link_dob;
+	STRING9		link_ssn;
+END;
+
 
 export Layout_vtid := record
   unsigned6 vtid;
