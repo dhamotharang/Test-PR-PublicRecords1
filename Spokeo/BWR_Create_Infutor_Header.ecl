@@ -1,4 +1,4 @@
-#option('multiplePersistInstances',FALSE);
+﻿#option('multiplePersistInstances',FALSE);
  inf := Infutor.infutor_header_filtered(true);	// : PERSIST('~thor::spokeo::persist::infutor_header');
  inf2 := DISTRIBUTE(inf(did<>0), did);
  hdr := SORT(inf2, did, prim_range, prim_name, zip, -sec_range, LOCAL);
@@ -14,9 +14,11 @@
 									self.sec_range := IF(right.sec_range='', left.sec_range, right.sec_range);
 									self := right;),
 									LOCAL);	//	 : PERSIST('~thor::spokeo::persist::infutor_header_rolledup');
+ getbest := Infutor.infutor_best(true);
 
 SEQUENTIAL(									
 	OUTPUT(inf,,'~thor::spokeo::infutor_header', compressed, overwrite),
-	OUTPUT(infh,,'~thor::spokeo::infutor_header_rolledup', compressed, overwrite)
+	OUTPUT(infh,,'~thor::spokeo::infutor_header_rolledup', compressed, overwrite),
+	getbest
 );
 

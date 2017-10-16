@@ -1,4 +1,4 @@
-EXPORT Layout_Out := RECORD
+﻿EXPORT Layout_Out := RECORD
 		Layout_In;
 		unsigned6			LexId;
 		string3				Lexid_Score;
@@ -23,4 +23,11 @@ EXPORT Layout_Out := RECORD
 		string20			Best_Last_Name;
 		string5				Best_Name_Suffix;
 		string6				Best_Birth_YearMonth;
+		// flags
+		string1				judgments := '';
+		string1				civilCourtRecords := '';
+		string1				crimCourtRecords := '';
+		string1				curr_incar_flag := '';
+		string1				foreclosures := '';
+		string1				bankruptcy := '';
 END;
