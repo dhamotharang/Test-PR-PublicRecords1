@@ -1,4 +1,4 @@
-EXPORT Map_GA(dataset({string ftype,string fdate})infile) := module
+﻿EXPORT Map_GA(dataset({string ftype,string fdate})infile) := module
 
 import Prof_License,ut;
 
@@ -95,8 +95,16 @@ medical_ex_out map2medical( dmedtrim l) := transform
   self.filedate                 := infile(ftype = 'medical')[1].fdate;                                                                                                                                                                                                                                                                                                                                                                      
   self.License                  := if ( trim(l.License)= '0' , '' , regexreplace('\'',trim(l.License),''));                                                                                                                                                                                                                                                                                                                
   self.Name                     := regexreplace('\'',trim(l.Full_Name),'');                                                                                                                                                                                                                                                                                                                                                  
-  self.Date_of_First_License    :=    l.Date_of_First_License;                                                                                                                                                                                                                                                                                                          
-  self.Expiration_Date          :=    l.Expiration;   
+  self.Date_of_First_License    := map(length(trim(l.Date_of_First_License)) = 7 and  trim(l.Date_of_First_License)[1] not in [ '1', '0']  => ( '0' + trim(l.Date_of_First_License)[1]+ '/' + trim (l.Date_of_First_License)[2..3]+'/'+ trim(l.Date_of_First_License)[4..7])   , 
+	                              length(trim(l.Date_of_First_License)) = 7 and  trim(l.Date_of_First_License)[1]  in [ '1', '0']  => (  trim(l.Date_of_First_License)[1..2]+ '/' + '0' + trim (l.Date_of_First_License)[3]+'/'+ trim(l.Date_of_First_License)[4..7])   , 
+                                      length(trim(l.Date_of_First_License)) = 8 and  trim(l.Date_of_First_License)[5..6] in [ '19' ,'20' ]  =>  trim(l.Date_of_First_License)[1..2] + '/' + trim(l.Date_of_First_License)[3..4]+ '/' + trim(l.Date_of_First_License)[5..8] ,                                                                                            
+                                       '0' + trim(l.Date_of_First_License)[1]+ '/' + '0' + trim (l.Date_of_First_License)[2]+'/'+trim(l.Date_of_First_License)[3..6]
+																);                                                                                                                                                                                                                                                                                                                                                
+  self.Expiration_Date          :=  map(length(trim(l.Expiration)) = 7 and  trim(l.Expiration)[1] not in [ '1', '0']  => ( '0' + trim(l.Expiration)[1]+ '/' + trim (l.Expiration)[2..3]+'/'+ trim(l.Expiration)[4..7])   ,    
+	                                length(trim(l.Expiration)) = 7 and  trim(l.Expiration)[1]  in [ '1', '0']  => (  trim(l.Expiration)[1..2]+ '/' + '0' + trim (l.Expiration)[3]+'/'+ trim(l.Expiration)[4..7])   ,
+                                      length(trim(l.Expiration)) = 8 and  trim(l.Expiration)[5..6] in [ '19' ,'20' ]  =>  trim(l.Expiration)[1..2] + '/' + trim(l.Expiration)[3..4]+ '/' + trim(l.Expiration)[5..8] ,                                                                                            
+                                       '0' + trim(l.Expiration)[1]+ '/' + '0' + trim (l.Expiration)[2]+'/'+trim(l.Expiration)[3..6]
+																);           
   self.Status_code              :=  trim(l.Status);                                                                                                                                                                                                                                                                                                                                                                  
   self.Title                    :=  trim(l.Designation);                                                                                                                                                                                                                                                                                                                                                                   
   self.License_Specialty        := regexreplace('\'',trim(l.Speciality),'');                                                                                                                                                                                                                                                                                                                                    
@@ -159,8 +167,8 @@ self.orig_city           := l.City;
 self.orig_st             := trim(l.State);                                                                                                                                                                                                                                                                                                                                                             
 self.orig_zip            := StringLib.Stringfilter(l.Zipcode,'0123456789')[1..9];                                                                                                                                                                                                                                                                                                                      
 self.business_flag      := 'N';                                                                                                                                                                                                                                                                                                                                                                       
-self.issue_date          := fSlashedMDYtoCYMD(l.Date_of_First_License);                                                                                                                                                                                                                                                                                                   
-self.expiration_date     := fSlashedMDYtoCYMD(l.Expiration_Date);                                                                                                                                                                                                                                                                                                         
+self.issue_date          := fSlashedMDYtoCYMD(regexreplace(' 0:00:00',l.Date_of_First_License,  ''));                                                                                                                                                                                                                                                                                                   
+self.expiration_date     := fSlashedMDYtoCYMD(regexreplace(' 0:00:00',l.Expiration_Date,  ''));                                                                                                                                                                                                                                                                                                         
 self.action_effective_dt := map ( trim(l.Date_of_Public_Board_Order) = ' ' or regexfind('[a-zA-Z]',trim(l.Date_of_Public_Board_Order)) => ''   ,                                                                                                                                                                                                                                                                                                                   
 		                              length(trim(l.Date_of_Public_Board_Order))=7 => (l.Date_of_Public_Board_Order[4..7] + '0' + l.Date_of_Public_Board_Order[1..3]) ,                                                                                                                                                                                                                                   
 		                              length(trim(l.Date_of_Public_Board_Order))=8 => (l.Date_of_Public_Board_Order[5..8] + l.Date_of_Public_Board_Order[1..4]) ,                                                                                                                                                                                                                                          
@@ -294,15 +302,15 @@ outfile := proc_clean_all(input,'GA').cleanout;
 
 export dGAout := Sequential(prep, 
                                    FileServices.RemoveSuperFile('~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ga'),
-																	 if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ga_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ga_old')),
-								                   if ( FileServices.FileExists( '~thor_data400::in::prolic_ga_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_ga_old')),
-											             FileServices.RenameLogicalfile( '~thor_data400::in::prolic_ga','~thor_data400::in::prolic_ga_old'),
-											        
-											             output( outfile,,'~thor_data400::in::prolic_ga',overwrite),
-                                   FileServices.StartSuperfiletransaction(),
-												              FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ga'),
-																      FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ga_old'),
-											             FileServices.FinishSuperfiletransaction()
+																	   if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ga_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ga_old')),
+								       if ( FileServices.FileExists( '~thor_data400::in::prolic_ga_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_ga_old')),
+                       FileServices.RenameLogicalfile( '~thor_data400::in::prolic_ga','~thor_data400::in::prolic_ga_old'),
+											      output( outfile,,'~thor_data400::in::prolic_ga',compressed,overwrite),
+                            FileServices.StartSuperfiletransaction(),
+												    FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ga'),
+													 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ga_old'),
+
+											      FileServices.FinishSuperfiletransaction()
 											   );
 
 end;

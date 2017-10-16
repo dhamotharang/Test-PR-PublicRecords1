@@ -57,17 +57,17 @@ outfile := proc_clean_all(fout_ne,'NE').cleanout;
 
 export buildprep := Sequential(dout, 
                         FileServices.RemoveSuperFile('~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ne'),
-                        if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ne_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ne_old')),
-								        if ( FileServices.FileExists( '~thor_data400::in::prolic_ne_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_ne_old')),
-                        FileServices.RenameLogicalfile( '~thor_data400::in::prolic_ne','~thor_data400::in::prolic_ne_old'),            
+                if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ne_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ne_old')),
+								       if ( FileServices.FileExists( '~thor_data400::in::prolic_ne_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_ne_old')),
+                   					   FileServices.RenameLogicalfile( '~thor_data400::in::prolic_ne','~thor_data400::in::prolic_ne_old'),
 												   
-										FileServices.FinishSuperfiletransaction(),
                         
 											output( outfile,,'~thor_data400::in::prolic_ne',compressed,overwrite),
                          FileServices.StartSuperfiletransaction(),
 						
 												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ne'),
-												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old::cmp','~thor_data400::in::prolic_ne_old'),
+	 										    FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ne_old'),
+
 	
 											   FileServices.FinishSuperfiletransaction()
 											 );

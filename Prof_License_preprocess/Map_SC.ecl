@@ -1,4 +1,4 @@
-import lib_stringlib,Prof_License, ut;
+﻿import lib_stringlib,Prof_License, ut;
 
 EXPORT Map_SC (dataset({string ftype,string fdate})infile) := module
 
@@ -347,7 +347,7 @@ export buildprep := Sequential(prep,
 								        if ( FileServices.FileExists( '~thor_data400::in::prolic_sc_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_sc_old')),
                         FileServices.RenameLogicalfile( '~thor_data400::in::prolic_sc','~thor_data400::in::prolic_sc_old'),   
                          
-											output( outfile,,'~thor_data400::in::prolic_sc',overwrite),
+											output( outfile,,'~thor_data400::in::prolic_sc',compressed,overwrite),
                          FileServices.StartSuperfiletransaction(),
 								
 												 
