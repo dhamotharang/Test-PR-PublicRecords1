@@ -30,6 +30,8 @@ module
     export MbsFDNMasterIDExcl    			:= tools.mod_FilenamesBuild(lTemplate('MbsFDNMasterIDExclusion'),pversion);
 		export MbsFDNMasterIDIndTypIncl   := tools.mod_FilenamesBuild(lTemplate('MbsFdnMasterIDIndTypeInclusion'),pversion);
   	export LinkIds               			:= tools.mod_FilenamesBuild(lTemplate('LINKIDS'),pversion);
+		export DriversLicense        			:= tools.mod_FilenamesBuild(lTemplate('DriversLicense'),pversion);
+		export BankAccount           			:= tools.mod_FilenamesBuild(lTemplate('BankAccount'),pversion);
 				
 		export dAll_filenames :=
 		    ID.dAll_filenames +
@@ -49,6 +51,8 @@ module
 				MbsFDNMasterID.dAll_filenames +
 				MbsFDNMasterIDExcl.dAll_filenames +
 				if(Platform.Source = 'FraudGov',MbsFDNMasterIDIndTypIncl.dAll_filenames) +
+				DriversLicense.dAll_filenames +
+				BankAccount.dAll_filenames +
 				LinkIds.dAll_filenames;  
 				
 		end;

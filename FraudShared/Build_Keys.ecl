@@ -21,6 +21,8 @@ export Build_Keys(
 	tools.mac_WriteIndex('TheKeys.Main.NPI.New'								  						,BuildNPIKey						   					);
 	tools.mac_WriteIndex('TheKeys.Main.AppProviderID.New'       						,BuildAppProviderIDKey	   					);
 	tools.mac_WriteIndex('TheKeys.Main.LNPID.New'               						,BuildLNPIDKey	         						);
+	tools.mac_WriteIndex('TheKeys.Main.DriversLicense.New'               		,BuildDriversLicenseKey	         		);
+	tools.mac_WriteIndex('TheKeys.Main.BankAccount.New'               			,BuildBankAccountKey	         			);
 	tools.mac_WriteIndex('TheKeys.Main.MBS.New'								  						,BuildMbsKey							 					);
 	tools.mac_WriteIndex('TheKeys.Main.MbsIndTypeExclusion.New'							,BuildMbsIndTypeExclusionKey				);
   tools.mac_WriteIndex('TheKeys.Main.MbsProductInclude.New'								,BuildMbsProductIncludeKey				 	);
@@ -43,6 +45,8 @@ export Build_Keys(
 			,BuildNPIKey
 			,BuildAppProviderIDKey
 			,BuildLNPIDKey
+			,BuildDriversLicenseKey
+			,BuildBankAccountKey
 			,BuildMbsKey
 			,BuildMbsIndTypeExclusionKey
 			,BuildMbsProductIncludeKey
