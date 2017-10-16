@@ -1,4 +1,4 @@
-import	std;
+﻿import	std;
 //lfn := '~thor::spokeo::processed::201701';
 lfn := '~thor::spokeo::processed::w20170523-151012';
 //lfn := '~thor::spokeo::out::processed::201701a';
@@ -29,10 +29,17 @@ r1 := RECORD
 		boolean				deceased;
 		string10			phone;
 		string8				dob;
+		unsigned8			hhid;
 		string6				Best_Birth_YearMonth;
+		string1				judgments := '';
+		string1				civilCourtRecords := '';
+		string1				crimCourtRecords := '';
+		string1				curr_incar_flag := '';
+		string1				foreclosures := '';
+		string1				bankruptcy := '';
+
 		string10      geo_lat;
 		string11      geo_long;
-		unsigned8			hhid;
 		string64			SpokeoID;
 END;
 

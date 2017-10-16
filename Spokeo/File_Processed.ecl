@@ -1,7 +1,10 @@
-//lfn := '~thor::spokeo::processed';
+﻿//lfn := '~thor::spokeo::processed';
 //lfn := '~thor::spokeo::processed::w20170403-141258';
 //lfn := '~thor::spokeo::processed::w20170511-082738';
-lfn := '~thor::spokeo::processed::w20170523-151012';
-
-
+//lfn := '~thor::spokeo::processed::W20170605-134857';
+//lfn := '~thor::spokeo::processed::w20170920-154507';
+//lfn := '~thor::spokeo::processed::w20170925-114224';
+//lfn := '~thor::spokeo::processed::w20170926-153416';
+//lfn := '~thor::spokeo::processed::w20170927-145344';
+lfn := '~thor::spokeo::processed::W20170927-155753';
 EXPORT File_Processed := dataset(lfn, Spokeo.Layout_Temp, thor);
