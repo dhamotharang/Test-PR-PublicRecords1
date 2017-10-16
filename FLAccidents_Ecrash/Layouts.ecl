@@ -273,28 +273,37 @@ export key_search_layout := record
 	string100	orig_lname;
 end;
 
-export key_slim_layout := record 
+export key_slim_layout := record  
+	string40  accident_nbr;	
+	string40  orig_accnbr;
+	string40  addl_report_number;	
+	string8   accident_date; 
+	string2   report_code;
+	string100 jurisdiction;
+	string2   jurisdiction_state;
+	string11  jurisdiction_nbr;
+	string4   work_type_id;
+  string3   report_type_id;
+	string11  report_id;
+	string9   agency_ori;
+	string100 vendor_code;
+	string20  vendor_report_id;
+	string20  reportLinkID;
+  string30  vin;
+  string25  driver_license_nbr;
+  string2   dlnbr_st;
+  string10  tag_nbr;
+  string2   tagnbr_st;
+  string12  officer_id;
+	string8   date_vendor_last_reported;
+	string100 accident_location;
+	unsigned6 idfield;
+  string12  did;
+  string60  fname;
+  string60  mname;
+  string100 lname;
+end;
 
-string40  accident_nbr;
-string40  orig_accnbr,
-string40  addl_report_number,
-string8   accident_date,
-string2   report_code,
-string100 jurisdiction,
-string2   jurisdiction_state,
-string11  jurisdiction_nbr;
-string4   work_type_id,
-string3   report_type_id,
-string11  report_id,
-string9   agency_ori,
-string100 Vendor_Code,
-string20  vendor_report_id,
-string20  ReportLinkID ,
-string8   date_vendor_last_reported , 
-string100 accident_location;
-unsigned6 Idfield ; 
-
-end; 
 export PhotoLayout := record
 string11 document_id,
 string11 incident_id,

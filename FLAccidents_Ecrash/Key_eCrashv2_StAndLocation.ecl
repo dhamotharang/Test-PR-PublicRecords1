@@ -1,27 +1,6 @@
-/*2015-11-16T21:03:51Z (Srilatha Katukuri)
-#193680 - CR323
-*/
-/*2015-07-23T16:50:02Z (Srilatha Katukuri)
-#173799 - reordering of fields
+﻿import doxie, ut, Data_Services; 
 
-*/
-/*2015-07-07T18:00:25Z (Srilatha Katukuri)
-#173799
-*/
-/*2015-06-26T20:02:23Z (Srilatha Katukuri)
-#173799 
-
-*/
-/*2015-04-15T18:03:19Z (Srilatha Katukuri)
-#173799- Included Jurisdiction Field
-*/
-/*2015-04-07T22:09:10Z (Srilatha Katukuri)
-Adding Jurisdiction Field #173799
-*/
-import doxie, ut, Data_Services ; 
-
-ds := project (FLAccidents_Ecrash.File_KeybuildV2.out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']), FLAccidents_Ecrash.Layouts.key_slim_layout );  
-
+ds := FLAccidents_Ecrash.File_KeybuildV2.eCrashSearchRecs(Accident_Location <> '');  
 
 SlimAccident := record 
 ds;
@@ -98,36 +77,36 @@ string31 Alocation69;
 string30 Alocation70;
 string29 Alocation71;
 string28 Alocation72;
-string57 Alocation73;
-string56 Alocation74;
-string55 Alocation75;
-string54 Alocation76;
-string53 Alocation77;
-string52 Alocation78;
-string51 Alocation79;
-string51 Alocation80;
-string51 Alocation81;
-string51 Alocation82;
-string51 Alocation83;
-string51 Alocation84;
-string51 Alocation85;
-string51 Alocation86;
-string51 Alocation87;
-string51 Alocation88;
-string51 Alocation89;
-string51 Alocation90;
-string51 Alocation91;
-string51 Alocation92;
-string51 Alocation93;
-string51 Alocation94;
-string51 Alocation95;
-string54 Alocation96;
-string53 Alocation97;
+string27 Alocation73;
+string26 Alocation74;
+string25 Alocation75;
+string24 Alocation76;
+string23 Alocation77;
+string22 Alocation78;
+string21 Alocation79;
+string20 Alocation80;
+string19 Alocation81;
+string18 Alocation82;
+string17 Alocation83;
+string16 Alocation84;
+string15 Alocation85;
+string14 Alocation86;
+string13 Alocation87;
+string12 Alocation88;
+string11 Alocation89;
+string10 Alocation90;
+string9  Alocation91;
+string8  Alocation92;
+string7  Alocation93;
+string6  Alocation94;
+string5  Alocation95;
+string4  Alocation96;
+string3  Alocation97;
 end; 
 
 Parse_Accident_Location := project(ds, transform(SlimAccident, 
 
-  Part_AccidentLocation := if(trim(left.Accident_Location,left,right) ='' , '', trim(left.Accident_Location,left,right));
+  Part_AccidentLocation := if(trim(left.Accident_Location,left,right) = '' , '', trim(left.Accident_Location,left,right));
   AlMaxLength	:=	100;
   SELF.Alocation1 := Part_AccidentLocation[1..AlMaxLength];
   SELF.Alocation2 := if(length(trim(Part_AccidentLocation[2..AlMaxLength],left,right)) < 4 , '',trim(Part_AccidentLocation[2..AlMaxLength], left, right)) ;
@@ -235,8 +214,8 @@ Parse_Accident_Location := project(ds, transform(SlimAccident,
   self := left)); 
 	
 Slim_Accident_Rec	:=	RECORD
-	String100	Partial_Accident_Location := '';
-	ds;
+	string100	Partial_Accident_Location := '';
+	FLAccidents_Ecrash.Layouts.key_slim_layout;
 END;
 
 Slim_Accident_Rec SlimLocation(SlimAccident l, integer cnt) := transform
@@ -345,16 +324,22 @@ Slim_Accident_Rec SlimLocation(SlimAccident l, integer cnt) := transform
 		
 	end;
 					   
-norm_report := normalize(Parse_Accident_Location, 97, SlimLocation(left, counter))(partial_accident_location <>''); 
+norm_report := normalize(Parse_Accident_Location, 97, SlimLocation(left, counter))(partial_accident_location <> ''); 
 
 
-Final_Accident_Location	:=	dedup(sort(distribute(project(norm_report , transform(Slim_Accident_Rec , 
-          self.Partial_Accident_Location := if(trim(left.Partial_Accident_Location,left,right) ='' , '', trim(left.Partial_Accident_Location,left,right));
-					self := left;))(Partial_Accident_Location <>''),hash64(accident_nbr)),accident_nbr, local), all,local);
+Final_Accident_Location	:=	dedup(sort(distributed(project(norm_report, transform(Slim_Accident_Rec, 
+                                                           self.Partial_Accident_Location := if(trim(left.Partial_Accident_Location,left,right) = '', 
+																													                                      '', 
+																																																trim(left.Partial_Accident_Location,left,right));
+					                                                 self := left;))(Partial_Accident_Location <> ''), 
+																			             hash64(accident_nbr)), 
+					                             accident_nbr,Partial_Accident_Location,report_code,jurisdiction_state,jurisdiction,accident_date,report_type_id, local), 
+					                        accident_nbr,Partial_Accident_Location,report_code,jurisdiction_state,jurisdiction,accident_date,report_type_id, local);
 					
 	 
 
-EXPORT Key_eCrashv2_StAndLocation  := index(Final_Accident_Location ,{ Partial_Accident_location,jurisdiction_state, jurisdiction}
-                                               ,{Final_Accident_Location}
-                                               ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_StAndLocation_' + doxie.Version_SuperKey);
-																							//	,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::PRUS::ecrashV2_StAndLocation_' + doxie.Version_SuperKey);
+EXPORT Key_eCrashv2_StAndLocation  := index(Final_Accident_Location
+                                            ,{Partial_Accident_location, jurisdiction_state, jurisdiction}
+                                            ,{Final_Accident_Location}
+                                            ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_StAndLocation_' + doxie.Version_SuperKey);
+																						// ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::PRUS::ecrashV2_StAndLocation_' + doxie.Version_SuperKey);
