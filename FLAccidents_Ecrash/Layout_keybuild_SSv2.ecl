@@ -225,4 +225,10 @@
 
 		//Buycrash project KY integration		
 		STRING3 contrib_source;
+		
+		//Buycrash Release 4		
+	  STRING12 officer_id;
+		
+		//Appriss Integration
+		STRING1 Releasable;
 END;
