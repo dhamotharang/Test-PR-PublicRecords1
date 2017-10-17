@@ -24,14 +24,15 @@ module
 		export AppProviderID         			:= tools.mod_FilenamesBuild(lTemplate('AppProviderID'),pversion);
 		export LNPID                 			:= tools.mod_FilenamesBuild(lTemplate('LNPID'),pversion);
     export Mbs                   			:= tools.mod_FilenamesBuild(lTemplate('Mbs'),pversion);
-    export MbsGcIdExclusion     			:= tools.mod_FilenamesBuild(lTemplate('MbsGcIdExclusion'),pversion);
-		export MbsIndTypeExclusion   			:= tools.mod_FilenamesBuild(lTemplate('MbsIndTypeExclusion'),pversion);
+    export MbsIndTypeExclusion   			:= tools.mod_FilenamesBuild(lTemplate('MbsIndTypeExclusion'),pversion);
     export MbsProductInclude     			:= tools.mod_FilenamesBuild(lTemplate('MbsProductInclude'),pversion);
     export MbsFDNMasterID        			:= tools.mod_FilenamesBuild(lTemplate('Gcid_2_MbsFDNMasterID'),pversion);
     export MbsFDNMasterIDExcl    			:= tools.mod_FilenamesBuild(lTemplate('MbsFDNMasterIDExclusion'),pversion);
 		export MbsFDNMasterIDIndTypIncl   := tools.mod_FilenamesBuild(lTemplate('MbsFdnMasterIDIndTypeInclusion'),pversion);
   	export LinkIds               			:= tools.mod_FilenamesBuild(lTemplate('LINKIDS'),pversion);
-		
+		export DriversLicense        			:= tools.mod_FilenamesBuild(lTemplate('DriversLicense'),pversion);
+		export BankAccount           			:= tools.mod_FilenamesBuild(lTemplate('BankAccount'),pversion);
+				
 		export dAll_filenames :=
 		    ID.dAll_filenames +
 			 	DID.dAll_filenames +
@@ -45,12 +46,13 @@ module
 				AppProviderID.dAll_filenames + 
 				LNPID.dAll_filenames + 
 				Mbs.dAll_filenames + 
-				MbsGcIdExclusion.dAll_filenames + 
 				MbsIndTypeExclusion.dAll_filenames +
 				MbsProductInclude.dAll_filenames +
 				MbsFDNMasterID.dAll_filenames +
 				MbsFDNMasterIDExcl.dAll_filenames +
 				if(Platform.Source = 'FraudGov',MbsFDNMasterIDIndTypIncl.dAll_filenames) +
+				DriversLicense.dAll_filenames +
+				BankAccount.dAll_filenames +
 				LinkIds.dAll_filenames;  
 				
 		end;
