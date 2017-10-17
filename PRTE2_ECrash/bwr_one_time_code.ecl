@@ -74,13 +74,13 @@ MakeSuperKeys ('~prte::key::ecrashv2::@version@::supplemental');
 MakeSuperKeys ('~prte::key::ecrashv2::@version@::tagnbr');
 MakeSuperKeys ('~prte::key::ecrashv2::@version@::vin7');
 MakeSuperKeys ('~prte::key::ecrashv2::@version@::vin');
+// New Keys
 MakeSuperKeys ('~prte::key::ecrashv2::@version@::agency');
+MakeSuperKeys ('~prte::key::ecrashv2::@version@::dlnnbrdlstate');
+MakeSuperKeys ('~prte::key::ecrashv2::@version@::licenseplatenbr');
+MakeSuperKeys ('~prte::key::ecrashv2::@version@::officerbadgenbr');
+MakeSuperKeys ('~prte::key::ecrashv2::@version@::vinnbr');
 
-
-// MakeSuperFiles ('~PRTE::BASE::ecrashv2@version@');
-// MakeSuperFiles ('~PRTE::BASE::ecrashv2@version@');
-// MakeSuperFiles ('~PRTE::BASE::ecrashv2@version@');
-// MakeSuperFiles ('~PRTE::BASE::ecrashv2@version@');
 
 promotesupers.mac_create_superfiles('~prte::base::ecrashv2');
 promotesupers.mac_create_superfiles('~prte::base::ecrash0');

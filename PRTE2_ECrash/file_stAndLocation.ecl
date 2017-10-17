@@ -1,6 +1,8 @@
-import PRTE2_Ecrash, FLAccidents_Ecrash;
+﻿import PRTE2_Ecrash, FLAccidents_Ecrash;
 
-ds := project (File_KeybuildV2.out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']), FLAccidents_Ecrash.Layouts.key_slim_layout );  
+
+ds := File_KeybuildV2.eCrashSearchRecs(Accident_Location <> '');  
+// ds := project (File_KeybuildV2.out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']), FLAccidents_Ecrash.Layouts.key_slim_layout );  
 
 
 SlimAccident := record 
