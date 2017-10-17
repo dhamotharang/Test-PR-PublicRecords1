@@ -1,5 +1,4 @@
 ﻿EXPORT matchCodes := module
-
     EXPORT onlineMatchLayout := record      
       INTEGER2 Match_parent_proxid;
       INTEGER2 Match_sele_proxid;
@@ -123,6 +122,5 @@
       IF (rec.sele_flag_match_code not in no_match, 'SELE_FLAG,', '') + 
       IF (rec.org_flag_match_code not in no_match, 'ORG_FLAG,', '') + 
       IF (rec.ult_flag_match_code not in no_match, 'ULT_FLAG,', '')   ;
-
 end;
 

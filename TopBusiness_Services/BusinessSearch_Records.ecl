@@ -40,7 +40,7 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 		possible_LAFN := exists(ds_linkIDsRestricted(keysfailed != 0));
 		// set this here and used farther down to indicate of a search result set
 		// could have more results but does not.															 															                 																						
-		possible_Truncation := exists(ds_linkIDsRestricted(isTruncated));
+		possible_Truncation := exists(ds_linkIDsRestricted(is_Truncated));
 																 
     ResultSetSlim :=  ds_linkIDsRestricted(proxid <> 0); 
 		
@@ -1493,3 +1493,5 @@ EXPORT Search( dataset(BIPV2.IDFunctions.rec_SearchInput) InputSearch,
 	END;							
 
 END;
+
+

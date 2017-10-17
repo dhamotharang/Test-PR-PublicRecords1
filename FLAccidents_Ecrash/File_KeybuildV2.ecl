@@ -1,7 +1,4 @@
-/*2015-05-15T21:02:48Z (Srilatha Katukuri)
-Bug# 180852 - PIR 4710 Coplogic Data ingestion
-*/
-/////////////////////////////////////////////////////////////////
+﻿/////////////////////////////////////////////////////////////////
 //Expand Florida file 
 /////////////////////////////////////////////////////////////////
 import FLAccidents,ut;
@@ -61,6 +58,7 @@ FLAccidents_Ecrash.Layout_keybuild_SSv2 xpndrecs(flc_ss L, FLAccidents.basefile_
 		self.Policy_Expiration_Date	:= '';
 		self.Report_Has_Coversheet		:= '0';
 		self.date_vendor_last_reported := L.accident_date; // need to create date field...
+		//self.IdField 								:=	R.IdField;
 		self 								:= L;
 		self 								:= R;
 		self                := []; 
@@ -78,6 +76,7 @@ FLAccidents_Ecrash.Layout_keybuild_SSv2 xpndrecs1(pflc_ss L,FLAccidents.BaseFile
 
 	self.carrier_name := if(l.carrier_name <> '', l.carrier_name,  R.ins_company_name);
 	self.Policy_num   := if(l.Policy_num <>'',l.Policy_num, R.ins_policy_nbr); 
+	//self.IdField 			:=	R.IdField;
 	self 							:= L;
 end;
 
@@ -171,6 +170,12 @@ pflc_ss slimrec(ntlFile L) := transform
 		self.tif_image_hash 					:= l.tif_image_hash; 
 		self.acct_nbr 								:= l.acct_nbr ; 
 		self.addl_report_number 			:= l.REPORT_NBR ; 
+/* 		unsigned6 prefix              := MAP(l.report_code[1] = 'I' and l.vehicle_incident_id[1..3] = 'OID'    => 1000000000000,  // inquiry 
+   																				l.report_code[1] = 'I' and l.vehicle_incident_id[1..3] <> 'OID' => 2000000000000, // inquiry 
+   																	      l.report_code = 'FA' => 6000000000000, // For FL accidents there is no incident id so use accident number 
+                                           7000000000000 );  // national accidents 
+       SELF.idfield                  := prefix + (unsigned6) if(trim(L.vehicle_incident_id,all) <> '', L.vehicle_incident_id, '0');
+*/
 		self						:= L;
 		self						:= [];
 end;
@@ -272,7 +277,14 @@ FLAccidents_Ecrash.Layout_keybuild_SSv2 slimrec2(inqFile L ,unsigned1 cnt) := tr
 		self.acct_nbr 								:= l.acct_nbr ; 
 		self.CRU_inq_name_type 				:=  choose(cnt ,'1','2','3');
 		self.reason_id                := l.reason_id; 
-		self						:= L;
+/* 		unsigned6 prefix              := MAP(l.report_code[1] = 'I' and l.vehicle_incident_id[1..3] = 'OID'    => 1000000000000,  // inquiry 
+   																				l.report_code[1] = 'I' and l.vehicle_incident_id[1..3] <> 'OID' => 2000000000000, // inquiry 
+   																	      l.report_code = 'FA' => 6000000000000, // For FL accidents there is no incident id so use accident number 
+                                           7000000000000 );  // national accidents 
+       self.idfield                  := prefix + (unsigned6) if(trim(L.vehicle_incident_id,all) <> '', L.vehicle_incident_id, '0');
+*/ 
+  		self						:= L;
+
 		self						:= [];
 
 end;
@@ -366,16 +378,30 @@ pflc_ss slimrec3(eFile L, unsigned1 cnt) := transform
 		self.vehicle_unit_number 						:= L.unit_number;
 		self.next_street 										:= l.next_street;
 		self.addl_report_number							:= if(l.source_id in ['TF','TM'],L.case_identifier,L.state_report_number);
-		self.agency_ori											:= l.ori_number;
+		self.agency_ori											:= IF (l.ori_number = 'FL0130600','FL0130000',l.ori_number); //MDPD ORI correction remove this code after the historical update completed successfully
 		self.Insurance_Company_Standardized := l.Insurance_Company_Standardized;
 		self.is_available_for_public				:= if(l.report_code in ['TF','EA'],'1',l.is_available_for_public);
 		self.report_status 									:= l.report_status;
 		self.date_vendor_last_reported 			:= L.date_vendor_last_reported;
 		self.creation_date 									:= l.creation_date; 
 		self.report_type_id 								:= L.report_type_id ;
-		self.ssn 														:= l.ssn; 
+		self.ssn 													  := l.ssn; 
 		self.cru_jurisdiction 							:= l.cru_agency_name; 
-		self.cru_jurisdiction_nbr 					:= l.cru_agency_id;
+		self.cru_jurisdiction_nbr 				  := l.cru_agency_id;
+		//Policy records Addition
+		self.fatality_involved							:= L.fatality_involved;
+		self.latitude												:= L.lattitude;
+		self.longitude											:= L.Longitude;
+		self.address1												:= L.address;
+		self.address2												:= L.address2;
+		self.state													:= L.State;
+		self.home_phone										  := L.home_phone;
+	//End of Police Record/Claims Process
+	  
+		// BuyCrash
+		self.officer_id                     := L.officer_id;
+		//Appriss Integration
+		self.Releasable                     := '1'; 		
 		self								                := L;
 		self                                := [];
    
@@ -400,7 +426,7 @@ getMvrDid := FLAccidents_Ecrash.Fn_Mvr_DID(uprecsNodid);
 total := uprecsDID+ getMvrDid; 
 
 ddrecs := dedup(sort(distribute(total,hash(accident_nbr))
-															,accident_date,accident_nbr,jurisdiction_state,vin,tag_nbr,lname,fname,mname,did,record_type,prim_name,dob,report_code,report_type_id,map (work_type_id in ['1','0'] => 2, 1), date_vendor_last_reported,creation_date,carrier_name,driver_license_nbr,local) // give preference to ecrash work type 1's over 2,3
+															,accident_date,accident_nbr,jurisdiction_state,vin,tag_nbr,lname,fname,mname,did,record_type,prim_name,dob,report_code,report_type_id,map (work_type_id in ['1','0'] => 2, 1), date_vendor_last_reported,creation_date,length(trim(carrier_name,left,right))!=0,length(trim(driver_license_nbr,left,right)) !=0,vehicle_incident_id,local) // give preference to ecrash work type 1's over 2,3
 															,accident_date,accident_nbr,jurisdiction_state,vin,tag_nbr,lname,fname,mname,did,record_type,prim_name,dob,report_code,report_type_id,right,local) ;
 															
 
@@ -413,6 +439,10 @@ FLAccidents_Ecrash.Layout_keybuild_SSv2 slimrecs(ddrecs L) := transform
      self.orig_accnbr := l.accident_nbr; 
 		 self.addl_report_number :=  if(stringlib.stringfilterout(trim(l.addl_report_number ,left,right),'0') <>'',l.addl_report_number,'') ;
 		 self.scrub_addl_report_number := stringlib.StringFilter(self.addl_report_number,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+		 self.policy_effective_date := map ( trim(l.policy_effective_date)[1] = '0' =>  '',
+		                                     trim(l.policy_effective_date)[8] = '-' =>  trim(l.policy_effective_date)[1..7],
+																					                                            trim(l.policy_effective_date)
+																				);
 		 
 self 								:= L;
 end;
@@ -420,10 +450,18 @@ end;
 shared outrecs0  := project(ddrecs,slimrecs(left)): persist('~thor_data400::persist::ecrash_ssV2');
 //ALpha files only need records with below reason ID's for IA
 
-  AlphaIA     := outrecs0 (report_code[1] = 'I'); 
-  AlphaOther  := outrecs0 (report_code[1] <>'I');
-	
-export Alpha  := AlphaOther +  AlphaIA (reason_id in ['HOLD','AFYI','ASSI','AUTO','CALL','PRAC','SEAR','SECR','WAIT','PRAI']); 
-export out    := outrecs0(CRU_inq_name_type not in ['2','3']);
+shared InteractiveReports :=  ['I0','I1','I2','I3','I4','I5','I6','I7','I8','I9'];
+AlphaIA     := outrecs0 (report_code[1] = 'I' and report_code not in InteractiveReports); 
+AlphaOther  := outrecs0 (report_code[1] <>'I');
+shared AlphaCmbnd := AlphaOther +  AlphaIA (reason_id in ['HOLD','AFYI','ASSI','AUTO','CALL','PRAC','SEAR','SECR','WAIT','PRAI']);
+
+shared AlphaOtherVendors := AlphaCmbnd(trim(vendor_code, left,right) <> 'COPLOGIC');
+//export Coplogic :=  AlphaCmbnd(trim(vendor_code, left,right) = 'COPLOGIC');
+AlphaCoplogic := AlphaCmbnd(trim(vendor_code, left,right) = 'COPLOGIC' and ((trim(supplemental_report,left,right) ='1' and trim(super_report_id, left, right) <> trim(report_id, left, right))or (trim(supplemental_report,left,right) ='0' and trim(super_report_id, left, right) = trim(report_id, left, right)) or (trim(supplemental_report,left,right) ='' and trim(super_report_id, left, right) = trim(report_id, left, right) )) );
+export Alpha  :=  AlphaOtherVendors + AlphaCoplogic;
+export out    := outrecs0(CRU_inq_name_type not in ['2','3'] and report_code not in InteractiveReports and trim(vendor_code, left,right) <> 'COPLOGIC');
+
+shared searchRecs := out(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']);
+export eCrashSearchRecs := distribute(project(searchRecs, Layouts.key_search_layout), hash64(accident_nbr)):independent;
 
 end; 

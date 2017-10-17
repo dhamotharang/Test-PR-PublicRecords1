@@ -1,4 +1,4 @@
-//This is the code to execute in a builder window
+﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
 #workunit('name','BizLinkFull.BWR_UseExternal - Using External Linking - SALT V3.3.1');
 IMPORT BizLinkFull,SALT33;
@@ -29,3 +29,4 @@ IMPORT BizLinkFull,SALT33;
 //        ,/* MY_CONTACTNAME*/,/* MY_STREETADDRESS*/,MyOutFile,Stats);
   MyOutFile;
   Stats;
+

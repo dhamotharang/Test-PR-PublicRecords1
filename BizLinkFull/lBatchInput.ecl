@@ -21,4 +21,3 @@
   UNSIGNED6  entered_proxid;
 END;
 
-

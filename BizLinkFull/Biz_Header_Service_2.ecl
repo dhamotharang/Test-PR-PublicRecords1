@@ -135,7 +135,7 @@ sFNamePreferred:=THISMODULE.fn_PreferredName(Input_fname);
 sSortFlag:=IF(bHSort,'T','_');
 Template := dataset([],THISMODULE.Process_Biz_Layouts.InputLayout);
 //�
-Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,Input_LeadThreshold,TRUE,FALSE
+Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,Input_LeadThreshold
   ,(TYPEOF(Template.parent_proxid))Input_parent_proxid
   ,(TYPEOF(Template.sele_proxid))Input_sele_proxid
   ,(TYPEOF(Template.org_proxid))Input_org_proxid
@@ -265,6 +265,7 @@ dSlimmed:=PROJECT(dLinkIDs,TRANSFORM(lSlimmed,
   SELF:=[];
 ));
 
+
 dResults:=THISMODULE.MEOW_Biz(Input_Data).Data_;
 dProxids:=SORT(TABLE(dResults,{proxid;weight;KeysUsed;KeysFailed;UNSIGNED proxid_count:=COUNT(GROUP);},proxid,KeysFailed),-weight,proxid,KeysFailed);
 dNamesAddresses:=TABLE(dResults,{company_name;prim_range;prim_name;city;st;zip;},company_name,prim_range,prim_name,city,st,zip);
@@ -280,7 +281,7 @@ dInputData:=PROJECT(Input_Data,TRANSFORM({RECORDOF(LEFT) AND NOT [zip_cases];STR
   SELF:=LEFT;
 ));
 dKeysUsed:=TABLE(dProxids,{KeysUsed;STRING keys:=THISMODULE.Process_Biz_Layouts.KeysUsedToText(KeysUsed);},KeysUsed);
-dKeyLegend:=THISMODULE.GenerationMod.xlinkpaths_;
+dKeyLegend:=THISMODULE.linkpaths;
 IF(bResearch,
   SEQUENTIAL
   (
