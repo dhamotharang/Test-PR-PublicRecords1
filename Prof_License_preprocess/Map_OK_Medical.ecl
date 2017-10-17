@@ -200,7 +200,7 @@ export buildprep := Sequential( dOKMedicalSF,
 							
 												 
 												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ok'),
-	FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old::cmp','~thor_data400::in::prolic_ok_old'),
+	FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ok_old'),
 											   FileServices.FinishSuperfiletransaction()
 											 );
 

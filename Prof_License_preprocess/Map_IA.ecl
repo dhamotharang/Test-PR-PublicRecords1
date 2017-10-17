@@ -193,16 +193,18 @@ doutfinal1 := dataset('~thor_data400::in::prolic::ia::medical',Prof_License.Layo
  outfile := proc_clean_all(doutfinal1,'IA').cleanout;
  
  export buildprep :=  Sequential( dout,
-                 
                                    FileServices.RemoveSuperFile('~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ia'),
-																	 if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ia_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ia_old')),
-								                   if ( FileServices.FileExists( '~thor_data400::in::prolic_ia_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_ia_old')),
-                                   FileServices.RenameLogicalfile( '~thor_data400::in::prolic_ia','~thor_data400::in::prolic_ia_old'),                         
-											             output( outfile,,'~thor_data400::in::prolic_ia',compressed,overwrite),
-                                   FileServices.StartSuperfiletransaction(),												 
-												               FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ia'),
-												               FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old::cmp','~thor_data400::in::prolic_ia_old'),
-												           FileServices.FinishSuperfiletransaction()
+																	   if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ia_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ia_old')),
+								       if ( FileServices.FileExists( '~thor_data400::in::prolic_ia_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_ia_old')),
+                       FileServices.RenameLogicalfile( '~thor_data400::in::prolic_ia','~thor_data400::in::prolic_ia_old'),
+                         
+											output( outfile,,'~thor_data400::in::prolic_ia',compressed,overwrite),
+                         FileServices.StartSuperfiletransaction(),
+												 
+												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ia'),
+												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ia_old'),
+
+												 FileServices.FinishSuperfiletransaction()
 
 											 );
 											 

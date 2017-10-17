@@ -18,7 +18,7 @@ Prof_License.Layout_proLic_in map2all( File_NJ_All_Available.raw l) := transform
   self.orig_former_name            := '';
   //self.license_obtained_by         := l.orig_obtained_by;
   self.business_flag              := l.P_IS_ORGANIZATION;
-  self.issue_date                  := if ( l.L_ISSUE_DATE <> '', if  ( l.L_ISSUE_DATE[8..9]  > fdate[3..4] , '19' ,'20') + 
+  self.issue_date                  := if ( l.L_ISSUE_DATE <> '', if  ( l.L_ISSUE_DATE[8..9]  > '50' , '19' ,'20') + 
                                             l.L_ISSUE_DATE[8..9] + 
                                          case( l.L_ISSUE_DATE[4..6],
                                               'JAN' => '01' ,
@@ -93,13 +93,18 @@ outfile := proc_clean_all(dNJAll,'NJ').cleanout;
 
 export buildprep := Sequential(dout, 
                         FileServices.RemoveSuperFile('~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_nj'),
-                        if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_nj_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_nj_old')),
-								        if ( FileServices.FileExists( '~thor_data400::in::prolic_nj_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_nj_old')),
-                     	  FileServices.RenameLogicalfile( '~thor_data400::in::prolic_nj','~thor_data400::in::prolic_nj_old'),                         
-											  output( outfile,,'~thor_data400::in::prolic_nj',compressed,overwrite),
-                         FileServices.StartSuperfiletransaction(),											 
+                 if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_nj_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_nj_old')),
+								       if ( FileServices.FileExists( '~thor_data400::in::prolic_nj_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_nj_old')),
+                     			   FileServices.RenameLogicalfile( '~thor_data400::in::prolic_nj','~thor_data400::in::prolic_nj_old'),
+                         
+											output( outfile,,'~thor_data400::in::prolic_nj',compressed,overwrite),
+                         FileServices.StartSuperfiletransaction(),
+								
+												 
 												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_nj'),
-												  FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old::cmp','~thor_data400::in::prolic_nj_old'),	
+	 										    FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_nj_old'),
+
+	
 											   FileServices.FinishSuperfiletransaction()
 											 );
 
