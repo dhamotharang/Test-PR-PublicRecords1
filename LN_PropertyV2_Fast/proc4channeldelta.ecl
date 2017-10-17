@@ -1,4 +1,4 @@
-// this is an exact copy of LN_PropertyV2_Fast.proc4channel for the delta that runs after the full
+﻿// this is an exact copy of LN_PropertyV2_Fast.proc4channel for the delta that runs after the full
 // This is to avoid running sandoxed code from the full build.
 import	LN_PropertyV2_Fast,RoxieKeyBuild,LN_PropertyV2,ut,Std;
 
@@ -214,7 +214,7 @@ Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::deed.fid',					'Q',mv7_qa,
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.did',   			'Q',mv10_qa,2);
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.fid', 				'Q',mv12_qa,2);
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.bdid', 			'Q',mv11_qa,2);
-Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.linkids', 		'Q',mv26_qa,2);
+Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.linkids', 		'Q',mv26_qa,3);
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName+'@version@::search.fid_linkids','Q',mv27_qa,2);
 //Move FCRA Keys to QA
 Roxiekeybuild.MAC_SK_Move_v2(SuperKeyName_fcra+'@version@::addr_search.fid',	  'Q',mv14_qa_fcra,2);
