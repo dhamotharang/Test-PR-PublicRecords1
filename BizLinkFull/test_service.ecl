@@ -19,7 +19,7 @@ EXPORT test_service := MACRO
 
   searches := dataset([{Input_company_name,Input_prim_range,Input_prim_name,Input_zip,Input_company_phone,'',Input_zip_radius}],
   {string company_name, string prim_range, string prim_name, string zip5, string10 phone10, string acctno, 
-  unsigned3 zip_radius_miles := 0,  string Contact_fname := '', string Contact_mname := '', string Contact_lname := ''});
+  unsigned3 zip_radius_miles := 0,	string Contact_fname := '', string Contact_mname := '', string Contact_lname := ''});
 
   inputs := project(searches,transform(BIPV2.IDfunctions.rec_SearchInput,self := left,self := []));
 

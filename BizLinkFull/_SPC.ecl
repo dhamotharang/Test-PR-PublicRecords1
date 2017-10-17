@@ -1,4 +1,4 @@
-OPTIONS:-ma
+﻿OPTIONS:-ma
 MODULE:BizLinkFull
 FILENAME:BizHead
 IDNAME:proxid
@@ -80,3 +80,4 @@ LINKPATH:L_EMAIL:contact_email:+:company_sic_code1:cnp_name:cnp_number:cnp_btype
 LINKPATH:L_SIC:company_sic_code1:zip:?:cnp_name:prim_name:
 LINKPATH:L_SOURCE:source_record_id:source:?:cnp_name(HASBASE):prim_name:zip:city:st:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag
 LINKPATH:L_CONTACT_DID:contact_did
+

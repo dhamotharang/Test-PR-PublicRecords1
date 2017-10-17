@@ -1509,1598 +1509,1598 @@ NULL := -999999999;
 
 INTEGER contains_i( string haystack, string needle ) := (INTEGER)(StringLib.StringFind(haystack, needle, 1) > 0);
 
-sysdate      := common.sas_date(if(historydate=999999, (string)std.date.today(), (string6)historydate+'01'));
+sysdate      := __common__( common.sas_date(if(historydate=999999, (string)std.date.today(), (string6)historydate+'01')) ) ;
 
-_ver_src_id_fsrc_fdate := Models.Common.getw(ver_src_id_firstseen_list, 1);
+_ver_src_id_fsrc_fdate := __common__( Models.Common.getw(ver_src_id_firstseen_list, 1) ) ;
 
-_ver_src_id_fsrc_fdate2 := common.sas_date((string)(_ver_src_id_fsrc_fdate));
+_ver_src_id_fsrc_fdate2 := __common__( common.sas_date((string)(_ver_src_id_fsrc_fdate)) ) ;
 
-yr__ver_src_id_fsrc_fdate := if(min(sysdate, _ver_src_id_fsrc_fdate2) = NULL, NULL, (sysdate - _ver_src_id_fsrc_fdate2) / 365.25);
+yr__ver_src_id_fsrc_fdate := __common__( if(min(sysdate, _ver_src_id_fsrc_fdate2) = NULL, NULL, (sysdate - _ver_src_id_fsrc_fdate2) / 365.25) ) ;
 
-mth__ver_src_id_fsrc_fdate := if(min(sysdate, _ver_src_id_fsrc_fdate2) = NULL, NULL, (sysdate - _ver_src_id_fsrc_fdate2) / 30.5);
+mth__ver_src_id_fsrc_fdate := __common__( if(min(sysdate, _ver_src_id_fsrc_fdate2) = NULL, NULL, (sysdate - _ver_src_id_fsrc_fdate2) / 30.5) ) ;
 
-_ver_src_id_br_pos := Models.Common.findw_cpp(ver_src_id_list, 'BR' , '  ,', 'ie');
+_ver_src_id_br_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'BR' , '  ,', 'ie') ) ;
 
-_ver_src_id__br := _ver_src_id_br_pos > 0;
+_ver_src_id__br := __common__( _ver_src_id_br_pos > 0 ) ;
 
-_ver_src_id_fdate_br := if(_ver_src_id_br_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_br_pos), '0');
+_ver_src_id_fdate_br := __common__( if(_ver_src_id_br_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_br_pos), '0') ) ;
 
-_ver_src_id_fdate_br2 := common.sas_date((string)(_ver_src_id_fdate_br));
+_ver_src_id_fdate_br2 := __common__( common.sas_date((string)(_ver_src_id_fdate_br)) ) ;
 
-yr__ver_src_id_fdate_br := if(min(sysdate, _ver_src_id_fdate_br2) = NULL, NULL, (sysdate - _ver_src_id_fdate_br2) / 365.25);
+yr__ver_src_id_fdate_br := __common__( if(min(sysdate, _ver_src_id_fdate_br2) = NULL, NULL, (sysdate - _ver_src_id_fdate_br2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_br := if(min(sysdate, _ver_src_id_fdate_br2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_br2) / 30.5));
+mth__ver_src_id_fdate_br := __common__( if(min(sysdate, _ver_src_id_fdate_br2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_br2) / 30.5)) ) ;
 
-_ver_src_id_ldate_br := if(_ver_src_id_br_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_br_pos), '0');
+_ver_src_id_ldate_br := __common__( if(_ver_src_id_br_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_br_pos), '0') ) ;
 
-_ver_src_id_ldate_br2 := common.sas_date((string)(_ver_src_id_ldate_br));
+_ver_src_id_ldate_br2 := __common__( common.sas_date((string)(_ver_src_id_ldate_br)) ) ;
 
-yr__ver_src_id_ldate_br := if(min(sysdate, _ver_src_id_ldate_br2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_br2) / 365.25));
+yr__ver_src_id_ldate_br := __common__( if(min(sysdate, _ver_src_id_ldate_br2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_br2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_br := if(min(sysdate, _ver_src_id_ldate_br2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_br2) / 30.5));
+mth__ver_src_id_ldate_br := __common__( if(min(sysdate, _ver_src_id_ldate_br2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_br2) / 30.5)) ) ;
 
-_ver_src_id_c_pos := Models.Common.findw_cpp(ver_src_id_list, 'C' , '  ,', 'ie');
+_ver_src_id_c_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'C' , '  ,', 'ie') ) ;
 
-_ver_src_id__c := _ver_src_id_c_pos > 0;
+_ver_src_id__c := __common__( _ver_src_id_c_pos > 0 ) ;
 
-_ver_src_id_fdate_c := if(_ver_src_id_c_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_c_pos), '0');
+_ver_src_id_fdate_c := __common__( if(_ver_src_id_c_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_c_pos), '0') ) ;
 
-_ver_src_id_fdate_c2 := common.sas_date((string)(_ver_src_id_fdate_c));
+_ver_src_id_fdate_c2 := __common__( common.sas_date((string)(_ver_src_id_fdate_c)) ) ;
 
-yr__ver_src_id_fdate_c := if(min(sysdate, _ver_src_id_fdate_c2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_c2) / 365.25));
+yr__ver_src_id_fdate_c := __common__( if(min(sysdate, _ver_src_id_fdate_c2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_c2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_c := if(min(sysdate, _ver_src_id_fdate_c2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_c2) / 30.5));
+mth__ver_src_id_fdate_c := __common__( if(min(sysdate, _ver_src_id_fdate_c2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_c2) / 30.5)) ) ;
 
-_ver_src_id_ldate_c := if(_ver_src_id_c_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_c_pos), '0');
+_ver_src_id_ldate_c := __common__( if(_ver_src_id_c_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_c_pos), '0') ) ;
 
-_ver_src_id_ldate_c2 := common.sas_date((string)(_ver_src_id_ldate_c));
+_ver_src_id_ldate_c2 := __common__( common.sas_date((string)(_ver_src_id_ldate_c)) ) ;
 
-yr__ver_src_id_ldate_c := if(min(sysdate, _ver_src_id_ldate_c2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_c2) / 365.25));
+yr__ver_src_id_ldate_c := __common__( if(min(sysdate, _ver_src_id_ldate_c2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_c2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_c := if(min(sysdate, _ver_src_id_ldate_c2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_c2) / 30.5));
+mth__ver_src_id_ldate_c := __common__( if(min(sysdate, _ver_src_id_ldate_c2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_c2) / 30.5)) ) ;
 
-_ver_src_id_d_pos := Models.Common.findw_cpp(ver_src_id_list, 'D' , '  ,', 'ie');
+_ver_src_id_d_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'D' , '  ,', 'ie') ) ;
 
-_ver_src_id__d := _ver_src_id_d_pos > 0;
+_ver_src_id__d := __common__( _ver_src_id_d_pos > 0 ) ;
 
-_ver_src_id_fdate_d := if(_ver_src_id_d_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_d_pos), '0');
+_ver_src_id_fdate_d := __common__( if(_ver_src_id_d_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_d_pos), '0') ) ;
 
-_ver_src_id_fdate_d2 := common.sas_date((string)(_ver_src_id_fdate_d));
+_ver_src_id_fdate_d2 := __common__( common.sas_date((string)(_ver_src_id_fdate_d)) ) ;
 
-yr__ver_src_id_fdate_d := if(min(sysdate, _ver_src_id_fdate_d2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_d2) / 365.25));
+yr__ver_src_id_fdate_d := __common__( if(min(sysdate, _ver_src_id_fdate_d2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_d2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_d := if(min(sysdate, _ver_src_id_fdate_d2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_d2) / 30.5));
+mth__ver_src_id_fdate_d := __common__( if(min(sysdate, _ver_src_id_fdate_d2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_d2) / 30.5)) ) ;
 
-_ver_src_id_ldate_d := if(_ver_src_id_d_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_d_pos), '0');
+_ver_src_id_ldate_d := __common__( if(_ver_src_id_d_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_d_pos), '0') ) ;
 
-_ver_src_id_ldate_d2 := common.sas_date((string)(_ver_src_id_ldate_d));
+_ver_src_id_ldate_d2 := __common__( common.sas_date((string)(_ver_src_id_ldate_d)) ) ;
 
-yr__ver_src_id_ldate_d := if(min(sysdate, _ver_src_id_ldate_d2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_d2) / 365.25));
+yr__ver_src_id_ldate_d := __common__( if(min(sysdate, _ver_src_id_ldate_d2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_d2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_d := if(min(sysdate, _ver_src_id_ldate_d2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_d2) / 30.5));
+mth__ver_src_id_ldate_d := __common__( if(min(sysdate, _ver_src_id_ldate_d2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_d2) / 30.5)) ) ;
 
-_ver_src_id_df_pos := Models.Common.findw_cpp(ver_src_id_list, 'DF' , '  ,', 'ie');
+_ver_src_id_df_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'DF' , '  ,', 'ie') ) ;
 
-_ver_src_id__df := _ver_src_id_df_pos > 0;
+_ver_src_id__df := __common__( _ver_src_id_df_pos > 0 ) ;
 
-_ver_src_id_fdate_df := if(_ver_src_id_df_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_df_pos), '0');
+_ver_src_id_fdate_df := __common__( if(_ver_src_id_df_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_df_pos), '0') ) ;
 
-_ver_src_id_fdate_df2 := common.sas_date((string)(_ver_src_id_fdate_df));
+_ver_src_id_fdate_df2 := __common__( common.sas_date((string)(_ver_src_id_fdate_df)) ) ;
 
-yr__ver_src_id_fdate_df := if(min(sysdate, _ver_src_id_fdate_df2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_df2) / 365.25));
+yr__ver_src_id_fdate_df := __common__( if(min(sysdate, _ver_src_id_fdate_df2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_df2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_df := if(min(sysdate, _ver_src_id_fdate_df2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_df2) / 30.5));
+mth__ver_src_id_fdate_df := __common__( if(min(sysdate, _ver_src_id_fdate_df2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_df2) / 30.5)) ) ;
 
-_ver_src_id_ldate_df := if(_ver_src_id_df_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_df_pos), '0');
+_ver_src_id_ldate_df := __common__( if(_ver_src_id_df_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_df_pos), '0') ) ;
 
-_ver_src_id_ldate_df2 := common.sas_date((string)(_ver_src_id_ldate_df));
+_ver_src_id_ldate_df2 := __common__( common.sas_date((string)(_ver_src_id_ldate_df)) ) ;
 
-yr__ver_src_id_ldate_df := if(min(sysdate, _ver_src_id_ldate_df2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_df2) / 365.25));
+yr__ver_src_id_ldate_df := __common__( if(min(sysdate, _ver_src_id_ldate_df2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_df2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_df := if(min(sysdate, _ver_src_id_ldate_df2) = NULL, NULL,roundup( (sysdate - _ver_src_id_ldate_df2) / 30.5));
+mth__ver_src_id_ldate_df := __common__( if(min(sysdate, _ver_src_id_ldate_df2) = NULL, NULL,roundup( (sysdate - _ver_src_id_ldate_df2) / 30.5)) ) ;
 
-_ver_src_id_dn_pos := Models.Common.findw_cpp(ver_src_id_list, 'DN' , '  ,', 'ie');
+_ver_src_id_dn_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'DN' , '  ,', 'ie') ) ;
 
-_ver_src_id__dn := _ver_src_id_dn_pos > 0;
+_ver_src_id__dn := __common__( _ver_src_id_dn_pos > 0 ) ;
 
-_ver_src_id_fdate_dn := if(_ver_src_id_dn_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_dn_pos), '0');
+_ver_src_id_fdate_dn := __common__( if(_ver_src_id_dn_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_dn_pos), '0') ) ;
 
-_ver_src_id_fdate_dn2 := common.sas_date((string)(_ver_src_id_fdate_dn));
+_ver_src_id_fdate_dn2 := __common__( common.sas_date((string)(_ver_src_id_fdate_dn)) ) ;
 
-yr__ver_src_id_fdate_dn := if(min(sysdate, _ver_src_id_fdate_dn2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_dn2) / 365.25));
+yr__ver_src_id_fdate_dn := __common__( if(min(sysdate, _ver_src_id_fdate_dn2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_dn2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_dn := if(min(sysdate, _ver_src_id_fdate_dn2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_dn2) / 30.5));
+mth__ver_src_id_fdate_dn := __common__( if(min(sysdate, _ver_src_id_fdate_dn2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_dn2) / 30.5)) ) ;
 
-_ver_src_id_ldate_dn := if(_ver_src_id_dn_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_dn_pos), '0');
+_ver_src_id_ldate_dn := __common__( if(_ver_src_id_dn_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_dn_pos), '0') ) ;
 
-_ver_src_id_ldate_dn2 := common.sas_date((string)(_ver_src_id_ldate_dn));
+_ver_src_id_ldate_dn2 := __common__( common.sas_date((string)(_ver_src_id_ldate_dn)) ) ;
 
-yr__ver_src_id_ldate_dn := if(min(sysdate, _ver_src_id_ldate_dn2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_dn2) / 365.25));
+yr__ver_src_id_ldate_dn := __common__( if(min(sysdate, _ver_src_id_ldate_dn2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_dn2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_dn := if(min(sysdate, _ver_src_id_ldate_dn2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_dn2) / 30.5));
+mth__ver_src_id_ldate_dn := __common__( if(min(sysdate, _ver_src_id_ldate_dn2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_dn2) / 30.5)) ) ;
 
-_ver_src_id_fb_pos := Models.Common.findw_cpp(ver_src_id_list, 'FB' , '  ,', 'ie');
+_ver_src_id_fb_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'FB' , '  ,', 'ie') ) ;
 
-_ver_src_id__fb := _ver_src_id_fb_pos > 0;
+_ver_src_id__fb := __common__( _ver_src_id_fb_pos > 0 ) ;
 
-_ver_src_id_fdate_fb := if(_ver_src_id_fb_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_fb_pos), '0');
+_ver_src_id_fdate_fb := __common__( if(_ver_src_id_fb_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_fb_pos), '0') ) ;
 
-_ver_src_id_fdate_fb2 := common.sas_date((string)(_ver_src_id_fdate_fb));
+_ver_src_id_fdate_fb2 := __common__( common.sas_date((string)(_ver_src_id_fdate_fb)) ) ;
 
-yr__ver_src_id_fdate_fb := if(min(sysdate, _ver_src_id_fdate_fb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fb2) / 365.25));
+yr__ver_src_id_fdate_fb := __common__( if(min(sysdate, _ver_src_id_fdate_fb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fb2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_fb := if(min(sysdate, _ver_src_id_fdate_fb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fb2) / 30.5));
+mth__ver_src_id_fdate_fb := __common__( if(min(sysdate, _ver_src_id_fdate_fb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fb2) / 30.5)) ) ;
 
-_ver_src_id_ldate_fb := if(_ver_src_id_fb_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_fb_pos), '0');
+_ver_src_id_ldate_fb := __common__( if(_ver_src_id_fb_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_fb_pos), '0') ) ;
 
-_ver_src_id_ldate_fb2 := common.sas_date((string)(_ver_src_id_ldate_fb));
+_ver_src_id_ldate_fb2 := __common__( common.sas_date((string)(_ver_src_id_ldate_fb)) ) ;
 
-yr__ver_src_id_ldate_fb := if(min(sysdate, _ver_src_id_ldate_fb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fb2) / 365.25));
+yr__ver_src_id_ldate_fb := __common__( if(min(sysdate, _ver_src_id_ldate_fb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fb2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_fb := if(min(sysdate, _ver_src_id_ldate_fb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fb2) / 30.5));
+mth__ver_src_id_ldate_fb := __common__( if(min(sysdate, _ver_src_id_ldate_fb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fb2) / 30.5)) ) ;
 
-_ver_src_id_l0_pos := Models.Common.findw_cpp(ver_src_id_list, 'L0' , '  ,', 'ie');
+_ver_src_id_l0_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'L0' , '  ,', 'ie') ) ;
 
-_ver_src_id__l0 := _ver_src_id_l0_pos > 0;
+_ver_src_id__l0 := __common__( _ver_src_id_l0_pos > 0 ) ;
 
-_ver_src_id_fdate_l0 := if(_ver_src_id_l0_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_l0_pos), '0');
+_ver_src_id_fdate_l0 := __common__( if(_ver_src_id_l0_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_l0_pos), '0') ) ;
 
-_ver_src_id_fdate_l02 := common.sas_date((string)(_ver_src_id_fdate_l0));
+_ver_src_id_fdate_l02 := __common__( common.sas_date((string)(_ver_src_id_fdate_l0)) ) ;
 
-yr__ver_src_id_fdate_l0 := if(min(sysdate, _ver_src_id_fdate_l02) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_l02) / 365.25));
+yr__ver_src_id_fdate_l0 := __common__( if(min(sysdate, _ver_src_id_fdate_l02) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_l02) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_l0 := if(min(sysdate, _ver_src_id_fdate_l02) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_l02) / 30.5));
+mth__ver_src_id_fdate_l0 := __common__( if(min(sysdate, _ver_src_id_fdate_l02) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_l02) / 30.5)) ) ;
 
-_ver_src_id_ldate_l0 := if(_ver_src_id_l0_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_l0_pos), '0');
+_ver_src_id_ldate_l0 := __common__( if(_ver_src_id_l0_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_l0_pos), '0') ) ;
 
-_ver_src_id_ldate_l02 := common.sas_date((string)(_ver_src_id_ldate_l0));
+_ver_src_id_ldate_l02 := __common__( common.sas_date((string)(_ver_src_id_ldate_l0)) ) ;
 
-yr__ver_src_id_ldate_l0 := if(min(sysdate, _ver_src_id_ldate_l02) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_l02) / 365.25));
+yr__ver_src_id_ldate_l0 := __common__( if(min(sysdate, _ver_src_id_ldate_l02) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_l02) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_l0 := if(min(sysdate, _ver_src_id_ldate_l02) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_l02) / 30.5));
+mth__ver_src_id_ldate_l0 := __common__( if(min(sysdate, _ver_src_id_ldate_l02) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_l02) / 30.5)) ) ;
 
-_ver_src_id_l2_pos := Models.Common.findw_cpp(ver_src_id_list, 'L2' , '  ,', 'ie');
+_ver_src_id_l2_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'L2' , '  ,', 'ie') ) ;
 
-_ver_src_id__l2 := _ver_src_id_l2_pos > 0;
+_ver_src_id__l2 := __common__( _ver_src_id_l2_pos > 0 ) ;
 
-_ver_src_id_fdate_l2 := if(_ver_src_id_l2_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_l2_pos), '0');
+_ver_src_id_fdate_l2 := __common__( if(_ver_src_id_l2_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_l2_pos), '0') ) ;
 
-_ver_src_id_fdate_l22 := common.sas_date((string)(_ver_src_id_fdate_l2));
+_ver_src_id_fdate_l22 := __common__( common.sas_date((string)(_ver_src_id_fdate_l2)) ) ;
 
-yr__ver_src_id_fdate_l2 := if(min(sysdate, _ver_src_id_fdate_l22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_l22) / 365.25));
+yr__ver_src_id_fdate_l2 := __common__( if(min(sysdate, _ver_src_id_fdate_l22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_l22) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_l2 := if(min(sysdate, _ver_src_id_fdate_l22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_l22) / 30.5));
+mth__ver_src_id_fdate_l2 := __common__( if(min(sysdate, _ver_src_id_fdate_l22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_l22) / 30.5)) ) ;
 
-_ver_src_id_ldate_l2 := if(_ver_src_id_l2_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_l2_pos), '0');
+_ver_src_id_ldate_l2 := __common__( if(_ver_src_id_l2_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_l2_pos), '0') ) ;
 
-_ver_src_id_ldate_l22 := common.sas_date((string)(_ver_src_id_ldate_l2));
+_ver_src_id_ldate_l22 := __common__( common.sas_date((string)(_ver_src_id_ldate_l2)) ) ;
 
-yr__ver_src_id_ldate_l2 := if(min(sysdate, _ver_src_id_ldate_l22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_l22) / 365.25));
+yr__ver_src_id_ldate_l2 := __common__( if(min(sysdate, _ver_src_id_ldate_l22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_l22) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_l2 := if(min(sysdate, _ver_src_id_ldate_l22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_l22) / 30.5));
+mth__ver_src_id_ldate_l2 := __common__( if(min(sysdate, _ver_src_id_ldate_l22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_l22) / 30.5)) ) ;
 
-_ver_src_id_u2_pos := Models.Common.findw_cpp(ver_src_id_list, 'U2' , '  ,', 'ie');
+_ver_src_id_u2_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'U2' , '  ,', 'ie') ) ;
 
-_ver_src_id__u2 := _ver_src_id_u2_pos > 0;
+_ver_src_id__u2 := __common__( _ver_src_id_u2_pos > 0 ) ;
 
-_ver_src_id_fdate_u2 := if(_ver_src_id_u2_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_u2_pos), '0');
+_ver_src_id_fdate_u2 := __common__( if(_ver_src_id_u2_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_u2_pos), '0') ) ;
 
-_ver_src_id_fdate_u22 := common.sas_date((string)(_ver_src_id_fdate_u2));
+_ver_src_id_fdate_u22 := __common__( common.sas_date((string)(_ver_src_id_fdate_u2)) ) ;
 
-yr__ver_src_id_fdate_u2 := if(min(sysdate, _ver_src_id_fdate_u22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_u22) / 365.25));
+yr__ver_src_id_fdate_u2 := __common__( if(min(sysdate, _ver_src_id_fdate_u22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_u22) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_u2 := if(min(sysdate, _ver_src_id_fdate_u22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_u22) / 30.5));
+mth__ver_src_id_fdate_u2 := __common__( if(min(sysdate, _ver_src_id_fdate_u22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_u22) / 30.5)) ) ;
 
-_ver_src_id_ldate_u2 := if(_ver_src_id_u2_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_u2_pos), '0');
+_ver_src_id_ldate_u2 := __common__( if(_ver_src_id_u2_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_u2_pos), '0') ) ;
 
-_ver_src_id_ldate_u22 := common.sas_date((string)(_ver_src_id_ldate_u2));
+_ver_src_id_ldate_u22 := __common__( common.sas_date((string)(_ver_src_id_ldate_u2)) ) ;
 
-yr__ver_src_id_ldate_u2 := if(min(sysdate, _ver_src_id_ldate_u22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_u22) / 365.25));
+yr__ver_src_id_ldate_u2 := __common__( if(min(sysdate, _ver_src_id_ldate_u22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_u22) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_u2 := if(min(sysdate, _ver_src_id_ldate_u22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_u22) / 30.5));
+mth__ver_src_id_ldate_u2 := __common__( if(min(sysdate, _ver_src_id_ldate_u22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_u22) / 30.5)) ) ;
 
-_ver_src_id_ar_pos := Models.Common.findw_cpp(ver_src_id_list, 'AR' , '  ,', 'ie');
+_ver_src_id_ar_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'AR' , '  ,', 'ie') ) ;
 
-_ver_src_id__ar := _ver_src_id_ar_pos > 0;
+_ver_src_id__ar := __common__( _ver_src_id_ar_pos > 0 ) ;
 
-_ver_src_id_fdate_ar := if(_ver_src_id_ar_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ar_pos), '0');
+_ver_src_id_fdate_ar := __common__( if(_ver_src_id_ar_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ar_pos), '0') ) ;
 
-_ver_src_id_fdate_ar2 := common.sas_date((string)(_ver_src_id_fdate_ar));
+_ver_src_id_fdate_ar2 := __common__( common.sas_date((string)(_ver_src_id_fdate_ar)) ) ;
 
-yr__ver_src_id_fdate_ar := if(min(sysdate, _ver_src_id_fdate_ar2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ar2) / 365.25));
+yr__ver_src_id_fdate_ar := __common__( if(min(sysdate, _ver_src_id_fdate_ar2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ar2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_ar := if(min(sysdate, _ver_src_id_fdate_ar2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ar2) / 30.5));
+mth__ver_src_id_fdate_ar := __common__( if(min(sysdate, _ver_src_id_fdate_ar2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ar2) / 30.5)) ) ;
 
-_ver_src_id_ldate_ar := if(_ver_src_id_ar_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ar_pos), '0');
+_ver_src_id_ldate_ar := __common__( if(_ver_src_id_ar_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ar_pos), '0') ) ;
 
-_ver_src_id_ldate_ar2 := common.sas_date((string)(_ver_src_id_ldate_ar));
+_ver_src_id_ldate_ar2 := __common__( common.sas_date((string)(_ver_src_id_ldate_ar)) ) ;
 
-yr__ver_src_id_ldate_ar := if(min(sysdate, _ver_src_id_ldate_ar2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ar2) / 365.25));
+yr__ver_src_id_ldate_ar := __common__( if(min(sysdate, _ver_src_id_ldate_ar2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ar2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_ar := if(min(sysdate, _ver_src_id_ldate_ar2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ar2) / 30.5));
+mth__ver_src_id_ldate_ar := __common__( if(min(sysdate, _ver_src_id_ldate_ar2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ar2) / 30.5)) ) ;
 
-_ver_src_id_ba_pos := Models.Common.findw_cpp(ver_src_id_list, 'BA' , '  ,', 'ie');
+_ver_src_id_ba_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'BA' , '  ,', 'ie') ) ;
 
-_ver_src_id__ba := _ver_src_id_ba_pos > 0;
+_ver_src_id__ba := __common__( _ver_src_id_ba_pos > 0 ) ;
 
-_ver_src_id_fdate_ba := if(_ver_src_id_ba_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ba_pos), '0');
+_ver_src_id_fdate_ba := __common__( if(_ver_src_id_ba_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ba_pos), '0') ) ;
 
-_ver_src_id_fdate_ba2 := common.sas_date((string)(_ver_src_id_fdate_ba));
+_ver_src_id_fdate_ba2 := __common__( common.sas_date((string)(_ver_src_id_fdate_ba)) ) ;
 
-yr__ver_src_id_fdate_ba := if(min(sysdate, _ver_src_id_fdate_ba2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ba2) / 365.25));
+yr__ver_src_id_fdate_ba := __common__( if(min(sysdate, _ver_src_id_fdate_ba2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ba2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_ba := if(min(sysdate, _ver_src_id_fdate_ba2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ba2) / 30.5));
+mth__ver_src_id_fdate_ba := __common__( if(min(sysdate, _ver_src_id_fdate_ba2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ba2) / 30.5)) ) ;
 
-_ver_src_id_ldate_ba := if(_ver_src_id_ba_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ba_pos), '0');
+_ver_src_id_ldate_ba := __common__( if(_ver_src_id_ba_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ba_pos), '0') ) ;
 
-_ver_src_id_ldate_ba2 := common.sas_date((string)(_ver_src_id_ldate_ba));
+_ver_src_id_ldate_ba2 := __common__( common.sas_date((string)(_ver_src_id_ldate_ba)) ) ;
 
-yr__ver_src_id_ldate_ba := if(min(sysdate, _ver_src_id_ldate_ba2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ba2) / 365.25));
+yr__ver_src_id_ldate_ba := __common__( if(min(sysdate, _ver_src_id_ldate_ba2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ba2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_ba := if(min(sysdate, _ver_src_id_ldate_ba2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ba2) / 30.5));
+mth__ver_src_id_ldate_ba := __common__( if(min(sysdate, _ver_src_id_ldate_ba2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ba2) / 30.5)) ) ;
 
-_ver_src_id_bm_pos := Models.Common.findw_cpp(ver_src_id_list, 'BM' , '  ,', 'ie');
+_ver_src_id_bm_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'BM' , '  ,', 'ie') ) ;
 
-_ver_src_id__bm := _ver_src_id_bm_pos > 0;
+_ver_src_id__bm := __common__( _ver_src_id_bm_pos > 0 ) ;
 
-_ver_src_id_fdate_bm := if(_ver_src_id_bm_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_bm_pos), '0');
+_ver_src_id_fdate_bm := __common__( if(_ver_src_id_bm_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_bm_pos), '0') ) ;
 
-_ver_src_id_fdate_bm2 := common.sas_date((string)(_ver_src_id_fdate_bm));
+_ver_src_id_fdate_bm2 := __common__( common.sas_date((string)(_ver_src_id_fdate_bm)) ) ;
 
-yr__ver_src_id_fdate_bm := if(min(sysdate, _ver_src_id_fdate_bm2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_bm2) / 365.25));
+yr__ver_src_id_fdate_bm := __common__( if(min(sysdate, _ver_src_id_fdate_bm2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_bm2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_bm := if(min(sysdate, _ver_src_id_fdate_bm2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_bm2) / 30.5));
+mth__ver_src_id_fdate_bm := __common__( if(min(sysdate, _ver_src_id_fdate_bm2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_bm2) / 30.5)) ) ;
 
-_ver_src_id_ldate_bm := if(_ver_src_id_bm_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_bm_pos), '0');
+_ver_src_id_ldate_bm := __common__( if(_ver_src_id_bm_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_bm_pos), '0') ) ;
 
-_ver_src_id_ldate_bm2 := common.sas_date((string)(_ver_src_id_ldate_bm));
+_ver_src_id_ldate_bm2 := __common__( common.sas_date((string)(_ver_src_id_ldate_bm)) ) ;
 
-yr__ver_src_id_ldate_bm := if(min(sysdate, _ver_src_id_ldate_bm2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_bm2) / 365.25));
+yr__ver_src_id_ldate_bm := __common__( if(min(sysdate, _ver_src_id_ldate_bm2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_bm2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_bm := if(min(sysdate, _ver_src_id_ldate_bm2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_bm2) / 30.5));
+mth__ver_src_id_ldate_bm := __common__( if(min(sysdate, _ver_src_id_ldate_bm2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_bm2) / 30.5)) ) ;
 
-_ver_src_id_bn_pos := Models.Common.findw_cpp(ver_src_id_list, 'BN' , '  ,', 'ie');
+_ver_src_id_bn_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'BN' , '  ,', 'ie') ) ;
 
-_ver_src_id__bn := _ver_src_id_bn_pos > 0;
+_ver_src_id__bn := __common__( _ver_src_id_bn_pos > 0 ) ;
 
-_ver_src_id_fdate_bn := if(_ver_src_id_bn_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_bn_pos), '0');
+_ver_src_id_fdate_bn := __common__( if(_ver_src_id_bn_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_bn_pos), '0') ) ;
 
-_ver_src_id_fdate_bn2 := common.sas_date((string)(_ver_src_id_fdate_bn));
+_ver_src_id_fdate_bn2 := __common__( common.sas_date((string)(_ver_src_id_fdate_bn)) ) ;
 
-yr__ver_src_id_fdate_bn := if(min(sysdate, _ver_src_id_fdate_bn2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_bn2) / 365.25));
+yr__ver_src_id_fdate_bn := __common__( if(min(sysdate, _ver_src_id_fdate_bn2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_bn2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_bn := if(min(sysdate, _ver_src_id_fdate_bn2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_bn2) / 30.5));
+mth__ver_src_id_fdate_bn := __common__( if(min(sysdate, _ver_src_id_fdate_bn2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_bn2) / 30.5)) ) ;
 
-_ver_src_id_ldate_bn := if(_ver_src_id_bn_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_bn_pos), '0');
+_ver_src_id_ldate_bn := __common__( if(_ver_src_id_bn_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_bn_pos), '0') ) ;
 
-_ver_src_id_ldate_bn2 := common.sas_date((string)(_ver_src_id_ldate_bn));
+_ver_src_id_ldate_bn2 := __common__( common.sas_date((string)(_ver_src_id_ldate_bn)) ) ;
 
-yr__ver_src_id_ldate_bn := if(min(sysdate, _ver_src_id_ldate_bn2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_bn2) / 365.25));
+yr__ver_src_id_ldate_bn := __common__( if(min(sysdate, _ver_src_id_ldate_bn2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_bn2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_bn := if(min(sysdate, _ver_src_id_ldate_bn2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_bn2) / 30.5));
+mth__ver_src_id_ldate_bn := __common__( if(min(sysdate, _ver_src_id_ldate_bn2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_bn2) / 30.5)) ) ;
 
-_ver_src_id_cu_pos := Models.Common.findw_cpp(ver_src_id_list, 'CU' , '  ,', 'ie');
+_ver_src_id_cu_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'CU' , '  ,', 'ie') ) ;
 
-_ver_src_id__cu := _ver_src_id_cu_pos > 0;
+_ver_src_id__cu := __common__( _ver_src_id_cu_pos > 0 ) ;
 
-_ver_src_id_fdate_cu := if(_ver_src_id_cu_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_cu_pos), '0');
+_ver_src_id_fdate_cu := __common__( if(_ver_src_id_cu_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_cu_pos), '0') ) ;
 
-_ver_src_id_fdate_cu2 := common.sas_date((string)(_ver_src_id_fdate_cu));
+_ver_src_id_fdate_cu2 := __common__( common.sas_date((string)(_ver_src_id_fdate_cu)) ) ;
 
-yr__ver_src_id_fdate_cu := if(min(sysdate, _ver_src_id_fdate_cu2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_cu2) / 365.25));
+yr__ver_src_id_fdate_cu := __common__( if(min(sysdate, _ver_src_id_fdate_cu2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_cu2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_cu := if(min(sysdate, _ver_src_id_fdate_cu2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_cu2) / 30.5));
+mth__ver_src_id_fdate_cu := __common__( if(min(sysdate, _ver_src_id_fdate_cu2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_cu2) / 30.5)) ) ;
 
-_ver_src_id_ldate_cu := if(_ver_src_id_cu_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_cu_pos), '0');
+_ver_src_id_ldate_cu := __common__( if(_ver_src_id_cu_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_cu_pos), '0') ) ;
 
-_ver_src_id_ldate_cu2 := common.sas_date((string)(_ver_src_id_ldate_cu));
+_ver_src_id_ldate_cu2 := __common__( common.sas_date((string)(_ver_src_id_ldate_cu)) ) ;
 
-yr__ver_src_id_ldate_cu := if(min(sysdate, _ver_src_id_ldate_cu2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_cu2) / 365.25));
+yr__ver_src_id_ldate_cu := __common__( if(min(sysdate, _ver_src_id_ldate_cu2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_cu2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_cu := if(min(sysdate, _ver_src_id_ldate_cu2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_cu2) / 30.5));
+mth__ver_src_id_ldate_cu := __common__( if(min(sysdate, _ver_src_id_ldate_cu2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_cu2) / 30.5)) ) ;
 
-_ver_src_id_da_pos := Models.Common.findw_cpp(ver_src_id_list, 'DA' , '  ,', 'ie');
+_ver_src_id_da_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'DA' , '  ,', 'ie') ) ;
 
-_ver_src_id__da := _ver_src_id_da_pos > 0;
+_ver_src_id__da := __common__( _ver_src_id_da_pos > 0 ) ;
 
-_ver_src_id_fdate_da := if(_ver_src_id_da_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_da_pos), '0');
+_ver_src_id_fdate_da := __common__( if(_ver_src_id_da_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_da_pos), '0') ) ;
 
-_ver_src_id_fdate_da2 := common.sas_date((string)(_ver_src_id_fdate_da));
+_ver_src_id_fdate_da2 := __common__( common.sas_date((string)(_ver_src_id_fdate_da)) ) ;
 
-yr__ver_src_id_fdate_da := if(min(sysdate, _ver_src_id_fdate_da2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_da2) / 365.25));
+yr__ver_src_id_fdate_da := __common__( if(min(sysdate, _ver_src_id_fdate_da2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_da2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_da := if(min(sysdate, _ver_src_id_fdate_da2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_da2) / 30.5));
+mth__ver_src_id_fdate_da := __common__( if(min(sysdate, _ver_src_id_fdate_da2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_da2) / 30.5)) ) ;
 
-_ver_src_id_ldate_da := if(_ver_src_id_da_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_da_pos), '0');
+_ver_src_id_ldate_da := __common__( if(_ver_src_id_da_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_da_pos), '0') ) ;
 
-_ver_src_id_ldate_da2 := common.sas_date((string)(_ver_src_id_ldate_da));
+_ver_src_id_ldate_da2 := __common__( common.sas_date((string)(_ver_src_id_ldate_da)) ) ;
 
-yr__ver_src_id_ldate_da := if(min(sysdate, _ver_src_id_ldate_da2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_da2) / 365.25));
+yr__ver_src_id_ldate_da := __common__( if(min(sysdate, _ver_src_id_ldate_da2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_da2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_da := if(min(sysdate, _ver_src_id_ldate_da2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_da2) / 30.5));
+mth__ver_src_id_ldate_da := __common__( if(min(sysdate, _ver_src_id_ldate_da2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_da2) / 30.5)) ) ;
 
-_ver_src_id_ef_pos := Models.Common.findw_cpp(ver_src_id_list, 'EF' , '  ,', 'ie');
+_ver_src_id_ef_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'EF' , '  ,', 'ie') ) ;
 
-_ver_src_id__ef := _ver_src_id_ef_pos > 0;
+_ver_src_id__ef := __common__( _ver_src_id_ef_pos > 0 ) ;
 
-_ver_src_id_fdate_ef := if(_ver_src_id_ef_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ef_pos), '0');
+_ver_src_id_fdate_ef := __common__( if(_ver_src_id_ef_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ef_pos), '0') ) ;
 
-_ver_src_id_fdate_ef2 := common.sas_date((string)(_ver_src_id_fdate_ef));
+_ver_src_id_fdate_ef2 := __common__( common.sas_date((string)(_ver_src_id_fdate_ef)) ) ;
 
-yr__ver_src_id_fdate_ef := if(min(sysdate, _ver_src_id_fdate_ef2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ef2) / 365.25));
+yr__ver_src_id_fdate_ef := __common__( if(min(sysdate, _ver_src_id_fdate_ef2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ef2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_ef := if(min(sysdate, _ver_src_id_fdate_ef2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ef2) / 30.5));
+mth__ver_src_id_fdate_ef := __common__( if(min(sysdate, _ver_src_id_fdate_ef2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ef2) / 30.5)) ) ;
 
-_ver_src_id_ldate_ef := if(_ver_src_id_ef_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ef_pos), '0');
+_ver_src_id_ldate_ef := __common__( if(_ver_src_id_ef_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ef_pos), '0') ) ;
 
-_ver_src_id_ldate_ef2 := common.sas_date((string)(_ver_src_id_ldate_ef));
+_ver_src_id_ldate_ef2 := __common__( common.sas_date((string)(_ver_src_id_ldate_ef)) ) ;
 
-yr__ver_src_id_ldate_ef := if(min(sysdate, _ver_src_id_ldate_ef2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ef2) / 365.25));
+yr__ver_src_id_ldate_ef := __common__( if(min(sysdate, _ver_src_id_ldate_ef2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ef2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_ef := if(min(sysdate, _ver_src_id_ldate_ef2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ef2) / 30.5));
+mth__ver_src_id_ldate_ef := __common__( if(min(sysdate, _ver_src_id_ldate_ef2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ef2) / 30.5)) ) ;
 
-_ver_src_id_fi_pos := Models.Common.findw_cpp(ver_src_id_list, 'FI' , '  ,', 'ie');
+_ver_src_id_fi_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'FI' , '  ,', 'ie') ) ;
 
-_ver_src_id__fi := _ver_src_id_fi_pos > 0;
+_ver_src_id__fi := __common__( _ver_src_id_fi_pos > 0 ) ;
 
-_ver_src_id_fdate_fi := if(_ver_src_id_fi_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_fi_pos), '0');
+_ver_src_id_fdate_fi := __common__( if(_ver_src_id_fi_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_fi_pos), '0') ) ;
 
-_ver_src_id_fdate_fi2 := common.sas_date((string)(_ver_src_id_fdate_fi));
+_ver_src_id_fdate_fi2 := __common__( common.sas_date((string)(_ver_src_id_fdate_fi)) ) ;
 
-yr__ver_src_id_fdate_fi := if(min(sysdate, _ver_src_id_fdate_fi2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fi2) / 365.25));
+yr__ver_src_id_fdate_fi := __common__( if(min(sysdate, _ver_src_id_fdate_fi2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fi2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_fi := if(min(sysdate, _ver_src_id_fdate_fi2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fi2) / 30.5));
+mth__ver_src_id_fdate_fi := __common__( if(min(sysdate, _ver_src_id_fdate_fi2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fi2) / 30.5)) ) ;
 
-_ver_src_id_ldate_fi := if(_ver_src_id_fi_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_fi_pos), '0');
+_ver_src_id_ldate_fi := __common__( if(_ver_src_id_fi_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_fi_pos), '0') ) ;
 
-_ver_src_id_ldate_fi2 := common.sas_date((string)(_ver_src_id_ldate_fi));
+_ver_src_id_ldate_fi2 := __common__( common.sas_date((string)(_ver_src_id_ldate_fi)) ) ;
 
-yr__ver_src_id_ldate_fi := if(min(sysdate, _ver_src_id_ldate_fi2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fi2) / 365.25));
+yr__ver_src_id_ldate_fi := __common__( if(min(sysdate, _ver_src_id_ldate_fi2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fi2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_fi := if(min(sysdate, _ver_src_id_ldate_fi2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fi2) / 30.5));
+mth__ver_src_id_ldate_fi := __common__( if(min(sysdate, _ver_src_id_ldate_fi2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fi2) / 30.5)) ) ;
 
-_ver_src_id_i_pos := Models.Common.findw_cpp(ver_src_id_list, 'I' , '  ,', 'ie');
+_ver_src_id_i_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'I' , '  ,', 'ie') ) ;
 
-_ver_src_id__i := _ver_src_id_i_pos > 0;
+_ver_src_id__i := __common__( _ver_src_id_i_pos > 0 ) ;
 
-_ver_src_id_fdate_i := if(_ver_src_id_i_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_i_pos), '0');
+_ver_src_id_fdate_i := __common__( if(_ver_src_id_i_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_i_pos), '0') ) ;
 
-_ver_src_id_fdate_i2 := common.sas_date((string)(_ver_src_id_fdate_i));
+_ver_src_id_fdate_i2 := __common__( common.sas_date((string)(_ver_src_id_fdate_i)) ) ;
 
-yr__ver_src_id_fdate_i := if(min(sysdate, _ver_src_id_fdate_i2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_i2) / 365.25));
+yr__ver_src_id_fdate_i := __common__( if(min(sysdate, _ver_src_id_fdate_i2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_i2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_i := if(min(sysdate, _ver_src_id_fdate_i2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_i2) / 30.5));
+mth__ver_src_id_fdate_i := __common__( if(min(sysdate, _ver_src_id_fdate_i2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_i2) / 30.5)) ) ;
 
-_ver_src_id_ldate_i := if(_ver_src_id_i_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_i_pos), '0');
+_ver_src_id_ldate_i := __common__( if(_ver_src_id_i_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_i_pos), '0') ) ;
 
-_ver_src_id_ldate_i2 := common.sas_date((string)(_ver_src_id_ldate_i));
+_ver_src_id_ldate_i2 := __common__( common.sas_date((string)(_ver_src_id_ldate_i)) ) ;
 
-yr__ver_src_id_ldate_i := if(min(sysdate, _ver_src_id_ldate_i2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_i2) / 365.25));
+yr__ver_src_id_ldate_i := __common__( if(min(sysdate, _ver_src_id_ldate_i2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_i2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_i := if(min(sysdate, _ver_src_id_ldate_i2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_i2) / 30.5));
+mth__ver_src_id_ldate_i := __common__( if(min(sysdate, _ver_src_id_ldate_i2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_i2) / 30.5)) ) ;
 
-_ver_src_id_ia_pos := Models.Common.findw_cpp(ver_src_id_list, 'IA' , '  ,', 'ie');
+_ver_src_id_ia_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'IA' , '  ,', 'ie') ) ;
 
-_ver_src_id__ia := _ver_src_id_ia_pos > 0;
+_ver_src_id__ia := __common__( _ver_src_id_ia_pos > 0 ) ;
 
-_ver_src_id_fdate_ia := if(_ver_src_id_ia_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ia_pos), '0');
+_ver_src_id_fdate_ia := __common__( if(_ver_src_id_ia_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ia_pos), '0') ) ;
 
-_ver_src_id_fdate_ia2 := common.sas_date((string)(_ver_src_id_fdate_ia));
+_ver_src_id_fdate_ia2 := __common__( common.sas_date((string)(_ver_src_id_fdate_ia)) ) ;
 
-yr__ver_src_id_fdate_ia := if(min(sysdate, _ver_src_id_fdate_ia2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ia2) / 365.25));
+yr__ver_src_id_fdate_ia := __common__( if(min(sysdate, _ver_src_id_fdate_ia2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ia2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_ia := if(min(sysdate, _ver_src_id_fdate_ia2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ia2) / 30.5));
+mth__ver_src_id_fdate_ia := __common__( if(min(sysdate, _ver_src_id_fdate_ia2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ia2) / 30.5)) ) ;
 
-_ver_src_id_ldate_ia := if(_ver_src_id_ia_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ia_pos), '0');
+_ver_src_id_ldate_ia := __common__( if(_ver_src_id_ia_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ia_pos), '0') ) ;
 
-_ver_src_id_ldate_ia2 := common.sas_date((string)(_ver_src_id_ldate_ia));
+_ver_src_id_ldate_ia2 := __common__( common.sas_date((string)(_ver_src_id_ldate_ia)) ) ;
 
-yr__ver_src_id_ldate_ia := if(min(sysdate, _ver_src_id_ldate_ia2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ia2) / 365.25));
+yr__ver_src_id_ldate_ia := __common__( if(min(sysdate, _ver_src_id_ldate_ia2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ia2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_ia := if(min(sysdate, _ver_src_id_ldate_ia2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ia2) / 30.5));
+mth__ver_src_id_ldate_ia := __common__( if(min(sysdate, _ver_src_id_ldate_ia2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ia2) / 30.5)) ) ;
 
-_ver_src_id_in_pos := Models.Common.findw_cpp(ver_src_id_list, 'IN' , '  ,', 'ie');
+_ver_src_id_in_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'IN' , '  ,', 'ie') ) ;
 
-_ver_src_id__in := _ver_src_id_in_pos > 0;
+_ver_src_id__in := __common__( _ver_src_id_in_pos > 0 ) ;
 
-_ver_src_id_fdate_in := if(_ver_src_id_in_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_in_pos), '0');
+_ver_src_id_fdate_in := __common__( if(_ver_src_id_in_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_in_pos), '0') ) ;
 
-_ver_src_id_fdate_in2 := common.sas_date((string)(_ver_src_id_fdate_in));
+_ver_src_id_fdate_in2 := __common__( common.sas_date((string)(_ver_src_id_fdate_in)) ) ;
 
-yr__ver_src_id_fdate_in := if(min(sysdate, _ver_src_id_fdate_in2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_in2) / 365.25));
+yr__ver_src_id_fdate_in := __common__( if(min(sysdate, _ver_src_id_fdate_in2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_in2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_in := if(min(sysdate, _ver_src_id_fdate_in2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_in2) / 30.5));
+mth__ver_src_id_fdate_in := __common__( if(min(sysdate, _ver_src_id_fdate_in2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_in2) / 30.5)) ) ;
 
-_ver_src_id_ldate_in := if(_ver_src_id_in_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_in_pos), '0');
+_ver_src_id_ldate_in := __common__( if(_ver_src_id_in_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_in_pos), '0') ) ;
 
-_ver_src_id_ldate_in2 := common.sas_date((string)(_ver_src_id_ldate_in));
+_ver_src_id_ldate_in2 := __common__( common.sas_date((string)(_ver_src_id_ldate_in)) ) ;
 
-yr__ver_src_id_ldate_in := if(min(sysdate, _ver_src_id_ldate_in2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_in2) / 365.25));
+yr__ver_src_id_ldate_in := __common__( if(min(sysdate, _ver_src_id_ldate_in2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_in2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_in := if(min(sysdate, _ver_src_id_ldate_in2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_in2) / 30.5));
+mth__ver_src_id_ldate_in := __common__( if(min(sysdate, _ver_src_id_ldate_in2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_in2) / 30.5)) ) ;
 
-_ver_src_id_os_pos := Models.Common.findw_cpp(ver_src_id_list, 'OS' , '  ,', 'ie');
+_ver_src_id_os_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'OS' , '  ,', 'ie') ) ;
 
-_ver_src_id__os := _ver_src_id_os_pos > 0;
+_ver_src_id__os := __common__( _ver_src_id_os_pos > 0 ) ;
 
-_ver_src_id_fdate_os := if(_ver_src_id_os_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_os_pos), '0');
+_ver_src_id_fdate_os := __common__( if(_ver_src_id_os_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_os_pos), '0') ) ;
 
-_ver_src_id_fdate_os2 := common.sas_date((string)(_ver_src_id_fdate_os));
+_ver_src_id_fdate_os2 := __common__( common.sas_date((string)(_ver_src_id_fdate_os)) ) ;
 
-yr__ver_src_id_fdate_os := if(min(sysdate, _ver_src_id_fdate_os2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_os2) / 365.25));
+yr__ver_src_id_fdate_os := __common__( if(min(sysdate, _ver_src_id_fdate_os2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_os2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_os := if(min(sysdate, _ver_src_id_fdate_os2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_os2) / 30.5));
+mth__ver_src_id_fdate_os := __common__( if(min(sysdate, _ver_src_id_fdate_os2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_os2) / 30.5)) ) ;
 
-_ver_src_id_ldate_os := if(_ver_src_id_os_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_os_pos), '0');
+_ver_src_id_ldate_os := __common__( if(_ver_src_id_os_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_os_pos), '0') ) ;
 
-_ver_src_id_ldate_os2 := common.sas_date((string)(_ver_src_id_ldate_os));
+_ver_src_id_ldate_os2 := __common__( common.sas_date((string)(_ver_src_id_ldate_os)) ) ;
 
-yr__ver_src_id_ldate_os := if(min(sysdate, _ver_src_id_ldate_os2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_os2) / 365.25));
+yr__ver_src_id_ldate_os := __common__( if(min(sysdate, _ver_src_id_ldate_os2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_os2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_os := if(min(sysdate, _ver_src_id_ldate_os2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_os2) / 30.5));
+mth__ver_src_id_ldate_os := __common__( if(min(sysdate, _ver_src_id_ldate_os2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_os2) / 30.5)) ) ;
 
-_ver_src_id_p_pos := Models.Common.findw_cpp(ver_src_id_list, 'P' , '  ,', 'ie');
+_ver_src_id_p_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'P' , '  ,', 'ie') ) ;
 
-_ver_src_id__p := _ver_src_id_p_pos > 0;
+_ver_src_id__p := __common__( _ver_src_id_p_pos > 0 ) ;
 
-_ver_src_id_fdate_p := if(_ver_src_id_p_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_p_pos), '0');
+_ver_src_id_fdate_p := __common__( if(_ver_src_id_p_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_p_pos), '0') ) ;
 
-_ver_src_id_fdate_p2 := common.sas_date((string)(_ver_src_id_fdate_p));
+_ver_src_id_fdate_p2 := __common__( common.sas_date((string)(_ver_src_id_fdate_p)) ) ;
 
-yr__ver_src_id_fdate_p := if(min(sysdate, _ver_src_id_fdate_p2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_p2) / 365.25));
+yr__ver_src_id_fdate_p := __common__( if(min(sysdate, _ver_src_id_fdate_p2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_p2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_p := if(min(sysdate, _ver_src_id_fdate_p2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_p2) / 30.5));
+mth__ver_src_id_fdate_p := __common__( if(min(sysdate, _ver_src_id_fdate_p2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_p2) / 30.5)) ) ;
 
-_ver_src_id_ldate_p := if(_ver_src_id_p_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_p_pos), '0');
+_ver_src_id_ldate_p := __common__( if(_ver_src_id_p_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_p_pos), '0') ) ;
 
-_ver_src_id_ldate_p2 := common.sas_date((string)(_ver_src_id_ldate_p));
+_ver_src_id_ldate_p2 := __common__( common.sas_date((string)(_ver_src_id_ldate_p)) ) ;
 
-yr__ver_src_id_ldate_p := if(min(sysdate, _ver_src_id_ldate_p2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_p2) / 365.25));
+yr__ver_src_id_ldate_p := __common__( if(min(sysdate, _ver_src_id_ldate_p2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_p2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_p := if(min(sysdate, _ver_src_id_ldate_p2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_p2) / 30.5));
+mth__ver_src_id_ldate_p := __common__( if(min(sysdate, _ver_src_id_ldate_p2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_p2) / 30.5)) ) ;
 
-_ver_src_id_pl_pos := Models.Common.findw_cpp(ver_src_id_list, 'PL' , '  ,', 'ie');
+_ver_src_id_pl_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'PL' , '  ,', 'ie') ) ;
 
-_ver_src_id__pl := _ver_src_id_pl_pos > 0;
+_ver_src_id__pl := __common__( _ver_src_id_pl_pos > 0 ) ;
 
-_ver_src_id_fdate_pl := if(_ver_src_id_pl_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_pl_pos), '0');
+_ver_src_id_fdate_pl := __common__( if(_ver_src_id_pl_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_pl_pos), '0') ) ;
 
-_ver_src_id_fdate_pl2 := common.sas_date((string)(_ver_src_id_fdate_pl));
+_ver_src_id_fdate_pl2 := __common__( common.sas_date((string)(_ver_src_id_fdate_pl)) ) ;
 
-yr__ver_src_id_fdate_pl := if(min(sysdate, _ver_src_id_fdate_pl2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_pl2) / 365.25));
+yr__ver_src_id_fdate_pl := __common__( if(min(sysdate, _ver_src_id_fdate_pl2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_pl2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_pl := if(min(sysdate, _ver_src_id_fdate_pl2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_pl2) / 30.5));
+mth__ver_src_id_fdate_pl := __common__( if(min(sysdate, _ver_src_id_fdate_pl2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_pl2) / 30.5)) ) ;
 
-_ver_src_id_ldate_pl := if(_ver_src_id_pl_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_pl_pos), '0');
+_ver_src_id_ldate_pl := __common__( if(_ver_src_id_pl_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_pl_pos), '0') ) ;
 
-_ver_src_id_ldate_pl2 := common.sas_date((string)(_ver_src_id_ldate_pl));
+_ver_src_id_ldate_pl2 := __common__( common.sas_date((string)(_ver_src_id_ldate_pl)) ) ;
 
-yr__ver_src_id_ldate_pl := if(min(sysdate, _ver_src_id_ldate_pl2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_pl2) / 365.25));
+yr__ver_src_id_ldate_pl := __common__( if(min(sysdate, _ver_src_id_ldate_pl2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_pl2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_pl := if(min(sysdate, _ver_src_id_ldate_pl2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_pl2) / 30.5));
+mth__ver_src_id_ldate_pl := __common__( if(min(sysdate, _ver_src_id_ldate_pl2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_pl2) / 30.5)) ) ;
 
-_ver_src_id_q3_pos := Models.Common.findw_cpp(ver_src_id_list, 'Q3' , '  ,', 'ie');
+_ver_src_id_q3_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'Q3' , '  ,', 'ie') ) ;
 
-_ver_src_id__q3 := _ver_src_id_q3_pos > 0;
+_ver_src_id__q3 := __common__( _ver_src_id_q3_pos > 0 ) ;
 
-_ver_src_id_fdate_q3 := if(_ver_src_id_q3_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_q3_pos), '0');
+_ver_src_id_fdate_q3 := __common__( if(_ver_src_id_q3_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_q3_pos), '0') ) ;
 
-_ver_src_id_fdate_q32 := common.sas_date((string)(_ver_src_id_fdate_q3));
+_ver_src_id_fdate_q32 := __common__( common.sas_date((string)(_ver_src_id_fdate_q3)) ) ;
 
-yr__ver_src_id_fdate_q3 := if(min(sysdate, _ver_src_id_fdate_q32) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_q32) / 365.25));
+yr__ver_src_id_fdate_q3 := __common__( if(min(sysdate, _ver_src_id_fdate_q32) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_q32) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_q3 := if(min(sysdate, _ver_src_id_fdate_q32) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_q32) / 30.5));
+mth__ver_src_id_fdate_q3 := __common__( if(min(sysdate, _ver_src_id_fdate_q32) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_q32) / 30.5)) ) ;
 
-_ver_src_id_ldate_q3 := if(_ver_src_id_q3_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_q3_pos), '0');
+_ver_src_id_ldate_q3 := __common__( if(_ver_src_id_q3_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_q3_pos), '0') ) ;
 
-_ver_src_id_ldate_q32 := common.sas_date((string)(_ver_src_id_ldate_q3));
+_ver_src_id_ldate_q32 := __common__( common.sas_date((string)(_ver_src_id_ldate_q3)) ) ;
 
-yr__ver_src_id_ldate_q3 := if(min(sysdate, _ver_src_id_ldate_q32) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_q32) / 365.25));
+yr__ver_src_id_ldate_q3 := __common__( if(min(sysdate, _ver_src_id_ldate_q32) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_q32) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_q3 := if(min(sysdate, _ver_src_id_ldate_q32) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_q32) / 30.5));
+mth__ver_src_id_ldate_q3 := __common__( if(min(sysdate, _ver_src_id_ldate_q32) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_q32) / 30.5)) ) ;
 
-_ver_src_id_sk_pos := Models.Common.findw_cpp(ver_src_id_list, 'SK' , '  ,', 'ie');
+_ver_src_id_sk_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'SK' , '  ,', 'ie') ) ;
 
-_ver_src_id__sk := _ver_src_id_sk_pos > 0;
+_ver_src_id__sk := __common__( _ver_src_id_sk_pos > 0 ) ;
 
-_ver_src_id_fdate_sk := if(_ver_src_id_sk_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_sk_pos), '0');
+_ver_src_id_fdate_sk := __common__( if(_ver_src_id_sk_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_sk_pos), '0') ) ;
 
-_ver_src_id_fdate_sk2 := common.sas_date((string)(_ver_src_id_fdate_sk));
+_ver_src_id_fdate_sk2 := __common__( common.sas_date((string)(_ver_src_id_fdate_sk)) ) ;
 
-yr__ver_src_id_fdate_sk := if(min(sysdate, _ver_src_id_fdate_sk2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sk2) / 365.25));
+yr__ver_src_id_fdate_sk := __common__( if(min(sysdate, _ver_src_id_fdate_sk2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sk2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_sk := if(min(sysdate, _ver_src_id_fdate_sk2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sk2) / 30.5));
+mth__ver_src_id_fdate_sk := __common__( if(min(sysdate, _ver_src_id_fdate_sk2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sk2) / 30.5)) ) ;
 
-_ver_src_id_ldate_sk := if(_ver_src_id_sk_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sk_pos), '0');
+_ver_src_id_ldate_sk := __common__( if(_ver_src_id_sk_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sk_pos), '0') ) ;
 
-_ver_src_id_ldate_sk2 := common.sas_date((string)(_ver_src_id_ldate_sk));
+_ver_src_id_ldate_sk2 := __common__( common.sas_date((string)(_ver_src_id_ldate_sk)) ) ;
 
-yr__ver_src_id_ldate_sk := if(min(sysdate, _ver_src_id_ldate_sk2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sk2) / 365.25));
+yr__ver_src_id_ldate_sk := __common__( if(min(sysdate, _ver_src_id_ldate_sk2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sk2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_sk := if(min(sysdate, _ver_src_id_ldate_sk2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sk2) / 30.5));
+mth__ver_src_id_ldate_sk := __common__( if(min(sysdate, _ver_src_id_ldate_sk2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sk2) / 30.5)) ) ;
 
-_ver_src_id_tx_pos := Models.Common.findw_cpp(ver_src_id_list, 'TX' , '  ,', 'ie');
+_ver_src_id_tx_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'TX' , '  ,', 'ie') ) ;
 
-_ver_src_id__tx := _ver_src_id_tx_pos > 0;
+_ver_src_id__tx := __common__( _ver_src_id_tx_pos > 0 ) ;
 
-_ver_src_id_fdate_tx := if(_ver_src_id_tx_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_tx_pos), '0');
+_ver_src_id_fdate_tx := __common__( if(_ver_src_id_tx_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_tx_pos), '0') ) ;
 
-_ver_src_id_fdate_tx2 := common.sas_date((string)(_ver_src_id_fdate_tx));
+_ver_src_id_fdate_tx2 := __common__( common.sas_date((string)(_ver_src_id_fdate_tx)) ) ;
 
-yr__ver_src_id_fdate_tx := if(min(sysdate, _ver_src_id_fdate_tx2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_tx2) / 365.25));
+yr__ver_src_id_fdate_tx := __common__( if(min(sysdate, _ver_src_id_fdate_tx2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_tx2) / 365.25)) ) ;
 
-mth__ver_src_id_fdate_tx := if(min(sysdate, _ver_src_id_fdate_tx2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_tx2) / 30.5));
+mth__ver_src_id_fdate_tx := __common__( if(min(sysdate, _ver_src_id_fdate_tx2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_tx2) / 30.5)) ) ;
 
-_ver_src_id_ldate_tx := if(_ver_src_id_tx_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_tx_pos), '0');
+_ver_src_id_ldate_tx := __common__( if(_ver_src_id_tx_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_tx_pos), '0') ) ;
 
-_ver_src_id_ldate_tx2 := common.sas_date((string)(_ver_src_id_ldate_tx));
+_ver_src_id_ldate_tx2 := __common__( common.sas_date((string)(_ver_src_id_ldate_tx)) ) ;
 
-yr__ver_src_id_ldate_tx := if(min(sysdate, _ver_src_id_ldate_tx2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_tx2) / 365.25));
+yr__ver_src_id_ldate_tx := __common__( if(min(sysdate, _ver_src_id_ldate_tx2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_tx2) / 365.25)) ) ;
 
-mth__ver_src_id_ldate_tx := if(min(sysdate, _ver_src_id_ldate_tx2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_tx2) / 30.5));
+mth__ver_src_id_ldate_tx := __common__( if(min(sysdate, _ver_src_id_ldate_tx2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_tx2) / 30.5)) ) ;
 
-_ver_src_id_v2_pos := Models.Common.findw_cpp(ver_src_id_list, 'V2' , '  ,', 'ie');
+_ver_src_id_v2_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'V2' , '  ,', 'ie') ) ;
 
-_ver_src_id__v2 := _ver_src_id_v2_pos > 0;
+_ver_src_id__v2 := __common__( _ver_src_id_v2_pos > 0 ) ;
 
-_ver_src_id_fdate_v2_1 := if(_ver_src_id_v2_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_v2_pos), '0');
+_ver_src_id_fdate_v2_1 := __common__( if(_ver_src_id_v2_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_v2_pos), '0') ) ;
 
-_ver_src_id_fdate_v22 := common.sas_date((string)(_ver_src_id_fdate_v2_1));
+_ver_src_id_fdate_v22 := __common__( common.sas_date((string)(_ver_src_id_fdate_v2_1)) ) ;
 
-yr__ver_src_id_fdate_v2 := if(min(sysdate, _ver_src_id_fdate_v22) = NULL, NULL, (sysdate - _ver_src_id_fdate_v22) / 365.25);
+yr__ver_src_id_fdate_v2 := __common__( if(min(sysdate, _ver_src_id_fdate_v22) = NULL, NULL, (sysdate - _ver_src_id_fdate_v22) / 365.25) ) ;
 
-mth__ver_src_id_fdate_v2 := if(min(sysdate, _ver_src_id_fdate_v22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_v22) / 30.5));
+mth__ver_src_id_fdate_v2 := __common__( if(min(sysdate, _ver_src_id_fdate_v22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_v22) / 30.5)) ) ;
 
-_ver_src_id_ldate_v2_1 := if(_ver_src_id_v2_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_v2_pos), '0');
+_ver_src_id_ldate_v2_1 := __common__( if(_ver_src_id_v2_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_v2_pos), '0') ) ;
 
-_ver_src_id_ldate_v22 := common.sas_date((string)(_ver_src_id_ldate_v2_1));
+_ver_src_id_ldate_v22 := __common__( common.sas_date((string)(_ver_src_id_ldate_v2_1)) ) ;
 
-yr__ver_src_id_ldate_v2 := if(min(sysdate, _ver_src_id_ldate_v22) = NULL, NULL, (sysdate - _ver_src_id_ldate_v22) / 365.25);
+yr__ver_src_id_ldate_v2 := __common__( if(min(sysdate, _ver_src_id_ldate_v22) = NULL, NULL, (sysdate - _ver_src_id_ldate_v22) / 365.25) ) ;
 
-mth__ver_src_id_ldate_v2 := if(min(sysdate, _ver_src_id_ldate_v22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_v22) / 30.5));
+mth__ver_src_id_ldate_v2 := __common__( if(min(sysdate, _ver_src_id_ldate_v22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_v22) / 30.5)) ) ;
 
-_ver_src_id_wa_pos := Models.Common.findw_cpp(ver_src_id_list, 'WA' , '  ,', 'ie');
+_ver_src_id_wa_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'WA' , '  ,', 'ie') ) ;
 
-_ver_src_id__wa := _ver_src_id_wa_pos > 0;
+_ver_src_id__wa := __common__( _ver_src_id_wa_pos > 0 ) ;
 
-_ver_src_id_fdate_wa := if(_ver_src_id_wa_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_wa_pos), '0');
+_ver_src_id_fdate_wa := __common__( if(_ver_src_id_wa_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_wa_pos), '0') ) ;
 
-_ver_src_id_fdate_wa2 := common.sas_date((string)(_ver_src_id_fdate_wa));
+_ver_src_id_fdate_wa2 := __common__( common.sas_date((string)(_ver_src_id_fdate_wa)) ) ;
 
-yr__ver_src_id_fdate_wa := if(min(sysdate, _ver_src_id_fdate_wa2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wa2) / 365.25);
+yr__ver_src_id_fdate_wa := __common__( if(min(sysdate, _ver_src_id_fdate_wa2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wa2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_wa := if(min(sysdate, _ver_src_id_fdate_wa2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wa2) / 30.5));
+mth__ver_src_id_fdate_wa := __common__( if(min(sysdate, _ver_src_id_fdate_wa2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wa2) / 30.5)) ) ;
 
-_ver_src_id_ldate_wa := if(_ver_src_id_wa_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wa_pos), '0');
+_ver_src_id_ldate_wa := __common__( if(_ver_src_id_wa_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wa_pos), '0') ) ;
 
-_ver_src_id_ldate_wa2 := common.sas_date((string)(_ver_src_id_ldate_wa));
+_ver_src_id_ldate_wa2 := __common__( common.sas_date((string)(_ver_src_id_ldate_wa)) ) ;
 
-yr__ver_src_id_ldate_wa := if(min(sysdate, _ver_src_id_ldate_wa2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wa2) / 365.25);
+yr__ver_src_id_ldate_wa := __common__( if(min(sysdate, _ver_src_id_ldate_wa2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wa2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_wa := if(min(sysdate, _ver_src_id_ldate_wa2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wa2) / 30.5));
+mth__ver_src_id_ldate_wa := __common__( if(min(sysdate, _ver_src_id_ldate_wa2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wa2) / 30.5)) ) ;
 
-_ver_src_id_by_pos := Models.Common.findw_cpp(ver_src_id_list, 'BY' , '  ,', 'ie');
+_ver_src_id_by_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'BY' , '  ,', 'ie') ) ;
 
-_ver_src_id__by := _ver_src_id_by_pos > 0;
+_ver_src_id__by := __common__( _ver_src_id_by_pos > 0 ) ;
 
-_ver_src_id_fdate_by := if(_ver_src_id_by_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_by_pos), '0');
+_ver_src_id_fdate_by := __common__( if(_ver_src_id_by_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_by_pos), '0') ) ;
 
-_ver_src_id_fdate_by2 := common.sas_date((string)(_ver_src_id_fdate_by));
+_ver_src_id_fdate_by2 := __common__( common.sas_date((string)(_ver_src_id_fdate_by)) ) ;
 
-yr__ver_src_id_fdate_by := if(min(sysdate, _ver_src_id_fdate_by2) = NULL, NULL, (sysdate - _ver_src_id_fdate_by2) / 365.25);
+yr__ver_src_id_fdate_by := __common__( if(min(sysdate, _ver_src_id_fdate_by2) = NULL, NULL, (sysdate - _ver_src_id_fdate_by2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_by := if(min(sysdate, _ver_src_id_fdate_by2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_by2) / 30.5));
+mth__ver_src_id_fdate_by := __common__( if(min(sysdate, _ver_src_id_fdate_by2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_by2) / 30.5)) ) ;
 
-_ver_src_id_ldate_by := if(_ver_src_id_by_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_by_pos), '0');
+_ver_src_id_ldate_by := __common__( if(_ver_src_id_by_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_by_pos), '0') ) ;
 
-_ver_src_id_ldate_by2 := common.sas_date((string)(_ver_src_id_ldate_by));
+_ver_src_id_ldate_by2 := __common__( common.sas_date((string)(_ver_src_id_ldate_by)) ) ;
 
-yr__ver_src_id_ldate_by := if(min(sysdate, _ver_src_id_ldate_by2) = NULL, NULL, (sysdate - _ver_src_id_ldate_by2) / 365.25);
+yr__ver_src_id_ldate_by := __common__( if(min(sysdate, _ver_src_id_ldate_by2) = NULL, NULL, (sysdate - _ver_src_id_ldate_by2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_by := if(min(sysdate, _ver_src_id_ldate_by2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_by2) / 30.5));
+mth__ver_src_id_ldate_by := __common__( if(min(sysdate, _ver_src_id_ldate_by2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_by2) / 30.5)) ) ;
 
-_ver_src_id_cf_pos := Models.Common.findw_cpp(ver_src_id_list, 'CF' , '  ,', 'ie');
+_ver_src_id_cf_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'CF' , '  ,', 'ie') ) ;
 
-_ver_src_id__cf := _ver_src_id_cf_pos > 0;
+_ver_src_id__cf := __common__( _ver_src_id_cf_pos > 0 ) ;
 
-_ver_src_id_fdate_cf := if(_ver_src_id_cf_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_cf_pos), '0');
+_ver_src_id_fdate_cf := __common__( if(_ver_src_id_cf_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_cf_pos), '0') ) ;
 
-_ver_src_id_fdate_cf2 := common.sas_date((string)(_ver_src_id_fdate_cf));
+_ver_src_id_fdate_cf2 := __common__( common.sas_date((string)(_ver_src_id_fdate_cf)) ) ;
 
-yr__ver_src_id_fdate_cf := if(min(sysdate, _ver_src_id_fdate_cf2) = NULL, NULL, (sysdate - _ver_src_id_fdate_cf2) / 365.25);
+yr__ver_src_id_fdate_cf := __common__( if(min(sysdate, _ver_src_id_fdate_cf2) = NULL, NULL, (sysdate - _ver_src_id_fdate_cf2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_cf := if(min(sysdate, _ver_src_id_fdate_cf2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_cf2) / 30.5));
+mth__ver_src_id_fdate_cf := __common__( if(min(sysdate, _ver_src_id_fdate_cf2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_cf2) / 30.5)) ) ;
 
-_ver_src_id_ldate_cf := if(_ver_src_id_cf_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_cf_pos), '0');
+_ver_src_id_ldate_cf := __common__( if(_ver_src_id_cf_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_cf_pos), '0') ) ;
 
-_ver_src_id_ldate_cf2 := common.sas_date((string)(_ver_src_id_ldate_cf));
+_ver_src_id_ldate_cf2 := __common__( common.sas_date((string)(_ver_src_id_ldate_cf)) ) ;
 
-yr__ver_src_id_ldate_cf := if(min(sysdate, _ver_src_id_ldate_cf2) = NULL, NULL, (sysdate - _ver_src_id_ldate_cf2) / 365.25);
+yr__ver_src_id_ldate_cf := __common__( if(min(sysdate, _ver_src_id_ldate_cf2) = NULL, NULL, (sysdate - _ver_src_id_ldate_cf2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_cf := if(min(sysdate, _ver_src_id_ldate_cf2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_cf2) / 30.5));
+mth__ver_src_id_ldate_cf := __common__( if(min(sysdate, _ver_src_id_ldate_cf2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_cf2) / 30.5)) ) ;
 
-_ver_src_id_e_pos := Models.Common.findw_cpp(ver_src_id_list, 'E' , '  ,', 'ie');
+_ver_src_id_e_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'E' , '  ,', 'ie') ) ;
 
-_ver_src_id__e := _ver_src_id_e_pos > 0;
+_ver_src_id__e := __common__( _ver_src_id_e_pos > 0 ) ;
 
-_ver_src_id_fdate_e := if(_ver_src_id_e_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_e_pos), '0');
+_ver_src_id_fdate_e := __common__( if(_ver_src_id_e_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_e_pos), '0') ) ;
 
-_ver_src_id_fdate_e2 := common.sas_date((string)(_ver_src_id_fdate_e));
+_ver_src_id_fdate_e2 := __common__( common.sas_date((string)(_ver_src_id_fdate_e)) ) ;
 
-yr__ver_src_id_fdate_e := if(min(sysdate, _ver_src_id_fdate_e2) = NULL, NULL, (sysdate - _ver_src_id_fdate_e2) / 365.25);
+yr__ver_src_id_fdate_e := __common__( if(min(sysdate, _ver_src_id_fdate_e2) = NULL, NULL, (sysdate - _ver_src_id_fdate_e2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_e := if(min(sysdate, _ver_src_id_fdate_e2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_e2) / 30.5));
+mth__ver_src_id_fdate_e := __common__( if(min(sysdate, _ver_src_id_fdate_e2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_e2) / 30.5)) ) ;
 
-_ver_src_id_ldate_e := if(_ver_src_id_e_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_e_pos), '0');
+_ver_src_id_ldate_e := __common__( if(_ver_src_id_e_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_e_pos), '0') ) ;
 
-_ver_src_id_ldate_e2 := common.sas_date((string)(_ver_src_id_ldate_e));
+_ver_src_id_ldate_e2 := __common__( common.sas_date((string)(_ver_src_id_ldate_e)) ) ;
 
-yr__ver_src_id_ldate_e := if(min(sysdate, _ver_src_id_ldate_e2) = NULL, NULL, (sysdate - _ver_src_id_ldate_e2) / 365.25);
+yr__ver_src_id_ldate_e := __common__( if(min(sysdate, _ver_src_id_ldate_e2) = NULL, NULL, (sysdate - _ver_src_id_ldate_e2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_e := if(min(sysdate, _ver_src_id_ldate_e2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_e2) / 30.5));
+mth__ver_src_id_ldate_e := __common__( if(min(sysdate, _ver_src_id_ldate_e2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_e2) / 30.5)) ) ;
 
-_ver_src_id_ey_pos := Models.Common.findw_cpp(ver_src_id_list, 'EY' , '  ,', 'ie');
+_ver_src_id_ey_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'EY' , '  ,', 'ie') ) ;
 
-_ver_src_id__ey := _ver_src_id_ey_pos > 0;
+_ver_src_id__ey := __common__( _ver_src_id_ey_pos > 0 ) ;
 
-_ver_src_id_fdate_ey := if(_ver_src_id_ey_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ey_pos), '0');
+_ver_src_id_fdate_ey := __common__( if(_ver_src_id_ey_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ey_pos), '0') ) ;
 
-_ver_src_id_fdate_ey2 := common.sas_date((string)(_ver_src_id_fdate_ey));
+_ver_src_id_fdate_ey2 := __common__( common.sas_date((string)(_ver_src_id_fdate_ey)) ) ;
 
-yr__ver_src_id_fdate_ey := if(min(sysdate, _ver_src_id_fdate_ey2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ey2) / 365.25);
+yr__ver_src_id_fdate_ey := __common__( if(min(sysdate, _ver_src_id_fdate_ey2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ey2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_ey := if(min(sysdate, _ver_src_id_fdate_ey2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ey2) / 30.5));
+mth__ver_src_id_fdate_ey := __common__( if(min(sysdate, _ver_src_id_fdate_ey2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ey2) / 30.5)) ) ;
 
-_ver_src_id_ldate_ey := if(_ver_src_id_ey_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ey_pos), '0');
+_ver_src_id_ldate_ey := __common__( if(_ver_src_id_ey_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ey_pos), '0') ) ;
 
-_ver_src_id_ldate_ey2 := common.sas_date((string)(_ver_src_id_ldate_ey));
+_ver_src_id_ldate_ey2 := __common__( common.sas_date((string)(_ver_src_id_ldate_ey)) ) ;
 
-yr__ver_src_id_ldate_ey := if(min(sysdate, _ver_src_id_ldate_ey2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ey2) / 365.25);
+yr__ver_src_id_ldate_ey := __common__( if(min(sysdate, _ver_src_id_ldate_ey2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ey2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_ey := if(min(sysdate, _ver_src_id_ldate_ey2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ey2) / 30.5));
+mth__ver_src_id_ldate_ey := __common__( if(min(sysdate, _ver_src_id_ldate_ey2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ey2) / 30.5)) ) ;
 
-_ver_src_id_f_pos := Models.Common.findw_cpp(ver_src_id_list, 'F' , '  ,', 'ie');
+_ver_src_id_f_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'F' , '  ,', 'ie') ) ;
 
-_ver_src_id__f := _ver_src_id_f_pos > 0;
+_ver_src_id__f := __common__( _ver_src_id_f_pos > 0 ) ;
 
-_ver_src_id_fdate_f := if(_ver_src_id_f_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_f_pos), '0');
+_ver_src_id_fdate_f := __common__( if(_ver_src_id_f_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_f_pos), '0') ) ;
 
-_ver_src_id_fdate_f2 := common.sas_date((string)(_ver_src_id_fdate_f));
+_ver_src_id_fdate_f2 := __common__( common.sas_date((string)(_ver_src_id_fdate_f)) ) ;
 
-yr__ver_src_id_fdate_f := if(min(sysdate, _ver_src_id_fdate_f2) = NULL, NULL, (sysdate - _ver_src_id_fdate_f2) / 365.25);
+yr__ver_src_id_fdate_f := __common__( if(min(sysdate, _ver_src_id_fdate_f2) = NULL, NULL, (sysdate - _ver_src_id_fdate_f2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_f := if(min(sysdate, _ver_src_id_fdate_f2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_f2) / 30.5));
+mth__ver_src_id_fdate_f := __common__( if(min(sysdate, _ver_src_id_fdate_f2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_f2) / 30.5)) ) ;
 
-_ver_src_id_ldate_f := if(_ver_src_id_f_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_f_pos), '0');
+_ver_src_id_ldate_f := __common__( if(_ver_src_id_f_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_f_pos), '0') ) ;
 
-_ver_src_id_ldate_f2 := common.sas_date((string)(_ver_src_id_ldate_f));
+_ver_src_id_ldate_f2 := __common__( common.sas_date((string)(_ver_src_id_ldate_f)) ) ;
 
-yr__ver_src_id_ldate_f := if(min(sysdate, _ver_src_id_ldate_f2) = NULL, NULL, (sysdate - _ver_src_id_ldate_f2) / 365.25);
+yr__ver_src_id_ldate_f := __common__( if(min(sysdate, _ver_src_id_ldate_f2) = NULL, NULL, (sysdate - _ver_src_id_ldate_f2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_f := if(min(sysdate, _ver_src_id_ldate_f2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_f2) / 30.5));
+mth__ver_src_id_ldate_f := __common__( if(min(sysdate, _ver_src_id_ldate_f2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_f2) / 30.5)) ) ;
 
-_ver_src_id_fk_pos := Models.Common.findw_cpp(ver_src_id_list, 'FK' , '  ,', 'ie');
+_ver_src_id_fk_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'FK' , '  ,', 'ie') ) ;
 
-_ver_src_id__fk := _ver_src_id_fk_pos > 0;
+_ver_src_id__fk := __common__( _ver_src_id_fk_pos > 0 ) ;
 
-_ver_src_id_fdate_fk := if(_ver_src_id_fk_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_fk_pos), '0');
+_ver_src_id_fdate_fk := __common__( if(_ver_src_id_fk_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_fk_pos), '0') ) ;
 
-_ver_src_id_fdate_fk2 := common.sas_date((string)(_ver_src_id_fdate_fk));
+_ver_src_id_fdate_fk2 := __common__( common.sas_date((string)(_ver_src_id_fdate_fk)) ) ;
 
-yr__ver_src_id_fdate_fk := if(min(sysdate, _ver_src_id_fdate_fk2) = NULL, NULL, (sysdate - _ver_src_id_fdate_fk2) / 365.25);
+yr__ver_src_id_fdate_fk := __common__( if(min(sysdate, _ver_src_id_fdate_fk2) = NULL, NULL, (sysdate - _ver_src_id_fdate_fk2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_fk := if(min(sysdate, _ver_src_id_fdate_fk2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fk2) / 30.5));
+mth__ver_src_id_fdate_fk := __common__( if(min(sysdate, _ver_src_id_fdate_fk2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fk2) / 30.5)) ) ;
 
-_ver_src_id_ldate_fk := if(_ver_src_id_fk_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_fk_pos), '0');
+_ver_src_id_ldate_fk := __common__( if(_ver_src_id_fk_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_fk_pos), '0') ) ;
 
-_ver_src_id_ldate_fk2 := common.sas_date((string)(_ver_src_id_ldate_fk));
+_ver_src_id_ldate_fk2 := __common__( common.sas_date((string)(_ver_src_id_ldate_fk)) ) ;
 
-yr__ver_src_id_ldate_fk := if(min(sysdate, _ver_src_id_ldate_fk2) = NULL, NULL, (sysdate - _ver_src_id_ldate_fk2) / 365.25);
+yr__ver_src_id_ldate_fk := __common__( if(min(sysdate, _ver_src_id_ldate_fk2) = NULL, NULL, (sysdate - _ver_src_id_ldate_fk2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_fk := if(min(sysdate, _ver_src_id_ldate_fk2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fk2) / 30.5));
+mth__ver_src_id_ldate_fk := __common__( if(min(sysdate, _ver_src_id_ldate_fk2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fk2) / 30.5)) ) ;
 
-_ver_src_id_fr_pos := Models.Common.findw_cpp(ver_src_id_list, 'FR' , '  ,', 'ie');
+_ver_src_id_fr_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'FR' , '  ,', 'ie') ) ;
 
-_ver_src_id__fr := _ver_src_id_fr_pos > 0;
+_ver_src_id__fr := __common__( _ver_src_id_fr_pos > 0 ) ;
 
-_ver_src_id_fdate_fr := if(_ver_src_id_fr_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_fr_pos), '0');
+_ver_src_id_fdate_fr := __common__( if(_ver_src_id_fr_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_fr_pos), '0') ) ;
 
-_ver_src_id_fdate_fr2 := common.sas_date((string)(_ver_src_id_fdate_fr));
+_ver_src_id_fdate_fr2 := __common__( common.sas_date((string)(_ver_src_id_fdate_fr)) ) ;
 
-yr__ver_src_id_fdate_fr := if(min(sysdate, _ver_src_id_fdate_fr2) = NULL, NULL, (sysdate - _ver_src_id_fdate_fr2) / 365.25);
+yr__ver_src_id_fdate_fr := __common__( if(min(sysdate, _ver_src_id_fdate_fr2) = NULL, NULL, (sysdate - _ver_src_id_fdate_fr2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_fr := if(min(sysdate, _ver_src_id_fdate_fr2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fr2) / 30.5));
+mth__ver_src_id_fdate_fr := __common__( if(min(sysdate, _ver_src_id_fdate_fr2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_fr2) / 30.5)) ) ;
 
-_ver_src_id_ldate_fr := if(_ver_src_id_fr_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_fr_pos), '0');
+_ver_src_id_ldate_fr := __common__( if(_ver_src_id_fr_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_fr_pos), '0') ) ;
 
-_ver_src_id_ldate_fr2 := common.sas_date((string)(_ver_src_id_ldate_fr));
+_ver_src_id_ldate_fr2 := __common__( common.sas_date((string)(_ver_src_id_ldate_fr)) ) ;
 
-yr__ver_src_id_ldate_fr := if(min(sysdate, _ver_src_id_ldate_fr2) = NULL, NULL, (sysdate - _ver_src_id_ldate_fr2) / 365.25);
+yr__ver_src_id_ldate_fr := __common__( if(min(sysdate, _ver_src_id_ldate_fr2) = NULL, NULL, (sysdate - _ver_src_id_ldate_fr2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_fr := if(min(sysdate, _ver_src_id_ldate_fr2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fr2) / 30.5));
+mth__ver_src_id_ldate_fr := __common__( if(min(sysdate, _ver_src_id_ldate_fr2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_fr2) / 30.5)) ) ;
 
-_ver_src_id_ft_pos := Models.Common.findw_cpp(ver_src_id_list, 'FT' , '  ,', 'ie');
+_ver_src_id_ft_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'FT' , '  ,', 'ie') ) ;
 
-_ver_src_id__ft := _ver_src_id_ft_pos > 0;
+_ver_src_id__ft := __common__( _ver_src_id_ft_pos > 0 ) ;
 
-_ver_src_id_fdate_ft := if(_ver_src_id_ft_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ft_pos), '0');
+_ver_src_id_fdate_ft := __common__( if(_ver_src_id_ft_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ft_pos), '0') ) ;
 
-_ver_src_id_fdate_ft2 := common.sas_date((string)(_ver_src_id_fdate_ft));
+_ver_src_id_fdate_ft2 := __common__( common.sas_date((string)(_ver_src_id_fdate_ft)) ) ;
 
-yr__ver_src_id_fdate_ft := if(min(sysdate, _ver_src_id_fdate_ft2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ft2) / 365.25);
+yr__ver_src_id_fdate_ft := __common__( if(min(sysdate, _ver_src_id_fdate_ft2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ft2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_ft := if(min(sysdate, _ver_src_id_fdate_ft2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ft2) / 30.5));
+mth__ver_src_id_fdate_ft := __common__( if(min(sysdate, _ver_src_id_fdate_ft2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ft2) / 30.5)) ) ;
 
-_ver_src_id_ldate_ft := if(_ver_src_id_ft_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ft_pos), '0');
+_ver_src_id_ldate_ft := __common__( if(_ver_src_id_ft_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ft_pos), '0') ) ;
 
-_ver_src_id_ldate_ft2 := common.sas_date((string)(_ver_src_id_ldate_ft));
+_ver_src_id_ldate_ft2 := __common__( common.sas_date((string)(_ver_src_id_ldate_ft)) ) ;
 
-yr__ver_src_id_ldate_ft := if(min(sysdate, _ver_src_id_ldate_ft2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ft2) / 365.25);
+yr__ver_src_id_ldate_ft := __common__( if(min(sysdate, _ver_src_id_ldate_ft2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ft2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_ft := if(min(sysdate, _ver_src_id_ldate_ft2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ft2) / 30.5));
+mth__ver_src_id_ldate_ft := __common__( if(min(sysdate, _ver_src_id_ldate_ft2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ft2) / 30.5)) ) ;
 
-_ver_src_id_gr_pos := Models.Common.findw_cpp(ver_src_id_list, 'GR' , '  ,', 'ie');
+_ver_src_id_gr_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'GR' , '  ,', 'ie') ) ;
 
-_ver_src_id__gr := _ver_src_id_gr_pos > 0;
+_ver_src_id__gr := __common__( _ver_src_id_gr_pos > 0 ) ;
 
-_ver_src_id_fdate_gr := if(_ver_src_id_gr_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_gr_pos), '0');
+_ver_src_id_fdate_gr := __common__( if(_ver_src_id_gr_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_gr_pos), '0') ) ;
 
-_ver_src_id_fdate_gr2 := common.sas_date((string)(_ver_src_id_fdate_gr));
+_ver_src_id_fdate_gr2 := __common__( common.sas_date((string)(_ver_src_id_fdate_gr)) ) ;
 
-yr__ver_src_id_fdate_gr := if(min(sysdate, _ver_src_id_fdate_gr2) = NULL, NULL, (sysdate - _ver_src_id_fdate_gr2) / 365.25);
+yr__ver_src_id_fdate_gr := __common__( if(min(sysdate, _ver_src_id_fdate_gr2) = NULL, NULL, (sysdate - _ver_src_id_fdate_gr2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_gr := if(min(sysdate, _ver_src_id_fdate_gr2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_gr2) / 30.5));
+mth__ver_src_id_fdate_gr := __common__( if(min(sysdate, _ver_src_id_fdate_gr2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_gr2) / 30.5)) ) ;
 
-_ver_src_id_ldate_gr := if(_ver_src_id_gr_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_gr_pos), '0');
+_ver_src_id_ldate_gr := __common__( if(_ver_src_id_gr_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_gr_pos), '0') ) ;
 
-_ver_src_id_ldate_gr2 := common.sas_date((string)(_ver_src_id_ldate_gr));
+_ver_src_id_ldate_gr2 := __common__( common.sas_date((string)(_ver_src_id_ldate_gr)) ) ;
 
-yr__ver_src_id_ldate_gr := if(min(sysdate, _ver_src_id_ldate_gr2) = NULL, NULL, (sysdate - _ver_src_id_ldate_gr2) / 365.25);
+yr__ver_src_id_ldate_gr := __common__( if(min(sysdate, _ver_src_id_ldate_gr2) = NULL, NULL, (sysdate - _ver_src_id_ldate_gr2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_gr := if(min(sysdate, _ver_src_id_ldate_gr2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_gr2) / 30.5));
+mth__ver_src_id_ldate_gr := __common__( if(min(sysdate, _ver_src_id_ldate_gr2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_gr2) / 30.5)) ) ;
 
-_ver_src_id_h7_pos := Models.Common.findw_cpp(ver_src_id_list, 'H7' , '  ,', 'ie');
+_ver_src_id_h7_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'H7' , '  ,', 'ie') ) ;
 
-_ver_src_id__h7 := _ver_src_id_h7_pos > 0;
+_ver_src_id__h7 := __common__( _ver_src_id_h7_pos > 0 ) ;
 
-_ver_src_id_fdate_h7 := if(_ver_src_id_h7_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_h7_pos), '0');
+_ver_src_id_fdate_h7 := __common__( if(_ver_src_id_h7_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_h7_pos), '0') ) ;
 
-_ver_src_id_fdate_h72 := common.sas_date((string)(_ver_src_id_fdate_h7));
+_ver_src_id_fdate_h72 := __common__( common.sas_date((string)(_ver_src_id_fdate_h7)) ) ;
 
-yr__ver_src_id_fdate_h7 := if(min(sysdate, _ver_src_id_fdate_h72) = NULL, NULL, (sysdate - _ver_src_id_fdate_h72) / 365.25);
+yr__ver_src_id_fdate_h7 := __common__( if(min(sysdate, _ver_src_id_fdate_h72) = NULL, NULL, (sysdate - _ver_src_id_fdate_h72) / 365.25) ) ;
 
-mth__ver_src_id_fdate_h7 := if(min(sysdate, _ver_src_id_fdate_h72) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_h72) / 30.5));
+mth__ver_src_id_fdate_h7 := __common__( if(min(sysdate, _ver_src_id_fdate_h72) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_h72) / 30.5)) ) ;
 
-_ver_src_id_ldate_h7 := if(_ver_src_id_h7_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_h7_pos), '0');
+_ver_src_id_ldate_h7 := __common__( if(_ver_src_id_h7_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_h7_pos), '0') ) ;
 
-_ver_src_id_ldate_h72 := common.sas_date((string)(_ver_src_id_ldate_h7));
+_ver_src_id_ldate_h72 := __common__( common.sas_date((string)(_ver_src_id_ldate_h7)) ) ;
 
-yr__ver_src_id_ldate_h7 := if(min(sysdate, _ver_src_id_ldate_h72) = NULL, NULL, (sysdate - _ver_src_id_ldate_h72) / 365.25);
+yr__ver_src_id_ldate_h7 := __common__( if(min(sysdate, _ver_src_id_ldate_h72) = NULL, NULL, (sysdate - _ver_src_id_ldate_h72) / 365.25) ) ;
 
-mth__ver_src_id_ldate_h7 := if(min(sysdate, _ver_src_id_ldate_h72) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_h72) / 30.5));
+mth__ver_src_id_ldate_h7 := __common__( if(min(sysdate, _ver_src_id_ldate_h72) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_h72) / 30.5)) ) ;
 
-_ver_src_id_ic_pos := Models.Common.findw_cpp(ver_src_id_list, 'IC' , '  ,', 'ie');
+_ver_src_id_ic_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'IC' , '  ,', 'ie') ) ;
 
-_ver_src_id__ic := _ver_src_id_ic_pos > 0;
+_ver_src_id__ic := __common__( _ver_src_id_ic_pos > 0 ) ;
 
-_ver_src_id_fdate_ic := if(_ver_src_id_ic_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ic_pos), '0');
+_ver_src_id_fdate_ic := __common__( if(_ver_src_id_ic_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ic_pos), '0') ) ;
 
-_ver_src_id_fdate_ic2 := common.sas_date((string)(_ver_src_id_fdate_ic));
+_ver_src_id_fdate_ic2 := __common__( common.sas_date((string)(_ver_src_id_fdate_ic)) ) ;
 
-yr__ver_src_id_fdate_ic := if(min(sysdate, _ver_src_id_fdate_ic2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ic2) / 365.25);
+yr__ver_src_id_fdate_ic := __common__( if(min(sysdate, _ver_src_id_fdate_ic2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ic2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_ic := if(min(sysdate, _ver_src_id_fdate_ic2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ic2) / 30.5));
+mth__ver_src_id_fdate_ic := __common__( if(min(sysdate, _ver_src_id_fdate_ic2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ic2) / 30.5)) ) ;
 
-_ver_src_id_ldate_ic := if(_ver_src_id_ic_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ic_pos), '0');
+_ver_src_id_ldate_ic := __common__( if(_ver_src_id_ic_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ic_pos), '0') ) ;
 
-_ver_src_id_ldate_ic2 := common.sas_date((string)(_ver_src_id_ldate_ic));
+_ver_src_id_ldate_ic2 := __common__( common.sas_date((string)(_ver_src_id_ldate_ic)) ) ;
 
-yr__ver_src_id_ldate_ic := if(min(sysdate, _ver_src_id_ldate_ic2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ic2) / 365.25);
+yr__ver_src_id_ldate_ic := __common__( if(min(sysdate, _ver_src_id_ldate_ic2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ic2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_ic := if(min(sysdate, _ver_src_id_ldate_ic2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ic2) / 30.5));
+mth__ver_src_id_ldate_ic := __common__( if(min(sysdate, _ver_src_id_ldate_ic2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ic2) / 30.5)) ) ;
 
-_ver_src_id_ip_pos := Models.Common.findw_cpp(ver_src_id_list, 'IP' , '  ,', 'ie');
+_ver_src_id_ip_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'IP' , '  ,', 'ie') ) ;
 
-_ver_src_id__ip := _ver_src_id_ip_pos > 0;
+_ver_src_id__ip := __common__( _ver_src_id_ip_pos > 0 ) ;
 
-_ver_src_id_fdate_ip := if(_ver_src_id_ip_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ip_pos), '0');
+_ver_src_id_fdate_ip := __common__( if(_ver_src_id_ip_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ip_pos), '0') ) ;
 
-_ver_src_id_fdate_ip2 := common.sas_date((string)(_ver_src_id_fdate_ip));
+_ver_src_id_fdate_ip2 := __common__( common.sas_date((string)(_ver_src_id_fdate_ip)) ) ;
 
-yr__ver_src_id_fdate_ip := if(min(sysdate, _ver_src_id_fdate_ip2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ip2) / 365.25);
+yr__ver_src_id_fdate_ip := __common__( if(min(sysdate, _ver_src_id_fdate_ip2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ip2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_ip := if(min(sysdate, _ver_src_id_fdate_ip2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ip2) / 30.5));
+mth__ver_src_id_fdate_ip := __common__( if(min(sysdate, _ver_src_id_fdate_ip2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ip2) / 30.5)) ) ;
 
-_ver_src_id_ldate_ip := if(_ver_src_id_ip_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ip_pos), '0');
+_ver_src_id_ldate_ip := __common__( if(_ver_src_id_ip_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ip_pos), '0') ) ;
 
-_ver_src_id_ldate_ip2 := common.sas_date((string)(_ver_src_id_ldate_ip));
+_ver_src_id_ldate_ip2 := __common__( common.sas_date((string)(_ver_src_id_ldate_ip)) ) ;
 
-yr__ver_src_id_ldate_ip := if(min(sysdate, _ver_src_id_ldate_ip2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ip2) / 365.25);
+yr__ver_src_id_ldate_ip := __common__( if(min(sysdate, _ver_src_id_ldate_ip2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ip2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_ip := if(min(sysdate, _ver_src_id_ldate_ip2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ip2) / 30.5));
+mth__ver_src_id_ldate_ip := __common__( if(min(sysdate, _ver_src_id_ldate_ip2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ip2) / 30.5)) ) ;
 
-_ver_src_id_is_pos := Models.Common.findw_cpp(ver_src_id_list, 'IS' , '  ,', 'ie');
+_ver_src_id_is_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'IS' , '  ,', 'ie') ) ;
 
-_ver_src_id__is := _ver_src_id_is_pos > 0;
+_ver_src_id__is := __common__( _ver_src_id_is_pos > 0 ) ;
 
-_ver_src_id_fdate_is := if(_ver_src_id_is_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_is_pos), '0');
+_ver_src_id_fdate_is := __common__( if(_ver_src_id_is_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_is_pos), '0') ) ;
 
-_ver_src_id_fdate_is2 := common.sas_date((string)(_ver_src_id_fdate_is));
+_ver_src_id_fdate_is2 := __common__( common.sas_date((string)(_ver_src_id_fdate_is)) ) ;
 
-yr__ver_src_id_fdate_is := if(min(sysdate, _ver_src_id_fdate_is2) = NULL, NULL, (sysdate - _ver_src_id_fdate_is2) / 365.25);
+yr__ver_src_id_fdate_is := __common__( if(min(sysdate, _ver_src_id_fdate_is2) = NULL, NULL, (sysdate - _ver_src_id_fdate_is2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_is := if(min(sysdate, _ver_src_id_fdate_is2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_is2) / 30.5));
+mth__ver_src_id_fdate_is := __common__( if(min(sysdate, _ver_src_id_fdate_is2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_is2) / 30.5)) ) ;
 
-_ver_src_id_ldate_is := if(_ver_src_id_is_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_is_pos), '0');
+_ver_src_id_ldate_is := __common__( if(_ver_src_id_is_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_is_pos), '0') ) ;
 
-_ver_src_id_ldate_is2 := common.sas_date((string)(_ver_src_id_ldate_is));
+_ver_src_id_ldate_is2 := __common__( common.sas_date((string)(_ver_src_id_ldate_is)) ) ;
 
-yr__ver_src_id_ldate_is := if(min(sysdate, _ver_src_id_ldate_is2) = NULL, NULL, (sysdate - _ver_src_id_ldate_is2) / 365.25);
+yr__ver_src_id_ldate_is := __common__( if(min(sysdate, _ver_src_id_ldate_is2) = NULL, NULL, (sysdate - _ver_src_id_ldate_is2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_is := if(min(sysdate, _ver_src_id_ldate_is2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_is2) / 30.5));
+mth__ver_src_id_ldate_is := __common__( if(min(sysdate, _ver_src_id_ldate_is2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_is2) / 30.5)) ) ;
 
-_ver_src_id_it_pos := Models.Common.findw_cpp(ver_src_id_list, 'IT' , '  ,', 'ie');
+_ver_src_id_it_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'IT' , '  ,', 'ie') ) ;
 
-_ver_src_id__it := _ver_src_id_it_pos > 0;
+_ver_src_id__it := __common__( _ver_src_id_it_pos > 0 ) ;
 
-_ver_src_id_fdate_it := if(_ver_src_id_it_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_it_pos), '0');
+_ver_src_id_fdate_it := __common__( if(_ver_src_id_it_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_it_pos), '0') ) ;
 
-_ver_src_id_fdate_it2 := common.sas_date((string)(_ver_src_id_fdate_it));
+_ver_src_id_fdate_it2 := __common__( common.sas_date((string)(_ver_src_id_fdate_it)) ) ;
 
-yr__ver_src_id_fdate_it := if(min(sysdate, _ver_src_id_fdate_it2) = NULL, NULL, (sysdate - _ver_src_id_fdate_it2) / 365.25);
+yr__ver_src_id_fdate_it := __common__( if(min(sysdate, _ver_src_id_fdate_it2) = NULL, NULL, (sysdate - _ver_src_id_fdate_it2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_it := if(min(sysdate, _ver_src_id_fdate_it2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_it2) / 30.5));
+mth__ver_src_id_fdate_it := __common__( if(min(sysdate, _ver_src_id_fdate_it2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_it2) / 30.5)) ) ;
 
-_ver_src_id_ldate_it := if(_ver_src_id_it_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_it_pos), '0');
+_ver_src_id_ldate_it := __common__( if(_ver_src_id_it_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_it_pos), '0') ) ;
 
-_ver_src_id_ldate_it2 := common.sas_date((string)(_ver_src_id_ldate_it));
+_ver_src_id_ldate_it2 := __common__( common.sas_date((string)(_ver_src_id_ldate_it)) ) ;
 
-yr__ver_src_id_ldate_it := if(min(sysdate, _ver_src_id_ldate_it2) = NULL, NULL, (sysdate - _ver_src_id_ldate_it2) / 365.25);
+yr__ver_src_id_ldate_it := __common__( if(min(sysdate, _ver_src_id_ldate_it2) = NULL, NULL, (sysdate - _ver_src_id_ldate_it2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_it := if(min(sysdate, _ver_src_id_ldate_it2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_it2) / 30.5));
+mth__ver_src_id_ldate_it := __common__( if(min(sysdate, _ver_src_id_ldate_it2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_it2) / 30.5)) ) ;
 
-_ver_src_id_j2_pos := Models.Common.findw_cpp(ver_src_id_list, 'J2' , '  ,', 'ie');
+_ver_src_id_j2_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'J2' , '  ,', 'ie') ) ;
 
-_ver_src_id__j2 := _ver_src_id_j2_pos > 0;
+_ver_src_id__j2 := __common__( _ver_src_id_j2_pos > 0 ) ;
 
-_ver_src_id_fdate_j2 := if(_ver_src_id_j2_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_j2_pos), '0');
+_ver_src_id_fdate_j2 := __common__( if(_ver_src_id_j2_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_j2_pos), '0') ) ;
 
-_ver_src_id_fdate_j22 := common.sas_date((string)(_ver_src_id_fdate_j2));
+_ver_src_id_fdate_j22 := __common__( common.sas_date((string)(_ver_src_id_fdate_j2)) ) ;
 
-yr__ver_src_id_fdate_j2 := if(min(sysdate, _ver_src_id_fdate_j22) = NULL, NULL, (sysdate - _ver_src_id_fdate_j22) / 365.25);
+yr__ver_src_id_fdate_j2 := __common__( if(min(sysdate, _ver_src_id_fdate_j22) = NULL, NULL, (sysdate - _ver_src_id_fdate_j22) / 365.25) ) ;
 
-mth__ver_src_id_fdate_j2 := if(min(sysdate, _ver_src_id_fdate_j22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_j22) / 30.5));
+mth__ver_src_id_fdate_j2 := __common__( if(min(sysdate, _ver_src_id_fdate_j22) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_j22) / 30.5)) ) ;
 
-_ver_src_id_ldate_j2 := if(_ver_src_id_j2_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_j2_pos), '0');
+_ver_src_id_ldate_j2 := __common__( if(_ver_src_id_j2_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_j2_pos), '0') ) ;
 
-_ver_src_id_ldate_j22 := common.sas_date((string)(_ver_src_id_ldate_j2));
+_ver_src_id_ldate_j22 := __common__( common.sas_date((string)(_ver_src_id_ldate_j2)) ) ;
 
-yr__ver_src_id_ldate_j2 := if(min(sysdate, _ver_src_id_ldate_j22) = NULL, NULL, (sysdate - _ver_src_id_ldate_j22) / 365.25);
+yr__ver_src_id_ldate_j2 := __common__( if(min(sysdate, _ver_src_id_ldate_j22) = NULL, NULL, (sysdate - _ver_src_id_ldate_j22) / 365.25) ) ;
 
-mth__ver_src_id_ldate_j2 := if(min(sysdate, _ver_src_id_ldate_j22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_j22) / 30.5));
+mth__ver_src_id_ldate_j2 := __common__( if(min(sysdate, _ver_src_id_ldate_j22) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_j22) / 30.5)) ) ;
 
-_ver_src_id_kc_pos := Models.Common.findw_cpp(ver_src_id_list, 'KC' , '  ,', 'ie');
+_ver_src_id_kc_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'KC' , '  ,', 'ie') ) ;
 
-_ver_src_id__kc := _ver_src_id_kc_pos > 0;
+_ver_src_id__kc := __common__( _ver_src_id_kc_pos > 0 ) ;
 
-_ver_src_id_fdate_kc := if(_ver_src_id_kc_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_kc_pos), '0');
+_ver_src_id_fdate_kc := __common__( if(_ver_src_id_kc_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_kc_pos), '0') ) ;
 
-_ver_src_id_fdate_kc2 := common.sas_date((string)(_ver_src_id_fdate_kc));
+_ver_src_id_fdate_kc2 := __common__( common.sas_date((string)(_ver_src_id_fdate_kc)) ) ;
 
-yr__ver_src_id_fdate_kc := if(min(sysdate, _ver_src_id_fdate_kc2) = NULL, NULL, (sysdate - _ver_src_id_fdate_kc2) / 365.25);
+yr__ver_src_id_fdate_kc := __common__( if(min(sysdate, _ver_src_id_fdate_kc2) = NULL, NULL, (sysdate - _ver_src_id_fdate_kc2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_kc := if(min(sysdate, _ver_src_id_fdate_kc2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_kc2) / 30.5));
+mth__ver_src_id_fdate_kc := __common__( if(min(sysdate, _ver_src_id_fdate_kc2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_kc2) / 30.5)) ) ;
 
-_ver_src_id_ldate_kc := if(_ver_src_id_kc_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_kc_pos), '0');
+_ver_src_id_ldate_kc := __common__( if(_ver_src_id_kc_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_kc_pos), '0') ) ;
 
-_ver_src_id_ldate_kc2 := common.sas_date((string)(_ver_src_id_ldate_kc));
+_ver_src_id_ldate_kc2 := __common__( common.sas_date((string)(_ver_src_id_ldate_kc)) ) ;
 
-yr__ver_src_id_ldate_kc := if(min(sysdate, _ver_src_id_ldate_kc2) = NULL, NULL, (sysdate - _ver_src_id_ldate_kc2) / 365.25);
+yr__ver_src_id_ldate_kc := __common__( if(min(sysdate, _ver_src_id_ldate_kc2) = NULL, NULL, (sysdate - _ver_src_id_ldate_kc2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_kc := if(min(sysdate, _ver_src_id_ldate_kc2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_kc2) / 30.5));
+mth__ver_src_id_ldate_kc := __common__( if(min(sysdate, _ver_src_id_ldate_kc2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_kc2) / 30.5)) ) ;
 
-_ver_src_id_mh_pos := Models.Common.findw_cpp(ver_src_id_list, 'MH' , '  ,', 'ie');
+_ver_src_id_mh_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'MH' , '  ,', 'ie') ) ;
 
-_ver_src_id__mh := _ver_src_id_mh_pos > 0;
+_ver_src_id__mh := __common__( _ver_src_id_mh_pos > 0 ) ;
 
-_ver_src_id_fdate_mh := if(_ver_src_id_mh_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_mh_pos), '0');
+_ver_src_id_fdate_mh := __common__( if(_ver_src_id_mh_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_mh_pos), '0') ) ;
 
-_ver_src_id_fdate_mh2 := common.sas_date((string)(_ver_src_id_fdate_mh));
+_ver_src_id_fdate_mh2 := __common__( common.sas_date((string)(_ver_src_id_fdate_mh)) ) ;
 
-yr__ver_src_id_fdate_mh := if(min(sysdate, _ver_src_id_fdate_mh2) = NULL, NULL, (sysdate - _ver_src_id_fdate_mh2) / 365.25);
+yr__ver_src_id_fdate_mh := __common__( if(min(sysdate, _ver_src_id_fdate_mh2) = NULL, NULL, (sysdate - _ver_src_id_fdate_mh2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_mh := if(min(sysdate, _ver_src_id_fdate_mh2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_mh2) / 30.5));
+mth__ver_src_id_fdate_mh := __common__( if(min(sysdate, _ver_src_id_fdate_mh2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_mh2) / 30.5)) ) ;
 
-_ver_src_id_ldate_mh := if(_ver_src_id_mh_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_mh_pos), '0');
+_ver_src_id_ldate_mh := __common__( if(_ver_src_id_mh_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_mh_pos), '0') ) ;
 
-_ver_src_id_ldate_mh2 := common.sas_date((string)(_ver_src_id_ldate_mh));
+_ver_src_id_ldate_mh2 := __common__( common.sas_date((string)(_ver_src_id_ldate_mh)) ) ;
 
-yr__ver_src_id_ldate_mh := if(min(sysdate, _ver_src_id_ldate_mh2) = NULL, NULL, (sysdate - _ver_src_id_ldate_mh2) / 365.25);
+yr__ver_src_id_ldate_mh := __common__( if(min(sysdate, _ver_src_id_ldate_mh2) = NULL, NULL, (sysdate - _ver_src_id_ldate_mh2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_mh := if(min(sysdate, _ver_src_id_ldate_mh2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_mh2) / 30.5));
+mth__ver_src_id_ldate_mh := __common__( if(min(sysdate, _ver_src_id_ldate_mh2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_mh2) / 30.5)) ) ;
 
-_ver_src_id_mw_pos := Models.Common.findw_cpp(ver_src_id_list, 'MW' , '  ,', 'ie');
+_ver_src_id_mw_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'MW' , '  ,', 'ie') ) ;
 
-_ver_src_id__mw := _ver_src_id_mw_pos > 0;
+_ver_src_id__mw := __common__( _ver_src_id_mw_pos > 0 ) ;
 
-_ver_src_id_fdate_mw := if(_ver_src_id_mw_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_mw_pos), '0');
+_ver_src_id_fdate_mw := __common__( if(_ver_src_id_mw_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_mw_pos), '0') ) ;
 
-_ver_src_id_fdate_mw2 := common.sas_date((string)(_ver_src_id_fdate_mw));
+_ver_src_id_fdate_mw2 := __common__( common.sas_date((string)(_ver_src_id_fdate_mw)) ) ;
 
-yr__ver_src_id_fdate_mw := if(min(sysdate, _ver_src_id_fdate_mw2) = NULL, NULL, (sysdate - _ver_src_id_fdate_mw2) / 365.25);
+yr__ver_src_id_fdate_mw := __common__( if(min(sysdate, _ver_src_id_fdate_mw2) = NULL, NULL, (sysdate - _ver_src_id_fdate_mw2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_mw := if(min(sysdate, _ver_src_id_fdate_mw2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_mw2) / 30.5));
+mth__ver_src_id_fdate_mw := __common__( if(min(sysdate, _ver_src_id_fdate_mw2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_mw2) / 30.5)) ) ;
 
-_ver_src_id_ldate_mw := if(_ver_src_id_mw_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_mw_pos), '0');
+_ver_src_id_ldate_mw := __common__( if(_ver_src_id_mw_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_mw_pos), '0') ) ;
 
-_ver_src_id_ldate_mw2 := common.sas_date((string)(_ver_src_id_ldate_mw));
+_ver_src_id_ldate_mw2 := __common__( common.sas_date((string)(_ver_src_id_ldate_mw)) ) ;
 
-yr__ver_src_id_ldate_mw := if(min(sysdate, _ver_src_id_ldate_mw2) = NULL, NULL, (sysdate - _ver_src_id_ldate_mw2) / 365.25);
+yr__ver_src_id_ldate_mw := __common__( if(min(sysdate, _ver_src_id_ldate_mw2) = NULL, NULL, (sysdate - _ver_src_id_ldate_mw2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_mw := if(min(sysdate, _ver_src_id_ldate_mw2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_mw2) / 30.5));
+mth__ver_src_id_ldate_mw := __common__( if(min(sysdate, _ver_src_id_ldate_mw2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_mw2) / 30.5)) ) ;
 
-_ver_src_id_np_pos := Models.Common.findw_cpp(ver_src_id_list, 'NP' , '  ,', 'ie');
+_ver_src_id_np_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'NP' , '  ,', 'ie') ) ;
 
-_ver_src_id__np := _ver_src_id_np_pos > 0;
+_ver_src_id__np := __common__( _ver_src_id_np_pos > 0 ) ;
 
-_ver_src_id_fdate_np := if(_ver_src_id_np_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_np_pos), '0');
+_ver_src_id_fdate_np := __common__( if(_ver_src_id_np_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_np_pos), '0') ) ;
 
-_ver_src_id_fdate_np2 := common.sas_date((string)(_ver_src_id_fdate_np));
+_ver_src_id_fdate_np2 := __common__( common.sas_date((string)(_ver_src_id_fdate_np)) ) ;
 
-yr__ver_src_id_fdate_np := if(min(sysdate, _ver_src_id_fdate_np2) = NULL, NULL, (sysdate - _ver_src_id_fdate_np2) / 365.25);
+yr__ver_src_id_fdate_np := __common__( if(min(sysdate, _ver_src_id_fdate_np2) = NULL, NULL, (sysdate - _ver_src_id_fdate_np2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_np := if(min(sysdate, _ver_src_id_fdate_np2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_np2) / 30.5));
+mth__ver_src_id_fdate_np := __common__( if(min(sysdate, _ver_src_id_fdate_np2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_np2) / 30.5)) ) ;
 
-_ver_src_id_ldate_np := if(_ver_src_id_np_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_np_pos), '0');
+_ver_src_id_ldate_np := __common__( if(_ver_src_id_np_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_np_pos), '0') ) ;
 
-_ver_src_id_ldate_np2 := common.sas_date((string)(_ver_src_id_ldate_np));
+_ver_src_id_ldate_np2 := __common__( common.sas_date((string)(_ver_src_id_ldate_np)) ) ;
 
-yr__ver_src_id_ldate_np := if(min(sysdate, _ver_src_id_ldate_np2) = NULL, NULL, (sysdate - _ver_src_id_ldate_np2) / 365.25);
+yr__ver_src_id_ldate_np := __common__( if(min(sysdate, _ver_src_id_ldate_np2) = NULL, NULL, (sysdate - _ver_src_id_ldate_np2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_np := if(min(sysdate, _ver_src_id_ldate_np2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_np2) / 30.5));
+mth__ver_src_id_ldate_np := __common__( if(min(sysdate, _ver_src_id_ldate_np2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_np2) / 30.5)) ) ;
 
-_ver_src_id_nr_pos := Models.Common.findw_cpp(ver_src_id_list, 'NR' , '  ,', 'ie');
+_ver_src_id_nr_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'NR' , '  ,', 'ie') ) ;
 
-_ver_src_id__nr := _ver_src_id_nr_pos > 0;
+_ver_src_id__nr := __common__( _ver_src_id_nr_pos > 0 ) ;
 
-_ver_src_id_fdate_nr := if(_ver_src_id_nr_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_nr_pos), '0');
+_ver_src_id_fdate_nr := __common__( if(_ver_src_id_nr_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_nr_pos), '0') ) ;
 
-_ver_src_id_fdate_nr2 := common.sas_date((string)(_ver_src_id_fdate_nr));
+_ver_src_id_fdate_nr2 := __common__( common.sas_date((string)(_ver_src_id_fdate_nr)) ) ;
 
-yr__ver_src_id_fdate_nr := if(min(sysdate, _ver_src_id_fdate_nr2) = NULL, NULL, (sysdate - _ver_src_id_fdate_nr2) / 365.25);
+yr__ver_src_id_fdate_nr := __common__( if(min(sysdate, _ver_src_id_fdate_nr2) = NULL, NULL, (sysdate - _ver_src_id_fdate_nr2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_nr := if(min(sysdate, _ver_src_id_fdate_nr2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_nr2) / 30.5));
+mth__ver_src_id_fdate_nr := __common__( if(min(sysdate, _ver_src_id_fdate_nr2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_nr2) / 30.5)) ) ;
 
-_ver_src_id_ldate_nr := if(_ver_src_id_nr_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_nr_pos), '0');
+_ver_src_id_ldate_nr := __common__( if(_ver_src_id_nr_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_nr_pos), '0') ) ;
 
-_ver_src_id_ldate_nr2 := common.sas_date((string)(_ver_src_id_ldate_nr));
+_ver_src_id_ldate_nr2 := __common__( common.sas_date((string)(_ver_src_id_ldate_nr)) ) ;
 
-yr__ver_src_id_ldate_nr := if(min(sysdate, _ver_src_id_ldate_nr2) = NULL, NULL, (sysdate - _ver_src_id_ldate_nr2) / 365.25);
+yr__ver_src_id_ldate_nr := __common__( if(min(sysdate, _ver_src_id_ldate_nr2) = NULL, NULL, (sysdate - _ver_src_id_ldate_nr2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_nr := if(min(sysdate, _ver_src_id_ldate_nr2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_nr2) / 30.5));
+mth__ver_src_id_ldate_nr := __common__( if(min(sysdate, _ver_src_id_ldate_nr2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_nr2) / 30.5)) ) ;
 
-_ver_src_id_sa_pos := Models.Common.findw_cpp(ver_src_id_list, 'SA' , '  ,', 'ie');
+_ver_src_id_sa_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'SA' , '  ,', 'ie') ) ;
 
-_ver_src_id__sa := _ver_src_id_sa_pos > 0;
+_ver_src_id__sa := __common__( _ver_src_id_sa_pos > 0 ) ;
 
-_ver_src_id_fdate_sa := if(_ver_src_id_sa_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_sa_pos), '0');
+_ver_src_id_fdate_sa := __common__( if(_ver_src_id_sa_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_sa_pos), '0') ) ;
 
-_ver_src_id_fdate_sa2 := common.sas_date((string)(_ver_src_id_fdate_sa));
+_ver_src_id_fdate_sa2 := __common__( common.sas_date((string)(_ver_src_id_fdate_sa)) ) ;
 
-yr__ver_src_id_fdate_sa := if(min(sysdate, _ver_src_id_fdate_sa2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sa2) / 365.25);
+yr__ver_src_id_fdate_sa := __common__( if(min(sysdate, _ver_src_id_fdate_sa2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sa2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_sa := if(min(sysdate, _ver_src_id_fdate_sa2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sa2) / 30.5));
+mth__ver_src_id_fdate_sa := __common__( if(min(sysdate, _ver_src_id_fdate_sa2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sa2) / 30.5)) ) ;
 
-_ver_src_id_ldate_sa := if(_ver_src_id_sa_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sa_pos), '0');
+_ver_src_id_ldate_sa := __common__( if(_ver_src_id_sa_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sa_pos), '0') ) ;
 
-_ver_src_id_ldate_sa2 := common.sas_date((string)(_ver_src_id_ldate_sa));
+_ver_src_id_ldate_sa2 := __common__( common.sas_date((string)(_ver_src_id_ldate_sa)) ) ;
 
-yr__ver_src_id_ldate_sa := if(min(sysdate, _ver_src_id_ldate_sa2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sa2) / 365.25);
+yr__ver_src_id_ldate_sa := __common__( if(min(sysdate, _ver_src_id_ldate_sa2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sa2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_sa := if(min(sysdate, _ver_src_id_ldate_sa2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sa2) / 30.5));
+mth__ver_src_id_ldate_sa := __common__( if(min(sysdate, _ver_src_id_ldate_sa2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sa2) / 30.5)) ) ;
 
-_ver_src_id_sb_pos := Models.Common.findw_cpp(ver_src_id_list, 'SB' , '  ,', 'ie');
+_ver_src_id_sb_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'SB' , '  ,', 'ie') ) ;
 
-_ver_src_id__sb := _ver_src_id_sb_pos > 0;
+_ver_src_id__sb := __common__( _ver_src_id_sb_pos > 0 ) ;
 
-_ver_src_id_fdate_sb := if(_ver_src_id_sb_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_sb_pos), '0');
+_ver_src_id_fdate_sb := __common__( if(_ver_src_id_sb_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_sb_pos), '0') ) ;
 
-_ver_src_id_fdate_sb2 := common.sas_date((string)(_ver_src_id_fdate_sb));
+_ver_src_id_fdate_sb2 := __common__( common.sas_date((string)(_ver_src_id_fdate_sb)) ) ;
 
-yr__ver_src_id_fdate_sb := if(min(sysdate, _ver_src_id_fdate_sb2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sb2) / 365.25);
+yr__ver_src_id_fdate_sb := __common__( if(min(sysdate, _ver_src_id_fdate_sb2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sb2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_sb := if(min(sysdate, _ver_src_id_fdate_sb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sb2) / 30.5));
+mth__ver_src_id_fdate_sb := __common__( if(min(sysdate, _ver_src_id_fdate_sb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sb2) / 30.5)) ) ;
 
-_ver_src_id_ldate_sb := if(_ver_src_id_sb_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sb_pos), '0');
+_ver_src_id_ldate_sb := __common__( if(_ver_src_id_sb_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sb_pos), '0') ) ;
 
-_ver_src_id_ldate_sb2 := common.sas_date((string)(_ver_src_id_ldate_sb));
+_ver_src_id_ldate_sb2 := __common__( common.sas_date((string)(_ver_src_id_ldate_sb)) ) ;
 
-yr__ver_src_id_ldate_sb := if(min(sysdate, _ver_src_id_ldate_sb2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sb2) / 365.25);
+yr__ver_src_id_ldate_sb := __common__( if(min(sysdate, _ver_src_id_ldate_sb2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sb2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_sb := if(min(sysdate, _ver_src_id_ldate_sb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sb2) / 30.5));
+mth__ver_src_id_ldate_sb := __common__( if(min(sysdate, _ver_src_id_ldate_sb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sb2) / 30.5)) ) ;
 
-_ver_src_id_sg_pos := Models.Common.findw_cpp(ver_src_id_list, 'SG' , '  ,', 'ie');
+_ver_src_id_sg_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'SG' , '  ,', 'ie') ) ;
 
-_ver_src_id__sg := _ver_src_id_sg_pos > 0;
+_ver_src_id__sg := __common__( _ver_src_id_sg_pos > 0 ) ;
 
-_ver_src_id_fdate_sg := if(_ver_src_id_sg_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_sg_pos), '0');
+_ver_src_id_fdate_sg := __common__( if(_ver_src_id_sg_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_sg_pos), '0') ) ;
 
-_ver_src_id_fdate_sg2 := common.sas_date((string)(_ver_src_id_fdate_sg));
+_ver_src_id_fdate_sg2 := __common__( common.sas_date((string)(_ver_src_id_fdate_sg)) ) ;
 
-yr__ver_src_id_fdate_sg := if(min(sysdate, _ver_src_id_fdate_sg2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sg2) / 365.25);
+yr__ver_src_id_fdate_sg := __common__( if(min(sysdate, _ver_src_id_fdate_sg2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sg2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_sg := if(min(sysdate, _ver_src_id_fdate_sg2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sg2) / 30.5));
+mth__ver_src_id_fdate_sg := __common__( if(min(sysdate, _ver_src_id_fdate_sg2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sg2) / 30.5)) ) ;
 
-_ver_src_id_ldate_sg := if(_ver_src_id_sg_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sg_pos), '0');
+_ver_src_id_ldate_sg := __common__( if(_ver_src_id_sg_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sg_pos), '0') ) ;
 
-_ver_src_id_ldate_sg2 := common.sas_date((string)(_ver_src_id_ldate_sg));
+_ver_src_id_ldate_sg2 := __common__( common.sas_date((string)(_ver_src_id_ldate_sg)) ) ;
 
-yr__ver_src_id_ldate_sg := if(min(sysdate, _ver_src_id_ldate_sg2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sg2) / 365.25);
+yr__ver_src_id_ldate_sg := __common__( if(min(sysdate, _ver_src_id_ldate_sg2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sg2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_sg := if(min(sysdate, _ver_src_id_ldate_sg2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sg2) / 30.5));
+mth__ver_src_id_ldate_sg := __common__( if(min(sysdate, _ver_src_id_ldate_sg2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sg2) / 30.5)) ) ;
 
-_ver_src_id_sj_pos := Models.Common.findw_cpp(ver_src_id_list, 'SJ' , '  ,', 'ie');
+_ver_src_id_sj_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'SJ' , '  ,', 'ie') ) ;
 
-_ver_src_id__sj := _ver_src_id_sj_pos > 0;
+_ver_src_id__sj := __common__( _ver_src_id_sj_pos > 0 ) ;
 
-_ver_src_id_fdate_sj := if(_ver_src_id_sj_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_sj_pos), '0');
+_ver_src_id_fdate_sj := __common__( if(_ver_src_id_sj_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_sj_pos), '0') ) ;
 
-_ver_src_id_fdate_sj2 := common.sas_date((string)(_ver_src_id_fdate_sj));
+_ver_src_id_fdate_sj2 := __common__( common.sas_date((string)(_ver_src_id_fdate_sj)) ) ;
 
-yr__ver_src_id_fdate_sj := if(min(sysdate, _ver_src_id_fdate_sj2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sj2) / 365.25);
+yr__ver_src_id_fdate_sj := __common__( if(min(sysdate, _ver_src_id_fdate_sj2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sj2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_sj := if(min(sysdate, _ver_src_id_fdate_sj2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sj2) / 30.5));
+mth__ver_src_id_fdate_sj := __common__( if(min(sysdate, _ver_src_id_fdate_sj2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sj2) / 30.5)) ) ;
 
-_ver_src_id_ldate_sj := if(_ver_src_id_sj_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sj_pos), '0');
+_ver_src_id_ldate_sj := __common__( if(_ver_src_id_sj_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sj_pos), '0') ) ;
 
-_ver_src_id_ldate_sj2 := common.sas_date((string)(_ver_src_id_ldate_sj));
+_ver_src_id_ldate_sj2 := __common__( common.sas_date((string)(_ver_src_id_ldate_sj)) ) ;
 
-yr__ver_src_id_ldate_sj := if(min(sysdate, _ver_src_id_ldate_sj2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sj2) / 365.25);
+yr__ver_src_id_ldate_sj := __common__( if(min(sysdate, _ver_src_id_ldate_sj2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sj2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_sj := if(min(sysdate, _ver_src_id_ldate_sj2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sj2) / 30.5));
+mth__ver_src_id_ldate_sj := __common__( if(min(sysdate, _ver_src_id_ldate_sj2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sj2) / 30.5)) ) ;
 
-_ver_src_id_sp_pos := Models.Common.findw_cpp(ver_src_id_list, 'SP' , '  ,', 'ie');
+_ver_src_id_sp_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'SP' , '  ,', 'ie') ) ;
 
-_ver_src_id__sp := _ver_src_id_sp_pos > 0;
+_ver_src_id__sp := __common__( _ver_src_id_sp_pos > 0 ) ;
 
-_ver_src_id_fdate_sp := if(_ver_src_id_sp_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_sp_pos), '0');
+_ver_src_id_fdate_sp := __common__( if(_ver_src_id_sp_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_sp_pos), '0') ) ;
 
-_ver_src_id_fdate_sp2 := common.sas_date((string)(_ver_src_id_fdate_sp));
+_ver_src_id_fdate_sp2 := __common__( common.sas_date((string)(_ver_src_id_fdate_sp)) ) ;
 
-yr__ver_src_id_fdate_sp := if(min(sysdate, _ver_src_id_fdate_sp2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sp2) / 365.25);
+yr__ver_src_id_fdate_sp := __common__( if(min(sysdate, _ver_src_id_fdate_sp2) = NULL, NULL, (sysdate - _ver_src_id_fdate_sp2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_sp := if(min(sysdate, _ver_src_id_fdate_sp2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sp2) / 30.5));
+mth__ver_src_id_fdate_sp := __common__( if(min(sysdate, _ver_src_id_fdate_sp2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_sp2) / 30.5)) ) ;
 
-_ver_src_id_ldate_sp := if(_ver_src_id_sp_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sp_pos), '0');
+_ver_src_id_ldate_sp := __common__( if(_ver_src_id_sp_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_sp_pos), '0') ) ;
 
-_ver_src_id_ldate_sp2 := common.sas_date((string)(_ver_src_id_ldate_sp));
+_ver_src_id_ldate_sp2 := __common__( common.sas_date((string)(_ver_src_id_ldate_sp)) ) ;
 
-yr__ver_src_id_ldate_sp := if(min(sysdate, _ver_src_id_ldate_sp2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sp2) / 365.25);
+yr__ver_src_id_ldate_sp := __common__( if(min(sysdate, _ver_src_id_ldate_sp2) = NULL, NULL, (sysdate - _ver_src_id_ldate_sp2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_sp := if(min(sysdate, _ver_src_id_ldate_sp2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sp2) / 30.5));
+mth__ver_src_id_ldate_sp := __common__( if(min(sysdate, _ver_src_id_ldate_sp2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_sp2) / 30.5)) ) ;
 
-_ver_src_id_ut_pos := Models.Common.findw_cpp(ver_src_id_list, 'UT' , '  ,', 'ie');
+_ver_src_id_ut_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'UT' , '  ,', 'ie') ) ;
 
-_ver_src_id__ut := _ver_src_id_ut_pos > 0;
+_ver_src_id__ut := __common__( _ver_src_id_ut_pos > 0 ) ;
 
-_ver_src_id_fdate_ut := if(_ver_src_id_ut_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ut_pos), '0');
+_ver_src_id_fdate_ut := __common__( if(_ver_src_id_ut_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_ut_pos), '0') ) ;
 
-_ver_src_id_fdate_ut2 := common.sas_date((string)(_ver_src_id_fdate_ut));
+_ver_src_id_fdate_ut2 := __common__( common.sas_date((string)(_ver_src_id_fdate_ut)) ) ;
 
-yr__ver_src_id_fdate_ut := if(min(sysdate, _ver_src_id_fdate_ut2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ut2) / 365.25);
+yr__ver_src_id_fdate_ut := __common__( if(min(sysdate, _ver_src_id_fdate_ut2) = NULL, NULL, (sysdate - _ver_src_id_fdate_ut2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_ut := if(min(sysdate, _ver_src_id_fdate_ut2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ut2) / 30.5));
+mth__ver_src_id_fdate_ut := __common__( if(min(sysdate, _ver_src_id_fdate_ut2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_ut2) / 30.5)) ) ;
 
-_ver_src_id_ldate_ut := if(_ver_src_id_ut_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ut_pos), '0');
+_ver_src_id_ldate_ut := __common__( if(_ver_src_id_ut_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_ut_pos), '0') ) ;
 
-_ver_src_id_ldate_ut2 := common.sas_date((string)(_ver_src_id_ldate_ut));
+_ver_src_id_ldate_ut2 := __common__( common.sas_date((string)(_ver_src_id_ldate_ut)) ) ;
 
-yr__ver_src_id_ldate_ut := if(min(sysdate, _ver_src_id_ldate_ut2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ut2) / 365.25);
+yr__ver_src_id_ldate_ut := __common__( if(min(sysdate, _ver_src_id_ldate_ut2) = NULL, NULL, (sysdate - _ver_src_id_ldate_ut2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_ut := if(min(sysdate, _ver_src_id_ldate_ut2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ut2) / 30.5));
+mth__ver_src_id_ldate_ut := __common__( if(min(sysdate, _ver_src_id_ldate_ut2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_ut2) / 30.5)) ) ;
 
-_ver_src_id_v_pos := Models.Common.findw_cpp(ver_src_id_list, 'V' , '  ,', 'ie');
+_ver_src_id_v_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'V' , '  ,', 'ie') ) ;
 
-_ver_src_id__v := _ver_src_id_v_pos > 0;
+_ver_src_id__v := __common__( _ver_src_id_v_pos > 0 ) ;
 
-_ver_src_id_fdate_v := if(_ver_src_id_v_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_v_pos), '0');
+_ver_src_id_fdate_v := __common__( if(_ver_src_id_v_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_v_pos), '0') ) ;
 
-_ver_src_id_fdate_v2 := common.sas_date((string)(_ver_src_id_fdate_v));
+_ver_src_id_fdate_v2 := __common__( common.sas_date((string)(_ver_src_id_fdate_v)) ) ;
 
-yr__ver_src_id_fdate_v := if(min(sysdate, _ver_src_id_fdate_v2) = NULL, NULL, (sysdate - _ver_src_id_fdate_v2) / 365.25);
+yr__ver_src_id_fdate_v := __common__( if(min(sysdate, _ver_src_id_fdate_v2) = NULL, NULL, (sysdate - _ver_src_id_fdate_v2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_v := if(min(sysdate, _ver_src_id_fdate_v2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_v2) / 30.5));
+mth__ver_src_id_fdate_v := __common__( if(min(sysdate, _ver_src_id_fdate_v2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_v2) / 30.5)) ) ;
 
-_ver_src_id_ldate_v := if(_ver_src_id_v_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_v_pos), '0');
+_ver_src_id_ldate_v := __common__( if(_ver_src_id_v_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_v_pos), '0') ) ;
 
-_ver_src_id_ldate_v2 := common.sas_date((string)(_ver_src_id_ldate_v));
+_ver_src_id_ldate_v2 := __common__( common.sas_date((string)(_ver_src_id_ldate_v)) ) ;
 
-yr__ver_src_id_ldate_v := if(min(sysdate, _ver_src_id_ldate_v2) = NULL, NULL, (sysdate - _ver_src_id_ldate_v2) / 365.25);
+yr__ver_src_id_ldate_v := __common__( if(min(sysdate, _ver_src_id_ldate_v2) = NULL, NULL, (sysdate - _ver_src_id_ldate_v2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_v := if(min(sysdate, _ver_src_id_ldate_v2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_v2) / 30.5));
+mth__ver_src_id_ldate_v := __common__( if(min(sysdate, _ver_src_id_ldate_v2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_v2) / 30.5)) ) ;
 
-_ver_src_id_wb_pos := Models.Common.findw_cpp(ver_src_id_list, 'WB' , '  ,', 'ie');
+_ver_src_id_wb_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'WB' , '  ,', 'ie') ) ;
 
-_ver_src_id__wb := _ver_src_id_wb_pos > 0;
+_ver_src_id__wb := __common__( _ver_src_id_wb_pos > 0 ) ;
 
-_ver_src_id_fdate_wb := if(_ver_src_id_wb_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_wb_pos), '0');
+_ver_src_id_fdate_wb := __common__( if(_ver_src_id_wb_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_wb_pos), '0') ) ;
 
-_ver_src_id_fdate_wb2 := common.sas_date((string)(_ver_src_id_fdate_wb));
+_ver_src_id_fdate_wb2 := __common__( common.sas_date((string)(_ver_src_id_fdate_wb)) ) ;
 
-yr__ver_src_id_fdate_wb := if(min(sysdate, _ver_src_id_fdate_wb2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wb2) / 365.25);
+yr__ver_src_id_fdate_wb := __common__( if(min(sysdate, _ver_src_id_fdate_wb2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wb2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_wb := if(min(sysdate, _ver_src_id_fdate_wb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wb2) / 30.5));
+mth__ver_src_id_fdate_wb := __common__( if(min(sysdate, _ver_src_id_fdate_wb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wb2) / 30.5)) ) ;
 
-_ver_src_id_ldate_wb := if(_ver_src_id_wb_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wb_pos), '0');
+_ver_src_id_ldate_wb := __common__( if(_ver_src_id_wb_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wb_pos), '0') ) ;
 
-_ver_src_id_ldate_wb2 := common.sas_date((string)(_ver_src_id_ldate_wb));
+_ver_src_id_ldate_wb2 := __common__( common.sas_date((string)(_ver_src_id_ldate_wb)) ) ;
 
-yr__ver_src_id_ldate_wb := if(min(sysdate, _ver_src_id_ldate_wb2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wb2) / 365.25);
+yr__ver_src_id_ldate_wb := __common__( if(min(sysdate, _ver_src_id_ldate_wb2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wb2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_wb := if(min(sysdate, _ver_src_id_ldate_wb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wb2) / 30.5));
+mth__ver_src_id_ldate_wb := __common__( if(min(sysdate, _ver_src_id_ldate_wb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wb2) / 30.5)) ) ;
 
-_ver_src_id_wc_pos := Models.Common.findw_cpp(ver_src_id_list, 'WC' , '  ,', 'ie');
+_ver_src_id_wc_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'WC' , '  ,', 'ie') ) ;
 
-_ver_src_id__wc := _ver_src_id_wc_pos > 0;
+_ver_src_id__wc := __common__( _ver_src_id_wc_pos > 0 ) ;
 
-_ver_src_id_fdate_wc := if(_ver_src_id_wc_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_wc_pos), '0');
+_ver_src_id_fdate_wc := __common__( if(_ver_src_id_wc_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_wc_pos), '0') ) ;
 
-_ver_src_id_fdate_wc2 := common.sas_date((string)(_ver_src_id_fdate_wc));
+_ver_src_id_fdate_wc2 := __common__( common.sas_date((string)(_ver_src_id_fdate_wc)) ) ;
 
-yr__ver_src_id_fdate_wc := if(min(sysdate, _ver_src_id_fdate_wc2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wc2) / 365.25);
+yr__ver_src_id_fdate_wc := __common__( if(min(sysdate, _ver_src_id_fdate_wc2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wc2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_wc := if(min(sysdate, _ver_src_id_fdate_wc2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wc2) / 30.5));
+mth__ver_src_id_fdate_wc := __common__( if(min(sysdate, _ver_src_id_fdate_wc2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wc2) / 30.5)) ) ;
 
-_ver_src_id_ldate_wc := if(_ver_src_id_wc_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wc_pos), '0');
+_ver_src_id_ldate_wc := __common__( if(_ver_src_id_wc_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wc_pos), '0') ) ;
 
-_ver_src_id_ldate_wc2 := common.sas_date((string)(_ver_src_id_ldate_wc));
+_ver_src_id_ldate_wc2 := __common__( common.sas_date((string)(_ver_src_id_ldate_wc)) ) ;
 
-yr__ver_src_id_ldate_wc := if(min(sysdate, _ver_src_id_ldate_wc2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wc2) / 365.25);
+yr__ver_src_id_ldate_wc := __common__( if(min(sysdate, _ver_src_id_ldate_wc2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wc2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_wc := if(min(sysdate, _ver_src_id_ldate_wc2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wc2) / 30.5));
+mth__ver_src_id_ldate_wc := __common__( if(min(sysdate, _ver_src_id_ldate_wc2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wc2) / 30.5)) ) ;
 
-_ver_src_id_wk_pos := Models.Common.findw_cpp(ver_src_id_list, 'WK' , '  ,', 'ie');
+_ver_src_id_wk_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'WK' , '  ,', 'ie') ) ;
 
-_ver_src_id__wk := _ver_src_id_wk_pos > 0;
+_ver_src_id__wk := __common__( _ver_src_id_wk_pos > 0 ) ;
 
-_ver_src_id_fdate_wk := if(_ver_src_id_wk_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_wk_pos), '0');
+_ver_src_id_fdate_wk := __common__( if(_ver_src_id_wk_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_wk_pos), '0') ) ;
 
-_ver_src_id_fdate_wk2 := common.sas_date((string)(_ver_src_id_fdate_wk));
+_ver_src_id_fdate_wk2 := __common__( common.sas_date((string)(_ver_src_id_fdate_wk)) ) ;
 
-yr__ver_src_id_fdate_wk := if(min(sysdate, _ver_src_id_fdate_wk2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wk2) / 365.25);
+yr__ver_src_id_fdate_wk := __common__( if(min(sysdate, _ver_src_id_fdate_wk2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wk2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_wk := if(min(sysdate, _ver_src_id_fdate_wk2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wk2) / 30.5));
+mth__ver_src_id_fdate_wk := __common__( if(min(sysdate, _ver_src_id_fdate_wk2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wk2) / 30.5)) ) ;
 
-_ver_src_id_ldate_wk := if(_ver_src_id_wk_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wk_pos), '0');
+_ver_src_id_ldate_wk := __common__( if(_ver_src_id_wk_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wk_pos), '0') ) ;
 
-_ver_src_id_ldate_wk2 := common.sas_date((string)(_ver_src_id_ldate_wk));
+_ver_src_id_ldate_wk2 := __common__( common.sas_date((string)(_ver_src_id_ldate_wk)) ) ;
 
-yr__ver_src_id_ldate_wk := if(min(sysdate, _ver_src_id_ldate_wk2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wk2) / 365.25);
+yr__ver_src_id_ldate_wk := __common__( if(min(sysdate, _ver_src_id_ldate_wk2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wk2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_wk := if(min(sysdate, _ver_src_id_ldate_wk2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wk2) / 30.5));
+mth__ver_src_id_ldate_wk := __common__( if(min(sysdate, _ver_src_id_ldate_wk2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wk2) / 30.5)) ) ;
 
-_ver_src_id_wx_pos := Models.Common.findw_cpp(ver_src_id_list, 'WX' , '  ,', 'ie');
+_ver_src_id_wx_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'WX' , '  ,', 'ie') ) ;
 
-_ver_src_id__wx := _ver_src_id_wx_pos > 0;
+_ver_src_id__wx := __common__( _ver_src_id_wx_pos > 0 ) ;
 
-_ver_src_id_fdate_wx := if(_ver_src_id_wx_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_wx_pos), '0');
+_ver_src_id_fdate_wx := __common__( if(_ver_src_id_wx_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_wx_pos), '0') ) ;
 
-_ver_src_id_fdate_wx2 := common.sas_date((string)(_ver_src_id_fdate_wx));
+_ver_src_id_fdate_wx2 := __common__( common.sas_date((string)(_ver_src_id_fdate_wx)) ) ;
 
-yr__ver_src_id_fdate_wx := if(min(sysdate, _ver_src_id_fdate_wx2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wx2) / 365.25);
+yr__ver_src_id_fdate_wx := __common__( if(min(sysdate, _ver_src_id_fdate_wx2) = NULL, NULL, (sysdate - _ver_src_id_fdate_wx2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_wx := if(min(sysdate, _ver_src_id_fdate_wx2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wx2) / 30.5));
+mth__ver_src_id_fdate_wx := __common__( if(min(sysdate, _ver_src_id_fdate_wx2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_wx2) / 30.5)) ) ;
 
-_ver_src_id_ldate_wx := if(_ver_src_id_wx_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wx_pos), '0');
+_ver_src_id_ldate_wx := __common__( if(_ver_src_id_wx_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_wx_pos), '0') ) ;
 
-_ver_src_id_ldate_wx2 := common.sas_date((string)(_ver_src_id_ldate_wx));
+_ver_src_id_ldate_wx2 := __common__( common.sas_date((string)(_ver_src_id_ldate_wx)) ) ;
 
-yr__ver_src_id_ldate_wx := if(min(sysdate, _ver_src_id_ldate_wx2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wx2) / 365.25);
+yr__ver_src_id_ldate_wx := __common__( if(min(sysdate, _ver_src_id_ldate_wx2) = NULL, NULL, (sysdate - _ver_src_id_ldate_wx2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_wx := if(min(sysdate, _ver_src_id_ldate_wx2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wx2) / 30.5));
+mth__ver_src_id_ldate_wx := __common__( if(min(sysdate, _ver_src_id_ldate_wx2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_wx2) / 30.5)) ) ;
 
-_ver_src_id_zo_pos := Models.Common.findw_cpp(ver_src_id_list, 'ZO' , '  ,', 'ie');
+_ver_src_id_zo_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'ZO' , '  ,', 'ie') ) ;
 
-_ver_src_id__zo := _ver_src_id_zo_pos > 0;
+_ver_src_id__zo := __common__( _ver_src_id_zo_pos > 0 ) ;
 
-_ver_src_id_fdate_zo := if(_ver_src_id_zo_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_zo_pos), '0');
+_ver_src_id_fdate_zo := __common__( if(_ver_src_id_zo_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_zo_pos), '0') ) ;
 
-_ver_src_id_fdate_zo2 := common.sas_date((string)(_ver_src_id_fdate_zo));
+_ver_src_id_fdate_zo2 := __common__( common.sas_date((string)(_ver_src_id_fdate_zo)) ) ;
 
-yr__ver_src_id_fdate_zo := if(min(sysdate, _ver_src_id_fdate_zo2) = NULL, NULL, (sysdate - _ver_src_id_fdate_zo2) / 365.25);
+yr__ver_src_id_fdate_zo := __common__( if(min(sysdate, _ver_src_id_fdate_zo2) = NULL, NULL, (sysdate - _ver_src_id_fdate_zo2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_zo := if(min(sysdate, _ver_src_id_fdate_zo2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_zo2) / 30.5));
+mth__ver_src_id_fdate_zo := __common__( if(min(sysdate, _ver_src_id_fdate_zo2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_zo2) / 30.5)) ) ;
 
-_ver_src_id_ldate_zo := if(_ver_src_id_zo_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_zo_pos), '0');
+_ver_src_id_ldate_zo := __common__( if(_ver_src_id_zo_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_zo_pos), '0') ) ;
 
-_ver_src_id_ldate_zo2 := common.sas_date((string)(_ver_src_id_ldate_zo));
+_ver_src_id_ldate_zo2 := __common__( common.sas_date((string)(_ver_src_id_ldate_zo)) ) ;
 
-yr__ver_src_id_ldate_zo := if(min(sysdate, _ver_src_id_ldate_zo2) = NULL, NULL, (sysdate - _ver_src_id_ldate_zo2) / 365.25);
+yr__ver_src_id_ldate_zo := __common__( if(min(sysdate, _ver_src_id_ldate_zo2) = NULL, NULL, (sysdate - _ver_src_id_ldate_zo2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_zo := if(min(sysdate, _ver_src_id_ldate_zo2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_zo2) / 30.5));
+mth__ver_src_id_ldate_zo := __common__( if(min(sysdate, _ver_src_id_ldate_zo2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_zo2) / 30.5)) ) ;
 
-_ver_src_id_y_pos := Models.Common.findw_cpp(ver_src_id_list, 'Y' , '  ,', 'ie');
+_ver_src_id_y_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'Y' , '  ,', 'ie') ) ;
 
-_ver_src_id__y := _ver_src_id_y_pos > 0;
+_ver_src_id__y := __common__( _ver_src_id_y_pos > 0 ) ;
 
-_ver_src_id_fdate_y := if(_ver_src_id_y_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_y_pos), '0');
+_ver_src_id_fdate_y := __common__( if(_ver_src_id_y_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_y_pos), '0') ) ;
 
-_ver_src_id_fdate_y2 := common.sas_date((string)(_ver_src_id_fdate_y));
+_ver_src_id_fdate_y2 := __common__( common.sas_date((string)(_ver_src_id_fdate_y)) ) ;
 
-yr__ver_src_id_fdate_y := if(min(sysdate, _ver_src_id_fdate_y2) = NULL, NULL, (sysdate - _ver_src_id_fdate_y2) / 365.25);
+yr__ver_src_id_fdate_y := __common__( if(min(sysdate, _ver_src_id_fdate_y2) = NULL, NULL, (sysdate - _ver_src_id_fdate_y2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_y := if(min(sysdate, _ver_src_id_fdate_y2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_y2) / 30.5));
+mth__ver_src_id_fdate_y := __common__( if(min(sysdate, _ver_src_id_fdate_y2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_y2) / 30.5)) ) ;
 
-_ver_src_id_ldate_y := if(_ver_src_id_y_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_y_pos), '0');
+_ver_src_id_ldate_y := __common__( if(_ver_src_id_y_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_y_pos), '0') ) ;
 
-_ver_src_id_ldate_y2 := common.sas_date((string)(_ver_src_id_ldate_y));
+_ver_src_id_ldate_y2 := __common__( common.sas_date((string)(_ver_src_id_ldate_y)) ) ;
 
-yr__ver_src_id_ldate_y := if(min(sysdate, _ver_src_id_ldate_y2) = NULL, NULL, (sysdate - _ver_src_id_ldate_y2) / 365.25);
+yr__ver_src_id_ldate_y := __common__( if(min(sysdate, _ver_src_id_ldate_y2) = NULL, NULL, (sysdate - _ver_src_id_ldate_y2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_y := if(min(sysdate, _ver_src_id_ldate_y2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_y2) / 30.5));
+mth__ver_src_id_ldate_y := __common__( if(min(sysdate, _ver_src_id_ldate_y2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_y2) / 30.5)) ) ;
 
-_ver_src_id_gb_pos := Models.Common.findw_cpp(ver_src_id_list, 'GB' , '  ,', 'ie');
+_ver_src_id_gb_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'GB' , '  ,', 'ie') ) ;
 
-_ver_src_id__gb := _ver_src_id_gb_pos > 0;
+_ver_src_id__gb := __common__( _ver_src_id_gb_pos > 0 ) ;
 
-_ver_src_id_fdate_gb := if(_ver_src_id_gb_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_gb_pos), '0');
+_ver_src_id_fdate_gb := __common__( if(_ver_src_id_gb_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_gb_pos), '0') ) ;
 
-_ver_src_id_fdate_gb2 := common.sas_date((string)(_ver_src_id_fdate_gb));
+_ver_src_id_fdate_gb2 := __common__( common.sas_date((string)(_ver_src_id_fdate_gb)) ) ;
 
-yr__ver_src_id_fdate_gb := if(min(sysdate, _ver_src_id_fdate_gb2) = NULL, NULL, (sysdate - _ver_src_id_fdate_gb2) / 365.25);
+yr__ver_src_id_fdate_gb := __common__( if(min(sysdate, _ver_src_id_fdate_gb2) = NULL, NULL, (sysdate - _ver_src_id_fdate_gb2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_gb := if(min(sysdate, _ver_src_id_fdate_gb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_gb2) / 30.5));
+mth__ver_src_id_fdate_gb := __common__( if(min(sysdate, _ver_src_id_fdate_gb2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_gb2) / 30.5)) ) ;
 
-_ver_src_id_ldate_gb := if(_ver_src_id_gb_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_gb_pos), '0');
+_ver_src_id_ldate_gb := __common__( if(_ver_src_id_gb_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_gb_pos), '0') ) ;
 
-_ver_src_id_ldate_gb2 := common.sas_date((string)(_ver_src_id_ldate_gb));
+_ver_src_id_ldate_gb2 := __common__( common.sas_date((string)(_ver_src_id_ldate_gb)) ) ;
 
-yr__ver_src_id_ldate_gb := if(min(sysdate, _ver_src_id_ldate_gb2) = NULL, NULL, (sysdate - _ver_src_id_ldate_gb2) / 365.25);
+yr__ver_src_id_ldate_gb := __common__( if(min(sysdate, _ver_src_id_ldate_gb2) = NULL, NULL, (sysdate - _ver_src_id_ldate_gb2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_gb := if(min(sysdate, _ver_src_id_ldate_gb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_gb2) / 30.5));
+mth__ver_src_id_ldate_gb := __common__( if(min(sysdate, _ver_src_id_ldate_gb2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_gb2) / 30.5)) ) ;
 
-_ver_src_id_cs_pos := Models.Common.findw_cpp(ver_src_id_list, 'C#' , ' ,', 'ie');
+_ver_src_id_cs_pos := __common__( Models.Common.findw_cpp(ver_src_id_list, 'C#' , ' ,', 'ie') ) ;
 
-_ver_src_id__cs := _ver_src_id_cs_pos > 0;
+_ver_src_id__cs := __common__( _ver_src_id_cs_pos > 0 ) ;
 
-_ver_src_id_ldate_cs := if(_ver_src_id_cs_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_cs_pos), '0');
+_ver_src_id_ldate_cs := __common__( if(_ver_src_id_cs_pos > 0, Models.Common.getw(ver_src_id_lastseen_list, _ver_src_id_cs_pos), '0') ) ;
 
-_ver_src_id_ldate_cs2 := common.sas_date((string)(_ver_src_id_ldate_cs));
+_ver_src_id_ldate_cs2 := __common__( common.sas_date((string)(_ver_src_id_ldate_cs)) ) ;
 
-yr__ver_src_id_ldate_cs := if(min(sysdate, _ver_src_id_ldate_cs2) = NULL, NULL, (sysdate - _ver_src_id_ldate_cs2) / 365.25);
+yr__ver_src_id_ldate_cs := __common__( if(min(sysdate, _ver_src_id_ldate_cs2) = NULL, NULL, (sysdate - _ver_src_id_ldate_cs2) / 365.25) ) ;
 
-mth__ver_src_id_ldate_cs := if(min(sysdate, _ver_src_id_ldate_cs2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_cs2) / 30.5));
+mth__ver_src_id_ldate_cs := __common__( if(min(sysdate, _ver_src_id_ldate_cs2) = NULL, NULL, roundup((sysdate - _ver_src_id_ldate_cs2) / 30.5)) ) ;
 
-_ver_src_id_fdate_cs := if(_ver_src_id_cs_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_cs_pos), '0');
+_ver_src_id_fdate_cs := __common__( if(_ver_src_id_cs_pos > 0, Models.Common.getw(ver_src_id_firstseen_list, _ver_src_id_cs_pos), '0') ) ;
 
-_ver_src_id_fdate_cs2 := common.sas_date((string)(_ver_src_id_fdate_cs));
+_ver_src_id_fdate_cs2 := __common__( common.sas_date((string)(_ver_src_id_fdate_cs)) ) ;
 
-yr__ver_src_id_fdate_cs := if(min(sysdate, _ver_src_id_fdate_cs2) = NULL, NULL, (sysdate - _ver_src_id_fdate_cs2) / 365.25);
+yr__ver_src_id_fdate_cs := __common__( if(min(sysdate, _ver_src_id_fdate_cs2) = NULL, NULL, (sysdate - _ver_src_id_fdate_cs2) / 365.25) ) ;
 
-mth__ver_src_id_fdate_cs := if(min(sysdate, _ver_src_id_fdate_cs2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_cs2) / 30.5));
+mth__ver_src_id_fdate_cs := __common__( if(min(sysdate, _ver_src_id_fdate_cs2) = NULL, NULL, roundup((sysdate - _ver_src_id_fdate_cs2) / 30.5)) ) ;
 
-vs_ver_src_id__gb := _ver_src_id__gb;
+vs_ver_src_id__gb := __common__( _ver_src_id__gb ) ;
 
-vs_gb_id_mth_fseen := mth__ver_src_id_fdate_gb;
+vs_gb_id_mth_fseen := __common__( mth__ver_src_id_fdate_gb ) ;
 
-vs_gb_id_mth_lseen := mth__ver_src_id_ldate_gb;
+vs_gb_id_mth_lseen := __common__( mth__ver_src_id_ldate_gb ) ;
 
-vs_ver_src_id__y := _ver_src_id__y;
+vs_ver_src_id__y := __common__( _ver_src_id__y ) ;
 
-vs_y_id_mth_fseen := mth__ver_src_id_fdate_y;
+vs_y_id_mth_fseen := __common__( mth__ver_src_id_fdate_y ) ;
 
-vs_y_id_mth_lseen := mth__ver_src_id_ldate_y;
+vs_y_id_mth_lseen := __common__( mth__ver_src_id_ldate_y ) ;
 
-vs_ver_src_id__ut := (integer) _ver_src_id__ut;
+vs_ver_src_id__ut := __common__( (integer) _ver_src_id__ut ) ;
 
-vs_ut_id_mth_fseen := mth__ver_src_id_fdate_ut;
+vs_ut_id_mth_fseen := __common__( mth__ver_src_id_fdate_ut ) ;
 
-vs_ut_id_mth_lseen := mth__ver_src_id_ldate_ut;
+vs_ut_id_mth_lseen := __common__( mth__ver_src_id_ldate_ut ) ;
 
-vs_ver_src_id__os := _ver_src_id__os;
+vs_ver_src_id__os := __common__( _ver_src_id__os ) ;
 
-vs_os_id_mth_fseen := mth__ver_src_id_fdate_os;
+vs_os_id_mth_fseen := __common__( mth__ver_src_id_fdate_os ) ;
 
-vs_os_id_mth_lseen := mth__ver_src_id_ldate_os;
+vs_os_id_mth_lseen := __common__( mth__ver_src_id_ldate_os ) ;
 
-vs_ver_src_id__bm := (integer) _ver_src_id__bm;
+vs_ver_src_id__bm := __common__( (integer) _ver_src_id__bm ) ;
 
-vs_bm_id_mth_fseen := mth__ver_src_id_fdate_bm;
+vs_bm_id_mth_fseen := __common__( mth__ver_src_id_fdate_bm ) ;
 
-vs_bm_id_mth_lseen := mth__ver_src_id_ldate_bm;
+vs_bm_id_mth_lseen := __common__( mth__ver_src_id_ldate_bm ) ;
 
-vs_ver_src_id__i := (integer) _ver_src_id__i;
+vs_ver_src_id__i := __common__( (integer) _ver_src_id__i ) ;
 
-vs_i_id_mth_fseen := mth__ver_src_id_fdate_i;
+vs_i_id_mth_fseen := __common__( mth__ver_src_id_fdate_i ) ;
 
-vs_i_id_mth_lseen := mth__ver_src_id_ldate_i;
+vs_i_id_mth_lseen := __common__( mth__ver_src_id_ldate_i ) ;
 
-vs_ver_src_id__in := (integer) _ver_src_id__in;
+vs_ver_src_id__in := __common__( (integer) _ver_src_id__in ) ;
 
-vs_in_id_mth_fseen := mth__ver_src_id_fdate_in;
+vs_in_id_mth_fseen := __common__( mth__ver_src_id_fdate_in ) ;
 
-vs_in_id_mth_lseen := mth__ver_src_id_ldate_in;
+vs_in_id_mth_lseen := __common__( mth__ver_src_id_ldate_in ) ;
 
-vs_ver_src_id__l0 := _ver_src_id__l0;
+vs_ver_src_id__l0 := __common__( _ver_src_id__l0 ) ;
 
-vs_l0_id_mth_fseen := mth__ver_src_id_fdate_l0;
+vs_l0_id_mth_fseen := __common__( mth__ver_src_id_fdate_l0 ) ;
 
-vs_l0_id_mth_lseen := mth__ver_src_id_ldate_l0;
+vs_l0_id_mth_lseen := __common__( mth__ver_src_id_ldate_l0 ) ;
 
-vs_ver_src_id__wa := _ver_src_id__wa;
+vs_ver_src_id__wa := __common__( _ver_src_id__wa ) ;
 
-vs_wa_id_mth_fseen := mth__ver_src_id_fdate_wa;
+vs_wa_id_mth_fseen := __common__( mth__ver_src_id_fdate_wa ) ;
 
-vs_wa_id_mth_lseen := mth__ver_src_id_ldate_wa;
+vs_wa_id_mth_lseen := __common__( mth__ver_src_id_ldate_wa ) ;
 
-vs_ver_src_id__ar := _ver_src_id__ar;
+vs_ver_src_id__ar := __common__( _ver_src_id__ar ) ;
 
-vs_ar_id_mth_fseen := mth__ver_src_id_fdate_ar;
+vs_ar_id_mth_fseen := __common__( mth__ver_src_id_fdate_ar ) ;
 
-vs_ar_id_mth_lseen := mth__ver_src_id_ldate_ar;
+vs_ar_id_mth_lseen := __common__( mth__ver_src_id_ldate_ar ) ;
 
-vs_ver_src_id__v2 := _ver_src_id__v2;
+vs_ver_src_id__v2 := __common__( _ver_src_id__v2 ) ;
 
-vs_v2_id_mth_fseen := mth__ver_src_id_fdate_v2;
+vs_v2_id_mth_fseen := __common__( mth__ver_src_id_fdate_v2 ) ;
 
-vs_v2_id_mth_lseen := mth__ver_src_id_ldate_v2;
+vs_v2_id_mth_lseen := __common__( mth__ver_src_id_ldate_v2 ) ;
 
-vs_adl_util_i_1 := if(not(truedid), NULL, NULL);
+vs_adl_util_i_1 := __common__( if(not(truedid), NULL, NULL) ) ;
 
-vs_adl_util_i := if(util_adl_type_list = '', -1, (integer) (contains_i(util_adl_type_list, '1') > 0));
+vs_adl_util_i := __common__( if(util_adl_type_list = '', -1, (integer) (contains_i(util_adl_type_list, '1') > 0)) ) ;
 
-vs_util_adl_count := if(not(truedid), NULL, util_adl_count);
+vs_util_adl_count := __common__( if(not(truedid), NULL, util_adl_count) ) ;
 
-_util_adl_first_seen := common.sas_date((string)(util_adl_first_seen));
+_util_adl_first_seen := __common__( common.sas_date((string)(util_adl_first_seen)) ) ;
 
-vs_util_adl_mths_fs := map(
+vs_util_adl_mths_fs := __common__( map(
     not(truedid)                => NULL,
     _util_adl_first_seen = NULL => -1,
-                                   (sysdate - _util_adl_first_seen) / (365.25 / 12));
+                                   (sysdate - _util_adl_first_seen) / (365.25 / 12)) ) ;
 
-_gong_did_first_seen := common.sas_date((string)(gong_did_first_seen));
+_gong_did_first_seen := __common__( common.sas_date((string)(gong_did_first_seen)) ) ;
 
-_gong_did_last_seen := common.sas_date((string)(gong_did_last_seen));
+_gong_did_last_seen := __common__( common.sas_date((string)(gong_did_last_seen)) ) ;
 
-vs_gong_adl_mths_ls := map(
+vs_gong_adl_mths_ls := __common__( map(
     not(truedid)               => NULL,
     _gong_did_last_seen = NULL => -1,
-                                  (sysdate - _gong_did_last_seen) / (365.25 / 12));
+                                  (sysdate - _gong_did_last_seen) / (365.25 / 12)) ) ;
 
-_header_first_seen := common.sas_date((string)(header_first_seen));
+_header_first_seen := __common__( common.sas_date((string)(header_first_seen)) ) ;
 
-vs_header_mths_fs := map(
+vs_header_mths_fs := __common__( map(
     not(truedid)              => NULL,
     _header_first_seen = NULL => -1,
-                                 (sysdate - _header_first_seen) / (365.25 / 12));
+                                 (sysdate - _header_first_seen) / (365.25 / 12)) ) ;
 
-_header_last_seen := common.sas_date((string)(header_last_seen));
+_header_last_seen := __common__( common.sas_date((string)(header_last_seen)) ) ;
 
-_br_first_seen_1 := common.sas_date((string)(br_First_seen));
+_br_first_seen_1 := __common__( common.sas_date((string)(br_First_seen)) ) ;
 
-vs_br_mths_fs := map(
+vs_br_mths_fs := __common__( map(
     not(truedid)            => NULL,
     _br_first_seen_1 = NULL => -1,
-                               (sysdate - _br_first_seen_1) / (365.25 / 12));
+                               (sysdate - _br_first_seen_1) / (365.25 / 12)) ) ;
 
-vs_br_business_count := if(not(truedid), -1, br_business_count);
+vs_br_business_count := __common__( if(not(truedid), -1, br_business_count) ) ;
 
-vs_br_dead_business_count := if(not(truedid), -1, br_dead_business_count);
+vs_br_dead_business_count := __common__( if(not(truedid), -1, br_dead_business_count) ) ;
 
-vs_br_active_phone_count := if(not(truedid), -1, br_active_phone_count);
+vs_br_active_phone_count := __common__( if(not(truedid), -1, br_active_phone_count) ) ;
 
-vs_email_count := if(not(truedid), -1, email_count);
+vs_email_count := __common__( if(not(truedid), -1, email_count) ) ;
 
-vs_email_domain_free_count := if(not(truedid), -1, email_domain_free_count);
+vs_email_domain_free_count := __common__( if(not(truedid), -1, email_domain_free_count) ) ;
 
-vs_email_domain_edu_count := if(not(truedid), -1, email_domain_EDU_count);
+vs_email_domain_edu_count := __common__( if(not(truedid), -1, email_domain_EDU_count) ) ;
 
-vs_historical_count := if(not(truedid), -1, historical_count);
+vs_historical_count := __common__( if(not(truedid), -1, historical_count) ) ;
 
-vs_college_tier := map(not(truedid) => -1,
+vs_college_tier := __common__( map(not(truedid) => -1,
 	college_tier = '' => NULL,
-	(integer) college_tier);
+	(integer) college_tier) ) ;
 
-vs_prof_license_flag := if(not(truedid), -1, (integer) prof_license_flag);
+vs_prof_license_flag := __common__( if(not(truedid), -1, (integer) prof_license_flag) ) ;
 
-_prof_license_ix_sanct_fs := common.sas_date((string)(Prof_license_IX_sanct_fs));
+_prof_license_ix_sanct_fs := __common__( common.sas_date((string)(Prof_license_IX_sanct_fs)) ) ;
 
-_prof_license_ix_sanct_ls := common.sas_date((string)(Prof_license_IX_sanct_ls));
+_prof_license_ix_sanct_ls := __common__( common.sas_date((string)(Prof_license_IX_sanct_ls)) ) ;
 
-ver_src_cons_fsrc_fdate := Models.Common.getw(ver_sources_first_seen, 1);
+ver_src_cons_fsrc_fdate := __common__( Models.Common.getw(ver_sources_first_seen, 1) ) ;
 
-ver_src_cons_fsrc_fdate2 := common.sas_date((string)(ver_src_cons_fsrc_fdate));
+ver_src_cons_fsrc_fdate2 := __common__( common.sas_date((string)(ver_src_cons_fsrc_fdate)) ) ;
 
-yr_ver_src_cons_fsrc_fdate := if(min(sysdate, ver_src_cons_fsrc_fdate2) = NULL, NULL, (sysdate - ver_src_cons_fsrc_fdate2) / 365.25);
+yr_ver_src_cons_fsrc_fdate := __common__( if(min(sysdate, ver_src_cons_fsrc_fdate2) = NULL, NULL, (sysdate - ver_src_cons_fsrc_fdate2) / 365.25) ) ;
 
-mth_ver_src_cons_fsrc_fdate := if(min(sysdate, ver_src_cons_fsrc_fdate2) = NULL, NULL, roundup((sysdate - ver_src_cons_fsrc_fdate2) / 30.5));
+mth_ver_src_cons_fsrc_fdate := __common__( if(min(sysdate, ver_src_cons_fsrc_fdate2) = NULL, NULL, roundup((sysdate - ver_src_cons_fsrc_fdate2) / 30.5)) ) ;
 
-ver_src_cons_vo_pos := Models.Common.findw_cpp(ver_sources, 'VO' , '  ,', 'ie');
+ver_src_cons_vo_pos := __common__( Models.Common.findw_cpp(ver_sources, 'VO' , '  ,', 'ie') ) ;
 
-ver_src_cons__vo := ver_src_cons_vo_pos > 0;
+ver_src_cons__vo := __common__( ver_src_cons_vo_pos > 0 ) ;
 
-ver_src_cons_fdate_vo := if(ver_src_cons_vo_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cons_vo_pos), '0');
+ver_src_cons_fdate_vo := __common__( if(ver_src_cons_vo_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cons_vo_pos), '0') ) ;
 
-ver_src_cons_fdate_vo2 := common.sas_date((string)(ver_src_cons_fdate_vo));
+ver_src_cons_fdate_vo2 := __common__( common.sas_date((string)(ver_src_cons_fdate_vo)) ) ;
 
-yr_ver_src_cons_fdate_vo := if(min(sysdate, ver_src_cons_fdate_vo2) = NULL, NULL, (sysdate - ver_src_cons_fdate_vo2) / 365.25);
+yr_ver_src_cons_fdate_vo := __common__( if(min(sysdate, ver_src_cons_fdate_vo2) = NULL, NULL, (sysdate - ver_src_cons_fdate_vo2) / 365.25) ) ;
 
-mth_ver_src_cons_fdate_vo := if(min(sysdate, ver_src_cons_fdate_vo2) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_vo2) / 30.5));
+mth_ver_src_cons_fdate_vo := __common__( if(min(sysdate, ver_src_cons_fdate_vo2) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_vo2) / 30.5)) ) ;
 
-ver_src_cons_ldate_vo := if(ver_src_cons_vo_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_vo_pos), '0');
+ver_src_cons_ldate_vo := __common__( if(ver_src_cons_vo_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_vo_pos), '0') ) ;
 
-ver_src_cons_ldate_vo2 := common.sas_date((string)(ver_src_cons_ldate_vo));
+ver_src_cons_ldate_vo2 := __common__( common.sas_date((string)(ver_src_cons_ldate_vo)) ) ;
 
-yr_ver_src_cons_ldate_vo := if(min(sysdate, ver_src_cons_ldate_vo2) = NULL, NULL, (sysdate - ver_src_cons_ldate_vo2) / 365.25);
+yr_ver_src_cons_ldate_vo := __common__( if(min(sysdate, ver_src_cons_ldate_vo2) = NULL, NULL, (sysdate - ver_src_cons_ldate_vo2) / 365.25) ) ;
 
-mth_ver_src_cons_ldate_vo := if(min(sysdate, ver_src_cons_ldate_vo2) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_vo2) / 30.5));
+mth_ver_src_cons_ldate_vo := __common__( if(min(sysdate, ver_src_cons_ldate_vo2) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_vo2) / 30.5)) ) ;
 
-ver_src_cons_wp_pos := Models.Common.findw_cpp(ver_sources, 'WP' , '  ,', 'ie');
+ver_src_cons_wp_pos := __common__( Models.Common.findw_cpp(ver_sources, 'WP' , '  ,', 'ie') ) ;
 
-ver_src_cons__wp := ver_src_cons_wp_pos > 0;
+ver_src_cons__wp := __common__( ver_src_cons_wp_pos > 0 ) ;
 
-ver_src_cons_fdate_wp := if(ver_src_cons_wp_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cons_wp_pos), '0');
+ver_src_cons_fdate_wp := __common__( if(ver_src_cons_wp_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cons_wp_pos), '0') ) ;
 
-ver_src_cons_fdate_wp2 := common.sas_date((string)(ver_src_cons_fdate_wp));
+ver_src_cons_fdate_wp2 := __common__( common.sas_date((string)(ver_src_cons_fdate_wp)) ) ;
 
-yr_ver_src_cons_fdate_wp := if(min(sysdate, ver_src_cons_fdate_wp2) = NULL, NULL, (sysdate - ver_src_cons_fdate_wp2) / 365.25);
+yr_ver_src_cons_fdate_wp := __common__( if(min(sysdate, ver_src_cons_fdate_wp2) = NULL, NULL, (sysdate - ver_src_cons_fdate_wp2) / 365.25) ) ;
 
-mth_ver_src_cons_fdate_wp := if(min(sysdate, ver_src_cons_fdate_wp2) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_wp2) / 30.5));
+mth_ver_src_cons_fdate_wp := __common__( if(min(sysdate, ver_src_cons_fdate_wp2) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_wp2) / 30.5)) ) ;
 
-ver_src_cons_ldate_wp := if(ver_src_cons_wp_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_wp_pos), '0');
+ver_src_cons_ldate_wp := __common__( if(ver_src_cons_wp_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_wp_pos), '0') ) ;
 
-ver_src_cons_ldate_wp2 := common.sas_date((string)(ver_src_cons_ldate_wp));
+ver_src_cons_ldate_wp2 := __common__( common.sas_date((string)(ver_src_cons_ldate_wp)) ) ;
 
-yr_ver_src_cons_ldate_wp := if(min(sysdate, ver_src_cons_ldate_wp2) = NULL, NULL, (sysdate - ver_src_cons_ldate_wp2) / 365.25);
+yr_ver_src_cons_ldate_wp := __common__( if(min(sysdate, ver_src_cons_ldate_wp2) = NULL, NULL, (sysdate - ver_src_cons_ldate_wp2) / 365.25) ) ;
 
-mth_ver_src_cons_ldate_wp := if(min(sysdate, ver_src_cons_ldate_wp2) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_wp2) / 30.5));
+mth_ver_src_cons_ldate_wp := __common__( if(min(sysdate, ver_src_cons_ldate_wp2) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_wp2) / 30.5)) ) ;
 
-ver_src_cons_am_pos := Models.Common.findw_cpp(ver_sources, 'AM' , '  ,', 'ie');
+ver_src_cons_am_pos := __common__( Models.Common.findw_cpp(ver_sources, 'AM' , '  ,', 'ie') ) ;
 
-ver_src_cons__am := ver_src_cons_am_pos > 0;
+ver_src_cons__am := __common__( ver_src_cons_am_pos > 0 ) ;
 
-ver_src_cons_fdate_am := if(ver_src_cons_am_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cons_am_pos), '0');
+ver_src_cons_fdate_am := __common__( if(ver_src_cons_am_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cons_am_pos), '0') ) ;
 
-ver_src_cons_fdate_am2 := common.sas_date((string)(ver_src_cons_fdate_am));
+ver_src_cons_fdate_am2 := __common__( common.sas_date((string)(ver_src_cons_fdate_am)) ) ;
 
-yr_ver_src_cons_fdate_am := if(min(sysdate, ver_src_cons_fdate_am2) = NULL, NULL, (sysdate - ver_src_cons_fdate_am2) / 365.25);
+yr_ver_src_cons_fdate_am := __common__( if(min(sysdate, ver_src_cons_fdate_am2) = NULL, NULL, (sysdate - ver_src_cons_fdate_am2) / 365.25) ) ;
 
-mth_ver_src_cons_fdate_am := if(min(sysdate, ver_src_cons_fdate_am2) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_am2) / 30.5));
+mth_ver_src_cons_fdate_am := __common__( if(min(sysdate, ver_src_cons_fdate_am2) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_am2) / 30.5)) ) ;
 
-ver_src_cons_ldate_am := if(ver_src_cons_am_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_am_pos), '0');
+ver_src_cons_ldate_am := __common__( if(ver_src_cons_am_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_am_pos), '0') ) ;
 
-ver_src_cons_ldate_am2 := common.sas_date((string)(ver_src_cons_ldate_am));
+ver_src_cons_ldate_am2 := __common__( common.sas_date((string)(ver_src_cons_ldate_am)) ) ;
 
-yr_ver_src_cons_ldate_am := if(min(sysdate, ver_src_cons_ldate_am2) = NULL, NULL, (sysdate - ver_src_cons_ldate_am2) / 365.25);
+yr_ver_src_cons_ldate_am := __common__( if(min(sysdate, ver_src_cons_ldate_am2) = NULL, NULL, (sysdate - ver_src_cons_ldate_am2) / 365.25) ) ;
 
-mth_ver_src_cons_ldate_am := if(min(sysdate, ver_src_cons_ldate_am2) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_am2) / 30.5));
+mth_ver_src_cons_ldate_am := __common__( if(min(sysdate, ver_src_cons_ldate_am2) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_am2) / 30.5)) ) ;
 
-ver_src_cons_e1_pos := Models.Common.findw_cpp(ver_sources, 'E1' , '  ,', 'ie');
+ver_src_cons_e1_pos := __common__( Models.Common.findw_cpp(ver_sources, 'E1' , '  ,', 'ie') ) ;
 
-ver_src_cons__e1 := ver_src_cons_e1_pos > 0;
+ver_src_cons__e1 := __common__( ver_src_cons_e1_pos > 0 ) ;
 
-ver_src_cons_fdate_e1 := if(ver_src_cons_e1_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cons_e1_pos), '0');
+ver_src_cons_fdate_e1 := __common__( if(ver_src_cons_e1_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cons_e1_pos), '0') ) ;
 
-ver_src_cons_fdate_e12 := common.sas_date((string)(ver_src_cons_fdate_e1));
+ver_src_cons_fdate_e12 := __common__( common.sas_date((string)(ver_src_cons_fdate_e1)) ) ;
 
-yr_ver_src_cons_fdate_e1 := if(min(sysdate, ver_src_cons_fdate_e12) = NULL, NULL, (sysdate - ver_src_cons_fdate_e12) / 365.25);
+yr_ver_src_cons_fdate_e1 := __common__( if(min(sysdate, ver_src_cons_fdate_e12) = NULL, NULL, (sysdate - ver_src_cons_fdate_e12) / 365.25) ) ;
 
-mth_ver_src_cons_fdate_e1 := if(min(sysdate, ver_src_cons_fdate_e12) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_e12) / 30.5));
+mth_ver_src_cons_fdate_e1 := __common__( if(min(sysdate, ver_src_cons_fdate_e12) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_e12) / 30.5)) ) ;
 
-ver_src_cons_ldate_e1 := if(ver_src_cons_e1_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_e1_pos), '0');
+ver_src_cons_ldate_e1 := __common__( if(ver_src_cons_e1_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_e1_pos), '0') ) ;
 
-ver_src_cons_ldate_e12 := common.sas_date((string)(ver_src_cons_ldate_e1));
+ver_src_cons_ldate_e12 := __common__( common.sas_date((string)(ver_src_cons_ldate_e1)) ) ;
 
-yr_ver_src_cons_ldate_e1 := if(min(sysdate, ver_src_cons_ldate_e12) = NULL, NULL, (sysdate - ver_src_cons_ldate_e12) / 365.25);
+yr_ver_src_cons_ldate_e1 := __common__( if(min(sysdate, ver_src_cons_ldate_e12) = NULL, NULL, (sysdate - ver_src_cons_ldate_e12) / 365.25) ) ;
 
-mth_ver_src_cons_ldate_e1 := if(min(sysdate, ver_src_cons_ldate_e12) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_e12) / 30.5));
+mth_ver_src_cons_ldate_e1 := __common__( if(min(sysdate, ver_src_cons_ldate_e12) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_e12) / 30.5)) ) ;
 
-ver_src_cons_e2_pos := Models.Common.findw_cpp(ver_sources, 'E2' , '  ,', 'ie');
+ver_src_cons_e2_pos := __common__( Models.Common.findw_cpp(ver_sources, 'E2' , '  ,', 'ie') ) ;
 
-ver_src_cons__e2 := ver_src_cons_e2_pos > 0;
+ver_src_cons__e2 := __common__( ver_src_cons_e2_pos > 0 ) ;
 
-ver_src_cons_fdate_e2 := if(ver_src_cons_e2_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cons_e2_pos), '0');
+ver_src_cons_fdate_e2 := __common__( if(ver_src_cons_e2_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cons_e2_pos), '0') ) ;
 
-ver_src_cons_fdate_e22 := common.sas_date((string)(ver_src_cons_fdate_e2));
+ver_src_cons_fdate_e22 := __common__( common.sas_date((string)(ver_src_cons_fdate_e2)) ) ;
 
-yr_ver_src_cons_fdate_e2 := if(min(sysdate, ver_src_cons_fdate_e22) = NULL, NULL, (sysdate - ver_src_cons_fdate_e22) / 365.25);
+yr_ver_src_cons_fdate_e2 := __common__( if(min(sysdate, ver_src_cons_fdate_e22) = NULL, NULL, (sysdate - ver_src_cons_fdate_e22) / 365.25) ) ;
 
-mth_ver_src_cons_fdate_e2 := if(min(sysdate, ver_src_cons_fdate_e22) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_e22) / 30.5));
+mth_ver_src_cons_fdate_e2 := __common__( if(min(sysdate, ver_src_cons_fdate_e22) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_e22) / 30.5)) ) ;
 
-ver_src_cons_ldate_e2 := if(ver_src_cons_e2_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_e2_pos), '0');
+ver_src_cons_ldate_e2 := __common__( if(ver_src_cons_e2_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_e2_pos), '0') ) ;
 
-ver_src_cons_ldate_e22 := common.sas_date((string)(ver_src_cons_ldate_e2));
+ver_src_cons_ldate_e22 := __common__( common.sas_date((string)(ver_src_cons_ldate_e2)) ) ;
 
-yr_ver_src_cons_ldate_e2 := if(min(sysdate, ver_src_cons_ldate_e22) = NULL, NULL, (sysdate - ver_src_cons_ldate_e22) / 365.25);
+yr_ver_src_cons_ldate_e2 := __common__( if(min(sysdate, ver_src_cons_ldate_e22) = NULL, NULL, (sysdate - ver_src_cons_ldate_e22) / 365.25) ) ;
 
-mth_ver_src_cons_ldate_e2 := if(min(sysdate, ver_src_cons_ldate_e22) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_e22) / 30.5));
+mth_ver_src_cons_ldate_e2 := __common__( if(min(sysdate, ver_src_cons_ldate_e22) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_e22) / 30.5)) ) ;
 
-ver_src_cons_e3_pos := Models.Common.findw_cpp(ver_sources, 'E3' , '  ,', 'ie');
+ver_src_cons_e3_pos := __common__( Models.Common.findw_cpp(ver_sources, 'E3' , '  ,', 'ie') ) ;
 
-ver_src_cons__e3 := ver_src_cons_e3_pos > 0;
+ver_src_cons__e3 := __common__( ver_src_cons_e3_pos > 0 ) ;
 
-ver_src_cons_fdate_e3 := if(ver_src_cons_e3_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cons_e3_pos), '0');
+ver_src_cons_fdate_e3 := __common__( if(ver_src_cons_e3_pos > 0, Models.Common.getw(ver_sources_first_seen, ver_src_cons_e3_pos), '0') ) ;
 
-ver_src_cons_fdate_e32 := common.sas_date((string)(ver_src_cons_fdate_e3));
+ver_src_cons_fdate_e32 := __common__( common.sas_date((string)(ver_src_cons_fdate_e3)) ) ;
 
-yr_ver_src_cons_fdate_e3 := if(min(sysdate, ver_src_cons_fdate_e32) = NULL, NULL, (sysdate - ver_src_cons_fdate_e32) / 365.25);
+yr_ver_src_cons_fdate_e3 := __common__( if(min(sysdate, ver_src_cons_fdate_e32) = NULL, NULL, (sysdate - ver_src_cons_fdate_e32) / 365.25) ) ;
 
-mth_ver_src_cons_fdate_e3 := if(min(sysdate, ver_src_cons_fdate_e32) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_e32) / 30.5));
+mth_ver_src_cons_fdate_e3 := __common__( if(min(sysdate, ver_src_cons_fdate_e32) = NULL, NULL, roundup((sysdate - ver_src_cons_fdate_e32) / 30.5)) ) ;
 
-ver_src_cons_ldate_e3 := if(ver_src_cons_e3_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_e3_pos), '0');
+ver_src_cons_ldate_e3 := __common__( if(ver_src_cons_e3_pos > 0, Models.Common.getw(ver_sources_last_seen, ver_src_cons_e3_pos), '0') ) ;
 
-ver_src_cons_ldate_e32 := common.sas_date((string)(ver_src_cons_ldate_e3));
+ver_src_cons_ldate_e32 := __common__( common.sas_date((string)(ver_src_cons_ldate_e3)) ) ;
 
-yr_ver_src_cons_ldate_e3 := if(min(sysdate, ver_src_cons_ldate_e32) = NULL, NULL, (sysdate - ver_src_cons_ldate_e32) / 365.25);
+yr_ver_src_cons_ldate_e3 := __common__( if(min(sysdate, ver_src_cons_ldate_e32) = NULL, NULL, (sysdate - ver_src_cons_ldate_e32) / 365.25) ) ;
 
-mth_ver_src_cons_ldate_e3 := if(min(sysdate, ver_src_cons_ldate_e32) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_e32) / 30.5));
+mth_ver_src_cons_ldate_e3 := __common__( if(min(sysdate, ver_src_cons_ldate_e32) = NULL, NULL, roundup((sysdate - ver_src_cons_ldate_e32) / 30.5)) ) ;
 
-_ver_src_cons_fdate_vo := common.sas_date((string)(ver_src_cons_fdate_vo));
+_ver_src_cons_fdate_vo := __common__( common.sas_date((string)(ver_src_cons_fdate_vo)) ) ;
 
-_ver_src_cons_ldate_vo := common.sas_date((string)(ver_src_cons_ldate_vo));
+_ver_src_cons_ldate_vo := __common__( common.sas_date((string)(ver_src_cons_ldate_vo)) ) ;
 
-vs_ver_src_cons_vo_mths_ls := map(
+vs_ver_src_cons_vo_mths_ls := __common__( map(
     not(truedid)                  => NULL,
     _ver_src_cons_ldate_vo = NULL => -1,
-                                     (sysdate - _ver_src_cons_ldate_vo) / (365.25 / 12));
+                                     (sysdate - _ver_src_cons_ldate_vo) / (365.25 / 12)) ) ;
 
-vs_ver_sources_wp_pop := if(not(truedid), NULL, (integer) (ver_src_cons_wp_pos > 0));
+vs_ver_sources_wp_pop := __common__( if(not(truedid), NULL, (integer) (ver_src_cons_wp_pos > 0)) ) ;
 
-_ver_src_cons_fdate_wp := common.sas_date((string)(ver_src_cons_fdate_wp));
+_ver_src_cons_fdate_wp := __common__( common.sas_date((string)(ver_src_cons_fdate_wp)) ) ;
 
-_ver_src_cons_ldate_wp := common.sas_date((string)(ver_src_cons_ldate_wp));
+_ver_src_cons_ldate_wp := __common__( common.sas_date((string)(ver_src_cons_ldate_wp)) ) ;
 
-vs_ver_sources_am_pop := if(not(truedid), NULL, (integer) (ver_src_cons_am_pos > 0));
+vs_ver_sources_am_pop := __common__( if(not(truedid), NULL, (integer) (ver_src_cons_am_pos > 0)) ) ;
 
-_ver_src_cons_fdate_am := common.sas_date((string)(ver_src_cons_fdate_am));
+_ver_src_cons_fdate_am := __common__( common.sas_date((string)(ver_src_cons_fdate_am)) ) ;
 
-_ver_src_cons_ldate_am := common.sas_date((string)(ver_src_cons_ldate_am));
+_ver_src_cons_ldate_am := __common__( common.sas_date((string)(ver_src_cons_ldate_am)) ) ;
 
-vs_ver_sources_e1_pop := if(not(truedid), NULL, (integer) (ver_src_cons_e1_pos > 0));
+vs_ver_sources_e1_pop := __common__( if(not(truedid), NULL, (integer) (ver_src_cons_e1_pos > 0)) ) ;
 
-_ver_src_cons_fdate_e1 := common.sas_date((string)(ver_src_cons_fdate_e1));
+_ver_src_cons_fdate_e1 := __common__( common.sas_date((string)(ver_src_cons_fdate_e1)) ) ;
 
-vs_ver_src_cons_e1_mths_fs := map(
+vs_ver_src_cons_e1_mths_fs := __common__( map(
     not(truedid)                  => NULL,
     _ver_src_cons_fdate_e1 = NULL => -1,
-                                     (sysdate - _ver_src_cons_fdate_e1) / (365.25 / 12));
+                                     (sysdate - _ver_src_cons_fdate_e1) / (365.25 / 12)) ) ;
 
-_ver_src_cons_ldate_e1 := common.sas_date((string)(ver_src_cons_ldate_e1));
+_ver_src_cons_ldate_e1 := __common__( common.sas_date((string)(ver_src_cons_ldate_e1)) ) ;
 
-vs_ver_src_cons_e1_mths_ls := map(
+vs_ver_src_cons_e1_mths_ls := __common__( map(
     not(truedid)                  => NULL,
     _ver_src_cons_ldate_e1 = NULL => -1,
-                                     (sysdate - _ver_src_cons_ldate_e1) / (365.25 / 12));
+                                     (sysdate - _ver_src_cons_ldate_e1) / (365.25 / 12)) ) ;
 
-_ver_src_cons_fdate_e2 := common.sas_date((string)(ver_src_cons_fdate_e2));
+_ver_src_cons_fdate_e2 := __common__( common.sas_date((string)(ver_src_cons_fdate_e2)) ) ;
 
-vs_ver_src_cons_e2_mths_fs := map(
+vs_ver_src_cons_e2_mths_fs := __common__( map(
     not(truedid)                  => NULL,
     _ver_src_cons_fdate_e2 = NULL => -1,
-                                     (sysdate - _ver_src_cons_fdate_e2) / (365.25 / 12));
+                                     (sysdate - _ver_src_cons_fdate_e2) / (365.25 / 12)) ) ;
 
-_ver_src_cons_ldate_e2 := common.sas_date((string)(ver_src_cons_ldate_e2));
+_ver_src_cons_ldate_e2 := __common__( common.sas_date((string)(ver_src_cons_ldate_e2)) ) ;
 
-vs_ver_src_cons_e2_mths_ls := map(
+vs_ver_src_cons_e2_mths_ls := __common__( map(
     not(truedid)                  => NULL,
     _ver_src_cons_ldate_e2 = NULL => -1,
-                                     (sysdate - _ver_src_cons_ldate_e2) / (365.25 / 12));
+                                     (sysdate - _ver_src_cons_ldate_e2) / (365.25 / 12)) ) ;
 
-_ver_src_cons_fdate_e3 := common.sas_date((string)(ver_src_cons_fdate_e3));
+_ver_src_cons_fdate_e3 := __common__( common.sas_date((string)(ver_src_cons_fdate_e3)) ) ;
 
-vs_ver_src_cons_e3_mths_fs := map(
+vs_ver_src_cons_e3_mths_fs := __common__( map(
     not(truedid)                  => NULL,
     _ver_src_cons_fdate_e3 = NULL => -1,
-                                     (sysdate - _ver_src_cons_fdate_e3) / (365.25 / 12));
+                                     (sysdate - _ver_src_cons_fdate_e3) / (365.25 / 12)) ) ;
 
-_ver_src_cons_ldate_e3 := common.sas_date((string)(ver_src_cons_ldate_e3));
+_ver_src_cons_ldate_e3 := __common__( common.sas_date((string)(ver_src_cons_ldate_e3)) ) ;
 
-vs_ver_src_cons_e3_mths_ls := map(
+vs_ver_src_cons_e3_mths_ls := __common__( map(
     not(truedid)                  => NULL,
     _ver_src_cons_ldate_e3 = NULL => -1,
-                                     (sysdate - _ver_src_cons_ldate_e3) / (365.25 / 12));
+                                     (sysdate - _ver_src_cons_ldate_e3) / (365.25 / 12)) ) ;
 
-c_vs_gb_id_mth_fseen_w := map(
+c_vs_gb_id_mth_fseen_w := __common__( map(
     vs_gb_id_mth_fseen = NULL  => 0.00000,
     vs_gb_id_mth_fseen <= 3.5  => 0.91610,
     vs_gb_id_mth_fseen <= 7.5  => 0.88764,
@@ -3113,28 +3113,28 @@ c_vs_gb_id_mth_fseen_w := map(
     vs_gb_id_mth_fseen <= 52.5 => 0.05666,
     vs_gb_id_mth_fseen <= 85.5 => -0.00212,
     vs_gb_id_mth_fseen <= 97.5 => -0.19392,
-                                  -0.33280);
+                                  -0.33280) ) ;
 
-c_vs_gb_id_mth_lseen_w := map(
+c_vs_gb_id_mth_lseen_w := __common__( map(
     vs_gb_id_mth_lseen = NULL   => 0.00000,
     vs_gb_id_mth_lseen <= 13.5  => 0.27213,
     vs_gb_id_mth_lseen <= 38.5  => -0.05875,
     vs_gb_id_mth_lseen <= 50.5  => -0.22762,
     vs_gb_id_mth_lseen <= 125.5 => -0.24205,
     vs_gb_id_mth_lseen <= 136.5 => -0.28738,
-                                   -0.44975);
+                                   -0.44975) ) ;
 
-c_vs_ver_src_id__bm_w := map(
+c_vs_ver_src_id__bm_w := __common__( map(
     vs_ver_src_id__bm = NULL => 0.00000,
     vs_ver_src_id__bm <= 0   => 0.00329,
-                                -1.30107);
+                                -1.30107) ) ;
 
-c_vs_ver_src_id__in_w := map(
+c_vs_ver_src_id__in_w := __common__( map(
     vs_ver_src_id__in = NULL => 0.00000,
     vs_ver_src_id__in <= 0.5 => 0.00723,
-                                -0.84185);
+                                -0.84185) ) ;
 
-c_vs_util_adl_count_w := map(
+c_vs_util_adl_count_w := __common__( map(
     vs_util_adl_count = NULL => 0.00000,
     vs_util_adl_count <= 0.5 => -0.21937,
     vs_util_adl_count <= 1.5 => -0.06067,
@@ -3142,26 +3142,26 @@ c_vs_util_adl_count_w := map(
     vs_util_adl_count <= 4.5 => 0.29960,
     vs_util_adl_count <= 6.5 => 0.44774,
     vs_util_adl_count <= 7.5 => 0.53142,
-                                0.64580);
+                                0.64580) ) ;
 
-c_vs_util_adl_mths_fs_w := map(
+c_vs_util_adl_mths_fs_w := __common__( map(
     vs_util_adl_mths_fs = NULL           => 0.00000,
     vs_util_adl_mths_fs = -1             => -0.17300,
     vs_util_adl_mths_fs <= 18.1190965095 => 0.17201,
     vs_util_adl_mths_fs <= 43.0554414785 => 0.30402,
     vs_util_adl_mths_fs <= 63.09650924   => 0.45759,
-                                            0.77814);
+                                            0.77814) ) ;
 
-c_vs_gong_adl_mths_ls_w := map(
+c_vs_gong_adl_mths_ls_w := __common__( map(
     vs_gong_adl_mths_ls = NULL           => 0.00000,
     vs_gong_adl_mths_ls = -1             => 0.18245,
     vs_gong_adl_mths_ls <= 1.1663244353  => -0.25396,
     vs_gong_adl_mths_ls <= 43.6468172485 => 0.12138,
     vs_gong_adl_mths_ls <= 98.316221766  => 0.17905,
     vs_gong_adl_mths_ls <= 131.039014375 => 0.25395,
-                                            0.32975);
+                                            0.32975) ) ;
 
-c_vs_header_mths_fs_w := map(
+c_vs_header_mths_fs_w := __common__( map(
     vs_header_mths_fs = NULL           => 0.00000,
     vs_header_mths_fs = -1             => 0.00000,
     vs_header_mths_fs <= 52.501026694  => 0.98807,
@@ -3183,15 +3183,15 @@ c_vs_header_mths_fs_w := map(
     vs_header_mths_fs <= 360.985626285 => -0.23830,
     vs_header_mths_fs <= 403.991786445 => -0.30308,
     vs_header_mths_fs <= 426.989733055 => -0.31986,
-                                          -0.46326);
+                                          -0.46326) ) ;
 
-c_vs_pb_mths_fs_w := 0.00000;
+c_vs_pb_mths_fs_w := __common__( 0.00000 ) ;
 
-c_vs_pb_mths_ls_w := 0.00000;
+c_vs_pb_mths_ls_w := __common__( 0.00000 ) ;
 
-c_vs_pb_number_of_sources_w := 0.00000;
+c_vs_pb_number_of_sources_w := __common__( 0.00000 ) ;
 
-c_vs_br_mths_fs_w := map(
+c_vs_br_mths_fs_w := __common__( map(
     vs_br_mths_fs = NULL           => 0.00000,
     vs_br_mths_fs = -1             => 0.15995,
     vs_br_mths_fs <= 40.0328542095 => 0.16446,
@@ -3203,15 +3203,15 @@ c_vs_br_mths_fs_w := map(
     vs_br_mths_fs <= 259.466119095 => -0.32882,
     vs_br_mths_fs <= 288.887063655 => -0.56406,
     vs_br_mths_fs <= 439.03080082  => -0.64676,
-                                      -0.90995);
+                                      -0.90995) ) ;
 
-c_vs_br_dead_business_count_w := map(
+c_vs_br_dead_business_count_w := __common__( map(
     vs_br_dead_business_count = NULL => 0.00000,
     vs_br_dead_business_count = -1   => 0.00000,
     vs_br_dead_business_count <= 0.5 => -0.03651,
-                                        0.11377);
+                                        0.11377) ) ;
 
-c_vs_br_active_phone_count_w := map(
+c_vs_br_active_phone_count_w := __common__( map(
     vs_br_active_phone_count = NULL => 0.00000,
     vs_br_active_phone_count = -1   => 0.00000,
     vs_br_active_phone_count <= 0.5 => 0.14873,
@@ -3220,9 +3220,9 @@ c_vs_br_active_phone_count_w := map(
     vs_br_active_phone_count <= 3.5 => -0.39871,
     vs_br_active_phone_count <= 4.5 => -0.47623,
     vs_br_active_phone_count <= 5.5 => -0.82346,
-                                       -0.95214);
+                                       -0.95214) ) ;
 
-c_vs_email_count_w := map(
+c_vs_email_count_w := __common__( map(
     vs_email_count = NULL => 0.00000,
     vs_email_count = -1   => 0.00000,
     vs_email_count <= 0   => 0.12660,
@@ -3230,9 +3230,9 @@ c_vs_email_count_w := map(
     vs_email_count <= 2   => -0.07738,
     vs_email_count <= 5   => -0.10033,
     vs_email_count <= 9.5 => 0.21847,
-                             0.58567);
+                             0.58567) ) ;
 
-c_vs_email_domain_free_count_w := map(
+c_vs_email_domain_free_count_w := __common__( map(
     vs_email_domain_free_count = NULL => 0.00000,
     vs_email_domain_free_count = -1   => 0.00000,
     vs_email_domain_free_count <= 0.5 => -0.06058,
@@ -3240,41 +3240,41 @@ c_vs_email_domain_free_count_w := map(
     vs_email_domain_free_count <= 2.5 => 0.09472,
     vs_email_domain_free_count <= 3.5 => 0.17439,
     vs_email_domain_free_count <= 4.5 => 0.37563,
-                                         0.51286);
+                                         0.51286) ) ;
 
-c_vs_email_domain_edu_count_w := map(
+c_vs_email_domain_edu_count_w := __common__( map(
     vs_email_domain_edu_count = NULL => 0.00000,
     vs_email_domain_edu_count = -1   => 0.00000,
     vs_email_domain_edu_count <= 0.5 => 0.00745,
-                                        -0.39425);
+                                        -0.39425) ) ;
 
-c_vs_college_tier_w := map(
+c_vs_college_tier_w := __common__( map(
     vs_college_tier = NULL => 0.00000,
     vs_college_tier = -1   => 1.11226,
     vs_college_tier <= 1.5 => -0.80274,
     vs_college_tier <= 2.5 => -0.31965,
     vs_college_tier <= 3.5 => -0.05275,
     vs_college_tier <= 4.5 => 0.10779,
-                              0.54352);
+                              0.54352) ) ;
 
-c_vs_prof_license_flag_w := map(
+c_vs_prof_license_flag_w := __common__( map(
     vs_prof_license_flag = NULL => 0.00000,
     vs_prof_license_flag = -1   => 0.00000,
     vs_prof_license_flag <= 0.5 => 0.05818,
-                                   -0.38783);
+                                   -0.38783) ) ;
 
-c_vs_ver_src_cons_vo_mths_ls_w := map(
+c_vs_ver_src_cons_vo_mths_ls_w := __common__( map(
     vs_ver_src_cons_vo_mths_ls = NULL          => 0.00000,
     vs_ver_src_cons_vo_mths_ls = -1            => 0.01379,
     vs_ver_src_cons_vo_mths_ls <= 1.0020533881 => -0.24285,
-                                                  0.31383);
+                                                  0.31383) ) ;
 
-c_vs_ver_sources_am_pop_w := map(
+c_vs_ver_sources_am_pop_w := __common__( map(
     vs_ver_sources_am_pop = NULL => 0.00000,
     vs_ver_sources_am_pop <= 0.5 => 0.00790,
-                                    -0.50074);
+                                    -0.50074) ) ;
 
-bv_bus_rep_source_profile := -2.39363071732448 +
+bv_bus_rep_source_profile := __common__( -2.39363071732448 +
     c_vs_gb_id_mth_fseen_w * 0.561921735535521 +
     c_vs_gb_id_mth_lseen_w * 0.446192049813919 +
     c_vs_ver_src_id__bm_w * 0.815988410427249 +
@@ -3295,15 +3295,15 @@ bv_bus_rep_source_profile := -2.39363071732448 +
     c_vs_college_tier_w * 0.982093772667627 +
     c_vs_prof_license_flag_w * 0.660765941536277 +
     c_vs_ver_src_cons_vo_mths_ls_w * 0.677134518064185 +
-    c_vs_ver_sources_am_pop_w * 0.860183034397654;
+    c_vs_ver_sources_am_pop_w * 0.860183034397654 ) ;
 
-r_vs_adl_util_i_w := map(
+r_vs_adl_util_i_w := __common__( map(
     vs_adl_util_i = NULL => 0.00000,
     vs_adl_util_i = -1   => -0.21442,
     vs_adl_util_i <= 0.5 => 0.16661,
-                            0.32090);
+                            0.32090) ) ;
 
-r_vs_util_adl_count_w := map(
+r_vs_util_adl_count_w := __common__( map(
     vs_util_adl_count = NULL  => 0.00000,
     vs_util_adl_count <= 0.5  => -0.21937,
     vs_util_adl_count <= 1.5  => -0.06067,
@@ -3312,25 +3312,25 @@ r_vs_util_adl_count_w := map(
     vs_util_adl_count <= 6.5  => 0.44774,
     vs_util_adl_count <= 7.5  => 0.53142,
     vs_util_adl_count <= 11.5 => 0.58502,
-                                 0.80562);
+                                 0.80562) ) ;
 
-r_vs_util_adl_mths_fs_w := map(
+r_vs_util_adl_mths_fs_w := __common__( map(
     vs_util_adl_mths_fs = NULL           => 0.00000,
     vs_util_adl_mths_fs = -1             => -0.17300,
     vs_util_adl_mths_fs <= 18.1190965095 => 0.17201,
     vs_util_adl_mths_fs <= 43.0554414785 => 0.30402,
     vs_util_adl_mths_fs <= 63.09650924   => 0.45759,
-                                            0.77814);
+                                            0.77814) ) ;
 
-r_vs_gong_adl_mths_ls_w := map(
+r_vs_gong_adl_mths_ls_w := __common__( map(
     vs_gong_adl_mths_ls = NULL           => 0.00000,
     vs_gong_adl_mths_ls = -1             => 0.18245,
     vs_gong_adl_mths_ls <= 1.1663244353  => -0.25396,
     vs_gong_adl_mths_ls <= 43.6468172485 => 0.12138,
     vs_gong_adl_mths_ls <= 98.316221766  => 0.17905,
-                                            0.26491);
+                                            0.26491) ) ;
 
-r_vs_header_mths_fs_w := map(
+r_vs_header_mths_fs_w := __common__( map(
     vs_header_mths_fs = NULL           => 0.00000,
     vs_header_mths_fs = -1             => 0.00000,
     vs_header_mths_fs <= 52.501026694  => 0.98807,
@@ -3351,15 +3351,15 @@ r_vs_header_mths_fs_w := map(
     vs_header_mths_fs <= 360.985626285 => -0.23830,
     vs_header_mths_fs <= 403.991786445 => -0.30308,
     vs_header_mths_fs <= 426.989733055 => -0.31986,
-                                          -0.46326);
+                                          -0.46326) ) ;
 
-r_vs_pb_mths_fs_w := 0.00000;
+r_vs_pb_mths_fs_w := __common__( 0.00000 ) ;
 
-r_vs_pb_mths_ls_w := 0.00000;
+r_vs_pb_mths_ls_w := __common__( 0.00000 ) ;
 
-r_vs_pb_number_of_sources_w := 0.00000;
+r_vs_pb_number_of_sources_w := __common__( 0.00000 ) ;
 
-r_vs_br_mths_fs_w := map(
+r_vs_br_mths_fs_w := __common__( map(
     vs_br_mths_fs = NULL           => 0.00000,
     vs_br_mths_fs = -1             => 0.15995,
     vs_br_mths_fs <= 17.527720739  => 0.17528,
@@ -3375,9 +3375,9 @@ r_vs_br_mths_fs_w := map(
     vs_br_mths_fs <= 259.466119095 => -0.33784,
     vs_br_mths_fs <= 288.887063655 => -0.56406,
     vs_br_mths_fs <= 439.03080082  => -0.64676,
-                                      -0.90995);
+                                      -0.90995) ) ;
 
-r_vs_br_business_count_w := map(
+r_vs_br_business_count_w := __common__( map(
     vs_br_business_count = NULL  => 0.00000,
     vs_br_business_count = -1    => 0.00000,
     vs_br_business_count <= 0.5  => 0.17346,
@@ -3387,16 +3387,16 @@ r_vs_br_business_count_w := map(
     vs_br_business_count <= 6.5  => -0.08541,
     vs_br_business_count <= 10.5 => -0.12807,
     vs_br_business_count <= 12.5 => -0.16932,
-                                    -0.41378);
+                                    -0.41378) ) ;
 
-r_vs_br_dead_business_count_w := map(
+r_vs_br_dead_business_count_w := __common__( map(
     vs_br_dead_business_count = NULL => 0.00000,
     vs_br_dead_business_count = -1   => 0.00000,
     vs_br_dead_business_count <= 0.5 => -0.03651,
     vs_br_dead_business_count <= 8.5 => 0.11186,
-                                        0.19728);
+                                        0.19728) ) ;
 
-r_vs_br_active_phone_count_w := map(
+r_vs_br_active_phone_count_w := __common__( map(
     vs_br_active_phone_count = NULL => 0.00000,
     vs_br_active_phone_count = -1   => 0.00000,
     vs_br_active_phone_count <= 0.5 => 0.14873,
@@ -3405,9 +3405,9 @@ r_vs_br_active_phone_count_w := map(
     vs_br_active_phone_count <= 3.5 => -0.39871,
     vs_br_active_phone_count <= 4.5 => -0.47623,
     vs_br_active_phone_count <= 5.5 => -0.82346,
-                                       -0.95214);
+                                       -0.95214) ) ;
 
-r_vs_email_count_w := map(
+r_vs_email_count_w := __common__( map(
     vs_email_count = NULL => 0.00000,
     vs_email_count = -1   => 0.00000,
     vs_email_count <= 0   => 0.12660,
@@ -3416,9 +3416,9 @@ r_vs_email_count_w := map(
     vs_email_count <= 3   => -0.11055,
     vs_email_count <= 5   => -0.08999,
     vs_email_count <= 9.5 => 0.21847,
-                             0.58567);
+                             0.58567) ) ;
 
-r_vs_email_domain_free_count_w := map(
+r_vs_email_domain_free_count_w := __common__( map(
     vs_email_domain_free_count = NULL => 0.00000,
     vs_email_domain_free_count = -1   => 1.03909,
     vs_email_domain_free_count <= 0.5 => -0.06342,
@@ -3426,59 +3426,59 @@ r_vs_email_domain_free_count_w := map(
     vs_email_domain_free_count <= 2.5 => 0.09188,
     vs_email_domain_free_count <= 3.5 => 0.17155,
     vs_email_domain_free_count <= 4.5 => 0.37279,
-                                         0.51003);
+                                         0.51003) ) ;
 
-r_vs_email_domain_edu_count_w := map(
+r_vs_email_domain_edu_count_w := __common__( map(
     vs_email_domain_edu_count = NULL => 0.00000,
     vs_email_domain_edu_count = -1   => 0.00000,
     vs_email_domain_edu_count <= 0.5 => 0.00745,
-                                        -0.39425);
+                                        -0.39425) ) ;
 
-r_vs_historical_count_w := map(
+r_vs_historical_count_w := __common__( map(
     vs_historical_count = NULL  => 0.00000,
     vs_historical_count = -1    => 0.00000,
     vs_historical_count <= 0.5  => -0.06391,
     vs_historical_count <= 23.5 => 0.04499,
-                                   0.25088);
+                                   0.25088) ) ;
 
-r_vs_college_tier_w := map(
+r_vs_college_tier_w := __common__( map(
     vs_college_tier = NULL => 0.00000,
     vs_college_tier = -1   => 1.11226,
     vs_college_tier <= 1.5 => -0.80274,
     vs_college_tier <= 2.5 => -0.31965,
     vs_college_tier <= 3.5 => -0.05275,
     vs_college_tier <= 4.5 => 0.10779,
-                              0.54352);
+                              0.54352) ) ;
 
-r_vs_prof_license_flag_w := map(
+r_vs_prof_license_flag_w := __common__( map(
     vs_prof_license_flag = NULL => 0.00000,
     vs_prof_license_flag = -1   => 0.00000,
     vs_prof_license_flag <= 0.5 => 0.05818,
-                                   -0.38783);
+                                   -0.38783) ) ;
 
-r_vs_ver_src_cons_vo_mths_ls_w := map(
+r_vs_ver_src_cons_vo_mths_ls_w := __common__( map(
     vs_ver_src_cons_vo_mths_ls = NULL          => 0.00000,
     vs_ver_src_cons_vo_mths_ls = -1            => 0.01379,
     vs_ver_src_cons_vo_mths_ls <= 1.0020533881 => -0.24285,
     vs_ver_src_cons_vo_mths_ls <= 12.501026694 => 0.22439,
-                                                  0.32655);
+                                                  0.32655) ) ;
 
-r_vs_ver_sources_wp_pop_w := map(
+r_vs_ver_sources_wp_pop_w := __common__( map(
     vs_ver_sources_wp_pop = NULL => 0.00000,
     vs_ver_sources_wp_pop <= 0.5 => 0.17600,
-                                    -0.07426);
+                                    -0.07426) ) ;
 
-r_vs_ver_sources_am_pop_w := map(
+r_vs_ver_sources_am_pop_w := __common__( map(
     vs_ver_sources_am_pop = NULL => 0.00000,
     vs_ver_sources_am_pop <= 0.5 => 0.00790,
-                                    -0.50074);
+                                    -0.50074) ) ;
 
-r_vs_ver_sources_e1_pop_w := map(
+r_vs_ver_sources_e1_pop_w := __common__( map(
     vs_ver_sources_e1_pop = NULL => 0.00000,
     vs_ver_sources_e1_pop <= 0.5 => 0.00829,
-                                    -0.10771);
+                                    -0.10771) ) ;
 
-bv_rep_only_source_profile := -2.39308403795477 +
+bv_rep_only_source_profile := __common__( -2.39308403795477 +
     r_vs_adl_util_i_w * 0.0145303904477801 +
     r_vs_util_adl_count_w * 0.301080905323183 +
     r_vs_util_adl_mths_fs_w * 0.784719506644756 +
@@ -3500,9 +3500,9 @@ bv_rep_only_source_profile := -2.39308403795477 +
     r_vs_ver_src_cons_vo_mths_ls_w * 0.737884857021843 +
     r_vs_ver_sources_wp_pop_w * 0.0574268119550084 +
     r_vs_ver_sources_am_pop_w * 0.854315518533643 +
-    r_vs_ver_sources_e1_pop_w * 0.41909038777041;
+    r_vs_ver_sources_e1_pop_w * 0.41909038777041 ) ;
 
-b_vs_gb_id_mth_fseen_w := map(
+b_vs_gb_id_mth_fseen_w := __common__( map(
     vs_gb_id_mth_fseen = NULL   => 0.00000,
     vs_gb_id_mth_fseen <= 3.5   => 1.18469,
     vs_gb_id_mth_fseen <= 5.5   => 1.00816,
@@ -3513,9 +3513,9 @@ b_vs_gb_id_mth_fseen_w := map(
     vs_gb_id_mth_fseen <= 38.5  => 0.20462,
     vs_gb_id_mth_fseen <= 83.5  => -0.01942,
     vs_gb_id_mth_fseen <= 101.5 => -0.13725,
-                                   -0.25131);
+                                   -0.25131) ) ;
 
-b_vs_gb_id_mth_lseen_w := map(
+b_vs_gb_id_mth_lseen_w := __common__( map(
     vs_gb_id_mth_lseen = NULL   => 0.00000,
     vs_gb_id_mth_lseen <= 5     => 0.24469,
     vs_gb_id_mth_lseen <= 14.5  => 0.15837,
@@ -3523,24 +3523,24 @@ b_vs_gb_id_mth_lseen_w := map(
     vs_gb_id_mth_lseen <= 37.5  => -0.15769,
     vs_gb_id_mth_lseen <= 136.5 => -0.32490,
     vs_gb_id_mth_lseen <= 142.5 => -0.40067,
-                                   -0.44574);
+                                   -0.44574) ) ;
 
-b_vs_ver_src_id__ut_w := map(
+b_vs_ver_src_id__ut_w := __common__( map(
     vs_ver_src_id__ut = NULL => 0.00000,
     vs_ver_src_id__ut <= 0.5 => -0.00404,
-                                0.27518);
+                                0.27518) ) ;
 
-b_vs_ver_src_id__bm_w := map(
+b_vs_ver_src_id__bm_w := __common__( map(
     vs_ver_src_id__bm = NULL => 0.00000,
     vs_ver_src_id__bm <= 0.5 => 0.00709,
-                                -1.24297);
+                                -1.24297) ) ;
 
-b_vs_ver_src_id__i_w := map(
+b_vs_ver_src_id__i_w := __common__( map(
     vs_ver_src_id__i = NULL => 0.00000,
     vs_ver_src_id__i <= 0.5 => 0.03682,
-                               -0.55654);
+                               -0.55654) ) ;
 
-b_vs_v2_id_mth_fseen_w := map(
+b_vs_v2_id_mth_fseen_w := __common__( map(
     vs_v2_id_mth_fseen = NULL   => 0.00000,
     vs_v2_id_mth_fseen <= 6.5   => 0.66077,
     vs_v2_id_mth_fseen <= 12.5  => 0.51001,
@@ -3551,36 +3551,36 @@ b_vs_v2_id_mth_fseen_w := map(
     vs_v2_id_mth_fseen <= 97.5  => -0.06275,
     vs_v2_id_mth_fseen <= 160.5 => -0.15919,
     vs_v2_id_mth_fseen <= 182.5 => -0.17426,
-                                   -0.28772);
+                                   -0.28772) ) ;
 
-b_vs_v2_id_mth_lseen_w := map(
+b_vs_v2_id_mth_lseen_w := __common__( map(
     vs_v2_id_mth_lseen = NULL => 0.00000,
     vs_v2_id_mth_lseen <= 0.5 => -0.15569,
-                                 0.18778);
+                                 0.18778) ) ;
 
-bv_bus_only_source_profile := -2.28659863446935 +
+bv_bus_only_source_profile := __common__( -2.28659863446935 +
     b_vs_gb_id_mth_fseen_w * 0.731914265073424 +
     b_vs_gb_id_mth_lseen_w * 0.723388216510074 +
     b_vs_ver_src_id__ut_w * 1.35963627629314 +
     b_vs_ver_src_id__bm_w * 0.930806740119904 +
     b_vs_ver_src_id__i_w * 0.811612004655868 +
     b_vs_v2_id_mth_fseen_w * 0.544847340558092 +
-    b_vs_v2_id_mth_lseen_w * 0.995501979514548;
+    b_vs_v2_id_mth_lseen_w * 0.995501979514548 ) ;
 
-truebiz_ln := id_seleID != '0' and NOT(((integer)ver_src_id_count in [-1, 0]));
+truebiz_ln := __common__( id_seleID != '0' and NOT(((integer)ver_src_id_count in [-1, 0])) ) ;
 
-iv_rv5_unscorable := if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and TrueDID = false, 1, 0);
+iv_rv5_unscorable := __common__( if(NAS_Summary <= 4 and NAP_Summary <= 4 and Infutor_NAP <= 4 and Add_Input_NAProp <= 3 and TrueDID = false, 1, 0) ) ;
 
-rv_a46_curr_avm_autoval := if(not(truedid), NULL, add_curr_avm_auto_val);
+rv_a46_curr_avm_autoval := __common__( if(not(truedid), NULL, add_curr_avm_auto_val) ) ;
 
-rv_d30_derog_count := if(not(truedid), NULL, min(if(if(max(criminal_count, attr_bankruptcy_count60, attr_eviction_count, attr_num_unrel_liens60) = NULL, NULL, sum(if(criminal_count = NULL, 0, criminal_count), if(attr_bankruptcy_count60 = NULL, 0, attr_bankruptcy_count60), if(attr_eviction_count = NULL, 0, attr_eviction_count), if(attr_num_unrel_liens60 = NULL, 0, attr_num_unrel_liens60))) = NULL, -NULL, if(max(criminal_count, attr_bankruptcy_count60, attr_eviction_count, attr_num_unrel_liens60) = NULL, NULL, sum(if(criminal_count = NULL, 0, criminal_count), if(attr_bankruptcy_count60 = NULL, 0, attr_bankruptcy_count60), if(attr_eviction_count = NULL, 0, attr_eviction_count), if(attr_num_unrel_liens60 = NULL, 0, attr_num_unrel_liens60)))), 999));
+rv_d30_derog_count := __common__( if(not(truedid), NULL, min(if(if(max(criminal_count, attr_bankruptcy_count60, attr_eviction_count, attr_num_unrel_liens60) = NULL, NULL, sum(if(criminal_count = NULL, 0, criminal_count), if(attr_bankruptcy_count60 = NULL, 0, attr_bankruptcy_count60), if(attr_eviction_count = NULL, 0, attr_eviction_count), if(attr_num_unrel_liens60 = NULL, 0, attr_num_unrel_liens60))) = NULL, -NULL, if(max(criminal_count, attr_bankruptcy_count60, attr_eviction_count, attr_num_unrel_liens60) = NULL, NULL, sum(if(criminal_count = NULL, 0, criminal_count), if(attr_bankruptcy_count60 = NULL, 0, attr_bankruptcy_count60), if(attr_eviction_count = NULL, 0, attr_eviction_count), if(attr_num_unrel_liens60 = NULL, 0, attr_num_unrel_liens60)))), 999)) ) ;
 
-bv_assoc_judg_tot := map(
+bv_assoc_judg_tot := __common__( map(
     not(truebiz_ln) => NULL,
     (integer)assoc_count = 0 => -1,
-    (integer) assoc_judg_total);
+    (integer) assoc_judg_total) ) ;
 
-rv_i61_inq_collection_recency := map(
+rv_i61_inq_collection_recency := __common__( map(
     not(truedid)           => NULL,
     inq_collection_count01 > 0 => 1,
     inq_collection_count03 > 0 => 3,
@@ -3588,27 +3588,27 @@ rv_i61_inq_collection_recency := map(
     inq_collection_count12 > 0 => 12,
     inq_collection_count24 > 0=> 24,
     inq_collection_count > 0  => 99,
-                              0);
+                              0) ) ;
 
-_inq_banko_cm_last_seen := common.sas_date((string)(Inq_banko_cm_last_seen));
+_inq_banko_cm_last_seen := __common__( common.sas_date((string)(Inq_banko_cm_last_seen)) ) ;
 
-nf_mos_inq_banko_cm_lseen := map(
+nf_mos_inq_banko_cm_lseen := __common__( map(
     not(truedid)                   => NULL,
     _inq_banko_cm_last_seen = NULL => -1,
-    min(if(if ((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12)))), 999));
+    min(if(if ((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12) >= 0, truncate((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12)), roundup((sysdate - _inq_banko_cm_last_seen) / (365.25 / 12)))), 999)) ) ;
 
-bx_addr_assessed_value := if(not(truebiz_ln) or (integer)pop_bus_addr = 0, NULL, (integer) addr_input_assessed_value);
+bx_addr_assessed_value := __common__( if(not(truebiz_ln) or (integer)pop_bus_addr = 0, NULL, (integer) addr_input_assessed_value) ) ;
 
-bv_sos_current_standing := map(
+bv_sos_current_standing := __common__( map(
     not(truebiz_ln)          => NULL,
     (integer)sos_inc_filing_count = 0 => -1,
-    (integer) sos_standing);
+    (integer) sos_standing) ) ;
 
-mortgage_type := if(truedid and add_curr_pop, add_curr_mortgage_type, '');
+mortgage_type := __common__( if(truedid and add_curr_pop, add_curr_mortgage_type, '') ) ;
 
-mortgage_present := if(truedid and add_curr_pop, ((add_curr_mortgage_date not in [0, NULL])), false);
+mortgage_present := __common__( if(truedid and add_curr_pop, ((add_curr_mortgage_date not in [0, NULL])), false) ) ;
 
-iv_curr_add_mortgage_type := map(
+iv_curr_add_mortgage_type := __common__( map(
     not(truedid and add_curr_pop)                         => '               ',
     (mortgage_type in ['CNV', 'N'])                       => 'CONVENTIONAL   ',
     (mortgage_type in ['FHA', 'G', 'VA'])                 => 'GOVERNMENT     ',
@@ -3620,84 +3620,84 @@ iv_curr_add_mortgage_type := map(
     (mortgage_type in ['U'])                              => 'UNKNOWN        ',
     not(mortgage_type = '')				                            => 'OTHER          ',
     mortgage_present                                      => 'UNKNOWN        ',
-                                                             'NO MORTGAGE');
+                                                             'NO MORTGAGE') ) ;
 
-source_ar := Models.Common.findw_cpp(ver_src_list, 'AR' ,  , '') > 0;
+source_ar := __common__( Models.Common.findw_cpp(ver_src_list, 'AR' ,  , '') > 0 ) ;
 
-source_ba := Models.Common.findw_cpp(ver_src_list, 'BA' ,  , '') > 0;
+source_ba := __common__( Models.Common.findw_cpp(ver_src_list, 'BA' ,  , '') > 0 ) ;
 
-source_bm := Models.Common.findw_cpp(ver_src_list, 'BM' ,  , '') > 0;
+source_bm := __common__( Models.Common.findw_cpp(ver_src_list, 'BM' ,  , '') > 0 ) ;
 
-source_br := Models.Common.findw_cpp(ver_src_list, 'BR' ,  , '') > 0;
+source_br := __common__( Models.Common.findw_cpp(ver_src_list, 'BR' ,  , '') > 0 ) ;
 
-source_c := Models.Common.findw_cpp(ver_src_list, 'C' ,  , '') > 0;
+source_c := __common__( Models.Common.findw_cpp(ver_src_list, 'C' ,  , '') > 0 ) ;
 
-source_cs := Models.Common.findw_cpp(ver_src_list, 'C#' ,  , '') > 0;
+source_cs := __common__( Models.Common.findw_cpp(ver_src_list, 'C#' ,  , '') > 0 ) ;
 
-source_da := Models.Common.findw_cpp(ver_src_list, 'DA' ,  , '') > 0;
+source_da := __common__( Models.Common.findw_cpp(ver_src_list, 'DA' ,  , '') > 0 ) ;
 
-source_df := Models.Common.findw_cpp(ver_src_list, 'DF' ,  , '') > 0;
+source_df := __common__( Models.Common.findw_cpp(ver_src_list, 'DF' ,  , '') > 0 ) ;
 
-source_dn := Models.Common.findw_cpp(ver_src_list, 'DN' ,  , '') > 0;
+source_dn := __common__( Models.Common.findw_cpp(ver_src_list, 'DN' ,  , '') > 0 ) ;
 
-source_ef := Models.Common.findw_cpp(ver_src_list, 'EF' ,  , '') > 0;
+source_ef := __common__( Models.Common.findw_cpp(ver_src_list, 'EF' ,  , '') > 0 ) ;
 
-source_er := Models.Common.findw_cpp(ver_src_list, 'ER' ,  , '') > 0;
+source_er := __common__( Models.Common.findw_cpp(ver_src_list, 'ER' ,  , '') > 0 ) ;
 
-source_fb := Models.Common.findw_cpp(ver_src_list, 'FB' ,  , '') > 0;
+source_fb := __common__( Models.Common.findw_cpp(ver_src_list, 'FB' ,  , '') > 0 ) ;
 
-source_ft := Models.Common.findw_cpp(ver_src_list, 'FT' ,  , '') > 0;
+source_ft := __common__( Models.Common.findw_cpp(ver_src_list, 'FT' ,  , '') > 0 ) ;
 
-source_gb := Models.Common.findw_cpp(ver_src_list, 'GB' ,  , '') > 0;
+source_gb := __common__( Models.Common.findw_cpp(ver_src_list, 'GB' ,  , '') > 0 ) ;
 
-source_i := Models.Common.findw_cpp(ver_src_list, 'I' ,  , '') > 0;
+source_i := __common__( Models.Common.findw_cpp(ver_src_list, 'I' ,  , '') > 0 ) ;
 
-source_ia := Models.Common.findw_cpp(ver_src_list, 'IA' ,  , '') > 0;
+source_ia := __common__( Models.Common.findw_cpp(ver_src_list, 'IA' ,  , '') > 0 ) ;
 
-source_ic := Models.Common.findw_cpp(ver_src_list, 'IC' ,  , '') > 0;
+source_ic := __common__( Models.Common.findw_cpp(ver_src_list, 'IC' ,  , '') > 0 ) ;
 
-source_in := Models.Common.findw_cpp(ver_src_list, 'IN' ,  , '') > 0;
+source_in := __common__( Models.Common.findw_cpp(ver_src_list, 'IN' ,  , '') > 0 ) ;
 
-source_l0 := Models.Common.findw_cpp(ver_src_list, 'L0' ,  , '') > 0;
+source_l0 := __common__( Models.Common.findw_cpp(ver_src_list, 'L0' ,  , '') > 0 ) ;
 
-source_l2 := Models.Common.findw_cpp(ver_src_list, 'L2' ,  , '') > 0;
+source_l2 := __common__( Models.Common.findw_cpp(ver_src_list, 'L2' ,  , '') > 0 ) ;
 
-source_os := Models.Common.findw_cpp(ver_src_list, 'OS' ,  , '') > 0;
+source_os := __common__( Models.Common.findw_cpp(ver_src_list, 'OS' ,  , '') > 0 ) ;
 
-source_p := Models.Common.findw_cpp(ver_src_list, 'P' ,  , '') > 0;
+source_p := __common__( Models.Common.findw_cpp(ver_src_list, 'P' ,  , '') > 0 ) ;
 
-source_pp := Models.Common.findw_cpp(ver_src_list, 'PP' ,  , '') > 0;
+source_pp := __common__( Models.Common.findw_cpp(ver_src_list, 'PP' ,  , '') > 0 ) ;
 
-source_q3 := Models.Common.findw_cpp(ver_src_list, 'Q3' ,  , '') > 0;
+source_q3 := __common__( Models.Common.findw_cpp(ver_src_list, 'Q3' ,  , '') > 0 ) ;
 
-source_tx := Models.Common.findw_cpp(ver_src_list, 'TX' ,  , '') > 0;
+source_tx := __common__( Models.Common.findw_cpp(ver_src_list, 'TX' ,  , '') > 0 ) ;
 
-source_u := Models.Common.findw_cpp(ver_src_list, 'U' ,  , '') > 0;
+source_u := __common__( Models.Common.findw_cpp(ver_src_list, 'U' ,  , '') > 0 ) ;
 
-source_ut := Models.Common.findw_cpp(ver_src_list, 'UT' ,  , '') > 0;
+source_ut := __common__( Models.Common.findw_cpp(ver_src_list, 'UT' ,  , '') > 0 ) ;
 
-source_v2 := Models.Common.findw_cpp(ver_src_list, 'V2' ,  , '') > 0;
+source_v2 := __common__( Models.Common.findw_cpp(ver_src_list, 'V2' ,  , '') > 0 ) ;
 
-source_wa := Models.Common.findw_cpp(ver_src_list, 'WA' ,  , '') > 0;
+source_wa := __common__( Models.Common.findw_cpp(ver_src_list, 'WA' ,  , '') > 0 ) ;
 
-source_wk := Models.Common.findw_cpp(ver_src_list, 'WK' ,  , '') > 0;
+source_wk := __common__( Models.Common.findw_cpp(ver_src_list, 'WK' ,  , '') > 0 ) ;
 
-num_pos_sources := if(max((integer)source_ar, (integer)source_bm, (integer)source_c, (integer)source_cs, (integer)source_dn, (integer)source_ef, (integer)source_ft, (integer)source_i, (integer)source_ia, (integer)source_in, (integer)source_p, (integer)source_v2, (integer)source_wk) = NULL, NULL, sum((integer)source_ar, (integer)source_bm, (integer)source_c, (integer)source_cs, (integer)source_dn, (integer)source_ef, (integer)source_ft, (integer)source_i, (integer)source_ia, (integer)source_in, (integer)source_p, (integer)source_v2, (integer)source_wk));
+num_pos_sources := __common__( if(max((integer)source_ar, (integer)source_bm, (integer)source_c, (integer)source_cs, (integer)source_dn, (integer)source_ef, (integer)source_ft, (integer)source_i, (integer)source_ia, (integer)source_in, (integer)source_p, (integer)source_v2, (integer)source_wk) = NULL, NULL, sum((integer)source_ar, (integer)source_bm, (integer)source_c, (integer)source_cs, (integer)source_dn, (integer)source_ef, (integer)source_ft, (integer)source_i, (integer)source_ia, (integer)source_in, (integer)source_p, (integer)source_v2, (integer)source_wk)) ) ;
 
-num_neg_sources := if(max((integer)source_ba, (integer)source_l2, (integer)source_ut) = NULL, NULL, sum((integer)source_ba, (integer)source_l2, (integer)source_ut));
+num_neg_sources := __common__( if(max((integer)source_ba, (integer)source_l2, (integer)source_ut) = NULL, NULL, sum((integer)source_ba, (integer)source_l2, (integer)source_ut)) ) ;
 
-bv_ver_src_derog_ratio := map(
+bv_ver_src_derog_ratio := __common__( map(
     not(truebiz_ln)                                                                                                                                                 => NULL,
     ver_src_list = ''                                                                                                                                             => -1,
     if(max(num_pos_sources, num_neg_sources) = NULL, NULL, sum(if(num_pos_sources = NULL, 0, num_pos_sources), if(num_neg_sources = NULL, 0, num_neg_sources))) = 0 => -2,
     num_neg_sources > 0                                                                                                                                             => round(num_neg_sources / if(max(num_pos_sources, num_neg_sources) = NULL, NULL, sum(if(num_pos_sources = NULL, 0, num_pos_sources), if(num_neg_sources = NULL, 0, num_neg_sources)))/.1)*.1,
-                                                                                                                                                                       100 + num_pos_sources);
+                                                                                                                                                                       100 + num_pos_sources) ) ;
 
-bv_mth_ver_src_p_ls_1 := if(not(truebiz_ln), NULL, NULL);
+bv_mth_ver_src_p_ls_1 := __common__( if(not(truebiz_ln), NULL, NULL) ) ;
 
-bv_mth_ver_src_p_ls := if(not(_ver_src_id__p), -1, mth__ver_src_id_ldate_p);
+bv_mth_ver_src_p_ls := __common__( if(not(_ver_src_id__p), -1, mth__ver_src_id_ldate_p) ) ;
 
-rv_d34_attr_liens_recency := map(
+rv_d34_attr_liens_recency := __common__( map(
     not(truedid)                                                              => NULL,
     (boolean)attr_num_rel_liens30 or (boolean)attr_num_unrel_liens30          => 1,
     (boolean)attr_num_rel_liens90 or (boolean)attr_num_unrel_liens90          => 3,
@@ -3707,58 +3707,58 @@ rv_d34_attr_liens_recency := map(
     (boolean)attr_num_rel_liens36 or (boolean)attr_num_unrel_liens36          => 36,
     (boolean)attr_num_rel_liens60 or (boolean)attr_num_unrel_liens60          => 60,
     liens_historical_released_count > 0 or liens_historical_unreleased_ct > 0 => 99,
-                                                                                 0);
+                                                                                 0) ) ;
 
-bv_lien_avg_amount := map(
+bv_lien_avg_amount := __common__( map(
     not(truebiz_ln)       => NULL,
     (integer)lien_filed_count <= 0 => -1,
-    (integer) lien_total_amount / (integer) lien_filed_count);
+    (integer) lien_total_amount / (integer) lien_filed_count) ) ;
 
-bv_lien_total_amount := map(
+bv_lien_total_amount := __common__( map(
     not(truebiz_ln)       => NULL,
     (integer)lien_filed_count <= 0 => -1,
-    (integer) lien_total_amount);
+    (integer) lien_total_amount) ) ;
 
-nf_fp_varrisktype := map(
+nf_fp_varrisktype := __common__( map(
     not(truedid)          => NULL,
     (integer) fp_varrisktype = 0 => NULL,
-    (integer) trim(fp_varrisktype, LEFT));
+    (integer) trim(fp_varrisktype, LEFT)) ) ;
 
-bv_ver_src_id_mth_since_fs := if(not(truebiz_ln), NULL, (integer) ver_src_id_mth_since_fs);
+bv_ver_src_id_mth_since_fs := __common__( if(not(truebiz_ln), NULL, (integer) ver_src_id_mth_since_fs) ) ;
 
-nf_fp_srchunvrfdssncount := if(not(truedid), NULL, min(if((integer) fp_srchunvrfdssncount = NULL, -NULL, (integer) fp_srchunvrfdssncount), 999));
+nf_fp_srchunvrfdssncount := __common__( if(not(truedid), NULL, min(if((integer) fp_srchunvrfdssncount = NULL, -NULL, (integer) fp_srchunvrfdssncount), 999)) ) ;
 
-_judg_filed_firstseen := common.sas_date((string)(judg_filed_firstseen));
+_judg_filed_firstseen := __common__( common.sas_date((string)(judg_filed_firstseen)) ) ;
 
-bv_judg_filed_mth_fs := map(
+bv_judg_filed_mth_fs := __common__( map(
     not(truebiz_ln)              => NULL,
     _judg_filed_firstseen = NULL => -1,
-    if ((sysdate - _judg_filed_firstseen) / (365.25 / 12) >= 0, roundup((sysdate - _judg_filed_firstseen) / (365.25 / 12)), truncate((sysdate - _judg_filed_firstseen) / (365.25 / 12))));
+    if ((sysdate - _judg_filed_firstseen) / (365.25 / 12) >= 0, roundup((sysdate - _judg_filed_firstseen) / (365.25 / 12)), truncate((sysdate - _judg_filed_firstseen) / (365.25 / 12)))) ) ;
 
-rv_a41_prop_owner := map(
+rv_a41_prop_owner := __common__( map(
     not(truedid)                                                           => NULL,
     add_curr_naprop = 4 or add_prev_naprop = 4 or property_owned_total > 0 => 1,
-                                                                              0);
+                                                                              0) ) ;
 
-_sos_agent_change_lastseen := common.sas_date((string)(sos_agent_change_lastseen));
+_sos_agent_change_lastseen := __common__( common.sas_date((string)(sos_agent_change_lastseen)) ) ;
 
-bv_sos_mth_agent_change := map(
+bv_sos_mth_agent_change := __common__( map(
     not(truebiz_ln)                   => NULL,
     _sos_agent_change_lastseen = NULL => -1,
-                                         if ((sysdate - _sos_agent_change_lastseen) / (365.25 / 12) >= 0, roundup((sysdate - _sos_agent_change_lastseen) / (365.25 / 12)), truncate((sysdate - _sos_agent_change_lastseen) / (365.25 / 12))));
+                                         if ((sysdate - _sos_agent_change_lastseen) / (365.25 / 12) >= 0, roundup((sysdate - _sos_agent_change_lastseen) / (365.25 / 12)), truncate((sysdate - _sos_agent_change_lastseen) / (365.25 / 12)))) ) ;
 
-bv_assoc_lien_tot := map(
+bv_assoc_lien_tot := __common__( map(
     not(truebiz_ln) => NULL,
     (integer)assoc_count = 0 => -1,
-    (integer)assoc_lien_total);
+    (integer)assoc_lien_total) ) ;
 
-bx_addr_lres := map(
+bx_addr_lres := __common__( map(
     not(truebiz_ln) or (integer)pop_bus_addr = 0                                                                       => NULL,
     trim((string)ver_addr_src_firstseen_list, ALL) = '' or 
 		trim((string)ver_addr_src_lastseen_list, ALL) = '' => -1,
-    (integer) addr_input_lres);
+    (integer) addr_input_lres) ) ;
 
-rv_d32_attr_felonies_recency := map(
+rv_d32_attr_felonies_recency := __common__( map(
     not(truedid)     => NULL,
     attr_felonies30 >= 1  => 1,
     attr_felonies90 >= 1 => 3,
@@ -3768,14 +3768,14 @@ rv_d32_attr_felonies_recency := map(
     attr_felonies36 >= 1 => 36,
     attr_felonies60 >= 1 => 60,
     felony_count > 0 => 99,
-                        0);
+                        0) ) ;
 
-rv_ever_asset_owner := map(
+rv_ever_asset_owner := __common__( map(
     not(truedid)                                                                                                                                                                         => NULL,
     add_curr_naprop = 4 or add_prev_naprop = 4 or property_owned_total > 0 or Models.Common.findw_cpp(ver_sources, 'P' , ', ', 'E') > 0 or watercraft_count > 0 or attr_num_aircraft > 0 => 1,
-                                                                                                                                                                                            0);
+                                                                                                                                                                                            0) ) ;
 
-rv_d34_attr_unrel_liens_recency := map(
+rv_d34_attr_unrel_liens_recency := __common__( map(
     not(truedid)                       => NULL,
     attr_num_unrel_liens30 >=1            => 1,
     attr_num_unrel_liens90 >=1            => 3,
@@ -3785,45 +3785,45 @@ rv_d34_attr_unrel_liens_recency := map(
     attr_num_unrel_liens36 >=1=> 36,
     attr_num_unrel_liens60  >=1 => 60,
     liens_historical_unreleased_ct > 0 => 99,
-                                          0);
+                                          0) ) ;
 
-rv_a44_curr_add_naprop := if(not(truedid and add_curr_pop), NULL, add_curr_naprop);
+rv_a44_curr_add_naprop := __common__( if(not(truedid and add_curr_pop), NULL, add_curr_naprop) ) ;
 
-bv_mth_bureau_fs := map(
+bv_mth_bureau_fs := __common__( map(
     not(truebiz_ln)                  => NULL,
     (integer)ver_src_bureau_mth_since_fs = -1 => -1,
-    (integer) ver_src_bureau_mth_since_fs);
+    (integer) ver_src_bureau_mth_since_fs) ) ;
 
-rv_i60_inq_auto_count12 := if(not(truedid), NULL, min(if(inq_auto_count12 = NULL, -NULL, inq_auto_count12), 999));
+rv_i60_inq_auto_count12 := __common__( if(not(truedid), NULL, min(if(inq_auto_count12 = NULL, -NULL, inq_auto_count12), 999)) ) ;
 
-br_first_seen_char := br_first_seen;
+br_first_seen_char := __common__( br_first_seen ) ;
 
-_br_first_seen := common.sas_date((string)(br_first_seen_char));
+_br_first_seen := __common__( common.sas_date((string)(br_first_seen_char)) ) ;
 
-rv_mos_since_br_first_seen := map(
+rv_mos_since_br_first_seen := __common__( map(
     not(truedid)          => NULL,
     _br_first_seen = NULL => -1,
-                             min(if(if ((sysdate - _br_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _br_first_seen) / (365.25 / 12)), roundup((sysdate - _br_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _br_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _br_first_seen) / (365.25 / 12)), roundup((sysdate - _br_first_seen) / (365.25 / 12)))), 999));
+                             min(if(if ((sysdate - _br_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _br_first_seen) / (365.25 / 12)), roundup((sysdate - _br_first_seen) / (365.25 / 12))) = NULL, -NULL, if ((sysdate - _br_first_seen) / (365.25 / 12) >= 0, truncate((sysdate - _br_first_seen) / (365.25 / 12)), roundup((sysdate - _br_first_seen) / (365.25 / 12)))), 999)) ) ;
 
-nf_fp_srchvelocityrisktype := map(
+nf_fp_srchvelocityrisktype := __common__( map(
     not(truedid)                   => NULL,
     fp_srchvelocityrisktype = '' => NULL,
-    (INTEGER) trim(fp_srchvelocityrisktype, LEFT));
+    (INTEGER) trim(fp_srchvelocityrisktype, LEFT)) ) ;
 
-rv_d33_eviction_count := if(not(truedid), NULL, min(if(attr_eviction_count = NULL, -NULL, attr_eviction_count), 999));
+rv_d33_eviction_count := __common__( if(not(truedid), NULL, min(if(attr_eviction_count = NULL, -NULL, attr_eviction_count), 999)) ) ;
 
-bv_lien_ft_count := if(not(truebiz_ln), NULL, (integer) lien_filed_FT_ct);
+bv_lien_ft_count := __common__( if(not(truebiz_ln), NULL, (integer) lien_filed_FT_ct) ) ;
 
-rv_d34_unrel_liens_ct := if(not(truedid), NULL, min(if(liens_recent_unreleased_count = NULL, -NULL, liens_recent_unreleased_count), 999));
+rv_d34_unrel_liens_ct := __common__( if(not(truedid), NULL, min(if(liens_recent_unreleased_count = NULL, -NULL, liens_recent_unreleased_count), 999)) ) ;
 
-bv_assoc_derog_pct := map(
+bv_assoc_derog_pct := __common__( map(
     not(truebiz_ln)  => NULL,
     (integer)assoc_count <= 0 => -1,
-     max((integer)assoc_felony_count, (integer)assoc_bankruptcy_count12, (integer)assoc_lien_count, (integer)assoc_judg_count) / (integer)assoc_count);
+     max((integer)assoc_felony_count, (integer)assoc_bankruptcy_count12, (integer)assoc_lien_count, (integer)assoc_judg_count) / (integer)assoc_count) ) ;
 
-nf_fp_srchunvrfdphonecount := if(not(truedid), NULL, min(if((integer) fp_srchunvrfdphonecount = NULL, -NULL, (integer)fp_srchunvrfdphonecount), 999));
+nf_fp_srchunvrfdphonecount := __common__( if(not(truedid), NULL, min(if((integer) fp_srchunvrfdphonecount = NULL, -NULL, (integer)fp_srchunvrfdphonecount), 999)) ) ;
 
-rv_i60_inq_comm_recency := map(
+rv_i60_inq_comm_recency := __common__( map(
     not(truedid)               => NULL,
     inq_communications_count01 >= 1 => 1,
     inq_communications_count03 >= 1 => 3,
@@ -3831,29 +3831,29 @@ rv_i60_inq_comm_recency := map(
     inq_communications_count12 >= 1 => 12,
     inq_communications_count24 >= 1 => 24,
     inq_communications_count   >= 1 => 99,
-                                  0);
+                                  0) ) ;
 
-nf_fp_srchfraudsrchcountyr := if(not(truedid), NULL, min(if((integer)fp_srchfraudsrchcountyr = NULL, -NULL, (integer)fp_srchfraudsrchcountyr), 999));
+nf_fp_srchfraudsrchcountyr := __common__( if(not(truedid), NULL, min(if((integer)fp_srchfraudsrchcountyr = NULL, -NULL, (integer)fp_srchfraudsrchcountyr), 999)) ) ;
 
-bv_ver_src_id_activity12 := if(not(truebiz_ln), NULL, (integer) ver_src_id_activity12);
+bv_ver_src_id_activity12 := __common__( if(not(truebiz_ln), NULL, (integer) ver_src_id_activity12) ) ;
 
-bv_lien_ot_count := if(not(truebiz_ln), NULL,  (integer)lien_filed_OT_ct);
+bv_lien_ot_count := __common__( if(not(truebiz_ln), NULL,  (integer)lien_filed_OT_ct) ) ;
 
-bv_judg_avg_amount := map(
+bv_judg_avg_amount := __common__( map(
     not(truebiz_ln)       => NULL,
     (integer)judg_filed_count <= 0 => -1,
-    (integer)judg_total_amount / (integer)judg_filed_count);
+    (integer)judg_total_amount / (integer)judg_filed_count) ) ;
 
-nf_fp_srchunvrfdaddrcount := if(not(truedid), NULL, min(if( (integer)fp_srchunvrfdaddrcount = NULL, -NULL,  (integer)fp_srchunvrfdaddrcount), 999));
+nf_fp_srchunvrfdaddrcount := __common__( if(not(truedid), NULL, min(if( (integer)fp_srchunvrfdaddrcount = NULL, -NULL,  (integer)fp_srchunvrfdaddrcount), 999)) ) ;
 
-nf_fp_sourcerisktype := map(
+nf_fp_sourcerisktype := __common__( map(
     not(truedid)             => NULL,
     fp_sourcerisktype = '' => NULL,
-    (integer) trim(fp_sourcerisktype, LEFT));
+    (integer) trim(fp_sourcerisktype, LEFT)) ) ;
 
-nf_fp_prevaddrageoldest := if(not(truedid), NULL, min(if((integer) fp_prevaddrageoldest = NULL, -NULL, (integer) fp_prevaddrageoldest), 999));
+nf_fp_prevaddrageoldest := __common__( if(not(truedid), NULL, min(if((integer) fp_prevaddrageoldest = NULL, -NULL, (integer) fp_prevaddrageoldest), 999)) ) ;
 
-rv_i60_inq_auto_recency := map(
+rv_i60_inq_auto_recency := __common__( map(
     not(truedid)     => NULL,
     inq_auto_count01 >= 1 => 1,
     inq_auto_count03  >= 1 => 3,
@@ -3861,11 +3861,11 @@ rv_i60_inq_auto_recency := map(
     inq_auto_count12  >= 1 => 12,
     inq_auto_count24 >= 1  => 24,
     inq_auto_count   >= 1  => 99,
-                        0);
+                        0) ) ;
 
-rv_i61_inq_collection_count12 := if(not(truedid), NULL, min(if((integer) inq_collection_count12 = NULL, -NULL,(integer)  inq_collection_count12), 999));
+rv_i61_inq_collection_count12 := __common__( if(not(truedid), NULL, min(if((integer) inq_collection_count12 = NULL, -NULL,(integer)  inq_collection_count12), 999)) ) ;
 
-rv_i60_inq_hiriskcred_recency := map(
+rv_i60_inq_hiriskcred_recency := __common__( map(
     not(truedid)               => NULL,
     inq_highRiskCredit_count01  >= 1 => 1,
     inq_highRiskCredit_count03  >= 1 => 3,
@@ -3873,13 +3873,13 @@ rv_i60_inq_hiriskcred_recency := map(
     inq_highRiskCredit_count12 >= 1  => 12,
     inq_highRiskCredit_count24  >= 1 => 24,
     inq_highRiskCredit_count    >= 1 => 99,
-                                  0);
+                                  0) ) ;
 
-rv_c14_addrs_per_adl_c6 := if(not(truedid), NULL, min(if((integer) addrs_per_adl_c6 = NULL, -NULL, (integer) addrs_per_adl_c6), 999));
+rv_c14_addrs_per_adl_c6 := __common__( if(not(truedid), NULL, min(if((integer) addrs_per_adl_c6 = NULL, -NULL, (integer) addrs_per_adl_c6), 999)) ) ;
 
-rv_c12_num_nonderogs := if(not(truedid), NULL, min(if((integer) attr_num_nonderogs = NULL, -NULL, (integer) attr_num_nonderogs), 4));
+rv_c12_num_nonderogs := __common__( if(not(truedid), NULL, min(if((integer) attr_num_nonderogs = NULL, -NULL, (integer) attr_num_nonderogs), 4)) ) ;
 
-s0_v01_w := map(
+s0_v01_w := __common__( map(
     bv_bus_rep_source_profile = NULL           => 0,
     bv_bus_rep_source_profile = -1             => 0,
     bv_bus_rep_source_profile <= -3.3955322565 => -0.420450712577453,
@@ -3891,9 +3891,9 @@ s0_v01_w := map(
     bv_bus_rep_source_profile <= -2.1244878985 => 0.108909294403979,
     bv_bus_rep_source_profile <= -1.715984092  => 0.184374358350777,
     bv_bus_rep_source_profile <= -1.0046005985 => 0.381875355244527,
-                                                  0.652297018639119);
+                                                  0.652297018639119) ) ;
 
-s0_aa_code_01 := map(
+s0_aa_code_01 := __common__( map(
     s0_v01_w = -0.420450712577453              => '     ',
     bv_bus_rep_source_profile = NULL           => 'B031',
     bv_bus_rep_source_profile = -1             => 'B034',
@@ -3906,11 +3906,11 @@ s0_aa_code_01 := map(
     bv_bus_rep_source_profile <= -2.1244878985 => 'B034',
     bv_bus_rep_source_profile <= -1.715984092  => 'B034',
     bv_bus_rep_source_profile <= -1.0046005985 => 'B034',
-                                                  'B034');
+                                                  'B034') ) ;
 
-s0_aa_dist_01 := 0 - s0_v01_w;
+s0_aa_dist_01 := __common__( 0 - s0_v01_w ) ;
 
-s0_v02_w := map(
+s0_v02_w := __common__( map(
     rv_a46_curr_avm_autoval = NULL      => 0,
     rv_a46_curr_avm_autoval = -1        => 0,
     rv_a46_curr_avm_autoval <= 0        => 0.0560016662782271,
@@ -3918,9 +3918,9 @@ s0_v02_w := map(
     rv_a46_curr_avm_autoval <= 140279   => 0.253962623900315,
     rv_a46_curr_avm_autoval <= 164999   => 0.126523026145714,
     rv_a46_curr_avm_autoval <= 200004.5 => 0.0551409985410823,
-                                           -0.206958034439097);
+                                           -0.206958034439097) ) ;
 
-s0_aa_code_02 := map(
+s0_aa_code_02 := __common__( map(
     s0_v02_w = -0.206958034439097       => '     ',
     rv_a46_curr_avm_autoval = NULL      => 'P535',
     rv_a46_curr_avm_autoval = -1        => 'P509',
@@ -3929,11 +3929,11 @@ s0_aa_code_02 := map(
     rv_a46_curr_avm_autoval <= 140279   => 'P509',
     rv_a46_curr_avm_autoval <= 164999   => 'P509',
     rv_a46_curr_avm_autoval <= 200004.5 => 'P509',
-                                           'P509');
+                                           'P509') ) ;
 
-s0_aa_dist_02 := 0 - s0_v02_w;
+s0_aa_dist_02 := __common__( 0 - s0_v02_w ) ;
 
-s0_v03_w := map(
+s0_v03_w := __common__( map(
     rv_d30_derog_count = NULL => 0,
     rv_d30_derog_count = -1   => 0,
     rv_d30_derog_count <= 0.5 => -0.0881074376235155,
@@ -3941,9 +3941,9 @@ s0_v03_w := map(
     rv_d30_derog_count <= 2   => 0.132460577697125,
     rv_d30_derog_count <= 5.5 => 0.241578213192017,
     rv_d30_derog_count <= 6.5 => 0.425834844055478,
-                                 0.5329816995126);
+                                 0.5329816995126) ) ;
 
-s0_aa_code_03 := map(
+s0_aa_code_03 := __common__( map(
     s0_v03_w = -0.0881074376235155 => '     ',
     rv_d30_derog_count = NULL      => 'P535',
     rv_d30_derog_count = -1        => 'P526',
@@ -3952,11 +3952,11 @@ s0_aa_code_03 := map(
     rv_d30_derog_count <= 2        => 'P526',
     rv_d30_derog_count <= 5.5      => 'P526',
     rv_d30_derog_count <= 6.5      => 'P526',
-                                      'P526');
+                                      'P526') ) ;
 
-s0_aa_dist_03 := 0 - s0_v03_w;
+s0_aa_dist_03 := __common__( 0 - s0_v03_w ) ;
 
-s0_v04_w := map(
+s0_v04_w := __common__( map(
     bv_rep_only_source_profile = NULL           => 0,
     bv_rep_only_source_profile = -1             => 0,
     bv_rep_only_source_profile <= -3.3087025605 => -0.281258380535393,
@@ -3968,9 +3968,9 @@ s0_v04_w := map(
     bv_rep_only_source_profile <= -2.034436164  => 0.0795250399991452,
     bv_rep_only_source_profile <= -1.632375088  => 0.143653679711649,
     bv_rep_only_source_profile <= -1.5861383885 => 0.24147982552513,
-                                                   0.287465957065813);
+                                                   0.287465957065813) ) ;
 
-s0_aa_code_04 := map(
+s0_aa_code_04 := __common__( map(
     s0_v04_w = -0.281258380535393               => '     ',
     bv_rep_only_source_profile = NULL           => 'P535',
     bv_rep_only_source_profile = -1             => 'P515',
@@ -3983,49 +3983,49 @@ s0_aa_code_04 := map(
     bv_rep_only_source_profile <= -2.034436164  => 'P515',
     bv_rep_only_source_profile <= -1.632375088  => 'P515',
     bv_rep_only_source_profile <= -1.5861383885 => 'P515',
-                                                   'P515');
+                                                   'P515') ) ;
 
-s0_aa_dist_04 := 0 - s0_v04_w;
+s0_aa_dist_04 := __common__( 0 - s0_v04_w ) ;
 
-s0_v05_w := map(
+s0_v05_w := __common__( map(
     bv_assoc_judg_tot = NULL => 0,
     bv_assoc_judg_tot = -1   => 0.0244094712349465,
     bv_assoc_judg_tot <= 0.5 => -0.061231904104776,
     bv_assoc_judg_tot <= 1.5 => 0.329168273901262,
     bv_assoc_judg_tot <= 2   => 0.53168632227103,
-                                0.63055536954674);
+                                0.63055536954674) ) ;
 
-s0_aa_code_05 := map(
+s0_aa_code_05 := __common__( map(
     s0_v05_w = -0.061231904104776 => '     ',
     bv_assoc_judg_tot = NULL      => 'B031',
     bv_assoc_judg_tot = -1        => 'B017',
     bv_assoc_judg_tot <= 0.5      => 'B026',
     bv_assoc_judg_tot <= 1.5      => 'B026',
     bv_assoc_judg_tot <= 2        => 'B026',
-                                     'B026');
+                                     'B026') ) ;
 
-s0_aa_dist_05 := 0 - s0_v05_w;
+s0_aa_dist_05 := __common__( 0 - s0_v05_w ) ;
 
-s0_v06_w := map(
+s0_v06_w := __common__( map(
     rv_i61_inq_collection_recency = NULL => 0,
     rv_i61_inq_collection_recency = -1   => 0,
     rv_i61_inq_collection_recency <= 0.5 => -0.107919096830067,
     rv_i61_inq_collection_recency <= 9   => 0.331699094289581,
     rv_i61_inq_collection_recency <= 24  => 0.144892353520593,
-                                            -0.107919096830067);
+                                            -0.107919096830067) ) ;
 
-s0_aa_code_06 := map(
+s0_aa_code_06 := __common__( map(
     s0_v06_w = -0.107919096830067        => '     ',
     rv_i61_inq_collection_recency = NULL => 'P535',
     rv_i61_inq_collection_recency = -1   => 'P540',
     rv_i61_inq_collection_recency <= 0.5 => 'P540',
     rv_i61_inq_collection_recency <= 9   => 'P540',
     rv_i61_inq_collection_recency <= 24  => 'P540',
-                                            'P540');
+                                            'P540') ) ;
 
-s0_aa_dist_06 := 0 - s0_v06_w;
+s0_aa_dist_06 := __common__( 0 - s0_v06_w ) ;
 
-s0_v07_w := map(
+s0_v07_w := __common__( map(
     bv_bus_only_source_profile = NULL           => 0,
     bv_bus_only_source_profile = -1             => 0,
     bv_bus_only_source_profile <= -2.7140256535 => -0.315386297072775,
@@ -4034,9 +4034,9 @@ s0_v07_w := map(
     bv_bus_only_source_profile <= -1.957897059  => 0.0189516900513446,
     bv_bus_only_source_profile <= -1.7091781455 => 0.184402012659872,
     bv_bus_only_source_profile <= -1.2166780885 => 0.354602057146306,
-                                                   0.45606398361048);
+                                                   0.45606398361048) ) ;
 
-s0_aa_code_07 := map(
+s0_aa_code_07 := __common__( map(
     s0_v07_w = -0.315386297072775               => '     ',
     bv_bus_only_source_profile = NULL           => 'B031',
     bv_bus_only_source_profile = -1             => 'B034',
@@ -4046,30 +4046,30 @@ s0_aa_code_07 := map(
     bv_bus_only_source_profile <= -1.957897059  => 'B034',
     bv_bus_only_source_profile <= -1.7091781455 => 'B034',
     bv_bus_only_source_profile <= -1.2166780885 => 'B034',
-                                                   'B034');
+                                                   'B034') ) ;
 
-s0_aa_dist_07 := 0 - s0_v07_w;
+s0_aa_dist_07 := __common__( 0 - s0_v07_w ) ;
 
-s0_v08_w := map(
+s0_v08_w := __common__( map(
     nf_mos_inq_banko_cm_lseen = NULL  => 0,
     nf_mos_inq_banko_cm_lseen = -1    => -0.0274238945018624,
     nf_mos_inq_banko_cm_lseen <= 6.5  => 0.466627917528398,
     nf_mos_inq_banko_cm_lseen <= 12.5 => 0.348164490562641,
     nf_mos_inq_banko_cm_lseen <= 59.6 => 0.278040340675528,
-                                         -0.0274238945018624);
+                                         -0.0274238945018624) ) ;
 
-s0_aa_code_08 := map(
+s0_aa_code_08 := __common__( map(
     s0_v08_w = -0.0274238945018624    => '     ',
     nf_mos_inq_banko_cm_lseen = NULL  => 'P535',
     nf_mos_inq_banko_cm_lseen = -1    => 'P540',
     nf_mos_inq_banko_cm_lseen <= 6.5  => 'P540',
     nf_mos_inq_banko_cm_lseen <= 12.5 => 'P540',
     nf_mos_inq_banko_cm_lseen <= 59.6 => 'P540',
-                                         'P540');
+                                         'P540') ) ;
 
-s0_aa_dist_08 := 0 - s0_v08_w;
+s0_aa_dist_08 := __common__( 0 - s0_v08_w ) ;
 
-s0_v09_w := map(
+s0_v09_w := __common__( map(
     bx_addr_assessed_value = NULL    => 0,
     bx_addr_assessed_value = -1      => 0,
     bx_addr_assessed_value <= 0      => 0.0814658371628586,
@@ -4077,9 +4077,9 @@ s0_v09_w := map(
     bx_addr_assessed_value <= 192688 => 0.0912812258159474,
     bx_addr_assessed_value <= 219248 => 0.0482266766154843,
     bx_addr_assessed_value <= 266752 => -0.0206059254025205,
-                                        -0.0954360671646139);
+                                        -0.0954360671646139) ) ;
 
-s0_aa_code_09 := map(
+s0_aa_code_09 := __common__( map(
     s0_v09_w = -0.0954360671646139   => '     ',
     bx_addr_assessed_value = NULL    => 'B031',
     bx_addr_assessed_value = -1      => 'B069',
@@ -4088,18 +4088,18 @@ s0_aa_code_09 := map(
     bx_addr_assessed_value <= 192688 => 'B069',
     bx_addr_assessed_value <= 219248 => 'B069',
     bx_addr_assessed_value <= 266752 => 'B069',
-                                        'B069');
+                                        'B069') ) ;
 
-s0_aa_dist_09 := 0 - s0_v09_w;
+s0_aa_dist_09 := __common__( 0 - s0_v09_w ) ;
 
-s0_v10_w := map(
+s0_v10_w := __common__( map(
     bv_sos_current_standing = NULL => 0,
     bv_sos_current_standing = -1   => -0.0367536943766163,
     bv_sos_current_standing <= 0   => 0,
     bv_sos_current_standing <= 2   => 0.49084339045106,
-                                      -0.0367536943766163);
+                                      -0.0367536943766163) ) ;
 
-s0_aa_code_10 := map(
+s0_aa_code_10 := __common__( map(
     s0_v10_w = -0.0367536943766163 => '     ',
     s0_v10_w = 0.49084339045106 => '     ',
 		bv_sos_current_standing = NULL => 'B031',
@@ -4107,29 +4107,29 @@ s0_aa_code_10 := map(
     bv_sos_current_standing <= 0   => 'B035',
     bv_sos_current_standing <= 1   => 'B059',
     bv_sos_current_standing <= 2.5 => 'B075',
-                                      'B034');
+                                      'B034') ) ;
 
-s0_aa_dist_10 := 0 - s0_v10_w;
+s0_aa_dist_10 := __common__( 0 - s0_v10_w ) ;
 
-s0_v11_w := map(
+s0_v11_w := __common__( map(
     iv_curr_add_mortgage_type = ''                                                          => 0,
     (iv_curr_add_mortgage_type in ['CONVENTIONAL'])                                           => -0.0677291146258545,
     (iv_curr_add_mortgage_type in ['GOVERNMENT', 'NON-TRADITIONAL', 'UNKNOWN', 'COMMERCIAL']) => -0.0120250198819395,
     (iv_curr_add_mortgage_type in ['NO MORTGAGE'])                                            => 0.0463519424827326,
-                                                                                                 0);
+                                                                                                 0) ) ;
 
-s0_aa_code_11 := map(
+s0_aa_code_11 := __common__( map(
     s0_v11_w = -0.0677291146258545                                                            => '     ',
     iv_curr_add_mortgage_type = ''                                                          => 'P535',
     (iv_curr_add_mortgage_type in ['CONVENTIONAL'])                                           => 'P510',
     (iv_curr_add_mortgage_type in ['GOVERNMENT', 'NON-TRADITIONAL', 'UNKNOWN', 'COMMERCIAL']) => 'P510',
     (rv_a44_curr_add_naprop in [0, 1])                                                        => 'P505',
     (iv_curr_add_mortgage_type in ['NO MORTGAGE'])                                            => 'P513',
-                                                                                                 'P510');
+                                                                                                 'P510') ) ;
 
-s0_aa_dist_11 := 0 - s0_v11_w;
+s0_aa_dist_11 := __common__( 0 - s0_v11_w ) ;
 
-s0_v12_w := map(
+s0_v12_w := __common__( map(
     bv_ver_src_derog_ratio = NULL   => 0,
     bv_ver_src_derog_ratio = -1     => 0.339906480022536,
     bv_ver_src_derog_ratio <= -1.5  => 0.114518896797613,
@@ -4139,9 +4139,9 @@ s0_v12_w := map(
     bv_ver_src_derog_ratio <= 51    => 0.409765153107066,
     bv_ver_src_derog_ratio <= 102.5 => -0.0338802200351155,
     bv_ver_src_derog_ratio <= 103.5 => -0.148619761974858,
-                                       -0.334345448926729);
+                                       -0.334345448926729) ) ;
 
-s0_aa_code_12 := map(
+s0_aa_code_12 := __common__( map(
     s0_v12_w = -0.334345448926729   => '     ',
     bv_ver_src_derog_ratio = NULL   => 'B031',
     bv_ver_src_derog_ratio = -1     => 'B034',
@@ -4152,35 +4152,35 @@ s0_aa_code_12 := map(
     bv_ver_src_derog_ratio <= 51    => 'B063',
     bv_ver_src_derog_ratio <= 102.5 => 'B034',
     bv_ver_src_derog_ratio <= 103.5 => 'B034',
-                                       'B034');
+                                       'B034') ) ;
 
-s0_aa_dist_12 := 0 - s0_v12_w;
+s0_aa_dist_12 := __common__( 0 - s0_v12_w ) ;
 
-s0_v13_w := map(
+s0_v13_w := __common__( map(
     bv_mth_ver_src_p_ls = NULL => 0,
     bv_mth_ver_src_p_ls = -1   => 0.0184795332753227,
     bv_mth_ver_src_p_ls <= 24  => -0.090092200998207,
-                                  -0.0241765048470953);
+                                  -0.0241765048470953) ) ;
 
-s0_aa_code_13 := map(
+s0_aa_code_13 := __common__( map(
     s0_v13_w = -0.090092200998207 => '     ',
     bv_mth_ver_src_p_ls = NULL    => 'B076',
     bv_mth_ver_src_p_ls = -1      => 'B052',
     bv_mth_ver_src_p_ls <= 24     => 'B076',
-                                     'B076');
+                                     'B076') ) ;
 
-s0_aa_dist_13 := 0 - s0_v13_w;
+s0_aa_dist_13 := __common__( 0 - s0_v13_w ) ;
 
-s0_v14_w := map(
+s0_v14_w := __common__( map(
     rv_d34_attr_liens_recency = NULL => 0,
     rv_d34_attr_liens_recency = -1   => 0,
     rv_d34_attr_liens_recency <= 0.5 => -0.0804335280617169,
     rv_d34_attr_liens_recency <= 18  => 0.717337078296652,
     rv_d34_attr_liens_recency <= 48  => 0.498216239874925,
     rv_d34_attr_liens_recency <= 60  => 0.37975021013053,
-                                        -0.0804335280617169);
+                                        -0.0804335280617169) ) ;
 
-s0_aa_code_14 := map(
+s0_aa_code_14 := __common__( map(
     s0_v14_w = -0.0804335280617169   => '     ',
     rv_d34_attr_liens_recency = NULL => 'P535',
     rv_d34_attr_liens_recency = -1   => 'P526',
@@ -4188,43 +4188,43 @@ s0_aa_code_14 := map(
     rv_d34_attr_liens_recency <= 18  => 'P526',
     rv_d34_attr_liens_recency <= 48  => 'P526',
     rv_d34_attr_liens_recency <= 60  => 'P526',
-                                        'P526');
+                                        'P526') ) ;
 
-s0_aa_dist_14 := 0 - s0_v14_w;
+s0_aa_dist_14 := __common__( 0 - s0_v14_w ) ;
 
-s0_v15_w := map(
+s0_v15_w := __common__( map(
     bv_lien_avg_amount = NULL           => 0,
     bv_lien_avg_amount = -1             => -0.010561496657869,
     bv_lien_avg_amount <= 5389.57142855 => 0.103659081363966,
-                                           0.410984457988868);
+                                           0.410984457988868) ) ;
 
-s0_aa_code_15 := map(
+s0_aa_code_15 := __common__( map(
     s0_v15_w = -0.010561496657869       => '     ',
     bv_lien_avg_amount = NULL           => 'B031',
     bv_lien_avg_amount = -1             => 'B079',
     bv_lien_avg_amount <= 5389.57142855 => 'B079',
-                                           'B079');
+                                           'B079') ) ;
 
-s0_aa_dist_15 := 0 - s0_v15_w;
+s0_aa_dist_15 := __common__( 0 - s0_v15_w ) ;
 
-s0_v16_w := map(
+s0_v16_w := __common__( map(
     bv_lien_total_amount = NULL     => 0,
     bv_lien_total_amount = -1       => -0.0174364029895024,
     bv_lien_total_amount <= 1687    => -0.0174364029895024,
     bv_lien_total_amount <= 10980.5 => 0.192906716770004,
-                                       0.327682607451732);
+                                       0.327682607451732) ) ;
 
-s0_aa_code_16 := map(
+s0_aa_code_16 := __common__( map(
     s0_v16_w = -0.0174364029895024  => '     ',
     bv_lien_total_amount = NULL     => 'B031',
     bv_lien_total_amount = -1       => 'B079',
     bv_lien_total_amount <= 1687    => 'B079',
     bv_lien_total_amount <= 10980.5 => 'B079',
-                                       'B079');
+                                       'B079') ) ;
 
-s0_aa_dist_16 := 0 - s0_v16_w;
+s0_aa_dist_16 := __common__( 0 - s0_v16_w ) ;
 
-s0_v17_w := map(
+s0_v17_w := __common__( map(
     nf_fp_varrisktype = NULL => 0,
     nf_fp_varrisktype = -1   => 0,
     nf_fp_varrisktype <= 1   => -0.0245444219580424,
@@ -4232,9 +4232,9 @@ s0_v17_w := map(
     nf_fp_varrisktype <= 3.5 => 0.10803615114697,
     nf_fp_varrisktype <= 4.5 => 0.129005916315595,
     nf_fp_varrisktype <= 5.5 => 0.157837490477875,
-                                0.209360695332488);
+                                0.209360695332488) ) ;
 
-s0_aa_code_17 := map(
+s0_aa_code_17 := __common__( map(
     s0_v17_w = -0.0245444219580424 => '     ',
     nf_fp_varrisktype = NULL       => 'P535',
     nf_fp_varrisktype = -1         => 'P535',
@@ -4243,11 +4243,11 @@ s0_aa_code_17 := map(
     nf_fp_varrisktype <= 3.5       => 'P566',
     nf_fp_varrisktype <= 4.5       => 'P566',
     nf_fp_varrisktype <= 5.5       => 'P566',
-                                      'P566');
+                                      'P566') ) ;
 
-s0_aa_dist_17 := 0 - s0_v17_w;
+s0_aa_dist_17 := __common__( 0 - s0_v17_w ) ;
 
-s0_v18_w := map(
+s0_v18_w := __common__( map(
     bv_ver_src_id_mth_since_fs = NULL   => 0,
     bv_ver_src_id_mth_since_fs = -1     => -0.111349656811288,
     bv_ver_src_id_mth_since_fs <= 34.5  => 0.0524268547462212,
@@ -4255,9 +4255,9 @@ s0_v18_w := map(
     bv_ver_src_id_mth_since_fs <= 146.5 => -0.0367835582317426,
     bv_ver_src_id_mth_since_fs <= 156.5 => -0.0578731663968318,
     bv_ver_src_id_mth_since_fs <= 202.5 => -0.0720855691030857,
-                                           -0.111349656811288);
+                                           -0.111349656811288) ) ;
 
-s0_aa_code_18 := map(
+s0_aa_code_18 := __common__( map(
     s0_v18_w = -0.111349656811288       => '     ',
     bv_ver_src_id_mth_since_fs = NULL   => 'B031',
     bv_ver_src_id_mth_since_fs = -1     => 'B036',
@@ -4266,75 +4266,75 @@ s0_aa_code_18 := map(
     bv_ver_src_id_mth_since_fs <= 146.5 => 'B036',
     bv_ver_src_id_mth_since_fs <= 156.5 => 'B036',
     bv_ver_src_id_mth_since_fs <= 202.5 => 'B036',
-                                           'B036');
+                                           'B036') ) ;
 
-s0_aa_dist_18 := 0 - s0_v18_w;
+s0_aa_dist_18 := __common__( 0 - s0_v18_w ) ;
 
-s0_v19_w := map(
+s0_v19_w := __common__( map(
     nf_fp_srchunvrfdssncount = NULL => 0,
     nf_fp_srchunvrfdssncount = -1   => 0,
     nf_fp_srchunvrfdssncount <= 0.5 => -0.0103068553556184,
-                                       0.245143824744679);
+                                       0.245143824744679) ) ;
 
-s0_aa_code_19 := map(
+s0_aa_code_19 := __common__( map(
     s0_v19_w = -0.0103068553556184  => '     ',
     nf_fp_srchunvrfdssncount = NULL => 'P535',
     nf_fp_srchunvrfdssncount = -1   => 'P539',
     nf_fp_srchunvrfdssncount <= 0.5 => 'P539',
-                                       'P539');
+                                       'P539') ) ;
 
-s0_aa_dist_19 := 0 - s0_v19_w;
+s0_aa_dist_19 := __common__( 0 - s0_v19_w ) ;
 
-s0_v20_w := map(
+s0_v20_w := __common__( map(
     bv_judg_filed_mth_fs = NULL  => 0,
     bv_judg_filed_mth_fs = -1    => -0.00615943462019671,
     bv_judg_filed_mth_fs <= 44.5 => 0.401681015251044,
-                                    0.0890731050458654);
+                                    0.0890731050458654) ) ;
 
-s0_aa_code_20 := map(
+s0_aa_code_20 := __common__( map(
     s0_v20_w = -0.00615943462019671 => '     ',
     bv_judg_filed_mth_fs = NULL     => 'B031',
     bv_judg_filed_mth_fs = -1       => 'B063',
     bv_judg_filed_mth_fs <= 44.5    => 'B063',
-                                       'B063');
+                                       'B063') ) ;
 
-s0_aa_dist_20 := 0 - s0_v20_w;
+s0_aa_dist_20 := __common__( 0 - s0_v20_w ) ;
 
-s0_v21_w := map(
+s0_v21_w := __common__( map(
     rv_a41_prop_owner = NULL => 0,
     rv_a41_prop_owner = -1   => 0,
     rv_a41_prop_owner <= 0.5 => 0.138398913261513,
-                                -0.0118702794578432);
+                                -0.0118702794578432) ) ;
 
-s0_aa_code_21 := map(
+s0_aa_code_21 := __common__( map(
     s0_v21_w = -0.0118702794578432 => '     ',
     rv_a41_prop_owner = NULL       => 'P535',
     rv_a41_prop_owner = -1         => 'P502',
     rv_a41_prop_owner <= 0.5       => 'P502',
-                                      'P502');
+                                      'P502') ) ;
 
-s0_aa_dist_21 := 0 - s0_v21_w;
+s0_aa_dist_21 := __common__( 0 - s0_v21_w ) ;
 
-s0_v22_w := map(
+s0_v22_w := __common__( map(
     bv_assoc_lien_tot = NULL => 0,
     bv_assoc_lien_tot = -1   => 0.00941509845328186,
     bv_assoc_lien_tot <= 0.5 => -0.0198302250581444,
     bv_assoc_lien_tot <= 1.5 => 0.106712263506093,
     bv_assoc_lien_tot <= 2.5 => 0.119155293894942,
-                                0.220243070070351);
+                                0.220243070070351) ) ;
 
-s0_aa_code_22 := map(
+s0_aa_code_22 := __common__( map(
     s0_v22_w = -0.0198302250581444 => '     ',
     bv_assoc_lien_tot = NULL       => 'B031',
     bv_assoc_lien_tot = -1         => 'B017',
     bv_assoc_lien_tot <= 0.5       => 'B026',
     bv_assoc_lien_tot <= 1.5       => 'B026',
     bv_assoc_lien_tot <= 2.5       => 'B026',
-                                      'B026');
+                                      'B026') ) ;
 
-s0_aa_dist_22 := 0 - s0_v22_w;
+s0_aa_dist_22 := __common__( 0 - s0_v22_w ) ;
 
-s0_v23_w := map(
+s0_v23_w := __common__( map(
     bx_addr_lres = NULL   => 0,
     bx_addr_lres = -1     => -0.00571039201494675,
     bx_addr_lres <= 11.5  => 0.0567868589732502,
@@ -4344,9 +4344,9 @@ s0_v23_w := map(
     bx_addr_lres <= 151.5 => -0.0500734616999242,
     bx_addr_lres <= 222.5 => -0.0502267987788971,
     bx_addr_lres <= 275.5 => -0.0888200195638869,
-                             -0.117200408130116);
+                             -0.117200408130116) ) ;
 
-s0_aa_code_23 := map(
+s0_aa_code_23 := __common__( map(
     s0_v23_w = -0.117200408130116 => '     ',
     bx_addr_lres = NULL           => 'B031',
     bx_addr_lres = -1             => 'B031',
@@ -4357,50 +4357,50 @@ s0_aa_code_23 := map(
     bx_addr_lres <= 151.5         => 'B070',
     bx_addr_lres <= 222.5         => 'B070',
     bx_addr_lres <= 275.5         => 'B070',
-                                     'B070');
+                                     'B070') ) ;
 
-s0_aa_dist_23 := 0 - s0_v23_w;
+s0_aa_dist_23 := __common__( 0 - s0_v23_w ) ;
 
-s0_v24_w := map(
+s0_v24_w := __common__( map(
     rv_d32_attr_felonies_recency = NULL => 0,
     rv_d32_attr_felonies_recency = -1   => 0,
     rv_d32_attr_felonies_recency <= 0   => -0.00259610393939799,
-                                           0.178281098267757);
+                                           0.178281098267757) ) ;
 
-s0_aa_code_24 := map(
+s0_aa_code_24 := __common__( map(
     s0_v24_w = -0.00259610393939799     => '     ',
     rv_d32_attr_felonies_recency = NULL => 'P535',
     rv_d32_attr_felonies_recency = -1   => 'P526',
     rv_d32_attr_felonies_recency <= 0   => 'P526',
-                                           'P526');
+                                           'P526') ) ;
 
-s0_aa_dist_24 := 0 - s0_v24_w;
+s0_aa_dist_24 := __common__( 0 - s0_v24_w ) ;
 
-s0_v25_w := map(
+s0_v25_w := __common__( map(
     rv_ever_asset_owner = NULL => 0,
     rv_ever_asset_owner = -1   => 0,
     rv_ever_asset_owner <= 0.5 => 0.1055223957361,
-                                  -0.006324421228605);
+                                  -0.006324421228605) ) ;
 
-s0_aa_code_25 := map(
+s0_aa_code_25 := __common__( map(
     s0_v25_w = -0.006324421228605 => '     ',
     rv_ever_asset_owner = NULL    => 'P535',
     rv_ever_asset_owner = -1      => 'P501',
     rv_ever_asset_owner <= 0.5    => 'P501',
-                                     'P501');
+                                     'P501') ) ;
 
-s0_aa_dist_25 := 0 - s0_v25_w;
+s0_aa_dist_25 := __common__( 0 - s0_v25_w ) ;
 
-s0_v26_w := map(
+s0_v26_w := __common__( map(
     rv_d34_attr_unrel_liens_recency = NULL => 0,
     rv_d34_attr_unrel_liens_recency = -1   => 0,
     rv_d34_attr_unrel_liens_recency <= 0.5 => -0.0424733084498656,
     rv_d34_attr_unrel_liens_recency <= 18  => 0.441964246178922,
     rv_d34_attr_unrel_liens_recency <= 48  => 0.300228122588715,
     rv_d34_attr_unrel_liens_recency <= 60  => 0.225251303786368,
-                                              -0.0424733084498656);
+                                              -0.0424733084498656) ) ;
 
-s0_aa_code_26 := map(
+s0_aa_code_26 := __common__( map(
     s0_v26_w = -0.0424733084498656         => '     ',
     rv_d34_attr_unrel_liens_recency = NULL => 'P535',
     rv_d34_attr_unrel_liens_recency = -1   => 'P526',
@@ -4408,206 +4408,206 @@ s0_aa_code_26 := map(
     rv_d34_attr_unrel_liens_recency <= 18  => 'P526',
     rv_d34_attr_unrel_liens_recency <= 48  => 'P526',
     rv_d34_attr_unrel_liens_recency <= 60  => 'P526',
-                                              'P526');
+                                              'P526') ) ;
 
-s0_aa_dist_26 := 0 - s0_v26_w;
+s0_aa_dist_26 := __common__( 0 - s0_v26_w ) ;
 
-s0_v27_w := map(
+s0_v27_w := __common__( map(
     bv_mth_bureau_fs = NULL   => 0,
     bv_mth_bureau_fs = -1     => 0.00521441288617275,
     bv_mth_bureau_fs <= 70.5  => 0.0120762658712951,
     bv_mth_bureau_fs <= 124.5 => -0.0765046550085903,
-                                 -0.127560665099968);
+                                 -0.127560665099968) ) ;
 
-s0_aa_code_27 := map(
+s0_aa_code_27 := __common__( map(
     s0_v27_w = -0.127560665099968 => '     ',
     bv_mth_bureau_fs = NULL       => 'P535',
     bv_mth_bureau_fs = -1         => 'P523',
     bv_mth_bureau_fs <= 70.5      => 'P523',
     bv_mth_bureau_fs <= 124.5     => 'P523',
-                                     'P523');
+                                     'P523') ) ;
 
-s0_aa_dist_27 := 0 - s0_v27_w;
+s0_aa_dist_27 := __common__( 0 - s0_v27_w ) ;
 
-s0_v28_w := map(
+s0_v28_w := __common__( map(
     rv_i60_inq_auto_count12 = NULL => 0,
     rv_i60_inq_auto_count12 = -1   => 0,
     rv_i60_inq_auto_count12 <= 0.5 => -0.00905701902288646,
     rv_i60_inq_auto_count12 <= 2.5 => 0.078265313767785,
-                                      0.202657492999427);
+                                      0.202657492999427) ) ;
 
-s0_aa_code_28 := map(
+s0_aa_code_28 := __common__( map(
     s0_v28_w = -0.00905701902288646 => '     ',
     rv_i60_inq_auto_count12 = NULL  => 'P535',
     rv_i60_inq_auto_count12 = -1    => 'P539',
     rv_i60_inq_auto_count12 <= 0.5  => 'P539',
     rv_i60_inq_auto_count12 <= 2.5  => 'P539',
-                                       'P539');
+                                       'P539') ) ;
 
-s0_aa_dist_28 := 0 - s0_v28_w;
+s0_aa_dist_28 := __common__( 0 - s0_v28_w ) ;
 
-s0_v29_w := map(
+s0_v29_w := __common__( map(
     rv_mos_since_br_first_seen = NULL   => 0,
     rv_mos_since_br_first_seen = -1     => 0.045176570117496,
     rv_mos_since_br_first_seen <= 49.5  => 0.0288889354526648,
     rv_mos_since_br_first_seen <= 220.5 => -0.0392071764970965,
     rv_mos_since_br_first_seen <= 290.5 => -0.0545689875228921,
-                                           -0.122721893792547);
+                                           -0.122721893792547) ) ;
 
-s0_aa_code_29 := map(
+s0_aa_code_29 := __common__( map(
     s0_v29_w = -0.122721893792547       => '     ',
     rv_mos_since_br_first_seen = NULL   => 'P535',
     rv_mos_since_br_first_seen = -1     => 'P565',
     rv_mos_since_br_first_seen <= 49.5  => 'P565',
     rv_mos_since_br_first_seen <= 220.5 => 'P565',
     rv_mos_since_br_first_seen <= 290.5 => 'P565',
-                                           'P565');
+                                           'P565') ) ;
 
-s0_aa_dist_29 := 0 - s0_v29_w;
+s0_aa_dist_29 := __common__( 0 - s0_v29_w ) ;
 
-s0_v30_w := map(
+s0_v30_w := __common__( map(
     nf_fp_srchvelocityrisktype = NULL => 0,
     nf_fp_srchvelocityrisktype = -1   => 0,
     nf_fp_srchvelocityrisktype <= 3   => -0.00455206860793901,
     nf_fp_srchvelocityrisktype <= 5   => 0.0181118390893505,
-                                         0.0646321479958328);
+                                         0.0646321479958328) ) ;
 
-s0_aa_code_30 := map(
+s0_aa_code_30 := __common__( map(
     s0_v30_w = -0.00455206860793901   => '     ',
     nf_fp_srchvelocityrisktype = NULL => 'P535',
     nf_fp_srchvelocityrisktype = -1   => 'P539',
     nf_fp_srchvelocityrisktype <= 3   => 'P539',
     nf_fp_srchvelocityrisktype <= 5   => 'P539',
-                                         'P539');
+                                         'P539') ) ;
 
-s0_aa_dist_30 := 0 - s0_v30_w;
+s0_aa_dist_30 := __common__( 0 - s0_v30_w ) ;
 
-s0_v31_w := map(
+s0_v31_w := __common__( map(
     rv_d33_eviction_count = NULL => 0,
     rv_d33_eviction_count = -1   => 0,
     rv_d33_eviction_count <= 0.5 => -0.00508112630079548,
     rv_d33_eviction_count <= 1.5 => 0.173209495025751,
-                                    0.342544888958172);
+                                    0.342544888958172) ) ;
 
-s0_aa_code_31 := map(
+s0_aa_code_31 := __common__( map(
     s0_v31_w = -0.00508112630079548 => '     ',
     rv_d33_eviction_count = NULL    => 'P535',
     rv_d33_eviction_count = -1      => 'P526',
     rv_d33_eviction_count <= 0.5    => 'P526',
     rv_d33_eviction_count <= 1.5    => 'P526',
-                                       'P526');
+                                       'P526') ) ;
 
-s0_aa_dist_31 := 0 - s0_v31_w;
+s0_aa_dist_31 := __common__( 0 - s0_v31_w ) ;
 
-s0_v32_w := map(
+s0_v32_w := __common__( map(
     bv_lien_ft_count = NULL => 0,
     bv_lien_ft_count = -1   => 0,
     bv_lien_ft_count <= 0.5 => -0.00284521739366358,
-                               0.205043350550051);
+                               0.205043350550051) ) ;
 
-s0_aa_code_32 := map(
+s0_aa_code_32 := __common__( map(
     s0_v32_w = -0.00284521739366358 => '     ',
     bv_lien_ft_count = NULL         => 'B031',
     bv_lien_ft_count = -1           => 'B063',
     bv_lien_ft_count <= 0.5         => 'B063',
-                                       'B063');
+                                       'B063') ) ;
 
-s0_aa_dist_32 := 0 - s0_v32_w;
+s0_aa_dist_32 := __common__( 0 - s0_v32_w ) ;
 
-s0_v33_w := map(
+s0_v33_w := __common__( map(
     rv_d34_unrel_liens_ct = NULL => 0,
     rv_d34_unrel_liens_ct = -1   => 0,
     rv_d34_unrel_liens_ct <= 0.5 => -0.00405904559458691,
-                                    0.15237953221647);
+                                    0.15237953221647) ) ;
 
-s0_aa_code_33 := map(
+s0_aa_code_33 := __common__( map(
     s0_v33_w = -0.00405904559458691 => '     ',
     rv_d34_unrel_liens_ct = NULL    => 'P535',
     rv_d34_unrel_liens_ct = -1      => 'P526',
     rv_d34_unrel_liens_ct <= 0.5    => 'P526',
-                                       'P526');
+                                       'P526') ) ;
 
-s0_aa_dist_33 := 0 - s0_v33_w;
+s0_aa_dist_33 := __common__( 0 - s0_v33_w ) ;
 
-s0_v34_w := map(
+s0_v34_w := __common__( map(
     bv_assoc_derog_pct = NULL           => 0,
     bv_assoc_derog_pct = -1             => 0.00815523205088307,
     bv_assoc_derog_pct <= 0             => -0.0305018386597529,
     bv_assoc_derog_pct <= 0.3875        => 0.0463864446016512,
     bv_assoc_derog_pct <= 0.63333333335 => 0.122902562915995,
-                                           0.160435669649836);
+                                           0.160435669649836) ) ;
 
-s0_aa_code_34 := map(
+s0_aa_code_34 := __common__( map(
     s0_v34_w = -0.0305018386597529      => '     ',
     bv_assoc_derog_pct = NULL           => 'B031',
     bv_assoc_derog_pct = -1             => 'B017',
     bv_assoc_derog_pct <= 0             => 'B026',
     bv_assoc_derog_pct <= 0.3875        => 'B026',
     bv_assoc_derog_pct <= 0.63333333335 => 'B026',
-                                           'B026');
+                                           'B026') ) ;
 
-s0_aa_dist_34 := 0 - s0_v34_w;
+s0_aa_dist_34 := __common__( 0 - s0_v34_w ) ;
 
-s0_v35_w := map(
+s0_v35_w := __common__( map(
     nf_fp_srchunvrfdphonecount = NULL => 0,
     nf_fp_srchunvrfdphonecount = -1   => 0,
     nf_fp_srchunvrfdphonecount <= 0.5 => -0.0117612059881204,
     nf_fp_srchunvrfdphonecount <= 1.5 => 0.0462928784227782,
-                                         0.0763295551592002);
+                                         0.0763295551592002) ) ;
 
-s0_aa_code_35 := map(
+s0_aa_code_35 := __common__( map(
     s0_v35_w = -0.0117612059881204    => '     ',
     nf_fp_srchunvrfdphonecount = NULL => 'P535',
     nf_fp_srchunvrfdphonecount = -1   => 'P539',
     nf_fp_srchunvrfdphonecount <= 0.5 => 'P539',
     nf_fp_srchunvrfdphonecount <= 1.5 => 'P539',
-                                         'P539');
+                                         'P539') ) ;
 
-s0_aa_dist_35 := 0 - s0_v35_w;
+s0_aa_dist_35 := __common__( 0 - s0_v35_w ) ;
 
-s0_v36_w := map(
+s0_v36_w := __common__( map(
     rv_i60_inq_comm_recency = NULL => 0,
     rv_i60_inq_comm_recency = -1   => 0,
     rv_i60_inq_comm_recency <= 0.5 => -0.00432860120266802,
     rv_i60_inq_comm_recency <= 12  => 0.0899804741270784,
-                                      -0.00432860120266802);
+                                      -0.00432860120266802) ) ;
 
-s0_aa_code_36 := map(
+s0_aa_code_36 := __common__( map(
     s0_v36_w = -0.00432860120266802 => '     ',
     rv_i60_inq_comm_recency = NULL  => 'P535',
     rv_i60_inq_comm_recency = -1    => 'P539',
     rv_i60_inq_comm_recency <= 0.5  => 'P539',
     rv_i60_inq_comm_recency <= 12   => 'P539',
-                                       'P539');
+                                       'P539') ) ;
 
-s0_aa_dist_36 := 0 - s0_v36_w;
+s0_aa_dist_36 := __common__( 0 - s0_v36_w ) ;
 
-s0_v37_w := map(
+s0_v37_w := __common__( map(
     nf_fp_srchfraudsrchcountyr = NULL => 0,
     nf_fp_srchfraudsrchcountyr = -1   => 0,
     nf_fp_srchfraudsrchcountyr <= 0.5 => -0.0120833658301427,
     nf_fp_srchfraudsrchcountyr <= 1.5 => 0.0345670512861276,
-                                         0.0627512162158203);
+                                         0.0627512162158203) ) ;
 
-s0_aa_code_37 := map(
+s0_aa_code_37 := __common__( map(
     s0_v37_w = -0.0120833658301427    => '     ',
     nf_fp_srchfraudsrchcountyr = NULL => 'P535',
     nf_fp_srchfraudsrchcountyr = -1   => 'P539',
     nf_fp_srchfraudsrchcountyr <= 0.5 => 'P539',
     nf_fp_srchfraudsrchcountyr <= 1.5 => 'P539',
-                                         'P539');
+                                         'P539') ) ;
 
-s0_aa_dist_37 := 0 - s0_v37_w;
+s0_aa_dist_37 := __common__( 0 - s0_v37_w ) ;
 
-s0_v38_w := map(
+s0_v38_w := __common__( map(
     bv_ver_src_id_activity12 = NULL => 0,
     bv_ver_src_id_activity12 = -1   => 0,
     bv_ver_src_id_activity12 <= 0.5 => 0.25430332671837,
     bv_ver_src_id_activity12 <= 1   => 0.00509879592863039,
     bv_ver_src_id_activity12 <= 3   => -0.00530374882607918,
-                                       -0.0341400955594518);
+                                       -0.0341400955594518) ) ;
 
-s0_aa_code_38 := map(
+s0_aa_code_38 := __common__( map(
     s0_v38_w = -0.0341400955594518                                 => '     ',
     bv_ver_src_id_activity12 = NULL                                => 'B031',
     bv_ver_src_id_activity12 = -1                                  => 'B034',
@@ -4615,77 +4615,77 @@ s0_aa_code_38 := map(
     0 <= bv_sos_mth_agent_change AND bv_sos_mth_agent_change <= 12 => 'B056',
     bv_ver_src_id_activity12 <= 1                                  => 'B034',
     bv_ver_src_id_activity12 <= 3                                  => 'B034',
-                                                                      'B034');
+                                                                      'B034') ) ;
 
-s0_aa_dist_38 := 0 - s0_v38_w;
+s0_aa_dist_38 := __common__( 0 - s0_v38_w ) ;
 
-s0_v39_w := map(
+s0_v39_w := __common__( map(
     bv_lien_ot_count = NULL => 0,
     bv_lien_ot_count = -1   => 0,
     bv_lien_ot_count <= 0   => -0.00427316842003629,
     bv_lien_ot_count <= 1   => 0.0438534932508342,
-                               0.161209832767035);
+                               0.161209832767035) ) ;
 
-s0_aa_code_39 := map(
+s0_aa_code_39 := __common__( map(
     s0_v39_w = -0.00427316842003629 => '     ',
     bv_lien_ot_count = NULL         => 'B031',
     bv_lien_ot_count = -1           => 'B063',
     bv_lien_ot_count <= 0           => 'B063',
     bv_lien_ot_count <= 1           => 'B063',
-                                       'B063');
+                                       'B063') ) ;
 
-s0_aa_dist_39 := 0 - s0_v39_w;
+s0_aa_dist_39 := __common__( 0 - s0_v39_w ) ;
 
-s0_v40_w := map(
+s0_v40_w := __common__( map(
     bv_judg_avg_amount = NULL     => 0,
     bv_judg_avg_amount = -1       => -0.00194968863408312,
     bv_judg_avg_amount <= 4159.75 => 0.0416545312655188,
-                                     0.131657141296978);
+                                     0.131657141296978) ) ;
 
-s0_aa_code_40 := map(
+s0_aa_code_40 := __common__( map(
     s0_v40_w = -0.00194968863408312 => '     ',
     bv_judg_avg_amount = NULL       => 'B031',
     bv_judg_avg_amount = -1         => 'B079',
     bv_judg_avg_amount <= 4159.75   => 'B079',
-                                       'B079');
+                                       'B079') ) ;
 
-s0_aa_dist_40 := 0 - s0_v40_w;
+s0_aa_dist_40 := __common__( 0 - s0_v40_w ) ;
 
-s0_v41_w := map(
+s0_v41_w := __common__( map(
     nf_fp_srchunvrfdaddrcount = NULL => 0,
     nf_fp_srchunvrfdaddrcount = -1   => 0,
     nf_fp_srchunvrfdaddrcount <= 0.5 => -0.00246660169417597,
-                                        0.0840434348931558);
+                                        0.0840434348931558) ) ;
 
-s0_aa_code_41 := map(
+s0_aa_code_41 := __common__( map(
     s0_v41_w = -0.00246660169417597  => '     ',
     nf_fp_srchunvrfdaddrcount = NULL => 'P535',
     nf_fp_srchunvrfdaddrcount = -1   => 'P539',
     nf_fp_srchunvrfdaddrcount <= 0.5 => 'P539',
-                                        'P539');
+                                        'P539') ) ;
 
-s0_aa_dist_41 := 0 - s0_v41_w;
+s0_aa_dist_41 := __common__( 0 - s0_v41_w ) ;
 
-s0_v42_w := map(
+s0_v42_w := __common__( map(
     nf_fp_sourcerisktype = NULL => 0,
     nf_fp_sourcerisktype = -1   => 0,
     nf_fp_sourcerisktype <= 4   => -0.00399945113620758,
     nf_fp_sourcerisktype <= 5   => -0.00215357452658665,
     nf_fp_sourcerisktype <= 6.5 => 0.038745521928441,
-                                   0.0669845948828356);
+                                   0.0669845948828356) ) ;
 
-s0_aa_code_42 := map(
+s0_aa_code_42 := __common__( map(
     s0_v42_w = -0.00399945113620758 => '     ',
     nf_fp_sourcerisktype = NULL     => 'P535',
     nf_fp_sourcerisktype = -1       => 'P515',
     nf_fp_sourcerisktype <= 4       => 'P515',
     nf_fp_sourcerisktype <= 5       => 'P515',
     nf_fp_sourcerisktype <= 6.5     => 'P515',
-                                       'P515');
+                                       'P515') ) ;
 
-s0_aa_dist_42 := 0 - s0_v42_w;
+s0_aa_dist_42 := __common__( 0 - s0_v42_w ) ;
 
-s0_v43_w := map(
+s0_v43_w := __common__( map(
     nf_fp_prevaddrageoldest = NULL   => 0,
     nf_fp_prevaddrageoldest = -1     => 0.00412733255820826,
     nf_fp_prevaddrageoldest <= 16.5  => 0.0248076172010063,
@@ -4693,9 +4693,9 @@ s0_v43_w := map(
     nf_fp_prevaddrageoldest <= 45.5  => 0.0120843953312668,
     nf_fp_prevaddrageoldest <= 99.5  => 0.00763478319687844,
     nf_fp_prevaddrageoldest <= 232.5 => -0.00756138112930466,
-                                        -0.0181731976794484);
+                                        -0.0181731976794484) ) ;
 
-s0_aa_code_43 := map(
+s0_aa_code_43 := __common__( map(
     s0_v43_w = -0.0181731976794484   => '     ',
     nf_fp_prevaddrageoldest = NULL   => 'P535',
     nf_fp_prevaddrageoldest = -1     => 'P567',
@@ -4704,11 +4704,11 @@ s0_aa_code_43 := map(
     nf_fp_prevaddrageoldest <= 45.5  => 'P567',
     nf_fp_prevaddrageoldest <= 99.5  => 'P567',
     nf_fp_prevaddrageoldest <= 232.5 => 'P567',
-                                        'P567');
+                                        'P567') ) ;
 
-s0_aa_dist_43 := 0 - s0_v43_w;
+s0_aa_dist_43 := __common__( 0 - s0_v43_w ) ;
 
-s0_rcvalueb036 := (integer)(s0_aa_code_01 = 'B036') * s0_aa_dist_01 +
+s0_rcvalueb036 := __common__( (integer)(s0_aa_code_01 = 'B036') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B036') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B036') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B036') * s0_aa_dist_04 +
@@ -4750,9 +4750,9 @@ s0_rcvalueb036 := (integer)(s0_aa_code_01 = 'B036') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B036') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B036') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B036') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B036') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B036') * s0_aa_dist_43 ) ;
 
-s0_rcvalueb035 := (integer)(s0_aa_code_01 = 'B035') * s0_aa_dist_01 +
+s0_rcvalueb035 := __common__( (integer)(s0_aa_code_01 = 'B035') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B035') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B035') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B035') * s0_aa_dist_04 +
@@ -4794,9 +4794,9 @@ s0_rcvalueb035 := (integer)(s0_aa_code_01 = 'B035') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B035') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B035') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B035') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B035') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B035') * s0_aa_dist_43 ) ;
 
-s0_rcvalueb034 := (integer)(s0_aa_code_01 = 'B034') * s0_aa_dist_01 +
+s0_rcvalueb034 := __common__( (integer)(s0_aa_code_01 = 'B034') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B034') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B034') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B034') * s0_aa_dist_04 +
@@ -4838,9 +4838,9 @@ s0_rcvalueb034 := (integer)(s0_aa_code_01 = 'B034') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B034') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B034') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B034') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B034') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B034') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep535 := (integer)(s0_aa_code_01 = 'P535') * s0_aa_dist_01 +
+s0_rcvaluep535 := __common__( (integer)(s0_aa_code_01 = 'P535') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P535') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P535') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P535') * s0_aa_dist_04 +
@@ -4882,9 +4882,9 @@ s0_rcvaluep535 := (integer)(s0_aa_code_01 = 'P535') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P535') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P535') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P535') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P535') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P535') * s0_aa_dist_43 ) ;
 
-s0_rcvalueb031 := (integer)(s0_aa_code_01 = 'B031') * s0_aa_dist_01 +
+s0_rcvalueb031 := __common__( (integer)(s0_aa_code_01 = 'B031') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B031') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B031') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B031') * s0_aa_dist_04 +
@@ -4926,9 +4926,9 @@ s0_rcvalueb031 := (integer)(s0_aa_code_01 = 'B031') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B031') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B031') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B031') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B031') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B031') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep539 := (integer)(s0_aa_code_01 = 'P539') * s0_aa_dist_01 +
+s0_rcvaluep539 := __common__( (integer)(s0_aa_code_01 = 'P539') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P539') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P539') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P539') * s0_aa_dist_04 +
@@ -4970,9 +4970,9 @@ s0_rcvaluep539 := (integer)(s0_aa_code_01 = 'P539') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P539') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P539') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P539') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P539') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P539') * s0_aa_dist_43 ) ;
 
-s0_rcvalueb017 := (integer)(s0_aa_code_01 = 'B017') * s0_aa_dist_01 +
+s0_rcvalueb017 := __common__( (integer)(s0_aa_code_01 = 'B017') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B017') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B017') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B017') * s0_aa_dist_04 +
@@ -5014,9 +5014,9 @@ s0_rcvalueb017 := (integer)(s0_aa_code_01 = 'B017') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B017') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B017') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B017') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B017') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B017') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep515 := (integer)(s0_aa_code_01 = 'P515') * s0_aa_dist_01 +
+s0_rcvaluep515 := __common__( (integer)(s0_aa_code_01 = 'P515') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P515') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P515') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P515') * s0_aa_dist_04 +
@@ -5058,9 +5058,9 @@ s0_rcvaluep515 := (integer)(s0_aa_code_01 = 'P515') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P515') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P515') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P515') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P515') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P515') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep513 := (integer)(s0_aa_code_01 = 'P513') * s0_aa_dist_01 +
+s0_rcvaluep513 := __common__( (integer)(s0_aa_code_01 = 'P513') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P513') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P513') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P513') * s0_aa_dist_04 +
@@ -5102,9 +5102,9 @@ s0_rcvaluep513 := (integer)(s0_aa_code_01 = 'P513') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P513') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P513') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P513') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P513') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P513') * s0_aa_dist_43 ) ;
 
-s0_rcvalueb075 := (integer)(s0_aa_code_01 = 'B075') * s0_aa_dist_01 +
+s0_rcvalueb075 := __common__( (integer)(s0_aa_code_01 = 'B075') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B075') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B075') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B075') * s0_aa_dist_04 +
@@ -5146,9 +5146,9 @@ s0_rcvalueb075 := (integer)(s0_aa_code_01 = 'B075') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B075') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B075') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B075') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B075') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B075') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep526 := (integer)(s0_aa_code_01 = 'P526') * s0_aa_dist_01 +
+s0_rcvaluep526 := __common__( (integer)(s0_aa_code_01 = 'P526') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P526') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P526') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P526') * s0_aa_dist_04 +
@@ -5190,9 +5190,9 @@ s0_rcvaluep526 := (integer)(s0_aa_code_01 = 'P526') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P526') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P526') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P526') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P526') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P526') * s0_aa_dist_43 ) ;
 
-s0_rcvalueb079 := (integer)(s0_aa_code_01 = 'B079') * s0_aa_dist_01 +
+s0_rcvalueb079 := __common__( (integer)(s0_aa_code_01 = 'B079') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B079') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B079') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B079') * s0_aa_dist_04 +
@@ -5234,9 +5234,9 @@ s0_rcvalueb079 := (integer)(s0_aa_code_01 = 'B079') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B079') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B079') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B079') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B079') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B079') * s0_aa_dist_43 ) ;
 
-s0_rcvalueb070 := (integer)(s0_aa_code_01 = 'B070') * s0_aa_dist_01 +
+s0_rcvalueb070 := __common__( (integer)(s0_aa_code_01 = 'B070') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B070') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B070') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B070') * s0_aa_dist_04 +
@@ -5278,9 +5278,9 @@ s0_rcvalueb070 := (integer)(s0_aa_code_01 = 'B070') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B070') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B070') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B070') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B070') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B070') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep509 := (integer)(s0_aa_code_01 = 'P509') * s0_aa_dist_01 +
+s0_rcvaluep509 := __common__( (integer)(s0_aa_code_01 = 'P509') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P509') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P509') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P509') * s0_aa_dist_04 +
@@ -5322,9 +5322,9 @@ s0_rcvaluep509 := (integer)(s0_aa_code_01 = 'P509') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P509') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P509') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P509') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P509') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P509') * s0_aa_dist_43 ) ;
 
-s0_rcvalueb069 := (integer)(s0_aa_code_01 = 'B069') * s0_aa_dist_01 +
+s0_rcvalueb069 := __common__( (integer)(s0_aa_code_01 = 'B069') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B069') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B069') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B069') * s0_aa_dist_04 +
@@ -5366,9 +5366,9 @@ s0_rcvalueb069 := (integer)(s0_aa_code_01 = 'B069') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B069') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B069') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B069') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B069') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B069') * s0_aa_dist_43 ) ;
 
-s0_rcvalueb026 := (integer)(s0_aa_code_01 = 'B026') * s0_aa_dist_01 +
+s0_rcvalueb026 := __common__( (integer)(s0_aa_code_01 = 'B026') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B026') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B026') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B026') * s0_aa_dist_04 +
@@ -5410,9 +5410,9 @@ s0_rcvalueb026 := (integer)(s0_aa_code_01 = 'B026') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B026') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B026') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B026') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B026') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B026') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep502 := (integer)(s0_aa_code_01 = 'P502') * s0_aa_dist_01 +
+s0_rcvaluep502 := __common__( (integer)(s0_aa_code_01 = 'P502') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P502') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P502') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P502') * s0_aa_dist_04 +
@@ -5454,9 +5454,9 @@ s0_rcvaluep502 := (integer)(s0_aa_code_01 = 'P502') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P502') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P502') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P502') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P502') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P502') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep540 := (integer)(s0_aa_code_01 = 'P540') * s0_aa_dist_01 +
+s0_rcvaluep540 := __common__( (integer)(s0_aa_code_01 = 'P540') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P540') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P540') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P540') * s0_aa_dist_04 +
@@ -5498,9 +5498,9 @@ s0_rcvaluep540 := (integer)(s0_aa_code_01 = 'P540') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P540') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P540') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P540') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P540') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P540') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep501 := (integer)(s0_aa_code_01 = 'P501') * s0_aa_dist_01 +
+s0_rcvaluep501 := __common__( (integer)(s0_aa_code_01 = 'P501') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P501') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P501') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P501') * s0_aa_dist_04 +
@@ -5542,9 +5542,9 @@ s0_rcvaluep501 := (integer)(s0_aa_code_01 = 'P501') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P501') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P501') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P501') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P501') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P501') * s0_aa_dist_43 ) ;
 
-s0_rcvalueb063 := (integer)(s0_aa_code_01 = 'B063') * s0_aa_dist_01 +
+s0_rcvalueb063 := __common__( (integer)(s0_aa_code_01 = 'B063') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B063') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B063') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B063') * s0_aa_dist_04 +
@@ -5586,9 +5586,9 @@ s0_rcvalueb063 := (integer)(s0_aa_code_01 = 'B063') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B063') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B063') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B063') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B063') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B063') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep505 := (integer)(s0_aa_code_01 = 'P505') * s0_aa_dist_01 +
+s0_rcvaluep505 := __common__( (integer)(s0_aa_code_01 = 'P505') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P505') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P505') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P505') * s0_aa_dist_04 +
@@ -5630,9 +5630,9 @@ s0_rcvaluep505 := (integer)(s0_aa_code_01 = 'P505') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P505') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P505') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P505') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P505') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P505') * s0_aa_dist_43 ) ;
 
-s0_rcvalueb076 := (integer)(s0_aa_code_01 = 'B076') * s0_aa_dist_01 +
+s0_rcvalueb076 := __common__( (integer)(s0_aa_code_01 = 'B076') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B076') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B076') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B076') * s0_aa_dist_04 +
@@ -5674,9 +5674,9 @@ s0_rcvalueb076 := (integer)(s0_aa_code_01 = 'B076') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B076') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B076') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B076') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B076') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B076') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep510 := (integer)(s0_aa_code_01 = 'P510') * s0_aa_dist_01 +
+s0_rcvaluep510 := __common__( (integer)(s0_aa_code_01 = 'P510') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P510') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P510') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P510') * s0_aa_dist_04 +
@@ -5718,9 +5718,9 @@ s0_rcvaluep510 := (integer)(s0_aa_code_01 = 'P510') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P510') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P510') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P510') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P510') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P510') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep567 := (integer)(s0_aa_code_01 = 'P567') * s0_aa_dist_01 +
+s0_rcvaluep567 := __common__( (integer)(s0_aa_code_01 = 'P567') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P567') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P567') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P567') * s0_aa_dist_04 +
@@ -5762,9 +5762,9 @@ s0_rcvaluep567 := (integer)(s0_aa_code_01 = 'P567') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P567') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P567') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P567') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P567') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P567') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep566 := (integer)(s0_aa_code_01 = 'P566') * s0_aa_dist_01 +
+s0_rcvaluep566 := __common__( (integer)(s0_aa_code_01 = 'P566') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P566') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P566') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P566') * s0_aa_dist_04 +
@@ -5806,9 +5806,9 @@ s0_rcvaluep566 := (integer)(s0_aa_code_01 = 'P566') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P566') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P566') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P566') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P566') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P566') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep565 := (integer)(s0_aa_code_01 = 'P565') * s0_aa_dist_01 +
+s0_rcvaluep565 := __common__( (integer)(s0_aa_code_01 = 'P565') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P565') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P565') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P565') * s0_aa_dist_04 +
@@ -5850,9 +5850,9 @@ s0_rcvaluep565 := (integer)(s0_aa_code_01 = 'P565') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P565') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P565') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P565') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P565') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P565') * s0_aa_dist_43 ) ;
 
-s0_rcvaluep523 := (integer)(s0_aa_code_01 = 'P523') * s0_aa_dist_01 +
+s0_rcvaluep523 := __common__( (integer)(s0_aa_code_01 = 'P523') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'P523') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'P523') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'P523') * s0_aa_dist_04 +
@@ -5894,9 +5894,9 @@ s0_rcvaluep523 := (integer)(s0_aa_code_01 = 'P523') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'P523') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'P523') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'P523') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'P523') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'P523') * s0_aa_dist_43 ) ;
 
-s0_rcvalueb052 := (integer)(s0_aa_code_01 = 'B052') * s0_aa_dist_01 +
+s0_rcvalueb052 := __common__( (integer)(s0_aa_code_01 = 'B052') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B052') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B052') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B052') * s0_aa_dist_04 +
@@ -5938,9 +5938,9 @@ s0_rcvalueb052 := (integer)(s0_aa_code_01 = 'B052') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B052') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B052') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B052') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B052') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B052') * s0_aa_dist_43 ) ;
 
-s0_rcvalueb056 := (integer)(s0_aa_code_01 = 'B056') * s0_aa_dist_01 +
+s0_rcvalueb056 := __common__( (integer)(s0_aa_code_01 = 'B056') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B056') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B056') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B056') * s0_aa_dist_04 +
@@ -5982,9 +5982,9 @@ s0_rcvalueb056 := (integer)(s0_aa_code_01 = 'B056') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B056') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B056') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B056') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B056') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B056') * s0_aa_dist_43 ) ;
 
-s0_rcvalueb059 := (integer)(s0_aa_code_01 = 'B059') * s0_aa_dist_01 +
+s0_rcvalueb059 := __common__( (integer)(s0_aa_code_01 = 'B059') * s0_aa_dist_01 +
     (integer)(s0_aa_code_02 = 'B059') * s0_aa_dist_02 +
     (integer)(s0_aa_code_03 = 'B059') * s0_aa_dist_03 +
     (integer)(s0_aa_code_04 = 'B059') * s0_aa_dist_04 +
@@ -6026,9 +6026,9 @@ s0_rcvalueb059 := (integer)(s0_aa_code_01 = 'B059') * s0_aa_dist_01 +
     (integer)(s0_aa_code_40 = 'B059') * s0_aa_dist_40 +
     (integer)(s0_aa_code_41 = 'B059') * s0_aa_dist_41 +
     (integer)(s0_aa_code_42 = 'B059') * s0_aa_dist_42 +
-    (integer)(s0_aa_code_43 = 'B059') * s0_aa_dist_43;
+    (integer)(s0_aa_code_43 = 'B059') * s0_aa_dist_43 ) ;
 
-s0_lgt := -3.95711111699048 +
+s0_lgt := __common__( -3.95711111699048 +
     s0_v01_w +
     s0_v02_w +
     s0_v03_w +
@@ -6071,9 +6071,9 @@ s0_lgt := -3.95711111699048 +
     s0_v40_w +
     s0_v41_w +
     s0_v42_w +
-    s0_v43_w;
+    s0_v43_w ) ;
 
-s1_v01_w := map(
+s1_v01_w := __common__( map(
     rv_a46_curr_avm_autoval = NULL      => 0,
     rv_a46_curr_avm_autoval = -1        => 0,
     rv_a46_curr_avm_autoval <= 0        => 0.0662218181528626,
@@ -6081,9 +6081,9 @@ s1_v01_w := map(
     rv_a46_curr_avm_autoval <= 123268   => 0.409654143956975,
     rv_a46_curr_avm_autoval <= 139058.5 => 0.131018509186709,
     rv_a46_curr_avm_autoval <= 249883   => -0.0355000439779728,
-                                           -0.259310159463757);
+                                           -0.259310159463757) ) ;
 
-s1_aa_code_01 := map(
+s1_aa_code_01 := __common__( map(
     s1_v01_w = -0.259310159463757       => '      ',
     rv_a46_curr_avm_autoval = NULL      => 'P535',
     rv_a46_curr_avm_autoval = -1        => 'P509',
@@ -6092,11 +6092,11 @@ s1_aa_code_01 := map(
     rv_a46_curr_avm_autoval <= 123268   => 'P509',
     rv_a46_curr_avm_autoval <= 139058.5 => 'P509',
     rv_a46_curr_avm_autoval <= 249883   => 'P509',
-                                           'P509');
+                                           'P509') ) ;
 
-s1_aa_dist_01 := 0 - s1_v01_w;
+s1_aa_dist_01 := __common__( 0 - s1_v01_w ) ;
 
-s1_v02_w := map(
+s1_v02_w := __common__( map(
     bv_bus_rep_source_profile = NULL           => 0,
     bv_bus_rep_source_profile = -1             => 0,
     bv_bus_rep_source_profile <= -3.3427138575 => -0.467658740793298,
@@ -6108,9 +6108,9 @@ s1_v02_w := map(
     bv_bus_rep_source_profile <= -1.909663895  => 0.17744486770283,
     bv_bus_rep_source_profile <= -1.8534513105 => 0.193042523243922,
     bv_bus_rep_source_profile <= -1.274646112  => 0.275856090904245,
-                                                  0.464902110391566);
+                                                  0.464902110391566) ) ;
 
-s1_aa_code_02 := map(
+s1_aa_code_02 := __common__( map(
     s1_v02_w = -0.467658740793298              => '      ',
     bv_bus_rep_source_profile = NULL           => 'P535',
     bv_bus_rep_source_profile = -1             => 'P515',
@@ -6123,11 +6123,11 @@ s1_aa_code_02 := map(
     bv_bus_rep_source_profile <= -1.909663895  => 'P515',
     bv_bus_rep_source_profile <= -1.8534513105 => 'P515',
     bv_bus_rep_source_profile <= -1.274646112  => 'P515',
-                                                  'P515');
+                                                  'P515') ) ;
 
-s1_aa_dist_02 := 0 - s1_v02_w;
+s1_aa_dist_02 := __common__( 0 - s1_v02_w ) ;
 
-s1_v03_w := map(
+s1_v03_w := __common__( map(
     bv_rep_only_source_profile = NULL           => 0,
     bv_rep_only_source_profile = -1             => 0,
     bv_rep_only_source_profile <= -3.3419543775 => -0.357314091370433,
@@ -6139,9 +6139,9 @@ s1_v03_w := map(
     bv_rep_only_source_profile <= -1.8927867815 => 0.150189937627071,
     bv_rep_only_source_profile <= -1.5691132945 => 0.231191123228877,
     bv_rep_only_source_profile <= -1.238914958  => 0.255539826296189,
-                                                   0.39168566546721);
+                                                   0.39168566546721) ) ;
 
-s1_aa_code_03 := map(
+s1_aa_code_03 := __common__( map(
     s1_v03_w = -0.357314091370433               => '      ',
     bv_rep_only_source_profile = NULL           => 'P535',
     bv_rep_only_source_profile = -1             => 'P515',
@@ -6154,20 +6154,20 @@ s1_aa_code_03 := map(
     bv_rep_only_source_profile <= -1.8927867815 => 'P515',
     bv_rep_only_source_profile <= -1.5691132945 => 'P515',
     bv_rep_only_source_profile <= -1.238914958  => 'P515',
-                                                   'P515');
+                                                   'P515') ) ;
 
-s1_aa_dist_03 := 0 - s1_v03_w;
+s1_aa_dist_03 := __common__( 0 - s1_v03_w ) ;
 
-s1_v04_w := map(
+s1_v04_w := __common__( map(
     rv_i61_inq_collection_recency = NULL => 0,
     rv_i61_inq_collection_recency = -1   => 0,
     rv_i61_inq_collection_recency <= 0.5 => -0.121960674918155,
     rv_i61_inq_collection_recency <= 9   => 0.434602123636611,
     rv_i61_inq_collection_recency <= 18  => 0.297663084920067,
     rv_i61_inq_collection_recency <= 24  => 0.184796037313923,
-                                            -0.121960674918155);
+                                            -0.121960674918155) ) ;
 
-s1_aa_code_04 := map(
+s1_aa_code_04 := __common__( map(
     s1_v04_w = -0.121960674918155        => '      ',
     rv_i61_inq_collection_recency = NULL => 'P535',
     rv_i61_inq_collection_recency = -1   => 'P540',
@@ -6175,11 +6175,11 @@ s1_aa_code_04 := map(
     rv_i61_inq_collection_recency <= 9   => 'P540',
     rv_i61_inq_collection_recency <= 18  => 'P540',
     rv_i61_inq_collection_recency <= 24  => 'P540',
-                                            'P540');
+                                            'P540') ) ;
 
-s1_aa_dist_04 := 0 - s1_v04_w;
+s1_aa_dist_04 := __common__( 0 - s1_v04_w ) ;
 
-s1_v05_w := map(
+s1_v05_w := __common__( map(
     rv_d30_derog_count = NULL => 0,
     rv_d30_derog_count = -1   => 0,
     rv_d30_derog_count <= 0.5 => -0.0738995877998049,
@@ -6187,9 +6187,9 @@ s1_v05_w := map(
     rv_d30_derog_count <= 4.5 => 0.181060252781531,
     rv_d30_derog_count <= 5.5 => 0.246166154457983,
     rv_d30_derog_count <= 7.5 => 0.381372229817378,
-                                 0.535722899572138);
+                                 0.535722899572138) ) ;
 
-s1_aa_code_05 := map(
+s1_aa_code_05 := __common__( map(
     s1_v05_w = -0.0738995877998049 => '      ',
     rv_d30_derog_count = NULL      => 'P535',
     rv_d30_derog_count = -1        => 'P526',
@@ -6198,20 +6198,20 @@ s1_aa_code_05 := map(
     rv_d30_derog_count <= 4.5      => 'P526',
     rv_d30_derog_count <= 5.5      => 'P526',
     rv_d30_derog_count <= 7.5      => 'P526',
-                                      'P526');
+                                      'P526') ) ;
 
-s1_aa_dist_05 := 0 - s1_v05_w;
+s1_aa_dist_05 := __common__( 0 - s1_v05_w ) ;
 
-s1_v06_w := map(
+s1_v06_w := __common__( map(
     rv_d34_attr_unrel_liens_recency = NULL => 0,
     rv_d34_attr_unrel_liens_recency = -1   => 0,
     rv_d34_attr_unrel_liens_recency <= 0.5 => -0.0596494267599805,
     rv_d34_attr_unrel_liens_recency <= 30  => 0.555630158934244,
     rv_d34_attr_unrel_liens_recency <= 48  => 0.436410245126093,
     rv_d34_attr_unrel_liens_recency <= 60  => 0.37310641375962,
-                                              -0.0596494267599805);
+                                              -0.0596494267599805) ) ;
 
-s1_aa_code_06 := map(
+s1_aa_code_06 := __common__( map(
     s1_v06_w = -0.0596494267599805         => '      ',
     rv_d34_attr_unrel_liens_recency = NULL => 'P535',
     rv_d34_attr_unrel_liens_recency = -1   => 'P526',
@@ -6219,62 +6219,62 @@ s1_aa_code_06 := map(
     rv_d34_attr_unrel_liens_recency <= 30  => 'P526',
     rv_d34_attr_unrel_liens_recency <= 48  => 'P526',
     rv_d34_attr_unrel_liens_recency <= 60  => 'P526',
-                                              'P526');
+                                              'P526') ) ;
 
-s1_aa_dist_06 := 0 - s1_v06_w;
+s1_aa_dist_06 := __common__( 0 - s1_v06_w ) ;
 
-s1_v07_w := map(
+s1_v07_w := __common__( map(
     nf_fp_srchvelocityrisktype = NULL => 0,
     nf_fp_srchvelocityrisktype = -1   => 0,
     nf_fp_srchvelocityrisktype <= 3.5 => -0.0421793118394418,
     nf_fp_srchvelocityrisktype <= 5.5 => 0.18948465287554,
-                                         0.472759699969382);
+                                         0.472759699969382) ) ;
 
-s1_aa_code_07 := map(
+s1_aa_code_07 := __common__( map(
     s1_v07_w = -0.0421793118394418    => '      ',
     nf_fp_srchvelocityrisktype = NULL => 'P535',
     nf_fp_srchvelocityrisktype = -1   => 'P539',
     nf_fp_srchvelocityrisktype <= 3.5 => 'P539',
     nf_fp_srchvelocityrisktype <= 5.5 => 'P539',
-                                         'P539');
+                                         'P539') ) ;
 
-s1_aa_dist_07 := 0 - s1_v07_w;
+s1_aa_dist_07 := __common__( 0 - s1_v07_w ) ;
 
-s1_v08_w := map(
+s1_v08_w := __common__( map(
     nf_mos_inq_banko_cm_lseen = NULL  => 0,
     nf_mos_inq_banko_cm_lseen = -1    => -0.0270928806494992,
     nf_mos_inq_banko_cm_lseen <= 7    => 0.512695165939598,
     nf_mos_inq_banko_cm_lseen <= 10   => 0.396430290403858,
     nf_mos_inq_banko_cm_lseen <= 49.8 => 0.31122306294174,
-                                         -0.0270928806494992);
+                                         -0.0270928806494992) ) ;
 
-s1_aa_code_08 := map(
+s1_aa_code_08 := __common__( map(
     s1_v08_w = -0.0270928806494992    => '      ',
     nf_mos_inq_banko_cm_lseen = NULL  => 'P535',
     nf_mos_inq_banko_cm_lseen = -1    => 'P540',
     nf_mos_inq_banko_cm_lseen <= 7    => 'P540',
     nf_mos_inq_banko_cm_lseen <= 10   => 'P540',
     nf_mos_inq_banko_cm_lseen <= 49.8 => 'P540',
-                                         'P540');
+                                         'P540') ) ;
 
-s1_aa_dist_08 := 0 - s1_v08_w;
+s1_aa_dist_08 := __common__( 0 - s1_v08_w ) ;
 
-s1_v09_w := map(
+s1_v09_w := __common__( map(
     rv_a41_prop_owner = NULL => 0,
     rv_a41_prop_owner = -1   => 0,
     rv_a41_prop_owner <= 0.5 => 0.290797564115243,
-                                -0.0340649880445184);
+                                -0.0340649880445184) ) ;
 
-s1_aa_code_09 := map(
+s1_aa_code_09 := __common__( map(
     s1_v09_w = -0.0340649880445184 => '      ',
     rv_a41_prop_owner = NULL       => 'P535',
     rv_a41_prop_owner = -1         => 'P502',
     rv_a41_prop_owner <= 0.5       => 'P502',
-                                      'P502');
+                                      'P502') ) ;
 
-s1_aa_dist_09 := 0 - s1_v09_w;
+s1_aa_dist_09 := __common__( 0 - s1_v09_w ) ;
 
-s1_v10_w := map(
+s1_v10_w := __common__( map(
     nf_fp_prevaddrageoldest = NULL   => 0,
     nf_fp_prevaddrageoldest = -1     => 0.0315624639137176,
     nf_fp_prevaddrageoldest <= 7.5   => 0.187167870524971,
@@ -6284,9 +6284,9 @@ s1_v10_w := map(
     nf_fp_prevaddrageoldest <= 125.5 => -0.0180326257748619,
     nf_fp_prevaddrageoldest <= 195.5 => -0.0503686663258628,
     nf_fp_prevaddrageoldest <= 238.5 => -0.0698589503784016,
-                                        -0.106919528615633);
+                                        -0.106919528615633) ) ;
 
-s1_aa_code_10 := map(
+s1_aa_code_10 := __common__( map(
     s1_v10_w = -0.106919528615633    => '      ',
     nf_fp_prevaddrageoldest = NULL   => 'P535',
     nf_fp_prevaddrageoldest = -1     => 'P567',
@@ -6297,52 +6297,52 @@ s1_aa_code_10 := map(
     nf_fp_prevaddrageoldest <= 125.5 => 'P567',
     nf_fp_prevaddrageoldest <= 195.5 => 'P567',
     nf_fp_prevaddrageoldest <= 238.5 => 'P567',
-                                        'P567');
+                                        'P567') ) ;
 
-s1_aa_dist_10 := 0 - s1_v10_w;
+s1_aa_dist_10 := __common__( 0 - s1_v10_w ) ;
 
-s1_v11_w := map(
+s1_v11_w := __common__( map(
     nf_fp_srchunvrfdssncount = NULL => 0,
     nf_fp_srchunvrfdssncount = -1   => 0,
     nf_fp_srchunvrfdssncount <= 0.5 => -0.0150914685024417,
-                                       0.320063839227879);
+                                       0.320063839227879) ) ;
 
-s1_aa_code_11 := map(
+s1_aa_code_11 := __common__( map(
     s1_v11_w = -0.0150914685024417  => '      ',
     nf_fp_srchunvrfdssncount = NULL => 'P535',
     nf_fp_srchunvrfdssncount = -1   => 'P539',
     nf_fp_srchunvrfdssncount <= 0.5 => 'P539',
-                                       'P539');
+                                       'P539') ) ;
 
-s1_aa_dist_11 := 0 - s1_v11_w;
+s1_aa_dist_11 := __common__( 0 - s1_v11_w ) ;
 
-s1_v12_w := map(
+s1_v12_w := __common__( map(
     rv_i60_inq_auto_count12 = NULL => 0,
     rv_i60_inq_auto_count12 = -1   => 0,
     rv_i60_inq_auto_count12 <= 0.5 => -0.016917071374486,
     rv_i60_inq_auto_count12 <= 2.5 => 0.15523458544694,
-                                      0.388242474891784);
+                                      0.388242474891784) ) ;
 
-s1_aa_code_12 := map(
+s1_aa_code_12 := __common__( map(
     s1_v12_w = -0.016917071374486  => '      ',
     rv_i60_inq_auto_count12 = NULL => 'P535',
     rv_i60_inq_auto_count12 = -1   => 'P539',
     rv_i60_inq_auto_count12 <= 0.5 => 'P539',
     rv_i60_inq_auto_count12 <= 2.5 => 'P539',
-                                      'P539');
+                                      'P539') ) ;
 
-s1_aa_dist_12 := 0 - s1_v12_w;
+s1_aa_dist_12 := __common__( 0 - s1_v12_w ) ;
 
-s1_v13_w := map(
+s1_v13_w := __common__( map(
     rv_d34_attr_liens_recency = NULL => 0,
     rv_d34_attr_liens_recency = -1   => 0,
     rv_d34_attr_liens_recency <= 0.5 => -0.0322555239970124,
     rv_d34_attr_liens_recency <= 30  => 0.246959818541904,
     rv_d34_attr_liens_recency <= 48  => 0.214561822458599,
     rv_d34_attr_liens_recency <= 60  => 0.171490702778492,
-                                        -0.0322555239970124);
+                                        -0.0322555239970124) ) ;
 
-s1_aa_code_13 := map(
+s1_aa_code_13 := __common__( map(
     s1_v13_w = -0.0322555239970124   => '      ',
     rv_d34_attr_liens_recency = NULL => 'P535',
     rv_d34_attr_liens_recency = -1   => 'P526',
@@ -6350,71 +6350,71 @@ s1_aa_code_13 := map(
     rv_d34_attr_liens_recency <= 30  => 'P526',
     rv_d34_attr_liens_recency <= 48  => 'P526',
     rv_d34_attr_liens_recency <= 60  => 'P526',
-                                        'P526');
+                                        'P526') ) ;
 
-s1_aa_dist_13 := 0 - s1_v13_w;
+s1_aa_dist_13 := __common__( 0 - s1_v13_w ) ;
 
-s1_v14_w := map(
+s1_v14_w := __common__( map(
     nf_fp_sourcerisktype = NULL => 0,
     nf_fp_sourcerisktype = -1   => 0,
     nf_fp_sourcerisktype <= 5   => -0.0156948348486841,
     nf_fp_sourcerisktype <= 6   => 0.0236610298204858,
     nf_fp_sourcerisktype <= 7.5 => 0.223609896204516,
-                                   0.330101073583405);
+                                   0.330101073583405) ) ;
 
-s1_aa_code_14 := map(
+s1_aa_code_14 := __common__( map(
     s1_v14_w = -0.0156948348486841 => '      ',
     nf_fp_sourcerisktype = NULL    => 'P535',
     nf_fp_sourcerisktype = -1      => 'P515',
     nf_fp_sourcerisktype <= 5      => 'P515',
     nf_fp_sourcerisktype <= 6      => 'P515',
     nf_fp_sourcerisktype <= 7.5    => 'P515',
-                                      'P515');
+                                      'P515') ) ;
 
-s1_aa_dist_14 := 0 - s1_v14_w;
+s1_aa_dist_14 := __common__( 0 - s1_v14_w ) ;
 
-s1_v15_w := map(
+s1_v15_w := __common__( map(
     rv_i60_inq_comm_recency = NULL => 0,
     rv_i60_inq_comm_recency = -1   => 0,
     rv_i60_inq_comm_recency <= 0.5 => -0.0182134328771924,
     rv_i60_inq_comm_recency <= 12  => 0.342396608737328,
-                                      -0.0182134328771924);
+                                      -0.0182134328771924) ) ;
 
-s1_aa_code_15 := map(
+s1_aa_code_15 := __common__( map(
     s1_v15_w = -0.0182134328771924 => '      ',
     rv_i60_inq_comm_recency = NULL => 'P535',
     rv_i60_inq_comm_recency = -1   => 'P539',
     rv_i60_inq_comm_recency <= 0.5 => 'P539',
     rv_i60_inq_comm_recency <= 12  => 'P539',
-                                      'P539');
+                                      'P539') ) ;
 
-s1_aa_dist_15 := 0 - s1_v15_w;
+s1_aa_dist_15 := __common__( 0 - s1_v15_w ) ;
 
-s1_v16_w := map(
+s1_v16_w := __common__( map(
     rv_d32_attr_felonies_recency = NULL => 0,
     rv_d32_attr_felonies_recency = -1   => 0,
     rv_d32_attr_felonies_recency <= 0   => -0.00458551531924943,
-                                           0.310374397834624);
+                                           0.310374397834624) ) ;
 
-s1_aa_code_16 := map(
+s1_aa_code_16 := __common__( map(
     s1_v16_w = -0.00458551531924943     => '      ',
     rv_d32_attr_felonies_recency = NULL => 'P535',
     rv_d32_attr_felonies_recency = -1   => 'P526',
     rv_d32_attr_felonies_recency <= 0   => 'P526',
-                                           'P526');
+                                           'P526') ) ;
 
-s1_aa_dist_16 := 0 - s1_v16_w;
+s1_aa_dist_16 := __common__( 0 - s1_v16_w ) ;
 
-s1_v17_w := map(
+s1_v17_w := __common__( map(
     nf_fp_varrisktype = NULL => 0,
     nf_fp_varrisktype = -1   => 0.0659305311929053,
     nf_fp_varrisktype <= 1   => -0.0155876076306679,
     nf_fp_varrisktype <= 2.5 => 0.04678927804608,
     nf_fp_varrisktype <= 3.5 => 0.0550922792779533,
     nf_fp_varrisktype <= 4.5 => 0.0957801498998182,
-                                0.124780608855422);
+                                0.124780608855422) ) ;
 
-s1_aa_code_17 := map(
+s1_aa_code_17 := __common__( map(
     s1_v17_w = -0.0155876076306679 => '      ',
     nf_fp_varrisktype = NULL       => 'P535',
     nf_fp_varrisktype = -1         => 'P535',
@@ -6422,148 +6422,148 @@ s1_aa_code_17 := map(
     nf_fp_varrisktype <= 2.5       => 'P566',
     nf_fp_varrisktype <= 3.5       => 'P566',
     nf_fp_varrisktype <= 4.5       => 'P566',
-                                      'P566');
+                                      'P566') ) ;
 
-s1_aa_dist_17 := 0 - s1_v17_w;
+s1_aa_dist_17 := __common__( 0 - s1_v17_w ) ;
 
-s1_v18_w := map(
+s1_v18_w := __common__( map(
     rv_d33_eviction_count = NULL => 0,
     rv_d33_eviction_count = -1   => 0,
     rv_d33_eviction_count <= 0.5 => -0.00515219927848869,
-                                    0.231803129664979);
+                                    0.231803129664979) ) ;
 
-s1_aa_code_18 := map(
+s1_aa_code_18 := __common__( map(
     s1_v18_w = -0.00515219927848869 => '      ',
     rv_d33_eviction_count = NULL    => 'P535',
     rv_d33_eviction_count = -1      => 'P526',
     rv_d33_eviction_count <= 0.5    => 'P526',
-                                       'P526');
+                                       'P526') ) ;
 
-s1_aa_dist_18 := 0 - s1_v18_w;
+s1_aa_dist_18 := __common__( 0 - s1_v18_w ) ;
 
-s1_v19_w := map(
+s1_v19_w := __common__( map(
     rv_i60_inq_auto_recency = NULL => 0,
     rv_i60_inq_auto_recency = -1   => 0,
     rv_i60_inq_auto_recency <= 0.5 => -0.0141383134139647,
     rv_i60_inq_auto_recency <= 4.5 => 0.107047139165997,
     rv_i60_inq_auto_recency <= 12  => 0.0664068559746673,
-                                      -0.0141383134139647);
+                                      -0.0141383134139647) ) ;
 
-s1_aa_code_19 := map(
+s1_aa_code_19 := __common__( map(
     s1_v19_w = -0.0141383134139647 => '      ',
     rv_i60_inq_auto_recency = NULL => 'P535',
     rv_i60_inq_auto_recency = -1   => 'P539',
     rv_i60_inq_auto_recency <= 0.5 => 'P539',
     rv_i60_inq_auto_recency <= 4.5 => 'P539',
     rv_i60_inq_auto_recency <= 12  => 'P539',
-                                      'P539');
+                                      'P539') ) ;
 
-s1_aa_dist_19 := 0 - s1_v19_w;
+s1_aa_dist_19 := __common__( 0 - s1_v19_w ) ;
 
-s1_v20_w := map(
+s1_v20_w := __common__( map(
     rv_i61_inq_collection_count12 = NULL => 0,
     rv_i61_inq_collection_count12 = -1   => 0,
     rv_i61_inq_collection_count12 <= 0.5 => -0.00679658901451645,
     rv_i61_inq_collection_count12 <= 2.5 => 0.0716072006477226,
-                                            0.0913500072012444);
+                                            0.0913500072012444) ) ;
 
-s1_aa_code_20 := map(
+s1_aa_code_20 := __common__( map(
     s1_v20_w = -0.00679658901451645      => '      ',
     rv_i61_inq_collection_count12 = NULL => 'P535',
     rv_i61_inq_collection_count12 = -1   => 'P540',
     rv_i61_inq_collection_count12 <= 0.5 => 'P540',
     rv_i61_inq_collection_count12 <= 2.5 => 'P540',
-                                            'P540');
+                                            'P540') ) ;
 
-s1_aa_dist_20 := 0 - s1_v20_w;
+s1_aa_dist_20 := __common__( 0 - s1_v20_w ) ;
 
-s1_v21_w := map(
+s1_v21_w := __common__( map(
     rv_i60_inq_hiriskcred_recency = NULL => 0,
     rv_i60_inq_hiriskcred_recency = -1   => 0,
     rv_i60_inq_hiriskcred_recency <= 0.5 => -0.0057000899049818,
     rv_i60_inq_hiriskcred_recency <= 12  => 0.205442175657761,
-                                            -0.0057000899049818);
+                                            -0.0057000899049818) ) ;
 
-s1_aa_code_21 := map(
+s1_aa_code_21 := __common__( map(
     s1_v21_w = -0.0057000899049818       => '      ',
     rv_i60_inq_hiriskcred_recency = NULL => 'P535',
     rv_i60_inq_hiriskcred_recency = -1   => 'P539',
     rv_i60_inq_hiriskcred_recency <= 0.5 => 'P539',
     rv_i60_inq_hiriskcred_recency <= 12  => 'P539',
-                                            'P539');
+                                            'P539') ) ;
 
-s1_aa_dist_21 := 0 - s1_v21_w;
+s1_aa_dist_21 := __common__( 0 - s1_v21_w ) ;
 
-s1_v22_w := map(
+s1_v22_w := __common__( map(
     iv_curr_add_mortgage_type = ''                                                                   => 0,
     (iv_curr_add_mortgage_type in ['CONVENTIONAL'])                                                    => -0.020212895633126,
     (iv_curr_add_mortgage_type in ['GOVERNMENT', 'NON-TRADITIONAL', 'UNKNOWN', 'COMMERCIAL', 'OTHER']) => -0.00899345751036937,
     (iv_curr_add_mortgage_type in ['NO MORTGAGE'])                                                     => 0.0168024233107262,
-                                                                                                          0);
+                                                                                                          0) ) ;
 
-s1_aa_code_22 := map(
+s1_aa_code_22 := __common__( map(
     s1_v22_w = -0.020212895633126                                                                      => '      ',
     iv_curr_add_mortgage_type = ''                                                                   => 'P535',
     (iv_curr_add_mortgage_type in ['CONVENTIONAL'])                                                    => 'P510',
     (iv_curr_add_mortgage_type in ['GOVERNMENT', 'NON-TRADITIONAL', 'UNKNOWN', 'COMMERCIAL', 'OTHER']) => 'P510',
     (rv_a44_curr_add_naprop in [0, 1])                                                                 => 'P505',
     (iv_curr_add_mortgage_type in ['NO MORTGAGE'])                                                     => 'P513',
-                                                                                                          'P510');
+                                                                                                          'P510') ) ;
 
-s1_aa_dist_22 := 0 - s1_v22_w;
+s1_aa_dist_22 := __common__( 0 - s1_v22_w ) ;
 
-s1_v23_w := map(
+s1_v23_w := __common__( map(
     rv_c14_addrs_per_adl_c6 = NULL => 0,
     rv_c14_addrs_per_adl_c6 = -1   => 0,
     rv_c14_addrs_per_adl_c6 <= 0.5 => -0.00820103475323372,
     rv_c14_addrs_per_adl_c6 <= 1.5 => 0.0689324550421659,
-                                      0.148210076831546);
+                                      0.148210076831546) ) ;
 
-s1_aa_code_23 := map(
+s1_aa_code_23 := __common__( map(
     s1_v23_w = -0.00820103475323372 => '      ',
     rv_c14_addrs_per_adl_c6 = NULL  => 'P535',
     rv_c14_addrs_per_adl_c6 = -1    => 'P517',
     rv_c14_addrs_per_adl_c6 <= 0.5  => 'P517',
     rv_c14_addrs_per_adl_c6 <= 1.5  => 'P517',
-                                       'P517');
+                                       'P517') ) ;
 
-s1_aa_dist_23 := 0 - s1_v23_w;
+s1_aa_dist_23 := __common__( 0 - s1_v23_w ) ;
 
-s1_v24_w := map(
+s1_v24_w := __common__( map(
     nf_fp_srchunvrfdaddrcount = NULL => 0,
     nf_fp_srchunvrfdaddrcount = -1   => 0,
     nf_fp_srchunvrfdaddrcount <= 0.5 => -0.00226337453888191,
-                                        0.0716419489787622);
+                                        0.0716419489787622) ) ;
 
-s1_aa_code_24 := map(
+s1_aa_code_24 := __common__( map(
     s1_v24_w = -0.00226337453888191  => '      ',
     nf_fp_srchunvrfdaddrcount = NULL => 'P535',
     nf_fp_srchunvrfdaddrcount = -1   => 'P539',
     nf_fp_srchunvrfdaddrcount <= 0.5 => 'P539',
-                                        'P539');
+                                        'P539') ) ;
 
-s1_aa_dist_24 := 0 - s1_v24_w;
+s1_aa_dist_24 := __common__( 0 - s1_v24_w ) ;
 
-s1_v25_w := map(
+s1_v25_w := __common__( map(
     rv_c12_num_nonderogs = NULL => 0,
     rv_c12_num_nonderogs = -1   => 0,
     rv_c12_num_nonderogs <= 1.5 => 0.0402371078365719,
-                                   -0.00208812088436208);
+                                   -0.00208812088436208) ) ;
 
-s1_aa_code_25 := map(
+s1_aa_code_25 := __common__( map(
     s1_v25_w = -0.00208812088436208 => '      ',
     rv_c12_num_nonderogs = NULL     => 'P535',
     rv_c12_num_nonderogs = -1       => 'P515',
     rv_c12_num_nonderogs <= 1.5     => 'P515',
-                                       'P515');
+                                       'P515') ) ;
 
-s1_aa_dist_25 := 0 - s1_v25_w;
+s1_aa_dist_25 := __common__( 0 - s1_v25_w ) ;
 
-s1_aa_code_26 := 'B067';
+s1_aa_code_26 := __common__( 'B067' ) ;
 
-s1_aa_dist_26 := -999;
+s1_aa_dist_26 := __common__( -999 ) ;
 
-s1_rcvaluep509 := (integer)(s1_aa_code_01 = 'P509') * s1_aa_dist_01 +
+s1_rcvaluep509 := __common__( (integer)(s1_aa_code_01 = 'P509') * s1_aa_dist_01 +
     (integer)(s1_aa_code_02 = 'P509') * s1_aa_dist_02 +
     (integer)(s1_aa_code_03 = 'P509') * s1_aa_dist_03 +
     (integer)(s1_aa_code_04 = 'P509') * s1_aa_dist_04 +
@@ -6588,9 +6588,9 @@ s1_rcvaluep509 := (integer)(s1_aa_code_01 = 'P509') * s1_aa_dist_01 +
     (integer)(s1_aa_code_23 = 'P509') * s1_aa_dist_23 +
     (integer)(s1_aa_code_24 = 'P509') * s1_aa_dist_24 +
     (integer)(s1_aa_code_25 = 'P509') * s1_aa_dist_25 +
-    (integer)(s1_aa_code_26 = 'P509') * s1_aa_dist_26;
+    (integer)(s1_aa_code_26 = 'P509') * s1_aa_dist_26 ) ;
 
-s1_rcvaluep502 := (integer)(s1_aa_code_01 = 'P502') * s1_aa_dist_01 +
+s1_rcvaluep502 := __common__( (integer)(s1_aa_code_01 = 'P502') * s1_aa_dist_01 +
     (integer)(s1_aa_code_02 = 'P502') * s1_aa_dist_02 +
     (integer)(s1_aa_code_03 = 'P502') * s1_aa_dist_03 +
     (integer)(s1_aa_code_04 = 'P502') * s1_aa_dist_04 +
@@ -6615,9 +6615,9 @@ s1_rcvaluep502 := (integer)(s1_aa_code_01 = 'P502') * s1_aa_dist_01 +
     (integer)(s1_aa_code_23 = 'P502') * s1_aa_dist_23 +
     (integer)(s1_aa_code_24 = 'P502') * s1_aa_dist_24 +
     (integer)(s1_aa_code_25 = 'P502') * s1_aa_dist_25 +
-    (integer)(s1_aa_code_26 = 'P502') * s1_aa_dist_26;
+    (integer)(s1_aa_code_26 = 'P502') * s1_aa_dist_26 ) ;
 
-s1_rcvaluep535 := (integer)(s1_aa_code_01 = 'P535') * s1_aa_dist_01 +
+s1_rcvaluep535 := __common__( (integer)(s1_aa_code_01 = 'P535') * s1_aa_dist_01 +
     (integer)(s1_aa_code_02 = 'P535') * s1_aa_dist_02 +
     (integer)(s1_aa_code_03 = 'P535') * s1_aa_dist_03 +
     (integer)(s1_aa_code_04 = 'P535') * s1_aa_dist_04 +
@@ -6642,9 +6642,9 @@ s1_rcvaluep535 := (integer)(s1_aa_code_01 = 'P535') * s1_aa_dist_01 +
     (integer)(s1_aa_code_23 = 'P535') * s1_aa_dist_23 +
     (integer)(s1_aa_code_24 = 'P535') * s1_aa_dist_24 +
     (integer)(s1_aa_code_25 = 'P535') * s1_aa_dist_25 +
-    (integer)(s1_aa_code_26 = 'P535') * s1_aa_dist_26;
+    (integer)(s1_aa_code_26 = 'P535') * s1_aa_dist_26 ) ;
 
-s1_rcvaluep539 := (integer)(s1_aa_code_01 = 'P539') * s1_aa_dist_01 +
+s1_rcvaluep539 := __common__( (integer)(s1_aa_code_01 = 'P539') * s1_aa_dist_01 +
     (integer)(s1_aa_code_02 = 'P539') * s1_aa_dist_02 +
     (integer)(s1_aa_code_03 = 'P539') * s1_aa_dist_03 +
     (integer)(s1_aa_code_04 = 'P539') * s1_aa_dist_04 +
@@ -6669,9 +6669,9 @@ s1_rcvaluep539 := (integer)(s1_aa_code_01 = 'P539') * s1_aa_dist_01 +
     (integer)(s1_aa_code_23 = 'P539') * s1_aa_dist_23 +
     (integer)(s1_aa_code_24 = 'P539') * s1_aa_dist_24 +
     (integer)(s1_aa_code_25 = 'P539') * s1_aa_dist_25 +
-    (integer)(s1_aa_code_26 = 'P539') * s1_aa_dist_26;
+    (integer)(s1_aa_code_26 = 'P539') * s1_aa_dist_26 ) ;
 
-s1_rcvaluep540 := (integer)(s1_aa_code_01 = 'P540') * s1_aa_dist_01 +
+s1_rcvaluep540 := __common__( (integer)(s1_aa_code_01 = 'P540') * s1_aa_dist_01 +
     (integer)(s1_aa_code_02 = 'P540') * s1_aa_dist_02 +
     (integer)(s1_aa_code_03 = 'P540') * s1_aa_dist_03 +
     (integer)(s1_aa_code_04 = 'P540') * s1_aa_dist_04 +
@@ -6696,9 +6696,9 @@ s1_rcvaluep540 := (integer)(s1_aa_code_01 = 'P540') * s1_aa_dist_01 +
     (integer)(s1_aa_code_23 = 'P540') * s1_aa_dist_23 +
     (integer)(s1_aa_code_24 = 'P540') * s1_aa_dist_24 +
     (integer)(s1_aa_code_25 = 'P540') * s1_aa_dist_25 +
-    (integer)(s1_aa_code_26 = 'P540') * s1_aa_dist_26;
+    (integer)(s1_aa_code_26 = 'P540') * s1_aa_dist_26 ) ;
 
-s1_rcvaluep515 := (integer)(s1_aa_code_01 = 'P515') * s1_aa_dist_01 +
+s1_rcvaluep515 := __common__( (integer)(s1_aa_code_01 = 'P515') * s1_aa_dist_01 +
     (integer)(s1_aa_code_02 = 'P515') * s1_aa_dist_02 +
     (integer)(s1_aa_code_03 = 'P515') * s1_aa_dist_03 +
     (integer)(s1_aa_code_04 = 'P515') * s1_aa_dist_04 +
@@ -6723,9 +6723,9 @@ s1_rcvaluep515 := (integer)(s1_aa_code_01 = 'P515') * s1_aa_dist_01 +
     (integer)(s1_aa_code_23 = 'P515') * s1_aa_dist_23 +
     (integer)(s1_aa_code_24 = 'P515') * s1_aa_dist_24 +
     (integer)(s1_aa_code_25 = 'P515') * s1_aa_dist_25 +
-    (integer)(s1_aa_code_26 = 'P515') * s1_aa_dist_26;
+    (integer)(s1_aa_code_26 = 'P515') * s1_aa_dist_26 ) ;
 
-s1_rcvaluep505 := (integer)(s1_aa_code_01 = 'P505') * s1_aa_dist_01 +
+s1_rcvaluep505 := __common__( (integer)(s1_aa_code_01 = 'P505') * s1_aa_dist_01 +
     (integer)(s1_aa_code_02 = 'P505') * s1_aa_dist_02 +
     (integer)(s1_aa_code_03 = 'P505') * s1_aa_dist_03 +
     (integer)(s1_aa_code_04 = 'P505') * s1_aa_dist_04 +
@@ -6750,9 +6750,9 @@ s1_rcvaluep505 := (integer)(s1_aa_code_01 = 'P505') * s1_aa_dist_01 +
     (integer)(s1_aa_code_23 = 'P505') * s1_aa_dist_23 +
     (integer)(s1_aa_code_24 = 'P505') * s1_aa_dist_24 +
     (integer)(s1_aa_code_25 = 'P505') * s1_aa_dist_25 +
-    (integer)(s1_aa_code_26 = 'P505') * s1_aa_dist_26;
+    (integer)(s1_aa_code_26 = 'P505') * s1_aa_dist_26 ) ;
 
-s1_rcvaluep513 := (integer)(s1_aa_code_01 = 'P513') * s1_aa_dist_01 +
+s1_rcvaluep513 := __common__( (integer)(s1_aa_code_01 = 'P513') * s1_aa_dist_01 +
     (integer)(s1_aa_code_02 = 'P513') * s1_aa_dist_02 +
     (integer)(s1_aa_code_03 = 'P513') * s1_aa_dist_03 +
     (integer)(s1_aa_code_04 = 'P513') * s1_aa_dist_04 +
@@ -6777,9 +6777,9 @@ s1_rcvaluep513 := (integer)(s1_aa_code_01 = 'P513') * s1_aa_dist_01 +
     (integer)(s1_aa_code_23 = 'P513') * s1_aa_dist_23 +
     (integer)(s1_aa_code_24 = 'P513') * s1_aa_dist_24 +
     (integer)(s1_aa_code_25 = 'P513') * s1_aa_dist_25 +
-    (integer)(s1_aa_code_26 = 'P513') * s1_aa_dist_26;
+    (integer)(s1_aa_code_26 = 'P513') * s1_aa_dist_26 ) ;
 
-s1_rcvaluep510 := (integer)(s1_aa_code_01 = 'P510') * s1_aa_dist_01 +
+s1_rcvaluep510 := __common__( (integer)(s1_aa_code_01 = 'P510') * s1_aa_dist_01 +
     (integer)(s1_aa_code_02 = 'P510') * s1_aa_dist_02 +
     (integer)(s1_aa_code_03 = 'P510') * s1_aa_dist_03 +
     (integer)(s1_aa_code_04 = 'P510') * s1_aa_dist_04 +
@@ -6804,9 +6804,9 @@ s1_rcvaluep510 := (integer)(s1_aa_code_01 = 'P510') * s1_aa_dist_01 +
     (integer)(s1_aa_code_23 = 'P510') * s1_aa_dist_23 +
     (integer)(s1_aa_code_24 = 'P510') * s1_aa_dist_24 +
     (integer)(s1_aa_code_25 = 'P510') * s1_aa_dist_25 +
-    (integer)(s1_aa_code_26 = 'P510') * s1_aa_dist_26;
+    (integer)(s1_aa_code_26 = 'P510') * s1_aa_dist_26 ) ;
 
-s1_rcvalueb067 := (integer)(s1_aa_code_01 = 'B067') * s1_aa_dist_01 +
+s1_rcvalueb067 := __common__( (integer)(s1_aa_code_01 = 'B067') * s1_aa_dist_01 +
     (integer)(s1_aa_code_02 = 'B067') * s1_aa_dist_02 +
     (integer)(s1_aa_code_03 = 'B067') * s1_aa_dist_03 +
     (integer)(s1_aa_code_04 = 'B067') * s1_aa_dist_04 +
@@ -6831,9 +6831,9 @@ s1_rcvalueb067 := (integer)(s1_aa_code_01 = 'B067') * s1_aa_dist_01 +
     (integer)(s1_aa_code_23 = 'B067') * s1_aa_dist_23 +
     (integer)(s1_aa_code_24 = 'B067') * s1_aa_dist_24 +
     (integer)(s1_aa_code_25 = 'B067') * s1_aa_dist_25 +
-    (integer)(s1_aa_code_26 = 'B067') * s1_aa_dist_26;
+    (integer)(s1_aa_code_26 = 'B067') * s1_aa_dist_26 ) ;
 
-s1_rcvaluep517 := (integer)(s1_aa_code_01 = 'P517') * s1_aa_dist_01 +
+s1_rcvaluep517 := __common__( (integer)(s1_aa_code_01 = 'P517') * s1_aa_dist_01 +
     (integer)(s1_aa_code_02 = 'P517') * s1_aa_dist_02 +
     (integer)(s1_aa_code_03 = 'P517') * s1_aa_dist_03 +
     (integer)(s1_aa_code_04 = 'P517') * s1_aa_dist_04 +
@@ -6858,9 +6858,9 @@ s1_rcvaluep517 := (integer)(s1_aa_code_01 = 'P517') * s1_aa_dist_01 +
     (integer)(s1_aa_code_23 = 'P517') * s1_aa_dist_23 +
     (integer)(s1_aa_code_24 = 'P517') * s1_aa_dist_24 +
     (integer)(s1_aa_code_25 = 'P517') * s1_aa_dist_25 +
-    (integer)(s1_aa_code_26 = 'P517') * s1_aa_dist_26;
+    (integer)(s1_aa_code_26 = 'P517') * s1_aa_dist_26 ) ;
 
-s1_rcvaluep567 := (integer)(s1_aa_code_01 = 'P567') * s1_aa_dist_01 +
+s1_rcvaluep567 := __common__( (integer)(s1_aa_code_01 = 'P567') * s1_aa_dist_01 +
     (integer)(s1_aa_code_02 = 'P567') * s1_aa_dist_02 +
     (integer)(s1_aa_code_03 = 'P567') * s1_aa_dist_03 +
     (integer)(s1_aa_code_04 = 'P567') * s1_aa_dist_04 +
@@ -6885,9 +6885,9 @@ s1_rcvaluep567 := (integer)(s1_aa_code_01 = 'P567') * s1_aa_dist_01 +
     (integer)(s1_aa_code_23 = 'P567') * s1_aa_dist_23 +
     (integer)(s1_aa_code_24 = 'P567') * s1_aa_dist_24 +
     (integer)(s1_aa_code_25 = 'P567') * s1_aa_dist_25 +
-    (integer)(s1_aa_code_26 = 'P567') * s1_aa_dist_26;
+    (integer)(s1_aa_code_26 = 'P567') * s1_aa_dist_26 ) ;
 
-s1_rcvaluep566 := (integer)(s1_aa_code_01 = 'P566') * s1_aa_dist_01 +
+s1_rcvaluep566 := __common__( (integer)(s1_aa_code_01 = 'P566') * s1_aa_dist_01 +
     (integer)(s1_aa_code_02 = 'P566') * s1_aa_dist_02 +
     (integer)(s1_aa_code_03 = 'P566') * s1_aa_dist_03 +
     (integer)(s1_aa_code_04 = 'P566') * s1_aa_dist_04 +
@@ -6912,9 +6912,9 @@ s1_rcvaluep566 := (integer)(s1_aa_code_01 = 'P566') * s1_aa_dist_01 +
     (integer)(s1_aa_code_23 = 'P566') * s1_aa_dist_23 +
     (integer)(s1_aa_code_24 = 'P566') * s1_aa_dist_24 +
     (integer)(s1_aa_code_25 = 'P566') * s1_aa_dist_25 +
-    (integer)(s1_aa_code_26 = 'P566') * s1_aa_dist_26;
+    (integer)(s1_aa_code_26 = 'P566') * s1_aa_dist_26 ) ;
 
-s1_rcvaluep526 := (integer)(s1_aa_code_01 = 'P526') * s1_aa_dist_01 +
+s1_rcvaluep526 := __common__( (integer)(s1_aa_code_01 = 'P526') * s1_aa_dist_01 +
     (integer)(s1_aa_code_02 = 'P526') * s1_aa_dist_02 +
     (integer)(s1_aa_code_03 = 'P526') * s1_aa_dist_03 +
     (integer)(s1_aa_code_04 = 'P526') * s1_aa_dist_04 +
@@ -6939,9 +6939,9 @@ s1_rcvaluep526 := (integer)(s1_aa_code_01 = 'P526') * s1_aa_dist_01 +
     (integer)(s1_aa_code_23 = 'P526') * s1_aa_dist_23 +
     (integer)(s1_aa_code_24 = 'P526') * s1_aa_dist_24 +
     (integer)(s1_aa_code_25 = 'P526') * s1_aa_dist_25 +
-    (integer)(s1_aa_code_26 = 'P526') * s1_aa_dist_26;
+    (integer)(s1_aa_code_26 = 'P526') * s1_aa_dist_26 ) ;
 
-s1_lgt := -3.76884717497182 +
+s1_lgt := __common__( -3.76884717497182 +
     s1_v01_w +
     s1_v02_w +
     s1_v03_w +
@@ -6966,31 +6966,31 @@ s1_lgt := -3.76884717497182 +
     s1_v22_w +
     s1_v23_w +
     s1_v24_w +
-    s1_v25_w;
+    s1_v25_w ) ;
 
-rep_only := if(truebiz_ln, 0, 1);
+rep_only := __common__( if(truebiz_ln, 0, 1) ) ;
 
-final_score_1 := if(rep_only = 0, s0_lgt, NULL);
+final_score_1 := __common__( if(rep_only = 0, s0_lgt, NULL) ) ;
 
-final_score := if(rep_only = 1, s1_lgt, final_score_1);
+final_score := __common__( if(rep_only = 1, s1_lgt, final_score_1) ) ;
 
-base := 700;
+base := __common__( 700 ) ;
 
-pts := -40;
+pts := __common__( -40 ) ;
 
-lgt := ln(0.018 / (1 - 0.018));
+lgt := __common__( ln(0.018 / (1 - 0.018)) ) ;
 
-slbb1702_0_2_1 := round(max((real)501, min(900, if(base + pts * (final_score - lgt) / ln(2) = NULL, -NULL, base + pts * (final_score - lgt) / ln(2)))));
+slbb1702_0_2_1 := __common__( round(max((real)501, min(900, if(base + pts * (final_score - lgt) / ln(2) = NULL, -NULL, base + pts * (final_score - lgt) / ln(2))))) ) ;
 
-slbb1702_0_2 := if(iv_rv5_unscorable = 1, 222, slbb1702_0_2_1);
+slbb1702_0_2 := __common__( if(iv_rv5_unscorable = 1, 222, slbb1702_0_2_1) ) ;
 
 
-ds_layout := {STRING rc, REAL value};
+ds_layout :=  {STRING rc, REAL value}  ;
 
-Null_ds := dataset([{'00', NULL}, {'00', NULL}, {'00', NULL}, {'00', NULL}], ds_layout);
+Null_ds :=  dataset([{'00', NULL}, {'00', NULL}, {'00', NULL}, {'00', NULL}], ds_layout)  ;
 
 //*************************************************************************************//
-s_aa_code_set:= [
+s_aa_code_set:=  [
 s0_aa_code_01,
 s0_aa_code_02,
 s0_aa_code_03,
@@ -7035,9 +7035,9 @@ s0_aa_code_40,
 s0_aa_code_41,
 s0_aa_code_42,
 s0_aa_code_43
-];
+]  ;
              
-rc_dataset_s0 := DATASET([
+rc_dataset_s0 := __common__( DATASET([
     {'B017', s0_rcvalueB017},
     {'B026', s0_rcvalueB026},
     {'B031', s0_rcvalueB031},
@@ -7068,67 +7068,67 @@ rc_dataset_s0 := DATASET([
     {'P565', s0_rcvalueP565},
     {'P566', s0_rcvalueP566},
     {'P567', s0_rcvalueP567}
-    ], ds_layout)(rc in s_aa_code_set);
+    ], ds_layout)(rc in s_aa_code_set) ) ;
 
 //*************************************************************************************//
 // IMPORTANT NOTE:  Select ONLY reason codes with an RCValue < 0.  I'll leave the 
 //   implementation of this to the Engineer
 //*************************************************************************************//
-rc_dataset_0_sorted_new := sort(rc_dataset_s0, value, rc);
+rc_dataset_0_sorted_new := __common__( sort(rc_dataset_s0, value, rc) ) ;
 
-baseBLS0_rc1  := rc_dataset_0_sorted_new[1].rc;
-baseBLS0_rc2  := rc_dataset_0_sorted_new[2].rc;
-baseBLS0_rc3  := rc_dataset_0_sorted_new[3].rc;
-baseBLS0_rc4  := rc_dataset_0_sorted_new[4].rc;
-baseBLS0_rc5  := rc_dataset_0_sorted_new[5].rc;
-baseBLS0_rc6  := rc_dataset_0_sorted_new[6].rc;
-baseBLS0_rc7  := rc_dataset_0_sorted_new[7].rc;
-baseBLS0_rc8  := rc_dataset_0_sorted_new[8].rc;
-baseBLS0_rc9  := rc_dataset_0_sorted_new[9].rc;
-baseBLS0_rc10  := rc_dataset_0_sorted_new[10].rc;
-baseBLS0_rc11  := rc_dataset_0_sorted_new[11].rc;
-baseBLS0_rc12  := rc_dataset_0_sorted_new[12].rc;
-baseBLS0_rc13  := rc_dataset_0_sorted_new[13].rc;
-baseBLS0_rc14  := rc_dataset_0_sorted_new[14].rc;
-baseBLS0_rc15  := rc_dataset_0_sorted_new[15].rc;
-baseBLS0_rc16  := rc_dataset_0_sorted_new[16].rc;
-baseBLS0_rc17  := rc_dataset_0_sorted_new[17].rc;
-baseBLS0_rc18  := rc_dataset_0_sorted_new[18].rc;
-baseBLS0_rc19  := rc_dataset_0_sorted_new[19].rc;
-baseBLS0_rc20  := rc_dataset_0_sorted_new[20].rc;
-baseBLS0_rc21  := rc_dataset_0_sorted_new[21].rc;
-baseBLS0_rc22  := rc_dataset_0_sorted_new[22].rc;
-baseBLS0_rc23  := rc_dataset_0_sorted_new[23].rc;
-baseBLS0_rc24  := rc_dataset_0_sorted_new[24].rc;
-baseBLS0_rc25  := rc_dataset_0_sorted_new[25].rc;
-baseBLS0_rc26  := rc_dataset_0_sorted_new[26].rc;
-baseBLS0_rc27  := rc_dataset_0_sorted_new[27].rc;
-baseBLS0_rc28  := rc_dataset_0_sorted_new[28].rc;
-baseBLS0_rc29  := rc_dataset_0_sorted_new[29].rc;
-baseBLS0_rc30  := rc_dataset_0_sorted_new[30].rc;
-baseBLS0_rc31  := rc_dataset_0_sorted_new[31].rc;
-baseBLS0_rc32  := rc_dataset_0_sorted_new[32].rc;
-baseBLS0_rc33  := rc_dataset_0_sorted_new[33].rc;
-baseBLS0_rc34  := rc_dataset_0_sorted_new[34].rc;
-baseBLS0_rc35  := rc_dataset_0_sorted_new[35].rc;
-baseBLS0_rc36  := rc_dataset_0_sorted_new[36].rc;
-baseBLS0_rc37  := rc_dataset_0_sorted_new[37].rc;
-baseBLS0_rc38  := rc_dataset_0_sorted_new[38].rc;
-baseBLS0_rc39  := rc_dataset_0_sorted_new[39].rc;
-baseBLS0_rc40  := rc_dataset_0_sorted_new[40].rc;
-baseBLS0_rc41  := rc_dataset_0_sorted_new[41].rc;
-baseBLS0_rc42  := rc_dataset_0_sorted_new[42].rc;
-baseBLS0_rc43  := rc_dataset_0_sorted_new[43].rc;
-baseBLS0_rc44  := rc_dataset_0_sorted_new[44].rc;
-baseBLS0_rc45  := rc_dataset_0_sorted_new[45].rc;
-baseBLS0_rc46  := rc_dataset_0_sorted_new[46].rc;
-baseBLS0_rc47  := rc_dataset_0_sorted_new[47].rc;
-baseBLS0_rc48  := rc_dataset_0_sorted_new[48].rc;
-baseBLS0_rc49  := rc_dataset_0_sorted_new[49].rc;
-baseBLS0_rc50  := rc_dataset_0_sorted_new[50].rc;
+baseBLS0_rc1  := __common__( rc_dataset_0_sorted_new[1].rc ) ;
+baseBLS0_rc2  := __common__( rc_dataset_0_sorted_new[2].rc ) ;
+baseBLS0_rc3  := __common__( rc_dataset_0_sorted_new[3].rc ) ;
+baseBLS0_rc4  := __common__( rc_dataset_0_sorted_new[4].rc ) ;
+baseBLS0_rc5  := __common__( rc_dataset_0_sorted_new[5].rc ) ;
+baseBLS0_rc6  := __common__( rc_dataset_0_sorted_new[6].rc ) ;
+baseBLS0_rc7  := __common__( rc_dataset_0_sorted_new[7].rc ) ;
+baseBLS0_rc8  := __common__( rc_dataset_0_sorted_new[8].rc ) ;
+baseBLS0_rc9  := __common__( rc_dataset_0_sorted_new[9].rc ) ;
+baseBLS0_rc10  := __common__( rc_dataset_0_sorted_new[10].rc ) ;
+baseBLS0_rc11  := __common__( rc_dataset_0_sorted_new[11].rc ) ;
+baseBLS0_rc12  := __common__( rc_dataset_0_sorted_new[12].rc ) ;
+baseBLS0_rc13  := __common__( rc_dataset_0_sorted_new[13].rc ) ;
+baseBLS0_rc14  := __common__( rc_dataset_0_sorted_new[14].rc ) ;
+baseBLS0_rc15  := __common__( rc_dataset_0_sorted_new[15].rc ) ;
+baseBLS0_rc16  := __common__( rc_dataset_0_sorted_new[16].rc ) ;
+baseBLS0_rc17  := __common__( rc_dataset_0_sorted_new[17].rc ) ;
+baseBLS0_rc18  := __common__( rc_dataset_0_sorted_new[18].rc ) ;
+baseBLS0_rc19  := __common__( rc_dataset_0_sorted_new[19].rc ) ;
+baseBLS0_rc20  := __common__( rc_dataset_0_sorted_new[20].rc ) ;
+baseBLS0_rc21  := __common__( rc_dataset_0_sorted_new[21].rc ) ;
+baseBLS0_rc22  := __common__( rc_dataset_0_sorted_new[22].rc ) ;
+baseBLS0_rc23  := __common__( rc_dataset_0_sorted_new[23].rc ) ;
+baseBLS0_rc24  := __common__( rc_dataset_0_sorted_new[24].rc ) ;
+baseBLS0_rc25  := __common__( rc_dataset_0_sorted_new[25].rc ) ;
+baseBLS0_rc26  := __common__( rc_dataset_0_sorted_new[26].rc ) ;
+baseBLS0_rc27  := __common__( rc_dataset_0_sorted_new[27].rc ) ;
+baseBLS0_rc28  := __common__( rc_dataset_0_sorted_new[28].rc ) ;
+baseBLS0_rc29  := __common__( rc_dataset_0_sorted_new[29].rc ) ;
+baseBLS0_rc30  := __common__( rc_dataset_0_sorted_new[30].rc ) ;
+baseBLS0_rc31  := __common__( rc_dataset_0_sorted_new[31].rc ) ;
+baseBLS0_rc32  := __common__( rc_dataset_0_sorted_new[32].rc ) ;
+baseBLS0_rc33  := __common__( rc_dataset_0_sorted_new[33].rc ) ;
+baseBLS0_rc34  := __common__( rc_dataset_0_sorted_new[34].rc ) ;
+baseBLS0_rc35  := __common__( rc_dataset_0_sorted_new[35].rc ) ;
+baseBLS0_rc36  := __common__( rc_dataset_0_sorted_new[36].rc ) ;
+baseBLS0_rc37  := __common__( rc_dataset_0_sorted_new[37].rc ) ;
+baseBLS0_rc38  := __common__( rc_dataset_0_sorted_new[38].rc ) ;
+baseBLS0_rc39  := __common__( rc_dataset_0_sorted_new[39].rc ) ;
+baseBLS0_rc40  := __common__( rc_dataset_0_sorted_new[40].rc ) ;
+baseBLS0_rc41  := __common__( rc_dataset_0_sorted_new[41].rc ) ;
+baseBLS0_rc42  := __common__( rc_dataset_0_sorted_new[42].rc ) ;
+baseBLS0_rc43  := __common__( rc_dataset_0_sorted_new[43].rc ) ;
+baseBLS0_rc44  := __common__( rc_dataset_0_sorted_new[44].rc ) ;
+baseBLS0_rc45  := __common__( rc_dataset_0_sorted_new[45].rc ) ;
+baseBLS0_rc46  := __common__( rc_dataset_0_sorted_new[46].rc ) ;
+baseBLS0_rc47  := __common__( rc_dataset_0_sorted_new[47].rc ) ;
+baseBLS0_rc48  := __common__( rc_dataset_0_sorted_new[48].rc ) ;
+baseBLS0_rc49  := __common__( rc_dataset_0_sorted_new[49].rc ) ;
+baseBLS0_rc50  := __common__( rc_dataset_0_sorted_new[50].rc ) ;
  
 //*************************************************************************************//
-s1_code_set := [s1_aa_code_01,
+s1_code_set := __common__( [s1_aa_code_01,
 s1_aa_code_02,
 s1_aa_code_03,
 s1_aa_code_04,
@@ -7154,8 +7154,8 @@ s1_aa_code_22,
 s1_aa_code_23,
 s1_aa_code_24,
 s1_aa_code_25,
-s1_aa_code_26];
-rc_dataset_s1 := DATASET([
+s1_aa_code_26] ) ;
+rc_dataset_s1 := __common__( DATASET([
     {'B067', s1_rcvalueB067},
     {'P502', s1_rcvalueP502},
     {'P505', s1_rcvalueP505},
@@ -7170,65 +7170,65 @@ rc_dataset_s1 := DATASET([
     {'P540', s1_rcvalueP540},
     {'P566', s1_rcvalueP566},
     {'P567', s1_rcvalueP567}
-    ], ds_layout)(rc in s1_code_set);
+    ], ds_layout)(rc in s1_code_set) ) ;
 
 //*************************************************************************************//
 // If none of the first four RCs are a business reason code (rc[1] = 'B'), find the first 
 // business reason code, and make that the fourh reason code. Then shift everything down
 // one position to make room for that reason code.  
 //*************************************************************************************//
-rc_dataset_s_sorted_new := sort(rc_dataset_s1, value, rc);
+rc_dataset_s_sorted_new := __common__( sort(rc_dataset_s1, value, rc) ) ;
 
-baseBLS1_rc1  := rc_dataset_s_sorted_new[1].rc;
-baseBLS1_rc2  := rc_dataset_s_sorted_new[2].rc;
-baseBLS1_rc3  := rc_dataset_s_sorted_new[3].rc;
-baseBLS1_rc4  := rc_dataset_s_sorted_new[4].rc;
-baseBLS1_rc5  := rc_dataset_s_sorted_new[5].rc;
-baseBLS1_rc6  := rc_dataset_s_sorted_new[6].rc;
-baseBLS1_rc7  := rc_dataset_s_sorted_new[7].rc;
-baseBLS1_rc8  := rc_dataset_s_sorted_new[8].rc;
-baseBLS1_rc9  := rc_dataset_s_sorted_new[9].rc;
-baseBLS1_rc10  := rc_dataset_s_sorted_new[10].rc;
-baseBLS1_rc11  := rc_dataset_s_sorted_new[11].rc;
-baseBLS1_rc12  := rc_dataset_s_sorted_new[12].rc;
-baseBLS1_rc13  := rc_dataset_s_sorted_new[13].rc;
-baseBLS1_rc14  := rc_dataset_s_sorted_new[14].rc;
-baseBLS1_rc15  := rc_dataset_s_sorted_new[15].rc;
-baseBLS1_rc16  := rc_dataset_s_sorted_new[16].rc;
-baseBLS1_rc17  := rc_dataset_s_sorted_new[17].rc;
-baseBLS1_rc18  := rc_dataset_s_sorted_new[18].rc;
-baseBLS1_rc19  := rc_dataset_s_sorted_new[19].rc;
-baseBLS1_rc20  := rc_dataset_s_sorted_new[20].rc;
-baseBLS1_rc21  := rc_dataset_s_sorted_new[21].rc;
-baseBLS1_rc22  := rc_dataset_s_sorted_new[22].rc;
-baseBLS1_rc23  := rc_dataset_s_sorted_new[23].rc;
-baseBLS1_rc24  := rc_dataset_s_sorted_new[24].rc;
-baseBLS1_rc25  := rc_dataset_s_sorted_new[25].rc;
-baseBLS1_rc26  := rc_dataset_s_sorted_new[26].rc;
-baseBLS1_rc27  := rc_dataset_s_sorted_new[27].rc;
-baseBLS1_rc28  := rc_dataset_s_sorted_new[28].rc;
-baseBLS1_rc29  := rc_dataset_s_sorted_new[29].rc;
-baseBLS1_rc30  := rc_dataset_s_sorted_new[30].rc;
-baseBLS1_rc31  := rc_dataset_s_sorted_new[31].rc;
-baseBLS1_rc32  := rc_dataset_s_sorted_new[32].rc;
-baseBLS1_rc33  := rc_dataset_s_sorted_new[33].rc;
-baseBLS1_rc34  := rc_dataset_s_sorted_new[34].rc;
-baseBLS1_rc35  := rc_dataset_s_sorted_new[35].rc;
-baseBLS1_rc36  := rc_dataset_s_sorted_new[36].rc;
-baseBLS1_rc37  := rc_dataset_s_sorted_new[37].rc;
-baseBLS1_rc38  := rc_dataset_s_sorted_new[38].rc;
-baseBLS1_rc39  := rc_dataset_s_sorted_new[39].rc;
-baseBLS1_rc40  := rc_dataset_s_sorted_new[40].rc;
-baseBLS1_rc41  := rc_dataset_s_sorted_new[41].rc;
-baseBLS1_rc42  := rc_dataset_s_sorted_new[42].rc;
-baseBLS1_rc43  := rc_dataset_s_sorted_new[43].rc;
-baseBLS1_rc44  := rc_dataset_s_sorted_new[44].rc;
-baseBLS1_rc45  := rc_dataset_s_sorted_new[45].rc;
-baseBLS1_rc46  := rc_dataset_s_sorted_new[46].rc;
-baseBLS1_rc47  := rc_dataset_s_sorted_new[47].rc;
-baseBLS1_rc48  := rc_dataset_s_sorted_new[48].rc;
-baseBLS1_rc49  := rc_dataset_s_sorted_new[49].rc;
-baseBLS1_rc50  := rc_dataset_s_sorted_new[50].rc;
+baseBLS1_rc1  := __common__( rc_dataset_s_sorted_new[1].rc ) ;
+baseBLS1_rc2  := __common__( rc_dataset_s_sorted_new[2].rc ) ;
+baseBLS1_rc3  := __common__( rc_dataset_s_sorted_new[3].rc ) ;
+baseBLS1_rc4  := __common__( rc_dataset_s_sorted_new[4].rc ) ;
+baseBLS1_rc5  := __common__( rc_dataset_s_sorted_new[5].rc ) ;
+baseBLS1_rc6  := __common__( rc_dataset_s_sorted_new[6].rc ) ;
+baseBLS1_rc7  := __common__( rc_dataset_s_sorted_new[7].rc ) ;
+baseBLS1_rc8  := __common__( rc_dataset_s_sorted_new[8].rc ) ;
+baseBLS1_rc9  := __common__( rc_dataset_s_sorted_new[9].rc ) ;
+baseBLS1_rc10  := __common__( rc_dataset_s_sorted_new[10].rc ) ;
+baseBLS1_rc11  := __common__( rc_dataset_s_sorted_new[11].rc ) ;
+baseBLS1_rc12  := __common__( rc_dataset_s_sorted_new[12].rc ) ;
+baseBLS1_rc13  := __common__( rc_dataset_s_sorted_new[13].rc ) ;
+baseBLS1_rc14  := __common__( rc_dataset_s_sorted_new[14].rc ) ;
+baseBLS1_rc15  := __common__( rc_dataset_s_sorted_new[15].rc ) ;
+baseBLS1_rc16  := __common__( rc_dataset_s_sorted_new[16].rc ) ;
+baseBLS1_rc17  := __common__( rc_dataset_s_sorted_new[17].rc ) ;
+baseBLS1_rc18  := __common__( rc_dataset_s_sorted_new[18].rc ) ;
+baseBLS1_rc19  := __common__( rc_dataset_s_sorted_new[19].rc ) ;
+baseBLS1_rc20  := __common__( rc_dataset_s_sorted_new[20].rc ) ;
+baseBLS1_rc21  := __common__( rc_dataset_s_sorted_new[21].rc ) ;
+baseBLS1_rc22  := __common__( rc_dataset_s_sorted_new[22].rc ) ;
+baseBLS1_rc23  := __common__( rc_dataset_s_sorted_new[23].rc ) ;
+baseBLS1_rc24  := __common__( rc_dataset_s_sorted_new[24].rc ) ;
+baseBLS1_rc25  := __common__( rc_dataset_s_sorted_new[25].rc ) ;
+baseBLS1_rc26  := __common__( rc_dataset_s_sorted_new[26].rc ) ;
+baseBLS1_rc27  := __common__( rc_dataset_s_sorted_new[27].rc ) ;
+baseBLS1_rc28  := __common__( rc_dataset_s_sorted_new[28].rc ) ;
+baseBLS1_rc29  := __common__( rc_dataset_s_sorted_new[29].rc ) ;
+baseBLS1_rc30  := __common__( rc_dataset_s_sorted_new[30].rc ) ;
+baseBLS1_rc31  := __common__( rc_dataset_s_sorted_new[31].rc ) ;
+baseBLS1_rc32  := __common__( rc_dataset_s_sorted_new[32].rc ) ;
+baseBLS1_rc33  := __common__( rc_dataset_s_sorted_new[33].rc ) ;
+baseBLS1_rc34  := __common__( rc_dataset_s_sorted_new[34].rc ) ;
+baseBLS1_rc35  := __common__( rc_dataset_s_sorted_new[35].rc ) ;
+baseBLS1_rc36  := __common__( rc_dataset_s_sorted_new[36].rc ) ;
+baseBLS1_rc37  := __common__( rc_dataset_s_sorted_new[37].rc ) ;
+baseBLS1_rc38  := __common__( rc_dataset_s_sorted_new[38].rc ) ;
+baseBLS1_rc39  := __common__( rc_dataset_s_sorted_new[39].rc ) ;
+baseBLS1_rc40  := __common__( rc_dataset_s_sorted_new[40].rc ) ;
+baseBLS1_rc41  := __common__( rc_dataset_s_sorted_new[41].rc ) ;
+baseBLS1_rc42  := __common__( rc_dataset_s_sorted_new[42].rc ) ;
+baseBLS1_rc43  := __common__( rc_dataset_s_sorted_new[43].rc ) ;
+baseBLS1_rc44  := __common__( rc_dataset_s_sorted_new[44].rc ) ;
+baseBLS1_rc45  := __common__( rc_dataset_s_sorted_new[45].rc ) ;
+baseBLS1_rc46  := __common__( rc_dataset_s_sorted_new[46].rc ) ;
+baseBLS1_rc47  := __common__( rc_dataset_s_sorted_new[47].rc ) ;
+baseBLS1_rc48  := __common__( rc_dataset_s_sorted_new[48].rc ) ;
+baseBLS1_rc49  := __common__( rc_dataset_s_sorted_new[49].rc ) ;
+baseBLS1_rc50  := __common__( rc_dataset_s_sorted_new[50].rc ) ;
 
 
 /* Note for Engineering:  I did not implement this logic as described
@@ -7243,257 +7243,257 @@ in the SAS model code:
     5. put the original fourth RC in the fifth position
 */
 
-bus_mod_rc25_tmp := map(
+bus_mod_rc25_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc25,
-                             basebls1_rc25);
+                             basebls1_rc25) ) ;
 
-bus_mod_rc31_tmp := map(
+bus_mod_rc31_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc31,
-                             basebls1_rc31);
+                             basebls1_rc31) ) ;
 
-bus_mod_rc8_tmp := map(
+bus_mod_rc8_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc8,
-                             basebls1_rc8);
+                             basebls1_rc8) ) ;
 
-bus_mod_rc36_tmp := map(
+bus_mod_rc36_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc36,
-                             basebls1_rc36);
+                             basebls1_rc36) ) ;
 
-bus_mod_rc41_tmp := map(
+bus_mod_rc41_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc41,
-                             basebls1_rc41);
+                             basebls1_rc41) ) ;
 
-bus_mod_rc10_tmp := map(
+bus_mod_rc10_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc10,
-                             basebls1_rc10);
+                             basebls1_rc10) ) ;
 
-bus_mod_rc50_tmp := map(
+bus_mod_rc50_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc50,
-                             basebls1_rc50);
+                             basebls1_rc50) ) ;
 
-bus_mod_rc46_tmp := map(
+bus_mod_rc46_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc46,
-                             basebls1_rc46);
+                             basebls1_rc46) ) ;
 
-bus_mod_rc34_tmp := map(
+bus_mod_rc34_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc34,
-                             basebls1_rc34);
+                             basebls1_rc34) ) ;
 
-bus_mod_rc13_tmp := map(
+bus_mod_rc13_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc13,
-                             basebls1_rc13);
+                             basebls1_rc13) ) ;
 
-bus_mod_rc30_tmp := map(
+bus_mod_rc30_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc30,
-                             basebls1_rc30);
+                             basebls1_rc30) ) ;
 
-bus_mod_rc9_tmp := map(
+bus_mod_rc9_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc9,
-                             basebls1_rc9);
+                             basebls1_rc9) ) ;
 
-bus_mod_rc29_tmp := map(
+bus_mod_rc29_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc29,
-                             basebls1_rc29);
+                             basebls1_rc29) ) ;
 
-bus_mod_rc24_tmp := map(
+bus_mod_rc24_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc24,
-                             basebls1_rc24);
+                             basebls1_rc24) ) ;
 
-bus_mod_rc35_tmp := map(
+bus_mod_rc35_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc35,
-                             basebls1_rc35);
+                             basebls1_rc35) ) ;
 
-bus_mod_rc48_tmp := map(
+bus_mod_rc48_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc48,
-                             basebls1_rc48);
+                             basebls1_rc48) ) ;
 
-bus_mod_rc2 := map(
+bus_mod_rc2 := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc2,
-                             basebls1_rc2);
+                             basebls1_rc2) ) ;
 
-bus_mod_rc14_tmp := map(
+bus_mod_rc14_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc14,
-                             basebls1_rc14);
+                             basebls1_rc14) ) ;
 
-bus_mod_rc26_tmp := map(
+bus_mod_rc26_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc26,
-                             basebls1_rc26);
+                             basebls1_rc26) ) ;
 
-bus_mod_rc6_tmp := map(
+bus_mod_rc6_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc6,
-                             basebls1_rc6);
+                             basebls1_rc6) ) ;
 
-bus_mod_rc44_tmp := map(
+bus_mod_rc44_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc44,
-                             basebls1_rc44);
+                             basebls1_rc44) ) ;
 
-bus_mod_rc21_tmp := map(
+bus_mod_rc21_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc21,
-                             basebls1_rc21);
+                             basebls1_rc21) ) ;
 
-bus_mod_rc43_tmp := map(
+bus_mod_rc43_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc43,
-                             basebls1_rc43);
+                             basebls1_rc43) ) ;
 
-bus_mod_rc19_tmp := map(
+bus_mod_rc19_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc19,
-                             basebls1_rc19);
+                             basebls1_rc19) ) ;
 
-bus_mod_rc32_tmp := map(
+bus_mod_rc32_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc32,
-                             basebls1_rc32);
+                             basebls1_rc32) ) ;
 
-bus_mod_rc38_tmp := map(
+bus_mod_rc38_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc38,
-                             basebls1_rc38);
+                             basebls1_rc38) ) ;
 
-bus_mod_rc15_tmp := map(
+bus_mod_rc15_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc15,
-                             basebls1_rc15);
+                             basebls1_rc15) ) ;
 
-bus_mod_rc37_tmp := map(
+bus_mod_rc37_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc37,
-                             basebls1_rc37);
+                             basebls1_rc37) ) ;
 
-bus_mod_rc33_tmp := map(
+bus_mod_rc33_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc33,
-                             basebls1_rc33);
+                             basebls1_rc33) ) ;
 
-bus_mod_rc1 := map(
+bus_mod_rc1 := __common__( map(
     iv_rv5_unscorable = 1 => 'B068',
     rep_only = 0          => basebls0_rc1,
-                             basebls1_rc1);
+                             basebls1_rc1) ) ;
 
-bus_mod_rc28_tmp := map(
+bus_mod_rc28_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc28,
-                             basebls1_rc28);
+                             basebls1_rc28) ) ;
 
-bus_mod_rc22_tmp := map(
+bus_mod_rc22_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc22,
-                             basebls1_rc22);
+                             basebls1_rc22) ) ;
 
-bus_mod_rc42_tmp := map(
+bus_mod_rc42_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc42,
-                             basebls1_rc42);
+                             basebls1_rc42) ) ;
 
-bus_mod_rc7_tmp := map(
+bus_mod_rc7_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc7,
-                             basebls1_rc7);
+                             basebls1_rc7) ) ;
 
-bus_mod_rc18_tmp := map(
+bus_mod_rc18_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc18,
-                             basebls1_rc18);
+                             basebls1_rc18) ) ;
 
-bus_mod_rc49_tmp := map(
+bus_mod_rc49_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc49,
-                             basebls1_rc49);
+                             basebls1_rc49) ) ;
 
-bus_mod_rc16_tmp := map(
+bus_mod_rc16_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc16,
-                             basebls1_rc16);
+                             basebls1_rc16) ) ;
 
-bus_mod_rc27_tmp := map(
+bus_mod_rc27_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc27,
-                             basebls1_rc27);
+                             basebls1_rc27) ) ;
 
-bus_mod_rc40_tmp := map(
+bus_mod_rc40_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc40,
-                             basebls1_rc40);
+                             basebls1_rc40) ) ;
 
-bus_mod_rc47_tmp := map(
+bus_mod_rc47_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc47,
-                             basebls1_rc47);
+                             basebls1_rc47) ) ;
 
-bus_mod_rc45_tmp := map(
+bus_mod_rc45_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc45,
-                             basebls1_rc45);
+                             basebls1_rc45) ) ;
 
-bus_mod_rc3 := map(
+bus_mod_rc3 := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc3,
-                             basebls1_rc3);
+                             basebls1_rc3) ) ;
 
-bus_mod_rc12_tmp := map(
+bus_mod_rc12_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc12,
-                             basebls1_rc12);
+                             basebls1_rc12) ) ;
 
-bus_mod_rc11_tmp := map(
+bus_mod_rc11_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc11,
-                             basebls1_rc11);
+                             basebls1_rc11) ) ;
 
-bus_mod_rc39_tmp := map(
+bus_mod_rc39_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc39,
-                             basebls1_rc39);
+                             basebls1_rc39) ) ;
 
-bus_mod_rc17_tmp := map(
+bus_mod_rc17_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc17,
-                             basebls1_rc17);
+                             basebls1_rc17) ) ;
 
-bus_mod_rc4_tmp := map(
+bus_mod_rc4_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc4,
-                             basebls1_rc4);
+                             basebls1_rc4) ) ;
 
-bus_mod_rc5_tmp := map(
+bus_mod_rc5_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc5,
-                             basebls1_rc5);
+                             basebls1_rc5) ) ;
 														 
-bus_mod_rc23_tmp := map(
+bus_mod_rc23_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc23,
-                             basebls1_rc23);
+                             basebls1_rc23) ) ;
 
-bus_mod_rc20_tmp := map(
+bus_mod_rc20_tmp := __common__( map(
     iv_rv5_unscorable = 1 => '',
     rep_only = 0          => basebls0_rc20,
-                             basebls1_rc20);														 
+                             basebls1_rc20) ) ;														 
 
-b_rc_rc := dataset([
+b_rc_rc := __common__( dataset([
 {bus_mod_rc5_tmp, 1},
 {bus_mod_rc6_tmp, 2},
 {bus_mod_rc7_tmp, 3},
@@ -7539,77 +7539,77 @@ b_rc_rc := dataset([
 {bus_mod_rc47_tmp, 43},
 {bus_mod_rc48_tmp, 44},
 {bus_mod_rc49_tmp, 45},
-{bus_mod_rc50_tmp, 46}], ds_layout);
+{bus_mod_rc50_tmp, 46}], ds_layout) ) ;
 
-do_new_sort := bus_mod_rc1[1..1] <> 'B' and bus_mod_rc2[1..1] <> 'B' and 
-							 bus_mod_rc3[1..1] <> 'B' and bus_mod_rc4_tmp[1..1] <> 'B';
-rc4_business := b_rc_rc(rc[1] = 'B')[1];
-brc := b_rc_rc(rc <> rc4_business.rc); //gives us all except new B reason code
-rc_dataset_s2_sorted_new := if(do_new_sort, brc, b_rc_rc); 
+do_new_sort := __common__( bus_mod_rc1[1..1] <> 'B' and bus_mod_rc2[1..1] <> 'B' and 
+							 bus_mod_rc3[1..1] <> 'B' and bus_mod_rc4_tmp[1..1] <> 'B' ) ;
+rc4_business := __common__( b_rc_rc(rc[1] = 'B')[1] ) ;
+brc := __common__( b_rc_rc(rc <> rc4_business.rc) ) ; //gives us all except new B reason code
+rc_dataset_s2_sorted_new := __common__( if(do_new_sort, brc, b_rc_rc) ) ; 
 
-bus_mod_rc4  := if(do_new_sort and rc4_business.rc != '', rc4_business.rc, bus_mod_rc4_tmp);
-bus_mod_rc5  := if(do_new_sort and rc4_business.rc != '', bus_mod_rc4_tmp, rc_dataset_s2_sorted_new[1].rc);
-bus_mod_rc6  := if(do_new_sort,rc_dataset_s2_sorted_new[1].rc, rc_dataset_s2_sorted_new[2].rc);
-bus_mod_rc7  := if(do_new_sort,rc_dataset_s2_sorted_new[2].rc,rc_dataset_s2_sorted_new[3].rc);
-bus_mod_rc8  := if(do_new_sort,rc_dataset_s2_sorted_new[3].rc,rc_dataset_s2_sorted_new[4].rc);
-bus_mod_rc9  := if(do_new_sort,rc_dataset_s2_sorted_new[4].rc,rc_dataset_s2_sorted_new[5].rc);
-bus_mod_rc10 := if(do_new_sort,rc_dataset_s2_sorted_new[5].rc,rc_dataset_s2_sorted_new[6].rc);
-bus_mod_rc11 := if(do_new_sort,rc_dataset_s2_sorted_new[6].rc,rc_dataset_s2_sorted_new[7].rc);
-bus_mod_rc12 := if(do_new_sort,rc_dataset_s2_sorted_new[7].rc,rc_dataset_s2_sorted_new[8].rc);
-bus_mod_rc13 := if(do_new_sort,rc_dataset_s2_sorted_new[8].rc,rc_dataset_s2_sorted_new[9].rc);
-bus_mod_rc14 := if(do_new_sort,rc_dataset_s2_sorted_new[9].rc,rc_dataset_s2_sorted_new[10].rc);
-bus_mod_rc15 := if(do_new_sort,rc_dataset_s2_sorted_new[10].rc,rc_dataset_s2_sorted_new[11].rc);
-bus_mod_rc16 := if(do_new_sort,rc_dataset_s2_sorted_new[11].rc,rc_dataset_s2_sorted_new[12].rc);
-bus_mod_rc17 := if(do_new_sort,rc_dataset_s2_sorted_new[12].rc,rc_dataset_s2_sorted_new[13].rc);
-bus_mod_rc18 := if(do_new_sort,rc_dataset_s2_sorted_new[13].rc,rc_dataset_s2_sorted_new[14].rc);
-bus_mod_rc19 := if(do_new_sort,rc_dataset_s2_sorted_new[14].rc,rc_dataset_s2_sorted_new[15].rc);
-bus_mod_rc20 := if(do_new_sort,rc_dataset_s2_sorted_new[15].rc,rc_dataset_s2_sorted_new[16].rc);
-bus_mod_rc21 := if(do_new_sort,rc_dataset_s2_sorted_new[16].rc,rc_dataset_s2_sorted_new[17].rc);
-bus_mod_rc22 := if(do_new_sort,rc_dataset_s2_sorted_new[17].rc,rc_dataset_s2_sorted_new[18].rc);
-bus_mod_rc23 := if(do_new_sort,rc_dataset_s2_sorted_new[18].rc,rc_dataset_s2_sorted_new[19].rc);
-bus_mod_rc24 := if(do_new_sort,rc_dataset_s2_sorted_new[19].rc,rc_dataset_s2_sorted_new[20].rc);
-bus_mod_rc25 := if(do_new_sort,rc_dataset_s2_sorted_new[20].rc,rc_dataset_s2_sorted_new[21].rc);
-bus_mod_rc26 := if(do_new_sort,rc_dataset_s2_sorted_new[21].rc,rc_dataset_s2_sorted_new[22].rc);
-bus_mod_rc27 := if(do_new_sort,rc_dataset_s2_sorted_new[22].rc,rc_dataset_s2_sorted_new[23].rc);
-bus_mod_rc28 := if(do_new_sort,rc_dataset_s2_sorted_new[23].rc,rc_dataset_s2_sorted_new[24].rc);
-bus_mod_rc29 := if(do_new_sort,rc_dataset_s2_sorted_new[24].rc,rc_dataset_s2_sorted_new[25].rc);
-bus_mod_rc30 := if(do_new_sort,rc_dataset_s2_sorted_new[25].rc,rc_dataset_s2_sorted_new[26].rc);
-bus_mod_rc31 := if(do_new_sort,rc_dataset_s2_sorted_new[26].rc,rc_dataset_s2_sorted_new[271].rc);
-bus_mod_rc32 := if(do_new_sort,rc_dataset_s2_sorted_new[27].rc,rc_dataset_s2_sorted_new[28].rc);
-bus_mod_rc33 := if(do_new_sort,rc_dataset_s2_sorted_new[28].rc,rc_dataset_s2_sorted_new[29].rc);
-bus_mod_rc34 := if(do_new_sort,rc_dataset_s2_sorted_new[29].rc,rc_dataset_s2_sorted_new[30].rc);
-bus_mod_rc35 := if(do_new_sort,rc_dataset_s2_sorted_new[30].rc,rc_dataset_s2_sorted_new[31].rc);
-bus_mod_rc36 := if(do_new_sort,rc_dataset_s2_sorted_new[31].rc,rc_dataset_s2_sorted_new[32].rc);
-bus_mod_rc37 := if(do_new_sort,rc_dataset_s2_sorted_new[32].rc,rc_dataset_s2_sorted_new[33].rc);
-bus_mod_rc38 := if(do_new_sort,rc_dataset_s2_sorted_new[33].rc,rc_dataset_s2_sorted_new[34].rc);
-bus_mod_rc39 := if(do_new_sort,rc_dataset_s2_sorted_new[34].rc,rc_dataset_s2_sorted_new[35].rc);
-bus_mod_rc40 := if(do_new_sort,rc_dataset_s2_sorted_new[35].rc,rc_dataset_s2_sorted_new[36].rc);
-bus_mod_rc41 := if(do_new_sort,rc_dataset_s2_sorted_new[36].rc,rc_dataset_s2_sorted_new[37].rc);
-bus_mod_rc42 := if(do_new_sort,rc_dataset_s2_sorted_new[37].rc,rc_dataset_s2_sorted_new[38].rc);
-bus_mod_rc43 := if(do_new_sort,rc_dataset_s2_sorted_new[38].rc,rc_dataset_s2_sorted_new[39].rc);
-bus_mod_rc44 := if(do_new_sort,rc_dataset_s2_sorted_new[39].rc,rc_dataset_s2_sorted_new[40].rc);
-bus_mod_rc45 := if(do_new_sort,rc_dataset_s2_sorted_new[40].rc,rc_dataset_s2_sorted_new[41].rc);
-bus_mod_rc46 := if(do_new_sort,rc_dataset_s2_sorted_new[41].rc,rc_dataset_s2_sorted_new[42].rc);
-bus_mod_rc47 := if(do_new_sort,rc_dataset_s2_sorted_new[42].rc,rc_dataset_s2_sorted_new[43].rc);
-bus_mod_rc48 := if(do_new_sort,rc_dataset_s2_sorted_new[43].rc,rc_dataset_s2_sorted_new[44].rc);
-bus_mod_rc49 := if(do_new_sort,rc_dataset_s2_sorted_new[44].rc,rc_dataset_s2_sorted_new[45].rc);
-bus_mod_rc50 := if(do_new_sort,rc_dataset_s2_sorted_new[45].rc,rc_dataset_s2_sorted_new[46].rc);
+bus_mod_rc4  := __common__( if(do_new_sort and rc4_business.rc != '', rc4_business.rc, bus_mod_rc4_tmp) ) ;
+bus_mod_rc5  := __common__( if(do_new_sort and rc4_business.rc != '', bus_mod_rc4_tmp, rc_dataset_s2_sorted_new[1].rc) ) ;
+bus_mod_rc6  := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[1].rc, rc_dataset_s2_sorted_new[2].rc) ) ;
+bus_mod_rc7  := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[2].rc,rc_dataset_s2_sorted_new[3].rc) ) ;
+bus_mod_rc8  := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[3].rc,rc_dataset_s2_sorted_new[4].rc) ) ;
+bus_mod_rc9  := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[4].rc,rc_dataset_s2_sorted_new[5].rc) ) ;
+bus_mod_rc10 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[5].rc,rc_dataset_s2_sorted_new[6].rc) ) ;
+bus_mod_rc11 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[6].rc,rc_dataset_s2_sorted_new[7].rc) ) ;
+bus_mod_rc12 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[7].rc,rc_dataset_s2_sorted_new[8].rc) ) ;
+bus_mod_rc13 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[8].rc,rc_dataset_s2_sorted_new[9].rc) ) ;
+bus_mod_rc14 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[9].rc,rc_dataset_s2_sorted_new[10].rc) ) ;
+bus_mod_rc15 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[10].rc,rc_dataset_s2_sorted_new[11].rc) ) ;
+bus_mod_rc16 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[11].rc,rc_dataset_s2_sorted_new[12].rc) ) ;
+bus_mod_rc17 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[12].rc,rc_dataset_s2_sorted_new[13].rc) ) ;
+bus_mod_rc18 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[13].rc,rc_dataset_s2_sorted_new[14].rc) ) ;
+bus_mod_rc19 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[14].rc,rc_dataset_s2_sorted_new[15].rc) ) ;
+bus_mod_rc20 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[15].rc,rc_dataset_s2_sorted_new[16].rc) ) ;
+bus_mod_rc21 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[16].rc,rc_dataset_s2_sorted_new[17].rc) ) ;
+bus_mod_rc22 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[17].rc,rc_dataset_s2_sorted_new[18].rc) ) ;
+bus_mod_rc23 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[18].rc,rc_dataset_s2_sorted_new[19].rc) ) ;
+bus_mod_rc24 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[19].rc,rc_dataset_s2_sorted_new[20].rc) ) ;
+bus_mod_rc25 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[20].rc,rc_dataset_s2_sorted_new[21].rc) ) ;
+bus_mod_rc26 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[21].rc,rc_dataset_s2_sorted_new[22].rc) ) ;
+bus_mod_rc27 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[22].rc,rc_dataset_s2_sorted_new[23].rc) ) ;
+bus_mod_rc28 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[23].rc,rc_dataset_s2_sorted_new[24].rc) ) ;
+bus_mod_rc29 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[24].rc,rc_dataset_s2_sorted_new[25].rc) ) ;
+bus_mod_rc30 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[25].rc,rc_dataset_s2_sorted_new[26].rc) ) ;
+bus_mod_rc31 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[26].rc,rc_dataset_s2_sorted_new[271].rc) ) ;
+bus_mod_rc32 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[27].rc,rc_dataset_s2_sorted_new[28].rc) ) ;
+bus_mod_rc33 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[28].rc,rc_dataset_s2_sorted_new[29].rc) ) ;
+bus_mod_rc34 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[29].rc,rc_dataset_s2_sorted_new[30].rc) ) ;
+bus_mod_rc35 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[30].rc,rc_dataset_s2_sorted_new[31].rc) ) ;
+bus_mod_rc36 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[31].rc,rc_dataset_s2_sorted_new[32].rc) ) ;
+bus_mod_rc37 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[32].rc,rc_dataset_s2_sorted_new[33].rc) ) ;
+bus_mod_rc38 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[33].rc,rc_dataset_s2_sorted_new[34].rc) ) ;
+bus_mod_rc39 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[34].rc,rc_dataset_s2_sorted_new[35].rc) ) ;
+bus_mod_rc40 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[35].rc,rc_dataset_s2_sorted_new[36].rc) ) ;
+bus_mod_rc41 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[36].rc,rc_dataset_s2_sorted_new[37].rc) ) ;
+bus_mod_rc42 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[37].rc,rc_dataset_s2_sorted_new[38].rc) ) ;
+bus_mod_rc43 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[38].rc,rc_dataset_s2_sorted_new[39].rc) ) ;
+bus_mod_rc44 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[39].rc,rc_dataset_s2_sorted_new[40].rc) ) ;
+bus_mod_rc45 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[40].rc,rc_dataset_s2_sorted_new[41].rc) ) ;
+bus_mod_rc46 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[41].rc,rc_dataset_s2_sorted_new[42].rc) ) ;
+bus_mod_rc47 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[42].rc,rc_dataset_s2_sorted_new[43].rc) ) ;
+bus_mod_rc48 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[43].rc,rc_dataset_s2_sorted_new[44].rc) ) ;
+bus_mod_rc49 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[44].rc,rc_dataset_s2_sorted_new[45].rc) ) ;
+bus_mod_rc50 := __common__( if(do_new_sort,rc_dataset_s2_sorted_new[45].rc,rc_dataset_s2_sorted_new[46].rc) ) ;
 
-slbb_rc1_1 := bus_mod_rc1;
+slbb_rc1_1 := __common__( bus_mod_rc1 ) ;
 
-slbb_rc2_1 := bus_mod_rc2;
+slbb_rc2_1 := __common__( bus_mod_rc2 ) ;
 
-slbb_rc3_1 := bus_mod_rc3;
+slbb_rc3_1 := __common__( bus_mod_rc3 ) ;
 
-slbb_rc4_1 := bus_mod_rc4;
+slbb_rc4_1 := __common__( bus_mod_rc4 ) ;
 
-slbb_rc2 := if(slbb1702_0_2 >= 870, '', slbb_rc2_1);
+slbb_rc2 := __common__( if(slbb1702_0_2 >= 870, '', slbb_rc2_1) ) ;
 
-slbb_rc3 := if(slbb1702_0_2 >= 870, '', slbb_rc3_1);
+slbb_rc3 := __common__( if(slbb1702_0_2 >= 870, '', slbb_rc3_1) ) ;
 
-slbb_rc1 := if(slbb1702_0_2 >= 870, '', slbb_rc1_1);
+slbb_rc1 := __common__( if(slbb1702_0_2 >= 870, '', slbb_rc1_1) ) ;
 
-slbb_rc4 := if(slbb1702_0_2 >= 870, '', slbb_rc4_1);
+slbb_rc4 := __common__( if(slbb1702_0_2 >= 870, '', slbb_rc4_1) ) ;
 
 //*************************************************************************************//
 //                      Reason Code Overrides 
