@@ -195,22 +195,41 @@ function
 																																					 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
 																																					 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
 																																					).powid;
+																					
 			self.proxid													:= PRTE2.fn_AppendFakeID.LinkIds(l.company_name, l.company_fein, (string8)l.company_incorporation_date, 
 																																					 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
 																																					 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
 																																					).proxid;
-			self.seleid													:= PRTE2.fn_AppendFakeID.LinkIds(l.company_name, l.company_fein, (string8)l.company_incorporation_date, 
-																																					 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
-																																					 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
-																																					).seleid;
-			self.orgid													:= PRTE2.fn_AppendFakeID.LinkIds(l.company_name, l.company_fein, (string8)l.company_incorporation_date, 
-																																					 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
-																																					 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
-																																					).orgid;
-			self.ultid													:= PRTE2.fn_AppendFakeID.LinkIds(l.company_name, l.company_fein, (string8)l.company_incorporation_date, 
-																																					 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
-																																					 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
-																																					).ultid;
+			self.seleid													:= if(trim(l.cust_name) = '', //   For Historical IRS data, using the link_fein(bdid) and (link_inc_date)dummy date because of these fields being blank.
+																								PRTE2.fn_AppendFakeID.LinkIds( l.company_name, l.link_fein, (string8)l.link_inc_date, 
+																																							 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
+																																							 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
+																																						 ).seleid,
+																								PRTE2.fn_AppendFakeID.LinkIds( l.company_name, l.company_fein, (string8)l.company_incorporation_date, 
+																																							 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
+																																							 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
+																																						 ).seleid
+																							 );
+			self.orgid													:= if(trim(l.cust_name) = '', //   For Historical IRS data, using the link_fein(bdid) and (link_inc_date)dummy date because of these fields being blank.
+																								PRTE2.fn_AppendFakeID.LinkIds( l.company_name, l.link_fein, (string8)l.link_inc_date, 
+																																							 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
+																																							 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
+																																						 ).orgid,
+																								PRTE2.fn_AppendFakeID.LinkIds( l.company_name, l.company_fein, (string8)l.company_incorporation_date, 
+																																							 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
+																																							 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
+																																						 ).orgid
+																							 );
+			self.ultid													:= if(trim(l.cust_name) = '',	//   For Historical IRS data, using the link_fein(bdid) and (link_inc_date)dummy date because of these fields being blank.
+																								PRTE2.fn_AppendFakeID.LinkIds( l.company_name, l.link_fein, (string8)l.link_inc_date, 
+																																							 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
+																																							 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
+																																						 ).ultid,
+																								PRTE2.fn_AppendFakeID.LinkIds( l.company_name, l.company_fein, (string8)l.company_incorporation_date, 
+																																							 l.company_address.prim_range, l.company_address.prim_name, l.company_address.sec_range,
+																																							 l.company_address.v_city_name, l.company_address.st, l.company_address.zip, ''
+																																						 ).ultid
+																							 );
 			self.cnt_rcid_per_dotid							:= 0;
 			self.cnt_dot_per_proxid							:= 0;
 			self.cnt_prox_per_lgid3							:= 0;
