@@ -1,7 +1,7 @@
 ﻿import ut, Data_Services, Header;
 
 ds	:= dataset('~thor_data400::base::email_data_fcra', Layout_Email.base, thor);
-fDeathMaster	:= Header.File_DID_Death_MasterV3_ssa(src = 'D$');
+fDeathMaster	:= Header.File_DID_Death_MasterV3_ssa;
 
 //Flag invalid emails
 l_temp	:= RECORD
