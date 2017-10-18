@@ -1,4 +1,4 @@
-EXPORT Layout_FIDO := MODULE
+﻿EXPORT Layout_FIDO := MODULE
 
 export extract_in := RECORD
   integer4 customer_account_sk;
@@ -33,6 +33,13 @@ export extract_in := RECORD
   string allow_flag;
   string mask;
   string market;
+	unsigned4 first_seen_dt;
+  unsigned4 last_seen_dt;
+  string100 country;
+  string100 country_gen1;
+  string100 country_gen2;
+  string100 country_gen3;
+
  END;
 
 export extract_out := record
@@ -49,22 +56,28 @@ export extract_out := record
   string2 industry_code_2;
   string100 sub_market;
   integer4 cy_vertical_sk;
- string15 vc_id;
+  string15 vc_id;
   boolean internal_flag;
   string50 vertical_market;
   string50 abstracted_vertical_market;
- string100 subaccount_name;
-   string50 inquiry_tracking_industry;
- string4 ranked_sic_code;
+  string100 subaccount_name;
+  string50 inquiry_tracking_industry;
+  string4 ranked_sic_code;
 	string industry;
   string use;
   string opt_out;
   string disable_observation;
   string content;
 	integer1 exclude_from_access;
- string mask;
+  string mask;
   string market;
-
+  unsigned4 first_seen_dt;
+  unsigned4 last_seen_dt;
+  string100 country;
+  string100 country_gen1;
+  string100 country_gen2;
+  string100 country_gen3;
+	
  END;
 
 export new_MBS := record
