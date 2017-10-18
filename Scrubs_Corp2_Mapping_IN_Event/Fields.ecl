@@ -1,4 +1,4 @@
-IMPORT ut,SALT34;
+﻿IMPORT ut,SALT34;
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Fields := MODULE
  
@@ -59,11 +59,11 @@ EXPORT InValidFT_invalid_filing_cd(SALT34.StrType s) := WHICH(((SALT34.StrType) 
 EXPORT InValidMessageFT_invalid_filing_cd(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInEnum('set_valid_filing'),SALT34.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_alphablankSp(SALT34.StrType s0) := FUNCTION
-  s1 := SALT34.stringfilter(s0,' ABCDEFGHIJKLMNOPQRSTUVWXYZ/'); // Only allow valid symbols
+  s1 := SALT34.stringfilter(s0,' ABCDEFGHIJKLMNOPQRSTUVWXYZ/-'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_alphablankSp(SALT34.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT34.StringFilter(s,' ABCDEFGHIJKLMNOPQRSTUVWXYZ/'))));
-EXPORT InValidMessageFT_invalid_alphablankSp(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInChars(' ABCDEFGHIJKLMNOPQRSTUVWXYZ/'),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_alphablankSp(SALT34.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT34.StringFilter(s,' ABCDEFGHIJKLMNOPQRSTUVWXYZ/-'))));
+EXPORT InValidMessageFT_invalid_alphablankSp(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInChars(' ABCDEFGHIJKLMNOPQRSTUVWXYZ/-'),SALT34.HygieneErrors.Good);
  
 EXPORT SALT34.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'corp_key','corp_supp_key','corp_vendor','corp_vendor_county','corp_vendor_subcode','corp_state_origin','corp_process_date','corp_sos_charter_nbr','event_filing_reference_nbr','event_amendment_nbr','event_filing_date','event_date_type_cd','event_date_type_desc','event_filing_cd','event_filing_desc','event_corp_nbr','event_corp_nbr_cd','event_corp_nbr_desc','event_roll','event_frame','event_start','event_end','event_microfilm_nbr','event_desc','event_revocation_comment1','event_revocation_comment2','event_book_nbr','event_page_nbr','event_certification_nbr');
 EXPORT FieldNum(SALT34.StrType fn) := CASE(fn,'corp_key' => 0,'corp_supp_key' => 1,'corp_vendor' => 2,'corp_vendor_county' => 3,'corp_vendor_subcode' => 4,'corp_state_origin' => 5,'corp_process_date' => 6,'corp_sos_charter_nbr' => 7,'event_filing_reference_nbr' => 8,'event_amendment_nbr' => 9,'event_filing_date' => 10,'event_date_type_cd' => 11,'event_date_type_desc' => 12,'event_filing_cd' => 13,'event_filing_desc' => 14,'event_corp_nbr' => 15,'event_corp_nbr_cd' => 16,'event_corp_nbr_desc' => 17,'event_roll' => 18,'event_frame' => 19,'event_start' => 20,'event_end' => 21,'event_microfilm_nbr' => 22,'event_desc' => 23,'event_revocation_comment1' => 24,'event_revocation_comment2' => 25,'event_book_nbr' => 26,'event_page_nbr' => 27,'event_certification_nbr' => 28,0);

@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_Corp2_Mapping_IN_Event
 FILENAME:in_file
 //Uncomment up to NINES for internal or external adl
@@ -21,7 +21,7 @@ FIELDTYPE:invalid_mandatory:LENGTHS(1..)
 FIELDTYPE:invalid_date:ALLOW(0123456789):CUSTOM(Scrubs.fn_valid_pastDate>0)
 FIELDTYPE:invalid_charter:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-:):LENGTHS(1..)
 FIELDTYPE:invalid_filing_cd:ENUM(set_valid_filing)
-FIELDTYPE:invalid_alphablankSp:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ/)
+FIELDTYPE:invalid_alphablankSp:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ/-)
 
 FIELD:corp_key:TYPE(STRING30):LIKE(invalid_corp_key):0,0
 FIELD:corp_supp_key:TYPE(STRING30):0,0

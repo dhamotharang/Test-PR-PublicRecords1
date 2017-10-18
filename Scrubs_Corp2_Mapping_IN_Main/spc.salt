@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_Corp2_Mapping_IN_Main
 FILENAME:in_file
 //Uncomment up to NINES for internal or external adl
@@ -24,8 +24,8 @@ FIELDTYPE:invalid_future_date:ALLOW(0123456789):CUSTOM(Scrubs.fn_valid_GeneralDa
 FIELDTYPE:invalid_charter_nbr:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-:):LENGTHS(1..)
 FIELDTYPE:invalid_flag_code:ENUM(Y|N| )
 FIELDTYPE:invalid_name_type_cd:CUSTOM(Scrubs_Corp2_Mapping_IN_Main.Functions.invalid_name_type_code>0,recordorigin)
-FIELDTYPE:invalid_term_exist_cd:ENUM(D| )
-FIELDTYPE:invalid_term_exist_desc:ENUM(EXPIRATION DATE| )
+FIELDTYPE:invalid_term_exist_cd:ENUM(D|P| )
+FIELDTYPE:invalid_term_exist_desc:ENUM(EXPIRATION DATE|PERPETUAL| )
 FIELDTYPE:invalid_for_dom_ind:ENUM(D|F| )
 FIELDTYPE:invalid_recordorigin:ENUM(C|T)
 FIELDTYPE:invalid_numeric:ALLOW(0123456789)
@@ -33,7 +33,7 @@ FIELDTYPE:invalid_numblank:ALLOW(0123456789):LENGTHS(0,1..)
 FIELDTYPE:invalid_status_cd:ENUM(Scrubs_Corp2_Mapping_IN_Main.Functions.set_valid_status_cd)
 FIELDTYPE:invalid_llc_managed_cd:ENUM(0|1| ) 
 FIELDTYPE:invalid_fein:ALLOW(0123456789):LENGTHS(0,9)
-FIELDTYPE:invalid_alphaNum_sp:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-())
+FIELDTYPE:invalid_alphaNum_sp:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-().)
 FIELDTYPE:invalid_alphablank:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ)
 FIELDTYPE:invalid_orig_org_structure_cd:ENUM(Scrubs_Corp2_Mapping_IN_Main.Functions.set_valid_org_cd)
 
@@ -87,7 +87,7 @@ FIELD:corp_ticker_symbol:TYPE(STRING8):0,0
 FIELD:corp_stock_exchange:TYPE(STRING8):0,0
 FIELD:corp_inc_state:TYPE(STRING2):LIKE(invalid_state_origin):0,0
 FIELD:corp_inc_county:TYPE(STRING30):0,0
-FIELD:corp_inc_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:corp_inc_date:TYPE(STRING8):LIKE(invalid_future_date):0,0
 FIELD:corp_anniversary_month:TYPE(STRING15):0,0
 FIELD:corp_fed_tax_id:TYPE(STRING32):LIKE(invalid_fein):0,0
 FIELD:corp_state_tax_id:TYPE(STRING32):0,0
@@ -98,7 +98,7 @@ FIELD:corp_foreign_domestic_ind:TYPE(STRING1):LIKE(invalid_for_dom_ind):0,0
 FIELD:corp_forgn_state_cd:TYPE(STRING3):LIKE(invalid_alphablank):0,0
 FIELD:corp_forgn_state_desc:TYPE(STRING60):LIKE(invalid_alphablank):0,0
 FIELD:corp_forgn_sos_charter_nbr:TYPE(STRING32):0,0
-FIELD:corp_forgn_date:TYPE(STRING8):LIKE(invalid_date):0,0
+FIELD:corp_forgn_date:TYPE(STRING8):LIKE(invalid_future_date):0,0
 FIELD:corp_forgn_fed_tax_id:TYPE(STRING32):0,0
 FIELD:corp_forgn_state_tax_id:TYPE(STRING32):0,0
 FIELD:corp_forgn_term_exist_cd:TYPE(STRING8):0,0
@@ -169,7 +169,7 @@ FIELD:cont_fname:TYPE(STRING20):0,0
 FIELD:cont_mname:TYPE(STRING20):0,0
 FIELD:cont_lname:TYPE(STRING20):0,0
 FIELD:cont_suffix:TYPE(STRING5):0,0
-FIELD:cont_title1_desc:TYPE(STRING60):LIKE(invalid_alphablank):0,0
+FIELD:cont_title1_desc:TYPE(STRING60):LIKE(invalid_alphaNum_sp):0,0
 FIELD:cont_title2_desc:TYPE(STRING60):0,0
 FIELD:cont_title3_desc:TYPE(STRING60):0,0
 FIELD:cont_title4_desc:TYPE(STRING60):0,0

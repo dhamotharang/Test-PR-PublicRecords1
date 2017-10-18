@@ -1,4 +1,4 @@
-/*2014-04-01T15:20:48Z (mgould_prod)
+﻿/*2014-04-01T15:20:48Z (mgould_prod)
 C:\Users\goulmi01\AppData\Roaming\HPCC Systems\eclide\mgould_prod\Boca_Prod\Corp2_Mapping\Filenames\2014-04-01T15_20_48Z.ecl
 */
 /*2013-12-06T19:54:44Z (mgould_prod)
@@ -345,15 +345,12 @@ module
 	export in_raw :=
 	module
 
-		export Corp_Agents               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Agents::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
-		export Corp_Corporations         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Corporations::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export Corp_Agents               := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corp_agents::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
+		export Corp_Corporations         := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::corp_corporations::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
 		export Corp_Filings              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Filings::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
 		export Corp_Mergers              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Mergers::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
 		export Corp_Names                := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Names::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
 		export Corp_Officers             := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Officers::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
-		export Corp_Reports              := VersionControl.mInputFileNameVersions(lthor + 'in::corp2::@version@::Corp_Reports::in','bctlpedata10',,,,,pGroupname,,,'VARIABLE',,8192 ,'\\t',,',');
-		export EntityType_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::EntityType_Table::in','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,,'\\t',,',');
-		export FilingType_Table          := VersionControl.mInputFileNameVersions(lthor + 'lookup::corp2::@version@::FilingType_Table::in','bctlpedata10',,,,, pGroupname,,,'VARIABLE',,,'\\t',,',');
 
 		export dAll_filenames :=
 			  Corp_Agents.dAll_filenames
@@ -361,11 +358,7 @@ module
 			+ Corp_Filings.dAll_filenames
 			+ Corp_Mergers.dAll_filenames
 			+ Corp_Names.dAll_filenames
-			+ Corp_Officers.dAll_filenames
-			+ Corp_Reports.dAll_filenames
-			+ EntityType_Table.dAll_filenames
-			+ FilingType_Table.dAll_filenames
-			;
+			+ Corp_Officers.dAll_filenames;
 
 	end;
 
