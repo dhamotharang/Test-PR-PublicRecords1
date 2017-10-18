@@ -1,4 +1,4 @@
-IMPORT ut,SALT34;
+﻿IMPORT ut,SALT34;
 IMPORT Scrubs,Scrubs_Corp2_Mapping_IN_Main; // Import modules for FieldTypes attribute definitions
 EXPORT Fields := MODULE
  
@@ -74,14 +74,14 @@ EXPORT InValidMessageFT_invalid_name_type_cd(UNSIGNED1 wh) := CHOOSE(wh,SALT34.H
 EXPORT MakeFT_invalid_term_exist_cd(SALT34.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_term_exist_cd(SALT34.StrType s) := WHICH(((SALT34.StrType) s) NOT IN ['D',' ']);
-EXPORT InValidMessageFT_invalid_term_exist_cd(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInEnum('D| '),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_term_exist_cd(SALT34.StrType s) := WHICH(((SALT34.StrType) s) NOT IN ['D','P',' ']);
+EXPORT InValidMessageFT_invalid_term_exist_cd(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInEnum('D|P| '),SALT34.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_term_exist_desc(SALT34.StrType s0) := FUNCTION
   RETURN  s0;
 END;
-EXPORT InValidFT_invalid_term_exist_desc(SALT34.StrType s) := WHICH(((SALT34.StrType) s) NOT IN ['EXPIRATION DATE',' ']);
-EXPORT InValidMessageFT_invalid_term_exist_desc(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInEnum('EXPIRATION DATE| '),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_term_exist_desc(SALT34.StrType s) := WHICH(((SALT34.StrType) s) NOT IN ['EXPIRATION DATE','PERPETUAL',' ']);
+EXPORT InValidMessageFT_invalid_term_exist_desc(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInEnum('EXPIRATION DATE|PERPETUAL| '),SALT34.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_for_dom_ind(SALT34.StrType s0) := FUNCTION
   RETURN  s0;
@@ -129,11 +129,11 @@ EXPORT InValidFT_invalid_fein(SALT34.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH
 EXPORT InValidMessageFT_invalid_fein(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInChars('0123456789'),SALT34.HygieneErrors.NotLength('0,9'),SALT34.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_alphaNum_sp(SALT34.StrType s0) := FUNCTION
-  s1 := SALT34.stringfilter(s0,' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-()'); // Only allow valid symbols
+  s1 := SALT34.stringfilter(s0,' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-().'); // Only allow valid symbols
   RETURN  s1;
 END;
-EXPORT InValidFT_invalid_alphaNum_sp(SALT34.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT34.StringFilter(s,' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-()'))));
-EXPORT InValidMessageFT_invalid_alphaNum_sp(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInChars(' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-()'),SALT34.HygieneErrors.Good);
+EXPORT InValidFT_invalid_alphaNum_sp(SALT34.StrType s) := WHICH(LENGTH(TRIM(s))<>LENGTH(TRIM(SALT34.StringFilter(s,' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-().'))));
+EXPORT InValidMessageFT_invalid_alphaNum_sp(UNSIGNED1 wh) := CHOOSE(wh,SALT34.HygieneErrors.NotInChars(' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-().'),SALT34.HygieneErrors.Good);
  
 EXPORT MakeFT_invalid_alphablank(SALT34.StrType s0) := FUNCTION
   s1 := SALT34.stringfilter(s0,' ABCDEFGHIJKLMNOPQRSTUVWXYZ'); // Only allow valid symbols
@@ -353,9 +353,9 @@ EXPORT Make_corp_inc_county(SALT34.StrType s0) := s0;
 EXPORT InValid_corp_inc_county(SALT34.StrType s) := FALSE;
 EXPORT InValidMessage_corp_inc_county(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_inc_date(SALT34.StrType s0) := MakeFT_invalid_date(s0);
-EXPORT InValid_corp_inc_date(SALT34.StrType s) := InValidFT_invalid_date(s);
-EXPORT InValidMessage_corp_inc_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
+EXPORT Make_corp_inc_date(SALT34.StrType s0) := MakeFT_invalid_future_date(s0);
+EXPORT InValid_corp_inc_date(SALT34.StrType s) := InValidFT_invalid_future_date(s);
+EXPORT InValidMessage_corp_inc_date(UNSIGNED1 wh) := InValidMessageFT_invalid_future_date(wh);
  
 EXPORT Make_corp_anniversary_month(SALT34.StrType s0) := s0;
 EXPORT InValid_corp_anniversary_month(SALT34.StrType s) := FALSE;
@@ -397,9 +397,9 @@ EXPORT Make_corp_forgn_sos_charter_nbr(SALT34.StrType s0) := s0;
 EXPORT InValid_corp_forgn_sos_charter_nbr(SALT34.StrType s) := FALSE;
 EXPORT InValidMessage_corp_forgn_sos_charter_nbr(UNSIGNED1 wh) := '';
  
-EXPORT Make_corp_forgn_date(SALT34.StrType s0) := MakeFT_invalid_date(s0);
-EXPORT InValid_corp_forgn_date(SALT34.StrType s) := InValidFT_invalid_date(s);
-EXPORT InValidMessage_corp_forgn_date(UNSIGNED1 wh) := InValidMessageFT_invalid_date(wh);
+EXPORT Make_corp_forgn_date(SALT34.StrType s0) := MakeFT_invalid_future_date(s0);
+EXPORT InValid_corp_forgn_date(SALT34.StrType s) := InValidFT_invalid_future_date(s);
+EXPORT InValidMessage_corp_forgn_date(UNSIGNED1 wh) := InValidMessageFT_invalid_future_date(wh);
  
 EXPORT Make_corp_forgn_fed_tax_id(SALT34.StrType s0) := s0;
 EXPORT InValid_corp_forgn_fed_tax_id(SALT34.StrType s) := FALSE;
@@ -681,9 +681,9 @@ EXPORT Make_cont_suffix(SALT34.StrType s0) := s0;
 EXPORT InValid_cont_suffix(SALT34.StrType s) := FALSE;
 EXPORT InValidMessage_cont_suffix(UNSIGNED1 wh) := '';
  
-EXPORT Make_cont_title1_desc(SALT34.StrType s0) := MakeFT_invalid_alphablank(s0);
-EXPORT InValid_cont_title1_desc(SALT34.StrType s) := InValidFT_invalid_alphablank(s);
-EXPORT InValidMessage_cont_title1_desc(UNSIGNED1 wh) := InValidMessageFT_invalid_alphablank(wh);
+EXPORT Make_cont_title1_desc(SALT34.StrType s0) := MakeFT_invalid_alphaNum_sp(s0);
+EXPORT InValid_cont_title1_desc(SALT34.StrType s) := InValidFT_invalid_alphaNum_sp(s);
+EXPORT InValidMessage_cont_title1_desc(UNSIGNED1 wh) := InValidMessageFT_invalid_alphaNum_sp(wh);
  
 EXPORT Make_cont_title2_desc(SALT34.StrType s0) := s0;
 EXPORT InValid_cont_title2_desc(SALT34.StrType s) := FALSE;
