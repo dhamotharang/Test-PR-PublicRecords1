@@ -1,30 +1,39 @@
-
+﻿
 Import FCRA, PRTE2_Prof_LicenseV2, ut,PRTE_CSV,VersionControl, _Control,Prof_LicenseV2;
 
 EXPORT Files := 	MODULE
 					
 	EXPORT DS_prolicv2_IN 	:= DATASET('~prte::in::prolicv2',
-		     PRTE2_Prof_LicenseV2.Layouts.Layout_file_prof_license_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+		     Layouts.Layout_file_prof_license_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')));
+ 
+  EXPORT DS_File_prolicv2_Base_ext := DATASET(constants.prolicv2_base, 
+	       Layouts.Layout_file_prof_license_in, FLAT );
 
-//Base
-	Export DS_File_prolicv2_Base   := DATASET(constants.prolicv2_base,
-				 Layouts.Layout_Base_With_Tiers,flat);
 
-//Base2
-	Export DS_File_prolicv2_Base2   := project(DS_File_prolicv2_Base, Layouts.Layout_Base);
+  Export DS_File_prolicv2_Base := project(DS_File_prolicv2_Base_ext, 
+         transform(Layouts.Layout_Base_With_Tiers, 
+				 self.did := (string12)left.did;
+				 self.bdid := (string12)left.bdid;
+         self := Left;
+         self := [];	 
+  ));    
+	
+	 Export DS_File_prolicv2_Base2   := project(DS_File_prolicv2_Base, Layouts.Layout_Base);
 		
-//did	
-	 Shared Layouts.Layout_did_out trfProject(DS_File_prolicv2_Base l) := transform
-   self.did := (unsigned6) l.did;
-   self     := l;
-   end;
+
+	  Shared Layouts.Layout_did_out trfProject(DS_File_prolicv2_Base l) := transform
+    self.did := (unsigned6) l.did;
+    self     := l;
+    end;
    
-	 Export DS_prolicv2_did := project(DS_File_prolicv2_Base , trfProject(left));
+	  Export DS_prolicv2_did := project(DS_File_prolicv2_Base , trfProject(left));
 	  
-   Export DS_prolicv2 := project(DS_File_prolicv2_Base,Layouts.Layout_Base);
+    Export DS_prolicv2 := project(DS_File_prolicv2_Base,Layouts.Layout_Base);
+	 
+	  Export DS_prolicv2_AID:= project(DS_File_prolicv2_Base,layouts.layout_prolic_out_with_AID);
 		
-//linkid
-  Export DS_prolicv2_linkid:=project(DS_File_prolicv2_Base,Layouts.LayoutLinkID);
+
+   Export DS_prolicv2_linkid:=project(DS_File_prolicv2_Base,Layouts.LayoutLinkID);
 
   Layouts.layout_Autokeys trfAutokeys(DS_prolicv2 l,integer C) := transform
   self.name.lname         := l.lname;
