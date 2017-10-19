@@ -36,6 +36,8 @@ UpdateRoxiePage := sequential(RoxieKeybuild.updateversion('AmericanstudentKeys',
 
 
 email_notify := sequential(
+							//DF-20264 Build base file for ASL suppression list
+							American_student_list.Proc_build_suppression(filedate),
 							doSpray,
 							American_student_list.Proc_build_base,
 							American_student_list.proc_build_address_list(filedate),
