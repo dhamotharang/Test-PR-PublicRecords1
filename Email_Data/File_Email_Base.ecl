@@ -1,7 +1,7 @@
 ﻿import Email_Data, ut, Data_Services, Header;
 //New base layout with scrubbits field appended
 	ds_base := dataset('~thor_data400::base::email_data', Email_Data.Layout_Email.Scrubs_bits_base, thor);
-	fDeathMaster	:= Header.File_DID_Death_MasterV3_ssa;
+	fDeathMaster	:= Header.File_DID_Death_MasterV3_ssa(src = 'D$');
 	
 //Flag invalid emails
 l_temp	:= RECORD
@@ -24,7 +24,7 @@ END;
 
 //Only need to check valid records for DOD criteria to see if further filtering is needed
 jDeathInd	:= JOIN(SORT(DISTRIBUTE(pValidEmail(SkipRec = FALSE and DID <> 0),HASH(DID)),DID,LOCAL),
-									SORT(DISTRIBUTE(fDeathMaster((unsigned6)DID <> 0),HASH((unsigned6)DID)),DID, LOCAL),
+									SORT(DISTRIBUTE(fDeathMaster((unsigned6)DID <> 0 and (integer)DOD8 <> 0),HASH((unsigned6)DID)),DID, LOCAL),
 									LEFT.DID = (unsigned6)RIGHT.DID,
 									DeathInd(LEFT,RIGHT),LEFT OUTER, LOOKUP, LOCAL);
 									
