@@ -1,37 +1,37 @@
-
-import std, ut;
+﻿
+import std, ut,Data_Services;
 
 #OPTION('multiplePersistInstances',false);
 
-pep := DATASET('~thor::in::globalwatchlists::innovative_systems::pep', 
+pep := DATASET(Data_Services.foreign_prod + 'thor::in::globalwatchlists::innovative_systems::pep', 
                                                                 Layout_Innovative_OFAC_Enhanced.Layout_pep, thor)
 														                                     ;	
 //output(pep, named('pep'));
 
-OSC := DATASET('~thor::in::globalwatchlists::innovative_systems::osc', 
+OSC := DATASET(Data_Services.foreign_prod + 'thor::in::globalwatchlists::innovative_systems::osc', 
                                                                 Layout_Innovative_OFAC_Enhanced.Layout_OSC, thor)
 														                                     ;	
 //output(choosen(OSC,all), named('OSC'));
 
-OCC := DATASET('~thor::in::globalwatchlists::innovative_systems::occ', 
+OCC := DATASET(Data_Services.foreign_prod + 'thor::in::globalwatchlists::innovative_systems::occ', 
                                                                 Layout_Innovative_OFAC_Enhanced.layout_cft, thor)
 														                                     ;	
 //output(OCC, named('OCC'));
 
-FBI := DATASET('~thor::in::globalwatchlists::innovative_systems::fbi', 
+FBI := DATASET(Data_Services.foreign_prod + 'thor::in::globalwatchlists::innovative_systems::fbi', 
                                                                 Layout_Innovative_OFAC_Enhanced.Layout_FBI, thor)
 														                                     ;	
 //output(FBI, named('FBI'));
 
-UNS := DATASET('~thor::in::globalwatchlists::innovative_systems::uns', 
+UNS := DATASET(Data_Services.foreign_prod + 'thor::in::globalwatchlists::innovative_systems::uns', 
                                                                 Layout_Innovative_OFAC_Enhanced.Layout_UNS, thor)(original_primary_name_01 <> '' and location <> 'brow')
 														                                     ;	
 //output(UNS, named('UNS'));
 
-cft := dataset('~thor::in::globalwatchlists::innovative_systems::cft',Layout_Innovative_OFAC_Enhanced.layout_cft,thor);
+cft := dataset(Data_Services.foreign_prod + 'thor::in::globalwatchlists::innovative_systems::cft',Layout_Innovative_OFAC_Enhanced.layout_cft,thor);
 
 // fin file will always be same for all builds.
-fin := dataset('~thor::in::patriot::innovative::ofac::enhanced::fin',Layout_Innovative_OFAC_Enhanced.layout_fin,thor);
+fin := dataset(Data_Services.foreign_prod + 'thor::in::patriot::innovative::ofac::enhanced::fin',Layout_Innovative_OFAC_Enhanced.layout_fin,thor);
 
 
 // PEP
@@ -1009,7 +1009,7 @@ patriot_common_UNS := PROJECT(normalize_uns_addresses,tr_patriot_common_UNS(left
 		v_serial_no 										:= regexfind('(^[0]*)(\\d+)', regexfind('\\d+', regexreplace('^94', L.Serial_Number, ''), 0), 2);
 		self.pty_key 										:= TRIM(L.Application_Code, left, right) + TRIM(v_serial_no, left, right);
 		self.source 										:= 'Cmmdty. Fut. Trad. Commission Lst. of Reg. & Self-Reg. Auth.';
-		self.orig_pty_name 							:= ut.fnTrim2Upper(CHOOSE(C,L.line_data_1, L.Original_Primary_Name));
+		self.orig_pty_name 							:= ut.CleanSpacesAndUpper(CHOOSE(C,L.line_data_1, L.Original_Primary_Name));
 		self.country 										:= TRIM(L.Original_Add_01_Line_01, left, right);
 		self.name_type 									:= CHOOSE(C,'',if(L.Primary_Record = 'N', 'AKA', ''));
 		self.addr_1 										:= TRIM(L.Original_Add_01_Line_01);
