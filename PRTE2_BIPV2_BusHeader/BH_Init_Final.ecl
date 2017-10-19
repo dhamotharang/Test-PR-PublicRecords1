@@ -24,8 +24,8 @@ function
 		self.vl_id             							:= if(trim(l.cust_name) = '', '', ut.CleanSpacesAndUpper(l.src) + STD.Str.CleanSpaces(l.link_fein + l.link_inc_date));
 		self.company_bdid										:= l.bdid;
 	  self.company_phone									:= STD.Str.CleanSpaces(l.bus_phone);
-	  self.phone_score      							:= if(trim(l.bus_phone) <> '', 1, 0);
-		self.phone_type	      							:= if(trim(l.bus_phone) <> '', 'T', '');
+	  self.phone_score      							:= if((integer)trim(l.bus_phone) <> 0, 1, 0);
+		self.phone_type	      							:= if((integer)trim(l.bus_phone) <> 0, 'T', '');
 	  self.source           							:= ut.CleanSpacesAndUpper(l.src);
 	  self.company_fein      							:= STD.Str.CleanSpaces(l.orig_fein);
 		self.best_fein_Indicator						:= if(mdr.sourceTools.SourceIsDunn_Bradstreet_Fein(l.src) and trim(l.orig_fein) <> '', '1', '');

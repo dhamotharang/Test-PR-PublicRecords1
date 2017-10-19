@@ -15,7 +15,7 @@ EXPORT Filename_Keys := module
     // ,BIPV2.KeySuffix
   // ));
 
-  SHARED STRING basename:=Data_services.Data_location.Prefix('biz_linking') + 'key::'+THISMODULE+'::'+superkey_version+'::proxid::';
+  SHARED STRING basename := '~prte::key::'+THISMODULE+'::'+superkey_version+'::proxid::';
   // Key_BizHead_
   EXPORT Refs                      := basename+'refs';
   EXPORT Words                     := basename+'words';

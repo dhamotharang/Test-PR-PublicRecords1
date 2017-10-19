@@ -5,7 +5,9 @@ EXPORT Key_License_Linkids := MODULE
    // DEFINE THE INDEX
 	shared superfile_name		:= keynames().License_linkids.qa;
 
-	shared Base				:= Files().base.Industry.built;
+	shared Base				:= Files().base.License.built(license_number<>'' or
+																									license_state<>''
+																								 );
 	
 	BIPV2.IDmacros.mac_IndexWithXLinkIDs(Base, k, superfile_name)
 	export Key := k;
