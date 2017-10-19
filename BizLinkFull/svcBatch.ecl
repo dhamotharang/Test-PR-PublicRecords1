@@ -6,7 +6,7 @@ EXPORT svcBatch := MACRO
  
   // For any records where a proxid was not populated, perform a batch append
   dFormalized:=BizLinkFull._Search.macFormalize(dInput,,,FALSE);
-  dResults:=BizLinkFull._Search.BatchSubmit(dFormalized,FALSE,FALSE);
+  dResults:=BizLinkFull._Search.BatchSubmit(dFormalized,FALSE);
   dBatchSearch:=JOIN(dInput,dResults,LEFT.acctno=RIGHT.reference,TRANSFORM(BizLinkFull.lBatchOutput,
     SELF.proxid             := RIGHT.results[1].proxid;
     SELF.seleid             := RIGHT.results[1].seleid;
@@ -59,17 +59,15 @@ EXPORT svcBatch := MACRO
   
   // Results are the sum of the two datasets above.
   dAppended:=DEDUP(SORT(dBatchSearch+dIDSearch,acctno,-weight),acctno);
-
   // Pull the data from the Best key for all of the IDs in the search results.
   MEOW:=BizLinkFull.MEOW_Biz(DATASET([],BizLinkFull.Process_Biz_Layouts.InputLayout));
-  dLinkIDs_:=BIPV2_Best.Key_LinkIds.kfetch(
+  dLinkIDs:=BIPV2_Best.Key_LinkIds.kfetch(
     inputs:=DEDUP(PROJECT(dAppended,BIPV2.IDlayouts.l_xlink_ids),ALL),
     Level:=MAP(
       sBestLevel='PROXID' => BIPV2.IDconstants.Fetch_Level_PROXID,
       BIPV2.IDconstants.Fetch_Level_SELEID
     )
-  );
-  dLinkIDs:=dLinkIDs_(IF(sBestLevel='PROXID',1=1,proxid=0));
+  )(IF(sBestLevel='PROXID',1=1,proxid=0));
   
   // Add in the IDs to the Best results.
   dWithSele:=JOIN(dLinkIDs,dAppended,LEFT.seleid=RIGHT.seleid,TRANSFORM({UNSIGNED acctno;UNSIGNED4 weight;UNSIGNED4 score;UNSIGNED parent_proxid;UNSIGNED sele_proxid;UNSIGNED org_proxid;UNSIGNED ultimate_proxid; STRING search_matches, RECORDOF(LEFT);},
@@ -139,21 +137,6 @@ EXPORT svcBatch := MACRO
   ),KEEP(1));
   
   // reply with the output type the user requested.
-  OUTPUT(dInput, NAMED('dInput'));
-  OUTPUT(dFormalized, NAMED('dFormalized'));
-  OUTPUT(dResults, NAMED('dResults'));
-  output(dBatchSearch, named('dBatchSearch'));
-  output(dIDFormalized, named('dIDFormalized'));
-  output(dIDSearch, named('dIDSearch'));
-  output(dAppended, named('dAppended'));
-  output(dLinkIDs_, named('dLinkIDs_'));
-  output(dLinkIDs, named('dLinkIDs'));
-  output(dWithSele, named('dWithSele'));
-  output(dBestOut, named('dBestOut'));
-  OUTPUT(dSeleScored, NAMED('dSeleScored'));
-  OUTPUT(dSeleScoredFormalized, NAMED('dSeleScoredFormalized'));
-  
-  OUTPUT(IF(bIncludeBest,dSeleBest,dAppended),NAMED('Results'));
+  OUTPUT(BIPV2_Suppression.macSuppress(IF(bIncludeBest,dSeleBest,dAppended)),NAMED('Results'));
 ENDMACRO;
-
 

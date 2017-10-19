@@ -25,10 +25,10 @@ dsRequest := DATASET ([prepRequest()]);
 // GetPersonContext accpets just a row now instead of a dataset, so use dsRequest[1]
 dsResponse := PersonContext.GetPersonContext(dsRequest[1]);
 
-dsResponseRecords_roxie := TOPN(dsResponse[1].records,
-	1000, 
-	dsResponse[1].records.LexID,
-	-(integer) stringLib.StringFilter(dsResponse[1].records.dateadded[1..10], '0123456789'));
+// go back to limiting the results to just 100 records per LexID.  Just used dedup instead of TopN which didn't work in batch mode
+dsResponseRecords_roxie := dedup(
+	sort(dsResponse[1].records, dsResponse[1].records.LexID, -(integer) stringLib.StringFilter(dsResponse[1].records.dateadded[1..10], '0123456789'), dsResponse[1].records.statementID), 
+	dsResponse[1].records.LexID, keep(iesp.Constants.MAX_CONSUMER_STATEMENTS));
 
 // When running on thor, GetPersonContext takes in multiple rows of data and returns multiple rows of data, instead of using child datasets like the roxie version in order to avoid errors 
 dsResponseRecords_thor := SORT(PersonContext.GetPersonContext_thor(PCKeys), LexID, -(integer) stringLib.StringFilter(dateadded[1..10], '0123456789'));

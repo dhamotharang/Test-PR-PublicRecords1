@@ -7,8 +7,6 @@ EXPORT RVA1611_2_0 (GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam, boo
 	
 	MODEL_DEBUG := False;
 	
-	isPreScreenPurpose := False;
-
 	#if(MODEL_DEBUG)
 	Layout_Debug := RECORD
 	
@@ -491,12 +489,13 @@ currenttaxmarket := map(
     not((addrcurrentdwelltype in ['S']))                                      => -9999,
 																												(Integer)addrcurrenttaxmarketvalue);
      
-		inputtaxmarket := map(
+inputtaxmarket := map(
 		(addrinputdwelltype in ['-1']) or (addrinputtaxmarketvalue in ['-1'])  => -1,                                                                                                                                                                                                                                                                                                                                                                                                                     
    not(( addrinputdwelltype in ['S']))                             => -9999,                                                                                                                                                                                                                                                                                                                                                                                                                  
                                                                    (Integer)addrinputtaxmarketvalue);                                                                                 
 
-iv_inputcurrtaxmarketvaluesfdmax := if (max((integer)inputtaxmarket, currenttaxmarket)= 0, -9999, max((integer)inputtaxmarket, currenttaxmarket));
+iv_inputcurrtaxmarketvaluesfdmax := max((integer)inputtaxmarket, currenttaxmarket);
+//iv_inputcurrtaxmarketvaluesfdmax := if (max((integer)inputtaxmarket, currenttaxmarket)= 0, -9999, max((integer)inputtaxmarket, currenttaxmarket));
 
 iv_currentcountyratiosfd := if(not((addrcurrentdwelltype in ['S'])), -9999, (Real)addrcurrentcountyratio);
 
@@ -994,9 +993,10 @@ rva1611_2_0 := map(
     (rv5_attr_unscoreable in ['2 UNSCORE']) => 222,
     (ford_rv5_attr_seg in ['1 DEROG'])      => max(min(if(round(pdo * (ln(all_drg_probscore / (1 - all_drg_probscore)) - ln(odds)) / ln(2) + base) = NULL, -NULL, round(pdo * (ln(all_drg_probscore / (1 - all_drg_probscore)) - ln(odds)) / ln(2) + base)), 900), 501),
     (ford_rv5_attr_seg in ['2 OWNER'])      => max(min(if(round(pdo * (ln(all_own_probscore / (1 - all_own_probscore)) - ln(odds)) / ln(2) + base) = NULL, -NULL, round(pdo * (ln(all_own_probscore / (1 - all_own_probscore)) - ln(odds)) / ln(2) + base)), 900), 501),
-                                               max(min(if(round(pdo * (ln(all_oth_probscore / (1 - all_oth_probscore)) - ln(odds)) / ln(2) + base) = NULL, -NULL, round(pdo * (ln(all_oth_probscore / (1 - all_oth_probscore)) - ln(odds)) / ln(2) + base)), 900), 501));
-
-all_drg_dist_seg_0 := 2.6080769 - 4.3936108;
+																							 max(min(if(round(pdo * (ln(all_oth_probscore / (1 - all_oth_probscore)) - ln(odds)) / ln(2) + base) = NULL, -NULL, round(pdo * (ln(all_oth_probscore / (1 - all_oth_probscore)) - ln(odds)) / ln(2) + base)), 900), 501));																							
+		 
+all_drg_AACD_SEG_0 := if(Ford_RV5_Attr_seg in ['1 DEROG'],'D30','');
+     all_drg_DIST_SEG_0 := 2.6080769 - 4.3936108; 
 
 all_drg_aacd_0 := map(
     (m5_drg_inquiryindex in [1])                                     => 'I60',
@@ -1160,6 +1160,31 @@ all_drg_aacd_15 := map(
 
 all_drg_dist_15 := all_drg_subscore15 - 0.124713;
 
+ds_layout := {STRING rc, REAL value};
+
+// Drg  := dataset([
+			// {all_drg_AACD_SEG_0 , all_drg_DIST_SEG_0},  
+			// {all_drg_aacd_0, all_drg_dist_0}, 
+			// {all_drg_aacd_1, all_drg_dist_1}, 
+			// {all_drg_aacd_2, all_drg_dist_2}, 
+			// {all_drg_aacd_3, all_drg_dist_3},
+			// {all_drg_aacd_4, all_drg_dist_4},
+			// {all_drg_aacd_5, all_drg_dist_5},
+			// {all_drg_aacd_6, all_drg_dist_6},
+			// {all_drg_aacd_7, all_drg_dist_7},
+			// {all_drg_aacd_8, all_drg_dist_8},
+			// {all_drg_aacd_9, all_drg_dist_9},
+			// {all_drg_aacd_10, all_drg_dist_10},
+			// {all_drg_aacd_11, all_drg_dist_11},
+			// {all_drg_aacd_12, all_drg_dist_12},
+			// {all_drg_aacd_13, all_drg_dist_13},
+			// {all_drg_aacd_14, all_drg_dist_14},
+			// {all_drg_aacd_15, all_drg_dist_15}],
+			// ds_layout)(value < 0);
+			
+		// tbl_Drg :=
+				// TABLE( drg, {rc, cnt := SUM(GROUP, value)}, rc); 
+
 all_drg_rcvaluep89 := (integer)(all_drg_aacd_0 = 'P89') * all_drg_dist_0 +
     (integer)(all_drg_aacd_1 = 'P89') * all_drg_dist_1 +
     (integer)(all_drg_aacd_2 = 'P89') * all_drg_dist_2 +
@@ -1263,6 +1288,7 @@ all_drg_rcvaluel77 := (integer)(all_drg_aacd_0 = 'L77') * all_drg_dist_0 +
     (integer)(all_drg_aacd_15 = 'L77') * all_drg_dist_15;
 
 all_drg_rcvalued30 := (integer)(all_drg_aacd_0 = 'D30') * all_drg_dist_0 +
+    (integer)(all_drg_aacd_seg_0 = 'D30') * all_drg_dist_seg_0 +
     (integer)(all_drg_aacd_1 = 'D30') * all_drg_dist_1 +
     (integer)(all_drg_aacd_2 = 'D30') * all_drg_dist_2 +
     (integer)(all_drg_aacd_3 = 'D30') * all_drg_dist_3 +
@@ -1346,6 +1372,23 @@ all_drg_rcvaluei60 := (integer)(all_drg_aacd_0 = 'I60') * all_drg_dist_0 +
     (integer)(all_drg_aacd_13 = 'I60') * all_drg_dist_13 +
     (integer)(all_drg_aacd_14 = 'I60') * all_drg_dist_14 +
     (integer)(all_drg_aacd_15 = 'I60') * all_drg_dist_15;
+		
+all_drg_rcvaluei61 := (integer)(all_drg_aacd_0 = 'I61') * all_drg_dist_0 +
+    (integer)(all_drg_aacd_1 = 'I61') * all_drg_dist_1 +
+    (integer)(all_drg_aacd_2 = 'I61') * all_drg_dist_2 +
+    (integer)(all_drg_aacd_3 = 'I61') * all_drg_dist_3 +
+    (integer)(all_drg_aacd_4 = 'I61') * all_drg_dist_4 +
+    (integer)(all_drg_aacd_5 = 'I61') * all_drg_dist_5 +
+    (integer)(all_drg_aacd_6 = 'I61') * all_drg_dist_6 +
+    (integer)(all_drg_aacd_7 = 'I61') * all_drg_dist_7 +
+    (integer)(all_drg_aacd_8 = 'I61') * all_drg_dist_8 +
+    (integer)(all_drg_aacd_9 = 'I61') * all_drg_dist_9 +
+    (integer)(all_drg_aacd_10 = 'I61') * all_drg_dist_10 +
+    (integer)(all_drg_aacd_11 = 'I61') * all_drg_dist_11 +
+    (integer)(all_drg_aacd_12 = 'I61') * all_drg_dist_12 +
+    (integer)(all_drg_aacd_13 = 'I61') * all_drg_dist_13 +
+    (integer)(all_drg_aacd_14 = 'I61') * all_drg_dist_14 +
+    (integer)(all_drg_aacd_15 = 'I61') * all_drg_dist_15;
 
 all_drg_rcvaluep85 := (integer)(all_drg_aacd_0 = 'P85') * all_drg_dist_0 +
     (integer)(all_drg_aacd_1 = 'P85') * all_drg_dist_1 +
@@ -1976,7 +2019,9 @@ all_own_rcvaluec14 := (integer)(all_own_aacd_0 = 'C14') * all_own_dist_0 +
     (integer)(all_own_aacd_15 = 'C14') * all_own_dist_15 +
     (integer)(all_own_aacd_16 = 'C14') * all_own_dist_16;
 
+ all_oth_AACD_SEG_0 := if(Ford_RV5_Attr_seg in ['3 OTHER'],'A41','');
 all_oth_dist_seg_0 := 3.1000180 - 4.3936108;
+
 
 all_oth_aacd_0 := map(
     (m5_oth_inquiryindex in [1])                                     => 'I60',
@@ -2119,6 +2164,21 @@ all_oth_aacd_12 := map(
 
 all_oth_dist_12 := all_oth_subscore12 - 0.310022;
 
+
+all_oth_rcvaluea42 := (integer)(all_oth_aacd_0 = 'A42') * all_oth_dist_0 +
+    (integer)(all_oth_aacd_1 = 'A42') * all_oth_dist_1 +
+    (integer)(all_oth_aacd_2 = 'A42') * all_oth_dist_2 +
+    (integer)(all_oth_aacd_3 = 'A42') * all_oth_dist_3 +
+    (integer)(all_oth_aacd_4 = 'A42') * all_oth_dist_4 +
+    (integer)(all_oth_aacd_5 = 'A42') * all_oth_dist_5 +
+    (integer)(all_oth_aacd_6 = 'A42') * all_oth_dist_6 +
+    (integer)(all_oth_aacd_7 = 'A42') * all_oth_dist_7 +
+    (integer)(all_oth_aacd_8 = 'A42') * all_oth_dist_8 +
+    (integer)(all_oth_aacd_9 = 'A42') * all_oth_dist_9 +
+    (integer)(all_oth_aacd_10 = 'A42') * all_oth_dist_10 +
+    (integer)(all_oth_aacd_11 = 'A42') * all_oth_dist_11 +
+    (integer)(all_oth_aacd_12 = 'A42') * all_oth_dist_12;
+
 all_oth_rcvaluec13 := (integer)(all_oth_aacd_0 = 'C13') * all_oth_dist_0 +
     (integer)(all_oth_aacd_1 = 'C13') * all_oth_dist_1 +
     (integer)(all_oth_aacd_2 = 'C13') * all_oth_dist_2 +
@@ -2160,6 +2220,20 @@ all_oth_rcvaluep89 := (integer)(all_oth_aacd_0 = 'P89') * all_oth_dist_0 +
     (integer)(all_oth_aacd_10 = 'P89') * all_oth_dist_10 +
     (integer)(all_oth_aacd_11 = 'P89') * all_oth_dist_11 +
     (integer)(all_oth_aacd_12 = 'P89') * all_oth_dist_12;
+		
+all_oth_rcvalued31 := (integer)(all_oth_aacd_0 = 'D31') * all_oth_dist_0 +
+    (integer)(all_oth_aacd_1 = 'D31') * all_oth_dist_1 +
+    (integer)(all_oth_aacd_2 = 'D31') * all_oth_dist_2 +
+    (integer)(all_oth_aacd_3 = 'D31') * all_oth_dist_3 +
+    (integer)(all_oth_aacd_4 = 'D31') * all_oth_dist_4 +
+    (integer)(all_oth_aacd_5 = 'D31') * all_oth_dist_5 +
+    (integer)(all_oth_aacd_6 = 'D31') * all_oth_dist_6 +
+    (integer)(all_oth_aacd_7 = 'D31') * all_oth_dist_7 +
+    (integer)(all_oth_aacd_8 = 'D31') * all_oth_dist_8 +
+    (integer)(all_oth_aacd_9 = 'D31') * all_oth_dist_9 +
+    (integer)(all_oth_aacd_10 = 'D31') * all_oth_dist_10 +
+    (integer)(all_oth_aacd_11 = 'D31') * all_oth_dist_11 +
+    (integer)(all_oth_aacd_12 = 'D31') * all_oth_dist_12;
 
 all_oth_rcvaluel81 := (integer)(all_oth_aacd_0 = 'L81') * all_oth_dist_0 +
     (integer)(all_oth_aacd_1 = 'L81') * all_oth_dist_1 +
@@ -2274,7 +2348,8 @@ all_oth_rcvaluei61 := (integer)(all_oth_aacd_0 = 'I61') * all_oth_dist_0 +
     (integer)(all_oth_aacd_12 = 'I61') * all_oth_dist_12;
 
 all_oth_rcvaluea41 := (integer)(all_oth_aacd_0 = 'A41') * all_oth_dist_0 +
-    (integer)(all_oth_aacd_1 = 'A41') * all_oth_dist_1 +
+		(integer)(all_oth_aacd_seg_0 = 'A41') * all_oth_dist_seg_0 +
+		(integer)(all_oth_aacd_1 = 'A41') * all_oth_dist_1 +
     (integer)(all_oth_aacd_2 = 'A41') * all_oth_dist_2 +
     (integer)(all_oth_aacd_3 = 'A41') * all_oth_dist_3 +
     (integer)(all_oth_aacd_4 = 'A41') * all_oth_dist_4 +
@@ -2365,12 +2440,14 @@ all_oth_rcvaluec14 := (integer)(all_oth_aacd_0 = 'C14') * all_oth_dist_0 +
 // that model code for guidance on implementing reason codes. 
 //*************************************************************************************//
 
-ds_layout := {STRING rc, REAL value};
+
 
  
 //*************************************************************************************//
 rc_dataset_all_oth := DATASET([
+    {'A42', all_oth_rcvalueA42},
     {'C13', all_oth_rcvalueC13},
+    {'D31', all_oth_rcvalueD31},
     {'C21', all_oth_rcvalueC21},
     {'P89', all_oth_rcvalueP89},
     {'L81', all_oth_rcvalueL81},
@@ -2387,7 +2464,7 @@ rc_dataset_all_oth := DATASET([
     {'E57', all_oth_rcvalueE57},
     {'S65', all_oth_rcvalueS65},
     {'C14', all_oth_rcvalueC14}
-    ], ds_layout);
+    ], ds_layout)(value < 0);
 
 //*************************************************************************************//
 // IMPORTANT NOTE:  Select ONLY reason codes with an RCValue < 0.  I'll leave the 
@@ -2449,6 +2526,7 @@ all_own_vl4 := rc_dataset_all_own_sorted[4].value;
  
 //*************************************************************************************//
 rc_dataset_all_drg := DATASET([
+    // {'D30', all_drg_DIST_SEG_0},
     {'P89', all_drg_rcvalueP89},
     {'C21', all_drg_rcvalueC21},
     {'L80', all_drg_rcvalueL80},
@@ -2460,6 +2538,7 @@ rc_dataset_all_drg := DATASET([
     {'A46', all_drg_rcvalueA46},
     {'C13', all_drg_rcvalueC13},
     {'I60', all_drg_rcvalueI60},
+    {'I61', all_drg_rcvalueI61},
     {'P85', all_drg_rcvalueP85},
     {'S66', all_drg_rcvalueS66},
     {'C12', all_drg_rcvalueC12},
@@ -2553,7 +2632,7 @@ rc5_c118 := map(
     // trim(rc4_2, LEFT, RIGHT) = ''         => '',
                                              // '');
 
-// rc1_1 := if(not((rc1_2 in ['I60', 'I61'])) and not((rc2_2 in ['I60', 'I61'])) and not((rc3_2 in ['I60', 'I61'])) and not((rc4_2 in ['I60', 'I61'])), rc1_c118, rc1_2);
+//rc1_1 := if(not((rc1_2 in ['I60', 'I61'])) and not((rc2_2 in ['I60', 'I61'])) and not((rc3_2 in ['I60', 'I61'])) and not((rc4_2 in ['I60', 'I61'])), rc1_c118, rc1_2);
 
 rc5_1 := if(not((rc1_2 in ['I60', 'I61'])) and not((rc2_2 in ['I60', 'I61'])) and not((rc3_2 in ['I60', 'I61'])) and not((rc4_2 in ['I60', 'I61'])), rc5_c118, '');
 

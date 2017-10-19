@@ -6,7 +6,7 @@
 */
 /*--INFO-- Compare two IDs to see if they should be joined.<p>If it is easier you may place the two IDs on the first line and they will be parsed into first and second.</p>*/
 EXPORT proxidCompareService := MACRO
-  IMPORT SALT28,BizLinkFull,ut;
+  IMPORT SALT33,BizLinkFull,ut;
 STRING50 proxidonestr := ''  : STORED('proxidOne');
 STRING20 proxidtwostr := '*'  : STORED('proxidtwo');
 UNSIGNED8 proxidone0 := (UNSIGNED8)ut.Word(proxidonestr,1); // Allow for two token on a line input
@@ -21,7 +21,7 @@ s := GLOBAL(PROJECT(k,BizLinkFull.Layout_Specificities.R)[1]);
 odlv := BizLinkFull.Debug(BFile,s).RolledEntities(odl);
 odrv := BizLinkFull.Debug(BFile,s).RolledEntities(odr);
 mtch := BizLinkFull.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,proxidone,proxidtwo,0,0}],BizLinkFull.match_candidates(BFile).layout_matches));
-// Put out easy to read versions of the 5116576 data
+// Put out easy to read versions of the proxid data
 OUTPUT( odlv,NAMED('proxidOneFieldValues'));
 OUTPUT( odrv,NAMED('proxidTwoFieldValues'));
 // Put out the actually matching information
@@ -30,4 +30,5 @@ OUTPUT( SORT(mtch,-Conf),NAMED('RecordMatches'));
 OUTPUT( odl,NAMED('proxidOneRecords'));
 OUTPUT( odr,NAMED('proxidTwoRecords'));
 ENDMACRO;
+ 
 

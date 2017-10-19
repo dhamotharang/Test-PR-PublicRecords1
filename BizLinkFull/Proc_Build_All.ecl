@@ -1,13 +1,9 @@
 ﻿import tools;
-
 EXPORT Proc_Build_All(
-
    string   pversion
   ,boolean  pPromote2QA = true
-
 ) :=
 function
-
   shared specs  := specificities(File_BizHead);
   shared knames := keynames(pversion);
   
@@ -39,10 +35,9 @@ function
   Buildword_company_url          := tools.macf_writeindex('specs.company_url_values_key    ,knames.word_company_url         .new'      );
   Buildwheel_city_clean          := tools.macf_writeindex('Wheel.Key_city_clean            ,knames.wheel_city_clean         .new'      );
   Buildwheel_quick_city_clean    := tools.macf_writeindex('Wheel.KeyQuick_city_clean       ,knames.wheel_quick_city_clean   .new'      );
-
   returnresult := sequential(
-      bizlinkfull._dostrata_ID_Check(File_BizHead,pversion)
-     ,BuildSpecs
+     bizlinkfull._dostrata_ID_Check(File_BizHead,pversion)
+    ,BuildSpecs
     ,if(not tools.fun_DoAllFilesExist.fNamesBuilds(knames.dall_filenames)
       ,sequential(
         parallel(
@@ -86,3 +81,4 @@ function
   return returnresult;
     
 end;
+

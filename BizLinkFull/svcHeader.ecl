@@ -1,5 +1,4 @@
-﻿
-EXPORT svcHeader := MACRO
+﻿EXPORT svcHeader := MACRO
 IMPORT SALT28,BizLinkFull;
 IMPORT BIPV2;
 IMPORT BIPV2_Company_Names;
@@ -58,7 +57,6 @@ THISMODULE:=BizLinkFull;
   BOOLEAN bHSort:=FALSE:STORED('HierarchicalSort',FORMAT(SEQUENCE(46)));
   BOOLEAN bSoapCall:=FALSE:STORED('SoapCallMode',FORMAT(SEQUENCE(47)));
   UNSIGNED Input_LeadThreshold:=10:STORED('LeadThreshold',FORMAT(SEQUENCE(48)));
-
 //---------------------------------------------------------------------------
 // If an airport code is entered, derive the city and state from that
 //---------------------------------------------------------------------------
@@ -97,7 +95,6 @@ sFNamePreferred:=THISMODULE.fn_PreferredName(Input_fname);
 // Flag for sorting hierarchically.
 //---------------------------------------------------------------------------
 sSortFlag:=IF(bHSort,'T','_');
-
 Template := dataset([],THISMODULE.Process_Biz_Layouts.InputLayout);
 //�
 Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,Input_LeadThreshold
@@ -148,12 +145,10 @@ Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,I
   ,(TYPEOF(Template.STREETADDRESS))(TRIM(Input_prim_range)+' '+THISMODULE.Fields.Make_prim_name((SALT29.StrType)Input_prim_name)+' '+THISMODULE.Fields.Make_sec_range((SALT29.StrType)Input_sec_range))
   ,RecordsOnly,FullMatch,e_rcid,e_proxid,e_seleid,e_orgid,e_ultid,e_powid}],THISMODULE.Process_Biz_Layouts.InputLayout);
 //�
-
 dResults:=THISMODULE.MEOW_Biz(Input_Data).Data_;
 dProxids:=SORT(TABLE(dResults,{proxid;weight;KeysUsed;KeysFailed;UNSIGNED proxid_count:=COUNT(GROUP);},proxid,KeysFailed),-weight,proxid,KeysFailed);
 dNamesAddresses:=TABLE(dResults,{company_name;prim_range;prim_name;city;st;zip;},company_name,prim_range,prim_name,city,st,zip);
 dAggregated:=SORT(tools.mac_AggregateFieldsPerID(dResults,proxid),-weights[1].weight);
-
 dInputData:=PROJECT(Input_Data,TRANSFORM({RECORDOF(LEFT) AND NOT [zip_cases];STRING city_entered;STRING state_entered;STRING derived_city;STRING derived_state;STRING zip_entered;UNSIGNED zip_radius;UNSIGNED zip_count;},
   SELF.city_entered:=Input_city;
   SELF.state_entered:=Input_st;
@@ -166,7 +161,6 @@ dInputData:=PROJECT(Input_Data,TRANSFORM({RECORDOF(LEFT) AND NOT [zip_cases];STR
 ));
 dKeysUsed:=TABLE(dProxids,{KeysUsed;STRING keys:=THISMODULE.Process_Biz_Layouts.KeysUsedToText(KeysUsed);},KeysUsed);
 dKeyLegend:=THISMODULE.linkpaths;
-
 IF(bSoapCall,
 OUTPUT(THISMODULE.MEOW_Biz(Input_Data).Raw_Results,NAMED('soap_results')),
 SEQUENTIAL(
@@ -177,7 +171,4 @@ SEQUENTIAL(
   OUTPUT(dKeysUsed,NAMED('KeysUsed')),
   OUTPUT(dKeyLegend,NAMED('KeyLegend'))
 ));
-
 ENDMACRO;
-
-

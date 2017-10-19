@@ -1,4 +1,4 @@
-Import data_services;
+﻿Import data_services;
 source := RECORD
    unsigned2 source_type_id;
    string25 source_type;
@@ -7,6 +7,9 @@ source := RECORD
    unsigned2 expectation_of_victim_entities_id;
    string10 expectation_of_victim_entities;
    string100 industry_segment;
+	 string2		Customer_State;
+	 string3		Customer_County;	
+	 string 		Customer_Vertical;
   END;
 
 activity := RECORD
@@ -108,6 +111,18 @@ clean_phones := RECORD
    string10 phone_number;
    string10 cell_phone;
    string10 work_phone;
+  END;
+
+address_cleaner := RECORD
+   string100 street_1;
+   string50 street_2;
+   string100 city;
+   string10 state;
+   string10 zip;
+   string10 address_type;
+   string100 address_1;
+   string50 address_2;
+   layout_clean182_fips clean_address;
   END;
 
 r:=RECORD,maxlength(60000)
@@ -223,7 +238,7 @@ r:=RECORD,maxlength(60000)
   activity classification_activity;
   entity classification_entity;
   permissible_use_access classification_permissible_use_access;
-  string50 source;
+  string100 source;
   unsigned4 process_date;
   unsigned4 dt_first_seen;
   unsigned4 dt_last_seen;
@@ -266,8 +281,42 @@ r:=RECORD,maxlength(60000)
   unsigned2 ultscore;
   unsigned2 ultweight;
   clean_phones clean_phones;
+  string1 head_of_household_indicator;
+  string20 relationship_indicator;
+  string3 county;
+  address_cleaner additional_address;
+  string1 race;
+  string1 ethnicity;
+  string20 bank_routing_number_1;
+  string20 bank_account_number_1;
+  string20 bank_routing_number_2;
+  string20 bank_account_number_2;
+  string30 reported_by;
+  string60 name_risk_code;
+  string60 ssn_risk_code;
+  string60 dob_risk_code;
+  string60 drivers_license_risk_code;
+  string60 physical_address_risk_code;
+  string60 phone_risk_code;
+  string60 cell_phone_risk_code;
+  string60 work_phone_risk_code;
+  string60 bank_account_1_risk_code;
+  string60 bank_account_2_risk_code;
+  string60 email_address_risk_code;
+  string30 ip_address_fraud_code;
+  string60 business_risk_code;
+  string60 mailing_address_risk_code;
+	string60	device_risk_code;
+  string10 tax_preparer_id;
+  string8 start_date;
+  string8 end_date;
+  string10 amount_paid;
+  string10 region_code;
+  string10 investigator_id;
   unsigned8 __internal_fpos__;
  END;
+
+
 d	:=dataset([],r);
 
 EXPORT Key_Id(string Platform) :=	Index(d,{record_id,uid},{d},
