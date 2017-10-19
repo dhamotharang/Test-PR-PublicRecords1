@@ -1,6 +1,8 @@
-﻿export Suppress := module
+﻿import dops;
+export Suppress := module
 
-	export court_code_caseno := ['GA0040530470',
+	export court_code_caseno := dops.SuppressID('bankruptcy').GetIDsAsSet();
+	/*export court_code_caseno := ['GA0040530470',
 	'CA0069319926',
 	'CA0069221225',
 	'NJ0039634209',
@@ -584,6 +586,6 @@
 	'OH0011252708',
 	'MI0021445781',
 	'MI0021068957'
-];
+];*/
 
 end;
