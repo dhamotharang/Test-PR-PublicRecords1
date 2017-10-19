@@ -1,4 +1,4 @@
-import doxie, fcra, ut, header_quick, Riskwise, risk_indicators, Advo, Address;
+import doxie, fcra, ut, header_quick, Riskwise, risk_indicators, Advo, Address, Std;
 
 // call full header, call full override
 // join them together by rid, left outer
@@ -10,7 +10,7 @@ import doxie, fcra, ut, header_quick, Riskwise, risk_indicators, Advo, Address;
 // layout override will be layout header plus string blankout plus addr flags
 
 
-todaysdate := ut.GetDate; // for checking derog's fcra-date compliance
+todaysdate := (string) Std.Date.Today(); // for checking derog's fcra-date compliance
 unsigned3 history_date := 999999;	// removed the input history date, this query is not meant to be run in historical mode
 
 export _header_data (dataset (doxie.layout_references) bshell_dids, 
