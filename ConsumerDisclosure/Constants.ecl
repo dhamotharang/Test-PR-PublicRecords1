@@ -1,6 +1,7 @@
 ﻿EXPORT Constants :=
 MODULE
 
+	// below limits are defined here due to requirement of this service to return ALL payload records for subject
   EXPORT Limits :=
   MODULE
 		EXPORT UNSIGNED2 MaxATFPerDID 		 	 := 200; // atf_services.constants.MAX_RECS_PER_ATF_ID
@@ -11,6 +12,12 @@ MODULE
     EXPORT UNSIGNED2 MaxBKParties        := 200;
     EXPORT UNSIGNED1 MaxBankruptcyPerDID := 1000; 
     EXPORT UNSIGNED2 MaxCCWPerDID     	 := 50;   // ut.limits.CCW_PER_DID
+    EXPORT UNSIGNED2 MaxCrimOffendersPerDID := 10000;   
+    EXPORT UNSIGNED2 MaxCrimOffendersPerOFK := 4000;   
+    EXPORT UNSIGNED2 MaxCrimEvents       := 5000;   
+    EXPORT UNSIGNED2 MaxCrimOffenses     := 500;   
+    EXPORT UNSIGNED2 MaxCrimPunishments  := 200;   
+    EXPORT UNSIGNED2 MaxCrimCourtOffenses := 2000;   
     EXPORT UNSIGNED2 MaxDeathPerDID 		 := 100;
 		EXPORT UNSIGNED2 MaxEmailPerDID      := 100; 
     EXPORT UNSIGNED2 MaxGongPerDID 		 	 := 100;    
@@ -26,6 +33,7 @@ MODULE
     EXPORT UNSIGNED2 MaxProfLicensePerDID:= 100;
     EXPORT UNSIGNED2 MaxPropPerDID       := 1000;  // 88 LexIds have above 10K ffids, with 7 lexids above 40K ffids
     EXPORT UNSIGNED2 MaxPropPerFID       := 100;
+    EXPORT UNSIGNED2 MaxPropPartiesPerFID := 100;
 		EXPORT UNSIGNED2 MaxStudentPerDID    := 100; 
 		EXPORT UNSIGNED2 MaxSOffenderPerDID  := 100; //SexOffender_Services.Constants.MAX_RECS_PERDID
 		EXPORT UNSIGNED2 MaxSOPerSSPK        := 200; 

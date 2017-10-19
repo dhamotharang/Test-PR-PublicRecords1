@@ -1,4 +1,4 @@
-IMPORT SALT33,ut,std;
+﻿IMPORT SALT33,ut,std;
 EXPORT Key_BizHead_L_CONTACT_DID := MODULE
  
 //contact_did
@@ -115,3 +115,4 @@ IMPORT SALT33,BizLinkFull;
 #END
 ENDMACRO;
 END;
+

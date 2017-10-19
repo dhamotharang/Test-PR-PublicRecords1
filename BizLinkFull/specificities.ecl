@@ -1,4 +1,4 @@
-IMPORT ut,SALT33;
+﻿IMPORT ut,SALT33;
 EXPORT specificities(DATASET(layout_BizHead) ih) := MODULE
  
 EXPORT ih_init := SALT33.initNullIDs.baseLevel(ih,rcid,proxid);
@@ -988,3 +988,4 @@ EXPORT SpcShift := TABLE(Specificities,SpcShiftR);
 EXPORT AllProfiles := parent_proxid_specificity_profile + sele_proxid_specificity_profile + org_proxid_specificity_profile + ultimate_proxid_specificity_profile + source_specificity_profile + source_record_id_specificity_profile + company_name_specificity_profile + company_name_prefix_specificity_profile + cnp_name_specificity_profile + cnp_number_specificity_profile + cnp_btype_specificity_profile + cnp_lowv_specificity_profile + company_phone_3_specificity_profile + company_phone_3_ex_specificity_profile + company_phone_7_specificity_profile + company_fein_specificity_profile + company_sic_code1_specificity_profile + prim_range_specificity_profile + prim_name_specificity_profile + sec_range_specificity_profile + city_specificity_profile + city_clean_specificity_profile + st_specificity_profile + zip_specificity_profile + company_url_specificity_profile + isContact_specificity_profile + contact_did_specificity_profile + title_specificity_profile + fname_specificity_profile + fname_preferred_specificity_profile + mname_specificity_profile + lname_specificity_profile + name_suffix_specificity_profile + contact_ssn_specificity_profile + contact_email_specificity_profile + sele_flag_specificity_profile + org_flag_specificity_profile + ult_flag_specificity_profile + fallback_value_specificity_profile;
 END;
  
+

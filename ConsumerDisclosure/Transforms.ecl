@@ -52,6 +52,49 @@ EXPORT Transforms := MODULE
 		SELF.GroupBy.tmsid := l.tmsid;
 	END;
 	
+//----------Criminal-------------
+	iesp.fcradataservice.t_FcraDataServiceCriminalOffenderData xfOffenders(
+										ConsumerDisclosure.RawCriminal.offender_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	iesp.fcradataservice.t_FcraDataServiceCriminalOffenseData xfOffenses(
+											ConsumerDisclosure.RawCriminal.offense_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	iesp.fcradataservice.t_FcraDataServiceCriminalCourtOffenseData xfCourtOffenses(
+											ConsumerDisclosure.RawCriminal.court_offense_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	iesp.fcradataservice.t_FcraDataServiceCriminalActivityData xfActivities(
+											ConsumerDisclosure.RawCriminal.activity_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	iesp.fcradataservice.t_FcraDataServiceCriminalPunishmentData xfPunishment(
+											ConsumerDisclosure.RawCriminal.punishment_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	EXPORT iesp.fcradataservice.t_FcraDataServiceCriminalData xformCriminalData(
+																				ConsumerDisclosure.RawCriminal.criminal_rec_out l) 
+	:= TRANSFORM
+		SELF.Offenders := PROJECT(l.Offenders, xfOffenders(LEFT));
+		SELF.OffendersPlus := PROJECT(l.OffenderPlus, xfOffenders(LEFT));
+		SELF.Offenses := PROJECT(l.Offenses, xfOffenses(LEFT));
+		SELF.CourtOffenses := PROJECT(l.CourtOffenses, xfCourtOffenses(LEFT));
+		SELF.Activity := PROJECT(l.Activities, xfActivities(LEFT));
+		SELF.Punishment := PROJECT(l.Punishments, xfPunishment(LEFT));
+		SELF.GroupBy.offender_key := l.offender_key;
+	END;
+	
 //----------Marriage-Divorce-------------
 	iesp.fcradataservice.t_FcraDataServiceMarriageDivMainData xfMDMain(
 										ConsumerDisclosure.RawMarriageDivorce.MD_main_out rec) := TRANSFORM
@@ -92,6 +135,57 @@ EXPORT Transforms := MODULE
 		SELF.Certificate := PROJECT(l.Certificate, xfPilotCert(LEFT));
 		SELF.Registration := PROJECT(l.Registration, xfPilotReg(LEFT));
 		SELF.GroupBy.unique_id := l.unique_id;
+	END;
+	
+	//----------Property-------------
+	iesp.fcradataservice.t_FcraDataServicePropertyAssessmentData xfPropAssessment(
+										ConsumerDisclosure.RawProperty.assessment_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec.RawData;
+		SELF.AddlLegalDescription := rec.AddlLegalDescription;
+	END;
+	
+	iesp.fcradataservice.t_FcraDataServicePropertyDeedData xfPropDeed(
+											ConsumerDisclosure.RawProperty.deed_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec.RawData;
+		SELF.AdditionalNames := PROJECT(rec.AdditionalNames, iesp.fcradataservice_raw.t_FcraDataServiceRawPropertyAddlNames);
+	END;
+	
+	iesp.fcradataservice.t_FcraDataServicePropertySearchData xfPropSearch(
+											ConsumerDisclosure.RawProperty.property_search_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	EXPORT iesp.fcradataservice.t_FcraDataServicePropertyData xformPropertyData(
+																				ConsumerDisclosure.RawProperty.property_out l) 
+	:= TRANSFORM
+		SELF.Assessment := PROJECT(l.Assessment, xfPropAssessment(LEFT));
+		SELF.Deed := PROJECT(l.Deed, xfPropDeed(LEFT));
+		SELF.Search := PROJECT(l.Search, xfPropSearch(LEFT));
+		SELF.GroupBy.ln_fares_id := l.ln_fares_id;
+	END;
+	
+//----------SexOffenders-------------
+	iesp.fcradataservice.t_FcraDataServiceSOffenderMainData xformSOffenders(
+										ConsumerDisclosure.RawOffender.so_offender_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	iesp.fcradataservice.t_FcraDataServiceSOffenseData xformSOffenses(
+											ConsumerDisclosure.RawOffender.so_offense_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	EXPORT iesp.fcradataservice.t_FcraDataServiceSOData xformSexOffenderData(
+																				ConsumerDisclosure.RawOffender.SO_out l) 
+	:= TRANSFORM
+		SELF.Main := PROJECT(l.Offenders, xformSOffenders(LEFT));
+		SELF.Offenses := PROJECT(l.Offenses, xformSOffenses(LEFT));
+		SELF.GroupBy.seisint_primary_key := l.seisint_primary_key;
 	END;
 	
 //----------UCC-------------

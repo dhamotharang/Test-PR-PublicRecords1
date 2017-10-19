@@ -1,4 +1,4 @@
-﻿EXPORT Layout_Infiles_Fixed := MODULE
+﻿EXPORT Layout_Infiles_Fixed := MODULE 
 	EXPORT agency_cmbnd := RECORD
 		STRING11   Agency_ori;
 		STRING3    Agency_State_Abbr;
@@ -439,13 +439,14 @@
 		STRING20 ReportLinkID; 
 		STRING3 Page_Count;
 		STRING1 is_delete;
+		STRING8 last_update_date;
 		STRING3 Contrib_source;
 	END;
 
 	EXPORT persn := RECORD
 		STRING11 Person_ID;
 		STRING19 Creation_Date;
-		STRING9 Incident_ID;
+		STRING11 Incident_ID;
 		STRING3 Person_Number;
 		STRING8 Sex;
 		STRING100 Person_Type;
@@ -602,7 +603,7 @@
 	EXPORT vehicl := RECORD
 		STRING11 Vehicle_ID;
 		STRING19 Creation_Date;
-		STRING9 Incident_ID;
+		STRING11 Incident_ID;
 		STRING30 VIN;
 		STRING5 VIN_Status;
 		STRING20 Damaged_Areas_Derived1;
@@ -1615,7 +1616,7 @@
 	END;
 	EXPORT property_damage := RECORD
 		STRING11 Property_Damage_ID;
-		STRING9 Incident_ID;
+		STRING11 Incident_ID;
 		STRING200 damage_description;
 		STRING7 damage_estimate;
 		STRING200 property_owner_name;

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Wheel_city_clean_Service">
 <part name="prefix" type="xsd:string"/>
 <part name="count" type="xsd:integer"/>
@@ -13,3 +13,4 @@ EXPORT Wheel_city_clean_Service() := FUNCTION
     results := BizLinkFull.Wheel.Fetch_city_clean(SALT33.StringToUppercase(Input_prefix), Input_count, Input_WheelThreshold);
     RETURN OUTPUT(results);
 END;
+

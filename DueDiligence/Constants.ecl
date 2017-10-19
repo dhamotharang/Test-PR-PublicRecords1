@@ -1,9 +1,15 @@
-﻿IMPORT MDR;
+﻿IMPORT MDR, risk_indicators;
 
 EXPORT Constants := MODULE
 
 
 EXPORT VERSION_3 := 3;
+
+/*  Use position 3 through 5 to build the 3 digit county from the 5 digit FIPS code    */  
+EXPORT FIRST_POS := 3;                 
+EXPORT LAST_POS  := 5;  
+
+EXPORT MAX_ATMOST := 1000;             /* The maximum number of records we care to use in an ATMOST within a JOIN. */
 
 EXPORT IND_REQ_ATTRIBUTE_V3 := 'DDAINDV3';
 EXPORT BUS_REQ_ATTRIBUTE_V3 := 'DDABUSV3';
@@ -25,6 +31,9 @@ EXPORT VALIDATION_INVALID_DPPA := 'Not an allowable DPPA permissible purpose';
 EXPORT DEFAULT_DPPA := 3;
 EXPORT DEFAULT_GLBA := 5;
 
+EXPORT EMPTY := '';
+
+EXPORT PO_ADDRESS_EXPRESSION := '((P[\\s\\.]*O[\\.\\s]*)|(POST[\\s]*OFFICE[\\s]*))+BOX';  //find reference to po box or post office box
 
 // NOTE: when calling these macros (mac_ListTop*), you will need to add a "#expand(...)" before the actual
 // fully qualified macro name or it will sort/dedup/group on the full string below 
@@ -33,8 +42,12 @@ EXPORT mac_ListTop3Linkids := MACRO
     'Busn_info.BIP_IDS.UltID.LinkID, Busn_info.BIP_IDS.OrgID.LinkID, Busn_info.BIP_IDS.SeleID.LinkID'
 ENDMACRO;
 
-
+EXPORT NUMERIC_VALUES := '0123456789';
 EXPORT date8Nines := 99999999;
+EXPORT MIN_ADDRESS_SCORE := 70;
+EXPORT MAX_ADDRESS_SCORE := 100;
+
+EXPORT HighCrimeValue := 140;                 //  High = 140 or more,   Avg = 60 - 139,  Low = 1 - 59
 
 EXPORT Owned_Property_code := 'OP'; 
 EXPORT Sold_Property_code  := 'SP';
@@ -43,7 +56,31 @@ EXPORT INQUIRED_BUSINESS_DEGREE := 'IB';
 EXPORT INQUIRED_BUSINESS_EXEC_DEGREE := 'IE';
 EXPORT LINKED_BUSINESS_DEGREE := 'LB';
 EXPORT LINKED_BUSINESS_EXEC_DEGREE := 'LE';
+EXPORT REGISTERED_AGENT := 'RA';
 EXPORT RELATED_BUSINESS_DEGREE := 'RB';
+
+EXPORT EXECUTIVE_TITLES := ['ATTORNEY', 'BOARD MEMBER', 'CHAIRMAN', 'CHIEF EXECUTIVE OFFICER', 'CHIEF EXECUTIVE OFFICER, DIRECTOR', 
+														'CHIEF EXECUTIVE OFFICER, PRESIDENT', 'CHIEF FINANCIAL OFFICER', 'CHIEF FINANCIAL OFFICER, SR VICE PRESIDENT', 
+														'CHIEF INFORMATION OFFICER', 'CHIEF MARKETING OFFICER', 'CHIEF OPERATING OFFICER', 'CHIEF PURCHASING OFFICER', 
+														'CHIEF TECHNOLOGY OFFICER', 'COMPTROLLER', 'CONTROLLER', 'DIRECTOR', 'DIRECTOR, EXECUTIVE VICE PRESIDENT', 
+														'EXECUTIVE', 'EXECUTIVE - FINANCE', 'EXECUTIVE - HUMAN RESOURCE', 'EXECUTIVE -MARKETING', 'EXECUTIVE DIRECTOR', 
+														'EXECUTIVE VICE PRESIDENT', 'EXECUTIVE VICE PRESIDENT, CHIEF FINANCIAL OFFICER', 'EXECUTIVE VICE PRESIDENT, DIRECTOR', 
+														'EXECUTIVE VICE PRESIDENT, SECRETARY', 'EXECUTIVE VICE PRESIDENT, SECRETARY, DIRECTOR', 'EXECUTIVE VICE PRESIDENT, SECRETARY, TREASURER', 
+														'EXECUTIVE VICE PRESIDENT, SECRETARY, TREASURER, DIRECTOR', 'EXECUTIVE VICE PRESIDENT, TREASURER', 
+														'EXECUTIVE VICE PRESIDENT, TREASURER, DIRECTOR', 'FOUNDER', 'GENERAL COUNSEL', 'GENERAL MANAGER', 'GENERAL PARTNER', 'IT DIRECTOR', 
+														'IT EXECUTIVE', 'MANAGER', 'MANAGER, MEMBER', 'MANAGING DIRECTOR', 'MANAGING MEMBER', 'MANAGING PARTNER', 'MEDICAL DIRECTOR', 
+														'MEMBER', 'OFFICER', 'OFFICER, DIRECTOR', 'OWNER', 'PARTNER', 'PRESDIENT, CHIEF EXECUTIVE OFFICER', 'PRESIDENT', 
+														'PRESIDENT, CHIEF OPERATING OFFICER', 'PRESIDENT, DIRECTOR', 'PRESIDENT, EXECUTIVE VICE PRESIDENT', 'PRESIDENT, SECRETARY', 
+														'PRESIDENT, SECRETARY, DIRECTOR', 'PRESIDENT, SECRETARY, TREASURER', 'PRESIDENT, SECRETARY, TREASURER, DIRECTOR', 
+														'PRESIDENT, TREASURER', 'PRESIDENT, TREASURER, DIRECTOR', 'PRESIDENT, VICE PRESIDENT', 'PRESIDENT, VICE PRESIDENT, DIRECTOR', 
+														'PRESIDENT, VICE PRESIDENT, SECRETARY', 'PRESIDENT, VICE PRESIDENT, SECRETARY, DIRECTOR', 
+														'PRESIDENT, VICE PRESIDENT, SECRETARY, TREASURER', 'PRESIDENT, VICE PRESIDENT, SECRETARY, TREASURER, DIRECTOR', 
+														'PRESIDENT, VICE PRESIDENT, TREASURER', 'PRESIDENT, VICE PRESIDENT, TREASURER, DIRECTOR', 'PRINCIPAL', 'REGIONAL MANAGER', 
+														'SECRETARY, DIRECTOR', 'SECRETARY, TREASURER', 'SECRETARY, TREASURER, DIRECTOR', 'SR VICE PRESIDENT', 
+														'SR VICE PRESIDENT, GENERAL COUNSEL', 'TREASURER', 'TREASURER, DIRECTOR', 'VICE CHAIRMAN', 'VICE PRESIDENT', 
+														'VICE PRESIDENT, COMPTROLLER', 'VICE PRESIDENT, DIRECTOR', 'VICE PRESIDENT, GENERAL COUNSEL', 'VICE PRESIDENT, SECRETARY', 
+														'VICE PRESIDENT, SECRETARY, DIRECTOR', 'VICE PRESIDENT, SECRETARY, TREASURER', 'VICE PRESIDENT, SECRETARY, TREASURER, DIRECTOR', 
+														'VICE PRESIDENT, TREASURER', 'VICE PRESIDENT, TREASURER, DIRECTOR'];
 
 EXPORT CORP_STATUS_ACTIVE := 'A';
 EXPORT CORP_STATUS_INACTIVE := 'I';
@@ -53,7 +90,6 @@ EXPORT CORP_STATUS_SUSPEND := 'S';
 EXPORT COPR_STATUS_OTHER := 'O';
 
 EXPORT CONTACT_TYPE_CONTACT := 'T';
-EXPORT CONTACT_TYPE_REGISTERED_AGENT := 'G';
 
 //Company Types
 EXPORT CMPTYP_TRUST := 'TRUST';
@@ -70,8 +106,10 @@ EXPORT CMPTYP_LIMITED_PARTNERSHIP := 'LIMITED PARTNERSHIP';
 EXPORT CMPTYP_LIMITED_LIABILITY_CORP := 'LIMITED LIABILITY CORPORATION';
 EXPORT CMPTYP_LIMITED_LIABILITY_PARTNERSHIP := 'LIMITED LIABILITY PARTNERSHIP';
 
-EXPORT CREDIT_SOURCES := ['ER', 'Q3', 'DN', 'RR']; 
-EXPORT BUS_SHELL_SOURCES := ['BM', 'Y', 'W', 'GB', 'GG', 'UT'];
+EXPORT EXCLUDE_SOURCES := [MDR.SourceTools.src_Dunn_Bradstreet]; //['D']
+
+EXPORT CREDIT_SOURCES := [MDR.SourceTools.src_EBR, MDR.SourceTools.src_Experian_CRDB, MDR.SourceTools.src_Cortera];  //['ER', 'Q3', 'RR']
+EXPORT BUS_SHELL_SOURCES := [MDR.SourceTools.src_BBB_Member, MDR.SourceTools.src_Yellow_Pages, MDR.SourceTools.src_Gong_Business, MDR.SourceTools.src_Gong_Government, MDR.SourceTools.src_Utilities];  //['BM', 'Y', 'GB', 'GG', 'UT']
 
 EXPORT SOURCE_BUSINESS_REGISTRATION := MDR.SourceTools.src_Business_Registration;
 EXPORT SOURCE_BUSINESS_CORP := 'SOS';
@@ -210,32 +248,16 @@ EXPORT AUTO_SIC := ['7539', '7538', '7537', '7532', '5731',
  export string1 VEH_LESSEE			:= '5';
  export string1 VEH_LIENHOLDER  := '7';
 	 
-	 
+//Incorporated in a loose state
+EXPORT STATES_WITH_LOOSE_INCORPORATION_LAWS := ['DE','NV','WY'];		
+
+EXPORT CMRA_SIC_CODES :=  risk_indicators.iid_constants.setCRMA;
 											
 											
-											
-											
-											
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//BELOW is currently not being used/called - help to clean/maintain what in our constatnts
-
+   											
+//High Intensity Financial Crime Area (HIFCA) by FIPS code 
+//The FIPS county code is a five-digit Federal Information Processing Standards (FIPS) code (FIPS 6-4) 
+//which uniquely identifies counties and county equivalents in the United States,
 EXPORT setHIFCA := [
 										// California Northern District	
 										'06001','06013','06015','06023','06033','06041','06045','06053',
@@ -245,7 +267,7 @@ EXPORT setHIFCA := [
 										// Southwest Border - Arizona
 										'48043','48047','48061','48105','48109','48127','48131','48137',
 										'48141','48215','48229','48243','48247','48261','48271','48283',
-										'48323','48311','48371','48377','48389','48427','48435','48443',
+										'48323','48371','48377','48389','48427','48435','48443',
 										'48463','48465','48479','48489','48505','48507',
 										// Arizona
 										'04001','04003','04005','04007','04009','04011','04012','04013',
@@ -282,6 +304,9 @@ EXPORT setHIFCA := [
 										'12011','12061','12085','12086','12087','12093','12099','12111'
 										];	
 
+
+ 
+//High Intensity Drug Trafficking Areas (HIDTA) 
 EXPORT setHIDTA := [
 										//Gulf Coast HIDTA Alabama		
 										'01003','01073','01089','01097','01101','01103',	
@@ -313,6 +338,8 @@ EXPORT setHIDTA := [
 										'12089','12107','12109',	
 										//South Florida HIDTA 	
 										'12011','12086','12087','12099',	
+										//Gulf Coast HIDTA Florida                                                     
+										'12033','12113', 
 										//Atlanta HIDTA 	
 										'13013','13015','13057','13063','13067','13089','13097','13113',	
 										'13117','13121','13135','13151',	
@@ -321,12 +348,14 @@ EXPORT setHIDTA := [
 										//Chicago HIDTA 	
 										'17031','17063','17093','17197',	
 										//Lake County HIDTA 	
-										'18089','18127',	
+										'18089','18091','18097','18127',	
 										//Midwest HIDTA Iowa	
 										'19013','19113','19127','19139','19153','19155','19163','19193',	
 										//Midwest HIDTA Kansas	
 										'20009','20021','20037','20055','20059','20091','20099','20103',	
-										'20121','20169','20173','20175','20177','20209',	
+										'20121','20169','20173','20175','20177','20209',
+										//Ohio HIDTA Kentucky	
+										'21015','21037','21117',  
 										//Appalachia HIDTA 	
 										'21001','21013','21025','21051','21053','21057','21071','21095',	
 										'21109','21119','21121','21125','21129','21131','21133','21153',	
@@ -337,11 +366,15 @@ EXPORT setHIDTA := [
 										//New England HIDTA Maine	
 										'23005',	
 										//Wash/Baltimore HIDTA  *** The spread sheet has Prince Georges as a county name (notice the end quote).  Needed to be changed to regular single quote to work.  	
-										'24003','24005','24510','24017','24025','24027','24031','24033',	
+										'24003','24005','24013','24017','24025','24027','24031','24033','24043','24510',
+										//Wash/Baltimore HIDTA Virginia
+										'51069','51640',                                               //Notice 51640 is for Independent City of GALAX
+										//Wash/Baltimore HIDTA West Virginia
+										'54037',
 										//New England HIDTA Massachusetts	
-										'25009','25013','25017','25023','25025','25027',	
+										'25005','25009','25013','25017','25023','25025','25027',	
 										//Michigan HIDTA 	
-										'26005','26049','26077','26081','26099','26125','26145','26159',	
+										'26005','26049','26077','26081','26099','26121','26125','26145','26159',	
 										'26161','26163',	
 										//Gulf Coast HIDTA Mississippi	
 										'28045','28047','28049','28059','28071','28089','28121',	
@@ -359,15 +392,15 @@ EXPORT setHIDTA := [
 										//New England HIDTA New Hampshire	
 										'33011',	
 										//NY/NJ HIDTA New Jersey	
-										'34003','34013','34017','34021','34023','34031','34039',	
+										'34003','34013','34017','34021','34023','34025','34031','34039',	
 										//Philly/Camden HIDTA New Jersey	
 										'34007',	
 										//SW Border-NM Region 	
 										'35001','35005','35013','35015','35017','35023','35025','35027',
 										'35029','35035','35039','35045','35045','35049','35057','35061',	
 										//NY/NJ HIDTA New York	
-										'36001','36005','36019','36029','36033','36045','36047','36055',	
-										'36059','36059','36067','36071','36081','36085','36089','36103',	
+										'36001','36005','36007','36019','36029','36033','36045','36047','36055',	
+										'36059','36059','36063','36067','36071','36081','36085','36089','36103','36111',	
 										'36119',	
 										//Atlanta HIDTA North Carolina	
 										'37001','37021','37063','37071','37081','37089','37101','37111',	
@@ -375,12 +408,12 @@ EXPORT setHIDTA := [
 										//Midwest HIDTA North Dakota	
 										'38015','38017','38035','38059','38071','38077','38099','38101',	
 										//Ohio HIDTA	
-										'39035','39045','39049','39057','39061','39095','39099','39113',	
+										'39035','39045','39049','39057','39061','39093','39095','39099','39113',	
 										'39151','39153','39165',	
 										//North Texas HIDTA Oklahoma	
-										'40027','40031','40101','40109','40135','40143',	
+										'40027','40031','40091','40101','40109','40121','40135','40143',	
 										//Oregon HIDTA  ***Warm Springs Reservation is not a valid county in our Fips2County file, nor is it listed in Wikipedia's list of counties for Oregon. Is the spread sheet incorrect?',	
-										'41005','41017','41019','41029','41039','41047','41051','41059',	
+										'41005','41017','41019','41029','41039','41043','41047','41051','41059',	
 										'41067',	
 										//Philly/Camden HIDTA Philadelphia	
 										'42029','42045','42101',	
@@ -392,10 +425,10 @@ EXPORT setHIDTA := [
 										'46005','46011','46013','46027','46029','46033','46081','46083',
 										'46093','46099','46103','46127','46135',	
 										//Appalachia HIDTA Tennessee	
-										'47007','47013','47025','47027','47029','47035','47049','47051',	
+										'47007', '47009','47013','47025','47027','47029','47035','47049','47051',	
 										'47057','47059','47061','47063','47065','47073','47087','47089',
 										'47093','47111','47115','47133','47137','47141','47143','47145',	
-										'47151','47153','47155','47171','47179','47185',	
+										'47151','47153','47155','47171','47179','47185', 	
 										//Atlanta HIDTA Tennessee	
 										'47157',	
 										//Houston HIDTA  ***Note - Spread sheet had 'Kennedy' as one of the counties here, but is actually 'Kenedy' in our file',	
@@ -417,6 +450,8 @@ EXPORT setHIDTA := [
 										'49011','49035','49043','49049','49053','49057',	
 										//New England HIDTA Vermont	
 										'50007',	
+										//Appalachia HIDTA Virginia
+										'51035','51077','51155','51197',
 										//Wash/Baltimore HIDTA Virginia  *** the spread sheet had 'Loudon' but our file has 'Loudoun'.  Also 'City of Richmond' is actually just 'Richmond' in our file.',	
 										'51510','51013','51041','51059','51600','51610','51085','51087',	
 										'51670','51107','51683','51685','51730','51149','51153','51159',	
@@ -425,9 +460,11 @@ EXPORT setHIDTA := [
 										'53057','53061','53063','53067','53073','53077',
 										//Appalachia HIDTA West Virginia	
 										'54005','54011','54039','54043','54045','54053','54047','54055',	
-										'54059','54079','54099',	
+										'54059','54061','54079','54099',
 										//Milwaukee HIDTA	
-										'55009','55025','55059','55079','55101','55105','55133',	
+										'55009','55025','55059','55079','55101','55105','55133',
+										//Wisconsin HIDTA Minnesota
+										'27003','27037','27053','27123','27163',  
 										//Rocky Mountain HIDTA Wyoming	
 										'56001','56005','56021','56025','56037','56041'
 										];		
@@ -920,7 +957,9 @@ EXPORT CountyForeignJurisdic := [
 																		'48323','48377','48427','48443','48465','48479','48505','50001','50009','50011',
 																		'50013','50019','53019','53047','53051','53065','53073'];
 																		
-EXPORT CountyBordersOceanForgJur		:= [ '02180','12087','12086'];
+
+//***County Borders Ocean and within 150 miles of Foreign
+EXPORT CountyBordersOceanForgJur		:= [ '02180','12011','12061','12085','12086','12087','12099','12111','48057','48239','48273','48355','48409','48007','48391','48489'];
 																	
 																	// '01003','01097','02013','02016','02050','02060','02070','02122','02150','02164',
 																	// '02180','02185','02188','02201','02220','02232','02261','02270','06015','06023',

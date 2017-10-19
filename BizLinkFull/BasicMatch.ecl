@@ -1,4 +1,4 @@
-IMPORT SALT33,ut;
+﻿IMPORT SALT33,ut;
 EXPORT BasicMatch(DATASET(layout_BizHead) ih) := MODULE// An extremely tight pre-match designed to quickly eliminate high volume duplicates
  
 SHARED  h00 := Specificities(ih).input_file;
@@ -28,3 +28,4 @@ EXPORT input_file := o1 : INDEPENDENT;
 EXPORT basic_match_count := COUNT(PickOne);
 EXPORT id_delta := COUNT(DEDUP(h00,proxid,ALL))-COUNT(DEDUP(input_file,proxid,ALL)); // Should equal basic_match_count
 END;
+

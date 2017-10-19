@@ -1,4 +1,4 @@
-IMPORT SALT33,ut,std;
+﻿IMPORT SALT33,ut,std;
 EXPORT Key_BizHead_L_SIC := MODULE
  
 //company_sic_code1:zip:?:cnp_name:prim_name
@@ -173,3 +173,4 @@ IMPORT SALT33,BizLinkFull;
 #END
 ENDMACRO;
 END;
+
