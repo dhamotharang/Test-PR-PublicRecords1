@@ -1,4 +1,4 @@
-//export MAC_Spray_And_Build(sourceIP,sourceFile,filedate,recsize = '4235',doscore = 'false', group_name='\'thor400_60\'') := macro
+﻿//export MAC_Spray_And_Build(sourceIP,sourceFile,filedate,recsize = '4235',doscore = 'false', group_name='\'thor400_60\'') := macro
 
 export MAC_Spray_And_Build(filedate,recsize = '4235',doscore = 'false', group_name='\'thor400_44\'') := macro
 
@@ -72,7 +72,7 @@ fieldstats.mac_stat_file(%inf%,%stats%,'patriot',50,6,false,
 Patriot.Out_Patriot_File_Stats_Population(filedate,strata_output)
 
 // Update DOPS page
-%do9% := RoxieKeyBuild.updateversion('PatriotKeys',filedate,'kgummadi@seisint.com',,'N');
+%do9% := dops.updateversion('PatriotKeys',filedate,'kgummadi@seisint.com',,'N');
 
 //Create Orbit Entry
 %do10% := Orbit3.proc_Orbit3_CreateBuild('Patriot Act',filedate);
