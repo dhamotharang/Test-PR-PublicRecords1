@@ -1,4 +1,4 @@
-import ut,dops,header,std;
+﻿import ut,dops,header,std;
 #workunit('name','Start Watchdog build with New Header');
  
 ECL1(string wtype) := 
@@ -58,18 +58,18 @@ statusemail := FileServices.sendemail('sudhir.kasavajjala@lexisnexis.com,michael
 ds := dataset('~thor_data400::watchdog::newheader_version',{string wtype,string hdr_version,boolean ishdrnew,string issubmitted,string iscompleted},thor,opt);
 
 
-LaunchJobs := map(    count(ds(wtype = 'glb' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y' )) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('nonglb'), 'thor400_60')),
-                     count(ds(wtype = 'nonglb' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y' )) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('glb_nonen'), 'thor400_60')) ,
-										 count(ds(wtype = 'glb_nonen' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('glb_noneq'), 'thor400_60')) ,
-                     count(ds(wtype = 'glb_noneq' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('glb_nonen_noneq'), 'thor400_60')) ,
-                     count(ds(wtype = 'glb_nonen_noneq' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('nonglb_nonutility'), 'thor400_60')) ,
-                     count(ds(wtype = 'nonglb_nonutility' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('nonutility'), 'thor400_60')) ,
-                     count(ds(wtype = 'nonutility' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('nonglb_noneq'), 'thor400_60')) ,
-                     count(ds(wtype = 'nonglb_noneq' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL2('fcra_best_nonEN'), 'thor400_60')) ,
-										 count(ds(wtype = 'fcra_best_nonEN' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL2('fcra_best_nonEQ'), 'thor400_60')) ,
-										 count(ds(wtype = 'fcra_best_nonEQ' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('supplemental'), 'thor400_60')) ,
-                     count(ds(wtype = 'supplemental' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL3, 'thor400_60')) ,
-                     count(ds(wtype = 'fcra_best_nonEQ' and hdr_version = build_date and ishdrnew = true and issubmitted = 'N' and iscompleted = 'N')) = 1  => Sequential(header.fSubmitNewWorkunit(ECL1('glb'), 'thor400_60')) ,
+LaunchJobs := map(    count(ds(wtype = 'glb' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y' )) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('nonglb'), 'thor400_44')),
+                     count(ds(wtype = 'nonglb' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y' )) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('glb_nonen'), 'thor400_44')) ,
+										 count(ds(wtype = 'glb_nonen' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('glb_noneq'), 'thor400_44')) ,
+                     count(ds(wtype = 'glb_noneq' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('glb_nonen_noneq'), 'thor400_44')) ,
+                     count(ds(wtype = 'glb_nonen_noneq' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('nonglb_nonutility'), 'thor400_44')) ,
+                     count(ds(wtype = 'nonglb_nonutility' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('nonutility'), 'thor400_44')) ,
+                     count(ds(wtype = 'nonutility' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('nonglb_noneq'), 'thor400_44')) ,
+                     count(ds(wtype = 'nonglb_noneq' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL2('fcra_best_nonEN'), 'thor400_44')) ,
+										 count(ds(wtype = 'fcra_best_nonEN' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL2('fcra_best_nonEQ'), 'thor400_44')) ,
+										 count(ds(wtype = 'fcra_best_nonEQ' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL1('supplemental'), 'thor400_44')) ,
+                     count(ds(wtype = 'supplemental' and hdr_version = build_date and ishdrnew = true and issubmitted = 'Y' and iscompleted = 'Y')) = 1 => Sequential(header.fSubmitNewWorkunit(ECL3, 'thor400_44')) ,
+                     count(ds(wtype = 'fcra_best_nonEQ' and hdr_version = build_date and ishdrnew = true and issubmitted = 'N' and iscompleted = 'N')) = 1  => Sequential(header.fSubmitNewWorkunit(ECL1('glb'), 'thor400_44')) ,
 										 
 										 Output('No Job scheduled')
                      );
