@@ -1,4 +1,6 @@
-﻿export Suppress_TMSID := ['SA1011035200503291973741500',
+﻿  import dops;
+  export Suppress_TMSID := dops.SuppressID('liens').GetIDsAsSet();
+/*export Suppress_TMSID := ['SA1011035200503291973741500',
 																				 'HG95R42298031946FLDADC1',
 																				 'SA101103519960509000865726399653',
 																				 'HG97CC070529125000MOBOOD1',
@@ -8009,4 +8011,4 @@
 'HG0901000576520112530MDHARD1',
 'HG027GV15000973001421VABUCD1',
 'HG200422675599529HIHONC1'
-];																																																																																																																					
+];*/																																																																																																																	
