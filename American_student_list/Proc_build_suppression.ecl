@@ -1,5 +1,5 @@
 ﻿IMPORT ut, PromoteSupers, _control, VersionControl;
-EXPORT Proc_build_suppression(STRING filedate, STRING filename='*SUPP*.TXT') := FUNCTION
+EXPORT Proc_build_suppression(STRING filedate, STRING filename='AS*SUPP*.TXT') := FUNCTION
 
 	server_dir := '/data/data_build_1/american_student/data/';
 	server_group := VersionControl.GroupName('44');
