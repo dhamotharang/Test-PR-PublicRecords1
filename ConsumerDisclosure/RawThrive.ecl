@@ -1,28 +1,27 @@
 ﻿IMPORT doxie, FCRA, FFD, Thrive, ConsumerDisclosure, MDR,STD,UT;
+
+layout_thrive_raw := RECORD(Thrive.layouts.baseOld)  //recordof(Thrive.keys().did_fcra.qa)
+END;
+
+layout_thrive_rawrec := RECORD(layout_thrive_raw)
+		ConsumerDisclosure.Layouts.InternalMetadata;
+END;
+	
+
 EXPORT RawThrive := MODULE
 
-	SHARED Thrive_raw := RECORD(Thrive.layouts.baseOld)
+	EXPORT layout_thrive_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_thrive_raw;
 	END;
 
-	SHARED Thrive_rawrec := RECORD(Thrive_raw)
-		ConsumerDisclosure.Layouts.InternalMetadata;
-	END;
-	
-	EXPORT Thrive_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		Thrive_raw;
-	END;
-
-	EXPORT DateIsOk (STRING8 _date, STRING8 _today) := ut.DaysApart(_date, _today) < ut.DaysInNYears(7);
-	
 	EXPORT GetData(DATASET(doxie.layout_references) in_dids,
 								DATASET (fcra.Layout_override_flag) flag_file,
-								DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,														 
+								DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs,														 
 							  ConsumerDisclosure.IParams.IParam in_mod) := 
 	FUNCTION
 
 		BOOLEAN showDisputedRecords := in_mod.ReturnDisputed;
-	
-		today := (STRING8)Std.Date.Today();
+		todaysdate := (STRING8) STD.Date.Today();
 		
 		pc_flags := slim_pc_recs(datagroup = FFD.Constants.DataGroups.THRIVE);
 		all_flags := flag_file(file_id = FCRA.FILE_ID.THRIVE);
@@ -30,7 +29,7 @@ EXPORT RawThrive := MODULE
 		flag_recs := 
 			JOIN(all_flags, FCRA.Key_Override_Thrive_ffid.thrive, 
 				KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-				TRANSFORM(Thrive_rawrec,
+				TRANSFORM(layout_thrive_rawrec,
 					is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 					SELF.compliance_flags.isOverride := is_override;
 					SELF.compliance_flags.isSuppressed := ~is_override;
@@ -50,7 +49,7 @@ EXPORT RawThrive := MODULE
 
 		main_recs := JOIN(in_dids, Thrive.keys().did_fcra.qa,
 													KEYED(LEFT.did = RIGHT.did),
- 													TRANSFORM(Thrive_rawrec,
+ 													TRANSFORM(layout_thrive_rawrec,
 																		SELF.compliance_flags.IsOverwritten :=
 																			(RIGHT.persistent_record_id<>'' AND (STRING)RIGHT.persistent_record_id IN override_ids), 
 																		SELF.compliance_flags.IsSuppressed :=
@@ -69,10 +68,10 @@ EXPORT RawThrive := MODULE
 			in_mod.ReturnOverwritten or ~compliance_flags.isOverwritten,
 			in_mod.ReturnSuppressed or ~compliance_flags.isSuppressed,
 			src = MDR.sourceTools.src_Thrive_PD,  // should we filter by src?
-			DateIsOk((STRING8)dt_first_seen, today)
+			ConsumerDisclosure.Functions.FCRADateIsOk((STRING8)dt_first_seen, todaysdate)
 			);
 										
-		Thrive_rawrec xformStatements(Thrive_rawrec l,	FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_thrive_rawrec xformStatements(layout_thrive_rawrec l,	FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_ids := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -87,7 +86,7 @@ EXPORT RawThrive := MODULE
 													KEEP(1),
 													LIMIT(0));
 			
-		recs_out := PROJECT(recs_final_ds, TRANSFORM(Thrive_out,			
+		recs_out := PROJECT(recs_final_ds, TRANSFORM(layout_thrive_out,			
 												SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(LEFT.compliance_flags,
 																								LEFT.record_ids,
 																								LEFT.statement_ids,

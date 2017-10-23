@@ -19,15 +19,18 @@ export t_FcraDataServiceDatasetSelection := record
 	boolean IncludeGong {xpath('IncludeGong')};
 	boolean IncludeHeader {xpath('IncludeHeader')};
 	boolean IncludeHuntingFishing {xpath('IncludeHuntingFishing')};
+	boolean IncludeInfutor {xpath('IncludeInfutor')};
+	boolean IncludeInquiries {xpath('IncludeInquiries')};
 	boolean IncludeLiens {xpath('IncludeLiens')};
 	boolean IncludeMarriageDivorce {xpath('IncludeMarriageDivorce')};
-	boolean IncludeInfutor {xpath('IncludeInfutor')};
+	boolean IncludeOptOuts {xpath('IncludeOptOuts')};
 	boolean IncludeOffenders {xpath('IncludeOffenders')};
 	boolean IncludePeopleAtWork {xpath('IncludePeopleAtWork')};
 	boolean IncludePhoneHistory {xpath('IncludePhoneHistory')};
 	boolean IncludePilot {xpath('IncludePilot')};
 	boolean IncludeProfessionalLicenses {xpath('IncludeProfessionalLicenses')};
 	boolean IncludeProperties {xpath('IncludeProperties')};
+	boolean IncludeSSN {xpath('IncludeSSN')};
 	boolean IncludeStudents {xpath('IncludeStudents')};
 	boolean IncludeThrive {xpath('IncludeThrive')};
 	boolean IncludeUCC {xpath('IncludeUCC')};
@@ -161,11 +164,6 @@ export t_FcraDataServiceAdvoData := record
 	iesp.fcradataservice_raw.t_FcraDataServiceRawAdvo Rawdata {xpath('Rawdata')};
 end;
 		
-export t_FcraDataServiceCriminalActivityData := record
-	iesp.fcradataservice_common.t_FcraDataServiceMetadata Metadata {xpath('Metadata')};
-	iesp.fcradataservice_raw.t_FcraDataServiceRawCriminalActivity Rawdata {xpath('Rawdata')};
-end;
-		
 export t_FcraDataServiceCriminalCourtOffenseData := record
 	iesp.fcradataservice_common.t_FcraDataServiceMetadata Metadata {xpath('Metadata')};
 	iesp.fcradataservice_raw.t_FcraDataServiceRawCriminalCourtOffense Rawdata {xpath('Rawdata')};
@@ -192,7 +190,6 @@ export t_FcraDataServiceCriminalData := record
 	dataset(t_FcraDataServiceCriminalOffenderData) OffendersPlus {xpath('OffendersPlus/Row'), MAXCOUNT(iesp.Constants.DataService.MaxCrimOffenders)};
 	dataset(t_FcraDataServiceCriminalOffenseData) Offenses {xpath('Offenses/Row'), MAXCOUNT(iesp.Constants.DataService.MaxCrimOffenses)};
 	dataset(t_FcraDataServiceCriminalCourtOffenseData) CourtOffenses {xpath('CourtOffenses/Row'), MAXCOUNT(iesp.Constants.DataService.MaxCrimCourtOffenses)};
-	dataset(t_FcraDataServiceCriminalActivityData) Activity {xpath('Activity/Row'), MAXCOUNT(iesp.Constants.DataService.MaxCrimActivities)};
 	dataset(t_FcraDataServiceCriminalPunishmentData) Punishment {xpath('Punishment/Row'), MAXCOUNT(iesp.Constants.DataService.MaxCrimPunishment)};
 end;
 		
@@ -216,6 +213,11 @@ end;
 export t_FcraDataServiceHeaderData := record
 	t_FcraDataServiceHeaderMetadata Metadata {xpath('Metadata')};
 	iesp.fcradataservice_raw.t_FcraDataServiceRawHeader Rawdata {xpath('Rawdata')};
+end;
+		
+export t_FcraDataServiceInquiriesData := record
+	iesp.fcradataservice_common.t_FcraDataServiceMetadata Metadata {xpath('Metadata')};
+	iesp.fcradataservice_raw.t_FcraDataServiceRawInquiries Rawdata {xpath('Rawdata')};
 end;
 		
 export t_FcraDataServiceInfutorData := record
@@ -255,6 +257,11 @@ export t_FcraDataServiceMarriageDivData := record
 	dataset(t_FcraDataServiceMarriageDivPartyData) Search {xpath('Search/Row'), MAXCOUNT(iesp.Constants.DataService.MaxMarriageDiv)};
 end;
 		
+export t_FcraDataServiceOptOutData := record
+	iesp.fcradataservice_common.t_FcraDataServiceMetadata Metadata {xpath('Metadata')};
+	iesp.fcradataservice_raw.t_FcraDataServiceRawOptOut Rawdata {xpath('Rawdata')};
+end;
+		
 export t_FcraDataServiceProfLicenseData := record
 	iesp.fcradataservice_common.t_FcraDataServiceMetadata Metadata {xpath('Metadata')};
 	iesp.fcradataservice_raw.t_FcraDataServiceRawProfLicenseDid Rawdata {xpath('Rawdata')};
@@ -282,9 +289,14 @@ export t_FcraDataServicePropertySearchData := record
 	iesp.fcradataservice_raw.t_FcraDataServiceRawPropertySearch Rawdata {xpath('Rawdata')};
 end;
 		
-export t_FcraDataServicePropertyData := record
+export t_FcraDataServicePropertyAssessment := record
 	iesp.fcradataservice_raw.t_FcraDataServiceRawPropertyGroupBy GroupBy {xpath('GroupBy')};
 	dataset(t_FcraDataServicePropertyAssessmentData) Assessment {xpath('Assessment/Row'), MAXCOUNT(iesp.Constants.DataService.MaxProperties)};
+	dataset(t_FcraDataServicePropertySearchData) Search {xpath('Search/Row'), MAXCOUNT(iesp.Constants.DataService.MaxProperties)};
+end;
+		
+export t_FcraDataServicePropertyDeed := record
+	iesp.fcradataservice_raw.t_FcraDataServiceRawPropertyGroupBy GroupBy {xpath('GroupBy')};
 	dataset(t_FcraDataServicePropertyDeedData) Deed {xpath('Deed/Row'), MAXCOUNT(iesp.Constants.DataService.MaxProperties)};
 	dataset(t_FcraDataServicePropertySearchData) Search {xpath('Search/Row'), MAXCOUNT(iesp.Constants.DataService.MaxProperties)};
 end;
@@ -370,15 +382,22 @@ export t_FcraDataServiceReport := record
 	dataset(t_FcraDataServiceHeaderData) HeaderData {xpath('HeaderData/Row'), MAXCOUNT(iesp.Constants.DataService.MaxHeader)};
 	dataset(t_FcraDataServiceHuntFishData) HuntingFishing {xpath('HuntingFishing/Row'), MAXCOUNT(iesp.Constants.DataService.MaxHunters)};
 	dataset(t_FcraDataServiceInfutorData) Infutor {xpath('Infutor/Row'), MAXCOUNT(iesp.Constants.DataService.MaxInfutor)};
+	dataset(t_FcraDataServiceInquiriesData) Inquiries {xpath('Inquiries/Row'), MAXCOUNT(iesp.Constants.DataService.MaxInquiries)};
+	dataset(t_FcraDataServiceLiensData) Liens {xpath('Liens/Row'), MAXCOUNT(iesp.Constants.DataService.MaxLiens)};
 	dataset(t_FcraDataServiceMarriageDivData) Marriage {xpath('Marriage/Row'), MAXCOUNT(iesp.Constants.DataService.MaxMarriageDiv)};
+	dataset(t_FcraDataServiceOptOutData) OptOut {xpath('OptOut/Row'), MAXCOUNT(iesp.Constants.DataService.MaxOptOut)};
 	dataset(t_FcraDataServicePAWData) PeopleAtWork {xpath('PeopleAtWork/Row'), MAXCOUNT(iesp.Constants.DataService.MaxPAW)};
 	dataset(t_FcraDataServicePilotData) Pilot {xpath('Pilot/Row'), MAXCOUNT(iesp.Constants.DataService.MaxPilots)};
 	dataset(t_FcraDataServiceProfLicenseData) ProfessionalLicense {xpath('ProfessionalLicense/Row'), MAXCOUNT(iesp.Constants.DataService.MaxProfLicense)};
 	dataset(t_FcraDataServiceProfLicenseMariData) ProfLicenseMari {xpath('ProfLicenseMari/Row'), MAXCOUNT(iesp.Constants.DataService.MaxProfLicense)};
 	dataset(t_FcraDataServicePersonContextRecord) PersonContext {xpath('PersonContext/Row'), MAXCOUNT(iesp.Constants.DataService.MaxPersonContext)};
-	dataset(t_FcraDataServicePropertyData) Property {xpath('Property/Row'), MAXCOUNT(iesp.Constants.DataService.MaxProperties)};
+	dataset(t_FcraDataServicePropertyAssessment) PropertyAssessment {xpath('PropertyAssessment/Row'), MAXCOUNT(iesp.Constants.DataService.MaxProperties)};
+	dataset(t_FcraDataServicePropertyDeed) PropertyDeed {xpath('PropertyDeed/Row'), MAXCOUNT(iesp.Constants.DataService.MaxProperties)};
+	dataset(t_FcraDataServicePropertyDeed) DeedByResidence {xpath('DeedByResidence/Row'), MAXCOUNT(iesp.Constants.DataService.MaxProperties)};
+	dataset(t_FcraDataServicePropertyAssessment) AssessmentByResidence {xpath('AssessmentByResidence/Row'), MAXCOUNT(iesp.Constants.DataService.MaxProperties)};
 	dataset(t_FcraDataServiceSOData) SexOffenders {xpath('SexOffenders/Row'), MAXCOUNT(iesp.Constants.DataService.MaxSOffenders)};
 	dataset(t_FcraDataServiceSSNData) SSN {xpath('SSN/Row'), MAXCOUNT(iesp.Constants.DataService.MaxSSN)};
+	dataset(t_FcraDataServiceSSNData) SSNFromInquiries {xpath('SSNFromInquiries/Row'), MAXCOUNT(iesp.Constants.DataService.MaxSSN)};
 	dataset(t_FcraDataServiceThriveData) Thrive {xpath('Thrive/Row'), MAXCOUNT(iesp.Constants.DataService.MaxThrive)};
 	dataset(t_FcraDataServiceUCCData) UCC {xpath('UCC/Row'), MAXCOUNT(iesp.Constants.DataService.MaxUCCFilings)};
 	dataset(t_FcraDataServiceWatercraftData) Watercraft {xpath('Watercraft/Row'), MAXCOUNT(iesp.Constants.DataService.MaxWatercrafts)};

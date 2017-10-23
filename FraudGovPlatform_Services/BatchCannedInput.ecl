@@ -136,57 +136,23 @@ END;
 
 FraudShared_Services.Layouts.BatchIn_rec rec00012() := TRANSFORM
 	SELF.acctno := 'rec00012';
-  SELF.ssn := '594715761';
-	// SELF.did := 102648498593;
-  SELF.name_first := 'EDGARDO';
-  SELF.name_last := 'BRIGHAM';
-  SELF.addr := '813 POPLAR ST';
-	SELF.p_city_name := 'MOUNT DORA';
+  SELF.ssn := '590443261';
+	SELF.did := 102648498593;
+  SELF.name_first := 'nasya';
+  SELF.name_last := 'wagner';
+  SELF.addr := '5450 SW 156TH PL';
+	SELF.p_city_name := 'miami';
   SELF.st := 'FL';
-  SELF.z5 := '32757';
-  SELF.phoneno := '3523087852';
+  SELF.z5 := '3466';
+  SELF.phoneno := '7278155566';
 	SELF.ip_address := '216.3.128.12';
-  SELF := [];
-END;
-
-FraudShared_Services.Layouts.BatchIn_rec rec00013() := TRANSFORM
-	SELF.acctno := 'rec00013';
-  SELF.ssn := '567159036 ';
-  SELF := [];
-END;
-
-FraudShared_Services.Layouts.BatchIn_rec rec00014() := TRANSFORM
-	SELF.acctno := 'rec0014_multiple-KF';
-  SELF.ssn := '680183022';
-  SELF.name_first := 'WOLFGANG';
-  SELF.name_last := 'TREMBLET';
-  SELF.addr := '5035 BOWMAN PARK PT';
-	SELF.p_city_name := 'NAPLES';
-  SELF.st := 'FL';
-  SELF.z5 := '34112';
-  SELF.phoneno := '3059620758';
-	SELF.email_address := 'CHELM17@WALMART.COM';
-	SELF.ip_address := '216.3.49.28';	
-  SELF := [];
-END;
-
-FraudShared_Services.Layouts.BatchIn_rec rec00015() := TRANSFORM
-	SELF.acctno := 'rec0015_multiple-KF-Velocity';
-  SELF.ssn := '227585650';
-  SELF.name_first := 'JORGE';
-  SELF.name_last := 'CHARLES';
-  SELF.addr := '6608 NEWPORT PALMS CT';
-	SELF.p_city_name := 'MIAMI';
-  SELF.st := 'FL';
-  SELF.z5 := '33185';
-  SELF.phoneno := '3059867047';
-	SELF.email_address := 'CHELM17@WALMART.COM';
-	SELF.ip_address := '216.3.49.28';	
+  SELF.geo_lat := '28.357200';
+  SELF.geo_long := '-82.656090';
   SELF := [];
 END;
 
 EXPORT BatchCannedInput := dataset([
-  /*rec0001(), rec0002(), rec0003(), rec0004(), rec0005(), rec0006(), rec0007(), rec0008(), rec0009(), rec00010(), rec00011(), rec00012(), rec00013(), rec00014() ,*/ rec00015()
+  rec0001(), rec0002(), rec0003(), rec0004(), rec0005(), rec0006(), rec0007(), rec0008(), rec0009(), rec00010(), rec00011(), rec00012()
 ]);
 
 /*

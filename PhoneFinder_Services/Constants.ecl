@@ -1,4 +1,4 @@
-IMPORT iesp, Gateway;
+﻿IMPORT iesp, Gateway;
 EXPORT Constants :=
 MODULE
 
@@ -8,7 +8,7 @@ MODULE
 	EXPORT UNSIGNED1 MaxGatewayMatches   := 100;
 	EXPORT UNSIGNED1 MaxTUGatewayResults := 30;
 	EXPORT UNSIGNED1 MaxPhoneMatches     := 10;
-	EXPORT UNSIGNED1 MaxRoyalties        := 8; // accudata ocn royalty
+	EXPORT UNSIGNED1 MaxRoyalties        := 9; // zumigo royalty
 	
 	// Phone Porting 
 	EXPORT UNSIGNED1 MaxPortedMatches    	 := 100;	
@@ -76,7 +76,8 @@ MODULE
 	EXPORT RiskLevel		 := ENUM(PASS=1,WARN=2,FAILED=3);
 	EXPORT UNSIGNED1 OTPRiskLimit := 5;
 	EXPORT UNSIGNED1 InquiryDayLimit := 1;
-	EXPORT defaultRules	 := DATASET([{'Phone Association','H','1','0','No Identity',0,0,true,true}],iesp.phonefinder.t_PhoneFinderRiskIndicator);
+	EXPORT defaultRules	 := DATASET([{'Phone Association','H','1','0','No Identity',0,0,true,true}, {'Phone Association','H','1','-1','No phone associated with subject',0,0,true,true}],
+	                                iesp.phonefinder.t_PhoneFinderRiskIndicator);
 	EXPORT SET OF STRING enumCategory := ['Phone Association','Phone Activity','Phone Criteria'];
 	
 	EXPORT SpoofPhoneOrigin :=
@@ -117,4 +118,7 @@ MODULE
 		EXPORT Targus       := FALSE;
 		EXPORT PhoneMetadata:= FALSE;
 	END;
+	//Zumigo
+	EXPORT ConsentLevels   := ENUM(PII_Association = 0, Single_consumer = 1, Full_Consumer = 2);
+	
 END;

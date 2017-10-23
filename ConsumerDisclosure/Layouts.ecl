@@ -25,4 +25,28 @@ MODULE
 		DATASET(FFD.Layouts.StatementIdRec) statement_ids := DATASET([], FFD.Layouts.StatementIdRec);
 	END;
 	
+	EXPORT ssn_rec := RECORD
+		UNSIGNED6 subject_did := 0;
+		UNSIGNED3 dt_last_seen;
+		STRING9   ssn;
+		STRING1   valid_SSN := '';
+	END;
+	
+	EXPORT address_rec := RECORD
+		UNSIGNED6 subject_did := 0;
+		STRING10 prim_range;
+		STRING2  predir;
+		STRING28 prim_name;
+		STRING4  suffix;
+		STRING2  postdir;
+		STRING10 unit_desig;
+		STRING8  sec_range;
+		STRING25 city_name;
+		STRING2  st;
+		STRING5  zip;
+		STRING4  zip4;
+		STRING3  county;
+		STRING7	 geo_blk;
+	END;
+
 END;

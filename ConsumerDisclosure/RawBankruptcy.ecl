@@ -1,74 +1,78 @@
 ﻿IMPORT BankruptcyV2,BankruptcyV3,BankruptcyV3_Services,ConsumerDisclosure,doxie,FCRA,FFD,Suppress,STD;
-EXPORT RawBankruptcy := MODULE
 
-	SHARED Bankruptcy_main_raw := RECORD(BankruptcyV2.Layout_bankruptcy_main_v3.layout_bankruptcy_main_filing_supp_excludescrubs)
-	END;
+boolean IsFCRA := TRUE;
 
-	SHARED Bankruptcy_party_raw := RECORD //(BankruptcyV2.layout_bankruptcy_search_v3)
+layout_Bankruptcy_main_raw := RECORD // recordof(BankruptcyV3.key_bankruptcyV3_main_full)
+	BankruptcyV2.Layout_bankruptcy_main_v3.layout_bankruptcy_main_filing_supp_excludescrubs;
+END;
+
+layout_Bankruptcy_party_raw := RECORD // recordof(BankruptcyV3.key_bankruptcyv3_search_full_bip)
 		BankruptcyV2.layout_bankruptcy_search_v3_supp_bip  - [ScrubsBits1];
-	END;
+END;
 
-	SHARED Bankruptcy_withdraw_raw := RECORD(BankruptcyV3.Layout_BankruptcyV3_WithdrawnStatus.wsKey)
-	END;
-		
-  // -------- Bankruptcy
-	
-  SHARED Bankruptcy_party_rawrec := RECORD
+layout_Bankruptcy_withdraw_raw := RECORD //recordof(BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus)
+	BankruptcyV3.Layout_BankruptcyV3_WithdrawnStatus.wsKey;
+END;
+
+layout_Bankruptcy_party_rawrec := RECORD
 		ConsumerDisclosure.Layouts.InternalMetadata;
-		Bankruptcy_party_raw;		
-		Bankruptcy_withdraw_raw WithdrawnStatusInfo;		
-	END;
+		layout_Bankruptcy_party_raw;		
+		layout_Bankruptcy_withdraw_raw WithdrawnStatusInfo;		
+END;
 	
-	SHARED Bankruptcy_main_rawrec := RECORD		
+layout_Bankruptcy_main_rawrec := RECORD		
 		ConsumerDisclosure.Layouts.InternalMetadata;
-		Bankruptcy_main_raw;
-	END;
+		layout_Bankruptcy_main_raw;
+END;
 	
-	SHARED Bankruptcy_rawrec := RECORD
+layout_bankruptcy_rawrec := RECORD
 		unsigned6 subject_did;
 		string50 tmsid;
 		string5  court_code;
-		dataset(Bankruptcy_main_rawrec) main;
-		dataset(Bankruptcy_party_rawrec) parties;
+		dataset(layout_Bankruptcy_main_rawrec) main;
+		dataset(layout_Bankruptcy_party_rawrec) parties;
+END;
+	
+		
+EXPORT RawBankruptcy := MODULE
+
+
+	EXPORT layout_bankruptcy_party_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_Bankruptcy_party_raw RawData;
+		layout_Bankruptcy_withdraw_raw WithdrawnStatusInfo;
 	END;
 	
-	EXPORT Bankruptcy_party_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		Bankruptcy_party_raw RawData;
-		Bankruptcy_withdraw_raw WithdrawnStatusInfo;
-	END;
-	
-	EXPORT Bankruptcy_main_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		Bankruptcy_main_raw RawData;
+	EXPORT layout_bankruptcy_main_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_Bankruptcy_main_raw RawData;
 		BankruptcyV3.layout_courts courtinfo {xpath('CourtInfo')};		
 	END;
 	
-	EXPORT Bankruptcy_out := RECORD
+	EXPORT layout_bankruptcy_out := RECORD
 		STRING50 tmsid;
-		DATASET(Bankruptcy_main_out) main {xpath('Main/Row')};
-		DATASET(Bankruptcy_party_out) parties {xpath('parties/Row')};
+		DATASET(layout_bankruptcy_main_out) main {xpath('Main/Row')};
+		DATASET(layout_bankruptcy_party_out) parties {xpath('parties/Row')};
 	END;
 
  
 EXPORT GetData(dataset(doxie.layout_references) in_dids,
 							dataset (fcra.Layout_override_flag) flag_file,
-							dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,														 
+							dataset (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs,														 
 							ConsumerDisclosure.IParams.IParam in_mod) :=
 FUNCTION
-	boolean IsFCRA := TRUE;
 	boolean showDisputedRecords := in_mod.ReturnDisputed;
 	string8 current_date := (string8) Std.Date.Today();
 	
 	flags := flag_file(file_id = FCRA.FILE_ID.BANKRUPTCY);
 	
-	// -------------  BANKRUPTCY SEARCH  -------------	
   tmsids := 
 		join (in_dids, BankruptcyV3.key_bankruptcyV3_did(IsFCRA),
 			left.did<>0 and keyed(left.did=right.did),
 			transform(RIGHT),
 			limit(0), keep(ConsumerDisclosure.Constants.Limits.MaxBankruptcyPerDID));
 	
+	// -------------  BANKRUPTCY SEARCH  -------------	
 	l_bk_search_tmp := record
-		Bankruptcy_party_rawrec;
+		layout_Bankruptcy_party_rawrec;
 		boolean inputIsDebtor;
 	end;
 	
@@ -93,7 +97,7 @@ FUNCTION
 	bk_search_with_debtors := 
 		join(bk_search_raw, bk_debtors, 
 			left.tmsid=right.tmsid and left.court_code=right.court_code and left.case_number=right.case_number and right.inputIsDebtor,
-			transform(Bankruptcy_party_rawrec, 
+			transform(layout_Bankruptcy_party_rawrec, 
 				self.subject_did := left.subject_did,
 				self := left
 			));	
@@ -102,7 +106,7 @@ FUNCTION
 	bk_search_overrides := 
 		join(flags, FCRA.key_override_bkv3_search_ffid,
 			keyed (left.flag_file_id = right.flag_file_id),
-				transform(Bankruptcy_party_rawrec,
+				transform(layout_Bankruptcy_party_rawrec,
 					_is_override := right.flag_file_id <> '' and left.flag_file_id = right.flag_file_id;					
 					self.subject_did := (unsigned6) left.did;
 					self.compliance_flags.IsOverride := _is_override;
@@ -123,7 +127,7 @@ FUNCTION
 
 	bk_search_with_flags := 
 		project(bk_search_with_debtors, 
-			transform(Bankruptcy_party_rawrec,
+			transform(layout_Bankruptcy_party_rawrec,
 				self.Compliance_Flags.isOverwritten := left.combined_record_id in rid_search_overrides,
 				self.Compliance_Flags.isSuppressed := left.combined_record_id in rid_search_suppressed,
 				self := left));
@@ -141,7 +145,7 @@ FUNCTION
 	);	
 	
 	// add statements and disputes
-	Bankruptcy_party_rawrec xformPartyStatements(Bankruptcy_party_rawrec l,	FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+	layout_Bankruptcy_party_rawrec xformPartyStatements(layout_Bankruptcy_party_rawrec l,	FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			skip(~ShowDisputedRecords and r.isDisputed)
 					self.statement_ids := r.StatementIDs;
 					self.compliance_flags.IsDisputed := r.isDisputed;
@@ -161,14 +165,14 @@ FUNCTION
 	bk_search_plus_withdraw := JOIN(bk_search, BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus(isFCRA:= TRUE),
 												KEYED(LEFT.tmsid = RIGHT.tmsid AND LEFT.caseID = RIGHT.caseID  AND LEFT.DefendantID = RIGHT.DefendantID)
 												AND LEFT.name_type = BankruptcyV3_Services.consts.NAME_TYPES.DEBTOR,  
-												TRANSFORM(Bankruptcy_party_rawrec,
+												TRANSFORM(layout_Bankruptcy_party_rawrec,
 																	SELF.WithdrawnStatusInfo := RIGHT,
 																	SELF := LEFT),
 												LEFT OUTER,
 												KEEP(1), LIMIT(0));
 	
 		//--------------do non-subject suppression -------------
-		Bankruptcy_party_rawrec xformNSS(Bankruptcy_party_rawrec L) := TRANSFORM
+		layout_Bankruptcy_party_rawrec xformNSS(layout_Bankruptcy_party_rawrec L) := TRANSFORM
 			isRestricted := (L.subject_did <> (unsigned6) L.did) and L.name_type=BankruptcyV3_Services.consts.NAME_TYPES.DEBTOR;
     
       SELF.subject_did := L.subject_did;
@@ -197,7 +201,7 @@ FUNCTION
 		join (bk_all_deduped, BankruptcyV3.key_bankruptcyV3_main_full(isFCRA),
 			left.case_number<>'' AND left.court_code<>'' AND left.tmsid<>''
 			and keyed (left.tmsid = right.tmsid), 
-			transform (Bankruptcy_main_rawrec, 
+			transform (layout_Bankruptcy_main_rawrec, 
 				self.subject_did := left.subject_did; 
 				self.combined_record_id := right.tmsid[3..]; // main record id = court_code + case_number
 				self.record_ids.RecId1 := right.tmsid;
@@ -209,7 +213,7 @@ FUNCTION
 	bk_main_overrides := 
 		join(flags, FCRA.key_override_bkv3_main_ffid,
 			keyed (left.flag_file_id = right.flag_file_id),
-				transform(Bankruptcy_main_rawrec,
+				transform(layout_Bankruptcy_main_rawrec,
 					_is_override := right.flag_file_id <> '' and left.flag_file_id = right.flag_file_id;
 					self.Compliance_Flags.IsOverride := _is_override;
 					self.Compliance_Flags.IsSuppressed := ~_is_override;
@@ -226,7 +230,7 @@ FUNCTION
 	
 	bk_main_flags := 
 		project(bk_main_raw, 
-			transform(Bankruptcy_main_rawrec,
+			transform(layout_Bankruptcy_main_rawrec,
 				self.compliance_flags.isOverwritten := left.combined_record_id in rid_main_overrides,
 				self.compliance_flags.isSuppressed := left.combined_record_id in rid_main_suppressed,
 				self := left));
@@ -241,7 +245,7 @@ FUNCTION
 	);	
 
 	// add statements and disputes
-	Bankruptcy_main_rawrec xformMainStatements(Bankruptcy_main_rawrec l,	FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+	layout_Bankruptcy_main_rawrec xformMainStatements(layout_Bankruptcy_main_rawrec l,	FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			skip(~ShowDisputedRecords and r.isDisputed)
 					self.statement_ids := r.StatementIDs;
 					self.compliance_flags.IsDisputed := r.isDisputed;
@@ -254,8 +258,8 @@ FUNCTION
 			xformMainStatements(left,right),
 			left outer, keep(1), limit(0));	
 		
-	Bankruptcy_rawrec 
-		xtRollMain(Bankruptcy_main_rawrec l, dataset(Bankruptcy_main_rawrec) all_rows) := 
+	layout_bankruptcy_rawrec 
+		xtRollMain(layout_Bankruptcy_main_rawrec l, dataset(layout_Bankruptcy_main_rawrec) all_rows) := 
 	transform
 		self.tmsid := l.tmsid;
 		self.court_code := l.court_code;
@@ -266,8 +270,8 @@ FUNCTION
 		
 	bk_main := rollup(group(sort(bk_main_statements_disputes, tmsid), tmsid), group, xtRollMain(left, ROWS(left)));	
 	
-	Bankruptcy_rawrec 
-		xtAddParties(Bankruptcy_rawrec l, dataset(Bankruptcy_party_rawrec) all_parties) := 
+	layout_bankruptcy_rawrec 
+		xtAddParties(layout_bankruptcy_rawrec l, dataset(layout_Bankruptcy_party_rawrec) all_parties) := 
 	transform
 		self.parties := sort(all_parties, -compliance_flags.isOverride, compliance_flags.isSuppressed, compliance_flags.isOverwritten, -date_last_seen, -date_first_seen);
 		self := l;
@@ -279,9 +283,9 @@ FUNCTION
 	
 	// -------------  BANKRUPTCY COURTS  -------------
 	
-	Bankruptcy_out xtOut(Bankruptcy_rawrec l, recordof(BankruptcyV3.key_bankruptcyV3_courts) r) := 
+	layout_bankruptcy_out xtOut(layout_bankruptcy_rawrec l, recordof(BankruptcyV3.key_bankruptcyV3_courts) r) := 
 	transform
-		self.main := project(l.main, transform(Bankruptcy_main_out,
+		self.main := project(l.main, transform(layout_bankruptcy_main_out,
 			self.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(left.compliance_flags,
 																								left.record_ids,
 																								left.statement_IDs,
@@ -290,7 +294,7 @@ FUNCTION
 			self.CourtInfo := r;
 			self.RawData := left;
 			));
-		self.parties := project(l.parties, transform(Bankruptcy_party_out, 			
+		self.parties := project(l.parties, transform(layout_bankruptcy_party_out, 			
 			self.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(left.compliance_flags,
 																								left.record_ids,
 																								left.statement_IDs,

@@ -9,7 +9,7 @@ EXPORT GetCCRGateway (DATASET(ConsumerCreditReport_Services.Layouts.workRec) ds_
 		// QueryId is assigned as acctno as the ONLY input field returned in gateway response
 		SELF.User.QueryId:=(STRING)L.acctno;
 		SELF.User.EndUser.CompanyName:=in_mod.EndUserCompanyName;
-		SELF.Options.PermissiblePurpose:=in_mod.FCRAPurpose;
+		SELF.Options.PermissiblePurpose:=(string)in_mod.FCRAPurpose; 
 		SELF.SearchBy.Subject.SSN:=L.ssn;
 		SELF.SearchBy.Subject.PhoneNumber:=L.phoneno;
 		SELF.SearchBy.Subject.Name.First:=L.name_first;

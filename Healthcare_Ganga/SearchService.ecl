@@ -1,9 +1,9 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="IdentityScreeningRequest">  
 	<part name="IdentityScreeningRequest" type="tns:XmlDataSet" cols="80" rows="30" />
  </message>
 */
-IMPORT IESP;
+IMPORT IESP,AutoStandardI,Healthcare_Shared,Healthcare_Header_Services,Healthcare_Ganga, ut;
 
 EXPORT SearchService := MACRO
 	ds_in := DATASET ([], iesp.healthcare_identity.t_HealthCareIdentityScreeningRequest): STORED('IdentityScreeningRequest', FEW);
@@ -14,9 +14,9 @@ EXPORT SearchService := MACRO
 	
 
 	Healthcare_Ganga.Layouts.IdentityInput getCriteria() := TRANSFORM
+		self.acctno := '1';
 		self.APSTransactionID := SearchCriteria.APSTransactionID;
 		self.EnrollmentId := SearchCriteria.EnrollmentId;
-		self.RecordIdentifier := SearchCriteria.RecordIdentifier;
 		self.FirstName := SearchCriteria.Individual.Name.First;
 		self.LastName := SearchCriteria.Individual.Name.Last;
 		self.DoB := iesp.ecl2esp.t_DateToString8(SearchCriteria.Individual.DOB);
@@ -35,13 +35,21 @@ EXPORT SearchService := MACRO
 	END;
 	
 	dsCriteria := DATASET([getCriteria()]);
-	// output(dsCriteria, named('input_criteria'));
-	
-	// rawdata:=Healthcare_Ganga.Records.getAllRecords(dsCriteria);
-	// resultsFinal := PROJECT(rawdata, Healthcare_Ganga.Transforms.xformWeb(left));
+	gm := AutoStandardI.GlobalModule();
+	Healthcare_Header_Services.Layouts.common_runtime_config buildConfig():=transform
+	 self.glb_ok := ut.glb_ok (gm.GLBPurpose);
+	 self.dppa_ok := ut.dppa_ok(gm.DPPAPurpose);
+	 self.DRM := gm.DataRestrictionMask;
+		self.IncludeSpecialties  := Healthcare_Shared.Constants.CFG_False;
+		self.IncludeLicenses  := Healthcare_Shared.Constants.CFG_False;
+		self.IncludeResidencies  := Healthcare_Shared.Constants.CFG_False;
+		//self:=[];Do not uncomment otherwise the default values will not get set.
+	end;
+	cfg := dataset([buildConfig()]);
 
-	results := PROJECT(dsCriteria, Healthcare_Ganga.Transforms.xform(left));
-	
+	rawdata := Healthcare_Ganga.Records.getAllRecords(dsCriteria,cfg);
+	results := join(dsCriteria, rawdata, left.acctno = right.acctno, Healthcare_Ganga.Transforms.xformWeb(left, right), left outer);
+
 	output(results, named('Results'));
 
 ENDMACRO;

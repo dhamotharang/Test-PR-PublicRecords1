@@ -615,10 +615,12 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 Max_ABMS_ADDRESSES				:= Max_Large_Cnt;
 		EXPORT UNSIGNED2 Max_ABMS_Contacts				:= Max_Small_Cnt;
 		EXPORT UNSIGNED2 Max_ABMS_TypeOfPractice	:= Max_Small_Cnt;
-		EXPORT UNSIGNED2 Max_ABMS_Certications		:= Max_Small_Cnt;
+		EXPORT UNSIGNED2 Max_ABMS_Certications   	:= Max_Small_Cnt; //Deprecated, use the constant below for future methods.
+		EXPORT UNSIGNED2 Max_ABMS_Certifications	:= Max_Small_Cnt;
 		EXPORT UNSIGNED2 Max_ABMS_Career					:= Max_Small_Cnt;
 		EXPORT UNSIGNED2 Max_ABMS_Education				:= Max_Small_Cnt;
-		EXPORT UNSIGNED2 Max_ABMS_Prof_Assoc			:= Max_Small_Cnt;
+		EXPORT UNSIGNED2 Max_ABMS_Prof_Assoc      := Max_Small_Cnt;
+		EXPORT UNSIGNED2 Max_ABMS_Memberships			:= Max_ABMS_Prof_Assoc;
 		EXPORT UNSIGNED2 Max_NCPDP_Search					:= Max_Cnt_Search;
 		EXPORT UNSIGNED2 Max_NCPDP_Report					:= Max_Small_Cnt;
 		EXPORT UNSIGNED2 Max_NPPES								:= Max_Small_Cnt;
@@ -642,6 +644,7 @@ EXPORT Constants := MODULE
 		EXPORT UNSIGNED2 MAX_PROVIDERSEARCH       := Max_1KCnt_Search;
 		EXPORT UNSIGNED2 MAX_PROVIDERREPORT       := Max_1KCnt_Search;
 		EXPORT UNSIGNED2 MAX_LEGACY_IDS           := 10;
+		EXPORT UNSIGNED2 MAX_COPYRIGHTS           := Max_Small_Cnt;
   end;
 
   export HC_LOOKUPS := MODULE
@@ -925,6 +928,15 @@ EXPORT Constants := MODULE
 		export MaxWatchlists := MaxCountWatchLists;
 	END;
 
+	// IdentityContactResolution (ICR) - As used by govt_collection_services
+  export IdentityContactResolution := MODULE
+	  export MaxDebtorPhones := 3;
+		export MaxReportAKAs := 3;
+		export MaxReportPhones := 3;
+		export MaxReportDebtors := 3;
+		export MaxReports := 10;
+	END;
+  
   //InstantId Reporting and Archiving
 	EXPORT IIDReporting := MODULE	
 		//Search
@@ -1733,6 +1745,7 @@ EXPORT Constants := MODULE
     export unsigned2 MAX_COUNT_CALBUS_RECORD    := 100; // max may need adjusted??? 
 		export unsigned2 MAX_COUNT_CNLD_RECORD    	:= 100;  
     export unsigned2 MAX_COUNT_CORP_RECORD      := 100; // max may need adjusted???
+		export unsigned2 MAX_COUNT_CORTERA_RECORD   := 100;
 		export unsigned2 MAX_COUNT_CRASH_RECORD			:= 100;
     export unsigned2 MAX_COUNT_CU_RECORD        := 100; // max may need adjusted???
     export unsigned2 MAX_COUNT_DCA_RECORD       := 100; // max may need adjusted???
@@ -1978,19 +1991,20 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxATF             := 200;
 		export unsigned2 MaxAVM             := 1000;
 		export unsigned2 MaxBankruptcies    := 1000;  
-		export unsigned2	MaxCrimOffenders	:= 1000;
-		export unsigned2	MaxCrimOffenses				:= CRIM.MaxOffenses;
-		export unsigned2	MaxCrimCourtOffenses	:= CRIM.MaxCourtOffenses;
-		export unsigned2	MaxCrimPunishment	:= (CRIM.MaxPrisons + CRIM.MaxParoles);
-		export unsigned2	MaxCrimActivities	:= CRIM.MaxEvents;
+		export unsigned2 MaxCrimOffenders		:= 1000;
+		export unsigned2 MaxCrimOffenses		:= CRIM.MaxOffenses;
+		export unsigned2 MaxCrimCourtOffenses	:= CRIM.MaxCourtOffenses;
+		export unsigned2 MaxCrimPunishment	:= (CRIM.MaxPrisons + CRIM.MaxParoles);
 		export unsigned2 MaxDeathDid        := 100;
 		export unsigned2 MaxEmail           := 100;
 		export unsigned2 MaxGong            := 100;
 		export unsigned2 MaxHeader          := 1000;
 		export unsigned2 MaxHunters         := 350;
 		export unsigned2 MaxInfutor         := 100;
+		export unsigned2 MaxInquiries       := 1000;
 		export unsigned2 MaxLiens           := 100;
 		export unsigned2 MaxMarriageDiv     := 100;
+		export unsigned2 MaxOptOut          := 100;
 		export unsigned2 MaxPAW             := 100;
 		export unsigned2 MaxPersonContext   := PersonContext.MAX_RECORDS;
 		export unsigned2 MaxPilots          := 200;
@@ -2004,15 +2018,28 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxWatercrafts     := 1000;
 	end;
 
-
   // Google Pony express
   export MailMatch := MODULE
     export unsigned2 MaxResults := 1000;
     export unsigned2 MaxCountSearch := 1000;
   END;
 	
+	export FraudGov := MODULE
+	  export unsigned2 MAX_COUNT_PAYLOAD := 1000;
+		export unsigned2 MAX_COUNT_VELOCITY := 1000;
+		export unsigned2 MAX_COUNT_KNOWN_RISK := 1000;
+	  export unsigned2 MAX_COUNT_BUSINESS_LINKIDS := 100;
+		export unsigned2 MAX_COUNT_CRIMINAL_OFFENSES := 6;
+		export unsigned2 MAX_COUNT_REMARKS := 30;
+		export unsigned2 MAX_COUNT_ADDRESS := 10;
+		export unsigned2 MAX_COUNT_CRIMINAL := 1000;
+		export unsigned2 MAX_COUNT_GLOBAL_WATCHLIST := 1000;
+		export unsigned2 MAX_COUNT_RED_FLAG := 1000;
+	end;
+	
 	// PRCT/Demo Search Tool
   export DEMO_SEARCH_TOOL := MODULE
     export unsigned2 MAX_COUNT_SEARCH_RESPONSE_RECORDS := 100;
   end;
+	
 END;

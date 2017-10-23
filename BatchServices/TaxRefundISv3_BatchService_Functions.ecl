@@ -3,6 +3,31 @@
 
 EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 
+	EXPORT ProcessHRICodes(BatchServices.TaxRefundISv3_BatchService_Interfaces.Input mod_args) := FUNCTION 
+		//
+		// Instantiate the normal defaults ONLY when NO arguments are specified on any of the parameters.
+		// Note that these strings are supposed to be strings of HRI_Codes separated by commas.
+		//
+		aRisk := Std.Str.ToUppercase(TRIM(mod_args.AddressRiskHRICodes, ALL));
+		iRisk := Std.Str.ToUppercase(TRIM(mod_args.IdentityRiskHRICodes, ALL));
+		rOnly := Std.Str.ToUppercase(TRIM(mod_args.ReportOnlyHRICodes, ALL));
+		boolean allFieldsBlank := aRisk='' AND iRisk='' AND rOnly='';
+		
+		// TRIS v3.2 Enhancement : Updated HRI codes per Req # 3.1.3.8
+		aRisk2 := IF(allFieldsBlank, '11,14', aRisk);
+		iRisk2 := IF(allFieldsBlank, '03,72,IS,QD,QA,QE,BO,S5,S2,S1',iRisk);
+		rOnly2 := IF(allFieldsBlank, '71,RS,MO', rOnly);
+		
+		finalResults := MODULE(PROJECT(mod_args, BatchServices.TaxRefundISv3_BatchService_Interfaces.Input))
+			EXPORT string AddressRiskHRICodes  := aRisk2;
+			EXPORT string IdentityRiskHRICodes := iRisk2;
+			EXPORT string ReportOnlyHRICodes   := rOnly2;
+			EXPORT string AllHRICodes := aRisk2 + ',' + iRisk2 + ',' + rOnly2;
+		END;
+		
+		RETURN finalResults;
+	END;
+
   shared rec_extra_address_info := record
     string10 lat := '';
     string11 long := '';
@@ -38,7 +63,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 	// *--- Function to clean batch input ---* //
 	EXPORT fnc_clean_batch(dataset(rec_in) ds_batch_in) := FUNCTION
     rec_in_batch tf_clean_batch_in(rec_in l, integer C) := TRANSFORM
-				/* --- ADDRESS INFORMATION --- */
+				// --- ADDRESS INFORMATION
 				addr1			 				:= Address.Addr1FromComponents(l.prim_range, l.predir, l.prim_name,
 		                                     l.addr_suffix, l.postdir, 
 																				 l.unit_desig, l.sec_range);
@@ -92,7 +117,6 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 					has_full_address := (le.prim_range != '' OR le.prim_name != '') and has_cityst_or_zip;												
 					has_SSN := LENGTH(TRIM(le.ssn))=9;    
 					has_suff_input := has_full_name AND has_full_address AND has_SSN;
-					
 					is_rejected_rec := NOT has_suff_input;					
 					SELF.is_rejected_rec := is_rejected_rec;
 					SELF := le;
@@ -100,28 +124,59 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		END;
 
 
-	// Tris 3.2 Enhancement : Since Net Acuity is no longer in used, commenting out this function....
-	/*
-	EXPORT getIPAddressRecords(DATASET(rec_in_wdid) in_clean_batch,
-														 UNSIGNED1 glb_purpose_value,
-												     UNSIGNED1 dppa_purpose_value,
-														 DATASET(Gateway.Layouts.Config) gateways_in) := FUNCTION
-		
-		formattedInput := PROJECT(in_clean_batch, TRANSFORM(RiskWise.Layout_IPAI,
-																									SELF.Seq := LEFT.Seq,
-																									SELF.IPAddr := LEFT.ip_Address,
-																									SELF := []));
-																																						 
-	  netAcuityResults := Risk_Indicators.getNetAcuity(formattedInput, 
-																										 gateways_in, 
-																										 dppa_purpose_value, 
-																										 glb_purpose_value);
+	// *--- Function to get DID & Best info from ADL Best --> didville.did_service_common_function ---* //
+	export getAdlBestInfo(dataset(rec_in_batch) in_clean_batch,
+				 BatchServices.TaxRefundISv3_BatchService_Interfaces.Input args_in) := function
+
+			p := module(AutoStandardI.PermissionI_Tools.params)
+				export boolean AllowAll := false;
+				export boolean AllowGLB := false;
+				export boolean AllowDPPA := false;
+				export unsigned1 DPPAPurpose := args_in.DPPAPurpose;
+				export unsigned1 GLBPurpose := args_in.GLBPurpose;
+				export boolean IncludeMinors := false;
+			END;
+			GLB := AutoStandardI.PermissionI_Tools.val(p).glb.ok(args_in.GLBPurpose);
+			hhidplus := stringlib.stringfind(args_in.append_l,'HHID_PLUS',1)<>0;
+      edabest := stringlib.stringfind(args_in.append_l,'BEST_EDA',1)<>0;
+
+			DidVille.Layout_Did_OutBatch into(rec_in_batch l) := transform
+				 self.seq := l.seq;
+				 self.phone10 := '';
+				 self.title := '';
+				 self.fname := l.name_first;
+				 self.mname := l.name_middle;
+				 self.lname := l.name_last;
+				 self.suffix := l.name_suffix;
+				 self.ssn := stringlib.stringfilter(l.ssn,'0123456789');
+				 self.did := (unsigned)l.did;
+				 self := l;
+			end;
+
+			recs := project(in_clean_batch,into(left));
+
+      AdlBestInfo_res
+                 := didville.did_service_common_function(recs,
+																												 appends_value      := args_in.append_l,
+																												 verify_value       := args_in.verify_l,
+																												 glb_flag           := GLB,
+																												 hhidplus_value     := hhidplus,
+																												 edabest_value      := edabest,
+																												 glb_purpose_value  := args_in.GLBPurpose,
+																												 appType            := args_in.ApplicationType,
+																												 include_minors     := args_in.IncludeMinors,
+																												 dppa_purpose_value := args_in.DPPAPurpose,
+																												 IndustryClass_val  := args_in.IndustryClass,
+																												 DRM_val            := args_in.DataRestriction,
+																												 GetSSNBest         := args_in.GetSSNBest);
+
+      // *--- DEBUG ---* //
+      // output(AdlBestInfo_res, named('AdlBestInfo_res'));
+      return AdlBestInfo_res; //???
+	end;
+
 	
-		RETURN netAcuityResults;
-	END;
-	*/
-	
-	// *--- Function to get BestAddress batch records ---* //
+	// *--- Function to get Best Address & Address history (batch) records ---* //
 	export getBestAddress(dataset(rec_in_wdid) in_clean_batch,
 												BatchServices.TaxRefundISv3_BatchService_Interfaces.Input args_in) := function
 												
@@ -156,7 +211,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 				boolean InputZipMatch;
 				boolean InputStateMatch;
 				string6 InputAddrFirstSeen;
-				string6 InputAddrLastSeen;				
+				string6 InputAddrLastSeen;
       end;
      
       address_record xformFindMatch(addrBest_res L) := transform
@@ -166,18 +221,29 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
         string zip_in := addrBest_batch(acctno = acct_no)[1].z5;
         string city_in := addrBest_batch(acctno = acct_no)[1].p_city_name;
         string state_in := addrBest_batch(acctno = acct_no)[1].st;
-        self.hasInputAddr := L.is_input or (prim_range_in = L.prim_range 
-																						and prim_name_in = L.prim_name 
-																						and (zip_in = L.z5 or (city_in = L.p_city_name and state_in = L.st)));
-        self.InputAddrDate := L.addr_dt_last_seen;
-        self.InputAddrFirstSeen := L.addr_dt_first_seen;
-        self.InputAddrLastSeen := L.addr_dt_last_seen;
-				
-				inputZipMatch := L.z5 = zip_in;
-				inputStateMatch := L.st = args_in.input_state;
-       	self.InputStateMatch := inputStateMatch;	
+
+        // RQ-13765 added comments and re-organized order of coding from here to the end
+        // Is the addrbest hist rec marked as matching the input? OR 
+        // does the addrbest hist rec street/C/S/Z fields match the corresponding input fields?
+        inputAddrMatch    := L.is_input OR 
+                             (prim_range_in = L.prim_range and
+															prim_name_in  = L.prim_name  and 
+															(zip_in = L.z5 or 
+                               (city_in = L.p_city_name and state_in = L.st))
+                             );
+        self.hasInputAddr := inputAddrMatch;
+        // RQ-13765, added if conditional check in 3 lines below to fix the bug
+        self.InputAddrDate      := if(inputAddrMatch,L.addr_dt_last_seen,'');
+        self.InputAddrFirstSeen := if(inputAddrMatch,L.addr_dt_first_seen,'');
+        self.InputAddrLastSeen  := if(inputAddrMatch,L.addr_dt_last_seen,'');
+
+        // does the addrbest hist rec zip field match the corresponding input field?
+        inputZipMatch          := L.z5 = zip_in;
 				self.InputZipMatchDate := if (inputZipMatch, L.addr_dt_last_seen,'');  //assigned later in rollup logic
-				self.InputZipMatch := inputZipMatch;
+				self.InputZipMatch     := inputZipMatch;
+
+        // does the addrbest hist rec state field match the customer state the batch is being run for?
+       	self.InputStateMatch := L.st = args_in.input_state;
         self := L;
       end;
       
@@ -212,64 +278,6 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
       // output(addrBest_res_final, named('addrBest_res_final'));
 			return addrBest_res_final;
 	end;
-
-	// *--- Function to get BestSSN from ADLBest -> DidVille.Did_Batch_Service_Raw ---* //
-	export getBestSSNInfo(dataset(rec_in_batch) in_clean_batch,
-												BatchServices.TaxRefundISv3_BatchService_Interfaces.Input args_in) := function
-
-			p := module(AutoStandardI.PermissionI_Tools.params)
-				export boolean AllowAll := false;
-				export boolean AllowGLB := false;
-				export boolean AllowDPPA := false;
-				export unsigned1 DPPAPurpose := args_in.DPPAPurpose;
-				export unsigned1 GLBPurpose := args_in.GLBPurpose;
-				export boolean IncludeMinors := false;
-			END;
-			GLB := AutoStandardI.PermissionI_Tools.val(p).glb.ok(args_in.GLBPurpose);
-			hhidplus := stringlib.stringfind(args_in.append_l,'HHID_PLUS',1)<>0;
-      edabest := stringlib.stringfind(args_in.append_l,'BEST_EDA',1)<>0;
-
-			DidVille.Layout_Did_OutBatch into(rec_in_batch l) := transform
-				 self.seq := l.seq;
-				 self.phone10 := '';
-				 self.title := '';
-				 self.fname := l.name_first;
-				 self.mname := l.name_middle;
-				 self.lname := l.name_last;
-				 self.suffix := l.name_suffix;
-				 self.ssn := stringlib.stringfilter(l.ssn,'0123456789');
-				 self.did := (unsigned)l.did;
-				 self := l;
-			end;
-
-			recs := project(in_clean_batch,into(left));
-			bestSsn_res := didville.did_service_common_function(recs,
-																												 appends_value      := args_in.append_l,
-																												 verify_value       := args_in.verify_l,
-																												 glb_flag           := GLB,
-																												 hhidplus_value     := hhidplus,
-																												 edabest_value      := edabest,
-																												 glb_purpose_value  := args_in.GLBPurpose,
-																												 appType            := args_in.ApplicationType,
-																												 include_minors     := args_in.IncludeMinors,
-																												 dppa_purpose_value := args_in.DPPAPurpose,
-																												 IndustryClass_val  := args_in.IndustryClass,
-																												 DRM_val            := args_in.DataRestriction,
-																												 GetSSNBest         := args_in.GetSSNBest);
-			return bestSsn_res;
-	end;
-	
-
-  // *--- Function to get SSNIssuance issued start date ---* //
-  export getSSNIssuanceRecords(dataset(rec_final) in_data) := function
-  
-			//Tris 3.2 Enhancement : Per req 3.1.10, removing possible_age_dob = '' condition and project to SSNIssuance batch input layout (acctno + ssn)
-			no_dob_recs := project(in_data, BatchServices.Layouts.SsnIssuance.batch_in);
-    
-      ssn_issuance_res := BatchServices.SSN_Issuance_BatchService_Records (no_dob_recs);
-
-      return ssn_issuance_res;
-  end;
 
 
 	// *--- Function to get criminal batch records with Department of Corrections as datasource ---* //
@@ -450,7 +458,8 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		return ds_felonies_at_addr;
 	end;
 	*/
-	
+
+
 	// *--- Function to get phone recs ---* //
 	EXPORT getPhoneRecords(DATASET(rec_in_wdid) in_clean_batch,
 												 UNSIGNED1 glb_purpose_value,
@@ -474,6 +483,147 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		RETURN ProgressivePhones;
 
 	END;
+
+	
+	// Tris 3.2 Enhancement : Since Net Acuity is no longer in used, commenting out this function....
+	/*
+	EXPORT getIPAddressRecords(DATASET(rec_in_wdid) in_clean_batch,
+														 UNSIGNED1 glb_purpose_value,
+												     UNSIGNED1 dppa_purpose_value,
+														 DATASET(Gateway.Layouts.Config) gateways_in) := FUNCTION
+		
+		formattedInput := PROJECT(in_clean_batch, TRANSFORM(RiskWise.Layout_IPAI,
+																									SELF.Seq := LEFT.Seq,
+																									SELF.IPAddr := LEFT.ip_Address,
+																									SELF := []));
+																																						 
+	  netAcuityResults := Risk_Indicators.getNetAcuity(formattedInput, 
+																										 gateways_in, 
+																										 dppa_purpose_value, 
+																										 glb_purpose_value);
+	
+		RETURN netAcuityResults;
+	END;
+	*/
+  
+
+	EXPORT getIPMetaDataRecords(DATASET(rec_in_wdid) in_clean_batch) := FUNCTION
+		
+			ds_IP_Metadata_batch_in := PROJECT(in_clean_batch , TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_in_raw,
+																														SELF.acctno			:= LEFT.acctno,
+																														SELF.ip_address1:= LEFT.ip_address,
+																														SELF.ip_address2:= LEFT.device_ini_ip_address,
+																														SELF.ip_address3:= LEFT.device_submit_ip_address));
+
+			BatchServices.IP_Metadata_Layouts.batch_in normBatchRecs(ds_IP_Metadata_batch_in L,INTEGER C) := TRANSFORM
+				STRING IP_address	:=CHOOSE(C,L.IP_address1,L.IP_address2,L.IP_address3);
+				SELF.orig_acctno 	:= L.acctno;
+				SELF.IP_address		:=IF(IP_address!='',Std.Str.ToUpperCase(IP_address),SKIP);
+				SELF:=L;
+			END;
+
+			ds_batch_in_normalized := NORMALIZE(ds_IP_Metadata_batch_in,3,normBatchRecs(LEFT,COUNTER));
+
+			ds_child_recs := BatchServices.IP_Metadata_Records(ds_batch_in_normalized);
+
+			ds_parent_recs := PROJECT(DEDUP(SORT(ds_batch_in_normalized,acctno),acctno),TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_out_flat_acctno,SELF:=LEFT,SELF:=[]));
+
+			ds_batch_out_denormalized := BatchShare.MAC_ExpandLayout.Denorm(ds_parent_recs,ds_child_recs,BatchServices.IP_Metadata_Layouts.batch_out_raw,'');
+			
+			RETURN ds_batch_out_denormalized;
+	END;
+
+
+	EXPORT getValidationIpProblems(string45 input_ip_address , string45 ip_metadata_ip_address, string5 country_code) := FUNCTION
+	
+		string50 ip_addr_trimmed 	:= trim(ip_metadata_ip_address);
+		string2 ipcountry				  := if(ip_addr_trimmed = '', '', trim(StringLib.StringToUpperCase(country_code)));
+		
+		validationIpProblems 		:= map(	input_ip_address = ''	=> '-1',
+																		ipcountry IN BatchServices.Constants.TRISv3.IP_Country	=> '0',
+																		ipcountry NOT IN BatchServices.Constants.TRISv3.IP_Country and ipcountry <>'' => '1',
+																		// anything else is '2'
+																		'2');
+		RETURN validationIpProblems;
+	END;
+
+
+	EXPORT getIPAddrExceedsInputAddr(	REAL input_lat, 
+																		REAL input_long,
+																		string45 ipaddress, 
+																		string10 latitude,
+																		string10 longitude, 
+																		BatchServices.TaxRefundISv3_BatchService_Interfaces.Input args_in) := FUNCTION
+																																		
+			//TRIS v3.0 : IP Address indicator req. 4.1.47
+			ip_lat     := (REAL)latitude;
+			ip_long    := (REAL)longitude;
+			geo_dist   := IF(	ipaddress <> '',
+												Address_Attributes.functions.GeoDist(	input_lat,
+																															input_long,
+																															ip_lat,
+																															ip_long),
+												0);
+
+			ipInvalid := if(// line below added due to 2015 enhancements, req 4.1.7 new input option
+											Stringlib.StringFilterOut(ipaddress[1],'0123456789') <> '' or 
+											ipaddress = '' or ipaddress = '0' or
+											(ip_lat = 0 and ip_long = 0), TRUE, FALSE);	
+								
+			IPAddrExceedsInputAddr := MAP(ipInvalid	=> '',
+																		StringLib.StringToUpperCase(args_in.FilterRule)='V3FDN_FILTER' and geo_dist >= args_in.IPAddrExceedsRange => '1', 
+																		(NOT StringLib.StringToUpperCase(args_in.FilterRule)='V3FDN_FILTER') and geo_dist >= 100 => '1',
+																		'');
+			RETURN IPAddrExceedsInputAddr;
+	END;
+	
+	
+ // *--- Function to get HRI Address codes ---* //
+  export getHRIRecords(dataset(rec_in_wdid) in_clean_batch) := function
+  
+      Autokey_batch.Layouts.rec_inBatchMaster xformToBatchRec(rec_in_wdid L) := transform
+        SELF.acctno      := l.acctno;
+        
+        SELF.prim_range  := StringLib.StringToUpperCase(l.prim_range);	
+        SELF.predir      := StringLib.StringToUpperCase(l.predir);	
+        SELF.prim_name   := StringLib.StringToUpperCase(l.prim_name);	
+        SELF.addr_suffix := StringLib.StringToUpperCase(l.addr_suffix);	
+        SELF.postdir     := StringLib.StringToUpperCase(l.postdir);	
+        SELF.unit_desig  := StringLib.StringToUpperCase(l.unit_desig);	
+        SELF.sec_range   := StringLib.StringToUpperCase(l.sec_range);	
+
+        SELF.p_city_name := StringLib.StringToUpperCase(l.p_city_name);	
+        SELF.st          := StringLib.StringToUpperCase(l.st);
+        SELF.z5          := l.z5;
+        
+        self := [];
+      end;
+      
+      indata := project(in_clean_batch, xformToBatchRec(left));
+
+      // Retrieve and output records
+      ds_outrecs := BatchServices.HRI_Address_Records(indata);
+      
+			// 2015 enhancements/fix req 4.1.13 to only use the first 4 digits of the sic_code 
+			// returned from BatchServices.HRI_Address_Records.
+			ds_outrecs_filt := ds_outrecs(sic_code[1..4] = 
+	                              BatchServices.Constants.TRISV3.Correctional_Institution);
+
+			return ds_outrecs_filt;
+			
+  end;	
+
+
+  // *--- Function to get SSNIssuance issued start date ---* //
+  export getSSNIssuanceRecords(dataset(rec_final) in_data) := function
+  
+			//Tris 3.2 Enhancement : Per req 3.1.10, removing possible_age_dob = '' condition and project to SSNIssuance batch input layout (acctno + ssn)
+			no_dob_recs := project(in_data, BatchServices.Layouts.SsnIssuance.batch_in);
+    
+      ssn_issuance_res := BatchServices.SSN_Issuance_BatchService_Records (no_dob_recs);
+
+      return ssn_issuance_res;
+  end;
 	
 	
   // *--- Function to get flags indicating input address matched a relatives address ---* //
@@ -514,42 +664,6 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		  
 		 return outRecs;
 	end;
-	
-	
- // *--- Function to get HRA Service description code ---* //
-  export getHRIRecords(dataset(rec_in_wdid) in_clean_batch) := function
-  
-      Autokey_batch.Layouts.rec_inBatchMaster xformToBatchRec(rec_in_wdid L) := transform
-        SELF.acctno      := l.acctno;
-        
-        SELF.prim_range  := StringLib.StringToUpperCase(l.prim_range);	
-        SELF.predir      := StringLib.StringToUpperCase(l.predir);	
-        SELF.prim_name   := StringLib.StringToUpperCase(l.prim_name);	
-        SELF.addr_suffix := StringLib.StringToUpperCase(l.addr_suffix);	
-        SELF.postdir     := StringLib.StringToUpperCase(l.postdir);	
-        SELF.unit_desig  := StringLib.StringToUpperCase(l.unit_desig);	
-        SELF.sec_range   := StringLib.StringToUpperCase(l.sec_range);	
-
-        SELF.p_city_name := StringLib.StringToUpperCase(l.p_city_name);	
-        SELF.st          := StringLib.StringToUpperCase(l.st);
-        SELF.z5          := l.z5;
-        
-        self := [];
-      end;
-      
-      indata := project(in_clean_batch, xformToBatchRec(left));
-
-      // Retrieve and output records
-      ds_outrecs := BatchServices.HRI_Address_Records(indata);
-      
-			// 2015 enhancements/fix req 4.1.13 to only use the first 4 digits of the sic_code 
-			// returned from BatchServices.HRI_Address_Records.
-			ds_outrecs_filt := ds_outrecs(sic_code[1..4] = 
-	                              BatchServices.Constants.TRISV3.Correctional_Institution);
-
-			return ds_outrecs_filt;
-			
-  end;	
 
 
  // *--- Function to get FraudPoint2.0 data ---* //
@@ -562,15 +676,15 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 												 string DataPermissionMask
 												 ) := function
 		
-	// Layout for batch input to FraudPoint 2.0 :
-	layout_fp_batch_in := Models.FraudAdvisor_Batch_Service_Layouts.BatchInput;
+	  // Layout for batch input to FraudPoint 2.0 :
+	  layout_fp_batch_in := Models.FraudAdvisor_Batch_Service_Layouts.BatchInput;
 		
-			layout_fp_batch_in fill_fpBatch (in_clean_batch L) := TRANSFORM
+		layout_fp_batch_in fill_fpBatch (in_clean_batch L) := TRANSFORM
 				self := L;
 				self.Suffix := L.Addr_Suffix;
 				self := [];
-			END;
-			batch_in_FP := project(in_clean_batch,fill_fpBatch(LEFT));
+		end;
+		batch_in_FP := project(in_clean_batch,fill_fpBatch(LEFT));
 
 
     // module here inherits the interface & overrides it
@@ -601,6 +715,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 
 		return wModel;
 	end;
+
 
 	/* Tris 3.2 Enhancement : Since dod_bkr_flag is blanked out, this function will not be used, so commenting out....
   // *--- Function to get Bankruptcy data for the min input and did for req 4.1.31 ---* // 
@@ -1221,12 +1336,105 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		RETURN liensFlat30;
   END; //end of getLienRecords function		
 	*/	
+
+	
+	EXPORT getContribRecs (dataset(rec_final) recs_in, string in_DataPermissionMask) := FUNCTION
+			contributory_key := tris_lnssi_build.key_field_value;
+
+			dataPermissionTempMod := module (AutoStandardI.DataPermissionI.params)
+				export dataPermissionMask := in_DataPermissionMask;
+			end;
+			boolean use_ContributoryData := AutoStandardI.DataPermissionI.val(dataPermissionTempMod).use_TrisContributoryData;
+			
+			slim_input_fields :=  record
+				string30 acctno;
+				string2	st	:= '';
+				string200 isp_name1	:= '';
+				string200 isp_name2	:= '';
+				string200 isp_name3	:= '';
+				string25 Contrib_Risk_field:='';
+				string50 Contrib_Risk_Value:='';
+				string Contrib_Risk_Attr:='';
+				string Contrib_State_Excl:='';					
+			end;
+
+			slim_input_fields appendAcctNo(rec_final L, recordof(contributory_key) R) := transform
+				self.Contrib_Risk_field := R.Contrib_Risk_field;
+				self.Contrib_Risk_Value	:= R.Contrib_Risk_Value;
+				self.Contrib_Risk_Attr  := R.Contrib_Risk_Attr;
+				self.Contrib_State_Excl	:= R.Contrib_State_Excl;	
+				self := L;
+			end;
+		
+			contrib_recs_rtn := join(recs_in, contributory_key, 
+																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.RTNbr) and 
+																StringLib.StringToUpperCase(right.contrib_risk_value) = left.routing_transit_nbr,
+																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+																									
+			contrib_recs_abrn:= join(recs_in, contributory_key, 
+																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.ARNbr) and
+																StringLib.StringToUpperCase(right.contrib_risk_value) = left.aba_rout_nbr, 
+																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+																									
+			contrib_recs_prep:= join(recs_in, contributory_key, 
+																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.PrepID) and
+																StringLib.StringToUpperCase(right.contrib_risk_value) = left.prep_id2, 
+																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+
+			contrib_recs_email:= join(recs_in, contributory_key, 
+																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.EmailAdd) and 
+																StringLib.StringToUpperCase(right.contrib_risk_value) = left.email_address, 
+																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+																									
+			contrib_recs_isp	:= join(recs_in, contributory_key, 
+																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName OR
+																			right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName2 OR
+																			right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName3)
+																AND 
+																(StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name1) OR 
+																 StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name2) OR 
+																 StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name3)),
+																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+
+			contrib_recs := contrib_recs_rtn + contrib_recs_abrn + contrib_recs_prep + contrib_recs_email + contrib_recs_isp;
+			
+			contrib_recs_to_return := if(	use_ContributoryData, 
+																		contrib_recs(st not in [Std.Str.SplitWords(contrib_state_excl,',')] and contrib_risk_value <> ''), 
+																		dataset([], slim_input_fields)); 
+		
+			pre_contrib_recs:= dedup(sort(contrib_recs_to_return,acctno,(contrib_risk_field	= BatchServices.Constants.TRISv3.RTNbr), 
+																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName),
+																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.ARNbr), 
+																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.PrepID),
+																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.EmailAdd)), 
+																acctno, contrib_risk_value);
+			
+			rec_final deNorm (rec_final L, slim_input_fields R, INTEGER C) := transform
+				self.Contrib_Risk_Field1	:= if(C=1, R.Contrib_Risk_field, L.Contrib_Risk_field1);
+				self.Contrib_Risk_Value1 	:= if(C=1, R.Contrib_Risk_Value, L.Contrib_Risk_Value1);
+				self.Contrib_Risk_Attr1		:= if(C=1, R.Contrib_Risk_Attr, L.Contrib_Risk_Attr1);
+
+				self.Contrib_Risk_Field2  := if(C=2, R.Contrib_Risk_field, L.Contrib_Risk_Field2);
+				self.Contrib_Risk_Value2  := if(C=2, R.Contrib_Risk_Value, L.Contrib_Risk_Value2);
+				self.Contrib_Risk_Attr2 	:= if(C=2, R.Contrib_Risk_Attr, L.Contrib_Risk_Attr2);
+
+				self.Contrib_Risk_Field3  := if(C=3, R.Contrib_Risk_field, L.Contrib_Risk_Field3);
+				self.Contrib_Risk_Value3  := if(C=3, R.Contrib_Risk_Value, L.Contrib_Risk_Value3);
+				self.Contrib_Risk_Attr3		:= if(C=3, R.Contrib_Risk_Attr, L.Contrib_Risk_Attr3);
+				self := L;
+			end;
+
+			final_recs_flat := denormalize(recs_in , pre_contrib_recs,
+																			left.acctno = right.acctno,
+																			deNorm(left, right, counter));
+		return final_recs_flat;
+	END;	
+
 	
 	//*******************************************************************************************
 	//***********   V3_1  FILTER   ****************************************************************
 	//*******************************************************************************************
-	
-	
+
 	string30 v3_1Filter(string10 curr_incar_flag, string10 curr_incar_flag_BestSSN,string10 act_rel_date_1,
 											string10 ctrl_rel_date_1,string10 sch_rel_dt_1,string10 act_rel_dt_1_BestSSN,
 											string10 ctl_rel_dt_1_BestSSN,string10 sch_rel_dt_1_BestSSN,string10 Input_Address_Prison,
@@ -1483,189 +1691,5 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		
 		return batch_res_after_filter;
 	end;
-	
-	EXPORT ProcessHRICodes(BatchServices.TaxRefundISv3_BatchService_Interfaces.Input mod_args) := FUNCTION 
-		//
-		// Instantiate the normal defaults ONLY when NO arguments are specified on any of the parameters.
-		// Note that these strings are supposed to be strings of HRI_Codes separated by commas.
-		//
-		aRisk := Std.Str.ToUppercase(TRIM(mod_args.AddressRiskHRICodes, ALL));
-		iRisk := Std.Str.ToUppercase(TRIM(mod_args.IdentityRiskHRICodes, ALL));
-		rOnly := Std.Str.ToUppercase(TRIM(mod_args.ReportOnlyHRICodes, ALL));
-		boolean allFieldsBlank := aRisk='' AND iRisk='' AND rOnly='';
-		
-		// TRIS v3.2 Enhancement : Updated HRI codes per Req # 3.1.3.8
-		aRisk2 := IF(allFieldsBlank, '11,14', aRisk);
-		iRisk2 := IF(allFieldsBlank, '03,72,IS,QD,QA,QE,BO,S5,S2,S1',iRisk);
-		rOnly2 := IF(allFieldsBlank, '71,RS,MO', rOnly);
-		
-		finalResults := MODULE(PROJECT(mod_args, BatchServices.TaxRefundISv3_BatchService_Interfaces.Input))
-			EXPORT string AddressRiskHRICodes  := aRisk2;
-			EXPORT string IdentityRiskHRICodes := iRisk2;
-			EXPORT string ReportOnlyHRICodes   := rOnly2;
-			EXPORT string AllHRICodes := aRisk2 + ',' + iRisk2 + ',' + rOnly2;
-		END;
-		
-		RETURN finalResults;
-	END;
 
-	EXPORT getIPMetaDataRecords(DATASET(rec_in_wdid) in_clean_batch) := FUNCTION
-		
-			ds_IP_Metadata_batch_in := PROJECT(in_clean_batch , TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_in_raw,
-																														SELF.acctno			:= LEFT.acctno,
-																														SELF.ip_address1:= LEFT.ip_address,
-																														SELF.ip_address2:= LEFT.device_ini_ip_address,
-																														SELF.ip_address3:= LEFT.device_submit_ip_address));
-
-			BatchServices.IP_Metadata_Layouts.batch_in normBatchRecs(ds_IP_Metadata_batch_in L,INTEGER C) := TRANSFORM
-				STRING IP_address	:=CHOOSE(C,L.IP_address1,L.IP_address2,L.IP_address3);
-				SELF.orig_acctno 	:= L.acctno;
-				SELF.IP_address		:=IF(IP_address!='',Std.Str.ToUpperCase(IP_address),SKIP);
-				SELF:=L;
-			END;
-
-			ds_batch_in_normalized := NORMALIZE(ds_IP_Metadata_batch_in,3,normBatchRecs(LEFT,COUNTER));
-
-			ds_child_recs := BatchServices.IP_Metadata_Records(ds_batch_in_normalized);
-
-			ds_parent_recs := PROJECT(DEDUP(SORT(ds_batch_in_normalized,acctno),acctno),TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_out_flat_acctno,SELF:=LEFT,SELF:=[]));
-
-			ds_batch_out_denormalized := BatchShare.MAC_ExpandLayout.Denorm(ds_parent_recs,ds_child_recs,BatchServices.IP_Metadata_Layouts.batch_out_raw,'');
-			
-			RETURN ds_batch_out_denormalized;
-	END;
-	
-	EXPORT getValidationIpProblems(string45 input_ip_address , string45 ip_metadata_ip_address, string5 country_code) := FUNCTION
-	
-		string50 ip_addr_trimmed 	:= trim(ip_metadata_ip_address);
-		string2 ipcountry				  := if(ip_addr_trimmed = '', '', trim(StringLib.StringToUpperCase(country_code)));
-		
-		validationIpProblems 		:= map(	input_ip_address = ''	=> '-1',
-																		ipcountry IN BatchServices.Constants.TRISv3.IP_Country	=> '0',
-																		ipcountry NOT IN BatchServices.Constants.TRISv3.IP_Country and ipcountry <>'' => '1',
-																		// anything else is '2'
-																		'2');
-		RETURN validationIpProblems;
-	END;
-
-	EXPORT getIPAddrExceedsInputAddr(	REAL input_lat, 
-																		REAL input_long,
-																		string45 ipaddress, 
-																		string10 latitude,
-																		string10 longitude, 
-																		BatchServices.TaxRefundISv3_BatchService_Interfaces.Input args_in) := FUNCTION
-																																		
-			//TRIS v3.0 : IP Address indicator req. 4.1.47
-			ip_lat     := (REAL)latitude;
-			ip_long    := (REAL)longitude;
-			geo_dist   := IF(	ipaddress <> '',
-												Address_Attributes.functions.GeoDist(	input_lat,
-																															input_long,
-																															ip_lat,
-																															ip_long),
-												0);
-
-			ipInvalid := if(// line below added due to 2015 enhancements, req 4.1.7 new input option
-											Stringlib.StringFilterOut(ipaddress[1],'0123456789') <> '' or 
-											ipaddress = '' or ipaddress = '0' or
-											(ip_lat = 0 and ip_long = 0), TRUE, FALSE);	
-								
-			IPAddrExceedsInputAddr := MAP(ipInvalid	=> '',
-																		StringLib.StringToUpperCase(args_in.FilterRule)='V3FDN_FILTER' and geo_dist >= args_in.IPAddrExceedsRange => '1', 
-																		(NOT StringLib.StringToUpperCase(args_in.FilterRule)='V3FDN_FILTER') and geo_dist >= 100 => '1',
-																		'');
-			RETURN IPAddrExceedsInputAddr;
-	END;
-	
-	EXPORT getContribRecs (dataset(rec_final) recs_in, string in_DataPermissionMask) := FUNCTION
-			contributory_key := tris_lnssi_build.key_field_value;
-
-			dataPermissionTempMod := module (AutoStandardI.DataPermissionI.params)
-				export dataPermissionMask := in_DataPermissionMask;
-			end;
-			boolean use_ContributoryData := AutoStandardI.DataPermissionI.val(dataPermissionTempMod).use_TrisContributoryData;
-			
-			slim_input_fields :=  record
-				string30 acctno;
-				string2	st	:= '';
-				string200 isp_name1	:= '';
-				string200 isp_name2	:= '';
-				string200 isp_name3	:= '';
-				string25 Contrib_Risk_field:='';
-				string50 Contrib_Risk_Value:='';
-				string Contrib_Risk_Attr:='';
-				string Contrib_State_Excl:='';					
-			end;
-
-			slim_input_fields appendAcctNo(rec_final L, recordof(contributory_key) R) := transform
-				self.Contrib_Risk_field := R.Contrib_Risk_field;
-				self.Contrib_Risk_Value	:= R.Contrib_Risk_Value;
-				self.Contrib_Risk_Attr  := R.Contrib_Risk_Attr;
-				self.Contrib_State_Excl	:= R.Contrib_State_Excl;	
-				self := L;
-			end;
-		
-			contrib_recs_rtn := join(recs_in, contributory_key, 
-																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.RTNbr) and 
-																StringLib.StringToUpperCase(right.contrib_risk_value) = left.routing_transit_nbr,
-																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
-																									
-			contrib_recs_abrn:= join(recs_in, contributory_key, 
-																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.ARNbr) and
-																StringLib.StringToUpperCase(right.contrib_risk_value) = left.aba_rout_nbr, 
-																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
-																									
-			contrib_recs_prep:= join(recs_in, contributory_key, 
-																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.PrepID) and
-																StringLib.StringToUpperCase(right.contrib_risk_value) = left.prep_id2, 
-																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
-
-			contrib_recs_email:= join(recs_in, contributory_key, 
-																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.EmailAdd) and 
-																StringLib.StringToUpperCase(right.contrib_risk_value) = left.email_address, 
-																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
-																									
-			contrib_recs_isp	:= join(recs_in, contributory_key, 
-																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName OR
-																			right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName2 OR
-																			right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName3)
-																AND 
-																(StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name1) OR 
-																 StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name2) OR 
-																 StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name3)),
-																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
-
-			contrib_recs := contrib_recs_rtn + contrib_recs_abrn + contrib_recs_prep + contrib_recs_email + contrib_recs_isp;
-			
-			contrib_recs_to_return := if(	use_ContributoryData, 
-																		contrib_recs(st not in [Std.Str.SplitWords(contrib_state_excl,',')] and contrib_risk_value <> ''), 
-																		dataset([], slim_input_fields)); 
-		
-			pre_contrib_recs:= dedup(sort(contrib_recs_to_return,acctno,(contrib_risk_field	= BatchServices.Constants.TRISv3.RTNbr), 
-																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName),
-																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.ARNbr), 
-																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.PrepID),
-																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.EmailAdd)), 
-																acctno, contrib_risk_value);
-			
-			rec_final deNorm (rec_final L, slim_input_fields R, INTEGER C) := transform
-				self.Contrib_Risk_Field1	:= if(C=1, R.Contrib_Risk_field, L.Contrib_Risk_field1);
-				self.Contrib_Risk_Value1 	:= if(C=1, R.Contrib_Risk_Value, L.Contrib_Risk_Value1);
-				self.Contrib_Risk_Attr1		:= if(C=1, R.Contrib_Risk_Attr, L.Contrib_Risk_Attr1);
-
-				self.Contrib_Risk_Field2  := if(C=2, R.Contrib_Risk_field, L.Contrib_Risk_Field2);
-				self.Contrib_Risk_Value2  := if(C=2, R.Contrib_Risk_Value, L.Contrib_Risk_Value2);
-				self.Contrib_Risk_Attr2 	:= if(C=2, R.Contrib_Risk_Attr, L.Contrib_Risk_Attr2);
-
-				self.Contrib_Risk_Field3  := if(C=3, R.Contrib_Risk_field, L.Contrib_Risk_Field3);
-				self.Contrib_Risk_Value3  := if(C=3, R.Contrib_Risk_Value, L.Contrib_Risk_Value3);
-				self.Contrib_Risk_Attr3		:= if(C=3, R.Contrib_Risk_Attr, L.Contrib_Risk_Attr3);
-				self := L;
-			end;
-
-			final_recs_flat := denormalize(recs_in , pre_contrib_recs,
-																			left.acctno = right.acctno,
-																			deNorm(left, right, counter));
-		return final_recs_flat;
-	END;	
 END;
