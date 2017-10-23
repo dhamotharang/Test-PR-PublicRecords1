@@ -29,7 +29,7 @@ EXPORT Proc_Build_IP_Metadata(string version, const varstring eclsourceip):= fun
 	//Build/Move Raw IP_Metadata History Files///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	
-		reformDaily 		:= project(distribute(IP_Metadata.File_IP_Metadata.Raw), IP_Metadata.Layout_IP_Metadata.Raw);													
+		reformDaily 		:= project(distribute(IP_Metadata.File_IP_Metadata.Raw), IP_Metadata.Layout_IP_Metadata.History);													
 		ccatRawHistory	:= output(dedup(sort(distribute(reformDaily + IP_Metadata.File_IP_Metadata.History, hash(ip_rng_beg, ip_rng_end)), record, local), record, local),,'~thor_data400::in::ip_metadata_history_'+version,__compressed__);
 	
 		mvRawHistory		:= Std.File.PromoteSuperFileList(['~thor_data400::in::ip_metadata_history',
@@ -82,17 +82,24 @@ EXPORT Proc_Build_IP_Metadata(string version, const varstring eclsourceip):= fun
 	//Run Build, Add Logger, & Provide Email on Build Status/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-		sendEmail 		:= sequential(BuildLogger.BuildStart(false),
-																BuildLogger.PrepStart(false), sprayRaw, BuildLogger.PrepEnd(false),
-																BuildLogger.BaseStart(False), bldBase, BuildLogger.BaseEnd(False),
-																clrDelete, mvBase, ccatRawHistory, mvRawHistory,
-																BuildLogger.KeyStart(false), bldIPMetadata, mvBldIPMetadata, mvQAIPMetadata, BuildLogger.KeyEnd(false),
-																BuildLogger.PostStart(False),dopsUpdate, buildStrata, scrubsRuns, BuildLogger.PostEnd(False), 
-																BuildLogger.BuildEnd(false)):
-																Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhonesInfo Ported & Metadata Key Build Succeeded', workunit + ': Build complete.')),
-																Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhonesInfo Ported & Metadata Key Build Failed', workunit + '\n' + FAILMESSAGE)
-																);
-		
-		return sendEmail;
-												
+		sendEmail			:=  sequential(BuildLogger.BuildStart(false),
+																													BuildLogger.PrepStart(false), 
+																													sprayRaw, 
+																													BuildLogger.PrepEnd(false),
+																													BuildLogger.BaseStart(False), 
+																													bldBase, 
+																													BuildLogger.BaseEnd(False),
+																													clrDelete, mvBase, ccatRawHistory, mvRawHistory,
+																													BuildLogger.KeyStart(false), 
+																													bldIPMetadata, mvBldIPMetadata, mvQAIPMetadata, 
+																													BuildLogger.KeyEnd(false),
+																													BuildLogger.PostStart(False),
+																													dopsUpdate, buildStrata, scrubsRuns, 
+																													BuildLogger.PostEnd(False), 
+																													BuildLogger.BuildEnd(false)):
+																													Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhonesInfo Ported & Metadata Key Build Succeeded', workunit + ': Build complete.')),
+																													Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexis.com', 'PhonesInfo Ported & Metadata Key Build Failed', workunit + '\n' + FAILMESSAGE));					
+																												
+	return sendEmail;
+
 end;
