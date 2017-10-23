@@ -1,0 +1,56 @@
+﻿EXPORT MAC_LiensV2_LiensSearchServiceFCRA := MACRO
+
+	#WEBSERVICE(FIELDS(
+		'DID',
+		'BDID',
+		'PartyType',
+		'CompanyName',
+		'SSN',
+		'UnParsedFullName',
+		'FirstName',
+		'MiddleName',
+		'LastName',
+		'Addr',
+		'City',
+		'State',
+		'Zip',
+		'ZipRadius',
+		'County',
+		'LienCaseNumber',
+		'FilingNumber',
+		'IRSSerialNumber',
+		'FilingJurisdiction',
+		'TMSID',
+		'RMSID',
+		'FEIN',
+		'CertificateNumber',
+		'Phone',
+		/*---- Compliance Fields ----*/
+		'GLBPurpose',
+		'DPPAPurpose',
+		'ApplicationType',
+		'NonSubjectSuppression',
+		'ApplyNonsubjectRestrictions',
+		'FCRAPurpose',
+		'FFDOptionsMask',
+		/*---- Other Fields ----*/
+		'SkipRecords',
+		'MaxResults',
+		'MaxResultsThisTime',
+		'NoDeepDive',
+		'ExactOnly',
+		'StrictMatch',
+		'AllowNickNames',
+		'PhoneticMatch',
+		'ScoreThreshold',
+		'PenaltThreshold',
+		'ReturnHashes',
+		'srch_hashvals',
+		'EvictionsOnly',
+		'LiensOnly',
+		'JudgmentsOnly',
+		/*---- Gateways ----*/
+		'Gateways'
+	));
+
+ENDMACRO;

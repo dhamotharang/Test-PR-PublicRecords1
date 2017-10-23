@@ -1,4 +1,4 @@
-﻿IMPORT iesp, FFD, FCRA;
+﻿IMPORT iesp, FFD, FCRA, UT;
 
 EXPORT Functions :=
 MODULE
@@ -18,5 +18,7 @@ MODULE
 		END;
 		RETURN ROW(xformMeta());
 	END;
+
+	EXPORT FCRADateIsOk (STRING8 _date, STRING8 _today) := ut.DaysApart(_date, _today) < ut.DaysInNYears(7);
 
 END;

@@ -1,6 +1,7 @@
 ﻿IMPORT STD, eCrash_Services;
 
 EXPORT Constants := MODULE
+		EXPORT string Hyphen := '-';
 		EXPORT string DIRECT_hit := 'DIRECT';
 		EXPORT string POSSIBLE_hit := 'POSSIBLE';
 		EXPORT Iyetek_src := ['TM','TF'];
@@ -39,6 +40,7 @@ EXPORT Constants := MODULE
 		EXPORT MAX_RAW_PERSON_COUNT := 20000;
 		EXPORT MAX_ACCIDENTS_PER_AGENCY_PER_DAY := 2000;
 		EXPORT MAX_ACCIDENTS_PER_AGENCY_PER_LOCATION := 7000;
+		EXPORT MAX_PERSON_RECORDS := 2000;
 		
 		//mbsi ids of agencies
 		EXPORT REDACTION_AGENCY_LIST := [
@@ -63,5 +65,10 @@ EXPORT Constants := MODULE
 		EXPORT DATA_SOURCE_IYETEK := 'IyeTek';
 		EXPORT DATA_SOURCE_CRU := 'CRU';
 		EXPORT REPORT_CODE_ACCIDENT := 'A';
+		EXPORT REPORT_CODE_KY  := 'TM';
+		EXPORT AGENCY_FLAG_APPEND := 'AP';
+		EXPORT AGENCY_FLAG_OVERWRITE := 'OW';
+		
+		EXPORT Format_Report_Creation_Date(STRING inDate) := inDate[1..4] + Hyphen + inDate[5..6] + Hyphen + inDate[7..8];
 END;
 

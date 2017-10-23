@@ -23,7 +23,7 @@ export bankruptcy_raw(boolean isFCRA = false) :=
       string9 in_ssn = '',
       string50 in_lname = '',
       string30 in_fname = '',
-      string17 in_case_number = '',
+      string25 in_case_number = '',
       unsigned6 in_did = 0
 			) :=
 				function

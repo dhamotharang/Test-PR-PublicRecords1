@@ -58,6 +58,8 @@
 		export String40 DeltabaseSql := 'DeltaBaseSql';	
 		export String40 EcrashImageRetrieval := 'AccidentImage';	
 		export String40 ZumigoIdentity := 'zumigoidentity';			//Zumigo Line Identity
+    // Equifax Account Decisioning gateway
+    export String40 EquifaxAcctDecisioning := 'equifaxattributes';   // FCRA only as of 10/2017
 	end;
 	
 	export ConfigProperties := module

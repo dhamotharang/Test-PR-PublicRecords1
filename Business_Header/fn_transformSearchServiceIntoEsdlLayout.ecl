@@ -1,4 +1,4 @@
-import business_header, iesp;
+﻿import business_header, iesp;
 
 export fn_transformSearchServiceIntoEsdlLayout(	
 	dataset(Business_Header.layout_biz_search.result_with_input_and_dt_first_seen) in_recs
@@ -18,8 +18,8 @@ export fn_transformSearchServiceIntoEsdlLayout(
 	self.Address.UnitNumber         := l.sec_range,
 	self.Address.State              := l.state,
 	self.Address.City               := l.city,
-	self.Address.Zip5               := (string5) l.zip,
-	self.Address.Zip4               := (string4) l.zip4,
+	self.Address.Zip5               := if(l.zip = 0,'',intformat(l.zip,5,1)),
+	self.Address.Zip4               := if(l.zip4 = 0,'',intformat(l.zip4,4,1)),
 	// CA: next 5 fields are blanked as they are not in the data
 	self.Address.StreetAddress1     := '',
 	self.Address.StreetAddress2     := '',
