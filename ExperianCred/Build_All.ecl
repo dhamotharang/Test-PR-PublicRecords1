@@ -1,4 +1,4 @@
-import ut, VersionControl, orbit3;
+﻿import ut, VersionControl, orbit3;
 export Build_all(string version=version) := function
 
 //-----------Spray input and delete files
@@ -27,9 +27,9 @@ built := sequential(
 					,FileServices.FinishSuperFileTransaction()
 					,
 					#END
-					//spray_input
-					spray_delete
-					//,spray_deceased
+					spray_input
+					,spray_delete
+					,spray_deceased
 					,NormAddress
 					,CleanName
 					,CleanAddress

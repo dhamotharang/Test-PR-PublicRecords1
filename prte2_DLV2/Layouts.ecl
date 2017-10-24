@@ -1,4 +1,4 @@
-import DriversV2, AID;
+﻿import DriversV2, AID;
 EXPORT Layouts := module
 
  //  CONVICTIONS
@@ -16,20 +16,25 @@ EXPORT Layouts := module
 	//	FRA_INSURANCE
 	export Layout_FRA_Insurance := DriversV2.Layouts_DL_Conv_Points_Common.Layout_FRA_Insurance;		
 
+	EXPORT Layout_Drivers := DriversV2.Layout_Drivers_Extended;
+  
+
   EXPORT Layout_Base := RECORD
-		DriversV2.Layout_Drivers_Extended;
+		Layout_Drivers;
     string100 cust_name;
     string20 bug_num;
+    qstring8 link_dob;
+    qstring9 link_ssn;
   END;    
 	
 	//Non exported layout from DriversV2.File_DL_base_for_Autokeys
 	EXPORT Layout_DL_AutoKeys  := record
-		Layout_Base - cust_name - bug_num;
+		Layout_Drivers - IssuedRecord;
 		unsigned1 zero  := 0;
 		string1   blank := '';
 	end;
 
-	EXPORT Layout_Drivers := DriversV2.Layout_Drivers_Extended;
+
 	
 	EXPORT Layout_DL := DriversV2.Layout_DL;
 	
@@ -164,5 +169,8 @@ unsigned1 zero;
 string1 blank;
 string100 cust_name;
 string20 bug_num;
+qstring8 link_dob;
+qstring9 link_ssn;
 END;
+
 END;

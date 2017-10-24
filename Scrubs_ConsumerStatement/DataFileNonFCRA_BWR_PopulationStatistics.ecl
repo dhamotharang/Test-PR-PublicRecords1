@@ -1,0 +1,7 @@
+﻿//This is the code to execute in a builder window
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','Scrubs_ConsumerStatement.DataFileNonFCRA_BWR_PopulationStatistics - Population Statistics - SALT V3.8.0');
+IMPORT Scrubs_ConsumerStatement,SALT38;
+// In the line below substitute the file you want statistics for; and substitute any field names you can
+  Scrubs_ConsumerStatement.DataFileNonFCRA_MAC_PopulationStatistics(YourFileName,/*Reference Field*/,/* statement_id_field */,/* orig_fname_field */,/* orig_lname_field */,/* orig_mname_field */,/* orig_cname_field */,/* orig_address_field */,/* orig_city_field */,/* orig_st_field */,/* orig_zip_field */,/* orig_zip4_field */,/* phone_field */,/* title_field */,/* fname_field */,/* mname_field */,/* lname_field */,/* name_suffix_field */,/* name_score_field */,/* prim_range_field */,/* predir_field */,/* prim_name_field */,/* addr_suffix_field */,/* postdir_field */,/* unit_desig_field */,/* sec_range_field */,/* p_city_name_field */,/* v_city_name_field */,/* st_field */,/* zip_field */,/* zip4_field */,/* cart_field */,/* cr_sort_sz_field */,/* lot_field */,/* lot_order_field */,/* dbpc_field */,/* chk_digit_field */,/* rec_type_field */,/* county_field */,/* geo_lat_field */,/* geo_long_field */,/* msa_field */,/* geo_blk_field */,/* geo_match_field */,/* err_stat_field */,/* date_submitted_field */,/* date_created_field */,/* did_field */,/* consumer_text_field */,/* override_flag_field */,outfile);
+  OUTPUT(outfile,NAMED('PopulationStatistics'));

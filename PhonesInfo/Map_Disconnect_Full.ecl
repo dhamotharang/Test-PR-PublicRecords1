@@ -18,7 +18,8 @@ ds 	:= PhonesInfo.File_Deact.History;
 																								std.str.find(truncFilename, 'tmobile', 1)<>0 	=> 'TMOBILE',
 																								std.str.find(truncFilename, 'uscc', 1)<>0 		=> 'USCC',
 																								std.str.find(truncFilename, 'verizon', 1)<>0 	=> 'VERIZON',
-																								std.str.find(truncFilename, 'clearsky', 1)<>0 	=> 'CLEARSKY',
+																								std.str.find(truncFilename, 'clearsky', 1)<>0 => 'CLEARSKY',
+																								std.str.find(truncFilename, 'interop', 1)<>0 	=> 'INTEROP',
 																								''), left, right);		
 			self.filedate									:= trFilename[length(trFilename)-7..];
 			self.swap_start_dt						:= if(l.action_code in ['SW'], (unsigned)l.timestamp, 0);
