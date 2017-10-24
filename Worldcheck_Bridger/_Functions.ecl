@@ -1114,6 +1114,7 @@
 				trim(kword, left, right) = 'INSAE-50-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_INSAE_50_WC,
 				trim(kword, left, right) = 'OFAC-DPRK4' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_DPRK4,
 				trim(kword, left, right) = 'PHNBI' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHNBI,
+				trim(kword, left, right) = 'PHDND-MLAO' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHDND_MLAO,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

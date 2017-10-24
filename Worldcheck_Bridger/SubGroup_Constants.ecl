@@ -1012,6 +1012,7 @@
 		export string KEYWORD_INSAE_50_WC						:= '700';		
 		export string KEYWORD_OFAC_DPRK4						:= '701';		
 		export string KEYWORD_PHNBI									:= '702';		
+		export string KEYWORD_PHDND_MLAO						:= '703';		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	
