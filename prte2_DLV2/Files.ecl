@@ -1,4 +1,4 @@
-import prte_csv, header,ut,AutoKey,NID,autokeyb2,Census_data,codes;
+﻿import prte_csv, header,ut,AutoKey,NID,autokeyb2,Census_data,codes;
 
 EXPORT files := module
 
@@ -97,7 +97,7 @@ o6 := join(o5,
 EXPORT dl2_dl_number			  := o6;
 
 
-file_search_prep := PROJECT(dl2_base, Layouts.Layout_Base - cust_name - bug_num);
+file_search_prep := PROJECT(dl2_base, Layouts.Layout_Drivers);
 
 export File_DL_Search 			  := Header.fn_dlamxtnd(file_search_prep);
 
