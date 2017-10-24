@@ -69,9 +69,9 @@ currentDate := (STRING)STD.Date.Today();
 										30 => COUNT(SubjectPhone.InquiryDates((UNSIGNED4)inquiryDate>=(UNSIGNED)ut.date_math(currentDate, -l.Threshold))) + SubjectPhone.RecordsReturned
 										                                                            >= MAX(l.ThresholdA,Constants.InquiryDayLimit),
                     31=> 	SubjectPhone.CallForwardingIndicator   =	PhoneFinder_Services.Functions.CallForwardingDesc(1),							
-										32 => (UNSIGNED)SubjectPhone.dt_first_seen > 0,
-										33 => (UNSIGNED)SubjectPhone.dt_last_seen > 0,
-										34 => (UNSIGNED)SubjectPhone.dt_first_seen > 0 AND (UNSIGNED)SubjectPhone.dt_last_seen > 0,
+										32 => (UNSIGNED)SubjectPhone.dt_first_seen = 0,
+										33 => (UNSIGNED)SubjectPhone.dt_last_seen = 0,
+										34 => (UNSIGNED)SubjectPhone.dt_first_seen = 0 AND (UNSIGNED)SubjectPhone.dt_last_seen = 0,
 										FALSE);				
 		//Keep violating rules and risk indicator	based on individual rule.
 		SELF.Alerts 	 := IF(hasFailed, PROJECT(l, TRANSFORM(alertRec, SELF.flag := LEFT.Category,SELF.message := LEFT.RiskDescription)));
