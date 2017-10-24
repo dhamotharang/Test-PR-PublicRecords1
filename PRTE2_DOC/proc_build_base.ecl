@@ -1,4 +1,4 @@
-IMPORT  PRTE2_DOC,PromoteSupers, prte2,ut, std, address, aid;
+﻿IMPORT  PRTE2_DOC,PromoteSupers, prte2,ut, std, address, aid;
 
 EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 		
@@ -38,7 +38,7 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
 			self.lname := Address.CleanNameFields(clean_name).lname;
 			self.name_suffix := Address.CleanNameFields(clean_name).name_suffix;
 			SELF.DOB := INTFORMAT(l.DOB,8,1); 
-			self.did := (string12)prte2.fn_AppendFakeID.did(self.lname, self.lname, l.SSN, SELF.DOB, l.cust_name);
+			self.did := (string12)prte2.fn_AppendFakeID.did(self.fname, self.lname, l.link_ssn, l.link_dob, l.cust_name);
 			SELF.ZIP5 := l.ZIP5;
 			self.ssn_appended := l.ssn;
 			self.ace_fips_st := l.clean_address.fips_state;
