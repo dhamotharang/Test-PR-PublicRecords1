@@ -1,4 +1,4 @@
-import lib_keylib,lib_fileservices,ut,Header;
+﻿import lib_fileservices,ut,Header;
 
 export	as_header(dataset(Layouts.base) pFile = dataset([],Layouts.base), boolean pForHeaderBuild=false, boolean pFastHeader= false)
  :=
