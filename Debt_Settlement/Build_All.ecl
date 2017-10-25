@@ -1,11 +1,11 @@
-import versioncontrol, _control,Business_Header;
+﻿import versioncontrol, _control,Business_Header, Orbit3;
 
 export Build_All(
 
 	 string																			pversion
-	,string																			pServerIP						= _control.IPAddress.edata10
-	,string																			pDirectory					= '/prod_data_build_13/eval_data/debt_settlement/'
-	,string																			pFilename						= 'attroney_file_did_stats.csv'
+	,string																			pServerIP						= _control.IPAddress.bctlpedata11
+	,string																			pDirectory					= '/data/prod_data_build_13/eval_data/debt_settlement/data/'+ pversion + '/'
+	,string																			pFilename						= 'attorney_file_did_stats.csv'
 	,string																			pFilename2					= 'DebtSettlementCreditCounsel.csv'
 	,boolean																		pUseBusHeader				= _Flags.UseBusinessHeader
 	,string																			pGroupName					= _Constants().groupname																		
@@ -37,7 +37,7 @@ module
 		,pOverwrite
 
 	));
-	
+	orbit_update := Orbit3.proc_Orbit3_CreateBuild ('DebtSettlement',pversion,'N');	
 	export full_build := sequential(
 		Create_Supers
 		,spray_files
@@ -48,7 +48,7 @@ module
 		,Promote().Inputfiles.Using2Used
 		,QA_Records()
 		,Build_Strata(pversion,pOverwrite,,pIsTesting)
-		
+		,orbit_update
 	) : success(Send_Emails(pversion).Roxie), failure(send_emails(pversion).buildfailure);
 	
 	export All :=
