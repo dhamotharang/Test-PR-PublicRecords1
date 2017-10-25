@@ -1,4 +1,4 @@
-import	_control,Address,AID,ut;
+﻿import	_control,Address,AID,ut;
 
 export	Spray_Prep_Fedex(string	pVersion)	:= function
 	string					vCorrectionsCSVSeparator				:=	',';
@@ -31,8 +31,7 @@ export	Spray_Prep_Fedex(string	pVersion)	:= function
 																												vCorrectionsCSVSeparator,
 																												vCorrectionsCSVTerminator,
 																												vCorrectionsCSVQuote,
-																											//_control.TargetGroup.Thor400_20,
-																												'thor400_30',
+																											_control.TargetGroup.Thor400_44,
 																												vCorrectionsTempLogicalFileName,
 																												,,,true,true,true
 																											), 
