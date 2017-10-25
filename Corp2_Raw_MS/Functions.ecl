@@ -1,4 +1,4 @@
-IMPORT corp2, ut, address;
+﻿IMPORT corp2, ut, address;
 
 EXPORT FUNCTIONS := Module
 
@@ -264,7 +264,7 @@ EXPORT FUNCTIONS := Module
 							'VOLUNTARYDISSOLVED'                                => 'VOLUNTARY DISSOLVED',
 							'WITHDRAWN'                                         => 'WITHDRAWN',
 							'WITHDRAWNBYMERGER'                                 => 'WITHDRAWN BY MERGER',
-							'GOOD'                                              => '',
+							'GOOD'                                              => 'GOOD STANDING', // DF-19224
 							''					                                        => '',
 							'**|'+corp2.t2u(strValue));
 										
