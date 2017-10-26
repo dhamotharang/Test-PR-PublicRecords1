@@ -13,6 +13,6 @@ EXPORT MAC_Govt_Collections_Report_Service := MACRO
 											'IndustryClass',
 											'ssnMask',
 											/*---- ESDL Request Field .----*/
-											'icrreportrequest'
+											'IdentityContactResolutionReportRequest'
 										));	                  
 ENDMACRO;

@@ -78,7 +78,7 @@ EXPORT getAttributes (DATASET(doxie.layout_best) infile,
           END;
 
         ds_gatewayRecToGetDid := DATASET([xfm_intoGetDidLayout(_rowGw)]);
-        ds_gatewayRecDid := AutoHeaderV2.get_dids(ds_gatewayRecToGetDid); 
+        ds_gatewayRecDid := AutoHeaderV2.get_dids(ds_gatewayRecToGetDid,,FALSE); 
         
         useGatewayResults := ds_gatewayRecDid[1].DID = _rowInf.DID;
 
