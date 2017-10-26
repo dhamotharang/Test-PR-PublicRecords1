@@ -34,6 +34,7 @@ EXPORT IP_Metadata := MODULE
 		unsigned8 edge_postal_conf;
 		integer8 edge_gmt_offset;
 		string5 edge_in_dst;
+		string40 edge_timezone_name;
 		string10 sic_code;
 		string70 domain_name;
 		string200 isp_name;
