@@ -1,5 +1,6 @@
 ﻿IMPORT Gateway, Phones, PhoneFinder_Services, STD;
 EXPORT GetZumigoIdentity_Records(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final)  dPhoneRecs,
+                                 DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInBestInfo,
                                  PhoneFinder_Services.iParam.ReportParams         inMod,
 																 DATASET(Gateway.Layouts.Config) dGateways) := 
 
@@ -8,34 +9,38 @@ MODULE
    
    Ph_wireless := dPhoneRecs(phone <> '' AND typeflag != Phones.Constants.TypeFlag.DataSource_PV AND COC_description = PhoneFinder_Services.Constants.PhoneType.Wireless);
 
-   // for phone search, we are sending upto 10 identities.
-   PhoneSrch_wireless := TOPN(GROUP(SORT(Ph_wireless(phone = batch_in.homephone), acctno, seq), acctno), 10, acctno);
+   // for phone search, we are sending upto 10 different identities per acct, by picking recent ones.
+   Ph_wireless_ddp := DEDUP(SORT(Ph_wireless, acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip), acctno, phone, fname, lname, prim_range, prim_name, city_name, st, zip);
+   PhoneSrch_wireless := TOPN(GROUP(SORT(Ph_wireless_ddp(phone = batch_in.homephone), acctno,  -dt_last_seen, dt_first_seen, seq), acctno), 10, acctno);
                                 	
-   Primary_identity_phones := dPhoneRecs(batch_in.homephone = ''  AND isprimaryphone AND phone<>'' AND fname<>'' AND lname<>'' AND prim_name<>'' AND city_name<>'' AND st<>'' AND zip<>'');
-	
-   PII_wireless_pre := DEDUP(SORT(Ph_wireless(batch_in.homephone = ''),acctno, seq),acctno);
-	 
-   // sending in primary identities name/addr to first wireless phone 
+  
+	// for pii search, sending in one primary wireless phone , if available, else one other phone per acct
+	// sorting other phones(non primary) by score and dates 
+  	
+   PII_wireless_pre := DEDUP(SORT(Ph_wireless(batch_in.homephone = ''), acctno, if(isprimaryphone, 1, 0), -phone_score, -dt_last_seen, dt_first_seen), acctno);
+     
+		 // sending in best identities name/addr to first wireless phone 
    PhoneFinder_Services.Layouts.PhoneFinder.Final in_addr(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
-	                                                       PhoneFinder_Services.Layouts.PhoneFinder.Final r)
-   := TRANSFORM
-     SELF.phone :=  l.phone;
-     SELF.fname :=  r.fname;
-     SELF.lname := r.lname;
-     SELF.prim_range := r.prim_range;
-     SELF.prim_name := r.prim_name;
-     SELF.city_name := r.city_name;
-     SELF.st :=  r.st;
-     SELF.zip :=  r.zip;
-     SELF := l;																				
-																																														
-   END;
-	 
-   // for PII search, we are sending only one identity to zumigo
-   PII_wireless := JOIN(PII_wireless_pre, Primary_identity_phones, LEFT.acctno = RIGHT.acctno AND LEFT.did = RIGHT.did, in_addr(left,right),limit(0), keep(1));
+   	                                                       PhoneFinder_Services.Layouts.BatchInAppendDID r)
+      := TRANSFORM
+        SELF.phone :=  l.phone;
+        SELF.fname :=  r.name_first;
+        SELF.lname := r.name_last;
+        SELF.prim_range := r.prim_range;
+        SELF.prim_name := r.prim_name;
+        SELF.city_name := r.p_city_name;
+        SELF.st :=  r.st;
+        SELF.zip :=  r.z5;
+        SELF := l;																				
+   																																														
+      END;
+
+
+   PII_wireless := JOIN(PII_wireless_pre, dInBestInfo, LEFT.acctno = RIGHT.acctno, in_addr(left,right),limit(0), keep(1));
 
    Phones_wireless := PII_wireless + PhoneSrch_wireless;
-		
+
+
    Zum_inMod := MODULE(Phones.IParam.inZumigoParams)
 /*      use_case := MAP(inMod.Usecase[1] = '1' => 'OTPCFD',
                        inMod.Usecase[2] = '1' => 'FCIP',
@@ -49,16 +54,16 @@ MODULE
 		 EXPORT STRING8	billingId := inMod.billingId;
 		 EXPORT STRING20 productName := 'PHONE FINDER';
 		 SHARED UNSIGNED1 consent_level := inMod.LineIdentityConsentLevel;	
-		 EXPORT BOOLEAN 	NameAddressValidation := CASE(consent_level, 1 => FALSE,  2 => FALSE,  3 => TRUE, FALSE); // Only nameaddrvalidation and callhandlinginfo for this phase
-		 EXPORT BOOLEAN	NameAddressInfo       := CASE(consent_level, 1 => FALSE, 2 => FALSE,  3 => FALSE, FALSE);
-		 EXPORT BOOLEAN	AccountInfo           := CASE(consent_level, 1 => FALSE, 2 => FALSE,  3 => FALSE, FALSE);
-		 EXPORT BOOLEAN	CarrierInfo           := CASE(consent_level, 1 => FALSE, 2 => FALSE, 3 => FALSE, FALSE);
-		 EXPORT BOOLEAN	CallHandlingInfo      := CASE(consent_level, 1 => FALSE, 2 => FALSE,  3 => TRUE, FALSE);
-		 EXPORT BOOLEAN	DeviceInfo            := CASE(consent_level, 1 => FALSE, 2 => FALSE,  3 => FALSE, FALSE);
-		 EXPORT BOOLEAN 	DeviceHistory         := CASE(consent_level, 1 => FALSE, 2 => FALSE, 3 => FALSE, FALSE);
+		 EXPORT BOOLEAN 	NameAddressValidation := IF(consent_level = 3, TRUE, FALSE); // Only nameaddrvalidation and callhandlinginfo for this phase
+		 EXPORT BOOLEAN	NameAddressInfo       := FALSE;
+		 EXPORT BOOLEAN	AccountInfo           := FALSE;
+		 EXPORT BOOLEAN	CarrierInfo           := FALSE;
+		 EXPORT BOOLEAN	CallHandlingInfo      := IF(consent_level =3, TRUE, FALSE);
+		 EXPORT BOOLEAN	DeviceInfo            := FALSE;
+		 EXPORT BOOLEAN 	DeviceHistory         := FALSE;
 		 EXPORT STRING10 optInType             := 'Whitelist';
-		 EXPORT STRING5 	optInMethod           := CASE(consent_level, 1 => 'TCPA', 2 => 'IVR', 3 => 'TCO', '');
-		 EXPORT STRING3 	optinDuration         := CASE(consent_level, 1 => 'ONE', 2 => 'ONE', 3 => 'ONG', '');
+		 EXPORT STRING5 	optInMethod           := IF(consent_level= 3, 'TCO', '');
+		 EXPORT STRING3 	optinDuration         := IF(consent_level= 3, 'ONG', '');
 		 EXPORT STRING 	optinId               := IF(Phones.Constants.Debug.Testing, '1', inMod.billingId);
 		 EXPORT STRING 	optInVersionId        := '';
 		 EXPORT STRING15 optInTimestamp := (STRING)STD.Date.CurrentDate(TRUE)+' '+(STRING)INTFORMAT(STD.Date.CurrentTime(TRUE),6,1);	

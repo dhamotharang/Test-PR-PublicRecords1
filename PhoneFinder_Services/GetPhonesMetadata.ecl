@@ -25,7 +25,7 @@
 	// ****************************************Process Location*************************************************
 	// ---------------------------------------------------------------------------------------------------------																
 	PhoneFinder_Services.Layouts.PhoneFinder.Final UpdatePrimaryAddress (PhoneFinder_Services.Layouts.PhoneFinder.Final l, dInBestInfo r) := TRANSFORM
-		bestMatch := l.acctno=r.acctno and l.did=r.did;
+		bestMatch := l.acctno=r.acctno and (l.did=r.did OR l.batch_in.did = r.did);
 		SELF.prim_range 	:= IF(bestMatch,r.prim_range,l.prim_range);
 		SELF.predir 			:= IF(bestMatch,r.predir,l.predir);
 		SELF.prim_name 		:= IF(bestMatch,r.prim_name,l.prim_name);
@@ -35,6 +35,7 @@
 		SELF.city_name 		:= IF(bestMatch,r.p_city_name,l.city_name);
 		SELF.st 					:= IF(bestMatch,r.st,l.st);
 		SELF.zip 					:= IF(bestMatch,r.z5,l.zip);
+		SELF.did 					:= IF(bestMatch,r.did,l.did);
 		SELF.phone_vendor	:= IF(bestMatch,'BA',l.phone_vendor); // identify info as coming from best rec, is not display in final output
 		SELF.isprimaryphone := l.isprimaryphone;
 		SELF := l;
@@ -425,15 +426,16 @@
 		
 	
   #IF(PhoneFinder_Services.Constants.Debug.PhoneMetadata)		
-		OUTPUT(dSearchRecs0,NAMED('dSearchRecs0'));												
-		OUTPUT(dSearchRecs,NAMED('dSearchRecs'));												
-		OUTPUT(phoneStateUpdate,NAMED('phoneStateUpdate'));												
-		OUTPUT(bestInfo,NAMED('bestInfo'));												
-		OUTPUT(phonewBestAddr,NAMED('phonewBestAddr'));												
-		OUTPUT(ds_zip,NAMED('ds_zip'));												
-		OUTPUT(ds_cityState,NAMED('ds_cityState'));												
-		OUTPUT(dSearchRecswAddrType,NAMED('dSearchRecswAddrType'));												
-		OUTPUT(dSearchRecswLocInfo,NAMED('dSearchRecswLocInfo'));												
+ 		OUTPUT(dSearchRecs0,NAMED('dSearchRecs0'));												
+ 		OUTPUT(dInBestInfo,NAMED('dInBestInfo'));												
+   	OUTPUT(dSearchRecs,NAMED('dSearchRecs_metadata'));												
+   	OUTPUT(phoneStateUpdate,NAMED('phoneStateUpdate'));												
+    OUTPUT(bestInfo,NAMED('bestInfo'));												
+    OUTPUT(phonewBestAddr,NAMED('phonewBestAddr'));												
+    OUTPUT(ds_zip,NAMED('ds_zip'));												
+    OUTPUT(ds_cityState,NAMED('ds_cityState'));												
+    OUTPUT(dSearchRecswAddrType,NAMED('dSearchRecswAddrType'));												
+    OUTPUT(dPhoneInquiryRecs_final,NAMED('dPhoneInquiryRecs_final'));												
 		// OUTPUT(dssubjects,NAMED('dsSubjects'));												
 		// OUTPUT(subjectInfo,NAMED('subjectInfo'));																			
 		// OUTPUT(dDeltabaseSpoofed,NAMED('dDeltabaseSpoofed'));												
@@ -442,7 +444,7 @@
 		// OUTPUT(transformSpoof,NAMED('transformSpoof'));		
 		// OUTPUT(spoofInfo,NAMED('spoofInfo'));		
 		// OUTPUT(spoofInfowHistory,NAMED('spoofInfowHistory'));	
-		OUTPUT(dPhoneInfoUpdate,NAMED('dPhoneInfoUpdate'));	
+	  OUTPUT(dPhoneInfoUpdate,NAMED('dPhoneInfoUpdate'));	
 		// OUTPUT(dOTP,NAMED('dOTPIndex'));		
 		// OUTPUT(dDeltaOTPwSubject,NAMED('dDeltaOTPwSubject'));		
 		// OUTPUT(dOTPPhones,NAMED('dOTPPhones'));		
@@ -462,7 +464,7 @@
 		OUTPUT(dotherPhones_wRiskValues,NAMED('otherPhones_wRiskValues'));		
 		// OUTPUT(dPRIResults,NAMED('PRIResults'));		
 		OUTPUT(PhoneAlerts,NAMED('PhoneAlerts'));		
-		OUTPUT(PhoneInfowPRI,NAMED('dPhoneInfowPRI'));		
+		OUTPUT(dPhoneInfowPRI,NAMED('dPhoneInfowPRI'));		
 		OUTPUT(MetadataResults,NAMED('MetadataResults'));		
 	#END;
 	

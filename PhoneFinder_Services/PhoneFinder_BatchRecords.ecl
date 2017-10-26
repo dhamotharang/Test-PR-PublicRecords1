@@ -119,7 +119,7 @@ MODULE
 		                           PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs,inMod,dGateways,subjectInfo,accu_inport(port_end_dt <> 0)),
 															 dSearchRecs);																	 
    
-	SHARED Zum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(ported_phones, inMod, dGateways);
+	SHARED Zum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(ported_phones, dinBestInfo, inMod, dGateways);
 	SHARED Zumigo_recs:= Zum_gw_recs.Zumigo_GLI;
 
 	

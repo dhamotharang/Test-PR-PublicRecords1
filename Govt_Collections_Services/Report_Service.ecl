@@ -1,20 +1,20 @@
 ﻿/*--SOAP--
 <message name="govt_collections_services.report_service">
-  <part name="icrreportrequest" sequence="1" type="tns:XmlDataset"/>
+  <part name="IdentityContactResolutionReportRequest" sequence="1" type="tns:XmlDataset"/>
 </message>
 */
 IMPORT Address, AutoStandardI, Gateway, iesp, govt_collections_services, ut, Doxie, Suppress, STD, WSInput;
 
 EXPORT Report_Service() := MACRO
 
-		// From batch - Initialize batch param values now that ESP param values have been loaded.
-		batch_params := Govt_Collections_Services.IParams.getBatchParams();	
-    
     // Setup the field that shall be displayed on the WsECL page.
     WSInput.MAC_Govt_Collections_Report_Service();
     
+		// From batch - Initialize batch param values now that ESP param values have been loaded.
+		batch_params := Govt_Collections_Services.IParams.getBatchParams();	
+    
     // Parse the ESDL input
-    dIn := DATASET([], iesp.identity_contact_resolution.t_IdentityContactResolutionReportRequest) : STORED('ICRReportRequest',FEW);
+    dIn := DATASET([], iesp.identity_contact_resolution.t_IdentityContactResolutionReportRequest) : STORED('IdentityContactResolutionReportRequest',FEW);
     icrRequest := dIn[1] : INDEPENDENT;
     
     // Reportby request
@@ -28,7 +28,7 @@ EXPORT Report_Service() := MACRO
     
     // Attempt to derive an SSN from the given DID value that may be provided on input to this service
     // interface.
-    dids := DATASET ([{icrReportBy.uniqueid}], doxie.layout_references_hh);
+    dids := DATASET ([{icrReportBy.uniqueid}], doxie.layout_references);
     ds_header := doxie.central_header (dids, false, false, true);
     
     // Use the unmasked SSN regardless of SSN mask setting because we are using this SSN internally in
