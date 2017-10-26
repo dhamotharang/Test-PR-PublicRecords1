@@ -52,11 +52,26 @@ EXPORT RawDeltaBaseSQL(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 		EXPORT string		ALLStreetSQL						:= accidentStreetSQL+crossStreetSQL+nextStreetSQL;
 		EXPORT string		ANYStreetSQLifParms			:= IF(hasANYStreet,' AND ('+ALLStreetSQL+')','');
 		EXPORT string   location_search_sql := IF (hasAccidentStreet, ' AND k.accident_location_street LIKE "%'+in_mod.AccidentLocationStreet+'%"', '') + IF (hasCrossStreet, ' AND k.accident_location_crossstreet LIKE "%'+in_mod.AccidentLocationCrossStreet+'%"','');
-
-		vinSQL := IF(in_mod.VehicleVin <> '', ' AND v.vin = "' + in_mod.VehicleVin + '"', '');
-		licenseSQL := IF(in_mod.driversLicenseNumber <> '', ' AND p.driver_license_number = "' + in_mod.driversLicenseNumber + '"', '');
-		tagSQL := IF(in_mod.LicensePlate <> '', ' AND v.tag_number = "' + in_mod.LicensePlate + '"', '');		
-		officerBadgeSQL := IF(in_mod.OfficerBadgeNumber <> '', ' AND k.officer_id = "' + in_mod.OfficerBadgeNumber + '"', '');
+		EXPORT boolean 	hasDolStartdate := in_mod.DolStartdate <> '';
+		EXPORT boolean 	hasDolEnddate := in_mod.DolEnddate <> '';
+		EXPORT boolean 	hasVin := in_mod.VehicleVin <> '';
+		EXPORT boolean 	haslicenseNbr := in_mod.driversLicenseNumber <> '';
+		EXPORT boolean 	hasTag := in_mod.LicensePlate <> '';
+		EXPORT boolean 	hasOfficerBadge := in_mod.OfficerBadgeNumber <> '';
+		
+		EXPORT boolean isDOLOnly := ((hasDolStartdate AND hasDolEnddate) OR hasInputDOL)
+			AND ~hasOneNameParm 
+			AND	~hasANYStreet
+			AND ~hasReportNumberParm 
+			AND ~hasVin
+			AND ~haslicenseNbr
+			AND ~hasTag
+			AND ~hasOfficerBadge;
+		
+		vinSQL := IF(hasVin, ' AND v.vin = "' + in_mod.VehicleVin + '"', '');
+		licenseSQL := IF(haslicenseNbr, ' AND p.driver_license_number = "' + in_mod.driversLicenseNumber + '"', '');
+		tagSQL := IF(hasTag, ' AND v.tag_number = "' + in_mod.LicensePlate + '"', '');		
+		officerBadgeSQL := IF(hasOfficerBadge, ' AND k.officer_id = "' + in_mod.OfficerBadgeNumber + '"', '');
 
 		
 	  shared dataset(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended) GetNormzd_aliasrecs(eCrash_Services.IParam.searchrecords tmod):= FUNCTION
@@ -167,11 +182,14 @@ EXPORT RawDeltaBaseSQL(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 		//TODO   *OR* I can remove the existing ANYStreetSQLifParms ... not sure how long that's been there but it hasn't appeared to hurt anything.
 		//TODO 7-9-13 ... I think I really need to add fuzzyCaseIdentitySQL here to limit rows returned.
 		EXPORT byAutoRecsWhere(eCrash_Services.Layouts.ECrashSearchAgency_alias_extended Rec) := FUNCTION
-				RETURN 
+				RETURN IF(
+					isDOLOnly, 
+					'',
 					fullNameSQLifParms
 					+ ANYStreetSQLifParms
 					+ Rec.jurisAndStateIfParmsElseNotNull
-					+ Rec.vinLicenseTagOfficerBadgeSQL;
+					+ Rec.vinLicenseTagOfficerBadgeSQL
+				);
 		END;
 		
 		EXPORT byAutoRecsSQL() := FUNCTION		
