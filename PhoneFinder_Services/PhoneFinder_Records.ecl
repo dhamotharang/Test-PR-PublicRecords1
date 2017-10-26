@@ -104,8 +104,9 @@ MODULE
 	SHARED dPorted_Phones := IF(inMod.IncludePhoneMetadata, 
 		                           PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs,inMod,dGateways,dSubjectInfo,dAccu_inport(port_end_dt <> 0)),
 															 dSearchRecs);
+	
 	// zumigo call														 
-	SHARED dZum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(dPorted_Phones, inMod, dGateways);
+	SHARED dZum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(dPorted_Phones, dinBestInfo, inMod, dGateways);
 	SHARED dZumigo_recs:= dZum_gw_recs.Zumigo_GLI; // zumigo records
 	
 	SHARED dZum_final := IF(inMod.UseZumigoIdentity, dZumigo_recs, dPorted_Phones);

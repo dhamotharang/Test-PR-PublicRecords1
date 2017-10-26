@@ -37,7 +37,7 @@ did_fcra := dids[1].did;
 application_type_value := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(isFCRA),AutoStandardI.InterfaceTranslator.application_type_val.params));
 
 // FFD - BEGIN				 
-integer8 inFFDMask 					:= FFD.FFDMask.Get(inApplicationType:=application_type_value);
+integer8 inFFDMask := FFD.FFDMask.Get(inApplicationType:=application_type_value);
 boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDMask);
 
 // get person context
@@ -69,13 +69,13 @@ eq_act_dec_rec :=
                                   );
 
 tempmod := module(project(AutoStandardI.GlobalModule(IsFCRA),CriminalRecords_Services.IParam.report,opt))
-    export string14 did := (string) dids[1].did;
-    export string25 doc_number   := '' ;
-    export string60 offender_key := '' ;
-    export boolean  IncludeAllCriminalRecords := true;
-    export boolean  IncludeSexualOffenses := false;  
-		export integer8 FFDOptionsMask := inFFDMask;
-		export boolean  SkipPersonContextCall := true;
+  export string14 did := (string) dids[1].did;
+  export string25 doc_number := '';
+  export string60 offender_key := '';
+  export boolean  IncludeAllCriminalRecords := true;
+  export boolean  IncludeSexualOffenses := false;
+  export integer8 FFDOptionsMask := inFFDMask;
+  export boolean  SkipPersonContextCall := true;
 end;
 crmr := CriminalRecords_Services.ReportService_Records.val(tempmod, IsFCRA, pc_recs);
 docr2 := IF (Include_CriminalRecords_val, crmr[1].CriminalRecords);
@@ -84,10 +84,10 @@ so_rec := doxie.SexOffender_Search_Records(besr, isFCRA, slim_pc_recs, inFFDMask
 soff := if(Include_SexualOffenses_val, dedup(sort(so_rec,seisint_primary_key),seisint_primary_key));
 
 doxie_crs.layout_report_fcra patch(doxie.layout_central_records l) := transform
-	self.DOC2_children         := global (docr2);
-	self.sex_offenses_children := global(soff);
+  self.DOC2_children         := global (docr2);
+  self.sex_offenses_children := global(soff);
   self.Eq_Decisioning_Attr   := eq_act_dec_rec[1];
-	self := l;
+  self := l;
   self := []; //vehicles, images
 end;
 
@@ -97,19 +97,13 @@ consumer_statements := if(ShowConsumerStatements and exists(all_records), FFD.pr
 outputErrors := output (remote_header_err, NAMED('exception'), EXTEND);
 
 // 'FARES' fcra-props are filtered out by definition; (no royalties).
-// keep empty royalties for the sake of the same output as regular CRS
-
-royalties := IF(all_records[1].Eq_Decisioning_Attr.EQUIFAX_GATEWAY_USAGE > EquifaxDecisioning.Constants.EQUIFAX_GATEWAY_USAGE.GATEWAY_NOT_CALLED,  //ENUM(UNSIGNED1, GATEWAY_NOT_REQUESTED, GATEWAY_NOT_CALLED, RESULTS_RETURNED, RESULTS_NOT_RETURNED, NO_GATEWAY_ATTRIUBTES_RETURNED )
-                DATASET ([{Royalty.Constants.RoyaltyCode.EFX_ATTR, 
-													 Royalty.Constants.RoyaltyType.EFX_ATTR, 
-							             1, 0}], Royalty.Layouts.Royalty),
-                DATASET ([], Royalty.Layouts.Royalty));
+royalties := IF(EquifaxDecisioningRequested, Royalty.RoyaltyEqDecisioning.GetOnlineRoyalties(eq_act_dec_rec));
 
 DO_ALL := parallel(
   output (all_records,named('CRS_result')),
   output (consumer_statements,named('ConsumerStatements')),
   output (royalties,named('RoyaltySet')),
-	outputErrors);
+  outputErrors);
 DO_ALL;
 
 ENDMACRO;
