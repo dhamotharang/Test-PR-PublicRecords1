@@ -8,12 +8,12 @@ MODULE
 	//	Server IP to Spray from
 	EXPORT	serverIP	:=	IF(	_control.thisenvironment.name='Dataland',
 														'bctlpedata12.risk.regn.net',
-														'bctlpedata10.risk.regn.net');
+														'bctlpedata11.risk.regn.net');
 	
 	//	Directory to Spray from
 	EXPORT	Directory	:=	IF(	_control.thisenvironment.name='Dataland',
-														'/data/data_build_1/american_student/',
-														'/data/data_build_1/american_student/');
+														'/data/data_build_1/american_student/okc/',
+														'/data/data_build_1/american_student/okc/');
 
 	//	Scrubs email notification
 	EXPORT 	email_notification_scrubs := 'cathy.tio@lexisnexisrisk.com';

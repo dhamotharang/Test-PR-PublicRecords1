@@ -9,7 +9,7 @@ IMPORT Scrubs_OKC_Student_List_V2;
 EXPORT proc_build_all(STRING pversion) := FUNCTION
 
 		RETURN SEQUENTIAL(
-									OKC_Student_List.fSprayFiles(pversion,,,'*','thor50_dev_v2')
+									OKC_Student_List.fSprayFiles(pversion,,,'*')
    		    ,OKC_Student_List.Promote(pversion).inputfiles.Sprayed2Using
    					 ,OKC_Student_List.Build_Ingest_File(pversion)
    					 ,OKC_Student_List.Promote(pversion).Inputfiles.Using2Used
