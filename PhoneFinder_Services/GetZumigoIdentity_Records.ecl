@@ -17,25 +17,32 @@ MODULE
 	// for pii search, sending in one primary wireless phone , if available, else one other phone per acct
 	// sorting other phones(non primary) by score and dates 
   	
-   PII_wireless_pre := DEDUP(SORT(Ph_wireless(batch_in.homephone = ''), acctno, if(isprimaryphone, 1, 0), -phone_score, -dt_last_seen, dt_first_seen), acctno);
+   PII_wireless_pre := DEDUP(SORT(Ph_wireless(batch_in.homephone = ''), acctno, if(isprimaryphone, 0, 1), -phone_score, -dt_last_seen, dt_first_seen), acctno);
      
 		 // sending in best identities name/addr to first wireless phone 
    PhoneFinder_Services.Layouts.PhoneFinder.Final in_addr(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
    	                                                       PhoneFinder_Services.Layouts.BatchInAppendDID r)
-      := TRANSFORM
-        SELF.phone :=  l.phone;
+   := TRANSFORM
+        
+				    SELF.phone :=  l.phone;
         SELF.fname :=  r.name_first;
+        SELF.mname :=  r.name_middle;
         SELF.lname := r.name_last;
         SELF.prim_range := r.prim_range;
+        SELF.predir := r.predir;
         SELF.prim_name := r.prim_name;
+        SELF.suffix := r.addr_suffix;
+        SELF.postdir := r.postdir;
+        SELF.unit_desig := r.unit_desig;
+        SELF.sec_range := r.sec_range;
         SELF.city_name := r.p_city_name;
         SELF.st :=  r.st;
         SELF.zip :=  r.z5;
+        SELF.zip4 :=  r.zip4;
         SELF := l;																				
-   																																														
+   																																																																																																													
       END;
-
-
+	 
    PII_wireless := JOIN(PII_wireless_pre, dInBestInfo, LEFT.acctno = RIGHT.acctno, in_addr(left,right),limit(0), keep(1));
 
    Phones_wireless := PII_wireless + PhoneSrch_wireless;
