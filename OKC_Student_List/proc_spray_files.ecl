@@ -1,4 +1,6 @@
-﻿IMPORT versioncontrol, tools, _control, OKC_Student_List;
+﻿//Example
+//OKC_Student_List.proc_spray_files.fSprayOKCStudentListCollegeMajor('20171027','ds_college_major_mapped_updates_20171026.csv');
+IMPORT versioncontrol, tools, _control, OKC_Student_List;
 EXPORT proc_spray_files := MODULE
 
 	//Spray college info reference table provided by Nicole
@@ -70,10 +72,10 @@ EXPORT proc_spray_files := MODULE
 	//Spray college major mapping table from OKC to ASL, provided by Margaret Product Manager
 	EXPORT fSprayOKCStudentListCollegeMajor( 
 		STRING		pVersionDate		=	'',
-		STRING		pServerIP				= 'bctlpedata12.risk.regn.net',
-		STRING		pDirectory			= '/data/temp/logs/',
 		STRING		pFilename				= 'ds_college_major_mapped.csv',
-		STRING		pGroupName			=	'thor50_dev02',
+		STRING		pServerIP				= Constants().serverIP,
+		STRING		pDirectory			= Constants().Directory,
+		STRING		pGroupName			=	_Dataset().groupname,
 		BOOLEAN		pIsTesting			=	FALSE,
 		BOOLEAN		pOverwrite			=	TRUE,
 		STRING		pNameOutput			=	'Spray OKC_Student_List College Major Mapping Table'
