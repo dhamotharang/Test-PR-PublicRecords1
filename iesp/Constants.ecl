@@ -545,10 +545,25 @@ EXPORT Constants := MODULE
     // Counts used in the iesp.frauddefensenetwork attribute related to the "Susupicious Activity Report"
 		export unsigned2 MAX_COUNT_EXCLUDE_IND_TYPES := 10; //estimated, actual still TBD
 		export unsigned2 MAX_COUNT_FILE_TYPES        := 20; //estimated, actual still TBD
-    export unsigned2 MAX_COUNT_MATCH_DETAILS     := 50; //estimated, actual still TBD  
-    export unsigned2 MAX_COUNT_RESPONSE_RECORDS  := 10; //estimated, actual still TBD
-    export unsigned2 ROLLUP_MAX_COUNT_HITS       := 10; //estimated, actual still TBD
+  export unsigned2 MAX_COUNT_MATCH_DETAILS     := 50; //estimated, actual still TBD  
+  export unsigned2 MAX_COUNT_RESPONSE_RECORDS  := 10; //estimated, actual still TBD
+  export unsigned2 ROLLUP_MAX_COUNT_HITS       := 10; //estimated, actual still TBD
   end;
+	
+	export FraudGov := MODULE
+	 export unsigned2 MAX_COUNT_PAYLOAD := 1000;
+		export unsigned2 MAX_COUNT_VELOCITY := 1000;
+		export unsigned2 MAX_COUNT_KNOWN_RISK := 1000;
+	 export unsigned2 MAX_COUNT_BUSINESS_LINKIDS := 100;
+		export unsigned2 MAX_COUNT_OFFENSES := 6;
+		export unsigned2 MAX_COUNT_CRIMINAL_CASES := 6;
+		export unsigned2 MAX_COUNT_REMARKS := 30;
+		export unsigned2 MAX_COUNT_ADDRESS := 10;
+		export unsigned2 MAX_COUNT_CRIMINAL := 1000;
+		export unsigned2 MAX_COUNT_GLOBAL_WATCHLIST := 1000;
+		export unsigned2 MAX_COUNT_RED_FLAG := 1000;
+		export unsigned2 MAX_ALERT := 4;
+	end;
 	
 	export Fraud_Point := MODULE
 		export unsigned2 MaxAttributes := 256; // update after reviewing attribute return counts.
@@ -2023,19 +2038,6 @@ EXPORT Constants := MODULE
     export unsigned2 MaxResults := 1000;
     export unsigned2 MaxCountSearch := 1000;
   END;
-	
-	export FraudGov := MODULE
-	  export unsigned2 MAX_COUNT_PAYLOAD := 1000;
-		export unsigned2 MAX_COUNT_VELOCITY := 1000;
-		export unsigned2 MAX_COUNT_KNOWN_RISK := 1000;
-	  export unsigned2 MAX_COUNT_BUSINESS_LINKIDS := 100;
-		export unsigned2 MAX_COUNT_CRIMINAL_OFFENSES := 6;
-		export unsigned2 MAX_COUNT_REMARKS := 30;
-		export unsigned2 MAX_COUNT_ADDRESS := 10;
-		export unsigned2 MAX_COUNT_CRIMINAL := 1000;
-		export unsigned2 MAX_COUNT_GLOBAL_WATCHLIST := 1000;
-		export unsigned2 MAX_COUNT_RED_FLAG := 1000;
-	end;
 	
 	// PRCT/Demo Search Tool
   export DEMO_SEARCH_TOOL := MODULE
