@@ -2,11 +2,12 @@
 
 EXPORT IParams := MODULE
 
-	EXPORT Params := INTERFACE(BatchShare.IParam.BatchParams, FCRA.iRules, FCRA.FCRAPurpose.params)
+	EXPORT Params := INTERFACE(BatchShare.IParam.BatchParams, FCRA.iRules)
 		EXPORT STRING50 ReferenceCode := '';
 		EXPORT STRING50 BillingCode := '';
 		EXPORT STRING120 EndUserCompanyName := '';
 		EXPORT STRING6 DOBMask := '';
+		EXPORT STRING PermissiblePurpose := '';
 		EXPORT BOOLEAN FetchLiensJudgments := FALSE;
 		EXPORT BOOLEAN hasGlbPermissiblePurpose := FALSE;
 		EXPORT INTEGER bsVersion := 0;
@@ -29,8 +30,8 @@ EXPORT IParams := MODULE
 			EXPORT STRING50 BillingCode := '' : STORED('BillingCode');
 			EXPORT STRING120 EndUserCompanyName := '' : STORED('EndUserCompanyName');
 			EXPORT STRING6 DOBMask := Suppress.Constants.DATE_MASK_TYPE.NONE : STORED('DOBMask');
-			EXPORT INTEGER FCRAPurpose := FCRA.FCRAPurpose.Get();
-			EXPORT INTEGER8 FFDOptionsMask := FFD.FFDMask.Get(); // for now, just setting the value here, since ESP is not yet passing this option as of 10/11/17. 
+			EXPORT STRING PermissiblePurpose := '' : STORED('FCRAPurpose'); // just a passthrough to the gateway. esdl should have been defined as PermissiblePurpose instead.
+			EXPORT INTEGER8 FFDOptionsMask := FFD.FFDMask.Get(); 
 			EXPORT BOOLEAN FetchLiensJudgments := IncludeLiensJudgments AND NOT isRestricted;
 			EXPORT BOOLEAN hasGlbPermissiblePurpose := perm.glb.ok(bs_mod.GLBPurpose);
 			EXPORT INTEGER bsVersion := 50 : STORED('bsVersion');
