@@ -42,12 +42,7 @@ EXPORT Constants := MODULE
  
   EXPORT DOCRestrictedDataTypes := ['5']; // Arrest records go into Offender and Court_offense keys.
  
-  EXPORT InfutorRestrictedSources := [MDR.sourceTools.src_InfutorTRK];
-	
- 
-	
-  //EXPORT LiensRestrictedSources(string tmsid) := tmsid[1..2] = 'CA'; // California liens, source code ['LF']
-  
+  EXPORT InfutorRestrictedSources := [MDR.sourceTools.src_InfutorTRK];  
 		
 	//EXPORT GongRestrictedSources := [];
 	EXPORT PhonesPlusRestrictedSources := [MDR.sourceTools.src_InfutorCID, MDR.sourceTools.src_Infutor_Veh];
@@ -77,7 +72,7 @@ EXPORT Constants := MODULE
 		MDR.sourceTools.src_Death_Restricted
 		];
 //------------------------------------------------------------------------------------------------------//
-	EXPORT LiensRestrictedSources(string tmsid) := false; // currently none of the sources are restricted. 
+	 EXPORT LiensRestrictedSources(string tmsid) := tmsid[1..2] = 'CA'; // California liens, source code ['LF']
 
 //------------------------------------------------------------------------------------------------------//
 /*  CivilCourtKeys :-  
