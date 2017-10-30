@@ -13,7 +13,7 @@ export t_ICRDebtor := record
 end;
 		
 export t_ICRReportBy := record
-	string9 ssn {xpath('SSN')};
+	string11 ssn {xpath('SSN')};
 	string12 uniqueid {xpath('UniqueId')};
 	iesp.share.t_Name name {xpath('Name')};
 	iesp.share.t_Address address {xpath('Address')};
