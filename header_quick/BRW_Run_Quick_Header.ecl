@@ -8,4 +8,4 @@
 //#OPTION('AllowedClusters', 'thor400_44');
 #OPTION('AllowAutoQueueSwitch',TRUE);
 #OPTION('multiplePersistInstances',FALSE);
-header_quick.proc_quickHdr_build_all('bctlpedata10.risk.regn.net',Header.Sourcedata_month.v_eq_as_of_date);s 
+header_quick.proc_quickHdr_build_all('bctlpedata10.risk.regn.net',Header.Sourcedata_month.v_eq_as_of_date); 
