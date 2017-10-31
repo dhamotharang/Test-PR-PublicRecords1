@@ -2,7 +2,7 @@
 
 EXPORT Build_Search (String filedate) := FUNCTION
 
-boca_search := PROJECT(Files.ln_propertyv2_search_in(ln_fares_id !='ln_fares_id' and ln_fares_id !=''), transform(
+boca_search := PROJECT(Files.ln_propertyv2_search_in, transform(
 						layouts.layout_search_building,
 						self.dt_last_seen := map(left.dt_last_seen <> 0 => left.dt_last_seen, 
 																left.dt_vendor_last_reported <> 0 => left.dt_vendor_last_reported,
@@ -115,13 +115,13 @@ self.persistent_record_id := 0;
 self.app_tax_id :=L.Link_FEIN;
 
 self.dt_first_seen            			:=	(unsigned3)filedate[1..6];
-self.dt_last_seen           				:=	(unsigned3)filedate[1..6];
+self.dt_last_seen           		 		:=	(unsigned3)filedate[1..6];
 
 self.dt_vendor_first_reported				:= (unsigned3)filedate[1..6];
-self.dt_vendor_last_reported				:= (unsigned3)filedate[1..6];
+self.dt_vendor_last_reported			 	:= (unsigned3)filedate[1..6];
 
-self.ln_fares_id            				:=  L.ln_fares_id;
-self.process_date                   :=  filedate;
+self.ln_fares_id            			  :=  L.ln_fares_id;
+self.process_date                :=  filedate;
 self.vendor_source_flag :=L.vendor_Source_flag;
 self.cust_name :=L.cust_name;
 self.link_inc_date :=L.link_inc_date;
@@ -176,11 +176,11 @@ self.app_tax_id :=L.Link_FEIN;
 self.nameasis := choose(cnt,L.assessee_name,L.assessee_name,L.second_assessee_name,L.second_assessee_name);
 self.which_orig := choose(cnt,'1','1','2','2');
 self.dt_first_seen            			:=	(unsigned3)filedate[1..6];
-self.dt_last_seen           				:=	(unsigned3)filedate[1..6];
+self.dt_last_seen           		 		:=	(unsigned3)filedate[1..6];
 self.dt_vendor_first_reported				:=	(unsigned3)filedate[1..6];
-self.dt_vendor_last_reported				:=	(unsigned3)filedate[1..6];
-self.ln_fares_id            				:=L.ln_fares_id;
-self.process_date :=                  filedate;
+self.dt_vendor_last_reported			 	:=	(unsigned3)filedate[1..6];
+self.ln_fares_id            				 :=L.ln_fares_id;
+self.process_date :=             filedate;
 self.vendor_source_flag :=L.vendor_Source_flag;
 self.cust_name :=L.cust_name;
 self.link_inc_date :=L.link_inc_date;
@@ -200,9 +200,9 @@ nameNormalized_tax_2:=nameNormalized_tax(name!='');
 nameNormalizedAll:=nameNormalized_deed_2 + nameNormalized_tax_2;
 
 NID.Mac_CleanFullNames(nameNormalizedAll, VerifyBusRecs, name,_nameorder := 'L',
-                                                                ,includeInRepository:=false, normalizeDualNames:=false);
+                       ,includeInRepository:=false, normalizeDualNames:=false);
 
-		person_flags 		:= ['P', 'D'];
+		person_flags  		:= ['P', 'D'];
 		business_flags 	:= ['B', 'U', 'I'];
 
    
@@ -212,10 +212,10 @@ NID.Mac_CleanFullNames(nameNormalizedAll, VerifyBusRecs, name,_nameorder := 'L',
 			SELF.mname        := IF(L.nametype IN person_flags, L.cln_mname, '');
 			SELF.lname        := IF(L.nametype IN person_flags, L.cln_lname, '');
 			SELF.name_suffix  := IF(L.nametype IN person_flags, L.cln_suffix, '');
-			SELF.cname   := IF(L.nametype IN business_flags, StringLib.StringToUpperCase(L.Name), '');
-			 SELF 							  := L;
-			 SELF := [];
-	   END;
+			SELF.cname        := IF(L.nametype IN business_flags, StringLib.StringToUpperCase(L.Name), '');
+			SELF  							     := L;
+			SELF              := [];
+	  END;
 		 
 		   d_CleanFullNames      := PROJECT(VerifyBusRecs, Trans_cleanBusName(LEFT));
 			 
@@ -230,17 +230,17 @@ NID.Mac_CleanFullNames(nameNormalizedAll, VerifyBusRecs, name,_nameorder := 'L',
 											  self.powid	:=  if (left.cname !='',vLinkingIds.powid, 0);
 			                  self.proxid	:=  if (left.cname !='',vLinkingIds.proxid, 0) ;
 			                  self.seleid	:=  if (left.cname !='',vLinkingIds.seleid, 0) ;
-			                  self.orgid	:=  if (left.cname !='',vLinkingIds.orgid, 0) ;
-		                    self.ultid	:=  if (left.cname !='',vLinkingIds.ultid, 0);
-												SELF.did :=  if (left.cname = '',prte2.fn_AppendFakeID.did(left.fname, left.lname, left.app_ssn, 
-												                left.app_dob, left.cust_name),0);
-										  	self	  		:= left));
+			                  self.orgid	:=   if (left.cname !='',vLinkingIds.orgid, 0) ;
+		                   self.ultid	:=   if (left.cname !='',vLinkingIds.ultid, 0);
+												         SELF.did :=     if (left.cname = '',prte2.fn_AppendFakeID.did(left.fname, left.lname, left.app_ssn, 
+												                            left.app_dob, left.cust_name),0);
+										  	        self	  		:= left));
 														
      dbase2:=dedup(dbase,RECORD,ALL);// : persist('~prte::search::property');
 		 
 		 df_search2:=project(df_search,transform(Layouts.New_Search_Layout,
 		             Self:=left;
-								 self:=[]));
+								       self:=[]));
 		 dbase3:=dbase2 + df_search2;
 		 PromoteSupers.MAC_SF_BuildProcess(dbase3,'~PRTE::BASE::ln_propertyv2::search', writefile_search,,,,filedate);	
 		 SEQUENTIAL(writefile_search);

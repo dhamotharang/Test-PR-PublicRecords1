@@ -1,7 +1,7 @@
 ﻿import RoxieKeyBuild;
 EXPORT SuppressID(string datasetname) := module
 
-	export ValidDatasets := ['liens','gong','ucc','bankruptcy'];
+	export ValidDatasets := ['liens','gong','ucc','bankruptcy','foreclosure','unsuppress','fbn'];
 	
 	export isValidDataset := if (datasetname in ValidDatasets
 																		,true
@@ -25,11 +25,16 @@ EXPORT SuppressID(string datasetname) := module
 	
 	export GetRecords() := dataset(Files().Super,rSuppressLayout,thor,opt);
 	
-	export GetIDsAsSet(boolean isFCRA = false) := set(if (isFCRA
-																										,GetRecords()(flag = 'A' and whenupdated < thresholddate)
-																										,GetRecords()(flag = 'A')
-																									)
-																						,idvalue);
+	export GetIDsAsSet(boolean isFCRA = false, boolean isUnsuppress = false) 
+																					:= if( ~isUnsuppress 
+																								,set(if (isFCRA
+																												,GetRecords()(flag = 'A' and whenupdated < thresholddate)
+																												,GetRecords()(flag = 'A')
+																											)
+																									,idvalue)
+																								,set(GetRecords()(flag = 'D'), idvalue)
+																								);
+	
 		
 	export Add(set of string idvalues
 							,string filedate) := function
@@ -69,18 +74,21 @@ EXPORT SuppressID(string datasetname) := module
 	export Delete(set of string idvalues
 							,string filedate) := function
 		
-		dSuppressedRecords := GetRecords();
+		dSuppressedRecords := GetRecords()(idvalue not in idvalues);
+
+		didvalues := dataset(idvalues,{string idvalue});
 		
-		rSuppressLayout xFlagAsDeletes(dSuppressedRecords l) := transform
-			self.flag := if (l.idvalue in idvalues,'D',l.flag);
+		rSuppressLayout xFlagAsDeletes(didvalues l) := transform
+			self.flag := 'D';
 			self.whenupdated := regexreplace('-', WORKUNIT,'')[2..];
+			self.filedate := filedate;
 			self := l;
 		end;
 		
-		dFlagAsDeletes := project(dSuppressedRecords,xFlagAsDeletes(left));
+		dFlagAsDeletes := project(didvalues,xFlagAsDeletes(left));
 		
 		
-		RoxieKeyBuild.MAC_SF_BuildProcess_V2(dFlagAsDeletes
+		RoxieKeyBuild.MAC_SF_BuildProcess_V2(dFlagAsDeletes + dSuppressedRecords
 																					,Files().Prefix
 																					,Files().Suffix
 																					,filedate
@@ -93,4 +101,7 @@ EXPORT SuppressID(string datasetname) := module
 								);
 		
 	end;
+	
+	
+	
 end;

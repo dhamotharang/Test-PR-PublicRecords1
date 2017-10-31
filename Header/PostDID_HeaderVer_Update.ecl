@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////////////////////
 //	
 //	AttribHeadere	:	Header.PostDID_HeaderVer_Update
 //	Parameters	:	Datasetname
@@ -11,7 +11,7 @@
 
 import did_add,_Control;
 
-export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_file_version',STRING roxie_ip=_Control.RoxieEnv.prod_batch_neutral) := function
+export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_build_version',STRING roxie_ip=_Control.RoxieEnv.prod_batch_neutral) := function
 
 	// Flag file which contains the prod header version used for last DID process
 

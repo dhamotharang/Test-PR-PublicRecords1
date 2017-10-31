@@ -1,4 +1,4 @@
-import STD,lib_workunitservices,lib_stringlib,thorbackup;
+﻿import STD,lib_workunitservices,lib_stringlib,thorbackup;
 EXPORT WorkunitTimingDetails(string esp
 														,string fromemail
 														,string toemaillist
@@ -7,7 +7,7 @@ EXPORT WorkunitTimingDetails(string esp
 	shared states := ['completed','aborted','failed'];
 	shared startwu := 'W20160101-000000';
 	shared endwu := 'W' + (string)STD.Date.Today() + '-' + (string)STD.Date.CurrentTime(true);
-	
+	shared integer baskets := 500;
 	
 	export rWUTimingDetails := record, maxlength(20000)
 		string wuid;
@@ -38,6 +38,8 @@ EXPORT WorkunitTimingDetails(string esp
 		unsigned8 totalthortime := 0;
 		unsigned8 totalprocesstime := 0;
 		unsigned8 totaldfutime := 0;
+		integer whichbasket := 0;
+		integer cnt := 0;
 		string location := dops.constants.location;
 		
 	end;
@@ -48,7 +50,7 @@ EXPORT WorkunitTimingDetails(string esp
 															, highwuid := endwu)(stringlib.StringToLowerCase(state) in states)
 													,	lib_workunitservices.WorkunitServices.workunitlist
 														(lowwuid := p_wuid 
-															, highwuid := p_wuid)	
+															, highwuid := endwu)	
 														), wuid);
 	
 	export GetDetails() := function
@@ -67,7 +69,7 @@ EXPORT WorkunitTimingDetails(string esp
 		dWUTimingDetails := project(dGetWUList,xConvertToLocalLayout(left));
 		
 		
-		rDataVizInfo xCaptureTimings(dWUTimingDetails l) := transform
+		rDataVizInfo xCaptureTimings(dWUTimingDetails l,integer c) := transform
 			s_time := l.wutimestamp(trim(id,left,right) = 'Created')[1].time;
 			e_time := sort(l.wutimestamp(trim(id,left,right) = 'QueryFinished'),-time)[1].time;
 			startseconds := if (s_time <> '',STD.Date.SecondsFromParts((integer)s_time[1..4]
@@ -89,7 +91,7 @@ EXPORT WorkunitTimingDetails(string esp
 			thortime := (unsigned8)(l.wutimings(trim(name,left,right) = 'Total thor time' or trim(name,left,right) = 'Total cluster time')[1].duration / 1000);
 			processtime := (unsigned8)(l.wutimings(trim(name,left,right) = 'Process')[1].duration / 1000);
 			compiletime := (unsigned8)(l.wutimings(trim(name,left,right) = 'compile')[1].duration / 1000);
-			totaltime := endseconds - startseconds;
+			totaltime := if (endseconds > startseconds, endseconds - startseconds, startseconds - endseconds);
 			dfutime := (unsigned8)(SUM(l.wutimings(regexfind('SPRAY',std.str.touppercase(trim(name,left,right)),nocase)),duration) / 1000);
 			self.starttime := s_time;
 			self.endtime := e_time;
@@ -98,20 +100,32 @@ EXPORT WorkunitTimingDetails(string esp
 			self.totalprocesstime :=  processtime;
 			self.totaldfutime := dfutime;
 			self.totalcompiletime := compiletime;
+			self.cnt := c;
 			self := l;
 		end;
 		
-		dCaptureTimings := project(dWUTimingDetails,xCaptureTimings(left))(starttime <> '' and endtime <> '');
+		dCaptureTimings := project(dWUTimingDetails,xCaptureTimings(left,counter))(starttime <> '' and endtime <> '');
 		
-		return dCaptureTimings;
+		
+		
+		rDataVizInfo itr_recs(dCaptureTimings l, dCaptureTimings r) := transform
+			self.whichbasket := if (r.cnt > (baskets * l.whichbasket) and r.cnt > (l.whichbasket * thorbackup.Constants.getnooffiles().nfiles),l.whichbasket + 1,l.whichbasket);
+			self := r;
+			
+		end;
+		
+		dgroupbaskets := iterate(dCaptureTimings,itr_recs(left,right));
+		
+				
+		return dgroupbaskets;
 		
 	end;
 	
-	export UpdateDOPS() := function
+	export UpdateDOPSDB(dataset(rDataVizInfo) dDetails) := function
 		
-		dDetails := GetDetails();
+		//dDetails := GetDetails();
 	
-		rDataVizInfoXML := record, maxlength(20000)
+		rDataVizInfoXML := record
 			string wuid{xpath('wuid')};
 			string job{xpath('job')};
 			string owner{xpath('owner')};
@@ -159,31 +173,74 @@ EXPORT WorkunitTimingDetails(string esp
 				dops.constants.prboca.serviceurl('dev'),
 				'UpdateWUTimings',
 				rUpdateWUTimingsRequest,
-				dataset(rUpdateWUTimingsResponse),
+				rUpdateWUTimingsResponse,
 				xpath('UpdateWUTimingsResponse/UpdateWUTimingsResult'),
 				NAMESPACE('http://lexisnexis.com/'),
 				LITERAL,
-				SOAPACTION('http://lexisnexis.com/UpdateWUTimings')) : independent;
+				SOAPACTION('http://lexisnexis.com/UpdateWUTimings'));
 		
-		return if (regexfind('hthor', thorlib.cluster())
-							,sequential(
-									output(rSOAPResponse)
-									,if(rSOAPResponse[1].Code = '-1',
-											fileservices.sendemail(toemaillist
-																				,'WU Timing Details SOAP Errors for ' + esp
-																				,'Workunit: ' + workunit + '\n\nReason: ' + rSOAPResponse[1].description
-																				,
-																				,
-																				,fromemail),
-											output('No Soap failures')
-										))
-							,fail('run on a hthor cluster')
-						);
+		respstatus := record
+			string Code;
+			string description;
 		
+		end;
+		
+		resp := dataset([{rSOAPResponse.Code,rSOAPResponse.description}],respstatus);
+		
+		return resp;
 		
 		
 	end;
+
+	export UpdateDOPS() := function
+		dDetails := GetDetails() : independent;
+		
+		basketsds := dedup(dDetails,whichbasket);
+
+		respstatus := record
+			string Code;
+			string description;
+		
+		end;
+		
+		soap_recs := record
+			integer whichbasket;
+			//integer flagforemail := 0;
+			dataset(respstatus) rstatus;
+		end;
+		
+		soap_recs make_soap_calls(basketsds l) := transform
+			
+			self.rstatus := UpdateDOPSDB(dDetails(whichbasket = l.whichbasket));
+			self := l;
+		end;
+		
+		soap_response := project(basketsds,make_soap_calls(left));
+		
+		soapds := dataset('~dataops::soapcalls::wutimingstoupdatedb',soap_recs,thor,opt);
+		
+		return if (regexfind('hthor', thorlib.cluster())
+							,sequential(
+									//output(choosen(ds,100)),
+									output(soap_response,,'~dataops::soapcalls::wutimingstoupdatedb',overwrite),
+									if(count(soapds(rstatus[1].Code = '-1')) > 0,
+									sequential(
+										//output(choosen(soapds(rstatus[1].Code = '-1'),100)),
+										fileservices.sendemail(toemaillist,
+			'WU Timings Soap Calls failed - ' + Std.Date.SecondsToString(Std.Date.CurrentSeconds(TRUE), '%F%H%M%S%u'),
+			'workunit: ' + workunit
+																	,
+																	,
+																	,fromemail)),
+										output('No Soap failures')
+											)
+									)
+							,fail('run on a hthor cluster'));
+									
+			
+	end;
 	
+	/*
 	export run() := UpdateDOPS() : success(output('Workunit completed successfully'))
 									,failure(dops.GetWUErrorMessages(WORKUNIT
 																							,esp
@@ -191,5 +248,5 @@ EXPORT WorkunitTimingDetails(string esp
 																							,fromemail
 																							,toemaillist)
 														);
-	
+	*/
 end;

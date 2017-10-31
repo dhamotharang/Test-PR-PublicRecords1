@@ -7,21 +7,26 @@ srcdir := '/data/projects/cortera/data/'+version+'/';
 
 root := '~thor::cortera::in::';
 ip := _control.IPAddress.bctlpedata10;
+clusta := IF(_control.ThisEnvironment.Name='Dataland','thor400_sta01','thor400_44');
 
 sprayfile(string filename) := 
 
 		STD.File.SprayVariable(ip,
 							srcdir + filename,
 							8192,'|',,,
-							'thor400_44',
+							clusta,
 							root + Std.Str.tolowercase(filename),
 							,,,true,false,true
 						);
 
 
 return
-PARALLEL(
+	SEQUENTIAL(
+		PARALLEL(
 			sprayfile('bugatti_hdr_' + version + '_output.dat'),
 			sprayfile('bugatti_stats_' + version + '_output.dat')
-			);
+			),
+		Cortera.Promote().Hdr_in(root+'bugatti_hdr_' + version + '_output.dat'),
+		Cortera.Promote().Attr_in(root+'bugatti_stats_' + version + '_output.dat')
+	);
 end;

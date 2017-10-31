@@ -8,7 +8,7 @@ alpha_deed_file:=Project(files.ln_propertyv2_alpha_deed,TRANSFORM(Layouts.prte__
 													SELF := []));	
 													
 
-deed_file_accum:= dedup(alpha_deed_file + Files.ln_propertyv2_deed_in(ln_fares_id[3..5]!='ALP'), record, all);													
+deed_file_accum:= dedup(alpha_deed_file + Files.ln_propertyv2_deed_in, record, all);													
 
 
 Layouts.layout_deed_mortgage_common_model_base_ext PhysicalAddress(layouts.prte__ln_propertyV2__base__deed L, INTEGER C) :=	TRANSFORM
@@ -18,8 +18,8 @@ Layouts.layout_deed_mortgage_common_model_base_ext PhysicalAddress(layouts.prte_
 	END;
 	
 
-deed_file := PROJECT(deed_file_accum(cust_name!='' and  ln_fares_id !=''), PhysicalAddress(LEFT,COUNTER));
-deed_file_untouched := PROJECT(deed_file_accum(cust_name='' and  ln_fares_id !=''), PhysicalAddress(LEFT,COUNTER));
+deed_file := PROJECT(deed_file_accum(cust_name!=''), PhysicalAddress(LEFT,COUNTER));
+deed_file_untouched := PROJECT(deed_file_accum(cust_name=''), PhysicalAddress(LEFT,COUNTER));
 PRTE2.CleanFields(deed_file, deed_file_clean);
 
 ut.MAC_Append_Rcid (deed_file_clean,deed_row_id,deed_file_seq);
@@ -28,7 +28,7 @@ alpha_tax_file:=Project(files.ln_propertyv2_alpha_tax,TRANSFORM(Layouts.prte__ln
 													SELF := LEFT, 
 													SELF := []));	
 				
-tax_file_accum:= dedup(alpha_tax_file + Files.ln_propertyv2_tax_in(ln_fares_id[3..5]!='ALP'), record, all);			
+tax_file_accum:= dedup(alpha_tax_file + Files.ln_propertyv2_tax_in, record, all);			
 
 Layouts.layout_property_common_model_base_ext PhysicalAddress2(layouts.prte__ln_propertyV2__base__tax L, INTEGER C) :=	TRANSFORM
 						SELF.tax_row_id := C;
@@ -36,8 +36,8 @@ Layouts.layout_property_common_model_base_ext PhysicalAddress2(layouts.prte__ln_
 						SELF          := [];
 	END;
 	
-tax_file := PROJECT(tax_file_accum(cust_name!='' and  ln_fares_id !=''), PhysicalAddress2(LEFT,COUNTER));
-tax_file_untouched := PROJECT(tax_file_accum(cust_name='' and  ln_fares_id !=''), PhysicalAddress2(LEFT,COUNTER));
+tax_file := PROJECT(tax_file_accum(cust_name!=''), PhysicalAddress2(LEFT,COUNTER));
+tax_file_untouched := PROJECT(tax_file_accum(cust_name=''), PhysicalAddress2(LEFT,COUNTER));
 PRTE2.CleanFields(tax_file, tax_file_clean);
 
 ut.MAC_Append_Rcid (tax_file_clean,tax_row_id,tax_file_seq); 
@@ -203,10 +203,10 @@ all_addr := deed_addr + tax_addr;
 
  df_deed := deed_NewRecordsClean + deed_file_untouched;
    
- df_deed_out :=  Project(df_deed,layouts.deed_mortgage_common_model_base_out); //: persist('~prte2::deed::property'); 
+ df_deed_out :=  Project(df_deed,layouts.deed_mortgage_common_model_base_out);//: persist('~prte2::deed::property'); 
  
- tax_OldRecords := tax_file_seq(cust_name = '' and  ln_fares_id !='');
- tax_NewRecords	:= tax_file_seq(cust_name <> '' and  ln_fares_id !='');  
+ tax_OldRecords := tax_file_seq(cust_name = '');
+ tax_NewRecords	:= tax_file_seq(cust_name <> '');  
  
  tax_NewRecordsClean := JOIN(d_all_addr_cleaned,
                                  tax_NewRecords, 
