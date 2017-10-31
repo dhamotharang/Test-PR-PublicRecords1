@@ -1,6 +1,5 @@
-
+﻿
 // layout of file feed from Neustar
-
 EXPORT Layout_Neustar := RECORD
 				string1 	ACTION_CODE;			
 				string  	RECORD_ID;
@@ -43,3 +42,15 @@ EXPORT Layout_Neustar := RECORD
 				string		Original_Last_Line := '';
 				string255 filename{virtual (logicalfilename)};
 		END;
+/*
+NOTE: the UNLICENSED field is now the Data Source, which may have one of the following values:
+1 Amacai Data/DA Public Data
+2 PRIVATE (Non Pub) DA Data
+6 Time Warner Public (in DA) Data
+9 Comtel Public (in DA) Data
+12 Other MSO Public
+15 SuddenLink Public
+18 Comcast Business Pub
+21 Cox Public
+24 MediacomPub
+*/
