@@ -1013,6 +1013,7 @@
 		export string KEYWORD_OFAC_DPRK4						:= '701';		
 		export string KEYWORD_PHNBI									:= '702';		
 		export string KEYWORD_PHDND_MLAO						:= '703';		
+		export string KEYWORD_BISN_CAATSA231				:= '704';		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	
