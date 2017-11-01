@@ -1,4 +1,4 @@
-
+﻿
 //Defines full build process
 import _control, versioncontrol, std, lib_stringlib;
 
@@ -29,7 +29,8 @@ export Build_Base( string		version		= ''
 		shared lf := Bair.Filenames(version, pUseProd, pDelta).Dbo_event_mo_Base.new;
 		mo := if(EmptyBase
 						,dataset([], bair.layouts.dbo_event_mo_final_Base)
-						,Bair.Update_Base(version,pUseProd,pDelta).MO_base
+						,Bair.AppendDID_Payload(version,pUseProd,pDelta).mo_w_lexid
+						// ,Bair.Update_Base(version,pUseProd,pDelta).MO_base
 						);
 		VersionControl.macBuildNewLogicalFile(lf, mo, BuildFile);
 		export mo_all	:= sequential(				
