@@ -1,4 +1,4 @@
-import AutoKeyB2,PAW, header_services, Autokey, ut; 
+﻿import AutoKeyB2,PAW, header_services, Autokey, ut; 
 
 export Proc_Build_Autokey(
 
@@ -32,7 +32,7 @@ FUNCTION
 	end;
 
 	EmpFullOut_HashBDID EmpHashBDID(Layout.Employment_Out l) := transform                            
-	 self.hval := hashmd5(intformat((unsigned6)l.bdid,15,1), intformat((unsigned6)l.did,15,1));
+	 self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1), intformat((unsigned6)l.did,15,1));
 	 self := l;
 	end;
 
@@ -188,7 +188,7 @@ FUNCTION
 																								attr );
 	Base_File_In := attr();
 	
-	//UNSIGNED6 endMax := MAX(paw.File_Base, contact_id);
+	// UNSIGNED6 endMax := MAX(paw.File_Base, contact_id);
 
 	paw.Layout.Employment_Out reformated_header(Base_File_In L, INTEGER c) := 
 		transform
