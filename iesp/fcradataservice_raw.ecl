@@ -1298,27 +1298,6 @@ export t_FcraDataServiceRawCriminalGroupBy := record
 	string offender_key {xpath('offender_key')};
 end;
 		
-export t_FcraDataServiceRawCriminalActivity := record
-	string process_date {xpath('process_date')};
-	string offender_key {xpath('offender_key')};
-	string vendor {xpath('vendor')};
-	string state_origin {xpath('state_origin')};
-	string source_file {xpath('source_file')};
-	string off_comp {xpath('off_comp')};
-	string case_number {xpath('case_number')};
-	string event_type {xpath('event_type')};
-	string event_sort_key {xpath('event_sort_key')};
-	string event_date {xpath('event_date')};
-	string event_location_code {xpath('event_location_code')};
-	string event_location_desc {xpath('event_location_desc')};
-	string event_desc_code {xpath('event_desc_code')};
-	string event_desc_1 {xpath('event_desc_1')};
-	string event_desc_2 {xpath('event_desc_2')};
-	string conviction_override_date {xpath('conviction_override_date')};
-	string conviction_override_date_type {xpath('conviction_override_date_type')};
-	unsigned activity_persistent_id {xpath('activity_persistent_id')};
-end;
-		
 export t_FcraDataServiceRawCriminalCourtOffense := record
 	string process_date {xpath('process_date')};
 	string offender_key {xpath('offender_key')};
@@ -1839,7 +1818,6 @@ export t_FcraDataServiceRawHeader := record
 	t_FcraDataServiceRawHeaderAddrFlags addr_flags {xpath('addr_flags')};
 	string high_risk_address_source {xpath('high_risk_address_source')};
 	string high_risk_address_description {xpath('high_risk_address_description')};
-	string blankout {xpath('blankout')};
 end;
 		
 export t_FcraDataServiceRawInfutorDid := record
@@ -1867,6 +1845,233 @@ export t_FcraDataServiceRawInfutorDid := record
 	string geo_blk {xpath('geo_blk')};
 	unsigned dt_first_seen {xpath('dt_first_seen')};
 	unsigned dt_last_seen {xpath('dt_last_seen')};
+end;
+		
+export t_FcraDataServiceRawInquiriesMBS := record
+	string company_id {xpath('company_id')};
+	string global_company_id {xpath('global_company_id')};
+end;
+		
+export t_FcraDataServiceRawInquiriesFlags := record
+	unsigned allowflags {xpath('allowflags')};
+end;
+		
+export t_FcraDataServiceRawInquiriesBusInfo := record
+	string primary_market_code {xpath('primary_market_code')};
+	string secondary_market_code {xpath('secondary_market_code')};
+	string industry_1_code {xpath('industry_1_code')};
+	string industry_2_code {xpath('industry_2_code')};
+	string sub_market {xpath('sub_market')};
+	string vertical {xpath('vertical')};
+	string use {xpath('use')};
+	string industry {xpath('industry')};
+end;
+		
+export t_FcraDataServiceRawInquiriesPersonData := record
+	string full_name {xpath('full_name')};
+	string first_name {xpath('first_name')};
+	string middle_name {xpath('middle_name')};
+	string last_name {xpath('last_name')};
+	string address {xpath('address')};
+	string city {xpath('city')};
+	string state {xpath('state')};
+	string zip {xpath('zip')};
+	string personal_phone {xpath('personal_phone')};
+	string work_phone {xpath('work_phone')};
+	string dob {xpath('dob')};
+	string dl {xpath('dl')};
+	string dl_st {xpath('dl_st')};
+	string email_address {xpath('email_address')};
+	string ssn {xpath('ssn')};
+	string linkid {xpath('linkid')};
+	string ipaddr {xpath('ipaddr')};
+	string title {xpath('title')};
+	string fname {xpath('fname')};
+	string mname {xpath('mname')};
+	string lname {xpath('lname')};
+	string name_suffix {xpath('name_suffix')};
+	string prim_range {xpath('prim_range')};
+	string predir {xpath('predir')};
+	string prim_name {xpath('prim_name')};
+	string addr_suffix {xpath('addr_suffix')};
+	string postdir {xpath('postdir')};
+	string unit_desig {xpath('unit_desig')};
+	string sec_range {xpath('sec_range')};
+	string v_city_name {xpath('v_city_name')};
+	string st {xpath('st')};
+	string zip5 {xpath('zip5')};
+	string zip4 {xpath('zip4')};
+	string addr_rec_type {xpath('addr_rec_type')};
+	string fips_state {xpath('fips_state')};
+	string fips_county {xpath('fips_county')};
+	string geo_lat {xpath('geo_lat')};
+	string geo_long {xpath('geo_long')};
+	string cbsa {xpath('cbsa')};
+	string geo_blk {xpath('geo_blk')};
+	string geo_match {xpath('geo_match')};
+	string err_stat {xpath('err_stat')};
+	string appended_ssn {xpath('appended_ssn')};
+	unsigned appended_adl {xpath('appended_adl')};
+end;
+		
+export t_FcraDataServiceRawInquiriesBusData := record
+	string cname {xpath('cname')};
+	string address {xpath('address')};
+	string city {xpath('city')};
+	string state {xpath('state')};
+	string zip {xpath('zip')};
+	string company_phone {xpath('company_phone')};
+	string ein {xpath('ein')};
+	string charter_number {xpath('charter_number')};
+	string ucc_number {xpath('ucc_number')};
+	string domain_name {xpath('domain_name')};
+	string prim_range {xpath('prim_range')};
+	string predir {xpath('predir')};
+	string prim_name {xpath('prim_name')};
+	string addr_suffix {xpath('addr_suffix')};
+	string postdir {xpath('postdir')};
+	string unit_desig {xpath('unit_desig')};
+	string sec_range {xpath('sec_range')};
+	string v_city_name {xpath('v_city_name')};
+	string st {xpath('st')};
+	string zip5 {xpath('zip5')};
+	string zip4 {xpath('zip4')};
+	string addr_rec_type {xpath('addr_rec_type')};
+	string fips_state {xpath('fips_state')};
+	string fips_county {xpath('fips_county')};
+	string geo_lat {xpath('geo_lat')};
+	string geo_long {xpath('geo_long')};
+	string cbsa {xpath('cbsa')};
+	string geo_blk {xpath('geo_blk')};
+	string geo_match {xpath('geo_match')};
+	string err_stat {xpath('err_stat')};
+	unsigned appended_bdid {xpath('appended_bdid')};
+	string appended_ein {xpath('appended_ein')};
+end;
+		
+export t_FcraDataServiceRawInquiriesBusUserData := record
+	string first_name {xpath('first_name')};
+	string middle_name {xpath('middle_name')};
+	string last_name {xpath('last_name')};
+	string address {xpath('address')};
+	string city {xpath('city')};
+	string state {xpath('state')};
+	string zip {xpath('zip')};
+	string personal_phone {xpath('personal_phone')};
+	string dob {xpath('dob')};
+	string dl {xpath('dl')};
+	string dl_st {xpath('dl_st')};
+	string ssn {xpath('ssn')};
+	string title {xpath('title')};
+	string fname {xpath('fname')};
+	string mname {xpath('mname')};
+	string lname {xpath('lname')};
+	string name_suffix {xpath('name_suffix')};
+	string prim_range {xpath('prim_range')};
+	string predir {xpath('predir')};
+	string prim_name {xpath('prim_name')};
+	string addr_suffix {xpath('addr_suffix')};
+	string postdir {xpath('postdir')};
+	string unit_desig {xpath('unit_desig')};
+	string sec_range {xpath('sec_range')};
+	string v_city_name {xpath('v_city_name')};
+	string st {xpath('st')};
+	string zip5 {xpath('zip5')};
+	string zip4 {xpath('zip4')};
+	string addr_rec_type {xpath('addr_rec_type')};
+	string fips_state {xpath('fips_state')};
+	string fips_county {xpath('fips_county')};
+	string geo_lat {xpath('geo_lat')};
+	string geo_long {xpath('geo_long')};
+	string cbsa {xpath('cbsa')};
+	string geo_blk {xpath('geo_blk')};
+	string geo_match {xpath('geo_match')};
+	string err_stat {xpath('err_stat')};
+	string appended_ssn {xpath('appended_ssn')};
+	unsigned appended_adl {xpath('appended_adl')};
+end;
+		
+export t_FcraDataServiceRawInquiriesPermissablePupose := record
+	string glb_purpose {xpath('glb_purpose')};
+	string dppa_purpose {xpath('dppa_purpose')};
+	string fcra_purpose {xpath('fcra_purpose')};
+end;
+		
+export t_FcraDataServiceRawInquiriesSearch := record
+	string datetime {xpath('datetime')};
+	string start_monitor {xpath('start_monitor')};
+	string stop_monitor {xpath('stop_monitor')};
+	string login_history_id {xpath('login_history_id')};
+	string transaction_id {xpath('transaction_id')};
+	string sequence_number {xpath('sequence_number')};
+	string method {xpath('method_')};
+	string product_code {xpath('product_code')};
+	string transaction_type {xpath('transaction_type')};
+	string function_description {xpath('function_description')};
+	string ipaddr {xpath('ipaddr')};
+end;
+		
+export t_FcraDataServiceRawInquiriesAddrFlags := record
+	string dwelltype {xpath('dwelltype')};
+	string valid {xpath('valid')};
+	string prisonaddr {xpath('prisonaddr')};
+	string highrisk {xpath('highrisk')};
+	string corpmil {xpath('corpmil')};
+	string donotdeliver {xpath('donotdeliver')};
+	string deliverystatus {xpath('deliverystatus')};
+	string addresstype {xpath('addresstype')};
+	string dropindicator {xpath('dropindicator')};
+	unsigned unit_count {xpath('unit_count')};
+	string mail_usage {xpath('mail_usage')};
+end;
+		
+export t_FcraDataServiceRawInquiriesAddressCharacteristics := record
+	t_FcraDataServiceRawInquiriesAddrFlags addr_flags {xpath('addr_flags')};
+	string listed_phone {xpath('listed_phone')};
+	string listed_phone_fname {xpath('listed_phone_fname')};
+	string listed_phone_lname {xpath('listed_phone_lname')};
+	string listed_phone_source {xpath('listed_phone_source')};
+end;
+		
+export t_FcraDataServiceRawInquiriesPhoneCharacteristics := record
+	string phone_indicator {xpath('phone_indicator')};
+	string phone_type {xpath('phone_type')};
+	string listed_prim_range {xpath('listed_prim_range')};
+	string listed_predir {xpath('listed_predir')};
+	string listed_prim_name {xpath('listed_prim_name')};
+	string listed_suffix {xpath('listed_suffix')};
+	string listed_postdir {xpath('listed_postdir')};
+	string listed_unit_desig {xpath('listed_unit_desig')};
+	string listed_sec_range {xpath('listed_sec_range')};
+	string listed_city_name {xpath('listed_city_name')};
+	string listed_st {xpath('listed_st')};
+	string listed_zip {xpath('listed_zip')};
+	string listed_fname {xpath('listed_fname')};
+	string listed_lname {xpath('listed_lname')};
+	string listed_address_source {xpath('listed_address_source')};
+	string disconnects_last_12months {xpath('disconnects_last_12months')};
+	string zipcode_phone_match {xpath('zipcode_phone_match')};
+	string highriskphone_description {xpath('highriskphone_description')};
+	string highriskphone_source {xpath('highriskphone_source')};
+end;
+		
+export t_FcraDataServiceRawInquiries := record
+	t_FcraDataServiceRawInquiriesMBS mbs {xpath('mbs')};
+	t_FcraDataServiceRawInquiriesFlags allow_flags {xpath('allow_flags')};
+	t_FcraDataServiceRawInquiriesBusInfo bus_intel {xpath('bus_intel')};
+	t_FcraDataServiceRawInquiriesPersonData person_q {xpath('person_q')};
+	t_FcraDataServiceRawInquiriesBusData bus_q {xpath('bus_q')};
+	t_FcraDataServiceRawInquiriesBusUserData bususer_q {xpath('bususer_q')};
+	t_FcraDataServiceRawInquiriesPermissablePupose permissions {xpath('permissions')};
+	t_FcraDataServiceRawInquiriesSearch search_info {xpath('search_info')};
+	t_FcraDataServiceRawInquiriesAddressCharacteristics address_characteristics {xpath('address_characteristics')};
+	t_FcraDataServiceRawInquiriesPhoneCharacteristics phone_characteristics {xpath('phone_characteristics')};
+	integer lexids_per_inquiry_ssn {xpath('lexids_per_inquiry_ssn')};
+	integer lexids_per_inquiry_phone {xpath('lexids_per_inquiry_phone')};
+	integer lexids_per_inquiry_address {xpath('lexids_per_inquiry_address')};
+	integer ssns_per_inquiry_address {xpath('ssns_per_inquiry_address')};
+	string inquiry_phone_high_risk_source {xpath('inquiry_phone_high_risk_source')};
+	string inquiry_phone_characteristics_source {xpath('inquiry_phone_characteristics_source')};
 end;
 		
 export t_FcraDataServiceRawLiensGroupBy := record
@@ -2102,6 +2307,24 @@ export t_FcraDataServiceRawMarriageDivSearchRid := record
 	string times_married {xpath('times_married')};
 	string last_marriage_end_dt {xpath('last_marriage_end_dt')};
 	unsigned persistent_record_id {xpath('persistent_record_id')};
+end;
+		
+export t_FcraDataServiceRawOptOut := record
+	unsigned l_did {xpath('l_did')};
+	string ssn {xpath('ssn')};
+	string source_flag {xpath('source_flag')};
+	string julian_date {xpath('julian_date')};
+	string inname_first {xpath('inname_first')};
+	string inname_last {xpath('inname_last')};
+	string address {xpath('address')};
+	string city {xpath('city')};
+	string state {xpath('state')};
+	string zip5 {xpath('zip5')};
+	unsigned did_score {xpath('did_score')};
+	string ssn_append {xpath('ssn_append')};
+	string permanent_flag {xpath('permanent_flag')};
+	string opt_back_in {xpath('opt_back_in')};
+	string date_yyyymmdd {xpath('date_yyyymmdd')};
 end;
 		
 export t_FcraDataServiceRawPropertyGroupBy := record

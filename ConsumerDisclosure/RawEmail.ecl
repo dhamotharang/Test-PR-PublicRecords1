@@ -1,22 +1,22 @@
 ﻿IMPORT doxie, FCRA, FFD, Email_Data, ConsumerDisclosure, STD, UT;
 
-Email_Data_raw := RECORD(Email_Data.Layout_Email.Keys)  
+layout_email_raw := RECORD(Email_Data.Layout_Email.Keys)  
 END;
 
-Email_Data_rawrec := RECORD(Email_Data_raw)
+layout_email_rawrec := RECORD(layout_email_raw)
 	ConsumerDisclosure.Layouts.InternalMetadata;
 END;
 	
 
 EXPORT RawEmail := MODULE
 
-	EXPORT Email_Data_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		Email_Data_raw;
+	EXPORT layout_email_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_email_raw;
 	END;
 
 	EXPORT GetData(DATASET(doxie.layout_references) in_dids,
 								DATASET (fcra.Layout_override_flag) flag_file,
-								DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,														 
+								DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs,														 
 							 ConsumerDisclosure.IParams.IParam in_mod) := 
 	FUNCTION
 
@@ -29,7 +29,7 @@ EXPORT RawEmail := MODULE
 	flag_recs := 
 		JOIN(all_flags, FCRA.key_override_email_data_ffid, 
 			KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-			TRANSFORM(Email_Data_rawrec,
+			TRANSFORM(layout_email_rawrec,
 				is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 				SELF.compliance_flags.isOverride := is_override;
 				SELF.compliance_flags.isSuppressed := ~is_override;
@@ -49,7 +49,7 @@ EXPORT RawEmail := MODULE
 
 	main_recs := JOIN(in_dids, email_data.Key_Did_FCRA,
 												KEYED(LEFT.did = RIGHT.did),
-												TRANSFORM(Email_Data_rawrec,
+												TRANSFORM(layout_email_rawrec,
 																	SELF.compliance_flags.IsOverwritten :=
 																		(RIGHT.email_rec_key>0 AND (STRING)RIGHT.email_rec_key IN override_ids), 
 																	SELF.compliance_flags.IsSuppressed :=
@@ -67,10 +67,10 @@ EXPORT RawEmail := MODULE
 	recs_filt:= recs_all(
 		in_mod.ReturnOverwritten or ~compliance_flags.isOverwritten,
 		in_mod.ReturnSuppressed or ~compliance_flags.isSuppressed,
-		ut.daysApart(date_last_seen, todaysdate) < ut.DaysInNYears(7)
+		ConsumerDisclosure.Functions.FCRADateIsOk(date_last_seen, todaysdate)
 		);
 	
-		Email_Data_rawrec xformStatements(Email_Data_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_email_rawrec xformStatements(layout_email_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_ids := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -85,7 +85,7 @@ EXPORT RawEmail := MODULE
 													KEEP(1),
 													LIMIT(0));
 			
-		recs_out := PROJECT(recs_final_ds, TRANSFORM(Email_Data_out,			
+		recs_out := PROJECT(recs_final_ds, TRANSFORM(layout_email_out,			
 												SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(LEFT.compliance_flags,
 																								LEFT.record_ids,
 																								LEFT.statement_ids,
@@ -99,7 +99,7 @@ EXPORT RawEmail := MODULE
 		IF(ConsumerDisclosure.Debug,OUTPUT(main_recs, NAMED('Email_Data_main_recs')));
 		IF(ConsumerDisclosure.Debug,OUTPUT(recs_out, NAMED('Email_Data_recs')));
 		
-		RETURN SORT(recs_out, -date_last_seen, -date_first_seen);
+		RETURN SORT(recs_out, -date_last_seen, -date_first_seen, email_rec_key);
 	END;
 
 END;

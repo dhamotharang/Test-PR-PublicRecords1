@@ -1,101 +1,75 @@
 ﻿IMPORT ConsumerDisclosure, doxie, FCRA, FFD, Suppress, Corrections, doxie_files, STD;
 
-	BOOLEAN IsFCRA := TRUE;
-	
-	offender_raw := RECORD  // recordof(doxie_files.Key_Offenders(true))
+BOOLEAN IsFCRA := TRUE;
+																	// recordof(doxie_files.Key_Offenders_OffenderKey(true))
+layout_offender_raw := RECORD  // recordof(doxie_files.Key_Offenders(true))
 		Corrections.layout_offender;
-	END; 
+END; 
 	
-	offenderplus_raw := RECORD  // recordof(doxie_files.Key_Offenders_OffenderKey(true))
-		corrections.layout_Offender;
-	END; 
-	
-	offense_raw := RECORD  // recordof(doxie_files.Key_Offenses(true))
+layout_offense_raw := RECORD  // recordof(doxie_files.Key_Offenses(true))
 		corrections.layout_offense_common;
-	END; 
+END; 
 	
-	punishment_raw := RECORD  // recordof(doxie_files.Key_Punishment(true))
+layout_punishment_raw := RECORD  // recordof(doxie_files.Key_Punishment(true))
 		corrections.Layout_CrimPunishment;
-	END; 
+END; 
 	
-	activity_raw := RECORD  // recordof(doxie_files.key_activity (true))
-		corrections.layout_activity;
-	END; 
-	
-	court_offense_raw := RECORD  // recordof(doxie_files.key_court_offenses(true))
+layout_court_offense_raw := RECORD  // recordof(doxie_files.key_court_offenses(true))
 		corrections.Layout_CourtOffenses;
-	END; 
+END; 
 	
-	court_offense_rawrec := RECORD(court_offense_raw)
+layout_court_offense_rawrec := RECORD(layout_court_offense_raw)
 		ConsumerDisclosure.Layouts.InternalMetadata;
-	END;
+END;
 	
-	activity_rawrec := RECORD(activity_raw)
+layout_punishment_rawrec := RECORD(layout_punishment_raw)
 		ConsumerDisclosure.Layouts.InternalMetadata;
-	END;
+END;
 	
-	punishment_rawrec := RECORD(punishment_raw)
+layout_offense_rawrec := RECORD(layout_offense_raw)
 		ConsumerDisclosure.Layouts.InternalMetadata;
-	END;
+END;
 	
-	offense_rawrec := RECORD(offense_raw)
+layout_offender_rawrec := RECORD(layout_offender_raw)
 		ConsumerDisclosure.Layouts.InternalMetadata;
-	END;
-	
-	offender_rawrec := RECORD(offender_raw)
-		ConsumerDisclosure.Layouts.InternalMetadata;
-	END;
+END;
 
-	ofk_rec := RECORD
+layout_ofk_rec := RECORD
 		STRING offender_key;
 		UNSIGNED6 subject_did := 0;
-	END;
+END;
 
 EXPORT RawCriminal := MODULE
 
-/*
-fcra.key_override_crim.offenders
-fcra.key_override_crim.offenses
-fcra.key_override_crim.punishment
-fcra.key_override_crim.offenders_plus
-fcra.key_override_crim.court_offenses
-fcra.key_override_crim.activity
-*/
-
-	EXPORT court_offense_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		court_offense_raw;
+	EXPORT layout_court_offense_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_court_offense_raw;
 	END;
 	
-	EXPORT activity_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		activity_raw;
+	EXPORT layout_punishment_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_punishment_raw;
 	END;
 	
-	EXPORT punishment_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		punishment_raw;
+	EXPORT layout_offense_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_offense_raw;
 	END;
 	
-	EXPORT offense_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		offense_raw;
+	EXPORT layout_offender_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_offender_raw;
 	END;
 	
-	EXPORT offender_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		offender_raw;
-	END;
-	
-	EXPORT criminal_rec_out := RECORD
+	EXPORT layout_criminal_rec_out := RECORD
 		string offender_key;
-		DATASET(offender_out) Offenders;
-		DATASET(offender_out) OffenderPlus;
-		DATASET(offense_out)  Offenses;
-		DATASET(activity_out) Activities;
-		DATASET(court_offense_out) CourtOffenses;
-		DATASET(punishment_out) Punishments;
+		DATASET(layout_offender_out) Offenders;
+		DATASET(layout_offender_out) OffenderPlus;
+		DATASET(layout_offense_out)  Offenses;
+		DATASET(layout_court_offense_out) CourtOffenses;
+		DATASET(layout_punishment_out) Punishments;
 	END;
 	
 	EXPORT GetData(
 		DATASET(doxie.layout_references) in_dids,
 		DATASET (fcra.Layout_override_flag) flag_file,
-		DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,														 
+		DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs,														 
 		ConsumerDisclosure.IParams.IParam in_mod) := 
   FUNCTION
 
@@ -109,7 +83,7 @@ fcra.key_override_crim.activity
 		offenders_flag_recs := 
 			JOIN(offenders_all_flags, FCRA.key_override_crim.offenders, 
 				KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-				TRANSFORM(offender_rawrec,
+				TRANSFORM(layout_offender_rawrec,
 					is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 					SELF.compliance_flags.isOverride := is_override;
 					SELF.compliance_flags.isSuppressed := ~is_override;
@@ -130,7 +104,7 @@ fcra.key_override_crim.activity
 		offenders_main_recs := JOIN(in_dids, doxie_files.Key_Offenders(isFCRA),
 			KEYED(LEFT.did = RIGHT.sdid) AND
 			FCRA.crim_is_ok (todaysdate, RIGHT.fcra_date, RIGHT.fcra_conviction_flag, RIGHT.fcra_traffic_flag),
-			TRANSFORM(offender_rawrec,
+			TRANSFORM(layout_offender_rawrec,
 				SELF.compliance_flags.IsOverwritten := (RIGHT.offender_key<>'' AND RIGHT.offender_key IN offenders_override_ids);
 				SELF.compliance_flags.IsSuppressed := (RIGHT.offender_key<>'' AND RIGHT.offender_key IN offenders_suppressed_ids);
 				SELF.subject_did := LEFT.did;
@@ -148,7 +122,7 @@ fcra.key_override_crim.activity
 			FCRA.crim_is_ok (todaysdate, fcra_date, fcra_conviction_flag, fcra_traffic_flag)
 			);
 											
-		offender_rawrec xformOffenderStatements(offender_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_offender_rawrec xformOffenderStatements(layout_offender_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_IDs := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -164,7 +138,7 @@ fcra.key_override_crim.activity
 													LIMIT(0));
 		
 		offender_recs_out := PROJECT(offender_recs_with_pc,
-																	TRANSFORM(offender_out,
+																	TRANSFORM(layout_offender_out,
 																		SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(
 																											LEFT.compliance_flags, 
 																											LEFT.record_ids, 
@@ -173,7 +147,7 @@ fcra.key_override_crim.activity
 																											FFD.Constants.DataGroups.OFFENDERS),
 																		SELF := LEFT));
 
-		id_recs := DEDUP(PROJECT(offender_recs_with_pc,ofk_rec),ALL);
+		id_recs := DEDUP(PROJECT(offender_recs_with_pc,layout_ofk_rec),ALL);
 
   // -------------  OFFENSES  -------------
 
@@ -183,7 +157,7 @@ fcra.key_override_crim.activity
 		offense_flag_recs := 
 			JOIN(offense_all_flags, FCRA.key_override_crim.offenses, 
 				KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-				TRANSFORM(offense_rawrec,
+				TRANSFORM(layout_offense_rawrec,
 					is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 					SELF.compliance_flags.isOverride := is_override;
 					SELF.compliance_flags.isSuppressed := ~is_override;
@@ -203,7 +177,7 @@ fcra.key_override_crim.activity
 
 		offense_main_recs := JOIN(id_recs, doxie_files.Key_Offenses(isFCRA),
 			KEYED(LEFT.offender_key = RIGHT.ok),
-			TRANSFORM(offense_rawrec,
+			TRANSFORM(layout_offense_rawrec,
 				SELF.compliance_flags.IsOverwritten := (RIGHT.offense_persistent_id<>0 AND (STRING) RIGHT.offense_persistent_id IN offense_override_ids);
 				SELF.compliance_flags.IsSuppressed := (RIGHT.offense_persistent_id<>0 AND (STRING) RIGHT.offense_persistent_id IN offense_suppressed_ids)
 																							OR (RIGHT.offender_key IN offenders_suppressed_ids);
@@ -222,7 +196,7 @@ fcra.key_override_crim.activity
 			FCRA.crim_is_ok (todaysdate, fcra_date, fcra_conviction_flag, fcra_traffic_flag)
 			);
 
-		offense_rawrec xformOffenseStatements(offense_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_offense_rawrec xformOffenseStatements(layout_offense_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_IDs := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -238,7 +212,7 @@ fcra.key_override_crim.activity
 													LIMIT(0));
 		
 		offense_recs_out := PROJECT(offense_recs_final_ds, 
-																	TRANSFORM(offense_out,
+																	TRANSFORM(layout_offense_out,
 																		SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(
 																											LEFT.compliance_flags, 
 																											LEFT.record_ids, 
@@ -255,7 +229,7 @@ fcra.key_override_crim.activity
 		punishment_flag_recs := 
 			JOIN(punishment_all_flags, FCRA.key_override_crim.punishment, 
 				KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-				TRANSFORM(punishment_rawrec,
+				TRANSFORM(layout_punishment_rawrec,
 					is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 					SELF.compliance_flags.isOverride := is_override;
 					SELF.compliance_flags.isSuppressed := ~is_override;
@@ -275,7 +249,7 @@ fcra.key_override_crim.activity
 
 		punishment_main_recs := JOIN(id_recs, doxie_files.Key_Punishment(isFCRA),
 			KEYED(LEFT.offender_key = RIGHT.ok),
-			TRANSFORM(punishment_rawrec,
+			TRANSFORM(layout_punishment_rawrec,
 				SELF.compliance_flags.IsOverwritten := (RIGHT.punishment_persistent_id<>0 AND (STRING) RIGHT.punishment_persistent_id IN punishment_override_ids);
 				SELF.compliance_flags.IsSuppressed := (RIGHT.punishment_persistent_id<>0 AND (STRING) RIGHT.punishment_persistent_id IN punishment_suppressed_ids)
 																							OR (RIGHT.offender_key IN offenders_suppressed_ids);
@@ -293,7 +267,7 @@ fcra.key_override_crim.activity
 			in_mod.ReturnSuppressed OR ~compliance_flags.isSuppressed 
 			);
 											
-		punishment_rawrec xformPunishmentStatements(punishment_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_punishment_rawrec xformPunishmentStatements(layout_punishment_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_IDs := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -309,7 +283,7 @@ fcra.key_override_crim.activity
 													LIMIT(0));
 		
 		punishment_recs_out := PROJECT(punishment_recs_final_ds, 
-																	TRANSFORM(punishment_out,
+																	TRANSFORM(layout_punishment_out,
 																		SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(
 																											LEFT.compliance_flags, 
 																											LEFT.record_ids, 
@@ -326,7 +300,7 @@ fcra.key_override_crim.activity
 		court_offenses_flag_recs := 
 			JOIN(court_offenses_all_flags, FCRA.key_override_crim.court_offenses, 
 				KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-				TRANSFORM(court_offense_rawrec,
+				TRANSFORM(layout_court_offense_rawrec,
 					is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 					SELF.compliance_flags.isOverride := is_override;
 					SELF.compliance_flags.isSuppressed := ~is_override;
@@ -346,7 +320,7 @@ fcra.key_override_crim.activity
 
 		court_offenses_main_recs := JOIN(id_recs, doxie_files.key_court_offenses(isFCRA),
 			KEYED(LEFT.offender_key = RIGHT.ofk),
-			TRANSFORM(court_offense_rawrec,
+			TRANSFORM(layout_court_offense_rawrec,
 				SELF.compliance_flags.IsOverwritten := (RIGHT.offense_persistent_id<>0 AND (STRING) RIGHT.offense_persistent_id IN court_offenses_override_ids);
 				SELF.compliance_flags.IsSuppressed := (RIGHT.offense_persistent_id<>0 AND (STRING) RIGHT.offense_persistent_id IN court_offenses_suppressed_ids)
 																							OR (RIGHT.offender_key IN offenders_suppressed_ids);
@@ -365,7 +339,7 @@ fcra.key_override_crim.activity
 			FCRA.crim_is_ok (todaysdate, fcra_date, fcra_conviction_flag, fcra_traffic_flag)
 			);
 											
-		court_offense_rawrec xformCourtOffenseStatements(court_offense_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_court_offense_rawrec xformCourtOffenseStatements(layout_court_offense_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_IDs := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -381,7 +355,7 @@ fcra.key_override_crim.activity
 													LIMIT(0));
 		
 		court_offenses_recs_out := PROJECT(court_offenses_recs_final_ds, 
-																	TRANSFORM(court_offense_out,
+																	TRANSFORM(layout_court_offense_out,
 																		SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(
 																											LEFT.compliance_flags, 
 																											LEFT.record_ids, 
@@ -390,77 +364,6 @@ fcra.key_override_crim.activity
 																											FFD.Constants.DataGroups.COURT_OFFENSES),
 																		SELF := LEFT));			
 
-  // -------------  ACTIVITY / EVENTS -------------
-
-		activity_pc_flags := slim_pc_recs(datagroup = FFD.Constants.DataGroups.ACTIVITY);
-		activity_all_flags := flag_file(file_id = FCRA.FILE_ID.ACTIVITY);
-		
-		activity_flag_recs := 
-			JOIN(activity_all_flags, FCRA.key_override_crim.activity, 
-				KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-				TRANSFORM(activity_rawrec,
-					is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
-					SELF.compliance_flags.isOverride := is_override;
-					SELF.compliance_flags.isSuppressed := ~is_override;
-					SELF.subject_did := (UNSIGNED6) LEFT.did;
-					SELF.combined_record_id := LEFT.record_id;
-					SELF.record_ids.RecId1 := (STRING) RIGHT.activity_persistent_id;
-					SELF := RIGHT;
-					SELF := LEFT;
-					SELF := []),
-				LEFT OUTER, KEEP(FCRA.compliance.MAX_OVERRIDE_limit), LIMIT(0)); 
-
-		activity_override_recs := activity_flag_recs(compliance_flags.isOverride);	
-		activity_suppressed_recs := activity_flag_recs(compliance_flags.isSuppressed);		
-
-		activity_override_ids := SET(activity_override_recs, combined_record_id);	
-		activity_suppressed_ids := SET(activity_suppressed_recs, combined_record_id);
-
-		activity_main_recs := JOIN(id_recs, doxie_files.key_activity(isFCRA),
-			KEYED(LEFT.offender_key = RIGHT.ok),
-			TRANSFORM(activity_rawrec,
-				SELF.compliance_flags.IsOverwritten := (RIGHT.activity_persistent_id<>0 AND (STRING) RIGHT.activity_persistent_id IN activity_override_ids);
-				SELF.compliance_flags.IsSuppressed := (RIGHT.activity_persistent_id<>0 AND (STRING) RIGHT.activity_persistent_id IN activity_suppressed_ids)
-																							OR (RIGHT.offender_key IN offenders_suppressed_ids);
-				SELF.subject_did := LEFT.subject_did;
-				SELF.record_ids.RecId1 := (STRING) RIGHT.activity_persistent_id;
-				SELF := RIGHT;
-				SELF := LEFT;
-				SELF := []), // recid2, recid3, recid4
-			LIMIT(0), KEEP(ConsumerDisclosure.Constants.Limits.MaxCrimEvents));
-																	
-		activity_recs_all := activity_main_recs + activity_override_recs;
-		
-		activity_recs_filt := activity_recs_all(
-			in_mod.ReturnOverwritten OR ~compliance_flags.isOverwritten,
-			in_mod.ReturnSuppressed OR ~compliance_flags.isSuppressed,
-			FCRA.crim_is_ok (todaysdate, event_date, 'Y', 'N')
-			);
-											
-		activity_rawrec xformActivityStatements(activity_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
-			SKIP(~ShowDisputedRecords AND r.isDisputed)
-					SELF.statement_IDs := r.StatementIDs;
-					SELF.compliance_flags.IsDisputed := r.isDisputed;
-					SELF := l;
-		END;
-				
-		activity_recs_final_ds := JOIN(activity_recs_filt, activity_pc_flags,
-													LEFT.subject_did = (UNSIGNED6) RIGHT.LexId AND
-													LEFT.activity_persistent_id = (UNSIGNED) RIGHT.RecID1,
-													xformActivityStatements(LEFT,RIGHT), 
-													LEFT OUTER,
-													KEEP(1),
-													LIMIT(0));
-		
-		activity_recs_out := PROJECT(activity_recs_final_ds, 
-																	TRANSFORM(activity_out,
-																		SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(
-																											LEFT.compliance_flags, 
-																											LEFT.record_ids, 
-																											LEFT.statement_IDs, 
-																											LEFT.subject_did, 
-																											FFD.Constants.DataGroups.ACTIVITY),
-																		SELF := LEFT));			
 
   // -------------  OFFENDERS_PLUS  -------------
 
@@ -470,7 +373,7 @@ fcra.key_override_crim.activity
 		offenderplus_flag_recs := 
 			JOIN(offenderplus_all_flags, FCRA.key_override_crim.offenders_plus, 
 				KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-				TRANSFORM(offender_rawrec,
+				TRANSFORM(layout_offender_rawrec,
 					is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 					SELF.compliance_flags.isOverride := is_override;
 					SELF.compliance_flags.isSuppressed := ~is_override;
@@ -490,7 +393,7 @@ fcra.key_override_crim.activity
 
 		offenderplus_main_recs := JOIN(id_recs, doxie_files.Key_Offenders_OffenderKey(isFCRA),
 			KEYED(LEFT.offender_key = RIGHT.ofk),
-			TRANSFORM(offender_rawrec,
+			TRANSFORM(layout_offender_rawrec,
 				SELF.compliance_flags.IsOverwritten := (RIGHT.offender_persistent_id<>0 AND (STRING) RIGHT.offender_persistent_id IN offenderplus_override_ids);
 				SELF.compliance_flags.IsSuppressed := (RIGHT.offender_persistent_id<>0 AND (STRING) RIGHT.offender_persistent_id IN offenderplus_suppressed_ids)
 																							OR (RIGHT.offender_key IN offenders_suppressed_ids);
@@ -509,7 +412,7 @@ fcra.key_override_crim.activity
 			FCRA.crim_is_ok (todaysdate, fcra_date, fcra_conviction_flag, fcra_traffic_flag)
 			);
 											
-		offender_rawrec xformOffenderPlusStatements(offender_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_offender_rawrec xformOffenderPlusStatements(layout_offender_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_IDs := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -525,7 +428,7 @@ fcra.key_override_crim.activity
 													LIMIT(0));
 		
 		offenderplus_recs_out := PROJECT(offenderplus_recs_final_ds, 
-																	TRANSFORM(offender_out,
+																	TRANSFORM(layout_offender_out,
 																		SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(
 																											LEFT.compliance_flags, 
 																											LEFT.record_ids, 
@@ -536,22 +439,21 @@ fcra.key_override_crim.activity
 
 		//----- Combine all results for output---------
 
-		criminal_rec_out xfRollOffenders(offender_out le, 
-												DATASET(offender_out) ri) := 
+		layout_criminal_rec_out xfRollOffenders(layout_offender_out le, 
+												DATASET(layout_offender_out) ri) := 
 		TRANSFORM
 			SELF.offender_key := le.offender_key;
 			SELF.Offenders := ri;
 			SELF.OffenderPlus := [];
 			SELF.Offenses := [];
 			SELF.CourtOffenses := [];
-			SELF.Activities := [];
 			SELF.Punishments := [];
 		END;
 			
 		offenders_rolled := ROLLUP(GROUP(SORT(offender_recs_out, offender_key), offender_key), 
 																	GROUP, xfRollOffenders(LEFT, ROWS(LEFT)));	
 
-		criminal_rec_out xfAddOffense(criminal_rec_out le, DATASET(offense_out) ri) := 
+		layout_criminal_rec_out xfAddOffense(layout_criminal_rec_out le, DATASET(layout_offense_out) ri) := 
 		TRANSFORM
 			SELF.Offenses := ri;
 			SELF := le;
@@ -562,7 +464,7 @@ fcra.key_override_crim.activity
 														GROUP, 
 														xfAddOffense(LEFT, ROWS(RIGHT)));		
 
-		criminal_rec_out xfAddCourtOffense(criminal_rec_out le, DATASET(court_offense_out) ri) := 
+		layout_criminal_rec_out xfAddCourtOffense(layout_criminal_rec_out le, DATASET(layout_court_offense_out) ri) := 
 		TRANSFORM
 			SELF.CourtOffenses := ri;
 			SELF := le;
@@ -573,29 +475,18 @@ fcra.key_override_crim.activity
 														GROUP, 
 														xfAddCourtOffense(LEFT, ROWS(RIGHT)));		
 
-		criminal_rec_out xfAddActivity(criminal_rec_out le, DATASET(activity_out) ri) := 
-		TRANSFORM
-			SELF.Activities := ri;
-			SELF := le;
-		END;
-			
-		crim_with_activities := DENORMALIZE(crim_with_court_offenses, activity_recs_out, 
-														LEFT.offender_key = RIGHT.offender_key,
-														GROUP, 
-														xfAddActivity(LEFT, ROWS(RIGHT)));		
-
-		criminal_rec_out xfAddPunishment(criminal_rec_out le, DATASET(punishment_out) ri) := 
+		layout_criminal_rec_out xfAddPunishment(layout_criminal_rec_out le, DATASET(layout_punishment_out) ri) := 
 		TRANSFORM
 			SELF.Punishments := ri;
 			SELF := le;
 		END;
 			
-		crim_with_punishments := DENORMALIZE(crim_with_activities, punishment_recs_out, 
+		crim_with_punishments := DENORMALIZE(crim_with_court_offenses, punishment_recs_out, 
 														LEFT.offender_key = RIGHT.offender_key,
 														GROUP, 
 														xfAddPunishment(LEFT, ROWS(RIGHT)));		
 
-		criminal_rec_out xfAddOffenderPlus(criminal_rec_out le, DATASET(offender_out) ri) := 
+		layout_criminal_rec_out xfAddOffenderPlus(layout_criminal_rec_out le, DATASET(layout_offender_out) ri) := 
 		TRANSFORM
 			SELF.OffenderPlus := ri;
 			SELF := le;
@@ -621,10 +512,6 @@ fcra.key_override_crim.activity
 	IF(ConsumerDisclosure.Debug, OUTPUT(court_offenses_override_recs, NAMED('court_offense_override_recs')));
 	IF(ConsumerDisclosure.Debug, OUTPUT(court_offenses_main_recs, NAMED('court_offense_main_recs')));
 	IF(ConsumerDisclosure.Debug, OUTPUT(court_offenses_recs_out, NAMED('court_offense_recs_out')));
-	IF(ConsumerDisclosure.Debug, OUTPUT(activity_suppressed_recs, NAMED('activity_suppressed_recs')));
-	IF(ConsumerDisclosure.Debug, OUTPUT(activity_override_recs, NAMED('activity_override_recs')));
-	IF(ConsumerDisclosure.Debug, OUTPUT(activity_main_recs, NAMED('activity_main_recs')));
-	IF(ConsumerDisclosure.Debug, OUTPUT(activity_recs_out, NAMED('activity_recs_out')));
 	IF(ConsumerDisclosure.Debug, OUTPUT(punishment_suppressed_recs, NAMED('punishment_suppressed_recs')));
 	IF(ConsumerDisclosure.Debug, OUTPUT(punishment_override_recs, NAMED('punishment_override_recs')));
 	IF(ConsumerDisclosure.Debug, OUTPUT(punishment_main_recs, NAMED('punishment_main_recs')));

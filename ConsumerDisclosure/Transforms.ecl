@@ -31,21 +31,21 @@ EXPORT Transforms := MODULE
 
 	//----------Bankruptcy-------------
 	iesp.fcradataservice.t_FcraDataServiceBKSearchData xfBKsearch(
-										ConsumerDisclosure.RawBankruptcy.Bankruptcy_party_out bks) := TRANSFORM
+										ConsumerDisclosure.RawBankruptcy.layout_Bankruptcy_party_out bks) := TRANSFORM
 		SELF.MetaData := bks.MetaData;
 		SELF.RawData := bks.RawData;
 		SELF.WithdrawnStatusInfo := bks.WithdrawnStatusInfo;
 	END;
 	
 	iesp.fcradataservice.t_FcraDataServiceBKMainData xfBKmain(
-											ConsumerDisclosure.RawBankruptcy.Bankruptcy_main_out bkl) := TRANSFORM
+											ConsumerDisclosure.RawBankruptcy.layout_Bankruptcy_main_out bkl) := TRANSFORM
 		SELF.MetaData := bkl.MetaData;
 		SELF.RawData := bkl.RawData;
 		SELF.CourtInfo := bkl.CourtInfo;
 	END;
 	
 	EXPORT iesp.fcradataservice.t_FcraDataServiceBankruptcyData xformBKData(
-																				ConsumerDisclosure.RawBankruptcy.Bankruptcy_out l) 
+																				ConsumerDisclosure.RawBankruptcy.layout_Bankruptcy_out l) 
 	:= TRANSFORM
 		SELF.Main := PROJECT(l.Main, xfBKmain(LEFT));
 		SELF.Search := PROJECT(l.Parties, xfBKsearch(LEFT));
@@ -54,45 +54,60 @@ EXPORT Transforms := MODULE
 	
 //----------Criminal-------------
 	iesp.fcradataservice.t_FcraDataServiceCriminalOffenderData xfOffenders(
-										ConsumerDisclosure.RawCriminal.offender_out rec) := TRANSFORM
+										ConsumerDisclosure.RawCriminal.layout_offender_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec;
 	END;
 	
 	iesp.fcradataservice.t_FcraDataServiceCriminalOffenseData xfOffenses(
-											ConsumerDisclosure.RawCriminal.offense_out rec) := TRANSFORM
+											ConsumerDisclosure.RawCriminal.layout_offense_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec;
 	END;
 	
 	iesp.fcradataservice.t_FcraDataServiceCriminalCourtOffenseData xfCourtOffenses(
-											ConsumerDisclosure.RawCriminal.court_offense_out rec) := TRANSFORM
-		SELF.MetaData := rec.MetaData;
-		SELF.RawData := rec;
-	END;
-	
-	iesp.fcradataservice.t_FcraDataServiceCriminalActivityData xfActivities(
-											ConsumerDisclosure.RawCriminal.activity_out rec) := TRANSFORM
+											ConsumerDisclosure.RawCriminal.layout_court_offense_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec;
 	END;
 	
 	iesp.fcradataservice.t_FcraDataServiceCriminalPunishmentData xfPunishment(
-											ConsumerDisclosure.RawCriminal.punishment_out rec) := TRANSFORM
+											ConsumerDisclosure.RawCriminal.layout_punishment_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec;
 	END;
 	
 	EXPORT iesp.fcradataservice.t_FcraDataServiceCriminalData xformCriminalData(
-																				ConsumerDisclosure.RawCriminal.criminal_rec_out l) 
+																				ConsumerDisclosure.RawCriminal.layout_criminal_rec_out l) 
 	:= TRANSFORM
 		SELF.Offenders := PROJECT(l.Offenders, xfOffenders(LEFT));
 		SELF.OffendersPlus := PROJECT(l.OffenderPlus, xfOffenders(LEFT));
 		SELF.Offenses := PROJECT(l.Offenses, xfOffenses(LEFT));
 		SELF.CourtOffenses := PROJECT(l.CourtOffenses, xfCourtOffenses(LEFT));
-		SELF.Activity := PROJECT(l.Activities, xfActivities(LEFT));
 		SELF.Punishment := PROJECT(l.Punishments, xfPunishment(LEFT));
 		SELF.GroupBy.offender_key := l.offender_key;
+	END;
+	
+//----------Liens-------------
+	iesp.fcradataservice.t_FcraDataServiceLiensMainData xfLiensMain(
+										ConsumerDisclosure.RawLiens.layout_liens_main_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	iesp.fcradataservice.t_FcraDataServiceLiensPartyData xfLiensParty(
+											ConsumerDisclosure.RawLiens.layout_liens_party_out rec) := TRANSFORM
+		SELF.MetaData := rec.MetaData;
+		SELF.RawData := rec;
+	END;
+	
+	EXPORT iesp.fcradataservice.t_FcraDataServiceLiensData xformLiensData(
+																				ConsumerDisclosure.RawLiens.layout_liens_out l) 
+	:= TRANSFORM
+		SELF.Main := PROJECT(l.Main, xfLiensMain(LEFT));
+		SELF.Party := PROJECT(l.Parties, xfLiensParty(LEFT));
+		SELF.GroupBy.tmsid := l.tmsid;
+		SELF.GroupBy.rmsid := l.rmsid;
 	END;
 	
 //----------Marriage-Divorce-------------
@@ -145,6 +160,16 @@ EXPORT Transforms := MODULE
 		SELF.AddlLegalDescription := rec.AddlLegalDescription;
 	END;
 	
+	EXPORT iesp.fcradataservice.t_FcraDataServicePropertyAssessment xformPropertyAssessmentData(
+																				ConsumerDisclosure.RawProperty.property_out l) 
+	:= TRANSFORM
+		SELF.Assessment := PROJECT(l.Assessment, xfPropAssessment(LEFT));
+		SELF.Search := PROJECT(l.Search, TRANSFORM(iesp.fcradataservice.t_FcraDataServicePropertySearchData,
+																								SELF.MetaData := LEFT.MetaData,
+																								SELF.RawData := LEFT));
+		SELF.GroupBy.ln_fares_id := l.ln_fares_id;
+	END;
+	
 	iesp.fcradataservice.t_FcraDataServicePropertyDeedData xfPropDeed(
 											ConsumerDisclosure.RawProperty.deed_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
@@ -152,18 +177,13 @@ EXPORT Transforms := MODULE
 		SELF.AdditionalNames := PROJECT(rec.AdditionalNames, iesp.fcradataservice_raw.t_FcraDataServiceRawPropertyAddlNames);
 	END;
 	
-	iesp.fcradataservice.t_FcraDataServicePropertySearchData xfPropSearch(
-											ConsumerDisclosure.RawProperty.property_search_out rec) := TRANSFORM
-		SELF.MetaData := rec.MetaData;
-		SELF.RawData := rec;
-	END;
-	
-	EXPORT iesp.fcradataservice.t_FcraDataServicePropertyData xformPropertyData(
+	EXPORT iesp.fcradataservice.t_FcraDataServicePropertyDeed xformPropertyDeedData(
 																				ConsumerDisclosure.RawProperty.property_out l) 
 	:= TRANSFORM
-		SELF.Assessment := PROJECT(l.Assessment, xfPropAssessment(LEFT));
 		SELF.Deed := PROJECT(l.Deed, xfPropDeed(LEFT));
-		SELF.Search := PROJECT(l.Search, xfPropSearch(LEFT));
+		SELF.Search := PROJECT(l.Search, TRANSFORM(iesp.fcradataservice.t_FcraDataServicePropertySearchData,
+																								SELF.MetaData := LEFT.MetaData,
+																								SELF.RawData := LEFT));
 		SELF.GroupBy.ln_fares_id := l.ln_fares_id;
 	END;
 	
@@ -211,25 +231,25 @@ EXPORT Transforms := MODULE
 	
 	//----------Watercraft-------------
 	iesp.fcradataservice.t_FcraDataServiceWatercraftOwnerData xfWatercraftOwners(
-										ConsumerDisclosure.RawWatercraft.Watercraft_owners_out rec) := TRANSFORM
+										ConsumerDisclosure.RawWatercraft.layout_watercraft_owners_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec;
 	END;
 	
 	iesp.fcradataservice.t_FcraDataServiceWatercraftInfoData xfWatercraftInfo(
-											ConsumerDisclosure.RawWatercraft.Watercraft_info_out rec) := TRANSFORM
+											ConsumerDisclosure.RawWatercraft.layout_watercraft_info_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec;
 	END;
 	
 	iesp.fcradataservice.t_FcraDataServiceWatercraftCoastguardData xfCoastguard(
-											ConsumerDisclosure.RawWatercraft.Coastguard_out rec) := TRANSFORM
+											ConsumerDisclosure.RawWatercraft.layout_coastguard_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec;
 	END;
 	
 	EXPORT iesp.fcradataservice.t_FcraDataServiceWatercraftData xformWatercraftData(
-																				ConsumerDisclosure.RawWatercraft.Watercraft_out l) 
+																				ConsumerDisclosure.RawWatercraft.layout_watercraft_out l) 
 	:= TRANSFORM
 		SELF.Owners := PROJECT(l.Owners, xfWatercraftOwners(LEFT));
 		SELF.Details := PROJECT(l.Details, xfWatercraftInfo(LEFT));

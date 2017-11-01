@@ -1,55 +1,56 @@
 ﻿IMPORT Watercraft, ConsumerDisclosure, doxie, FCRA, FFD, MDR, Suppress;
 
-EXPORT RawWatercraft := MODULE
+	BOOLEAN IsFCRA := TRUE;
 
-	SHARED Watercraft_info_raw := RECORD(Watercraft.Layout_Watercraft_Main_Base) // RECORDOF(watercraft.key_watercraft_wid)
+	layout_watercraft_info_raw := RECORD(Watercraft.Layout_Watercraft_Main_Base) // RECORDOF(watercraft.key_watercraft_wid)
 	END; 
 	
-	SHARED Watercraft_owners_raw := RECORD // RECORDOF(watercraft.key_watercraft_sid)
+	layout_watercraft_owners_raw := RECORD // RECORDOF(watercraft.key_watercraft_sid)
 		Watercraft.Layout_Watercraft_Search_Base_slim -{watercraft.layout_exclusions};
 	END; 
 
-	SHARED Coastguard_raw := RECORD(Watercraft.Layout_Watercraft_Coastguard_Base) // RECORDOF(watercraft.key_watercraft_cid)
+	layout_coastguard_raw := RECORD(Watercraft.Layout_Watercraft_Coastguard_Base) // RECORDOF(watercraft.key_watercraft_cid)
 	END; 
 	
-	SHARED Watercraft_info_rawrec := RECORD(Watercraft_info_raw)
+	layout_watercraft_info_rawrec := RECORD(layout_watercraft_info_raw)
 		ConsumerDisclosure.Layouts.InternalMetadata;
 	END;
 	
-	SHARED Watercraft_owners_rawrec := RECORD(Watercraft_owners_raw)
+	layout_watercraft_owners_rawrec := RECORD(layout_watercraft_owners_raw)
 		ConsumerDisclosure.Layouts.InternalMetadata;
 	END;
 	
-	SHARED Coastguard_rawrec := RECORD(Coastguard_raw)
+	layout_coastguard_rawrec := RECORD(layout_coastguard_raw)
 		ConsumerDisclosure.Layouts.InternalMetadata;
 	END;
 	
-	EXPORT Watercraft_info_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		Watercraft_info_raw;
+
+EXPORT RawWatercraft := MODULE
+
+	EXPORT layout_watercraft_info_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_watercraft_info_raw;
 	END;
 
-	EXPORT Watercraft_owners_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		Watercraft_owners_raw;
+	EXPORT layout_watercraft_owners_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_watercraft_owners_raw;
 	END;
 
-	EXPORT Coastguard_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		Coastguard_raw;
+	EXPORT layout_coastguard_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_coastguard_raw;
 	END;
 
-	EXPORT Watercraft_out := RECORD
+	EXPORT layout_watercraft_out := RECORD
 		STRING state_origin;
 		STRING watercraft_key;
 		STRING sequence_key;
-		DATASET(Watercraft_owners_out) Owners;
-		DATASET(Watercraft_info_out) Details;
-		DATASET(Coastguard_out) Coastguard;
+		DATASET(layout_watercraft_owners_out) Owners;
+		DATASET(layout_watercraft_info_out) Details;
+		DATASET(layout_coastguard_out) Coastguard;
 	END;
 	
-	BOOLEAN IsFCRA := TRUE;
-
 	EXPORT GetData(DATASET(doxie.layout_references) in_dids,
 									DATASET (fcra.Layout_override_flag) flag_file,
-									DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,														 
+									DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs,														 
 									ConsumerDisclosure.IParams.IParam in_mod) := FUNCTION
 
 		BOOLEAN showDisputedRecords := in_mod.ReturnDisputed;
@@ -70,9 +71,9 @@ EXPORT RawWatercraft := MODULE
 										
 		// --------------coastguard-------------
 		Watercraft_coastguard_flag_recs := 
-			JOIN(coastguard_flags, FCRA.key_override_watercraft.wid, 
+			JOIN(coastguard_flags, FCRA.key_override_watercraft.cid, 
 				KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-				TRANSFORM(coastguard_rawrec,
+				TRANSFORM(layout_coastguard_rawrec,
 					is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 					SELF.compliance_flags.isOverride := is_override;
 					SELF.compliance_flags.isSuppressed := ~is_override;
@@ -90,11 +91,11 @@ EXPORT RawWatercraft := MODULE
 		Watercraft_coastguard_override_ids := SET(Watercraft_coastguard_override_recs, combined_record_id);	
 		Watercraft_coastguard_suppressed_ids := SET(Watercraft_coastguard_suppressed_recs, combined_record_id);
 
-		Watercraft_coastguard_payload_recs := JOIN(id_recs, watercraft.key_watercraft_wid(IsFCRA),
+		Watercraft_coastguard_payload_recs := JOIN(id_recs, watercraft.key_watercraft_cid(IsFCRA),
 													KEYED(LEFT.state_origin = RIGHT.state_origin AND
 																LEFT.watercraft_key = RIGHT.watercraft_key AND
 																LEFT.sequence_key = RIGHT.sequence_key),
-													TRANSFORM(coastguard_rawrec,
+													TRANSFORM(layout_coastguard_rawrec,
 																		rec_id := (STRING)RIGHT.persistent_record_id;
 																		rec_id_oldway := TRIM(RIGHT.watercraft_key)+TRIM(RIGHT.sequence_key);
 																		SELF.compliance_flags.IsOverwritten :=
@@ -119,11 +120,11 @@ EXPORT RawWatercraft := MODULE
 										
 		// translate the source code to be the header source code so it can be found in the vendor lookup service
 		coastguard_source_code_corr := PROJECT(Watercraft_coastguard_recs_filt, 
-																		TRANSFORM(coastguard_rawrec, 
+																		TRANSFORM(layout_coastguard_rawrec, 
 																		SELF.source_code := MDR.sourcetools.fWatercraft(LEFT.Source_Code, LEFT.State_Origin), 
 																		SELF := LEFT));
 
-		coastguard_rawrec xformCoastguardStatements(coastguard_rawrec l,	FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_coastguard_rawrec xformCoastguardStatements(layout_coastguard_rawrec l,	FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_ids := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -139,7 +140,7 @@ EXPORT RawWatercraft := MODULE
 													LIMIT(0));
 			
 		Watercraft_coastguard_recs_out := PROJECT(Watercraft_coastguard_final_ds, 
-														TRANSFORM(coastguard_out,			
+														TRANSFORM(layout_coastguard_out,			
 														SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(
 																								LEFT.compliance_flags,
 																								LEFT.record_ids,
@@ -153,7 +154,7 @@ EXPORT RawWatercraft := MODULE
 		Watercraft_info_flag_recs := 
 			JOIN(Watercraft_info_flags, FCRA.key_override_watercraft.wid, 
 				KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-				TRANSFORM(Watercraft_info_rawrec,
+				TRANSFORM(layout_watercraft_info_rawrec,
 					is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 					SELF.compliance_flags.isOverride := is_override;
 					SELF.compliance_flags.isSuppressed := ~is_override;
@@ -175,7 +176,7 @@ EXPORT RawWatercraft := MODULE
 												KEYED(LEFT.state_origin = RIGHT.state_origin AND
 															LEFT.watercraft_key = RIGHT.watercraft_key AND
 															LEFT.sequence_key = RIGHT.sequence_key),
-													TRANSFORM(Watercraft_info_rawrec,
+													TRANSFORM(layout_watercraft_info_rawrec,
 																		rec_id := (STRING)RIGHT.persistent_record_id;
 																		rec_id_oldway := TRIM(RIGHT.watercraft_key)+TRIM(RIGHT.sequence_key);
 																		SELF.compliance_flags.IsOverwritten :=
@@ -200,11 +201,11 @@ EXPORT RawWatercraft := MODULE
 										
 		// translate the source code to be the header source code so it can be found in the vendor lookup service
 		Watercraft_info_source_code_corr := PROJECT(Watercraft_info_recs_filt, 
-																		TRANSFORM(Watercraft_info_rawrec, 
+																		TRANSFORM(layout_watercraft_info_rawrec, 
 																		SELF.source_code := MDR.sourcetools.fWatercraft(LEFT.Source_Code, LEFT.State_Origin), 
 																		SELF := LEFT));
 	
-		Watercraft_info_rawrec xformInfoStatements(Watercraft_info_rawrec l,	FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_watercraft_info_rawrec xformInfoStatements(layout_watercraft_info_rawrec l,	FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_ids := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -220,7 +221,7 @@ EXPORT RawWatercraft := MODULE
 													LIMIT(0));
 			
 		Watercraft_info_recs_out := PROJECT(Watercraft_info_final_ds, 
-														TRANSFORM(Watercraft_info_out,			
+														TRANSFORM(layout_watercraft_info_out,			
 														SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(
 																								LEFT.compliance_flags,
 																								LEFT.record_ids,
@@ -234,7 +235,7 @@ EXPORT RawWatercraft := MODULE
 		owners_flag_recs := 
 			JOIN(Watercraft_owners_flags, FCRA.Key_Override_Watercraft.sid, 
 				KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-				TRANSFORM(Watercraft_owners_rawrec,
+				TRANSFORM(layout_watercraft_owners_rawrec,
 					is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 					SELF.compliance_flags.isOverride := is_override;
 					SELF.compliance_flags.isSuppressed := ~is_override;
@@ -256,7 +257,7 @@ EXPORT RawWatercraft := MODULE
 													KEYED(LEFT.state_origin = RIGHT.state_origin AND
 																LEFT.watercraft_key = RIGHT.watercraft_key AND
 																LEFT.sequence_key = RIGHT.sequence_key),
-													TRANSFORM(Watercraft_owners_rawrec,
+													TRANSFORM(layout_watercraft_owners_rawrec,
 																			rec_id := (STRING)RIGHT.persistent_record_id;
 																			rec_id_oldway := TRIM(RIGHT.watercraft_key)+TRIM(RIGHT.sequence_key);
 																			SELF.compliance_flags.IsOverwritten :=
@@ -284,7 +285,7 @@ EXPORT RawWatercraft := MODULE
 			);   
 										
 			
-		Watercraft_owners_rawrec xformOwnersStatements(Watercraft_owners_rawrec l,FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_watercraft_owners_rawrec xformOwnersStatements(layout_watercraft_owners_rawrec l,FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_IDs := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -301,12 +302,12 @@ EXPORT RawWatercraft := MODULE
 		
 		// translate the source code to be the header source code so it can be found in the vendor lookup service
 		owners_recs_final_ds := PROJECT(owners_recs_with_pc, 
-																		TRANSFORM(Watercraft_owners_rawrec, 
+																		TRANSFORM(layout_watercraft_owners_rawrec, 
 																		SELF.source_code := MDR.sourcetools.fWatercraft(LEFT.Source_Code, LEFT.State_Origin), 
 																		SELF := LEFT));
 	
 		//apply non-subject suppression as restricted 
-		Watercraft_owners_rawrec xformNSS(Watercraft_owners_rawrec L) := TRANSFORM
+		layout_watercraft_owners_rawrec xformNSS(layout_watercraft_owners_rawrec L) := TRANSFORM
 			IsSubject := (L.subject_did = (UNSIGNED) L.did);
 			NotAPerson := (L.did = '') AND ((L.bdid != '') OR (L.fein != '') OR (L.company_name != ''));
 			isRestricted := ~(IsSubject OR NotAPerson);
@@ -332,7 +333,7 @@ EXPORT RawWatercraft := MODULE
 												Watercraft_owners_nss, owners_recs_final_ds);  
 
 		owners_recs_out := PROJECT(Watercraft_owners_final_ds, 
-												TRANSFORM(Watercraft_owners_out,			
+												TRANSFORM(layout_watercraft_owners_out,			
 												SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(LEFT.compliance_flags,
 																								LEFT.record_ids,
 																								LEFT.statement_IDs,
@@ -342,8 +343,8 @@ EXPORT RawWatercraft := MODULE
 												));			
 												
 		// Now combining data sets for final output
-		Watercraft_out xfRollOwners(Watercraft_owners_out le, 
-												DATASET(Watercraft_owners_out) owners_rows) := 
+		layout_watercraft_out xfRollOwners(layout_watercraft_owners_out le, 
+												DATASET(layout_watercraft_owners_out) owners_rows) := 
 		TRANSFORM
 			SELF.state_origin := le.state_origin;
 			SELF.watercraft_key := le.watercraft_key;
@@ -357,7 +358,7 @@ EXPORT RawWatercraft := MODULE
 																						state_origin,watercraft_key,sequence_key), 
 																			GROUP, xfRollOwners(LEFT, ROWS(LEFT)));	
 
-		Watercraft_out xfAddDetails(Watercraft_out le, DATASET(Watercraft_info_out) info_rows) := 
+		layout_watercraft_out xfAddDetails(layout_watercraft_out le, DATASET(layout_watercraft_info_out) info_rows) := 
 		TRANSFORM
 			SELF.Details := info_rows;
 			SELF := le;
@@ -370,7 +371,7 @@ EXPORT RawWatercraft := MODULE
 														GROUP, 
 														xfAddDetails(LEFT, ROWS(RIGHT)));		
 
-		Watercraft_out xfAddCoastguards(Watercraft_out le, DATASET(coastguard_out) c_rows) := 
+		layout_watercraft_out xfAddCoastguards(layout_watercraft_out le, DATASET(layout_coastguard_out) c_rows) := 
 		TRANSFORM
 			SELF.Coastguard := c_rows;
 			SELF := le;
