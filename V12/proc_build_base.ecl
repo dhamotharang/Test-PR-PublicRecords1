@@ -172,12 +172,12 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 	
 	rsCleanAIDGood	:=	rsCleanAIDGoodAddr + rsCleanAIDGoodNoAddr;
 	
-	//Clean Base file to remove invalid characters - only needed the first time to remove unprintable characters from history file
-	//PRTE2.CleanFields(V12.files.V12_base, ClnBaseOut);
+	//Clean Base file to remove invalid characters
+	PRTE2.CleanFields(V12.files.V12_base, ClnBaseOut);
 	
 	BOOLEAN basefileexists	:=	NOTHOR(fileservices.GetSuperFileSubCount(V12.thor_cluster + 'base::V12')) > 0; 
 	
-	BasePlusIn	:=	IF(basefileexists, rsCleanAIDGood + V12.files.V12_base, rsCleanAIDGood);
+	BasePlusIn	:=	IF(basefileexists, rsCleanAIDGood + ClnBaseOut, rsCleanAIDGood);
 																													
 	BaseDist	:=	SORT(DISTRIBUTE(BasePlusIn, HASH(first_name
 																						+last_name
