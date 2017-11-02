@@ -17,6 +17,7 @@ EXPORT proc_build_all(STRING version) := FUNCTION
 										FileServices.StartSuperFileTransaction(),
 										FileServices.AddSuperFile('~thor_data400::in::email::v12_epostal_history','~thor_data400::in::email::v12_epostal',,TRUE),
 										FileServices.ClearSuperFile('~thor_data400::in::email::v12_epostal'),
+									//No longer receiving these files
 										// FileServices.AddSuperFile('~thor_data400::in::email::v12_ezip_history','~thor_data400::in::email::v12_ezip',,TRUE),
 										// FileServices.ClearSuperFile('~thor_data400::in::email::v12_ezip'),
 										// FileServices.AddSuperFile('~thor_data400::in::email::v12_optout_history','~thor_data400::in::email::v12_optout',,TRUE),
