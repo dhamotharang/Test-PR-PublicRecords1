@@ -33,7 +33,7 @@ EXPORT Get_ids
   dids_search := PROJECT (hasdid, doxie.Layout_references);
 
   // dids (from input)
-  dids_input  := doxie.Get_Dids (true,true);
+  dids_input  := PROJECT (doxie.Get_Dids (true,true), doxie.layout_references);
 
   all_dids := DEDUP (dids_search + dids_input, ALL);
 
