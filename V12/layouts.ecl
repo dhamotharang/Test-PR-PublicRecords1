@@ -1,4 +1,4 @@
-EXPORT layouts := MODULE
+﻿EXPORT layouts := MODULE
 	
 	IMPORT AID;
 	
@@ -92,7 +92,7 @@ EXPORT layouts := MODULE
 		string8		date_last_seen;
 		string8		date_vendor_first_reported;
 		string8		date_vendor_last_reported;
-		
+		boolean 	current_rec; //Added to distinguish historical records(with hb and optout) from new full file replacement
 	END;
 	
 END;	

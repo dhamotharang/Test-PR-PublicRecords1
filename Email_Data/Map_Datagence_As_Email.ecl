@@ -1,7 +1,7 @@
 ﻿import V12, address, ut,emailservice, mdr, _validate, Entiera, lib_StringLib, std;
 export Map_Datagence_As_Email(version) := function
 
-with_email := V12.Files.V12_Base(length(trim(email,left, right)) > 4 and StringLib.StringFindCount(email,  '@') > 0 AND optout != TRUE and STD.Str.Find(first_name, '|', 1) =0 and  STD.Str.Find(last_name, '|', 1) = 0 and STD.Str.Find(city, '|', 1) = 0 );
+with_email := V12.Files.V12_Base(length(trim(email,left, right)) > 4 and StringLib.StringFindCount(email,  '@') > 0 AND optout != TRUE AND current_rec = true); //removed pipe filters as that is already included in base build
 
 //apply macro to obtain email domain fields
 emailservice.mac_append_domain_flags(with_email,domain_d,email);
@@ -12,7 +12,7 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d input) := transform
 	self.rec_src_all      					:= translation_codes.source_bitmap_code(mdr.sourceTools.src_datagence);
 	self.email_src_all    					:= translation_codes.source_bitmap_code(mdr.sourceTools.src_datagence);
 	self.email_src_num 							:= 1;
-	self.current_rec      					:= true;
+	self.current_rec      					:= input.current_rec;  //input is now a full replace with history records appended. Current_rec logic is in input base logic
 	self.activecode     						:= if (input.hardbounce, 'I', '');	
 	self.did_type         					:= '';
 	self.orig_pmghousehold_id  			:= '';
