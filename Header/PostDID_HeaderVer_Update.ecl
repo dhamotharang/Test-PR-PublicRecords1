@@ -62,8 +62,10 @@ export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_build_v
                                             output(proj_out,,newflagfilename,overwrite)
                                 )
                             ),
+                            std.file.startsuperfiletransaction(),
                             std.file.clearsuperfile (flagfilename,true),  //delete when clearing
-                            std.file.addsuperfile   (flagfilename,newflagfilename)
+                            std.file.addsuperfile   (flagfilename,newflagfilename),
+                            std.file.finishsuperfiletransaction()
                 );
 
 	return create_out;
