@@ -1,4 +1,4 @@
-EXPORT ScrubsPlus_PassFile(inputFile,DatasetName,ScrubsModule,ScrubsProfileName,ScopeName='',filedate,emailList='', UseOnFail=false)	:=	FUNCTIONMACRO 
+﻿EXPORT ScrubsPlus_PassFile(inputFile,DatasetName,ScrubsModule,ScrubsProfileName,ScopeName='',filedate,emailList='', UseOnFail=false)	:=	FUNCTIONMACRO 
 
 	folder						:=	#EXPAND(ScrubsModule);
 	inFile						:=	inputFile;
@@ -82,6 +82,28 @@ EXPORT ScrubsPlus_PassFile(inputFile,DatasetName,ScrubsModule,ScrubsProfileName,
 	ErroredRecords					:= count(dWithScrubs(bFailedScrubs));
 	PcntErroredRec					:= (String)((decimal5_2)((((real)ErroredRecords)/((real)TotalRecs))*100));
 	//This will output a file with bitmap(s) and a processed file with all on fail flags activated for the rules
+	
+	LoadProfile:=dataset('~thor_data400::Scrubs::'+ScrubsProfileName+'::ProfileStorage',Scrubs.Layouts.ProfileRule_Rec,thor,opt);
+	
+	MergeScrubsBase:= join(Orbit_stats, LoadProfile, trim(left.RuleDesc, left, right) = trim(right.Name, left, right),
+                                         transform( Scrubs.layouts.StatsOutLayout, 
+																				 self.RulePcnt := (decimal5_2) (((real)left.Rulecnt/(real)left.RecordsTotal) * 100.00);
+																				 self.RejectWarning := if(self.RulePcnt > (decimal5_2) right.passpercentagetop, 'Y', 'N'),
+																				 self.RuleName := trim(left.RuleDesc, left),
+																				 self.ruledesc :=  trim(stringlib.stringfindreplace(left.errormessage[..100], ',', ' '),left, right),
+																				 self.FieldName := trim(Ut.Word(left.ruledesc,1,':'), left),
+																				 self.InvalidValue := (string)(string100)left.rawcodemissing,
+																				 self.InvalidValueCnt := left.rawcodemissingcnt,
+																				 self.RuleThreshold := (decimal5_2) right.passpercentagetop;
+																				 self := left,
+																				 self := right));
+																				 
+	IdentifyExceedThreshold	:= 	MergeScrubsBase(RejectWarning='Y');
+	IdentifyExceedSevere			:=	IdentifyExceedThreshold(Severity='1');
+	
+	NumExceedThreshold:=count(IdentifyExceedThreshold);
+	NumExceedSevere:=count(IdentifyExceedSevere);	
+	
 	bitfile_name		:=	'~thor_data::'+scope_datasetName+'::Scrubs_Bits';
 	processedfile_name		:=	'~thor_data::'+scope_datasetName+'::Processed_File';
 	CreateBitmaps		:=	OUTPUT( N.BitmapInfile,,bitfile_name, OVERWRITE, compressed, named(scope_datasetName+'_BitFile_'+filedate)); // long term storage
@@ -93,7 +115,7 @@ EXPORT ScrubsPlus_PassFile(inputFile,DatasetName,ScrubsModule,ScrubsProfileName,
 	T := S.FromBits(DS);	// Use the FromBits module; makes my bitmap datafile easier to get to read
 	TranslateBitmap	:=	OUTPUT(T);
 	
-	new_entry:=dataset([{DatasetName,ProfileName,scopename,filedate,TotalRecs,NumRules,NumFailedRules,ErroredRecords,TotalRemovedRecs,PcntErroredRec,workunit}],Scrubs.Layouts.LogRecord);
+	new_entry:=dataset([{DatasetName,ProfileName,scopename,filedate,TotalRecs,NumRules,NumFailedRules,NumExceedThreshold,NumExceedSevere,ErroredRecords,TotalRemovedRecs,PcntErroredRec,workunit}],Scrubs.Layouts.LogRecord);
 	outnew:=output(new_entry);
 
 	EmailReport:=if(emailList <>'' , fileservices.sendEmail(emailList,
@@ -106,6 +128,8 @@ EXPORT ScrubsPlus_PassFile(inputFile,DatasetName,ScrubsModule,ScrubsProfileName,
 																			'Total Number of Records:'+TotalRecs+'\n'+
 																			'Total Number of Rules:'+NumRules+'\n'+
 																			'Total Number of Failed Rules:'+NumFailedRules+'\n'+
+																			'Total Number of Rules That Exceed Threshold:'+NumExceedThreshold+'\n'+
+																			'Total Number of Severe Rules That Exceed Threshold:'+NumExceedSevere+'\n'+
 																			'Total Number of Errored Records:'+ErroredRecords+'\n'+
 																			'Percent Errored Records:'+PcntErroredRec+'\n'+
 																			'Total Number of Removed Recs:'+TotalRemovedRecs+'\n'+
@@ -113,25 +137,21 @@ EXPORT ScrubsPlus_PassFile(inputFile,DatasetName,ScrubsModule,ScrubsProfileName,
 																			
 	SubmitStats						:=	Scrubs.OrbitProfileStats(profilename,'ScrubsAlerts',Orbit_stats,filedate,profilename).SubmitStats;
 	
-	SuperFile:='~thor_data400::ScrubsPlus::Log';
-	Super_Log_File:='~thor_data400::ScrubsPlus::'+ScrubsModule+'::Log';
-	SuperFile_Entries	:=	dataset(Super_Log_File,Scrubs.Layouts.LogRecord,thor,opt);
+	SuperFile:='~thor_data400::ScrubsPlus::log';
+	Super_Log_File:='~thor_data400::ScrubsPlus::'+ScrubsModule+'::Log::'+workunit+'::'+ScrubsProfileName;
 	
-	Create_New_File	:=	sequential(output(SuperFile_Entries+new_entry,,Super_Log_File+'_temp',thor,overwrite,named(scope_datasetName+'_LogEntryFull_'+filedate)),
-																																																						 STD.File.StartSuperFileTransaction(),
-																																																						 STD.File.RemoveSuperFile(SuperFile,Super_Log_File,true),
-																																																						 STD.File.FinishSuperFileTransaction());
-																																																						 // output(old_entries+new_entry,,Super_Log_File+'_temp',thor,overwrite));
+	Create_New_File	:=	output(new_entry,,Super_Log_File,thor,overwrite,named(scope_datasetName+'_LogEntryFull'));
 
 
 
 	publish:=sequential(
 										Create_New_File,
-										nothor(global(sequential(fileservices.deleteLogicalFile(Super_Log_File),
-										fileservices.renameLogicalFile(Super_Log_File+'_temp',Super_Log_File),
+										nothor(global(sequential(
 										STD.File.StartSuperFileTransaction(),
 										STD.File.AddSuperFile(SuperFile,Super_Log_File),
 										STD.File.FinishSuperFileTransaction()))));
+
+
 
 
 

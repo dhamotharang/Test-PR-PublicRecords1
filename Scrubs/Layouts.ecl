@@ -1,4 +1,4 @@
-import Salt35;
+﻿import Salt35;
 EXPORT Layouts := MODULE
 
 //	Scrubs
@@ -66,6 +66,8 @@ export LogRecord	:=	record
 				string NumRecs;
 				string NumRules;
 				string NumErroredRules;
+				string RulesExceedingThreshold;
+				string RulesExceedingSevere;
 				string NumErroredRecs;
 				string PcntErroredRecs;
 				string NumRemovedRecs;
@@ -94,6 +96,8 @@ export OrbitLogLayout	:=	record
 		string RuleType;
 		Decimal5_2 PassPercentageBottom:=0.0;
 		Decimal5_2 PassPercentageTop;
+		//Decimal5_2 CompareToPreviousMin:=0.0;
+		//Decimal5_2 CompareToPreviousMax:=0.0;
 		string Code;
 		string Severity;
 	end;
