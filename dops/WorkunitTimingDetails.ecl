@@ -5,7 +5,7 @@ EXPORT WorkunitTimingDetails(string esp
 														,string p_wuid = ''
 														) := module
 	shared states := ['completed','aborted','failed'];
-	shared startwu := 'W20160101-000000';
+	shared startwu := 'W' + (string)STD.Date.AdjustDate(STD.Date.Today(),0,-1) + '-' + (string)STD.Date.CurrentTime(true);
 	shared endwu := 'W' + (string)STD.Date.Today() + '-' + (string)STD.Date.CurrentTime(true);
 	shared integer baskets := 500;
 	
@@ -220,9 +220,11 @@ EXPORT WorkunitTimingDetails(string esp
 		soapds := dataset('~dataops::soapcalls::wutimingstoupdatedb',soap_recs,thor,opt);
 		
 		return if (regexfind('hthor', thorlib.cluster())
-							,sequential(
+						,if (~fileservices.fileexists('~wutimings::job::running')
+								,sequential(
+									output(dataset([{WORKUNIT}],{string wuid}),,'~wutimings::job::running',overwrite)
 									//output(choosen(ds,100)),
-									output(soap_response,,'~dataops::soapcalls::wutimingstoupdatedb',overwrite),
+									,output(soap_response,,'~dataops::soapcalls::wutimingstoupdatedb',overwrite),
 									if(count(soapds(rstatus[1].Code = '-1')) > 0,
 									sequential(
 										//output(choosen(soapds(rstatus[1].Code = '-1'),100)),
@@ -232,21 +234,25 @@ EXPORT WorkunitTimingDetails(string esp
 																	,
 																	,
 																	,fromemail)),
-										output('No Soap failures')
-											)
+										output('No Soap failures'))
+										,fileservices.deletelogicalfile('~wutimings::job::running')
+											
 									)
+									,output('Another job running')
+								)
 							,fail('run on a hthor cluster'));
 									
 			
 	end;
 	
-	/*
+	
 	export run() := UpdateDOPS() : success(output('Workunit completed successfully'))
-									,failure(dops.GetWUErrorMessages(WORKUNIT
+									,failure(sequential
+															(dops.GetWUErrorMessages(WORKUNIT
 																							,esp
 																							,
 																							,fromemail
 																							,toemaillist)
+																,fileservices.deletelogicalfile('~wutimings::job::running'))
 														);
-	*/
 end;
