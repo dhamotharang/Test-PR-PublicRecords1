@@ -2,7 +2,7 @@
 
 BOOLEAN IsFCRA := TRUE;
 	
-property_search_raw := RECORD(LN_PropertyV2.layout_search_building)  //recordof(LN_PropertyV2.key_search_fid)
+layout_property_search_raw := RECORD(LN_PropertyV2.layout_search_building)  //recordof(LN_PropertyV2.key_search_fid)
 	//  additional columns of key_search_fid index:
 		STRING1 source_code_1;
 		STRING1 source_code_2;
@@ -15,62 +15,123 @@ property_search_raw := RECORD(LN_PropertyV2.layout_search_building)  //recordof(
 		string1   best_locid;
 END; 
 	
-addllegal_raw := RECORD(LN_PropertyV2.layout_addl_legal) //recordof(LN_PropertyV2.key_addl_legal_fid)
+layout_addllegal_raw := RECORD(LN_PropertyV2.layout_addl_legal) //recordof(LN_PropertyV2.key_addl_legal_fid)
 END;
 
-addlnames_raw := RECORD(LN_PropertyV2.layout_addl_names) //recordof(LN_PropertyV2.key_addl_names)
+layout_addlnames_raw := RECORD(LN_PropertyV2.layout_addl_names) //recordof(LN_PropertyV2.key_addl_names)
 END;
 
-assessment_raw := RECORD(ln_propertyv2.layout_property_common_model_base) //recordof(LN_PropertyV2.key_assessor_fid)
+layout_assessment_raw := RECORD(ln_propertyv2.layout_property_common_model_base) //recordof(LN_PropertyV2.key_assessor_fid)
 		UNSIGNED6 proc_date;
 END;
 	
-deed_raw := RECORD(ln_propertyv2.layout_deed_mortgage_common_model_base) //recordof(LN_PropertyV2.key_deed_fid)
+layout_deed_raw := RECORD(ln_propertyv2.layout_deed_mortgage_common_model_base) //recordof(LN_PropertyV2.key_deed_fid)
 		UNSIGNED6 proc_date;
 END;
 	
-property_search_rawrec := RECORD(property_search_raw)
+layout_property_search_rawrec := RECORD(layout_property_search_raw)
 		ConsumerDisclosure.Layouts.InternalMetadata;
 END;
 	
-assessment_rawrec := RECORD(assessment_raw)
+layout_assessment_rawrec := RECORD(layout_assessment_raw)
 		ConsumerDisclosure.Layouts.InternalMetadata;
-		addllegal_raw AddlLegalDescription;
+		layout_addllegal_raw AddlLegalDescription;
 END;
 	
-deed_rawrec := RECORD(deed_raw)
+layout_deed_rawrec := RECORD(layout_deed_raw)
 		ConsumerDisclosure.Layouts.InternalMetadata;
-		DATASET(addlnames_raw) AdditionalNames;
+		DATASET(layout_addlnames_raw) AdditionalNames;
 END;
 	
+layout_fareid := RECORD
+	STRING50 ln_fares_id;
+	UNSIGNED6 s_did := 0;
+	BOOLEAN isOwnedBySubject := FALSE;
+END;
+
+layout_fareid_addr := RECORD(ConsumerDisclosure.Layouts.address_rec)
+	layout_fareid;
+	unsigned3 dt_last_seen;
+END;
+		
 
 EXPORT RawProperty := MODULE
 
-	EXPORT property_search_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		property_search_raw;
+	EXPORT layout_property_search_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_property_search_raw;
 	END;
 	
-	EXPORT assessment_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		assessment_raw RawData;
-		addllegal_raw AddlLegalDescription;
+	EXPORT layout_assessment_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_assessment_raw RawData;
+		layout_addllegal_raw AddlLegalDescription;
 	END;
 	
-	EXPORT deed_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		deed_raw RawData;
-		DATASET(addlnames_raw) AdditionalNames;
+	EXPORT layout_deed_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_deed_raw RawData;
+		DATASET(layout_addlnames_raw) AdditionalNames;
 	END;
 	
-	EXPORT property_out := RECORD
+	EXPORT layout_property_out := RECORD
     STRING50 ln_fares_id;
-		DATASET(property_search_out) Search {xpath('Search/Row')};
-		DATASET(assessment_out) Assessment {xpath('Assessment/Row')};
-		DATASET(deed_out) Deed {xpath('Deed/Row')};
+		BOOLEAN isOwnedBySubject := FALSE;
+		DATASET(layout_property_search_out) Search;
+		DATASET(layout_assessment_out) Assessment;
+		DATASET(layout_deed_out) Deed;
 	END;
 		
-	EXPORT GetData(
-		DATASET(doxie.layout_references) in_dids,
+	GetFareIdByDid(DATASET(doxie.layout_references) in_dids) := FUNCTION
+	
+		id_recs_prelim := JOIN(in_dids,ln_propertyv2.key_property_did(isFCRA),
+												KEYED(LEFT.did = RIGHT.s_did) AND
+												// Filter out "Care-Of" records
+												RIGHT.source_code[1] != 'C',
+												TRANSFORM(layout_fareid, SELF.isOwnedBySubject:=TRUE, SELF:=RIGHT),
+										LIMIT(0),KEEP(ConsumerDisclosure.Constants.Limits.MaxPropPerDID)); 
+		
+		id_recs_ddp := DEDUP(SORT(id_recs_prelim,s_did,ln_fares_id),s_did,ln_fares_id);
+		RETURN id_recs_ddp;
+	END;
+
+	GetFareIdByAddress(DATASET(ConsumerDisclosure.Layouts.address_rec) in_addresses) := FUNCTION
+		// expected that addresses coming from input are unique and have seq_no assigned
+		by_address_recs_prelim := JOIN(in_addresses,ln_propertyv2.key_addr_fid(isFCRA),
+																	 LEFT.prim_name<>'' AND
+																	 KEYED (LEFT.prim_name=Right.prim_name AND
+																					 LEFT.prim_range=Right.prim_range AND
+																					 LEFT.zip=Right.zip AND
+																					 LEFT.predir=Right.predir AND
+																					 LEFT.postdir=Right.postdir AND
+																					 LEFT.suffix=Right.suffix AND
+																					 LEFT.sec_range=Right.sec_range AND
+																					 RIGHT.source_code_2 = 'P') AND
+																		RIGHT.source_code_1 <> 'C',  // filter out "Care-Of" records
+																		TRANSFORM(layout_fareid_addr, 
+																					SELF.isOwnedBySubject:=FALSE, 
+																					SELF.s_did:=LEFT.subject_did, 
+																					SELF.ln_fares_id:=RIGHT.ln_fares_id, 
+																					SELF:=LEFT, SELF:=[]),
+																LIMIT(0),KEEP(ConsumerDisclosure.Constants.Limits.MaxPropPerAddress)); 
+		
+		by_address_recs := JOIN (by_address_recs_prelim, ln_propertyv2.key_search_fid(IsFCRA),
+                                  KEYED (LEFT.ln_fares_id = RIGHT.ln_fares_id) AND
+																	RIGHT.source_code[1]='O', 
+                                  TRANSFORM (layout_fareid_addr, 
+																						SELF.dt_last_seen := RIGHT.dt_last_seen, 
+																						SELF:=LEFT),
+                                  LIMIT(0), KEEP(ConsumerDisclosure.Constants.Limits.MaxPropPerFID));
+                        
+		assmnt_fares := DEDUP(SORT(by_address_recs(ln_fares_id[2]='A'), s_did,zip,prim_name,prim_range,predir,postdir,suffix,sec_range,-dt_last_seen), s_did, zip,prim_name,prim_range,predir,postdir,suffix,sec_range);   // keep the most recent fares id per address
+		deed_fares   := DEDUP(SORT(by_address_recs(ln_fares_id[2]='D'), s_did,zip,prim_name,prim_range,predir,postdir,suffix,sec_range,-dt_last_seen), s_did, zip,prim_name,prim_range,predir,postdir,suffix,sec_range); // keep the most recent fares id per address
+
+		fareid_recs := PROJECT(assmnt_fares+deed_fares, TRANSFORM(layout_fareid, SELF:=LEFT));
+		
+		RETURN fareid_recs;
+	END;
+
+	GetPropertiesByFareId(
+		DATASET(layout_fareid) id_recs,
 		DATASET (fcra.Layout_override_flag) flag_file,
-		DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,														 
+		DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs,														 
 		ConsumerDisclosure.IParams.IParam in_mod) := 
   FUNCTION
 
@@ -85,21 +146,11 @@ EXPORT RawProperty := MODULE
 		property_search_pc_flags := slim_pc_recs(datagroup = FFD.Constants.DataGroups.PROPERTY_SEARCH);
 		property_search_all_flags := flag_file(file_id = FCRA.FILE_ID.SEARCH);
 		
-		id_recs_prelim := JOIN(in_dids,ln_propertyv2.key_property_did(isFCRA),
-												KEYED(LEFT.did = RIGHT.s_did) AND
-												//KEYED(RIGHT.source_code_2 = 'P') AND  // should we use that filter? 
-												// Filter out "Care-Of" records
-												RIGHT.source_code[1] != 'C',
-												TRANSFORM(RIGHT),
-										LIMIT(0),KEEP(ConsumerDisclosure.Constants.Limits.MaxPropPerDID)); 
-		
-		id_recs := DEDUP(SORT(id_recs_prelim,s_did,ln_fares_id),s_did,ln_fares_id);
-		
 			//-------assessment-------------
 		assessment_flag_recs := 
 			JOIN(assessment_all_flags, FCRA.key_override_property.assessment, 
 				KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-				TRANSFORM(assessment_rawrec,
+				TRANSFORM(layout_assessment_rawrec,
 					is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 					SELF.compliance_flags.isOverride := is_override;
 					SELF.compliance_flags.isSuppressed := ~is_override;
@@ -125,7 +176,7 @@ EXPORT RawProperty := MODULE
 
 		assessment_payload_recs := JOIN(id_recs, LN_PropertyV2.key_assessor_fid(isFCRA),
 									KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id),
-									TRANSFORM(assessment_rawrec,
+									TRANSFORM(layout_assessment_rawrec,
 										SELF.compliance_flags.IsOverwritten := (RIGHT.ln_fares_id<>'' AND RIGHT.ln_fares_id IN assessment_override_ids),
 										SELF.compliance_flags.IsSuppressed := (RIGHT.ln_fares_id<>'' AND RIGHT.ln_fares_id IN assessment_suppressed_ids),
 										SELF.subject_did := LEFT.s_did,
@@ -142,7 +193,7 @@ EXPORT RawProperty := MODULE
 			in_mod.ReturnSuppressed or ~compliance_flags.isSuppressed
 			);
 											
-		assessment_rawrec xformAssessmentStatements(assessment_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_assessment_rawrec xformAssessmentStatements(layout_assessment_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_IDs := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -159,14 +210,14 @@ EXPORT RawProperty := MODULE
 
 		assessment_final_ds := JOIN(assessment_with_pc, LN_PropertyV2.key_addl_legal_fid(isFCRA),
 															KEYED(left.ln_fares_id = right.ln_fares_id),
-															TRANSFORM(assessment_rawrec,
+															TRANSFORM(layout_assessment_rawrec,
 																				SELF.AddlLegalDescription:=RIGHT,
 																				SELF:=LEFT),
 															LIMIT(0), KEEP(1),  
 															LEFT OUTER);
 
 		assessment_recs_out := PROJECT(assessment_final_ds, 
-																	TRANSFORM(assessment_out,
+																	TRANSFORM(layout_assessment_out,
 																		SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(
 																				LEFT.compliance_flags, 
 																				LEFT.record_ids, 
@@ -181,7 +232,7 @@ EXPORT RawProperty := MODULE
 		deed_flag_recs := 
 			JOIN(deed_all_flags, FCRA.key_override_property.deed, 
 				KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-				TRANSFORM(deed_rawrec,
+				TRANSFORM(layout_deed_rawrec,
 					is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 					SELF.compliance_flags.isOverride := is_override;
 					SELF.compliance_flags.isSuppressed := ~is_override;
@@ -207,7 +258,7 @@ EXPORT RawProperty := MODULE
 
 		deed_payload_recs := JOIN(id_recs, LN_PropertyV2.key_deed_fid(isFCRA),
 									KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id),
-									TRANSFORM(deed_rawrec,
+									TRANSFORM(layout_deed_rawrec,
 										SELF.compliance_flags.IsOverwritten := (RIGHT.ln_fares_id<>'' AND RIGHT.ln_fares_id IN deed_override_ids);
 										SELF.compliance_flags.IsSuppressed := (RIGHT.ln_fares_id<>'' AND RIGHT.ln_fares_id IN deed_suppressed_ids);
 										SELF.subject_did := LEFT.s_did;
@@ -224,7 +275,7 @@ EXPORT RawProperty := MODULE
 			in_mod.ReturnSuppressed or ~compliance_flags.isSuppressed
 			);
 											
-		deed_rawrec xformDeedStatements(deed_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_deed_rawrec xformDeedStatements(layout_deed_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_IDs := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -241,10 +292,10 @@ EXPORT RawProperty := MODULE
 													
 		addl_names	:= JOIN(id_recs, LN_PropertyV2.key_addl_names(isFCRA),
 												KEYED(LEFT.ln_fares_id=RIGHT.ln_fares_id),
-												TRANSFORM(addlnames_raw, SELF:=RIGHT),
+												TRANSFORM(layout_addlnames_raw, SELF:=RIGHT),
 												KEEP(ConsumerDisclosure.Constants.Limits.MaxPropPartiesPerFID), LIMIT(0));
 
-		deed_rawrec xfAddNames(deed_rawrec le, DATASET(addlnames_raw) ri) := TRANSFORM
+		layout_deed_rawrec xfAddNames(layout_deed_rawrec le, DATASET(layout_addlnames_raw) ri) := TRANSFORM
 			SELF.AdditionalNames := ri;
 			SELF := le;
 		END;
@@ -255,7 +306,7 @@ EXPORT RawProperty := MODULE
 																	xfAddNames(LEFT, ROWS(RIGHT)));	
 		
 		deed_recs_out := PROJECT(deed_final_ds, 
-																	TRANSFORM(deed_out,
+																	TRANSFORM(layout_deed_out,
 																		SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(
 																				LEFT.compliance_flags, 
 																				LEFT.record_ids, 
@@ -271,7 +322,7 @@ EXPORT RawProperty := MODULE
 		property_search_flag_recs := 
 			JOIN(property_search_all_flags, FCRA.key_override_property.search, 
 				KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-				TRANSFORM(property_search_rawrec,
+				TRANSFORM(layout_property_search_rawrec,
 					is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 					SELF.compliance_flags.isOverride := is_override;
 					SELF.compliance_flags.isSuppressed := ~is_override;
@@ -299,7 +350,7 @@ EXPORT RawProperty := MODULE
 
 		property_search_payload_recs := JOIN(id_recs, LN_PropertyV2.key_search_fid(isFCRA),
 								KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id),
-								TRANSFORM(property_search_rawrec,
+								TRANSFORM(layout_property_search_rawrec,
 									SELF.compliance_flags.IsOverwritten := (RIGHT.persistent_record_id>0 AND (STRING) RIGHT.persistent_record_id IN property_search_override_ids);
 									SELF.compliance_flags.IsSuppressed := (RIGHT.persistent_record_id>0 AND (STRING) RIGHT.persistent_record_id IN property_search_suppressed_ids)
 																												OR (RIGHT.ln_fares_id IN suppressed_fares_ids);
@@ -318,7 +369,7 @@ EXPORT RawProperty := MODULE
 			in_mod.nss <> Suppress.Constants.NonSubjectSuppression.returnBlank OR subject_did=did
 			);
 											
-		property_search_rawrec xformAddStatements(property_search_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_property_search_rawrec xformAddStatements(layout_property_search_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_IDs := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -334,10 +385,10 @@ EXPORT RawProperty := MODULE
 													LIMIT(0));
 
 		//apply non-subject suppression for restricted
-		property_search_rawrec xformNSS(property_search_rawrec L) := TRANSFORM
+		layout_property_search_rawrec xformNSS(layout_property_search_rawrec L) := TRANSFORM
 			IsSubject := (L.subject_did = L.did);  
 			NotAPerson := (L.did = 0) AND ((L.bdid != 0) OR (L.cname != ''));
-			isRestricted := ~IsSubject AND ~NotAPerson;
+			isRestricted := ~(IsSubject OR NotAPerson);
     
       SELF.subject_did := L.subject_did;
       SELF.compliance_flags := L.compliance_flags;
@@ -357,7 +408,7 @@ EXPORT RawProperty := MODULE
 												property_search_nss, property_search_recs_final_ds);  
 
 		property_search_recs_out := PROJECT(property_search_final_ds, 
-																			TRANSFORM(property_search_out,
+																			TRANSFORM(layout_property_search_out,
 																				SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(
 																													LEFT.compliance_flags, 
 																													LEFT.record_ids, 
@@ -369,10 +420,13 @@ EXPORT RawProperty := MODULE
 			
 		
 		// --------Now combining data sets for final output
-		ids := PROJECT(id_recs, TRANSFORM(property_out,SELF.ln_fares_id:=LEFT.ln_fares_id, SELF:=[]));
+		ids := PROJECT(id_recs, TRANSFORM(layout_property_out,
+																			SELF.ln_fares_id:=LEFT.ln_fares_id, 
+																			SELF.isOwnedBySubject:=LEFT.isOwnedBySubject, 
+																			SELF:=[]));
 		
-		property_out xfAddSearch(property_out le, 
-												DATASET(property_search_out) ri) := 
+		layout_property_out xfAddSearch(layout_property_out le, 
+												DATASET(layout_property_search_out) ri) := 
 		TRANSFORM
 			SELF.Search := ri;
 			SELF := le;
@@ -383,7 +437,7 @@ EXPORT RawProperty := MODULE
 																			GROUP, 
 																			xfAddSearch(LEFT, ROWS(RIGHT)));	
 
-		property_out xfAddAssessment(property_out le, DATASET(assessment_out) ri) := 
+		layout_property_out xfAddAssessment(layout_property_out le, DATASET(layout_assessment_out) ri) := 
 		TRANSFORM
 			SELF.Assessment := ri;
 			SELF := le;
@@ -394,7 +448,7 @@ EXPORT RawProperty := MODULE
 																				GROUP, 
 																				xfAddAssessment(LEFT, ROWS(RIGHT)));		
 												
-		property_out xfAddDeed(property_out le, DATASET(deed_out) ri) := 
+		layout_property_out xfAddDeed(layout_property_out le, DATASET(layout_deed_out) ri) := 
 		TRANSFORM
 			SELF.Deed := ri;
 			SELF := le;
@@ -409,22 +463,41 @@ EXPORT RawProperty := MODULE
 		recs_out := prelim_recs_out(EXISTS(Deed) OR EXISTS(Assessment) OR EXISTS(Search));	
 			
 												
-		IF(ConsumerDisclosure.Debug, OUTPUT(id_recs, NAMED('property_search_ids')));
-		IF(ConsumerDisclosure.Debug, OUTPUT(property_search_suppressed_recs, NAMED('property_search_suppressed_recs')));
-		IF(ConsumerDisclosure.Debug, OUTPUT(property_search_override_recs, NAMED('property_search_override_recs')));
-		IF(ConsumerDisclosure.Debug, OUTPUT(property_search_payload_recs, NAMED('property_search_payload_recs')));
-		IF(ConsumerDisclosure.Debug, OUTPUT(property_search_recs_out, NAMED('property_search_recs')));
-		IF(ConsumerDisclosure.Debug, OUTPUT(assessment_suppressed_recs, NAMED('assessment_suppressed_recs')));
-		IF(ConsumerDisclosure.Debug, OUTPUT(assessment_override_recs, NAMED('assessment_override_recs')));
-		IF(ConsumerDisclosure.Debug, OUTPUT(assessment_payload_recs, NAMED('assessment_payload_recs')));
-		IF(ConsumerDisclosure.Debug, OUTPUT(assessment_recs_out, NAMED('assessment_recs_out')));
-		IF(ConsumerDisclosure.Debug, OUTPUT(deed_suppressed_recs, NAMED('deed_suppressed_recs')));
-		IF(ConsumerDisclosure.Debug, OUTPUT(deed_override_recs, NAMED('deed_override_recs')));
-		IF(ConsumerDisclosure.Debug, OUTPUT(deed_payload_recs, NAMED('deed_payload_recs')));
-		IF(ConsumerDisclosure.Debug, OUTPUT(deed_recs_out, NAMED('deed_recs_out')));
-		IF(ConsumerDisclosure.Debug, OUTPUT(recs_out, NAMED('property_combined_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(id_recs, NAMED('property_search_ids')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(property_search_suppressed_recs, NAMED('property_search_suppressed_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(property_search_override_recs, NAMED('property_search_override_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(property_search_payload_recs, NAMED('property_search_payload_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(property_search_recs_out, NAMED('property_search_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(assessment_suppressed_recs, NAMED('assessment_suppressed_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(assessment_override_recs, NAMED('assessment_override_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(assessment_payload_recs, NAMED('assessment_payload_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(assessment_recs_out, NAMED('assessment_recs_out')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(deed_suppressed_recs, NAMED('deed_suppressed_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(deed_override_recs, NAMED('deed_override_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(deed_payload_recs, NAMED('deed_payload_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(deed_recs_out, NAMED('deed_recs_out')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(recs_out, NAMED('property_combined_recs')));
 
 		RETURN recs_out;
 	END;
 
+	EXPORT GetData(
+		DATASET(doxie.layout_references) in_dids,
+		DATASET(ConsumerDisclosure.Layouts.address_rec) in_addresses,
+		DATASET (fcra.Layout_override_flag) flag_file,
+		DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs,														 
+		ConsumerDisclosure.IParams.IParam in_mod) := 
+  FUNCTION
+	
+		owner_id_recs := GetFareIdByDid(in_dids);  // fare ids for subject owned properties
+		residence_id_recs := GetFareIdByAddress(in_addresses);  // fare ids by subject residence
+		combined_id_recs := DEDUP(SORT(owner_id_recs+residence_id_recs,ln_fares_id,s_did,-isOwnedBySubject),ln_fares_id,s_did);  // if duplicates keep fares id owned by subject
+		all_properties := GetPropertiesByFareId(combined_id_recs,flag_file,slim_pc_recs,in_mod);
+		
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(owner_id_recs, NAMED('property_owner_id_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(residence_id_recs, NAMED('property_residence_id_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(combined_id_recs, NAMED('property_combined_id_recs')));
+		
+		RETURN all_properties;
+	END;
 END;
