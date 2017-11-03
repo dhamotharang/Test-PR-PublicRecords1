@@ -6,7 +6,8 @@
 		'DOBMask',
 		'SSNMask',
 		'GLBPurpose',
-		'FCRAPurpose',
+		'PermissiblePurpose',
+		'FFDOptionsMask',
 		/*---- Other Fields ----*/
 		'IncludeLiensJudgments',
 		/*---- Gateways ----*/
