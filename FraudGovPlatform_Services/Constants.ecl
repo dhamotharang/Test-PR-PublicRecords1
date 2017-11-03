@@ -16,8 +16,9 @@
   EXPORT MAX_RECS_ON_JOIN    := 1000;
   EXPORT MAX_REQUIRED_INPUTS := 100;
   EXPORT PRODUCT_INCLUDE_CODE_ALL := 1; //There are many other codes in data_file
-	EXPORT STRING FRAUDPLATFORM := 'FraudGov';
-	EXPORT INTEGER MAXVELOCITIES := 3;		
+	EXPORT STRING FRAUD_PLATFORM := 'FraudGov';
+	EXPORT INTEGER MAX_VELOCITIES := 3;		
+	EXPORT INTEGER MAX_KNOWN_FRAUDS := 5;
     
   // GOV FDN id key classification_Permissible_use_access.file_type field possible data values
   EXPORT FileTypeCodes  := MODULE
