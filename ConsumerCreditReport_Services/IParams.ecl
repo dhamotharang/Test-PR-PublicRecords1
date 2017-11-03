@@ -30,7 +30,7 @@ EXPORT IParams := MODULE
 			EXPORT STRING50 BillingCode := '' : STORED('BillingCode');
 			EXPORT STRING120 EndUserCompanyName := '' : STORED('EndUserCompanyName');
 			EXPORT STRING6 DOBMask := Suppress.Constants.DATE_MASK_TYPE.NONE : STORED('DOBMask');
-			EXPORT STRING PermissiblePurpose := '' : STORED('FCRAPurpose'); // just a passthrough to the gateway. esdl should have been defined as PermissiblePurpose instead.
+			EXPORT STRING PermissiblePurpose := '' : STORED('PermissiblePurpose');
 			EXPORT INTEGER8 FFDOptionsMask := FFD.FFDMask.Get(); 
 			EXPORT BOOLEAN FetchLiensJudgments := IncludeLiensJudgments AND NOT isRestricted;
 			EXPORT BOOLEAN hasGlbPermissiblePurpose := perm.glb.ok(bs_mod.GLBPurpose);
@@ -49,8 +49,8 @@ EXPORT IParams := MODULE
 		STRING120 EndUserCompanyName:=USER.EndUser.CompanyName;
 		#STORED('EndUserCompanyName',EndUserCompanyName);
 		OPTIONS:=GLOBAL(req.Options);
-		STRING FCRAPurpose:=OPTIONS.FCRAPurpose;
-		#STORED('FCRAPurpose',FCRAPurpose);
+		STRING PermissiblePurpose:=OPTIONS.PermissiblePurpose;
+		#STORED('PermissiblePurpose',PermissiblePurpose);
 		STRING FFDOptionsMask:=OPTIONS.FFDOptionsMask;
 		#STORED('FFDOptionsMask',FFDOptionsMask);
 		BOOLEAN IncludeLiensJudgments:=OPTIONS.IncludeLiensJudgments;
