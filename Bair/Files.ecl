@@ -1,4 +1,4 @@
-IMPORT tools;
+﻿IMPORT tools;
 
 EXPORT Files(string version = '', boolean pUseProd = false, boolean pUseDelta = false, boolean pPrepped = false) := MODULE
  
@@ -252,7 +252,7 @@ EXPORT Files(string version = '', boolean pUseProd = false, boolean pUseDelta = 
 	tools.mac_FilesBase(Filenames(version,pUseProd,pUseDelta).offenders_dbo_offender_Base, Bair.layouts.offenders_dbo_offender_Base, offenders_offender_Base);	
 	tools.mac_FilesBase(Filenames(version,pUseProd,pUseDelta).offenders_dbo_classification_Base, Bair.layouts.offenders_dbo_classification_Base, offenders_classification_Base);	
 	tools.mac_FilesBase(Filenames(version,pUseProd,pUseDelta).offenders_dbo_offender_classification_Base, Bair.layouts.offenders_dbo_offender_classification_Base, offenders_offender_classification_Base);
-	
+		
 	tools.mac_FilesBase(Filenames(version,pUseProd,pUseDelta).event_address_lookup_Base, Bair.layouts.AddressLookup_In, AddressLookup_Base, pOpt	:= 'true');
 	tools.mac_FilesBase(Filenames(version,pUseProd,pUseDelta).agency_deletes_Base, Bair.layouts.AgencyDeletes_Base, AgencyDeletes_base, pOpt	:= 'true');
 	
@@ -287,6 +287,7 @@ EXPORT Files(string version = '', boolean pUseProd = false, boolean pUseDelta = 
 	
 	tools.mac_FilesBase(Filenames(version,pUseProd,pUseDelta).dbo_offenders_Base, bair.layouts.dbo_offenders_Base, offenders_Base, pOpt	:= 'true');
 	tools.mac_FilesBase(Filenames(version,pUseProd,pUseDelta).dbo_offenders_Picture_Base, bair.layouts.dbo_offenders_Picture_Base, offenders_picture_Base, pOpt	:= 'true');
+	tools.mac_FilesBase(Filenames(version,pUseProd,pUseDelta).dbo_offenders_class_Base, Bair.layouts.Offenders_dbo_classification_In, offenders_class_Base, pOpt	:= 'true');
 	
 	tools.mac_FilesBase(Filenames(version,pUseProd,pUseDelta).dbo_crash_Base, bair.layouts.dbo_crash_Base, crash_Base, pOpt	:= 'true');
 	

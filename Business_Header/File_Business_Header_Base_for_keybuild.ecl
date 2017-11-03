@@ -1,4 +1,4 @@
-import ut, lib_fileservices, header_services,mdr;
+﻿import ut, lib_fileservices, header_services,mdr;
 
 //CNG W20070822-183241 dat//////////////////////////////////
 
@@ -126,7 +126,7 @@ rFullOut_HashDIDAddress := record
 end;
 
 rFullOut_HashDIDAddress tHashDIDAddress(in_hdr_layout l) := transform                            
- self.hval := hashmd5(intformat(l.bdid,15,1),(string)l.state,(string)l.zip,(string)l.city,
+ self.hval := hashmd5(intformat((unsigned6)l.bdid,12,1),(string)l.state,(string)l.zip,(string)l.city,
 									(string)l.prim_name,(string)l.prim_range,(string)l.predir,(string)l.addr_suffix,(string)l.postdir,(string)l.sec_range);
  self := l;
 end;
