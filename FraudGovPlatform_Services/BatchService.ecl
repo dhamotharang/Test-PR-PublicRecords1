@@ -22,6 +22,9 @@
 	<part name="FraudPlatform" type="xsd:string"/>
 	<part name="MaxVelocities" type="xsd:integer"/>	
 
+	<!-- Internal Option --> 
+	<part name="TestVelocityRules" type="xsd:boolean"/>
+
   <part name="batch_in"	type="tns:XmlDataSet" cols="70" rows="25"/> 
 </message>
 */
@@ -56,10 +59,8 @@ EXPORT BatchService(useCannedRecs = FALSE) := MACRO
   // Call Batch Records attribute to fetch records. 
   // **************************************************************************************
 	ds_records := FraudGovPlatform_Services.BatchRecords(ds_batch_in_with_did, batch_params);
-
-  // **
-  // ** Simple transform to convert the input layout to the output layout
-  // **
+	
+  // ** Simple transform to convert the ds_records to the flat output layout
 	flatten_out := FraudGovPlatform_Services.Functions.getFlatBatchOut(ds_records);
 	
 	BatchShare.MAC_RestoreAcctno(ds_batch_in, flatten_out, Results,true, false);
@@ -67,6 +68,7 @@ EXPORT BatchService(useCannedRecs = FALSE) := MACRO
 	// OUTPUT(ds_xml_in_raw, NAMED('ds_xml_in_raw'));
 	// OUTPUT(ds_in, NAMED('ds_in'));
 	// OUTPUT(ds_batch_in, NAMED('ds_batch_in'));
+	// OUTPUT(ds_batch_in_with_did, NAMED('ds_batch_in_with_did'));
 	// OUTPUT(ds_records, NAMED('ds_records'));
 	// OUTPUT(flatten_out, NAMED('flatten_out'));
 	OUTPUT(Results, NAMED('Results'));

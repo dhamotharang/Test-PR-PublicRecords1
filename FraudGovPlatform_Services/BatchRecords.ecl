@@ -16,7 +16,7 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 		//** Known Frauds
 		//**
 		ds_payload_KNFD := ds_payload(classification_Permissible_use_access.file_type = FraudGovPlatform_Services.Constants.PayloadFileTypeEnum.KnownFraud); 
-		ds_reportKnownFrauds := FraudGovPlatform_Services.Functions.getKnownFraudsRecs(ds_batch_in, batch_params, ds_payload_KNFD);
+		ds_reportKnownFrauds := FraudGovPlatform_Services.Functions.getKnownFraudRecs(ds_batch_in, batch_params, ds_payload_KNFD);
 
 		//**
 		//** Velocities goes here
@@ -27,24 +27,21 @@ EXPORT BatchRecords(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_i
 		//**
 		//** Assemble the pieces
 		//**
-		ds_known_fraud := FraudGovPlatform_Services.Functions.getKnownFraud(ds_reportKnownFrauds);		
-		
-		FraudGovPlatform_Services.Layouts.Batch_out_pre_rec xfm_w_knownfraud(FraudGovPlatform_Services.Layouts.Batch_out_pre_rec  L,
-																																				 FraudGovPlatform_Services.Layouts.KnownFrauds_BatchOut_rec R) := TRANSFORM
+		FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw xfm_w_knownfraud(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw  L,
+																																				  FraudGovPlatform_Services.Layouts.KnownFrauds_rec R) := TRANSFORM
 
-			SELF.childRecs_KnownFrauds := PROJECT(R, TRANSFORM(FraudGovPlatform_Services.Layouts.KnownFrauds_BatchOut_rec, SELF := LEFT));
-			// SELF.childRecs_velocities := PROJECT(L.childRecs_Velocities, TRANSFORM(FraudGovPlatform_Services.Layouts.Velocities, SELF := []));
+			SELF.childRecs_KnownFrauds_raw := PROJECT(R, TRANSFORM(FraudGovPlatform_Services.Layouts.KnownFrauds_rec, SELF := LEFT));
 			SELF := L;
 			SELF := [];
 		END;
 
-		ds_w_known_frauds := JOIN(ds_reportFromBatchServices, ds_known_fraud,
+		ds_w_known_frauds := JOIN(ds_reportFromBatchServices, ds_reportKnownFrauds,
 														LEFT.acctno = RIGHT.acctno,
 														xfm_w_knownfraud(LEFT,RIGHT),
 														LEFT OUTER);
-
-		FraudGovPlatform_Services.Layouts.Batch_out_pre_rec xfm_w_velocities(FraudGovPlatform_Services.Layouts.Batch_out_pre_rec L,
-																																				 DATASET(FraudGovPlatform_Services.Layouts.velocities) R) := TRANSFORM
+														
+		FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw xfm_w_velocities(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw L,
+																																				   DATASET(FraudGovPlatform_Services.Layouts.velocities) R) := TRANSFORM
 			SELF.batchin_rec := L;
 			SELF.childRecs_Velocities := R;
 			SELF := L; 
