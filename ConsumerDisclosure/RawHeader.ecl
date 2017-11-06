@@ -59,7 +59,6 @@ header_main_suppressions := join(flagged_hdr_suppressions, doxie.Key_fcra_Header
 										
 header_suppressions := quick_header_suppressions + header_main_suppressions;
 
-										
 // get the header corrections
 header_corr := join(bshell_dids, FCRA.Key_Override_Header_DID,	// this includes quick header
 										left.did<>0 and keyed(left.did=right.did) and
@@ -93,8 +92,6 @@ header_main := join(bshell_dids, doxie.Key_fcra_Header,
 										LIMIT(ut.limits.HEADER_PER_DID));	
 
 combo_header := qheader_main + header_main;
-			
-						
 						
 // search citystatezip for each header record to get the corp/mil flag
 Riskwise.layouts_vru.Layout_Header_Data getZipFlag(recordof(doxie.Key_fcra_Header) le, riskwise.Key_CityStZip ri) := transform
@@ -194,14 +191,26 @@ wUnitCount := join(wADVO, doxie.Key_FCRA_AptBuildings,
 		left outer, atmost(riskwise.max_atmost), keep(1));														
 
 
-Layout_working combineHeaderCorrections(Riskwise.layouts_vru.Layout_Header_Data le, header_corr ri) := transform
+// added this project to separate logic of applying corrections from logic of assigning values to all payload records
+// moved below out of transform combineHeaderCorrections()
+// - check SSN/DOB and add missing address flags
+header_combined_data := project(wUnitCount, transform(Riskwise.layouts_vru.Layout_Header_Data,
+	street_address := risk_indicators.MOD_AddressClean.street_address(Address.Addr1FromComponents(left.Prim_Range, left.PreDir, left.Prim_Name, left.Suffix, left.PostDir, left.Unit_Desig, left.Sec_Range));
 	// clean the address here so that we can get valid, dwelling type
-	street_address := risk_indicators.MOD_AddressClean.street_address(Address.Addr1FromComponents(le.Prim_Range, le.PreDir, le.Prim_Name, le.Suffix, le.PostDir, le.Unit_Desig, le.Sec_Range));
-	cleanAddr := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.city_name, le.st, le.zip+le.zip4 ) ;
+	cleanAddr := risk_indicators.MOD_AddressClean.clean_addr( street_address, left.city_name, left.st, left.zip+left.zip4 ) ;
 	addrVal := Risk_Indicators.iid_constants.addrvalflag(cleanAddr[179..182]);
+	self.addr_flags.dwelltype := cleanAddr[139];
+	self.addr_flags.valid := if(addrVal='N' and street_address<>'' and 
+															((left.city_name<>'' and left.st<>'') or left.zip<>''), '0', '1');
+
+	// the ssn and dob will get blanked out in the _header_data results whenever the valid_ssn or valid_dob = 'M' indicating that these records had the DOB or SSN manufactured from another source.
+	self.ssn := if(left.valid_ssn <>'M',left.ssn,''); // if manufactured, then blank out
+	self.dob := if(left.valid_dob <>'M',left.dob,0); // if manufactured, then blank out
+	self:=left));																																																																								
 	
-	ssnToUse := IF(le.valid_ssn<>'M', le.ssn, '');	// if manufactured, then blank out
-	dobToUse := IF(le.valid_dob<>'M', le.dob, 0);	// if manufactured, then blank out
+//header_combined_data has all payload data before corrections applied.
+
+Layout_working combineHeaderCorrections(Riskwise.layouts_vru.Layout_Header_Data le, header_corr ri) := transform
 	
 	// correct fields where a correction was done or suppressed
 	self.fname := if(ri.head.fname<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Fname]='1', ri.head.fname, le.fname);
@@ -219,8 +228,8 @@ Layout_working combineHeaderCorrections(Riskwise.layouts_vru.Layout_Header_Data 
 	self.st := if(ri.head.st<>'' or ri.blankout[risk_indicators.iid_constants.suppress.St]='1', ri.head.st, le.st);
 	self.zip := if(ri.head.zip<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Zip]='1', ri.head.zip, le.zip);
 	self.zip4 := if(ri.head.zip4<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Zip4]='1', ri.head.zip4, le.zip4);
-	self.ssn := if(ri.head.ssn<>'' or ri.blankout[risk_indicators.iid_constants.suppress.SSN]='1', ri.head.ssn, ssnToUse);
-	self.dob := if(ri.head.dob<>0 or ri.blankout[risk_indicators.iid_constants.suppress.DOB]='1', ri.head.dob, dobToUse);
+	self.ssn := if(ri.head.ssn<>'' or ri.blankout[risk_indicators.iid_constants.suppress.SSN]='1', ri.head.ssn, le.ssn);
+	self.dob := if(ri.head.dob<>0 or ri.blankout[risk_indicators.iid_constants.suppress.DOB]='1', ri.head.dob, le.dob);
 	
 	// check to see what was changed to what and if changed, then populate the fields for the next project
 	fnameCorrected := ri.head.fname<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Fname]='1';	// correction field will only be populated if a correction was done
@@ -308,17 +317,16 @@ Layout_working combineHeaderCorrections(Riskwise.layouts_vru.Layout_Header_Data 
 	self.newZip4 := if(zip4Corrected, ri.head.zip4, '');	// only populate the new if there is a new
 	
 	ssnCorrected := ri.head.ssn<>'' or ri.blankout[risk_indicators.iid_constants.suppress.SSN]='1';	// correction field will only be populated if a correction was done
-	self.oldSSN := if(ssnCorrected, ssnToUse, '');			// only populate the old if there is a new
+	self.oldSSN := if(ssnCorrected, le.ssn, '');			// only populate the old if there is a new
 	self.newSSN := if(ssnCorrected, ri.head.ssn, '');	// only populate the new if there is a new
 	
 	dobCorrected := ri.head.dob<>0 or ri.blankout[risk_indicators.iid_constants.suppress.DOB]='1';	// correction field will only be populated if a correction was done
-	self.oldDOB := if(dobCorrected, (string)dobToUse, '');			// only populate the old if there is a new
+	self.oldDOB := if(dobCorrected, (string)le.dob, '');			// only populate the old if there is a new
 	self.newDOB := if(dobCorrected, (string)ri.head.dob, '');	// only populate the new if there is a new
 
 	// set the flags
-	self.addr_flags.dwelltype := if(ri.addr_flags.dwelltype<>'' or ri.blankout[risk_indicators.iid_constants.suppress.DwellType]='1', ri.addr_flags.dwelltype, cleanAddr[139]);
-	self.addr_flags.valid := if(ri.addr_flags.valid<>'' or ri.blankout[19]='1', ri.addr_flags.valid, if((addrVal='N' and (	(street_address<>'' and le.city_name<>'' and le.st<>'') or 
-																																																													(street_address<>'' and le.zip<>''))), '0', '1'));																																																														
+	self.addr_flags.dwelltype := if(ri.addr_flags.dwelltype<>'' or ri.blankout[risk_indicators.iid_constants.suppress.DwellType]='1', ri.addr_flags.dwelltype, le.addr_flags.dwelltype);
+	self.addr_flags.valid := if(ri.addr_flags.valid<>'' or ri.blankout[19]='1', ri.addr_flags.valid, le.addr_flags.valid);																																																														
 	
 	self.addr_flags.prisonAddr := if(ri.addr_flags.prisonAddr<>'' or ri.blankout[risk_indicators.iid_constants.suppress.PrisonAddr]='1', ri.addr_flags.prisonAddr, le.addr_flags.prisonAddr);
 	
@@ -338,12 +346,11 @@ Layout_working combineHeaderCorrections(Riskwise.layouts_vru.Layout_Header_Data 
 	
 	
 	dwellTypeCorrected := ri.addr_flags.dwelltype<>'' or ri.blankout[risk_indicators.iid_constants.suppress.DwellType]='1';	// correction field will only be populated if a correction was done
-	self.oldDwellType := if(dwellTypeCorrected, cleanAddr[139], '');					// only populate the old if there is a new
+	self.oldDwellType := if(dwellTypeCorrected, le.addr_flags.dwelltype, '');					// only populate the old if there is a new
 	self.newDwellType := if(dwellTypeCorrected, ri.addr_flags.dwelltype, '');	// only populate the new if there is a new
 	
 	validCorrected := ri.addr_flags.valid<>'' or ri.blankout[risk_indicators.iid_constants.suppress.Valid]='1';	// correction field will only be populated if a correction was done
-	self.oldValid := if(validCorrected, if((addrVal='N' and (	(street_address<>'' and le.city_name<>'' and le.st<>'') or 
-																														(street_address<>'' and le.zip<>''))), '0', '1'), '');		// only populate the old if there is a new
+	self.oldValid := if(validCorrected, le.addr_flags.valid, '');		// only populate the old if there is a new
 	self.newValid := if(validCorrected, ri.addr_flags.valid, '');			// only populate the new if there is a new
 	
 	prisonAddrCorrected := ri.addr_flags.prisonAddr<>'' or ri.blankout[risk_indicators.iid_constants.suppress.PrisonAddr]='1';	// correction field will only be populated if a correction was done
@@ -391,11 +398,8 @@ Layout_working combineHeaderCorrections(Riskwise.layouts_vru.Layout_Header_Data 
 	self := le;
 end;
 
-//wUnitCount has all payload data before corrections applied.
-// we need to identify 3 separate data sets:  
-// records before correction, records after correction applied and records not corrected 
 
-corrPlusHeader := join(wUnitCount, header_corr,
+corrPlusHeader := join(header_combined_data, header_corr,
 											right.head.did<>0 and left.did=right.head.did and
 											(
 											(left.rid=right.head.rid)  // old way
@@ -405,13 +409,17 @@ corrPlusHeader := join(wUnitCount, header_corr,
 											combineHeaderCorrections(left, right), 
 											LEFT OUTER, many lookup);
 
-// --- records with correction applied-----
-corrOnly := corrPlusHeader(isCorrected);
-// --- records not corrected-----
-unCorrOnly := corrPlusHeader(~isCorrected);
+// we need to identify 3 separate data sets:  
+// records before correction, records after overrides applied and records with no overrides applied 
 
+// --- records after correction-----
+corrOnly := corrPlusHeader(isCorrected);
+
+// --- records where no overrides were applied-----
+unCorrOnly := corrPlusHeader(~isCorrected);
+ 
 // --- records before correction-----
-before_CorrOnly := join(wUnitCount, header_corr,
+before_CorrOnly := join(header_combined_data, header_corr,
 											right.head.did<>0 and left.did=right.head.did and
 											(
 											(left.rid=right.head.rid)  // old way
@@ -766,7 +774,7 @@ before_future_corr_recs := join(unCorrOnly, no_correction_recs,
 												left only);
 
 // need to add back the corrOnly records
-header_recs_temp := no_correction_recs + future_corr_recs + before_future_corr_recs + before_CorrOnly
+header_recs_with_correction := no_correction_recs + future_corr_recs + before_future_corr_recs + before_CorrOnly
 												+ project(corrOnly, 
 																	transform(layout_header_internal,
 																		self.head := left,
@@ -775,6 +783,21 @@ header_recs_temp := no_correction_recs + future_corr_recs + before_future_corr_r
 																		self.record_ids.RecId1 := (string) left.persistent_record_id,
 																		self := left,
 																		self := []));
+
+// in case of no overrides available we need to do rollup by persistent_record_id 
+header_combined_ddp := dedup(sort(header_combined_data, persistent_record_id, -Fname,-Mname,-Lname,-Name_Suffix,-Prim_Range,-Predir,-Prim_Name,-Suffix,-Postdir,-Unit_Desig,-Sec_Range,-City_Name,-St,-Zip,-Zip4,-SSN,-DOB,
+																			-addr_flags.DwellType,-addr_flags.Valid,-addr_flags.PrisonAddr,-addr_flags.HighRisk,-addr_flags.CorpMil,-addr_flags.DoNotDeliver,
+																			-addr_flags.DeliveryStatus,-addr_flags.AddressType,-addr_flags.DropIndicator,-addr_flags.unit_count, -addr_flags.mail_usage, did),
+															persistent_record_id);
+																
+no_correction_needed := project(header_combined_ddp, transform(layout_header_internal, 
+																self.subject_did := left.did,
+																self.record_ids.RecId1 := (string) left.persistent_record_id,
+																self.head:=left, 
+																self:=left, 
+																self:=[]));
+
+header_recs_temp := IF(EXISTS(header_corr), header_recs_with_correction, no_correction_needed);
 
 layout_header_internal xfmarksuppressed (layout_header_internal le, recordof(doxie.Key_fcra_Header) ri) := transform
 	is_suppressed	:= le.head.did=ri.did and
@@ -815,7 +838,7 @@ header_recs_with_future_suppression := join(header_recs_temp, header_suppression
 						left.head.unit_desig=right.unit_desig and
 						left.head.sec_range=right.sec_range and
 						left.head.ssn=right.ssn and
-						left.head.dob=right.dob, 
+						left.head.dob=right.dob,
 						xfmarksuppressed(left, right), 
 						left outer, limit(0));  
 
@@ -880,60 +903,64 @@ header_recs := project(header_recs_final_srt,
 													self.RawData := left			
 													));			
 				
-	IF(ConsumerDisclosure.Debug,OUTPUT(qheader_main, NAMED('qheader_main')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(header_main, NAMED('header_main')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(wUnitCount, NAMED('header_wUnitCount')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(header_corr, NAMED('header_corr')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(corrOnly, NAMED('header_corrOnly')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(unCorrOnly, NAMED('header_unCorrOnly')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(finalCorr, NAMED('header_finalCorr')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(finalCorr2, NAMED('header_finalCorr2')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(no_correction_recs, NAMED('header_no_correction_recs')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(future_corr_recs, NAMED('header_future_corr_recs')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(before_future_corr_recs, NAMED('header_future_overwritten_recs')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(before_CorrOnly, NAMED('header_original_overwritten_recs')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(sort(header_recs_temp,head.persistent_record_id), NAMED('header_combined_uncorr_overrides_overwrtten_recs')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(header_suppressions, NAMED('header_suppressions')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(header_recs_with_future_suppression, NAMED('header_recs_with_future_suppression')));
-	IF(ConsumerDisclosure.Debug,OUTPUT(header_recs, NAMED('header_recs_out')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(qheader_main, NAMED('qheader_main')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(header_main, NAMED('header_main')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(wUnitCount, NAMED('header_wUnitCount')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(header_corr, NAMED('header_corr')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(corrOnly, NAMED('header_corrOnly')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(unCorrOnly, NAMED('header_unCorrOnly')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(finalCorr, NAMED('header_finalCorr')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(finalCorr2, NAMED('header_finalCorr2')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(no_correction_recs, NAMED('header_no_correction_recs')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(future_corr_recs, NAMED('header_future_corr_recs')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(before_future_corr_recs, NAMED('header_future_overwritten_recs')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(before_CorrOnly, NAMED('header_original_overwritten_recs')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(sort(header_recs_temp,head.persistent_record_id), NAMED('header_combined_uncorr_overrides_overwrtten_recs')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(header_suppressions, NAMED('header_suppressions')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(header_recs_with_future_suppression, NAMED('header_recs_with_future_suppression')));
+	IF(ConsumerDisclosure.Debug AND in_mod.IncludeHeader,OUTPUT(header_recs, NAMED('header_recs_out')));
 	
 	return header_recs;
 end;
 
 export GetAddressList(DATASET(layout_header_out) in_header_recs) := 
-	function
-	cleaned_data := in_header_recs(~MetaData.ComplianceFlags.isSuppressed,
+	FUNCTION
+	filtered_recs := in_header_recs(~MetaData.ComplianceFlags.isSuppressed,
 															// ~MetaData.ComplianceFlags.isDisputed,
 															~MetaData.ComplianceFlags.isOverwritten);
-	all_addresses := PROJECT(cleaned_data, 
+	all_addresses := PROJECT(filtered_recs, 
 														TRANSFORM(ConsumerDisclosure.Layouts.address_rec, 
 															SELF.subject_did:=(UNSIGNED)LEFT.Metadata.Lexid,
 															SELF:=LEFT.RawData.head));
-	deduped_addresses := DEDUP(all_addresses, ALL);	
-		
-	return deduped_addresses;													
-end;
+
+	unique_address_list := DEDUP(SORT(all_addresses, subject_did,zip,prim_name,prim_range,predir,postdir,suffix,sec_range,-geo_blk), 
+														subject_did,zip,prim_name,prim_range,predir,postdir,suffix,sec_range);
 	
+	return unique_address_list;													
+end;
+
 export  PickBestSSN(dataset(layout_header_out) in_header_recs) := 
 	function
-	cleaned_data := in_header_recs(~MetaData.ComplianceFlags.isSuppressed,
+	filtered_recs := in_header_recs(~MetaData.ComplianceFlags.isSuppressed,
 															// ~MetaData.ComplianceFlags.isDisputed,
 															~MetaData.ComplianceFlags.isOverwritten);
-	sorted_recs := sort(project(cleaned_data, 
+	sorted_recs := sort(project(filtered_recs, 
 															transform(ConsumerDisclosure.Layouts.ssn_rec,
 															SELF.subject_did:=(UNSIGNED)LEFT.Metadata.Lexid,
 															SELF:=LEFT.RawData.head)),
-									-dt_last_seen, -ssn);
+									subject_did, -dt_last_seen, -ssn);
 
+	// 	this logic is coming from FCRA.comp_subject  AssignBest()
 	ConsumerDisclosure.Layouts.ssn_rec AssignBestSSN(ConsumerDisclosure.Layouts.ssn_rec L, ConsumerDisclosure.Layouts.ssn_rec R) := transform
 		boolean prefer_left_ssn := (L.valid_ssn = 'G') or (R.ssn = '') or ((L.valid_ssn = 'M') and (R.valid_ssn != 'G'));
 		Self.ssn := if (prefer_left_ssn, L.ssn, R.ssn);
 		Self.valid_ssn := if (prefer_left_ssn, L.valid_ssn, R.valid_ssn);
 		Self.subject_did := L.subject_did; 
 		Self.dt_last_seen := if (prefer_left_ssn, L.dt_last_seen, R.dt_last_seen); 
+		self.header_source := true;
 	end;
-	rolled_recs := rollup (sorted_recs, TRUE, AssignBestSSN (Left, Right));
-	return rolled_recs;
+	rolled_recs := rollup (sorted_recs, Left.subject_did=Right.subject_did, AssignBestSSN (Left, Right));
+	return rolled_recs(ssn<>'');
 end;
 
 

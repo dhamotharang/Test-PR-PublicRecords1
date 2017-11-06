@@ -3,30 +3,38 @@ EXPORT Transforms := MODULE
 
 	//-----Aircraft------------
 	iesp.fcradataservice.t_FcraDataServiceAircraftIdData xfAircraftId(
-										ConsumerDisclosure.RawAircraft.aircraft_out air) := TRANSFORM
+										ConsumerDisclosure.RawAircraft.layout_aircraft_out air) := TRANSFORM
 		SELF.MetaData := air.MetaData;
 		SELF.RawData := air;
 	END;
 	
 	iesp.fcradataservice.t_FcraDataServiceAircraftDetailsData xfAircraftDetails(
-											ConsumerDisclosure.RawAircraft.aircraft_details_out dtls) := TRANSFORM
+											ConsumerDisclosure.RawAircraft.layout_aircraft_details_out dtls) := TRANSFORM
 		SELF.MetaData := dtls.MetaData;
 		SELF.RawData := dtls;
 	END;
 	
 	iesp.fcradataservice.t_FcraDataServiceAircraftEngineData xfAircraftEngine(
-											ConsumerDisclosure.RawAircraft.aircraft_engine_out eng) := TRANSFORM
+											ConsumerDisclosure.RawAircraft.layout_aircraft_engine_out eng) := TRANSFORM
 		SELF.MetaData := eng.MetaData;
 		SELF.RawData := eng;
 	END;
 	
-	EXPORT iesp.fcradataservice.t_FcraDataServiceAircraftData xformAircraftData(ConsumerDisclosure.RawAircraft.FAA_out l) 
+	EXPORT iesp.fcradataservice.t_FcraDataServiceAircraftData xformAircraftData(ConsumerDisclosure.RawAircraft.layout_FAA_out l) 
 	:= TRANSFORM
 		SELF.Aircraft := PROJECT(l.Aircraft, xfAircraftId(LEFT));
 		SELF.AircraftDetails := PROJECT(l.AircraftDetails, xfAircraftDetails(LEFT));
 		SELF.AircraftEngine := PROJECT(l.AircraftEngine, xfAircraftEngine(LEFT));
 		SELF.GroupBy.mfr_mdl_code := l.mfr_mdl_code;
 		SELF.GroupBy.eng_mfr_mdl := l.eng_mfr_mdl;
+	END;
+
+	//----------AVM Medians-------------
+	EXPORT iesp.fcradataservice.t_FcraDataServiceAVMMediansData xformAVMMediansData(ConsumerDisclosure.RawAVM.layout_avm_medians_out l) 
+	:= TRANSFORM
+		SELF.AddressWithCalculatedAVMMedians := PROJECT(l.disclosure_medians, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceAVMMediansCalculatedData,SELF.CalculatedData:= LEFT, SELF.MetaData:= LEFT.MetaData));
+		SELF.AVMMediansHistory := PROJECT(l.raw_medians, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceAVMMediansRawData,SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
+		SELF.GroupBy.geolink := l.block_geolink;
 	END;
 
 	//----------Bankruptcy-------------
@@ -154,14 +162,14 @@ EXPORT Transforms := MODULE
 	
 	//----------Property-------------
 	iesp.fcradataservice.t_FcraDataServicePropertyAssessmentData xfPropAssessment(
-										ConsumerDisclosure.RawProperty.assessment_out rec) := TRANSFORM
+										ConsumerDisclosure.RawProperty.layout_assessment_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec.RawData;
 		SELF.AddlLegalDescription := rec.AddlLegalDescription;
 	END;
 	
 	EXPORT iesp.fcradataservice.t_FcraDataServicePropertyAssessment xformPropertyAssessmentData(
-																				ConsumerDisclosure.RawProperty.property_out l) 
+																				ConsumerDisclosure.RawProperty.layout_property_out l) 
 	:= TRANSFORM
 		SELF.Assessment := PROJECT(l.Assessment, xfPropAssessment(LEFT));
 		SELF.Search := PROJECT(l.Search, TRANSFORM(iesp.fcradataservice.t_FcraDataServicePropertySearchData,
@@ -171,14 +179,14 @@ EXPORT Transforms := MODULE
 	END;
 	
 	iesp.fcradataservice.t_FcraDataServicePropertyDeedData xfPropDeed(
-											ConsumerDisclosure.RawProperty.deed_out rec) := TRANSFORM
+											ConsumerDisclosure.RawProperty.layout_deed_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec.RawData;
 		SELF.AdditionalNames := PROJECT(rec.AdditionalNames, iesp.fcradataservice_raw.t_FcraDataServiceRawPropertyAddlNames);
 	END;
 	
 	EXPORT iesp.fcradataservice.t_FcraDataServicePropertyDeed xformPropertyDeedData(
-																				ConsumerDisclosure.RawProperty.property_out l) 
+																				ConsumerDisclosure.RawProperty.layout_property_out l) 
 	:= TRANSFORM
 		SELF.Deed := PROJECT(l.Deed, xfPropDeed(LEFT));
 		SELF.Search := PROJECT(l.Search, TRANSFORM(iesp.fcradataservice.t_FcraDataServicePropertySearchData,
