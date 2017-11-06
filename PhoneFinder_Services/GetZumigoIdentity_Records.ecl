@@ -81,7 +81,7 @@ MODULE
    Phones.Layouts.ZumigoIdentity.subjectVerificationRequest toZin(PhoneFinder_Services.Layouts.PhoneFinder.Final l) := transform
 
      SELF.acctno := l.acctno;
-     SELF.seq    := l.seq;
+     SELF.sequence_number    := l.seq;
      SELF.phone  := l.phone;
      SELF.lexid := l.did;
      SELF.nametype := 'FULL NAME';
@@ -123,7 +123,7 @@ MODULE
 
    EXPORT Zumigo_GLI := JOIN(dPhoneRecs, Zumigo_Hist,
                        left.acctno = right.acctno AND
-											 left.seq    = right.seq AND
+											 left.seq    = right.sequence_number AND
 											 left.phone  = right.submitted_phonenumber,
 											 toZumValidated(left, right),
 											 LEFT OUTER, KEEP(1),

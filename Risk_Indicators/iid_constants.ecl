@@ -1,7 +1,4 @@
-﻿/*2017-08-09T23:46:41Z (Kevin Huls)
-MS-160 - correct the way historyDateTimeStamp is used by using the day portion instead of hard coding to '01'
-*/
-import ut, risk_indicators, header, mdr, suppress, did_add, doxie, fcra, riskwise, STD;
+﻿import ut, risk_indicators, header, mdr, suppress, did_add, doxie, fcra, riskwise, STD;
 
 // line 4 and line 9 are 2 different constants.  one is the date as a string, the other is a date as unsigned value.  
 // to toggle the system date, update both of them to the date you want the system to be.
@@ -797,5 +794,6 @@ export countDiff1Dig(GROUPED DATASET(subsLayout) subsFile, string30 currString) 
 	
 end;
 
+export Set_Restricted_States_For_Marketing := ['ID', 'IL', 'KS', 'NM', 'SC', 'WA', 'NY'];
 
 end;

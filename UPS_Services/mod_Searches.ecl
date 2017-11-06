@@ -1,4 +1,4 @@
-import autoheaderi, autostandardi, doxie, doxie_cbrs, business_header, iesp, address, ut;
+﻿import autoheaderi, autostandardi, doxie, doxie_cbrs, business_header, iesp, address, ut;
 
 
 export mod_Searches := MODULE
@@ -388,7 +388,7 @@ export mod_Searches := MODULE
 			end;
 
 			// autoheaderi does a better job than the partial fetch when state and zip are missing
-			std_dids := AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do_hhid(AHI_mod);
+			std_dids := AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(AHI_mod);
 			par_dids := PROJECT(mod_PartialMatch(in_mod).dids, doxie.layout_references_hh);
 			
 			dset := CHOOSEN(SORT(if(in_mod.state = '' and in_mod.zip = '', std_dids, par_dids),did), max_dids);//now deterministic

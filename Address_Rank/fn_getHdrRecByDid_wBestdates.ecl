@@ -1,6 +1,6 @@
-IMPORT Doxie;
+﻿IMPORT Doxie;
 EXPORT  fn_getHdrRecByDid_wBestdates(DATASET(doxie.layout_references_hh) dids_hh) := FUNCTION
-	hdr_recs  		:= doxie.header_records_byDID(dids_hh);
+	hdr_recs  		:= doxie.header_records_byDID(dids_hh,true); //true to get Quick Header Data
 	
 	RECORDOF(hdr_recs) getBestDates(hdr_recs l, hdr_recs r) := TRANSFORM
 		SELF.dt_first_seen := IF(l.dt_first_seen > 0 AND l.dt_first_seen < r.dt_first_seen,l.dt_first_seen, r.dt_first_seen);

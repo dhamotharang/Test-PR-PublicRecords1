@@ -1,10 +1,10 @@
-IMPORT doxie,iesp,PersonReports,AutoStandardI,Address,ut,
+﻿IMPORT doxie,iesp,PersonReports,AutoStandardI,Address,ut,
 	ATF_Services,CriminalRecords_Services,Foreclosure_Services,
 	Hunting_Fishing_Services,InternetDomain_Services,Identifier2,VehicleV2_Services, NID, header;
 
 EXPORT Records := MODULE
 
-		EXPORT BOOLEAN validDidRec(Layouts.DidRecord didRec,IParam.searchParams rptByMod) := FUNCTION
+		EXPORT BOOLEAN validDidRec(PublicProfileServices.Layouts.DidRecord didRec,IParam.searchParams rptByMod) := FUNCTION
 		hdrRecs := doxie.header_records_byDID(DATASET([{didRec.did,FALSE}],doxie.layout_references_hh));
 
 		// INPUT DOB EXISTS IN DATASET OF HEADER RECORDS
@@ -87,8 +87,8 @@ EXPORT Records := MODULE
 		IF(NOT TRUE IN SET(srchReq,validSrch) AND rptByMod.UniqueID='',FAIL(301,doxie.ErrorCodes(301)));
 
 		hdrDids    := PROJECT(srchReq,Transforms.getDids(LEFT,COUNTER));
-		normDids   := NORMALIZE(hdrDids,LEFT.didRecs,TRANSFORM(Layouts.didRecord,SELF:=RIGHT));
-		filterDids := PROJECT(normDids,TRANSFORM(Layouts.didRecord,SELF.seq:=IF(validDidRec(LEFT,rptByMod),LEFT.seq,SKIP),SELF:=LEFT));
+		normDids   := NORMALIZE(hdrDids,LEFT.didRecs,TRANSFORM(PublicProfileServices.Layouts.didRecord,SELF:=RIGHT));
+		filterDids := PROJECT(normDids,TRANSFORM(PublicProfileServices.Layouts.didRecord,SELF.seq:=IF(validDidRec(LEFT,rptByMod),LEFT.seq,SKIP),SELF:=LEFT));
 		dedupDids  := DEDUP(SORT(filterDids,did,seq),did);
 
 		RETURN dedupDids;
@@ -109,7 +109,7 @@ EXPORT Records := MODULE
 		
 		// ONLY DID USED FROM GLOBAL MODULE
 		glbMod := AutoStandardI.GlobalModule();
-		dids := IF(rptByMod.UniqueID='',Functions.FetchI_Hdr_Indv_do(rptByMod),
+		dids := IF(rptByMod.UniqueID='',PublicProfileServices.Functions.FetchI_Hdr_Indv_do(rptByMod),
 			DATASET([{(UNSIGNED6)rptByMod.UniqueID}],doxie.layout_references));
 
 		atfMod := MODULE(PROJECT(glbMod,ATF_Services.IParam.search_params,opt))
@@ -290,7 +290,7 @@ EXPORT Records := MODULE
 		AoRes  := ROW(Transforms.setAddrResults(AoSub));
 		CmbRes := ROW(Transforms.setCombinationResults(CmbSub));
 
-		Layouts.hdrSumRecord initSummary() := TRANSFORM
+		PublicProfileServices.Layouts.hdrSumRecord initSummary() := TRANSFORM
 			SELF.SSNResults := GLOBAL(SoRes);
 			SELF.NameSSNResults := GLOBAL(NsRes);
 			SELF.NameDOBResults := GLOBAL(NdRes);

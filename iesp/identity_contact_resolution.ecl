@@ -20,8 +20,11 @@ export t_ICRReportBy := record
 end;
 		
 export t_ICRReportOption := record (iesp.share.t_BaseReportOption)
-	integer returncount {xpath('ReturnCount')};
-	integer startingrecord {xpath('StartingRecord')};
+	string2 inputstate {xpath('InputState')};
+	boolean includephones {xpath('IncludePhones')};
+	boolean includeminors {xpath('IncludeMinors')};//hidden[internal]
+	boolean getssnbest {xpath('GetSSNBest')};//hidden[internal]
+	boolean appendbestdata {xpath('AppendBestData')};
 end;
 		
 export t_ICRReportRecord := record

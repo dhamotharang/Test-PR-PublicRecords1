@@ -10,9 +10,6 @@ EXPORT Report_Service() := MACRO
     // Setup the field that shall be displayed on the WsECL page.
     WSInput.MAC_Govt_Collections_Report_Service();
     
-		// From batch - Initialize batch param values now that ESP param values have been loaded.
-		batch_params := Govt_Collections_Services.IParams.getBatchParams();	
-    
     // Parse the ESDL input
     dIn := DATASET([], iesp.identity_contact_resolution.t_IdentityContactResolutionReportRequest) : STORED('IdentityContactResolutionReportRequest',FEW);
     icrRequest := dIn[1] : INDEPENDENT;
@@ -22,6 +19,21 @@ EXPORT Report_Service() := MACRO
     
     // Store some standard input parameters (generally, for search purpose)
     iesp.ECL2ESP.SetInputBaseRequest(icrRequest);
+    
+    // Ensure we specifically store unique values currently supported in batch.
+    #stored ('inputstate', icrRequest.Options.inputstate);  
+
+    maxPhoneCount := IF(icrRequest.Options.includephones, 
+                            iesp.Constants.IdentityContactResolution.MaxReportPhones, 
+                            0);
+    #stored ('maxphonecount', maxPhoneCount);  
+    
+    #stored ('includeminors', icrRequest.Options.includeminors);  
+    #stored ('getssnbest', icrRequest.Options.getssnbest);  
+    #stored ('appendbestdata', icrRequest.Options.appendbestdata);  
+    
+		// From batch - Initialize batch param values now that ESP param values have been loaded.
+		batch_params := Govt_Collections_Services.IParams.getBatchParams();	
     
     // Global module
     globalMod := AutoStandardI.GlobalModule();
@@ -203,7 +215,7 @@ EXPORT Report_Service() := MACRO
     // OUTPUT( dGateways, NAMED('dGateways') );    
     // OUTPUT( globalMod );
     // OUTPUT( searchMod );
-    // OUTPUT( ds_xml_in, NAMED('RS_ds_xml_in') );    
+    // OUTPUT( ds_xml_in, NAMED('ds_xml_in') );    
 		// OUTPUT(in_ssn_mask, NAMED('in_ssn_mask'));
 		// OUTPUT(is_GLB_fail, NAMED('is_GLB_fail'));
 		// OUTPUT(is_DRM_fail, NAMED('is_DRM_fail'));

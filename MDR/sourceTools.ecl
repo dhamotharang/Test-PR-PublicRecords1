@@ -317,7 +317,8 @@ MODULE
 	export src_OIG                       := 'ZO';  // US Office of Inspector General
 	export src_One_Click_Data            := 'OC';
 	export src_OSHAIR                    := 'OS';  // US Occupational Safety & Health Administration, incident reports
-	export src_OutwardMedia 						 := 'OM';
+	export src_OutwardMedia 						 						:= 'OM';
+	export src_OKC_Student_List										:= 'O9';  //okc student list	
 	export src_PBSA                      := 'QY';  // United States Postal Service
   export src_pcnsr							 			 := 'PN';
 	export src_Phones_Plus               := 'PP';
@@ -1746,7 +1747,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_OIG                       := [src_OIG                       ];
 	export set_One_Click_Data            := [src_One_Click_Data            ];
 	export set_OSHAIR                    := [src_OSHAIR                    ];
-	export set_OutwardMedia		           := [src_OutwardMedia			         ];
+	export set_OutwardMedia		           	:= [src_OutwardMedia			         ];
+	export set_OKC_Student_List					 				:= [src_OKC_Student_List					 ];
 	export set_PBSA			                 := [src_PBSA 			               ];
 	export set_Pcnsr		                 := [src_Pcnsr			               ];
 	export set_Phones_Plus               := [src_Phones_Plus               ];
@@ -2265,6 +2267,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsNonUpdatingSrc             (string  sr) := sr               in set_NonUpdatingSrc             ;
 	export SourceIsOIG                        (string  sr) := sr               in set_OIG           	           ;
 	export SourceIsOne_Click_Data             (string  sr) := sr               in set_One_Click_Data	           ;
+	export SourceIsOKC_Student_List           (string  sr) := sr               in set_OKC_Student_List           ;
 	#if(_Control.ThisEnvironment.IsPlatformThor = true)
 		export SourceIsOnProbation                (string  sr) := SourceGroup(sr)  in set_Probation                ;
 	#else
@@ -2773,6 +2776,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_NPPES                     ,'NPPES'                                                     }
 		,{src_OIG                       ,'OIG'                                                       }
 		,{src_One_Click_Data            ,'One Click Data'                                            }
+		,{src_OKC_Student_List          ,'OKC Student List'                                          }
 		,{src_OSHAIR                    ,'OSHAIR'                                                    }
 		,{src_OutwardMedia			        ,'Outward Media Email'                                       }
 		,{src_PBSA                      ,'United States Postal Service' 			                       }	  
@@ -3272,6 +3276,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_NPPES                     => 'NPPES'                                                
 		,src_OIG                       => 'OIG'                                       
 		,src_One_Click_Data            => 'One Click Data'                                       
+		,src_OKC_Student_List					 				=> 'OKC Student List'
 		,src_OSHAIR                    => 'OSHAIR'                                               
 		,src_OutwardMedia			         => 'Outward Media Email'                                  
 		,src_PBSA	                     => 'United States Postal Service'                   		 	

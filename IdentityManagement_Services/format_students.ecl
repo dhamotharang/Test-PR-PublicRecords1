@@ -1,4 +1,4 @@
-/***
+﻿/***
  ** Function to transform and filter a studentt dataset into desired format.
  ** Clear "UNCLASSIFIED" major.
  ** Filter addresses named "UNIV" or "UNIVERSITY".
@@ -7,7 +7,6 @@
 import American_Student_Services, ut, iesp, Address;
 
 out_rec := iesp.identitymanagementreport.t_IdmStudentRecord;
-
 Date_YY_to_YYYY(unsigned yy, unsigned delta=5) := function
 	now		:= ut.GetDate;
 	high	:= (unsigned)now[1..4] + delta;
@@ -16,10 +15,15 @@ Date_YY_to_YYYY(unsigned yy, unsigned delta=5) := function
 	return yyyy;
 	// NOTE: Pass yy<100 and delta<100 or craziness ensues
 end;
-	
-college_rec := iesp.identitymanagementreport.t_IdmStudentCollege;
+Idmcollege_DSSD :=iesp.identitymanagementreport.t_IdmStudentCollege;
+
+college_rec := record
+string2 src;
+Idmcollege_DSSD;
+end;
 
 student_rec := American_Student_Services.Layouts.finalrecs;
+
 
 export out_rec format_students(DATASET(student_rec) d_student) := FUNCTION
 			
@@ -75,19 +79,23 @@ export out_rec format_students(DATASET(student_rec) d_student) := FUNCTION
 						self.Filtered := L.prim_name IN ['UNIV', 'UNIVERSITY'];
 						self.FirstReported := iesp.ECL2ESP.toDate((INTEGER)L.date_vendor_first_reported);
 						self.LastReported  := iesp.ECL2ESP.toDate((INTEGER)L.date_vendor_last_reported);
+						self.src := l.src;
 			End;
 
 			college_recs := project(student_hs_class, toCollege(left))(CollegeName <> '');
-			idm_college_recs := DEDUP(SORT(college_recs,CollegeName,-LastReported),CollegeName);
-			
-			out_rec toOut() := transform
-						// we want the Unique ID w/o the leading zeroes
-					self.UniqueId := parent_row.UniqueId;
-					self.HighSchoolGradYear := parent_row.HighSchoolGradYear;
-				  self.Colleges := choosen(SORT(idm_college_recs,-LastReported),iesp.Constants.IDM.MaxStudentColleges);
-			end;
-			
-			esp_student := dataset ([toOut ()]);
+			idm_college_recs := DEDUP(SORT(college_recs,CollegeName,-LastReported,src),CollegeName);
+				
+			idm_college_recs_Dssd :=project(idm_college_recs,Idmcollege_DSSD);
+
+ 			out_rec toOut() := transform
+   						// we want the Unique ID w/o the leading zeroes
+   					self.UniqueId := parent_row.UniqueId;
+   					self.HighSchoolGradYear := parent_row.HighSchoolGradYear;
+   				  self.Colleges := choosen(SORT(idm_college_recs_Dssd,-LastReported),iesp.Constants.IDM.MaxStudentColleges);
+   			end;
+   			
+   			esp_student := dataset ([toOut ()]);
+
 			
 /*******
 			// DEBUG
@@ -98,5 +106,5 @@ export out_rec format_students(DATASET(student_rec) d_student) := FUNCTION
 			OUTPUT(esp_student,         NAMED('esp_student'));
 /*******/
 
-		RETURN esp_student;
+RETURN esp_student;
 end;
