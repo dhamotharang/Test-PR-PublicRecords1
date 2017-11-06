@@ -46,7 +46,7 @@
 			string	country;
 			string	imsi;
 			string	imsi_seensince;
-			integer	imsi_changed_this_time;
+			integer	imsi_changedthis_time;
 			integer	imsi_change_count;
 			string	imsi_trackedsince;
 			string	iccid;
@@ -164,7 +164,7 @@
 			string20 country;
 			string100 imsi;
 			string20 imsi_seensince;
-			integer1 imsi_changed_this_time;
+			integer1 imsi_changedthis_time;
 			integer5 imsi_change_count;
 			string20 imsi_trackedsince;
 			string100 iccid;

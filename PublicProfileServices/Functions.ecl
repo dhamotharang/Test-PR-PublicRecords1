@@ -1,4 +1,4 @@
-IMPORT AutoStandardI,AutoHeaderI,doxie,ut;
+﻿IMPORT AutoStandardI,AutoHeaderI,doxie,ut;
 
 autoStndGlbMod := AutoStandardI.GlobalModule();
 
@@ -15,7 +15,7 @@ EXPORT Functions := MODULE
 		END;
 		tmpmod := MODULE(PROJECT(glbMod,AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,OPT))
 		END;
-		RETURN AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do_hhid(tmpmod);
+		RETURN AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(tmpmod);
 	END;
 
 	EXPORT FetchI_Hdr_Indv_do(IParam.searchParams rptByMod) := FUNCTION
@@ -25,7 +25,7 @@ EXPORT Functions := MODULE
 		END;
 		tmpmod := MODULE(PROJECT(glbMod,AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full,OPT))
 		END;
-		RETURN AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(tmpmod);
+		RETURN PROJECT(AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(tmpmod), doxie.layout_references);
 	END;
 
 	EXPORT cntUnqSsnDob(DATASET(doxie.layout_presentation) hdrRecs) := FUNCTION

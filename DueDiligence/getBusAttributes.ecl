@@ -28,26 +28,22 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	//Get linked business to the business passed in
 	linkedBus := DueDiligence.getBusLinkedBus(busBestData, options, linkingOptions);
 	
-	//count and add the number of linked businesses
-	countLnkBus := TABLE(UNGROUP(linkedBus), {seq, unsigned3 linkdBusCount := count(group)}, seq);	
-	addLnkBus := JOIN(busBestData, countLnkBus,
-										LEFT.seq = RIGHT.seq,
-										TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																SELF.LinkedBusncount := RIGHT.linkdBusCount;
-																SELF := LEFT),
-										LEFT OUTER);
-	
 	//Get executives from inquired businesses
-	busExecs := DueDiligence.getBusExec(addLnkBus, options, linkingOptions);
+	busExecs := DueDiligence.getBusExec(linkedBus, options, linkingOptions);
 	
 	//Get related businesses
 	relatedBus := DATASET([], DueDiligence.Layouts.Busn_Internal);
-
+	
+	
+	
+	//get attribute data for individuals related to the inquired business
+	busProfLicense := DueDiligence.getBusProfLic(busExecs, includeReport);
+	
 
 	//get attribute data for the inquired business
-	busProperty := DueDiligence.getBusProperty(busExecs, options, linkingOptions);
+	busProperty := DueDiligence.getBusProperty(busProfLicense, options, linkingOptions);
 
-	busWatercraft := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions);
+	busWatercraft := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions, includeReport);
 
 	busAircraft := DueDiligence.getBusAircraft(busWatercraft, options);
 	
@@ -60,9 +56,9 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 
 
 	/*attributes taking in inquired and linked businesses*/
-	busHeader := DueDiligence.getBusHeader(busGeoRisk + linkedBus, options, linkingOptions);
+	busHeader := DueDiligence.getBusHeader(busGeoRisk, options, linkingOptions, includeReport);
 	
-	busSOS := DueDiligence.getBusSOSDetail(busHeader + linkedBus, options, linkingOptions);
+	busSOS := DueDiligence.getBusSOSDetail(busHeader, options, linkingOptions, includeReport);
 
 	
 	
@@ -75,8 +71,17 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 
 
 
+
+	//temp code to remove after dataset size selected
+	addCounts := PROJECT(busSicNaic, TRANSFORM(RECORDOF(LEFT),
+																										SELF.numOfRegAgents := COUNT(LEFT.registeredAgents);
+																										SELF.numOfSicNaic := COUNT(LEFT.sicNaicSources);
+																										SELF := LEFT;));
+
+
+
 	//Populate the index for the customer
-	busKRI := DueDiligence.getBusKRI(busSicNaic + inquiredBusNoBIP);
+	busKRI := DueDiligence.getBusKRI(addCounts + inquiredBusNoBIP);
 
 	
 	
@@ -89,13 +94,17 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	IF(debugMode, OUTPUT(busBestData, NAMED('busBestData')));	
 	IF(debugMode, OUTPUT(linkedBus, NAMED('linkedBus')));	
 	IF(debugMode, OUTPUT(busExecs, NAMED('busExecs')));
-	// IF(debugMode, OUTPUT(relatedBus, NAMED('relatedBus')));
+	IF(debugMode, OUTPUT(relatedBus, NAMED('relatedBus')));
 
+	IF(debugMode, OUTPUT(busProfLicense, NAMED('busProfLicense')));
+	
 	IF(debugMode, OUTPUT(busProperty, NAMED('busProperty')));
 	IF(debugMode, OUTPUT(busWatercraft, NAMED('busWatercraft')));
 	IF(debugMode, OUTPUT(busAircraft, NAMED('busAircraft')));	
 	IF(debugMode, OUTPUT(busVehicle, NAMED('busVehicle')));	
 	IF(debugMode, OUTPUT(busReg, NAMED('busReg')));	
+	IF(debugMode, OUTPUT(busGeoRisk, NAMED('busGeoRisk')));	
+	
 	IF(debugMode, OUTPUT(busHeader, NAMED('busHeader')));
 	IF(debugMode, OUTPUT(busSOS, NAMED('busSOS')));
 	

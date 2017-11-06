@@ -1,4 +1,4 @@
-import doxie, fcra, ut, header_quick, Riskwise, risk_indicators, Advo, Address, Std;
+﻿import doxie, fcra, ut, header_quick, Riskwise, risk_indicators, Advo, Address, Std;
 
 // call full header, call full override
 // join them together by rid, left outer
@@ -38,7 +38,12 @@ header_main_suppressions := join(flagged_hdr_suppressions, doxie.Key_fcra_Header
 												trim((string)right.did) + trim((string)right.rid) = trim(left.record_id) or // old way - retrieving corrected records from prior to 11/13/2012
 												trim( (string)right.persistent_record_id ) = trim(left.record_id)   // new way - using persistent_record_id
 											),
-										transform( recordof(doxie.Key_fcra_Header), self := right ),
+										transform( recordof(doxie.Key_fcra_Header), 
+											ssnToUse := IF(right.valid_ssn<>'M', right.ssn, '');	// if manufactured, then blank out
+											dobToUse := IF(right.valid_dob<>'M', right.dob, 0);	// if manufactured, then blank out
+											self.ssn := ssnToUse;
+											self.dob := dobToUse;
+											self := right ),
 										LIMIT(ut.limits.HEADER_PER_DID));	
 header_suppressions := quick_header_suppressions + header_main_suppressions;
 
@@ -686,9 +691,11 @@ header_recs_filtered := join(header_recs_temp, header_suppressions,
 						left.suffix=right.suffix and
 						left.postdir=right.postdir and
 						left.unit_desig=right.unit_desig and
-						left.sec_range=right.sec_range and
-						left.ssn=right.ssn and
-						left.dob=right.dob, transform(layout_working, self := left), 
+						left.sec_range=right.sec_range and 
+						(left.ssn=right.ssn OR (left.ssn='' and left.valid_ssn='M') or (right.ssn='' and right.valid_ssn='M') ) and
+						(left.dob=right.dob OR (left.dob=0 and left.valid_dob='M') OR (right.dob=0 and right.valid_dob='M') ), 
+						
+						transform(layout_working, self := left), 
 						left only );  
 					
 header_recs := sort(header_recs_filtered, src, fname, mname, lname, name_suffix, prim_range, predir, prim_name, suffix, postdir, unit_desig, sec_range, ssn, dob, rid); 

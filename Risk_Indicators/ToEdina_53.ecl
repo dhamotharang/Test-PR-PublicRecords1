@@ -608,6 +608,22 @@ export ToEdina_53( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.BRM_Derogs.bk_disposed_historical_cnt120		:= le.BJL.bk_disposed_historical_cnt120;
 	self.BRM_Derogs.attr_eviction_count84						:= le.BJL.eviction_count84; 
 
+	//MS-159
+	self.bus_addr_only_curr			:= le.Address_Verification.bus_addr_only_curr;
+	self.bus_addr_only					:= le.Address_Verification.bus_addr_only;
+
+	//MS-71
+	self.BIP_Header							:= le.BIP_Header;
+	
+	//MS-158
+	self.bus_property_owned_total					:= le.Address_Verification.bus_owned.property_total;
+	self.bus_property_owned_assess_total	:= le.Address_Verification.bus_owned.property_owned_assessed_total;
+	self.bus_property_owned_assess_count	:= le.Address_Verification.bus_owned.property_owned_assessed_count;
+	self.bus_property_sold_total					:= le.Address_Verification.bus_sold.property_total;
+	self.bus_property_sold_assess_total		:= le.Address_Verification.bus_sold.property_owned_assessed_total;
+	self.bus_property_sold_assess_count		:= le.Address_Verification.bus_sold.property_owned_assessed_count;
+
+	
 	self := le;
 	end;
 
