@@ -22,7 +22,9 @@ inner_party_search (inner_params2 in_mod, boolean isFCRA = false) := function
 		byak := WatercraftV2_services.autokey_ids.val(in_mod,false, false);
 		
 		//********* DIDS
-		dids := if(isFCRA or in_mod.NoDeepDive, dataset([{in_mod.DID}],doxie.layout_references),doxie.Get_Dids(true, true));
+		dids := if(isFCRA or in_mod.NoDeepDive, 
+				dataset([{in_mod.DID}],doxie.layout_references),
+				PROJECT (doxie.Get_Dids(true, true), doxie.layout_references));
 
 		bydid := WatercraftV2_services.WatercraftV2_raw.get_watercraftkeys_from_dids(dids, isFCRA);
 

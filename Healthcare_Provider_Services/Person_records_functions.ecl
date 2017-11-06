@@ -4,7 +4,7 @@ EXPORT Person_records_functions := Module
 
 	shared header_records(boolean include_dailies = false, boolean allow_wildcard = false, set of STRING1 daily_autokey_skipset=[],
 												boolean noFail = false, boolean isrollup = false,	dataset (doxie.layout_references) dids=dataset ([],doxie.layout_references)) :=	FUNCTION
-		d := doxie.get_dids(,noFail);
+		d := PROJECT (doxie.get_dids(,noFail), doxie.layout_references);
 		l := doxie.header_records_byDID(project (if(count(dids(did>0))>0, dids,d), doxie.layout_references_hh), include_dailies, allow_wildcard, daily_autokey_skipset,,,,,,,,isrollup);
 		RETURN l;
 	END;	

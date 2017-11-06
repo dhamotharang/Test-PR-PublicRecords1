@@ -36,7 +36,7 @@ EXPORT HeaderFileRollupService_Records :=
         DLDids     := PROJECT(DLraw_dids,doxie.layout_references_hh);
         isDLSearch := dlSearch AND EXISTS(DLDids);
 
-        header_dids := if(~ta1_iparam_mod.reduced_data,doxie.get_dids_hhid(,isDLSearch));
+        header_dids := if(~ta1_iparam_mod.reduced_data,doxie.get_dids(,isDLSearch));
         dids := if(isDLSearch, DLDids, header_dids);
 
         // Get header records
