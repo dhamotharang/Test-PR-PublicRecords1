@@ -3,10 +3,10 @@ import _control,ut,Orbit3;
 
 #workunit ('priority','high');
 #workunit	('priority',11);
-//#option 	('activitiesPerCpp', 50);
+#option 	('activitiesPerCpp', 50);
 // do not use thor400_44 until BEGINC++ fixed
 //#option 	('AllowClusters','thor400_20,thor400_44,thor400_60');
-//#option 	('AllowClusters','thor400_20,thor400_60');
+#option 	('AllowClusters','thor400_20,thor400_60');
 #option 	('AllowAutoQueueSwitch','1');
 #option 	('multiplePersistInstances',FALSE);
 

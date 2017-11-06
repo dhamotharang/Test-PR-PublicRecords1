@@ -1,4 +1,4 @@
-import doxie_files, ut, doxie, fcra, riskwise, bankruptcyv3, Risk_Indicators;
+﻿import doxie_files, ut, doxie, fcra, riskwise, bankruptcyv3, Risk_Indicators;
 
 EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0,
 	GROUPED DATASET(Risk_Indicators.layouts.layout_derogs_input) ids) := FUNCTION
@@ -49,13 +49,18 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 		SELF.BJL.disposition := ri.disposition;
 		hit := ri.case_number<>'';
 		SELF.BJL.filing_count := (INTEGER)hit;
+		SELF.BJL.filing_count120 := if(hit, (integer)risk_indicators.iid_constants.checkdays(myGetDate,(STRING8)date_last_seen,ut.DaysInNYears(10), le.historydate), 0);
 		SELF.BJL.bk_recent_count := (INTEGER)(hit AND ri.disposition='');
 		date_disp := if(bsversion<50, (INTEGER) ri.discharged, date_last_seen);
 		SELF.BJL.bk_disposed_recent_count := (INTEGER)(ri.disposition<>'' AND ut.DaysApart((string) date_disp,myGetDate)<365*2+1);// we are potentially counting some dispositions in the future but not others depending on the dates
 		SELF.BJL.bk_disposed_historical_count := (INTEGER)(ri.disposition<>'' AND ut.DaysApart((string) date_disp,myGetDate)>365*2);
+		SELF.BJL.bk_disposed_historical_cnt120 := (INTEGER)(ri.disposition<>'' AND ut.DaysApart((string) date_disp,myGetDate)>365*2 AND 
+																							 risk_indicators.iid_constants.checkdays(myGetDate,(STRING8)date_disp,ut.DaysInNYears(10), le.historydate));
 
 		SELF.BJL.bk_dismissed_recent_count := (INTEGER)(StringLib.StringToUpperCase(ri.disposition)='DISMISSED' AND ut.DaysApart((string) date_disp,myGetDate)<365*2+1);
 		SELF.BJL.bk_dismissed_historical_count := (INTEGER)(StringLib.StringToUpperCase(ri.disposition)='DISMISSED' AND ut.DaysApart((string) date_disp,myGetDate)>365*2);
+		SELF.BJL.bk_dismissed_historical_cnt120 := (INTEGER)(StringLib.StringToUpperCase(ri.disposition)='DISMISSED' AND ut.DaysApart((string) date_disp,myGetDate)>365*2 AND
+																								risk_indicators.iid_constants.checkdays(myGetDate,(STRING8)date_disp,ut.DaysInNYears(10), le.historydate));
 		
 		SELF.BJL.bk_count30 := (integer)Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)SELF.BJL.date_last_seen,30);
 		SELF.BJL.bk_count90 := (integer)Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)SELF.BJL.date_last_seen,90);
@@ -97,16 +102,21 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 		SELF.BJL.bk_chapter :=  IF (takeLeft, le.BJL.bk_chapter, ri.bjl.bk_chapter);
 		
 		SELF.BJL.filing_count := le.BJL.filing_count + IF(sameBankruptcy,0,ri.BJL.filing_count);
+		SELF.BJL.filing_count120 := le.BJL.filing_count120 + IF(sameBankruptcy,0,ri.BJL.filing_count120);
 		SELF.BJL.bk_recent_count := le.BJL.bk_recent_count + 
 									IF(sameBankruptcy,0,ri.BJL.bk_recent_count);
 		SELF.BJL.bk_disposed_recent_count := le.BJL.bk_disposed_recent_count + 
 									IF(sameBankruptcy,0,ri.BJL.bk_disposed_recent_count);
 		SELF.BJL.bk_disposed_historical_count := le.BJL.bk_disposed_historical_count + 
 									IF(sameBankruptcy,0,ri.BJL.bk_disposed_historical_count);
+		SELF.BJL.bk_disposed_historical_cnt120 := le.BJL.bk_disposed_historical_cnt120 + 
+									IF(sameBankruptcy, 0, ri.BJL.bk_disposed_historical_cnt120);
 		SELF.BJL.bk_dismissed_recent_count := le.BJL.bk_dismissed_recent_count + 
 									IF(sameBankruptcy,0,ri.BJL.bk_dismissed_recent_count);
 		SELF.BJL.bk_dismissed_historical_count := le.BJL.bk_dismissed_historical_count + 
 									IF(sameBankruptcy,0,ri.BJL.bk_dismissed_historical_count);
+		SELF.BJL.bk_dismissed_historical_cnt120 := le.BJL.bk_dismissed_historical_cnt120 + 
+									IF(sameBankruptcy, 0, ri.BJL.bk_dismissed_historical_cnt120);
 									
 		SELF.BJL.bk_count30 := le.BJL.bk_count30 + IF(sameBankruptcy,0,ri.BJL.bk_count30);
 		SELF.BJL.bk_count90 := le.BJL.bk_count90 + IF(sameBankruptcy,0,ri.BJL.bk_count90);
@@ -150,11 +160,14 @@ EXPORT Boca_Shell_Bankrucpty_FCRAHist (	integer bsVersion, unsigned8 BSOptions=0
 		SELF.BJL.filing_type := '';
 		SELF.BJL.disposition := '';
 		SELF.BJL.filing_count := 0;
+		SELF.BJL.filing_count120 := 0;
 		SELF.BJL.bk_recent_count := 0;
 		SELF.BJL.bk_disposed_recent_count := 0;// we are potentially counting some dispositions in the future but not others depending on the dates
 		SELF.BJL.bk_disposed_historical_count := 0;
+		SELF.BJL.bk_disposed_historical_cnt120 := 0;
 		SELF.BJL.bk_dismissed_recent_count := 0;
 		SELF.BJL.bk_dismissed_historical_count := 0;
+		SELF.BJL.bk_dismissed_historical_cnt120 := 0;
  		SELF.BJL.bk_count30 := 0;
 		SELF.BJL.bk_count90 := 0;
 		SELF.BJL.bk_count180 := 0;

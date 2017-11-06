@@ -10,6 +10,9 @@ EndDate := ut.GetDate;
 BeginDateTemp := ut.date_math(EndDate, -365);
 BeginDate := IF(BeginDateTemp >= '20130512', BeginDateTemp, '20130512'); // Tracking didn't fully start until this date, eliminate the "test" days before this date.
 
+BadEndDate := '20170516';
+BadBeginDate := '20170622';
+
 eyeball := 100;
 
 /* ***********************************************************************************************
@@ -20,7 +23,10 @@ eyeball := 100;
 
 LogFile := Score_Logs.Key_ScoreLogs_XMLTransactionID;
 
-LogsRaw := DISTRIBUTE(PULL(LogFile (StringLib.StringToUpperCase(TRIM(Product)) IN ['INSTANTID'] AND datetime[1..8] BETWEEN BeginDate AND EndDate AND StringLib.StringToLowerCase(TRIM(login_id)) NOT IN Risk_Reporting.Constants.IgnoredLogins AND customer_id NOT IN Risk_Reporting.Constants.IgnoredAccountIDs)));
+LogsRaw := DISTRIBUTE(PULL(LogFile (StringLib.StringToUpperCase(TRIM(Product)) IN ['INSTANTID'] AND 
+	((datetime[1..8] BETWEEN BeginDate AND BadEndDate) OR
+	(datetime[1..8] BETWEEN BadBeginDate AND EndDate)) 
+	AND StringLib.StringToLowerCase(TRIM(login_id)) NOT IN Risk_Reporting.Constants.IgnoredLogins AND customer_id NOT IN Risk_Reporting.Constants.IgnoredAccountIDs)));
 
 // In order to join the parsed input and output together I need to force the transaction id into the inputxml, and I needed a root XML node for the outputxml.  This seemed like the most reasonable way to do that.
 Logs := PROJECT(LogsRaw, TRANSFORM({RECORDOF(LogsRaw), STRING30 TransactionID, STRING10 AccountID, STRING8 TransactionDate}, 

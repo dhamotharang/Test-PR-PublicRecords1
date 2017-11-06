@@ -3,7 +3,7 @@
 EXPORT Constants := MODULE
 
 	shared prefix := IF(_Control.ThisEnvironment.Name='Dataland', Data_Services.foreign_prod,'~');
-
+	//shared prefix := '~';
 	export sfCorteraHdr := prefix + 'thor::cortera::header';
 	export sfAttributes := prefix + 'thor::cortera::attributes';
 	export sfExecutives := prefix + 'thor::cortera::executives';

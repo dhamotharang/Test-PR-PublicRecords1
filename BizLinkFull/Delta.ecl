@@ -1,4 +1,4 @@
-EXPORT Delta(DATASET(Layout_BizHead)old_s, DATASET(Layout_BizHead) new_s) := MODULE//Routines to compute the differences between two instances of a file
+﻿EXPORT Delta(DATASET(Layout_BizHead)old_s, DATASET(Layout_BizHead) new_s) := MODULE//Routines to compute the differences between two instances of a file
   Diff_Layout := RECORD(layout_BizHead)
     BOOLEAN  Added;
     BOOLEAN Deleted;
@@ -18,3 +18,4 @@ EXPORT Differences := re;
   d := Differences;
 EXPORT DifferenceSummary := hygiene(old_s).Summary('Old') + hygiene(new_s).Summary('New') + hygiene(d(deleted)).Summary('Deletions') + hygiene(d(added)).Summary('Additions') + hygiene(d(changed)).Summary('Updates');
 END;
+

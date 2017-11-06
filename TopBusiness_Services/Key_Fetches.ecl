@@ -1,4 +1,4 @@
-// TBD as of 10/07/16:
+﻿// TBD as of 10/07/16:
   // 1. Add a key fetch EXPORT for linkids keys used in any ***Source_Records attribute and 
 	//    then revise the ***Source_Records attribute to use the new export for these sources:
 	//    NOTE: some of the sources below already have a key fetch export, but the corresponding
@@ -18,7 +18,7 @@
 
   // 2. Add other common BIP linkids keys, i.e. BusHdr, Directories, Best, others???
 
-IMPORT AMS, ATF, BankruptcyV3, BIPV2, BIPV2_Build, BusReg, Corp2, DCAV2, DEA, DNB_FEINV2, EBR, 
+IMPORT AMS, ATF, BankruptcyV3, BIPV2, BIPV2_Build, BusReg, Corp2, Cortera, DCAV2, DEA, DNB_FEINV2, EBR, 
        Experian_CRDB, Experian_FEIN, faa, FBNV2, FCC, Frandx, Gong, LiensV2, LN_PropertyV2, 
 			 OSHAIR, Prof_LicenseV2, Property, Sheila_Greco, TopBusiness_BIPV2, UCCV2, VehicleV2, 
 			 Watercraft, YellowPages;
@@ -73,7 +73,12 @@ EXPORT Key_Fetches(dataset(BIPV2.IDlayouts.l_xlink_ids) ds_in_linkids
   // *** Key fetch to get Business Registrations linkids key records
   EXPORT ds_busreg_linkidskey_recs := BusReg.key_busreg_company_linkids.kFetch(ds_in_linkids,
 	                                                                             FETCH_LEVEL,,FETCH_LIMIT);
-
+   
+	// *** Key fetch to get cortera Linkids key records
+	EXPORT ds_cortera_linkidskey_recs := Cortera.Key_LinkIds.kFetch2(project(ds_in_linkids, 
+	                                                                    transform(BIPV2.IDlayouts.l_xlink_ids2,
+																																			  SELF := LEFT, SELF := [])),
+																																		FETCH_LEVEL,,FETCH_LIMIT);
   // *** Key fetch to get Corp/Incorporation linkids key records
   EXPORT ds_corp_linkidskey_recs := Corp2.Key_Linkids.Corp.kFetch(ds_in_linkids,FETCH_LEVEL);
 

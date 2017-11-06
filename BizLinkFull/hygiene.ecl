@@ -1,4 +1,4 @@
-IMPORT ut,SALT33;
+﻿IMPORT ut,SALT33;
 EXPORT hygiene(dataset(layout_BizHead) h) := MODULE
  
 //A simple summary record
@@ -304,3 +304,4 @@ EXPORT ValidityErrors := ValErr;
 //We have proxid specified - so we can compute statistics on the cluster counts
 EXPORT ClusterCounts := SALT33.MOD_ClusterStats.Counts(h,proxid);
 END;
+

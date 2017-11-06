@@ -1,4 +1,4 @@
-EXPORT Wheel := MODULE
+﻿EXPORT Wheel := MODULE
 IMPORT ut,SALT33;
 SHARED ExactMatchLimit := 3;
  
@@ -22,3 +22,4 @@ END;
  
 EXPORT BuildAll := PARALLEL(BUILDINDEX(Key_city_clean, OVERWRITE),BUILDINDEX(KeyQuick_city_clean, OVERWRITE));
 END;
+

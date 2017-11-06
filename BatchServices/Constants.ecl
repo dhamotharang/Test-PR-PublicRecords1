@@ -62,7 +62,6 @@ EXPORT Constants := MODULE
 	export Email := MODULE
 		export JOIN_LIMIT := 10000;
 		export SEQ_MAX_LIMIT := 500;
-    EXPORT D2C_CNSMR_RESTRICTED:=[MDR.sourceTools.src_Datagence	,	MDR.sourceTools.src_Entiera];
 	end;
 	export REALTIME_Record_max := 100;
 	export RealTime := MODULE

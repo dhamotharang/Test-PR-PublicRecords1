@@ -1,4 +1,4 @@
-#workunit('name','ADL based FCRA Bocashell 5.2 Process');
+﻿#workunit('name','ADL based FCRA Bocashell 5.2 Process');
 
 isFCRA := true;
 
@@ -20,7 +20,7 @@ unsigned1 parallel_calls := 30;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 20;
 string DataRestrictionMask := '1000010001000100000000000'; // to restrict fares, experian, transunion and experian FCRA 
 boolean RetainInputDID := FALSE; //Change to TRUE to retain the input LexID
-string IntendedPurpose := 'APPLICATION';
+string IntendedPurpose := 'APPLICATION';  //Change to "PRESCREENING" for prescreen mode
 
 
 //===================  input-output files  ======================

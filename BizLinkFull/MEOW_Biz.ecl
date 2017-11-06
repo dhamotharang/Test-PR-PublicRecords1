@@ -1,4 +1,4 @@
-IMPORT ut,SALT33;
+﻿IMPORT ut,SALT33;
 // @param MultiRec - if set to true then multiple records may have the same Reference and a consolidated result will be produced
 // @param ButNot - set of IDs that will NOT be considered as part of the result
  
@@ -276,3 +276,4 @@ EXPORT Raw_Results := IF(EXISTS(RR0),RR8);
   EXPORT DataToSearch := DEDUP(ds,WHOLE RECORD,ALL);
 END;
  
+

@@ -1,4 +1,4 @@
-import BIPV2, doxie, doxie_cbrs, liensv2, suppress, ut, FFD, FCRA;
+﻿import BIPV2, doxie, doxie_cbrs, liensv2, suppress, ut, FFD, FCRA, STD;
 // This module will provide liens data in different formats.
 
 //IMPORTANT FCRA-NOTE:
@@ -36,7 +36,7 @@ export liens_raw := module
 			%party_checked% := join(%res1%, key_attr2,
 										 keyed(left.tmsid = right.tmsid and left.rmsid = right.rmsid) and 
 										 left.did = (unsigned)right.did and 
-										 right.name_type[1] = stringlib.stringtouppercase(in_party_type)[1],
+										 right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
 										 transform(liensv2_services.layout_rmsid,self := right),
 										 limit(10000));
 										 
@@ -51,7 +51,7 @@ export liens_raw := module
 			// Compare to bdid below
 			%res2% := join(dedup(sort(in_dids,did),did),key_attr,
 										keyed(left.did = right.did) and
-									 (In_Party_Type = '' or exists(key_attr2((unsigned)did = left.did and tmsid = right.tmsid and rmsid=right.rmsid and name_type[1] = stringlib.stringtouppercase(In_Party_Type)[1]))),								
+									 (In_Party_Type = '' or exists(key_attr2((unsigned)did = left.did and tmsid = right.tmsid and rmsid=right.rmsid and name_type[1] = STD.Str.ToUpperCase(In_Party_Type)[1]))),								
 										transform(liensv2_services.layout_rmsid,self := right),
 										LIMIT(200,SKIP));
 			out_file := IF(isMoxie,%res2%,%use_res%);
@@ -81,7 +81,7 @@ export liens_raw := module
 		party_checked1 := join(res1, liensv2.key_liens_party_ID,
 										 keyed(left.tmsid = right.tmsid and left.rmsid = right.rmsid) and 
 										 left.bdid = (unsigned)right.bdid and 
-										 right.name_type[1] = stringlib.stringtouppercase(in_party_type)[1],
+										 right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
 										 transform(liensv2_services.layout_rmsid,self := right),
 										 keep(10000));
 								
@@ -96,7 +96,7 @@ export liens_raw := module
 		party_checked2 := join(res2, liensv2.key_liens_party_ID,
 										 keyed(left.tmsid = right.tmsid and left.rmsid = right.rmsid) and 
 										 left.bdid = (unsigned)right.bdid and 
-										 right.name_type[1] = stringlib.stringtouppercase(in_party_type)[1],
+										 right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
 										 transform(liensv2_services.layout_rmsid,self := right),
 										 keep(500));
 								
@@ -122,7 +122,7 @@ export liens_raw := module
                      left.orgid = right.orgid and
                      left.seleid = right.seleid and
                      left.proxid = right.proxid and
-										 right.name_type[1] = stringlib.stringtouppercase(in_party_type)[1],
+										 right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
 										 transform(liensv2_services.layout_rmsid,self := right),
 										 keep(10000));
 								
@@ -189,7 +189,7 @@ export liens_raw := module
 		res_reg_checked := join(res_reg, liensv2.key_liens_party_ID,
 														keyed(left.tmsid = right.tmsid) and 
 														left.did = (unsigned)right.did and 
-														right.name_type[1] = stringlib.stringtouppercase(in_party_type)[1],
+														right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
 														transform(liensv2_services.layout_tmsid,self.acctno := left.acctno, self := right),
 														keep(1000));
 
@@ -204,7 +204,7 @@ export liens_raw := module
 		res_fcra_checked := join(res_fcra, liensv2.key_liens_party_ID,
 														keyed(left.tmsid = right.tmsid) and 
 														left.did = (unsigned)right.did and 
-														right.name_type[1] = stringlib.stringtouppercase(in_party_type)[1],
+														right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
 														transform(liensv2_services.layout_tmsid,self.acctno := left.acctno,self := right),
 														keep(1000));
 
@@ -255,7 +255,7 @@ export liens_raw := module
 		party_checked := join(res, liensv2.key_liens_party_ID,
 										 keyed(left.tmsid = right.tmsid) and 
 										 left.bdid = (unsigned)right.bdid and 
-										 right.name_type[1] = stringlib.stringtouppercase(in_party_type)[1],
+										 right.name_type[1] = STD.Str.ToUpperCase(in_party_type)[1],
 										 transform(liensv2_services.layout_tmsid,self := right),
 										 keep(1000));
 								
@@ -312,7 +312,7 @@ export liens_raw := module
                     boolean includeCriminalIndicators=false,
 										DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = FFD.Constants.BlankPersonContextBatchSlim,
 										integer8 inFFDOptionsMask = 0,
-										integer FCRAPurpose = FCRA.Constants.FCRAPurpose.NoValueProvided) := function
+										integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided) := function
 			
 			tmsidsgrpd	:=	group(sort(in_tmsids,acctno,tmsid),acctno);
 		
@@ -332,7 +332,7 @@ export liens_raw := module
                     boolean includeCriminalIndicators=false,
 										DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc = FFD.Constants.BlankPersonContextBatchSlim,
 										integer8 inFFDOptionsMask = 0,
-										integer FCRAPurpose = -1 ) := function						
+										integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided ) := function						
 			return ungroup(by_tmsid_batch(group(sorted(in_tmsids, acctno), acctno),in_ssn_mask_type,
 			                                IsFCRA,in_filing_jurisdiction,person_filter_id, 
 											                return_multiple_pages,appType,includeCriminalIndicators, 
@@ -348,7 +348,7 @@ export liens_raw := module
                     boolean includeCriminalIndicators=false,
 										DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc  = FFD.Constants.BlankPersonContextBatchSlim,
 									  integer8 inFFDOptionsMask = 0,
-										integer FCRAPurpose = -1 ) := function
+										integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided ) := function
    		  return by_tmsid_batch(get_tmsids_from_dids_batch(in_dids, IsFCRA, in_party_type),
 				                        in_ssn_mask_type,IsFCRA,'','',false,appType,includeCriminalIndicators,
 																ds_slim_pc,inFFDOptionsMask,FCRAPurpose);
@@ -364,7 +364,7 @@ export liens_raw := module
                   boolean includeCriminalIndicators=false,
 									DATASET(FFD.Layouts.PersonContextBatchSlim) ds_slim_pc  = FFD.Constants.BlankPersonContextBatchSlim,
 									integer8 inFFDOptionsMask = 0,
-									integer FCRAPurpose = -1 ) := function
+									integer FCRAPurpose = FCRA.FCRAPurpose.NoValueProvided ) := function
       ds_batch := group(sorted(project(in_dids, doxie.layout_references_acctno), acctno), acctno);
 		  return ungroup(by_did_batch(ds_batch,in_ssn_mask_type,IsFCRA,in_party_type,
 			                              appType,includeCriminalIndicators,ds_slim_pc,

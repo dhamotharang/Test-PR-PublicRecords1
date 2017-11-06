@@ -1,4 +1,4 @@
-IMPORT ut,SALT33;
+﻿IMPORT ut,SALT33;
 EXPORT Fields := MODULE
  
 // Processing for each FieldType
@@ -469,3 +469,4 @@ EXPORT UIDConsistency(infile) := FUNCTIONMACRO
   RETURN m;
 ENDMACRO;
 END;
+

@@ -1,4 +1,4 @@
-import salt29;
+﻿import salt29;
 
 EXPORT fn_MatchesToText (STRING m) := FUNCTION
 	noMatch := [(String)SALT29.MatchCode.OneComponentNull, (String)SALT29.MatchCode.OneSideNull, '0', '-'];
@@ -18,7 +18,7 @@ EXPORT fn_MatchesToText (STRING m) := FUNCTION
 					IF(matchSet[16] not in noMatch, 'DOB_DAY,', '')      +							
 				 IF(matchSet[17] not in noMatch, 'PHONE,', '')       + IF(matchSet[18] not in noMatch, 'DL_STATE,', '') + 
 				 IF(matchSet[19] not in noMatch, 'DL_NBR,', '')      + IF(matchSet[20] not in noMatch, 'SRC,', '') + 
-				 IF(matchSet[21] not in noMatch, 'SOURCE_RID,', '')  + IF(matchSet[22] not in noMatch, 'RID,', '') + 
-				 IF(matchSet[23] not in noMatch, 'MAINNAME,', ''));							
+				 IF(matchSet[21] not in noMatch, 'SOURCE_RID,', '')  +
+				 IF(matchSet[22] not in noMatch, 'MAINNAME,', ''));							
 	RETURN res;
 END;

@@ -1,4 +1,4 @@
-IMPORT Address, AutoStandardI, BIPV2, Business_Credit_Scoring, BusinessCredit_Services, Business_Risk_BIP, Doxie, iesp, LNSmallBusiness, ut;
+﻿IMPORT Address, AutoStandardI, BIPV2, Business_Credit_Scoring, BusinessCredit_Services, Business_Risk_BIP, Doxie, iesp, LNSmallBusiness, ut;
 
 EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords inmod,
 																		DATASET(BusinessCredit_Services.Layouts.TopBusinessRecord) topBusinessRecs,
@@ -131,7 +131,9 @@ EXPORT fn_getBusiness_CreditScore (BusinessCredit_Services.Iparam.reportrecords 
 	iesp.businesscreditreport.t_BusinessCreditScore score_trans(RECORDOF(model_results) L) := TRANSFORM  
 		SELF.ScoreType		 	:=	CASE(L.ModelName,
                                  BusinessCredit_Services.Constants.CREDIT_SCORE_MODEL	 => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT,
+                                 BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO	 => BusinessCredit_Services.Constants.SCORE_TYPE.CREDIT,
 																 BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
+																 BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB  => BusinessCredit_Services.Constants.SCORE_TYPE.BLENDED,
 																''
 																);
 		SELF.MinScoreRange 	:=	(integer)L.MinRange;

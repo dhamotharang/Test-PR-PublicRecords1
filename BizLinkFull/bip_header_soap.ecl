@@ -1,4 +1,4 @@
-IMPORT BizLinkFull;
+﻿IMPORT BizLinkFull;
 EXPORT bip_header_soap := MACRO
   LOADXML(BizLinkFull._Search.sFieldNames);
   #DECLARE(input_fields)
@@ -75,3 +75,4 @@ EXPORT bip_header_soap := MACRO
     // OUTPUT(dRawResultsClipped,NAMED('soap_results'));
 ENDMACRO;
   
+

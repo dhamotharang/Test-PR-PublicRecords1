@@ -1,4 +1,4 @@
-IMPORT SALT33,ut,std;
+﻿IMPORT SALT33,ut,std;
 EXPORT Key_BizHead_L_CNPNAME_FUZZY := MODULE
  
 //company_name_prefix:?:cnp_name:zip:city:st:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag
@@ -409,3 +409,4 @@ IMPORT SALT33,BizLinkFull;
 #END
 ENDMACRO;
 END;
+
