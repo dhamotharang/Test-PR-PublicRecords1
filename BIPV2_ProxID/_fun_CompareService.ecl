@@ -1,4 +1,4 @@
-import BIPV2_ProxID,tools;
+﻿import BIPV2_PROXID,tools;
 
 EXPORT _fun_CompareService(
 
@@ -13,22 +13,22 @@ function
   unsigned8 Proxidone   := IF( pProxid1>pProxid2, pProxid1, pProxid2 );
   unsigned8 Proxidtwo   := IF( pProxid1>pProxid2, pProxid2, pProxid1 );
 
-  BFile := BIPV2_ProxID.In_DOT_Base;
-  kFile := BIPV2_ProxID.Keys(BFile,version);
+  BFile := BIPV2_PROXID.In_DOT_Base;
+  kFile := BIPV2_PROXID.Keys(BFile,version);
 
-  odl   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=Proxidone),100000),BIPV2_ProxID.match_candidates(BFile).layout_candidates);
-  odr   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=ProxidTwo),100000),BIPV2_ProxID.match_candidates(BFile).layout_candidates);
+  odl   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=Proxidone),100000),transform(BIPV2_PROXID.match_candidates(BFile).layout_candidates,self := left,self := []));
+  odr   := PROJECT(CHOOSEN(KFile.Candidates(Proxid=ProxidTwo),100000),transform(BIPV2_PROXID.match_candidates(BFile).layout_candidates,self := left,self := []));
   k     := KFile.Specificities_Key;
-  s     := GLOBAL(PROJECT(k,BIPV2_ProxID.Layout_Specificities.R)[1]);
-  odlv  := BIPV2_ProxID.Debug(BFile,s).RolledEntities(odl);
-  odrv  := BIPV2_ProxID.Debug(BFile,s).RolledEntities(odr);
+  s     := GLOBAL(PROJECT(k,transform(BIPV2_PROXID.Layout_Specificities.R,self := left,self := []))[1]);
+  odlv  := BIPV2_PROXID.Debug(BFile,s).RolledEntities(odl);
+  odrv  := BIPV2_PROXID.Debug(BFile,s).RolledEntities(odr);
 
-  BIPV2_ProxID.match_candidates(BFile).layout_attribute_matches ainto(KFile.Attribute_Matches le) := TRANSFORM
+  BIPV2_PROXID.match_candidates(BFile).layout_attribute_matches ainto(KFile.Attribute_Matches le) := TRANSFORM
     SELF := le;
   END;
 
   am    := PROJECT(KFile.Attribute_Matches(Proxid1=Proxidone,Proxid2=Proxidtwo)+KFile.Attribute_Matches(Proxid1=Proxidtwo,Proxid2=Proxidone),ainto(LEFT));
-  mtch  := BIPV2_ProxID.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,Proxidone,Proxidtwo,0,0}],BIPV2_ProxID.match_candidates(BFile).layout_matches),am);
+  mtch  := BIPV2_PROXID.Debug(BFile,s).AnnotateMatchesFromData(odl+odr,DATASET([{0,0,0,0,Proxidone,Proxidtwo,0,0}],BIPV2_PROXID.match_candidates(BFile).layout_matches),am);
 
   // get layout with the scores only for easier reading
   layouttools := tools.macf_LayoutTools(recordof(mtch),false,'^(?!.*?(left|right|skipped).*).*$',true);

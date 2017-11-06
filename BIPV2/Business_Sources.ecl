@@ -87,17 +87,4 @@ Business_Sources1 :=
  // -- We are ingesting the re-corp states in stages
  // -- any changes made to this attribute regarding the re-corp need to also be made to 
  // -- Corp2.Corp2_As_Business_Linking.
- export Business_Sources:=Business_Sources1
- (~(        
-           mdr.sourceTools.SourceIsNJ_Corporations(source)  //BH-245 -- corp keys changed, need to patch
-        or mdr.sourceTools.SourceIsMO_Corporations(source)  //BH-245 -- corp keys changed, need to patch
-        // or mdr.sourceTools.SourceIsSC_Corporations(source)  //BH-245 -- no address
-        // or mdr.sourceTools.SourceIsWI_Corporations(source)  //BH-245 -- no address
-
-        or mdr.sourceTools.SourceIsGA_Corporations(source)  //BH-245 -- corp keys changed, need to patch
-        or mdr.sourceTools.SourceIsNC_Corporations(source)  //BH-245 -- corp keys changed, need to patch
-        or mdr.sourceTools.SourceIsPA_Corporations(source)  //BH-245 -- corp keys changed, need to patch
-        or mdr.sourceTools.SourceIsUT_Corporations(source)  //BH-245 -- corp keys changed, need to patch
-        or mdr.sourceTools.SourceIsVT_Corporations(source)  //BH-245 -- corp keys changed, need to patch
-
-));
+ export Business_Sources:=Business_Sources1;

@@ -1,4 +1,4 @@
-import BIPV2_LGID3,tools;
+﻿import BIPV2_LGID3,tools;
 export _Samples(dataset(BIPV2_LGID3.Layout_LGID3)ih=BIPV2_LGID3.In_LGID3) := module
 		
 	export BasicSamp := module
@@ -9,7 +9,7 @@ export _Samples(dataset(BIPV2_LGID3.Layout_LGID3)ih=BIPV2_LGID3.In_LGID3) := mod
 		export out := OUTPUT(BasicMatchSampleRecords,NAMED('BasicMatchSampleRecords'),ALL);
 	end;
 	export ReviewSamples := module
-		shared psetReviewers					:= ['CM','LB','DW','HS','AL','DS','ZS','JA','AJ','PW'];
+		shared psetReviewers					:= ['CM','LB','DW','RP','AL','DS','ZS','JA','AJ','PW'];
 		shared pNumSamplesPerReviewer	:= 30;//20;
 		shared ConfThreshold					:= '40'; //'42';
 		shared kmtch									:= BIPV2_LGID3.Keys(ih).MatchSample;
@@ -18,7 +18,7 @@ export _Samples(dataset(BIPV2_LGID3.Layout_LGID3)ih=BIPV2_LGID3.In_LGID3) := mod
 		export out										:= tools.mac_GetSALTReviewSamples(kmtch,kcand,BIPV2_LGID3.In_LGID3,lgid3,ConfThreshold,pNumSamplesPerReviewer,psetReviewers,,,,ExtraMatchFilter);
 	end;
 	export ReviewSamples_sbfe := module
-		shared psetReviewers					:= ['CM','LB','DW','HS','AL'];
+		shared psetReviewers					:= ['CM','LB','DW','RP','AL'];
 		shared pNumSamplesPerReviewer	:= 30;//20;
 		shared ConfThreshold					:=  '40'; //'42';
 		shared kmtch									:= BIPV2_LGID3.Keys(ih).MatchSample;

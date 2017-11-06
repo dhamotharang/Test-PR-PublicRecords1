@@ -2,9 +2,9 @@
 //version
 lversion              := BIPV2.KeySuffix       ;
 //Start iterations
-DotStartIteration     := 187                   ;
-ProxStartIteration    := 354                   ;
-Lgid3StartIteration   := 259                   ;
+DotStartIteration     := 190                   ;
+ProxStartIteration    := 362                   ;
+Lgid3StartIteration   := 274                   ;
 PowDownStartIteration := 1                     ;
 PowStartIteration     := 1                     ;
 EmpDownStartIteration := 1                     ;
