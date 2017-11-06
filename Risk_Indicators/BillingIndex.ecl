@@ -1,4 +1,4 @@
-
+﻿
 // Billing index rule of thumb:
 // ECL index % 100 + 30 == ESP index
 // e.g., sub-prime auto is 108; 108%100+30 = 38
@@ -178,6 +178,9 @@ export BillingIndex := MODULE
 		export FP1611_1			:= '162'; //FP1611_1 - Fraudpoint 3.0 Custom Model for Axcess Financial (162 % 100 + 30 = 92)
 		export FP1606_1			:= '163'; //FP1606_1 - Fraudpoint 3.0 Custom Model for CashCall & LoanMe (163 % 100 + 30 = 93)
 		export FP1610_2			:= '164'; //FP1610_2 - Fraudpoint 3.0 Custom Model for Axcess Financial (164 % 100 + 30 = 94)
-	
+  export FP1702_1			:= '165'; //FP1702_1 - Fraudpoint 3.0 Custom Model for Kohls online (165 % 100 + 30 = 95)
+		export FP1706_1		 := '166'; //FP1706_1 - Fraudpoint 3.0 Custom Model for MetaBank (166 % 100 + 30 = 96)
+		export FP1702_2			:= '167'; //FP1702_2 - Fraudpoint 3.0 Custom Model for Kohls POS (167 % 100 + 30 = 97)	
+		export FP1609_2			:= '168'; //FP1609_2 - Fraudpoint 3.0 Custom Model for Discovery (168 % 100 + 30 = 98)	
 END;
 

@@ -1,4 +1,4 @@
-IMPORT SALT33;
+﻿IMPORT SALT33;
 EXPORT Config := MODULE,VIRTUAL
 EXPORT DoSliceouts := TRUE; // If set to false slice-outs do not occur (saves time)
 EXPORT CorrelateSampleSize := 100000000; // Size of sample used in hygiene.corelations
@@ -22,3 +22,4 @@ EXPORT city_clean_WheelThreshold := 2000;
 EXPORT company_url_Force := 0; // Wordbags have an implicit FORCE(0) when asking 'does it match'
 // Configuration of external files
 END;
+

@@ -72,12 +72,14 @@ FUNCTION
 														 TRANSFORM(RECORDOF(LEFT),
 														     SElF.weight:= right.proxweight;
 																 SELF := LEFT));											 
-  
+																 
   // Restrict the max records for each acct# depending on user input 
 	ds_BestInfoRecs := UNGROUP(TOPN(GROUP(SORT(ds_BestInfo2,acctno, -weight, -record_score,record),acctno),inMod.MaxResultsPerAcct,acctno));
   
   // Get link ids
-  ds_linkIdsWithAcctNo := PROJECT(ds_BestInfoRecs,BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo);
+  ds_linkIdsWithAcctNoTmp := PROJECT(ds_BestInfoRecs,BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo);
+	ds_linkidsWithAcctno := SORT(DEDUP(SORT(ds_linkIdsWithAcctNoTmp,acctno, ultid, orgid, seleid, -weight,-record_score),
+	                                              acctno, ultid, orgid, seleid), acctno, -weight, -record_score,record);
   
 	ds_linkIds := DEDUP(PROJECT(ds_BestInfoRecs,BIPV2.IDlayouts.l_xlink_ids),ALL);
 									 
@@ -640,21 +642,26 @@ FUNCTION
 	
    //OUTPUT(ds_BestInfo,NAMED('ds_BestInfo'));
   // OUTPUT(ds_linkIds,NAMED('ds_linkIds'));
- //OUTPUT(ds_BestBatchRecs, NAMED('ds_BestBatchRecs'));
-	// OUTPUT(ds_linkIdsWithAcctNo, NAMED('ds_linkIdsWithAcctNo'));]
+ 
+	 // OUTPUT(ds_linkIdsWithAcctNoTmp, NAMED('ds_linkIdsWithAcctNoTmp'));
+	 // output(ds_linkidsWithAcctno, named('ds_linkidsWithAcctno'));
 	  // OUTPUT(ds_Format2SearchInput, named('ds_Format2SearchInput'));
 	 
-	  // OUTPUT(ds_BestInfoTmp_all, named('ds_BestInfoTmp_all'));
-		// output(ds_bestInfo2, named('ds_bestInfo2'));
+	 // OUTPUT(ds_BestInfoTmp_all, named('ds_BestInfoTmp_all'));
+		//OUTPUT(ds_BestBatchRecs, NAMED('ds_BestBatchRecs'));
+		 //output(ds_bestInfo2, named('ds_bestInfo2'));
+		 // output(ds_bestInfo2_slim, named('ds_bestInfo2_slim'));
+		 //output(ds_BestInfoRecs, named('ds_BestInfoRecs'));
+		 
 	 // output(ds_BestInfoTmp, named('ds_BestInfoTmp'));
 	  // OUTPUT(ds_bestKfetchSourceDResults, NAMED('ds_bestKfetchSourceDResults'));
 	   // OUTPUT(ds_BestInfoRecs, NAMED('ds_BestInfoRecs'));
 	  //output(ds_best, named('ds_best'));
    //OUTPUT(ds_NameAddressBatchRecs,NAMED('ds_NameAddressBatchRecs'));
-   // OUTPUT(ds_HeaderInfoAll,NAMED('ds_HeaderInfoAll'));
+   //OUTPUT(ds_HeaderInfoAll,NAMED('ds_HeaderInfoAll'));
 	
   // OUTPUT(ds_GongPhones,NAMED('ds_GongPhones'));
-	// output(ds_Phones2Final, NAMED('ds_Phones2Final'));
+	//output(ds_Phones2Final, NAMED('ds_Phones2Final'));
  // OUTPUT(ds_Corps,NAMED('ds_Corps'));
   // OUTPUT(ds_Flags,NAMED('ds_Flags'));
   // OUTPUT(ds_Executives,NAMED('ds_Executives'));
@@ -664,10 +671,10 @@ FUNCTION
   // OUTPUT(ds_Corps2Final,NAMED('ds_Corps2Final'));
   // OUTPUT(ds_Flags2Final,NAMED('ds_Flags2Final'));
  // OUTPUT(ds_Execs2Final,NAMED('ds_Execs2Final'));
-  //OUTPUT(ds_DCAInfo2Final,NAMED('ds_DCAInfo2Final'));
+  // OUTPUT(ds_DCAInfo2Final,NAMED('ds_DCAInfo2Final'));
 	
 	//output(ds_OSHAFinal, named('ds_OSHAFinal'));
-
+  
   RETURN PROJECT(IF(inmod.BestOnly,ds_HeaderInfoAll,ds_DCAInfo2FinalSorted),
 	                              BusinessBatch_BIP.Layouts.Final);
 END;

@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------
+﻿//---------------------------------------------------------------------------
 // Unified module to process any search or external append request
 //---------------------------------------------------------------------------
 IMPORT BIPV2;
@@ -498,3 +498,4 @@ EXPORT _Search:=MODULE
   ENDMACRO;
 // End Quick index searches and appends
 END;
+

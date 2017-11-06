@@ -1,7 +1,4 @@
-/*2017-06-29T19:46:55Z (dschlangen)
-C:\Users\schlandv\AppData\Roaming\HPCC Systems\eclide\dschlangen\dataland_staging\Risk_Indicators\getAllBocaShellData\2017-06-29T19_46_55Z.ecl
-*/
-IMPORT Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, LN_PropertyV2_Services, riskview;
+﻿IMPORT Ut, riskwise, models, easi, doxie, dma, fcra_opt_out, USPIS_HotList, AML, gateway, LN_PropertyV2_Services, riskview;
 
 EXPORT getAllBocaShellData (
   GROUPED DATASET (risk_indicators.Layout_output) iid, 
@@ -401,8 +398,8 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
   // =============== Derogs ===============
 
   derogs := IF (IsFCRA,
-                Risk_Indicators.Boca_Shell_Derogs_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, onThor),
-                Risk_Indicators.Boca_Shell_Derogs      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), BSversion));
+                Risk_Indicators.Boca_Shell_Derogs_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, onThor, iid),
+								Risk_Indicators.Boca_Shell_Derogs      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), BSversion));
   
 	derogs_hist := IF (IsFCRA,
                      Risk_Indicators.Boca_Shell_Derogs_Hist_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ),

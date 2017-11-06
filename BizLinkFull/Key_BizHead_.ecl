@@ -1,4 +1,4 @@
-IMPORT SALT33,ut,std;
+﻿IMPORT SALT33,ut,std;
 EXPORT Key_BizHead_ := MODULE
  
 //parent_proxid:?:sele_proxid:org_proxid:+:ultimate_proxid:has_lgid:empid:source:source_record_id:source_docid:company_name:company_name_prefix:cnp_name:cnp_number:cnp_btype:cnp_lowv:company_phone:company_phone_3:company_phone_3_ex:company_phone_7:company_fein:company_sic_code1:active_duns_number:prim_range:prim_name:sec_range:city:city_clean:st:zip:company_url:isContact:contact_did:title:fname:fname_preferred:mname:lname:name_suffix:contact_ssn:contact_email:sele_flag:org_flag:ult_flag:fallback_value:CONTACTNAME:STREETADDRESS
@@ -48,7 +48,7 @@ EXPORT Key := INDEX(DataForKey2,{DataForKey2},{},KeyName);
  
 EXPORT BuildAll := PARALLEL(BUILDINDEX(ValueKey, OVERWRITE),BUILDINDEX(Key, OVERWRITE));
 KeyRec := RECORDOF(Key);
- 
+/* 
 EXPORT RawFetch(TYPEOF(h.parent_proxid) param_parent_proxid = (TYPEOF(h.parent_proxid))'',TYPEOF(h.sele_proxid) param_sele_proxid = (TYPEOF(h.sele_proxid))'',TYPEOF(h.org_proxid) param_org_proxid = (TYPEOF(h.org_proxid))'',TYPEOF(h.ultimate_proxid) param_ultimate_proxid = (TYPEOF(h.ultimate_proxid))'',TYPEOF(h.has_lgid) param_has_lgid = (TYPEOF(h.has_lgid))'',TYPEOF(h.empid) param_empid = (TYPEOF(h.empid))'',TYPEOF(h.source) param_source = (TYPEOF(h.source))'',TYPEOF(h.source_record_id) param_source_record_id = (TYPEOF(h.source_record_id))'',TYPEOF(h.source_docid) param_source_docid = (TYPEOF(h.source_docid))'',TYPEOF(h.company_name) param_company_name = (TYPEOF(h.company_name))'',TYPEOF(h.company_name_prefix) param_company_name_prefix = (TYPEOF(h.company_name_prefix))'',TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.cnp_number) param_cnp_number = (TYPEOF(h.cnp_number))'',TYPEOF(h.cnp_btype) param_cnp_btype = (TYPEOF(h.cnp_btype))'',TYPEOF(h.cnp_lowv) param_cnp_lowv = (TYPEOF(h.cnp_lowv))'',TYPEOF(h.company_phone) param_company_phone = (TYPEOF(h.company_phone))'',TYPEOF(h.company_phone_3) param_company_phone_3 = (TYPEOF(h.company_phone_3))'',TYPEOF(h.company_phone_3_ex) param_company_phone_3_ex = (TYPEOF(h.company_phone_3_ex))'',TYPEOF(h.company_phone_7) param_company_phone_7 = (TYPEOF(h.company_phone_7))'',TYPEOF(h.company_fein) param_company_fein = (TYPEOF(h.company_fein))'',TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPEOF(h.company_sic_code1))'',TYPEOF(h.active_duns_number) param_active_duns_number = (TYPEOF(h.active_duns_number))'',TYPEOF(h.prim_range) param_prim_range = (TYPEOF(h.prim_range))'',TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.sec_range) param_sec_range = (TYPEOF(h.sec_range))'',TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_clean) param_city_clean = (TYPEOF(h.city_clean))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',DATASET(process_Biz_layouts.layout_zip_cases) param_zip,TYPEOF(h.company_url) param_company_url = (TYPEOF(h.company_url))'',TYPEOF(h.isContact) param_isContact = (TYPEOF(h.isContact))'',TYPEOF(h.contact_did) param_contact_did = (TYPEOF(h.contact_did))'',TYPEOF(h.title) param_title = (TYPEOF(h.title))'',TYPEOF(h.fname) param_fname = (TYPEOF(h.fname))'',TYPEOF(h.fname_preferred) param_fname_preferred = (TYPEOF(h.fname_preferred))'',TYPEOF(h.mname) param_mname = (TYPEOF(h.mname))'',TYPEOF(h.lname) param_lname = (TYPEOF(h.lname))'',TYPEOF(h.name_suffix) param_name_suffix = (TYPEOF(h.name_suffix))'',TYPEOF(h.contact_ssn) param_contact_ssn = (TYPEOF(h.contact_ssn))'',TYPEOF(h.contact_email) param_contact_email = (TYPEOF(h.contact_email))'',TYPEOF(h.sele_flag) param_sele_flag = (TYPEOF(h.sele_flag))'',TYPEOF(h.org_flag) param_org_flag = (TYPEOF(h.org_flag))'',TYPEOF(h.ult_flag) param_ult_flag = (TYPEOF(h.ult_flag))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',SALT33.StrType param_CONTACTNAME,SALT33.StrType param_STREETADDRESS,TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'') := 
   FUNCTION
  //Create wordstream from parameters
@@ -119,4 +119,6 @@ EXPORT ScoredproxidFetch(TYPEOF(h.parent_proxid) param_parent_proxid = (TYPEOF(h
   END;
   RETURN ROLLUP(PROJECT(PROJECT(NOFOLD(RawData),Score(LEFT)),Process_Biz_Layouts.update_forcefailed(LEFT)),LEFT.proxid = RIGHT.proxid,Process_Biz_Layouts.combine_scores(LEFT,RIGHT));
 END;
+*/
 END;
+

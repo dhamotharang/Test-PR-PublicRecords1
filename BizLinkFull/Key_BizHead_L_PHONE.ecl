@@ -1,4 +1,4 @@
-IMPORT SALT33,ut,std;
+﻿IMPORT SALT33,ut,std;
 EXPORT Key_BizHead_L_PHONE := MODULE
  
 //company_phone_7:?:cnp_name:company_phone_3:+:company_phone_3_ex:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:city:st:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag
@@ -458,3 +458,4 @@ IMPORT SALT33,BizLinkFull;
 #END
 ENDMACRO;
 END;
+

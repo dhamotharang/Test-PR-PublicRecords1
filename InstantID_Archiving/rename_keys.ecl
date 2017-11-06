@@ -1,4 +1,4 @@
-import ut,doxie;
+﻿import ut,doxie;
 
 export rename_keys(string new_date) :=
 function
@@ -22,7 +22,13 @@ all_fraudkeys := DATASET([
 {'~thor_data400::key::instantid_archiving::qa::redflags', '~thor_data400::key::instantid_archiving::'+new_date+'::redflags'},
 {'~thor_data400::key::instantid_archiving::qa::model', '~thor_data400::key::instantid_archiving::'+new_date+'::model'},
 {'~thor_data400::key::instantid_archiving::qa::verification', '~thor_data400::key::instantid_archiving::'+new_date+'::verification'},
-{'~thor_data400::key::instantid_archiving::qa::report', '~thor_data400::key::instantid_archiving::'+new_date+'::report'}
+{'~thor_data400::key::instantid_archiving::qa::report', '~thor_data400::key::instantid_archiving::'+new_date+'::report'},
+{'~thor_data400::key::instantid_archiving::qa::report1', '~thor_data400::key::instantid_archiving::'+new_date+'::report1'},
+{'~thor_data400::key::instantid_archiving::qa::report2', '~thor_data400::key::instantid_archiving::'+new_date+'::report2'},
+{'~thor_data400::key::instantid_archiving::qa::report3', '~thor_data400::key::instantid_archiving::'+new_date+'::report3'},
+{'~thor_data400::key::instantid_archiving::qa::report4', '~thor_data400::key::instantid_archiving::'+new_date+'::report4'},
+{'~thor_data400::key::instantid_archiving::qa::report5', '~thor_data400::key::instantid_archiving::'+new_date+'::report5'},
+{'~thor_data400::key::instantid_archiving::qa::report6', '~thor_data400::key::instantid_archiving::'+new_date+'::report6'}
 
 
 ], ut.Layout_Superkeynames.inputlayout);

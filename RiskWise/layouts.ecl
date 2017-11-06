@@ -1,4 +1,4 @@
-/*2016-05-21T00:50:26Z (Kevin Huls)
+﻿/*2016-05-21T00:50:26Z (Kevin Huls)
 RQ-12730: Emerging Identities
 */
 /*2016-05-18T19:05:55Z (Kevin Huls)
@@ -214,6 +214,7 @@ export reasoncode_settings := RECORD
 	boolean IsInstantID := false;
 	unsigned1 IIDVersion := 0;
 	boolean EnableEmergingID := false;
+	boolean IsIdentifier2 := false;
 end;
 
 export actioncode_settings := RECORD

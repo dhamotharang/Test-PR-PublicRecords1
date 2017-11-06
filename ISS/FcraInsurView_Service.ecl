@@ -1,4 +1,4 @@
-//cut and pasted from Models.RiskView_Service
+﻿//cut and pasted from Models.RiskView_Service
 // not all logic was copied as only wanted the RV 4 attributes - no scores or other versions of attributes/boca shell
 /*--SOAP--
 <message name="FcraInsurView_Service">
@@ -336,8 +336,8 @@ export FcraInsurView_Service := MACRO
 		self.Result.InsurViewAttributes.Version4.PhoneAndAddressRisk := if(InPersonApplication, dataset([],iesp.fcrainsurviewattributes.t_PhoneAndAddressRiskAttributes)[1], PhnAddrRisk[1]);
 		self.Result.InsurViewAttributes.Version4.ConsumerReportedFlags :=if(InPersonApplication, dataset([],iesp.fcrainsurviewattributes.t_ConsumerReportedFlags)[1], ConsmrRpt[1]);
 		
-		self.Result.ConsumerStatements := rt.ConsumerStatements;
-
+		self.Result.ConsumerStatements := project(rt.ConsumerStatements,
+			transform(iesp.share_fcra.t_ConsumerStatement, self.dataGroup := '', self := left));
 	END;
 			
 	//final_wEcho := PROJECT(attributesWithFlags, addEcho(LEFT));	

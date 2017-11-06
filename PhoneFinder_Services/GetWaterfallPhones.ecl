@@ -1,4 +1,4 @@
-IMPORT AddrBest,Doxie_Raw,Gateway,MDR,PhoneFinder_Services,Progressive_phone;
+﻿IMPORT AddrBest,Doxie_Raw,Gateway,MDR,PhoneFinder_Services,Progressive_phone;
 
 // Layouts
 lBatchIn       := PhoneFinder_Services.Layouts.BatchInAppendDID;
@@ -56,10 +56,9 @@ FUNCTION
 	TRANSFORM
 		SELF.batch_in          := le;
 		SELF.did               := IF(ri.p_did>0,ri.p_did,ri.did);
-		SELF.fname             := IF(ri.subj_phone_type_new = MDR.SourceTools.src_Metronet_Gateway,ri.subj_first,ri.p_name_first);
-		SELF.mname             := IF(ri.subj_phone_type_new = MDR.SourceTools.src_Metronet_Gateway,ri.subj_middle,'');
-		SELF.lname             := IF(ri.subj_phone_type_new = MDR.SourceTools.src_Metronet_Gateway,ri.subj_last,ri.p_name_last);
-		SELF.suffix            := ri.addr_suffix;
+		SELF.fname             := IF(ri.subj_first <> '', ri.subj_first, ri.p_name_first);
+   	SELF.mname             := ri.subj_middle;
+   	SELF.lname             := IF(ri.subj_last <> '', ri.subj_last,ri.p_name_last);
 		SELF.city_name         := ri.p_city_name;
 		SELF.zip               := ri.zip5;
 		SELF.phone             := ri.subj_phone10;

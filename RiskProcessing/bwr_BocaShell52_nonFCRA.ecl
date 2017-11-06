@@ -1,4 +1,4 @@
-#workunit('name','nonfcrashell 5.2');
+﻿#workunit('name','nonfcrashell 5.2');
 
 // Reads sample data from input file, makes a SOAP call to service specified and (optionally),
 // saves results in output file. 
@@ -13,7 +13,7 @@
 
 IMPORT Risk_Indicators, RiskWise, data_services, _control, gateway;
 
-unsigned record_limit :=   10;    //number of records to read from input file; 0 means ALL
+unsigned record_limit :=   0;    //number of records to read from input file; 0 means ALL
 unsigned1 parallel_calls := 30;  //number of parallel soap calls to make [1..30]
 unsigned1 eyeball := 25;
 boolean RemoveFares := false;	// change this to TRUE for FARES filtering

@@ -1,4 +1,4 @@
-//This is the code to execute in a builder window
+﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
 #workunit('name','BizLinkFull.BWR_Specificities - Specificities - SALT V3.3.1');
 IMPORT BizLinkFull,SALT33;
@@ -23,3 +23,4 @@ OUTPUT(SpecMod.SpcShift,NAMED('SpcShift'));
 ], {varstring Test__javascript}),NAMED('Dashboard_Links'));
   BizLinkFull.SEE_Specificities_Comp.Build_Ins001_vDetail.BuildAll;
  
+

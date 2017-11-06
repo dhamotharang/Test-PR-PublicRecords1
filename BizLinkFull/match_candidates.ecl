@@ -1,4 +1,4 @@
-// Begin code to produce match candidates
+﻿// Begin code to produce match candidates
 IMPORT SALT33,ut;
 EXPORT match_candidates(DATASET(layout_BizHead) ih) := MODULE
 SHARED s := Specificities(ih).Specificities[1];
@@ -515,3 +515,4 @@ EXPORT HasBuddies := TABLE(Annotated(buddies>0), { rcid });
 EXPORT Unlinkables := Annotated(~Linkable); // Insufficient data to ever get a match
 EXPORT Candidates := Annotated(Linkable); //No point in trying to link records with too little data
 END;
+

@@ -5,7 +5,7 @@ EXPORT FileModule(string esp
 									
 	shared l_esp := if (~regexfind('http://',esp),'http://'+esp, esp);
 	
-	// Get all files (used/written) in WU
+	
 	export GetFilesInWorkunit(string wuid = WORKUNIT) := function
 		
 		rWUInfoRequest := record

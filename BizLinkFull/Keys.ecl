@@ -1,4 +1,4 @@
-EXPORT Keys(DATASET(layout_BizHead) ih) := MODULE
+﻿EXPORT Keys(DATASET(layout_BizHead) ih) := MODULE
 SHARED s := Specificities(ih).Specificities;
  
 EXPORT SpecificitiesDebugKeyName := '~'+'key::BizLinkFull::proxid::Debug::specificities_debug';
@@ -9,3 +9,4 @@ EXPORT BuildAll := Build_Specificities_Key;
 EXPORT RelationshipKeys := BUILDINDEX(Specificities_Key, OVERWRITE, FEW);
 END;
  
+

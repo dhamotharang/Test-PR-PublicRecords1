@@ -1,4 +1,4 @@
-EXPORT Externals := MODULE
+﻿EXPORT Externals := MODULE
   IMPORT SALT26,BizLinkFull;// Gather up the UID counts from each of the children - provides 'we also found' capability
   AllEfr0 := ;
 // Need to compute the 'rolled up' counts for parents in hierarchy
@@ -52,3 +52,4 @@ EXPORT Fetch(DATASET(BizLinkFull.Process_Biz_Layouts.id_stream_layout) ins,Fetch
   RETURN ROLLUP(ig,GROUP,Get(ROWS(LEFT)));
 END;
 END;
+
