@@ -1116,6 +1116,8 @@
 				trim(kword, left, right) = 'PHNBI' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHNBI,
 				trim(kword, left, right) = 'PHDND-MLAO' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHDND_MLAO,
 				trim(kword, left, right) = 'BISN-CAATSA231' =>SubGroup_Constants.numKeywordsID.KEYWORD_BISN_CAATSA231,
+				trim(kword, left, right) = 'CANS-JVCFO' =>SubGroup_Constants.numKeywordsID.KEYWORD_CANS_JVCFO,
+				trim(kword, left, right) = 'PPICIJ-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PPICIJ_WC,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);
