@@ -1,4 +1,4 @@
-IMPORT SALT33,ut,std;
+﻿IMPORT SALT33,ut,std;
 EXPORT Key_Classify_PS_DLN := MODULE
  
 //DL:DL_ST:?:MAINNAME:+:NAME_SUFFIX:DOB
@@ -87,8 +87,8 @@ EXPORT ScoredEID_HASHFetch(TYPEOF(h.DL) param_DL = (TYPEOF(h.DL))'',TYPEOF(h.DL_
   RawData := RawFetch(param_DL,param_DL_ST,param_FNAME,param_MNAME,param_LNAME);
  
   Process_PS_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 5; // Set bitmap for key used
-    SELF.keys_failed := IF(le.EID_HASH = 0, 1 << 5, 0); // Set bitmap for key failed
+    SELF.keys_used := 1 << 6; // Set bitmap for key used
+    SELF.keys_failed := IF(le.EID_HASH = 0, 1 << 6, 0); // Set bitmap for key failed
     SELF.DL_match_code := MAP(le.DL = (TYPEOF(le.DL))'' OR le.DL = (TYPEOF(le.DL))'' => SALT33.MatchCode.OneSideNull,match_methods(File_Classify_PS).match_DL(le.DL,param_DL,TRUE));
     SELF.DLWeight := (50+MAP ( le.DL = param_DL  => le.DL_weight100,
           le.DL = (TYPEOF(le.DL))'' OR param_DL = (TYPEOF(le.DL))'' => 0,
@@ -178,7 +178,7 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex) := FUN
  
   Process_PS_Layouts.LayoutScoredFetch Score_Batch(Key le,recs ri) := TRANSFORM
     SELF.Reference := ri.reference; // Copy reference field
-    SELF.keys_used := 1 << 5; // Set bitmap for key used
+    SELF.keys_used := 1 << 6; // Set bitmap for key used
     SELF.keys_failed := 0; // Set bitmap for key failed
     SELF.DL_match_code := MAP(le.DL = (TYPEOF(le.DL))'' OR le.DL = (TYPEOF(le.DL))'' => SALT33.MatchCode.OneSideNull,match_methods(File_Classify_PS).match_DL(le.DL,ri.DL,TRUE));
     SELF.DLWeight := (50+MAP ( le.DL = ri.DL  => le.DL_weight100,
