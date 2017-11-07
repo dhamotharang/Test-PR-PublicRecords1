@@ -1,4 +1,4 @@
-IMPORT	FCRA, STD, lib_date;
+﻿IMPORT	LiensV2_SrcInfoRpt,	FCRA, STD, lib_date;
 // Remove requested records from FCRA. -- bug #132111
 rmv_filing		:=	'(VACATE|TERMINATION|LIS PENDENS WITHDRAWAL|FORECLOSURE DISMISSED|FILED IN ERROR|FEDERAL COURT DISMISSAL|ERRONEOUS TERMINATION|'+
 									'FEDERAL COURT CHANGE OF VENUE|DISMISSED JUDGMENT|COURT ORDER NO CHANGE|CIVIL DISMISSAL|'+
@@ -56,5 +56,21 @@ dMainRemoveMedicalTerms	:=	JOIN(
 															LOCAL
 														);
 
-EXPORT	file_liens_fcra_main	:=	dMainRemoveMedicalTerms;
+//	Remove Main records by TMSID/RMSID from Jurisdictions are non-updating 				
+dMainRemoveSuppressedJurisdictions	:=	JOIN(
+																					SORT(DISTRIBUTE(dMainRemoveMedicalTerms,
+																						HASH(	TMSID, RMSID)),
+																									TMSID, RMSID,LOCAL),
+																					SORT(DISTRIBUTE(LiensV2_SrcInfoRpt.fn_SuppressedFCRALiensMain,
+																						HASH(	TMSID, RMSID)),
+																									TMSID, RMSID,LOCAL),
+																						LEFT.tmsid	=	RIGHT.tmsid	AND
+																						LEFT.rmsid	=	RIGHT.rmsid,
+																					TRANSFORM(LEFT),
+																					LEFT ONLY,
+																					LOCAL
+																				);
+
+
+EXPORT	file_liens_fcra_main	:=	dMainRemoveSuppressedJurisdictions;
 
