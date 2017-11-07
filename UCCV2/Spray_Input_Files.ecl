@@ -1,6 +1,6 @@
 ﻿import UCCV2,_control;
 
-export Spray_Input_Files (string filename,string filedate,string gname,string source,string sourcetype,string SuppressionFileName) 
+export Spray_Input_Files (string filename,string filedate,string gname,string source,string sourcetype,string SuppressionFileName = '') 
 := function
 
 sourceCaps	:=	StringLib.StringToUpperCase(source);
