@@ -172,7 +172,7 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
                                             //Append ID(s)
                                             SELF.bdid := prte2.fn_AppendFakeID.bdid(RIGHT.corp_legal_name,	LEFT.corp_address1.prim_range,	LEFT.corp_address1.prim_name, LEFT.corp_address1.v_city_name, LEFT.corp_address1.st, LEFT.corp_address1.zip, RIGHT.cust_name);
                                             //generating linkids
-                                            vLinkingIds := prte2.fn_AppendFakeID.LinkIds(RIGHT.corp_legal_name, RIGHT.corp_fed_tax_id, RIGHT.corp_inc_date, LEFT.corp_address1.prim_range, LEFT.corp_address1.prim_name, 
+                                            vLinkingIds := prte2.fn_AppendFakeID.LinkIds(RIGHT.corp_legal_name, (string9)RIGHT.corp_fed_tax_id, RIGHT.corp_inc_date, LEFT.corp_address1.prim_range, LEFT.corp_address1.prim_name, 
                                                                                          LEFT.corp_address1.sec_range, LEFT.corp_address1.v_city_name, LEFT.corp_address1.st, LEFT.corp_address1.zip, RIGHT.cust_name);
                                         
                                             SELF.powid	:= vLinkingIds.powid;
@@ -277,7 +277,7 @@ EXPORT PROC_BUILD_BASE(String filedate) := FUNCTION
                                             //Append ID(s)
                                             SELF.bdid := prte2.fn_AppendFakeID.bdid(RIGHT.corp_legal_name,	LEFT.corp_address1.prim_range,	LEFT.corp_address1.prim_name, LEFT.corp_address1.v_city_name, LEFT.corp_address1.st, LEFT.corp_address1.zip, RIGHT.cust_name);
                                             //generating linkids
-                                            vLinkingIds := prte2.fn_AppendFakeID.LinkIds(RIGHT.corp_legal_name, RIGHT.cont_fein, RIGHT.link_inc_date, LEFT.cont_address.prim_range, LEFT.cont_address.prim_name, 
+                                            vLinkingIds := prte2.fn_AppendFakeID.LinkIds(RIGHT.corp_legal_name, (string9)RIGHT.cont_fein, RIGHT.link_inc_date, LEFT.cont_address.prim_range, LEFT.cont_address.prim_name, 
                                                                                          LEFT.cont_address.sec_range, LEFT.cont_address.v_city_name, LEFT.cont_address.st, LEFT.cont_address.zip, RIGHT.cust_name);
                                         
                                             SELF.powid	:= vLinkingIds.powid;
