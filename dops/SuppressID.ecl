@@ -1,6 +1,9 @@
-﻿import RoxieKeyBuild;
-EXPORT SuppressID(string datasetname) := module
+﻿import RoxieKeyBuild,Data_Services;
+EXPORT SuppressID(string datasetname,
+									boolean useLocal = true) := module
 
+	// datasetname - name that matches the validdatasets
+	// useProdFile - whether to use the prod file 
 	export ValidDatasets := ['liens','gong','ucc','bankruptcy','foreclosure','unsuppress','fbn'];
 	
 	export isValidDataset := if (datasetname in ValidDatasets
@@ -8,6 +11,9 @@ EXPORT SuppressID(string datasetname) := module
 																		,false);
 	
 	shared thresholddate := '20171201000000';
+	shared ProdOrDev := if (useLocal
+													,'~'
+													,Data_Services.foreign_prod);
 	
 	export rSuppressLayout := record
 		string idvalue;
@@ -16,14 +22,14 @@ EXPORT SuppressID(string datasetname) := module
 		string flag;
 	end;
 	
-	export Files() := module
-		export Prefix := '~thor::base::suppress';
+	export Files(boolean useConditionalPrefix = false) := module
+		export Prefix := if (useConditionalPrefix,ProdOrDev,'~') + 'thor::base::suppress';
 		export Suffix := datasetname;
 		export Super := Prefix+'::qa::'+Suffix;
 		export Logical(string filedate) := Prefix+'::'+filedate+'::'+Suffix;
 	end;
 	
-	export GetRecords() := dataset(Files().Super,rSuppressLayout,thor,opt);
+	export GetRecords() := dataset(Files(true).Super,rSuppressLayout,thor,opt);
 	
 	export GetIDsAsSet(boolean isFCRA = false, boolean isUnsuppress = false) 
 																					:= if( ~isUnsuppress 
