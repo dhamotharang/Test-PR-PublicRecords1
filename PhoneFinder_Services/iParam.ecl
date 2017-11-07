@@ -1,4 +1,4 @@
-IMPORT AutoHeaderI,AutoStandardI,BatchServices,iesp;
+﻿IMPORT AutoHeaderI,AutoStandardI,BatchServices,iesp;
 
 EXPORT iParam :=
 MODULE
@@ -36,6 +36,7 @@ MODULE
 		EXPORT BOOLEAN   UseEquifax	         := FALSE;
 		EXPORT BOOLEAN   useWaterfallv6			 := FALSE;
 		EXPORT BOOLEAN   UseAccuData_OCN		 := FALSE; // accudata_ocn gateway call
+		EXPORT BOOLEAN   UseZumigoIdentity		 := FALSE; // zumigo gateway call
     EXPORT BOOLEAN   IncludePhoneMetadata:= FALSE;
 		EXPORT BOOLEAN   UseDeltabase 			 := FALSE;
     EXPORT BOOLEAN   SubjectMetadataOnly := FALSE;	
@@ -55,6 +56,12 @@ MODULE
 		// Risk evaluation requests
 		EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators	:= DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator);
 		EXPORT BOOLEAN   IncludeOtherPhoneRiskIndicators  := FALSE;
+		
+		//Zumigo Options
+		EXPORT UNSIGNED1 LineIdentityConsentLevel     := 0;
+		EXPORT STRING20  Usecase := '';
+		EXPORT STRING3 	ProductCode := '';
+		EXPORT STRING8	BillingId := '';
 	END;
 
 	EXPORT AKParams :=

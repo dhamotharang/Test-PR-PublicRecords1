@@ -1,4 +1,4 @@
-//This is the code to execute in a builder window
+﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
 #workunit('name','BizLinkFull.BWR_TestExternal - Test External Linking - Precision and Recall - SALT V3.3.1');
 IMPORT BizLinkFull,SALT33;
@@ -20,3 +20,4 @@ IMPORT BizLinkFull,SALT33;
   Errors;
   MyOutFile;
   Stats;
+

@@ -1,4 +1,4 @@
-EXPORT MAC_phone_noreconn_search := MACRO
+﻿EXPORT MAC_phone_noreconn_search := MACRO
 	#WEBSERVICE(FIELDS(	
 											/*---- Compliance Fields ----*/
 											'ApplicationType',
@@ -31,7 +31,10 @@ EXPORT MAC_phone_noreconn_search := MACRO
 											'City',
 											'State',
 											'Zip',
+											'County',
 											'Phone',
+											'DateFirstSeen',
+											'DateLastSeen',
 											'CompanyName',
 											'BatchFriendly',
 											'PhoneticMatch',
@@ -39,7 +42,6 @@ EXPORT MAC_phone_noreconn_search := MACRO
 											'StrictMatch',
 											'SuppressNewPorting',
 											'SuppressPortedTestDate',
-											'SuppressTelcordiaOnly',
 											'SuppressBlankNameAddress',											
 											'TUGatewayPhoneticMatch',
 											'UseDateSort',

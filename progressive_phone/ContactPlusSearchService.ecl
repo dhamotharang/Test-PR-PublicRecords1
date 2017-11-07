@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ContactPlusSearchService" wuTimeout="300000">
 	<part name="DedupePhones" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="DPPAPurpose" type="xsd:unsignedInt"/>
@@ -74,6 +74,7 @@ IMPORT progressive_phone, addrbest,iesp,PhonesFeedback_Services,ut,
 				doxie,PersonSearch_Services, AutoStandardi,EmailService,Suppress, Royalty;
 
 EXPORT ContactPlusSearchService := MACRO
+    #constant('IncludeFraudDefenseNetwork',false)
 		rec_in := iesp.contactplus.t_ContactPlusSearchRequest;
     ds_in := DATASET ([], rec_in) : STORED ('ContactPlusSearchRequest', FEW);
 		first_row := ds_in[1] : independent;

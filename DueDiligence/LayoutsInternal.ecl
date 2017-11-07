@@ -1,32 +1,39 @@
-﻿IMPORT DueDiligence; 
+﻿IMPORT DueDiligence;
 
 EXPORT LayoutsInternal := MODULE
 
  EXPORT  InternalBIPIDsLayout := RECORD
 	  UNSIGNED4 seq;
-		UNSIGNED4 ultID;
-		UNSIGNED4 orgID;
-		UNSIGNED4 seleID;
+		UNSIGNED6 ultID;
+		UNSIGNED6 orgID;
+		UNSIGNED6 seleID;
+		UNSIGNED6 proxID;
+		UNSIGNED6 powID;
 	END;   
 	
-
-
+	
 	EXPORT SicNaicLayout := RECORD
-		UNSIGNED4 seq;
-		UNSIGNED4 ultID;
-		UNSIGNED4 orgID;
-		UNSIGNED4 seleID;
+		InternalBIPIDsLayout;
 		DATASET(DueDiligence.Layouts.LayoutSICNAIC) sources;
 	END;
 	
 	EXPORT SicNaicUniqueIndustryLayout := RECORD
-		UNSIGNED4 Seq;
-		UNSIGNED4 ultID;
-		UNSIGNED4 orgID;
-		UNSIGNED4 seleID;
+		InternalBIPIDsLayout;
 		DueDiligence.Layouts.LayoutSICNAIC;
 		DueDiligence.Layouts.SicNaicRiskLayout;
 	END;
+	
+	EXPORT AgentLayout := RECORD
+		InternalBIPIDsLayout;
+		DATASET(DueDiligence.Layouts.LayoutAgent) agents;
+	END;
+	
+	EXPORT RelatedParty := RECORD
+		InternalBIPIDsLayout;
+		DueDiligence.Layouts.RelatedParty party;
+	END;
+
+
 
 //------                                      ------
 //------  BusPropertyOwnedWithDetails         ------
@@ -59,27 +66,44 @@ EXPORT LayoutsInternal := MODULE
      string5   zip;
      string4   zip4;
 		 STRING20  countyName;  
+  END;					
+	
+	EXPORT VinTitleAndRegistration := RECORD
+		STRING30		vin;
+		STRING2   	titleState;
+		STRING8   	titleDate;
+		STRING2   	registrationState;
+    STRING8   	registrationDate;
+	END;
+	
+	EXPORT YearMakeModel := RECORD
+		STRING4   	year;
+		STRING30  	make;
+		STRING30  	model;
+	END;
+
+  EXPORT AircraftSlimLayout := RECORD
+    InternalBIPIDsLayout;
+		YearMakeModel;
+		STRING1   detailType; 
+		UNSIGNED1	numberOfEngines;
+		STRING		tailNumber;
+		VinTitleAndRegistration;
+		STRING12	manufactureModelCode;		//used to get number of engines
   END;								
 
-//------                                      ------
-//------                                     ------
-//------  Populated with data for the report  ------
-//------                                      ------
-  EXPORT AircrafttSlimLayout := RECORD
-     InternalBIPIDsLayout  AircraftReportData;
-		 STRING4   Year;
-		 STRING30  Make;
-		 STRING30  Model;
-		 STRING4   DetailType; 
-		 STRING30  VIN;            // Aircraft Identification Number
-		 STRING2   TitleState;
-		 STRING8   TitleDate;
-		 string80  cname;
-		 string2   RegistrationState;
-     string2   RegistrationDate;
-  END;								
-
-
+  EXPORT WatercraftSlimLayout := RECORD
+    InternalBIPIDsLayout;
+		STRING30 watercraftKey;		//used to get watercraft details
+	  STRING30 sequenceKey;			//used to get watercraft details
+		STRING2 stateOrigin;				//used to get watercraft details
+		YearMakeModel;
+		STRING		vesselType;
+		UNSIGNED2 vesselLengthInches;
+		STRING		propulsion;
+		VinTitleAndRegistration;
+		UNSIGNED2 watercraftCount;
+  END;
 
 
 END;

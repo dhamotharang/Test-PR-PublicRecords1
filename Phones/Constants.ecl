@@ -1,4 +1,4 @@
-// Constants accross different phone services
+﻿// Constants accross different phone services
 IMPORT MDR;
 EXPORT Constants :=
 MODULE
@@ -111,7 +111,7 @@ MODULE
 		EXPORT Other				  	:= 'O'; //restrictions and/or special services not defined by other SSC
 		EXPORT Radio				  	:= 'R'; //Two-way Conventional Mobile Radio - pre-cellphone technology
 		EXPORT MiscServices			:= 'S'; //Miscellaneous Services - non-500 PCS, Voice Mail, etc.
-		EXPORT Time				  		:= 'T'; //Time of dayÂ” announcement
+		EXPORT Time				  		:= 'T'; //Time of day announcement
 		EXPORT VOIP					  	:= 'V'; //Internet Protocol Voice Enabled Services
 		EXPORT Weather			  	:= 'W'; //Weather announcement
 		EXPORT Exchange			  	:= 'X'; //Local Exchange - LEC IntraLATA special billing option on a LATA-wide basis
@@ -128,6 +128,8 @@ MODULE
 		EXPORT UNSIGNED1 MaxRecords					 	 := 5;  	
 		EXPORT STRING 	 DELTA_ATT_DQ_IRS			 := 'ATT_DQ_IRS';
 		EXPORT STRING 	 QueryType_ATT_DQ_IRS	 := 'DQ_IRS';		
+		EXPORT STRING 	 ZumigoIdentity				 := 'Zumigo_GLI';		
+		EXPORT UNSIGNED1 MaxZumigoRequest			 := 15;		
 	END;
 	// Debug
 	EXPORT Debug :=
@@ -135,6 +137,9 @@ MODULE
 		EXPORT PhonesPlus := FALSE;
 		EXPORT PhoneMetadata_wLIDB := FALSE;
 		EXPORT PhoneAttributes_Main := FALSE;
+		EXPORT Zumigo := FALSE;
+		EXPORT STRING InternalTestClientID := 'LEXISNEXIS';
+		EXPORT testing := FALSE;
 	END;
 	
 	//Phone Ownership (Phone Attributes)
@@ -158,5 +163,7 @@ MODULE
 		EXPORT DISCONNECTED_CODE:= 'DE';
 	END;
 	
+	EXPORT UNSIGNED1 Zumigo_NameAddr_Validation_Threshold_MIN :=80;
+	EXPORT UNSIGNED1 Zumigo_NameAddr_Validation_Threshold_MAX :=100;
 	
 END;

@@ -1,4 +1,4 @@
-#workunit('name','FCRA Bocashell 5.3 Process');
+﻿#workunit('name','FCRA Bocashell 5.3 Process');
 
 isFCRA := true;
 
@@ -81,7 +81,6 @@ l := RECORD
 END;
 	
 l assignAccount (ds_input le, INTEGER c) := TRANSFORM
-	self.ExcludeIbehavior := true;  // set this back to false if they would like to include this data for their test.  this is temporary until end of July 2017
 	
   SELF.old_account_number := le.Account;
   SELF.AccountNumber := (STRING)c;

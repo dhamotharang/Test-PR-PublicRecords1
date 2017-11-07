@@ -1,4 +1,4 @@
-// Various routines to assist in debugging
+﻿// Various routines to assist in debugging
  
 IMPORT SALT33,ut,std;
 EXPORT Debug(DATASET(layout_BizHead) ih, Layout_Specificities.R s, MatchThreshold = Config_BIP.MatchThreshold) := MODULE
@@ -992,3 +992,4 @@ Layout_Chubbies := RECORD,MAXLENGTH(63000)
 END;
 EXPORT Chubbies := TABLE(t,Layout_Chubbies);
 END;
+

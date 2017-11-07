@@ -1,4 +1,4 @@
-#workunit('name','nonfcrashell 5.3');
+﻿#workunit('name','nonfcrashell 5.3');
 
 // Reads sample data from input file, makes a SOAP call to service specified and (optionally),
 // saves results in output file. 
@@ -84,7 +84,6 @@ END;
 	
 	
 l assignAccount (ds_input le, INTEGER c) := TRANSFORM
-	self.ExcludeIbehavior := true;  // set this back to false if they would like to include this data for their test
 	self.old_account_number := le.Account;
   SELF.AccountNumber := (string)c;
   	

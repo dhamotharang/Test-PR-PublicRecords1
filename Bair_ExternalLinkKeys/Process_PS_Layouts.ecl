@@ -1,4 +1,4 @@
-EXPORT Process_PS_Layouts := MODULE
+﻿EXPORT Process_PS_Layouts := MODULE
  
 IMPORT SALT33;
 SHARED h := File_Classify_PS;//The input file
@@ -103,7 +103,7 @@ EXPORT InputToMC(DATASET(InputLayout) Inp) := FUNCTION
   RETURN TABLE(inp,r);
 END;
  
-EXPORT HardKeyMatch(InputLayout le) := le.FNAME <> (typeof(le.FNAME))'' AND le.LNAME <> (typeof(le.LNAME))'' AND le.ST <> (typeof(le.ST))'' OR le.PRIM_RANGE <> (typeof(le.PRIM_RANGE))'' AND le.PRIM_NAME <> (typeof(le.PRIM_NAME))'' AND le.ZIP <> (typeof(le.ZIP))'' OR le.DOB <> (typeof(le.DOB))'' AND le.LNAME <> (typeof(le.LNAME))'' OR le.ZIP <> (typeof(le.ZIP))'' AND le.PRIM_RANGE <> (typeof(le.PRIM_RANGE))'' OR le.DL <> (typeof(le.DL))'' AND le.DL_ST <> (typeof(le.DL_ST))'' OR le.PHONE <> (typeof(le.PHONE))'' OR le.LNAME <> (typeof(le.LNAME))'' AND le.FNAME <> (typeof(le.FNAME))'' OR le.VIN <> (typeof(le.VIN))'' OR le.LEXID <> (typeof(le.LEXID))'' OR le.POSSIBLE_SSN <> (typeof(le.POSSIBLE_SSN))'' OR le.LATITUDE <> (typeof(le.LATITUDE))'' AND le.LONGITUDE <> (typeof(le.LONGITUDE))'' OR le.PLATE <> (typeof(le.PLATE))'' OR le.CLEAN_COMPANY_NAME <> (typeof(le.CLEAN_COMPANY_NAME))'';
+EXPORT HardKeyMatch(InputLayout le) := le.FNAME <> (typeof(le.FNAME))'' AND le.LNAME <> (typeof(le.LNAME))'' AND le.ST <> (typeof(le.ST))'' OR le.PRIM_RANGE <> (typeof(le.PRIM_RANGE))'' AND le.PRIM_NAME <> (typeof(le.PRIM_NAME))'' AND le.ZIP <> (typeof(le.ZIP))'' OR le.PRIM_NAME <> (typeof(le.PRIM_NAME))'' AND le.P_CITY_NAME <> (typeof(le.P_CITY_NAME))'' AND le.ST <> (typeof(le.ST))'' OR le.DOB <> (typeof(le.DOB))'' AND le.LNAME <> (typeof(le.LNAME))'' OR le.ZIP <> (typeof(le.ZIP))'' AND le.PRIM_RANGE <> (typeof(le.PRIM_RANGE))'' OR le.DL <> (typeof(le.DL))'' AND le.DL_ST <> (typeof(le.DL_ST))'' OR le.PHONE <> (typeof(le.PHONE))'' OR le.LNAME <> (typeof(le.LNAME))'' AND le.FNAME <> (typeof(le.FNAME))'' OR le.VIN <> (typeof(le.VIN))'' OR le.LEXID <> (typeof(le.LEXID))'' OR le.POSSIBLE_SSN <> (typeof(le.POSSIBLE_SSN))'' OR le.LATITUDE <> (typeof(le.LATITUDE))'' AND le.LONGITUDE <> (typeof(le.LONGITUDE))'' OR le.PLATE <> (typeof(le.PLATE))'' OR le.CLEAN_COMPANY_NAME <> (typeof(le.CLEAN_COMPANY_NAME))'';
 EXPORT LayoutScoredFetch := RECORD // Nulls required for linkpaths that do not have field
   h.EID_HASH;
   INTEGER2 Weight; // Specificity attached to this match
@@ -522,7 +522,7 @@ EXPORT CombineLinkpathScores(DATASET(LayoutScoredFetch) in_data) := FUNCTION
   RETURN DEDUP( SORT( rolled, Reference, -weight, LOCAL ), Reference, KEEP(Config.LinkpathCandidateCount),LOCAL);
 END;
 EXPORT KeysUsedToText(UNSIGNED4 k) := FUNCTION
-  list := IF(k&1 <>0,'UberKey,','') + IF(k&(1<<1)<>0,'NAME,','') + IF(k&(1<<2)<>0,'ADDRESS,','') + IF(k&(1<<3)<>0,'DOB,','') + IF(k&(1<<4)<>0,'ZIP_PR,','') + IF(k&(1<<5)<>0,'DLN,','') + IF(k&(1<<6)<>0,'PH,','') + IF(k&(1<<7)<>0,'LFZ,','') + IF(k&(1<<8)<>0,'VIN,','') + IF(k&(1<<9)<>0,'LEXID,','') + IF(k&(1<<10)<>0,'SSN,','') + IF(k&(1<<11)<>0,'LATLONG,','') + IF(k&(1<<12)<>0,'PLATE,','') + IF(k&(1<<13)<>0,'COMPANY,','');
+  list := IF(k&1 <>0,'UberKey,','') + IF(k&(1<<1)<>0,'NAME,','') + IF(k&(1<<2)<>0,'ADDRESS,','') + IF(k&(1<<3)<>0,'ADDRESS1,','') + IF(k&(1<<4)<>0,'DOB,','') + IF(k&(1<<5)<>0,'ZIP_PR,','') + IF(k&(1<<6)<>0,'DLN,','') + IF(k&(1<<7)<>0,'PH,','') + IF(k&(1<<8)<>0,'LFZ,','') + IF(k&(1<<9)<>0,'VIN,','') + IF(k&(1<<10)<>0,'LEXID,','') + IF(k&(1<<11)<>0,'SSN,','') + IF(k&(1<<12)<>0,'LATLONG,','') + IF(k&(1<<13)<>0,'PLATE,','') + IF(k&(1<<14)<>0,'COMPANY,','');
   RETURN list[1..LENGTH(TRIM(list))-1]; // Strim last ,
 end;
 EXPORT Layout_RolledEntity := RECORD,MAXLENGTH(63000)

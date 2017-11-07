@@ -1,4 +1,4 @@
-export reasonCodes(layout, cnt, rc_settings) := 
+﻿export reasonCodes(layout, cnt, rc_settings) := 
 
 MACRO
 
@@ -6,7 +6,7 @@ CHOOSEN(
 	IF(Risk_Indicators.rcSet.isCode32(layout.watchlist_table, layout.watchlist_record_number),DATASET([{'32',risk_indicators.getHRIDesc('32')}],risk_indicators.Layout_Desc)) &
 	// note:  PO is in here twice because it changed priority for ciid v1
 	IF(Risk_Indicators.rcSet.isCodePO(layout.addr_type) AND (rc_settings[1].IsInstantID AND rc_settings[1].IIDVersion=0), DATASET([{'PO',risk_indicators.getHRIDesc('PO')}],risk_indicators.Layout_Desc)) &	
-	IF(Risk_Indicators.rcSet.isCodeDI(layout.DIDdeceased) AND ~risk_indicators.rcSet.isCode02(layout.decsflag) AND rc_settings[1].IIDVersion>=1,DATASET([{'DI',risk_indicators.getHRIDesc('DI')}],risk_indicators.Layout_Desc)) &
+	IF(Risk_Indicators.rcSet.isCodeDI(layout.DIDdeceased) AND (~risk_indicators.rcSet.isCode02(layout.decsflag) or rc_settings[1].isIdentifier2)  AND rc_settings[1].IIDVersion>=1,DATASET([{'DI',risk_indicators.getHRIDesc('DI')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCode02(layout.decsflag),DATASET([{'02',risk_indicators.getHRIDesc('02')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCode03(layout.socsdobflag),DATASET([{'03',risk_indicators.getHRIDesc('03')}],risk_indicators.Layout_Desc)) &
 	IF(Risk_Indicators.rcSet.isCodePO(layout.addr_type) AND (rc_settings[1].IsInstantID AND rc_settings[1].IIDVersion>=1), DATASET([{'PO',risk_indicators.getHRIDesc('PO')}],risk_indicators.Layout_Desc)) &

@@ -1,4 +1,4 @@
-IMPORT ut,SALT33;
+﻿IMPORT ut,SALT33;
 // This module is to the field values what the fields module is to the field itself
 // It really exists to answer the question: does a token with these characters logically belong in this field?
 // This module should be viewed as experimental
@@ -208,3 +208,4 @@ END;
  
 EXPORT PrettyStreamClassify(SALT33.StrType s) := SALT33.fn_pretty_hypothesis(s,StreamClassify(s),Fields.FieldName);
 END;
+

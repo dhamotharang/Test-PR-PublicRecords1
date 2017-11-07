@@ -1,4 +1,4 @@
-import DeathV2_Services, AutoStandardI, MDR, BatchServices, ut, D2C;
+﻿import DeathV2_Services, AutoStandardI, MDR, BatchServices, ut, D2C;
 
 export Functions := module
 
@@ -6,7 +6,8 @@ export Functions := module
 		return AutoStandardI.DataRestrictionI.val(in_mod).isHeaderSourceRestricted(src, in_mod.DataRestrictionMask)
 						or (glb_ok = false and glb_flag = 'Y')
 						or (in_mod.UseDeathMasterSSAUpdates = false and src = MDR.sourceTools.src_Death_Restricted)					
-						or (in_mod.IsConsumer and src in D2C.Constants.DeathRestrictedSources); 											
+						or (in_mod.IsConsumer and src in D2C.Constants.DeathRestrictedSources)										
+						or (in_mod.SuppressNonMarketingDeathSources and src in [DeathV2_Services.Constants.src_Death_NonMarketing_Sources]);			
 	END;			 		
 	
 	SHARED csvStr2ds(STRING csvStr) := FUNCTION

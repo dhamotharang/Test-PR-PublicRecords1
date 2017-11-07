@@ -1,4 +1,4 @@
-IMPORT SALT33;
+﻿IMPORT SALT33;
 EXPORT Scaled_Candidates(DATASET(layout_BizHead) le,DATASET(match_candidates(le).layout_candidates) cfk = Match_Candidates(le).candidates ) := FUNCTION
 R := RECORD
   cfk;
@@ -29,3 +29,4 @@ END;
 scaled := project(cfk,ProcessConceptScaling(left));
   RETURN scaled;
 END;
+

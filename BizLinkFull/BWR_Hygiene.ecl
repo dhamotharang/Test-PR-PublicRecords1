@@ -1,4 +1,4 @@
-//This is the code to execute in a builder window
+﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
 #workunit('name','BizLinkFull.BWR_Hygiene - Hygiene & Stats - SALT V3.3.1');
 IMPORT BizLinkFull,SALT33;
@@ -40,3 +40,4 @@ IMPORT BizLinkFull,SALT33;
   OUTPUT(BizLinkFull.SEE_Hygiene_Comp.SEE_Hygiene_Comp_Ins001_DDL,NAMED('SEE_Hygiene_Comp_Ins001_DDL'));
   BizLinkFull.SEE_Hygiene_Comp.Build_Ins001_Validity_Errors.BuildAll;
  
+

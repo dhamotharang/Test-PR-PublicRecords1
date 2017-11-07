@@ -1,4 +1,4 @@
-IMPORT SALT33,std;
+﻿IMPORT SALT33,std;
 EXPORT match_methods(DATASET(layout_BizHead) ih) := MODULE
  
 SHARED h := match_candidates(ih).candidates;
@@ -226,3 +226,4 @@ EXPORT match_STREETADDRESS(TYPEOF(h.STREETADDRESS) L,TYPEOF(h.STREETADDRESS) R) 
    MAP(L = R => SALT33.MatchCode.ExactMatch,
   SALT33.MatchCode.NoMatch);
 END;
+

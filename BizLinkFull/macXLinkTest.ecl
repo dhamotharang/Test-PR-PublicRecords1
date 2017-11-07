@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------
+﻿//---------------------------------------------------------------------------
 // Macro accepts a dataset and runs it through the batch external linking
 // process.  User does not need to be concerned with input layout or field
 // order.  The only two requirements are that the dataset have a "Ref" field
@@ -73,3 +73,4 @@ EXPORT macXLinkTest(d,bDebug=FALSE,bShowIntermediate=FALSE):=FUNCTIONMACRO
     RETURN(%o%);
   #END
 ENDMACRO;
+

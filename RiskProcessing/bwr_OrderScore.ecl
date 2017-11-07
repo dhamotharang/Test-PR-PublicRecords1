@@ -1,4 +1,4 @@
-/* *** Note that Netacuity is turned ON *** needs to use Cert gateway  
+﻿/* *** Note that Netacuity is turned ON *** needs to use Cert gateway  
 But Model does use Netacuity! */
 #workunit('name','Order Score');
 
@@ -206,7 +206,8 @@ soapResults_raw := SOAPCALL(soapInput,
 				{soapInput}, 
 				DATASET(xlayout),
         RETRY(5), TIMEOUT(500), //literal,
-        XPATH('Models.OrderScore_ServiceResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
+        // XPATH('Models.OrderScore_ServiceResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
+				XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
 				PARALLEL(threads), onFail(myFail(LEFT)));
 
 soap_Results := soapResults_raw(errorcode='');  // filter out the intermediate logging rows from the response

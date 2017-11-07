@@ -1,4 +1,4 @@
-IMPORT BBB2, BIPV2, Business_Risk_BIP, BusReg, Corp2, EBR, MDR, Risk_Indicators, UT, Business_Header;
+﻿IMPORT BBB2, BIPV2, Business_Risk_BIP, BusReg, Corp2, EBR, MDR, Risk_Indicators, UT, Business_Header;
 
 EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -53,8 +53,18 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Figure out if the kFetch was successful
 	kFetchErrorCodes := Business_Risk_BIP.Common.GrabFetchErrorCode(CorpFilings_seq);
 
+ // Calculate the source code by state to restrict records for Marketing properly. We'll 
+ // borrow corp_src_type for the state source code.
+ CorpFilings_withSrcCode := 
+  PROJECT(
+    CorpFilings_seq,
+    TRANSFORM( RECORDOF(CorpFilings_seq), 
+      SELF.corp_src_type := MDR.sourceTools.fCorpV2( LEFT.corp_key, LEFT.corp_state_origin ),
+      SELF := LEFT
+    ) );
+  
 	// Filter out records after our history date.
-	CorpFilings_recs := Business_Risk_BIP.Common.FilterRecords(CorpFilings_seq, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_ID_Corporations, AllowedSourcesSet);
+	CorpFilings_recs := Business_Risk_BIP.Common.FilterRecords(CorpFilings_withSrcCode, dt_first_seen, dt_vendor_first_reported, corp_src_type, AllowedSourcesSet);
 	
 	// Filter out any companies (designated as such by corp_key) that have no Current corp filing 
 	// records anywhere. Such companies no longer exist.
@@ -269,6 +279,7 @@ EXPORT getCorporateFilings(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// OUTPUT( EBR_recs_rollup, NAMED('EBR_recs_rollup') );
 	// OUTPUT( CorpFilings_raw, NAMED('CorpFilings_raw') );
 	// OUTPUT( CorpFilings_seq, NAMED('CorpFilings_seq') );
+ // OUTPUT( CorpFilings_withSrcCode, NAMED('CorpFilings_withSrcCode') );
 	// OUTPUT( CorpFilings_recs, NAMED('CorpFilings_recs') );
 	// OUTPUT( CorpFilings_recs_filt, NAMED('CorpFilings_recs_filt'), ALL );
 	// OUTPUT( CorpFilings_recs_srtd, NAMED('CorpFilings_recs_srtd'), ALL );

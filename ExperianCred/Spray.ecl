@@ -1,11 +1,11 @@
-import VersionControl;
+﻿import VersionControl;
 
 export Spray := module
 
 // export Input := DATASET([
  	// {'edata11-bld.br.seisint.com'										
  	// ,'/data_lib_2_hus2/Experian/non-fcra/' + version   //Location to be determined                  
- 	// ,'*.dat*'                           
+ 	// ,'*.dat'                           
  	// ,'1701'                                                             
  	// ,'~thor_dell400::in::experiancred::cpchf@version@'    
  	// ,[{'~thor_data400::in::experiancred'}]    

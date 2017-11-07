@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Biz_FragHunter_Service">
 <part name="parent_proxid" type="xsd:string"/>
 <part name="sele_proxid" type="xsd:string"/>
@@ -195,3 +195,4 @@ EXPORT Biz_FragHunter_Service := MACRO
   OUTPUT(odm.Raw_Data,NAMED('FragmentData'));
   OUTPUT(pm.Raw_Data,NAMED('OriginalData'));
 ENDMACRO;
+
