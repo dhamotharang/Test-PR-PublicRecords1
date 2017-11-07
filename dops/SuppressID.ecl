@@ -1,6 +1,6 @@
 ﻿import RoxieKeyBuild,Data_Services;
 EXPORT SuppressID(string datasetname,
-									boolean useLocal = true) := module
+									boolean useLocal = false) := module
 
 	// datasetname - name that matches the validdatasets
 	// useProdFile - whether to use the prod file 
@@ -11,7 +11,7 @@ EXPORT SuppressID(string datasetname,
 																		,false);
 	
 	shared thresholddate := '20171201000000';
-	shared ProdOrDev := if (useLocal
+	shared ProdOrDev := if (useLocal or dops.constants.ThorEnvironment = 'prod'
 													,'~'
 													,Data_Services.foreign_prod);
 	
