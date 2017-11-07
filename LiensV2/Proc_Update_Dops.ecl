@@ -1,4 +1,4 @@
-import Roxiekeybuild,Orbit3;
+﻿import Roxiekeybuild,Orbit3;
 export Proc_Update_Dops() := function
 	string_rec := record
 		string processdate;
@@ -7,14 +7,15 @@ export Proc_Update_Dops() := function
 	return sequential(
 						if(~fileservices.fileexists('~thor::dops::liensv2'),
 								fileservices.createsuperfile('~thor::dops::liensv2')),
-						if(fileservices.getsuperfilesubcount('~thor::dops::liensv2') = 3,
-					sequential(RoxieKeybuild.updateversion('Liensv2Keys',newfiledate,'skasavajjala@seisint.com,michael.gould@lexisnexis.com',,'N|B'),
-					        Orbit3.proc_Orbit3_CreateBuild ( 'Liens & Judgements',newfiledate,'N|B'),
-					fileservices.clearsuperfile('~thor::dops::liensv2',true),
-					fileservices.sendemail(
-												'BocaRoxiePackageTeam@lexisnexis.com',
-												'ALERT:LiensV2Keys:Completed',
-												'Liensv2 job finished, add to package for deployment'
-										)),
-					output('Liens build still running')));
+						// if(fileservices.getsuperfilesubcount('~thor::dops::liensv2') = 3,
+					// sequential(RoxieKeybuild.updateversion('Liensv2Keys',newfiledate,'skasavajjala@seisint.com,michael.gould@lexisnexis.com',,'N|B'),
+					        // Orbit3.proc_Orbit3_CreateBuild ( 'Liens & Judgements',newfiledate,'N|B'),
+					// fileservices.clearsuperfile('~thor::dops::liensv2',true),
+					// fileservices.sendemail(
+												// 'BocaRoxiePackageTeam@lexisnexis.com',
+												// 'ALERT:LiensV2Keys:Completed',
+												// 'Liensv2 job finished, add to package for deployment'
+										// )),
+					// output('Liens build still running'))
+					);
 end;
