@@ -1,4 +1,4 @@
-import liensv2;
+﻿import liensv2;
 
 export Inputs_Set(boolean incremental=false, string versionBuild=header.version_build) := function
 
@@ -122,6 +122,10 @@ asl_file := if(fileservices.getsuperfilesubcount('~thor_data400::Base::ASLHeader
 output('Nothing added to Base::ASLHeader_Building'),
 fileservices.addsuperfile('~thor_data400::Base::ASLHeader_Building','~thor_data400::base::american_student_list',,true));
 
+osl_file := if(fileservices.getsuperfilesubcount('~thor_data400::Base::OKC_SLHeader_Building')>0,
+output('Nothing added to Base::OKC_SLHeader_Building'),
+fileservices.addsuperfile('~thor_data400::Base::OKC_SLHeader_Building','~thor_data400::base::okc_student_list',,true));
+
 voters_v2 := if(fileservices.getsuperfilesubcount('~thor_data400::Base::Voters_Header_Building')>0,
 output('Nothing added to Base::Voters_Header_Building'),
 fileservices.addsuperfile('~thor_data400::Base::Voters_Header_Building','~thor_data400::Base::Voters_Reg',,true));
@@ -197,6 +201,7 @@ sequence_sources :=parallel(
                             ,Header.Mod_SetSources(,versionBuild).sequence_DEA
                             ,Header.Mod_SetSources(,versionBuild).sequence_WP
                             ,Header.Mod_SetSources(,versionBuild).sequence_SL
+                            ,Header.Mod_SetSources(,versionBuild).sequence_S1
                             ,Header.Mod_SetSources(,versionBuild).sequence_VO
                             ,Header.Mod_SetSources(,versionBuild).sequence_CY
                             ,Header.Mod_SetSources(,versionBuild).sequence_ND
@@ -233,7 +238,9 @@ add_super := sequential(
                                             ,ln_prop_srch
                                             ,ln_prop_addl_deeds
                                             ,ln_prop_addl_asses
-                                            ,asl_file,voters_v2
+                                            ,asl_file
+                                            ,osl_file
+                                            ,voters_v2
                                             ,vehicle_v2_main
                                             ,vehicle_v2_party
                                             ,certegy_file
