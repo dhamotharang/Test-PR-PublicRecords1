@@ -10,8 +10,8 @@ export Clean_OSHAIR_data (string filedate, string process_date) := function
 		DCA     - Debt Collection Agency, under contract of OSHA
 		FTA     - Failure to Abate
 		FAT/CAT - Fatality and/or Catastrophe - definition of catastrophe:
-												Federal OSHA: 5 or more hospitalized injuries
-												State   OSHA: Definitions vary
+							Federal OSHA: 5 or more hospitalized injuries
+							State   OSHA: Definitions vary
 		ID      - Identification, usually not purely numeric
 		MIS     - Old Management Information System, national office only
 		NR/Nr   - Number
@@ -19,10 +19,10 @@ export Clean_OSHAIR_data (string filedate, string process_date) := function
 		NAICS   - North American Industrial Classification System
 		SOL     - OSHA SOLicitor, or, Office of an OSHA Solicitor
 		State   - Usually identifies that group of approximately twenty-seven (27) states
-				  that have their own OSH Haz_Sub plan approved Federal OSHA under authority
-				  of the OSHA Act, paragraph 18(b)
+							that have their own OSH Haz_Sub plan approved Federal OSHA under authority
+							of the OSHA Act, paragraph 18(b)
 		VIO     - Violation - Note that initially violations are alleged.  After certain procedures
-				  have been completed, the alleged status is removed.
+							have been completed, the alleged status is removed.
 */
 
 layout_cleaned := record
@@ -30,16 +30,14 @@ layout_cleaned := record
 	unsigned4 dt_last_seen						 := 0;
 	unsigned4 dt_vendor_first_reported := 0;
 	unsigned4 dt_vendor_last_reported	 := 0;
-  bipv2.IDlayouts.l_xlink_ids;	//Added for BIP project
-	unsigned8 source_rec_id := 0; //Added for BIP project	
-	string2 source := '';
+  bipv2.IDlayouts.l_xlink_ids;						  //Added for BIP project
+	unsigned8 source_rec_id 					 := 0; //Added for BIP project	
+	string2 source 										 := '';
   OSHAIR.layout_OSHAIR_inspection_clean;
 end; 
 
 layout_cleaned trfInspectionMapped(Layouts_input.Inspection L) := TRANSFORM
-
-  string182 cleanaddress := 
-				Address.CleanAddress182(l.Site_Address, l.site_city + ', ' + l.Site_State + ' ' + INTFORMAT((INTEGER)l.Site_Zip,5,1));
+  string182 cleanaddress 									:=  Address.CleanAddress182(l.Site_Address, l.site_city + ', ' + l.Site_State + ' ' + INTFORMAT((INTEGER)l.Site_Zip,5,1));
 	self.dt_first_seen 											:=  (unsigned4)process_date;
 	self.dt_last_seen  											:=  (unsigned4)process_date;
 	self.dt_vendor_first_reported 					:=  (unsigned4)process_date;
@@ -49,7 +47,11 @@ layout_cleaned trfInspectionMapped(Layouts_input.Inspection L) := TRANSFORM
 	self.area_code													:=	l.reporting_id[3..5];
 	self.office_code												:=	l.reporting_id[6..7];	
 	self.fed_state_flag											:=	l.state_flag;
-	self.inspected_site_name								:=	ut.CleanSpacesAndUpper(l.estab_name);
+	/*Jira--DF-20163:Excluding numerals & "-" from estab_names !!  
+		ex: From this '317593358 - ADVANTAGE PRECAST INC' only "ADVANTAGE PRECAST INC" will be mapped to inspected_site_name field */
+	self.inspected_site_name								:=	map(regexreplace('[0-9]',ut.CleanSpacesAndUpper(l.estab_name[1..10]),'')='' and regexFind('\\x2D',l.estab_name[11]) => ut.CleanSpacesAndUpper(l.estab_name[12..]),  //Hex value for "-"  is '\\x2D'; 
+																									ut.CleanSpacesAndUpper(l.estab_name)
+																									);
 	self.inspected_site_street							:=	ut.CleanSpacesAndUpper(l.site_address);
 	self.inspected_site_state								:=	ut.CleanSpacesAndUpper(l.site_state);
 	self.inspected_site_zip									:=	(integer)l.site_zip;
@@ -57,22 +59,16 @@ layout_cleaned trfInspectionMapped(Layouts_input.Inspection L) := TRANSFORM
 	self.advance_notice_flag								:=	l.adv_notice;
 	self.Inspected_Site_City_Name     			:= 	ut.CleanSpacesAndUpper(l.site_city);	
 	self.inspection_opening_date						:=	if (_validate.date.fIsValid(StringLib.StringFindReplace(l.open_date,'-','')), 
-																											(integer)StringLib.StringFindReplace(l.open_date,'-',''), 
-																											0
-																									);
+																									(integer)StringLib.StringFindReplace(l.open_date,'-',''),0);
 	self.inspection_close_Date							:=	if (_validate.date.fIsValid(StringLib.StringFindReplace(l.close_conf_date,'-','')), 
-																											(integer)StringLib.StringFindReplace(l.close_conf_date,'-',''), 
-																											0
-																									);
+																									(integer)StringLib.StringFindReplace(l.close_conf_date,'-',''), 0);
 	self.close_case_date										:=	if (_validate.date.fIsValid(StringLib.StringFindReplace(l.close_case_date,'-','')), 
-																											(integer)StringLib.StringFindReplace(l.close_case_date,'-',''), 
-																											0
-																									);
+																									(integer)StringLib.StringFindReplace(l.close_case_date,'-',''), 0);
 	self.Safety_Health_Flag									:=	l.safety_hlth;
 	self.inspection_type										:=	l.insp_type;
 	self.inspection_scope										:=	l.insp_scope;
 	self.number_in_establishment						:=	(integer)l.nr_in_estab;
-	// self.union_flag													:=	l.union_status;
+	// self.union_flag											:=	l.union_status;
 	self.why_no_inspection_code							:=	l.why_no_insp;
 	self.safety_pg_manufacturing_insp_flag	:=	l.safety_manuf;
 	self.safety_pg_construction_insp_flag		:=	l.safety_const;
@@ -120,14 +116,14 @@ layout_cleaned trfInspectionMapped(Layouts_input.Inspection L) := TRANSFORM
 	self																		:= 	[];
 end;
 
-InspectionMapped	:=	project(oshair.files().input.Inspection.sprayed, trfInspectionMapped(left));
+InspectionMapped	:=	project(oshair.files().input.Inspection.using, trfInspectionMapped(left));
 
-BaseWithSource		:=	project(OSHAIR.file_out_inspection_cleaned_both,
-													TRANSFORM(layout_cleaned,
-																		self.source := mdr.sourceTools.src_OSHAIR;
-																		self.bdid	:= 0;
-																		self.BDID_score	:= 0;
-																		self := left;));
+BaseWithSource		:=	project(OSHAIR.Files().base.Inspection.qa,
+															TRANSFORM(layout_cleaned,
+																				self.source := mdr.sourceTools.src_OSHAIR;
+																				self.bdid	:= 0;
+																				self.BDID_score	:= 0;
+																				self := left;));
 
 InspectionAll			:=	InspectionMapped + BaseWithSource;
 
@@ -173,25 +169,27 @@ Business_Header_SS.MAC_Add_FEIN_By_BDID(OSHAIR_bdid_match
 OSHAIR_out_add_fein2 := distribute(PROJECT(OSHAIR_out_add_fein,OSHAIR.layout_OSHAIR_inspection_clean_BIP),hash32(Activity_Number));
 
 OSHAIR.layout_OSHAIR_inspection_clean_BIP RollupInspection(OSHAIR.layout_OSHAIR_inspection_clean_BIP l, OSHAIR.layout_OSHAIR_inspection_clean_BIP r) := transform
-  self.dt_first_seen  := ut.EarliestDate(l.dt_first_seen ,r.dt_first_seen	);  
-	self.dt_last_seen 	:= ut.LatestDate  (l.dt_last_seen	 ,r.dt_last_seen	);
+  
+	self.dt_first_seen  					:= ut.EarliestDate(l.dt_first_seen ,r.dt_first_seen	);  
+	self.dt_last_seen 						:= Max  (l.dt_last_seen	 ,r.dt_last_seen	);
 	self.dt_vendor_first_reported := ut.EarliestDate(l.dt_vendor_first_reported	,r.dt_vendor_first_reported	);	
-  self.dt_vendor_last_reported 	:= ut.LatestDate	(l.dt_vendor_last_reported	,r.dt_vendor_last_reported	);
-	self := l;
+  self.dt_vendor_last_reported 	:= Max	(l.dt_vendor_last_reported	,r.dt_vendor_last_reported	);
+	self 													:= l;
+	
 end;
 
 srtOSHAIR	:=	sort(OSHAIR_out_add_fein2,activity_number,source_rec_id, record, 
-												except dt_first_seen, dt_last_seen, dt_vendor_first_reported, dt_vendor_last_reported,
-													BDID_score, DotScore, DotWeight, EmpScore, EmpWeight,	POWScore, POWWeight, ProxScore, 
-													ProxWeight, SeleScore, SeleWeight, OrgScore, OrgWeight, UltScore, UltWeight, local);
+									 except dt_first_seen, dt_last_seen, dt_vendor_first_reported, dt_vendor_last_reported,
+									 BDID_score, DotScore, DotWeight, EmpScore, EmpWeight,	POWScore, POWWeight, ProxScore, 
+									 ProxWeight, SeleScore, SeleWeight, OrgScore, OrgWeight, UltScore, UltWeight, local);
 
 InspectionRollup := rollup(srtOSHAIR, RollupInspection(left, right), record 
-												,except dt_first_seen, dt_last_seen, 
-															  dt_vendor_first_reported, dt_vendor_last_reported,
-															  BDID_score, DotScore, DotWeight, EmpScore, EmpWeight,	
-															  POWScore, POWWeight, ProxScore, ProxWeight, SeleScore,
-															  SeleWeight, OrgScore, OrgWeight, UltScore, UltWeight
-												,local);
+													 ,except dt_first_seen, dt_last_seen, 
+																	 dt_vendor_first_reported, dt_vendor_last_reported,
+																	 BDID_score, DotScore, DotWeight, EmpScore, EmpWeight,	
+																	 POWScore, POWWeight, ProxScore, ProxWeight, SeleScore,
+																	 SeleWeight, OrgScore, OrgWeight, UltScore, UltWeight
+													 ,local);
 
 /* Generate the other OSHA base files */
 OSHAIR.normalize_child_datasets(filedate, process_date);
