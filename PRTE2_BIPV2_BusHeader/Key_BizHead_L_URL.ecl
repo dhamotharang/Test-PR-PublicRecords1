@@ -65,7 +65,7 @@ layout := RECORD // project out required fields
   h.ult_flag_weight100 ; // Contains 100x the specificity
 END;
  
-s := PRTE2_BIPV2_BusHeader.Specificities(File_BizHead).Specificities[1];
+s := PRTE2_BIPV2_BusHeader.Specificities(PRTE2_BIPV2_BusHeader.File_BizHead).Specificities[1];
  
 DataForKey0 := DEDUP(SORT(TABLE(h((company_url NOT IN SET(s.nulls_company_url,company_url) AND company_url <> (TYPEOF(company_url))'')),layout),WHOLE RECORD,LOCAL),WHOLE RECORD,LOCAL); // Project out the fields in match candidates required for this Name()
 // Now need to 'blow out' the fixed word-bag fields to create the pseudo-inversion
