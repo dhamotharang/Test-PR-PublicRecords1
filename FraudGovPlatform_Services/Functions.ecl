@@ -157,10 +157,13 @@ EXPORT Functions := MODULE
 															LEFT.batchin_rec.acctno = RIGHT.acctno,
 															TRANSFORM(slim_knownrisk_rec,
 																SELF.acctno := RIGHT.acctno,
-																SELF.known_risk_reason := MAP(LEFT.batchin_rec.did = (UNSIGNED6)RIGHT.did OR 
-																															(RIGHT.matchcode = 'SN' AND LEFT.batchin_rec.dob = RIGHT.dob8) => 'Identity is deceased on ' + ut.date_YYYYMMDDtoDateSlashed(RIGHT.dod8),
-																															RIGHT.matchcode IN ['AN', 'ANZ', 'ANC', 'ANS', 'NCZ'] AND
-																															LEFT.batchin_rec.dob = RIGHT.dob8 => 'Identity elements associated with deceased individual on ' + ut.date_YYYYMMDDtoDateSlashed(RIGHT.dod8),
+																SELF.known_risk_reason := MAP(RIGHT.matchcode IN ['SN', 'S', 'ANSZC', 'ANSZ', 'ANSC', 'ANS', 'SNCZ', 'SNC', 'SNZ'] AND
+																															LEFT.batchin_rec.dob = RIGHT.dob8 => 'Identity is deceased on ' + ut.date_YYYYMMDDtoDateSlashed(RIGHT.dod8),
+																															
+																															(LEFT.batchin_rec.did = (unsigned6) RIGHT.did and RIGHT.matchcode = '') OR
+																															(RIGHT.matchcode IN ['N','Z','NZ'] AND
+																															LEFT.batchin_rec.dob = RIGHT.dob8) => 'Identity elements associated with deceased individual on ' + ut.date_YYYYMMDDtoDateSlashed(RIGHT.dod8),
+																														 
 																														 ''),
 																SELF.event_date := RIGHT.dod8,
 																SELF.event_type := 'Death'));
