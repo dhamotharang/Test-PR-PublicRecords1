@@ -29,7 +29,7 @@ EXPORT proc_build_all(STRING version) := FUNCTION
 									
   create_orbit_build:= Orbit3.Proc_Orbit3_CreateBuild_npf ('V12 Group',version);
 		
-  RETURN If(EXISTS(FileServices.RemoteDirectory(_control.IPAddress.edata12,'/hds_180/V12/data/'+ version,'*.txt')),
+  RETURN If(EXISTS(FileServices.RemoteDirectory(_control.IPAddress.bctlpedata11,'/data/hds_180/V12/data/'+ version,'*.txt')),
 					SEQUENTIAL(spray_all
 										 ,buildnewbasefile
 										 ,V12.proc_build_strata(version)
