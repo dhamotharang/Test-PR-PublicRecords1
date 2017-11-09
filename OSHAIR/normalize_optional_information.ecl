@@ -19,7 +19,7 @@ end;
 
 ds_Optional_Information := 	project(OptionalInfo,normalize_optional_info(LEFT));
 
-dsAllOptInfo						:=	distribute((OSHAIR.Files().base.Optional_Info.qa + ds_Optional_Information),hash32(Activity_Number));
+dsAllOptInfo						:=	distribute((OSHAIR.Files().base.OptionalInfo.qa + ds_Optional_Information),hash32(Activity_Number));
 
 OSHAIR.layout_OSHAIR_optional_info_clean RollupOptInfo(OSHAIR.layout_OSHAIR_optional_info_clean l, OSHAIR.layout_OSHAIR_optional_info_clean r) := transform
   self.dt_first_seen  				  := ut.EarliestDate(l.dt_first_seen ,r.dt_first_seen	);  
