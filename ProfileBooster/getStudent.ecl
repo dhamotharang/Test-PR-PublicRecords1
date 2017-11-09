@@ -16,7 +16,7 @@ students_roxie := join(PBslim, american_student_list.key_DID,
 		left.did2!=0
 		and keyed(left.did2=right.l_did)
 		and (unsigned3)(right.date_first_seen[1..6]) < left.historydate
-		and ~(right.source=mdr.sourceTools.src_OKC_Student_List and right.state in Risk_Indicators.iid_constants.Set_Restricted_States_For_Marketing), // can't use this source in marketing products
+		and ~(right.source=mdr.sourceTools.src_OKC_Student_List and right.collegeid in Risk_Indicators.iid_constants.Set_Restricted_Colleges_For_Marketing), // can't use this source in marketing products
 		addStudent(left,right), left outer, atmost(keyed(left.did2=right.l_did), 100));
 
 students_thor := join(
@@ -25,7 +25,7 @@ students_thor := join(
 		left.did2!=0
 		and left.did2=right.l_did
 		and (unsigned3)(right.date_first_seen[1..6]) < left.historydate
-		and ~(right.source=mdr.sourceTools.src_OKC_Student_List and right.state in Risk_Indicators.iid_constants.Set_Restricted_States_For_Marketing), // can't use this source in marketing products
+		and ~(right.source=mdr.sourceTools.src_OKC_Student_List and right.collegeid in Risk_Indicators.iid_constants.Set_Restricted_Colleges_For_Marketing), // can't use this source in marketing products
 		addStudent(left,right), left outer, local);
 			
 students := if(onthor, students_thor, students_roxie);

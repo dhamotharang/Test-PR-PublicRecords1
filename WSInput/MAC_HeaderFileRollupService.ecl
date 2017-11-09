@@ -111,6 +111,7 @@
 											'MaxResults',
 											'MaxResultsThisTime',
 											'ScoreModel',
+											'ReturnPhoneScore',
 											'SkipRecords',
 											'Gateways'));
 ENDMACRO;

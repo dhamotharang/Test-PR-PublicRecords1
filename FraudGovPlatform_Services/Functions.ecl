@@ -1,4 +1,4 @@
-﻿IMPORT CriminalRecords_BatchService, FraudGovPlatform_Services, FraudShared_Services, ut;
+﻿IMPORT CriminalRecords_BatchService, FraudGovPlatform_Services, FraudShared_Services, ut, std;
 
 EXPORT Functions := MODULE
 	EXPORT getKnownFraudCodeDescLookup (String KnownFraudCode) := FUNCTION
@@ -63,7 +63,7 @@ EXPORT Functions := MODULE
     eventType2 := ',' + getKnownFraudCodeDescLookup(event_type2);
     eventType3 := ',' + getKnownFraudCodeDescLookup(event_type3);
 
-    RETURN TRIM(eventDates + eventType1 + eventType2 + eventType3);
+    RETURN std.str.cleanspaces(TRIM(eventDates + eventType1 + eventType2 + eventType3));
   END;
 	
 	EXPORT getExternalServicesRecs(	DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in, 

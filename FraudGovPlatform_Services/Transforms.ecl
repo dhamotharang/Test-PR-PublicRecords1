@@ -3,6 +3,7 @@
 
 EXPORT Transforms := MODULE
 
+  //this shared function is not used, it was replaced by functions.getKnownFraudDescriptionFromPayload()	
 	SHARED getKnownFraudDescriptionFromPayloadXml(FraudShared_Services.Layouts.Raw_Payload_rec p_rec ) := FUNCTION
 
     dString1 := '(On: ' + TRIM(p_rec.Event_Date) + ') ';
@@ -140,13 +141,7 @@ EXPORT Transforms := MODULE
 	END;
 	
 	EXPORT iesp.fraudgovplatform.t_FraudGovKnownRisk xform_known_frauds(FraudGovPlatform_Services.Layouts.KnownFrauds_rec l) := TRANSFORM		
-SELF.KnownRiskReasons := PROJECT(l.payload[1], 
-																											TRANSFORM({iesp.share.t_StringArrayItem}, 
-																													SELF.value := FraudGovPlatform_Services.Functions.getKnownFraudDescriptionFromPayload(LEFT.event_date, 
-																																																																																																																		 LEFT.event_end_date, 
-																																																																																																																		 LEFT.event_type_1, 
-																																																																																																																		 LEFT.event_type_2, 
-																																																																																																																		 LEFT.event_type_3)));		
+    SELF.KnownRiskReasons := PROJECT(l.payload, TRANSFORM({iesp.share.t_StringArrayItem}, SELF.value := FraudGovPlatform_Services.Functions.getKnownFraudDescriptionFromPayload(LEFT.event_date,LEFT.event_end_date, LEFT.event_type_1, LEFT.event_type_2, LEFT.event_type_3)));		
 		SELF.KnownRiskCount := COUNT(l.payload);
 		// SELF.PayloadRecords := PROJECT(l.payload, TRANSFORM(FraudShared.Layouts_Key.Main, SELF := LEFT));
 
