@@ -93,7 +93,7 @@
 
 
 
-IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, PersonReports, ut, seed_files, suppress;
+IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, IdentityFraud_Services, PersonReports, ut, seed_files, suppress;
 
 EXPORT IdentityFraudReportService () := MACRO
 #constant('SelectIndividually', true); // we will setup all components explicitly

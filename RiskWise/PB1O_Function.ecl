@@ -88,8 +88,9 @@ boolean hasbdids := false;
 boolean ExcludeWatchLists := false;
 boolean OFAC := true;
 Real Global_WatchList_Threshold := if(OFACversion = 4, 0.85, 0.84);
+boolean include_ofac := if(OFACversion = 4, True, False);
  
-biid_results := business_risk.InstantID_Function(prep,gateways,hasbdids,dppa,glb,isUtility,ln_branded,'pb01',ExcludeWatchLists,ofac, ofac_version := OFACversion, Global_WatchList_Threshold := Global_WatchList_Threshold, dataRestriction:=DataRestriction, dataPermission:=dataPermission);
+biid_results := business_risk.InstantID_Function(prep,gateways,hasbdids,dppa,glb,isUtility,ln_branded,'pb01',ExcludeWatchLists,ofac, ofac_version := OFACversion, include_ofac := include_ofac, Global_WatchList_Threshold := Global_WatchList_Threshold, dataRestriction:=DataRestriction, dataPermission:=dataPermission);
 dRoyalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Bus_Royalties');
 
 min2(integer L, integer R) :=  if (l < r , l, r);								
@@ -456,11 +457,8 @@ riskwise.layout_pb1o fillempty(biid_ret le) := transform
 	self.alertentity := if(le.rep_present, le.alertentity, '');
 end;
 
-
 res := project(biid_ret, fillempty(left));
 #STORED('Royalties', dRoyalties);
 return res;
 
 end;
-
-

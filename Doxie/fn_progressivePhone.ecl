@@ -41,8 +41,9 @@ EXPORT fn_progressivePhone := MODULE
 
 		PhonesFeedback_Services.Mac_Append_Feedback(ProgPhoneFilter,did,subj_phone10,ProgPhoneFilter_w_fb);
 		ProgPhoneFeedback := if(progphone_mod.IncludePhonesFeedback,ProgPhoneFilter_w_fb,ProgPhoneFilter);
+		ut.getTimeZone(ProgPhoneFeedback,subj_phone10,timeZone,ProgfinalOut);
 		
-		ProgPhoneGroup := GROUP(SORT(ProgPhoneFilter,acctno,-phone_score),acctno);
+		ProgPhoneGroup := GROUP(SORT(ProgfinalOut,acctno,-phone_score),acctno);
 
 		phoneRollRec := RECORD
 			UNSIGNED6 did;

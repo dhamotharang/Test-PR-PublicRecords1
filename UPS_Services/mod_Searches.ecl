@@ -1,4 +1,4 @@
-﻿import autoheaderi, autostandardi, doxie, doxie_cbrs, business_header, iesp, address, ut;
+﻿import autoheaderi, autostandardi, doxie, doxie_cbrs, business_header, iesp, address, UPS_Services, ut;
 
 
 export mod_Searches := MODULE
@@ -240,7 +240,7 @@ export mod_Searches := MODULE
 			MAP(
 				exists(bset) 
 					=> bset, 
-				Constants.DO_SECOND_SEARCH 
+				UPS_Services.Constants.DO_SECOND_SEARCH 
 					=> mod_SecondSearch.Business(in_mod).records,
 					DATASET([], doxie.layout_ref_bdid)
 			);
@@ -283,7 +283,7 @@ export mod_Searches := MODULE
 			// convert biz records to output layout
 			layout bizToLayoutTransform(biz L) := TRANSFORM
 				SELF.rollup_key := L.bdid;
-				SELF.rollup_key_type := Constants.TAG_ROLLUP_KEY_BDID;
+				SELF.rollup_key_type := UPS_Services.Constants.TAG_ROLLUP_KEY_BDID;
 				SELF.dt_last_seen := (INTEGER) L.dt_last_seen;
 				SELF.dt_first_seen := 0;
 				SELF.fname := '';
@@ -397,7 +397,7 @@ export mod_Searches := MODULE
 			MAP(
 				exists(dset) 
 					=> dset, 
-				Constants.DO_SECOND_SEARCH 
+				UPS_Services.Constants.DO_SECOND_SEARCH 
 					=> mod_SecondSearch.Individual(in_mod).records,
 					DATASET([], doxie.layout_references_hh)
 			);
@@ -419,7 +419,7 @@ export mod_Searches := MODULE
 			// convert records to output layout
 			layout indToLayoutTransform(ind L) := TRANSFORM
 				SELF.rollup_key := if (L.did <> 0, L.did, L.rid);
-				SELF.rollup_key_type := if (L.did <> 0, Constants.TAG_ROLLUP_KEY_DID, Constants.TAG_ROLLUP_KEY_RID);
+				SELF.rollup_key_type := if (L.did <> 0, UPS_Services.Constants.TAG_ROLLUP_KEY_DID, UPS_Services.Constants.TAG_ROLLUP_KEY_RID);
 
 				SELF.dt_last_seen := (INTEGER) L.dt_last_seen;
 				SELF.dt_first_seen := (INTEGER) L.dt_first_seen;
@@ -456,7 +456,7 @@ export mod_Searches := MODULE
 
 			resp := CHOOSEN(PROJECT(SORT(ind,did,rid), indToLayoutTransform(LEFT)), //now deterministic
 											Constant.MAX_SEARCH_RECORDS);
-			#if(Debug.debug_flag)
+			#if(UPS_Services.Debug.debug_flag)
 			// output(std_dids, NAMED('ind_std_dids'));
 			// output(par_dids, NAMED('ind_par_dids'));
 			output(resp, NAMED('ind_hdr'));

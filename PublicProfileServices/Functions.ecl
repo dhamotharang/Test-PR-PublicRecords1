@@ -1,10 +1,10 @@
-﻿IMPORT AutoStandardI,AutoHeaderI,doxie,ut;
+﻿IMPORT AutoStandardI,AutoHeaderI,doxie,PublicProfileServices,ut;
 
 autoStndGlbMod := AutoStandardI.GlobalModule();
 
 EXPORT Functions := MODULE
 
-	EXPORT FetchI_Hdr_Indv_do_hhid(IParam.searchParams rptByMod) := FUNCTION
+	EXPORT FetchI_Hdr_Indv_do_hhid(PublicProfileServices.IParam.searchParams rptByMod) := FUNCTION
 		glbMod := MODULE(PROJECT(rptByMod,autoStndGlbMod,OPT)),VIRTUAL
 			EXPORT BOOLEAN   IncludeMinors := TRUE;
 			EXPORT BOOLEAN   StrictMatch := TRUE;
@@ -18,7 +18,7 @@ EXPORT Functions := MODULE
 		RETURN AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(tmpmod);
 	END;
 
-	EXPORT FetchI_Hdr_Indv_do(IParam.searchParams rptByMod) := FUNCTION
+	EXPORT FetchI_Hdr_Indv_do(PublicProfileServices.IParam.searchParams rptByMod) := FUNCTION
 		glbMod := MODULE(PROJECT(rptByMod,autoStndGlbMod,OPT)),VIRTUAL
 			EXPORT BOOLEAN IncludeMinors := TRUE;
 			EXPORT BOOLEAN UseOnlyBestDid := TRUE;

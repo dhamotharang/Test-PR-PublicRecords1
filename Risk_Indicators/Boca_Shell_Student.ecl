@@ -24,7 +24,7 @@ export Boca_Shell_Student(GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, integ
 	student_file := join(ids_only, american_student_list.key_DID, 
 		left.did!=0 
 		and if(bsversion >= 4, true, if(right.source = MDR.sourceTools.src_OKC_Student_List, false, true)) 
-		and (~(right.source=mdr.sourceTools.src_OKC_Student_List and right.state in Risk_Indicators.iid_constants.Set_Restricted_States_For_Marketing) or isMarketing=false)
+		and (~(right.source=mdr.sourceTools.src_OKC_Student_List and right.collegeid in Risk_Indicators.iid_constants.Set_Restricted_Colleges_For_Marketing) or isMarketing=false)
 		and keyed(left.did=right.l_did)
 		and (unsigned3)(right.date_first_seen[1..6]) < left.historydate,
 		student(left,right), left outer, atmost(keyed(left.did=right.l_did), 100)

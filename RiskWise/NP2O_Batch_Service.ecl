@@ -34,17 +34,7 @@ tribcode := StringLib.StringToLowerCase(tribcode_value);
 
 productSet := ['np21','np22','np24','np25','np27','np50','np60','np80','np81','np82','np90', 'np91', 'np92'];
 
-BridgerGateway := Count(gateways_in(servicename='bridgerwlc')[1].url!='') > 0;
- 
-// Gateway.Layouts.Config gw_switch(gateways_in le) := transform
-	// self.servicename := map(IncludeTargus3220 and le.servicename = 'targus' => 'targuse3220',	// if E3220 requested, change servicename for later use
-													// le.servicename = 'bridgerwlc' and OFAC_version <> 4 => '',
-													// le.servicename);
-	// self.url := map(IncludeTargus3220 and le.servicename = 'targus' => le.url + '?ver_=1.39',	// need version 1.39 for E3220,
-										// le.servicename = 'bridgerwlc' and OFAC_version <> 4 => '',
-										// le.url); 
-	// self := le;
-// end;
+BridgerGateway := gateways_in(servicename='bridgerwlc')[1].url!='';
 
 OFACversion := map(BridgerGateway and tribcode = 'np21' => 4,
 																			tribcode in ['np90','np91','np92'] => 3,
@@ -57,6 +47,7 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
 	self.url := map(tribcode in attusSet and le.servicename = 'attus' => le.url, // attus gateway
 				 tribcode in targusGatewaySet and le.servicename = 'targus' => le.url, // targus gateway
+				 tribcode = 'np21' and le.servicename = 'bridgerwlc' => le.url, // bridger gateway
 				 ''); // default to no gateway call		
 	self := le;
 end;
