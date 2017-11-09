@@ -31,7 +31,7 @@ tribcode := StringLib.StringToLowerCase(tribcode_value);
 
 gateways_in := Gateway.Configuration.Get();
 
-BridgerGateway := Count(gateways_in(servicename='bridgerwlc')[1].url!='') > 0;
+BridgerGateway := gateways_in(servicename='bridgerwlc')[1].url!='';
 
 OFACversion := if(BridgerGateway and tribcode_value = '', 4, 1);
 

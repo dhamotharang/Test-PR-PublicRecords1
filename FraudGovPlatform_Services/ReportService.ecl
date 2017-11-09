@@ -10,7 +10,7 @@ IMPORT BatchShare;
 EXPORT ReportService() := MACRO
 
 		//The following macro defines the field sequence on WsECL page of query. 
-	  WSInput.MAC_FraudGovPlatform_Services_BatchService();
+	  WSInput.MAC_FraudGovPlatform_Services_ReportService();
 		
 		rec_in := iesp.fraudgovplatform.t_FraudGovReportRequest;
 		ds_in  := DATASET ([], rec_in) : STORED ('FraudGovReportRequest', FEW);
@@ -90,16 +90,18 @@ EXPORT ReportService() := MACRO
 	batch_params_mod := FraudGovPlatform_Services.IParam.getBatchParams();
 	report_mod := GetReportModule(first_row.reportBy);
 
-	//Get the associated DID's
-	BatchShare.MAC_AppendPicklistDID(report_mod(did=0), ds_batch_with_did, batch_params_mod, FALSE);	
-	report_mod_w_did := report_mod(did != 0) + ds_batch_with_did;
-								
-	tmp := FraudGovPlatform_Services.ReportRecords(report_mod_w_did, batch_params_mod);
+	// **************************************************************************************
+ // Append DID for Input PII
+ // **************************************************************************************	  
+	ds_batch_in_with_did := BatchShare.MAC_Get_Scored_DIDs(report_mod, batch_params_mod, usePhone:=TRUE);
+
+	tmp := FraudGovPlatform_Services.ReportRecords(ds_batch_in_with_did, batch_params_mod);
 	
 	//Final iESP Form Conversion
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tmp, 
 																																											 results, 
 																																											 iesp.fraudgovplatform.t_FraudGovReportResponse);
+											
 	output(results, NAMED('Results'));	
 	
 ENDMACRO;

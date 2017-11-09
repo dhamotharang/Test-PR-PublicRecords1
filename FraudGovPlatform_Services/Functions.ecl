@@ -1,4 +1,4 @@
-﻿IMPORT CriminalRecords_BatchService, FraudGovPlatform_Services, FraudShared_Services, ut;
+﻿IMPORT CriminalRecords_BatchService, FraudGovPlatform_Services, FraudShared_Services, ut, std;
 
 EXPORT Functions := MODULE
 	EXPORT getKnownFraudCodeDescLookup (String KnownFraudCode) := FUNCTION
@@ -63,7 +63,7 @@ EXPORT Functions := MODULE
     eventType2 := ',' + getKnownFraudCodeDescLookup(event_type2);
     eventType3 := ',' + getKnownFraudCodeDescLookup(event_type3);
 
-    RETURN TRIM(eventDates + eventType1 + eventType2 + eventType3);
+    RETURN std.str.cleanspaces(TRIM(eventDates + eventType1 + eventType2 + eventType3));
   END;
 	
 	EXPORT getExternalServicesRecs(	DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in, 
@@ -157,10 +157,13 @@ EXPORT Functions := MODULE
 															LEFT.batchin_rec.acctno = RIGHT.acctno,
 															TRANSFORM(slim_knownrisk_rec,
 																SELF.acctno := RIGHT.acctno,
-																SELF.known_risk_reason := MAP(LEFT.batchin_rec.did = (UNSIGNED6)RIGHT.did OR 
-																															(RIGHT.matchcode = 'SN' AND LEFT.batchin_rec.dob = RIGHT.dob8) => 'Identity is deceased on ' + ut.date_YYYYMMDDtoDateSlashed(RIGHT.dod8),
-																															RIGHT.matchcode IN ['AN', 'ANZ', 'ANC', 'ANS', 'NCZ'] AND
-																															LEFT.batchin_rec.dob = RIGHT.dob8 => 'Identity elements associated with deceased individual on ' + ut.date_YYYYMMDDtoDateSlashed(RIGHT.dod8),
+																SELF.known_risk_reason := MAP(RIGHT.matchcode IN ['SN', 'S', 'ANSZC', 'ANSZ', 'ANSC', 'ANS', 'SNCZ', 'SNC', 'SNZ'] AND
+																															LEFT.batchin_rec.dob = RIGHT.dob8 => 'Identity is deceased on ' + ut.date_YYYYMMDDtoDateSlashed(RIGHT.dod8),
+																															
+																															(LEFT.batchin_rec.did = (unsigned6) RIGHT.did and RIGHT.matchcode = '') OR
+																															(RIGHT.matchcode IN ['N','Z','NZ'] AND
+																															LEFT.batchin_rec.dob = RIGHT.dob8) => 'Identity elements associated with deceased individual on ' + ut.date_YYYYMMDDtoDateSlashed(RIGHT.dod8),
+																														 
 																														 ''),
 																SELF.event_date := RIGHT.dod8,
 																SELF.event_type := 'Death'));

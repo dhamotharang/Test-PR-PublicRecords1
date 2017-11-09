@@ -526,16 +526,18 @@ EXPORT phone_noreconn_search := MACRO
 	//
 	dt_first_seenValueTrimmed := trim((string) (srchMod.datefirstseen),left,right);
 	dt_last_seenValueTrimmed := trim((string) (srchMod.datelastseen),left,right);
-
-	dt_first_seenValue := if (length(dt_first_seenValueTrimmed) = 6, srchMod.datefirstseen * 100, 0); 
+  len_dt_first_seenValueTrimmmed := length(dt_first_seenValueTrimmed);
+	len_dt_last_seenValueTrimmed :=   length(dt_last_seenValueTrimmed);
+	dt_first_seenValue := if (len_dt_first_seenValueTrimmmed = 6, srchMod.datefirstseen, 0); 
                           
-	dt_last_seenValue  := if (length(dt_last_seenValueTrimmed) = 6, srchMod.datelastseen * 100, 0);
+	dt_last_seenValue  := if (len_dt_last_seenValueTrimmed = 6, srchMod.datelastseen, 0);
 														
 	// srchmod.datefirstSeen and srchmod.datelastseen always 6 in length set by autostandardi.intefacetranslator											    
-	// called within the doxie.MAC_Header_Field_Declare() above.
-  dt_filterOk :=  ((Length(dt_first_seenValueTrimmed) = 6) and (LENGTH(dt_last_seenValueTrimmed) = 6)) OR
-	                ((Length(dt_first_seenValueTrimmed) = 6) and srchMod.datelastseen = 0) OR
-									((srchMod.datefirstseen = 0 AND LENGTH(dt_last_seenValueTrimmed) = 6));
+	// called within the doxie.MAC_Header_Field_Declare() above.  Double check here so that filter below
+	// is done correctly.
+  dt_filterOk :=  ((len_dt_first_seenValueTrimmmed = 6) and (len_dt_last_seenValueTrimmed = 6)) OR
+	                ((len_dt_first_seenValueTrimmmed = 6) and srchMod.datelastseen = 0) OR
+									(srchMod.datefirstseen = 0 AND len_dt_last_seenValueTrimmed = 6);
   ds_results_ported_checked_gatewayOnly := ds_results_ported_checked(vendor_id = 'TG' OR
 	                                                                   vendor_id ='MN' OR
 																																		 typeflag = 'I' OR
@@ -547,14 +549,14 @@ EXPORT phone_noreconn_search := MACRO
 	
                                                                                                                  
 	ds_results_ported_checkedFilteredSlimBoth := ds_results_ported_checked_nonGateway(
-	                                                ((unsigned4) (dt_first_seen[1..8])) >= dt_first_seenValue   and 
-                                                  ((unsigned4) (dt_last_seen[1..8])) <= dt_last_seenValue																								
+	                                                ((unsigned4) (dt_first_seen[1..6])) >= dt_first_seenValue   and 
+                                                  ((unsigned4) (dt_last_seen[1..6])) <= dt_last_seenValue																								
 																												);
 	ds_results_ported_checkedFilteredSlimJustFirstSeen := ds_results_ported_checked_nonGateway(
-	                                                 (((unsigned4) (dt_first_seen[1..8])) >= dt_first_seenValue)																									  
+	                                                 (((unsigned4) (dt_first_seen[1..6])) >= dt_first_seenValue)																									  
                                                         );
 	ds_results_ported_checkedFilteredSlimJustLastSeen := ds_results_ported_checked_nonGateway(
-	                                                      (((unsigned4) (dt_last_seen[1..8]))<= dt_last_seenValue)																												
+	                                                      (((unsigned4) (dt_last_seen[1..6]))<= dt_last_seenValue)																												
 																												           );																				 																										 
 	ds_results_ported_checkedFilteredDateTmp := IF (srchMod.DateFirstSeen <> 0 and srchMod.DateLastSeen <> 0 and dt_filterOK,
                               ds_results_ported_checkedFilteredSlimBoth,
@@ -570,7 +572,7 @@ EXPORT phone_noreconn_search := MACRO
 																					   
 	// ** END *** of mods for Reverse Search Plus to filter on dt_last/first_seen
 																		
-  // FB  in attr names stands for phones FeedBack (FB)																		
+  // the string 'FB'  in attr names stands for phones FeedBack (FB)																		
 
 	doxie.MAC_Marshall_Results_NoCount(ds_results_ported_checkedFilteredDate,resultsPreFB,,disp_cnt);
 
@@ -613,6 +615,10 @@ EXPORT phone_noreconn_search := MACRO
   //OUTPUT(dt_filterOk, named('dt_filterOk'));
 	// output(dt_first_seenValueTrimmed, named('dt_first_seenValueTrimmed'));
 	// output(dt_last_seenValueTrimmed, named('dt_last_seenValueTrimmed'));
+	// output(ds_results_ported_checked_nonGateway, named('ds_results_ported_checked_nonGateway'));
+	// output(dt_last_seenValueTrimmed, named('dt_last_seenValueTrimmed'));
+  // output(dt_last_seenValue, named('dt_last_seenValue'));
+	// output(ds_results_ported_checkedFilteredDate, named('ds_results_ported_checkedFilteredDate'));
 	// output(resultsWithAddrFBFilteredSlimJustFirstSeen, named('resultsWithAddrFBFilteredSlimJustFirstSeen'));
 	// output(resultsWithAddrFBFilteredSlimJustLastSeen, named('resultsWithAddrFBFilteredSlimJustLastSeen'));
 	// output(ds_results_ported_checked, named('ds_results_ported_checked'));
