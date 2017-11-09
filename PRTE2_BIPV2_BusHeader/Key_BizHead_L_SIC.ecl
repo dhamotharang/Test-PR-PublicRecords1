@@ -27,7 +27,7 @@ layout := RECORD // project out required fields
   h.prim_name_e1_Weight100;
 END;
  
-s := PRTE2_BIPV2_BusHeader.Specificities(File_BizHead).Specificities[1];
+s := PRTE2_BIPV2_BusHeader.Specificities(PRTE2_BIPV2_BusHeader.File_BizHead).Specificities[1];
  
 DataForKey0 := DEDUP(SORT(TABLE(h((company_sic_code1 NOT IN SET(s.nulls_company_sic_code1,company_sic_code1) AND company_sic_code1 <> (TYPEOF(company_sic_code1))''),(zip NOT IN SET(s.nulls_zip,zip) AND zip <> (TYPEOF(zip))'')),layout),WHOLE RECORD,LOCAL),WHOLE RECORD,LOCAL); // Project out the fields in match candidates required for this Name()
  

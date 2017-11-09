@@ -42,10 +42,10 @@ function
 		integer2  total_score                 ;
 	 end;
 
-	ds_get_seleid1 := join(ds_BH_rel        ,ds_bip ,left.bdid1 = right.company_bdid ,transform({unsigned6 seleid1,recordof(ds_BH_rel     )}  ,self.seleid1 := right.seleid,self := left),hash);
-	ds_get_seleid2 := join(ds_get_seleid1   ,ds_bip ,left.bdid2 = right.company_bdid ,transform({unsigned6 seleid2,recordof(ds_get_seleid1)}  ,self.seleid2 := right.seleid,self := left),hash);
-	ds_get_dates1 := join(ds_get_seleid2  ,PRTE2_Business_Header.BH_Init() ,left.bdid1 = right.bdid ,transform({unsigned4 dt_first_seen_track ,recordof(ds_get_seleid2)},self.dt_first_seen_track := (unsigned4)right.dt_first_seen,self := left),hash);
-	ds_get_dates2 := join(ds_get_dates1   ,PRTE2_Business_Header.BH_Init() ,left.bdid1 = right.bdid ,transform({unsigned4 dt_last_seen_track ,recordof(ds_get_dates1  )},self.dt_last_seen_track  := (unsigned4)right.dt_last_seen ,self := left),hash);
+	ds_get_seleid1 := join(ds_BH_rel      ,dedup(sort(ds_bip,company_bdid,seleid),company_bdid) ,left.bdid1 = right.company_bdid ,transform({unsigned6 seleid1,recordof(ds_BH_rel     )}  ,self.seleid1 := right.seleid,self := left),hash);
+	ds_get_seleid2 := join(ds_get_seleid1 ,dedup(sort(ds_bip,company_bdid,seleid),company_bdid) ,left.bdid2 = right.company_bdid ,transform({unsigned6 seleid2,recordof(ds_get_seleid1)}  ,self.seleid2 := right.seleid,self := left),hash);
+	ds_get_dates1 := join(ds_get_seleid2  ,dedup(sort(PRTE2_Business_Header.BH_Init()(trim(dt_first_seen) != ''),bdid,dt_first_seen),bdid) ,left.bdid1 = right.bdid ,transform({unsigned4 dt_first_seen_track ,recordof(ds_get_seleid2)},self.dt_first_seen_track := (unsigned4)right.dt_first_seen,self := left),hash,left outer);
+	ds_get_dates2 := join(ds_get_dates1   ,dedup(sort(PRTE2_Business_Header.BH_Init()(trim(dt_last_seen ) != ''),bdid,dt_last_seen ),bdid) ,left.bdid1 = right.bdid ,transform({unsigned4 dt_last_seen_track ,recordof(ds_get_dates1  )},self.dt_last_seen_track  := (unsigned4)right.dt_last_seen ,self := left),hash,left outer);
 
 	ds_result := project(ds_get_dates2 ,transform(lay_sele_relative
 		,self.seleid1                       := left.seleid1 

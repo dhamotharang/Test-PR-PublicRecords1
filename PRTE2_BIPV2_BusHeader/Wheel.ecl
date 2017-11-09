@@ -3,7 +3,7 @@ IMPORT BizLinkFull,ut,SALT33;
 SHARED ExactMatchLimit := 3;
  
 EXPORT KeyName_city_clean := PRTE2_BIPV2_BusHeader.Filename_keys.Wheel_city_clean; /*HACK07Wheel_city_clean*/
-SpecMod := BizLinkFull.specificities(PRTE2_BIPV2_BusHeader.File_BizHead);
+SpecMod := PRTE2_BIPV2_BusHeader.specificities(PRTE2_BIPV2_BusHeader.File_BizHead);
 /*HACK02*/ SHARED city_cleanDS := TABLE(SpecMod.city_clean_values_persisted, {SALT33.Str30Type prefix := SpecMod.city_clean_values_persisted.city_clean;  REAL8 specificity := SpecMod.city_clean_values_persisted.field_specificity;});
  
 EXPORT Key_city_clean := INDEX(city_cleanDS,{prefix},{city_cleanDS},KeyName_city_clean);
