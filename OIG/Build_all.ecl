@@ -1,4 +1,4 @@
-import versioncontrol, _control, ut,Roxiekeybuild, lib_stringlib, OIG;
+﻿import versioncontrol, _control, ut,Roxiekeybuild, lib_stringlib, OIG, Orbit3;
 
 export Build_all(string    pVersion,string filedate) := function 
                      
@@ -67,7 +67,9 @@ export Build_all(string    pVersion,string filedate) := function
     VersionControl.macBuildNewLogicalFile(OIG.Filenames(pversion).base.new,Base,Build_Base_File);
                         
     dops_update           := Roxiekeybuild.updateversion('OIGKeys',pVersion,'saritha.myana@lexisnexis.com;Randy.Reyes@lexisnexisrisk.com;Manuel.Tarectecan@lexisnexisrisk.com;Abednego.Escobal@lexisnexisrisk.com',,'N'); 
-                                                            
+    
+    orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('OIG',(string)pVersion,'N');
+	
     full_build            := sequential (nothor(apply(OIG.filenames().Base.dAll_filenames, apply(dSuperfiles, versioncontrol.mUtilities.createsuper(name))))
                                          ,nothor(apply(OIG.Keynames(pversion).dall_filenames, apply(dSuperfiles,VersionControl.mUtilities.createsupers(OIG.Keynames(pversion).dall_filenames))))
                                          ,CreateTempKeyBuildIfNotExist
@@ -85,6 +87,7 @@ export Build_all(string    pVersion,string filedate) := function
                                          ,output(choosen(OIG.Files().KeyBase.qa(addr_type='P'and did<> 0) , 1000), named ('Sample_KeyBasefile_PeopleRecords'))
                                          ,OIG.Out_base_OIG_stats_pop(pVersion)
                                          ,dops_update
+                                         ,orbit_update
                                          ): success(OIG.send_email(pversion).buildsuccess), failure(OIG.send_email(pversion).buildfailure);
                                                                      
 
