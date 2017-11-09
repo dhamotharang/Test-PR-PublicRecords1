@@ -31,9 +31,9 @@ export Proc_Build_All(string filedate, string version) := function
 
 	//Update ORBIT
 	orbitUpdate := Orbit3.proc_Orbit3_CreateBuild('OSHAIR',filedate,'N|B'); 
-	return sequential(oshair.promote(filedate).Inputfiles.Sprayed2Using,
-										process_date, 
+	return sequential(process_date, 
 										spray_files,
+										oshair.promote(filedate).Inputfiles.Sprayed2Using,
 										clean_data,
 										oshair.promote(version).buildfiles.new2built,
 										build_keys,
