@@ -425,8 +425,8 @@ risk_indicators.layout_input into(d l) := transform
 	
 	SELF.employer_name := stringlib.stringtouppercase(cmpy_value);
 	SELF.lname_prev := stringlib.stringtouppercase(formerlast_value);
-	self.historydate := history_date;
-	self.historyDateTimeStamp := historyDateTimeStamp;
+	SELF.historydate := IF(historyDateTimeStamp <> '', (UNSIGNED)historyDateTimeStamp[1..6], history_date);
+	SELF.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(historydateTimeStamp, history_date);
 end;
 prep := PROJECT(d,into(LEFT));
 
@@ -444,7 +444,8 @@ risk_indicators.layout_input into2 := TRANSFORM
 	SELF.in_state         := if(model_name='fp1509_2', '', stringlib.stringtouppercase(state2_value));
 	SELF.in_zipCode       := if(model_name='fp1509_2', cmRetailZipValue, zip2_value);
 	SELF.phone10          := hphone2_value;	
-	SELF.historydate      := history_date;
+	SELF.historydate := IF(historyDateTimeStamp <> '', (UNSIGNED)historyDateTimeStamp[1..6], history_date);
+	SELF.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(historydateTimeStamp, history_date);
 	SELF := [];
 END;
 
