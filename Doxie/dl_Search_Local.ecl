@@ -7,7 +7,9 @@ boolean random_value := false : STORED('Randomize');
 doxie.MAC_Header_Field_Declare()
 doxie.MAC_Selection_Declare()
 
-dids := IF(did_value = '', get_dids())(Include_DriversLicenses_val);
+dids := IF (did_value = '', 
+            PROJECT (doxie.get_dids(), doxie.layout_references),
+            DATASET ([{did_value}], doxie.layout_references)) (Include_DriversLicenses_val);
 
 outf2 := Doxie_Raw.DL_Raw(dids,
     dateVal,
