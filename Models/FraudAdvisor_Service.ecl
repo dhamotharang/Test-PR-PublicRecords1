@@ -425,8 +425,8 @@ risk_indicators.layout_input into(d l) := transform
 	
 	SELF.employer_name := stringlib.stringtouppercase(cmpy_value);
 	SELF.lname_prev := stringlib.stringtouppercase(formerlast_value);
-	self.historydate := history_date;
-	self.historyDateTimeStamp := historyDateTimeStamp;
+	SELF.historydate := IF(historyDateTimeStamp <> '', (UNSIGNED)historyDateTimeStamp[1..6], history_date);
+	SELF.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(historydateTimeStamp, history_date);
 end;
 prep := PROJECT(d,into(LEFT));
 
@@ -444,7 +444,8 @@ risk_indicators.layout_input into2 := TRANSFORM
 	SELF.in_state         := if(model_name='fp1509_2', '', stringlib.stringtouppercase(state2_value));
 	SELF.in_zipCode       := if(model_name='fp1509_2', cmRetailZipValue, zip2_value);
 	SELF.phone10          := hphone2_value;	
-	SELF.historydate      := history_date;
+	SELF.historydate := IF(historyDateTimeStamp <> '', (UNSIGNED)historyDateTimeStamp[1..6], history_date);
+	SELF.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(historydateTimeStamp, history_date);
 	SELF := [];
 END;
 
@@ -511,9 +512,11 @@ end;
 //Options copied over from targets np31 model to make it work the same in FraudAdvisor
 //These options are being hard coded to prevent target's fp1403_2 model from changing if FraudAdvisor settings change
 DisableInquiriesInCVI := True;																																								//Disable Customer Network: True
-unsigned3 LastSeenThresholdIn := if(model_name IN ['fp1403_2','fp1510_2'], 730, 
-																		if(doAttributesVersion201, 9999, risk_indicators.iid_constants.oneyear)
-																		);	//Last Seen Threshold: 365 days (1 year) for fp1403_2, otherwise use default
+unsigned3 LastSeenThresholdIn := map(	
+																		model_name IN ['fp1702_1','fp1702_2'] => risk_indicators.iid_constants.max_unsigned3,
+																		model_name IN ['fp1403_2','fp1510_2'] => 730, 
+																		doAttributesVersion201 => 9999,
+																		risk_indicators.iid_constants.oneyear);	//Last Seen Threshold: 365 days (1 year) for fp1403_2, otherwise use default
 DisallowInsurancePhoneHeaderGateway := FALSE;																																	//Set to True to deny access to Insurance Phone Header Gateway
 boolean doInquiries := ~DisableInquiriesInCVI AND dataRestriction[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue AND model_name IN ['fp1403_2','fp1510_2'];
 
