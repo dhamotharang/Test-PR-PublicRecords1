@@ -2,8 +2,7 @@
 
 export normalize_violations(string filedate, string process_date):= FUNCTION
 
-Violation := oshair.files().input.Violation.sprayed;
-
+Violation 				 := oshair.files().input.Violation.using;
 violations_cleaned := OSHAIR.layout_OSHAIR_violations_clean;
 
 violations_cleaned normalize_violation(Violation L) := TRANSFORM
@@ -42,23 +41,22 @@ violations_cleaned normalize_violation(Violation L) := TRANSFORM
 end;
 
 ds_Violations 	:= 	project(Violation,normalize_violation(LEFT));
-
-dsAllViolations	:=	distribute((OSHAIR.file_out_violations_cleaned + ds_Violations),hash32(Activity_Number));
+dsAllViolations	:=	distribute((OSHAIR.Files().base.Violations.qa+ ds_Violations),hash32(Activity_Number));
 
 OSHAIR.layout_OSHAIR_violations_clean RollupViolations(OSHAIR.layout_OSHAIR_violations_clean l, OSHAIR.layout_OSHAIR_violations_clean r) := transform
-	self.dt_first_seen  := ut.EarliestDate(l.dt_first_seen ,r.dt_first_seen	);  
-	self.dt_last_seen 	:= ut.LatestDate  (l.dt_last_seen	 ,r.dt_last_seen	);
+	self.dt_first_seen  					:= ut.EarliestDate(l.dt_first_seen ,r.dt_first_seen	);  
+	self.dt_last_seen 						:= MAX(l.dt_last_seen	 ,r.dt_last_seen	);
 	self.dt_vendor_first_reported := ut.EarliestDate(l.dt_vendor_first_reported	,r.dt_vendor_first_reported	);	
-  self.dt_vendor_last_reported 	:= ut.LatestDate	(l.dt_vendor_last_reported	,r.dt_vendor_last_reported	);
-	self := l;
+  self.dt_vendor_last_reported 	:= MAX(l.dt_vendor_last_reported	,r.dt_vendor_last_reported	);
+	self												  := l;
 end;
 
 ViolationsRollup	:= rollup(sort(dsAllViolations,record, except dt_first_seen,dt_last_seen, 
-														  dt_vendor_first_reported, dt_vendor_last_reported, local)
-										, RollupViolations(left, right), record
-										,except dt_first_seen, dt_last_seen, 
-														dt_vendor_first_reported, dt_vendor_last_reported
-										, local);
+														dt_vendor_first_reported, dt_vendor_last_reported, local)
+														, RollupViolations(left, right), record
+														,except dt_first_seen, dt_last_seen, 
+																		dt_vendor_first_reported, dt_vendor_last_reported
+														, local);
 
 return output(ViolationsRollup,,'~thor_data400::base::oshair::' + filedate + '::violations',compressed,overwrite);
 

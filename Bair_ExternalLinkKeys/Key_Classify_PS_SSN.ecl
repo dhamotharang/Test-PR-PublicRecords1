@@ -1,4 +1,4 @@
-IMPORT SALT33,ut,std;
+﻿IMPORT SALT33,ut,std;
 EXPORT Key_Classify_PS_SSN := MODULE
  
 //POSSIBLE_SSN:?:MAINNAME:+:SEARCH_ADDR1:P_CITY_NAME:ST:DOB
@@ -93,8 +93,8 @@ EXPORT ScoredEID_HASHFetch(TYPEOF(h.POSSIBLE_SSN) param_POSSIBLE_SSN = (TYPEOF(h
   RawData := RawFetch(param_POSSIBLE_SSN,param_FNAME,param_MNAME,param_LNAME);
  
   Process_PS_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 10; // Set bitmap for key used
-    SELF.keys_failed := IF(le.EID_HASH = 0, 1 << 10, 0); // Set bitmap for key failed
+    SELF.keys_used := 1 << 11; // Set bitmap for key used
+    SELF.keys_failed := IF(le.EID_HASH = 0, 1 << 11, 0); // Set bitmap for key failed
     SELF.POSSIBLE_SSN_match_code := MAP(le.POSSIBLE_SSN = (TYPEOF(le.POSSIBLE_SSN))'' OR le.POSSIBLE_SSN = (TYPEOF(le.POSSIBLE_SSN))'' => SALT33.MatchCode.OneSideNull,match_methods(File_Classify_PS).match_POSSIBLE_SSN(le.POSSIBLE_SSN,param_POSSIBLE_SSN,0,0,TRUE));
     SELF.POSSIBLE_SSNWeight := (50+MAP ( le.POSSIBLE_SSN = param_POSSIBLE_SSN  => le.POSSIBLE_SSN_weight100,
           le.POSSIBLE_SSN = (TYPEOF(le.POSSIBLE_SSN))'' OR param_POSSIBLE_SSN = (TYPEOF(le.POSSIBLE_SSN))'' => 0,
@@ -189,7 +189,7 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex) := FUN
  
   Process_PS_Layouts.LayoutScoredFetch Score_Batch(Key le,recs ri) := TRANSFORM
     SELF.Reference := ri.reference; // Copy reference field
-    SELF.keys_used := 1 << 10; // Set bitmap for key used
+    SELF.keys_used := 1 << 11; // Set bitmap for key used
     SELF.keys_failed := 0; // Set bitmap for key failed
     SELF.POSSIBLE_SSN_match_code := MAP(le.POSSIBLE_SSN = (TYPEOF(le.POSSIBLE_SSN))'' OR le.POSSIBLE_SSN = (TYPEOF(le.POSSIBLE_SSN))'' => SALT33.MatchCode.OneSideNull,match_methods(File_Classify_PS).match_POSSIBLE_SSN(le.POSSIBLE_SSN,ri.POSSIBLE_SSN,0,0,TRUE));
     SELF.POSSIBLE_SSNWeight := (50+MAP ( le.POSSIBLE_SSN = ri.POSSIBLE_SSN  => le.POSSIBLE_SSN_weight100,

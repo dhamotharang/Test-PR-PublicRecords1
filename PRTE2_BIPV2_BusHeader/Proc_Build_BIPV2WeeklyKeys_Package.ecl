@@ -15,7 +15,7 @@ function
 	Build_dir_linkids       := tools.macf_writeindex('Key_Directories_Linkids.key ,knames.directories_linkids.new');
 
 	BuildWeeklyKeys := 
-	parallel(
+	sequential(
 		 Build_contact_linkids
 		,PRTE2_BIPV2_BusHeader.Promote(pversion,'^~prte.*?key.*contact_linkids$').New2Built
 		,Build_dir_linkids

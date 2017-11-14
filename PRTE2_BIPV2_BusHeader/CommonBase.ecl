@@ -67,7 +67,8 @@ EXPORT CommonBase := MODULE
 		IMPORT Suppress;
 		ds_exorcise := ds(ingest_status<>'Old'); // Exorcise all ghosts, which _can_ remove cluster base records!
 		ds_exclude  := ds_exorcise(BIPV2.mod_sources.srcInBase(source));
-		ds_reg      := Suppress.applyRegulatory.applyBIPV2(ds_exclude);
+		//ds_reg      := Suppress.applyRegulatory.applyBIPV2(ds_exclude);
+		ds_reg      := ds_exclude;
 		RETURN ds_reg;
 	ENDMACRO;
   
@@ -80,7 +81,8 @@ EXPORT CommonBase := MODULE
 		IMPORT Suppress;
 		ds_exorcise := ds(ingest_status<>'Old'); // Exorcise all ghosts, which _can_ remove cluster base records!
 		ds_exclude  := ds_exorcise(BIPV2.mod_sources.srcInXlink(source));
-		ds_reg      := Suppress.applyRegulatory.applyBIPV2(ds_exclude);
+		//ds_reg      := Suppress.applyRegulatory.applyBIPV2(ds_exclude);
+		ds_reg      := ds_exclude;
 		RETURN ds_reg;
 	ENDMACRO;
 
