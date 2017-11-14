@@ -11,9 +11,12 @@ EXPORT SuppressID(string datasetname,
 																		,false);
 	
 	shared thresholddate := '20171201000000';
-	shared ProdOrDev := if (useLocal or dops.constants.ThorEnvironment = 'prod'
+	shared ProdOrDev := if (~useLocal 
+													,if (dops.constants.ThorEnvironment = 'prod'
+																,'~'
+																,Data_Services.foreign_prod)
 													,'~'
-													,Data_Services.foreign_prod);
+													);
 	
 	export rSuppressLayout := record
 		string idvalue;
