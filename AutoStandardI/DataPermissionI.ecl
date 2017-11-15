@@ -30,6 +30,7 @@
 				EXPORT use_ZumigoIdentity	:= in_mod.DataPermissionMask[21] NOT IN restrictedSet;
         // per MBS team: DPM 22, is reserved for HealthLinkDimensions 
         EXPORT use_EquifaxAcctDecisioning := in_mod.DataPermissionMask[23] NOT IN restrictedSet;
+				EXPORT use_AccuityBankData := in_mod.DataPermissionMask[24] NOT IN restrictedSet;
 				EXPORT STRING permission_mask := in_mod.DataPermissionMask;
 	END;
 END;

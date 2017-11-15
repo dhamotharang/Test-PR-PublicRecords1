@@ -66,72 +66,45 @@ MODULE
 	dWaterfallResults := PhoneFinder_Services.DIDSearch(dInNoPhone,inMod,dGateways,dInNoPhoneBestInfo);
 
 	//combine results to get phone metadata
-	dSearchRecs_pre		:= UNGROUP(dPhoneSearchResults + dWaterfallResults);
-
-  SHARED dSearchRecs		 := dSearchRecs_pre(((did <> 0 AND fname <> ''AND lname <> '') OR typeflag = Phones.Constants.TypeFlag.DataSource_PV) OR listed_name <> '');
-
-  dInRecs	:= IF(inMod.TransactionType=PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
-																PROJECT(dInPhone,TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final,
-																																SELF.acctno:=LEFT.acctno, 
-																																SELF.seq:=LEFT.seq, 
-																																SELF.phone:=LEFT.homephone, 
-																																SELF.batch_in.homephone:=LEFT.homephone, 
-																																SELF:=[])),
-																dSearchRecs);	
+ 	SHARED dSearchRecs_pre		:= UNGROUP(dPhoneSearchResults + dWaterfallResults);
 	
-  //phone searches do not generate other phones related to the subject, hence all phone searches are subject related.
-	needPortingInfo 	:= IF(inMod.SubjectMetadataOnly,dInRecs(isprimaryphone OR batch_in.homephone<>''),dInRecs);
-
-	//reduce layout by selecting necessary fields
-	PhoneFinder_Services.Layouts.SubjectPhone getSubjectPhone(needPortingInfo l) := TRANSFORM
-			SELF.acctno := l.acctno;
-			SELF.did := l.did;
-			SELF.phone := l.phone;
-			//If phone record occurs after first_seen minus 5 days the date field in the port/spoof table will associate active with subject.
-			SELF.FirstSeenDate := IF((UNSIGNED)l.dt_first_seen<> 0,(UNSIGNED)ut.date_math(l.dt_first_seen, -PhoneFinder_Services.Constants.PortingMarginOfError),0);
-			SELF.LastSeenDate  := IF((UNSIGNED)l.dt_last_seen <> 0,(UNSIGNED)ut.date_math(l.dt_last_seen, PhoneFinder_Services.Constants.PortingMarginOfError), 0); 
-	END;
-	dsSubjects := PROJECT(needPortingInfo,getSubjectPhone(LEFT));			
-			
-		//rollup to get comprehensive port period
-	PhoneFinder_Services.Layouts.SubjectPhone rollSubject(PhoneFinder_Services.Layouts.SubjectPhone l,PhoneFinder_Services.Layouts.SubjectPhone r) := TRANSFORM
-			SELF.FirstSeenDate := ut.Min2(l.FirstSeenDate,r.FirstSeenDate);
-			SELF               := l;
-	END;
-	SHARED subjectInfo:= ROLLUP(SORT(dsSubjects,acctno,did,phone,-LastSeenDate,FirstSeenDate),
-														LEFT.acctno=RIGHT.acctno AND
-														LEFT.did=RIGHT.did AND
-														LEFT.phone=RIGHT.phone,
-														rollSubject(LEFT,RIGHT));	
+  SHARED dSearchRecs		 := dSearchRecs_pre(((did <> 0 AND fname <> ''AND lname <> '') OR typeflag = Phones.Constants.TypeFlag.DataSource_PV) OR listed_name <> '');
+	
+  SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dInPhone, dSearchRecs, inMod);
 														
   ds_in_accu := IF(inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment,
 	                 project(dedup(sort(dInPhone, acctno), acctno),
 									 transform(PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in, self.acctno := left.acctno, self.phone := left.homephone)),
 									 project(dSearchRecs(typeflag = Phones.Constants.TypeFlag.DataSource_PV), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in));
 									 
-	AccuDataGateway := if(inMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));
+ 	AccuDataGateway := if(inMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));
   SHARED accu_porting := PhoneFinder_Services.GetAccuDataPhones.GetAccuData_Ocn_PortingData(ds_in_accu,
 	                                                                                          AccuDataGateway[1]);	
-																																														
-	accu_inport := PROJECT(accu_porting, PhoneFinder_Services.Layouts.PortedMetadata);	
+	 accu_inport := PROJECT(accu_porting, PhoneFinder_Services.Layouts.PortedMetadata);	
 	
-	SHARED ported_phones := IF(inMod.IncludePhoneMetadata, 
-		                           PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs,inMod,dGateways,subjectInfo,accu_inport(port_end_dt <> 0)),
-															 dSearchRecs);																	 
+	 SHARED ported_phones := IF(inMod.IncludePhoneMetadata, 
+		                           PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs,inMod,dGateways,dSubjectInfo,accu_inport(port_end_dt <> 0)),
+															              dSearchRecs);																	 
    
 	SHARED Zum_gw_recs := PhoneFinder_Services.GetZumigoIdentity_Records(ported_phones, dinBestInfo, inMod, dGateways);
 	SHARED Zumigo_recs:= Zum_gw_recs.Zumigo_GLI;
 
-	
-  SHARED Zum_final := if(inMod.UseZumigoIdentity, Zumigo_recs, ported_phones);
+	SHARED Zum_final := if(inMod.UseZumigoIdentity, Zumigo_recs, ported_phones);
 
 	dSearchResultsUnfiltered := IF((inMod.IncludePhoneMetadata AND EXISTS(dSearchRecs))
 																					OR (inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment AND EXISTS(dInPhone))
-																																	,PhoneFinder_Services.GetPhonesMetadata(Zum_final,inMod,dGateways,dinBestInfo,dInPhone,subjectInfo)
+																																	,PhoneFinder_Services.GetPhonesMetadata(Zum_final,inMod,dGateways,dinBestInfo,dInPhone,dSubjectInfo)
 																																	,Zum_final);
-																																	
-	PhoneSearchResults:=UNGROUP(dSearchResultsUnfiltered(acctno IN SET(dInPhone,acctno)));
-	DidSearchResults	:=UNGROUP(dSearchResultsUnfiltered(acctno NOT IN SET(dInPhone,acctno)));
+    // restriction added here if plugin from batch is set to true ....
+		//  if not then don't do any restrictions.																																	
+   dSearchResultsUnfilteredFinal := IF (inMod.DirectMarketingSourcesOnly, 
+	                                  dSearchResultsUnfiltered(src NOT IN (PhoneFinder_Services.Constants.BatchRestrictedDirectMarketingSourcesSet)), 
+								                           dSearchResultsUnfiltered);																																	
+  // output(dSearchResultsUnfiltered, named('dSearchResultsUnfiltered'));
+	// output(dSearchResultsUnfilteredFinal, named('dSearchResultsUnfilteredFinal'));
+	
+	PhoneSearchResults:=UNGROUP(dSearchResultsUnfilteredFinal(acctno IN SET(dInPhone,acctno)));
+	DidSearchResults	:=UNGROUP(dSearchResultsUnfilteredFinal(acctno NOT IN SET(dInPhone,acctno)));
 	// Format to batch out layout
 	SHARED dFormat2Batch := IF( EXISTS(dInPhone),
 															PhoneFinder_Services.Functions.FormatResults2Batch( dAppendDIDs(phone != '' and err_search = 0),inMod,
@@ -141,12 +114,12 @@ MODULE
 															PhoneFinder_Services.Functions.FormatResults2Batch( dAppendDIDs(phone = '' and err_search = 0),inMod,
 																																									dinBestInfo,DidSearchResults,FALSE));
  	
-  // Royalties	
-  dSearchResultsFilter := dSearchRecs(typeflag != Phones.Constants.TypeFlag.DataSource_PV);
+ // Royalties	
+ dSearchResultsFilter := dSearchRecs_pre(typeflag != Phones.Constants.TypeFlag.DataSource_PV);
    	
-  // Sort and dedup data
-  dResultsDIDDedup   := DEDUP(SORT(dSearchResultsFilter(did != 0),acctno,did,phone,-dt_last_seen,RECORD),acctno,did,phone);
-  dResultsNoDIDDedup := DEDUP(SORT(dSearchResultsFilter(did = 0),
+ // Sort and dedup data
+ dResultsDIDDedup   := DEDUP(SORT(dSearchResultsFilter(did != 0),acctno,did,phone,-dt_last_seen,RECORD),acctno,did,phone);
+ dResultsNoDIDDedup := DEDUP(SORT(dSearchResultsFilter(did = 0),
    																		acctno,fname,mname,lname,name_suffix,listed_name,
    																		prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,
    																		city_name,st,zip,zip4,county_code,county_name,phone,-dt_last_seen,RECORD),
@@ -154,18 +127,17 @@ MODULE
    															prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,
    															city_name,st,zip,zip4,county_code,county_name,phone);
    	
-  SHARED dResultsDedup := dResultsDIDDedup + dResultsNoDIDDedup;
+ SHARED dResultsDedup := dResultsDIDDedup + dResultsNoDIDDedup;
    	
-  accu_royalty := project(accu_porting, transform(PhoneFinder_Services.Layouts.PhoneFinder.Final, self.acctno := left.acctno, self.typeflag := left.typeflag, 
+ accu_royalty := project(accu_porting, transform(PhoneFinder_Services.Layouts.PhoneFinder.Final, self.acctno := left.acctno, self.typeflag := left.typeflag, 
    																				self.phone := left.phone, self := [])); // accudata_ocn royalty
 																					
-  SHARED dResultsDedup_More := dResultsDedup + accu_royalty + Zum_final;	
+ SHARED dResultsDedup_More := dResultsDedup + accu_royalty + Zum_final;	
    	
-  SHARED dResultsDedupQSent := dResultsDedup_More + dSearchRecs(typeflag = Phones.Constants.TypeFlag.DataSource_PV);
-   	
-   
-  PhoneFinder_Services.Layouts.PhoneFinder.BatchOut tPopulateRoyalty(PhoneFinder_Services.Layouts.PhoneFinder.BatchOut le,PhoneFinder_Services.Layouts.PhoneFinder.Final ri) :=
-  TRANSFORM
+ SHARED dResultsDedupQSent := dResultsDedup_More + dSearchRecs_pre(typeflag = Phones.Constants.TypeFlag.DataSource_PV);
+ 
+ PhoneFinder_Services.Layouts.PhoneFinder.BatchOut tPopulateRoyalty(PhoneFinder_Services.Layouts.PhoneFinder.BatchOut le,PhoneFinder_Services.Layouts.PhoneFinder.Final ri) :=
+ TRANSFORM
    		BOOLEAN vLastResortExists := ri.vendor_id = MDR.sourceTools.src_wired_Assets_Royalty;
    		BOOLEAN vMetronetExists   := ri.subj_phone_type_new = MDR.sourceTools.src_Metronet_Gateway;
    		BOOLEAN vQSentExists      := ri.vendor_id = MDR.sourceTools.src_Inhouse_QSent;
@@ -195,28 +167,31 @@ MODULE
 			SELF.royalty_type_9 := IF(vZumigoExists,Royalty.Constants.RoyaltyType.ZUMIGO_IDENTITY,le.royalty_type_9); 
 			SELF.royalty_src_9  := IF(vZumigoExists,MDR.sourceTools.src_Zumigo_GetLineId,le.royalty_src_9);
    		SELF                := le;
-  END;
+ END;
    	
-  dResultsWithRoyalty := DENORMALIZE( dFormat2Batch,
-   																			dResultsDedupQSent,
-   																			LEFT.acctno = RIGHT.acctno,
-   																			tPopulateRoyalty(LEFT,RIGHT));
+ dResultsWithRoyalty := DENORMALIZE( dFormat2Batch,   																			
+																				    dResultsDedupQsent,
+   																			  LEFT.acctno = RIGHT.acctno,
+   																			  tPopulateRoyalty(LEFT,RIGHT));
+  																					
+  //output(dFormat2Batch, named('dFormat2Batch'));																					
+																	
    	
-  BatchShare.MAC_RestoreAcctno(dAppendDIDs,dResultsWithRoyalty,EXPORT dBatchOut);
+ BatchShare.MAC_RestoreAcctno(dAppendDIDs,dResultsWithRoyalty,EXPORT dBatchOut);
    	
-   	// Calculate royalties by acctno
-   	dRoyaltiesLastResort 	:= Royalty.RoyaltyLastResort.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedup, vendor_id, phone);
-   	dResultsDedupMNR			:= dedup(sort(dResultsDedup, acctno, subj_phone_type_new), acctno, subj_phone_type_new); // to match the counters calculated in the denormalize step above
-   	dRoyaltiesMetronet 		:= Royalty.RoyaltyMetronet.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedupMNR, subj_phone_type_new);
-   	dResultsDedupQSentR		:= dedup(sort(dResultsDedupQSent, acctno, vendor_id, typeflag), acctno, vendor_id, typeflag); // to match the counters calculated in the denormalize step above
-   	dRoyaltiesQSent 			:= Royalty.RoyaltyQSent.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedupQSentR, vendor_id, typeflag);
-   	dRoyaltiesTargus 			:= Royalty.RoyaltyTargus.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedup, vendor_id, targustype);
-   	dRoyaltiesEquifax			:= Royalty.RoyaltyEFXDataMart.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedup, subj_phone_type_new);
-    Accu_OCN_ddp          := dedup(sort(dResultsDedup_More,acctno, typeflag), acctno, typeflag);
-   	dRoyaltiesAccudata_ocn:= Royalty.RoyaltyAccudata.GetBatchRoyaltiesByAcctno(dAppendDIDs,Accu_OCN_ddp ,typeflag); // accudata_ocn royalty
-    dRoyaltyZumGetIden := Royalty.RoyaltyZumigoGetLineIdentity.GetBatchRoyaltiesByAcctno(sort(Zum_final, acctno, phone,-rec_source), rec_source, phone, acctno);
+ // Calculate royalties by acctno
+ dRoyaltiesLastResort 	:= Royalty.RoyaltyLastResort.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedup, vendor_id, phone);
+ dResultsDedupMNR			:= dedup(sort(dResultsDedup, acctno, subj_phone_type_new), acctno, subj_phone_type_new); // to match the counters calculated in the denormalize step above
+ dRoyaltiesMetronet 		:= Royalty.RoyaltyMetronet.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedupMNR, subj_phone_type_new);
+ dResultsDedupQSentR		:= dedup(sort(dResultsDedupQSent, acctno, vendor_id, typeflag), acctno, vendor_id, typeflag); // to match the counters calculated in the denormalize step above
+ dRoyaltiesQSent 			:= Royalty.RoyaltyQSent.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedupQSentR, vendor_id, typeflag);
+ dRoyaltiesTargus 			:= Royalty.RoyaltyTargus.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedup, vendor_id, targustype);
+ dRoyaltiesEquifax			:= Royalty.RoyaltyEFXDataMart.GetBatchRoyaltiesByAcctno(dAppendDIDs, dResultsDedup, subj_phone_type_new);
+ Accu_OCN_ddp          := dedup(sort(dResultsDedup_More,acctno, typeflag), acctno, typeflag);
+ dRoyaltiesAccudata_ocn:= Royalty.RoyaltyAccudata.GetBatchRoyaltiesByAcctno(dAppendDIDs,Accu_OCN_ddp ,typeflag); // accudata_ocn royalty
+ dRoyaltyZumGetIden := Royalty.RoyaltyZumigoGetLineIdentity.GetBatchRoyaltiesByAcctno(sort(Zum_final, acctno, phone,-rec_source), rec_source, phone, acctno);
    
-  dRoyaltiesByAcctno := 
+ dRoyaltiesByAcctno := 
    		if(inMod.UseLastResort, dRoyaltiesLastResort) + 
    		if(inMod.UseInHouseQSent or inMod.UseQSent, dRoyaltiesQSent) + 
    		if(inMod.UseMetronet, dRoyaltiesMetronet) + 
@@ -227,8 +202,7 @@ MODULE
    		dataset([], Royalty.Layouts.RoyaltyForBatch);
    
   // Create RoyaltySet to be returned
-  EXPORT dRoyalties := Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, inMod.DetailedRoyalties);
+ EXPORT dRoyalties := Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, inMod.DetailedRoyalties);
 
-
-  EXPORT Zumigo_History_Recs := IF(inMod.UseZumigoIdentity, Zum_gw_recs.Zumigo_Hist, DATASET([],Phones.Layouts.ZumigoIdentity.zOut));
+ EXPORT Zumigo_History_Recs := IF(inMod.UseZumigoIdentity, Zum_gw_recs.Zumigo_Hist, DATASET([],Phones.Layouts.ZumigoIdentity.zOut));
 END;

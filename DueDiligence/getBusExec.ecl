@@ -10,7 +10,7 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 										BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
 
 
-	contactsRaw := BIPV2_Build.key_contact_linkids.kFetch(DueDiligence.Common.GetLinkIDs(indata),
+	contactsRaw := BIPV2_Build.key_contact_linkids.kFetch(DueDiligence.Common.GetLinkIDsForKFetch(indata),
 																												 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																												 0, // ScoreThreshold --> 0 = Give me everything
 																												 linkingOptions,
@@ -19,10 +19,10 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																										 
 																										 
 	// Add back to Corp Filings our Seq numbers.
-	DueDiligence.Common.AppendSeq(contactsRaw, indata, contactsRaw_seq);
+	contactsRawSeq := DueDiligence.Common.AppendSeq(contactsRaw, indata, FALSE);
 	
 	// Filter out records after our history date.
-	corpFilingsFiltRecs := DueDiligence.Common.FilterRecords(contactsRaw_seq, dt_first_seen, dt_vendor_first_reported);
+	corpFilingsFiltRecs := DueDiligence.Common.FilterRecords(contactsRawSeq, dt_first_seen, dt_vendor_first_reported);
 	
 	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently - dates used in FilterRecords have been cleaned
 	clean_conFirstSeen := DueDiligence.Common.CleanDateFields(corpFilingsFiltRecs, dt_first_seen_contact);
@@ -41,11 +41,9 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																													SELF.partyFirstSeen := (UNSIGNED4)LEFT.dt_first_seen_contact;
 																													SELF.partyLastSeen := (UNSIGNED4)LEFT.dt_last_seen_contact;
 																													SELF.relatedParty.ssn := LEFT.contact_ssn;
-																																																										
-																													raw := STD.Str.ToUpperCase(TRIM(LEFT.contact_job_title_raw, LEFT, RIGHT));
-																													derived := STD.Str.ToUpperCase(TRIM(LEFT.contact_job_title_derived, LEFT, RIGHT));
 																													
-																													execTitle := IF(raw IN DueDiligence.Constants.EXECUTIVE_TITLES, raw, IF(derived IN DueDiligence.Constants.EXECUTIVE_TITLES, derived, DueDiligence.Constants.EMPTY));
+																													derived := STD.Str.ToUpperCase(TRIM(LEFT.contact_job_title_derived, LEFT, RIGHT));
+																													execTitle := IF(derived IN DueDiligence.Constants.EXECUTIVE_TITLES, derived, DueDiligence.Constants.EMPTY);
 																													
 																													SELF.title := execTitle;
 																													SELF.isExec := execTitle <> DueDiligence.Constants.EMPTY;
@@ -54,54 +52,10 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 
 
-	// noDIDsWithSSN := pulledContacts(relatedParty.ssn > '0' AND relatedParty.did = 0);
-	// OUTPUT(noDIDsWithSSN, NAMED('noDIDsWithSSN'));
 
 	sortPulledExecs := SORT(pulledContacts(isExec AND relatedParty.did > 0), seq, #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), relatedParty.did, relatedParty.lastName, -relatedParty.firstName, title, partyLastSeen, partyFirstSeen);
 	dedupPulledExecs := DEDUP(sortPulledExecs, seq, #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), relatedParty.did, relatedParty.lastName, relatedParty.firstName, title, partyLastSeen, partyFirstSeen);
-
-/*	
-	sortPulledExecs := SORT(pulledContacts(isExec), seq, #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), relatedParty.did, relatedParty.lastName, -relatedParty.firstName, title, partyLastSeen, partyFirstSeen);
-	dedupPulledExecs := DEDUP(sortPulledExecs, seq, #expand(BIPV2.IDmacros.mac_ListTop3Linkids()), relatedParty.did, relatedParty.lastName, relatedParty.firstName, title, partyLastSeen, partyFirstSeen);
-
-
-	//split rollups by did and no did, so we can rollup those with a did by did to truly combine titles even if variation in name (ie Dan vs Daniel)
-	rollPulledExecsNoDID := ROLLUP(dedupPulledExecs(relatedParty.did = 0),
-																	LEFT.seq = RIGHT.seq AND
-																	LEFT.ultID = RIGHT.ultID AND
-																	LEFT.orgID = RIGHT.orgID AND
-																	LEFT.seleID = RIGHT.seleID AND
-																	LEFT.relatedParty.lastName = RIGHT.relatedParty.lastName AND
-																	LEFT.relatedParty.firstName = RIGHT.relatedParty.firstName AND
-																	LEFT.title = RIGHT.title,
-																	TRANSFORM(RECORDOF(LEFT),
-																						SELF.partyLastSeen := MAX(LEFT.partyLastSeen, RIGHT.partyLastSeen);
-																						SELF.partyFirstSeen := IF(LEFT.partyFirstSeen = 0, MAX(LEFT.partyFirstSeen, RIGHT.partyFirstSeen), MIN(LEFT.partyFirstSeen, RIGHT.partyFirstSeen));
-																						SELF := LEFT;));
-																						
-	transformExcsWithNoDID := PROJECT(rollPulledExecsNoDID, TRANSFORM(RECORDOF(LEFT),
-																																			SELF.relatedParty.positions := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.Positions,
-																																																														SELF.firstSeen := LEFT.partyFirstSeen;
-																																																														SELF.lastSeen := LEFT.partyLastSeen;
-																																																														SELF.title := LEFT.title;
-																																																														SELF := [];));
-																																			SELF := LEFT;));
-	
-	sortExecsWithNoDID := SORT(transformExcsWithNoDID, seq, #expand(BIPV2.IDmacros.mac_ListTop3Linkids()));
-	
-	rollUniqueExecsWithNoDID := ROLLUP(sortExecsWithNoDID,
-																			LEFT.seq = RIGHT.seq AND
-																			LEFT.ultID = RIGHT.ultID AND
-																			LEFT.orgID = RIGHT.orgID AND
-																			LEFT.seleID = RIGHT.seleID AND
-																			LEFT.relatedParty.lastName = RIGHT.relatedParty.lastName AND
-																			LEFT.relatedParty.firstName = RIGHT.relatedParty.firstName,
-																			TRANSFORM(RECORDOF(LEFT),
-																								SELF.relatedParty.positions := LEFT.relatedParty.positions + RIGHT.relatedParty.positions;
-																								SELF := LEFT;));
-																						
-																						
-*/																	
+																	
 	//seperate those with dids																		
 	rollPulledExecsWithDID := ROLLUP(dedupPulledExecs(relatedParty.did > 0),
 																		LEFT.seq = RIGHT.seq AND
@@ -116,6 +70,7 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																						SELF := LEFT;));
 																						
 	transformExecsWithDID := PROJECT(rollPulledExecsWithDID, TRANSFORM(RECORDOF(LEFT),
+																																			SELF.relatedParty.numOfPositions := 1;
 																																			SELF.relatedParty.positions := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.Positions,
 																																																														SELF.firstSeen := LEFT.partyFirstSeen;
 																																																														SELF.lastSeen := LEFT.partyLastSeen;
@@ -133,12 +88,13 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																		LEFT.relatedParty.did = RIGHT.relatedParty.did,
 																		TRANSFORM(RECORDOF(LEFT),
 																							SELF.relatedParty.positions := LEFT.relatedParty.positions + RIGHT.relatedParty.positions;
+																							SELF.relatedParty.numOfPositions := LEFT.relatedParty.numOfPositions + RIGHT.relatedParty.numOfPositions;
 																							SELF := LEFT;));
 																						
 	
 	
 	//combine all unique execs back together
-	allExecs := PROJECT(/*rollUniqueExecsWithNoDID +*/ rollUniqueExecsWithDID, TRANSFORM({UNSIGNED4 seq, UNSIGNED6 ultID, UNSIGNED6 orgID, UNSIGNED6 seleID, DATASET(DueDiligence.Layouts.RelatedParty) executives},
+	allExecs := PROJECT(rollUniqueExecsWithDID, TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, DATASET(DueDiligence.Layouts.RelatedParty) executives},
 																																										SELF.executives := LEFT.relatedParty;
 																																										SELF := LEFT;
 																																										SELF := [];));
@@ -160,7 +116,8 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 										LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
 										LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,	
 										TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-															SELF.execs := LEFT.execs + RIGHT.executives;
+															SELF.execs := RIGHT.executives;
+															SELF.numOfBusExecs := COUNT(RIGHT.executives);
 															SELF := LEFT;),
 										LEFT OUTER);
 
@@ -173,9 +130,6 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(pulledContacts, NAMED('pulledContacts'));
 	// OUTPUT(sortPulledExecs, NAMED('sortPulledExecs'));
 	// OUTPUT(dedupPulledExecs, NAMED('dedupPulledExecs'));
-	// OUTPUT(rollPulledExecsNoDID, NAMED('rollPulledExecsNoDID'));
-	// OUTPUT(transformExcsWithNoDID, NAMED('transformExcsWithNoDID'));
-	// OUTPUT(rollUniqueExecsWithNoDID, NAMED('rollUniqueExecsWithNoDID'));
 	
 	// OUTPUT(rollPulledExecsWithDID, NAMED('rollPulledExecsWithDID'));
 	// OUTPUT(transformExecsWithDID, NAMED('transformExecsWithDID'));

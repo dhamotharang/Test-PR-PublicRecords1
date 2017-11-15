@@ -136,23 +136,134 @@ END;
 
 FraudShared_Services.Layouts.BatchIn_rec rec00012() := TRANSFORM
 	SELF.acctno := 'rec00012';
-  SELF.ssn := '590443261';
-	SELF.did := 102648498593;
-  SELF.name_first := 'nasya';
-  SELF.name_last := 'wagner';
-  SELF.addr := '5450 SW 156TH PL';
-	SELF.p_city_name := 'miami';
+  SELF.ssn := '594715761';
+	// SELF.did := 102648498593;
+  SELF.name_first := 'EDGARDO';
+  SELF.name_last := 'BRIGHAM';
+  SELF.addr := '813 POPLAR ST';
+	SELF.p_city_name := 'MOUNT DORA';
   SELF.st := 'FL';
-  SELF.z5 := '3466';
-  SELF.phoneno := '7278155566';
+  SELF.z5 := '32757';
+  SELF.phoneno := '3523087852';
 	SELF.ip_address := '216.3.128.12';
-  SELF.geo_lat := '28.357200';
-  SELF.geo_long := '-82.656090';
+  SELF := [];
+END;
+
+FraudShared_Services.Layouts.BatchIn_rec rec00013() := TRANSFORM
+	SELF.acctno := 'rec00013';
+  SELF.ssn := '567159036 ';
+  SELF := [];
+END;
+
+FraudShared_Services.Layouts.BatchIn_rec rec00014() := TRANSFORM
+	SELF.acctno := 'rec0014_multiple-KF';
+  SELF.ssn := '680183022';
+  SELF.name_first := 'WOLFGANG';
+  SELF.name_last := 'TREMBLET';
+  SELF.addr := '5035 BOWMAN PARK PT';
+	SELF.p_city_name := 'NAPLES';
+  SELF.st := 'FL';
+  SELF.z5 := '34112';
+  SELF.phoneno := '3059620758';
+	SELF.email_address := 'CHELM17@WALMART.COM';
+	SELF.ip_address := '216.3.49.28';	
+  SELF := [];
+END;
+
+FraudShared_Services.Layouts.BatchIn_rec rec00015() := TRANSFORM
+	SELF.acctno := 'rec0015_multiple-KF-Velocity';
+  SELF.ssn := '227585650';
+  SELF.name_first := 'JORGE';
+  SELF.name_last := 'CHARLES';
+  SELF.addr := '6608 NEWPORT PALMS CT';
+	SELF.p_city_name := 'MIAMI';
+  SELF.st := 'FL';
+  SELF.z5 := '33185';
+  SELF.phoneno := '3059867047';
+	SELF.email_address := 'CHELM17@WALMART.COM';
+	SELF.ip_address := '216.3.49.28';	
+  SELF := [];
+END;
+
+FraudShared_Services.Layouts.BatchIn_rec prod_rec0001() := TRANSFORM
+	SELF.acctno := 'prod_rec0001';
+  SELF.ssn := '714931610';
+  SELF.name_first := 'BENN';
+  SELF.name_last := 'BURGHER';
+  SELF.addr := '8320 JARBOE ST';
+	SELF.p_city_name := 'MELBOURNE';
+  SELF.st := 'FL';
+  SELF.z5 := '32940';
+  SELF.phoneno := '9542033011';
+	SELF.email_address := 'JCARMAN4@BIZJOURNALS.COM';
+	SELF.ip_address := '216.3.128.12';
+	SELF.dl_state := 'FL';
+	SELF.dl_number := 'K532166588790';
+  SELF := [];
+END;
+
+FraudShared_Services.Layouts.BatchIn_rec prod_rec0002() := TRANSFORM
+	SELF.acctno := 'prod_rec0002';
+  SELF.ssn := '595489567';
+  SELF.dob := '19870000';
+  SELF.name_first := 'NASYA';
+  SELF.name_last := 'WAGNER';
+  SELF.addr := '5450 SW 156TH PL';
+	SELF.p_city_name := 'MIAMI';
+  SELF.st := 'FL';
+  SELF.z5 := '33185';
+  SELF.phoneno := '9542033011';
+	SELF.email_address := 'BHALLET0@NBCNEWS.COM';
+	SELF.ip_address := '216.3.128.12';
+	SELF.dl_state := 'FL';
+	SELF.dl_number := 'H400421893380';
+  SELF := [];
+END;
+
+FraudShared_Services.Layouts.BatchIn_rec prod_rec0003() := TRANSFORM
+	SELF.acctno := 'prod_rec0003';
+  SELF.ssn := '534563999';
+  SELF.name_first := 'AARONS';
+  SELF.name_last := 'MARY';
+  SELF := [];
+END;
+
+FraudShared_Services.Layouts.BatchIn_rec prod_rec0004() := TRANSFORM
+	SELF.acctno := 'prod_rec0004';
+  SELF.ssn := '600076337';
+  SELF.did := 385786;
+  SELF.dob := '19230413';
+  SELF.name_first := 'MARIA';
+  SELF.name_last := 'MORENO';	
+  SELF.name_middle := 'H';	
+  SELF := [];
+END;
+
+FraudShared_Services.Layouts.BatchIn_rec prod_rec0005() := TRANSFORM
+	SELF.acctno := 'prod_rec0005';
+  SELF.ssn := '511567093';
+  SELF.dob := '19501005';
+  SELF.name_first := 'MICHAEL';
+  SELF.name_last := 'HENDRICKSON';	
+  SELF.name_middle := 'W';	
+  SELF := [];
+END;
+
+FraudShared_Services.Layouts.BatchIn_rec prod_rec0006() := TRANSFORM
+	SELF.acctno := 'prod_rec0006';
+  SELF.did := 187417114379;
+  SELF := [];
+END;
+
+FraudShared_Services.Layouts.BatchIn_rec prod_rec0007() := TRANSFORM
+	SELF.acctno := 'prod_rec0007';
+  SELF.ssn := '313138936';
   SELF := [];
 END;
 
 EXPORT BatchCannedInput := dataset([
-  rec0001(), rec0002(), rec0003(), rec0004(), rec0005(), rec0006(), rec0007(), rec0008(), rec0009(), rec00010(), rec00011(), rec00012()
+  /*rec0001(), rec0002(), rec0003(), rec0004(), rec0005(), rec0006(), rec0007(), rec0008(), rec0009(), rec00010(), rec00011(), rec00012(), rec00013(), rec00014() , rec00015()*/
+	prod_rec0001(), prod_rec0002(), prod_rec0003(), prod_rec0004(), prod_rec0005(), prod_rec0006(),	prod_rec0007()
 ]);
 
 /*

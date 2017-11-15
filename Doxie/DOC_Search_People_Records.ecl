@@ -11,7 +11,7 @@ string14 uid_value := '' : stored('UniqueId');
 pre_dids := 	MAP(	uid_value<>''		=> DATASET([{(unsigned)uid_value}],layout_references),
 				Law_Enforcement	=> doxie.Get_SRNA_DIDs, 
 				did_value<>''		=> DATASET([{(unsigned)did_value}],layout_references),
-				IF(~noDeepDive, doxie.Get_Dids()));
+				IF(~noDeepDive, PROJECT (doxie.Get_Dids(), doxie.layout_references)));
 				
 dids := pre_dids(Include_CriminalRecords_val);
 

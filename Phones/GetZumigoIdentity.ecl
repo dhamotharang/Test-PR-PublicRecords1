@@ -10,9 +10,9 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		//NameAddressValidation service should include phone with name(s) and address(es) pair.
 		isValidNameAddrRequest := l.phone<>'' AND l.first_name<>'' AND l.last_name<>'' AND l.prim_name<>'' AND l.p_city_name<>'' AND l.st<>'' AND l.z5<>'';
 		//preserve the acctno and seq for each record sent to Zumigo. This will be group by phone number across multiple account to avoid duplicate calls for the same phone.
-		acctSeqPrefix := l.acctno + '|'+ l.seq + '|';
+		acctSeqPrefix := l.acctno + '|'+ l.sequence_number + '|';
 		SELF.acctno := l.acctno;
-		SELF.seq := l.seq;
+		SELF.sequence_number := l.sequence_number;
 		SELF.MobileDeviceNumber := l.phone;
 		SELF.Name.NameType := IF(isValidNameAddrRequest,acctSeqPrefix + l.NameType,'');
 		SELF.Name.FirstName := l.first_name;
@@ -108,7 +108,7 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		SELF.country := l.response.LineIdentityResponse.Account.BillingAddress.Country;
 		SELF.imsi	:= IF(l.response.LineIdentityResponse.Subscriber.IntlMobileSubscriberId='','',(STRING)hash64(l.response.LineIdentityResponse.Subscriber.IntlMobileSubscriberId));
 		SELF.imsi_seensince := l.response.LineIdentityResponse.Subscriber.SeenSince;
-		SELF.imsi_changed_this_time := (INTEGER)l.response.LineIdentityResponse.Subscriber.ChangedThisTime;
+		SELF.imsi_changedthis_time := (INTEGER)l.response.LineIdentityResponse.Subscriber.ChangedThisTime;
 		SELF.imsi_change_count := l.response.LineIdentityResponse.Subscriber.ChangeCount;
 		SELF.imsi_trackedsince := l.response.LineIdentityResponse.Subscriber.TrackedSince;
 		SELF.iccid	:= IF(l.response.LineIdentityResponse.Subscriber.IntegratedCircuitCardId='','',(STRING)hash64(l.response.LineIdentityResponse.Subscriber.IntegratedCircuitCardId));
@@ -190,19 +190,19 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 		setStr:=STD.Str.SplitWords(l.sub_name_type,'|');
 		addressType:=STD.Str.SplitWords(l.sub_addr_type,'|')[3];
 		SELF.acctno := setStr[1];
-		SELF.seq := (UNSIGNED)setStr[2];
+		SELF.sequence_number := (UNSIGNED)setStr[2];
 		SELF.sub_name_type := setStr[3];
 		SELF.sub_addr_type := addressType;
 		SELF := l;
 		SELF :=[];
 	END;
 	updateValidationAcctnoNSeq := IF(inMod.NameAddressValidation,PROJECT(zHistoryRecs,extractAcctnoNSeq(LEFT)),
-																															 PROJECT(zHistoryRecs,Phones.Layouts.ZumigoIdentity.zOut));
+																															 PROJECT(zHistoryRecs,TRANSFORM(Phones.Layouts.ZumigoIdentity.zOut, SELF.sequence_number := (UNSIGNED)LEFT.sequence_number, SELF := LEFT)));
 																														 
 	Phones.Layouts.ZumigoIdentity.zOut updateIDs (Phones.Layouts.ZumigoIdentity.subjectVerificationRequest l, Phones.Layouts.ZumigoIdentity.zOut r):= TRANSFORM
 		//Always used LN data to populate identity data for ZumigoHistory
 		SELF.acctno := l.acctno;
-		SELF.seq := l.seq;
+		SELF.sequence_number := l.sequence_number;
 		SELF.submitted_phonenumber := l.phone;
 		SELF.sub_lexid := l.lexid;
 		SELF.sub_busult_id := l.busult_id;
@@ -230,7 +230,7 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 	dsZumigoHistory := JOIN(inRecs,updateValidationAcctnoNSeq,
 													LEFT.phone 	= RIGHT.submitted_phonenumber AND
 													(LEFT.acctno	= RIGHT.acctno OR RIGHT.acctno='') AND
-													(LEFT.seq 		= RIGHT.seq OR RIGHT.seq=0),
+													(LEFT.sequence_number 		= RIGHT.sequence_number OR RIGHT.sequence_number=0),
 													updateIDs(LEFT,RIGHT),
 													LEFT OUTER, KEEP(1),LIMIT(0));
 													

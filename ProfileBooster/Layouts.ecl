@@ -1,4 +1,4 @@
-IMPORT iesp, Risk_Indicators, Models, header, doxie;
+﻿IMPORT iesp, Risk_Indicators, Models, header, doxie;
 
 EXPORT Layouts := MODULE
 
@@ -283,6 +283,7 @@ EXPORT Layout_PB_Slim_student := RECORD
 	string1 	student_college_code;
 	string1 	student_college_type;
 	string1 	student_college_tier;
+	string2 	src;
 END;
 
 EXPORT Layout_PB_Slim_profLic := RECORD

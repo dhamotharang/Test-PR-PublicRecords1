@@ -22,6 +22,7 @@
 										'DIDScoreThreshold',
 										'FraudPlatform',
 										'MaxVelocities',
+										'TestVelocityRules',
 										/*---- Batch_In Request Field .----*/
 										'batch_in'
 							));	

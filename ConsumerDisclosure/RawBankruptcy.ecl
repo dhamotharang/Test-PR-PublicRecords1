@@ -29,6 +29,8 @@ layout_bankruptcy_rawrec := RECORD
 		unsigned6 subject_did;
 		string50 tmsid;
 		string5  court_code;
+		string8	date_last_seen; 
+		string8	date_first_seen;
 		dataset(layout_Bankruptcy_main_rawrec) main;
 		dataset(layout_Bankruptcy_party_rawrec) parties;
 END;
@@ -49,6 +51,8 @@ EXPORT RawBankruptcy := MODULE
 	
 	EXPORT layout_bankruptcy_out := RECORD
 		STRING50 tmsid;
+		STRING8	date_last_seen; 
+		STRING8	date_first_seen;
 		DATASET(layout_bankruptcy_main_out) main {xpath('Main/Row')};
 		DATASET(layout_bankruptcy_party_out) parties {xpath('parties/Row')};
 	END;
@@ -261,6 +265,8 @@ FUNCTION
 	layout_bankruptcy_rawrec 
 		xtRollMain(layout_Bankruptcy_main_rawrec l, dataset(layout_Bankruptcy_main_rawrec) all_rows) := 
 	transform
+		self.date_first_seen := l.date_first_seen;
+		self.date_last_seen := l.date_last_seen;
 		self.tmsid := l.tmsid;
 		self.court_code := l.court_code;
 		self.subject_did := l.subject_did;
@@ -268,7 +274,7 @@ FUNCTION
 		self.parties := [];
 	end;
 		
-	bk_main := rollup(group(sort(bk_main_statements_disputes, tmsid), tmsid), group, xtRollMain(left, ROWS(left)));	
+	bk_main := rollup(group(sort(bk_main_statements_disputes, tmsid, -date_last_seen, -date_first_seen), tmsid), group, xtRollMain(left, ROWS(left)));	
 	
 	layout_bankruptcy_rawrec 
 		xtAddParties(layout_bankruptcy_rawrec l, dataset(layout_Bankruptcy_party_rawrec) all_parties) := 
@@ -304,6 +310,8 @@ FUNCTION
 			self.RawData := left;
 			));
 		self.tmsid := l.tmsid;
+		self.date_first_seen := l.date_first_seen;
+		self.date_last_seen := l.date_last_seen;
 	end;
 	
   bk_out := 
@@ -313,29 +321,29 @@ FUNCTION
 		left outer, keep(1), limit(0));	
 	
 	// -- search
-	if($.Debug, output(tmsids, named('tmsids')));
-	if($.Debug, output(bk_search_raw, named('bk_search_raw')));
-	if($.Debug, output(bk_debtors, named('bk_debtors')));
-	if($.Debug, output(bk_search_with_debtors, named('bk_search_with_debtors')));
-	if($.Debug, output(bk_search_overrides, named('bk_search_overrides')));
-	if($.Debug, output(rid_search_overrides, named('rid_search_overrides')));
-	if($.Debug, output(rid_search_suppressed, named('rid_search_suppressed')));
-	if($.Debug, output(bk_search_with_flags, named('bk_search_with_flags')));
-	// if($.Debug, output(bk_search_filtered, named('bk_search_filtered')));
-	if($.Debug, output(bk_search, named('bk_search')));
-	if($.Debug, output(bk_search_plus_withdraw, named('bk_search_plus_withdraw')));
+	if($.Debug AND in_mod.IncludeBankruptcy, output(tmsids, named('bk_tmsids')));
+	if($.Debug AND in_mod.IncludeBankruptcy, output(bk_search_raw, named('bk_search_raw')));
+	if($.Debug AND in_mod.IncludeBankruptcy, output(bk_debtors, named('bk_debtors')));
+	if($.Debug AND in_mod.IncludeBankruptcy, output(bk_search_with_debtors, named('bk_search_with_debtors')));
+	if($.Debug AND in_mod.IncludeBankruptcy, output(bk_search_overrides, named('bk_search_overrides')));
+	//if($.Debug AND in_mod.IncludeBankruptcy, output(rid_search_overrides, named('rid_search_overrides')));
+	//if($.Debug AND in_mod.IncludeBankruptcy, output(rid_search_suppressed, named('rid_search_suppressed')));
+	if($.Debug AND in_mod.IncludeBankruptcy, output(bk_search_with_flags, named('bk_search_with_flags')));
+	// if($.Debug AND in_mod.IncludeBankruptcy, output(bk_search_filtered, named('bk_search_filtered')));
+	if($.Debug AND in_mod.IncludeBankruptcy, output(bk_search, named('bk_search')));
+	if($.Debug AND in_mod.IncludeBankruptcy, output(bk_search_plus_withdraw, named('bk_search_plus_withdraw')));
 	// -- main
-	if($.Debug, output(bk_main_raw, named('bk_main_raw')));
-	if($.Debug, output(bk_main_overrides, named('bk_main_overrides')));
-	if($.Debug, output(rid_main_overrides, named('rid_main_overrides')));
-	if($.Debug, output(rid_main_suppressed, named('rid_main_suppressed')));
-	if($.Debug, output(bk_main_flags, named('bk_main_flags')));	
-	if($.Debug, output(bk_main, named('bk_main')));
-	// if($.Debug, output(bk_main_filtered, named('bk_main_filtered')));
-	if($.Debug, output(bk_main_with_parties, named('bk_main_with_parties')));	
-	if($.Debug, output(bk_out, named('bankruptcy_recs')));	
+	if($.Debug AND in_mod.IncludeBankruptcy, output(bk_main_raw, named('bk_main_raw')));
+	if($.Debug AND in_mod.IncludeBankruptcy, output(bk_main_overrides, named('bk_main_overrides')));
+	//if($.Debug AND in_mod.IncludeBankruptcy, output(rid_main_overrides, named('rid_main_overrides')));
+	//if($.Debug AND in_mod.IncludeBankruptcy, output(rid_main_suppressed, named('rid_main_suppressed')));
+	if($.Debug AND in_mod.IncludeBankruptcy, output(bk_main_flags, named('bk_main_flags')));	
+	if($.Debug AND in_mod.IncludeBankruptcy, output(bk_main, named('bk_main')));
+	// if($.Debug AND in_mod.IncludeBankruptcy, output(bk_main_filtered, named('bk_main_filtered')));
+	if($.Debug AND in_mod.IncludeBankruptcy, output(bk_main_with_parties, named('bk_main_with_parties')));	
+	if($.Debug AND in_mod.IncludeBankruptcy, output(bk_out, named('bankruptcy_recs')));	
 	
-	return bk_out;
+	return sort(bk_out, -date_last_seen, -date_first_seen);
 END;
 
 END;

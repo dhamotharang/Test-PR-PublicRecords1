@@ -1,10 +1,10 @@
 ﻿IMPORT doxie, FCRA, FFD, Advo, ConsumerDisclosure;
 
-advo_raw := RECORD  // recordof(Advo.Key_Addr1_FCRA_history)
+layout_advo_raw := RECORD  // recordof(Advo.Key_Addr1_FCRA_history)
 	Advo.Layouts.Layout_Common_Out_k -[src];  
 END;
 
-advo_rawrec := RECORD(advo_raw)
+layout_advo_rawrec := RECORD(layout_advo_raw)
 	ConsumerDisclosure.Layouts.InternalMetadata;
 END;
 	
@@ -12,7 +12,7 @@ END;
 EXPORT RawAdvo := MODULE
 
 	EXPORT layout_advo_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		advo_raw;
+		layout_advo_raw;
 	END;
 
 	EXPORT GetData(DATASET(ConsumerDisclosure.Layouts.address_rec) in_addresses,
@@ -29,7 +29,7 @@ EXPORT RawAdvo := MODULE
 	flag_recs := 
 		JOIN(all_flags, FCRA.key_override_advo_ffid, 
 			KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-			TRANSFORM(advo_rawrec,
+			TRANSFORM(layout_advo_rawrec,
 				is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 				SELF.compliance_flags.isOverride := is_override;
 				SELF.compliance_flags.isSuppressed := ~is_override;
@@ -44,9 +44,19 @@ EXPORT RawAdvo := MODULE
 				SELF := []),
 			LEFT OUTER, KEEP(FCRA.compliance.MAX_OVERRIDE_limit), LIMIT(0)); 
 
-	override_recs := flag_recs(compliance_flags.isOverride);	
+	override_recs_prelim := flag_recs(compliance_flags.isOverride);	
 	suppressed_recs := flag_recs(compliance_flags.isSuppressed);		
 
+	// filtering to keep only overrides for input addreses
+	override_recs := JOIN(override_recs_prelim, in_addresses, 
+													LEFT.prim_name = RIGHT.prim_name AND
+													LEFT.st = RIGHT.st AND
+													LEFT.zip = RIGHT.zip AND
+													LEFT.prim_range = RIGHT.prim_range AND
+													LEFT.sec_range = RIGHT.sec_range,
+													TRANSFORM(LEFT), 
+													KEEP(1), LIMIT(0));
+													
 	override_ids := SET(override_recs, combined_record_id);	
 	suppressed_ids := SET(suppressed_recs, combined_record_id);
 
@@ -59,7 +69,7 @@ EXPORT RawAdvo := MODULE
 															LEFT.predir = RIGHT.predir AND
 															LEFT.postdir = RIGHT.postdir AND
 															LEFT.sec_range = RIGHT.sec_range),
-												TRANSFORM(advo_rawrec,
+												TRANSFORM(layout_advo_rawrec,
 																	rec_id := TRIM(RIGHT.zip) + TRIM(RIGHT.prim_range) + TRIM(RIGHT.prim_name) + TRIM(RIGHT.sec_range);
 																	SELF.compliance_flags.IsOverwritten := (rec_id IN override_ids), 
 																	SELF.compliance_flags.IsSuppressed :=(rec_id IN suppressed_ids), 
@@ -81,7 +91,7 @@ EXPORT RawAdvo := MODULE
 		in_mod.ReturnSuppressed or ~compliance_flags.isSuppressed
 		);
 	
-		advo_rawrec xformStatements(advo_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_advo_rawrec xformStatements(layout_advo_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_ids := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -108,10 +118,10 @@ EXPORT RawAdvo := MODULE
 												SELF := LEFT;			
 												));			
 												
-		IF(ConsumerDisclosure.Debug,OUTPUT(suppressed_recs, NAMED('Advo_Data_suppressed_recs')));
-		IF(ConsumerDisclosure.Debug,OUTPUT(override_recs, NAMED('Advo_Data_override_recs')));
-		IF(ConsumerDisclosure.Debug,OUTPUT(main_recs, NAMED('Advo_Data_main_recs')));
-		IF(ConsumerDisclosure.Debug,OUTPUT(recs_out, NAMED('Advo_Data_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeAdvo,OUTPUT(suppressed_recs, NAMED('Advo_Data_suppressed_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeAdvo,OUTPUT(override_recs, NAMED('Advo_Data_override_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeAdvo,OUTPUT(main_recs, NAMED('Advo_Data_main_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeAdvo,OUTPUT(recs_out, NAMED('Advo_Data_recs')));
 		
 		RETURN SORT(recs_out, -date_last_seen, -date_first_seen, RECORD);
 	END;

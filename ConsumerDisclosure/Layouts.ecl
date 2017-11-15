@@ -30,6 +30,8 @@ MODULE
 		UNSIGNED3 dt_last_seen;
 		STRING9   ssn;
 		STRING1   valid_SSN := '';
+		BOOLEAN   inquiry_source := FALSE;
+		BOOLEAN   header_source := FALSE;
 	END;
 	
 	EXPORT address_rec := RECORD

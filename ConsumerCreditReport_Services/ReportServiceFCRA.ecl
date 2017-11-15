@@ -4,7 +4,8 @@
 	<part name="DOBMask"               type="xsd:string"/>
 	<part name="SSNMask"               type="xsd:string"/>
 	<part name="GLBPurpose"            type="xsd:byte"/>
-	<part name="FCRAPurpose"           type="xsd:byte"/>
+	<part name="PermissiblePurpose"    type="xsd:string"/>
+	<part name="FFDOptionsMask"        type="xsd:integer"/>
 	<part name="IncludeLiensJudgments" type="xsd:boolean"/>
 	<part name="Gateways"              type="tns:XmlDataSet" cols="70" rows="4"/>
 	<part name="FCRAConsumerCreditReportRequest" type="tns:XmlDataSet" cols="70" rows="25"/>

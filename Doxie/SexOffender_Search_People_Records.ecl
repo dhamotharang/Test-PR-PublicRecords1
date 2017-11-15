@@ -16,7 +16,7 @@ string14 uid_value := '' : stored('UniqueId');
 pre_dids := 	MAP( uid_value<>''		=> DATASET([{(unsigned)uid_value}],layout_references),
 				Law_Enforcement	=> doxie.Get_SRNA_DIDs, 
 				did_value<>''		=> DATASET([{(unsigned)did_value}],layout_references),
-				doxie.Get_Dids(,~isCRS));
+				PROJECT (doxie.Get_Dids(,~isCRS), doxie.layout_references));
 
 // on FCRA side DIDs should be pre-calculated
 dids := if (IsFCRA, project (ds_best, doxie.layout_references), pre_dids);//(Include_SexualOffenses_val);

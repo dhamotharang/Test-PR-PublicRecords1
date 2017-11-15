@@ -1,65 +1,68 @@
 ﻿IMPORT doxie, FCRA, FFD, FAA, BIPV2,  ConsumerDisclosure;
-EXPORT RawAircraft := MODULE
 
-	SHARED aircraft_raw := RECORD //RECORDOF(FAA.key_aircraft_id)
+BOOLEAN IsFCRA := TRUE;
+
+layout_aircraft_raw := RECORD //RECORDOF(FAA.key_aircraft_id)
 	  UNSIGNED6 aircraft_id;
 		FAA.layout_aircraft_registration_out_Persistent_ID;
 		BIPV2.IDlayouts.l_xlink_ids;
-	END;
+END;
 	
-	SHARED aircraft_engine_raw := RECORD //RECORDOF(FAA.key_engine_info)\
+layout_aircraft_engine_raw := RECORD //RECORDOF(FAA.key_engine_info)\
 		STRING5 code;
 		FAA.layout_engine_info;
-	END;
+END;
 	
-	EXPORT aircraft_details_raw := RECORD //RECORDOF(FAA.key_aircraft_info)
+layout_aircraft_details_raw := RECORD //RECORDOF(FAA.key_aircraft_info)
 		STRING7 code;
 		FAA.layout_aircraft_info;
-	END;
+END;
 
-	SHARED aircraft_rawrec := RECORD(aircraft_raw)
+layout_aircraft_rawrec := RECORD(layout_aircraft_raw)
 		ConsumerDisclosure.Layouts.InternalMetadata;
-	END;
+END;
 	
-	SHARED aircraft_details_rawrec := RECORD(aircraft_details_raw)
+layout_aircraft_details_rawrec := RECORD(layout_aircraft_details_raw)
 		ConsumerDisclosure.Layouts.InternalMetadata;
-	END;
+END;
 	
-	SHARED aircraft_engine_rawrec := RECORD(aircraft_engine_raw)
+layout_aircraft_engine_rawrec := RECORD(layout_aircraft_engine_raw)
 		ConsumerDisclosure.Layouts.InternalMetadata;
-	END;
+END;
 	
-	EXPORT aircraft_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		aircraft_raw;
-	END;
-
-	EXPORT aircraft_engine_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		aircraft_engine_raw;
-	END;
-
-	EXPORT aircraft_details_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
-		aircraft_details_raw;
-	END;
-
-	EXPORT FAA_out := RECORD
-    aircraft_raw.mfr_mdl_code;
-    aircraft_raw.eng_mfr_mdl;
-		DATASET(aircraft_out) Aircraft {xpath('Aircraft/Row')};
-		DATASET(aircraft_details_out) AircraftDetails {xpath('AircraftDetails/Row')};
-		DATASET(aircraft_engine_out) AircraftEngine {xpath('AircraftEngine/Row')};
-	END;
-
-  mfr_eng_codes_rec := RECORD
+layout_mfr_eng_codes := RECORD
 		UNSIGNED subject_did;
-    aircraft_raw.mfr_mdl_code;
-    aircraft_raw.eng_mfr_mdl;
-  END;
+    layout_aircraft_raw.mfr_mdl_code;
+    layout_aircraft_raw.eng_mfr_mdl;
+END;
 	
-	BOOLEAN IsFCRA := TRUE;
+
+EXPORT RawAircraft := MODULE
+
+	EXPORT layout_aircraft_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_aircraft_raw;
+	END;
+
+	EXPORT layout_aircraft_engine_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_aircraft_engine_raw;
+	END;
+
+	EXPORT layout_aircraft_details_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
+		layout_aircraft_details_raw;
+	END;
+
+	EXPORT layout_FAA_out := RECORD
+    layout_aircraft_raw.date_last_seen;  // to be used for sorting internally
+    layout_aircraft_raw.mfr_mdl_code;
+    layout_aircraft_raw.eng_mfr_mdl;
+		DATASET(layout_aircraft_out) Aircraft {xpath('Aircraft/Row')};
+		DATASET(layout_aircraft_details_out) AircraftDetails {xpath('AircraftDetails/Row')};
+		DATASET(layout_aircraft_engine_out) AircraftEngine {xpath('AircraftEngine/Row')};
+	END;
 
 	EXPORT GetData(DATASET(doxie.layout_references) in_dids,
 								DATASET (fcra.Layout_override_flag) flag_file,
-								DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs = FFD.Constants.BlankPersonContextBatchSlim,														 
+								DATASET (FFD.Layouts.PersonContextBatchSlim) slim_pc_recs,														 
 							 ConsumerDisclosure.IParams.IParam in_mod) := 
  FUNCTION
 
@@ -76,7 +79,7 @@ EXPORT RawAircraft := MODULE
 	aircraft_flag_recs := 
 		JOIN(aircraft_flags, FCRA.key_override_faa.aircraft, 
 			KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-			TRANSFORM(aircraft_rawrec,
+			TRANSFORM(layout_aircraft_rawrec,
 				is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 				SELF.compliance_flags.isOverride := is_override;
 				SELF.compliance_flags.isSuppressed := ~is_override;
@@ -101,7 +104,7 @@ EXPORT RawAircraft := MODULE
 									
 	aircraft_main_recs := JOIN(aircraft_id_recs, FAA.key_aircraft_id(IsFCRA),
 												KEYED(LEFT.aircraft_id = RIGHT.aircraft_id),
-												TRANSFORM(aircraft_rawrec,
+												TRANSFORM(layout_aircraft_rawrec,
 																	SELF.compliance_flags.IsOverwritten :=
 																		(RIGHT.persistent_record_id>0 AND (STRING) RIGHT.persistent_record_id IN aircraft_override_ids), 
 																	SELF.compliance_flags.IsSuppressed :=
@@ -121,7 +124,7 @@ EXPORT RawAircraft := MODULE
 		in_mod.ReturnSuppressed or ~compliance_flags.isSuppressed
 		);
 										
-		aircraft_rawrec xformStatements(aircraft_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_aircraft_rawrec xformStatements(layout_aircraft_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_ids := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -135,7 +138,7 @@ EXPORT RawAircraft := MODULE
 													KEEP(1),
 													LIMIT(0));
 			
-		aircraft_recs_out := PROJECT(aircraft_recs_final_ds, TRANSFORM(aircraft_out,			
+		aircraft_recs_out := PROJECT(aircraft_recs_final_ds, TRANSFORM(layout_aircraft_out,			
 												SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(LEFT.compliance_flags,
 																								LEFT.record_ids,
 																								LEFT.statement_IDs,
@@ -144,7 +147,7 @@ EXPORT RawAircraft := MODULE
 												SELF := LEFT;			
 												));			
 
-	mfr_eng_codes := PROJECT(aircraft_recs_final_ds, mfr_eng_codes_rec);
+	mfr_eng_codes := PROJECT(aircraft_recs_final_ds, layout_mfr_eng_codes);
 	mfr_mdl_ids := DEDUP(SORT(mfr_eng_codes, mfr_mdl_code), mfr_mdl_code);
 	mfr_engine_ids := DEDUP(SORT(mfr_eng_codes, eng_mfr_mdl), eng_mfr_mdl);
 	
@@ -152,7 +155,7 @@ EXPORT RawAircraft := MODULE
 	aircraft_info_flag_recs := 
 		JOIN(aircraft_info_flags, FCRA.key_override_faa.aircraft_details, 
 			KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-			TRANSFORM(aircraft_details_rawrec,
+			TRANSFORM(layout_aircraft_details_rawrec,
 				is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 				SELF.compliance_flags.isOverride := is_override;
 				SELF.compliance_flags.isSuppressed := ~is_override;
@@ -173,13 +176,13 @@ EXPORT RawAircraft := MODULE
 
 	aircraft_info_main_recs := JOIN(mfr_mdl_ids, FAA.key_aircraft_info(IsFCRA),
 												KEYED(LEFT.mfr_mdl_code = RIGHT.code),
-												TRANSFORM(aircraft_details_rawrec,
+												TRANSFORM(layout_aircraft_details_rawrec,
 																	SELF.compliance_flags.IsOverwritten :=
 																		(RIGHT.code <> '' AND RIGHT.code IN aircraft_info_override_ids), 
 																	SELF.compliance_flags.IsSuppressed :=
 																		(RIGHT.code <> '' and RIGHT.code IN aircraft_info_suppressed_ids), 
 																	SELF.subject_did := LEFT.subject_did,
-																	SELF.record_ids.RecId1 := (STRING) RIGHT.code,
+																	SELF.record_ids.RecId1 := (STRING) RIGHT.aircraft_mfr_model_code,
 																	SELF := RIGHT,
 																	SELF := LEFT,
 																	SELF := []),
@@ -193,7 +196,7 @@ EXPORT RawAircraft := MODULE
 		in_mod.ReturnSuppressed OR ~compliance_flags.isSuppressed
 		);
 										
-		aircraft_details_rawrec xfAircraftInfoStatements(aircraft_details_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_aircraft_details_rawrec xfAircraftInfoStatements(layout_aircraft_details_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_ids := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -208,7 +211,7 @@ EXPORT RawAircraft := MODULE
 													LIMIT(0));
 			
 		aircraft_info_recs_out := PROJECT(aircraft_info_recs_final_ds, 
-																TRANSFORM(aircraft_details_out,			
+																TRANSFORM(layout_aircraft_details_out,			
 												SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(LEFT.compliance_flags,
 																								LEFT.record_ids,
 																								LEFT.statement_IDs,
@@ -221,7 +224,7 @@ EXPORT RawAircraft := MODULE
 	aircraft_engine_flag_recs := 
 		JOIN(aircraft_engine_flags, FCRA.key_override_faa.aircraft_engine, 
 			KEYED (LEFT.flag_file_id = RIGHT.flag_file_id), 
-			TRANSFORM(aircraft_engine_rawrec,
+			TRANSFORM(layout_aircraft_engine_rawrec,
 				is_override := LEFT.flag_file_id <> '' AND LEFT.flag_file_id = RIGHT.flag_file_id;
 				SELF.compliance_flags.isOverride := is_override;
 				SELF.compliance_flags.isSuppressed := ~is_override;
@@ -242,13 +245,13 @@ EXPORT RawAircraft := MODULE
 
 	aircraft_engine_main_recs := JOIN(mfr_engine_ids, FAA.key_engine_info(IsFCRA),
 												KEYED(LEFT.eng_mfr_mdl = RIGHT.code),
-												TRANSFORM(aircraft_engine_rawrec,
+												TRANSFORM(layout_aircraft_engine_rawrec,
 																	SELF.compliance_flags.IsOverwritten :=
 																		(RIGHT.code <> '' AND RIGHT.code IN aircraft_engine_override_ids), 
 																	SELF.compliance_flags.IsSuppressed :=
 																		(RIGHT.code <> '' and RIGHT.code IN aircraft_engine_suppressed_ids), 
 																	SELF.subject_did := LEFT.subject_did,
-																	SELF.record_ids.RecId1 := (STRING) RIGHT.code,
+																	SELF.record_ids.RecId1 := (STRING) RIGHT.engine_mfr_model_code,
 																	SELF := RIGHT,
 																	SELF := LEFT,
 																	SELF := []),
@@ -262,7 +265,7 @@ EXPORT RawAircraft := MODULE
 		in_mod.ReturnSuppressed OR ~compliance_flags.isSuppressed
 		);
 										
-		aircraft_engine_rawrec xfAircraftEngineStatements(aircraft_engine_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
+		layout_aircraft_engine_rawrec xfAircraftEngineStatements(layout_aircraft_engine_rawrec l, FFD.Layouts.PersonContextBatchSlim r) := TRANSFORM,
 			SKIP(~ShowDisputedRecords AND r.isDisputed)
 					SELF.statement_ids := r.StatementIDs;
 					SELF.compliance_flags.IsDisputed := r.isDisputed;
@@ -277,7 +280,7 @@ EXPORT RawAircraft := MODULE
 													LIMIT(0));
 			
 		aircraft_engine_recs_out := PROJECT(aircraft_engine_recs_final_ds, 
-																TRANSFORM(aircraft_engine_out,			
+																TRANSFORM(layout_aircraft_engine_out,			
 												SELF.Metadata := ConsumerDisclosure.Functions.GetMetadataESDL(LEFT.compliance_flags,
 																								LEFT.record_ids,
 																								LEFT.statement_IDs,
@@ -287,22 +290,23 @@ EXPORT RawAircraft := MODULE
 												));			
 
 		// Now combining data sets for final output
-		FAA_out xfRollAircraft(aircraft_out le, 
-												DATASET(aircraft_out) aircraft_rows) := 
+		layout_FAA_out xfRollAircraft(layout_aircraft_out le, 
+												DATASET(layout_aircraft_out) aircraft_rows) := 
 		TRANSFORM
+			SELF.date_last_seen := le.date_last_seen; //pick the most recent
 			SELF.mfr_mdl_code := le.mfr_mdl_code;
 			SELF.eng_mfr_mdl := le.eng_mfr_mdl;
-			SELF.Aircraft := aircraft_rows;
+			SELF.Aircraft := SORT(aircraft_rows, n_number, -date_last_seen);
 			SELF.AircraftEngine := [];
 			SELF.AircraftDetails := [];
 		END;
 			
-		aircraft_rolled := ROLLUP(GROUP(SORT(aircraft_recs_out, mfr_mdl_code,eng_mfr_mdl), mfr_mdl_code,eng_mfr_mdl), 
+		aircraft_rolled := ROLLUP(GROUP(SORT(aircraft_recs_out, mfr_mdl_code,eng_mfr_mdl, -date_last_seen), mfr_mdl_code,eng_mfr_mdl), 
 																	GROUP, xfRollAircraft(LEFT, ROWS(LEFT)));	
 
-		FAA_out xfAddEngine(FAA_out le, DATASET(aircraft_engine_out) r_rows) := 
+		layout_FAA_out xfAddEngine(layout_FAA_out le, DATASET(layout_aircraft_engine_out) r_rows) := 
 		TRANSFORM
-			SELF.AircraftEngine := r_rows;
+			SELF.AircraftEngine := SORT(r_rows, filedate);
 			SELF := le;
 		END;
 			
@@ -311,9 +315,9 @@ EXPORT RawAircraft := MODULE
 														GROUP, 
 														xfAddEngine(LEFT, ROWS(RIGHT)));		
 		
-		FAA_out xfAddDetails(FAA_out le, DATASET(aircraft_details_out) r_rows) := 
+		layout_FAA_out xfAddDetails(layout_FAA_out le, DATASET(layout_aircraft_details_out) r_rows) := 
 		TRANSFORM
-			SELF.AircraftDetails := r_rows;
+			SELF.AircraftDetails := SORT(r_rows, filedate);
 			SELF := le;
 		END;
 			
@@ -324,18 +328,18 @@ EXPORT RawAircraft := MODULE
 		
 		
 												
-		IF(ConsumerDisclosure.Debug,OUTPUT(aircraft_suppressed_recs, NAMED('aircraft_suppressed_recs')));
-		IF(ConsumerDisclosure.Debug,OUTPUT(aircraft_override_recs, NAMED('aircraft_override_recs')));
-		IF(ConsumerDisclosure.Debug,OUTPUT(aircraft_main_recs, NAMED('aircraft_main_recs')));
-		IF(ConsumerDisclosure.Debug,OUTPUT(aircraft_engine_suppressed_recs, NAMED('aircraft_engine_suppressed_recs')));
-		IF(ConsumerDisclosure.Debug,OUTPUT(aircraft_engine_override_recs, NAMED('aircraft_engine_override_recs')));
-		IF(ConsumerDisclosure.Debug,OUTPUT(aircraft_engine_main_recs, NAMED('aircraft_engine_main_recs')));
-		IF(ConsumerDisclosure.Debug,OUTPUT(aircraft_info_suppressed_recs, NAMED('aircraft_info_suppressed_recs')));
-		IF(ConsumerDisclosure.Debug,OUTPUT(aircraft_info_override_recs, NAMED('aircraft_info_override_recs')));
-		IF(ConsumerDisclosure.Debug,OUTPUT(aircraft_info_main_recs, NAMED('aircraft_info_main_recs')));
-		IF(ConsumerDisclosure.Debug,OUTPUT(recs_out, NAMED('aircrafts_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeAircraft,OUTPUT(aircraft_suppressed_recs, NAMED('aircraft_suppressed_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeAircraft,OUTPUT(aircraft_override_recs, NAMED('aircraft_override_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeAircraft,OUTPUT(aircraft_main_recs, NAMED('aircraft_main_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeAircraft,OUTPUT(aircraft_engine_suppressed_recs, NAMED('aircraft_engine_suppressed_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeAircraft,OUTPUT(aircraft_engine_override_recs, NAMED('aircraft_engine_override_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeAircraft,OUTPUT(aircraft_engine_main_recs, NAMED('aircraft_engine_main_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeAircraft,OUTPUT(aircraft_info_suppressed_recs, NAMED('aircraft_info_suppressed_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeAircraft,OUTPUT(aircraft_info_override_recs, NAMED('aircraft_info_override_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeAircraft,OUTPUT(aircraft_info_main_recs, NAMED('aircraft_info_main_recs')));
+		IF(ConsumerDisclosure.Debug AND in_mod.IncludeAircraft,OUTPUT(recs_out, NAMED('aircraft_combined_recs')));
 
-		RETURN recs_out;
+		RETURN SORT(recs_out, -date_last_seen);
 	END;
 	
 END;
