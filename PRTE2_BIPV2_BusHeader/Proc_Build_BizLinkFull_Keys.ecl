@@ -7,7 +7,7 @@ EXPORT Proc_Build_BizLinkFull_Keys(
 function
 
 	shared bizbase	:= PRTE2_BIPV2_BusHeader.File_BizHead;
-  shared specs  	:= BizLinkFull.specificities(bizbase);
+  shared specs  	:= PRTE2_BIPV2_BusHeader.specificities(bizbase);
   shared knames 	:= PRTE2_BIPV2_BusHeader.keynames(pversion);
   
   //BuildSpecs                     := tools.macf_writeindex('Keys(bizbase).Specificities_Key',,true);

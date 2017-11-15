@@ -1,4 +1,4 @@
-every_10_min := '*/10 0-23 * * *';
+﻿every_10_min := '*/10 0-23 * * *';
 IP:=NAC.Constants.LandingZoneServer;
 RootDir := NAC.Constants.LandingZonePathBaseEx;
 
@@ -47,7 +47,6 @@ NOC_MSG
 	;
 
 import _Control;
-#WORKUNIT('protect',true);
 #WORKUNIT('name', 'NAC Input Prep Schedule');
 ThorName:=if(_Control.ThisEnvironment.Name='Dataland','thor50_dev01','thor400_30_sla');
 

@@ -1,3 +1,6 @@
+﻿/*2017-11-10T21:40:19Z (Debendra Kumar)
+
+*/
 import ut, VersionControl,lib_stringlib,lib_fileservices,_control,orbit3;
 export Build_all(string version=version) := function
 
@@ -22,42 +25,23 @@ built := sequential(
 					,FCRA_ExperianCred
 					,zDoPopulationStats
 					,FileServices.StartSuperFileTransaction()
-#IF (IsFullUpdate = false)
-					,FileServices.AddSuperFile(Superfile_List.updates_history,Superfile_List.updates_father,,true)
-					,FileServices.ClearSuperFile(Superfile_List.updates_father)
-					,FileServices.AddSuperFile(Superfile_List.updates_father,Superfile_List.updates,,true)
-					,FileServices.ClearSuperFile(Superfile_List.updates)
+						,FileServices.ClearSuperFile(Superfile_List.updates_history,true)
+						,FileServices.AddSuperFile(Superfile_List.updates_history,Superfile_List.updates,,true)
+						,FileServices.ClearSuperFile(Superfile_List.updates)
+						
+						,FileServices.ClearSuperFile(Superfile_List.deletes_history,true)
+						,FileServices.AddSuperFile(Superfile_List.deletes_history,Superfile_List.deletes,,true)
+						,FileServices.ClearSuperFile(Superfile_List.deletes)
 
-					,FileServices.AddSuperFile(Superfile_List.deletes_history,Superfile_List.deletes_father,,true)
-					,FileServices.ClearSuperFile(Superfile_List.deletes_father)
-					,FileServices.AddSuperFile(Superfile_List.deletes_father,Superfile_List.deletes,,true)
-					,FileServices.ClearSuperFile(Superfile_List.deletes)
-
-					,FileServices.AddSuperFile(Superfile_List.deceased_history,Superfile_List.deceased_father,,true)
-					,FileServices.ClearSuperFile(Superfile_List.deceased_father)
-					,FileServices.AddSuperFile(Superfile_List.deceased_father,Superfile_List.deceased,,true)
-					,FileServices.ClearSuperFile(Superfile_List.deceased)
-#ELSE  //  flush past updates and start fresh
-					,FileServices.AddSuperFile(Superfile_List.load_father,Superfile_List.load,,true)
-					,FileServices.ClearSuperFile(Superfile_List.load)
-
-					,FileServices.ClearSuperFile(Superfile_List.updates_history,true)
-					,FileServices.ClearSuperFile(Superfile_List.updates_father,true)
-					,FileServices.AddSuperFile(Superfile_List.updates_father,Superfile_List.updates,,true)
-					,FileServices.ClearSuperFile(Superfile_List.updates)
-
-					,FileServices.ClearSuperFile(Superfile_List.deletes_history,true)
-					,FileServices.ClearSuperFile(Superfile_List.deletes_father,true)
-					,FileServices.AddSuperFile(Superfile_List.deletes_father,Superfile_List.deletes,,true)
-					,FileServices.ClearSuperFile(Superfile_List.deletes)
-
-					,FileServices.ClearSuperFile(Superfile_List.deceased_history,true)
-					,FileServices.ClearSuperFile(Superfile_List.deceased_father,true)
-					,FileServices.AddSuperFile(Superfile_List.deceased_father,Superfile_List.deceased,,true)
-					,FileServices.ClearSuperFile(Superfile_List.deceased)
+						,FileServices.ClearSuperFile(Superfile_List.deceased_history,true)
+						,FileServices.AddSuperFile(Superfile_List.deceased_history,Superfile_List.deceased,,true)
+						,FileServices.ClearSuperFile(Superfile_List.deceased)
+#IF (IsFullUpdate = true)  //  flush past updates and start fresh
+						,FileServices.ClearSuperFile(Superfile_List.load_father,true)
+						,FileServices.AddSuperFile(Superfile_List.load_father,Superfile_List.load,,true)
+						,FileServices.ClearSuperFile(Superfile_List.load)
 #END
 					,FileServices.FinishSuperFileTransaction()
-					//,Orbit3.Proc_Orbit3_CreateBuild_npf('Credit Header FCRA Experian',version)
 					);
 
 return built;

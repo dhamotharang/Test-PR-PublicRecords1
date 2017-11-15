@@ -18,18 +18,10 @@ zDoPopulationStats := Strata_Stat_ExperianCred;
 
 built := sequential(
 					//Automatically resets deceased and delete superfiles for full updates
-					#IF (IsFullUpdate = true)
-					FileServices.StartSuperFileTransaction()
-					,FileServices.AddSuperFile(Superfile_List.Source_Deceased_File_history,Superfile_List.Source_Deceased_File,,true)
-					,FileServices.AddSuperFile(Superfile_List.Source_Delete_File_history,Superfile_List.Source_delete_File,,true)
-					,FileServices.ClearSuperFile(Superfile_List.Source_Deceased_File)
-					,FileServices.ClearSuperFile(Superfile_List.Source_Delete_File)
-					,FileServices.FinishSuperFileTransaction()
-					,
-					#END
-					spray_input
+					 spray_input
 					,spray_delete
 					,spray_deceased
+					//,
 					,NormAddress
 					,CleanName
 					,CleanAddress
@@ -37,9 +29,30 @@ built := sequential(
 					//,Build_all_keys
 					,zDoPopulationStats
 					//Archive processed files in history
-					,FileServices.StartSuperFileTransaction()
-					,FileServices.AddSuperFile(Superfile_List.Source_File_Processed,Superfile_List.Source_File,,true)
-					,FileServices.ClearSuperFile(Superfile_List.Source_File)
+					,FileServices.StartSuperFileTransaction()						
+						#IF (IsFullUpdate = true)
+							//remove and delete previous input files
+							,FileServices.ClearSuperFile(Superfile_List.Source_Full_File_History, true)
+							,FileServices.ClearSuperFile(Superfile_List.Source_Deceased_Full_File_history, true)
+							,FileServices.ClearSuperFile(Superfile_List.Source_Delete_Full_File_History, true)
+							//add current input files to history
+							,FileServices.AddSuperFile(Superfile_List.Source_Full_File_History,Superfile_List.Source_File,,true)
+							,FileServices.AddSuperFile(Superfile_List.Source_Deceased_Full_File_history,Superfile_List.Source_Deceased_File,,true)
+							,FileServices.AddSuperFile(Superfile_List.Source_Delete_Full_File_History,Superfile_List.Source_delete_File,,true)	
+						#else
+							//remove and delete previous input files
+							,FileServices.ClearSuperFile(Superfile_List.Source_File_History, true)
+							,FileServices.ClearSuperFile(Superfile_List.Source_Deceased_File_history, true)
+							,FileServices.ClearSuperFile(Superfile_List.Source_Delete_File_history, true)
+							//add current input files to history
+							,FileServices.AddSuperFile(Superfile_List.Source_File_History,Superfile_List.Source_File,,true)
+							,FileServices.AddSuperFile(Superfile_List.Source_Deceased_File_history,Superfile_List.Source_Deceased_File,,true)
+							,FileServices.AddSuperFile(Superfile_List.Source_Delete_File_history,Superfile_List.Source_delete_File,,true)	
+						#End
+						//clear current input files						
+						,FileServices.ClearSuperFile(Superfile_List.Source_File)
+						,FileServices.ClearSuperFile(Superfile_List.Source_Deceased_File)
+						,FileServices.ClearSuperFile(Superfile_List.Source_delete_File)
 					,FileServices.FinishSuperFileTransaction()
 					,Orbit3.Proc_Orbit3_CreateBuild_npf('Credit Header',version)
 					);

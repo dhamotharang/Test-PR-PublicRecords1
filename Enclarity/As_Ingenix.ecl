@@ -132,7 +132,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 							,lookup);
 							
 		sort_prep5		:= sort(distribute(prep5, hash(group_key)), group_key, local);
-		sort_InIndi	:=	sort(distribute(InIndi, hash(group_key)), group_key, -dt_vendor_last_reported, local);
+		sort_InIndi	:=	sort(distribute(InIndi, hash(group_key, addr_key)), group_key, addr_key, -dt_vendor_last_reported, local):independent;
 
 		OutLayout tr2(sort_prep5 l, sort_InIndi r) := transform
 			self.lnpid															:=	if(l.group_key = r.group_key, r.lnpid, l.lnpid);
@@ -235,7 +235,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 							);
 
 		sort_prep6		:= sort(distribute(prep6, hash(group_key)), group_key, local);
-		sort_inAsso	:= sort(distribute(InAsso, hash(group_key)), group_key, -dt_vendor_last_reported, local);
+		sort_inAsso	:= sort(distribute(InAsso, hash(group_key, addr_key)), group_key, addr_key, -dt_vendor_last_reported, local):independent;
 		
 		OutLayout tr3(sort_prep6 l, sort_InAsso r) := transform
 			self.lnpid															:=	if(l.group_key = r.group_key, r.lnpid, l.lnpid);
@@ -335,7 +335,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 							,local
 							);
 
-		sort_prep7	:= sort(distribute(prep7, hash(group_key)), group_key, local);
+		sort_prep7	:= dedup(sort(distribute(prep7, hash(group_key)), group_key, local), record, local);
 		sort_InFac	:= sort(distribute(InFac(sanc1_code <> ''), hash(group_key)), group_key, local);
 		
 		OutLayout tr4(sort_InFac l) := transform
@@ -416,7 +416,9 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 							,left outer
 							,lookup);
 
-		prep10:=join(prep9,InSanCd
+		sort_prep9	:= sort(distribute(prep9, hash(sanc_brdtype, group_key)), sanc_brdtype, group_key, local);
+		
+		prep10:=join(sort_prep9,InSanCd
 							,left.sanc_brdtype=right.sanc_code  // note: overloaded sanc_brdtype for temp use above
 							,transform({prep9,InSanCd.sanc_code,InSanCd.sanc_desc}
 									,self:=left
@@ -424,8 +426,10 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 									)
 							,left outer
 							,lookup);
+							
+		sort_prep10:=sort(prep10, prov_type_desc);
 
-		prep11:=project(prep10
+		prep11:=project(sort_prep10
 							,transform(OutLayout
 									,self.SANC_PROVTYPE:=left.prov_type_desc
 									// could put together from provider type, state and type of sanction
@@ -433,8 +437,11 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 									,self.SANC_BRDTYPE := ''
 									,self:=left
 									));
+								
+		sort_prep11	:= dedup(sort(distribute(prep11, hash(group_key, SANC_LICNBR)), group_key, SANC_LICNBR, local), record, local);
 
-		EXPORT Sanctions_All := dedup(prep7 + prep11,record,all) :persist('~thor400_data::persist::Sanctions_All2');
+
+		EXPORT Sanctions_All := sort_prep7 + sort_prep11 :persist('~thor400_data::persist::Sanctions_All2');
 
 		//////////////////////////////////////////////////////////
 		// update_BWR_Sanctions_Did_File
