@@ -18,7 +18,7 @@ EXPORT Files := MODULE
 																																			self.bdid_out			:= (unsigned8)left.bdid_out;
 																																			self.street1			:= left.street;
 																																			self.suffix				:= left.addr_suffix;
-																																			self.aircraft_id	:= aircraft_id;																																	
+																																			self.aircraft_id	:= left.aircraft_id;																																	
 																																			self 							:= left;
 																																			self 							:= [];
 																																			));
