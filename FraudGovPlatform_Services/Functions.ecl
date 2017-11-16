@@ -1,70 +1,6 @@
-﻿IMPORT CriminalRecords_BatchService, FraudGovPlatform_Services, FraudShared_Services, ut, std;
+﻿IMPORT CriminalRecords_BatchService, FraudGovPlatform_Services, FraudShared_Services,Patriot , ut;
 
 EXPORT Functions := MODULE
-	EXPORT getKnownFraudCodeDescLookup (String KnownFraudCode) := FUNCTION
-		KnownFraudDesc := CASE(KnownFraudCode,
-													'1000' => 'Confirmed as stolen or compromised',
-													'1001' => 'Suspected stolen or compromised',
-													'1002' => 'Confirmed out-of-state',
-													'1003' => 'Suspected out-of-state',
-													'1004' => 'Under investigation',
-													'1005' => 'Confirmed association with fraud ring',
-													'1006' => 'Suspected association with fraud ring',
-													'1007' => 'On known watch list',
-													'2000' => 'Fraud - Multiple categories',
-													'2001' => 'Fraud - False Pretense',
-													'2002' => 'Fraud - Criminal Impersonation',
-													'2003' => 'Fraud - Misrepresentation',
-													'2004' => 'Fraud - Food Stamp',
-													'2005' => 'Fraud - Deceit',
-													'2006' => 'Fraud - Tax',
-													'2007' => 'Fraud - Exploitation',
-													'2008' => 'Fraud - Computer Fraud',
-													'2009' => 'Fraud - Multiple HHS Programs',
-													'2010' => 'Fraud - Medicaid Beneficiary',
-													'2011' => 'Fraud - Medicaid Provider',
-													'2012' => 'Fraud - Medicaid Claims',
-													'2013' => 'Fraud - Unemployment Insurance Business',
-													'2014' => 'Fraud - Unemployment Insurance Beneficiary',
-													'2015' => 'Fraud - Unemployment Insurance Claims',
-													'2016' => 'Fraud - Collusion',
-													'2017' => 'Fraud - False Welfare',
-													'2018' => 'Fraud - Falsification',
-													'2019' => 'Fraud - False Statements & Reports',
-													'3000' => 'Theft - Breach of trust',
-													'3001' => 'Theft - Multiple Categories',
-													'3002' => 'Theft - Credit Card',
-													'3003' => 'Theft - Deception',
-													'3004' => 'Theft - Embezzlement',
-													'3005' => 'Theft - Multiple Categories',
-													'3006' => 'Theft - Trover',
-													'3007' => 'Theft - Services',
-													'4000' => 'Forgery - Multiple categories',
-													'4001' => 'Forgery - Counterfeit',
-													'4002' => 'Bad Check - Multiple Categories',
-													'4003' => 'Bad Check - Checks',
-													'4004' => 'Bad Check - Funds',
-													'4005' => 'False Personation',
-													'4006' => 'Money Laundering',
-													'4007' => 'Tampering',
-													'' );
-		RETURN KnownFraudDesc;
-	END;
-
-  EXPORT getKnownFraudDescriptionFromPayload(	string8 event_date = '', 
-																							string8 event_end_date = '', 
-																							string75 event_type1 = '', string75 event_type2 = '', string75 event_type3 = '') := FUNCTION
-
-    dString1 := '(On: ' + ut.date_YYYYMMDDtoDateSlashed(event_date) + ') ';
-    dString2 := '(From: '+ ut.date_YYYYMMDDtoDateSlashed(event_date) + ' To: ' + ut.date_YYYYMMDDtoDateSlashed(event_end_date) + ') ';
-
-    eventDates := IF(event_date=event_end_date, dString1, dString2);
-    eventType1 := ',' + getKnownFraudCodeDescLookup(event_type1); 
-    eventType2 := ',' + getKnownFraudCodeDescLookup(event_type2);
-    eventType3 := ',' + getKnownFraudCodeDescLookup(event_type3);
-
-    RETURN std.str.cleanspaces(TRIM(eventDates + eventType1 + eventType2 + eventType3));
-  END;
 	
 	EXPORT getExternalServicesRecs(	DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in, 
 																	FraudGovPlatform_Services.IParam.BatchParams batch_params ) := FUNCTION
@@ -82,14 +18,18 @@ EXPORT Functions := MODULE
 			SELF.childRecs_Patriot := UNGROUP(recs_Patriot(acctno = L.acctno));
 			SELF := L;
 			SELF := [];
-		END;    
+		END;
 
 		final_recs := PROJECT(ds_batch_in, xfm_Compilation(LEFT));
 		
-		// output(recs_Death, named('recs_Death'));
-		// output(recs_Criminal, named('recs_Criminal'));
-		// output(recs_RedFlag, named('recs_RedFlag'));
-		// output(recs_Patriot, named('recs_Patriot'));
+		// Added for QA to display raw records coming out of external services, so its easy for them to test knownfrauds.
+		#IF(FraudGovPlatform_Services.Constants.IS_DEBUG)
+			output(recs_Death, named('recs_Death'));
+			output(recs_Criminal, named('recs_Criminal'));
+			output(recs_RedFlag, named('recs_RedFlag'));
+			output(recs_Patriot, named('recs_Patriot'));
+		#END
+		
 		return final_recs;
 	END;
 		
@@ -97,13 +37,13 @@ EXPORT Functions := MODULE
 														FraudGovPlatform_Services.IParam.BatchParams batch_params,
 														DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) ds_payloads_in) := FUNCTION
 
-		FraudGovPlatform_Services.Layouts.KnownFrauds_rec xfm_KNFDCompilation(FraudShared_Services.Layouts.BatchIn_rec L, 
+		FraudGovPlatform_Services.Layouts.KnownFrauds_rec xfm_KNFDCompilation(FraudShared_Services.Layouts.BatchIn_rec L,
 																																					DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) R ) := TRANSFORM
 		
 			ds_sorted := SORT(R, -event_date);
 			SELF.payload := ds_sorted;
 			SELF := L;
-		END;	
+		END;
 
 		knownFraudResults := DENORMALIZE(	ds_batch_in, ds_payloads_in, 
 																			LEFT.acctno = RIGHT.acctno,
@@ -202,13 +142,46 @@ EXPORT Functions := MODULE
 																	
 																	// Commented lines are actaully work for GRP-247 and will be added later on....not part of 11/14 roxie release.
 																	SELF.known_risk_reason :=	MAP(name_ssn_dob_match AND RIGHT.curr_incar_flag = 'Y' => 'Identity is Incarcerated',
-																																// name_ssn_dob_match AND RIGHT.curr_incar_flag <> 'Y' => 'Identity has been convicted of fraud', 
+																																name_ssn_dob_match AND RIGHT.curr_incar_flag <> 'Y' => 'Identity has been convicted of fraud', 
 																																~name_ssn_dob_match AND RIGHT.curr_incar_flag = 'Y' => 'Identity is associated with an incarcerated individual',
-																																// ~name_ssn_dob_match AND RIGHT.curr_incar_flag <> 'Y' => 'Identity is associated with an individual convicted of fraud',
+																																~name_ssn_dob_match AND RIGHT.curr_incar_flag <> 'Y' AND 
+																																(RIGHT.fname <> '' OR RIGHT.lname <> '' OR RIGHT.ssn <> '') => 'Identity is associated with an individual convicted of fraud',
 																															 '');
 																	SELF.event_date := RIGHT.offense_date;
-																	SELF.event_type := 'Criminal'));																																	 
+																	SELF.event_type := 'Criminal'));				
+																	
+		//*** RED FLAG KNOWN RISKS ***//
 		
+		ds_red_flag_temp := NORMALIZE(ds_records.childRecs_redFlag, 12, FraudGovPlatform_Services.Transforms.xnorm_red_flag(LEFT, COUNTER));
+		
+		FraudGovPlatform_Services.Layouts.red_flag_desc_w_cat_weight xnorm_red_flag_w_weight(FraudGovPlatform_Services.Layouts.red_flag_desc_w_details l, 
+																																																																																FraudGovPlatform_Services.Layouts.red_flag_desc r) := TRANSFORM
+				SELF := r;
+				SELF := l;
+		END;
+		
+		ds_red_flag_temp2 := NORMALIZE(ds_red_flag_temp, LEFT.hri_details, xnorm_red_flag_w_weight(LEFT,RIGHT));
+		
+		ds_red_flag_sorted := SORT(ds_red_flag_temp2, seq, category_weight, hri_weight);
+
+		red_flag_knownrisk_ds := JOIN(ds_records, ds_red_flag_sorted,
+																														LEFT.batchin_rec.acctno = (STRING)RIGHT.seq,
+																																TRANSFORM(slim_knownrisk_rec,
+																																		SELF.acctno := LEFT.batchin_rec.acctno,
+																																		SELF.known_risk_reason :=	RIGHT.desc;
+																																		SELF.event_date := '';
+																																		SELF.event_type := 'RedFlag'));	
+
+		// *** PATRIOT/GLOBAL WATCH LIST KNOWN RISKS ***
+		patriot_recs_raw := PROJECT(ds_records.childRecs_Patriot, TRANSFORM(Patriot.layout_batch_out, SELF := LEFT, SELF := []));
+		patriot_knownrisk_ds := JOIN(ds_records, patriot_recs_raw,
+																LEFT.batchin_rec.acctno = RIGHT.acctno,
+																	TRANSFORM(slim_knownrisk_rec,
+																		SELF.acctno := LEFT.batchin_rec.acctno,
+																		SELF.known_risk_reason :=	'Name match on the Global watch list';
+																		SELF.event_date := ''; //No date to add. 
+																		SELF.event_type := 'Patriot'));
+																		
 		//*** KNFD KNOWN RISKS ***//
 		FraudGovPlatform_Services.Layouts.KnownFrauds_rec trans (FraudGovPlatform_Services.Layouts.KnownFrauds_rec R) := TRANSFORM
 			SELF := R;
@@ -225,7 +198,7 @@ EXPORT Functions := MODULE
 		knfd_knownrisk_ds := PROJECT(knfd_payload_ds,
 																	TRANSFORM(slim_knownrisk_rec,
 																		SELF.acctno := LEFT.acctno,
-																		SELF.known_risk_reason := getKnownFraudDescriptionFromPayload(LEFT.event_date,
+																		SELF.known_risk_reason := FraudGovPlatform_Services.Utilities.getKnownFraudDescriptionFromPayload(LEFT.event_date,
 																																																	LEFT.event_end_date,
 																																																	LEFT.Event_Type_1,
 																																																	LEFT.Event_Type_2,
@@ -234,17 +207,17 @@ EXPORT Functions := MODULE
 																		SELF.event_type := 'KNFD'));
 		
 		//*** COMBINED KNOWN RISKS ***//
-		known_risk_ds := sort(death_knownrisk_ds + crim_knownrisk_ds + knfd_knownrisk_ds , acctno, -event_date)(known_risk_reason <> '');
-															
-		// output(ds_records, named('ds_records'));															
-		// output(death_knownrisk_ds, named('death_knownrisk_ds'));
-		// output(crim_recs_raw, named('crim_recs_raw'));
-		// output(crim_knownrisk_ds, named('crim_knownrisk_ds'));
-		// output(crim_recs_norm, named('crim_recs_norm'));
-		// output(crim_recs_norm_dedup, named('crim_recs_norm_dedup'));
-		// output(knfd_knownrisk_ds, named('knfd_knownrisk_ds'));
-		// output(known_risk_ds, named('known_risk_ds'));
+		known_risk_ds := sort(patriot_knownrisk_ds + death_knownrisk_ds + crim_knownrisk_ds + knfd_knownrisk_ds + red_flag_knownrisk_ds, acctno, -event_date)(known_risk_reason <> '');
 
+		#IF(FraudGovPlatform_Services.Constants.IS_DEBUG)
+			output(ds_records, named('ds_records'));															
+			// output(death_knownrisk_ds, named('death_knownrisk_ds'));
+			// output(crim_knownrisk_ds, named('crim_knownrisk_ds'));
+			// output(patriot_knownrisk_ds, named('patriot_knownrisk_ds'));
+			// output(knfd_knownrisk_ds, named('knfd_knownrisk_ds'));
+			// output(known_risk_ds, named('known_risk_ds'));
+		#END
+		
 		return known_risk_ds;
 	END;
 
@@ -255,7 +228,8 @@ EXPORT Functions := MODULE
 		FraudGovPlatform_Services.Layouts.BatchOut_rec xfm_pre_batchout(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw L) := TRANSFORM
 			SELF.Seq := L.batchin_rec.Seq;
 			SELF.LexID := L.batchin_rec.did;
-
+			SELF.identity_resolved := IF(L.batchin_rec.did <> 0 , 'Y', 'N');
+			
 			unsigned4 VEL_CNT := COUNT(L.childRecs_Velocities);
 			SELF.velocity_exceeded_cnt := VEL_CNT;
 			SELF.velocity_exceeded_reason1 := IF(VEL_CNT >= 1, L.childRecs_Velocities[1].description, '');
@@ -283,8 +257,6 @@ EXPORT Functions := MODULE
 															LEFT.acctno = RIGHT.acctno,
 															GROUP,
 															xfm_batchout(LEFT, ROWS(RIGHT)));
-
-		// output(ds_results, named('ds_results'));
 		RETURN ds_results;
 	END;
 

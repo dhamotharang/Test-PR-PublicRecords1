@@ -197,4 +197,21 @@ EXPORT Layouts := MODULE
 			STRING10  Home_Phone2;	
 		END;
 		
+		EXPORT red_flag_desc := RECORD
+			STRING5 hri;
+			STRING desc;
+			INTEGER hri_weight;
+		END;
+
+		EXPORT red_flag_desc_w_details := RECORD
+			UNSIGNED seq := 0;
+			INTEGER category_weight;
+			DATASET(red_flag_desc) hri_details;
+		END;
+	
+		EXPORT red_flag_desc_w_cat_weight := RECORD
+			UNSIGNED seq := 0;
+			red_flag_desc;
+			INTEGER category_weight;
+		END;
 END;

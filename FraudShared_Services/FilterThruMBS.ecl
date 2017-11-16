@@ -91,7 +91,9 @@ EXPORT FilterThruMBS(
 		//RIGHT.inclusion_id = gc_id_in AND
 		RIGHT.FdnMasterId IN SetFdnMasterIds AND
 		RIGHT.ind_type = ind_type_in,
-		TRANSFORM(LEFT));
+		TRANSFORM(LEFT),
+    KEEP(FraudShared_Services.Constants.MAX_RECS_ON_JOIN),
+    LIMIT(0));
 
 	
 	ds_results := IF(fraud_platform = FraudGovPlatform_Services.Constants.FRAUD_PLATFORM , Include_FraudGov , ds_results_pre);
