@@ -87,29 +87,3 @@ EXPORT proc_build_fraud_flag_eq(string filedate) := function
         return build_it;
         
 END;
-
-
-
-
-/*
-
-sort by vid, code and date reported (each vid-code-date_reported are 1 or more groups)
-
-			vid code reported dt_first dt_last
-   123 x    210701   210701			210701
-	  123 x    210701   210702			210702
-   123 -----------   210703 		201703 (not reported)
-			123 x    210701   210704   201704
-
-   vid code reported dt_first dt_last
-			123 x    201701   201701   201702
-			123 x    201701   201704   201704   IOW if more than 1 month difference - it needs to be a new group
-
-We ignore ambiguous time span overlaps and we split non-concecutive periods. Only then we take date max/min
-
-so:
-
-sort(ds,vid,code,date_reported)
-
-
-*/

@@ -1,4 +1,4 @@
-import header, doxie, autokey, autokeyb, RoxieKeyBuild, header_services, risk_indicators, mdr,aid,PromoteSupers;
+﻿import header, doxie, autokey, autokeyb, RoxieKeyBuild, header_services, risk_indicators, mdr,aid,PromoteSupers;
 
 export FN_KeyBuild(dataset(header.Layout_Header) header_in0, string filedate) := 
 FUNCTION
@@ -211,24 +211,28 @@ autoKeys := header_quick.FN_AutokeyBuild(file_header_quick_skip_PID, filedate);
 fcra_didkey := FN_key_DID(file_header_quick(src in mdr.sourceTools.set_scoring_FCRA,src not in mdr.sourceTools.set_scoring_FCRA_retro_test),
 																																											'~thor_data400::key::HeaderQuick::fcra::'+filedate+'::DID') ;
 
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(     didkey,           '',                                            '~thor_data400::key::HeaderQuick::'      +filedate+'::DID',         B1);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(fcra_didkey,           '',                                            '~thor_data400::key::HeaderQuick::fcra::'+filedate+'::DID',         B2);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(key_ssn_validity,      '~thor_data400::key::HeaderQuick_SSN_validity','~thor_data400::key::HeaderQuick::'      +filedate+'::SSN_validity',B3);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(header.key_nlr_payload,'~thor_data400::key::header_nlr::did.rid',     '~thor_data400::key::header_nlr::'       +filedate+'::did.rid',     B4);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(     didkey,           '',                                            '~thor_data400::key::HeaderQuick::'            +filedate+'::DID',         B1);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(fcra_didkey,           '',                                            '~thor_data400::key::HeaderQuick::fcra::'      +filedate+'::DID',         B2);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(key_ssn_validity,      '~thor_data400::key::HeaderQuick_SSN_validity','~thor_data400::key::HeaderQuick::'            +filedate+'::SSN_validity',B3);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(header.key_nlr_payload,'~thor_data400::key::header_nlr::did.rid',     '~thor_data400::key::header_nlr::'             +filedate+'::did.rid',     B4);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(header_quick.key_fraud_flag_eq_pre,'',                                '~thor_data400::key::HeaderQuick::fraud_flag::'+filedate+'::eq'          ,B5);
 
-RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::HeaderQuickDID',           '~thor_data400::key::HeaderQuick::'      +filedate+'::DID',          M1);
-RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::HeaderQuick::fcra::DID',   '~thor_data400::key::HeaderQuick::fcra::'+filedate+'::DID',          M2);
-Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::HeaderQuick_SSN_validity', '~thor_data400::key::HeaderQuick::'      +filedate+'::SSN_validity', M3);
-Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::header_nlr::did.rid',      '~thor_data400::key::header_nlr::'       +filedate+'::did.rid',      M4);
+RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::HeaderQuickDID',                '~thor_data400::key::HeaderQuick::'              +filedate+'::DID',          M1);
+RoxieKeyBuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::HeaderQuick::fcra::DID',        '~thor_data400::key::HeaderQuick::fcra::'        +filedate+'::DID',          M2);
+Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::HeaderQuick_SSN_validity',      '~thor_data400::key::HeaderQuick::'              +filedate+'::SSN_validity', M3);
+Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::header_nlr::did.rid',           '~thor_data400::key::header_nlr::'               +filedate+'::did.rid',      M4);
+Roxiekeybuild.Mac_SK_Move_to_Built_v2('~thor_data400::key::headerquick::fraud_flag::@version@::eq','~ thor_data400::key::headerquick::fraud_flag::'+filedate+'::eq',    M5);
 
-PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::HeaderQuickDID',          'Q',MQ1);
-PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::HeaderQuick::fcra::DID',  'Q',MQ2);
-PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::HeaderQuick_SSN_validity','Q',MQ3);
-PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::header_nlr::did.rid',     'Q',MQ4);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::HeaderQuickDID',                 'Q',MQ1);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::HeaderQuick::fcra::DID',         'Q',MQ2);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::HeaderQuick_SSN_validity',       'Q',MQ3);
+PromoteSupers.MAC_SK_Move_v2('~thor_data400::key::header_nlr::did.rid',            'Q',MQ4);
+Roxiekeybuild.Mac_SK_Move_V3('~thor_data400::key::headerquick::fraud_flag::@version@::eq','Q',MQ5,filedate);
 
 return sequential(
 									build_source_key(filedate)
 									,build_qh_base
+									,header_quick.proc_build_fraud_flag_eq(filedate)
 									,notify('QuickHeader BaseFile Complete','*')
 									,build_rid_srid_keys(filedate)
 									,parallel(
@@ -237,6 +241,7 @@ return sequential(
 														,sequential(B2,M2,MQ2)
 														,sequential(B3,M3,MQ3)
 														,sequential(B4,M4,MQ4)
+														,sequential(B5,M5,MQ5)
 														)
 									//,build_source_key_prep(filedate)
 								);
