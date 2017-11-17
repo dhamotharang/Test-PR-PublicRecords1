@@ -1,4 +1,4 @@
-
+﻿
 // OHS0654 / Ohio Department of Commerce / Multiple Professions //
 //Real Estate and Profession Licensing.csv
 export layout_OHS0654 := MODULE
@@ -35,9 +35,9 @@ export layout_OHS0654 := MODULE
 	//DFI.csv
 	EXPORT layout_mortgage := RECORD
 		STRING150 FULL_NAME;
-		STRING60  DBA1;
-		STRING60  DBA2;
-		STRING60  DBA3;
+		STRING160  DBA1;
+		STRING160  DBA2;
+		STRING160  DBA3;
 		STRING50  CREDENTIAL_NUMBER;
 		STRING50  CREDENTIAL_TYPE;
 		STRING20  FIRST_ISSUANCE_DATE;
