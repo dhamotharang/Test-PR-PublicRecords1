@@ -3,73 +3,6 @@
 
 EXPORT Raw := MODULE
 
-	SHARED boolean Include_ALL_Watchlist  := FALSE : STORED('Include_ALL_Watchlist');
-	SHARED boolean Include_BES_Watchlist  := FALSE : STORED('Include_BES_Watchlist');
-	SHARED boolean Include_CFTC_Watchlist := FALSE : STORED('Include_CFTC_Watchlist');
-	SHARED boolean Include_DTC_Watchlist  := FALSE : STORED('Include_DTC_Watchlist');
-	SHARED boolean Include_EUDT_Watchlist := FALSE : STORED('Include_EUDT_Watchlist');
-	SHARED boolean Include_FBI_Watchlist  := FALSE : STORED('Include_FBI_Watchlist');
-	SHARED boolean Include_FCEN_Watchlist := FALSE : STORED('Include_FCEN_Watchlist');
-	SHARED boolean Include_FAR_Watchlist  := FALSE : STORED('Include_FAR_Watchlist');
-	SHARED boolean Include_IMW_Watchlist  := FALSE : STORED('Include_IMW_Watchlist');
-	SHARED boolean Include_OFAC_Watchlist := FALSE : STORED('Include_OFAC_Watchlist');
-	SHARED boolean Include_OCC_Watchlist  := FALSE : STORED('Include_OCC_Watchlist');
-	SHARED boolean Include_OSFI_Watchlist := FALSE : STORED('Include_OSFI_Watchlist');
-	SHARED boolean Include_PEP_Watchlist  := FALSE : STORED('Include_PEP_Watchlist');
-	SHARED boolean Include_SDT_Watchlist  := FALSE : STORED('Include_SDT_Watchlist');
-	SHARED boolean Include_BIS_Watchlist  := FALSE : STORED('Include_BIS_Watchlist');
-	SHARED boolean Include_UNNT_Watchlist := FALSE : STORED('Include_UNNT_Watchlist');
-	SHARED boolean Include_WBIF_Watchlist := FALSE : STORED('Include_WBIF_Watchlist');
-
-	SHARED boolean Include_ADFA_Watchlist := FALSE : STORED('Include_ADFA_Watchlist');
-	SHARED boolean Include_FAJC_Watchlist := FALSE : STORED('Include_FAJC_Watchlist');
-	SHARED boolean Include_FATF_Watchlist := FALSE : STORED('Include_FATF_Watchlist');
-	SHARED boolean Include_FBIH_Watchlist := FALSE : STORED('Include_FBIH_Watchlist');
-	SHARED boolean Include_FBIS_Watchlist := FALSE : STORED('Include_FBIS_Watchlist');
-	SHARED boolean Include_FBIT_Watchlist := FALSE : STORED('Include_FBIT_Watchlist');
-	SHARED boolean Include_FBIW_Watchlist := FALSE : STORED('Include_FBIW_Watchlist');
-	SHARED boolean Include_HKMA_Watchlist := FALSE : STORED('Include_HKMA_Watchlist');
-	SHARED boolean Include_MASI_Watchlist := FALSE : STORED('Include_MASI_Watchlist');
-	SHARED boolean Include_OFFC_Watchlist := FALSE : STORED('Include_OFFC_Watchlist');
-	SHARED boolean Include_PMLC_Watchlist := FALSE : STORED('Include_PMLC_Watchlist');
-	SHARED boolean Include_PMLJ_Watchlist := FALSE : STORED('Include_PMLJ_Watchlist');
-	
-	SHARED GetWatchlist() := FUNCTION
-		dWL := DATASET([], iesp.share.t_StringArrayItem) 
-      + IF(Include_ALL_Watchlist,  DATASET([{patriot.constants.wlALL}],  iesp.share.t_StringArrayItem))
-		  + IF(Include_BES_Watchlist,  DATASET([{patriot.constants.wlBES}],  iesp.share.t_StringArrayItem))
-		  + IF(Include_CFTC_Watchlist, DATASET([{patriot.constants.wlCFTC}], iesp.share.t_StringArrayItem))
-		  + IF(Include_DTC_Watchlist,  DATASET([{patriot.constants.wlDTC}],  iesp.share.t_StringArrayItem))
-		  + IF(Include_EUDT_Watchlist, DATASET([{patriot.constants.wlEUDT}], iesp.share.t_StringArrayItem))
-		  + IF(Include_FBI_Watchlist,  DATASET([{patriot.constants.wlFBI}],  iesp.share.t_StringArrayItem))
-		  + IF(Include_FCEN_Watchlist, DATASET([{patriot.constants.wlFCEN}], iesp.share.t_StringArrayItem))
-		  + IF(Include_FAR_Watchlist,  DATASET([{patriot.constants.wlFAR}],  iesp.share.t_StringArrayItem))
-		  + IF(Include_IMW_Watchlist,  DATASET([{patriot.constants.wlIMW}],  iesp.share.t_StringArrayItem))
-		  + IF(Include_OFAC_Watchlist, DATASET([{patriot.constants.wlOFAC}], iesp.share.t_StringArrayItem))
-		  + IF(Include_OCC_Watchlist,  DATASET([{patriot.constants.wlOCC}],  iesp.share.t_StringArrayItem))
-		  + IF(Include_OSFI_Watchlist, DATASET([{patriot.constants.wlOSFI}], iesp.share.t_StringArrayItem))
-		  + IF(Include_PEP_Watchlist,  DATASET([{patriot.constants.wlPEP}],  iesp.share.t_StringArrayItem))
-		  + IF(Include_SDT_Watchlist,  DATASET([{patriot.constants.wlSDT}],  iesp.share.t_StringArrayItem))
-		  + IF(Include_BIS_Watchlist,  DATASET([{patriot.constants.wlBIS}],  iesp.share.t_StringArrayItem))
-		  + IF(Include_UNNT_Watchlist, DATASET([{patriot.constants.wlUNNT}], iesp.share.t_StringArrayItem))
-		  + IF(Include_WBIF_Watchlist, DATASET([{patriot.constants.wlWBIF}], iesp.share.t_StringArrayItem))
-		  + IF(Include_ADFA_Watchlist, DATASET([{patriot.constants.wlADFA}], iesp.share.t_StringArrayItem))
-		  + IF(Include_FAJC_Watchlist, DATASET([{patriot.constants.wlFAJC}], iesp.share.t_StringArrayItem))
-		  + IF(Include_FATF_Watchlist, DATASET([{patriot.constants.wlFATF}], iesp.share.t_StringArrayItem))
-		  + IF(Include_FBIH_Watchlist, DATASET([{patriot.constants.wlFBIH}], iesp.share.t_StringArrayItem))
-		  + IF(Include_FBIS_Watchlist, DATASET([{patriot.constants.wlFBIS}], iesp.share.t_StringArrayItem))
-		  + IF(Include_FBIT_Watchlist, DATASET([{patriot.constants.wlFBIT}], iesp.share.t_StringArrayItem))
-		  + IF(Include_FBIW_Watchlist, DATASET([{patriot.constants.wlFBIW}], iesp.share.t_StringArrayItem))
-		  + IF(Include_HKMA_Watchlist, DATASET([{patriot.constants.wlHKMA}], iesp.share.t_StringArrayItem))
-		  + IF(Include_MASI_Watchlist, DATASET([{patriot.constants.wlMASI}], iesp.share.t_StringArrayItem))
-		  + IF(Include_OFFC_Watchlist, DATASET([{patriot.constants.wlOFFC}], iesp.share.t_StringArrayItem))
-		  + IF(Include_PMLC_Watchlist, DATASET([{patriot.constants.wlPMLC}], iesp.share.t_StringArrayItem))
-		  + IF(Include_PMLJ_Watchlist, DATASET([{patriot.constants.wlPMLJ}], iesp.share.t_StringArrayItem));
-		
-		RETURN dWL;
-		
-	END;
-
 	EXPORT GetDeath(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
 									FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
 									
@@ -84,13 +17,28 @@ EXPORT Raw := MODULE
 	
 	EXPORT GetCriminal(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
 										 FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
-									
-		crim_batch_params := MODULE(
-      PROJECT(batch_params, CriminalRecords_BatchService.IParam.batch_params, OPT))
+			
+		// As per GRP-248 only following offense Categories needs to be returned. 
+		crim_batch_params := MODULE(CriminalRecords_BatchService.IParam.batch_params) 
+				EXPORT BOOLEAN IncludeBadChecks:= TRUE;
+				EXPORT BOOLEAN IncludeBribery:= TRUE;
+				EXPORT BOOLEAN IncludeBurglaryComm:= TRUE;
+				EXPORT BOOLEAN IncludeBurglaryRes:= TRUE;
+				EXPORT BOOLEAN IncludeBurglaryVeh:= TRUE;
+				EXPORT BOOLEAN IncludeComputer:= TRUE;
+				EXPORT BOOLEAN IncludeCounterfeit:= TRUE;
+				EXPORT BOOLEAN IncludeFraud:= TRUE;
+				EXPORT BOOLEAN IncludeIdTheft:= TRUE;
+				EXPORT BOOLEAN IncludeMVTheft:= TRUE;    
+				EXPORT BOOLEAN IncludeRobberyComm:= TRUE;
+				EXPORT BOOLEAN IncludeRobberyRes:= TRUE;
+				EXPORT BOOLEAN IncludeShoplift:= TRUE;
+				EXPORT BOOLEAN IncludeStolenProp:= TRUE;
+				EXPORT BOOLEAN IncludeTheft:= TRUE;
+				EXPORT BOOLEAN IncludeAtLeast1Offense := TRUE; //This is internal option for Crim Batch Record which needs to be set true if any of the offense categories are TRUE...
 		END;
 		
 		ds_crim_in := PROJECT(ds_batch_in, TRANSFORM(CriminalRecords_BatchService.Layouts.batch_in, SELF := LEFT, SELF := []));
-		
 		ds_criminal := CriminalRecords_BatchService.BatchRecords(crim_batch_params, ds_crim_in);
 		ds_criminal_records := ds_criminal.Records;
 									
@@ -126,73 +74,14 @@ EXPORT Raw := MODULE
 		actualIIDVersion := MAP((unsigned)IIDVersion > maxAllowedVersion => 99,	// they asked for a version that doesn't exist
 														IIDVersionOverride = false => ut.imin2(ut.max2((unsigned)IIDversion, lowestAllowedVersion), maxAllowedVersion),	// choose the higher of the allowed or asked for because they can't override lowestAllowedVersion, however, don't let them pick a version that is higher than the highest one we currently support
 														(unsigned)IIDversion); // they can override, give them whatever they asked for
-		in_format := RECORD
-			risk_indicators.Layout_Batch_In;
-			string20 HistoryDateTimeStamp := '';
-			string6 Gender := '';
-			string44 PassportUpperLine := '';
-			string44 PassportLowerLine := '';
-			// fields below requested by Deni/Mike to be added for fraudpoint 2.0, even though we do nothing with them
-			string5 Grade := '';
-			string16 Channel := '';
-			string8 Income := '';
-			string16 OwnOrRent := '';
-			string16 LocationIdentifier := '';
-			string16 OtherApplicationIdentifier := '';
-			string16 OtherApplicationIdentifier2 := '';
-			string16 OtherApplicationIdentifier3 := '';
-			string8 DateofApplication := '';
-			string8 TimeofApplication := '';
-			string50 email := '';
-			string64 custom_input1 := '';
-			string64 custom_input2 := '';
-			string64 custom_input3 := '';
-			string64 custom_input4 := '';
-			string64 custom_input5 := '';
-			string64 custom_input6 := '';
-			string64 custom_input7 := '';
-			string64 custom_input8 := '';
-			string64 custom_input9 := '';
-			string64 custom_input10 := '';
-			string64 custom_input11 := '';
-			string64 custom_input12 := '';
-			string64 custom_input13 := '';
-			string64 custom_input14 := '';
-			string64 custom_input15 := '';
-			string64 custom_input16 := '';
-			string64 custom_input17 := '';
-			string64 custom_input18 := '';
-			string64 custom_input19 := '';
-			string64 custom_input20 := '';
-			string64 custom_input21 := '';
-			string64 custom_input22 := '';
-			string64 custom_input23 := '';
-			string64 custom_input24 := '';
-			string64 custom_input25 := '';
-			string120 UnparsedFullName2;
-			string30  Name_First2;
-			string30  Name_Middle2;
-			string30  Name_Last2;
-			string5   Name_Suffix2;
-			string65  Street_Addr2;
-			string10  Prim_Range2;
-			string2   Predir2;
-			string28  Prim_Name2;
-			string4   Suffix2;
-			string2   Postdir2;
-			string10  Unit_Desig2;
-			string8   Sec_Range2;
-			string25  p_City_name2;
-			string2   St2;
-			string5   Z52;
-			string10  Home_Phone2;	
-		END;
 
 		ds_red_flags := PROJECT(ds_batch_in, 
-												TRANSFORM(in_format, 
-														SELF.seq := COUNTER,
-														SELF := LEFT, 
-														SELF := []));
+											TRANSFORM(FraudGovPlatform_Services.Layouts.red_flag_in, 
+												SELF.seq := COUNTER,
+												SELF.home_phone := LEFT.phoneno,
+												SELF.street_addr := LEFT.addr,
+												SELF := LEFT, 
+												SELF := []));
 
 		Gateway.Layouts.Config gw_switch(batch_params.gateways le) := TRANSFORM
 			SELF.servicename := MAP(IncludeTargus = FALSE AND le.servicename = 'targus' => '',	// don't call TG when Targus = FALSE
@@ -305,26 +194,26 @@ EXPORT Raw := MODULE
  	EXPORT GetGlobalWatchlist(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
 														FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
 														
-		  string20 search_type := 'BOTH' : STORED('search_type');
-			
-  		patriot.Layout_batch_in xform_in(ds_batch_in le) := TRANSFORM
-      //SELF.seq := C;
-  			 SELF.name_first := Stringlib.StringToUpperCase(le.name_first);
-		    SELF.name_middle := Stringlib.StringToUpperCase(le.name_middle);
-  			 SELF.name_last := Stringlib.StringToUpperCase(le.name_last);
-		  	 SELF.name_unparsed := '';
-	  		 SELF.country := '';
-	  		 SELF.search_type := Stringlib.StringToUpperCase(search_type);
-		  	 SELF.dob := le.dob;	
-		  	 SELF := le;
-		  END;
-			
-	   ds_global_watchlist_in := GROUP(PROJECT(ds_batch_in, xform_in(LEFT)), acctno);
-		
-    // Parameters to function call from Michele Walklin
-		  ds_global_watchlist_out := Patriot.Search_Batch_Function(ds_global_watchlist_in, FALSE, 0.00, 2, TRUE);
-									
-		  RETURN UNGROUP(ds_global_watchlist_out);
+		string20 search_type := 'BOTH' : STORED('search_type');
+
+		patriot.Layout_batch_in xform_in(ds_batch_in le) := TRANSFORM
+			//SELF.seq := C;
+			SELF.name_first := Stringlib.StringToUpperCase(le.name_first);
+			SELF.name_middle := Stringlib.StringToUpperCase(le.name_middle);
+			SELF.name_last := Stringlib.StringToUpperCase(le.name_last);
+			SELF.name_unparsed := '';
+			SELF.country := '';
+			SELF.search_type := Stringlib.StringToUpperCase(search_type);
+			SELF.dob := le.dob;	
+			SELF := le;
+		END;
+
+		ds_global_watchlist_in := GROUP(PROJECT(ds_batch_in, xform_in(LEFT)), acctno);
+
+		// Parameters to function call from Michele Walklin
+		ds_global_watchlist_out := Patriot.Search_Batch_Function(ds_global_watchlist_in, FALSE, 0.00, 2, TRUE);
+								
+		RETURN UNGROUP(ds_global_watchlist_out);
 										 
  	END;
 	
