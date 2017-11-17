@@ -1,4 +1,4 @@
-export MAC_FEIN (indataset,inbname,
+﻿export MAC_FEIN (indataset,inbname,
 						infein,
 						phone,
 						inprim_name,inprim_range,inst,incity_name,inzip,insec_range,
@@ -30,7 +30,7 @@ TRANSFORM
   SELF.bdid := le.inbdid;
 	SELF.lookups := le.inlookups | ut.bit_set(0,0);
 END;
-%p% := PROJECT(%indata%((integer)infein<>0), %proj%(LEFT));
+%p% := PROJECT(%indata%((integer)stringlib.stringfilterout((string)infein,'-')<>0), %proj%(LEFT));
 
 // Dedup by all fields or by all fields except lookup, preferring the record with the favored lookup
 // bit set or otherwise the record with the highest lookup bit set for a set of otherwise identical records
