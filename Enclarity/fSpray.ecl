@@ -1,4 +1,4 @@
-IMPORT VersionControl,_Control, ut, lib_fileservices,enclarity, tools;
+﻿IMPORT VersionControl,_Control, ut, lib_fileservices,enclarity, tools;
 
 EXPORT fSpray(
 	STRING		pVersion              = '',
@@ -24,8 +24,8 @@ EXPORT fSpray(
 	STRING		pCollapseFilename			= '*collap*.txt',
 	STRING		pSplitFilename				= '*split*.txt',
 	STRING		pDropFilename					= '*drop*.txt',
-	STRING		pDirectory						= '/data/data_build_4/enclarity/data/' + pVersion,
-	STRING		pGroupName						= IF((tools._Constants.IsDataland),'thor40_241','thor400_44'),
+	STRING		pDirectory						= '/data/data_build_4/enclarity/data/' + pVersion[1..8],
+	STRING		pGroupName						= IF((tools._Constants.IsDataland),'thor400_dev01_v2','thor400_44'),
 	BOOLEAN		pIsTesting						= false,
 	BOOLEAN		pOverwrite						= true,
 	STRING		pNameOutput						= 'Enclarity Source Files Info Spray Report'

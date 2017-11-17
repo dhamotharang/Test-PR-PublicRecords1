@@ -1669,10 +1669,9 @@ end;
 	EXPORT License_Base := FUNCTION
 		hist_base	:= Mark_history(Enclarity.Files(filedate,pUseProd).license_base.built, Enclarity.layouts.license_base);
 	
-		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).License:PERSIST('~thor_data400::persist::enclarity::license_std');
-		sort_std	:= sort(distribute(std_input, hash(group_key, last_name, first_name, prefix_name, orig_fullname, suffix_name, suffix_other)), group_key, last_name, first_name, prefix_name, orig_fullname, suffix_name, suffix_other, skew(0.1,0.5), local);
+		std_input := Enclarity.StandardizeInputFile(filedate, pUseProd).License;
 
-		cleanNames := Clean_name(sort_std, Enclarity.Layouts.license_base)
+		cleanNames := Clean_name(std_input, Enclarity.Layouts.license_base)
 			:PERSIST('~thor_data400::persist::enclarity::license_names');
 
 		cleanAdd_a	:= Clean_addr(cleanNames, Enclarity.layouts.license_base)
@@ -1682,8 +1681,8 @@ end;
 											 ,cleanAdd_a
 											 ,cleanAdd_a + hist_base);
 
-		new_base_d := DISTRIBUTE(base_and_update, HASH(group_key, lic_num, lic_state, lic_status, addr_key));
-		
+		new_base_d := DISTRIBUTE(base_and_update, HASH(group_key));  
+
 		dob_file	:= distribute(Enclarity.Files().prov_birthdate_base.built(clean_date_of_birth<>''), hash(group_key));
 		base_d	:= JOIN(new_base_d, dob_file
 										,LEFT.group_key = RIGHT.group_key
