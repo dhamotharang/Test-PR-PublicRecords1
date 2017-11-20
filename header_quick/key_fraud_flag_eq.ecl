@@ -30,8 +30,5 @@ EXPORT key_fraud_flag_eq :=
             {dummy_dataset},
             Data_Services.Data_location.Prefix('header_quick')+
             'thor_data400::key::HeaderQuick::fraud_flag::qa::eq'
-											// '~thor_data400::key::headerquick::fraud_flag::20171016z::eq'						
-						
-						
           );
             
