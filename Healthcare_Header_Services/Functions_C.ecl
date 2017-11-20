@@ -1,6 +1,5 @@
 EXPORT Functions_C := MODULE
     Export UNSIGNED4 BusName_PrefixMatchCount(STRING a, STRING b) := BEGINC++
-        "!";
         unsigned int    minLength = lenA < lenB ? lenA : lenB;
         unsigned int    numMatched = 0;
 
