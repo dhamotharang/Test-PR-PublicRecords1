@@ -62,7 +62,7 @@ export Search_Service := MACRO
 	BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
 
 	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(TRUE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.RiskView__Search_Service);
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(TRUE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.RiskView__Search_Service);
 /* ************* End Scout Fields **************/
 
 /* ***************************************

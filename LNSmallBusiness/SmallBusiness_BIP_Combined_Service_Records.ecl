@@ -143,18 +143,10 @@ EXPORT SmallBusiness_BIP_Combined_Service_Records (LNSmallBusiness.IParam.LNSmal
                                                              SmallBizCombined_inmod.DataPermissionMask,
                                                              ds_CombinedModelsRequested));
   
-				ds_NewModels:=	if(ds_CombinedModelsRequested[1].ModelName in [BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] OR
-						ds_CombinedModelsRequested[2].ModelName in [BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] OR
-						ds_CombinedModelsRequested[3].ModelName in [BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] OR
-						ds_CombinedModelsRequested[4].ModelName in [BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] OR
-						ds_CombinedModelsRequested[5].ModelName in [BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB],
+				ds_NewModels:=	if(EXISTS(ds_CombinedModelsRequested(ModelName = BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB)),
 							BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_SLBB, 
 							BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE) +
-						if(ds_CombinedModelsRequested[1].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO] OR
-						ds_CombinedModelsRequested[2].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO] OR
-						ds_CombinedModelsRequested[3].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO] OR
-						ds_CombinedModelsRequested[4].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO] OR
-						ds_CombinedModelsRequested[5].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO],
+						if(EXISTS(ds_CombinedModelsRequested(ModelName = BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO)),
 							BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_SLBO, 
 							BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE);  
 	
@@ -388,8 +380,6 @@ ds_newModels;
       END;
       
     ds_results_NoHit := DATASET([xfm_transform_NoHit()]) ;
-	// output(ds_CombinedModelsRequested, named('ds_CombinedModelsRequested'));
-	// output(SBA_Results_Temp_with_PhoneSources, named('SBA_Results_Temp_with_PhoneSources'));		
 		
 		ds_results := IF( isGoodHit OR isBIPIDSearch OR SmallBizCombined_inmod.TestDataEnabled, ds_results_Hit, ds_results_NoHit );
 		

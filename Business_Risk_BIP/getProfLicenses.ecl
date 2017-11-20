@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Risk, Business_Risk_BIP, FAA, MDR, Prof_LicenseV2, Risk_Indicators, UT, Watercraft;
+﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, FAA, MDR, Prof_LicenseV2, Risk_Indicators, UT, Watercraft;
 
 EXPORT getProfLicenses(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -63,6 +63,7 @@ EXPORT getProfLicenses(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) PhoneSources;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) NameSources;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) AddressVerSources;
+		DATASET(Business_Risk_BIP.Layouts.LayoutSources) BestAddressSources;
 	END;
 	
 	tempProfLicCalc calcProfLic(Business_Risk_BIP.Layouts.Shell le, ProfLicRecords ri) := TRANSFORM
@@ -81,7 +82,16 @@ EXPORT getProfLicenses(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																						Risk_Indicators.AddrScore.AddressScore(le.Clean_Input.Prim_Range, le.Clean_Input.Prim_Name, le.Clean_Input.Sec_Range, 
 																						ri.prim_range, ri.prim_name, ri.sec_range,
 																						ZIPScore, CityStateScore)));
-		
+
+		BestAddressPopulated		:= TRIM(le.Best_Info.BestPrimName) <> '' AND TRIM(le.Best_Info.BestCompanyZip) <> '' AND TRIM(ri.prim_name) <> '' AND TRIM(ri.Zip) <> '';
+		BestZIPScore						:= IF(le.Best_Info.BestCompanyZip <> '' AND ri.Zip <> '' AND le.Best_Info.BestCompanyZip[1] = ri.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(le.Best_Info.BestCompanyZip, ri.Zip), NoScoreValue);
+		BestCityStateScore			:= IF(le.Best_Info.BestCompanyCity <> '' AND le.Best_Info.BestCompanyState <> '' AND ri.p_city_name <> '' AND ri.St <> '' AND le.Best_Info.BestCompanyState[1] = ri.St[1], Risk_Indicators.AddrScore.CityState_Score(le.Best_Info.BestCompanyCity, le.Best_Info.BestCompanyState, ri.p_city_name, ri.St, ''), NoScoreValue);
+		BestCityStateZipMatched	:= Risk_Indicators.iid_constants.ga(BestZIPScore) AND Risk_Indicators.iid_constants.ga(BestCityStateScore) AND BestAddressPopulated;
+		BestAddressMatched			:= BestAddressPopulated AND Risk_Indicators.iid_constants.ga(IF(BestZIPScore = NoScoreValue AND BestCityStateScore = NoScoreValue, NoScoreValue, 
+																						Risk_Indicators.AddrScore.AddressScore(le.Best_Info.BestPrimRange, le.Best_Info.BestPrimName, le.Best_Info.BestSecRange, 
+																						ri.prim_range, ri.prim_name, ri.sec_range,
+																						BestZIPScore, BestCityStateScore)));
+																						
 		PhonePopulated			:= TRIM(le.Clean_Input.Phone10) <> '' AND TRIM(ri.phone) <> '';
 		PhoneMatched				:= PhonePopulated AND (le.Clean_Input.Phone10[1] = ri.phone[1] OR le.Clean_Input.Phone10[4] = ri.phone[4] OR le.Clean_Input.Phone10[4] = ri.phone[1]) AND Risk_Indicators.iid_constants.gn(Risk_Indicators.PhoneScore(le.Clean_Input.Phone10, ri.phone));
 		
@@ -94,14 +104,15 @@ EXPORT getProfLicenses(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 		Sources := DATASET([{Business_Risk_BIP.Constants.Src_Prolic, 
 												 DateFirstSeen, 
-												 '', // no vendor first seen date field on professional license records
+												 Business_Risk_BIP.Constants.MissingDate, // no vendor first seen date field on professional license records
 												 DateLastSeen,
-												 '', // no vendor last seen date field on professional license records
+												 Business_Risk_BIP.Constants.MissingDate, // no vendor last seen date field on professional license records
 												 1}], Business_Risk_BIP.Layouts.LayoutSources); 
 												 
-		SELF.PhoneSources      := IF(                                  BNAPCalc IN ['4', '5', '8'], Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
-		SELF.NameSources       := IF(Options.BusShellVersion >= 22 AND BNAPCalc IN ['5', '8']     , Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));																											
-		SELF.AddressVerSources := IF(Options.BusShellVersion >= 22 AND BNAPCalc IN ['4', '8']     , Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));					
+		SELF.PhoneSources      := IF(                                  																							BNAPCalc IN ['4', '5', '8'], Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
+		SELF.NameSources       := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22 AND BNAPCalc IN ['5', '8']     , Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));																											
+		SELF.AddressVerSources := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22 AND BNAPCalc IN ['4', '8']     , Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));					
+		SELF.BestAddressSources := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND BestAddressMatched, Sources, 				DATASET([], Business_Risk_BIP.Layouts.LayoutSources));					
 	END;
   
 	profLicBNAPRaw := JOIN(Shell, ProfLicRecords, LEFT.Seq = RIGHT.Seq,
@@ -110,6 +121,7 @@ EXPORT getProfLicenses(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	profLicBNAPRolled := ROLLUP(SORT(profLicBNAPRaw, Seq), LEFT.Seq = RIGHT.Seq, TRANSFORM(tempProfLicCalc,
 																			SELF.NameSources := LEFT.NameSources + RIGHT.NameSources;
 																			SELF.AddressVerSources := LEFT.AddressVerSources + RIGHT.AddressVerSources;
+																			SELF.BestAddressSources := LEFT.BestAddressSources + RIGHT.BestAddressSources;
 																			SELF.PhoneSources := LEFT.PhoneSources + RIGHT.PhoneSources;
 																			SELF := LEFT));
 
@@ -119,6 +131,7 @@ EXPORT getProfLicenses(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
                        SELF.PhoneSources            := RIGHT.PhoneSources,
                        SELF.NameSources             := RIGHT.NameSources,
                        SELF.AddressVerSources       := RIGHT.AddressVerSources,
+											 SELF.BestAddressSources			:= RIGHT.BestAddressSources,
                        SELF.Sources                 := LEFT.Sources,
                        SELF := RIGHT,
                        SELF := LEFT,

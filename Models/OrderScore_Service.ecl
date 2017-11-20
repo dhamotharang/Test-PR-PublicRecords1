@@ -65,7 +65,7 @@ export OrderScore_Service := MACRO
 	BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
 
 	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__OrderScore_Service);
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__OrderScore_Service);
 /* ************* End Scout Fields **************/
 
 

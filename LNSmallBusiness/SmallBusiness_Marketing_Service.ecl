@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SmallBusiness_Marketing_Service" wuTimeout="300000">
 	<part name="SmallBusinessMarketingRequest" type="tns:XmlDataSet" cols="110" rows="75"/>
   <!-- Option Fields --> 
@@ -273,7 +273,7 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 		DisableOutcomeTracking := DisableIntermediateShellLoggingOutOfBand OR users.OutcomeTrackingOptOut;
 
 		//Look up the industry by the company ID.
-		Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.LNSmallBusiness__SmallBusiness_Marketing_Service);
+		Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.LNSmallBusiness__SmallBusiness_Marketing_Service);
 	/* ************* End Scout Fields **************/
 
 	UNSIGNED1 DPPAPurpose_stored      := Business_Risk_BIP.Constants.Default_DPPA                : STORED('DPPAPurpose');
@@ -857,6 +857,7 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 																										 self.i_bus_state := search.Company.address.State,
 																										 self.i_bus_zip := search.Company.address.Zip5,
 																										 //No models are available to the product yet
+																										 //If any get added will need to add section here to log
 																										 self := left,
 																										 self := [] ));
 		Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);

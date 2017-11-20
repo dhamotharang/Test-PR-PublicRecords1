@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Risk_BIP, DID_Add, Inquiry_AccLogs, MDR, Risk_Indicators, RiskWise, OSHAIR, UT;
+﻿IMPORT BIPV2, Business_Risk_BIP, DID_Add, Inquiry_AccLogs, MDR, Risk_Indicators, RiskWise, OSHAIR, UT;
 
 EXPORT getInquiries(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -236,108 +236,12 @@ EXPORT getInquiries(DATASET(Business_Risk_BIP.Layouts.Shell) Shell_pre,
 																							SELF.Business_To_Executive_Link.BusExecLinkInquiryOverlapCount := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.BusExecLinkInquiryOverlapCount, -1, 99999);
 																							SELF.Business_To_Executive_Link.BusExecLinkInquiryOverlapCount2 := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.BusExecLinkInquiryOverlapCount2, -1, 99999);
 																							SELF.Business_To_Executive_Link.BusExecLinkInquiryOverlapCount3 := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.BusExecLinkInquiryOverlapCount3, -1, 99999);
-																							SELF := LEFT),
-																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-	
-	// ---------------- Consumer Inquiries Address - Only Allowed in Non-Marketing Mode ------------------
-	tempConsumerInquiry := RECORD
-		UNSIGNED4 Seq;
-		STRING40 Transaction_ID;
-		STRING40 Sequence_Number;
-		UNSIGNED2 InquiryCount;
-		UNSIGNED2 InquirySSNCount;
-	END;
-	// This MACRO creates a common transform for counting up valid inquiries
-	inquiryTransformMac (TransformName, KeyName) := MACRO
-		tempConsumerInquiry TransformName(Business_Risk_BIP.Layouts.Shell le, KeyName ri) := TRANSFORM
-			SELF.Seq := le.Seq;
-			SELF.Transaction_ID := (STRING)ri.Search_Info.Transaction_ID;
-			SELF.Sequence_Number := (STRING)ri.Search_Info.Sequence_Number;
-			
-			RawIndustry := StringLib.StringToUpperCase(TRIM(ri.Bus_Intel.Industry, LEFT, RIGHT));
-			Vertical := StringLib.StringToUpperCase(TRIM(ri.Bus_Intel.Vertical, LEFT, RIGHT));
-			SubMarket := StringLib.StringToUpperCase(TRIM(ri.Bus_Intel.Sub_Market, LEFT, RIGHT));
-			FunctionDescription := StringLib.StringToUpperCase(TRIM(ri.Search_Info.Function_Description, LEFT, RIGHT));
-			ProductCode := StringLib.StringToUpperCase(TRIM(ri.Search_Info.Product_Code, LEFT, RIGHT));
-			BusUse := StringLib.StringToUpperCase(TRIM(ri.Bus_Intel.Use, LEFT, RIGHT));
-			
-			Date := Business_Risk_BIP.Common.checkInvalidDate(TRIM(StringLib.StringFilter(ri.search_info.datetime[1..8], '0123456789')), Business_Risk_BIP.Constants.MissingDate, (INTEGER)Business_Risk_BIP.Constants.NinesDate);
-			Time := TRIM(StringLib.StringFilter(ri.search_info.datetime[10..15], '0123456789'));
-			LogDate := IF(LENGTH(Date) = 8, Date, ''); // Make sure we have a valid 8 byte date
-			LogTime := IF(LENGTH(Time) = 6, Time, ''); // Make sure we have a valid 6 byte time (HHMMSS)
-			
-			// Adopted from Risk_Indicators.Boca_Shell_Inquiries
-			ValidInquiry := Inquiry_AccLogs.Shell_Constants.Valid_Velocity_Inquiry(Vertical, RawIndustry, FunctionDescription, 
-															LogDate, le.Clean_Input.HistoryDate, SubMarket, BusUse, ProductCode,
-															ri.Permissions.FCRA_Purpose, FALSE /*isFCRA*/, 50  /*bsversion*/, ri.search_info.method );
-		
-			SELF.InquiryCount := IF(ValidInquiry = TRUE, 1, 0);
-			SSNMatches := Risk_Indicators.iid_constants.gn(DID_Add.SSN_Match_Score(le.Clean_Input.FEIN, ri.Person_Q.Appended_SSN, LENGTH(TRIM(le.Clean_Input.FEIN)) = 4)); 
-			// This will only be used in the InquiryConsumerAddressSSN calculation
-			SELF.InquirySSNCount := IF(ValidInquiry = TRUE AND SSNMatches = TRUE, 1, 0);
-		END;
-	ENDMACRO;
-
-	inquiryTransformMac(grabAddress, Inquiry_AccLogs.Key_Inquiry_Address);
-	inquiryTransformMac(grabAddressUpdate, Inquiry_AccLogs.Key_Inquiry_Address_Update);
-	consumerAddressBase := IF(Options.MarketingMode = 0, JOIN(Shell, Inquiry_AccLogs.Key_Inquiry_Address,
-																TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND
-																KEYED(LEFT.Clean_Input.Zip5 = RIGHT.Zip AND LEFT.Clean_Input.Prim_Name = RIGHT.Prim_Name AND
-																			LEFT.Clean_Input.Prim_Range = RIGHT.Prim_Range AND LEFT.Clean_Input.Sec_Range = RIGHT.Sec_Range) AND
-																LEFT.Clean_Input.PreDir = RIGHT.Person_Q.PreDir AND LEFT.Clean_Input.Addr_Suffix = RIGHT.Person_Q.Addr_Suffix AND
-																// See comments on Business_Risk_BIP.Common.FilterRecords for details - but the <= and < checks below are correct and intentional
-																((LEFT.Clean_Input.HistoryDate = (INTEGER)Business_Risk_BIP.Constants.NinesDate AND (INTEGER)(RIGHT.Search_Info.DateTime[1..6]) <= LEFT.Clean_Input.HistoryDate) OR (INTEGER)(RIGHT.Search_Info.DateTime[1..6]) < LEFT.Clean_Input.HistoryDate), // Only keep records within the history date
-															grabAddress(LEFT, RIGHT), ATMOST(RiskWise.max_atmost)),
-													DATASET([], tempConsumerInquiry));
-	consumerAddressUpdate := IF(Options.MarketingMode = 0, JOIN(Shell, Inquiry_AccLogs.Key_Inquiry_Address_Update,
-																TRIM(LEFT.Clean_Input.Prim_Name) <> '' AND TRIM(LEFT.Clean_Input.Zip5) <> '' AND
-																KEYED(LEFT.Clean_Input.Zip5 = RIGHT.Zip AND LEFT.Clean_Input.Prim_Name = RIGHT.Prim_Name AND
-																			LEFT.Clean_Input.Prim_Range = RIGHT.Prim_Range AND LEFT.Clean_Input.Sec_Range = RIGHT.Sec_Range) AND
-																LEFT.Clean_Input.PreDir = RIGHT.Person_Q.PreDir AND LEFT.Clean_Input.Addr_Suffix = RIGHT.Person_Q.Addr_Suffix AND
-																// See comments on Business_Risk_BIP.Common.FilterRecords for details - but the <= and < checks below are correct and intentional
-																((LEFT.Clean_Input.HistoryDate = (INTEGER)Business_Risk_BIP.Constants.NinesDate AND (INTEGER)(RIGHT.Search_Info.DateTime[1..6]) <= LEFT.Clean_Input.HistoryDate) OR (INTEGER)(RIGHT.Search_Info.DateTime[1..6]) < LEFT.Clean_Input.HistoryDate), // Only keep records within the history date
-															grabAddressUpdate(LEFT, RIGHT), ATMOST(RiskWise.max_atmost)),
-													DATASET([], tempConsumerInquiry));
-	
-	consumerAddress := DEDUP(SORT(UNGROUP(consumerAddressBase + consumerAddressUpdate), Seq, Transaction_ID, Sequence_Number), Seq, Transaction_ID, Sequence_Number);
-
-	consumerAddressRolled := ROLLUP(consumerAddress, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempConsumerInquiry, SELF.InquiryCount := LEFT.InquiryCount + RIGHT.InquiryCount; SELF := LEFT));
-	
-	withConsumerAddressRolled := JOIN(withBusinessInquiries, consumerAddressRolled, LEFT.Seq = RIGHT.Seq,
-																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
-																							SELF.Inquiry.InquiryConsumerAddress := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.InquiryCount, -1, 99999);
-																							SELF.Inquiry.InquiryConsumerAddressSSN := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.InquirySSNCount, -1, 99999);
-																							SELF := LEFT),
-																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-	
-	// ---------------- Consumer Inquiries Phone - Only Allowed in Non-Marketing Mode ------------------
-	inquiryTransformMac(grabPhone, Inquiry_AccLogs.Key_Inquiry_Phone);
-	inquiryTransformMac(grabPhoneUpdate, Inquiry_AccLogs.Key_Inquiry_Phone_Update);
-	consumerPhoneBase := IF(Options.MarketingMode = 0, JOIN(Shell, Inquiry_AccLogs.Key_Inquiry_Phone,
-										LEFT.Clean_Input.Phone10 <> '' AND KEYED(LEFT.Clean_Input.Phone10 = RIGHT.Phone10) AND
-										// See comments on Business_Risk_BIP.Common.FilterRecords for details - but the <= and < checks below are correct and intentional
-										((LEFT.Clean_Input.HistoryDate = (INTEGER)Business_Risk_BIP.Constants.NinesDate AND (INTEGER)(RIGHT.Search_Info.DateTime[1..6]) <= LEFT.Clean_Input.HistoryDate) OR (INTEGER)(RIGHT.Search_Info.DateTime[1..6]) < LEFT.Clean_Input.HistoryDate), // Only keep records within the history date
-								grabPhone(LEFT, RIGHT), ATMOST(RiskWise.max_atmost)),
-								DATASET([], tempConsumerInquiry));
-	consumerPhoneUpdate := IF(Options.MarketingMode = 0, JOIN(Shell, Inquiry_AccLogs.Key_Inquiry_Phone_Update,
-										LEFT.Clean_Input.Phone10 <> '' AND KEYED(LEFT.Clean_Input.Phone10 = RIGHT.Phone10) AND
-										// See comments on Business_Risk_BIP.Common.FilterRecords for details - but the <= and < checks below are correct and intentional
-										((LEFT.Clean_Input.HistoryDate = (INTEGER)Business_Risk_BIP.Constants.NinesDate AND (INTEGER)(RIGHT.Search_Info.DateTime[1..6]) <= LEFT.Clean_Input.HistoryDate) OR (INTEGER)(RIGHT.Search_Info.DateTime[1..6]) < LEFT.Clean_Input.HistoryDate), // Only keep records within the history date
-								grabPhoneUpdate(LEFT, RIGHT), ATMOST(RiskWise.max_atmost)),
-								DATASET([], tempConsumerInquiry));
-	
-	consumerPhone := DEDUP(SORT(UNGROUP(consumerPhoneBase + consumerPhoneUpdate), Seq, Transaction_ID, Sequence_Number), Seq, Transaction_ID, Sequence_Number);
-
-	consumerPhoneRolled := ROLLUP(consumerPhone, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempConsumerInquiry, SELF.InquiryCount := LEFT.InquiryCount + RIGHT.InquiryCount; SELF := LEFT));
-	
-	withConsumerPhoneRolled := JOIN(withConsumerAddressRolled, consumerPhoneRolled, LEFT.Seq = RIGHT.Seq,
-																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
-																							SELF.Inquiry.InquiryConsumerPhone := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.InquiryCount, -1, 99999);
 																							SELF.Data_Build_Dates.InquiriesBuildDate := InqBuildDate;
-																							SELF := LEFT),
+                                              SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 	
-	withErrorCodesInquiry := JOIN(withConsumerPhoneRolled, kFetchErrorCodesInquiry, LEFT.Seq = RIGHT.Seq,
+																	
+	withErrorCodesInquiry := JOIN(withBusinessInquiries, kFetchErrorCodesInquiry, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeInquiries := (STRING)RIGHT.Fetch_Error_Code;
 																							SELF := LEFT),

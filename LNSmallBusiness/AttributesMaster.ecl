@@ -1,6 +1,7 @@
-IMPORT Business_Risk_BIP;
+﻿IMPORT Business_Risk_BIP;
 
-EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell) := MODULE
+EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell, UNSIGNED BusShellVersion) := MODULE
+ SHARED SET_NO_HITS := ['-1', '0', ''];
  EXPORT UNSIGNED6 PowID := BusShell.BIP_IDs.PowID.LinkID;
  EXPORT UNSIGNED6 ProxID := BusShell.BIP_IDs.ProxID.LinkID;
  EXPORT UNSIGNED6 SeleID := BusShell.BIP_IDs.SeleID.LinkID;
@@ -147,8 +148,10 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell) := MODULE
  EXPORT STRING2 VerificationBusInputPhone := BusShell.Verification.VerificationBusInputPhone;
  EXPORT STRING2 VerificationBusInputFEIN := BusShell.Verification.VerificationBusInputFEIN;
  EXPORT STRING2 VerificationBusInputIndustry := BusShell.Verification.VerificationBusInputIndustry;
- EXPORT STRING5 BusinessRecordTimeOldest := BusShell.Business_Activity.BusinessRecordTimeOldest;
- EXPORT STRING5 BusinessRecordTimeNewest := BusShell.Business_Activity.BusinessRecordTimeNewest;
+ EXPORT STRING5 BusinessRecordTimeOldest := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, 
+				BusShell.Business_Activity.BusinessRecordTimeOldest, BusShell.Business_Activity.SourceBusinessRecordTimeOldestID);
+ EXPORT STRING5 BusinessRecordTimeNewest := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, 
+				BusShell.Business_Activity.BusinessRecordTimeNewest, BusShell.Business_Activity.SourceBusinessRecordTimeNewestID);
  EXPORT STRING2 BusinessRecordUpdated12Month := BusShell.Business_Activity.BusinessRecordUpdated12Month;
  EXPORT STRING2 BusinessActivity03Month := BusShell.Business_Activity.BusinessActivity03Month;
  EXPORT STRING2 BusinessActivity06Month := BusShell.Business_Activity.BusinessActivity06Month;
@@ -157,13 +160,15 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell) := MODULE
  EXPORT STRING3 FirmAgeEstablished := BusShell.Firmographic.FirmAgeEstablished;
  EXPORT STRING4 FirmSICCode   := BusShell.Firmographic.FirmSICCode;
  EXPORT STRING6 FirmNAICSCode   := BusShell.Firmographic.FirmNAICSCode;
- EXPORT STRING2 FirmEmployeeCount   := Map((integer)BusShell.Firmographic.FirmEmployeeCount in [-1, 0]      => BusShell.Firmographic.FirmEmployeeCount,
-                       (integer)BusShell.Firmographic.FirmEmployeeCount between 1 and 5   => '1',
-                       (integer)BusShell.Firmographic.FirmEmployeeCount between 6 and 10  => '2',
+ EXPORT STRING6 FirmEmployeeCount   := Map(
+                        BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 => BusShell.Firmographic.FirmEmployeeCount,
+                        (integer)BusShell.Firmographic.FirmEmployeeCount in [-1, 0]        => BusShell.Firmographic.FirmEmployeeCount,
+                       (integer)BusShell.Firmographic.FirmEmployeeCount between 1 and 5    => '1',
+                       (integer)BusShell.Firmographic.FirmEmployeeCount between 6 and 10   => '2',
                        (integer)BusShell.Firmographic.FirmEmployeeCount between 11 and 25  => '3',
-                       (integer)BusShell.Firmographic.FirmEmployeeCount > 25        => '4',
-                                                     '0');
- EXPORT STRING9 FirmReportedSales   := BusShell.Firmographic.FirmReportedSales;
+                       (integer)BusShell.Firmographic.FirmEmployeeCount > 25               => '4',
+                                                                                              '0');
+ EXPORT STRING11 FirmReportedSales   := BusShell.Firmographic.FirmReportedSales;
  EXPORT STRING9 FirmReportedEarnings   := BusShell.Firmographic.FirmReportedEarnings;
  EXPORT STRING2 FirmIRSRetirementPlan := BusShell.Firmographic.FirmIRSRetirementPlan;
  EXPORT STRING2 FirmNonProfit   := BusShell.Firmographic.FirmNonProfit;
@@ -217,36 +222,6 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell) := MODULE
  EXPORT STRING5 UCCTimeNewest := BusShell.Public_Record.UCCTimeNewest;
  EXPORT STRING5 UCCTimeOldest := BusShell.Public_Record.UCCTimeOldest;
  EXPORT STRING2 GovernmentDebarred := BusShell.Public_Record.GovernmentDebarred;
- // EXPORT STRING5 TradeTimeNewest := BusShell.Tradeline.TradeTimeNewest;
- // EXPORT STRING5 TradeTimeOldest := BusShell.Tradeline.TradeTimeOldest;
- // EXPORT STRING6 TradeCount := BusShell.Tradeline.TradeCount;
- // EXPORT STRING6 TradeNewCount := BusShell.Tradeline.TradeNewCount;
- // EXPORT STRING6 TradeAgedCount := BusShell.Tradeline.TradeAgedCount;
- // EXPORT STRING9 TradeBalanceCurrent := BusShell.Tradeline.TradeBalanceCurrent;
- // EXPORT STRING9 TradeBalanceActive := BusShell.Tradeline.TradeBalanceActive;
- // EXPORT STRING9 TradeHighBalanceExtendCredit := BusShell.Tradeline.TradeHighBalanceExtendCredit;
- // EXPORT STRING9 TradeMedianBalanceExtendCredit := BusShell.Tradeline.TradeMedianBalanceExtendCredit;
- // EXPORT STRING9 TradeHighBalanceNew := BusShell.Tradeline.TradeHighBalanceNew;
- // EXPORT STRING9 TradeHighBalanceAged := BusShell.Tradeline.TradeHighBalanceAged;
- // EXPORT STRING9 TradeHighBalance := BusShell.Tradeline.TradeHighBalance;
- // EXPORT STRING3 TradeGoodStandingNewPercent := BusShell.Tradeline.TradeGoodStandingNewPercent;
- // EXPORT STRING3 TradeGoodStandingAgedPercent := BusShell.Tradeline.TradeGoodStandingAgedPercent;
- // EXPORT STRING3 TradeGoodStandingPercent := BusShell.Tradeline.TradeGoodStandingPercent;
- // EXPORT STRING3 TradeDPD01NewPercent := BusShell.Tradeline.TradeDPD01NewPercent;
- // EXPORT STRING3 TradeDPD31NewPercent := BusShell.Tradeline.TradeDPD31NewPercent;
- // EXPORT STRING3 TradeDPD61NewPercent := BusShell.Tradeline.TradeDPD61NewPercent;
- // EXPORT STRING3 TradeDPD91NewPercent := BusShell.Tradeline.TradeDPD91NewPercent;
- // EXPORT STRING2 TradeHighestDPDNew := BusShell.Tradeline.TradeHighestDPDNew;
- // EXPORT STRING3 TradeDPD01AgedPercent := BusShell.Tradeline.TradeDPD01AgedPercent;
- // EXPORT STRING3 TradeDPD31AgedPercent := BusShell.Tradeline.TradeDPD31AgedPercent;
- // EXPORT STRING3 TradeDPD61AgedPercent := BusShell.Tradeline.TradeDPD61AgedPercent;
- // EXPORT STRING3 TradeDPD91AgedPercent := BusShell.Tradeline.TradeDPD91AgedPercent;
- // EXPORT STRING2 TradeHighestDPDAged := BusShell.Tradeline.TradeHighestDPDAged;
- // EXPORT STRING3 TradeDPD01Percent := BusShell.Tradeline.TradeDPD01Percent;
- // EXPORT STRING3 TradeDPD31Percent := BusShell.Tradeline.TradeDPD31Percent;
- // EXPORT STRING3 TradeDPD61Percent := BusShell.Tradeline.TradeDPD61Percent;
- // EXPORT STRING3 TradeDPD91Percent := BusShell.Tradeline.TradeDPD91Percent;
- // EXPORT STRING2 TradeHighestDPD := BusShell.Tradeline.TradeHighestDPD;
  // The Business Shell returns raw counts for these - translate them to -1 = no company found, 0 = no inquiries, 1 = 1 or more inquiries.
  EXPORT STRING5 InquiryHighRisk12Month := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Inquiry.InquiryHighRisk12Month, -1, 1);
  EXPORT STRING5 InquiryHighRisk03Month := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Inquiry.InquiryHighRisk03Month, -1, 1);
@@ -299,13 +274,14 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell) := MODULE
  EXPORT STRING5 BusExecLinkInquiryOverlapCount3 := BusShell.Business_To_Executive_Link.BusExecLinkInquiryOverlapCount3;
  EXPORT STRING2 BusExecLinkAuthRep3AddrBusAddr := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep3AddrBusAddr;
  EXPORT STRING2 BusExecLinkAuthRep3PhoneBusPhone := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneBusPhone;
- EXPORT STRING2 BusFEINPersonOverlap  := BusShell.Business_To_Person_Link.BusFEINPersonOverlap;
- EXPORT STRING2 BusFEINPersonAddrOverlap  := BusShell.Business_To_Person_Link.BusFEINPersonAddrOverlap;
- EXPORT STRING2 BusFEINPersonPhoneOverlap  := BusShell.Business_To_Person_Link.BusFEINPersonPhoneOverlap;
- EXPORT STRING2 BusAddrPersonNameOverlap  := BusShell.Business_To_Person_Link.BusAddrPersonNameOverlap;
+ EXPORT STRING2 BusFEINPersonOverlap := BusShell.Business_To_Person_Link.BusFEINPersonOverlap;
+ EXPORT STRING2 BusFEINPersonAddrOverlap := BusShell.Business_To_Person_Link.BusFEINPersonAddrOverlap;
+ EXPORT STRING2 BusFEINPersonPhoneOverlap := BusShell.Business_To_Person_Link.BusFEINPersonPhoneOverlap;
+ EXPORT STRING2 BusAddrPersonNameOverlap := BusShell.Business_To_Person_Link.BusAddrPersonNameOverlap;
  EXPORT STRING5 InputAddrConsumerCount := BusShell.Input_Characteristics.InputAddrConsumerCount;
  EXPORT STRING2 InputAddrSourceCount := BusShell.Input_Characteristics.InputAddrSourceCount;
- EXPORT STRING2 InputAddrType := BusShell.Input_Characteristics.InputAddrType;
+ EXPORT STRING2 InputAddrType := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30,
+				BusShell.Input_Characteristics.InputAddrType, BusShell.Input_Characteristics.InputAddrTypeNoID);
  EXPORT STRING2 InputAddrBusinessOwned := BusShell.Input_Characteristics.InputAddrBusinessOwned;
  EXPORT STRING9 InputAddrLotSize := BusShell.Input_Characteristics.InputAddrLotSize;
  EXPORT STRING9 InputAddrAssessedTotal  := BusShell.Input_Characteristics.InputAddrAssessedTotal;
@@ -329,6 +305,246 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell) := MODULE
  EXPORT STRING6 AssociateBusinessCount := BusShell.Associates.AssociateBusinessCount;
  EXPORT STRING6 AssociateCityCount := BusShell.Associates.AssociateCityCount;
  EXPORT STRING6 AssociateCountyCount := BusShell.Associates.AssociateCountyCount;
+
+  // SBA Version 2.0 Attributes
+  EXPORT STRING15 LNLexIDPOW := BusShell.Verification.inputidmatchpowid;
+	EXPORT STRING15 LNLexIDProx := BusShell.Verification.inputidmatchproxid;
+	EXPORT STRING15 LNLexIDSELE := BusShell.Verification.inputidmatchseleid;
+	EXPORT STRING15 LNLexIDORG := BusShell.Verification.inputidmatchorgid;
+	EXPORT STRING15 LNLexIDULT := BusShell.Verification.inputidmatchultid;
+  EXPORT STRING1 InputCheckAnnualRevenue := BusShell.Input.InputCheckBusAnnualRevenue;
+	EXPORT STRING120 OutBestBusName := BusShell.Best_Info.BestCompanyName;
+	EXPORT STRING100 OutBestBusStreetAddr := BusShell.Best_Info.BestCompanyAddress1;
+	EXPORT STRING25 OutBestBusCity := BusShell.Best_Info.BestCompanyCity;
+	EXPORT STRING2 OutBestBusState := BusShell.Best_Info.BestCompanyState;
+	EXPORT STRING9 OutBestBusZip := BusShell.Best_Info.BestCompanyZip;
+	EXPORT STRING9 OutBestBusFEIN := BusShell.Best_Info.BestCompanyFEIN;
+  EXPORT STRING6 OutBestNAICS := BusShell.Firmographic.FirmNAICSCode;
+  EXPORT STRING4 OutBestSIC := BusShell.Firmographic.FirmSICCode;
+	EXPORT STRING10 OutBestBusPhone := BusShell.Best_Info.BestCompanyPhone;
+	EXPORT STRING1 LNHitInd :=(STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.SourceIndex, 0, 1);
+  EXPORT STRING1 LNInputInd := IF(
+                    BusShell.Business_To_Person_Link.BusAddrPersonNameOverlap NOT IN SET_NO_HITS OR
+                    BusShell.Business_To_Person_Link.BusAddrPersonAltNameOverlap NOT IN SET_NO_HITS OR
+                    BusShell.Business_To_Person_Link.BusFEINPersonAddrOverlap NOT IN SET_NO_HITS OR
+                    BusShell.Business_To_Person_Link.BusFEINPersonPhoneOverlap NOT IN SET_NO_HITS OR
+                    BusShell.Business_To_Person_Link.BusFEINPersonOverlap NOT IN SET_NO_HITS OR
+                    BusShell.Input_Characteristics.InputAddrConsumerCount NOT IN SET_NO_HITS OR
+                    BusShell.Input_Characteristics.InputTINEntityCount NOT IN SET_NO_HITS OR
+                    BusShell.Input_Characteristics.InputPhoneEntityCount NOT IN SET_NO_HITS OR
+                    BusShell.Input_Characteristics.InputAddrTINCount NOT IN SET_NO_HITS OR
+                    BusShell.Input_Characteristics.InputAddrTypeNoID NOT IN SET_NO_HITS OR
+                    BusShell.Verification.InputAddrVacancyNoID NOT IN SET_NO_HITS OR
+                    BusShell.Input_Characteristics.InputAddrAssessedTotal NOT IN SET_NO_HITS OR
+                    BusShell.Input_Characteristics.InputAddrLotSize NOT IN SET_NO_HITS OR
+                    BusShell.Input_Characteristics.InputAddrSqFootage NOT IN SET_NO_HITS OR
+                    BusShell.Verification.VerificationBusInputPhoneAddr NOT IN SET_NO_HITS OR
+                    BusShell.Verification.phonedisconnected NOT IN SET_NO_HITS OR
+                    BusShell.Input_Characteristics.InputPhoneMobile NOT IN SET_NO_HITS OR
+                    BusShell.Verification.PhoneResidential NOT IN SET_NO_HITS OR
+                    BusShell.Input_Characteristics.InputPhoneProblems NOT IN SET_NO_HITS OR
+                    BusShell.Verification.FEINAddrNameMismatch NOT IN SET_NO_HITS OR
+                    BusShell.Verification.FEINOnFile NOT IN SET_NO_HITS OR
+                    BusShell.Verification.VerInputIDTruebiz NOT IN SET_NO_HITS, '1', '0');
+  EXPORT STRING2 BusinessRecordUpdated12M := BusShell.Business_Activity.SourceBusinessRecordUpdated12MonthID;
+  EXPORT STRING2 BusinessActivity03M := BusShell.Business_Activity.BusinessActivity03MonthID;
+  EXPORT STRING2 BusinessActivity06M := BusShell.Business_Activity.BusinessActivity06MonthID;
+  EXPORT STRING2 BusinessActivity12M := BusShell.Business_Activity.BusinessActivity12MonthID;
+	EXPORT STRING2 VerificationBusInputAltName := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.AltNameMatchSourceCount, -1, 1);
+	EXPORT STRING2 AddrOwnershipCurrent := BusShell.Best_Info.BestOwnership;
+	EXPORT STRING9 AddrAssessedValueCurrent := BusShell.Best_Info.BestAssessedValue;
+	EXPORT STRING9 AddrLotSizeCurrent := BusShell.Best_Info.BestLotSize;
+	EXPORT STRING9 AddrBuildingSizeCurrent := BusShell.Best_Info.BestBldgSize;
+	// EXPORT STRING6 FirmEmployeeCount := BusShell.Firmographic.FirmEmployeeCount;
+	EXPORT STRING2 FirmOwnershipType := BusShell.Firmographic.OwnershipType;
+	// EXPORT STRING11 FirmReportedSales := BusShell.Firmographic.FirmReportedSales;
+	EXPORT STRING2 FirmParentCompanyInd := BusShell.Organizational_Structure.OrgParentCompany;
+  EXPORT STRING3 FirmAgeObserved := BusShell.Firmographic.busobservedageID;
+	EXPORT STRING2 SOSStateMatchInputState := BusShell.SOS.SOSIncorporationStateInput;
+  EXPORT STRING5 SOSIncorporationFilingsCount := BusShell.SOS.SOSIncorporationCount;
+  EXPORT STRING5 SOSIncorporationTimeOldest := BusShell.SOS.SOSTimeIncorporation;
+	EXPORT STRING5 SOSDomesticCount := BusShell.SOS.SOSDomesticCount;
+	EXPORT STRING2 SOSStandingWorst := BusShell.SOS.SOSStandingWorst;
+	EXPORT STRING2 SOSStandingBest := BusShell.SOS.SOSStandingBest;
+	EXPORT STRING2 SOSStandingDefunct := BusShell.SOS.soseverdefunct;
+  EXPORT STRING5 SOSForeignCount := BusShell.SOS.SOSForeignCount;
+  EXPORT STRING3 SOSForeignStateCount := BusShell.SOS.SOSForeignStateCount;
+  EXPORT STRING3 BankruptcyCount12M := BusShell.Bankruptcy.BankruptcyCount12Month;
+  EXPORT STRING3 BankruptcyCount24M := BusShell.Bankruptcy.BankruptcyCount24Month;
+  EXPORT STRING3 BankruptcyCount84M := BusShell.Bankruptcy.BankruptcyCount84Month;
+	// EXPORT STRING5 LienCount := BusShell.Lien_And_Judgment.LienCount;
+  EXPORT STRING5 LienStateCount := BusShell.Lien_And_Judgment.LienStateCount;
+	EXPORT STRING2 LienStateMatchInputState := BusShell.Lien_And_Judgment.LienStateInput;
+  EXPORT STRING8 LienTotalAmount := BusShell.Lien_And_Judgment.LienDollarTotal;
+  EXPORT STRING2 LienNewestType := BusShell.Lien_And_Judgment.LienType;
+  EXPORT STRING5 LienCount03M := BusShell.Lien_And_Judgment.LienFiledCount03;
+  EXPORT STRING5 LienCount06M := BusShell.Lien_And_Judgment.LienFiledCount06;
+  EXPORT STRING5 LienCount12M := BusShell.Lien_And_Judgment.LienFiledCount12;
+  EXPORT STRING5 LienCount24M := BusShell.Lien_And_Judgment.LienFiledCount24;
+  EXPORT STRING5 LienCount36M := BusShell.Lien_And_Judgment.LienFiledCount36;
+  EXPORT STRING5 LienCount60M := BusShell.Lien_And_Judgment.LienFiledCount60;
+	EXPORT STRING5 LienFedTaxCount := BusShell.Lien_And_Judgment.LienFiledFTCount;
+	EXPORT STRING8 LienFedTaxTotalAmount := BusShell.Lien_And_Judgment.LienFiledFTTotalAmount;
+	EXPORT STRING5 LienForeclosureCount := BusShell.Lien_And_Judgment.LienFiledFCCount;
+	EXPORT STRING8 LienForeclosureTotalAmount := BusShell.Lien_And_Judgment.LienFiledFCTotalAmount;
+	EXPORT STRING5 LienTenantCount := BusShell.Lien_And_Judgment.LienFiledLTCount;
+	EXPORT STRING8 LienTenantTotalAmount := BusShell.Lien_And_Judgment.LienFiledLTTotalAmount;
+	EXPORT STRING5 LienMechanicalCount := BusShell.Lien_And_Judgment.LienFiledMLCount;
+	EXPORT STRING8 LienMechanicalTotalAmount := BusShell.Lien_And_Judgment.LienFiledMLTotalAmount;
+	EXPORT STRING5 LienOtherCount := BusShell.Lien_And_Judgment.LienFiledOCount;
+  EXPORT STRING8 LienOtherTotalAmount := BusShell.Lien_And_Judgment.LienFiledOTotalAmount;
+  EXPORT STRING2 JudgmentStateCount := BusShell.Lien_And_Judgment.JudgmentStateCount;
+	EXPORT STRING2 JudgmentStateMatchInputState := BusShell.Lien_And_Judgment.JudgmentStateInput;
+  EXPORT STRING9 JudgmentTotalAmount := BusShell.Lien_And_Judgment.JudgmentDollarTotal;
+  EXPORT STRING2 JudgmentNewestType := BusShell.Lien_And_Judgment.JudgmentType;
+  EXPORT STRING5 JudgmentCount03M := BusShell.Lien_And_Judgment.JudgmentFiledCount03;
+  EXPORT STRING5 JudgmentCount06M := BusShell.Lien_And_Judgment.JudgmentFiledCount06;
+  EXPORT STRING5 JudgmentCount12M := BusShell.Lien_And_Judgment.JudgmentFiledCount12;
+  EXPORT STRING5 JudgmentCount24M := BusShell.Lien_And_Judgment.JudgmentFiledCount24;
+  EXPORT STRING5 JudgmentCount36M := BusShell.Lien_And_Judgment.JudgmentFiledCount36;
+  EXPORT STRING5 JudgmentCount60M := BusShell.Lien_And_Judgment.JudgmentFiledCount60;
+	EXPORT STRING5 JudgmentClaimsCount := BusShell.Lien_And_Judgment.JudgmentFiledCJCount;
+	EXPORT STRING9 JudgmentClaimsTotalAmount := BusShell.Lien_And_Judgment.JudgmentFiledCJTotalAmount;
+	EXPORT STRING5 JudgmentSmallClaimsCount := BusShell.Lien_And_Judgment.JudgmentFiledSCCount;
+	EXPORT STRING9 JudgmentSmallClaimsTotalAmount := BusShell.Lien_And_Judgment.JudgmentFiledSCTotalAmount;
+	EXPORT STRING5 JudgmentSuitsCount := BusShell.Lien_And_Judgment.JudgmentFiledSTCount;
+	EXPORT STRING9 JudgmentsSuitsTotalAmount := BusShell.Lien_And_Judgment.JudgmentFiledSTTotalAmount;
+	EXPORT STRING5 JudgmentsOtherCount := BusShell.Lien_And_Judgment.JudgmentFiledOCount;
+	EXPORT STRING9 JudgmentOtherTotalAmount := BusShell.Lien_And_Judgment.JudgmentFiledOTotalAmount;
+  EXPORT STRING4 AssetPropCountEver := BusShell.Asset_Information.AssetPropertyCount;
+  EXPORT STRING4 AssetPropCountCurrent := BusShell.Asset_Information.AssetCurrentPropertyCount;
+  EXPORT STRING2 AssetPropStateCountEver := BusShell.Asset_Information.AssetPropertyStateCount;
+  EXPORT STRING4 AssetPropStateCountCurrent := BusShell.Asset_Information.AssetCurrentPropertyStateCount;
+  EXPORT STRING9 AssetPropLotSizeTotalEver := BusShell.Asset_Information.AssetPropertyLotSizeTotal;
+  EXPORT STRING9 AssetPropLotSizeTotalCurrent := BusShell.Asset_Information.AssetCurrentPropertyLotSizeTotal;
+  EXPORT STRING9 AssetPropSqFootageTotalEver := BusShell.Asset_Information.AssetPropertySqFootageTotal;
+  EXPORT STRING9 AssetPropSqFootageTotalCurrent := BusShell.Asset_Information.AssetCurrentPropertySqFootageTotal;
+  EXPORT STRING9 AssetPropAssessedTotalEver := BusShell.Asset_Information.AssetPropertyAssessedTotal;
+  EXPORT STRING9 AssetPropAssessedTotalCurrent := BusShell.Asset_Information.AssetCurrentPropertyAssessedTotal;
+	EXPORT STRING7 AssetVehicleCount := BusShell.Asset_Information.AssetVehicleCount;
+	EXPORT STRING7 AssetVehiclePersonalCount := BusShell.Asset_Information.AssetPersonalVehicleCount;
+	EXPORT STRING7 AssetVehicleCommercialCount := BusShell.Asset_Information.AssetCommercialVehicleCount;
+	EXPORT STRING7 AssetVehicleOtherCount := BusShell.Asset_Information.AssetOtherVehicleCount;
+	EXPORT STRING6 UCCActiveCount := BusShell.Public_Record.UCCActiveCount;
+	EXPORT STRING6 UCCTerminatedCount := BusShell.Public_Record.UCCTerminatedCount;
+	EXPORT STRING6 UCCOtherCount := BusShell.Public_Record.UCCOtherCount;
+	EXPORT STRING2 UCCRoles := BusShell.Public_Record.UCCRole;
+	EXPORT STRING2 UCCRolesActive := BusShell.Public_Record.UCCRoleActive;
+	EXPORT STRING5 InquiryCount := BusShell.Inquiry.inquirycount;
+	EXPORT STRING5 InquiryCount03M := BusShell.Inquiry.Inquiry03Month;
+	EXPORT STRING5 InquiryCount06M := BusShell.Inquiry.Inquiry06Month;
+	EXPORT STRING5 InquiryCount12M := BusShell.Inquiry.Inquiry12Month;
+	EXPORT STRING5 InquiryCount24M := BusShell.Inquiry.Inquiry24Month;
+	EXPORT STRING5 InquiryCreditCount := BusShell.Inquiry.InquiryCreditCount;
+	EXPORT STRING5 InquiryCreditCount03M := BusShell.Inquiry.InquiryCredit03Month;
+	EXPORT STRING5 InquiryCreditCount06M := BusShell.Inquiry.InquiryCredit06Month;
+	EXPORT STRING5 InquiryCreditCount12M := BusShell.Inquiry.InquiryCredit12Month;
+	EXPORT STRING5 InquiryCreditCount24M := BusShell.Inquiry.InquiryCredit24Month;
+	EXPORT STRING5 InquiryHighRiskCount := BusShell.Inquiry.InquiryHighRiskCount;
+	EXPORT STRING5 InquiryHighRiskCount03M := BusShell.Inquiry.InquiryHighRisk03Month;
+	EXPORT STRING5 InquiryHighRiskCount06M := BusShell.Inquiry.InquiryHighRisk06Month;
+	EXPORT STRING5 InquiryHighRiskCount12M := BusShell.Inquiry.InquiryHighRisk12Month;
+	EXPORT STRING5 InquiryHighRiskCount24M := BusShell.Inquiry.InquiryHighRisk24Month;
+	EXPORT STRING5 InquiryOtherCount := BusShell.Inquiry.InquiryOtherCount;
+	EXPORT STRING5 InquiryOtherCount03M := BusShell.Inquiry.InquiryOther03Month;
+	EXPORT STRING5 InquiryOtherCount06M := BusShell.Inquiry.InquiryOther06Month;
+	EXPORT STRING5 InquiryOtherCount12M := BusShell.Inquiry.InquiryOther12Month;
+	EXPORT STRING5 InquiryOtherCount24M := BusShell.Inquiry.InquiryOther24Month; 
+	EXPORT STRING2 BusExecLinkRepNameOnFile := BusShell.Business_To_Executive_Link.BusExecLinkAuthRepNameOnFile;
+	EXPORT STRING2 BusExecLinkRepAddrOnFile := BusShell.Business_To_Executive_Link.BusExecLinkAuthRepAddrOnFile;
+	EXPORT STRING2 BusExecLinkRepPhoneOnFile := BusShell.Business_To_Executive_Link.BusExecLinkAuthRepPhoneOnFile;
+	EXPORT STRING2 BusExecLinkRepSSNOnFile := BusShell.Business_To_Executive_Link.BusExecLinkAuthRepSSNOnFile;
+	EXPORT STRING2 BusExecLinkBusNameRepFirst := BusShell.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFirst;
+	EXPORT STRING2 BusExecLinkBusNameRepLast := BusShell.Business_To_Executive_Link.BusExecLinkBusNameAuthRepLast;
+	EXPORT STRING2 BusExecLinkBusNameRepFull := BusShell.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFull;
+	EXPORT STRING2 BusExecLinkRepAddrBusAddr := BusShell.Business_To_Executive_Link.BusExecLinkAuthRepAddrBusAddr;
+	EXPORT STRING2 BusExecLinkRepPhoneBusPhone := BusShell.Business_To_Executive_Link.BusExecLinkAuthRepPhoneBusPhone;
+	EXPORT STRING2 BusExecLinkRepSSNBusFEIN := BusShell.Business_To_Executive_Link.BusExecLinkAuthRepSSNBusFein;
+	EXPORT STRING2 BusExecLinkUtilOverlapCount := BusShell.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount;
+	EXPORT STRING5 BusExecLinkInqOverlapCount := BusShell.Business_To_Executive_Link.BusExecLinkInquiryOverlapCount;
+	EXPORT STRING5 BusExecLinkPropOverlapCount := BusShell.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount;
+	EXPORT STRING5 BusExecLinkBusAddrRepOwned := BusShell.Business_To_Executive_Link.BusExecLinkBusAddrAuthRepOwned;
+	EXPORT STRING2 BusExecLinkRep2NameOnFile := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep2NameOnFile;
+	EXPORT STRING2 BusExecLinkRep2AddrOnFile := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep2AddrOnFile;
+	EXPORT STRING2 BusExecLinkRep2PhoneOnFile := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep2PhoneOnFile;
+	EXPORT STRING2 BusExecLinkRep2SSNOnFile := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep2SSNOnFile;
+	EXPORT STRING2 BusExecLinkBusNameRep2First := BusShell.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2First;
+	EXPORT STRING2 BusExecLinkBusNameRep2Last := BusShell.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2Last;
+	EXPORT STRING2 BusExecLinkBusNameRep2Full := BusShell.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2Full;
+	EXPORT STRING2 BusExecLinkRep2AddrBusAddr := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep2AddrBusAddr;
+	EXPORT STRING2 BusExecLinkRep2PhoneBusPhone := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep2PhoneBusPhone;
+	EXPORT STRING2 BusExecLinkRep2SSNBusFEIN := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep2SSNBusFein;
+	EXPORT STRING2 BusExecLinkUtilOverlapCount2 := BusShell.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount2;
+	EXPORT STRING5 BusExecLinkInqOverlapCount2 := BusShell.Business_To_Executive_Link.BusExecLinkInquiryOverlapCount2;
+	EXPORT STRING5 BusExecLinkPropOverlapCount2 := BusShell.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount2;
+	EXPORT STRING5 BusExecLinkBusAddrRep2Owned := BusShell.Business_To_Executive_Link.BusExecLinkBusAddrAuthRep2Owned;
+	EXPORT STRING2 BusExecLinkRep3NameOnFile := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep3NameOnFile;
+	EXPORT STRING2 BusExecLinkRep3AddrOnFile := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep3AddrOnFile;
+	EXPORT STRING2 BusExecLinkRep3PhoneOnFile := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneOnFile;
+	EXPORT STRING2 BusExecLinkRep3SSNOnFile := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep3SSNOnFile;
+	EXPORT STRING2 BusExecLinkBusNameRep3First := BusShell.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3First;
+	EXPORT STRING2 BusExecLinkBusNameRep3Last := BusShell.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3Last;
+	EXPORT STRING2 BusExecLinkBusNameRep3Full := BusShell.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3Full;
+  EXPORT STRING2 BusExecLinkRep3AddrBusAddr := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep3AddrBusAddr;
+  EXPORT STRING5 BusExecLinkBusAddrRep3Owned := BusShell.Business_To_Executive_Link.BusExecLinkBusAddrAuthRep3Owned;
+	EXPORT STRING2 BusExecLinkRep3PhoneBusPhone := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneBusPhone;
+	EXPORT STRING2 BusExecLinkRep3SSNBusFEIN := BusShell.Business_To_Executive_Link.BusExecLinkAuthRep3SSNBusFein;  
+	EXPORT STRING2 BusExecLinkUtilOverlapCount3 := BusShell.Business_To_Executive_Link.BusExecLinkUtilityOverlapCount3;
+	EXPORT STRING5 BusExecLinkInqOverlapCount3 := BusShell.Business_To_Executive_Link.BusExecLinkInquiryOverlapCount3;
+	EXPORT STRING5 BusExecLinkPropOverlapCount3 := BusShell.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount3;
+
+	EXPORT STRING12 B2BProviderAvg12M := BusShell.B2B.AvgProviderCount12Mos;
+	EXPORT STRING2 B2BProviderDelta12M := BusShell.B2B.ProviderTrajectory12Mos;
+	EXPORT STRING2 B2BProviderDelta24M := BusShell.B2B.ProviderTrajectory24Mos;
+	EXPORT STRING2 B2BSpendCategories12M := BusShell.B2B.NumSpendCategories12Mos;
+	EXPORT STRING9 B2BSpendTotal12M := BusShell.B2B.TotalSpend12Mos;
+	EXPORT STRING2 B2BSpendDelta12M := BusShell.B2B.SpendTrajectory12Mos;
+	EXPORT STRING2 B2BSpendDelta24M := BusShell.B2B.SpendTrajectory24Mos;
+	EXPORT STRING9 B2BDBTAvg03 := BusShell.B2B.AveDaysBeyondTerms;
+	EXPORT STRING2 B2B30DBT12MInd := BusShell.B2B.AvgPctTradelinesGT30DPDIndex12Mos;
+	EXPORT STRING2 B2B60DBT12MInd := BusShell.B2B.AvgPctTradelinesGT60DPDIndex12Mos;
+	EXPORT STRING2 B2B90DBT12Ind := BusShell.B2B.AvgPctTradelinesGT90DPDIndex12Mos;
+	EXPORT STRING2 B2BDBT30Delta12M := BusShell.B2B.DaysBeyondTerms30Trajectory12Mos;
+	EXPORT STRING2 B2BDBT30Delta24M := BusShell.B2B.DaysBeyondTerms30Trajectory24Mos;
+	EXPORT STRING2 B2BDBT60Delta12M := BusShell.B2B.DaysBeyondTerms60Trajectory12Mos;
+	EXPORT STRING2 B2BDBT60Delta24M := BusShell.B2B.DaysBeyondTerms60Trajectory24Mos;
+	EXPORT STRING2 B2BPaid12M := BusShell.B2B.PaidInFull12Mos;
+	EXPORT STRING9 B2BBalanceAvg03M := BusShell.B2B.AvgPayments03Mos;
+
+	EXPORT STRING2 BusAddrPersonNameAltNameOverlap := BusShell.Business_To_Person_Link.BusAddrPersonAltNameOverlap;
+	EXPORT STRING3 InputFEINEntityCount := BusShell.Input_Characteristics.InputTINEntityCount;
+	EXPORT STRING3 InputBusAddrCurrentCount := BusShell.Business_Characteristics.BusinessAddrCount;
+	EXPORT STRING2 InputBusNameOtherBusNameMatch := BusShell.Verification.VerInputNameAlternative;
+	EXPORT STRING2 InputBusNameDBAMatch := BusShell.Verification.VerInputNameDBA;
+	EXPORT STRING2 InputAltNameBusNameMatch := BusShell.Verification.AltNameMatchName;
+	EXPORT STRING2 InputAltNameOtherBusNameMatch := BusShell.Verification.VerInputAltNameAlternative;
+	EXPORT STRING2 InputAltNameDBAMatch := BusShell.Verification.VerInputAltNameDBA;
+	EXPORT STRING2 InputAddrPoBox := BusShell.Verification.AddrPOBox;
+	EXPORT STRING2 InputAddrVacancy := BusShell.Verification.InputAddrVacancyNoID;
+  EXPORT STRING5 InputAddrFEINCount := BusShell.Input_Characteristics.InputAddrTINCount;
+  EXPORT STRING2 InputAddrValid := BusShell.Verification.InputAddrValidNoID;
+  EXPORT STRING2 InputAddrZipMismatch := BusShell.Verification.AddrZipMismatch;
+  EXPORT STRING5 InputAddrTimeOldest := BusShell.Verification.InputAddrLengthOfResidence;
+  EXPORT STRING2 InputAddrOwnership := BusShell.Verification.InputAddrOwnership;
+  EXPORT STRING9 InputAddrAssessedValue := BusShell.Input_Characteristics.InputAddrAssessedTotal;
+  EXPORT STRING9 InputAddrBuildingSize := BusShell.Input_Characteristics.InputAddrSqFootage;
+	EXPORT STRING InputPhoneResidential := BusShell.Verification.PhoneResidential;
+  EXPORT STRING2 InputPhoneMismatch := BusShell.Verification.VerificationBusInputPhoneAddr;
+  EXPORT STRING2 InputPhoneDisconnected := BusShell.Verification.phonedisconnected;
+  EXPORT STRING2 InputPhoneValid := BusShell.Verification.InputPhoneValidNoID;
+  EXPORT STRING2 InputPhoneType := BusShell.Input_Characteristics.InputPhoneMobile;
+  EXPORT STRING2 InputFEINHitIndex := BusShell.Verification.FEINOnFile;
+	EXPORT STRING2 InputFEINBIIMismatch := BusShell.Verification.FEINAddrNameMismatch;
+  EXPORT STRING6 AssociateBankrupt12MCount := BusShell.Associates.AssociateBankrupt1YearCount;
+	EXPORT STRING6 AssociateCurrCount := BusShell.Associates.AssociateCurrentCount;
+	EXPORT STRING6 AssociateCurrCountWithFelony := BusShell.Associates.AssociateCurrentCountWithFelony;
+	EXPORT STRING6 AssociateCurrCountWithBkrpt := BusShell.Associates.AssociateCurrentCountWithBankruptcy;
+	EXPORT STRING6 AssociateCurrCountWithLien := BusShell.Associates.AssociateCurrentCountWithLien;
+	EXPORT STRING6 AssociateCurrCountWithJudgment := BusShell.Associates.AssociateCurrentCountWithJudgment;
+	EXPORT STRING6 AssociateCurrCountWithProp := BusShell.Associates.AssociateCurrentCountWithProperty;
+	EXPORT STRING6 AssociateCurrBusinessesTotal := BusShell.Associates.AssociateCurrentBusinessCount;
+	EXPORT STRING6 AssociateCurrSOSCount := BusShell.Associates.AssociateCurrentSOSCount;
+	EXPORT STRING2 SourceIndex := BusShell.Verification.SourceIndex;
 
 	// SBFE data
 	EXPORT STRING1 SBFEHitIndex := BusShell.SBFE.SBFESourceIndex;

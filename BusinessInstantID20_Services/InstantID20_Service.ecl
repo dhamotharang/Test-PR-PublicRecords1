@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BusinessInstantID20_Service">
 	<part name="BusinessInstantID20Request" type="tns:XmlDataSet" cols="110" rows="75"/>
 	<part name="DPPAPurpose" type="xsd:integer"/>
@@ -64,7 +64,7 @@ EXPORT InstantID20_Service() := MACRO
 			BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
 
 			//Look up the industry by the company ID.
-			Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Business_Risk__InstantID_20_Service);
+			Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Business_Risk__InstantID_20_Service);
 		/* ************* End Scout Fields **************/
 
 		// Rename #STORED attributes found in the service interface above so they match what 
@@ -236,11 +236,8 @@ EXPORT InstantID20_Service() := MACRO
 																										 self.i_bus_city := search.Company.address.City,
 																										 self.i_bus_state := search.Company.address.State,
 																										 self.i_bus_zip := search.Company.address.Zip5,
-																										 // model_count := count(left.SmallBusinessAnalyticsResults.Models);
-																										 // self.i_model_name_1 := left.SmallBusinessAnalyticsResults.Models[1].Name,
-																										 //Check to see if there was more than one model requested
-																										 // extra_score := model_count > 1;
-																										 // self.i_model_name_2 := IF(extra_score, left.SmallBusinessAnalyticsResults.Models[2].Name, ''),
+																										 self.i_model_name_1 := 'BVI',
+																										 self.i_model_name_2 := 'CVI',
 																										 self.o_score_1    := (Integer)left.Result.CompanyResults.BusinessVerification.Index,
 																										 self.o_reason_1_1 := left.Result.CompanyResults.RiskIndicators[1].RiskCode,
 																										 self.o_reason_1_2 := left.Result.CompanyResults.RiskIndicators[2].RiskCode,

@@ -1,4 +1,4 @@
-IMPORT Business_Risk_BIP;
+﻿IMPORT Business_Risk_BIP;
 
 EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Risk_BIP.Layouts.Shell le, UNSIGNED1 BusShellVersion) := 
 	TRANSFORM
@@ -51,7 +51,7 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Verification.AddrZipCodeMatch := Business_Risk_BIP.Common.SetBoolean(FALSE);
 		SELF.Verification.AddrCityZipMatch := Business_Risk_BIP.Common.SetBoolean(FALSE);
 		SELF.Verification.AddrVerification := '-1';
-		SELF.Verification.AddrIsBest := Business_Risk_BIP.Common.SetBoolean(FALSE);
+		SELF.Verification.AddrIsBest := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, Business_Risk_BIP.Common.SetBoolean(FALSE), '-1');
 		SELF.Verification.AddrSourceCount := '-1';
 		SELF.Verification.AddrVerificationSourceCount := '-1';
 		SELF.Verification.InputAddrLengthOfResidence := '-1';
@@ -72,7 +72,17 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Verification.PhoneMatchDateLastSeen := '-1';
 		SELF.Verification.PhoneMisKey := Business_Risk_BIP.Common.SetBoolean(FALSE);
 		SELF.Verification.InputPhoneValid := '-1';
-		SELF.Verification.PhoneDisconnected := '-1';
+
+		InputPhoneProblems := MAP(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22 => '-1',
+                              le.Input.InputCheckBusPhone = '0'				                           => '-1',
+															le.Verification.PhoneDisconnected = '1'	                           => '1',
+                                                                                                    le.Input_Characteristics.InputPhoneProblems);
+		SELF.Input_Characteristics.InputPhoneProblems := InputPhoneProblems;
+		SELF.Verification.PhoneDisconnected := MAP(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22 => '-1',
+                                               le.Input.InputCheckBusPhone = '0'	                                => '-1',
+																							 InputPhoneProblems = '1'						                                => '1',
+                                                                                                                     le.Verification.PhoneDisconnected);
+                                                                                     
 		SELF.Verification.FEINMatchSourceCount := '-1';
 		SELF.Verification.FEINVerification := '-1';
 		SELF.Verification.FEINMiskeyFlag := Business_Risk_BIP.Common.SetBoolean(FALSE);
@@ -94,6 +104,7 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Verification.BNAT2 := '0';
 		SELF.Verification.BNAS2 := '0';
 		SELF.Verification.BVIIndicator2 := '00';
+		SELF.Verification.BVI := '00';
 		SELF.Verification.InputIDMatchConfidence := checkVersion('0', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Verification.InputIDMatchCategory := checkVersion(Business_Risk_BIP.Constants.Category_None, Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Verification.InputIDMatchStatus := checkVersion('UNKNOWN', Business_Risk_BIP.Constants.BusShellVersion_v22);
@@ -110,14 +121,21 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Verification.PhoneInputMiskey := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Verification.PhoneDistance := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Verification.FEINInputMiskey := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
-		SELF.Verification.FEINAddrNameMismatch := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);		
-		SELF.Verification.AltNameMatchSourceCount := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
+		SELF.Verification.FEINAddrNameMismatch := MAP(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v22 => '',
+                                                  BusShellVersion = Business_Risk_BIP.Constants.BusShellVersion_v22 => '-1',
+                                                                                                               le.Verification.FEINAddrNameMismatch);		
+    SELF.Verification.AltNameMatchSourceCount := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Verification.AltNameMatchName := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Verification.VerAltNameMiskey := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Verification.VerInputAltNameAlternative := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Verification.VerInputAltNameDBA := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Verification.VerWatchlistAltNameMatch := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
-		
+		SELF.Verification.SourceIndex := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
+    SELF.Verification_Summary.PhoneSourceVerifIndex := '-1';
+    SELF.Verification_Summary.BureauSourceVerifIndex := '-1';
+    SELF.Verification_Summary.GovtSourceVerifIndex := '-1';
+    SELF.Verification_Summary.PubRecSourceVerifIndex := '-1';
+    SELF.Verification_Summary.BusDirectorySourceVerifIndex := '-1';
 		SELF.Business_Activity.SourceBusinessRecordTimeOldestID := '-1';
 		SELF.Business_Activity.SourceBusinessRecordTimeNewestID := '-1';
 		SELF.Business_Activity.SourceBusinessRecordUpdated12MonthID := '-1';
@@ -138,7 +156,9 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Firmographic.FirmSICCode := '-1';
 		SELF.Firmographic.FirmNAICSCode := '-1';
 		SELF.Firmographic.FirmEmployeeCount := '-1';
+		SELF.Firmographic.FirmEmployeeRangeCount := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 		SELF.Firmographic.FirmReportedSales := '-1';
+		SELF.Firmographic.FirmReportedSalesRange := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 		SELF.Firmographic.FirmReportedEarnings := '-1';
 		SELF.Firmographic.FirmIRSRetirementPlan := '-1';
 		SELF.Firmographic.FirmNonProfit := '-1';
@@ -146,15 +166,21 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Firmographic.BusObservedAge := '-1';
 		SELF.Firmographic.FinanceReportedAssets := '-1';
 		SELF.Firmographic.FinanceWorthOfBus := '-1';
+    SELF.Firmographic.BusTypeAddress := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 		SELF.Firmographic.IndustryNAICRecent := '-1';
 		SELF.Firmographic.IndustrySICRecent := '-1';
 		SELF.Firmographic.FirmEmployeeCountSmallest := '-1';
+		SELF.Firmographic.FirmEmployeeRangeCountSmallest := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 		SELF.Firmographic.FirmEmployeeCountLargest := '-1';
+		SELF.Firmographic.FirmEmployeeRangeCountlargest := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 		SELF.Firmographic.FirmEmployeeCountMostRecent := '-1';
+		SELF.Firmographic.FirmEmployeeRangeCountMostRecent := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Firmographic.OwnershipType := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 		SELF.Organizational_Structure.OrgLocationCount := '-1';
 		SELF.Organizational_Structure.OrgRelatedCount := '-1';
+		SELF.Organizational_Structure.OrgParentCompany := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 		SELF.Organizational_Structure.OrgLegalEntityCount := '-1';
-		SELF.Organizational_Structure.OrgAddrLegalEntityCount := '-1';
+		SELF.Organizational_Structure.OrgAddrLegalEntityCount := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Organizational_Structure.OrgAddrLegalEntityCount);
 		SELF.Organizational_Structure.UltIDOrgIDTreeCount := '-1';
 		SELF.Organizational_Structure.UltIDProxIDTreeCount := '-1';
 		SELF.Organizational_Structure.UltIDPowIDTreeCount := '-1';
@@ -176,6 +202,16 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.SOS.SOSFilingCount := '-1';
 		SELF.SOS.SOSFilingDateFirstSeen := '-1';
 		SELF.SOS.SOSFilingDateLastSeen := '-1';
+		SELF.SOS.SOSDomesticCount := '-1';
+		SELF.SOS.SOSDomesticMosSinceFirstSeen := '-1';
+		SELF.SOS.SOSDomesticDateFirstSeen := '-1';
+		SELF.SOS.SOSDomesticDateLastSeen := '-1';
+		SELF.SOS.SOSForeignCount := '-1';
+		SELF.SOS.SOSForeignMosSinceFirstSeen := '-1';
+		SELF.SOS.SOSForeignDateFirstSeen := '-1';
+		SELF.SOS.SOSForeignDateLastSeen := '-1';
+		SELF.SOS.SOSStandingBest := '-1';
+		SELF.SOS.SOSStandingWorst := '-1';
 		SELF.SOS.SOSForeignStateCount := '-1';
 		SELF.SOS.SOSRegisterAgentChangeCount := '-1';
 		SELF.SOS.SOSRegisterAgentChangeDateFirstSeen := '-1';
@@ -338,12 +374,22 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Lien_And_Judgment.JudgmentReleasedODateLastSeen := '-1';
 		SELF.Lien_And_Judgment.JudgmentReleasedOTotalAmount := '-1';
 		SELF.Asset_Information.AssetPropertyCount := '-1';
+		SELF.Asset_Information.AssetCurrentPropertyCount := '-1';
 		SELF.Asset_Information.AssetPropertyStateCount := '-1';
+		SELF.Asset_Information.AssetCurrentPropertyStateCount := '-1';
 		SELF.Asset_Information.AssetPropertyLotSizeTotal:= '-1';
+		SELF.Asset_Information.AssetCurrentPropertyLotSizeTotal:= '-1';
 		SELF.Asset_Information.AssetPropertyAssessedTotal := '-1';
+		SELF.Asset_Information.AssetCurrentPropertyAssessedTotal := '-1';
 		SELF.Asset_Information.AssetPropertySqFootageTotal	:= '-1';
+		SELF.Asset_Information.AssetCurrentPropertySqFootageTotal	:= '-1';
 		SELF.Asset_Information.AssetAircraftCount := '-1';
 		SELF.Asset_Information.AssetWatercraftCount := '-1';		
+    SELF.Asset_Information.AssetVehicleCount := '-1';
+    SELF.Asset_Information.AssetPersonalVehicleCount := '-1';
+    SELF.Asset_Information.AssetCommercialVehicleCount := '-1';
+    SELF.Asset_Information.AssetOtherVehicleCount := '-1';
+    SELF.Asset_Information.AssetTotalVehicleValue := '-1';
 		SELF.Public_Record.UCCCount := '-1';
 		SELF.Public_Record.UCCTimeNewest := '-1';
 		SELF.Public_Record.UCCTimeOldest := '-1';
@@ -355,6 +401,8 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Public_Record.UCCInitialFilingDateLastSeen := '-1';
 		SELF.Public_Record.UCCDateFirstSeen := '-1';
 		SELF.Public_Record.UCCDateLastSeen := '-1';
+		SELF.Public_Record.UCCRole := '-1';
+		SELF.Public_Record.UCCRoleActive := '-1';
 		SELF.Tradeline.TradeTimeNewest := '-1';
 		SELF.Tradeline.TradeTimeOldest := '-1';
 		SELF.Tradeline.TradeCount := '-1';
@@ -415,9 +463,9 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Inquiry.Inquiry06Month := '-1';
 		SELF.Inquiry.Inquiry12Month := '-1';
 		SELF.Inquiry.Inquiry24Month := '-1';
-		SELF.Inquiry.InquiryConsumerAddress := '-1';
-		SELF.Inquiry.InquiryConsumerPhone := '-1';
-		SELF.Inquiry.InquiryConsumerAddressSSN := '-1';
+		SELF.Inquiry.InquiryConsumerAddress := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Inquiry.InquiryConsumerAddress);
+		SELF.Inquiry.InquiryConsumerPhone := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Inquiry.InquiryConsumerPhone);
+		SELF.Inquiry.InquiryConsumerAddressSSN := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Inquiry.InquiryConsumerAddressSSN);
 		SELF.Inquiry.InquiryOtherCount := '-1';
 		SELF.Inquiry.InquiryOther03Month := '-1';
 		SELF.Inquiry.InquiryOther06Month := '-1';
@@ -425,6 +473,9 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Inquiry.InquiryOther24Month := '-1';
 		SELF.Inquiry.InquiryDateFirstSeen := '-1';
 		SELF.Inquiry.InquiryDateLastSeen := '-1';
+
+    SELF.Business_To_Executive_Link.BusExecLinkAuthRepIndex := '-1';
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRepLexIDOnFile := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRepNameOnFile := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRepAddrOnFile := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRepSSNOnFile := '-1';
@@ -493,6 +544,8 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Business_To_Executive_Link.AR2BBusRep1AddrDistance := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Business_To_Executive_Link.AR2BBusRep1PhoneDistance := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);		
 		
+    SELF.Business_To_Executive_Link.BusExecLinkAuthRep2Index := '-1';
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2LexIDOnFile := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2NameOnFile := '-1';	  
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2AddrOnFile := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2PhoneOnFile := '-1';
@@ -510,6 +563,8 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Business_To_Executive_Link.AR2BBusRep2AddrDistance := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Business_To_Executive_Link.AR2BBusRep2PhoneDistance := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		
+    SELF.Business_To_Executive_Link.BusExecLinkAuthRep3Index := '-1';
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3LexIDOnFile := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3NameOnFile := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3AddrOnFile := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneOnFile := '-1';
@@ -527,6 +582,8 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Business_To_Executive_Link.AR2BBusRep3AddrDistance := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Business_To_Executive_Link.AR2BBusRep3PhoneDistance := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		
+    SELF.Business_To_Executive_Link.BusExecLinkAuthRep4Index := '-1';
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4LexIDOnFile := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4NameOnFile := '-1';	  
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4AddrOnFile := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneOnFile := '-1';
@@ -544,6 +601,8 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Business_To_Executive_Link.AR2BBusRep4AddrDistance := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Business_To_Executive_Link.AR2BBusRep4PhoneDistance := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		
+    SELF.Business_To_Executive_Link.BusExecLinkAuthRep5Index := '-1';
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5LexIDOnFile := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5NameOnFile := '-1';	  
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5AddrOnFile := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneOnFile := '-1';
@@ -561,39 +620,39 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Business_To_Executive_Link.AR2BBusRep5AddrDistance := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);
 		SELF.Business_To_Executive_Link.AR2BBusRep5PhoneDistance := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v22);		
 		
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFirstInput := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepPrefFirstInput := '-1';
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFirstInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFirstInput);
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepPrefFirstInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRepPrefFirstInput);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepPrefFirstFile := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepLastInput := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFullInput := '-1';
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepLastInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRepLastInput);
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFullInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFullInput);
 		SELF.Business_To_Executive_Link.BusExecLinkPublishedAssociation := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRepAddrBusAddrInput := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2FirstInput := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2PrefFirstInput := '-1';
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2FirstInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2FirstInput);
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2PrefFirstInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2PrefFirstInput);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2PrefFirstFile := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2LastInput := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2FullInput := '-1';
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2LastInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2LastInput);
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2FullInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2FullInput);
 		SELF.Business_To_Executive_Link.BusExecLinkPublishedAssociation2 := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2AddrBusAddrInput := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3FirstInput := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3PrefFirstInput := '-1';		
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3FirstInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3FirstInput);
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3PrefFirstInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3PrefFirstInput);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3PrefFirstFile := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3LastInput := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3FullInput := '-1';
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3LastInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3LastInput);
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3FullInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3FullInput);
 		SELF.Business_To_Executive_Link.BusExecLinkPublishedAssociation3 := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3AddrBusAddrInput := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4FirstInput := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4PrefFirstInput := '-1';
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4FirstInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4FirstInput);
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4PrefFirstInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4PrefFirstInput);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4PrefFirstFile := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4LastInput := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4FullInput := '-1';
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4LastInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4LastInput);
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4FullInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4FullInput);
 		SELF.Business_To_Executive_Link.BusExecLinkPublishedAssociation4 := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4AddrBusAddrInput := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5FirstInput := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5PrefFirstInput := '-1';
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5FirstInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5FirstInput);
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5PrefFirstInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5PrefFirstInput);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5PrefFirstFile := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5LastInput := '-1';
-		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5FullInput := '-1';
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5LastInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5LastInput);
+		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5FullInput := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5FullInput);
 		SELF.Business_To_Executive_Link.BusExecLinkPublishedAssociation5 := '-1';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5AddrBusAddrInput := '-1';
 
@@ -602,16 +661,35 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Business_To_Person_Link.BusFEINPersonPhoneOverlap := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v21, '-1', le.Business_To_Person_Link.BusFEINPersonPhoneOverlap);
 		SELF.Business_To_Person_Link.BusAddrPersonNameOverlap := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v21, '-1', le.Business_To_Person_Link.BusAddrPersonNameOverlap);
 		SELF.Business_To_Person_Link.BusAddrPersonAltNameOverlap := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v21, '-1', le.Business_To_Person_Link.BusAddrPersonAltNameOverlap);
-		SELF.Input_Characteristics.InputAddrConsumerCount := '-1';
+
+    SELF.Residential_Business.ResidentialBusIndicator := '-1';
+    SELF.Residential_Business.ResidentialBusDescription := '-1';
+
+		SELF.Input_Characteristics.InputAddrConsumerCount:= IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22, '-1', le.Input_Characteristics.InputAddrConsumerCount);
 		SELF.Input_Characteristics.InputAddrSourceCount := '-1';
 		SELF.Input_Characteristics.InputAddrType := '-1';
 		SELF.Input_Characteristics.InputAddrBusinessOwned := '-1';
-		SELF.Input_Characteristics.InputAddrLotSize  := '-1';
-		SELF.Input_Characteristics.InputAddrAssessedTotal  := '-1';
-		SELF.Input_Characteristics.InputAddrSqFootage  := '-1';
-		SELF.Input_Characteristics.InputPhoneProblems  := '-1';
-		SELF.Input_Characteristics.InputPhoneEntityCount  := '-1';
-		SELF.Input_Characteristics.InputPhoneMobile  := '-1';
+		SELF.Input_Characteristics.InputAddrLotSize  := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22,'-1', le.Input_Characteristics.InputAddrLotSize);
+		SELF.Input_Characteristics.InputAddrAssessedTotal  := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22,'-1', le.Input_Characteristics.InputAddrAssessedTotal);
+		SELF.Input_Characteristics.InputAddrSqFootage  := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22,'-1', le.Input_Characteristics.InputAddrSqFootage);
+		SELF.Input_Characteristics.InputPhoneEntityCount  := IF(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22,'-1', le.Input_Characteristics.InputPhoneEntityCount);
+		SELF.Input_Characteristics.InputPhoneMobile  :=  MAP(BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v22 => '-1', 
+                                                         le.Input.InputCheckBusPhone = '0'                                  => '-1', 
+                                                                                                                               le.Input_Characteristics.InputPhoneMobile);
+   
+
+		SELF.Best_Info.BestSourceCount := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Best_Info.BestTypeAdvo := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Best_Info.BestTypeOther := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Best_Info.BestZipcodeType := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Best_Info.BestVacancy := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Best_Info.BestLengthResidency := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Best_Info.BestOwnership := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Best_Info.BestAssessedValue := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Best_Info.BestLotSize := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Best_Info.BestBldgSize := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Best_Info.BestPhoneService := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+    
 		SELF.Associates.AssociateCount := '-1';
 		SELF.Associates.AssociateHighCrimeAddrCount := '-1';
 		SELF.Associates.AssociateFelonyCount := '-1';
@@ -629,12 +707,53 @@ EXPORT Business_Risk_BIP.Layouts.Shell xfm_finalizeBlankShellFields(Business_Ris
 		SELF.Associates.AssociateCityCount := '-1';
 		SELF.Associates.AssociateCountyCount := '-1';
 		SELF.Associates.AssociatePAWCount := '-1';
+		SELF.Associates.AssociateCurrentCount := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Associates.AssociateCurrentCountWithFelony := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Associates.AssociateCurrentCountWithBankruptcy := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Associates.AssociateCurrentCountWithLien := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Associates.AssociateCurrentCountWithJudgment := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Associates.AssociateCurrentCountWithProperty := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Associates.AssociateCurrentBusinessCount := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Associates.AssociateCurrentPAWCount := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.Associates.AssociateCurrentSOSCount := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		
+    SELF.B2B.UltimateIDCount := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+    SELF.B2B.UltimateIDCountActive := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+    SELF.B2B.UltimateIDCountInactive := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+    SELF.B2B.HeaderTimeOldest := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+    SELF.B2B.AttributesTimeOldest := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.VendorScoreFutureDelinquencyMax := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.VendorScoreFutureDelinquencyMin := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.VendorScorePaymentBehaviorMax := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.VendorScorePaymentBehaviorMin := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.AvgProviderCount12Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.ProviderTrajectory12Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.ProviderTrajectory24Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.NumSpendCategories12Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.TotalSpend12Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.SpendTrajectory12Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.SpendTrajectory24Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.AveDaysBeyondTerms := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.AvgPctTradelinesGT30DPD12Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.AvgPctTradelinesGT30DPDIndex12Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.AvgPctTradelinesGT60DPD12Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.AvgPctTradelinesGT60DPDIndex12Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.AvgPctTradelinesGT90DPD12Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.AvgPctTradelinesGT90DPDIndex12Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.DaysBeyondTerms30Trajectory12Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.DaysBeyondTerms30Trajectory24Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.DaysBeyondTerms60Trajectory12Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.DaysBeyondTerms60Trajectory24Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.PaidInFull12Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.AvgPayments03Mos := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+		SELF.B2B.BusinessClosedDate := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
+
 		SELF.Data_Build_Dates.BankruptcyBuildDate := '-1';
 		SELF.Data_Build_Dates.BusinessHeaderBuildDate := '-1';
 		SELF.Data_Build_Dates.InquiriesBuildDate := '-1';
 		SELF.Data_Build_Dates.AircraftBuildDate := '-1';
 		SELF.Data_Build_Dates.WatercraftBuildDate := '-1';
-		
+		SELF.Data_Build_Dates.CorteraBuildDate := checkVersion('-1', Business_Risk_BIP.Constants.BusShellVersion_v30);
 		SELF.SBFE.SBFESourceIndex := '0';
 		SELF.SBFE.SBFEVerBusInputName := '-99';
 		SELF.SBFE.SBFENameMatchDateFirstSeen := checkVersion('-99', Business_Risk_BIP.Constants.BusShellVersion_v22);

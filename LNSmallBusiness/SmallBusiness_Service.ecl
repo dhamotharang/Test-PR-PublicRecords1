@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SmallBusiness_Service">
 	<!-- XML INPUT -->
 	<part name="SmallBusinessRiskRequest" type="tns:XmlDataSet" cols="80" rows="30" />
@@ -165,7 +165,7 @@ export SmallBusiness_Service := macro
 	BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
 
 	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.LNSmallBusiness__SmallBusiness_Service);
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.LNSmallBusiness__SmallBusiness_Service);
 /* ************* End Scout Fields **************/
 	
 	unsigned history_date         := 999999 : stored('HistoryDateYYYYMM');
@@ -239,7 +239,7 @@ export SmallBusiness_Service := macro
 																							 self.i_bus_city := search.Business.address.City,
 																							 self.i_bus_state := search.Business.address.State,
 																							 self.i_bus_zip := search.Business.address.Zip5,
-																							 self.i_model_name_1 := ds_in[1].servicelocations[1].parameters[1].value,
+																							 self.i_model_name_1 := IF(ds_in[1].servicelocations[1].parameters[1].value = '', 'RVS811_0', ds_in[1].servicelocations[1].parameters[1].value),
 																							 self.o_score_1    := left.Result.Models[1].Scores[1].value,
 																							 self.o_reason_1_1 := left.Result.Models[1].Scores[1].BusinessHighRiskIndicators[1].Riskcode,
 																							 self.o_reason_1_2 := left.Result.Models[1].Scores[1].BusinessHighRiskIndicators[2].Riskcode,

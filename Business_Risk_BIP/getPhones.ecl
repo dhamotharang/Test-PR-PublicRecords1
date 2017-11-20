@@ -1,10 +1,12 @@
-IMPORT BIPV2, Risk_Indicators, SALT28, CellPhone, Gong, ut;
+﻿IMPORT BIPV2, Risk_Indicators, SALT28, CellPhone, Gong, ut;
 
 EXPORT getPhones(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
 											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
-											 
+
+	calculateValueFor := Business_Risk_BIP.mod_BusinessShellVersionLogic(Options);
+
 /* ************************************************************************
 	 *  Get Switch Type and Phone Type																						*
 	 ************************************************************************ */
@@ -132,9 +134,7 @@ connectedPhones := JOIN (shell, Gong.Key_History_phone,
 	
 	withResidentialPhones := JOIN(Shell, ResidentialPhonesDD, LEFT.Seq = RIGHT.Seq,
 													TRANSFORM(Business_Risk_BIP.Layouts.Shell,
-														SELF.Verification.PhoneResidential :=  MAP(RIGHT.Business_Flag = FALSE AND RIGHT.Prim_Name <> '' => '1', 
-																																			 RIGHT.Business_Flag = TRUE AND RIGHT.Prim_Name <> '' =>  '0',
-																																																															  '-1');
+														SELF.Verification.PhoneResidential := calculateValueFor._PhoneResidential(RIGHT.Business_Flag, RIGHT.Prim_Name, LEFT.Input.InputCheckBusPhone);
 														SELF := LEFT),																																																										 
 													LEFT OUTER, KEEP(1), ATMOST(100), FEW);		
 	SortConnectedPhones := dedup(sort(connectedPhones, seq, p3, p7, DID, BDID, dt_last_seen), seq, p3, p7, DID, BDID) ((UNSIGNED)DID > 0 OR (UNSIGNED)BDID > 0);
@@ -170,7 +170,7 @@ connectedPhones := JOIN (shell, Gong.Key_History_phone,
 // 4 = Input phone does not belong to input ZIP code area
 // 5 = Input phone is a pager service
 // 6 = Input phone is invalid"
-	  AddphoneAttributes := join(withResidentialPhones, AddConnectedPhoneCnt, LEFT.seq = RIGHT.seq,
+	AddphoneAttributes := join(withResidentialPhones, AddConnectedPhoneCnt, LEFT.seq = RIGHT.seq,
 													TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																			SELF.Input_Characteristics.InputPhoneProblems  :=  MAP(RIGHT.phonetype <> '1'  => '6',
 																																				RIGHT.Phone_Switch_Type = 'G' => '5',
@@ -184,7 +184,23 @@ connectedPhones := JOIN (shell, Gong.Key_History_phone,
 																			SELF.Input_Characteristics.InputPhoneMobile := RIGHT.Phone_Cell_Type,
 																		//	SELF.Verification.PhoneResidential := IF(RIGHT.Phone_Cell_Type = '1', '-1', LEFT.Verification.PhoneResidential);
 																			SELF := LEFT), LEFT OUTER);
+
+	// ---------------- Phone Risk Table - This contains Disconnect information via EDA/Gong ----------------------
+	potentialPhoneDisconnectRaw := JOIN(Shell, Risk_Indicators.Key_Phone_Table_V2, TRIM(LEFT.Clean_Input.Phone10) <> '' AND KEYED(LEFT.Clean_Input.Phone10 = RIGHT.Phone10),
+																	TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq, UNSIGNED3 HistoryDate}, SELF.Seq := LEFT.Seq; SELF.HistoryDate := LEFT.Clean_Input.HistoryDate; SELF := RIGHT),
+																	ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 	
+	potentialPhoneDisconnect := SORT(Business_Risk_BIP.Common.FilterRecords(potentialPhoneDisconnectRaw, dt_first_seen, (UNSIGNED)Business_Risk_BIP.Constants.MissingDate, '', AllowedSourcesSet), Seq, -((INTEGER)dt_first_seen), -potDisconnect);
+	
+	// Keep the most recent record, it's possible this number has been disconnected and then reconnected, the most recent record should hopefully be accurate
+	phoneDisconnect := ROLLUP(potentialPhoneDisconnect, LEFT.Seq = RIGHT.Seq, TRANSFORM(LEFT));
+	
+	withPhoneDisconnect := JOIN(AddphoneAttributes, phoneDisconnect, LEFT.Seq = RIGHT.Seq,
+																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
+																							SELF.Verification.PhoneDisconnected := IF((INTEGER)RIGHT.dt_first_seen <= 0, '2', (STRING)((INTEGER)RIGHT.potDisconnect)); // A 2 indicates "Unknown"
+																							SELF := LEFT),
+																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
+																	
 	// output(Shell, named('ShellInTemp'));
 	// output(SwitchTypeTZTemp, named('SwitchTypeTZTemp'));
 	// output(SwitchTypeTZ, named('sample_SwitchTypeTZ'));
@@ -200,5 +216,5 @@ connectedPhones := JOIN (shell, Gong.Key_History_phone,
 	// output(AddphoneAttributes, named('AddphoneAttributes'));
 
 	
-	RETURN AddphoneAttributes;
+	RETURN withPhoneDisconnect;
 	END;

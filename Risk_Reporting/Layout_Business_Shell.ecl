@@ -1,4 +1,4 @@
-/* ********************************************************
+﻿/* ********************************************************
 ***********************************************************
 ** This is a snapshot of the Bus Shell as of 6/29/2016   **
 ** -- Contains up to Shell 2.1                           **
@@ -7,7 +7,7 @@
 **    support query.                                     **
 ***********************************************************
 ********************************************************* */
-	IMPORT Business_Risk_BIP, SALT28;
+	IMPORT Business_Risk_BIP, BIPv2, SALT28, UCCv2_Services;
 	
 	// Input Batch layout - can map our XML query input to this Batch layout
 	// NOTE: If you change this you MUST redeploy the Library as the interface has changed.
@@ -15,6 +15,7 @@
 		UNSIGNED4		Seq := 0;
 		STRING30		AcctNo := '';
 		UNSIGNED6		HistoryDate := (INTEGER)Business_Risk_BIP.Constants.NinesDate; // Six 9's indicates Realtime search
+		UNSIGNED6		HistoryDateTime := (INTEGER)Business_Risk_BIP.Constants.NinesDateTime; // Twelve 9's indicates Realtime search
 		// BIP Link IDs
 		SALT28.UIDType	PowID := 0;
 		SALT28.UIDType	ProxID := 0;
@@ -173,6 +174,84 @@
 		UNSIGNED6		Rep3_LexID := 0;
 		UNSIGNED1		Rep3_LexIDScore := 0;
 		STRING50		Rep3_BusinessTitle := '';
+		// Authorized Representative 4 Information
+		STRING120		Rep4_FullName := '';
+		STRING5			Rep4_NameTitle := '';
+		STRING20		Rep4_FirstName := '';
+		STRING20		Rep4_PreferredFirstName := ''; // Note, this is only in the Clean_Input section - NOT the Input_Echo section
+		STRING20		Rep4_MiddleName := '';
+		STRING20		Rep4_LastName := '';
+		STRING5			Rep4_NameSuffix := '';
+		STRING20		Rep4_FormerLastName := '';
+		STRING120		Rep4_StreetAddress1 := '';
+		STRING120		Rep4_StreetAddress2 := '';
+		STRING25		Rep4_City := '';
+		STRING2			Rep4_State := '';
+		STRING9			Rep4_Zip := '';
+		STRING10  	Rep4_Prim_Range := '';
+		STRING2   	Rep4_PreDir := '';
+		STRING28  	Rep4_Prim_Name := '';
+		STRING4   	Rep4_Addr_Suffix := '';
+		STRING2   	Rep4_PostDir := '';
+		STRING10  	Rep4_Unit_Desig := '';
+		STRING8   	Rep4_Sec_Range := '';
+		STRING5   	Rep4_Zip5 := '';
+		STRING4   	Rep4_Zip4 := '';
+		STRING10		Rep4_Lat := '';
+		STRING11		Rep4_Long := '';
+		STRING1			Rep4_Addr_Type := '';
+		STRING4			Rep4_Addr_Status := '';
+		STRING3 		Rep4_County := '';
+		STRING7 		Rep4_Geo_Block := '';
+		STRING9			Rep4_SSN := '';
+		STRING8			Rep4_DateOfBirth := '';
+		STRING10		Rep4_Phone10 := '';
+		STRING3			Rep4_Age := '';
+		STRING25		Rep4_DLNumber := '';
+		STRING2			Rep4_DLState := '';
+		STRING100		Rep4_Email := '';
+		UNSIGNED6		Rep4_LexID := 0;
+		UNSIGNED1		Rep4_LexIDScore := 0;
+		STRING50		Rep4_BusinessTitle := '';
+		// Authorized Representative 5 Information
+		STRING120		Rep5_FullName := '';
+		STRING5			Rep5_NameTitle := '';
+		STRING20		Rep5_FirstName := '';
+		STRING20		Rep5_PreferredFirstName := ''; // Note, this is only in the Clean_Input section - NOT the Input_Echo section
+		STRING20		Rep5_MiddleName := '';
+		STRING20		Rep5_LastName := '';
+		STRING5			Rep5_NameSuffix := '';
+		STRING20		Rep5_FormerLastName := '';
+		STRING120		Rep5_StreetAddress1 := '';
+		STRING120		Rep5_StreetAddress2 := '';
+		STRING25		Rep5_City := '';
+		STRING2			Rep5_State := '';
+		STRING9			Rep5_Zip := '';
+		STRING10  	Rep5_Prim_Range := '';
+		STRING2   	Rep5_PreDir := '';
+		STRING28  	Rep5_Prim_Name := '';
+		STRING4   	Rep5_Addr_Suffix := '';
+		STRING2   	Rep5_PostDir := '';
+		STRING10  	Rep5_Unit_Desig := '';
+		STRING8   	Rep5_Sec_Range := '';
+		STRING5   	Rep5_Zip5 := '';
+		STRING4   	Rep5_Zip4 := '';
+		STRING10		Rep5_Lat := '';
+		STRING11		Rep5_Long := '';
+		STRING1			Rep5_Addr_Type := '';
+		STRING4			Rep5_Addr_Status := '';
+		STRING3 		Rep5_County := '';
+		STRING7 		Rep5_Geo_Block := '';
+		STRING9			Rep5_SSN := '';
+		STRING8			Rep5_DateOfBirth := '';
+		STRING10		Rep5_Phone10 := '';
+		STRING3			Rep5_Age := '';
+		STRING25		Rep5_DLNumber := '';
+		STRING2			Rep5_DLState := '';
+		STRING100		Rep5_Email := '';
+		UNSIGNED6		Rep5_LexID := 0;
+		UNSIGNED1		Rep5_LexIDScore := 0;
+		STRING50		Rep5_BusinessTitle := '';
 	END;
 	
 	// Raw BIP Link ID
@@ -191,6 +270,7 @@
 	// Output of Business_Risk_BIP.BIP_LinkID_Append
 	LinkID_Results := RECORD
 		UNSIGNED4 Seq := 0;
+		BOOLEAN BIPIDSourceInput; // Indicates if the BIP IDs were returned from the append process or input
 		// Return all ID's/Company Names
 		DATASET(LinkIDs) PowIDs;
 		DATASET(LinkIDs) ProxIDs;
@@ -204,21 +284,25 @@
 		LinkIDs SeleID;
 		LinkIDs OrgID;
 		LinkIDs UltID;
+		INTEGER2 Weight;
 		CompanyNames CompanyName;
 	END;
 	
 	LayoutSources := RECORD
 		STRING2 Source := '';
 		STRING6 DateFirstSeen := '';
+		STRING6 DateVendorFirstSeen := '';
 		STRING6 DateLastSeen := '';
-		UNSIGNED4 RecordCount := 0;
+		STRING6 DateVendorLastSeen := '';
+		INTEGER4 RecordCount := 0;
 	END;
 		
 	LayoutContacts := RECORD
 		UNSIGNED4 Seq := 0;
 		UNSIGNED6 DID := 0;
 		UNSIGNED4	RecordCount := 0;
-		UNSIGNED6	HistoryDate := 0;
+		UNSIGNED3	HistoryDate := 0;
+		BOOLEAN		IsCurrent := FALSE;
 		// --- Comes from Doxie.Mac_Best_Records ---
 		QSTRING10	phone := '';
 		STRING4		timezone :='';
@@ -286,6 +370,19 @@
 		STRING20		Watchlist_LName; 
 	END;
 	
+	LayoutPhoneAddrDistances := RECORD
+		STRING10 BestBusinessPrimRange;
+		STRING28 BestBusinessPrimName;
+		STRING8 BestBusinessSecRange;
+		STRING5 BestBusinessZip;
+		STRING2 BestBusinessSt;
+		STRING25 BestBusinessCity;
+		STRING10 BestBusinessPhone;
+		STRING10 BestBusinessLat;
+		STRING11 BestBusinessLong;
+		
+	END;
+	
 	// ----- Begin Attributes -----
 	LayoutInputCheck := RECORD
 		STRING1 InputCheckBusName;
@@ -294,6 +391,7 @@
 		STRING1 InputCheckBusCity;
 		STRING1 InputCheckBusState;
 		STRING1 InputCheckBusZip;
+    STRING1 InputCheckBusAddrZip;
 		STRING1 InputCheckBusFEIN;
 		STRING1 InputCheckBusPhone;
 		STRING1 InputCheckBusSIC;
@@ -350,20 +448,88 @@
 		STRING1 InputCheckAuthRep3Age;
 		STRING1 InputCheckAuthRep3Title;
 		STRING1 InputCheckAuthRep3DL;
-		STRING1 InputCheckAuthRep3DLState;		
+		STRING1 InputCheckAuthRep3DLState;
+		STRING1 InputCheckAuthRep4FirstName;
+		STRING1 InputCheckAuthRep4LastName;
+		STRING1 InputCheckAuthRep4MiddleName;
+		STRING1 InputCheckAuthRep4Addr;
+		STRING1 InputCheckAuthRep4City;
+		STRING1 InputCheckAuthRep4State;
+		STRING1 InputCheckAuthRep4Zip;
+		STRING1 InputCheckAuthRep4SSN;
+		STRING1 InputCheckAuthRep4Phone;
+		STRING1 InputCheckAuthRep4DOBYear;
+		STRING1 InputCheckAuthRep4DOBMonth;
+		STRING1 InputCheckAuthRep4DOBDay;
+		STRING1 InputCheckAuthRep4Age;
+		STRING1 InputCheckAuthRep4Title;
+		STRING1 InputCheckAuthRep4DL;
+		STRING1 InputCheckAuthRep4DLState;
+		STRING1 InputCheckAuthRep5FirstName;
+		STRING1 InputCheckAuthRep5LastName;
+		STRING1 InputCheckAuthRep5MiddleName;
+		STRING1 InputCheckAuthRep5Addr;
+		STRING1 InputCheckAuthRep5City;
+		STRING1 InputCheckAuthRep5State;
+		STRING1 InputCheckAuthRep5Zip;
+		STRING1 InputCheckAuthRep5SSN;
+		STRING1 InputCheckAuthRep5Phone;
+		STRING1 InputCheckAuthRep5DOBYear;
+		STRING1 InputCheckAuthRep5DOBMonth;
+		STRING1 InputCheckAuthRep5DOBDay;
+		STRING1 InputCheckAuthRep5Age;
+		STRING1 InputCheckAuthRep5Title;
+		STRING1 InputCheckAuthRep5DL;
+		STRING1 InputCheckAuthRep5DLState;
 	END;
 	
 	LayoutVerification := RECORD
+  STRING120 VerifiedCompanyName;
+  STRING120 VerifiedAltCompanyName;
+  STRING120 VerifiedCompanyAddress1;
+  STRING25 VerifiedCompanyCity;
+  STRING2 VerifiedCompanyState;
+  STRING9 VerifiedCompanyZip;
+  STRING9 VerifiedCompanyFEIN;
+  STRING10 VerifiedCompanyPhone;
+
+  STRING1 VerifiedCompanyNameInd;
+  STRING1 VerifiedCompanyAddressInd;
+  STRING1 VerifiedCompanyFEINInd;
+  STRING1 VerifiedCompanyPhoneInd;
+
+  STRING60 VerifiedConsumerName;
+  STRING60 VerifiedConsumerAltName;
+  STRING120 VerifiedConsumerAddress1;
+  // STRING120 VerifiedConsumerAddress2;
+  STRING25 VerifiedConsumerCity;
+  STRING2 VerifiedConsumerState;
+  STRING9 VerifiedConsumerZip;
+  STRING9 VerifiedConsumerFEIN;
+  STRING10 VerifiedConsumerPhone;
+    
 		STRING2 VerificationBusInputName;
 		STRING2 VerificationBusInputAddr;
 		STRING2 VerificationBusInputPhone;
 		STRING2 VerificationBusInputPhoneAddr;
 		STRING2 VerificationBusInputFEIN;
 		STRING2 VerificationBusInputIndustry;
+		
+		STRING2 SourceCountID;		
+		STRING195 SourceListID;
+		STRING455 SourceDateFirstSeenListID;
+		STRING455 SourceIDDateFirstSeenList;
+		STRING455 SourceDateLastSeenListID;
+		STRING455 SourceIDDateLastSeenList;
+		STRING6 SourceFirstSeenID;
+		STRING6 SourceLastSeenID;
+
 		STRING2 SourceCount; // Supports up to 99 sources, plenty more than the 65 sources we allow in the list fields
 		STRING195 SourceList; // Supports 65 sources including delimiter (2 char source + ,)
 		STRING455 SourceDateFirstSeenList; // Supports 65 sources including delmiter (YYYYMM + ,)
+		STRING455 SourceDateFirstSeenListV;
 		STRING455 SourceDateLastSeenList; // Supports 65 sources including delmiter (YYYYMM + ,)
+		STRING455 SourceDateLastSeenListV;
 		STRING6 DateFirstSeen;
 		STRING6 DateLastSeen;
 		STRING5 SourceMostRecentTimeonFile;
@@ -377,6 +543,13 @@
 		STRING2 SourceBankruptcy;
 		STRING2 SourceProperty;
 		STRING2 SourceUtility;
+		STRING5 SourceNonDerogCountID;
+		STRING5 SourceNonDerogCount03MonthID;
+		STRING5 SourceNonDerogCount06MonthID;
+		STRING5 SourceNonDerogCount12MonthID;
+		STRING5 SourceNonDerogCount24MonthID;
+		STRING5 SourceNonDerogCount36MonthID;
+		STRING5 SourceNonDerogCount60MonthID;
 		STRING5 SourceNonDerogCount;
 		STRING5 SourceNonDerogCount03;
 		STRING5 SourceNonDerogCount06;
@@ -388,10 +561,27 @@
 		STRING1 NameMiskey;
 		STRING5 NameMatchCount;
 		STRING2 NameMatchSourceCount;
+		STRING2	VerNameMiskey;
+		STRING2	VerWatchlistNameMatch;
+		STRING2	VerInputNameAlternative;
+		STRING2	VerInputNameDBA;
 		STRING195 NameMatchSourceList; // Supports 65 sources including delimiter (2 char source + ,)
 		STRING455 NameMatchDateFirstSeenList; // Supports 65 source dates including delimiter (YYYYMM + ,)
+		STRING455 NameMatchSourceFSList;
 		STRING455 NameMatchDateLastSeenList; // Supports 65 source dates including delimiter (YYYYMM + ,)
-		STRING1 AddrCityMatch;
+		STRING455 NameMatchSourceLSList;
+		STRING3 AltNameMatchSourceCount;
+		STRING195 AltNameMatchSourceList;
+		STRING455 AltNameMatchDateFirstSeenList;
+		STRING455 AltNameMatchDateLastSeenList;
+		STRING455 AltNameMatchSourceFSList;
+		STRING455 AltNameMatchSourceLSList;	
+		STRING2 AltNameMatchName;
+		STRING2 VerAltNameMiskey;
+		STRING2 VerInputAltNameAlternative;
+		STRING2 VerInputAltNameDBA;
+		STRING2 VerWatchlistAltNameMatch;
+		STRING1 AddrCityMatch; 
 		STRING195 AddrCityMatchSourceList; // Supports 65 sources including delimiter (2 char source + ,)
 		STRING1 AddrStateMatch;
 		STRING195 AddrStateMatchSourceList; // Supports 65 sources including delimiter (2 char source + ,)
@@ -400,36 +590,72 @@
 		STRING1 AddrCityZipMatch;
 		STRING2 AddrVerification;
 		STRING1 AddrIsBest;
+		STRING2	AddrPOBox;
+		STRING2	AddrZipVerification;
+		STRING2	AddrZipMismatch;
+		STRING2 AddrZipType;
 		STRING2 AddrSourceCount;
 		STRING195 AddrVerificationSourceList; // Supports 65 sources including delimiter (2 char source + ,)
+		STRING2 AddrVerificationSourceCount;
 		STRING455 AddrVerificationDateFirstSeenList; // Supports 65 source dates including delimiter (YYYYMM + ,)
+		STRING455 AddrMatchSourceFSList;
 		STRING455 AddrVerificationDateLastSeenList; // Supports 65 source dates including delimiter (YYYYMM + ,)
+		STRING455 AddrMatchSourceLSList;
 		STRING5 InputAddrLengthOfResidence;
 		STRING2 InputAddrValid;
+		STRING2 InputAddrValidNoID;
 		STRING3 AddrEverReported;
 		STRING2 InputAddrVacancy;
+		STRING2 InputAddrVacancyNoID;
 		STRING2 InputAddrOwnership;
 		STRING2 InputAddrNotMostRecent;
-		STRING1 AddrMiskey;
+		STRING2 AddrMiskey;
 		STRING3 AddrConsumerCount;
 		STRING1 PhoneMatch;
 		STRING5 PhoneMatchCount;
+		STRING2	PhoneMatchSourceCountID;
+		STRING195 PhoneMatchSourceListID;
+		STRING455 PhoneDateFirstSeenListID;
+		STRING455 PhoneMatchIDSourceDateFSList;
+		STRING455 PhoneDateLastSeenListID;
+		STRING455 PhoneMatchIDSourceDateLSList;
+		STRING8 PhoneMatchDateFirstSeenID;
+		STRING8 PhoneMatchDateLastSeenID;
 		STRING2 PhoneMatchSourceCount;
 		STRING195 PhoneMatchSourceList; // Supports 65 sources including delimiter (2 char source + ,)
 		STRING455 PhoneMatchDateFirstSeenList; // Supports 65 source dates including delimiter (YYYYMM + ,)
+		STRING455 PhoneMatchSourceDateFSList;
 		STRING455 PhoneMatchDateLastSeenList; // Supports 65 source dates including delimiter (YYYYMM + ,)
+		STRING455 PhoneMatchSourceDateLSList;
 		STRING8 PhoneMatchDateFirstSeen;
 		STRING8 PhoneMatchDateLastSeen;
 		STRING1 PhoneMisKey;
 		STRING2 InputPhoneValid;
+		STRING2 InputPhoneValidNoID;
 		STRING2 PhoneDisconnected;
+		STRING2	PhoneInputMiskey;
+		STRING2	PhoneNameMismatch;
+		STRING6 PhoneResidential;
+		STRING6 PhoneDistance;
 		STRING2 FEINMatchSourceCount;
 		STRING195 FEINMatchSourceList; // Supports 65 sources including delimiter (2 char source + ,)
 		STRING455 FEINMatchDateFirstSeenList; // Supports 65 source dates including delimiter (YYYYMM + ,)
+		STRING455 FEINMatchSourceDateFSList;
 		STRING455 FEINMatchDateLastSeenList; // Supports 65 source dates including delimiter (YYYYMM + ,)
+		STRING455 FEINMatchSourceDateLSList;
 		STRING2 FEINVerification;
 		STRING1 FEINMiskeyFlag;
 		STRING2 InputFEINValid;
+		STRING2 InputFEINValidNoID;
+		STRING2	FEINPersonNameMatch;
+		STRING2	FEINPersonAddrMatch;
+		STRING2	FEINAssociateSSNMatch;
+		STRING2	FEINRelativeSSNMatch;
+		STRING2	FEINHouseholdSSNMatch;
+		STRING2	FEINOnFile;
+		STRING2	FEINInputMiskey;
+		STRING2	FEINBusinessMismatch;
+		STRING2	FEINAddrNameMismatch;
 		STRING6 BusFEINOnFileCount;
 		STRING2 BusAddrConsumerFirstName;
 		STRING2 BusAddrConsumerLastName;
@@ -442,20 +668,38 @@
 		STRING2 BNAT2;
 		STRING2 BNAS2;
 		STRING2 BVIIndicator2;
+  STRING2 BVI;
+  STRING3 BVIDescriptionCode;
+  STRING150 BVIDescriptionText;
+		STRING3 InputIDMatchConfidence;
+		STRING20 InputIDMatchCategory;
+		STRING10 InputIDMatchStatus;
+		STRING2	VerInputIDTruebiz;
 		STRING15 InputIDMatchPowID;
 		STRING15 InputIDMatchProxID;
 		STRING15 InputIDMatchSeleID;
 		STRING15 InputIDMatchOrgID;
 		STRING15 InputIDMatchUltID;
+		
+		STRING2 SourceIndex;
 	END;
 	
 	LayoutBusinessActivity := RECORD
+		STRING5 SourceBusinessRecordTimeOldestID;
+		STRING5 SourceBusinessRecordTimeNewestID;
+		STRING2 SourceBusinessRecordUpdated12MonthID;
+		STRING2 BusinessActivity03MonthID;
+		STRING2 BusinessActivity06MonthID;
+		STRING2 BusinessActivity12MonthID;
+		
 		STRING5 BusinessRecordTimeOldest;
 		STRING5 BusinessRecordTimeNewest;
 		STRING2 BusinessRecordUpdated12Month;
 		STRING2 BusinessActivity03Month;
 		STRING2 BusinessActivity06Month;
 		STRING2 BusinessActivity12Month;
+		STRING2	BusinessActivity24Month;
+		STRING2	BusinessActivity36Month;
 	END;
 	
 	LayoutBusinessCharacteristics := RECORD
@@ -468,12 +712,15 @@
 		STRING4 FirmSICCode;
 		STRING6 FirmNAICSCode;
 		STRING6 FirmEmployeeCount;
-		STRING9 FirmReportedSales;
+		STRING6 FirmEmployeeRangeCount;
+		STRING11 FirmReportedSales;
+		STRING9 FirmReportedSalesRange;
 		STRING9 FirmReportedEarnings;
 		STRING2 FirmIRSRetirementPlan;
 		STRING2 FirmNonProfit;
+		STRING3 BusObservedAgeID;
 		STRING3 BusObservedAge;
-		STRING1 BusTypeAddress;
+		STRING2 BusTypeAddress;
 		STRING9 FinanceReportedAssets;
 		STRING9 FinanceWorthOfBus;
 		STRING6 IndustryNAICRecent;
@@ -491,27 +738,82 @@
 		STRING63 FirmEmployeeCountDateLastSeenList; // Allows for 7 sources (YYYYMMDD + ,)
 		STRING49 FirmEmployeeCountList; // Allows for 6 digits + delimiter for 7 sources (###### + ,)
 		STRING6 FirmEmployeeCountSmallest;
+		STRING FirmEmployeeRangeCountSmallest;
 		STRING6 FirmEmployeeCountLargest;
+		STRING FirmEmployeeRangeCountlargest;
 		STRING6 FirmEmployeeCountMostRecent;
+		STRING6 FirmEmployeeRangeCountMostRecent;
+		STRING2 OwnershipType;
 	END;
 	
+ LayoutB2B := RECORD
+    STRING5 UltimateIDCount;
+    STRING5 UltimateIDCountActive;
+    STRING5 UltimateIDCountInactive;
+    STRING5 HeaderTimeOldest;
+    STRING5 AttributesTimeOldest;
+		STRING3 VendorScoreFutureDelinquencyMax; // Shell only
+		STRING3 VendorScoreFutureDelinquencyMin; // Shell only
+		STRING3 VendorScorePaymentBehaviorMax; // Shell only
+		STRING3 VendorScorePaymentBehaviorMin; // Shell only
+		STRING12 AvgProviderCount12Mos;
+		STRING2 ProviderTrajectory12Mos;
+		STRING2 ProviderTrajectory24Mos;	
+		STRING2 NumSpendCategories12Mos;
+		STRING9 TotalSpend12Mos;
+		STRING2 SpendTrajectory12Mos;
+		STRING2 SpendTrajectory24Mos;	
+		STRING9 AveDaysBeyondTerms;
+		STRING3 AvgPctTradelinesGT30DPD12Mos;
+		STRING2 AvgPctTradelinesGT30DPDIndex12Mos;
+		STRING3 AvgPctTradelinesGT60DPD12Mos;
+		STRING2 AvgPctTradelinesGT60DPDIndex12Mos;
+		STRING3 AvgPctTradelinesGT90DPD12Mos;
+		STRING2 AvgPctTradelinesGT90DPDIndex12Mos;	
+		STRING2 DaysBeyondTerms30Trajectory12Mos;
+    STRING2 DaysBeyondTerms30Trajectory24Mos;
+		STRING2 DaysBeyondTerms60Trajectory12Mos;
+    STRING2 DaysBeyondTerms60Trajectory24Mos;
+		STRING2 PaidInFull12Mos;
+		STRING9 AvgPayments03Mos;
+		STRING8 BusinessClosedDate; // Shell only
+ END;
+
 	LayoutOrganizationalStructure := RECORD
 		STRING5 OrgLocationCount;
 		STRING5 OrgRelatedCount;
+		STRING2 OrgParentCompany;
 		STRING5 OrgLegalEntityCount;
 		STRING5 OrgAddrLegalEntityCount;
+  STRING5 OrgAddrLegalEntityCount01Mos;
+  STRING5 OrgAddrLegalEntityCount03Mos;
+  STRING5 OrgAddrLegalEntityCount06Mos;
+  STRING5 OrgAddrLegalEntityCount12Mos;
+  STRING5 OrgAddrLegalEntityCount24Mos;
+  STRING5 OrgAddrLegalEntityCountActive;
+  STRING5 OrgAddrLegalEntityCountInactive;
+  STRING5 OrgAddrLegalEntityCountDefunct;
+  STRING5 OrgAddrLegalEntityCountFirstSeen01Mos;
+  STRING5 OrgAddrLegalEntityCountFirstSeen03Mos;
+  STRING5 OrgAddrLegalEntityCountFirstSeen06Mos;
+  STRING5 OrgAddrLegalEntityCountFirstSeen12Mos;
+  STRING5 OrgAddrLegalEntityCountFirstSeen24Mos;
+  STRING5 OrgAddrLegalEntityCountFirstSeenEver;
 		STRING5 UltIDOrgIDTreeCount;
 		STRING5 UltIDProxIDTreeCount;
 		STRING5 UltIDPowIDTreeCount;
 		STRING5 OrgIDProxIDTreeCount;
 		STRING5 OrgIDPowIDTreeCount;
 		STRING5 SeleIDPowIDTreeCount;
-		STRING5 ProxIDPowIDTreeCount;		
+		STRING5 ProxIDPowIDTreeCount;		   
 	END;
 	
 	LayoutSOS := RECORD
 		STRING5 SOSTimeIncorporation;    
 		STRING5 SOSTimeAgentChange;
+		STRING2 SOSStanding;
+  STRING2 SOSStandingWorst;
+  STRING2 SOSStandingBest;
 		STRING2 SOSEverDefunct;
 		STRING2	SOSStateCount;
 		STRING2 SOSForeignStateFlag;
@@ -522,6 +824,14 @@
 		STRING2 SOSIncorporationStateFirst;
 		STRING2 SOSIncorporationStateLast;
 		STRING2 SOSIncorporationStateInput;
+  STRING5 SOSDomesticCount;
+  STRING8 SOSDomesticDateFirstSeen;
+  STRING8 SOSDomesticDateLastSeen;
+  STRING5 SOSDomesticMosSinceFirstSeen;
+  STRING5 SOSForeignCount;
+  STRING8 SOSForeignDateFirstSeen;
+  STRING8 SOSForeignDateLastSeen;
+  STRING5 SOSForeignMosSinceFirstSeen;
 		STRING200 SOSTypeOfFilingTermList;        // Allows for one hundred 1-character codes plus delimiter (C + ,)
 		STRING300 SOSStateOfIncorporationList;    // Allows for one hundred 2-character codes plus delimiter (CC + ,)
 		STRING5 SOSStateOfIncorporationCount;
@@ -722,12 +1032,22 @@
 	
 	LayoutAssets := RECORD
 		STRING4 AssetPropertyCount;
-		STRING4 AssetPropertyStateCount;
+  STRING4 AssetCurrentPropertyCount;
+		STRING2 AssetPropertyStateCount;
+  STRING4 AssetCurrentPropertyStateCount;
 		STRING9 AssetPropertyLotSizeTotal;
+  STRING9 AssetCurrentPropertyLotSizeTotal;
 		STRING9 AssetPropertyAssessedTotal;
+  STRING9 AssetCurrentPropertyAssessedTotal;
 		STRING9 AssetPropertySqFootageTotal;
+  STRING9 AssetCurrentPropertySqFootageTotal;
 		STRING6 AssetAircraftCount;
 		STRING6 AssetWatercraftCount;
+  STRING7 AssetVehicleCount;
+  STRING7 AssetPersonalVehicleCount;
+  STRING7 AssetCommercialVehicleCount;
+  STRING7 AssetOtherVehicleCount;
+  STRING9 AssetTotalVehicleValue;
 		STRING1000 PropertyAssessedValueList; // Allows for 100 nine digit property assessments + delimiters ($$$$$$$$$ + ,)
 	END;
 	
@@ -736,9 +1056,12 @@
 		STRING5 UCCTimeNewest;
 		STRING5 UCCTimeOldest;
 		STRING2 GovernmentDebarred;
+		// STRING2 GovernmentApproved;
 		STRING6 UCCActiveCount;
 		STRING6 UCCTerminatedCount;
 		STRING6 UCCOtherCount;
+  STRING2 UCCRole;
+  STRING2 UCCRoleActive;
 		STRING1800 UCCDateList;          // Allows for 200 UCC record dates + delimiters (YYYYMMDD + ,)
 		STRING8 UCCInitialFilingDateFirstSeen;
 		STRING8 UCCInitialFilingDateLastSeen;
@@ -746,6 +1069,22 @@
 		STRING8 UCCDateLastSeen;
 		STRING400 UCCTypesList;          // Allows for 200 UCC record types + delimiters (T + ,)
 		STRING400 UCCFilingStatusList;   // Allows for 200 UCC record status + delimiters (S + ,)
+	END;
+
+	LayoutTempUCCRec := RECORD
+  UNSIGNED4 Seq;
+  UNSIGNED3 HistoryDate;
+  STRING role_type;
+  UCCv2_Services.layout_ucc_rollup_src;
+	END;
+
+	LayoutTempUCCFiling := RECORD
+		STRING8 Date;
+		STRING TMSID;
+		INTEGER FilingDate;
+		INTEGER1 FilingType;
+		INTEGER1 FilingStatus;
+		STRING roleType;
 	END;
 	
 	LayoutTradeline := RECORD
@@ -812,9 +1151,44 @@
 		STRING5 Inquiry06Month;
 		STRING5 Inquiry12Month;
 		STRING5 Inquiry24Month;
+  STRING5 InquiryBusAddress;
+  STRING5 InquiryBusAddress01Mos;
+  STRING5 InquiryBusAddress03Mos;
+  STRING5 InquiryBusAddress06Mos;
+  STRING5 InquiryBusAddress12Mos;
+  STRING5 InquiryBusAddress24Mos;
+  STRING5 InquiryBusPhone;
+  STRING5 InquiryBusPhone01Mos;
+  STRING5 InquiryBusPhone03Mos;
+  STRING5 InquiryBusPhone06Mos;
+  STRING5 InquiryBusPhone12Mos;
+  STRING5 InquiryBusPhone24Mos;
+  STRING5 InquiryBusFEIN;
+  STRING5 InquiryBusFEIN01Mos;
+  STRING5 InquiryBusFEIN03Mos;
+  STRING5 InquiryBusFEIN06Mos;
+  STRING5 InquiryBusFEIN12Mos;
+  STRING5 InquiryBusFEIN24Mos;
 		STRING5 InquiryConsumerAddress;
+  STRING5 InquiryConsumerAddress01Mos;
+  STRING5 InquiryConsumerAddress03Mos;
+  STRING5 InquiryConsumerAddress06Mos;
+  STRING5 InquiryConsumerAddress12Mos;
 		STRING5 InquiryConsumerPhone;
+  STRING5 InquiryConsumerPhone01Mos;
+  STRING5 InquiryConsumerPhone03Mos;
+  STRING5 InquiryConsumerPhone06Mos;
+  STRING5 InquiryConsumerPhone12Mos;
+  STRING5 InquiryConsumerSSN;
+  STRING5 InquiryConsumerSSN01Mos;
+  STRING5 InquiryConsumerSSN03Mos;
+  STRING5 InquiryConsumerSSN06Mos;
+  STRING5 InquiryConsumerSSN12Mos;
 		STRING5 InquiryConsumerAddressSSN;
+  STRING5 InquiryConsumerAddressSSN01Mos;
+  STRING5 InquiryConsumerAddressSSN03Mos;
+  STRING5 InquiryConsumerAddressSSN06Mos;
+  STRING5 InquiryConsumerAddressSSN12Mos;
 		STRING5 InquiryOtherCount;
 		STRING5 InquiryOther24Month;
 		STRING5 InquiryOther12Month;
@@ -828,6 +1202,7 @@
 	
 	LayoutBusinessToExecutiveLink := RECORD
 		// Authorized Representative 1
+  STRING2 BusExecLinkAuthRepLexIDOnFile;
 		STRING2 BusExecLinkAuthRepNameOnFile;
 		STRING2 BusExecLinkAuthRepAddrOnFile;
 		STRING2 BusExecLinkAuthRepSSNOnFile;
@@ -842,7 +1217,22 @@
 		STRING5 BusExecLinkInquiryOverlapCount;
 		STRING2 BusExecLinkAuthRepAddrBusAddr;
 		STRING2 BusExecLinkAuthRepPhoneBusPhone;
+		
+		STRING2	AR2BRep1PhoneBusHeader;
+		STRING2	AR2BRep1SSNBusHeader;
+		STRING2	AR2BRep1NameBusHeaderLexID;
+		STRING2	AR2BRep1AddrBusHeaderLexID;
+		STRING2	AR2BRep1PhoneBusHeaderLexID;
+		STRING2	AR2BRep1SSNBusHeaderLexID;
+		STRING2	AR2BRep1AddrAssociateCHeader;
+		STRING2	AR2BRep1PhoneAssociateCHeader;
+		STRING2	AR2BRep1SSNAssociateCHeader;
+		STRING2	AR2BBusPAWRep1;
+		STRING6 AR2BBusRep1AddrDistance;
+		STRING6 AR2BBusRep1PhoneDistance;
+    
 		// Authorized Representative 2
+  STRING2 BusExecLinkAuthRep2LexIDOnFile;
 		STRING2 BusExecLinkAuthRep2NameOnFile;	  
 		STRING2 BusExecLinkAuthRep2AddrOnFile;
 		STRING2 BusExecLinkAuthRep2PhoneOnFile;
@@ -850,31 +1240,122 @@
 		STRING2 BusExecLinkBusNameAuthRep2First;
 		STRING2 BusExecLinkBusNameAuthRep2Last;
 		STRING2 BusExecLinkBusNameAuthRep2Full;
-    STRING2 BusExecLinkAuthRep2SSNBusFEIN;
+  STRING2 BusExecLinkAuthRep2SSNBusFEIN;
 		STRING5 BusExecLinkPropertyOverlapCount2;
 		STRING5 BusExecLinkBusAddrAuthRep2Owned;
 		STRING2 BusExecLinkUtilityOverlapCount2;
 		STRING5 BusExecLinkInquiryOverlapCount2;
 		STRING2 BusExecLinkAuthRep2AddrBusAddr;
 		STRING2 BusExecLinkAuthRep2PhoneBusPhone;
+    
+		STRING2	AR2BRep2PhoneBusHeader;
+		STRING2	AR2BRep2SSNBusHeader;
+		STRING2	AR2BRep2NameBusHeaderLexID;
+		STRING2	AR2BRep2AddrBusHeaderLexID;
+		STRING2	AR2BRep2PhoneBusHeaderLexID;
+		STRING2	AR2BRep2SSNBusHeaderLexID;
+		STRING2	AR2BRep2AddrAssociateCHeader;
+		STRING2 AR2BRep2PhoneAssociateCHeader;
+		STRING2	AR2BRep2SSNAssociateCHeader;
+		STRING2	AR2BBusPAWRep2;
+		STRING6 AR2BBusRep2AddrDistance;
+		STRING6 AR2BBusRep2PhoneDistance;
+    
 		// Authorized Representative 3
+  STRING2 BusExecLinkAuthRep3LexIDOnFile;
 		STRING2 BusExecLinkAuthRep3NameOnFile;
-    STRING2 BusExecLinkAuthRep3AddrOnFile;
+  STRING2 BusExecLinkAuthRep3AddrOnFile;
 		STRING2 BusExecLinkAuthRep3PhoneOnFile;
- 	  STRING2 BusExecLinkAuthRep3SSNOnFile;
+  STRING2 BusExecLinkAuthRep3SSNOnFile;
 		STRING2 BusExecLinkBusNameAuthRep3First;
 		STRING2 BusExecLinkBusNameAuthRep3Last;
 		STRING2 BusExecLinkBusNameAuthRep3Full;
-    STRING2 BusExecLinkAuthRep3SSNBusFein;
+  STRING2 BusExecLinkAuthRep3SSNBusFein;
 		STRING5 BusExecLinkPropertyOverlapCount3;
 		STRING5 BusExecLinkBusAddrAuthRep3Owned;
 		STRING2 BusExecLinkUtilityOverlapCount3;
 		STRING5 BusExecLinkInquiryOverlapCount3;
 		STRING2 BusExecLinkAuthRep3AddrBusAddr;
 		STRING2 BusExecLinkAuthRep3PhoneBusPhone;
+    
+		STRING2	AR2BRep3PhoneBusHeader;
+		STRING2	AR2BRep3SSNBusHeader;
+		STRING2	AR2BRep3NameBusHeaderLexID;
+		STRING2	AR2BRep3AddrBusHeaderLexID;
+		STRING2	AR2BRep3PhoneBusHeaderLexID;
+		STRING2	AR2BRep3SSNBusHeaderLexID;
+		STRING2	AR2BRep3AddrAssociateCHeader;
+		STRING2 AR2BRep3PhoneAssociateCHeader;
+		STRING2	AR2BRep3SSNAssociateCHeader;
+		STRING2 AR2BBusPAWRep3;
+		STRING6 AR2BBusRep3AddrDistance;
+		STRING6 AR2BBusRep3PhoneDistance;
+    
+		// Authorized Representative 4
+  STRING2 BusExecLinkAuthRep4LexIDOnFile;
+		STRING2 BusExecLinkAuthRep4NameOnFile;
+  STRING2 BusExecLinkAuthRep4AddrOnFile;
+		STRING2 BusExecLinkAuthRep4PhoneOnFile;
+ 	STRING2 BusExecLinkAuthRep4SSNOnFile;
+		STRING2 BusExecLinkBusNameAuthRep4First;
+		STRING2 BusExecLinkBusNameAuthRep4Last;
+		STRING2 BusExecLinkBusNameAuthRep4Full;
+  STRING2 BusExecLinkAuthRep4SSNBusFein;
+		STRING5 BusExecLinkPropertyOverlapCount4;
+		STRING5 BusExecLinkBusAddrAuthRep4Owned;
+		STRING2 BusExecLinkUtilityOverlapCount4;
+		STRING5 BusExecLinkInquiryOverlapCount4;
+		STRING2 BusExecLinkAuthRep4AddrBusAddr;
+		STRING2 BusExecLinkAuthRep4PhoneBusPhone;
+    
+		STRING2	AR2BRep4PhoneBusHeader;
+		STRING2	AR2BRep4SSNBusHeader;
+		STRING2	AR2BRep4NameBusHeaderLexID;
+		STRING2	AR2BRep4AddrBusHeaderLexID;
+		STRING2	AR2BRep4PhoneBusHeaderLexID;
+		STRING2	AR2BRep4SSNBusHeaderLexID;
+		STRING2	AR2BRep4AddrAssociateCHeader;
+		STRING2 AR2BRep4PhoneAssociateCHeader;
+		STRING2	AR2BRep4SSNAssociateCHeader;
+		STRING2 AR2BBusPAWRep4;
+		STRING6 AR2BBusRep4AddrDistance;
+		STRING6 AR2BBusRep4PhoneDistance;
+    
+		// Authorized Representative 5
+  STRING2 BusExecLinkAuthRep5LexIDOnFile;
+  STRING2 BusExecLinkAuthRep5NameOnFile;
+  STRING2 BusExecLinkAuthRep5AddrOnFile;
+		STRING2 BusExecLinkAuthRep5PhoneOnFile;
+ 	STRING2 BusExecLinkAuthRep5SSNOnFile;
+		STRING2 BusExecLinkBusNameAuthRep5First;
+		STRING2 BusExecLinkBusNameAuthRep5Last;
+		STRING2 BusExecLinkBusNameAuthRep5Full;
+  STRING2 BusExecLinkAuthRep5SSNBusFein;
+		STRING5 BusExecLinkPropertyOverlapCount5;
+		STRING5 BusExecLinkBusAddrAuthRep5Owned;
+		STRING2 BusExecLinkUtilityOverlapCount5;
+		STRING5 BusExecLinkInquiryOverlapCount5;
+		STRING2 BusExecLinkAuthRep5AddrBusAddr;
+		STRING2 BusExecLinkAuthRep5PhoneBusPhone;
+    
+		STRING2	AR2BRep5PhoneBusHeader;
+		STRING2	AR2BRep5SSNBusHeader;
+		STRING2	AR2BRep5NameBusHeaderLexID;
+		STRING2	AR2BRep5AddrBusHeaderLexID;
+		STRING2	AR2BRep5PhoneBusHeaderLexID;
+		STRING2	AR2BRep5SSNBusHeaderLexID;
+		STRING2	AR2BRep5AddrAssociateCHeader;
+		STRING2 AR2BRep5PhoneAssociateCHeader;
+		STRING2	AR2BRep5SSNAssociateCHeader;
+		STRING2 AR2BBusPAWRep5;
+		STRING6 AR2BBusRep5AddrDistance;
+		STRING6 AR2BBusRep5PhoneDistance;
+		
 		STRING2 BusExecLinkIndexRep1;
 		STRING2 BusExecLinkIndexRep2;
 		STRING2 BusExecLinkIndexRep3;
+		STRING2 BusExecLinkIndexRep4;
+		STRING2 BusExecLinkIndexRep5;
 		STRING2 BusExecLinkBusNameAuthRepFirstInput;
 		STRING2 BusExecLinkBusNameAuthRepPrefFirstInput;
 		STRING2 BusExecLinkBusNameAuthRepPrefFirstFile;
@@ -896,28 +1377,148 @@
 		STRING2 BusExecLinkBusNameAuthRep3FullInput;
 		STRING2 BusExecLinkPublishedAssociation3;
 		STRING2 BusExecLinkAuthRep3AddrBusAddrInput;
+		STRING2 BusExecLinkBusNameAuthRep4FirstInput;
+    STRING2 BusExecLinkBusNameAuthRep4PrefFirstInput;		
+		STRING2 BusExecLinkBusNameAuthRep4PrefFirstFile;
+		STRING2 BusExecLinkBusNameAuthRep4LastInput;
+		STRING2 BusExecLinkBusNameAuthRep4FullInput;
+		STRING2 BusExecLinkPublishedAssociation4;
+		STRING2 BusExecLinkAuthRep4AddrBusAddrInput;
+		STRING2 BusExecLinkBusNameAuthRep5FirstInput;
+    STRING2 BusExecLinkBusNameAuthRep5PrefFirstInput;		
+		STRING2 BusExecLinkBusNameAuthRep5PrefFirstFile;
+		STRING2 BusExecLinkBusNameAuthRep5LastInput;
+		STRING2 BusExecLinkBusNameAuthRep5FullInput;
+		STRING2 BusExecLinkPublishedAssociation5;
+		STRING2 BusExecLinkAuthRep5AddrBusAddrInput;
+
+  STRING15 BusExecLinkAuthRepLexID;
+		STRING2 BusExecLinkAuthRepIndex;
+		STRING150 BusExecLinkAuthRepIndexDesc;
+  STRING30 BusExecLinkAuthRepTitle;
+  STRING15 BusExecLinkAuthRep2LexID;
+  STRING2 BusExecLinkAuthRep2Index;
+		STRING150 BusExecLinkAuthRep2IndexDesc;
+  STRING30 BusExecLinkAuthRep2Title;
+  STRING15 BusExecLinkAuthRep3LexID;
+  STRING2 BusExecLinkAuthRep3Index;
+		STRING150 BusExecLinkAuthRep3IndexDesc;
+  STRING30 BusExecLinkAuthRep3Title;
+  STRING15 BusExecLinkAuthRep4LexID;
+  STRING2 BusExecLinkAuthRep4Index;
+		STRING150 BusExecLinkAuthRep4IndexDesc;
+  STRING30 BusExecLinkAuthRep4Title;
+  STRING15 BusExecLinkAuthRep5LexID;
+  STRING2 BusExecLinkAuthRep5Index;
+		STRING150 BusExecLinkAuthRep5IndexDesc;
+  STRING30 BusExecLinkAuthRep5Title;  
+    
 	END;
-	
+
+ LayoutResidentialBusiness := RECORD
+  STRING2 ResidentialBusIndicator;
+  STRING30 ResidentialBusDescription;
+ END;
+
+	LayoutRiskIndicator := RECORD
+		STRING4 BusRiskIndicator1;
+		STRING110 BusRiskIndicatorDesc1;
+		STRING4 BusRiskIndicator2;
+		STRING110 BusRiskIndicatorDesc2;
+  STRING4 BusRiskIndicator3;
+		STRING110 BusRiskIndicatorDesc3;
+  STRING4 BusRiskIndicator4;
+		STRING110 BusRiskIndicatorDesc4;
+  STRING4 BusRiskIndicator5;
+		STRING110 BusRiskIndicatorDesc5;
+  STRING4 BusRiskIndicator6;
+		STRING110 BusRiskIndicatorDesc6;
+  STRING4 BusRiskIndicator7;
+		STRING110 BusRiskIndicatorDesc7;
+  STRING4 BusRiskIndicator8;
+		STRING110 BusRiskIndicatorDesc8;
+	END;
+  
+	LayoutVerificationSummary := RECORD
+		STRING2 PhoneSourceVerifIndex;
+		STRING60 PhoneSourceVerifDescription; 
+		STRING2 BureauSourceVerifIndex;
+		STRING60 BureauSourceVerifDescription;
+		STRING2 GovtSourceVerifIndex;
+		STRING60 GovtSourceVerifDescription;
+		STRING2 PubRecSourceVerifIndex;
+		STRING60 PubRecSourceVerifDescription;
+		STRING2 BusDirectorySourceVerifIndex;
+		STRING60 BusDirectorySourceVerifDescription;
+	END; 
+  
 	LayoutBusinessToPersonLink := RECORD
+  STRING2 BusPersonOverlap;
+  STRING15 BusPersonLexIDOverlap;
 		STRING2 BusFEINPersonOverlap;
 		STRING2 BusFEINPersonAddrOverlap;
 		STRING2 BusFEINPersonPhoneOverlap;
 		STRING2 BusAddrPersonNameOverlap;
+		STRING2 BusAddrPersonAltNameOverlap;
 	END;
 	
 	LayoutInputCharacteristics := RECORD
 		STRING5 InputAddrConsumerCount;
 		STRING2 InputAddrSourceCount;
 		STRING2 InputAddrType;
+		STRING2 InputAddrTypeNoID;
 		STRING2 InputAddrBusinessOwned;
 		STRING9 InputAddrLotSize; 
 		STRING9 InputAddrAssessedTotal; 
 		STRING9 InputAddrSqFootage;
 		STRING2 InputPhoneProblems;
 		STRING3 InputPhoneEntityCount;
-		STRING2 InputPhoneMobile;
+  STRING3 InputPhoneEntityCount01Mos;
+  STRING3 InputPhoneEntityCount03Mos;
+  STRING3 InputPhoneEntityCount06Mos;
+  STRING3 InputPhoneEntityCount12Mos;
+  STRING3 InputPhoneEntityCount24Mos;
+  STRING3 InputTINEntityCount01Mos;
+  STRING3 InputTINEntityCount03Mos;
+  STRING3 InputTINEntityCount06Mos;
+  STRING3 InputTINEntityCount12Mos;
+  STRING3 InputTINEntityCount24Mos;
+  STRING3 InputTINEntityCount; 
+  STRING5 InputAddrTINCount;
+		STRING2 InputPhoneMobile;		
 	END;
 	
+ LayoutBestInfo := RECORD
+  STRING120 BestCompanyName;
+  STRING100 BestCompanyAddress1;
+		STRING10  	BestPrimRange;
+		STRING2   	BestPreDir;
+		STRING28  	BestPrimName;
+		STRING4   	BestAddrSuffix;
+		STRING2   	BestPostDir;
+		STRING10  	BestUnitDesig;
+		STRING8   	BestSecRange;
+  STRING25 BestCompanyCity;
+  STRING2 BestCompanyState;
+  STRING9 BestCompanyZip;
+  STRING9 BestCompanyFEIN;
+  STRING10 BestCompanyPhone;
+  STRING2 BestSourceCount;
+  STRING195 BestSourceList;
+  STRING455 BestSourceFirstSeenList;
+  STRING455 BestSourceLastSeenList;
+  STRING21 BestPhoneService;
+  STRING19 BestTypeAdvo;
+  STRING20 BestTypeOther;
+  STRING22 BestZipcodeType;
+  STRING17 BestVacancy;
+  STRING14 BestLengthResidency;
+  STRING19 BestOwnership;
+  STRING9 BestAssessedValue;
+  STRING18 BestLotSize;
+  STRING19 BestBldgSize;
+	END;
+  
 	LayoutAssociates := RECORD
 		STRING6 AssociateCount;
 		STRING6 AssociateHighCrimeAddrCount;
@@ -936,6 +1537,15 @@
 		STRING6 AssociateCityCount;
 		STRING6 AssociateCountyCount;
 		STRING6 AssociatePAWCount;
+  STRING6 AssociateCurrentCount;
+  STRING6 AssociateCurrentCountWithFelony;
+  STRING6 AssociateCurrentCountWithBankruptcy;
+  STRING6 AssociateCurrentCountWithLien;
+  STRING6 AssociateCurrentCountWithJudgment;
+  STRING6 AssociateCurrentCountWithProperty;
+  STRING6 AssociateCurrentBusinessCount;
+  STRING6 AssociateCurrentPAWCount;
+  STRING6 AssociateCurrentSOSCount;
 	END;
 		
 	LayoutDataBuildDates := RECORD
@@ -944,15 +1554,40 @@
 		STRING8	InquiriesBuildDate;
 		STRING8 AircraftBuildDate;
 		STRING8 WatercraftBuildDate;
+		STRING8 CorteraBuildDate;
 	END;
 	
+	LayoutBestAddrPhones := RECORD
+		STRING10 Phone10;
+	END;	
+
 	LayoutSBFE := RECORD
 		STRING1 SBFESourceIndex;
 		STRING3 SBFEVerBusInputName;
+		STRING8 SBFENameMatchDateFirstSeen;
+		STRING3 SBFENameMatchMonthsFirstSeen;
+		STRING8 SBFENameMatchDateLastSeen;
+		STRING3 SBFENameMatchMonthsLastSeen;
+		STRING8 SBFEAltNameMatchDateFirstSeen;
+		STRING3 SBFEAltNameMatchMonthsFirstSeen;
+		STRING8 SBFEAltNameMatchDateLastSeen;
+		STRING3 SBFEAltNameMatchMonthsLastSeen;		
 		STRING3 SBFEVerBusInputAddr;
+		STRING8 SBFEAddrMatchDateFirstSeen;
+		STRING3 SBFEAddrMatchMonthsFirstSeen;
+		STRING8 SBFEAddrMatchDateLastSeen;
+		STRING3 SBFEAddrMatchMonthsLastSeen;
 		STRING3 SBFEVerBusInputPhone;
+		STRING8 SBFEPhoneMatchDateFirstSeen;
+		STRING3 SBFEPhoneMatchMonthsFirstSeen;
+		STRING8 SBFEPhoneMatchDateLastSeen;
+		STRING3 SBFEPhoneMatchMonthsLastSeen;
 		STRING3 SBFEVerBusInputPhoneAddr;
 		STRING3 SBFEVerBusInputPhoneFEIN;
+		STRING8 SBFEFEINMatchDateFirstSeen;
+		STRING3 SBFEFEINMatchMonthsFirstSeen;
+		STRING8 SBFEFEINMatchDateLastSeen;
+		STRING3 SBFEFEINMatchMonthsLastSeen;
 		STRING3 SBFEVerBusInputIndustryCode;
 		STRING3 SBFEBusExecLinkRep1NameonFile;
 		STRING3 SBFEBusExecLinkRep1AddronFile;
@@ -965,7 +1600,15 @@
 		STRING3 SBFEBusExecLinkRep3NameonFile;
 		STRING3 SBFEBusExecLinkRep3AddronFile;
 		STRING3 SBFEBusExecLinkRep3PhoneonFile;
-		STRING3 SBFEBusExecLinkRep3SSNonFile;		
+		STRING3 SBFEBusExecLinkRep3SSNonFile;	
+		STRING3 SBFEBusExecLinkRep4NameonFile;
+		STRING3 SBFEBusExecLinkRep4AddronFile;
+		STRING3 SBFEBusExecLinkRep4PhoneonFile;
+		STRING3 SBFEBusExecLinkRep4SSNonFile;
+		STRING3 SBFEBusExecLinkRep5NameonFile;
+		STRING3 SBFEBusExecLinkRep5AddronFile;
+		STRING3 SBFEBusExecLinkRep5PhoneonFile;
+		STRING3 SBFEBusExecLinkRep5SSNonFile;
 		STRING8 SBFEDateFirstCycleAll;
 		STRING3 SBFETimeOldestCycle;
 		STRING8 SBFEDateLastCycleAll;
@@ -2828,6 +3471,83 @@
 		STRING3 SBFEINTERNALObservedPerf24;
 		STRING3 SBFEINTERNALObservedPerf36;
 	END;
+
+	LayoutFetchErrorCodes := RECORD
+		STRING1 LargeBusiness; // A 0/1 boolean indicator of a large business
+		STRING3 FetchCodeABIUS;
+		STRING3 FetchCodeAircraft;
+		STRING3 FetchCodeBankruptcy;
+		STRING3 FetchCodeBBBMember;
+		STRING3 FetchCodeBBBNonMember;
+		STRING3 FetchCodeBusinessHeader;
+		STRING3 FetchCodeBusinessRegistration;
+		STRING3 FetchCodeCalBus;
+		STRING3 FetchCodeEBR5600;
+		STRING3 FetchCodeCorporateFilings;
+		STRING3 FetchCodeDCA;
+		STRING3 FetchCodeDeadCo;
+		STRING3 FetchCodeDNBDMI;
+		STRING3 FetchCodeEDA;
+		STRING3 FetchCodeFBN;
+		STRING3 FetchCodeGovernmentDebarred;
+		STRING3 FetchCodeInquiries;
+		STRING3 FetchCodeInquiriesUpdate;
+		STRING3 FetchCodeIRSNonProfit;
+		STRING3 FetchCodeIRSRetirement;
+		STRING3 FetchCodeLien;
+		STRING3 FetchCodeOSHA;
+		STRING3 FetchCodeProperty;
+		STRING3 FetchCodeSBFE;
+		STRING3 FetchCodeTradelines;
+		STRING3 FetchCodeUCC;
+		STRING3 FetchCodeUtility;
+		STRING3 FetchCodeWatercraft;
+		STRING3 FetchCodeYellowPages;
+	END;
+
+	LayoutBusinessHeaderSlim := RECORD
+		UNSIGNED4 seq;
+		UNSIGNED2 fetch_error_code;
+		UNSIGNED6 HistoryDate;
+		BIPV2.IDlayouts.l_xlink_ids2;
+		UNSIGNED6 rcid;
+		STRING2   source;
+		// Hierarchy
+		BOOLEAN   has_lgid;
+		BOOLEAN   is_sele_level;
+		BOOLEAN   is_org_level;
+		BOOLEAN   is_ult_level;
+		UNSIGNED6 parent_proxid;
+		UNSIGNED6 sele_proxid;
+		UNSIGNED6 org_proxid;
+		UNSIGNED6 ultimate_proxid;
+		UNSIGNED2 levels_from_top;
+		UNSIGNED3 nodes_below;
+		UNSIGNED3 nodes_total;
+		BOOLEAN   ParentAboveSELE;
+		// Company info
+		STRING120 company_name;
+		STRING10  prim_range;
+		STRING2   predir;
+		STRING28  prim_name;
+		STRING4   addr_suffix;
+		STRING2   postdir;
+		STRING10  unit_desig;
+		STRING8   sec_range;
+		STRING25  p_city_name;
+		STRING25  v_city_name;
+		STRING2   st;
+		STRING5   zip;
+		STRING4   zip4;
+		STRING3   fips_county;
+		STRING9   company_fein;
+		STRING10  company_phone;
+		// Record metadata
+		UNSIGNED4 dt_first_seen;
+		UNSIGNED4 dt_last_seen;
+		UNSIGNED4 dt_vendor_first_reported;
+		UNSIGNED4 dt_vendor_last_reported;	
+	END;
 	
 	// Internal Business Shell layout - this is what will get passed around to append data
 	Shell := RECORD
@@ -2839,15 +3559,19 @@
 		DATASET(LayoutSources) NameSources; // Note, internal use
 		DATASET(LayoutSources) AddressVerSources; // Note, internal use
 		DATASET(LayoutSources) AddressSources; // Note, internal use
+		DATASET(LayoutSources) BestAddressSources; // Note, internal use
 		DATASET(LayoutSources) PhoneSources; // Note, internal use
 		DATASET(LayoutSources) FEINSources; // Note, internal use
 		DATASET(LayoutSources) EmployeeSources; // Note, internal use
 		DATASET(LayoutSICNAIC) SICNAICSources; // Note, internal use
+		DATASET(LayoutSources) LinkIdSources;
+		DATASET(LayoutSources) PhoneIDSources;
 		LayoutInputCheck    Input;
 		LayoutVerification	Verification;
 		LayoutBusinessActivity Business_Activity;
 		LayoutBusinessCharacteristics Business_Characteristics;
 		LayoutFirmographic	Firmographic;
+  LayoutB2B B2B;
 		LayoutOrganizationalStructure Organizational_Structure;
 		LayoutSOS						SOS;
 		LayoutBankruptcy		Bankruptcy;
@@ -2857,14 +3581,22 @@
 		LayoutTradeline			Tradeline;
 		LayoutInquiryInfo		Inquiry;
 		LayoutBusinessToExecutiveLink	Business_To_Executive_Link;
+  LayoutResidentialBusiness Residential_Business;
+  LayoutRiskIndicator Risk_Indicator;
+  LayoutVerificationSummary Verification_Summary;
 		LayoutBusinessToPersonLink Business_To_Person_Link;
 		LayoutInputCharacteristics Input_Characteristics;
+  LayoutBestInfo Best_Info;
 		LayoutAssociates		Associates;
-		LayoutSBFE					SBFE; 
+		LayoutSBFE					SBFE;
 		LayoutDataBuildDates Data_Build_Dates;
+		LayoutFetchErrorCodes Data_Fetch_Indicators;
 		DATASET(LayoutWatchlist) WatchlistHits; // Note, internal use
 		DATASET(LayoutContacts) ContactDIDs; // Note, internal use
+		LayoutPhoneAddrDistances PhoneAddressDistances; // Note, internal use
+		DATASET(LayoutBestAddrPhones) BestAddrPhones;
 		STRING1							DeceasedFEIN_As_SSN; // Note, internal use
+		STRING1             BillingHit;  // Note, internal use
 	END;
 
 	BatchScoreData := RECORD
@@ -2881,9 +3613,9 @@
 		STRING5 Model_2_RC3;
 		STRING5 Model_2_RC4;
 	END;
-	
+  
 	// Final layout that looks pretty enough for display to other groups
 	EXPORT Layout_Business_Shell := RECORD
-		Shell - Seq - BIP_IDs - Sources - NameSources - AddressVerSources - AddressSources - PhoneSources - FEINSources - EmployeeSources - SICNAICSources - WatchlistHits - ContactDIDs - DeceasedFEIN_As_SSN;
+		Shell - Seq - BIP_IDs - Sources - NameSources - AddressVerSources - AddressSources - BestAddressSources - PhoneSources - FEINSources - EmployeeSources - SICNAICSources - LinkIdSources - PhoneIDSources - WatchlistHits - ContactDIDs - DeceasedFEIN_As_SSN - PhoneAddressDistances - BestAddrPhones;
 		BatchScoreData;
 	END;

@@ -360,6 +360,6 @@
 	ret_test_seed := Seed_Files.GetIdentifier2(iidRecs,Test_Data_Table_Name);
 	
   //transform output for ESDL compliance (iesp.instantid.t_Identifier2Result)
-  iesp_out := iesp.transform_identifier2( if(test_data_Enabled, ret_test_seed, final_recs_plus_knownbad) );
+  iesp_out :=  if(test_data_Enabled, ret_test_seed, final_recs_plus_knownbad);
 	
 export Identifier2Records := iesp_out;

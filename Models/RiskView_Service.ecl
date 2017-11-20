@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="RiskView_Service">
 	<part name="DID" type="xsd:unsigned"/>
 	<part name="AccountNumber" type="xsd:string"/>
@@ -88,8 +88,6 @@ export RiskView_Service := MACRO
 	'FFDOptionsMask'
 	));
 	
-	// BOOLEAN DisableOutcomeTracking := FALSE : STORED('OutcomeTrackingOptOut');
-
 	/* **********************************************
 		 *  Fields needed for improved Scout Logging  *
 		 **********************************************/
@@ -108,7 +106,7 @@ export RiskView_Service := MACRO
 		string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
 
 	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(TRUE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__RiskView_Service);
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(TRUE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__RiskView_Service);
 	/* ************* End Scout Fields **************/
 
 	Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suffix_val,'FirstName','MiddleName','LastName','NameSuffix')

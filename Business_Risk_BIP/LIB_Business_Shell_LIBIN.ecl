@@ -23,5 +23,6 @@ EXPORT LIB_Business_Shell_LIBIN := INTERFACE
 	EXPORT BOOLEAN 		include_ofac 																		:= TRUE;
 	EXPORT BOOLEAN 		include_additional_watchlists 									:= FALSE;
 	EXPORT BOOLEAN    DoNotUseAuthRepInBIPAppend 											:= FALSE;
+  EXPORT BOOLEAN    CorteraRetrotest                                := FALSE;
 	EXPORT BOOLEAN		IsBIID20																				:= FALSE;	
 END;

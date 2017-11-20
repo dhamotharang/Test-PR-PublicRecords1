@@ -331,11 +331,6 @@ targus := Royalty.RoyaltyTargus.GetOnlineRoyalties(UNGROUP(ret), src, TargusType
 //Only get royalties for hitting the Insurance DL information if they are allowed to access the information
 Boolean TrackInsuranceRoyalties := Risk_Indicators.iid_constants.InsuranceDL_ok(DataPermission);
 insurance := If(TrackInsuranceRoyalties, Royalty.RoyaltyFDNDLDATA.GetWebRoyalties(UNGROUP(ret), did, insurance_dl_used, true));
-
-royalties4us := if(test_data_enabled, DATASET([], Royalty.Layouts.Royalty), 
-	targus + insurance);	
-	
-#stored('Royalties', royalties4us);	
 																	
 ret_test_seed_un := risk_indicators.InstantID_Test_Function(Test_Data_Table_Name,fname_val,lname_val,ssn_value,zip_value,
                        					 phone_value,Account_value, NumReturnCodes);
@@ -355,7 +350,8 @@ ret_test_seed := project(ret_test_seed_un,transform(risk_indicators.Layout_Insta
 																										self.PassportLowerLine := passportlowerline ;
 																										self.Gender := gender ; 
 																										self.InstantIDVersion := (string)actualIIDVersion;
-																										self := left));
+																										self := left;
+																										self := []));
 
 risk_indicators.layout_input into_test_prep(risk_indicators.Layout_InstantID_NuGenPlus l) := transform
 	self.seq := l.seq;	// take seq from the ret_test_seed data as we will need it for joining to scores later.
@@ -655,8 +651,21 @@ END;
 
 ret_temp2 := UNGROUP(PROJECT(ret, format_out(LEFT)));
 
+ret_royalty := project(ret_temp2, transform(Risk_Indicators.Layout_InstantID_NuGenPlus,
+																										self.royalty_type_code_targus := targus[1].royalty_type_code,
+                                                    self.royalty_type_code_insurance := insurance[1].royalty_type_code,
+                                                    self.royalty_type_targus := targus[1].royalty_type,
+                                                    self.royalty_type_insurance := insurance[1].royalty_type,
+																										self.royalty_count_targus := targus[1].royalty_count,
+                                                    self.royalty_count_insurance := insurance[1].royalty_count,
+																										self.non_royalty_count_targus := targus[1].non_royalty_count,
+                                                    self.non_royalty_count_insurance := insurance[1].non_royalty_count,
+																										self.count_entity_targus := targus[1].count_entity,
+                                                    self.count_entity_insurance := insurance[1].count_entity,
+																										self := left));
+
 //for Emerging Identities, return standardized county name
-ret_temp := join(ret_temp2, census_data.Key_Fips2County, 
+ret_temp := join(ret_royalty, census_data.Key_Fips2County, 
 	keyed(left.st=right.state_code) and
 	keyed(left.county=right.county_fips),
 	transform(risk_indicators.Layout_InstantID_NuGenPlus, 

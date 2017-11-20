@@ -82,10 +82,10 @@ FUNCTION
 		SELF.Pilot := PROJECT(pilot_recs, ConsumerDisclosure.Transforms.xformPilotData(LEFT));
 		SELF.ProfessionalLicense := PROJECT(proflic_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceProfLicenseData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
 		SELF.ProfLicenseMari := PROJECT(proflic_mari_recs, TRANSFORM(iesp.fcradataservice.t_FcraDataServiceProfLicenseMariData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData));
-		SELF.PropertyAssessment := PROJECT(property_by_owner_recs(EXISTS(Assessment)), ConsumerDisclosure.Transforms.xformPropertyAssessmentData(LEFT));
-		SELF.PropertyDeed := PROJECT(property_by_owner_recs(EXISTS(Deed)), ConsumerDisclosure.Transforms.xformPropertyDeedData(LEFT));
-		SELF.AssessmentByResidence := PROJECT(property_by_residence_recs(EXISTS(Assessment)), ConsumerDisclosure.Transforms.xformPropertyAssessmentData(LEFT));
-		SELF.DeedByResidence := PROJECT(property_by_residence_recs(EXISTS(Deed)), ConsumerDisclosure.Transforms.xformPropertyDeedData(LEFT));
+		SELF.PropertyAssessment := PROJECT(SORT(property_by_owner_recs(EXISTS(Assessment)),-assessed_value_year), ConsumerDisclosure.Transforms.xformPropertyAssessmentData(LEFT));
+		SELF.PropertyDeed := PROJECT(SORT(property_by_owner_recs(EXISTS(Deed)),-contract_date), ConsumerDisclosure.Transforms.xformPropertyDeedData(LEFT));
+		SELF.AssessmentByResidence := PROJECT(SORT(property_by_residence_recs(EXISTS(Assessment)),-assessed_value_year), ConsumerDisclosure.Transforms.xformPropertyAssessmentData(LEFT));
+		SELF.DeedByResidence := PROJECT(SORT(property_by_residence_recs(EXISTS(Deed)),-contract_date), ConsumerDisclosure.Transforms.xformPropertyDeedData(LEFT));
 		SELF.SexOffenders := PROJECT(so_recs, ConsumerDisclosure.Transforms.xformSexOffenderData(LEFT));
 		SELF.SSN := PROJECT(ssn_recs(isHeaderSource), TRANSFORM(iesp.fcradataservice.t_FcraDataServiceSSNData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData, SELF.SourceData.death_sources := LEFT.death_sources));
 		SELF.SSNFromInquiries := PROJECT(ssn_recs(isInquirySource), TRANSFORM(iesp.fcradataservice.t_FcraDataServiceSSNData, SELF.RawData:= LEFT, SELF.MetaData:= LEFT.MetaData, SELF.SourceData.death_sources := LEFT.death_sources));
