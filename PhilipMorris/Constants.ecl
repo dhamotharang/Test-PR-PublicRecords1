@@ -1,4 +1,4 @@
-import ut, doxie, header, AddrBest;
+import ut;
 
 EXPORT Constants := MODULE
 	EXPORT ValidPhoneMatches := ['2','4','6','8'];
@@ -133,7 +133,7 @@ EXPORT Constants := MODULE
 	EXPORT MAX_NUM_RECORDS_PER_INPUT_TO_MOVE_TO_NEXT_STEP := 20;
 	EXPORT MAX_NUM_OF_DERIVED_SSNS_PER_INPUT := 100;
 	
-	EXPORT ALPHABET := ut.alphabet + ' ';
+	EXPORT ALPHABET := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ';
 	
 	EXPORT NOMATCHFAILURECODE := ENUM(UNSIGNED2,
 																		FAILURECODE_UNK = 0,

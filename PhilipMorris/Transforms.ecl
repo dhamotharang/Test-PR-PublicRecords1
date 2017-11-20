@@ -1,4 +1,4 @@
-import doxie, header, ut, mdr, iesp, didville, AddrBest, DayBatchEDA, NID;
+import ut, mdr, iesp, didville, AddrBest, DayBatchEDA, NID;
 
 CN := PhilipMorris.Constants;
 LT := PhilipMorris.Layouts;
@@ -69,44 +69,53 @@ export Transforms := MODULE
 																					 boolean acceptFirstInitialForFirstName,
 																					 boolean AllowProbationSources) := TRANSFORM , SKIP (~AllowProbationSources and mdr.SourceTools.SourceIsOnProbation(l.src))
 			
-			selfCompareName := FN.fn_getCleanName(L.lname, L.fname, L.mname, '', '', false);
-			//selfCompareName := FN.fn_getCleanName(L.lname, L.fname, L.mname, '', '');
-			//selfCompareNameNoMiddle := if (L.mname <> '', FN.fn_getCleanName(L.lname, L.fname, '', '', ''));
-			//selfCompareNoCleaner := FN.fn_getCleanName(L.lname, L.fname, L.mname, '', '', false);
-			//selfCompareNoCleanerNoMiddle := if (L.mname <> '', FN.fn_getCleanName(L.lname, L.fname, '', '', '', false));
+			_name := FN.fn_getCleanName(L.lname, L.fname, L.mname, '', '', false);
+
+			_prim_name := L.prim_name;
+
+			is_PO := FN.fn_IsPoBox (_prim_name);
+			is_RR := FN.fn_RRType (_prim_name);
 
 			self.InternalSeqNo := l.InternalSeqNo;
-			self.CandidateName := selfCompareName;
-								
+			self.CandidateName := _name;
+
 			//the address is already cleaned and parsed 			
-			self.CandidateAddress.AddressID						:= L.SearchAddress.AddressID;
-			self.CandidateAddress.Prim_Range						:= L.prim_range;
-			self.CandidateAddress.PreDir							:= L.predir;
-			self.CandidateAddress.Prim_Name						:= L.prim_name;
-			self.CandidateAddress.Addr_Suffix					:= L.suffix;
-			self.CandidateAddress.PostDir							:= L.postdir;
-			self.CandidateAddress.Unit_Desig						:= L.unit_desig;
-			self.CandidateAddress.Sec_Range						:= L.sec_range;
-			self.CandidateAddress.V_City_Name						:= L.city_name;
-			self.CandidateAddress.St									:= L.ST;
-			self.CandidateAddress.Zip5									:= L.ZIP;
-			self.CandidateAddress.Z5Numeric						:= (Integer4)TRIM(L.ZIP);
-			self.CandidateAddress.Zip4								:= L.Zip4;
-			self.CandidateAddress.fips_county							:= L.county;
-			self.CandidateAddress.addr_rec_type						:= '';
-			self.CandidateAddress.err_stat					:= '';
-			self.CandidateAddress.ISPoBOXType					:= FN.fn_IsPoBox(self.CandidateAddress.Prim_Name);
-			self.CandidateAddress.ISRRType						:= FN.fn_RRType(self.CandidateAddress.Prim_Name);
+			PhilipMorris.Layouts.Clean.Address SetCandidateAddress () := TRANSFORM
+				SELF.AddressID     := L.SearchAddress.AddressID;
+				SELF.Prim_Range    := L.prim_range;
+				SELF.PreDir        := L.predir;
+				SELF.Prim_Name     := _prim_name;
+				SELF.Addr_Suffix   := L.suffix;
+				SELF.PostDir       := L.postdir;
+				SELF.Unit_Desig    := L.unit_desig;
+				SELF.Sec_Range     := L.sec_range;
+				SELF.V_City_Name   := L.city_name;
+				SELF.St            := L.ST;
+				SELF.Zip5          := L.ZIP;
+				SELF.Z5Numeric     := (integer4) TRIM (L.ZIP);
+				SELF.Zip4          := L.Zip4;
+				SELF.fips_county   := L.county;
+				SELF.addr_rec_type := '';
+				SELF.err_stat      := '';
+				SELF.ISPoBOXType   := is_PO;
+				SELF.ISRRType      := is_RR;
+				SELF.PrimNameLen   := FN.fn_getLen (L.prim_name);
+				SELF.PrimRangeLen  := FN.fn_getLen (L.prim_range);
+			END;
+			_address := ROW (SetCandidateAddress ());
+								
+			self.CandidateAddress	:= _address;
 			SELF.DID := L.DID;
-			SELF.SSN := FN.fn_CleanSSN(L.SSN);
-			Self.IsSearchableSSN  := FN.fn_IsSearchableSSN(Self.SSN);		
-			Self.SSN4							:= IF(FN.fn_getLen(Self.SSN) >=4, 
-																	FN.fn_CleanSSN4(SELF.SSN[FN.fn_getLen(SELF.SSN)-3..]), '');
-			
-			SELF.DOB_YYYYMMDD := FN.fn_CleanDOBFromInt(L.DOB);
+
+			_ssn := FN.fn_CleanSSN(L.SSN);
+			SELF.SSN := _ssn;
+			Self.IsSearchableSSN  := FN.fn_IsSearchableSSN(_ssn);		
+			Self.SSN4							:= IF(FN.fn_getLen(_ssn) >=4, 
+																	FN.fn_CleanSSN4(_ssn[FN.fn_getLen(_ssn)-3..]), '');
+
+			_dob := FN.fn_CleanDOBFromInt(L.DOB);
+			SELF.DOB_YYYYMMDD := _dob;
 			SELF.DOB_Numeric := L.DOB;
-			SELF.CandidateAddress.PrimNameLen 			:= FN.fn_getLen(L.prim_name);
-			SELF.CandidateAddress.PrimRangeLen 			:= FN.fn_getLen(L.prim_range);
 			
 			/* bugzilla 56745 */
 			compareOutputSSN := FN.fn_CleanSSN(L.InternalOnlyOutputSSN);
@@ -120,7 +129,7 @@ export Transforms := MODULE
 																						 CN.SortSearchPassEnum.INPUT_SSN_IGNORE_LAST,
 																						 CN.SortSearchPassEnum.DERIVED_IGNORE_LAST], 
 															FN.fn_MatchesSSN(L.SearchSSN, compareOutputSSN), 
-															FN.fn_MatchesSSN(L.SearchSSN, SELF.SSN));
+															FN.fn_MatchesSSN(L.SearchSSN, _ssn));
 			self.MatchesSSN4 := if ( searchpass in [CN.SortSearchPassEnum.INPUT_SSN, 
 															 							 CN.SortSearchPassEnum.DERIVED,
 																						 CN.SortSearchPassEnum.NAMEFLIP_DERIVED,
@@ -129,119 +138,39 @@ export Transforms := MODULE
 															FN.fn_MatchesSSN(L.SSN4, compareSSN4), 
 															FN.fn_MatchesSSN(L.SSN4, SELF.SSN4));												
 			
-			self.MatchesYOB := FN.fn_MatchesYOB(L.DOB_YYYYMMDD, SELF.DOB_YYYYMMDD);
-			self.MatchesYOBMOB := FN.fn_MatchesYOBMOB(L.DOB_YYYYMMDD, SELF.DOB_YYYYMMDD);
-			self.MatchesYOBMOBDOB := FN.fn_MatchesYOBMOBDOB(L.DOB_YYYYMMDD, SELF.DOB_YYYYMMDD);
+			self.MatchesYOB := FN.fn_MatchesYOB(L.DOB_YYYYMMDD, _dob);
+			self.MatchesYOBMOB := FN.fn_MatchesYOBMOB(L.DOB_YYYYMMDD, _dob);
+			self.MatchesYOBMOBDOB := FN.fn_MatchesYOBMOBDOB(L.DOB_YYYYMMDD, _dob);
 			
-			self.MatchesFirstName := FN.fn_MatchesFirstName_Exact(L.SearchName, self.CandidateName, acceptFirstInitialForFirstName);
-			self.MatchesLastName := FN.fn_MatchesLastName_Exact(L.SearchName, self.CandidateName);
-			self.MatchesFirstNameFuzzy := FN.fn_MatchesFirstName_Fuzzy(L.SearchName, self.CandidateName, CN.FUZZY_MATCHING_LAST_MATCHING_PCTG);
-			self.MatchesLastNameFuzzy := FN.fn_MatchesLastName_Fuzzy(L.SearchName, self.CandidateName, CN.FUZZY_MATCHING_LAST_MATCHING_PCTG);
-			self.MatchesFirstLastNameFuzzy_Age4 := FN.fn_MatchesFirstLastName_Fuzzy(L.SearchName, self.CandidateName, CN.FUZZY_MATCHING_LASTFIRST_DOB4_MATCHING_PCTG);
-			self.MatchesFirstLastNameFuzzy_Age6 := FN.fn_MatchesFirstLastName_Fuzzy(L.SearchName, self.CandidateName, CN.FUZZY_MATCHING_LASTFIRST_DOB68_MATCHING_PCTG);
-			self.MatchesFirstLastInstring := FN.fn_MatchesFirstLastInstring(L.SearchName, self.CandidateName);
+			self.MatchesFirstName := FN.fn_MatchesFirstName_Exact(L.SearchName, _name, acceptFirstInitialForFirstName);
+			self.MatchesLastName := FN.fn_MatchesLastName_Exact(L.SearchName, _name);
+			self.MatchesFirstNameFuzzy := FN.fn_MatchesFirstName_Fuzzy(L.SearchName, _name, CN.FUZZY_MATCHING_LAST_MATCHING_PCTG);
+			self.MatchesLastNameFuzzy := FN.fn_MatchesLastName_Fuzzy(L.SearchName, _name, CN.FUZZY_MATCHING_LAST_MATCHING_PCTG);
+			self.MatchesFirstLastNameFuzzy_Age4 := FN.fn_MatchesFirstLastName_Fuzzy(L.SearchName, _name, CN.FUZZY_MATCHING_LASTFIRST_DOB4_MATCHING_PCTG);
+			self.MatchesFirstLastNameFuzzy_Age6 := FN.fn_MatchesFirstLastName_Fuzzy(L.SearchName, _name, CN.FUZZY_MATCHING_LASTFIRST_DOB68_MATCHING_PCTG);
+			self.MatchesFirstLastInstring := FN.fn_MatchesFirstLastInstring(L.SearchName, _name);
 			
 			//name matching enhanced is currently removed because we do not want to 
 			//invoke the cleaner at run time for all header records
-			/* 
-				to improve name matching, we are doing the following comparisons:
-				a) cleaner input to cleaner output (w/ middle name)
-				b) cleaner input to cleaner output (w/o middle name)
-				c) cleaner input to non_cleaner output (w/ middle name)
-				d) cleaner input to non_cleaner output (w/o middle name)
-				e) non_cleaner input to cleaner output (w/ middle name)
-				f) non_cleaner input to cleaner output (w/o middle name)
-				g) non_cleaner input to non_cleaner output (w/ middle name)
-				h) non_cleaner input to non_cleaner output (w/o middle name)				
 			
-			self.MatchesFirstName := FN.fn_MatchesFirstName_Exact(L.SearchName, selfCompareName, acceptFirstInitialForFirstName) or
-															 FN.fn_MatchesFirstName_Exact(L.SearchName, selfCompareNameNoMiddle, acceptFirstInitialForFirstName) or
-															 FN.fn_MatchesFirstName_Exact(L.SearchName, selfCompareNoCleaner, acceptFirstInitialForFirstName) or
-															 FN.fn_MatchesFirstName_Exact(L.SearchName, selfCompareNoCleanerNoMiddle, acceptFirstInitialForFirstName) or
-															 FN.fn_MatchesFirstName_Exact(L.SearchNameNonCleaner, selfCompareName, acceptFirstInitialForFirstName) or
-															 FN.fn_MatchesFirstName_Exact(L.SearchNameNonCleaner, selfCompareNameNoMiddle, acceptFirstInitialForFirstName) or
-															 FN.fn_MatchesFirstName_Exact(L.SearchNameNonCleaner, selfCompareNoCleaner, acceptFirstInitialForFirstName) or
-															 FN.fn_MatchesFirstName_Exact(L.SearchNameNonCleaner, selfCompareNoCleanerNoMiddle, acceptFirstInitialForFirstName);
-															 
-			self.MatchesLastName := FN.fn_MatchesLastName_Exact(L.SearchName, selfCompareName) or
-															FN.fn_MatchesLastName_Exact(L.SearchName, selfCompareNameNoMiddle) or
-															FN.fn_MatchesLastName_Exact(L.SearchName, selfCompareNoCleaner) or
-															FN.fn_MatchesLastName_Exact(L.SearchName, selfCompareNoCleanerNoMiddle) or
-															FN.fn_MatchesLastName_Exact(L.SearchNameNonCleaner, selfCompareName) or
-															FN.fn_MatchesLastName_Exact(L.SearchNameNonCleaner, selfCompareNameNoMiddle) or
-															FN.fn_MatchesLastName_Exact(L.SearchNameNonCleaner, selfCompareNoCleaner) or
-															FN.fn_MatchesLastName_Exact(L.SearchNameNonCleaner, selfCompareNoCleanerNoMiddle);
-															
-			self.MatchesFirstNameFuzzy := (self.MatchesFirstName and ~acceptFirstInitialForFirstName) or
-																		FN.fn_MatchesFirstName_Fuzzy(L.SearchName, selfCompareName, CN.FUZZY_MATCHING_FIRST_MATCHING_PCTG) or
-																		FN.fn_MatchesFirstName_Fuzzy(L.SearchName, selfCompareNameNoMiddle, CN.FUZZY_MATCHING_FIRST_MATCHING_PCTG) or
-																		FN.fn_MatchesFirstName_Fuzzy(L.SearchName, selfCompareNoCleaner, CN.FUZZY_MATCHING_FIRST_MATCHING_PCTG) or
-																		FN.fn_MatchesFirstName_Fuzzy(L.SearchName, selfCompareNoCleanerNoMiddle, CN.FUZZY_MATCHING_FIRST_MATCHING_PCTG) or
-																		FN.fn_MatchesFirstName_Fuzzy(L.SearchNameNonCleaner, selfCompareName, CN.FUZZY_MATCHING_FIRST_MATCHING_PCTG) or
-																		FN.fn_MatchesFirstName_Fuzzy(L.SearchNameNonCleaner, selfCompareNameNoMiddle, CN.FUZZY_MATCHING_FIRST_MATCHING_PCTG) or
-																		FN.fn_MatchesFirstName_Fuzzy(L.SearchNameNonCleaner, selfCompareNoCleaner, CN.FUZZY_MATCHING_FIRST_MATCHING_PCTG) or
-																		FN.fn_MatchesFirstName_Fuzzy(L.SearchNameNonCleaner, selfCompareNoCleanerNoMiddle, CN.FUZZY_MATCHING_FIRST_MATCHING_PCTG);
-																		
-			self.MatchesLastNameFuzzy := self.MatchesLastName or
-																	 FN.fn_MatchesLastName_Fuzzy(L.SearchName, selfCompareName, CN.FUZZY_MATCHING_LAST_MATCHING_PCTG) or
-																	 FN.fn_MatchesLastName_Fuzzy(L.SearchName, selfCompareNameNoMiddle, CN.FUZZY_MATCHING_LAST_MATCHING_PCTG) or
-																	 FN.fn_MatchesLastName_Fuzzy(L.SearchName, selfCompareNoCleaner, CN.FUZZY_MATCHING_LAST_MATCHING_PCTG) or
-																	 FN.fn_MatchesLastName_Fuzzy(L.SearchName, selfCompareNoCleanerNoMiddle, CN.FUZZY_MATCHING_LAST_MATCHING_PCTG) or
-																	 FN.fn_MatchesLastName_Fuzzy(L.SearchNameNonCleaner, selfCompareName, CN.FUZZY_MATCHING_LAST_MATCHING_PCTG) or
-																	 FN.fn_MatchesLastName_Fuzzy(L.SearchNameNonCleaner, selfCompareNameNoMiddle, CN.FUZZY_MATCHING_LAST_MATCHING_PCTG) or
-																	 FN.fn_MatchesLastName_Fuzzy(L.SearchNameNonCleaner, selfCompareNoCleaner, CN.FUZZY_MATCHING_LAST_MATCHING_PCTG) or
-																	 FN.fn_MatchesLastName_Fuzzy(L.SearchNameNonCleaner, selfCompareNoCleanerNoMiddle, CN.FUZZY_MATCHING_LAST_MATCHING_PCTG);
-																	 
-			self.MatchesFirstLastNameFuzzy_Age4 := (self.MatchesFirstName and ~acceptFirstInitialForFirstName and self.MatchesLastName) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchName, selfCompareName, CN.FUZZY_MATCHING_LASTFIRST_DOB4_MATCHING_PCTG) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchName, selfCompareNameNoMiddle, CN.FUZZY_MATCHING_LASTFIRST_DOB4_MATCHING_PCTG) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchName, selfCompareNoCleaner, CN.FUZZY_MATCHING_LASTFIRST_DOB4_MATCHING_PCTG) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchName, selfCompareNoCleanerNoMiddle, CN.FUZZY_MATCHING_LASTFIRST_DOB4_MATCHING_PCTG) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchNameNonCleaner, selfCompareName, CN.FUZZY_MATCHING_LASTFIRST_DOB4_MATCHING_PCTG) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchNameNonCleaner, selfCompareNameNoMiddle, CN.FUZZY_MATCHING_LASTFIRST_DOB4_MATCHING_PCTG) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchNameNonCleaner, selfCompareNoCleaner, CN.FUZZY_MATCHING_LASTFIRST_DOB4_MATCHING_PCTG) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchNameNonCleaner, selfCompareNoCleanerNoMiddle, CN.FUZZY_MATCHING_LASTFIRST_DOB4_MATCHING_PCTG);
-																						 
-			self.MatchesFirstLastNameFuzzy_Age6 := (self.MatchesFirstName and ~acceptFirstInitialForFirstName and self.MatchesLastName) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchName, selfCompareName, CN.FUZZY_MATCHING_LASTFIRST_DOB68_MATCHING_PCTG) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchName, selfCompareNameNoMiddle, CN.FUZZY_MATCHING_LASTFIRST_DOB68_MATCHING_PCTG) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchName, selfCompareNoCleaner, CN.FUZZY_MATCHING_LASTFIRST_DOB68_MATCHING_PCTG) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchName, selfCompareNoCleanerNoMiddle, CN.FUZZY_MATCHING_LASTFIRST_DOB68_MATCHING_PCTG) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchNameNonCleaner, selfCompareName, CN.FUZZY_MATCHING_LASTFIRST_DOB68_MATCHING_PCTG) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchNameNonCleaner, selfCompareNameNoMiddle, CN.FUZZY_MATCHING_LASTFIRST_DOB68_MATCHING_PCTG) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchNameNonCleaner, selfCompareNoCleaner, CN.FUZZY_MATCHING_LASTFIRST_DOB68_MATCHING_PCTG) or
-																						 FN.fn_MatchesFirstLastName_Fuzzy(L.SearchNameNonCleaner, selfCompareNoCleanerNoMiddle, CN.FUZZY_MATCHING_LASTFIRST_DOB68_MATCHING_PCTG);
-			
-			self.MatchesFirstLastInstring := (self.MatchesFirstName and ~acceptFirstInitialForFirstName and self.MatchesLastName) or
-																			 FN.fn_MatchesFirstLastInstring(L.SearchName, selfCompareName) or
-																			 FN.fn_MatchesFirstLastInstring(L.SearchName, selfCompareNameNoMiddle) or
-																			 FN.fn_MatchesFirstLastInstring(L.SearchName, selfCompareNoCleaner) or
-																			 FN.fn_MatchesFirstLastInstring(L.SearchName, selfCompareNoCleanerNoMiddle) or
-																			 FN.fn_MatchesFirstLastInstring(L.SearchNameNonCleaner, selfCompareName) or
-																			 FN.fn_MatchesFirstLastInstring(L.SearchNameNonCleaner, selfCompareNameNoMiddle) or
-																			 FN.fn_MatchesFirstLastInstring(L.SearchNameNonCleaner, selfCompareNoCleaner) or
-																			 FN.fn_MatchesFirstLastInstring(L.SearchNameNonCleaner, selfCompareNoCleanerNoMiddle);
-			//end enhanced name comparisons
-			*/
-			
-			self.MatchesZipCode := FN.fn_MatchesZIP(L.SearchAddress.Z5Numeric, self.CandidateAddress.Z5Numeric);															
+			self.MatchesZipCode := FN.fn_MatchesZIP(L.SearchAddress.Z5Numeric, _address.Z5Numeric);															
 			
 			self.MatchesStreetNameExact := 
-				MAP(self.CandidateAddress.ISPoBOXType => FN.fn_MatchesStreetNameNormal_Exact(L.SearchAddress, self.CandidateAddress),
-						self.CandidateAddress.ISRRType => FN.fn_MatchesStreetNameNormal_Exact(L.SearchAddress, self.CandidateAddress),																		
-						FN.fn_MatchesStreetNameNormal_Exact(L.SearchAddress, self.CandidateAddress));
+				MAP(is_PO => FN.fn_MatchesStreetNameNormal_Exact(L.SearchAddress, _address),
+						is_RR => FN.fn_MatchesStreetNameNormal_Exact(L.SearchAddress, _address),																		
+						FN.fn_MatchesStreetNameNormal_Exact(L.SearchAddress, _address));
 			self.MatchesHouseNumberExact := 
-				MAP(self.CandidateAddress.ISPoBOXType => FN.fn_MatchesHouseNumberPobBox_Exact(L.SearchAddress, self.CandidateAddress),
-						self.CandidateAddress.ISRRType => FN.fn_MatchesHouseNumberRR_Exact(L.SearchAddress, self.CandidateAddress),																		
-						FN.fn_MatchesHouseNumberNormal_Exact(L.SearchAddress, self.CandidateAddress));
+				MAP(is_PO => FN.fn_MatchesHouseNumberPobBox_Exact(L.SearchAddress, _address),
+						is_RR => FN.fn_MatchesHouseNumberRR_Exact(L.SearchAddress, _address),																		
+						FN.fn_MatchesHouseNumberNormal_Exact(L.SearchAddress, _address));
 			self.MatchesStreetNameFirst4 := 
-				MAP(self.CandidateAddress.ISPoBOXType => FN.fn_MatchesStreetNameNormal(L.SearchAddress, self.CandidateAddress),
-						self.CandidateAddress.ISRRType => FN.fn_MatchesStreetNameNormal(L.SearchAddress, self.CandidateAddress),																		
-						FN.fn_MatchesStreetNameNormal(L.SearchAddress, self.CandidateAddress));
+				MAP(is_PO => FN.fn_MatchesStreetNameNormal(L.SearchAddress, _address),
+						is_RR => FN.fn_MatchesStreetNameNormal(L.SearchAddress, _address),																		
+						FN.fn_MatchesStreetNameNormal(L.SearchAddress, _address));
 			self.MatchesHouseNumberFirst3 := 
-				MAP(self.CandidateAddress.ISPoBOXType => FN.fn_MatchesHouseNumberPobBox(L.SearchAddress, self.CandidateAddress),
-						self.CandidateAddress.ISRRType => FN.fn_MatchesHouseNumberRR(L.SearchAddress, self.CandidateAddress),																		
-						FN.fn_MatchesHouseNumberNormal(L.SearchAddress, self.CandidateAddress));
+				MAP(is_PO => FN.fn_MatchesHouseNumberPobBox(L.SearchAddress, _address),
+						is_RR => FN.fn_MatchesHouseNumberRR(L.SearchAddress, _address),																		
+						FN.fn_MatchesHouseNumberNormal(L.SearchAddress, _address));
 			
 			self.DateProcessed_YYYYMMDD := L.TodayYYYYMMDD;				
 			self.SourceType := FN.fn_GetSourceType(L.src);
@@ -263,8 +192,8 @@ export Transforms := MODULE
 																													self.MatchesStreetNameExact,
 																													self.MatchesHouseNumberExact));																																				
       
-			self.AgeMatchType := FN.fn_GetAgeMatchType(L.DOB_YYYYMMDD, SELF.DOB_YYYYMMDD);
-		  self.SourceNameSort := FN.fn_GetSourceNameSort(L.src, searchpass);
+			self.AgeMatchType := FN.fn_GetAgeMatchType(L.DOB_YYYYMMDD, _dob);
+			self.SourceNameSort := FN.fn_GetSourceNameSort(L.src, searchpass);
 			
 			self.IsValidCandidate := FN.fn_IsValidCandidateForSearchPass(self.MatchesSSN,
 																																	self.MatchesSSN4,
@@ -287,17 +216,17 @@ export Transforms := MODULE
 																																	self.SourceNameSort);
 			self.AgeVerified := FN.fn_GetAgeVerified(self.IsValidCandidate,
 																							 self.AgeMatchType,
-																							 FN.fn_GetUnderAge(SELF.DOB_YYYYMMDD, minAgeValue, L.TodayYear, L.TodayYearMonth, L.TodayYearMonthDay), 
+																							 FN.fn_GetUnderAge(_dob, minAgeValue, L.TodayYear, L.TodayYearMonth, L.TodayYearMonthDay), 
 																							 FN.fn_IsPrimaryHit(FN.fn_GetSourceName(self.SourceNameSort, isDerived)),
 																							 self.SourceNameSort);			      																												
 																													
-      SELF.AgeMatchTypeDisplay := MAP(self.AgeVerified and self.AgeMatchType > 0 => (QSTRING2)(self.AgeMatchType), CN.DISPLAY_UNDEFINED_OR_BLANK[1]);
+			SELF.AgeMatchTypeDisplay := MAP(self.AgeVerified and self.AgeMatchType > 0 => (QSTRING2)(self.AgeMatchType), CN.DISPLAY_UNDEFINED_OR_BLANK[1]);
 			SELF.SourceName	:= 
 				IF(~self.AgeVerified and searchpass != CN.SortSearchPassEnum.SSN4EXPANSION, CN.DISPLAY_SOURCENAME_BLANK, FN.fn_GetSourceName(self.SourceNameSort, isDerived));
 				
 			SELF.InputMatchCode	:= IF (self.SearchPass = CN.SortSearchPassEnum.SSN4EXPANSION, CN.DISPLAY_INPUTMATCHCODE_ADDRESS_MISS, 
 					IF ( ~self.AgeVerified, CN.DISPLAY_INPUTMATCHCODE_ADDRESS_MISS, FN.fn_GetInputMatchCode(self.SearchPass, L.SearchAddress.AddressID)));
-			SELF.UnderAge := IF ( self.AgeMatchType <= 0, CN.DISPLAY_UNDEFINED_OR_BLANK, FN.fn_GetUnderAge(SELF.DOB_YYYYMMDD, minAgeValue, L.TodayYear, L.TodayYearMonth, L.TodayYearMonthDay));																															
+			SELF.UnderAge := IF ( self.AgeMatchType <= 0, CN.DISPLAY_UNDEFINED_OR_BLANK, FN.fn_GetUnderAge(_dob, minAgeValue, L.TodayYear, L.TodayYearMonth, L.TodayYearMonthDay));																															
 			
 			self.rawRecord := L;
 			self := L, 
