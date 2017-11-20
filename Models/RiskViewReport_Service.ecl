@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="RiskviewReport_Service">
 	<part name="RiskViewReportRequest" type="tns:XmlDataSet" cols="110" rows="75"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
@@ -19,9 +19,29 @@ export RiskViewReport_Service := MACRO
 			'RiskViewReportRequest',
 			'HistoryDateYYYYMM',
 			'gateways',
-			'scores'));
+			'scores',
+			'OutcomeTrackingOptOut'));
+			
+		/* **********************************************
+		 *  Fields needed for improved Scout Logging  *
+		 **********************************************/
+			string32 _LoginID           := ''	: STORED('_LoginID');
+			string20 CompanyID          := '' : STORED('_CompanyID');
+			string20 FunctionName       := '' : STORED('_LogFunctionName');
+			string50 ESPMethod          := '' : STORED('_ESPMethodName');
+			string10 InterfaceVersion   := '' : STORED('_ESPClientInterfaceVersion');
+			string10 SSN_Mask           := '' : STORED('SSNMask');
+			string10 DOB_Mask	          := ''	: STORED('DOBMask');
+			string1 DL_Mask             := ''	: STORED('DLMask');
+			string5 DeliveryMethod      := '' : STORED('_DeliveryMethod');
+			string5 DeathMasterPurpose  := '' : STORED('__deathmasterpurpose');
+			string1 ExcludeDMVPII       := '' : STORED('ExcludeDMVPII');
+			BOOLEAN DisableOutcomeTracking := FALSE : STORED('OutcomeTrackingOptOut');
+			string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
 
-		BOOLEAN DisableOutcomeTracking := FALSE : STORED('OutcomeTrackingOptOut');
+			//Look up the industry by the company ID.
+			Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(TRUE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__RiskView_Service);
+		/* ************* End Scout Fields **************/
 
 		requestIn := DATASET([], iesp.riskviewreport.t_RiskViewReportRequest)  	: STORED('RiskViewReportRequest', FEW);
 		
@@ -109,6 +129,17 @@ export RiskViewReport_Service := MACRO
 		
 		#stored('FFDOptionsMask', option.FFDOptionsMask);
 		
+		// Pull model information for scout logging
+		ds_scores := dataset([],Models.Layout_Score_Chooser) 		: stored('scores',few);
+		scores_count := count(ds_scores);
+		
+		scores_param := ds_scores.parameters(StringLib.StringToLowerCase(name)='custom');
+		model_name1 := IF(scores_count >= 1, StringLib.StringToLowerCase(scores_param[1].value), '');
+		
+		scores_param2 := ds_scores[2].parameters(StringLib.StringToLowerCase(name)='custom');
+		model_name2 := IF(scores_count > 1, StringLib.StringToLowerCase(scores_param2[1].value), '');
+		
+		
 		// Riskview_Records requires either a model request or an attribute request
 		// Riskviewreport sends the model request out of band on the scores block	
 		riskview_xml := Models.RiskView_Records;
@@ -165,8 +196,62 @@ export RiskViewReport_Service := MACRO
 		// Must end with '_intermediate__log'
 		OUTPUT(intermediateLog, NAMED('LOG_log__mbs__fcra_intermediate__log'));
 		
+		//Log to Deltabase
+		Deltabase_Logging_prep := project(riskview_xml, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
+																						 self.company_id := (Integer)CompanyID,
+																						 self.login_id := _LoginID,
+																						 self.product_id := Risk_Reporting.ProductID.Models__RiskView_Service,
+																						 self.function_name := FunctionName,
+																						 self.esp_method := ESPMethod,
+																						 self.interface_version := InterfaceVersion,
+																						 self.delivery_method := DeliveryMethod,
+																						 self.date_added := (STRING8)Std.Date.Today(),
+																						 self.death_master_purpose := DeathMasterPurpose,
+																						 self.ssn_mask := SSN_Mask,
+																						 self.dob_mask := DOB_Mask,
+																						 self.dl_mask := DL_Mask,
+																						 self.exclude_dmv_pii := ExcludeDMVPII,
+																						 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
+																						 self.archive_opt_in := ArchiveOptIn,
+																						 self.data_restriction_mask := DataRestriction,
+																						 self.data_permission_mask := DataPermission,
+																						 self.industry := Industry_Search[1].Industry,
+																						 // self.i_attributes_name := attributesIn[1].name,
+																						 self.i_ssn := inSSN,
+																						 self.i_name_first := search.Name.First,
+																						 self.i_name_last := search.Name.Last,
+																						 // self.i_lexid := did_value, 
+																						 self.i_address := streetAddr,
+																						 self.i_city := search.Address.City,
+																						 self.i_state := search.Address.State,
+																						 self.i_zip := search.Address.Zip5,
+																						 self.i_dl := search.DriverLicenseNumber,
+																						 self.i_dl_state := Search.DriverLicenseState,
+																						 // Check to see if there were models requested
+																						 // model_count := count(option.IncludeModels.ModelRequests);
+																						 self.i_model_name_1 := model_name1,
+																						 extra_score := scores_count > 1;
+																						 self.i_model_name_2 := model_name2,
+																						 self.o_score_1    := (Integer)left.Models[1].Scores[1].i,
+																						 self.o_reason_1_1 := left.Models[1].Scores[1].reason_codes[1].reason_code,
+																						 self.o_reason_1_2 := left.Models[1].Scores[1].reason_codes[2].reason_code,
+																						 self.o_reason_1_3 := left.Models[1].Scores[1].reason_codes[3].reason_code,
+																						 self.o_reason_1_4 := left.Models[1].Scores[1].reason_codes[4].reason_code,
+																						 self.o_reason_1_5 := left.Models[1].Scores[1].reason_codes[5].reason_code,
+																						 self.o_reason_1_6 := left.Models[1].Scores[1].reason_codes[6].reason_code,
+																						 self.o_score_2    := IF(extra_score, (Integer)left.Models[2].Scores[1].i, 0),
+																						 self.o_reason_2_1 := IF(extra_score, left.Models[2].Scores[1].reason_codes[1].reason_code, ''),
+																						 self.o_reason_2_2 := IF(extra_score, left.Models[2].Scores[1].reason_codes[2].reason_code, ''),
+																						 self.o_reason_2_3 := IF(extra_score, left.Models[2].Scores[1].reason_codes[3].reason_code, ''),
+																						 self.o_reason_2_4 := IF(extra_score, left.Models[2].Scores[1].reason_codes[4].reason_code, ''),
+																						 self.o_reason_2_5 := IF(extra_score, left.Models[2].Scores[1].reason_codes[5].reason_code, ''),
+																						 self.o_reason_2_6 := IF(extra_score, left.Models[2].Scores[1].reason_codes[6].reason_code, ''),
+																						 // self.o_lexid      := left.did,
+																						 self := left,
+																						 self := [] ));
+		Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
+		
 		//Improved Scout Logging
-		Deltabase_Logging := DATASET([], Risk_Reporting.Layouts.LOG_Deltabase_Layout) : STORED('Deltabase_Log');
 		IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
 
 		output( res, named( 'Results' ) );

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SmallBusiness_BIP_Combined_Service" wuTimeout="300000">
 	<part name="SmallBusinessBipCombinedReportRequest" type="tns:XmlDataSet" cols="110" rows="75"/>
   <!-- Option Fields --> 
@@ -110,7 +110,7 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
 			DisableOutcomeTracking  := DisableIntermediateShellLoggingOutOfBand OR users.OutcomeTrackingOptOut;
 
 			//Look up the industry by the company ID.
-			Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.LNSmallBusiness__SmallBusiness_BIP_Combined_Service);
+			Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.LNSmallBusiness__SmallBusiness_BIP_Combined_Service);
 		/* ************* End Scout Fields **************/
    
     // Below we'll prefer users.DataRestrictionMask, users.DataPermissionMask, users.industryclass, etc., over
@@ -384,10 +384,16 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
     Targus_PhoneSource  := ds_Results[1].CreditReportRecords[1].PhoneSources(source = MDR.sourceTools.src_Targus_Gateway);
     ds_Targus_royalties := Royalty.RoyaltyTargus.GetOnlineRoyalties(Targus_PhoneSource, source, TargusType, TRUE, TRUE, FALSE, FALSE);
 
+   /* ************************************************************************
+    *                    Cortera Royalties                                    *
+    **************************************************************************/
+    ds_Cortera_royalties := IF( TestData_Enabled, Royalty.RoyaltyCortera.InHouse.GetNoRoyalties(), Royalty.RoyaltyCortera.InHouse.GetCombinedServiceRoyalties(ds_Results) );
+    
     // Combine Royalties  
     ds_Royalties := DATASET([], Royalty.Layouts.Royalty) + 
                     ds_combinedSBFE_royalties + 
-                    ds_Targus_royalties;
+                    ds_Targus_royalties +
+                    ds_Cortera_royalties;
     
 		//Log to Deltabase
 		Deltabase_Logging_prep := project(ds_Results, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
@@ -438,11 +444,11 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
 																										 self.i_bus_city := search.Company.address.City,
 																										 self.i_bus_state := search.Company.address.State,
 																										 self.i_bus_zip := search.Company.address.Zip5,
-																										 model_count := count(left.SmallBusinessAnalyticsResults.Models);
-																										 self.i_model_name_1 := left.SmallBusinessAnalyticsResults.Models[1].Name,
+																										 model_count := count(Models_Requested);
+																										 self.i_model_name_1 := Models_Requested[1].ModelName,
 																										 //Check to see if there was more than one model requested
 																										 extra_score := model_count > 1;
-																										 self.i_model_name_2 := IF(extra_score, left.SmallBusinessAnalyticsResults.Models[2].Name, ''),
+																										 self.i_model_name_2 := IF(extra_score, Models_Requested[2].ModelName, ''),
 																										 self.o_score_1    := (Integer)left.SmallBusinessAnalyticsResults.Models[1].Scores[1].Value,
 																										 self.o_reason_1_1 := left.SmallBusinessAnalyticsResults.Models[1].Scores[1].ScoreReasons[1].ReasonCode,
 																										 self.o_reason_1_2 := left.SmallBusinessAnalyticsResults.Models[1].Scores[1].ScoreReasons[2].ReasonCode,

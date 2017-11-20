@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Risk_BIP, MDR, LiensV2, Risk_Indicators, UT;
+﻿IMPORT BIPV2, Business_Risk_BIP, MDR, LiensV2, Risk_Indicators, UT;
 
 EXPORT getLiens(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -321,9 +321,12 @@ EXPORT getLiens(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				TodaysDate := Business_Risk_BIP.Common.todaysDate(BHBuildDate, LEFT.Clean_Input.HistoryDate);
 				SELF.Lien_And_Judgment.LienFiledDateFirstSeen := oldestFiling;
 				SELF.Lien_And_Judgment.LienFiledDateLastSeen := newestFiling;
-				SELF.Lien_And_Judgment.LienTimeNewest := (STRING)IF((INTEGER)newestFiling > 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(newestFiling, TodaysDate), 1, 999), -1);
-				SELF.Lien_And_Judgment.LienTimeOldest := (STRING)IF((INTEGER)oldestFiling > 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(oldestFiling, TodaysDate), 1, 999), -1);
-				
+				SELF.Lien_And_Judgment.LienTimeNewest := (STRING)MAP((INTEGER)newestFiling > 0                                                  => Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(newestFiling, TodaysDate), 1, 999),
+                                                              Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30 => -1,
+                                                                                                                                            0);
+				SELF.Lien_And_Judgment.LienTimeOldest := (STRING)MAP((INTEGER)oldestFiling > 0                                                  => Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(oldestFiling, TodaysDate), 1, 999), 
+                                                              Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30 => -1,
+                                                                                                                                            0);
 				liensFiled := sortedLiens ((INTEGER)FilingDate > 0);
 				liens60Month := liensFiled (ut.DaysApart(FilingDate, TodaysDate) <= ut.DaysInNYears(5));
 				liens36Month := liens60Month (ut.DaysApart(FilingDate, TodaysDate) <= ut.DaysInNYears(3));
@@ -424,10 +427,13 @@ EXPORT getLiens(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.Lien_And_Judgment.LienFilingStatusList := Business_Risk_BIP.Common.convertDelimited(sortedLiens, FilingStatus, Business_Risk_BIP.Constants.FieldDelimiter);
 				SELF.Lien_And_Judgment.LienFilingStateList  := Business_Risk_BIP.Common.convertDelimited(sortedLiens, FilingState, Business_Risk_BIP.Constants.FieldDelimiter);
 				SELF.Lien_And_Judgment.LienStateCount				:= (STRING)Business_Risk_BIP.Common.capNum(COUNT(DEDUP(SORT(sortedLiens (FilingState <> ''), FilingState), FilingState)), -1, 99999); // Count all unique states
-				SELF.Lien_And_Judgment.LienStateInput				:= Business_Risk_BIP.Common.SetBoolean(COUNT(sortedLiens (FilingState = LEFT.Clean_Input.State)) > 0); // Business has a lien filing within the input state
+				SELF.Lien_And_Judgment.LienStateInput				:= IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND TRIM(LEFT.Clean_Input.State)='', '-1',
+                                                          Business_Risk_BIP.Common.SetBoolean(COUNT(sortedLiens (FilingState = LEFT.Clean_Input.State)) > 0)); // Business has a lien filing within the input state
 				SELF.Lien_And_Judgment.LienAmountList       := Business_Risk_BIP.Common.convertDelimited(sortedLiens, Amount, Business_Risk_BIP.Constants.FieldDelimiter);
-				SELF.Lien_And_Judgment.LienDollarTotal      := if(RIGHT.LienCount = 0, '-1',(STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.LienDollarTotal, -1, 99999999));
-				SELF.Lien_And_Judgment.LienCount            := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.LienCount, -1, 99999);
+				SELF.Lien_And_Judgment.LienDollarTotal      := MAP(RIGHT.LienCount = 0 AND Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30 => '-1',
+                                                          RIGHT.LienCount = 0 AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 => '0',
+                                                                                                                                                                (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.LienDollarTotal, -1, 99999999));
+        SELF.Lien_And_Judgment.LienCount            := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.LienCount, -1, 99999);
 				SELF.Lien_And_Judgment.LienCount12Month     := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.LienCount12Month, -1, 99999);
 				SELF.Lien_And_Judgment.LienCount24Month     := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.LienCount24Month, -1, 99999);
 				SELF := LEFT
@@ -521,17 +527,24 @@ EXPORT getLiens(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				
 				SELF.Lien_And_Judgment.JudgFiledDateFirstSeen		:= oldestFiling;
 				SELF.Lien_And_Judgment.JudgFiledDateLastSeen		:= newestFiling;
-				SELF.Lien_And_Judgment.JudgmentTimeNewest 		:= (STRING)IF((INTEGER)newestFiling > 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(newestFiling, TodaysDate), 1, 999), -1);
-				SELF.Lien_And_Judgment.JudgmentTimeOldest 		:= (STRING)IF((INTEGER)oldestFiling > 0, Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(oldestFiling, TodaysDate), 1, 999), -1);
+				SELF.Lien_And_Judgment.JudgmentTimeNewest 		:= (STRING)MAP((INTEGER)newestFiling > 0                                                   => Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(newestFiling, TodaysDate), 1, 999),
+                                                                      Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30 => -1,
+                                                                                                                                                    0);
+				SELF.Lien_And_Judgment.JudgmentTimeOldest 		:= (STRING)MAP((INTEGER)oldestFiling > 0                                                  => Business_Risk_BIP.Common.capNum((INTEGER)ut.MonthsApart(oldestFiling, TodaysDate), 1, 999), 
+                                                                      Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30 => -1,
+                                                                                                                                                    0);
 				SELF.Lien_And_Judgment.JudgmentReleasedCount    := (STRING)Business_Risk_BIP.Common.CapNum(COUNT(JudgReleased), -1, 99999);
 				SELF.Lien_And_Judgment.JudgmentTypeList         := Business_Risk_BIP.Common.convertDelimited(sortedJudgments, JudgmentType, Business_Risk_BIP.Constants.FieldDelimiter);
 				SELF.Lien_And_Judgment.JudgmentType				:= if(RIGHT.JudgmentCount = 0, '-1', sortedJudgments (JudgmentType <> '')[1].JudgmentType); // Grab the most recent populated judgment type
 				SELF.Lien_And_Judgment.JudgmentFilingStatusList := Business_Risk_BIP.Common.convertDelimited(sortedJudgments, FilingStatus, Business_Risk_BIP.Constants.FieldDelimiter);
 				SELF.Lien_And_Judgment.JudgmentFilingStateList  := Business_Risk_BIP.Common.convertDelimited(sortedJudgments, FilingState, Business_Risk_BIP.Constants.FieldDelimiter);
 				SELF.Lien_And_Judgment.JudgmentStateCount				:= (STRING)Business_Risk_BIP.Common.CapNum(COUNT(DEDUP(SORT(sortedJudgments (FilingState <> ''), FilingState), FilingState)), -1, 99); // Count all unique states
-				SELF.Lien_And_Judgment.JudgmentStateInput				:= Business_Risk_BIP.Common.SetBoolean(COUNT(sortedJudgments (FilingState = LEFT.Clean_Input.State)) > 0); // Business has a judgment filing within the input state
+				SELF.Lien_And_Judgment.JudgmentStateInput				:= IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND TRIM(LEFT.Clean_Input.State)='', '-1',
+                                                              Business_Risk_BIP.Common.SetBoolean(COUNT(sortedJudgments (FilingState = LEFT.Clean_Input.State)) > 0)); // Business has a judgment filing within the input state
 				SELF.Lien_And_Judgment.JudgmentAmountList       := Business_Risk_BIP.Common.convertDelimited(sortedJudgments, Amount, Business_Risk_BIP.Constants.FieldDelimiter);
-				SELF.Lien_And_Judgment.JudgmentDollarTotal      := if(RIGHT.JudgmentCount = 0, '-1',(STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.JudgmentDollarTotal, -1, 99999999));
+				SELF.Lien_And_Judgment.JudgmentDollarTotal      := MAP(RIGHT.JudgmentCount = 0 AND Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30 => '-1',
+                                                               RIGHT.JudgmentCount = 0 AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 => '0',
+                                                                                                                (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.JudgmentDollarTotal, -1, 99999999));
 				SELF.Lien_And_Judgment.JudgmentCount        		:= (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.JudgmentCount, -1, 99999);
 				SELF.Lien_And_Judgment.JudgmentCount12Month     := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.JudgmentCount12Month, -1, 99999);
 				SELF.Lien_And_Judgment.JudgmentCount24Month     := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.JudgmentCount24Month, -1, 99999);

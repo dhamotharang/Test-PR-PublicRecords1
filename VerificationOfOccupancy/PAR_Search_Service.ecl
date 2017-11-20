@@ -1,4 +1,4 @@
-
+﻿
 /*--SOAP--
 <message name="Premise Association Report">
 	<part name="PremiseAssociationRequest" type="tns:XmlDataSet" cols="80" rows="50"/>
@@ -41,7 +41,7 @@ EXPORT PAR_Search_Service() := MACRO
 	BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
 	
 	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.VerificationOfOccupancy__PAR_Search_Service);
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.VerificationOfOccupancy__PAR_Search_Service);
 /* ************* End Scout Fields **************/
 	
 	string6  outOfBandHistoryDate := '' : STORED('HistoryDateYYYYMM');

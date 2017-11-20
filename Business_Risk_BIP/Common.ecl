@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Credit, Business_Risk_BIP, Doxie, Inquiry_AccLogs, MDR, Models, UT;
+﻿IMPORT BIPV2, Business_Credit, Business_Risk_BIP, Doxie, Inquiry_AccLogs, MDR, Models, UT, STD;
 
 EXPORT Common := MODULE
 	// Grabs just the linking ID's and Unique Seq Number - this is needed to use the BIP kFetch
@@ -190,6 +190,20 @@ OUTPUT(converted, NAMED('Converted_Set'));
 		
 		RETURN(filtered);
 	ENDMACRO;
+	
+	// Modifying the FilterRecords functionMacro for Cortera data. For Cortera records, we only want to keep records from the most recent Cortera build as of the history date.
+	// This is defined as records marked as current, or records from within a week of the historydate (since we do weekly Cortera builds).
+	EXPORT FilterCorteraRecords(myDataset, dateFirstSeenField, secondaryDateFirstSeenField, dateLastSeenField, currentIndicator, sourceCode, AllowedSourcesSet) := FUNCTIONMACRO
+		filtered := myDataset ((sourceCode = '' OR sourceCode IN AllowedSourcesSet) AND
+														dateFirstSeenField < (UNSIGNED)(((STRING)HistoryDate + '01')[1..8]) AND
+														secondaryDateFirstSeenField < (UNSIGNED)(((STRING)HistoryDate + '01')[1..8]) AND
+														secondaryDateFirstSeenField > 0 AND
+														(currentIndicator OR
+														(((STRING)HistoryDate) <> Business_Risk_BIP.Constants.NinesDate AND 
+														dateLastSeenField >= STD.Date.AdjustDate((UNSIGNED)(((STRING)HistoryDate + '01')[1..8]), day_delta := -7))));
+		RETURN(filtered);
+	ENDMACRO;
+	
 	
 	// This functionmacro takes in the results of kFetch2 and determines if there was an error code returns from the kFetch which might indicate a large company
 	EXPORT GrabFetchErrorCode(myDataset) := FUNCTIONMACRO
@@ -674,4 +688,115 @@ OUTPUT(converted, NAMED('Converted_Set'));
         PhonePopulated = FALSE AND NameMatched  = TRUE  AND	AddressMatched = TRUE																	=> '7', // Input Name matches Address, But the Phone was not found or missing
         PhoneMatched   = TRUE  AND	NameMatched  = TRUE  AND	AddressMatched = TRUE																	=> '8', // Input Business name, Address and Phone Verified
         '0');
+  
+  // The following function cleans all non-ANSI chars from a string and substitutes a space instead.
+  EXPORT STRING fn_CleanString(STRING x) := REGEXREPLACE('[^ -~]+',x,' ');
+  
+	EXPORT INTEGER getSalesRangeIndex(INTEGER SalesAmount) := FUNCTION
+			SalesIndex := MAP(
+					SalesAmount = -1																					=> -1,
+					SalesAmount = 0																					  => 0,
+					SalesAmount >= 1 AND SalesAmount < 500000 								=> 1,
+					SalesAmount >= 500000 AND SalesAmount < 1000000 					=> 2,
+					SalesAmount >= 1000000 AND SalesAmount < 5000000 					=> 3,
+					SalesAmount >= 5000000 AND SalesAmount < 10000000 				=> 4,
+					SalesAmount >= 10000000 AND SalesAmount < 25000000 				=> 5,
+					SalesAmount >= 25000000 AND SalesAmount < 50000000 				=> 6,
+					SalesAmount >= 50000000 AND SalesAmount < 75000000 				=> 7,
+					SalesAmount >= 75000000 AND SalesAmount < 150000000 			=> 8,
+					SalesAmount >= 150000000 AND SalesAmount < 200000000 			=> 9,
+					SalesAmount >= 200000000 AND SalesAmount < 500000000 			=> 10,
+					SalesAmount >= 500000000 AND SalesAmount < 1000000000 		=> 11,
+					SalesAmount >= 1000000000 AND SalesAmount < 5000000000 		=> 12,
+					SalesAmount >= 5000000000 AND SalesAmount < 10000000000 	=> 13,
+					SalesAmount >= 10000000000 AND SalesAmount < 50000000000 	=> 14,
+					SalesAmount >= 50000000000 AND SalesAmount < 100000000000 => 15,
+					SalesAmount >= 100000000000																=> 16,
+																																			 -1);
+			RETURN SalesIndex;
+		END;	
+
+	EXPORT INTEGER getEmployeeRangeIndex(INTEGER EmployeeCount) := FUNCTION
+			EmployeeIndex := MAP(
+					EmployeeCount = -1																 => -1,
+          EmployeeCount = 0                                  => 0,
+					EmployeeCount >= 1 AND EmployeeCount < 5 					 => 1,
+					EmployeeCount >= 5 AND EmployeeCount < 10 				 => 2,
+					EmployeeCount >= 10 AND EmployeeCount < 20 				 => 3,
+					EmployeeCount >= 20 AND EmployeeCount < 50 				 => 4,
+					EmployeeCount >= 50 AND EmployeeCount < 100 			 => 5,
+					EmployeeCount >= 100 AND EmployeeCount < 250 			 => 6,
+					EmployeeCount >= 250 AND EmployeeCount < 500 			 => 7,
+					EmployeeCount >= 500 AND EmployeeCount < 1000 		 => 8,
+					EmployeeCount >= 1000 AND EmployeeCount < 2000 		 => 9,
+					EmployeeCount >= 2000 AND EmployeeCount < 5000 		 => 10,
+					EmployeeCount >= 5000 AND EmployeeCount < 10000 	 => 11,
+					EmployeeCount >= 10000 AND EmployeeCount < 25000 	 => 12,
+					EmployeeCount >= 25000 AND EmployeeCount < 50000 	 => 13,
+					EmployeeCount >= 50000 AND EmployeeCount < 75000 	 => 14,
+					EmployeeCount >= 75000 AND EmployeeCount < 100000  => 15,
+					EmployeeCount >= 100000 AND EmployeeCount < 150000 => 16,
+					EmployeeCount >= 150000 AND EmployeeCount < 200000 => 17,
+					EmployeeCount >= 200000 AND EmployeeCount < 250000 => 18,
+					EmployeeCount >= 250000 AND EmployeeCount < 300000 => 19,
+					EmployeeCount >= 300000														 => 20,
+																															 -1);
+			RETURN EmployeeIndex;
+		END;	
+		
+EXPORT STRING getCorteraTradelineIndex(STRING AvgPctTradelinesBeyondTerms) := FUNCTION
+			IndexResults := MAP(AvgPctTradelinesBeyondTerms = '-1' 				=> '-1',
+													AvgPctTradelinesBeyondTerms = '0'	 				=> '0',
+													(INTEGER)AvgPctTradelinesBeyondTerms > 0 	=> '1',
+																																			 '-1');
+			RETURN IndexResults;
+		END;
+
+EXPORT STRING getCorteraTrajectory(STRING total_numrel_avg, STRING total_slope, STRING mthspastleast = '24', STRING mthspastmost = '24') := FUNCTION
+      DataReported := (REAL)total_numrel_avg <> 0 OR (REAL)mthspastleast <> 24 OR (REAL)mthspastmost <> 24;
+			TrajectoryIndex := MAP(	TRIM(total_numrel_avg) = '' 					=> '-1', // Not on file
+                              NOT DataReported                      => '0',	 // No B2B data reported in the last 12 months
+														 (REAL)total_slope < 0 AND DataReported	=> '2',  // Negative trajectory in the last 12 months
+														 (REAL)total_slope = 0 AND DataReported => '3',	 // No change in the past 12 months
+														 (REAL)total_slope > 0 AND DataReported => '4',	 // Positive trajectory in the past 12 months
+																																			 '1'); // Else: unknown trajectory			
+			RETURN TrajectoryIndex;
+		END;	
+		
+EXPORT STRING rollCorteraTrajectory(STRING left_trajectory, STRING right_trajectory) := FUNCTION
+			RolledTrajectory := MAP(left_trajectory = right_trajectory 																   => left_trajectory,																									                         // If trajectories are equal, use that
+															(left_trajectory = '-1' OR right_trajectory = '-1') AND 																																									
+															((INTEGER)left_trajectory >= 0 OR (INTEGER)right_trajectory >= 0) => (STRING)MAX((INTEGER)left_trajectory, (INTEGER)right_trajectory), // If one trajectory is -1, use the other trajectory
+															(left_trajectory = '0' OR right_trajectory = '0') AND 
+															((INTEGER)left_trajectory > 0 OR (INTEGER)right_trajectory > 0) 	 => (STRING)MAX((INTEGER)left_trajectory, (INTEGER)right_trajectory), // If one trajectory is 0, use the other trajectory
+                                                                                    '1');																														                               // Otherwise, the two trajectories are both > 0 but are not equal, 
+                                                                                                                                                      // so return '1' indicating trajectory is unknown.
+			RETURN RolledTrajectory;
+		END;
+		
+	// This function determines whether a firstname or lastname are found as at least one of the words in the companyname.
+EXPORT fn_isFoundInCompanyName( STRING CompanyName, STRING PersonName ) := FUNCTION
+		UCase       := STD.Str.ToUpperCase;
+		layout_word := {STRING companyname_word};
+
+		// Make sure the first and last name are at least 2 characters long so 
+		// we aren't comparing blank or 1 character names to the company name.
+		hasAtLeastTwoChars := LENGTH(TRIM(PersonName)) >= 2;
+
+		// Remove possessive suffixes (...'s and ...'), and commas.
+		layout_word xfm_removeUnwantedChars( layout_word le ) := TRANSFORM
+			filt1 := STD.Str.FindReplace( le.companyname_word, '\'S', '' );
+			filt2 := STD.Str.FindReplace( filt1     , '\'' , '' );
+			filt3 := STD.Str.FindReplace( filt2     , ','  , '' );
+			SELF.companyname_word := filt3;
+		END;
+		
+		set_CompanyName_words     := STD.Str.SplitWords(UCase(CompanyName),' ');
+		ds_CompanyName_words      := DATASET( set_CompanyName_words, layout_word );
+		ds_CompanyName_words_filt := PROJECT( ds_CompanyName_words, xfm_removeUnwantedChars(LEFT) );
+		isFoundInCompanyName      := COUNT( ds_CompanyName_words_filt(companyname_word = UCase(PersonName)) ) > 0;
+		
+		RETURN isFoundInCompanyName AND hasAtLeastTwoChars;
+	END;
+	
 END;

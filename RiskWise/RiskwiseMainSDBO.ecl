@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Business Verify with Dual Input">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="account" type="xsd:string"/>
@@ -171,7 +171,7 @@ export RiskwiseMainSDBO := MACRO
 	string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
 
 	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.RiskWise__RiskWiseMainSDBO);
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.RiskWise__RiskWiseMainSDBO);
 /* ************* End Scout Fields **************/
 
 string4  tribCode_value := '' 		: stored('tribcode');	

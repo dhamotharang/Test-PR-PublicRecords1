@@ -1,8 +1,4 @@
-﻿/*2017-08-10T19:30:48Z (laure fischer)
-RR-11566 - update the max # assets for Due Diligence
-*/
-
-// NOTE1: To assist in finding things, this attribute has been re-arranged to put things
+﻿// NOTE1: To assist in finding things, this attribute has been re-arranged to put things
 // in alphabetic product name order.  However the BR & AR modules refer to other modules,
 // so they have to be at the bottom.
 //
@@ -2006,30 +2002,30 @@ EXPORT Constants := MODULE
 		export unsigned2 MaxATF             := 200;
 		export unsigned2 MaxAVM             := 1000;
 		export unsigned2 MaxBankruptcies    := 1000;  
-		export unsigned2 MaxCrimOffenders		:= 1000;
-		export unsigned2 MaxCrimOffenses		:= CRIM.MaxOffenses;
-		export unsigned2 MaxCrimCourtOffenses	:= CRIM.MaxCourtOffenses;
-		export unsigned2 MaxCrimPunishment	:= (CRIM.MaxPrisons + CRIM.MaxParoles);
+		export unsigned2 MaxCrimOffenders		:= 2000;  
+		export unsigned2 MaxCrimOffenses		:= 750;
+		export unsigned2 MaxCrimCourtOffenses	:= 900;
+		export unsigned2 MaxCrimPunishment	:= 150;
 		export unsigned2 MaxDeathDid        := 100;
-		export unsigned2 MaxEmail           := 100;
-		export unsigned2 MaxGong            := 100;
+		export unsigned2 MaxEmail           := 1000;
+		export unsigned2 MaxGong            := 1000;
 		export unsigned2 MaxHeader          := 1000;
-		export unsigned2 MaxHunters         := 350;
-		export unsigned2 MaxInfutor         := 100;
+		export unsigned2 MaxHunters         := 700;
+		export unsigned2 MaxInfutor         := 1000;
 		export unsigned2 MaxInquiries       := 1000;
-		export unsigned2 MaxLiens           := 100;
-		export unsigned2 MaxMarriageDiv     := 100;
+		export unsigned2 MaxLiens           := 1000;
+		export unsigned2 MaxMarriageDiv     := 150;
 		export unsigned2 MaxOptOut          := 100;
-		export unsigned2 MaxPAW             := 100;
+		export unsigned2 MaxPAW             := 1000;
 		export unsigned2 MaxPersonContext   := PersonContext.MAX_RECORDS;
 		export unsigned2 MaxPilots          := 200;
-		export unsigned2 MaxProfLicense     := 100;
-		export unsigned2 MaxProperties      := 200;
+		export unsigned2 MaxProfLicense     := 1000;
+		export unsigned2 MaxProperties      := 1000;
 		export unsigned2 MaxStudent         := 100;
 		export unsigned2 MaxSSN             := 100;
 		export unsigned2 MaxSOffenders      := 200;
 		export unsigned2 MaxUCCFilings      := 1000;
-		export unsigned2 MaxThrive          := 1000;
+		export unsigned2 MaxThrive          := 250;
 		export unsigned2 MaxWatercrafts     := 1000;
 	end;
 

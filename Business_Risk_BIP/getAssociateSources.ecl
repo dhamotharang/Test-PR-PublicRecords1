@@ -1,4 +1,4 @@
-IMPORT BankruptcyV3, BIPV2, Business_Risk_BIP, Data_Services, Doxie_Files, EASI, Liensv2, MDR, PAW, Risk_Indicators, RiskWise, UT;
+﻿IMPORT BankruptcyV3, BIPV2, Business_Risk_BIP, Data_Services, Doxie_Files, EASI, Liensv2, LN_PropertyV2, MDR, PAW, Risk_Indicators, RiskWise, UT;
 
 EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -33,13 +33,16 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 									RIGHT.criminal_offender_level='4' AND RIGHT.offense_score='F' AND 
 									(((UNSIGNED3)(RIGHT.Earliest_Offense_Date[1..6]) < LEFT.HistoryDate AND (UNSIGNED)RIGHT.Earliest_Offense_Date > 0) OR 
 									((UNSIGNED)RIGHT.Earliest_Offense_Date = 0 AND  (UNSIGNED)RIGHT.Offense.Arr_Date[1..6] < LEFT.HistoryDate AND (UNSIGNED)RIGHT.Offense.Arr_Date > 0)), 
-											TRANSFORM({RECORDOF(LEFT), UNSIGNED3 FelonyCount},
-														SELF.FelonyCount := IF(RIGHT.Criminal_Offender_Level = '4' AND RIGHT.Offense_Score = 'F', 1, 0);
+											TRANSFORM({RECORDOF(LEFT), UNSIGNED3 FelonyCount, UNSIGNED3 CurrentAssociateFelonyCount},
+														IsFelony := RIGHT.Criminal_Offender_Level = '4' AND RIGHT.Offense_Score = 'F';
+														SELF.FelonyCount := IF(IsFelony, 1, 0);
+														SELF.CurrentAssociateFelonyCount := IF(IsFelony AND LEFT.IsCurrent, 1, 0);
 														SELF := LEFT),
 											LEFT OUTER, ATMOST(100));
 	
 	OffenderRolled := ROLLUP(SORT(OffenderRaw, Seq, DID), LEFT.Seq = RIGHT.Seq AND LEFT.DID = RIGHT.DID, TRANSFORM(RECORDOF(LEFT),
 														SELF.FelonyCount := LEFT.FelonyCount + RIGHT.FelonyCount;
+														SELF.CurrentAssociateFelonyCount := LEFT.CurrentAssociateFelonyCount + RIGHT.CurrentAssociateFelonyCount;
 														SELF := LEFT));
 	
 	// Count the number of associates per Seq, Sum up how many total felonies those associate have, and count how many associates have felonies
@@ -47,12 +50,14 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		{Seq,
 		UNSIGNED8 Associates := COUNT(GROUP),
 		UNSIGNED8 AssociateFelonyCount := SUM(GROUP, FelonyCount),
-		UNSIGNED8 AssociateCountWithFelony := COUNT(GROUP, FelonyCount >= 1)
+		UNSIGNED8 AssociateCountWithFelony := COUNT(GROUP, FelonyCount >= 1),
+		UNSIGNED8 AssociateCurrentCountWithFelony := COUNT(GROUP, CurrentAssociateFelonyCount >=1)
 		},
 		Seq);
 	withOffender := JOIN(withEASI, OffenderStats, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 			SELF.Associates.AssociateFelonyCount := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateFelonyCount, -1, 999999), '-1');
 			SELF.Associates.AssociateCountWithFelony := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateCountWithFelony, -1, 999999), '-1');
+			SELF.Associates.AssociateCurrentCountWithFelony := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateCurrentCountWithFelony, -1, 999999), '-1');
 			SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(100), FEW, PARALLEL);
 	
 	// ----- Bankruptcy -----
@@ -67,11 +72,15 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 															
 	BankruptcyRaw := JOIN(BankruptcyTMSID, BankruptcyV3.key_bankruptcyv3_search_full_bip(), LEFT.BK_TMSID <> '' AND KEYED(LEFT.BK_TMSID = RIGHT.TMSID) AND
 												RIGHT.Name_Type = 'D' AND (UNSIGNED)RIGHT.DID = LEFT.DID AND (UNSIGNED)(RIGHT.Date_Filed[1..6]) < LEFT.HistoryDate AND (UNSIGNED)RIGHT.Date_Filed > 0,
-											TRANSFORM({RECORDOF(LEFT), UNSIGNED3 BankruptcyCount, UNSIGNED3 BankruptcyCount1Year},
+											TRANSFORM({RECORDOF(LEFT), UNSIGNED3 BankruptcyCount, UNSIGNED3 BankruptcyCount1Year, UNSIGNED3 CurrentAssociateBankruptcyCount},
 															DismissedBankruptcy := StringLib.StringToUpperCase(RIGHT.disposition) = 'DISMISSED';
 															TodaysDate := Business_Risk_BIP.Common.todaysDate(BkBuildDate, LEFT.HistoryDate);
-															SELF.BankruptcyCount := IF(DismissedBankruptcy = FALSE AND RIGHT.TMSID <> '', 1, 0);
-															SELF.BankruptcyCount1Year := IF(DismissedBankruptcy = FALSE AND RIGHT.TMSID <> '' AND UT.DaysApart(TodaysDate, RIGHT.Date_Filed) <= Business_Risk_BIP.Constants.OneYear, 1, 0);
+															IsBankruptcy := DismissedBankruptcy = FALSE AND RIGHT.TMSID <> ''
+                                              AND (Options.BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30 OR
+                                                     UT.DaysApart(TodaysDate, RIGHT.Date_Filed) <= ut.DaysInNYears(10));
+															SELF.BankruptcyCount := IF(IsBankruptcy, 1, 0);
+															SELF.BankruptcyCount1Year := IF(IsBankruptcy AND UT.DaysApart(TodaysDate, RIGHT.Date_Filed) <= Business_Risk_BIP.Constants.OneYear, 1, 0);
+															SELF.CurrentAssociateBankruptcyCount := IF(IsBankruptcy AND LEFT.IsCurrent, 1, 0);
 															SELF := LEFT), LEFT OUTER, KEEP(100), ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 	
 	BankruptcyRawUnique := DEDUP(SORT(BankruptcyRaw, Seq, DID, BK_TMSID, Case_Num), Seq, DID, BK_TMSID, Case_Num);
@@ -79,6 +88,7 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	BankruptcyRolled := ROLLUP(SORT(BankruptcyRawUnique, Seq, DID), LEFT.Seq = RIGHT.Seq AND LEFT.DID = RIGHT.DID, TRANSFORM(RECORDOF(LEFT), 
 															SELF.BankruptcyCount := LEFT.BankruptcyCount + RIGHT.BankruptcyCount;
 															SELF.BankruptcyCount1Year := LEFT.BankruptcyCount1Year + RIGHT.BankruptcyCount1Year;
+															SELF.CurrentAssociateBankruptcyCount := LEFT.CurrentAssociateBankruptcyCount + RIGHT.CurrentAssociateBankruptcyCount;
 															SELF := LEFT));
 	
 	// Count the number of associates per Seq, Sum up how many total bankruptcies those associate have, how many total bankruptcies those associates have in the past year, and count how many associates have bankruptcies
@@ -86,14 +96,20 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		{Seq,
 		UNSIGNED8 Associates := COUNT(GROUP),
 		UNSIGNED8 AssociateBankruptcyCount := SUM(GROUP, BankruptcyCount),
+    // In version 3.0 and up, AssociateBankruptcyCount1Year is a count of associates with bankruptcies.
+    // In previous versions, AssociateBankruptcyCount1Year is a count of bankruptcies associates have.
 		UNSIGNED8 AssociateBankruptcyCount1Year := SUM(GROUP, BankruptcyCount1Year),
-		UNSIGNED8 AssociateCountWithBankruptcy := COUNT(GROUP, BankruptcyCount >= 1)
+		UNSIGNED8 AssociateBankruptcyCount1Year_v30 := COUNT(GROUP, BankruptcyCount1Year >= 1),
+		UNSIGNED8 AssociateCountWithBankruptcy := COUNT(GROUP, BankruptcyCount >= 1),
+		UNSIGNED8 AssociateCurrentCountWithBankruptcy := COUNT(GROUP, CurrentAssociateBankruptcyCount >= 1)
 		},
 		Seq);
 	withBankruptcy := JOIN(withOffender, BankruptcyStats, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 			SELF.Associates.AssociateBankruptCount := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateBankruptcyCount, -1, 999999), '-1');
-			SELF.Associates.AssociateBankrupt1YearCount := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateBankruptcyCount1Year, -1, 999999), '-1');
+			AssociateBankrupt1YearCount := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, RIGHT.AssociateBankruptcyCount1Year_v30, RIGHT.AssociateBankruptcyCount1Year);
+      SELF.Associates.AssociateBankrupt1YearCount := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(AssociateBankrupt1YearCount, -1, 999999), '-1');
 			SELF.Associates.AssociateCountWithBankruptcy := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateCountWithBankruptcy, -1, 999999), '-1');
+			SELF.Associates.AssociateCurrentCountWithBankruptcy := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateCurrentCountWithBankruptcy, -1, 999999), '-1');
 			SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(100), FEW, PARALLEL);
 	
 	
@@ -117,7 +133,7 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 												(((UNSIGNED)(RIGHT.Orig_Filing_Date[1..6]) < LEFT.HistoryDate AND (UNSIGNED)RIGHT.Orig_Filing_Date > 0) 
 												OR ((UNSIGNED)RIGHT.Orig_Filing_Date = 0 AND (UNSIGNED)RIGHT.Process_Date[1..6] < LEFT.HistoryDate AND (UNSIGNED)RIGHT.Process_Date > 0)) AND
 												TRIM(StringLib.StringToUpperCase(RIGHT.Filing_Type_Desc)) NOT IN Risk_Indicators.iid_constants.set_Invalid_Liens_50, // Ignore certain Lien types - matches Consumer Shell 5.0
-											TRANSFORM({RECORDOF(LEFT), UNSIGNED3 LienCount, UNSIGNED3 JudgmentCount, STRING8 Orig_Filing_Date, STRING8 Release_Date},
+											TRANSFORM({RECORDOF(LEFT), UNSIGNED3 LienCount, UNSIGNED3 CurrentAssociateLienCount, UNSIGNED3 JudgmentCount, UNSIGNED3 CurrentAssociateJudgmentCount, STRING8 Orig_Filing_Date, STRING8 Release_Date},
 															FilingType := StringLib.StringToUpperCase(RIGHT.Filing_Type_Desc);
 															Type_Category := MAP(FilingType IN Risk_Indicators.iid_constants.set_Invalid_Liens_50	=> 'Invalid',
 																									 FilingType IN Risk_Indicators.iid_constants.setSuits           	=> 'Judgment',
@@ -138,8 +154,12 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																									 'Lien' // default
 																								 );
 															TodaysDate := Business_Risk_BIP.Common.todaysDate(LienBuildDate, LEFT.HistoryDate);
-															SELF.LienCount := IF(Type_Category = 'Lien' AND UT.DaysApart(TodaysDate, RIGHT.Orig_Filing_Date) <= UT.DaysInNYears(7), 1, 0);
-															SELF.JudgmentCount := IF(Type_Category = 'Judgment' AND UT.DaysApart(TodaysDate, RIGHT.Orig_Filing_Date) <= UT.DaysInNYears(7), 1, 0);
+															IsLien := Type_Category = 'Lien' AND UT.DaysApart(TodaysDate, RIGHT.Orig_Filing_Date) <= UT.DaysInNYears(7);
+															IsJudgment := Type_Category = 'Judgment' AND UT.DaysApart(TodaysDate, RIGHT.Orig_Filing_Date) <= UT.DaysInNYears(7);
+															SELF.LienCount := IF(IsLien, 1, 0);
+															SELF.CurrentAssociateLienCount := IF(IsLien AND LEFT.IsCurrent, 1, 0);
+															SELF.JudgmentCount := IF(IsJudgment, 1, 0);
+															SELF.CurrentAssociateJudgmentCount := IF(IsJudgment AND LEFT.IsCurrent, 1, 0);
 															SELF.Orig_Filing_Date := RIGHT.Orig_Filing_Date;
 															SELF.Release_Date := MAP(((INTEGER)RIGHT.release_date[1..6]) <= LEFT.HistoryDate	=> RIGHT.release_date,
 																																																									 Business_Risk_BIP.Constants.MissingDate);
@@ -148,13 +168,17 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Get the "best" count per TMSID
 	LienJudgmentRolledTMSID := ROLLUP(SORT(LienJudgmentRaw, Seq, DID, TMSID, -Orig_Filing_Date, -Release_Date), LEFT.Seq = RIGHT.Seq AND LEFT.DID = RIGHT.DID AND LEFT.TMSID = RIGHT.TMSID, TRANSFORM(RECORDOF(LEFT), 
 															SELF.LienCount := MAX(LEFT.LienCount, RIGHT.LienCount); // Only keep 1 Lien count per TMSID, thus MAX instead of adding together
+															SELF.CurrentAssociateLienCount := MAX(LEFT.CurrentAssociateLienCount, RIGHT.CurrentAssociateLienCount); // Only keep 1 Lien count per TMSID, thus MAX instead of adding together
 															SELF.JudgmentCount := MAX(LEFT.JudgmentCount, RIGHT.JudgmentCount); // Only keep 1 Judgment count per TMSID, thus MAX instead of adding together
+															SELF.CurrentAssociateJudgmentCount := MAX(LEFT.CurrentAssociateJudgmentCount, RIGHT.CurrentAssociateJudgmentCount); // Only keep 1 Judgment count per TMSID, thus MAX instead of adding together
 															SELF := LEFT));
 	
 	// Get the count per DID
 	LienJudgmentRolled := ROLLUP(SORT(LienJudgmentRolledTMSID, Seq, DID), LEFT.Seq = RIGHT.Seq AND LEFT.DID = RIGHT.DID, TRANSFORM(RECORDOF(LEFT), 
 															SELF.LienCount := LEFT.LienCount + RIGHT.LienCount;
+															SELF.CurrentAssociateLienCount := LEFT.CurrentAssociateLienCount + RIGHT.CurrentAssociateLienCount;
 															SELF.JudgmentCount := LEFT.JudgmentCount + RIGHT.JudgmentCount;
+															SELF.CurrentAssociateJudgmentCount := LEFT.CurrentAssociateJudgmentCount + RIGHT.CurrentAssociateJudgmentCount;
 															SELF := LEFT));
 	
 	// Count the number of associates per Seq, Sum up how many total Liens/Judgments those associate have, and count how many associates have Liens/Judgments
@@ -163,15 +187,19 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		UNSIGNED8 Associates := COUNT(GROUP),
 		UNSIGNED8 AssociateLienCount := SUM(GROUP, LienCount),
 		UNSIGNED8 AssociateCountWithLien := COUNT(GROUP, LienCount >= 1),
+		UNSIGNED8 AssociateCurrentCountWithLien := COUNT(GROUP, CurrentAssociateLienCount >= 1),
 		UNSIGNED8 AssociateJudgmentCount := SUM(GROUP, JudgmentCount),
-		UNSIGNED8 AssociateCountWithJudgment := COUNT(GROUP, JudgmentCount >= 1)
+		UNSIGNED8 AssociateCountWithJudgment := COUNT(GROUP, JudgmentCount >= 1),
+		UNSIGNED8 AssociateCurrentCountWithJudgment := COUNT(GROUP, CurrentAssociateJudgmentCount >= 1)
 		},
 		Seq);
 	withLienJudgment := JOIN(withBankruptcy, LienJudgmentStats, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 			SELF.Associates.AssociateLienCount := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateLienCount, -1, 999999), '-1');
 			SELF.Associates.AssociateCountWithLien := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateCountWithLien, -1, 999999), '-1');
+			SELF.Associates.AssociateCurrentCountWithLien := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateCurrentCountWithLien, -1, 999999), '-1');
 			SELF.Associates.AssociateJudgmentCount := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateJudgmentCount, -1, 999999), '-1');
 			SELF.Associates.AssociateCountWithJudgment := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateCountWithJudgment, -1, 999999), '-1');
+			SELF.Associates.AssociateCurrentCountWithJudgment := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateCurrentCountWithJudgment, -1, 999999), '-1');
 			SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(100), FEW, PARALLEL);
 	
 	
@@ -276,15 +304,19 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		{Seq,
 		 DID,
 		 UNSIGNED8 UniqueBusinessRecords := COUNT(GROUP, UltID > 0 AND OrgID > 0 AND SeleID > 0 AND ProxID > 0 AND PowID > 0),
-		 UNSIGNED8 Contact_ID := MAX(GROUP, Contact_ID)
-		 },
+		 //UNSIGNED8 CurrentAssociateUniqueBusinessRecords := COUNT(GROUP, UltID > 0 AND OrgID > 0 AND SeleID > 0 AND ProxID > 0 AND PowID > 0 AND IsCurrent),
+		 UNSIGNED8 Contact_ID := MAX(GROUP, Contact_ID),
+		 BOOLEAN	 IsCurrent := MAX(GROUP, IsCurrent)
+		},
 		 Seq, DID, UltID);
 		 
 	PAWUniqueBusinessCounts := TABLE(PAWUniqueBusinessRecords,
 		{Seq,
 		DID,
 		UNSIGNED8 UniqueBusinesses := COUNT(GROUP, UniqueBusinessRecords >= 1),
-		UNSIGNED8 Contact_ID := MAX(GROUP, Contact_ID)
+		//UNSIGNED8 CurrentAssociateUniqueBusinesses := COUNT(GROUP, CurrentAssociateUniqueBusinessRecords >= 1),
+		UNSIGNED8 Contact_ID := MAX(GROUP, Contact_ID),
+		BOOLEAN		IsCurrent := MAX(GROUP, IsCurrent)
 		},
 		Seq, DID);
 	
@@ -293,13 +325,17 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		{Seq,
 		UNSIGNED8 Associates := COUNT(GROUP),
 		UNSIGNED8 AssociatePAWCount := COUNT(GROUP, Contact_ID > 0),
-		UNSIGNED8 AssociateBusinessCount := SUM(GROUP, UniqueBusinesses)
+		UNSIGNED8 AssociateCurrentPAWCount := COUNT(GROUP, Contact_ID > 0 AND IsCurrent),
+		UNSIGNED8 AssociateBusinessCount := SUM(GROUP, UniqueBusinesses),
+		UNSIGNED8 AssociateCurrentBusinessCount := SUM(GROUP, UniqueBusinesses, IsCurrent)
 		},
 		Seq);
 	
 	withPAW := JOIN(watchlistRisk, PAWStats, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 			SELF.Associates.AssociateBusinessCount := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateBusinessCount, -1, 999999), '-1');
+			SELF.Associates.AssociateCurrentBusinessCount := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateCurrentBusinessCount, -1, 999999), '-1');			
 			SELF.Associates.AssociatePAWCount := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociatePAWCount, -1, 999999), '-1');
+			SELF.Associates.AssociateCurrentPAWCount := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateCurrentPAWCount, -1, 999999), '-1');
 			SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(100), FEW, PARALLEL);
 
 	
@@ -313,7 +349,28 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			SELF.Associates.AssociateCountyCount := IF(associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(COUNT(matchingCounty), -1, 999999), '-1');
 			SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(100), FEW, PARALLEL);
 
+	// ----- Property Ownership -----
+	OwnershipKey := LN_PropertyV2.key_ownership_did(FALSE /*isFCRA*/);
 	
+	PropertyOwnership := JOIN(seqContactInfo, OwnershipKey, LEFT.DID > 0 AND LEFT.IsCurrent AND KEYED(LEFT.DID = RIGHT.DID) AND
+			(INTEGER)(((STRING)RIGHT.dt_first_seen)[1..6]) < LEFT.HistoryDate, TRANSFORM({RECORDOF(LEFT), BOOLEAN IsPropertyOwner},
+									SELF.IsPropertyOwner := RIGHT.DID > 0;
+									SELF := LEFT),
+			LEFT OUTER, KEEP(100), ATMOST(Business_Risk_BIP.Constants.Limit_Default));		
+
+	Properties := DEDUP(SORT(PropertyOwnership, Seq, DID, -IsPropertyOwner), Seq, DID);
+	
+	PropertyOwnershipStats := TABLE(Properties, 		
+		{Seq,
+		UNSIGNED8 Associates := COUNT(GROUP),
+		UNSIGNED8 AssociateCurrentCountWithProperty := COUNT(GROUP, IsPropertyOwner)
+		},
+		Seq);
+		
+	withPropertyOwnership := JOIN(withCityCountyCounts, PropertyOwnershipStats, LEFT.Seq = RIGHT.Seq, TRANSFORM(Business_Risk_BIP.Layouts.Shell,
+			SELF.Associates.AssociateCurrentCountWithProperty := IF(RIGHT.Associates >= MinAssociatesNeededToCalculate, (STRING)Business_Risk_BIP.Common.capNum(RIGHT.AssociateCurrentCountWithProperty, -1, 999999), '-1');;
+			SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(100), FEW, PARALLEL);
+
   // *********************
 	//   DEBUGGING OUTPUTS
 	// *********************
@@ -348,6 +405,8 @@ EXPORT getAssociateSources(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// OUTPUT(CHOOSEN(PAWStats, 100), NAMED('Sample_PAWStats'));
 	// OUTPUT(CHOOSEN(withPAW, 100), NAMED('Sample_withPAW'));
 	// OUTPUT(CHOOSEN(withCityCountyCounts, 100), NAMED('Sample_withCityCountyCounts'));
-	
-	RETURN withCityCountyCounts;
+	// OUTPUT(CHOOSEN(PropertyOwnershipStats, 100), NAMED('Sample_PropertyOwnershipStats'));
+	// OUTPUT(CHOOSEN(withPropertyOwnership, 100), NAMED('Sample_withPropertyOwnership'));
+
+	RETURN withPropertyOwnership;
 END;

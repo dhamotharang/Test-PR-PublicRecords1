@@ -64,15 +64,19 @@ EXPORT RawProperty := MODULE
 	EXPORT layout_assessment_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
 		layout_assessment_raw RawData;
 		layout_addllegal_raw AddlLegalDescription;
+    STRING4 assessed_value_year;  // for assessment sorting
 	END;
 	
 	EXPORT layout_deed_out := RECORD(ConsumerDisclosure.Layouts.Metadata)
 		layout_deed_raw RawData;
 		DATASET(layout_addlnames_raw) AdditionalNames;
+    STRING8 contract_date;        // for deed sorting
 	END;
 	
 	EXPORT layout_property_out := RECORD
     STRING50 ln_fares_id;
+    STRING8 contract_date;        // for DEED sorting
+    STRING4 assessed_value_year;  // for assessment sorting
 		BOOLEAN isOwnedBySubject := FALSE;
 		DATASET(layout_property_search_out) Search;
 		DATASET(layout_assessment_out) Assessment;
@@ -225,7 +229,8 @@ EXPORT RawProperty := MODULE
 																				LEFT.subject_did, 
 																				FFD.Constants.DataGroups.ASSESSMENT),
 																		SELF.AddlLegalDescription := LEFT.AddlLegalDescription,			
-																		SELF.RawData := LEFT			
+                                    SELF.assessed_value_year := LEFT.assessed_value_year,
+																		SELF.RawData := LEFT
 																	));			
 
 	//-------deed-----------
@@ -315,6 +320,7 @@ EXPORT RawProperty := MODULE
 																				FFD.Constants.DataGroups.DEED
 																			),
 																		SELF.AdditionalNames := LEFT.AdditionalNames,			
+																		SELF.contract_date := LEFT.contract_date,			
 																		SELF.RawData := LEFT			
 																		));			
 
@@ -428,7 +434,7 @@ EXPORT RawProperty := MODULE
 		layout_property_out xfAddSearch(layout_property_out le, 
 												DATASET(layout_property_search_out) ri) := 
 		TRANSFORM
-			SELF.Search := ri;
+			SELF.Search := SORT(ri, -dt_last_seen, -dt_first_seen);
 			SELF := le;
 		END;
 			
@@ -439,7 +445,8 @@ EXPORT RawProperty := MODULE
 
 		layout_property_out xfAddAssessment(layout_property_out le, DATASET(layout_assessment_out) ri) := 
 		TRANSFORM
-			SELF.Assessment := ri;
+			SELF.Assessment := SORT(ri, -assessed_value_year);
+			SELF.assessed_value_year := MAX(ri, ri.assessed_value_year);  // for sorting assessment records
 			SELF := le;
 		END;
 			
@@ -450,7 +457,8 @@ EXPORT RawProperty := MODULE
 												
 		layout_property_out xfAddDeed(layout_property_out le, DATASET(layout_deed_out) ri) := 
 		TRANSFORM
-			SELF.Deed := ri;
+			SELF.Deed := SORT(ri, -contract_date);
+			SELF.contract_date := MAX(ri, ri.contract_date);  // for sorting deed records
 			SELF := le;
 		END;
 			
@@ -460,7 +468,7 @@ EXPORT RawProperty := MODULE
 																		xfAddDeed(LEFT, ROWS(RIGHT)));		
 												
 
-		recs_out := prelim_recs_out(EXISTS(Deed) OR EXISTS(Assessment) OR EXISTS(Search));	
+		recs_out := prelim_recs_out(EXISTS(Deed) OR EXISTS(Assessment));	
 			
 												
 		IF(ConsumerDisclosure.Debug AND in_mod.IncludeProperties, OUTPUT(id_recs, NAMED('property_search_ids')));

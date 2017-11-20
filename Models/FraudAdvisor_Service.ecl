@@ -186,7 +186,7 @@ Risk_indicators.MAC_unparsedfullname(title_val,first_value,middle_value,last_val
 	string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
 
 	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__FraudAdvisor_Service);
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__FraudAdvisor_Service);
 /* ************* End Scout Fields **************/
 
 unsigned6 did_value := 0          : stored('DID');

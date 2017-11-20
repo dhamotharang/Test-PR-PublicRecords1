@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Risk_BIP, MDR, OSHAIR, UT;
+﻿IMPORT BIPV2, Business_Risk_BIP, MDR, OSHAIR, UT;
 
 EXPORT getOSHA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -29,6 +29,7 @@ EXPORT getOSHA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateVendorFirstSeen := Business_Risk_BIP.Common.groupMinDate6(inspection_close_date, HistoryDate),
 			 STRING6 DateLastSeen := Business_Risk_BIP.Common.groupMaxDate6(inspection_close_date, HistoryDate),
 			 STRING6 DateVendorLastSeen := Business_Risk_BIP.Constants.MissingDate,
+			 BOOLEAN PrivateOwnership := COUNT(GROUP, TRIM(own_type_desc) = 'PRIVATE') > 0;
 			 UNSIGNED4 RecordCount := COUNT(GROUP)
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
@@ -37,11 +38,13 @@ EXPORT getOSHA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Rollup the dates first/last seen into child datasets by Seq
 	tempLayout := RECORD
 		UNSIGNED4 Seq;
+		UNSIGNED OwnershipType;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) Sources;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSICNAIC) SICNAICSources;
 	END;
 	OSHAStatsTemp := PROJECT(OSHAStats, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
+																				SELF.OwnershipType := IF(LEFT.PrivateOwnership, 2, 0);
 																				SELF.Sources := DATASET([{LEFT.Source, 
 																																	IF(LEFT.DateFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateFirstSeen), 
 																																	IF(LEFT.DateVendorFirstSeen = Business_Risk_BIP.Constants.NinesDate, Business_Risk_BIP.Constants.MissingDate, LEFT.DateVendorFirstSeen), 																																	
@@ -49,10 +52,16 @@ EXPORT getOSHA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources);
 																				SELF := []));
-	OSHAStatsRolled := ROLLUP(OSHAStatsTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.Sources := LEFT.Sources + RIGHT.Sources; SELF := LEFT));
+	OSHAStatsRolled := ROLLUP(OSHAStatsTemp, LEFT.Seq = RIGHT.Seq, 
+																	TRANSFORM(tempLayout, 
+																							SELF.Seq := LEFT.Seq; 
+																							SELF.OwnershipType := MAX(LEFT.OwnershipType, RIGHT.OwnershipType);
+																							SELF.Sources := LEFT.Sources + RIGHT.Sources; 
+																							SELF := LEFT));
 	
 	withOSHAStats := JOIN(Shell, OSHAStatsRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
+																							SELF.Firmographic.OwnershipType := (STRING)RIGHT.OwnershipType;
 																							SELF.Sources := RIGHT.Sources;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);

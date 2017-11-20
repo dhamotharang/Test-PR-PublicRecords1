@@ -1,6 +1,7 @@
-export AdditionalEvents_BatchService_Records(	dataset(layout_bkevents_in) ds_in,
+﻿import Banko;
+export AdditionalEvents_BatchService_Records(	dataset(Banko.layout_bkevents_in) ds_in,
 																							boolean isFCRA = false, 
-																							search_type = Constants.search_type_code.CASECOURT,
+																							search_type = Banko.Constants.search_type_code.CASECOURT,
 																							boolean returnUncategorizedEvents = false) 
 := function
 	
@@ -32,24 +33,25 @@ export AdditionalEvents_BatchService_Records(	dataset(layout_bkevents_in) ds_in,
 	
 	/*	get results from defined search type	*/
 	ds_out := case(search_type,
-							Constants.search_type_code.CASECOURT => 
+							Banko.Constants.search_type_code.CASECOURT => 
 														join(	ds_in, 
 																	k_evts, 
-																	keyed(left.casekey = right.casekey and left.court_code = right.court_code)
+																	keyed(left.casekey <> '' and left.casekey = right.casekey 
+																		and left.court_code <> '' and left.court_code = right.court_code)
 																		and other_join_options(),
 																	xfm_join(left, right),
 																	limit(Banko.Constants.BkEvents.JOIN_LIMIT, skip)),
-							Constants.search_type_code.TMSID			=> 
+							Banko.Constants.search_type_code.TMSID			=> 
 														join(	ds_in,
 																	k_evts, 
-																	keyed(left.tmsid[8.. ] = right.casekey and left.tmsid[3..7] = right.court_code)
+																	keyed(left.tmsid <> '' and left.tmsid[8.. ] = right.casekey and left.tmsid[3..7] = right.court_code)
 																		and other_join_options(),
 																	xfm_join(left, right),
 																	limit(Banko.Constants.BkEvents.JOIN_LIMIT, skip)),
-							Constants.search_type_code.CASEID		=> 
+							Banko.Constants.search_type_code.CASEID		=> 
 														join(	ds_in, 
 																	k_evts, 
-																	keyed(left.caseid = right.caseid) and wild(right.casekey) and wild(right.court_code)
+																	keyed(left.caseid <> '' and left.caseid = right.caseid) and wild(right.casekey) and wild(right.court_code)
 																		and other_join_options(),
 																	xfm_join(left, right),
 																	limit(Banko.Constants.BkEvents.JOIN_LIMIT, skip)));

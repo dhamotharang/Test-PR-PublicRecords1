@@ -1,4 +1,4 @@
-/*2016-03-22T01:30:53Z (Michele Walklin)
+﻿/*2016-03-22T01:30:53Z (Michele Walklin)
 for review
 */
 import iesp, Risk_Indicators, Fingerprint, ut, Gateway, codes, iesp;
@@ -32,6 +32,8 @@ gateway_cfg  := gateways(Gateway.Configuration.IsBridgerwlc(servicename))[1];
 //Build dataset to pass to XG5 containing one record but has all records (batch or XML) within the 'EntityRecords' nested dataset			
 iesp.WsSearchCore.t_SearchRequest into_req(Risk_Indicators.iid_constants.ds_Record le) := transform
 
+	self.user.ReferenceCode		:= gateway_cfg.TransactionId;
+	
 	self.Config.DataFiles := project(fileToSearchDedup, transform(iesp.WsSearchCore.t_ConfigDataFile,
 			self.Name  := left.dbname;
 			self.MinScore  := threshold_value;

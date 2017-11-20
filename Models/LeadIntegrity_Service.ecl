@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Lead Integrity Service">
 	<part name="LeadIntegrityRequest" type="tns:XmlDataSet" cols="110" rows="75"/>
   <part name="DataRestrictionMask" type="xsd:string"/>
@@ -110,7 +110,7 @@ EXPORT LeadIntegrity_Service := MACRO
 	#stored('DisableBocaShellLogging', DisableOutcomeTracking);
 
 	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__LeadIntegrity_Service);
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__LeadIntegrity_Service);
 /* ************* End Scout Fields **************/
 
 /* ***************************************

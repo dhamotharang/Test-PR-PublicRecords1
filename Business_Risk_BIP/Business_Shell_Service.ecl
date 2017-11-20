@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Business_Shell_Service" wuTimeout="300000">
 	<part name="Seq" type="xsd:integer"/>
 	<part name="AcctNo" type="xsd:string"/>
@@ -224,6 +224,8 @@
 	<part name="Rep5_Email" type="xsd:string"/>
 	<part name="Rep5_LexID" type="xsd:integer"/>
   <part name="Rep5_BusinessTitle" type="xsd:string"/>
+
+ <part name="CorteraRetrotestRecords" type="tns:XmlDataSet" cols="110" rows="75"/>
 	
 	<!-- Option Fields --> 
 	<part name="DPPA_Purpose" type="xsd:integer"/>
@@ -251,12 +253,13 @@
 	<part name="RunTargusGatewayAnywayForTesting" type="xsd:boolean"/>
 	<part name="OverrideExperianRestriction" type="xsd:boolean"/>
 	<part name="IncludeAuthRepInBIPAppend" type="xsd:boolean"/>
+	<part name="CorteraRetrotest" type="xsd:boolean"/>
 </message>
 */
 /*--INFO-- Business Shell Service - This is the XML Service utilizing BIP linking. */
 
 #option('expandSelectCreateRow', true);
-IMPORT Business_Risk_BIP, Gateway, iesp, UT;
+IMPORT Business_Risk_BIP, Cortera, Gateway, iesp, UT;
 
 EXPORT Business_Shell_Service() := FUNCTION
 	/* ************************************************************************
@@ -731,6 +734,9 @@ EXPORT Business_Shell_Service() := FUNCTION
 	STRING100	Rep5_Email            := '' : STORED('Rep5_Email');
 	UNSIGNED6	Rep5_LexID            := 0  : STORED('Rep5_LexID');
 	STRING50			Rep5_BusinessTitle  := ''  : STORED('Rep5_BusinessTitle');
+  
+ ds_CorteraRetrotestRecsRaw := DATASET([], Cortera.layout_Retrotest_raw) : STORED('CorteraRetrotestRecords', FEW);
+
 	// Option Fields
 	UNSIGNED1	DPPA_Purpose         := Business_Risk_BIP.Constants.Default_DPPA : STORED('DPPA_Purpose');
 	UNSIGNED1	GLBA_Purpose         := Business_Risk_BIP.Constants.Default_GLBA : STORED('GLBA_Purpose');
@@ -757,6 +763,7 @@ EXPORT Business_Shell_Service() := FUNCTION
 	BOOLEAN RunTargusGateway       := FALSE : STORED('RunTargusGatewayAnywayForTesting');
 	BOOLEAN OverrideExperianRestriction := FALSE : STORED('OverrideExperianRestriction');
 	BOOLEAN IncludeAuthRepInBIPAppend := FALSE : STORED('IncludeAuthRepInBIPAppend');
+	BOOLEAN CorteraRetrotest := FALSE : STORED('CorteraRetrotest');
 	
 	Gateways := Gateway.Configuration.Get();	// Gateways Coded in this Product: Targus
 
@@ -1017,7 +1024,10 @@ EXPORT Business_Shell_Service() := FUNCTION
 																																 Gateways,
 																																 RunTargusGateway, /* for testing purposes only */
 																																 OverrideExperianRestriction,
-																																 IncludeAuthRepInBIPAppend);
+																																 IncludeAuthRepInBIPAppend,
+																																 FALSE,
+                                                                 CorteraRetrotest,
+																																 ds_CorteraRetrotestRecsRaw);
 	
 	Final_Results := PROJECT(Shell_Results, TRANSFORM(Business_Risk_BIP.Layouts.OutputLayout, SELF := LEFT));
 

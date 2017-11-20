@@ -42,8 +42,13 @@ EXPORT Constants := MODULE
 	EXPORT BusShellVersion_v20					:= 20; // Business Shell v2.0: Original business shell and original SBFE attributes
 	EXPORT BusShellVersion_v21					:= 21; // Business Shell v2.1: Business Shell with SBFE enhancement attributes. This is what SBA uses.
 	EXPORT BusShellVersion_v22					:= 22; // Business Shell v2.2: Business Shell with SBFE enhancement attributes and Business Shell Enhancement attributes.
-	
-	
+	EXPORT BusShellVersion_v30					:= 30; // Business Shell v3.0: Business Shell v2.2 with Cortera data and enhancement attributes.
+
+	EXPORT RESTRICTED_SET := ['0',''];
+	EXPORT BVI_NOHIT_VALUES := ['','0'];
+	EXPORT BVI_DESC_KEY_NOHIT_VALUES := ['311','411','412'];
+	EXPORT SUPPRESSABLE_RISK_CODES := ['10','11','12','13','14','15','16','18','23','24','25','29','36','38','39','40','41','42','47','48','49','50'];
+
 	EXPORT Default_MarketingMode				:= 0; // Default to OFF.  When ON (> 0) this disables several shell sources
 	EXPORT Default_AllowedSources				:= ''; // Default to blank.  This allows for 'DNBDMI' data to be turned on, which can only be used for research purposes at the moment - NO CUSTOMERS CAN USE
 	EXPORT AllowDNBDMI									:= 'DNBDMI'; // This is what must be passed in under AllowedSources to turn on DNB DMI data
@@ -53,6 +58,7 @@ EXPORT Constants := MODULE
 	EXPORT NinesDate										:= '999999'; // Use this to ensure MIN(dates) works, set 0 dates to all 9's and then MIN.
 	EXPORT NinesDateTime								:= '999999999999'; // Same idea as above.
 	
+	EXPORT OneMonth											:= 30;
 	EXPORT TwoMonths										:= 61; // 60.83 days is approximately 2 months, rounded up to 61
 	EXPORT ThreeMonths									:= 92; // 91.31 days is approximately 3 months, rounded up to 92
 	EXPORT SixMonths										:= 183; // 182.63 days is approximately 6 months, rounded up to 183
@@ -367,6 +373,7 @@ EXPORT Constants := MODULE
 												{MDR.sourceTools.src_WV_Corporations,						'A'}, // CV
 												{MDR.sourceTools.src_WV_Hist_Corporations,			'A'}, // C!
 												{MDR.sourceTools.src_WY_Corporations,						'A'}, // CZ
+												{MDR.SourceTools.src_Cortera,										'A'}, // RR
 												{MDR.sourceTools.src_Dunn_Bradstreet,						'A'}, // D
 												{MDR.sourceTools.src_Dunn_Bradstreet_Fein,			'A'}, // DN
 												{MDR.sourceTools.src_EBR,												'A'}, // ER
@@ -566,5 +573,5 @@ EXPORT Constants := MODULE
 												{MDR.sourceTools.src_ZUtil_Work_Phone,					'C'}, // ZK
 												{MDR.sourceTools.src_Daily_ZUtilities,					'C'}, // ZU
 												{MDR.sourceTools.src_Vickers,										'C'}  // V
-														], Layout_AllowedSources);
+												], Layout_AllowedSources);
 end;

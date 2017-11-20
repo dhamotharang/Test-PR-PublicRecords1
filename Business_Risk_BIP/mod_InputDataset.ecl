@@ -1,5 +1,4 @@
-
-IMPORT Business_Risk_BIP, STD;
+﻿IMPORT Business_Risk_BIP, STD;
 
 EXPORT mod_InputDataset(DATASET(Business_Risk_BIP.Layouts.Input) ds_InputOrig, Business_Risk_BIP.LIB_Business_Shell_LIBIN Options) := 
 	MODULE
@@ -121,7 +120,7 @@ EXPORT mod_InputDataset(DATASET(Business_Risk_BIP.Layouts.Input) ds_InputOrig, B
 						SELF.Verification.AltNameMatchDateLastSeenList  := ri.Verification.NameMatchDateLastSeenList;
 						SELF.Verification.AltNameMatchSourceFSList      := ri.Verification.NameMatchSourceFSList;
 						SELF.Verification.AltNameMatchSourceLSList      := ri.Verification.NameMatchSourceLSList;
-
+						SELF.Verification.VerifiedConsumerAltName       := ri.Verification.VerifiedConsumerName;
 						SELF.Verification.AltNameMatchName := 
 								MAP(
 									TRIM(le.Input_Echo.CompanyName) = '' OR TRIM(ri.Input_Echo.CompanyName) = ''                     => '-1',
@@ -183,6 +182,8 @@ EXPORT mod_InputDataset(DATASET(Business_Risk_BIP.Layouts.Input) ds_InputOrig, B
 								(STRING)MAX( (INTEGER)le.Verification.bnas2, (INTEGER)ri.Verification.bnas2 );
 						SELF.Verification.bviindicator2 := 
 								(STRING)MAX( (INTEGER)le.Verification.bviindicator2, (INTEGER)ri.Verification.bviindicator2 );
+						SELF.Verification.BVI := 
+								(STRING)MAX( (INTEGER)le.Verification.BVI, (INTEGER)ri.Verification.BVI );
 						
 						SELF := le;
 
@@ -215,6 +216,12 @@ EXPORT mod_InputDataset(DATASET(Business_Risk_BIP.Layouts.Input) ds_InputOrig, B
 									IF( TRIM(LEFT.Input_Echo.AltCompanyName) != '', LEFT.Verification.VerInputAltNameDBA, '-1' );
 							SELF.Verification.VerWatchlistAltNameMatch := 
 									IF( TRIM(LEFT.Input_Echo.AltCompanyName) != '', LEFT.Verification.VerWatchlistAltNameMatch, '-1' );
+							SELF.Verification.bviindicator :=
+									IF( LEFT.Verification.bviindicator = '0', '00', LEFT.Verification.bviindicator );
+							SELF.Verification.bviindicator2 :=
+									IF( LEFT.Verification.bviindicator2 = '0', '00', LEFT.Verification.bviindicator2 );
+							SELF.Verification.BVI :=
+									IF( LEFT.Verification.BVI = '0', '00', LEFT.Verification.BVI );
 							SELF.Business_To_Person_Link.BusAddrPersonAltNameOverlap := 
 									IF( TRIM(LEFT.Input_Echo.AltCompanyName) != '', LEFT.Business_To_Person_Link.BusAddrPersonAltNameOverlap, '-1' );
 							SELF.SBFE.SBFEAltNameMatchDateFirstSeen :=

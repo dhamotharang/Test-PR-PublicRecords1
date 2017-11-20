@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="St. Cloud Main Service NP2O">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="account" type="xsd:string"/>
@@ -96,7 +96,7 @@ export RiskWiseMainNP2O := MACRO
 	string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
 
 	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.RiskWise__RiskWiseMainNP2O);
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.RiskWise__RiskWiseMainNP2O);
 /* ************* End Scout Fields **************/
 
 string4  tribCode_value := '' 		: stored('tribcode');
@@ -132,7 +132,7 @@ gateways_in := Gateway.Configuration.Get();
 productSet := ['np21','np22','np24','np25','np27','np31','np50','np60','np80','np81','np82','np90', 'np91', 'np92'];
 
 tribCode := StringLib.StringToLowerCase(tribCode_value);
-boolean Log_trib := tribcode in ['np21', 'np22', 'np31'];
+boolean Log_trib := tribcode in ['np21', 'np22'];
 
 targusGatewaySet := ['np21','np22','np24','np25','np27','np31','np50','np60','np80','np81','np82','np90', 'np91', 'np92'];
 attusSet := ['np80','np81','np82'];

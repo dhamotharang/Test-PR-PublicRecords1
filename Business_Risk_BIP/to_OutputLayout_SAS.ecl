@@ -1,4 +1,4 @@
-EXPORT to_OutputLayout_SAS( DATASET(Business_Risk_BIP.Layouts.OutputLayout) final_results ) := 
+﻿EXPORT to_OutputLayout_SAS( DATASET(Business_Risk_BIP.Layouts.OutputLayout) final_results ) := 
 	FUNCTION
 
 		MaxSASLength := 1000; // Max length for the list fields to be imported into SAS (Technically SAS can handle up to 32,767 - but modeling only wants 1,000 to help with speed of imports)
@@ -17,7 +17,7 @@ EXPORT to_OutputLayout_SAS( DATASET(Business_Risk_BIP.Layouts.OutputLayout) fina
 				RETURN IF( LENGTH(TRIM(str)) < len, str, str_trunc_list );
 			END;
 	
-		Business_Risk_BIP.Layouts.OutputLayout_SAS_v21 xfm_toOutputLayoutSAS(Business_Risk_BIP.Layouts.OutputLayout le)  :=
+		Business_Risk_BIP.Layouts_SAS.OutputLayout_SAS_v21 xfm_toOutputLayoutSAS(Business_Risk_BIP.Layouts.OutputLayout le)  :=
 			TRANSFORM
 				SELF.account := le.Input_Echo.acctno;
 				SELF.seq := le.Input_Echo.seq;
@@ -2633,7 +2633,7 @@ EXPORT to_OutputLayout_SAS( DATASET(Business_Risk_BIP.Layouts.OutputLayout) fina
 				SELF.dfi_FetchCodeWatercraft := le.Data_Fetch_Indicators.FetchCodeWatercraft;
 				SELF.dfi_FetchCodeYellowPages := le.Data_Fetch_Indicators.FetchCodeYellowPages;
 				
-			//	SELF := [];
+				SELF := [];
 			END;
 			
 		final_results_for_SAS := PROJECT( final_results, xfm_toOutputLayoutSAS(LEFT) );

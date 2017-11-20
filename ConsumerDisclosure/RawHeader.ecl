@@ -54,7 +54,12 @@ header_main_suppressions := join(flagged_hdr_suppressions, doxie.Key_fcra_Header
 												trim((string)right.did) + trim((string)right.rid) = trim(left.record_id) or // old way - retrieving corrected records from prior to 11/13/2012
 												trim( (string)right.persistent_record_id ) = trim(left.record_id)   // new way - using persistent_record_id
 											),
-										transform( recordof(doxie.Key_fcra_Header), self := right ),
+										transform( recordof(doxie.Key_fcra_Header), 
+											ssnToUse := IF(right.valid_ssn<>'M', right.ssn, '');	// if manufactured, then blank out
+											dobToUse := IF(right.valid_dob<>'M', right.dob, 0);	// if manufactured, then blank out
+											self.ssn := ssnToUse;
+											self.dob := dobToUse;
+											self := right),
 										LIMIT(0),KEEP(ConsumerDisclosure.Constants.Limits.MaxHeaderPerDID));	
 										
 header_suppressions := quick_header_suppressions + header_main_suppressions;
@@ -812,8 +817,8 @@ layout_header_internal xfmarksuppressed (layout_header_internal le, recordof(dox
 						le.head.postdir=ri.postdir and
 						le.head.unit_desig=ri.unit_desig and
 						le.head.sec_range=ri.sec_range and
-						le.head.ssn=ri.ssn and
-						le.head.dob=ri.dob;
+						(le.head.ssn=ri.ssn OR (le.head.ssn='' and le.head.valid_ssn='M') OR (ri.ssn='' and ri.valid_ssn='M')) and
+						(le.head.dob=ri.dob  OR (le.head.dob=0 and le.head.valid_dob='M') OR (ri.dob=0 and ri.valid_dob='M'));
 	self.compliance_flags.isSuppressed := is_suppressed;
 	self.isPropagatedCorrection := is_suppressed or le.isPropagatedCorrection;
 	self := le;
@@ -821,7 +826,7 @@ layout_header_internal xfmarksuppressed (layout_header_internal le, recordof(dox
 end;
 
 // identify any future header records with PII information that has been suppressed in a previous RID
-header_suppressions_ddp := dedup(sort(header_suppressions,did,fname,mname,lname,name_suffix,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,ssn,dob),
+header_suppressions_ddp := dedup(sort(header_suppressions,did,fname,mname,lname,name_suffix,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,ssn,dob,-valid_ssn,-valid_dob),
 																did,fname,mname,lname,name_suffix,prim_range,predir,prim_name,suffix,postdir,unit_desig,sec_range,ssn,dob);
 																
 header_recs_with_future_suppression := join(header_recs_temp, header_suppressions_ddp,
@@ -837,10 +842,10 @@ header_recs_with_future_suppression := join(header_recs_temp, header_suppression
 						left.head.postdir=right.postdir and
 						left.head.unit_desig=right.unit_desig and
 						left.head.sec_range=right.sec_range and
-						left.head.ssn=right.ssn and
-						left.head.dob=right.dob,
+						(left.head.ssn=right.ssn OR (left.head.ssn='' and left.head.valid_ssn='M') OR (right.ssn='' and right.valid_ssn='M') ) and
+						(left.head.dob=right.dob OR (left.head.dob=0 and left.head.valid_dob='M') OR (right.dob=0 and right.valid_dob='M') ), 
 						xfmarksuppressed(left, right), 
-						left outer, limit(0));  
+						left outer, limit(0), keep(1));  
 
 header_recs_suppressed := project(header_suppressions, 
 																	transform(layout_header_internal,

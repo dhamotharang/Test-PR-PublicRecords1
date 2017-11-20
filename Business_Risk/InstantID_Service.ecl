@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BocaBusinessInstantID">
 	<part name="_LoginID" type="xsd:string"/>
 	<part name="tribcode" 		type="xsd:string"/>
@@ -151,7 +151,7 @@ export InstantID_Service() := macro
 	string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
 
 	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Business_Risk__InstantID_Service);
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Business_Risk__InstantID_Service);
 /* ************* End Scout Fields **************/
 
 string4	tribcode_value		:= '' : stored('tribcode');
@@ -708,8 +708,8 @@ Deltabase_Logging_prep := project(final, transform(Risk_Reporting.Layouts.LOG_De
 																							 self.i_bus_city := city,
 																							 self.i_bus_state := state,
 																							 self.i_bus_zip := zip,
-																							 self.i_model_name_1 := model_url[1].parameters[1].value,
-																							 self.i_model_name_2 := '',
+																							 self.i_model_name_1 := 'BVI',
+																							 self.i_model_name_2 := 'CVI',
 																							 self.o_score_1    := (Integer)left.BVI, //bvi
 																							 self.o_reason_1_1 := left.PRI_1,
 																							 self.o_reason_1_2 := left.PRI_2,

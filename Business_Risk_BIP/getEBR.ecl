@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Risk_BIP, EBR, MDR, UT;
+﻿IMPORT BIPV2, Business_Risk_BIP, EBR, MDR, UT;
 
 EXPORT getEBR(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -32,7 +32,9 @@ EXPORT getEBR(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 STRING6 DateVendorLastSeen := Business_Risk_BIP.Constants.MissingDate,
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
 			 INTEGER FirmAgeEstablished := MAX(GROUP, (INTEGER)yrs_in_bus_actual),
-			 UNSIGNED8 FirmReportedSales := MAX(GROUP, (INTEGER)EBR.fFix_amount_codes(Sales_Actual)) // Because the data team botched the conversion process Sales_Actual contains characters, and rather than fix the data they created a function to translate the characters to the correct numbers
+       // For v30 and up, need to differentiate between 0 and '' for FirmReportedSales. Set missing records to -1.
+			 INTEGER FirmReportedSales := MAX(GROUP, IF(EBR.fFix_amount_codes(Sales_Actual) = '' AND Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30, -1, 
+                                          (INTEGER)EBR.fFix_amount_codes(Sales_Actual))) // Because the data team botched the conversion process Sales_Actual contains characters, and rather than fix the data they created a function to translate the characters to the correct numbers
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
 			 );
@@ -41,7 +43,7 @@ EXPORT getEBR(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	tempLayout := RECORD
 		UNSIGNED4 Seq;
 		INTEGER FirmAgeEstablished;
-		UNSIGNED8 FirmReportedSales;
+		INTEGER FirmReportedSales;
 		UNSIGNED4 RecordCount;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) Sources;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSICNAIC) SICNAICSources;

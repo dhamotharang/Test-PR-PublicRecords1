@@ -252,16 +252,16 @@ EXPORT RawLiens := MODULE
 														xfAddParties(LEFT, ROWS(RIGHT)));		
 
 			
-			IF(ConsumerDisclosure.Debug,OUTPUT(id_recs, NAMED('liens_id_recs')));
-			IF(ConsumerDisclosure.Debug,OUTPUT(liens_party_suppressed_recs, NAMED('liens_party_suppressed_recs')));
-			IF(ConsumerDisclosure.Debug,OUTPUT(liens_party_override_recs, NAMED('liens_party_override_recs')));
-			IF(ConsumerDisclosure.Debug,OUTPUT(liens_party_payload_recs, NAMED('liens_party_payload_recs')));
-			IF(ConsumerDisclosure.Debug,OUTPUT(main_suppressed_recs, NAMED('liens_main_suppressed_recs')));
-			IF(ConsumerDisclosure.Debug,OUTPUT(main_override_recs, NAMED('liens_main_override_recs')));
-			IF(ConsumerDisclosure.Debug,OUTPUT(main_payload_recs, NAMED('liens_main_payload_recs')));
-			IF(ConsumerDisclosure.Debug,OUTPUT(recs_out, NAMED('Liens_combined_recs')));
+			IF(ConsumerDisclosure.Debug AND in_mod.IncludeLiens,OUTPUT(id_recs, NAMED('liens_id_recs')));
+			IF(ConsumerDisclosure.Debug AND in_mod.IncludeLiens,OUTPUT(liens_party_suppressed_recs, NAMED('liens_party_suppressed_recs')));
+			IF(ConsumerDisclosure.Debug AND in_mod.IncludeLiens,OUTPUT(liens_party_override_recs, NAMED('liens_party_override_recs')));
+			IF(ConsumerDisclosure.Debug AND in_mod.IncludeLiens,OUTPUT(liens_party_payload_recs, NAMED('liens_party_payload_recs')));
+			IF(ConsumerDisclosure.Debug AND in_mod.IncludeLiens,OUTPUT(main_suppressed_recs, NAMED('liens_main_suppressed_recs')));
+			IF(ConsumerDisclosure.Debug AND in_mod.IncludeLiens,OUTPUT(main_override_recs, NAMED('liens_main_override_recs')));
+			IF(ConsumerDisclosure.Debug AND in_mod.IncludeLiens,OUTPUT(main_payload_recs, NAMED('liens_main_payload_recs')));
+			IF(ConsumerDisclosure.Debug AND in_mod.IncludeLiens,OUTPUT(recs_out, NAMED('Liens_combined_recs')));
 
-		RETURN SORT(recs_out(EXISTS(Parties)), -orig_filing_date, tmsid, rmsid);
+		RETURN SORT(recs_out(EXISTS(Parties)), -orig_filing_date, tmsid, rmsid, RECORD);
 	END;
 
 END;

@@ -120,19 +120,19 @@ EXPORT Transforms := MODULE
 	
 //----------Marriage-Divorce-------------
 	iesp.fcradataservice.t_FcraDataServiceMarriageDivMainData xfMDMain(
-										ConsumerDisclosure.RawMarriageDivorce.MD_main_out rec) := TRANSFORM
+										ConsumerDisclosure.RawMarriageDivorce.layout_MD_main_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec;
 	END;
 	
 	iesp.fcradataservice.t_FcraDataServiceMarriageDivPartyData xfMDParty(
-											ConsumerDisclosure.RawMarriageDivorce.MD_party_out rec) := TRANSFORM
+											ConsumerDisclosure.RawMarriageDivorce.layout_MD_party_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec;
 	END;
 	
 	EXPORT iesp.fcradataservice.t_FcraDataServiceMarriageDivData xformMDData(
-																				ConsumerDisclosure.RawMarriageDivorce.MD_out l) 
+																				ConsumerDisclosure.RawMarriageDivorce.layout_MD_out l) 
 	:= TRANSFORM
 		SELF.Main := PROJECT(l.Main, xfMDMain(LEFT));
 		SELF.Search := PROJECT(l.Parties, xfMDParty(LEFT));
@@ -141,19 +141,19 @@ EXPORT Transforms := MODULE
 	
 	//----------Pilot-------------
 	iesp.fcradataservice.t_FcraDataServicePilotRegistrationData xfPilotReg(
-										ConsumerDisclosure.RawPilot.Pilot_reg_out reg) := TRANSFORM
+										ConsumerDisclosure.RawPilot.layout_Pilot_reg_out reg) := TRANSFORM
 		SELF.MetaData := reg.MetaData;
 		SELF.RawData := reg;
 	END;
 	
 	iesp.fcradataservice.t_FcraDataServicePilotCertificateData xfPilotCert(
-											ConsumerDisclosure.RawPilot.Pilot_cert_out cert) := TRANSFORM
+											ConsumerDisclosure.RawPilot.layout_Pilot_cert_out cert) := TRANSFORM
 		SELF.MetaData := cert.MetaData;
 		SELF.RawData := cert;
 	END;
 	
 	EXPORT iesp.fcradataservice.t_FcraDataServicePilotData xformPilotData(
-																				ConsumerDisclosure.RawPilot.Pilot_out l) 
+																				ConsumerDisclosure.RawPilot.layout_Pilot_out l) 
 	:= TRANSFORM
 		SELF.Certificate := PROJECT(l.Certificate, xfPilotCert(LEFT));
 		SELF.Registration := PROJECT(l.Registration, xfPilotReg(LEFT));
@@ -197,19 +197,19 @@ EXPORT Transforms := MODULE
 	
 //----------SexOffenders-------------
 	iesp.fcradataservice.t_FcraDataServiceSOffenderMainData xformSOffenders(
-										ConsumerDisclosure.RawOffender.so_offender_out rec) := TRANSFORM
+										ConsumerDisclosure.RawOffender.layout_so_offender_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec;
 	END;
 	
 	iesp.fcradataservice.t_FcraDataServiceSOffenseData xformSOffenses(
-											ConsumerDisclosure.RawOffender.so_offense_out rec) := TRANSFORM
+											ConsumerDisclosure.RawOffender.layout_so_offense_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec;
 	END;
 	
 	EXPORT iesp.fcradataservice.t_FcraDataServiceSOData xformSexOffenderData(
-																				ConsumerDisclosure.RawOffender.SO_out l) 
+																				ConsumerDisclosure.RawOffender.layout_SO_out l) 
 	:= TRANSFORM
 		SELF.Main := PROJECT(l.Offenders, xformSOffenders(LEFT));
 		SELF.Offenses := PROJECT(l.Offenses, xformSOffenses(LEFT));
@@ -218,19 +218,19 @@ EXPORT Transforms := MODULE
 	
 //----------UCC-------------
 	iesp.fcradataservice.t_FcraDataServiceUCCMainData xformUCCMain(
-										ConsumerDisclosure.RawUCC.UCC_main_out rec) := TRANSFORM
+										ConsumerDisclosure.RawUCC.layout_UCC_main_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec;
 	END;
 	
 	iesp.fcradataservice.t_FcraDataServiceUCCPartyData xformUCCParty(
-											ConsumerDisclosure.RawUCC.UCC_party_out rec) := TRANSFORM
+											ConsumerDisclosure.RawUCC.layout_UCC_party_out rec) := TRANSFORM
 		SELF.MetaData := rec.MetaData;
 		SELF.RawData := rec;
 	END;
 	
 	EXPORT iesp.fcradataservice.t_FcraDataServiceUCCData xformUCCData(
-																				ConsumerDisclosure.RawUCC.UCC_out l) 
+																				ConsumerDisclosure.RawUCC.layout_UCC_out l) 
 	:= TRANSFORM
 		SELF.Main := PROJECT(l.UCCMain, xformUCCMain(LEFT));
 		SELF.Party := PROJECT(l.UCCParty, xformUCCParty(LEFT));

@@ -1,5 +1,5 @@
 ﻿IMPORT AutoStandardI, BIPV2, BIPV2_Best, Business_Risk_BIP, Corp2, Doxie, EBR, EBR_Services, 
-       LN_propertyV2, LN_PropertyV2_Services, MDR, Risk_Indicators, SALT28, UT;
+       LN_propertyV2, LN_PropertyV2_Services, MDR, Risk_Indicators, SALT28, UT, STD;
 
 EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -8,6 +8,9 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	
 	// ---------------[ Local attributes ]----------------
 	
+ SOLD_PROPERTY  := 'SP';
+ OWNED_PROPERTY := 'OP';
+ 
 	// Scalar values:
 	FETCH_LEVEL   := Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel);
 	SELEID_FILTER := FETCH_LEVEL in [BIPV2.IDconstants.Fetch_Level_UltID, BIPV2.IDconstants.Fetch_Level_OrgID, BIPV2.IDconstants.Fetch_Level_SELEID];
@@ -21,7 +24,7 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		UNSIGNED8 AssetPropertyAssessedTotal;  
 		STRING9		PropertyLotSizeTotal;
 		STRING9		BuildingSquareFootageTotal;
-		STRING1   BusTypeAddress;
+		STRING2   BusTypeAddress;
 		INTEGER1  Matches_Input_Property;
 		STRING		LN_Fares_ID;
 	END;
@@ -135,6 +138,7 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			RETURN sortby_date;
 		END;
 
+  fn_getYear(STRING HistoryDate) := IF(HistoryDate = Business_Risk_BIP.Constants.NinesDate, ((STRING)STD.Date.Today())[1..4], HistoryDate[1..4]);
 	// ---------------[ Best Data ]----------------
 	
 	// Write to Verification datarow:
@@ -186,20 +190,6 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		);
 		
 	// ---------------[ Property Data ]----------------	
-	
-	// Write to Assets datarow:
-	//    o   STRING AssetPropertyCount; 
-	//        -  "The count of the number of properties owned by the business"; 
-	//        -   -1 = The business is not on file; 0 = The business does not own any property; 
-	//            1-9999 = Count of the number of properties owned by this company
-	//    o   STRING PropertyAssessedValueList; (Note the spelling error)
-	//        -  "The list of assessed property values for each property in the same order as 
-	//           'PropertyRecordStateList' in whole dollars";
-	//        -  Whole dollar value(s)???
-	//    o   STRING AssetPropertyAssessedTotal;
-	//        -  "The total assessed value for all property owned by this business in 
-	//           whole dollars";
-	//        -  -1 = Business is not on file; 0 - 999999999 = Value of property in whole dollars
 
 	Property_raw := LN_propertyv2.key_Linkids.kfetch2(Business_Risk_BIP.Common.GetLinkIDs(Shell),
 	                                         FETCH_LEVEL,
@@ -216,8 +206,13 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	Business_Risk_BIP.Common.AppendCleanedInput(Property_Seq, Shell, Property_Seq_CleanInput);
 
 	// Filter out records after our history date.
-	Property_recs := Business_Risk_BIP.Common.FilterRecords(Property_Seq_CleanInput, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_LnPropV2_Fares_Asrs, AllowedSourcesSet);
-		
+	Property_recs_pre := Business_Risk_BIP.Common.FilterRecords(Property_Seq_CleanInput, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_LnPropV2_Fares_Asrs, AllowedSourcesSet);
+
+ Property_recs := 
+    IF( Options.BusShellVersion < 30,
+        Property_recs_pre,
+        Property_recs_pre(Source_Code IN [SOLD_PROPERTY,OWNED_PROPERTY]) );
+ 
 	// Get Property Assessments
 	assessments_raw := 
 		JOIN(
@@ -249,20 +244,52 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.BuildingSquareFootage := IF(LEFT.BuildingSquareFootage > 0, LEFT.BuildingSquareFootage, RIGHT.BuildingSquareFootage);
 				SELF.assessed_total_value := IF((INTEGER)LEFT.assessed_total_value > 0, LEFT.assessed_total_value, RIGHT.assessed_total_value);
 				SELF := LEFT));
+
+ // Get the assessment records that are current as of the historyDate. From here on down
+ // we'll be calculating assessment records for properties "ever" owned by the business,
+ // as well as those "currently" owned by the business.
+
+ // How do we judge whether the most recent assessment record is "current"? Assessment records
+ // are generated for a particular property once each year for taxation purposes. For example, 
+ // John Doe owns a house and has lived in it for five years, so he will have 4 or 5 assessment
+ // records for that house. But let's say he has sold his house three years ago; the last 
+ // assessment record for that house under John's ownership will also be three years ago. So 
+ // the rule to determine whether he owns a house "currently" is existence of an assessment
+ // record either last year or this year.
+	assessments_most_recent_current := 
+  JOIN(
+    Shell, assessments_most_recent, 
+    LEFT.seq = RIGHT.seq AND
+    (INTEGER)(RIGHT.sortby_date[1..4]) >= (INTEGER)( fn_getYear((STRING)LEFT.Clean_Input.historydate)) - 1,
+    TRANSFORM( RIGHT ), INNER
+  );
 	
 	assessments_inflated := 
 		PROJECT(
 			assessments_most_recent,
 			TRANSFORM( layout_PropertyAssessment_inflated,
-				SELF.AssetPropertyCount            := 1;
-				SELF.PropertyAssessedValueList := LEFT.assessed_total_value;
-				SELF.AssetPropertyAssessedTotal     := (UNSIGNED8)LEFT.assessed_total_value;
-				SELF.BuildingSquareFootage		:= LEFT.BuildingSquareFootage;
+				SELF.AssetPropertyCount         := 1;
+				SELF.PropertyAssessedValueList  := LEFT.assessed_total_value;
+				SELF.AssetPropertyAssessedTotal := (UNSIGNED8)LEFT.assessed_total_value;
+				SELF.BuildingSquareFootage      := LEFT.BuildingSquareFootage;
 				SELF := LEFT; 
 				SELF := []
 			)
 		);
-	
+
+	assessments_inflated_current := 
+		PROJECT(
+			assessments_most_recent_current,
+			TRANSFORM( layout_PropertyAssessment_inflated,
+				SELF.AssetPropertyCount         := 1;
+				SELF.PropertyAssessedValueList  := LEFT.assessed_total_value;
+				SELF.AssetPropertyAssessedTotal := (UNSIGNED8)LEFT.assessed_total_value;
+				SELF.BuildingSquareFootage      := LEFT.BuildingSquareFootage;
+				SELF := LEFT; 
+				SELF := []
+			)
+		);
+    
 	assessments_unique_prop := ROLLUP(SORT(assessments_inflated, Seq, APNA_or_PIN_Number), LEFT.Seq = RIGHT.Seq AND LEFT.APNA_or_PIN_Number = RIGHT.APNA_or_PIN_Number,
 			TRANSFORM(layout_PropertyAssessment_inflated,
 				SELF.Seq := LEFT.Seq;
@@ -271,7 +298,16 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.PropertyAssessedValueList := (STRING)MAX((INTEGER)LEFT.PropertyAssessedValueList, (INTEGER)RIGHT.PropertyAssessedValueList);
 				SELF.AssetPropertyAssessedTotal := MAX(LEFT.AssetPropertyAssessedTotal, RIGHT.AssetPropertyAssessedTotal);
 				SELF := LEFT));
-		
+
+	assessments_unique_prop_current := ROLLUP(SORT(assessments_inflated_current, Seq, APNA_or_PIN_Number), LEFT.Seq = RIGHT.Seq AND LEFT.APNA_or_PIN_Number = RIGHT.APNA_or_PIN_Number,
+			TRANSFORM(layout_PropertyAssessment_inflated,
+				SELF.Seq := LEFT.Seq;
+				SELF.BuildingSquareFootage := MAX(LEFT.BuildingSquareFootage, RIGHT.BuildingSquareFootage);
+				SELF.AssetPropertyCount := LEFT.AssetPropertyCount + RIGHT.AssetPropertyCount;
+				SELF.PropertyAssessedValueList := (STRING)MAX((INTEGER)LEFT.PropertyAssessedValueList, (INTEGER)RIGHT.PropertyAssessedValueList);
+				SELF.AssetPropertyAssessedTotal := MAX(LEFT.AssetPropertyAssessedTotal, RIGHT.AssetPropertyAssessedTotal);
+				SELF := LEFT));
+        
 	assessments_rolled :=
 		ROLLUP(SORT(assessments_unique_prop, Seq), LEFT.seq = RIGHT.seq, 
 			TRANSFORM( layout_PropertyAssessment_inflated,
@@ -282,6 +318,16 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.BuildingSquareFootage := LEFT.BuildingSquareFootage + RIGHT.BuildingSquareFootage;
 				SELF := RIGHT));
 
+	assessments_rolled_current :=
+		ROLLUP(SORT(assessments_unique_prop_current, Seq), LEFT.seq = RIGHT.seq, 
+			TRANSFORM( layout_PropertyAssessment_inflated,
+				SELF.seq := LEFT.seq;
+				SELF.AssetPropertyCount := LEFT.AssetPropertyCount + RIGHT.AssetPropertyCount;
+				SELF.PropertyAssessedValueList := TRIM(LEFT.PropertyAssessedValueList) + Business_Risk_BIP.Constants.FieldDelimiter + TRIM(RIGHT.PropertyAssessedValueList);
+				SELF.AssetPropertyAssessedTotal := LEFT.AssetPropertyAssessedTotal + RIGHT.AssetPropertyAssessedTotal;
+				SELF.BuildingSquareFootage := LEFT.BuildingSquareFootage + RIGHT.BuildingSquareFootage;
+				SELF := RIGHT));
+        
 	withPropertyData := JOIN(withAddrIsBest, assessments_rolled, LEFT.seq = RIGHT.seq, 
 			TRANSFORM( layout_AddrAndPropertyData,
 				SELF.seq                      	:= LEFT.seq;
@@ -291,9 +337,21 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.AssetPropertyAssessedTotal     	:= RIGHT.AssetPropertyAssessedTotal;
 				SELF.BuildingSquareFootageTotal	:= (STRING)RIGHT.BuildingSquareFootage;
 				SELF := []), LEFT OUTER, KEEP(1), FEW);
-		
+
+	withPropertyData_current := JOIN(withAddrIsBest, assessments_rolled_current, LEFT.seq = RIGHT.seq, 
+			TRANSFORM( layout_AddrAndPropertyData,
+				SELF.seq                      	:= LEFT.seq;
+				SELF.AddrIsBest               	:= LEFT.AddrIsBest;
+				SELF.AssetPropertyCount            	:= 0; // RIGHT.AssetPropertyCount; // For now, don't count assessments in the Property count, as they are being double-counted with the Deed Property Count
+				SELF.PropertyAssessedValueList 	:= RIGHT.PropertyAssessedValueList;
+				SELF.AssetPropertyAssessedTotal     	:= RIGHT.AssetPropertyAssessedTotal;
+				SELF.BuildingSquareFootageTotal	:= (STRING)RIGHT.BuildingSquareFootage;
+				SELF := []), LEFT OUTER, KEEP(1), FEW);
+        
 	// Get Property Deeds
-	deeds_raw := JOIN(Property_recs, LN_PropertyV2.key_deed_fid(),																	     
+ property_deed_recs := Property_recs( ln_fares_id[2] = 'D' );
+ 
+	deeds_raw := JOIN(property_deed_recs, LN_PropertyV2.key_deed_fid(),																	     
 			KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id) AND
 			RIGHT.Buyer_Or_Borrower_Ind = 'O', 
 			TRANSFORM({RECORDOF(LEFT), STRING unique_prop_id, STRING sortby_date, STRING land_lot_size, STRING Buyer_Or_Borrower_Ind, INTEGER Matches_Input_Property},
@@ -315,11 +373,38 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			), KEEP(1), ATMOST(100));
 
 	deeds_filtered := deeds_raw(unique_prop_id != '' AND sortby_date != '');
-	
+
+ deeds_sold := DEDUP(SORT(deeds_filtered(Source_Code = SOLD_PROPERTY), uniqueid, prim_range, prim_name[1..8]), uniqueid, prim_range, prim_name[1..8]);   
+
+ deeds_current := 
+    JOIN(
+      deeds_filtered, deeds_sold,
+      left.seq = right.seq  and
+      left.prim_range = right.prim_range and
+      left.prim_name = right.prim_name and
+      left.st = right.st and
+      left.p_city_name = right.p_city_name and
+      left.zip = right.zip,
+      transform(recordof(left), 
+        self := left
+      ),
+      left only
+    );
+                                              
 	uniqueStateCount := TABLE(TABLE(deeds_filtered, {Seq, St}, Seq, St), // Gather all unique States for each Seq
+			{UNSIGNED1 UniqueStateCount := COUNT(GROUP, TRIM(St) <> ''), Seq}, Seq); // Count the unique populated States for each Seq
+
+	uniqueStateCount_current := TABLE(TABLE(deeds_current, {Seq, St}, Seq, St), // Gather all unique States for each Seq
 			{UNSIGNED1 UniqueStateCount := COUNT(GROUP, TRIM(St) <> ''), Seq}, Seq); // Count the unique populated States for each Seq
 	
 	deeds_sorted :=	SORT(deeds_filtered,
+			seq,
+			unique_prop_id,
+			-((INTEGER)sortby_date),
+			-((INTEGER)(vendor_source_flag IN ['F','S'])) // 'F','S' are FARES records; 'D','O' are FIDELITY records
+		);
+
+	deeds_sorted_current :=	SORT(deeds_current,
 			seq,
 			unique_prop_id,
 			-((INTEGER)sortby_date),
@@ -332,8 +417,22 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.Land_Lot_Size := IF((INTEGER)LEFT.Land_Lot_Size > 0, LEFT.Land_Lot_Size, RIGHT.Land_Lot_Size);
 				SELF.Matches_Input_Property := MAX(LEFT.Matches_Input_Property, RIGHT.Matches_Input_Property);
 				SELF := LEFT));
+
+	deeds_most_recent_current := ROLLUP(deeds_sorted_current, LEFT.Seq = RIGHT.Seq AND LEFT.Unique_Prop_ID = RIGHT.Unique_Prop_ID,
+			TRANSFORM(RECORDOF(LEFT),
+				SELF.Land_Lot_Size := IF((INTEGER)LEFT.Land_Lot_Size > 0, LEFT.Land_Lot_Size, RIGHT.Land_Lot_Size);
+				SELF.Matches_Input_Property := MAX(LEFT.Matches_Input_Property, RIGHT.Matches_Input_Property);
+				SELF := LEFT));
 	
 	deeds_inflated := PROJECT(deeds_most_recent,
+			TRANSFORM(layout_PropertyDeed_inflated,
+				SELF.AssetPropertyCount            := 1;
+				SELF.PropertyLotSize					:= (INTEGER)LEFT.Land_Lot_Size;
+				SELF.Matches_Input_Property   := IF(TRIM(LEFT.LN_Fares_ID) = '', -1, LEFT.Matches_Input_Property);
+				SELF := LEFT; 
+				SELF := []));
+
+	deeds_inflated_current := PROJECT(deeds_most_recent_current,
 			TRANSFORM(layout_PropertyDeed_inflated,
 				SELF.AssetPropertyCount            := 1;
 				SELF.PropertyLotSize					:= (INTEGER)LEFT.Land_Lot_Size;
@@ -348,7 +447,15 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.Matches_Input_Property := MAX(LEFT.Matches_Input_Property, RIGHT.Matches_Input_Property);
 				SELF.AssetPropertyCount := LEFT.AssetPropertyCount + RIGHT.AssetPropertyCount;
 				SELF := LEFT));
-		
+
+	deeds_unique_prop_current := ROLLUP(SORT(deeds_inflated_current, Seq, APNT_or_PIN_Number), LEFT.Seq = RIGHT.Seq AND LEFT.APNT_or_PIN_Number = RIGHT.APNT_or_PIN_Number,
+			TRANSFORM(layout_PropertyDeed_inflated,
+				SELF.Seq := LEFT.Seq;
+				SELF.PropertyLotSize := MAX(LEFT.PropertyLotSize, RIGHT.PropertyLotSize);
+				SELF.Matches_Input_Property := MAX(LEFT.Matches_Input_Property, RIGHT.Matches_Input_Property);
+				SELF.AssetPropertyCount := LEFT.AssetPropertyCount + RIGHT.AssetPropertyCount;
+				SELF := LEFT));
+        
 	deeds_rolled :=	ROLLUP(SORT(deeds_unique_prop, Seq),	LEFT.seq = RIGHT.seq, 
 			TRANSFORM(layout_PropertyDeed_inflated,
 				SELF.seq           := LEFT.seq;
@@ -357,6 +464,14 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF.Matches_Input_Property := MAX(LEFT.Matches_Input_Property, RIGHT.Matches_Input_Property);
 				SELF := RIGHT));
 
+	deeds_rolled_current :=	ROLLUP(SORT(deeds_unique_prop_current, Seq),	LEFT.seq = RIGHT.seq, 
+			TRANSFORM(layout_PropertyDeed_inflated,
+				SELF.seq           := LEFT.seq;
+				SELF.AssetPropertyCount := LEFT.AssetPropertyCount + RIGHT.AssetPropertyCount;
+				SELF.PropertyLotSize := LEFT.PropertyLotSize + RIGHT.PropertyLotSize;
+				SELF.Matches_Input_Property := MAX(LEFT.Matches_Input_Property, RIGHT.Matches_Input_Property);
+				SELF := RIGHT));
+        
 	withPropertyDeedData :=	JOIN(withPropertyData, deeds_rolled, LEFT.seq = RIGHT.seq, 
 			TRANSFORM(layout_AddrAndPropertyData,
 				SELF.seq                      := LEFT.seq;
@@ -366,6 +481,15 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 				SELF := LEFT;
 				SELF := []), LEFT OUTER, KEEP(1), FEW);
 
+	withPropertyDeedData_current :=	JOIN(withPropertyData_current, deeds_rolled_current, LEFT.seq = RIGHT.seq, 
+			TRANSFORM(layout_AddrAndPropertyData,
+				SELF.seq                      := LEFT.seq;
+				SELF.AssetPropertyCount            := LEFT.AssetPropertyCount + RIGHT.AssetPropertyCount;
+				SELF.PropertyLotSizeTotal			:= (STRING)RIGHT.PropertyLotSize;
+				SELF.Matches_Input_Property   := RIGHT.Matches_Input_Property;
+				SELF := LEFT;
+				SELF := []), LEFT OUTER, KEEP(1), FEW);
+        
 	// ---------------[ Business Type Data ]----------------	
 		
 	// Write to Firmographic datarow:
@@ -437,27 +561,47 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			Shell, withBusTypeAddress, 
 			LEFT.Seq = RIGHT.Seq,
 			TRANSFORM( Business_Risk_BIP.Layouts.Shell,
-				SELF.Verification.AddrIsBest         := RIGHT.AddrIsBest,
-				SELF.Asset_Information.AssetPropertyCount            := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.AssetPropertyCount, -1, 9999),
-				SELF.Asset_Information.PropertyAssessedValueList := RIGHT.PropertyAssessedValueList,
-				SELF.Asset_Information.AssetPropertyAssessedTotal     := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.AssetPropertyAssessedTotal, -1, 999999999),
-				SELF.Firmographic.BusTypeAddress     := RIGHT.BusTypeAddress,
-				SELF.Asset_Information.AssetPropertyLotSizeTotal:= (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.PropertyLotSizeTotal, -1, 999999999),
-				SELF.Asset_Information.AssetPropertySqFootageTotal	 := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.BuildingSquareFootageTotal, -1, 999999999),
-				SELF.Verification.InputAddrOwnership := (STRING)RIGHT.Matches_Input_Property;
-				SELF.Input_Characteristics.InputAddrBusinessOwned			 := MAP(RIGHT.Matches_Input_Property >= 1 => '1', 
-																										RIGHT.Matches_Input_Property = 0	=> '0',
-																																												 '-1');
+				SELF.Firmographic.BusTypeAddress                   := RIGHT.BusTypeAddress,
+				SELF.Verification.AddrIsBest                       := RIGHT.AddrIsBest,
+				SELF.Verification.InputAddrOwnership               := IF(LEFT.Input.InputCheckBusAddrZip = '0', '-1', (STRING)RIGHT.Matches_Input_Property);
+				SELF.Input_Characteristics.InputAddrBusinessOwned  := 
+          MAP(RIGHT.Matches_Input_Property >= 1 => '1', 
+              RIGHT.Matches_Input_Property = 0	=> '0',
+              '-1');
+				SELF.Asset_Information.AssetPropertyCount          := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.AssetPropertyCount, -1, 9999),
+				SELF.Asset_Information.PropertyAssessedValueList   := RIGHT.PropertyAssessedValueList,
+				SELF.Asset_Information.AssetPropertyAssessedTotal  := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.AssetPropertyAssessedTotal, -1, 999999999),
+				SELF.Asset_Information.AssetPropertyLotSizeTotal   := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.PropertyLotSizeTotal, -1, 999999999),
+				SELF.Asset_Information.AssetPropertySqFootageTotal := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.BuildingSquareFootageTotal, -1, 999999999),
 				SELF := LEFT
 			),
 			LEFT OUTER, KEEP(1), ATMOST(100), FEW
 		);
-	
+    
 	withStateCount := JOIN(withAddrAndPropertyData, uniqueStateCount, LEFT.Seq = RIGHT.Seq,
 			TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 				SELF.Asset_Information.AssetPropertyStateCount := (STRING)Business_Risk_BIP.Common.capNum(MIN(RIGHT.UniqueStateCount, (INTEGER)LEFT.Asset_Information.AssetPropertyCount), -1, 9999);
 				SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(100), FEW);
-	
+
+	withAddrAndPropertyData_current := 
+		JOIN(
+			withStateCount, withPropertyDeedData_current, 
+			LEFT.Seq = RIGHT.Seq,
+			TRANSFORM( Business_Risk_BIP.Layouts.Shell,
+				SELF.Asset_Information.AssetCurrentPropertyCount          := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.AssetPropertyCount, -1, 9999),
+				SELF.Asset_Information.AssetCurrentPropertyAssessedTotal  := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.AssetPropertyAssessedTotal, -1, 999999999),
+				SELF.Asset_Information.AssetCurrentPropertyLotSizeTotal   := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.PropertyLotSizeTotal, -1, 999999999),
+				SELF.Asset_Information.AssetCurrentPropertySqFootageTotal := (STRING)Business_Risk_BIP.Common.capNum((INTEGER)RIGHT.BuildingSquareFootageTotal, -1, 999999999),
+				SELF := LEFT
+			),
+			LEFT OUTER, KEEP(1), ATMOST(100), FEW
+		);
+    
+	withStateCount_current := JOIN(withAddrAndPropertyData_current, uniqueStateCount_current, LEFT.Seq = RIGHT.Seq,
+			TRANSFORM(Business_Risk_BIP.Layouts.Shell,
+				SELF.Asset_Information.AssetCurrentPropertyStateCount := (STRING)Business_Risk_BIP.Common.capNum(MIN(RIGHT.UniqueStateCount, (INTEGER)LEFT.Asset_Information.AssetCurrentPropertyCount), -1, 9999);
+				SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(100), FEW);
+        
 	PropertyStats := TABLE(Property_recs,
 			{Seq,
 			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
@@ -470,11 +614,13 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 },
 			 Seq, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
 			 );
+
 	// Rollup the dates first/last seen into child datasets by Seq
 	tempLayout := RECORD
 		UNSIGNED4 Seq;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) Sources;
 	END;
+
 	PropertyStatsTemp := PROJECT(PropertyStats, TRANSFORM(tempLayout,
 																				SELF.Seq := LEFT.Seq;
 																				SELF.Sources := DATASET([{LEFT.SourceField, 
@@ -484,9 +630,10 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																																	LEFT.DateVendorLastSeen,
 																																	LEFT.RecordCount}], Business_Risk_BIP.Layouts.LayoutSources);
 																				SELF := []));
+
 	PropertyStatsRolled := ROLLUP(PropertyStatsTemp, LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, SELF.Seq := LEFT.Seq; SELF.Sources := LEFT.Sources + RIGHT.Sources; SELF := LEFT));
 	
-	withPropertyStats := JOIN(withStateCount, PropertyStatsRolled, LEFT.Seq = RIGHT.Seq,
+	withPropertyStats := JOIN(withStateCount_current, PropertyStatsRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							// Make sure if we have a current property that it gets recorded to the sources list.
 																							SELF.Sources := LEFT.Sources + IF((INTEGER)LEFT.Asset_Information.AssetPropertyCount > 0, RIGHT.Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
@@ -501,20 +648,46 @@ EXPORT getAddrAndPropertyData(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// OUTPUT( BestSeq, NAMED('BestSeq') );
 	// OUTPUT( BestSeq_slim, NAMED('BestSeq_slim') );
 	// OUTPUT( withAddrIsBest, NAMED('withAddrIsBest') );
-	// OUTPUT( Property_raw, NAMED('Property_raw') );
-	// OUTPUT( Property_seq, NAMED('Property_seq') );
-	// OUTPUT( Property_recs, NAMED('Property_recs') );
-	// OUTPUT( assessments_raw, NAMED('assessments_raw') );
-	// OUTPUT( assessments_filtered, NAMED('assessments_filtered') );
-	// OUTPUT( assessments_sorted, NAMED('assessments_sorted') );
-	// OUTPUT( assessments_most_recent, NAMED('assessments_most_recent') );
-	// OUTPUT( assessments_inflated, NAMED('assessments_inflated') );
-	// OUTPUT( assessments_rolled, NAMED('assessments_rolled') );
-	// OUTPUT( withPropertyData, NAMED('withPropertyData') );
-	// OUTPUT( CorpFilings_sorted, NAMED('CorpFilings_sorted') );
-	// OUTPUT( CorpFilings_having_BusTypeAddr_most_recent, NAMED('CorpFilings_most_recent') );
-	// OUTPUT( withBusTypeAddress, NAMED('withBusTypeAddress') );
-	// OUTPUT( withAddrAndPropertyData, NAMED('withAddrAndPropertyData') );
+  
+	// OUTPUT( CHOOSEN(Property_raw,100), NAMED('Property_raw') );
+	// OUTPUT( CHOOSEN(Property_seq,100), NAMED('Property_seq') );
+	// OUTPUT( CHOOSEN(Property_recs,100), NAMED('Property_recs') );
+	// OUTPUT( Property_recs, NAMED('Property_recs_all'), ALL );
+	// OUTPUT( CHOOSEN(assessments_raw,100), NAMED('assessments_raw') );
+	// OUTPUT( CHOOSEN(assessments_filtered,100), NAMED('assessments_filtered') );
+	// OUTPUT( CHOOSEN(assessments_sorted,100), NAMED('assessments_sorted') );
+	// OUTPUT( CHOOSEN(assessments_most_recent,100), NAMED('assessments_most_recent') );
+ // OUTPUT( CHOOSEN(assessments_most_recent_current,100), NAMED('assessments_most_recent_current') );
+	// OUTPUT( CHOOSEN(assessments_inflated,100), NAMED('assessments_inflated') );
+	// OUTPUT( CHOOSEN(assessments_inflated_current,100), NAMED('assessments_inflated_current') );
+	// OUTPUT( CHOOSEN(assessments_rolled,100), NAMED('assessments_rolled') );
+	// OUTPUT( CHOOSEN(assessments_rolled_current,100), NAMED('assessments_rolled_current') );
+	// OUTPUT( CHOOSEN(withPropertyData,100), NAMED('withPropertyData') );
+	// OUTPUT( CHOOSEN(withPropertyData_current,100), NAMED('withPropertyData_current') );
+ // OUTPUT( CHOOSEN(property_deed_recs,100), NAMED('property_deed_recs') );
+	// OUTPUT( CHOOSEN(deeds_raw,100), NAMED('deeds_raw') );
+	// OUTPUT( CHOOSEN(deeds_filtered,100), NAMED('deeds_filtered') );
+ // OUTPUT( CHOOSEN(deeds_sold,100), NAMED('deeds_sold') );
+ // OUTPUT( CHOOSEN(deeds_current,100), NAMED('deeds_current') );
+	// OUTPUT( CHOOSEN(uniqueStateCount,100), NAMED('uniqueStateCount') );
+	// OUTPUT( CHOOSEN(uniqueStateCount_current,100), NAMED('uniqueStateCount_current') );
+	// OUTPUT( CHOOSEN(deeds_sorted,100), NAMED('deeds_sorted') );
+ // OUTPUT( CHOOSEN(deeds_sorted_current,100), NAMED('deeds_sorted_current') );
+	// OUTPUT( CHOOSEN(deeds_most_recent,100), NAMED('deeds_most_recent') );
+	// OUTPUT( CHOOSEN(deeds_most_recent_current,100), NAMED('deeds_most_recent_current') );
+	// OUTPUT( CHOOSEN(deeds_inflated,100), NAMED('deeds_inflated') );
+	// OUTPUT( CHOOSEN(deeds_inflated_current,100), NAMED('deeds_inflated_current') );
+	// OUTPUT( CHOOSEN(deeds_unique_prop,100), NAMED('deeds_unique_prop') );
+	// OUTPUT( CHOOSEN(deeds_unique_prop_current,100), NAMED('deeds_unique_prop_current') );
+	// OUTPUT( CHOOSEN(deeds_rolled,100), NAMED('deeds_rolled') );
+	// OUTPUT( CHOOSEN(deeds_rolled_current,100), NAMED('deeds_rolled_current') );
+	// OUTPUT( CHOOSEN(withPropertyDeedData,100), NAMED('withPropertyDeedData') );
+	// OUTPUT( CHOOSEN(withPropertyDeedData_current,100), NAMED('withPropertyDeedData_current') );
+  
+	// OUTPUT( CHOOSEN(CorpFilings_sorted,100), NAMED('CorpFilings_sorted') );
+	// OUTPUT( CHOOSEN(CorpFilings_having_BusTypeAddr_most_recent,100), NAMED('CorpFilings_most_recent') );
+	// OUTPUT( CHOOSEN(withBusTypeAddress,100), NAMED('withBusTypeAddress') );
+	// OUTPUT( CHOOSEN(withAddrAndPropertyData,100), NAMED('withAddrAndPropertyData') );
 	
 	RETURN withPropertyStats;
 

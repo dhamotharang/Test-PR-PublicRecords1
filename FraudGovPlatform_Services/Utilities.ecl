@@ -1,4 +1,4 @@
-﻿IMPORT ut;
+﻿IMPORT ut,STD;
 
 EXPORT Utilities := MODULE
 
@@ -64,7 +64,7 @@ EXPORT Utilities := MODULE
     eventType2 := ',' + getKnownFraudCodeDescLookup(event_type2);
     eventType3 := ',' + getKnownFraudCodeDescLookup(event_type3);
 
-    RETURN TRIM(eventDates + eventType1 + eventType2 + eventType3);
+    RETURN STD.Str.CleanSpaces(eventDates + eventType1 + eventType2 + eventType3);
   END;
 
 END;
