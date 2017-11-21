@@ -4,9 +4,9 @@ EXPORT OrbitProfileStats (string pProfileName = '', string pProfileType = 'Scrub
 EXPORT GetProfile:= Orbit3SOA.Orbit3GetProfileRules(pProfileType, pProfileName);
 				DefaultPass:=GetProfile(Name='Default')[1].PassPercentage;
 				DefaultConversion	:=	project(GetProfile,Transform(Scrubs.Layouts.OrbitLayoutStep1,
-																			self.passpercentage	:=	if(left.passpercentage = '',DefaultPass,left.passpercentage);
+																			self.passpercentage	:=	if(STD.Str.find(left.name,':POP',1)=0 and STD.Str.find(left.name,':SUMMARY',1)=0 and left.passpercentage = '',DefaultPass,left.passpercentage);
 																			self := left;));
-shared	RemoveBlankRules	:=	DefaultConversion(passpercentage<>'');
+shared	RemoveBlankRules	:=	DefaultConversion(STD.Str.find(name,':POP',1)<>0 or STD.Str.find(name,':SUMMARY',1)<>0 or passpercentage<>'');
 
 SHARED Filename := '~profiletemplate::' + pProfileType + '::' + pProfileName + '.csv';
 //	Scrubs
@@ -24,21 +24,22 @@ EXPORT ProfileTemplate:=  output(profile_header + project(dedup(sort(ScrubsStats
 																																	 self := left)) ,, Filename, csv(separator(','),terminator('\r\n'),quote('"'),maxlength(65535)), compressed, overwrite, named('ProfileTemplate'+FileType)); 	
 
 //	Scrubs Alerts
-SHARED profile_alerts_header := dataset([{'Profile','Rule Name','Description','Enabled','Default','Order','Code','Severity','Pass Percentage','Percentage Error - Relative to previous (Min)','Percentage Error - Relative to previous (Max)','Change To/From Zero'},
-																  {pProfileName,'Default','','true','true','0','','','','-10','20','false'}], layouts.ProfileAlertsTemplateLayout);
+SHARED profile_alerts_header := dataset([{'Profile','Rule Name','Description','Enabled','Default','Order','Code','Severity','Pass Percentage','Percentage Error - Relative to previous (Min)','Percentage Error - Relative to previous (Max)','ScrubsAlertsPerRelToPopulationMin','Change To/From Zero'},
+																  {pProfileName,'Default','','true','true','0','','','','-10','20','','false'}], layouts.ProfileAlertsTemplateLayout);
 EXPORT ProfileAlertsTemplate:=  output(profile_alerts_header + project(dedup(sort(ScrubsStats, ruledesc, -rulepcnt), ruledesc),
 																																	 transform(layouts.ProfileAlertsTemplateLayout,
 																																	 self.Profile := pProfileName;
 																													 	       self.Rule_Name := trim(left.ruledesc, left, right),
-																																	 self.Description :=   trim(stringlib.stringfindreplace(left.errormessage[..100], ',', ' '),left, right),
+																																	 self.Description :=   trim(stringlib.stringfindreplace(left.errormessage, ',', ' '),left, right),
 																																	 self.Enabled := 'TRUE',
 																													 	       self.Default_Rule := 'FALSE',
 																													 	       self.Order := (string)counter,
 																													 	       self.severity :='',
 																													 	       self.code:= '',
-																																	 self.Pass_Percentage := (string) (decimal5_2) (((real)left.Rulecnt/(real)left.RecordsTotal) * 100.00);
+																																	 self.Pass_Percentage := if(STD.Str.find(self.Rule_Name,':POP',1)=0 and STD.Str.find(self.Rule_Name,':SUMMARY',1)=0,(string) (decimal5_2) (((real)left.Rulecnt/(real)left.RecordsTotal) * 100.00),'');
 																																	 self.Percentage_Error_Min	:=	'',
 																																	 self.Percentage_Error_Max	:=	'',
+																																	 self.ScrubsAlertsPerRelToPopulationMin	:=	'',
 																																	 self.Change_To_From_Zero	:=	'',
 																																	 self := left)) ,, Filename, csv(separator(','),terminator('\r\n'),quote('"'),maxlength(65535)), compressed, overwrite, named('ProfileAlertsTemplate'+FileType)); 	
 											
@@ -57,6 +58,7 @@ Export CompareToProfile_with_examples 	 := join(ScrubsStats, RemoveBlankRules, t
 
 EXPORT CompareToProfile_for_Orbit := dedup(sort(CompareToProfile_with_examples, Sourcecode, RuleName), Sourcecode, RuleName);
 EXPORT SubmitStats :=  sequential(output(ScrubsStats,,'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+CustomTag,thor,all,expire(2)),
+output(RemoveBlankRules),
 																	output(_control.fSubmitNewWorkunit('#workunit(\'name\',\'Build Scrubs - '+pProfileName+'\');\r\n'+
 																																		 'Submission:=dataset(\'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+CustomTag+'\',Salt35.ScrubsOrbitLayout,thor);\r\n'+
 																																		 'CalculateWarnings:=Scrubs.OrbitProfileStats(\''+pProfileName+'\',\'ScrubsAlerts\',Submission,\''+versionDate+'\',\''+pProfileName+'\').CompareToProfile_for_Orbit;\r\n'+

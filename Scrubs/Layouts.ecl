@@ -43,6 +43,7 @@ string Severity := '';
 string Pass_Percentage;
 string Percentage_Error_Min := '';
 string Percentage_Error_Max := '';
+string ScrubsAlertsPerRelToPopulationMin := '';
 string Change_To_From_Zero := '';
 end;
 
@@ -74,6 +75,7 @@ export LogRecord	:=	record
 				string WU;
 			end;
 export OrbitLogLayout	:=	record
+			string ProfileName;
 			string version;
 			UNSIGNED8 recordstotal;
 			UNSIGNED4 processdate;
