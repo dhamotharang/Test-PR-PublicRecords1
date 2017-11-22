@@ -1504,6 +1504,22 @@ EXPORT dsSourceCriteria := DATASET([
 {'EU Early Detection and Exclusion System List','1490'},
 {'UN Security Council Resolution 2375 (2017) - Designated Vessels Pursuant to Paragraph 6','1491'},
 {'Vessels - EC (CFSP) 2017/1909 Democratic People\'s Republic of Korea List','1492'},
-{'Vessels - EC 2017/1897 Democratic People\'s Republic of Korea List','1493'}
+{'Vessels - EC 2017/1897 Democratic People\'s Republic of Korea List','1493'},
+{'Australian Criminal Code Terrorist Organisation','1494'},
+{'CAATSA Section 231(d) List Regarding the Defense Sector of the Government of the Russian Federation','1495'},
+{'DFATD (Canada) Justice for Victims of Corrupt Foreign Officials Regulations','1496'},
+{'EC (CFSP) 2017/1948 Sudan List','1497'},
+{'EC (CFSP) 2017/1976 Libya List','1498'},
+{'EC (CFSP) 2017/2008 Libya List','1499'},
+{'EC (CFSP) 2017/2163  Ukraine List','1500'},
+{'EC 2017/1942 Sudan List','1501'},
+{'EC 2017/1974 Libya List','1502'},
+{'EC 2017/2006 Libya List','1503'},
+{'EC 2017/2153 Ukraine List','1504'},
+{'Las Vegas Metropolitan Police Department Most Wanted','1505'},
+{'Latvian National Sanctions List','1506'},
+{'Saga Prefectural Police (Japan) Arrest List','1507'},
+{'Taiwan Financial Supervisory Commission Securities and Futures Bureau Bulletin Board List','1508'},
+{'US Department of State Cuba Restricted List','1509'}
 
 ],r);
