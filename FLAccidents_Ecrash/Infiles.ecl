@@ -92,14 +92,12 @@ incidents := join(distribute(incident, hash(incident_id)), incidents_todelete,
 					
 //filter out Nassau TF
 export tincident  := project(incidents(~(source_id in ['TF','TM'] and agency_id = '1603437')),transform(FLAccidents_Ecrash.Layout_Infiles_Fixed.incident
-													,self.incident_id := left.incident_id[1..9], 
-													self.case_identifier := stringlib.stringtouppercase(left.case_identifier),
-													self.state_report_number := stringlib.stringtouppercase(left.state_report_number),
-													self.crash_time := if(left.incident_id in ['10560507','10405314', '10405522','10403933','10560555','10560530']  , '', left.crash_time),  
-													SELF.ori_number := IF (left.ori_number = 'FL0130600','FL0130000',left.ori_number); //MDPD ORI correction remove this code after the historical update completed successfully
-								        	SELF.report_agency_ori := IF (left.report_agency_ori = 'FL0130600','FL0130000',left.report_agency_ori); //MDPD ORI correction remove this code after the historical update completed successfully
-													SELF.contrib_source := IF(stringlib.stringtouppercase(trim(left.contrib_source,left,right)) IN ['\\N', 'NULL'],  '', left.contrib_source);
-													self:= left));		
+													,SELF.incident_id := LEFT.incident_id[1..9]; 
+													 SELF.case_identifier := stringlib.stringtouppercase(LEFT.case_identifier);
+													 SELF.state_report_number := stringlib.stringtouppercase(LEFT.state_report_number);
+													 SELF.crash_time := IF(left.incident_id IN ['10560507','10405314', '10405522','10403933','10560555','10560530']  , '', LEFT.crash_time);
+													 SELF.contrib_source := IF(stringlib.stringtouppercase(TRIM(LEFT.contrib_source,left,right)) IN ['\\N', 'NULL'],  '', LEFT.contrib_source);
+													 SELF:= LEFT;));		
 
  jpersn := 	join(distribute(persn, hash(incident_id)), incidents_todelete, 
 								trim(left.incident_id, all)= trim(right.incident_id,all),
