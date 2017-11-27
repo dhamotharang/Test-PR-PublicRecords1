@@ -1,4 +1,4 @@
-import  address, ut, header_slimsort, did_add, didville,watchdog, ExperianCred, _validate;
+﻿import  address, ut, header_slimsort, did_add, didville,watchdog, ExperianCred, _validate;
 
 name_clean := Files.Cashed_Names_File;
 addr_clean := Files.Cashed_Address_File;
@@ -316,7 +316,10 @@ Experian_dec_dedp   := dedup(sort(distribute(Experian_dec , hash(Encrypted_Exper
 Experian_base_d2     := distribute(apply_deletes,  hash(Encrypted_Experian_PIN));
 
 Layouts.Layout_Out t_apply_deceased(Experian_base_d2 le, Experian_dec_dedp ri) := transform
-	self.deceased_ind     := if(ri.Encrypted_Experian_PIN <> '' and le.NameType[..2] <> 'SP', 1, 0);
+	self.deceased_ind     :=  if(ri.Encrypted_Experian_PIN <> '',
+                               le.deceased_ind,
+                               if(le.NameType[..2] <> 'SP', 1, 0)
+                              );
 	SELF := le;
 end;
 
