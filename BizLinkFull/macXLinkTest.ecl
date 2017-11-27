@@ -73,4 +73,3 @@ EXPORT macXLinkTest(d,bDebug=FALSE,bShowIntermediate=FALSE):=FUNCTIONMACRO
     RETURN(%o%);
   #END
 ENDMACRO;
-

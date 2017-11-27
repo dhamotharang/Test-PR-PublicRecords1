@@ -70,4 +70,3 @@ EXPORT svcWheelCompanyName() := FUNCTION
   
   RETURN output( res, named( 'Results' ) );
 END;
-
