@@ -1,4 +1,4 @@
-﻿IMPORT BatchServices, Corrections;
+﻿IMPORT BatchServices, Corrections, Models;
 
 EXPORT TaxRefundISv3_BatchService_Layouts := MODULE
 
@@ -32,48 +32,9 @@ EXPORT TaxRefundISv3_BatchService_Layouts := MODULE
 			string4  addr_status := ''; // to display hri code 11 in TRIS v3.1
     end; 
 
-    // slimmed output of the bankruptcy batch service
-		export rec_bankr_res := record
-		  string30  acctno;
-			unsigned6 bankr_did;
-			string8   date_filed;
-			string8   orig_filing_date;
-		end;
-
-    // slimmed output of the driver license batch service
-		export rec_dl_res := record
-		  string30  acctno;
-			unsigned6 dl_did;
-			unsigned4 lic_issue_date;
-		end;
-
-    // slimmed output of the property batch service
-		export rec_propdeed_res := record
-		  string30  acctno;
-			unsigned6 deed_did;
-			string8   deed_contract_date;
-			string8   deed_recording_date;
-		end;
-
-    // slimmed output of the vehicle batch service
-		export rec_mvr_res := record
-		  string30 acctno;
-			unsigned6 mvr_did;
-			string8   reg_first_date;
-			string8   reg_latest_effective_date;
-		end;
-
-    // slimmed output of the voter batch service
- 		export rec_voter_res := record
-		  string30  acctno;
-		  unsigned6 voter_did;
-			string8   RegDate;
-			string8   LastDateVote;
-		end;
-
 		//used this in the normalized version    
 		export rec_lien := record
-		  STRING30	 	acctno      	:= '';
+			BatchServices.Layouts.layout_batch_common_acct;
 	    string50 filing_jurisdiction;
       string21 filing_jurisdiction_name;
 	    string20 orig_filing_number;
@@ -89,6 +50,29 @@ EXPORT TaxRefundISv3_BatchService_Layouts := MODULE
       string100 judge;
       string100 filing_status;	
     end;			
+
+    // Added for RQ-13836
+    // slimmed output of the Models.FraudAdvisor_Batch_Service_Records(FraudPoint) function
+    // since that attribute does not have a nice exportable record layout for it's final output
+    // that could be used in BatchServices.trisv31_get_hri 
+		export rec_fp_res_slim := record
+			BatchServices.Layouts.layout_batch_common_acct;
+      // only the FraudPoint fields output or used by TRIS
+	    Models.Layout_FD_Batch_Out.score1;
+		  Models.Layout_FDAttributes_Batch.v2_VariationSsnCount;
+		  Models.Layout_FDAttributes_Batch.v2_DivSSNIdentityCount;
+      Models.Layout_FDAttributes_Batch.v2_IDVerSSN;
+		  Models.Layout_FDAttributes_Batch.v2_ValidationAddrProblems;
+		  Models.Layout_FDAttributes_Batch.v2_InputAddrDwellType;
+		  Models.Layout_FDAttributes_Batch.v2_DivAddrIdentityCountNew;
+      Models.Layout_FD_Batch_Out.reason1;
+      Models.Layout_FD_Batch_Out.reason2;
+      Models.Layout_FD_Batch_Out.reason3;
+      Models.Layout_FD_Batch_Out.reason4;
+      Models.Layout_FD_Batch_Out.reason5;
+      Models.Layout_FD_Batch_Out.reason6;
+		end;
+
 		
 		export rec_batch_out := record
 			rec_batch_in;   //input data (see layout above)
@@ -668,9 +652,10 @@ EXPORT TaxRefundISv3_BatchService_Layouts := MODULE
 
 			unsigned2 Royalty_NAG; // Royalty.RoyaltyNetAcuity.IPData.Royalty_NAG;
 
-			// TRIS v3 2015 enhancement, new field ---v
+			// TRIS v3.0 2015-04-02 enhancement, new field ---v
 			string4   BestAddrChangeDistance; // "-1" or 0-9999 // TRIS v3 2015 enhancements req 4.1.10
-			// v3.1 with fdn
+
+			// v3.1 with fdn 
 			boolean fdn_id_risk;
 			unsigned1 FDN_Count  := 0;
 
