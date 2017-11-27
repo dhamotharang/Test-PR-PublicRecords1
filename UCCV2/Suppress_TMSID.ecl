@@ -1,5 +1,5 @@
-﻿ import dops;  
-	export Suppress_TMSID := dops.SuppressID('ucc').GetIDsAsSet();
+﻿ import dops;
+ 	export Suppress_TMSID(boolean isFCRA = false)  := dops.SuppressID('ucc').GetIDsAsSet(isFCRA);
 /*export Suppress_TMSID := ['TX9900206870',
 						'DNB2009007921920090109',
 						'DNB2009009378020090112',

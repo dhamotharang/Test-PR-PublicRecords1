@@ -1,4 +1,4 @@
-import ut, Enclarity, tools;
+﻿import ut, Enclarity, tools;
 
 EXPORT Files(STRING pversion = '', boolean pUseProd = false) := MODULE
 
@@ -24,19 +24,19 @@ EXPORT Files(STRING pversion = '', boolean pUseProd = false) := MODULE
   export npi_history 				:= dataset(Filenames(pversion,pUseProd).npi_lInputHistTemplate, layouts.npi_Input, csv(separator('|'),quote('')));
   export medschool_input  	:= dataset(Filenames(pversion,pUseProd).medschool_lInputTemplate, layouts.medschool_Input, csv(separator('|'),quote('')));
 	export medschool_history  := dataset(Filenames(pversion,pUseProd).medschool_lInputHistTemplate, layouts.medschool_Input, csv(separator('|'),quote('')));
-	export tax_codes_input   	:= dataset(Filenames(pversion,pUseProd).tax_codes_lInputTemplate, layouts.tax_codes_Input, csv(separator('|'),quote('')),opt);
+	export tax_codes_input   	:= dataset(Filenames(pversion,pUseProd).tax_codes_lInputTemplate, layouts.tax_codes_Input, csv(separator('|'),quote('')));
 	export tax_codes_history  := dataset(Filenames(pversion,pUseProd).tax_codes_lInputHistTemplate, layouts.tax_codes_Input, csv(separator('|'),quote('')));	
   export prov_ssn_input			:= dataset(Filenames(pversion,pUseProd).prov_ssn_lInputTemplate, layouts.prov_ssn_Input, csv(separator('|'),quote('')),opt);
   export prov_ssn_history		:= dataset(Filenames(pversion,pUseProd).prov_ssn_lInputHistTemplate, layouts.prov_ssn_Input, csv(separator('|'),quote('')));
-  export specialty_input  	:= dataset(Filenames(pversion,pUseProd).specialty_lInputTemplate, layouts.specialty_Input, csv(separator('|'),quote('')),opt);
+  export specialty_input  	:= dataset(Filenames(pversion,pUseProd).specialty_lInputTemplate, layouts.specialty_Input, csv(separator('|'),quote('')));
   export specialty_history  := dataset(Filenames(pversion,pUseProd).specialty_lInputHistTemplate, layouts.specialty_Input, csv(separator('|'),quote('')));
-  export sanc_prov_type_input  := dataset(Filenames(pversion,pUseProd).sanc_prov_type_lInputTemplate, layouts.sanc_prov_type_Input, csv(separator('|'),quote('')),opt);
+  export sanc_prov_type_input  := dataset(Filenames(pversion,pUseProd).sanc_prov_type_lInputTemplate, layouts.sanc_prov_type_Input, csv(separator('|'),quote('')));
   export sanc_prov_type_history  := dataset(Filenames(pversion,pUseProd).sanc_prov_type_lInputHistTemplate, layouts.sanc_prov_type_Input, csv(separator('|'),quote('')));
-  export sanc_codes_input  	:= dataset(Filenames(pversion,pUseProd).sanc_codes_lInputTemplate, layouts.sanc_codes_Input, csv(separator('|'),quote('')),opt);
+  export sanc_codes_input  	:= dataset(Filenames(pversion,pUseProd).sanc_codes_lInputTemplate, layouts.sanc_codes_Input, csv(separator('|'),quote('')));
   export sanc_codes_history := dataset(Filenames(pversion,pUseProd).sanc_codes_lInputHistTemplate, layouts.sanc_codes_Input, csv(separator('|'),quote('')));
   // export dea_BAcodes_input  := dataset(Filenames(pversion,pUseProd).dea_BAcodes_lInputTemplate, layouts.dea_BAcodes_Input, csv(separator('|')),opt);
   // export dea_BAcodes_history  := dataset(Filenames(pversion,pUseProd).dea_BAcodes_lInputHistTemplate, layouts.dea_BAcodes_Input, csv(separator('|')));
-	export prov_birthdate_input := dataset(Filenames(pversion,puseProd).prov_birthdate_lInputTemplate, layouts.prov_birthdate_input, csv(separator('|'),quote('')),opt);
+	export prov_birthdate_input := dataset(Filenames(pversion,puseProd).prov_birthdate_lInputTemplate, layouts.prov_birthdate_input, csv(separator('|'),quote('')));
 	export prov_birthdate_history := dataset(Filenames(pversion,puseProd).prov_birthdate_lInputHistTemplate, layouts.prov_birthdate_input, csv(separator('|'),quote('')));
   export sanction_input  		:= dataset(Filenames(pversion,pUseProd).sanction_lInputTemplate, layouts.sanction_Input, csv(separator('|'),quote('')));
   export sanction_history  	:= dataset(Filenames(pversion,pUseProd).sanction_lInputHistTemplate, layouts.sanction_Input, csv(separator('|'),quote('')));
