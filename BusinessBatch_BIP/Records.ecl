@@ -263,7 +263,7 @@ FUNCTION
 		SELF.Corp_var1_last_seen :=  IF(cnt = 1,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var1_last_seen);	
     SELF.corp_var1_state_origin := IF(cnt = 1,ri.corp_state_origin,le.corp_var1_state_origin);																													 
-		
+		  SELF.corp_var1_legal_name := IF(cnt = 1, ri.corp_legal_name, le.corp_var1_legal_name);
 		
 		SELF.corp_var2 := IF(cnt = 2,ri.Corp_sos_charter_nbr,le.corp_var2);
 		SELF.Corp_var2_first_seen  := IF(cnt = 2,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
@@ -271,62 +271,71 @@ FUNCTION
 		SELF.Corp_var2_last_seen :=  IF(cnt = 2,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var2_last_seen);	
     SELF.corp_var2_state_origin := IF(cnt = 2,ri.corp_state_origin,le.corp_var2_state_origin);																													 
-																															 
+				SELF.corp_var2_legal_name := IF(cnt = 2, ri.corp_legal_name, le.corp_var2_legal_name);
+				
     SELF.corp_var3 := IF(cnt = 3,ri.Corp_sos_charter_nbr,le.corp_var3);
 		SELF.Corp_var3_first_seen  := IF(cnt = 3,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var3_first_seen);
 		SELF.Corp_var3_last_seen :=  IF(cnt = 3,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var3_last_seen);	
 		SELF.corp_var3_state_origin := IF(cnt = 3,ri.corp_state_origin,le.corp_var3_state_origin);									
-   
+  SELF.corp_var3_legal_name := IF(cnt = 3, ri.corp_legal_name, le.corp_var3_legal_name);
+	
 	  SELF.corp_var4 := IF(cnt = 4,ri.Corp_sos_charter_nbr,le.corp_var4);
 		SELF.Corp_var4_first_seen  := IF(cnt = 4,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var4_first_seen);
 		SELF.Corp_var4_last_seen :=  IF(cnt = 4,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var4_last_seen);	
      SELF.corp_var4_state_origin := IF(cnt = 4,ri.corp_state_origin,le.corp_var4_state_origin);																																						 
-   	 
+   	 SELF.corp_var4_legal_name := IF(cnt = 4, ri.corp_legal_name, le.corp_var4_legal_name);
+		 
 		SELF.corp_var5 := IF(cnt = 5,ri.Corp_sos_charter_nbr,le.corp_var5);
 		SELF.Corp_var5_first_seen  := IF(cnt = 5,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var5_first_seen);
 		SELF.Corp_var5_last_seen :=  IF(cnt = 5,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var5_last_seen);	
-    SELF.corp_var5_state_origin := IF(cnt = 5,ri.corp_state_origin,le.corp_var5_state_origin);																																						 
+    SELF.corp_var5_state_origin := IF(cnt = 5,ri.corp_state_origin,le.corp_var5_state_origin);
+		  SELF.corp_var5_legal_name := IF(cnt = 5, ri.corp_legal_name, le.corp_var5_legal_name);
    
 	  SELF.corp_var6 := IF(cnt = 6,ri.Corp_sos_charter_nbr,le.corp_var6);
 		SELF.Corp_var6_first_seen  := IF(cnt = 6,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var6_first_seen);
 		SELF.Corp_var6_last_seen :=  IF(cnt = 6,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var6_last_seen);	
-   SELF.corp_var6_state_origin := IF(cnt = 6,ri.corp_state_origin,le.corp_var6_state_origin);																																																					 
+   SELF.corp_var6_state_origin := IF(cnt = 6,ri.corp_state_origin,le.corp_var6_state_origin);
+	 SELF.corp_var6_legal_name := IF(cnt = 6, ri.corp_legal_name, le.corp_var6_legal_name);
    
 	 SELF.corp_var7 := IF(cnt = 7,ri.Corp_sos_charter_nbr,le.corp_var7);
 		SELF.Corp_var7_first_seen  := IF(cnt = 7,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var7_first_seen);
 		SELF.Corp_var7_last_seen :=  IF(cnt = 7,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var7_last_seen);	
-    SELF.corp_var7_state_origin := IF(cnt = 7,ri.corp_state_origin,le.corp_var7_state_origin);																																						 
+    SELF.corp_var7_state_origin := IF(cnt = 7,ri.corp_state_origin,le.corp_var7_state_origin);
+		SELF.corp_var7_legal_name := IF(cnt = 7, ri.corp_legal_name, le.corp_var7_legal_name);
    
 	  SELF.corp_var8 := IF(cnt = 8,ri.Corp_sos_charter_nbr,le.corp_var8);
 		SELF.Corp_var8_first_seen  := IF(cnt = 8,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var8_first_seen);
 		SELF.Corp_var8_last_seen :=  IF(cnt = 8,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var8_last_seen);	
-    SELF.corp_var8_state_origin := IF(cnt = 8,ri.corp_state_origin,le.corp_var8_state_origin);																																						 
+    SELF.corp_var8_state_origin := IF(cnt = 8,ri.corp_state_origin,le.corp_var8_state_origin);
+		SELF.corp_var8_legal_name := IF(cnt = 8, ri.corp_legal_name, le.corp_var8_legal_name);
 	 
 	  SELF.corp_var9 := IF(cnt = 9,ri.Corp_sos_charter_nbr,le.corp_var9);
 		SELF.Corp_var9_first_seen  := IF(cnt = 9,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var9_first_seen);
 		SELF.Corp_var9_last_seen :=  IF(cnt = 9,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var9_last_seen);	
-    SELF.corp_var9_state_origin := IF(cnt = 9,ri.corp_state_origin,le.corp_var9_state_origin);																																						 
+    SELF.corp_var9_state_origin := IF(cnt = 9,ri.corp_state_origin,le.corp_var9_state_origin);	
+		SELF.corp_var9_legal_name := IF(cnt = 9, ri.corp_legal_name, le.corp_var9_legal_name);
     
 		SELF.corp_var10 := IF(cnt = 10,ri.Corp_sos_charter_nbr,le.corp_var10);
 		SELF.Corp_var10_first_seen  := IF(cnt = 10,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var10_first_seen);
 		SELF.Corp_var10_last_seen :=  IF(cnt = 10,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var10_last_seen);	
-    SELF.corp_var10_state_origin := IF(cnt = 10,ri.corp_state_origin,le.corp_var10_state_origin);																																						 
+    SELF.corp_var10_state_origin := IF(cnt = 10,ri.corp_state_origin,le.corp_var10_state_origin);
+		  SELF.corp_var10_legal_name := IF(cnt = 10, ri.corp_legal_name, le.corp_var10_legal_name);
    
 		SELF.total_corp := 0;
 		
@@ -614,7 +623,8 @@ FUNCTION
 	                     LEFT.acctno = RIGHT.acctno AND
 									     BIPV2.IDmacros.mac_JoinTop3Linkids(),
 											 TRANSFORM(BusinessBatch_BIP.Layouts.FinalWithLinkIds,											 
-											 SELF.OshaViolations := RIGHT.OshaViolations;											 
+											 SELF.OshaViolations := RIGHT.OshaViolations;	
+											 SELF.Total_Inspections := RIGHT.Total_Inspections;
 											 SELF := LEFT),
 											 LEFT OUTER, LIMIT(0), KEEP(1));
 											 									 

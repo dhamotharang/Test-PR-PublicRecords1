@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BusinessBatch_BIP">
 	<part name="DPPAPurpose"          type="xsd:byte"/>
 	<part name="GLBPurpose"           type="xsd:byte"/>
@@ -14,18 +14,20 @@
 EXPORT RollupService() :=
 MACRO
 	
-	ds_batchIn := DATASET([],BusinessBatch_BIP.Layouts.Input) : STORED('Batch_In');
+	ds_batchIn := DATASET([], BusinessBatch_BIP.Layouts.Input) : STORED('Batch_In');
 	
   // Standardize input
-  BatchShare.MAC_ProcessInput(ds_batchIn,ds_batchInProcessed);
+  BatchShare.MAC_ProcessInput(ds_batchIn, ds_batchInProcessed);
   
   batchParams := BusinessBatch_BIP.iParam.getBatchParams();
   
-	ds_batchResults := BusinessBatch_BIP.Records(ds_batchInProcessed,batchParams);
+	ds_batchResults := BusinessBatch_BIP.Records(ds_batchInProcessed, batchParams);
   
-  BatchShare.MAC_RestoreAcctno(ds_batchInProcessed,ds_batchResults,results);
+  BatchShare.MAC_RestoreAcctno(ds_batchInProcessed, ds_batchResults, ds_results);
+		
+		ut.mac_TrimFields(ds_results, 'ds_results', Results);
 	
-	OUTPUT(results,NAMED('Results'));
+	OUTPUT(Results, NAMED('Results'));
 
 ENDMACRO;	
 
