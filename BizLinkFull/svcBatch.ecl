@@ -139,4 +139,3 @@ EXPORT svcBatch := MACRO
   // reply with the output type the user requested.
   OUTPUT(BIPV2_Suppression.macSuppress(IF(bIncludeBest,dSeleBest,dAppended)),NAMED('Results'));
 ENDMACRO;
-

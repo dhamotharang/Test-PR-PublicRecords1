@@ -20,4 +20,3 @@ EXPORT EFR_Layout := RECORD
   DATASET(EFR_Child) Hits;
 END;
 END;
-

@@ -31,4 +31,3 @@ OUTPUT( odl,NAMED('proxidOneRecords'));
 OUTPUT( odr,NAMED('proxidTwoRecords'));
 ENDMACRO;
  
-

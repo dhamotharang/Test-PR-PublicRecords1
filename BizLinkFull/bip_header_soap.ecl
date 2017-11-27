@@ -75,4 +75,3 @@ EXPORT bip_header_soap := MACRO
     // OUTPUT(dRawResultsClipped,NAMED('soap_results'));
 ENDMACRO;
   
-

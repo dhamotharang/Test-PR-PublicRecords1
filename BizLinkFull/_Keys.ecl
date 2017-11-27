@@ -1,20 +1,14 @@
-//Compile all keys for bizlinkfull in one place
+﻿//Compile all keys for BizLinkFull in one place
 //easy to output this module to see if keys exist/are correct layout/etc
 import bipv2,BIPV2_Company_Names,TopBusiness_BIPV2,BIPV2_ProxID,BIPV2_Best,BIPV2_Relative,BizLinkFull,tools,BIPV2_Seleid_Relative,BIPV2_LGID3,Address_Attributes,BIPv2_HRCHY;
-
 EXPORT _Keys(
-
    string   pversion              = 'qa'
-  ,boolean	pUseOtherEnvironment	= false
-
+  ,boolean  pUseOtherEnvironment  = false
 ) :=
 module
-
   shared bizbase        := BizLinkFull.File_BizHead;
   shared specs          := BizLinkFull.specificities(bizbase);
-
   shared bizknames        := BizLinkFull.keynames           (pversion,puseotherenvironment);
-
   //key definitions
   export Xlinkmeow                      := tools.macf_FilesIndex('BizLinkFull.Process_Biz_Layouts.Key            ' ,bizknames.meow                    );
   export Xlinkrefs                      := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.Key                   ' ,bizknames.refs                    );
@@ -43,7 +37,6 @@ module
   export Xlinksup_orgid                 := tools.macf_FilesIndex('BizLinkFull.Process_Biz_Layouts.KeyorgidUp     ' ,bizknames.sup_orgid               );
   export Xlinksup_rcid                  := tools.macf_FilesIndex('BizLinkFull.Process_Biz_Layouts.KeyIDHistory   ' ,bizknames.sup_rcid                );
   export Xlinkrefs_l_sic                := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_SIC.Key              ' ,bizknames.refs_l_sic               );
-
   export outputkeys := 
   parallel(
      output('______________________________________________________________________________')
