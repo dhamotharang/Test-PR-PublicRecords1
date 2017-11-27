@@ -1,7 +1,4 @@
-﻿/*2017-08-21T16:06:34Z (dlingle)
-C:\Users\lingledg\AppData\Roaming\HPCC Systems\eclide\dlingle\OSS_Dataland\BusinessBatch_BIP\Functions\2017-08-21T16_06_34Z.ecl
-*/
-IMPORT BIPV2,BIPV2_Build, BusinessBatch_BIP,
+﻿IMPORT BIPV2,BIPV2_Build, BusinessBatch_BIP,
 	Corp2,DCAV2,Gong,LiensV2,LN_PropertyV2,
        Suppress,TopBusiness_Services,UCCV2,FAA,Watercraft,VehicleV2,ut, 
 			 SAM,Business_Risk,Business_Risk_BIP,Codes,bankruptcyV3, STD,
@@ -1174,18 +1171,28 @@ END;
 	   dOSHAInfo := OSHAIR.Key_OSHAIR_LinkIds.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID,,
 		                                               BusinessBatch_BIP.Constants.Limits.MAXOshair);
 
-     dOSHAInfoSlim := DEDUP(SORT(dOSHAInfo,activity_number),activity_number);
-		         
+     dOSHAInfoSlim := DEDUP(SORT(dOSHAInfo,activity_number, -last_activity_date),activity_number);
+			         
 	   dOSHADataWithAcctNo := JOIN(dLinkIDsWithAcctNo,dOSHAInfoSlim,
 														  BIPV2.IDmacros.mac_JoinTop3Linkids(),
 															  TRANSFORM(BusinessBatch_BIP.Layouts.OSHAInspectionInfo,
-																  SELF.acctno := LEFT.acctno; 
-																	SELF.OshaViolations := (unsigned2) RIGHT.total_Violations;
+																 SELF.acctno := LEFT.acctno; 
+																 SELF.OshaViolations := right.total_Violations;
+																	SELF.Total_Inspections := IF(BIPV2.IDmacros.mac_JoinTop3Linkids(), 
+																																												BusinessBatch_BIP.Constants.Defaults.NumberofInspections, 0); // condition for zero inspection matches
 																	SELF        := LEFT;
-																)
-															, LEFT OUTER, 
-															LIMIT(0), KEEP(1)
-														); 				
-	  RETURN dOSHADataWithAcctNo;		
+																	SELF        := []),
+																	LEFT OUTER,	LIMIT(BusinessBatch_BIP.Constants.Limits.MAXOshair, SKIP)); 		
+														
+			BusinessBatch_BIP.Layouts.OSHAInspectionInfo rollup_recs(BusinessBatch_BIP.Layouts.OSHAInspectionInfo L, 
+																																																																													BusinessBatch_BIP.Layouts.OSHAInspectionInfo R) := TRANSFORM
+			  SELF.OshaViolations := L.OshaViolations + R.OshaViolations;
+			  SELF.Total_Inspections := L.Total_Inspections + R.Total_Inspections;
+			  SELF := L; 
+	  End;
+
+		OSHARecs := rollup(dOSHADataWithAcctNo, rollup_recs(left,right), ultid, seleid, orgid);									
+														
+		RETURN OSHARecs;		
 	END;
 END;

@@ -191,6 +191,7 @@ EXPORT Layouts := MODULE
     Corp2.Layout_Corporate_Direct_Corp_Base.corp_ra_name_suffix1;
     Corp2.Layout_Corporate_Direct_Corp_Base.corp_ra_cname1;
     Corp2.Layout_Corporate_Direct_Corp_Base.corp_ra_phone10;
+		Corp2.Layout_Corporate_Direct_Corp_Base.corp_legal_name; // CORP LEGAL NAME		
 		Corp2.Layout_Corporate_Direct_Corp_Base.corp_sos_charter_nbr;
 		Corp2.Layout_Corporate_Direct_Corp_Base.dt_first_seen;
 		Corp2.Layout_Corporate_Direct_Corp_Base.dt_last_seen;
@@ -287,7 +288,8 @@ EXPORT Layouts := MODULE
 	RECORD
 	  STRING20 acctno;
 		BIPV2.IDlayouts.l_header_ids;		
-		unsigned2 OshaViolations;		
+		unsigned2 OshaViolations;
+		unsigned2 Total_Inspections;
   END;		
 		
 	EXPORT PARENT_FINAL := record	  
@@ -701,51 +703,61 @@ EXPORT Layouts := MODULE
 		STRING10  corp_var1_first_seen;
 		STRING10  corp_var1_last_seen;
 		STRING3   corp_var1_state_origin;
+		string350 corp_var1_legal_name;
 		
 	  STRING20  corp_var2;
 		STRING10  corp_var2_first_seen;
 		STRING10  corp_var2_last_seen;
 		STRING3   corp_var2_state_origin;
+		string350 corp_var2_legal_name;
 		
 		STRING20  corp_var3;
 		STRING10  corp_var3_first_seen;
 		STRING10  corp_var3_last_seen;
 		STRING3   corp_var3_state_origin;
+		string350 corp_var3_legal_name;
 		
 		STRING20  corp_var4;
 		STRING10  corp_var4_first_seen;
 		STRING10  corp_var4_last_seen;
 		STRING3   corp_var4_state_origin;
+		string350 corp_var4_legal_name;
 		
 		STRING20  corp_var5;
 		STRING10  corp_var5_first_seen;
 		STRING10  corp_var5_last_seen;
 		STRING3   corp_var5_state_origin;
+		string350 corp_var5_legal_name;
 		
 		STRING20  corp_var6;
 		STRING10  corp_var6_first_seen;
 		STRING10  corp_var6_last_seen;
 		STRING3   corp_var6_state_origin;
+		string350 corp_var6_legal_name;
 		
 		STRING20  corp_var7;
 		STRING10  corp_var7_first_seen;
 		STRING10  corp_var7_last_seen;
 		STRING3   corp_var7_state_origin;
+		string350 corp_var7_legal_name;
 		
 		STRING20  corp_var8;
 		STRING10  corp_var8_first_seen;
 		STRING10  corp_var8_last_seen;
 		STRING3   corp_var8_state_origin;
+		string350 corp_var8_legal_name;
 		
 		STRING20  corp_var9;
 		STRING10  corp_var9_first_seen;
 		STRING10  corp_var9_last_seen;
 		STRING3   corp_var9_state_origin;
+		string350 corp_var9_legal_name;
 		
 		STRING20  corp_var10;
 		STRING10  corp_var10_first_seen;
 		STRING10  corp_var10_last_seen;			
 		STRING3   corp_var10_state_origin;
+		string350 corp_var10_legal_name;
 		
 		UNSIGNED2 total_Corp;
 		
