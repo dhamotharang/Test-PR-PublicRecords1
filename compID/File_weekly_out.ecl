@@ -1,1 +1,0 @@
-export File_weekly_out := dataset('~thor_data400::out::weekly::alpharetta::compid',Layout_compID_out,flat);
