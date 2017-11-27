@@ -403,14 +403,14 @@ EXPORT file_combined_people(Boolean FCRA = false, Boolean dtc = false) := functi
 		people_j1 := join(people_grouped2, People_Owned_BDIDs.Records,
 											left.did = right.did,
 											transform({people_grouped2},
-																self.owned_businesses_bdid := project(right.company_titles, Layouts.business_bdid_layout);
+																self.owned_businesses_bdid := choosen(project(right.company_titles, Layouts.business_bdid_layout),25);
 																self.Owned_Business_bdid_cnt := count(right.company_titles);
 																self := left;
 																), left outer);
 		people_j := join(people_j1, People_Owned_LinkIDs.Records,
 											left.did = right.did,
 											transform({people_grouped2},
-																self.owned_businesses_linkid := right.businesses_linkids;
+																self.owned_businesses_linkid := choosen(right.businesses_linkids,25);
 																self.Owned_Business_linkid_cnt := count(right.businesses_linkids);
 																self := left;
 																), left outer);															
