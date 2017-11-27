@@ -1,5 +1,5 @@
 ﻿  import dops;  
-  export Suppress_TMSID := dops.SuppressID('fbn').GetIDsAsSet();
+  export Suppress_TMSID(boolean isFCRA = false)  := dops.SuppressID('fbn').GetIDsAsSet(isFCRA);
 /*export Suppress_TMSID := [ 'CP1972282901115689912',
 'INF214497643',
 'NYN3386756439',
