@@ -61,7 +61,7 @@ EXPORT SuppressID(string datasetname,
 		dConvertToSuppressLayout := project(dInputIDs,xConvertToSuppressLayout(left));
 		
 		dAddSuppressIDs := dedup(sort(dSuppressedRecords + dConvertToSuppressLayout
-																	,idvalue,filedate)
+																	,idvalue,-filedate)
 															,idvalue);
 		
 		
