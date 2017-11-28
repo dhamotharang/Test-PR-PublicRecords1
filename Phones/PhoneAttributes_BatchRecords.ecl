@@ -1,4 +1,4 @@
-IMPORT Phones, STD, UT;
+﻿IMPORT Phones, STD, UT;
 
 EXPORT PhoneAttributes_BatchRecords(
 	DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dBatchPhonesIn,
@@ -62,6 +62,8 @@ EXPORT PhoneAttributes_BatchRecords(
 		SELF.suspended_date							:= if(suspended, L.deact_start_dt, 0);
 		SELF.reactivated_date						:= if(reactivated, L.react_start_dt, 0);
 		SELF.source											:= L.source;
+		SELF.prepaid										:= L.prepaid;
+		SELF.error_desc									:= L.error_desc;
 	END;
 	dIntermediateBatchPhones := PROJECT(dPortedPhonesSorted, tOutputLayout(LEFT));
 	

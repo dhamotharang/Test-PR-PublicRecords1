@@ -1390,6 +1390,14 @@ export Layout_Boca_Shell_Edina_v53 := RECORD
 	integer bus_property_sold_total;
 	integer bus_property_sold_assess_total;
 	integer bus_property_sold_assess_count;
+	Risk_Indicators.Layouts.layout_Equifax_FraudFlags Eqfx_FraudFlags;
+	string3 crossindv5 := '';
+	string3 reason1cv5 := '';
+	string3 reason2cv5 := '';
+	string3 reason3cv5 := '';
+	string3 reason4cv5 := '';
+	string3 reason5cv5 := '';
+
 	
 END;
 

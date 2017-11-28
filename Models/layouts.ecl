@@ -92,53 +92,53 @@ export Layout_CDM_Batch_Out := record
 	unsigned4 seq;
 	
 	// ssn
-	string		IDVerSSNCreditBureauCount;
-	string    IDVerSSNCreditBureauMonthsSeen;
-	string		IDVerSSNGovernmentCount;
-	string    IDVerSSNGovernmentMonthsSeen;
-	string		IDVerSSNDriversLicense;
-	string		IDVerSSNDriversLicenseMonthsSeen;
-	string 		IDVerSSNBehavioralCount;
-	string		IDVerSSNBehavioralMonthsSeen;
+	string2	  IDVerSSNCreditBureauCount;
+	string4   IDVerSSNCreditBureauMonthsSeen;
+	string3 	IDVerSSNGovernmentCount;
+	string4   IDVerSSNGovernmentMonthsSeen;
+	string2		IDVerSSNDriversLicense;
+	string4		IDVerSSNDriversLicenseMonthsSeen;
+	string3		IDVerSSNBehavioralCount;
+	string4		IDVerSSNBehavioralMonthsSeen;
 	
 	// addr
-	string		IDVerAddrMatchesCurrent;
-	string		IDVerAddrCreditBureauCount;
-	string		IDVerAddrCreditBureauMonthsSeen;
-	string		IDVerAddrGovernmentCount;
-	string		IDVerAddrGovernmentMonthsSeen;
-	string		IDVerAddrDriversLicense;
-	string		IDVerAddrDriversLicenseMonthsSeen;
-	string		IDVerAddrVoterRegistration;
-	string		IDVerAddrVoterRegMonthsSeen;
-	string		IDVerAddrVehicleRegistration;
-	string		IDVerAddrVehicleRegMonthsSeen;
-	string		IDVerAddrProperty;
-	string		IDVerAddrPropertyMonthsSeen;
-	string		IDVerAddrBehavioralCount;
-	string		IDVerAddrBehavioralMonthsSeen;
+	string2		IDVerAddrMatchesCurrent;
+	string2		IDVerAddrCreditBureauCount;
+	string4		IDVerAddrCreditBureauMonthsSeen;
+	string3		IDVerAddrGovernmentCount;
+	string4		IDVerAddrGovernmentMonthsSeen;
+	string2		IDVerAddrDriversLicense;
+	string4		IDVerAddrDriversLicenseMonthsSeen;
+	string2		IDVerAddrVoterRegistration;
+	string4		IDVerAddrVoterRegMonthsSeen;
+	string2		IDVerAddrVehicleRegistration;
+	string4		IDVerAddrVehicleRegMonthsSeen;
+	string2		IDVerAddrProperty;
+	string4		IDVerAddrPropertyMonthsSeen;
+	string3		IDVerAddrBehavioralCount;
+	string4		IDVerAddrBehavioralMonthsSeen;
 	
 	// dob
-	string		IDVerDOBCreditBureauCount;
-	string		IDVerDOBCreditBureauMonthsSeen;
-	string		IDVerDOBGovernmentCount;
-	string		IDVerDOBGovernmentMonthsSeen;
-	string		IDVerDOBDriversLicense;
-	string		IDVerDOBDriversLicenseMonthsSeen;
-	string		IDVerDOBVoterRegistration;
-	string		IDVerDOBVoterRegMonthsSeen;
-	string		IDVerDOBVehicleRegistration;
-	string		IDVerDOBVehicleRegMonthsSeen;
-	string		IDVerDOBBehavioralCount;
-	string		IDVerDOBBehavioralMonthsSeen;
+	string2		IDVerDOBCreditBureauCount;
+	string4		IDVerDOBCreditBureauMonthsSeen;
+	string3		IDVerDOBGovernmentCount;
+	string4		IDVerDOBGovernmentMonthsSeen;
+	string2		IDVerDOBDriversLicense;
+	string4		IDVerDOBDriversLicenseMonthsSeen;
+	string2		IDVerDOBVoterRegistration;
+	string4		IDVerDOBVoterRegMonthsSeen;
+	string2		IDVerDOBVehicleRegistration;
+	string4		IDVerDOBVehicleRegMonthsSeen;
+	string3		IDVerDOBBehavioralCount;
+	string4		IDVerDOBBehavioralMonthsSeen;
 	
 	// firstname
-	string		IDVerFirstNameCreditBureauCount;
-	string    IDVerFirstNameCreditBureauMonthsSeen;
-	string		IDVerFirstNameGovernmentCount;
-	string    IDVerFirstNameGovernmentMonthsSeen;
-	string 		IDVerFirstNameBehavioralCount;
-	string		IDVerFirstNameBehavioralMonthsSeen;
+	string2		IDVerFirstNameCreditBureauCount;
+	string4   IDVerFirstNameCreditBureauMonthsSeen;
+	string3		IDVerFirstNameGovernmentCount;
+	string4   IDVerFirstNameGovernmentMonthsSeen;
+	string3 	IDVerFirstNameBehavioralCount;
+	string4		IDVerFirstNameBehavioralMonthsSeen;
 	
 end;
 

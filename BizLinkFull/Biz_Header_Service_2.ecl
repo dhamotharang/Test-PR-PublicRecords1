@@ -80,7 +80,7 @@ THISMODULE:=BizLinkFull;
   SALT33.StrType Input_empid := '' : STORED('empid',FORMAT(FEW,SEQUENCE(31)));
   UNSIGNED e_powid := 0 : STORED('powid',FORMAT(SEQUENCE(32)));
   SALT33.StrType Input_isContact := '' : STORED('isContact',FORMAT(SEQUENCE(33)));
-  UNSIGNED Input_UniqueID := 0 : STORED('UniqueID',FORMAT(SEQUENCE(34)));
+  UNSIGNED Input_UniqueID := 1 : STORED('UniqueID',FORMAT(SEQUENCE(34)));
   UNSIGNED InputMaxIds0 := 0 : STORED('MaxIds',FORMAT(SEQUENCE(35)));
   BOOLEAN FullMatch := FALSE : STORED('MatchAllInOneRecord',FORMAT(SEQUENCE(36)));
   BOOLEAN RecordsOnly := FALSE: STORED('RecordsOnly',FORMAT(SEQUENCE(37)));
@@ -135,7 +135,7 @@ sFNamePreferred:=THISMODULE.fn_PreferredName(Input_fname);
 sSortFlag:=IF(bHSort,'T','_');
 Template := dataset([],THISMODULE.Process_Biz_Layouts.InputLayout);
 //�
-Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,Input_LeadThreshold
+Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,Input_LeadThreshold,TRUE,FALSE
   ,(TYPEOF(Template.parent_proxid))Input_parent_proxid
   ,(TYPEOF(Template.sele_proxid))Input_sele_proxid
   ,(TYPEOF(Template.org_proxid))Input_org_proxid
@@ -146,7 +146,7 @@ Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,I
   ,(TYPEOF(Template.source_record_id))Input_source_record_id
   ,(TYPEOF(Template.source_docid))Input_source_docid
   ,(TYPEOF(Template.company_name))THISMODULE.Fields.Make_company_name((SALT33.StrType)Input_company_name)
-  ,(TYPEOF(Template.company_name_prefix))THISMODULE.Fields.Make_company_name_prefix((SALT33.StrType)dCnpName[1].cnp_name[..5])
+  ,(TYPEOF(Template.company_name_prefix))THISMODULE.Fields.Make_company_name_prefix((SALT33.StrType)BizLinkFull.fn_company_name_prefix(dCnpName[1].cnp_name))
   ,(TYPEOF(Template.cnp_name))THISMODULE.Fields.Make_cnp_name((SALT33.StrType)dCnpName[1].cnp_name)
   ,(TYPEOF(Template.cnp_number))dCnpName[1].cnp_number
   ,(TYPEOF(Template.cnp_btype))dCnpName[1].cnp_btype

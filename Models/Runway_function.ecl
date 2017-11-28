@@ -3915,11 +3915,25 @@ RVS811_0_0_score := Models.RVS811_0_0(ungroup(clam), bshell);
    self := left), keep(1), left outer);
    // output(with_RVS811_0_0, named('with_RVS811_0_0'));		
    
+	RVS1706_0_score := Models.RVS1706_0_0(clam);
+// output(RVS1706_0_score, named('RVS1706_0_score'));
+                                     
+with_RVS1706_0 := join(with_RVS811_0_0, RVS1706_0_score,
+left.seq=(unsigned)right.seq,
+transform(Models.layout_Runway,
+self.RVS1706_0_score := right.score;
+self.RVS1706_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self.RVS1706_0_reason2 := if(exclude_reasons, '',  right.ri[2].hri);
+self.RVS1706_0_reason3 := if(exclude_reasons, '',  right.ri[3].hri);
+self.RVS1706_0_reason4 := if(exclude_reasons, '',  right.ri[4].hri);
+self := left), keep(1), left outer);
+// output(with_RVS1706_0, named('with_RVS1706_0'));	 
+	 
 
 RVT1003_0_0_score := Models.RVT1003_0_0(clam);
 // output(RVT1003_0_0_score, named('RVT1003_0_0_score'));
                                      
-with_RVT1003_0_0 := join(with_RVS811_0_0, RVT1003_0_0_score,
+with_RVT1003_0_0 := join(with_RVS1706_0, RVT1003_0_0_score,
 left.seq=(unsigned)right.seq,
 transform(Models.layout_Runway,
 self.RVT1003_0_0_score := right.score;
@@ -5923,6 +5937,12 @@ self.RVS811_0_0_reason1	:= if(model_environment in [1,3], left.RVS811_0_0_reason
 self.RVS811_0_0_reason2	:= if(model_environment in [1,3], left.RVS811_0_0_reason2	, '');
 self.RVS811_0_0_reason3	:= if(model_environment in [1,3], left.RVS811_0_0_reason3	, '');
 self.RVS811_0_0_reason4	:= if(model_environment in [1,3], left.RVS811_0_0_reason4	, '');
+
+self.RVS1706_0_score	:= if(model_environment in [1,2], left.RVS1706_0_score	, '');
+self.RVS1706_0_reason1	:= if(model_environment in [1,2], left.RVS1706_0_reason1	, '');
+self.RVS1706_0_reason2	:= if(model_environment in [1,2], left.RVS1706_0_reason2	, '');
+self.RVS1706_0_reason3	:= if(model_environment in [1,2], left.RVS1706_0_reason3	, '');
+self.RVS1706_0_reason4	:= if(model_environment in [1,2], left.RVS1706_0_reason4	, '');
 
 
 self.RVT1003_0_0_score	:= if(model_environment in [1,2], left.RVT1003_0_0_score	, '');

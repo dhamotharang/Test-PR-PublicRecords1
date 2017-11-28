@@ -207,9 +207,9 @@ EXPORT getAllBocaShellData (
 
 	prop_with_advo_deduped :=  dedup(sort(prop_with_advo, seq, did, zip5, prim_range, prim_name, addr_suffix, predir, postdir, sec_range, -date_first_seen), 
 																												seq, did, zip5, prim_range, prim_name, addr_suffix, predir, postdir, sec_range);
-	
+
   single_property := 
-		MAP(BSversion >= 53 and ~isFCRA	=> group(prop_with_advo_deduped, seq), //new business property fields are nonFCRA only
+		MAP(BSversion >= 53 and ~isFCRA	=> sort(group(sort(prop_with_advo_deduped + prop_common(isrelat), seq), seq),prim_name,prim_range,zip5,sec_range,census_loose,dataSrce), 
 				BSversion >= 50 						=> prop_common,
 																			 IF(production_realtime_mode, prop, prop_hist)
 			 );
@@ -1768,7 +1768,12 @@ AllowedSourcesSet :=
 
 withBIP_Header := Risk_Indicators.Boca_Shell_BIP_Header(finalOffset, Options, linkingOptions, AllowedSourcesSet, isFCRA); 
 
-final53 := if(bsversion >= 53, group(withBIP_Header, seq), finalOffset);
+withEquifaxFraudFlags := Risk_Indicators.Boca_Shell_Equifax_FraudFlags(group(withBIP_Header, seq), isFCRA); 
+
+final53 := if(bsversion >= 53, group(withEquifaxFraudFlags, seq), finalOffset);
+
+
+// final53 := finalOffset;
 
 // output(derogs_added_back, named('derogs_added_back'));
 // output(final, named('final'));

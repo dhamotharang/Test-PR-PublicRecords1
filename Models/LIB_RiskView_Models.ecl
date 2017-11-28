@@ -25,10 +25,10 @@ EXPORT LIB_RiskView_Models (
 	
 	/* Model Validation -- Use this when trying to validate a new model through the RiskView.Search_Service */
   EXPORT TurnOnValidation := FALSE; // When TRUE allows for Layout_Debug to be OUTPUT in the Search_Service
-	//EXPORT TurnOnValidation := TRUE; // When TRUE allows for Layout_Debug to be OUTPUT in the RiskView.Search_Service
+	// EXPORT TurnOnValidation := TRUE; // When TRUE allows for Layout_Debug to be OUTPUT in the RiskView.Search_Service
 	
 	
-	EXPORT ValidatingModel := Models.RVA1611_2_0 (BocaShell, False); // Change this to the model you are tring to validate
+	EXPORT ValidatingModel := Models.RVS1706_0_0(BocaShell); // Change this to the model you are tring to validate
 	
 	
 	// Version 4.0
@@ -89,6 +89,7 @@ EXPORT LIB_RiskView_Models (
 	SHARED MType_B := 'BankCard';
 	SHARED MType_G := 'ShortTermLending';
 	SHARED MType_T := 'Telecom';
+	SHARED MType_S := 'CrossIndustry';
 	// calcIndex returns the 'billing_index' given the report_option value.
 	// billing_index is needed by batch.  it is passed to the ESP logging server
 	// which performs a calculation to determine the actual report option.
@@ -116,6 +117,7 @@ that is sent INTO calcindex for ECL.
 
 	EXPORT ValidV50Models := DATASET([// Model Name |    Output Name     | Model Index   | Model Type
                                     //     v      |         v          |    v          |    v
+																  {'RVS1706_0', MType_S+'RVS1706_0', calcIndex( 39), '0-999', 0}, //RV Crossindustry Flaghips
 																			{'RVA1503_0', MType_A+'RVA1503_0', calcIndex( 40), '0-999', 0},
 																			{'RVB1503_0', MType_B+'RVB1503_0', calcIndex( 41), '0-999', 0},
 																			{'RVG1502_0', MType_G+'RVG1502_0', calcIndex( 42), '0-999', 0},
@@ -186,6 +188,7 @@ that is sent INTO calcindex for ECL.
 											'RVG1706_1' => UNGROUP(Models.RVG1706_1_0(BocaShell)),		
 											'RVA1611_1' => UNGROUP(Models.RVA1611_1_0(BocaShell, isPreScreenPurpose)),	
 											'RVA1611_2' => UNGROUP(Models.RVA1611_2_0(BocaShell, isPreScreenPurpose)),	
+											'RVS1706_0' => UNGROUP(Models.RVS1706_0_0(BocaShell)),	
 											// ----------------------------------------------------------------------------------
 											// ------------------- FAKE MODELS - STATIC SCORE AND REASON CODES ------------------
 											'RVA9999_9' => UNGROUP(Models.FAKE_0_0(BocaShell, 'RV50')),

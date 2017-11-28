@@ -1,4 +1,4 @@
-IMPORT Drivers,MDR,Phonesplus_v2,STD,ut;
+﻿IMPORT Drivers,MDR,Phonesplus_v2,STD,ut;
 
 EXPORT Functions :=
 MODULE
@@ -402,5 +402,11 @@ MODULE
 		RETURN ssc_out;
 	
 	END;
+	
+	EXPORT STRING LineServiceTypeDesc(INTEGER LineServiceType) := CASE(LineServiceType,
+																																0 => Phones.Constants.PhoneServiceType.Landline,
+																																1 => Phones.Constants.PhoneServiceType.Wireless,
+																																2 => Phones.Constants.PhoneServiceType.VoIP,
+																																Phones.Constants.PhoneServiceType.Other);		
 
 END;

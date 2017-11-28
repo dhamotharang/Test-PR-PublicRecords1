@@ -1,4 +1,4 @@
-/*2015-11-09T22:10:46Z (Xuran Yan)
+﻿/*2015-11-09T22:10:46Z (Xuran Yan)
 Simplified last modification
 */
 import models, easi, riskwise, _Control;
@@ -72,6 +72,7 @@ rvBank5 := models.RVB1503_0_0(bsdata);
 rvAuto5 := models.RVA1503_0_0(bsdata);
 rvTelecom5 := models.RVT1503_0_0(bsdata);
 rvMoney5 := models.RVG1502_0_0(bsdata);
+rvCrossInd5 := models.RVS1706_0_0(bsdata);
 
 Layout_Boca_Shell doModels(Layout_Boca_Shell le, Models.Layout_ModelOut ri, integer i) := transform
 	self.rv_scores.auto := if(i=1, ri.score, le.rv_scores.auto);
@@ -198,6 +199,12 @@ input_ok := if((
 	self.rv_scores.reason3mv5  := if( i=29 and input_ok, ri.ri[3].hri, le.rv_scores.reason3mv5 );
 	self.rv_scores.reason4mv5  := if( i=29 and input_ok, ri.ri[4].hri, le.rv_scores.reason4mv5 );
 	self.rv_scores.reason5mv5  := if( i=29 and input_ok, ri.ri[5].hri, le.rv_scores.reason5mv5 );
+	self.rv_scores.crossindv5  := if( i=30 and input_ok, ri.score, le.rv_scores.crossindv5 );
+	self.rv_scores.reason1cv5  := if( i=30 and input_ok, ri.ri[1].hri, le.rv_scores.reason1cv5 );
+	self.rv_scores.reason2cv5  := if( i=30 and input_ok, ri.ri[2].hri, le.rv_scores.reason2cv5 );
+	self.rv_scores.reason3cv5  := if( i=30 and input_ok, ri.ri[3].hri, le.rv_scores.reason3cv5 );
+	self.rv_scores.reason4cv5  := if( i=30 and input_ok, ri.ri[4].hri, le.rv_scores.reason4cv5 );
+	self.rv_scores.reason5cv5  := if( i=30 and input_ok, ri.ri[5].hri, le.rv_scores.reason5cv5 );
 	
 	self.fd_scores.fd3 := if(i=9, ri.score, le.fd_scores.fd3);
 	self.fd_scores.fd6 := if(i=10, ri.score, le.fd_scores.fd6);
@@ -297,6 +304,9 @@ wTelecom5   := if(onThor,
 wMoney5     := if(onThor,
 						join(wTelecom5, distribute(rvMoney5, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,29), left outer, local),
 						join(wTelecom5, rvMoney5, left.seq=right.seq, doModels(LEFT,RIGHT,29), left outer));
+wCrossInd5  := if(onThor,
+						join(wMoney5, distribute(rvCrossInd5, hash64(seq)), left.seq=right.seq, doModels(LEFT,RIGHT,30), left outer, local),
+						join(wMoney5, rvCrossInd5, left.seq=right.seq, doModels(LEFT,RIGHT,30), left outer));
 
 // FRAUD MODELS
 wFD3 := if(onThor,
@@ -374,7 +384,7 @@ wFP3_FDN := if(onThor,
 							join(wFP3, distribute(fp3_FDN, hash64(seq)), left.seq=right.seq, doFP3FDN1505Model(LEFT,RIGHT), left outer, local),
 							join(wFP3, fp3_FDN, left.seq=right.seq, doFP3FDN1505Model(LEFT,RIGHT), left outer));
 
-wModels1 := if(isFCRA, wMoney5, wFP3_FDN);
+wModels1 := if(isFCRA, wCrossInd5, wFP3_FDN);
 
 
 
@@ -453,6 +463,11 @@ self.rv_scores.reason2mv5	:= if(left.rv_scores.reason2mv5	in ['00', '000'], '', 
 self.rv_scores.reason3mv5	:= if(left.rv_scores.reason3mv5	in ['00', '000'], '', left.rv_scores.reason3mv5	);
 self.rv_scores.reason4mv5	:= if(left.rv_scores.reason4mv5	in ['00', '000'], '', left.rv_scores.reason4mv5	);
 self.rv_scores.reason5mv5	:= if(left.rv_scores.reason5mv5	in ['00', '000'], '', left.rv_scores.reason5mv5	);
+self.rv_scores.reason1cv5	:= if(left.rv_scores.reason1cv5	in ['00', '000'], '', left.rv_scores.reason1cv5	);
+self.rv_scores.reason2cv5	:= if(left.rv_scores.reason2cv5	in ['00', '000'], '', left.rv_scores.reason2cv5	);
+self.rv_scores.reason3cv5	:= if(left.rv_scores.reason3cv5	in ['00', '000'], '', left.rv_scores.reason3cv5	);
+self.rv_scores.reason4cv5	:= if(left.rv_scores.reason4cv5	in ['00', '000'], '', left.rv_scores.reason4cv5	);
+self.rv_scores.reason5cv5	:= if(left.rv_scores.reason5cv5	in ['00', '000'], '', left.rv_scores.reason5cv5	);
 
 self.fd_scores.reason1	:= if(left.fd_scores.reason1	in ['00', '000'], '', left.fd_scores.reason1	);
 self.fd_scores.reason2	:= if(left.fd_scores.reason2	in ['00', '000'], '', left.fd_scores.reason2	);

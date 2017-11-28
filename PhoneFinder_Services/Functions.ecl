@@ -186,7 +186,7 @@ MODULE
 	EXPORT GetDIDsBatch(DATASET(Autokey_batch.Layouts.rec_inBatchMaster) dBatchIn) :=
 	FUNCTION
 		
-		dDidsAcctno 	:= BatchServices.Functions.fn_find_dids_and_append_to_acctno(dBatchIn, PhoneFinder_Services.Constants.MaxDIDs); 
+		dDidsAcctno 	:= BatchServices.Functions.fn_find_dids_and_append_to_acctno(dBatchIn, PhoneFinder_Services.Constants.MaxDIDs,  false); // to prune oldssns
 		
 		// Rollup the dids dataset returned with each acctno to count the dids
 		lBatchInDID tRollDids(doxie.layout_references_acctno le, dataset(doxie.layout_references_acctno) allRows) :=
