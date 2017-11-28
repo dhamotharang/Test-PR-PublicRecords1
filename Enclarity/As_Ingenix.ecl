@@ -131,8 +131,82 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 							,left outer
 							,lookup);
 							
+		
+		temp_InIndi_rec:= record
+			InIndi.lnpid;
+			InIndi.dt_first_seen;
+			InIndi.dt_last_seen;
+			InIndi.dt_vendor_first_reported;
+			InIndi.dt_vendor_last_reported;
+			InIndi.pid;
+			InIndi.group_key;
+			InIndi.addr_key;
+			InIndi.prim_range;
+			InIndi.predir;
+			InIndi.prim_name;
+			InIndi.addr_suffix;
+			InIndi.postdir;
+			InIndi.unit_desig;
+			InIndi.sec_range;
+			InIndi.v_city_name;
+			InIndi.p_city_name;
+			InIndi.st;
+			InIndi.zip;
+			InIndi.zip4;
+			InIndi.cart;
+			InIndi.cr_sort_sz;
+			InIndi.lot;
+			InIndi.lot_order;
+			InIndi.dbpc;
+			InIndi.chk_digit;
+			InIndi.rec_type;
+			InIndi.fips_st;
+			InIndi.fips_county;
+			InIndi.geo_lat;
+			InIndi.geo_long;
+			InIndi.msa;
+			InIndi.geo_match;
+			InIndi.err_stat;
+			InIndi.source_rid;
+			InIndi.did;
+			InIndi.last_name;
+			InIndi.first_name;
+			InIndi.middle_name;
+			InIndi.clean_dob;
+			InIndi.clean_ssn;
+			InIndi.upin;
+			InIndi.title;
+			InIndi.fname;
+			InIndi.mname;
+			InIndi.lname;
+			InIndi.name_suffix;
+			InIndi.DotID;
+			InIndi.DotScore;
+			InIndi.DotWeight;
+			InIndi.EmpID;
+			InIndi.EmpScore;
+			InIndi.EmpWeight;
+			InIndi.POWID;
+			InIndi.POWScore;
+			InIndi.POWWeight;
+			InIndi.ProxID;
+			InIndi.ProxScore;
+			InIndi.ProxWeight;
+			InIndi.SELEID;
+			InIndi.SELEScore;
+			InIndi.SELEWeight;	
+			InIndi.OrgID;
+			InIndi.OrgScore;
+			InIndi.OrgWeight;
+			InIndi.UltID;
+			InIndi.UltScore;
+			InIndi.UltWeight;	
+		end;
+		
+		slim_InIndi	:= project(InIndi, temp_InIndi_rec);
 		sort_prep5		:= sort(distribute(prep5, hash(group_key)), group_key, local);
-		sort_InIndi	:=	sort(distribute(InIndi, hash(group_key, addr_key)), group_key, addr_key, -dt_vendor_last_reported, local):independent;
+		dedup_InIndi	:=	dedup(sort(distribute(slim_InIndi, hash(group_key, addr_key)), group_key, addr_key, -dt_vendor_last_reported, local), group_key, addr_key, local):independent;
+		sort_InIndi	:=	sort(distribute(dedup_InIndi, hash(group_key)), group_key, -dt_vendor_last_reported, local):independent;
 
 		OutLayout tr2(sort_prep5 l, sort_InIndi r) := transform
 			self.lnpid															:=	if(l.group_key = r.group_key, r.lnpid, l.lnpid);
@@ -234,8 +308,79 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 							,local
 							);
 
-		sort_prep6		:= sort(distribute(prep6, hash(group_key)), group_key, local);
-		sort_inAsso	:= sort(distribute(InAsso, hash(group_key, addr_key)), group_key, addr_key, -dt_vendor_last_reported, local):independent;
+		temp_InAsso_rec:= record
+			InAsso.lnpid;
+			InAsso.dt_first_seen;
+			InAsso.dt_last_seen;
+			InAsso.dt_vendor_first_reported;
+			InAsso.dt_vendor_last_reported;
+			InAsso.pid;
+			InAsso.group_key;
+			InAsso.addr_key;
+			InAsso.prim_range;
+			InAsso.predir;
+			InAsso.prim_name;
+			InAsso.addr_suffix;
+			InAsso.postdir;
+			InAsso.unit_desig;
+			InAsso.sec_range;
+			InAsso.v_city_name;
+			InAsso.st;
+			InAsso.zip;
+			InAsso.bdid;
+			InAsso.bdid_score;
+			InAsso.did;
+			InAsso.Prepped_name;
+			InAsso.bill_tin;
+			InAsso.title;
+			InAsso.fname;
+			InAsso.mname;
+			InAsso.lname;
+			InAsso.name_suffix;
+			InAsso.p_city_name;
+			InAsso.zip4;
+			InAsso.cart;
+			InAsso.cr_sort_sz;
+			InAsso.lot;
+			InAsso.lot_order;
+			InAsso.dbpc;
+			InAsso.chk_digit;
+			InAsso.rec_type;
+			InAsso.fips_st;
+			InAsso.fips_county;
+			InAsso.geo_lat;
+			InAsso.geo_long;
+			InAsso.msa;
+			InAsso.geo_match;
+			InAsso.err_stat;
+			InAsso.source_rid;
+			InAsso.DotID;
+			InAsso.DotScore;
+			InAsso.DotWeight;
+			InAsso.EmpID;
+			InAsso.EmpScore;
+			InAsso.EmpWeight;
+			InAsso.POWID;
+			InAsso.POWScore;
+			InAsso.POWWeight;
+			InAsso.ProxID;
+			InAsso.ProxScore;
+			InAsso.ProxWeight;
+			InAsso.SELEID;
+			InAsso.SELEScore;
+			InAsso.SELEWeight;	
+			InAsso.OrgID;
+			InAsso.OrgScore;
+			InAsso.OrgWeight;
+			InAsso.UltID;
+			InAsso.UltScore;
+			InAsso.UltWeight;	
+		end;
+		
+		slim_InAsso	:= project(InAsso, temp_InAsso_rec);
+		
+		sort_prep6		:= sort(distribute(prep6, hash(group_key, addr_key)), group_key, addr_key, local);
+		sort_InAsso	:= dedup(sort(distribute(slim_InAsso, hash(group_key, addr_key)), group_key, addr_key, -dt_vendor_last_reported, local), group_key, addr_key, local):independent;
 		
 		OutLayout tr3(sort_prep6 l, sort_InAsso r) := transform
 			self.lnpid															:=	if(l.group_key = r.group_key, r.lnpid, l.lnpid);
@@ -330,13 +475,14 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 		// prep7:=join(distribute(prep6,hash(group_key)), dedup(sort(distribute(InAsso,hash(group_key)),group_key,-dt_vendor_last_reported,local),group_key,local)
 		prep7:=join(sort_prep6, sort_InAsso
 							,left.group_key=right.group_key
+							and left.addr_key=right.addr_key
 							,tr3(left,right)
 							,left outer
 							,local
 							);
 
 		sort_prep7	:= dedup(sort(distribute(prep7, hash(group_key)), group_key, local), record, local);
-		sort_InFac	:= sort(distribute(InFac(sanc1_code <> ''), hash(group_key)), group_key, local);
+		sort_InFac	:= sort(distribute(InFac(sanc1_code <> ''), hash(group_key)), group_key, -dt_vendor_last_reported, local);
 		
 		OutLayout tr4(sort_InFac l) := transform
 			self.lnpid															:=	l.lnpid;
@@ -439,14 +585,13 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 									));
 								
 		sort_prep11	:= dedup(sort(distribute(prep11, hash(group_key, SANC_LICNBR)), group_key, SANC_LICNBR, local), record, local);
+		sort_prep7a	:= dedup(sort(distribute(sort_prep7, hash(group_key, addr_key)), group_key, addr_key, local), record, local);
 
-
-		EXPORT Sanctions_All := sort_prep7 + sort_prep11 :persist('~thor400_data::persist::Sanctions_All2');
+		EXPORT Sanctions_All := sort_prep7a + sort_prep11 :persist('~thor400_data::persist::Sanctions_All2');
 
 		//////////////////////////////////////////////////////////
 		// update_BWR_Sanctions_Did_File
 		//////////////////////////////////////////////////////////
-
 		outlayout  := {ingenix_natlprof.layout_sanctions_DID_RecID};
 
 		prep1 := project(Sanctions_All,outlayout);

@@ -316,9 +316,9 @@ Experian_dec_dedp   := dedup(sort(distribute(Experian_dec , hash(Encrypted_Exper
 Experian_base_d2     := distribute(apply_deletes,  hash(Encrypted_Experian_PIN));
 
 Layouts.Layout_Out t_apply_deceased(Experian_base_d2 le, Experian_dec_dedp ri) := transform
-	self.deceased_ind     :=  if(ri.Encrypted_Experian_PIN <> '',
-                               le.deceased_ind,
-                               if(le.NameType[..2] <> 'SP', 1, 0)
+	self.deceased_ind     :=  if(le.Encrypted_Experian_PIN <> ri.Encrypted_Experian_PIN , // no match 
+                               le.deceased_ind,                   // Keep existing (left)
+                               if(le.NameType[..2] <> 'SP', 1, 0) // Else consider NameType and assign new value
                               );
 	SELF := le;
 end;

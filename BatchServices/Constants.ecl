@@ -1,7 +1,4 @@
-﻿/*2014-08-27T23:00:06Z (greg whitaker)
-TRIS V3 constants added
-*/
-import ut,MDR;
+﻿import ut,MDR;
 EXPORT Constants := MODULE
 	
 	EXPORT PROPERTY_MAX_RESULTS_PER_ACCT 	:= 20;
@@ -183,8 +180,8 @@ EXPORT Constants := MODULE
 		EXPORT Department_of_Corrections := 'Department of Corrections';
 		EXPORT Criminal_Court := 'Criminal Court';
 		
-		//Tris v3.2 Enhancement : Following Constants are added for Req # 3.1.6
-		EXPORT SET OF STRING15 IP_Country := ['US','USA','United States'];
+		//Tris v3.2 Enhancement : Following Constants are added for Req # 3.1.4
+		EXPORT SET OF STRING5 IP_Country := ['US','USA'];
 		EXPORT Contributory_Rec_Join_Limit := 100;
 		EXPORT RTNbr 		:= 'ROUTING_TRANSIT_NBR';
 		EXPORT ARNbr 		:= 'ABA_ROUT_NBR';

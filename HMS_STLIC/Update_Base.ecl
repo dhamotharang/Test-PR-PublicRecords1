@@ -1,4 +1,4 @@
-import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
+﻿import Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
 Header, Header_Slimsort, didville, DID_Add,Business_Header_SS, NID, AID, watchdog,
 VersionControl,lib_fileservices,Health_Provider_Services,Health_Facility_Services,
 BIPV2_Company_Names, HealthCareFacility,HMS_STLIC,Scrubs_HMS_STLIC,Scrubs;
@@ -532,7 +532,14 @@ EXPORT Update_Base (string filedate, boolean pUseProd = false) := MODULE
 			
 			end;
 				
-			base_t := project(base_a,NullAddressesAndReset(LEFT));
+			base_t_sub := project(base_a,NullAddressesAndReset(LEFT));
+			
+			HMS_STLIC.Layouts.statelicense_base xcmpCleanDobExpDte(base_t_sub L) := TRANSFORM
+					SELF.clean_dateofbirth := fn_chkdobDate(L.clean_issue_date,L.clean_expiration_date,L.clean_dateofbirth);
+					SELF := L;
+			END;
+
+			base_t := project(base_t_sub,xcmpCleanDobExpDte(LEFT));
 			
 			HMS_STLIC.Layouts.statelicense_base  GetSourceRID(base_t L)	:= TRANSFORM
    			SELF.source_rid 							:= HASH64(hashmd5(

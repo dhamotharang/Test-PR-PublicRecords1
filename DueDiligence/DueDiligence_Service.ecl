@@ -325,11 +325,12 @@ EXPORT DueDiligence_Service := MACRO
 
 
 	final := IF(requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, IndAttributes, Busnattributes);
-	output(final, NAMED('Results'));                                           //This is the customer facing output    
+	
+	output(final, NAMED('Results')); //This is the customer facing output    
 
 	IF(debugIndicator, output(cleanData, NAMED('cleanData')));                              //This is for debug mode 	
-	IF(debugIndicator, output(wseq, NAMED('wseq')));                              //This is for debug mode 
-	IF(intermediates, output(businessResults, NAMED('busResults')));                              //This is for debug mode 
+	IF(debugIndicator, output(wseq, NAMED('wseq')));                              					//This is for debug mode 
+	IF(intermediates, output(businessResults, NAMED('busResults')));                        //This is for debug mode 
 
 ENDMACRO;
 
