@@ -1,4 +1,4 @@
-﻿import Header;
+﻿import Header,ut;
 
 export    OKC_Student_List_as_header(
 
@@ -23,7 +23,7 @@ export    OKC_Student_List_as_header(
         self.dt_nonglb_last_seen      := self.dt_last_seen;
         self.rec_type                 := '';
         self.vendor_id                := L.studentid;
-        self.phone                    := l.phonenumber;
+        self.phone                    := l.telephone;
         self.ssn                      := l.ssn;
         
         //dob_formatted cleans up the birth_date field
@@ -32,6 +32,9 @@ export    OKC_Student_List_as_header(
         self.city_name                := l.v_city_name;
         self.county                   := l.fips_county;
         self.cbsa                     := if(l.msa!='',l.msa + '0','');
+        
+        self.title                    := if(l.title in ['MR','MS'],l.title,'');
+        self.name_suffix              := ut.fGetSuffix(l.name_suffix);
         self                          := L;
 
     end;
