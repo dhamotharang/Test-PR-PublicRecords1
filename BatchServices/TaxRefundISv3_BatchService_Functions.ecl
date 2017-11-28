@@ -507,47 +507,91 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 	*/
   
 
+	// *--- Function to get in-house IP_Metadata info for all 3 input ip addresses ---* //
+  // 08/11/2017 v3.2 enhancements requirement 3.1.3.12
 	EXPORT getIPMetaDataRecords(DATASET(rec_in_wdid) in_clean_batch) := FUNCTION
 		
-			ds_IP_Metadata_batch_in := PROJECT(in_clean_batch , TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_in_raw,
-																														SELF.acctno			:= LEFT.acctno,
-																														SELF.ip_address1:= LEFT.ip_address,
-																														SELF.ip_address2:= LEFT.device_ini_ip_address,
-																														SELF.ip_address3:= LEFT.device_submit_ip_address));
+			ds_IP_Metadata_batch_in := PROJECT(in_clean_batch , 
+                                         TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_in_raw,
+																				   SELF.acctno			:= LEFT.acctno,
+																					 SELF.ip_address1 := LEFT.ip_address,
+																					 SELF.ip_address2 := LEFT.device_ini_ip_address,
+																					 SELF.ip_address3 := LEFT.device_submit_ip_address));
 
 			BatchServices.IP_Metadata_Layouts.batch_in normBatchRecs(ds_IP_Metadata_batch_in L,INTEGER C) := TRANSFORM
 				STRING IP_address	:=CHOOSE(C,L.IP_address1,L.IP_address2,L.IP_address3);
 				SELF.orig_acctno 	:= L.acctno;
-				SELF.IP_address		:=IF(IP_address!='',Std.Str.ToUpperCase(IP_address),SKIP);
+        // Need to maintain the order of input ip addresses as output 1, 2 & 3 even if 1 
+        // or more of the input values are blank.  So allow a blank ip_address to go thru.
+				SELF.IP_address		:= Std.Str.ToUpperCase(IP_address); 
 				SELF:=L;
 			END;
 
 			ds_batch_in_normalized := NORMALIZE(ds_IP_Metadata_batch_in,3,normBatchRecs(LEFT,COUNTER));
 
-			ds_child_recs := BatchServices.IP_Metadata_Records(ds_batch_in_normalized);
+			ds_child_recs_raw := BatchServices.IP_Metadata_Records(ds_batch_in_normalized);
+
+      // A blank input ip_address causes some bogus info to be returned by 
+      // BatchServices.IP_Metadata_Records above; 
+      // So when that situation exists, null out the fields we are using for TRIS output.
+ 			ds_child_recs := PROJECT(ds_child_recs_raw,
+         TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_out,
+				 BlankIPAddress           := LEFT.ip_address = '';
+         SELF.edge_country			  := IF(BlankIPAddress,'',LEFT.edge_country);
+	       SELF.edge_region         := IF(BlankIPAddress,'',LEFT.edge_region);
+         SELF.edge_city           := IF(BlankIPAddress,'',LEFT.edge_city);
+         SELF.edge_conn_speed     := IF(BlankIPAddress,'',LEFT.edge_conn_speed);
+         SELF.edge_latitude       := IF(BlankIPAddress,'',LEFT.edge_latitude);
+         SELF.edge_longitude      := IF(BlankIPAddress,'',LEFT.edge_longitude);
+	       SELF.edge_postal_code    := IF(BlankIPAddress,'',LEFT.edge_postal_code);
+	       SELF.edge_continent_code := IF(BlankIPAddress,0, LEFT.edge_continent_code);
+		     SELF.edge_country_conf   := IF(BlankIPAddress,0, LEFT.edge_country_conf);
+         SELF.edge_region_conf    := IF(BlankIPAddress,0, LEFT.edge_region_conf);
+         SELF.edge_city_conf      := IF(BlankIPAddress,0, LEFT.edge_city_conf);
+         SELF.edge_postal_conf    := IF(BlankIPAddress,0, LEFT.edge_postal_conf);
+	       SELF.isp_name            := IF(BlankIPAddress,'',LEFT.isp_name);
+	       SELF.edge_gmt_offset     := IF(BlankIPAddress,0, LEFT.edge_gmt_offset);
+	       SELF.domain_name         := IF(BlankIPAddress,'',LEFT.domain_name);
+	       SELF.proxy_type          := IF(BlankIPAddress,'',LEFT.proxy_type);
+         SELF.proxy_description   := IF(BlankIPAddress,'',LEFT.proxy_description);
+         SELF.asn                 := IF(BlankIPAddress,0, LEFT.asn);
+         SELF.asn_name            := IF(BlankIPAddress,'',LEFT.asn_name);
+         SELF                     := LEFT;));
 
 			ds_parent_recs := PROJECT(DEDUP(SORT(ds_batch_in_normalized,acctno),acctno),TRANSFORM(BatchServices.IP_Metadata_Layouts.batch_out_flat_acctno,SELF:=LEFT,SELF:=[]));
 
 			ds_batch_out_denormalized := BatchShare.MAC_ExpandLayout.Denorm(ds_parent_recs,ds_child_recs,BatchServices.IP_Metadata_Layouts.batch_out_raw,'');
+                                                             
+      // *--- DEBUG ---* //
+		  // output(in_clean_batch, named('in_clean_batch'));
+		  // output(ds_IP_Metadata_batch_in, named('ds_IP_Metadata_batch_in'));
+      // output(ds_batch_in_normalized, named('ds_batch_in_normalized'));
+      // output(ds_child_recs_raw, named('ds_child_recs_raw'));
+      // output(ds_child_recs, named('ds_child_recs'));
+      // output(ds_parent_recs, named('ds_parent_recs'));
+      // output(ds_batch_out_denormalized, named('ds_batch_out_denormalized'));
 			
 			RETURN ds_batch_out_denormalized;
 	END;
 
-
+  // 08/11/2017 v3.2 enhancements requirement 3.1.4
 	EXPORT getValidationIpProblems(string45 input_ip_address , string45 ip_metadata_ip_address, string5 country_code) := FUNCTION
 	
-		string50 ip_addr_trimmed 	:= trim(ip_metadata_ip_address);
-		string2 ipcountry				  := if(ip_addr_trimmed = '', '', trim(StringLib.StringToUpperCase(country_code)));
-		
-		validationIpProblems 		:= map(	input_ip_address = ''	=> '-1',
-																		ipcountry IN BatchServices.Constants.TRISv3.IP_Country	=> '0',
-																		ipcountry NOT IN BatchServices.Constants.TRISv3.IP_Country and ipcountry <>'' => '1',
-																		// anything else is '2'
-																		'2');
+		string5  ipcountry				  := if(ip_metadata_ip_address = '',
+                                      '', trim(StringLib.StringToUpperCase(country_code)));
+    
+		validationIpProblems 		:= 
+       map( input_ip_address = ''	                                      => '-1',
+						ipcountry     IN BatchServices.Constants.TRISv3.IP_Country	=> '0',
+						ipcountry NOT IN BatchServices.Constants.TRISv3.IP_Country 
+            and ipcountry <>''                                          => '1',
+						// anything else is '2'
+						                                                               '2');
+            
 		RETURN validationIpProblems;
 	END;
 
-
+  // 08/11/2017 v3.2 enhancements requirement 3.1.5
 	EXPORT getIPAddrExceedsInputAddr(	REAL input_lat, 
 																		REAL input_long,
 																		string45 ipaddress, 
@@ -577,7 +621,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 			RETURN IPAddrExceedsInputAddr;
 	END;
 	
-	
+
  // *--- Function to get HRI Address codes ---* //
   export getHRIRecords(dataset(rec_in_wdid) in_clean_batch) := function
   
@@ -1337,7 +1381,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
   END; //end of getLienRecords function		
 	*/	
 
-	
+
 	EXPORT getContribRecs (dataset(rec_final) recs_in, string in_DataPermissionMask) := FUNCTION
 			contributory_key := tris_lnssi_build.key_field_value;
 

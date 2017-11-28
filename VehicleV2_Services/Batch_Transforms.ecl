@@ -1,4 +1,4 @@
-import VehicleV2_Services, MDR;
+﻿import VehicleV2_Services, MDR;
 
 export Batch_Transforms := MODULE
 
@@ -40,6 +40,7 @@ export Batch_Transforms := MODULE
 		LH_info    := PROJECT(R.LienHolders(sequence_key<>''),VehicleV2_Services.assorted_layouts.Layout_lienholder);
 		LE_info    := PROJECT(R.Lessees(sequence_key<>''),VehicleV2_Services.assorted_layouts.layout_lessee);
 		LO_info    := PROJECT(R.Lessors(sequence_key<>''),VehicleV2_Services.assorted_layouts.Layout_lessee_or_lessor);
+		BR_info    := PROJECT(R.Brands, VehicleV2_Services.assorted_layouts.layout_brand);
     
 		SELF.Own_sequence_key := Owner_info[1].sequence_key;
 		SELF.Reg_sequence_key := Reg_info[1].sequence_key;
@@ -564,6 +565,35 @@ export Batch_Transforms := MODULE
 		SELF.lo_3_EmpID := lo_info[3].EmpID;
 		SELF.lo_3_DotID := lo_info[3].DotID;
 																	 
+		//Brand 1
+		self.brand_date_1 := BR_info[1].brand_date;
+		self.brand_state_1 := BR_info[1].brand_state;
+		self.brand_code_1 := BR_info[1].brand_code;
+		self.brand_type_1 := BR_info[1].brand_type;
+
+		//Brand 2
+		self.brand_date_2 := BR_info[2].brand_date;
+		self.brand_state_2 := BR_info[2].brand_state;
+		self.brand_code_2 := BR_info[2].brand_code;
+		self.brand_type_2 := BR_info[2].brand_type;
+
+		//Brand 3
+		self.brand_date_3 := BR_info[3].brand_date;
+		self.brand_state_3 := BR_info[3].brand_state;
+		self.brand_code_3 := BR_info[3].brand_code;
+		self.brand_type_3 := BR_info[3].brand_type;
+
+		//Brand 4
+		self.brand_date_4 := BR_info[4].brand_date;
+		self.brand_state_4 := BR_info[4].brand_state;
+		self.brand_code_4 := BR_info[4].brand_code;
+		self.brand_type_4 := BR_info[4].brand_type;
+
+		//Brand 5
+		self.brand_date_5 := BR_info[5].brand_date;
+		self.brand_state_5 := BR_info[5].brand_state;
+		self.brand_code_5 := BR_info[5].brand_code;
+		self.brand_type_5 := BR_info[5].brand_type;		
 		
 		SELF := if(exists(owner_info),owner_info[1]);
 		SELF := if(exists(reg_info),reg_info[1]);

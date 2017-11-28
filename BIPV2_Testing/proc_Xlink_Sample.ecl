@@ -1,4 +1,4 @@
-import bipv2;
+﻿import bipv2;
 EXPORT proc_Xlink_Sample(
 
    string  pversion        = bipv2.KeySuffix
@@ -29,8 +29,8 @@ function
 
   returnresult := 
 		sequential(
-			output(z)
-			, BIPV2_Testing.ShortCycle.out			
+			// output(z)
+			 BIPV2_Testing.ShortCycle.out			
 //			, BIPV2_Testing.mod_XLink_throughput.out
 		)  : 
      SUCCESS(send_emails(pversion).buildsuccess) 

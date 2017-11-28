@@ -1,4 +1,4 @@
-import Appriss, doxie, AutoStandardI, iesp,American_student_services,American_student_list,codes,AlloyMedia_student_list,American_Student_Services, lib_stringlib;
+﻿import Appriss, doxie, AutoStandardI, iesp,American_student_services,American_student_list,codes,AlloyMedia_student_list,American_Student_Services, lib_stringlib;
 
 export Raw := MODULE
 	
@@ -43,6 +43,7 @@ export Raw := MODULE
 		self.SchoolSizeExploded := if(L.school_size_code<>'', CodesV3_ASL(field_name='SCHOOL_SIZE_CODE' AND code=L.school_size_code)[1].long_desc, ''),
 	  self.TuitionCode := L.tuition_code;
 		self.TuitionExploded := if(L.tuition_code<>'', CodesV3_ASL(field_name='TUITION_CODE' AND code=L.tuition_code)[1].long_desc, ''),
+		self.src := L.source,
 		self := L;
 	end;
 	
@@ -69,6 +70,7 @@ export Raw := MODULE
 		self.SchoolSizeExploded := if(L.school_size_code<>'', CodesV3_ASL(field_name='SCHOOL_SIZE_CODE' AND code=L.school_size_code)[1].long_desc, ''),
 	  self.TuitionCode := L.tuition_code;
 		self.TuitionExploded := if(L.tuition_code<>'', CodesV3_ASL(field_name='TUITION_CODE' AND code=L.tuition_code)[1].long_desc, ''),
+		self.src := L.source,
 		self.isDeepDive := R.isDeepDive;
 		self := L;
 	end;
@@ -77,7 +79,7 @@ export Raw := MODULE
 									keyed(left.did=right.l_did),
 									get_results(left,right),
 									LIMIT(American_Student_Services.Constants.MAX_RECS_ON_JOIN, fail(203, doxie.ErrorCodes(203))));									
-																		
+								
 	RETURN ds_recs;
 	
 	END;
@@ -122,6 +124,7 @@ export Raw := MODULE
 		self.public_private_code		:= R.public_private_code;
 		self.college_code_exploded 	:= '',
 		self.college_type_exploded 	:= '',		
+		self.src                    := R.Source,
 		self 												:= R
 	end;	
 	

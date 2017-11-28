@@ -1,4 +1,4 @@
-import ut, did_add, header_slimsort, didville,watchdog,doxie,header, lib_stringlib,mdr,address;
+﻿import ut, did_add, header_slimsort, didville,watchdog,doxie,header, lib_stringlib,mdr,address;
 
 export Build_base(string filedate) := function
 
@@ -105,9 +105,9 @@ end;
 ds_previous := files.certegy_base;
 
 ds_clean0	:=	project(ds_in,tr_base(left),local)
-								/*:persist('~thor400_44::persist::certegy_ds_clean')*/
-								/*:persist('~thor400_60::persist::certegy_ds_clean')*/
-								:persist('~thor400_20::persist::certegy_ds_clean')
+								:persist('~thor400_44::persist::certegy_ds_clean')
+								//:persist('~thor400_60::persist::certegy_ds_clean')*/
+								//:persist('~thor400_20::persist::certegy_ds_clean')
 								;
 
 ds_clean00 := ds_clean0 + ds_previous;

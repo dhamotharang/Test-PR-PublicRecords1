@@ -1,4 +1,4 @@
-import AutoHeaderI;
+﻿import AutoHeaderI;
 
 export Search_IDs := MODULE
 
@@ -7,7 +7,7 @@ export Search_IDs := MODULE
 		
 	export val(params in_mod) := function
 	
-		dids := AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do_hhid(in_mod);
+		dids := AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(in_mod);
 	
 		return dids;
 	END;

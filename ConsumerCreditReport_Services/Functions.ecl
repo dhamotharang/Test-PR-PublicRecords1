@@ -76,8 +76,8 @@ EXPORT Functions := MODULE
 
 		ds_dids:=PROJECT(ds_work_in(did!=0),TRANSFORM(FFD.Layouts.DidBatch,SELF:=LEFT));
 		DataGroupSet:=IF(in_mod.FetchLiensJudgments,FFD.Constants.DataGroupSet.Liens,FFD.Constants.DataGroupSet.Person);
-		// in theory, there should be a conditional check here based on in_mod.FFDOptionsMask to show or not consumer statements. 
-		ds_prsnCntxt:=FFD.FetchPersonContext(ds_dids,in_mod.gateways,DataGroupSet);
+		showConsumerStatements:=FFD.FFDMask.isShowConsumerStatements(in_mod.FFDOptionsMask);
+		ds_prsnCntxt:=IF(showConsumerStatements,FFD.FetchPersonContext(ds_dids,in_mod.gateways,DataGroupSet),DATASET([],FFD.Layouts.PersonContextBatch));
 
 		Risk_Indicators.Layouts.tmp_Consumer_Statements xformConsumerStatement(ds_prsnCntxt L) := TRANSFORM	
 			SELF.UniqueId:=L.LexID;

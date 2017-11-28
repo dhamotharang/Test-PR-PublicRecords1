@@ -84,7 +84,7 @@ MODULE
 		
 		EXPORT subjectVerificationRequest := RECORD
 			STRING	 	acctno;
-			UNSIGNED1 seq;			
+			UNSIGNED1 sequence_number;			
 			STRING10 	phone;
 			subjectName;
 			business;
@@ -93,7 +93,7 @@ MODULE
 	
 		EXPORT zIn := RECORD
 			STRING acctno;
-			UNSIGNED1 seq;
+			UNSIGNED1 sequence_number;
 			STRING MobileDeviceNumber;
 			iesp.zumigo_identity.t_ZIdNameToVerify Name;
 			iesp.zumigo_identity.t_ZIdSubjectAddress Address;
@@ -101,9 +101,13 @@ MODULE
 		
 		EXPORT zOut := RECORD
 			STRING acctno:='';
-			UNSIGNED1 seq :=0 ;
+			UNSIGNED1 sequence_number :=0 ;
 			gatewayHistory;
 		END;
+		// Deltabase format specific to report services only 
+	 EXPORT zDeltabaseLog := RECORD
+	   DATASET(zOut) Records {XPATH('Records/Rec')};
+	 END;
 	
 	END;
 

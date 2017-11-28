@@ -2,161 +2,121 @@
 
 EXPORT Common := MODULE
 
-// Grabs just the linking ID's and Unique Seq Number - this is needed to use the BIP kFetch
-	EXPORT GetLinkIDsForKFetch(DATASET(DueDiligence.Layouts.Busn_Internal) BusnData) := FUNCTION
-		
-		BIPV2.IDlayouts.l_xlink_ids grabLinkIDsForKFetch(DueDiligence.Layouts.Busn_Internal le) := TRANSFORM
-			//SELF.UniqueID		:= le.seq;
-			SELF.PowID			:= le.Busn_info.BIP_IDs.PowID.LinkID;
-			SELF.PowScore		:= le.Busn_info.BIP_IDs.PowID.Score;
-			SELF.PowWeight	:= le.Busn_info.BIP_IDs.PowID.Weight;
-			
-			SELF.ProxID			:= le.Busn_info.BIP_IDs.ProxID.LinkID;
-			SELF.ProxScore	:= le.Busn_info.BIP_IDs.ProxID.Score;
-			SELF.ProxWeight	:= le.Busn_info.BIP_IDs.ProxID.Weight;
-			
-			SELF.SeleID			:= le.Busn_info.BIP_IDs.SeleID.LinkID;
-			SELF.SeleScore	:= le.Busn_info.BIP_IDs.SeleID.Score;
-			SELF.SeleWeight	:= le.Busn_info.BIP_IDs.SeleID.Weight;
-			
-			SELF.OrgID			:= le.Busn_info.BIP_IDs.OrgID.LinkID;
-			SELF.OrgScore		:= le.Busn_info.BIP_IDs.OrgID.Score;
-			SELF.OrgWeight	:= le.Busn_info.BIP_IDs.OrgID.Weight;
-			
-			SELF.UltID			:= le.Busn_info.BIP_IDs.UltID.LinkID;
-			SELF.UltScore		:= le.Busn_info.BIP_IDs.UltID.Score;
-			SELF.UltWeight	:= le.Busn_info.BIP_IDs.UltID.Weight;
-			
-			SELF := [];                                       // Don't populate DotID or EmpID
-		END;
-		
-		linkIDsOnlyForKFetch := PROJECT(BusnData, grabLinkIDsForKFetch(LEFT));
-		
-		RETURN linkIDsOnlyForKFetch;
-	END;
-
-
-
-
-
-	// Grabs just the linking ID's and Unique Seq Number - this is needed to use the BIP kFetch
+	// Grabs just the linking ID's and Unique Seq Number - this is needed to use the BIP kFetch2
 	EXPORT GetLinkIDs(DATASET(DueDiligence.Layouts.Busn_Internal) BusnData) := FUNCTION
 		
-		BIPV2.IDlayouts.l_xlink_ids2 grabLinkIDs(DueDiligence.Layouts.Busn_Internal le) := TRANSFORM
-			SELF.UniqueID		:= le.seq;
-			SELF.PowID			:= le.Busn_info.BIP_IDs.PowID.LinkID;
-			SELF.PowScore		:= le.Busn_info.BIP_IDs.PowID.Score;
-			SELF.PowWeight	:= le.Busn_info.BIP_IDs.PowID.Weight;
-			
-			SELF.ProxID			:= le.Busn_info.BIP_IDs.ProxID.LinkID;
-			SELF.ProxScore	:= le.Busn_info.BIP_IDs.ProxID.Score;
-			SELF.ProxWeight	:= le.Busn_info.BIP_IDs.ProxID.Weight;
-			
-			SELF.SeleID			:= le.Busn_info.BIP_IDs.SeleID.LinkID;
-			SELF.SeleScore	:= le.Busn_info.BIP_IDs.SeleID.Score;
-			SELF.SeleWeight	:= le.Busn_info.BIP_IDs.SeleID.Weight;
-			
-			SELF.OrgID			:= le.Busn_info.BIP_IDs.OrgID.LinkID;
-			SELF.OrgScore		:= le.Busn_info.BIP_IDs.OrgID.Score;
-			SELF.OrgWeight	:= le.Busn_info.BIP_IDs.OrgID.Weight;
-			
-			SELF.UltID			:= le.Busn_info.BIP_IDs.UltID.LinkID;
-			SELF.UltScore		:= le.Busn_info.BIP_IDs.UltID.Score;
-			SELF.UltWeight	:= le.Busn_info.BIP_IDs.UltID.Weight;
-			
-			SELF := [];                                       // Don't populate DotID or EmpID
-		END;
-		
-		linkIDsOnly := PROJECT(BusnData, grabLinkIDs(LEFT));
+		linkIDsOnly := PROJECT(BusnData, TRANSFORM(BIPV2.IDlayouts.l_xlink_ids2,
+																								SELF.UniqueID		:= LEFT.seq;
+																								SELF.PowID			:= LEFT.Busn_info.BIP_IDs.PowID.LinkID;
+																								SELF.PowScore		:= LEFT.Busn_info.BIP_IDs.PowID.Score;
+																								SELF.PowWeight	:= LEFT.Busn_info.BIP_IDs.PowID.Weight;
+																								
+																								SELF.ProxID			:= LEFT.Busn_info.BIP_IDs.ProxID.LinkID;
+																								SELF.ProxScore	:= LEFT.Busn_info.BIP_IDs.ProxID.Score;
+																								SELF.ProxWeight	:= LEFT.Busn_info.BIP_IDs.ProxID.Weight;
+																								
+																								SELF.SeleID			:= LEFT.Busn_info.BIP_IDs.SeleID.LinkID;
+																								SELF.SeleScore	:= LEFT.Busn_info.BIP_IDs.SeleID.Score;
+																								SELF.SeleWeight	:= LEFT.Busn_info.BIP_IDs.SeleID.Weight;
+																								
+																								SELF.OrgID			:= LEFT.Busn_info.BIP_IDs.OrgID.LinkID;
+																								SELF.OrgScore		:= LEFT.Busn_info.BIP_IDs.OrgID.Score;
+																								SELF.OrgWeight	:= LEFT.Busn_info.BIP_IDs.OrgID.Weight;
+																								
+																								SELF.UltID			:= LEFT.Busn_info.BIP_IDs.UltID.LinkID;
+																								SELF.UltScore		:= LEFT.Busn_info.BIP_IDs.UltID.Score;
+																								SELF.UltWeight	:= LEFT.Busn_info.BIP_IDs.UltID.Weight;
+																								
+																								SELF := []; )); // Don't populate DotID or EmpID
 		
 		RETURN linkIDsOnly;
 	END;
 	
-	EXPORT ValidateRequest(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbPurpose, UNSIGNED1 dppaPurpose):= FUNCTION
-	
-		DueDiligence.Layouts.Input validateRequest(DueDiligence.Layouts.Input le) := TRANSFORM
-			//Validate the request
-			BOOLEAN IndFNamePopulated		  := le.individual.name.firstName <> DueDiligence.Constants.EMPTY OR le.individual.name.fullName <> DueDiligence.Constants.EMPTY;
-			BOOLEAN IndLNamePopulated	  	:= le.individual.name.lastName <> DueDiligence.Constants.EMPTY OR le.individual.name.fullName <> DueDiligence.Constants.EMPTY;
-			BOOLEAN IndAddrPopulated		  := le.Individual.address.streetaddress1 <> DueDiligence.Constants.EMPTY OR (le.Individual.address.prim_range <> DueDiligence.Constants.EMPTY AND le.Individual.address.prim_name <> DueDiligence.Constants.EMPTY);
-			BOOLEAN IndCityStatePopulated := le.individual.address.city <> DueDiligence.Constants.EMPTY AND le.individual.address.state <> DueDiligence.Constants.EMPTY;
-			BOOLEAN IndZipPopulated		    := le.individual.address.zip5 <> DueDiligence.Constants.EMPTY;
-			BOOLEAN IndSSNPopulated		    := le.individual.ssn <> DueDiligence.Constants.EMPTY;
-
-			BOOLEAN BusNamePopulated		  := le.business.companyName <> DueDiligence.Constants.EMPTY OR le.business.altCompanyName <> DueDiligence.Constants.EMPTY;
-			BOOLEAN BusAddrPopulated		  := le.business.address.streetaddress1 <> DueDiligence.Constants.EMPTY OR (le.business.address.prim_range <> DueDiligence.Constants.EMPTY AND le.Business.address.prim_name <> DueDiligence.Constants.EMPTY);
-			BOOLEAN BusCityStatePopulated := le.business.address.city <> DueDiligence.Constants.EMPTY AND le.business.address.state <> DueDiligence.Constants.EMPTY;
-			BOOLEAN BusZipPopulated		    := le.business.address.zip5 <> DueDiligence.Constants.EMPTY;
-			BOOLEAN BusTaxIDPopulated		  := le.business.fein <> DueDiligence.Constants.EMPTY;
-			
-			BOOLEAN LexIDPopulated		  	:= le.individual.lexID <> DueDiligence.Constants.EMPTY;
-			BOOLEAN SeleIDPopulated	  	  := le.business.lexID <> DueDiligence.Constants.EMPTY;
-			BOOLEAN ValidGLB		  				:= Risk_Indicators.iid_constants.glb_ok((UNSIGNED)glbPurpose, FALSE );
-			BOOLEAN ValidDPPA	  					:= Risk_Indicators.iid_constants.dppa_ok((UNSIGNED)dppaPurpose, FALSE);
-			
-			BOOLEAN ValidIndividual := (IndFNamePopulated AND IndLNamePopulated AND
-																			(IndSSNPopulated OR 
-																			(IndAddrPopulated AND (IndCityStatePopulated OR IndZipPopulated)))) 
-																	OR LexIDPopulated;
-			
-			BOOLEAN ValidBusiness := (BusNamePopulated AND
-																		(BusTaxIDPopulated OR
-																		(BusAddrPopulated AND (BusCityStatePopulated OR BusZipPopulated)))) 
-																OR SeleIDPopulated;
-																
-			BOOLEAN ValidIndVersion := le.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS;
-			BOOLEAN ValidBusVersion := le.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS;
-			
-			STRING OhNoMessage := MAP(ValidIndVersion = FALSE AND ValidBusVersion = FALSE => DueDiligence.Constants.VALIDATION_INVALID_VERSION,
-																ValidIndVersion AND ValidIndividual = FALSE => DueDiligence.Constants.VALIDATION_INVALID_INDIVIDUAL,
-																ValidBusVersion AND ValidBusiness = FALSE => DueDiligence.Constants.VALIDATION_INVALID_BUSINESS,
-																ValidGLB = FALSE => DueDiligence.Constants.VALIDATION_INVALID_GLB,
-																ValidDPPA = FALSE => DueDiligence.Constants.VALIDATION_INVALID_DPPA,
-																DueDiligence.Constants.EMPTY);
-
-			
-			SELF.validRequest := IF(OhNoMessage = DueDiligence.Constants.EMPTY, TRUE, FALSE);
-			SELF.errorMessage := OhNoMessage;
-			SELF := le;
-		END;
+	// Grabs just the linking ID's without Unique Seq Number - this is needed to use the BIP kFetch
+	EXPORT GetLinkIDsForKFetch(DATASET(DueDiligence.Layouts.Busn_Internal) BusnData) := FUNCTION
 		
-		validatedRequests := PROJECT(input, validateRequest(LEFT));
+		linkIDsOnlyForKFetch := PROJECT(GetLinkIDs(BusnData), TRANSFORM(BIPV2.IDlayouts.l_xlink_ids, SELF := LEFT;));
+		
+		RETURN linkIDsOnlyForKFetch;
+	END;
+	
+	
+	EXPORT ValidateRequest(DATASET(DueDiligence.Layouts.Input) input, UNSIGNED1 glbPurpose, UNSIGNED1 dppaPurpose):= FUNCTION
+
+		validatedRequests := PROJECT(input, TRANSFORM(DueDiligence.Layouts.Input,
+																									//Validate the request
+																									BOOLEAN IndFNamePopulated		  := LEFT.individual.name.firstName <> DueDiligence.Constants.EMPTY OR LEFT.individual.name.fullName <> DueDiligence.Constants.EMPTY;
+																									BOOLEAN IndLNamePopulated	  	:= LEFT.individual.name.lastName <> DueDiligence.Constants.EMPTY OR LEFT.individual.name.fullName <> DueDiligence.Constants.EMPTY;
+																									BOOLEAN IndAddrPopulated		  := LEFT.Individual.address.streetaddress1 <> DueDiligence.Constants.EMPTY OR (LEFT.Individual.address.prim_range <> DueDiligence.Constants.EMPTY AND LEFT.Individual.address.prim_name <> DueDiligence.Constants.EMPTY);
+																									BOOLEAN IndCityStatePopulated := LEFT.individual.address.city <> DueDiligence.Constants.EMPTY AND LEFT.individual.address.state <> DueDiligence.Constants.EMPTY;
+																									BOOLEAN IndZipPopulated		    := LEFT.individual.address.zip5 <> DueDiligence.Constants.EMPTY;
+																									BOOLEAN IndSSNPopulated		    := LEFT.individual.ssn <> DueDiligence.Constants.EMPTY;
+
+																									BOOLEAN BusNamePopulated		  := LEFT.business.companyName <> DueDiligence.Constants.EMPTY OR LEFT.business.altCompanyName <> DueDiligence.Constants.EMPTY;
+																									BOOLEAN BusAddrPopulated		  := LEFT.business.address.streetaddress1 <> DueDiligence.Constants.EMPTY OR (LEFT.business.address.prim_range <> DueDiligence.Constants.EMPTY AND LEFT.Business.address.prim_name <> DueDiligence.Constants.EMPTY);
+																									BOOLEAN BusCityStatePopulated := LEFT.business.address.city <> DueDiligence.Constants.EMPTY AND LEFT.business.address.state <> DueDiligence.Constants.EMPTY;
+																									BOOLEAN BusZipPopulated		    := LEFT.business.address.zip5 <> DueDiligence.Constants.EMPTY;
+																									BOOLEAN BusTaxIDPopulated		  := LEFT.business.fein <> DueDiligence.Constants.EMPTY;
+																									
+																									BOOLEAN LexIDPopulated		  	:= LEFT.individual.lexID <> DueDiligence.Constants.EMPTY;
+																									BOOLEAN SeleIDPopulated	  	  := LEFT.business.lexID <> DueDiligence.Constants.EMPTY;
+																									BOOLEAN ValidGLB		  				:= Risk_Indicators.iid_constants.glb_ok((UNSIGNED)glbPurpose, FALSE );
+																									BOOLEAN ValidDPPA	  					:= Risk_Indicators.iid_constants.dppa_ok((UNSIGNED)dppaPurpose, FALSE);
+																									
+																									BOOLEAN ValidIndividual := (IndFNamePopulated AND IndLNamePopulated AND
+																																									(IndSSNPopulated OR 
+																																									(IndAddrPopulated AND (IndCityStatePopulated OR IndZipPopulated)))) 
+																																							OR LexIDPopulated;
+																									
+																									BOOLEAN ValidBusiness := (BusNamePopulated AND
+																																								(BusTaxIDPopulated OR
+																																								(BusAddrPopulated AND (BusCityStatePopulated OR BusZipPopulated)))) 
+																																						OR SeleIDPopulated;
+																																						
+																									BOOLEAN ValidIndVersion := LEFT.requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS;
+																									BOOLEAN ValidBusVersion := LEFT.requestedVersion IN DueDiligence.Constants.VALID_BUS_ATTRIBUTE_VERSIONS;
+																									
+																									STRING OhNoMessage := MAP(ValidIndVersion = FALSE AND ValidBusVersion = FALSE => DueDiligence.Constants.VALIDATION_INVALID_VERSION,
+																																						ValidIndVersion AND ValidIndividual = FALSE => DueDiligence.Constants.VALIDATION_INVALID_INDIVIDUAL,
+																																						ValidBusVersion AND ValidBusiness = FALSE => DueDiligence.Constants.VALIDATION_INVALID_BUSINESS,
+																																						ValidGLB = FALSE => DueDiligence.Constants.VALIDATION_INVALID_GLB,
+																																						ValidDPPA = FALSE => DueDiligence.Constants.VALIDATION_INVALID_DPPA,
+																																						DueDiligence.Constants.EMPTY);
+
+																									
+																									SELF.validRequest := IF(OhNoMessage = DueDiligence.Constants.EMPTY, TRUE, FALSE);
+																									SELF.errorMessage := OhNoMessage;
+																									SELF := LEFT;));
 
 		RETURN validatedRequests;
 	END;
 
 	//copied/modified from 	Business_Risk_BIP.Common.AppendSeq2
 	//datasetToJoinTo must be of DueDiligence.Layouts.Busn_Internal structure
-	EXPORT AppendSeq(rawData, datasetToJoinTo, joinResult) := MACRO
-		joinResult := JOIN(rawData, datasetToJoinTo, 
-												LEFT.UltID = RIGHT.Busn_info.BIP_IDS.UltID.LinkID AND
-												LEFT.OrgID = RIGHT.Busn_info.BIP_IDS.OrgID.LinkID AND
-												LEFT.SeleID = RIGHT.Busn_info.BIP_IDS.SeleID.LinkID, 
-												TRANSFORM({RECORDOF(LEFT), UNSIGNED4 seq, UNSIGNED4 historyDate, STRING2 partyRelation},
+	//(or at a minimum have the same structure for link ids, seq, and history date)
+	EXPORT AppendSeq(rawData, datasetToJoinTo, rawIncludesUniqueID) := FUNCTIONMACRO
+		
+		//create the where clause based on if rawData has uniqueID or not
+		LOCAL whereClause := 'LEFT.UltID = RIGHT.Busn_info.BIP_IDS.UltID.LinkID AND ' +
+										'LEFT.OrgID = RIGHT.Busn_info.BIP_IDS.OrgID.LinkID AND ' +
+										'LEFT.SeleID = RIGHT.Busn_info.BIP_IDS.SeleID.LinkID' + 
+										IF(rawIncludesUniqueID, ' AND LEFT.uniqueID = RIGHT.seq', DueDiligence.Constants.EMPTY);
+				
+		//if rawData has uniqueID field, assuming unquieness - otherwise remove duplicate rows
+		//should only have duplicate rows if a given business was added to the file twice
+		LOCAL uniqueRawRows := IF(rawIncludesUniqueID = FALSE, DEDUP(rawData, ALL), rawData);
+		
+		LOCAL joinResult := JOIN(uniqueRawRows, datasetToJoinTo, 
+												#EXPAND(whereClause), 
+												TRANSFORM({RECORDOF(LEFT), UNSIGNED4 seq, UNSIGNED4 historyDate},
 																	SELF.seq := RIGHT.seq;
 																	SELF.historyDate := RIGHT.historyDate;
-																	SELF.partyRelation := RIGHT.relatedDegree;
 																	SELF := LEFT), 
-												FEW);                                                                    // Can use FEW because the RIGHT side should contain < 10000 rows (100 only average in batch)
+												FEW); 
+												
+		RETURN joinResult;										
 	ENDMACRO;
-	
-	
- // -------                                                                                    -----
- // -------  This is a common routine that joins the raw data to the Business Internal record  -----
- // ------- Note:  this only works when the datasetToJoinTo is the Business Internal record    -----
- // -------                                                                                    -----
-	EXPORT AppendSeqAndHistoryDate(rawData, datasetToJoinTo, joinResult) := MACRO
-		joinResult := JOIN(rawData, datasetToJoinTo, 
-												LEFT.UltID                 = RIGHT.Busn_info.BIP_IDS.UltID.LinkID AND
-												LEFT.OrgID                 = RIGHT.Busn_info.BIP_IDS.OrgID.LinkID AND
-												LEFT.SeleID                = RIGHT.Busn_info.BIP_IDS.SeleID.LinkID,
-												TRANSFORM({RECORDOF(LEFT), UNSIGNED4 Seq, UNSIGNED4 HistoryDate},
-																	SELF.Seq         := RIGHT.Seq;
-																	SELF.HistoryDate := RIGHT.HistoryDate;
-																	SELF             := LEFT), 
-												FEW);                                                                      // Can use FEW because the RIGHT side should contain < 10000 rows (100 only average in batch)
-	ENDMACRO;	
-	
+
 	
 	EXPORT fn_filterOnArchiveDate(INTEGER fieldDate, INTEGER archiveDate) := FUNCTION
 		
@@ -298,6 +258,21 @@ EXPORT Common := MODULE
 
 		RETURN updatedField;
 	ENDMACRO;
+	
+	// ------                                                       ----
+	// ------  Use this to get a valid date based on the history    ----
+	// ------   date.  If the history date is all 9's use the       ----
+	// ------   ELSE use the history date passed into the function  ----
+  EXPORT GetMyDate(unsigned4 history_date)                 := FUNCTION
+	   /* today_date will be in YYYYMMDD format */  
+	   unsigned4 todays_date               := STD.Date.Today();
+	   unsigned4 returnDateToUse := IF(history_date=99999999,
+	                      todays_date,
+												history_date);
+	
+	   RETURN returnDateToUse; 
+	
+	END;       //END OF THIS FUNCTION
 	
 	
 	EXPORT GetCleanData(DATASET(DueDiligence.Layouts.Input) input) := FUNCTION
@@ -704,5 +679,163 @@ EXPORT Common := MODULE
 		RETURN lnkedBus;
 	END; 
 
+// ******************************************************************************************************** //
+// Replace/Overlay the Executives info on the Business Internal with the updatedExec information collected  //
+// ******************************************************************************************************** // 
+EXPORT ReplaceExecs(DATASET(DueDiligence.Layouts.Busn_Internal) inquiredBus,
+                    DATASET(DueDiligence.LayoutsInternal.RelatedParty) UpdateExecs) := FUNCTION
+
+// Define a layout just for this FUNCTION                              //  
+   ExecsChildRollUPLayout    := RECORD
+	    DueDiligence.LayoutsInternal.InternalBIPIDsLayout;                           //*  This is the unique ID of the parent  
+	    DATASET(DueDiligence.Layouts.RelatedParty) ExecutiveInfo;
+	 END;														 
+
+// Populate the a new DATASET to be used in the ROLLUP                  //  	
+   ExecutivePreSort  := PROJECT(UpdateExecs, TRANSFORM(ExecsChildRollUPLayout,
+	                                    SELF.ExecutiveInfo := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.RelatedParty,
+																																				   SELF := LEFT.party;));
+																			SELF := LEFT;));
+	               
+// SORT the Executive Prep in seq, ulti etc. sequence For the ROLLUP!!!!!//
+   ExecutiveSort  := SORT(ExecutivePreSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+
+// RollUp all of the Executives into a Normalized Dataset              // 
+// Create a Parent Row of seq, ultid, orgid, seleid, powid and proxid  //
+//                                                                     //
+ ExecutiveDataset  :=   
+		ROLLUP(ExecutiveSort,
+				LEFT.seq          = RIGHT.seq
+				     AND
+				LEFT.UltID        = RIGHT.UltID
+				     AND
+				LEFT.OrgID        = RIGHT.OrgID
+				     AND
+				LEFT.SeleID       = RIGHT.SeleID,
+				                       // And create children rows of executives  //
+				                        TRANSFORM (ExecsChildRollUPLayout ,
+																		       SELF.ExecutiveInfo    := LEFT.ExecutiveInfo + RIGHT.ExecutiveInfo; 
+																					 SELF                := LEFT));
+				       
+ 
+ /* DENORMALIZE/JOIN and the BusnData(parentrecordset) with the Legal Events(childrecordset)  */   															 															
+	   ReplaceBusnExecsWithNewInfo := DENORMALIZE(inquiredBus, ExecutiveDataset,
+	                                              /* WHERE */ 
+																							 LEFT.seq                             = RIGHT.seq
+																							      AND
+	                                             LEFT.Busn_info.BIP_IDS.UltID.LinkID  = RIGHT.UltID
+																							      AND
+																							 LEFT.Busn_info.BIP_IDS.OrgID.LinkID  = RIGHT.OrgID
+																							      AND
+																							 LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.SeleID,  
+												                       GROUP,
+																							 
+																							 /* Update the Parent dataset  From the Left */  
+																							 TRANSFORM(DueDiligence.Layouts.Busn_Internal, 
+																							      SELF.seq                              := LEFT.seq; 
+																							      SELF.Busn_info.BIP_IDS.UltID.LinkID   := LEFT.Busn_info.BIP_IDS.UltID.LinkID; 
+																							      /* Overlay the Child dataset From the Right   */  
+                                                    SELF.Execs                            := RIGHT.ExecutiveInfo;                                             
+																							      SELF                                  := LEFT,
+                                                    SELF                                  := []));
+
+		 
+	
+		RETURN ReplaceBusnExecsWithNewInfo;
+	END; 
+	
+	
+	
+  EXPORT getLienTypeCategory( STRING filing_type_desc) := FUNCTION
+
+  lien_type_category := 
+					MAP(
+						filing_type_desc IN Risk_Indicators.iid_constants.set_Invalid_Liens_50	=> DueDiligence.Constants.INVALID_LIEN,        //'IN'
+						filing_type_desc IN Risk_Indicators.iid_constants.setSuits           	  => DueDiligence.Constants.SUITS,               //'SU'
+						filing_type_desc IN Risk_Indicators.iid_constants.setSmallClaims    		=> DueDiligence.Constants.SMALL_CLAIMS,        //'SC'
+						filing_type_desc IN Risk_Indicators.iid_constants.setFederalTax     		=> DueDiligence.Constants.FEDERAL_TAX,         //'FX'
+						filing_type_desc IN Risk_Indicators.iid_constants.setForeclosure     	  => DueDiligence.Constants.FORECLOSURE,         //'FC'
+						filing_type_desc IN Risk_Indicators.iid_constants.setLandlordTenant 		=> DueDiligence.Constants.LANDLORD_TENANT,     //'LT'
+						filing_type_desc IN Risk_Indicators.iid_constants.setLisPendens     		=> DueDiligence.Constants.LISPENDENS,          //'LP',
+						filing_type_desc IN Risk_Indicators.iid_constants.setMechanicsLiens 		=> DueDiligence.Constants.MECHANICS_LIEN,      //'ML',
+						filing_type_desc IN Risk_Indicators.iid_constants.setCivilJudgment  		=> DueDiligence.Constants.CIVIL_JUDGMENT,      //'CJ',
+						filing_type_desc IN Risk_Indicators.iid_constants.setOtherTax					  => DueDiligence.Constants.OTHER_TAX,           //'OX',
+						filing_type_desc NOT IN 
+							[ 
+								Risk_Indicators.iid_constants.setCivilJudgment + Risk_Indicators.iid_constants.setFederalTax + 
+								Risk_Indicators.iid_constants.setLandlordTenant + Risk_Indicators.iid_constants.setSmallClaims + 
+								Risk_Indicators.iid_constants.setForeclosure + Risk_Indicators.iid_constants.setOtherTax
+							]  																																				=> DueDiligence.Constants.DEFAULT_LIEN_CATAGORY,  //'OT',
+						                                                                               DueDiligence.Constants.DEFAULT_LIEN_CATAGORY); //'OT' is default
+
+  RETURN lien_type_category;
+	END;
+
+
+   EXPORT getJudgmentTypeCategory( STRING filing_type_desc) := FUNCTION
+
+   judgment_type_category :=    
+			 MAP(
+						filing_type_desc IN Risk_Indicators.iid_constants.set_Invalid_Liens_50	=> DueDiligence.Constants.INVALID_JUDGMENT,     //'Invalid',
+						filing_type_desc IN Risk_Indicators.iid_constants.setSuits           	  => DueDiligence.Constants.JUDGMENT,             //'Judgment',
+						filing_type_desc IN Risk_Indicators.iid_constants.setSmallClaims    		=> DueDiligence.Constants.JUDGMENT,             //'Judgment',
+						filing_type_desc IN Risk_Indicators.iid_constants.setFederalTax     		=> DueDiligence.Constants.LIEN,                 //'Lien',
+						filing_type_desc IN Risk_Indicators.iid_constants.setForeclosure     	  => DueDiligence.Constants.LIEN,                 //'Lien', 
+						filing_type_desc IN Risk_Indicators.iid_constants.setLandlordTenant 		=> DueDiligence.Constants.LIEN,                 //'Lien',
+						filing_type_desc IN Risk_Indicators.iid_constants.setLisPendens     		=> DueDiligence.Constants.LIEN,                 //'Lien',
+						filing_type_desc IN Risk_Indicators.iid_constants.setOtherTax       		=> DueDiligence.Constants.LIEN,                 //'Lien',
+						filing_type_desc IN Risk_Indicators.iid_constants.setMechanicsLiens 		=> DueDiligence.Constants.LIEN,                 //'Lien',
+						filing_type_desc IN Risk_Indicators.iid_constants.setCivilJudgment  		=> DueDiligence.Constants.JUDGMENT,             //'Judgment',
+						filing_type_desc NOT IN 
+							[ 
+								Risk_Indicators.iid_constants.setCivilJudgment + Risk_Indicators.iid_constants.setFederalTax + 
+								Risk_Indicators.iid_constants.setLandlordTenant + Risk_Indicators.iid_constants.setOtherTax + 
+								Risk_Indicators.iid_constants.setSmallClaims + Risk_Indicators.iid_constants.setForeclosure
+							]                                                                     => 'Lien',
+						                                                                           'Lien'); // default
+					
+    RETURN judgment_type_category;
+	END;
+
+
+
+  EXPORT getFilingStatusCategory( STRING filing_status) := FUNCTION
+
+   filing_status_category :=    
+    MAP(
+						filing_status IN DueDiligence.Constants.filing_status_satisfied => 'Satis',
+						filing_status IN DueDiligence.Constants.filing_status_dismissed => 'Dismiss',
+						filing_status  = 'UNLAPSED'                                     => 'Unlapsed',
+						filing_status  = 'LAPSED'                                       => 'Lapsed',
+						filing_status NOT IN
+							[
+								DueDiligence.Constants.filing_status_satisfied 
+								+ DueDiligence.Constants.filing_status_dismissed 
+								+ [ 'UNLAPSED','LAPSED' ]
+							]                                                                  => 'Other',
+						                                                                        ''); // default
+    RETURN filing_status_category; 
+  END;
+
+	//NOTE: This is being used during development between developers - this is not used/available in the product at this point...
+	EXPORT IndividualJoin(joinTo, didFieldName, keyName, whereClause, joinType, maxRecords = 5) := FUNCTIONMACRO
+
+		LOCAL atmostMax := IF(maxRecords > 0, 'ATMOST(' + maxRecords + ')', DueDiligence.Constants.EMPTY);
+		LOCAL addJoinType := IF(joinType = DueDiligence.Constants.EMPTY, joinType, joinType + ',');
+		LOCAL didField := 'LEFT.' + didFieldName;
+		
+		LOCAL joinResult := JOIN(joinTo, #EXPAND(keyName), 
+													#EXPAND(whereClause), 
+													TRANSFORM({UNSIGNED4 seq, UNSIGNED6 inDid, UNSIGNED4 historyDate, RECORDOF(RIGHT)},
+																		SELF.seq := LEFT.seq;
+																		SELF.inDid := #EXPAND(didField);
+																		SELF.historyDate := LEFT.historyDate;
+																		SELF := RIGHT), 
+													#EXPAND(addJoinType)					
+													#EXPAND(atmostMax)); 
+												
+		RETURN joinResult;
+
+	ENDMACRO;
 		
 END;

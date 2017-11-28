@@ -1,4 +1,4 @@
-import BatchServices, doxie, ut, gong_services, AutoHeaderI, STD;
+﻿import BatchServices, doxie, gong_services, AutoHeaderI, STD;
 
 in_layout := BatchServices.Layouts.RTPhones.rec_batch_RTPhones_input;
 
@@ -36,7 +36,7 @@ export SearchInHouse(BatchServices.RealTimePhones_Params.params in_mod,
 					export string2 state := Lout.st;
 					export string6 zip := Lout.zip5;
 			end;
-			dids := if (Lout.resultcount >= in_mod.maxResults,dataset([],doxie.layout_references),AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(tempmod));
+			dids := if (Lout.resultcount >= in_mod.maxResults,dataset([],doxie.layout_references_hh),AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(tempmod));
   		data_restriction_mask := doxie.DataRestriction.fixed_DRM;
 	  	IncludeFullPhonesPlus := true;
   		ds_pp := call_phones_macro(dids, GLB_Purpose, DPPA_Purpose, industry_class_value,IncludeFullPhonesPlus, company_name,data_restriction_mask);
@@ -44,7 +44,7 @@ export SearchInHouse(BatchServices.RealTimePhones_Params.params in_mod,
 															 GLB_Purpose, DPPA_Purpose, industry_class_value, company_name);
 			unsigned1 lengthSSN := length(trim(SSN_value));
 			UseAllDids := lengthSSN > 0; // if there is a ssn then use all dids
-			gong_dids := if (UseAllDids, dids, dataset([{(unsigned6)did_value}],doxie.layout_references));
+			gong_dids := if (UseAllDids, dids, dataset([{(unsigned6)did_value}],doxie.layout_references_hh));
 			gong_recs := gong_services.Fetch_Gong_History(gong_dids,false,true,,,true,,false,if(~UseAllDids, true, false));
 			doxie.layout_pp_raw_common gong2Pretty(gong_recs le) :=
 			TRANSFORM

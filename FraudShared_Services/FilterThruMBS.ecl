@@ -94,7 +94,7 @@ EXPORT FilterThruMBS(
 		TRANSFORM(LEFT));
 
 	
-	ds_results := IF(fraud_platform = FraudGovPlatform_Services.Constants.FRAUDPLATFORM , Include_FraudGov , ds_results_pre);
+	ds_results := IF(fraud_platform = FraudGovPlatform_Services.Constants.FRAUD_PLATFORM , Include_FraudGov , ds_results_pre);
 
 	// OUTPUT(ds_ids, named('ds_ids'));
 	// OUTPUT(FdnMasterId_exclude_result, named('FdnMasterId_exclude_result'));

@@ -1,7 +1,9 @@
 ﻿IMPORT _control;
 EXPORT CONSTANTS := MODULE
 		EXPORT LandingZone		 								:= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
-		
+	
+		EXPORT alpha_ip := fileservices.ResolveHostName('alpha_prod_thor_dali.risk.regn.net');
+
 		export prefix                        :=   '/data/super_credit/ecrash/sla_build/';                
 		EXPORT InPathForIncident					  := prefix + 'noniyetek/incident/in';
 		EXPORT InPathForBillingAgency					  := prefix + 'noniyetek/BillingAgencies/in';

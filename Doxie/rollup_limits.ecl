@@ -1,4 +1,4 @@
-export rollup_limits :=
+﻿export rollup_limits :=
 MODULE
 	export ssns := 15;
 	export ssn_hris := 10;
@@ -19,6 +19,7 @@ MODULE
 	export phone_hris := 10;
 	
 	export relatives_names := 10;
+	export progressivePhone := 150;
 	
 	EXPORT SET OF STRING	TNT_CURRENT_SET := ['B', 'V','C'];  
 	                              // same as progressive_phone.Constants.TNT_CURRENT_SET

@@ -1,4 +1,4 @@
-﻿import Address_Attributes, Business_Risk, BIPV2, BusReg, Business_Risk_BIP, DueDiligence, Corp2, Riskwise, Risk_Indicators, business_header;
+﻿IMPORT Address_Attributes, Business_Risk, BIPV2, BusReg, Business_Risk_BIP, DueDiligence, Corp2, Riskwise, Risk_Indicators, business_header;
 
 /* 
 	Following Keys being used:
@@ -18,7 +18,7 @@ EXPORT getBusRegistration(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																												 Options.KeepLargeBusinesses);
 	
 	// Add back our Seq numbers
-	DueDiligence.Common.AppendSeq(regBusRaw, indata, regBusSeq);
+	regBusSeq := DueDiligence.Common.AppendSeq(regBusRaw, indata, TRUE);
 
 	// Filter out records after our history date.
 	regBusFiltRec := DueDiligence.Common.FilterRecords(regBusSeq, dt_first_seen, dt_vendor_first_reported);
@@ -64,7 +64,7 @@ EXPORT getBusRegistration(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 
 	//get registered agent information
-	busRegAgent := regBusFilt(rawfields.ra_name <> '' AND clean_ra_address.prim_name <> '');
+	busRegAgent := regBusFilt(rawfields.ra_name <> DueDiligence.Constants.EMPTY AND clean_ra_address.prim_name <> DueDiligence.Constants.EMPTY);
 	sortBusRegAgent := SORT(busRegAgent, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), clean_ra_address.prim_range, clean_ra_address.predir, clean_ra_address.prim_name, clean_ra_address.addr_suffix, clean_ra_address.postdir, clean_ra_address.zip, dt_first_seen);
 
 	rollBusRegAgent := ROLLUP(sortBusRegAgent,

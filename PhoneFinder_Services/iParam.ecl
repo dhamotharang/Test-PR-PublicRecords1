@@ -53,6 +53,7 @@ MODULE
 	  EXPORT BOOLEAN   UseLengthOfTimeVerify  := FALSE;
 		EXPORT BOOLEAN   IsPhone7Search         := FALSE;
 		
+		
 		// Risk evaluation requests
 		EXPORT DATASET(iesp.phonefinder.t_PhoneFinderRiskIndicator) RiskIndicators	:= DATASET([],iesp.phonefinder.t_PhoneFinderRiskIndicator);
 		EXPORT BOOLEAN   IncludeOtherPhoneRiskIndicators  := FALSE;
@@ -62,6 +63,8 @@ MODULE
 		EXPORT STRING20  Usecase := '';
 		EXPORT STRING3 	ProductCode := '';
 		EXPORT STRING8	BillingId := '';
+		// batch only options.
+		EXPORT BOOLEAN   DirectMarketingSourcesOnly        := FALSE;
 	END;
 
 	EXPORT AKParams :=

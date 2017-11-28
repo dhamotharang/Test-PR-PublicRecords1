@@ -1,4 +1,4 @@
-import iesp, risk_indicators, fcra, doxie, ut, RiskView, Suppress, faa, 
+﻿import iesp, risk_indicators, fcra, doxie, ut, RiskView, Suppress, faa, 
 	RiskWiseFCRA, PersonContext;
 // for now this only supports a single input record -- that's what the fcradataservice restricts too...
 
@@ -285,11 +285,11 @@ EXPORT Search_RptFunction(dataset(Risk_Indicators.Layout_Input) raw_input,
 		property_recs := RiskView.Search_RptData.propertyrecs(bocashell, DataRestrictionMask);
 		prop_recs :=	if(bs.address_verification.sold.property_total >= 1 or 
 							bs.address_verification.owned.property_total >= 1, property_recs,
-							group(dataset([], Risk_Indicators.Layouts.layout_relat_prop_plusv4),seq)); 		
+							group(dataset([], Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd),seq)); 		
 	
 		propertyrecs :=	sort(prop_recs,  -purchase_date);	
 
-		iesp.riskview2.t_Rv2ReportRealPropertyRecord formatpropertyrecs(Risk_Indicators.Layouts.layout_relat_prop_plusv4 l, integer c) := TRANSFORM
+		iesp.riskview2.t_Rv2ReportRealPropertyRecord formatpropertyrecs(Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd l, integer c) := TRANSFORM
 			self.Seq := c;
 			self.Address := RiskView.Search_RptData.esdlAddress(l.prim_range, l.predir, l.prim_name, l.addr_suffix, l.postdir, l.unit_desig, l.sec_range, '','', l.city_name, l.st, l.zip5, '', '','','');
 			self.Status := if(l.property_status_applicant = 'O', 'CURRENT', 'PREVIOUS');

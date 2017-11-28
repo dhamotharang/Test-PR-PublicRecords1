@@ -236,7 +236,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		
 		/*BUSINESS STRUCTURE TYPE*/ 
-		structure := IF(le.hdBusnType = '', le.adrBusnType, le.hdBusnType);
+		structure := IF(le.hdBusnType = DueDiligence.Constants.EMPTY, le.adrBusnType, le.hdBusnType);
 		structFlag9 := IF(structure = DueDiligence.Constants.CMPTYP_PROPRIETORSHIP OR structure = DueDiligence.Constants.CMPTYP_ASSUMED_NAME_DBA, 'T', 'F');
 		structFlag8 := IF(structure = DueDiligence.Constants.CMPTYP_TRUST, 'T', 'F');
 		structFlag7 := IF(structure = DueDiligence.Constants.CMPTYP_LIMITED_LIABILITY_CORP, 'T', 'F');
@@ -245,7 +245,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		structFlag4 := IF(structure = DueDiligence.Constants.CMPTYP_CORP_BUSINESS OR structure = DueDiligence.Constants.CMPTYP_FOREIGN_CORP, 'T', 'F');
 		structFlag3 := IF(structure = DueDiligence.Constants.CMPTYP_PROFESSIONAL_CORP OR structure = DueDiligence.Constants.CMPTYP_PROFESSIONAL_ASSOC, 'T', 'F');
 		structFlag2 := IF(structure = DueDiligence.Constants.CMPTYP_LIMITED_PARTNERSHIP OR structure = DueDiligence.Constants.CMPTYP_LIMITED_LIABILITY_PARTNERSHIP, 'T', 'F');
-		structFlag1 := IF(structure = '', 'T', 'F');
+		structFlag1 := IF(structure = DueDiligence.Constants.EMPTY, 'T', 'F');
 		
 		structConcat := structFlag9 + structFlag8 + structFlag7 + structFlag6 + structFlag5 + structFlag4 + structFlag3 + structFlag2 + structFlag1;
 		structFlag0 := IF(STD.Str.Find(structConcat, 'T', 1) = 0, 'T', 'F');  	//Insufficient information reported on business and cannot calculate
@@ -322,6 +322,30 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		SELF.BusShellShelfRisk_Flags := shellShelfConcat_Final;
 		SELF.BusShellShelfRisk := (STRING)(10-STD.Str.Find(shellShelfConcat_Final, 'T', 1)); 
+		
+		
+		/*BUSINESS EXECUTIVE OFFICERS RISK*/
+		highRiskFound := le.atleastOneActiveLawAcctExec OR le.atleastOneActiveFinRealEstateExec OR le.atleastOneActiveMedicalExec OR 
+											le.atleastOneActiveBlastPilotExec OR le.atleastOneInactiveLawAcctExec OR le.atleastOneInactiveFinRealEstateExec OR 
+											le.atleastOneInactiveMedicalExec OR le.atleastOneInactiveBlastPilotExec;
+		execOfficerRisk9 := IF(le.atleastOneActiveLawAcctExec, 'T', 'F');
+		execOfficerRisk8 := IF(le.atleastOneActiveFinRealEstateExec, 'T', 'F');
+		execOfficerRisk7 := IF(le.atleastOneActiveMedicalExec, 'T', 'F');
+		execOfficerRisk6 := IF(le.atleastOneActiveBlastPilotExec, 'T', 'F');
+		execOfficerRisk5 := IF(le.atleastOneInactiveLawAcctExec, 'T', 'F');
+		execOfficerRisk4 := IF(le.atleastOneInactiveFinRealEstateExec, 'T', 'F');
+		execOfficerRisk3 := IF(le.atleastOneInactiveMedicalExec, 'T', 'F');
+		execOfficerRisk2 := IF(le.atleastOneInactiveBlastPilotExec, 'T', 'F');
+		execOfficerRisk1 := IF(le.numOfBusExecs = 0 OR highRiskFound = FALSE, 'T', 'F');
+												
+		execOfficerRiskConcat := execOfficerRisk9 + execOfficerRisk8 + execOfficerRisk7 + execOfficerRisk6 + execOfficerRisk5 + execOfficerRisk4 + execOfficerRisk3 + execOfficerRisk2 + execOfficerRisk1;
+		execOfficerRiskFlag0 := IF(STD.Str.Find(execOfficerRiskConcat, 'T', 1) = 0, 'T', 'F');  //Insufficient information reported on business and cannot calculate
+		
+		execOfficerRiskConcat_Final := execOfficerRiskConcat + execOfficerRiskFlag0;
+		
+		SELF.BusExecOfficersRisk_Flags := execOfficerRiskConcat_Final;
+		SELF.BusExecOfficersRisk := (STRING)(10-STD.Str.Find(execOfficerRiskConcat_Final, 'T', 1));
+		
 		
 		
     /* BUSINESS GEOGRAPHIC RISK  */  
@@ -445,8 +469,8 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 																										// SELF.BusHighRiskNewsProfiles_Flags := INVALID_BUSINESS_FLAGS;
 																										// SELF.BusLinkedBusRisk := INVALID_BUSINESS_SCORE;
 																										// SELF.BusLinkedBusRisk_Flags := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusExecOfficersRisk := INVALID_BUSINESS_SCORE;
-																										// SELF.BusExecOfficersRisk_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusExecOfficersRisk := INVALID_BUSINESS_SCORE;
+																										SELF.BusExecOfficersRisk_Flags := INVALID_BUSINESS_FLAGS;
 																										// SELF.BusExecOfficersResidencyRisk := INVALID_BUSINESS_SCORE;
 																										// SELF.BusExecOfficersResidencyRisk_Flags := INVALID_BUSINESS_FLAGS;
 																										SELF := LEFT;));
