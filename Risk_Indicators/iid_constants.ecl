@@ -358,6 +358,7 @@ export Mask_DOB(string dob, unsigned1 dob_mask_value = suppress.Constants.dateMa
 	return sDOBmasked;
 end;
 
+export invalid_dobs := ['19000101','19000000','19010101','18990101'];
 
 export dobmatch_score_fuzzy6(boolean indobpop, boolean founddobpop, string8 indob, string8 founddob) := 
 																	map(~indobpop or ~founddobpop => 255,
@@ -873,5 +874,8 @@ export Set_Restricted_Colleges_For_Marketing := [
 '16196',
 '16198',
 '16201'];
+
+export Set_Equifax_Active_Duty_Alert_Codes := ['W','Q','N'];
+export Set_Equifax_Fraud_Alert_Codes := ['W','Q','X','V'];
 
 end;

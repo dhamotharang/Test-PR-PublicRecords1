@@ -914,6 +914,7 @@ iid_constants.layout_outx getHeader(Layout_working le) := TRANSFORM
 	dobmatch_score1 := IF(indobpop and founddobpop,did_add.ssn_match_score(le.dob[1..8],le_head_dob[1..8]),255);	// per GB, if input dob is less than 8 bytes, don't let it pass
 	yyyymm_match := le.dob[1..6]=le_head_dob[1..6];
 	dobmatch_score := map(
+	  indobpop and le_head_dob in risk_indicators.iid_constants.invalid_dobs => 1,
 		DOBMatchOption = 'FUZZYCCYYMM' => dobmatch_score_fuzzy6,
 		DOBMatchOption = 'RADIUSCCYY' => dobmatch_score_radius,
 		DOBMatchOption = 'EXACTCCYYMMDD' => dobmatch_score_exact8,
@@ -1505,6 +1506,7 @@ iid_constants.layout_outx GetFakeHeaderRecords (Risk_Indicators.layout_output le
 	dobmatch_score1 := IF(indobpop and founddobpop,did_add.ssn_match_score(le.dob[1..8],ri_dob[1..8]),255);	// per GB, if input dob is less than 8 bytes, don't let it pass
 	yyyymm_match := le.dob[1..6]=ri_dob[1..6];
 	dobmatch_score := map(
+	  indobpop and ri_dob in risk_indicators.iid_constants.invalid_dobs => 1,
 		DOBMatchOption = 'FUZZYCCYYMM' => dobmatch_score_fuzzy6,
 		DOBMatchOption = 'RADIUSCCYY' => dobmatch_score_radius,
 		DOBMatchOption = 'EXACTCCYYMMDD' => dobmatch_score_exact8,

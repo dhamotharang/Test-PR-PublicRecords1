@@ -2,7 +2,7 @@
 IMPORT MDR;
 EXPORT Constants :=
 MODULE
-
+		EXPORT UNSIGNED  MAX_RECORDS := 10000;
   // PhonesPlusV2 special text to indicate "Insurance Verified and moved from below to above 
 	// the line".  The text is derived from decoding the "rules" field by using 
 	// Phonesplus_v2.Translation_Codes.fGet_rules_caption_from_bitmap.
@@ -119,9 +119,19 @@ MODULE
 		EXPORT PRnUSVI			  	:= '8'; //Puerto Rico and U.S. Virgin Islands
 	END;
 	
+	// Phone types
+	EXPORT PhoneServiceType :=
+	MODULE
+		EXPORT Landline := 'LANDLINE';
+		EXPORT Wireless := 'WIRELESS';
+		EXPORT VoIP     := 'VOIP';
+		EXPORT Other    := 'UNKNOWN';
+	END;		
+	
 	EXPORT GatewayValues :=
 	MODULE
-	  EXPORT AccuDataLNP  := 'LNP'; // local number poratability data - AccuData gateway transaction type
+	  EXPORT STRING AccuDataLNP  := 'LNP'; // local number poratability data - AccuData gateway transaction type
+	  EXPORT STRING AccuDataCNAM := 'CNM2'; // Retrieve Calling Name for phone number
 		EXPORT UNSIGNED1 SQLSelectLimit			 	 := 100;  // Limit SQL select for each phone
 		EXPORT UNSIGNED1 requestTimeout			 	 := 5;  
 		EXPORT UNSIGNED1 requestRetries			 	 := 0;  	
@@ -131,9 +141,21 @@ MODULE
 		EXPORT STRING 	 ZumigoIdentity				 := 'Zumigo_GLI';		
 		EXPORT UNSIGNED1 MaxZumigoRequest			 := 15;		
 	END;
+	// Zumigo Input Values
+	EXPORT ZumigoInputOptions :=
+	MODULE
+		EXPORT STRING OptInType := 'WHITELIST';
+		EXPORT OptInMethod := ['TCO','MA','TCP','IVR','SMS','TCPA','ONE','OTHER'];
+		EXPORT OptInDuration := ['ONE','ONG'];
+	END;		
+	
+	EXPORT UNSIGNED1 Zumigo_NameAddr_Validation_Threshold_MIN :=80;
+	EXPORT UNSIGNED1 Zumigo_NameAddr_Validation_Threshold_MAX :=100;		
 	// Debug
 	EXPORT Debug :=
 	MODULE
+		EXPORT AccuDataCNAM := FALSE;
+		EXPORT LNData := FALSE;
 		EXPORT PhonesPlus := FALSE;
 		EXPORT PhoneMetadata_wLIDB := FALSE;
 		EXPORT PhoneAttributes_Main := FALSE;
@@ -163,7 +185,5 @@ MODULE
 		EXPORT DISCONNECTED_CODE:= 'DE';
 	END;
 	
-	EXPORT UNSIGNED1 Zumigo_NameAddr_Validation_Threshold_MIN :=80;
-	EXPORT UNSIGNED1 Zumigo_NameAddr_Validation_Threshold_MAX :=100;
-	
+
 END;

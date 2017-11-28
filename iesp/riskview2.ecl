@@ -293,7 +293,7 @@ export t_RiskView2LiensJudgmentsReportForLien := record
 	string60 Agency {xpath('Agency')};
 	string35 AgencyCounty {xpath('AgencyCounty')};
 	string2 AgencyState {xpath('AgencyState')};
-	unsigned ConsumerStatementId {xpath('ConsumerStatementId')};
+	string25 ConsumerStatementId {xpath('ConsumerStatementId')};
 end;
 		
 export t_RiskView2LiensJudgmentsReportForJudgement := record
@@ -313,7 +313,7 @@ export t_RiskView2LiensJudgmentsReportForJudgement := record
 	string60 Agency {xpath('Agency')};
 	string35 AgencyCounty {xpath('AgencyCounty')};
 	string2 AgencyState {xpath('AgencyState')};
-	unsigned ConsumerStatementId {xpath('ConsumerStatementId')};
+	string25 ConsumerStatementId {xpath('ConsumerStatementId')};
 end;
 		
 export t_RiskView2LiensJudgmentsReport := record

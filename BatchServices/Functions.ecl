@@ -101,7 +101,9 @@ EXPORT Functions := MODULE
 	
 	SHARED fn_GetDids(Autokey_batch.Layouts.rec_inBatchMaster le, 
 										unsigned2 did_limit = 100, 
-										AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full args = project(AutoStandardI.GlobalModule(), AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full, opt)) := FUNCTION
+										AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full args = project(AutoStandardI.GlobalModule(), AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full, opt),
+										boolean UseOldssns = true) := FUNCTION
+										
 			tempdmod := MODULE(PROJECT(args, AutoHeaderI.LIBIN.FetchI_Hdr_Indv.full, opt))
 				EXPORT lastname           := le.name_last;  
 				EXPORT firstname          := le.name_first; 
@@ -126,23 +128,28 @@ EXPORT Functions := MODULE
 // I'm not comfortable with this, but it is backward compatible
         export boolean IncludeMinors := true;
 
-        export boolean KeepOldSsns := true;
+     // Due to the 2014-10-15T23:25:55Z Checkin Changes - adding an exception for phone finder services to prune out oldssns
+				// AutoHeaderV2.LIBCALL_conversions.GetPreprocessedInputDataset is checking two : KeepOldSsns or ~UsingKeepSSNs
+				// Flags KeepOldSsns and UsingKeepSSNs serves the same purpose of allowing old ssn's- as per vlad KeepOldSsns takes the precedence
+        export boolean KeepOldSsns := UseOldssns;
+        export boolean UsingKeepSSNs := ~UseOldssns;
 			END;
 
-			// Note: AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do method is impossible to implement now due to the compile-
+			// Note: AutoHeaderI/LIBCALL_FetchI_Hdr_Indv/do method is impossible to implement now due to the compile-
 			// time error on the keyword 'skip'. Instead, we'll invoke 'references', which will perform a DID lookup
 			// on the person him-herself, but not on the household. We'll switch back to the 'do' method when Gavin 
 			// fixes the problem with 'skip'. See bug #32760.
-			// RETURN CHOOSEN(AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.references(tempdmod),did_limit);
-
+			// RETURN CHOOSEN(PROJECT(AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do(tempdmod),did_limit), doxie.layout_references);
       ds_search := AutoHeaderV2.LIBCALL_conversions.GetPreprocessedInputDataset (tempdmod);
+	
       // library wrapper call
       dids := AutoHeaderV2.get_dids (ds_search, AutoHeaderV2.Constants.SearchCode.NOFAIL);
+
       return choosen (project (dids,doxie.layout_references), did_limit);
 	END;
 	// Obtain a set of dids for each batch input record. Return only acctno and did. ( 1 acctno --> M dids )
 	EXPORT fn_find_dids_and_append_to_acctno( DATASET(Autokey_batch.Layouts.rec_inBatchMaster) ak_input = DATASET([],Autokey_batch.Layouts.rec_inBatchMaster),
-	                                          unsigned2 in_did_limit = 100) := FUNCTION
+	                                          unsigned2 in_did_limit = 100, boolean UseOldssns = true) := FUNCTION
 			
 			// .. Attach a dataset of dids to input record.
 			rec_inBatchMaster_plus_DIDs := RECORD
@@ -153,7 +160,7 @@ EXPORT Functions := MODULE
 			// .. Use LIBCALL_FetchI_Hdr_Indv to grab DIDs.
 			rec_inBatchMaster_plus_DIDs xfm_DeepDiveForDids(Autokey_batch.Layouts.rec_inBatchMaster le) := 
 				TRANSFORM				
-					SELF.dids := fn_GetDids(le, in_did_limit);	
+					SELF.dids := fn_GetDids(le, in_did_limit, , UseOldssns);	
 					SELF      := le;
 				END;
 			

@@ -63,7 +63,7 @@ string5   industry_class_val := '';
 boolean   isUtility := false;
 boolean   ofac_Only := false;
 
-string DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
+string50 DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 unsigned3 history_date := 999999 		: stored('HistoryDateYYYYMM');
 boolean DisableDoNotMailFilter := false		:	stored('DisableDoNotMailFilter');
@@ -90,7 +90,7 @@ risk_indicators.Layout_Input into_in(batchinseq le) := TRANSFORM
 	self.seq := le.seq;	
 	self.ssn := IF(le.ssn='000000000','',le.ssn);	// blank out social if it is all 0's
 	self.dob := dob_val;
-	self.age := if ((integer)dob_val != 0,(STRING3)ut.GetAgeI((integer)dob_val), '');
+	self.age := if ((integer)dob_val != 0,(STRING3)ut.Age((integer)dob_val), '');
 	
 	/* got 5 phones to deal with... for now dropping all but 1
 	self.phone10 := le.Home_Phone;
@@ -161,9 +161,8 @@ BOOLEAN ofacSearching := false;
 UNSIGNED1 ofacVersion := 0;
 BOOLEAN includeAdditionalWatchlists := false;
 BOOLEAN excludeWatchlists := true; 
-// For ITA we can't use FARES Data
 BOOLEAN filterOutFares := TRUE;
-append_best := 2;
+append_best := 0;
 
 unsigned8 BSOptions := risk_indicators.iid_constants.BSOptions.IncludeDoNotMail + 
 											 risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity;
@@ -196,7 +195,7 @@ unsigned3 fixYYYY00( unsigned YYYYMM ) := if( YYYYMM > 0 and YYYYMM % 100 = 0, Y
 models.layouts.layout_CDM_Batch_Out get_clam(clam le) := transform
 self.seq := le.seq;
 
-system_yearmonth := if(le.historydate = risk_indicators.iid_constants.default_history_date, (integer)(ut.GetDate[1..6]), le.historydate);
+system_yearmonth := if(le.historydate = risk_indicators.iid_constants.default_history_date, (integer)(Std.Date.Today()[1..6]), le.historydate);
 
 noAddrinput    := not le.input_validation.Address;
 noSSNinput     := not le.input_validation.ssn;
@@ -236,38 +235,38 @@ fname_src_dts := sort(fname_dts(str2 not in ['','0']),str2,str1) + sort(fname_dt
 // ssn - credit bureau
 t_ssn_src := if(count(ssn_src_dts(str1 in credit_combo_srcs)) > 0,1,0);
 self.IDVerSSNCreditBureauCount     := if(noSSNinput, '-1', (string)min(9, count(ssn_src_dts(str1 in credit_sources))+t_ssn_src) );
-self.IDVerSSNCreditBureauMonthsSeen := map(le.did=0 => '', 
+self.IDVerSSNCreditBureauMonthsSeen := map(le.did=0 => '-1', 
                                         self.IDVerSSNCreditBureauCount = '0' => '-2',
-																				(integer)trim(ssn_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2) = 0 => '-1',
-																				(string)months_apart(system_yearmonth, fixYYYY00((integer)trim(ssn_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2)))
+																				(integer)trim(ssn_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2) = 0 => '-3',
+																				(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(ssn_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2))))
 																				);
 // ssn - government
 g_ssn_src := if(count(ssn_src_dts(str1 in govt_combo_srcs)) > 0,1,0);
 self.IDVerSSNGovernmentCount     := if(noSSNinput, '-1', (string)min(255, count(ssn_src_dts(str1 in govt_sources))+g_ssn_src) );
-self.IDVerSSNGovernmentMonthsSeen := map(le.did=0 => '',
+self.IDVerSSNGovernmentMonthsSeen := map(le.did=0 => '-1',
                                       self.IDVerSSNGovernmentCount = '0' => '-2',
-																			(integer)trim(ssn_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2) = 0 => '-1',
-																			(string)months_apart(system_yearmonth, fixYYYY00((integer)trim(ssn_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2)))
+																			(integer)trim(ssn_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2) = 0 => '-3',
+																			(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(ssn_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2))))
 																			);
    // no ver ssn last seen dates
-self.IDVerSSNDriversLicense := map(le.did=0 or noSSNinput                                  => '-1',
+self.IDVerSSNDriversLicense := map(le.did=0 or noSSNinput                                        => '-1',
                                    (count(ssn_src_dts(str1 in govtDL_sources)) > 0
-																			                 and count(ssn_src_dts(str1 in nongovtDL_sources)) > 0) => '3',
-																			                count(ssn_src_dts(str1 in govtDL_sources)) > 0          => '2',
-																					              count(ssn_src_dts(str1 in nongovtDL_sources)) > 0       => '1',
-																					                                                                         '0');
-self.IDVerSSNDriversLicenseMonthsSeen := map(le.did=0 => '',
+																			    and count(ssn_src_dts(str1 in nongovtDL_sources)) > 0) => '3',
+																		count(ssn_src_dts(str1 in govtDL_sources)) > 0               => '2',
+																		count(ssn_src_dts(str1 in nongovtDL_sources)) > 0            => '1',
+																					                                                          '0');
+self.IDVerSSNDriversLicenseMonthsSeen := map(le.did=0 => '-1',
                                             count(ssn_src_dts(str1 in allDL_sources)) = 0 => '-2',
-																						(integer)trim(ssn_src_dts(str1 in allDL_sources)[1].str2) = 0 => '-1',
-																						(string)months_apart(system_yearmonth, fixYYYY00((integer)trim(ssn_src_dts(str1 in allDL_sources)[1].str2)))
+																						(integer)trim(ssn_src_dts(str1 in allDL_sources)[1].str2) = 0 => '-3',
+																						(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(ssn_src_dts(str1 in allDL_sources)[1].str2))))
 																						);
    // no ver ssn last seen dates
 // ssn - behavioral
 self.IDVerSSNBehavioralCount     := if(noSSNinput, '-1', (string)min(255, count(ssn_src_dts(str1 in behav_sources))) );
-self.IDVerSSNBehavioralMonthsSeen := map(le.did=0 => '',
+self.IDVerSSNBehavioralMonthsSeen := map(le.did=0 => '-1',
                                       self.IDVerSSNBehavioralCount = '0' => '-2',
-																			(integer)trim(ssn_src_dts(str1 in behav_sources)[1].str2) = 0 => '-1',
-																			(string)months_apart(system_yearmonth, fixYYYY00((integer)trim(ssn_src_dts(str1 in behav_sources)[1].str2)))
+																			(integer)trim(ssn_src_dts(str1 in behav_sources)[1].str2) = 0 => '-3',
+																			(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(ssn_src_dts(str1 in behav_sources)[1].str2))))
 																			);
    // no ver ssn last seen dates
 
@@ -278,19 +277,19 @@ self.IDVerAddrMatchesCurrent := map(le.did=0 or noAddrinput => '-1',
 // addr - credit bureau
 t_addr_src := if(count(addr_src_dts(str1 in credit_combo_srcs)) > 0,1,0);
 self.IDVerAddrCreditBureauCount     := if(noaddrinput, '-1', (string)min(9, count(addr_src_dts(str1 in credit_sources))+t_addr_src) );
-self.IDVerAddrCreditBureauMonthsSeen := map(le.did=0 => '',
+self.IDVerAddrCreditBureauMonthsSeen := map(le.did=0 => '-1',
                                             self.IDVerAddrCreditBureauCount = '0' => '-2',
-																						(integer)trim(addr_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2) = 0 => '-1',
-																						(string)months_apart(system_yearmonth, fixYYYY00((integer)trim(addr_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2)))
+																						(integer)trim(addr_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2) = 0 => '-3',
+																						(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(addr_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2))))
 																						);
    // no ver addr last seen dates
 // addr - government
 g_addr_src := if(count(addr_src_dts(str1 in govt_combo_srcs)) > 0,1,0);
 self.IDVerAddrGovernmentCount     := if(noaddrinput, '-1', (string)min(255, count(addr_src_dts(str1 in govt_sources))+g_addr_src) );
-self.IDVerAddrGovernmentMonthsSeen := map(le.did=0 => '',
+self.IDVerAddrGovernmentMonthsSeen := map(le.did=0 => '-1',
                                        self.IDVerAddrGovernmentCount = '0' => '-2',
-																			 (integer)trim(addr_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2) = 0 => '-1',
-																			 (string)months_apart(system_yearmonth, fixYYYY00((integer)trim(addr_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2)))
+																			 (integer)trim(addr_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2) = 0 => '-3',
+																			 (string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(addr_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2))))
 																			 );
    // no ver addr last seen dates
 // addr - drivers license
@@ -300,67 +299,67 @@ self.IDVerAddrDriversLicense          := map(le.did=0 or noAddrinput            
 																             count(addr_src_dts(str1 in govtDL_sources)) > 0      => '2',
 																		         count(addr_src_dts(str1 in nongovtDL_sources)) > 0   => '1',
 																		                                                                 '0');
-self.IDVerAddrDriversLicenseMonthsSeen := map(le.did=0 => '',
+self.IDVerAddrDriversLicenseMonthsSeen := map(le.did=0 => '-1',
                                            count(addr_src_dts(str1 in allDL_sources)) = 0 => '-2',
-																					 (integer)trim(addr_src_dts(str1 in allDL_sources)[1].str2) = 0 => '-1',
-																					 (string)months_apart(system_yearmonth, fixYYYY00((integer)trim(addr_src_dts(str1 in allDL_sources)[1].str2)))
+																					 (integer)trim(addr_src_dts(str1 in allDL_sources)[1].str2) = 0 => '-3',
+																					 (string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(addr_src_dts(str1 in allDL_sources)[1].str2))))
 																					 );
    // no ver addr last seen dates
 // addr - voter
 self.IDVerAddrVoterRegistration := map(le.did=0 or noAddrinput                        => '-1',
                                        count(addr_src_dts(str1 in voter_sources)) > 0 => '1',
 																			                                                   '0');
-self.IDVerAddrVoterRegMonthsSeen := map(le.did=0 => '',
+self.IDVerAddrVoterRegMonthsSeen := map(le.did=0 => '-1',
                                      count(addr_src_dts(str1 in voter_sources)) = 0 => '-2',
-																		 (integer)trim(addr_src_dts(str1 in voter_sources)[1].str2) = 0 => '-1',
-																		 (string)months_apart(system_yearmonth, fixYYYY00((integer)trim(addr_src_dts(str1 in voter_sources)[1].str2)))
+																		 (integer)trim(addr_src_dts(str1 in voter_sources)[1].str2) = 0 => '-3',
+																		 (string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(addr_src_dts(str1 in voter_sources)[1].str2))))
 																		 );
    // no ver addr last seen dates
 // addr - vehicle reg
 self.IDVerAddrVehicleRegistration := map(le.did=0 or noAddrinput                          => '-1',
                                          count(addr_src_dts(str1 in vehicle_sources)) > 0 => '1',
 																				                                                     '0');
-self.IDVerAddrVehicleRegMonthsSeen := map(le.did=0 => '',
+self.IDVerAddrVehicleRegMonthsSeen := map(le.did=0 => '-1',
                                        count(addr_src_dts(str1 in vehicle_sources)) = 0 => '-2',
-																			 (integer)trim(addr_src_dts(str1 in vehicle_sources)[1].str2) = 0 => '-1',
-																			 (string)months_apart(system_yearmonth, fixYYYY00((integer)trim(addr_src_dts(str1 in vehicle_sources)[1].str2)))
+																			 (integer)trim(addr_src_dts(str1 in vehicle_sources)[1].str2) = 0 => '-3',
+																			 (string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(addr_src_dts(str1 in vehicle_sources)[1].str2))))
 																			 );
    // no ver addr last seen dates
 // addr - property
 self.IDVerAddrProperty := map(le.did=0 or noAddrinput                           => '-1',
                               count(addr_src_dts(str1 in property_sources)) > 0 => '1',
 															                                                     '0');
-self.IDVerAddrPropertyMonthsSeen := map(le.did=0 => '',
+self.IDVerAddrPropertyMonthsSeen := map(le.did=0 => '-1',
                                      count(addr_src_dts(str1 in property_sources)) = 0 => '-2',
-																		 (integer)trim(addr_src_dts(str1 in property_sources)[1].str2) = 0 => '-1',
-																		 (string)months_apart(system_yearmonth, fixYYYY00((integer)trim(addr_src_dts(str1 in property_sources)[1].str2)))
+																		 (integer)trim(addr_src_dts(str1 in property_sources)[1].str2) = 0 => '-3',
+																		 (string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(addr_src_dts(str1 in property_sources)[1].str2))))
 																		 );
    // no ver addr last seen dates
 // addr - behavioral
 self.IDVerAddrBehavioralCount     := if(noAddrinput, '-1', (string)min(255, count(addr_src_dts(str1 in behav_sources))) );
-self.IDVerAddrBehavioralMonthsSeen := map(le.did=0 => '',
+self.IDVerAddrBehavioralMonthsSeen := map(le.did=0 => '-1',
                                        self.IDVerAddrBehavioralCount = '0' => '-2',
-																			 (integer)trim(addr_src_dts(str1 in behav_sources)[1].str2) = 0 => '-1',
-																			 (string)months_apart(system_yearmonth, fixYYYY00((integer)trim(addr_src_dts(str1 in behav_sources)[1].str2)))
+																			 (integer)trim(addr_src_dts(str1 in behav_sources)[1].str2) = 0 => '-3',
+																			 (string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(addr_src_dts(str1 in behav_sources)[1].str2))))
 																			 );
    // no ver addr last seen dates
 
 // dob - credit bureau
 t_dob_src := if(count(dob_src_dts(str1 in credit_combo_srcs)) > 0,1,0);
 self.IDVerDOBCreditBureauCount := if(noDOBinput, '-1', (string)min(9, count(dob_src_dts(str1 in credit_sources))+t_dob_src) );
-self.IDVerDOBCreditBureauMonthsSeen := map(le.did=0 => '',
+self.IDVerDOBCreditBureauMonthsSeen := map(le.did=0 => '-1',
                                         self.IDVerDOBCreditBureauCount = '0' => '-2',
-																				(integer)trim(dob_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2) = 0 => '-1',
-																				(string)months_apart(system_yearmonth,fixYYYY00((integer)trim(dob_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2)))
+																				(integer)trim(dob_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2) = 0 => '-3',
+																				(string)min(9999, months_apart(system_yearmonth,fixYYYY00((integer)trim(dob_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2))))
 																				);
    // no ver dob last seen dates
 // dob - government
 g_dob_src := if(count(dob_src_dts(str1 in govt_combo_srcs)) > 0,1,0);
 self.IDVerDOBGovernmentCount := if(noDOBinput, '-1', (string)min(255, count(dob_src_dts(str1 in govt_sources))+g_dob_src) );
-self.IDVerDOBGovernmentMonthsSeen := map(le.did=0 => '',
+self.IDVerDOBGovernmentMonthsSeen := map(le.did=0 => '-1',
                                       self.IDVerDOBGovernmentCount = '0' => '-2',
-																			(integer)trim(dob_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2) = 0 => '-1',
-																			(string)months_apart(system_yearmonth, fixYYYY00((integer)trim(dob_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2)))
+																			(integer)trim(dob_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2) = 0 => '-3',
+																			(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(dob_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2))))
 																			);
    // no ver dob last seen dates
 // dob - drivers license
@@ -370,65 +369,65 @@ self.IDVerDOBDriversLicense := map(le.did=0 or noDOBinput                       
 																   count(dob_src_dts(str1 in govtDL_sources)) > 0      => '2',
 																	 count(dob_src_dts(str1 in nongovtDL_sources)) > 0   => '1',
 																		                                                      '0');
-self.IDVerDOBDriversLicenseMonthsSeen := map(le.did=0 => '',
+self.IDVerDOBDriversLicenseMonthsSeen := map(le.did=0 => '-1',
                                           count(dob_src_dts(str1 in allDL_sources)) = 0 => '-2',
-																					(integer)trim(dob_src_dts(str1 in allDL_sources)[1].str2) = 0 => '-1',
-																					(string)months_apart(system_yearmonth, fixYYYY00((integer)trim(dob_src_dts(str1 in allDL_sources)[1].str2)))
+																					(integer)trim(dob_src_dts(str1 in allDL_sources)[1].str2) = 0 => '-3',
+																					(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(dob_src_dts(str1 in allDL_sources)[1].str2))))
 																					);
    // no ver dob last seen dates
 // dob - voter
 self.IDVerDOBVoterRegistration := map(le.did=0 or noDOBinput => '-1',
                                       count(dob_src_dts(str1 in voter_sources)) > 0 => '1',
 																			'0');
-self.IDVerDOBVoterRegMonthsSeen := map(le.did=0 => '',
+self.IDVerDOBVoterRegMonthsSeen := map(le.did=0 => '-1',
                                     count(dob_src_dts(str1 in voter_sources)) = 0 => '-2',
-																		(integer)trim(dob_src_dts(str1 in voter_sources)[1].str2) = 0 => '-1',
-																		(string)months_apart(system_yearmonth, fixYYYY00((integer)trim(dob_src_dts(str1 in voter_sources)[1].str2)))
+																		(integer)trim(dob_src_dts(str1 in voter_sources)[1].str2) = 0 => '-3',
+																		(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(dob_src_dts(str1 in voter_sources)[1].str2))))
 																		);
    // no ver dob last seen dates
 // dob - vehicle
 self.IDVerDOBVehicleRegistration := map(le.did=0 or noDOBinput => '-1',
                                         count(dob_src_dts(str1 in vehicle_sources)) > 0 => '1',
 																				'0');
-self.IDVerDOBVehicleRegMonthsSeen := map(le.did=0 => '',
+self.IDVerDOBVehicleRegMonthsSeen := map(le.did=0 => '-1',
                                       count(dob_src_dts(str1 in vehicle_sources)) = 0 => '-2',
-																			(integer)trim(dob_src_dts(str1 in vehicle_sources)[1].str2) = 0 => '-1',
-																			(string)months_apart(system_yearmonth, fixYYYY00((integer)trim(dob_src_dts(str1 in vehicle_sources)[1].str2)))
+																			(integer)trim(dob_src_dts(str1 in vehicle_sources)[1].str2) = 0 => '-3',
+																			(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(dob_src_dts(str1 in vehicle_sources)[1].str2))))
 																			);
    // no ver dob last seen dates
 // dob - behavioral
 self.IDVerDOBBehavioralCount     := if(noDOBinput, '-1', (string)min(255, count(dob_src_dts(str1 in behav_sources))) );
-self.IDVerDOBBehavioralMonthsSeen := map(le.did=0 => '',
+self.IDVerDOBBehavioralMonthsSeen := map(le.did=0 => '-1',
                                       self.IDVerDOBBehavioralCount = '0' => '-2',
-																			(integer)trim(dob_src_dts(str1 in behav_sources)[1].str2) = 0 => '-1',
-																			(string)months_apart(system_yearmonth, fixYYYY00((integer)trim(dob_src_dts(str1 in behav_sources)[1].str2)))
+																			(integer)trim(dob_src_dts(str1 in behav_sources)[1].str2) = 0 => '-3',
+																			(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(dob_src_dts(str1 in behav_sources)[1].str2))))
 																			);
    // no ver dob last seen dates
 
 // fname - credit bureau
 t_fnm_src := if(count(fname_src_dts(str1 in credit_combo_srcs)) > 0,1,0);
 self.IDVerFirstNameCreditBureauCount     := if(noFNameinput, '-1', (string)min(9, count(fname_src_dts(str1 in credit_sources))+t_fnm_src) );
-self.IDVerFirstNameCreditBureauMonthsSeen := map(le.did=0 => '',
+self.IDVerFirstNameCreditBureauMonthsSeen := map(le.did=0 => '-1',
                                               self.IDVerFirstNameCreditBureauCount = '0' => '-2',
-																							(integer)trim(fname_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2) = 0 => '-1',
-																							(string)months_apart(system_yearmonth, fixYYYY00((integer)trim(fname_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2)))
+																							(integer)trim(fname_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2) = 0 => '-3',
+																							(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(fname_src_dts(str1 in (credit_sources+credit_combo_srcs))[1].str2))))
 																							);
    // no ver fname last seen dates
 // fname - government
 g_fnm_src := if(count(fname_src_dts(str1 in govt_combo_srcs)) > 0,1,0);
 self.IDVerFirstNameGovernmentCount     := if(noFNameinput, '-1', (string)min(255, count(fname_src_dts(str1 in govt_sources))+g_fnm_src) );
-self.IDVerFirstNameGovernmentMonthsSeen := map(le.did=0 => '',
+self.IDVerFirstNameGovernmentMonthsSeen := map(le.did=0 => '-1',
                                             self.IDVerFirstNameGovernmentCount = '0' => '-2',
-																						(integer)trim(fname_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2) = 0 => '-1',
-																						(string)months_apart(system_yearmonth, fixYYYY00((integer)trim(fname_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2)))
+																						(integer)trim(fname_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2) = 0 => '-3',
+																						(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(fname_src_dts(str1 in (govt_sources+govt_combo_srcs))[1].str2))))
 																						);
    // no ver fname last seen dates
 // fname - behavioral
 self.IDVerFirstNameBehavioralCount     := if(noFNameinput, '-1', (string)min(255, count(fname_src_dts(str1 in behav_sources))) );
-self.IDVerFirstNameBehavioralMonthsSeen := map(le.did=0 => '',
+self.IDVerFirstNameBehavioralMonthsSeen := map(le.did=0 => '-1',
                                             self.IDVerFirstNameBehavioralCount = '0' => '-2',
-																						(integer)trim(fname_src_dts(str1 in behav_sources)[1].str2) = 0 => '-1',
-																						(string)months_apart(system_yearmonth, fixYYYY00((integer)trim(fname_src_dts(str1 in behav_sources)[1].str2)))
+																						(integer)trim(fname_src_dts(str1 in behav_sources)[1].str2) = 0 => '-3',
+																						(string)min(9999, months_apart(system_yearmonth, fixYYYY00((integer)trim(fname_src_dts(str1 in behav_sources)[1].str2))))
 																						);
    // no ver fname last seen dates
 

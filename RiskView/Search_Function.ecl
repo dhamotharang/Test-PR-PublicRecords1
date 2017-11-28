@@ -9,6 +9,7 @@ EXPORT Search_Function(
 	string Bankcard_model_name,
 	string Short_term_lending_model_name,
 	string Telecommunications_model_name,
+	string Crossindustry_model_name,
 	string Custom_model_name,
 	string Custom2_model_name,
 	string Custom3_model_name,
@@ -184,7 +185,7 @@ end;
 LexIDOnlyOnInput := bsprep[1].DID > 0 AND bsprep[1].SSN = '' AND bsprep[1].dob = '' AND bsprep[1].phone10 = '' AND bsprep[1].wphone10 = '' AND 
 										bsprep[1].fname = '' AND bsprep[1].lname = '' AND bsprep[1].in_streetAddress = '' AND bsprep[1].z5 = '' AND bsprep[1].dl_number = '';
 
-bsversion := 50;  // hard code this for now
+bsversion := IF(Crossindustry_model_name = 'rvs1706_0', 52,50);  // hard code this for now
 
 	// set variables for passing to bocashell function fcra
 	BOOLEAN isUtility := FALSE;
@@ -267,6 +268,7 @@ isLnJRunningAlone := if(IncludeLnJ and
 	trim(Bankcard_model_name) = '' and
 	trim(Short_term_lending_model_name) = '' and
 	trim(Telecommunications_model_name) = '' and
+	trim(Crossindustry_model_name) = '' and
 	trim(Custom_model_name) = '' and 
 	trim(Custom2_model_name) = '' and 
 	trim(Custom3_model_name) = '' and
@@ -281,6 +283,7 @@ isReportAlone := if(RiskviewReportRequest and
 	trim(Bankcard_model_name) = '' and
 	trim(Short_term_lending_model_name) = '' and
 	trim(Telecommunications_model_name) = '' and
+	trim(Crossindustry_model_name) = '' and
 	trim(Custom_model_name) = '' and 
 	trim(Custom2_model_name) = '' and 
 	trim(Custom3_model_name) = '' and
@@ -380,6 +383,11 @@ valid_telecommunications := telecommunications_model <> '' AND telecommunication
 telecommunications_model_result := MAP(valid_telecommunications	=> Models.LIB_RiskView_V50_Function(clam, telecommunications_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																																	 noModelResults);
 
+Crossindustry_model := StringLib.StringToUpperCase(Crossindustry_model_name);
+valid_Crossindustry := Crossindustry_model <> '' AND Crossindustry_model IN valid_model_names;
+Crossindustry_model_result := MAP(valid_Crossindustry	=> Models.LIB_RiskView_V50_Function(clam, Crossindustry_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
+																																	 noModelResults);
+
 custom_model := StringLib.StringToUpperCase(Custom_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom := custom_model not in ['','MLA1608_0'] AND custom_model IN valid_model_names;
@@ -466,8 +474,22 @@ riskview5_score_telecommunications_results := JOIN(riskview5_score_short_term_le
 		SELF.Telecommunications_reason4 := if(valid_Telecommunications AND NOT isPreScreenPurpose AND RIGHT.RI[4].HRI <> '00', RIGHT.RI[4].HRI, '');
 		SELF.Telecommunications_reason5 := if(valid_Telecommunications AND NOT isPreScreenPurpose AND RIGHT.RI[5].HRI <> '00', RIGHT.RI[5].HRI, '');
 		SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(100));
+		
+	riskview5_score_Crossindustry_results := JOIN(riskview5_score_telecommunications_results, Crossindustry_model_result, LEFT.seq = RIGHT.seq,
+	TRANSFORM(RiskView.layouts.layout_riskview5_search_results,
+		Crossindustry_info := model_info(Model_Name = Crossindustry_model)[1];
+		SELF.Crossindustry_Index := if(valid_Crossindustry, (STRING)Crossindustry_info.Billing_Index, '');
+		SELF.Crossindustry_Score_Name := if(valid_Crossindustry, Crossindustry_info.Output_Model_Name, '');
+		SELF.Crossindustry_Type := if(valid_Crossindustry, Crossindustry_info.Model_Type, '');
+		SELF.Crossindustry_score := if(valid_Crossindustry, RIGHT.Score, '');
+		SELF.Crossindustry_reason1 := if(valid_Crossindustry AND NOT isPreScreenPurpose AND RIGHT.RI[1].HRI <> '00', RIGHT.RI[1].HRI, '');
+		SELF.Crossindustry_reason2 := if(valid_Crossindustry AND NOT isPreScreenPurpose AND RIGHT.RI[2].HRI <> '00', RIGHT.RI[2].HRI, '');
+		SELF.Crossindustry_reason3 := if(valid_Crossindustry AND NOT isPreScreenPurpose AND RIGHT.RI[3].HRI <> '00', RIGHT.RI[3].HRI, '');
+		SELF.Crossindustry_reason4 := if(valid_Crossindustry AND NOT isPreScreenPurpose AND RIGHT.RI[4].HRI <> '00', RIGHT.RI[4].HRI, '');
+		SELF.Crossindustry_reason5 := if(valid_Crossindustry AND NOT isPreScreenPurpose AND RIGHT.RI[5].HRI <> '00', RIGHT.RI[5].HRI, '');
+		SELF := LEFT), LEFT OUTER, KEEP(1), ATMOST(100));
 
-riskview5_score_custom_results := JOIN(riskview5_score_telecommunications_results, custom_model_result, LEFT.seq = RIGHT.seq,
+riskview5_score_custom_results := JOIN(riskview5_score_Crossindustry_results, custom_model_result, LEFT.seq = RIGHT.seq,
 	TRANSFORM(riskview.layouts.layout_riskview5_search_results,
 		Custom_info := model_info(Model_Name = custom_model)[1];
 		SELF.Custom_Index := if(valid_custom, (STRING)Custom_info.Billing_Index, '');
@@ -573,7 +595,7 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	// Regulatory Condition 100F, on the FCRA Prescreen OptOut File
 	boolean PrescreenOptOut :=  isPreScreenPurpose and risk_indicators.iid_constants.CheckFlag( risk_indicators.iid_constants.IIDFlag.IsPreScreen, rt.iid.iid_flags );
 	
-	hasScore (STRING score) := le.Auto_score = score OR le.Bankcard_score = score OR le.Short_term_lending_Score = score OR le.Telecommunications_score = score OR le.Custom_score = score;
+	hasScore (STRING score) := le.Auto_score = score OR le.Bankcard_score = score OR le.Short_term_lending_Score = score OR le.Telecommunications_score = score OR le.Crossindustry_score = score OR le.Custom_score = score;
 	
 	// instead of just using the le.SubjectDeceased, also calculate it here because sometimes attributes are not requested, and then the alert doesn't get triggered.
 	attr := models.Attributes_Master(rt, true);
@@ -661,6 +683,10 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	prescreen_score_pass_teleco := (INTEGER)prescreen_score_threshold > 0 AND (INTEGER)le.Telecommunications_score >= (INTEGER)prescreen_score_threshold;
 	prescreen_score_scenario_teleco := prescreen_score_pass_teleco OR prescreen_score_fail_teleco;
 	
+	prescreen_score_fail_Crossindustry := (INTEGER)prescreen_score_threshold > 0 AND (INTEGER)le.Crossindustry_score < (INTEGER)prescreen_score_threshold;
+	prescreen_score_pass_Crossindustry := (INTEGER)prescreen_score_threshold > 0 AND (INTEGER)le.Crossindustry_score >= (INTEGER)prescreen_score_threshold;
+	prescreen_score_scenario_Crossindustry := prescreen_score_pass_Crossindustry OR prescreen_score_fail_Crossindustry;
+	
 	prescreen_score_fail_custom := (INTEGER)prescreen_score_threshold > 0 AND (INTEGER)le.Custom_score < (INTEGER)prescreen_score_threshold;
 	prescreen_score_pass_custom := (INTEGER)prescreen_score_threshold > 0 AND (INTEGER)le.Custom_score >= (INTEGER)prescreen_score_threshold;
 	prescreen_score_scenario_custom := prescreen_score_pass_custom OR prescreen_score_fail_custom;
@@ -708,6 +734,17 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	SELF.Telecommunications_reason3 := IF(prescreen_score_scenario_teleco OR score_override_alert_returned, '', le.Telecommunications_reason3);
 	SELF.Telecommunications_reason4 := IF(prescreen_score_scenario_teleco OR score_override_alert_returned, '', le.Telecommunications_reason4);
 	SELF.Telecommunications_reason5 := IF(prescreen_score_scenario_teleco OR score_override_alert_returned, '', le.Telecommunications_reason5);
+	
+	SELF.Crossindustry_score := MAP(le.Crossindustry_score <> '' AND score_override_alert_returned 	=> '100',
+																			 le.Crossindustry_score <> '' AND prescreen_score_pass_Crossindustry		=> '1',
+																			 le.Crossindustry_score <> '' AND prescreen_score_fail_Crossindustry		=> '0',
+																																																							 le.Crossindustry_score);
+	SELF.Crossindustry_Type := IF(prescreen_score_scenario_Crossindustry, '0-1', le.Crossindustry_Type);
+	SELF.Crossindustry_reason1 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned, '', le.Crossindustry_reason1);
+	SELF.Crossindustry_reason2 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned, '', le.Crossindustry_reason2);
+	SELF.Crossindustry_reason3 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned, '', le.Crossindustry_reason3);
+	SELF.Crossindustry_reason4 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned, '', le.Crossindustry_reason4);
+	SELF.Crossindustry_reason5 := IF(prescreen_score_scenario_Crossindustry OR score_override_alert_returned, '', le.Crossindustry_reason5);
 
 	SELF.Custom_score := MAP(le.Custom_score <> '' AND score_override_alert_returned 	=> '100',
 													 le.Custom_score <> '' AND prescreen_score_pass_custom		=> '1',
@@ -723,7 +760,7 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	AlertRegulatoryCondition := map(
 		le.confirmationsubjectfound='0' => '0',  // if the subject is not found on file, also return a 0 for the AlertRegulatoryCondition	
 		(hasSecurityFreeze and ~isCollectionsPurpose) or isStateException or tooYoungForPrescreen or PrescreenOptOut OR 
-						prescreen_score_scenario_auto OR prescreen_score_scenario_bankcard OR prescreen_score_scenario_stl OR prescreen_score_scenario_teleco OR prescreen_score_scenario_custom => '3',// Subject has an alert on their file restricting the return of their information and therefore all attributes values have been suppressed 
+						prescreen_score_scenario_auto OR prescreen_score_scenario_bankcard OR prescreen_score_scenario_stl OR prescreen_score_scenario_teleco OR prescreen_score_scenario_Crossindustry OR prescreen_score_scenario_custom => '3',// Subject has an alert on their file restricting the return of their information and therefore all attributes values have been suppressed 
 		hasSecurityFreeze and isCollectionsPurpose => '2',  // security freeze isn't a regulatory condition to blank everything out if the purpose is collections	
 		hasConsumerStatement or hasSecurityFraudAlert or hasBankruptcyAlert=> '2',  // Subject has an alert on their file that does not impact the return of their information
 		'1');
@@ -1039,16 +1076,19 @@ riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, risk
 // OUTPUT(bankcard_model, NAMED('bankcard_model'));
 // OUTPUT(short_term_lending_model, NAMED('short_term_lending_model'));
 // OUTPUT(telecommunications_model, NAMED('telecommunications_model'));
+// OUTPUT(Crossindustry_model, NAMED('Crossindustry_model'));
 // OUTPUT(custom_model, NAMED('custom_model'));
 // OUTPUT(auto_model_result, NAMED('auto_model_result'));
 // OUTPUT(bankcard_model_result, NAMED('bankcard_model_result'));
 // OUTPUT(short_term_lending_model_result, NAMED('short_term_lending_model_result'));
 // OUTPUT(telecommunications_model_result, NAMED('telecommunications_model_result'));
+// OUTPUT(Crossindustry_model_result, NAMED('Crossindustry_model_result'));
 // OUTPUT(custom_model_result, NAMED('custom_model_result'));
 // OUTPUT(riskview5_score_auto_results, NAMED('riskview5_score_auto_results'));
 // OUTPUT(riskview5_score_bankcard_results, NAMED('riskview5_score_bankcard_results'));
 // OUTPUT(riskview5_score_short_term_lending_results, NAMED('riskview5_score_short_term_lending_results'));
 // OUTPUT(riskview5_score_telecommunications_results, NAMED('riskview5_score_telecommunications_results'));
+// OUTPUT(riskview5_score_Crossindustry_results, NAMED('riskview5_score_Crossindustry_results'));
 // OUTPUT(riskview5_score_search_results, NAMED('riskview5_score_search_results'));
 // output(intended_purpose, named('intended_purpose'));
 // output(AttributesVersionRequest, named('AttributesVersionRequest'));
@@ -1062,6 +1102,7 @@ riskview5_final_results := if(MLA_request_pos <> 0, riskview5_wMLA_results, risk
 // output(custom_model, named('RVsrchFunc_custom_model'));
 // output(MLA_model_result, named('RVsrchFunc_MLA_model_result'));
 // output(riskview5_score_telecommunications_results, named('RVsrchFunc_riskview5_score_telecommunications_results'));
+// output(riskview5_score_Crossindustry_results, named('RVsrchFunc_riskview5_score_Crossindustry_results'));
 // output(riskview5_score_search_results, named('riskview5_score_search_results'));
 // output(riskview5_search_results, named('riskview5_search_results'));
 // output(MLA_results, named('MLA_results'));

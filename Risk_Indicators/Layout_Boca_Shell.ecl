@@ -748,6 +748,12 @@ string3 bankcard;
 	string3 reason3mv5 := '';
 	string3 reason4mv5 := '';
 	string3 reason5mv5 := '';
+	string3 crossindv5 := '';
+	string3 reason1cv5 := '';
+	string3 reason2cv5 := '';
+	string3 reason3cv5 := '';
+	string3 reason4cv5 := '';
+	string3 reason5cv5 := '';
 	
 END;
 
@@ -928,7 +934,7 @@ RECORD
 	string8	archive_date_24mo;	//history date + 2 years
 
 	Risk_Indicators.Layouts.layout_BIP_Header_info BIP_Header;	//MS-71
-	// Risk_Indicators.Layouts.layout_Equifax_FraudFlags Eqfx_FraudFlags;	//MS-167
+	Risk_Indicators.Layouts.layout_Equifax_FraudFlags Eqfx_FraudFlags;	//MS-167
 	
 	//these are child sets...LEAVE as last item in Boca Shell - nothing after them:)
 	Risk_Indicators.Layouts_Derog_Info.LJ_DataSets LnJ_datasets;

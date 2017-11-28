@@ -1485,7 +1485,6 @@ export layout_pii_stability := record
 	unsigned1	link_wgt_prim_range_npos_cnt	;
 	unsigned1	link_wgt_ssn4_npos_cnt	;
 	unsigned1	link_wgt_ssn5_npos_cnt	;
-	unsigned1	link_wgt_total_npos_cnt	;
 	unsigned1	link_wgt_dob_nneg_cnt	;
 	unsigned1	link_wgt_fname_nneg_cnt	;
 	unsigned1	link_wgt_lname_nneg_cnt	;
@@ -1494,7 +1493,6 @@ export layout_pii_stability := record
 	unsigned1	link_wgt_prim_range_nneg_cnt	;
 	unsigned1	link_wgt_ssn4_nneg_cnt	;
 	unsigned1	link_wgt_ssn5_nneg_cnt	;
-	unsigned1	link_wgt_total_nneg_cnt	;
 	unsigned1	link_wgt_dob_nzero_cnt	;
 	unsigned1	link_wgt_fname_nzero_cnt	;
 	unsigned1	link_wgt_lname_nzero_cnt	;
@@ -1503,7 +1501,6 @@ export layout_pii_stability := record
 	unsigned1	link_wgt_prim_range_nzero_cnt	;
 	unsigned1	link_wgt_ssn4_nzero_cnt	;
 	unsigned1	link_wgt_ssn5_nzero_cnt	;
-	unsigned1	link_wgt_total_nzero_cnt	;
 	string15	link_max_weight_element	;
 	string15	link_min_weight_element	;
 end;
@@ -1775,14 +1772,14 @@ export layout_BIP_Header_info := record
 end;
 
 //MS-167: new Equifax Fraud Flags fields
-// export layout_Equifax_FraudFlags := record
-	// integer 	factact_curr_active_duty := 0;
-	// integer 	factact_curr_active_duty_fseen := 0;
-	// integer 	factact_curr_fraud_alert := 0;
-	// integer 	factact_curr_fraud_alert_fseen := 0;
-	// integer 	factact_curr_alert_code := 0;
-	// integer 	factact_hist_fraud_alert_ct := 0;
-	// integer 	factact_hist_fraud_alert_lseen := 0;
-// end;
+export layout_Equifax_FraudFlags := record
+	integer 	factact_curr_active_duty := 0;
+	integer 	factact_curr_active_duty_fseen := 0;
+	integer 	factact_curr_fraud_alert := 0;
+	integer 	factact_curr_fraud_alert_fseen := 0;
+	string2 	factact_curr_alert_code := '';
+	integer 	factact_hist_fraud_alert_ct := 0;
+	integer 	factact_hist_fraud_alert_lseen := 0;
+end;
 
 END;

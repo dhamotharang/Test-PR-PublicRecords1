@@ -104,8 +104,9 @@ export Search_Service := MACRO
 	STRING bankcard_model_name := StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value[1..9])='rvb1503_0')[1].value);
 	STRING Short_term_lending_model_name := StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value[1..9])='rvg1502_0')[1].value);
 	STRING Telecommunications_model_name := StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value[1..9])='rvt1503_0')[1].value);	
+	STRING Crossindustry_model_name := StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value[1..9])='rvs1706_0')[1].value);	
 	
-	ds_flagship_models := dataset([{auto_model_name}, {bankcard_model_name}, {short_term_lending_model_name}, {telecommunications_model_name}], {string flagship_names}) : global;
+	ds_flagship_models := dataset([{auto_model_name}, {bankcard_model_name}, {short_term_lending_model_name}, {telecommunications_model_name}, {Crossindustry_model_name}], {string flagship_names}) : global;
 	STRING custom_model_name 	:= StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value) not in set(ds_flagship_models, flagship_names) )[1].value);
 	ds_flagship_plus_custom   := ds_flagship_models + dataset([{custom_model_name}], {string flagship_names}) : global;
 	STRING custom2_model_name := StringLib.StringToLowerCase(option.IncludeModels.Names(StringLib.StringToLowerCase(value) not in set(ds_flagship_plus_custom, flagship_names) )[1].value);
@@ -250,7 +251,7 @@ export Search_Service := MACRO
 error_message := 'Error - Minimum input fields required: First Name, Last Name, Address, and Zip or City and State; LexID only; or First Name, Last Name, and SSN';
 // MLA alert requested by itself (no scores, attributes, report) 
 MLA_alone				:= custom_model_name = 'mla1608_0' AND auto_model_name = '' AND bankcard_model_name = '' AND 
-									 Short_term_lending_model_name = '' AND Telecommunications_model_name = '' AND AttributesVersionRequest = '' AND
+									 Short_term_lending_model_name = '' AND Telecommunications_model_name = '' AND Crossindustry_model_name ='' AND AttributesVersionRequest = '' AND
 									 custom2_model_name = '' AND custom3_model_name = '' AND custom4_model_name = '' AND custom5_model_name = '' AND
 									 ~run_riskview_report;
 								 
@@ -282,6 +283,7 @@ input_ok := if((
 		bankcard_model_name, 
 		Short_term_lending_model_name, 
 		Telecommunications_model_name, 
+		Crossindustry_model_name, 
 		Custom_model_name,
 		Custom2_model_name,
 		Custom3_model_name,
@@ -320,6 +322,7 @@ input_ok := if((
 				bankcard_model_name, 
 				Short_term_lending_model_name, 
 				Telecommunications_model_name, 
+				Crossindustry_model_name, 
 				Custom_model_name,
 				Custom2_model_name,
 				Custom3_model_name,
@@ -743,11 +746,12 @@ input_ok := if((
 			c=2	=> le.BankCard_Score_Name,
 			c=3	=> le.Short_term_lending_Score_Name,
 			c=4	=> le.Telecommunications_Score_Name,
-			c=5	=> le.Custom_Score_Name,
-			c=6	=> le.Custom2_Score_Name,
-			c=7	=> le.Custom3_Score_Name,
-			c=8	=> le.Custom4_Score_Name,
-			c=9	=> le.Custom5_Score_Name,
+			c=5	=> le.Crossindustry_Score_Name,
+			c=6	=> le.Custom_Score_Name,
+			c=7	=> le.Custom2_Score_Name,
+			c=8	=> le.Custom3_Score_Name,
+			c=9	=> le.Custom4_Score_Name,
+			c=10	=> le.Custom5_Score_Name,
 			''
 		);
 		
@@ -756,11 +760,12 @@ input_ok := if((
 			c=2 => le.BankCard_Type,
 			c=3 => le.Short_term_lending_Type,
 			c=4 => le.Telecommunications_Type,
-			c=5 => le.Custom_Type,
-			c=6 => le.Custom2_Type,
-			c=7 => le.Custom3_Type,
-			c=8 => le.Custom4_Type,
-			c=9 => le.Custom5_Type,			
+			c=5 => le.Crossindustry_Type,
+			c=6 => le.Custom_Type,
+			c=7 => le.Custom2_Type,
+			c=8 => le.Custom3_Type,
+			c=9 => le.Custom4_Type,
+			c=10 => le.Custom5_Type,			
 			''
 		);
 
@@ -769,11 +774,12 @@ input_ok := if((
 			c=2	=> le.Bankcard_score,
 			c=3	=> le.Short_term_lending_score,
 			c=4	=> le.Telecommunications_score,
-			c=5	=> le.Custom_score,
-			c=6 => le.Custom2_score,
-			c=7 => le.Custom3_score,
-			c=8 => le.Custom4_score,
-			c=9 => le.Custom5_score,
+			c=5	=> le.Crossindustry_score,
+			c=6	=> le.Custom_score,
+			c=7 => le.Custom2_score,
+			c=8 => le.Custom3_score,
+			c=9 => le.Custom4_score,
+			c=10 => le.Custom5_score,
 			''
 		);
 		
@@ -782,11 +788,12 @@ input_ok := if((
 			c=2	=> le.Bankcard_reason1,
 			c=3	=> le.Short_term_lending_reason1,
 			c=4	=> le.Telecommunications_reason1,
-			c=5	=> le.Custom_reason1,
-			c=6	=> le.Custom2_reason1,
-			c=7	=> le.Custom3_reason1,
-			c=8	=> le.Custom4_reason1,
-			c=9	=> le.Custom5_reason1,
+			c=5	=> le.Crossindustry_reason1,
+			c=6	=> le.Custom_reason1,
+			c=7	=> le.Custom2_reason1,
+			c=8	=> le.Custom3_reason1,
+			c=9	=> le.Custom4_reason1,
+			c=10	=> le.Custom5_reason1,
 			''
 		);
 		
@@ -795,11 +802,12 @@ input_ok := if((
 			c=2	=> le.Bankcard_reason2,
 			c=3	=> le.Short_term_lending_reason2,
 			c=4	=> le.Telecommunications_reason2,
-			c=5	=> le.Custom_reason2,
-			c=6	=> le.Custom2_reason2,
-			c=7	=> le.Custom3_reason2,
-			c=8	=> le.Custom4_reason2,
-			c=9	=> le.Custom5_reason2,
+			c=5	=> le.Crossindustry_reason2,
+			c=6	=> le.Custom_reason2,
+			c=7	=> le.Custom2_reason2,
+			c=8	=> le.Custom3_reason2,
+			c=9	=> le.Custom4_reason2,
+			c=10	=> le.Custom5_reason2,
 			''
 		);
 		
@@ -808,11 +816,12 @@ input_ok := if((
 			c=2	=> le.Bankcard_reason3,
 			c=3	=> le.Short_term_lending_reason3,
 			c=4	=> le.Telecommunications_reason3,
-			c=5	=> le.Custom_reason3,
-			c=6	=> le.Custom2_reason3,
-			c=7	=> le.Custom3_reason3,
-			c=8	=> le.Custom4_reason3,
-			c=9	=> le.Custom5_reason3,
+			c=5	=> le.Crossindustry_reason3,
+			c=6	=> le.Custom_reason3,
+			c=7	=> le.Custom2_reason3,
+			c=8	=> le.Custom3_reason3,
+			c=9	=> le.Custom4_reason3,
+			c=10	=> le.Custom5_reason3,
 			''
 		);
 		
@@ -821,11 +830,12 @@ input_ok := if((
 			c=2	=> le.Bankcard_reason4,
 			c=3	=> le.Short_term_lending_reason4,
 			c=4	=> le.Telecommunications_reason4,
-			c=5	=> le.Custom_reason4,
-			c=6	=> le.Custom2_reason4,
-			c=7	=> le.Custom3_reason4,
-			c=8	=> le.Custom4_reason4,
-			c=9	=> le.Custom5_reason4,
+			c=5	=> le.Crossindustry_reason4,
+			c=6	=> le.Custom_reason4,
+			c=7	=> le.Custom2_reason4,
+			c=8	=> le.Custom3_reason4,
+			c=9	=> le.Custom4_reason4,
+			c=10	=> le.Custom5_reason4,
 			''
 		);
 		
@@ -834,11 +844,12 @@ input_ok := if((
 			c=2	=> le.Bankcard_reason5,
 			c=3	=> le.Short_term_lending_reason5,
 			c=4	=> le.Telecommunications_reason5,
-			c=5	=> le.Custom_reason5,
-			c=6	=> le.Custom2_reason5,
-			c=7	=> le.Custom3_reason5,
-			c=8	=> le.Custom4_reason5,
-			c=9	=> le.Custom5_reason5,
+			c=5	=> le.Crossindustry_reason5,
+			c=6	=> le.Custom_reason5,
+			c=7	=> le.Custom2_reason5,
+			c=8	=> le.Custom3_reason5,
+			c=9	=> le.Custom4_reason5,
+			c=10	=> le.Custom5_reason5,
 			''
 		);
 		
@@ -973,6 +984,7 @@ input_ok := if((
 			self.DateFiled := iesp.ECL2ESP.toDate((integer)left.DateFiled);
 			self.ReleaseDate := iesp.ECL2ESP.toDate((integer)left.ReleaseDate);
 			self.DateLastSeen := iesp.ECL2ESP.toDate((integer)left.DateLastSeen);
+			self.ConsumerStatementId := RiskView.Transforms.SetCSID(left.ConsumerStatementId);
 			self := left;
 			self := [];
 		));
@@ -982,6 +994,7 @@ input_ok := if((
 			self.DateFiled := iesp.ECL2ESP.toDate((integer)left.DateFiled);
 			self.ReleaseDate := iesp.ECL2ESP.toDate((integer)left.ReleaseDate);
 			self.DateLastSeen := iesp.ECL2ESP.toDate((integer)left.DateLastSeen);
+			self.ConsumerStatementId := RiskView.Transforms.SetCSID(left.ConsumerStatementId);
 			self := left;
 			self := [];
 		));

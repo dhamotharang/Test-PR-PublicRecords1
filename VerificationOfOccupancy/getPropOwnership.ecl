@@ -1,4 +1,4 @@
-import Risk_Indicators, ut, LN_PropertyV2, RiskWise, Address;
+﻿import Risk_Indicators, ut, LN_PropertyV2, RiskWise, Address;
 
 EXPORT getPropOwnership(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell) VOOShell, boolean fares_ok = true) := FUNCTION
 
@@ -104,7 +104,7 @@ EXPORT getPropOwnership(DATASET(VerificationOfOccupancy.Layouts.Layout_VOOShell)
 	VerificationOfOccupancy.Layouts.Layout_property getAddrFID(addrFares le, searchKey ri) := TRANSFORM
 		fname_match := Risk_Indicators.g(Risk_Indicators.FnameScore(le.fname,ri.fname));
 		lname_match := Risk_Indicators.g(Risk_Indicators.LnameScore(le.lname,ri.lname));
-		person_match := (lname_match and fname_match) or le.DID = ri.DID;
+		person_match := (lname_match and fname_match) or (le.DID <> 0 and le.DID = ri.DID);
 		SELF.property_person_match := person_match;
 		property_owned 						:= if(ri.source_code_1='O' and person_match, '1', '0');  
 		SELF.property_owned 			:= property_owned;

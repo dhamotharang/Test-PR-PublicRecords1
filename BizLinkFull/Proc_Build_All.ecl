@@ -47,8 +47,8 @@ function
           ,Buildsup_seleid              
           ,Buildsup_orgid   
           ,Buildsup_rcid
-          ,Buildrefs                    
-          ,Buildwords                   
+          // ,Buildrefs                    
+          // ,Buildwords                   
           ,Buildrefs_l_cnpname    
           ,Buildrefs_l_cnpname_zip
           ,Buildrefs_l_cnpname_st       

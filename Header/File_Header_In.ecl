@@ -1,4 +1,4 @@
-import ut,eq_hist;
+﻿import ut,eq_hist,Std,data_Services;
 
 export file_header_in(boolean pFastHeader=false) := module
 
@@ -88,9 +88,9 @@ shared rec_weekly := record
  ebcdic string1  new_rec;
  ebcdic string38 filler2;
 end;
- 
-shared monthly_file :=	dataset('~thor_data400::in::hdr_raw',rec,flat) +
-                        dataset('~thor_data400::in::hdr_supplement2',rec,flat);
+lc:=data_Services.Data_location.prefix('header_quick');
+EXPORT monthly_file :=	dataset(lc+'thor_data400::in::hdr_raw',rec,flat) +
+                        dataset(lc+'thor_data400::in::hdr_supplement2',rec,flat);
 shared weekly_file  := dataset('~thor400_84::in::eq_weekly_with_as_of_date',rec_weekly,flat);
 
 //all this is in the attempt to avoid the monthly data from re-cleaning/DID'ing (header.preprocess)
@@ -100,10 +100,14 @@ shared monthly_file1 := project(monthly_file,transform(header.layout_eq_src,self
 
 //EQ and EH (EQ history restored) are concatenated in EQ source key but if both sources are sequenced independent of one another,
 //two entities will endup with the same uid causing queries to randomly display the wrong one - bug 80773
-shared seed:=if(pFastHeader,999999999999,1);
-header.Mac_Set_Header_Source(monthly_file1,header.layout_eq_src,header.layout_header_in,'EQ',withUID,seed);
+max_uid:=max(eq_hist.file.base,uid);
+shared seed:=if(pFastHeader,999999999999,max_uid);
 
-export eq_uid_monthly := withUID : persist('persist::headerbuild_eq_src');
+src_rec:=header.layouts_SeqdSrc.EQ_src_rec;
+
+header.Mac_Set_Header_Source(monthly_file1,header.layout_eq_src,src_rec,'EQ',withUID,seed);
+
+export eq_uid_monthly := withUID;
 
 //counter is safe provided that that the monthly file has less than 100B records
 //UID's still need to be unique across the monthly & weekly data in the event
@@ -114,9 +118,9 @@ export eq_uid_monthly := withUID : persist('persist::headerbuild_eq_src');
 //if the Weekly data were ever added
 
 fn_convert_to_days(integer pInput) := 
-	 (((integer)(pInput[1..4])*365)
-	+ ((integer)(pInput[5..6])* 12)
-	+ ((integer)(pInput[7..8])    )
+	 (((integer)(((string)pInput)[1..4])*365)
+	+ ((integer)(((string)pInput)[5..6])* 12)
+	+ ((integer)(((string)pInput)[7..8])    )
 	 );
 	 
 r_layout_header_in_with_as_of_dt := record
@@ -130,14 +134,14 @@ end;
 r_layout_header_in_with_as_of_dt t_map_weekly(weekly_file le, integer c) := transform
  self.eq_as_of_dt         := le.eq_as_of_dt;
  self.eq_as_of_dt_in_days := fn_convert_to_days((integer)le.eq_as_of_dt);
- self.today_in_days       := fn_convert_to_days((integer)ut.getdate);
- self.within_range        := ut.DaysApart(ut.getdate,le.eq_as_of_dt)	<= header.sourcedata_month.v_nbr_of_days_to_keep;
+ self.today_in_days       := fn_convert_to_days((integer)(STRING8)Std.Date.Today());
+ self.within_range        := ut.DaysApart((STRING8)Std.Date.Today(),le.eq_as_of_dt)	<= header.sourcedata_month.v_nbr_of_days_to_keep;
  self.src                 := 'WH';
  self.uid                 := c + seed + 100000000000;
  self                     := le;
  self                     := [];
 end;
 
-export eq_uid_weekly  := project(weekly_file,t_map_weekly(left,counter))(within_range=true);
+export eq_uid_weekly  := project(weekly_file,t_map_weekly(left,counter))(within_range=true) : persist('~thor_data400::headerbuild_eq_src_weekly');
 
 end;
