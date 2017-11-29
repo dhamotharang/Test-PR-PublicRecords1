@@ -10,7 +10,7 @@ EXPORT SuppressID(string datasetname,
 																		,true
 																		,false);
 	
-	shared thresholddate := '20171201000000';
+	shared thresholddate := '20171228000000';
 	shared ProdOrDev := if (~useLocal 
 													,if (dops.constants.ThorEnvironment = 'prod'
 																,'~'
