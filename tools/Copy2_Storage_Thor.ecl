@@ -4,7 +4,7 @@ export  Copy2_Storage_Thor(
 
    string  filename       
   ,string  tempname          = ''
-  ,string  pCluster          = 'thor400_31_store'
+  ,string  pCluster          = 'thor400_24_store'
   ,boolean pDeleteSourceFile = false
   ,string  pEclserver        = 'prod_esp.br.seisint.com'//10.241.20.202
   ,string  pSourceDali       = 'prod_dali.br.seisint.com'
@@ -19,7 +19,7 @@ Function
   lTempname   := if(tempname = '' ,lfilename + %'tempcopyname'% ,tempname)    ;
   serv        := 'server=http://' + pEclserver + ':8010 '                          ;
   nsplit      := ' nosplit=1 '                                                ;
-  dstcluster  := 'dstcluster=thor400_31_store '                               ;
+  dstcluster  := 'dstcluster=thor400_24_store '                               ;
   over        := 'overwrite=1 '                                               ;
   repl        := 'replicate=1 '                                               ;
   comp        := 'compress=1 ';//if (ut.isCompressed(lfilename),'compress=1 ','compressed=0 '); 

@@ -1020,6 +1020,7 @@ EXPORT AdjustKeysUsedAndFailed(DATASET(LayoutScoredFetch) in_data) := FUNCTION
   flgFail := agg[1].keys_failed;
   RETURN IF(COUNT(in_data(proxid = 0)) > 0, IF(COUNT(in_data(proxid <> 0)) > 0, PROJECT(in_data(proxid <> 0), AdjustFlags(LEFT, flgFail)), PROJECT(in_data(proxid = 0)[1..1], AdjustFlags(LEFT, flgFail))), in_data);
   END;
+
 // if at least one key failed and at least one not key failed row, remove keys failed rows and put keys failed into put into existing rows
 // if you have only key failed rows - aggregate, and return one with all aggregated
 END;

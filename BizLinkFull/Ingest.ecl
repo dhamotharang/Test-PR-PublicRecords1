@@ -5,3 +5,4 @@ EXPORT Ingest(BOOLEAN incremental=FALSE
 ) := MODULE
 EXPORT InputFile := dsBase; // Nothing to ingest - so very simple process
 END;
+

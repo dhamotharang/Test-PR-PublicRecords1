@@ -1,4 +1,5 @@
 ﻿OPTIONS:-ma
+
 MODULE:BizLinkFull
 FILENAME:BizHead
 PROCESS:Biz:UBER(NEVER)
@@ -8,15 +9,19 @@ IDFIELD:EXISTS:proxid
 IDPARENTS:seleid,orgid,ultid
 IDUNCLE:powid
 RIDFIELD:rcid
+
 RECORDS:4000000000
 POPULATION:250000000
 NINES:3
+
 FIELDTYPE:T_ALLCAPS:CAPS:ONFAIL(CLEAN)
 FIELDTYPE:T_ALPHANUM:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789):SPACES( <>{}[]-^=!+&,./):ONFAIL(CLEAN)
 FIELDTYPE:T_ALPHA:CAPS:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ):ONFAIL(CLEAN)
 FIELDTYPE:T_NUMBER:ALLOW(0123456789):ONFAIL(CLEAN)
 FIELDTYPE:T_FEIN:ALLOW(0123456789):LENGTHS(9):ONFAIL(BLANK)
+
 FUZZY:NormSuffix:RST:CUSTOM(fn_normSuffix):TYPE(STRING5)
+
 FIELD:parent_proxid:WEIGHT(.001):28,0
 FIELD:sele_proxid:WEIGHT(.001):28,0
 FIELD:org_proxid:WEIGHT(.001):28,0
@@ -61,8 +66,10 @@ FIELD:sele_flag:WEIGHT(0.001):0,0
 FIELD:org_flag:WEIGHT(0.001):0,0
 FIELD:ult_flag:WEIGHT(0.001):0,0
 FIELD:fallback_value:FALLBACK(3):1,0
+
 CONCEPT:CONTACTNAME:fname:mname:lname:SCALE(NEVER):23,492
 CONCEPT:STREETADDRESS:prim_range:prim_name:sec_range:SCALE(NEVER):23,96
+
 LINKPATH:L_CNPNAME_ZIP:cnp_name:zip:?:prim_name:st(HASBASE):city:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag
 LINKPATH:L_CNPNAME_ST:cnp_name:st:?:prim_name:zip(HASBASE):city:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:REQUIRED(L_CNPNAME_ZIP)
 LINKPATH:L_CNPNAME:cnp_name:?:prim_name:st:city:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:zip(HASBASE):REQUIRED(L_CNPNAME_ST)

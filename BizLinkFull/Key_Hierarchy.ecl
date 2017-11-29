@@ -16,3 +16,4 @@ IMPORT BizLinkFull;
   dParentChild:=SORT(DISTRIBUTE(dUlts+dOrgs+dProxs+dDots,HASH32(parent)),RECORD);
   
 EXPORT Key_Hierarchy:=INDEX(dParentChild,{parent},{dParentChild},BizLinkFull.filename_keys.hierarchy);  
+
