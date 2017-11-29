@@ -27,6 +27,7 @@ sequence_sources :=parallel(
                             ,Header.Mod_SetSources(,versionBuild).sequence_DEA
                             ,Header.Mod_SetSources(,versionBuild).sequence_WP
                             ,Header.Mod_SetSources(,versionBuild).sequence_SL
+                            ,Header.Mod_SetSources(,versionBuild).sequence_S1
                             ,Header.Mod_SetSources(,versionBuild).sequence_VO
                             ,Header.Mod_SetSources(,versionBuild).sequence_CY
                             ,Header.Mod_SetSources(,versionBuild).sequence_ND

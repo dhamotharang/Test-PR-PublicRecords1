@@ -150,12 +150,13 @@ export proc_postHeaderBuilds := module
                                             header.LogBuild('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                             ,if(exists(wl),fail('QUICK HEADER is running'))
-                                            // ,nothor(Header.move_header_raw_to_prod())
-                                            // ,Header.Proc_Copy_From_Alpha.MoveToQA
+                                            ,nothor(Header.move_header_raw_to_prod())
+                                            ,Header.Proc_Copy_From_Alpha.MoveToQA
                                             // ,output(Verify_XADL1_base_files,named('XADLfiles'),all)
                                             ,header.Proc_Accept_SRC_toQA()
                                             // ,output(verify_keys('SourceKeys'),named('SourceKeys'))
                                             ,notify('Build_FCRA_Header','*')
+                                            ,notify('build_property_full','*')
                                             ,header.LogBuild('Completed :'+step)
                                             )
                                             :success(header.msg(cmpltd,elist_owners).good)

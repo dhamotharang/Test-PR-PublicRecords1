@@ -21,7 +21,7 @@ end;
 
 //Basic  Match - a one to one join - basic assumption here is:
  //that there are absolutely no duplicates in the left nor the right side
-_j_all :=  join(PHin, NHRin,
+j_all_new :=  join(PHin, NHRin,
 				left.src        =right.src         and
 // Bug: 173413
 // this change is in conjunction with other changes made in:
@@ -54,9 +54,12 @@ _j_all :=  join(PHin, NHRin,
 				,add_rid_all(left,right)
 				,right outer
 				,local
-				): persist(               '~thor_data400::persist::hbm::'+ versionBuild,expire(60));
+				): persist(             '~thor_data400::persist::hbm::'+ versionBuild ,expire(60));
 
-j_all:=dataset(      '~thor_data400::persist::hbm::'+ versionBuild,{_j_all},thor);
+j_all:= if(std.file.fileexists( '~thor_data400::persist::hbm::'+ versionBuild ) 
+                 ,dataset(      '~thor_data400::persist::hbm::'+ versionBuild ,{j_all_new},thor)
+                 ,j_all_new);
+
 outf_noID := dedup(j_all,record,all,local);
 
 oNMNHR    := outf_noID(rid=0);
