@@ -1,17 +1,20 @@
-import _Control;
+﻿import _Control;
 
-lTargetESPAddress		:=	if(_Control.ThisEnvironment.Name='Dataland'
+_TargetESPAddress		:=	if(_Control.ThisEnvironment.Name='Dataland'
 														,_Control.IPAddress.dataland_esp
 														,_Control.IPAddress.prod_thor_esp);
 
 lTargetESPPort			:=	'8010';
 
-	export	string	fSubmitNewWorkunit(string pECLText, string pCluster)	:=
+	export	string	fSubmitNewWorkunit(string pECLText, string pCluster, string ESP='')	:=
 	function
+    lTargetESPAddress := case (ESP, 'Dataland'   => _Control.IPAddress.dataland_esp,
+                                       'Production' => _Control.IPAddress.prod_thor_esp,
+                                       _TargetESPAddress);
+			
 		string fWUCreateAndUpdate(string pECLText)	:=
 		function
-
-			rWUCreateAndUpdateRequest	:=
+      rWUCreateAndUpdateRequest	:=
 			record
 				string										QueryText{xpath('QueryText'),maxlength(20000)}	:=	pECLText;
 			end;

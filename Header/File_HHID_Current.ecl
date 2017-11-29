@@ -1,4 +1,4 @@
-import header,PRTE2_Header;
+﻿import header,PRTE2_Header;
 #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
 f := header.File_HHID;
 #ELSE
@@ -27,5 +27,5 @@ fgv := GROUP(
 #IF (PRTE2_Header.constants.PRTE_BUILD) #WARNING(PRTE2_Header.constants.PRTE_BUILD_WARN_MSG);
 export File_HHID_Current := fgv;
 #ELSE
-export File_HHID_Current := fgv : persist('HHID_Current');
+export File_HHID_Current := fgv : persist('HHID_Current_headerbuilding');
 #END

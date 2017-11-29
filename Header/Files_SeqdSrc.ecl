@@ -1,6 +1,9 @@
-EXPORT Files_SeqdSrc(boolean pFastHeader=false) := module
+﻿EXPORT Files_SeqdSrc(boolean pFastHeader=false) := module
 
-	SHARED pVersion:=if(pFastHeader,Header.Sourcedata_month.v_eq_as_of_date,header.version_build);
+    // #stored ('versionBuild', 'yyyymmdd'   ); 
+    versionBuild := header.version_build : stored('versionBuild');
+    
+	SHARED pVersion:=if(pFastHeader,Header.Sourcedata_month.v_eq_as_of_date,versionBuild);
 
 	SHARED SFname:=if(pFastheader,'SeqdFastHeaderSrc','SeqdHeaderSrc');
 

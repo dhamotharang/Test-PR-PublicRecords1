@@ -1,12 +1,14 @@
-IMPORT ut,Data_Services;
+﻿IMPORT ut,Data_Services;
 EXPORT Proc_Copy_To_Alpha(string pversion) := FUNCTION
 
 		aEsp 					:= '10.194.12.2';
 		aCluster			:= 'thor400_198_a';
-		flagFileName 	:= 'thor_data400::flag::personHeader::boca::hhid_copy';
+		flagFileName 	:= 'thor_data400::flag::personHeader::boca::hhid_copy_';
 		
 		l := Data_Services.Data_location.person_header;
-		copy_to_alpha(string lfn):= fileservices.RemotePull('http://'+aEsp+':8010/FileSpray',l+lfn,aCluster,'~'+lfn);
+		copy_to_alpha(string lfn):= fileservices.RemotePull('http://'+aEsp+':8010/FileSpray',l+lfn,aCluster,'~'+lfn
+                                ,/*tmOut*/,/*maxConn*/,/*ovrt*/,/*relct*/,/*asSuper*/,/*frcPsh*/,/*bfrSz*/,/*wrp*/,true) ;
+
 
 		
 		createFlagFile := output(dataset([{pversion}],{string9 version}),,'~'+flagFileName,overwrite);

@@ -1,4 +1,4 @@
-import header,ut,PersonLinkingADL2V3,header_slimsort,Roxiekeybuild,Text_FragV1,Doxie,data_services,misc,_control,Std,PromoteSupers;
+﻿import header,ut,PersonLinkingADL2V3,header_slimsort,Roxiekeybuild,Text_FragV1,Doxie,data_services,misc,_control,Std,PromoteSupers;
 
 export proc_postHeaderBuilds := module
 
@@ -27,8 +27,8 @@ export proc_postHeaderBuilds := module
 		#stored ('version'  , header.version_build); 
 		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
 
-		thor1:='thor400_60';
-		thor2:='thor400_44';
+		thor1:='thor400_44';
+		thor2:='thor400_60';
 
 		bld_Transunion_LN    := Header.transunion_did
 		: success(sequential(output('TU/LT completed'),header.msg('TU/LT completed',elist_owners).good))
@@ -46,13 +46,13 @@ export proc_postHeaderBuilds := module
 		export XADLkeys := sequential(
                                          header.LogBuild('Started :'+step)
                                         ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
-                                        ,nothor(Header.Proc_Copy_From_Alpha.Copy)
+                                        // ,nothor(Header.Proc_Copy_From_Alpha.Copy)
                                         ,bld_Transunion_LN
                                         ,bld_Transunion_Ptrak
                                         ,notify('Build_Relatives','*')
                                         ,build_slimsorts
                                         ,nothor(Header.Proc_Copy_From_Alpha.CopyOthers)
-                                        , header.LogBuild('Completed :'+step)
+                                        ,header.LogBuild('Completed :'+step)
                                         )
                                         :success(header.msg(cmpltd,elist_owners).good)
                                         ,failure(header.msg(failed,elist_owners).bad)
@@ -150,8 +150,8 @@ export proc_postHeaderBuilds := module
                                             header.LogBuild('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                             ,if(exists(wl),fail('QUICK HEADER is running'))
-                                            ,nothor(Header.move_header_raw_to_prod())
-                                            ,nothor(Header.Proc_Copy_From_Alpha.MoveToQA)
+                                            // ,nothor(Header.move_header_raw_to_prod())
+                                            // ,Header.Proc_Copy_From_Alpha.MoveToQA
                                             // ,output(Verify_XADL1_base_files,named('XADLfiles'),all)
                                             ,header.Proc_Accept_SRC_toQA()
                                             // ,output(verify_keys('SourceKeys'),named('SourceKeys'))

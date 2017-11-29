@@ -1,7 +1,4 @@
-/*2015-12-15T01:42:25Z (Dave Schlangen_Prod)
-turned bocashell library back on
-*/
-import _Control;
+﻿import _Control;
 export LibraryUse := MODULE
 
 /*
@@ -20,8 +17,8 @@ export ForceOff_AllLibraries := FALSE;
 
 //*** Libraries that are ON by default ***
 
-export ForceOffOne_NID__lib_PFirst := FALSE;
-// export ForceOffOne_NID__lib_PFirst := TRUE;
+// export ForceOffOne_NID__lib_PFirst := FALSE;
+export ForceOffOne_NID__lib_PFirst := TRUE;
 
 export ForceOffOne_AutoHeaderI__LIB_FetchI_Hdr_Indv := FALSE;
 // export ForceOffOne_AutoHeaderI__LIB_FetchI_Hdr_Indv := TRUE;

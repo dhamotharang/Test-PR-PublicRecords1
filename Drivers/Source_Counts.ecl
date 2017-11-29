@@ -1,4 +1,4 @@
-v := drivers.File_Dl;
+﻿v := drivers.File_Dl;
 
 slimrec := record
 	v.source_code;
@@ -15,4 +15,5 @@ countrec := record
 end;
 
 vcount := distribute(table(vslim, countrec, source_code, orig_state), hash(src));
-export Source_Counts := vcount(counted > 10) : persist('Persist::DrvLic_Source_Counts');
+// export Source_Counts := vcount(counted > 10) : persist('Persist::DrvLic_Source_Counts');
+export Source_Counts:=dataset('~thor400_84::persist::drvlic_source_counts',countrec,thor);
