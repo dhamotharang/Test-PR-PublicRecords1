@@ -1,10 +1,13 @@
-import  UCCV2,RoxieKeyBuild,ut,autokey,doxie,fcra; 
+﻿import  UCCV2,RoxieKeyBuild,ut,autokey,doxie,fcra; 
 
 export Key_rmsid_main (boolean  IsFCRA = false) := function
 		KeyName       :=cluster.cluster_out+'Key::ucc::';
 		
-		dMain	:=	File_UCC_Main_Base;
-
+		dMain	:=	if (isFCRA,
+										File_UCC_Main_Base_FCRA,
+										File_UCC_Main_Base
+									);
+									
 		string fXlateUnprintable(string pInput)	:=stringlib.StringToUpperCase(regexreplace('[^\\x20-\\x7F]',pInput,''));
 
 		Layout_UCC_Common.Layout_ucc_new tProject(File_UCC_Main_Base pInput) := Transform

@@ -1,4 +1,4 @@
-import doxie, doxie_files, business_header, doxie_build, doxie_raw;
+﻿import doxie, doxie_files, business_header, doxie_build, doxie_raw;
 
 Business_Header.doxie_MAC_Field_Declare()
 doxie.MAC_Selection_Declare()
@@ -13,7 +13,7 @@ END;
 
 dids := MAP(dl_value != '' 	=> 	DEDUP(PROJECT(dl_search_local, just_did(LEFT)), did, all),
 		  did_value != ''	=> 	dataset([{did_value}], layout_references),
-							get_dids())(Include_MotorVehicles_val);
+							PROJECT (get_dids(), doxie.layout_references))(Include_MotorVehicles_val);
 
 FT := Doxie_Raw.Veh_Raw(dids, vin_value, tag_value, vid_value, st_code_value, veh_num_value,
     company_name_value, dateVal, dppa_purpose, glb_purpose, ln_branded_value, ssn_mask_value, dl_mask_value,

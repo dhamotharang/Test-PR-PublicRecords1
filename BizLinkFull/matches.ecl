@@ -4819,4 +4819,3 @@ EXPORT PostIDs := BizLinkFull.Fields.UIDConsistency(Patched_Infile_thin); // Exp
 EXPORT PatchingError0 := PreIDs.IdCounts[2].cnt - PostIDs.IdCounts[2].cnt - MatchesPerformed - COUNT(BasicMatch(ih).patch_file)  + SlicesPerformed; // Should be zero
 EXPORT DuplicateRids0 := COUNT(Patched_Infile_thin) - PostIDs.IdCounts[1].Cnt; // Should be zero
 END;
-

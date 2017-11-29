@@ -1119,6 +1119,9 @@
 				trim(kword, left, right) = 'CANS-JVCFO' =>SubGroup_Constants.numKeywordsID.KEYWORD_CANS_JVCFO,
 				trim(kword, left, right) = 'PPICIJ-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PPICIJ_WC,
 				trim(kword, left, right) = 'USCRL' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCRL,
+				trim(kword, left, right) = 'CODIAN' =>SubGroup_Constants.numKeywordsID.KEYWORD_CODIAN,
+				trim(kword, left, right) = 'NPCIAA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NPCIAA,
+				trim(kword, left, right) = 'EDES' =>SubGroup_Constants.numKeywordsID.KEYWORD_EDES,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

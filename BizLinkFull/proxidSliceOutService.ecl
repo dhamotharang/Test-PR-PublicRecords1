@@ -38,4 +38,3 @@ output( odl_noprop,named('proxidValues_NoProp'));
 output( odr_noprop,named('PreferredproxidValues_NoProp'));
 endmacro;
  
-

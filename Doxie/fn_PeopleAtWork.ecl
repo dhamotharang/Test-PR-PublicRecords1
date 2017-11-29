@@ -1,4 +1,4 @@
-IMPORT doxie,iesp,doxie_crs,PAW_Services,AutoStandardI;
+﻿IMPORT doxie,iesp,doxie_crs,PAW_Services,AutoStandardI;
 
 EXPORT fn_PeopleAtWork(DATASET(doxie.Layout_Rollup.KeyRec) inKeyRecs) := FUNCTION
 
@@ -58,7 +58,7 @@ EXPORT fn_PeopleAtWork(DATASET(doxie.Layout_Rollup.KeyRec) inKeyRecs) := FUNCTIO
    
    //add iesp (PAW V1) version of paw records 
    setofdids := dedup (project (inKeyRecs, transform (doxie.layout_references, Self.did := (unsigned6) Left.did)), did, all);
-   // this is to replace doxie.Get_Dids(); call, which won't return any candidates for, say, search by DL number.
+   // this is to replace doxie\Get_Dids call, which won't return any candidates for, say, search by DL number.
 
    outKeyRecsV1 := DENORMALIZE (inKeyRecs,doxie.employment_records (setofdids),LEFT.did=RIGHT.did,pawTrans(LEFT,RIGHT));   
 

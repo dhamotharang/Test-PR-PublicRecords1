@@ -56,4 +56,3 @@ SHARED LinkPhase(BOOLEAN again) := SEQUENTIAL(PARALLEL(OutputSamples,ExecutionSt
 EXPORT DoAll := LinkPhase(FALSE);
 EXPORT DoAllAgain := LinkPhase(TRUE);
 END;
-

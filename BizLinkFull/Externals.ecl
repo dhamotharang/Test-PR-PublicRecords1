@@ -52,4 +52,3 @@ EXPORT Fetch(DATASET(BizLinkFull.Process_Biz_Layouts.id_stream_layout) ins,Fetch
   RETURN ROLLUP(ig,GROUP,Get(ROWS(LEFT)));
 END;
 END;
-

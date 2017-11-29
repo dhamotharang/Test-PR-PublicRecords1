@@ -206,7 +206,7 @@ EXPORT ContactPlusSearchService := MACRO
 			export string32 applicationType	:= app_type;
 		end;
 		email_dids := EmailService.EmailSearchService_IDs.val(em_mod).by_email_val;
-		dids_fetched:= doxie.Get_Dids(); // use pii to get dids		
+		dids_fetched:= PROJECT (doxie.Get_Dids(), doxie.layout_references); // use pii to get dids		
   	best_pen_rec := record(doxie.layout_best)
 	  	unsigned pen;
 	  end;

@@ -1,6 +1,4 @@
-﻿// WA UCC MAIN MAPPER 
-
-import address, did_add, didville,ut,header_slimsort,UCCV2,business_header,Business_Header_SS,_control,PromoteSupers;
+﻿import address, did_add, didville,ut,header_slimsort,UCCV2,business_header,Business_Header_SS,_control,PromoteSupers;
 
 trimUpper(string s) := function
 		  return trim(stringlib.StringToUppercase(s),left,right);
@@ -12,7 +10,11 @@ if(process_date='',fail('ERROR -- UNABLE TO OBTAIN PROCESS DATE FOR WA UCC DATA'
    
 newInput 				:= 	UCCV2.File_WA_in;
 mainBase 				:= 	UCCV2.File_WA_Main_Base;
-suppressionFile	:=	UCCV2.File_WA_Suppression;
+suppressionFile	:=	if (COUNT(FileServices.SuperFileContents(uccv2.Cluster.Cluster_In + 'in::uccv2::WA::suppression')) > 0,
+													UCCV2.File_WA_Suppression,
+													DATASET([], UCCV2.Layout_File_WA_Suppression)
+												);
+NeedSuppression	:=	COUNT(NOTHOR(FileServices.SuperFileContents(uccv2.Cluster.Cluster_In + 'in::uccv2::WA::suppression'))) > 0;
 
 UCCV2.Layout_UCC_Common.layout_UCC_new bldMain(newInput L) := TRANSFORM
 
@@ -147,11 +149,22 @@ UCCV2.Layout_UCC_Common.layout_UCC_new  tRollupDuplicates(UCCV2.Layout_UCC_Commo
 	self				:= L;
 end;
 											
-newMainBase := rollup(Keepers,tRollupDuplicates(left,right),tmsid,rmsid,local);
+newMainBase := rollup(sortNewInput,tRollupDuplicates(left,right),tmsid,rmsid,local);
 AddRecordID := uccv2.fnAddPersistentRecordID_Main(newMainBase);
 
-PromoteSupers.MAC_SF_BuildProcess(AddRecordID,uccv2.cluster.cluster_out+'base::UCC::main::WA',Suppress, 2,,true);
+PromoteSupers.MAC_SF_BuildProcess(AddRecordID,uccv2.cluster.cluster_out+'base::UCC::main::WA',NewBase, 2,,true);
 
-export Proc_Build_WA_Main_Base	:=	sequential(	Suppress
-																								,DesprayMissing
-																								);
+											
+newMainSuppressed 		:= rollup(Keepers,tRollupDuplicates(left,right),tmsid,rmsid,local);
+AddRecordIDSuppressed := uccv2.fnAddPersistentRecordID_Main(newMainSuppressed);
+
+PromoteSupers.MAC_SF_BuildProcess(AddRecordIDSuppressed,uccv2.cluster.cluster_out+'base::UCC::main::WA',Suppress, 2,,true);
+
+SuppressRecords	:=	sequential(	Suppress, DesprayMissing);
+
+
+sequential(	if (NeedSuppression,
+									SuppressRecords,
+									NewBase
+								)									
+					);

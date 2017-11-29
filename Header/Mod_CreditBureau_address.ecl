@@ -102,7 +102,7 @@ EqFiles:=project(EqFiles0
 
 EnFiles
 	:=
-	DATASET(ExperianCred.SuperFile_List.Source_File_History, {string75 fn { virtual(logicalfilename)},ExperianCred.Layouts.Layout_In}, THOR)
+	DATASET(ExperianCred.SuperFile_List.Source_File_History, {string75 fn { virtual(logicalfilename)},ExperianCred.Layouts.Layout_In}, THOR, opt)
 	;
 
 TnFiles

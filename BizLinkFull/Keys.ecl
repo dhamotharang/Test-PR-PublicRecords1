@@ -6,7 +6,5 @@ EXPORT SpecificitiesDebugKeyName := '~'+'key::BizLinkFull::proxid::Debug::specif
 EXPORT Specificities_Key := INDEX(s,{1},{s},SpecificitiesDebugKeyName);
 SHARED Build_Specificities_Key := BUILDINDEX(Specificities_Key, OVERWRITE, FEW);
 EXPORT BuildAll := Build_Specificities_Key;
-EXPORT RelationshipKeys := BUILDINDEX(Specificities_Key, OVERWRITE, FEW);
 END;
  
-

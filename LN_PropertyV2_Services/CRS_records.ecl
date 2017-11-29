@@ -1,4 +1,4 @@
-import doxie, doxie_ln, ut, NID, suppress, FFD, LN_PropertyV2_Services;
+﻿import doxie, doxie_ln, ut, NID, suppress, FFD, LN_PropertyV2_Services;
 
 l_fidPlus				:= { LN_PropertyV2_Services.layouts.fid; string1 source_code_1; };
 l_assess_wider	:= LN_PropertyV2_Services.layouts.assess.result.wider;
@@ -24,7 +24,7 @@ allowedSources := if(LN_PropertyV2_Services.input.lnBranded, ['O','B','S'], ['O'
 
 // generate list of DIDs and BDIDs
 dids_direct	:= if(LN_PropertyV2_Services.input.did<>0, dataset([{LN_PropertyV2_Services.input.did}], LN_PropertyV2_Services.layouts.search_did));
-dids_deep		:= limit( doxie.Get_Dids(), LN_PropertyV2_Services.consts.max_deepDIDs, skip);
+dids_deep		:= PROJECT (limit( doxie.Get_Dids(), LN_PropertyV2_Services.consts.max_deepDIDs, skip), doxie.layout_references);
 dids				:= if(LN_PropertyV2_Services.input.incProp and ~IsFCRA, dedup(sort(dids_direct+dids_deep,did),did), dids_direct);	// the conditional may improve performance slightly
 bdids				:= dataset([], Doxie.Layout_ref_bdid);
 

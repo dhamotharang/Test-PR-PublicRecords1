@@ -153,4 +153,3 @@ EXPORT Biz_Comp_Service := MACRO
   e := BizLinkFull.Externals.Fetch(pm.Uid_Results,Options); // Perform data-bomb fetch
   OUTPUT(e,NAMED('DataBombs'));
 ENDMACRO;
-

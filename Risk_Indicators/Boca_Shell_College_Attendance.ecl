@@ -1,3 +1,4 @@
+﻿
 import Inquiry_AccLogs;
 
 EXPORT Boca_Shell_College_Attendance( grouped dataset(risk_indicators.layout_boca_shell) input_clam, boolean isFCRA ) := function
@@ -17,13 +18,14 @@ with_college_attendance := project(input_clam,
 						and bus_intel.industry='STUDENT LOANS'), 1));
 		
 		student_loan_inquiry := if(isFCRA, false, inquiry_hit);  // only ping inquiries for non-fcra
-		
+	
+	
 		self.attended_college := 
 													map(
 													left.did=0 => false,
 													left.email_summary.email_domain_EDU_ct > 0 => true,	
 													left.professional_license.plCategory in ['3','4','5'] => true,
-													left.student.file_type in ['A','H','C'] => true,
+													left.student.file_type in ['A','H','C','O'] => true,
 													left.student.file_type='M' and (left.student.college_code<>'' or left.student.college_tier<>'' or left.student.college_major<>'') => true,
 													left.student.file_type='' and (left.student.college_code<>'' or left.student.college_tier<>'' or left.student.college_major<>'' or
 																												 left.student.class<>'' or left.student.income_level_code<>'') => true,										 

@@ -331,6 +331,12 @@ export Layout_Relat_Prop_Plusv4 := RECORD
 	Layout_Recent_Property_Sales;
 END;
 
+//MS-158: new property record layout that includes the business address indicator from ADVO
+export Layout_Relat_Prop_Plus_BusInd := RECORD	
+	Layout_Relat_Prop_Plusv4;
+	string1 Residential_or_Business_Ind;			
+	unsigned3 historydate;
+END;
 
 export Layout_Infutor := RECORD
 	unsigned4 infutor_date_first_seen;
@@ -1753,5 +1759,30 @@ export tmp_ConsumerStatements := Record
 	dataset(tmp_Consumer_Statements) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 end;
 
+//MS-71: new BIP header fields
+export layout_BIP_Header_info := record
+	integer 	bus_seleids_peradl := 0;
+	integer 	bus_gold_seleids_peradl := 0;
+	integer 	bus_active_seleids_peradl := 0;
+	integer 	bus_inactive_seleids_peradl := 0;
+	integer 	bus_defunct_seleids_peradl := 0;
+	integer 	bus_gold_seleid_first_seen := 0;
+	integer 	bus_header_first_seen := 0;
+	integer 	bus_header_last_seen := 0;
+	integer 	bus_header_build_date := 0;
+	integer 	bus_SOS_filings_peradl := 0;
+	integer 	bus_active_SOS_filings_peradl := 0;
+end;
+
+//MS-167: new Equifax Fraud Flags fields
+// export layout_Equifax_FraudFlags := record
+	// integer 	factact_curr_active_duty := 0;
+	// integer 	factact_curr_active_duty_fseen := 0;
+	// integer 	factact_curr_fraud_alert := 0;
+	// integer 	factact_curr_fraud_alert_fseen := 0;
+	// integer 	factact_curr_alert_code := 0;
+	// integer 	factact_hist_fraud_alert_ct := 0;
+	// integer 	factact_hist_fraud_alert_lseen := 0;
+// end;
 
 END;

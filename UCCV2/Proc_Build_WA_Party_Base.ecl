@@ -1,7 +1,11 @@
 ﻿IMPORT Address, NID, UCCV2, ut;
 
 newInput   			:= 	UCCV2.File_WA_in;	
-suppressionFile	:=	UCCV2.File_WA_Suppression;
+suppressionFile	:=	if (COUNT(FileServices.SuperFileContents(uccv2.Cluster.Cluster_In + 'in::uccv2::WA::suppression')) > 0,
+													UCCV2.File_WA_Suppression,
+													DATASET([], UCCV2.Layout_File_WA_Suppression)
+												);
+NeedSuppression	:=	COUNT(NOTHOR(FileServices.SuperFileContents(uccv2.Cluster.Cluster_In + 'in::uccv2::WA::suppression'))) > 0;
 
 trimUpper(string s) := function
 			return trim(stringlib.StringToUppercase(s),left,right);
@@ -83,9 +87,14 @@ Keepers		:=	join(	dParties,
 										JoinForKeeps(left, right),
 										Left only,
 										local);	
+										
+TempParties	:=	if (NeedSuppression,
+											Keepers,
+											dParties
+										);								
 
 // Since the layout contains nametype, need to declare the NID attriubte to be something else.
-NID.Mac_CleanFullNames(Keepers, VerifyPersons, Orig_name, , nid_nametype);
+NID.Mac_CleanFullNames(TempParties, VerifyPersons, Orig_name, , nid_nametype);
 
 person_flags := ['P', 'D'];
 // An executive decision was made to consider Unclassifed and Invalid names as company names for UCC.

@@ -1378,6 +1378,18 @@ export Layout_Boca_Shell_Edina_v53 := RECORD
 	integer swappedNames;
 	Layout_inq_PII_corroboration     inq_PII_corroboration; 
 	Layout_BRM_Derogs                BRM_Derogs;
+	//MS-159: new business address fields
+	integer	bus_addr_only_curr;
+	integer	bus_addr_only;
+	//MS-71: new BIP header fields
+	Risk_Indicators.Layouts.layout_BIP_Header_info BIP_Header;
+	//MS-158: new business property fields
+	integer bus_property_owned_total;
+	integer bus_property_owned_assess_total;
+	integer bus_property_owned_assess_count;
+	integer bus_property_sold_total;
+	integer bus_property_sold_assess_total;
+	integer bus_property_sold_assess_count;
 	
 END;
 

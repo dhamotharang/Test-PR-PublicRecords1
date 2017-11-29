@@ -1,10 +1,12 @@
-/*2014-11-16T00:19:09Z (Nathan Koubsky)
+﻿/*2014-11-16T00:19:09Z (Nathan Koubsky)
 Added core roxie ip
 */
 import risk_indicators, Phone_Shell, ut;
 
 // placeholder for all of the roxie VIPs to use when processing files using soapcall
 export shortcuts := module
+
+export prod_batch_analytics_roxie := 'http://10.176.68.205:9876';
 
 	export prod_batch_neutral := 'http://roxiebatch.br.seisint.com:9856';
 	export prod_batch_fcra := 'http://fcrabatch.sc.seisint.com:9876';
@@ -72,6 +74,7 @@ export shortcuts := module
 	//deltabase gateways for Inquiries
 	export gw_delta_dev := dataset( [{'delta_inquiry','http://rw_score_dev:Password01@10.176.68.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
 	export gw_delta_prod := dataset( [{'delta_inquiry','http://delta_iid_api_user:2rch%40p1$$@10.176.69.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
+	export gw_delta_DR_prod := dataset( [{'delta_inquiry','http://delta_iid_api_user:2rch%40p1$$@10.191.24.151:7909/WsDeltaBase/preparedsql'}], risk_indicators.layout_gateways_in );
 	
 	// export gw_FCRA      := dataset( [{'FCRA','http://rwgatewaycert.sc.seisint.com:7726'}], risk_indicators.layout_gateways_in );
 	// export gw_FCRA      := dataset( [{'FCRA','http://rwgatewaycert.sc.seisint.com:7726'}], risk_indicators.layout_gateways_in );
@@ -207,11 +210,11 @@ export shortcuts := module
 	end;
 	
 // keeping a copy of these shells on dataland thor50_dev cluster and prod pound_option_thor cluster
-	export validation_fcra_shell108k_41    := dataset( '~thor50_dev::out::fcrashell41_validation_108k__w20150506-141026',  ox50, csv(quote('"'), maxlength(15000)) );
-	export validation_nonfcra_shell108k_41 := dataset( '~thor50_dev::out::nonfcrashell41_validation_108k__w20150506-125953',  ox50, csv(quote('"'), maxlength(15000)) );
+	export validation_fcra_shell108k_41    := dataset( ut.foreign_dataland + 'thor50_dev::out::fcrashell41_validation_108k__w20150506-141026',  ox50, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_41 := dataset( ut.foreign_dataland + 'thor50_dev::out::nonfcrashell41_validation_108k__w20150506-125953',  ox50, csv(quote('"'), maxlength(15000)) );
 	
-	export validation_fcra_shell108k_50    := dataset( '~thor50_dev::out::fcrashell50_validation_108k__w20150506-140238',  ox50, csv(quote('"'), maxlength(15000)) );
-	export validation_nonfcra_shell108k_50 := dataset( '~thor50_dev::out::nonfcrashell50_validation_108k__w20150506-125241-1',  ox50, csv(quote('"'), maxlength(15000)) );
+	export validation_fcra_shell108k_50    := dataset( ut.foreign_dataland + 'thor50_dev::out::fcrashell50_validation_108k__w20150506-140238',  ox50, csv(quote('"'), maxlength(15000)) );
+	export validation_nonfcra_shell108k_50 := dataset( ut.foreign_dataland + 'thor50_dev::out::nonfcrashell50_validation_108k__w20150506-125241-1',  ox50, csv(quote('"'), maxlength(15000)) );
 	
 //commented out since the layout has changed too much. If need, recreate	
 	// export	ox50btst := record

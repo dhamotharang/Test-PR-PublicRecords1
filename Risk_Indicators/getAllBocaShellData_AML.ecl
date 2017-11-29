@@ -402,7 +402,7 @@ RelatRecProp := join(ids_wide, 	single_property_relat,
 	// =============== Student File ===============
 	student_rolled := IF (IsFCRA,
 													Risk_Indicators.Boca_Shell_Student_FCRA (ids_only(~isrelat), bsversion),
-													Risk_Indicators.Boca_Shell_Student      (ids_only(~isrelat), bsversion));
+													Risk_Indicators.Boca_Shell_Student      (ids_only(~isrelat), bsversion, filter_out_fares));
 
 
 // =============== Aircraft ===============
