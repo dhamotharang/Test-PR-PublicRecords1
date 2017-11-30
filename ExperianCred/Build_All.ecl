@@ -22,7 +22,7 @@ input 		:= STD.File.RemoteDirectory(Spray.ip, Spray.path,'*.dat');
 delete 		:= STD.File.RemoteDirectory(Spray.ip, Spray.path,'DPINS');
 deceased  := STD.File.RemoteDirectory(Spray.ip, Spray.path,'DEC');
 
-DEL_EXT_FILE := nothor(apply(input + delete + deceased, STD.File.DeleteExternalFile(Spray.ip, Spray.path + name)));
+DEL_EXT_FILE := nothor(apply(input + delete + deceased, STD.File.DeleteExternalFile(Spray.ip, Spray.path + '/' + name)));
 
 built := sequential(
 					//Automatically resets deceased and delete superfiles for full updates
