@@ -1,7 +1,4 @@
-﻿/*2017-08-09T23:46:41Z (Kevin Huls)
-MS-160 - correct the way historyDateTimeStamp is used by using the day portion instead of hard coding to '01'
-*/
-import ut, risk_indicators, header, mdr, suppress, did_add, doxie, fcra, riskwise, STD;
+﻿import ut, risk_indicators, header, mdr, suppress, did_add, doxie, fcra, riskwise, STD;
 
 // line 4 and line 9 are 2 different constants.  one is the date as a string, the other is a date as unsigned value.  
 // to toggle the system date, update both of them to the date you want the system to be.
@@ -797,5 +794,84 @@ export countDiff1Dig(GROUPED DATASET(subsLayout) subsFile, string30 currString) 
 	
 end;
 
+export Set_Restricted_States_For_Marketing := ['ID', 'IL', 'KS', 'NM', 'SC', 'WA', 'NY'];
+export Set_Restricted_Colleges_For_Marketing := [
+'15322',
+'15323',
+'15324',
+'15325',
+'15326',
+'15327',
+'15328',
+'15329',
+'15330',
+'15331',
+'15334',
+'15335',
+'15336',
+'15337',
+'15338',
+'15340',
+'15341',
+'15343',
+'15344',
+'15345',
+'15346',
+'15347',
+'15348',
+'15349',
+'15350',
+'15351',
+'15352',
+'15353',
+'15354',
+'15355',
+'15356',
+'15357',
+'15360',
+'15362',
+'15363',
+'15364',
+'15366',
+'15368',
+'15371',
+'15372',
+'15373',
+'15378',
+'15417',
+'15418',
+'15419',
+'15421',
+'15423',
+'15425',
+'15426',
+'15431',
+'15432',
+'15434',
+'15436',
+'15438',
+'15439',
+'15441',
+'15443',
+'15444',
+'15446',
+'15856',
+'15858',
+'15873',
+'15877',
+'15896',
+'15901',
+'15904',
+'16172',
+'16174',
+'16176',
+'16178',
+'16179',
+'16181',
+'16182',
+'16189',
+'16196',
+'16198',
+'16201'];
 
 end;

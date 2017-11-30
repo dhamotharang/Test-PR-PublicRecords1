@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="CreditReportService">
 	<part name="BusinessCreditReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
 </message>
@@ -49,8 +49,6 @@ EXPORT CreditReportService := MACRO
 	#STORED('UltID',ReportBy.Company.BusinessIds.UltID);
 	#STORED('DID',ReportBy.AuthorizedRep.UniqueId);
 	#STORED('IncludeBusinessCredit',Options.IncludeBusinessCredit);
-	#STORED('TestDataEnabled',Users.TestDataEnabled);
-	#STORED('TestDataTableName',StringLib.StringToUpperCase(TRIM(users.TestDataTableName, LEFT, RIGHT)));
 	
 	UNSIGNED6 s_DotID  := 0 : STORED('DotID');
 	UNSIGNED6 s_EmpID  := 0 : STORED('EmpID');
@@ -116,8 +114,8 @@ EXPORT CreditReportService := MACRO
 		EXPORT BOOLEAN 		Include_BusinessCredit 			:= 	FALSE :  STORED('IncludeBusinessCredit');
 		EXPORT STRING 		DataRestrictionMask 				:= global_mod.DataRestrictionMask;
 		EXPORT STRING 		DataPermissionMask 					:= global_mod.DataPermissionMask;
-    EXPORT BOOLEAN    TestDataEnabled             := False : STORED('TestDataEnabled');
-		EXPORT STRING     TestDataTableName           := '' : STORED('TestDataTableName');
+    EXPORT BOOLEAN    TestDataEnabled             := Users.TestDataEnabled;
+		EXPORT STRING     TestDataTableName           := TRIM(users.TestDataTableName, LEFT, RIGHT);
 	END;
 	
 	record_results	:= BusinessCredit_Services.CreditReport_Records(input_mod);

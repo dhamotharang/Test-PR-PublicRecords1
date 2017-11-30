@@ -80,7 +80,7 @@ EXPORT match_company_phone_7(TYPEOF(h.company_phone_7) L, TYPEOF(h.company_phone
 );
 EXPORT match_company_fein(TYPEOF(h.company_fein) L, TYPEOF(h.company_fein) R, UNSIGNED1 LL = 0, UNSIGNED1 RL = 0, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT37.MatchCode.ExactMatch,
-  Config_BIP.WithinEditN(L,LL,R,RL,1, 0) => SALT37.MatchCode.EditDistanceMatch,
+	Config_BIP.WithinEditN(L,LL,R,RL,1, 0) => SALT37.MatchCode.EditDistanceMatch,
     SALT37.MatchCode.NoMatch),
         MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
 );
@@ -91,26 +91,26 @@ EXPORT match_company_sic_code1(TYPEOF(h.company_sic_code1) L, TYPEOF(h.company_s
 );
 EXPORT match_prim_range(TYPEOF(h.prim_range) L, TYPEOF(h.prim_range) R, UNSIGNED1 LL = 0, UNSIGNED1 RL = 0, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT37.MatchCode.ExactMatch,
-  Config_BIP.WithinEditN(L,LL,R,RL,1, 0) => SALT37.MatchCode.EditDistanceMatch,
+	Config_BIP.WithinEditN(L,LL,R,RL,1, 0) => SALT37.MatchCode.EditDistanceMatch,
     SALT37.MatchCode.NoMatch),
         MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
 );
 EXPORT match_prim_name(TYPEOF(h.prim_name) L, TYPEOF(h.prim_name) R, UNSIGNED1 LL = 0, UNSIGNED1 RL = 0, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT37.MatchCode.ExactMatch,
-  Config_BIP.WithinEditN(L,LL,R,RL,1, 0) => SALT37.MatchCode.EditDistanceMatch,
+	Config_BIP.WithinEditN(L,LL,R,RL,1, 0) => SALT37.MatchCode.EditDistanceMatch,
     SALT37.MatchCode.NoMatch),
         MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
 );
 EXPORT match_sec_range(TYPEOF(h.sec_range) L, TYPEOF(h.sec_range) R, UNSIGNED1 LL = 0, UNSIGNED1 RL = 0, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT37.MatchCode.ExactMatch,
-  Config_BIP.WithinEditN(L,LL,R,RL,1, 0) => SALT37.MatchCode.EditDistanceMatch,
+	Config_BIP.WithinEditN(L,LL,R,RL,1, 0) => SALT37.MatchCode.EditDistanceMatch,
     SALT37.MatchCode.NoMatch),
         MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
 );
 EXPORT match_city(TYPEOF(h.city) L, TYPEOF(h.city) R, UNSIGNED1 LL = 0, UNSIGNED1 RL = 0, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT37.MatchCode.ExactMatch,
-  Config_BIP.WithinEditN(L,LL,R,RL,2, 0) => SALT37.MatchCode.EditDistanceMatch,
-  metaphonelib.dmetaphone1(L) = metaphonelib.dmetaphone1(R) => SALT37.MatchCode.PhoneticMatch,
+	Config_BIP.WithinEditN(L,LL,R,RL,2, 0) => SALT37.MatchCode.EditDistanceMatch,
+	metaphonelib.dmetaphone1(L) = metaphonelib.dmetaphone1(R) => SALT37.MatchCode.PhoneticMatch,
     SALT37.MatchCode.NoMatch),
         MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
 );
@@ -157,9 +157,9 @@ EXPORT match_title(TYPEOF(h.title) L, TYPEOF(h.title) R, BOOLEAN RequiredField =
 );
 EXPORT match_fname(TYPEOF(h.fname) L, TYPEOF(h.fname) R, UNSIGNED1 LL = 0, UNSIGNED1 RL = 0, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT37.MatchCode.ExactMatch,
-  LENGTH(TRIM(L))>0 and L = R[1..LENGTH(TRIM(L))] => SALT37.MatchCode.InitialMatch,
-  LENGTH(TRIM(R))>0 and R = L[1..LENGTH(TRIM(R))] => SALT37.MatchCode.InitialMatch,
-  Config_BIP.WithinEditN(L,LL,R,RL,1, 0) => SALT37.MatchCode.EditDistanceMatch,
+	LENGTH(TRIM(L))>0 and L = R[1..LENGTH(TRIM(L))] => SALT37.MatchCode.InitialMatch,
+	LENGTH(TRIM(R))>0 and R = L[1..LENGTH(TRIM(R))] => SALT37.MatchCode.InitialMatch,
+	Config_BIP.WithinEditN(L,LL,R,RL,1, 0) => SALT37.MatchCode.EditDistanceMatch,
     SALT37.MatchCode.NoMatch),
         MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
 );
@@ -170,18 +170,18 @@ EXPORT match_fname_preferred(TYPEOF(h.fname_preferred) L, TYPEOF(h.fname_preferr
 );
 EXPORT match_mname(TYPEOF(h.mname) L, TYPEOF(h.mname) R, UNSIGNED1 LL = 0, UNSIGNED1 RL = 0, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT37.MatchCode.ExactMatch,
-  LENGTH(TRIM(L))>0 and L = R[1..LENGTH(TRIM(L))] => SALT37.MatchCode.InitialMatch,
-  LENGTH(TRIM(R))>0 and R = L[1..LENGTH(TRIM(R))] => SALT37.MatchCode.InitialMatch,
-  Config_BIP.WithinEditN(L,LL,R,RL,2, 0) => SALT37.MatchCode.EditDistanceMatch,
+	LENGTH(TRIM(L))>0 and L = R[1..LENGTH(TRIM(L))] => SALT37.MatchCode.InitialMatch,
+	LENGTH(TRIM(R))>0 and R = L[1..LENGTH(TRIM(R))] => SALT37.MatchCode.InitialMatch,
+	Config_BIP.WithinEditN(L,LL,R,RL,2, 0) => SALT37.MatchCode.EditDistanceMatch,
     SALT37.MatchCode.NoMatch),
         MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
 );
 EXPORT match_lname(TYPEOF(h.lname) L, TYPEOF(h.lname) R, UNSIGNED1 LL = 0, UNSIGNED1 RL = 0, BOOLEAN RequiredField = FALSE) := IF(~RequiredField,
    MAP(L = R => SALT37.MatchCode.ExactMatch,
     SALT37.HyphenMatch(L,R,1)<=2 => SALT37.MatchCode.HyphenMatch,
-  LENGTH(TRIM(L))>0 and L = R[1..LENGTH(TRIM(L))] => SALT37.MatchCode.InitialMatch,
-  LENGTH(TRIM(R))>0 and R = L[1..LENGTH(TRIM(R))] => SALT37.MatchCode.InitialMatch,
-  Config_BIP.WithinEditN(L,LL,R,RL,2, 0) => SALT37.MatchCode.EditDistanceMatch,
+	LENGTH(TRIM(L))>0 and L = R[1..LENGTH(TRIM(L))] => SALT37.MatchCode.InitialMatch,
+	LENGTH(TRIM(R))>0 and R = L[1..LENGTH(TRIM(R))] => SALT37.MatchCode.InitialMatch,
+	Config_BIP.WithinEditN(L,LL,R,RL,2, 0) => SALT37.MatchCode.EditDistanceMatch,
     SALT37.MatchCode.NoMatch),
         MAP(L = R => SALT37.MatchCode.ExactMatch, SALT37.MatchCode.NoMatch)
 );

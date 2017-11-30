@@ -1,4 +1,4 @@
-IMPORT doxie, AutoStandardI, AutoHeaderI, AutoHeaderV2;
+﻿IMPORT doxie, AutoStandardI, AutoHeaderI, AutoHeaderV2;
 
 EXPORT dataset(doxie.layout_references) 
        Get_Dids(boolean forceLocal = true, boolean noFail = false) := function
@@ -16,6 +16,6 @@ EXPORT dataset(doxie.layout_references)
 	dids := AutoHeaderV2.get_dids (ds_search, search_code, forceLocal);
 
   // slim down to comply with legacy usage;
-  return project (dids, doxie.layout_references);
+  return project (dids, doxie.layout_references_hh);
 
 END;

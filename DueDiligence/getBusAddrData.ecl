@@ -9,28 +9,26 @@
 EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 												Business_Risk_BIP.LIB_Business_Shell_LIBIN options) := FUNCTION
 	
-	inquiredBusinesses := inData(relatedDegree = DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE);
-												
 	//call key to initially get counts based on address, regardless of powID
-	addrCountRaw := JOIN(inquiredBusinesses, Address_Attributes.key_AML_addr, 
+	addrCountRaw := JOIN(inData, Address_Attributes.key_AML_addr, 
 												KEYED(TRIM(LEFT.busn_info.address.zip5) = RIGHT.zip) AND
 												KEYED(TRIM(LEFT.busn_info.address.prim_range) = RIGHT.prim_range) AND
 												KEYED(TRIM(LEFT.busn_info.address.prim_name) = RIGHT.prim_name) AND
 												KEYED(TRIM(LEFT.busn_info.address.addr_suffix) = RIGHT.addr_suffix) AND
 												KEYED(TRIM(LEFT.busn_info.address.predir) = RIGHT.predir) AND
 												KEYED(TRIM(LEFT.busn_info.address.postdir) = RIGHT.postdir),
-												TRANSFORM({UNSIGNED6 ultID, UNSIGNED6 orgID, UNSIGNED6 seleID, RECORDOF(RIGHT)},
+												TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED4 historyDate, RECORDOF(RIGHT)},
+																	SELF.seq := LEFT.seq;
 																	SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
 																	SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
 																	SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
-																	SELF := RIGHT;),
+																	SELF.historyDate := LEFT.historyDate;
+																	SELF := RIGHT;
+																	SELF := [];),
 												KEEP(1));
-
-	// Add back our Seq number
-	DueDiligence.Common.AppendSeq(addrCountRaw, indata, addrCountRaw_seq);
 	
 	// Filter out records after our history date.
-	addrCountDataFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(addrCountRaw_seq, dt_first_seen);
+	addrCountDataFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(addrCountRaw, dt_first_seen);
 	
 	//determine businesses counts (at addr, incorporated in loose state, have no fein)
 	addCounts := JOIN(inData, addrCountDataFiltRecs,
@@ -116,19 +114,18 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 									KEYED(TRIM(LEFT.busn_info.address.predir) = RIGHT.predir) AND
 									KEYED(TRIM(LEFT.busn_info.address.postdir) = RIGHT.postdir) AND
 									RIGHT.powID IN LEFT.setUniquePowIDs,
-									TRANSFORM({UNSIGNED6 ultID, UNSIGNED6 orgID, UNSIGNED6 seleID, STRING2 partyIndicator, RECORDOF(RIGHT)},
+									TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED4 historyDate, STRING2 partyIndicator, RECORDOF(RIGHT)},
 														SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
 														SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
 														SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+														SELF.historyDate := LEFT.historyDate;
 														SELF.partyIndicator := LEFT.relatedDegree;
-														SELF := RIGHT;),
-									ATMOST(500));
-
-	// Add back our Seq number
-	DueDiligence.Common.AppendSeq(addrRaw, indata, addrRaw_seq);
+														SELF := RIGHT;
+														SELF := []),
+									ATMOST(DueDiligence.Constants.MAX_ATMOST_500));
 	
 	// Filter out records after our history date.
-	addrDataFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(addrRaw_seq, dt_first_seen);
+	addrDataFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(addrRaw, dt_first_seen);
 	
 	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently - dates used in FilterRecords have been cleaned
 	clean_dateLastSeen := DueDiligence.Common.CleanDateFields(addrDataFiltRecs, dt_last_seen);
@@ -152,7 +149,7 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 													LEFT.orgID = RIGHT.orgID AND
 													LEFT.seleID = RIGHT.seleID,
 													TRANSFORM({RECORDOF(LEFT)},
-																		SELF.company_org_structure_derived := IF(LEFT.company_org_structure_derived = '', RIGHT.company_org_structure_derived, LEFT.company_org_structure_derived);
+																		SELF.company_org_structure_derived := IF(LEFT.company_org_structure_derived = DueDiligence.Constants.EMPTY, RIGHT.company_org_structure_derived, LEFT.company_org_structure_derived);
 																		SELF := LEFT;));
 		
 	addAddrStructure := JOIN(addMatchingRAAddresses, rollStructure,
@@ -244,8 +241,8 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 
 
 	//determine high risk sic code based on address
-	hraSicRaw := JOIN(inquiredBusinesses, risk_indicators.key_HRI_Address_To_SIC,
-										RIGHT.sic_code <>'' and 
+	hraSicRaw := JOIN(inData, risk_indicators.key_HRI_Address_To_SIC,
+										RIGHT.sic_code <> DueDiligence.Constants.EMPTY and 
 										KEYED(TRIM(LEFT.busn_info.address.zip5) = RIGHT.z5) AND
 										KEYED(TRIM(LEFT.busn_info.address.prim_range) = RIGHT.prim_range) AND
 										KEYED(TRIM(LEFT.busn_info.address.prim_name) = RIGHT.prim_name) AND
@@ -253,19 +250,19 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 										KEYED(TRIM(LEFT.busn_info.address.predir) = RIGHT.predir) AND
 										KEYED(TRIM(LEFT.busn_info.address.postdir) = RIGHT.postdir) AND
 										KEYED(TRIM(LEFT.busn_info.address.sec_range) = RIGHT.sec_range),
-										TRANSFORM({UNSIGNED6 ultID, UNSIGNED6 orgID, UNSIGNED6 seleID, STRING2 partyIndicator, RECORDOF(RIGHT)},
+										TRANSFORM({DueDiligence.LayoutsInternal.InternalBIPIDsLayout, UNSIGNED4 historyDate, STRING2 partyIndicator, RECORDOF(RIGHT)},
+															SELF.seq := LEFT.seq;
 															SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
 															SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
 															SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
+															SELF.historyDate := LEFT.historyDate;
 															SELF.partyIndicator := LEFT.relatedDegree;
-															SELF := RIGHT;),
-										ATMOST(100));
-									
-	// Add back our Seq number
-	DueDiligence.Common.AppendSeq(hraSicRaw, indata, hraSicRaw_seq);
+															SELF := RIGHT;
+															SELF := [];),
+										ATMOST(DueDiligence.Constants.MAX_ATMOST_100));
 	
 	// Filter out records after our history date.
-	addrSicDataFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(hraSicRaw_seq, dt_first_seen);
+	addrSicDataFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(hraSicRaw, dt_first_seen);
 	
 	addrSicDataTrans := PROJECT(addrSicDataFiltRecs, TRANSFORM({BOOLEAN cmraSicCode, RECORDOF(LEFT)},
 																															SELF.cmraSicCode := LEFT.sic_code IN DueDiligence.Constants.CMRA_SIC_CODES;
@@ -296,7 +293,6 @@ EXPORT getBusAddrData(DATASET(DueDiligence.Layouts.Busn_Internal) inData,
 	// OUTPUT(addCounts, NAMED('addCounts'));
 			
 	// OUTPUT(addrRaw, NAMED('addrRaw'));
-	// OUTPUT(addrRaw_seq, NAMED('addrRaw_seq'));
 	// OUTPUT(addrDataFilt, NAMED('addrDataFilt'));
 	
 	// OUTPUT(allAgents, NAMED('allAgents'));

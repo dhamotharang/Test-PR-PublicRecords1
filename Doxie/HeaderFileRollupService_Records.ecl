@@ -1,5 +1,5 @@
-IMPORT AddressFeedback, AddressFeedback_Services, BusinessCredit_Services, DriversV2,  
-       lib_stringlib, PhonesFeedback, PhonesFeedback_Services, Suppress, ut;
+﻿IMPORT AddressFeedback, AddressFeedback_Services, BusinessCredit_Services, DriversV2,  
+       PhonesFeedback, PhonesFeedback_Services, Suppress, ut, iesp, doxie;
 
 EXPORT HeaderFileRollupService_Records := 
   MODULE
@@ -36,7 +36,7 @@ EXPORT HeaderFileRollupService_Records :=
         DLDids     := PROJECT(DLraw_dids,doxie.layout_references_hh);
         isDLSearch := dlSearch AND EXISTS(DLDids);
 
-        header_dids := if(~ta1_iparam_mod.reduced_data,doxie.get_dids_hhid(,isDLSearch));
+        header_dids := if(~ta1_iparam_mod.reduced_data,doxie.get_dids(,isDLSearch));
         dids := if(isDLSearch, DLDids, header_dids);
 
         // Get header records
@@ -50,13 +50,13 @@ EXPORT HeaderFileRollupService_Records :=
         // Rollup header records
         tmpRecs := doxie.rollup_presentation(presRecs, ta1_iparam_mod.allow_wildcard);
         ta1_tmp := set_premium_phone_count(tmpRecs,glbMod.dataRestrictionMask)[1];
-        
+
       RETURN ta1_tmp;
     END; // fn_get_ta1_temp
 
     
-    EXPORT fn_get_ta2 ( DATASET(doxie.layout_rollup.KeyRec_Seq) ta1_tmp_results, doxie.HeaderFileRollupService_IParam.ta2_iparams ta2_iparam_mod ):=
-      FUNCTION
+    EXPORT fn_get_ta2 ( DATASET(doxie.layout_rollup.KeyRec_Seq) ta1_tmp_results,doxie.HeaderFileRollupService_IParam.ta2_iparams ta2_iparam_mod ):=
+			FUNCTION
 
         useBusinessCreditSorting := BusinessCredit_Services.Functions.fn_useBusinessCredit( ta2_iparam_mod.dataPermissionMask, ta2_iparam_mod.Include_BusinessCredit );
 
@@ -94,7 +94,8 @@ EXPORT HeaderFileRollupService_Records :=
             SELF.rids					:= filtered_rids;
             SELF.AddrRecs			:= PROJECT(IF(ta2_iparam_mod.Include_AddressFeedback, addrRecsWithFeedback, _addrRecs), doxie.Layout_Rollup.AddrRec_feedback);
             SELF.ssn_count    := COUNT(L.ssnRecs);
-            SELF              := L;
+						SELF.progressive_phones := [];
+		        SELF              := L;
           END;
 
         // ----------------------------------------------------------------------
@@ -111,10 +112,30 @@ EXPORT HeaderFileRollupService_Records :=
         // Business Credit / SBFE - request is to resort SBFE records to the top of the results list
         ds_ta2_BusinessCredit_atTop := BusinessCredit_Services.Functions.fn_BusinessCreditSorting ( ta2_preBusinessCredit, ta2_iparam_mod.SeleId, ta2_iparam_mod.OrgId, ta2_iparam_mod.UltId ); 
          
-        ta2 := IF( useBusinessCreditSorting, ds_ta2_BusinessCredit_atTop, ta2_preBusinessCredit );
-      
+				ta2 := IF( useBusinessCreditSorting, ds_ta2_BusinessCredit_atTop, ta2_preBusinessCredit );
+      				
         RETURN ta2;
       END;
+		
+		EXPORT get_progressive_phone ( DATASET(doxie.Layout_Rollup.KeyRec_feedback) in_records, 
+																		doxie.iParam.ProgressivePhoneParams progphone_mod = module(doxie.iParam.ProgressivePhoneParams)end):=
+      FUNCTION
+			
+				PhoneDids := DEDUP(SORT(PROJECT(in_records(did <> ''), TRANSFORM(doxie.layout_references, SELF.did := (UNSIGNED6) LEFT.did)), did, did));
+
+				ds_ProgPhone := doxie.fn_progressivePhone.byDIDonly(PhoneDids,progphone_mod);
+				
+				doxie.Layout_Rollup.KeyRec_feedback AppendProgPhone(doxie.Layout_Rollup.KeyRec_feedback inRec, RECORDOF(ds_ProgPhone) PhoneRecs) := TRANSFORM
+					SELF.progressive_phones := iesp.transform_progressive_phones(PhoneRecs.phoneinfo,progphone_mod.ReturnPhoneScore, progphone_mod.ScoreModel);
+					SELF := inRec;
+				END;
+
+				progPhoneRecs := JOIN(in_records,ds_ProgPhone,(INTEGER)LEFT.did=RIGHT.did,
+															AppendProgPhone(LEFT,RIGHT),
+															LEFT OUTER);
+			
+				RETURN progPhoneRecs;
+		END;
 
     // Added the following function to allow records from the Doxie.HFRS to be returned
     EXPORT fn_get_personRecords ( doxie.HeaderFileRollupService_IParam.ta1_IParams ta1_Iparam_mod, doxie.HeaderFileRollupService_IParam.ta2_IParams ta2_IParam_mod ):=

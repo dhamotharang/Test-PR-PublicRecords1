@@ -21,6 +21,7 @@ Function
 			Prte_akey_zip			:= 	fileservices.copy('~foreign::10.241.12.201::thor_data400::key::fdn::qa::autokey::zip','thor400_44','~prte::key::fdn::' + pIndexVersion + '::autokey::zip');
 			Prte_akey_zipb2			:= 	fileservices.copy('~foreign::10.241.12.201::thor_data400::key::fdn::qa::autokey::zipb2','thor400_44','~prte::key::fdn::' + pIndexVersion + '::autokey::zipb2');			
 			Prte_key_bdid			:= 	fileservices.copy('~foreign::10.241.12.201::thor_data400::key::fdn::qa::bdid','thor400_44','~prte::key::fdn::' + pIndexVersion + '::bdid');
+			Prte_key_deviceid			:= 	fileservices.copy('~foreign::10.241.12.201::thor_data400::key::fdn::qa::deviceid','thor400_44','~prte::key::fdn::' + pIndexVersion + '::deviceid');
 			Prte_key_did			:= 	fileservices.copy('~foreign::10.241.12.201::thor_data400::key::fdn::qa::did','thor400_44','~prte::key::fdn::' + pIndexVersion + '::did');
 			Prte_key_email			:= 	fileservices.copy('~foreign::10.241.12.201::thor_data400::key::fdn::qa::email','thor400_44','~prte::key::fdn::' + pIndexVersion + '::email');
 			Prte_key_id			:= 	fileservices.copy('~foreign::10.241.12.201::thor_data400::key::fdn::qa::id','thor400_44','~prte::key::fdn::' + pIndexVersion + '::id');
@@ -58,6 +59,7 @@ Function
 																Prte_akey_zip,
 																Prte_akey_zipb2,
 																Prte_key_bdid,
+																Prte_key_deviceid,
 																Prte_key_did,
 																Prte_key_email,
 																Prte_key_id,
@@ -68,6 +70,11 @@ Function
 																Prte_key_mbsproductinclude,
 																Prte_key_mbsfdnmasterID,
 																Prte_key_mbsfdnmasterIDExcl,
+																Prte_key_lnpid,
+																Prte_key_appproviderid,
+																Prte_key_npi,
+																Prte_key_professionalid,
+																Prte_key_tin,																
 																Prte_key_BankAccount,
 																Prte_key_driverslicense),
                               PRTE.UpdateVersion('FDNKeys',										//	Package name

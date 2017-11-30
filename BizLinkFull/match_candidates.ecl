@@ -51,9 +51,9 @@ PrePropCounts := RECORD
 END;
 EXPORT PPS := TABLE(thin_table,PrePropCounts);
 EXPORT poprec := RECORD
-  STRING label;
-    REAL8 pop;
-  END;
+	STRING label;
+		REAL8 pop;
+	END;
 EXPORT PrePropogationStats := SALT37.MAC_Pivot(PPS, poprec);
 SHARED layout_withpropvars := RECORD
   thin_table;

@@ -44,18 +44,18 @@ ut.MAC_Append_Rcid (tax_file_clean,tax_row_id,tax_file_seq);
 						
 deed_addr := PROJECT(deed_file_clean(cust_name <> ''), 
                              TRANSFORM(Layouts.temp_address_layout,
-                                       SELF.deed_row_id := LEFT.deed_row_id;
-																			 SELF := LEFT; 
-                                       SELF := []
+                             SELF.deed_row_id := LEFT.deed_row_id;
+																			          SELF := LEFT; 
+                             SELF := []
                                        )										
                                     );
 
 tax_addr := PROJECT(tax_file_clean(cust_name <> ''), 
-                             TRANSFORM(Layouts.temp_address_layout,
-                                       SELF.tax_row_id := LEFT.tax_row_id;
+                    TRANSFORM(Layouts.temp_address_layout,
+                    SELF.tax_row_id := LEFT.tax_row_id;
 																			 SELF.tax_mailing_full_street_address :=LEFT.mailing_full_street_address;
 																			 SELF. tax_mailing_city_state_zip :=LEFT.mailing_city_state_zip;
-                                       SELF.tax_property_full_street_address :=LEFT.property_full_street_address;
+                    SELF.tax_property_full_street_address :=LEFT.property_full_street_address;
 																			 SELF. tax_property_city_state_zip :=LEFT.property_city_state_zip;
 																			 SElF := LEFT; 
                                        SELF := []
@@ -110,7 +110,7 @@ all_addr := deed_addr + tax_addr;
                                  self.deed_mail_geo_match := left.mail_address.geo_match;
                                  self.deed_mail_err_stat := left.mail_address.err_stat;
 																 
-																 self.deed_seller_prim_range := left.seller_address.prim_range;
+																                 self.deed_seller_prim_range := left.seller_address.prim_range;
                                  self.deed_seller_predir := left.seller_address.predir;
                                  self.deed_seller_prim_name := left.seller_address.prim_name;
                                  self.deed_seller_addr_suffix := left.seller_address.addr_suffix;
@@ -137,8 +137,32 @@ all_addr := deed_addr + tax_addr;
                                  self.deed_seller_geo_blk := left.seller_address.geo_blk;
                                  self.deed_seller_geo_match := left.seller_address.geo_match;
                                  self.deed_seller_err_stat := left.seller_address.err_stat;
+																
+															   self.owner_bdid := if(right.name1_link_fein !='' and right.name1 !='', prte2.fn_AppendFakeID.bdid(right.name1, self.deed_mail_prim_range, 
+									               self.deed_mail_prim_name, self.deed_mail_v_city_name, self.deed_mail_state,self.deed_mail_zip5,'LN_PR'),0); 
+                                 
 																 
-																 self.deed_property_prim_range := left.property_address.prim_range;
+																 vLinkingIds :=  prte2.fn_AppendFakeID.LinkIds(right.name1, right.name1_link_fein, right.name1_link_inc_date, 
+ 									                          self.deed_mail_prim_range, self.deed_mail_prim_name, self.deed_mail_sec_range, self.deed_mail_v_city_name, self.deed_mail_state, self.deed_mail_zip5, 'LN_PR');
+												 
+											       self.owner_powid	:=  if (right.name1_link_fein !='' and right.name1 !='',vLinkingIds.powid, 0);
+			               self.owner_proxid	:=  if (right.name1_link_fein !='' and right.name1 !='',vLinkingIds.proxid, 0) ;
+			               self.owner_seleid	:=  if (right.name1_link_fein !='' and right.name1 !='',vLinkingIds.seleid, 0) ;
+			               self.owner_orgid	:=  if (right.name1_link_fein !='' and right.name1 !='',vLinkingIds.orgid, 0) ;
+		                self.owner_ultid	:=  if (right.name1_link_fein !='' and right.name1 !='',vLinkingIds.ultid, 0);
+																														
+																	 self.seller_bdid := if(right.seller1_link_fein !='' and right.seller1 !='', prte2.fn_AppendFakeID.bdid(right.seller1, self.deed_seller_prim_range, 
+									              self.deed_seller_prim_name, self.deed_seller_v_city_name, self.deed_seller_state,self.deed_seller_zip5,'LN_PR'),0); 
+                 
+								         vLinkingIds_2 :=  prte2.fn_AppendFakeID.LinkIds(right.seller1, right.seller1_link_fein, right.seller1_link_inc_date, 
+ 									                          self.deed_seller_prim_range, self.deed_seller_prim_name, self.deed_seller_sec_range, self.deed_seller_v_city_name, self.deed_seller_state, self.deed_seller_zip5, 'LN_PR');																  
+																	self.seller_powid	:=  if (right.seller1_link_fein !='' and right.seller1 !='',vLinkingIds_2.powid, 0);
+			              self.seller_proxid	:=  if (right.seller1_link_fein !='' and right.seller1 !='',vLinkingIds_2.proxid, 0) ;
+			              self.seller_seleid	:=  if (right.seller1_link_fein !=''  and right.seller1 !='',vLinkingIds_2.seleid, 0) ;
+			              self.seller_orgid	:=  if (right.seller1_link_fein !='' and right.seller1 !='',vLinkingIds_2.orgid, 0) ;
+		               self.seller_ultid	:=  if (right.seller1_link_fein != '' and right.seller1 !='',vLinkingIds_2.ultid, 0);
+																 
+																                 self.deed_property_prim_range := left.property_address.prim_range;
                                  self.deed_property_predir := left.property_address.predir;
                                  self.deed_property_prim_name := left.property_address.prim_name;
                                  self.deed_property_addr_suffix := left.property_address.addr_suffix;
@@ -166,7 +190,7 @@ all_addr := deed_addr + tax_addr;
                                  self.deed_property_geo_match := left.property_address.geo_match;
                                  self.deed_property_err_stat := left.property_address.err_stat;
 																 
-																 self.deed_lender_prim_range := left.lender_address.prim_range;
+																                 self.deed_lender_prim_range := left.lender_address.prim_range;
                                  self.deed_lender_predir := left.lender_address.predir;
                                  self.deed_lender_prim_name := left.lender_address.prim_name;
                                  self.deed_lender_addr_suffix := left.lender_address.addr_suffix;
@@ -212,7 +236,7 @@ all_addr := deed_addr + tax_addr;
                                  tax_NewRecords, 
                                  LEFT.tax_row_id = RIGHT.tax_row_id,
                                  TRANSFORM( Layouts.layout_property_common_model_base_ext,
-																 self.tax_mail_prim_range := left.tax_mail_address.prim_range;
+															                	 self.tax_mail_prim_range := left.tax_mail_address.prim_range;
                                  self.tax_mail_predir := left.tax_mail_address.predir;
                                  self.tax_mail_prim_name := left.tax_mail_address.prim_name;
                                  self.tax_mail_addr_suffix := left.tax_mail_address.addr_suffix;
@@ -240,7 +264,19 @@ all_addr := deed_addr + tax_addr;
                                  self.tax_mail_geo_match := left.tax_mail_address.geo_match;
                                  self.tax_mail_err_stat := left.tax_mail_address.err_stat;
 																 
-																 self.tax_property_prim_range := left.tax_property_address.prim_range;
+																 self.owner_tax_bdid := if(right.assessee_name_link_fein !='' and right.assessee_name !='', prte2.fn_AppendFakeID.bdid(right.assessee_name, self.tax_mail_prim_range, 
+									               self.tax_mail_prim_name, self.tax_mail_v_city_name, self.tax_mail_state,self.tax_mail_zip5,'LN_PR'),0); 
+																
+                 vLinkingIds_3 :=  prte2.fn_AppendFakeID.LinkIds(right.assessee_name, right.assessee_name_link_fein, right.assessee_name_link_inc_date, 
+ 									                          self.tax_mail_prim_range, self.tax_mail_prim_name, self.tax_mail_sec_range, self.tax_mail_v_city_name, self.tax_mail_state, self.tax_mail_zip5, 'LN_PR');
+												 
+											       self.owner_tax_powid	:=  if (right.assessee_name_link_fein !='' and right.assessee_name !='',vLinkingIds_3.powid, 0);
+			               self.owner_tax_proxid	:=  if (right.assessee_name_link_fein !='' and right.assessee_name !='',vLinkingIds_3.proxid, 0) ;
+			               self.owner_tax_seleid	:=  if (right.assessee_name_link_fein !='' and right.assessee_name !='',vLinkingIds_3.seleid, 0) ;
+			               self.owner_tax_orgid	:=  if (right.assessee_name_link_fein !='' and right.assessee_name !='',vLinkingIds_3.orgid, 0) ;
+		                self.owner_tax_ultid	:=  if (right.assessee_name_link_fein !='' and right.assessee_name !='',vLinkingIds_3.ultid, 0);																		
+																		
+																                 self.tax_property_prim_range := left.tax_property_address.prim_range;
                                  self.tax_property_predir := left.tax_property_address.predir;
                                  self.tax_property_prim_name := left.tax_property_address.prim_name;
                                  self.tax_property_addr_suffix := left.tax_property_address.addr_suffix;

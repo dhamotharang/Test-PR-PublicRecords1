@@ -3,9 +3,9 @@
 export SpryInput(string filedate) := function
 
 	versionnum							 :=filedate;
-	sourceDIR								 :='/hds_4/certegy/';
+	sourceDIR								 :='/data/hds_4/certegy/data/';
 	Target									 :='~thor_data400::in::certegy::dl';
-	sourceIP								 :=_Control.IPAddress.edata12;
+	sourceIP								 :=_Control.IPAddress.bctlpedata11;
 	filename								 :=versionnum[3..]+'_certextr.dat';
 	sourcepath1							 :=sourceDIR + versionnum + '/' + filename;
 	maxrecordsize						 :=371;
