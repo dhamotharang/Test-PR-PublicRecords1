@@ -286,8 +286,10 @@ insurance := Project(iid, transform(Royalty.Layouts.Royalty,
                   self.count_entity := left.count_entity_insurance,
 									self := left));
 
-royalties4us := if(test_data_enabled, DATASET([], Royalty.Layouts.Royalty), 
-	targus + insurance);	
+royalties4ustemp := if(test_data_enabled, DATASET([], Royalty.Layouts.Royalty), 
+	targus + insurance);
+	
+royalties4us := royalties4ustemp(royalty_type_code != 0);
 	
 
 // Deltabase_Log

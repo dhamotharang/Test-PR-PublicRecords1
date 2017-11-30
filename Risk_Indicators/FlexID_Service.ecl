@@ -332,8 +332,10 @@ export FlexID_Service := MACRO
                   self.count_entity := left.count_entity_insurance,
 									self := left));
 
-	royalties4us := if(test_data_enabled, DATASET([], Royalty.Layouts.Royalty), 
-	targus + insurance);	
+royalties4ustemp := if(test_data_enabled, DATASET([], Royalty.Layouts.Royalty), 
+	targus + insurance);
+	
+royalties4us := royalties4ustemp(royalty_type_code != 0);
 	
 	iesp.flexid.t_FlexIDResponse intoOut(iid le, iesp.flexid.t_FlexIdRequest ri) := TRANSFORM
 		

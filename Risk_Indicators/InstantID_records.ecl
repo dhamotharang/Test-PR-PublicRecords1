@@ -651,18 +651,18 @@ END;
 
 ret_temp2 := UNGROUP(PROJECT(ret, format_out(LEFT)));
 
-ret_royalty := project(ret_temp2, transform(Risk_Indicators.Layout_InstantID_NuGenPlus,
-																										self.royalty_type_code_targus := targus[1].royalty_type_code,
+ret_royalty := project(ret_temp2, transform(Risk_Indicators.Layout_InstandID_NuGen,
+																																																				self.royalty_type_code_targus := targus[1].royalty_type_code,
                                                     self.royalty_type_code_insurance := insurance[1].royalty_type_code,
                                                     self.royalty_type_targus := targus[1].royalty_type,
                                                     self.royalty_type_insurance := insurance[1].royalty_type,
-																										self.royalty_count_targus := targus[1].royalty_count,
+																																																			 self.royalty_count_targus := targus[1].royalty_count,
                                                     self.royalty_count_insurance := insurance[1].royalty_count,
-																										self.non_royalty_count_targus := targus[1].non_royalty_count,
+																																																				self.non_royalty_count_targus := targus[1].non_royalty_count,
                                                     self.non_royalty_count_insurance := insurance[1].non_royalty_count,
-																										self.count_entity_targus := targus[1].count_entity,
+																																																				self.count_entity_targus := targus[1].count_entity,
                                                     self.count_entity_insurance := insurance[1].count_entity,
-																										self := left));
+																									                           self := left));
 
 //for Emerging Identities, return standardized county name
 ret_temp := join(ret_royalty, census_data.Key_Fips2County, 
