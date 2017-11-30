@@ -2498,6 +2498,7 @@ end;
 																										 self.i_zip := search.Address.Zip5,
 																										 self.i_dl := search.DriverLicenseNumber,
 																										 self.i_dl_state := search.DriverLicenseState,
+																										 self.i_attributes_name := option.AttributesVersionRequest,
 																										 self.i_model_name_1 := left.Result.Models[1].Name,
 																										 self.o_score_1 := (Integer)left.Result.Models[1].Scores[1].Value,
 																										 self.o_reason_1_1 := left.Result.Models[1].Scores[1].WarningCodeIndicators[1].WarningCode,

@@ -71,6 +71,7 @@ Layout_Eqfx_FraudFlags_Plus roll_fraudFlags(Layout_Eqfx_FraudFlags_Plus le, Layo
 																																												 min(le.factact_curr_fraud_alert_fseen, ri.factact_curr_fraud_alert_fseen));
 	self.factact_curr_alert_code 				:= map(le.factact_curr_alert_code = ''					=> ri.factact_curr_alert_code,
 																						 ri.factact_curr_alert_code = ''					=> le.factact_curr_alert_code,
+																						 le.factact_curr_alert_code in ['W','Q']	=> le.factact_curr_alert_code, //'W' and 'Q' indicate both active duty and fraud alert so don't change to an alert code that indicates only one or the other even if it is more recent ('N','V','X') 
 																						 ri.date_reported > le.date_reported			=> ri.factact_curr_alert_code,
 																																												 le.factact_curr_alert_code);
 	self.factact_hist_fraud_alert_ct 		:= le.factact_hist_fraud_alert_ct + if(~sameAlert or le.factact_hist_fraud_alert_ct = 0, ri.factact_hist_fraud_alert_ct, 0); //same alert - count as only one
@@ -88,7 +89,7 @@ fraudFlagsSorted2 := sort(fraudFlagsProjected, seq, did, -factact_code, date_rep
 fraudFlagsRolled2 := rollup(fraudFlagsSorted2, left.seq=right.seq and left.did=right.did, roll_fraudFlags(left,right));     
 
 risk_indicators.Layout_Boca_Shell addFraudFlags(risk_indicators.Layout_Boca_Shell le, fraudFlagsRolled2 ri) := TRANSFORM
-	noHit																								:= le.seq <> ri.seq;
+	noHit																								:= ri.DID = 0;
 	noDID																								:= le.DID = 0;
 	invalidHit																					:= ri.factact_code = '' and ri.date_reported = 0 and ri.dt_vendor_last_reported = 0;
 	SELF.Eqfx_FraudFlags.factact_curr_active_duty     	:= map(noDID															=> -1,
@@ -110,6 +111,7 @@ risk_indicators.Layout_Boca_Shell addFraudFlags(risk_indicators.Layout_Boca_Shel
 	SELF.Eqfx_FraudFlags.factact_curr_alert_code				:= map(noDID															=> '-1',
 																														 noHit															=> '-2',
 																														 invalidHit													=> '-3',
+																														 ri.factact_curr_alert_code = ''		=> '0', //return '0' instead of blank when we had a Fraud Flags key hit but it was not current
 																																																	 ri.factact_curr_alert_code);
 	SELF.Eqfx_FraudFlags.factact_hist_fraud_alert_ct		:= map(noDID															=> -1,
 																														 noHit															=> -2,

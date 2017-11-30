@@ -3,7 +3,7 @@ IMPORT ut, Std, RiskWise,Risk_Indicators;
 
 EXPORT RVS1706_0_0(GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) clam) := FUNCTION
 
-	MODEL_DEBUG := false;
+	MODEL_DEBUG := False;
 
 	#if(MODEL_DEBUG)
 	Layout_Debug := RECORD
@@ -1187,7 +1187,9 @@ upcase := stringlib.stringtouppercase;
 	prof_license_category            := le.professional_license.plcategory;
 	input_dob_match_level            := le.dobmatchlevel;
 	inferred_age                     := le.inferred_age;
-
+	rc_hrisksic      														  := (INTEGER)le.iid.hrisksic;
+	rc_ssndobflag     := le.iid.socsdobflag ;
+	rc_pwssndobflag		:= le.iid.pwsocsdobflag; 
 
 	/* ***********************************************************
 	 *                    Generated ECL                          *
@@ -15745,11 +15747,14 @@ deceased := map(
     rc_ssndod != 0                                                         => 1,
     contains_i(ver_sources, 'DE') > 0 or contains_i(ver_sources, 'DS') > 0 => 2,
                                                                               0);
+ov_ssnprior      := (rc_ssndobflag='1' or rc_pwssndobflag='1');
+ov_corrections   := (rc_hrisksic=2225);
 
 RVS1706_0 := map(
-    deceased > 0          => 200,
-    iv_rv5_unscorable = '1' => 222,
-                             min(590, if(RVS1706_0_1 = NULL, -NULL, RVS1706_0_1)));
+    deceased > 0          												=> 200,
+    iv_rv5_unscorable = '1' 										=> 222,
+				ov_ssnprior or ov_corrections				 => min(590, RVS1706_0_1),
+																																									RVS1706_0_1);
 
 l77_addrs_move_traj_index := if(iv_a46_l77_addrs_move_traj_index = 1 and (StringLib.StringToUpperCase(trim(rc_dwelltype, LEFT, RIGHT)) = 'A' or StringLib.StringToUpperCase(trim(out_addr_type, LEFT, RIGHT)) = 'H' or not(out_unit_desig = '') or not(out_sec_range = '')), aa_rc008, NULL);
 

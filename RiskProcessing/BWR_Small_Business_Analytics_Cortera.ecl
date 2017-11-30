@@ -354,7 +354,7 @@ layout_flat_v2 := RECORD
 		UNSIGNED6 OrgID;
 		UNSIGNED6 UltID;
 		#IF(includeLN)
-		LNSmallBusiness.BIP_Layouts.Version2Attributes;
+		LNSmallBusiness.BIP_Layouts.Version2Attributes - SourceIndex;
 		#END
 		#IF(IncludeSBFE)
 		LNSmallBusiness.BIP_Layouts.SBFEAttributes;			
@@ -777,7 +777,7 @@ layout_flat_v2 flatten_v2(layout_soap le, SmallBusinessAnalyticsoutput ri) := TR
 	SELF.AssociateCurrCountWithProp := getValue(V2AttributeResults, 'AssociateCurrCountWithProp');
 	SELF.AssociateCurrBusinessesTotal := getValue(V2AttributeResults, 'AssociateCurrBusinessesTotal');
 	SELF.AssociateCurrSOSCount  := getValue(V2AttributeResults, 'AssociateCurrSOSCount ');
-	SELF.SourceIndex := getValue(V2AttributeResults, 'SourceIndex');
+	// SELF.SourceIndex := getValue(V2AttributeResults, 'SourceIndex');
 	#END
 	
   #IF(IncludeSBFE)

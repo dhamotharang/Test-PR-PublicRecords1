@@ -4141,7 +4141,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 		boundedPropertyCount := IF((INTEGER)le.Asset_Information.AssetPropertyAssessedTotal > 0, (STRING)MAX((INTEGER)le.Asset_Information.AssetPropertyCount, 1), le.Asset_Information.AssetPropertyCount); // Make sure we have a property count of at least 1 if we have assessed values
 		SELF.Asset_Information.AssetPropertyCount := calculateValueFor.checkTrueBiz(boundedPropertyCount, VerInputIDTruebiz);
-		AssetPropertyAssessedTotal := IF((INTEGER)boundedPropertyCount > 0, le.Asset_Information.AssetPropertyAssessedTotal, '-1'); // Return -1 for the assessed total if there are no properties to count
+		AssetPropertyAssessedTotal := calculateValueFor._AssetPropertyAssessedTotal(boundedPropertyCount, le.Asset_Information.AssetPropertyAssessedTotal);
 		SELF.Asset_Information.AssetPropertyAssessedTotal := calculateValueFor.checkTrueBiz(AssetPropertyAssessedTotal, VerInputIDTruebiz);
 		SELF.Asset_Information.PropertyAssessedValueList := IF((INTEGER)boundedPropertyCount > 0, le.Asset_Information.PropertyAssessedValueList, ''); // Return a blank list if there are no properties to count
 		SELF.Asset_Information.AssetPropertyStateCount := calculateValueFor.checkTrueBiz(le.Asset_Information.AssetPropertyStateCount, VerInputIDTruebiz);
@@ -4154,7 +4154,7 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 
 		boundedCurrentPropertyCount := IF((INTEGER)le.Asset_Information.AssetCurrentPropertyAssessedTotal > 0, (STRING)MAX((INTEGER)le.Asset_Information.AssetCurrentPropertyCount, 1), le.Asset_Information.AssetCurrentPropertyCount); // Make sure we have a property count of at least 1 if we have assessed values
 		SELF.Asset_Information.AssetCurrentPropertyCount := calculateValueFor.checkTrueBiz(boundedCurrentPropertyCount, VerInputIDTruebiz);
-		AssetCurrentPropertyAssessedTotal := IF((INTEGER)boundedCurrentPropertyCount > 0, le.Asset_Information.AssetCurrentPropertyAssessedTotal, '-1'); // Return -1 for the assessed total if there are no properties to count
+		AssetCurrentPropertyAssessedTotal := IF((INTEGER)boundedCurrentPropertyCount > 0, le.Asset_Information.AssetCurrentPropertyAssessedTotal, '0'); // Return -1 for the assessed total if there are no properties to count
 		SELF.Asset_Information.AssetCurrentPropertyAssessedTotal := calculateValueFor.checkTrueBiz(AssetCurrentPropertyAssessedTotal, VerInputIDTruebiz);
 		SELF.Asset_Information.AssetCurrentPropertyStateCount := calculateValueFor.checkTrueBiz(le.Asset_Information.AssetCurrentPropertyStateCount, VerInputIDTruebiz);
 		SELF.Asset_Information.AssetCurrentPropertyLotSizeTotal := calculateValueFor.checkTrueBiz(le.Asset_Information.AssetCurrentPropertyLotSizeTotal, VerInputIDTruebiz);
@@ -4397,9 +4397,8 @@ EXPORT Business_Shell_Function(DATASET(Business_Risk_BIP.Layouts.Input) InputOri
 																							 InputPhoneProblems = '1'						=> '1',
 																																										 le.Verification.PhoneDisconnected);
 		SELF.Input_Characteristics.InputAddrBusinessOwned := IF(le.Input.InputCheckBusAddr = '0', '-1', le.Input_Characteristics.InputAddrBusinessOwned);
-		SELF.Input_Characteristics.InputPhoneEntityCount := MAP(le.Input.InputCheckBusPhone = '1' => (STRING)MAX((INTEGER)le.Input_Characteristics.InputPhoneEntityCount, 0), 
-                                                            Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND le.Input.InputCheckBusPhone = '0' => '-1',
-                                                            le.Input_Characteristics.InputPhoneEntityCount); // If phone is populated make sure this is at least a 1
+    SELF.Input_Characteristics.InputPhoneEntityCount := calculateValueFor._InputPhoneEntityCount(le.Input_Characteristics.InputPhoneEntityCount, le.Input.InputCheckBusPhone, le.Clean_Input.Phone10);
+
 		BusinessAddrCount := (STRING)MAX((INTEGER)le.Business_Characteristics.BusinessAddrCount, 0); // We have BIP ID's, make sure the count is at least 0
 		SELF.Business_Characteristics.BusinessAddrCount := calculateValueFor.checkTrueBiz(BusinessAddrCount, VerInputIDTruebiz);
 		BusinessActivity36Month := 											MAP((INTEGER)MaxDateLastSeen <= 0 															=> '-1', 

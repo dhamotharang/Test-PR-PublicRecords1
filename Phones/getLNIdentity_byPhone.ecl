@@ -51,9 +51,9 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 																										SELF.Contact_lname:=LEFT.lname,
 																										SELF.Contact_did:=LEFT.did,
 																										SELF:=LEFT,SELF:=[]));
-	//get raw data	- limit to requested phones only																							
-	dsRawData := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(dsBusinesPhones).raw_data;	
-	dsBips := DEDUP(dsRawData(company_phone IN SET(dsPhones,phone)),all);
+	//get bip data		 - Gong.key_History_LinkIDs	may be added later - exploring the value.																		
+	dsBipData2 := BIPV2.IDfunctions.fn_IndexedSearchForXLinkIDs(dsBusinesPhones).data2_;	
+	dsBips := DEDUP(dsBipData2(source<>'D'),all); //filter out Dunn's records, should only be used for linking
 
 	layout_rawRec:=RECORDOF(dsBips);
 
@@ -71,10 +71,10 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 		SELF.fname := IF(l.fname='',r.fname,l.fname);
 		SELF.mname := IF(l.mname='',r.mname,l.mname);
 		SELF.lname := IF(l.lname='',r.lname,l.lname);
+		SELF.company_phone := IF(l.company_phone='',r.company_phone,l.company_phone);
 		SELF := l;
 	END;
-	dsRolledRaw := ROLLUP(SORT(dsBips,company_phone,ultid,orgid,seleid,proxid,powid,lname,fname,company_status_derived!='ACTIVE',-dt_last_seen,dt_first_seen),
-											LEFT.company_phone=RIGHT.company_phone AND
+	dsRolledRaw := ROLLUP(SORT(dsBips,ultid,orgid,seleid,proxid,powid,lname,fname,company_status_derived!='ACTIVE',-dt_last_seen,dt_first_seen),
 											LEFT.ultid=RIGHT.ultid AND
 											LEFT.orgid=RIGHT.orgid AND
 											LEFT.seleid=RIGHT.seleid AND
@@ -128,8 +128,8 @@ EXPORT GetLNIdentity_byPhone(DATASET(Phones.Layouts.PhoneIdentity)  dsPhones,
 		// OUTPUT(dsPhonesPlusRequest,NAMED('dsPhonesPlusRequest'));	
 		OUTPUT(dsPhonesPlus,NAMED('dsPhonesPlus'));	
 		OUTPUT(businessRequest,NAMED('businessRequest'));	
-		// OUTPUT(dsBusinesPhones,NAMED('dsBusinesPhones'));		
-		OUTPUT(dsRawData,NAMED('dsRawData'));						
+		// OUTPUT(dsBusinesPhones,NAMED('dsBusinesPhones'));			
+		OUTPUT(dsBipData2,NAMED('dsBipData2'));	
 		OUTPUT(dsBips,NAMED('dsBips'));		
 		OUTPUT(dsRolledRaw,NAMED('dsRolledRaw'),all);	
 		OUTPUT(dsBusinessInfo,NAMED('dsBusinessInfo'));	
