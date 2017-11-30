@@ -143,10 +143,14 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell, UNSIGNED BusS
  EXPORT STRING1 InputCheckAuthRep3Title := BusShell.Input.InputCheckAuthRep3Title;   
  EXPORT STRING1 InputCheckAuthRep3DL := BusShell.Input.InputCheckAuthRep3DL;
  EXPORT STRING1 InputCheckAuthRep3DLState := BusShell.Input.InputCheckAuthRep3DLState;
- EXPORT STRING2 VerificationBusInputName := BusShell.Verification.VerificationBusInputName;
- EXPORT STRING2 VerificationBusInputAddr := BusShell.Verification.VerificationBusInputAddr;
- EXPORT STRING2 VerificationBusInputPhone := BusShell.Verification.VerificationBusInputPhone;
- EXPORT STRING2 VerificationBusInputFEIN := BusShell.Verification.VerificationBusInputFEIN;
+ EXPORT STRING2 VerificationBusInputName := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, BusShell.Verification.VerificationBusInputName,
+				(STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.NameMatchSourceCount, -1, 1));
+ EXPORT STRING2 VerificationBusInputAddr := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, BusShell.Verification.VerificationBusInputAddr,
+				(STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.AddrVerificationSourceCount, -1, 1));
+ EXPORT STRING2 VerificationBusInputPhone := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, BusShell.Verification.VerificationBusInputPhone,
+				(STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.PhoneMatchSourceCountID, -1, 1));
+ EXPORT STRING2 VerificationBusInputFEIN := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, BusShell.Verification.VerificationBusInputFEIN,
+				(STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.FEINMatchSourceCount, -1, 1));
  EXPORT STRING2 VerificationBusInputIndustry := BusShell.Verification.VerificationBusInputIndustry;
  EXPORT STRING5 BusinessRecordTimeOldest := IF(BusShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, 
 				BusShell.Business_Activity.BusinessRecordTimeOldest, BusShell.Business_Activity.SourceBusinessRecordTimeOldestID);
@@ -324,28 +328,28 @@ EXPORT AttributesMaster (Business_Risk_BIP.Layouts.Shell BusShell, UNSIGNED BusS
 	EXPORT STRING10 OutBestBusPhone := BusShell.Best_Info.BestCompanyPhone;
 	EXPORT STRING1 LNHitInd :=(STRING)Business_Risk_BIP.Common.capNum((INTEGER)BusShell.Verification.SourceIndex, 0, 1);
   EXPORT STRING1 LNInputInd := IF(
-                    BusShell.Business_To_Person_Link.BusAddrPersonNameOverlap NOT IN SET_NO_HITS OR
-                    BusShell.Business_To_Person_Link.BusAddrPersonAltNameOverlap NOT IN SET_NO_HITS OR
-                    BusShell.Business_To_Person_Link.BusFEINPersonAddrOverlap NOT IN SET_NO_HITS OR
-                    BusShell.Business_To_Person_Link.BusFEINPersonPhoneOverlap NOT IN SET_NO_HITS OR
-                    BusShell.Business_To_Person_Link.BusFEINPersonOverlap NOT IN SET_NO_HITS OR
-                    BusShell.Input_Characteristics.InputAddrConsumerCount NOT IN SET_NO_HITS OR
-                    BusShell.Input_Characteristics.InputTINEntityCount NOT IN SET_NO_HITS OR
-                    BusShell.Input_Characteristics.InputPhoneEntityCount NOT IN SET_NO_HITS OR
-                    BusShell.Input_Characteristics.InputAddrTINCount NOT IN SET_NO_HITS OR
-                    BusShell.Input_Characteristics.InputAddrTypeNoID NOT IN SET_NO_HITS OR
-                    BusShell.Verification.InputAddrVacancyNoID NOT IN SET_NO_HITS OR
-                    BusShell.Input_Characteristics.InputAddrAssessedTotal NOT IN SET_NO_HITS OR
-                    BusShell.Input_Characteristics.InputAddrLotSize NOT IN SET_NO_HITS OR
-                    BusShell.Input_Characteristics.InputAddrSqFootage NOT IN SET_NO_HITS OR
-                    BusShell.Verification.VerificationBusInputPhoneAddr NOT IN SET_NO_HITS OR
-                    BusShell.Verification.phonedisconnected NOT IN SET_NO_HITS OR
-                    BusShell.Input_Characteristics.InputPhoneMobile NOT IN SET_NO_HITS OR
-                    BusShell.Verification.PhoneResidential NOT IN SET_NO_HITS OR
-                    BusShell.Input_Characteristics.InputPhoneProblems NOT IN SET_NO_HITS OR
-                    BusShell.Verification.FEINAddrNameMismatch NOT IN SET_NO_HITS OR
-                    BusShell.Verification.FEINOnFile NOT IN SET_NO_HITS OR
-                    BusShell.Verification.VerInputIDTruebiz NOT IN SET_NO_HITS, '1', '0');
+                    TRIM(BusShell.Business_To_Person_Link.BusAddrPersonNameOverlap) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Business_To_Person_Link.BusAddrPersonAltNameOverlap) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Business_To_Person_Link.BusFEINPersonAddrOverlap) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Business_To_Person_Link.BusFEINPersonPhoneOverlap) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Business_To_Person_Link.BusFEINPersonOverlap) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Input_Characteristics.InputAddrConsumerCount) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Input_Characteristics.InputTINEntityCount) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Input_Characteristics.InputPhoneEntityCount) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Input_Characteristics.InputAddrTINCount) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Input_Characteristics.InputAddrTypeNoID) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Verification.InputAddrVacancyNoID) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Input_Characteristics.InputAddrAssessedTotal) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Input_Characteristics.InputAddrLotSize) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Input_Characteristics.InputAddrSqFootage) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Verification.VerificationBusInputPhoneAddr) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Verification.phonedisconnected) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Input_Characteristics.InputPhoneMobile) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Verification.PhoneResidential) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Input_Characteristics.InputPhoneProblems) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Verification.FEINAddrNameMismatch) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Verification.FEINOnFile) NOT IN SET_NO_HITS OR
+                    TRIM(BusShell.Verification.VerInputIDTruebiz) NOT IN SET_NO_HITS, '1', '0');
   EXPORT STRING2 BusinessRecordUpdated12M := BusShell.Business_Activity.SourceBusinessRecordUpdated12MonthID;
   EXPORT STRING2 BusinessActivity03M := BusShell.Business_Activity.BusinessActivity03MonthID;
   EXPORT STRING2 BusinessActivity06M := BusShell.Business_Activity.BusinessActivity06MonthID;

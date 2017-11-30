@@ -212,7 +212,7 @@ EXPORT getMotorVehicles(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
       TRANSFORM( layout_Vehicles_slim,
         SELF.historyDateYYYYMMDD := 
           MAP( 
-            LEFT.historyDate IN [0,999999,99999999,999999999999] => (UNSIGNED4)(STD.System.Job.WUID()[2..9]),
+            LEFT.historyDate IN [0,999999,99999999,999999999999] => (UNSIGNED4)(((STRING)STD.Date.Today())[1..8]),
             LENGTH( (STRING)LEFT.historyDate ) >= 8 => (UNSIGNED4)(((STRING)(LEFT.historyDate))[1..8]),
             LENGTH( (STRING)LEFT.historyDate )  = 6 => (UNSIGNED4)((STRING)(LEFT.historyDate) + '01'),
             (UNSIGNED4)(((STRING)(LEFT.historyDate))[1..8])

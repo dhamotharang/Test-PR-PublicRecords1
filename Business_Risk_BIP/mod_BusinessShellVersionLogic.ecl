@@ -284,7 +284,15 @@ EXPORT mod_BusinessShellVersionLogic(Business_Risk_BIP.LIB_Business_Shell_LIBIN 
         COUNT(filings(FilingStatus = 1)), 
         COUNT(filings(FilingStatus IN [1,8])) 
       );
-  
 
-
+  EXPORT _AssetPropertyAssessedTotal(STRING boundedPropertyCount, STRING AssetPropertyAssessedTotal) := 
+    MAP((INTEGER)boundedPropertyCount > 0                                                                         => AssetPropertyAssessedTotal,
+        (INTEGER)boundedPropertyCount <= 0 AND busShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 => '0',
+                                                                                                                     '-1');
+                                                                                                                     
+  EXPORT _InputPhoneEntityCount(STRING InputPhoneEntityCount, STRING InputCheckBusPhone , STRING Phone10) := FUNCTION
+    InputPhoneEntityCount_1 := IF(InputCheckBusPhone = '1', (STRING)MAX((INTEGER)InputPhoneEntityCount, 0), InputPhoneEntityCount);
+    InputPhoneEntityCount_2 := IF(TRIM(Phone10) <> '', (STRING)MAX((INTEGER)InputPhoneEntityCount, 0), '-1');
+    RETURN  IF(busShellVersion < Business_Risk_BIP.Constants.BusShellVersion_v30, InputPhoneEntityCount_1, InputPhoneEntityCount_2);
+  END;  
 END;
