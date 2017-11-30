@@ -20,3 +20,4 @@
   STRING60   contact_email;
   UNSIGNED6  entered_proxid;
 END;
+

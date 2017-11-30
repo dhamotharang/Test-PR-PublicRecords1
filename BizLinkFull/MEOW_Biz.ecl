@@ -20,7 +20,7 @@ Process_Biz_Layouts.OutputLayout GetResults(Process_Biz_Layouts.InputLayout le) 
   In_bGetAllScores := le.bGetAllScores;
   SELF.keys_tried := IF (Key_BizHead_L_CNPNAME_ZIP.CanSearch(le),1 << 1,0) + IF (Key_BizHead_L_CNPNAME_ST.CanSearch(le),1 << 2,0) + IF (Key_BizHead_L_CNPNAME.CanSearch(le),1 << 3,0) + IF (Key_BizHead_L_CNPNAME_FUZZY.CanSearch(le),1 << 4,0) + IF (Key_BizHead_L_ADDRESS1.CanSearch(le),1 << 5,0) + IF (Key_BizHead_L_ADDRESS2.CanSearch(le),1 << 6,0) + IF (Key_BizHead_L_ADDRESS3.CanSearch(le),1 << 7,0) + IF (Key_BizHead_L_PHONE.CanSearch(le),1 << 8,0) + IF (Key_BizHead_L_FEIN.CanSearch(le),1 << 9,0) + IF (Key_BizHead_L_URL.CanSearch(le),1 << 10,0) + IF (Key_BizHead_L_CONTACT.CanSearch(le),1 << 11,0) + IF (Key_BizHead_L_CONTACT_SSN.CanSearch(le),1 << 12,0) + IF (Key_BizHead_L_EMAIL.CanSearch(le),1 << 13,0) + IF (Key_BizHead_L_SIC.CanSearch(le),1 << 14,0) + IF (Key_BizHead_L_SOURCE.CanSearch(le),1 << 15,0) + IF (Key_BizHead_L_CONTACT_DID.CanSearch(le),1 << 16,0);
   // fetchResults := TOPN(ROLLUP(
-  fetchResults := SORT(ROLLUP( // JA 20171109
+	fetchResults := SORT(ROLLUP( // JA 20171109
     MERGE(
     SORTED(Key_BizHead_L_CNPNAME_ZIP.ScoredproxidFetch(param_cnp_name := cnp_name_spec,param_zip := le.zip_cases,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_st := le.st,param_city := le.city,param_city_len := city_len,param_company_sic_code1 := le.company_sic_code1,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce),ultid,orgid,seleid,proxid)
     ,SORTED(IF((~BizLinkFull.Key_BizHead_L_CNPNAME_ZIP.CanSearch(le)),Key_BizHead_L_CNPNAME_ST.ScoredproxidFetch(param_cnp_name := cnp_name_spec,param_st := le.st,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_zip := le.zip_cases,param_city := le.city,param_city_len := city_len,param_company_sic_code1 := le.company_sic_code1,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce)),ultid,orgid,seleid,proxid)
@@ -41,8 +41,8 @@ Process_Biz_Layouts.OutputLayout GetResults(Process_Biz_Layouts.InputLayout le) 
     // , RIGHT.proxid > 0 AND LEFT.proxid = RIGHT.proxid AND LEFT.seleid = RIGHT.seleid AND LEFT.orgid = RIGHT.orgid AND LEFT.ultid = RIGHT.ultid, BizLinkFull.Process_Biz_Layouts.Combine_Scores(LEFT,RIGHT, In_disableForce))(proxid NOT IN ButNot),le.MaxIDs + 1,-Weight)(SALT37.DebugMode OR ~ForceFailed OR ButNot<>[]); // Warning - is a fetch to keys etc
     , RIGHT.proxid > 0 AND LEFT.proxid = RIGHT.proxid AND LEFT.seleid = RIGHT.seleid AND LEFT.orgid = RIGHT.orgid AND LEFT.ultid = RIGHT.ultid, BizLinkFull.Process_Biz_Layouts.Combine_Scores(LEFT,RIGHT, In_disableForce))(proxid NOT IN ButNot),-Weight)(SALT37.DebugMode OR ~ForceFailed OR ButNot<>[]); // Warning - is a fetch to keys etc // JA 20171109
   // SELF.Results := CHOOSEN(fetchResults, le.MaxIDs); 
-  // SELF.Results := fetchResults; // JA 20171109 can't do the + 1 trick here
-  SELF.Results := PROJECT(Process_Biz_Layouts.AdjustKeysUsedAndFailed(fetchResults), TRANSFORM(RECORDOF(LEFT), SELF.reference := le.UniqueID, SELF := LEFT));
+	// SELF.Results := fetchResults; // JA 20171109 can't do the + 1 trick here
+	SELF.Results := PROJECT(Process_Biz_Layouts.AdjustKeysUsedAndFailed(fetchResults), TRANSFORM(RECORDOF(LEFT), SELF.reference := le.UniqueID, SELF := LEFT));
   SELF.IsTruncated := COUNT(fetchResults) > le.MaxIDs;
     SELF.Results_seleid := IF(In_bGetAllScores,SORT( ROLLUP( SORT( SELF.Results,-seleid),LEFT.seleid=RIGHT.seleid,Process_Biz_Layouts.Combine_Scores(LEFT,RIGHT, In_disableForce)),-Weight,-(proxid=SELF.Results[1].proxid),-proxid));
     SELF.Results_orgid := IF(In_bGetAllScores,SORT( ROLLUP( SORT( SELF.Results_seleid,-orgid),LEFT.orgid=RIGHT.orgid,Process_Biz_Layouts.Combine_Scores(LEFT,RIGHT, In_disableForce)),-Weight,-(seleid=SELF.Results[1].seleid),-seleid));
@@ -232,7 +232,7 @@ EXPORT Raw_Results := IF(EXISTS(RR0),RR8);
     END;
     ScoredData := JOIN(RD,Inv,LEFT.UniqueId=RIGHT.UniqueId,score_fields(LEFT,RIGHT));
     Layout_Matched_Data prop_full(ScoredData le,ScoredData ri) := TRANSFORM
-      SELF.Has_FullMatch := ri.Has_FullMatch OR le.Has_FullMatch AND le.proxid=ri.proxid AND le.UniqueId=ri.UniqueId;
+  	  SELF.Has_FullMatch := ri.Has_FullMatch OR le.Has_FullMatch AND le.proxid=ri.proxid AND le.UniqueId=ri.UniqueId;
       SELF := ri;
     END;
     RETURN ITERATE( SORT( ScoredData,UniqueId,-Has_FullMatch ),prop_full(LEFT,RIGHT) );
@@ -242,33 +242,34 @@ EXPORT Raw_Results := IF(EXISTS(RR0),RR8);
   // Now narrow down to the required records - note this can be switched per UniqueId
   i1 := i(Has_FullMatch OR ~FullMatch_Required,~RecordsOnly OR Is_FullMatch OR ~FullMatch_Required AND Record_Score>0);
   W1 := IF ( i1.RecordsOnly,i1.Record_Score,i1.Weight );
-  
-  // JA 20171109
+	
+	// JA 20171109
   Data_0 := DEDUP(SORT(i1, UniqueId, -W1, proxid, -(Record_Score + Weight - W1)),WHOLE RECORD)(rcid > 0 OR KeysFailed <> 0);
-  Data_Cardinality0 := GROUP(TABLE(Data_0, {UniqueId, ProxId, max_weight := MAX(GROUP, Weight)}, UniqueId, ProxId), UniqueId); // GROUP will help reset counter for each UniqueId
-  Data_Cardinality := UNGROUP(PROJECT(SORT(Data_Cardinality0, -max_weight), 
-    TRANSFORM({RECORDOF(Data_Cardinality0), UNSIGNED ProxId_Counter},
-      SELF.ProxId_Counter := COUNTER;
-      SELF := LEFT;))); 
-  Data_1 := JOIN(Data_Cardinality, In, // Just getting MaxIDs
-    LEFT.UniqueId = RIGHT.UniqueID,
-    TRANSFORM({RECORDOF(LEFT), In.MaxIDs},
-      SELf.MaxIDs := RIGHT.MaxIDs;
-      SELF := LEFT;));
-  Data_2 := JOIN(Data_0, Data_1, // Adding MaxIDs and ProxId_Counter to Data_0
-    LEFT.UniqueId = RIGHT.UniqueID AND LEFT.ProxId = RIGHT.ProxId,
-    TRANSFORM({RECORDOF(LEFT), Data_1.ProxId_Counter, Data_1.MaxIDs},
-      SELF.ProxId_Counter := RIGHT.ProxId_Counter;
-      SELF.MaxIDs := RIGHT.MaxIDs;
-      SELF := LEFT;));
-  dTruncated := TABLE(Data_2(ProxID_counter > MaxIDs), {UniqueId}, UniqueId);
-  EXPORT Data_ := SORT(JOIN(Data_2, dTruncated, // This needs to be EXPORTED in actual code, will this maintain sort order of Data_0???
-    LEFT.UniqueId = RIGHT.UniqueId,
-    TRANSFORM({RECORDOF(LEFT), BOOLEAN Is_Truncated},
-      SELF.Is_Truncated := (RIGHT.UniqueId > 0); // IF UniqueId in dTruncated is present, THEN is_Trucated = TRUE, ELSE FALSE
-      SELF := LEFT;),
-    LEFT OUTER)(ProxID_counter <= MaxIDs), -Weight);
+	Data_Cardinality0 := GROUP(TABLE(Data_0, {UniqueId, ProxId, max_weight := MAX(GROUP, Weight)}, UniqueId, ProxId), UniqueId); // GROUP will help reset counter for each UniqueId
+	Data_Cardinality := UNGROUP(PROJECT(SORT(Data_Cardinality0, -max_weight), 
+		TRANSFORM({RECORDOF(Data_Cardinality0), UNSIGNED ProxId_Counter},
+			SELF.ProxId_Counter := COUNTER;
+			SELF := LEFT;)));	
+	Data_1 := JOIN(Data_Cardinality, In, // Just getting MaxIDs
+		LEFT.UniqueId = RIGHT.UniqueID,
+		TRANSFORM({RECORDOF(LEFT), In.MaxIDs},
+			SELf.MaxIDs := RIGHT.MaxIDs;
+			SELF := LEFT;));
+	Data_2 := JOIN(Data_0, Data_1, // Adding MaxIDs and ProxId_Counter to Data_0
+		LEFT.UniqueId = RIGHT.UniqueID AND LEFT.ProxId = RIGHT.ProxId,
+		TRANSFORM({RECORDOF(LEFT), Data_1.ProxId_Counter, Data_1.MaxIDs},
+			SELF.ProxId_Counter := RIGHT.ProxId_Counter;
+			SELF.MaxIDs := RIGHT.MaxIDs;
+			SELF := LEFT;));
+	dTruncated := TABLE(Data_2(ProxID_counter > MaxIDs), {UniqueId}, UniqueId);
+	EXPORT Data_ := SORT(JOIN(Data_2, dTruncated, // This needs to be EXPORTED in actual code, will this maintain sort order of Data_0???
+		LEFT.UniqueId = RIGHT.UniqueId,
+		TRANSFORM({RECORDOF(LEFT), BOOLEAN Is_Truncated},
+			SELF.Is_Truncated := (RIGHT.UniqueId > 0); // IF UniqueId in dTruncated is present, THEN is_Trucated = TRUE, ELSE FALSE
+			SELF := LEFT;),
+		LEFT OUTER)(ProxID_counter <= MaxIDs), -Weight);
 // End JA 20171109
+
   // Now create 'data bombs' suitable for a remote deep dive search
   // We might want to reduce the number of results 'cleverly' over time - for now slap it all in there
   Process_Biz_Layouts.InputLayout tr(Raw_Data le) := TRANSFORM
