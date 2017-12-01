@@ -1,4 +1,4 @@
-import BizLinkFull, BIPV2_Company_Names, ut, SALT28, BIPV2_Best, BIPV2_Suppression;
+﻿import BizLinkFull, BIPV2_Company_Names, ut, SALT28, BIPV2_Best, BIPV2_Suppression;
 import std.Str AS Str;
 import address;
 EXPORT IDfunctions := 
@@ -91,7 +91,7 @@ SHARED SALTInput2_:=PROJECT(SearchInputcnp,TRANSFORM({THISMODULE.Process_Biz_Lay
   SELF.org_flag       := IF(LEFT.HSort,'T','_');
   SELF.ult_flag       := IF(LEFT.HSort,'T','_');
   SELF.acctno         := LEFT.acctno;
-  SELF.leadthreshold  := 10;
+  SELF.disableForce   :=TRUE;
   SELF := [];
 ));
 EXPORT SALTInput2:=PROJECT(SALTInput2_,THISMODULE.Process_Biz_Layouts.InputLayout);
@@ -123,6 +123,7 @@ EXPORT RecordOut2 := outrec2;
 // output(Raw_Results2, named('Raw_Results2'));
 // output(raw_data, named('raw_data'));
 EXPORT Data2_ := Outfile2;
+
 EXPORT UnsuppressedData2_ := output_unsuppressed;
 // EXPORT Data2_:=Raw_Results2;
 EXPORT SeleMatch:=JOIN(SearchInput,Outfile2(rcid>0),LEFT.acctno=RIGHT.acctno AND (UNSIGNED)LEFT.inSeleID=RIGHT.rcid,TRANSFORM({STRING30 acctno;BOOLEAN valid_sele;},SELF.valid_sele:=((UNSIGNED)LEFT.InSeleID=0 OR (UNSIGNED)LEFT.InSeleID=RIGHT.seleid);SELF:=LEFT;),LEFT OUTER);
