@@ -66,9 +66,8 @@ boolean   ofac_Only := false;
 string50 DataRestriction := risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 unsigned3 history_date := 999999 		: stored('HistoryDateYYYYMM');
-boolean DisableDoNotMailFilter := false		:	stored('DisableDoNotMailFilter');
 
-unsigned1 dppa := if(~DisableDoNotMailFilter, 0, prep_dppa);
+unsigned1 dppa := prep_dppa;
 
 bsVersion := 41;
 
@@ -436,7 +435,7 @@ self := [];
 end;
 
 clam_attrib := project( clam, get_clam(LEFT) );
-output(clam_attrib,named('CDMResults'));
+output(clam_attrib,named('Results'));
 
 ENDMACRO;
 
