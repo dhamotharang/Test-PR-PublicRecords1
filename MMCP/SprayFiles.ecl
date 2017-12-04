@@ -1,6 +1,6 @@
-IMPORT _Control, tools;
+﻿IMPORT _Control, tools;
 
-EXPORT SprayFiles(STRING	pServerIP								= _Control.IPAddress.bctlpedata12,
+EXPORT SprayFiles(STRING	pServerIP								= _Control.IPAddress.bctlpedata10,
 	                STRING	pDirectory							= '/data/hds_4/MMCP/data',
 	                STRING	pFilenameLicenseStatus	= '4386*',
 	                STRING	pFilenameLicensee 			= '4385*',

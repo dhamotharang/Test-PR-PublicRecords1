@@ -1,10 +1,10 @@
-import Business_DOT_SALT_micro9,tools;
+﻿import Business_DOT_SALT_micro9,tools;
 EXPORT AggregateProxidElements(
 	 dataset(layout_DOT_Base)	pDataset
 ) :=
 function
 	dslim := project(pDataset, transform(
-	{pDataset.proxid,pDataset.company_name,pDataset.cnp_name
+	{pDataset.proxid,pDataset.dotid/*,pDataset.company_name*/,pDataset.cnp_name
   ,pDataset.cnp_number,pDataset.cnp_btype
 	,pDataset.prim_name,string address/*,string contact*/,pDataset.source,pDataset.active_duns_number,pDataset.hist_duns_number,pDataset.active_enterprise_number
   ,string1 company_foreign_domestic,string active_domestic_corp_key,string foreign_corp_key,string fein,pdataset.company_phone
@@ -18,13 +18,14 @@ function
 		self					:= left;	
 	));
 	
-	dpost := tools.mac_AggregateFieldsPerID(dslim,proxid,,false);
+	dpost := tools.mac_AggregateFieldsPerID(dslim,proxid,,false,pLimitChildDatasts := 100);
 	
-	dcountdotids := project(dpost,transform({recordof(left) - company_phones,unsigned4 cnt_phones}
+	dcountdotids := project(dpost,transform({unsigned6 proxid,unsigned6 cnt_dotids,recordof(left) - company_phones - dotids - proxid,unsigned4 cnt_phones}
 //    ,self.cnt_dotids    := count(left.dotids  )
 //    ,self.cnt_contacts  := count(left.contacts)
 //    ,self.cnt_srcvlids  := count(left.srcvlids)
     ,self.cnt_phones    := count(left.company_phones)
+    ,self.cnt_dotids    := count(left.dotids)
  //   ,self.cnt_company_names    := count(left.company_names)
     ,self := left
   ));

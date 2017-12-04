@@ -1,4 +1,4 @@
-IMPORT doxie, doxie_raw, iesp;//, AutoHeaderI, AutoStandardI;
+﻿IMPORT doxie, doxie_raw, iesp;//, AutoHeaderI, AutoStandardI;
 
 // Produces static counts (from header key)
 
@@ -132,7 +132,7 @@ EXPORT out_rec SourceCounts_records (dataset (doxie.layout_references) dids,
          if (param.include_sexualoffences and (src_row.so_cnt > 0),  dataset ([
              {'Sexual Offense', src_row.so_cnt, did_ref_prefix + 'SEXOFFENDER', 'Retrievable'},
              {'SO',            0,              did_ref_prefix + 'SEXOFFENDER', 'Section'}], iesp.share.t_SourceSection)) +
-				 if (param.include_students and (src_row.student_cnt > 0),  dataset ([
+									if (param.include_students and (src_row.student_cnt > 0),  dataset ([
              {'Student Locator', src_row.student_cnt, did_ref_prefix + 'STUDENT', 'Retrievable'},
              {'STUDENT',            0,         did_ref_prefix + 'STUDENT', 'Section'}], iesp.share.t_SourceSection)) +		 
          if (header_include and (src_row.ak_cnt > 0),             dataset ([
@@ -179,7 +179,7 @@ EXPORT out_rec SourceCounts_records (dataset (doxie.layout_references) dids,
          if (param.include_properties and (src_row.assessment2_cnt > 0) and (param.property_version = 2), dataset ([
              {'Tax Assessor Records', src_row.assessment2_cnt, did_ref_prefix + 'ASSESSMENT_V2','Retrievable'},
              {'ASSESSMENT_V2',        0,                       did_ref_prefix + 'ASSESSMENT_V2','Section'}], iesp.share.t_SourceSection)) +
-				 if (param.include_properties and (src_row.assessment2_cnt > 0) and (param.property_version = 2), dataset ([
+									if (param.include_properties and (src_row.assessment2_cnt > 0) and (param.property_version = 2), dataset ([
              {'Property Records', src_row.assessment2_cnt + src_row.deed2_cnt, did_ref_prefix + 'PROPERTY_V2','Retrievable'},
              {'PROPERTY_V2',        0,                       did_ref_prefix + 'PROPERTY_V2','Section'}], iesp.share.t_SourceSection)) +		 
          if (header_include and (src_row.util_cnt > 0), dataset ([
@@ -188,18 +188,15 @@ EXPORT out_rec SourceCounts_records (dataset (doxie.layout_references) dids,
          if (header_include and (src_row.statedeath_cnt > 0) /*and (param.statedeath_version = 1)*/, dataset ([
              {'State Death Records', src_row.statedeath_cnt, did_ref_prefix + 'STATEDEATH', 'Retrievable'},
              {'STATEDEATH',          0,                      did_ref_prefix + 'STATEDEATH', 'Section'}], iesp.share.t_SourceSection)) +
-        if (header_include and (src_row.targ_cnt > 0) /*and (param.targus_version = 1)*/, dataset ([
+									if (header_include and (src_row.targ_cnt > 0) /*and (param.targus_version = 1)*/, dataset ([
              {'Person Locator 4', src_row.targ_cnt, did_ref_prefix + 'TARG', 'Retrievable'},
              {'Person Locator 4', 0,                did_ref_prefix + 'TARG', 'Section'}], iesp.share.t_SourceSection)) +
-        if (header_include and (src_row.tn_cnt > 0), dataset ([
+									if (header_include and (src_row.tn_cnt > 0), dataset ([
              {'Person Locator 6', src_row.tn_cnt, did_ref_prefix + 'PL6', 'Retrievable'}], iesp.share.t_SourceSection)) +		
-        if (header_include and (src_row.quickheader_cnt > 0) , dataset ([
-             {'Person Locator 7', src_row.quickheader_cnt, did_ref_prefix + 'QH', 'Retrievable'},
-             {'Person Locator 7', 0,                did_ref_prefix + 'QH', 'Section'}], iesp.share.t_SourceSection)) +						 
-        if (header_include and (src_row.en_cnt > 0) /*and (param.en_version = 1)*/, dataset ([
+									if (header_include and (src_row.en_cnt > 0) /*and (param.en_version = 1)*/, dataset ([
              {'Person Locator 5', src_row.en_cnt, did_ref_prefix + 'PL5', 'Retrievable'}], iesp.share.t_SourceSection)) +
        
-			 if (header_include and (src_row.en_cnt > 0) /*and (param.en_version = 1)*/, dataset ([
+									if (header_include and (src_row.en_cnt > 0) /*and (param.en_version = 1)*/, dataset ([
              {'Person Locator 1', src_row.eq_cnt, did_ref_prefix + 'PL1', 'Retrievable'}], iesp.share.t_SourceSection));
 
 //  self.quickheader_cnt := count(dedup(SORT(L.quickheader_child, RECORD), record));

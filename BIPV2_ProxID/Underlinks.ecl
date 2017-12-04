@@ -1,6 +1,6 @@
-// This is a super-sloppy match which is then scored and graded.
+﻿// This is a super-sloppy match which is then scored and graded.
 // Designed to let you know where the underlinks are lurking
-IMPORT SALT30,ut,std;
+IMPORT SALT37,std;
 EXPORT Underlinks(DATASET(layout_DOT_Base) ih,UNSIGNED MatchThreshold = Config.MatchThreshold) := MODULE
 SHARED LowerMatchThreshold := MatchThreshold-6; // Consider up to Threshold - 6
 SHARED h := match_candidates(ih).candidates;
@@ -34,7 +34,7 @@ EXPORT ForceFails := TABLE(RRF,R);
   ds := RRF;
   R := RECORD
     ds;
-    SALT30.StrType Summary;
+    SALT37.StrType Summary;
   END;
   R tosummary(ds le) := TRANSFORM
     SELF := le;

@@ -1,4 +1,4 @@
-
+﻿
 //Use the same date for both parameters when there is no full file date
 export BWR_Transunion_Build (full_filedate = '', update_filedate = '') := MACRO
 
@@ -13,7 +13,7 @@ export BWR_Transunion_Build (full_filedate = '', update_filedate = '') := MACRO
 	#OPTION('multiplePersistInstances',FALSE);
   
 
-	import Transunion_PTrak;  
+	import Transunion_PTrak, Orbit3;  
 	
 	Proc_Spray_Update		:= Transunion_PTrak.Spray_Transunion_Update_Fixed (full_filedate, update_filedate)   
 							: 	success(OUTPUT('Transunion PTrak Base Files updated successfully.')), 

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ProdData" wuTimeout="300000">
 	<!-- Company SearchBy Fields --> 
 	<part name="CompanyName" type="xsd:string"/>
@@ -116,7 +116,7 @@
 /*--INFO-- Prod Data Service - This is the XML Service utilizing BIP linking*/
 
 #option('expandSelectCreateRow', true);
-IMPORT Address, BBB2, BIPV2, Business_Credit, Business_Credit_KEL, Business_Risk_BIP, Corp2, DCAV2, DNB_DMI, EBR, EBR_Services, FBNv2, Gateway, GovData, iesp, InfoUSA, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, NID, OSHAIR, Risk_Indicators, RiskWise, UCCV2, UCCv2_Services, UT, UtilFile;
+IMPORT Address, BBB2, BIPV2, BizLinkFull, Business_Credit, Business_Credit_KEL, Business_Risk_BIP, Corp2, DCAV2, DNB_DMI, EBR, EBR_Services, FBNv2, Gateway, GovData, iesp, InfoUSA, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, NID, OSHAIR, Risk_Indicators, RiskWise, UCCV2, UCCv2_Services, UT, UtilFile;
 
 EXPORT ProdData() := FUNCTION
 	/* ************************************************************************
@@ -500,9 +500,9 @@ EXPORT ProdData() := FUNCTION
 		SELF.Input_Echo := le; // Keep our original input
 		
 		// Company Name Fields
-		CompanyName := IF(le.CompanyName <> '', ut.CleanCompany(le.CompanyName), ut.CleanCompany(le.AltCompanyName)); // If the customer didn't pass in a company but passed in an alt company name use the alt as the company name
+		CompanyName := IF(le.CompanyName <> '', BizLinkFull.Fields.Make_cnp_name(le.CompanyName), BizLinkFull.Fields.Make_cnp_name(le.AltCompanyName)); // If the customer didn't pass in a company but passed in an alt company name use the alt as the company name
 		SELF.Clean_Input.CompanyName := CompanyName;
-		SELF.Clean_Input.AltCompanyName := IF(le.CompanyName <> '', ut.CleanCompany(le.AltCompanyName), ''); // Blank out the cleaned AltCompanyName if CompanyName wasn't populated, as we copied Alt into the Main CompanyName field on the previous line
+		SELF.Clean_Input.AltCompanyName := IF(le.CompanyName <> '', BizLinkFull.Fields.Make_cnp_name(le.AltCompanyName), ''); // Blank out the cleaned AltCompanyName if CompanyName wasn't populated, as we copied Alt into the Main CompanyName field on the previous line
 		// Company Address Fields
 		companyAddress := Risk_Indicators.MOD_AddressClean.street_address(le.StreetAddress1 + ' ' + le.StreetAddress2, le.Prim_Range, le.Predir, le.Prim_Name, le.Addr_Suffix, le.Postdir, le.Unit_Desig, le.Sec_Range);
 		companyCleanAddr := Risk_Indicators.MOD_AddressClean.clean_addr(companyAddress, le.City, le.State, le.Zip);											
@@ -885,8 +885,18 @@ EXPORT ProdData() := FUNCTION
 	// Add back our Seq numbers.
 	Business_Risk_BIP.Common.AppendSeq2(CorpFilings_raw, LinkIDsFound, CorpFilings_seq);
 
+ // Calculate the source code by state to restrict records for Marketing properly. We'll 
+ // borrow corp_src_type for the state source code.
+ CorpFilings_withSrcCode := 
+  PROJECT(
+    CorpFilings_seq,
+    TRANSFORM( RECORDOF(CorpFilings_seq),
+      SELF.corp_src_type := MDR.sourceTools.fCorpV2( LEFT.corp_key, LEFT.corp_state_origin ),
+      SELF := LEFT
+    ) );
+
 	// Filter out records after our history date.
-	CorpFilings_recs := Business_Risk_BIP.Common.FilterRecords(CorpFilings_seq, dt_last_seen, dt_vendor_first_reported, MDR.SourceTools.src_ID_Corporations, AllowedSourcesSet);
+	CorpFilings_recs := Business_Risk_BIP.Common.FilterRecords(CorpFilings_withSrcCode, dt_last_seen, dt_vendor_first_reported, corp_src_type, AllowedSourcesSet);
 	
 	
 	// ------------ Bankruptcy Build Date -------------

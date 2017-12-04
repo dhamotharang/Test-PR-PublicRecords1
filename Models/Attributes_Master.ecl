@@ -1,4 +1,4 @@
-import risk_indicators, ut, mdr, easi, riskwise, aml, riskview;
+﻿import risk_indicators, ut, mdr, easi, riskwise, aml, riskview;
 
 blankEasi := row( [], EASI.Layout_Easi_Census );
 blankBTST := row( [], Risk_Indicators.Layout_BocaShell_BtSt_Out );
@@ -752,6 +752,7 @@ export	string2	RecentMoveEconTrajectoryIndex	:= convertTrajectory_to_index(Recen
 		 
 export	string1	EducationAttendedCollege	:= 	map(clam.student.file_type='H' => '1', 
 													clam.student.file_type='C' => '1',
+													clam.student.file_type='O' => '1',
 													clam.student.file_type='M' and (clam.student.college_code<>'' or clam.student.college_type<>'' or
 																												clam.student.college_name<>'') => '1',
 													'0');
@@ -2237,6 +2238,7 @@ export string2 SourceVoterRegistration := map(not clam.truedid => '-1',
 export string2 EducationAttendance := map(not clam.truedid => '-1',
 													clam.student.file_type='H' => '1', 
 													clam.student.file_type='C' => '1',
+													clam.student.file_type='O' => '1',
 													clam.student.file_type='M' and 
 														(clam.student.college_code<>'' or clam.student.college_tier<>'' or clam.student.college_major<>'') => '1',
 													clam.student.file_type='' and 

@@ -8,7 +8,7 @@ EXPORT Key_BH_Linking_Ids := MODULE
 	
 	shared infile := PRTE2_BIPV2_BusHeader.File_DS_CLEAN;
   shared Infile_hidden:=join(PRTE2_BIPV2_BusHeader.Files().base.Linking.built,infile, left.rcid=right.rcid, 
-					transform({BIPV2.CommonBase.DS_BASE},
+					transform({PRTE2_BIPV2_BusHeader.CommonBase.DS_BUILT},
 					           self:=left), left only,hash); //Add hash because RHS skewed, based on distribution of LHS partition points
 	
 	shared infile_rec := record

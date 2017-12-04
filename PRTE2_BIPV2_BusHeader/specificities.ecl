@@ -760,7 +760,8 @@ EXPORT isContact_max := MAX(isContact_values_persisted,field_specificity);
 SALT33.MAC_Field_Specificity(isContact_values_persisted,isContact,isContact_nulls,ol) // Compute column level specificity
 EXPORT isContact_specificity := ol;
 SALT33.MAC_Field_Nulls(contact_did_values_persisted,BizLinkFull.Layout_Specificities.contact_did_ChildRec,nv) // Use automated NULL spotting
-EXPORT contact_did_nulls := nv;
+//EXPORT contact_did_nulls := nv;
+EXPORT contact_did_nulls := dataset([],recordof(nv));
 SALT33.MAC_Field_Bfoul(contact_did_deduped,contact_did,proxid,contact_did_nulls,ClusterSizes,false,false,bf) // Compute the chances of a field having 2 values for one entity
 EXPORT contact_did_switch := bf;
 EXPORT contact_did_max := MAX(contact_did_values_persisted,field_specificity);

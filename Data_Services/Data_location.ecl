@@ -15,10 +15,11 @@ SetDali := [
 
 export Prefix(string serviceName) := function
 	return	trim(case (trim(servicename),
-	              'person_slimsorts' 	=> map(ThorLib.Group() = 'thor400_44_eclcc' => '~thor400_44::'
+	              'person_slimsorts' 	=> map(ThorLib.Group() = 'thor400_44' => '~thor400_44::'
 																					, ''),	
 								'person_xADL2'     	=> '',
 								'LAB_xLink' 				=> map(ThorLib.Group() = 'thor400_44' => '~thor400_44::'
+                                          ,ThorLib.Group() = 'thor400_60' => '~thor400_60::'
 																					,_Control.ThisEnvironment.ThisDaliIp in SetDali  => foreign_prod+'thor400_60::'
 																					, ''),	
 								'Vina'							=> map(_Control.ThisEnvironment.ThisDaliIp in SetDali  => foreign_prod

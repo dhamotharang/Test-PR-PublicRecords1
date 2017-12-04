@@ -19,16 +19,18 @@ ln_propertyv2_deed_base := DATASET('~PRTE::BASE::ln_propertyv2::deed', PRTE2_LNP
 ln_propertyv2_deed := Project(ln_propertyv2_deed_base(cust_name!=''), PRTE2_LNProperty.layouts.deed_mortgage_common_model_base_out);
 
 PRTE2_LNProperty.Layouts.Layout_Norm_Search 	tNormalized(ln_propertyv2_deed L, INTEGER cnt) :=	TRANSFORM
-self.name := choose(cnt, L.name1, L.name1, L.name1, L.name1, L.name2,L.name2,L.name2,L.name2);
+
+self.name := choose(cnt, L.name1, L.name1, L.seller1, L.seller1, L.name2,L.name2,L.seller2,L.seller2);
+
 self.source_code:=	choose(cnt,'OO','OP','SS','SP','OO','OP','SS','SP');
 
 self.prim_range := choose(cnt, L.deed_mail_prim_range, L.deed_property_prim_range,L.deed_seller_prim_range,L.deed_property_prim_range,
                                L.deed_mail_prim_range, L.deed_property_prim_range,L.deed_seller_prim_range,L.deed_property_prim_range);
     
-self.predir := choose(cnt, L.deed_mail_predir, L.deed_property_predir,L.deed_seller_predir,L.deed_property_predir,
+self.predir := choose(cnt, L.deed_mail_predir, L.deed_property_predir, L.deed_seller_predir, L.deed_property_predir,
                            L.deed_mail_predir, L.deed_property_predir,L.deed_seller_predir,L.deed_property_predir);		
 
-self.prim_name := choose(cnt, L.deed_mail_prim_name, L.deed_property_prim_name,L.deed_seller_prim_name,L.deed_property_prim_name,
+self.prim_name := choose(cnt, L.deed_mail_prim_name, L.deed_property_prim_name, L.deed_seller_prim_name,L.deed_property_prim_name,
                               L.deed_mail_prim_name, L.deed_property_prim_name,L.deed_seller_prim_name,L.deed_property_prim_name);
 
 self.suffix := choose(cnt, L.deed_mail_addr_suffix, L.deed_property_addr_suffix,L.deed_seller_addr_suffix,L.deed_property_addr_suffix,
@@ -101,18 +103,42 @@ self.geo_match := choose(cnt, L.deed_mail_geo_match, L.deed_property_geo_match, 
 self.err_stat := choose(cnt, L.deed_mail_err_stat, L.deed_property_err_stat, L.deed_seller_err_stat, L.deed_property_err_stat,
                              L.deed_mail_err_stat, L.deed_property_err_stat, L.deed_seller_err_stat, L.deed_property_err_stat);
 
-self.app_SSN := choose(cnt,L.name1_link_ssn, L.name1_link_ssn,L.name1_link_ssn,L.name1_link_ssn,
-                           L.name2_link_ssn, L.name2_link_ssn,L.name2_link_ssn,L.name2_link_ssn);
+self.app_SSN := choose(cnt,L.name1_link_ssn, L.name1_link_ssn,L.seller1_link_ssn,L.seller1_link_ssn,
+                           L.name2_link_ssn, L.name2_link_ssn,L.seller2_link_ssn,L.seller2_link_ssn);
 													 
-self.app_DOB := choose(cnt,L.name1_link_dob, L.name1_link_dob,L.name1_link_dob,L.name1_link_dob,
-                           L.name2_link_dob, L.name2_link_dob,L.name2_link_dob,L.name2_link_dob);
+self.app_DOB := choose(cnt,L.name1_link_dob, L.name1_link_dob,L.seller1_link_dob,L.seller1_link_dob,
+                           L.name2_link_dob, L.name2_link_dob,L.seller2_link_dob,L.seller2_link_dob);
+													
+self.app_tax_id := choose(cnt,L.name1_link_fein, L.name1_link_fein,L.seller1_link_fein,L.seller1_link_fein,
+                           L.name2_link_fein, L.name2_link_fein,L.seller2_link_fein,L.seller2_link_fein);
+													 
+self.link_inc_date := choose(cnt,L.name1_link_inc_date, L.name1_link_inc_date,L.seller1_link_inc_date,L.seller1_link_inc_date,
+                           L.name2_link_inc_date, L.name2_link_inc_date,L.seller2_link_inc_date,L.seller2_link_inc_date);
 
-self.nameasis := choose(cnt,L.name1,L.name1,L.name1, L.name1,
-                            L.name2,L.name2,L.name2,L.name2);
+self.bdid := choose(cnt,L.owner_bdid, L.owner_bdid,L.seller_bdid,L.seller_bdid,
+                           L.owner_bdid, L.owner_bdid,L.seller_bdid,L.seller_bdid);
+
+self.powid := choose(cnt,L.owner_powid, L.owner_powid,L.seller_powid,L.seller_powid,
+                           L.owner_powid, L.owner_powid,L.seller_powid,L.seller_powid);
+													 
+self.proxid := choose(cnt,L.owner_proxid, L.owner_proxid,L.seller_proxid,L.seller_proxid,
+                           L.owner_proxid, L.owner_proxid,L.seller_proxid,L.seller_proxid);
+													 
+self.seleid := choose(cnt,L.owner_seleid, L.owner_seleid,L.seller_seleid,L.seller_seleid,
+                           L.owner_seleid, L.owner_seleid,L.seller_seleid,L.seller_seleid);
+
+self.orgid := choose(cnt,L.owner_orgid, L.owner_orgid,L.seller_orgid,L.seller_orgid,
+                           L.owner_orgid, L.owner_orgid,L.seller_orgid,L.seller_orgid);
+		
+self.ultid := choose(cnt,L.owner_ultid, L.owner_ultid,L.seller_ultid,L.seller_ultid,
+                           L.owner_ultid, L.owner_ultid,L.seller_ultid,L.seller_ultid);
+													 
+self.nameasis := choose(cnt,L.name1,L.name1,L.seller1, L.seller1,
+                            L.name2,L.name2,L.seller2,L.seller2);
+
 self.which_orig := choose(cnt,'1','1','1','1','2','2','2','2');
 self.phone_number := L.phone_number;
 self.persistent_record_id := 0;
-self.app_tax_id :=L.Link_FEIN;
 
 self.dt_first_seen            			:=	(unsigned3)filedate[1..6];
 self.dt_last_seen           		 		:=	(unsigned3)filedate[1..6];
@@ -124,12 +150,6 @@ self.ln_fares_id            			  :=  L.ln_fares_id;
 self.process_date                :=  filedate;
 self.vendor_source_flag :=L.vendor_Source_flag;
 self.cust_name :=L.cust_name;
-self.link_inc_date :=L.link_inc_date;
-self.powid:=0;
-self.proxid	:= 0;
-self.seleid := 0;
-self.orgid	:= 0;
-self.ultid	:= 0;
 
 END;
 
@@ -142,39 +162,81 @@ self.name := choose(cnt, L.assessee_name, L.assessee_name, L.second_assessee_nam
 self.source_code:=	choose(cnt,'OO','OP','OO','OP');
 
 self.prim_range := choose(cnt, L.tax_mail_prim_range, L.tax_property_prim_range,L.tax_mail_prim_range,L.tax_property_prim_range);
+
 self.predir := choose(cnt, L.tax_mail_predir,L.tax_property_predir,L.tax_mail_predir,L.tax_property_predir);
+
 self.prim_name := choose(cnt,L.tax_mail_prim_name,L.tax_property_prim_name,L.tax_mail_prim_name,L.tax_property_prim_name);
+
 self.suffix := choose(cnt,L.tax_mail_addr_suffix,L.tax_property_addr_suffix,L.tax_mail_addr_suffix, L.tax_property_addr_suffix);
+
 self.postdir := choose(cnt,L.tax_mail_postdir,L.tax_property_postdir,L.tax_mail_postdir, L.tax_property_postdir);
+
 self.unit_desig := choose(cnt,L.tax_mail_unit_desig,L.tax_property_unit_desig,L.tax_mail_unit_desig,L.tax_property_unit_desig);
+
 self.sec_range := choose(cnt,L.tax_mail_sec_range,L.tax_property_sec_range,L.tax_mail_sec_range,L.tax_property_sec_range);
+
 self.p_city_name := choose(cnt,L.tax_mail_p_city_name,L.tax_property_p_city_name,L.tax_mail_p_city_name,L.tax_property_p_city_name);
+
 self.v_city_name := choose(cnt,L.tax_mail_v_city_name,L.tax_property_v_city_name,L.tax_mail_v_city_name,L.tax_property_v_city_name);
+
 self.st := choose(cnt,L.tax_mail_state,L.tax_property_state,L.tax_mail_state,L.tax_property_state);
+
 self.zip := choose(cnt,L.tax_mail_zip5,L.tax_property_zip5,L.tax_mail_zip5,L.tax_property_zip5);
+
 self.zip4 := choose(cnt,L.tax_mail_zip4,L.tax_property_zip4,L.tax_mail_zip4,L.tax_property_zip4);
+
 self.cart := choose(cnt,L.tax_mail_cart,L.tax_property_cart,L.tax_mail_cart,L.tax_property_cart);
+
 self.cr_sort_sz := choose(cnt,L.tax_mail_cr_sort_sz,L.tax_property_cr_sort_sz,L.tax_mail_cr_sort_sz,L.tax_property_cr_sort_sz);
+
 self.lot := choose(cnt,L.tax_mail_lot,L.tax_property_lot,L.tax_mail_lot,L.tax_property_lot);
+
 self.lot_order := choose(cnt,L.tax_mail_lot_order,L.tax_property_lot_order,L.tax_mail_lot_order,L.tax_property_lot_order);
+
 self.dbpc := choose(cnt,L.tax_mail_dpbc,L.tax_property_dpbc,L.tax_mail_dpbc,L.tax_property_dpbc);
+
 self.chk_digit := choose(cnt,L.tax_mail_chk_digit,L.tax_property_chk_digit,L.tax_mail_chk_digit,L.tax_property_chk_digit);
+
 self.rec_type := choose(cnt,L.tax_mail_rec_type,L.tax_property_rec_type,L.tax_mail_rec_type,L.tax_property_rec_type);
+
 self.county := choose(cnt,L.tax_mail_fips_county,L.tax_property_fips_county,L.tax_mail_fips_county,L.tax_property_fips_county);
+
 self.geo_lat := choose(cnt,L.tax_mail_geo_lat,L.tax_property_geo_lat,L.tax_mail_geo_lat,L.tax_property_geo_lat);
+
 self.geo_long := choose(cnt,L.tax_mail_geo_long,L.tax_property_geo_long,L.tax_mail_geo_long,L.tax_property_geo_long);
+
 self.msa := choose(cnt,L.tax_mail_msa,L.tax_property_msa,L.tax_mail_msa,L.tax_property_msa);
+
 self.geo_blk := choose(cnt,L.tax_mail_geo_blk,L.tax_property_geo_blk,L.tax_mail_geo_blk,L.tax_property_geo_blk);
+
 self.geo_match := choose(cnt,L.tax_mail_geo_match,L.tax_property_geo_match,L.tax_mail_geo_match,L.tax_property_geo_blk);
+
 self.err_stat := choose(cnt,L.tax_mail_err_stat,L.tax_property_err_stat,L.tax_mail_err_stat,L.tax_property_err_stat);
-self.phone_number := L.assessee_phone_number;
+
 self.app_SSN := choose(cnt,L.assessee_name_link_ssn, L.assessee_name_link_ssn, L.second_assessee_name_link_ssn, L.second_assessee_name_link_ssn);
+
 self.app_DOB := choose(cnt,L.assessee_name_link_dob, L.assessee_name_link_dob, L.second_assessee_name_link_dob, L.second_assessee_name_link_dob);
 
-self.persistent_record_id := 0;
-self.app_tax_id :=L.Link_FEIN;
+self.app_tax_id := choose(cnt,L.assessee_name_link_fein, L.assessee_name_link_fein, L.second_assessee_name_link_fein, L.second_assessee_name_link_fein);
+
+self.link_inc_date := choose(cnt,L.assessee_name_link_inc_date, L.assessee_name_link_inc_date, L.second_assessee_name_link_inc_date, L.second_assessee_name_link_inc_date);
+
+self.bdid := choose(cnt,L.owner_tax_bdid, L.owner_tax_bdid, L.owner_tax_bdid,L.owner_tax_bdid);
+
+self.powid := choose(cnt,L.owner_tax_powid, L.owner_tax_powid, L.owner_tax_powid,L.owner_tax_powid);
+
+self.proxid := choose(cnt,L.owner_tax_proxid, L.owner_tax_proxid, L.owner_tax_proxid,L.owner_tax_proxid);
+
+self.seleid := choose(cnt,L.owner_tax_seleid, L.owner_tax_seleid, L.owner_tax_seleid,L.owner_tax_seleid);
+
+self.orgid := choose(cnt,L.owner_tax_orgid, L.owner_tax_orgid, L.owner_tax_orgid,L.owner_tax_orgid);
+
+self.ultid := choose(cnt,L.owner_tax_ultid, L.owner_tax_ultid, L.owner_tax_ultid,L.owner_tax_ultid);
 self.nameasis := choose(cnt,L.assessee_name,L.assessee_name,L.second_assessee_name,L.second_assessee_name);
-self.which_orig := choose(cnt,'1','1','2','2');
+self.which_orig := choose(cnt,'1','1','2','2');                          
+
+self.phone_number := L.assessee_phone_number;
+self.persistent_record_id := 0;
 self.dt_first_seen            			:=	(unsigned3)filedate[1..6];
 self.dt_last_seen           		 		:=	(unsigned3)filedate[1..6];
 self.dt_vendor_first_reported				:=	(unsigned3)filedate[1..6];
@@ -183,12 +245,6 @@ self.ln_fares_id            				 :=L.ln_fares_id;
 self.process_date :=             filedate;
 self.vendor_source_flag :=L.vendor_Source_flag;
 self.cust_name :=L.cust_name;
-self.link_inc_date :=L.link_inc_date;
-self.powid:=0;
-self.proxid	:= 0;
-self.seleid := 0;
-self.orgid	:= 0;
-self.ultid	:= 0;
 
 END;
 
@@ -221,22 +277,11 @@ NID.Mac_CleanFullNames(nameNormalizedAll, VerifyBusRecs, name,_nameorder := 'L',
 			 
 			  dBase := project(d_CleanFullNames,
 			                  transform(Prte2_LNProperty.Layouts.New_Search_Layout,
-												 self.bdid := if(Left.cname !='', prte2.fn_AppendFakeID.bdid(left.cname, left.prim_range, 
-									                     left.prim_name, left.v_city_name,left.st,left.zip, left.cust_name),0); 
-													
-												 vLinkingIds :=  prte2.fn_AppendFakeID.LinkIds(left.cname, left.app_tax_id, left.link_inc_date, 
- 									                          left.prim_range, left.prim_name, left.sec_range, left.v_city_name, left.st, left.zip, left.cust_name);
-												 
-											  self.powid	:=  if (left.cname !='',vLinkingIds.powid, 0);
-			                  self.proxid	:=  if (left.cname !='',vLinkingIds.proxid, 0) ;
-			                  self.seleid	:=  if (left.cname !='',vLinkingIds.seleid, 0) ;
-			                  self.orgid	:=   if (left.cname !='',vLinkingIds.orgid, 0) ;
-		                   self.ultid	:=   if (left.cname !='',vLinkingIds.ultid, 0);
 												         SELF.did :=     if (left.cname = '',prte2.fn_AppendFakeID.did(left.fname, left.lname, left.app_ssn, 
 												                            left.app_dob, left.cust_name),0);
 										  	        self	  		:= left));
 														
-     dbase2:=dedup(dbase,RECORD,ALL);// : persist('~prte::search::property');
+   dbase2:=dedup(dbase,RECORD,ALL);// : persist('~prte::search::property');
 		 
 		 df_search2:=project(df_search,transform(Layouts.New_Search_Layout,
 		             Self:=left;

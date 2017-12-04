@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 export Files := module;
 export File_In    		   := DATASET(SuperFile_List.Source_File, ExperianCred.Layouts.Layout_In, THOR);;
 
@@ -14,6 +14,6 @@ export File_Delete_In_Old24  := DATASET(SuperFile_List.Source_Delete_File_Old, E
 
 export File_Deceased_In			  := DATASET(SuperFile_List.Source_Deceased_File, ExperianCred.Layouts.Layout_Deceased_In, THOR);
 
-export File_History		   := DATASET(SuperFile_List.Source_File_Processed, ExperianCred.Layouts.Layout_In, THOR);
+export File_History		   := DATASET(SuperFile_List.Source_File_History, ExperianCred.Layouts.Layout_In, THOR);
 
 end;

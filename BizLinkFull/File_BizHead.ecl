@@ -1,4 +1,4 @@
-#OPTION('multiplePersistInstances',FALSE);
+﻿#OPTION('multiplePersistInstances',FALSE);
 IMPORT BIPV2;
 IMPORT BIPv2_HRCHY;
 IMPORT BIPV2_Files;

@@ -1,4 +1,4 @@
-import Risk_Indicators, STD;
+﻿import Risk_Indicators, STD;
 
 /*
 	*************************************************************************************
@@ -86,6 +86,9 @@ export Configuration := module
 	export IsNews				(string40 svcName) := FALSE;  // should never be used
 	export IsEquifaxSts (string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.EquifaxSts;
 	export IsThreatMetrix	(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.ThreatMetrix;
+	export IsAttIapQuery(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.AttIapQuery;		
+	export IsZumigoIdentity(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.ZumigoIdentity;		
+  export IsEquifaxAcctDecisioning(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.EquifaxAcctDecisioning;		
   // internal
 	export IsNeutralRoxie(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.NeutralRoxie;
 	export IsFCRARoxie(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.FCRARoxie;
@@ -95,8 +98,8 @@ export Configuration := module
 	export IsBridgerWLC(string40 svcName) := stringlib.StringToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.BridgerWLC;		
 	export IsPhoneMetadata(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.PhonesMetaData;		
 	export IsDeltaPersoncontext(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.delta_personcontext;	
-	export IsAttIapQuery(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.AttIapQuery;	
 	export IsConsumerCreditReport(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.ConsumerCreditReport;	
+
 	// ************************************************************************	
 	// Use functions below to retrieve gateway configuration properties.
 	//

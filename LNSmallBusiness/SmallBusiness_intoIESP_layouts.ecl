@@ -1,11 +1,12 @@
-IMPORT BusinessCredit_Services, iesp, LNSmallBusiness;
+﻿IMPORT BusinessCredit_Services, iesp, LNSmallBusiness;
 
 EXPORT SmallBusiness_intoIESP_layouts := 
   MODULE
   
     EXPORT fn_SmallBiz_intoESDL(DATASET(LNSmallBusiness.BIP_Layouts.IntermediateLayout) SBA_Results = DATASET([],LNSmallBusiness.BIP_Layouts.IntermediateLayout),
                                 DATASET(LNSmallBusiness.Layouts.AttributeGroupRec) AttributesRequested = DATASET([],LNSmallBusiness.Layouts.AttributeGroupRec),
-                                STRING20 LNSmallBizModelsType =  BusinessCredit_Services.Constants.SCORE_TYPE.NONE
+                                STRING20 LNSmallBizModelsType =  BusinessCredit_Services.Constants.SCORE_TYPE.NONE,
+																																SET OF STRING NewLNSmallBizModelsType =  BusinessCredit_Services.Constants.MODEL_NAME_SETS.NONE
                                ) := 
       FUNCTION
         /* *************************************************************************
@@ -2090,7 +2091,8 @@ EXPORT SmallBusiness_intoIESP_layouts :=
             SELF.Attributes := NameValuePairsSBFE;
           END;
         
-         set_ScoreTypeFilter := BusinessCredit_Services.Functions.fn_set_ScoreTypeFilter( LNSmallBizModelsType );
+         set_ScoreTypeFilter := BusinessCredit_Services.Functions.fn_set_ScoreTypeFilter( LNSmallBizModelsType ) + 
+														NewLNSmallBizModelsType;
 
          // Return only the models requested by the user, return empty dataset if none requested
          ds_modelsToReturn := 

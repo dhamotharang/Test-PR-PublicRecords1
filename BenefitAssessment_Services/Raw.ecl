@@ -1,4 +1,4 @@
-IMPORT BatchShare, FCRA, Risk_Indicators, ut, Header, SexOffender_Services, CriminalRecords_BatchService, riskwise, LN_PropertyV2_Services,
+﻿IMPORT BatchShare, FCRA, Risk_Indicators, ut, Header, SexOffender_Services, CriminalRecords_BatchService, riskwise, LN_PropertyV2_Services,
        doxie, suppress, RiskWiseFCRA, marriage_divorce_v2_Services, liensv2, BankruptcyV2, BankruptcyV3;
 
 EXPORT Raw := module
@@ -100,6 +100,12 @@ EXPORT Raw := module
 		ds_searched_prop_acctno := JOIN(ds_fids_with_input, ds_prop_search_out,
 			LEFT.ln_fares_id = RIGHT.ln_fares_id, 
 			TRANSFORM(BenefitAssessment_Services.Layouts.rec_propOutWithAcctno, SELF.acctno := LEFT.acctno, SELF := RIGHT) , LIMIT(Constants.MAX_RECS, SKIP));
+			
+			// output(ds_just_dids,named('ds_just_dids'));
+			// output(ds_fids_by_did2,named('ds_fids_by_did2'));
+			// output(ds_fids_with_input,named('ds_fids_with_input'));
+			// output(ds_prop_search_out,named('ds_prop_search_out'));
+			// output(ds_searched_prop_acctno,named('ds_searched_prop_acctno'));
 		
 		RETURN ds_searched_prop_acctno;
 	END;
@@ -134,7 +140,7 @@ EXPORT Raw := module
 		//get the non-deeds hits into the format to look for assessments
 		ds_ass_of_nondeeds := JOIN(ds_owners_with_input, ds_searched_prop_acctno, 
 				LEFT.acctno = RIGHT.acctno,
-				TRANSFORM(BenefitAssessment_Services.Layouts.rec_propOutWithAcctno, SELF := RIGHT), RIGHT ONLY);
+				TRANSFORM(BenefitAssessment_Services.Layouts.rec_propOutWithAcctno, SELF := RIGHT), LIMIT(Constants.MAX_RECS, SKIP)/*, RIGHT ONLY*/);
 		//search for assessments for non-deeds
 		ds_assmts := PROJECT(ds_ass_of_nondeeds(fid_type = LN_PropertyV2_Services.consts.VENDOR_FARES), 
 											BenefitAssessment_Services.Transforms.MakeAssessmentFlat(LEFT));
@@ -205,6 +211,25 @@ EXPORT Raw := module
 																	LEFT ONLY);
 																	
 		ds_curr := 	ds_curr_out + ds_curr_output;
+			
+		// output(ds_searched_prop_acctno,named('ds_searched_prop_acctno'));		
+		// output(ds_input,named('ds_input'));		
+		// output(ds_deeds,named('ds_deeds'));		
+		// output(ds_sorted_owners,named('ds_sorted_owners'));		
+		// output(ds_input_with_searchids,named('ds_input_with_searchids'));		
+		// output(ds_owners_with_input,named('ds_owners_with_input'));		
+		 // output(ds_ass_of_nondeeds,named('ds_ass_of_nondeeds'));		
+		// output(ds_assmts,named('ds_assmts'));		
+		// output(ds_sorted_assmts,named('ds_sorted_assmts'));		
+		// output(ds_assmts_with_input,named('ds_assmts_with_input'));		
+		// output(ds_owners_with_inputTMP,named('ds_owners_with_inputTMP'));		
+		// output(ds_owners_with_input2,named('ds_owners_with_input2'));		
+		// output(ds_sorted_owners_with_input,named('ds_sorted_owners_with_input'));		
+		// output(prop_rec_count,named('prop_rec_count'));		
+		// output(ds_input_w_acctno,named('ds_input_w_acctno'));		
+		// output(ds_in_grouped,named('ds_in_grouped'));		
+		
+		
 
 		RETURN ds_curr;
 	END;

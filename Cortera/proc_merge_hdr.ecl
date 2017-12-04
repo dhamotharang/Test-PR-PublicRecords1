@@ -42,10 +42,10 @@ EXPORT proc_merge_hdr(dataset(Cortera.Layout_Header_Out) allcurrent, dataset(Cor
 										self.current := false;
 										self := left;), INNER, LOCAL);
 	// set new current values
-	changed_curr := JOIN(current, delta(n_diff=true), left.link_id=right.link_id,
+	changed_prev := JOIN(previous, delta(n_diff=true), left.link_id=right.link_id,
 								TRANSFORM(Cortera.Layout_Header_Out,
 										self := left;), INNER, LOCAL);
-	changed := JOIN(current, changed_curr, left.link_id=right.link_id,
+	changed := JOIN(current, changed_prev, left.link_id=right.link_id,
 								TRANSFORM(Cortera.Layout_Header_Out,
 										self.current := true;
 										self.dt_vendor_first_reported := (unsigned4)version;

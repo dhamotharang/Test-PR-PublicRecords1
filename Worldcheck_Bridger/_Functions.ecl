@@ -1115,6 +1115,14 @@
 				trim(kword, left, right) = 'OFAC-DPRK4' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_DPRK4,
 				trim(kword, left, right) = 'PHNBI' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHNBI,
 				trim(kword, left, right) = 'PHDND-MLAO' =>SubGroup_Constants.numKeywordsID.KEYWORD_PHDND_MLAO,
+				trim(kword, left, right) = 'BISN-CAATSA231' =>SubGroup_Constants.numKeywordsID.KEYWORD_BISN_CAATSA231,
+				trim(kword, left, right) = 'CANS-JVCFO' =>SubGroup_Constants.numKeywordsID.KEYWORD_CANS_JVCFO,
+				trim(kword, left, right) = 'PPICIJ-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PPICIJ_WC,
+				trim(kword, left, right) = 'USCRL' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCRL,
+				trim(kword, left, right) = 'CODIAN' =>SubGroup_Constants.numKeywordsID.KEYWORD_CODIAN,
+				trim(kword, left, right) = 'NPCIAA' =>SubGroup_Constants.numKeywordsID.KEYWORD_NPCIAA,
+				trim(kword, left, right) = 'EDES' =>SubGroup_Constants.numKeywordsID.KEYWORD_EDES,
+				trim(kword, left, right) = 'KRFSS' =>SubGroup_Constants.numKeywordsID.KEYWORD_KRFSS,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

@@ -18,7 +18,7 @@ layout := RECORD // project out required fields
   h.contact_did_weight100 ; // Contains 100x the specificity
 END;
  
-s := PRTE2_BIPV2_BusHeader.Specificities(File_BizHead).Specificities[1];
+s := PRTE2_BIPV2_BusHeader.Specificities(PRTE2_BIPV2_BusHeader.File_BizHead).Specificities[1];
  
 DataForKey0 := DEDUP(SORT(TABLE(h((contact_did NOT IN SET(s.nulls_contact_did,contact_did) AND contact_did <> (TYPEOF(contact_did))'')),layout),WHOLE RECORD,LOCAL),WHOLE RECORD,LOCAL); // Project out the fields in match candidates required for this Name()
  

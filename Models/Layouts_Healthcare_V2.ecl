@@ -1,4 +1,4 @@
-Import Models;
+﻿Import Models;
 Import Profilebooster;
 
 EXPORT Layouts_Healthcare_V2 := module 
@@ -2533,7 +2533,7 @@ END;
 
 	EXPORT Final_Output_Layout_ADL := RECORD
 	Final_Output_Layout;
-	String ADLScore;
+	String3 ADLScore;
 	END;
 	
 	EXPORT Attributes_Only_Layout := RECORD

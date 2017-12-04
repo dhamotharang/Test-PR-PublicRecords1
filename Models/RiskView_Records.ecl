@@ -1,4 +1,4 @@
-
+﻿
 IMPORT risk_indicators, Risk_Reporting, address, ut, fcra_opt_out, gateway, RiskView, iesp, riskwisefcra, Inquiry_AccLogs, Business_Risk_BIP, STD;
 
 VALIDATING := False;
@@ -2857,7 +2857,9 @@ ExperianTransaction := DataRestriction[risk_indicators.iid_constants.posExperian
 
 	final := join(clam_to_run, final1, left.did=right.did,
 								transform(Layout_Riskview, 
-									self.ConsumerStatements := if(OutputConsumerStatements, left.ConsumerStatements);
+									self.ConsumerStatements := if(OutputConsumerStatements, 
+										project(left.ConsumerStatements, transform(
+												iesp.share_fcra.t_ConsumerStatement, self.dataGroup := '', self := left)));
 									self := right,
 									self := []), KEEP(1), ATMOST(100));
 #end

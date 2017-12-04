@@ -1,9 +1,9 @@
-/*2016-07-11T18:11:51Z (Dmitriy Lazarenko)
+﻿/*2016-07-11T18:11:51Z (Dmitriy Lazarenko)
 adding a comment on why we have limit of 7000 here
 */
-IMPORT FLAccidents_Ecrash, ut, doxie,lib_stringlib,std, iesp;
+IMPORT FLAccidents_Ecrash, ut, doxie,lib_stringlib,std, iesp, eCrash_Services;
 
-EXPORT Raw(IParam.searchrecords in_mod) := MODULE
+EXPORT Raw(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 		shared 	accnbr_key:=FLAccidents_Ecrash.key_EcrashV2_accnbrV1;
 		shared 	dol_key:=FLAccidents_Ecrash.key_EcrashV2_dol;
 		shared 	partial_accnbr_key := FLAccidents_Ecrash.Key_EcrashV2_Partial_Report_Nbr;
@@ -11,6 +11,10 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 		shared  preferredName_key := FLAccidents_Ecrash.Key_eCrashv2_PrefName_State;
 		shared reportLinkKey := FLAccidents_Ecrash.Key_eCrashv2_ReportLinkId;
 		shared lastName_key := FLAccidents_Ecrash.Key_EcrashV2_LastName;
+		shared VinNbr_key := FLAccidents_Ecrash.key_ecrashV2_VinNbr;
+		shared DlnNbrDLState_key := FLAccidents_Ecrash.key_ecrashV2_DlnNbrDLState;
+		shared OfficerBadgeNbr_key := FLAccidents_Ecrash.key_ecrashV2_OfficerBadgeNbr;
+		shared LicensePlateNbr_key := FLAccidents_Ecrash.key_ecrashV2_LicensePlateNbr;
 		
 		shared boolean hasJurisdictionInfo    := COUNT(in_mod.agencies(JurisdictionState <> '' AND Jurisdiction <> '')) > 0;
 		
@@ -31,11 +35,11 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 
 		//BAP
 		EXPORT 	by_auto_recs() := FUNCTION
-				auto_ds := project(in_mod,IParam.autokey_search);
+				auto_ds := project(in_mod,eCrash_Services.IParam.autokey_search);
 				
 				autokey_ds := autokey_ids(auto_ds);
 				
-				autokey_with_alias := JOIN(autokey_ds, in_mod.agencies, TRUE, TRANSFORM(Layouts.search,
+				autokey_with_alias := JOIN(autokey_ds, in_mod.agencies, TRUE, TRANSFORM(eCrash_Services.Layouts.search,
 																		SELF.JurisdictionState := right.JurisdictionState;
 																		SELF.Jurisdiction := right.Jurisdiction;
 																		SELF.PrimaryAgency := right.PrimaryAgency;
@@ -47,7 +51,7 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 	
 		EXPORT by_rpt_num() := FUNCTION				
 							
-				agency_search_ds := PROJECT(in_mod.agencies, TRANSFORM(Layouts.search, 
+				agency_search_ds := PROJECT(in_mod.agencies, TRANSFORM(eCrash_Services.Layouts.search, 
 																												SELF.reportnumber := in_mod.reportnumber;
 																												SELF.isdeepdive 	:= false;																												
 																												SELF := LEFT;));				
@@ -55,25 +59,25 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 				RETURN agency_search_ds;
 		END;
 
-		EXPORT byReportNumber(dataset(Layouts.search) ids_raw_in) := FUNCTION
+		EXPORT byReportNumber(dataset(eCrash_Services.Layouts.search) ids_raw_in) := FUNCTION
 							
 				rpn_recs_res1:= join(ids_raw_in,accnbr_key,
 													keyed(right.l_accnbr=left.reportnumber) and
-													keyed(right.report_code in constants.ecrash_src_codes) and
+													keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
 													if(in_mod.RequestHashKey,(right.agency_ori = left.AgencyORI and right.image_hash<>''),right.jurisdiction<>''),
 													transform(recordof(accnbr_key),
-													self := right),limit(constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
+													self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
 				// TODO: a hack to return some meaningful response in a case of (incorrectly created) test data;
 				//       an error-message is not very appropriate: rather should be something like "too much data associated with an object"
 				
 				rpn_recs_res_w_jur:= join(ids_raw_in,accnbr_key,
 													keyed(right.l_accnbr=left.reportnumber) and
-													keyed(right.report_code in constants.ecrash_src_codes) and
+													keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
 													keyed(right.jurisdiction_state = left.jurisdictionState) and
 													keyed(right.jurisdiction = left.jurisdiction) and
 													if(in_mod.RequestHashKey,(right.agency_ori = left.AgencyORI and right.image_hash<>''), true),
 													transform(recordof(accnbr_key),
-													self := right),limit(constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
+													self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
 				
 				rpn_recs_res := if(hasJurisdictionInfo,
 													 rpn_recs_res_w_jur,
@@ -86,13 +90,13 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 				boolean isPartial := length(in_mod.reportnumber) = 4;
 				partial_report_number := if(isPartial, in_mod.reportnumber, in_mod.reportnumber[1..4]);
 				
-				by_partial_rptNum := PROJECT(in_mod.agencies, TRANSFORM(Layouts.search, 
+				by_partial_rptNum := PROJECT(in_mod.agencies, TRANSFORM(eCrash_Services.Layouts.search, 
 																												SELF.reportnumber := partial_report_number;
 																												SELF.isdeepdive 	:= false;																												
 																												SELF := LEFT;));
 				
 				
-			Layouts.search xformToAccnbr(by_partial_rptNum L, partial_accnbr_key R):=transform
+			eCrash_Services.Layouts.search xformToAccnbr(by_partial_rptNum L, partial_accnbr_key R):=transform
 					self.reportnumber := R.l_accnbr;
 					self.isdeepdive:=false;
 					self.jurisdiction := L.jurisdiction;
@@ -105,20 +109,20 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 					//BAP - kevin says needs cleanup, but not yet.
 				partial_rpn_recs_res1:= join(by_partial_rptNum,partial_accnbr_key,
 													keyed(right.partial_report_nbr=left.reportnumber) and
-													keyed(right.report_code in constants.ecrash_src_codes) and 
+													keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and 
 													keyed (right.jurisdiction != '') and
 													wild (right.jurisdiction_state) and
 													wild (right.accident_date) and
-													(Constants.valid_match(right.jurisdiction_state,left.JurisdictionState)) and 
-													(Constants.valid_match(STD.Str.ToUpperCase(right.jurisdiction),left.jurisdiction)),
-													xformToAccnbr(left, right),limit(constants.MAX_PARTIAL_NUMBER, fail(203, doxie.ErrorCodes(203))));
+													(eCrash_Services.Constants.valid_match(right.jurisdiction_state,left.JurisdictionState)) and 
+													(eCrash_Services.Constants.valid_match(STD.Str.ToUpperCase(right.jurisdiction),left.jurisdiction)),
+													xformToAccnbr(left, right),limit(eCrash_Services.constants.MAX_PARTIAL_NUMBER, fail(203, doxie.ErrorCodes(203))));
 										
 				partial_rpn_recs_res_w_jur:= join(by_partial_rptNum,partial_accnbr_key,
 													keyed(right.partial_report_nbr=left.reportnumber) and
-													keyed(right.report_code in constants.ecrash_src_codes) and
+													keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
 													keyed(right.jurisdiction_state = left.jurisdictionState) and
 													keyed(right.jurisdiction = left.jurisdiction),
-													xformToAccnbr(left, right),limit(constants.MAX_PARTIAL_NUMBER, fail(203, doxie.ErrorCodes(203))));
+													xformToAccnbr(left, right),limit(eCrash_Services.constants.MAX_PARTIAL_NUMBER, fail(203, doxie.ErrorCodes(203))));
 													
 				partial_recs := if(hasJurisdictionInfo, partial_rpn_recs_res_w_jur, partial_rpn_recs_res1);
 
@@ -126,7 +130,7 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 																					SELF.daterange := RIGHT.daterange;
 																					SELF := LEFT;), ALL);
 				
-				Layouts.search xformToAccnbrWithDOL(ds_date_range_search_ds L, partial_accnbr_key R):=transform
+				eCrash_Services.Layouts.search xformToAccnbrWithDOL(ds_date_range_search_ds L, partial_accnbr_key R):=transform
 					self.reportnumber := R.l_accnbr;
 					self.isdeepdive:=false;
 					self.jurisdiction := L.jurisdiction;
@@ -136,13 +140,13 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 				
 				partial_rpn_recs_w_fuzzydol:=	join(ds_date_range_search_ds, partial_accnbr_key,
 																				keyed (right.partial_report_nbr=partial_report_number) and 
-																				keyed (right.report_code in constants.ecrash_src_codes) and 
+																				keyed (right.report_code in eCrash_Services.constants.ecrash_src_codes) and 
 																				keyed (right.accident_date=left.daterange) and
 																				keyed (right.jurisdiction != '') and
 																				wild (right.jurisdiction_state) and
-																				(Constants.valid_match(right.jurisdiction_state,left.JurisdictionState)) and 
-																				(Constants.valid_match(STD.Str.ToUpperCase(right.jurisdiction),left.jurisdiction)),
-																				xformToAccnbrWithDOL(left, right),limit(Constants.MAX_ACCIDENTS_PER_DAY, fail(203, doxie.ErrorCodes(203))));
+																				(eCrash_Services.Constants.valid_match(right.jurisdiction_state,left.JurisdictionState)) and 
+																				(eCrash_Services.Constants.valid_match(STD.Str.ToUpperCase(right.jurisdiction),left.jurisdiction)),
+																				xformToAccnbrWithDOL(left, right),limit(eCrash_Services.Constants.MAX_ACCIDENTS_PER_DAY, fail(203, doxie.ErrorCodes(203))));
 																				
 				partial_rpn_recs_res := if(hasInputDOL, partial_rpn_recs_w_fuzzydol, partial_recs);
 				
@@ -163,8 +167,8 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 			// dol := in_mod.dateofloss;
 			// in_jurisdiction := STD.Str.ToUpperCase(in_mod.jurisdiction);
 			// in_jurisdiction_state := STD.Str.ToUpperCase(in_mod.JurisdictionState);
-			boolean ignore_state_search 						:= constants.no_state_search(in_mod);
-			boolean ignore_jurisdiction_search 			:= constants.no_jurisdiction_search(in_mod);
+			boolean ignore_state_search 						:= eCrash_Services.constants.no_state_search(in_mod);
+			boolean ignore_jurisdiction_search 			:= eCrash_Services.constants.no_jurisdiction_search(in_mod);
 			
       tmp_dol_rec := record
 				string8 dol;
@@ -195,26 +199,26 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 			// Limit 2k records for each agency(left record) and then sort by primary agency to get all the primary records
 			//If primary records exceed 2k limit then fail else take remaining to fill 2k from alias records
 			agency_dol_recs:=	JOIN(dol_search_ds, dol_key,  keyed (right.accident_date=left.dol) and 
-																								keyed (right.report_code in constants.ecrash_src_codes) and 
+																								keyed (right.report_code in eCrash_Services.constants.ecrash_src_codes) and 
 																									keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
 																									keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState),
 																									xformToDolRec(left, right), 
-																									limit(constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1, fail(203, doxie.ErrorCodes(203))));
+																									limit(eCrash_Services.constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1, fail(203, doxie.ErrorCodes(203))));
 			
 			agency_dol_recs_sorted := SORT(agency_dol_recs, -primaryagency, record);
 
-			dol_recs := IF(count(agency_dol_recs_sorted(primaryagency)) < (constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1), agency_dol_recs_sorted[1..constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY], fail(agency_dol_recs_sorted, 203, doxie.ErrorCodes(203))); 
+			dol_recs := IF(count(agency_dol_recs_sorted(primaryagency)) < (eCrash_Services.constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1), agency_dol_recs_sorted[1..eCrash_Services.Constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY], fail(agency_dol_recs_sorted, 203, doxie.ErrorCodes(203))); 
 			
 			agency_dol_fuzzy_recs := JOIN(dol_search_ds, dol_key,  keyed (right.accident_date between left.start_date and left.end_date) and 
-																											  keyed (right.report_code in constants.ecrash_src_codes) and 
+																											  keyed (right.report_code in eCrash_Services.constants.ecrash_src_codes) and 
 																												keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
 																												keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState),
 																												xformToDolRec(left, right), 
-																												limit(constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1, fail(203, doxie.ErrorCodes(203))));
+																												limit(eCrash_Services.constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1, fail(203, doxie.ErrorCodes(203))));
 			
 			agency_dol_fuzzy_recs_sorted := SORT(agency_dol_fuzzy_recs, -primaryagency);
 			
-			dol_fuzzy_recs := IF(count(agency_dol_fuzzy_recs_sorted(primaryagency)) < (constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1), agency_dol_fuzzy_recs_sorted[1..constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY], fail(agency_dol_fuzzy_recs_sorted, 203, doxie.ErrorCodes(203))); 
+			dol_fuzzy_recs := IF(count(agency_dol_fuzzy_recs_sorted(primaryagency)) < (eCrash_Services.constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY + 1), agency_dol_fuzzy_recs_sorted[1..eCrash_Services.Constants.MAX_ACCIDENTS_PER_AGENCY_PER_DAY], fail(agency_dol_fuzzy_recs_sorted, 203, doxie.ErrorCodes(203))); 
 			
 			dol_fuzzy_recs_filtered := IF(EXISTS(dol_recs), dol_recs, dol_fuzzy_recs);
 			
@@ -222,11 +226,11 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 																
 			final_dol_fuzzy_recs := join(dol_fuzzy_recs_filtered,accnbr_key,
 																		keyed(right.l_accnbr=left.accident_nbr) and
-																		keyed(right.report_code in constants.ecrash_src_codes) and
+																		keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
 																		keyed(right.jurisdiction_state = left.jurisdiction_state) and
 																		keyed(right.jurisdiction = left.jurisdiction),
 																		transform(recordof(accnbr_key),
-																		self := right),limit(constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
+																		self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
 			RETURN final_dol_fuzzy_recs;
 																
 		END;
@@ -278,7 +282,7 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 																									          (left.start_date = '' or (right.accident_date between left.start_date and left.end_date)) and
 																										        (left.dol = '' or right.accident_date = left.dol), 
 																														xformToLocRec(left, right), 
-																														limit(constants.MAX_ACCIDENTS_PER_AGENCY_PER_LOCATION + 1, fail(203, doxie.ErrorCodes(203))));
+																														limit(eCrash_Services.constants.MAX_ACCIDENTS_PER_AGENCY_PER_LOCATION + 1, fail(203, doxie.ErrorCodes(203))));
 		 
 			//7k limit is used because on average if we have more then 7k records here then we run into a memory limit exhausted in recs_raw_dupe join in Records file
 			//which is something we need to look at.
@@ -286,15 +290,15 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 			
 			loc_recs_sorted := SORT(loc_recs, -primaryagency, record);
 			//add 7000 to constants
-			filtered_loc_recs := IF(count(loc_recs_sorted(primaryagency)) < (constants.MAX_ACCIDENTS_PER_AGENCY_PER_LOCATION + 1), loc_recs_sorted[1..constants.MAX_ACCIDENTS_PER_AGENCY_PER_LOCATION], fail(loc_recs_sorted, 203, doxie.ErrorCodes(203))); 
+			filtered_loc_recs := IF(count(loc_recs_sorted(primaryagency)) < (eCrash_Services.constants.MAX_ACCIDENTS_PER_AGENCY_PER_LOCATION + 1), loc_recs_sorted[1..eCrash_Services.Constants.MAX_ACCIDENTS_PER_AGENCY_PER_LOCATION], fail(loc_recs_sorted, 203, doxie.ErrorCodes(203))); 
 						
 			loc_recs_exact := join(filtered_loc_recs,accnbr_key,
 													keyed(right.l_accnbr=left.accident_nbr) and
-													keyed(right.report_code in constants.ecrash_src_codes) and
+													keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
 													keyed(right.jurisdiction_state = left.jurisdiction_state) and
 													keyed(right.jurisdiction = left.jurisdiction),
 													transform(recordof(accnbr_key),
-													self := right),limit(constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
+													self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
 													
 			RETURN loc_recs_exact;
 			
@@ -340,26 +344,26 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 			end;
 			
       fname_recs :=	join(fname_search_ds, preferredName_key, 
-																		keyed(right.fname = left.firstName) and
-																		keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
-																		keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState) and
-																		(left.CrossStreet = '' OR Constants.contains_match(right.accident_location,left.CrossStreet)) and
-																		(left.LocStreet = '' OR Constants.contains_match(right.accident_location,left.LocStreet)) and
-																		(left.start_date = '' or (right.accident_date between left.start_date and left.end_date)), xformToFnameRec(left, right),
-																		limit(constants.MAX_RAW_PERSON_COUNT + 1, fail(203, doxie.ErrorCodes(203))));
+				keyed(right.fname = left.firstName) and
+				keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
+				keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState) and
+				(left.CrossStreet = '' OR eCrash_Services.Constants.contains_match(right.accident_location,left.CrossStreet)) and
+				(left.LocStreet = '' OR eCrash_Services.Constants.contains_match(right.accident_location,left.LocStreet)) and
+				(left.start_date = '' or (right.accident_date between left.start_date and left.end_date)), xformToFnameRec(left, right),
+				limit(eCrash_Services.constants.MAX_RAW_PERSON_COUNT + 1, fail(203, doxie.ErrorCodes(203))));
 			
 			fname_recs_sorted 	:= SORT(fname_recs, -primaryagency, record);
-			filtered_max_person_fname_recs := IF(count(fname_recs_sorted(primaryagency)) < (constants.MAX_RAW_PERSON_COUNT +1), fname_recs_sorted[1..constants.MAX_RAW_PERSON_COUNT], fail(fname_recs_sorted, 203, doxie.ErrorCodes(203))); 	
+			filtered_max_person_fname_recs := IF(count(fname_recs_sorted(primaryagency)) < (eCrash_Services.constants.MAX_RAW_PERSON_COUNT +1), fname_recs_sorted[1..eCrash_Services.Constants.MAX_RAW_PERSON_COUNT], fail(fname_recs_sorted, 203, doxie.ErrorCodes(203))); 	
 			
-			filtered_fname_recs := Limit(dedup(sort(filtered_max_person_fname_recs,-primaryagency,accident_nbr,report_code,jurisdiction_state,jurisdiction),accident_nbr,report_code,jurisdiction_state,jurisdiction),2000,fail(203, doxie.ErrorCodes(203)));
+			filtered_fname_recs := Limit(dedup(sort(filtered_max_person_fname_recs,-primaryagency,accident_nbr,report_code,jurisdiction_state,jurisdiction),accident_nbr,report_code,jurisdiction_state,jurisdiction),eCrash_Services.Constants.MAX_PERSON_RECORDS,fail(203, doxie.ErrorCodes(203)));
 															 
 			first_name_recs_exact := join(filtered_fname_recs,accnbr_key,
 																		keyed(right.l_accnbr=left.accident_nbr) and
-																		keyed(right.report_code in constants.ecrash_src_codes) and
+																		keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
 																		keyed(right.jurisdiction_state = left.jurisdiction_state) and
 																		keyed(right.jurisdiction = left.jurisdiction),
 																		transform(recordof(accnbr_key),
-																		self := right),limit(constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
+																		self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
 
 			RETURN first_name_recs_exact;
 			
@@ -408,29 +412,208 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 																		keyed(right.lname = left.lastname) and
 																		keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
 																		keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState) and
-																		(left.CrossStreet = '' OR Constants.contains_match(right.accident_location,left.CrossStreet)) and
-																		(left.LocStreet = '' OR Constants.contains_match(right.accident_location,left.LocStreet)) and
+																		(left.CrossStreet = '' OR eCrash_Services.Constants.contains_match(right.accident_location,left.CrossStreet)) and
+																		(left.LocStreet = '' OR eCrash_Services.Constants.contains_match(right.accident_location,left.LocStreet)) and
 																		(left.start_date = '' or (right.accident_date between left.start_date and left.end_date)), xformToLnameRec(left, right),
-																		limit(constants.MAX_RAW_PERSON_COUNT + 1, fail(203, doxie.ErrorCodes(203))));
+																		limit(eCrash_Services.constants.MAX_RAW_PERSON_COUNT + 1, fail(203, doxie.ErrorCodes(203))));
 			
 			lname_recs_sorted 	:= SORT(lname_recs, -primaryagency, record);
-			filtered_max_person_lname_recs := IF(count(lname_recs_sorted(primaryagency)) < (constants.MAX_RAW_PERSON_COUNT + 1), lname_recs_sorted[1..constants.MAX_RAW_PERSON_COUNT], fail(lname_recs_sorted, 203, doxie.ErrorCodes(203))); 	
+			filtered_max_person_lname_recs := IF(count(lname_recs_sorted(primaryagency)) < (eCrash_Services.constants.MAX_RAW_PERSON_COUNT + 1), lname_recs_sorted[1..eCrash_Services.Constants.MAX_RAW_PERSON_COUNT], fail(lname_recs_sorted, 203, doxie.ErrorCodes(203))); 	
       
-			filtered_lname_recs := Limit(dedup(sort(filtered_max_person_lname_recs,-primaryagency,accident_nbr,report_code,jurisdiction_state,jurisdiction),accident_nbr,report_code,jurisdiction_state,jurisdiction),2000,fail(203, doxie.ErrorCodes(203)));
+			filtered_lname_recs := Limit(dedup(sort(filtered_max_person_lname_recs,-primaryagency,accident_nbr,report_code,jurisdiction_state,jurisdiction),accident_nbr,report_code,jurisdiction_state,jurisdiction),eCrash_Services.Constants.MAX_PERSON_RECORDS,fail(203, doxie.ErrorCodes(203)));
 															 
 			last_name_recs_exact := join(filtered_lname_recs,accnbr_key,
 																		keyed(right.l_accnbr=left.accident_nbr) and
-																		keyed(right.report_code in constants.ecrash_src_codes) and
+																		keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
 																		keyed(right.jurisdiction_state = left.jurisdiction_state) and
 																		keyed(right.jurisdiction = left.jurisdiction),
 																		transform(recordof(accnbr_key),
-																		self := right),limit(constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
+																		self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
 
 			RETURN last_name_recs_exact;
 			
 		END;
+	
+		EXPORT byVin() := FUNCTION
+			
+			vin_rec := RECORD
+				FLAccidents_Ecrash.Layouts.key_slim_layout;
+				boolean primaryagency;
+			end;
+			
+			vin_search_ds := eCrash_Services.functions.GetAgencySearchDs(in_mod);	
+			
+			vin_rec xformToVinRec(vin_search_ds L, VinNbr_key R):=transform
+					self.primaryagency := L.primaryagency;
+					self := R;
+			end;
+	
+
+      vin_recs :=	join(vin_search_ds, VinNbr_key, 
+																		keyed(right.vin = left.vin) and
+																		keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
+																		keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState) and
+																		(left.DriversLicenseNum = '' OR left.DriversLicenseNum = right.driver_license_nbr) and
+																		(left.OfficerBadge = '' OR left.OfficerBadge = right.officer_id) and
+																		(left.LicensePlate = '' OR left.LicensePlate = right.tag_nbr) and
+																		(left.CrossStreet = '' OR eCrash_Services.Constants.contains_match(right.accident_location,left.CrossStreet)) and
+																		(left.LocStreet = '' OR eCrash_Services.Constants.contains_match(right.accident_location,left.LocStreet)) and
+																		(left.start_date = '' or (right.accident_date between left.start_date and left.end_date)), xformToVinRec(left, right),
+																		limit(eCrash_Services.constants.MAX_RAW_PERSON_COUNT + 1, fail(203, doxie.ErrorCodes(203))));
+
+			
+			vin_recs_sorted 	:= SORT(vin_recs, -primaryagency, record);
+			filtered_max_vin_recs := IF(count(vin_recs_sorted(primaryagency)) < (eCrash_Services.constants.MAX_RAW_PERSON_COUNT + 1), vin_recs_sorted[1..eCrash_Services.Constants.MAX_RAW_PERSON_COUNT], fail(vin_recs_sorted, 203, doxie.ErrorCodes(203))); 	
+      
+			filtered_vin_recs := Limit(dedup(sort(filtered_max_vin_recs,-primaryagency,accident_nbr,report_code,jurisdiction_state,jurisdiction),accident_nbr,report_code,jurisdiction_state,jurisdiction),eCrash_Services.Constants.MAX_PERSON_RECORDS,fail(203, doxie.ErrorCodes(203)));
+			
+			//try DOL in the join to see if stray records are removed												 
+			vin_recs_exact := join(filtered_vin_recs,accnbr_key,
+																		keyed(right.l_accnbr=left.accident_nbr) and
+																		keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
+																		keyed(right.jurisdiction_state = left.jurisdiction_state) and
+																		keyed(right.jurisdiction = left.jurisdiction),
+																		transform(recordof(accnbr_key),
+																		self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
+	
+			RETURN vin_recs_exact;
+			
+		END;
+	
+		EXPORT byDriversLicenseNum() := FUNCTION
 		
-		EXPORT getAssociatedReports(dataset(Layouts.recs_with_penalty) intialSearchResults) := FUNCTION
+			dl_rec := RECORD
+				FLAccidents_Ecrash.Layouts.key_slim_layout;
+				boolean primaryagency;
+			end;
+		
+			dl_search_ds := eCrash_Services.functions.GetAgencySearchDs(in_mod);
+			
+			dl_rec xformToDLRec(dl_search_ds L, DlnNbrDLState_key R):=transform
+					self.primaryagency := L.primaryagency;
+					self := R;
+			end;
+							
+      dl_recs :=	join(dl_search_ds, DlnNbrDLState_key, 
+																		keyed(right.driver_license_nbr = left.DriversLicenseNum) and
+																		wild(right.dlnbr_st) and	
+																		keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
+																		keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState) and
+																		(left.vin = '' OR left.vin = right.vin) and
+																		(left.OfficerBadge = '' OR left.OfficerBadge = right.officer_id) and
+																		(left.LicensePlate = '' OR left.LicensePlate = right.tag_nbr) and
+																		(left.CrossStreet = '' OR eCrash_Services.Constants.contains_match(right.accident_location,left.CrossStreet)) and
+																		(left.LocStreet = '' OR eCrash_Services.Constants.contains_match(right.accident_location,left.LocStreet)) and
+																		(left.start_date = '' or (right.accident_date between left.start_date and left.end_date)), xformToDLRec(left, right),
+																		limit(eCrash_Services.constants.MAX_RAW_PERSON_COUNT + 1, fail(203, doxie.ErrorCodes(203))));
+			
+			dl_recs_sorted 	:= SORT(dl_recs, -primaryagency, record);
+			filtered_max_dl_recs := IF(count(dl_recs_sorted(primaryagency)) < (eCrash_Services.constants.MAX_RAW_PERSON_COUNT + 1), dl_recs_sorted[1..eCrash_Services.Constants.MAX_RAW_PERSON_COUNT], fail(dl_recs_sorted, 203, doxie.ErrorCodes(203))); 	
+      
+			filtered_dl_recs := Limit(dedup(sort(filtered_max_dl_recs,-primaryagency,accident_nbr,report_code,jurisdiction_state,jurisdiction),accident_nbr,report_code,jurisdiction_state,jurisdiction),eCrash_Services.Constants.MAX_PERSON_RECORDS,fail(203, doxie.ErrorCodes(203)));
+															 
+			dl_recs_exact := join(filtered_dl_recs,accnbr_key,
+																		keyed(right.l_accnbr=left.accident_nbr) and
+																		keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
+																		keyed(right.jurisdiction_state = left.jurisdiction_state) and
+																		keyed(right.jurisdiction = left.jurisdiction),
+																		transform(recordof(accnbr_key),
+																		self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
+	
+			RETURN dl_recs_exact;
+			
+		END;
+		
+		EXPORT byOfficerBadge() := FUNCTION
+			
+			OffBadge_rec := RECORD
+				FLAccidents_Ecrash.Layouts.key_slim_layout;
+				boolean primaryagency;
+			end;
+			
+
+			offBadge_search_ds := eCrash_Services.functions.GetAgencySearchDs(in_mod);
+			
+			OffBadge_rec xformToOffBadgeRec(offBadge_search_ds L, OfficerBadgeNbr_key R):=transform
+					self.primaryagency := L.primaryagency;
+					self := R;
+			end;
+						
+      offBadge_recs :=	join(offBadge_search_ds, OfficerBadgeNbr_key, 
+																		keyed(right.officer_id = left.OfficerBadge) and
+																		keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
+																		keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState) and
+																		(left.vin = '' OR left.vin = right.vin) and
+																		(left.DriversLicenseNum = '' OR left.DriversLicenseNum = right.driver_license_nbr) and
+																		(left.LicensePlate = '' OR left.LicensePlate = right.tag_nbr) and
+																		(left.CrossStreet = '' OR eCrash_Services.Constants.contains_match(right.accident_location,left.CrossStreet)) and
+																		(left.LocStreet = '' OR eCrash_Services.Constants.contains_match(right.accident_location,left.LocStreet)) and
+																		(left.start_date = '' or (right.accident_date between left.start_date and left.end_date)), xformToOffBadgeRec(left, right),
+																		limit(eCrash_Services.constants.MAX_RAW_PERSON_COUNT + 1, fail(203, doxie.ErrorCodes(203))));
+			
+			offBadge_recs_sorted 	:= SORT(offBadge_recs, -primaryagency, record);
+			filtered_max_offBadge_recs := IF(count(offBadge_recs_sorted(primaryagency)) < (eCrash_Services.constants.MAX_RAW_PERSON_COUNT + 1), offBadge_recs_sorted[1..eCrash_Services.Constants.MAX_RAW_PERSON_COUNT], fail(offBadge_recs_sorted, 203, doxie.ErrorCodes(203))); 	
+      
+			filtered_offBadge_recs := Limit(dedup(sort(filtered_max_offBadge_recs,-primaryagency,accident_nbr,report_code,jurisdiction_state,jurisdiction),accident_nbr,report_code,jurisdiction_state,jurisdiction),eCrash_Services.Constants.MAX_PERSON_RECORDS,fail(203, doxie.ErrorCodes(203)));
+															 
+			offBadge_recs_exact := join(filtered_offBadge_recs,accnbr_key,
+																		keyed(right.l_accnbr=left.accident_nbr) and
+																		keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
+																		keyed(right.jurisdiction_state = left.jurisdiction_state) and
+																		keyed(right.jurisdiction = left.jurisdiction),
+																		transform(recordof(accnbr_key),
+																		self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
+	
+			RETURN offBadge_recs_exact;
+			
+		END;
+		
+		EXPORT byLicensePlate() := FUNCTION
+			
+			LicensePlate_rec := RECORD
+				FLAccidents_Ecrash.Layouts.key_slim_layout;
+				boolean primaryagency;
+			end;
+			
+		
+			licensePlate_search_ds := eCrash_Services.functions.GetAgencySearchDs(in_mod);
+			
+			LicensePlate_rec xformToLicPlateRec(licensePlate_search_ds L, LicensePlateNbr_key R):=transform
+					self.primaryagency := L.primaryagency;
+					self := R;
+			end;
+						
+      licensePlate_recs :=	join(licensePlate_search_ds, LicensePlateNbr_key, 
+																		keyed(right.tag_nbr = left.LicensePlate) and
+																		wild(right.tagnbr_st) and	
+																		keyed (left.jurisdiction = '' or right.jurisdiction = left.jurisdiction) and
+																		keyed (left.JurisdictionState = '' or right.jurisdiction_state = left.JurisdictionState) and
+																		(left.vin = '' OR left.vin = right.vin) and
+																		(left.OfficerBadge = '' OR left.OfficerBadge = right.officer_id) and
+																		(left.DriversLicenseNum = '' OR left.DriversLicenseNum = right.driver_license_nbr) and
+																		(left.CrossStreet = '' OR eCrash_Services.Constants.contains_match(right.accident_location,left.CrossStreet)) and
+																		(left.LocStreet = '' OR eCrash_Services.Constants.contains_match(right.accident_location,left.LocStreet)) and
+																		(left.start_date = '' or (right.accident_date between left.start_date and left.end_date)), xformToLicPlateRec(left, right),
+																		limit(eCrash_Services.constants.MAX_RAW_PERSON_COUNT + 1, fail(203, doxie.ErrorCodes(203))));
+			
+			licensePlate_recs_sorted 	:= SORT(licensePlate_recs, -primaryagency, record);
+			filtered_max_licensePlate_recs := IF(count(licensePlate_recs_sorted(primaryagency)) < (eCrash_Services.constants.MAX_RAW_PERSON_COUNT + 1), licensePlate_recs_sorted[1..eCrash_Services.Constants.MAX_RAW_PERSON_COUNT], fail(licensePlate_recs_sorted, 203, doxie.ErrorCodes(203))); 	
+      
+			filtered_licensePlate_recs := Limit(dedup(sort(filtered_max_licensePlate_recs,-primaryagency,accident_nbr,report_code,jurisdiction_state,jurisdiction),accident_nbr,report_code,jurisdiction_state,jurisdiction),eCrash_Services.Constants.MAX_PERSON_RECORDS,fail(203, doxie.ErrorCodes(203)));
+															 
+			licensePlate_recs_exact := join(filtered_licensePlate_recs,accnbr_key,
+																		keyed(right.l_accnbr=left.accident_nbr) and
+																		keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
+																		keyed(right.jurisdiction_state = left.jurisdiction_state) and
+																		keyed(right.jurisdiction = left.jurisdiction),
+																		transform(recordof(accnbr_key),
+																		self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
+	
+			RETURN licensePlate_recs_exact;
+			
+		END;
+
+		EXPORT getAssociatedReports(dataset(eCrash_Services.Layouts.recs_with_penalty) intialSearchResults) := FUNCTION
 		
 		  filtered_recs := intialSearchResults(ReportLinkID <> '');
 			
@@ -438,23 +621,23 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 																			 keyed(right.ReportLinkID=left.ReportLinkID) and
 																			 right.report_type_id<>left.report_type_id,
 																			 transform(recordof(reportLinkKey),
-																			 self := right),limit(constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
+																			 self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
 																		 
       
 			associated_report_links_full_recs := join(associated_report_links,accnbr_key,
 																								keyed(right.l_accnbr=left.accident_nbr) and
-																								keyed(right.report_code in constants.ecrash_src_codes) and
+																								keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
 																								keyed(right.jurisdiction_state = left.jurisdiction_state) and
 																								right.ReportLinkID = left.ReportLinkID and
 																								right.report_type_id = left.report_type_id,
 																								transform(recordof(accnbr_key),
-																								self := right),limit(constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
+																								self := right),limit(eCrash_Services.constants.MAX_REPORT_NUMBER, fail(203, doxie.ErrorCodes(203))));
 																								
-      associated_reports_keys := project(associated_report_links_full_recs,Layouts.recs_with_penalty);
+      associated_reports_keys := project(associated_report_links_full_recs,eCrash_Services.Layouts.recs_with_penalty);
 			
 			//OUTPUT(associated_reports_keys,named('associatedReports_keys'));
 																								
-			Layouts.recs_with_report_association xformDeltaAssociatedReports(Layouts.recs_with_penalty l) := TRANSFORM 
+			eCrash_Services.Layouts.recs_with_report_association xformDeltaAssociatedReports(eCrash_Services.Layouts.recs_with_penalty l) := TRANSFORM 
 				SELF.recs := RecordsDeltaBase(in_mod).getAssociatedReports(l);
 			END;
 			
@@ -517,14 +700,14 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 			//limiting the in clause so that we don't get back more than 1000 records in each deltabase request
 			numberofsets := ((count(delta_incidentIds) - 1) / 200 ) + 1;
 	
-			Layouts.SubsSeqIncidentRecord assignSequence(Layouts.SubsIncidentRecord l, Integer sequence) := Transform
+			eCrash_Services.Layouts.SubsSeqIncidentRecord assignSequence(eCrash_Services.Layouts.SubsIncidentRecord l, Integer sequence) := Transform
 				self.sequence := sequence;
 				self := l;
 			END;
 	
 			seq_incidentIds := project(delta_incidentIds,assignSequence(LEFT,(counter% numberofsets)+1));
 	
-			Layouts.SubsGroupedIncidentRecord buildIncidentParentRecs(Layouts.SubsSeqIncidentRecord l,dataset(Layouts.SubsSeqIncidentRecord) r) := Transform		
+			eCrash_Services.Layouts.SubsGroupedIncidentRecord buildIncidentParentRecs(eCrash_Services.Layouts.SubsSeqIncidentRecord l,dataset(eCrash_Services.Layouts.SubsSeqIncidentRecord) r) := Transform		
 				SELF.groupedIncidentIds :=  eCrash_Services.fn_CombineWords(SET(r, incidentId), ',');
 			END;
 	
@@ -537,7 +720,7 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 	
 			grouped_delta_incidentIds := rollup (incident_grp, group, buildIncidentParentRecs (left, rows (left)));
 			
-			Layouts.recs_with_report_association xformDeltaAssociatedReports(Layouts.SubsGroupedIncidentRecord l) := TRANSFORM 
+			eCrash_Services.Layouts.recs_with_report_association xformDeltaAssociatedReports(eCrash_Services.Layouts.SubsGroupedIncidentRecord l) := TRANSFORM 
 				SELF.recs := delta_raw_in.getSubscriptionReports(l.groupedIncidentIds);
 			END;
 			
@@ -558,7 +741,7 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 
 			payload_recs := CHOOSEN(
 				dol_key(keyed (accident_date  BETWEEN start_Date and  end_date) and 
-					keyed (report_code in constants.ecrash_src_codes) and 
+					keyed (report_code in eCrash_Services.constants.ecrash_src_codes) and 
 					keyed (jurisdiction_state = in_jurisdiction_state) and 
 					keyed (jurisdiction = in_jurisdiction) and
 					report_type_id = 'A'
@@ -575,7 +758,7 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 															
 			//OUTPUT(count(payload_recs),named ('payload_recs'));											
 															
-      payload_recs_pen :=project(payload_recs,TRANSFORM(Layouts.recs_with_penalty, SELF.isMatched:=true,SELF.l_accnbr:= LEFT.accident_nbr, SELF:=LEFT,SELF:=[]));	
+      payload_recs_pen :=project(payload_recs,TRANSFORM(eCrash_Services.Layouts.recs_with_penalty, SELF.isMatched:=true,SELF.l_accnbr:= LEFT.accident_nbr, SELF:=LEFT,SELF:=[]));	
 			
 			merged_recs_raw := payload_recs_pen + transformed_delta_pen_recs;
 			merged_recs := eCrash_Services.Functions.FilterOutDeletedReports(merged_recs_raw);
@@ -625,22 +808,22 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 										right.report_type_id = left.report_type_id and
 										right.report_code = left.report_code and
 										right.report_id = left.report_id,
-										transform(recordof(Layouts.recs_with_penalty),
-										self := right),limit(constants.MAX_ACCIDENTS_PER_DAY, fail(203, doxie.ErrorCodes(203))));
+										transform(recordof(eCrash_Services.Layouts.recs_with_penalty),
+										self := right),limit(eCrash_Services.constants.MAX_ACCIDENTS_PER_DAY, fail(203, doxie.ErrorCodes(203))));
 										
       //OUTPUT(count(deltabse_person_recs),named('deltabse_person_recs_count'));
 			
 			payload_person_recs_tmp := join(payload_limit_recs,accnbr_key,
 																		keyed(right.l_accnbr=left.l_accnbr) and
-																		keyed(right.report_code in constants.ecrash_src_codes) and
+																		keyed(right.report_code in eCrash_Services.constants.ecrash_src_codes) and
 																		keyed(right.jurisdiction_state = left.jurisdiction_state) and
 																		keyed(right.jurisdiction = left.jurisdiction) and 
 																		right.accident_date = left.accident_date and
 																		right.report_type_id = left.report_type_id ,
 																		transform(recordof(accnbr_key),
-																		self := right),limit(constants.MAX_ACCIDENTS_PER_DAY, fail(203, doxie.ErrorCodes(203))));
+																		self := right),limit(eCrash_Services.constants.MAX_ACCIDENTS_PER_DAY, fail(203, doxie.ErrorCodes(203))));
 																		
-      payload_person_recs := project(payload_person_recs_tmp,TRANSFORM(Layouts.recs_with_penalty, SELF.isMatched:=true, SELF:=LEFT));																		
+      payload_person_recs := project(payload_person_recs_tmp,TRANSFORM(eCrash_Services.Layouts.recs_with_penalty, SELF.isMatched:=true, SELF:=LEFT));																		
 			
 			//OUTPUT(count(payload_person_recs_tmp),named('payload_person_recs_tmp_count'));
 			
@@ -649,14 +832,14 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
       merged_person_recs :=  deltabse_person_recs + payload_person_recs;
 			//merged_person_recs :=  deltabse_person_recs; //Temp Remove
 			
-			recs_filtered_dedup := Functions.PreferDriverRecords(merged_person_recs);
+			recs_filtered_dedup := eCrash_Services.Functions.PreferDriverRecords(merged_person_recs);
 			
 			//OUTPUT(count(recs_filtered_dedup),named('recs_filtered_dedup_count'));
 			
-			recs_result := functions.InvolvedPartyTransform(recs_filtered_dedup,in_mod,true);
+			recs_result := eCrash_Services.functions.InvolvedPartyTransform(recs_filtered_dedup,in_mod,true);
 						
 			iesp.ecrash.t_ECrashSearchRecord setLastName(iesp.ecrash.t_ECrashSearchRecord l) := TRANSFORM
-				SELF.LastName :=  eCrash_Services.fn_CombineWords(SET(project(l.InvolvedParties(Name.Last <> ''),TRANSFORM(Layouts.LastNameSortValue, SELF.LastName:=LEFT.Name.Last)), LastName), ',');
+				SELF.LastName :=  eCrash_Services.fn_CombineWords(SET(project(l.InvolvedParties(Name.Last <> ''),TRANSFORM(eCrash_Services.Layouts.LastNameSortValue, SELF.LastName:=LEFT.Name.Last)), LastName), ',');
 				self := l;
 			END;
 			
@@ -681,7 +864,7 @@ EXPORT Raw(IParam.searchrecords in_mod) := MODULE
 												 sort_field = 'LastName' => if(sort_order='DESC', SORT(final_recs_results,-LastName), SORT(final_recs_results,LastName)),
 												 SORT(recs_result,-DateOfLoss));
 		
-			grouped_result_recs := functions.SubscriptionNonAssociatedGroupedReports(sorted_recs);
+			grouped_result_recs := eCrash_Services.functions.SubscriptionNonAssociatedGroupedReports(sorted_recs);
 			
 			return grouped_result_recs;
 		END;

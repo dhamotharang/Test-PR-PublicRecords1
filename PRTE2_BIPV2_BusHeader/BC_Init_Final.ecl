@@ -1,15 +1,17 @@
 ﻿import BIPV2;
 
 export BC_Init_Final(
-		dataset(PRTE2_BIPV2_BusHeader.Layouts.Base.Layout_CommonBase	)	pInput_BH_Init_Final		= PRTE2_BIPV2_BusHeader.BH_Init_Final()	
+		dataset(PRTE2_BIPV2_BusHeader.Layouts.Base.Layout_CommonBase	)	pInput_BH_Base	= PRTE2_BIPV2_BusHeader.Files().base.Linking.built	
 	
 ) :=
 function
 
 	//*** Business Header records
-	dBH_Recs := pInput_BH_Init_Final;
+	dBH_Recs := pInput_BH_Base;
 	
-	PRTE2_BIPV2_BusHeader.Layouts.Base.Layout_Contacts trf_Map2BusContacts(dBH_Recs l) := transform
+	Lay_Contacts := PRTE2_BIPV2_BusHeader.Layouts.Base.Layout_Contacts;
+	
+	Lay_Contacts trf_Map2BusContacts(dBH_Recs l) := transform
 	  self.company_address.prim_range		:= l.prim_range;
 		self.company_address.predir				:= l.predir;
 		self.company_address.prim_name		:= l.prim_name;
@@ -44,11 +46,32 @@ function
 		self.contact_name.name_suffix     := l.name_suffix;
     self.contact_name.name_score	    := l.name_score;
 		self                            	:= l;
-		//self                              := [];
+		self                              := [];
 	end;
 	
-	dBip_BC_base := project(dBH_Recs, trf_Map2BusContacts(left));
+	dBip_BC_recs := project(dBH_Recs, trf_Map2BusContacts(left));
 	
-	return dBip_BC_base;
+	dBip_BC_valid_recs  := dBip_BC_recs(contact_name.fname<>'' and contact_name.lname<>'');
+	
+	Lay_Contacts xform_add_deriveds(Lay_Contacts le) := transform
+   self.contact_job_title_derived := bipv2.bl_tables.contacttitle(le.contact_job_title_raw);
+	 self.contact_type_derived      := bipv2.bl_tables.contacttypedesc(le.contact_type_raw);
+	 self.contact_status_derived    := bipv2.bl_tables.contactstatus(le.contact_status_raw);
+	 self                           := le;
+  end;
+	
+	p_add_deriveds_bc_recs := project(dBip_BC_valid_recs, xform_add_deriveds(left));
+	
+  Lay_Contacts xform_add_exec_ind(Lay_Contacts le, bipv2.bl_tables.executivetitles ri) := transform
+	 self.executive_ind             := ri.position_title<>'';
+	 self.executive_ind_order       := ri.order;
+	 self                           := le;
+  end;
+	
+	j_add_exec_ind_bc_base := join(p_add_deriveds_bc_recs, bipv2.bl_tables.executivetitles, 
+																 left.contact_job_title_derived = right.position_title,
+																 xform_add_exec_ind(left,right), left outer, lookup);
+	
+	return j_add_exec_ind_bc_base;
 	
 end;

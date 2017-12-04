@@ -1,7 +1,12 @@
-EXPORT Layout_GetRelationship := MODULE
-			
+﻿EXPORT Layout_GetRelationship := MODULE
+
+// Relationship interface layouts
 export DIDs_layout := record
   unsigned6 DID;
+end;
+
+export DIDS_Pairs_layout := record(DIDs_Layout)
+	typeof(DIDs_layout.DID) DID2;
 end;
 
 export TransactionalFlags_layout   := record 
@@ -47,6 +52,7 @@ export RelationshipInterface := record
   unsigned2 minScore                   := 0;
   unsigned4 recentRelative             := 0;
   unsigned8 person2                    := 0;
+	boolean   runBatch                   := FALSE;
 	TransactionalFlags_layout     txflag;
 end;
 	
@@ -149,5 +155,16 @@ export InterfaceOuput := record
 	boolean   isAssociate;
 	boolean   isBusiness;
 end;	
-	
+
+export relativeRecNeutral := layout_output.key;
+
+export interfaceOutputNeutral := record
+	relativeRecNeutral;
+	string1   title_type;
+	integer2  source_type;
+	boolean   isRelative;
+	boolean   isAssociate;
+	boolean   isBusiness;
+end;
+
 END;
