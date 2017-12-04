@@ -244,7 +244,7 @@ Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 end;
 gateways := project(gateways_in, gw_switch(left));
 
-
+if( OFAC_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 foorec := record
 	unsigned4	seq := 0;

@@ -24,10 +24,9 @@ EXPORT ReportServiceFCRA := MACRO
 
 	ConsumerCreditReport_Services.IParams.SetInputUserOptions(GLOBAL(firstRow));
 	in_mod := ConsumerCreditReport_Services.IParams.getParams();
-	IF(NOT in_mod.hasGlbPermissiblePurpose, FAIL(ConsumerCreditReport_Services.Constants.GLB_REQUIRED_MSG));
 	ds_input_recs := ConsumerCreditReport_Services.Functions.format_InputRec(ds_xml);
 
-	ds_records := ConsumerCreditReport_Services.Records(ds_input_recs,in_mod);
+	ds_records := ConsumerCreditReport_Services.Records(ds_input_recs,in_mod,TRUE);
 	ds_results := PROJECT(ds_records,TRANSFORM(iesp.consumercreditreport_fcra.t_FcraConsumerCreditReportResponse,SELF:=LEFT));
 	ds_royalties := Royalty.RoyaltyCCR.GetOnlineRoyalties(ds_records);
 
