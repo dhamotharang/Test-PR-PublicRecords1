@@ -1,4 +1,7 @@
-﻿//RiskView.Search_Service
+﻿/*2017-11-21T00:37:17Z (aleksandar tomovic)
+Check in for RR-11812
+*/
+//RiskView.Search_Service
 /*--SOAP--
 <message name="RiskView Search_Service">
 	<part name="RiskView2Request" type="tns:XmlDataSet" cols="110" rows="75"/>
@@ -984,7 +987,6 @@ input_ok := if((
 			self.DateFiled := iesp.ECL2ESP.toDate((integer)left.DateFiled);
 			self.ReleaseDate := iesp.ECL2ESP.toDate((integer)left.ReleaseDate);
 			self.DateLastSeen := iesp.ECL2ESP.toDate((integer)left.DateLastSeen);
-			self.ConsumerStatementId := RiskView.Transforms.SetCSID(left.ConsumerStatementId);
 			self := left;
 			self := [];
 		));
@@ -994,7 +996,6 @@ input_ok := if((
 			self.DateFiled := iesp.ECL2ESP.toDate((integer)left.DateFiled);
 			self.ReleaseDate := iesp.ECL2ESP.toDate((integer)left.ReleaseDate);
 			self.DateLastSeen := iesp.ECL2ESP.toDate((integer)left.DateLastSeen);
-			self.ConsumerStatementId := RiskView.Transforms.SetCSID(left.ConsumerStatementId);
 			self := left;
 			self := [];
 		));

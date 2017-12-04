@@ -360,7 +360,8 @@ FUNCTION
 																 if (LEFT.corp_var6 <> '', 1, 0) +
 																 if (LEFT.corp_var7 <> '', 1, 0) +
 																 if (LEFT.corp_var8 <> '', 1, 0) +
-																 if (LEFT.corp_var9 <> '', 1, 0);
+																 if (LEFT.corp_var9 <> '', 1, 0) +
+																 if (LEFT.corp_var10 <> '', 1, 0);
 														SELF := LEFT;
 														));
 														

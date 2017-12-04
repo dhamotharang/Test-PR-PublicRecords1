@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="PatriotSearch">
 	<part name="_LoginID" type="xsd:string"/>
   <part name="Threshold" type="xsd:real"/>
@@ -61,6 +61,8 @@ boolean use_dob_Filter := FALSE :stored('UseDobFilter');
 integer2 dob_radius := -1 :stored('DobRadius');
 
 	gateways				:= Gateway.Configuration.Get();
+	
+if( OFAC_version = 4 and not exists(gateways(servicename = 'bridgerwlc')) , fail(Risk_Indicators.iid_constants.OFAC4_NoGateway));
 
 dob_radius_use := if(use_dob_Filter,dob_radius,-1);
 
