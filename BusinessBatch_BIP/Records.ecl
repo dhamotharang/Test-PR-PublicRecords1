@@ -351,9 +351,9 @@ FUNCTION
 
    ds_Corps2Final := PROJECT(ds_Corps2FinalTmp, TRANSFORM(RECORDOF(LEFT),
 	                        
-	                SELF.Total_Corp :=  
-														   if (LEFT.corp_var1 <> '', 1, 0) +
-							          if (LEFT.corp_var2 <> '', 1, 0) +
+	                          SELF.Total_Corp :=  
+														     if (LEFT.corp_var1 <> '', 1, 0) +
+							                   if (LEFT.corp_var2 <> '', 1, 0) +
 																 if (LEFT.corp_var3 <> '', 1, 0) +
 																 if (LEFT.corp_var4 <> '', 1, 0) +
 																 if (LEFT.corp_var5 <> '', 1, 0) +
@@ -362,8 +362,8 @@ FUNCTION
 																 if (LEFT.corp_var8 <> '', 1, 0) +
 																 if (LEFT.corp_var9 <> '', 1, 0) +
 																 if (LEFT.corp_var10 <> '', 1, 0);
-																	SELF := LEFT;
-																	));
+														SELF := LEFT;
+														));
 														
   // Flags
   BusinessBatch_BIP.Layouts.FinalWithLinkIds tFlags2Final(BusinessBatch_BIP.Layouts.FinalWithLinkIds le,BusinessBatch_BIP.Layouts.Flags ri) :=
