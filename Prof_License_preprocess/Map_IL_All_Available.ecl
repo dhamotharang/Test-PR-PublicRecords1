@@ -1,4 +1,4 @@
-import Prof_License;
+﻿import Prof_License;
 
 EXPORT Map_IL_All_Available( string fdate) := module
 
@@ -219,19 +219,15 @@ fout_IL := project ( fin_il , map2comm (left));
 outfile := proc_clean_all(fout_IL,'IL').cleanout;
 
 export buildprep := Sequential(dout, 
-                  FileServices.StartSuperfiletransaction(),
                                    FileServices.RemoveSuperFile('~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_il'),
 																	   if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_il_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_il_old')),
 								       if ( FileServices.FileExists( '~thor_data400::in::prolic_il_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_il_old')),
                        FileServices.RenameLogicalfile( '~thor_data400::in::prolic_il','~thor_data400::in::prolic_il_old'),
-										    FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_il_old'),
-										            FileServices.FinishSuperfiletransaction(),
-
+			
                
                          
-											output( outfile,,'~thor_data400::in::prolic_il',overwrite),
+											output( outfile,,'~thor_data400::in::prolic_il',compressed,overwrite),
                          FileServices.StartSuperfiletransaction(),
-											   FileServices.RenameLogicalfile( '~thor_data400::in::prolic_il','~thor_data400::in::prolic_il_old'),
 										    FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_il_old'),
 												 
 												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_il'),

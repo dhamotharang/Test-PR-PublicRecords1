@@ -1,10 +1,10 @@
-IMPORT data_services,Relationship,header_services;
+﻿IMPORT data_services,Relationship,header_services;
 EXPORT File_Relatives_Insurance(boolean suppressed=false) :=FUNCTION
 
 		file := dataset(
 		 	data_services.Data_Location.Relatives
 		 +'thor_data400::base::relatives_insurance::boca_copy'
-		,Relationship.layout_GetRelationship.RelativeRec
+		,Relationship.layout_output.titled
 		,flat);
 		
 		suppression_code := MODULE
@@ -24,7 +24,7 @@ EXPORT File_Relatives_Insurance(boolean suppressed=false) :=FUNCTION
 							 
 							Base_File_Append_In := attr();
 
-							Relationship.layout_GetRelationship.RelativeRec reformat_header(Base_File_Append_In L) := transform
+							Relationship.layout_output.titled reformat_header(Base_File_Append_In L) := transform
 									self.did1 := (unsigned6) L.did1;
 									self.did2 := (unsigned6) L.did2;
 
@@ -47,14 +47,14 @@ EXPORT File_Relatives_Insurance(boolean suppressed=false) :=FUNCTION
 							rHashVal := header_services.Supplemental_Data.layout_out;
 
 							ro_temp_rec := record
-								 Relationship.layout_GetRelationship.RelativeRec;
+								 Relationship.layout_output.titled;
 								 data16 hval1;
 								 data16 hval2;
 								 data16 hval3;
 								 data16 hval4;
 							end;
 
-							ro_temp_rec tHash_vals(Relationship.layout_GetRelationship.RelativeRec l) := transform                            
+							ro_temp_rec tHash_vals(Relationship.layout_output.titled l) := transform                            
 								 self.hval1 := hashmd5(intformat(l.did1,15,1),intformat(l.did2,15,1));
 								 self.hval2 := hashmd5(intformat(l.did2,15,1),intformat(l.did1,15,1));
 								 self.hval3 := hashmd5(intformat(l.did1,15,1));
@@ -64,7 +64,7 @@ EXPORT File_Relatives_Insurance(boolean suppressed=false) :=FUNCTION
 
 							ro_temp := project(ro, tHash_vals(left));
 
-							Relationship.layout_GetRelationship.RelativeRec tSuppress(ro_Temp l, dSuppressedIn r) := transform
+							Relationship.layout_output.titled tSuppress(ro_Temp l, dSuppressedIn r) := transform
 							 self := l;
 							end;
 

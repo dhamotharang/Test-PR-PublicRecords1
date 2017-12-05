@@ -1,4 +1,4 @@
-IMPORT AddrBest,Doxie_Raw,Gateway,MDR,PhoneFinder_Services,Progressive_phone;
+﻿IMPORT AddrBest,Doxie_Raw,Gateway,MDR,PhoneFinder_Services,Progressive_phone;
 
 // Layouts
 lBatchIn       := PhoneFinder_Services.Layouts.BatchInAppendDID;
@@ -34,32 +34,38 @@ FUNCTION
 	qSentV2Gateway := dGateways(inMod.useQSent and Gateway.Configuration.isQsentV2(servicename))[1];
 	metronetGateway:= dGateways(inMod.useMetronet and Gateway.Configuration.isMetronet(servicename))[1];
 	
-	Progressive_phone.layout_progressive_batch_in tFormat2ProgressivePhone(dIn pInput) :=
+	BOOLEAN isWaterfallphonesearch := inMod.useWaterfallv6 OR isPhoneExists;
+	
+ Progressive_phone.layout_progressive_batch_in tFormat2ProgressivePhone(dIn pInput) :=
 	TRANSFORM
-		SELF.phoneno := pInput.homephone;
-		SELF.suffix  := pInput.addr_suffix;
-		SELF.z4      := pInput.zip4;
-		SELF         := pInput;
+	
+	 SELF.acctno  := pInput.acctno;
+	 SELF.did     := pInput.did;
+		SELF.phoneno := IF(isWaterfallphonesearch, pInput.homephone, '');
+		SELF.suffix  := IF(isWaterfallphonesearch, pInput.addr_suffix, '');
+		SELF.z4      := IF(isWaterfallphonesearch, pInput.zip4, '');
+		SELF         := IF(isWaterfallphonesearch, pInput);
 		SELF         := [];
 	END;
-	dFormat2ProgressivePhone := PROJECT(dIn,tFormat2ProgressivePhone(LEFT));
-	WFConstants := PhoneFinder_Services.Constants.WFConstants;
+	
+	dFormat2ProgressivePhone := PROJECT(dIn,tFormat2ProgressivePhone(LEFT));	
+	WFConstants := PhoneFinder_Services.Constants.WFConstants;				
+	 // sending in lexid only as the input to WF in a PII search
 	dWaterfallPIISearch 	:= AddrBest.Progressive_phone_common(dFormat2ProgressivePhone,tmpMod,,DATASET(metronetGateway),,,TRUE,inMod.UseMetronet,
 															TRUE,WFConstants.MetronetLimit,progressive_phone.Constants.WFP_V8_CP_V3_MODEL_NAMES[2],,,,,,,
 															WFConstants.MaxSubjects,,,inMod.UseEquifax,WFConstants.MaxPremiumSource);																										
 	dWaterfallPhoneSearch := AddrBest.Progressive_phone_common(dFormat2ProgressivePhone,tmpMod,,DATASET(metronetGateway),,,TRUE,inMod.UseMetronet,TRUE);
 	
-	dWaterfallPhones := IF(inMod.useWaterfallv6 OR isPhoneExists,dWaterfallPhoneSearch,dWaterfallPIISearch);
+	dWaterfallPhones := IF(isWaterfallphonesearch,dWaterfallPhoneSearch,dWaterfallPIISearch);
 	
 	// Format to common layout
 	lFinal tWaterfall2Common(dIn le,dWaterfallPhones ri) :=
 	TRANSFORM
 		SELF.batch_in          := le;
 		SELF.did               := IF(ri.p_did>0,ri.p_did,ri.did);
-		SELF.fname             := IF(ri.subj_phone_type_new = MDR.SourceTools.src_Metronet_Gateway,ri.subj_first,ri.p_name_first);
-		SELF.mname             := IF(ri.subj_phone_type_new = MDR.SourceTools.src_Metronet_Gateway,ri.subj_middle,'');
-		SELF.lname             := IF(ri.subj_phone_type_new = MDR.SourceTools.src_Metronet_Gateway,ri.subj_last,ri.p_name_last);
-		SELF.suffix            := ri.addr_suffix;
+		SELF.fname             := IF(ri.subj_first <> '', ri.subj_first, ri.p_name_first);
+  SELF.mname             := ri.subj_middle;
+  SELF.lname             := IF(ri.subj_last <> '', ri.subj_last,ri.p_name_last);
 		SELF.city_name         := ri.p_city_name;
 		SELF.zip               := ri.zip5;
 		SELF.phone             := ri.subj_phone10;
@@ -149,11 +155,13 @@ FUNCTION
 	#IF(PhoneFinder_Services.Constants.Debug.Waterfall)
 		wfWithPhone   := SEQUENTIAL(OUTPUT(dIn,NAMED('dPhone_Waterfall_In'),EXTEND),
 																OUTPUT(dFormat2ProgressivePhone,NAMED('dPhone_Format2ProgressivePhone'),EXTEND),
+																OUTPUT(dWaterfallPhoneSearch,NAMED('dWaterfallPhoneSearch'),EXTEND),
 																OUTPUT(dWaterfallPhones,NAMED('dPhone_WaterfallPhones'),EXTEND),
 																OUTPUT(dWaterfallPhones2Common,NAMED('dPhone_WaterfallPhones2Common'),EXTEND));
 		
 		wfWithNoPhone := SEQUENTIAL(OUTPUT(dIn,NAMED('dWaterfall_In'),EXTEND),
 																OUTPUT(dFormat2ProgressivePhone,NAMED('dFormat2ProgressivePhone'),EXTEND),
+																OUTPUT(dWaterfallPIISearch,NAMED('dWaterfallPIISearch'),EXTEND),
 																OUTPUT(dWaterfallPhones,NAMED('dWaterfallPhones'),EXTEND),
 																OUTPUT(dWaterfallPhones2Common,NAMED('dWaterfallPhones2Common'),EXTEND),
 																OUTPUT(dWaterfallPrimaryPhone,NAMED('dWaterfallPrimaryPhone'),EXTEND),

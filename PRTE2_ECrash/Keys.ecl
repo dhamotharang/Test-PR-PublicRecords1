@@ -1,4 +1,4 @@
-IMPORT  doxie, mdr, prte2_Ecrash, STD, BIPV2, ut, FLAccidents_Ecrash;
+﻿IMPORT  doxie, mdr, prte2_Ecrash, STD, BIPV2, ut, FLAccidents_Ecrash;
 
 EXPORT keys := MODULE
 
@@ -74,7 +74,7 @@ EXPORT key_ecrashv2_accnbr 	:= INDEX(files_addl.ds_accnbr, {l_accnbr, report_cod
 																			Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::accnbr');
 
 
-EXPORT key_ecrashv2_accnbrv1 := INDEX(files_addl.ds_accnbrv1, {l_accnbr, report_code,jurisdiction_state, jurisdiction}, {files_addl.ds_accnbrv1},
+EXPORT key_ecrashv2_accnbrv1 := INDEX(files_addl.ds_accnbrv1, {l_accnbr, report_code, jurisdiction_state, jurisdiction}, {files_addl.ds_accnbrv1},
 																			Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::accnbrv1');
 	 
 EXPORT key_ecrashv2_agencyid_sentdate := INDEX(files_addl.ds_agencyid_sentdate, {jurisdiction_nbr}, {MaxSent_to_hpcc_date}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::agencyid_sentdate'); 
@@ -84,7 +84,7 @@ EXPORT Key_ecrashv2_LastName := INDEX(files_addl.ds_lastname_state, {lname,juris
 
 EXPORT key_ecrashv2_prefname_state 	:= INDEX(files_addl.ds_prefname_state,{fname,jurisdiction_state,jurisdiction}, {files_addl.ds_prefname_state},
 																			Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::prefname_state');
-
+	
 EXPORT key_ecrashv2_standlocation 	:= INDEX(file_stAndLocation, {Partial_Accident_location,jurisdiction_state, jurisdiction},
 																					{file_stAndLocation},
 																					Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::standlocation');
@@ -114,7 +114,7 @@ EXPORT key_ecrashv2_deltadate 		:= INDEX(file_deltadate, {delta_text},{delta_tex
 
 
 // Partial Acct NBR Key
-in_accnbr := key_ecrashv2_accnbrv1(report_code in ['EA','TM','TF'] and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']);
+in_accnbr := key_ecrashv2_accnbrv1(KEYED(report_code in ['EA','TM','TF']) and WILD(l_accnbr) and work_type_id not in ['2','3'] and trim(report_type_id,all) in ['A','DE']);
 parse_report := project(in_accnbr, transform(Layouts.slim_partial_report_nbr, 
 																						 part_num := if(trim(std.str.Filterout(left.l_accnbr,'0-'),left,right) ='' , '', trim(left.l_accnbr,left,right));
   																					 SELF.f1 := part_num[1..4];
@@ -221,7 +221,11 @@ EXPORT key_ecrashv2analytics_byinter 	:= INDEX(file_BYInter(agencyid <>''), {age
 
 EXPORT key_ecrashv2analytics_bymoy 		:= INDEX(file_ByMOY(agencyid <>''),{agencyid, Accident_date}, {file_ByMOY}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::analytics_bymoy'); 
 
+//New Key for BuyCash KY Integration
+EXPORT key_ecrashV2_agency 						:= INDEX(files.base_agencycmbnd, {Agency_State_Abbr,Agency_Name,Agency_ori}, 
+																									{Mbsi_Agency_ID, Cru_Agency_ID, Cru_State_Number, Source_ID, Append_Overwrite_Flag}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::agency'); 
 
+								                            
 EXPORT Key_LinkIds   := MODULE
 
   // DEFINE THE INDEX
@@ -250,6 +254,18 @@ EXPORT Key_LinkIds   := MODULE
 	END;
 
 END;
+	
+	
+//New Keys for  BuyCrash Appriss Ingretation
+EXPORT	key_ecrashv2_DlnNbrDLState :=	INDEX(Files_Addl.ds_DLNbrState,{driver_license_nbr,dlnbr_st,jurisdiction_state,jurisdiction}
+																							,{Files_Addl.ds_DLNbrState}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::DlnNbrDLState'); 
 
+EXPORT	key_ecrashv2_LicensePlateNbr :=	INDEX(Files_Addl.ds_LicensePlateNbr, {tag_nbr,tagnbr_st,jurisdiction_state,jurisdiction}, {Files_Addl.ds_LicensePlateNbr}
+																							  ,Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::LicensePlateNbr'); 
+																								
+EXPORT	key_ecrashv2_OfficerBadgeNbr :=	INDEX(Files_Addl.ds_OfficerBadgeNbr, {officer_id,jurisdiction_state,jurisdiction}, {Files_Addl.ds_OfficerBadgeNbr}
+																								,Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::OfficerBadgeNbr'); 
 
+EXPORT	key_ecrashv2_VinNbr :=	INDEX(Files_Addl.ds_VinNbr, {vin,jurisdiction_state,jurisdiction}, {Files_Addl.ds_VinNbr}, Constants.KeyName_ecrashv2+ '::' + doxie.Version_SuperKey + '::VinNbr'); 		
+																				
 END;

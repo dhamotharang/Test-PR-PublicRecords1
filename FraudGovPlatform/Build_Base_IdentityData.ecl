@@ -1,4 +1,4 @@
-Import ut,tools,inquiry_acclogs,FraudShared,Address; 
+﻿Import ut,tools,inquiry_acclogs,FraudShared,Address; 
 
 EXPORT Build_Base_IdentityData (
    string pversion
@@ -17,7 +17,6 @@ module
 				
 				    self.process_date                    := (unsigned) pversion, 
 						self.Unique_Id                       := 0; 
-						self.Source                          := 'IDDT'; 
 						self.dt_first_seen                   := (unsigned)pInput.Date_of_Transaction [1..8]; 
 						self.dt_last_seen                    := (unsigned)pInput.Date_of_Transaction [1..8];
 						self.dt_vendor_last_reported         := (unsigned) pversion;
@@ -38,10 +37,20 @@ module
 		
 	IdentityDataUpdate	:=	project(dedup(inIdentityDataUpdateUpper ,all),tPrep(left,counter));
 	
+	Mbs_ds := FraudShared.Files().Input.MBS.sprayed(status = 1);
+
+	IdentityDataSource  := join(IdentityDataUpdate,
+														Mbs_ds, 
+															(unsigned6) left.Client_ID = right.gc_id and 
+															right.file_type = Functions.file_type_fn('IDDT') and 
+															Functions.ind_type_fn(left.customer_program) = right.ind_type and 
+															left.customer_state = right.Customer_State,  
+														TRANSFORM(Layouts.Base.IdentityData,SELF.Source := RIGHT.fdn_file_code; SELF := LEFT));
+														
 	//Standardize_Name(IdentityDataUpdate, first_name, middle_name, last_name, suffix, IdentityDataUpdateCleaned); 
 
   // Rollup Update and previous base 
-	Pcombined     := If(UpdateIdentityData , inBaseIdentityData + IdentityDataUpdate , IdentityDataUpdate); 	
+	Pcombined     := If(UpdateIdentityData , inBaseIdentityData + IdentityDataSource , IdentityDataSource); 	
 	pDataset_Dist := distribute(Pcombined, hash(Transaction_ID_Number));	
 	pDataset_sort := sort(pDataset_Dist , -Transaction_ID_Number, -dt_last_seen,-process_date,record  ,local);
 			

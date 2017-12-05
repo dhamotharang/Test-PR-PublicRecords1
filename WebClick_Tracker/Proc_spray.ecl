@@ -1,4 +1,4 @@
-// Name - Proc_Spray
+﻿// Name - Proc_Spray
 // Parameters - filedate (date of spray), sourcefile (file name with full path)
 // Function - Sprays a csv file and moves the sprayed file to a superfile
 
@@ -16,7 +16,7 @@ export Proc_spray(string filedate,string sourcefile,string source) := function
 	
 	// Spray CSV file
 	spraycsv := FileServices.SprayVariable(sourceIP,sourcefile,,,,,group_name,
-						tempfilename ,-1,,,true,true);
+						tempfilename ,-1,,,true,true,true);
 	
 	// Add source flag
 	ds := dataset(tempfilename,WebClick_Tracker.Layout_WC_FileIn_Pre_Flag,csv(quote('\"')));
@@ -34,7 +34,7 @@ export Proc_spray(string filedate,string sourcefile,string source) := function
 							if (fileservices.superfileexists(superfile),
 								output(superfile + ' exists'),
 								fileservices.createsuperfile(superfile)),
-							output(tab_recs,,infilename,csv(quote('\"'))),
+							output(tab_recs,,infilename,csv(quote('\"')),compressed),
 							fileservices.addsuperfile(superfile,infilename),
 							fileservices.deletelogicalfile(tempfilename)
 						);

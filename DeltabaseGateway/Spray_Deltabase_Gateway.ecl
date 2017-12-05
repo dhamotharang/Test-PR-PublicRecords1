@@ -12,7 +12,7 @@ EXPORT Spray_Deltabase_Gateway(string version, const varstring eclsourceip, stri
 																				'|\t|',
 																				'\r\n',
 																				,
-																				thor_name,
+																				STD.System.Thorlib.Group(),
 																				root + version, 
 																				,
 																				,

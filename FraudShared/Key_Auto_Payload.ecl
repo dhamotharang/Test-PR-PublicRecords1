@@ -1,4 +1,4 @@
-Import data_services;
+﻿Import data_services;
 
 entity := RECORD
    unsigned2 entity_type_id;
@@ -11,7 +11,7 @@ entity := RECORD
    string10 evidence;
    string10 investigated_count;
   END;
-	
+
 layout_clean_name := RECORD
    string5 title;
    string20 fname;
@@ -55,6 +55,18 @@ clean_phones := RECORD
    string10 phone_number;
    string10 cell_phone;
    string10 work_phone;
+  END;
+
+address_cleaner := RECORD
+   string100 street_1;
+   string50 street_2;
+   string100 city;
+   string10 state;
+   string10 zip;
+   string10 address_type;
+   string100 address_1;
+   string50 address_2;
+   layout_clean182_fips clean_address;
   END;
 
 r:=RECORD
@@ -133,8 +145,8 @@ r:=RECORD
   string25 contact;
   string25 call_records;
   string1 in_service;
-	entity classification_entity;
-  string50 source;
+  entity classification_entity;
+  string100 source;
   unsigned4 process_date;
   unsigned4 dt_first_seen;
   unsigned4 dt_last_seen;
@@ -178,8 +190,10 @@ r:=RECORD
   unsigned2 ultscore;
   unsigned2 ultweight;
   clean_phones clean_phones;
+  address_cleaner additional_address;
   unsigned8 __internal_fpos__;
  END;
+
 
 d	:=dataset([],r);
 

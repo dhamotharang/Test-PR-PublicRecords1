@@ -1,4 +1,4 @@
-IMPORT BatchShare, iesp;
+﻿IMPORT BatchShare, iesp, Risk_Indicators;
 
 EXPORT Layouts := MODULE
 
@@ -16,7 +16,7 @@ EXPORT Layouts := MODULE
 		inputRec;
 		STRING20 orig_acctno;
 		Batchshare.Layouts.ShareErrors;
-		DATASET(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements;
+		Risk_Indicators.Layouts.tmp_ConsumerStatements;
 	END;
 
 	EXPORT ccrResp := RECORD
@@ -24,7 +24,8 @@ EXPORT Layouts := MODULE
 		STRING2 Source;
 		STRING12 UniqueId1;
 		STRING12 UniqueId2;
-		iesp.consumercreditreport_fcra.t_FcraConsumerCreditReportResponse;
+		iesp.consumercreditreport_fcra.t_FcraConsumerCreditReportResponse AND NOT ConsumerStatements;
+		Risk_Indicators.Layouts.tmp_ConsumerStatements;
 	END;
 
 END;

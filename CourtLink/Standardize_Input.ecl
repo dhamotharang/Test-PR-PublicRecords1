@@ -1,4 +1,4 @@
-import Address, Ut, lib_stringlib, _Control, business_header,_Validate, NID;
+﻿import Address, Ut, lib_stringlib, _Control, business_header,_Validate, NID;
 // 	The Courtlink Data is unique in format. Understanding the format of the data is 
 // 	necessary to understand the formatting steps taken in the code: 
 //	The file will consist of six different sections.  Each section begins with a three 
@@ -12,28 +12,28 @@ import Address, Ut, lib_stringlib, _Control, business_header,_Validate, NID;
 //	Attorneys					/06
 //
 // Following each section, the data consists of delimited fields.  Fields are delimited 
-// by the ASCII character 166 (Â¦).  All fields are text strings.  Fields that do not 
+// by the ASCII character 166 (¦).  All fields are text strings.  Fields that do not 
 // contain data will still be followed by the delimiter (thus, there will be two 
 // successive delimiter characters).  The delimited fields within each section are as 
 // follows:
 //
 // Section: /01 Basic Docket Information
-// (1)StateÂ¦(2)CourtIDÂ¦(3)Court NameÂ¦(4)Docket NumberÂ¦(5)Office NameÂ¦
-// (6)Docket As Of DateÂ¦(7)Class CodeÂ¦(8)Case CaptionÂ¦(9)Date FiledÂ¦(10)Judge 
-// TitleÂ¦(11)Judge NameÂ¦(12)Referred To Judge TitleÂ¦(13)Referred To JudgeÂ¦
-// (14)Jury DemandÂ¦(15)Demand AmountÂ¦(16)Nature of Suit CodeÂ¦(17)Nature of 
-// Suit DescriptionÂ¦(18)Lead Docket NumberÂ¦(19)JurisdictionÂ¦(20)CauseÂ¦
-// (21)StatuteÂ¦(22)CAÂ¦(23)Case ClosedÂ¦(24)Date Retrieved
+// (1)State¦(2)CourtID¦(3)Court Name¦(4)Docket Number¦(5)Office Name¦
+// (6)Docket As Of Date¦(7)Class Code¦(8)Case Caption¦(9)Date Filed¦(10)Judge 
+// Title¦(11)Judge Name¦(12)Referred To Judge Title¦(13)Referred To Judge¦
+// (14)Jury Demand¦(15)Demand Amount¦(16)Nature of Suit Code¦(17)Nature of 
+// Suit Description¦(18)Lead Docket Number¦(19)Jurisdiction¦(20)Cause¦
+// (21)Statute¦(22)CA¦(23)Case Closed¦(24)Date Retrieved
 //
 // Section: /02 Other Docket Numbers
 // (1)Other Docket Number
 //
 // Sections: /03 Plaintiff; /04 Defendant, /05 Other Litigant
-// (1)Litigant NameÂ¦(2)Litigant LabelÂ¦(3)Layout CodeÂ¦(4)Termination Date
+// (1)Litigant Name¦(2)Litigant Label¦(3)Layout Code¦(4)Termination Date
 //
 // Section: /06 Attorney
-// (1)Attorney NameÂ¦(2)Attorney LabelÂ¦(3)Firm NameÂ¦(4)AddressÂ¦(5)CityÂ¦
-// (6)StateÂ¦(7)Zip CodeÂ¦(8)CountryÂ¦(9)Additional InformationÂ¦(10)Termination 
+// (1)Attorney Name¦(2)Attorney Label¦(3)Firm Name¦(4)Address¦(5)City¦
+// (6)State¦(7)Zip Code¦(8)Country¦(9)Additional Information¦(10)Termination 
 // Date
 //
 // The following code will add linking keys to each section of the file so that 
@@ -51,11 +51,11 @@ export Standardize_Input := module
 	//	remove special characters that were seen in the data
 	//////////////////////////////
 		CourtLink.Layouts.Input.Sprayed	trfRemoveSpecialCharacters(CourtLink.Layouts.Input.Sprayed l)	:=	transform
-			string tmp1		:=	StringLib.StringFindReplace(l.TmpField, 'Â»','');
-			string tmp2		:=	StringLib.StringFindReplace(tmp1, 'Â«','');
-			string tmp3		:=	StringLib.StringFindReplace(tmp2, 'Â§','; ');
+			string tmp1		:=	StringLib.StringFindReplace(l.TmpField, '»','');
+			string tmp2		:=	StringLib.StringFindReplace(tmp1, '«','');
+			string tmp3		:=	StringLib.StringFindReplace(tmp2, '§','; ');
 			string tmp4		:=	StringLib.StringFindReplace(tmp3, '&#064;','@');
-			self.TmpField	:=	tmp4 + 'Â¦';
+			self.TmpField	:=	tmp4 + '¦';
 		end;
 
 		CleanRaw	:=	project(pRawFileInput, trfRemoveSpecialCharacters(left));
@@ -69,12 +69,12 @@ export Standardize_Input := module
 		CourtLink.Layouts.input.CommonBlob	trfAddLinks(CourtLink.Layouts.Input.Sprayed input)	:=	transform
 			self.RecId		:=	input.tmpField[2..3];
 			self.LinkKey1	:=	if (input.tmpField[1..3]='/01',
-										input.tmpField[4..5] + input.tmpField[StringLib.StringFind(input.tmpField, 'Â¦', 3) + 1..StringLib.StringFind(input.tmpField, 'Â¦', 4) - 1],
+										input.tmpField[4..5] + input.tmpField[StringLib.StringFind(input.tmpField, '¦', 3) + 1..StringLib.StringFind(input.tmpField, '¦', 4) - 1],
 										''
 									);
-			integer pos		:=	if (StringLib.StringFind(input.tmpField, 'Â¦', 1) = 0,
+			integer pos		:=	if (StringLib.StringFind(input.tmpField, '¦', 1) = 0,
 										length(input.tmpField) + 1,
-										StringLib.StringFind(input.tmpField, 'Â¦', 1)
+										StringLib.StringFind(input.tmpField, '¦', 1)
 									);
 			self.LinkKey2	:=	if (input.tmpField[1..3]='/03' or input.tmpField[1..3]='/04' or input.tmpField[1..3]='/05',
 										input.tmpField[..pos - 1],
@@ -135,102 +135,102 @@ export Standardize_Input := module
 	//	Parse thru the /01 record, mapping to the fields	
 	//////////////////////////////
 		CourtLink.Layouts.Input.BasicInfo	  trfRec01(CourtLink.Layouts.input.CommonBlob l)	:=	transform	
-			self.State					:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 1) != 0,
-													stringlib.StringToUppercase(l.tmpField[4..StringLib.StringFind(l.tmpField, 'Â¦', 1) - 1]),
+			self.State					:= 	if (StringLib.StringFind(l.tmpField, '¦', 1) != 0,
+													stringlib.StringToUppercase(l.tmpField[4..StringLib.StringFind(l.tmpField, '¦', 1) - 1]),
 													''
 												);
-			self.CourtID				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 2) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 1) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 2) - 1]),
+			self.CourtID				:= 	if (StringLib.StringFind(l.tmpField, '¦', 2) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 1) + 1..StringLib.StringFind(l.tmpField, '¦', 2) - 1]),
 													''
 												);
-			self.CourtName				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 3) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 2) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 3) - 1]),
+			self.CourtName				:= 	if (StringLib.StringFind(l.tmpField, '¦', 3) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 2) + 1..StringLib.StringFind(l.tmpField, '¦', 3) - 1]),
 													''
 												);
-			self.DocketNumber			:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 4) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 3) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 4) - 1]),
+			self.DocketNumber			:= 	if (StringLib.StringFind(l.tmpField, '¦', 4) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 3) + 1..StringLib.StringFind(l.tmpField, '¦', 4) - 1]),
 													''
 												);
-			self.OfficeName				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 5) != 0,
-													regexreplace('[()]', stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 4) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 5) - 1]),''), 
+			self.OfficeName				:= 	if (StringLib.StringFind(l.tmpField, '¦', 5) != 0,
+													regexreplace('[()]', stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 4) + 1..StringLib.StringFind(l.tmpField, '¦', 5) - 1]),''), 
 													''
 												);
-			self.AsOfDate				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 6) != 0,
-													reformatDate(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 5) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 6) - 1]),
+			self.AsOfDate				:= 	if (StringLib.StringFind(l.tmpField, '¦', 6) != 0,
+													reformatDate(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 5) + 1..StringLib.StringFind(l.tmpField, '¦', 6) - 1]),
 													''
 													);
-			self.ClassCode				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 7) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 6) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 7) - 1]),
+			self.ClassCode				:= 	if (StringLib.StringFind(l.tmpField, '¦', 7) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 6) + 1..StringLib.StringFind(l.tmpField, '¦', 7) - 1]),
 													''
 												);
-			self.CaseCaption			:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 8) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 7) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 8) - 1]),
+			self.CaseCaption			:= 	if (StringLib.StringFind(l.tmpField, '¦', 8) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 7) + 1..StringLib.StringFind(l.tmpField, '¦', 8) - 1]),
 													''
 												);
-			self.DateFiled				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 9) != 0,
-													reformatDate(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 8) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 9) - 1]),
+			self.DateFiled				:= 	if (StringLib.StringFind(l.tmpField, '¦', 9) != 0,
+													reformatDate(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 8) + 1..StringLib.StringFind(l.tmpField, '¦', 9) - 1]),
 													''
 												);
-			self.JudgeTitle				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 10) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 9) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 10) - 1]),
+			self.JudgeTitle				:= 	if (StringLib.StringFind(l.tmpField, '¦', 10) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 9) + 1..StringLib.StringFind(l.tmpField, '¦', 10) - 1]),
 													''
 												);
-			self.JudgeName				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 11) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 10) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 11) - 1]),
+			self.JudgeName				:= 	if (StringLib.StringFind(l.tmpField, '¦', 11) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 10) + 1..StringLib.StringFind(l.tmpField, '¦', 11) - 1]),
 													''
 												);
-			self.ReferredToJudgeTitle	:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 12) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 11) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 12) - 1]),
+			self.ReferredToJudgeTitle	:= 	if (StringLib.StringFind(l.tmpField, '¦', 12) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 11) + 1..StringLib.StringFind(l.tmpField, '¦', 12) - 1]),
 													''
 												);
-			self.ReferredToJudge		:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 13) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 12) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 13) - 1]),
+			self.ReferredToJudge		:= 	if (StringLib.StringFind(l.tmpField, '¦', 13) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 12) + 1..StringLib.StringFind(l.tmpField, '¦', 13) - 1]),
 													''
 												);
-			self.JuryDemand				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 14) != 0 and 
-												trim(stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 13) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 14) - 1]),left,right)<>'NONE',
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 13) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 14) - 1]),
+			self.JuryDemand				:= 	if (StringLib.StringFind(l.tmpField, '¦', 14) != 0 and 
+												trim(stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 13) + 1..StringLib.StringFind(l.tmpField, '¦', 14) - 1]),left,right)<>'NONE',
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 13) + 1..StringLib.StringFind(l.tmpField, '¦', 14) - 1]),
 													''
 												);
-			self.DemandAmount			:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 15) != 0 and
-												(integer)stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 14) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 15) - 1])<>0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 14) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 15) - 1]),
+			self.DemandAmount			:= 	if (StringLib.StringFind(l.tmpField, '¦', 15) != 0 and
+												(integer)stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 14) + 1..StringLib.StringFind(l.tmpField, '¦', 15) - 1])<>0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 14) + 1..StringLib.StringFind(l.tmpField, '¦', 15) - 1]),
 													''
 												);
-			self.SuitNatureCode			:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 16) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 15) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 16) - 1]),
+			self.SuitNatureCode			:= 	if (StringLib.StringFind(l.tmpField, '¦', 16) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 15) + 1..StringLib.StringFind(l.tmpField, '¦', 16) - 1]),
 													''
 												);
-			self.SuitNatureDesc			:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 17) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 16) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 17) - 1]),
+			self.SuitNatureDesc			:= 	if (StringLib.StringFind(l.tmpField, '¦', 17) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 16) + 1..StringLib.StringFind(l.tmpField, '¦', 17) - 1]),
 													''
 												);
-			self.LeadDocketNumber		:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 18) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 17) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 18) - 1]),
+			self.LeadDocketNumber		:= 	if (StringLib.StringFind(l.tmpField, '¦', 18) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 17) + 1..StringLib.StringFind(l.tmpField, '¦', 18) - 1]),
 													''
 												);
-			self.Jurisdiction			:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 19) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 18) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 19) - 1]),
+			self.Jurisdiction			:= 	if (StringLib.StringFind(l.tmpField, '¦', 19) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 18) + 1..StringLib.StringFind(l.tmpField, '¦', 19) - 1]),
 													''
 												);
-			self.Cause					:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 20) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 19) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 20) - 1]),
+			self.Cause					:= 	if (StringLib.StringFind(l.tmpField, '¦', 20) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 19) + 1..StringLib.StringFind(l.tmpField, '¦', 20) - 1]),
 													''
 												);
-			self.Statute				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 21) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 20) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 21) - 1]),
+			self.Statute				:= 	if (StringLib.StringFind(l.tmpField, '¦', 21) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 20) + 1..StringLib.StringFind(l.tmpField, '¦', 21) - 1]),
 													''
 												);
-			self.CA						:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 22) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 21) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 22) - 1]),
+			self.CA						:= 	if (StringLib.StringFind(l.tmpField, '¦', 22) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 21) + 1..StringLib.StringFind(l.tmpField, '¦', 22) - 1]),
 													''
 												);
-			self.CaseClosed				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 23) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 22) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 23) - 1]),
+			self.CaseClosed				:= 	if (StringLib.StringFind(l.tmpField, '¦', 23) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 22) + 1..StringLib.StringFind(l.tmpField, '¦', 23) - 1]),
 													''
 												);
-			self.DateRetrieved			:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 24) != 0,
-													reformatDate(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 23) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 24) - 1]),
+			self.DateRetrieved			:= 	if (StringLib.StringFind(l.tmpField, '¦', 24) != 0,
+													reformatDate(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 23) + 1..StringLib.StringFind(l.tmpField, '¦', 24) - 1]),
 													''
 												);
 			self						:=	l;
@@ -242,8 +242,8 @@ export Standardize_Input := module
 	//	Parse thru the /02 record, mapping to the fields	
 	//////////////////////////////
 		CourtLink.Layouts.Input.OtherDocketNumbers  trfRec02(CourtLink.Layouts.input.CommonBlob l)	:=	transform	
-			self.DocketNumber			:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 1) != 0,
-													stringlib.StringToUppercase(l.tmpField[4..StringLib.StringFind(l.tmpField, 'Â¦', 1) - 1]),
+			self.DocketNumber			:= 	if (StringLib.StringFind(l.tmpField, '¦', 1) != 0,
+													stringlib.StringToUppercase(l.tmpField[4..StringLib.StringFind(l.tmpField, '¦', 1) - 1]),
 													''
 												);
 			self						:=	l;
@@ -255,20 +255,20 @@ export Standardize_Input := module
 	//	Parse thru the /03-/05 records, mapping to the fields	
 	//////////////////////////////
 		CourtLink.Layouts.Input.Parties	  trfRec03_05(CourtLink.Layouts.input.CommonBlob l)	:=	transform	
-			self.LitigantName			:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 1) != 0,
-													stringlib.StringToUppercase(l.tmpField[4..StringLib.StringFind(l.tmpField, 'Â¦', 1) - 1]),
+			self.LitigantName			:= 	if (StringLib.StringFind(l.tmpField, '¦', 1) != 0,
+													stringlib.StringToUppercase(l.tmpField[4..StringLib.StringFind(l.tmpField, '¦', 1) - 1]),
 													''
 												);
-			self.LitigantLabel			:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 2) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 1) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 2) - 1]),
+			self.LitigantLabel			:= 	if (StringLib.StringFind(l.tmpField, '¦', 2) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 1) + 1..StringLib.StringFind(l.tmpField, '¦', 2) - 1]),
 													''
 												);
-			self.LayoutCode				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 3) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 2) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 3) - 1]),
+			self.LayoutCode				:= 	if (StringLib.StringFind(l.tmpField, '¦', 3) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 2) + 1..StringLib.StringFind(l.tmpField, '¦', 3) - 1]),
 													''
 												);
-			self.TerminationDate		:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 4) != 0,
-													reformatDate(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 3) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 4) - 1]),
+			self.TerminationDate		:= 	if (StringLib.StringFind(l.tmpField, '¦', 4) != 0,
+													reformatDate(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 3) + 1..StringLib.StringFind(l.tmpField, '¦', 4) - 1]),
 													''
 												);
 			self						:=	l;
@@ -280,44 +280,44 @@ export Standardize_Input := module
 	//	Parse thru the /06 record, mapping to the fields	
 	//////////////////////////////
 		CourtLink.Layouts.Input.Attorney	  trfRec06(CourtLink.Layouts.input.CommonBlob l)	:=	transform	
-			self.AttorneyName			:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 1) != 0,
-													stringlib.StringToUppercase(l.tmpField[4..StringLib.StringFind(l.tmpField, 'Â¦', 1) - 1]),
+			self.AttorneyName			:= 	if (StringLib.StringFind(l.tmpField, '¦', 1) != 0,
+													stringlib.StringToUppercase(l.tmpField[4..StringLib.StringFind(l.tmpField, '¦', 1) - 1]),
 													''
 												);
-			self.AttorneyLabel			:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 2) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 1) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 2) - 1]),
+			self.AttorneyLabel			:= 	if (StringLib.StringFind(l.tmpField, '¦', 2) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 1) + 1..StringLib.StringFind(l.tmpField, '¦', 2) - 1]),
 													''
 												);
-			self.FirmName				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 3) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 2) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 3) - 1]),
+			self.FirmName				:= 	if (StringLib.StringFind(l.tmpField, '¦', 3) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 2) + 1..StringLib.StringFind(l.tmpField, '¦', 3) - 1]),
 													''
 												);
-			self.Address				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 4) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 3) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 4) - 1]),
+			self.Address				:= 	if (StringLib.StringFind(l.tmpField, '¦', 4) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 3) + 1..StringLib.StringFind(l.tmpField, '¦', 4) - 1]),
 													''
 												);
-			self.City					:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 5) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 4) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 5) - 1]),
+			self.City					:= 	if (StringLib.StringFind(l.tmpField, '¦', 5) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 4) + 1..StringLib.StringFind(l.tmpField, '¦', 5) - 1]),
 													''
 												);
-			self.State					:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 6) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 5) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 6) - 1]),
+			self.State					:= 	if (StringLib.StringFind(l.tmpField, '¦', 6) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 5) + 1..StringLib.StringFind(l.tmpField, '¦', 6) - 1]),
 													''
 												);
-			self.ZipCode				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 7) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 6) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 7) - 1]),
+			self.ZipCode				:= 	if (StringLib.StringFind(l.tmpField, '¦', 7) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 6) + 1..StringLib.StringFind(l.tmpField, '¦', 7) - 1]),
 													''
 												);
-			self.Country				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 8) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 7) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 8) - 1]),
+			self.Country				:= 	if (StringLib.StringFind(l.tmpField, '¦', 8) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 7) + 1..StringLib.StringFind(l.tmpField, '¦', 8) - 1]),
 													''
 												);
-			self.AddtlInfo				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 9) != 0,
-													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 8) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 9) - 1]),
+			self.AddtlInfo				:= 	if (StringLib.StringFind(l.tmpField, '¦', 9) != 0,
+													stringlib.StringToUppercase(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 8) + 1..StringLib.StringFind(l.tmpField, '¦', 9) - 1]),
 													''
 												);
-			self.TermDate				:= 	if (StringLib.StringFind(l.tmpField, 'Â¦', 10) != 0,
-													reformatDate(l.tmpField[StringLib.StringFind(l.tmpField, 'Â¦', 9) + 1..StringLib.StringFind(l.tmpField, 'Â¦', 10) - 1]),
+			self.TermDate				:= 	if (StringLib.StringFind(l.tmpField, '¦', 10) != 0,
+													reformatDate(l.tmpField[StringLib.StringFind(l.tmpField, '¦', 9) + 1..StringLib.StringFind(l.tmpField, '¦', 10) - 1]),
 													''
 												);	
 												

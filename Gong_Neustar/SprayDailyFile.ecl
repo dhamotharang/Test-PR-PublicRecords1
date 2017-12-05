@@ -1,4 +1,4 @@
-import std, _control;
+﻿import std, _control;
 // this will spray one file
 EXPORT SprayDailyFile(string version) := FUNCTION
 
@@ -11,7 +11,7 @@ root := '~thor::in::gong::targus::daily::';
 sfDaily := '~thor::in::gong::targus::daily::' + version[1..6]; 
 ip := _control.IPAddress.bctlpedata10;
 
-//target := 'thor400_dev01';				//dataland
+//target := 'thor50_dev02';				//dataland
 target := 'thor400_44';				//production
 
 sprayFile(string filename) := 
@@ -22,7 +22,16 @@ sprayFile(string filename) :=
 							target,
 							root + version[1..6] + '::' + filename,
 							,,,true,false,true
-							):
+							);
+						
+List := STD.File.RemoteDirectory( _control.IPAddress.bctlpedata10, srcdir + version[1..8] , '*.txt');
+
+FileCheck := 
+SEQUENTIAL(
+			IF(EXISTS(list(size=0)),
+			FAIL('Zero byte file detected'),
+			NOTHOR(sprayFile(lfn)))
+			):
 
 SUCCESS(FileServices.SendEmail(gong_Neustar.SuccessEmail, 'GONG - Daily Spray Complete', WORKUNIT)),
 Failure(FileServices.SendEmail(gong_Neustar.FailureEmail, 'GONG - Daily Spray Failure',WORKUNIT + '\n' + FAILMESSAGE));
@@ -40,7 +49,8 @@ CreateSuperfile :=
 return SEQUENTIAL
 (	
 	CreateSuperFile,
-	sprayFile(lfn),
+	FileCheck,
+	//sprayFile(lfn),
 	AddToSuperFile
 );
 

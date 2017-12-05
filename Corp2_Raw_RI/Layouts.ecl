@@ -1,4 +1,4 @@
-EXPORT Layouts := module
+﻿EXPORT Layouts := module
 
 	export EntitiesIN := record
 
@@ -237,5 +237,12 @@ EXPORT Layouts := module
 		string ActiveEntity_Name;
 
 	end;
-
+	
+	export NamesIn_TempLay := record
+		NamesIn;
+		EntitiesIn.StateofIncorp;
+		EntitiesIn.Charter;
+		EntitiesIn.DateofOrganization;
+	end;
+	
 end;

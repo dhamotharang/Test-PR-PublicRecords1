@@ -1,12 +1,16 @@
+﻿/*2017-07-27T01:01:57Z (Vern Bentley)
+BH-321 -- fix corp to not rollup across sources.
+*/
 IMPORT Address,AID, Business_Header,Business_HeaderV2,CORP,LIB_STRINGLIB,MDR,UT, _Validate;
 
 EXPORT fCorp2_As_Business_Linking(
 
-   dataset(Layout_Corporate_Direct_Corp_AID         ) pCorp_Base    = corp2.files().AID.corp.prod
-  ,dataset(Layout_Corporate_Direct_Cont_AID         ) pCont_Base    = corp2.files().AID.cont.prod
-  ,dataset(Corp2.Layout_Corporate_Direct_Event_Base ) pEvent_Base   = corp2.files().base.events.prod
-  ,dataset(Corp2.Layout_Corporate_Direct_AR_Base    ) pAR_Base      = corp2.files().base.ar.prod
-  ,set of string                                      pTestCorpkeys = []                              //use this to query for specific corpkeys throughout the as header at each step.  adds additional debug outputs for them
+   dataset(Layout_Corporate_Direct_Corp_AID         ) pCorp_Base      = corp2.files().AID.corp.prod
+  ,dataset(Layout_Corporate_Direct_Cont_AID         ) pCont_Base      = corp2.files().AID.cont.prod
+  ,dataset(Corp2.Layout_Corporate_Direct_Event_Base ) pEvent_Base     = corp2.files().base.events.prod
+  ,dataset(Corp2.Layout_Corporate_Direct_AR_Base    ) pAR_Base        = corp2.files().base.ar.prod
+  ,set of string                                      pTestCorpkeys   = []                              //use this to query for specific corpkeys throughout the as header at each step.  adds additional debug outputs for them
+  ,set of unsigned8                                   pTestSourceRids = []                              //use this to query for specific corpkeys throughout the as header at each step.  adds additional debug outputs for them
 ) := 
 function
 
@@ -381,36 +385,65 @@ function
 				self.dt_vendor_first_reported			:=	ut.EarliestDate(l.dt_vendor_first_reported, r.dt_vendor_first_reported);
 				self.dt_vendor_last_reported			:=	max(l.dt_vendor_last_reported, r.dt_vendor_last_reported);		
 				self.company_name 								:= if(l.company_name = '', r.company_name, l.company_name);
-				self.company_rawaid								:= if(l.company_rawaid	= 0								and	l.company_address.zip4 = '', r.company_rawaid,							l.company_rawaid);	
-				self.company_aceaid								:= if(l.company_aceaid	= 0								and	l.company_address.zip4 = '', r.company_aceaid,							l.company_aceaid);				
-				self.company_address.prim_range 	:= if(l.company_address.prim_range = '' 	and l.company_address.zip4 = '', r.company_address.prim_range, 	l.company_address.prim_range);
-				self.company_address.predir 			:= if(l.company_address.predir = '' 			and l.company_address.zip4 = '', r.company_address.predir, 			l.company_address.predir);
-				self.company_address.prim_name 		:= if(l.company_address.prim_name = '' 		and l.company_address.zip4 = '', r.company_address.prim_name, 	l.company_address.prim_name);
-				self.company_address.addr_suffix	:= if(l.company_address.addr_suffix = '' 	and l.company_address.zip4 = '', r.company_address.addr_suffix, l.company_address.addr_suffix);
-				self.company_address.postdir 			:= if(l.company_address.postdir = '' 			and l.company_address.zip4 = '', r.company_address.postdir, 		l.company_address.postdir);
-				self.company_address.unit_desig 	:= if(l.company_address.unit_desig = ''		and l.company_address.zip4 = '', r.company_address.unit_desig, 	l.company_address.unit_desig);
-				self.company_address.sec_range 		:= if(l.company_address.sec_range = '' 		and l.company_address.zip4 = '', r.company_address.sec_range, 	l.company_address.sec_range);
-				self.company_address.p_city_name 	:= if(l.company_address.p_city_name = '' 	and l.company_address.zip4 = '', r.company_address.p_city_name, l.company_address.p_city_name);
-				self.company_address.v_city_name 	:= if(l.company_address.v_city_name = '' 	and l.company_address.zip4 = '', r.company_address.v_city_name, l.company_address.v_city_name);
-				self.company_address.st 					:= if(l.company_address.st = '' 					and l.company_address.zip4 = '', r.company_address.st, 					l.company_address.st);
-				self.company_address.zip	 				:= if(l.company_address.zip = '' 					and l.company_address.zip4 = '', r.company_address.zip, 				l.company_address.zip);
-				self.company_address.zip4 				:= if(l.company_address.zip4 = '', 																				 r.company_address.zip4, 				l.company_address.zip4);
-				self.company_address.fips_state 	:= if(l.company_address.fips_state = '' 	and l.company_address.zip4 = '', r.company_address.fips_state,	l.company_address.fips_state);
-				self.company_address.fips_county 	:= if(l.company_address.fips_county = '' 	and l.company_address.zip4 = '', r.company_address.fips_county,	l.company_address.fips_county);
-				self.company_address.geo_lat 			:= if(l.company_address.geo_lat = '' 			and l.company_address.zip4 = '', r.company_address.geo_lat, 		l.company_address.geo_lat);
-				self.company_address.geo_long 		:= if(l.company_address.geo_long = '' 		and l.company_address.zip4 = '', r.company_address.geo_long, l.company_address.geo_long);	
-				self.company_address.msa 					:= if(l.company_address.msa = '' 					and l.company_address.zip4 = '', r.company_address.msa, l.company_address.msa);
+        // -- we should choose the left or right address, not a hybrid of both
+        // -- zip, prim_range and prim_name will all be equal in this transform because of the join condition
+        // -- so if we check the zip4, we can choose which address is better.
+				self.company_rawaid								:= if(l.company_address.zip4 = '' , r.company_rawaid               ,l.company_rawaid               );	
+				self.company_aceaid								:= if(l.company_address.zip4 = '' , r.company_aceaid               ,l.company_aceaid               );				
+				self.company_address.prim_range 	:= if(l.company_address.zip4 = '' , r.company_address.prim_range   ,l.company_address.prim_range   );
+				self.company_address.predir 			:= if(l.company_address.zip4 = '' , r.company_address.predir       ,l.company_address.predir       );
+				self.company_address.prim_name 		:= if(l.company_address.zip4 = '' , r.company_address.prim_name    ,l.company_address.prim_name    );
+				self.company_address.addr_suffix	:= if(l.company_address.zip4 = '' , r.company_address.addr_suffix  ,l.company_address.addr_suffix  );
+				self.company_address.postdir 			:= if(l.company_address.zip4 = '' , r.company_address.postdir      ,l.company_address.postdir      );
+				self.company_address.unit_desig 	:= if(l.company_address.zip4 = '' , r.company_address.unit_desig   ,l.company_address.unit_desig   );
+				self.company_address.sec_range 		:= if(l.company_address.zip4 = '' , r.company_address.sec_range    ,l.company_address.sec_range    );
+				self.company_address.p_city_name 	:= if(l.company_address.zip4 = '' , r.company_address.p_city_name  ,l.company_address.p_city_name  );
+				self.company_address.v_city_name 	:= if(l.company_address.zip4 = '' , r.company_address.v_city_name  ,l.company_address.v_city_name  );
+				self.company_address.st 					:= if(l.company_address.zip4 = '' , r.company_address.st           ,l.company_address.st           );
+				self.company_address.zip	 				:= if(l.company_address.zip4 = '' , r.company_address.zip          ,l.company_address.zip          );
+				self.company_address.zip4 				:= if(l.company_address.zip4 = '' , r.company_address.zip4         ,l.company_address.zip4         );
+				self.company_address.fips_state 	:= if(l.company_address.zip4 = '' , r.company_address.fips_state   ,l.company_address.fips_state   );
+				self.company_address.fips_county 	:= if(l.company_address.zip4 = '' , r.company_address.fips_county  ,l.company_address.fips_county  );
+				self.company_address.geo_lat 			:= if(l.company_address.zip4 = '' , r.company_address.geo_lat      ,l.company_address.geo_lat      );
+				self.company_address.geo_long 		:= if(l.company_address.zip4 = '' , r.company_address.geo_long     ,l.company_address.geo_long     );	
+				self.company_address.msa 					:= if(l.company_address.zip4 = '' , r.company_address.msa          ,l.company_address.msa          );
+        
 				self.company_fein 								:= if(l.company_fein = '', r.company_fein, l.company_fein);		
 				self.company_phone								:= if(ut.cleanphone(l.company_phone) = '', r.company_phone, l.company_phone);
 				self.phone_type										:= if(ut.cleanphone(l.company_phone) = '', r.phone_type, l.phone_type);
 				self.vl_id 												:= if(l.vl_id = '', r.vl_id, l.vl_id);	
 				self.phone_score 									:= if(ut.cleanphone(l.company_phone) = '',r.phone_score, l.phone_score);
+
+				self.company_charter_number				:= if(trim(l.company_charter_number			) = ''    ,r.company_charter_number			 ,l.company_charter_number			);
+				self.company_name_type_raw				:= if(trim(l.company_name_type_raw			) = ''    ,r.company_name_type_raw			 ,l.company_name_type_raw			  );				
+				self.company_name_status_raw			:= if(trim(l.company_name_status_raw		) = ''    ,r.company_name_status_raw		 ,l.company_name_status_raw		  );
+				self.company_bdid									:= if(     l.company_bdid								  =  0    ,r.company_bdid								 ,l.company_bdid								);
+				self.company_filing_date					:= if(     l.company_filing_date				  =  0    ,r.company_filing_date				 ,l.company_filing_date				  );
+				self.company_status_date					:= if(     l.company_status_date			    =  0    ,r.company_status_date				 ,l.company_status_date				  );
+				self.company_address.geo_blk 			:= if(     l.company_address.zip4         = ''    ,r.company_address.geo_blk 		 ,l.company_address.geo_blk 		);
+				self.company_address.geo_match 		:= if(     l.company_address.zip4         = ''    ,r.company_address.geo_match 	 ,l.company_address.geo_match 	);
+				self.company_address.err_stat 		:= if(     l.company_address.zip4         = ''    ,r.company_address.err_stat 	 ,l.company_address.err_stat 	  );
+				self.company_address_type_raw			:= if(trim(l.company_address_type_raw		) = ''    ,r.company_address_type_raw		 ,l.company_address_type_raw		);
+				self.company_status_raw						:= if(trim(l.company_status_raw					) = ''    ,r.company_status_raw					 ,l.company_status_raw					);
+				self.company_ticker								:= if(trim(l.company_ticker							) = ''    ,r.company_ticker							 ,l.company_ticker							);
+				self.company_ticker_exchange			:= if(trim(l.company_ticker_exchange		) = ''    ,r.company_ticker_exchange		 ,l.company_ticker_exchange		  );
+				self.company_inc_state						:= if(trim(l.company_inc_state					) = ''    ,r.company_inc_state					 ,l.company_inc_state					  );
+				self.company_incorporation_date		:= if(     l.company_incorporation_date	  =  0    ,r.company_incorporation_date	 ,l.company_incorporation_date	);
+				self.company_foreign_domestic			:= if(trim(l.company_foreign_domestic		) = ''    ,r.company_foreign_domestic		 ,l.company_foreign_domestic		);
+				self.company_foreign_date					:= if(     l.company_foreign_date				  =  0    ,r.company_foreign_date				 ,l.company_foreign_date				);
+				self.company_org_structure_raw		:= if(trim(l.company_org_structure_raw	) = ''    ,r.company_org_structure_raw	 ,l.company_org_structure_raw	  );
+				self.company_sic_code1						:= if(trim(l.company_sic_code1					) = ''    ,r.company_sic_code1					 ,l.company_sic_code1					  );
+				self.company_naics_code1					:= if(trim(l.company_naics_code1				) = ''    ,r.company_naics_code1				 ,l.company_naics_code1				  );
+				self.company_url									:= if(trim(l.company_url								) = ''    ,r.company_url								 ,l.company_url								  );
+				self.current											:= if(     l.current										  = false ,r.current										 ,l.current										  );
+				self.source_record_id							:= if(l.dt_vendor_first_reported < r.dt_vendor_first_reported ,l.source_record_id ,r.source_record_id);
+        
 				self 														  := l;
 		end;	
 
-		corp_clean_dist := distribute(corp_group_clean,hash(/*trim(vl_id),*/trim(company_address.zip),trim(company_address.prim_name),trim(company_address.prim_range),trim(company_name)));
+		corp_clean_dist := distribute(corp_group_clean,hash(trim(vl_id),trim(company_address.zip),trim(company_address.prim_name),trim(company_address.prim_range),trim(company_name)));
 
-		corp_clean_sort := sort(corp_clean_dist/*,vl_id*/,company_address.zip,company_address.prim_range,company_address.prim_name,company_name
+		corp_clean_sort := sort(corp_clean_dist,vl_id,company_address.zip,company_address.prim_range,company_address.prim_name,company_name
 													,if(company_address.sec_range<>'',0,1), company_address.sec_range
 													,if(company_phone<>'',0,1), company_phone
 													,if(company_fein<>'',0,1), company_fein
@@ -421,7 +454,7 @@ function
 				
 		ds_company := rollup(corp_clean_sort
 															 ,
-                                // left.vl_id                      = right.vl_id and
+                                left.vl_id                      = right.vl_id and
                                 left.company_address.zip 				= right.company_address.zip and
 																left.company_address.prim_name 	= right.company_address.prim_name and
 																left.company_address.prim_range = right.company_address.prim_range and
@@ -724,71 +757,68 @@ function
        
        self.dt_first_seen := map(both_dates_zero_forgn  =>  (unsigned4)Corp2.fCheckDate((string8)left.company_foreign_date      )
                                 ,both_dates_zero_inc    =>  (unsigned4)Corp2.fCheckDate((string8)left.company_incorporation_date)  
-                                ,                           left.dt_first_seen
+                                ,                                                                left.dt_first_seen
                              );
        self.dt_last_seen  := map(both_dates_zero_forgn  =>  (unsigned4)Corp2.fCheckDate((string8)left.company_foreign_date      )
                                 ,both_dates_zero_inc    =>  (unsigned4)Corp2.fCheckDate((string8)left.company_incorporation_date)  
-                                ,                           left.dt_last_seen
+                                ,                                                                left.dt_last_seen
                              );
        self               := left
     ));
     
     outputdebug := 
     parallel(
-       output(base_company         (trim(corp_key           ) in lcorpkey                          )  ,named('base_company'        ),all)
-      ,output(corpDist             (trim(corp_key           ) in lcorpkey                          )  ,named('corpDist'            ),all) 
-      ,output(deDupCorp            (trim(corp_key           ) in lcorpkey                          )  ,named('deDupCorp'           ),all) 
-      
-      ,output(ds_filter_event      (trim(corp_key           ) in lcorpkey                          )  ,named('ds_filter_event'     ),all) 
-      ,output(ds_filter_AR         (trim(corp_key           ) in lcorpkey                          )  ,named('ds_filter_AR'        ),all) 
-      ,output(ds_proj_event        (trim(corp_key           ) in lcorpkey                          )  ,named('ds_proj_event'       ),all) 
-      ,output(ds_proj_AR           (trim(corp_key           ) in lcorpkey                          )  ,named('ds_proj_AR'          ),all) 
-      ,output(ds_concat_event_ar   (trim(corp_key           ) in lcorpkey                          )  ,named('ds_concat_event_ar'  ),all)       
+       output(base_company         ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                           or (count(pTestSourceRids) > 0 and source_rec_id in pTestSourceRids ))  ,named('base_company'        ),all)
+      ,output(corpDist             ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                           or (count(pTestSourceRids) > 0 and source_rec_id in pTestSourceRids ))  ,named('corpDist'            ),all) 
+      ,output(deDupCorp            ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                           or (count(pTestSourceRids) > 0 and source_rec_id in pTestSourceRids ))  ,named('deDupCorp'           ),all) 
         
-      ,output(base_event           (trim(corp_key           ) in lcorpkey                          )  ,named('base_event'          ),all)                                          
-      ,output(ds_prep_corp         (trim(corp_key           ) in lcorpkey                          )  ,named('ds_prep_corp'        ),all)                                      
-      ,output(ds_add_rec_id        (trim(corp_key           ) in lcorpkey                          )  ,named('ds_add_rec_id'       ),all)
-      // ,output(ds_combined1         (trim(corp_key           ) in lcorpkey                          )  ,named('ds_combined1'        ),all)                                      
-      // ,output(ds_combined1_nomatch (trim(corp_key           ) in lcorpkey                          )  ,named('ds_combined1_nomatch'),all)
-      // ,output(ds_combined2         (trim(corp_key           ) in lcorpkey                          )  ,named('ds_combined2'        ),all)                                      
-      ,output(ds_combined          (trim(corp_key           ) in lcorpkey                          )  ,named('ds_combined'         ),all)
-      ,output(ds_combined_prep     (trim(corp_key           ) in lcorpkey                          )  ,named('ds_combined_prep'    ),all)
-      ,output(company_seq          (trim(corp_key           ) in lcorpkey                          )  ,named('company_seq'         ),all)                                      
-      ,output(ds_company_norm      (trim(vl_id              ) in lcorpkey                          )  ,named('ds_company_norm'     ),all)
-      ,output(ds_company_norm2	   (trim(vl_id              ) in lcorpkey                          )  ,named('ds_company_norm2'	   ),all)                                      
-      ,output(ds_company_norm_dist (trim(vl_id              ) in lcorpkey                          )  ,named('ds_company_norm_dist'),all)
-      ,output(ds_company_sort      (trim(vl_id              ) in lcorpkey                          )  ,named('ds_company_sort'     ),all)                                      
-      ,output(ds_company_rollup    (trim(vl_id              ) in lcorpkey                          )  ,named('ds_company_rollup'   ),all)
-      ,output(corp_group_clean     (trim(vl_id              ) in lcorpkey                          )  ,named('corp_group_clean'    ),all)                                      
-      ,output(corp_clean_dist      (trim(vl_id              ) in lcorpkey                          )  ,named('corp_clean_dist'     ),all)
-      ,output(corp_clean_sort      (trim(tmp_join_id_company) in lcorpkey or trim(vl_id) in lcorpkey)  ,named('corp_clean_sort'    ),all)                                      
-      ,output(ds_company           (trim(tmp_join_id_company) in lcorpkey or trim(vl_id) in lcorpkey)  ,named('ds_company'         ),all)
-      // ,output(ds_company           (trim(tmp_join_id_company) in lcorpkey or trim(vl_id) in lcorpkey or trim(company_name) = 'DIAMOND ONSHORE PRODUCTION II, L.P.' or (company_bdid = 2679968604 and dt_first_seen = 20041103)  )  ,named('ds_company'          ),all)
-            
-      ,output(corp_base            (trim(corp_key           ) in lcorpkey)  ,named('corp_base'           ),all)                                      
-      ,output(corpkeys_list				 (trim(corp_key           ) in lcorpkey)  ,named('corpkeys_list'			 ),all)					 
-      ,output(corpkeys_list_dist   (trim(corp_key           ) in lcorpkey)  ,named('corpkeys_list_dist'  ),all)                                      
-      ,output(contSlim             (trim(corp_key           ) in lcorpkey)  ,named('contSlim'            ),all)
-      ,output(base_contact         (trim(corp_key           ) in lcorpkey)  ,named('base_contact'        ),all)
-      ,output(base_contact_dist    (trim(corp_key           ) in lcorpkey)  ,named('base_contact_dist'   ),all)                                      
-      ,output(base_contact_select  (trim(corp_key           ) in lcorpkey)  ,named('base_contact_select' ),all)
-      ,output(ds_contact_proj      (trim(tmp_join_id_contact) in lcorpkey)  ,named('ds_contact_proj'     ),all)                                      
-      ,output(ds_contact           (trim(tmp_join_id_contact) in lcorpkey)  ,named('ds_contact'          ),all)
-      ,output(ds_company_dist      (trim(vl_id              ) in lcorpkey)  ,named('ds_company_dist'     ),all)                                      
-      ,output(ds_contact_dist      (trim(tmp_join_id_contact) in lcorpkey)  ,named('ds_contact_dist'     ),all)
-      ,output(j1	                 (trim(vl_id              ) in lcorpkey)  ,named('j1'	                 ),all)                                      
-      ,output(norm_j1              (trim(vl_id              ) in lcorpkey)  ,named('norm_j1'             ),all)
-      ,output(concat               (trim(vl_id              ) in lcorpkey)  ,named('concat'              ),all)                                      
-      ,output(ChkFile	             (trim(vl_id              ) in lcorpkey)  ,named('ChkFile'	           ),all)
-      ,output(DBAFile              (trim(vl_id              ) in lcorpkey)  ,named('DBAFile'             ),all)                                      
-      ,output(NonDBAFile           (trim(vl_id              ) in lcorpkey)  ,named('NonDBAFile'          ),all)
-      ,output(norm_DBAFile         (trim(vl_id              ) in lcorpkey)  ,named('norm_DBAFile'        ),all)                                      
-      ,output(concat2              (trim(vl_id              ) in lcorpkey)  ,named('concat2'             ),all)
-      ,output(concatDist           (trim(vl_id              ) in lcorpkey)  ,named('concatDist'          ),all)                                      
-      ,output(concat_dupd          (trim(vl_id              ) in lcorpkey)  ,named('concat_dupd'         ),all)
-      ,output(ds_result            (trim(vl_id              ) in lcorpkey)  ,named('ds_result'           ),all)
+      ,output(ds_filter_event      ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                            )  ,named('ds_filter_event'     ),all) 
+      ,output(ds_filter_AR         ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                            )  ,named('ds_filter_AR'        ),all) 
+      ,output(ds_proj_event        ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                            )  ,named('ds_proj_event'       ),all) 
+      ,output(ds_proj_AR           ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                            )  ,named('ds_proj_AR'          ),all) 
+      ,output(ds_concat_event_ar   ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                            )  ,named('ds_concat_event_ar'  ),all)       
+                                                                                                       
+      ,output(base_event           ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                            )  ,named('base_event'          ),all)                                          
+      ,output(ds_prep_corp         ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_rec_id in pTestSourceRids ))  ,named('ds_prep_corp'        ),all)                                      
+      ,output(ds_add_rec_id        ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_rec_id in pTestSourceRids ))  ,named('ds_add_rec_id'       ),all)
+      ,output(ds_combined          ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_rec_id in pTestSourceRids ))  ,named('ds_combined'         ),all)
+      ,output(ds_combined_prep     ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_rec_id in pTestSourceRids ))  ,named('ds_combined_prep'    ),all)
+      ,output(company_seq          ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_rec_id in pTestSourceRids ))  ,named('company_seq'         ),all) 
+      
+      ,output(ds_company_norm      ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('ds_company_norm'     ),all)
+      ,output(ds_company_norm2	   ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('ds_company_norm2'	   ),all)                                      
+      ,output(ds_company_norm_dist ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('ds_company_norm_dist'),all)
+      ,output(ds_company_sort      ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('ds_company_sort'     ),all)                                      
+      ,output(ds_company_rollup    ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('ds_company_rollup'   ),all)
+      ,output(corp_group_clean     ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('corp_group_clean'    ),all)                                      
+      ,output(corp_clean_dist      ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('corp_clean_dist'     ),all)
+      ,output(corp_clean_sort      ((count(lcorpkey) > 0 and trim(tmp_join_id_company) in lcorpkey )  or (count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey ) or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('corp_clean_sort'     ),all)                                      
+      ,output(ds_company           ((count(lcorpkey) > 0 and trim(tmp_join_id_company) in lcorpkey )  or (count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey ) or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('ds_company'          ),all)
+                                                                                                        
+      ,output(corp_base            ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_rec_id in pTestSourceRids ))  ,named('corp_base'           ),all)                                      
+      ,output(corpkeys_list				 ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                            )  ,named('corpkeys_list'			 ),all)					 
+      ,output(corpkeys_list_dist   ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                            )  ,named('corpkeys_list_dist'  ),all)                                      
+      ,output(contSlim             ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                             )  ,named('contSlim'            ),all)
+      ,output(base_contact         ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                             )  ,named('base_contact'        ),all)
+      ,output(base_contact_dist    ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                             )  ,named('base_contact_dist'   ),all)                                      
+      ,output(base_contact_select  ((count(lcorpkey) > 0 and trim(corp_key           ) in lcorpkey )                             )  ,named('base_contact_select' ),all)
+      ,output(ds_contact_proj      ((count(lcorpkey) > 0 and trim(tmp_join_id_contact) in lcorpkey )                             )  ,named('ds_contact_proj'     ),all)                                      
+      ,output(ds_contact           ((count(lcorpkey) > 0 and trim(tmp_join_id_contact) in lcorpkey )                             )  ,named('ds_contact'          ),all)
+      ,output(ds_company_dist      ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('ds_company_dist'     ),all)                                      
+      ,output(ds_contact_dist      ((count(lcorpkey) > 0 and trim(tmp_join_id_contact) in lcorpkey )                             )  ,named('ds_contact_dist'     ),all)
+      ,output(j1	                 ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('j1'	                 ),all)                                      
+      ,output(norm_j1              ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('norm_j1'             ),all)
+      ,output(concat               ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('concat'              ),all)                                      
+      ,output(ChkFile	             ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('ChkFile'	           ),all)
+      ,output(DBAFile              ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('DBAFile'             ),all)                                      
+      ,output(NonDBAFile           ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('NonDBAFile'          ),all)
+      ,output(norm_DBAFile         ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('norm_DBAFile'        ),all)                                      
+      ,output(concat2              ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('concat2'             ),all)
+      ,output(concatDist           ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('concatDist'          ),all)                                      
+      ,output(concat_dupd          ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('concat_dupd'         ),all)
+      ,output(ds_result            ((count(lcorpkey) > 0 and trim(vl_id           ) in lcorpkey )                            or (count(pTestSourceRids) > 0 and source_record_id in pTestSourceRids ))  ,named('ds_result'           ),all)
     );                              
 		
-	return when(ds_result ,if(count(pTestCorpkeys) != 0  ,outputdebug));
+	return when(ds_result ,if(count(pTestCorpkeys) != 0 or count(pTestSourceRids) != 0 ,outputdebug));
 			
 end;				

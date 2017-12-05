@@ -1,7 +1,8 @@
-import	lib_fileservices,_control,RoxieKeyBuild,ut;
+﻿import	lib_fileservices,_control,RoxieKeyBuild,ut, DOPS;
 
 export	Proc_Build_GWL_All_V2(string	pFileDate)	:=
 function
+	//Spray Raw File
 	//Spray Raw File
 	sprayEntityFile		:=	FileServices.SprayXml(	_control.IPAddress.bctlpedata10,
 																								'/data/data_999/sanctions/bridger/in/'+pFileDate+'/MasterListEntityConverted.xml',
@@ -42,8 +43,8 @@ function
 	buildKeys	:=	GlobalWatchLists.Proc_Build_GWL_Keys_V2(pFileDate);
 	
 	// Update DOPS
-	updateDOPS						:=	RoxieKeyBuild.updateversion('GlobalWatchListV2Keys',pFileDate,'kgummadi@seisint.com,skasavajjala@seisint.com',,'N|BN');
-	updateAlpharettaDOPS	:=	RoxieKeyBuild.updateversion('GlobalWatchListV2Keys',pFileDate,'kgummadi@seisint.com,skasavajjala@seisint.com',,'N',,,'A');
+	updateDOPS						:=	DOPS.updateversion('GlobalWatchListV2Keys',pFileDate,'kgummadi@seisint.com,skasavajjala@seisint.com');
+	updateAlpharettaDOPS	:=	DOPS.updateversion('GlobalWatchListV2Keys',pFileDate,'kgummadi@seisint.com,skasavajjala@seisint.com',,'N',,,'A');
 	
 	//Create OrbitI build
 	createAlpharettabuild  := GlobalWatchLists.Proc_OrbitI_CreateBuild(pFileDate,'V2');

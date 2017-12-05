@@ -1,4 +1,4 @@
-import ut, _control;
+﻿import ut, _control, Orbit3;
 
 export proc_Spray_Build_all(string filedate, string pFormYear) := function
 
@@ -39,7 +39,9 @@ doBuild := irs5500.proc_Build_All(filedate, pFormYear).All;
 //Create Sample New Records for QA
 sampleRecs := IRS5500.SampleRecsQA; 
 
-retval := sequential(sprayfile, superfile_transac,doBuild, sampleRecs);
+orbit_update := Orbit3.proc_Orbit3_CreateBuild ('IRS 5500',filedate,'N');
+
+retval := sequential(sprayfile, superfile_transac,doBuild,sampleRecs,orbit_update);
 
 return retval;
 end;	

@@ -1,4 +1,4 @@
-import UCCV2, Lib_FileServices,RoxieKeybuild,orbit_report,Scrubs_UCCV2;
+﻿import UCCV2, Lib_FileServices,RoxieKeybuild,orbit_report,Scrubs_UCCV2,Orbit3;
 
 export BWR_Build(string filedate) := FUNCTION
 
@@ -45,6 +45,8 @@ buildprocess := sequential(
 							// superfiles
 							Call_Manage_InSuperfiles(false),
 							getretval,
+							Orbit3.proc_Orbit3_CreateBuild ('UCC Filings',filedate,'N|B'),
+							Orbit3.proc_Orbit3_CreateBuild ('FCRA UCC Filings',filedate,'F'),
 							
 					)		: Success(FileServices.SendEmail('christopher.brodeur@lexisnexisrisk.com, intel357@bellsouth.net, randy.reyes@lexisnexisrisk.com, Abednego.Escobal@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com', 'UCC - Build Complete', thorlib.wuid())),
 	              Failure(FileServices.SendEmail('christopher.brodeur@lexisnexisrisk.com, intel357@bellsouth.net, randy.reyes@lexisnexisrisk.com, Abednego.Escobal@lexisnexisrisk.com, Manuel.Tarectecan@lexisnexisrisk.com', 'UCC - Build Failure', thorlib.wuid() + '\n' + FAILMESSAGE));

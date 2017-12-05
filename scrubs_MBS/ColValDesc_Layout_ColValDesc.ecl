@@ -1,0 +1,1 @@
+﻿EXPORT ColValDesc_Layout_ColValDesc := {ColValDesc_In_ColValDesc};

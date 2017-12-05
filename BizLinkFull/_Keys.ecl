@@ -1,4 +1,4 @@
-//Compile all keys for bizlinkfull in one place
+﻿//Compile all keys for bizlinkfull in one place
 //easy to output this module to see if keys exist/are correct layout/etc
 import bipv2,BIPV2_Company_Names,TopBusiness_BIPV2,BIPV2_ProxID,BIPV2_Best,BIPV2_Relative,BizLinkFull,tools,BIPV2_Seleid_Relative,BIPV2_LGID3,Address_Attributes,BIPv2_HRCHY;
 

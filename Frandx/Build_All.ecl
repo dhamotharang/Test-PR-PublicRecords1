@@ -1,10 +1,10 @@
-import tools, _control;
+﻿import tools, _control, ut, std, Scrubs, Scrubs_Frandx;
 
 export Build_All(
 
 	 string															pversion
 	,string															pDirectory			= '/data/data_build_1/frandx/in/'+ pversion
-	,string															pServerIP				= _control.IPAddress.bctlpedata11
+ ,string															pServerIP				= _control.IPAddress.bctlpedata11
 	,string															pFilename				= '*txt'
 	,string															pGroupName			= _dataset().groupname																		
 	,boolean														pIsTesting			= false
@@ -19,6 +19,7 @@ function
 		 Create_Supers
 		,Spray					(pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite)
 		,Build_Base			(pversion,pIsTesting,pSprayedFile,pBaseFile	)
+  ,Scrubs.ScrubsPlus('Frandx','Scrubs_Frandx','Scrubs_Frandx_Base', 'Base', pversion,Email_Notification_Lists(pIsTesting).BuildFailure,false)
 		,Build_Keys			(pversion																		).all
 		,Build_Strata		(pversion	,pOverwrite,,,	pIsTesting				)
 		,Promote().Inputfiles.using2used

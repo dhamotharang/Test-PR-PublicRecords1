@@ -1,4 +1,4 @@
-import Address, AID, Business_Header, ut, PRTE2;
+﻿import Address, AID, Business_Header, ut, PRTE2;
 
 export BH_Init (
 
@@ -83,6 +83,7 @@ function
 	//Append cleaned address fields
 	Layouts.Out.Layout_BH_Out tMapClnAddr(dBH_Addr_For_AID l, dWithAID r) := transform
 			self.RawAID					:= r.aidwork_rawaid;
+			self.AceAID					:= r.AIDWork_ACECache.aid;
 			self.prim_range     := r.AIDWork_ACECache.prim_range;
 			self.predir         := r.AIDWork_ACECache.predir;
 			self.prim_name      := r.AIDWork_ACECache.prim_name;

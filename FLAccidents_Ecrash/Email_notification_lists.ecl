@@ -1,4 +1,4 @@
-import _control,RoxieKeyBuild;
+﻿import _control,RoxieKeyBuild;
 export Email_Notification_Lists :=
 module
 	
@@ -8,7 +8,7 @@ module
 	
 	export BuildFailure := 'sudhir.kasavajjala@lexisnexis.com; Christopher.Brodeur@lexisnexis.com; John.Freibaum@lexisnexis.com';
 	
-	export NOC := 'sudhir.kasavajjala@lexisnexis.com; Christopher.Brodeur@lexisnexis.com; ris-glonoc@risk.lexisnexis.com';
+	export NOC := 'sudhir.kasavajjala@lexisnexis.com;  ris-glonoc@risk.lexisnexis.com';
 	
 	
 	

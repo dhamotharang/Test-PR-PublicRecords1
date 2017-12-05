@@ -1,4 +1,4 @@
-import ut, lib_stringlib;
+﻿import ut, lib_stringlib,Std;
 
 //Fix Oregon Sex Offenders
 //hyg_ORSOR 	:= sort(hygenics_soff.File_In_SO_Defendant(sourcename='OREGON_SEX_OFFENDER_REGISTRY'), lastname, firstname, dob);
@@ -380,9 +380,10 @@ ds_d2 			:= dedup(sort(distribute(hygenics_soff.file_in_so_alias,hash(RecordID, 
 														trim(l.sourcename, left, right) = 'PUEBLO_OF_SANTO_DOMINGO_SEX_OFFENDER_REGISTRY'	=> 'PUEBLO_OF_SANTO_DOMINGO_SOR',
 														trim(l.sourcename, left, right) = 'UTE_INDIAN_TRIBE_SEX_OFFENDER_REGISTRY' => 'UTE_INDIAN_TRIBE_SOR',
 														trim(l.sourcename, left, right) = 'YANKTON_SIOUX_TRIBE_SEX_OFFENDER_REGISTRY'	=> 'YANKTON_SIOUX_TRIBE_SOR',
+														trim(l.sourcename, left, right) = 'EASTERN_BAND_OF_CHEROKEE_INDIANS_SEX_OFFENDER_REGISTRY'	=> 'ESTRN_BAND_OF_CHEROKEE_IND_SOR',
 														l.sourcename);
-		self.date_added   						:= ut.getdate;
-		self.date_updated   					:= ut.GetDate;
+		self.date_added   						:= (STRING8)Std.Date.Today();
+		self.date_updated   					:= (STRING8)Std.Date.Today();
 		//self.src_dt_added						:= l.recorduploaddate;
 		self.src_upload_date					:= l.recorduploaddate;
 		self.state_of_origin   					:= l.statecode;

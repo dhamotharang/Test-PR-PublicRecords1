@@ -1,4 +1,4 @@
-IMPORT AccountMonitoring, DidVille, Doxie_cbrs, Address, Business_Header_SS;
+﻿IMPORT AccountMonitoring, DidVille, Doxie_cbrs, Address, Business_Header_SS;
 
 EXPORT fn_portfolio_update(UNSIGNED1 pseudo_environment,
                            STRING spray_ip_address,
@@ -49,8 +49,8 @@ EXPORT fn_portfolio_update(UNSIGNED1 pseudo_environment,
 						SELF.address_cln := MAP(new_address1 != '' AND
 																		new_address2 != '' => Address.CleanAddress182(new_address1, 
 																																									new_address2, 
-																																									Address.Constants.newbatchserver, 
-																																									Address.Constants.newbatchport),
+																																									Address.Constants.CorrectServer, 
+																																									Address.Constants.CorrectPort),
 																													'');
 						SELF             := l;
 					END;

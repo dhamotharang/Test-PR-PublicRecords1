@@ -1,4 +1,4 @@
-// TXS0636 / Texas Office of Consumer Credit Commissioner / Other Lenders //
+﻿// TXS0636 / Texas Office of Consumer Credit Commissioner / Other Lenders //
 EXPORT layout_TXS0636 := MODULE
 	EXPORT raw := RECORD
   STRING50   LICENSETYPE;
@@ -28,7 +28,7 @@ EXPORT layout_TXS0636 := MODULE
 	STRING20   PHONE;
 	STRING20   FAX_NUMBER;
 	// STRING10   LICENSEDATE;
-	STRING10   DATE_CANCELLED;
+	// STRING10   DATE_CANCELLED;
 	// STRING10   LAST_RENEWED_DATE;
 	// STRING30   STATUS;
 	END;

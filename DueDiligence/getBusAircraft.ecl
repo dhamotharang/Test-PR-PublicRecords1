@@ -1,10 +1,10 @@
-IMPORT BIPV2, Business_Risk_BIP, FAA, MDR, Risk_Indicators, STD, UT, Watercraft;
+﻿IMPORT BIPV2, Business_Risk_BIP, FAA, MDR, Risk_Indicators, STD, UT, Watercraft;
 
 EXPORT getBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
 											     Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 													 boolean DebugMode = FALSE
 											     ) := FUNCTION
-	// ------                                                                                    ------
+	// ------                                                                                     ------
 	// ------ Notes:                                                                             ------  
 	// ------    There are no restrictions on aircraft data so no DRM flags are being sent intot this function
 	// ------    BIPV2.mod_sources.iParams linkingOptions                                        ------
@@ -38,7 +38,7 @@ EXPORT getBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   // ------                                                                                    ------	
 	// ------ Add our sequence number to the avaiation records found for this Business           ------
 	// ------                                                                                    ------
-	DueDiligence.Common.AppendSeq(AircraftRaw, tempBusnData, AircraftRaw_with_seq);
+	AircraftRaw_with_seq := DueDiligence.Common.AppendSeq(AircraftRaw, tempBusnData, TRUE);
 	
 	// ------                                                                                    ------
 	// ------ When this query runs in ARCHIVE MODE the History date on the input contains a date ------
@@ -81,8 +81,8 @@ EXPORT getBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------ Use the current flag to select the 'active' record from list of aircraft records   ------
 	// ------ This is how duplicate records are removed for aircraft                             ------
 	// ------                                                                                    ------
-	Aircraft_current_sort := SORT(Aircraft_Filtered(historydate = DueDiligence.Constants.date8Nines), seq, #expand(DueDiligence.Constants.mac_ListTop3Linkids()), n_number, current_flag);
-	Aircraft_current_dedup := DEDUP(Aircraft_current_sort, seq, #expand(DueDiligence.Constants.mac_ListTop3Linkids()), n_number);
+	Aircraft_current_sort := SORT(Aircraft_Filtered(historydate = DueDiligence.Constants.date8Nines), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), n_number, current_flag);
+	Aircraft_current_dedup := DEDUP(Aircraft_current_sort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), n_number);
 	Aircraft_Current  := Aircraft_current_dedup(current_flag = 'A');  
   
 	Summary_BusAir_current_mode := table(Aircraft_Current, {seq, ultid, orgid, seleid, name, historydate, OwnAirCnt := count(group)}, seq, ultid, orgid, seleid);

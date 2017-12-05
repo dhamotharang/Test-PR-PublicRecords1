@@ -1,4 +1,4 @@
-// tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(pSuperfileIn)[1].name)  ,pDeleteSourceFile  := true));
+﻿// tools.Copy2_Storage_Thor(filename := '~' + nothor(std.file.superfilecontents(pSuperfileIn)[1].name)  ,pDeleteSourceFile  := true));
 
 import wk_ut,_control;
 
@@ -12,7 +12,7 @@ EXPORT Copy2_Storage_Thor_Parallel(
   ,pWorkmanFilename  = '\'\''
   ,pWorkmanSuper     = '\'\''
   ,tempname          = '\'\''
-  ,pCluster          = '\'thor400_31_store\''
+  ,pCluster          = '\'thor400_24_store\''
   ,pEclserver        = '\'prod_esp.br.seisint.com\''//10.241.20.202
   ,pSourceDali       = '\'prod_dali.br.seisint.com\''
   ,pOutputEcl        = 'false'

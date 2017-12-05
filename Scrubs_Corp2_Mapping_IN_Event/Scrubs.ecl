@@ -1,4 +1,4 @@
-IMPORT ut,SALT34;
+﻿IMPORT ut,SALT34;
 IMPORT Scrubs; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
  
@@ -26,7 +26,7 @@ EXPORT FromNone(DATASET(Layout_in_file) h) := MODULE
     SELF.event_filing_desc_Invalid := Fields.InValid_event_filing_desc((SALT34.StrType)le.event_filing_desc);
     SELF := le;
   END;
-  EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE)):independent;
+  EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_in_file);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
     SELF.ScrubsBits1 := ( le.corp_key_Invalid << 0 ) + ( le.corp_vendor_Invalid << 2 ) + ( le.corp_state_origin_Invalid << 3 ) + ( le.corp_process_date_Invalid << 4 ) + ( le.corp_sos_charter_nbr_Invalid << 6 ) + ( le.event_filing_cd_Invalid << 8 ) + ( le.event_filing_desc_Invalid << 9 );
@@ -67,7 +67,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     event_filing_cd_ENUM_ErrorCount := COUNT(GROUP,h.event_filing_cd_Invalid=1);
     event_filing_desc_ALLOW_ErrorCount := COUNT(GROUP,h.event_filing_desc_Invalid=1);
   END;
-  EXPORT SummaryStats := TABLE(h,r):independent;
+  EXPORT SummaryStats := TABLE(h,r);
   r := RECORD
     STRING10 Src;
     STRING FieldName;

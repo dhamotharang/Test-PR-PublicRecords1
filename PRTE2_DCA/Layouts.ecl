@@ -1,4 +1,4 @@
-IMPORT DCAV2, Address, Standard;
+﻿IMPORT DCAV2, Address, Standard;
 
 EXPORT Layouts := MODULE
 
@@ -9,6 +9,7 @@ EXPORT Layouts := MODULE
 	EXPORT layout_clean182_fips := Address.Layout_Clean182_fips;
 	EXPORT clean_phones := DCAV2.Layouts.clean_phones;
 	EXPORT clean_dates :=  DCAV2.Layouts.clean_dates;
+ EXPORT layout_base_companies := DCAV2.Layouts.base.companies;
 
 	EXPORT layout_linkids := RECORD
 		unsigned6 ultid;

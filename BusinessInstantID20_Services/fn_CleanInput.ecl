@@ -1,4 +1,4 @@
-IMPORT Address, Business_Risk_BIP, Risk_Indicators, RiskWise, STD, ut;
+﻿IMPORT Address, BizLinkFull, Business_Risk_BIP, Risk_Indicators, RiskWise, STD, ut;
 
 	// The following function cleans the input data for the Business and the Authorized Reps:
 	//   o   CompanyName and Name
@@ -56,7 +56,7 @@ IMPORT Address, Business_Risk_BIP, Risk_Indicators, RiskWise, STD, ut;
 			BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfoClean xfm_CleanInput(BusinessInstantID20_Services.layouts.InputCompanyAndAuthRepInfo le) :=
 				TRANSFORM
 					// Clean up the Company Name, Company Address, FEIN, and Company Phone.
-					_CompanyName   := IF(le.CompanyName <> '', ut.CleanCompany(le.CompanyName), ut.CleanCompany(le.AltCompanyName)); // If the customer didn't pass in a company but passed in an alt company name use the alt as the company name
+					_CompanyName   := IF(le.CompanyName <> '', BizLinkFull.Fields.Make_cnp_name(le.CompanyName), BizLinkFull.Fields.Make_cnp_name(le.AltCompanyName)); // If the customer didn't pass in a company but passed in an alt company name use the alt as the company name
 					_Clean_FEIN    := StringLib.StringFilter(le.FEIN, '0123456789');
 					_Clean_phone10 := RiskWise.CleanPhone(le.Phone10);
 					_Address       := Risk_Indicators.MOD_AddressClean.street_address(le.StreetAddress1 + ' ' + le.StreetAddress2);
@@ -67,7 +67,7 @@ IMPORT Address, Business_Risk_BIP, Risk_Indicators, RiskWise, STD, ut;
 					SELF.AcctNo         := le.AcctNo;
 					SELF.HistoryDate    := IF(le.HistoryDate <= 0, (INTEGER)Business_Risk_BIP.Constants.NinesDate, le.HistoryDate); // If HistoryDate not populated run in "realtime" mode
 					SELF.CompanyName    := TRIM(UCase(_CompanyName));
-					SELF.AltCompanyName := IF(le.CompanyName <> '', ut.CleanCompany(le.AltCompanyName), ''); // Blank out the cleaned AltCompanyName if CompanyName wasn't populated, as we copied Alt into the Main CompanyName field on the previous line
+					SELF.AltCompanyName := IF(le.CompanyName <> '', BizLinkFull.Fields.Make_cnp_name(le.AltCompanyName), ''); // Blank out the cleaned AltCompanyName if CompanyName wasn't populated, as we copied Alt into the Main CompanyName field on the previous line
 					SELF.StreetAddress1 := TRIM(UCase(le.StreetAddress1));
 					SELF.StreetAddress2 := TRIM(UCase(le.StreetAddress2));
 					SELF.City           := TRIM(UCase(le.City));

@@ -1,4 +1,4 @@
-// Various routines to assist in debugging
+﻿// Various routines to assist in debugging
  
 IMPORT SALT30,ut,std;
 EXPORT Debug(DATASET(layout_LGID3) ih, Layout_Specificities.R s, MatchThreshold = Config.MatchThreshold) := MODULE
@@ -131,7 +131,7 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
   SELF.sbfe_id_match_code := MAP(
 		le.sbfe_id_isnull OR ri.sbfe_id_isnull => SALT30.MatchCode.OneSideNull,
 		match_methods(ih).match_sbfe_id(le.sbfe_id,ri.sbfe_id));
-  INTEGER2 sbfe_id_score_temp := MAP(
+  SELF.sbfe_id_score := MAP(
                         le.sbfe_id_isnull OR ri.sbfe_id_isnull => 0,
                         le.sbfe_id = ri.sbfe_id  => le.sbfe_id_weight100,
                         SALT30.Fn_Fail_Scale(le.sbfe_id_weight100,s.sbfe_id_switch));
@@ -273,7 +273,6 @@ EXPORT layout_sample_matches sample_match_join(match_candidates(ih).layout_candi
   SELF.right_dt_first_seen := ri.dt_first_seen;
   SELF.left_dt_last_seen := le.dt_last_seen;
   SELF.right_dt_last_seen := ri.dt_last_seen;
-  SELF.sbfe_id_score := sbfe_id_score_temp*2.00; 
   SELF.Lgid3IfHrchy_score := IF ( Lgid3IfHrchy_score_temp >= Config.Lgid3IfHrchy_Force * 100, Lgid3IfHrchy_score_temp, -9999 ); // Enforce FORCE parameter
   SELF.Lgid3IfHrchy_skipped := SELF.Lgid3IfHrchy_score < -5000;// Enforce FORCE parameter
   SELF.left_active_duns_number := le.active_duns_number;

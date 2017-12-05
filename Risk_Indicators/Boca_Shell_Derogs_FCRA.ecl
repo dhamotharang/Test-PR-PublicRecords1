@@ -1,8 +1,9 @@
-import FCRA, Risk_Indicators, RiskView, ut;
+﻿import FCRA, Risk_Indicators, RiskView, ut;
 
 export Boca_Shell_Derogs_FCRA (GROUPED DATASET(layouts.layout_derogs_input) ids, 
 	integer bsVersion, unsigned8 BSOptions=0, 
-	boolean IncludeLnJ = false, boolean onThor=false) := function
+	boolean IncludeLnJ = false, boolean onThor=false,
+	GROUPED DATASET (risk_indicators.Layout_output) iid_withPersonContext) := function
 
   todaysdate := (string) risk_indicators.iid_constants.todaydate;
 
@@ -116,17 +117,19 @@ export Boca_Shell_Derogs_FCRA (GROUPED DATASET(layouts.layout_derogs_input) ids,
   BankLiensCrim := Risk_Indicators.Boca_Shell_Crim_FCRA(bsVersion, BSOptions, BankLiens, onThor); 
 	BankLiensCrimSO := Risk_Indicators.Boca_Shell_SO_FCRA(bsVersion, BSOptions, BankLiensCrim, onThor); 
 
-	BankLiensCrimSO_LNJ :=	Risk_Indicators.Boca_Shell_Liens_LnJ_FCRA(bsVersion, BSOptions, w_corrections, IncludeLnJ, onThor);								
+	BankLiensCrimSO_LNJ :=	Risk_Indicators.Boca_Shell_Liens_LnJ_FCRA(bsVersion, BSOptions, w_corrections, 
+		IncludeLnJ, onThor, iid_withPersonContext);								
 	DerogsLNJ := JOIN(BankLiensCrimSO, BankLiensCrimSO_LNJ,
 					LEFT.Did = Right.Did,
 					RiskView.Transforms.GetLnJInfo(LEFT, RIGHT),
 					LEFT OUTER);
-			
+	// output(iid_withPersonContext, named('derogIIDPC'));		
 	// output(Bankruptcy, named('Bankruptcy'));
 	// output(BankLiens, named('BankLiens'));
 	// output(BankLiensCrim, named('BankLiensCrim'));
 	// output(BankLiensCrimSO, named('BankLiensCrimSO'));
 	// output(BankLiensCrimSO_LNJ, named('BankLiensCrimSO_LNJ'));
+	// output(w_corrections, named('w_correctionsbb'));
 	// output(DerogsLNJ, named('DerogsLNJ'));
 	// output(DerogsLNJ2, named('DerogsLNJ2'));
 	// output(w_corrections, named('input'));

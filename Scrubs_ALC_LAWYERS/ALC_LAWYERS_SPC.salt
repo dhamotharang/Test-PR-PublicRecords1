@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_ALC_LAWYERS
 FILENAME:ALC_LAWYERS
 //Uncomment up to NINES for internal or external adl
@@ -46,9 +46,9 @@ FIELD:county_cd:TYPE(STRING15):LIKE(invalid_alphanumeric):0,0
 FIELD:msa:TYPE(STRING4):LIKE(invalid_numeric):0,0
 FIELD:nielsen_county_cd:TYPE(STRING1):LIKE(invalid_alphanumeric):0,0
 FIELD:number_of_lawyers_range:TYPE(STRING10):LIKE(invalid_number_of_lawyers_range):0,0
-FIELD:practice_area:TYPE(STRING255):LIKE(invalid_alphanumericpound):0,0
-FIELD:title_cd:TYPE(STRING25):LIKE(invalid_numericpound):0,0
-FIELD:phone:TYPE(STRING10):LIKE(invalid_numeric):0,0
+FIELD:practice_area:TYPE(STRING254):LIKE(invalid_alphanumericpound):0,0
+FIELD:title_cd:TYPE(STRING50):LIKE(invalid_numericpound):0,0
+FIELD:phone:TYPE(STRING20):LIKE(invalid_numeric):0,0
 FIELD:list_id:TYPE(STRING10):LIKE(invalid_numeric):0,0
 FIELD:scno:TYPE(STRING10):LIKE(invalid_numeric):0,0
 FIELD:keycode:TYPE(STRING35):0,0

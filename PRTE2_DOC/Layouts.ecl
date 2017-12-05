@@ -1,8 +1,8 @@
-Import hygenics_crim, corrections, address, Criminal_Records, ut, doxie;
+﻿Import hygenics_crim, corrections, address, Criminal_Records, ut, doxie;
 EXPORT Layouts := module
 
 EXPORT layout_offender := hygenics_crim.layout_offender;
-EXPORT layout_offender_plus := hygenics_crim.layout_offender or {string100 cust_name, string20 bug_num};
+EXPORT layout_offender_plus := hygenics_crim.layout_offender or {string100 cust_name, string20 bug_num,		string8		link_dob,	string9	link_ssn};
 EXPORT layout_offenses_base_plus := corrections.layout_offense_common or {string100 cust_name, string20 bug_num};
 EXPORT layout_offense_common := corrections.layout_offense_common;
 EXPORT Layout_CrimPunishment := corrections.Layout_CrimPunishment;
@@ -523,6 +523,8 @@ string2 offense_score;
 unsigned8 offender_persistent_id;
 string100 cust_name;
 string20 bug_num;
+string8		link_dob;	
+string9	link_ssn;
 END;
 
 

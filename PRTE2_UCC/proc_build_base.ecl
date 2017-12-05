@@ -1,4 +1,4 @@
-IMPORT PRTE2_UCC, UCCV2, PromoteSupers, STD, PRTE2, Address, AID, AID_Support, ut;
+﻿IMPORT PRTE2_UCC, UCCV2, PromoteSupers, STD, PRTE2, Address, AID, AID_Support, ut;
 #constant(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
 
 EXPORT proc_build_base := FUNCTION
@@ -120,9 +120,9 @@ Layouts.Party_ext xForm(addr_clean le) := TRANSFORM
 	SELF.err_stat		  :=	le.AIDWork_AceCache.err_stat;
 	//DID and BDID process
 	SELF.bdid					:= prte2.fn_AppendFakeID.bdid(self.company_name, self.prim_range,  self.prim_name,  self.v_city_name,  self.st,  self.zip5,  le.cust_name);
-	SELF.did	 				:= prte2.fn_AppendFakeID.did(self.fname, self.lname, le.ssn, le.link_dob, le.cust_name);
+	SELF.did	 				:= prte2.fn_AppendFakeID.did(self.fname, self.lname, le.link_ssn, le.link_dob, le.cust_name);
 	
-	vLinkingIds 			:= prte2.fn_AppendFakeID.LinkIds(TempCleanComp, le.fein, le.link_inc_date,  le.AIDWork_ACECache.prim_range,  le.aidwork_acecache.prim_name,
+	vLinkingIds 			:= prte2.fn_AppendFakeID.LinkIds(TempCleanComp, le.link_fein, le.link_inc_date,  le.AIDWork_ACECache.prim_range,  le.aidwork_acecache.prim_name,
 																											le.AIDWork_ACECache.sec_range,  le.AIDWork_ACECache.v_city_name,  le.AIDWork_ACECache.st,  le.aidwork_acecache.zip5,  le.cust_name);
 	SELF.powid				:= vLinkingIds.powid;
 	SELF.proxid				:= vLinkingIds.proxid;

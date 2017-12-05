@@ -1,4 +1,4 @@
-import _control, tools;
+﻿import _control, tools;
 
 export _Flags :=
 module
@@ -11,7 +11,6 @@ module
 	
 		export Input := module
 			export MBS                  						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MBS        										.Sprayed))) > 0;
-      export MbsGcIdExclusion     						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MbsGcIdExclusion    						.Sprayed))) > 0;
       export MbsNewGcIdExclusion  						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MbsNewGcIdExclusion  					.Sprayed))) > 0;
       export MbsIndTypeExclusion  						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MbsIndTypeExclusion  					.Sprayed))) > 0;
 			export MbsFdnMasterIDIndTypeInclusion		:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MbsFdnMasterIDIndTypeInclusion .Sprayed))) > 0;

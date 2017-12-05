@@ -1,4 +1,4 @@
-import _control,RoxieKeyBuild;
+﻿import _control,RoxieKeyBuild;
 export Email_Notification_Lists :=
 module
 	shared emailaddressep := if(Corp2.IsTesting, ',', ';');
@@ -6,10 +6,8 @@ module
 	export all_hands := 'michael.gould@lexisnexis.com' 						
 											+ emailaddressep +	'julie.ellison@lexisnexis.com' 		
 											+ emailaddressep +	'julianne.franzer@lexisnexis.com' 
-											+ emailaddressep +  'valerie.minnis@lexisnexis.com'
 											+ emailaddressep +  'kevin.reeder@lexisnexis.com'
 											+ emailaddressep +  'audra.mireles@lexisnexis.com'
-											+ emailaddressep +  'sandy.butler@lexisnexis.com'
 											+ emailaddressep +  'saritha.myana@lexisnexis.com'
 											+ emailaddressep +  'rosemary.murphy@lexisnexis.com'
 											+ emailaddressep +  'lucinda.sibille@lexisnexis.com'

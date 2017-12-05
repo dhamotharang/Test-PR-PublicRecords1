@@ -1,18 +1,9 @@
-IMPORT Risk_Indicators, Gateway, Business_Risk_BIP, BIPV2, DueDiligence;
+﻿IMPORT Risk_Indicators, Gateway, Business_Risk_BIP, BIPV2, DueDiligence, STD, WSInput;
 
 EXPORT DueDiligence_Batch_Service() := FUNCTION
 	
-	//The following macro defines the field sequence on WsECL page of query.
-	#WEBSERVICE(FIELDS(
-                'batch_in',
-                'glbaPurpose',
-                'dppaPurpose',
-								'dataRestriction',
-								'dataPermissionMask',
-                'attributesVersion',
-                'includeNews',
-                'gateways'
-                ));
+	//The following macro defines the field sequence on WsECL page of query. 
+  WSInput.MAC_DueDiligence_Batch_Service();
 								
 
   batch_in  := DATASET([], DueDiligence.Layouts.BatchInLayout ) : STORED('batch_in');
@@ -26,7 +17,7 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
 	
 	DueDiligence.Layouts.Input formatInput(DueDiligence.Layouts.BatchInLayout le, INTEGER cnt) := TRANSFORM
 	
-		customerType := StringLib.StringToUpperCase(le.custType);
+		customerType := STD.Str.ToUpperCase(le.custType);
 	
 		version := MAP(attributesVersion = DueDiligence.Constants.VERSION_3 AND customerType = DueDiligence.Constants.INDIVIDUAL => DueDiligence.Constants.IND_REQ_ATTRIBUTE_V3,
 										attributesVersion = DueDiligence.Constants.VERSION_3 AND customerType = DueDiligence.Constants.BUSINESS => DueDiligence.Constants.BUS_REQ_ATTRIBUTE_V3,
@@ -44,7 +35,9 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
 		ind_in := IF(version IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, 
 												DATASET([TRANSFORM(DueDiligence.Layouts.Indv_Input,
 																						SELF.lexID := TRIM(le.lexID);
+																						SELF.nameInputOrder := TRIM(le.nameInputOrder);
 																						SELF.name := DATASET([TRANSFORM(DueDiligence.Layouts.Name,
+																																						SELF.fullName := TRIM(le.fullName);
 																																						SELF.firstName := TRIM(le.firstName);
 																																						SELF.middleName := TRIM(le.middleName);
 																																						SELF.lastName := TRIM(le.lastName);
@@ -148,7 +141,7 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
 		EXPORT UNSIGNED1	GLBA_Purpose 				:= glba;
 		EXPORT STRING50		DataRestrictionMask	:= dataRestriction;
 		EXPORT STRING50		DataPermissionMask	:= dataPermission;
-		EXPORT STRING10		IndustryClass				:= StringLib.StringToUpperCase(Business_Risk_BIP.Constants.Default_IndustryClass);
+		EXPORT STRING10		IndustryClass				:= STD.Str.ToUpperCase(Business_Risk_BIP.Constants.Default_IndustryClass);
 		EXPORT UNSIGNED1	LinkSearchLevel			:= Business_Risk_BIP.Constants.LinkSearch.SeleID;
 		EXPORT UNSIGNED1	BusShellVersion			:= Business_Risk_BIP.Constants.Default_BusShellVersion;
 		EXPORT UNSIGNED1	MarketingMode				:= Business_Risk_BIP.Constants.Default_MarketingMode;
@@ -231,5 +224,17 @@ EXPORT DueDiligence_Batch_Service() := FUNCTION
 		
 	RETURN OUTPUT(final, NAMED('Results'));
 															 
-
 END;
+
+
+/*--SOAP-- 
+<message name="duediligence.duediligence_batch_service">
+	<part name="batch_in" sequence="1" type="tns:XmlDataset"/>
+	<part name="attributesversion" sequence="2" type="xsd:integer"/>
+	<part name="glbapurpose" sequence="5" type="xsd:integer"/>
+	<part name="dppapurpose" sequence="6" type="xsd:integer"/>
+	<part name="datarestriction" sequence="7" type="xsd:string"/>
+	<part name="datapermissionmask" sequence="8" type="xsd:string"/>
+</message>
+*/
+

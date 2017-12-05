@@ -10,6 +10,7 @@ inFile := DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Raw;
 		self.sequence_number 						:= DeltabaseGateway._Functions.rmNull(trim(l.sequence_number, left, right));
 		self.source 										:= DeltabaseGateway._Functions.rmNull(stringlib.stringtouppercase(trim(l.source, left, right)));
 		self.vendor_transaction_id 			:= DeltabaseGateway._Functions.rmNull(stringlib.stringtouppercase(trim(l.vendor_transaction_id, left, right)));
+		self.submitted_phonenumber 			:= DeltabaseGateway._Functions.rmNull(trim(l.submitted_phonenumber, left, right));
 		self.optin_type 								:= DeltabaseGateway._Functions.rmNull(trim(l.optin_type, left, right));
 		self.optin_method 							:= DeltabaseGateway._Functions.rmNull(trim(l.optin_method, left, right));
 		self.optin_duration 						:= DeltabaseGateway._Functions.rmNull(trim(l.optin_duration, left, right));

@@ -1,14 +1,14 @@
-IMPORT FraudShared;
+﻿IMPORT FraudShared;
 EXPORT Functions := 
-	module 
+	MODULE 
 	
-Export     fSlashedMDYtoCYMD(string pDateIn) 
+EXPORT     fSlashedMDYtoCYMD(string pDateIn) 
                :=          intformat((integer2)regexreplace('.*/.*/([0-9]+)',pDateIn,'$1'),4,1) 
                      +     intformat((integer1)regexreplace('([0-9]+)/.*/.*',pDateIn,'$1'),2,1)
                      +     intformat((integer1)regexreplace('.*/([0-9]+)/.*',pDateIn,'$1'),2,1);
 
 
-Export Classification (
+EXPORT Classification (
 
            dataset(FraudShared.Layouts.Base.Main) pBaseFile ) := 
 					 
@@ -58,9 +58,9 @@ function
 	
 end; 
 
- EXPORT nullset := ['none','NONE','','NULL','null','UNKNOWN','unknown', 'UKNOWN', 'Null'];
+EXPORT nullset := ['none','NONE','','NULL','null','UNKNOWN','unknown', 'UKNOWN', 'Null'];
 
-	EXPORT CleanFields(inputFile,outputFile) := macro
+EXPORT CleanFields(inputFile,outputFile) := macro
 
 		LOADXML('<xml/>');
 
@@ -68,7 +68,7 @@ end;
 
 		#uniquename(myCleanFunction)
 
-		STRING %myCleanFunction%(STRING x) := if(TRIM(x,all) in Functions.nullset , '',stringlib.stringcleanspaces(stringlib.stringtouppercase(x)));
+		STRING %myCleanFunction%(STRING x) := if(TRIM(x,all) in FraudGovPlatform.Functions.nullset , '',stringlib.stringcleanspaces(stringlib.stringtouppercase(x)));
 		
 			#uniquename(tra)
 		inputFile %tra%(inputFile le) :=
@@ -95,7 +95,7 @@ end;
 		outputFile := PROJECT(inputFile, %tra%(LEFT));
 	ENDMACRO;
 	
-	export fraud_type_fn(string off_desc_clean) := function 
+EXPORT fraud_type_fn(string off_desc_clean) := function 
 
    										frd_typ     := MAP(REGEXFIND('FRAUD| WELFARE FRD | WELFARE FARUD | WELFARE FRUAD | FAUDULENT | FRADULENT ',' ' + off_desc_clean + ' ')
 																		                      => 'FRAUD - MULTIPLE CATEGORIES',	
@@ -180,5 +180,21 @@ end;
 return frd_typ;
 end;
 		
+EXPORT file_type_fn(string4 Source) := function
+	file_type_v := map(
+										 regexfind('IDDT',Source) => 3,
+										 regexfind('KNFD',Source) => 1,
+										 0
+										);
+	return file_type_v;
+END;
+EXPORT ind_type_fn(string1 customer_program) := function
+	ind_type_v := map(
+										 customer_program = 'S' => 1292,
+										 customer_program = 'M' => 1302,
+										 0
+										);
+	return ind_type_v;
+END;
 end; 
 			

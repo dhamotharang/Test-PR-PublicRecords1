@@ -1,4 +1,4 @@
-import BIPV2, Business_Risk_BIP, CalBus, DCAV2, DueDiligence, EBR, FBNv2, OSHAIR, YellowPages;
+﻿IMPORT BIPV2, Business_Risk_BIP, CalBus, DCAV2, DueDiligence, EBR, FBNv2, OSHAIR, YellowPages, STD;
 
 /*
 	Following Keys being used:
@@ -25,7 +25,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																							 Options.KeepLargeBusinesses);																						 
 																							 
 	// Add back our Seq numbers
-	DueDiligence.Common.AppendSeq(oshaRaw, indata, oshaRawSeq);
+	oshaRawSeq := DueDiligence.Common.AppendSeq(oshaRaw, indata, TRUE);
 			
 	// Filter out records after our history date.
 	oshaFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(oshaRawSeq, inspection_opening_date);
@@ -65,8 +65,8 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																															 Options.KeepLargeBusinesses);
 																															 
 	// Add back our Seq numbers
-	DueDiligence.Common.AppendSeq(ebr5600Raw, indata, ebr5600RawSeq);
-			
+	ebr5600RawSeq := DueDiligence.Common.AppendSeq(ebr5600Raw, indata, TRUE);
+
 	// Filter out records after our history date.
 	ebrFiltRec := DueDiligence.Common.FilterRecordsSingleDate(ebr5600RawSeq, date_first_seen);
 	
@@ -106,7 +106,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																			 Options.KeepLargeBusinesses);		
 																							
 	// Add back our Seq numbers
-	DueDiligence.Common.AppendSeq(dcaRaw, indata, dcaRawSeq);
+	dcaRawSeq := DueDiligence.Common.AppendSeq(dcaRaw, indata, TRUE);
 			
 	// Filter out records after our history date.
 	dcaFiltRec := DueDiligence.Common.FilterRecords(dcaRawSeq, date_first_seen, date_vendor_first_reported);
@@ -168,7 +168,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																			 Options.KeepLargeBusinesses);	
 																			 
 	// Add back our Seq numbers
-	DueDiligence.Common.AppendSeq(fbnRaw, indata, fbnRawSeq);
+	fbnRawSeq := DueDiligence.Common.AppendSeq(fbnRaw, indata, TRUE);
 			
 	// Filter out records after our history date.
 	fbnFiltRec := DueDiligence.Common.FilterRecords(fbnRawSeq, dt_first_seen, dt_vendor_first_reported);
@@ -204,7 +204,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																											 Options.KeepLargeBusinesses);
 																									 
 	// Add back our Seq numbers
-	DueDiligence.Common.AppendSeq(ypRaw, indata, ypRawSeq);
+	ypRawSeq := DueDiligence.Common.AppendSeq(ypRaw, indata, TRUE);
 			
 	// Filter out records after our history date.
 	ypFiltRec := DueDiligence.Common.FilterRecordsSingleDate(ypRawSeq, pub_date);
@@ -237,8 +237,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																		SELF := LEFT;),
 													LEFT OUTER);
 													
-
-													
+											
 	// ---------------- CALBUS - California Business ---------------------
 	calBusRaw := CalBus.Key_Calbus_LinkIDS.kFetch2(linkIDs,
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
@@ -247,7 +246,7 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																							Options.KeepLargeBusinesses);
 																							
 	// Add back our Seq numbers
-	DueDiligence.Common.AppendSeq(calBusRaw, indata, calBusRawSeq);
+	calBusRawSeq := DueDiligence.Common.AppendSeq(calBusRaw, indata, TRUE);
 			
 	// Filter out records after our history date.
 	calBusFiltRec := DueDiligence.Common.FilterRecordsSingleDate(calBusRawSeq, dt_first_seen);
@@ -273,14 +272,18 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													LEFT OUTER);
 
 
+
+
 	//Grab all the SIC and NAIC codes from all sources
 	allCodes := NORMALIZE(addCalBusSicNaic, LEFT.SicNaicSources, TRANSFORM(DueDiligence.LayoutsInternal.SicNaicUniqueIndustryLayout,
 																																					SELF.seq := LEFT.seq;
 																																					SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
 																																					SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
 																																					SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
-																																					SELF.cibExists :=  RIGHT.SICIndustry = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS OR 
-																																														 RIGHT.NAICIndustry = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS;
+																																					SELF.cibRetailExists :=  RIGHT.SICIndustry = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL OR 
+																																																	 RIGHT.NAICIndustry = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL;
+																																					SELF.cibNonRetailExists := RIGHT.SICIndustry = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL OR 
+																																																		 RIGHT.NAICIndustry = DueDiligence.Constants.INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL;								 
 																																					SELF.msbExists :=  RIGHT.SICIndustry = DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS OR 
 																																														 RIGHT.NAICIndustry = DueDiligence.Constants.INDUSTRY_MONEY_SERVICE_BUSINESS;
 																																					SELF.nbfiExists := RIGHT.SICIndustry = DueDiligence.Constants.INDUSTRY_NON_BANK_FINANCIAL_INSTITUTIONS OR 
@@ -297,10 +300,12 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																																					SELF.moderateRiskIndustExists := RIGHT.NAICRiskLevel = DueDiligence.Constants.RISK_LEVEL_MEDIUM;
 																																					SELF.lowRiskIndustExists := RIGHT.SICRiskLevel = DueDiligence.Constants.RISK_LEVEL_LOW OR 
 																																																			RIGHT.NAICRiskLevel = DueDiligence.Constants.RISK_LEVEL_LOW;
+																																					SELF.sicCodes := RIGHT.sicCode;
+																																					SELF.naicCodes := RIGHT.naicCode;
 																																					SELF := RIGHT;
 																																					SELF := []));
-	//Determine if industry level or risk was hit																			
-	uniqueIndustriesSort := SORT(allCodes, seq, #expand(DueDiligence.Constants.mac_ListTop3Linkids()));
+	//Determine if industry level or risk was hit	
+	uniqueIndustriesSort := SORT(allCodes, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), sicCode, naicCode);
 	
 	uniqueIndustries := ROLLUP(uniqueIndustriesSort, 
 															LEFT.seq = RIGHT.seq AND
@@ -308,7 +313,8 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 															LEFT.orgID = RIGHT.orgID AND
 															LEFT.seleID = RIGHT.seleID,
 															TRANSFORM(DueDiligence.LayoutsInternal.SicNaicUniqueIndustryLayout,
-																				SELF.cibExists := LEFT.cibExists OR RIGHT.cibExists;
+																				SELF.cibRetailExists := LEFT.cibRetailExists OR RIGHT.cibRetailExists;
+																				SELF.cibNonRetailExists := LEFT.cibNonRetailExists OR RIGHT.cibNonRetailExists;
 																				SELF.msbExists := LEFT.msbExists OR RIGHT.msbExists;
 																				SELF.nbfiExists := LEFT.nbfiExists OR RIGHT.nbfiExists;
 																				SELF.cagExists := LEFT.cagExists OR RIGHT.cagExists;
@@ -317,6 +323,12 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																				SELF.otherHighRiskIndustExists := LEFT.otherHighRiskIndustExists OR RIGHT.otherHighRiskIndustExists;
 																				SELF.moderateRiskIndustExists := LEFT.moderateRiskIndustExists OR RIGHT.moderateRiskIndustExists;
 																				SELF.lowRiskIndustExists := LEFT.lowRiskIndustExists OR RIGHT.lowRiskIndustExists;
+																				
+																				sicFound := RIGHT.sicCodes <> DueDiligence.Constants.EMPTY AND STD.Str.Find(LEFT.sicCodes, RIGHT.sicCodes, 1) = 0;	
+																				naicFound := RIGHT.naicCodes <> DueDiligence.Constants.EMPTY AND STD.Str.Find(LEFT.naicCodes, RIGHT.naicCodes, 1) = 0;	
+																				
+																				SELF.sicCodes := IF(sicFound, IF(LEFT.sicCodes = DueDiligence.Constants.EMPTY, RIGHT.sicCodes, LEFT.sicCodes + ',' + RIGHT.sicCodes), LEFT.sicCodes);
+																				SELF.naicCodes := IF(naicFound, IF(LEFT.naicCodes = DueDiligence.Constants.EMPTY, RIGHT.naicCodes, LEFT.naicCodes + ',' + RIGHT.naicCodes), LEFT.naicCodes);
 																				SELF := LEFT;));
 																				
 	addIndustry := JOIN(addYpSicNaic, uniqueIndustries,
@@ -325,7 +337,8 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 											LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
 											LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
 											TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																SELF.sicNaicRisk.cibExists := RIGHT.cibExists;
+																SELF.sicNaicRisk.cibRetailExists := RIGHT.cibRetailExists;
+																SELF.sicNaicRisk.cibNonRetailExists := RIGHT.cibNonRetailExists;
 																SELF.sicNaicRisk.msbExists := RIGHT.msbExists;
 																SELF.sicNaicRisk.nbfiExists := RIGHT.nbfiExists;
 																SELF.sicNaicRisk.cagExists := RIGHT.cagExists;
@@ -334,18 +347,26 @@ EXPORT getBusSicNaic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																SELF.sicNaicRisk.otherHighRiskIndustExists := RIGHT.otherHighRiskIndustExists;
 																SELF.sicNaicRisk.moderateRiskIndustExists := RIGHT.moderateRiskIndustExists;
 																SELF.sicNaicRisk.lowRiskIndustExists := RIGHT.lowRiskIndustExists;
+																SELF.sicNaicRisk.sicCodes := RIGHT.sicCodes;
+																SELF.sicNaicRisk.naicCodes := RIGHT.naicCodes;
 																SELF := LEFT;),
 											LEFT OUTER);
 	
-													
+											
 
 
+	// OUTPUT(ebr5600Raw, NAMED('ebr5600Raw'));
+	// OUTPUT(ebr5600RawSeq, NAMED('ebr5600RawSeq'));
 	// OUTPUT(allYpSicNaic, NAMED('allYpSicNaic'));
 	// OUTPUT(sortYpRollSicNaic, NAMED('sortYpRollSicNaic'));
 	// OUTPUT(allCodes, NAMED('allCodes'));
 	// OUTPUT(uniqueIndustriesSort, NAMED('uniqueIndustriesSort'));
 	// OUTPUT(uniqueIndustries, NAMED('uniqueIndustries'));
 	// OUTPUT(addIndustry, NAMED('addIndustry'));
+	
+	
+	// OUTPUT(test, NAMED('test'));
+	// OUTPUT(test2, NAMED('test2'));
 
 	RETURN addIndustry;
 END;

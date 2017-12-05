@@ -1,4 +1,4 @@
-/*2016-05-26T20:32:11Z (Kevin Huls_prod)
+﻿/*2016-05-26T20:32:11Z (Kevin Huls_prod)
 Update for Emerging Identities
 */
 #workunit('name','FlexID Process v1');
@@ -77,8 +77,12 @@ layout_soap t_f(f le, INTEGER c) := TRANSFORM
 	
 	// self.gateways := dataset([], risk_indicators.Layout_Gateways_In);
 	// self.gateways := dataset([{'targus','http://rw_data_prod:Password01@gatewayprodesp.sc.seisint.com:7726/wsGateway/?ver_=1.70'}], risk_indicators.Layout_Gateways_In);
-	self.gateways := dataset([{'insurancephoneheader','http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7526/WsPrism/?ver_=1.82'}], risk_indicators.Layout_Gateways_In);
 
+	// for production runs, use the production gateway
+	// self.gateways := dataset([{'insurancephoneheader','http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7526/WsPrism/?ver_=1.82'}], risk_indicators.Layout_Gateways_In);
+	self.gateways := dataset([{'insurancephoneheader','HTTP://api_prod_gw_roxie:g0h3%40t2x@gatewayprodesp.sc.seisint.com:7726/WsGatewayEx/?ver_=1.87'}], risk_indicators.Layout_Gateways_In);
+	
+	
 // self.gateways := dataset([{'targus','http://rw_data_prod:Password01@gatewayprodesp.sc.seisint.com:7726/wsGateway/?ver_=1.70'}
 //            ,{'insurancephoneheader','http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7526/WsPrism/?ver_=1.82'}], risk_indicators.Layout_Gateways_In);
 

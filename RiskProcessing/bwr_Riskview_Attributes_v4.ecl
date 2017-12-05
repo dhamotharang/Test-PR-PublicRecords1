@@ -1,4 +1,4 @@
-#workunit('name','FCRA-Credit Attributes 4.0');
+﻿#workunit('name','FCRA-Credit Attributes 4.0');
 #option ('hthorMemoryLimit', 1000);
 #option ('linkCountedRows', false); 
 import models, Riskwise, Risk_Indicators;
@@ -143,7 +143,7 @@ resu := soapcall(dist_dataset, fcraroxieIP,
 										DATASET(xlayout),
 										RETRY(5), TIMEOUT(500), LITERAL,
                     XPATH('Models.RiskView_Testing_ServiceResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
-										PARALLEL(25), onFail(myFail(LEFT)));
+										PARALLEL(30), onFail(myFail(LEFT)));
 
 output(choosen(resu, eyeball), named('roxie_result'));
 

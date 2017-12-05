@@ -1,4 +1,4 @@
-EXPORT test_BocaShell_SoapCall (dataset (Layout_InstID_SoapCall) indataset, 
+﻿EXPORT test_BocaShell_SoapCall (dataset (Layout_InstID_SoapCall) indataset, 
                                 string service_name, string service_url,
                                 const unsigned1 call_number = 1)  := FUNCTION
 
@@ -42,6 +42,7 @@ END;
 result := SOAPCALL (dist_dataset, service_url, 
                     service_name, {dist_dataset}, 
                     DATASET (xlayout),
+										XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
 										RETRY(5), TIMEOUT(500),
                     PARALLEL (call_number), onFail(myFail (Left)));
 

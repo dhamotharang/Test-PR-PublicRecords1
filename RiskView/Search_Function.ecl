@@ -1,4 +1,4 @@
-import gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA;
+﻿import AID, gateway, risk_indicators, address, riskwise, ut, Risk_Reporting, Consumerstatement, Models, iesp, RiskWiseFCRA;
 
 EXPORT Search_Function(
 	dataset(RiskView.Layouts.layout_riskview_input) riskview_input, 
@@ -30,7 +30,8 @@ EXPORT Search_Function(
 	boolean	IncludeRecordsWithSSN,
 	boolean	IncludeBureauRecs,
 	boolean IncludeLnJ,
-	boolean RetainInputDID
+	boolean RetainInputDID,
+	boolean onThor = FALSE
 ) := function
 
 
@@ -81,35 +82,86 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
 	SELF.in_state := le.St;
 	SELF.in_zipCode := le.Z5;
 	self.in_country := '';
+	//If running on Thor, we will call the AID address cache macro to populate these fields in the next transform to save processing time.
+	self.prim_range 	:= IF(onThor, '', address.cleanFields(clean_addr).prim_range);
+	self.predir 			:= IF(onThor, '', address.cleanFields(clean_addr).predir);
+	self.prim_name 		:= IF(onThor, '', address.cleanFields(clean_addr).prim_name);
+	self.addr_suffix 	:= IF(onThor, '', address.cleanFields(clean_addr).addr_suffix);
+	self.postdir 			:= IF(onThor, '', address.cleanFields(clean_addr).postdir);
+	self.unit_desig 	:= IF(onThor, '', address.cleanFields(clean_addr).unit_desig);
+	self.sec_range 		:= IF(onThor, '', address.cleanFields(clean_addr).sec_range);
+	self.p_city_name 	:= IF(onThor, '', address.cleanFields(clean_addr).v_city_name);  // use v_city_name 90..114 to match all other scoring products
+	self.st 					:= IF(onThor, '', address.cleanFields(clean_addr).st);
+	self.z5 					:= IF(onThor, '', address.cleanFields(clean_addr).zip);
+	self.zip4 				:= IF(onThor, '', address.cleanFields(clean_addr).zip4);
+	self.lat 					:= IF(onThor, '', address.cleanFields(clean_addr).geo_lat);
+	self.long 				:= IF(onThor, '', address.cleanFields(clean_addr).geo_long);
+	self.addr_type 		:= IF(onThor, '', address.cleanFields(clean_addr).rec_type);
+	self.addr_status 	:= IF(onThor, '', address.cleanFields(clean_addr).err_stat);
+	self.county 			:= IF(onThor, '', clean_addr[143..145]);  // address.cleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
+	self.geo_blk 			:= IF(onThor, '', address.cleanFields(clean_addr).geo_blk);
+	self.country 			:= '';
 	
-	self.prim_range := address.cleanFields(clean_addr).prim_range;
-	self.predir := address.cleanFields(clean_addr).predir;
-	self.prim_name := address.cleanFields(clean_addr).prim_name;
-	self.addr_suffix := address.cleanFields(clean_addr).addr_suffix;
-	self.postdir := address.cleanFields(clean_addr).postdir;
-	self.unit_desig := address.cleanFields(clean_addr).unit_desig;
-	self.sec_range := address.cleanFields(clean_addr).sec_range;
-	self.p_city_name := address.cleanFields(clean_addr).v_city_name;  // use v_city_name 90..114 to match all other scoring products
-	self.st := address.cleanFields(clean_addr).st;
-	self.z5 := address.cleanFields(clean_addr).zip;
-	self.zip4 := address.cleanFields(clean_addr).zip4;
-	self.lat := address.cleanFields(clean_addr).geo_lat;
-	self.long := address.cleanFields(clean_addr).geo_long;
-	self.addr_type := address.cleanFields(clean_addr).rec_type;
-	self.addr_status := address.cleanFields(clean_addr).err_stat;
-	self.county := clean_addr[143..145];  // address.cleanFields(clean_addr).county returns the full 5 character fips, we only want the county fips
-	self.geo_blk := address.cleanFields(clean_addr).geo_blk;
-	self.country := '';
-	self.dl_number := stringlib.stringtouppercase(dl_num_clean);
-	self.dl_state := stringlib.stringtouppercase(le.dl_state);
-	
+	self.dl_number 		:= stringlib.stringtouppercase(dl_num_clean);
+	self.dl_state 		:= stringlib.stringtouppercase(le.dl_state);
 	history_date := if(le.historydateTimeStamp='', risk_indicators.iid_constants.default_history_date, (unsigned)le.historydateTimeStamp[1..6]);
 	self.historydate := history_date;
 	self.historyDateTimeStamp := risk_indicators.iid_constants.mygetdateTimeStamp(le.historydateTimeStamp, history_date);
 		
 END;
 
-bsprep := PROJECT(riskview_input, cleanup(left));
+bsprep_roxie := PROJECT(riskview_input, cleanup(left));
+
+// Now get ready to call AID Address Cache macro, which we will use if running thor version
+r_layout_input_PlusRaw	:= RECORD
+	Risk_Indicators.Layout_Input;
+	// add these 3 fields to existing layout anytime i want to use this macro
+	STRING60	Line1;
+	STRING60	LineLast;
+	UNSIGNED8	rawAID;
+end;
+
+r_layout_input_PlusRaw	prep_for_AID(bsprep_roxie le)	:= transform
+	SELF.Line1		:=	TRIM(stringlib.stringtouppercase(le.in_streetAddress));
+	SELF.LineLast	:=	address.addr2fromcomponents(stringlib.stringtouppercase(le.in_city), stringlib.stringtouppercase(le.in_state),  le.in_zipCode);
+	SELF.rawAID			:=	0;
+	SELF	:=	le;
+end;
+aid_prepped	:=	PROJECT(bsprep_roxie, prep_for_AID(left));
+
+UNSIGNED4 lAIDAppendFlags := AID.Common.eReturnValues.RawAID | AID.Common.eReturnValues.ACECacheRecords | AID.Common.eReturnValues.NoNewCacheFiles;
+
+AID.MacAppendFromRaw_2Line(	aid_prepped,
+														Line1,
+														LineLast,
+														rawAID,
+														my_dataset_with_address_cache,
+														lAIDAppendFlags);
+
+Risk_Indicators.Layout_Input getCleanAddr_thor(my_dataset_with_address_cache le) := TRANSFORM
+	SELF.prim_range      := le.aidwork_acecache.prim_range;
+	SELF.predir          := le.aidwork_acecache.predir;
+	SELF.prim_name       := le.aidwork_acecache.prim_name;
+	SELF.addr_suffix     := le.aidwork_acecache.addr_suffix;
+	SELF.postdir         := le.aidwork_acecache.postdir;
+	SELF.unit_desig      := le.aidwork_acecache.unit_desig;
+	SELF.sec_range       := le.aidwork_acecache.sec_range;
+	SELF.p_city_name     := le.aidwork_acecache.p_city_name;
+	SELF.st              := le.aidwork_acecache.st;
+	SELF.z5              := le.aidwork_acecache.zip5;
+	SELF.zip4            := le.aidwork_acecache.zip4;
+	SELF.lat             := le.aidwork_acecache.geo_lat;
+	SELF.long            := le.aidwork_acecache.geo_long;
+	SELF.addr_type 			 := risk_indicators.iid_constants.override_addr_type(le.in_streetAddress, le.aidwork_acecache.rec_type[1],le.aidwork_acecache.cart);
+	SELF.addr_status     := le.aidwork_acecache.err_stat;
+	SELF.county          := le.aidwork_acecache.county[3..5]; //bytes 1-2 are state code, 3-5 are county number
+	SELF.geo_blk         := le.aidwork_acecache.geo_blk;	
+	self := le;
+END;
+
+bsprep_thor := PROJECT(my_dataset_with_address_cache, getCleanAddr_thor(LEFT)): PERSIST('~BOCASHELLFCRA::cleaned_inputs');
+
+bsprep := IF(onThor, bsprep_thor, bsprep_roxie);
 
 RiskView.Layouts.Layout_Custom_Inputs getCustomInputs(RiskView.Layouts.layout_riskview_input le) := TRANSFORM
 	SELF.Seq := le.Seq; // This should match the Seq number of BSPrep/Model Results
@@ -164,28 +216,19 @@ bsversion := 50;  // hard code this for now
 		if( IncludeRecordsWithSSN, risk_indicators.iid_constants.BSOptions.SSNLienFtlr, 0 ) +
 		if( IncludeBureauRecs, risk_indicators.iid_constants.BSOptions.BCBLienFtlr, 0 )	 +
 		if( RetainInputDID or LexIDOnlyOnInput, Risk_Indicators.iid_constants.BSOptions.RetainInputDID, 0 );
-
-	normal_clam := Risk_Indicators.Boca_Shell_Function_FCRA(
-		bsprep, gateways, dppa, glba, isUtility, isLN,
-		require2ele, doRelatives, doDL, doVehicle, doDerogs, ofacOnly,
-		suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
-		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
-		bsVersion, isPreScreenPurpose, doScore, ADL_Based_Shell:=false, datarestriction:=datarestriction, BSOptions:=BSOptions,
-		datapermission:=datapermission, IN_isDirectToConsumer:=isDirectToConsumerPurpose,
-		IncludeLnJ :=IncludeLnJ
-	);
-	adl_clam := Risk_Indicators.Boca_Shell_Function_FCRA(
-		bsprep, gateways, dppa, glba, isUtility, isLN,
-		require2ele, doRelatives, doDL, doVehicle, doDerogs, ofacOnly,
-		suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
-		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
-		bsVersion, isPreScreenPurpose, doScore, ADL_Based_Shell:=true, datarestriction:=datarestriction, BSOptions:=BSOptions,
-		datapermission:=datapermission, IN_isDirectToConsumer:=isDirectToConsumerPurpose,
-		IncludeLnJ :=IncludeLnJ
-	);
-
+		
 	// In prescreen mode or if Lex ID is the only input run the ADL Based shell to append inputs
-	clam := if(isPreScreenPurpose OR LexIDOnlyOnInput, adl_clam, normal_clam);
+	ADL_Based_Shell := isPreScreenPurpose OR LexIDOnlyOnInput;
+	
+	clam := Risk_Indicators.Boca_Shell_Function_FCRA(
+		bsprep, gateways, dppa, glba, isUtility, isLN,
+		require2ele, doRelatives, doDL, doVehicle, doDerogs, ofacOnly,
+		suppressNearDups, fromBIID, excludeWatchlists, fromIT1O,
+		ofacVersion, includeOfac, includeAddWatchlists, watchlistThreshold,
+		bsVersion, isPreScreenPurpose, doScore, ADL_Based_Shell:=ADL_Based_Shell, datarestriction:=datarestriction, BSOptions:=BSOptions,
+		datapermission:=datapermission, IN_isDirectToConsumer:=isDirectToConsumerPurpose,
+		IncludeLnJ :=IncludeLnJ, onThor := onThor
+	);
 	
 #if(Models.LIB_RiskView_Models().TurnOnValidation = FALSE)
 
@@ -270,7 +313,8 @@ attrLnJ :=  if( IncludeLnJ /*and FilterLnJ = false*/,
 riskview5_attr_search_results_attrv5 := join(clam, attrv5, left.seq=right.seq,
 transform(riskview.layouts.layout_riskview5_search_results, 
 	self.LexID := if(right.did=0, '', (string)right.did);
-	self.ConsumerStatements := left.ConsumerStatements;
+	self.ConsumerStatements := project(left.ConsumerStatements, transform(
+		iesp.share_fcra.t_ConsumerStatement, self.dataGroup := '', self := left));
 	self := right,
 	self := left,
 	self := []), LEFT OUTER, KEEP(1), ATMOST(100));
@@ -925,7 +969,6 @@ riskview.layouts.layout_riskview5_search_results apply_score_alert_filters(riskv
 	self.ConfirmationSubjectFound	 := map(isLnJRunningAlone => '',
 							isReportAlone => '',
 							le.ConfirmationSubjectFound	);
-
 	self := le;
 end;
 

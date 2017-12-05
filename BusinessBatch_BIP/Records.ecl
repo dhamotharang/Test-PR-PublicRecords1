@@ -1,4 +1,4 @@
-IMPORT BIPV2, BusinessBatch_BIP, Business_Risk_BIP, MDR, ut, AutoStandardI;
+﻿IMPORT BIPV2, BusinessBatch_BIP, Business_Risk_BIP, MDR, ut, AutoStandardI;
 
 EXPORT Records( DATASET(BusinessBatch_BIP.Layouts.Input_Processed) ds_BatchIn,
                 BusinessBatch_BIP.iParam.BatchParams               inMod
@@ -72,13 +72,14 @@ FUNCTION
 														 TRANSFORM(RECORDOF(LEFT),
 														     SElF.weight:= right.proxweight;
 																 SELF := LEFT));											 
-  
+																 
   // Restrict the max records for each acct# depending on user input 
 	ds_BestInfoRecs := UNGROUP(TOPN(GROUP(SORT(ds_BestInfo2,acctno, -weight, -record_score,record),acctno),inMod.MaxResultsPerAcct,acctno));
   
-  
   // Get link ids
-  ds_linkIdsWithAcctNo := PROJECT(ds_BestInfoRecs,BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo);
+  ds_linkIdsWithAcctNoTmp := PROJECT(ds_BestInfoRecs,BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo);
+	ds_linkidsWithAcctno := SORT(DEDUP(SORT(ds_linkIdsWithAcctNoTmp,acctno, ultid, orgid, seleid, -weight,-record_score),
+	                                              acctno, ultid, orgid, seleid), acctno, -weight, -record_score,record);
   
 	ds_linkIds := DEDUP(PROJECT(ds_BestInfoRecs,BIPV2.IDlayouts.l_xlink_ids),ALL);
 									 
@@ -117,6 +118,16 @@ FUNCTION
   
   // Get DCA info
   ds_DCAInfo := BusinessBatch_BIP.Functions(inMod).GetDCAInfo(ds_linkIdsWithAcctNo,ds_linkIds);
+	
+	// Get Diversity Cert info
+	ds_DiversityCert := BusinessBatch_BIP.Functions(inMod).getDiversityCertInfo(ds_linkIdsWithAcctNo,ds_linkIds);
+	
+	// Get labor actions data	
+	ds_LaborActionsWHD := BusinessBatch_BIP.Functions(inMod).getLaborActionsWHDInfo(ds_linkIdsWithAcctNo,ds_linkIds);
+	
+	// Get OSHAIR data
+	ds_OSHA := BusinessBatch_BIP.Functions(inMod).getOSHAInfo(ds_linkIdsWithAcctNo,ds_linkIds);
+	
   
   // Merge all the results
   // Business header info
@@ -219,7 +230,8 @@ FUNCTION
 																					 'F' => ri.corp_forgn_term_exist_exp,
 																					 '');		
     self.corp_status_desc := ri.corp_status_desc;
-		// not a new field just getting it from corp data not from best key.											  
+		// not a new field just getting it from corp data not from best key.
+		self.Business_type := ri.corp_filing_desc;
     SELF.Corp_filing_date := ri.Corp_filing_date;			
 		// ****** from TopBusiness_Services.IncorporationSection
 		// Examine 3 fields to know know what to store in the existence/expiration fields
@@ -240,7 +252,7 @@ FUNCTION
                       ri.corp_forgn_term_exist_exp !='' or 
 		                  ri.corp_forgn_term_exist_desc != '';
         tmpExistence_desc       := if (useForeign,ri.corp_forgn_term_exist_desc,ri.corp_term_exist_desc);
-        //tmpExistence_code       := if(UseForeign,ri.corp_forgn_term_exist_cd,ri.corp_term_exist_cd);
+        
     SELF.Corp_expiration_date :=  if (tmpExistence_desc = 'DATE OF EXPIRATION', 
 		                   ut.date_YYYYMMDDtoDateSlashed(corp_expiration_date),'');   											 
     SELF.Corp_filing_type :=  ri.corp_filing_desc;
@@ -249,7 +261,8 @@ FUNCTION
 		SELF.Corp_var1_first_seen  := IF(cnt = 1,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var1_first_seen);
 		SELF.Corp_var1_last_seen :=  IF(cnt = 1,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
-		                                                       le.Corp_var1_last_seen);		 
+		                                                       le.Corp_var1_last_seen);	
+    SELF.corp_var1_state_origin := IF(cnt = 1,ri.corp_state_origin,le.corp_var1_state_origin);																													 
 		
 		
 		SELF.corp_var2 := IF(cnt = 2,ri.Corp_sos_charter_nbr,le.corp_var2);
@@ -257,57 +270,63 @@ FUNCTION
 		                                                       le.corp_var2_first_seen);
 		SELF.Corp_var2_last_seen :=  IF(cnt = 2,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var2_last_seen);	
-
-
+    SELF.corp_var2_state_origin := IF(cnt = 2,ri.corp_state_origin,le.corp_var2_state_origin);																													 
+																															 
     SELF.corp_var3 := IF(cnt = 3,ri.Corp_sos_charter_nbr,le.corp_var3);
 		SELF.Corp_var3_first_seen  := IF(cnt = 3,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var3_first_seen);
 		SELF.Corp_var3_last_seen :=  IF(cnt = 3,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var3_last_seen);	
+		SELF.corp_var3_state_origin := IF(cnt = 3,ri.corp_state_origin,le.corp_var3_state_origin);									
    
-	 
 	  SELF.corp_var4 := IF(cnt = 4,ri.Corp_sos_charter_nbr,le.corp_var4);
 		SELF.Corp_var4_first_seen  := IF(cnt = 4,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var4_first_seen);
 		SELF.Corp_var4_last_seen :=  IF(cnt = 4,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var4_last_seen);	
-   
-	  
+     SELF.corp_var4_state_origin := IF(cnt = 4,ri.corp_state_origin,le.corp_var4_state_origin);																																						 
+   	 
 		SELF.corp_var5 := IF(cnt = 5,ri.Corp_sos_charter_nbr,le.corp_var5);
 		SELF.Corp_var5_first_seen  := IF(cnt = 5,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var5_first_seen);
 		SELF.Corp_var5_last_seen :=  IF(cnt = 5,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var5_last_seen);	
+    SELF.corp_var5_state_origin := IF(cnt = 5,ri.corp_state_origin,le.corp_var5_state_origin);																																						 
    
 	  SELF.corp_var6 := IF(cnt = 6,ri.Corp_sos_charter_nbr,le.corp_var6);
 		SELF.Corp_var6_first_seen  := IF(cnt = 6,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var6_first_seen);
 		SELF.Corp_var6_last_seen :=  IF(cnt = 6,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var6_last_seen);	
+   SELF.corp_var6_state_origin := IF(cnt = 6,ri.corp_state_origin,le.corp_var6_state_origin);																																																					 
    
 	 SELF.corp_var7 := IF(cnt = 7,ri.Corp_sos_charter_nbr,le.corp_var7);
 		SELF.Corp_var7_first_seen  := IF(cnt = 7,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var7_first_seen);
 		SELF.Corp_var7_last_seen :=  IF(cnt = 7,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var7_last_seen);	
+    SELF.corp_var7_state_origin := IF(cnt = 7,ri.corp_state_origin,le.corp_var7_state_origin);																																						 
    
 	  SELF.corp_var8 := IF(cnt = 8,ri.Corp_sos_charter_nbr,le.corp_var8);
 		SELF.Corp_var8_first_seen  := IF(cnt = 8,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var8_first_seen);
 		SELF.Corp_var8_last_seen :=  IF(cnt = 8,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var8_last_seen);	
+    SELF.corp_var8_state_origin := IF(cnt = 8,ri.corp_state_origin,le.corp_var8_state_origin);																																						 
 	 
 	  SELF.corp_var9 := IF(cnt = 9,ri.Corp_sos_charter_nbr,le.corp_var9);
 		SELF.Corp_var9_first_seen  := IF(cnt = 9,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var9_first_seen);
 		SELF.Corp_var9_last_seen :=  IF(cnt = 9,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var9_last_seen);	
+    SELF.corp_var9_state_origin := IF(cnt = 9,ri.corp_state_origin,le.corp_var9_state_origin);																																						 
     
 		SELF.corp_var10 := IF(cnt = 10,ri.Corp_sos_charter_nbr,le.corp_var10);
 		SELF.Corp_var10_first_seen  := IF(cnt = 10,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_first_seen)),
 		                                                       le.corp_var10_first_seen);
 		SELF.Corp_var10_last_seen :=  IF(cnt = 10,ut.date_YYYYMMDDtoDateSlashed((string)(ri.dt_last_seen)),
 		                                                       le.Corp_var10_last_seen);	
+    SELF.corp_var10_state_origin := IF(cnt = 10,ri.corp_state_origin,le.corp_var10_state_origin);																																						 
    
 		SELF.total_corp := 0;
 		
@@ -540,7 +559,66 @@ FUNCTION
                                 BIPV2.IDmacros.mac_JoinTop3Linkids(),
                                 tExecs2Final(LEFT,RIGHT,COUNTER),
                                 LEFT OUTER);
-  
+																
+  	// Get Diversity Cert info
+		
+  ds_DivCertInfoFinal := JOIN(ds_Execs2Final, ds_DiversityCert,
+	                     LEFT.acctno = RIGHT.acctno AND
+									     BIPV2.IDmacros.mac_JoinTop3Linkids(),
+											 TRANSFORM(BusinessBatch_BIP.Layouts.FinalWithLinkIds,
+											 
+											 	SELF.div_dt_first_seen := RIGHT.div_dt_first_seen;
+												SELF.div_dt_last_seen := RIGHT.div_dt_last_seen;
+																	SELF.div_state := RIGHT.div_state;
+																	SELF.div_minorityAffiliation := RIGHT.div_minorityAffiliation;
+																	SELF.div_certificationtype1 := RIGHT.div_certificationtype1;
+																	SELF.div_certificatedatefrom1 := RIGHT.div_certificatedatefrom1;
+																	SELF.div_certificatedateto1  := RIGHT.div_certificatedateto1;
+																	SELF.div_certificatestatus1   := RIGHT.div_certificatestatus1;
+																	SELF.div_certificatenumber1   := RIGHT.div_certificatenumber1;
+																	
+																	SELF.div_certificationtype2 := RIGHT.div_certificationtype2;
+																	SELF.div_certificatedatefrom2 := RIGHT.div_certificatedatefrom2;
+																	SELF.div_certificatedateto2  := RIGHT.div_certificatedateto2;
+																	SELF.div_certificatestatus2   := RIGHT.div_certificatestatus2;
+																	SELF.div_certificatenumber2   := RIGHT.div_certificatenumber2;
+																	
+																	SELF.div_certificationtype3 := RIGHT.div_certificationtype3;
+																	SELF.div_certificatedatefrom3 := RIGHT.div_certificatedatefrom3;
+																	SELF.div_certificatedateto3  := RIGHT.div_certificatedateto3;
+																	SELF.div_certificatestatus3   := RIGHT.div_certificatestatus3;
+																	SELF.div_certificatenumber3   := RIGHT.div_certificatenumber3;
+																	
+																	SELF.div_certificationtype4 := RIGHT.div_certificationtype4;
+																	SELF.div_certificatedatefrom4 := RIGHT.div_certificatedatefrom4;
+																	SELF.div_certificatedateto4  := RIGHT.div_certificatedateto4;
+																	SELF.div_certificatestatus4   := RIGHT.div_certificatestatus4;
+																	SELF.div_certificatenumber4   := RIGHT.div_certificatenumber4;
+																																													 											 
+											 SELF := LEFT),
+											 LEFT OUTER,LIMIT(0),KEEP(1));
+											 
+  ds_LaborActionsWHDFinal := JOIN(ds_DivCertInfoFinal,	                                
+																	  ds_LaborActionsWHD,
+	                     LEFT.acctno = RIGHT.acctno AND
+									     BIPV2.IDmacros.mac_JoinTop3Linkids(),
+											 TRANSFORM(BusinessBatch_BIP.Layouts.FinalWithLinkIds,
+													SELF.laborActionViolations := RIGHT.laborActionViolations;
+													SELF.laborActionBackWages := RIGHT.laborActionBackWages;
+													SELF.laborActionMoneyPenalties := RIGHT.laborActionMoneyPenalties;												
+											 SELF := LEFT),
+											 LEFT OUTER, LIMIT(0), KEEP(1));
+											
+
+	ds_OSHAFinal := JOIN(ds_LaborActionsWHDFinal, DS_OSHA,
+	                     LEFT.acctno = RIGHT.acctno AND
+									     BIPV2.IDmacros.mac_JoinTop3Linkids(),
+											 TRANSFORM(BusinessBatch_BIP.Layouts.FinalWithLinkIds,											 
+											 SELF.OshaViolations := RIGHT.OshaViolations;											 
+											 SELF := LEFT),
+											 LEFT OUTER, LIMIT(0), KEEP(1));
+											 									 
+	  
   // DCA Info
   BusinessBatch_BIP.Layouts.FinalWithLinkIds tDCAInfo2Final(BusinessBatch_BIP.Layouts.FinalWithLinkIds le,BusinessBatch_BIP.Layouts.DCAInfo ri) :=
   TRANSFORM
@@ -550,7 +628,7 @@ FUNCTION
     SELF                  := le;
   END;
   
-  ds_DCAInfo2Final := JOIN( ds_Execs2Final,ds_DCAInfo,
+  ds_DCAInfo2Final := JOIN( ds_OSHAFinal,	ds_DCAInfo,
                             LEFT.acctno = RIGHT.acctno AND
                             BIPV2.IDmacros.mac_JoinTop3Linkids(),
                             tDCAInfo2Final(LEFT,RIGHT),
@@ -560,24 +638,30 @@ FUNCTION
   ds_DCAInfo2FinalSorted := SORT(ds_DCAInfo2Final, acctno, -weight, -record_score, RECORD);
 	//output(tmpTopResultsScoredGrouped, named('tmpTopResultsScoredGrouped'));
 	//output(ds_bestInfo, named('ds_bestInfo'));
-	//output(ds_bestInfo2, named('ds_bestInfo2'));
+	
 	
    //OUTPUT(ds_BestInfo,NAMED('ds_BestInfo'));
   // OUTPUT(ds_linkIds,NAMED('ds_linkIds'));
- //OUTPUT(ds_BestBatchRecs, NAMED('ds_BestBatchRecs'));
-	// OUTPUT(ds_linkIdsWithAcctNo, NAMED('ds_linkIdsWithAcctNo'));]
+ 
+	 // OUTPUT(ds_linkIdsWithAcctNoTmp, NAMED('ds_linkIdsWithAcctNoTmp'));
+	 // output(ds_linkidsWithAcctno, named('ds_linkidsWithAcctno'));
 	  // OUTPUT(ds_Format2SearchInput, named('ds_Format2SearchInput'));
 	 
 	 // OUTPUT(ds_BestInfoTmp_all, named('ds_BestInfoTmp_all'));
+		//OUTPUT(ds_BestBatchRecs, NAMED('ds_BestBatchRecs'));
+		 //output(ds_bestInfo2, named('ds_bestInfo2'));
+		 // output(ds_bestInfo2_slim, named('ds_bestInfo2_slim'));
+		 //output(ds_BestInfoRecs, named('ds_BestInfoRecs'));
+		 
 	 // output(ds_BestInfoTmp, named('ds_BestInfoTmp'));
 	  // OUTPUT(ds_bestKfetchSourceDResults, NAMED('ds_bestKfetchSourceDResults'));
-	   //OUTPUT(ds_BestInfoRecs, NAMED('ds_BestInfoRecs'));
+	   // OUTPUT(ds_BestInfoRecs, NAMED('ds_BestInfoRecs'));
 	  //output(ds_best, named('ds_best'));
    //OUTPUT(ds_NameAddressBatchRecs,NAMED('ds_NameAddressBatchRecs'));
-   // OUTPUT(ds_HeaderInfoAll,NAMED('ds_HeaderInfoAll'));
+   //OUTPUT(ds_HeaderInfoAll,NAMED('ds_HeaderInfoAll'));
 	
   // OUTPUT(ds_GongPhones,NAMED('ds_GongPhones'));
-	// output(ds_Phones2Final, NAMED('ds_Phones2Final'));
+	//output(ds_Phones2Final, NAMED('ds_Phones2Final'));
  // OUTPUT(ds_Corps,NAMED('ds_Corps'));
   // OUTPUT(ds_Flags,NAMED('ds_Flags'));
   // OUTPUT(ds_Executives,NAMED('ds_Executives'));
@@ -586,8 +670,11 @@ FUNCTION
   // OUTPUT(ds_Phones2Final,NAMED('ds_Phones2Final'));
   // OUTPUT(ds_Corps2Final,NAMED('ds_Corps2Final'));
   // OUTPUT(ds_Flags2Final,NAMED('ds_Flags2Final'));
-  // OUTPUT(ds_Execs2Final,NAMED('ds_Execs2Final'));
-  //OUTPUT(ds_DCAInfo2Final,NAMED('ds_DCAInfo2Final'));
-
-  RETURN PROJECT(IF(inmod.BestOnly,ds_HeaderInfoAll,ds_DCAInfo2FinalSorted),BusinessBatch_BIP.Layouts.Final);
+ // OUTPUT(ds_Execs2Final,NAMED('ds_Execs2Final'));
+  // OUTPUT(ds_DCAInfo2Final,NAMED('ds_DCAInfo2Final'));
+	
+	//output(ds_OSHAFinal, named('ds_OSHAFinal'));
+  
+  RETURN PROJECT(IF(inmod.BestOnly,ds_HeaderInfoAll,ds_DCAInfo2FinalSorted),
+	                              BusinessBatch_BIP.Layouts.Final);
 END;

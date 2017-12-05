@@ -1,7 +1,7 @@
-IMPORT Enclarity_Facility_Sanctions;
+﻿IMPORT Enclarity_Facility_Sanctions;
 EXPORT Filecode_Control(string filedate, boolean pUseProd = false) := MODULE
 
-	EXPORT cumulative_filecodes	:= ['SNC_AKF1','SNC_ALF1','SNC_ARF3','SNC_AZF2','SNC_AZF3','SNC_CAF2','SNC_CAF3','SNC_CAF4',
+	EXPORT cumulative_filecodes	:= ['SNC_AKF1','SNC_ALF1','SNC_ALF3','SNC_ARF3','SNC_AZF2','SNC_AZF3','SNC_CAF2','SNC_CAF3','SNC_CAF4',
 																	'SNC_CAF7','SNC_CAF8','SNC_COF3','SNC_CTF2','SNC_CTF3','SNC_CTF6','SNC_DCF1','SNC_DEF2',
 																	'SNC_GAF2','SNC_HIF1','SNC_IAF2','SNC_IAF4','SNC_ILF1','SNC_ILF2','SNC_ILF4','SNC_INF2',
 																	'SNC_INF3','SNC_KSF3','SNC_LAF4','SNC_MAF2','SNC_MAF3','SNC_MDF3','SNC_MEF1','SNC_MIF1',

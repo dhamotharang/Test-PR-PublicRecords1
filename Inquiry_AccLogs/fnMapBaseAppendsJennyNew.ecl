@@ -1,4 +1,4 @@
- /*2016-04-24T19:10:38Z (jhuang_prod)
+﻿ /*2016-04-24T19:10:38Z (jhuang_prod)
 C:\Users\huangzx\AppData\Roaming\HPCC Systems\eclide\jhuang_prod\ProdThorBoca\Inquiry_AccLogs\fnMapBaseAppendsJennyNew\2016-04-24T19_10_38Z.ecl
 */
 import ut,data_services, address, aid, lib_stringlib, address, did_add, Business_Header_SS, header_slimsort, watchdog, business_header;
@@ -224,6 +224,7 @@ HashBaseFile :=project(base_file,
 															self.mbs.global_company_id 	:= '';
 															SELF.Search_info.start_monitor	:= if(left.bus_intel.use<>'' and SELF.search_info.datetime[..8] <> '', SELF.search_info.datetime[..8], left.search_info.start_monitor);
 															SELF.Search_info.stop_monitor	:= if(left.bus_intel.use<>'' and SELF.search_info.datetime[..8] <> '', SELF.search_info.datetime[..8], left.search_info.stop_monitor);
+															self.bus_intel.sub_market := if(left.bus_intel.sub_market='CARD','CARDS',left.bus_intel.sub_market);
 															self := left));
 
 dHashBaseFile := distribute(HashBaseFile(bus_intel.use <> ''), 

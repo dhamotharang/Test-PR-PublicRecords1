@@ -1,9 +1,9 @@
-IMPORT _Control, RoxieKeyBuild, tools;
+﻿IMPORT _Control, RoxieKeyBuild, tools;
 
 EXPORT Build_All(
   STRING								pversion,
 	STRING								pDirectory							= '/data/hds_4/MMCP/data',
-	STRING								pServerIP								= _Control.IPAddress.bctlpedata12,
+	STRING								pServerIP								= _Control.IPAddress.bctlpedata10,
 	BOOLEAN								pIsTesting							= FALSE,
 	BOOLEAN								pOverwrite							= FALSE,
 	BOOLEAN								pReplicate							=	FALSE,

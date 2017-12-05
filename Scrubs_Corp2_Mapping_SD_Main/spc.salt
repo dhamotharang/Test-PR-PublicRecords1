@@ -1,4 +1,4 @@
-OPTIONS:-gh
+﻿OPTIONS:-gh
 MODULE:Scrubs_Corp2_Mapping_SD_Main
 FILENAME:In_File
 
@@ -21,7 +21,7 @@ FIELDTYPE:invalid_state_origin:ENUM(SD)
 FIELDTYPE:invalid_name_type_code:CUSTOM(Scrubs_Corp2_Mapping_SD_Main.Functions.invalid_name_type_code>0,recordorigin)
 FIELDTYPE:invalid_forgn_dom_code:ENUM(D|F| )
 FIELDTYPE:invalid_flag_code:ENUM(N| )
-FIELDTYPE:invalid_name_type_desc:ENUM(LEGAL|REGISTRATION|RESERVED)
+FIELDTYPE:invalid_name_type_desc:ENUM(LEGAL|DBA|REGISTRATION|RESERVED)
 FIELDTYPE:invalid_mandatory:LENGTHS(1..)
 FIELDTYPE:invalid_numeric:ALLOW(0123456789):LENGTHS(1..)
 FIELDTYPE:invalid_alphablank:ALLOW( ABCDEFGHIJKLMNOPQRSTUVWXYZ)

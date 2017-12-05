@@ -1,4 +1,4 @@
-EXPORT Map_AL_Medical(string fdate) := module
+﻿EXPORT Map_AL_Medical(string fdate) := module
 
  import Prof_License,Lib_StringLib,ut;
 
@@ -97,21 +97,22 @@ dWithPA := project( File_AL_Medical.phya, map2pa(left));
 //Verifying License numbers in  base from prep file
   validate_prep := Prof_License_preprocess.fn_ValidateLicInBase (dWithAll, albase,'al').out;
 
-  superfile_trans := Sequential(   FileServices.RemoveSuperFile('~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_al'),
-                        if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_al_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_al_old')),
-								        if ( FileServices.FileExists( '~thor_data400::in::prolic_al_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_al_old')),
-                        FileServices.RenameLogicalfile( '~thor_data400::in::prolic_al','~thor_data400::in::prolic_al_old'),
+  superfile_trans := Sequential(  
+                            FileServices.RemoveSuperFile('~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_al'),
+                            if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_al_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_al_old')),
+								            if ( FileServices.FileExists( '~thor_data400::in::prolic_al_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_al_old')),
+                            FileServices.RenameLogicalfile( '~thor_data400::in::prolic_al','~thor_data400::in::prolic_al_old'),
+				
 										   );
 
 
   export buildprep := Sequential( dALMedout,
                          superfile_trans,
-                         output( outfile,,'~thor_data400::in::prolic_al',overwrite),
+                         output( outfile,,'~thor_data400::in::prolic_al',compressed,overwrite),
 												 validate_prep,
                          FileServices.StartSuperfiletransaction(),
 					                 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_al'),
-													 							 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_al_old'), 											   
-
+											FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_al_old'), 
 	                       FileServices.FinishSuperfiletransaction()
 											 );
 

@@ -1,4 +1,4 @@
-IMPORT bair,ut, mdr, tools, _validate, Address, Ut, lib_stringlib, _Control, business_header, Enclarity,
+﻿IMPORT bair,ut, mdr, tools, _validate, Address, Ut, lib_stringlib, _Control, business_header, Enclarity,
 Header, Header_Slimsort, didville, ut, DID_Add, Business_Header_SS, NID, AID,STD,Vehicle_Wildcard, Bair_composite, SALT32;
 
 EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
@@ -68,7 +68,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				SELF := [];
 			END;
 			
-			dStd := dedup(NORMALIZE(res, 3, tMapping(LEFT,counter)), all);
+			dStd := dedup(NORMALIZE(res(quarantined = '0'), 3, tMapping(LEFT,counter)), all);
 
 			return dStd;
 		
@@ -92,7 +92,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 			r tMapping(res L,  integer C) := TRANSFORM
 				self.data_provider_id		:=L.ori;
 				self.data_provider_ori	:=L.data_provider_ori;
-				self.incident						:=(string)L.cfs_id;
+				self.incident						:=L.event_number;
 				self.orig_name					:=trim(L.complainant,left,right);
 				self.Prepped_rec_type		:=choose(C
 																	,Bair._Constant.CFS_caller_addr
@@ -121,7 +121,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				SELF := [];
 			END;
 			
-			dStd := dedup(NORMALIZE(res, 3, tMapping(LEFT,counter)), all);
+			dStd := dedup(NORMALIZE(res(quarantined = '0'), 3, tMapping(LEFT,counter)), all);
 			return dStd;
 		
 	END;
@@ -153,9 +153,14 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self.recordid_raids			:=L.recordid_raids;
 				self.Prepped_rec_type		:=Bair._Constant.Events_Mo_address_of_crime;
 				self.orig_address				:=L.address_of_crime;
-				self.orig_City					:=L.city;
-				self.orig_st						:=L.state;
-				self.orig_zip						:=L.zip;
+
+				temp_adddr 	:= trim(regexreplace('USA$', L.address_of_crime, ' ' ), left, right);
+				goodAddr 		:= if(count(STD.STr.SplitWords(temp_adddr,',')) = 3, true, false);
+				
+				self.orig_City					:=trim(if(goodAddr, STD.STr.SplitWords(temp_adddr,',')[2], ''), left, right);
+				self.orig_st						:=trim(if(goodAddr, regexfind('[a-z]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				self.orig_zip						:=trim(if(goodAddr, regexfind('[0-9]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				
 				self.dt_first_seen			:=L.clean_First_Date_Time;
 				self.dt_last_seen				:=L.clean_Last_Date_Time;
 				self.class_code					:=Bair.MapClassCodeNum(1, (string)L.ucr_group);
@@ -171,7 +176,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				SELF := [];
 			END;				
 
-			dStd := PROJECT(res, tMapping(LEFT));
+			dStd := PROJECT(res(quarantined = '0'), tMapping(LEFT));
 			return dStd;
 	END;
 	
@@ -197,9 +202,14 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self.recordid_raids			:=L.recordid_raids;
 				self.Prepped_rec_type		:=Bair._Constant.Events_Mo_address_of_crime;
 				self.orig_address				:=L.address_of_crime;
-				self.orig_City					:=L.city;
-				self.orig_st						:=L.state;
-				self.orig_zip						:=L.zip;
+				
+				temp_adddr 	:= trim(regexreplace('USA$', L.address_of_crime, ' ' ), left, right);
+				goodAddr 		:= if(count(STD.STr.SplitWords(temp_adddr,',')) = 3, true, false);
+				
+				self.orig_City					:=trim(if(goodAddr, STD.STr.SplitWords(temp_adddr,',')[2], ''), left, right);
+				self.orig_st						:=trim(if(goodAddr, regexfind('[a-z]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				self.orig_zip						:=trim(if(goodAddr, regexfind('[0-9]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				
 				self.dt_first_seen			:=L.clean_First_Date_Time;
 				self.dt_last_seen				:=L.clean_Last_Date_Time;
 				self.class_code					:=Bair.MapClassCodeNum(1, (string)L.ucr_group);
@@ -215,7 +225,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				SELF := [];
 			END;				
 
-			dStd := PROJECT(res, tMapping(LEFT));
+			dStd := PROJECT(res(quarantined = '0'), tMapping(LEFT));
 			return dStd;
 	END;
 
@@ -246,10 +256,15 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self.incident						:=L.ir_number;
 				self.Prepped_rec_type		:=Bair._Constant.Events_Persons_persons_address;
 				self.name_type					:=L.name_type;
-				self.orig_address				:=L.persons_address;														
-				self.orig_City					:=L.city;
-				self.orig_st						:=L.state;
-				self.orig_zip						:=L.zip;
+				self.orig_address				:=L.persons_address;
+				
+				temp_adddr 	:= trim(regexreplace('USA$', L.persons_address, ' ' ), left, right);
+				goodAddr 		:= if(count(STD.STr.SplitWords(temp_adddr,',')) = 3, true, false);
+				
+				self.orig_City					:=trim(if(goodAddr, STD.STr.SplitWords(temp_adddr,',')[2], ''), left, right);
+				self.orig_st						:=trim(if(goodAddr, regexfind('[a-z]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				self.orig_zip						:=trim(if(goodAddr, regexfind('[0-9]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				
 				self.age								:=bair.fnAge((unsigned4)L.clean_dob);
 				self.orig_moniker				:=trim(L.moniker, left, right);
 				self.name_hint					:='FML';
@@ -269,7 +284,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self := [];
 			END;
 			
-			dStd := PROJECT(res, tMapping(LEFT));
+			dStd := PROJECT(res(quarantined = '0'), tMapping(LEFT));
 			return dStd;
 	END;
 	
@@ -295,10 +310,15 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self.incident						:=L.ir_number;
 				self.Prepped_rec_type		:=Bair._Constant.Events_Persons_persons_address;
 				self.name_type					:=L.name_type;
-				self.orig_address				:=L.persons_address;														
-				self.orig_City					:=L.city;
-				self.orig_st						:=L.state;
-				self.orig_zip						:=L.zip;
+				self.orig_address				:=L.persons_address;
+				
+				temp_adddr 	:= trim(regexreplace('USA$', L.persons_address, ' ' ), left, right);
+				goodAddr 		:= if(count(STD.STr.SplitWords(temp_adddr,',')) = 3, true, false);
+				
+				self.orig_City					:=trim(if(goodAddr, STD.STr.SplitWords(temp_adddr,',')[2], ''), left, right);
+				self.orig_st						:=trim(if(goodAddr, regexfind('[a-z]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				self.orig_zip						:=trim(if(goodAddr, regexfind('[0-9]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				
 				self.age								:=bair.fnAge((unsigned4)L.clean_dob);
 				self.orig_moniker				:=trim(L.moniker, left, right);
 				self.name_hint					:='FML';
@@ -318,7 +338,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self := [];
 			END;
 				
-			dStd := PROJECT(res, tMapping(LEFT));
+			dStd := PROJECT(res(quarantined = '0'), tMapping(LEFT));
 			return dStd;
 	END;
 	
@@ -349,9 +369,14 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self.incident						:=L.ir_number;
 				self.Prepped_rec_type		:=Bair._Constant.Events_Vehicle_vehicle_address;
 				self.orig_address				:=L.vehicle_address;
-				self.orig_City					:=L.city;
-				self.orig_st						:=L.state;
-				self.orig_zip						:=L.zip;
+				
+				temp_adddr 	:= trim(regexreplace('USA$', L.vehicle_address, ' ' ), left, right);
+				goodAddr 		:= if(count(STD.STr.SplitWords(temp_adddr,',')) = 3, true, false);
+				
+				self.orig_City					:=trim(if(goodAddr, STD.STr.SplitWords(temp_adddr,',')[2], ''), left, right);
+				self.orig_st						:=trim(if(goodAddr, regexfind('[a-z]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				self.orig_zip						:=trim(if(goodAddr, regexfind('[0-9]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				
 				self.plate							:=STD.Str.ToUpperCase(trim(L.plate, left, right));
 				self.plate_st						:=Bair_composite.fn_st2abbrev(trim(L.plate_state, left, right));
 				self.make								:=STD.Str.ToUpperCase(trim(L.make, left, right));
@@ -376,7 +401,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self := [];
 			END;				
 
-			dStd := PROJECT(res, tMapping(LEFT));
+			dStd := PROJECT(res(quarantined = '0'), tMapping(LEFT));
 			return dStd;
 	END;
 	
@@ -402,9 +427,14 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self.incident						:=L.ir_number;
 				self.Prepped_rec_type		:=Bair._Constant.Events_Vehicle_vehicle_address;
 				self.orig_address				:=L.vehicle_address;
-				self.orig_City					:=L.city;
-				self.orig_st						:=L.state;
-				self.orig_zip						:=L.zip;
+				
+				temp_adddr 	:= trim(regexreplace('USA$', L.vehicle_address, ' ' ), left, right);
+				goodAddr 		:= if(count(STD.STr.SplitWords(temp_adddr,',')) = 3, true, false);
+				
+				self.orig_City					:=trim(if(goodAddr, STD.STr.SplitWords(temp_adddr,',')[2], ''), left, right);
+				self.orig_st						:=trim(if(goodAddr, regexfind('[a-z]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				self.orig_zip						:=trim(if(goodAddr, regexfind('[0-9]+', STD.STr.SplitWords(temp_adddr,',')[3], 0, nocase), ''), left, right);
+				
 				self.plate							:=STD.Str.ToUpperCase(trim(L.plate, left, right));
 				self.plate_st						:=Bair_composite.fn_st2abbrev(trim(L.plate_state, left, right));
 				self.make								:=STD.Str.ToUpperCase(trim(L.make, left, right));
@@ -429,7 +459,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self := [];
 			END;
 				
-			dStd := PROJECT(res, tMapping(LEFT));
+			dStd := PROJECT(res(quarantined = '0'), tMapping(LEFT));
 			return dStd;
 	END;
 	
@@ -494,7 +524,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self:=[];
 			END;
 			
-		dStd := dedup(NORMALIZE(res, 2, tMapping(LEFT,counter)), all);
+		dStd := dedup(NORMALIZE(res(quarantined = '0'), 2, tMapping(LEFT,counter)), all);
 		return dStd;
 		
 	END;
@@ -553,7 +583,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self:=[];
 			END;
 				
-			dStd := dedup(NORMALIZE(res, 2, tMapping(LEFT,counter)), all);
+			dStd := dedup(NORMALIZE(res(quarantined = '0'), 2, tMapping(LEFT,counter)), all);
 			return dStd;
 		
 	END;
@@ -692,7 +722,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self:=[];
 			END;				
 
-			dStd := dedup(sort(Normalize(res,3, tMapping(LEFT,counter)),record,except Prepped_rec_type),record,except Prepped_rec_type);
+			dStd := dedup(sort(Normalize(res(quarantined = '0'),3, tMapping(LEFT,counter)),record,except Prepped_rec_type),record,except Prepped_rec_type);
 			return dStd;
 	END;
 	
@@ -825,7 +855,7 @@ EXPORT PrepDID_Payload (string version='', boolean pUseProd = true) := MODULE
 				self:=[];
 			END;
 				
-			dStd := dedup(sort(Normalize(res,3, tMapping(LEFT,counter)),record,except Prepped_rec_type),record,except Prepped_rec_type);
+			dStd := dedup(sort(Normalize(res(quarantined = '0'),3, tMapping(LEFT,counter)),record,except Prepped_rec_type),record,except Prepped_rec_type);
 			return dStd;		
 	END;
 	

@@ -1,4 +1,4 @@
-IMPORT ut,SALT31;
+﻿IMPORT ut,SALT31, /*HACK*/SALT38;
 EXPORT specificities(DATASET(layout_Base) ih) := MODULE
 EXPORT ih_init := SALT31.initNullIDs.baseLevel(ih,rcid,Seleid);
 SHARED h := ih_init;
@@ -57,7 +57,7 @@ EXPORT  cnp_name_deduped := SALT31.MAC_Field_By_UID(input_file,Seleid,cnp_name) 
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT31.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-  SALT31.mac_edit_distance_pairs(specs_added,cnp_name,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
+  /*HACK*/SALT38.mac_edit_distance_pairs(specs_added,cnp_name,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
 EXPORT cnp_name_values_persisted_temp := distance_computed : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::values::cnp_name',EXPIRE(Config.PersistExpire));
 EXPORT  company_inc_state_deduped := SALT31.MAC_Field_By_UID(input_file,Seleid,company_inc_state) : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::dedups::company_inc_state',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT31.Mac_Field_Count_UID(company_inc_state_deduped,company_inc_state,Seleid,counted,counted_clusters) // count the number of UIDs with each field value
@@ -78,7 +78,7 @@ EXPORT  company_charter_number_deduped := SALT31.MAC_Field_By_UID(input_file,Sel
   with_id := table(counted,r1);
   ut.MAC_Sequence_Records(with_id,id,sequenced)
   SALT31.MAC_Field_Specificities(sequenced,specs_added) // Compute specificity for each value
-  SALT31.mac_edit_distance_pairs(specs_added,company_charter_number,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
+  /*HACK*/SALT38.mac_edit_distance_pairs(specs_added,company_charter_number,cnt,1,false,distance_computed);//Computes specificities of fuzzy matches
 EXPORT company_charter_number_values_persisted_temp := distance_computed : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::values::company_charter_number',EXPIRE(Config.PersistExpire));
 EXPORT  company_fein_deduped := SALT31.MAC_Field_By_UID(input_file,Seleid,company_fein) : PERSIST('~temp::Seleid::BIPV2_Seleid_Relative::dedups::company_fein',EXPIRE(Config.PersistExpire)); // Reduce to field values by UID
   SALT31.Mac_Field_Count_UID(company_fein_deduped,company_fein,Seleid,counted,counted_clusters) // count the number of UIDs with each field value

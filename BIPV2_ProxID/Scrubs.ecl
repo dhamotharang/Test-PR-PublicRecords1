@@ -1,4 +1,4 @@
-IMPORT ut,SALT30;
+﻿IMPORT SALT37;
 EXPORT Scrubs := MODULE
  
 // The module to handle the case where no scrubs exist
@@ -10,12 +10,13 @@ EXPORT Scrubs := MODULE
     UNSIGNED8 ScrubsBits1;
   END;
 EXPORT FromNone(DATASET(Layout_DOT_Base) h) := MODULE
-  Expanded_Layout into(h le) := TRANSFORM
-    SELF.st_Invalid := Fields.InValid_st((SALT30.StrType)le.st);
-    SELF.zip_Invalid := Fields.InValid_zip((SALT30.StrType)le.zip);
+  SHARED Expanded_Layout toExpanded(h le, BOOLEAN withOnfail) := TRANSFORM
+    SELF.st_Invalid := Fields.InValid_st((SALT37.StrType)le.st);
+    SELF.zip_Invalid := Fields.InValid_zip((SALT37.StrType)le.zip);
     SELF := le;
   END;
-  EXPORT ExpandedInfile := PROJECT(h,Into(LEFT));
+  EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
+  EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_DOT_Base);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
     SELF.ScrubsBits1 := ( le.st_Invalid << 0 ) + ( le.zip_Invalid << 2 );
     SELF := le;
@@ -50,8 +51,8 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     STRING FieldName;
     STRING FieldType;
     STRING ErrorType;
-    SALT30.StrType ErrorMessage;
-    SALT30.StrType FieldContents;
+    SALT37.StrType ErrorMessage;
+    SALT37.StrType FieldContents;
   END;
   r into(h le,UNSIGNED c) := TRANSFORM
     SELF.Src :=  le.source;
@@ -62,21 +63,23 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.zip_Invalid,'ALLOW','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'st','zip','UNKNOWN');
     SELF.FieldType := CHOOSE(c,'alpha','number','UNKNOWN');
-    SELF.FieldContents := CHOOSE(c,(SALT30.StrType)le.st,(SALT30.StrType)le.zip,'***SALTBUG***');
+    SELF.FieldContents := CHOOSE(c,(SALT37.StrType)le.st,(SALT37.StrType)le.zip,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,2,Into(LEFT,COUNTER));
    bv := TABLE(AllErrors,{FieldContents, FieldName, Cnt := COUNT(GROUP)},FieldContents, FieldName,MERGE);
   EXPORT BadValues := TOPN(bv,1000,-Cnt);
   // Particular form of stats required for Orbit
   EXPORT OrbitStats(UNSIGNED examples = 10,UNSIGNED Pdate=(UNSIGNED)StringLib.getdateYYYYMMDD()) := FUNCTION
-    SALT30.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
+    SALT37.ScrubsOrbitLayout Into(SummaryStats le, UNSIGNED c) := TRANSFORM
       SELF.recordstotal := le.TotalCnt;
       SELF.processdate := Pdate;
       SELF.sourcecode := le.source;
       SELF.ruledesc := CHOOSE(c
           ,'st:alpha:CAPS','st:alpha:ALLOW'
           ,'zip:number:ALLOW','UNKNOWN');
-      SELF.ErrorMessage := '';
+      SELF.ErrorMessage := CHOOSE(c
+          ,Fields.InvalidMessage_st(1),Fields.InvalidMessage_st(2)
+          ,Fields.InvalidMessage_zip(1),'UNKNOWN');
       SELF.rulecnt := CHOOSE(c
           ,le.st_CAPS_ErrorCount,le.st_ALLOW_ErrorCount
           ,le.zip_ALLOW_ErrorCount,0);
@@ -89,16 +92,15 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
       AllErrors.Src;
       STRING RuleDesc := TRIM(AllErrors.FieldName)+':'+TRIM(AllErrors.FieldType)+':'+AllErrors.ErrorType;
       STRING ErrorMessage := TRIM(AllErrors.errormessage);
-      SALT30.StrType RawCodeMissing := AllErrors.FieldContents;
+      SALT37.StrType RawCodeMissing := AllErrors.FieldContents;
     END;
     tab := TABLE(AllErrors,orb_r);
     orb_sum := TABLE(tab,{src,ruledesc,ErrorMessage,rawcodemissing,rawcodemissingcnt := COUNT(GROUP)},src,ruledesc,ErrorMessage,rawcodemissing,MERGE);
     gt := GROUP(TOPN(GROUP(orb_sum,src,ruledesc,ALL),examples,-rawcodemissingcnt));
-    SALT30.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
+    SALT37.ScrubsOrbitLayout jn(SummaryInfo le, gt ri) := TRANSFORM
       SELF.rawcodemissing := ri.rawcodemissing;
       SELF.rawcodemissingcnt := ri.rawcodemissingcnt;
-      SELF.ErrorMessage := ri.ErrorMessage;
-   SELF := le;
+      SELF := le;
     END;
     j := JOIN(SummaryInfo,gt,LEFT.SourceCode=RIGHT.SRC AND LEFT.ruledesc=RIGHT.ruledesc,jn(LEFT,RIGHT),HASH,LEFT OUTER);
     RETURN IF(examples>0,j,SummaryInfo);

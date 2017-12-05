@@ -1,4 +1,4 @@
-import Prof_License,ut,lib_StringLib;
+﻿import Prof_License,ut,lib_StringLib;
 
 EXPORT Map_CA_AllAvailable ( string fdate) := module
 
@@ -126,7 +126,7 @@ export buildprep := Sequential(dout,
 												       if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ca_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ca_old')),
 								               if ( FileServices.FileExists( '~thor_data400::in::prolic_ca_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_ca_old')),
                                FileServices.RenameLogicalfile( '~thor_data400::in::prolic_ca','~thor_data400::in::prolic_ca_old'),
-   										         output( outfile,,'~thor_data400::in::prolic_ca',overwrite),
+   										         output( outfile,,'~thor_data400::in::prolic_ca',compressed,overwrite),
                                FileServices.StartSuperfiletransaction(),
 												         FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ca'),
 															   FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ca_old'),

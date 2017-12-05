@@ -1,4 +1,4 @@
-IMPORT Civ_Court, civil_court, ut, lib_StringLib, std;
+﻿IMPORT Civ_Court, civil_court, ut, lib_StringLib, std;
 
 #option('multiplePersistInstances',FALSE);
 
@@ -6,8 +6,11 @@ IMPORT Civ_Court, civil_court, ut, lib_StringLib, std;
 fWAJud := Civ_Court.Files_In_WA.CivJud_in;
 fWAPar := Civ_Court.Files_In_WA.CivPar_in;
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 
 Civil_Court.Layout_In_Matter tWA(fWAJud input) := Transform
 self.process_date				:= civil_court.Version_Development;
@@ -24,19 +27,19 @@ self.case_type					:= IF(input.case_type = 'SC','SMALL CLAIMS','CIVIL');
 self.case_title					:= input.case_title;
 self.case_cause_code		:= input.case_cause_number;
 self.case_cause					:= '';
-TempFileDte							:= ut.ConvertDate(input.filing_date);
+TempFileDte							:= Std.Date.ConvertDateFormatMultiple(input.filing_date,fmtsin,fmtout);
 self.filing_date				:= If(STD.DATE.IsValidDate((INTEGER) TempFileDte),TempFileDte,'');
-TempJudmtDte						:= ut.ConvertDate(input.judgement_date);
+TempJudmtDte						:= Std.Date.ConvertDateFormatMultiple(input.judgement_date,fmtsin,fmtout);
 self.judgmt_date				:= If(STD.DATE.IsValidDate((INTEGER) TempJudmtDte),TempJudmtDte,'');
 self.judgmt_type_code 	:= input.judgement_type_code;
 self.judgmt_type 				:= '';
-TempJudgmtDte						:= ut.ConvertDate(input.judgement_disposition_date);
+TempJudgmtDte						:= Std.Date.ConvertDateFormatMultiple(input.judgement_disposition_date,fmtsin,fmtout);
 self.judgmt_disposition_date :=	If(STD.DATE.IsValidDate((INTEGER) TempJudgmtDte),TempJudgmtDte,'');
 self.judgmt_disposition_code := input.judgement_disposition_code;
 self.judgmt_disposition := '';
 self.disposition_code		:= input.case_disposition_code;
 self.disposition_description := '';
-TempDispDte							:= ut.ConvertDate(input.case_disposition_date);
+TempDispDte							:= Std.Date.ConvertDateFormatMultiple(input.case_disposition_date,fmtsin,fmtout);
 self.disposition_date 	:= If(STD.DATE.IsValidDate((INTEGER) TempDispDte),TempDispDte,'');
 self := [];
 end;

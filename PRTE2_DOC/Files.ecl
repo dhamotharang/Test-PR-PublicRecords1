@@ -1,15 +1,15 @@
-IMPORT hygenics_crim, ut,hygenics_search,crimsrch, doxie, autokey, lib_stringlib, std;
+﻿IMPORT hygenics_crim, ut,hygenics_search,crimsrch, doxie, autokey, lib_stringlib, std;
 EXPORT files := module
 
-shared file_offenders_base_plus					:= DATASET('~PRTE::BASE::corrections::offenders', Layouts.layout_offender_plus,FLAT);
+EXPORT file_offenders_base_plus					:= DATASET('~PRTE::BASE::corrections::offenders', Layouts.layout_offender_plus,FLAT);
 
-shared file_offenses_base_plus					:= DATASET('~PRTE::BASE::corrections::offenses', Layouts.layout_offenses_base_plus, FLAT);
+EXPORT file_offenses_base_plus					:= DATASET('~PRTE::BASE::corrections::offenses', Layouts.layout_offenses_base_plus, FLAT);
 
-shared file_activity_base_plus					:= DATASET('~PRTE::BASE::corrections::activity', Layouts.layout_activity_base_plus, FLAT);
+EXPORT file_activity_base_plus					:= DATASET('~PRTE::BASE::corrections::activity', Layouts.layout_activity_base_plus, FLAT);
 
-shared file_court_offenses_plus					:= DATASET('~PRTE::BASE::corrections::court_offenses', Layouts.layout_court_offenses_base_plus, FLAT );
+EXPORT file_court_offenses_plus					:= DATASET('~PRTE::BASE::corrections::court_offenses', Layouts.layout_court_offenses_base_plus, FLAT );
 
-shared file_punishment_plus 						:= DATASET('~PRTE::BASE::corrections::punishment', Layouts.layout_punishment_plus, FLAT);
+EXPORT file_punishment_plus 						:= DATASET('~PRTE::BASE::corrections::punishment', Layouts.layout_punishment_plus, FLAT);
 
 EXPORT corrections_activity 						:= Project(file_activity_base_plus, Layouts.layout_corrections_activity_public);
 

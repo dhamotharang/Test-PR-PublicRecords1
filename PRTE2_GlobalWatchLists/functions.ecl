@@ -1,4 +1,4 @@
-Import GlobalWatchLists,ut,prte2_header,aid,header,lib_datalib,Data_Services,doxie;
+﻿Import GlobalWatchLists,ut,prte2_header,aid,header,lib_datalib,Data_Services,doxie;
 
 EXPORT functions := module
 
@@ -258,7 +258,8 @@ RECORD
 END;
 keyrec := doxie.key_header;
 
-tmpi :=   INDEX(keyRec,{keyRec.s_did}, {keyrec}, '~thor_data400::key::header_QA'); 
+tmpi :=   INDEX(keyRec,{keyRec.s_did}, {keyrec}, data_services.data_location.prefix('person_header')+'prte::key::header::qa::data');
+
 redist := DISTRIBUTE(p, tmpi, LEFT.did = RIGHT.s_did);
 p1 getBestName(redist le, tmpi ri) :=
 TRANSFORM

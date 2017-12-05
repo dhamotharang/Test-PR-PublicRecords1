@@ -1,4 +1,4 @@
-IMPORT bair,ut, mdr, tools, _validate, Address, Ut, lib_stringlib, _Control, business_header, Enclarity,
+﻿IMPORT bair,ut, mdr, tools, _validate, Address, Ut, lib_stringlib, _Control, business_header, Enclarity,
 Header, Header_Slimsort, didville, ut, DID_Add, Business_Header_SS, NID, AID,STD,Vehicle_Wildcard;
 
 EXPORT Standardize_input (string pversion='', boolean pUseProd = true, boolean pUseDelta = false) := MODULE
@@ -79,16 +79,32 @@ EXPORT Standardize_input (string pversion='', boolean pUseProd = true, boolean p
 	END;
  
  EXPORT MO_PHONE	:= FUNCTION
+ 
+			mo	:= if(pUseDelta
+							,bair_composite.Files(pUseProd,pUseDelta).composite_mo_building
+							,bair.Files(pversion, pUseProd,pUseDelta).mo_Base.built
+							);
 			
-			baseFile					:= if(pUseDelta
-															,bair_composite.Files(pUseProd,pUseDelta).composite_mo_building
-															,bair.Files(pversion, pUseProd,pUseDelta).mo_Base.built
-															);			
-	
+			per	:= if(pUseDelta
+							,bair_composite.Files(pUseProd,pUseDelta).composite_per_building
+							,bair.Files(pversion, pUseProd,pUseDelta).persons_Base.built
+							);
+			
+			veh	:= if(pUseDelta
+							,bair_composite.Files(pUseProd,pUseDelta).composite_veh_building
+							,bair.Files(pversion, pUseProd,pUseDelta).vehicle_Base.built
+							);
+			
+			mo_p := project(mo, transform({mo.eid, string notes}, self.notes := left.synopsis_of_crime; self.eid:=left.eid;));
+			per_p := project(per, transform({per.eid, string notes}, self.notes := left.persons_notes; self.eid:=left.eid;));
+			veh_p := project(veh, transform({veh.eid, string notes}, self.notes := left.description; self.eid:=left.eid;));
+
+			events := mo_p + per_p + veh_p;
+			
 			str := '[()| |-]';
 			PATTERN phone := PATTERN ('[0-9]{3}[-][0-9]{3}[-][0-9]{4}') | PATTERN ('[(][0-9]{3}[)][0-9]{3}[-][0-9]{4}');
 			
-			base := PARSE(baseFile,synopsis_of_crime,phone,TRANSFORM(bair_composite.layouts.Phone_Parse
+			base := PARSE(events,notes,phone,TRANSFORM(bair_composite.layouts.Phone_Parse
 						,self.eid:=left.eid
 						,self.Phone:=Regexreplace(str,If(not matched(phone),'',matchtext(phone)),'')
 						,self.IsCurrent:=true

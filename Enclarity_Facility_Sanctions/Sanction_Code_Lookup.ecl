@@ -1,4 +1,4 @@
-IMPORT Enclarity_Facility_Sanctions;
+﻿IMPORT Enclarity_Facility_Sanctions;
 EXPORT Sanction_Code_Lookup := MODULE
 
 		SancLookupTable := RECORD
@@ -70,6 +70,7 @@ EXPORT Sanction_Code_Lookup := MODULE
 				dataset([ {'SNC_AKF1','AK','Department of Health and Social Services',						'Medicaid Board',										'Medicaid',	'Cumulative'														},
 									{'SNC_ALF1','AL','License Board',																				'Pharmacy Board',										'State',		'Cumulative'														},
 									{'SNC_ALF2','AL','Medicaid Agency',																			'Medicaid Board',										'Medicaid',	'Full refresh'													},
+									{'SNC_ALF3','AL','License Board',																					'Home Medical Equipment Board',	'State',		'Cumulative'								},
 									{'SNC_ARF2','AR','Arkansas Department of Human Services',								'Medicaid Board',										'Medicaid',	'Full refresh'													},
 									{'SNC_ARF3','AR','Arkansas State Board of Pharmacy',										'License Board',										'State',		'Cumulative'														},
 									{'SNC_AZF2','AZ','Department of Health Services',												'License Board',										'State',		'Cumulative'														},

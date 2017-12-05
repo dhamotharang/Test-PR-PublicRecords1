@@ -1,4 +1,4 @@
-import Address;
+﻿import Address;
 
 export Layouts := module
 
@@ -362,6 +362,7 @@ export Layouts := module
 			Address.Layout_Clean182_fips;
 			string2 Addr_type := '';
 			unsigned8 RawAID := 0;
+			unsigned8 AceAID := 0;
 	  end;
 				
 		export Layout_For_AID_Addr :=
@@ -372,6 +373,7 @@ export Layouts := module
 			Address.Layout_Clean182_fips;
 			string2 Addr_type := '';
 			unsigned8 RawAID := 0;
+			unsigned8 AceAID := 0;
 	  end;
 		
 		export Layout_Relatives := record
@@ -443,6 +445,7 @@ export Layouts := module
 			Address.Layout_Clean182_fips;
 			string2 Addr_type := '';
 			unsigned8 RawAID := 0;
+			unsigned8 AceAID := 0;
 	  end;
 		
 		export Layout_BC_Out :=
@@ -454,8 +457,10 @@ export Layouts := module
 			Address.Layout_Clean_Name;
 			Address.Layout_Clean182_fips contact_clean_addr;
 			unsigned8 contact_RawAID := 0;
+			unsigned8 contact_AceAID := 0;
 			Address.Layout_Clean182_fips company_clean_addr;
 			unsigned8 company_RawAID := 0;
+			unsigned8 company_AceAID := 0;
 	  end;
 		
 	end;

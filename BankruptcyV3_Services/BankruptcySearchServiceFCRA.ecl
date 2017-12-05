@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BankruptcySearchServiceFCRA">
 	<!-- Indexed Directly -->
   <part name="TMSID" 							type="xsd:string"/>
@@ -22,6 +22,7 @@
   <part name="FEIN"		  					type="xsd:string"/>
 	
 	<!-- CaseNumber -->
+	<part name="EnableCaseNumberFilterSearch" type="xsd:boolean"/>
 	<part name="CaseNumber"         type="xsd:string"/>
 	
   <part name="FilingJurisdiction"	type='xsd:string'/>	
@@ -63,8 +64,8 @@ export BankruptcySearchServiceFCRA(
 	) :=
 		macro
     
-		 //The following macro defines the field sequence on WsECL page of query.
-	   WSInput.MAC_BankruptcyV3_Services_BankruptcySearchServiceFCRA();
+		//The following macro defines the field sequence on WsECL page of query.
+	  WSInput.MAC_BankruptcyV3_Services_BankruptcySearchServiceFCRA();
 		
 		doxie.MAC_Header_Field_Declare(true);
 		#constant('SearchIgnoresAddressOnly',true);
@@ -80,8 +81,9 @@ export BankruptcySearchServiceFCRA(
 		integer1 lname_sort		:= 0 : stored('LastNameSort');
 		integer1 cname_sort		:= 0 : stored('CompanyNameSort');
 		boolean suppress_withdrawn_bankruptcy	:= false 	: stored('SuppressWithdrawnBankruptcy');
+		boolean Enable_CaseNumFilterSrch	:= false 	: stored('EnableCaseNumberFilterSearch');
 		
-		//Check if the customer is a Collections customer
+    //Check if the customer is a Collections customer
     fcra_subj_only := false : stored ('ApplyNonsubjectRestrictions');
 		boolean isCollections := application_type_value IN AutoStandardI.Constants.COLLECTION_TYPES;
 		boolean returnByDidOnly := fcra_subj_only OR isCollections;
@@ -99,16 +101,24 @@ export BankruptcySearchServiceFCRA(
 		//if more than one DID is found this call will fail the service with desired error message
     unsigned6 input_did := (unsigned6) did_value;
 
-		// gateways := Gateway.Constants.void_gateway : stored ('gateways', few);
+		EnableCaseNumFilter := CaseNumber_value != '' and Enable_CaseNumFilterSrch;
+    // gateways := Gateway.Constants.void_gateway : stored ('gateways', few);
 		gateways := Gateway.Configuration.Get();
-		picklist_res := FCRA.PickListSoapcall.non_esdl(gateways, true, returnByDidOnly and (input_did = 0)); 
+		picklist_res := FCRA.PickListSoapcall.non_esdl(gateways, true, ~EnableCaseNumFilter and returnByDidOnly and (input_did = 0)); 
 		unsigned6 subj_did := if(returnByDidOnly  and (input_did = 0), (unsigned6) picklist_res[1].Records[1].UniqueId, input_did);
 		//------------------------------------------------------------------------------------
 		
-		recs	 := bankruptcyv3_Services.bankruptcy_raw(true).search_view(in_ssn_mask := ssn_mask_value,
+    recs	 := bankruptcyv3_Services.bankruptcy_raw(true).search_view(in_ssn_mask := ssn_mask_value,
 																																		 in_party_type := party_type_adj, 
 																																		 in_filing_jurisdiction := FilingJurisdiction_value,
-																																		 suppress_withdrawn_bankruptcy := suppress_withdrawn_bankruptcy);
+																																		 suppress_withdrawn_bankruptcy := suppress_withdrawn_bankruptcy,
+                                                                     EnableCaseNumberFilter := EnableCaseNumFilter,  
+                                                                     in_state := state_val,
+                                                                     in_ssn := ssn_value,
+                                                                     in_lname := lname_value,
+                                                                     in_fname := fname_value,
+                                                                     in_case_number := CaseNumber_value,
+                                                                     in_did := input_did);
 		rec_out := record
 			bankruptcyv3_services.layouts.layout_rollup, 
 			Text_Search.Layout_ExternalKey,
@@ -128,7 +138,7 @@ export BankruptcySearchServiceFCRA(
 																											lname_sort, 
 																											cname_sort);
 		
-		recs_filt := recs_srt(~returnByDidOnly or (unsigned6)matched_party.did = subj_did);
+		recs_filt := recs_srt(~returnByDidOnly or (unsigned6)matched_party.did = subj_did or EnableCaseNumFilter );
 		
 		rec_out xformNonSubject(rec_out L) := transform
 			debtors_supp := project(L.debtors((unsigned6)did = subj_did),
@@ -185,6 +195,17 @@ export BankruptcySearchServiceFCRA(
 										self := right, // to get statementids and isdisputed for debtors child dataset
 										self:= left));
 										
+    CaseNumberErrorCode := 
+      FCRA.Functions.CheckCaseNumMinInput(CaseNumber_value, fname_value,
+                                             lname_value,ssn_value,state_val,(unsigned6)did_value);
+                                             
+    if(Enable_CaseNumFilterSrch and CaseNumberErrorCode != 0,  
+       FAIL(CaseNumberErrorCode, ut.MapMessageCodes(CaseNumberErrorCode)));
+
+    if(EnableCaseNumFilter and count(final(matched_party.did != final[1].matched_party.did)) > 0,  
+       FAIL(ut.constants_MessageCodes.FCRA_CASE_NUM_MORE_THAN_1_REC_RETURNED, 
+            ut.MapMessageCodes(ut.constants_MessageCodes.FCRA_CASE_NUM_MORE_THAN_1_REC_RETURNED)));
+
 	  // get FFD statements
 	  consumer_statements := IF(ShowConsumerStatements and exists(final), FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
 

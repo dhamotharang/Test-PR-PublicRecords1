@@ -1,4 +1,4 @@
-import doxie, tools, versioncontrol,FraudShared;
+﻿import doxie, tools, versioncontrol,FraudShared;
 
 export Build_Keys(
 	 string pversion = ''
@@ -21,9 +21,10 @@ export Build_Keys(
 	tools.mac_WriteIndex('TheKeys.Main.NPI.New'								  						,BuildNPIKey						   					);
 	tools.mac_WriteIndex('TheKeys.Main.AppProviderID.New'       						,BuildAppProviderIDKey	   					);
 	tools.mac_WriteIndex('TheKeys.Main.LNPID.New'               						,BuildLNPIDKey	         						);
+	tools.mac_WriteIndex('TheKeys.Main.DriversLicense.New'               		,BuildDriversLicenseKey	         		);
+	tools.mac_WriteIndex('TheKeys.Main.BankAccount.New'               			,BuildBankAccountKey	         			);
 	tools.mac_WriteIndex('TheKeys.Main.MBS.New'								  						,BuildMbsKey							 					);
-	tools.mac_WriteIndex('TheKeys.Main.MbsGcIdExclusion.New'								,BuildMbsGcIdExclusionKey					 	);
-  tools.mac_WriteIndex('TheKeys.Main.MbsIndTypeExclusion.New'							,BuildMbsIndTypeExclusionKey				);
+	tools.mac_WriteIndex('TheKeys.Main.MbsIndTypeExclusion.New'							,BuildMbsIndTypeExclusionKey				);
   tools.mac_WriteIndex('TheKeys.Main.MbsProductInclude.New'								,BuildMbsProductIncludeKey				 	);
   tools.mac_WriteIndex('TheKeys.Main.MbsFDNMasterIDKey.New'								,BuildMbsFDNMasterIDKey				 			);
   tools.mac_WriteIndex('TheKeys.Main.MbsFDNMasterIDExclKey.New'						,BuildMbsFDNMasterIDExclKey				 	);
@@ -44,8 +45,9 @@ export Build_Keys(
 			,BuildNPIKey
 			,BuildAppProviderIDKey
 			,BuildLNPIDKey
+			,BuildDriversLicenseKey
+			,BuildBankAccountKey
 			,BuildMbsKey
-			,BuildMbsGcIdExclusionKey
 			,BuildMbsIndTypeExclusionKey
 			,BuildMbsProductIncludeKey
 			,BuildMbsFDNMasterIDKey

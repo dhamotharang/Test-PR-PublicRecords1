@@ -1,20 +1,20 @@
-import ut;
+﻿import ut;
 EXPORT Map_CO(dataset({string ftype,string fdate})infile) := module
 
 import Prof_License,Lib_StringLib;
 
 //convert files with missing lic type to common layout 
 
-concatin := File_CO.med1 ;
+concatin := File_CO.med ;
 						 
-concatout := project(		concatin ,transform(	File_CO.common_lt, self := left,self := [] )) + File_CO.med2 (regexfind('[A-Z]',zipcode) = false);		 
+//concatout := project(		concatin ,transform(	File_CO.common_lt, self := left,self := [] )) + File_CO.med2 (regexfind('[A-Z]',zipcode) = false);		 
 
-Prof_License.Layout_proLic_in map2med( concatout l ) := transform
+Prof_License.Layout_proLic_in map2med( concatin l ) := transform
 
     self.date_first_seen         := infile(ftype = 'medical')[1].fdate;                                                              
     self.date_last_seen          := infile(ftype = 'medical')[1].fdate;                                                         
     self.profession_or_board     := 'Medical';                                                                   
-    self.license_type            := case ( StringLib.StringToUpperCase(trim(l.CaseActionTypeDesc)), 
+    self.license_type            := case ( StringLib.StringToUpperCase(trim(l.LicenseType)), 
                                                               'AV' => 'Academic Veterinarian' ,
                                                                                                           
                                    'ACU' => 'Acupuncturist' ,                             
@@ -199,7 +199,7 @@ Prof_License.Layout_proLic_in map2med( concatout l ) := transform
                                                                                           
                                    'WHO' => 'Wholesaler Out-of-State' , '');   
 
-    self.license_number       := l.CredentialNumber;                                                              
+    self.license_number       := l.LicenseNumber;                                                              
     self.status               := l.Status;                                                                       
     self.company_name    := trim(l.Entity_Name);                                        
     self.orig_name            := trim(l.FirstName + ' ' + l.MiddleName + ' ' + l.LastName + ' ' + l.Suffix);              
@@ -209,23 +209,19 @@ Prof_License.Layout_proLic_in map2med( concatout l ) := transform
     self.orig_city            := l.City;                                                                      
     self.orig_st              := trim(l.StateCode)[1..2];                                  
     self.orig_zip             := StringLib.Stringfilter(l.ZipCode,'0123456789')[1..9];                      
-    self.phone                :=  StringLib.Stringfilter(l.Phone,'0123456789')[1..10];                  
-    self.issue_date           := trim(l.FirstEffectiveDate);                                        
+    self.phone                :=  '';//StringLib.Stringfilter(l.Phone,'0123456789')[1..10];                  
+    self.issue_date           := trim(l.FirstIssueDate);                                        
     self.expiration_date      := trim(l.ExpirationDate);                                      
-    self.last_renewal_date    := trim(l.EffectiveDate);                                         
+    self.last_renewal_date    := trim(l.LastRenewalDate);                                         
     self.education_1_degree   := trim(l.Degree)[1..15];                    
-    self.education_2_degree    := l.Degree1;                                                          
-    self.education_3_degree   := l.Degree2;                                                          
-    self.license_obtained_by  := if ( l.License_Method <> '' , l.License_Method , '' ) ;                              
+    self.education_2_degree    := '';//l.Degree1;                                                          
+    self.education_3_degree   := '';//l.Degree2;                                                          
+    self.license_obtained_by  := '';//if ( l.License_Method <> '' , l.License_Method , '' ) ;                              
     self.additional_licensing_specifics := regexreplace(     ', *',                    
                                                       regexreplace( 'Specialties: *' ,                                                                                
                                                                                     
                                                                   'Specialties: ' +                                                                                  
-                                                                    if ( l.Specialty1 <> '', trim(l.Specialty1) +  ', ' , '' )  +                
-                                                                    if ( l.Specialty2 <> '' , trim(l.Specialty2) + ', ' ,  '' ) +               
-                                                                    if (l.Specialty3 <> '',   trim(l.Specialty3) +  ', ' , '' ) +               
-                                                                    if (l.Specialty4 <> '' ,  trim(l.Specialty4) +  ', ' , '' ) +                
-                                                                    if (l.Specialty5  <> '',  trim(l.Specialty5) +  ', ' , '' ) +               
+                                                                    if ( l.Speciality <> '', trim(l.Speciality)  , '' )  +       
                                                                      '*'                                                                                              
                                                                                                                                                                          
                                                                   ,  '')                                                                          
@@ -233,16 +229,16 @@ Prof_License.Layout_proLic_in map2med( concatout l ) := transform
                                                                                           
     self.vendor                := 'Colorado Board of Medical Examiners';                                           
     self.source_st             := 'CO';                                                                         
-    self.action_case_number    := trim(l.FormattedCaseNumber);                                           
-    self.action_desc           := trim(l.CaseActionTypeDesc);                                             
-    self.action_effective_dt   := trim(l.DateEffective);                                         
-    self.action_posting_status_dt := trim(l.DateCompleted);                                                                                                                                                                                                                                                                     
+    self.action_case_number    := trim(l.CaseNumber);                                           
+    self.action_desc           := trim(l.ProgramAction);                                             
+    self.action_effective_dt   := trim(l.DisciplineEffectiveDate);                                         
+    self.action_posting_status_dt := trim(l.DisciplineCompletedDate);                                                                                                                                                                                                                                                                     
 self := l;
 self := [];
 
 end;
 
-dOutMed := project( concatout, map2med(left));
+dOutMed := project( concatin, map2med(left));
 
 dOutMedSF := Sequential( FileServices.ClearSuperfile( '~thor_data400::in::prolic::co::medical'),
                          output( dOutMed (profession_or_board <> ''),,'~thor_data400::in::prolic::co::medical_'+infile(ftype = 'medical')[1].fdate	,overwrite),
@@ -698,7 +694,7 @@ superfile_trans := Sequential(
 
 export buildprep := Sequential( dout,
                              superfile_trans,
-			          								output( outfile,,'~thor_data400::in::prolic_co',overwrite),
+			          								output( outfile,,'~thor_data400::in::prolic_co',compressed,overwrite),
                                 FileServices.StartSuperfiletransaction(),  
 												        FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_co'),
 																				 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_co_old'),

@@ -1,4 +1,4 @@
-EXPORT Map_AZ(dataset({string ftype,string fdate})infile) := module
+﻿EXPORT Map_AZ(dataset({string ftype,string fdate})infile) := module
 import Prof_License, lib_StringLib, ut;
 
 //Map to final layout
@@ -229,7 +229,7 @@ validate_prep := Prof_License_preprocess.fn_ValidateLicInBase (input, azbase,'az
 										 
 export buildprep := Sequential( prep,
                         superfile_trans,
-                        output( outfile,,'~thor_data400::in::prolic_az',overwrite),
+                        output( outfile,,'~thor_data400::in::prolic_az',compressed,overwrite),
 												validate_prep,
                          FileServices.StartSuperfiletransaction(),
 					         					FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_az'),

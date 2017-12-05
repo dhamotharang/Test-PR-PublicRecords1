@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 EXPORT File_AZ := module
 
 Layout_Ost := record
@@ -19,7 +19,6 @@ Layout_Ost := record
    string Office_State;
    string Office_Zip;
    string Office_Phone;
-	 string field;
    string In_State;
    string Medical_School;
    string Graduation_Date;
@@ -81,23 +80,21 @@ end;
 export nurse := dataset(ut.foreign_prod+'thor_data400::in::prolic::az::nurse::raw',Layout_nurse,CSV( heading(1),separator(','),terminator(['\n']),Quote('"')));
 
 Layout_pharm := record
-   string License_Type;
 	 string License_Number;
+   string License_Type;
+	  string sub_License_Type;
    string  Status;
-	 string  Emp_Type;
    string FirstName;
 	 string MiddleName;
 	 string LastName;
-	 string DOB;
    string  Address;
+	  string suite;
    string  City;
-	 string  County;
    string  State;
    string  Zip;
    string  Original_Licensure_Date;
    string  Effective_From;
    string  Effective_To;
-   string Email;
 end;
 
 export pharm := dataset(ut.foreign_prod+'thor_data400::in::prolic::az::pharmacy::raw',Layout_pharm,CSV( heading(1),separator(','),terminator(['\n']),Quote('"')));

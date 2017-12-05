@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take ME Real Estate Appraisers License raw file and convert it to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
@@ -48,8 +48,8 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 		SELF.STD_PROF_DESC		:= ' ';
 		SELF.DATE_FIRST_SEEN	:= thorlib.wuid()[2..9];
 		SELF.DATE_LAST_SEEN		:= thorlib.wuid()[2..9];
-		SELF.DATE_VENDOR_FIRST_REPORTED := pVersion;
-		SELF.DATE_VENDOR_LAST_REPORTED	:= pVersion;
+		SELF.DATE_VENDOR_FIRST_REPORTED := Prof_License_Mari.DateCleaner.ToYYYYMMDD(L.PRINTDATE);
+		SELF.DATE_VENDOR_LAST_REPORTED	:= Prof_License_Mari.DateCleaner.ToYYYYMMDD(L.PRINTDATE);
 		SELF.PROCESS_DATE			:= thorlib.wuid()[2..9];
 
 		SELF.TYPE_CD					:= IF(TRIM(L.LIC_TYPE,LEFT,RIGHT) IN MD_Lic_types,'MD','GR');
@@ -94,7 +94,7 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 		temp_OfficeName				:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(getOfficeName);											 
 		stdOfficeName					:= TRIM(Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(temp_OfficeName),LEFT,RIGHT);
 		clnOfficeName					:= TRIM(StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.strippunctName(stdOfficeName)),LEFT,RIGHT);
-		replOfficeSlash				:= REGEXREPLACE('C/O',clnOfficeName,'');
+		replOfficeSlash				:= StringLib.StringCleanSpaces(REGEXREPLACE('C/O',clnOfficeName,''));
 		SELF.NAME_OFFICE			:= IF(REGEXFIND(IPpattern,stdOfficeName),stdOfficeName,REGEXREPLACE(' COMPANY',replOfficeSlash,' CO'));
 		SELF.OFFICE_PARSE			:= IF(SELF.NAME_OFFICE != ' ','GR',' ');
 
@@ -132,19 +132,19 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_ORG_ORIG		:= Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.FULLNAME);
 		SELF.NAME_FORMAT			:= 'F';
 
-		SELF.NAME_MARI_ORG		:= IF(TRIM(ClnOfficeName)!=' ',TRIM(ClnOfficeName,LEFT,RIGHT),' ');	
+		SELF.NAME_MARI_ORG		:= IF(TRIM(replOfficeSlash)!=' ',TRIM(replOfficeSlash,LEFT,RIGHT),' ');	
 		SELF.NAME_MARI_DBA	  := IF(SELF.NAME_DBA != ' ',tmpNameDBA,' ');
 		SELF.NAME_DBA_ORIG	  := IF(SELF.NAME_DBA != ' ',ut.CleanSpacesAndUpper(L.DBA),'');
 		
 		//Clean phone/fax and remove +1 and non-numerics
-		SELF.PHN_MARI_1				:= TRIM(L.TELE_1,ALL);				//the phone number before running through our clean process
-		SELF.PHN_MARI_FAX_1		:= TRIM(L.FAX_1,ALL);					//the fax number before running through our clean process
-		clnPhone							:= REGEXREPLACE('\\+1',L.TELE_1,'');
-		clnFax								:= REGEXREPLACE('\\+1',L.FAX_1,'');
-		SELF.PHN_PHONE_1			:= StringLib.StringFilter(clnPhone,'0123456789');
-		SELF.PHN_FAX_1				:= StringLib.StringFilter(clnFax,'0123456789');
 		
-
+		TrimPhone             := StringLib.StringFilter(L.TELE_1,'0123456789');
+		TrimFax               := StringLib.StringFilter(L.FAX_1,'0123456789');
+		SELF.PHN_MARI_1				:= ut.CleanPhone(TrimPhone);				//the phone number before running through our clean process
+		SELF.PHN_MARI_FAX_1		:= ut.CleanPhone(TrimFax);					//the fax number before running through our clean process
+		SELF.PHN_PHONE_1			:= ut.CleanPhone(TrimPhone);
+		SELF.PHN_FAX_1				:= ut.CleanPhone(TrimFax);
+		
 		TrimCity							:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.CITY_1);
 		TrimState							:= Prof_License_Mari.mod_clean_name_addr.TRIMUPPER(L.STATE_1);
 		TrimZip								:= TRIM(L.ZIP_1);
@@ -287,7 +287,13 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 																	'RECIPROCITY' => 'R',
 																	'RENEWAL EXAM' => 'E',
 																	'SCHOOLING'    => 'S',  //NEW CODES
-																	'UNKNOWN'      => 'U',  // NEW CODES        
+																	'UNKNOWN'      => 'U',  // NEW CODES   
+																	'GRANDFATHERED' => 'G',
+                 'EXAMINATION> FEDERAL' => 'F', //( EXAMINATION-FEDERAL)
+                 'RECIPROCITY> FEDERAL' => 'X', //(RECIPROCITY- FEDERAL)
+                 'ENDORSEMENT' => 'D',
+                 'ORIGINAL' => 'L', 
+                 'WAIVER' => 'W', 
 																	'');
 		SELF.AGENCY_ID      := ut.CleanSpacesAndUpper(L.AGENCY);
 		SELF.REGULATOR      := ut.CleanSpacesAndUpper(L.BOARDNAME);
@@ -296,17 +302,20 @@ EXPORT map_MES0838_conversion(STRING pVersion) := FUNCTION
 		SELF.DISPLINARY_ACTION:= MAP(TRIM(L.FLAG15)<>'' => Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.FLAG15),
 		                             TRIM(L.FLAG13)<>'' => Prof_License_Mari.mod_clean_name_addr.TrimUpper(L.FLAG13),
 																 '');
-		SELF.CONT_EDUCATION_REQ	  := IF(TRIM(L.CEUREQUIRED)<>'',TRIM(L.CEUREQUIRED),'');
+
+  TrimCEUREQUIRED          := REGEXREPLACE('\\.00',L.CEUREQUIRED,'');
+		SELF.CONT_EDUCATION_REQ	 := IF(TRIM(L.CEUREQUIRED)<> '',TrimCEUREQUIRED,'');
 		SELF.CONT_EDUCATION_ERND	:= IF(TRIM(L.CEUEARNED)<>'',TRIM(L.CEUEARNED),'');
 		SELF.CONT_EDUCATION_TERM	:= IF(TRIM(L.RENTERM)<>'',TRIM(L.RENTERM),'');
-
+		
 		//new field added 2/19/13 Cathy Tio
 		SELF.PROVNOTE_2 			:= IF(L.PRINTDATE<>'','PRINTDATE: ' + ut.CleanSpacesAndUpper(L.PRINTDATE)+';','')+
 		                         IF(L.ALMSIMPORTCONTEXT<>'','ALMSIMPORTCONTEXT: ' + ut.CleanSpacesAndUpper(L.ALMSIMPORTCONTEXT)+';','')+
 		                         IF(L.SUSPSTART<>'','SUSPENSIONSTARTDATE: ' + ut.CleanSpacesAndUpper(L.SUSPSTART)+';','')+
 		                         IF(L.SUSPEND<>'','SUSPENSIONENDDATE: ' + ut.CleanSpacesAndUpper(L.SUSPEND)+';','');
 		SELF.PROVNOTE_3 			:= IF(L.EMP_DBA<>'','EMPLOYER ALIAS: '+ut.CleanSpacesAndUpper(L.EMP_DBA)+';','') +
-		                         IF(L.RINAME<>'','RESPONSIBLE INDIVIDUAL: ' +ut.CleanSpacesAndUpper(L.RINAME)+';','');
+		                         IF(L.RINAME<>'','RESPONSIBLE INDIVIDUAL: ' +ut.CleanSpacesAndUpper(L.RINAME)+';','') +
+														                IF(L.AUTHORITYDESC<>'','AUTHORITY DESC: ' +ut.CleanSpacesAndUpper(L.AUTHORITYDESC)+';','');
 
 		//existing fields added 8/12/13 
 		SELF.PROVNOTE_1				:= TRIM(IF(L.LEG_STATE<>'','LEGAL_STATE:'+TRIM(L.LEG_STATE),'')+

@@ -1,4 +1,4 @@
-import ut, _Control;
+﻿import ut, _Control;
 EXPORT Constants := module
 
 	export yogurt(string superfilename = '') := module
@@ -10,7 +10,7 @@ EXPORT Constants := module
 		export startwudaysbehind := 'W' + ut.date_math(enddate,-20) + '-' + l_time;
 		export serv := 'server=http://10.241.31.11:8010 ';
 		export nsplit := ' nosplit=1 ';
-		export dstcluster := 'dstcluster=thor40_31_yogurt ';
+		export dstcluster := 'dstcluster=thor40_25_yogurt ';
 		export over := 'overwrite=1 ';
 		export repl := 'replicate=1 ';
 		export action := 'action=copy ';
@@ -30,7 +30,7 @@ EXPORT Constants := module
 	end;
 	
 	export esp := module
-		export bocaprodthor := '10.241.30.202';
+		export bocaprodthor := 'prod_esp.br.seisint.com';
 		export yogurtthorforboca := '10.241.31.11';
 	end;
 	// Set this value to get files older than n days

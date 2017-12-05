@@ -1,4 +1,4 @@
-import STD;
+﻿import STD;
 EXPORT _ConstructTracebackFiles(string version_in, string iter_in) := Module
   shared rec_m:=RECORD
         string20 version;
@@ -50,17 +50,18 @@ EXPORT _ConstructTracebackFiles(string version_in, string iter_in) := Module
 	
 	
 	shared rec:=RECORD
-        unsigned6 rcid;
-        unsigned6 proxid_before;
-        unsigned6 proxid_after;
-        unsigned6 lgid3_before;
-        unsigned6 lgid3_after;
-        unsigned6 orgid_before;
-        unsigned6 orgid_after;
-        unsigned6 ultid_before;
-        unsigned6 ultid_after;
-        unsigned4 change_date;
-       END;
+  unsigned6 rcid;
+  unsigned6 proxid_before;
+  unsigned6 proxid_after;
+  unsigned6 lgid3_before;
+  unsigned6 lgid3_after;
+  unsigned6 orgid_before;
+  unsigned6 orgid_after;
+  unsigned6 ultid_before;
+  unsigned6 ultid_after;
+  unsigned6 change_date;
+ END;
+
        
  shared rec1:=Record
        string20 version;

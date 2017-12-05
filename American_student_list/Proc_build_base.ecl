@@ -38,6 +38,7 @@
 				self.GENDER   			     					:= if(trim(self.GENDER_CODE,left,right) = '1', 'MALE',
 											  if(trim(self.GENDER_CODE,left,right) = '2', 'FEMALE', 
 											  ''));
+				self.BIRTH_DATE										:=	TRIM(pInput.BIRTH_DATE,left,right)[3..];
 				self.DOB_FORMATTED        				:= MAP(LENGTH(TRIM(pInput.BIRTH_DATE,left,right)) = 4 => TRIM(pInput.BIRTH_DATE,left,right) + '0000', 
 																										 
 																								 LENGTH(TRIM(pInput.BIRTH_DATE,left,right)) = 6 => TRIM(pInput.BIRTH_DATE,left,right) + '00',
@@ -248,11 +249,12 @@
 	
 	rsCleanAIDGood := PROJECT(rsCleanAID, tProjectClean(LEFT)) + American_student_list.File_American_Student_DID_v2;
 	
-	
-  
+	//DF-20264 Suppress records in ASL suppression list
+	rsCleanAIDGood_Supp := American_student_list.fnExcludeSuppressedRecords(rsCleanAIDGood); 
 	
 	//Flip names before DID process
-	ut.mac_flipnames(rsCleanAIDGood,fname,mname,lname,rsAIDCleanFlipNames);
+	// ut.mac_flipnames(rsCleanAIDGood,fname,mname,lname,rsAIDCleanFlipNames);
+	ut.mac_flipnames(rsCleanAIDGood_Supp,fname,mname,lname,rsAIDCleanFlipNames);
 
 	//add src 
 	src_rec := record

@@ -1,4 +1,4 @@
-// Process to build the American Student List Files.
+﻿// Process to build the American Student List Files.
 import ut, _control, roxiekeybuild, VersionControl, Scrubs_American_Student_List;
 
 export Proc_build_all(string filedate, string filename) :=
@@ -36,7 +36,9 @@ UpdateRoxiePage := sequential(RoxieKeybuild.updateversion('AmericanstudentKeys',
 
 
 email_notify := sequential(
-							//doSpray,
+							//DF-20264 Build base file for ASL suppression list
+							American_student_list.Proc_build_suppression(filedate),
+							doSpray,
 							American_student_list.Proc_build_base,
 							American_student_list.proc_build_address_list(filedate),
 							parallel(
@@ -45,7 +47,8 @@ email_notify := sequential(
 										,American_student_list.Out_Base_Stats_Population_V2(filedate)    //populate STRATA for v2 6/11/13
 										,American_student_list.Proc_Build_Autokeys(filedate)
 									   ),
-							UpdateRoxiePage,
+										 American_student_list.fn_Key_Compare(filedate),
+							if(American_student_list.fn_CheckBeforeDops(filedate),UpdateRoxiePage);
 							Scrubs_American_Student_List.PostBuildScrubs(filedate)
 							) : 
 							SUCCESS(e_mail_success), 

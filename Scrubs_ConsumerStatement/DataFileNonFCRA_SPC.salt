@@ -1,0 +1,63 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_ConsumerStatement
+FILENAME:ConsumerStatement
+NAMESCOPE:DataFileNonFCRA
+
+FIELDTYPE:Invalid_Number:ALLOW(0123456789)
+FIELDTYPE:Invalid_Date:ALLOW(0123456789 :-)
+FIELDTYPE:Invalid_Phone:ALLOW(0123456789):LENGTHS(0,10)
+FIELDTYPE:Invalid_Name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-' )
+FIELDTYPE:Invalid_State:CUSTOM(Scrubs.fn_Valid_StateAbbrev>0)
+
+FIELD:statement_id:LIKE(Invalid_Number):TYPE(INTEGER8):0,0
+FIELD:orig_fname:LIKE(Invalid_Name):TYPE(STRING30):0,0
+FIELD:orig_lname:LIKE(Invalid_Name):TYPE(STRING30):0,0
+FIELD:orig_mname:LIKE(Invalid_Name):TYPE(STRING30):0,0
+FIELD:orig_cname:LIKE(Invalid_Name):TYPE(STRING100):0,0
+FIELD:orig_address:TYPE(STRING100):0,0
+FIELD:orig_city:TYPE(STRING30):0,0
+FIELD:orig_st:LIKE(Invalid_State):TYPE(STRING2):0,0
+FIELD:orig_zip:LIKE(Invalid_Number):TYPE(STRING5):0,0
+FIELD:orig_zip4:LIKE(Invalid_Number):TYPE(STRING4):0,0
+FIELD:phone:LIKE(Invalid_Phone):TYPE(STRING10):0,0
+FIELD:title:TYPE(STRING5):0,0
+FIELD:fname:LIKE(Invalid_Name):TYPE(STRING20):0,0
+FIELD:mname:LIKE(Invalid_Name):TYPE(STRING20):0,0
+FIELD:lname:LIKE(Invalid_Name):TYPE(STRING20):0,0
+FIELD:name_suffix:TYPE(STRING5):0,0
+FIELD:name_score:TYPE(STRING3):0,0
+FIELD:prim_range:TYPE(STRING10):0,0
+FIELD:predir:TYPE(STRING2):0,0
+FIELD:prim_name:TYPE(STRING28):0,0
+FIELD:addr_suffix:TYPE(STRING4):0,0
+FIELD:postdir:TYPE(STRING2):0,0
+FIELD:unit_desig:TYPE(STRING10):0,0
+FIELD:sec_range:TYPE(STRING8):0,0
+FIELD:p_city_name:TYPE(STRING25):0,0
+FIELD:v_city_name:TYPE(STRING25):0,0
+FIELD:st:LIKE(Invalid_State):TYPE(STRING2):0,0
+FIELD:zip:LIKE(Invalid_Number):TYPE(STRING5):0,0
+FIELD:zip4:LIKE(Invalid_Number):TYPE(STRING4):0,0
+FIELD:cart:TYPE(STRING4):0,0
+FIELD:cr_sort_sz:TYPE(STRING1):0,0
+FIELD:lot:TYPE(STRING4):0,0
+FIELD:lot_order:TYPE(STRING1):0,0
+FIELD:dbpc:TYPE(STRING2):0,0
+FIELD:chk_digit:TYPE(STRING1):0,0
+FIELD:rec_type:TYPE(STRING2):0,0
+FIELD:county:TYPE(STRING5):0,0
+FIELD:geo_lat:TYPE(STRING10):0,0
+FIELD:geo_long:TYPE(STRING11):0,0
+FIELD:msa:TYPE(STRING4):0,0
+FIELD:geo_blk:TYPE(STRING7):0,0
+FIELD:geo_match:TYPE(STRING1):0,0
+FIELD:err_stat:TYPE(STRING4):0,0
+FIELD:date_submitted:LIKE(Invalid_Date):TYPE(STRING20):0,0
+FIELD:date_created:LIKE(Invalid_Date):TYPE(STRING20):0,0
+FIELD:did:LIKE(Invalid_Number):TYPE(UNSIGNED6):0,0
+FIELD:consumer_text:TYPE(STRING):0,0
+FIELD:override_flag:LIKE(Invalid_Number):TYPE(INTEGER8):0,0
+// CONCEPT statements should be used to group together interellated fields; such as address
+// RELATIONSHIP is used to find non-obvious relationships between the clusters
+// SOURCEFIELD is used if a field of the file denotes a source of the records in that file
+// LINKPATH is used to define access paths for external linking

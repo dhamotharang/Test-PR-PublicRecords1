@@ -1,4 +1,4 @@
-// Extends header-based data with single source data
+﻿// Extends header-based data with single source data
 
 import moxie_phonesplus_server, bankruptcyv2_services, doxie_crs, doxie, liensv2_services,
   UCCv2_Services, Votersv2_services, WatercraftV2_services,	DeaV2_Services, EmailService, iesp;
@@ -17,6 +17,7 @@ recccwr := doxie_crs.layout_ccw_records;
 recplrr := doxie_crs.layout_PL_Records;
 recsancr:= doxie.ingenix_sanctions_module.layout_ingenix_sanctions_report;
 recprovr:= doxie.ingenix_provider_module.layout_ingenix_provider_report;
+recUtility := doxie_crs.layout_utility.record_layout_slim;
 recatfr := iesp.firearm_fcra.t_FcraFirearmRecord;
 rechunr := doxie_crs.layout_hunting_records;
 recpilr := doxie_crs.layout_pilot_records;
@@ -45,6 +46,7 @@ recverification := iesp.verification.t_IndividualVerificationRecord;
 recpsummary := iesp.phonesummary.t_PhoneSummaryRecord;
 recASL			:= iesp.student.t_PossibleStudentInformation;
 recASL2			:= iesp.student.t_StudentRecord;
+
 //**** Individual record defs
 
 
@@ -65,6 +67,7 @@ export layout_central_records := record, maxlength(doxie_crs.maxlength_report)
 	dataset(recplrr) professional_licenses_children;
 	dataset(recsancr) sanction_children;
 	dataset(recprovr) provider_children;
+  dataset(recUtility) utility_children;
 	dataset(recEmail) Email_children;
 	dataset(employm) employment_children;
 	dataset(recatfr) firearms_and_explosives_children{xpath('FirearmExplosives/FirearmExplosive')};

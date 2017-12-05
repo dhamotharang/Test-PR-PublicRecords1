@@ -1,4 +1,4 @@
-import Address , bipv2, Inquiry_Acclogs, corrections,FraudShared;
+﻿import Address , bipv2, Inquiry_Acclogs, corrections,FraudShared;
 
 export Layouts := MODULE
 
@@ -143,6 +143,7 @@ export Layouts := MODULE
 			string75	isp;
 			string12	device_id;
 			string8		device_date;
+			string60	device_risk_code;
 			string20	unique_number;
 			string10	mac_address;
 			string20	serial_number;
@@ -215,8 +216,7 @@ export Layouts := MODULE
 			string8 	dob  														:= '';
 			string25	Drivers_License_Number					:= '';
 			string2		Drivers_License_State						:= '';			
-		end;
-
+		END;
 	END;
 
 	export vLoad := {string75 fn { virtual(logicalfilename)},Sprayed.IdentityData};
@@ -237,7 +237,7 @@ export Layouts := MODULE
 		END;
 		export KnownFraud := RECORD
 				Sprayed.KnownFraud;
-				Provenance
+				Provenance;
 		END;
 	end;
 
@@ -257,7 +257,7 @@ EXPORT Base := MODULE
 		unsigned2		name_ind:=0;
 		unsigned8		NID:=0;
 		unsigned4		process_date ; 
-		string4			Source; 
+		string100		Source; 
 		unsigned8		source_rec_id;
 		unsigned8		Unique_Id ; 
 	end; 
@@ -276,10 +276,10 @@ EXPORT Base := MODULE
 		unsigned2		name_ind:=0;
 		unsigned8		NID:=0;
 		unsigned4		process_date ; 
-		string4			Source; 
+		string100		Source; 
 		unsigned8		source_rec_id;
 		unsigned8		Unique_Id ; 
-	end; 	
+	END;
 END;
 
 END;

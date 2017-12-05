@@ -1,11 +1,14 @@
-IMPORT Civ_Court, civil_court, crim_common, ut, lib_StringLib; 
+﻿IMPORT Civ_Court, civil_court, crim_common, ut, lib_StringLib, Std; 
 
 #option('multiplePersistInstances',FALSE);
 
 fHall := Civ_court.File_In_GA_Hall;
 
-fmtsin := '%m/%d/%Y';
-fmtout := '%Y%m%d';
+fmtsin := [
+		'%m/%d/%Y',
+		'%m/%d/%Y'
+	];
+	fmtout:='%Y%m%d';	
 	
 Civil_Court.Layout_In_Matter tHall(fHall input) := TRANSFORM
 self.process_date				:= civil_court.Version_Development;
@@ -18,7 +21,7 @@ self.court_code					:= '';
 self.court							:= 'HALL COUNTY COURT';
 self.case_number				:= UpperCaseNum;
 self.case_type					:= ut.CleanSpacesAndUpper(input.case_type);
-self.filing_date				:= IF(trim(input.date_filed,all) <> '', ut.ConvertDate(input.date_filed,fmtsin,fmtout), '');
+self.filing_date				:= IF(trim(input.date_filed,all) <> '', Std.date.ConvertDateFormatMultiple(input.date_filed,fmtsin,fmtout), '');
 self.disposition_description	:= ut.CleanSpacesAndUpper(input.disposition);
 self := [];
 END;

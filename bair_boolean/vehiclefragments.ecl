@@ -1,10 +1,11 @@
-IMPORT Text_Search, Codes, Header, MDR, bair;
+﻿IMPORT Text_Search, Codes, Header, MDR, bair;
 // Should inherit IFragmentSource, but needs fix for 51580
 EXPORT vehiclefragments(Types.StateList st_list=ALL, Boolean pDelta=true) := MODULE
 	//SHARED Persist_Stem 		:= '~THOR_DATA400::PERSIST::FRAGS_';
 	SHARED Persist_vehicle	:= bair_boolean.constants('').persistfile('vehicle');
 
-  bair_data := Bair.files(pUseDelta:=pDelta).vehicle_Base.built(eid not in set(bair_boolean.temp,ExternalKey));
+  bair_data := Bair.files(pUseDelta:=pDelta).vehicle_Base.built;
+  // bair_data := Bair.files(pUseDelta:=pDelta).vehicle_Base.built(eid not in set(bair_boolean.temp,ExternalKey));
 	//bair_data := choosen(Bair.files(pUseDelta:=pDelta).vehicle_Base.built,10000);
 	SHARED vehicle_Base := DISTRIBUTE(bair_data(eid <> ''),HASH64(eid));
 	

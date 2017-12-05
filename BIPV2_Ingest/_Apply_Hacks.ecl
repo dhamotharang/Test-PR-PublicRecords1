@@ -1,4 +1,4 @@
-// BIPV2_Ingest._Apply_Hacks(); 
+﻿// BIPV2_Ingest._Apply_Hacks(); 
 import wk_ut;
 EXPORT _Apply_Hacks(
 
@@ -18,6 +18,10 @@ function
 			'/*HACK03*/\n${2}_dist := DISTRIBUTE($3, hash32($5));\n$1${2}_dist$4,LOCAL)','distribute before GROUP' }
      ,{pModule,'Ingest',     '((GroupIngest0)\\s*:=\\s*GROUP\\()([^,]+)(,(.*?),ALL)\\)','HACK04',
 			'/*HACK04*/\n${2}_dist := DISTRIBUTE($3, hash32($5));\n$1${2}_dist$4,LOCAL)','distribute before GROUP' }
+     ,{pModule,'Ingest',     '(Base0)(\\s*:=\\s*PROJECT[^;]+;)','HACK05',
+			'${1}WithBlank${2}\n$1 := _Custom.FilterBlanks(${1}WithBlank);/*HACK05*/','allow blank records' }
+     ,{pModule,'Ingest',     '(ORe\\s*:=\\s*AllRecs0[^;]+);','HACK06',
+			'${1} + _Custom.GetBlanks(Base0WithBlank);/*HACK06*/','allow blank records' }
   ],Tools.layout_attribute_hacks2);
 
   return Tools.HackAttribute2(dAtmostChange,pShouldSaveAttributes,pEsp).saveit;

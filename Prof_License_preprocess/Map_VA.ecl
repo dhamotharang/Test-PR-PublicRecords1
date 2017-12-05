@@ -1,4 +1,4 @@
-import  Prof_License,ut,Std;
+﻿import  Prof_License,ut,Std;
 EXPORT Map_VA(dataset({string ftype,string fdate})infile) := module
 
 Prof_License.Layout_proLic_in map2va( Files_VA_Raw.health l) := transform
@@ -245,7 +245,7 @@ export buildprep := Sequential(doutfinal,
                               if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_va_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_va_old')),
 							        	       if ( FileServices.FileExists( '~thor_data400::in::prolic_va_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_va_old')),
                               FileServices.RenameLogicalfile( '~thor_data400::in::prolic_va','~thor_data400::in::prolic_va_old'),                         
-											       output( outfile,,'~thor_data400::in::prolic_va',overwrite),
+											       output( outfile,,'~thor_data400::in::prolic_va',compressed,overwrite),
                             FileServices.StartSuperfiletransaction(),												 
 					    							 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_va'),
 				    								 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_va_old'),

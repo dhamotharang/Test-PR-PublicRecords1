@@ -1,6 +1,6 @@
-import ut, okc_sexual_offenders;
+﻿import  okc_sexual_offenders,Data_Services;
  
- ds := dataset(ut.foreign_prod+'thor_200::in::hd_sex_off::lookup::superfile',OKC_Sexual_Offenders.Layout_OKC_Pics_Lookup,csv(separator('/'),terminator(['\r\n','\r','\n']),quote('"')));
+ ds := dataset(Data_Services.foreign_prod+'thor_200::in::hd_sex_off::lookup::superfile',OKC_Sexual_Offenders.Layout_OKC_Pics_Lookup,csv(separator('/'),terminator(['\r\n','\r','\n']),quote('"')));
  
  OKC_Sexual_Offenders.Layout_OKC_Pics_Lookup fixState(ds l):= transform
 	 // self.state_of_origin := if(StringLib.StringToUpperCase(l.state_of_origin)[1..4]='GUAM',

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="UCCReportService">
 
   <part name="DID" 					       type="xsd:string"/>
@@ -22,8 +22,8 @@ export UCCReportService() := macro
 
 BOOLEAN return_multiple_pgs := FALSE : STORED('ReturnMultiplePages');
 
-r := UCCv2_Services.UCCReportService_records(return_multiple_pgs);
+res := UCCv2_Services.UCCReportService_records(return_multiple_pgs);
 
-output(r, named('Results'));
+output(res, named('Results'));
 
 endmacro;

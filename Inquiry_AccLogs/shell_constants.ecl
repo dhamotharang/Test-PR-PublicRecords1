@@ -1,3 +1,6 @@
+﻿/*2017-08-09T23:16:44Z (Kevin Huls)
+MS-160 - correctly use the full date from 'HistoryDateTimeStamp' when it is provided on input.
+*/
 import risk_indicators, ut;
 
 EXPORT shell_constants :=  module
@@ -6,9 +9,9 @@ export collections_vertical_set := ['COLLECTIONS','RECEIVABLES MANAGEMENT','1PC'
 
 // for FCRA, we need to cap records at 1 years from the history date
 // for non-fcra, allow anything as long as the log_date is populated
-export	inquiry_is_ok(unsigned3 historydate, STRING8 log_date, boolean isFCRA) := function
-			today := risk_indicators.iid_constants.mygetdate(historydate);
-			inquiryOK_fcra := ut.DaysApart(today,log_date) < ut.DaysInNYears(1);
+export	inquiry_is_ok(unsigned3 historydate, STRING8 log_date, boolean isFCRA, string historyDateTimeStamp = '') := function
+			today := risk_indicators.iid_constants.mygetdatetimestamp(historyDateTimeStamp, historydate);
+			inquiryOK_fcra := ut.DaysApart(today[1..8],log_date) < ut.DaysInNYears(1);
 			inquiryOK := if(isFCRA, inquiryOK_fcra, log_date<>'');
 			return inquiryOK;
 end;
@@ -114,14 +117,14 @@ export VOO_search_functions := [
 	'RISKWISE FRAUD & ID ADVISOR+ (HRG 1-4 EX09)',
 	'RISKWISE ID ADVISOR+ (RC ONLY EX05)',
 	'RISKWISE CONSUMER INSTANT ID W/ FRAUD DEFENDER (PW',
-	'INSTANT IDÂ® CONSUMER VERIF W/ FRAUDPOINT',
-	'FRAUDPOINTÂ®',
+	'INSTANT ID® CONSUMER VERIF W/ FRAUDPOINT',
+	'FRAUDPOINT®',
 	'FLEXID WITH VERIFICATION SUMMARY FLAGS',
 	'INSTANT IDR CONSUMER VERIF',
 	'FLEXID',
-	'INSTANT IDÂ® CONSUMER VERIF',
+	'INSTANT ID® CONSUMER VERIF',
 	'RISKWISE INSTANT ID W/ LN OFAC (NP90)',
-	'INSTANT IDÂ® CONSUMER VERIF W FRAUDPOINT',        
+	'INSTANT ID® CONSUMER VERIF W FRAUDPOINT',        
 	'RISKINDICATORS.FLEXIDBATCHSERVICE',        
 	'RISKINDICATORS.INSTANTIDBATCH',        
 	'RISKWISE CONSUMER INSTANT ID W/ FRAUD DEFENDER (PW07)',        
@@ -188,18 +191,18 @@ export fraud_search_functions := [
 	'RISKWISE FRAUD & ID ADVISOR+ (HRG 1-4 EX09)',
 	'RISKWISE ID ADVISOR+ (RC ONLY EX05)',
 	'RISKWISE CONSUMER INSTANT ID W/ FRAUD DEFENDER (PW',
-	'INSTANT IDÂ® BUSINESS VERIF',
-	'INSTANT IDÂ® BV + FRAUDDEFENDER',
-	'INSTANT IDÂ® CONSUMER VERIF W/ FRAUDPOINT',
-	'FRAUDPOINTÂ®',
+	'INSTANT ID® BUSINESS VERIF',
+	'INSTANT ID® BV + FRAUDDEFENDER',
+	'INSTANT ID® CONSUMER VERIF W/ FRAUDPOINT',
+	'FRAUDPOINT®',
 	'FLEXID WITH VERIFICATION SUMMARY FLAGS',
 	'INSTANT IDR CONSUMER VERIF',
 	'FLEXID',
-	'INSTANT IDÂ® CONSUMER VERIF',
+	'INSTANT ID® CONSUMER VERIF',
 	'RISKWISE INSTANT ID W/ LN OFAC (NP90)',
 	'INSTANT ID BUSINESS VERIF',
-	'INSTANT IDÂ® BV FRAUDDEFENDER',
-	'INSTANT IDÂ® CONSUMER VERIF W FRAUDPOINT'        
+	'INSTANT ID® BV FRAUDDEFENDER',
+	'INSTANT ID® CONSUMER VERIF W FRAUDPOINT'        
 	];
 
 export banko_functions := ['BANKO BATCH'];				
@@ -345,7 +348,7 @@ shared set_valid_52_nonfcra_additions := [
 'BASE BUNDLE SEARCH 8',
 'BASE BUNDLE SEARCH 9',
 'BEST NAME ADDRESS',
-'BRIDGER Ã¢Â€Â“ REAL-TIME',
+'BRIDGER â REAL-TIME',
 'BRIDGER REAL-TIME',
 'BUSINESS INVIEW CREDIT REPORT',
 'BUSINESS INVIEW REPORT',
@@ -392,7 +395,7 @@ shared set_valid_52_nonfcra_additions := [
 'LEXISNEXIS PHONE FINDER - BASIC SEARCH',
 'LEXISNEXIS PHONE FINDER - PREMIUM SEARCH',
 'LEXISNEXIS PHONE FINDER - ULTIMATE SEARCH',
-'LEXISNEXIS PHONE FINDER Â– ULTIMATE SEARCH',
+'LEXISNEXIS PHONE FINDER  ULTIMATE SEARCH',
 'LEXISNEXIS PHONE FINDER BASIC SEARCH',
 'LEXISNEXIS PHONE FINDER PREMIUM SEARCH',
 'LEXISNEXIS PHONE FINDER ULTIMATE SEARCH',
@@ -689,7 +692,7 @@ if(bsVersion>=50, ['IDENTITY VELOCITY REPORT', 'AUTHENTICATION'], []) +
 'MAP THIS ADDRESS',
 'CRIMINAL RECORDS',
 'BATCHSERVICES.JAILBOOKINGBATCHSERVICE',
-'INSTANT IDÂ® BV + FRAUDDEFENDER',
+'INSTANT ID® BV + FRAUDDEFENDER',
 'PHONE LOOKUP',
 'FIND A PERSON - PHONE',
 'INSTANTIDR CONSCELL',
@@ -896,7 +899,7 @@ if(bsVersion>=50, ['IDENTITY VELOCITY REPORT', 'AUTHENTICATION'], []) +
 'FED FIREARMS EXPLOSIVES',
 'COMPREHENSIVE HEALTHCARE PROVIDER REPORT',
 'ADVANCED SEX OFFENDER SEARCH',
-'INSTANT IDÂ® CONSUMER VERIF W FRAUDPOINT',
+'INSTANT ID® CONSUMER VERIF W FRAUDPOINT',
 'MOBILE BUSINESS REPORT',
 'LIVING SITUATION SEARCH',
 'RT PHONES/QSENT CIS GATEWAY',
@@ -917,7 +920,7 @@ if(bsVersion>=50, ['IDENTITY VELOCITY REPORT', 'AUTHENTICATION'], []) +
 'INSURANCECERTIFICATIONSERVICES.BATCHSERVICE',
 'SEARCH ON TAX PROFESSIONAL',
 'SEC FORM 10-K',
-'INSTANT IDÂ® CONSUMER VERIF',
+'INSTANT ID® CONSUMER VERIF',
 'RISKWISE CUSTOM INFOTRACE RECOVER SCORE (IT51)',
 'ADDRESS LOCATOR SEARCH',
 'BANKERS NEWS',
@@ -928,7 +931,7 @@ if(bsVersion>=50, ['IDENTITY VELOCITY REPORT', 'AUTHENTICATION'], []) +
 'SEC FILINGS SEARCH',
 'OSHA INVESTIGATIVE REPORT',
 'POLK VIN GATEWAY',
-'SMARTLINXÂ® PERSON REPORT',
+'SMARTLINX® PERSON REPORT',
 'COMMERCIAL LENDING REPORT',
 'DEATHS OBITS IN 60 DAYS NEWS',
 'FIND A PERSON - EXPT',
@@ -948,7 +951,7 @@ if(bsVersion>=50, ['IDENTITY VELOCITY REPORT', 'AUTHENTICATION'], []) +
 'INSTANT ID-INTL:IRELAND',
 'OCCCR-10 YEAR SEARCH',
 'PHOTOCOPY EXPENSE',
-'SMARTLINXÂ® BUSINESS REPORT',
+'SMARTLINX® BUSINESS REPORT',
 'TODAYS NEWS',
 'ACCESS COURT FEE',
 'BASE BUSINESS PRINCIPAL REPORT',
@@ -970,7 +973,7 @@ if(bsVersion>=50, ['IDENTITY VELOCITY REPORT', 'AUTHENTICATION'], []) +
 'PARTNER/VENDER REPORT',
 'PHONE PLUS SEARCH VIA IDENTITY REPORT',
 'SEC ANNUAL RPTS TO SHARE',
-'SMARTLINXÂ® LOCATION REPORT',
+'SMARTLINX® LOCATION REPORT',
 'CASE CONNECT ENROLLMENT',
 'COMMERCIAL LEASING REPORT',
 'COMPREPORT',
@@ -1007,7 +1010,7 @@ export set_valid_phone_shell_functions := [
 'FLEXID',
 'FLEXID WITH VERIFICATION SUMMARY FLAGS',
 'FRAUDPOINT',
-'FRAUDPOINTÂ®',
+'FRAUDPOINT®',
 'IDENTIFIER2 SEARCH',
 'IDENTITY FRAUD REPORT',
 'INSTANT ID',
@@ -1016,12 +1019,12 @@ export set_valid_phone_shell_functions := [
 'INSTANT ID FRAUD DEFENDER SEARCH',
 'INSTANT ID INTERNATIONAL',
 'INSTANT ID MODEL SEARCH',
-'INSTANT IDÂ® BUSINESS VERIF',
-'INSTANT IDÂ® BV + FRAUDDEFENDER',
-'INSTANT IDÂ® BV FRAUDDEFENDER',
-'INSTANT IDÂ® CONSUMER VERIF',
-'INSTANT IDÂ® CONSUMER VERIF W FRAUDPOINT',
-'INSTANT IDÂ® CONSUMER VERIF W/ FRAUDPOINT',
+'INSTANT ID® BUSINESS VERIF',
+'INSTANT ID® BV + FRAUDDEFENDER',
+'INSTANT ID® BV FRAUDDEFENDER',
+'INSTANT ID® CONSUMER VERIF',
+'INSTANT ID® CONSUMER VERIF W FRAUDPOINT',
+'INSTANT ID® CONSUMER VERIF W/ FRAUDPOINT',
 'INSTANT IDR CONSUMER VERIF',
 'INTERNATIONAL INSTANT ID - PASSPORT VALIDATION',
 'RISK_INDICATORS.INSTANTID_BATCH',
@@ -1086,7 +1089,7 @@ export set_valid_suspiciousfraud_functions := set_suspiciousfraud_function_names
 'FLEXID',
 'FLEXID WITH VERIFICATION SUMMARY FLAGS',
 'FRAUDPOINT',
-'FRAUDPOINTÂ®',
+'FRAUDPOINT®',
 'IDENTIFIER2 SEARCH',
 'IDENTITY FRAUD REPORT',
 'INSTANT ID',
@@ -1095,12 +1098,12 @@ export set_valid_suspiciousfraud_functions := set_suspiciousfraud_function_names
 'INSTANT ID FRAUD DEFENDER SEARCH',
 'INSTANT ID INTERNATIONAL',
 'INSTANT ID MODEL SEARCH',
-'INSTANT IDÂ® BUSINESS VERIF',
-'INSTANT IDÂ® BV + FRAUDDEFENDER',
-'INSTANT IDÂ® BV FRAUDDEFENDER',
-'INSTANT IDÂ® CONSUMER VERIF',
-'INSTANT IDÂ® CONSUMER VERIF W FRAUDPOINT',
-'INSTANT IDÂ® CONSUMER VERIF W/ FRAUDPOINT',
+'INSTANT ID® BUSINESS VERIF',
+'INSTANT ID® BV + FRAUDDEFENDER',
+'INSTANT ID® BV FRAUDDEFENDER',
+'INSTANT ID® CONSUMER VERIF',
+'INSTANT ID® CONSUMER VERIF W FRAUDPOINT',
+'INSTANT ID® CONSUMER VERIF W/ FRAUDPOINT',
 'INSTANT IDR CONSUMER VERIF',
 'INTERNATIONAL INSTANT ID - PASSPORT VALIDATION',
 'RISK_INDICATORS.INSTANTID_BATCH',
@@ -1457,7 +1460,7 @@ export Valid_Suspicious_Fraud_Inquiry(UNSIGNED3 ArchiveDate, STRING8 LogDate, ST
 		TRIM(Use) = '';
 
 export Valid_Velocity_Inquiry(string vertical, string industry, string func, string logdate, unsigned3 historydate, 
-											string sub_market, string use, string product_code, string fcra_purpose, boolean isFCRA, integer bsVersion, string method) := function
+											string sub_market, string use, string product_code, string fcra_purpose, boolean isFCRA, integer bsVersion, string method, string historyDateTimeStamp = '') := function
 		collections_bucket := if(bsversion>=50, collections_vertical_set, 	['COLLECTIONS','1PC','3PC']);											 
 		isCollection := (~isFCRA or trim(fcra_purpose) = '164') and
 										trim(StringLib.StringToUpperCase(vertical)) in collections_bucket or 
@@ -1465,7 +1468,7 @@ export Valid_Velocity_Inquiry(string vertical, string industry, string func, str
 										StringLib.StringFind(StringLib.StringToUpperCase(sub_market),'FIRST PARTY', 1) > 0;
 										
 		func_desc := trim(StringLib.StringToUpperCase(func));
-		agebucket := risk_indicators.iid_constants.age_bucket(logdate, historydate);
+		agebucket := risk_indicators.iid_constants.age_bucket(logdate, historydate, historyDateTimeStamp);
 		
 		// for ticket MS-97, filter out batch inquiries for anything >= 52.  changing it for shell 50 was going to impact over 30% of existing customer transactions
 		method_ok := bsversion < 52 or trim(StringLib.StringToUpperCase(method)) not in ['BATCH','MONITORING'];
@@ -1483,7 +1486,7 @@ end;
 
 // this function is the same as Valid_Velocity_Inquiry with the exception of the fact that they want to keep Batch and Monitoring inquiries included in the VirtualFraud counts
 export Valid_VirtualFraud_Velocity_Inquiry(string vertical, string industry, string func, string logdate, unsigned3 historydate, 
-											string sub_market, string use, string product_code, string fcra_purpose, boolean isFCRA, integer bsVersion) := function
+											string sub_market, string use, string product_code, string fcra_purpose, boolean isFCRA, integer bsVersion, string historyDateTimeStamp = '') := function
 		collections_bucket := if(bsversion>=50, collections_vertical_set, 	['COLLECTIONS','1PC','3PC']);											 
 		isCollection := (~isFCRA or trim(fcra_purpose) = '164') and
 										trim(StringLib.StringToUpperCase(vertical)) in collections_bucket or 
@@ -1491,7 +1494,7 @@ export Valid_VirtualFraud_Velocity_Inquiry(string vertical, string industry, str
 										StringLib.StringFind(StringLib.StringToUpperCase(sub_market),'FIRST PARTY', 1) > 0;
 										
 		func_desc := trim(StringLib.StringToUpperCase(func));
-		agebucket := risk_indicators.iid_constants.age_bucket(logdate, historydate);
+		agebucket := risk_indicators.iid_constants.age_bucket(logdate, historydate, historyDateTimeStamp);
 		
 		return logdate<>'' and
 										agebucket <= 12 and
@@ -1503,9 +1506,9 @@ export Valid_VirtualFraud_Velocity_Inquiry(string vertical, string industry, str
 end;
 
 
-export ValidCBDInquiry(string func, string logdate, unsigned3 historydate, string use,string product_code) :=
+export ValidCBDInquiry(string func, string logdate, unsigned3 historydate, string use,string product_code, string historyDateTimeStamp = '') :=
 	logdate != ''
-	and risk_indicators.iid_constants.age_bucket(logdate, historydate) <= 12
+	and risk_indicators.iid_constants.age_bucket(logdate, historydate, historyDateTimeStamp) <= 12
 	and trim(StringLib.StringToUpperCase(func)) in chargeback_functions
 	and trim(use)='' and
 	trim(product_code) in valid_product_codes;	
@@ -1582,7 +1585,7 @@ export Valid_BillGroup_Inquiry(string vertical,
 															 string use,
 															 string product_code, 
 															 string fcra_purpose, 
-															 boolean isFCRA, integer bsVersion) :=function
+															 boolean isFCRA, integer bsVersion, string historyDateTimeStamp = '') :=function
 															 
         collections_bucket := if(bsversion>=50, collections_vertical_set,['COLLECTIONS','1PC','3PC']);                                             
         isCollection := (~isFCRA or trim(fcra_purpose) = '164') and 
@@ -1591,7 +1594,7 @@ export Valid_BillGroup_Inquiry(string vertical,
 												StringLib.StringFind(StringLib.StringToUpperCase(sub_market),'FIRST PARTY', 1)> 0;
 
         func_desc := trim(StringLib.StringToUpperCase(func));
-        agebucket := risk_indicators.iid_constants.age_bucket(logdate,historydate);
+        agebucket := risk_indicators.iid_constants.age_bucket(logdate,historydate, historyDateTimeStamp);
 
         return logdate<>'' and  inquiry_is_ok(historydate,logdate, isFCRA) and
                                 not isCollection and 

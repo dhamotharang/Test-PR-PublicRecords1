@@ -1,6 +1,6 @@
-#option('globalAutoHoist', false); 
+﻿#option('globalAutoHoist', false); 
 #option ('optimizeProjects', false);
-import RoxieKeyBuild, tools, _control, VersionControl;
+import RoxieKeyBuild, tools, _control, VersionControl, Scrubs, Scrubs_DNB_DMI, ut, std;
 //export Email_Recipients := 'kevin.reeder@lexisnexis.com';
 export Build_All(
 	 string																	pversion
@@ -31,13 +31,14 @@ function
 		,if(not pUseV1Inputs	,Spray					(pversion,pServerIP,pDirectory,pFilename,pGroupName,not pShouldSpray,pOverwrite)
 													,Compile_Old_Inputs()
 		)
-		,Build_Base			(pversion,pIsTesting,pUseV1Bases,pUseV1Inputs,pSprayedFile,pBaseCompaniesFile2,pBaseContactsFile2,pInputCompaniesFile,pInputContactsFile,,,pKeyDatasetName)
+    ,Build_Base			(pversion,pIsTesting,pUseV1Bases,pUseV1Inputs,pSprayedFile,pBaseCompaniesFile2,pBaseContactsFile2,pInputCompaniesFile,pInputContactsFile,,,pKeyDatasetName)
 		,Build_Keys			(pversion	,pKeyDatasetName																	).all
 		,Build_Autokeys	(pversion	,pKeyDatasetName																	)
 		,Build_Strata		(pversion	,pOverwrite,,,,	pIsTesting				)
 		,Promote().Inputfiles.using2used
 		,Promote(,'base').Buildfiles.Built2QA
 		,Promote(,'key',,,pKeyDatasetName).Buildfiles.Built2QA
+		,Scrubs.ScrubsPlus('DNB_DMI','Scrubs_DNB_DMI','Scrubs_DNB_DMI_Raw','Raw' ,pversion,DNB_DMI.Email_Notification_Lists().ScrubsPlus,false)		
 		,QA_Records()
 		,RoxieKeyBuild.updateversion('DNBKeys',pversion,_Control.MyInfo.EmailAddressNotify,,'N')
 	) : success(Send_Emails(pversion,,not pIsTesting,pKeyDatasetName).Roxie), failure(send_emails(pversion,,not pIsTesting).buildfailure);

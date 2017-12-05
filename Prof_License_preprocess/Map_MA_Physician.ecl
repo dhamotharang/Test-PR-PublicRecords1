@@ -1,4 +1,4 @@
-import lib_StringLib,Prof_License;
+﻿import lib_StringLib,Prof_License;
 
 EXPORT Map_MA_Physician(string fdate) := module
 
@@ -58,19 +58,19 @@ dMAPhyClean := Sequential(
 outfile := proc_clean_all(dMAPhyout,'MA').cleanout;
 
 export buildprep := Sequential(dMAPhyClean, 
-                  FileServices.StartSuperfiletransaction(),
                                    FileServices.RemoveSuperFile('~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ma'),
 																	   if ( FileServices.FindSuperfilesubname(  '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ma_old') <> 0,      FileServices.RemoveSuperFile(	'~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ma_old')),
 								       if ( FileServices.FileExists( '~thor_data400::in::prolic_ma_old'), FileServices.Deletelogicalfile('~thor_data400::in::prolic_ma_old')),
                        FileServices.RenameLogicalfile( '~thor_data400::in::prolic_ma','~thor_data400::in::prolic_ma_old'),
-										    FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ma_old'),
-										            FileServices.FinishSuperfiletransaction(),
+					
                          
-											output( outfile,,'~thor_data400::in::prolic_ma',overwrite),
+											output( outfile,,'~thor_data400::in::prolic_ma',compressed,overwrite),
                          FileServices.StartSuperfiletransaction(),
 							
 												 
 												 FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources', '~thor_data400::in::prolic_ma'),
+	 										    FileServices.AddSuperfile( '~thor_data400::in::prolic::allsources::old','~thor_data400::in::prolic_ma_old'),
+
 	
 											   FileServices.FinishSuperfiletransaction()
 											 );

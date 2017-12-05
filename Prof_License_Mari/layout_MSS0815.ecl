@@ -1,4 +1,4 @@
-// MSS0815 / Mississippi Real Estate Commission / Multiple Professions //
+﻿// MSS0815 / Mississippi Real Estate Commission / Multiple Professions //
 EXPORT layout_MSS0815 := MODULE
 //mab electronic list_lexisnexis
 	EXPORT apr := RECORD
@@ -7,8 +7,9 @@ EXPORT layout_MSS0815 := MODULE
 		STRING20		LIC_NBR;
 		STRING150		NAME_FULL;
 		// STRING30		FIRST_LIC_DATE;		
-		STRING10    RENEW_DATE;  	//NEW
-		STRING10		EXP_DATE;   	//NEXT RENEW DATE		
+		// STRING10    RENEW_DATE;  	//NEW
+		STRING10		EXP_DATE;   	//NEXT RENEW DATE	
+		STRING30		FIRST_LIC_DATE;
 		STRING30		LIC_STATUS;
 		STRING100		ADDRESS1;
 		STRING100		ADDRESS2;
@@ -21,13 +22,13 @@ EXPORT layout_MSS0815 := MODULE
 		STRING10    PHONE_2_TYPE;		
 		STRING30    FAX;
 		STRING50    EMAIL;
-		// STRING50 	COUNTY;    
+		STRING50 	COUNTY;    
 		// STRING50   DBA;					// NOT POPULATED
     // STRING30   PHONE_3; 			// TOLL FREE PHONE-- NOT POPULATED
 		// STRING50		DEPARTMENT;
-		// STRING50		NAME_FIRST;
-		// STRING50		NAME_MID;
-		// STRING50		NAME_LAST;
+		STRING50		NAME_FIRST;
+		STRING50		NAME_MID;
+		STRING50		NAME_LAST;
 	END;
 	
 // mrec_electronic_list_lexisnexis.csv

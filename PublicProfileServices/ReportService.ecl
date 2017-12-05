@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ReportService">
 	<part name="PublicProfileReportRequest" type="tns:XmlDataSet" cols="80" rows="40" />
 </message>
@@ -65,6 +65,8 @@ IMPORT iesp,address,ut,PersonReports,AutoStandardI;
 EXPORT ReportService := MACRO
 	#CONSTANT('IncludeMinors',TRUE);
 	#CONSTANT('IncludeNonDMVSources',TRUE);
+  // v-- Added for RQ-13563 to purposely force off the use of FDN keys
+  #CONSTANT('IncludeFraudDefenseNetwork',FALSE);
 
 	// get XML input 
 	rec_in := iesp.public_profile_report.t_PublicProfileReportRequest;

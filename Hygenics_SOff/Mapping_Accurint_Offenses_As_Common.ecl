@@ -1,4 +1,4 @@
-import sexoffender;
+﻿import sexoffender;
 
 df := File_Accurint_In; 
 
@@ -756,6 +756,7 @@ o2 defCategory(o2 l):= transform
             'LISTED AS A TIER 3 IN PENNSYLVANIA|'+
 
             'DESIGNATED A TIER LEVEL 3 BY NV|'+
+						'DESIGNATED TIER III IN MISSISSIPPI|'+
              'DESIGNATED A TIER LEVEL 3 IN NV'
 
 						,
@@ -3122,6 +3123,8 @@ o2 defCategory(o2 l):= transform
 						'RSA 632-A:2|'+	
 						'18 USC 2252A\\(A\\)\\(2\\) AND 18:2256\\(A\\)\\(2\\)&AMP;\\(8\\)\\(A\\)|'+	
 						'RSA 632-A:2|'+	
+						'DUI - IMPAIRMENT|'+
+						'UCMJ ART 134|'+
 
 
 						
