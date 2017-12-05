@@ -379,8 +379,9 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 		
 		slim_InAsso	:= project(InAsso, temp_InAsso_rec);
 		
-		sort_prep6		:= sort(distribute(prep6, hash(group_key, addr_key)), group_key, addr_key, local);
-		sort_InAsso	:= dedup(sort(distribute(slim_InAsso, hash(group_key, addr_key)), group_key, addr_key, -dt_vendor_last_reported, local), group_key, addr_key, local):independent;
+		sort_prep6		:= sort(distribute(prep6, hash(group_key)), group_key, local);
+		dedup_InAsso	:= dedup(sort(distribute(slim_InAsso, hash(group_key, addr_key)), group_key, addr_key, -dt_vendor_last_reported, local), group_key, addr_key, local):independent;
+		sort_InAsso	:= sort(distribute(dedup_InAsso, hash(group_key)), group_key, -dt_vendor_last_reported, local):independent;
 		
 		OutLayout tr3(sort_prep6 l, sort_InAsso r) := transform
 			self.lnpid															:=	if(l.group_key = r.group_key, r.lnpid, l.lnpid);
@@ -475,7 +476,7 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 		// prep7:=join(distribute(prep6,hash(group_key)), dedup(sort(distribute(InAsso,hash(group_key)),group_key,-dt_vendor_last_reported,local),group_key,local)
 		prep7:=join(sort_prep6, sort_InAsso
 							,left.group_key=right.group_key
-							and left.addr_key=right.addr_key
+							// and left.addr_key=right.addr_key
 							,tr3(left,right)
 							,left outer
 							,local
@@ -1356,9 +1357,9 @@ EXPORT As_Ingenix (STRING filedate, boolean pUseProd = true) := MODULE
 												
 		Outlayout t_rollup (sort_inIndi L, sort_InIndi R) := transform
 			SELF.dt_first_seen            := (STRING)ut.EarliestDate ((INTEGER)L.dt_first_seen, (INTEGER)R.dt_first_seen);
-			SELF.dt_last_seen             := (STRING)ut.LatestDate   ((INTEGER)L.dt_last_seen, 	(INTEGER)R.dt_last_seen);
+			SELF.dt_last_seen             := (STRING)max((INTEGER)L.dt_last_seen, 	(INTEGER)R.dt_last_seen);
 			SELF.dt_vendor_first_reported := (STRING)ut.EarliestDate((INTEGER)L.dt_vendor_first_reported, (INTEGER)R.dt_vendor_first_reported);
-			SELF.dt_vendor_last_reported  := (STRING)ut.LatestDate  ((INTEGER)L.dt_vendor_last_reported,  (INTEGER)R.dt_vendor_last_reported);
+			SELF.dt_vendor_last_reported  := (STRING)max((INTEGER)L.dt_vendor_last_reported,  (INTEGER)R.dt_vendor_last_reported);
 			SELF						 							:= L;
 		END;
 
