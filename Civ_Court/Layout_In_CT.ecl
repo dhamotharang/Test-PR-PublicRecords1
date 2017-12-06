@@ -1,4 +1,4 @@
-Export Layout_In_CT := Module
+﻿Export Layout_In_CT := Module
 Export	Lay_SCRAM	:= Record // lookup
 		Unsigned1	SCRAMID;
 		String1	SCRAMCode;
@@ -215,7 +215,35 @@ Export	Lay_eSelfRepAppearance	:= Record
 		String19	CreatedDate;
 		Integer8	AuditID;
 		String19	ModifiedDate;
-End;					
+End;
+			
+// Export	Lay_KeyPointDates	:= Record
+		// Integer4	CaseRefNum;
+		// String19	WritEntryDate;
+		// String19	TrialListClaimDate;
+		// String19	VerdictTrialCompleteDate;
+		// String19	InitDispositionDate;
+		// String19	AppealAppellateDate;
+		// String19	AppealSupremeCourtDate;
+		// String19	DispOfAppealDate;
+		// String19	ReturnDate;
+		// String19	FileDate;
+		// String19	LastActionDate;
+		// String19	DispositionDate;
+		// String19	ContinuanceDate;
+		// String19	AssignedDate;
+		// String19	ReferralDate;
+		// String19	MarkingDate;
+		// String19	FinancialDisputesModifiedDate;
+		// String19	ChildrenDisputesModifiedDate;
+		// String19	HighConflictDisputesModifiedDate;
+		// String19	HighConflictDisputesRFTDModifiedDate;
+		// String19	DVIssuesModifiedDate;
+		// String19	CreatedDate;
+		// String19	ModifiedDate;
+		// Integer8	AuditID;
+// End;
+
 Export	Lay_KeyPointDates	:= Record
 		Integer4	CaseRefNum;
 		String19	WritEntryDate;
@@ -241,7 +269,59 @@ Export	Lay_KeyPointDates	:= Record
 		String19	CreatedDate;
 		// String19	ModifiedDate;
 		Integer8	AuditID;
-End;					
+		String19 AnswerDate;
+End;
+					
+// Export	Lay_JUDCase	:= Record
+		// Integer4	CaseRefNum;
+		// String10	LocCode;
+		// String10	CaseCat;
+		// String10	CaseYY;
+		// String50	CaseNo;
+		// String10	CaseSuffix;
+		// String15	OrigFullDocket;
+		// Integer4 	TransferStatus;
+		// String10	CTMajorCd;
+		// String10	CTMinorCd;
+		// String19	PayDate;
+		// Unsigned1	Void;
+		// Integer4	MonRefNum;
+		// String10	WaiverTyCd;
+		// String50	PlaintCapName;
+		// String10	PlaintETAL;
+		// String50	DefnCapName;
+		// String10	DefnETAL;
+		// String10	CaptionTy;
+		// String8	FilingFeeAmt;
+		// String8	WaiverFeeAmt;
+		// String50	FinancialNotes;
+		// String50	CaptionNotes;
+		// Unsigned1	CaseSealedFlag;
+		// String19	CreatedDate;
+		// String50	VoidedBy;
+		// String1	PrefixSuffixType;
+		// String3	PrefixSuffixCode;
+		// Integer4	DocRuleID;
+		// Integer4	InitTransID;
+		// Integer8	AuditID;
+		// Integer2	Paperless  := 0;
+		// Integer2	RetentionIndicatorID;
+		// Integer2	ListTypeID  := 0;
+		// String2	PrivilegedCode;
+		// String1	ChildCode;
+		// Unsigned2	MarkingCodeID;
+		// String19	ModifiedDate;
+		// String50	DispositionDockLegCode;
+		// String20	DispositionJurisNo;
+		// String20	ReferralJudgeJurisNo;
+		// String500	TrialListPrivilegeCorrection_Notes;
+		// Unsigned1	FinancialDisputes  := 0;
+		// Unsigned1	ChildrenDisputes  := 0;
+		// Unsigned1	HighConflictDisputes  := 0;
+		// Unsigned1	HighConflictdisputesRFTD  := 0;
+		// Unsigned1	DVIssues  := 0;
+// End;
+
 Export	Lay_JUDCase	:= Record
 		Integer4	CaseRefNum;
 		String10	LocCode;
@@ -289,8 +369,18 @@ Export	Lay_JUDCase	:= Record
 		Unsigned1	ChildrenDisputes  := 0;
 		Unsigned1	HighConflictDisputes  := 0;
 		Unsigned1	HighConflictdisputesRFTD  := 0;
-		Unsigned1	DVIssues  := 0;
-End;					
+		//Unsigned1	DVIssues  := 0;
+		Unsigned1	JurySelection  := 0;
+		Unsigned1	JuvenileCase  := 0;
+		String15	ForeCourtNo;
+		String8	ClaimedAmt;
+		Unsigned1	SMCLegacyInd  := 0;
+		String20	SMCDocketNo;
+														
+		// string1	A;
+		// string1	B;
+End;	
+			
 Export	Lay_eAttyAppearance	:= Record
 		Integer4	AttyAppearanceID;
 		Integer4	CaseRefNum;
