@@ -37,6 +37,11 @@ layout_cleaned := record
 end; 
 
 layout_cleaned trfInspectionMapped(Layouts_input.Inspection L) := TRANSFORM
+  //Jira--DF-20163:Excluding numerals & "-" from estab_names !!  
+	//Pass1: Eliminating WA (plus digits) preceding the business name ex:WA317940156 - HOLADAY PARKS IN
+	//Pass2: Eliminating 5 digits or more preceding the business name  //95497 - D - E CONSTRUCTION INC
+	Pass1   								 								:=  regexreplace('^WA[0-9]{5,}\\x20+\\x2D+\\x20',ut.CleanSpacesAndUpper(l.estab_name),'');
+	Pass2   															  :=  regexreplace('^[0-9]{5,}\\x20+\\x2D+\\x20',Pass1,'');
   string182 cleanaddress 									:=  Address.CleanAddress182(l.Site_Address, l.site_city + ', ' + l.Site_State + ' ' + INTFORMAT((INTEGER)l.Site_Zip,5,1));
 	self.dt_first_seen 											:=  (unsigned4)process_date;
 	self.dt_last_seen  											:=  (unsigned4)process_date;
@@ -47,11 +52,9 @@ layout_cleaned trfInspectionMapped(Layouts_input.Inspection L) := TRANSFORM
 	self.area_code													:=	l.reporting_id[3..5];
 	self.office_code												:=	l.reporting_id[6..7];	
 	self.fed_state_flag											:=	l.state_flag;
-	/*Jira--DF-20163:Excluding numerals & "-" from estab_names !!  
-		ex: From this '317593358 - ADVANTAGE PRECAST INC' only "ADVANTAGE PRECAST INC" will be mapped to inspected_site_name field */
-	self.inspected_site_name								:=	map(regexreplace('[0-9]',ut.CleanSpacesAndUpper(l.estab_name[1..10]),'')='' and regexFind('\\x2D',l.estab_name[11]) => ut.CleanSpacesAndUpper(l.estab_name[12..]),  //Hex value for "-"  is '\\x2D'; 
-																									ut.CleanSpacesAndUpper(l.estab_name)
-																									);
+	//(Eliminating any number lower than 5 digits not part of this fix -per Rosemary that we will be eliminating too many legitimate business names if we correct fewer than 5 digits!!!)
+  //making sure digits** preceding name are not less than 5 digits & also making sure all those are only numeric numbers !!
+	self.Inspected_Site_Name								:=  Pass2;
 	self.inspected_site_street							:=	ut.CleanSpacesAndUpper(l.site_address);
 	self.inspected_site_state								:=	ut.CleanSpacesAndUpper(l.site_state);
 	self.inspected_site_zip									:=	(integer)l.site_zip;
@@ -81,7 +84,7 @@ layout_cleaned trfInspectionMapped(Layouts_input.Inspection L) := TRANSFORM
 	self.Own_Type_Desc                			:= 	OSHAIR.lookup_OSHAIR_Mini.Owner_Type_lookup(L.Owner_Type);
 	self.Insp_Type_Desc               			:= 	OSHAIR.lookup_OSHAIR_Mini.Inspection_Type_lookup(L.Insp_Type);
 	self.Insp_Scope_Desc              			:= 	OSHAIR.lookup_OSHAIR_Mini.Inspection_Scope_lookup(L.Insp_Scope);
-	self.cname                        			:= 	ut.CleanSpacesAndUpper(l.estab_name);
+	self.cname                        			:= 	Pass2;
 	self.SIC_Code                     			:= 	(integer)l.SIC_Code;
   self.prim_range                   			:= 	cleanaddress[1..10];
 	self.predir 	                   				:= 	cleanaddress[11..12];
@@ -126,7 +129,6 @@ BaseWithSource		:=	project(OSHAIR.Files().base.Inspection.qa,
 																				self := left;));
 
 InspectionAll			:=	InspectionMapped + BaseWithSource;
-
 BDID_Matchset 		:= 	['A'];
 
 Business_Header_SS.MAC_Add_BDID_Flex(InspectionAll       		  // Input Dataset

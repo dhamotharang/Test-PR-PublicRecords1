@@ -123,3 +123,4 @@
       IF (rec.org_flag_match_code not in no_match, 'ORG_FLAG,', '') + 
       IF (rec.ult_flag_match_code not in no_match, 'ULT_FLAG,', '')   ;
 end;
+

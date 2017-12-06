@@ -992,3 +992,4 @@ Layout_Chubbies := RECORD,MAXLENGTH(63000)
 END;
 EXPORT Chubbies := TABLE(t,Layout_Chubbies);
 END;
+

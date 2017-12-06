@@ -25,7 +25,7 @@ deletes 		:= STD.File.RemoteDirectory(Spray.ip, Spray.path,'DPINS');
 deceased  	:= STD.File.RemoteDirectory(Spray.ip, Spray.path,'DEC');
 loads  			:= STD.File.RemoteDirectory(Spray.ip, Spray.path,'D*LEXNEX*EXP*FCRA.dat');
 
-DEL_EXT_FILE := nothor(apply(updates + deletes + deceased + loads, STD.File.DeleteExternalFile(Spray.ip, Spray.path + name)));
+DEL_EXT_FILE := nothor(apply(updates + deletes + deceased + loads, STD.File.DeleteExternalFile(Spray.ip, Spray.path + '/' + name)));
 
 built := sequential(
 					spray_it

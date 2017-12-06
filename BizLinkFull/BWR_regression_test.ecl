@@ -60,3 +60,4 @@ dRadiusCheck:=DATASET([{'Lower-radius results all in higher-radius ones',bRadius
 //---------------------------------------------------------------------------
 dResults:=dMaxResults+dLeadThresholdWorks+dNoMemoryErrors+dStateRestricted+dVeryLargeResults+dPlural+dRadiusCheck;
 dResults;
+

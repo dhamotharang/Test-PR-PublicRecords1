@@ -43,7 +43,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Risk_Indicators.Key_Inquiry_Table_DID
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(inquiry_Acclogs.Key_Inquiry_industry_use_vertical(),'~thor_data400::key::inquiry_table::industry_use_vertical','~thor_data400::key::inquiry_table::'+rundate+'::industry_use_vertical',bk_industry_veritcal);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(inquiry_Acclogs.key_lookup_function_desc,'~thor_data400::key::inquiry_table::lookup_function_desc','~thor_data400::key::inquiry_table::'+rundate+'::lookup_function_desc',bk_function_desc);
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(Inquiry_AccLogs.Key_Inquiry_FEIN_Update,'~thor_data400::key::inquiry_table::@version@::fein_update','~thor_data400::key::inquiry::'+rundate+'::fein_Update',bk_feinu);
-RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(inquiry_Acclogs.Key_Inquiry_industry_use_vertical_login(),'~thor_data400::key::inquiry_table::industry_use_vertical_login','~thor_data400::key::inquiry_table::'+rundate+'::industry_use_vertical_login',bk_industry_veritcal_login);
+RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(inquiry_Acclogs.Key_Inquiry_industry_use_vertical_login(),'~thor_data400::key::inquiry_table::industry_use_vertical_login','~thor_data400::key::inquiry_table::'+rundate+'::industry_use_vertical_login',bk_industry_vertical_login);
 ////////////////////////////////// MOVE KEYS to BUILT
 
 /* // Updates Only */
@@ -84,7 +84,7 @@ processedFiles := nothor(workunitservices.WorkunitFilesRead(workunit)) +
 
 BuildKeys := 
 					sequential(
-					 parallel(bk_addru, bk_trans,bk_didu, bk_phoneu, bk_ssnu, bk_emailu, bk_nameu, bk_IPaddru, bk_LinkIdsu, bk_did_old,bk_industry_veritcal,bk_function_desc,bk_feinu,bk_industry_veritcal_login);
+					 parallel(bk_addru, bk_trans,bk_didu, bk_phoneu, bk_ssnu, bk_emailu, bk_nameu, bk_IPaddru, bk_LinkIdsu, bk_did_old,bk_industry_veritcal,bk_function_desc,bk_feinu,bk_industry_vertical_login);
 					 parallel(mv_addru, mv_transu, mv_didu, mv_phoneu, mv_ssnu, mv_emailu, mv_nameu, mv_IPaddru, mv_LinkIdsu, mv_didold,mv_industry_vertical,mv_function_desc,mv_feinu,mv_industry_vertical_login);
 					 parallel(mv2qa_addru,mv2qa_transu, mv2qa_didu, mv2qa_phoneu, mv2qa_ssnu, mv2qa_emailu,mv2qa_nameu, mv2qa_IPaddru, mv2qa_LinkIdsu, mv2qa_didold,mv2qa_industry_vertical,mv2qa_function_desc,mv2qa_feinu,mv2qa_industry_vertical_login);			 
 					 RoxieKeybuild.updateversion('InquiryTableUpdateKeys',rundate,'john.freibaum@lexisnexisrisk.com, Fernando.Incarnacao@lexisnexisrisk.com, Sudhir.Kasavajjala@lexisnexisrisk.com, Darren.Knowles@lexisnexisrisk.com',,'N'),

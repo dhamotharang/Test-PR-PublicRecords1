@@ -48,7 +48,7 @@ IMPORT lib_ziplib;
 IMPORT lib_stringlib;
 IMPORT RiskWise;
 THISMODULE:=BizLinkFull;
-//?
+//�
   UNSIGNED e_proxid := 0 : STORED('proxid',FORMAT(SEQUENCE(1)));
   SALT33.StrType Input_company_name := '' : STORED('company_name',FORMAT(SEQUENCE(2)));
   SALT33.StrType Input_prim_range := '' : STORED('prim_range',FORMAT(FIELDWIDTH(10),SEQUENCE(3)));
@@ -80,11 +80,11 @@ THISMODULE:=BizLinkFull;
   SALT33.StrType Input_empid := '' : STORED('empid',FORMAT(FEW,SEQUENCE(31)));
   UNSIGNED e_powid := 0 : STORED('powid',FORMAT(SEQUENCE(32)));
   SALT33.StrType Input_isContact := '' : STORED('isContact',FORMAT(SEQUENCE(33)));
-  UNSIGNED Input_UniqueID := 0 : STORED('UniqueID',FORMAT(SEQUENCE(34)));
+  UNSIGNED Input_UniqueID := 1 : STORED('UniqueID',FORMAT(SEQUENCE(34)));
   UNSIGNED InputMaxIds0 := 0 : STORED('MaxIds',FORMAT(SEQUENCE(35)));
   BOOLEAN FullMatch := FALSE : STORED('MatchAllInOneRecord',FORMAT(SEQUENCE(36)));
   BOOLEAN RecordsOnly := FALSE: STORED('RecordsOnly',FORMAT(SEQUENCE(37)));
-//?
+//�
   UNSIGNED e_seleid := 0 : STORED('seleid',FORMAT(SEQUENCE(38)));
   UNSIGNED e_orgid := 0 : STORED('orgid',FORMAT(SEQUENCE(39)));
   UNSIGNED e_ultid := 0 : STORED('ultid',FORMAT(SEQUENCE(40)));
@@ -134,7 +134,7 @@ sFNamePreferred:=THISMODULE.fn_PreferredName(Input_fname);
 //---------------------------------------------------------------------------
 sSortFlag:=IF(bHSort,'T','_');
 Template := dataset([],THISMODULE.Process_Biz_Layouts.InputLayout);
-//?
+//�
 Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,Input_LeadThreshold,TRUE,FALSE
   ,(TYPEOF(Template.parent_proxid))Input_parent_proxid
   ,(TYPEOF(Template.sele_proxid))Input_sele_proxid
@@ -146,7 +146,7 @@ Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,I
   ,(TYPEOF(Template.source_record_id))Input_source_record_id
   ,(TYPEOF(Template.source_docid))Input_source_docid
   ,(TYPEOF(Template.company_name))THISMODULE.Fields.Make_company_name((SALT33.StrType)Input_company_name)
-  ,(TYPEOF(Template.company_name_prefix))THISMODULE.Fields.Make_company_name_prefix((SALT33.StrType)dCnpName[1].cnp_name[..5])
+  ,(TYPEOF(Template.company_name_prefix))THISMODULE.Fields.Make_company_name_prefix((SALT33.StrType)BizLinkFull.fn_company_name_prefix(dCnpName[1].cnp_name))
   ,(TYPEOF(Template.cnp_name))THISMODULE.Fields.Make_cnp_name((SALT33.StrType)dCnpName[1].cnp_name)
   ,(TYPEOF(Template.cnp_number))dCnpName[1].cnp_number
   ,(TYPEOF(Template.cnp_btype))dCnpName[1].cnp_btype
@@ -183,7 +183,8 @@ Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,I
   ,(TYPEOF(Template.CONTACTNAME))(THISMODULE.Fields.Make_fname((SALT33.StrType)Input_fname)+' '+THISMODULE.Fields.Make_mname((SALT33.StrType)Input_mname)+' '+THISMODULE.Fields.Make_lname((SALT33.StrType)Input_lname))
   ,(TYPEOF(Template.STREETADDRESS))(TRIM(Input_prim_range)+' '+THISMODULE.Fields.Make_prim_name((SALT33.StrType)Input_prim_name)+' '+THISMODULE.Fields.Make_sec_range((SALT33.StrType)Input_sec_range))
   ,RecordsOnly,FullMatch,e_rcid,e_proxid,e_seleid,e_orgid,e_ultid,e_powid}],THISMODULE.Process_Biz_Layouts.InputLayout);
-//?
+//�
+
 dRawResultsNormed:=NORMALIZE(THISMODULE.MEOW_Biz(Input_Data).raw_results,LEFT.Results,TRANSFORM({LEFT.uniqueid;RECORDOF(RIGHT);},SELF:=LEFT;SELF:=RIGHT;));
 lMatches:={STRING field;STRING input_value;STRING match_value;INTEGER2 weight;INTEGER1 match_code;};
 dProxidMatches:=PROJECT(dRawResultsNormed,TRANSFORM({LEFT.uniqueid;STRING proxid__html;LEFT.weight;LEFT.score;DATASET(lMatches) matches;},
@@ -236,6 +237,7 @@ dProxidMatches:=PROJECT(dRawResultsNormed,TRANSFORM({LEFT.uniqueid;STRING proxid
   SELF.proxid__html:=BIPV2.Hyperlink().BIPHeader(LEFT.proxid);
   SELF:=LEFT;
 ));
+
 dSeleProxids:=THISMODULE.Process_Biz_Layouts.KeyproxidUp(ultid=e_seleid AND orgid=e_seleid AND seleid=e_seleid);
 dLinkIDs:=BIPV2_Best.Key_LinkIds.kfetch(
   inputs:=DEDUP(PROJECT(dSeleProxids,BIPV2.IDlayouts.l_xlink_ids),ALL),
@@ -262,6 +264,8 @@ dSlimmed:=PROJECT(dLinkIDs,TRANSFORM(lSlimmed,
   SELF.naics_codes:=PROJECT(LEFT.naics_code,TRANSFORM(RECORDOF(lSlimmed.naics_codes),SELF.naics_code:=LEFT.company_naics_code1;));
   SELF:=[];
 ));
+
+
 dResults:=THISMODULE.MEOW_Biz(Input_Data).Data_;
 dProxids:=SORT(TABLE(dResults,{proxid;weight;KeysUsed;KeysFailed;UNSIGNED proxid_count:=COUNT(GROUP);},proxid,KeysFailed),-weight,proxid,KeysFailed);
 dNamesAddresses:=TABLE(dResults,{company_name;prim_range;prim_name;city;st;zip;},company_name,prim_range,prim_name,city,st,zip);
@@ -298,3 +302,4 @@ IF(bResearch,
   )
 );
 ENDMACRO;
+
