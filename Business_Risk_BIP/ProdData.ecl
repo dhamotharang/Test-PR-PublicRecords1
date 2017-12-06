@@ -106,6 +106,7 @@
 	<part name="IncludeUCC" type="xsd:boolean"/>
 	<part name="IncludeCorpFilings" type="xsd:boolean"/>
 	<part name="IncludeBankruptcy" type="xsd:boolean"/>
+	<part name="IncludeCortera" type="xsd:boolean"/>
  <part name="IncludeWatchlistSearch" type="xsd:boolean"/>
  <part name="IncludeProfessionalLicense" type="xsd:boolean"/>
 	<part name="IncludeSBFE" type="xsd:boolean"/>
@@ -176,6 +177,7 @@ EXPORT ProdData() := FUNCTION
 	'IncludeBusinessHeader',
 	'IncludeBusReg',
 	'IncludeCorpFilings',
+  'IncludeCortera',
 	'IncludeDCA',
 	'IncludeDEADCO',
 	'IncludeDNBDMI',
@@ -311,6 +313,7 @@ EXPORT ProdData() := FUNCTION
 	BOOLEAN IncludeWatchlist_In := FALSE : STORED('IncludeWatchlistSearch');
 	BOOLEAN IncludeProfLic_In := FALSE : STORED('IncludeProfessionalLicense');
 	BOOLEAN IncludeSBFE_In := FALSE : STORED('IncludeSBFE');
+	BOOLEAN IncludeCortera_In := FALSE : STORED('IncludeCortera');
 	UNSIGNED1 KeepLargeBusinesses_In  := Business_Risk_BIP.Constants.DefaultJoinType : STORED('KeepLargeBusinesses');
 	BOOLEAN OverrideExperianRestriction_In := FALSE : STORED('OverrideExperianRestriction');
 
@@ -430,6 +433,7 @@ EXPORT ProdData() := FUNCTION
 		EXPORT BOOLEAN		IncludeBusinessHeader	:= FALSE;
 		EXPORT BOOLEAN		IncludeBusReg				:= FALSE;
 		EXPORT BOOLEAN		IncludeCorpFilings	:= FALSE;
+    EXPORT BOOLEAN    IncludeCortera      := FALSE;
 		EXPORT BOOLEAN		IncludeDCA					:= FALSE;
 		EXPORT BOOLEAN		IncludeDEADCO				:= FALSE;
 		EXPORT BOOLEAN		IncludeDNBDMI				:= FALSE;
@@ -458,6 +462,7 @@ EXPORT ProdData() := FUNCTION
 		EXPORT BOOLEAN IncludeBusinessHeader := IncludeBusinessHeader_In;
 		EXPORT BOOLEAN IncludeBusReg := IncludeBusReg_In;
 		EXPORT BOOLEAN IncludeCorpFilings := IncludeCorpFilings_In;
+    EXPORT BOOLEAN IncludeCortera := IncludeCortera_In;
 		EXPORT BOOLEAN IncludeDCA := IncludeDCA_In;
 		EXPORT BOOLEAN IncludeDEADCO := IncludeDEADCO_In;
 		EXPORT BOOLEAN IncludeDNBDMI := IncludeDNBDMI_In;
@@ -748,8 +753,8 @@ EXPORT ProdData() := FUNCTION
 	
 	cleanedInputSet := PROJECT(LinkIDsFound, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input));
 	
-	optionsDataset := DATASET([{outputs.OutputRecordCount, outputs.IncludeAll, outputs.IncludeABIUS, outputs.IncludeBankruptcy, outputs.IncludeBBB, outputs.IncludeBusinessHeader, outputs.IncludeBusReg, outputs.IncludeCorpFilings, outputs.IncludeDCA, outputs.IncludeDEADCO, outputs.IncludeDNBDMI, outputs.IncludeEBR, outputs.IncludeFBN, outputs.IncludeInquiriesBus, outputs.IncludeIRS990, outputs.IncludeLiensJudgments, outputs.IncludeLinkingResults, outputs.IncludeOSHA, outputs.IncludePropertyAssessments, outputs.IncludePropertyDeeds, outputs.IncludeSBFE, outputs.IncludeTradelines, outputs.IncludeUCC, outputs.IncludeUtility, linkingOptions.DataRestrictionMask, linkingOptions.ignoreFares, linkingOptions.ignoreFidelity, linkingOptions.AllowAll, linkingOptions.AllowGLB, linkingOptions.AllowDPPA, linkingOptions.DPPAPurpose, linkingOptions.GLBPurpose, linkingOptions.IncludeMinors, linkingOptions.LNBranded}], 
-													 {UNSIGNED4 OutputRecordCount, BOOLEAN IncludeAll, BOOLEAN IncludeABIUS, BOOLEAN IncludeBankruptcy, BOOLEAN IncludeBBB, BOOLEAN IncludeBusinessHeader, BOOLEAN IncludeBusReg, BOOLEAN IncludeCorpFilings, BOOLEAN IncludeDCA, BOOLEAN IncludeDEADCO, BOOLEAN IncludeDNBDMI, BOOLEAN IncludeEBR, BOOLEAN IncludeFBN, BOOLEAN IncludeInquiriesBus, BOOLEAN IncludeIRS990, BOOLEAN IncludeLiensJudgments, BOOLEAN IncludeLinkingResults, BOOLEAN IncludeOSHA, BOOLEAN IncludePropertyAssessments, BOOLEAN IncludePropertyDeeds, BOOLEAN IncludeSBFE, BOOLEAN IncludeTradelines, BOOLEAN IncludeUCC, BOOLEAN IncludeUtility, STRING DataRestrictionMask, BOOLEAN ignoreFares, BOOLEAN ignoreFidelity, BOOLEAN AllowAll, BOOLEAN AllowGLB, BOOLEAN AllowDPPA, UNSIGNED1 DPPAPurpose, UNSIGNED1 GLBPurpose, BOOLEAN IncludeMinors, BOOLEAN LNBranded});
+	optionsDataset := DATASET([{outputs.OutputRecordCount, outputs.IncludeAll, outputs.IncludeABIUS, outputs.IncludeBankruptcy, outputs.IncludeBBB, outputs.IncludeBusinessHeader, outputs.IncludeBusReg, outputs.IncludeCorpFilings, outputs.IncludeCortera, outputs.IncludeDCA, outputs.IncludeDEADCO, outputs.IncludeDNBDMI, outputs.IncludeEBR, outputs.IncludeFBN, outputs.IncludeInquiriesBus, outputs.IncludeIRS990, outputs.IncludeLiensJudgments, outputs.IncludeLinkingResults, outputs.IncludeOSHA, outputs.IncludePropertyAssessments, outputs.IncludePropertyDeeds, outputs.IncludeSBFE, outputs.IncludeTradelines, outputs.IncludeUCC, outputs.IncludeUtility, linkingOptions.DataRestrictionMask, linkingOptions.ignoreFares, linkingOptions.ignoreFidelity, linkingOptions.AllowAll, linkingOptions.AllowGLB, linkingOptions.AllowDPPA, linkingOptions.DPPAPurpose, linkingOptions.GLBPurpose, linkingOptions.IncludeMinors, linkingOptions.LNBranded}], 
+													 {UNSIGNED4 OutputRecordCount, BOOLEAN IncludeAll, BOOLEAN IncludeABIUS, BOOLEAN IncludeBankruptcy, BOOLEAN IncludeBBB, BOOLEAN IncludeBusinessHeader, BOOLEAN IncludeBusReg, BOOLEAN IncludeCorpFilings, BOOLEAN IncludeCortera, BOOLEAN IncludeDCA, BOOLEAN IncludeDEADCO, BOOLEAN IncludeDNBDMI, BOOLEAN IncludeEBR, BOOLEAN IncludeFBN, BOOLEAN IncludeInquiriesBus, BOOLEAN IncludeIRS990, BOOLEAN IncludeLiensJudgments, BOOLEAN IncludeLinkingResults, BOOLEAN IncludeOSHA, BOOLEAN IncludePropertyAssessments, BOOLEAN IncludePropertyDeeds, BOOLEAN IncludeSBFE, BOOLEAN IncludeTradelines, BOOLEAN IncludeUCC, BOOLEAN IncludeUtility, STRING DataRestrictionMask, BOOLEAN ignoreFares, BOOLEAN ignoreFidelity, BOOLEAN AllowAll, BOOLEAN AllowGLB, BOOLEAN AllowDPPA, UNSIGNED1 DPPAPurpose, UNSIGNED1 GLBPurpose, BOOLEAN IncludeMinors, BOOLEAN LNBranded});
 	
 	kFetchLinkIDs := Business_Risk_BIP.Common.GetLinkIDs(LinkIDsFound);
 	kFetchLinkSearchLevel := Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel);
@@ -914,6 +919,11 @@ EXPORT ProdData() := FUNCTION
 	// --------------- SBFE data ----------------
 	SBFE := Business_Risk_BIP.PD_SBFE(LinkIDsFound, options, linkingOptions, AllowedSourcesSet).SBFE_data_raw;
 	
+  // --------------- Cortera data ----------------
+  Cortera := Business_Risk_BIP.PD_Cortera(LinkIDsFound, kFetchLinkIDs, kFetchLinkSearchLevel, linkingOptions, options, AllowedSourcesSet);
+  CorteraRecs := Cortera.CorteraRecs;
+  Cortera_Attribute_recs := Cortera.Cortera_Attribute_recs;
+  
 	// Keep all of the outputs at the end so that we can keep them sorted more easily, and so that the function compiles
 	// Inputs/Options - By outputting these two here we are forcing OSS to display the fields on the form in an order that makes sense and that we control
 	OUTPUT(Input, NAMED('Raw_Input'));
@@ -936,6 +946,8 @@ EXPORT ProdData() := FUNCTION
 	IF((outputs.IncludeBBB OR outputs.IncludeAll), OUTPUT(CHOOSEN((BBBNonMember), outputs.OutputRecordCount), NAMED('BBB_Non_Member')));
 	IF((outputs.IncludeBusReg OR outputs.IncludeAll), OUTPUT(CHOOSEN((BusReg), outputs.OutputRecordCount), NAMED('Bus_Reg')));
 	IF((outputs.IncludeCorpFilings OR outputs.IncludeAll), OUTPUT(CHOOSEN((CorpFilings_recs), outputs.OutputRecordCount), NAMED('Corp_Filings')));
+	IF((outputs.IncludeCortera OR outputs.IncludeAll), OUTPUT(CHOOSEN((CorteraRecs), outputs.OutputRecordCount), NAMED('Cortera_Header')));
+	IF((outputs.IncludeCortera OR outputs.IncludeAll), OUTPUT(CHOOSEN((Cortera_Attribute_recs), outputs.OutputRecordCount), NAMED('Cortera_Attributes')));
 	IF((outputs.IncludeDCA OR outputs.IncludeAll), OUTPUT(CHOOSEN((DCA), outputs.OutputRecordCount), NAMED('DCA')));
 	IF((outputs.IncludeDEADCO OR outputs.IncludeAll), OUTPUT(CHOOSEN((DEADCO), outputs.OutputRecordCount), NAMED('DEADCO')));
 	IF((outputs.IncludeDNBDMI OR outputs.IncludeAll), OUTPUT(CHOOSEN((DNBDMI), outputs.OutputRecordCount), NAMED('DNB_DMI')));

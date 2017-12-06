@@ -1,4 +1,4 @@
-/*2016-05-21T00:42:10Z (Kevin Huls)
+﻿/*2016-05-21T00:42:10Z (Kevin Huls)
 Automated reinstate from 2016-05-19T17:50:17Z
 */
 import models, riskwise, iesp;
@@ -156,5 +156,17 @@ RECORD, MAXLENGTH(24100)
 	STRING65 StreetAddress1;	//cleaned address 1
 	STRING65 StreetAddress2;  //cleaned address 2
 	STRING20 CountyName;	
+	
+			unsigned2	royalty_type_code_targus;
+		string20 		royalty_type_targus; 			
+   	unsigned2 	royalty_count_targus; 			 
+   	unsigned2 	non_royalty_count_targus;  
+		string20 		count_entity_targus := ''; 
+		
+		unsigned2	royalty_type_code_insurance; 	
+		string20 		royalty_type_insurance; 			
+   	unsigned2 	royalty_count_insurance; 			
+   	unsigned2 	non_royalty_count_insurance;  
+		string20 		count_entity_insurance := ''; 
 
 END;

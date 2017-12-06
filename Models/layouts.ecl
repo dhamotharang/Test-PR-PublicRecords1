@@ -1,4 +1,4 @@
-import risk_indicators, iesp;
+﻿import risk_indicators, iesp;
 
 export layouts := module
 
@@ -58,6 +58,90 @@ EXPORT Layout_HealthCare_Attributes := RECORD
 	DECIMAL8_2	CensusAveHHSize;
 	UNSIGNED3 	EstimatedHHIncome;
 END;
+
+export Layout_CDM_Batch_In := RECORD
+	unsigned4	seq;
+	STRING30  AcctNo;
+  STRING12 	ADL;
+	STRING3 	ADLScore;
+	STRING30  Name_First;
+	STRING30  Name_Middle;
+	STRING30  Name_Last;
+	STRING5   Name_Suffix;
+	STRING120 unParsedFullName :='';
+	STRING120 Name_Company :='';
+	STRING9   SSN;
+	STRING65 	street_addr := '';
+	STRING65 	street_addr_2 := '';
+	STRING25  p_City_name;
+	STRING2   St;
+	STRING9   Zip;
+	STRING8   DOB;
+	STRING10  Service_Request;
+	STRING2   Record_Type;
+	STRING10  Phone_1;
+	STRING10  Phone_2;
+	STRING10  Phone_3;
+	STRING10  Phone_4;
+	STRING10  Phone_5;
+	unsigned3 HistorydateYYYYMM;
+END;
+
+export Layout_CDM_Batch_Out := record
+  string30 	AcctNo;
+	unsigned4 seq;
+	
+	// ssn
+	string2	  IDVerSSNCreditBureauCount;
+	string4   IDVerSSNCreditBureauMonthsSeen;
+	string3 	IDVerSSNGovernmentCount;
+	string4   IDVerSSNGovernmentMonthsSeen;
+	string2		IDVerSSNDriversLicense;
+	string4		IDVerSSNDriversLicenseMonthsSeen;
+	string3		IDVerSSNBehavioralCount;
+	string4		IDVerSSNBehavioralMonthsSeen;
+	
+	// addr
+	string2		IDVerAddrMatchesCurrent;
+	string2		IDVerAddrCreditBureauCount;
+	string4		IDVerAddrCreditBureauMonthsSeen;
+	string3		IDVerAddrGovernmentCount;
+	string4		IDVerAddrGovernmentMonthsSeen;
+	string2		IDVerAddrDriversLicense;
+	string4		IDVerAddrDriversLicenseMonthsSeen;
+	string2		IDVerAddrVoterRegistration;
+	string4		IDVerAddrVoterRegMonthsSeen;
+	string2		IDVerAddrVehicleRegistration;
+	string4		IDVerAddrVehicleRegMonthsSeen;
+	string2		IDVerAddrProperty;
+	string4		IDVerAddrPropertyMonthsSeen;
+	string3		IDVerAddrBehavioralCount;
+	string4		IDVerAddrBehavioralMonthsSeen;
+	
+	// dob
+	string2		IDVerDOBCreditBureauCount;
+	string4		IDVerDOBCreditBureauMonthsSeen;
+	string3		IDVerDOBGovernmentCount;
+	string4		IDVerDOBGovernmentMonthsSeen;
+	string2		IDVerDOBDriversLicense;
+	string4		IDVerDOBDriversLicenseMonthsSeen;
+	string2		IDVerDOBVoterRegistration;
+	string4		IDVerDOBVoterRegMonthsSeen;
+	string2		IDVerDOBVehicleRegistration;
+	string4		IDVerDOBVehicleRegMonthsSeen;
+	string3		IDVerDOBBehavioralCount;
+	string4		IDVerDOBBehavioralMonthsSeen;
+	
+	// firstname
+	string2		IDVerFirstNameCreditBureauCount;
+	string4   IDVerFirstNameCreditBureauMonthsSeen;
+	string3		IDVerFirstNameGovernmentCount;
+	string4   IDVerFirstNameGovernmentMonthsSeen;
+	string3 	IDVerFirstNameBehavioralCount;
+	string4		IDVerFirstNameBehavioralMonthsSeen;
+	
+end;
+
 
 export Layout_LeadIntegrity_Batch_In := RECORD
 	unsigned4	seq;

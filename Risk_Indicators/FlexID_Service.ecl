@@ -187,10 +187,11 @@ export FlexID_Service := MACRO
 	string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
 	
 	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Risk_Indicators__InstantID);
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Risk_Indicators__InstantID);
 /* ************* End Scout Fields **************/
 
 	#stored ('AccountNumber',search_by.Seq);
+	boolean Test_Data_Enabled := FALSE   	: stored('TestDataEnabled');
 	
 	string28 streetName := search_by.address.StreetName;
 	#stored ('PrimName', streetName);
@@ -315,6 +316,26 @@ export FlexID_Service := MACRO
 	// make call to instantID
 	iid := Risk_Indicators.InstantID_records;
 	
+	targus := Project(iid, transform(Royalty.Layouts.Royalty,
+									self.royalty_type_code := left.royalty_type_code_targus,
+                  self.royalty_type := left.royalty_type_targus,	
+									self.royalty_count := left.royalty_count_targus,
+									self.non_royalty_count := left.non_royalty_count_targus,
+									self.count_entity := left.count_entity_targus,
+									self := left));
+									
+	insurance := Project(iid, transform(Royalty.Layouts.Royalty,
+                  self.royalty_type_code := left.royalty_type_code_insurance,
+                  self.royalty_type := left.royalty_type_insurance,
+                  self.royalty_count := left.royalty_count_insurance,
+                  self.non_royalty_count := left.non_royalty_count_insurance,
+                  self.count_entity := left.count_entity_insurance,
+									self := left));
+
+royalties4ustemp := if(test_data_enabled, DATASET([], Royalty.Layouts.Royalty), 
+	targus + insurance);
+	
+royalties4us := royalties4ustemp(royalty_type_code != 0);
 	
 	iesp.flexid.t_FlexIDResponse intoOut(iid le, iesp.flexid.t_FlexIdRequest ri) := TRANSFORM
 		
@@ -462,7 +483,8 @@ export FlexID_Service := MACRO
    																												 self.i_zip := zip5,
    																												 self.i_dl := search_by.DriverLicenseNumber,
    																												 self.i_dl_state := search_by.DriverLicenseState,
-																													 self.i_model_name_1 := Custommodelname,
+																													 self.i_model_name_1 := 'CVI',
+																													 self.i_model_name_2 := Custommodelname,
    																												 self.o_score_1 := (Integer)left.cvi,
    																												 self.o_reason_1_1 := left.ri[1].hri,
    																												 self.o_reason_1_2 := left.ri[2].hri,
@@ -486,7 +508,7 @@ export FlexID_Service := MACRO
 	
 	IF(~(DisableOutcomeTracking or user.OutcomeTrackingOptOut), OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 	
-	dRoyalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Royalties');
+	dRoyalties := royalties4us;
 	output(dRoyalties, named('RoyaltySet'));
 
 ENDMACRO;

@@ -238,6 +238,7 @@ export Master := dataset(
       {'ROYALTY', 'ABMS',                             '682', 'I', '' , 'ABMS distinct LNPID dataset'},
 			{'ROYALTY', 'ACCUITY_BANK_ROUTING',             '690', 'I', '' , 'Accuity Bank Routing Data'},
 			{'ROYALTY', 'CORTERA_REPORT',                   '700', 'G', '' , 'Cortera business info gateway'},
+			{'ROYALTY', 'CORTERA_FILE',                     '701', 'I', '' , 'Cortera inhouse business info'},
 			{'ROYALTY', 'ACCUDATA_DEFAULT',                 '710', 'G', '' , 'Accudata standard request'},
 			{'ROYALTY', 'ACCUDATA_CNAM_CNM2',               '711', 'G', '' , 'Accudata phone number calling name'},
 			{'ROYALTY', 'ACCUDATA_OCN_LNP',                 '712', 'G', '' , 'Accudata local number portability data'}

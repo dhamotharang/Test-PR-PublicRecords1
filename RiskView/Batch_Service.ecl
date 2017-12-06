@@ -1,4 +1,4 @@
-/*2017-06-19T14:44:53Z (mmarshik)
+﻿/*2017-06-19T14:44:53Z (mmarshik)
 C:\Users\marsmi01\AppData\Roaming\HPCC Systems\eclide\mmarshik\DataLand\RiskView\Batch_Service\2017-06-19T14_44_53Z.ecl
 */
 /*--SOAP--
@@ -10,6 +10,7 @@ C:\Users\marsmi01\AppData\Roaming\HPCC Systems\eclide\mmarshik\DataLand\RiskView
 	<part name="Bankcard_model_name" type="xsd:string"/>
 	<part name="Short_term_lending_model_name" type="xsd:string"/>
 	<part name="Telecommunications_model_name" type="xsd:string"/>
+	<part name="Crossindustry_model_name" type="xsd:string"/>
 	<part name="Custom_model_name" type="xsd:string"/>
 	<part name="Custom2_model_name" type="xsd:string"/>
 	<part name="Custom3_model_name" type="xsd:string"/>
@@ -53,6 +54,7 @@ string    Auto_model_name := '' 								: stored('Auto_model_name');
 string    Bankcard_model_name := '' 						: stored('Bankcard_model_name');
 string    Short_term_lending_model_name := '' 	: stored('Short_term_lending_model_name');
 string    Telecommunications_model_name := '' 	: stored('Telecommunications_model_name');
+string    Crossindustry_model_name := '' 	: stored('Crossindustry_model_name');
 string    Custom_model_name := '' 							: stored('Custom_model_name');
 string    Custom2_model_name := '' 							: stored('Custom2_model_name');
 string    Custom3_model_name := '' 							: stored('Custom3_model_name');
@@ -198,7 +200,7 @@ MLA_alone				:= StringLib.StringToLowerCase(custom_model_name) = 'mla1608_0' AND
 									 StringLib.StringToLowerCase(custom4_model_name) = '' AND
 									 StringLib.StringToLowerCase(custom5_model_name) = '' AND
 									 auto_model_name = '' AND bankcard_model_name = '' AND 
-									 Short_term_lending_model_name = '' AND Telecommunications_model_name = '' AND AttributesVersionRequest = '';
+									 Short_term_lending_model_name = '' AND Telecommunications_model_name = '' AND Crossindustry_model_name =''  AND AttributesVersionRequest = '';
 								 
 //error_message := 'Error - Minimum input fields required: First Name, Last Name, Address, and Zip or City and State; LexID only; or First Name, Last Name, and SSN';
 // Brad wants to keep error message stating just first/last name, but also allow user to use unparsedfullname field in place of first/last fields if they want
@@ -222,6 +224,7 @@ search_Results := riskview.Search_Function(valid_inputs,
 	bankcard_model_name, 
 	Short_term_lending_model_name, 
 	Telecommunications_model_name, 
+	Crossindustry_model_name, 
 	Custom_model_name,
 	Custom2_model_name,
 	Custom3_model_name,

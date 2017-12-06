@@ -1,7 +1,4 @@
-/*2016-11-08T00:50:29Z (aleksandar tomovic)
-For Review Jira RQ-13048
-*/
-IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, Risk_Indicators, UT;
+﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, Risk_Indicators, UT;
 
 EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -24,12 +21,32 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// Filter out records after our history date
 	Property := Business_Risk_BIP.Common.FilterRecords(PropertySeq, dt_first_seen, dt_vendor_first_reported, MDR.SourceTools.src_LnPropV2_Fares_Asrs, AllowedSourcesSet);
 	
+	PropertyWithBest := JOIN(DEDUP(SORT(Property, Seq, LN_Fares_ID), Seq, LN_Fares_ID), Shell, LEFT.Seq = RIGHT.Seq,
+															TRANSFORM({RECORDOF(LEFT), BOOLEAN AddrIsBest},
+																	NoScoreValue := 255;
+																	BestAddressPopulated := TRIM(RIGHT.Best_Info.BestPrimName) <> '' AND TRIM(RIGHT.Best_Info.BestCompanyZip) <> '' AND TRIM(LEFT.prim_name) <> '' AND TRIM(LEFT.Zip) <> '';
+																	BestZIPScore						:= IF(RIGHT.Best_Info.BestCompanyZip <> '' AND LEFT.Zip <> '' AND RIGHT.Best_Info.BestCompanyZip[1] = LEFT.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(RIGHT.Best_Info.BestCompanyZip, LEFT.Zip), NoScoreValue);
+																	BestStateMatched				:= StringLib.StringToUpperCase(RIGHT.Best_Info.BestCompanyState) = StringLib.StringToUpperCase(LEFT.st);
+																	BestCityStateScore			:= IF(RIGHT.Best_Info.BestCompanyCity <> '' AND RIGHT.Best_Info.BestCompanyState <> '' AND LEFT.p_city_name <> '' AND LEFT.st <> '' AND BestStateMatched, 
+																													Risk_Indicators.AddrScore.CityState_Score(RIGHT.Best_Info.BestCompanyCity, RIGHT.Best_Info.BestCompanyState, LEFT.p_city_name, LEFT.st, ''), NoScoreValue);
+																	BestCityStateZipMatched	:= BestAddressPopulated AND Risk_Indicators.iid_constants.ga(BestZIPScore) AND Risk_Indicators.iid_constants.ga(BestCityStateScore);
+		
+																	BestAddressScore := MAP(NOT BestAddressPopulated => NoScoreValue,
+																	BestAddressPopulated AND BestZIPScore = NoScoreValue AND BestCityStateScore = NoScoreValue => NoScoreValue,
+																																		Risk_Indicators.AddrScore.AddressScore(RIGHT.Best_Info.BestPrimRange, RIGHT.Best_Info.BestPrimName, RIGHT.Best_Info.BestSecRange, 
+																																		LEFT.prim_range, LEFT.prim_name, LEFT.sec_range,
+																																		BestZIPScore, BestCityStateScore));
+																	BestAddressMatched			:= BestAddressPopulated AND Risk_Indicators.iid_constants.ga(BestAddressScore);
+																	SELF.AddrIsBest := BestAddressMatched;
+																	SELF := LEFT),
+																ATMOST(Business_Risk_BIP.Constants.Limit_Default), KEEP(1), LEFT OUTER);
+
 	
-	PropertyDeeds := JOIN(DEDUP(SORT(Property, Seq, LN_Fares_ID), Seq, LN_Fares_ID), LN_PropertyV2.key_deed_fid(FALSE /*isFCRA*/), KEYED(LEFT.LN_Fares_ID = RIGHT.LN_Fares_ID),
-															TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq}, SELF.Seq := LEFT.Seq; SELF := RIGHT),
+	PropertyDeeds := JOIN(PropertyWithBest, LN_PropertyV2.key_deed_fid(FALSE /*isFCRA*/), KEYED(LEFT.LN_Fares_ID = RIGHT.LN_Fares_ID),
+															TRANSFORM({RECORDOF(RIGHT), UNSIGNED4 Seq, BOOLEAN AddrIsBest}, SELF.Seq := LEFT.Seq; SELF.AddrIsBest := LEFT.AddrIsBest; SELF := RIGHT),
 															ATMOST(Business_Risk_BIP.Constants.Limit_Deeds));
 	
-	PropertyDeedsRep := JOIN(Shell, PropertyDeeds, LEFT.Seq = RIGHT.Seq, TRANSFORM({RECORDOF(RIGHT), INTEGER3 BusExecLinkPropertyOverlapCount, INTEGER3 BusExecLinkPropertyOverlapCount2, INTEGER3 BusExecLinkPropertyOverlapCount3,INTEGER3 BusExecLinkPropertyOverlapCount4, INTEGER3 BusExecLinkPropertyOverlapCount5},
+	PropertyDeedsRep := JOIN(Shell, PropertyDeeds, LEFT.Seq = RIGHT.Seq, TRANSFORM({RECORDOF(RIGHT), INTEGER3 BusExecLinkPropertyOverlapCount, INTEGER3 BusExecLinkPropertyOverlapCount2, INTEGER3 BusExecLinkPropertyOverlapCount3,INTEGER3 BusExecLinkPropertyOverlapCount4, INTEGER3 BusExecLinkPropertyOverlapCount5, INTEGER1 BestOwnership},
 																	// Clean both names associated with the Deed to break it up into First and Last Name
 																	cleanName1 := Address.CleanNameFields(Address.CleanPerson73(RIGHT.name1));
 																	cleanName2 := Address.CleanNameFields(Address.CleanPerson73(RIGHT.name2));
@@ -89,6 +106,8 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																	NameMatch2Rep5 := FirstNameMatch2Rep5 AND LastNameMatch2Rep5;
 																	NameMatchRep5 := NameMatch1Rep5 OR NameMatch2Rep5;
 																	SELF.BusExecLinkPropertyOverlapCount5 := IF(NameMatchRep5, 1, 0);
+																	
+																	SELF.BestOwnership := IF(RIGHT.AddrIsBest, 1, 0);
 																	SELF := RIGHT), ATMOST(Business_Risk_BIP.Constants.Limit_Deeds));
 																	
 																	
@@ -100,7 +119,8 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 MaxBusExecLinkPropertyOverlapCount2 := MAX(GROUP, BusExecLinkPropertyOverlapCount2),
 			 MaxBusExecLinkPropertyOverlapCount3 := MAX(GROUP, BusExecLinkPropertyOverlapCount3),
 			 MaxBusExecLinkPropertyOverlapCount4 := MAX(GROUP, BusExecLinkPropertyOverlapCount4),
-			 MaxBusExecLinkPropertyOverlapCount5 := MAX(GROUP, BusExecLinkPropertyOverlapCount5)},
+			 MaxBusExecLinkPropertyOverlapCount5 := MAX(GROUP, BusExecLinkPropertyOverlapCount5),
+			 MaxBestOwnership := MAX(GROUP, BestOwnership)},
 			 Seq, LN_Fares_ID);
 			 
 	PropertyDeedsRepCounts := ROLLUP(SORT(PropertyDeedsRepStats, Seq), LEFT.Seq = RIGHT.Seq, TRANSFORM(RECORDOF(LEFT),
@@ -109,69 +129,9 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																					SELF.MaxBusExecLinkPropertyOverlapCount3 := LEFT.MaxBusExecLinkPropertyOverlapCount3 + RIGHT.MaxBusExecLinkPropertyOverlapCount3;
 																					SELF.MaxBusExecLinkPropertyOverlapCount4 := LEFT.MaxBusExecLinkPropertyOverlapCount4 + RIGHT.MaxBusExecLinkPropertyOverlapCount4;
 																					SELF.MaxBusExecLinkPropertyOverlapCount5 := LEFT.MaxBusExecLinkPropertyOverlapCount5 + RIGHT.MaxBusExecLinkPropertyOverlapCount5;
-																					
+																					SELF.MaxBestOwnership := MAX(LEFT.MaxBestOwnership, RIGHT.MaxBestOwnership);
 																					SELF := LEFT));
-  // Property data by address
-	KAF := LN_PropertyV2.key_addr_fid(false);
-	KASF := LN_PropertyV2.key_assessor_fid(FALSE /*isFCRA*/);
-	proprec := RECORD
-	  Business_Risk_BIP.Layouts.INPUT ;
-		string12 fares_id;
-		unsigned4 InputAddrLotSize; 
-		unsigned4 InputAddrAssessedTotal; 
-		unsigned4 InputAddrSqFootage;
-	END;
 
-	proprec get_property_by_addr(Shell le, KAF ri) := TRANSFORM
-		SELF.fares_id := ri.ln_fares_id;
-		SELF := le.CLEAN_INPUT;
-		SELF := [];
-	END;
-
-	property_by_address := JOIN(Shell, KAF,
-						LEFT.clean_input.prim_name<>'' AND
-						keyed(LEFT.clean_input.prim_name=RIGHT.prim_name) AND
-						keyed(LEFT.clean_input.prim_range=RIGHT.prim_range) AND
-						keyed(LEFT.clean_input.zip5=RIGHT.zip) AND
-						keyed(LEFT.clean_input.predir=RIGHT.predir) AND
-						keyed(LEFT.clean_input.postdir=RIGHT.postdir) AND
-						keyed(LEFT.clean_input.addr_suffix=RIGHT.suffix) AND
-						keyed(LEFT.clean_input.sec_range=RIGHT.sec_range) and
-						keyed(right.source_code_2 = 'P'),
-					   get_property_by_addr(LEFT,RIGHT), KEEP(100), LEFT OUTER,
-					   ATMOST(
-						   keyed(LEFT.clean_input.prim_name=RIGHT.prim_name) AND
-						   keyed(LEFT.clean_input.prim_range=RIGHT.prim_range) AND
-						   keyed(LEFT.clean_input.zip5=RIGHT.zip) AND
-						   keyed(LEFT.clean_input.predir=RIGHT.predir) AND
-						   keyed(LEFT.clean_input.postdir=RIGHT.postdir) AND
-						   keyed(LEFT.clean_input.addr_suffix=RIGHT.suffix) AND
-						   keyed(LEFT.clean_input.sec_range=RIGHT.sec_range) and
-						   keyed(right.source_code_2 = 'P'),
-						   Business_Risk_BIP.Constants.Limit_Default
-					   ));
-						 
-						 
-	proprec get_Assessements(property_by_address le, KASF ri) :=		TRANSFORM			 
-					SELF.InputAddrLotSize	:= (INTEGER)StringLib.StringFilter(ri.land_square_footage, '0123456789');					 
-          SELF.InputAddrSqFootage := (INTEGER)StringLib.StringFilter(ri.Building_Area, '0123456789');	
-				  SELF.InputAddrAssessedTotal := (INTEGER)max((INTEGER)ri.assessed_total_value, (INTEGER)ri.market_total_value);	
-					SELF := LE;
-					SELF := [];
-	END;
-	
-	PropertyAssessments := JOIN(DEDUP(SORT(property_by_address, Seq, Fares_ID), Seq, Fares_ID), KASF, 
-															KEYED(LEFT.Fares_ID = RIGHT.LN_Fares_ID) 
-															AND (unsigned3)right.proc_date[1..6] <= left.historydate
-															AND (unsigned3)right.recording_date[1..6] <= left.historydate,
-															get_Assessements(LEFT,RIGHT),
-															ATMOST(keyed(LEFT.fares_id=RIGHT.ln_fares_id),Business_Risk_BIP.Constants.Limit_Assessments));
-															
-		PropertyBusnAssessRolled := ROLLUP(SORT(PropertyAssessments, Seq), LEFT.Seq = RIGHT.Seq, TRANSFORM(RECORDOF(LEFT),
-																					SELF.InputAddrLotSize := MAX(LEFT.InputAddrLotSize, RIGHT.InputAddrLotSize);
-																					SELF.InputAddrSqFootage := MAX(LEFT.InputAddrSqFootage, RIGHT.InputAddrSqFootage);
-																					SELF.InputAddrAssessedTotal := MAX(LEFT.InputAddrAssessedTotal, RIGHT.InputAddrAssessedTotal);
-																					SELF := LEFT));
 	// --------------- Property Data - Using Consumer DID ----------------
 	OwnershipKey := LN_PropertyV2.key_ownership_did(FALSE /*isFCRA*/);
 	tempOwnershipRec := RECORD
@@ -274,6 +234,7 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount3 := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.MaxBusExecLinkPropertyOverlapCount3, -1, 99999);
 																							SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount4 := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.MaxBusExecLinkPropertyOverlapCount4, -1, 99999);
 																							SELF.Business_To_Executive_Link.BusExecLinkPropertyOverlapCount5 := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.MaxBusExecLinkPropertyOverlapCount5, -1, 99999);																							
+																							SELF.Best_Info.BestOwnership := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.MaxBestOwnership, -1, 1);
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 																	
@@ -287,15 +248,9 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 																	
-	withPropertyAssess := JOIN(withRepPropertyOwned, PropertyBusnAssessRolled, LEFT.Seq = RIGHT.Seq,
-																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
-																							SELF.Input_Characteristics.InputAddrLotSize := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.InputAddrLotSize, -1, 999999999);
-																							SELF.Input_Characteristics.InputAddrAssessedTotal := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.InputAddrAssessedTotal, -1, 999999999);
-																							SELF.Input_Characteristics.InputAddrSqFootage := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.InputAddrSqFootage, -1, 999999999);
-																							SELF := LEFT),
-																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
+
 	
-	withErrorCodes := JOIN(withPropertyAssess, kFetchErrorCodes, LEFT.Seq = RIGHT.Seq,
+	withErrorCodes := JOIN(withRepPropertyOwned, kFetchErrorCodes, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Data_Fetch_Indicators.FetchCodeProperty := (STRING)RIGHT.Fetch_Error_Code;
 																							SELF := LEFT),
@@ -313,8 +268,6 @@ EXPORT getProperty(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// OUTPUT(CHOOSEN(PropertyDeedsRepCounts, 100), NAMED('Sample_PropertyDeedsRepCounts'));
 	// OUTPUT(CHOOSEN(Shell, 100), NAMED('Sample_propertyShell'));
 	// OUTPUT(CHOOSEN(property_by_address, 100), NAMED('Sample_property_by_address'));
-	// OUTPUT(CHOOSEN(PropertyAssessments, 100), NAMED('Sample_PropertyAssessments'));
-	// OUTPUT(CHOOSEN(PropertyBusnAssessRolled, 100), NAMED('Sample_PropertyBusnAssessRolled'));
 	// OUTPUT(CHOOSEN(PropertyStats, 100), NAMED('Sample_PropertyStats'));
 	// OUTPUT(CHOOSEN(PropertyStatsTemp, 100), NAMED('Sample_PropertyStatsTemp'));
 	// OUTPUT(CHOOSEN(withProperty, 100), NAMED('Sample_withProperty'));

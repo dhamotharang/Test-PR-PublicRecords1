@@ -15,6 +15,7 @@ EXPORT Constants :=
     EXPORT HISTORICAL_FLAG    := 'H';
 
     EXPORT SMALL_BIZ_ATTR_V1_NAME   	:= 'SmallBusinessAttrV1';
+    EXPORT SMALL_BIZ_ATTR_V2_NAME   	:= 'SmallBusinessAttrV2';
     EXPORT SMALL_BIZ_SBFE_ATTR_NAME 	:= 'SmallBusinessAttrSBFE';
 		EXPORT SMALL_BIZ_MKT_ATTR_V1_NAME := 'SmBusMktAttrV1';
     EXPORT SMALL_BIZ_ATTR           	:= 'SMALLBUSINESSATTRV';
@@ -45,4 +46,25 @@ EXPORT Constants :=
 				EXPORT UNSIGNED2 DEFAULT_VALUE                             :=  0;
 			END;
 
+  EXPORT set_Cortera_attributeNames :=
+    [
+      'B2BProviderAvg12M',
+      'B2BProviderDelta12M',
+      'B2BProviderDelta24M',
+      'B2BSpendCategories12M',
+      'B2BSpendTotal12M',
+      'B2BSpendDelta12M',
+      'B2BSpendDelta24M',
+      'B2BDBTAvg03',
+      'B2B30DBT12MInd',
+      'B2B60DBT12MInd',
+      'B2B90DBT12Ind',
+      'B2BDBT30Delta12M',
+      'B2BDBT30Delta24M',
+      'B2BDBT60Delta12M',
+      'B2BDBT60Delta24M',
+      'B2BPaid12M',
+      'B2BBalanceAvg03M'
+    ];
+    
   END;

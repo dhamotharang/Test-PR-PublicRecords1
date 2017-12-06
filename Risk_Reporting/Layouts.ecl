@@ -1,4 +1,4 @@
-IMPORT iesp, gateway;
+﻿IMPORT iesp, gateway;
 
 EXPORT Layouts := MODULE
 
@@ -1906,6 +1906,71 @@ EXPORT Parsed_ChargeBackDefender_Layout := RECORD
 	Attributes_Layout;
 END;
 
+EXPORT Parsed_SMALLBUSINESSBIPCOMBINEDREPORT_Layout := RECORD
+	STRING30	TransactionID	:= ''; // Forced into the record so I can join it all together
+	STRING10	AccountID			:= '';
+	STRING8		TransactionDate := '';
+	// Input Fields
+	STRING150	EndUserCompanyName := '';
+	STRING150 CompanyName			:= '';
+	STRING120 CompanyAddress	:= '';
+	STRING25	CompanyCity			:= '';
+	STRING2		CompanyState		:= '';
+	STRING9		CompanyZIP			:= '';
+	STRING10	CompanyPhone10	:= '';
+	STRING15	FEIN						:= '';
+	STRING30	RepFirstName		:= '';
+	STRING30	RepLastName			:= '';
+	STRING9		RepSSN					:= '';
+	STRING8		RepDOB					:= '';
+	STRING120	RepAddress			:= '';
+	STRING25	RepCity					:= '';
+	STRING2		RepState				:= '';
+	STRING9		RepZip					:= '';
+	STRING20	RepDL						:= '';
+	STRING2		RepDLState			:= '';
+	STRING10	RepPhone10			:= '';
+	//Rep2
+	STRING30	RepFirstName2		:= '';
+	STRING30	RepLastName2			:= '';
+	STRING9		RepSSN2					:= '';
+	STRING8		RepDOB2					:= '';
+	STRING120	RepAddress2			:= '';
+	STRING25	RepCity2					:= '';
+	STRING2		RepState2				:= '';
+	STRING9		RepZip2					:= '';
+	STRING20	RepDL2						:= '';
+	STRING2		RepDLState2			:= '';
+	STRING10	RepPhone102			:= '';
+	
+	// Output Fields
+	STRING30	ModelName1			:= '';
+	STRING3		ModelScore1		:= '';
+	STRING30	ModelName2			:= '';
+	STRING3		ModelScore2		:= '';
+
+	STRING5		BusinessRC1Seq	:= '';
+	STRING5		BusinessRC1Code	:= '';
+	STRING5		BusinessRC1Desc	:= '';
+	STRING5		BusinessRC2Seq	:= '';
+	STRING5		BusinessRC2Code	:= '';
+	STRING5		BusinessRC2Desc	:= '';
+	STRING5		BusinessRC3Seq	:= '';
+	STRING5		BusinessRC3Code	:= '';
+	STRING5		BusinessRC3Desc	:= '';
+	STRING5		BusinessRC4Seq	:= '';
+	STRING5		BusinessRC4Code	:= '';
+	STRING5		BusinessRC4Desc	:= '';
+	STRING5		BusinessRC5Seq	:= '';
+	STRING5		BusinessRC5Code	:= '';
+	STRING5		BusinessRC5Desc	:= '';
+	STRING5		BusinessRC6Seq	:= '';
+	STRING5		BusinessRC6Code	:= '';
+	STRING5		BusinessRC6Desc	:= '';
+
+	Attributes_Layout;
+END;
+
 EXPORT LOG_Deltabase_Layout_Record := Record
 	// Transaction data
 	Integer8 company_id;
@@ -1960,7 +2025,7 @@ EXPORT LOG_Deltabase_Layout_Record := Record
 	String9  i_bus_zip;
 	String20 i_model_name_1;
 	String20 i_model_name_2;
-	String30 i_attributes_name;
+	String60 i_attributes_name;
 	// Response data
 	Integer2 o_score_1;
 	String4 o_reason_1_1;

@@ -14,6 +14,50 @@ MODULE
 	RECORD(doxie.layout_pp_raw_common)
 		BatchIn batch_in;
 	END;
+	EXPORT PhoneAcctno := RECORD
+		STRING20 acctno;
+		STRING10 phone;
+	END;
+	EXPORT PhoneIdentity := RECORD
+		UNSIGNED8 seq;
+		STRING20 acctno;	
+		STRING10 phone;	
+		STRING2 src;			
+		STRING1	ActiveFlag;			
+		UNSIGNED6 did;
+		UNSIGNED6 ultid;
+		UNSIGNED6 orgid;
+		UNSIGNED6 seleid;
+		UNSIGNED6 proxid;
+		UNSIGNED6 powid;	
+		UNSIGNED6 bdid := 0;
+		STRING8 dt_first_seen;	
+		STRING8 dt_last_seen;	
+		STRING9 ssn;
+		STRING20 fname;
+		STRING20 mname;
+		STRING20 lname;
+		STRING5 name_suffix;				
+		STRING120 CompanyName;
+		STRING10 prim_range;
+		STRING2 predir;
+		STRING28 prim_name;
+		STRING4 suffix;
+		STRING2 postdir;
+		STRING10 unit_desig;
+		STRING8 sec_range;
+		STRING120	addr;
+		STRING25	city_name;
+		STRING2	st;
+		STRING5	zip;
+		STRING4	zip4;
+		STRING30 county;
+		STRING120 listed_name;
+		STRING1 listing_type_res;	
+		STRING1 listing_type_bus;
+		STRING1 listing_type_gov;
+		STRING25 append_phone_type;
+	END;	
 	
 	EXPORT Deltabase := MODULE	
 		// Deltabase Layouts
@@ -110,6 +154,19 @@ MODULE
 	 END;
 	
 	END;
+	
+	EXPORT AccuDataCNAM := RECORD
+		STRING20 acctno;	
+		UNSIGNED6 did;
+		STRING2 source;
+		STRING20 name_first;
+		STRING20 name_last;
+		STRING listingName;
+		STRING10 phone;
+		UNSIGNED1 privateFlag;
+		UNSIGNED1 availabilityIndicator;
+		STRING error_desc;
+	END;	
 
 	EXPORT PhoneAttributes := MODULE
 		EXPORT gatewayQuery:=RECORD
@@ -123,6 +180,7 @@ MODULE
 		EXPORT Raw := RECORD
 			BatchShare.Layouts.ShareAcct;
 			recordof(PhonesInfo.Key_Phones.Ported_Metadata);
+			STRING error_desc;					
 		END;
 		
 		EXPORT BatchOut := RECORD
@@ -144,7 +202,9 @@ MODULE
 			string10	new_phone_number_from_swap;
 			unsigned8	suspended_date;
 			unsigned8	reactivated_date;
+			string1		prepaid;			
 			string5		source;
+			string		error_desc;			
 		END;
 
 	END;

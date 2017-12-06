@@ -623,8 +623,19 @@ export ToEdina_53( dataset(riskprocessing.layouts.layout_internal_shell) bs, boo
 	self.bus_property_sold_assess_total		:= le.Address_Verification.bus_sold.property_owned_assessed_total;
 	self.bus_property_sold_assess_count		:= le.Address_Verification.bus_sold.property_owned_assessed_count;
 
-	
+	//MS-167
+	self.Eqfx_FraudFlags				:= le.Eqfx_FraudFlags;
+
+	//MS-178
+	self.crossindv5 := le.rv_scores.crossindv5;
+	self.reason1cv5 := le.rv_scores.reason1cv5;
+	self.reason2cv5 := le.rv_scores.reason2cv5;
+	self.reason3cv5 := le.rv_scores.reason3cv5;
+	self.reason4cv5 := le.rv_scores.reason4cv5;
+	self.reason5cv5 := le.rv_scores.reason5cv5;
+
 	self := le;
+
 	end;
 
 	edina_v53 := project( bs, convertToEdina_v53(left) );

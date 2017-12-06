@@ -1,7 +1,7 @@
-IMPORT Royalty;
+﻿IMPORT Royalty;
 EXPORT RoyaltyEFXDataMart := MODULE
 
-	EXPORT GetBatchRoyaltiesByAcctno(dInF, dRecsOut, pPhoneType='royalty_type', fAcctno='acctno', fOrigAcctno='orig_acctno') := FUNCTIONMACRO
+	EXPORT GetBatchRoyaltiesByAcctno(dInF, dRecsOut, pPhoneType='royalty_type', fAcctno='acctno', fOrigAcctno='orig_acctno', royalty_type_value = 'Royalty.Constants.RoyaltyType.EFX_DATA_MART') := FUNCTIONMACRO
 		Royalty.Layouts.RoyaltyForBatch tPrepForRoyalty(RECORDOF(dInF) l, RECORDOF(dRecsOut) r) :=
 		TRANSFORM
 			SELF.acctno							:= l.fOrigAcctno;
@@ -11,7 +11,7 @@ EXPORT RoyaltyEFXDataMart := MODULE
 			SELF.non_royalty_count 	:= 0;
 		END;
 
-		dMNRecsOut := dRecsOut(pPhoneType=Royalty.Constants.RoyaltyType.EFX_DATA_MART);
+		dMNRecsOut := dRecsOut(pPhoneType=royalty_type_value);
 		dRoyaltiesByAcctno := JOIN(dInF, dMNRecsOut, (STRING)LEFT.fAcctno = (STRING)RIGHT.fAcctno, tPrepForRoyalty(LEFT, RIGHT));
 		RETURN dRoyaltiesByAcctno;
 	ENDMACRO;

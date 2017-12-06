@@ -350,7 +350,7 @@
 	// ---------------------------------------------------------------------------------------------------------																
 	primaryPhoneSource := [PhoneFinder_Services.Constants.PhoneSource.Waterfall,PhoneFinder_Services.Constants.PhoneSource.QSentGateway];															
 	displayPRI := displayAll AND EXISTS(inMod.RiskIndicators(Active));
-		
+	call_fowarded := PhoneFinder_Services.Functions.CallForwardingDesc(1);	// FORWARDED
 	PhoneFinder_Services.Layouts.PhoneFinder.Final rollMetadata(PhoneFinder_Services.Layouts.PhoneFinder.Final l,
 																																PhoneFinder_Services.Layouts.PhoneFinder.Final r) := TRANSFORM
 			SELF.dt_first_seen				:= (STRING)ut.Min2((INTEGER)l.dt_first_seen,(INTEGER)r.dt_first_seen);
@@ -363,6 +363,8 @@
 			SELF.typeflag							:= IF(r.typeflag = 'P',l.typeflag,r.typeflag);										
 			SELF.deceased							:= IF(r.deceased = 'Y',r.deceased,l.deceased);										
 			SELF.phone_source					:= IF(l.phone_source IN primaryPhoneSource,l.phone_source,r.phone_source); //more efficiently account for the subject
+			SELF.PhoneOwnershipIndicator := l.PhoneOwnershipIndicator or r.PhoneOwnershipIndicator; // retaining values for a phone
+			SELF.CallForwardingIndicator := IF(l.CallForwardingIndicator = call_fowarded, l.CallForwardingIndicator , r.CallForwardingIndicator);
 			SELF               				:= l;
 	END;
 	dRolledMetadataRecs:= ROLLUP(SORT(dPhoneInfowOTP,acctno,did,phone,typeflag=Phones.Constants.TypeFlag.DataSource_PV,-dt_last_seen,dt_first_seen,phone_source),

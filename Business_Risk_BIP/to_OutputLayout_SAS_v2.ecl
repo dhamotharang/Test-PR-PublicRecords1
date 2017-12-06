@@ -1,4 +1,4 @@
-// A slimmed down version of Business_Risk_BIP.to_OutputLayout_SAS that does not include the new SBFE enhancement attributes. This should only 
+﻿// A slimmed down version of Business_Risk_BIP.to_OutputLayout_SAS that does not include the new SBFE enhancement attributes. This should only 
 // be run for modelers when the original business shell version is requested.
 
 EXPORT to_OutputLayout_SAS_v2( DATASET(Business_Risk_BIP.Layouts.OutputLayout) final_results ) := 
@@ -20,7 +20,7 @@ EXPORT to_OutputLayout_SAS_v2( DATASET(Business_Risk_BIP.Layouts.OutputLayout) f
 				RETURN IF( LENGTH(TRIM(str)) < len, str, str_trunc_list );
 			END;
 		
-		Business_Risk_BIP.Layouts.OutputLayout_SAS_v2 xfm_toOutputLayoutSAS(Business_Risk_BIP.Layouts.OutputLayout le)  :=
+		Business_Risk_BIP.Layouts_SAS.OutputLayout_SAS_v2 xfm_toOutputLayoutSAS(Business_Risk_BIP.Layouts.OutputLayout le)  :=
 			TRANSFORM
 				SELF.account := le.Input_Echo.acctno;
 				SELF.seq := le.Input_Echo.seq;

@@ -1,4 +1,4 @@
-includeADLFields := FALSE; // If you set this to TRUE, make sure you set it to TRUE in Risk_Indicators.ToEdina_v4!
+﻿includeADLFields := FALSE; // If you set this to TRUE, make sure you set it to TRUE in Risk_Indicators.ToEdina_v4!
 
 layout_counts := RECORD
     unsigned2 counttotal;
@@ -184,12 +184,12 @@ layout_inquiries_edina := RECORD
 		unsigned2	inq_adlsperemail_count06	;
 	
 	// these aren't in shell 5.2 layout
-	// string8 am_first_seen_date;
-   // string8 am_last_seen_date;
-   // string8 cm_first_seen_date;
-   // string8 cm_last_seen_date;
-   // string8 om_first_seen_date;
-   // string8 om_last_seen_date;
+		string8 am_first_seen_date;
+		string8 am_last_seen_date;
+		string8 cm_first_seen_date;
+		string8 cm_last_seen_date;
+		string8 om_first_seen_date;
+		string8 om_last_seen_date;
 		risk_indicators.layouts.layout_best_pii_inquiries;
   END;
 	
@@ -1191,6 +1191,37 @@ layout_virtual_fraud := record
 	integer1  AltLexID_ssn_lo_risk_ct;
 end;
 
+// same as risk_indicators.layouts.layout_pii_stability minus the 3 total count fields
+layout_pii_stability52 := record
+	unsigned1	link_candidate_cnt	;
+	unsigned1	link_wgt_dob_npos_cnt	;
+	unsigned1	link_wgt_fname_npos_cnt	;
+	unsigned1	link_wgt_lname_npos_cnt	;
+	unsigned1	link_wgt_phone_npos_cnt	;
+	unsigned1	link_wgt_prim_name_npos_cnt	;
+	unsigned1	link_wgt_prim_range_npos_cnt	;
+	unsigned1	link_wgt_ssn4_npos_cnt	;
+	unsigned1	link_wgt_ssn5_npos_cnt	;
+	unsigned1	link_wgt_dob_nneg_cnt	;
+	unsigned1	link_wgt_fname_nneg_cnt	;
+	unsigned1	link_wgt_lname_nneg_cnt	;
+	unsigned1	link_wgt_phone_nneg_cnt	;
+	unsigned1	link_wgt_prim_name_nneg_cnt	;
+	unsigned1	link_wgt_prim_range_nneg_cnt	;
+	unsigned1	link_wgt_ssn4_nneg_cnt	;
+	unsigned1	link_wgt_ssn5_nneg_cnt	;
+	unsigned1	link_wgt_dob_nzero_cnt	;
+	unsigned1	link_wgt_fname_nzero_cnt	;
+	unsigned1	link_wgt_lname_nzero_cnt	;
+	unsigned1	link_wgt_phone_nzero_cnt	;
+	unsigned1	link_wgt_prim_name_nzero_cnt	;
+	unsigned1	link_wgt_prim_range_nzero_cnt	;
+	unsigned1	link_wgt_ssn4_nzero_cnt	;
+	unsigned1	link_wgt_ssn5_nzero_cnt	;
+	string15	link_max_weight_element	;
+	string15	link_min_weight_element	;
+end;
+
 export Layout_Boca_Shell_Edina_v52 := RECORD
 	#if(includeADLFields)
 	risk_indicators.iid_constants.adl_based_modeling_flags;
@@ -1227,8 +1258,8 @@ export Layout_Boca_Shell_Edina_v52 := RECORD
 	Layout_Infutor																					Infutor;
 	Layout_Impulse																					Impulse;
 	risk_indicators.layouts.layout_email_50									email_summary;  
-	Layout_Attributes																				Attributes;
-	Risk_Indicators.Layouts.layout_pii_stability 						PII_Stability;
+	Layout_Attributes																				Attributes; 
+	layout_pii_stability52 																	PII_Stability; 
 	layout_virtual_fraud																		Virtual_Fraud;	
 	risk_indicators.layouts.layout_test_fraud  							Test_Fraud;
 	risk_indicators.layouts.layout_contributory_fraud  			Contributory_Fraud;

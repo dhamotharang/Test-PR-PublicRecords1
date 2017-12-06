@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Identifier2_Service">
 	<part name="AccountNumber" type="xsd:string"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
@@ -387,7 +387,16 @@ export Identifier2_Service := MACRO
 	// With Emerging Identities changes, bump from BS version 3 to 51
 	#stored( 'BSVersion', 51 )
   
-  recs := Identifier2.Identifier2records;
+  recs2 := Identifier2.Identifier2records;
+	 recs := iesp.transform_identifier2(recs2);
+	 
+	 dRoyalties := Project(recs2, transform(Royalty.Layouts.Royalty,
+																		self.royalty_type_code := left.royalty_type_code_targus,
+                  self.royalty_type := left.royalty_type_targus,	
+																		self.royalty_count := left.royalty_count_targus,
+																		self.non_royalty_count := left.non_royalty_count_targus,
+																		self.count_entity := left.count_entity_targus,
+																		self := left));
 	 
 	// wrap it into output structure
 	iesp.mod_identifier2.t_Identifier2Response SetResponse (iesp.mod_identifier2.t_Identifier2Result L) := transform
@@ -399,7 +408,6 @@ export Identifier2_Service := MACRO
 	results := PROJECT (recs, SetResponse (Left));
 	output (results, named ('Results'));
 
-	dRoyalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Royalties');
-	output(dRoyalties, named('RoyaltySet'));
+output(dRoyalties, named('RoyaltySet'));
 ENDMACRO;
 // Identifier2_Service()

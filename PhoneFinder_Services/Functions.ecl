@@ -1,4 +1,4 @@
-﻿IMPORT Address,Autokey_batch,BatchServices,Doxie,iesp,Phones,PhoneFinder_Services,std,ut;
+﻿IMPORT Address,Autokey_batch,BatchServices,Doxie,header,iesp,Phones,PhoneFinder_Services,std,ut;
 
 pfLayouts     := PhoneFinder_Services.Layouts;
 lBatchInAcctno:= pfLayouts.BatchInAppendAcctno;
@@ -186,8 +186,10 @@ MODULE
 	EXPORT GetDIDsBatch(DATASET(Autokey_batch.Layouts.rec_inBatchMaster) dBatchIn) :=
 	FUNCTION
 		
-		dDidsAcctno 	:= BatchServices.Functions.fn_find_dids_and_append_to_acctno(dBatchIn, PhoneFinder_Services.Constants.MaxDIDs); 
+		dDidsAcctno_pre 	:= BatchServices.Functions.fn_find_dids_and_append_to_acctno(dBatchIn, PhoneFinder_Services.Constants.MaxDIDs,  false); // to prune oldssns
 		
+		dDidsAcctno       := dDidsAcctno_pre(did > 0, did < header.constants.QH_start_rid); 
+	
 		// Rollup the dids dataset returned with each acctno to count the dids
 		lBatchInDID tRollDids(doxie.layout_references_acctno le, dataset(doxie.layout_references_acctno) allRows) :=
 		TRANSFORM
@@ -215,6 +217,7 @@ MODULE
 				SELF.did_count 	:= RIGHT.did_count,
 				SELF						:= LEFT),
 			LEFT OUTER,ALL);	
+			
 		RETURN dWithDIDs;
 	END;
 	

@@ -5,6 +5,7 @@ MODULE
   EXPORT Defaults :=
   MODULE
 		EXPORT UNSIGNED1 MaxResultsPerAcctno := 5;
+		EXPORT UNSIGNED1 NumberofInspections := 1;
 		                  //////////////////////////////////////////////
 											// only get this number of rows (7500) and (7500) per match join in the kfetch 
 	                    // since we are in batch mode and don't want to overload roxie.

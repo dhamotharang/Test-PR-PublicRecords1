@@ -37,7 +37,7 @@ EXPORT CreditReportService := MACRO
 		BOOLEAN ArchiveOptIn            := False : STORED('instantidarchivingoptin');
 
 		//Look up the industry by the company ID.
-		Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.BusinessCredit_Services__CreditReportService);
+		Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.BusinessCredit_Services__CreditReportService);
 	/* ************* End Scout Fields **************/
 	
 	#STORED('DotID',ReportBy.Company.BusinessIds.DotID);

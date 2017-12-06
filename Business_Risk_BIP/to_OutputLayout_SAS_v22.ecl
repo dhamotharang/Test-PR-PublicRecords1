@@ -1,4 +1,4 @@
-EXPORT to_OutputLayout_SAS_v22( DATASET(Business_Risk_BIP.Layouts.OutputLayout) final_results ) := 
+﻿EXPORT to_OutputLayout_SAS_v22( DATASET(Business_Risk_BIP.Layouts.OutputLayout) final_results ) := 
 	FUNCTION
 
 		MaxSASLength := 1000; // Max length for the list fields to be imported into SAS (Technically SAS can handle up to 32,767 - but modeling only wants 1,000 to help with speed of imports)
@@ -17,7 +17,7 @@ EXPORT to_OutputLayout_SAS_v22( DATASET(Business_Risk_BIP.Layouts.OutputLayout) 
 				RETURN IF( LENGTH(TRIM(str)) < len, str, str_trunc_list );
 			END;
 	
-		Business_Risk_BIP.Layouts.OutputLayout_SAS_v22 xfm_toOutputLayoutSAS(Business_Risk_BIP.Layouts.OutputLayout le)  :=
+		Business_Risk_BIP.Layouts_SAS.OutputLayout_SAS_v22 xfm_toOutputLayoutSAS(Business_Risk_BIP.Layouts.OutputLayout le)  :=
 			TRANSFORM
 				SELF.account := le.Input_Echo.acctno;
 				SELF.seq := le.Input_Echo.seq;

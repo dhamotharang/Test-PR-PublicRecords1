@@ -1,4 +1,4 @@
-﻿IMPORT Address, Business_Risk_BIP, BusinessCredit_Services, Gateway, IESP, 
+﻿IMPORT Address, Business_Risk_BIP, BusinessCredit_Services, Cortera, Gateway, IESP, 
        Models, Risk_Indicators, Risk_Reporting, RiskWise, Suspicious_Fraud_LN, 
        UT, Royalty, Address;
 
@@ -22,26 +22,26 @@ EXPORT SmallBusiness_BIP_Function (
 											BOOLEAN DisableIntermediateShellLogging = FALSE,
 											BOOLEAN IncludeTargusGateway = FALSE,
 											BOOLEAN RunTargusGateway = FALSE,
-											UNSIGNED2 BIPIDWeightThreshold = LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.DEFAULT_VALUE
+											UNSIGNED2 BIPIDWeightThreshold = LNSmallBusiness.Constants.BIPID_WEIGHT_THRESHOLD.DEFAULT_VALUE,
+                      BOOLEAN CorteraRetrotest = FALSE,
+											DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw)
 																							) := FUNCTION
 
 	RESTRICTED_SET := ['0', ''];
 
 	// Use the SBFE restriction to return Scores or not.
-	allow_scores := DataPermissionMask[12] NOT IN RESTRICTED_SET;
-
+	allow_SBFE_scores := DataPermissionMask[12] NOT IN RESTRICTED_SET;
+  BusShellv22_scores_requested := EXISTS(ModelsRequested(ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.CREDIT_BLENDED_SLBB_SLBO));
+  
 /* ************************************************************************
 	 *                    Set common Business Shell Options                 *
 	 ************************************************************************ */
-	// UNSIGNED1	BusShellVersion	:= Business_Risk_BIP.Constants.Default_BusShellVersion;
-	UNSIGNED1	BusShellVersion	:= if(ModelsRequested[1].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
-			ModelsRequested[2].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
-			ModelsRequested[3].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
-			ModelsRequested[4].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
-			ModelsRequested[5].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB],	
-		Business_Risk_BIP.Constants.BusShellVersion_v22,
-		Business_Risk_BIP.Constants.Default_BusShellVersion);
+	UNSIGNED1	BusShellVersion	:= MAP((UNSIGNED)AttributesRequested(AttributeGroup[1..18] = 'SMALLBUSINESSATTRV')[1].AttributeGroup[19..] = 2 => Business_Risk_BIP.Constants.BusShellVersion_v30,
+                                    BusShellv22_scores_requested                                                                           => Business_Risk_BIP.Constants.BusShellVersion_v22,
+                                   (UNSIGNED)AttributesRequested(AttributeGroup[1..18] = 'SMALLBUSINESSATTRV')[1].AttributeGroup[19..] = 1 => Business_Risk_BIP.Constants.BusShellVersion_v21,
+                                                                                                                                              Business_Risk_BIP.Constants.Default_BusShellVersion);
 	
+  
 	// Create a datarow to add to the intermediate log.
 	Risk_Reporting.Layouts.Business_Risk_Job_Options xfm_options := TRANSFORM
 		SELF.DPPA_Purpose	              := DPPA_Purpose;
@@ -203,7 +203,12 @@ EXPORT SmallBusiness_BIP_Function (
 																																 Business_Risk_BIP.Constants.DefaultJoinType, 
 																																 IncludeTargusGateway,
 																																 Gateways,
-																																 RunTargusGateway /* for testing purposes only */ );
+																																 RunTargusGateway, /* for testing purposes only */ 
+																																 FALSE,
+																																 FALSE,
+																																 FALSE,
+                                                                 CorteraRetrotest,
+																																 ds_CorteraRetrotestRecsRaw);
 
 	Business_Risk_BIP.Layouts.Shell fn_transformToNoHit( Business_Risk_BIP.Layouts.Shell shell_results ) :=
 		FUNCTION
@@ -219,7 +224,7 @@ EXPORT SmallBusiness_BIP_Function (
 			BlankShell_v20 := 
 				PROJECT(BlankShell_pre, Business_Risk_BIP.xfm_blankOutSBFEEnhancementAttrs(LEFT));
 
-			BlankShell := MAP( NOT allow_scores							 																			=> BlankShell_restricted,
+			BlankShell := MAP( NOT allow_SBFE_scores							 																=> BlankShell_restricted,
 												 BusShellVersion <= Business_Risk_BIP.Constants.BusShellVersion_v20 => BlankShell_v20,
 												 /* default....................................................: */    BlankShell_pre );
 			RETURN BlankShell;
@@ -359,7 +364,7 @@ unsigned8 BSOptions :=
 /* ************************************************************************
 	 *                       Prepare Attribute Outputs                      *
 	 ************************************************************************ */
-	Attribute_Results := LNSmallBusiness.getSmallBusinessAttributes(Shell_Results);
+	Attribute_Results := LNSmallBusiness.getSmallBusinessAttributes(Shell_Results, BusShellVersion);
 	
 /* **************************************************************************
 	 *                            Calculate Scores                            *
@@ -409,12 +414,7 @@ unsigned8 BSOptions :=
 			ModelName 
 		);
 	
-	Model_Results := IF( allow_scores or 
-		(ModelsRequested[1].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
-			ModelsRequested[2].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
-			ModelsRequested[3].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
-			ModelsRequested[4].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB] or
-			ModelsRequested[5].ModelName in [BusinessCredit_Services.Constants.CREDIT_SCORE_SLBO, BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB]),
+	Model_Results := IF( allow_SBFE_scores or BusShellv22_scores_requested,
 																	Model_Results_sorted, 
 																	DATASET([], Layout_ModelOut_Plus) );
 	

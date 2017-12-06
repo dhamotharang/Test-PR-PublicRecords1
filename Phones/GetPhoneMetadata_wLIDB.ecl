@@ -1,4 +1,4 @@
-IMPORT Doxie, Gateway, Iesp, Phones, PhonesInfo, STD, UT;
+﻿IMPORT Doxie, Gateway, Iesp, Phones, PhonesInfo, STD, UT;
 
 EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dBatchPhonesIn,
 	Phones.IParam.PhoneAttributes.BatchParams in_mod) := FUNCTION
@@ -12,8 +12,9 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 	dPortedMetadataPhones := JOIN(dBatchPhonesIn, PhonesInfo.Key_Phones.Ported_Metadata,
 	KEYED(LEFT.phoneno = RIGHT.phone),
 	TRANSFORM(Layout_BatchRaw,
-		SELF.acctno := LEFT.acctno,
-		SELF				:= RIGHT),
+		SELF.acctno 		:= LEFT.acctno,
+		SELF.error_desc := '',
+		SELF						:= RIGHT),
 	LIMIT(0), KEEP(Consts.MaxRecsPerPhone));
 	
 	// Check deltabase for new acquired data
@@ -76,6 +77,7 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 		SELF.carrier_category := l.ATTResponse.InformationRetrievalResponse.Category;
 		SELF.local_area_transport_area := l.ATTResponse.InformationRetrievalResponse.LocalAccessAndTransport;
 		SELF.point_code := l.ATTResponse.InformationRetrievalResponse.PointCode;
+		SELF.error_desc := IF(l.ATTResponse.Status <> 'OK','LIDB: '+ l.ATTResponse.Status + ';','');
 		SELF:=[];
 	END;
 	dsRealTimeLIDB:= PROJECT(realTimeLIDB, transformRealTimeLIDB(LEFT))(phone<>'');
@@ -88,36 +90,38 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 												SELF:=[]),
 												LIMIT(0),KEEP(Consts.MaxRecsPerPhone));
 	// update carrier reference info											
-	dPortedPhoneswLineType := JOIN(IF(EXISTS(dsRealTimeLIDB),dsUpdatedLIDB + dPortedPhones,dPortedPhones), 
-																 PhonesInfo.Key_Source_Reference.ocn_name,
+	dsUpdatedLIDBwLineType := JOIN(dsUpdatedLIDB, PhonesInfo.Key_Source_Reference.ocn_name,
 																	KEYED(LEFT.account_owner = RIGHT.ocn) AND
 																	PhonesInfo._Functions.fn_standardName(LEFT.carrier_name) = RIGHT.name AND
 																	RIGHT.is_current,
 																	TRANSFORM(Layout_BatchRaw,SELF.serv:=RIGHT.serv,
 																														SELF.line:=RIGHT.line,
 																														SELF.spid:=RIGHT.spid,
+																														SELF.prepaid:=RIGHT.prepaid,
 																														SELF.operator_fullname:=RIGHT.operator_full_name,
 																														SELF.source := IF(LEFT.source=Consts.ATT_LIDB_Delta,Consts.ATT_LIDB_SRC,LEFT.source),
 																														SELF:=LEFT,SELF:=[]),
 																	LEFT OUTER, LIMIT(0), KEEP(1));	
+	dPortedPhoneswLineType := dPortedPhones + IF(EXISTS(dsRealTimeLIDB),dsUpdatedLIDBwLineType);																
 	#IF(Phones.Constants.Debug.PhoneMetadata_wLIDB)																	
-		output(dGateways, named('dGateways'));
-		output(listOfPhones, named('listOfPhones'));
-		output(dBatchPhonesIn, named('dBatchPhonesIn'));
-		output(deltaATTPhones, named('deltaATTPhones'));
-		output(dPortedDeltaPhones, named('dPortedDeltaPhones'));
-		output(dPortedMetadataPhones, named('dPortedMetadataPhones'));
-		output(dPortedPhones, named('dPortedPhones'));
-		output(latestPhoneRecs, named('latestPhoneRecs'));		
-		output(outdatedLIDB, named('outdatedLIDB'));	
-		output(noDataPhones, named('noDataPhones'));	
-		output(oldOrIncompleteRecs, named('oldOrIncompleteRecs'));	
-		output(needRealtimeUpdate, named('needRealtimeUpdate'));		
-		output(attGateway, named('attGateway'));	
+		// output(dGateways, named('dGateways'));
+		// output(listOfPhones, named('listOfPhones'));
+		// output(dBatchPhonesIn, named('dBatchPhonesIn'));
+		// output(deltaATTPhones, named('deltaATTPhones'));
+		// output(dPortedDeltaPhones, named('dPortedDeltaPhones'));
+		// output(dPortedMetadataPhones, named('dPortedMetadataPhones'));
+		// output(dPortedPhones, named('dPortedPhones'));
+		// output(latestPhoneRecs, named('latestPhoneRecs'));		
+		// output(outdatedLIDB, named('outdatedLIDB'));	
+		// output(noDataPhones, named('noDataPhones'));	
+		// output(oldOrIncompleteRecs, named('oldOrIncompleteRecs'));	
+		// output(needRealtimeUpdate, named('needRealtimeUpdate'));		
+		// output(attGateway, named('attGateway'));	
 		output(realTimeLIDB, named('realTimeLIDB'));	
-		output(dsRealTimeLIDB, named('dsRealTimeLIDB'));	
-		output(dsUpdatedLIDB, named('dsUpdatedLIDB'));	
-		output(dPortedPhoneswLineType, named('dPortedPhoneswLineType'));
+		// output(dsRealTimeLIDB, named('dsRealTimeLIDB'));	
+		// output(dsUpdatedLIDB, named('dsUpdatedLIDB'));	
+		// output(dsUpdatedLIDBwLineType, named('dsUpdatedLIDBwLineType'));
+		// output(dPortedPhoneswLineType, named('dPortedPhoneswLineType'));
 	#END
 	RETURN dPortedPhoneswLineType;
 

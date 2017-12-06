@@ -468,17 +468,18 @@ EXPORT Functions := MODULE
 														{STRING fragmentType}));
 									
 			customer := IF(batch_params.GlobalCompanyId = r.classification_permissible_use_access.gc_id, 
-											DATASET([{'Customer'}], {STRING contributionType}));
+											DATASET([{FraudGovPlatform_Services.Constants.Contribution_Types.CUSTOMER}], {STRING contributionType}));
 			
 			customerProgram := IF(batch_params.IndustryType = r.classification_permissible_use_access.ind_type,
-													DATASET([{'Customer Program'}], {STRING contributionType}));
+													DATASET([{FraudGovPlatform_Services.Constants.Contribution_Types.CUSTOMER_PROGRAM}], {STRING contributionType}));
 			
-			customerAgency := DATASET([], {STRING contributionType});
+			agencyState := IF(batch_params.AgencyState = r.classification_source.customer_state,
+													DATASET([{FraudGovPlatform_Services.Constants.Contribution_Types.AGENCY_STATE}], {STRING contributionType}));
 			
 			SELF.fragment_matches := person + name + ssn + physicalAddress + mailingAddress + IPAddress + 
 															 phone + deviceID + driversLicenseNumber + bankAccountNumber + geolocation;
 											 
-			SELF.contributionType_matches := customer + customerProgram + customerAgency;
+			SELF.contributionType_matches := customer + customerProgram + agencyState;
 														
 			SELF := [];
 		END;
@@ -488,7 +489,7 @@ EXPORT Functions := MODULE
 		ds_velocity_matches := JOIN(ds_batch_in, ds_payload,
 																LEFT.acctno = RIGHT.acctno,
 																		xform_velocity_matches(LEFT, RIGHT));
-
+																		
 		layout_velocity_in_temp xnorm_fragment(rec_velocity_matches l, {STRING fragmentType} r) := TRANSFORM
 			SELF.acctno := l.acctno;
 			SELF.fragment :=  r.fragmentType;
@@ -514,6 +515,11 @@ EXPORT Functions := MODULE
 		contributionType_recs_norm := NORMALIZE(fragment_recs_norm, 
 																			LEFT.contributionType_matches, 
 																					xnorm_contributionType(LEFT,  RIGHT));
+																								
+		#IF(FraudGovPlatform_Services.Constants.IS_DEBUG)
+			OUTPUT(ds_velocity_matches, NAMED('ds_velocity_matches'));
+		#END
+		
 		RETURN contributionType_recs_norm;
 		
 	END;

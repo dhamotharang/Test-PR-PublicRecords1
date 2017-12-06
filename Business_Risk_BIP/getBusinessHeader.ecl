@@ -8,6 +8,9 @@ EXPORT getBusinessHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 	// --------------- Business Header Build Date ----------------
 	BHBuildDate := Risk_Indicators.get_Build_date('bheader_build_version');
 	
+	// --------------- Business Shell Versioning logic ----------------
+	calculateValueFor := Business_Risk_BIP.mod_BusinessShellVersionLogic(Options);
+
 	// --------------- LexisNexis Business Header Searched By Ult ID ----------------
 	
 	// If running BIID2.0, search at input search level, since we don't use any UltID based attributes. 
@@ -73,7 +76,10 @@ EXPORT getBusinessHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 			 LinkID := Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID),
 			 UNSIGNED6 ContactDID := (UNSIGNED)Contact_DID,
 			 UNSIGNED4 RecordCount := COUNT(GROUP),
-			 UNSIGNED3 HistoryDate := HistoryDate
+			 UNSIGNED3 HistoryDate := HistoryDate,
+			 BOOLEAN IsCurrent := ut.DaysApart(Business_Risk_BIP.Common.groupMaxDate6(dt_last_seen, HistoryDate)+'01', 
+																				 Business_Risk_BIP.Common.todaysDate(BHBuildDate, HistoryDate)) <= ut.DaysInNYears(2),
+			 BOOLEAN IsSOS := COUNT(GROUP, source in MDR.sourceTools.set_CorpV2) >= 1																	 
 			 },
 			 Seq, Contact_DID, Business_Risk_BIP.Common.GetLinkSearchLevel(Options.LinkSearchLevel, SeleID)
 			  ) (ContactDID > 0);
@@ -82,7 +88,9 @@ EXPORT getBusinessHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 
 	BusinessHeaderTotalUniqueContactDIDs := TABLE(BusinessHeaderUniqueContactDIDs,
 			{Seq,
-			 UNSIGNED4 UniqueDIDCount := COUNT(GROUP, ContactDID > 0)
+			 UNSIGNED4 UniqueDIDCount := COUNT(GROUP, ContactDID > 0),
+			 UNSIGNED4 CurrentUniqueDIDCount := COUNT(GROUP, ContactDID > 0 AND IsCurrent),
+			 UNSIGNED4 CurrentUniqueSOSDIDCount := COUNT(GROUP, ContactDID > 0 AND IsCurrent AND IsSOS)
 			}, Seq);
 
 	Doxie.Mac_Best_Records(BusinessHeaderUniqueContactDIDs, ContactDID, getBestContactInfo, ut.DPPA_OK(Options.DPPA_Purpose), ut.GLB_OK(Options.GLBA_Purpose), FALSE/* UseNonBlankKey */, Options.DataRestrictionMask, (BOOLEAN)(Options.MarketingMode = 1));
@@ -102,6 +110,7 @@ EXPORT getBusinessHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																		SELF.DID := le.ContactDID;
 																		SELF.RecordCount := le.RecordCount;
 																		SELF.HistoryDate := le.HistoryDate;//le.Clean_Input.HistoryDate;
+																		SELF.IsCurrent := le.IsCurrent;
 																		SELF.Title := ri.Title;
 																		SELF.FName := ri.FName;
 																		SELF.MName := ri.MName;
@@ -220,7 +229,7 @@ EXPORT getBusinessHeader(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		boolean   Rep3SSNMatchedFile;   
 		Boolean   Rep3SSNMatchedFeinFile;
 		
-		boolean 	 Rep4AddressMatchedFile;
+		boolean 	Rep4AddressMatchedFile;
 		boolean   Rep4AddressNotPopulatedFile;
 		boolean   Rep4PhonePopulatedFile;
 		boolean   Rep4PhoneMatchedFile;
@@ -251,45 +260,45 @@ END;
 		DBANamePopulated 		:= TRIM(le.Clean_Input.CompanyName) <> '';
 		DBANameMatched			:= DBANamePopulated AND le.Clean_Input.CompanyName[1] = ri.DBA_Name[1] AND Risk_Indicators.iid_constants.g(Business_Risk.CNameScore(le.Clean_Input.CompanyName, ri.DBA_Name));
 		// Check to see if the Authorized Rep Name is part of the Company Name
-		BusNameAuthRepFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_FirstName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep_FirstName, 1) > 0);
-		BusNameAuthRepPreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_PreferredFirstName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep_PreferredFirstName, 1) > 0);
-		BusNameAuthRepLast	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_LastName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep_LastName, 1) > 0);
+		BusNameAuthRepFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_FirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep_FirstName));
+		BusNameAuthRepPreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_PreferredFirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep_PreferredFirstName));
+		BusNameAuthRepLast	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_LastName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep_LastName));
 		BusNameAuthRepFull	:= Business_Risk_BIP.Common.SetBoolean((BusNameAuthRepFirst = '1' AND BusNameAuthRepLast = '1') OR (BusNameAuthRepPreferredFirst = '1' AND BusNameAuthRepLast = '1'));
 		RepAR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_FirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep_FirstName, 1) > 0);
 		RepAR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_LastName <> '' AND StringLib.StringFind(ri.lname, le.Clean_Input.Rep_LastName, 1) > 0);
 		RepAR2BPreferredNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep_PreferredFirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep_PreferredFirstName, 1) > 0);
 		RepAR2BFullFile	:= Business_Risk_BIP.Common.SetBoolean((RepAR2BFNameFile = '1' AND RepAR2BLNameFile = '1') OR (RepAR2BPreferredNameFile = '1' AND RepAR2BLNameFile = '1'));
 
-		BusNameAuthRep2First	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_FirstName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep2_FirstName, 1) > 0);
-		BusNameAuthRep2PreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_PreferredFirstName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep2_PreferredFirstName, 1) > 0);
-		BusNameAuthRep2Last	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_LastName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep2_LastName, 1) > 0);
+		BusNameAuthRep2First	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_FirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep2_FirstName));
+		BusNameAuthRep2PreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_PreferredFirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep2_PreferredFirstName));
+		BusNameAuthRep2Last	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_LastName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep2_LastName));
 		BusNameAuthRep2Full	:= Business_Risk_BIP.Common.SetBoolean((BusNameAuthRep2First = '1' AND BusNameAuthRep2Last = '1') OR (BusNameAuthRep2PreferredFirst = '1' AND BusNameAuthRep2Last = '1'));
 		Rep2AR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_FirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep2_FirstName, 1) > 0);
 		Rep2AR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_LastName <> '' AND StringLib.StringFind(ri.lname, le.Clean_Input.Rep2_LastName, 1) > 0);
 		Rep2AR2BPreferredNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep2_PreferredFirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep2_PreferredFirstName, 1) > 0);
 		Rep2AR2BFullFile	:= Business_Risk_BIP.Common.SetBoolean((Rep2AR2BFNameFile = '1' AND Rep2AR2BLNameFile = '1') OR (Rep2AR2BPreferredNameFile = '1' AND Rep2AR2BLNameFile = '1'));
 		
-		BusNameAuthRep3First	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_FirstName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep3_FirstName, 1) > 0);
-		BusNameAuthRep3PreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_PreferredFirstName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep3_PreferredFirstName, 1) > 0);
-		BusNameAuthRep3Last	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_LastName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep3_LastName, 1) > 0);
+		BusNameAuthRep3First	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_FirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep3_FirstName));
+		BusNameAuthRep3PreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_PreferredFirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep3_PreferredFirstName));
+		BusNameAuthRep3Last	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_LastName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep3_LastName));
 		BusNameAuthRep3Full	:= Business_Risk_BIP.Common.SetBoolean((BusNameAuthRep3First = '1' AND BusNameAuthRep3Last = '1') OR (BusNameAuthRep3PreferredFirst = '1' AND BusNameAuthRep3Last = '1'));
 		Rep3AR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_FirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep3_FirstName, 1) > 0);
 		Rep3AR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_LastName <> '' AND StringLib.StringFind(ri.lname, le.Clean_Input.Rep3_LastName, 1) > 0);
 		Rep3AR2BPreferredNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep3_PreferredFirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep3_PreferredFirstName, 1) > 0);
 		Rep3AR2BFullFile	:= Business_Risk_BIP.Common.SetBoolean((Rep3AR2BFNameFile = '1' AND Rep3AR2BLNameFile = '1') OR (Rep3AR2BPreferredNameFile = '1' AND Rep3AR2BLNameFile = '1'));
 		
-		BusNameAuthRep4First	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_FirstName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep4_FirstName, 1) > 0);
-		BusNameAuthRep4PreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_PreferredFirstName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep4_PreferredFirstName, 1) > 0);
-		BusNameAuthRep4Last	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_LastName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep4_LastName, 1) > 0);
+		BusNameAuthRep4First	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_FirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep4_FirstName));
+		BusNameAuthRep4PreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_PreferredFirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep4_PreferredFirstName));
+		BusNameAuthRep4Last	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_LastName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep4_LastName));
 		BusNameAuthRep4Full	:= Business_Risk_BIP.Common.SetBoolean((BusNameAuthRep4First = '1' AND BusNameAuthRep4Last = '1') OR (BusNameAuthRep4PreferredFirst = '1' AND BusNameAuthRep4Last = '1'));
 		Rep4AR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_FirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep4_FirstName, 1) > 0);
 		Rep4AR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_LastName <> '' AND StringLib.StringFind(ri.lname, le.Clean_Input.Rep4_LastName, 1) > 0);
 		Rep4AR2BPreferredNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep4_PreferredFirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep4_PreferredFirstName, 1) > 0);
 		Rep4AR2BFullFile	:= Business_Risk_BIP.Common.SetBoolean((Rep4AR2BFNameFile = '1' AND Rep4AR2BLNameFile = '1') OR (Rep4AR2BPreferredNameFile = '1' AND Rep4AR2BLNameFile = '1'));
 		
-		BusNameAuthRep5First	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_FirstName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep5_FirstName, 1) > 0);
-		BusNameAuthRep5PreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_PreferredFirstName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep5_PreferredFirstName, 1) > 0);
-		BusNameAuthRep5Last	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_LastName <> '' AND StringLib.StringFind(ri.Company_Name, le.Clean_Input.Rep5_LastName, 1) > 0);
+		BusNameAuthRep5First	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_FirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep5_FirstName));
+		BusNameAuthRep5PreferredFirst	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_PreferredFirstName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep5_PreferredFirstName));
+		BusNameAuthRep5Last	:= Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_LastName <> '' AND calculateValueFor._BusNameAuthRepMatch(ri.Company_Name, le.Clean_Input.Rep5_LastName));
 		BusNameAuthRep5Full	:= Business_Risk_BIP.Common.SetBoolean((BusNameAuthRep5First = '1' AND BusNameAuthRep5Last = '1') OR (BusNameAuthRep5PreferredFirst = '1' AND BusNameAuthRep5Last = '1'));
 		Rep5AR2BFNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_FirstName <> '' AND StringLib.StringFind(ri.fname, le.Clean_Input.Rep5_FirstName, 1) > 0);
 		Rep5AR2BLNameFile       := Business_Risk_BIP.Common.SetBoolean(le.Clean_Input.Rep5_LastName <> '' AND StringLib.StringFind(ri.lname, le.Clean_Input.Rep5_LastName, 1) > 0);
@@ -311,6 +320,20 @@ END;
 																																		ri.prim_range, ri.prim_name, ri.sec_range,
 																																		ZIPScore, CityStateScore));
 		AddressMatched			:= AddressPopulated AND Risk_Indicators.iid_constants.ga(AddressScore);
+		//
+		BestAddressPopulated := TRIM(le.Best_Info.BestPrimName) <> '' AND TRIM(le.Best_Info.BestCompanyZip) <> '' AND TRIM(ri.prim_name) <> '' AND TRIM(ri.Zip) <> '';
+		BestZIPScore						:= IF(le.Best_Info.BestCompanyZip <> '' AND ri.Zip <> '' AND le.Best_Info.BestCompanyZip[1] = ri.Zip[1], Risk_Indicators.AddrScore.ZIP_Score(le.Best_Info.BestCompanyZip, ri.Zip), NoScoreValue);
+		BestStateMatched				:= StringLib.StringToUpperCase(le.Best_Info.BestCompanyState) = StringLib.StringToUpperCase(ri.st);
+		BestCityStateScore			:= IF(le.Best_Info.BestCompanyCity <> '' AND le.Best_Info.BestCompanyState <> '' AND ri.p_city_name <> '' AND ri.st <> '' AND BestStateMatched, 
+															Risk_Indicators.AddrScore.CityState_Score(le.Best_Info.BestCompanyCity, le.Best_Info.BestCompanyState, ri.p_city_name, ri.st, ''), NoScoreValue);
+		BestCityStateZipMatched	:= BestAddressPopulated AND Risk_Indicators.iid_constants.ga(BestZIPScore) AND Risk_Indicators.iid_constants.ga(BestCityStateScore);
+		
+		BestAddressScore := MAP(NOT BestAddressPopulated => NoScoreValue,
+												BestAddressPopulated AND BestZIPScore = NoScoreValue AND BestCityStateScore = NoScoreValue => NoScoreValue,
+																																		Risk_Indicators.AddrScore.AddressScore(le.Best_Info.BestPrimRange, le.Best_Info.BestPrimName, le.Best_Info.BestSecRange, 
+																																		ri.prim_range, ri.prim_name, ri.sec_range,
+																																		BestZIPScore, BestCityStateScore));
+		BestAddressMatched			:= BestAddressPopulated AND Risk_Indicators.iid_constants.ga(BestAddressScore);
 		
 		SELF.Verification.AddrMiskey := MAP(NOT AddressPopulated								  => '-1',
 																				AddressMatched AND AddressScore < 100 => '1',
@@ -362,7 +385,57 @@ END;
 															Rep5InputSSNPopulated AND le.Clean_Input.Rep5_SSN[1] = ri.contact_ssn[IF(Rep5SSNLength = 4, 6, 1)]	=> Risk_Indicators.iid_constants.gn(DID_Add.SSN_Match_Score(le.Clean_Input.Rep5_SSN, ri.contact_ssn, Rep5SSNLength=4)),
 																																																																 FALSE); 
 		
+
 		RepInputNamePopulated := TRIM(le.Clean_Input.Rep_FirstName) <> '' OR TRIM(le.Clean_Input.Rep_LastName) <> ''; // Populated if first or last are sent in
+		RepInputLexIDPopulated := le.Clean_Input.Rep_LexID > 0;
+		RepLexIDMatched := RepInputLexIDPopulated AND le.Clean_Input.Rep_LexID = ri.contact_did;
+
+    Rep2InputNamePopulated := TRIM(le.Clean_Input.Rep2_FirstName) <> '' OR TRIM(le.Clean_Input.Rep2_LastName) <> '';
+		Rep2InputLexIDPopulated := le.Clean_Input.Rep2_LexID > 0;
+		Rep2LexIDMatched := Rep2InputLexIDPopulated AND le.Clean_Input.Rep2_LexID = ri.contact_did;
+
+		Rep3InputNamePopulated := TRIM(le.Clean_Input.Rep3_FirstName) <> '' OR TRIM(le.Clean_Input.Rep3_LastName) <> '';
+		Rep3InputLexIDPopulated := le.Clean_Input.Rep3_LexID > 0;
+		Rep3LexIDMatched := Rep3InputLexIDPopulated AND le.Clean_Input.Rep3_LexID = ri.contact_did;
+
+		Rep4InputNamePopulated := TRIM(le.Clean_Input.Rep4_FirstName) <> '' OR TRIM(le.Clean_Input.Rep4_LastName) <> '';
+		Rep4InputLexIDPopulated := le.Clean_Input.Rep4_LexID > 0;
+		Rep4LexIDMatched := Rep4InputLexIDPopulated AND le.Clean_Input.Rep4_LexID = ri.contact_did;
+
+		Rep5InputNamePopulated := TRIM(le.Clean_Input.Rep5_FirstName) <> '' OR TRIM(le.Clean_Input.Rep5_LastName) <> '';
+    Rep5InputLexIDPopulated := le.Clean_Input.Rep5_LexID > 0;
+		Rep5LexIDMatched := Rep5InputLexIDPopulated AND le.Clean_Input.Rep5_LexID = ri.contact_did;
+    
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRepLexIDOnFile := MAP(NOT RepInputLexIDPopulated AND NOT RepInputNamePopulated => '-1',
+                                              NOT RepInputLexIDPopulated AND  RepInputNamePopulated                               => '0',
+																							RepInputLexIDPopulated AND NOT RepLexIDMatched				                              => '1',
+																							RepInputLexIDPopulated AND  RepLexIDMatched 					                              => '2',
+                                                                                                                                     '0');
+
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2LexIDOnFile := MAP(NOT Rep2InputLexIDPopulated AND NOT Rep2InputNamePopulated => '-1',
+                                              NOT Rep2InputLexIDPopulated AND  Rep2InputNamePopulated                                => '0',
+																							Rep2InputLexIDPopulated AND NOT Rep2LexIDMatched				                               => '1',
+																							Rep2InputLexIDPopulated AND  Rep2LexIDMatched 					                               => '2',
+                                                                                                                                        '0');
+																																																			 
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3LexIDOnFile := MAP(NOT Rep3InputLexIDPopulated AND NOT Rep3InputNamePopulated => '-1',
+                                              NOT Rep3InputLexIDPopulated AND  Rep3InputNamePopulated                                => '0',
+																							Rep3InputLexIDPopulated AND NOT Rep3LexIDMatched				                               => '1',
+																							Rep3InputLexIDPopulated AND  Rep3LexIDMatched 					                               => '2',
+                                                                                                                                        '0');
+
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4LexIDOnFile := MAP(NOT Rep4InputLexIDPopulated AND NOT Rep4InputNamePopulated => '-1',
+                                              NOT Rep4InputLexIDPopulated AND  Rep4InputNamePopulated                                => '0',
+																							Rep4InputLexIDPopulated AND NOT Rep4LexIDMatched				                               => '1',
+																							Rep4InputLexIDPopulated AND  Rep4LexIDMatched 					                               => '2',
+                                                                                                                                        '0');
+                                                                                                                                        
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5LexIDOnFile := MAP(NOT Rep5InputLexIDPopulated AND NOT Rep5InputNamePopulated => '-1',
+                                              NOT Rep5InputLexIDPopulated AND  Rep5InputNamePopulated                                => '0',
+																							Rep5InputLexIDPopulated AND NOT Rep5LexIDMatched				                               => '1',
+																							Rep5InputLexIDPopulated AND  Rep5LexIDMatched 					                               => '2',
+                                                                                                                                        '0');
+
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRepNameOnFile	:= Map(RepInputNamePopulated = FALSE														=> '-1',
 																							RepInputNamePopulated = TRUE AND TRIM(ri.fname) = '' AND TRIM(ri.lname) = ''				=> '0',
 																							RepInputNamePopulated = TRUE AND RepAR2BFNameFile = '1' AND RepAR2BLNameFile = '0'	=> '1',
@@ -421,14 +494,13 @@ END;
 																																																		   '0');																																																 
 																																																		 																																															 
 																																																		 
-		Rep2InputNamePopulated := TRIM(le.Clean_Input.Rep2_FirstName) <> '' OR TRIM(le.Clean_Input.Rep2_LastName) <> '';
+		
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2NameOnFile	:= Map(Rep2InputNamePopulated = FALSE															=> '-1',
 																							Rep2InputNamePopulated = TRUE AND TRIM(ri.fname) = '' AND TRIM(ri.lname) = ''					=> '0',
 																							Rep2InputNamePopulated = TRUE AND Rep2AR2BFNameFile = '1' AND Rep2AR2BLNameFile = '0'	=> '1',
 																							Rep2InputNamePopulated = TRUE AND Rep2AR2BLNameFile = '1' AND Rep2AR2BFNameFile = '0'	=> '2',
 																							Rep2InputNamePopulated = TRUE AND Rep2AR2BFullFile = '1'															=> '3',
 																																																																			 '0');		
-		Rep3InputNamePopulated := TRIM(le.Clean_Input.Rep3_FirstName) <> '' OR TRIM(le.Clean_Input.Rep3_LastName) <> '';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3NameOnFile	:= Map(Rep3InputNamePopulated = FALSE															=> '-1',
 																							Rep3InputNamePopulated = TRUE AND TRIM(ri.fname) = '' AND TRIM(ri.lname) = ''					=> '0',
 																							Rep3InputNamePopulated = TRUE AND Rep3AR2BFNameFile = '1' AND Rep3AR2BLNameFile = '0'	=> '1',
@@ -437,14 +509,12 @@ END;
 																																																																			 '0');	
 																																																																			 
 																																																					 
-		Rep4InputNamePopulated := TRIM(le.Clean_Input.Rep4_FirstName) <> '' OR TRIM(le.Clean_Input.Rep4_LastName) <> '';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4NameOnFile	:= Map(Rep4InputNamePopulated = FALSE															=> '-1',
 																							Rep4InputNamePopulated = TRUE AND TRIM(ri.fname) = '' AND TRIM(ri.lname) = ''					=> '0',
 																							Rep4InputNamePopulated = TRUE AND Rep4AR2BFNameFile = '1' AND Rep4AR2BLNameFile = '0'	=> '1',
 																							Rep4InputNamePopulated = TRUE AND Rep4AR2BLNameFile = '1' AND Rep4AR2BFNameFile = '0'	=> '2',
 																							Rep4InputNamePopulated = TRUE AND Rep4AR2BFullFile = '1'															=> '3',
 																																																																			 '0');		
-		Rep5InputNamePopulated := TRIM(le.Clean_Input.Rep5_FirstName) <> '' OR TRIM(le.Clean_Input.Rep5_LastName) <> '';
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5NameOnFile	:= Map(Rep5InputNamePopulated = FALSE															=> '-1',
 																							Rep5InputNamePopulated = TRUE AND TRIM(ri.fname) = '' AND TRIM(ri.lname) = ''					=> '0',
 																							Rep5InputNamePopulated = TRUE AND Rep5AR2BFNameFile = '1' AND Rep5AR2BLNameFile = '0'	=> '1',
@@ -713,13 +783,15 @@ END;
 																																																												 '-1'); // No phone records found
 		SELF.Verification.VerificationBusInputPhoneAddr := VerificationBusInputPhoneAddrLevel; // This calculation will also happen in Business_Risk_BIP.getGong, take the max of both in Business_Shell_Function
 																																																												 
-		PhoneNameMatchLevel := MAP((INTEGER)le.Clean_Input.Phone10 = 0 => '-1', //Phone not input
-																	NOT PhonePopulated AND (INTEGER)le.Clean_Input.Phone10 > 0 => '0' ,									//Phone not found on business header
-																	PhoneMatched = TRUE AND NameMatched = FALSE AND AddressMatched = FALSE => '1',
-																	PhoneMatched = TRUE AND NameMatched = TRUE AND AddressMatched = FALSE => '2',
-																	PhoneMatched = TRUE AND NameMatched = FALSE AND AddressMatched = TRUE => '3',																	
-																	PhoneMatched = TRUE AND NameMatched = TRUE AND AddressMatched = TRUE => '4',
-																																																			'0');
+		PhoneNameMatchLevel := MAP((INTEGER)le.Clean_Input.Phone10 = 0                                                                                 => '-1', //Phone not input
+                                  Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND 
+                                  (TRIM(le.Clean_Input.CompanyName) = '' OR TRIM(le.Clean_Input.Prim_Name) = '' OR TRIM(le.Clean_Input.Zip5) = '') => '-1', //In version 3.0 and up, need name and address input to calculate
+																	NOT PhonePopulated AND (INTEGER)le.Clean_Input.Phone10 > 0                                                       => '0' ,	//Phone not found on business header
+																	PhoneMatched = TRUE AND NameMatched = FALSE AND AddressMatched = FALSE                                           => '1',
+																	PhoneMatched = TRUE AND NameMatched = TRUE AND AddressMatched = FALSE                                            => '2',
+																	PhoneMatched = TRUE AND NameMatched = FALSE AND AddressMatched = TRUE                                            => '3',																	
+																	PhoneMatched = TRUE AND NameMatched = TRUE AND AddressMatched = TRUE                                             => '4',
+                                                                                                                                                      '0');
 																
 		SELF.Verification.PhoneNameMismatch := PhoneNameMatchLevel; //Also in Business_Risk_BIP.getEDA we will reassign values in Business_Shell_Function
 
@@ -780,6 +852,14 @@ END;
 																																DateLastSeen, 
 																																DateVendorLastSeen,
 																																1}], Business_Risk_BIP.Layouts.LayoutSources), DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
+																																
+		SELF.BestAddressSources := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND BestAddressMatched, 
+																															DATASET([{ri.Source,
+																																DateFirstSeen, 
+																																DateVendorFirstSeen, 
+																																DateLastSeen, 
+																																DateVendorLastSeen,
+																																1}], Business_Risk_BIP.Layouts.LayoutSources), DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
 		SELF.PhoneSources := IF(PhoneMatched, DATASET([{ri.Source, 
 																																DateFirstSeen, 
 																															  DateVendorFirstSeen, 
@@ -793,6 +873,9 @@ END;
 																																DateVendorLastSeen,
 																																1}], Business_Risk_BIP.Layouts.LayoutSources), DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
 		
+		SELF.BestAddrPhones := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND BestAddressMatched AND (INTEGER)ri.Company_Phone > 0,
+																															DATASET([{ri.Company_Phone}], Business_Risk_BIP.Layouts.LayoutBestAddrPhones), DATASET([], Business_Risk_BIP.Layouts.LayoutBestAddrPhones));
+
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFirst := IF(TRIM(le.Clean_Input.Rep_FirstName) = '', '-1', BusNameAuthRepFirst);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepPrefFirstFile := IF(TRIM(le.Clean_Input.Rep_FirstName) = '', '-1', BusNameAuthRepPreferredFirst);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepLast := IF(TRIM(le.Clean_Input.Rep_LastName) = '', '-1', BusNameAuthRepLast);
@@ -945,8 +1028,11 @@ END;
 		self.Business_To_Executive_Link.BusExecLinkAuthRep5SSNBusFein := MAP(Rep5InputSSNPopulated = FALSE					=> '-1',
 																							COUNT(appendedContactScores (Rep5SSNMatchedFeinFile = TRUE)) = 0  => '0',
 																							COUNT(appendedContactScores (Rep5SSNMatchedFeinFile = TRUE)) > 0	=> '1',
-																																																									 '0');																																																							 
-																																																									 
+																																																									 '0');			
+		SELF.Organizational_Structure.OrgParentCompany := MAP(ri.org_proxid <> 0 AND ri.org_proxid <> ri.proxid  => '0',
+																													ri.org_proxid = 0 		OR ri.org_proxid = ri.proxid => '1', // org_proxid = 0 means we have a single location company, so it has no parent
+																																																								'-1');																																																							 
+
 		SELF := le;
 	END;
 	// Set the MaxFEINVer to a '4' indicating that we had full verification at the input BIP ID level (Defaulted to SeleID)
@@ -1001,8 +1087,10 @@ END;
 		SELF.NameSources := le.NameSources + ri.NameSources; 
 		SELF.AddressSources := le.AddressSources + ri.AddressSources;
 		SELF.AddressVerSources := le.AddressVerSources + ri.AddressVerSources;
+		SELF.BestAddressSources := le.BestAddressSources + ri.BestAddressSources;
 		SELF.PhoneSources := le.PhoneSources + ri.PhoneSources;
 		SELF.FEINSources := le.FEINSources + ri.FEINSources;
+		SELF.BestAddrPhones := le.BestAddrPhones + ri.BestAddrPhones;
 		
     SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepPrefFirstFile := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkBusNameAuthRepPrefFirstFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkBusNameAuthRepPrefFirstFile);
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFirst := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFirst, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFirst);
@@ -1021,6 +1109,7 @@ END;
 		SELF.Business_To_Executive_Link.AR2BRep3SSNBusHeader := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.AR2BRep3SSNBusHeader, (INTEGER)ri.Business_To_Executive_Link.AR2BRep3SSNBusHeader);
 		SELF.Business_To_Executive_Link.AR2BRep4SSNBusHeader := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.AR2BRep4SSNBusHeader, (INTEGER)ri.Business_To_Executive_Link.AR2BRep4SSNBusHeader);
 		SELF.Business_To_Executive_Link.AR2BRep5SSNBusHeader := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.AR2BRep5SSNBusHeader, (INTEGER)ri.Business_To_Executive_Link.AR2BRep5SSNBusHeader);		
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRepLexIDOnFile := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRepLexIDOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRepLexIDOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRepAddrOnFile := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRepAddrOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRepAddrOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRepPhoneOnFile  := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRepPhoneOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRepPhoneOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRepSSNOnFile  := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRepSSNOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRepSSNOnFile);
@@ -1033,6 +1122,7 @@ END;
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2Full := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2Full, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2Full);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2PhoneBusPhone := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep2PhoneBusPhone, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep2PhoneBusPhone);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2AddrBusAddr := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep2AddrBusAddr, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep2AddrBusAddr);
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2LexIDOnFile := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep2LexIDOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep2LexIDOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2NameOnFile  := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep2NameOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep2NameOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2AddrOnFile := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep2AddrOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep2AddrOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep2PhoneOnFile  := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep2PhoneOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep2PhoneOnFile);
@@ -1045,7 +1135,8 @@ END;
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3Full := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3Full, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkBusNameAuthRep3Full);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneBusPhone := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneBusPhone, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneBusPhone);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3AddrBusAddr := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep3AddrBusAddr, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep3AddrBusAddr);
-    SELF.Business_To_Executive_Link.BusExecLinkAuthRep3NameOnFile  := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep3NameOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep3NameOnFile);
+    SELF.Business_To_Executive_Link.BusExecLinkAuthRep3LexIDOnFile := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep3LexIDOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep3LexIDOnFile);
+		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3NameOnFile  := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep3NameOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep3NameOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3AddrOnFile := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep3AddrOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep3AddrOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneOnFile  := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep3SSNOnFile  := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep3SSNOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep3SSNOnFile);
@@ -1057,6 +1148,7 @@ END;
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4Full := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4Full, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkBusNameAuthRep4Full);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneBusPhone := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneBusPhone, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneBusPhone);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4AddrBusAddr := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep4AddrBusAddr, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep4AddrBusAddr);
+    SELF.Business_To_Executive_Link.BusExecLinkAuthRep4LexIDOnFile := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep4LexIDOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep4LexIDOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4NameOnFile  := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep4NameOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep4NameOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4AddrOnFile := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep4AddrOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep4AddrOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneOnFile  := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneOnFile);
@@ -1069,11 +1161,13 @@ END;
 		SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5Full := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5Full, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkBusNameAuthRep5Full);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneBusPhone := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneBusPhone, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneBusPhone);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5AddrBusAddr := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep5AddrBusAddr, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep5AddrBusAddr);
+    SELF.Business_To_Executive_Link.BusExecLinkAuthRep5LexIDOnFile := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep5LexIDOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep5LexIDOnFile);
     SELF.Business_To_Executive_Link.BusExecLinkAuthRep5NameOnFile  := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep5NameOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep5NameOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5AddrOnFile := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep5AddrOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep5AddrOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneOnFile  := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5SSNOnFile  := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep5SSNOnFile, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep5SSNOnFile);
 		SELF.Business_To_Executive_Link.BusExecLinkAuthRep5SSNBusFein  := (STRING)MAX((INTEGER)le.Business_To_Executive_Link.BusExecLinkAuthRep5SSNBusFein, (INTEGER)ri.Business_To_Executive_Link.BusExecLinkAuthRep5SSNBusFein);
+		SELF.Organizational_Structure.OrgParentCompany := (STRING)MAX((INTEGER)le.Organizational_Structure.OrgParentCompany, (INTEGER)ri.Organizational_Structure.OrgParentCompany);
 		SELF := le;
 	END;
 	BusinessHeaderVerificationRolled := ROLLUP(SORT(BusinessHeaderVerification, Seq), LEFT.Seq = RIGHT.Seq, rollBusinessHeaderVerification(LEFT, RIGHT));
@@ -1163,9 +1257,11 @@ END;
 																							SELF.Verification.BNAP2 := Business_Risk_BIP.Common.calcBNAP_wide(RIGHT.PhoneMatched, RIGHT.PhonePopulated, RIGHT.NameMatched, RIGHT.AddressMatched, RIGHT.StateMatched); // Uses the combination of all header records to verify elements
 																							SELF.NameSources := RIGHT.NameSources;
 																							SELF.AddressVerSources := RIGHT.AddressVerSources;
+																							SELF.BestAddressSources := RIGHT.BestAddressSources;
 																							SELF.AddressSources := RIGHT.AddressSources;
 																							SELF.PhoneSources := RIGHT.PhoneSources;
 																							SELF.FEINSources := RIGHT.FEINSources;
+																							SELF.BestAddrPhones := RIGHT.BestAddrPhones;
 																							SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepPrefFirstFile := RIGHT.Business_To_Executive_Link.BusExecLinkBusNameAuthRepPrefFirstFile;
 																							SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFirst := RIGHT.Business_To_Executive_Link.BusExecLinkBusNameAuthRepFirst;
 																							SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRepLast := RIGHT.Business_To_Executive_Link.BusExecLinkBusNameAuthRepLast;
@@ -1184,11 +1280,13 @@ END;
 																							SELF.Business_To_Executive_Link.AR2BRep4SSNBusHeader := RIGHT.Business_To_Executive_Link.AR2BRep4SSNBusHeader;
 																							SELF.Business_To_Executive_Link.AR2BRep5SSNBusHeader := RIGHT.Business_To_Executive_Link.AR2BRep5SSNBusHeader;
 																							
+																							SELF.Business_To_Executive_Link.BusExecLinkAuthRepLexIDOnFile := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRepLexIDOnFile;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRepAddrOnFile := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRepAddrOnFile;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRepPhoneOnFile  := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRepPhoneOnFile;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRepSSNOnFile  := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRepSSNOnFile;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRepSSNBusFEIN := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRepSSNBusFEIN;
 																							//rep2
+																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep2LexIDOnFile := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep2LexIDOnFile;																							
 																							SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2PrefFirstFile := RIGHT.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2PrefFirstFile;
 																							SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2First := RIGHT.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2First;
 																							SELF.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2Last := RIGHT.Business_To_Executive_Link.BusExecLinkBusNameAuthRep2Last;
@@ -1208,6 +1306,7 @@ END;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneBusPhone := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneBusPhone;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep3AddrBusAddr := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep3AddrBusAddr;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep3NameOnFile  := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep3NameOnFile;
+																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep3LexIDOnFile := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep3LexIDOnFile;			
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep3AddrOnFile := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep3AddrOnFile;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneOnFile  := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep3PhoneOnFile;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep3SSNOnFile  := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep3SSNOnFile;
@@ -1221,7 +1320,8 @@ END;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneBusPhone := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneBusPhone;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep4AddrBusAddr := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep4AddrBusAddr;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep4NameOnFile  := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep4NameOnFile;
-																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep4AddrOnFile := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep4AddrOnFile;
+																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep4LexIDOnFile := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep4LexIDOnFile;			
+                                              SELF.Business_To_Executive_Link.BusExecLinkAuthRep4AddrOnFile := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep4AddrOnFile;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneOnFile  := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep4PhoneOnFile;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep4SSNOnFile  := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep4SSNOnFile;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep4SSNBusFEIN := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep4SSNBusFEIN;
@@ -1233,11 +1333,12 @@ END;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneBusPhone := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneBusPhone;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep5AddrBusAddr := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep5AddrBusAddr;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep5NameOnFile  := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep5NameOnFile;
+																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep5LexIDOnFile := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep5LexIDOnFile;			
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep5AddrOnFile := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep5AddrOnFile;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneOnFile  := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep5PhoneOnFile;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep5SSNOnFile  := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep5SSNOnFile;
 																							SELF.Business_To_Executive_Link.BusExecLinkAuthRep5SSNBusFein := RIGHT.Business_To_Executive_Link.BusExecLinkAuthRep5SSNBusFein;
-																							
+																							SELF.Organizational_Structure.OrgParentCompany := RIGHT.Organizational_Structure.OrgParentCompany;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 	
@@ -1258,6 +1359,8 @@ END;
 	withAssociateCounts := JOIN(withBusinessHeaderUniqueAddresses, BusinessHeaderTotalUniqueContactDIDs, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Associates.AssociateCount := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.UniqueDIDCount, -1, 100);
+																							SELF.Associates.AssociateCurrentCount := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.CurrentUniqueDIDCount, -1, 100);
+																							SELF.Associates.AssociateCurrentSOSCount := (STRING)Business_Risk_BIP.Common.capNum(RIGHT.CurrentUniqueSOSDIDCount, -1, 100);
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW, PARALLEL);
 																	
@@ -1438,7 +1541,7 @@ RollAdvoResidential := rollup(SORT(AdvoResidential, Seq), LEFT.Seq = RIGHT.Seq,
 	withUltIDTreeCounts := JOIN(withAssociateCounts, UltIDTree, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.Organizational_Structure.UltIDOrgIDTreeCount := (STRING)Business_Risk_BIP.Common.capNum(COUNT(RIGHT.OrgIDs), -1, 99999);
-																							SELF.Organizational_Structure.OrgLegalEntityCount := (STRING)Business_Risk_BIP.Common.capNum(MAX(COUNT(RIGHT.SeleIDs) - 1, 0), -1, 99999); // Subtract 1 from the COUNT to not count the SeleID we picked as the primary Sele
+																							SELF.Organizational_Structure.OrgLegalEntityCount := (STRING)Business_Risk_BIP.Common.capNum(MAX(calculateValueFor._OrgLegalEntityCount(COUNT(RIGHT.SeleIDs)), 0), -1, 99999); // Subtract 1 from the COUNT to not count the SeleID we picked as the primary Sele
 																							SELF.Organizational_Structure.OrgAddrLegalEntityCount := (STRING)Business_Risk_BIP.Common.capNum(COUNT(RIGHT.SeleIDsAddrMatch), -1, 99999);
 																							SELF.Organizational_Structure.UltIDProxIDTreeCount := (STRING)Business_Risk_BIP.Common.capNum(COUNT(RIGHT.ProxIDs), -1, 99999);
 																							SELF.Organizational_Structure.UltIDPowIDTreeCount := (STRING)Business_Risk_BIP.Common.capNum(COUNT(RIGHT.PowIDs), -1, 99999);
@@ -1447,7 +1550,7 @@ RollAdvoResidential := rollup(SORT(AdvoResidential, Seq), LEFT.Seq = RIGHT.Seq,
 	
 	withOrgIDTreeCounts := JOIN(withUltIDTreeCounts, OrgIDTree, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
-																							SELF.Organizational_Structure.OrgRelatedCount := (STRING)Business_Risk_BIP.Common.capNum(MAX(COUNT(RIGHT.SeleIDs) - 1, 0), -1, 99999); // Subtract 1 from the COUNT to not count the SeleID we picked as the primary Sele
+																							SELF.Organizational_Structure.OrgRelatedCount := (STRING)Business_Risk_BIP.Common.capNum(MAX(calculateValueFor._OrgRelatedCount(COUNT(RIGHT.SeleIDs)), 0), -1, 99999); // Subtract 1 from the COUNT to not count the SeleID we picked as the primary Sele
 																							SELF.Organizational_Structure.OrgIDProxIDTreeCount := (STRING)Business_Risk_BIP.Common.capNum(COUNT(RIGHT.ProxIDs), -1, 99999);
 																							SELF.Organizational_Structure.OrgIDPowIDTreeCount := (STRING)Business_Risk_BIP.Common.capNum(COUNT(RIGHT.PowIDs), -1, 99999);
 																							SELF := LEFT),
@@ -1484,6 +1587,8 @@ RollAdvoResidential := rollup(SORT(AdvoResidential, Seq), LEFT.Seq = RIGHT.Seq,
 																										(LEFT.PowID = RIGHT.PowID OR LEFT.PowID = 0), // Not searching on only UltID/OrgID/SeleID/ProxID - Match on PowID too
 																				TRANSFORM({UNSIGNED6 seq, STRING20 InputIDMatchCategory, STRING10 InputIDMatchStatus},
 																										SELF.seq := RIGHT.seq;
+																										GoldStatus := RIGHT.sele_gold = 'G';
+																										
 																										RawInputIDMatchStatus := MAP(Options.LinkSearchLevel = Business_Risk_BIP.Constants.LinkSearch.Default => RIGHT.sele_seg,
 																																								 Options.LinkSearchLevel = Business_Risk_BIP.Constants.LinkSearch.PowID 	=> RIGHT.pow_seg,
 																																								 Options.LinkSearchLevel = Business_Risk_BIP.Constants.LinkSearch.ProxID 	=> RIGHT.prox_seg,
@@ -1492,7 +1597,8 @@ RollAdvoResidential := rollup(SORT(AdvoResidential, Seq), LEFT.Seq = RIGHT.Seq,
 																																								 Options.LinkSearchLevel = Business_Risk_BIP.Constants.LinkSearch.UltID 	=> RIGHT.ult_seg,
 																																																																														 '0');
 																										
-																										SELF.InputIDMatchCategory := MAP(RawInputIDMatchStatus = '3' => Business_Risk_BIP.Constants.Category_TriCore, 				// 7 TRI CORE
+																										SELF.InputIDMatchCategory := MAP(
+																																								 RawInputIDMatchStatus = '3' 		 => Business_Risk_BIP.Constants.Category_TriCore, 				// 7 TRI CORE
 																																								 RawInputIDMatchStatus = '2'		 => Business_Risk_BIP.Constants.Category_DualCore, 				// 6 DUAL CORE
 																																								 RawInputIDMatchStatus = 'T'		 => Business_Risk_BIP.Constants.Category_TrustedSource,   // 5 TRUSTED SOURCE
 																																								 RawInputIDMatchStatus = '1'		 => Business_Risk_BIP.Constants.Category_SingleSource,    // 3 SINGLE SOURCE
@@ -1501,9 +1607,8 @@ RollAdvoResidential := rollup(SORT(AdvoResidential, Seq), LEFT.Seq = RIGHT.Seq,
 																																								 RawInputIDMatchStatus = 'D'		 => Business_Risk_BIP.Constants.Category_Defunct,  				// 1 DEFUNCT
 																																																										Business_Risk_BIP.Constants.Category_None); 					// 0 NONE
 																																																										
-																										SELF.InputIDMatchStatus := MAP(RawInputIDMatchStatus IN ['3','2','1','T','E'] => 'ACTIVE',
-																																									 RawInputIDMatchStatus IN ['I','D']						  => 'INACTIVE',
-																																																																		 'UNKNOWN');
+																										SELF.InputIDMatchStatus := calculateValueFor._InputIDMatchStatusBHeader(RawInputIDMatchStatus, GoldStatus);
+																										
 																									), LEFT OUTER, LIMIT(Business_Risk_BIP.Constants.Limit_BusHeader), KEEP(1)); 																
 	withIDMatchStatus := JOIN(withAddrResInd, BusinessHeaderIDStatus, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
@@ -1521,34 +1626,32 @@ RollAdvoResidential := rollup(SORT(AdvoResidential, Seq), LEFT.Seq = RIGHT.Seq,
 	// *********************
 	//   DEBUGGING OUTPUTS
 	// *********************
-	// OUTPUT(COUNT(BusinessHeaderRaw), NAMED('Total_BusinessHeaderRaw'));
+	// OUTPUT(CHOOSEN(BusinessHeaderUltRaw, 100), NAMED('Sample_BusinessHeaderUltRaw'));
+	// OUTPUT(CHOOSEN(BusinessHeaderUltSeq, 100), NAMED('Sample_BusinessHeaderUltSeq'));
+	// OUTPUT(CHOOSEN(BusinessHeaderUlt, 100), NAMED('Sample_BusinessHeaderUlt'));
+	// OUTPUT(CHOOSEN(linkIDGroups, 100), NAMED('Sample_linkIDGroups'));
 	// OUTPUT(COUNT(BusinessHeader), NAMED('Total_BusinessHeader'));
+	// OUTPUT(CHOOSEN(BusinessHeader, 100), NAMED('Sample_BusinessHeader'));
+	// OUTPUT(CHOOSEN(BusinessHeaderSourceStats, 100), NAMED('Sample_BusinessHeaderSourceStats'));
 	// OUTPUT(CHOOSEN(BusinessHeaderUniqueContactDIDs, 1000), NAMED('Sample_BusinessHeaderUniqueContactDIDs'));
 	// OUTPUT(CHOOSEN(getBestContactInfo, 1000), NAMED('Sample_getBestContactInfo'));
 	// OUTPUT(CHOOSEN(BusinessHeaderUniqueContacts, 1000), NAMED('Sample_BusinessHeaderUniqueContacts'));
-	// OUTPUT(CHOOSEN(BusinessHeaderUltRaw, 25), NAMED('Sample_BusinessHeaderUltRaw'));
-	// OUTPUT(CHOOSEN(BusinessHeaderUltSeq, 25), NAMED('Sample_BusinessHeaderUltSeq'));
-	// OUTPUT(CHOOSEN(BusinessHeaderUlt, 25), NAMED('Sample_BusinessHeaderUlt'));
-	// OUTPUT(CHOOSEN(BusinessHeader, 25), NAMED('Sample_BusinessHeader'));
-	// OUTPUT(CHOOSEN(BusinessHeaderSourceStats, 25), NAMED('Sample_BusinessHeaderSourceStats'));
-	// OUTPUT(CHOOSEN(withBusinessHeader, 25), NAMED('Sample_withBusinessHeader'));
 	// OUTPUT(CHOOSEN(BusinessHeaderVerification, 100), NAMED('Sample_BusinessHeaderVerification'));
 	// OUTPUT(CHOOSEN(BusinessHeaderVerificationRolled, 100), NAMED('Sample_BusinessHeaderVerificationRolled'));
-	// OUTPUT(CHOOSEN(withBusinessHeaderVerification, 500), NAMED('Sample_withBusinessHeaderVerification'));
 	// OUTPUT(CHOOSEN(BusinessHeaderAllAddresses, 500), NAMED('Sample_BusinessHeaderAllAddresses'));
-	// OUTPUT(CHOOSEN(BusInputAddr, 500), NAMED('Sample_BusInputAddr'));
 	// OUTPUT(CHOOSEN(BusinessHeaderUniqueAddresses, 500), NAMED('Sample_BusinessHeaderUniqueAddresses'));
+	// OUTPUT(CHOOSEN(countedUniqueAddresses, 500), NAMED('Sample_countedUniqueAddresses'));
+	// OUTPUT(CHOOSEN(withBusinessHeader, 100), NAMED('Sample_withBusinessHeader'));
+	// OUTPUT(CHOOSEN(withBusinessHeaderVerification, 500), NAMED('Sample_withBusinessHeaderVerification'));
+	// OUTPUT(CHOOSEN(withBusinessHeaderUniqueAddresses, 500), NAMED('Sample_withBusinessHeaderUniqueAddresses'));	
+	// OUTPUT(CHOOSEN(BusInputAddr, 500), NAMED('Sample_BusInputAddr'));
 	// OUTPUT(CHOOSEN(withAdvo, 100), NAMED('Sample_withAdvo'));
 	// OUTPUT(CHOOSEN(withADVODDInput, 500), NAMED('Sample_withADVODDInput'));
 	// OUTPUT(CHOOSEN(withADVODD, 500), NAMED('Sample_withADVODD'));
 	// OUTPUT(CHOOSEN(RollAdvoResidential, 100), NAMED('Sample_RollAdvoResidential'));
-	// OUTPUT(CHOOSEN(countedUniqueAddresses, 500), NAMED('Sample_countedUniqueAddresses'));
-	// OUTPUT(CHOOSEN(withBusinessHeaderUniqueAddresses, 500), NAMED('Sample_withBusinessHeaderUniqueAddresses'));
-	// OUTPUT(CHOOSEN(BusinessHeaderUltRaw, 100), NAMED('Sample_BusinessHeaderUltSeq'));
-	// OUTPUT(CHOOSEN(linkIDGroups, 100), NAMED('Sample_linkIDGroups'));
 	// OUTPUT(CHOOSEN(BusinessHeaderIDStatus, 100), NAMED('Sample_BusinessHeaderIDStatus'));
 	// OUTPUT(CHOOSEN(withIDMatchStatus, 100), NAMED('Sample_withIDMatchStatus'));
-	//  OUTPUT(CHOOSEN(withErrorCodes, 100), NAMED('Sample_withErrorCodes'));
+	// OUTPUT(CHOOSEN(withErrorCodes, 100), NAMED('Sample_withErrorCodes'));
 	
 	RETURN UNGROUP(withErrorCodes);
 END;

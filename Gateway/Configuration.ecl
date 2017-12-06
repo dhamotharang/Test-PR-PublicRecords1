@@ -88,7 +88,9 @@ export Configuration := module
 	export IsThreatMetrix	(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.ThreatMetrix;
 	export IsAttIapQuery(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.AttIapQuery;		
 	export IsZumigoIdentity(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.ZumigoIdentity;		
-  export IsEquifaxAcctDecisioning(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.EquifaxAcctDecisioning;		
+  export IsEquifaxAcctDecisioning(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.EquifaxAcctDecisioning;
+	export IsEquifaxEVS(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=Gateway.Constants.ServiceName.EquifaxEVS;
+	export IsAccuDataCNAM(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.IsAccuDataCNAM;
   // internal
 	export IsNeutralRoxie(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.NeutralRoxie;
 	export IsFCRARoxie(string40 svcName) := STD.Str.ToLowerCase(trim(svcName)) = Gateway.Constants.ServiceName.FCRARoxie;

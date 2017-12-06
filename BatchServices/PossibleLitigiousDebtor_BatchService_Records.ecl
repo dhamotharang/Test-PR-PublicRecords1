@@ -1,4 +1,4 @@
-import CourtLink, BatchServices, Autokey_batch, AutokeyB2,ut, autostandardI, suppress;
+﻿import CourtLink, BatchServices, Autokey_batch, AutokeyB2,ut, autostandardI, suppress;
 
     fn_apply_penalty(Autokey_batch.Layouts.rec_inBatchMaster l,                                     
 										 BatchServices.Layouts.PLD.rec_results_raw r)  := FUNCTION  
@@ -20,34 +20,9 @@ import CourtLink, BatchServices, Autokey_batch, AutokeyB2,ut, autostandardI, sup
 
 end;		
 
-BatchServices.Layouts.PLD.rec_batch_PLD_input file_inPLDBatchMaster(BOOLEAN forceSeq = FALSE) := function 
-		//
-		// generic layout with Possible Litigious debtor information added
-		// see BatchServices.Layouts.PLD.rec_batch_pld_input
-		//
-		rec := BatchServices.Layouts.PLD.rec_batch_PLD_input;
-
-		raw1 := DATASET([], rec) : STORED('batch_in', FEW);
-		raw0 := raw1 : GLOBAL;
-
-		rec tra(rec l) := TRANSFORM
-			SELF.max_results := if( (UNSIGNED8) l.max_results > 0, l.max_results, (string4) BatchServices.Constants.PLD.SEQ_MAX_LIMIT);
-			SELF := l;
-		end;
-
-		raw := PROJECT(raw0, tra(LEFT));
-
-		ut.MAC_Sequence_Records(raw, seq, raw_seq)
-
-		PLD_file := IF(NOT forceSeq AND EXISTS(raw(seq > 0)), raw, raw_seq);				
+EXPORT PossibleLitigiousDebtor_BatchService_Records(DATASET(BatchServices.Layouts.PLD.rec_batch_PLD_input) ds_batch_in_pld) := FUNCTION
 		
-		return PLD_file;
-	
-end;		
-
-EXPORT PossibleLitigiousDebtor_BatchService_Records(BOOLEAN useCannedRecs = FALSE) := FUNCTION
-		
-		// 1. Define values for obtaining autokeys and payloads.	
+		// Define values for obtaining autokeys and payloads.	
 				
 		c				:= CourtLink.Constants('');
 		ak_keyname    := c.ak_qa_keyname;
@@ -58,7 +33,7 @@ EXPORT PossibleLitigiousDebtor_BatchService_Records(BOOLEAN useCannedRecs = FALS
 
 		appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
 		
-		// 2. Configure the autokey search.		
+		// Configure the autokey search.		
 		ak_config_data := MODULE(BatchServices.Interfaces.i_AK_Config)
 			export workHard        := TRUE; // for Autokey_batch.Fetch_Address_Batch to run at all.  (addresses are not input just name info
 			                                 // and CourtJurisdiction).  
@@ -66,43 +41,21 @@ EXPORT PossibleLitigiousDebtor_BatchService_Records(BOOLEAN useCannedRecs = FALS
 			export PenaltThreshold := 2;  // done so that rules for middle name matching apply.  See bug # 59230
 			                              // for additional information and test cases.
 			export skip_set        := ak_skipset;
-		END;
-   	 
-		sample_PLD_set := BatchServices._Sample_inBatchMaster('POSSIBLELITIGIOUSDEBTOR');
-		
-		// just use other inputs for testing.
-	   test_PLD_recs := PROJECT(sample_PLD_set, TRANSFORM(
-		                                         BatchServices.Layouts.PLD.rec_batch_PLD_input,	
-																						        self.acctno := left.acctno;
-																						        SELF.name_first := left.name_first;
-																										Self.name_last  := left.name_last;																						        
-																										SELF.CourtJurisdiction :=  left.st;		
-																										self.CaseTypeSearch_FDCPA := left.sic_code;
-																										self.CaseTypeSearch_FCRA  := left.fein;
-																										self.CaseTypeSearch_TCPA  := left.ssn;
-																										SELF := []
-		                                                ));
-																																																																									
-    // 3. Grab the input XML and throw into a dataset.	
-		ds_batch_in_pld := 
-		                IF( NOT useCannedRecs, 		                         
-															file_inPLDBatchMaster(forceSeq := FALSE),
-		                          test_PLD_recs 
-                             );		        
+		END;       
 
-    // 4 move raw input into layout to pass to autokeys.
+    // move raw input into layout to pass to autokeys.
 		ds_batch_in := PROJECT(ds_batch_in_pld, Autokey_batch.Layouts.rec_inBatchMaster);														 
 											
-		// 5. Get fake ids from the autokeys based on batch input.
+		// Get fake ids from the autokeys based on batch input.
 		ds_fids := Autokey_batch.get_fids(ds_batch_in, ak_keyname, ak_config_data);
 				
-		// 6. Get autokey payload data (outPLfat) using the fake ids.
+		// Get autokey payload data (outPLfat) using the fake ids.
 		AutokeyB2.mac_get_payload( UNGROUP(ds_fids), ak_keyname, ak_dataset, outPLfat, did, bdid, ak_typeStr );
 		
 		//outPLfat := project(ds_batch_in, layout_acct_mname);
 		
 		
-		// 7. project payload into layout for output 
+		// project payload into layout for output 
 		ds_acctnos_PLD_CourtID_from_ak_payload := PROJECT( outPLfat, BatchServices.Layouts.PLD.rec_results_autokey_plus);
 						
 		// reduce payload just by input condition -- use acctno to join back set
@@ -131,7 +84,7 @@ EXPORT PossibleLitigiousDebtor_BatchService_Records(BOOLEAN useCannedRecs = FALS
 																		self := right)
 															 , LIMIT(BatchServices.Constants.PLD.JOIN_LIMIT, SKIP));		                                										
     			
-    //8. join against payload key.
+    //join against payload key.
     ds_payload := JOIN( ds_filter_payload,
 			                     CourtLink.key_CourtID_Docket,
 			                     KEYED(LEFT.courtid = RIGHT.courtid) AND
@@ -395,7 +348,7 @@ EXPORT PossibleLitigiousDebtor_BatchService_Records(BOOLEAN useCannedRecs = FALS
 										acctno, -dateFiled, record);
      ds_results_grouped := group(ds_results, acctno);										
 			 		    																				
-    // 10. At this point, 'flatten' the resultant records into the specified output layout using ostensibly															
+    // At this point, 'flatten' the resultant records into the specified output layout using ostensibly															
 		 ds_results_rolled_flat := ROLLUP(ds_results_grouped, GROUP, xfm_PLD_make_flat(LEFT, ROWS(LEFT)));		
 		 
 		  // output(ds_acctnos_PLD_CourtID_from_ak_payload, named('ds_acctnos_PLD_CourtID_from_ak_payload'));

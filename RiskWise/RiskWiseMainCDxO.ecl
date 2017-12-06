@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="St. Cloud Main Service CDxO">
 	<part name="tribCode" type="xsd:string"/>
 	<part name="account" type="xsd:string"/>
@@ -139,7 +139,7 @@ export RiskWiseMainCDxO := MACRO
 	string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
 
 	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.RiskWise__RiskWiseMainCDxO);
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.RiskWise__RiskWiseMainCDxO);
 /* ************* End Scout Fields **************/
 
 string4  tribCode_value := '' 		: stored('tribcode');

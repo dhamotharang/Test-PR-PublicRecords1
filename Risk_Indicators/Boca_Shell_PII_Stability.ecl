@@ -1,4 +1,4 @@
-// this attribute is only for beta testing for 5.2.  
+﻿// this attribute is only for beta testing for 5.2.  
 // when we put this into the real shell, the macro call to pii_stability can probably replace the DIDAppend macro in iid_getDIDprepOutput to be most efficient
 
 import didville;
@@ -43,7 +43,6 @@ link_wgt_prim_name_npos_cnt	:= count(group, 	prim_nameweight > 0	),
 link_wgt_prim_range_npos_cnt	:= count(group, 	prim_rangeweight > 0	),
 link_wgt_ssn4_npos_cnt	:= count(group, 	ssn4weight > 0	),
 link_wgt_ssn5_npos_cnt	:= count(group, 	ssn5weight > 0	),
-link_wgt_total_npos_cnt	:= count(group, 	weight > 0	),
 
 link_wgt_dob_nneg_cnt	:= count(group, 	dobweight < 0	),
 link_wgt_fname_nneg_cnt	:= count(group, 	fnameweight < 0	),
@@ -53,7 +52,6 @@ link_wgt_prim_name_nneg_cnt	:= count(group, 	prim_nameweight < 0	),
 link_wgt_prim_range_nneg_cnt	:= count(group, 	prim_rangeweight < 0	),
 link_wgt_ssn4_nneg_cnt	:= count(group, 	ssn4weight < 0	),
 link_wgt_ssn5_nneg_cnt	:= count(group, 	ssn5weight < 0	),
-link_wgt_total_nneg_cnt	:= count(group, 	weight < 0	),
 
 link_wgt_dob_nzero_cnt	:= count(group, 	dobweight = 0	),
 link_wgt_fname_nzero_cnt	:= count(group, 	fnameweight = 0	),
@@ -63,7 +61,6 @@ link_wgt_prim_name_nzero_cnt	:= count(group, 	prim_nameweight = 0	),
 link_wgt_prim_range_nzero_cnt	:= count(group, 	prim_rangeweight = 0	),
 link_wgt_ssn4_nzero_cnt	:= count(group, 	ssn4weight = 0	),
 link_wgt_ssn5_nzero_cnt	:= count(group, 	ssn5weight = 0	),
-link_wgt_total_nzero_cnt	:= count(group, 	weight = 0	),
 
 link_max_dobweight	:= max(group, dobweight);
 link_max_fnameweight	:= max(group, fnameweight);

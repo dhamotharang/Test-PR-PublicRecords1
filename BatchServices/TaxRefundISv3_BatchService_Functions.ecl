@@ -103,6 +103,10 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 			END;
 					
 			ds_batch_clean := project(ds_batch_in, tf_clean_batch_in(LEFT, COUNTER));
+
+      // *--- DEBUG ---* //
+			//output(ds_batch_in, named('fnccb_ds_batch_in'));
+ 			//output(ds_batch_clean, named('fnccb_ds_batch_clean'));
 			
 			RETURN ds_batch_clean;
 	END; 
@@ -175,7 +179,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
       return AdlBestInfo_res; //???
 	end;
 
-	
+
 	// *--- Function to get Best Address & Address history (batch) records ---* //
 	export getBestAddress(dataset(rec_in_wdid) in_clean_batch,
 												BatchServices.TaxRefundISv3_BatchService_Interfaces.Input args_in) := function
@@ -189,7 +193,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 			addrBest_batch := project(in_clean_batch, makeAddrBestBatch(left));
 			    
 			addrBest_mod := module(AddrBest.Iparams.SearchParams) 
-				export ReturnLatLong        				:= TRUE; // added for 2015 enhancements
+				export ReturnLatLong        				:= TRUE; // added for TRISv3.0.1 2015 enhancement
 				export HistoricMatchCodes   				:= TRUE;
 				export ReturnConfidenceFlag 				:= TRUE;
 				export MaxRecordsToReturn						:= 20;
@@ -250,7 +254,7 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
       with_input_indicator_recs := project(addrBest_res, xformFindMatch(left));
       
 			address_record xformRollup(address_record L, address_record R) := transform
-        self.hasInputAddr := L.hasInputAddr or R.hasInputAddr;
+        self.hasInputAddr  := L.hasInputAddr or R.hasInputAddr;
         self.InputAddrDate := map(L.hasInputAddr => L.InputAddrDate,
                                   R.hasInputAddr => R.InputAddrDate,
                                   '');
@@ -260,10 +264,10 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
         self.InputAddrLastSeen :=		map(L.hasInputAddr => L.InputAddrLastSeen,
 																				R.hasInputAddr => R.InputAddrLastSeen,
 																				'');																	
-        leftZipDate := if (L.InputZipMatch, l.InputZipMatchDate,'');
+        leftZipDate  := if (L.InputZipMatch, l.InputZipMatchDate,'');
 				rightZipDate := if (R.InputZipMatch, R.InputZipMatchDate,''); 
         self.InputZipMatchDate	:= max(leftZipDate, rightZipDate);																
-        self.InputZipMatch	:= L.InputZipMatch or R.InputZipMatch;	
+        self.InputZipMatch	 := L.InputZipMatch or R.InputZipMatch;	
 				self.InputStateMatch := L.InputStateMatch or R.InputStateMatch;
         self := L; //first record per acctno is best address
       end;
@@ -285,14 +289,14 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 
 		unsigned2 flag_value(string1 probationFlag, string1 paroleFlag, string1 incarFlag) := function
 			 flag_val := map(probationFlag = 'Y' => 1,
-											 paroleFlag = 'Y' => 2,
-											 incarFlag = 'Y' => 3,
+											 paroleFlag    = 'Y' => 2,
+											 incarFlag     = 'Y' => 3,
 											 probationFlag = 'U' => 4,
-											 paroleFlag = 'U' => 5,
-											 incarFlag = 'U' => 6,
+											 paroleFlag    = 'U' => 5,
+											 incarFlag     = 'U' => 6,
 											 probationFlag = 'N' => 7,
-											 paroleFlag = 'N' => 8,
-											 incarFlag = 'N' => 9,
+											 paroleFlag    = 'N' => 8,
+											 incarFlag     = 'N' => 9,
 											 10);
 			 return flag_val;
 		end;
@@ -315,8 +319,8 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
         
 		filt_crim_res := join(crim_res, in_clean_batch, 
 													left.acctno = right.acctno and
-													(left.data_type = BatchServices.Constants.TRISV3.Data_Type_1 or 
-																left.datasource = BatchServices.Constants.TRISV3.Department_of_Corrections) and //need to return only Department of Corrections datasource!
+													(left.data_type  = BatchServices.Constants.TRISV3.Data_Type_1 or 
+													 left.datasource = BatchServices.Constants.TRISV3.Department_of_Corrections) and //need to return only Department of Corrections datasource!
 													StringLib.StringToUpperCase(left.lname) = StringLib.StringToUpperCase(right.name_last) and
 													(StringLib.StringToUpperCase(left.fname[1]) = right.name_first[1] or
 														NID.PreferredFirstNew(left.fname) = right.name_first),
@@ -353,7 +357,6 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 
 		filt_crim_res_w_dates := project(filt_crim_res, fillSortFields(LEFT));
 		filt_crim_res_sorted := SORT(filt_crim_res_w_dates, -sDate1, sFlag, 
-
 																												-sDate2, sFlag, 
 																												-sDate3, sFlag, 
 																												-sDate4, sFlag, 
@@ -363,102 +366,18 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 																												-sDate8, sFlag, 
 																												-sDate9, sFlag,
 																												-process_date,sFlag);
+
+      // *--- DEBUG ---* //
+			//output(in_clean_batch, named('gcr_in_clean_batch'));
+		  //output(crim_batch,     named('gcr_crim_batch'));
+		  //output(crim_res_all,   named('gcr_crim_res_all'));
+		  //output(crim_res,       named('gcr_crim_res'));
+		  //output(filt_crim_res,  named('gcr_filt_crim_res'));
+		  //output(filt_crim_res_w_dates, named('gcr_filt_crim_res_w_dates'));
+		  //output(filt_crim_res_sorted,  named('gcr_filt_crim_res_sorted'));
 																												
 		return filt_crim_res_sorted;
 	end;
-	
-	/* Tris 3.2 Enhancement : Since InputAddrFelonyCount is blanked out, this function will not be used, so commenting out....
-	// * --- Function to get criminal batch records at input address --- * //
-	export getFeloniesAtAddressRecords(dataset(rec_in_wdid) in_clean_batch) := function
-
-		CriminalRecords_BatchService.Layouts.batch_in xformToCrimBatch(in_clean_batch L) := transform
-			self.acctno := L.acctno;
-			self.prim_range := L.prim_range;
-			self.prim_name := L.prim_name;
-			self.addr_suffix := L.addr_suffix;
-			self.postdir := L.postdir;
-			self.unit_desig := L.unit_desig;
-			self.sec_range := L.sec_range;
-			self.p_city_name := L.p_city_name;
-			self.st := L.st;
-			self.z5 := L.z5;
-			self.zip4 := L.zip4;
-			self := [];
-		end;
-		crim_batch := project(in_clean_batch, xformToCrimBatch(left));
-		
-		batch_params		:= BatchShare.IParam.getBatchParams();
-		crim_batch_params := module(project(batch_params, CriminalRecords_BatchService.IParam.batch_params, opt))	
-			unsigned2 MaxResults_val 		:= 50 : stored('MaxResults');
-			export boolean MatchStrAddr	:= true;      
-		  export boolean MatchState   := true;            
-		end;
-		
-		crim_res_all := CriminalRecords_BatchService.BatchRecords(crim_batch_params, crim_batch);
-		crim_res := crim_res_all.Records(did <> 0);
-			
-		filt_crim_res := join(crim_res, in_clean_batch, 
-													left.acctno = right.acctno and
-													(left.data_type = BatchServices.Constants.TRISV3.Data_Type_2 or 
-																left.datasource = BatchServices.Constants.TRISV3.Criminal_Court) and 
-													left.prim_range = right.prim_range and
-												  StringLib.StringToUpperCase(left.prim_name) = StringLib.StringToUpperCase(right.prim_name) and
-													StringLib.StringToUpperCase(left.p_city_name) = StringLib.StringToUpperCase(right.p_city_name) and
-													StringLib.StringToUpperCase(left.st) = StringLib.StringToUpperCase(right.st) and
-													left.zip5 = right.z5,
-													transform(recordof(crim_res), self := left), limit(0), keep(100));	
-	
-			filt_crim_res_felony := filt_crim_res(std.str.find(stringlib.StringToUpperCase(
-                  off_desc_1_1 + off_desc_1_2 + off_desc_1_3 + off_desc_1_4 + off_desc_1_5 + off_desc_1_6 +
-                  off_desc_2_1 + off_desc_2_2 + off_desc_2_3 + off_desc_2_4 + off_desc_2_5 + off_desc_2_6 +
-                  add_off_desc_1 + add_off_desc_2 + add_off_desc_3 + add_off_desc_4 + add_off_desc_5 + add_off_desc_6 +
-                  off_typ_1 +off_typ_2 + off_typ_3 + off_typ_4 + off_typ_5 + off_typ_6 +
-                  off_lev_1 +off_lev_2 + off_lev_3 + off_lev_4 + off_lev_5 + off_lev_6), 'FELONY') > 0 );
-			
-			crim_felony_recs_deduped := dedup(sort(filt_crim_res_felony, acctno, did), did);
-			
-			//Constant
-      max_address_rec := 20;
-      
-			AddrBest.Layout_BestAddr.Batch_in makeAddrBestBatch(crim_felony_recs_deduped L, integer C) := transform
-        self.did := L.did;
-			  // Can't run a batch of dids with the same account number.  Prepend a unique number that will
-				// be stripped off later.
-				self.acctno := (string)C + '_' + L.acctno;	
-				self := [];
-			end;
-					
-			addrBest_batch := project(crim_felony_recs_deduped, makeAddrBestBatch(left, counter));
-			    
-			addrBest_mod := module(AddrBest.Iparams.SearchParams) 
-				export IncludeRanking 				 := FALSE; //automatically applied to GOV applications to always get best ranked addr
-																								 //TRISv3.2 Enhancement : As per requirement, GBA should not be used for both 3.1 and 3.2 versions. Switching it back to Traditional Best.
-
-			end;
-			addrBest_res := AddrBest.Records(addrBest_batch, addrBest_mod).best_records;
-			
-			addrBest_res xform_w_acct(addrBest_res L) := transform
-				acctno := L.acctno;
-				SET OF STRING acct_elems := Std.Str.SplitWords(L.acctno, '_');
-				self.acctno := L.acctno[length(acct_elems[1]) + 2..length(acctno)];
-				self := L;
-			end;
-			
-			addrBest_res_w_acct := project(addrBest_res, xform_w_acct(left));
-
-			ds_felonies_at_addr := join(in_clean_batch, addrBest_res_w_acct,
-																	left.acctno = right.acctno and
-																	left.prim_range = right.prim_range and
-																	left.prim_name = right.prim_name and
-																	(left.sec_range = right.sec_range or left.sec_range = '' 
-																			or right.sec_range = '') and
-																	left.z5 = right.z5,
-																	transform(recordof(addrBest_res), self := right, self := []));
-																	
-		return ds_felonies_at_addr;
-	end;
-	*/
-
 
 	// *--- Function to get phone recs ---* //
 	EXPORT getPhoneRecords(DATASET(rec_in_wdid) in_clean_batch,
@@ -483,29 +402,6 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		RETURN ProgressivePhones;
 
 	END;
-
-	
-	// Tris 3.2 Enhancement : Since Net Acuity is no longer in used, commenting out this function....
-	/*
-	EXPORT getIPAddressRecords(DATASET(rec_in_wdid) in_clean_batch,
-														 UNSIGNED1 glb_purpose_value,
-												     UNSIGNED1 dppa_purpose_value,
-														 DATASET(Gateway.Layouts.Config) gateways_in) := FUNCTION
-		
-		formattedInput := PROJECT(in_clean_batch, TRANSFORM(RiskWise.Layout_IPAI,
-																									SELF.Seq := LEFT.Seq,
-																									SELF.IPAddr := LEFT.ip_Address,
-																									SELF := []));
-																																						 
-	  netAcuityResults := Risk_Indicators.getNetAcuity(formattedInput, 
-																										 gateways_in, 
-																										 dppa_purpose_value, 
-																										 glb_purpose_value);
-	
-		RETURN netAcuityResults;
-	END;
-	*/
-  
 
 	// *--- Function to get in-house IP_Metadata info for all 3 input ip addresses ---* //
   // 08/11/2017 v3.2 enhancements requirement 3.1.3.12
@@ -661,7 +557,8 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
   // *--- Function to get SSNIssuance issued start date ---* //
   export getSSNIssuanceRecords(dataset(rec_final) in_data) := function
   
-			//Tris 3.2 Enhancement : Per req 3.1.10, removing possible_age_dob = '' condition and project to SSNIssuance batch input layout (acctno + ssn)
+			//Tris 3.2 Enhancement : Per req 3.1.10, removing possible_age_dob = '' condition and 
+			// project to SSNIssuance batch input layout (acctno + ssn)
 			no_dob_recs := project(in_data, BatchServices.Layouts.SsnIssuance.batch_in);
     
       ssn_issuance_res := BatchServices.SSN_Issuance_BatchService_Records (no_dob_recs);
@@ -730,7 +627,6 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		end;
 		batch_in_FP := project(in_clean_batch,fill_fpBatch(LEFT));
 
-
     // module here inherits the interface & overrides it
 		InputArgs := module (Models.FraudAdvisor_Batch_Service_Interfaces.Input)
 					export string ModelName_in 					:= ModelName;
@@ -754,633 +650,17 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		end;
 
 		wModel := Models.FraudAdvisor_Batch_Service_Records(InputArgs,batch_in_FP,
-																												Gateway.Constants.void_gateway
-																												);
+																												Gateway.Constants.void_gateway);
 
-		return wModel;
+    ds_wModel_slimmed := project(wmodel,
+                            BatchServices.TaxRefundISv3_BatchService_Layouts.rec_fp_res_slim);
+
+    // *--- DEBUG ---* //
+		//output(wModel,            named('fnccfp2_wModel'));
+    //output(ds_wModel_slimmed, named('fnccfp2_ds_wModel_slimmed'));
+
+		return ds_wModel_slimmed;
 	end;
-
-
-	/* Tris 3.2 Enhancement : Since dod_bkr_flag is blanked out, this function will not be used, so commenting out....
-  // *--- Function to get Bankruptcy data for the min input and did for req 4.1.31 ---* // 
-	export func_get_bankr_data(dataset(rec_in_wdid) ds_batch_in_wdid) := function
-
-    // Project input dataset onto layout needed by the bankruptcy batch service
-		ds_bankr_input := project(ds_batch_in_wdid,
-															transform(BatchServices.layout_BankruptcyV3_Batch_in,
-																	        self := left));
-
-    // Call the bankruptcy batch service to get the bankruptcy data.
-    ds_bankr_recs := BatchServices.Bankruptcy_BatchService_records.Search(
-		                    // Some input parms copied from BatchServices.Bankruptcy_BatchService
-		                    ds_bankr_input, // input data to get bankruptcies for
-												['D'],  // party_types, [D]=match debtors only, req 4.1.31
-										    false,  // isFCRA, 
-												false,  // isDeepDive,  //not needed since did is input
-												'NONE', // in_ssn_mask, value doesn't really matter since we are not returning the bankr ssn
-												true    // use_namessnlast4 // true = BatchServices.Bankruptcy_BatchService default
-										 );
-	
-		// Then sort/dedup on data to be returned in case same address on more than 1 input record
-		ds_bankr_recs_kept := dedup(sort(ds_bankr_recs,
-																			 debtor_did,-date_filed,-orig_filing_date),
-																debtor_did,date_filed);
-
-     // Join input dataset to bankr recs kept on did to re-attach acctnos and to 
-		 // return all recs passed into this function, whether they had bankr data or not.
-		 ds_bankr_data_returned := join(ds_batch_in_wdid, ds_bankr_recs_kept,
-																		  left.did = (unsigned) right.debtor_did,
-																		transform(batchservices.TaxRefundISv3_BatchService_Layouts.rec_bankr_res,
-																		  self.acctno    := left.acctno, // re-attach input acctno
-																			self.bankr_did := (unsigned) right.debtor_did,
-																			self := right), // rest of fields right (bankr data)
-																		left outer // keep all input recs
-																	 );
-
-     // For debugging, uncomment lines below as needed
-	   // output(ds_batch_in_wdid,       named('ds_batch_in_wdid'));
-		 // output(ds_bankr_input,         named('ds_bankr_input'));
-     // output(ds_bankr_recs,          named('ds_bankr_recs'));
-		 // output(ds_bankr_recs_kept,     named('ds_bankr_recs_kept')); 
-     // output(ds_bankr_data_returned, named('ds_bankr_data_returned')); 
-
-		 return ds_bankr_data_returned;
-
-	end; // end of func_get_bankr_data
-	*/
-
-	/* Tris 3.2 Enhancement : Since dod_dl_flag is blanked out, this function will not be used, so commenting out....
-  // *--- Function to get Driver's License data for the min input and did for req 4.1.32 ---* // 
-	export func_get_dl_data(dataset(rec_in_wdid) ds_batch_in_wdid) := function
-
-    // Project input dataset onto layout needed by the bankruptcy batch service
-		ds_dl_input := project(ds_batch_in_wdid,
-															transform(Autokey_batch.Layouts.rec_inBatchMaster,
-																	        self := left));
-
-    // DL batch service config info (copied from DriversV2_Services.Batch_Service)
-		mod_dl_config := MODULE(DriversV2_Services.GetDLParams.batch_params)
-		  export useAllLookups := TRUE;
-		  export skip_set      := DriversV2.Constants.autokey_skipSet;
-			EXPORT boolean return_current_only	:= FALSE : STORED('Return_Current_Only');
-			EXPORT UNSIGNED8 MaxResultsPerAcct := 2000;
-	  end;
-
-    // Call the DL batch service to get the dl data.
-    ds_dl_recs := DriversV2_Services.Batch_Service_Records(ds_dl_input,
-										                                       mod_dl_config);
-
-    // Filter to only keep Current(not Historical) recs and recs where the status or 
-		// cdl_status do not indicate the person is "Deceased", req 4.1.32
-		// Then sort/dedup to only keep 1 most recent (highest lic_issue_date) record per did.
-		// See DriversV2_Services.fn_getDL_report (lines 129-137) use of the "Codes" key for: 
-		// history_name, status_name & cdl_status_name fields.  Then see the actual values
-		// on the prod codes_v3 key for those 3 fields.
-		// Note: The "raw" status & cdl_status data values mentioned in req 4.1.32, 
-		// bullet point 2, item #2 do not get returned in the dl batch service, only the 
-		// exploded/standardized values are returned from the Codes key join
-		// (i.e. "DECEASED" or "Deceased").  Therefore only the standardized values were
-		// checked for in the filter below.
-		ds_dl_recs_kept := dedup(sort(ds_dl_recs((history_name[1] != 'H'
-																					    // ^--- history_name filter should not be
-																						  // needed since input Return_Current_Only
-																							// option was set to TRUE,
-																							// but left it in to be safe.
-																						 )
-																						 and (Stringlib.StringToUpperCase(
-																									   status_name) != 'DECEASED')
-		                                         and (Stringlib.StringToUpperCase(
-																									   cdl_status_name) != 'DECEASED')
-																						 and (lic_issue_date !=0)
-																						),
-		                              did,-lic_issue_date,record),
-	                           did);
-
-     // Join input dataset to dl recs kept on did to re-attach acctnos and to 
-		 // return all recs passed into this function, whether they had dl data or not.
-		 ds_dl_data_returned := join(ds_batch_in_wdid,ds_dl_recs_kept,
-		                               left.did = right.did,
-																 transform(batchservices.TaxRefundISv3_BatchService_Layouts.rec_dl_res,
-																	 self.acctno := left.acctno, // re-attach input acctno
-																   self.dl_did := right.did,
-																	 self := right), // rest of fields right (dl data)
-																 left outer // keep all input recs
-															  );
-
-     // For debugging, uncomment lines below as needed
-	   // output(ds_batch_in_wdid,    named('ds_batch_in_wdid'));
-		 // output(ds_dl_input,         named('ds_dl_input'));
-     // output(ds_dl_recs,          named('ds_dl_recs'));
-		 // output(ds_dl_recs_kept,     named('ds_dl_recs_kept')); 
-     // output(ds_dl_data_returned, named('ds_dl_data_returned')); 
-
-		 return ds_dl_data_returned;
-
-	end; // end of func_get_dl_data
-	*/
-		
-	/* Tris 3.2 Enhancement : Since dod_deed_flag is blanked out, this function will not be used, so commenting out....
-  // *--- Function to get Property deeds data for the min input and did for req 4.1.33 ---* // 
-	export func_get_propdeed_data(dataset(rec_in_wdid) ds_batch_in_wdid) := function
-
-		// Capitalize any lower case alpha letters in the acctno field for matching later, 
-		// since the output of BatchServices.Property_BatchCommon also has that field capitalized.
-		ds_batch_in_wdid_cap := project(ds_batch_in_wdid,
-		                                transform(rec_in_wdid,
-																		  self.acctno := StringLib.StringToUpperCase(left.acctno),
-																			self        := left
-																		));
-
-    // Project input dataset onto layout needed by the property batch service.
-		ds_propdeed_input := project(ds_batch_in_wdid,
-	                               transform(LN_PropertyV2_Services.layouts.batch_in_plus_date_filter,
-																	  self := left
-																));
-
- 		// The line below was copied from BatchServices.Property_BatchService where it was
-		// passed into Property_BatchCommon.
-    nss := ut.getNonSubjectSuppression (Suppress.Constants.NonSubjectSuppression.doNothing);
-
-    // Call the Property batch service "Common" function to get the property data.
-		// NOTE: The Property batch service input options need to be set in 
-		//       BatchServices.TaxRefundISv3_BatchService_Records, before this  
-		//       func_get_propdeed_data function is called.
-    ds_propdeed_recs := BatchServices.Property_BatchCommon(false, // 1st parm=isFCRA
-		                                                       nss,   // 2nd parm nss unsigned1 value 
-																													 false,  // 3rd parm = useCannedrecs s/b false
-																											     ds_propdeed_input // 4th parm=input dataset,
-																													 ).Records;
-
-    // Normalize the non-empty recs out of the property batch service to split out 
-		// buyer_1 & buyer 2 names onto separate recs and only keeping
-		// the deed fields we will need later.
-    rec_prop_slim := record
-			 string30  acctno;
-       // will need to append 2 input name fields
-			 string3   input_name_first3;
-			 string20  input_name_last;
-		   string8   deed_contract_date  := '';
-		   string8   deed_recording_date := '';
-		   string70  deed_document_type_desc := '';					
-			 string120 buyer_orig_name   := '';
-		   string3   buyer_first_name3 := ''; // only need to compare first 3 chars
-		   string20  buyer_last_name   := '';
-		   string12  buyer_did         := '';
-		end;
-
-    rec_prop_slim tf_norm_names(recordof(ds_propdeed_recs) L,
-		                            integer C) := transform
-       self.input_name_first3 := '';
-			 self.input_name_last   := '';
-       self.buyer_orig_name	  := choose(C,L.buyer_1_orig_name,L.buyer_2_orig_name); 
-	     self.buyer_first_name3 := choose(C,L.buyer_1_first_name[1..3],L.buyer_2_first_name[1..3]);
-       self.buyer_last_name	  := choose(C,L.buyer_1_last_name,L.buyer_2_last_name);
-       self.buyer_did         := choose(C,L.buyer_1_did,L.buyer_2_did);
-			 self                   := L;	 
-		end;
-
-    ds_propdeed_recs_normed := normalize(ds_propdeed_recs
-																					 // filter to only keep recs where buyer names exist
-		                                       (buyer_1_orig_name !='' or
-		                                        buyer_2_orig_name !=''),
-		                                     2, // twice for buyer 1&2
-	                                       tf_norm_names(left,counter));
-
-   // Join normed recs back to input ds to get the input name info for comparision later.
-   ds_propdeed_recs_winputname := join(ds_propdeed_recs_normed, ds_batch_in_wdid_cap,
-	                                       left.acctno = right.acctno,
-																			 transform(rec_prop_slim,
-																			   // 2 fields from input (right), the rest from left
-																			   self.input_name_first3 := Stringlib.StringToUpperCase(
-																									                  right.name_first[1..3]),
-																				 self.input_name_last   := Stringlib.StringToUpperCase(
-																				                            right.name_last),
-																				 self            := left)
-	                                    );    
-  
-    // Filter to keep recs with certain conditions per req 4.1.33, bullet point 2,items 2-4
-		ds_propdeed_recs_kept := ds_propdeed_recs_winputname(
-															 // req item #3, match last/first name except if recs have
-															 // *TRUST* or *ESTATE* in buyer 1/2 orig  name fields
-															 (Stringlib.StringFind(buyer_orig_name,'TRUST',1)=0 and
-															  Stringlib.StringFind(buyer_orig_name,'ESTATE',1)=0)
-														   // req item #2, only recs with buyer1 or buyer 2 lastname &
-														   // firstname(first 3 chars) that match the input last/first name
-															 and (input_name_first3 = buyer_first_name3 and
-																    input_name_last   = buyer_last_name)
-                               // req item #4, recs that do not contain certain terms																		
-	                             and (deed_document_type_desc not in 
-															      batchservices.Constants.TRISv3.set_ExcludedDeedTypes)
-                               // req item #5a, have non-zero dates
-															 and ((unsigned)deed_contract_date  !=0 or 
-																	  (unsigned)deed_recording_date !=0)
-														 );
-
-     // Join input dataset to deed recs kept on did to re-attach acctnos and to 
-		 // return all recs passed into this function, whether they had deed data or not.
-		 ds_propdeed_data_returned := join(ds_batch_in_wdid,ds_propdeed_recs_kept,
-		                                     left.did = (unsigned) right.buyer_did,
-																		   transform(batchservices.TaxRefundISv3_BatchService_Layouts.rec_propdeed_res,
-																		     self.acctno   := left.acctno, //re-attach input acctno
-																			   self.deed_did := (unsigned) right.buyer_did,
-																			   self := right), // rest of fields right (dl data)
-																		   left outer // keep all input recs
-																	    );
-
-     // For debugging, uncomment lines below as needed
-	   // output(ds_batch_in_wdid,            named('ds_batch_in_wdid'));
-		 // output(ds_batch_in_wdid_cap,        named('ds_batch_in_wdid_cap'));
-		 // output(ds_propdeed_input,           named('ds_propdeed_input'));
-     // output(ds_propdeed_recs,            named('ds_propdeed_recs'));
-		 // output(ds_propdeed_recs_normed,     named('ds_propdeed_recs_normed')); 
-     // output(ds_propdeed_recs_winputname, named('ds_propdeed_recs_winputname')); 
-		 // output(ds_propdeed_recs_kept,       named('ds_propdeed_recs_kept')); 
-     // output(ds_propdeed_data_returned,   named('ds_propdeed_data_returned')); 
-
-		 return ds_propdeed_data_returned;
-
-	end; // end of func_get_propdeed_data
-	*/
-	
-	/* Tris 3.2 Enhancement : Since dod_mvr_flag is blanked out, this function will not be used, so commenting out....
-  // *--- Function to get vehicle/mvr data for the min input and did for req 4.1.34 ---* // 
-	export func_get_mvr_data(dataset(rec_in_wdid) ds_batch_in_wdid) := function
-
-    // Use VehicleV2_Services.RealTime_Batch_Service_V2_records. 
-    // NOTE: According to the product manager, Jennifer Paganacci on 09/10/14, due to 
-		// improvements/enhancements in the RTBSV2 she wants to use it instead of the 
-		// VehicleV2_Services.Vin_Batch_Service_records, even though the RT batch servicev2
-		// calls the Vin Batch Service.
-		//
-    // Project common TRISv3 batch input with did appended layout onto the layout 
-		// expected by VehicleV2_Services.RealTime_Batch_Service_Records.
-		ds_mvr_input := project(ds_batch_in_wdid,
-														transform(VehicleV2_Services.Batch_Layout.RealTime_InLayout_V2,
-																				 // Build "addr1" field from pieces
-																				 self.addr1      := Address.Addr1FromComponents(
-																														   left.prim_range, 
-																														   left.predir, 
-																															 left.prim_name,
-																															 left.addr_suffix, 
-																															 left.postdir, 
-																															 left.unit_desig, 
-																															 left.sec_range);
-                                         //  null out these
-																				 self.name_full  :='';
-																				 self.comp_name  := '';
-																				 self.addr2      := '';
-																				 self.year       := '';
-																				 self.make       := '';
-																				 self.model      := '';
-		                                     self.vinIn      :='';
-		                                     self.plate      :='';
-		                                     self.plateState := '';
-		                                     self.date       := '';
-																				 // name parts, p_city_name, st ,z5 & ssn fields
-																				 // have same field name as left so use left
-																				 self := left, 
-																		 ));
-
-    // Vehicle RealTime batch service config info module, 
-		//  (copied from VehicleV2_Services.RealTime_Batch_Service_V2)
-		mod_mvr := module(VehicleV2_Services.IParam.RTBatch_V2_params)
-		// most/all of these input options should not be needed since they 
-        // are not being input to this new TRISV3 Batch Service. 
-        // The only exception might be GatewayNameMatch and AlwaysHitGateway since they
-				// mentioned in req 4.1.34, but they are being set to FALSE in  
-        //   BatchServices.TaxRefundISv3_BatchService_Records.
-		    export boolean GatewayNameMatch    	:= false; // NOTE: default value diff than req 4.1.34, but matches the Veh RTBSV2
-	      // export BOOLEAN AlwaysHitGateway    := ~doxie.DataPermission.use_Polk;
-				export boolean Is_UseDate 					:= false; //use_date and is_veh2; since use_date defaults to false then is_UseDate is always false
-				export boolean ReturnCurrent				:= TRUE;  // NOTE: option name diff than req 4.1.34, but matches the Veh RTBSV2
-				export string32 ApplicationType 		:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(
-                AutoStandardI.GlobalModule(),AutoStandardI.InterfaceTranslator.application_type_val.params));
-			// export BOOLEAN AlwaysHitGateway    := ~doxie.DataPermission.use_Polk;
-		//
-	  end;
-
-		// NOTE: The VehicleV2.RealTime_Batch_Service_V2 input options like:
-		//           ReturnCurrent = TRUE,
-		//           GatewayNameMatch = Blank
-		//           RealTimePermissibleUse = Blank (causes the RTBSV2 to only access in-house MVR data???)
-		//  		 NEED to be set in BatchServices.TaxRefundISv3_BatchService_Records,
-		//            before this func_get_mvr_data function is called.
-	  ds_mvr_recs := VehicleV2_Services.RealTime_Batch_Service_V2_records(
-									     ds_mvr_input, 
-									     mod_mvr, 
-									 		 true);   //Is_Veh2
-
-    // Normalize the non-empty recs out of the vehicle rt batch service to split out 
-		// registrant names 1, 2 & 3 (with registration dates) onto separate recs 
-		// and only keep the mvr fields we will need later.
-    rec_mvr_slim := record
-		   string30 acctno;
-       // will need to append 2 input name fields
-			 string3   input_name_first3;
-			 string20  input_name_last;
-			 // only keep certain fields from veh batch service output
-			 string25  vin        :='';
-		   string3   reg_fname3 := ''; // only need to compare first 3 letters
-		   string20  reg_lname  := '';
-		   string12  reg_did    := '';
-			 string8   reg_first_date            := '';
-			 string8   reg_latest_effective_date := '';
-		end;
-
-    rec_mvr_slim tf_norm_registrants(recordof(ds_mvr_recs) L,
-	      	                           integer C) := transform
-       self.input_name_first3 := ''; //just null here, will be assigned below
-			 self.input_name_last   := ''; //just null here, will be assigned below
-			 // only need to save/check first 3 chars of first name.
-	     self.reg_fname3        := choose(C,L.reg_1_fname[1..3],L.reg_2_fname[1..3],L.reg_3_fname[1..3]);
-       self.reg_lname	        := choose(C,L.reg_1_lname,L.reg_2_lname,L.reg_3_lname);
-       self.reg_did           := choose(C,L.reg_1_did,L.reg_2_did,L.reg_3_did);
-			 // only 1 set of reg dates in Vehv2.RTbsV2 output, so put the 2 date fields on all recs
-			 // v--- since reg_first_date not populated on some(all?) source_code=DI recs, 
-			 //      if the reg_first_date is blank, use the reg_earliest_effective_date
-       self.reg_first_date            := if(L.reg_first_date != '', 
-			                                      L.reg_first_date,
-			                                      L.reg_earliest_effective_date);
-			 self.reg_latest_effective_date := L.reg_latest_effective_date;
-			 self                           := L;	 
-		end;
-
-    ds_mvr_recs_normed := normalize(ds_mvr_recs
-																	    // filter to only keep recs where a registrant name exists
-		                                  (reg_1_lname !='' or
-		                                   reg_2_lname !='' or 
-																			 reg_3_lname != ''),
-		                                   3, // 3 times for registrant 1, 2 & 3
-	                                     tf_norm_registrants(left,counter));
-
-   // Join normed recs back to input ds to get the input name info for comparision later.
-   ds_mvr_recs_winputname := join(ds_mvr_recs_normed,ds_batch_in_wdid,
-	                                   left.acctno = right.acctno,
-																	transform(rec_mvr_slim,
-																	   // 2 fields from input (right), the rest from left
-																		 self.input_name_first3 := Stringlib.StringToUpperCase(
-																						                  right.name_first[1..3]),
-																		 self.input_name_last   := Stringlib.StringToUpperCase(
-																				                            right.name_last),
-																		 self                   := left)
-	                               );
-
-    // Filter to only keep recs with certain conditions per req 4.1.34, bullet point 2,
-		// item #s 1 & 2.
-		// Then sort/dedup to only keep the 1 most recent (highest reg_latest_effective_date &
-		// highest reg_first_date) record per did.
-		ds_mvr_recs_kept := dedup(sort(ds_mvr_recs_winputname(
-		                                 // Filter first
-														         // req item #1, only recs with registrant 1, 2 or 3 
-																	   // lastname & firstname(first 3 chars) that match 
-																	   // the input last/first(3 chars) names.
-															       (input_name_first3 = reg_fname3 and
-																      input_name_last   = reg_lname)
-                                     // req item #2, reg dates match
-															       and (reg_first_date = reg_latest_effective_date)
-														        ), // end of filter
-																	 //Sort by:
-																	 reg_did,
-																	 -reg_latest_effective_date,
-																	 -reg_first_date),
-															//Dedup by:
-															reg_did
-															);														 
-
-     // Join input dataset to mvr recs kept on did to return all recs passed into
-		 // this function, whether they had mvr data or not.
-		 ds_mvr_data_returned := join(ds_batch_in_wdid, ds_mvr_recs_kept,
-																		left.did = (unsigned) right.reg_did,
-																	transform(batchservices.TaxRefundISv3_BatchService_Layouts.rec_mvr_res,
-																	  self.acctno  := left.acctno, // re-attach input acctno
-																	  self.mvr_did := (unsigned) right.reg_did,
-																		self         := right), // rest of fields right (voter data)
-																	left outer // keep all input recs
-																 );
-
-     // For debugging, uncomment lines below as needed
-     // output(ds_batch_in_wdid,       named('ds_batch_in_wdid'));
-		 // output(ds_mvr_input,           named('ds_mvr_input'));
-     // output(ds_mvr_recs,            named('ds_mvr_recs'));
-		 // output(ds_mvr_recs_normed,     named('ds_mvr_recs_normed')); 
-     // output(ds_mvr_recs_winputname, named('ds_mvr_recs_winputname')); 
-		 // output(ds_mvr_recs_kept,       named('ds_mvr_recs_kept')); 
-     // output(ds_mvr_data_returned,   named('ds_mvr_data_returned')); 
-
-		 return ds_mvr_data_returned;
-
-	end; // end of func_get_mvr_data
-	*/
-	
-	/* Tris 3.2 Enhancement : Since dod_voter_flag is blanked out, this function will not be used, so commenting out....
-  // *--- Function to get voter data for the min input and did for req 4.1.35 ---* // 
-	export func_get_voter_data(dataset(rec_in_wdid) ds_batch_in_wdid) := function
-
-    // Project input dataset onto layout needed by the voter batch service
-		ds_voter_input := project(ds_batch_in_wdid,
-															transform(Autokey_batch.Layouts.rec_inBatchMaster,
-																	        self := left));
-
-    // Voter batch service config info (copied from VotersV2_Services.BAtch_SErvice)
-	  mod_voter_config := MODULE(BatchServices.Interfaces.i_AK_Config)
-			export UseAllLookUps := TRUE; // used in VotersV2_Services.BAtch_SErvice, BUT
-			// it causes all dids at the input address to be returned regardless of input name.
-			// However if removed, there is an issue with the voter ssn autokey.
-			export skip_set      := ['B'];  //skip business related autokeys
-	  end;
-
-    // Call the voter batch service to get the voter data
-	  ds_voter_recs := VotersV2_Services.Batch_Service_Records(ds_voter_input,
-											                                       mod_voter_config);
-		
-    // Filter to only keep A(ctive) and not ABSENTEE recs. req 4.1.35
-		// Then sort/dedup to only keep 1 most recent (highest process_date and highest
-		// lastdatevote) record per did.
-		ds_voter_recs_kept := dedup(sort(ds_voter_recs(active_status = 'A' and
-																									 Stringlib.StringToUpperCase(
-																									   voter_status_exp) != 'ABSENTEE'),
-		                                 did,-process_date,-LastDateVote,record),
-	                              did);
-
-     // Join input dataset to voter recs kept on did to re-attach acctnos and to
-     // return all recs passed into this function, whether they had voter data or not.
-		 ds_voter_data_returned := join(ds_batch_in_wdid, ds_voter_recs_kept, 
-																			// need to match on did since all dids for an
-																			// addr are returned by the voter batch service.
-																			left.did = (unsigned) right.did,
-																		transform(batchservices.TaxRefundISv3_BatchService_Layouts.rec_voter_res,       
-																		  self.acctno    := left.acctno, // re-attach input acctno
-																			self.voter_did := (unsigned) right.did,
-																			self := right), // rest of fields right (voter data)
-																		left outer // keep all input recs
-																	 );
-
-     // For debugging, uncomment lines below as needed
-	   // output(ds_batch_in_wdid,       named('ds_batch_in_wdid'));
-		 // output(ds_voter_input,         named('ds_voter_input'));
-     // output(ds_voter_recs,          named('ds_voter_recs'));
-		 // output(ds_voter_recs_kept,     named('ds_voter_recs_kept')); 
-     // output(ds_voter_data_returned, named('ds_voter_data_returned')); 
-
-		 return ds_voter_data_returned;
-
-	end; // end of func_get_voter_data
-
-	
-  // *--- Functions related to getting Liens data ---* //
-	EXPORT LJcleanName(string Name) := FUNCTION
-				stripNameAnp := stringlib.stringfindreplace(Name,             '&',' ');
-				stripNameSlash := stringlib.stringfindreplace(stripNameAnp,   '/',' ');
-				stripDash := stringlib.stringfindreplace(stripNameSlash,          '-',' ');
-				stripNamePeriod := stringlib.stringfindreplace(stripDash,     '.','');
-				stripNameAppos := stringlib.stringfindreplace(stripNamePeriod,',','');
-				nydeptof := stringlib.stringfindreplace(stripNamePeriod,'NYDEPTOF','NY DEPT OF');
-				oftaxation := stringlib.stringfindreplace(stripNamePeriod,'OFTAXATION','OF TAXATION');
-				cleanName := stringlib.StringToUpperCase(nydeptof);
-				onespaceName := stringlib.StringCleanSpaces(cleanName);
-		RETURN onespaceName;
-	END; 
-	
-	EXPORT isCreditorState(string creditName) := FUNCTION
-		RETURN LJcleanName(creditName) in BatchServices.Constants.TRISv3.creditorStateSet;
-	END;
-	
-	EXPORT isStateLien(string OrigName) := FUNCTION
-		RETURN LJcleanName(OrigName) in BatchServices.Constants.TRISv3.stateLienSet;
-	END;
-	
-	EXPORT isLienReleased(string filingStatus) := FUNCTION
-		RETURN LJcleanName(filingStatus) in BatchServices.Constants.TRISv3.lienReleasedSet;
-	END;
-	
-  EXPORT LJoutputFilingState(string stateName) := FUNCTION
-		stateUpper := stringlib.StringToUpperCase(stateName);
-		stateDesc := if (codes.valid_st (stateUpper), codes.general.STATE_LONG(stateUpper), '');
-		retVal := if (stateDesc <> '', stateDesc, stateUpper);
-		RETURN retVal;
-	END;
-	
-	// SHARED TRISv3out := BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_out;
-  //SHARED TRISv3in_wDID  := BatchServices.TaxRefundISv3_BatchService_Layouts.rec_batch_in_wdid;
-	
-	// Tris 3.2 Enhancement : Since All 30 J&L fields are blanked out, this function will not be used, so commenting out....
-  EXPORT rec_final getLienRecords(Dataset(rec_final) trisOut, Dataset(rec_in_wdid) trisIn, BatchServices.TaxRefundISv3_BatchService_Interfaces.Input args_in) := function
-
-    LiensV2_Services.Batch_Layouts.batch_in fillinLien(trisIn l) := TRANSFORM
-      self := l;    //self := []  intentionally left out so I know I'm assigning all the fields and there are no extra I missed.
- 		  self.bdid := 0;
-		  self.FEIN := '';
-		  self.comp_name := '';	
-		  self.addr := '';
-    END;
-
-    batch_in := project(trisIn,  fillinLien(left));
-
-	  //==================================================================================
-    // this below is all taken from JudgmentsAndLiens_BatchService before and after its call to LiensV2_Services.Batch_records()
-    //==================================================================================
-
-		//*********************************************************************
-  	//if we knew application type for TRIS V3 we could remove global module.
-		//*********************************************************************
-		gm := AutoStandardI.GlobalModule();								
-		batch_params		:= BatchShare.IParam.getBatchParams();
-		jl_batch_params := module(project(batch_params, LiensV2_Services.IParam.batch_params, opt))
-			export unsigned8 MaxResults   					:= 10000 : STORED('MaxResults');	
-			export BOOLEAN no_did_append					 	:= FALSE : STORED('NoDIDAppend');
-			export BOOLEAN no_bdid_append				 		:= FALSE : STORED('NoBDIDAppend');
-			export UNSIGNED2 PenaltThreshold   			:= 10    : STORED('PenaltThreshold');
-			INTEGER max_results_per_acct 						:= 100   : STORED('Max_Results_Per_Acct');
-			export MaxResultsPerAcct 								:= 30    ;  //max 30
-			export SET OF STRING1 party_types				:= ['D'] ;  //debtor only 
-			export MatchName												:= FALSE : STORED('Match_Name');
-			export MatchStrAddr											:= FALSE : STORED('Match_Street_Address');
-			export MatchCity												:= FALSE : STORED('Match_City');
-			export MatchState												:= FALSE : STORED('Match_State');  
-			export MatchZip												  := FALSE : STORED('Match_Zip');   
-			export MatchSSN												  := FALSE : STORED('Match_SSN'); 	
-			export applicationType 									:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(gm,AutoStandardI.InterfaceTranslator.application_type_val.params));
-		END;
-		
-		BatchShare.MAC_SequenceInput(batch_in, ds_batch_in);
-		//get liens that match debtor up to 30	  
-  	ds_batch_out := LiensV2_Services.Batch_records(ds_batch_in, jl_batch_params);
-		// Restore original acctno and format to output layout.	
-		BatchShare.MAC_RestoreAcctno(ds_batch_in, ds_batch_out, ds_batch_ready, false);	
-		ds_JL_recs_flat := PROJECT(ds_batch_ready, LiensV2_Services.batch_make_flat(LEFT));		
-		pre_result := SORT(ds_JL_recs_flat, acctno, penalt, -orig_filing_date, -release_Date, filing_jurisdiction, orig_filing_number);
-		ut.mac_TrimFields(pre_result, 'pre_result', result);
-	 //==================================================================================
-   // end of code pulled from JudgmentsAndLiens_BatchService
-   //                MATCH RULES   REQ 4.1.49	 
-	 //==================================================================================
-
-   result fillRule1(result L) := transform
-	   self := L;
-	 end;
-	 
-	 resultsRule1 := JOIN(result, trisIn, left.acctno = right.acctno and 
-		                                    (((integer)left.debtor_1_party_1_did = right.did) or
-																				 ((integer)left.debtor_1_party_2_did = right.did) or
-																				 ((integer)left.debtor_2_party_1_did = right.did) or
-																				 ((integer)left.debtor_2_party_2_did = right.did) or
-																				 ((integer)left.debtor_3_party_1_did = right.did) or
-																				 ((integer)left.debtor_3_party_2_did = right.did) or
-																				 ((integer)left.debtor_4_party_1_did = right.did) or
-																				 ((integer)left.debtor_4_party_2_did = right.did) or
-																				 ((integer)left.debtor_5_party_1_did = right.did) or
-																				 ((integer)left.debtor_5_party_2_did = right.did) or
-																				 ((integer)left.debtor_6_party_1_did = right.did) or
-																				 ((integer)left.debtor_6_party_2_did = right.did) or
-																				 ((integer)left.debtor_7_party_1_did = right.did) or
-																				 ((integer)left.debtor_7_party_2_did = right.did)
-																				 ),	fillRule1(left));
- 		  //rule 2
-		inputValidCreditor := isCreditorState(args_in.Creditor) ;
-		cleanCreditor := LJcleanName(args_in.Creditor);
-		rule2recs := resultsRule1(((isCreditorState(creditor_cname) and inputValidCreditor) and 
-		                           (LJcleanName(creditor_cname) = cleanCreditor))
-		                            or 
-															((isCreditorState(creditor_orig_name) and inputValidCreditor) and 
-															 (LJcleanName(creditor_orig_name) = cleanCreditor))
-														 );				 
-    resultsRule2 := if (inputValidCreditor and (args_in.Creditor <> '') , rule2recs ,resultsRule1);		
- 	  //rule 3 and 4          
-		resultsRule3and4 := resultsRule2((isStateLien(orig_filing_type) or
-																			isStateLien(filing_1_filing_type_desc) or
-																			isStateLien(filing_2_filing_type_desc) or
-																			isStateLien(filing_3_filing_type_desc) or
-																			isStateLien(filing_4_filing_type_desc)
-																			)
-																		and 
-																			((release_date < stringlib.GetDateYYYYMMDD()) or 
- 																		   NOT (
-																		     isLienReleased(filing_1_filing_type_desc) or
-																				 isLienReleased(filing_2_filing_type_desc) or 
-																				 isLienReleased(filing_3_filing_type_desc) or
-																				 isLienReleased(filing_4_filing_type_desc) or
-																				 isLienReleased(filing_status))
-																			 )
-																			);
-			 // pull out all the field TRIS v3 is interested in 
-		liensRulesApplied := project(resultsRule3and4, TRANSFORM(BatchServices.TaxRefundISv3_BatchService_Layouts.rec_lien, 
-		                                                         self.filing_jurisdiction_name := if (left.filing_jurisdiction_name = '', LJoutputFilingState(left.filing_jurisdiction),left.filing_jurisdiction_name),
-																														 self := left));
-		liensNormalized := sort(liensRulesApplied, acctno, -orig_filing_date);																						 
-       // flatten the output, up to 30 liens and judgements.		
-    liensFlat30 := denormalize(trisOut, liensNormalized, left.acctno = right.acctno, 
-		                           BatchServices.TaxRefundISv3_BatchService_transforms.xfm_30_lien(left, right, counter)); 
-    // DEBUG															 
-	  // output(ds_batch_in,named('ds_batch_in'));
-	  // output(ds_batch_out,named('ds_batch_out'));
-	  // output(resultsRule1,named('resultsRule1'));
-	  // output(resultsRule2,named('resultsRule2'));
-	  // output(resultsRule3and4,named('resultsRule3and4'));
-		
-		RETURN liensFlat30;
-  END; //end of getLienRecords function		
-	*/	
-
 
 	EXPORT getContribRecs (dataset(rec_final) recs_in, string in_DataPermissionMask) := FUNCTION
 			contributory_key := tris_lnssi_build.key_field_value;
@@ -1391,15 +671,15 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 			boolean use_ContributoryData := AutoStandardI.DataPermissionI.val(dataPermissionTempMod).use_TrisContributoryData;
 			
 			slim_input_fields :=  record
-				string30 acctno;
-				string2	st	:= '';
+				string30  acctno;
+				string2	  st	:= '';
 				string200 isp_name1	:= '';
 				string200 isp_name2	:= '';
 				string200 isp_name3	:= '';
-				string25 Contrib_Risk_field:='';
-				string50 Contrib_Risk_Value:='';
-				string Contrib_Risk_Attr:='';
-				string Contrib_State_Excl:='';					
+				string25  Contrib_Risk_field :='';
+				string50  Contrib_Risk_Value :='';
+				string    Contrib_Risk_Attr  :='';
+				string    Contrib_State_Excl :='';					
 			end;
 
 			slim_input_fields appendAcctNo(rec_final L, recordof(contributory_key) R) := transform

@@ -1,4 +1,4 @@
-﻿IMPORT _Control, BIPV2, Business_Risk_BIP, Gateway, iesp, UT;
+﻿IMPORT _Control, BIPV2, Business_Risk_BIP, Cortera, Gateway, iesp, UT;
 
 Use_Business_Shell_Library := NOT _Control.LibraryUse.ForceOff_Business_Risk_BIP__LIB_Business_Shell;
 
@@ -23,7 +23,9 @@ EXPORT LIB_Business_Shell_Function (
 											BOOLEAN RunTargusGateway          = FALSE,
 											BOOLEAN OverrideExperianRestriction_In = FALSE,
 											BOOLEAN IncludeAuthRepInBIPAppend = FALSE,
-											BOOLEAN IsBIID20_In								= FALSE
+											BOOLEAN IsBIID20_In								= FALSE,
+                      BOOLEAN CorteraRetrotest_In       = FALSE,
+           DATASET(Cortera.layout_Retrotest_raw) ds_CorteraRetrotestRecsRaw = DATASET([],Cortera.layout_Retrotest_raw)
 																							) := FUNCTION
 
 options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
@@ -58,12 +60,13 @@ options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 	EXPORT BOOLEAN    OverrideExperianRestriction := OverrideExperianRestriction_In;	
 	EXPORT BOOLEAN    DoNotUseAuthRepInBIPAppend  := NOT IncludeAuthRepInBIPAppend;
 	EXPORT BOOLEAN		IsBIID20										:= IsBIID20_In;	
+  EXPORT BOOLEAN    CorteraRetrotest            := CorteraRetrotest_In;
 END;
 
 #if(Use_Business_Shell_Library)
 	Business_Shell_Results := LIBRARY('Business_Risk_BIP.LIB_Business_Shell', Business_Risk_BIP.LIB_Business_Shell_Interface(Input, options)).Results;
 #else
-	Business_Shell_Results := Business_Risk_BIP.Business_Shell_Function(Input, options);
+	Business_Shell_Results := Business_Risk_BIP.Business_Shell_Function(Input, options, ds_CorteraRetrotestRecsRaw);
 #end
 
 	RETURN(Business_Shell_Results);

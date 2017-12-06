@@ -1,4 +1,4 @@
-/*2016-05-21T00:38:47Z (Kevin Huls)
+﻿/*2016-05-21T00:38:47Z (Kevin Huls)
 Automated reinstate from 2016-05-19T17:50:17Z
 */
 /*--SOAP--
@@ -231,9 +231,10 @@ Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suf
 	string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
 	
 	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Risk_Indicators__InstantID);
+	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Risk_Indicators__InstantID);
 /* ************* End Scout Fields **************/
 
+boolean Test_Data_Enabled := FALSE   	: stored('TestDataEnabled');
 string120 addr1_val := ''    : stored('StreetAddress');
 string200 addr2_val := ''		 : stored('Addr');
 // Parsed address input
@@ -269,6 +270,28 @@ modelname := if(model_version='', custom_modelname, model_version);
 
 iid := Risk_Indicators.InstantID_records;
 
+targus := Project(iid, transform(Royalty.Layouts.Royalty,
+									self.royalty_type_code := left.royalty_type_code_targus,
+                  self.royalty_type := left.royalty_type_targus,	
+									self.royalty_count := left.royalty_count_targus,
+									self.non_royalty_count := left.non_royalty_count_targus,
+									self.count_entity := left.count_entity_targus,
+									self := left));
+
+insurance := Project(iid, transform(Royalty.Layouts.Royalty,
+                  self.royalty_type_code := left.royalty_type_code_insurance,
+                  self.royalty_type := left.royalty_type_insurance,
+                  self.royalty_count := left.royalty_count_insurance,
+                  self.non_royalty_count := left.non_royalty_count_insurance,
+                  self.count_entity := left.count_entity_insurance,
+									self := left));
+
+royalties4ustemp := if(test_data_enabled, DATASET([], Royalty.Layouts.Royalty), 
+	targus + insurance);
+	
+royalties4us := royalties4ustemp(royalty_type_code != 0);
+	
+
 // Deltabase_Log
 Deltabase_Logging_prep := project(iid, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
    																												 self.company_id := (Integer)CompanyID,
@@ -299,7 +322,8 @@ Deltabase_Logging_prep := project(iid, transform(Risk_Reporting.Layouts.LOG_Delt
    																												 self.i_zip := zip_value,
    																												 self.i_dl := dl_number_value,
    																												 self.i_dl_state := dl_state_value,
-																													 self.i_model_name_1 := modelname,
+																													 self.i_model_name_1 := 'CVI',
+																													 self.i_model_name_2 := modelname,
    																												 self.o_score_1 := (Integer)left.cvi,
    																												 self.o_reason_1_1 := left.ri[1].hri,
    																												 self.o_reason_1_2 := left.ri[2].hri,
@@ -326,7 +350,7 @@ output( final, named( 'Results' ) );
 
 IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 
-dRoyalties := DATASET([], Royalty.Layouts.Royalty) : STORED('Royalties');
+dRoyalties := royalties4us;
 output(dRoyalties, named('RoyaltySet'));
 
 ENDMACRO;

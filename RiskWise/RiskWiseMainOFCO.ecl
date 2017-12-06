@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Stand Alone OFAC Process">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="account" type="xsd:string"/>
@@ -17,7 +17,6 @@
 	<part name="DPPAPurpose" type="xsd:byte"/>
 	<part name="GLBPurpose" type="xsd:byte"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
-	<part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
  </message>
 */
 /*--INFO-- Migrating ofac and ofc2 to boca. Also added ofc3  */
@@ -48,29 +47,7 @@ export RiskWiseMainOFCO := MACRO
 	'countrycode',
 	'DPPAPurpose',
 	'GLBPurpose',
-	'gateways',
-	'OutcomeTrackingOptOut'));
-
-/* **********************************************
-   *  Fields needed for improved Scout Logging  *
-   **********************************************/
-	string32 _LoginID           := ''	: STORED('_LoginID');
-	string20 CompanyID          := '' : STORED('_CompanyID');
-	string20 FunctionName       := '' : STORED('_LogFunctionName');
-	string50 ESPMethod          := '' : STORED('_ESPMethodName');
-	string10 InterfaceVersion   := '' : STORED('_ESPClientInterfaceVersion');
-	string10 ssnmask            := '' : STORED('SSNMask');
-	string10 dobmask            := '' : STORED('DOBMask');
-	string1 dlmask              := '' : STORED('DLMask');
-	string5 DeliveryMethod      := '' : STORED('_DeliveryMethod');
-	string5 DeathMasterPurpose  := '' : STORED('__deathmasterpurpose');
-	string1 ExcludeDMVPII       := '' : STORED('ExcludeDMVPII');
-	BOOLEAN DisableOutcomeTracking := FALSE : STORED('OutcomeTrackingOptOut');
-	string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
-
-	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.RiskWise__RiskWiseMainOFCO);
-/* ************* End Scout Fields **************/
+	'gateways'));
 
 string4  tribCode_value := '' : stored('tribcode');
 string30 account_value := ''  : stored('account');
@@ -92,8 +69,6 @@ unsigned1 GLB_Purpose := RiskWise.permittedUse.fraudGLBA : stored('GLBPurpose');
 gateways_in := Gateway.Configuration.Get();
 
 tribCode := StringLib.StringToLowerCase(tribCode_value);
-boolean Log_trib := tribcode in ['ofac'];
-
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
 	self.url := map(tribcode='ofc2' and le.servicename='attus' => le.url,  //ofc2 uses attus gateway
@@ -164,45 +139,11 @@ riskwise.Layout_OFCO filterAttus(attus_final le) := TRANSFORM
 	SELF.alertphone := '';	
 END;
 
+
+
 attus_ret := project(attus_final, filterAttus(left));
 
 final := if(tribcode='ofc2', attus_ret, ret);
-
-//Log to Deltabase
-Deltabase_Logging_prep := project(final, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
-																								 self.company_id := (Integer)CompanyID,
-																								 self.login_id := _LoginID,
-																								 self.product_id := Risk_Reporting.ProductID.RiskWise__RiskWiseMainOFCO,
-																								 self.function_name := FunctionName,
-																								 self.esp_method := ESPMethod,
-																								 self.interface_version := InterfaceVersion,
-																								 self.delivery_method := DeliveryMethod,
-																								 self.date_added := (STRING8)Std.Date.Today(),
-																								 self.death_master_purpose := DeathMasterPurpose,
-																								 self.ssn_mask := ssnmask,
-																								 self.dob_mask := dobmask,
-																								 self.dl_mask := dlmask,
-																								 self.exclude_dmv_pii := ExcludeDMVPII,
-																								 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
-																								 self.archive_opt_in := ArchiveOptIn,
-																								 self.industry := Industry_Search[1].Industry,
-																								 self.i_name_first := first_value,
-																								 self.i_name_last := last_value,
-																								 self.i_address := addr_value,
-																								 self.i_city := city_value,
-																								 self.i_state := state_value,
-																								 self.i_zip := zip_value,
-																								 self.i_name_first_2 := first2_value,
-																								 self.i_name_last_2 := last2_value,
-																								 self.i_bus_name := cmpy_value,
-																								 self.o_lexid := (Integer)left.riskwiseid,  //did
-																								 self := left,
-																								 self := [] ));
-Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
-// #stored('Deltabase_Log', Deltabase_Logging);
-
-//Improved Scout Logging
-IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 
 /* 
 output(gateways_in, named('gateways_in'));

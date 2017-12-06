@@ -120,6 +120,9 @@ export DataRestrictionI := module
 		// Judgments & Liens (JuLi) Toggle use of JuLi dat, position 41 (JuLi data)
 		export JuLi_data := ~allow and (fixed_DRM[41] not in ['0','']);
 		
+		// Cortera data, position 42
+		export Cortera := ~allow and (fixed_DRM[42] not in ['0','']);
+		
 		// ATT LIDB = Line Information DataBase data
 		export boolean isATT_LIDBRestricted(drm_type drm='') := ~allow and (fixed_DRM[43] not in ['0','']);
 		export boolean ATT_LIDB := isATT_LIDBRestricted(fixed_DRM);	

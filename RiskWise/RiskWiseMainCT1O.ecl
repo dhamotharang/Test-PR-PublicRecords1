@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Call Trace">
 	<part name="tribcode" type="xsd:string"/>
 	<part name="account" type="xsd:string"/>
@@ -10,7 +10,6 @@
 	<part name="DataRestrictionMask" type="xsd:string"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
-	<part name="OutcomeTrackingOptOut" type="xsd:boolean"/>
  </message>
 */
 /*--INFO-- Migrating ct02, ct03 and ct50 to boca */
@@ -35,29 +34,7 @@ export RiskWiseMainCT1O := MACRO
 	'ApplicationType',
 	'DataRestrictionMask',
 	'HistoryDateYYYYMM',
-	'gateways',
-	'OutcomeTrackingOptOut'));
-
-/* **********************************************
-   *  Fields needed for improved Scout Logging  *
-   **********************************************/
-	string32 _LoginID           := ''	: STORED('_LoginID');
-	string20 CompanyID          := '' : STORED('_CompanyID');
-	string20 FunctionName       := '' : STORED('_LogFunctionName');
-	string50 ESPMethod          := '' : STORED('_ESPMethodName');
-	string10 InterfaceVersion   := '' : STORED('_ESPClientInterfaceVersion');
-	string10 ssnmask            := '' : STORED('SSNMask');
-	string10 dobmask            := '' : STORED('DOBMask');
-	string1 dlmask              := '' : STORED('DLMask');
-	string5 DeliveryMethod      := '' : STORED('_DeliveryMethod');
-	string5 DeathMasterPurpose  := '' : STORED('__deathmasterpurpose');
-	string1 ExcludeDMVPII       := '' : STORED('ExcludeDMVPII');
-	BOOLEAN DisableOutcomeTracking := FALSE : STORED('OutcomeTrackingOptOut');
-	string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
-
-	//Look up the industry by the company ID.
-	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.RiskWise__RiskWiseMainCT1O);
-/* ************* End Scout Fields **************/
+	'gateways'));
 
 string4 tribCode_value := '' : stored('tribcode');	// not used in prii
 string30 account_value := '' : stored('account');
@@ -78,7 +55,6 @@ appType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(Au
 
 
 tribcode := StringLib.StringToLowerCase(tribCode_value);
-boolean Log_trib := tribCode in ['ct02'];
 
 Gateway.Layouts.Config gw_switch(gateways_in le) := transform
 	self.servicename := le.servicename;
@@ -124,34 +100,6 @@ emptyset := dataset([], riskwise.Layout_CT1O);
 ret := map(	tribcode='ct02' and count(final_seed)>0 and runSeed_value => final_seed,
 			tribcode in ['ct02', 'ct03', 'ct50'] => ungroup(final),
 			emptyset);
-
-//Log to Deltabase
-Deltabase_Logging_prep := project(ret, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
-																								 self.company_id := (Integer)CompanyID,
-																								 self.login_id := _LoginID,
-																								 self.product_id := Risk_Reporting.ProductID.RiskWise__RiskWiseMainCT1O,
-																								 self.function_name := FunctionName,
-																								 self.esp_method := ESPMethod,
-																								 self.interface_version := InterfaceVersion,
-																								 self.delivery_method := DeliveryMethod,
-																								 self.date_added := (STRING8)Std.Date.Today(),
-																								 self.death_master_purpose := DeathMasterPurpose,
-																								 self.ssn_mask := ssnmask,
-																								 self.dob_mask := dobmask,
-																								 self.dl_mask := dlmask,
-																								 self.exclude_dmv_pii := ExcludeDMVPII,
-																								 self.scout_opt_out := (String)(Integer)DisableOutcomeTracking,
-																								 self.archive_opt_in := ArchiveOptIn,
-																								 self.data_restriction_mask := DataRestriction,
-																								 self.industry := Industry_Search[1].Industry,
-																								 self.o_lexid := (Integer)left.riskwiseid,  //did
-																								 self := left,
-																								 self := [] ));
-Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
-// #stored('Deltabase_Log', Deltabase_Logging);
-
-//Improved Scout Logging
-IF(~DisableOutcomeTracking and Log_trib, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 
 output(ret, named('Results'));
 

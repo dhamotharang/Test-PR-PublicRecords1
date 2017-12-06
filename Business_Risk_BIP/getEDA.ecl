@@ -1,4 +1,4 @@
-IMPORT BIPV2, Business_Risk, Business_Risk_BIP, Gong, MDR, Risk_Indicators, UT; 
+﻿IMPORT BIPV2, Business_Risk, Business_Risk_BIP, Gong, MDR, Risk_Indicators, UT; 
 
 EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -166,6 +166,8 @@ EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) PhoneIDSources;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) NameSources;
 		DATASET(Business_Risk_BIP.Layouts.LayoutSources) AddressVerSources;
+		DATASET(Business_Risk_BIP.Layouts.LayoutSources) BestAddressSources;
+		DATASET(Business_Risk_BIP.Layouts.LayoutBestAddrPhones) BestAddrPhones;
 	END;
 																													
 																													
@@ -191,23 +193,43 @@ EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																																										Risk_Indicators.AddrScore.AddressScore(LEFT.Clean_Input.Prim_Range, LEFT.Clean_Input.Prim_Name, LEFT.Clean_Input.Sec_Range, 
 																																										RIGHT.prim_range, RIGHT.prim_name, RIGHT.sec_range,
 																																										ZIPScore, CityStateScore)));
+																				
+																				BestAddressPopulated		:= TRIM(LEFT.Best_Info.BestPrimName) <> '' AND TRIM(LEFT.Best_Info.BestCompanyZip) <> '' AND TRIM(RIGHT.prim_name) <> '' AND TRIM(RIGHT.Z5) <> '';
+																				BestZIPScore						:= IF(LEFT.Best_Info.BestCompanyZip <> '' AND RIGHT.Z5 <> '' AND LEFT.Best_Info.BestCompanyZip[1] = RIGHT.Z5[1], Risk_Indicators.AddrScore.ZIP_Score(LEFT.Best_Info.BestCompanyZip, RIGHT.Z5), NoScoreValue);
+																				BestCityStateScore			:= IF(BestZIPScore <> NoScoreValue AND LEFT.Best_Info.BestCompanyCity <> '' AND LEFT.Best_Info.BestCompanyState <> '' AND RIGHT.p_city_name <> '' AND RIGHT.st <> '' AND LEFT.Best_Info.BestCompanyState[1] = RIGHT.st[1], Risk_Indicators.AddrScore.CityState_Score(LEFT.Best_Info.BestCompanyCity, LEFT.Best_Info.BestCompanyState, RIGHT.p_city_name, RIGHT.st, ''), NoScoreValue);
+																				BestCityStateZipMatched	:= Risk_Indicators.iid_constants.ga(BestZIPScore) AND Risk_Indicators.iid_constants.ga(BestCityStateScore) AND BestAddressPopulated;
+																				BestAddressMatched			:= BestAddressPopulated AND Risk_Indicators.iid_constants.ga(IF(BestZIPScore = NoScoreValue AND BestCityStateScore = NoScoreValue, NoScoreValue, 
+																																										Risk_Indicators.AddrScore.AddressScore(LEFT.Best_Info.BestPrimRange, LEFT.Best_Info.BestPrimName, LEFT.Best_Info.BestSecRange, 
+																																										RIGHT.prim_range, RIGHT.prim_name, RIGHT.sec_range,
+																																										BestZIPScore, BestCityStateScore)));
+																																										
 																				SELF.PhoneIdSources := IF(PhoneMatched, Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
 																				SELF.NameSources := IF(Options.BusShellVersion >= 22 AND NameMatched, Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
-																				SELF.AddressVerSources := IF(Options.BusShellVersion >= 22 AND AddressMatched, Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
+																				SELF.AddressVerSources := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v22 AND AddressMatched, Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
+																				SELF.BestAddressSources := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND BestAddressMatched, Sources, DATASET([], Business_Risk_BIP.Layouts.LayoutSources));
+																				SELF.BestAddrPhones := IF(Options.BusShellVersion >= Business_Risk_BIP.Constants.BusShellVersion_v30 AND BestAddressMatched AND TRIM(RIGHT.Phone10) <> '',
+																				DATASET([{RIGHT.Phone10}], Business_Risk_BIP.Layouts.LayoutBestAddrPhones), DATASET([], Business_Risk_BIP.Layouts.LayoutBestAddrPhones));
+
 																				SELF := []));
+																				
 	GongLinkIdRolled := ROLLUP(SORT(GongLinkIdStatsTemp, Seq), LEFT.Seq = RIGHT.Seq, TRANSFORM(tempLayout, 
 																				SELF.Seq := LEFT.Seq; 
 																				SELF.LinkIdSources := LEFT.LinkIdSources + RIGHT.LinkIdSources; 
 																				SELF.PhoneIDSources := LEFT.PhoneIDSources + RIGHT.PhoneIDSources;
 																				SELF.NameSources := LEFT.NameSources + RIGHT.NameSources;
 																				SELF.AddressVerSources := LEFT.AddressVerSources + RIGHT.AddressVerSources;
+																				SELF.BestAddressSources := LEFT.BestAddressSources + RIGHT.BestAddressSources;
+																				SELF.BestAddrPhones := LEFT.BestAddrPhones + RIGHT.BestAddrPhones;
 																				SELF := LEFT));
+																				
 	withGongLinkIdStats := JOIN(Shell, GongLinkIdRolled, LEFT.Seq = RIGHT.Seq,
 																	TRANSFORM(Business_Risk_BIP.Layouts.Shell,
 																							SELF.LinkIdSources := RIGHT.LinkIdSources;
 																							SELF.PhoneIDSources := RIGHT.PhoneIDSources;
 																							SELF.NameSources := RIGHT.NameSources;
 																							SELF.AddressVerSources := RIGHT.AddressVerSources;
+																							SELF.BestAddressSources := RIGHT.BestAddressSources;
+																							SELF.BestAddrPhones := RIGHT.BestAddrPhones;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 																	
@@ -217,6 +239,8 @@ EXPORT getEDA(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 																							SELF.PhoneIDSources := RIGHT.PhoneIDSources;
 																							SELF.NameSources := LEFT.NameSources + RIGHT.NameSources;
 																							SELF.AddressVerSources := LEFT.AddressVerSources + RIGHT.AddressVerSources;
+																							SELF.BestAddressSources := RIGHT.BestAddressSources;
+																							SELF.BestAddrPhones := RIGHT.BestAddrPhones;
 																							SELF := LEFT),
 																	LEFT OUTER, KEEP(1), ATMOST(100), FEW);
 	

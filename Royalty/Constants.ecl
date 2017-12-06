@@ -71,11 +71,15 @@ EXPORT Constants := module
 		export unsigned2 ZUMIGO_IDENTITY:= 601;		
 		export unsigned2 ATT_IAP_DQ_IRS	:= 611;	 
 		export unsigned2 EFX_CCR        := 620;
-    export unsigned2 EFX_ATTR       := 625;
+		export unsigned2 EFX_ATTR       := 625;
 		export unsigned2 FDNCORR   := 650;
 		export unsigned2 ACCUITY_BANK_ROUTING := 690;
+		export unsigned2 CORTERA_FILE := 701;
 		export unsigned2 ACCUDATA_CNAM_CNM2   := 711;
- 		export unsigned2 ACCUDATA_OCN_LNP   := 712;  
+		export unsigned2 ACCUDATA_OCN_LNP   := 712;
+		export unsigned2 EQUIFAX_EVS_VOE   := 713;
+		export unsigned2 EQUIFAX_EVS_VOI   := 714;
+
 	
 	end;		
 	
@@ -151,9 +155,12 @@ EXPORT Constants := module
 		export EFX_CCR        := _TYPE(RoyaltyCode.EFX_CCR);
 		export EFX_ATTR       := _TYPE(RoyaltyCode.EFX_ATTR);
 		export FDNCORR					:= _TYPE(RoyaltyCode.FDNCORR);  
-		export ACCUITY_BANK_ROUTING			:= _TYPE(RoyaltyCode.ACCUITY_BANK_ROUTING);  
+		export ACCUITY_BANK_ROUTING			:= _TYPE(RoyaltyCode.ACCUITY_BANK_ROUTING);
+		export CORTERA_FILE			:= _TYPE(RoyaltyCode.CORTERA_FILE);
 		export ACCUDATA_CNAM_CNM2				:= _TYPE(RoyaltyCode.ACCUDATA_CNAM_CNM2); 
-		export ACCUDATA_OCN_LNP					:= _TYPE(RoyaltyCode.ACCUDATA_OCN_LNP);  
+		export ACCUDATA_OCN_LNP					:= _TYPE(RoyaltyCode.ACCUDATA_OCN_LNP);
+		export EQUIFAX_EVS_VOE					:= _TYPE(RoyaltyCode.EQUIFAX_EVS_VOE);  
+		export EQUIFAX_EVS_VOI					:= _TYPE(RoyaltyCode.EQUIFAX_EVS_VOI); 
 	end;
 	
 	// *** DO NOT USE: TO BE DEPRECATED AND DELETED once batch can handle RoyaltySet dataset.

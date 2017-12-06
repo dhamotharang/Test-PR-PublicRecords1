@@ -1,4 +1,4 @@
-IMPORT AutoStandardI,DeathV2_Services,Didville,Doxie,Doxie_Raw,Experian_Phones,Gateway,Suppress,ut;
+﻿IMPORT AutoStandardI,DeathV2_Services,Didville,Doxie,Doxie_Raw,Experian_Phones,Gateway,Suppress,ut;
 
 lBatchIn       := PhoneFinder_Services.Layouts.BatchInAppendDID;
 lCommon        := PhoneFinder_Services.Layouts.PhoneFinder.Common;
@@ -101,8 +101,19 @@ FUNCTION
 	// Append DIDs
 	dAppendDIDs := PhoneFinder_Services.Functions.AppendDIDs(dAll);
 	
-	file_in := project(dAppendDIDs(did = 0 and (listing_type_bus = '' and fname <>'' and lname<>'' and prim_name<>'')), transform(didville.Layout_Did_OutBatch,
+		rec_w_newseq := record
+	 lFinal;
+	 UNSIGNED8     new_seq;
+	end;
+	
+	// adding new seq with counter values
+ dAppendDIDs_w_new_seq := project(dAppendDIDs, transform(recordof(rec_w_newseq), self.new_seq := counter, self := left));
+	
+ file_in_filter := dAppendDIDs_w_new_seq(did = 0 and (listing_type_bus = '' and fname <>'' and lname<>'' and prim_name<>''));
+	
+ file_in := project(file_in_filter, transform(didville.Layout_Did_OutBatch,
 																							 self.did := left.did,								 														 
+																							 self.seq := left.new_seq,				// passing in new_seq				 														 
 																							 self.suffix := left.name_suffix,
 																							 self.addr_suffix := left.suffix,
 																							 self.p_city_name := left.city_name,
@@ -120,10 +131,10 @@ FUNCTION
 																							 appType := inMod.ApplicationType,
 																							 IndustryClass_val := inMod.IndustryClass);		
 																							 
-	dAll_wDIDs := JOIN(dAppendDIDs,DIDsAdded,
-										LEFT.seq = RIGHT.seq,
+	dAll_wDIDs := JOIN(dAppendDIDs_w_new_seq,DIDsAdded,
+										LEFT.new_seq = RIGHT.seq,
 										TRANSFORM(RECORDOF(dAppendDIDs),SELF.DID:=IF(LEFT.DID = 0,RIGHT.DID,LEFT.DID),SELF:=LEFT),
-										LEFT OUTER, KEEP(1));			
+										LEFT OUTER, LIMIT(0), KEEP(1));			
 																						 
 											
 	// Deceased flag	
@@ -162,6 +173,11 @@ FUNCTION
 		OUTPUT(dWFExperianOnly,NAMED('dWFExperianOnly'));
 		OUTPUT(dAll,NAMED('dAll'));
 		OUTPUT(dAppendDIDs,NAMED('dAppendDIDs'));
+		OUTPUT(dAppendDIDs_w_new_seq,NAMED('dAppendDIDs_w_new_seq'));
+		OUTPUT(file_in_filter,NAMED('file_in_filter'));
+		OUTPUT(file_in,NAMED('file_in'));
+		OUTPUT(DIDsAdded,NAMED('DIDsAdded'));
+		OUTPUT(dAll_wDIDs,NAMED('dAll_wDIDs'));
 		OUTPUT(glb_ok,NAMED('glb_ok'));
 		OUTPUT(dDeceased,NAMED('dDeceased'));
 		OUTPUT(dSuppress,NAMED('dPhoneSearchSuppress'));
