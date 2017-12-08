@@ -653,7 +653,7 @@ END;
 
 ret_temp2 := UNGROUP(PROJECT(ret, format_out(LEFT)));
 
-ret_royalty := project(ret_temp2, transform(Risk_Indicators.Layout_InstandID_NuGen,
+ret_royalty := project(ret_temp2, transform(Risk_Indicators.Layout_InstantID_NuGenPlus,
 																																																				self.royalty_type_code_targus := targus[1].royalty_type_code,
                                                     self.royalty_type_code_insurance := insurance[1].royalty_type_code,
                                                     self.royalty_type_targus := targus[1].royalty_type,
