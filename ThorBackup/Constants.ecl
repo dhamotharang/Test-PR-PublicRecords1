@@ -8,7 +8,7 @@ EXPORT Constants := module
 		//export startwu := 'W' + startdate + '-' + l_time;
 		export endwu := 'W' + enddate + '-' + l_time;
 		export startwudaysbehind := 'W' + ut.date_math(enddate,-20) + '-' + l_time;
-		export serv := 'server=http://10.241.31.11:8010 ';
+		export serv := 'server=http://10.173.26.7:8010 ';
 		export nsplit := ' nosplit=1 ';
 		export dstcluster := 'dstcluster=thor40_25_yogurt ';
 		export over := 'overwrite=1 ';
@@ -31,7 +31,7 @@ EXPORT Constants := module
 	
 	export esp := module
 		export bocaprodthor := 'prod_esp.br.seisint.com';
-		export yogurtthorforboca := '10.241.31.11';
+		export yogurtthorforboca := '10.173.26.7';
 	end;
 	// Set this value to get files older than n days
 	export getthreshold(integer noofdays = 0) := module
