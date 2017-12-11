@@ -54,11 +54,11 @@ j_all_new :=  join(PHin, NHRin,
 				,add_rid_all(left,right)
 				,right outer
 				,local
-				): persist(             '~thor_data400::persist::hbm::'+ versionBuild ,expire(60));
+				): persist(                     '~thor_data400::persist::hbm::'+ versionBuild ,expire(60),REFRESH(FALSE));
 
-j_all:= if(std.file.fileexists( '~thor_data400::persist::hbm::'+ versionBuild ) 
-                 ,dataset(      '~thor_data400::persist::hbm::'+ versionBuild ,{j_all_new},thor)
-                 ,j_all_new);
+j_all:= if(nothor(std.file.fileexists(  '~thor_data400::persist::hbm::'+ versionBuild )) 
+                         ,dataset(      '~thor_data400::persist::hbm::'+ versionBuild ,header.Layout_New_Records,thor)
+                         ,j_all_new);
 
 outf_noID := dedup(j_all,record,all,local);
 

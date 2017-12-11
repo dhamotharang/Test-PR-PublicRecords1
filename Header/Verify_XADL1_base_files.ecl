@@ -147,6 +147,6 @@ dataset([
 ,{'~thor_data400::base::did_ssn_nonglb_nonUtil_prod'}
 ],{string200 fn});
 
-t:=table(d,{sfn:=fn,lfn:=if(STD.File.fileexists(fn),STD.File.SuperFileContents(fn))});
+t:=table(d,{sfn:=trim(fn),lfn:=if(STD.File.fileexists(fn),STD.File.SuperFileContents(fn))});
 
 EXPORT Verify_XADL1_base_files := t;
