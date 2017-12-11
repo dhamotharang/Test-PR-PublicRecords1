@@ -1,4 +1,4 @@
-Export File_In_CT := Module
+﻿Export File_In_CT := Module
 //Shared VersionDate := 'ct_20130307';
 //Lookup Files
 Export	File_AddressType := Dataset('~thor_data400::in::civil::ct::addresstype_lkp', Civ_Court.Layout_In_CT.Lay_AddressType, CSV(Separator('|'), Quote('"'), Terminator('\r\n')));
@@ -28,25 +28,30 @@ Export	File_KeyPointDates := Dataset('~thor_data400::in::civil::ct::KeyPointDate
 Export	File_ResactEntry := Dataset('~thor_data400::in::civil::ct::ResactEntry', Civ_Court.Layout_In_CT.Lay_ResactEntry, CSV(Separator('|'), Quote('"'), Terminator('\r\n')));
 
 
+// Export DateConversion(String dt) := Function
+// month := Map( stringlib.StringtoUpperCase(dt[1..3]) = 'JAN' => '01',
+								// stringlib.StringtoUpperCase(dt[1..3]) = 'FEB' => '02',
+								// stringlib.StringtoUpperCase(dt[1..3]) = 'MAR' => '03',
+								// stringlib.StringtoUpperCase(dt[1..3]) = 'APR' => '04',
+								// stringlib.StringtoUpperCase(dt[1..3]) = 'MAY' => '05',
+								// stringlib.StringtoUpperCase(dt[1..3]) = 'JUN' => '06',
+								// stringlib.StringtoUpperCase(dt[1..3]) = 'JUL' => '07',
+								// stringlib.StringtoUpperCase(dt[1..3]) = 'AUG' => '08',
+								// stringlib.StringtoUpperCase(dt[1..3]) = 'SEP' => '09',
+								// stringlib.StringtoUpperCase(dt[1..3]) = 'OCT' => '10',
+								// stringlib.StringtoUpperCase(dt[1..3]) = 'NOV' => '11',
+								// stringlib.StringtoUpperCase(dt[1..3]) = 'DEC' => '12', '');
+// day := If(length(Trim(dt[5..6],left, right)) = 1, '0'+ Trim(dt[5..6],left, right), dt[5..6]);
+// Year := dt[8..11];
+// frmtDate := If(dt <> '', If(length(trim(dt, left, right)) >8, year+month+day, dt), '');
+// Return frmtDate;
+// End;
+
+// Added new function to accomodate the new date format
 Export DateConversion(String dt) := Function
-month := Map( stringlib.StringtoUpperCase(dt[1..3]) = 'JAN' => '01',
-								stringlib.StringtoUpperCase(dt[1..3]) = 'FEB' => '02',
-								stringlib.StringtoUpperCase(dt[1..3]) = 'MAR' => '03',
-								stringlib.StringtoUpperCase(dt[1..3]) = 'APR' => '04',
-								stringlib.StringtoUpperCase(dt[1..3]) = 'MAY' => '05',
-								stringlib.StringtoUpperCase(dt[1..3]) = 'JUN' => '06',
-								stringlib.StringtoUpperCase(dt[1..3]) = 'JUL' => '07',
-								stringlib.StringtoUpperCase(dt[1..3]) = 'AUG' => '08',
-								stringlib.StringtoUpperCase(dt[1..3]) = 'SEP' => '09',
-								stringlib.StringtoUpperCase(dt[1..3]) = 'OCT' => '10',
-								stringlib.StringtoUpperCase(dt[1..3]) = 'NOV' => '11',
-								stringlib.StringtoUpperCase(dt[1..3]) = 'DEC' => '12', '');
-day := If(length(Trim(dt[5..6],left, right)) = 1, '0'+ Trim(dt[5..6],left, right), dt[5..6]);
-Year := dt[8..11];
-frmtDate := If(dt <> '', If(length(trim(dt, left, right)) >8, year+month+day, dt), '');
+frmtdate := (dt[1..4] + dt[6..7] + dt[9..10]);
 Return frmtDate;
 End;
-
 
 
 End;
