@@ -155,7 +155,7 @@ EXPORT Fn_File_Compare(OldFile,NewFile,ImportantFields='',IgnoreFields='', Distr
 	#else
 		#IF(useIgnore)
 			#IF(useDistribute)
-			SortedDistConCat:=Sort(Distribute(ConcatinatedFile,hash(recordof(OldFile))),record,except %IgnoreComma%,local);
+			SortedDistConCat:=Sort(Distribute(ConcatinatedFile,hash(%DistributeComma%)),record,except %IgnoreComma%,local);
 			FullRecDedup:=dedup(SortedDistConCat,record,except %IgnoreComma%,local);
 			#ELSE
 			SortedDistConCat:=Sort(ConcatinatedFile,record,except %IgnoreComma%);
@@ -163,7 +163,7 @@ EXPORT Fn_File_Compare(OldFile,NewFile,ImportantFields='',IgnoreFields='', Distr
 			#END
 		#else
 			#IF(useDistribute)
-			SortedDistConCat:=Sort(Distribute(ConcatinatedFile,hash(recordof(OldFile))),record,local);
+			SortedDistConCat:=Sort(Distribute(ConcatinatedFile,hash(%DistributeComma%)),record,local);
 			FullRecDedup:=dedup(SortedDistConCat,record,local);
 			#ELSE
 			SortedDistConCat:=Sort(ConcatinatedFile,record);
@@ -177,6 +177,7 @@ EXPORT Fn_File_Compare(OldFile,NewFile,ImportantFields='',IgnoreFields='', Distr
 			NumUniqueNewFile	:=count(RollNewFileDedup);
 			NumReducedOldFile	:=count(ReducedOldFile);
 			NumDedupCombined	:=count(RollupDedup);
+			PercentChangeImportant:=(real)((((real)NumDedupCombined-(real)NumUniqueOldFile)/((real)NumUniqueOldFile))*100);
 			NumLeftOnly				:=count(LeftOnly);
 			NumRightOnly			:=count(RightOnly);
 			ImpSuperFile:='~thor_data400::file_compare::ImportantFieldResults';
@@ -192,56 +193,55 @@ EXPORT Fn_File_Compare(OldFile,NewFile,ImportantFields='',IgnoreFields='', Distr
 																NumDedupCombined,
 																NumLeftOnly,
 																NumRightOnly,
-																(decimal5_2)((((real)NumDedupCombined-(real)NumUniqueOldFile)/((real)NumUniqueOldFile))*100),
-																(decimal5_2)((((real)NumLeftOnly)/((real)NumReducedOldFile))*100),
-																(decimal5_2)((((real)NumRightOnly)/((real)NumReducedOldFile))*100)}],file_compare.Layouts.ImportantFieldsResultsLayout);
+																(real)((((real)NumDedupCombined-(real)NumUniqueOldFile)/((real)NumUniqueOldFile))*100),
+																(real)((((real)NumLeftOnly)/((real)NumReducedOldFile))*100),
+																(real)((((real)NumRightOnly)/((real)NumReducedOldFile))*100)}],file_compare.Layouts.ImportantFieldsResultsLayout);
 			
 			PublishImportant:=sequential(
-												output(ImpOldEntries+ImpNewEntry,,ImpIndividLog+'_temp',thor,overwrite),
-												output(ImpNewEntry,named('FullRecStats')),
+												output(ImpOldEntries+ImpNewEntry,,ImpIndividLog+fileType+'_'+workunit,thor,overwrite),
+												output(ImpNewEntry,named('ImpRecStats'+filetype)),
 												nothor(global(sequential(if(std.file.FileExists(ImpIndividLog),
 																sequential(STD.File.StartSuperFileTransaction(),
-																STD.File.RemoveSuperFile(ImpSuperFile,ImpIndividLog,true),
+																STD.File.ClearSuperFile(ImpIndividLog,true),
 																STD.File.FinishSuperFileTransaction())),
-												fileservices.deleteLogicalFile(ImpIndividLog),
-												fileservices.renameLogicalFile(ImpIndividLog+'_temp',ImpIndividLog),
 												STD.File.StartSuperFileTransaction(),
-												STD.File.AddSuperFile(ImpSuperFile,ImpIndividLog),
+												STD.File.AddSuperFile(ImpIndividLog,ImpIndividLog+fileType+'_'+workunit),
 												STD.File.FinishSuperFileTransaction()))));
 			#END
 			NumOldFile:=count(OldFile);
 			NumNewFile:=count(NewFile);
 			NumDedupFullRec:=count(FullRecDedup);
+			PercentChangeFull:=(real)((((real)NumDedupFullRec-(real)NumOldFile)/((real)NumOldFile))*100);
 			FullSuperFile:='~thor_data400::file_compare::FullRecordResults';
 			FullIndividLog:='~thor_data400::file_compare::'+datasetName+'::FullRecordResults';
 			FullOldEntries:=dataset(FullIndividLog,file_compare.Layouts.FullFileResultsLayout,thor,opt);
-			FullNewEntry		:=dataset([{datasetName,fileType,Version,workunit,NumOldFile,NumNewFile,NumDedupFullRec,(decimal5_2)((((real)NumDedupFullRec-(real)NumOldFile)/((real)NumOldFile))*100)}],file_compare.Layouts.FullFileResultsLayout);
+			FullNewEntry		:=dataset([{datasetName,fileType,Version,workunit,NumOldFile,NumNewFile,NumDedupFullRec,(real)((((real)NumDedupFullRec-(real)NumOldFile)/((real)NumOldFile))*100)}],file_compare.Layouts.FullFileResultsLayout);
 			PublishFull:=sequential(
-												output(FullOldEntries+FullNewEntry,,FullIndividLog+'_temp',thor,overwrite),
-												output(FullNewEntry,named('FullRecStats')),
+												output(FullOldEntries+FullNewEntry,,FullIndividLog+fileType+'_'+workunit,thor,overwrite),
+												output(FullNewEntry,named('FullRecStats'+filetype)),
 												nothor(global(sequential(if(std.file.FileExists(FullIndividLog),
 																sequential(STD.File.StartSuperFileTransaction(),
-																STD.File.RemoveSuperFile(FullSuperFile,FullIndividLog,true),
+																STD.File.ClearSuperFile(FullIndividLog,true),
 																STD.File.FinishSuperFileTransaction())),
-												fileservices.deleteLogicalFile(FullIndividLog),
-												fileservices.renameLogicalFile(FullIndividLog+'_temp',FullIndividLog),
 												STD.File.StartSuperFileTransaction(),
-												STD.File.AddSuperFile(FullSuperFile,FullIndividLog),
+												STD.File.AddSuperFile(FullIndividLog,FullIndividLog+fileType+'_'+workunit),
 												STD.File.FinishSuperFileTransaction()))));									
 	
 	
 	return ordered(
-					output(NumDedupFullRec,named('NumDedupFullRec'))
-					,output(NumOldFile,named('NumOldFile'))
-					,output(NumNewFile,named('NumNewFile'))
+					output(NumDedupFullRec,named('NumDedupFullRec'+filetype))
+					,output(NumOldFile,named('NumOldFile'+filetype))
+					,output(NumNewFile,named('NumNewFile'+filetype))
+					,output(PercentChangeFull,named('PercentChangeFull'+filetype))
 					#if(publish)
 					,PublishFull
 					#end
 					#if(useImportant)
-					,output(NumDedupCombined,named('NumDedupCombined'))
-					,output(NumUniqueOldFile,named('NumUniqueOldFile'))
-					,output(NumUniqueNewFile,named('NumUniqueNewFile'))
-					,output(AggregateDiff,named('AggregateDiff'))
+					,output(NumDedupCombined,named('NumDedupCombined'+filetype))
+					,output(NumUniqueOldFile,named('NumUniqueOldFile'+filetype))
+					,output(NumUniqueNewFile,named('NumUniqueNewFile'+filetype))
+					,output(PercentChangeImportant,named('PercentChangeImportant'+filetype))
+					,output(AggregateDiff,named('AggregateDiff'+filetype))
 					#if(publish)
 					,PublishImportant
 					#end

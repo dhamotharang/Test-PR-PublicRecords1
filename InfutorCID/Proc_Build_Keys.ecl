@@ -1,4 +1,4 @@
-﻿import RoxieKeyBuild, ut, Orbit3;
+﻿import RoxieKeyBuild, ut, Orbit3, dops;
 
 export Proc_Build_Keys(string version) := function
 
@@ -40,11 +40,11 @@ run_keys := sequential(
 				parallel(bPhone, bPhone_fcra, bDID, bDID_fcra),
 				parallel(mPhone, mPhone_fcra, mDID, mDID_fcra),
 				parallel(mPhone_qa, mPhone_fcra_qa, mDID_qa, mDID_fcra_qa),
-				RoxieKeybuild.updateversion('InfutorcidKeys',version,'John.Freibaum@lexisnexis.com, cecelie.guyton@lexisnexis.com',,'N'),
+				dops.updateversion('InfutorcidKeys',version,'John.Freibaum@lexisnexis.com, cecelie.guyton@lexisnexis.com',,'N'),
 				orbit_update,
-				RoxieKeybuild.updateversion('FCRA_InfutorcidKeys',version,'John.Freibaum@lexisnexis.com, cecelie.guyton@lexisnexis.com',,'F'),
+				dops.updateversion('FCRA_InfutorcidKeys',version,'John.Freibaum@lexisnexis.com, cecelie.guyton@lexisnexis.com',,'F'),
 				orbit_updatef
 					);
-					
+		
 return run_keys;
 end;

@@ -1,4 +1,4 @@
-﻿import instantid_logs, aid, address, ut, did_add, header_slimsort, didville, header, address, watchdog, yellowpages, gong, cellphone, risk_indicators, lib_stringlib, ut, idl_header, address;
+﻿import instantid_logs, aid, address, ut, did_add, header_slimsort, didville, header, address, watchdog, yellowpages, gong, cellphone, risk_indicators, lib_stringlib, ut, idl_header, address, Std;
 
 export Map_InfutorCIDv2(string filedate) := function
 
@@ -36,7 +36,7 @@ end;
 /* Clean names, apply dates, change layout for new records */
 ifcid_new := project(IfCID_pNew, transform(clean_layout,
 																			
-																			GOODDATE(string indate) := if(indate between '19010101' and ut.getdate, indate, '');
+																			GOODDATE(string indate) := if(indate between '19010101' and (STRING8)Std.Date.Today(), indate, '');
 																			
 																			/* Clean out parans (Removes ( or ) and all characters following) and does not display names with junk fields */
 																			PRS_CLEANNAME(string ofname, string omname, string olname):= function
