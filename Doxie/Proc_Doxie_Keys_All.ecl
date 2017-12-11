@@ -26,5 +26,5 @@ export proc_doxie_keys_all(boolean pFastHeader=false) := function
  o := address_file.proc_build(filedate);
  wa_phone := Header.proc_build_header_wa ; 
  
- return sequential(/*clr_super,chk_build,g,fhb,*/i,v,w,s,m,r,n,o,Promotesupers.SF_MaintBuilt('~thor_data400::Base::HeaderKey'),wa_phone);
+ return sequential(clr_super,chk_build,g,fhb,i,v,w,s,m,r,n,o,Promotesupers.SF_MaintBuilt('~thor_data400::Base::HeaderKey'),wa_phone);
 end;
