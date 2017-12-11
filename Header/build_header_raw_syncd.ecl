@@ -1,4 +1,4 @@
-import PromoteSupers,ut,mdr,Data_Services,std;
+﻿import PromoteSupers,ut,mdr,Data_Services,std;
 pairs:=distribute(dataset(Filename_iHeader_did_rid,Layout_LAB_Pairs,flat),hash(rid));
 PromoteSupers.MAC_SF_BuildProcess(pairs,Data_Services.Data_Location.Prefix('Header')+'thor_data400::base::iheader_did_rid',copy_pairs,3,,true,pVersion:=Header.version_build);
 
@@ -14,7 +14,7 @@ droppedRidsBlankCnt:=   count(droppedRids(lname ='' ,  fname =''));
 duplicateRidsCount :=   count(table(Header.File_LAB_Pairs,{rid, rid_cnt := count(group)},rid,few,merge)(rid_cnt>1));
 
 //post Alpharetta DID to Boca DID if LAB build
-header_raw_syncd:=join(hr,File_LAB_Pairs
+header_raw_syncd_brid:=join(hr,File_LAB_Pairs
 						,left.rid=right.rid
 						,transform(layout_header
 											,self.did:=right.did
@@ -22,6 +22,7 @@ header_raw_syncd:=join(hr,File_LAB_Pairs
 											,self:=left)
 						,local)
 						;
+header_raw_syncd:=header.fn_apply_alpha_rids(header_raw_syncd_brid);
 
 r:={string17 eventstamp:='',string800 eventdesc:=''};
 
