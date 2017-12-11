@@ -1,11 +1,11 @@
-import tools, _control, _validate;
+﻿import tools, _control, _validate;
 
 export Build_All(
 
 	 string															pversion				= ''
 	,string															pRemoteIp				= _control.IPAddress.aprod_thor_dali
 	,string															pGroupName			= _dataset().groupname
-	,string															pFilename				= '~foreign::10.194.12.1::'+'thor::base::cclue::qa::search::output'
+	,string															pFilename				= '~foreign::10.194.10.1::'+'thor::base::cclue::qa::search::output'
 	,boolean														pIsTesting			= false
 	,boolean														pOverwrite			= false																															
 	,dataset(Layouts.Input.Sprayed	)		pSprayedFile		= Files().Input.using
