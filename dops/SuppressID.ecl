@@ -4,19 +4,6 @@ EXPORT SuppressID(string datasetname,
 
 	// datasetname - name that matches the validdatasets
 	// useProdFile - whether to use the prod file 
-	export ValidDatasets := ['liens','gong','ucc','bankruptcy','foreclosure','unsuppress','fbn'];
-	
-	export isValidDataset := if (datasetname in ValidDatasets
-																		,true
-																		,false);
-	
-	shared thresholddate := '20171228000000';
-	shared ProdOrDev := if (~useLocal 
-													,if (dops.constants.ThorEnvironment = 'prod'
-																,'~'
-																,Data_Services.foreign_prod)
-													,'~'
-													);
 	
 	export rSuppressLayout := record
 		string idvalue;
@@ -25,19 +12,12 @@ EXPORT SuppressID(string datasetname,
 		string flag;
 	end;
 	
-	export Files(boolean useConditionalPrefix = false) := module
-		export Prefix := if (useConditionalPrefix,ProdOrDev,'~') + 'thor::base::suppress';
-		export Suffix := datasetname;
-		export Super := Prefix+'::qa::'+Suffix;
-		export Logical(string filedate) := Prefix+'::'+filedate+'::'+Suffix;
-	end;
-	
-	export GetRecords() := dataset(Files(true).Super,rSuppressLayout,thor,opt);
+	export GetRecords() := dataset(dops.SuppressConstants(datasetname,useLocal).Files(true).Super,rSuppressLayout,thor,opt);
 	
 	export GetIDsAsSet(boolean isFCRA = false, boolean isUnsuppress = false) 
 																					:= if( ~isUnsuppress 
 																								,set(if (isFCRA
-																												,GetRecords()(flag = 'A' and whenupdated < thresholddate)
+																												,GetRecords()(flag = 'A' and whenupdated < dops.SuppressConstants(datasetname,useLocal).thresholddate)
 																												,GetRecords()(flag = 'A')
 																											)
 																									,idvalue)
@@ -66,13 +46,13 @@ EXPORT SuppressID(string datasetname,
 		
 		
 		RoxieKeyBuild.MAC_SF_BuildProcess_V2(dAddSuppressIDs
-																					,Files().Prefix
-																					,Files().Suffix
+																					,dops.SuppressConstants(datasetname,useLocal).Files().Prefix
+																					,dops.SuppressConstants(datasetname,useLocal).Files().Suffix
 																					,filedate
 																					,mCreateFile
 																					,,,true);
 		
-		return if(isValidDataset
+		return if(dops.SuppressConstants(datasetname,useLocal).isValidDataset
 									,mCreateFile
 									,fail(datasetname + ' not found in Suppress.ID.ValidDatasets')
 								);
@@ -98,13 +78,13 @@ EXPORT SuppressID(string datasetname,
 		
 		
 		RoxieKeyBuild.MAC_SF_BuildProcess_V2(dFlagAsDeletes + dSuppressedRecords
-																					,Files().Prefix
-																					,Files().Suffix
+																					,dops.SuppressConstants(datasetname,useLocal).Files().Prefix
+																					,dops.SuppressConstants(datasetname,useLocal).Files().Suffix
 																					,filedate
 																					,mCreateFile
 																					,,,true);
 		
-		return if(isValidDataset
+		return if(dops.SuppressConstants(datasetname,useLocal).isValidDataset
 									,mCreateFile
 									,fail(datasetname + ' not found in Suppress.ID.ValidDatasets')
 								);
