@@ -1,10 +1,10 @@
-import _control, lib_fileservices, ut, versioncontrol;
+﻿import _control, lib_fileservices, ut, versioncontrol;
 
 export spray_files(	string		pSourceIP		=	_control.IPAddress.bctlpedata11,
 										string		pDirectory	=	'/data/prod_data_build_13/production_data/emerges/hvc/data/20161104/',
 										unsigned	pRecLength	=	1888,
 										string		pVersion		=	ut.GetDate,
-										string		pGroupName	=	_control.TargetGroup.Thor400_20,
+										string		pGroupName	=	_control.TargetGroup.Thor400_44,
 										boolean		pOverwrite	=	false
 									)
 	:=
