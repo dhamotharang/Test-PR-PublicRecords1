@@ -1,6 +1,6 @@
 import _control, versioncontrol;
 
-export _Dataset(boolean pUseProd = false) := module
+export _Dataset(boolean pUseProd = false) := INLINE module
 
 	export Name										:= 'hms_stl';
 	export thor_cluster_Files			:= 	if(pUseProd 

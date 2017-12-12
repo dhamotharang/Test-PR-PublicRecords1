@@ -4,7 +4,7 @@ export PersistNames(
 	boolean	pUseOtherEnvironment	= false
 
 ) := 
-module
+INLINE module
 
 	shared persistroot		:= constants(pUseOtherEnvironment).persistTemplate;
 
@@ -14,6 +14,7 @@ module
 	export YellowPagesBaseYP		:= persistroot + 'YellowPages_Base_YP'						;
 	export Cleaned_Input_AID		:= persistroot + 'CleanedInputAID'								;
 	export FileKeybuild					:= persistroot + 'File_Keybuild'									;
+
 	
 	export dAll_persistnames := 
 	DATASET([

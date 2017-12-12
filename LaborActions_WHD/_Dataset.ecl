@@ -1,9 +1,9 @@
-import _control, versioncontrol;
+import data_services, versioncontrol;
 
-export _Dataset(boolean pUseOtherEnvironment = false) := module
+export _Dataset(boolean pUseOtherEnvironment = false) := INLINE module
 	export Name										:= 	'LaborActions_WHD';
 	export pname                                    :=   'LaborActionsWHD';
-	export thor_cluster_Files			:= 	'~thor_data400::';
+	export thor_cluster_Files			:= 	data_services.data_location.prefix () + 'thor_data400::';
 	export thor_cluster_Persists	:= 	thor_cluster_Files;
 	export max_record_size				:= 	40000;
 	export Groupname							:= 	versioncontrol.groupname();

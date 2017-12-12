@@ -4,7 +4,7 @@ export Constants(
 	boolean	pUseOtherEnvironment	= false
 
 ) :=
-module(tools.Constants(
+INLINE module(tools.Constants(
 
 	 pDatasetName					:= 'YellowPages'
 	,pUseOtherEnvironment	:= pUseOtherEnvironment

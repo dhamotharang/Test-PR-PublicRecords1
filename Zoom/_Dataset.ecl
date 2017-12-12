@@ -1,21 +1,16 @@
-import _control, versioncontrol;
+import tools;
 export _Dataset(
 
-	boolean	pUseProd = false
+	boolean	pUseOtherEnvironment	= false
 
-):=
-module
+) :=  INLINE MODULE (
+tools.Constants(
 
-	export Name										:= 'Zoom'								;
-	export thor_cluster_Files			:= 	if(pUseProd 
-																			,VersionControl.foreign_prod + 'thor_data400::'
-																			,'~thor_data400::'
-																		);
-	export thor_cluster_Persists	:= thor_cluster_Files		;
-	export max_record_size				:= 4096								;
+	 pDatasetName					:= 'Zoom'
+	,pUseOtherEnvironment	:= pUseOtherEnvironment
+	,pGroupname						:= ''
+	,pMaxRecordSize				:= 4096
+	,pIsTesting						:= Tools._Constants.IsDataland
+))
 
-	export Groupname	:= if(	_Control.ThisEnvironment.name		 = 'Dataland'	,'thor400_88_dev'
-																																					,'thor400_92'
-											);
-
-end;
+END;

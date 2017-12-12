@@ -4,7 +4,7 @@ export _Constants(
 	 boolean	pUseOtherEnvironment	= false
 	,string		pDatasetname					= 'DCAV2'
 
-) := module(
+) := INLINE module(
 	tools.Constants(
 		 pDatasetName					:= pDatasetname
 		,pUseOtherEnvironment	:= pUseOtherEnvironment

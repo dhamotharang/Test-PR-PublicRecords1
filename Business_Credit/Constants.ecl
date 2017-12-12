@@ -1,6 +1,6 @@
 IMPORT	Business_Credit,	MDR,	ut,	_control;
 EXPORT	Constants(string	pFileDate='')	:=
-MODULE
+INLINE MODULE
 
 	//	Source
 	EXPORT	source		:=	MDR.sourceTools.src_Business_Credit;
