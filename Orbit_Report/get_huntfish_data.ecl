@@ -1,4 +1,4 @@
-import ut,Codes,_Control;
+﻿import ut,Codes,_Control;
 export get_huntfish_data(dsname,ds,groupbyfield,datefield,emailme,groupbycat,retval,usenafield='\'false\'',filename='\'optional\'') := macro
 	
 	
@@ -45,8 +45,8 @@ export get_huntfish_data(dsname,ds,groupbyfield,datefield,emailme,groupbycat,ret
 		%tab_out1% := table(%join_out1%(statefield <> ''),%tab_rec1%,statefield,few);
 		retval := sequential(output(sort(%tab_out1%,statefield),,'~thor_data400::stats::orbit::build::merge::'+dsname,overwrite,csv),
 				if ( filename = 'optional',
-				lib_fileservices.FileServices.Despray('~thor_data400::stats::orbit::build::merge::'+dsname,_control.IPAddress.bctlpedata10,'/hds_180/orbit_stats/'+dsname + '/' + dsname + '_build.csv',,,,TRUE),
-				lib_fileservices.FileServices.Despray('~thor_data400::stats::orbit::build::merge::'+dsname,_control.IPAddress.bctlpedata10,'/hds_180/orbit_stats/'+dsname + '/' + filename + '_build.csv',,,,TRUE)
+				lib_fileservices.FileServices.Despray('~thor_data400::stats::orbit::build::merge::'+dsname,_control.IPAddress.bctlpedata11,'/data/prod_data_build_13/production_data/emerges/hvc/orbit_stats/'+dsname + '/' + dsname + '_build.csv',,,,TRUE),
+				lib_fileservices.FileServices.Despray('~thor_data400::stats::orbit::build::merge::'+dsname,_control.IPAddress.bctlpedata11,'/data/prod_data_build_13/production_data/emerges/hvc/orbit_stats/'+dsname + '/' + filename + '_build.csv',,,,TRUE)
 				));
 	#else
 		#uniquename(string_rec2)
@@ -91,8 +91,8 @@ export get_huntfish_data(dsname,ds,groupbyfield,datefield,emailme,groupbycat,ret
 							
 		retval := sequential(output(sort(%tab_out2%,statefield),,'~thor_data400::stats::orbit::build::merge::'+dsname,overwrite,csv),
 				if (filename='optional',
-				lib_fileservices.FileServices.Despray('~thor_data400::stats::orbit::build::merge::'+dsname,_control.IPAddress.bctlpedata10,'/hds_180/orbit_stats/'+dsname + '/' + dsname + '_build.csv',,,,TRUE),
-				lib_fileservices.FileServices.Despray('~thor_data400::stats::orbit::build::merge::'+dsname,_control.IPAddress.bctlpedata10,'/hds_180/orbit_stats/'+dsname + '/' + filename + '_build.csv',,,,TRUE)
+				lib_fileservices.FileServices.Despray('~thor_data400::stats::orbit::build::merge::'+dsname,_control.IPAddress.bctlpedata11,'/data/prod_data_build_13/production_data/emerges/hvc/orbit_stats'+dsname + '/' + dsname + '_build.csv',,,,TRUE),
+				lib_fileservices.FileServices.Despray('~thor_data400::stats::orbit::build::merge::'+dsname,_control.IPAddress.bctlpedata11,'/data/prod_data_build_13/production_data/emerges/hvc/orbit_stats'+dsname + '/' + filename + '_build.csv',,,,TRUE)
 				));
 	#end
 endmacro;
