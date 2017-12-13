@@ -10,6 +10,7 @@ import header,std,_control;
 #OPTION ('implicitJoinSubSort',FALSE);
 #OPTION ('implicitGroupSubSort',FALSE);
 
+EXPORT BWR_Build_Incremental(string filedate) := FUNCTION
 basename:='~thor_data400::base::header_raw_incremental';
 
 the_new_monthly := '~'+fileservices.SuperFileContents('~thor_data400::base::header_raw')[1].name;
@@ -54,15 +55,17 @@ run_build(string filedate) := if(the_eq_file_for_this_month_is_available
 // ************************************************************************************************************************  
 // NB: Update BOTH #stored AND run_date BEFORE kicking off !! No need to update version_build
 
-#stored ('versionBuild', '20171206'   ); 
-run_date :=              '20171206'    ;
+#stored ('versionBuild', filedate   ); 
+run_date :=              filedate    ;
 
 versionBuild := header.version_build : stored('versionBuild');  
 check_date(string filedate):= if(filedate<>versionBuild,fail('filedate and versionBuild MUST match'));
 
 go(string filedate)  :=  sequential(check_date(filedate), report_conditions, run_build(filedate));
 
-go(run_date);
+return go(run_date);
+
+end;
 
 // W:\Projects\Header\Incremental Raw\build incremental header raw.ecl
 // HeaderIngestSetup: W:\Projects\Header\suppress_header_records\BWR_HeaderIngestSetup2.ecl

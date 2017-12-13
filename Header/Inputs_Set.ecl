@@ -2,9 +2,9 @@
 
 export Inputs_Set(boolean incremental=false) := function
 
-// dLv2_file := if(fileservices.getsuperfilesubcount('~thor_data400::BASE::dl2::DLHeader_Building')>0,
-// output('Nothing added to BASE::dl2::DLHeader_Building.'),
-// fileservices.addsuperfile('~thor_data400::BASE::dl2::DLHeader_Building','~thor_200::base::dl2::drvlic_aid',,true));
+dLv2_file := if(fileservices.getsuperfilesubcount('~thor_data400::BASE::dl2::DLHeader_Building')>0,
+output('Nothing added to BASE::dl2::DLHeader_Building.'),
+fileservices.addsuperfile('~thor_data400::BASE::dl2::DLHeader_Building','~thor_200::base::dl2::drvlic_aid',,true));
 
 emrg := if(fileservices.getsuperfilesubcount('~thor_data400::base::emergesHeader_Building')>0,
 output('Nothing added to base::emergesHeader_Building.'),
@@ -162,9 +162,14 @@ AlloyMedia_SL_file := if(fileservices.getsuperfilesubcount('~thor_data400::base:
 output('Nothing added to Base::alloymedia_student_list_Header_Building'),
 fileservices.addsuperfile('~thor_data400::base::alloymedia_student_list_Header_Building','~thor_data400::base::alloymedia_student_list',,true));
 
+targus := if(fileservices.getsuperfilesubcount('~thor_data400::base::consumer_targusHeader_Building')>0,
+output('Nothing added to Base::consumer_targusHeader_Building'),
+fileservices.addsuperfile('~thor_data400::base::consumer_targusHeader_Building','~thor_data400::base::consumer_targus',,true));
+
 add_super := sequential(
                             parallel(
-                                             emrg
+                                             dLv2_file
+                                            ,emrg
                                             ,akPerm
                                             ,akPermE
                                             ,atf_file
@@ -173,7 +178,6 @@ add_super := sequential(
                                             ,gong_file
                                             ,ms_work
                                             ,liens_file
-                                            // ,liensv2_file // moved to second step (so we can see other changes in the meantime)
                                             ,utils
                                             ,bksrch
                                             ,bkmain
@@ -201,6 +205,7 @@ add_super := sequential(
                     ,if(~incremental        ,transunioncred_file   )
                                             ,EQ_hist_file
                                             ,AlloyMedia_SL_file
+                                            ,targus
                                             )
                     ,liensv2_file
                     );

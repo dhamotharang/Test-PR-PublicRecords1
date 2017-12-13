@@ -56,7 +56,7 @@ export proc_header := module
                                                             ,header.Proc_Regression_Test
                                                             ,header.Proc_BuildStats
                                                             ,Strata.modOrbitAdaptersForPersonHdrBld.fnGetCrossSourceAction(dataset(workunit('STATS'),ut.layout_stats_extend), Header.version_build)
-                                                            ,notify('Build_XADL','*')
+                                                            // ,notify('Build_XADL','*')
                                                             ,header.LogBuild('Completed :'+step)
                                                             )
                                                             :success(header.msg(cmpltd,elist).good)

@@ -116,6 +116,7 @@ SHARED updateSupers(string kNm,boolean skipIncSFupdate=false):= sequential(
 
            // We add both to make sure the monthly
            // std.file.RemoveOwnedSubFiles      (fName('inc',kNm)),
+           if(~skipIncSFupdate,std.file.RemoveOwnedSubFiles      (fName('inc',kNm),true)),
            if(~skipIncSFupdate,std.file.clearsuperfile           (fName('inc',kNm))),
            if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName(fileDate,kNm))),
            if(~skipIncSFupdate,std.file.addsuperfile             (fName('inc',kNm),fName6(fileDate,kNm))),
@@ -205,10 +206,10 @@ SHARED orbit_update_entries(string createORupdate) := function
  
 end;
 // run on hthor
-EXPORT Refresh_copy :=  if(not ok_to_copy,output('No copy. see outputs'),
+EXPORT Refresh_copy :=  if(true,//not ok_to_copy,output('No copy. see outputs'),
                         sequential(
-            copy_from_alpha,
-            update_inc_superfiles(),
+            // copy_from_alpha,
+            // update_inc_superfiles()
             udops,
             orbit_update_entries('create'),
             orbit_update_entries('update'),
