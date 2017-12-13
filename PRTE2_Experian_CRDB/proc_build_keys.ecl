@@ -1,4 +1,4 @@
-IMPORT RoxieKeyBuild, PRTE2_Common, PRTE, _control;
+﻿IMPORT RoxieKeyBuild, PRTE2_Common, PRTE, _control;
 
 EXPORT proc_build_keys(string filedate) := FUNCTION
 
@@ -23,8 +23,9 @@ RoxieKeyBuild.MAC_SK_BuildProcess_v2_local(keys.Key_Experian_LinkIDs.Key,
 	RETURN 		sequential(
 	          build_key_experian_crdb_linkids,
 	          move_built_key_experian_crdb_linkids,
-						move_qa_key_experian_crdb_linkids,
-						PerformUpdateOrNot);
+						move_qa_key_experian_crdb_linkids);
+						
+						//PerformUpdateOrNot);
 	
 
 END;

@@ -82,11 +82,11 @@ export proc_quickHdr_build_all (string sourceIP, string filedate) := function
 	Source_Check_rep := header_quick.Proc_source_check_report();
 	
 	return sequential( 
-                     check_superfiles_are_in_sync
-                    ,doWeekly
-                    ,doMonthly
-                    ,Inputs_Clear
-                    ,Inputs_Set(filedate)
+                   //  check_superfiles_are_in_sync
+                   // ,doWeekly
+                   // ,doMonthly
+                   // ,Inputs_Clear
+                    Inputs_Set(filedate)
                     ,buildAll
                     ,QA_sample/*,Source_Check_rep*/
                     );
