@@ -1,17 +1,28 @@
-Import watercraft_infutor, Address, AID, ut, VersionControl, NID, PromoteSupers;
+﻿Import watercraft_infutor, Address, AID, ut, VersionControl, NID, PromoteSupers;
 
 #workunit('name', 'Infutor Watercraft Base Build');
 
-ds:= dataset('~thor_data400::in::watercraft::infutor',watercraft_infutor.layouts.watercraft_infutor_in,CSV(terminator('\n'),separator('\t'),quote('')));
+// Grab date from Logical Filename
+RawInVirtual	:=	RECORD
+	watercraft_infutor.layouts.watercraft_infutor_in;
+	STRING	__filename	{ VIRTUAL(logicalfilename)};
+END;
+
+ds:= dataset('~thor_data400::in::watercraft::infutor',RawInVirtual,CSV(terminator('\n'),separator('\t'),quote('')));
+
+RawWithDate	:= PROJECT(ds, TRANSFORM(Watercraft_infutor.layouts.layout_CleanFields, SELF.filedate:=regexfind('[0-9]{8}',LEFT.__filename, 0);
+																																										SELF := LEFT;
+																																										SELF := [];// Grab date from Logical Filename
+											));
 
 ds_raw_base := dataset('~thor_data400::base::infutor_watercraft_raw',Watercraft_infutor.layouts.layout_CleanFields,flat);
 
-file_date := VersionControl.fGetFilenameVersion('~thor_data400::in::watercraft::infutor');
+//file_date := VersionControl.fGetFilenameVersion('~thor_data400::in::watercraft::infutor');
 
 //Concat Names and addresses for cleaning
-Watercraft_infutor.layouts.layout_CleanFields ConcatCleanFields(ds L) := TRANSFORM
+Watercraft_infutor.layouts.layout_CleanFields ConcatCleanFields(RawWithDate L) := TRANSFORM
 //	self.File_date := thorlib.wuid()[2..9];
-	self.Filedate	:= (string)file_date;
+	self.Filedate	:= L.filedate;
 	self.make := REGEXREPLACE('UNKNOWN',StringLib.StringToUpperCase(L.make),'');
 	self.Clean_Name	:= if(L.fname<>'', trim(L.fname,left,right)+' ' ,  '') +
 	                                 if(L.mname <>'',trim(L.mname)+ ' ', '')+ trim(L.lname,left,right)+ trim(L.suffix,left,right);
@@ -26,7 +37,7 @@ Watercraft_infutor.layouts.layout_CleanFields ConcatCleanFields(ds L) := TRANSFO
 	self := L;
 END;
 
-ds_ConcatFields := project(ds(fname != '' and lname != ''), ConcatCleanFields(LEFT));
+ds_ConcatFields := project(RawWithDate(fname != '' and lname != ''), ConcatCleanFields(LEFT));
 
 //Add name_type 
 // Address.Mac_Is_Business_Parsed(ds_ConcatFields,fPreclean,fname,mname,lname,suffix,,name_type);
