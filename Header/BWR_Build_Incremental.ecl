@@ -55,7 +55,6 @@ run_build(string filedate) := if(the_eq_file_for_this_month_is_available
 // ************************************************************************************************************************  
 // NB: Update BOTH #stored AND run_date BEFORE kicking off !! No need to update version_build
 
-#stored ('versionBuild', filedate   ); 
 run_date :=              filedate    ;
 
 versionBuild := header.version_build : stored('versionBuild');  
