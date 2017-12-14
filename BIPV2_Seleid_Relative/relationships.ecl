@@ -44,7 +44,7 @@ SHARED CandidatesNAMEST := TABLE(noFrandxCandidates,SlimRec1);
     UNSIGNED4 dt_first_seen_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesNAMEST le,CandidatesNAMEST ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesNAMEST le,CandidatesNAMEST ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -95,7 +95,7 @@ SHARED CandidatesCHARTER := TABLE(BaseFile(company_charter_number_weight100 + co
     UNSIGNED4 dt_first_seen_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesCHARTER le,CandidatesCHARTER ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesCHARTER le,CandidatesCHARTER ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -144,7 +144,7 @@ SHARED CandidatesFEIN := TABLE(BaseFile(company_fein_weight100>=2000),SlimRec); 
     UNSIGNED4 dt_first_seen_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesFEIN le,CandidatesFEIN ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesFEIN le,CandidatesFEIN ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -215,7 +215,7 @@ SHARED CandidatesCONTACT := TABLE(BaseFile(fname_weight100 + lname_weight100>=20
     UNSIGNED4 dt_first_seen_contact_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_contact_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesCONTACT le,CandidatesCONTACT ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesCONTACT le,CandidatesCONTACT ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -305,7 +305,7 @@ SHARED CandidatesADDRESS := TABLE(BaseFile(prim_name_weight100 + prim_range_weig
     UNSIGNED4 dt_first_seen_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesADDRESS le,CandidatesADDRESS ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesADDRESS le,CandidatesADDRESS ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -388,7 +388,7 @@ SHARED CandidatesDUNS_NUMBER := TABLE(BaseFile(active_duns_number_weight100>=200
     UNSIGNED4 dt_first_seen_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesDUNS_NUMBER le,CandidatesDUNS_NUMBER ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesDUNS_NUMBER le,CandidatesDUNS_NUMBER ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -437,7 +437,7 @@ SHARED CandidatesENTERPRISE_NUMBER := TABLE(BaseFile(active_enterprise_number_we
     UNSIGNED4 dt_first_seen_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesENTERPRISE_NUMBER le,CandidatesENTERPRISE_NUMBER ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesENTERPRISE_NUMBER le,CandidatesENTERPRISE_NUMBER ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;
@@ -488,7 +488,7 @@ SHARED CandidatesSOURCE := TABLE(BaseFile(source_weight100 + source_record_id_we
     UNSIGNED4 dt_first_seen_track; // Computed date for this particular field
     UNSIGNED4 dt_last_seen_track; // Computed date for this particular field
   END;
-  CombinationRecord NoteLink(CandidatesSOURCE le,CandidatesSOURCE ri) := TRANSFORM
+  CombinationRecord NoteLink(CandidatesSOURCE le,CandidatesSOURCE ri) := INLINE TRANSFORM
     SELF.Seleid1 := le.Seleid;
     SELF.Seleid2 := ri.Seleid;
     SELF.Cnt := 1;

@@ -1,6 +1,6 @@
 import _control, versioncontrol;
 
-export _Dataset(boolean pUseOtherEnvironment = false) := module
+export _Dataset(boolean pUseOtherEnvironment = false) := INLINE module
 	export Name										:= 	'Insurance_Certification';
 	export thor_cluster_Files			:= 	'~thor_data400::'; /* prod     */
 	//export thor_cluster_Files			:= 	'~thor40_241::';   /* dataland */

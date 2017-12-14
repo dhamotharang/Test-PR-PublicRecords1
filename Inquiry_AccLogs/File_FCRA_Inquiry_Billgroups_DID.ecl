@@ -9,7 +9,7 @@ sub market and other translation changes
 */
 import doxie, ut, risk_indicators;
 
-EXPORT File_FCRA_Inquiry_Billgroups_DID() := MODULE
+EXPORT File_FCRA_Inquiry_Billgroups_DID() := INLINE MODULE
 
 fcra_base :=  (fnAddSource(inquiry_acclogs.File_FCRA_Riskwise_Logs_Common, 'RISKWISE') + 
 							 fnAddSource(Inquiry_AccLogs.File_FCRA_BankoBatch_Logs_Common, 'BANKO BATCH') +

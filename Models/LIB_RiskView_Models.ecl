@@ -11,7 +11,7 @@ blankArguments := MODULE(Models.RV_LIBIN)
 EXPORT LIB_RiskView_Models (
 											GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) BocaShell = blankShell,
 											Models.RV_LIBIN arguments = blankArguments
-																							) := MODULE
+																							) := INLINE MODULE
 
 	SHARED modelName				:= StringLib.StringToUpperCase(arguments.modelName);
 	SHARED intendedPurpose	:= StringLib.StringToUpperCase(arguments.IntendedPurpose);

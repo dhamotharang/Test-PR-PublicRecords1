@@ -1,17 +1,17 @@
-import _control, versioncontrol,ut;
+import versioncontrol, Data_Services;
 
 export _Dataset(
 
 	boolean	pUseOtherEnvironment = false	//if true on dataland, use prod, if true on prod, use dataland
 
 ):=
-module
+INLINE module
 
 	export IsDataland 					:= VersionControl._Flags.IsDataland;
 	
 	export foreign_environment := if(VersionControl._Flags.IsDataland
-																	,ut.foreign_prod
-																	,ut.foreign_dataland
+																	,Data_Services.foreign_prod
+																	,Data_Services.foreign_dataland
 																);
 												
 	export Name										:= 'Martindale_Hubbell'		;
