@@ -1,4 +1,4 @@
-import ut,data_services;
+﻿import ut,data_services;
 
 /* Recreation of MBS on thor. New Files uploaded daily. 1 version of file saved in fathered super.  */
 export File_MBS := module
@@ -69,6 +69,7 @@ self.allowflags :=
 																										
 																										self.translation := inquiry_acclogs.fnTranslations.allowflags_str(allowflag_val);
 self.priority_flag := if(left.hist_subaccount_id = left.current_subaccount_id, 1, 0);
+self.country := trim(stringlib.stringtouppercase(left.country),left,right);
 self := left));
 																									
 df_fido_mbs_dist := distribute(df_fido_mbs(gc_id <> '' or company_id <> ''), hash(gc_id,company_id));

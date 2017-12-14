@@ -78,7 +78,9 @@
 '9Q', // OHIO_SENECA_COUNTY_COMMON_PLEAS_COURT                                                               
 '9T', // OHIO_OTTAWA_COUNTY_COMMON_PLEAS_COURT                                                               
 '9U', // OHIO_UNION_COUNTY_COMMON_PLEAS_COURT                                                                
-'9W', // TEXAS_KAUFMAN_COUNTY                                                                                
+'9W', // TEXAS_KAUFMAN_COUNTY 
+'10D',//UTAH_WHITE_COLLAR_CRIME_OFFENDER_REGISTRY  
+                                                                               
 'BA', // ALABAMA_BALDWIN_COUNTY_ARRESTS                                                                      
 'BC', // ALABAMA_HOUSTON_COUNTY_ARRESTS                                                                      
 'BD', // ALABAMA_JEFFERSON_COUNTY_ARRESTS                                                                    

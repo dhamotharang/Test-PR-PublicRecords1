@@ -128,19 +128,27 @@ hygenics_crim.Layout_Base_CourtOffenses_with_OffenseCategory addCOPID(all_files 
 fcra_v1_as_v1 := project(all_files, addCOPID(left));
 
 fcra_v1_as_v1 tJoinForOffensecategory(fcra_v1_as_v1 L, hygenics_search.Offense_Category.Layout_Lookup R) := transform
-    self.offense_category   := MAP(R.Category = 'GLOBAL' => hygenics_crim._functions.category_to_bitmap('OTHER'),
-		                               hygenics_crim._functions.category_to_bitmap(STD.Str.Filter(R.Category, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'))
+    self.offense_category   := MAP(//R.Category = 'GLOBAL' => hygenics_crim._fn_Multiple_categoryToBitmapj('OTHER'),
+		                               R.Category <> ''      => hygenics_crim._fn_Multiple_categoryToBitmap(STD.Str.Filter(R.Category, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_ |')),
+																	 L.Offense_Category
 																	 );  
 		self										:=	L;
 end;
 	
-fcra_v1_as_v2	:= join(fcra_v1_as_v1(offense_category =0),
-                      hygenics_search.Offense_Category.File_Lookup,
+fcra_v1_as_v2	:= join(fcra_v1_as_v1((offense_category =0 or offense_category = 2199023255552) and data_type ='2'),
+                      dedup(sort(hygenics_search.Offense_Category.File_Lookup,record),Offese_desc),
 																					trim(left.court_off_desc_1) = trim(right.Offese_desc),
 																					tJoinForOffensecategory(left,right),
 																					left outer, lookup);
+
+
+fcra_v1_as_v5	:= join(fcra_v1_as_v1((offense_category =0 or offense_category = 2199023255552) and data_type ='5'),
+                      hygenics_search.Offense_Category.File_Lookup,
+																					trim(left.arr_off_desc_1) = trim(right.Offese_desc),
+																					tJoinForOffensecategory(left,right),
+																					left outer, lookup);
 																					
-fcra_v1_as_v3 := fcra_v1_as_v2 + fcra_v1_as_v1(offense_category <>0);
+fcra_v1_as_v3 := fcra_v1_as_v5 + fcra_v1_as_v2 + fcra_v1_as_v1(offense_category <>0 and offense_category <> 2199023255552);
 
 	PromoteSupers.MAC_SF_BuildProcess(fcra_v1_as_v3,'~thor_data400::base::corrections_court_offenses_' + doxie_build.buildstate,aout,2,,true)
 			 
