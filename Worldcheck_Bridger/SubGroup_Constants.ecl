@@ -1021,6 +1021,7 @@
 		export string KEYWORD_NPCIAA								:= '709';
 		export string KEYWORD_EDES									:= '710';
 		export string KEYWORD_KRFSS									:= '711';
+		export string KEYWORD_PKPPMWT									:= '712';
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	
