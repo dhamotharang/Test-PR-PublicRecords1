@@ -1,4 +1,4 @@
-import watchdog, bankrupt, doxie_files, doxie, ut;
+import watchdog, bankrupt, doxie_files, doxie, ut,data_services;
 
 
 slimrec := record
@@ -74,5 +74,5 @@ end;
 
 outf := project(wcrim, back_to_slim(LEFT));
 			
-export Key_Quick_Derog := index(outf, {did}, {outf}, '~thor_data400::key::did_quick_derog_' + doxie.Version_SuperKey);
+export Key_Quick_Derog := index(outf, {did}, {outf}, data_services.data_location.prefix() + 'thor_data400::key::did_quick_derog_' + doxie.Version_SuperKey);
  

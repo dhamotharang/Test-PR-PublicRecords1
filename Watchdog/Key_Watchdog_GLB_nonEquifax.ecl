@@ -1,4 +1,4 @@
-import lib_fileservices, ut, header_services, doxie,_Control,header;
+﻿import lib_fileservices, header_services,header,ut, doxie,_Control,data_services;
 
 string_rec := record
 	watchdog.Layout_Best;
@@ -81,7 +81,7 @@ Base_File_Append_out := project(Base_File_Append_In, reformat_layout(left));
 //append ADL indicator
 watchdog.mac_append_ADL_ind(Base_File_Append_out, Base_File_Append);
 
-main_dataset := dataset('~thor_data400::base::watchdog_best_noneq',string_rec,flat) + Base_File_Append;
+main_dataset := dataset(data_services.data_location.prefix() + 'thor_data400::base::watchdog_best_noneq',string_rec,flat) + Base_File_Append;
  
 t0 := join(main_dataset,
 					Base_File_Append,
@@ -92,4 +92,4 @@ t0 := join(main_dataset,
 _t1 := t0 + Base_File_Append;
 ut.mac_suppress_by_phonetype(_t1,phone,st,t1,true,did);
 
-export Key_Watchdog_GLB_nonEquifax := INDEX(t1,{t1},'~thor_data400::key::watchdog_best_noneq.did_'+doxie.Version_SuperKey);
+export Key_Watchdog_GLB_nonEquifax := INDEX(t1,{t1},data_services.data_location.prefix() + 'thor_data400::key::watchdog_best_noneq.did_'+doxie.Version_SuperKey);

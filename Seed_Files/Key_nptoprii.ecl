@@ -1,3 +1,5 @@
+import data_services;
+
 numrec := record
 	layout_nptoprii;
 	string3	prodnum;
@@ -74,4 +76,4 @@ export Key_nptoprii := index(df,{prodnum, social},{account_out,
 	eqfscity3,
 	eqfsstate3,
 	eqfszip3,
-	eqfsphone3},'~thor_data400::key::seed::qa::nptoprii');
+	eqfsphone3},data_services.data_location.prefix() + 'thor_data400::key::seed::qa::nptoprii');

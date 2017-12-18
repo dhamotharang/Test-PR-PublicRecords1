@@ -1,4 +1,4 @@
-import ut, doxie;
+import ut, doxie,data_services;
 
 df_base := VehicleV2.Files.Base.Party;
 
@@ -28,4 +28,4 @@ ds_blur := project(ds_dedup, toBlur(left));
 
 export Key_Vehicle_Lic_Plate_Blur := index(
 	ds_blur, {license_plate_blur}, {ds_blur},
-	'~thor_data400::key::VehicleV2::lic_plate_blur_'+ doxie.Version_SuperKey);
+	data_services.data_location.prefix('Vehicle') + 'thor_data400::key::VehicleV2::lic_plate_blur_'+ doxie.Version_SuperKey);

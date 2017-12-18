@@ -1,4 +1,4 @@
-import doxie, ut, header_services;
+import doxie, ut, header_services,data_services;
 
 daily := utilfile.daily_fdid((unsigned6)did<>0);
 
@@ -42,4 +42,4 @@ p := PROJECT(PhSuppressed2,transform(utilfile.Layout_DID_Out,self := left));
 
 //************************************************************************************************************	
 
-export Key_Util_Daily_Did := INDEX(p,{unsigned6 s_did := (unsigned6)did},{p},ut.foreign_prod+'thor_data400::key::utility::daily.did_'+doxie.Version_SuperKey);
+export Key_Util_Daily_Did := INDEX(p,{unsigned6 s_did := (unsigned6)did},{p},data_services.foreign_prod+'thor_data400::key::utility::daily.did_'+doxie.Version_SuperKey);

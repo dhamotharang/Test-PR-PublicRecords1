@@ -1,4 +1,4 @@
-import ut;
+import data_services;
 
 numrec := record
 	layout_fa2onafi;
@@ -73,4 +73,4 @@ export Key_fa2onafi := index (df,{prodnum, social},{
      formerfirst5,
      formerlast5,
      internalcode5,
-     hphone }, '~thor_data400::key::seed::qa::fa2onafi');
+     hphone }, data_services.data_location.prefix() +'thor_data400::key::seed::qa::fa2onafi');

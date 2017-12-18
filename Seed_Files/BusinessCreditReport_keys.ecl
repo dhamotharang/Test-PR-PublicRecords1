@@ -1,5 +1,5 @@
 
-IMPORT Data_Services, ut, doxie, risk_indicators;
+IMPORT Data_Services, Data_Services, doxie, risk_indicators;
 
  
 EXPORT BusinessCreditReport_keys := MODULE
@@ -12,7 +12,7 @@ EXPORT BusinessCreditReport_keys := MODULE
 //===  configuration variables  for test === 
 //========================================== 
 	shared file_prefix_Test := '~LaureF3'; 
-  shared locat_Test := ut.foreign_dataland + file_prefix_Test + '::key::' + middle_name;
+  shared locat_Test := Data_Services.foreign_dataland + file_prefix_Test + '::key::' + middle_name;
 //==========================================
 //===  configuration variables  for prod === 
 //==========================================  

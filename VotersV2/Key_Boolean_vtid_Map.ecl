@@ -1,4 +1,4 @@
-import votersv2;
+import votersv2,data_services;
 
 
 tmsid_rec := RECORD
@@ -10,7 +10,7 @@ tmsid_rec := RECORD
 
 tmsid_table := dataset([],tmsid_rec);
 
-export key_boolean_vtid_map := index(tmsid_table,{src,doc,__filepos},'~thor_data400::key::votersv2::qa::doc.vtid');
+export key_boolean_vtid_map := index(tmsid_table,{src,doc,__filepos},data_services.data_location.prefix('Voter') + 'thor_data400::key::votersv2::qa::doc.vtid');
 
 
 

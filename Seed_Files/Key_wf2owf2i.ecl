@@ -1,4 +1,4 @@
-Import Seed_Files, Data_Services, ut;
+Import Seed_Files, Data_Services;
 
 numrec := record
 	Seed_Files.layout_wf2o;
@@ -125,5 +125,5 @@ export Key_wf2owf2i := index(df,{prodnum, social},{account,
 	reason2,
 	reason3,
 	reason4}, Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_Data400::key::seed::qa::wf2o');
-	// reason4}, ut.foreign_dataland + 'thor_Data400::key::seed::qa::wf2owf2i');
+	// reason4}, Data_Services.foreign_dataland + 'thor_Data400::key::seed::qa::wf2owf2i');
 	

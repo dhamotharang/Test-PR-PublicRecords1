@@ -1,4 +1,4 @@
-import ut, doxie, _Control;
+import ut, doxie, _Control,data_services;
 //compare to glb data and set flags
 watchdog.Layout_best_flags flags(watchdog.layout_best L, watchdog.Layout_Best R) := transform
  self.glb_name := if(datalib.leadmatch(l.fname,r.fname)=0 or 
@@ -19,4 +19,4 @@ markt := watchdog.File_Best_marketing;
 _t1 := join(glb,markt,left.did=right.did,flags(left,right),local);
 ut.mac_suppress_by_phonetype(_t1,phone,st,t1,true,did);
 
-export Key_Prep_Watchdog_marketing := INDEX(t1,{t1},'~thor_data400::key::watchdog_marketing.did_'+doxie.Version_SuperKey);
+export Key_Prep_Watchdog_marketing := INDEX(t1,{t1},data_services.data_location.prefix() + 'thor_data400::key::watchdog_marketing.did_'+doxie.Version_SuperKey);

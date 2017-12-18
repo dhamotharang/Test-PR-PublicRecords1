@@ -1,4 +1,4 @@
-import ut,doxie,watchdog,header,mdr,header_services, _Control;
+import ut,doxie,watchdog,header,header_services, _Control,data_services;
 
 string_rec := record
 	watchdog.Layout_Best;
@@ -86,7 +86,7 @@ Base_File_Append_out := project(Base_File_Append_In, reformat_layout(left));
 watchdog.mac_append_ADL_ind(Base_File_Append_out, Base_File_Append);
 //***********END*************************************************************
 
-wdog0 := dataset(ut.foreign_prod + 'thor_data400::BASE::Watchdog_best',string_rec,flat);
+wdog0 := dataset(data_services.foreign_prod + 'thor_data400::BASE::Watchdog_best',string_rec,flat);
 
 t0 := join(wdog0,
 					Base_File_Append,
@@ -98,7 +98,7 @@ wdog := t0 + Base_File_Append;
 
 candidates := distribute(wdog(trim(fname)='' or trim(lname)=''),hash(did));
 not_candidates := wdog(~(trim(fname)='' or trim(lname)=''));
-glb_pst        := distribute(dataset('~thor400_84::out::watchdog_filtered_header',header.layout_header,flat),hash(did));;
+glb_pst        := distribute(dataset(data_services.data_location.prefix() + 'thor400_84::out::watchdog_filtered_header',header.layout_header,flat),hash(did));;
 
 header.layout_header t1(glb_pst le, candidates ri) := transform
  self := le;
@@ -153,4 +153,4 @@ _fb := project(concat1,watchdog.layout_key);
 ut.mac_suppress_by_phonetype(_fb,phone,st,fb,true,did);
 
 export key_watchdog_glb_nonblank := INDEX(fb,watchdog.layout_key,
-ut.foreign_prod+ 'thor_data400::key::watchdog_best.did_nonblank_'+doxie.Version_SuperKey);
+data_services.foreign_prod+ 'thor_data400::key::watchdog_best.did_nonblank_'+doxie.Version_SuperKey);

@@ -1,4 +1,4 @@
-import VehicleV2, Doxie, ut, data_services,BIPV2;
+﻿import VehicleV2, Doxie, ut, data_services,BIPV2;
 
 get_recs	:= VehicleV2.file_VehicleV2_Party_Clean_Sequence_Key;
 
@@ -10,7 +10,7 @@ layout_std_lienholder_lkp := RECORD
 	STRING70	std_lienholder_name;
 END;
 
-file_std_lienholder_lkp := DATASET(ut.foreign_prod+ '~thor_data400::lookup::vehiclesv2::std_lienholder', layout_std_lienholder_lkp, CSV(SEPARATOR('|')));
+file_std_lienholder_lkp := DATASET(data_services.foreign_prod + 'thor_data400::lookup::vehiclesv2::std_lienholder', layout_std_lienholder_lkp, CSV(SEPARATOR('|')));
 
 layout_Key_Vehicle_Party_Key
 	:=

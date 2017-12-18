@@ -1,3 +1,4 @@
+import data_services;
 //Create best SSN key
 glb := watchdog.File_Best;
 non_glb := watchdog.File_Best_nonglb;
@@ -22,4 +23,4 @@ set_nonglb := join(glb_flags,non_glb,left.did=right.did,SSNflags(left,right,4),l
 set_nonutil := join(set_nonglb,non_util,left.did=right.did,SSNflags(left,right,2),local);
 set_nonglb_nonutil := join(set_nonutil,nonglb_nonutil,left.did=right.did,SSNflags(left,right,8),local);
 
-export Key_Prep_Best_SSN := index(set_nonglb_nonutil,{set_nonglb_nonutil},'~thor_data400::key::watchdog_best.ssn'+thorlib.wuid());
+export Key_Prep_Best_SSN := index(set_nonglb_nonutil,{set_nonglb_nonutil},data_services.data_location.prefix() + 'thor_data400::key::watchdog_best.ssn'+thorlib.wuid());

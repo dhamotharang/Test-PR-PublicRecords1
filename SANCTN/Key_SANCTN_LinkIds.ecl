@@ -1,9 +1,9 @@
-IMPORT BIPV2, SANCTN;
+IMPORT BIPV2, SANCTN,Data_Services;
 
 EXPORT Key_SANCTN_LinkIds := MODULE
 
   // DEFINE THE INDEX
-	shared superfile_name	:= '~thor_data400::key::sanctn::linkids_qa';
+	shared superfile_name	:= Data_Services.Data_Location.Prefix('Telcordia')+'thor_data400::key::sanctn::linkids_qa';
 		
 	shared Base := SANCTN.file_base_party;
 	

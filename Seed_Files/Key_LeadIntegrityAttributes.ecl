@@ -1,4 +1,4 @@
-import ut;
+import data_services;
 
 d := Seed_Files.file_LeadIntegrityAttributes;
 
@@ -8,4 +8,4 @@ newrec := record
 end;
 newtable := table(d, newrec);
 
-export Key_LeadIntegrityAttributes := index(newtable,{dataset_name,hashvalue}, {newtable}, '~thor_data400::key::testseed::qa::leadintegrityattributes');
+export Key_LeadIntegrityAttributes := index(newtable,{dataset_name,hashvalue}, {newtable}, data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::leadintegrityattributes');

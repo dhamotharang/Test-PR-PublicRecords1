@@ -1,4 +1,4 @@
-import address, doxie, ut, header_services;
+import address, doxie, ut, header_services,data_services;
 
 layout_orig_util_in := record
 	string15        id;
@@ -76,4 +76,4 @@ export Key_DID :=
        index(file_util_orig_in,
              {unsigned6 s_did := (unsigned6)did},
 						 {file_util_orig_in},
-						 '~thor_data400::key::utility_did_' + doxie.Version_SuperKey);
+						 data_services.data_location.prefix() + 'thor_data400::key::utility_did_' + doxie.Version_SuperKey);

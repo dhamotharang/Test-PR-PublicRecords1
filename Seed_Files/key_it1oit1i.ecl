@@ -1,3 +1,5 @@
+import data_services;
+
 numrec := record
 	layout_it1oit1i;
 	string3	prodnum;
@@ -82,4 +84,4 @@ export key_it1oit1i := index(df,{prodnum, social},
 	score2,
 	score3
 	}
-	, '~thor_Data400::key::seed::qa::it1oit1i');
+	, data_services.data_location.prefix() + 'thor_Data400::key::seed::qa::it1oit1i');

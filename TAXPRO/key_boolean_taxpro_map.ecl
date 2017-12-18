@@ -1,5 +1,5 @@
 
-import taxpro,text_search;
+import taxpro,text_search,data_services;
 
 
 
@@ -19,4 +19,4 @@ ds :=dataset([],layout_tmsid);
 
 
 export key_boolean_taxpro_map := index(ds,{doc,tmsid,__filepos},
-	'~thor_data400::key::taxpro::qa::docref.docref');
+	data_services.data_location.prefix() + 'thor_data400::key::taxpro::qa::docref.docref');

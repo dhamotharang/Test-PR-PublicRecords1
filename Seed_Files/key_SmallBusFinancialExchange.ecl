@@ -1,4 +1,4 @@
-IMPORT Business_Risk_BIP, Data_Services, UT;
+IMPORT  Data_Services;
 
 baseFile := Seed_Files.file_SmallBusFinancialExchange;
 
@@ -18,5 +18,5 @@ withHashValue := TABLE(baseFile, appendHashValue);
 export key_SmallBusFinancialExchange := index(withHashValue, {TestDataTableName, HashValue},
 																	{withHashValue},
 																	Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::testseed::qa::smallbusfinancialexchange'
-																	// '~thor_data400::key::testseed::qa::smallbusfinancialexchange'
+																	// data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::smallbusfinancialexchange'
 																	);

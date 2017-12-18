@@ -1,4 +1,4 @@
-Import Data_Services, ut;
+Import Data_Services;
 
 d := Seed_Files.file_AMLRiskAttributes;
 
@@ -8,5 +8,5 @@ newrec := record
 end;
 newtable := table(d, newrec);
 
-// export key_AMLRiskAttributes := index(newtable,{dataset_name,hashvalue}, {newtable},  '~thor_data400::key::testseed::qa::amlriskattributes_test');
+// export key_AMLRiskAttributes := index(newtable,{dataset_name,hashvalue}, {newtable},  data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::amlriskattributes_test');
 export Key_AMLRiskAttributes := index(newtable,{dataset_name,hashvalue}, {newtable}, Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::testseed::qa::amlriskattributes');

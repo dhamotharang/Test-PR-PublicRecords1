@@ -1,4 +1,4 @@
-import autokeyb2,doxie;
+import autokeyb2,data_services;
 
 //util bus autokeys
 Layout_Autokeys := RECORD
@@ -9,7 +9,7 @@ END;
 
 fakepf := dataset([],Layout_Autokeys);
 
-autokey_qa_name := '~thor_data400::key::utility::daily::bus::autokey::qa::';
+autokey_qa_name := data_services.data_location.prefix() + 'thor_data400::key::utility::daily::bus::autokey::qa::';
 
 autokeyb2.MAC_FID_Payload(fakepf,'','','','','','','','','',zero,bdid,autokey_qa_name+'Payload',plk,'')
 

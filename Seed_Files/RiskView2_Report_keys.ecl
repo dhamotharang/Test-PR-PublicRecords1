@@ -1,11 +1,11 @@
 
-IMPORT Data_Services, ut,doxie, risk_indicators;
+IMPORT Data_Services, doxie, risk_indicators;
 
 
 EXPORT RiskView2_Report_keys := MODULE
 
 	shared locat := Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::riskview2report::';
-	// shared locat := ut.foreign_dataland + 'thor_data400::key::riskview2report::';
+	// shared locat := Data_Services.foreign_dataland + 'thor_data400::key::riskview2report::';
 	
 	d := Seed_Files.Riskview2_Report_files.Summary;
 	newrec := record

@@ -1,4 +1,4 @@
-import doxie;
+import doxie,data_services;
 raw := file_areacode_change;
 
 
@@ -31,4 +31,4 @@ end;
 
 final := base + project(base, swap(left));
 
-export Key_AreaCode_Change_plus := index(final,{old_NPA,old_NXX},{final},'~thor_data400::key::areacode_change_plus_' + doxie.Version_SuperKey);
+export Key_AreaCode_Change_plus := index(final,{old_NPA,old_NXX},{final},data_services.data_location.prefix() + 'thor_data400::key::areacode_change_plus_' + doxie.Version_SuperKey);

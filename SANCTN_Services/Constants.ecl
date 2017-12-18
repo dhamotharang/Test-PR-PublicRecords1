@@ -1,3 +1,5 @@
+import data_services;
+
 // incident is identified by batch_number + incident_number (ID)
 EXPORT Constants := MODULE
   
@@ -21,7 +23,7 @@ EXPORT Constants := MODULE
   EXPORT unsigned2 ID_PER_CASENUMBER := 500; // ~210
 
   // Autokeys' related
-	EXPORT string ak_keyname := '~thor_data400::key::sanctn::qa::autokey::';
+	EXPORT string ak_keyname := data_services.data_location.prefix() + 'thor_data400::key::sanctn::qa::autokey::';
 	EXPORT string ak_typeStr := 'AK';
   EXPORT set_skip := ['P','Q','S','F']; //keys to skip searching in
 

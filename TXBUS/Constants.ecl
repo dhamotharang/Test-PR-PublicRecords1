@@ -1,12 +1,14 @@
+import data_services;
+
 export Constants := module
 
-   export Cluster := '~thor_data400::';
+   export Cluster := data_services.data_location.prefix() + 'thor_data400::';
    
-   export autokey_logical(string filedate) := '~thor_data400::key::txbus::'+ filedate + '::autokey::';
+   export autokey_logical(string filedate) := data_services.data_location.prefix() + 'thor_data400::key::txbus::'+ filedate + '::autokey::';
    
-   export autokey_keyname := '~thor_data400::key::txbus::autokey::@version@::';
+   export autokey_keyname := data_services.data_location.prefix() + 'thor_data400::key::txbus::autokey::@version@::';
    
-   export autokey_qa_name := '~thor_data400::key::txbus::autokey::qa::';
+   export autokey_qa_name := data_services.data_location.prefix() + 'thor_data400::key::txbus::autokey::qa::';
    //P in this set to skip personal phones
    //Q in this set to skip business phones
    //S in this set to skip SSN
