@@ -29,7 +29,7 @@ export Key_DID_w_Type (boolean  IsFCRA = false) := function
 		dDedup        := dedup(DSort ,did,tmsid,rmsid,party_type,local);
 
 	  return_file		:= IF (IsFCRA
-												,INDEX(dDedup  ,{did,party_type},{tmsid,rmsid},KeyName +'fcra::did_w_Type_' + Doxie.Version_SuperKey)
+												,INDEX(dataset([], RECORDOF(dDedup))  ,{did,party_type},{tmsid,rmsid},KeyName +'fcra::did_w_Type_' + Doxie.Version_SuperKey)
 												,INDEX(dDedup  ,{did,party_type},{tmsid,rmsid},KeyName +'did_w_Type_' + Doxie.Version_SuperKey)
 												);
 		return(return_file); 
