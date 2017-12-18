@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 lay_inputs	:= tools.Layout_FilenameVersions.Inputs;
@@ -18,7 +18,7 @@ export Promote(
 module
 	
 	export inputfiles					:= tools.mod_PromoteInput(pversion,pInputFilenames,pFilter,pDelete,pIsTesting);
-	export buildfiles					:= tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pIsTesting);
-	export NonBool_buildfiles	:= tools.mod_PromoteBuild(pversion,pNonBoolFilenames,pFilter,pDelete,pIsTesting);	
+	export buildfiles					:= tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pIsTesting,pForceGenPromotion := true);
+	export NonBool_buildfiles	:= tools.mod_PromoteBuild(pversion,pNonBoolFilenames,pFilter,pDelete,pIsTesting,pForceGenPromotion := true);	
 
 end;
