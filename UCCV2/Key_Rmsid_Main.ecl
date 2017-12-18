@@ -71,11 +71,11 @@ export Key_rmsid_main (boolean  IsFCRA = false) := function
 					SELF	             					  := pInput;
 	 end;
 
-		dmainBase 	  := project(dMain,tProject(left));
-		dSort         := sort(distribute(dmainBase,hash(tmsid,rmsid)),tmsid,rmsid,local);
-		
+		dmainBase 	  := 	project(dMain,tProject(left));
+		dSort         := 	sort(distribute(dmainBase,hash(tmsid,rmsid)),tmsid,rmsid,local);
+
 		return_file		:= IF (IsFCRA
-												,INDEX(dSort ,{tmsid,rmsid},{dmainBase},KeyName +'fcra::main_Rmsid_' +  doxie.Version_SuperKey)
+												,INDEX(dataset([],Layout_UCC_Common.Layout_ucc_new) ,{tmsid,rmsid},{dataset([],Layout_UCC_Common.Layout_ucc_new)},KeyName +'fcra::main_Rmsid_' +  doxie.Version_SuperKey)
 												,INDEX(dSort ,{tmsid,rmsid},{dmainBase},KeyName +'main_Rmsid_' +  doxie.Version_SuperKey)
 												);
 		return(return_file); 
