@@ -80,7 +80,7 @@ export Key_rmsid_party (boolean  IsFCRA = false) := function
                        tmsid,fname,lname,mname,prim_name,prim_range,company_name),tmsid,rmsid);
 
 	  return_file		:= IF (IsFCRA
-												,INDEX(dSort ,{tmsid,rmsid},{dSort},KeyName +'fcra::party_Rmsid_' + Doxie.Version_SuperKey)
+												,INDEX(dataset([],Layout_Party_linkids) ,{tmsid,rmsid},{dataset([],Layout_Party_linkids)},KeyName +'fcra::party_Rmsid_' + Doxie.Version_SuperKey)
 												,INDEX(dSort ,{tmsid,rmsid},{dSort},KeyName +'party_Rmsid_' + Doxie.Version_SuperKey)
 											  );
 		return(return_file); 

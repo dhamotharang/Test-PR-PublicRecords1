@@ -1,4 +1,4 @@
-import hygenics_crim, PromoteSupers, hygenics_crim,doxie_build;
+﻿import hygenics_crim, PromoteSupers, hygenics_crim,doxie_build,STD;
 
 fcra_v1 				:= Offenses_DOC_Joined;
 
@@ -91,7 +91,7 @@ hygenics_crim.Layout_Base_Offenses_with_OffenseCategory addDOPID(offns l):= tran
 																									Vstc_lgth_desc +
 																									Vnum_of_counts +
 																									Vchg);	
-    self.offense_category               := MAP(  l.off_desc_1 = 'NOT SPECIFIED' => 0,
+    self.offense_category               := MAP(  l.off_desc_1 = 'NOT SPECIFIED' =>hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Other),
 		                                             hygenics_crim._fns_offense_category.set_offense_category(stringlib.stringtouppercase(l.off_desc_1))
 																								 );																									
 		self := l;
@@ -99,6 +99,22 @@ hygenics_crim.Layout_Base_Offenses_with_OffenseCategory addDOPID(offns l):= tran
 
 all_files := project(offns, addDOPID(left));
 
-	PromoteSupers.MAC_SF_BuildProcess(all_files,'~thor_data400::base::corrections_offenses_' + doxie_build.buildstate, aout, 2, ,true);
+all_files tJoinForOffensecategory(all_files L, hygenics_search.Offense_Category.Layout_Lookup R) := transform
+    self.offense_category   := MAP(//R.Category = 'GLOBAL' => hygenics_crim._fn_Multiple_categoryToBitmapj('OTHER'),
+		                               R.Category <> ''      => hygenics_crim._fn_Multiple_categoryToBitmap(STD.Str.Filter(R.Category, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_')),
+																	 L.offense_category
+																	 );  
+		self										:=	L;
+end;
+	
+all_files2	:= join(all_files(offense_category =0 or offense_category = 2199023255552),
+                      hygenics_search.Offense_Category.File_Lookup,
+																					trim(left.off_desc_1) = trim(right.Offese_desc),
+																					tJoinForOffensecategory(left,right),
+																					left outer, lookup);
+																					
+all_files3 := all_files2 + all_files(offense_category <>0 and offense_category <> 2199023255552);
+
+	PromoteSupers.MAC_SF_BuildProcess(all_files3,'~thor_data400::base::corrections_offenses_' + doxie_build.buildstate, aout, 2, ,true);
 				 
 export Out_DOC_Offenses := aout;

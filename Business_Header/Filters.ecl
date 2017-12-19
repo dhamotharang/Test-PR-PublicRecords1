@@ -39,7 +39,8 @@ module
 																'1676507481   C37536530',
 																'1149525038   C37536530',
 																'1665485437   C37536530',
-																'2083107149    C107741806'
+																'2083107149    C107741806',
+																'2061716462    C344399990'
 															 ];
 	
 	export Input :=
@@ -392,6 +393,7 @@ module
 				// -- JIRA - DF-20268 - ZOOM Paw record to be removed
 				// -- JIRA - DF-20347 - Overlinking of PAW Zoom Record in Lexid 1443992436 - Consumer Advocacy
 				// -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
+				// -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
 				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in Bad_zoom_vend_ids)
 				// -- JIRA - DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				or  (mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
@@ -919,6 +921,7 @@ module
 				// -- JIRA - DF-20268 - ZOOM Paw record to be removed
 				// -- JIRA - DF-20347 - Overlinking of PAW Zoom Record in Lexid 1443992436 - Consumer Advocacy
 				// -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
+				// -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
 				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in Bad_zoom_vend_ids)
 				// -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				or  (mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
@@ -1508,6 +1511,7 @@ module
 				 // -- JIRA - DF-20268 - ZOOM Paw record to be removed
 				 // -- JIRA - DF-20347 - Overlinking of PAW Zoom Record in Lexid 1443992436 - Consumer Advocacy
 				 // -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
+				 // -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
 				( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in Bad_zoom_vend_ids)
 			or // -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				( mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
@@ -2017,6 +2021,7 @@ module
 				 // -- JIRA - DF-20268 - ZOOM Paw record to be removed
 				 // -- JIRA - DF-20347 - Overlinking of PAW Zoom Record in Lexid 1443992436 - Consumer Advocacy
 				 // -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
+				 // -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
 				( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in Bad_zoom_vend_ids)
 			or // -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				( mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
