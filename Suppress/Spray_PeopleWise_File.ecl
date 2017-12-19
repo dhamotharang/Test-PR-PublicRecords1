@@ -1,7 +1,7 @@
-export Spray_PeopleWise_File(sourceIP,sourcefile,filedate,group_name= '') := macro
+﻿export Spray_PeopleWise_File(sourceIP,sourcefile,filedate,group_name= '') := macro
 
 #workunit('name','Yogurt:Suppression Key Build '+filedate);
-#OPTION('AllowedClusters','thor400_44,thor400_60');
+#OPTION('AllowedClusters','thor400_44,thor400_66');
 //#OPTION('AllowAutoSwitchQueue','1');
 
 
