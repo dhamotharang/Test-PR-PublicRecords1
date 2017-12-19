@@ -81,8 +81,10 @@ export proc_quickHdr_build_all (string sourceIP, string filedate) := function
 	
 	Source_Check_rep := header_quick.Proc_source_check_report();
 	
-	return sequential( 
+	return sequential(
                      check_superfiles_are_in_sync
+                    ,header_quick._config.set_v_version
+                    ,header_quick._config.set_v_eq_as_of_date
                     ,doWeekly
                     ,doMonthly
                     ,Inputs_Clear

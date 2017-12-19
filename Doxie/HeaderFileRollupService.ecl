@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="headerFileRollupRequest">
   <part name="IndustryCLASS" type="xsd:string"/>
   <part name="SSN" type="xsd:string"/>
@@ -107,6 +107,20 @@
 	<part name="IndustryType"	    			    type="xsd:unsignedInt"/>
 	<part name="ProductCode"		  		      type="xsd:unsignedInt"/>
 
+	<!-- Progressive/waterfall Phone options -->
+	<part name="IncludeProgessivePhone" type="xsd:boolean"/>
+	<part name="ScoreModel" 						type="xsd:string"/>
+  <part name="MaxNumAssociate"  			type="xsd:unsignedInt"/>
+  <part name="MaxNumAssociateOther"  	type="xsd:unsignedInt"/>
+  <part name="MaxNumFamilyOther"  		type="xsd:unsignedInt"/>
+  <part name="MaxNumFamilyClose"  		type="xsd:unsignedInt"/>
+  <part name="MaxNumParent"  					type="xsd:unsignedInt"/>
+  <part name="MaxNumSpouse"  					type="xsd:unsignedInt"/>
+  <part name="MaxNumSubject"  				type="xsd:unsignedInt"/>
+  <part name="MaxNumNeighbor"  				type="xsd:unsignedInt"/>
+	<part name="ReturnPhoneScore" 			type="xsd:boolean"/>
+	<part name="IncludePhonesFeedback" 	type="xsd:boolean"/>
+
 	<part name="Gateways" type="tns:XmlDataSet" cols="70" rows="25"/>
 </message>
 */
@@ -117,7 +131,7 @@
 
 */
 
-IMPORT DriversV2,Gong_Services,PhonesFeedback,PhonesFeedback_Services,Suppress,WSInput;
+IMPORT Gong_Services,WSInput;
 EXPORT HeaderFileRollupService := MACRO
 
 		//The following macro defines the field sequence on WsECL page of query. 
@@ -130,6 +144,7 @@ EXPORT HeaderFileRollupService := MACRO
     BOOLEAN   BatchFriendly           := FALSE : STORED('BatchFriendly');
     STRING    DLNumber_Value          := ''    : STORED('DLNumber');
     STRING    DLState_Value           := ''    : STORED('DLState');
+		BOOLEAN   IncProgessivePhone			:= FALSE : STORED('IncludeProgessivePhone');
     #STORED('dl_number',stringlib.stringtouppercase(DLNumber_Value));
         
     doxie.MAC_Header_Field_Declare();
@@ -156,6 +171,9 @@ EXPORT HeaderFileRollupService := MACRO
         EXPORT BOOLEAN reduced_data       := reduced_data_value;
     END;
 
+		// Set progressive phone params
+		ProgPhone_mod := doxie.iParam.getProgressivePhoneParams();
+		
     ta1_tmp := doxie.HeaderFileRollupService_Records.fn_get_ta1_temp(ta1_tempmod);
 
     ta1_tmp_results := ta1_tmp.Results;
@@ -169,16 +187,20 @@ EXPORT HeaderFileRollupService := MACRO
         EXPORT BOOLEAN       Include_BusinessCredit   := FALSE : STORED('IncludeBusinessCredit');
         EXPORT BOOLEAN       Include_PhonesFeedback   := FALSE : STORED('IncludePhonesFeedback');
         EXPORT BOOLEAN       Include_AddressFeedback  := FALSE : STORED('IncludeAddressFeedback');
-        EXPORT SET OF STRING Include_SourceList       := []    : STORED('IncludeSourceList'); // keeping name in sync with IncludeSourceList in Doxie.HeaderSource_Service
+				EXPORT SET OF STRING Include_SourceList       := []    : STORED('IncludeSourceList'); // keeping name in sync with IncludeSourceList in Doxie.HeaderSource_Service
         EXPORT BOOLEAN       Smart_Rollup             := FALSE : STORED('SmartRollup');
       END;
 
     ta2 := doxie.HeaderFileRollupService_Records.fn_get_ta2(ta1_tmp_results, ta2_tempmod);
 
+	  ta_phones := doxie.HeaderFileRollupService_Records.get_progressive_phone(ta2,ProgPhone_mod);
+		
+		ta_final := IF(IncProgessivePhone,ta_phones,ta2);
+		
     //create flat version specifically designed for batch
-    ta1_batch := doxie.fn_flatten_rollup(ta2, BatchAccount);
-
-    OUTPUT(if (~BatchFriendly, ta2),       NAMED('Results'));
+    ta1_batch := doxie.fn_flatten_rollup(ta_final, BatchAccount);
+		
+    OUTPUT(if (~BatchFriendly, ta_final),  NAMED('Results'));
     OUTPUT(if ( BatchFriendly, ta1_batch), NAMED('BatchResults'));
     OUTPUT(householdAvailableCount,        NAMED('HouseholdRecordsCount'));
     OUTPUT(royalties,                      NAMED('RoyaltySet'));

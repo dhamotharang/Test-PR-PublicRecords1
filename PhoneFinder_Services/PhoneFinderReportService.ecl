@@ -185,18 +185,18 @@ MACRO
 		EXPORT BOOLEAN   UseEquifax         		:= ~doxie.DataRestriction.EquifaxPhoneMart and TransactionType = PhoneFinder_Services.Constants.TransType.Ultimate;
 		EXPORT BOOLEAN   useWaterfallv6					:= FALSE : STORED('useWaterfallv6');	// internal
 		EXPORT BOOLEAN   IncludePhoneMetadata		:= pfOptions.IncludePhoneMetadata : STORED('IncludePhoneMetadata');				 				 
-					 BOOLEAN   RealTimedata 			 		:= pfOptions.UseDeltabase : STORED('UseDeltabase');						 
+		BOOLEAN          RealTimedata 			 		:= pfOptions.UseDeltabase : STORED('UseDeltabase');						 
 		EXPORT BOOLEAN   UseDeltabase 					:= IF(IncludePhoneMetadata,RealTimedata,FALSE);																						 
-					 BOOLEAN   SubjectMetadata 		 		:= pfOptions.SubjectMetadataOnly : STORED('SubjectMetadataOnly');
+		BOOLEAN          SubjectMetadata 		 		:= pfOptions.SubjectMetadataOnly : STORED('SubjectMetadataOnly');
 		EXPORT BOOLEAN   SubjectMetadataOnly  	:= IF(IncludePhoneMetadata,SubjectMetadata,FALSE);
 		
 		// Options for phone verification	  
 		EXPORT BOOLEAN   VerifyPhoneName				:= pfOptions.VerificationOptions.VerifyPhoneName 				: STORED('VerifyPhoneName');
 		EXPORT BOOLEAN   VerifyPhoneNameAddress := pfOptions.VerificationOptions.VerifyPhoneNameAddress : STORED('VerifyPhoneNameAddress');
 		EXPORT BOOLEAN   VerifyPhoneIsActive    := pfOptions.VerificationOptions.VerifyPhoneIsActive    : STORED('VerifyPhoneIsActive');
-    EXPORT INTEGER   DateFirstSeenThreshold := pfOptions.VerificationOptions.DateFirstSeenThreshold	: STORED('DateFirstSeenThreshold');
-    EXPORT INTEGER   DateLastSeenThreshold  := pfOptions.VerificationOptions.DateLastSeenThreshold 	: STORED('DateLastSeenThreshold');
-    EXPORT INTEGER   LengthOfTimeThreshold  := pfOptions.VerificationOptions.LengthOfTimeThreshold 	: STORED('LengthOfTimeThreshold');
+  EXPORT INTEGER   DateFirstSeenThreshold := pfOptions.VerificationOptions.DateFirstSeenThreshold	: STORED('DateFirstSeenThreshold');
+  EXPORT INTEGER   DateLastSeenThreshold  := pfOptions.VerificationOptions.DateLastSeenThreshold 	: STORED('DateLastSeenThreshold');
+  EXPORT INTEGER   LengthOfTimeThreshold  := pfOptions.VerificationOptions.LengthOfTimeThreshold 	: STORED('LengthOfTimeThreshold');
 		EXPORT BOOLEAN   UseDateFirstSeenVerify := pfOptions.VerificationOptions.UseDateFirstSeenVerify	: STORED('UseDateFirstSeenVerify');
 		EXPORT BOOLEAN   UseDateLastSeenVerify  := pfOptions.VerificationOptions.UseDateLastSeenVerify  : STORED('UseDateLastSeenVerify');
 		EXPORT BOOLEAN   UseLengthOfTimeVerify  := pfOptions.VerificationOptions.UseLengthOfTimeVerify  : STORED('UseLengthOfTimeVerify');
@@ -218,23 +218,22 @@ MACRO
 																												IF(reportMod.TransactionType = PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
 																																											 dGateways(servicename IN PhoneFinder_Services.Constants.PhoneRiskAssessmentGateways),dGateways),
  																												formattedSearchBy);
-  	iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
+ iesp.phonefinder.t_PhoneFinderSearchResponse tFormat2IespResponse() :=
       		TRANSFORM
       			SELF._Header   := iesp.ECL2ESP.GetHeaderRow();
       			SELF.Records   := modRecords.dFormat2IESP;
       			SELF.InputEcho := pfSearchBy;
-      		END;
+ END;
       		
-    results := DATASET([tFormat2IespResponse()]);
+ results := DATASET([tFormat2IespResponse()]);
    
-   	royalties	:= modRecords.dRoyalties;
+ royalties	:= modRecords.dRoyalties;
    	
-   	Zumigo_Log := modRecords.Zumigo_History_Recs;
+ Zumigo_Log := modRecords.Zumigo_History_Recs;
     
-   	
-   	OUTPUT(results,named('Results'));
-   	OUTPUT(royalties,named('RoyaltySet'));
-   	OUTPUT(Zumigo_Log,named('LOG_DELTA_PHONEFINDER_DELTA_PHONES_GATEWAY'));
+ OUTPUT(results,named('Results'));
+ OUTPUT(royalties,named('RoyaltySet'));
+ OUTPUT(Zumigo_Log,named('LOG_DELTA__PHONEFINDER_DELTA__PHONES__GATEWAY'));
 
 ENDMACRO;
 

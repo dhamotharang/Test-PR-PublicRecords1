@@ -1,4 +1,4 @@
-import ut, ln_propertyv2, riskwise;
+﻿import ut, ln_propertyv2, riskwise;
 
 export Boca_Shell_Property (GROUPED DATASET(layout_PropertyRecord) p_address,
                             GROUPED DATASET(Layout_Boca_Shell_ids) ids, 
@@ -496,7 +496,7 @@ layout_out := RECORD
 	string4	assessed_value_year;
 END;
 
-Layouts.layout_relat_prop_plusv4 to_relat_prop(addDidtoAddr le) :=
+Layouts.Layout_Relat_Prop_Plus_BusInd to_relat_prop(addDidtoAddr le) :=
 TRANSFORM
 	SELF.isrelat := le.isrelat;
 	SELF.seq := le.seq;
@@ -525,6 +525,8 @@ TRANSFORM
 	SELF.county := le.county;
 	SELF.geo_blk := le.geo_blk;
 	SELF.census_loose := true;
+	SELF.Residential_or_Business_Ind  := '';
+	SELF.historydate  := 0;
 	SELF := le;
 END;
 Property := PROJECT(addDidtoAddr, to_relat_prop(LEFT));

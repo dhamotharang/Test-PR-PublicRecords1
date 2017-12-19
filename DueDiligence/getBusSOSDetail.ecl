@@ -8,21 +8,26 @@
 
 EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 												Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
-												BIPV2.mod_sources.iParams linkingOptions) := FUNCTION
+												BIPV2.mod_sources.iParams linkingOptions,
+												BOOLEAN includeReportData) := FUNCTION
 
+	//add linked businesses
+	linkedBus := DueDiligence.Common.getLinkedBusinesses(indata);
+	
+	allBusinesses := indata + linkedBus;
 
 	// ---------------[ Corporate Filings (SoS) Data ]----------------		
-	corpFilings_raw := Corp2.Key_LinkIDs.Corp.kfetch2(DueDiligence.Common.GetLinkIDs(indata),
+	corpFilingsRaw := Corp2.Key_LinkIDs.Corp.kfetch2(DueDiligence.Common.GetLinkIDs(allBusinesses),
 																										 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																										 0, // ScoreThreshold --> 0 = Give me everything
 																										 Business_Risk_BIP.Constants.Limit_Default,
 																										 Options.KeepLargeBusinesses);
 
 	// Add back to Corp Filings our Seq numbers.
-	DueDiligence.Common.AppendSeq(corpFilings_raw, indata, corpFilings_seq);
+	corpFilingsSeq := DueDiligence.Common.AppendSeq(corpFilingsRaw, indata, TRUE);
 	
 	// Filter out records after our history date.
-	corpFilingsFiltRecs := DueDiligence.Common.FilterRecords(corpFilings_seq, dt_first_seen, dt_vendor_first_reported);
+	corpFilingsFiltRecs := DueDiligence.Common.FilterRecords(corpFilingsSeq, dt_first_seen, dt_vendor_first_reported);
 	
 	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently - dates used in FilterRecords have been cleaned
 	clean_corpIncDt := DueDiligence.Common.CleanDateFields(corpFilingsFiltRecs, corp_inc_date);
@@ -71,7 +76,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 												LEFT OUTER);
 	
 	//get sos address location count - should only have 1 address associated with proxID
-	filtAddrLoc := corpFilingsFilt(corp_addr1_prim_name != '' AND corp_addr1_prim_name[1..6] != 'PO BOX');
+	filtAddrLoc := corpFilingsFilt(corp_addr1_prim_name != DueDiligence.Constants.EMPTY AND REGEXFIND(DueDiligence.Constants.NOT_PO_ADDRESS_EXPRESSION, TRIM(corp_addr1_prim_name), NOCASE));
 	corpAddrLocSort := SORT(filtAddrLoc, seq, #EXPAND(BIPV2.IDmacros.mac_ListTop4Linkids()));
 	corpAddrLocDedup := DEDUP(corpAddrLocSort, seq, #EXPAND(BIPV2.IDmacros.mac_ListTop4Linkids()));
 
@@ -160,61 +165,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																			SELF := LEFT;),
 														LEFT OUTER);
 
-	//has a business name or address change within the last year
-	businessWithinOneYear := corpFilingsFilt(DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)dt_last_seen, (STRING)historyDate) <= ut.DaysInNYears(1));		
-	
-	sortPopBusAddresses := SORT(businessWithinOneYear(corp_addr1_prim_name <> ''), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_sos_charter_nbr, corp_addr1_prim_range, 
-																corp_addr1_predir, corp_addr1_prim_name, corp_addr1_addr_suffix, corp_addr1_postdir, corp_addr1_unit_desig, corp_addr1_sec_range, 
-																corp_addr1_v_city_name, corp_addr1_state, corp_addr1_zip5, corp_addr1_zip4);
-
-	uniquePopBusAddresses := TABLE(sortPopBusAddresses, {BOOLEAN nameChg := FALSE, BOOLEAN addrChg := FALSE, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), 
-																												corp_sos_charter_nbr, UNSIGNED nameCount := 0, UNSIGNED addrCount := COUNT(GROUP)},  
-																	seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_sos_charter_nbr, corp_addr1_prim_range, corp_addr1_predir, 
-																	corp_addr1_prim_name, corp_addr1_addr_suffix, corp_addr1_postdir, corp_addr1_unit_desig, corp_addr1_sec_range, 
-																	corp_addr1_v_city_name, corp_addr1_state, corp_addr1_zip5, corp_addr1_zip4);
-	
-	sortPopBusName := SORT(businessWithinOneYear, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_sos_charter_nbr, corp_legal_name);
-	
-	uniquePopBusName := TABLE(sortPopBusName, {BOOLEAN nameChg := FALSE, BOOLEAN addrChg := FALSE, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), 
-																							corp_sos_charter_nbr, UNSIGNED nameCount := COUNT(GROUP), UNSIGNED addrCount := 0}, 
-														seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_sos_charter_nbr, corp_legal_name);
-
-	combineBusiness := SORT(uniquePopBusAddresses + uniquePopBusName, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_sos_charter_nbr, nameCount, addrCount);
-	
-	rollBusCounts := ROLLUP(combineBusiness,
-													LEFT.seq = RIGHT.seq AND
-													LEFT.ultID = RIGHT.ultID AND
-													LEFT.orgID = RIGHT.orgID AND
-													LEFT.seleID = RIGHT.seleID AND 
-													LEFT.corp_sos_charter_nbr = RIGHT.corp_sos_charter_nbr,
-													TRANSFORM({RECORDOF(LEFT)},
-																			SELF.nameChg := LEFT.nameChg OR (LEFT.nameCount > 0 AND RIGHT.nameCount > 0);
-																			SELF.addrChg := LEFT.addrChg OR (LEFT.addrCount > 0 AND RIGHT.addrCount > 0);
-																			SELF.nameCount := LEFT.nameCount + RIGHT.nameCount;
-																			SELF.addrCount := LEFT.addrCount + RIGHT.addrCount;
-																			SELF := LEFT;));
-
-	rollBusChanges := ROLLUP(rollBusCounts,
-														LEFT.seq = RIGHT.seq AND
-														LEFT.ultID = RIGHT.ultID AND
-														LEFT.orgID = RIGHT.orgID AND
-														LEFT.seleID = RIGHT.seleID,
-														TRANSFORM({RECORDOF(LEFT)},
-																			SELF.addrChg := LEFT.addrChg OR RIGHT.addrChg;																															
-																			SELF.nameChg := LEFT.nameChg OR RIGHT.nameChg;
-																			SELF := LEFT;));
-	
-	addBusAddrNameChanges := JOIN(addSosStatusDates, rollBusChanges,
-																LEFT.seq = RIGHT.seq AND
-																LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-																LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-																LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
-																TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																					SELF.sosBusNameChange := RIGHT.nameChg;
-																					SELF.sosBusAddressChange := RIGHT.addrChg;
-																					SELF := LEFT;),
-																LEFT OUTER);
-																
+															
 	//is the business incorporated in a state with loose incorporation laws
 	projectLooseLaws := PROJECT(corpFilingsFilt, TRANSFORM({BOOLEAN looseLawState, RECORDOF(LEFT)}, 
 																													SELF.looseLawState := LEFT.corp_inc_state IN DueDiligence.Constants.STATES_WITH_LOOSE_INCORPORATION_LAWS;
@@ -232,7 +183,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																			SELF.looseLawState := LEFT.looseLawState OR RIGHT.looseLawState;
 																			SELF := LEFT;));
 																			
-	addIncLooseLaws := JOIN(addBusAddrNameChanges, rollLooseLaws,
+	addIncLooseLaws := JOIN(addSosStatusDates, rollLooseLaws,
 													LEFT.seq = RIGHT.seq AND
 													LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
 													LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
@@ -243,95 +194,9 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													LEFT OUTER);
 													
 
-	
-	
-	//get contact information linked to corp keys
-	contactsRaw := JOIN(corpFilingsFilt, Corp2.keys().cont.CorpKey.qa,
-											KEYED(LEFT.corp_key = RIGHT.corp_key) AND
-											KEYED(LEFT.record_type = RIGHT.record_type) AND
-											LEFT.ultID = RIGHT.ultID AND
-											LEFT.orgID = RIGHT.orgID AND
-											LEFT.seleID = RIGHT.seleID,
-											TRANSFORM({UNSIGNED4 uniqueID, RECORDOF(RIGHT)},
-																	SELF.uniqueID := LEFT.seq;
-																	SELF := RIGHT;),
-											ATMOST(100));
-																
-	// Add back to Corp Filings our Seq numbers.
-	DueDiligence.Common.AppendSeq(contactsRaw, indata, contactsRaw_seq);
-	
-	// Filter out records after our history date.
-	contactFiltRecs := DueDiligence.Common.FilterRecords(contactsRaw_seq, dt_first_seen, dt_vendor_first_reported);
-	
-	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently - dates used in FilterRecords have been cleaned
-	clean_contactDateLastSeen := DueDiligence.Common.CleanDateFields(contactFiltRecs, dt_last_seen);
-
-	//creating variable to be used in logic so if add additional dates, does not impact flow
-	contactFilt := clean_contactDateLastSeen;	
-	
-	contacts := contactFilt(cont_type_cd = DueDiligence.Constants.CONTACT_TYPE_CONTACT);
-	
-	//has contact name or address change within the last year
-	contactWithinOneYear := contacts(DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)dt_last_seen, (STRING)historyDate) <= ut.DaysInNYears(1));	
-	
-	sortPopContAddresses := SORT(contactWithinOneYear(cont_prim_name <> ''), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_sos_charter_nbr, cont_prim_range, 
-																cont_predir, cont_prim_name, cont_addr_suffix, cont_postdir, cont_unit_desig, cont_sec_range, 
-																cont_v_city_name, cont_state, cont_zip5, cont_zip4);
-
-	uniquePopContAddresses := TABLE(sortPopContAddresses, {BOOLEAN nameChg := FALSE, BOOLEAN addrChg := FALSE, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), 
-																													corp_sos_charter_nbr, UNSIGNED nameCount := 0, UNSIGNED addrCount := COUNT(GROUP)},  
-																	seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_sos_charter_nbr, cont_prim_range, 
-																cont_predir, cont_prim_name, cont_addr_suffix, cont_postdir, cont_unit_desig, cont_sec_range, 
-																cont_v_city_name, cont_state, cont_zip5, cont_zip4);
-																
-	sortPopContName := SORT(contactWithinOneYear, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_sos_charter_nbr, cont_fname, cont_mname, cont_lname);
-
-	uniquePopContName := TABLE(sortPopContAddresses, {BOOLEAN nameChg := FALSE, BOOLEAN addrChg := FALSE, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), 
-																													corp_sos_charter_nbr, UNSIGNED nameCount := COUNT(GROUP), UNSIGNED addrCount := 0},  
-															seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), cont_fname, cont_mname, cont_lname, corp_sos_charter_nbr);
-																	
-	combineContacts := SORT(uniquePopContAddresses + uniquePopContName, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_sos_charter_nbr, nameCount, addrCount);																
-	
-	rollContCounts := ROLLUP(combineContacts,
-														LEFT.seq = RIGHT.seq AND
-														LEFT.ultID = RIGHT.ultID AND
-														LEFT.orgID = RIGHT.orgID AND
-														LEFT.seleID = RIGHT.seleID AND 
-														LEFT.corp_sos_charter_nbr = RIGHT.corp_sos_charter_nbr,
-														TRANSFORM({RECORDOF(LEFT)},
-																				SELF.nameChg := LEFT.nameChg OR (LEFT.nameCount > 0 AND RIGHT.nameCount > 0);
-																				SELF.addrChg := LEFT.addrChg OR (LEFT.addrCount > 0 AND RIGHT.addrCount > 0);
-																				SELF.nameCount := LEFT.nameCount + RIGHT.nameCount;
-																				SELF.addrCount := LEFT.addrCount + RIGHT.addrCount;
-																				SELF := LEFT;));
-	
-	rollContChanges := ROLLUP(rollContCounts,
-														LEFT.seq = RIGHT.seq AND
-														LEFT.ultID = RIGHT.ultID AND
-														LEFT.orgID = RIGHT.orgID AND
-														LEFT.seleID = RIGHT.seleID,
-														TRANSFORM({RECORDOF(LEFT)},
-																			SELF.addrChg := LEFT.addrChg OR RIGHT.addrChg;
-																			SELF.nameChg := LEFT.nameChg OR RIGHT.nameChg;
-																			SELF := LEFT;));
-	
-	addContactAddrNameChanges := JOIN(addIncLooseLaws, rollContChanges,
-																		LEFT.seq = RIGHT.seq AND
-																		LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-																		LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-																		LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
-																		TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																							SELF.sosContactNameChange := RIGHT.addrChg;
-																							SELF.sosContactAddressChange := RIGHT.nameChg;
-																							SELF := LEFT;),
-																		LEFT OUTER);													
-
-
-
-
 
 	//get all registered agent information
-	sosAgent := corpFilingsFilt((corp_ra_cname1 <> '' OR corp_ra_lname1 <> '') AND corp_ra_prim_name <> '');
+	sosAgent := corpFilingsFilt((corp_ra_cname1 <> DueDiligence.Constants.EMPTY OR corp_ra_lname1 <> DueDiligence.Constants.EMPTY) AND corp_ra_prim_name <> DueDiligence.Constants.EMPTY);
 	sortSosAgent := SORT(sosAgent, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_ra_prim_range, corp_ra_predir, corp_ra_prim_name, corp_ra_addr_suffix, corp_ra_postdir, corp_ra_zip5, dt_first_seen);
 
 	rollSosAgent := ROLLUP(sortSosAgent,
@@ -386,7 +251,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																	SELF.agents := LEFT.agents + RIGHT.agents;
 																	SELF := LEFT;));
 																	
-	addRegisteredAgents := JOIN(addContactAddrNameChanges, rollAgents,
+	addRegisteredAgents := JOIN(addIncLooseLaws, rollAgents,
 															LEFT.seq = RIGHT.seq AND
 															LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
 															LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
@@ -401,51 +266,30 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 		
 
-	// OUTPUT(CorpFilings_raw, NAMED('CorpFilings_raw'));
-	// OUTPUT(CorpFilings_seq, NAMED('CorpFilings_seq'));
+	// OUTPUT(indata, NAMED('indata'));
+	// OUTPUT(linkedBus, NAMED('linkedBus'));
+	// OUTPUT(allBusinesses, NAMED('allBusinesses'));
+	// OUTPUT(corpFilingsRaw, NAMED('corpFilingsRaw'));
+	// OUTPUT(corpFilingsSeq, NAMED('corpFilingsSeq'));
 	// OUTPUT(corpFilingsFilt, NAMED('corpFilingsFilt'));
 
 	// OUTPUT(incDateSort, NAMED('incDateSort'));
 	// OUTPUT(incDateDedup, NAMED('incDateDedup'));
 	// OUTPUT(addIncDate, NAMED('addIncDate'));
 	
+	// OUTPUT(filtAddrLoc, NAMED('filtAddrLoc'));
 	// OUTPUT(corpAddrLocCount, NAMED('corpAddrLocCount'));
 	// OUTPUT(addBusnLocCnt, NAMED('addBusnLocCnt'));
 	
 	// OUTPUT(projectDates, NAMED('projectDates'));
 	// OUTPUT(lastSeenSort, NAMED('lastSeenSort'));
-	// OUTPUT(lastSeenDedup, NAMED('lastSeenDedup'));
 	// OUTPUT(rollLastSeen, NAMED('rollLastSeen'));
 	// OUTPUT(addSosStatusDates, NAMED('addSosStatusDates'));
-	
-	// OUTPUT(businessWithinOneYear, NAMED('businessWithinOneYear'));
-	// OUTPUT(sortPopBusAddresses, NAMED('sortPopBusAddresses'));
-	// OUTPUT(uniquePopBusAddresses, NAMED('uniquePopBusAddresses'));
-	// OUTPUT(sortPopBusName, NAMED('sortPopBusName'));
-	// OUTPUT(uniquePopBusName, NAMED('uniquePopBusName'));
-	// OUTPUT(combineBusiness, NAMED('combineBusiness'));
-	// OUTPUT(rollCounts, NAMED('rollCounts'));
-	// OUTPUT(addBusAddrNameChanges, NAMED('addBusAddrNameChanges'));
 
 	// OUTPUT(projectLooseLaws, NAMED('projectLooseLaws'));
 	// OUTPUT(rollLooseLaws, NAMED('rollLooseLaws'));
 	// OUTPUT(addIncLooseLaws, NAMED('addIncLooseLaws'));
-	
-	// OUTPUT(contactsRaw, NAMED('contactsRaw'));
-	// OUTPUT(contactsRaw_seq, NAMED('contactsRaw_seq'));
-	// OUTPUT(contactFiltRecs, NAMED('contactFiltRecs'));
-	// OUTPUT(contactFilt, NAMED('contactFilt'));
-	
-	// OUTPUT(contactWithinOneYear, NAMED('contactWithinOneYear'));
-	// OUTPUT(sortPopContAddresses, NAMED('sortPopContAddresses'));
-	// OUTPUT(uniquePopContAddresses, NAMED('uniquePopContAddresses'));
-	// OUTPUT(sortPopContName, NAMED('sortPopContName'));
-	// OUTPUT(uniquePopContName, NAMED('uniquePopContName'));
-	// OUTPUT(combineContacts, NAMED('combineContacts'));
-	// OUTPUT(rollContCounts, NAMED('rollContCounts'));
-	// OUTPUT(rollContChanges, NAMED('rollContChanges'));
-	// OUTPUT(addContactAddrNameChanges, NAMED('addContactAddrNameChanges'));
-	
+
 	// OUTPUT(sosAgent, NAMED('sosAgent'));	
 	// OUTPUT(sortSosAgent, NAMED('sortSosAgent'));
 	// OUTPUT(rollSosAgent, NAMED('rollSosAgent'));

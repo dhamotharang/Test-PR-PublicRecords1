@@ -1,4 +1,4 @@
-EXPORT KeyNames(string pversion, boolean pUseDelta = false) := MODULE
+﻿EXPORT KeyNames(string pversion, boolean pUseDelta = false) := MODULE
 
 	// Common key name components
 	SHARED prefix    := KeyPrefix + '::key::bair_externallinkkeys';
@@ -29,6 +29,7 @@ EXPORT KeyNames(string pversion, boolean pUseDelta = false) := MODULE
 	EXPORT latlong_super		:= prefix + '::' + KeySuperfile + '::' + 'EID_HASH::Refs::LATLONG';
 	EXPORT plate_super			:= prefix + '::' + KeySuperfile + '::' + 'EID_HASH::Refs::PLATE';
 	EXPORT company_super		:= prefix + '::' + KeySuperfile + '::' + 'EID_HASH::Refs::COMPANY';
+	EXPORT address1_super		:= prefix + '::' + KeySuperfile + '::' + 'EID_HASH::Refs::ADDRESS1';
 	
 	// Specific key names father file
 	EXPORT refs_father			:= prefix + '::' + keyFather + '::' + 'EID_HASH::Refs';
@@ -48,6 +49,7 @@ EXPORT KeyNames(string pversion, boolean pUseDelta = false) := MODULE
 	EXPORT latlong_father		:= prefix + '::' + keyFather + '::' + 'EID_HASH::Refs::LATLONG';
 	EXPORT plate_father			:= prefix + '::' + keyFather + '::' + 'EID_HASH::Refs::PLATE';
 	EXPORT company_father		:= prefix + '::' + keyFather + '::' + 'EID_HASH::Refs::COMPANY';
+	EXPORT address1_father	:= prefix + '::' + keyFather + '::' + 'EID_HASH::Refs::ADDRESS1';
 	
 	// Specific key names logical file
 	EXPORT refs_logical			:= prefix + '::' + buildDate + '::' + 'EID_HASH::Refs';
@@ -67,6 +69,7 @@ EXPORT KeyNames(string pversion, boolean pUseDelta = false) := MODULE
 	EXPORT latlong_logical	:= prefix + '::' + buildDate + '::' + 'EID_HASH::Refs::LATLONG';
 	EXPORT plate_logical		:= prefix + '::' + buildDate + '::' + 'EID_HASH::Refs::PLATE';
 	EXPORT company_logical	:= prefix + '::' + buildDate + '::' + 'EID_HASH::Refs::COMPANY';
+	EXPORT address1_logical	:= prefix + '::' + buildDate + '::' + 'EID_HASH::Refs::ADDRESS1';
 	
 
 	//Delta keys for the incremental process
@@ -85,5 +88,6 @@ EXPORT KeyNames(string pversion, boolean pUseDelta = false) := MODULE
 	EXPORT lfz_Delta 			:= Getlgnames(lfz_super);	
 	EXPORT latlong_Delta 	:= Getlgnames(latlong_super);	
 	EXPORT company_Delta 	:= Getlgnames(company_super);	
+	EXPORT address1_Delta := Getlgnames(address1_super);	
 	
 END;

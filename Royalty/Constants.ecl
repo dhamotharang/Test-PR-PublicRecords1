@@ -73,6 +73,7 @@ EXPORT Constants := module
 		export unsigned2 EFX_CCR        := 620;
     export unsigned2 EFX_ATTR       := 625;
 		export unsigned2 FDNCORR   := 650;
+		export unsigned2 ACCUITY_BANK_ROUTING := 690;
 		export unsigned2 ACCUDATA_CNAM_CNM2   := 711;
  		export unsigned2 ACCUDATA_OCN_LNP   := 712;  
 	
@@ -150,6 +151,7 @@ EXPORT Constants := module
 		export EFX_CCR        := _TYPE(RoyaltyCode.EFX_CCR);
 		export EFX_ATTR       := _TYPE(RoyaltyCode.EFX_ATTR);
 		export FDNCORR					:= _TYPE(RoyaltyCode.FDNCORR);  
+		export ACCUITY_BANK_ROUTING			:= _TYPE(RoyaltyCode.ACCUITY_BANK_ROUTING);  
 		export ACCUDATA_CNAM_CNM2				:= _TYPE(RoyaltyCode.ACCUDATA_CNAM_CNM2); 
 		export ACCUDATA_OCN_LNP					:= _TYPE(RoyaltyCode.ACCUDATA_OCN_LNP);  
 	end;

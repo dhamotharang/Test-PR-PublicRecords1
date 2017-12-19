@@ -1,8 +1,8 @@
-IMPORT  doxie,mdr, PRTE2_DOC, hygenics_search;
+﻿IMPORT  doxie,mdr, PRTE2_DOC, hygenics_search;
 EXPORT keys := MODULE
 
 EXPORT key_criminal_offenders_did(Boolean IsFCRA) := INDEX(
-		if (IsFCRA, FILES.file_offenders_keybuilding((integer)did != 0 and Vendor not in hygenics_search.sCourt_Vendors_To_Omit),
+		if (IsFCRA, FILES.file_offenders_keybuilding((integer)did != 0),
 								FILES.file_offenders_keybuilding((integer)did != 0)),
 		{unsigned6 sdid := (integer)FILES.file_offenders_keybuilding.did},  
 		{FILES.file_offenders_keybuilding}, 
@@ -12,7 +12,7 @@ EXPORT key_criminal_offenders_did(Boolean IsFCRA) := INDEX(
 
 EXPORT key_offenses_offender_key(Boolean IsFCRA) := INDEX(
 		if (IsFCRA,
-				FILES.file_offenses_keybuilding(Vendor not in hygenics_search.sCourt_Vendors_To_Omit),  
+				FILES.file_offenses_keybuilding,  
 				FILES.file_offenses_keybuilding),
 		{ok := Files.file_offenses_keybuilding.offender_key},  
 		{FILES.file_offenses_keybuilding}, 
@@ -21,7 +21,7 @@ EXPORT key_offenses_offender_key(Boolean IsFCRA) := INDEX(
 
 EXPORT key_criminal_punishment_type(Boolean IsFCRA) := INDEX(
 		if (IsFCRA, 
-				Files.file_punishment_keybuilding(Vendor not in hygenics_search.sCourt_Vendors_To_Omit),
+				Files.file_punishment_keybuilding,
 				Files.file_punishment_keybuilding),
 		{ok := Files.file_punishment_keybuilding.offender_key, pt := Files.file_punishment_keybuilding.punishment_type},  
 		{Files.file_punishment_keybuilding}, 
@@ -31,7 +31,7 @@ EXPORT key_criminal_punishment_type(Boolean IsFCRA) := INDEX(
 		
 EXPORT key_corrections_activity(Boolean IsFCRA) := INDEX(
 		If (IsFCRA, 
-				Files.corrections_activity(Vendor not in hygenics_search.sCourt_Vendors_To_Omit),
+				Files.corrections_activity,
 				Files.corrections_activity),
 		{ok := Files.corrections_activity.offender_key},  
 		{Files.corrections_activity}, 
@@ -42,7 +42,7 @@ EXPORT key_corrections_activity(Boolean IsFCRA) := INDEX(
 
 EXPORT key_correctionsfcracourt_offenses_public(Boolean IsFCRA) := INDEX(
 		If (IsFCRA,
-				FILES.file_court_offenses(Vendor not in hygenics_search.sCourt_Vendors_To_Omit),
+				FILES.file_court_offenses,
 				FILES.file_court_offenses),
 		{ofk := FILES.file_court_offenses.offender_key},  
 		{FILES.file_court_offenses}, 
@@ -53,7 +53,7 @@ EXPORT key_correctionsfcracourt_offenses_public(Boolean IsFCRA) := INDEX(
 
 EXPORT key_corrections_offenders_offenderkey(Boolean IsFCRA) := INDEX(
 		if (IsFCRA, 
-				FILES.file_offenders_keybuilding(Vendor not in hygenics_search.sCourt_Vendors_To_Omit),
+				FILES.file_offenders_keybuilding,
 				FILES.file_offenders_keybuilding),
 		{string60 ofk := FILES.file_offenders_keybuilding.offender_key},  
 		{FILES.file_offenders_keybuilding}, 

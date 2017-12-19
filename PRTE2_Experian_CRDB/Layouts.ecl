@@ -1,4 +1,4 @@
-Import Experian_CRDB;
+﻿Import Experian_CRDB;
 
 EXPORT Layouts := module
 
@@ -199,6 +199,11 @@ string9  link_fein;
 string10 cust_name;
 string10 bug_num;
 string8 link_inc_date;
+End;
+
+Export msa_Layout:=Record
+string4    msa_code;
+string50			msa_Description	;
 End;
 
 END;

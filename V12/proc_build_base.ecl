@@ -175,9 +175,12 @@ EXPORT proc_build_base(STRING version) := FUNCTION
 	//Clean Base file to remove invalid characters
 	PRTE2.CleanFields(V12.files.V12_base, ClnBaseOut);
 	
+	//Set Base current_rec = false. Only records in recent file are current
+	ResetBase	:= PROJECT(ClnBaseOut, TRANSFORM(V12.layouts.V12_base, SELF.current_rec := false; SELF := LEFT));
+	
 	BOOLEAN basefileexists	:=	NOTHOR(fileservices.GetSuperFileSubCount(V12.thor_cluster + 'base::V12')) > 0; 
 	
-	BasePlusIn	:=	IF(basefileexists, rsCleanAIDGood + ClnBaseOut, rsCleanAIDGood);
+	BasePlusIn	:=	IF(basefileexists, rsCleanAIDGood + ResetBase, rsCleanAIDGood);
 																													
 	BaseDist	:=	SORT(DISTRIBUTE(BasePlusIn, HASH(first_name
 																						+last_name

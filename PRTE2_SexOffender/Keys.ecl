@@ -1,4 +1,4 @@
-IMPORT doxie, bipv2, ut, Data_Services, PRTE2_SexOffender, SexOffender, PRTE, AutoKeyB2, autokey, AutoKeyI, Hygenics_search;
+﻿IMPORT doxie, bipv2, ut, Data_Services, PRTE2_SexOffender, SexOffender, PRTE, AutoKeyB2, autokey, AutoKeyI, Hygenics_search;
 
 EXPORT Keys := MODULE
 
@@ -17,10 +17,9 @@ EXPORT Keys := MODULE
 	EXPORT Key_SexOffender_DID(BOOLEAN IsFCRA = FALSE) := FUNCTION
 		
 		df_final := dedup(sort(df_exp(did != 0), record), record);
-		df_filter := df_final(seisint_primary_key[1..4] not in Hygenics_search.Sex_Offenders_Not_Updating.SO_By_Key);
 		df_all 		:= df_final;
 		
-	RETURN	IF(IsFCRA, INDEX(df_filter,{did},{seisint_primary_key, lat, long},PRTE2_SexOffender.Constants.KEY_PREFIX + 'fcra::'+ doxie.Version_SuperKey + '::didpublic'),
+	RETURN	IF(IsFCRA, INDEX(df_all,{did},{seisint_primary_key, lat, long},PRTE2_SexOffender.Constants.KEY_PREFIX + 'fcra::'+ doxie.Version_SuperKey + '::didpublic'),
 								     INDEX(df_all,{did},{seisint_primary_key, lat, long},PRTE2_SexOffender.Constants.KEY_PREFIX +  doxie.Version_SuperKey + '::didpublic'));
 	END;
 
@@ -74,10 +73,9 @@ EXPORT Keys := MODULE
 		pGetCategory	:= PROJECT(Files.SexOffense_base, TRANSFORM(Layouts.lOffenseKey, self.sspk := left.seisint_primary_key; self.offense_category := GetOffenseCategory (left.offense_category[1..3]) +
 																												GetOffenseCategory (left.offense_category[5..7]); self := left;));
 																												
-		add_filter 	:= pGetCategory(seisint_primary_key[1..4] not in Hygenics_search.Sex_Offenders_Not_Updating.SO_By_Key);
 		add_all			:= pGetCategory;
 																												
-	RETURN IF(IsFCRA, INDEX(add_filter,{sspk},{pGetCategory},PRTE2_SexOffender.Constants.KEY_PREFIX + 'fcra::'+ doxie.Version_SuperKey + '::offenses_public'),
+	RETURN IF(IsFCRA, INDEX(add_all,{sspk},{pGetCategory},PRTE2_SexOffender.Constants.KEY_PREFIX + 'fcra::'+ doxie.Version_SuperKey + '::offenses_public'),
 										INDEX(add_all,{sspk},{pGetCategory},PRTE2_SexOffender.Constants.KEY_PREFIX +  doxie.Version_SuperKey + '::offenses_public'));
 	END;
 	
@@ -94,11 +92,10 @@ EXPORT Keys := MODULE
 											self.long	:= (real)left.geo_long;
                       self := left));
 											
-		Ofdr_filter := Ofdr_exp(seisint_primary_key[1..4] not in Hygenics_search.Sex_Offenders_Not_Updating.SO_By_Key);
 		Ofdr_all		:= Ofdr_exp;
 
 											
-	RETURN IF(IsFCRA, INDEX(Ofdr_filter,{string60 sspk := Ofdr_exp.seisint_primary_key},{Ofdr_filter},PRTE2_SexOffender.Constants.KEY_PREFIX + 'fcra::'+ doxie.Version_SuperKey + '::spkpublic'),
+	RETURN IF(IsFCRA, INDEX(Ofdr_all,{string60 sspk := Ofdr_exp.seisint_primary_key},{Ofdr_all},PRTE2_SexOffender.Constants.KEY_PREFIX + 'fcra::'+ doxie.Version_SuperKey + '::spkpublic'),
 										INDEX(Ofdr_all,{string60 sspk := Ofdr_exp.seisint_primary_key},{Ofdr_all},PRTE2_SexOffender.Constants.KEY_PREFIX +  doxie.Version_SuperKey + '::spkpublic'));
 	END;
 	

@@ -1,4 +1,4 @@
-#workunit('name','NonFCRA BocaShell 5.0');
+﻿#workunit('name','NonFCRA BocaShell 5.0');
 
 // Reads sample data from input file, makes a SOAP call to service specified and (optionally),
 // saves results in output file. 
@@ -21,7 +21,7 @@ boolean LeadIntegrityMode := false;  // change this to TRUE for LeadIntegrity mo
 string DataRestrictionMask := '0000000000000000000000000';	// byte 6, if 1, restricts experian, byte 8, if 1, restricts equifax, 
 																								// byte 10 restricts Transunion, 12 restricts ADVO, 13 restricts bureau deceased data
 string DataPermissionMask  := '0000000000100';	// byte 11, if 0, restricts FDN test fraud and contributory fraud  
-
+unsigned3 LastSeenThreshold := 0;	//# of days to consider header records as being recent for verification.  0 will use default (41 and lower = 365 days, 50 and higher = include all) 
 unsigned1 glba := 1;
 unsigned1 dppa := 3;
 boolean RetainInputDID := FALSE; //Change to TRUE to retain the input LexID
@@ -120,6 +120,7 @@ l assignAccount (ds_input le, INTEGER c) := TRANSFORM
   SELF.IncludeScore := true;
   SELF.datarestrictionmask := datarestrictionmask;
   SELF.RemoveFares := RemoveFares;
+  SELF.LastSeenThreshold := LastSeenThreshold;
 	self.bsversion := 50;				
   SELF := le;
   SELF := [];

@@ -9,6 +9,50 @@ lIdentityIesp := pfLayouts.PhoneFinder.IdentityIesp;
 
 EXPORT Functions :=
 MODULE
+
+ EXPORT GetSubjectInfo(DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInPhone,
+                      DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dSearchRecs,
+											           PhoneFinder_Services.iParam.ReportParams      inMod) := FUNCTION
+
+  dInRecs	:= IF(inMod.TransactionType=PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
+																PROJECT(dInPhone,TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final,
+																																SELF.acctno:=LEFT.acctno, 
+																																SELF.seq:=LEFT.seq, 
+																																SELF.phone:=LEFT.homephone, 
+																																SELF.batch_in.homephone:=LEFT.homephone, 
+																																SELF:=[])),
+																dSearchRecs);	
+	
+  //phone searches do not generate other phones related to the subject, hence all phone searches are subject related.
+	 dNeedPortingInfo 	:= IF(inMod.SubjectMetadataOnly,dInRecs(isprimaryphone OR batch_in.homephone<>''),dInRecs);
+
+	 //reduce layout by selecting necessary fields
+	 PhoneFinder_Services.Layouts.SubjectPhone getSubjectPhone(dNeedPortingInfo l) := TRANSFORM
+			SELF.acctno := l.acctno;
+			SELF.did := l.did;
+			SELF.phone := l.phone;
+			//If phone record occurs after first_seen minus 5 days the date field in the port/spoof table will associate active with subject.
+			SELF.FirstSeenDate := IF((UNSIGNED)l.dt_first_seen<> 0,(UNSIGNED)ut.date_math(l.dt_first_seen, -PhoneFinder_Services.Constants.PortingMarginOfError),0);
+			SELF.LastSeenDate  := IF((UNSIGNED)l.dt_last_seen <> 0,(UNSIGNED)ut.date_math(l.dt_last_seen, PhoneFinder_Services.Constants.PortingMarginOfError), 0); 
+	 END;
+	 dsSubjects := PROJECT(dNeedPortingInfo,getSubjectPhone(LEFT));			
+			
+		//rollup to get comprehensive port period
+	 PhoneFinder_Services.Layouts.SubjectPhone rollSubject(PhoneFinder_Services.Layouts.SubjectPhone l,PhoneFinder_Services.Layouts.SubjectPhone r) := TRANSFORM
+			SELF.FirstSeenDate := ut.Min2(l.FirstSeenDate,r.FirstSeenDate);
+			SELF               := l;
+	 END;
+	
+  dSubjectInfo:= ROLLUP(SORT(dsSubjects,acctno,did,phone,-LastSeenDate,FirstSeenDate),
+														LEFT.acctno=RIGHT.acctno AND
+														LEFT.did=RIGHT.did AND
+														LEFT.phone=RIGHT.phone,
+														rollSubject(LEFT,RIGHT));	
+														
+	 RETURN dSubjectInfo;
+	
+ END;
+ 
 	EXPORT getNameMatch(DATASET(iesp.phonefinder.t_PhoneIdentityInfo) dIdentitiesInfo, 
 											iesp.phonefinder.t_PhoneFinderSearchBy pSearchBy, 
 											BOOLEAN phoneticMatch = FALSE,
@@ -643,8 +687,8 @@ MODULE
    			OUTPUT(dPrimaryPhoneDetail,NAMED('dPrimaryPhoneDetail_Primary'),EXTEND);
    			OUTPUT(dPhoneDetail_,NAMED('dPhoneDetail_'),EXTEND);				
    			OUTPUT(dPhoneDetail,NAMED('dPhoneDetail_Primary'),EXTEND);
-        OUTPUT(dPhoneIesp,NAMED('dPhoneIesp_Primary'),EXTEND);
-			  OUTPUT(dPhoneIesp_Final,NAMED('dPhoneIesp_Final'),EXTEND);
+      OUTPUT(dPhoneIesp,NAMED('dPhoneIesp_Primary'),EXTEND);
+			   OUTPUT(dPhoneIesp_Final,NAMED('dPhoneIesp_Final'),EXTEND);
 		#END
 		
 		RETURN dPhoneIesp_Final;
@@ -723,20 +767,14 @@ MODULE
 		END;
 		
 		dPhoneIesp := PROJECT(dLimitOthers,tFormat2IespPhone(LEFT));
-		// to process super rule -1 for no phone recs
-		dNophoneIesp := PROJECT(dIn(phone = ''), TRANSFORM(lpf.PhoneFinder.OtherPhoneIesp, SELF.PhoneRiskIndicator := LEFT.PhoneRiskIndicator,
-		                                                SELF.Alerts	:= PROJECT(LEFT.Alerts,iesp.phonefinder.t_PhoneFinderAlert) , SELF := []));
-		
-	  dPhoneOtherIesp_Final := dPhoneIesp + dNophoneIesp;
 
 	  #IF(PhoneFinder_Services.Constants.Debug.Intermediate)
 				OUTPUT(dPhoneSlim,NAMED('dPhoneSlim'),EXTEND);
-   			OUTPUT(dPhoneRollup,NAMED('dPhoneRollup'),EXTEND);
-				OUTPUT(dPhoneIesp,NAMED('dPhoneIesp'),EXTEND);
-				OUTPUT(dPhoneOtherIesp_Final,NAMED('dPhoneOtherIesp_Final'),EXTEND);
+   	OUTPUT(dPhoneRollup,NAMED('dPhoneRollup'),EXTEND);
+				OUTPUT(dPhoneIesp,NAMED('dPhoneIesp'),EXTEND);		
 		#END
 
-		RETURN UNGROUP(dPhoneOtherIesp_Final);
+		RETURN UNGROUP(dPhoneIesp);
 	ENDMACRO;
 	
 	// Identity info

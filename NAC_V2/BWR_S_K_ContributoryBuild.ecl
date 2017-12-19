@@ -1,6 +1,5 @@
-envVars :=
- '#WORKUNIT(\'protect\',true);\n'
-+'#WORKUNIT(\'priority\',\'high\');\n'
+﻿envVars :=
+'#WORKUNIT(\'priority\',\'high\');\n'
 +'#WORKUNIT(\'priority\',11);\n'
 +'#STORED (\'_Validate_Year_Range_Low\', \'1800\');\n'
 +'#STORED (\'_Validate_Year_Range_high\', ut.GetDate[1..4]);\n'
@@ -32,7 +31,6 @@ envVars
 ;
 
 import _Control;
-#WORKUNIT('protect',true);
 ThorName:=if(_Control.ThisEnvironment.Name='Dataland','thor40_241','thor400_30_sla');
 
 // NOTE: Ssystem time is standard time + 5; therefore, Sunday at 10 PM is actually Monday 3 AM

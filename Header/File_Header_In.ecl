@@ -1,4 +1,4 @@
-import ut,eq_hist,Std;
+﻿import ut,eq_hist,Std,data_Services;
 
 export file_header_in(boolean pFastHeader=false) := module
 
@@ -88,9 +88,9 @@ shared rec_weekly := record
  ebcdic string1  new_rec;
  ebcdic string38 filler2;
 end;
- 
-shared monthly_file :=	dataset('~thor_data400::in::hdr_raw',rec,flat) +
-                        dataset('~thor_data400::in::hdr_supplement2',rec,flat);
+lc:=data_Services.Data_location.prefix('header_quick');
+EXPORT monthly_file :=	dataset(lc+'thor_data400::in::hdr_raw',rec,flat) +
+                        dataset(lc+'thor_data400::in::hdr_supplement2',rec,flat);
 shared weekly_file  := dataset('~thor400_84::in::eq_weekly_with_as_of_date',rec_weekly,flat);
 
 //all this is in the attempt to avoid the monthly data from re-cleaning/DID'ing (header.preprocess)

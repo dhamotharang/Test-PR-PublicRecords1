@@ -15,7 +15,7 @@ EXPORT Fn_ApplyDeathRule(dataset(recordof(Layout_email.temp_Validate)) email_in)
 	jDeathInd	:= JOIN(SORT(DISTRIBUTE(email_in(DID <> 0),HASH(DID)),DID, -process_date, LOCAL),
 										SORT(DISTRIBUTE(fDeathMaster((unsigned6)DID <> 0 and (integer)DOD8 <> 0),HASH((unsigned6)DID)),DID,LOCAL),
 										LEFT.DID = (unsigned6)RIGHT.DID,
-										DeathInd(LEFT,RIGHT),LEFT OUTER, Keep(1), LOCAL) : PERSIST('~thor_data400::persist::file_email_base');
+										DeathInd(LEFT,RIGHT),LEFT OUTER, Keep(1), LOCAL) : INDEPENDENT;//PERSIST('~thor_data400::persist::file_email_base');
 										
 	RETURN	jDeathInd(IsDeath = false);
 END;

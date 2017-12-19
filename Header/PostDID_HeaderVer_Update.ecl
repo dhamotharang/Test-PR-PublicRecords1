@@ -53,11 +53,14 @@ export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_build_v
 		
 	create_out := 
                 sequential(
-                            if(fileservices.fileexists(flagfilename),
+                            if(fileservices.fileexists(flagfilename),sequential(
+                                std.file.startsuperfiletransaction(),
+                                std.file.clearsuperfile(flagfilename),
+                                std.file.finishsuperfiletransaction(),
                                 if ( count(datesetfile_ds(pkgvariable = pkgvar)) > 0,
                                         output(process_out,,newflagfilename,overwrite),
                                         output(datesetfile_ds + proj_out,,newflagfilename,overwrite)
-                                ),
+                                )),
                                 sequential( std.file.createsuperfile(flagfilename),
                                             output(proj_out,,newflagfilename,overwrite)
                                 )
@@ -70,4 +73,4 @@ export PostDID_HeaderVer_Update(string datasetname,string pkgvar='header_build_v
 
 	return create_out;
 	
-end;
+end; 

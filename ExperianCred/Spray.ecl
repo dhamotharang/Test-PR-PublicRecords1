@@ -13,9 +13,13 @@ export Spray := module
 	// ,version
                       
  	// }
+	
+export ip 		:= 'bctlpedata11.risk.regn.net';
+export path 	:= '/data/data_lib_2_hus2/Experian/non-fcra/in/' + version;
+
 export Input := DATASET([
-               {'bctlpedata11.risk.regn.net'                                                                                                                                                      
-               ,'/data/data_lib_2_hus2/Experian/non-fcra/in/' + version   //Location to be determined                  
+               {ip                                                                                                                                                      
+               ,path   //Location to be determined                  
                 ,'*.dat'                           
                 ,'1701'                                                             
                 ,'~thor_dell400::in::experiancred::cpchf' + version + '_@version@'    
@@ -30,30 +34,30 @@ export Input := DATASET([
 
 
 export Delete := DATASET([
- 	{'bctlpedata11.risk.regn.net'										
- 	,'/data/data_lib_2_hus2/Experian/non-fcra/in/' + version   //Location to be determined                               
- 	,'DPINS'                           
- 	,'101'                                                             
- 	,'~thor_dell400::in::experiancred_delete::cpchf@version@'    
- 	,[{'~thor_data400::in::experiancred_delete'}]    
- 	,'thor400_44'
-	,version
- 	}
-], VersionControl.Layout_Sprays.Info);
+								{ip										
+								,path   //Location to be determined                               
+								,'DPINS'                           
+								,'101'                                                             
+								,'~thor_dell400::in::experiancred_delete::cpchf@version@'    
+								,[{'~thor_data400::in::experiancred_delete'}]    
+								,'thor400_44'
+								,version
+								}
+							], VersionControl.Layout_Sprays.Info);
 
 
 
 export Deceased := DATASET([
- 	{'bctlpedata11.risk.regn.net'										
- 	,'/data/data_lib_2_hus2/Experian/non-fcra/in/' + version   //Location to be determined                               
- 	,'DEC'                           
- 	,'101'                                                             
- 	,'~thor_dell400::in::experiancred_deceased::cpchf@version@'    
- 	,[{'~thor_data400::in::experiancred_deceased'}]    
- 	,'thor400_44'
-	,version
- 	}
-], VersionControl.Layout_Sprays.Info);
+									{ip										
+									,path   //Location to be determined                               
+									,'DEC'                           
+									,'101'                                                             
+									,'~thor_dell400::in::experiancred_deceased::cpchf@version@'    
+									,[{'~thor_data400::in::experiancred_deceased'}]    
+									,'thor400_44'
+									,version
+									}
+								], VersionControl.Layout_Sprays.Info);
 
 
 end;

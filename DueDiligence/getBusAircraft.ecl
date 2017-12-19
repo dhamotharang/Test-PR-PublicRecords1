@@ -38,7 +38,7 @@ EXPORT getBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   // ------                                                                                    ------	
 	// ------ Add our sequence number to the avaiation records found for this Business           ------
 	// ------                                                                                    ------
-	DueDiligence.Common.AppendSeq(AircraftRaw, tempBusnData, AircraftRaw_with_seq);
+	AircraftRaw_with_seq := DueDiligence.Common.AppendSeq(AircraftRaw, tempBusnData, TRUE);
 	
 	// ------                                                                                    ------
 	// ------ When this query runs in ARCHIVE MODE the History date on the input contains a date ------

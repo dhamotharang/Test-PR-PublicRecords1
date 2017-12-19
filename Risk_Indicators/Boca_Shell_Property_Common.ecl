@@ -1,4 +1,4 @@
-IMPORT Data_services, Doxie, LN_PropertyV2, LN_PropertyV2_Services, RiskWise, Suppress, profilebooster;
+﻿IMPORT Data_services, Doxie, LN_PropertyV2, LN_PropertyV2_Services, RiskWise, Suppress, profilebooster;
 
 EXPORT Boca_Shell_Property_Common(GROUPED DATASET(Layout_PropertyRecord) p_address,
                                   GROUPED DATASET(Layout_Boca_Shell_ids) ids_only, 
@@ -8,7 +8,7 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(Layout_PropertyRecord) p_addre
 																	LN_PropertyV2_Services.interfaces.Iinput_report input_mod,
 																  BOOLEAN ViewDebugs = FALSE,
 																	BOOLEAN is_from_PB = FALSE,
-																	boolean onThor = false) := FUNCTION											
+																	boolean onThor = false) := FUNCTION
 
 	// --------------------[ CONSTANTS ]-------------------
 
@@ -121,7 +121,7 @@ EXPORT Boca_Shell_Property_Common(GROUPED DATASET(Layout_PropertyRecord) p_addre
 			UNSIGNED1 NAProp := 0;
 			UNSIGNED3 historydate;
 			UNSIGNED6 inp_did;
-			BOOLEAN  isrelat;     // indicates that, when FALSE, the DID is that of the input subject; when TRUE, itâ€™s that of the input subjectâ€™s relative
+			BOOLEAN  isrelat;     // indicates that, when FALSE, the DID is that of the input subject; when TRUE, it’s that of the input subject’s relative
 			STRING20 inp_fname;   // first name of the input subject
 			STRING20 inp_lname;   // last name of the input subject
 			STRING20 prange := '';
@@ -628,7 +628,7 @@ end;
 	//      is a type of Owner) or Seller
 	//   o  All records obtained via address-only are retained. These records--regardless 
 	//      of who owned the property while the applicant lived there--can provide useful 
-	//      data that may be used to infer the applicantâ€™s relationship to the property owner.
+	//      data that may be used to infer the applicant’s relationship to the property owner.
 	layout_full_plus_ids xfm_filter_out_non_ownership_records( layout_full_plus_ids le ) :=
 		TRANSFORM, SKIP( 
 				le.dataSrce = SEARCHED_BY_LEXID AND
@@ -927,7 +927,8 @@ end;
 			ds_assessments_and_deeds_best_vendor_source,
 			seq, inp_did, unique_prop_id, -(UNSIGNED)(sortby_date[1..4]), -(UNSIGNED)(fid_type = DEED_RECORD)
 		);
-	
+
+
 	// .. Preserve both Deeds and Assessments data; choose which Parties to preserve.
 	ds_best_vendor_source_rolled := 
 		ROLLUP(
@@ -1131,7 +1132,7 @@ end;
 
 	// 10.b. Fill in data concerning the two most recently-sold properties; slim to final layout.
 	
-	Risk_Indicators.Layouts.layout_relat_prop_plusv4 xfm_add_most_recently_sold_data(layout_full_temp le) :=
+	Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd xfm_add_most_recently_sold_data(layout_full_temp le) :=
 		TRANSFORM
 			SELF.sale_price1       := IF( le.property_seq_no = 2, le.property_sale_amount, 0 );
 			SELF.sale_date1        := IF( le.property_seq_no = 2, le.property_sale_date, 0 );
@@ -1141,6 +1142,8 @@ end;
 			SELF.sale_date2        := IF( le.property_seq_no = 3, le.property_sale_date, 0 );
 			SELF.prev_purch_price2 := IF( le.property_seq_no = 3, le.property_prior_purchase_amount, 0 );
 			SELF.prev_purch_date2  := IF( le.property_seq_no = 3, le.property_prior_purchase_date, 0 );
+			SELF.Residential_or_Business_Ind  := '';
+			SELF.historydate  		 := 0;
 			SELF := le;
 		END;
 	
@@ -1189,11 +1192,32 @@ end;
 	
 	// output(ids_only, named('ids_only'));
 	// output(p_address, named('p_address'));
-	
-	// output(ids_plus_fares_by_did_roxie, named('ids_plus_fares_by_did_roxie'));
 	// output(ids_plus_fares_by_did, named('ids_plus_fares_by_did'));
 	// output(ids_plus_fares_by_address, named('ids_plus_fares_by_address'));
-	
+	// output(ids_plus_fares, named('ids_plus_fares'));
+	// output(property_fids_for_search, named('property_fids_for_search'));
+	// output(property_records_full_raw, named('property_records_full_raw'));
+	// output(property_records_full_pre, named('property_records_full_pre'));
+	// output(property_records_full, named('property_records_full'));
+	// output(ds_property_recs_raw_with_uniqueid, named('ds_property_recs_raw_with_uniqueid'));
+	// output(ds_property_recs_filt_d2, named('ds_property_recs_filt_d2'));
+	// output(ds_property_recs_filt_e, named('ds_property_recs_filt_e'));
+	// output(ds_assess_recs_FARES, named('ds_assess_recs_FARES'));
+	// output(ds_assess_recs_FIDELITY, named('ds_assess_recs_FIDELITY'));
+	// output(ds_assess_recs_FIDELITY_rolled, named('ds_assess_recs_FIDELITY_rolled'));
+	// output(ds_assess_recs_most_recent_pre, named('ds_assess_recs_most_recent_pre'));
+	// output(ds_assess_recs_most_recent, named('ds_assess_recs_most_recent'));
+	// output(ds_deed_recs, named('ds_deed_recs'));
+	// output(ds_deed_recs_most_recent, named('ds_deed_recs_most_recent'));
+	// output(ds_assessments_and_deeds_unioned, named('ds_assessments_and_deeds_unioned'));
+	// output(ds_assessments_and_deeds_grpd_best_choice, named('ds_assessments_and_deeds_grpd_best_choice'));
+	// output(ds_assessments_and_deeds_best_vendor_source, named('ds_assessments_and_deeds_best_vendor_source'));
+	// output(ds_best_vendor_source_sorted, named('ds_best_vendor_source_sorted'));
+	// output(ds_best_vendor_source_rolled, named('ds_best_vendor_source_rolled'));
+	// output(ds_final_pre, named('ds_final_pre'));
+	// output(ds_property_owned_records, named('ds_property_owned_records'));
+	// output(ds_property_sold_records, named('ds_property_sold_records'));
+	// output(ds_final, named('ds_final'));
 	// output(single_property, named('single_property'));
 
 	RETURN Single_Property;
