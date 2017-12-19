@@ -27,7 +27,7 @@ sequential(
 			updateSuper('~thor_data400::key::did_hhid_qa'		,'~thor_data400::key::header::hhid::'+pVersion+'::did.ver'	),
 			updateSuper('~thor_data400::key::hhid_did_qa'		,'~thor_data400::key::header::hhid::'+pVersion+'::hhid.ver'	),
 			updateSuper('~thor_data400::key::hhid_qa'				,'~thor_data400::key::header::'+pVersion+'::hhid'						),
-			updateSuper('~thor_data400::base::hss_household','~thor400_60::base::hss_household_'+pVersion								),
+			updateSuper('~thor_data400::base::hss_household','~thor400_66::base::hss_household_'+pVersion								),
 			
 			fileservices.SendEmail(emailListS,'SUCCESS! PersonHeader '+pVersion+' HHID files copied from Boca to Alpharetta','See Alpha prod:'+WORKUNIT),
 			if(fileservices.FileExists(flagFileName)=true,fileservices.deleteLogicalFile  (flagFileName))

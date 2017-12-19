@@ -18,7 +18,7 @@ envVars :=
  '#WORKUNIT(\'priority\',\'high\');\n'
 +'wuname := \'Create Raw Header Stats: \'+header.version_build;\n'
 +'#WORKUNIT(\'name\', wuname);\n'
-+'#OPTION(\'AllowedClusters\',\'thor400_60 ,thor400_44\');\n\n'
++'#OPTION(\'AllowedClusters\',\'thor400_66 ,thor400_44\');\n\n'
 +'elistDev:=\''+elist+'\';\n\n';
 ;
 
@@ -35,7 +35,7 @@ envVars
 +'	: success(send_email(\'Completed, a new header_raw is ready for transfer to Alpharetta\\n\\n\'))\n'
 +'	, failure(send_email(\'failed\\n\\n\'))\n'
 +'	;\n'
-+'sequential(stats, _control.fSubmitNewWorkunit(\'Relative_AVB.BWR_proc_BuildData\',\'thor400_60\'))'
++'sequential(stats, _control.fSubmitNewWorkunit(\'Relative_AVB.BWR_proc_BuildData\',\'thor400_66\'))'
 +'	;\n'
 +'// This process detects a new header_raw and creates new stats\n'
 +'// The new stats file version is used in Alpharetta to detect/trigger\n'
@@ -45,7 +45,7 @@ envVars
 
 
 #WORKUNIT('protect',true);
-ThorName:=if(_Control.ThisEnvironment.Name='Dataland','thor40_241_7','thor400_60');
+ThorName:=if(_Control.ThisEnvironment.Name='Dataland','thor40_241_7','thor400_66');
 
 #WORKUNIT('name','PersonHeader: Create Raw Header Stats - on NOTIFY');
 _Control.fSubmitNewWorkunit(lECL1, ThorName ) : WHEN('Create_Raw_Header_Stats')

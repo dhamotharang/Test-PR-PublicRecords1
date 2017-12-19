@@ -71,8 +71,8 @@ SHARED update_supers(string spr0, string newLogical) := function
                          'thor_data400::key::relatives_v3_qa',
                          'thor400_44::key::insuranceheader_segmentation::qa::did_ind'=>
                          '~thor400_44::key::insuranceheader_segmentation::did_ind_qa',
-                         'thor400_60::key::insuranceheader_segmentation::qa::did_ind'=>
-                         '~thor400_60::key::insuranceheader_segmentation::did_ind_qa'
+                         'thor400_66::key::insuranceheader_segmentation::qa::did_ind'=>
+                         '~thor400_66::key::insuranceheader_segmentation::did_ind_qa'
                   ,spr0);
     return sequential(
         output(dataset([{spr,'~'+newLogical}],{string super, string new_logical}),named('cp_built_update'),extend)
@@ -88,7 +88,7 @@ end;
 EXPORT Copy := sequential(
 
          nothor(apply(linking_keys+base_relative ,copy_files    (nm,src_name,'thor400_44','from_alpha1','thor_data400')))
-        ,nothor(apply(linking_keys               ,copy_files    (nm,src_name,'thor400_60','local'     ,'thor400_60'  )))
+        ,nothor(apply(linking_keys               ,copy_files    (nm,src_name,'thor400_66','local'     ,'thor400_66'  )))
         ,nothor(apply(linking_keys+base_relative ,update_supers (ver(nm,'built', 'thor_data400')   , ver(nm,filedate)  )))
 );
 // ************************************************************************************************************************************
@@ -105,7 +105,7 @@ EXPORT MoveToQA :=sequential(
          nothor(apply(linking_keys, update_supers(  ver(nm,'father','thor400_44'  ), ver(nm,'qa'    ,'thor400_44'  )) ))
         ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_44'  ), ver(nm,'built' ,'thor_data400')) ))
         ,nothor(apply(allAlphaFils, update_supers(  ver(nm,'qa'    ,'thor_data400'), ver(nm,'built' ,'thor_data400')) ))
-        ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_60'  ), ver(nm,filedate,'thor400_60'  )) ))
+        ,nothor(apply(linking_keys, update_supers(  ver(nm,'qa'    ,'thor400_66'  ), ver(nm,filedate,'thor400_66'  )) ))
         ,nothor(Header.Proc_Copy_From_Alpha_Incrementals.update_inc_superfiles(true)) // Restore the incremental keys into the qa superfiles
         ,_control.fSubmitNewWorkunit('Header.Proc_Copy_Keys_To_Dataland.Full','hthor_sta','Dataland') // Copy and update new full keys in dataland
 );

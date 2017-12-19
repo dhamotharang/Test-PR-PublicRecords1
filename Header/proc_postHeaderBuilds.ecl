@@ -28,7 +28,7 @@ export proc_postHeaderBuilds := module
 		#stored ('emailList', 'gabriel.marcan@lexisnexisrisk.com'    ); 
 
 		thor1:='thor400_44';
-		thor2:='thor400_60';
+		thor2:='thor400_66';
 
 		bld_Transunion_LN    := Header.transunion_did
 		: success(sequential(output('TU/LT completed'),header.msg('TU/LT completed',elist_owners).good))
