@@ -2,7 +2,7 @@
 	Note:  	This repository entry is intended to be sandboxed by each user
 			to allow each user to have values specific to that user.
 */
-export MyInfo//
+export MyInfo
  :=
   module
 	export	string	UserID				:=	'UserID';
