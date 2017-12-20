@@ -1,4 +1,4 @@
-//This for requesting the extra FP attributes for AmEx, so returns 225 attributes instead of the normal 215.
+﻿//This for requesting the extra FP attributes for AmEx, so returns 225 attributes instead of the normal 215.
 
 import ut, risk_indicators, models, scoring, riskwise;
 #workunit('name','Fraudpoint 3 Score and Attributes 201');
@@ -91,7 +91,6 @@ layout_soap := record
 	string TimeofApplication;
 	unsigned did := 0;
 	string50 DataPermissionMask;	
-		boolean ExcludeIbehavior;  // temporary field until end of July 2017
 
 end;
 
@@ -107,7 +106,6 @@ END;
 
 
 layout_old_acct into_fdInput(f le, INTEGER c) := TRANSFORM
-self.ExcludeIbehavior := true;  // set this back to false if they would like to include this data for their test
 
 	SELF.old_account_number := le.account;
 	SELF.Accountnumber := (STRING)c;	

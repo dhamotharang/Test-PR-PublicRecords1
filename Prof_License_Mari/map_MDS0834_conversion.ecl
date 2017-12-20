@@ -1,4 +1,4 @@
-// MDS0834 / Maryland Commission of Real Estate App & Home Insp / Real Estate Appraisers //
+﻿// MDS0834 / Maryland Commission of Real Estate App & Home Insp / Real Estate Appraisers //
 #workunit('name','map_MDS0834_conversion'); 
 IMPORT Prof_License, Prof_License_Mari, Address, Ut, Lib_FileServices, lib_stringlib;
 
@@ -52,29 +52,29 @@ EXPORT map_MDS0834_conversion(STRING pVersion) := FUNCTION
 		SELF.LAST_UPD_DTE			:= pVersion;							//it was set to process_date before
 		SELF.STAMP_DTE      	:= pVersion;
 		SELF.DATE_FIRST_SEEN	:= thorlib.wuid()[2..9];
-		SELF.DATE_LAST_SEEN		:= thorlib.wuid()[2..9];
+		SELF.DATE_LAST_SEEN	:= thorlib.wuid()[2..9];
 		SELF.DATE_VENDOR_FIRST_REPORTED := pVersion;
-		SELF.DATE_VENDOR_LAST_REPORTED	:= pVersion;
+		SELF.DATE_VENDOR_LAST_REPORTED	 := pVersion;
 		SELF.PROCESS_DATE			:= thorlib.wuid()[2..9];
 
 		SELF.STD_PROF_CD		  := ' ';
-		SELF.STD_SOURCE_UPD		:= src_cd;
+		SELF.STD_SOURCE_UPD	:= src_cd;
 
 		// assigning type code based on license type
-		tempTypeCd		  			:= 'MD';
-		SELF.TYPE_CD      		:= tempTypeCd;
+		tempTypeCd		  			    := 'MD';
+		SELF.TYPE_CD       		:= tempTypeCd;
 
 		//Populate license number
-		tempLicNum           	:= ut.CleanSpacesAndUpper(pInput.slnum);
+		tempLicNum          	:= ut.CleanSpacesAndUpper(pInput.slnum);
 		SELF.LICENSE_NBR	   	:= tempLicNum;
 		SELF.LICENSE_STATE	 	:= src_st;
 
 		// initialize raw_license_type from raw data
-		tempRawType  					:= ut.CleanSpacesAndUpper(pInput.lic_type);												 
-		SELF.RAW_LICENSE_TYPE := tempRawType;
+		tempRawType  					    := ut.CleanSpacesAndUpper(pInput.lic_type);												 
+		SELF.RAW_LICENSE_TYPE := IF(LENGTH(tempRawType) = 1,'0'+tempRawType,tempRawType);
 																	 													          
 		//Standardize license type by removing leading 0
-		tempStdLicType       	:= REGEXFIND('^(0){1}([1-9]){1}$', tempRawType, 2);												 
+		tempStdLicType       	:= IF(LENGTH(tempRawType) = 1,tempRawType, REGEXFIND('^(0){1}([1-9]){1}$', tempRawType, 2));												 
 		SELF.STD_LICENSE_TYPE := tempStdLicType;
 		
 		// assigning dates per business rules fmt_dateMMDDYYYY/*fmt_dateMMDDYYYY*/

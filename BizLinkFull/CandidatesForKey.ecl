@@ -1,1 +1,1 @@
-EXPORT CandidatesForKey := scaled_candidates(File_BizHead);
+﻿  EXPORT CandidatesForKey := scaled_candidates(File_BizHead);

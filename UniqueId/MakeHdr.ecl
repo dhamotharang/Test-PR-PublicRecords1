@@ -1,4 +1,4 @@
-import ut;
+﻿import ut;
 export MakeHdr := MODULE
 
 shared hdg_xml := '<?xml version="1.0" encoding="utf-8"?>\r\n<Watchlist>\r\n';
@@ -48,6 +48,7 @@ shared string HdrSearchCriteria(string Watchlistname) := TRIM(
 				+	'<value id="11" name="Libya"/>\r\n'
 				+	'<value id="8" name="North Korea - Democratic People\'s Republic of Korea"/>\r\n'
 				+	'<value id="17" name="Resolution 2270 (2016)-Annex III"/>\r\n'
+				+	'<value id="18" name="Resolution 2375 (2017)"/>\r\n'
 				+	'<value id="9" name="Somalia and Eritrea"/>\r\n'
 				+ '<value id="15" name="South Sudan"/>\r\n'
 				+	'<value id="10" name="Sudan"/>\r\n'

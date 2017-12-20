@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Wheel_company_name_Service">
 <part name="prefix" type="xsd:string"/>
 <part name="count" type="xsd:integer"/>
@@ -11,3 +11,4 @@ EXPORT Wheel_company_name_Service() := FUNCTION
     results := BizLinkFull.Wheel.Fetch_company_name(SALT28.StringToUppercase(Input_prefix), Input_count);
     RETURN OUTPUT(results);
 END;
+

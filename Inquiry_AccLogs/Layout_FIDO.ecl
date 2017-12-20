@@ -107,6 +107,7 @@ export new_MBS := record
 								integer1 exclude_from_access;
 								string mask;
 								integer1 priority_flag;
+								string100 country;
 
 		
  END;

@@ -1,4 +1,4 @@
-export layout_in_defendant := record
+﻿export layout_in_defendant := record
 	string40	RecordID;
 	string100	SourceName;
 	string20	SourceType;
@@ -59,5 +59,5 @@ export layout_in_defendant := record
 	string8		SexOffenderRegistryDate;
 	string8		SexOffenderRegExpirationDate;
 	string100	SexOffenderRegistryNumber;
-	string		SourceID;
+	string20	SourceID;
 end;

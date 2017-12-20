@@ -27,6 +27,22 @@ module
 		
 	shared trimids(string pid) := trim(pid,left,right);
 	
+	// -- ZOOM vendor_id's that will be filtered from Business contacts and PAW files.
+	shared Bad_zoom_vend_ids := [	'1901732652   C23201883',
+																'1793702174   C355227920',
+																'1793716775   C355227920',
+																'1576032856    C351610898',
+																'1645018152   C345926789',
+																'701965807C343689127',
+																'1910149483   C119243747',
+																'1166594123    C37536530',
+																'1676507481   C37536530',
+																'1149525038   C37536530',
+																'1665485437   C37536530',
+																'2083107149    C107741806',
+																'2061716462    C344399990'
+															 ];
+	
 	export Input :=
 	module
 	
@@ -374,11 +390,17 @@ module
 				// -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
 				// -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
 				// -- JIRA - DF-19818 - Consumer Adv - PAW Record Lex ID: 1974474589 Pickens
-				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898','1645018152   C345926789'])
+				// -- JIRA - DF-20268 - ZOOM Paw record to be removed
+				// -- JIRA - DF-20347 - Overlinking of PAW Zoom Record in Lexid 1443992436 - Consumer Advocacy
+				// -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
+				// -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
+				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in Bad_zoom_vend_ids)
 				// -- JIRA - DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				or  (mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
 				// -- JIRA - DF-19305 Experian Business Report has incorrect Officer Name of Jon C Dawson 
 				or  (mdr.sourceTools.sourceIsEBR(pInput.source) and trim(pInput.vendor_id) in ['940772280'] and trim(pInput.lname) = 'DAWSON')
+				// -- JIRA - DF-20318 PAW Error for LexID 13959907050 - Consumer Advocacy
+				or  (mdr.sourceTools.sourceIsSpoke(pInput.source) and trim(pInput.lname) = 'JOHNSON' and trim(pInput.fname) in ['CHRISTOPHER','CHRIS'] and pInput.phone = 6123046073)
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -896,11 +918,17 @@ module
 				// -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
 				// -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
 				// -- JIRA - DF-19818 - Consumer Adv - PAW Record Lex ID: 1974474589 Pickens
-				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898','1645018152   C345926789'])
+				// -- JIRA - DF-20268 - ZOOM Paw record to be removed
+				// -- JIRA - DF-20347 - Overlinking of PAW Zoom Record in Lexid 1443992436 - Consumer Advocacy
+				// -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
+				// -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
+				or  (mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in Bad_zoom_vend_ids)
 				// -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				or  (mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
 				// -- JIRA - DF-19305 Experian Business Report has incorrect Officer Name of Jon C Dawson 
 				or  (mdr.sourceTools.sourceIsEBR(pInput.source) and trim(pInput.vendor_id) in ['940772280'] and trim(pInput.lname) = 'DAWSON')
+				// -- JIRA - DF-20318 PAW Error for LexID 13959907050 - Consumer Advocacy
+				or  (mdr.sourceTools.sourceIsSpoke(pInput.source) and trim(pInput.lname) = 'JOHNSON' and trim(pInput.fname) in ['CHRISTOPHER','CHRIS'] and pInput.phone = 6123046073)
 			;
 
 			boolean lFullFilter 		:= if(pFilterOut
@@ -1480,11 +1508,17 @@ module
 				 // -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
 				 // -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
 				 // -- JIRA - DF-19818 - Consumer Adv - PAW Record Lex ID: 1974474589 Pickens
-				( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898','1645018152   C345926789'])
+				 // -- JIRA - DF-20268 - ZOOM Paw record to be removed
+				 // -- JIRA - DF-20347 - Overlinking of PAW Zoom Record in Lexid 1443992436 - Consumer Advocacy
+				 // -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
+				 // -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
+				( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in Bad_zoom_vend_ids)
 			or // -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				( mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
 			or // -- JIRA - DF-19305 Experian Business Report has incorrect Officer Name of Jon C Dawson 
 				( mdr.sourceTools.sourceIsEBR(pInput.source) and trim(pInput.vendor_id) in ['940772280'] and trim(pInput.lname) = 'DAWSON')
+			or // -- JIRA - DF-20318 PAW Error for LexID 13959907050 - Consumer Advocacy
+				(	mdr.sourceTools.sourceIsSpoke(pInput.source) and trim(pInput.lname) = 'JOHNSON' and trim(pInput.fname) in ['CHRISTOPHER','CHRIS'] and pInput.phone = 6123046073)
 				;
 
 			boolean lFullFilter 	:= not(lAdditionalFilter);	//negate it 
@@ -1984,11 +2018,17 @@ module
 				 // -- JIRA - DF-19164 Consumer Advocacy - Remove Zoom Records for LexID 1525274139 -
 				 // -- JIRA - DF-19343 Consumer Advocacy - Removal of PAW and Business Contacts Record for Tanemura
 				 // -- JIRA - DF-19818 - Consumer Adv - PAW Record Lex ID: 1974474589 Pickens
-				( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in ['1901732652   C23201883','1793702174   C355227920','1793716775   C355227920','1576032856    C351610898','1645018152   C345926789'])
+				 // -- JIRA - DF-20268 - ZOOM Paw record to be removed
+				 // -- JIRA - DF-20347 - Overlinking of PAW Zoom Record in Lexid 1443992436 - Consumer Advocacy
+				 // -- JIRA - LNK-788 - Overlinking of Mary J Conley - LexID 496119776 in PAW Record
+				 // -- JIRA - DF-20087 - Consumer Disputing PAW record - from zoom
+				( mdr.sourceTools.sourceIsZoom(pInput.source) and trim(pInput.vendor_id) in Bad_zoom_vend_ids)
 			or // -- JIRA DF-19767 Consumer Adv - Remove PAW record from LexID 2332177997 SICHERMAN
 				( mdr.sourceTools.sourceIsDCA(pInput.source) and trim(pInput.vendor_id) in ['3205715'] and trim(pInput.lname) = 'SICHERMAN')
 			or // -- JIRA - DF-19305 Experian Business Report has incorrect Officer Name of Jon C Dawson 
 				( mdr.sourceTools.sourceIsEBR(pInput.source) and trim(pInput.vendor_id) in ['940772280'] and trim(pInput.lname) = 'DAWSON')
+			or // -- JIRA - DF-20318 PAW Error for LexID 13959907050 - Consumer Advocacy
+				(	mdr.sourceTools.sourceIsSpoke(pInput.source) and trim(pInput.lname) = 'JOHNSON' and trim(pInput.fname) in ['CHRISTOPHER','CHRIS'] and trim(pInput.phone) = '6123046073')
 				;
 
 			boolean lFullFilter 	:= not(lAdditionalFilter);	//negate it 

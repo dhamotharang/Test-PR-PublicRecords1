@@ -65,7 +65,7 @@
 	NewBocaBase		:= BocaGE_prev + pGEBase;
  	
 	PRTE2_PhonesPlus.Layouts.Base_ext AddLinkID(NewBocaBase L) := TRANSFORM
-	  SELF.did  := prte2.fn_AppendFakeID.did(L.fname, L.lname, L.link_ssn, L.link_dob, L.cust_name);
+	  SELF.did  := prte2.fn_AppendFakeID.did(L.fname, L.lname, L.link_ssn, trim(L.link_dob), L.cust_name);
     //SELF.bdid := prte2.fn_AppendFakeID.bdid(L.clean_company,	L.prim_range,	L.prim_name, L.v_city_name, L.state, L.zip5, L.cust_name);
 		SELF				:= L;
   END;

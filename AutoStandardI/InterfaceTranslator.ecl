@@ -1,4 +1,4 @@
-import AutoStandardI;
+﻿import AutoStandardI;
 import address, doxie, ut, corp2_services, vehiclev2_services, business_header_ss, business_header,
        header, suppress, STD;
 
@@ -613,9 +613,9 @@ export InterfaceTranslator := module
 	end;
 	export casenumber_value := module
 		export params := interface
-			export string17 casenumber;
+			export string25 casenumber;
 		end;
-		export string17 val(params in_mod) := in_mod.casenumber;
+		export string25 val(params in_mod) := in_mod.casenumber;
 	end;
 	export filingjurisdiction_val := module //TODO: only in prof_LicenseV2_Services/ProfLicSearch; move to "value"
 		export params := interface

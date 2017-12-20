@@ -1,4 +1,4 @@
-import STD,doxie, ut,Data_Services,Suppress;
+﻿import STD,doxie, ut,Data_Services,Suppress;
 
 // Note: so far "Linking_type" and "Document_Type" are mutually exclusive,
 // and that's how it was implemented in Suppress/MAC_Suppress
@@ -6,8 +6,10 @@ import STD,doxie, ut,Data_Services,Suppress;
 SetRequireLinkingId:=['SSN','DID','BDID','RDID'];
 SetRequireDocumentId:=['FARES ID','OFFENDER KEY','OFFICIAL RECORD','FDN ID'];
 
+FilteredDS := Suppress.File_New_Suppression (Linking_ID not in Suppress.UNsuppress_DID);
 export Key_New_Suppression := 
-  index(Suppress.File_New_Suppression
+		index(FilteredDS
+  //index(Suppress.File_New_Suppression(Linking_ID not in Suppress.UNsuppress_DID)
 	(
    (STD.Str.ToUpperCase(TRIM(linking_type,left,right))      in SetRequireLinkingId  and (unsigned)linking_id<>0)
 or (STD.Str.ToUpperCase(TRIM(document_type,left,right))     in SetRequireDocumentId and           Document_Id<>'')

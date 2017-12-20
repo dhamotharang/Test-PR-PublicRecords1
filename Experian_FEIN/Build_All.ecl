@@ -1,4 +1,4 @@
-import ut, VersionControl,Roxiekeybuild, tools, _control;
+﻿import ut, VersionControl, dops, tools, _control, Scrubs, std, Scrubs_Experian_FEIN;
 
 export Build_All(
    string													pversion
@@ -12,10 +12,11 @@ export Build_All(
 		Create_Supers
 		,VersionControl.fSprayInputFiles(Spray(pversion).Input)
 		,Build_Base		(pversion,pIsTesting,pSprayedFile,pBaseFile)
+		,Scrubs.ScrubsPlus('Experian_FEIN','Scrubs_Experian_FEIN','Scrubs_Experian_FEIN_Base', 'Base', pVersion,Experian_FEIN.Email_Notification_Lists().Stats,false)
 		,Build_Keys		(pversion).all
-		,RoxieKeyBuild.updateversion('ExperianFEINKeys',pversion,_control.MyInfo.EmailAddressNotify,,'N')
+		,dops.updateversion('ExperianFEINKeys',pversion,_control.MyInfo.EmailAddressNotify,,'N')
 		,Build_Strata	(pversion,pOverwrite,,,pIsTesting)
-	  ,Promote().Inputfiles.using2used
+		,Promote().Inputfiles.using2used
 		,Promote().Buildfiles.Built2QA
 		,QA_Records()
 		

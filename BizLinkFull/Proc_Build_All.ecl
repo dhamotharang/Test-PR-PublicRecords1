@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 EXPORT Proc_Build_All(
    string   pversion
   ,boolean  pPromote2QA = true
@@ -47,8 +47,8 @@ function
           ,Buildsup_seleid              
           ,Buildsup_orgid   
           ,Buildsup_rcid
-          ,Buildrefs                    
-          ,Buildwords                   
+          // ,Buildrefs                    
+          // ,Buildwords                   
           ,Buildrefs_l_cnpname    
           ,Buildrefs_l_cnpname_zip
           ,Buildrefs_l_cnpname_st       
@@ -81,3 +81,4 @@ function
   return returnresult;
     
 end;
+

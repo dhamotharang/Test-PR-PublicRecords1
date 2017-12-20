@@ -23,7 +23,7 @@ rScraped := RECORD
 	STRING Zip;
 	STRING Phone;
 END;
-scraped := DATASET('~thor400_dev01_v2::aca::correctional_facilities_scraped',rScraped,CSV(HEADING(1)));
+scraped := DATASET('~thor_data400::in::aca::correctional_facilities_scraped',rScraped,CSV(HEADING(1)));
 
 uslec := Address_Attributes.file_Law_Enforcement;
 inBIP := BIPV2.CommonBase.DS_PROD(source IN ['Q3','ER','BR','DF'] AND current = TRUE AND prim_name <> '' AND zip <> ''); 
@@ -37,11 +37,12 @@ rDataIn := RECORD
 	STRING10 	prim_range;
 	STRING2  	predir;
 	STRING28 	prim_name;
-	STRING4  	suffix;
+	STRING4  	addr_suffix;
 	STRING2  	postdir;
 	STRING10 	unit_desig;
 	STRING8  	sec_range;
-	STRING25 	p_city_name;
+	STRING25		p_city_name;
+	STRING25		v_city_name;
 	STRING2  	st;
 	STRING5  	zip;
 	STRING4  	zip4;
@@ -58,27 +59,27 @@ END;
 
 rDataIn cleanScraped(scraped l) := TRANSFORM
 	clean_address := Risk_Indicators.MOD_AddressClean.clean_addr(l.Facility_address_Line_1 + ' ' + l.Facility_Address_Line_2, l.city, l.state, l.zip);
-	SELF.prim_range 	:= clean_address[1..10];
-	SELF.predir 			:= clean_address[11..12];
-	SELF.prim_name 		:= clean_address[13..40];
-	SELF.suffix 			:= clean_address[41..44];
-	SELF.postdir 			:= clean_address[45..46];
-	SELF.unit_desig 	:= clean_address[47..56];
-	SELF.sec_range 		:= clean_address[57..65];
-	SELF.p_city_name 	:= clean_address[66..89];
-	SELF.st 					:= clean_address[115..116];
-	SELF.zip 					:= clean_address[117..121];
-	SELF.zip4 				:= clean_address[122..125];
-	SELF.county 			:= clean_address[143..145];
-	SELF.geo_lat 			:= clean_address[146..155];
-	SELF.geo_long 		:= clean_address[156..166];
-	SELF.msa 					:= clean_address[167..170];
-	SELF.geo_blk 			:= clean_address[171..177];
-	SELF.geo_match 		:= clean_address[178];
-	//build geolink for AddrRisk
-	SELF.geolink 			:= clean_address[115..116]+clean_address[143..145]+clean_address[171..177];
-	SELF.rc := '99';
-	SELF := l;
+				SELF.prim_range := clean_address [1..10];
+				SELF.predir := clean_address [11..12];
+				SELF.prim_name := clean_address [13..40];
+				SELF.addr_suffix := clean_address [41..44];
+				SELF.postdir := clean_address [45..46];
+				SELF.unit_desig := clean_address [47..56];
+				SELF.sec_range := clean_address [57..64];
+				SELF.p_city_name := clean_address [65..89];
+				SELF.v_city_name := clean_address [90..114];
+				SELF.st := clean_address [115..116];
+				SELF.zip := clean_address [117..121];
+				SELF.zip4 := clean_address[122..125];
+				SELF.county := clean_address[143..145];
+				SELF.geo_lat := clean_address[146..155];
+				SELF.geo_long := clean_address[156..166];
+				SELF.msa := clean_address[167..170];
+				SELF.geo_blk := clean_address[171..177];
+				SELF.geo_match := clean_address[178];
+				SELF.geolink 		:= clean_address[115..116]+clean_address[143..145]+clean_address[171..177];
+			SELF.rc := '99';
+			SELF := l;
 END;
 clean_scraped := DEDUP(SORT(PROJECT(scraped, cleanScraped(LEFT)),prim_name, prim_range, zip, sec_range),prim_name, prim_range, zip, sec_range);
 
@@ -86,6 +87,8 @@ clean_scraped := DEDUP(SORT(PROJECT(scraped, cleanScraped(LEFT)),prim_name, prim
 rDataIn slimUSLEC(uslec l) := TRANSFORM
 	SELF.Complex_Name := TRIM(stringlib.StringToUpperCase(l.Department_Description));
 	SELF.Facility_Name := TRIM(stringlib.StringToUpperCase(l.Department_Name));
+	SELF.addr_suffix := l.suffix;
+	SELF.v_city_name := l.p_city_name;
 	SELF.rc := '98';
 	SELF := l;
 	SELF := [];
@@ -106,7 +109,8 @@ rFinal := RECORD
 		STRING2  postdir;
 		STRING5  unit_desig;
 		STRING8  sec_range;
-		STRING25 city;
+		STRING25		p_city_name;
+		STRING25		v_city_name;
 		STRING2  st;
 		STRING4  zip4;
 		UNSIGNED6 aid;
@@ -167,7 +171,6 @@ rFinal := RECORD
 
 rFinal xFormInt(cleaned_internal l) := TRANSFORM
 	SELF.aid := HASH(l.zip+l.prim_range+l.prim_name+l.predir+l.postdir+l.sec_range+l.zip4);
-	SELF.city := l.p_city_name;
 	SELF.cnp_name := l.facility_name;
 	SELF.rc := l.rc;//INDICATES HARD CODED TRUE POSITIVE
 	SELF.inst_class := MAP(l.complex_name[1] = 'A' => 'MUNICIPAL',
@@ -189,7 +192,6 @@ rFinal addAdvo(inBIP l, ADVO_base r) := TRANSFORM
 	SELF.postdir 		 			:= l.postdir;
 	SELF.unit_desig  		:= l.unit_desig;
 	SELF.sec_range 	 		:= l.sec_range;
-	SELF.city 			 					:= l.v_city_name;
 	SELF.streetlink  		:= l.zip + l.zip4[1..2];
 	SELF.geolink 		 			:= l.st + l.fips_county + l.geo_blk;
 	SELF.st 		 		 					:= l.st;

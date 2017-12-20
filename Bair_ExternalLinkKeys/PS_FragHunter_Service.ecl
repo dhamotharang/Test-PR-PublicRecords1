@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="PS_FragHunter_Service">
 <part name="NAME_SUFFIX" type="xsd:string"/>
 <part name="FNAME" type="xsd:string"/>
@@ -43,6 +43,7 @@
 <p>The more data input the better; but unless one of the following field combinations are present the UBER key will be used:-</p>
 <p>FNAME:LNAME:ST
 </p><p>PRIM_RANGE:PRIM_NAME:ZIP
+</p><p>PRIM_NAME:P_CITY_NAME:ST
 </p><p>DOB:LNAME
 </p><p>ZIP:PRIM_RANGE
 </p><p>DL:DL_ST

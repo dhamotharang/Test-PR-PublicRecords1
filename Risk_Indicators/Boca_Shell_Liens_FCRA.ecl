@@ -1,3 +1,6 @@
+﻿/*2017-08-31T13:22:58Z (khuls)
+C:\Users\hulske01\AppData\Roaming\HPCC Systems\eclide\khuls\dataland_dev\Risk_Indicators\Boca_Shell_Liens_FCRA\2017-08-31T13_22_58Z.ecl
+*/
 import doxie_files, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD;
  
 export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0, 
@@ -52,7 +55,9 @@ export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 																					Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)ri.date_first_seen,ut.DaysInNYears(3)));
 		SELF.BJL.liens_unreleased_count60 := (INTEGER)(ri.rmsid<>'' AND (INTEGER)ri.date_last_seen=0 and 
 																					Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)ri.date_first_seen,ut.DaysInNYears(5)));																			
-																																										
+		SELF.BJL.liens_unreleased_count84 := (INTEGER)(ri.rmsid<>'' AND (INTEGER)ri.date_last_seen=0 and 
+																					Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)ri.date_first_seen,ut.DaysInNYears(7)));																			
+																																									
 		// Released Liens	-----------------------------------																		
 		SELF.BJL.liens_recent_released_count := (INTEGER)(ri.rmsid<>'' AND 
 																				(INTEGER)ri.date_last_seen<>0 AND
@@ -75,9 +80,13 @@ export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 																				Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)ri.date_first_seen,ut.DaysInNYears(3)));
 		SELF.BJL.liens_released_count60 := (INTEGER)(ri.rmsid<>'' AND (INTEGER)ri.date_last_seen<>0 and 
 																				Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)ri.date_first_seen,ut.DaysInNYears(5)));																				
+		SELF.BJL.liens_released_count84 := (INTEGER)(ri.rmsid<>'' AND (INTEGER)ri.date_last_seen<>0 and 
+																				Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)ri.date_first_seen,ut.DaysInNYears(7)));																				
 																						
 		self.BJL.last_liens_unreleased_date := if((INTEGER)ri.date_last_seen=0, ri.date_first_seen, '');																			
+		SELF.BJL.liens_last_unrel_date84 := if((INTEGER)ri.date_last_seen=0 and risk_indicators.iid_constants.checkdays(myGetDate,(STRING8)ri.date_first_seen,ut.DaysInNYears(7),le.historydate), ri.date_first_seen, '');		
 		SELF.BJL.last_liens_released_date := if((INTEGER)ri.date_last_seen<>0, (unsigned)ri.date_first_seen, 0);
+		SELF.BJL.liens_last_rel_date84		:= if((INTEGER)ri.date_last_seen<>0 and risk_indicators.iid_constants.checkdays(myGetDate,(STRING8)ri.date_first_seen,ut.DaysInNYears(7),le.historydate), (unsigned)ri.date_last_seen, 0);
 		
 		SELF.date_first_seen := (unsigned)ri.date_first_seen;// to be used in evictions
 		SELF.date_last_seen := (unsigned)ri.date_last_seen;// to be used in evictions
@@ -162,6 +171,7 @@ export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.BJL.eviction_count24 := (integer)(isEviction and (INTEGER)le.date_last_seen=0 and Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)le.date_first_seen,ut.DaysInNYears(2)));
 		SELF.BJL.eviction_count36 := (integer)(isEviction and (INTEGER)le.date_last_seen=0 and Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)le.date_first_seen,ut.DaysInNYears(3)));
 		SELF.BJL.eviction_count60 := (integer)(isEviction and (INTEGER)le.date_last_seen=0 and Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)le.date_first_seen,ut.DaysInNYears(5)));
+		SELF.BJL.eviction_count84 := (integer)(isEviction and (INTEGER)le.date_last_seen=0 and Risk_Indicators.iid_constants.checkingDays(myGetDate,(STRING8)le.date_first_seen,ut.DaysInNYears(7)));
 
 		SELF.BJL.last_eviction_date := if(isEviction, (unsigned)le.date_first_seen, 0);
 
@@ -190,6 +200,15 @@ export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		isSmallClaimsReleased := ftd in iid_constants.setSmallClaims and goodResult and released and (bsversion<50 or (~isEviction and ftd not in iid_constants.setSuitsFCRA));
 		isSuits := ftd in iid_constants.setSuitsFCRA and goodResult and unreleased and (bsversion<50 or (~isEviction));
 		isSuitsReleased := ftd in iid_constants.setSuitsFCRA and goodResult and released and (bsversion<50 or (~isEviction));
+
+		isWithin84 := risk_indicators.iid_constants.checkdays(myGetDate,(STRING8)le.date_first_seen,ut.DaysInNYears(7),le.historydate);
+		isAnyUnreleased := isCivilJudgment or isFederalTax or isForeclosure or isLandlordTenant or isLisPendens or isOtherLJ or isOtherTax or isSmallClaims or isSuits;
+		isAnyReleased 	:= isCivilJudgmentReleased or isFederalTaxReleased or isForeclosureReleased or isLandlordTenantReleased or isLisPendensReleased or isOtherLJReleased or isOtherTaxReleased or isSmallClaimsReleased or isSuitsReleased;
+
+		self.liens.liens_unrel_total_amount84 := if(isWithin84 and isAnyUnreleased, (real)ri.amount, 0);
+		self.liens.liens_rel_total_amount84 	:= if(isWithin84 and isAnyReleased, (real)ri.amount, 0);
+		self.liens.liens_unrel_total_amount 	:= if(isAnyUnreleased, (real)ri.amount, 0);
+		self.liens.liens_rel_total_amount 		:= if(isAnyReleased, (real)ri.amount, 0);
 		
 		self.liens.liens_unreleased_civil_judgment.count := (integer)isCivilJudgment;
 		self.liens.liens_unreleased_civil_judgment.earliest_filing_date := if(isCivilJudgment, le.date_first_seen, 0);
@@ -291,6 +310,7 @@ export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.BJL.liens_unreleased_count24 :=  if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.BJL.liens_unreleased_count24 );	
 		SELF.BJL.liens_unreleased_count36 :=  if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.BJL.liens_unreleased_count36 );	
 		SELF.BJL.liens_unreleased_count60 :=	if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.BJL.liens_unreleased_count60 );																																						
+		SELF.BJL.liens_unreleased_count84 :=	if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.BJL.liens_unreleased_count84 );																																						
 		SELF.BJL.liens_recent_released_count :=  if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.BJL.liens_recent_released_count );	
 		SELF.BJL.liens_historical_released_count := if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.BJL.liens_historical_released_count );	
 		SELF.BJL.liens_released_count30 :=  if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.BJL.liens_released_count30 );	
@@ -300,8 +320,11 @@ export Boca_Shell_Liens_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.BJL.liens_released_count24 :=  if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.BJL.liens_released_count24 );	
 		SELF.BJL.liens_released_count36 :=  if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.BJL.liens_released_count36 );	
 		SELF.BJL.liens_released_count60 :=  if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.BJL.liens_released_count60 );	
+		SELF.BJL.liens_released_count84 :=  if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.BJL.liens_released_count84 );	
 		self.BJL.last_liens_unreleased_date := if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), '', le.BJL.last_liens_unreleased_date );	
+		SELF.BJL.liens_last_unrel_date84 := if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), '', le.bjl.liens_last_unrel_date84);
 		SELF.BJL.last_liens_released_date :=  if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.BJL.last_liens_released_date );	
+		SELF.BJL.liens_last_rel_date84 := if(bsversion>=50 and (isSuits or isSuitsReleased or isEviction), 0, le.bjl.liens_last_rel_date84);
 		self.ftd := if(goodResult, '1', '0');
 		SELF := le;
 	end;
@@ -363,6 +386,7 @@ liens_main_overrides := if(onThor, liens_main_overrides_thor, liens_main_overrid
 			SELF.BJL.liens_unreleased_count24             := RIGHT.BJL.liens_unreleased_count24            ;
 			SELF.BJL.liens_unreleased_count36             := RIGHT.BJL.liens_unreleased_count36            ;
 			SELF.BJL.liens_unreleased_count60             := RIGHT.BJL.liens_unreleased_count60            ;
+			SELF.BJL.liens_unreleased_count84             := RIGHT.BJL.liens_unreleased_count84            ;
 			SELF.BJL.liens_recent_released_count          := RIGHT.BJL.liens_recent_released_count         ;
 			SELF.BJL.liens_historical_released_count      := RIGHT.BJL.liens_historical_released_count     ;
 			SELF.BJL.liens_released_count30               := RIGHT.BJL.liens_released_count30              ;
@@ -372,8 +396,11 @@ liens_main_overrides := if(onThor, liens_main_overrides_thor, liens_main_overrid
 			SELF.BJL.liens_released_count24               := RIGHT.BJL.liens_released_count24              ;
 			SELF.BJL.liens_released_count36               := RIGHT.BJL.liens_released_count36              ;
 			SELF.BJL.liens_released_count60               := RIGHT.BJL.liens_released_count60              ;
+			SELF.BJL.liens_released_count84               := RIGHT.BJL.liens_released_count84              ;
 			SELF.BJL.last_liens_unreleased_date           := RIGHT.BJL.last_liens_unreleased_date          ;
+			SELF.BJL.liens_last_unrel_date84	            := RIGHT.BJL.liens_last_unrel_date84          	 ;
 			SELF.BJL.last_liens_released_date             := RIGHT.BJL.last_liens_released_date            ;
+			SELF.BJL.liens_last_rel_date84	              := RIGHT.BJL.liens_last_rel_date84	             ;
 			SELF.BJL.eviction_recent_unreleased_count     := RIGHT.BJL.eviction_recent_unreleased_count    ;
 			SELF.BJL.eviction_historical_unreleased_count := RIGHT.BJL.eviction_historical_unreleased_count;
 			SELF.BJL.eviction_recent_released_count       := RIGHT.BJL.eviction_recent_released_count      ;
@@ -386,6 +413,7 @@ liens_main_overrides := if(onThor, liens_main_overrides_thor, liens_main_overrid
 			SELF.BJL.eviction_count24                     := RIGHT.BJL.eviction_count24                    ;
 			SELF.BJL.eviction_count36                     := RIGHT.BJL.eviction_count36                    ;
 			SELF.BJL.eviction_count60                     := RIGHT.BJL.eviction_count60                    ;
+			SELF.BJL.eviction_count84                     := RIGHT.BJL.eviction_count84                    ;
 			SELF.BJL.last_eviction_date                   := RIGHT.BJL.last_eviction_date                  ;			
 			SELF.rmsid := right.rmsid; 
 			SELF.tmsid := right.tmsid;
@@ -413,6 +441,7 @@ liens_main_overrides := if(onThor, liens_main_overrides_thor, liens_main_overrid
 		SELF.BJL.liens_unreleased_count24 := le.BJL.liens_unreleased_count24 + IF(sameLien or (ri.evictionInd and bsVersion >=50),0,ri.BJL.liens_unreleased_count24);
 		SELF.BJL.liens_unreleased_count36 := le.BJL.liens_unreleased_count36 + IF(sameLien or (ri.evictionInd and bsVersion >=50),0,ri.BJL.liens_unreleased_count36);
 		SELF.BJL.liens_unreleased_count60 := le.BJL.liens_unreleased_count60 + IF(sameLien or (ri.evictionInd and bsVersion >=50),0,ri.BJL.liens_unreleased_count60);
+		SELF.BJL.liens_unreleased_count84 := le.BJL.liens_unreleased_count84 + IF(sameLien or (ri.evictionInd and bsVersion >=50),0,ri.BJL.liens_unreleased_count84);
 		
 		SELF.BJL.liens_recent_released_count := le.BJL.liens_recent_released_count + IF(sameLien or (ri.evictionInd and bsVersion >=50),0,ri.BJL.liens_recent_released_count);
 		SELF.BJL.liens_historical_released_count := le.BJL.liens_historical_released_count + IF(sameLien or (ri.evictionInd and bsVersion >=50),0,ri.BJL.liens_historical_released_count);
@@ -423,9 +452,12 @@ liens_main_overrides := if(onThor, liens_main_overrides_thor, liens_main_overrid
 		SELF.BJL.liens_released_count24 := le.BJL.liens_released_count24 + IF(sameLien or (ri.evictionInd and bsVersion >=50),0,ri.BJL.liens_released_count24);
 		SELF.BJL.liens_released_count36 := le.BJL.liens_released_count36 + IF(sameLien or (ri.evictionInd and bsVersion >=50),0,ri.BJL.liens_released_count36);
 		SELF.BJL.liens_released_count60 := le.BJL.liens_released_count60 + IF(sameLien or (ri.evictionInd and bsVersion >=50),0,ri.BJL.liens_released_count60);
+		SELF.BJL.liens_released_count84 := le.BJL.liens_released_count84 + IF(sameLien or (ri.evictionInd and bsVersion >=50),0,ri.BJL.liens_released_count84);
 		
 		SELF.BJL.last_liens_unreleased_date := if((integer)le.BJL.last_liens_unreleased_date > (integer)ri.BJL.last_liens_unreleased_date, le.BJL.last_liens_unreleased_date, ri.BJL.last_liens_unreleased_date);
+		SELF.BJL.liens_last_unrel_date84 := if((integer)le.BJL.liens_last_unrel_date84 > (integer)ri.BJL.liens_last_unrel_date84, le.BJL.liens_last_unrel_date84, ri.BJL.liens_last_unrel_date84);
 		SELF.BJL.last_liens_released_date := if((integer)le.BJL.last_liens_released_date > (integer)ri.BJL.last_liens_released_date, le.BJL.last_liens_released_date, ri.BJL.last_liens_released_date);
+		SELF.BJL.liens_last_rel_date84 := if((integer)le.BJL.liens_last_rel_date84 > (integer)ri.BJL.liens_last_rel_date84, le.BJL.liens_last_rel_date84, ri.BJL.liens_last_rel_date84);
 		
 		SELF.BJL.eviction_recent_unreleased_count := le.BJL.eviction_recent_unreleased_count + IF(sameLien,0,ri.BJL.eviction_recent_unreleased_count);
 		SELF.BJL.eviction_historical_unreleased_count := le.BJL.eviction_historical_unreleased_count + IF(sameLien,0,ri.BJL.eviction_historical_unreleased_count);
@@ -440,6 +472,7 @@ liens_main_overrides := if(onThor, liens_main_overrides_thor, liens_main_overrid
 		SELF.BJL.eviction_count24 := le.BJL.eviction_count24 + IF(sameLien,0,ri.BJL.eviction_count24);
 		SELF.BJL.eviction_count36 := le.BJL.eviction_count36 + IF(sameLien,0,ri.BJL.eviction_count36);
 		SELF.BJL.eviction_count60 := le.BJL.eviction_count60 + IF(sameLien,0,ri.BJL.eviction_count60);
+		SELF.BJL.eviction_count84 := le.BJL.eviction_count84 + IF(sameLien,0,ri.BJL.eviction_count84);
 		
 		SELF.BJL.last_eviction_date := MAX(le.BJL.last_eviction_date,ri.BJL.last_eviction_date);
 		
@@ -532,6 +565,11 @@ liens_main_overrides := if(onThor, liens_main_overrides_thor, liens_main_overrid
 		self.liens.liens_released_suits.earliest_filing_date := ut.Min2(le.liens.liens_released_suits.earliest_filing_date,ri.liens.liens_released_suits.earliest_filing_date);
 		self.liens.liens_released_suits.most_recent_filing_date := MAX(le.liens.liens_released_suits.most_recent_filing_date,ri.liens.liens_released_suits.most_recent_filing_date);
 		self.liens.liens_released_suits.total_amount := le.liens.liens_released_suits.total_amount + IF(sameLien and le.liens.liens_released_suits.total_amount>0,0,ri.liens.liens_released_suits.total_amount);
+
+		self.liens.liens_unrel_total_amount84 := le.liens.liens_unrel_total_amount84 + IF(sameLien and le.liens.liens_unrel_total_amount84>0,0,ri.liens.liens_unrel_total_amount84);
+		self.liens.liens_rel_total_amount84 	:= le.liens.liens_rel_total_amount84 + IF(sameLien and le.liens.liens_rel_total_amount84>0,0,ri.liens.liens_rel_total_amount84);
+		self.liens.liens_unrel_total_amount   := le.liens.liens_unrel_total_amount + IF(sameLien and le.liens.liens_unrel_total_amount>0,0,ri.liens.liens_unrel_total_amount);
+		self.liens.liens_rel_total_amount   	:= le.liens.liens_rel_total_amount + IF(sameLien and le.liens.liens_rel_total_amount>0,0,ri.liens.liens_rel_total_amount);
 		
 		SELF := ri;
 	END;
@@ -549,5 +587,15 @@ liens_main_overrides := if(onThor, liens_main_overrides_thor, liens_main_overrid
 	// output(liens_rolled, named('liens_rolled'));
 	// output(liensWBankruptcy, named('liensWBankruptcy'));
 	// output(w_bankruptcy, named('w_bankruptcy'));
+	// output(liens_added, named('liens_added'));
+	// output(liens_party_raw, named('liens_party_raw'));
+	// output(unique_ffids, named('unique_ffids'));
+	// output(liens_party_overrides, named('liens_party_overrides'));
+	// output(liens_main_raw, named('liens_main_raw'));
+	// output(liens_main_overrides, named('liens_main_overrides'));
+	// output(liens_full, named('liens_full'));
+	// output(liensWBankruptcy, named('liensWBankruptcy'));
+	// output(liens_rolled_original, named('liens_rolled_original'));
+	// output(liens_rolled, named('liens_rolled'));
 	 RETURN GROUP(liens_rolled, Seq);
  END;

@@ -1,4 +1,4 @@
-export Layout_Email := module
+﻿export Layout_Email := module
 layout_clean_name := RECORD
    string5 title;
    string20 fname;
@@ -183,7 +183,13 @@ end;
 	base;
 	unsigned scrubsbits1 := 0;
 end;
- 
+
+//Base layout with temp Validation fields
+export temp_Validate	:= RECORD
+		base;
+		Boolean SkipRec;
+		Boolean IsDeath;
+	END;
  
 export keys := record
 		Base /*and not [		Append_RawAID, 

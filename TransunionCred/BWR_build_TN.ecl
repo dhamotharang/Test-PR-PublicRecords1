@@ -1,4 +1,4 @@
-export BWR_build_TN (version) := MACRO
+﻿export BWR_build_TN (version) := MACRO
 
 #IF (TransunionCred.IsFullUpdate = false)
 #workunit('protect',true);
@@ -7,8 +7,8 @@ export BWR_build_TN (version) := MACRO
 #workunit('name','TransunionCred load ' + version);
 #END
 #workunit('priority','high');
-#option('AllowedClusters','thor400_44,thor400_60');
-#option('AllowAutoQueueSwitch',TRUE);
+#option('AllowedClusters','thor400_44_eclcc');
+//#option('AllowAutoQueueSwitch',TRUE);
 //#option ('activitiesPerCpp', 50);
 #option('multiplePersistInstances',FALSE);
 

@@ -1,4 +1,4 @@
-
+﻿
 import ut, riskwise, doxie, LN_PropertyV2, paw, Inquiry_AccLogs, liensv2, doxie_files, 
 BankruptcyV2, BankruptcyV3, american_student_list, AlloyMedia_student_list, prof_licenseV2, Impulse_Email, thrive, mdr;
 
@@ -133,7 +133,7 @@ with_alloy := join(with_professional_license, AlloyMedia_student_list.Key_DID,
 with_american_student := join(with_alloy, american_student_list.key_DID, 
 			left.hh_college_attendees<>1
 			and keyed(left.did=right.l_did)
-			and (right.file_type in ['H','C'] or
+			and (right.file_type in ['H','C','O'] or
 				(right.file_type='M' and (right.college_code<>'' or right.college_name<>'' or right.college_type<>'') ) )
 			and right.date_vendor_first_reported < risk_indicators.iid_constants.myGetDate(left.historydate),
 			transform(layout_hhid_temp, 

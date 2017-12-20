@@ -1,4 +1,4 @@
-import Hygenics_images;
+﻿import Hygenics_images;
 
 ////////////////////////////////////////////////////////////////////////////////
 //move image files. Do this after running the bat
@@ -25,7 +25,9 @@ import Hygenics_images;
 			Hygenics_images.move_crim_image_files('sc_doc', filedate),
 		  Hygenics_images.move_crim_image_files('ut_doc', filedate),
 			Hygenics_images.move_crim_image_files('wv_doc', filedate),
-			Hygenics_images.move_crim_image_files('wv_doc_alt', filedate));			
+			Hygenics_images.move_crim_image_files('wv_doc_alt', filedate),
+			Hygenics_images.move_crim_image_files('ga_par_rel', filedate)
+			);			
 			
 			
 			filedate_a := filedate + 'a';
@@ -135,3 +137,8 @@ import Hygenics_images;
 			Hygenics_images.move_crim_image_files('ut_utah_arr', filedate)
 			
 			);
+
+
+   /*******************************AOC***************************************/
+	 sequential(Hygenics_images.move_crim_image_files('ut_whitecollar_or', filedate);
+	 )

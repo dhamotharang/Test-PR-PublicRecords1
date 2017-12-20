@@ -8,6 +8,10 @@ ds_Alpha_Base	:= PRTE2_Watercraft.Files.Alpha_Base(watercraft_key <> '');
 
 //Spreadsheet updated by Data Insight
 ds_Boca_in := PRTE2_Watercraft.Files.Boca_in(watercraft_key <> '');
+
+//Clean invalid characters from input fields
+PRTE2.CleanFields(ds_Alpha_Base, dsCleanAlphaOut);
+PRTE2.CleanFields(ds_Boca_in, dsCleanBocaOut);
 									
 //Boca Base file
 PRTE2_Watercraft.Layouts.Base_new xfrmBoca(PRTE2_Watercraft.Layouts.Base_Boca L) := TRANSFORM
@@ -117,7 +121,7 @@ PRTE2_Watercraft.Layouts.Base_new xfrmBoca(PRTE2_Watercraft.Layouts.Base_Boca L)
 	self := [];
 END;
 
-pBoca	:= PROJECT(ds_Boca_in, xfrmBoca(left));
+pBoca	:= PROJECT(dsCleanBocaOut, xfrmBoca(left));
 
 fPrevRecs	:= pBoca(trim(cust_name) = ''); //previous production records
 fNewRecs	:= pBoca(trim(cust_name) != ''); //New added records
@@ -209,7 +213,7 @@ pBocaBase	:= PROJECT(ClnBocaBase, AddLinkID(LEFT)) + fPrevRecs;
 RoxieKeyBuild.Mac_SF_BuildProcess_V2(pBocaBase, PRTE2_Watercraft.Constants.BASE_PREFIX, 'boca', fileVersion, build_base, 3);	
 
 //Add persistent_id to Alpharetta file for dedup purposes against Boca file as records overlap
-pAlphaBase := PROJECT(ds_Alpha_Base, TRANSFORM(PRTE2_Watercraft.Layouts.Base_New,SELF.persistent_record_id := hash64(trim(left.watercraft_key,left,right)+','+
+pAlphaBase := PROJECT(dsCleanAlphaOut, TRANSFORM(PRTE2_Watercraft.Layouts.Base_New,SELF.persistent_record_id := hash64(trim(left.watercraft_key,left,right)+','+
 																		trim(left.watercraft_id,left,right)+','+
 																		trim(left.state_origin,left,right)+','+
 																		trim(left.source_code,left,right)+','+

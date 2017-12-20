@@ -307,7 +307,8 @@
                       '9L',// FLORIDA_ST_LUCIE_COUNTY_CIRCUIT_COURT       
                       '9N',// OHIO_DARKE_COUNTY_MUNICIPAL_COURT   
 											'9W',// TX_KAUFMAN_CTY      
-
+           '10B',//TEXAS_AUSTIN_COUNTY_MUNICIPAL_COURT
+           '10C', //TEXAS_DALLAS_JUSTICE_OF_THE_PEACE_TRAFFIC
 											//'98'  //TX_Waller_Cty_CrmCrt
 											
 										  // CRIMWISE Sources 

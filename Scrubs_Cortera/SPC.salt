@@ -13,7 +13,7 @@ FIELDTYPE:alpha:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):SPACES( <>{}[]-^=!+
 FIELDTYPE:name:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./\ ',&()123:"-):LENGTHS(0,1..)
 FIELDTYPE:bizname:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./@"_&,#():!*+?;$% /\'-):LENGTHS(0,1..)
 FIELDTYPE:feintype:ALLOW(0123456789):LENGTHS(0,9)
-FIELDTYPE:Invalid_Date:Custom(Scrubs.fn_valid_date>0)
+FIELDTYPE:Invalid_Date:Custom(Scrubs.fn_valid_date>0,'future')
 FIELDTYPE:OwnershipTypes:enum(P|V| )
 FIELDTYPE:StatusTypes:enum(A|D| )
 FIELDTYPE:YesNo:enum(Y|N| )

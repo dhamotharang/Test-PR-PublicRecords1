@@ -3,10 +3,10 @@ import _control,ut,Orbit3;
 
 #workunit ('priority','high');
 #workunit	('priority',11);
-//#option 	('activitiesPerCpp', 50);
+#option 	('activitiesPerCpp', 50);
 // do not use thor400_44 until BEGINC++ fixed
 //#option 	('AllowClusters','thor400_20,thor400_44,thor400_60');
-//#option 	('AllowClusters','thor400_20,thor400_60');
+#option 	('AllowClusters','thor400_20,thor400_60');
 #option 	('AllowAutoQueueSwitch','1');
 #option 	('multiplePersistInstances',FALSE);
 
@@ -14,7 +14,7 @@ export	proc_fedex_build_all(string	version_date) := function
 	spray_file			:=	fedex.Spray_Prep_Fedex(version_date);
 	build_base_keys	:=	fedex.proc_fedex_build_base(version_date);
 	//build_keys	:=	fedex.proc_fedex_build_keys2(version_date);
-	//sample_recs	:=	fedex.fedex_qa_samples(version_date);
+	sample_recs	:=	fedex.fedex_qa_samples(version_date);
 	filedate 				:= version_date[1..8];
 	STRATA 					:= fedex.FedEx_Stats(version_date); 
 	send_email			:= if (	fileservices.remotedirectory(_control.IPAddress.bctlpedata10, '/data/hds_4/FedEx/logs', 'parseError.log')[1].size > 0,

@@ -1,4 +1,4 @@
-// This service created to add Web Service fields for FCRA.Comprehensive_Report_Service
+﻿// This service created to add Web Service fields for FCRA.Comprehensive_Report_Service
 
 EXPORT MAC_FCRA_Comprehensive_Report_Service() := MACRO
 
@@ -53,6 +53,7 @@ EXPORT MAC_FCRA_Comprehensive_Report_Service() := MACRO
 										'MaxHriPer',
 										'IncludeForeclosures',
 										'IncludeBlankDOD',
+                    'IncludeEquifaxAcctDecisioning',
 										/*---- Others ----*/
 										'NonSubjectSuppression',
 										'ApplyNonsubjectRestrictions',

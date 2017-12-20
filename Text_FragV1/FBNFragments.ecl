@@ -1,11 +1,11 @@
-IMPORT Text_Search, Codes, Header, MDR, FBNV2;
+﻿IMPORT Text_Search, Codes, Header, MDR, FBNV2;
 // Should inherit IFragmentSource, but needs fix for 51580
 EXPORT FBNFragments(Types.StateList st_list=ALL) := MODULE
 	SHARED Persist_Stem 		:= '~THOR_DATA400::PERSIST::FRAGS_';
 	SHARED Persist_FBN_Bus	:= Persist_Stem + 'FBN_Bus';
 	SHARED Persist_FBN_Cont	:= Persist_Stem + 'FBN_Cont';
 
-	SHARED FBN_Base := FBNV2.File_FBN_Business_Base_AID(tmsid <> '',tmsid not in FBNV2.Suppress_TMSID);
+	SHARED FBN_Base := FBNV2.File_FBN_Business_Base_AID(tmsid <> '',tmsid not in FBNV2.Suppress_TMSID());
 	SHARED FBN_Cont := FBNV2.File_FBN_Contact_Base(tmsid <> '');
 	
 	SHARED UNSIGNED8 Key2Doc(STRING key) := (HASH64(key)) << 8;

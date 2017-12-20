@@ -1,8 +1,9 @@
-import doxie_files, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD;
+﻿import doxie_files, FCRA, ut, liensv2, riskwise, Risk_Indicators, STD, PersonContext;
  
 export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0, 
 		GROUPED DATASET(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus) w_corrections,
-		boolean IncludeLnJ = false, boolean onThor = false) := function
+		boolean IncludeLnJ = false, boolean onThor = false, 
+		GROUPED DATASET (risk_indicators.Layout_output) iid_withPersonContext) := function
  
 	todaysdate := (string) risk_indicators.iid_constants.todaydate;
 	// if the bsOption is turned on to remove liens, use the w_bankruptcy data prior to the liens joins
@@ -37,7 +38,7 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 											
 	liens_added := if(onThor, group(sort(distribute(liens_added_thor, hash64(seq)), seq, LOCAL), seq, LOCAL), liens_added_roxie);			
 											
-											
+										
 	MAC_liensParty_transform(trans_name, key_liens_party) := MACRO	
 
 	Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working trans_name(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_LnJ le, key_liens_party ri) := TRANSFORM
@@ -50,12 +51,12 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		//orig_name is not parsed/cleaned...so need to use the cleaned name fields
 		self.orig_name := Risk_Indicators.iid_constants.CreateFullName(ri.title, ri.fname, ri.mname, ri.lname, ri.name_suffix);
 		SELF.VendorDateLastSeen := ri.date_vendor_last_reported;
+		self.PersistId := (string) ri.persistent_record_id;
 		SELF := le;
 		SELF := [];
 	END;
 
 	endmacro;
-
 	MAC_liensParty_transform(get_liensparty_raw, liensv2.key_liens_party_id_FCRA);
 	MAC_liensParty_transform(get_liensparty_corrections, fcra.key_Override_liensv2_party_ffid);
 
@@ -332,9 +333,8 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.lnj_jgmt_total := if((isSuits or isSuitsReleased or isEviction or ~is_Jgmt), 0, (real)ri.amount);
 		SELF.lnj_jgmt_cnt := if((isSuits or isSuitsReleased or isEviction or ~is_Jgmt), 0, 1);							
 		//End Juli additions
-		
+		self.PersistId := (string) ri.persistent_record_id;
 		SELF := le;
-		//self := [];
 	end;
 	endmacro;
 
@@ -535,8 +535,26 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 			self := left),LEFT OUTER);
 			
 	liens_fullunSorted := ungroup(liens_fuller + liens_main_overrides);
-
-	liens_full := group(liens_fullunSorted, did);
+	//project the childset out to dataset on it's own to work with easier
+	PcontextStId := project(iid_withPersonContext.ConsumerStatements, 
+		transform(Risk_Indicators.Layouts.tmp_Consumer_Statements,
+			self := left));
+	//if any statementIds match between our data and person context, populate the statementId and carry it back
+	//in the LNJ datasets. The datasets are limited to 99 records.
+	LiensFullWithStId := join(liens_fullunSorted, PcontextStId,
+		(unsigned) left.Did = (unsigned) Right.UniqueId and
+		Right.DataGroup in [PersonContext.constants.datagroups.LIEN_MAIN, 
+								PersonContext.constants.datagroups.LIEN_PARTY] and
+		Right.StatementType in [PersonContext.constants.RecordTypes.CS, PersonContext.constants.RecordTypes.RS] and
+		Right.RecIdForStId != '' and 
+		trim(left.PersistId, left, right) = trim(Right.RecIdForStId, left, right),
+		transform(Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus_working,
+			self.did := left.did;
+			self.ConsumerStatementId := (unsigned) Right.statementid;
+			self := left), 
+			left outer);
+			
+	liens_full := group(LiensFullWithStId, did);
 	
 	liens_filtered_a := if(FilterCityLiens, liens_full(FileTypeDesc NOT IN Risk_Indicators.iid_constants.CityLienFltrs), liens_full);
 	liens_filtered_b := if(FilterCountyLiens, liens_filtered_a(FileTypeDesc NOT IN Risk_Indicators.iid_constants.CountyLienFltrs), liens_filtered_a);
@@ -738,7 +756,6 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 		SELF.Plaintiff := le.Plaintiff;
 		SELF.Eviction := le.Eviction;
 		SELF.FilingDescription := le.FilingDescription;
-		// SELF.date_last_seen := le.VendorDateLastSeen;
 		SELF.datefiled := le.datefiled;
 		SELF.ReleaseDate := le.ReleaseDate;
 		SELF := ri;
@@ -895,6 +912,13 @@ export Boca_Shell_Liens_LnJ_FCRA (integer bsVersion, unsigned8 BSOptions=0,
 // output(liensWplainTiff_duped, named('liensWplainTiff_duped'));
 // output(liens_party_rawTMp, named('liens_party_rawTMp'));
 // output(liens_added, named('liens_added'));
+// output(LiensFullWithStId, named('LiensFullWithStId'));
+// output(iid_withPersonContext, named('iid_withPersonContext'));
+// output(PcontextStId, named('PcontextStId'));
+// output(w_LiensNJudgments_All, named('w_LiensNJudgments_All'));
+// output(liens_party_overrides,named('liens_party_overrides'));
+// output(liens_main_overrides, named('liens_main_overrides'));
+// output(w_LiensNJudgmentsFinal, named('w_LiensNJudgmentsFinal'));
 
 	return SORT(GROUP(w_LiensNJudgmentsFinal, seq), seq);	
 
