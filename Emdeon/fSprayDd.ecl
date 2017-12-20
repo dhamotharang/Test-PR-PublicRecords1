@@ -1,4 +1,4 @@
-IMPORT lib_fileservices,_control,lib_stringlib,Versioncontrol,emdeon, ut, tools;
+﻿IMPORT lib_fileservices,_control,lib_stringlib,Versioncontrol,emdeon, ut, tools;
 
 EXPORT fSprayDd(
 
@@ -7,7 +7,7 @@ EXPORT fSprayDd(
 	//STRING		pServerIP							= _control.IPAddress.bctlpedata12,
 	STRING		pServerIP							= 'bctlpedata12.risk.regn.net',
 	STRING		pRawfile							= '*.dat',
-	STRING		pDirectory						= '/data/hds_3/uniqueid/enclarity/emdeon/',
+	STRING		pDirectory						= '/data/run_enclarity/emdeon/input/',
 	STRING		pGroupName						= IF((tools._Constants.IsDataland),'thor40_241','thor400_44'),
 	BOOLEAN		pIsTesting						= FALSE,
 	BOOLEAN		pOverwrite						= TRUE,
