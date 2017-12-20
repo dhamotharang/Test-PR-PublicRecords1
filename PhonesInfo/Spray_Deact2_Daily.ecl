@@ -21,7 +21,7 @@ EXPORT Spray_Deact2_Daily(string version, const varstring eclsourceip, string th
 																																						true);
 																																						
 	addSuper 		:= sequential(FileServices.StartSuperFileTransaction(),
-																										//Fileservices.ClearSuperfile('~thor_data400::in::phones::deact2_daily'),
+																										Fileservices.ClearSuperfile('~thor_data400::in::phones::deact2_daily'),
 																										Fileservices.AddSuperfile('~thor_data400::in::phones::deact2_daily', sfDaily + '_' + version),
 																										FileServices.FinishSuperFileTransaction());
 
