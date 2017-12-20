@@ -19,7 +19,7 @@ export Prefix(string serviceName) := function
 																					, ''),	
 								'person_xADL2'     	=> '',
 								'LAB_xLink' 				=> map(ThorLib.Group() = 'thor400_44' => '~thor400_44::'
-                                          ,ThorLib.Group() = 'thor400_60' => '~thor400_60::'
+                                          ,ThorLib.Group() = 'thor400_66' => '~thor400_66::'
 																					,_Control.ThisEnvironment.ThisDaliIp in SetDali  => foreign_prod+'thor400_60::'
 																					, ''),	
 								'Vina'							=> map(_Control.ThisEnvironment.ThisDaliIp in SetDali  => foreign_prod
