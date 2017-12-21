@@ -13,7 +13,7 @@ SetDali := [
 						,_Control.IPAddress.FCRALogTHOR_dali
 						];
 
-export Prefix(string serviceName) := function
+export Prefix(string serviceName='NoNameGiven') := function
 	return	trim(case (trim(servicename),
 	              'person_slimsorts' 	=> map(ThorLib.Group() = 'thor400_44' => '~thor400_44::'
 																					, ''),	
