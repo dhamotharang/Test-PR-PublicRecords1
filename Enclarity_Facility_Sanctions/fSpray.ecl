@@ -5,7 +5,7 @@ EXPORT fSpray(
 	BOOLEAN   pUseProd              				= false,
 	STRING		pServerIP											= '10.121.149.194',
 	STRING		pFacilitySanctionsFileName		= '*facility_sanctions_' + pVersion[..8] + '.txt',
-	STRING		pDirectory										= '/data/hds_3/uniqueid/enclarity/facility_sanctions/'+ pVersion[..8],
+	STRING		pDirectory										= '/data/run_enclarity/facility_sanctions/input/'+ pVersion[..8],
 	STRING		pGroupName										= IF((tools._Constants.IsDataland),'thor400_dev01','thor400_44'),
 	BOOLEAN		pIsTesting										= false,
 	BOOLEAN		pOverwrite										= true,
