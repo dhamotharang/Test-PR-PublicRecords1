@@ -1,4 +1,4 @@
-﻿import header,ut,PersonLinkingADL2V3,header_slimsort,Roxiekeybuild,Text_FragV1,Doxie,data_services,misc,_control,Std,PromoteSupers;
+﻿import header,ut,PersonLinkingADL2V3,header_slimsort,Roxiekeybuild,Text_FragV1,Doxie,data_services,misc,_control,Std,PromoteSupers,InsuranceHeader_xLink;
 
 export proc_postHeaderBuilds := module
 
@@ -20,6 +20,32 @@ export proc_postHeaderBuilds := module
 
 		SHARED fn:=nothor(fileservices.SuperFileContents(Filename_Header,1)[1].name);
 		SHARED sub:=stringlib.stringfind(fn,((STRING8)Std.Date.Today())[1..2],1);
+    EXPORT getVname (string superfile, string v_end = ':') := FUNCTION
+
+        FileName:=fileservices.GetSuperFileSubName(superfile,1);
+        v_strt  := stringlib.stringfind(FileName,'20',1);
+        v_endd	:= stringlib.stringfind(FileName[v_strt..],v_end,1);
+        v_name  := FileName[v_strt..v_strt+if(v_endd<1,length(FileName),v_endd)-2];
+
+        RETURN v_name;
+
+    END;
+    
+    SHARED checkLinkingVersion(string build_version):= if (
+    
+           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_ADDRESS().KeyName)<>build_version OR
+           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_DLN().KeyName)<>build_version OR
+           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_DOB().KeyName)<>build_version OR
+           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_LFZ().KeyName)<>build_version OR
+           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_NAME().KeyName)<>build_version OR
+           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_PH().KeyName)<>build_version OR
+           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_RELATIVE().KeyName)<>build_version OR
+           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_SSN().KeyName)<>build_version OR
+           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_SSN4().KeyName)<>build_version OR
+           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_ZIP_PR().KeyName)<>build_version OR
+           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_PH().KeyName)<>build_version
+       
+        ,fail('Header linking keys does not match version'));
 
 		// ******************************************************************************************** //
 
@@ -46,7 +72,8 @@ export proc_postHeaderBuilds := module
 		export XADLkeys := sequential(
                                          header.LogBuild('Started :'+step)
                                         ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
-                                        // ,nothor(Header.Proc_Copy_From_Alpha.Copy)
+                                        ,checkLinkingVersion(header.version_build)
+                                        ,nothor(Header.Proc_Copy_From_Alpha.Copy)
                                         ,bld_Transunion_LN
                                         ,bld_Transunion_Ptrak
                                         ,notify('Build_Relatives','*')
@@ -88,6 +115,7 @@ export proc_postHeaderBuilds := module
 		export relatives := sequential(
                                             header.LogBuild('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..],fail('Header base does not match version'))
+                                            ,checkLinkingVersion(header.version_build)
                                             ,bld_relatives
                                             ,parallel(make_hhid	,make_fcra_hhid)
                                             ,notify('Build_Header_Keys','*')
@@ -122,6 +150,7 @@ export proc_postHeaderBuilds := module
 		export headerKeys := sequential(
                                             header.LogBuild('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
+                                            ,checkLinkingVersion(header.version_build)
                                             ,Doxie.Proc_Doxie_Keys_All()
                                             // ,output(verify_keys('PersonHeaderKeys'),named('PersonHeaderKeys'))
                                             // ,output(verify_keys('RelativeKeys'),named('RelativeKeys'))
@@ -150,6 +179,7 @@ export proc_postHeaderBuilds := module
                                             header.LogBuild('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
                                             ,if(exists(wl),fail('QUICK HEADER is running'))
+                                            ,checkLinkingVersion(header.version_build)
                                             ,nothor(Header.move_header_raw_to_prod())
                                             ,Header.Proc_Copy_From_Alpha.MoveToQA
                                             // ,output(Verify_XADL1_base_files,named('XADLfiles'),all)
@@ -177,6 +207,7 @@ export proc_postHeaderBuilds := module
 		export FCRAheader := sequential(
                                         header.LogBuild('Started :'+step)
                                         ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
+                                        ,checkLinkingVersion(header.version_build)
                                         ,Doxie.Proc_FCRA_Doxie_keys_All()
                                         // ,output(verify_keys('FCRA_PersonHeaderKeys',true),named('FCRA_PersonHeaderKeys'))
                                         ,notify('Build_Header_boolean','*')
