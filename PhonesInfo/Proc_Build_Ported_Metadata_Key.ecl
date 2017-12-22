@@ -72,7 +72,7 @@ EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 	PhonesInfo.Out_STRATA_Population_Stats(PhonesInfo.File_TCPA.Main_Current,
 																				 PhonesInfo.File_iConectiv.Main_Current,
 																				 PhonesInfo.File_LIDB.Response_Processed,
-																				 PhonesInfo.File_Deact.Main_Current,
+																				 PhonesInfo.File_Deact.Main_Current2,
 																				 PhonesInfo.File_Metadata.PortedMetadata_Main,
 																				 PhonesInfo.File_Source_Reference.Main,
 																				 version,
@@ -111,7 +111,7 @@ EXPORT Proc_Build_Ported_Metadata_Key(string version):= function
 																Sample_PhonesMetadata, 
 																ScrubsRuns,
 															BuildLogger.PostEnd(False),
-														BuildLogger.BuildEnd(false) /*orbitUpdate*/):
+														BuildLogger.BuildEnd(false)):
 														Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'PhonesInfo Ported & Metadata Key Build Succeeded', workunit + ': Build complete.')),
 														Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'PhonesInfo Ported & Metadata Key Build Failed', workunit + '\n' + FAILMESSAGE)
 														);
