@@ -1,7 +1,7 @@
 EXPORT Out_STRATA_Population_Stats (pTCPAPort    			// TCPA Daily Port File
 																			,piConectPort   // iConectiv Daily Port File
 																			,pLIDB					// LIDB File
-																			,pDisconnect		// Disconnect Daily File
+																			,pDisc		// Disconnect Daily File
 																			,pPhonesMeta 		// PhonesMetadata File	
 																			,pCarrRef				// Carrier Reference File
 																			,pVersion       // Version of Strat Stats
@@ -103,6 +103,13 @@ import Strata, PhonesInfo, ut;
 	strata.createXMLStats(%dPopulationStats_pLIDB%,'PhonesMetadata', 'LIDBPhones', pVersion, '', %zRunLIDBStats%);
 	
 	//Disconnect File Population Stats
+		pDisc fTr(pDisc l):= transform
+			self.carrier_name := if(trim(l.carrier_name, left, right)='', 'BLANK', PhonesInfo._Functions.fn_carrierName(l.carrier_name));
+			self := l; 
+		end;
+		
+		pDisconnect := project(pDisc, fTr(left));
+		
 		%rPopulationStats_piDisconnect% := record												
 			countGroup                           		:= count(group);
 			pDisconnect.carrier_name;
@@ -127,7 +134,7 @@ import Strata, PhonesInfo, ut;
 		end;
 
 	%dPopulationStats_piDisconnect% := table(pDisconnect, %rPopulationStats_piDisconnect%, carrier_name, few);
-	strata.createXMLStats(%dPopulationStats_piDisconnect%,'PhonesMetadata', 'DisconnectPhones', pVersion, '', %zRunDisconnectStats%);	
+	strata.createXMLStats(%dPopulationStats_piDisconnect%,'PhonesMetadata', 'Disconnect2Phones', pVersion, '', %zRunDisconnectStats%);	
 	
 	//PhonesMetadata File Population Stats
 		%rPopulationStats_pPhonesMeta% := record
