@@ -2,7 +2,7 @@ import std, _control;
 
 EXPORT Spray_Deact2_Daily(string version, const varstring eclsourceip, string thorname):= FUNCTION
 
-	srcdir 	:= '/data/data_999/phones/mobile_id_deact2/';
+	srcdir 	:= '/data/data_999/phones/mobile_id_deact2/build/';
 	sfDaily := '~thor_data400::in::phones::deact2_daily';
 	
 	sprayFile 	:= std.File.SprayVariable(eclsourceip,
