@@ -99,6 +99,7 @@ sequential(
 					,%updatedops%
 				  ,getretval
 					,do_STRATA
+					,Scrubs_SANCTNKeys.fn_RunScrubs(filedate,'Harry.Gist@lexisnexis.com,Terri.Hardy-George@lexisnexis.com')
 		   );
 
 endmacro;
