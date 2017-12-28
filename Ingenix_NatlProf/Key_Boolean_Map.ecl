@@ -1,4 +1,4 @@
-Import Data_Services, Ingenix_NatlProf,text_search;
+﻿Import Data_Services, Ingenix_NatlProf,text_search;
 	
 	// Flat record format - from convert function
 	Text_Ingenix_flat := record(Text_Search.Layout_Docseg)
@@ -23,7 +23,7 @@ Import Data_Services, Ingenix_NatlProf,text_search;
 								 self.doc := left.DocRef.doc;
 								 self := left));
 
-	dist_map := distribute(proj_map,hash(doc));
+	dist_map := distribute(proj_map,hash(src,doc,sanc_id));
 	sort_map := sort(dist_map,src,doc,local);
 	tmsid_map := dedup(sort_map,src,doc,local);
 // check if the persist file exists, if it does do the boolean build, if not read the key.

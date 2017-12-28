@@ -1,10 +1,10 @@
-import ingenix_natlprof;
+﻿import ingenix_natlprof;
 import text_search;
 export Convert_ingenix_Func := function
 
 ds := ingenix_natlprof.Basefile_Sanctions;
 		
-dist_ds := distribute(ds,hash(sanc_id));
+dist_ds := dedup(distribute(ds,hash(sanc_id)),record, all, local);
 
 Layout_ingenix_record := record(text_search.Layout_Document)
 	typeof(ds.sanc_id) sanc_id;
@@ -53,7 +53,11 @@ end;
 
 norm_out := normalize(proj_out,left.segs,norm_ingenix(left,right));
 
-sort_out := sort(norm_out,sanc_id,local);
+// dist_out	:= dedup(norm_out, record, all);
+dist_out	:= dedup(distribute(norm_out, hash(sanc_id, docref)), record, all, local);
+
+// sort_out := sort(norm_out,sanc_id,local);
+sort_out := sort(distribute(dist_out, hash(sanc_id, docref)), sanc_id, docref, local);
 
 layout_ingenix_flat iterate_ingenix(layout_ingenix_flat l,layout_ingenix_flat r) := transform
 		self.docref.doc := if(l.sanc_id = r.sanc_id,l.docref.doc,
@@ -81,6 +85,10 @@ layout_ingenix_flat iterate_ingenix(layout_ingenix_flat l,layout_ingenix_flat r)
 
 	full_ret := itr_out(trim(content) <> '' and trim(content) <> ';') + segkeys;
 	
-	return full_ret;
+	dedup_ret	:= dedup(distribute(full_ret, hash(sanc_id, docref.doc, docref.src)),	record, all, local);
+	// dedup_ret	:= dedup(full_ret, record, all);
+	
+	// return full_ret;
+	return dedup_ret;
 			
 end;
