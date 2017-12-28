@@ -1126,6 +1126,7 @@
 				trim(kword, left, right) = 'PKPPMWT' =>SubGroup_Constants.numKeywordsID.KEYWORD_PKPPMWT,
 				trim(kword, left, right) = 'BRPRORJ' =>SubGroup_Constants.numKeywordsID.KEYWORD_BRPRORJ,
 				trim(kword, left, right) = 'USFHFA' =>SubGroup_Constants.numKeywordsID.KEYWORD_USFHFA,
+				trim(kword, left, right) = 'OFAC-GLOMAG' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_GLOMAG,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);
