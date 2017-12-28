@@ -1,4 +1,4 @@
-﻿import SANCTN,RoxieKeyBuild,PromoteSupers;
+﻿import SANCTN,RoxieKeyBuild,PromoteSupers,Scrubs_SANCTNKeys;
 
 export MAC_SANCTN_Build(filedate,skipTest=false) := MACRO
 #workunit('name','SANCTN Build ' + filedate);
