@@ -22,7 +22,7 @@ RoxieKeyBuild.Mac_Daily_Email_Local('SuppressionKeys','SUCC',filedate,%send_succ
 RoxieKeyBuild.Mac_Daily_Email_Local('SuppressionKeys','FAIL',filedate,%send_fail_msg%,Suppress.Spray_Notification_Email_Address);
 
 
-sequential(spray_actions,Suppress.Proc_Buld_New_Suppression_All(filedate)) : success(%send_succ_msg%), failure(%send_fail_msg%);
+sequential(spray_actions,Suppress.Proc_Buld_New_Suppression_All(filedate),Scrubs_Suppress.fn_RunScrubs(filedate[1..8],'')) : success(%send_succ_msg%), failure(%send_fail_msg%);
 
 
 endmacro;
