@@ -7,6 +7,7 @@ slim_base	:= record
 	base_file.sanc_id;
 end;
 
+// projected to slimmed layout and then dedup to reduce duplicates in the resulting key
 dedup_base	:= DEDUP(project(base_file, slim_base), RECORD, ALL);
 
 export key_sanctions_busname := index(dedup_base,

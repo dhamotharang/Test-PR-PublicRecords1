@@ -53,9 +53,8 @@ end;
 
 norm_out := normalize(proj_out,left.segs,norm_ingenix(left,right));
 
-// dist_out	:= dedup(norm_out, record, all);
 dist_out	:= dedup(distribute(norm_out, hash(sanc_id, docref)), record, all, local);
-
+//redistribute (is it necessary? not sure) deduped normalized file
 // sort_out := sort(norm_out,sanc_id,local);
 sort_out := sort(distribute(dist_out, hash(sanc_id, docref)), sanc_id, docref, local);
 

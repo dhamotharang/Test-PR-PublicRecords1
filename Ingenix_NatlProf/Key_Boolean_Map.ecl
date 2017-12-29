@@ -22,7 +22,7 @@
 	proj_map := project(ret,transform(string_rec,self.src := left.DocRef.src;
 								 self.doc := left.DocRef.doc;
 								 self := left));
-
+//distribute, sort, dedup - elimiate duplicates in some keys
 	dist_map := distribute(proj_map,hash(src,doc,sanc_id));
 	sort_map := sort(dist_map,src,doc,local);
 	tmsid_map := dedup(sort_map,src,doc,local);
