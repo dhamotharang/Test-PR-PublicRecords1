@@ -1,0 +1,16 @@
+﻿OPTIONS:-gh
+MODULE:Scrubs_Risk_Indicators
+FILENAME:Risk_Indicators
+NAMESCOPE:KeyGrowth
+
+FIELDTYPE:Invalid_Growth:CUSTOM(fn_Invalid_Growth>0)
+
+FIELD:dataset_name:TYPE(STRING):0,0
+FIELD:file_type:TYPE(STRING):0,0
+FIELD:version:TYPE(STRING):0,0
+FIELD:wu:TYPE(STRING):0,0
+FIELD:count_oldfile:TYPE(UNSIGNED8):0,0
+FIELD:count_newfile:TYPE(UNSIGNED8):0,0
+FIELD:count_deduped_combined:TYPE(UNSIGNED8):0,0
+FIELD:percent_change:LIKE(Invalid_Growth):TYPE(DECIMAL3):0,0
+
