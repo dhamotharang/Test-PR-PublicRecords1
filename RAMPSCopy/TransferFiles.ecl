@@ -1,4 +1,4 @@
-import did_add, dops, lib_fileservices, STD, lib_stringlib;
+﻿import did_add, dops, lib_fileservices, STD, lib_stringlib;
 EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
 
 	export RoxiePackage(string esp, string port, string target, boolean iscopy = false) := function
@@ -27,24 +27,23 @@ EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
 																,xFilesReadyForLive(left,right)
 																),superfile, subfile), superfile, subfile);
 
-		rtFilesToMove := record
+		/*rtFilesToMove := record
 			dFilesReadyForLive.superfile;
 			integer scnt := count(group);
 		end;
 
-		dtFilesToMove := table(dFilesReadyForLive,rtFilesToMove,superfile, few);
+		dtFilesToMove := table(dFilesReadyForLive,rtFilesToMove,superfile, few);*/
 
-		rdFilesToMove pGroupSubFiles(dFilesReadyForLive l, dtFilesToMove r) := transform
+		rdFilesToMove pGroupSubFiles(dFilesReadyForLive l, dFilesReadyForLive r) := transform
 			
-			self.cnt := r.scnt;
-			self := l;
+			self.cnt := if(l.superfile = r.superfile, l.cnt + 1, 1);
+			self := r;
 			
 		end;
 		
-		dGroupSubFiles := join(dFilesReadyForLive
-															,dtFilesToMove
-															,left.superfile = right.superfile
+		dGroupSubFiles := iterate(dFilesReadyForLive
 															,pGroupSubFiles(left,right));
+		
 		
 		return dGroupSubFiles;
 		
@@ -223,14 +222,19 @@ EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
 												
 																				
 																						sequential(
-																								if (fileservices.findsuperfilesubname('~'+superfile+'_delete', '~'+subfile) > 0
-																									,fileservices.removesuperfile('~'+superfile+'_delete','~'+subfile)),
-																								fileservices.addsuperfile('~'+superfile+'_delete','~'+superfile+'_father',,true),
-																								fileservices.clearsuperfile('~'+superfile+'_father'),
-																								fileservices.addsuperfile('~'+superfile+'_father','~'+superfile,,true),
-																								fileservices.clearsuperfile('~'+superfile),
-																								fileservices.removesuperfile('~'+superfile+'_delete','~'+subfile),
-																								fileservices.removesuperfile('~'+superfile+'_father','~'+subfile),
+																								if (cnt  = 1
+																									,sequential
+																										(
+																											if (fileservices.findsuperfilesubname('~'+superfile+'_delete', '~'+subfile) > 0
+																											,fileservices.removesuperfile('~'+superfile+'_delete','~'+subfile)),
+																											fileservices.addsuperfile('~'+superfile+'_delete','~'+superfile+'_father',,true),
+																											fileservices.clearsuperfile('~'+superfile+'_father'),
+																											fileservices.addsuperfile('~'+superfile+'_father','~'+superfile,,true),
+																											fileservices.clearsuperfile('~'+superfile),
+																											fileservices.removesuperfile('~'+superfile+'_delete','~'+subfile),
+																											fileservices.removesuperfile('~'+superfile+'_father','~'+subfile),
+																										)
+																									),
 																								fileservices.addsuperfile('~'+superfile,'~'+subfile),
 																								fileservices.removeownedsubfiles('~'+superfile+'_delete',true)
 																							)
