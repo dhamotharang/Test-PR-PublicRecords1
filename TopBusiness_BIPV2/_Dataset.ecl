@@ -1,4 +1,4 @@
-import _control, tools,ut;
+import _control, tools,data_services;
 
 export _Dataset(
 
@@ -8,14 +8,14 @@ export _Dataset(
 module
 
 	export foreign_environment := if(tools._Constants.IsDataland
-																	,ut.foreign_prod
-																	,ut.foreign_dataland
+																	,data_services.foreign_prod
+																	,data_services.foreign_dataland
 																);
 												
 	export Name										:= pName		;
 	export thor_cluster_Files			:= 	if(pUseOtherEnvironment 
 																			,foreign_environment + 'thor_data400::'
-																			,'~thor_data400::'
+																			,data_services.data_location.prefix() + 'thor_data400::'
 																		);
 	export thor_cluster_Persists	:= thor_cluster_Files		;
 	export max_record_size				:= 4096									;

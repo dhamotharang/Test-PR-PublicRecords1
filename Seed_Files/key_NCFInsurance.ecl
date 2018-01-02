@@ -1,4 +1,4 @@
-import ut, risk_indicators;
+import  risk_indicators,data_services;
 
 d :=  seed_files.file_NCFInsurance;
 
@@ -18,4 +18,4 @@ end;
 withHash := table( d, seed_layout );
 
 export key_NCFInsurance := index(withHash,{hashvalue,table_name,model_name}, {withHash},
-	'~thor_data400::key::testseed::qa::ncfinsurance');
+	data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::ncfinsurance');

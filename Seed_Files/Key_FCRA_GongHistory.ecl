@@ -1,3 +1,5 @@
+import data_services;
+
 d := file_FCRA_GongHistory;
 
 newrec := record
@@ -6,4 +8,4 @@ newrec := record
 end;
 newtable := table(d, newrec);
 
-export Key_FCRA_GongHistory := index(newtable,{dataset_name,hashvalue}, {newtable}, '~thor_data400::key::testseed::qa::fcragonghistory');
+export Key_FCRA_GongHistory := index(newtable,{dataset_name,hashvalue}, {newtable}, data_services.data_location.prefix() +'thor_data400::key::testseed::qa::fcragonghistory');

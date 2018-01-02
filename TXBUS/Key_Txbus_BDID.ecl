@@ -1,4 +1,4 @@
-import doxie;
+import doxie,data_services;
 
 in_base  := Txbus.File_Txbus_Base_For_Keys(bdid <> 0);
 
@@ -9,4 +9,4 @@ deduped_base := dedup(sort(dis_base, bdid, taxpayer_number, local), bdid, taxpay
 export Key_Txbus_BDID := index(deduped_base,
 							   {bdid},
 							   {bdid, Taxpayer_Number},
-							   '~thor_data400::key::txbus::'+doxie.Version_SuperKey+'::bdid');
+							   data_services.data_location.prefix() + 'thor_data400::key::txbus::'+doxie.Version_SuperKey+'::bdid');

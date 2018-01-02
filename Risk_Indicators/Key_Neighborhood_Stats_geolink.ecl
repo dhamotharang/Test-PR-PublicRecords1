@@ -1,4 +1,4 @@
-import doxie, ut, ln_propertyv2, advo;
+import doxie, ln_propertyv2, advo,data_services;
 
 prop_stats_rec := RECORD
   string12 geolink;
@@ -37,7 +37,7 @@ prop_stats_rec := RECORD
   unsigned4 total_property_count;
  END;
 
-// prop_stats := dataset('~thor400_88_staging::temp::ln_propertyv2_neighborhood_stats', prop_stats_rec, thor);
+// prop_stats := dataset(data_services.data_location.prefix() + 'thor400_88_staging::temp::ln_propertyv2_neighborhood_stats', prop_stats_rec, thor);
 prop_stats := ln_propertyv2.NeighborhoodStats;
 
 advo_stats_rec := RECORD
@@ -51,7 +51,7 @@ advo_stats_rec := RECORD
   unsigned4 neighborhood_property_count;
  END;
  
-// advo_stats := dataset('~thor400_88_staging::temp::advo_neighborhood_stats', advo_stats_rec, thor);
+// advo_stats := dataset(data_services.data_location.prefix() + 'thor400_88_staging::temp::advo_neighborhood_stats', advo_stats_rec, thor);
 advo_stats := advo.NeighborhoodStats;
 
 combined := record
@@ -66,5 +66,5 @@ j := join(prop_stats, advo_stats, left.geolink=right.geolink,
 
 
 export Key_Neighborhood_Stats_geolink := index(j,{geolink},{j},
-																	'~thor_data400::key::advo::'+doxie.Version_SuperKey+'::geolink');
+																	data_services.data_location.prefix() + 'thor_data400::key::advo::'+doxie.Version_SuperKey+'::geolink');
 																	

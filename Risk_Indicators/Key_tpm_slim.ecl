@@ -1,4 +1,4 @@
-import doxie;
+import doxie,Data_Services;
 j := Telcordia_tpm_base;
 
 slimrec := record	, MAXLENGTH(9999)
@@ -13,4 +13,4 @@ end;
 
 d := dataset('dummy',slimrec,flat);
 
-export Key_tpm_slim := INDEX(d,{npa,nxx,tb},{d},'~thor_data400::key::telcordia_tpm_slim_'+doxie.Version_SuperKey,OPT);
+export Key_tpm_slim := INDEX(d,{npa,nxx,tb},{d},Data_Services.Data_Location.Prefix('Telcordia')+'thor_data400::key::telcordia_tpm_slim_'+doxie.Version_SuperKey,OPT);

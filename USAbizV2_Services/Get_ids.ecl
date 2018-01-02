@@ -1,11 +1,11 @@
-IMPORT AutoKeyB2, InfoUSA, standard, doxie_raw, doxie, doxie_cbrs, ut, autokeyi, AutoStandardI, AutoHeaderI;
+IMPORT AutoKeyB2, InfoUSA, standard, doxie_raw, doxie, doxie_cbrs, data_services, autokeyi, AutoStandardI, AutoHeaderI;
 
 EXPORT Get_ids 
   (boolean workHard = true, boolean noFail = false, boolean IncludeDeepDives = false, boolean is_CompSearchL = false) := FUNCTION
 
   outrec := USAbizV2_Services.layouts.search_ids;
 
-	ak_keyname := ut.foreign_prod + 'thor_data400::key::InfoUSA::abius::qa::autokey::';
+	ak_keyname := data_services.foreign_prod + 'thor_data400::key::InfoUSA::abius::qa::autokey::';
 	ak_typeStr := 'BC';
 
 	tempmod := module(project(AutoStandardI.GlobalModule(),autokeyi.AutoKeyStandardFetchArgumentInterface,opt))

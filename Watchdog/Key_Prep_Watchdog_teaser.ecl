@@ -51,6 +51,6 @@ EXPORT Key_Prep_Watchdog_teaser (boolean exclude_EQ = true ) := FUNCTION
 			
 			non_eq := if(exclude_EQ,'_noneq','');
 			return index(wdog_filt, {lname, st, pfname, fname, zip}, {wdog_filt},
-																					'~thor_data400::key::watchdog_nonglb'+non_eq+'.teaser_'+ doxie.Version_SuperKey);
+																					data_services.data_location.prefix() + 'thor_data400::key::watchdog_nonglb'+non_eq+'.teaser_'+ doxie.Version_SuperKey);
 																					
 end;

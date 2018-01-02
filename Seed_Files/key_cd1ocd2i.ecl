@@ -1,3 +1,5 @@
+import data_services;
+
 numrec := record
 	layout_cd1ocd2i;
 	string3 prodnum;
@@ -76,4 +78,4 @@ export key_cd1ocd2i := index (df, {prodnum, string9 social := df.socs}, {account
      hphonetypeflag2,
      wphonetypeflag2,
      dwelltypeflag2,
-     sic2}, '~thor_Data400::key::seed::qa::cd1ocd2i');
+     sic2}, data_services.data_location.prefix() + 'thor_Data400::key::seed::qa::cd1ocd2i');

@@ -1,4 +1,4 @@
-import ut;
+import data_services;
 
 d :=  file_FlexID;
 
@@ -10,4 +10,4 @@ newtable := table(d,newrec);
 
 export Key_FlexID := index(newtable,{dataset_name,hashvalue},
 									{newtable},
-									'~thor_data400::key::testseed::qa::flexid');
+									data_services.data_location.prefix() +'thor_data400::key::testseed::qa::flexid');

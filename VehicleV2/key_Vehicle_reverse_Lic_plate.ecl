@@ -1,4 +1,4 @@
-import VehicleV2, VehLic, Doxie, ut,lib_StringLib, NID;
+import VehicleV2, Doxie, ut,lib_StringLib, NID,data_services;
 
 get_recs	:= distribute(VehicleV2.file_VehicleV2_Party_Clean_Sequence_Key,hash(vehicle_key,iteration_key,sequence_key));
 
@@ -118,4 +118,4 @@ party_iter := iterate(party_grp, trickle_current_date(left,right,counter));
 party_dedup := ungroup(dedup(party_iter, all));
 
 export Key_Vehicle_reverse_Lic_plate := index(party_dedup, {reverse_license_plate, state_origin,dph_lname,pfname,is_minor}, {party_dedup},
-'~thor_data400::key::VehicleV2::reverse_lic_plate_'+ doxie.Version_SuperKey);
+data_services.data_location.prefix('Vehicle') + 'thor_data400::key::VehicleV2::reverse_lic_plate_'+ doxie.Version_SuperKey);

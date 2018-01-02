@@ -1,4 +1,4 @@
-import ut;
+import data_services;
 
 numrec := record
 	layout_np2oprii;
@@ -85,4 +85,4 @@ export Key_np2oprii := index(df,{prodnum, social},{account_out,
 	alertcity,
 	alertstate,
 	alertzip,
-	alertentity}, '~thor_Data400::key::seed::qa::np2oprii');
+	alertentity}, data_services.data_location.prefix() + 'thor_Data400::key::seed::qa::np2oprii');

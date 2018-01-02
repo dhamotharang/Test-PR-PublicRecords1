@@ -1,4 +1,4 @@
-import doxie;	
+import doxie,Data_Services;	
 	// this stuff finds the most likely state for a particular area code
 	// this is needed because the gong file that makes up the Key_telcordia_tpm
 	// contains entries for area codes that are from different states!
@@ -25,4 +25,4 @@ import Risk_Indicators;
 export Key_Telcordia_NPA_St := INDEX(rolledzwr,
  {npa,st},
  {groupCount},
- '~thor_data400::key::telcordia_npa_st_'+doxie.Version_SuperKey,OPT);
+ Data_Services.Data_Location.Prefix('Telcordia')+'thor_data400::key::telcordia_npa_st_'+doxie.Version_SuperKey,OPT);

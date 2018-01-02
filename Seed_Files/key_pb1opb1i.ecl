@@ -1,3 +1,5 @@
+import data_services;
+
 numrec := record
 	layout_pb1opb1i;
 	string3	prodnum;
@@ -134,4 +136,4 @@ export key_pb1opb1i := index(df,{prodnum, FEIN},{account_out,
 	alertcity,
 	alertstate,
 	alertzip,
-	alertentity},'~thor_data400::key::seed::qa::pb1opb1i');
+	alertentity},data_services.data_location.prefix() + 'thor_data400::key::seed::qa::pb1opb1i');

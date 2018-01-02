@@ -1,3 +1,5 @@
+import data_services;
+
 numrec := record
 	layout_ef1oef1i;
 	string3 prodnum;
@@ -10,4 +12,4 @@ end;
 
 df := project(file_seed64,into_num(LEFT,'001'));
 
-export Key_ef1oef1i := index(df,{prodnum, string9 social := df.socs},{account_out,riskwiseid,socsverlevel},'~thor_Data400::key::seed::qa::ef1oef1i');
+export Key_ef1oef1i := index(df,{prodnum, string9 social := df.socs},{account_out,riskwiseid,socsverlevel},data_services.data_location.prefix() + 'thor_Data400::key::seed::qa::ef1oef1i');

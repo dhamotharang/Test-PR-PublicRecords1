@@ -1,4 +1,4 @@
-IMPORT Data_Services, Risk_Indicators, Seed_Files, UT;
+IMPORT Data_Services, Risk_Indicators, Seed_Files;
 
 baseFile := Seed_Files.File_RiskView2;
 
@@ -10,5 +10,5 @@ testseedTable := TABLE(baseFile, testSeedLayout);
 
 EXPORT Key_RiskView2 := INDEX(testseedTable, {TestDataTableName, HashValue}, 
 																{testseedTable}, 
-																// ut.foreign_dataland + 'thor_data400::key::testseed::qa::riskview2');
+																// Data_Services.foreign_dataland + 'thor_data400::key::testseed::qa::riskview2');
 																Data_Services.Data_location.Prefix('TestSeeds') + 'thor_data400::key::testseed::qa::riskview2');

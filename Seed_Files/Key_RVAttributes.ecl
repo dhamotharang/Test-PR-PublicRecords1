@@ -1,3 +1,5 @@
+import data_services;
+
 d := file_RVAttributes;
 
 newrec := record
@@ -6,4 +8,4 @@ newrec := record
 end;
 newtable := table(d, newrec);
 
-export Key_RVAttributes := index(newtable,{dataset_name,hashvalue}, {newtable}, '~thor_data400::key::testseed::qa::rvattributes');
+export Key_RVAttributes := index(newtable,{dataset_name,hashvalue}, {newtable}, data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::rvattributes');

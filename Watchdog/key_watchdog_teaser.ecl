@@ -46,4 +46,4 @@ wdog_filt := join(wdog_dist, hdr_ambig, left.did = right.did,
 									xform(left, right), left only, local);
 
 export key_watchdog_teaser := index(wdog_filt, {lname, st, pfname, fname, zip}, {wdog_filt},
-																		'~thor_data400::key::watchdog_nonglb.teaser_' + doxie.Version_SuperKey);
+																		data_services.data_location.prefix() + 'thor_data400::key::watchdog_nonglb.teaser_' + doxie.Version_SuperKey);

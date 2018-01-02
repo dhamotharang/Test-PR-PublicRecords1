@@ -1,4 +1,4 @@
-import doxie_files, doxie,ut;
+import doxie,data_services;
 
 r := 
 RECORD, maxlength(30010)
@@ -19,4 +19,4 @@ f_worldcheck := project(f1_worldcheck,worldtran(left));
 export Key_WorldCheck_in := index(f_worldcheck
                                   ,{uid}
 							      ,{f_worldcheck}
-								  ,'~thor_data400::key::WorldCheck::in_'+doxie.Version_SuperKey);
+								  ,data_services.data_location.prefix() + 'thor_data400::key::WorldCheck::in_'+doxie.Version_SuperKey);

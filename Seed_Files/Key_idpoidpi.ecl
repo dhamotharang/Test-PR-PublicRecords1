@@ -1,3 +1,5 @@
+import data_services;
+
 df := file_seed61;
 
 numrec := record
@@ -36,5 +38,5 @@ export Key_idpoidpi := index(df2,{prodnum, string9 social := df2.socs},{account_
 	nameaddrphone,
 	altlast,
 	altlast2,
-	correctlast},'~thor_Data400::key::seed::qa::idpoidpi');
+	correctlast},data_services.data_location.prefix() + 'thor_Data400::key::seed::qa::idpoidpi');
 	

@@ -1,4 +1,4 @@
-import ut;
+import data_services;
 
 numrec := record
 	layout_bc1obc1i;
@@ -98,4 +98,4 @@ export Key_bc1obc1i := index(df,{prodnum, fin},{acctno,
 	ecovariables,
 	tcifull,
 	tcilast,
-	tciaddr}, '~thor_Data400::key::seed::qa::bc1obc1i');
+	tciaddr}, data_services.data_location.prefix() + 'thor_Data400::key::seed::qa::bc1obc1i');

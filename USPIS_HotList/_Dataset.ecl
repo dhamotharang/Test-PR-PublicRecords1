@@ -1,4 +1,4 @@
-import _control, versioncontrol,ut;
+import _control, versioncontrol,data_services;
 
 export _Dataset(
 
@@ -10,14 +10,14 @@ INLINE module
 	export IsDataland 					:= VersionControl._Flags.IsDataland;
 	
 	export foreign_environment := if(VersionControl._Flags.IsDataland
-																	,ut.foreign_prod
-																	,ut.foreign_dataland
+																	,data_services.foreign_prod
+																	,data_services.foreign_dataland
 																);
 												
 	export Name										:= 'USPIS_HotList'		;
 	export thor_cluster_Files			:= 	if(pUseOtherEnvironment 
 																			,foreign_environment + 'thor_data400::'
-																			,'~thor_data400::'
+																			,data_services.data_location.prefix() + 'thor_data400::'
 																		);
 	export thor_cluster_Persists	:= thor_cluster_Files		;
 	export max_record_size				:= 8192									;

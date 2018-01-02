@@ -1,3 +1,5 @@
+import data_services;
+
 numrec := record
 	layout_sdbosd4i;
 	string3	prodnum;
@@ -142,4 +144,4 @@ export Key_sdbosd4i := index(df,{prodnum, social},{account_out,
 	oldjlunrlsdjdgmtcount2,
 	jlrlsdjdgmtcount2,
 	jlunrlsdliencount2,
-	jlrlsdliencount2},'~thor_data400::key::seed::qa::sdbosd4i');
+	jlrlsdliencount2},data_services.data_location.prefix() + 'thor_data400::key::seed::qa::sdbosd4i');
