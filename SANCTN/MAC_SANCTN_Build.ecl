@@ -1,4 +1,4 @@
-﻿import SANCTN,RoxieKeyBuild,PromoteSupers;
+﻿import SANCTN,RoxieKeyBuild,PromoteSupers,Scrubs_SANCTNKeys;
 
 export MAC_SANCTN_Build(filedate,skipTest=false) := MACRO
 #workunit('name','SANCTN Build ' + filedate);
@@ -99,6 +99,7 @@ sequential(
 					,%updatedops%
 				  ,getretval
 					,do_STRATA
+					,Scrubs_SANCTNKeys.fn_RunScrubs(filedate,'Harry.Gist@lexisnexis.com,Terri.Hardy-George@lexisnexis.com')
 		   );
 
 endmacro;
