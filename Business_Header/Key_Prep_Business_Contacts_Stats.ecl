@@ -1,3 +1,4 @@
+import data_services;
 stats_base := File_Prep_Business_Contacts_Stats_Plus;
 
 layout_contact_stat := RECORD
@@ -23,4 +24,4 @@ END;
 EXPORT Key_Prep_Business_Contacts_Stats := INDEX(
 	stats_base,
 	layout_contact_stat,
-	'~thor_data400::key::business_contacts_stat' + thorlib.wuid());
+	data_services.data_location.prefix() + 'thor_data400::key::business_contacts_stat' + thorlib.wuid());

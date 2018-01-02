@@ -1,4 +1,4 @@
-IMPORT SALT29,BIPV2_WAF;// Gather up the UID counts from each of the children - provides 'we also found' capability
+IMPORT SALT29,BIPV2_WAF, data_services;// Gather up the UID counts from each of the children - provides 'we also found' capability
 
 EXPORT Key_BIPV2_WAF := Module
 
@@ -35,7 +35,7 @@ SHARED AllEfr0 := Mod_Corps().EFR+Mod_UCC().EFR+Mod_Vehicle().EFR+Mod_PropertyV2
   m := GROUP(AllEfr4(~(proxid = 0 AND seleid = 0 AND orgid = 0 AND ultid = 0)),ultid,orgid,seleid,proxid,ALL);
   r := ROLLUP(m,GROUP,TRANSFORM(Ext_Layouts.EFR_Layout,SELF.Hits := PROJECT(ROWS(LEFT),Ext_Layouts.EFR_Child),SELF := LEFT));
 	
-	EXPORT Key := INDEX(r,{ultid,orgid,seleid,proxid},{r},'~thor_data400::key::BIPV2_WAF::qa::proxid::efr');
+	EXPORT Key := INDEX(r,{ultid,orgid,seleid,proxid},{r},data_services.data_location.prefix('bipv2') + 'thor_data400::key::BIPV2_WAF::qa::proxid::efr');
  
 	// Results will be aggregated by UniqueID from the idstream
 	EXPORT FetchEFR(DATASET(process_Biz_layouts.id_stream_layout) idstream,UNSIGNED User_Permits) := FUNCTION

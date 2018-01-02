@@ -1,4 +1,4 @@
-import address, address_Attributes, doxie, ut, bankruptcyv2, risk_indicators;
+import address, address_Attributes, doxie, data_services;
 
 bankrupt_slim := Address_Attributes.file_bankruptcy;
 
@@ -15,4 +15,4 @@ export key_bankruptcy_address := index(cleaned,{
 																		predir, 
 																		postdir},
 																		{cleaned},
-																		'~thor_data400::key::'+doxie.Version_SuperKey+'::bankruptcy::address');
+																		data_services.data_location.prefix() + 'thor_data400::key::'+doxie.Version_SuperKey+'::bankruptcy::address');

@@ -1,4 +1,4 @@
-import ut, BankruptcyV2, doxie;
+import ut, BankruptcyV2, doxie, data_services;
 
 layout_date := RECORD
 	unsigned4 date;
@@ -81,7 +81,7 @@ bankrupt_rolled := ROLLUP (ds_sorted, LEFT.did=RIGHT.did, roll_bankrupt(LEFT,RIG
 bankrupt_slim := PROJECT (bankrupt_rolled, slimrec);
 
 export Key_bankruptcyV3_FCRA_bocashell := index (bankrupt_slim, {did}, {bankrupt_slim},
-		'~thor_data400::key::bankruptcyv3::fcra::bocashell_' + doxie.Version_SuperKey);
+		data_services.data_location.prefix('bankruptcyv3') + 'thor_data400::key::bankruptcyv3::fcra::bocashell_' + doxie.Version_SuperKey);
 
 
 

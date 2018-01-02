@@ -1,4 +1,4 @@
-IMPORT Business_Header;
+IMPORT Business_Header, data_services;
 
 f_a := Business_Header_SS.File_Prep_BH_CompanyName_Address_Plus
 	((pr_pn_sr_st_bdids > 0 and pr_pn_sr_st_bdids < 100) or
@@ -27,4 +27,4 @@ END;
 
 EXPORT Key_Prep_BH_Addr_pr_pn_sr_st := INDEX(
 	fd, layout_address_index2, 
-	'~thor_data400::key::business_header.Addr_pr_pn_sr_st' + thorlib.wuid());
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.Addr_pr_pn_sr_st' + thorlib.wuid());

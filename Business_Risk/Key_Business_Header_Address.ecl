@@ -1,4 +1,4 @@
-import business_header, doxie, ut;
+import business_header, doxie, ut, data_services;
 
 f := Business_Header.File_Business_Header_Base_for_keybuild( (prim_name!='' or prim_range!='') and zip!=0 and bdid!=0);
 
@@ -31,5 +31,5 @@ export Key_Business_Header_Address := index(f,{zip,prim_range,prim_name,sec_rang
 													fein,
 													current,
 													dppa},			
-										'~thor_data400::key::br_bus_header_address_'+doxie.Version_SuperKey);
+										data_services.data_location.prefix() + 'thor_data400::key::br_bus_header_address_'+doxie.Version_SuperKey);
 										// ut.foreign_dataland + 'thor_data400::key::br_bus_header_address_'+doxie.Version_SuperKey);

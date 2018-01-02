@@ -1,4 +1,4 @@
-IMPORT Business_Header,ut;
+IMPORT Business_Header,ut, data_services;
 
 f_bh := business_header.File_Business_Header;
 
@@ -82,4 +82,4 @@ EXPORT Key_BH_BDID_pl := INDEX(
 	r, 
 	{bdid},
 	{r},
-	'~thor_data400::key::business_header.BDID_pl_' + business_header_ss.key_version);
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.BDID_pl_' + business_header_ss.key_version);

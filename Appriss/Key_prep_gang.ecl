@@ -1,4 +1,4 @@
-import doxie,ut;
+import doxie,ut, data_services;
 
 layout_prep_gang_key tSlim(file_bookings_base L):= TRANSFORM
 self.gang       :=trim(L.gang,left,right);
@@ -10,4 +10,4 @@ distributed_file := distribute(df,hash(booking_sid)) : persist('persist::appriss
 processed_gang_names := processGangNames(distributed_file);
 
 export Key_prep_gang :=  index(processed_gang_names,{gang},{booking_sid},
-                               '~thor_200::key::appriss::'+ doxie.Version_SuperKey+'::gang' );
+                               data_services.data_location.prefix() + 'thor_200::key::appriss::'+ doxie.Version_SuperKey+'::gang' );

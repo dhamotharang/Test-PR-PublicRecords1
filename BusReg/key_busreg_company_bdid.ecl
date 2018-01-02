@@ -11,4 +11,4 @@ end;
 	
 df := PROJECT(busreg.File_BusReg_Company(bdid != 0),TRANSFORM(slimLayout,SELF := LEFT;));
 
-export key_busreg_company_bdid := index(df,{bdid},{df},'~thor_data400::key::busreg_company_bdid_' + doxie.Version_SuperKey);
+export key_busreg_company_bdid := index(df,{bdid},{df},data_services.data_location.prefix() + 'thor_data400::key::busreg_company_bdid_' + doxie.Version_SuperKey);

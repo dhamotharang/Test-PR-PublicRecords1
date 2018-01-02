@@ -1,9 +1,9 @@
 EXPORT Key_BizHead_L_FEIN := MODULE
  
-IMPORT SALT29,ut,std;
+IMPORT SALT29,ut,std, data_services;
 //company_fein:+:company_sic_code1:cnp_name:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:p_city_name:st:prim_range:sec_range
  
-EXPORT KeyName := '~'+'key::BIPV2_WAF::proxid::Refs::L_FEIN';
+EXPORT KeyName := data_services.data_location.prefix('bipv2') +'key::BIPV2_WAF::proxid::Refs::L_FEIN';
 SHARED h := CandidatesForKey;//The input file - distributed by proxid
 layout := RECORD // project out required fields
 // Compulsory fields

@@ -1,4 +1,4 @@
-import header_services,paw;
+import header_services,paw, data_services;
 
 Drop_Header_Layout := //REMOVE WHEN WE START TO RECEIVE FILES IN THE CORRECT LAYOUT
 Record
@@ -71,4 +71,4 @@ fdedup := dedup(fprep, all);
 
 export Key_Prep_SIC_Code := index(
 	fdedup, {bdid}, {sic_code},
-	'~thor_data400::key::business_header.SIC_Code' + thorlib.wuid());
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.SIC_Code' + thorlib.wuid());

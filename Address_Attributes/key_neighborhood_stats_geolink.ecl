@@ -1,4 +1,4 @@
-import address, addrfraud, advo, BankruptcyV2, doxie, LiensV2, LN_PropertyV2, property, Risk_Indicators, ut, std;
+import address, addrfraud, advo, BankruptcyV2, doxie, LiensV2, LN_PropertyV2, property, Risk_Indicators, ut, std, data_services;
 
 //Constants
 mygetdate := (STRING8)Std.Date.Today();
@@ -1174,4 +1174,4 @@ final_withBankruptcy := join(final_withHedonics, Neighborhood_Bankruptcies,
 
 export key_Neighborhood_stats_geolink := index(final_withBankruptcy,{
 																	geolink},
-																	{final_withBankruptcy},'~thor_data400::key::neighborhood::'+doxie.Version_SuperKey+'::neighborhoodstats::geolink');
+																	{final_withBankruptcy},data_services.data_location.prefix() + 'thor_data400::key::neighborhood::'+doxie.Version_SuperKey+'::neighborhoodstats::geolink');

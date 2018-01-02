@@ -1,4 +1,4 @@
-import autokey,header,ut,doxie_cbrs;
+import autokey,header,ut,doxie_cbrs, data_services;
 d := Business_Header.File_Business_Header_Base_for_keybuild;
 
 ds := 
@@ -21,7 +21,7 @@ autokey.MAC_zipPRLname(ds,fname,mname,company_name,
 						rel_fname1,rel_fname2,rel_fname3,
 						lookups1,
 						bdid,
-						'~thor_data400::key::business_header.ZipPRLName',
+						data_services.data_location.prefix() + 'thor_data400::key::business_header.ZipPRLName',
 						k)
 
 export Key_ZipPRLName := k;

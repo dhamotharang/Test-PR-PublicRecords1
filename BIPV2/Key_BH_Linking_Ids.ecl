@@ -3,7 +3,6 @@ import BIPV2, AutoStandardI,BizLinkFull,BIPV2_Build,BIPv2_HRCHY,tools,BIPV2_Supp
 EXPORT Key_BH_Linking_Ids := MODULE
 
 	// DEFINE THE INDEX
-	//logical_name := '~thor_data400::key::BIPV2::Business_Header::20120828::linkIds';
 	superfile_name := BIPV2_Build.keynames(, pUseOtherEnvironment:= tools._Constants.IsDataland).linkids.qa;
 	
 	infile := BIPV2.CommonBase.DS_CLEAN;

@@ -1,9 +1,9 @@
 EXPORT Key_BizHead_ := MODULE
  
-IMPORT SALT29,ut,std;
+IMPORT SALT29,ut,std, data_services;
 //parent_proxid:ultimate_proxid:has_lgid:empid:powid:source:source_record_id:?:cnp_number:cnp_btype:cnp_lowv:cnp_name:company_phone:+:company_fein:company_sic_code1:prim_range:prim_name:sec_range:p_city_name:st:zip:company_url:isContact:title:fname:mname:lname:name_suffix:contact_email:CONTACTNAME:STREETADDRESS
  
-EXPORT KeyName := '~'+'key::BIPV2_WAF::proxid::Refs';
+EXPORT KeyName := data_services.data_location.prefix('bipv2') +'key::BIPV2_WAF::proxid::Refs';
 SHARED h := CandidatesForKey;//The input file - distributed by proxid
 SALT29.Layout_Uber_Plus IntoInversion(h le,unsigned2 c) := TRANSFORM
   SELF.word := CHOOSE(c,(SALT29.StrType)le.parent_proxid,(SALT29.StrType)le.ultimate_proxid,(SALT29.StrType)le.has_lgid,(SALT29.StrType)le.empid,(SALT29.StrType)le.powid,(SALT29.StrType)le.source,(SALT29.StrType)le.source_record_id,(SALT29.StrType)le.cnp_number,(SALT29.StrType)le.cnp_btype,(SALT29.StrType)le.cnp_lowv,'',(SALT29.StrType)le.company_phone,Fields.Make_company_fein((SALT29.StrType)le.company_fein),(SALT29.StrType)le.company_sic_code1,(SALT29.StrType)le.prim_range,Fields.Make_prim_name((SALT29.StrType)le.prim_name),Fields.Make_sec_range((SALT29.StrType)le.sec_range),Fields.Make_p_city_name((SALT29.StrType)le.p_city_name),Fields.Make_st((SALT29.StrType)le.st),Fields.Make_zip((SALT29.StrType)le.zip),'',(SALT29.StrType)le.isContact,(SALT29.StrType)le.title,Fields.Make_fname((SALT29.StrType)le.fname),Fields.Make_mname((SALT29.StrType)le.mname),Fields.Make_lname((SALT29.StrType)le.lname),Fields.Make_name_suffix((SALT29.StrType)le.name_suffix),(SALT29.StrType)le.contact_email,SKIP,SKIP,SKIP);
@@ -24,7 +24,7 @@ nfields30 := nfields7680+nfields7681+nfields7682;//Collect wordbags for parts of
 invert_records := nfields_r + nfields11 + nfields21;
 shared DataForKey0 := SALT29.Fn_Reduce_UBER_Local( invert_records );
  
-EXPORT ValueKeyName := '~'+'key::BIPV2_WAF::proxid::Words';
+EXPORT ValueKeyName := data_services.data_location.prefix('bipv2') +'key::BIPV2_WAF::proxid::Words';
   r0 := RECORD
     DataForKey0.uid;
     UNSIGNED6 InCluster := COUNT(GROUP);

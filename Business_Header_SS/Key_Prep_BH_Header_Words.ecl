@@ -1,4 +1,4 @@
-IMPORT Business_Header;
+IMPORT Business_Header, data_services ;
 
 wf := business_header_ss.File_Prep_BH_CompanyNameWords;
 
@@ -15,4 +15,4 @@ END;
 // referenced through the index.
 EXPORT Key_Prep_BH_Header_Words := INDEX(
 	wf, Layout_Header_Word_Index_Index, 
-	'~thor_data400::key::business_header.CoNameWords' + thorlib.wuid());
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.CoNameWords' + thorlib.wuid());

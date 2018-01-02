@@ -1,4 +1,4 @@
-import doxie;
+import doxie, data_services;
 
 f := Business_Header.BH_BDID_SIC();
 
@@ -10,4 +10,4 @@ end;
 fprep := table(f, layout_sic_index);
 fdedup := dedup(fprep, all);
 
-export Key_SIC_Code := index(fdedup,{bdid}, {sic_code},'~thor_data400::key::business_header.SIC_Code_' + doxie.Version_SuperKey);
+export Key_SIC_Code := index(fdedup,{bdid}, {sic_code},data_services.data_location.prefix() + 'thor_data400::key::business_header.SIC_Code_' + doxie.Version_SuperKey);

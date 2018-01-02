@@ -1,4 +1,4 @@
-import doxie_build, ut, header, gong, risk_indicators,doxie;
+import doxie_build, ut, header, gong, risk_indicators,doxie, data_services;
 
 // #if(Risk_Indicators.iid_constants.validation_debug)
 	// head := dataset(ut.foreign_prod+'thor_data400::base::headerkey_building', header.Layout_Header_v2, flat);
@@ -53,4 +53,4 @@ fraud := Address_Risk.BuildRiskDataset( a2d_with_coord );
 export Key_AddrFraud_GeoLink := index( fraud,
 	{fraud.geolink},
 	{fraud},
-    '~thor_data400::key::addrrisk_geolink_' + doxie.Version_SuperKey);
+    data_services.data_location.prefix() + 'thor_data400::key::addrrisk_geolink_' + doxie.Version_SuperKey);

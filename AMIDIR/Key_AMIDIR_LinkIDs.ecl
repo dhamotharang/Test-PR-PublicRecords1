@@ -1,8 +1,8 @@
-IMPORT BIPV2, doxie;
+IMPORT BIPV2, doxie, data_services;
 
 EXPORT  Key_AMIDIR_LinkIDs := MODULE
   shared  base_recs 					:= AMIDIR.File_AMIDIR_DID_SSN_BDID_BIP(Business_Name<>'');
-	export  out_superfile_Name  := '~thor_data400::key::amidir_LinkIDs_' + Doxie.Version_SuperKey; //linkid Key Super FileName
+	export  out_superfile_Name  := data_services.data_location.prefix() + 'thor_data400::key::amidir_LinkIDs_' + Doxie.Version_SuperKey; //linkid Key Super FileName
 	
   BIPV2.IDmacros.mac_IndexWithXLinkIDs(base_recs, out_key, out_superfile_Name);
   export Key := out_key;

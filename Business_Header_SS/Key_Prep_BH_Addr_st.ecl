@@ -1,4 +1,4 @@
-IMPORT Business_Header;
+IMPORT Business_Header, data_services;
 
 f_a := business_header.files().base.CompanynameAddressBroad.keybuild
 	((cn_st_bdids > 0 and cn_st_bdids < 100));
@@ -23,4 +23,4 @@ END;
 
 EXPORT Key_Prep_BH_Addr_st := INDEX(
 	fd, layout_address_index2, 
-	'~thor_data400::key::business_header.Addr_st' + thorlib.wuid());
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.Addr_st' + thorlib.wuid());

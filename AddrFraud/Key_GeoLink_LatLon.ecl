@@ -1,4 +1,4 @@
-import address_attributes, doxie;
+import address_attributes, doxie, data_services;
 
 L := record
 	qstring12 geolink;
@@ -19,4 +19,4 @@ END;
 slim := project( base, format(left) );
 
 
-export Key_GeoLink_LatLon := index( slim, {lat1000}, {geolink,lat,lon}, '~thor_data400::key::addrfraud::geoblk_latlon_'+ doxie.Version_SuperKey );
+export Key_GeoLink_LatLon := index( slim, {lat1000}, {geolink,lat,lon}, data_services.data_location.prefix() + 'thor_data400::key::addrfraud::geoblk_latlon_'+ doxie.Version_SuperKey );

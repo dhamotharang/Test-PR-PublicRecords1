@@ -1,4 +1,4 @@
-import ut,AutoStandardI,bipv2_build,tools;
+import ut,AutoStandardI,bipv2_build,tools, data_services;
 EXPORT key_Status := 
 MODULE
 
@@ -92,6 +92,6 @@ lksd.oc(d)
 lksd.oc(r)
 
 i := 
-index(r,,'~thor_data400::bipv2::status_index');
+index(r,,data_services.data_location.prefix('bipv2') + 'thor_data400::bipv2::status_index');
 build(i, overwrite)
 */

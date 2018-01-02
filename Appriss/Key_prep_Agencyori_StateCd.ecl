@@ -1,4 +1,4 @@
-import doxie,ut;
+import doxie,ut, data_services;
 
 layout_slim:=RECORD
 string20  AGENCY_ORI;	
@@ -16,4 +16,4 @@ END;
 df := PROJECT(file_bookings_base(AGENCY_ORI <> '' or state_cd <> '' ),tSlim(LEFT));
 
 export Key_prep_Agencyori_StateCd :=  index(df,{agency_ori,state_cd},{booking_sid},
-                                      '~thor_200::key::appriss::'+ doxie.Version_SuperKey+'::AgencyStateCd' );
+                                      data_services.data_location.prefix() + 'thor_200::key::appriss::'+ doxie.Version_SuperKey+'::AgencyStateCd' );

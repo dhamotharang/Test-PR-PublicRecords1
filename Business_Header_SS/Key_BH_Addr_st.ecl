@@ -1,4 +1,4 @@
-IMPORT Business_Header,ut;
+IMPORT Business_Header,ut, data_services;
 
 f_a := Business_Header_SS.File_BH_CompanyName_Address_Broad_Plus
 	((st_bdids > 0 and st_bdids < 100) or
@@ -17,4 +17,4 @@ END;
 
 EXPORT Key_BH_Addr_st := INDEX(
 	f_a, layout_address_index, 
-	'~thor_data400::key::business_header.Addr_st_' + business_header_ss.key_version, OPT);
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.Addr_st_' + business_header_ss.key_version, OPT);

@@ -1,4 +1,4 @@
-IMPORT Business_Header;
+IMPORT Business_Header, data_services;
 
 f_f := Business_Header_SS.File_BH_CompanyName_FEIN_Plus;
 
@@ -12,4 +12,4 @@ END;
 
 EXPORT Key_BH_FEIN := INDEX(
 	f_f, layout_fein_index, 
-	'~thor_data400::key::business_header.FEIN_2_' + business_header_ss.key_version, OPT);
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.FEIN_2_' + business_header_ss.key_version, OPT);
