@@ -1,10 +1,10 @@
-IMPORT SALT37,std;
+﻿IMPORT SALT37,std, data_services;
 EXPORT Key_InsuranceHeader_NAME(BOOLEAN incremental=FALSE) := MODULE
  
 //FNAME:LNAME:ST:?:DERIVED_GENDER:SNAME:MNAME:SSN5:SSN4:+:PRIM_RANGE:PRIM_NAME:SEC_RANGE:CITY:DOB
 EXPORT KeyName := KeyNames().NAME_super; /*HACK*/
  
-EXPORT KeyName_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::NAME';
+EXPORT KeyName_sf := data_services.data_location.prefix() + KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::NAME';
  
 EXPORT AssignCurrentKeyToSuperFile := FileServices.AddSuperFile(KeyName_sf,KeyName);
  

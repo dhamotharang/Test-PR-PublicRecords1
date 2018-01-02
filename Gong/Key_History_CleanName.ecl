@@ -1,4 +1,4 @@
-Import gong, doxie, nid, ut;
+﻿Import gong, doxie, nid, ut, data_services;
 
 hist_in := Gong.File_Surnames(trim(name_last)<>'');
 gong.mac_hist_full_slim_dep(hist_in, hist_out)
@@ -11,4 +11,4 @@ Export Key_History_CleanName :=
               string20 p_name_first := NID.PreferredFirstNew(name_first),
 							name_first},
              {hist_out},
-		   '~thor_data400::key::gong_history_cleanname_'  + doxie.Version_SuperKey);
+		   data_services.data_location.prefix() + 'thor_data400::key::gong_history_cleanname_'  + doxie.Version_SuperKey);

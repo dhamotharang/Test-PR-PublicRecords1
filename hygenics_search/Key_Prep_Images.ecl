@@ -1,4 +1,4 @@
-all_images := File_Images(imglength != 0);
+﻿all_images := File_Images(imglength != 0);
 
 	LayoutNoPhoto := RECORD
 	// 	all_images.did;

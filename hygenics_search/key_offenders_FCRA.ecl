@@ -1,5 +1,5 @@
-//WARNING: THIS KEY IS AN FCRA KEY...
-import doxie,crimsrch, ut;
+﻿//WARNING: THIS KEY IS AN FCRA KEY...
+import doxie,crimsrch,data_services;
 
 df_ := hygenics_search.File_Moxie_Offender_Dev((integer)did != 0);
 
@@ -13,4 +13,4 @@ df_ := hygenics_search.File_Moxie_Offender_Dev((integer)did != 0);
 export Key_Offenders_FCRA := index (df,
                                     {unsigned6 sdid := (integer)df.did},
                                     {df},
-                                    '~thor_200::key::criminal_offenders::fcra::' + doxie.Version_SuperKey + '::did');
+                                    data_services.data_location.prefix() + 'thor_200::key::criminal_offenders::fcra::' + doxie.Version_SuperKey + '::did');

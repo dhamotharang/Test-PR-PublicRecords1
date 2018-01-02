@@ -1,8 +1,8 @@
-// the purpose is to have an index of (all available) last names by phonetic key.
+﻿// the purpose is to have an index of (all available) last names by phonetic key.
 // lname is unique;
 // phonetic key to lname relation is 1:m (one phonetization MAY correspond to many words)
 // index contain some counters, which can be used later.
-IMPORT header, doxie, ut;
+IMPORT header, doxie, ut, data_services;
 
 layout_slim := RECORD (header.layout_phonetic_lname)
   unsigned6 did;
@@ -55,4 +55,4 @@ ds_res := JOIN (ds_ph, phkey_count,
                 ATMOST (1));  // [m:1]
 
 export key_phonetic_lname := INDEX (ds_res, {dph_lname}, {ds_res},
-  '~thor_data400::key::header::' + doxie.Version_SuperKey + '::phonetic_lname');
+  data_services.data_location.prefix() + 'thor_data400::key::header::' + doxie.Version_SuperKey + '::phonetic_lname');

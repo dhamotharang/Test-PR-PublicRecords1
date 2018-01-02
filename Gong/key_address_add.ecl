@@ -1,5 +1,5 @@
-//gong add prep key based on address fields
-import gong, doxie;
+﻿//gong add prep key based on address fields
+import gong, doxie, data_services;
 
 g := Gong.file_daily_full(trim(prim_name)<>'', trim(z5)<>'');
 
@@ -22,4 +22,4 @@ wcn := project(g, addcn(left));
 export key_address_add := 
        index(wcn,
             {prim_name, z5, prim_range, sec_range, predir, suffix},{phone10, listed_name, fname, mname, lname},
-	       '~thor_data400::key::gong_address_add_' + doxie.Version_SuperKey,OPT);
+	       data_services.data_location.prefix() + 'thor_data400::key::gong_address_add_' + doxie.Version_SuperKey,OPT);

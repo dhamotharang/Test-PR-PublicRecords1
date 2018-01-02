@@ -1,4 +1,4 @@
-import doxie;
+﻿import doxie, data_services;
 
 df := Inquiry_AccLogs.File_Inquiry_Base.history(bus_intel.industry <> '' and 
 						trim(person_q.email_address) <> '' and 
@@ -18,5 +18,5 @@ p := project(df, transform(slim,
 	self := left));
 
 export Key_Inquiry_Email := INDEX(p, {string50 email_address := person_q.email_address}, {p},
-						'~thor_data400::key::inquiry_table::' + doxie.version_superkey  + '::email');
+						data_services.data_location.prefix() + 'thor_data400::key::inquiry_table::' + doxie.version_superkey  + '::email');
 						

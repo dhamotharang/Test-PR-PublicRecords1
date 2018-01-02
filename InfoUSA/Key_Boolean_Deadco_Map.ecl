@@ -1,4 +1,4 @@
-import infousa;
+﻿import infousa, data_services;
 
 
 tmsid_rec := RECORD
@@ -11,7 +11,7 @@ tmsid_rec := RECORD
 
 tmsid_table := dataset([],tmsid_rec);
 
-export key_boolean_deadco_map := index(tmsid_table,{src,doc,abi_number,__filepos},'~thor_data400::key::deadco::qa::doc.abinumber');
+export key_boolean_deadco_map := index(tmsid_table,{src,doc,abi_number,__filepos},data_services.data_location.prefix() + 'thor_data400::key::deadco::qa::doc.abinumber');
 
 
 

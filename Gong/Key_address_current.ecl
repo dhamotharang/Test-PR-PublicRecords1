@@ -1,5 +1,5 @@
-//gong key based on some address fields
-import doxie, gong, ut;
+﻿//gong key based on some address fields
+import data_services, doxie, gong, ut;
 
 g := Gong.File_Gong_Full_Prepped_For_Keys(trim(prim_name)<>'', trim(z5)<>'');
 
@@ -55,4 +55,4 @@ export Key_address_current := index (Gong.File_Address_Current,
   {prim_name, st, z5, prim_range, sec_range, predir, suffix}, 
   {phone10, listed_name, fname, mname, lname, name_suffix, dual_name_flag, 
 	 date_first_seen, listing_type, publish_code, omit_phone},
-  '~thor_data400::key::gong_address_current_' + doxie.Version_SuperKey );
+   data_services.data_location.prefix() + 'thor_data400::key::gong_address_current_' + doxie.Version_SuperKey );

@@ -1,4 +1,4 @@
-import doxie, ut, inquiry_acclogs;
+﻿import doxie, ut, inquiry_acclogs, data_services;
 
 HashDS := distribute(project(inquiry_acclogs.File_FCRA_Inquiry_Base(bus_intel.industry <> '' and person_q.appended_adl > 0 and
 					trim(bus_intel.vertical)<>'' and
@@ -11,4 +11,4 @@ HashDS := distribute(project(inquiry_acclogs.File_FCRA_Inquiry_Base(bus_intel.in
 																													self := [] )), hash(person_q.appended_adl));
 
 export Key_FCRA_DID := index(HashDS, {person_q.appended_adl}, {HashDS}, 
-					'~thor_data400::key::inquiry_table::fcra::did_' + doxie.Version_SuperKey);
+					data_services.data_location.prefix() + 'thor_data400::key::inquiry_table::fcra::did_' + doxie.Version_SuperKey);

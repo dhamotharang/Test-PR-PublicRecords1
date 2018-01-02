@@ -1,4 +1,4 @@
-import header,watchdog,doxie,ut;
+﻿import doxie, data_services;
 
 suppression_file0 := header_quick.file_ssn_suppression;
 
@@ -14,4 +14,4 @@ suppression_file := table(suppression_file0,r1);
 export 	key_ssn_suppression := 
 index(suppression_file,
 {ssn},{suppression_file},
-'~thor_data400::key::ssn_suppression_'+doxie.Version_SuperKey);
+data_services.data_location.prefix() + 'thor_data400::key::ssn_suppression_'+doxie.Version_SuperKey);

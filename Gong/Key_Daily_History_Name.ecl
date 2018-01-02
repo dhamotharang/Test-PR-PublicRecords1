@@ -1,4 +1,4 @@
-import gong, doxie;
+﻿import gong, doxie, data_services;
 
 hist_in := gong.file_daily_full(trim(name_last)<>'');
 gong.mac_hist_full_slim_dep_dly(hist_in, hist_out)
@@ -11,4 +11,4 @@ Export key_daily_history_name :=
               string20 p_name_first := datalib.preferredfirst(name_first),
 							name_first},
              {hist_out},
-		   '~thor_data400::key::gong_daily_name_'  + doxie.Version_SuperKey);
+		   data_services.data_location.prefix() + 'thor_data400::key::gong_daily_name_'  + doxie.Version_SuperKey);

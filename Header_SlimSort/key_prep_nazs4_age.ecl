@@ -1,3 +1,5 @@
+﻿import data_services;
+
 df := dataset('~thor_Data400::base::hss_name_zip_age_ssn4_BUILDING',header_slimsort.Layout_Name_Age_Zip_SSN4,flat);
 
 export key_prep_nazs4_age := index(df,{df.lname,
@@ -37,4 +39,4 @@ export key_prep_nazs4_age := index(df,{df.lname,
 	//df.Count_Ar_F_Mi_L,
 	df.Count_A_F_L ,
 	//df.Count_Ar_F_L ,
-	df.did},'~thor_data400::key::key_nazs4_age_' + thorlib.wuid());
+	df.did},data_services.data_location.prefix() + 'thor_data400::key::key_nazs4_age_' + thorlib.wuid());

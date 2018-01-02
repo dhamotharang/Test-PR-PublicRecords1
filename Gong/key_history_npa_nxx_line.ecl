@@ -1,4 +1,4 @@
-import gong, doxie;
+﻿import gong, doxie, data_services;
 
 Legacy_Layout := PROJECT(File_History_Full_Prepped_for_Keys, Layout_history);
 
@@ -10,4 +10,4 @@ export key_history_npa_nxx_line :=
 		    boolean current_flag := if(current_record_flag='Y',true,false),
 		    boolean business_flag := if(listing_type_bus='B',true,false)},
              {Legacy_Layout},
-		   '~thor_data400::key::gong_history_npa_nxx_line_' + doxie.Version_SuperKey);
+		   data_services.data_location.prefix() + 'thor_data400::key::gong_history_npa_nxx_line_' + doxie.Version_SuperKey);

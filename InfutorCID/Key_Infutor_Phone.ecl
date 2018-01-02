@@ -1,4 +1,4 @@
-import ut, doxie;
+﻿import ut, doxie, data_services;
 
 baseCID := InfutorCID.File_InfutorCID_Base((unsigned)phone<>0);
 
@@ -42,4 +42,4 @@ slim_layout into_slim(baseCID le) := transform
 end;
 p := project(baseCID, into_slim(left));
 
-export Key_Infutor_Phone := index(p,{phone},{p},'~thor_data400::key::infutorcid::phone_' + doxie.Version_SuperKey);
+export Key_Infutor_Phone := index(p,{phone},{p},data_services.data_location.prefix() + 'thor_data400::key::infutorcid::phone_' + doxie.Version_SuperKey);

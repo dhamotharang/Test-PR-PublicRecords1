@@ -1,4 +1,4 @@
-import doxie, ut;
+﻿import doxie, ut, data_services;
 
 HashDS := distribute(project(inquiry_acclogs.File_FCRA_Inquiry_Base( (unsigned)person_q.zip > 0 and trim(person_q.prim_name)<>'' and
 					trim(bus_intel.vertical)<>'' and
@@ -10,9 +10,9 @@ HashDS := distribute(project(inquiry_acclogs.File_FCRA_Inquiry_Base( (unsigned)p
 																													self := left)), hash(person_q.zip));
 
 export Key_FCRA_Address := index(HashDS, {string5 zip := person_q.zip,person_q.prim_name,person_q.prim_range,person_q.sec_range}, {HashDS}, 
-																			'~thor_data400::key::inquiry_table::fcra::address_' + doxie.Version_SuperKey);
+																			data_services.data_location.prefix() + 'thor_data400::key::inquiry_table::fcra::address_' + doxie.Version_SuperKey);
 																																										
 // HashDS := dataset([], inquiry_acclogs.Layout_FCRAKeys.address);
 
 // export Key_FCRA_address := index(HashDS, {zip, prim_name, prim_range, sec_range}, {HashDS}, 
-														// '~thor_data400::key::inquiry_table::fcra::address_' + doxie.Version_SuperKey);
+														// data_services.data_location.prefix() + 'thor_data400::key::inquiry_table::fcra::address_' + doxie.Version_SuperKey);
