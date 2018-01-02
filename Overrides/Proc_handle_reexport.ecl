@@ -1,10 +1,13 @@
-import ut,_control, STD;
+﻿import ut,_control, STD;
 export Proc_handle_reexport(string reexportflag = 'no'
 												,string mode = ''
 												,string dserver = if (_Control.ThisEnvironment.Name = 'Prod_Thor'
 																						,_control.IPAddress.bctlpedata10
 																						,_control.IPAddress.bctlpedata12)
-												,string desprayprefix = '/data/data_lib_2_hus2/overrides/archive') := function
+												,string desprayprefix = '/data/data_lib_2_hus2/overrides/archive'
+												,string versiontoremove = '' // use when the logicals have to removed from super manually
+																							// example: 2 exports came in and first failed, second passed but you need to remove the first
+												) := function
 	// integer GetWords(string s,string1 c=' ') := BEGINC++
   // #option pure
 	// unsigned score = 0;
@@ -24,13 +27,21 @@ export Proc_handle_reexport(string reexportflag = 'no'
 	despraylocation := if (_Control.ThisEnvironment.Name = 'Prod_Thor',
 															desprayprefix+'/transfer',
 															desprayprefix+'/transfer/test');
+															
+	patterntosearch := if (versiontoremove <> '','*in*override*'+versiontoremove+'*','');
  
-	ds := fileservices.superfilecontents('~thor_data400::base::override::fcra::qa::lastprocessed');
-
-
+ 
 	rSuperNames := record
 		string name;
 	end;
+ 
+	ds := if (patterntosearch <> ''
+							,project(fileservices.logicalfilelist(patterntosearch),transform(rSuperNames,self := left))
+							,fileservices.superfilecontents('~thor_data400::base::override::fcra::qa::lastprocessed')
+						);
+
+
+	
 
 	rFilesToRemove := record
 		string thorname := '';
@@ -65,7 +76,7 @@ export Proc_handle_reexport(string reexportflag = 'no'
 	return sequential(
 					if ( ~fileservices.superfileexists('~thor_data400::base::override::fcra::qa::lastprocessed'),
 							fileservices.createsuperfile('~thor_data400::base::override::fcra::qa::lastprocessed')),
-					if (reexportflag = 'yes',
+					if (reexportflag = 'yes' or versiontoremove <> '',
 						nothor(apply(global(dPopulateSupername,few)
 							,sequential(fileservices.removesuperfile('~'+supername,'~'+thorname)
 								
@@ -79,6 +90,7 @@ export Proc_handle_reexport(string reexportflag = 'no'
 									)
 							)
 						),
-					fileservices.clearsuperfile('~thor_data400::base::override::fcra::qa::lastprocessed')
+					if (versiontoremove = ''
+						,fileservices.clearsuperfile('~thor_data400::base::override::fcra::qa::lastprocessed'))
 					);
 end;
