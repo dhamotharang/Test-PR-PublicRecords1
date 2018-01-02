@@ -1,4 +1,4 @@
-IMPORT Business_Header;
+IMPORT Business_Header, data_services;
 
 f_cn := Business_Header_SS.File_BH_CompanyName;
 
@@ -15,5 +15,5 @@ export Key_BH_CompanyName_Unlimited := INDEX(
 	d, 
 	{clean_company_name20,clean_company_name60},
 	{bdid},
-	'~thor_data400::key::business_header.CompanyName_Unlimited_' +  
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.CompanyName_Unlimited_' +  
 	business_header_ss.key_version);

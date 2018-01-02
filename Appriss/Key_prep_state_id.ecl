@@ -1,4 +1,4 @@
-import doxie,ut;
+import doxie,ut, data_services;
 
 layout_slim:=RECORD
 string25  state_id;	
@@ -15,4 +15,4 @@ df := PROJECT(file_bookings_base(state_id <> '' ),tSlim(LEFT));
 
 export Key_prep_state_id := 
  index(df,{state_id},{booking_sid},
-         '~thor_200::key::appriss::'+ doxie.Version_SuperKey+'::state_id' );
+         data_services.data_location.prefix() + 'thor_200::key::appriss::'+ doxie.Version_SuperKey+'::state_id' );

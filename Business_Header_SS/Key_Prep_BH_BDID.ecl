@@ -1,4 +1,4 @@
-IMPORT Business_Header;
+IMPORT Business_Header, data_services;
 
 f_bh := business_header.File_Prep_Business_Header_Plus;
 
@@ -9,4 +9,4 @@ END;
 
 EXPORT Key_Prep_BH_BDID := INDEX(
 	f_bh, layout_bdid_index, 
-	'~thor_data400::key::business_header.BDID' + thorlib.wuid());
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.BDID' + thorlib.wuid());

@@ -1,4 +1,4 @@
-IMPORT Accident_Services,doxie,ut;
+IMPORT Accident_Services,doxie,ut, data_services;
 
 UNSIGNED DOL  := Accident_Services.Constants.DOL;
 UNSIGNED NAME := Accident_Services.Constants.NAME;
@@ -38,5 +38,5 @@ InputRequired := DATASET([
 
 EXPORT Key_StResInput := INDEX(InputRequired,
 	{ApplicationType},{AccidentState,Bitmap},
-	'~thor_data400::key::accident_state_restrictions::input_' + doxie.Version_SuperKey);
+	data_services.data_location.prefix() + 'thor_data400::key::accident_state_restrictions::input_' + doxie.Version_SuperKey);
 	

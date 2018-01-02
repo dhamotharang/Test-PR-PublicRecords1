@@ -1,4 +1,4 @@
-import autokeyb2, doxie;
+import autokeyb2, doxie, data_services;
 
 rec := RECORD
   unsigned6 fakeid;
@@ -28,5 +28,5 @@ d := dataset([],rec);
 export Key_Appriss_Autokey_Payload := index(dedup(d,record,all)
                                           ,{fakeid}
 										  ,{d}
-										  ,'~thor_200::key::appriss::autokey::qa::payload');
+										  ,data_services.data_location.prefix() + 'thor_200::key::appriss::autokey::qa::payload');
 										  

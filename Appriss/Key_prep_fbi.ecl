@@ -1,4 +1,4 @@
-import doxie,ut;
+import doxie,ut, data_services;
 
 layout_slim:=RECORD
 string25  FBI_NBR;	
@@ -15,4 +15,4 @@ df := PROJECT(file_bookings_base(fbi_nbr <> ''),tSlim(LEFT));
 
 export Key_prep_fbi := 
  index(df,{fbi_nbr},{booking_sid},
-         '~thor_200::key::appriss::'+ doxie.Version_SuperKey+'::fbi' );
+         data_services.data_location.prefix() + 'thor_200::key::appriss::'+ doxie.Version_SuperKey+'::fbi' );

@@ -1,4 +1,4 @@
-import doxie,ut;
+import doxie,ut, data_services;
 
 layout_slim:=RECORD
 string25  DLNUMBER;	
@@ -15,5 +15,5 @@ df := PROJECT(file_bookings_base(dlnumber <> '' ),tSlim(LEFT));
 
 export Key_prep_DL := 
  index(df,{dlnumber},{booking_sid},
-         '~thor_200::key::appriss::'+ doxie.Version_SuperKey+'::dl' );
+         data_services.data_location.prefix() + 'thor_200::key::appriss::'+ doxie.Version_SuperKey+'::dl' );
 

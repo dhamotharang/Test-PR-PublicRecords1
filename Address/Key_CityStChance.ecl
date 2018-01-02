@@ -12,7 +12,7 @@ Payload - st, percent_chance (that the city belongs to the state, computed by zi
 */
 
 //*** First, get the correct header records
-import header,doxie,ut;
+import header,doxie,ut, data_services;
 h := 
 header.File_Headers;
 
@@ -87,7 +87,6 @@ index(
 	j,
 	{city_name},
 	{st, percent_chance},
-	//'~thor_data400::cemtemp::city_name.st'
-	ut.foreign_prod+'thor_data400::key::hdr_city_name.st.percent_chance_' + doxie.Version_SuperKey);
+	data_services.data_location.prefix()+'thor_data400::key::hdr_city_name.st.percent_chance_' + doxie.Version_SuperKey);
 
 export Key_CityStChance := i;

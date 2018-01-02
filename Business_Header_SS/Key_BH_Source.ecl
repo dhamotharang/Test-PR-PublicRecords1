@@ -1,4 +1,4 @@
-IMPORT Business_Header;
+IMPORT Business_Header, data_services;
 
 bh := Business_Header.File_Business_Header_Plus;
 
@@ -12,4 +12,4 @@ END;
 EXPORT Key_BH_Source := INDEX(
 	bh,
 	layout_src_seq,
-	'~thor_data400::key::business_header.src_' + business_header_ss.key_version);
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.src_' + business_header_ss.key_version);

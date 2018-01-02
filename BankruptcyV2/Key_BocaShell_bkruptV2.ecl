@@ -1,4 +1,4 @@
-import doxie, ut;
+import doxie, ut, data_services;
 
 slimmerrec :=
 RECORD
@@ -75,4 +75,4 @@ bankrupt_rolled := ROLLUP(SORT(distribute(w_bk, hash(did)),
 
 bankrupt_slim := PROJECT(bankrupt_rolled, slimmerrec);
 
-export Key_BocaShell_bkruptV2 := index(bankrupt_slim, {did}, {bankrupt_slim}, '~thor_data400::key::bankruptcyv2::bocashell_did_' + doxie.Version_SuperKey);
+export Key_BocaShell_bkruptV2 := index(bankrupt_slim, {did}, {bankrupt_slim}, data_services.data_location.prefix('bankruptcyv2') + 'thor_data400::key::bankruptcyv2::bocashell_did_' + doxie.Version_SuperKey);

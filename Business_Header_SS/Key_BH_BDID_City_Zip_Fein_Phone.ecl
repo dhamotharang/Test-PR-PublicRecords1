@@ -1,3 +1,4 @@
+import  data_services;
 sbh := business_header_ss.File_BH_BDID_City_Plus;
 
 layout_sbh_index := RECORD
@@ -12,4 +13,4 @@ END;
 EXPORT Key_BH_BDID_City_Zip_Fein_Phone := INDEX(
 	sbh,
 	layout_sbh_index,
-	'~thor_data400::key::business_header_bdid.city.zip.fein.phone_' + business_header_ss.key_version, OPT);
+	data_services.data_location.prefix() + 'thor_data400::key::business_header_bdid.city.zip.fein.phone_' + business_header_ss.key_version, OPT);

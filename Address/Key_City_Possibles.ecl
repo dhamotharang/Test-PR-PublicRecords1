@@ -1,4 +1,4 @@
-import header;
+import header, data_services;
 h := header.File_Headers;
 r := record
   h.city_name;
@@ -29,4 +29,4 @@ j := join(t1,t1,left.zip=right.zip,tp(left,right),atmost(100));
 
 sj := dedup(sort(j,city1,city2),city1,city2);
 	
-export Key_City_Possibles := index(sj,{sj},{},'~thor_data400::key::city1.city2');
+export Key_City_Possibles := index(sj,{sj},{},data_services.data_location.prefix() + 'thor_data400::key::city1.city2');

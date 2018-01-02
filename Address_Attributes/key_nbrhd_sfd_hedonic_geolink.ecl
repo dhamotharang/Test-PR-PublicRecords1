@@ -1,4 +1,4 @@
-import doxie, LN_PropertyV2, property, ut, Risk_Indicators;
+import doxie, LN_PropertyV2, property, ut, Risk_Indicators, data_services;
 
 layout_geolink := record
 	string12 geolink;
@@ -209,4 +209,4 @@ Neighborhood_Hedonics := project(Neighborhood_Pre_Hedonics, calcNeighborhoodHedo
 
 export key_nbrhd_sfd_hedonic_geolink  := index(Neighborhood_Hedonics,{
 																			geolink},
-																			{Neighborhood_Hedonics},'~thor_data400::key::Hedonic_SFDNeighborhoodStats::'+ doxie.Version_SuperKey +'::geolink');
+																			{Neighborhood_Hedonics},data_services.data_location.prefix() + 'thor_data400::key::Hedonic_SFDNeighborhoodStats::'+ doxie.Version_SuperKey +'::geolink');

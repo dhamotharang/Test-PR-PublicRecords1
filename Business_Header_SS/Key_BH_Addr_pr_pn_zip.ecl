@@ -1,4 +1,4 @@
-IMPORT Business_Header;
+IMPORT Business_Header, data_services;
 
 f_a := Business_Header_SS.File_BH_CompanyName_Address_Plus
 	((pr_pn_zip_bdids > 0 and pr_pn_zip_bdids < 100) or
@@ -19,4 +19,4 @@ END;
 
 EXPORT Key_BH_Addr_pr_pn_zip := INDEX(
 	f_a, layout_address_index, 
-	'~thor_data400::key::business_header.Addr_pr_pn_zip_' + business_header_ss.key_version, OPT);
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.Addr_pr_pn_zip_' + business_header_ss.key_version, OPT);

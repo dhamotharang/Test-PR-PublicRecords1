@@ -1,4 +1,4 @@
-IMPORT Business_Header;
+IMPORT Business_Header, data_services;
 
 f_cn := Business_Header_SS.File_Prep_BH_CompanyName_Plus;
 
@@ -18,4 +18,4 @@ end;
 
 EXPORT Key_Prep_BH_CompanyName := INDEX(
 	ft(cn_bdids > 0 and cn_bdids <= 10), r, 
-	'~thor_data400::key::business_header.CompanyName_3' + thorlib.wuid());
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.CompanyName_3' + thorlib.wuid());

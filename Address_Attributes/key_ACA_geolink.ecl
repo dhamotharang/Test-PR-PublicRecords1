@@ -1,6 +1,5 @@
-import aca, doxie, risk_indicators, ut;
+import aca, doxie, risk_indicators, ut, data_services;
 
-// df := aca.file_aca_clean(pPersistname := '~thor_data400::persist::aca::file_aca_clean::hri');
 df := ACA.key_aca_addr;
 
 layout_ACA_geolink := record
@@ -24,4 +23,4 @@ end;
 
 Cleaned := project(df, AddressClean(Left));
 
-export key_aca_geolink := index(Cleaned,{geolink}, {Cleaned}, '~thor_Data400::key::neighborhood::'+doxie.Version_SuperKey+'::aca_institutions_geolink');
+export key_aca_geolink := index(Cleaned,{geolink}, {Cleaned}, data_services.data_location.prefix() + 'thor_Data400::key::neighborhood::'+doxie.Version_SuperKey+'::aca_institutions_geolink');

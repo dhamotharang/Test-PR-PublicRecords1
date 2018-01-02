@@ -1,4 +1,4 @@
-import doxie;
+import doxie, data_services;
 
 r := business_risk.BDID_Table;
 
@@ -106,6 +106,6 @@ Layout_BDID_Risk_Table :=
   unsigned2 cnt_Y;
 end;
 
-//r := dataset('~thor_data400::persist::bdid_risk_table', Layout_BDID_Risk_Table, flat, __compressed__);
 
-export key_bdid_table := index(r,{bdid},{r},'~thor_data400::key::bdid_table_'+doxie.Version_SuperKey);
+
+export key_bdid_table := index(r,{bdid},{r},data_services.data_location.prefix() + 'thor_data400::key::bdid_table_'+doxie.Version_SuperKey);
