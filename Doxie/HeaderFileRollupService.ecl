@@ -108,7 +108,7 @@
 	<part name="ProductCode"		  		      type="xsd:unsignedInt"/>
 
 	<!-- Progressive/waterfall Phone options -->
-	<part name="IncludeProgessivePhone" type="xsd:boolean"/>
+	<part name="IncludeProgressivePhone" type="xsd:boolean"/>
 	<part name="ScoreModel" 						type="xsd:string"/>
   <part name="MaxNumAssociate"  			type="xsd:unsignedInt"/>
   <part name="MaxNumAssociateOther"  	type="xsd:unsignedInt"/>
@@ -144,7 +144,7 @@ EXPORT HeaderFileRollupService := MACRO
     BOOLEAN   BatchFriendly           := FALSE : STORED('BatchFriendly');
     STRING    DLNumber_Value          := ''    : STORED('DLNumber');
     STRING    DLState_Value           := ''    : STORED('DLState');
-		BOOLEAN   IncProgessivePhone			:= FALSE : STORED('IncludeProgessivePhone');
+		BOOLEAN   IncProgressivePhone			:= FALSE : STORED('IncludeProgressivePhone');
     #STORED('dl_number',stringlib.stringtouppercase(DLNumber_Value));
         
     doxie.MAC_Header_Field_Declare();
@@ -195,7 +195,7 @@ EXPORT HeaderFileRollupService := MACRO
 
 	  ta_phones := doxie.HeaderFileRollupService_Records.get_progressive_phone(ta2,ProgPhone_mod);
 		
-		ta_final := IF(IncProgessivePhone,ta_phones,ta2);
+		ta_final := IF(IncProgressivePhone,ta_phones,ta2);
 		
     //create flat version specifically designed for batch
     ta1_batch := doxie.fn_flatten_rollup(ta_final, BatchAccount);
