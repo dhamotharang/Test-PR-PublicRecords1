@@ -20,7 +20,7 @@ EXPORT _config := MODULE
     SHARED fst_monthly_file:=FileServices.remotedirectory(sprayIP(_control.IPAddress.bctlpedata10),sourcePath,monthly_files,false)[1].name;
     SHARED fst_weekly_file:=FileServices.remotedirectory(sprayIP(_control.IPAddress.bctlpedata10),sourcePath,weekly_files,false)[1].name;
     
-    SHARED newEquifaxMothlyHeaderDate := regexreplace('MONTHLY_HEADER_E_(.*).DAT',fst_monthly_file,'\\1');
+    SHARED newEquifaxMothlyHeaderDate := regexreplace('MONTHLY_HEADER_[C|E|S|W]_(.*).DAT',fst_monthly_file,'\\1');
     SHARED curEquifaxWeeklyHeaderDate := regexreplace('WEEKLY_HEADER_(.*).DAT',fst_weekly_file,'\\1');
     
     // We always add 7 days (sunday to sunday)
