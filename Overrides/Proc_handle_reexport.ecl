@@ -7,6 +7,7 @@ export Proc_handle_reexport(string reexportflag = 'no'
 												,string desprayprefix = '/data/data_lib_2_hus2/overrides/archive'
 												,string versiontoremove = '' // use when the logicals have to removed from super manually
 																							// example: 2 exports came in and first failed, second passed but you need to remove the first
+																							//JIRA: DF-20859  
 												) := function
 	// integer GetWords(string s,string1 c=' ') := BEGINC++
   // #option pure
@@ -27,7 +28,8 @@ export Proc_handle_reexport(string reexportflag = 'no'
 	despraylocation := if (_Control.ThisEnvironment.Name = 'Prod_Thor',
 															desprayprefix+'/transfer',
 															desprayprefix+'/transfer/test');
-															
+	
+	//JIRA: DF-20859  
 	patterntosearch := if (versiontoremove <> '','*in*override*'+versiontoremove+'*','');
  
  
@@ -35,6 +37,7 @@ export Proc_handle_reexport(string reexportflag = 'no'
 		string name;
 	end;
  
+ //JIRA: DF-20859  
 	ds := if (patterntosearch <> ''
 							,project(fileservices.logicalfilelist(patterntosearch),transform(rSuperNames,self := left))
 							,fileservices.superfilecontents('~thor_data400::base::override::fcra::qa::lastprocessed')
@@ -76,7 +79,7 @@ export Proc_handle_reexport(string reexportflag = 'no'
 	return sequential(
 					if ( ~fileservices.superfileexists('~thor_data400::base::override::fcra::qa::lastprocessed'),
 							fileservices.createsuperfile('~thor_data400::base::override::fcra::qa::lastprocessed')),
-					if (reexportflag = 'yes' or versiontoremove <> '',
+					if (reexportflag = 'yes' or versiontoremove <> '', //JIRA: DF-20859  
 						nothor(apply(global(dPopulateSupername,few)
 							,sequential(fileservices.removesuperfile('~'+supername,'~'+thorname)
 								
@@ -90,7 +93,7 @@ export Proc_handle_reexport(string reexportflag = 'no'
 									)
 							)
 						),
-					if (versiontoremove = ''
+					if (versiontoremove = '' //JIRA: DF-20859  
 						,fileservices.clearsuperfile('~thor_data400::base::override::fcra::qa::lastprocessed'))
 					);
 end;
