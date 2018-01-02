@@ -1,4 +1,4 @@
-import bankruptcyv3;
+﻿import bankruptcyv3, data_services;
 
 dBK_as_Source	:=	BankruptcyV3.BKv3_as_source(,,true);
 
@@ -11,6 +11,6 @@ slim_bk := project(dbk_as_source,transform(src_rec,self := left));
 
 mac_key_src(slim_bk, {string50 tmsid}, 
 						bk_child, 
-						'~thor_data400::key::bkv3_src_index_',id)
+						data_services.data_location.prefix() + 'thor_data400::key::bkv3_src_index_',id)
 
 export Key_Src_BKv3 := id;

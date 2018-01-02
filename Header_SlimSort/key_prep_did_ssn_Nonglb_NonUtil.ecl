@@ -1,3 +1,5 @@
+﻿import data_services;
+
 slim_rec_plus := record
 	unsigned6 did;
 	qstring9 ssn;
@@ -9,4 +11,4 @@ end;
 
 k4 := dataset('~thor_data400::base::did_ssn_nonglb_nonUtil_BUILDING',slim_rec_plus,flat);
 
-export key_prep_did_ssn_Nonglb_NonUtil := index(k4,{did,ssn,ssn4,freq,__fpos},'~thor_Data400::key::did_ssn_nonglb_nonUtil' + thorlib.wuid());
+export key_prep_did_ssn_Nonglb_NonUtil := index(k4,{did,ssn,ssn4,freq,__fpos},data_services.data_location.prefix() + 'thor_Data400::key::did_ssn_nonglb_nonUtil' + thorlib.wuid());

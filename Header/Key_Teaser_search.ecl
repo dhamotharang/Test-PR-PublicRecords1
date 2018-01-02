@@ -1,4 +1,4 @@
-import ut, doxie;
+﻿import ut, doxie, data_services;
 
 teaser := Header.file_teaser;
 
@@ -14,4 +14,4 @@ teaser_prepped := project(teaser, prep(left));
 
 export Key_Teaser_search := index(teaser_prepped, {dph_lname, lname, isCurrent, st, pfname, fname, zip, yob, minit}, 
 																									{teaser_prepped},
-																	'~thor_data400::key::watchdog_nonglb.teaser_search_' + doxie.Version_SuperKey);
+																	data_services.data_location.prefix() + 'thor_data400::key::watchdog_nonglb.teaser_search_' + doxie.Version_SuperKey);

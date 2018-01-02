@@ -1,9 +1,9 @@
-import autokeyb2,doxie,header, ut, codes,RoxieKeyBuild, infutor,mdr;
+﻿import autokeyb2,doxie,header, ut, codes,RoxieKeyBuild, infutor,mdr, data_services;
 
 srtcmbFILE := dataset([], recordof(doxie.header_pre_keybuild)-layout_header_exclusions);
 
 export Key_Header_Infutor_Knowx := INDEX(srtcmbFILE, {unsigned6 s_did := did}, {srtcmbFILE}-layout_header_exclusions, 
-							'~thor_data400::key::header.adl.infutor.knowx_' + doxie.version_superkey, OPT);
+							data_services.data_location.prefix() + 'thor_data400::key::header.adl.infutor.knowx_' + doxie.version_superkey, OPT);
 
 
 
@@ -89,4 +89,4 @@ export Key_Header_Infutor_Knowx := INDEX(srtcmbFILE, {unsigned6 s_did := did}, {
 // srtcmbFILE := sort(distribute(cmbFILEDoxie, hash(did, rid)), record, local);
 
 // /* //Build Keys - Index syntax taken from doxie.key_header */
-// export Key_Header_Infutor_Knowx := INDEX(srtcmbFILE, {unsigned6 s_did := did}, {srtcmbFILE}, '~thor_data400::key::header.adl.infutor.knowx_' + doxie.version_superkey, OPT);
+// export Key_Header_Infutor_Knowx := INDEX(srtcmbFILE, {unsigned6 s_did := did}, {srtcmbFILE}, data_services.data_location.prefix() + 'thor_data400::key::header.adl.infutor.knowx_' + doxie.version_superkey, OPT);

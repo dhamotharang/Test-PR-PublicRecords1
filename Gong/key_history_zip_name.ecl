@@ -1,4 +1,4 @@
-import gong, doxie, ut, nid;
+﻿import gong, doxie, ut, nid, data_services;
 
 hist_in := Gong.File_History_Full_Prepped_for_Keys(z5<>'');
 gong.mac_hist_full_slim_dep(hist_in, hist_out)
@@ -12,4 +12,4 @@ Export key_history_zip_name :=
 						  name_first
 					       },
             {hist_out},
-		   '~thor_data400::key::gong_history_zip_name_'  + doxie.Version_SuperKey);
+		   data_services.data_location.prefix() + 'thor_data400::key::gong_history_zip_name_'  + doxie.Version_SuperKey);

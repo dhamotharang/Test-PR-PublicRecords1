@@ -1,4 +1,4 @@
-IMPORT doxie;
+﻿IMPORT doxie, data_services;
 
 InpFile := PROJECT(InstantID_Archiving.Files_Base.InstantIDi_Verification, 
 										TRANSFORM({STRING25 product := 'INSTANTID INTERNATIONAL', InstantID_Archiving.Layouts.Verification}, 
@@ -12,4 +12,4 @@ SrtFile := SORT(DstFile, transaction_ID, product, date_added, LOCAL);
 DdpFile := DEDUP(SrtFile, RECORD, LOCAL);
 
 EXPORT Key_Verification := INDEX(DdpFile, {transaction_id}, {DdpFile}, 
-															'~thor_data400::key::instantid_archiving::'+doxie.Version_SuperKey+'::verification', opt);
+															data_services.data_location.prefix() + 'thor_data400::key::instantid_archiving::'+doxie.Version_SuperKey+'::verification', opt);

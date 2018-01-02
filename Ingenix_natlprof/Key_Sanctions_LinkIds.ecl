@@ -1,8 +1,8 @@
-IMPORT BIPV2, doxie;
+﻿IMPORT BIPV2, doxie, data_services;
 
 EXPORT Key_Sanctions_LinkIds := MODULE
 		shared  base_recs 					:= Ingenix_NatlProf.Basefile_Sanctions_Bdid;
-		export  out_SuperFile_Name  := '~thor_data400::key::ingenix_sanctions_linkids_' + doxie.Version_SuperKey; //linkids Key Super FileName
+		export  out_SuperFile_Name  := data_services.data_location.prefix() + 'thor_data400::key::ingenix_sanctions_linkids_' + doxie.Version_SuperKey; //linkids Key Super FileName
 		
 		BIPV2.IDmacros.mac_IndexWithXLinkIDs(base_recs, out_key, out_SuperFile_Name);
 		export Key := out_key;

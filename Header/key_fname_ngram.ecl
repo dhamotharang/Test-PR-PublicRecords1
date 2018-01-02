@@ -1,4 +1,4 @@
-import header,doxie ; 
+﻿import header,doxie, data_services ; 
 df0 := header.file_fname_ngram; 
 
 layout_slim := record
@@ -16,4 +16,4 @@ end;
 df := project(df0, reformat(left)); 
 
 export key_fname_ngram := index(df,{ngram}, {fname,_count}, 
-                                  '~thor_data400::key::hdr_fname_ngram_' + doxie.Version_SuperKey);
+                                  data_services.data_location.prefix() + 'thor_data400::key::hdr_fname_ngram_' + doxie.Version_SuperKey);

@@ -1,4 +1,4 @@
-import doxie;
+﻿import doxie, Data_Services;
 
 f := File_GlobalWatchLists_Keybuild;
 
@@ -14,4 +14,4 @@ TRANSFORM
 END;
 vessels_fixed := PROJECT(f,fix_vessels(LEFT));
 
-export key_GlobalWatchLists_key := INDEX(vessels_fixed,{pty_key},{vessels_fixed},'~thor_data400::key::globalwatchlists::globalwatchlists_key_'+doxie.Version_SuperKey);
+export key_GlobalWatchLists_key := INDEX(vessels_fixed,{pty_key},{vessels_fixed},data_services.data_location.prefix() + 'thor_data400::key::globalwatchlists::globalwatchlists_key_'+doxie.Version_SuperKey);

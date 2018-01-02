@@ -1,4 +1,4 @@
-import doxie,gong,gong_services,ut;
+﻿import doxie,gong,gong_services,ut, data_services;
 
 // Threshold for overly frequent combinations is 5000 instances
 // Any combination with less than 5000 instances will be excluded from the key (query will just search for these);
@@ -162,6 +162,6 @@ surnames_lfs_final := PROJECT(surnames_lfs_dd, f_layout_cnt);
 // combine them all and index 
 surnames_final := surnames_l_final + surnames_lf_final + surnames_ls_final + surnames_lfs_final;
 
-d:=INDEX(surnames_final,{k_name_last,k_name_first,k_st},{surnames_final}, '~thor_data400::key::gong_history::qa::surnames');
+d:=INDEX(surnames_final,{k_name_last,k_name_first,k_st},{surnames_final}, data_services.data_location.prefix() + 'thor_data400::key::gong_history::qa::surnames');
 
 export Key_History_Surname := d;

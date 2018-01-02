@@ -1,4 +1,4 @@
-import ingenix_natlprof, doxie, Data_Services;
+﻿import ingenix_natlprof, doxie, Data_Services;
 
 file_in := Ingenix_NatlProf.Basefile_ProviderSanctions;
 											 
@@ -8,7 +8,7 @@ dedup_providerid_base := dedup(sort_providerid_base,record,local);
 
 export key_ProviderSanctions_id :=index(dedup_providerid_base, 
                                 {unsigned6 l_providerid := (unsigned6)providerid},
-						  {dedup_providerid_base},'~thor_data400::key::ing_ProviderSanctions_id_' + doxie.Version_SuperKey);
+						  {dedup_providerid_base},data_services.data_location.prefix() + 'thor_data400::key::ing_ProviderSanctions_id_' + doxie.Version_SuperKey);
 								
 
 								

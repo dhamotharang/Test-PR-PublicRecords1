@@ -1,4 +1,4 @@
-import ingenix_natlprof, Doxie;
+﻿import ingenix_natlprof, Doxie, data_services;
 
 
 file_in := ingenix_natlprof.File_in_Providerlanguage;
@@ -10,6 +10,6 @@ sort_id_base := sort(dist_id_base, providerid, local);
 
 export key_language_providerid := index(sort_id_base, 
                                 {unsigned6 l_providerid := (unsigned6)providerid},{sort_id_base},
-				            '~thor_data400::key::ingenix_language_providerid_' + Doxie.Version_SuperKey);
+				            data_services.data_location.prefix() + 'thor_data400::key::ingenix_language_providerid_' + Doxie.Version_SuperKey);
 
 

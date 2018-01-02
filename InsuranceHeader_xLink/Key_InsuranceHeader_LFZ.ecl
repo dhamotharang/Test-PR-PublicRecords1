@@ -1,10 +1,10 @@
-IMPORT SALT37,std;
+﻿IMPORT SALT37,std,data_services;
 EXPORT Key_InsuranceHeader_LFZ(BOOLEAN incremental=FALSE) := MODULE
  
 //LNAME:FNAME:ZIP:+:CITY:PRIM_RANGE:PRIM_NAME:SSN5:SSN4:MNAME:SEC_RANGE:SNAME:DOB:ST
 EXPORT KeyName := KeyNames().LFZ_super; /*HACK*/
  
-EXPORT KeyName_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::LFZ';
+EXPORT KeyName_sf := data_services.data_location.prefix() + KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::LFZ';
  
 EXPORT AssignCurrentKeyToSuperFile := FileServices.AddSuperFile(KeyName_sf,KeyName);
  

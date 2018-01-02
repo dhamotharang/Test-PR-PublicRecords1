@@ -1,4 +1,4 @@
-import doxie, header;
+﻿import doxie, header, data_services;
 
 hdr := header.File_Headers;
 
@@ -42,4 +42,4 @@ hdr_final := join(hdr_final_ready, hdr_uni_did,
 			   
 export key_name_unique_did := 
        index(hdr_final, {fname, lname}, {did}, 
-	        '~thor_data400::key::fname.lname.unique.did_' + doxie.Version_SuperKey);
+	        data_services.data_location.prefix() + 'thor_data400::key::fname.lname.unique.did_' + doxie.Version_SuperKey);

@@ -1,4 +1,4 @@
-IMPORT doxie;
+﻿IMPORT doxie, data_services;
 
 {STRING25 product, InstantID_Archiving.Layouts.Risk}
 																trInFIle(InstantID_Archiving.Layouts.Risk L, STRING product) := TRANSFORM
@@ -22,4 +22,4 @@ SrtFile := SORT(DstFile, transaction_ID, product, date_added, LOCAL);
 DdpFile := DEDUP(SrtFile, RECORD, LOCAL);
 
 EXPORT Key_Risk := INDEX(DdpFile, {transaction_id}, {DdpFile}, 
-															'~thor_data400::key::instantid_archiving::'+doxie.Version_SuperKey+'::risk', opt);
+															data_services.data_location.prefix() + 'thor_data400::key::instantid_archiving::'+doxie.Version_SuperKey+'::risk', opt);
