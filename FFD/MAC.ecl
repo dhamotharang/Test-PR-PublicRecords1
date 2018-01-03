@@ -1,4 +1,4 @@
-EXPORT MAC := MODULE
+﻿EXPORT MAC := MODULE
 
 	EXPORT AppendConsumerStatements(__inf, __outf, __statements, __lout, __csf = 'ConsumerStatements') := MACRO
 		__outf := PROJECT(__inf, transform(__lout, self.__csf := __statements, self := left));
@@ -7,7 +7,7 @@ EXPORT MAC := MODULE
 	EXPORT PrepareResultRecord(__results, __outrec, __statements, __lout) := MACRO
 		IMPORT FFD,iesp;
 		#uniquename(__res_statements);
-		%__res_statements% := IF(EXISTS(__results),__statements,FFD.Constants.BlankConsumerStatements);
+		%__res_statements% := IF(EXISTS(__results),__statements,__statements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel));
 		
 		#uniquename(__res_layout);
 		%__res_layout% := RECORD

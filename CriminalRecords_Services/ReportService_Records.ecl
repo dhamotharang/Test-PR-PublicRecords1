@@ -1,4 +1,4 @@
-import  doxie, suppress, iesp, SexOffender_Services, fcra, FFD, ut;
+﻿import  doxie, suppress, iesp, SexOffender_Services, fcra, FFD, ut;
 
 export ReportService_Records := module
 	
@@ -71,9 +71,11 @@ export ReportService_Records := module
 
 		result:= applyRulesAndFormatCrimRecs(recs, in_params, isFCRA, ds_flags, slim_pc_recs, in_params.FFDOptionsMask);
 		
-		consumer_statements := if(isFCRA and showConsumerStatements and (exists(result[1].SexualOffenses) or exists(result[1].CriminalRecords)), 
-																FFD.prepareConsumerStatements(pc_recs), 
-																FFD.Constants.BlankConsumerStatements);
+		consumer_statements_all := if(isFCRA and showConsumerStatements, FFD.prepareConsumerStatements(pc_recs), 
+                                  FFD.Constants.BlankConsumerStatements);
+    has_consumer_data := exists(result[1].SexualOffenses) or exists(result[1].CriminalRecords);  
+    
+		consumer_statements := consumer_statements_all(has_consumer_data  OR StatementType IN FFD.Constants.RecordType.StatementConsumerLevel);
 		
 		FFD.MAC.AppendConsumerStatements(result, result_final, consumer_statements, iesp.criminal_fcra.t_FcraCriminalReportResponse);
 				

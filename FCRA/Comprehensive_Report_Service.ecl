@@ -92,7 +92,9 @@ doxie_crs.layout_report_fcra patch(doxie.layout_central_records l) := transform
 end;
 
 all_records := project (cent, patch(left));
-consumer_statements := if(ShowConsumerStatements and exists(all_records), FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements); 
+consumer_statements_all := if(ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
+
+consumer_statements := consumer_statements_all(exists(all_records) OR StatementType IN FFD.Constants.RecordType.StatementConsumerLevel); 
 
 outputErrors := output (remote_header_err, NAMED('exception'), EXTEND);
 
