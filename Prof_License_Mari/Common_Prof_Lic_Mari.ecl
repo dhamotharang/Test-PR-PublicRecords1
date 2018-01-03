@@ -1,4 +1,7 @@
-﻿export Common_Prof_Lic_Mari := MODULE
+﻿/*2016-06-08T19:32:42Z (Xia Sheng)
+Unix to Linux Migration 
+*/
+export Common_Prof_Lic_Mari := MODULE
 
 
 // common to all Profesional Lic MARI processing
