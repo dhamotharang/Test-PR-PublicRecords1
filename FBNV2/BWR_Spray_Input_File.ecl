@@ -1,4 +1,4 @@
-import FBNV2,_control;
+﻿import FBNV2,_control;
 
 export BWR_Spray_Input_File (string filename,string filedate,string source) 
 		:= function
@@ -31,7 +31,8 @@ export BWR_Spray_Input_File (string filename,string filedate,string source)
 																			'~thor_data400::in::fbnv2::tx::harris::' + filedate+ '::dbas') );
 
 				spray_Fixed				:= FileServices.SprayFixed(sourceip,filename, reclength,groupname,logicalfilename,-1,,,true,true,true);
-				spray_file				:= map(trim(source,left,right) in ['San_Diego','Filing','Event'] => spray_Fixed,
+				spray_file				:= map(trim(source,left,right) in ['Filing','Event'] => spray_Fixed,
+				                         trim(source,left,right) = 'San_Diego'   => FileServices.SprayVariable(sourceip,filename, ,',','\\n,\\r\\n','"',groupname,logicalfilename,-1,,,true,true,true),
 																 trim(source,left,right) = 'Santa_Clara' => FileServices.SprayVariable(sourceip,filename, ,,,'"',groupname,logicalfilename,-1,,,true,true,true),
 														     trim(source,left,right) = 'Harris' => spray_Harris,
 																 trim(source,left,right) = 'Orange' => FileServices.SprayVariable(sourceip,filename, ,,,'"',groupname,logicalfilename,-1,,,true,true,true),
@@ -40,7 +41,7 @@ export BWR_Spray_Input_File (string filename,string filedate,string source)
 																 
 				create_super			:= FileServices.CreateSuperFile(superfilename,false);
 				add_super 				:= sequential(FileServices.StartSuperFileTransaction(),
-																				FileServices.ClearSuperFile(superfilename),
+																				FileServices.ClearSuperFile(superfilename), 
 																				fileservices.addsuperfile(superfilename,logicalfilename),
 																				FileServices.FinishSuperFileTransaction()
 																			 );

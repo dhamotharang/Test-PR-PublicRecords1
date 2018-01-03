@@ -14,7 +14,7 @@
     RETURN NOTHOR(
       APPLY(
   	    dFilesToSpray,
-  		  FileServices.SprayVariable(constants.sRemoteIPAddress,sRemoteDirectory+dFilesToSpray.filename,,,,,thorlib.cluster(),sLocalDirectory+dFilesToSpray.filename,,,,TRUE)
+  		  FileServices.SprayVariable(constants.sRemoteIPAddress,sRemoteDirectory+dFilesToSpray.filename,,,,,thorlib.group(),sLocalDirectory+dFilesToSpray.filename,,,,TRUE)
   	  )
     );
   END;
