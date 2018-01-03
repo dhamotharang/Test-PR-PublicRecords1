@@ -1,4 +1,5 @@
-import autokey,header,ut;
+import autokey,header, data_services;
+
 d := header.Prepped_For_Keys;
 
 autokey.MAC_zipPRLname(d,fname,mname,lname,
@@ -12,8 +13,7 @@ autokey.MAC_zipPRLname(d,fname,mname,lname,
 						rel_fname1,rel_fname2,rel_fname3,
 						lookups,
 						did,
-						//ut.foreign_prod +'thor_data400::key::header.ZipPRLName',
-						'~thor_data400::key::header.ZipPRLName',
+						data_services.data_location.prefix() + 'thor_data400::key::header.ZipPRLName',
 						k)
 
 export Key_Header_ZipPRLName := k;

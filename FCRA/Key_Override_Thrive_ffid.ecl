@@ -1,9 +1,9 @@
-import fcra, ut, data_services; 
+import fcra, data_services; 
 export Key_Override_Thrive_ffid := MODULE
 
 shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
 shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-shared keyname_prefix := data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::';
+shared keyname_prefix := data_services.data_location.prefix()+'thor_data400::key::override::fcra::';
 
 ds_thrive := dataset(fname_prefix + 'thrive',FCRA.Layout_Override_thrive,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
 dailyds_thrive := dataset(daily_prefix + 'thrive',FCRA.Layout_Override_thrive,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);

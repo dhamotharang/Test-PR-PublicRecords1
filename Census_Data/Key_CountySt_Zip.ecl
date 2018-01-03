@@ -1,13 +1,13 @@
 // The purpose is to link a list of zip codes to a county
 
-IMPORT doxie, ut;
+IMPORT doxie, data_services;
 
 // fips5 is complete fips: 2 digit state code + 3 char county code
 layout_zips := RECORD
   string5 fips5;
   string5 zip5;
 END;
-ds_fips5_to_zip := DATASET ('~thor_data400::in::ZipbyCountyKeys', layout_zips, CSV);
+ds_fips5_to_zip := DATASET (data_services.data_location.prefix() + 'thor_data400::in::ZipbyCountyKeys', layout_zips, CSV);
 
 base_file := Census_Data.file_Fips2County;
 
@@ -30,7 +30,7 @@ ds_join := JOIN (ds_fips5_to_zip, base_file,
                  ATMOST (1)); // m:1 non-keyed relation
 
 EXPORT Key_CountySt_Zip := INDEX (ds_join, {county_name, state_code}, {zip5},
-                                 ut.foreign_prod+'thor_data400::key::countystate_zip_' + doxie.Version_SuperKey);
+                                 data_services.data_location.prefix() + 'thor_data400::key::countystate_zip_' + doxie.Version_SuperKey);
 
 
 // 27 zip records are missing for ALASKA. ALASKA "counties" (boroughs) discrepancies:

@@ -1,4 +1,4 @@
-import header;
+import header, data_services;
 
 // first portion repeated from Key_Did_Lookups
 res1 := exp_lookups;
@@ -73,4 +73,7 @@ end;
 
 res_out := join(res,res3,left.did = right.did,into2(LEFT,RIGHT),full outer,hash);
 
-export Key_Did_Lookups_v2 := index(res_out,{did},{res_out},'~thor_data400::key::header_lookups_v2_' + version_superkey);
+export Key_Did_Lookups_v2 := index(res_out,
+                                   {did},
+                                   {res_out},
+                                   data_services.data_location.prefix() + 'thor_data400::key::header_lookups_v2_' + version_superkey);

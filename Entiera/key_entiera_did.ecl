@@ -1,4 +1,4 @@
-import doxie,ut;
+import doxie, data_services;
 
 entiera_did					:= project(File_Entiera_Base_for_Keys(did>0),Layouts.Base_For_Indexes);
 entiera_did_w_fakes	:= project(Key_Payload,Layouts.Base_For_Indexes);
@@ -10,6 +10,5 @@ export key_entiera_did :=
 index(entiera_did_ready
       ,{did}
       ,{entiera_did_ready}
-			,'~thor_200::key::entiera::'+doxie.Version_SuperKey+'::did'
+			,data_services.data_location.prefix() + 'thor_200::key::entiera::'+doxie.Version_SuperKey+'::did'
 	 );
-

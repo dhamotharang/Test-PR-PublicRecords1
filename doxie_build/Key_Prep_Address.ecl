@@ -1,4 +1,4 @@
-import header;
+import header, data_services;
 
 t := header.Prepped_For_Keys;
 
@@ -23,4 +23,6 @@ r := record
 
 recs := dedup( sort( table(t,r), record, record ) ); 
 
-export Key_Prep_Address := index(recs,{recs},'~thor_data400::key::header.pname.prange.st.city.sec_range.lname' + thorlib.wuid());
+export Key_Prep_Address := index(recs,
+                                 {recs},
+                                 data_services.data_location.prefix() + 'thor_data400::key::header.pname.prange.st.city.sec_range.lname' + thorlib.wuid());

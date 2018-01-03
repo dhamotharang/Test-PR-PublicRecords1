@@ -1,4 +1,4 @@
-import doxie, ingenix_natlprof;
+import doxie, ingenix_natlprof, data_services;
 
 file_in := ingenix_natlprof.Basefile_Provider_Did;
 	
@@ -257,6 +257,6 @@ out_with_taxids := denormalize(out_with_licenses, f_taxids_dep,
 				           app_taxids(left, right), local) : persist('per_out_with_taxids');
 						 
 export key_provider_search_id := index(out_with_taxids, 
-                                          {unsigned6 l_providerid := (unsigned6)providerid},
-						            {out_with_taxids},
-				                      '~thor_data400::key::ing_provider_search_id_' + doxie.Version_SuperKey);
+                                       {unsigned6 l_providerid := (unsigned6)providerid},
+                                       {out_with_taxids},
+                                       data_services.data_location.prefix() + 'thor_data400::key::ing_provider_search_id_' + doxie.Version_SuperKey);

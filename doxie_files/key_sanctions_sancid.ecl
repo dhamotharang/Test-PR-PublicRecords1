@@ -1,4 +1,4 @@
-import Ingenix_NatlProf, doxie;
+import Ingenix_NatlProf, doxie, data_services;
 
 temp_rec := record
   string12	Bdid;
@@ -16,7 +16,6 @@ base_file := project(bdided_file,
 										   self      := left));
 
 export key_sanctions_sancid := index(base_file,
-                                 {unsigned6 l_sancid := (unsigned6)SANC_ID},
-						   {base_file},
-						   '~thor_data400::key::ingenix_sanctions_sancid_' + doxie.Version_SuperKey);
-												
+                                     {unsigned6 l_sancid := (unsigned6)SANC_ID},
+                                     {base_file},
+                                     data_services.data_location.prefix() + 'thor_data400::key::ingenix_sanctions_sancid_' + doxie.Version_SuperKey);

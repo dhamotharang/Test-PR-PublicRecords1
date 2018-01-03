@@ -1,5 +1,8 @@
-import doxie;
+import doxie, data_services;
 
 df := domains.File_Whois_Base;
 
-export Key_Whois_Bdid := index(df(bdid != 0),{bdid},{df},'~thor_Data400::key::whois_bdid_' + doxie.Version_SuperKey);
+export Key_Whois_Bdid := index(df(bdid != 0),
+                               {bdid},
+                               {df}, 
+                               data_services.data_location.prefix() + 'thor_Data400::key::whois_bdid_' + doxie.Version_SuperKey);

@@ -1,4 +1,4 @@
-import header, census_data, did_add;
+import header, census_data, data_services;
 
 death_record := record
 	header.File_Did_StateDeath_Master;
@@ -12,4 +12,4 @@ census_data.MAC_Fips2County(death_ready, state, fips_county, county_name, dead_w
 export key_statedeath_master_did := 
   index(dead_with_county(did <> '000000000000'),
   {unsigned6 l_did := (integer)did}, {dead_with_county},
-	'~thor_data400::key::did_statedeath_master_' + doxie.Version_SuperKey);
+	data_services.data_location.prefix() + 'thor_data400::key::did_statedeath_master_' + doxie.Version_SuperKey);

@@ -1,4 +1,4 @@
-import gong, doxie;
+import gong, doxie, data_services;
 
 input_recs := gong.File_Gong_Full(TRIM(st)<>'' AND TRIM(p_city_name)<>'' AND TRIM(prim_name)<>'');
 
@@ -32,4 +32,4 @@ export Key_st_city_prim_name_prim_range :=
 							string28 prim_name := prim_name,
 							string10 prim_range := prim_range},
              {all_cities},
-		   '~thor_data400::key::gong_eda_st_city_prim_name_prim_range_' + doxie.Version_SuperKey);
+		         data_services.data_location.prefix() + 'thor_data400::key::gong_eda_st_city_prim_name_prim_range_' + doxie.Version_SuperKey);

@@ -1,10 +1,10 @@
-import watercraft, ut, data_services;
+import watercraft, data_services;
 
 export key_override_watercraft := MODULE
 
-  shared fname_prefix := data_services.data_location.prefix('fcra_overrides')+'thor_data400::base::override::fcra::qa::';
+  shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
 	shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-  shared keyname_prefix := data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::watercraft::qa::';
+  shared keyname_prefix := data_services.data_location.prefix()+'thor_data400::key::override::fcra::watercraft::qa::';
 
   // SID
   sid_rec := record

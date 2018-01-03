@@ -1,4 +1,4 @@
-import liensv2;
+import data_services;
 
 
 id_rec := RECORD
@@ -14,7 +14,8 @@ id_rec := RECORD
 
 id_table := dataset([],id_rec);
 
-export key_boolean_id := index(id_table,{src,doc,state_death_id,__filepos},'~thor_data400::key::death_master::qa::docref.state_death_id');
-
+export key_boolean_id := index(id_table,
+                               {src,doc,state_death_id,__filepos},
+                               data_services.data_location.prefix() + 'thor_data400::key::death_master::qa::docref.state_death_id');
 
 

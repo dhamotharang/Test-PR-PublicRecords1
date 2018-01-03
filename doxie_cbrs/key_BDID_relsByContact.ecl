@@ -1,4 +1,4 @@
-import business_header,doxie;
+import business_header,doxie, data_services;
 
 set_notname := ['DOMAIN','REGISTERED','AGENT','ADMINISTRATOR'];
 c := business_header.File_Business_Contacts
@@ -47,4 +47,4 @@ j2 := join(jd,scores,left.bdid = right.bdid and left.bdid2 = right.bdid2, addsco
 export key_BDID_relsByContact := index(j2,
 {bdid, score},
 {did, bdid2},
-'~thor_data400::key::cbrs.bdid_relsByContact_' + doxie.Version_SuperKey);
+data_services.data_location.prefix() + 'thor_data400::key::cbrs.bdid_relsByContact_' + doxie.Version_SuperKey);

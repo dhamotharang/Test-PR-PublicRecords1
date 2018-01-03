@@ -1,4 +1,4 @@
-import Driversv2,Text_Search;
+﻿import Driversv2,Text_Search, data_services;
 
 	// Key layout
 	string_rec := record
@@ -19,7 +19,9 @@ import Driversv2,Text_Search;
 	dist_map := distribute(proj_map,hash(doc));
 	sort_map := sort(dist_map,src,doc,local);
 	tmsid_map := dedup(sort_map,src,doc,local);
+
 // check if the persist file exists, if it does do the boolean build, if not read the key.
-export Key_Boolean_Map := index(if(fileservices.fileexists('~thor_data400::persist::dlv2::boolean'),
-																		tmsid_map,read_ret),{src,doc},'~thor_data400::key::dlv2::qa::docref.dlseq');
-														
+export Key_Boolean_Map :=  index(if(fileservices.fileexists('~thor_data400::persist::dlv2::boolean'),
+																		tmsid_map, read_ret),
+															  {src,doc},
+															  data_services.data_location.prefix() + 'thor_data400::key::dlv2::qa::docref.dlseq');

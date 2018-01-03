@@ -1,4 +1,4 @@
-import calbus;
+import data_services;
 
 
 tmsid_rec := RECORD
@@ -11,7 +11,6 @@ tmsid_rec := RECORD
 
 tmsid_table := dataset([],tmsid_rec);
 
-export key_boolean_map := index(tmsid_table,{doc,corp_key,__filepos},'~thor_data400::key::corp2::qa::docref.docref');
-
-
-
+export key_boolean_map := index(tmsid_table,
+                                {doc,corp_key,__filepos},
+                                data_services.data_location.prefix() + 'thor_data400::key::corp2::qa::docref.docref');

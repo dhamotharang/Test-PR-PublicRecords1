@@ -1,4 +1,4 @@
-import doxie;
+import doxie, data_services;
 
 //ntlFile := FLAccidents.BaseFile_NtlAccidents_Alpharetta(party_type = '' or party_type = 'NOT DEFINED');
 ntlFile := FLAccidents.BaseFile_NtlAccidents_Alpharetta;//All parties
@@ -24,7 +24,7 @@ end;
 pntl := project(ntlFile,xpdrec(left)): persist('~thor_data400::persist::ntlcrash9');
 
 
-export key_Ntlcrash9 := index(pntl
-                            ,{unsigned6 l_acc_nbr := (integer)accident_nbr}
-							,{pntl}
-							,'~thor_data400::key::ntlcrash9_' + doxie.Version_SuperKey);
+export key_Ntlcrash9 := index(pntl,
+                              {unsigned6 l_acc_nbr := (integer)accident_nbr},
+                              {pntl},
+                              data_services.data_location.prefix() + 'thor_data400::key::ntlcrash9_' + doxie.Version_SuperKey);

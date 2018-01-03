@@ -1,4 +1,4 @@
-import doxie,ut;
+import doxie, data_services;
 
 temp_ds := project(File_Entiera_Base_for_Keys(did>0),Layouts.Base_For_Indexes);
 
@@ -31,5 +31,4 @@ export key_entiera_email_addresses :=
 index(dup_entiera_ValidemailAddr
       ,{email_addr1,email_addr2}
 			,{dup_entiera_ValidemailAddr}
-			,'~thor_200::key::entiera::'+doxie.Version_SuperKey+'::email_addresses');
-
+			,data_services.data_location.prefix() + 'thor_200::key::entiera::'+doxie.Version_SuperKey+'::email_addresses');

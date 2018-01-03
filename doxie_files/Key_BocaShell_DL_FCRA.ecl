@@ -1,5 +1,5 @@
 //WARNING: THIS KEY IS AN FCRA KEY...
-import doxie, ut, fcra;
+import fcra, doxie, ut, data_services;
 
 layout_addr := record
 	qstring28	prim_name;
@@ -52,7 +52,7 @@ dlrec roll_dls(dlrec le, dlrec ri) := TRANSFORM
 END;
 dl_rolled := ROLLUP(dl_id,left.roll_count < 100, roll_dls(LEFT,RIGHT));
 
-//Old name: '~thor_data400::key::bocaShell_DL_DID_' + doxie.Version_SuperKey);
+//Old name: 'thor_data400::key::bocaShell_DL_DID_' + doxie.Version_SuperKey);
 export Key_BocaShell_DL_FCRA :=
   index (dl_rolled, {did}, {dl_rolled},
-         '~thor_data400::key::dl::fcra::bocashell.did_' + doxie.Version_SuperKey);
+         data_services.data_location.prefix() + 'thor_data400::key::dl::fcra::bocashell.did_' + doxie.Version_SuperKey);

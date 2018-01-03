@@ -1,4 +1,4 @@
-import gong, doxie;
+import gong, doxie, data_services;
 
 input_recs := gong.File_Gong_Full((listing_type_res = 'R') AND (TRIM(name_last)<>''));
 
@@ -31,4 +31,4 @@ export Key_st_lname_city :=
 						  string20 lname := name_last,
 							string25 city := city},
              {all_cities},
-		   '~thor_data400::key::gong_eda_st_lname_city_' + doxie.Version_SuperKey);
+		         data_services.data_location.prefix() + 'thor_data400::key::gong_eda_st_lname_city_' + doxie.Version_SuperKey);

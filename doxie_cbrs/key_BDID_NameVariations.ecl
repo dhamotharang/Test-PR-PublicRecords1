@@ -1,4 +1,4 @@
-import doxie, business_header,ut;
+import doxie, business_header,ut, data_services;
 
 bf := business_header.File_Business_Header_Best;
 rel := table(business_header.File_Business_Relatives(name or name_Address or name_phone),	
@@ -43,4 +43,4 @@ ut.MAC_Slim_Back(i,rec,islim)
 export key_BDID_NameVariations := index(islim,
 {bdid, seq},
 {bdid2},
-'~thor_data400::key::cbrs.bdid_NameVariations_' + doxie.Version_SuperKey);
+data_services.data_location.prefix() + 'thor_data400::key::cbrs.bdid_NameVariations_' + doxie.Version_SuperKey);

@@ -1,6 +1,6 @@
-import bankruptcyv2, address, ut;
+import bankruptcyv2, address, ut, data_services;
 
-kfMain	 := dataset(ut.foreign_prod + 'thor_data400::base::override::fcra::qa::bankrupt_main',FCRA.Layout_Override_bk_filing,flat);
+kfMain	 := dataset(data_services.foreign_prod + 'thor_data400::base::override::fcra::qa::bankrupt_main',FCRA.Layout_Override_bk_filing,flat);
 
 layout_main_ffid_v3 := record
 	bankruptcyv2.layout_bankruptcy_main_v3.layout_bankruptcy_main_filing;
@@ -59,5 +59,7 @@ end;
 
 kv3 := project(kfMain, toV3Main(left));
 
-export key_override_bkv3_main_ffid := index (kv3, {flag_file_id}, {kv3}, 
-										'~thor_data400::key::override::fcra::bankrupt_filing::qa::ffid_v3');
+export key_override_bkv3_main_ffid := index (kv3, 
+                                             {flag_file_id}, 
+                                             {kv3}, 
+                                             data_services.data_location.prefix() + 'thor_data400::key::override::fcra::bankrupt_filing::qa::ffid_v3');

@@ -1,4 +1,4 @@
-import doxie;
+import doxie, data_services;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -111,7 +111,7 @@ pflc3v:= project(flc3v,xpndrecs(left));
 //National file does not have information pertinent to this layout.  Therefore only passing FL records.
 
 
-export key_Ntlcrash3v := index(pflc3v
-                            ,{unsigned6 l_acc_nbr := (integer)accident_nbr}
-							,{pflc3v}
-							,'~thor_data400::key::ntlcrash3v_' + doxie.Version_SuperKey);
+export key_Ntlcrash3v := index(pflc3v,
+                               {unsigned6 l_acc_nbr := (integer)accident_nbr},
+                               {pflc3v},
+                               data_services.data_location.prefix() + 'thor_data400::key::ntlcrash3v_' + doxie.Version_SuperKey);

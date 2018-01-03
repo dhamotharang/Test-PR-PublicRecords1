@@ -1,4 +1,4 @@
-import Doxie, ut;
+﻿import Doxie, ut, data_services;
 
 export key_DNM_Name_Address := index(file_suppressionMPS, 
 									{string28 l_prim_name := ut.StripOrdinal(prim_name), 
@@ -9,4 +9,4 @@ export key_DNM_Name_Address := index(file_suppressionMPS,
 									l_sec_range := sec_range,
 									l_lname := lname,
 									l_fname := fname},{file_suppressionMPS},
-									'~thor_data400::key::DNM::' + Doxie.Version_SuperKey + '::name.address');
+									data_services.data_location.prefix() + 'thor_data400::key::DNM::' + Doxie.Version_SuperKey + '::name.address');

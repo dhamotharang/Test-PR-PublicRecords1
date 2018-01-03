@@ -1,4 +1,4 @@
-import doxie, doxie_files, watchdog, bankrupt, ut, risk_indicators;
+import doxie, doxie_files, bankrupt, ut, data_services;
 
 slimmerrec := record
 	unsigned6	did;
@@ -52,4 +52,7 @@ liens_rolled := rollup(sort(DISTRIBUTE(w_liens,HASH(did)), did, rmsid, local),LE
 
 liens_slimmed := PROJECT(liens_rolled,slimmerrec);
 
-export Key_BocaShell_Liens := index(liens_slimmed, {did}, {liens_slimmed}, '~thor_data400::key::liens::bocashell_did_' + doxie.Version_SuperKey);
+export Key_BocaShell_Liens := index(liens_slimmed, 
+                                    {did}, 
+                                    {liens_slimmed}, 
+                                    data_services.data_location.prefix() + 'thor_data400::key::liens::bocashell_did_' + doxie.Version_SuperKey);

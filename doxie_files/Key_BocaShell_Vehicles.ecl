@@ -1,4 +1,4 @@
-import doxie_files, doxie;
+import doxie_files, doxie, data_services;
 
 Layout_Veh_Info :=
 RECORD
@@ -90,4 +90,7 @@ TRANSFORM
 END;
 vehicles_rolled := ROLLUP(vehicles_added,true,roll_Vehicles(LEFT,RIGHT));
 
-export Key_BocaShell_Vehicles := index(vehicles_rolled, {did}, {vehicles_rolled}, '~thor_data400::key::bocashell_veh_did_' + doxie.Version_SuperKey);
+export Key_BocaShell_Vehicles := index(vehicles_rolled, 
+                                       {did}, 
+                                       {vehicles_rolled}, 
+                                       data_services.data_location.prefix() + 'thor_data400::key::bocashell_veh_did_' + doxie.Version_SuperKey);

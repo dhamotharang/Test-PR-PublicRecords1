@@ -1,4 +1,4 @@
-import doxie, doxie_files, watchdog, liensv2, ut, risk_indicators;
+import doxie, doxie_files, liensv2, ut, risk_indicators, data_services;
 
 Layout_Liens_Info := RECORD
 	unsigned1 count;
@@ -395,4 +395,7 @@ liens_and_main_rolled := ROLLUP(SORT(w_main_distr, did,tmsid,rmsid, local),LEFT.
 // remove the tmsid and rmsid from the final layout
 liens_and_main_slimmed := PROJECT(liens_and_main_rolled,slimmerrec);
 
-export Key_Bocashell_Liens_and_Evictions_V2 := index(liens_and_main_slimmed, {did}, {liens_and_main_slimmed}, '~thor_data400::key::liensv2::bocashell_liens_and_evictions_did_v2_' + doxie.Version_SuperKey);
+export Key_Bocashell_Liens_and_Evictions_V2 := index(liens_and_main_slimmed, 
+                                                     {did}, 
+                                                     {liens_and_main_slimmed}, 
+                                                     data_services.data_location.prefix() + 'thor_data400::key::liensv2::bocashell_liens_and_evictions_did_v2_' + doxie.Version_SuperKey);

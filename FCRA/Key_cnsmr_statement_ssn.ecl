@@ -12,7 +12,7 @@ end;
 
   fname_prefix := '~thor_data400::base::override::fcra::qa::';
 	daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-  keyname_prefix := '~thor_data400::key::override::fcra::';
+  keyname_prefix := data_services.data_location.prefix() + 'thor_data400::key::override::fcra::';
 
 
 	// full file
@@ -25,4 +25,3 @@ end;
 	// replace the record in full file with the one in daily file.
 	FCRA.Mac_Replace_Records(kf,dailyds_ssn,ssn,replaceds);
   export key_cnsmr_statement_ssn := index (replaceds, {ssn}, {replaceds}, keyname_prefix + 'consumerstatement::qa::ssn');
-

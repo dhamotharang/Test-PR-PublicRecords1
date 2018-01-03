@@ -1,4 +1,5 @@
-import fcra, ut;
+import fcra, data_services;
+
 string_rec := record
  string32 key;
  string9 ssn;
@@ -89,5 +90,7 @@ end;
 
 kf := project(ds,proj_recs(left));
 
-export Key_Override_Student_FFID := index(kf,{flag_file_id}, {kf},
-  '~thor_data400::key::override::fcra::student::qa::ffid');
+export Key_Override_Student_FFID := index(kf,
+                                          {flag_file_id}, 
+                                          {kf},
+                                          data_services.data_location.prefix() + 'thor_data400::key::override::fcra::student::qa::ffid');
