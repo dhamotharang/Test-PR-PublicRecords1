@@ -1566,7 +1566,7 @@ EXPORT Constants := MODULE
 		export unsigned1 MaxRelatives     := 100;
 		export unsigned1 MaxAssociates    := 100;
 		export unsigned1 MaxSexualOffenses := 50;
-		export unsigned1 MaxCrimRecords   := 50;
+		export unsigned1 MaxCrimRecords   := 100;
 		export unsigned1 MaxSources       := 100; //unlimited
 		
 		export string1 CURRENT      := 'C';
