@@ -40,7 +40,7 @@ export Proc_handle_reexport(string reexportflag = 'no'
  //JIRA: DF-20859  
 	ds := if (patterntosearch <> ''
 							,project(fileservices.logicalfilelist(patterntosearch),transform(rSuperNames,self := left))
-							,fileservices.superfilecontents('~thor_data400::base::override::fcra::qa::lastprocessed')
+							,project(fileservices.superfilecontents('~thor_data400::base::override::fcra::qa::lastprocessed'),transform(rSuperNames,self := left))
 						);
 
 
