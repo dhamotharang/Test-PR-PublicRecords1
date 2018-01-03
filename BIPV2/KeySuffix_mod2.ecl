@@ -56,7 +56,8 @@ end;
 // export constant_ThisBuild_versionDate := '20170901a'; // S50a
 // export constant_ThisBuild_versionDate := '20171002'; // S51
 // export constant_ThisBuild_versionDate := '20171101'; // S52
-export constant_ThisBuild_versionDate := '20171129'; // S53
+// export constant_ThisBuild_versionDate := '20171129'; // S53
+export constant_ThisBuild_versionDate := '20180103'; // S54
 
 
 
@@ -121,6 +122,7 @@ dataset([
 ,{  52, '',   '20171101' ,  '20171101', '', '', 				'', 			  'Ingested S51 base. BH-362 -- BIP Build 52 - November 2017'}
 ,{  52, 'a',  '20171101a',  '20171101', '', '', 		    '', 			  'RR-11900 -- BIPV2 BizLinkFull keys upgrade to SALT 3.7'}
 ,{  53, '',   '20171129' ,  '20171129', '', '', 				'', 			  'Ingested S52 base. BH-385 -- BIP Build 53 - December 2017'}
+,{  54, '',   '20180103' ,  '20180103', '', '', 				'', 			  'Ingested S53 base. BH-396 -- BIP Build 54 - January 2018'}
 
 
 //						version,			ingest			ToThor			ToCertRox		ToProdRox		//these are not exact field names.  they just help w read and update.
