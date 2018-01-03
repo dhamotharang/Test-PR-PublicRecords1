@@ -1,4 +1,4 @@
-IMPORT BatchShare, FFD, PersonContext, iesp;
+﻿IMPORT BatchShare, FFD, PersonContext, iesp;
 
 EXPORT Constants := MODULE
 
@@ -9,7 +9,8 @@ EXPORT Constants := MODULE
 	
 	EXPORT RecordType := MODULE(PersonContext.Constants.RecordTypes)
 		EXPORT ComplianceRecordLevel := [DR, SR];
-		EXPORT StatementRecordLevel := [HS,RS,HSN,HSA,HSD,HSS,HSP,HSL];
+		EXPORT StatementRecordLevel := [RS,HSN,HSA,HSD,HSS,HSP,HSL];
+		EXPORT StatementConsumerLevel := [HS,CS];
 		EXPORT ComplianceSet := ComplianceRecordLevel;  // we will add other record types here later
 	END;
 	
