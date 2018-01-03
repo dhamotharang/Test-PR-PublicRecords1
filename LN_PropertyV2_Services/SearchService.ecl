@@ -135,11 +135,8 @@ export SearchService() := macro
 	// display Property results
 	output(cooked, named('Results'));
 
-	// display Foreclosure / Notice of Default results
-	map(
-		IncludeForeclosures      => output(foreclosureResults, named('ForeclosureResults')),
-		IncludeNoticesOfDefault  => output(foreclosureResults, named('ForeclosureResults'))
-		/* no default */
-	);
+
+  // display Foreclosure / Notice of Default results
+  if( IncludeForeclosures OR IncludeNoticesOfDefault, output(foreclosureResults, named('ForeclosureResults')));
 
 endmacro;
