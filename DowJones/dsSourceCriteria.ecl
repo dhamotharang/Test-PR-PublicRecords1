@@ -1520,6 +1520,12 @@ EXPORT dsSourceCriteria := DATASET([
 {'Latvian National Sanctions List','1506'},
 {'Saga Prefectural Police (Japan) Arrest List','1507'},
 {'Taiwan Financial Supervisory Commission Securities and Futures Bureau Bulletin Board List','1508'},
-{'US Department of State Cuba Restricted List','1509'}
+{'US Department of State Cuba Restricted List','1509'},
+{'EC (CFSP) 2017/2265 Libya List','1510'},
+{'EC 2017/2215 Banned Air Carriers List','1511'},
+{'EC 2017/2260 Libya List','1512'},
+{'EU List of Non-cooperative Jurisdictions For Tax Purposes','1513'},
+{'OFAC - Global Magnitsky Human Rights Accountability Act','1514'},
+{'Taiwan Financial Supervisory Commission Insurance Bureau Bulletin Board List','1515'}
 
 ],r);

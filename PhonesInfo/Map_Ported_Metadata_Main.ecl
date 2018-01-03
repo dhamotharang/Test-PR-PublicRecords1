@@ -2,7 +2,7 @@ import DeltabaseGateway, MDR, PhonesPlus_V2, Ut;
 	
 	portFile 		:= PhonesInfo.File_Phones.Ported_Current;
 	lidbFile		:= PhonesInfo.File_LIDB.Response_Processed;
-	discFile		:= PhonesInfo.File_Deact.Main_Current;
+	discFile		:= PhonesInfo.File_Deact.Main_Current2;
 	lidbDelt		:= DeltabaseGateway.File_Deltabase_Gateway.Historic_Results_Base(source in ['ATT_DQ_IRS'] and stringlib.stringfind(device_mgmt_status, 'BAD', 1)=0);
 	srcRef			:= PhonesInfo.File_Source_Reference.Main(is_current=TRUE);
 	
