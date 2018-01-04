@@ -435,7 +435,13 @@ self := [];
 end;
 
 clam_attrib := project( clam, get_clam(LEFT) );
-output(clam_attrib,named('Results'));
+clam_plus_acct := join( clam_attrib, batchinseq, 
+                        left.seq=right.seq, 
+												transform(models.layouts.layout_CDM_Batch_Out,self.acctno := right.acctno; self := left),
+												left outer
+											);
+// output(clam_attrib,named('Results'));
+output(clam_plus_acct,named('Results'));
 
 ENDMACRO;
 
