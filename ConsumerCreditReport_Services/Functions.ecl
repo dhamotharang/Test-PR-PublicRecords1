@@ -290,6 +290,8 @@ EXPORT Functions := MODULE
 																DATASET(ConsumerCreditReport_Services.Layouts.workRec) ds_work_in) := FUNCTION
 
 		ConsumerCreditReport_Services.Layouts.ccrResp restoreAcctNo(ds_ccr_resp L,ds_work_in R) := TRANSFORM
+			SELF._Header.Exceptions:=L._Header.Exceptions;
+			SELF._Header:=iesp.ECL2ESP.GetHeaderRow();
 			orig_acctno:=R.orig_acctno;
 			SELF.AccountNumber:=IF(orig_acctno!='',orig_acctno,L.AccountNumber);
 			SELF.InputEcho:=PROJECT(R,TRANSFORM(iesp.consumercreditreport_fcra.t_FcraCCRReportBy,
