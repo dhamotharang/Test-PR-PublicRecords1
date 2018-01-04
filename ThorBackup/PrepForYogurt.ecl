@@ -1,4 +1,4 @@
-/*2014-10-03T23:55:34Z (ananth_p venkatachalam)
+﻿/*2014-10-03T23:55:34Z (ananth_p venkatachalam)
 Move to new module
 */
 import lib_workunitservices,STD,ut, dops;
@@ -86,6 +86,7 @@ EXPORT PrepForYogurt(string location, string environment, string last_wuid = '')
 																				or regexfind('10.173.231.12',files,nocase)
 																				or regexfind('10.241.20.205',files,nocase)
 																				or regexfind('thor_data400::in::seq',files,nocase)
+																				or regexfind('^file::.*$',files,nocase)
 																				)) ,files),record);
 
 		fullset := record

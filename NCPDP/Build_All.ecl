@@ -1,4 +1,4 @@
-IMPORT _Control, RoxieKeyBuild, VersionControl, ut;
+﻿IMPORT _Control, RoxieKeyBuild, VersionControl, ut, Orbit3;
 
 EXPORT Build_All(STRING	pversion) := MODULE
 		EXPORT spray_files := fSpray(pversion); // The vendor changed from one input file to 12 input files.  All 12 files should be in same directory 
@@ -77,6 +77,8 @@ EXPORT Build_All(STRING	pversion) := MODULE
 
 	dops_update := RoxieKeyBuild.updateversion('NCPDPKeys', pversion, _Control.MyInfo.EmailAddressNotify,,'N'); 															
 
+  orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('NCPDP',pversion,'N');
+	
 	full_build := SEQUENTIAL( spray_files,
  													 Promote().Input.prov_info_Sprayed2Using,
  													 Build_prov_info_File,
@@ -166,7 +168,8 @@ EXPORT Build_All(STRING	pversion) := MODULE
 													 Proc_Build_RoxieKeys(pversion),
 													 out_STRATA_population_stats(pversion),
 													 New_records_sample,
-													 dops_update
+													 dops_update,
+													 orbit_update
 													) : SUCCESS(Send_Email(pversion).BuildSuccess), FAILURE(Send_Email(pversion).BuildFailure);
 
 	EXPORT All := IF(VersionControl.IsValidVersion(pversion)
