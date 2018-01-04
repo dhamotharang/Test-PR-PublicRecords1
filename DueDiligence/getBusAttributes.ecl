@@ -18,8 +18,8 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	inquiredBus := DueDiligence.getBusBIPId(cleanedInput, options, linkingOptions, includeReport);
 	
 	//seperate those with BIP IDs and those without/not found
-	inquiredBusWithBIP := inquiredBus(Busn_Info.BIP_IDs.PowID.LinkID <> 0 OR Busn_Info.BIP_IDs.ProxID.LinkID <> 0 OR Busn_Info.BIP_IDs.SeleID.LinkID <> 0 OR Busn_Info.BIP_IDs.OrgID.LinkID <> 0 OR Busn_Info.BIP_IDs.UltID.LinkID <> 0);
-	inquiredBusNoBIP := inquiredBus(Busn_Info.BIP_IDs.PowID.LinkID = 0 AND Busn_Info.BIP_IDs.ProxID.LinkID = 0 AND Busn_Info.BIP_IDs.SeleID.LinkID = 0 AND Busn_Info.BIP_IDs.OrgID.LinkID = 0 AND Busn_Info.BIP_IDs.UltID.LinkID = 0);
+	inquiredBusWithBIP := inquiredBus(Busn_Info.BIP_IDs.PowID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO OR Busn_Info.BIP_IDs.ProxID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO OR Busn_Info.BIP_IDs.SeleID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO OR Busn_Info.BIP_IDs.OrgID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO OR Busn_Info.BIP_IDs.UltID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO);
+	inquiredBusNoBIP := inquiredBus(Busn_Info.BIP_IDs.PowID.LinkID = DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.ProxID.LinkID = DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.SeleID.LinkID = DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.OrgID.LinkID = DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.UltID.LinkID = DueDiligence.Constants.NUMERIC_ZERO);
 	
 	//Get best data - best address for this LINKID (not everything was populated on the input).  This is our attempt to fill in what was not INPUT.
 	//  Bus_Info is populated here.   
@@ -39,21 +39,24 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	//get attribute data for individuals related to the inquired business
 	busProfLicense := DueDiligence.getBusProfLic(busExecs, includeReport);
 	
+	busLegalEvents := DueDiligence.getBusLegalEvents(busProfLicense, options, linkingOptions); 
+	
+
 
 	//get attribute data for the inquired business
-	busProperty := DueDiligence.getBusProperty(busProfLicense, options, linkingOptions);
+	busProperty := DueDiligence.getBusProperty(busLegalEvents, options, linkingOptions);
 
 	busWatercraft := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions, includeReport);
 
-	busAircraft := DueDiligence.getBusAircraft(busWatercraft, options);
+	busAircraft := DueDiligence.getBusAircraft(busWatercraft, options, includeReport);
 	
 	busVehicle := DueDiligence.getBusVehicle(busAircraft, options, linkingOptions);
 
 	busReg := DueDiligence.getBusRegistration(busVehicle, options, linkingOptions);
 	
-	busGeoRisk := DueDiligence.getBusGeographicRisk(busReg, options, debugMode);   
+	busGeoRisk := DueDiligence.getBusGeographicRisk(busReg, options);   
 
-
+	 
 
 	/*attributes taking in inquired and linked businesses*/
 	busHeader := DueDiligence.getBusHeader(busGeoRisk, options, linkingOptions, includeReport);
@@ -63,13 +66,11 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	
 	
 	/*attributes that must be called after other attributes*/
-	addrRisk  := DueDiligence.getBusAddrData(busSOS, options);  //must be called after getBusSOSDetail & getBusRegistration
+	addrRisk := DueDiligence.getBusAddrData(busSOS, options);  //must be called after getBusSOSDetail & getBusRegistration
 	
 	busAsInd := DueDiligence.getBusAsInd(addrRisk, options);  //must be called after getBusSOSDetail
 	
-	busSicNaic := DueDiligence.getBusSicNaic(busAsInd, options, linkingOptions);  //must be called after getBusRegistration & getBusHeader & getBusSOSDetail
-
-
+	busSicNaic := DueDiligence.getBusSicNaic(busAsInd, options, linkingOptions, includeReport);  //must be called after getBusRegistration & getBusHeader & getBusSOSDetail
 
 
 	//temp code to remove after dataset size selected
@@ -97,6 +98,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	IF(debugMode, OUTPUT(relatedBus, NAMED('relatedBus')));
 
 	IF(debugMode, OUTPUT(busProfLicense, NAMED('busProfLicense')));
+	IF(debugMode, OUTPUT(busLegalEvents, NAMED('busLegalEvents')));
 	
 	IF(debugMode, OUTPUT(busProperty, NAMED('busProperty')));
 	IF(debugMode, OUTPUT(busWatercraft, NAMED('busWatercraft')));

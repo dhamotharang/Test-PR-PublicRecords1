@@ -51,7 +51,7 @@ EXPORT getBusLinkedBus(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	joinBestWithMatch := JOIN(matchUltIDs, bestDataForLinkedBus,
 														LEFT.tempSeq = RIGHT.seq AND
 														LEFT.tempAcctNo = RIGHT.busn_info.accountNumber,
-														TRANSFORM({UNSIGNED4 parentSeq, UNSIGNED6 parentUltID, UNSIGNED6 parentOrgID, UNSIGNED6 parentSeleID, DATASET(DueDiligence.Layouts.Busn_Input) linkedBus},
+														TRANSFORM({UNSIGNED4 parentSeq, UNSIGNED6 parentUltID, UNSIGNED6 parentOrgID, UNSIGNED6 parentSeleID, DueDiligence.Layouts.Busn_Input linkedBus},
 																			parentSeqID := LEFT.seq;
 																			parentAcctNo := LEFT.acctNumber;
 																			
@@ -59,32 +59,45 @@ EXPORT getBusLinkedBus(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																			SELF.parentUltID := LEFT.ultID;
 																			SELF.parentOrgID := LEFT.orgID;
 																			SELF.parentSeleID := LEFT.seleID1;
-																			SELF.linkedBus := PROJECT(RIGHT.busn_info, TRANSFORM(DueDiligence.Layouts.Busn_Input,
-																																													SELF.BIP_IDs.seq := parentSeqID;
-																																													SELF.lexID := (STRING)LEFT.BIP_IDs.SeleID.LinkID;
-																																													SELF.accountNumber := parentAcctNo;
-																																													SELF := LEFT;));
+																			SELF.linkedBus.BIP_IDs.seq := parentSeqID;
+																			SELF.linkedBus.lexID := (STRING)RIGHT.busn_info.BIP_IDs.SeleID.LinkID;
+																			SELF.linkedBus.accountNumber := parentAcctNo;
+																			SELF.linkedBus := RIGHT.busn_info;
 																			SELF := [];));
 															
 	sortBestData := SORT(joinBestWithMatch, parentSeq, parentUltID, parentOrgID, parentSeleID);
+	groupBestData := GROUP(joinBestWithMatch, parentSeq, parentUltID, parentOrgID, parentSeleID);
 	
-	rollLnkedBus := ROLLUP(sortBestData,
-													LEFT.parentSeq = RIGHT.parentSeq AND
-													LEFT.parentUltID = RIGHT.parentUltID AND
-													LEFT.parentOrgID = RIGHT.parentOrgID AND
-													LEFT.parentSeleID = RIGHT.parentSeleID,
+	DueDiligence.LayoutsInternal.LinkedBusLayout getMaxLinkedBus(groupBestData gbd, INTEGER c) := TRANSFORM, SKIP(c > DueDiligence.Constants.MAX_LINKED_BUSINESSES)
+			SELF.linkedBus := PROJECT(gbd.linkedBus, TRANSFORM(LEFT));
+			SELF.seq := gbd.parentSeq;
+			SELF.ultID := gbd.parentUltID;
+			SELF.orgID := gbd.parentOrgID;
+			SELF.seleID := gbd.parentSeleID;
+			SELF := [];
+		END;
+	
+	getMaxLinkedBusinesses := PROJECT(groupBestData, getMaxLinkedBus(LEFT, COUNTER));
+	
+	sortMaxLinkedBusinesses := SORT(UNGROUP(getMaxLinkedBusinesses), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
+	
+	rollLnkedBus := ROLLUP(sortMaxLinkedBusinesses,
+													LEFT.seq = RIGHT.seq AND
+													LEFT.ultID = RIGHT.ultID AND
+													LEFT.orgID = RIGHT.orgID AND
+													LEFT.seleID = RIGHT.seleID,
 													TRANSFORM(RECORDOF(LEFT),
 																			SELF.linkedBus := LEFT.linkedBus + RIGHT.linkedBus;
 																			SELF := LEFT;));
 										
 	addLinkedBus := JOIN(indata, rollLnkedBus,
-												LEFT.seq = RIGHT.parentSeq AND
-												LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.parentUltID AND
-												LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.parentOrgID AND
-												LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.parentSeleID,
+												LEFT.seq = RIGHT.seq AND
+												LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
+												LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
+												LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
 												TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+																	SELF.linkBusCount := COUNT(RIGHT.linkedBus);
 																	SELF.linkedBusinesses := RIGHT.linkedBus;
-																	SELF.LinkedBusncount := COUNT(RIGHT.linkedBus);
 																	SELF := LEFT;),
 												LEFT OUTER);
 	
@@ -99,6 +112,10 @@ EXPORT getBusLinkedBus(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(matchUltIDs, NAMED('matchUltIDs'));
 	// OUTPUT(bestDataForLinkedBus, NAMED('bestDataForLinkedBus'));	
 	// OUTPUT(joinBestWithMatch, NAMED('joinBestWithMatch'));	
+	// OUTPUT(sortBestData, NAMED('sortBestData'));	
+	// OUTPUT(groupBestData, NAMED('groupBestData'));	
+	// OUTPUT(getMaxLinkedBusinesses, NAMED('getMaxLinkedBusinesses'));	
+	// OUTPUT(sortMaxLinkedBusinesses, NAMED('sortMaxLinkedBusinesses'));	
 	// OUTPUT(rollLnkedBus, NAMED('rollLnkedBus'));	
 	// OUTPUT(addLinkedBus, NAMED('addLinkedBus'));	
 	

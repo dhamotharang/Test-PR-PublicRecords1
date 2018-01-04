@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, FAA, MDR, Risk_Indicators, Riskwise, UT, Watercraft;
+﻿IMPORT BIPV2, Business_Risk_BIP, FAA, MDR, Risk_Indicators, Riskwise, UT, Watercraft, STD;
 
 EXPORT getBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -22,63 +22,59 @@ EXPORT getBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------                                                                                    ------
 	WatercraftRaw_with_seq := DueDiligence.Common.AppendSeq(WatercraftRaw, BusnData, TRUE);
 	
+	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
+	watercraftCleanDates := DueDiligence.Common.CleanDatasetDateFields(WatercraftRaw_with_seq, 'date_first_seen, date_vendor_first_reported');
+	
   // ------                                                                                    ------	
 	// ------ When this query runs in ARCHIVE MODE the History date on the input contains a date ------
 	// ------ Use this function drop public records that are out of scope for this transaction   ------
 	// ------ If the History date is all 9's essentially no records will be dropped - also known ------
 	// ------ as CURRENT MODE.                                                                   ------
 	// ------                                                                                    ------
-	WatercraftRecords := DueDiligence.Common.FilterRecords(WatercraftRaw_with_seq, date_first_seen, date_vendor_first_reported);
+	WatercraftRecords := DueDiligence.Common.FilterRecords(watercraftCleanDates, date_first_seen, date_vendor_first_reported);
 	
   // ------                                                                                    ------	
 	// ------  Get the details about the watercraft from the NON_FCRA version of the watercraft_wid  --
   // ------                                                                                    ------
 	Watercraftdetails := watercraft.key_watercraft_wid(false);	
 
-	
-	DueDiligence.LayoutsInternalReport.BusWatercraftSlimLayout  getWCDetails(WatercraftRecords le, Watercraftdetails ri) := TRANSFORM
-	   SELF.watercraftKey := le.watercraft_key;
-	   SELF.sequenceKey := le.sequence_key;
-		 SELF.stateOrigin := le.state_origin; 
-		 SELF.seq := le.seq;
-	   SELF.ultid := le.ultid;
-	   SELF.orgid := le.orgid;
-	   SELF.seleid := le.seleid;
+  watercraftSlim := join(WatercraftRecords, Watercraftdetails,
+												 right.watercraft_key      = left.watercraft_key and
+												 right.state_origin        = left.state_origin   and     
+												 right.sequence_key        = left.sequence_key,		 
+												 TRANSFORM(DueDiligence.LayoutsInternalReport.BusWatercraftSlimLayout,
+																	 SELF.watercraftKey := RIGHT.watercraft_key;
+																	 SELF.sequenceKey := RIGHT.sequence_key;
+																	 SELF.stateOrigin := RIGHT.state_origin; 
+																	 SELF.seq := LEFT.seq;
+																	 SELF.ultid := LEFT.ultid;
+																	 SELF.orgid := LEFT.orgid;
+																	 SELF.seleid := LEFT.seleid;
 
-	   SELF.watercraftCount := 1;
-		 SELF.year := ri.model_year;
-		 SELF.model := ri.watercraft_model_description;
-		 SELF.make := ri.watercraft_make_description;
-		 SELF.vesselType := ri.vehicle_type_description;
-		 SELF.propulsion := ri.propulsion_description;   
+																	 SELF.watercraftCount := 1;
+																	 SELF.year := RIGHT.model_year;
+																	 SELF.model := RIGHT.watercraft_model_description;
+																	 SELF.make := RIGHT.watercraft_make_description;
+																	 SELF.vesselType := RIGHT.vehicle_type_description;
+																	 SELF.propulsion := RIGHT.propulsion_description;   
 
-		 vesselLength := (UNSIGNED2)ri.watercraft_length; 
-     SELF.vesselTotalLength := vesselLength;
-		 SELF.vesselLengthFeet := vesselLength DIV 12;
-		 SELF.vesselLengthInches := vesselLength % 12;
-																	
-		 SELF.vin := ri.registration_number;
-		 SELF.titleState := ri.title_state;
-		 SELF.titleDate := ri.title_issue_date;
-		 SELF.registrationState := ri.st_registration;
-		 SELF.registrationDate := ri.registration_date;
-		 
-		 SELF := ri;
-	   
-	   SELF := [];
-   END;
-
-
-  Watercraftslim :=  join(WatercraftRecords, Watercraftdetails,
-												       right.watercraft_key      = left.watercraft_key and
-												       right.state_origin        = left.state_origin   and     
-												       right.sequence_key        = left.sequence_key,		 
-												 getWCDetails(left,right), 
+																	 vesselLength := (UNSIGNED2)RIGHT.watercraft_length; 
+																	 SELF.vesselTotalLength := vesselLength;
+																	 SELF.vesselLengthFeet := vesselLength DIV 12;
+																	 SELF.vesselLengthInches := vesselLength % 12;
+																																
+																	 SELF.vin := RIGHT.registration_number;
+																	 SELF.titleState := RIGHT.title_state;
+																	 SELF.titleDate := RIGHT.title_issue_date;
+																	 SELF.registrationState := RIGHT.st_registration;
+																	 SELF.registrationDate := RIGHT.registration_date;
+																	 
+																	 SELF := RIGHT; 
+																	 SELF := [];), 
 												 atmost(right.watercraft_key     = left.watercraft_key and 
 												        right.state_origin       = left.state_origin   and 
 																right.sequence_key       = left.sequence_key,
 												        riskwise.max_atmost));
-	
 	
 	slimSort := SORT(Watercraftslim, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), stateOrigin, watercraftKey, -sequenceKey);
 	waterRoll := ROLLUP(slimSort,
@@ -93,10 +89,10 @@ EXPORT getBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																	SELF.vesselLengthFeet := boat.vesselLengthFeet;
 																	SELF.vesselLengthInches := boat.vesselLengthInches;
 																	SELF.vesselTotalLength := boat.vesselTotalLength;
-																	SELF.titleState := IF(LEFT.titleState = DueDiligence.Constants.Empty, RIGHT.titleState, LEFT.titleState);
-																	SELF.titleDate := IF(LEFT.titleDate = DueDiligence.Constants.Empty, RIGHT.titleDate, LEFT.titleDate);
-																	SELF.registrationState := IF(LEFT.registrationState = DueDiligence.Constants.Empty, RIGHT.registrationState, LEFT.registrationState);
-																	SELF.registrationDate := IF(LEFT.registrationDate = DueDiligence.Constants.Empty, RIGHT.registrationDate, LEFT.registrationDate);
+																	SELF.titleState := IF(LEFT.titleState = DueDiligence.Constants.EMPTY, RIGHT.titleState, LEFT.titleState);
+																	SELF.titleDate := IF(LEFT.titleDate = DueDiligence.Constants.EMPTY, RIGHT.titleDate, LEFT.titleDate); 
+																	SELF.registrationState := IF(LEFT.registrationState = DueDiligence.Constants.EMPTY, RIGHT.registrationState, LEFT.registrationState);
+																	SELF.registrationDate := IF(LEFT.registrationDate = DueDiligence.Constants.EMPTY, RIGHT.registrationDate, LEFT.registrationDate);
 																	SELF.propulsion := IF(LEFT.propulsion = DueDiligence.Constants.Empty, RIGHT.propulsion, LEFT.propulsion);
 																	SELF.vin := IF(LEFT.vin = DueDiligence.Constants.Empty, RIGHT.vin, LEFT.vin);
 																	SELF := LEFT;));	
@@ -124,7 +120,7 @@ EXPORT getBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 												LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,												
 												TRANSFORM(DueDiligence.Layouts.Busn_Internal, 
 																	SELF.WatercraftCount  := RIGHT.watercraftCount,
-																	SELF.Watercraftlength := RIGHT.vesselLengthInches / 12,                //convert inches to feet. 
+																	SELF.Watercraftlength := RIGHT.vesselTotalLength / 12,                //convert inches to feet. 
 																	SELF := LEFT),
 																	LEFT OUTER);
 
@@ -163,6 +159,9 @@ EXPORT getBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// OUTPUT(Summary_BusWater, NAMED('Summary_BusWater'));
 	// OUTPUT(Update_BusnWatercraft, NAMED('Update_BusnWatercraft'));
 	// OUTPUT(addReport, NAMED('addReport'));
+
+	// OUTPUT(watercraftSlim, NAMED('watercraftSlim'));
+	// OUTPUT(watercraftDetailsCleanDate, NAMED('watercraftDetailsCleanDate'));
  
 	RETURN addReport;
 END;

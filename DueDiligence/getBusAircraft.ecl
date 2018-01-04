@@ -2,6 +2,7 @@
 
 EXPORT getBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
 											     Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
+													 BOOLEAN includeReportData,
 													 boolean DebugMode = FALSE
 											     ) := FUNCTION
 	// ------                                                                                     ------
@@ -40,13 +41,17 @@ EXPORT getBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------                                                                                    ------
 	AircraftRaw_with_seq := DueDiligence.Common.AppendSeq(AircraftRaw, tempBusnData, TRUE);
 	
+	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
+	aircraftDateClean := DueDiligence.Common.CleanDatasetDateFields(AircraftRaw_with_seq, 'date_first_seen, date_last_seen');
+	
 	// ------                                                                                    ------
 	// ------ When this query runs in ARCHIVE MODE the History date on the input contains a date ------
 	// ------ Use this function drop property records that are out of scope for this transaction ------
 	// ------ If the History date is all 9's essentially no records will be dropped - also known ------
 	// ------ as CURRENT MODE.                                                                   ------
 	// ------                                                                                    ------
-	Aircraft_Filtered := DueDiligence.Common.FilterRecordsSingleDate(AircraftRaw_with_seq, date_first_seen);
+	Aircraft_Filtered := DueDiligence.Common.FilterRecordsSingleDate(aircraftDateClean, date_first_seen);
+
 	
 	Aircraft_Sorted  :=  sort(Aircraft_Filtered, ultid, orgid, seleid, n_number, current_flag, date_first_seen);
   
@@ -57,7 +62,7 @@ EXPORT getBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																															self.seleid   := ri.seleid; 
 																															self.n_number := ri.n_number;
 																															/*  get the earliest date_first_seen   */  
-																															SELF.date_first_seen  := IF((UNSIGNED)le.date_first_seen = 0, MAX(le.date_first_seen, ri.date_first_seen), MIN(le.date_first_seen, ri.date_first_seen));
+																															SELF.date_first_seen  := IF((UNSIGNED)le.date_first_seen = DueDiligence.Constants.NUMERIC_ZERO, MAX(le.date_first_seen, ri.date_first_seen), MIN(le.date_first_seen, ri.date_first_seen));
 																															/*  get the latest date_last_seen      */
 																															self.date_last_seen   := MAX(le.date_last_seen, ri.date_last_seen);
 																															SELF := le;
@@ -70,12 +75,14 @@ EXPORT getBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------                                                                                    ------
 	Aircraft_archive := rollup(Aircraft_Sorted(historydate <> DueDiligence.Constants.date8Nines), rolluptheaircraft_process(left, right), ultid, orgid, seleid, n_number);	
 	
+	archiveFilter := Aircraft_archive(((UNSIGNED)historydate BETWEEN (UNSIGNED)date_first_seen and (UNSIGNED)date_last_seen) OR
+																		((UNSIGNED)date_last_seen < (UNSIGNED)historyDate AND current_flag = 'A'));
+	
   // ------                                                                                    ------  
 	// ------ For archive mode:  Count the number aircraft that we think are owned on            ------
 	// ------ a specific date in the past.                                                       ------
 	// ------                                                                                    ------
-  Summary_BusAir_archive_mode := table(Aircraft_archive, {seq, ultid, orgid, seleid, name, historydate, OwnAirCnt := count(group, ((UNSIGNED)historydate BETWEEN (UNSIGNED)date_first_seen and (UNSIGNED)date_last_seen) OR
-																																																											((UNSIGNED)date_last_seen < (UNSIGNED)historyDate AND current_flag = 'A'))}, seq, ultid, orgid, seleid);
+  Summary_BusAir_archive_mode := table(archiveFilter, {seq, ultid, orgid, seleid, name, historydate, OwnAirCnt := count(group)}, seq, ultid, orgid, seleid);
 	// ------                                                                                    ------
   // ------ For Current mode:                                                                  ------ 	
 	// ------ Use the current flag to select the 'active' record from list of aircraft records   ------
@@ -89,6 +96,19 @@ EXPORT getBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	
 	Summary  := Summary_BusAir_current_mode + Summary_BusAir_archive_mode;
 	
+	allData := archiveFilter + Aircraft_Current;
+	
+	slimAir := PROJECT(allData, TRANSFORM(DueDiligence.LayoutsInternalReport.BusAircraftSlimLayout,
+																				SELF.vin := LEFT.serial_number;
+																				SELF.tailNumber := LEFT.n_number;
+																				SELF.year := LEFT.year_mfr;
+																				SELF.make := LEFT.aircraft_mfr_name;
+																				SELF.model := LEFT.model_name;	
+																				SELF.manufactureModelCode := LEFT.mfr_mdl_code;
+																				SELF.registrationDate := LEFT.cert_issue_date;
+																				SELF := LEFT;
+																				SELF := [];));
+	
   // ------                                                                                    ------
   // ------ add the aircraft count to Busn_Internal layout.                                    ------
 	// ------                                                                                    ------
@@ -101,6 +121,11 @@ EXPORT getBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																	SELF.AircraftCount := RIGHT.OwnAirCnt,
 																	SELF := LEFT),
 																	LEFT OUTER);
+																	
+																	
+																	
+	addReportAircraft := IF(includeReportData, DueDiligence.reportBusAircraft(Update_BusnAircraft, slimAir), Update_BusnAircraft);
+																	
  
  
 	// ********************
@@ -131,5 +156,18 @@ EXPORT getBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	 IF(DebugMode,     OUTPUT(Summary,                                  NAMED('Summary')));
 	
 	
-	RETURN Update_BusnAircraft;
+	
+		// OUTPUT(faa_build_date, NAMED('faa_build_date'));
+		// OUTPUT(tempBusnData, NAMED('tempBusnData'));
+		// OUTPUT(AircraftRaw_with_seq, NAMED('AircraftRaw_with_seq'));
+		// OUTPUT(Aircraft_archive, NAMED('Aircraft_archive'));
+		// OUTPUT(archiveFilter, NAMED('archiveFilter'));
+		// OUTPUT(Aircraft_Current, NAMED('Aircraft_Current'));
+		// OUTPUT(allData, NAMED('allData'));
+		// OUTPUT(Summary, NAMED('Summary'));
+		// OUTPUT(slimAir, NAMED('slimAir'));
+		// OUTPUT(addReportAircraft, NAMED('addReportAircraft'));
+	
+	
+	RETURN addReportAircraft;
 END;

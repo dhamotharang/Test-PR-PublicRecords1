@@ -19,17 +19,12 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 																	SELF := [];),
 											ATMOST(RIGHT.did = LEFT.party.did, DueDiligence.Constants.MAX_ATMOST_1000));
 											
+	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
+	licenseCleanDate := DueDiligence.Common.CleanDatasetDateFields(licenseRaw, 'date_first_seen, date_last_seen, expiration_date, issue_date');										
+											
 	// Filter out records after our history date.
-	licenseFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(licenseRaw, date_first_seen);
+	licenseFilt := DueDiligence.Common.FilterRecordsSingleDate(licenseCleanDate, date_first_seen);
 	
-	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently - dates used in FilterRecords have been cleaned
-	clean_dateLastSeen := DueDiligence.Common.CleanDateFields(licenseFiltRecs, date_last_seen);
-	clean_expirationDate := DueDiligence.Common.CleanDateFields(clean_dateLastSeen, expiration_date);
-	clean_issueDate := DueDiligence.Common.CleanDateFields(clean_expirationDate, issue_date);
-
-	//creating variable to be used in logic so if add additional dates, does not impact flow
-	licenseFilt := clean_issueDate;
-
 	projectLicense := PROJECT(licenseFilt, TRANSFORM(DueDiligence.LayoutsInternal.PartyLicences,
 																										
 																										professionCat := TRIM(LEFT.profession_or_board, LEFT, RIGHT);
@@ -87,17 +82,11 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 																			SELF := [];),
 													ATMOST(LEFT.party.did = RIGHT.s_did, DueDiligence.Constants.MAX_ATMOST_1000));
 
+	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently - dates used in FilterRecords have been cleaned
+	mariLicenseDateClean:= DueDiligence.Common.CleanDatasetDateFields(mariLicenseRaw, 'date_first_seen, date_vendor_first_reported, date_last_seen, expire_dte, orig_issue_dte');
 	
 	// Filter out records after our history date.
-	mariLicenseFiltRecs := DueDiligence.Common.FilterRecords(mariLicenseRaw, date_first_seen, date_vendor_first_reported);
-	
-	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently - dates used in FilterRecords have been cleaned
-	clean_mariDateLastSeen := DueDiligence.Common.CleanDateFields(mariLicenseFiltRecs, date_last_seen);
-	clean_mariExpirationDate := DueDiligence.Common.CleanDateFields(clean_mariDateLastSeen, expire_dte);
-	clean_mariIssueDate := DueDiligence.Common.CleanDateFields(clean_mariExpirationDate, orig_issue_dte);
-
-	//creating variable to be used in logic so if add additional dates, does not impact flow
-	mariLicenseFilt := clean_mariIssueDate;
+	mariLicenseFilt := DueDiligence.Common.FilterRecords(mariLicenseDateClean, date_first_seen, date_vendor_first_reported);
 	
 	projectMariLicense := PROJECT(mariLicenseFilt, TRANSFORM(DueDiligence.LayoutsInternal.PartyLicences,
 																														

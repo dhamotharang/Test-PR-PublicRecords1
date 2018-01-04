@@ -34,15 +34,13 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																	SELF := [];), 
 											LEFT OUTER, ATMOST(DueDiligence.Constants.MAX_ATMOST_100));
 
+	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
+	advoCleanRecs := DueDiligence.Common.CleanDatasetDateFields(withAdvoRaw, 'advoDtfirstseen, date_first_seen, date_vendor_first_reported');
 	
 	// Filter out records after our history date.
-	advoFiltRecs := DueDiligence.Common.FilterRecords(withAdvoRaw, date_first_seen, date_vendor_first_reported);
+	advoFilt := DueDiligence.Common.FilterRecords(advoCleanRecs, date_first_seen, date_vendor_first_reported);
 	
-	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently - dates used in FilterRecords have been cleaned
-	clean_advoFirstSeen := DueDiligence.Common.CleanDateFields(advoFiltRecs, advoDtfirstseen);
-
-	//creating variable to be used in logic so if add additional dates, does not impact flow
-	advoFilt := clean_advoFirstSeen;
+	
 																
 	advoOnInputAddrSort := SORT(advoFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), zip, prim_range,	prim_name, addr_suffix, predir, postdir, sec_range, -advoDtfirstseen); 
 	advoDedup := DEDUP(advoOnInputAddrSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), zip, prim_range, prim_name, addr_suffix, predir, postdir, sec_range);
@@ -82,14 +80,13 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 														LEFT.Busn_info.fein[7] = RIGHT.S7 AND 
 														LEFT.Busn_info.fein[8] = RIGHT.S8 AND 
 														LEFT.Busn_info.fein[9] = RIGHT.S9),
-											TRANSFORM({UNSIGNED4 seq, UNSIGNED6 ultID, UNSIGNED6 orgID, UNSIGNED6 seleID, UNSIGNED6 did, UNSIGNED6 historyDate, BOOLEAN feinMatched, STRING fein, 
+											TRANSFORM({UNSIGNED4 seq, UNSIGNED6 ultID, UNSIGNED6 orgID, UNSIGNED6 seleID, UNSIGNED6 historyDate, BOOLEAN feinMatched, STRING fein, 
 																		STRING10 prim_range, STRING2  predir, STRING28 prim_name, STRING4  addr_suffix, STRING2  postdir, STRING10 unit_desig, 
 																		STRING8  sec_range, STRING25 city, STRING2  state, STRING5  zip5, STRING4  zip4, STRING companyName, RECORDOF(RIGHT)},
 																SELF.ultID := LEFT.Busn_info.BIP_IDs.UltID.LinkID;
 																SELF.orgID := LEFT.Busn_info.BIP_IDs.OrgID.LinkID;
 																SELF.seleID := LEFT.Busn_info.BIP_IDs.SeleID.LinkID;
 																SELF.seq := LEFT.seq;
-																SELF.did := RIGHT.did;
 																SELF.historyDate := LEFT.historyDate;
 																SELF.companyName := LEFT.busn_info.companyName;
 																SELF.feinMatched := RIGHT.did > 0;
@@ -177,21 +174,23 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																					addressMatched := Risk_Indicators.iid_constants.ga(addressScore) AND addressPopulated AND feinMatched;
 
 																					SELF.feinPersonAddrOverlap := MAP(feinMatched AND NOT addressPopulated => -1,		
-																																								(INTEGER)LEFT.fein = 0	OR NOT isBusinessRecord => -2, // -2s will be set to 0, but need something smaller than -1 since -1 should take precedence in MAX() in Rollup.
-																																								(INTEGER)RIGHT.did = 0 OR NOT feinMatched AND addressPopulated => -2, 
-																																								(INTEGER)RIGHT.did <> 0  AND NOT addressMatched AND feinMatched AND addressPopulated => 1,
-																																								(INTEGER)RIGHT.did <> 0  AND addressMatched AND feinMatched AND addressPopulated => 2,
+																																								(INTEGER)LEFT.fein = DueDiligence.Constants.NUMERIC_ZERO	OR NOT isBusinessRecord => -2, // -2s will be set to 0, but need something smaller than -1 since -1 should take precedence in MAX() in Rollup.
+																																								(INTEGER)RIGHT.did = DueDiligence.Constants.NUMERIC_ZERO OR NOT feinMatched AND addressPopulated => -2, 
+																																								(INTEGER)RIGHT.did <> DueDiligence.Constants.NUMERIC_ZERO  AND NOT addressMatched AND feinMatched AND addressPopulated => 1,
+																																								(INTEGER)RIGHT.did <> DueDiligence.Constants.NUMERIC_ZERO  AND addressMatched AND feinMatched AND addressPopulated => 2,
 																																								-1);
 																																																																				 
-																					SELF.feinPersonNameMatchLevel := IF((INTEGER)RIGHT.did <> 0 AND nameSimilar AND feinMatched, 1, 0);																																						 
+																					SELF.feinPersonNameMatchLevel := IF((INTEGER)RIGHT.did <> DueDiligence.Constants.NUMERIC_ZERO AND nameSimilar AND feinMatched, 1, DueDiligence.Constants.NUMERIC_ZERO);																																						 
 																					
 																					SELF := LEFT;
 																					SELF := [];),
 																ATMOST(Business_Risk_BIP.Constants.Limit_Default));
 
-			
+	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
+	consumerHeaderCleanRecs := DueDiligence.Common.CleanDatasetDateFields(consumerHeaderDidRaw, 'dt_first_seen');
+	
 	// Filter out records after our history date.
-	consumerHeaderDidFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(consumerHeaderDidRaw, dt_first_seen);
+	consumerHeaderDidFiltRecs := DueDiligence.Common.FilterRecordsSingleDate(consumerHeaderCleanRecs, dt_first_seen);
 															
 	// Determine if any records matched per Seq/DID
 	consumerHeaderDidStats := TABLE(consumerHeaderDidFiltRecs, {seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did,
@@ -216,11 +215,11 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
 																LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,	
 																TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																					SELF.feinIsSSN := LEFT.feinIsSSN OR (RIGHT.feinPersonNameMatch > 0 OR RIGHT.busFEINLinkedPersonAddr > 0);
+																					SELF.feinIsSSN := LEFT.feinIsSSN OR (RIGHT.feinPersonNameMatch > DueDiligence.Constants.NUMERIC_ZERO OR RIGHT.busFEINLinkedPersonAddr > DueDiligence.Constants.NUMERIC_ZERO);
 																					SELF.personNameSSN := RIGHT.feinPersonNameMatch;
 																					SELF.personAddrSSN := RIGHT.busFEINLinkedPersonAddr;																					
 																					SELF.busIsSOHO := LEFT.busIsSOHO OR 
-																														(RIGHT.busFEINLinkedPersonAddr = 2 OR RIGHT.feinPersonNameMatch = 1) AND LEFT.SOSIncorporationDate > 0;
+																														(RIGHT.busFEINLinkedPersonAddr = 2 OR RIGHT.feinPersonNameMatch = 1) AND LEFT.SOSIncorporationDate > DueDiligence.Constants.NUMERIC_ZERO;
 																					SELF := LEFT;),
 																LEFT OUTER);
 																

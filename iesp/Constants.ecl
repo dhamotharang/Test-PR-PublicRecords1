@@ -51,7 +51,8 @@ EXPORT Constants := MODULE
 	export unsigned2 MAX_CONSUMER_STATEMENTS := 100;
   
 	// Full File Disclosure
-	export unsigned2 MaxConsumerStatementIds := 20 * 5; // x5 because of header statements.
+	export unsigned2 MaxConsumerAlerts := 100;
+	export unsigned2 MaxConsumerStatementIds := 20 * 5; 
 	export unsigned2 MaxConsumerStatements := 200;
 	
   // Accidents - Florida and National
@@ -420,13 +421,33 @@ EXPORT Constants := MODULE
 		
 	//Due Diligence
 	export DDRAttributesConst := MODULE
-		export unsigned2 MaxAttributes      := 21;
-		export unsigned2 MaxDescriptions    := 210;
-		export unsigned2 MaxBusinesses      := 20;
-		export unsigned2 MaxActions         := 20;
-		export unsigned2 MaxAssets          := 20;
-    export unsigned2 MaxPersonNames     := 20;
-    export unsigned2 MaxRecords         := 20;
+		export unsigned2 MaxAttributes      				:= 22;		
+    export unsigned2 MaxMatchSummaries     		 	:= 20;
+    export unsigned2 MaxNewsProfiles       		 	:= 20;
+    export unsigned2 MaxProperties         			:= 20;
+    export unsigned2 MaxTennants	         			:= 20;
+    export unsigned2 MaxAircraft         				:= 20;
+    export unsigned2 MaxWatercraft         			:= 20;
+    export unsigned2 MaxVehicles         				:= 20;
+    export unsigned2 MaxOperatingLocations 			:= 20;
+    export unsigned2 MaxReportingBureaus 				:= 20;
+    export unsigned2 MaxReportingSources 				:= 20;
+    export unsigned2 MaxSOSFilingStatuses 			:= 20;
+    export unsigned2 MaxSICNAICs					 			:= 20;
+		export unsigned2 MaxActions         				:= 20;
+		export unsigned2 MaxDescriptions    				:= 210;
+		export unsigned2 MaxBusinesses      				:= 20;
+		export unsigned2 MaxSSNAssociations     		:= 20;
+		export unsigned2 MaxPersonNames      				:= 20;
+		export unsigned2 MaxAgents      						:= 20;
+		export unsigned2 MaxCreditors   						:= 20;
+		export unsigned2 MaxDebtors   							:= 20;
+		export unsigned2 MaxLienJudgementsEvictions	:= 20;
+		export unsigned2 MaxLegalEvents   					:= 20;
+		export unsigned2 MaxTitles   								:= 20;
+		export unsigned2 MaxLicenses   							:= 20;
+		export unsigned2 MaxBusinessExecs   				:= 20;
+		export unsigned2 MaxRegisteredAgents   			:= 20;
 	end;
 
   //Dun and Bradstreet (DNB)

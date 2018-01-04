@@ -9,7 +9,7 @@ EXPORT reportBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) inData,
 
 	
 	//Transform to limit the number of data in our dataset
-	DueDiligence.LayoutsInternalReport.BusWatercraftReportChildren getReportChildren(DueDiligence.LayoutsInternalReport.BusWatercraftSlimLayout wsl, INTEGER c) := TRANSFORM, SKIP(c > iesp.Constants.DDRAttributesConst.MaxAssets)
+	DueDiligence.LayoutsInternalReport.BusWatercraftReportChildren getReportChildren(DueDiligence.LayoutsInternalReport.BusWatercraftSlimLayout wsl, INTEGER c) := TRANSFORM, SKIP(c > iesp.Constants.DDRAttributesConst.MaxWatercraft)
 		SELF.water := PROJECT(wsl, TRANSFORM(iesp.duediligencereport.t_DDRWatercraft,
 																				SELF.sequence := c;
 																				SELF.watercraft := DATASET([TRANSFORM(iesp.duediligencereport.t_DDRYearMakeModel,
@@ -20,9 +20,8 @@ EXPORT reportBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) inData,
 																				SELF.vesselType := DATASET([TRANSFORM(iesp.duediligencereport.t_DDRAdditionalDetails,
 																																										SELF.detailType := LEFT.vesselType;
 																																										SELF := [];)])[1];
-																				SELF.vesselLength := LEFT.vesselTotalLength;
-																				// SELF.vesselLengthFeet := LEFT.vesselLengthFeet;
-																				// SELF.vesselLengthInches := LEFT.vesselLengthInches;
+																				SELF.lengthFeet := LEFT.vesselLengthFeet;
+																				SELF.lengthInches := LEFT.vesselLengthInches;
 																				SELF.title := DATASET([TRANSFORM(iesp.duediligencereport.t_DDRTitleInfo,
 																																								SELF.state := LEFT.titleState;
 																																								SELF.date := DATASET([TRANSFORM(iesp.share.t_Date,
@@ -38,9 +37,9 @@ EXPORT reportBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) inData,
 																																																											SELF.day := (INTEGER)LEFT.registrationDate[7..8];
 																																																											SELF := [];)])[1];)])[1];
 																																																											
-																				// SELF.vin := DATASET([TRANSFORM(iesp.duediligencereport.t_DDRVINNumber,
-																																							// SELF.vin := LEFT.vin;
-																																							// SELF := [];)])[1];
+																				SELF.vin := DATASET([TRANSFORM(iesp.duediligencereport.t_DDRVINNumber,
+																																							SELF.vin := LEFT.vin;
+																																							SELF := [];)])[1];
 																				SELF := LEFT;
 																				SELF := [];));
 		SELF := wsl;
