@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="RiskView RiskView5_CapOne_Batch_Service">
 	<part name="batch_in" type="tns:XmlDataSet" cols="70" rows="25"/>
 	<part name="Bankcard_model_name" type="xsd:string"/>
@@ -81,7 +81,7 @@ export RiskView5_CapOne_Batch_Service := MACRO
 			self.phone10 := '';// -- not being passed in by cap one per ian caton
 			self.wphone10 := '';//-- not being passed in by cap one per ian caton
 			
-				cleaned_name := Address.CleanPersonFML73(le.RX_unparsedfullname);
+				cleaned_name := Address.CleanPerson73(le.RX_unparsedfullname);
 				boolean valid_cleaned := le.RX_unparsedfullname <> '';
 			self.fname := stringlib.stringtouppercase(if(valid_cleaned, cleaned_name[6..25], ''));
 			self.lname := stringlib.stringtouppercase(if(valid_cleaned, cleaned_name[46..65], ''));
@@ -123,6 +123,7 @@ export RiskView5_CapOne_Batch_Service := MACRO
 			self := [];
 		END;
 		cleanInput := project(batchin_seq, prepInput(left));
+		//output(cleanInput);
 
 		lib_in := module(Models.RV_LIBIN)
 			EXPORT STRING30 modelName := '';
