@@ -1,5 +1,5 @@
 //WARNING: THIS KEY IS AN FCRA KEY...
-import doxie;
+import doxie, data_services;
 
 f := File_VehicleContacts;
 
@@ -13,6 +13,6 @@ t := TABLE (f, i_rec);
 r := t(sdid != 0, pick != 0);
 d := DEDUP(r, sdid, seq_no, ALL);
 
-//Old name: '~thor_data400::key::'+doxie_build.buildstate+'vehicle_did_'+doxie.Version_SuperKey);
+//Old name: 'thor_data400::key::'+doxie_build.buildstate+'vehicle_did_'+doxie.Version_SuperKey);
 export key_vehicle_did_FCRA := INDEX (d, {d.sdid}, {d.pick, d.seq_no},
-                                      '~thor_data400::key::vehicle::fcra::did_' + doxie.Version_SuperKey);
+                                      data_services.data_location.prefix() + 'thor_data400::key::vehicle::fcra::did_' + doxie.Version_SuperKey);

@@ -1,4 +1,5 @@
-import gong,doxie;
+import gong,doxie, data_services;
+
 export key_gong_add_batch_lczf := 
 	index(gong.File_Daily_Full(trim(name_last) <> ''),
 				 {name_last,
@@ -6,5 +7,5 @@ export key_gong_add_batch_lczf :=
 				  z5,
 					name_first},
 				 {gong.File_Daily_Full},
-				 '~thor_data400::key::gong_lczf_add_'+ doxie.Version_SuperKey,OPT
+				 data_services.data_location.prefix() + 'thor_data400::key::gong_lczf_add_'+ doxie.Version_SuperKey,OPT
 	);

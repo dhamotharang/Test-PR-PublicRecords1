@@ -1,4 +1,4 @@
-import doxie;
+import doxie, data_services;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -97,8 +97,7 @@ pntl := project(ntlFile,slimrec(left));
 
 allrecs := pflc0+pntl : persist('~thor_data400::persist::ntlcrash0');
 
-export Key_NtlCrash0 := index(allrecs
-                            ,{unsigned6 l_acc_nbr :=(integer)accident_nbr}
-							,{allrecs}
-							,'~thor_data400::key::ntlcrash0_' + doxie.Version_SuperKey);
-						 	 
+export Key_NtlCrash0 := index(allrecs,
+                              {unsigned6 l_acc_nbr :=(integer)accident_nbr},
+                              {allrecs},
+                              data_services.data_location.prefix() + 'thor_data400::key::ntlcrash0_' + doxie.Version_SuperKey);

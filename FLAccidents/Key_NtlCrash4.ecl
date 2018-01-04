@@ -1,7 +1,7 @@
 /*2010-12-01T21:01:25Z (t gibson)
 
 */
-import doxie;
+import doxie, data_services;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -216,12 +216,9 @@ end;
 
 pntl := project(ntlFile(party_type = 'DRIVER'),slimrec(left));
 
-allrecs := dedup(pflc4+pntl,record,all)
-					 : persist('~thor_data400::persist::ntlcrash4');
+allrecs := dedup(pflc4+pntl,record,all) : persist('~thor_data400::persist::ntlcrash4');
 
-export Key_ntlCrash4 := index(allrecs
-                            ,{unsigned6 l_acc_nbr := (integer)accident_nbr}
-							,{allrecs}
-							,'~thor_data400::key::ntlcrash4_' + doxie.Version_SuperKey);
-						 	 
-							
+export Key_ntlCrash4 := index(allrecs,
+                              {unsigned6 l_acc_nbr := (integer)accident_nbr},
+                              {allrecs},
+                              data_services.data_location.prefix() + 'thor_data400::key::ntlcrash4_' + doxie.Version_SuperKey);

@@ -1,4 +1,4 @@
-import doxie,ut;
+import doxie, data_services;
 
 layout_slim:=RECORD
  string10 	prim_range;
@@ -17,4 +17,4 @@ df := dedup(sort(PROJECT(File_base_facility(prim_range <> '' or prim_name <> '' 
 
 export Key_prep_address := 
  index(df,{prim_range,prim_name,zip,recptr},
-         '~thor_200::key::ERO::'+ doxie.Version_SuperKey+'::Facility_address' );
+         data_services.data_location.prefix() + 'thor_200::key::ERO::'+ doxie.Version_SuperKey+'::Facility_address' );

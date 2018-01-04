@@ -1,4 +1,4 @@
-import gong, doxie;
+import gong, doxie, data_services;
 
 valid_gong_add := gong.File_Daily_Full(trim(phone10) <> '');
 
@@ -23,5 +23,5 @@ export key_gong_add_phone :=
 							st,
 						  boolean business_flag := if(listing_type_bus = 'B', true, false)},
 						 {gong_add_file},
-						 '~thor_data400::key::gong_phone_add_' + doxie.Version_SuperKey,OPT				
+						 data_services.data_location.prefix() + 'thor_data400::key::gong_phone_add_' + doxie.Version_SuperKey,OPT				
 				);

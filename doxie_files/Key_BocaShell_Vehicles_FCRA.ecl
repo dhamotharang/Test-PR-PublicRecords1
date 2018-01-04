@@ -1,5 +1,5 @@
 //WARNING: THIS KEY IS AN FCRA KEY...
-import doxie;
+import doxie, data_services;
 
 Layout_Veh_Info := RECORD
 	UNSIGNED2 year_make;
@@ -85,6 +85,6 @@ vehrec roll_vehicles(vehrec le, vehrec ri) := TRANSFORM
 END;
 vehicles_rolled := ROLLUP (vehicles_added,true,roll_Vehicles(LEFT,RIGHT));
 
-//Old name:  '~thor_data400::key::bocashell_veh_did_' + doxie.Version_SuperKey
+//Old name:  'thor_data400::key::bocashell_veh_did_' + doxie.Version_SuperKey
 export Key_BocaShell_Vehicles_FCRA := index (vehicles_rolled, {did}, {vehicles_rolled},
-                                             '~thor_data400::key::vehicle::fcra::bocashell.did_' + doxie.Version_SuperKey);
+                                             data_services.data_location.prefix() + 'thor_data400::key::vehicle::fcra::bocashell.did_' + doxie.Version_SuperKey);

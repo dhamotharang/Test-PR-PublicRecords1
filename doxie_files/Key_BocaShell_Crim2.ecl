@@ -1,4 +1,4 @@
-import doxie, ut;
+import doxie, ut, data_services;
 
 todaysdate := ut.GetDate;
 checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
@@ -125,4 +125,7 @@ j := join(distribute(crim_counts_rolled, hash(did)),
 						SELF := right;),
 						local);
 
-export Key_BocaShell_Crim2 := index(j, {did}, {j},'~thor_data400::key::corrections_offenders_risk::bocashell_did_' + doxie.Version_SuperKey);
+export Key_BocaShell_Crim2 := index(j, 
+                                    {did}, 
+                                    {j},
+                                    data_services.data_location.prefix() + 'thor_data400::key::corrections_offenders_risk::bocashell_did_' + doxie.Version_SuperKey);

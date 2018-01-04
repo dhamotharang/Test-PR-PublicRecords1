@@ -1,3 +1,5 @@
+import data_services;
+
 export Key_Easi_Census_2000 := index(File_Easi_census,{GEOLINK},{POP00	,
 FAMILIES	,
 HH00	,
@@ -167,4 +169,5 @@ RICH_WHT	,
 SPAN_LANG	,
 WORK_HOME	,
 RICH_YOUNG	,
-TOTSALES	},'~thor_data400::key::Easi_census_2000_qa');
+TOTSALES	},
+data_services.data_location.prefix() + 'thor_data400::key::Easi_census_2000_qa');

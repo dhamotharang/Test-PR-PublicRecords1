@@ -1,7 +1,7 @@
 //this key is to get the dt_first_seen and dt_last_seen of an apartment build
 //also check the apartment type.
 
-import header, doxie, address, ut;
+import header, doxie, address, ut, data_services;
 
 apt_recs := header.ApartmentBuildings(apt_cnt > 1);
 da_recs := header.did_addresses;
@@ -92,5 +92,7 @@ end;
 
 apt_dts_parsed := project(apt_dts_cleaned, parse_them(left));
 
-export key_header_address_research := index(apt_dts_parsed, {zip, addr_type}, {apt_dts_parsed}, 
-							  '~thor_data400::key::address_research_' + doxie.Version_SuperKey);
+export key_header_address_research := index(apt_dts_parsed, 
+                                            {zip, addr_type}, 
+                                            {apt_dts_parsed}, 
+                                            data_services.data_location.prefix() + 'thor_data400::key::address_research_' + doxie.Version_SuperKey);

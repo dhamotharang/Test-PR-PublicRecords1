@@ -1,4 +1,4 @@
-import doxie;
+import doxie, data_services;
 
 layout_auto_stname := RECORD
   STRING2 st;
@@ -26,4 +26,6 @@ p := PROJECT(file_cwp_with_fdid(province<>'',lastname<>''), proj(LEFT));
 
 recs := dedup(sort(p, record), record);
   
-export key_auto_stname := INDEX(recs, {recs}, '~thor_data400::key::canadianwp_stname_' + doxie.Version_SuperKey);
+export key_auto_stname := INDEX(recs, 
+                                {recs}, 
+                                data_services.data_location.prefix() + 'thor_data400::key::canadianwp_stname_' + doxie.Version_SuperKey);

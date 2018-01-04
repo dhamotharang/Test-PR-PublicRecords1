@@ -1,4 +1,4 @@
-import dnb_feinv2, Doxie, ut,address;
+import dnb_feinv2, Doxie, data_services;
 
 get_recs := DNB_FEINv2.File_DNB_Fein_base_main;
 
@@ -10,5 +10,7 @@ slim_main := project(get_recs, slim_rec);
 dist_id := distribute(slim_main, hash(TMSID));
 sort_id := sort(dist_id, TMSID,local);
 
-export 	key_dnb_fein_tmsid := index(sort_id,{TMSID},{sort_id},
-'~thor_data400::key::dnbfein::TMSID_' + doxie.Version_SuperKey);
+export 	key_dnb_fein_tmsid := index(sort_id,
+                                    {TMSID},
+                                    {sort_id},
+                                    data_services.data_location.prefix() + 'thor_data400::key::dnbfein::TMSID_' + doxie.Version_SuperKey);

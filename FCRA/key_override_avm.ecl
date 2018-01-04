@@ -1,8 +1,9 @@
-import avm_v2;
+import avm_v2, data_services;
+
 EXPORT key_override_avm := module
 	shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
 	shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-	shared keyname_prefix := '~thor_data400::key::override::fcra::';
+	shared keyname_prefix := data_services.data_location.prefix() + 'thor_data400::key::override::fcra::';
 
 	ds_avm_medians := dataset(fname_prefix + 'avm_medians',AVM_V2.layouts.Layout_Override_AVM_Medians,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
 	dailyds_avm_medians := dataset(daily_prefix + 'avm_medians',AVM_V2.layouts.Layout_Override_AVM_Medians,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);

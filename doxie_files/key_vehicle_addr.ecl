@@ -1,4 +1,4 @@
-import doxie_build,doxie,AutoKey;
+import doxie_build,doxie,AutoKey, data_services;
 
 f := File_VehicleContacts;
 
@@ -26,4 +26,7 @@ t := project(f, xf_i_rec(left));
 r := t(prim_name <> '', zip <> '', pick != 0);
 d := DEDUP(r, prim_name, prim_range, st, city_code, zip, sec_range, seq_no, ALL);
 
-export Key_Vehicle_addr := INDEX(d, {d.prim_name, d.prim_range, d.st, d.city_code, d.zip, d.sec_range}, {d.pick, d.seq_no}, '~thor_data400::key::'+doxie_build.buildstate+'vehicle_addr_'+doxie.Version_SuperKey);
+export Key_Vehicle_addr := INDEX(d, 
+                                 {d.prim_name, d.prim_range, d.st, d.city_code, d.zip, d.sec_range}, 
+                                 {d.pick, d.seq_no}, 
+                                 data_services.data_location.prefix() + 'thor_data400::key::'+doxie_build.buildstate+'vehicle_addr_'+doxie.Version_SuperKey);

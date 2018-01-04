@@ -1,4 +1,4 @@
-import header, census_data, did_add, doxie;
+import header, census_data, doxie, data_services;
 
 //payload changed to the new basefile including state_death_id
 death_record := record
@@ -18,10 +18,6 @@ dead_with_county_sort := sort(dead_with_county_dist, fname, dod8, local);
 
 //build index on fname and dod8 
 export key_dod_fname := index(dead_with_county_sort,
-                               {fname, dod8},{dead_with_county_sort},
-				           '~thor_data400::key::dod_fname_death_masterV2_'+ doxie.Version_SuperKey);
-
-
-
-
-
+                              {fname, dod8},
+                              {dead_with_county_sort},
+                              data_services.data_location.prefix() + 'thor_data400::key::dod_fname_death_masterV2_'+ doxie.Version_SuperKey);

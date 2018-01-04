@@ -1,4 +1,4 @@
-import gong, doxie;
+import gong, doxie, data_services;
 
 input_recs := gong.File_Gong_Full((listing_type_bus = 'B') AND (TRIM(listed_name)<>''));
 
@@ -28,6 +28,6 @@ key_recs := ROLLUP(sort_words, LEFT.word=RIGHT.word, tallyWords(LEFT,RIGHT));
 export Key_bizword_frequency := 
        index(key_recs,
              {string30 word := word,
-							unsigned8 freq := freq},
+             unsigned8 freq := freq},
              {key_recs},
-		   '~thor_data400::key::gong_eda_bizword_frequency_' + doxie.Version_SuperKey);
+             data_services.data_location.prefix() + 'thor_data400::key::gong_eda_bizword_frequency_' + doxie.Version_SuperKey);

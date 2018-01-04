@@ -8,6 +8,6 @@ EXPORT Key_Deltabase_Gateway := MODULE
 	export Historic_Results			:= index(inFile
 																			,{submitted_phonenumber, transaction_id, batch_job_id, sequence_number}
 																			,{inFile}
-																			,'~thor_data400::key::deltabase_gateway::historic_results_'+doxie.Version_SuperKey);
+																			,data_services.data_location.prefix() + 'thor_data400::key::deltabase_gateway::historic_results_'+doxie.Version_SuperKey);
 
 END;

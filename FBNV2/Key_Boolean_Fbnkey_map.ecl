@@ -1,4 +1,5 @@
-import text_search;
+import text_search, data_services;
+
 inData_bus := FBNV2.File_FBN_Business_Base;
 
 layout_tmsid_rmsid := record
@@ -11,4 +12,4 @@ end;
 ds :=dataset([],layout_tmsid_rmsid);
 
 export Key_Boolean_Fbnkey_map := index(ds,{doc,tmsid,rmsid,__filepos},
-	'~thor_data400::key::fbn::qa::docref.docref');
+     data_services.data_location.prefix() + 'thor_data400::key::fbn::qa::docref.docref');

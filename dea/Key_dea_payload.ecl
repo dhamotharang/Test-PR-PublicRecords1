@@ -1,4 +1,4 @@
-import doxie,autokeyb2;
+import doxie, data_services;
 
 b_in := DEA.File_Dea_Doxie;
 
@@ -36,5 +36,7 @@ end;
 
 b := project(b_in,into_bus(left));
 
-export Key_dea_payload := index(b,{fakeid},{b},'~thor_data400::key::dea::'+ doxie.Version_SuperKey + '::autokey::payload');
-
+export Key_dea_payload := index(b,
+                                {fakeid},
+                                {b},
+                                data_services.data_location.prefix() + 'thor_data400::key::dea::'+ doxie.Version_SuperKey + '::autokey::payload');

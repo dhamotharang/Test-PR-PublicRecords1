@@ -1,4 +1,4 @@
-import doxie;
+import doxie, data_services;
 
 layout_auto_zip := record
   STRING6 zip;
@@ -24,4 +24,6 @@ p := PROJECT(file_cwp_with_fdid(postalcode<>''), proj(LEFT));
 
 recs := dedup(sort(p, record), record);
   
-export key_auto_zip := INDEX(recs, {recs}, '~thor_data400::key::canadianwp_zip_' + doxie.Version_SuperKey);
+export key_auto_zip := INDEX(recs, 
+                             {recs}, 
+                             data_services.data_location.prefix() + 'thor_data400::key::canadianwp_zip_' + doxie.Version_SuperKey);

@@ -3,7 +3,7 @@ import emerges, data_services;
 EXPORT key_override_hunting_fishing := module
 	fname_prefix := '~thor_data400::base::override::fcra::qa::';
 	daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-  keyname_prefix := '~thor_data400::key::override::fcra::hunting_fishing::qa::';
+  keyname_prefix := data_services.data_location.prefix() + 'thor_data400::key::override::fcra::hunting_fishing::qa::';
 
 //New	
 	// shared fname_prefix := '~thor_data400::base::override::fcra::qa::';

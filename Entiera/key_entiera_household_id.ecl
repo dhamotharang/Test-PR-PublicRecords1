@@ -1,4 +1,5 @@
-import doxie,ut;
+import doxie, data_services;
+
 //orig_houseold_id is variable length. so have to first convert to fixed length. 
 //index does not like variable length fields.
 temp_ds := project(File_Entiera_Base_for_Keys(did>0),Layouts.Base_For_Indexes);
@@ -18,6 +19,5 @@ export key_entiera_household_id :=
 index(entiera_household_id
       ,{household_id,individual_id}
 			,{entiera_household_id}
-			,'~thor_200::key::entiera::'+doxie.Version_SuperKey+'::household_id'
+			,data_services.data_location.prefix() + 'thor_200::key::entiera::'+doxie.Version_SuperKey+'::household_id'
 	 );
-

@@ -1,4 +1,4 @@
-import dnb_feinv2;
+import dnb_feinv2, data_services;
 
 
 tmsid_rec := RECORD
@@ -12,7 +12,9 @@ tmsid_rec := RECORD
 
 tmsid_table := dataset([],tmsid_rec);
 
-export key_boolean_map := index(tmsid_table,{src,doc,src2,doc2,__filepos},'~thor_data400::key::feinv2::qa::map.key');
+export key_boolean_map := index(tmsid_table,
+                                {src,doc,src2,doc2,__filepos},
+                                data_services.data_location.prefix() + 'thor_data400::key::feinv2::qa::map.key');
 
 
 

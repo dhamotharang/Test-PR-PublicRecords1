@@ -1,8 +1,9 @@
-import Death_Master, Doxie;
+import Doxie, data_services;
+
 EXPORT key_override_death_master := module
 	shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
 	shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-	shared keyname_prefix := '~thor_data400::key::override::fcra::';
+	shared keyname_prefix := data_services.data_location.prefix() + 'thor_data400::key::override::fcra::';
 
 //Death Master DID
 	Death_rec := RECORD

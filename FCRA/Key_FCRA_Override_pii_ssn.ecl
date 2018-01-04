@@ -1,4 +1,4 @@
-import fcra, ut;
+import data_services;
 
 kf := Pii_for_FCRA (ssn<>'');
 
@@ -11,5 +11,7 @@ END;
 kf_rolled := rollup( group(sort(kf,ssn),ssn), true, roll(left,right) );
 
 
-export Key_FCRA_Override_pii_ssn := 
-index (kf_rolled, {ssn}, {kf_rolled	}, '~thor_data400::key::fcra::override::pii::qa::ssn');
+export Key_FCRA_Override_pii_ssn := index (kf_rolled, 
+                                           {ssn}, 
+                                           {kf_rolled	}, 
+                                           data_services.data_location.prefix() + 'thor_data400::key::fcra::override::pii::qa::ssn');

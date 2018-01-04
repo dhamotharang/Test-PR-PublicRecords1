@@ -1,4 +1,4 @@
-import ingenix_natlprof, Doxie;
+import ingenix_natlprof, Doxie, data_services;
 
 file_in := ingenix_natlprof.Basefile_ProviderLicense;
 
@@ -20,5 +20,6 @@ file_in_srt := sort(file_in_dst, LicenseState, LicenseNumber, ProviderID, local)
 file_in_dep := dedup(file_in_srt, LicenseState, LicenseNumber, ProviderID, local);
 
 export key_provider_license := index(file_in_dep, 
-                               {LicenseState, LicenseNumber},{providerID},
-				           '~thor_data400::key::ing_provider_license_' + Doxie.Version_SuperKey);
+                                     {LicenseState, LicenseNumber},
+                                     {providerID},
+                                     data_services.data_location.prefix() + 'thor_data400::key::ing_provider_license_' + Doxie.Version_SuperKey);

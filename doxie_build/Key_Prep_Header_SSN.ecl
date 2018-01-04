@@ -1,4 +1,4 @@
-import header;
+import header, data_services;
 
 t := header.Prepped_For_Keys;
 
@@ -19,4 +19,6 @@ ssn_rec := record
 
 ssn_recs := dedup(sort(table(t((integer)ssn<>0),ssn_rec),record),record);
 
-export Key_Prep_Header_SSN := INDEX(ssn_recs, {ssn_recs}, '~thor_data400::key::header.ssn.did' + thorlib.wuid());
+export Key_Prep_Header_SSN := INDEX(ssn_recs, 
+                                    {ssn_recs}, 
+                                    data_services.data_location.prefix() + 'thor_data400::key::header.ssn.did' + thorlib.wuid());

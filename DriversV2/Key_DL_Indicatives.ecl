@@ -1,4 +1,4 @@
-import doxie_build, doxie;
+import doxie_build, doxie, data_services;
 
 only_with := DriversV2.file_dl_keybuilding(race IN ['W','H','A','I','B'],
 									sex_flag IN ['M','F'],(INTEGER)age<>0);
@@ -32,5 +32,5 @@ enum := ITERATE(dl4key,iter(LEFT,RIGHT));
 
 export Key_DL_Indicatives := index(enum, {race, sex_flag, age, orig_state, randomizer}, 
 								   {dl_number}, 
-								   '~thor_data400::key::dl2::'+ doxie.Version_SuperKey +'::dl_indicatives_'+doxie_build.buildstate);
-								   //'~thor_data400::key::dl2::dl_indicatives_'+doxie_build.buildstate + '_qa');
+								   data_services.data_location.prefix() + 'thor_data400::key::dl2::'+ doxie.Version_SuperKey +'::dl_indicatives_'+doxie_build.buildstate);
+								   //data_services.data_location.prefix() + 'thor_data400::key::dl2::dl_indicatives_'+doxie_build.buildstate + '_qa');

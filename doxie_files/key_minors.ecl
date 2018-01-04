@@ -1,4 +1,4 @@
-import header, _validate, ut, watchdog,doxie;
+import header, _validate, ut, watchdog, doxie, data_services;
 
 //take header records where a valid date shows them to be a minor
 h := 
@@ -47,7 +47,7 @@ i :=
 		j,
 		{did},
 		{dob},
-		'~thor_data400::key::header::minors_'+doxie.Version_SuperKey
+		data_services.data_location.prefix() + 'thor_data400::key::header::minors_'+doxie.Version_SuperKey
 	);
 
 export key_minors := i;

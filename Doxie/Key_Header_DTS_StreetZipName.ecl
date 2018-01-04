@@ -1,4 +1,4 @@
-import autokey, header, ut;
+import header, ut, data_services;
 
 t := header.Prepped_For_Keys(prim_name<>'');
 
@@ -89,4 +89,6 @@ recs := join(ts_dep, t_roll,
 		   left.prim_range = right.prim_range and 
 		   left.did = right.did, get_dt_seen(left, right), local, keep(1));
 
-export Key_Header_DTS_StreetZipName := INDEX(recs, {recs},'~thor_data400::key::header.dts.pname.zip.name.range_'+doxie.Version_SuperKey);
+export Key_Header_DTS_StreetZipName := INDEX(recs, 
+                                             {recs},
+                                             data_services.data_location.prefix() + 'thor_data400::key::header.dts.pname.zip.name.range_'+doxie.Version_SuperKey);

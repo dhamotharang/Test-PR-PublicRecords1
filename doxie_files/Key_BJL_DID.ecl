@@ -1,4 +1,4 @@
-import doxie, doxie_files, watchdog, bankrupt, ut, risk_indicators;
+import doxie, doxie_files, watchdog, bankrupt, ut, risk_indicators, data_services;
 
 df := watchdog.File_Best;
 
@@ -126,4 +126,7 @@ END;
 
 doc_rolled := ROLLUP(SORT(doc_added,did,crim_case_num, local), LEFT.did=RIGHT.did, roll_doc(LEFT,RIGHT), local);
 
-export Key_BJL_DID := index(doc_rolled, {did}, {doc_rolled}, '~thor_data400::key::BocaShell_Derogs_DID_' + doxie.Version_SuperKey);
+export Key_BJL_DID := index(doc_rolled, 
+                            {did}, 
+                            {doc_rolled}, 
+                            data_services.data_location.prefix() + 'thor_data400::key::BocaShell_Derogs_DID_' + doxie.Version_SuperKey);

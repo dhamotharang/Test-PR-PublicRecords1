@@ -1,4 +1,4 @@
-import header;
+import header, data_services;
 
 t := header.Prepped_For_Keys;
 
@@ -46,4 +46,6 @@ END;
 tot := j+PROJECT(i(fname_count>20000), xpand(LEFT));
 
 
-export Key_Header_FnameSmall := INDEX(tot, {tot}, '~thor_data400::key::header.fname_small_'+doxie.Version_SuperKey);
+export Key_Header_FnameSmall := INDEX(tot, 
+                                      {tot}, 
+                                      data_services.data_location.prefix() + 'thor_data400::key::header.fname_small_'+doxie.Version_SuperKey);

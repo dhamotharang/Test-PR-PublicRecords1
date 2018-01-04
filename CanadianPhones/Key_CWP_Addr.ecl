@@ -1,4 +1,4 @@
-import doxie, ut;
+import doxie, data_services;
 
 d := canadianphones.file_CanadianWhitePagesBase;
 
@@ -38,6 +38,7 @@ end;
 f := project(d(prim_name<>'' and zip <>''), transform(payload, self := left));
 
 
-export Key_CWP_Addr := index(f,{zip, prim_name, prim_range, sec_range},
-								{f},
-                                  '~thor_data400::key::canadianwp_addr_'+doxie.Version_SuperKey);
+export Key_CWP_Addr := index(f,
+                             {zip, prim_name, prim_range, sec_range},
+                             {f},
+                             data_services.data_location.prefix() + 'thor_data400::key::canadianwp_addr_'+doxie.Version_SuperKey);

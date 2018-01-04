@@ -75,4 +75,4 @@ end;
 kf := project(ds,proj_recs(left));
 
 export Key_Override_Impulse_FFID := index(kf,{flag_file_id}, {kf},
-data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::impulse::qa::ffid');
+data_services.data_location.prefix()+'thor_data400::key::override::fcra::impulse::qa::ffid');

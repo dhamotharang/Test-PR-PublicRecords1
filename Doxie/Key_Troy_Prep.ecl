@@ -1,4 +1,5 @@
-import header, watchdog, ut;
+import header, watchdog, ut, data_services;
+
 h := header.prepped_for_keys;
 
 r := record
@@ -44,4 +45,4 @@ r correct_reversals(r le) := transform
 
 p:= project(ag,correct_reversals(left));
 
-export Key_Troy_Prep := INDEX(p,{p},'~thor_data400::key::troy' + thorlib.WUID());
+export Key_Troy_Prep := INDEX(p,{p}, data_services.data_location.prefix() + 'thor_data400::key::troy' + thorlib.WUID());

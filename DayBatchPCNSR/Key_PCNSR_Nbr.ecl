@@ -1,4 +1,4 @@
-import DayBatchPCNSR, doxie;
+import DayBatchPCNSR, doxie, data_services;
 
 in_file := DayBatchPCNSR.prep_key();
 
@@ -11,4 +11,4 @@ export Key_PCNSR_Nbr :=
              {zip,zip4,prim_name,prim_range,sec_range
 							},
 							{dPhone},
-							'~thor_data::key::daybatch_pcnsr::'+doxie.Version_SuperKey+'::pcnsr.zz4317_deduped');
+							data_services.data_location.prefix() + 'thor_data::key::daybatch_pcnsr::'+doxie.Version_SuperKey+'::pcnsr.zz4317_deduped');
