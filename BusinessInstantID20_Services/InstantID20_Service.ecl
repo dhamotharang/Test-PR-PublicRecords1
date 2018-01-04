@@ -66,12 +66,6 @@ EXPORT InstantID20_Service() := MACRO
 			//Look up the industry by the company ID.
 			Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Business_Risk__InstantID_20_Service);
 		/* ************* End Scout Fields **************/
-
-		// Rename #STORED attributes found in the service interface above so they match what 
-		// BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs *only* is expecting. 
-		#STORED('GLBPurpose'                ,_GLBA_Purpose);
-		#STORED('OFAC_version'              ,_OFAC_Version);
-		#STORED('Global_Watchlist_Threshold',_Global_Watchlist_Threshold);
 		
 		ds_Input := DATASET([xfm_LoadInput]); // see this transform in Macros.mac_LoadInput()
 		
