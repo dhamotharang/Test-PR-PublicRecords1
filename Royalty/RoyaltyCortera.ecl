@@ -2,7 +2,7 @@
 
   EXPORT BOOLEAN isInhouseCorteraHit(STRING SourceIndex) := 
     FUNCTION
-      RETURN SourceIndex IN ['2','4','6','8'];
+      RETURN SourceIndex IN ['2','4','6','7'];
     END;
     
   EXPORT InHouse := MODULE
