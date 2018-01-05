@@ -44,6 +44,7 @@ RECORDOF(int0) xformMiscCodes(RECORDOF(int0) le) := TRANSFORM
 																				'');
 			SELF.ORIGIN_CD_DESC		:= CASE(TRIM(le.ORIGIN_CD),
 																			'D' => 'ENDORSEMENT',
+																			'C' => 'CREDENTIAL',
 																			'E' => 'EXAM',
 																			'G' => 'GRANDFATHERED',
 																			'L' => 'ORIGINAL',
