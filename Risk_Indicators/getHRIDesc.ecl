@@ -457,11 +457,7 @@ export getHRIDesc(string5 rc) := CASE(TRIM(rc),
 'D1' => 'Distance from Input Address to Retail Address over 100 Miles',
 'D2' => 'Distance from Input Address to Retail Address over 200 Miles',
 'D3' => 'Distance from Input Address to Retail Address over 400 Miles',
-'D30' => 'Derogatory public record on file',
-'D31' => 'Bankruptcy record on file',
-'D32' => 'Criminal record on file',
-'D33' => 'Eviction record on file',
-'D34' => 'Lien or judgment record on file',
+
 
 // Reason Code and Descriptions for SBOM_0_0 (Business Only) and SBBM_0_0 (Blended)
 'B017' => 'Too few business associates on record with business',
