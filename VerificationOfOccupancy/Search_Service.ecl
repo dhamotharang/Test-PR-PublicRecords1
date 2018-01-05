@@ -164,9 +164,14 @@ EXPORT Search_Service() := MACRO
 	packagedTestseedInput := PROJECT(ut.ds_oneRecord, intoLayoutInput(LEFT, COUNTER));	
 
 	searchResults := IF(TestDataEnabled, 
-		PROJECT(VerificationOfOccupancy.TestSeed_Function(packagedTestseedInput, TestDataTableName, IncludeModel), TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOBatchOutReport, SELF := LEFT; SELF := [])),	// TestSeed Values
+		PROJECT(VerificationOfOccupancy.TestSeed_Function(packagedTestseedInput, TestDataTableName, IncludeModel,IncludeReport), TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOBatchOutReport, SELF := LEFT; SELF := [])),	// TestSeed Values
 		VerificationOfOccupancy.Search_Function(VOO_Input, DataRestriction, glba, dppa, isUtility, AttributesVersion, IncludeModel, DataPermission, IncludeReport).VOOReport // Realtime Values
 	);
+	
+	// searchResults :=  VerificationOfOccupancy.Search_Function(VOO_Input, DataRestriction, glba, dppa, isUtility, AttributesVersion, IncludeModel, DataPermission, IncludeReport).VOOReport; // Realtime Values);
+	//searchResults :=  PROJECT(VerificationOfOccupancy.TestSeed_Function(packagedTestseedInput, TestDataTableName, IncludeModel,IncludeReport), TRANSFORM(VerificationOfOccupancy.Layouts.Layout_VOOBatchOutReport, SELF := LEFT; SELF := []));	// TestSeed Values
+// Realtime Values
+
 
 iesp.share.t_NameValuePair createrec(searchResults le, integer C) := TRANSFORM
 			self.Name:= case( C,
