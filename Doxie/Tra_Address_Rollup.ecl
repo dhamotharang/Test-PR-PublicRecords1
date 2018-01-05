@@ -1,4 +1,4 @@
-IMPORT doxie, FFD;
+﻿IMPORT doxie, FFD;
 
 pickNonEmpty(string l, string r) := if ( l = '', r, l );
 
@@ -14,20 +14,7 @@ export doxie.Layout_Comp_Addresses Tra_Address_Rollup(doxie.Layout_Comp_Addresse
   self.phone := if (le.phone = '', ri.phone, le.phone);
   self.listed_phone := if (le.listed_phone = '', ri.listed_phone, le.listed_phone);
 	boolean pick_ri_statements := le.phone = '' or le.listed_phone = '';
-	self.statementids := 
-		le.statementids(recordtype in [
-			FFD.Constants.RecordType.HS, 
-			FFD.Constants.RecordType.HSN, 
-			FFD.Constants.RecordType.HSA,
-			FFD.Constants.RecordType.HSP
-			]) + 
-			IF(pick_ri_statements, 
-				ri.statementids(recordtype in [
-					FFD.Constants.RecordType.HS, 
-					FFD.Constants.RecordType.HSP
-					]), 
-				dataset([], FFD.Layouts.StatementIdRec)
-				);
+	self.statementids := FFD.Constants.BlankStatements;
   self.isdisputed := le.isdisputed or (pick_ri_statements and ri.isdisputed);  
   self := le;
   end;

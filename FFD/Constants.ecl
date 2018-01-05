@@ -9,7 +9,7 @@ EXPORT Constants := MODULE
 	
 	EXPORT RecordType := MODULE(PersonContext.Constants.RecordTypes)
 		EXPORT ComplianceRecordLevel := [DR, SR];
-		EXPORT StatementRecordLevel := [RS,HSN,HSA,HSD,HSS,HSP,HSL];
+		EXPORT StatementRecordLevel := [RS];
 		EXPORT StatementConsumerLevel := [HS,CS];
 		EXPORT ComplianceSet := ComplianceRecordLevel;  // we will add other record types here later
 	END;
