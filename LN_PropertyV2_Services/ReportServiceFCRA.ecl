@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ReportServiceFCRA">
 
 	<!-- Property Keys -->
@@ -40,18 +40,17 @@ export ReportServiceFCRA() := macro
 	// compute results
 	#CONSTANT('usePropMarshall', true);
 	
-	// FFD				 
-	string  strFFDOptionsMask_in	 := '0' : stored('FFDOptionsMask');
-	integer8 valFFDOptionsMask 		 := ut.BinaryStringToInteger(STD.Str.Reverse(strFFDOptionsMask_in));
-	
+
 	//  Fill FCRA.iRules
 	iRulesParams := module (FCRA.iRules)
-		export integer8 FFDOptionsMask := valFFDOptionsMask;
+		export integer8 FFDOptionsMask := FFD.FFDMask.Get();
+	  export integer FCRAPurpose := FCRA.FCRAPurpose.Get();
   end;
 		
 	raw_combined := LN_PropertyV2_Services.ReportService_records(isFCRA,nss,iRulesParams);
 	raw := raw_combined.Records;
 	statements := raw_combined.Statements;
+  consumer_alerts := raw_combined.ConsumerAlerts;
 
 	// standard record counts & limits
 	doxie.MAC_Header_Field_Declare(isFCRA)
@@ -62,6 +61,8 @@ export ReportServiceFCRA() := macro
 	// display results
 	output(cooked, named('Results'));
 	output(statements, named('ConsumerStatements'));
+  output(consumer_alerts, named ('ConsumerAlerts'));	
+		
 
 endmacro;
 

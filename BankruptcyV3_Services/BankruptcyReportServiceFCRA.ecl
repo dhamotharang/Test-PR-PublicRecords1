@@ -175,9 +175,11 @@ export BankruptcyReportServiceFCRA() :=	macro
 	consumer_statements := if( exists(final), all_statements,
                             all_statements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel));
 	
+  consumer_alerts := FFD.Constants.BlankConsumerAlerts;
 	doOutput := sequential(
-		OUTPUT(final, NAMED('Results')),
-		output(consumer_statements,named('ConsumerStatements')));
+		output(final, named('Results')),
+		output(consumer_statements,named('ConsumerStatements')),
+    output(consumer_alerts, named('ConsumerAlerts')));	
 		
 	
 	sequential(

@@ -1,4 +1,4 @@
-IMPORT PersonContext, iesp, doxie;
+﻿IMPORT PersonContext, iesp, doxie;
 
 EXPORT Layouts := MODULE 
 
@@ -40,13 +40,15 @@ EXPORT Layouts := MODULE
     doxie.layout_references.did;
   END;
 
-  // consumer statements as they are returned from PC-service for batch input
+  // expanded layout with consumer info as it is returned from PC-service 
   EXPORT PersonContextBatch := RECORD
-    STRING20 acctno;
-    PersonContext.Layouts.Layout_PCResponseRec
+    STRING20 acctno;  //for batch input
+    BOOLEAN suppress_for_legal_hold := FALSE; // indicator whether all data has to be suppressed if Legal Hold alert is set
+    SET OF STRING set_FCRA_purpose := [];  // list of FCRA permissible purposes for which Security Freeze Alert should be applied
+    PersonContext.Layouts.Layout_PCResponseRec;
   END;
 	
-	// These are the FFD fileds that will be used to determine statements & disputes associated to the raw record.
+	// These are the FFD fields that will be used to determine statements & disputes associated to the raw record.
 	EXPORT CommonRawRecordElements:= RECORD
 		DATASET(StatementIdRec) StatementIds {xpath('StatementIdRecs/StatementIdRec')} := DATASET([], StatementIdRec);
     BOOLEAN isDisputed {xpath('IsDisputed')} := FALSE;
@@ -59,4 +61,21 @@ EXPORT Layouts := MODULE
 																												DateAdded, EventType, SourceSystem, StatementSequence, Content];
 	END;
 
+  
+	EXPORT ConsumerFlags := RECORD
+    STRING1 security_freeze := '';
+    STRING1 security_fraud_alert := '';
+    STRING1 identity_theft := '';
+    STRING1 legal_flag := '';
+    STRING1 has_consumer_statement := '';
+  END;
+  
+	EXPORT ConsumerFlagsBatch := RECORD
+	  STRING20 		acctno := '0';
+    STRING20		UniqueId;	//ie, LexId
+    BOOLEAN     suppress_records := FALSE; 
+    ConsumerFlags  consumer_flags;
+  END;
+  
+  
 END;

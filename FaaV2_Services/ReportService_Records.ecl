@@ -1,4 +1,4 @@
-
+﻿
 // general flow is this: takes id's (did's bdid's)...maybe aircraft number
 // hits payload key...and then formats into layout expected ...sorts it
 // after you fetch ID's...
@@ -50,7 +50,7 @@ import AutoStandardI, FaaV2_Services, doxie, iesp, FCRA, FFD, Gateway;
 		recs_sort := sort(recs_fmt, -dateLastSeen.year, -dateLastSeen.month, -dateLastSeen.day,record);
     tempresults_slim := project(recs_sort, iesp.faaaircraft_Fcra.t_FcraaircraftReportRecord);
 		
-		FFD.MAC.PrepareResultRecord(tempresults_slim, final_results, statements_out, iesp.faaaircraft_Fcra.t_FcraaircraftReportRecord); 
+		FFD.MAC.PrepareResultRecord(tempresults_slim, final_results, statements_out, FFD.Constants.BlankConsumerAlerts, iesp.faaaircraft_Fcra.t_FcraaircraftReportRecord); 
 	
 	return final_results;
 	end;

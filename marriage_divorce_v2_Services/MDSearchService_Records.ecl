@@ -1,4 +1,4 @@
-import doxie, suppress, FFD, iesp, FCRA, Gateway;
+﻿import doxie, suppress, FFD, iesp, FCRA, Gateway;
 
 export MDSearchService_Records(unsigned6 ldid=0,
 															 integer1 NSS_val=Suppress.Constants.NonSubjectSuppression.doNothing, 
@@ -47,7 +47,7 @@ final_d	:= dedup(rsrt, except record_id);
 // output(rpen,named('rpen'));
 // output(final_d,named('final_d'));
 
-FFD.MAC.PrepareResultRecord(final_d, results_combined, statement_output, Marriage_Divorce_v2_Services.Layouts.result.wide);
+FFD.MAC.PrepareResultRecord(final_d, results_combined, statement_output, FFD.Constants.BlankConsumerAlerts, Marriage_Divorce_v2_Services.Layouts.result.wide);
 
 return results_combined;
 

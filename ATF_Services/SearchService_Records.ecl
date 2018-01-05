@@ -1,4 +1,4 @@
-import AutoStandardI, atf_Services, doxie, iesp, ut, doxie_raw, suppress, Gateway,
+﻿import AutoStandardI, atf_Services, doxie, iesp, ut, doxie_raw, suppress, Gateway,
 			 FCRA, FFD, CriminalRecords_Services;
 
 export SearchService_Records := module
@@ -77,8 +77,8 @@ export SearchService_Records := module
 				we are showing that record or not. */
 		boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(in_mod.FFDOptionsMask);
   	consumer_statements := if(isFCRA and showConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
-
-		FFD.MAC.PrepareResultRecord(final_records, rec_out, consumer_statements, iesp.firearm_fcra.t_FcraFirearmRecord);
+    consumer_alerts := FFD.Constants.BlankConsumerAlerts;
+		FFD.MAC.PrepareResultRecord(final_records, rec_out, consumer_statements, consumer_alerts, iesp.firearm_fcra.t_FcraFirearmRecord);
     
 		return rec_out;
 	end;

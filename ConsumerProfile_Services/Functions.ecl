@@ -181,7 +181,7 @@ EXPORT Functions := MODULE
 	
 	//Alert Dataset
 	export getAlertDataset(string alertCode) := function
-		return dataset([{alertCode, FCRA.Constants.ALERT_DESCRIPTION(alertCode)}], iesp.fcraconsumerprofilereport.t_ConsumerProfileAlert);
+		return dataset([{alertCode, FCRA.Constants.ALERT_DESCRIPTION(alertCode),''}], iesp.fcraconsumerprofilereport.t_ConsumerProfileAlert);
 	end;
 	
 	//Extract Alerts from input

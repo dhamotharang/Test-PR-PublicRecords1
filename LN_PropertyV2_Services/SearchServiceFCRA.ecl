@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchServiceFCRA">
 
 	<!-- Autokey search fields -->
@@ -97,10 +97,6 @@ export SearchServiceFCRA() := macro
 	#CONSTANT('DisplayMatchedParty', true);
 	#constant('DidOnly', true); // for picklist
 	
-	// FFD				 
-	string  strFFDOptionsMask_in	 := '0' : stored('FFDOptionsMask');
-	integer8 valFFDOptionsMask 		 := ut.BinaryStringToInteger(STD.Str.Reverse(strFFDOptionsMask_in));
-	
 	//------------------------------------------------------------------------------------
 	// gateways := dataset([], Gateway.layouts.config) : stored ('gateways', few);
 	gateways := Gateway.Configuration.Get();
@@ -114,12 +110,14 @@ export SearchServiceFCRA() := macro
 	
 	  //  Fill FCRA.iRules
 	iRulesParams := module (FCRA.iRules)
-		export integer8 FFDOptionsMask := valFFDOptionsMask;
+		export integer8 FFDOptionsMask := FFD.FFDMask.Get();
+	  export integer FCRAPurpose := FCRA.FCRAPurpose.Get();
   end;
 	
 	raw_combined := LN_PropertyV2_Services.SearchService_records(rdid,nss,isFCRA,iRulesParams);
 	raw := raw_combined.Records;
 	statements := raw_combined.Statements;
+  consumer_alerts := raw_combined.ConsumerAlerts;
 	
 	// standard record counts & limits
 	doxie.MAC_Header_Field_Declare(isFCRA);
@@ -135,5 +133,6 @@ export SearchServiceFCRA() := macro
 	// display Property results
 	output(cooked, named('Results'));
 	output(statements, named('ConsumerStatements'));
-	
+	output(consumer_alerts, named('ConsumerAlerts'));
+
 endmacro;

@@ -225,9 +225,11 @@ export BankruptcySearchServiceFCRA(
 	  consumer_statements := IF( exists(final), all_statements, 
                               all_statements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel));
 
+    consumer_alerts := FFD.Constants.BlankConsumerAlerts;
 	  doxie.MAC_Marshall_Results(final, recs_marshalled);
 
     OUTPUT(recs_marshalled, NAMED('Results'));		
     OUTPUT (consumer_statements, named ('ConsumerStatements'));	
+    OUTPUT (consumer_alerts, named ('ConsumerAlerts'));	
     
  		endmacro;

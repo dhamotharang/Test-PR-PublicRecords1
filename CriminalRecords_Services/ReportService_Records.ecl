@@ -37,7 +37,8 @@ export ReportService_Records := module
 			self._Header		 := iesp.ECL2ESP.GetHeaderRow();
 			self.SexualOffenses	 := choosen(if(in_mod.IncludeSexualOffenses,sex_offender_rpt),iesp.Constants.SEXOFF_MAX_COUNT_REPORT_RESPONSE_RECORDS);
 			self.CriminalRecords := choosen(recs_fmt,iesp.constants.CRIM.MaxReportRecords);
-			self.ConsumerStatements  := dataset([],iesp.share_fcra.t_ConsumerStatement);
+			self.ConsumerStatements  := FFD.Constants.BlankConsumerStatements;
+			self.ConsumerAlerts  := FFD.Constants.BlankConsumerAlerts;
 		end;
 		final_proj:=dataset([final_xform()]);
 		
