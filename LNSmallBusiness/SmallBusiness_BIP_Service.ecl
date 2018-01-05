@@ -608,7 +608,7 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	// Starts with 'LOG_' (Upper case is important!!)
 	// Middle part is the database name, in this case: 'log__mbs'
 	// Must end with '_intermediate__log'
-	OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log'));
+	IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log')) );
 
 	// Calculate royalties. For SBFE...:
 	SBFE_royalties := IF( TestDataEnabled, Royalty.RoyaltySBFE.GetNoRoyalties(), Royalty.RoyaltySBFE.GetOnlineRoyalties(SBA_Results) );
@@ -711,7 +711,7 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 	// #stored('Deltabase_Log', Deltabase_Logging);
 	
 	//Improved Scout Logging
-	IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));	
+	IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));	
 	
 	// DEBUGs:
 	// OUTPUT( PhoneSources, NAMED('PhoneSources') );

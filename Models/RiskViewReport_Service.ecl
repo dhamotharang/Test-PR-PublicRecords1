@@ -194,7 +194,8 @@ export RiskViewReport_Service := MACRO
 		// Starts with 'LOG_' (Upper case is important!!)
 		// Middle part is the database name, in this case: 'log__mbs__fcra'
 		// Must end with '_intermediate__log'
-		OUTPUT(intermediateLog, NAMED('LOG_log__mbs__fcra_intermediate__log'));
+IF(~DisableOutcomeTracking and ~users.TestDataEnabled, OUTPUT(intermediateLog, NAMED('LOG_log__mbs__fcra_intermediate__log')) );
+
 		
 		//Log to Deltabase
 		Deltabase_Logging_prep := project(riskview_xml, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
@@ -252,7 +253,7 @@ export RiskViewReport_Service := MACRO
 		Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
 		
 		//Improved Scout Logging
-		IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
+		IF(~DisableOutcomeTracking and ~users.TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
 
 		output( res, named( 'Results' ) );
 //		output( BocaShell_returned, named('bocashell'));

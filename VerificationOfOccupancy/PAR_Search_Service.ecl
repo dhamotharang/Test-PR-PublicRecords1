@@ -250,7 +250,7 @@ EXPORT PAR_Search_Service() := MACRO
 	// #stored('Deltabase_Log', Deltabase_Logging);
 	
 	//Improved Scout Logging
-	IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+	IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 	
 	OUTPUT(PARResults, NAMED('Results'));
 	

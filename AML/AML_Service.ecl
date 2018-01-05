@@ -1,7 +1,4 @@
-﻿/*2013-06-27T16:57:58Z (Michele Walklin_prod)
-Historydate check
-*/
-/*--SOAP--
+﻿/*--SOAP--
 <message name="AML Attributes" wuTimeout="300000">
 	<part name="AntiMoneyLaunderingRiskAttributesRequest" type="tns:XmlDataSet" cols="80" rows="50"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
@@ -577,7 +574,7 @@ Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.
 // #stored('Deltabase_Log', Deltabase_Logging);
 
 //Improved Scout Logging
-IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 
 ENDMACRO;
 

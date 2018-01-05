@@ -1,7 +1,4 @@
-﻿/*2017-11-21T00:37:17Z (aleksandar tomovic)
-Check in for RR-11812
-*/
-//RiskView.Search_Service
+﻿//RiskView.Search_Service
 /*--SOAP--
 <message name="RiskView Search_Service">
 	<part name="RiskView2Request" type="tns:XmlDataSet" cols="110" rows="75"/>
@@ -1119,7 +1116,7 @@ Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.
 // #stored('Deltabase_Log', Deltabase_Logging);
 
 //Improved Scout Logging
-IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
+IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
 
 #end
 

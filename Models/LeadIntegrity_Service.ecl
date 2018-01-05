@@ -2523,7 +2523,7 @@ end;
 	OUTPUT(final, NAMED('Results'));
 	
 	//Improved Scout Logging
-	IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+	IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 
 ENDMACRO;
 // Models.LeadIntegrity_Service();
