@@ -21,7 +21,7 @@ shared  getFieldName2(string1 inChar)
 												'O' => 'OKCTY',
 												'D' => 'DAYTN',
 												'');	
-
+																								
 EXPORT getLINkidsAtProxidLevel( dataset(BIPV2.IDfunctions.rec_SearchInput) ds_Format2SearchInput,
 	unsigned8 MaxResultsPerAcct,
 	AutoStandardI.DataRestrictionI.params in_mod2   ) := FUNCTION
@@ -98,14 +98,24 @@ END;
     
     RETURN dGongPhonesWithAcctNo;
   END;
-		
-  EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,
-                  DATASET(BIPV2.IDlayouts.l_xlink_ids)                 dLinkIds) :=
+	
+	EXPORT getCorpLinkids(DATASET(BIPV2.IDlayouts.l_xlink_ids) dLinkIds) := function
+									
+    // Fetch Corps
+     CorpLinkids := Corp2.Key_LinkIds.Corp.KFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID);				
+	RETURN corpLinkids;
+	END;
+	 								
+ EXPORT GetCorps(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,                  								   
+									 dataset(RECORDOF(Corp2.Key_LinkIds.Corp.KFetch(
+																dataset([],bipv2.IDlayouts.l_xlink_ids)
+																)
+															     )
+													) ds_corplinkids_payload
+									 ) :=									
   FUNCTION
-    dCorps := Corp2.Key_Linkids.Corp.kFetch(dLinkIds,BIPV2.IDconstants.Fetch_Level_SELEID);
-    
     // Dedup corps
-    dCorpsDedup := DEDUP(SORT(dCorps,#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),corp_key),
+    dCorpsDedup := DEDUP(SORT(ds_corplinkids_payload,#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),corp_key),
                           #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),corp_key);
     
     // Join to the corp key and get all the corp recs for each corp_key
@@ -1194,5 +1204,155 @@ END;
 		OSHARecs := rollup(dOSHADataWithAcctNo, rollup_recs(left,right), ultid, seleid, orgid);									
 														
 		RETURN OSHARecs;		
+	END;
+	
+	EXPORT GetRegisteredAgentInfo(DATASET(BusinessBatch_BIP.Layouts.LinkIdsWithAcctNo) dLinkIDsWithAcctNo,
+	                    dataset(RECORDOF(Corp2.Key_LinkIds.Corp.KFetch(
+																dataset([],bipv2.IDlayouts.l_xlink_ids)
+																)
+															     )
+													) ds_corplinkids_payload ) := FUNCTION          
+			
+			 // Dedup corps
+       ds_raw_corp := DEDUP(SORT(ds_corplinkids_payload,#EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),corp_key),
+                          #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),corp_key);    													
+	     ds_corpRA :=   ds_raw_corp(corp_ra_lname1 != '');									                   
+	     ds_CompRA := dedup(ds_raw_corp(corp_ra_cname1 != '' and corp_ra_lname1 = ''), all);
+	 		 	  	
+	     // corp_ra_name
+	     ds_raw_PersonRA := dedup(project(ds_corpRA,
+	        transform(BusinessBatch_BIP.Layouts.RegisteredAgentInfo,		
+					  self.acctno := '';
+		        self.proxid := 0;
+				    self.ultid  := left.ultid;
+				    self.seleid := left.seleid;
+				    self.orgid  := left.orgid;
+				    self.dotid  := 0;
+				    self.powid  := 0;
+				    self.empid  := 0;
+				 
+				    self.RA_companyName := ''; 
+				    self.RA_dt_first_seen := left.dt_first_seen,
+				                         //reference bugzilla 123464 based on state list
+																 //
+						RA_state := trim(left.corp_ra_state, left, right);
+						self.RA_dt_last_seen := if (RA_state 
+				              in ['AZ', 'ID', 'IL', 'IN', 'LA', 
+											'OH', 'OK', 'SD', 'VA'] 
+												and left.corp_ra_effective_date <> '',
+												(unsigned4) left.corp_ra_effective_date,
+												// otherwise
+												 left.corp_ra_dt_last_seen);
+				 
+						self.RA_title    := left.corp_ra_title1;
+						self.RA_fname     := left.corp_ra_fname1;						
+						self.RA_mname    := left.corp_ra_mname1;
+						self.RA_lname      := left.corp_ra_lname1;
+						self.RA_name_suffix    := left.corp_ra_name_suffix1;
+						self.RA_prim_range     := left.corp_ra_prim_range,
+						self.RA_predir         := left.corp_ra_predir,
+						self.RA_prim_name      := left.corp_ra_prim_name,
+						self.RA_addr_suffix    := left.corp_ra_addr_suffix,
+						self.RA_postdir        := left.corp_ra_postdir,
+						self.RA_unit_desig     := left.corp_ra_unit_desig,
+						self.RA_sec_range      := left.corp_ra_sec_range,
+						self.RA_city_name      := left.corp_ra_v_city_name,
+						self.RA_state          := left.corp_ra_state,
+						self.RA_zip            := left.corp_ra_zip5,
+						self.RA_zip4           := left.corp_ra_zip4,
+						self.RA_position_title := left.corp_ra_title_desc; 					
+						)), all); 
+												
+				// NOW DO same with corp_ra_name <> '' set (company named RA's)
+					 ds_raw_compRA := dedup(project(ds_compRA,
+	    transform(BusinessBatch_BIP.Layouts.RegisteredAgentInfo,
+				    
+				self.acctno := '';
+		    self.proxid := 0;
+				self.ultid  := left.ultid;				 
+				self.orgid  := left.orgid;
+				self.seleid := left.seleid;
+				self.dotid  := 0;
+				self.powid  := 0;
+				self.empid  := 0;							
+				self.RA_companyName     := trim(left.corp_ra_cname1, left, right);
+				self.RA_dt_first_seen := left.dt_first_seen,
+				self.RA_dt_last_seen := left.dt_last_seen,
+				self.RA_title    := left.corp_ra_title1;
+		    self.RA_fname     := left.corp_ra_fname1;				
+		    self.RA_mname    := left.corp_ra_mname1;
+		    self.RA_lname      := left.corp_ra_lname1;
+		    self.RA_name_suffix    := left.corp_ra_name_suffix1;
+				self.RA_prim_range     := left.corp_ra_prim_range,
+				self.RA_predir         := left.corp_ra_predir,
+				self.RA_prim_name      := left.corp_ra_prim_name,
+				self.RA_addr_suffix    := left.corp_ra_addr_suffix,
+				self.RA_postdir        := left.corp_ra_postdir,
+				self.RA_unit_desig     := left.corp_ra_unit_desig,
+				self.RA_sec_range      := left.corp_ra_sec_range,
+				self.RA_city_name      := left.corp_ra_v_city_name,
+				self.RA_state          := left.corp_ra_state,
+				self.RA_zip            := left.corp_ra_zip5,
+				self.RA_zip4           := left.corp_ra_zip4,
+		    self.RA_position_title := left.corp_ra_title_desc; 				                   			
+				)),all);
+						                        	
+		// person RA's.
+	  registeredAgentsSlim := DEDUP(SORT(ds_raw_PersonRA, #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),
+		                                     RA_lname, RA_fname, RA_mname, RA_name_suffix,
+																				 RA_position_title, -RA_dt_last_seen, RA_dt_first_seen,
+															           if (RA_lname <> '',0,1),if (ra_state <> '', 0, 1)),
+																				 #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),  RA_lname, RA_fname, RA_mname, RA_name_suffix,
+																				 RA_position_title, RA_dt_last_seen, RA_dt_first_seen);
+  
+	 registeredAgentsRolled := rollup(
+			group(registeredAgentsSlim,#expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+			      RA_lname,RA_mname,RA_fname,RA_name_suffix,RA_position_title),
+			group,
+			transform(recordof(left),
+				self.RA_dt_last_seen := max(rows(left)(RA_dt_last_seen <> 0),RA_dt_last_seen),
+				self.RA_dt_first_seen := min(rows(left)(RA_dt_first_seen <> 0),RA_dt_first_seen),				
+				self := left));
+													 																																								
+     // company RA's. ..																			 
+    RegisteredCompAgentsSlim := DEDUP(SORT(ds_raw_compRA, #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()),RA_companyName,
+		                                                RA_position_title, -RA_dt_last_seen,
+																										if (RA_prim_range <> '', 0,1),
+				                                                   if (RA_city_name <> '', 0, 1), if (RA_state <> '', 0, 1), if (RA_zip <> '', 0, 1), record),
+																													 #EXPAND(BIPV2.IDmacros.mac_ListTop3Linkids()), RA_companyName,
+																													 RA_position_title);
+																													 																													 
+		RegisteredCompAgentsRolled := rollup(
+			group(
+				sort(RegisteredCompAgentsSlim,#expand(BIPV2.IDmacros.mac_ListTop3Linkids()),
+				     RA_companyName,RA_position_title,-RA_dt_last_seen,if (RA_prim_range <> '', 0,1),
+				     if (RA_city_name <> '', 0, 1), if (RA_state <> '', 0, 1), if (RA_zip <> '', 0, 1) ,record),
+				#expand(BIPV2.IDmacros.mac_ListTop3Linkids())
+				,RA_companyName,RA_position_title),
+			group,
+			transform(recordof(left),
+				self.RA_dt_last_seen := max(rows(left)(RA_dt_last_seen <> 0),RA_dt_last_seen),
+				self.RA_dt_first_seen := min(rows(left)(RA_dt_first_seen <> 0),RA_dt_first_seen),				
+				self := left));
+	
+    RegisteredAgentsBoth := registeredAgentsRolled + RegisteredCompAgentsRolled; 																												 
+																				 
+    registeredAgentsRecs := JOIN(dLinkIDsWithAcctNo, RegisteredAgentsBoth,
+		                             BIPV2.IDmacros.mac_JoinTop3Linkids(),
+																 TRANSFORM(BusinessBatch_BIP.Layouts.RegisteredAgentInfo,
+																    SELF.acctno := LEFT.acctno;
+																		SELF := RIGHT)
+																		, LEFT OUTER, 
+																		LIMIT(0), KEEP(BusinessBatch_BIP.Constants.Limits.MaxResultsRegisteredAgents));
+		 		
+     //output(sorted_PersonRAs, named('sorted_PersonRAs'));				
+		 // output(registeredAgentsSlim, named('registeredAgentsSlim'));
+		 // output(registeredAgentsRolled, named('registeredAgentsRolled'));
+		
+		 // output(registeredCompAgentsSlim, named('registeredCompAgentsSlim'));
+		 // output(registeredCompAgentsRolled, named('registeredCompAgentsRolled'));
+		 			
+		 //RETURN sorted_raw_data_3;
+		 RETURN RegisteredAgentsRecs;
 	END;
 END;

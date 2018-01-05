@@ -91,10 +91,13 @@ FUNCTION
   
   // Get Phones  
   ds_GongPhones := BusinessBatch_BIP.Functions(inMod).GetPhones(ds_linkIdsWithAcctNo,ds_linkIds);
-  
+	
+  // get corp linkids payloadinfo
+	ds_Corps_linkidPayload := BusinessBatch_BIP.Functions(inMod).getCorpLinkids(ds_LinkIds);
+
   // Get corps RA and executive contact information
-  ds_Corps := BusinessBatch_BIP.Functions(inMod).GetCorps(ds_linkIdsWithAcctNo,ds_linkIds);
-  
+  ds_Corps := BusinessBatch_BIP.Functions(inMod).GetCorps(ds_linkIdsWithAcctNo,ds_Corps_linkidPayload);
+																													
 	// get Bankruptcy info data
 	ds_bk := BusinessBatch_BIP.Functions(inMod).GetBankruptcy(ds_linkIdsWithAcctNo,ds_linkids);
 	
@@ -128,6 +131,9 @@ FUNCTION
 	// Get OSHAIR data
 	ds_OSHA := BusinessBatch_BIP.Functions(inMod).getOSHAInfo(ds_linkIdsWithAcctNo,ds_linkIds);
 	
+	// Get Registered Agent Data pass in corp payload as param.
+	ds_RegisteredAgents := BusinessBatch_BIP.Functions(inMod).getRegisteredAgentInfo(ds_linkIdsWithAcctNo,
+	                       ds_Corps_linkidPayload);	            
   
   // Merge all the results
   // Business header info
@@ -628,8 +634,242 @@ FUNCTION
 											 SELF.Total_Inspections := RIGHT.Total_Inspections;
 											 SELF := LEFT),
 											 LEFT OUTER, LIMIT(0), KEEP(1));
-											 									 
-	  
+											 
+   // Registered Agents
+  BusinessBatch_BIP.Layouts.FinalWithLinkIds tRegisteredAgents2Final(BusinessBatch_BIP.Layouts.FinalWithLinkIds le,BusinessBatch_BIP.Layouts.RegisteredAgentInfo ri,INTEGER cnt) :=
+  TRANSFORM	 
+	
+	  SELF.RA_title_var1                    := IF(cnt = 1,ri.RA_title,le.executive_title_var1);
+		SELF.RA_fname_var1                    := IF(cnt = 1,ri.RA_fname,le.executive_fname_var1); 
+		SELF.RA_mname_var1                    := IF(cnt = 1,ri.RA_mname,le.executive_mname_var1);
+		SELF.RA_lname_var1                    := IF(cnt = 1,ri.RA_lname,le.executive_lname_var1);
+		SELF.RA_name_suffix_var1              := IF(cnt = 1,ri.RA_name_suffix,le.executive_name_suffix_var1);
+		//SELF.position_title;
+		SELF.RA_dt_first_seen_var1            := IF(cnt = 1,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_first_seen),le.RA_dt_first_seen_var1);
+	  SELF.RA_dt_last_seen_var1             := IF(cnt = 1,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_last_seen),le.RA_dt_last_seen_var1);
+		SELF.RA_CompanyName_var1   := IF(cnt = 1,ri.RA_companyName,le.RA_companyName_var1);
+		
+    SELF.RA_prim_range_var1    := if (cnt = 1, ri.RA_prim_range, le.RA_prim_range_var1);
+	  SELF.RA_prim_name_var1     := if (cnt = 1, ri.RA_prim_name, le.RA_prim_name_var1);
+    SELF.RA_predir_var1        := if (cnt = 1, ri.RA_predir, le.RA_predir_var1);
+		SELF.RA_postdir_var1       := if (cnt = 1, ri.RA_postdir, le.RA_postdir_var1);
+		SELF.RA_sec_range_var1     := if (cnt = 1, ri.RA_sec_range, le.RA_sec_range_var1);
+	  SELF.RA_unit_desig_var1    := if (cnt = 1, ri.RA_unit_desig, le.RA_unit_desig_var1);
+		SELF.RA_addr_suffix_var1   := if (cnt = 1, ri.RA_addr_suffix, le.RA_addr_suffix_var1); 
+		SELF.RA_city_name_var1          := if (cnt = 1, ri.RA_city_name, le.RA_city_name_var1);
+		SELF.RA_state_var1         := if (cnt = 1, ri.RA_state, le.RA_state_var1);
+		SELF.RA_zip_var1           := if (cnt = 1, ri.RA_zip, le.RA_zip_var1);
+		SELF.RA_zip4_var1          := if (cnt = 1, ri.RA_zip4, le.RA_zip4_var1);
+
+    SELF.RA_title_var2                    := IF(cnt = 2,ri.RA_title,le.RA_title_var2);
+		SELF.RA_fname_var2                    := IF(cnt = 2,ri.RA_fname,le.RA_fname_var2); 
+		SELF.RA_mname_var2                    := IF(cnt = 2,ri.RA_mname,le.RA_mname_var2);
+		SELF.RA_lname_var2                    := IF(cnt = 2,ri.RA_lname,le.RA_lname_var2);
+		SELF.RA_name_suffix_var2              := IF(cnt = 2,ri.RA_name_suffix,le.RA_name_suffix_var2);
+		//SELF.position_title;
+		SELF.RA_dt_first_seen_var2            := IF(cnt = 2,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_first_seen),le.RA_dt_first_seen_var2);
+	  SELF.RA_dt_last_seen_var2             := IF(cnt = 2,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_last_seen),le.RA_dt_last_seen_var2);
+		SELF.RA_CompanyName_var2   := IF(cnt = 2,ri.RA_companyName,le.RA_companyName_var2);
+		
+    SELF.RA_prim_range_var2    := if (cnt = 2, ri.RA_prim_range, le.RA_prim_range_var2);
+	  SELF.RA_prim_name_var2     := if (cnt = 2, ri.RA_prim_name, le.RA_prim_name_var2);
+    SELF.RA_predir_var2        := if (cnt = 2, ri.RA_predir, le.RA_predir_var2);
+		SELF.RA_postdir_var2       := if (cnt = 2, ri.RA_postdir, le.RA_postdir_var2);
+		SELF.RA_sec_range_var2     := if (cnt = 2, ri.RA_sec_range, le.RA_sec_range_var2);
+	  SELF.RA_unit_desig_var2    := if (cnt = 2, ri.RA_unit_desig, le.RA_unit_desig_var2);
+		SELF.RA_addr_suffix_var2   := if (cnt = 2, ri.RA_addr_suffix, le.RA_addr_suffix_var2); 
+		SELF.RA_city_name_var2          := if (cnt = 2, ri.RA_city_name, le.RA_city_name_var2);
+		SELF.RA_state_var2         := if (cnt = 2, ri.RA_state, le.RA_state_var2);
+		SELF.RA_zip_var2           := if (cnt = 2, ri.RA_zip, le.RA_zip_var2);
+		SELF.RA_zip4_var2          := if (cnt = 2, ri.RA_zip4, le.RA_zip4_var2);		
+		
+		SELF.RA_title_var3                    := IF(cnt = 3,ri.RA_title,le.RA_title_var3);
+		SELF.RA_fname_var3                    := IF(cnt = 3,ri.RA_fname,le.RA_fname_var3); 
+		SELF.RA_mname_var3                    := IF(cnt = 3,ri.RA_mname,le.RA_mname_var3);
+		SELF.RA_lname_var3                    := IF(cnt = 3,ri.RA_lname,le.RA_lname_var3);
+		SELF.RA_name_suffix_var3              := IF(cnt = 3,ri.RA_name_suffix,le.RA_name_suffix_var3);
+		//SELF.position_title;
+		SELF.RA_dt_first_seen_var3            := IF(cnt = 3,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_first_seen),le.RA_dt_first_seen_var3);
+	  SELF.RA_dt_last_seen_var3             := IF(cnt = 3,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_last_seen),le.RA_dt_last_seen_var3);
+		SELF.RA_CompanyName_var3   := IF(cnt = 3, ri.RA_companyName,le.RA_companyName_var3);
+		
+    SELF.RA_prim_range_var3    := if (cnt = 3, ri.RA_prim_range, le.RA_prim_range_var3);
+	  SELF.RA_prim_name_var3     := if (cnt = 3, ri.RA_prim_name, le.RA_prim_name_var3);
+    SELF.RA_predir_var3        := if (cnt = 3, ri.RA_predir, le.RA_predir_var3);
+		SELF.RA_postdir_var3       := if (cnt = 3, ri.RA_postdir, le.RA_postdir_var3);
+		SELF.RA_sec_range_var3     := if (cnt = 3, ri.RA_sec_range, le.RA_sec_range_var3);
+	  SELF.RA_unit_desig_var3    := if (cnt = 3, ri.RA_unit_desig, le.RA_unit_desig_var3);
+		SELF.RA_addr_suffix_var3   := if (cnt = 3, ri.RA_addr_suffix, le.RA_addr_suffix_var3); 
+		SELF.RA_city_name_var3          := if (cnt = 3, ri.RA_city_name, le.RA_city_name_var3);
+		SELF.RA_state_var3         := if (cnt = 3, ri.RA_state, le.RA_state_var3);
+		SELF.RA_zip_var3           := if (cnt = 3, ri.RA_zip, le.RA_zip_var3);
+		SELF.RA_zip4_var3          := if (cnt = 3, ri.RA_zip4, le.RA_zip4_var3);	
+		
+		
+		SELF.RA_title_var4                    := IF(cnt = 4,ri.RA_title,le.RA_title_var4);
+		SELF.RA_fname_var4                    := IF(cnt = 4,ri.RA_fname,le.RA_fname_var4); 
+		SELF.RA_mname_var4                    := IF(cnt = 4,ri.RA_mname,le.RA_mname_var4);
+		SELF.RA_lname_var4                    := IF(cnt = 4,ri.RA_lname,le.RA_lname_var4);
+		SELF.RA_name_suffix_var4              := IF(cnt = 4,ri.RA_name_suffix,le.RA_name_suffix_var4);
+		//SELF.position_title;
+		SELF.RA_dt_first_seen_var4            := IF(cnt = 4,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_first_seen),le.RA_dt_first_seen_var4);
+	  SELF.RA_dt_last_seen_var4             := IF(cnt = 4,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_last_seen),le.RA_dt_last_seen_var4);
+		SELF.RA_CompanyName_var4   := IF(cnt = 4, ri.RA_companyName,le.RA_companyName_var4);
+		
+    SELF.RA_prim_range_var4    := if (cnt = 4, ri.RA_prim_range, le.RA_prim_range_var4);
+	  SELF.RA_prim_name_var4     := if (cnt = 4, ri.RA_prim_name, le.RA_prim_name_var4);
+    SELF.RA_predir_var4        := if (cnt = 4, ri.RA_predir, le.RA_predir_var4);
+		SELF.RA_postdir_var4       := if (cnt = 4, ri.RA_postdir, le.RA_postdir_var4);
+		SELF.RA_sec_range_var4     := if (cnt = 4, ri.RA_sec_range, le.RA_sec_range_var4);
+	  SELF.RA_unit_desig_var4    := if (cnt = 4, ri.RA_unit_desig, le.RA_unit_desig_var4);
+		SELF.RA_addr_suffix_var4   := if (cnt = 4, ri.RA_addr_suffix, le.RA_addr_suffix_var4); 
+		SELF.RA_city_name_var4          := if (cnt = 4, ri.RA_city_name, le.RA_city_name_var4);
+		SELF.RA_state_var4         := if (cnt = 4, ri.RA_state, le.RA_state_var4);
+		SELF.RA_zip_var4           := if (cnt = 4, ri.RA_zip, le.RA_zip_var4);
+		SELF.RA_zip4_var4          := if (cnt = 4, ri.RA_zip4, le.RA_zip4_var4);	
+		
+		SELF.RA_title_var5                    := IF(cnt = 5,ri.RA_title,le.RA_title_var5);
+		SELF.RA_fname_var5                    := IF(cnt = 5,ri.RA_fname,le.RA_fname_var5); 
+		SELF.RA_mname_var5                    := IF(cnt = 5,ri.RA_mname,le.RA_mname_var5);
+		SELF.RA_lname_var5                    := IF(cnt = 5,ri.RA_lname,le.RA_lname_var5);
+		SELF.RA_name_suffix_var5              := IF(cnt = 5,ri.RA_name_suffix,le.RA_name_suffix_var5);
+		//SELF.position_title;
+		SELF.RA_dt_first_seen_var5            := IF(cnt = 5,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_first_seen),le.RA_dt_first_seen_var5);
+	  SELF.RA_dt_last_seen_var5             := IF(cnt = 5,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_last_seen),le.RA_dt_last_seen_var5);
+		SELF.RA_CompanyName_var5   := IF(cnt = 5, ri.RA_companyName,le.RA_companyName_var5);
+		
+    SELF.RA_prim_range_var5    := if (cnt = 5, ri.RA_prim_range, le.RA_prim_range_var5);
+	  SELF.RA_prim_name_var5     := if (cnt = 5, ri.RA_prim_name, le.RA_prim_name_var5);
+    SELF.RA_predir_var5        := if (cnt = 5, ri.RA_predir, le.RA_predir_var5);
+		SELF.RA_postdir_var5       := if (cnt = 5, ri.RA_postdir, le.RA_postdir_var5);
+		SELF.RA_sec_range_var5     := if (cnt = 5, ri.RA_sec_range, le.RA_sec_range_var5);
+	  SELF.RA_unit_desig_var5    := if (cnt = 5, ri.RA_unit_desig, le.RA_unit_desig_var5);
+		SELF.RA_addr_suffix_var5   := if (cnt = 5, ri.RA_addr_suffix, le.RA_addr_suffix_var5); 
+		SELF.RA_city_name_var5          := if (cnt = 5, ri.RA_city_name, le.RA_city_name_var5);
+		SELF.RA_state_var5         := if (cnt = 5, ri.RA_state, le.RA_state_var5);
+		SELF.RA_zip_var5           := if (cnt = 5, ri.RA_zip, le.RA_zip_var5);
+		SELF.RA_zip4_var5          := if (cnt = 5, ri.RA_zip4, le.RA_zip4_var5);			
+
+    SELF.RA_title_var6                    := IF(cnt = 6,ri.RA_title,le.RA_title_var6);
+		SELF.RA_fname_var6                    := IF(cnt = 6,ri.RA_fname,le.RA_fname_var6); 
+		SELF.RA_mname_var6                    := IF(cnt = 6,ri.RA_mname,le.RA_mname_var6);
+		SELF.RA_lname_var6                    := IF(cnt = 6,ri.RA_lname,le.RA_lname_var6);
+		SELF.RA_name_suffix_var6              := IF(cnt = 6,ri.RA_name_suffix,le.RA_name_suffix_var6);
+		//SELF.position_title;
+		SELF.RA_dt_first_seen_var6            := IF(cnt = 6,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_first_seen),le.RA_dt_first_seen_var6);
+	  SELF.RA_dt_last_seen_var6             := IF(cnt = 6,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_last_seen),le.RA_dt_last_seen_var6);
+		SELF.RA_CompanyName_var6   := IF(cnt = 6, ri.RA_companyName,le.RA_companyName_var6);
+		
+    SELF.RA_prim_range_var6    := if (cnt = 6, ri.RA_prim_range, le.RA_prim_range_var6);
+	  SELF.RA_prim_name_var6     := if (cnt = 6, ri.RA_prim_name, le.RA_prim_name_var6);
+    SELF.RA_predir_var6        := if (cnt = 6, ri.RA_predir, le.RA_predir_var6);
+		SELF.RA_postdir_var6       := if (cnt = 6, ri.RA_postdir, le.RA_postdir_var6);
+		SELF.RA_sec_range_var6     := if (cnt = 6, ri.RA_sec_range, le.RA_sec_range_var6);
+	  SELF.RA_unit_desig_var6    := if (cnt = 6, ri.RA_unit_desig, le.RA_unit_desig_var6);
+		SELF.RA_addr_suffix_var6   := if (cnt = 6, ri.RA_addr_suffix, le.RA_addr_suffix_var6); 
+		SELF.RA_city_name_var6          := if (cnt = 6, ri.RA_city_name, le.RA_city_name_var6);
+		SELF.RA_state_var6         := if (cnt = 6, ri.RA_state, le.RA_state_var6);
+		SELF.RA_zip_var6           := if (cnt = 6, ri.RA_zip, le.RA_zip_var6);
+		SELF.RA_zip4_var6          := if (cnt = 6, ri.RA_zip4, le.RA_zip4_var6);					
+		
+		SELF.RA_title_var7                    := IF(cnt = 7,ri.RA_title,le.RA_title_var7);
+		SELF.RA_fname_var7                    := IF(cnt = 7,ri.RA_fname,le.RA_fname_var7); 
+		SELF.RA_mname_var7                    := IF(cnt = 7,ri.RA_mname,le.RA_mname_var7);
+		SELF.RA_lname_var7                    := IF(cnt = 7,ri.RA_lname,le.RA_lname_var7);
+		SELF.RA_name_suffix_var7              := IF(cnt = 7,ri.RA_name_suffix,le.RA_name_suffix_var7);
+		//SELF.position_title;
+		SELF.RA_dt_first_seen_var7            := IF(cnt = 7,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_first_seen),le.RA_dt_first_seen_var7);
+	  SELF.RA_dt_last_seen_var7             := IF(cnt = 7,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_last_seen),le.RA_dt_last_seen_var7);
+		SELF.RA_CompanyName_var7   := IF(cnt = 7, ri.RA_companyName,le.RA_companyName_var7);
+		
+    SELF.RA_prim_range_var7    := if (cnt = 7, ri.RA_prim_range, le.RA_prim_range_var7);
+	  SELF.RA_prim_name_var7     := if (cnt = 7, ri.RA_prim_name, le.RA_prim_name_var7);
+    SELF.RA_predir_var7        := if (cnt = 7, ri.RA_predir, le.RA_predir_var7);
+		SELF.RA_postdir_var7       := if (cnt = 7, ri.RA_postdir, le.RA_postdir_var7);
+		SELF.RA_sec_range_var7     := if (cnt = 7, ri.RA_sec_range, le.RA_sec_range_var7);
+	  SELF.RA_unit_desig_var7    := if (cnt = 7, ri.RA_unit_desig, le.RA_unit_desig_var7);
+		SELF.RA_addr_suffix_var7   := if (cnt = 7, ri.RA_addr_suffix, le.RA_addr_suffix_var7); 
+		SELF.RA_city_name_var7          := if (cnt = 7, ri.RA_city_name, le.RA_city_name_var7);
+		SELF.RA_state_var7         := if (cnt = 7, ri.RA_state, le.RA_state_var7);
+		SELF.RA_zip_var7           := if (cnt = 7, ri.RA_zip, le.RA_zip_var7);
+		SELF.RA_zip4_var7          := if (cnt = 7, ri.RA_zip4, le.RA_zip4_var7);
+		
+		SELF.RA_title_var8                    := IF(cnt = 8,ri.RA_title,le.RA_title_var8);
+		SELF.RA_fname_var8                    := IF(cnt = 8,ri.RA_fname,le.RA_fname_var8); 
+		SELF.RA_mname_var8                    := IF(cnt = 8,ri.RA_mname,le.RA_mname_var8);
+		SELF.RA_lname_var8                    := IF(cnt = 8,ri.RA_lname,le.RA_lname_var8);
+		SELF.RA_name_suffix_var8              := IF(cnt = 8,ri.RA_name_suffix,le.RA_name_suffix_var8);
+		//SELF.position_title;
+		SELF.RA_dt_first_seen_var8            := IF(cnt = 8,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_first_seen),le.RA_dt_first_seen_var8);
+	  SELF.RA_dt_last_seen_var8             := IF(cnt = 8,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_last_seen),le.RA_dt_last_seen_var8);
+		SELF.RA_CompanyName_var8   := IF(cnt = 8, ri.RA_companyName,le.RA_companyName_var8);
+		
+    SELF.RA_prim_range_var8    := if (cnt = 8, ri.RA_prim_range, le.RA_prim_range_var8);
+	  SELF.RA_prim_name_var8     := if (cnt = 8, ri.RA_prim_name, le.RA_prim_name_var8);
+    SELF.RA_predir_var8        := if (cnt = 8, ri.RA_predir, le.RA_predir_var8);
+		SELF.RA_postdir_var8       := if (cnt = 8, ri.RA_postdir, le.RA_postdir_var8);
+		SELF.RA_sec_range_var8     := if (cnt = 8, ri.RA_sec_range, le.RA_sec_range_var8);
+	  SELF.RA_unit_desig_var8    := if (cnt = 8, ri.RA_unit_desig, le.RA_unit_desig_var8);
+		SELF.RA_addr_suffix_var8   := if (cnt = 8, ri.RA_addr_suffix, le.RA_addr_suffix_var8); 
+		SELF.RA_city_name_var8     := if (cnt = 8, ri.RA_city_name, le.RA_city_name_var8);
+		SELF.RA_state_var8         := if (cnt = 8, ri.RA_state, le.RA_state_var8);
+		SELF.RA_zip_var8           := if (cnt = 8, ri.RA_zip, le.RA_zip_var8);
+		SELF.RA_zip4_var8          := if (cnt = 8, ri.RA_zip4, le.RA_zip4_var8);
+		
+		SELF.RA_title_var9                    := IF(cnt = 9,ri.RA_title,le.RA_title_var9);
+		SELF.RA_fname_var9                    := IF(cnt = 9,ri.RA_fname,le.RA_fname_var9); 
+		SELF.RA_mname_var9                    := IF(cnt = 9,ri.RA_mname,le.RA_mname_var9);
+		SELF.RA_lname_var9                    := IF(cnt = 9,ri.RA_lname,le.RA_lname_var9);
+		SELF.RA_name_suffix_var9              := IF(cnt = 9,ri.RA_name_suffix,le.RA_name_suffix_var9);
+		//SELF.position_title;
+		SELF.RA_dt_first_seen_var9            := IF(cnt = 9,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_first_seen),le.RA_dt_first_seen_var9);
+	  SELF.RA_dt_last_seen_var9             := IF(cnt = 9,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_last_seen),le.RA_dt_last_seen_var9);
+		SELF.RA_CompanyName_var9   := IF(cnt = 9, ri.RA_companyName,le.RA_companyName_var9);
+		
+    SELF.RA_prim_range_var9    := if (cnt = 9, ri.RA_prim_range, le.RA_prim_range_var9);
+	  SELF.RA_prim_name_var9     := if (cnt = 9, ri.RA_prim_name, le.RA_prim_name_var9);
+    SELF.RA_predir_var9        := if (cnt = 9, ri.RA_predir, le.RA_predir_var9);
+		SELF.RA_postdir_var9       := if (cnt = 9, ri.RA_postdir, le.RA_postdir_var9);
+		SELF.RA_sec_range_var9     := if (cnt = 9, ri.RA_sec_range, le.RA_sec_range_var9);
+	  SELF.RA_unit_desig_var9    := if (cnt = 9, ri.RA_unit_desig, le.RA_unit_desig_var9);
+		SELF.RA_addr_suffix_var9   := if (cnt = 9, ri.RA_addr_suffix, le.RA_addr_suffix_var9); 
+		SELF.RA_city_name_var9     := if (cnt = 9, ri.RA_city_name, le.RA_city_name_var9);
+		SELF.RA_state_var9         := if (cnt = 9, ri.RA_state, le.RA_state_var9);
+		SELF.RA_zip_var9           := if (cnt = 9, ri.RA_zip, le.RA_zip_var9);
+		SELF.RA_zip4_var9          := if (cnt = 9, ri.RA_zip4, le.RA_zip4_var9);
+		
+		SELF.RA_title_var10                    := IF(cnt = 10,ri.RA_title,le.RA_title_var10);
+		SELF.RA_fname_var10                    := IF(cnt = 10,ri.RA_fname,le.RA_fname_var10); 
+		SELF.RA_mname_var10                    := IF(cnt = 10,ri.RA_mname,le.RA_mname_var10);
+		SELF.RA_lname_var10                    := IF(cnt = 10,ri.RA_lname,le.RA_lname_var10);
+		SELF.RA_name_suffix_var10              := IF(cnt = 10,ri.RA_name_suffix,le.RA_name_suffix_var10);
+		//SELF.position_title;
+		SELF.RA_dt_first_seen_var10            := IF(cnt = 10,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_first_seen),le.RA_dt_first_seen_var10);
+	  SELF.RA_dt_last_seen_var10             := IF(cnt = 10,ut.date_YYYYMMDDtoDateSlashed((STRING8) ri.RA_dt_last_seen),le.RA_dt_last_seen_var10);
+		SELF.RA_CompanyName_var10   := IF(cnt = 10, ri.RA_companyName,le.RA_companyName_var10);
+		
+    SELF.RA_prim_range_var10    := if (cnt = 10, ri.RA_prim_range, le.RA_prim_range_var10);
+	  SELF.RA_prim_name_var10     := if (cnt = 10, ri.RA_prim_name, le.RA_prim_name_var10);
+    SELF.RA_predir_var10        := if (cnt = 10, ri.RA_predir, le.RA_predir_var10);
+		SELF.RA_postdir_var10       := if (cnt = 10, ri.RA_postdir, le.RA_postdir_var10);
+		SELF.RA_sec_range_var10     := if (cnt = 10, ri.RA_sec_range, le.RA_sec_range_var10);
+	  SELF.RA_unit_desig_var10    := if (cnt = 10, ri.RA_unit_desig, le.RA_unit_desig_var10);
+		SELF.RA_addr_suffix_var10   := if (cnt = 10, ri.RA_addr_suffix, le.RA_addr_suffix_var10); 
+		SELF.RA_city_name_var10          := if (cnt = 10, ri.RA_city_name, le.RA_city_name_var10);
+		SELF.RA_state_var10         := if (cnt = 10, ri.RA_state, le.RA_state_var10);
+		SELF.RA_zip_var10           := if (cnt = 10, ri.RA_zip, le.RA_zip_var10);
+		SELF.RA_zip4_var10          := if (cnt = 10, ri.RA_zip4, le.RA_zip4_var10);
+		
+    SELF                         := le;
+  END;											 
+											 
+  // Registered Agent Info	
+	ds_RegisteredAgentsFinal := DENORMALIZE(ds_OSHAFinal,
+																ds_RegisteredAgents,
+                                LEFT.acctno = RIGHT.acctno AND
+                                BIPV2.IDmacros.mac_JoinTop3Linkids(),																
+                                tRegisteredAgents2Final(LEFT,RIGHT,COUNTER),
+                                LEFT OUTER);    																		 								 
   // DCA Info
   BusinessBatch_BIP.Layouts.FinalWithLinkIds tDCAInfo2Final(BusinessBatch_BIP.Layouts.FinalWithLinkIds le,BusinessBatch_BIP.Layouts.DCAInfo ri) :=
   TRANSFORM
@@ -639,7 +879,7 @@ FUNCTION
     SELF                  := le;
   END;
   
-  ds_DCAInfo2Final := JOIN( ds_OSHAFinal,	ds_DCAInfo,
+  ds_DCAInfo2Final := JOIN( Ds_RegisteredAgentsFinal,	ds_DCAInfo,
                             LEFT.acctno = RIGHT.acctno AND
                             BIPV2.IDmacros.mac_JoinTop3Linkids(),
                             tDCAInfo2Final(LEFT,RIGHT),
@@ -685,6 +925,8 @@ FUNCTION
   // OUTPUT(ds_DCAInfo2Final,NAMED('ds_DCAInfo2Final'));
 	
 	//output(ds_OSHAFinal, named('ds_OSHAFinal'));
+	
+	//output(ds_RegisteredAgents, named('ds_RegisteredAgents'));
   
   RETURN PROJECT(IF(inmod.BestOnly,ds_HeaderInfoAll,ds_DCAInfo2FinalSorted),
 	                              BusinessBatch_BIP.Layouts.Final);
