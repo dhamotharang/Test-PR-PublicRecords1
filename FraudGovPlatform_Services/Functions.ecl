@@ -1,4 +1,4 @@
-﻿IMPORT CriminalRecords_BatchService, FraudGovPlatform_Services, FraudShared_Services,Patriot , ut;
+﻿IMPORT CriminalRecords_BatchService, FraudGovPlatform_Services, FraudShared_Services, Patriot, ut, STD;
 
 EXPORT Functions := MODULE
 	
@@ -232,9 +232,9 @@ EXPORT Functions := MODULE
 			
 			unsigned4 VEL_CNT := COUNT(L.childRecs_Velocities);
 			SELF.velocity_exceeded_cnt := VEL_CNT;
-			SELF.velocity_exceeded_reason1 := IF(VEL_CNT >= 1, L.childRecs_Velocities[1].description, '');
-			SELF.velocity_exceeded_reason2 := IF(VEL_CNT >= 2, L.childRecs_Velocities[2].description, '');
-			SELF.velocity_exceeded_reason3 := IF(VEL_CNT >= 3, L.childRecs_Velocities[3].description, '');
+			SELF.velocity_exceeded_reason1 := IF(VEL_CNT >= 1, STD.Str.CleanSpaces(L.childRecs_Velocities[1].description), '');
+			SELF.velocity_exceeded_reason2 := IF(VEL_CNT >= 2, STD.Str.CleanSpaces(L.childRecs_Velocities[2].description), '');
+			SELF.velocity_exceeded_reason3 := IF(VEL_CNT >= 3, STD.Str.CleanSpaces(L.childRecs_Velocities[3].description), '');
 
 			SELF := L;
 			SELF := [];
