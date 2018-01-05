@@ -174,7 +174,7 @@ self						:= [];
 end;
 piyetek := project(metadata,slimiyetek(left));*/
 
-allrecs :=dedup(pflc0+pntl+pInq+pecrash/*+piyetek*/,record,all): persist(Data_Services.Data_location.Prefix() + 'thor_data400::persist::ecrash0');
+allrecs :=dedup(pflc0+pntl+pInq+pecrash/*+piyetek*/,record,all): persist('~thor_data400::persist::ecrash0');
 
 export Key_ECrash0 := index(allrecs,
                             {string40 l_acc_nbr :=accident_nbr},
