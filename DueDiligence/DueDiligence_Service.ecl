@@ -3,7 +3,7 @@
 EXPORT DueDiligence_Service := MACRO
 
 	UNSIGNED1 NUMBER_OF_INDIVIDUAL_ATTRIBUTES := 17;
-	UNSIGNED1 NUMBER_OF_BUSINESS_ATTRIBUTES := 20;
+	UNSIGNED1 NUMBER_OF_BUSINESS_ATTRIBUTES := 22;
 
 	//The following macro defines the field sequence on WsECL page of query.
   WSInput.MAC_DueDiligence_Service();
@@ -24,12 +24,12 @@ EXPORT DueDiligence_Service := MACRO
 	//get outer band data - to use if customer data is not populated
 	outerBandDPPA := DueDiligence.Constants.EMPTY : STORED('DPPAPurpose');
 	outerBandGLBA := DueDiligence.Constants.EMPTY : STORED('GLBPurpose');
-	outerBandHistoryDate := 0 : STORED('HistoryDateYYYYMMDD');
+	outerBandHistoryDate := DueDiligence.Constants.NUMERIC_ZERO : STORED('HistoryDateYYYYMMDD');
 	
 	drm	:= IF(TRIM(userIn.DataRestrictionMask) <> DueDiligence.Constants.EMPTY, userIn.DataRestrictionMask, AutoStandardI.GlobalModule().DataRestrictionMask);
 	dpm	:= IF(TRIM(userIn.DataPermissionMask) <> DueDiligence.Constants.EMPTY, userIn.DataPermissionMask, AutoStandardI.GlobalModule().DataPermissionMask);
-	dppa := IF((UNSIGNED1)userIn.DLPurpose > 0, (UNSIGNED1)userIn.DLPurpose, (UNSIGNED1)outerBandDPPA);
-	glba := IF((UNSIGNED1)userIn.GLBPurpose > 0, (UNSIGNED1)userIn.GLBPurpose, (UNSIGNED1)outerBandGLBA);	
+	dppa := IF((UNSIGNED1)userIn.DLPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.DLPurpose, (UNSIGNED1)outerBandDPPA);
+	glba := IF((UNSIGNED1)userIn.GLBPurpose > DueDiligence.Constants.NUMERIC_ZERO, (UNSIGNED1)userIn.GLBPurpose, (UNSIGNED1)outerBandGLBA);	
 	
 	requestedVersion := TRIM(STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest));
 	includeReport := optionsIn.IncludeReport;
@@ -270,12 +270,14 @@ EXPORT DueDiligence_Service := MACRO
 									12 => ROW(createNVPair('BusPublicRecordAgeRange', le.BusPublicRecordAgeRange)),
 									13 => ROW(createNVPair('BusShellShelfRisk', le.BusShellShelfRisk)),
 									14 => ROW(createNVPair('BusMatchLevel', le.BusMatchLevel)),
-									15 => ROW(createNVPair('BusLegalEvents', le.BusLegalEvents)),
-									16 => ROW(createNVPair('BusLegalEventsFelonyType', le.BusLegalEventsFelonyType)),
-									17 => ROW(createNVPair('BusHighRiskNewsProfiles', le.BusHighRiskNewsProfiles)),
-									18 => ROW(createNVPair('BusLinkedBusRisk', le.BusLinkedBusRisk)),
-									19 => ROW(createNVPair('BusExecOfficersRisk', le.BusExecOfficersRisk)),
-									20 => ROW(createNVPair('BusExecOfficersResidencyRisk', le.BusExecOfficersResidencyRisk)),
+									15 => ROW(createNVPair('BusLegalCriminal', le.BusLegalCriminal)),
+									16 => ROW(createNVPair('BusLegalCivil', le.BusLegalCivil)),
+									17 => ROW(createNVPair('BusLegalTraffInfr', le.BusLegalTraffInfr)),
+									18 => ROW(createNVPair('BusLegalEventsFelonyType', le.BusLegalEventsFelonyType)),
+									19 => ROW(createNVPair('BusHighRiskNewsProfiles', le.BusHighRiskNewsProfiles)),
+									20 => ROW(createNVPair('BusLinkedBusRisk', le.BusLinkedBusRisk)),
+									21 => ROW(createNVPair('BusExecOfficersRisk', le.BusExecOfficersRisk)),
+									22 => ROW(createNVPair('BusExecOfficersResidencyRisk', le.BusExecOfficersResidencyRisk)),
 												ROW(createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID)));
 	END;
 	
@@ -296,12 +298,14 @@ EXPORT DueDiligence_Service := MACRO
 									12 => ROW(createNVPair('BusPublicRecordAgeRange_Flags', le.BusPublicRecordAgeRange_Flags)),
 									13 => ROW(createNVPair('BusShellShelfRisk_Flags', le.BusShellShelfRisk_Flags)),
 									14 => ROW(createNVPair('BusMatchLevel_Flags', le.BusMatchLevel_Flags)),
-									15 => ROW(createNVPair('BusLegalEvents_Flags', le.BusLegalEvents_Flags)),
-									16 => ROW(createNVPair('BusLegalEventsFelonyType_Flags', le.BusLegalEventsFelonyType_Flags)),
-									17 => ROW(createNVPair('BusHighRiskNewsProfiles_Flags', le.BusHighRiskNewsProfiles_Flags)),
-									18 => ROW(createNVPair('BusLinkedBusRisk_Flags', le.BusLinkedBusRisk_Flags)),
-									19 => ROW(createNVPair('BusExecOfficersRisk_Flags', le.BusExecOfficersRisk_Flags)),
-									20 => ROW(createNVPair('BusExecOfficersResidencyRisk_Flags', le.BusExecOfficersResidencyRisk_Flags)),
+									15 => ROW(createNVPair('BusLegalCriminal_Flags', le.BusLegalCriminal_Flags)),
+									16 => ROW(createNVPair('BusLegalCivil_Flags', le.BusLegalCivil_Flags)),
+									17 => ROW(createNVPair('BusLegalTraffInfr_Flags', le.BusLegalTraffInfr_Flags)),
+									18 => ROW(createNVPair('BusLegalEventsFelonyType_Flags', le.BusLegalEventsFelonyType_Flags)),
+									19 => ROW(createNVPair('BusHighRiskNewsProfiles_Flags', le.BusHighRiskNewsProfiles_Flags)),
+									20 => ROW(createNVPair('BusLinkedBusRisk_Flags', le.BusLinkedBusRisk_Flags)),
+									21 => ROW(createNVPair('BusExecOfficersRisk_Flags', le.BusExecOfficersRisk_Flags)),
+									22 => ROW(createNVPair('BusExecOfficersResidencyRisk_Flags', le.BusExecOfficersResidencyRisk_Flags)),
 												ROW(createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID)));
 	END;
 

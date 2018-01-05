@@ -1,4 +1,4 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence;
+﻿IMPORT BIPV2, Business_Risk_BIP, DueDiligence, STD;
 
 /*
 	Following Keys being used: 
@@ -27,16 +27,14 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	// Add back our Seq numbers.
 	busHeaderSeq := DueDiligence.Common.AppendSeq(busHeaderRaw, indata, TRUE);
-
+	
+	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
+	busHeaderCleanDate := DueDiligence.Common.CleanDatasetDateFields(busHeaderSeq, 'dt_first_seen, dt_vendor_first_reported, dt_last_seen');
+	
 	// Filter out records after our history date.
-	busHeaderFiltRecs := DueDiligence.Common.FilterRecords(busHeaderSeq, dt_first_seen, dt_vendor_first_reported);
-	
-	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently - dates used in FilterRecords have been cleaned
-	clean_dtLastSeen := DueDiligence.Common.CleanDateFields(busHeaderFiltRecs, dt_last_seen);
+	busHeaderFilt := DueDiligence.Common.FilterRecords(busHeaderCleanDate, dt_first_seen, dt_vendor_first_reported);
 
-	//creating variable to be used in logic so if add additional dates, does not impact flow
-	busHeaderFilt := clean_dtLastSeen;
-	
+
 	//get date first seen and date last seen
 	sortByDates := SORT(busHeaderFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), dt_first_seen, dt_last_seen);
 		
@@ -46,7 +44,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													LEFT.orgID = RIGHT.orgID AND
 													LEFT.seleID = RIGHT.seleID,
 													TRANSFORM({RECORDOF(busHeaderFilt)},
-																		SELF.dt_first_seen := IF(LEFT.dt_first_seen = 0, MAX(LEFT.dt_first_seen, RIGHT.dt_first_seen), MIN(LEFT.dt_first_seen, RIGHT.dt_first_seen));
+																		SELF.dt_first_seen := IF(LEFT.dt_first_seen = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.dt_first_seen, LEFT.dt_first_seen);
 																		SELF.dt_last_seen := MAX(LEFT.dt_last_seen, RIGHT.dt_last_seen);
 																		SELF := LEFT;));
 	
@@ -158,21 +156,21 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	//retrieve SIC and NAIC codes with dates
 	//SIC
-	outSic1 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_sic_code1, TRUE, TRUE, dt_first_seen, dt_last_seen, source);
-	outSic2 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_sic_code2, TRUE, FALSE, dt_first_seen, dt_last_seen, source);
-	outSic3 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_sic_code3, TRUE, FALSE, dt_first_seen, dt_last_seen, source);
-	outSic4 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_sic_code4, TRUE, FALSE, dt_first_seen, dt_last_seen, source);
-	outSic5 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_sic_code5, TRUE, FALSE, dt_first_seen, dt_last_seen, source);
+	outSic1 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_sic_code1, TRUE, TRUE, dt_first_seen, dt_last_seen);
+	outSic2 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_sic_code2, TRUE, FALSE, dt_first_seen, dt_last_seen);
+	outSic3 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_sic_code3, TRUE, FALSE, dt_first_seen, dt_last_seen);
+	outSic4 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_sic_code4, TRUE, FALSE, dt_first_seen, dt_last_seen);
+	outSic5 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_sic_code5, TRUE, FALSE, dt_first_seen, dt_last_seen);
 
 	// NAIC
-	outNaic1 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_naics_code1, FALSE, TRUE, dt_first_seen, dt_last_seen, source);
-	outNaic2 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_naics_code2, FALSE, FALSE, dt_first_seen, dt_last_seen, source);
-	outNaic3 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_naics_code3, FALSE, FALSE, dt_first_seen, dt_last_seen, source);
-	outNaic4 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_naics_code4, FALSE, FALSE, dt_first_seen, dt_last_seen, source);
-	outNaic5 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_naics_code5, FALSE, FALSE, dt_first_seen, dt_last_seen, source);
+	outNaic1 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_naics_code1, FALSE, TRUE, dt_first_seen, dt_last_seen);
+	outNaic2 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_naics_code2, FALSE, FALSE, dt_first_seen, dt_last_seen);
+	outNaic3 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_naics_code3, FALSE, FALSE, dt_first_seen, dt_last_seen);
+	outNaic4 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_naics_code4, FALSE, FALSE, dt_first_seen, dt_last_seen);
+	outNaic5 := DueDiligence.Common.getSicNaicCodes(busHeaderFilt, company_naics_code5, FALSE, FALSE, dt_first_seen, dt_last_seen);
 	
 	allSicNaic := outSic1 + outSic2 + outSic3 + outSic4 + outSic5 + outNaic1 + outNaic2 + outNaic3 + outNaic4 + outNaic5;
-	sortRollSicNaic := DueDiligence.Common.rollSicNaicBySeqAndBIP(allSicNaic);
+	sortRollSicNaic := DueDiligence.Common.rollSicNaicBySeqAndBIP(addStructure, allSicNaic);
 		
 	addSicNaic := JOIN(addStructure, sortRollSicNaic,
 														LEFT.seq = RIGHT.seq AND
@@ -180,7 +178,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 														LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
 														LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
 														TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																			SELF.SicNaicSources := LEFT.SicNaicSources + RIGHT.sources;
+																			SELF.SicNaicSources := RIGHT.sources;
 																			SELF := LEFT;),
 														LEFT OUTER);
 	
@@ -204,7 +202,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																																										RIGHT.sec_range);
 																	SELF.addressScore := addrScore;
 																	SELF.inputAddrMatch := addrScore BETWEEN DueDiligence.Constants.MIN_ADDRESS_SCORE AND DueDiligence.Constants.MAX_ADDRESS_SCORE;
-																	SELF.dateFirstSeen := IF(RIGHT.dt_first_seen = 0, RIGHT.dt_vendor_first_reported, RIGHT.dt_first_seen);
+																	SELF.dateFirstSeen := IF(RIGHT.dt_first_seen = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.dt_vendor_first_reported, RIGHT.dt_first_seen);
 																	SELF := LEFT;));
 																	
 	sortTopMatch := SORT(findMatchAddr(inputAddrMatch), seq, #EXPAND(DueDiligence.Constants.mac_ListTop3Linkids()), -addressScore);
@@ -238,7 +236,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 											LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
 											LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
 											TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																SELF.NoFein := (UNSIGNED)RIGHT.company_fein = 0 AND LEFT.busn_info.fein = DueDiligence.Constants.EMPTY;
+																SELF.NoFein := (UNSIGNED)RIGHT.company_fein = DueDiligence.Constants.NUMERIC_ZERO AND LEFT.busn_info.fein = DueDiligence.Constants.EMPTY;
 																SELF := LEFT;),
 											LEFT OUTER);
 											
@@ -269,7 +267,7 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													LEFT OUTER);										
 											
 	//get the first seen date from no credit source
-	nonCreditFrstSeenSort := SORT(busHeaderFilt(source NOT IN DueDiligence.Constants.CREDIT_SOURCES and dt_first_seen <> 0), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), dt_first_seen);
+	nonCreditFrstSeenSort := SORT(busHeaderFilt(source NOT IN DueDiligence.Constants.CREDIT_SOURCES and dt_first_seen <> DueDiligence.Constants.NUMERIC_ZERO), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), dt_first_seen);
 	nonCreditFirstSeenDedup := DEDUP(nonCreditFrstSeenSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()));
 
 	addNonCreditFirstSeen := JOIN(addIncLooseLaws, nonCreditFirstSeenDedup,
@@ -336,7 +334,6 @@ EXPORT getBusHeader(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(busHeaderFilt, NAMED('busHeaderFilt'));
 	
 	// OUTPUT(rollForDates, NAMED('rollForDates'));
-	// OUTPUT(clean_dtLastSeen, NAMED('clean_dtLastSeen'));
 	// OUTPUT(sortByDates, NAMED('sortByDates'));
 	// OUTPUT(addBusHdrDtSeen, NAMED('addBusHdrDtSeen'));
 	// OUTPUT(hdrSrcTable, NAMED('hdrSrcTable'));

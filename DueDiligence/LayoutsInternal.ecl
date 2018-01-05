@@ -14,7 +14,7 @@ EXPORT LayoutsInternal := MODULE
 	
 	EXPORT SicNaicLayout := RECORD
 		InternalBIPIDsLayout;
-		DATASET(DueDiligence.Layouts.LayoutSICNAIC) sources;
+		DATASET(DueDiligence.Layouts.LayoutSICNAIC) sources {MAXCOUNT(DueDiligence.Constants.MAX_SIC_NAIC)};
 	END;
 	
 	EXPORT SicNaicUniqueIndustryLayout := RECORD
@@ -23,9 +23,31 @@ EXPORT LayoutsInternal := MODULE
 		DueDiligence.Layouts.SicNaicRiskLayout;
 	END;
 	
+	EXPORT SlimSicNaicLayout := RECORD
+		InternalBIPIDsLayout;
+		DueDiligence.Layouts.LayoutSICNAIC;
+		STRING codeDescription;
+		STRING8 formattedSicCode;
+	END;
+	
 	EXPORT AgentLayout := RECORD
 		InternalBIPIDsLayout;
-		DATASET(DueDiligence.Layouts.LayoutAgent) agents;
+		DATASET(DueDiligence.Layouts.LayoutAgent) agents {MAXCOUNT(DueDiligence.Constants.MAX_REGISTERED_AGENTS)};
+	END;
+	
+	EXPORT Agent := RECORD
+		InternalBIPIDsLayout;
+		DueDiligence.Layouts.LayoutAgent agent;
+	END;
+	
+	EXPORT LinkedBusLayout := RECORD
+		InternalBIPIDsLayout;
+		DATASET(DueDiligence.Layouts.Busn_Input) linkedBus {MAXCOUNT(DueDiligence.Constants.MAX_LINKED_BUSINESSES)};
+	END;
+	
+	EXPORT RelatedPartyLayout := RECORD
+		InternalBIPIDsLayout;
+		DATASET(DueDiligence.Layouts.RelatedParty) executives {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};
 	END;
 	
 	EXPORT RelatedParty := RECORD
@@ -36,6 +58,7 @@ EXPORT LayoutsInternal := MODULE
 	
 	EXPORT PartyLicences := RECORD
 		InternalBIPIDsLayout;
+		UNSIGNED4	  historydate;
 		UNSIGNED6 did;
 		DueDiligence.Layouts.Licenses license;
 	END;
@@ -166,5 +189,23 @@ EXPORT 	ByDID_liens_judgments_categorized := RECORD
 		LiensLayout_by_DID;
 		plus_category_liens_judgments; 
 	END;
+	
+	
+//------                                     ------
+//------   Criminal Offense details          ------
+//------                                     ------
+//------                                     ------
+
+ 
+	
+	
+EXPORT CriminalDATASETLayout := RECORD
+    unsigned4		seq := 0;
+		unsigned6 	did;
+		string60 	offender_key; 
+		DATASET(DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense) DIDOffenses;
+	END;
+
+
 
 END;

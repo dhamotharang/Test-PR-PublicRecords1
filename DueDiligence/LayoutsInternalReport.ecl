@@ -44,12 +44,17 @@ EXPORT LayoutsInternalReport := MODULE
 	
 	EXPORT BusAircraftReportChildren := RECORD
 		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
-		DATASET(iesp.duediligencereport.t_DDRAircraft) air {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxAssets)};
+		DATASET(iesp.duediligencereport.t_DDRAircraft) air {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxAircraft)};
 	END;
 	
 	EXPORT BusWatercraftReportChildren := RECORD
 		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
-		DATASET(iesp.duediligencereport.t_DDRWatercraft) water {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxAssets)};
+		DATASET(iesp.duediligencereport.t_DDRWatercraft) water {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxWatercraft)};
 	END;
+	
+	// EXPORT BusIndustryRiskChildren := RECORD
+		// DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+		// DATASET(iesp.duediligencereport.t_DDRSICNAIC) industryRisk {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxSICNAICs)};
+	// END;
 
 END;
