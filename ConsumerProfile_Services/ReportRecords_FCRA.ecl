@@ -98,7 +98,7 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 	//--------------FFD------------------
 	ConsumerProfile_Services.Layouts.working xform(RiskWiseFCRA.layouts.working L , FFD.Layouts.PersonContextBatchSlim R ) := transform,
 			skip(~ShowDisputedRecords and r.isDisputed) 
-			self.StatementIDs := if(ShowConsumerStatements,r.StatementIDs,FFD.Constants.BlankStatements);
+			self.StatementIDs := FFD.Constants.BlankStatements;  // no record level statements for header data
 			self.isDisputed :=	r.isDisputed;
 			self := L;
 	end;
@@ -107,7 +107,7 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 												 (string)left.persistent_record_id = right.RecID1 and
 												 (((unsigned)left.did  = (unsigned) right.lexid) OR 
 														(right.acctno = FFD.Constants.SingleSearchAcctno) 
-												 )AND 
+												 ) AND 
 												 right.DataGroup = FFD.Constants.DataGroups.HDR,
   											 xform(left, right), 
 												 left outer,
@@ -127,8 +127,6 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 											, fname, mname, lname, name_suffix)
 										, fname, mname, lname, name_suffix);
 										
-	AKAs_filtered := project (fcra_akas, transform (ConsumerProfile_Services.Layouts.working, self.StatementIds := left.StatementIDs(RecordType = FFD.Constants.RecordType.HSN), self := left));									
-	
   //Get Address History
 	fcra_address_hist := ConsumerProfile_Services.Functions.getAddressHistory(fcra_header_final);	
 	
@@ -222,7 +220,7 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 	iesp.fcraconsumerprofilereport.t_ConsumerProfileResult xformResultsOut() := transform
 		self.isBillable 						:= isBillable;
 		self.ConsumerInformation 		:= project(fcra_header_best, xformConsumerInfoOut(left));
-		self.AKAs 									:= choosen(project(AKAs_filtered, xformAKAsOut(left)), iesp.Constants.ConsumerProfile.MAX_COUNT_AKAS); 
+		self.AKAs 									:= choosen(project(fcra_akas, xformAKAsOut(left)), iesp.Constants.ConsumerProfile.MAX_COUNT_AKAS); 
 		self.InputConfirmation 			:= input_verification;
 		self.AddressStability 			:= clam[1].addr_stability;
 		self.AddressHistories 			:= choosen(project(fcra_address_hist, xformAddressHistoryOut(left)), iesp.Constants.ConsumerProfile.MAX_COUNT_ADDR_HIST);

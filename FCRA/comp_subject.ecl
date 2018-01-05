@@ -1,4 +1,4 @@
-import fcra, doxie, riskwisefcra, doxie_crs, suppress, Gong, risk_Indicators, ut, NID, header, FFD;
+﻿import fcra, doxie, riskwisefcra, doxie_crs, suppress, Gong, risk_Indicators, ut, NID, header, FFD;
 
 doxie.MAC_Header_Field_Declare (true); // is FCRA
 // reads: dppa_ok, glb_ok, probation_override_value, no_scrub, IsFCRA, ssn_mask_value, dl_mask_value
@@ -74,7 +74,7 @@ head_all_clean_fat := project (head_all_clean, rec_header);
 
 rec_header xformHDR( rec_header l, FFD.Layouts.PersonContextBatchSlim r ) := 
 	TRANSFORM, SKIP(~showDisputedRecords AND r.isDisputed)																				 
-		SELF.StatementIDs := IF(ShowConsumerStatements,r.StatementIds,FFD.Constants.BlankStatements),
+		SELF.StatementIDs := FFD.Constants.BlankStatements,  // no record level statements for header data  
 		SELF.IsDisputed   := r.IsDisputed,
 		SELF := l
 	END;			
@@ -115,23 +115,13 @@ end;
 // try to choose a best record from a header:
 header_sort := sort (Mainfat, -dt_last_seen, -ssn);
 
-best_ffd_recordtype_set := [
-	FFD.Constants.RecordType.HS,
-	FFD.Constants.RecordType.HSN, 
-	FFD.Constants.RecordType.HSA,
-	FFD.Constants.RecordType.HSD,
-	FFD.Constants.RecordType.HSP
-];	
-
 rec_header AssignBest (rec_header L, rec_header R) := transform
   boolean prefer_left_ssn := (L.valid_ssn = 'G') or (R.ssn = '') or ((L.valid_ssn = 'M') and (R.valid_ssn != 'G'));
   Self.ssn := if (prefer_left_ssn, L.ssn, R.ssn);
   Self.valid_ssn := if (prefer_left_ssn, L.valid_ssn, R.valid_ssn);
   Self.dob := getBestDate (L.dob, R.dob); 
 	Self.isDisputed := L.isDisputed OR (~prefer_left_ssn AND R.isDisputed);
-	ssn_ids := IF(prefer_left_ssn, L.StatementIds, R.StatementIds);
-	Self.StatementIds := L.StatementIds(recordtype in best_ffd_recordtype_set) 
-		+ ssn_ids(recordtype = FFD.Constants.RecordType.HSS);
+	Self.StatementIds := FFD.Constants.BlankStatements;   // no record level statements for header data
   Self := L; // take everything else from the latest record
 end;
 best_header := rollup (header_sort, TRUE, AssignBest (Left, Right));
@@ -185,14 +175,8 @@ EXPORT best_record := best_masked;
 //=================================================================================================
 //=================================================================================================
 
-addr_ffd_recordtype_set := [
-	FFD.Constants.RecordType.HS,
-	FFD.Constants.RecordType.HSN, 
-	FFD.Constants.RecordType.HSA		
-];	
-
 Main := project (Mainfat, transform (doxie.layout_comp_addresses, 
-					self.statementids := left.statementids(recordtype in addr_ffd_recordtype_set),
+					self.statementids := FFD.Constants.BlankStatements, // no record level statements for header data
 					self := left, self.hri_address := []));
 doxie.MAC_Address_Rollup(Main,address_limit,Main_Dn, ut.IndustryClass.is_knowx);
 
@@ -219,14 +203,9 @@ Main_Dn_C := iterate(Main_Dn, traConsumer(left, right));
 Mainseq := if(ut.IndustryClass.is_Knowx, Main_Dn_C, Main_Dn_U);
 export Addresses := Mainseq;
 
-name_ffd_recordtype_set := [
-	FFD.Constants.RecordType.HS, 
-	FFD.Constants.RecordType.HSN
-	];
-
 mainfat_for_name := project(Mainfat,
 	transform(doxie.layout_NameDID,
-		self.statementids := left.statementids(recordtype in name_ffd_recordtype_set),
+		self.statementids := FFD.Constants.BlankStatements, // no record level statements for header data
 		self := left));
 
 doxie.layout_NameDID name_tra (doxie.layout_NameDID l, doxie.layout_NameDID r) := transform
@@ -242,7 +221,7 @@ export Names :=
 			did, name_suffix, fname, lname,-name_occurences),
     left.did = right.did and left.name_suffix = right.name_suffix and left.fname = right.fname and left.lname = right.lname, 
 			transform(doxie.layout_NameDID,
-				self.statementids := left.statementids + right.statementids,
+				self.statementids := FFD.Constants.BlankStatements,  // no record level statements for header data
 				self.isdisputed := left.isdisputed or right.isdisputed,
 				self := left));
 				
@@ -272,20 +251,13 @@ ssn_people := record
 	FFD.Layouts.CommonRawRecordElements;
   end;
 
-ssn_ffd_recordtype_set := [
-	FFD.Constants.RecordType.HS,
-	FFD.Constants.RecordType.HSN,
-	FFD.Constants.RecordType.HSD,
-	FFD.Constants.RecordType.HSS
-];
-
 ssn_people get_people (Mainfat le) := transform
   self.dead := le.tnt='D';
   self.name_suffix := IF(ut.is_unk(le.name_suffix),'',le.name_suffix);
   self.date_ob := le.dob;
   self.dt_first_seen := MAP(le.dt_first_seen<>0 => le.dt_first_seen,le.dt_last_seen<>0 => le.dt_last_seen, 99999999);
   self.dt_last_seen := MAP(le.dt_last_seen<>0 => le.dt_last_seen,le.dt_first_seen);	
-	self.statementids := le.statementids(recordtype in ssn_ffd_recordtype_set);
+	self.statementids := FFD.Constants.BlankStatements; // no record level statements for header data
 	self.isdisputed := le.isdisputed;
   self := le;
 end;
@@ -559,16 +531,7 @@ rt roll_into(rt le,rt ri) := transform
 	self.ssn_unmasked := if ( pick_ssn_unmasked_left, le.ssn_unmasked, ri.ssn_unmasked );
   self.mname := if ( pick_name_left, le.mname, ri.mname );
 	self.var_cnt := le.var_cnt + ri.var_cnt;	
-	self.statementids := 
-		if(pick_name_left, 
-			le.statementids(recordtype in [FFD.Constants.RecordType.HS, FFD.Constants.RecordType.HSN]), 
-			ri.statementids(recordtype in [FFD.Constants.RecordType.HS, FFD.Constants.RecordType.HSN])) +
-		if(pick_ssn_left or pick_ssn_unmasked_left, 
-			le.statementids(recordtype in [FFD.Constants.RecordType.HS, FFD.Constants.RecordType.HSS]), 
-			ri.statementids(recordtype in [FFD.Constants.RecordType.HS, FFD.Constants.RecordType.HSS])) +
-		if(pick_dob_left, 
-			le.statementids(recordtype in [FFD.Constants.RecordType.HS, FFD.Constants.RecordType.HSD]), 
-			ri.statementids(recordtype in [FFD.Constants.RecordType.HS, FFD.Constants.RecordType.HSD]));
+	self.statementids := FFD.Constants.BlankStatements;  // no record level statements for header data
   self.isdisputed := (le.isdisputed and (pick_dob_left or pick_ssn_left or pick_ssn_unmasked_left or pick_name_left))
 		or (ri.isdisputed and (~pick_dob_left or ~pick_ssn_left or ~pick_ssn_unmasked_left or ~pick_name_left));
   self := le;
@@ -581,7 +544,6 @@ r := rollup( ta, left.did = right.did and left.fname=right.fname and ut.lead_con
 //add the age
 doxie_crs.layout_comp_names addage(rt l) := transform
 	self.age := if ( l.dob = 0, 0, ut.GetAgeI(l.dob) );
-	self.statementids := dedup(l.statementids, all);	// may have HS duplicates, need to dedup
 	self := l;
 end;
 
@@ -724,7 +686,7 @@ myp := Mainfat (((integer)phone != 0) and (phone not in set(phones, phone)));
 phoneout := project (myp, transform (doxie_crs.layout_phones_old, 
 	self.timezone := '',
 	self.hri_phone := [],
-	self.StatementIDs := left.StatementIds(recordtype in [FFD.Constants.RecordType.HSA, FFD.Constants.RecordType.HSD]),
+	self.StatementIDs := FFD.Constants.BlankStatements,  // no record level statements for header data
 	self.IsDisputed   := left.IsDisputed,
 	self := left)); 
 
