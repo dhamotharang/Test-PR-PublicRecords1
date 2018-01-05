@@ -717,6 +717,15 @@ string2 FP1609_2_0_reason4 := '';
 string2 FP1609_2_0_reason5 := '';
 string2 FP1609_2_0_reason6 := '';
 
+String3 FP1607_1_0_score := '';
+string2 FP1607_1_0_reason1 := '';
+string2 FP1607_1_0_reason2 := '';
+string2 FP1607_1_0_reason3 := '';
+string2 FP1607_1_0_reason4 := '';
+string2 FP1607_1_0_reason5 := '';
+string2 FP1607_1_0_reason6 := '';
+
+
 
 String3 FP31105_1_0_score := '';
 string2 FP31105_1_0_reason1 := '';
