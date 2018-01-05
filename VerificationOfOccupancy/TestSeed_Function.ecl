@@ -1,9 +1,11 @@
-IMPORT Seed_Files, Risk_Indicators;
+﻿IMPORT Seed_Files, Risk_Indicators,iesp;
 
 EXPORT TestSeed_Function(
 	DATASET(Risk_Indicators.Layout_Input) inData,
 	STRING20 TestDataTableName,
-	BOOLEAN  IncludeModel = false
+	BOOLEAN  IncludeModel = false,
+	BOOLEAN  IncludeReport = false
+	
 	) := FUNCTION
 	Test_Data_Table_Name := StringLib.StringToUpperCase(TestDataTableName);
 	
@@ -35,5 +37,21 @@ EXPORT TestSeed_Function(
 		and KEYED(RIGHT.hashvalue = Seed_Files.Hash_InstantID((STRING20)LEFT.fname, (STRING20)LEFT.lname,
 			(STRING9)LEFT.ssn, '', (STRING5)LEFT.in_zipCode, (STRING10)LEFT.phone10, '')),
 		create_output(LEFT,RIGHT), LEFT OUTER, ATMOST(100),KEEP(1));
-	RETURN VerificationOfOccupancy_rec;
+		
+		report_in := project(inData, transform(Seed_Files.VerificationOfOccupancy_report_layouts.in_key,
+																							self.Seq   :=  left.seq ;
+																							self.fname :=  trim(left.fname);
+																							self.lname :=  trim(left.lname);
+																							self.zip   :=  trim(left.in_zipCode);
+																							self.in_ssn:=  trim(left.ssn);
+																							self.hphone:=  trim(left.phone10);
+																							self := [];
+																							));
+		
+	report_results := if(IncludeReport, VerificationOfOccupancy.Report_TestSeed_Function (report_in, Test_Data_Table_Name), dataset([], Seed_Files.VerificationOfOccupancy_report_layouts.VOOReportOutLayout));
+
+	FinalSeed := Join(VerificationOfOccupancy_rec, report_results, left.seq=right.seq, transform(VerificationOfOccupancy.Layouts.Layout_VOOBatchOutReport, self.Report:=right.Report, self:=left), LEFT OUTER, KEEP(1), ATMOST(100));
+		
+		
+	RETURN FinalSeed;
 END;

@@ -158,7 +158,7 @@ EXPORT PAR_Search_Service() := MACRO
 	packagedTestseedInput := PROJECT(ut.ds_oneRecord, intoLayoutInput(LEFT, COUNTER));	
 
 	searchResults := IF(TestDataEnabled, 
-		PROJECT(VerificationOfOccupancy.TestSeed_Function(packagedTestseedInput, TestDataTableName), TRANSFORM(VerificationOfOccupancy.Layouts.Layout_PARBatchOutReport, SELF := LEFT; SELF := [])),	// TestSeed Values
+		PROJECT(VerificationOfOccupancy.TestSeed_Function(packagedTestseedInput, TestDataTableName,IncludeModel,IncludeReport), TRANSFORM(VerificationOfOccupancy.Layouts.Layout_PARBatchOutReport, SELF := LEFT; SELF := [])),	// TestSeed Values
 		VerificationOfOccupancy.Search_Function(PAR_Input, DataRestriction, glba, dppa, isUtility, AttributesVersion, IncludeModel, DataPermission, IncludeReport, PAR_request := true).PARReport // Realtime Values
 	);
 
