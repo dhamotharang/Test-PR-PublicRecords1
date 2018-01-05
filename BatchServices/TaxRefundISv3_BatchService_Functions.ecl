@@ -663,12 +663,14 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 	end;
 
 	EXPORT getContribRecs (dataset(rec_final) recs_in, string in_DataPermissionMask) := FUNCTION
+
 			contributory_key := tris_lnssi_build.key_field_value;
 
 			dataPermissionTempMod := module (AutoStandardI.DataPermissionI.params)
 				export dataPermissionMask := in_DataPermissionMask;
 			end;
-			boolean use_ContributoryData := AutoStandardI.DataPermissionI.val(dataPermissionTempMod).use_TrisContributoryData;
+			boolean use_ContributoryData := 
+			        AutoStandardI.DataPermissionI.val(dataPermissionTempMod).use_TrisContributoryData;
 			
 			slim_input_fields :=  record
 				string30  acctno;
@@ -686,52 +688,92 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 				self.Contrib_Risk_field := R.Contrib_Risk_field;
 				self.Contrib_Risk_Value	:= R.Contrib_Risk_Value;
 				self.Contrib_Risk_Attr  := R.Contrib_Risk_Attr;
-				self.Contrib_State_Excl	:= R.Contrib_State_Excl;	
+				// Due to tris "contributory" key data inconsistencies, just to be safe in the state
+				// exclusion field, remove any imbedded space and convert lowercase to uppercase .
+				self.Contrib_State_Excl	:= Std.Str.ToUpperCase(trim(R.Contrib_State_Excl,ALL));
 				self := L;
 			end;
 		
-			contrib_recs_rtn := join(recs_in, contributory_key, 
+			contrib_recs_rtn  := join(recs_in, contributory_key, 
 																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.RTNbr) and 
-																StringLib.StringToUpperCase(right.contrib_risk_value) = left.routing_transit_nbr,
-																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+																Std.Str.ToUpperCase(right.contrib_risk_value) = left.routing_transit_nbr,
+																	appendAcctNo(left, right), limit(0), 
+																	keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
 																									
-			contrib_recs_abrn:= join(recs_in, contributory_key, 
+			contrib_recs_abrn := join(recs_in, contributory_key, 
 																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.ARNbr) and
-																StringLib.StringToUpperCase(right.contrib_risk_value) = left.aba_rout_nbr, 
-																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+																Std.Str.ToUpperCase(right.contrib_risk_value) = left.aba_rout_nbr, 
+																	appendAcctNo(left, right), limit(0), 
+																	keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
 																									
-			contrib_recs_prep:= join(recs_in, contributory_key, 
+			contrib_recs_prep := join(recs_in, contributory_key, 
 																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.PrepID) and
-																StringLib.StringToUpperCase(right.contrib_risk_value) = left.prep_id2, 
-																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+																Std.Str.ToUpperCase(right.contrib_risk_value) = left.prep_id2, 
+																	appendAcctNo(left, right), limit(0), 
+																	keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
 
-			contrib_recs_email:= join(recs_in, contributory_key, 
-																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.EmailAdd) and 
-																StringLib.StringToUpperCase(right.contrib_risk_value) = left.email_address, 
-																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
-																									
-			contrib_recs_isp	:= join(recs_in, contributory_key, 
-																keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName OR
-																			right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName2 OR
-																			right.contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName3)
-																AND 
-																(StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name1) OR 
-																 StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name2) OR 
-																 StringLib.StringToUpperCase(right.contrib_risk_value) = StringLib.StringToUpperCase(left.isp_name3)),
-																	appendAcctNo(left, right), limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
-
-			contrib_recs := contrib_recs_rtn + contrib_recs_abrn + contrib_recs_prep + contrib_recs_email + contrib_recs_isp;
+			contrib_recs_email := join(recs_in, contributory_key, 
+																 keyed(right.contrib_risk_field	= BatchServices.Constants.TRISv3.EmailAdd) and 
+																 Std.Str.ToUpperCase(right.contrib_risk_value) = left.email_address, 
+																	 appendAcctNo(left, right), limit(0), 
+																	 keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
 			
-			contrib_recs_to_return := if(	use_ContributoryData, 
-																		contrib_recs(st not in [Std.Str.SplitWords(contrib_state_excl,',')] and contrib_risk_value <> ''), 
-																		dataset([], slim_input_fields)); 
+      contrib_recs_isp2 := 
+			   join(recs_in, contributory_key, 
+							keyed(right.contrib_risk_field = BatchServices.Constants.TRISv3.ISPName2) AND
+						  (Std.Str.ToUpperCase(right.contrib_risk_value) = 
+						                                             Std.Str.ToUpperCase(left.isp_name2)),
+							appendAcctNo(left, right), 
+							limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+			
+			contrib_recs_isp3 := 
+			   join(recs_in, contributory_key, 
+							keyed(right.contrib_risk_field = BatchServices.Constants.TRISv3.ISPName3) AND
+						  (Std.Str.ToUpperCase(right.contrib_risk_value) = 
+						                                             Std.Str.ToUpperCase(left.isp_name3)),
+							appendAcctNo(left, right), 
+							limit(0), keep(BatchServices.Constants.TRISv3.Contributory_Rec_Join_Limit));
+
+
+			contrib_recs := contrib_recs_rtn  + contrib_recs_abrn  + 
+                      contrib_recs_prep + contrib_recs_email + 
+											contrib_recs_isp2 + contrib_recs_isp3;
+			
+			contrib_recs_to_return := 
+			   if(use_ContributoryData, 
+						contrib_recs(st not in [Std.Str.SplitWords(contrib_state_excl,',')] and 
+						             contrib_risk_value <> ''), 
+						dataset([], slim_input_fields)); 
 		
-			pre_contrib_recs:= dedup(sort(contrib_recs_to_return,acctno,(contrib_risk_field	= BatchServices.Constants.TRISv3.RTNbr), 
-																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.ISPName),
-																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.ARNbr), 
-																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.PrepID),
-																																	(contrib_risk_field	= BatchServices.Constants.TRISv3.EmailAdd)), 
-																acctno, contrib_risk_value);
+			// Return in a certain order as specified by the product manager via a 12/07/17 email
+			// for the RQ-13866 changes.
+			pre_contrib_recs:= sort(contrib_recs_to_return,
+				      acctno,
+							-(Contrib_Risk_field = BatchServices.Constants.TRISv3.EmailAdd and 
+							  Contrib_Risk_Attr  = BatchServices.Constants.TRISv3.RISK_ATTR2),
+							-(Contrib_Risk_field = BatchServices.Constants.TRISv3.PrepID   and 
+							  Contrib_Risk_Attr  = BatchServices.Constants.TRISv3.RISK_ATTR2),
+							-(Contrib_Risk_field = BatchServices.Constants.TRISv3.ISPName3 and 
+							  Contrib_Risk_Attr  = BatchServices.Constants.TRISv3.RISK_ATTR2),
+							-(Contrib_Risk_field = BatchServices.Constants.TRISv3.RTNbr    and 
+							  Contrib_Risk_Attr  = BatchServices.Constants.TRISv3.RISK_ATTR2),
+							-(Contrib_Risk_field = BatchServices.Constants.TRISv3.ISPName2 and 
+							  Contrib_Risk_Attr  = BatchServices.Constants.TRISv3.RISK_ATTR2),
+							-(Contrib_Risk_field = BatchServices.Constants.TRISv3.ARNbr    and 
+							  Contrib_Risk_Attr  = BatchServices.Constants.TRISv3.RISK_ATTR2),
+							-(Contrib_Risk_field = BatchServices.Constants.TRISv3.EmailAdd and 
+							  Contrib_Risk_Attr  = BatchServices.Constants.TRISv3.RISK_ATTR1),
+							-(Contrib_Risk_field = BatchServices.Constants.TRISv3.PrepID   and 
+							  Contrib_Risk_Attr  = BatchServices.Constants.TRISv3.RISK_ATTR1),
+							-(Contrib_Risk_field = BatchServices.Constants.TRISv3.ISPName3 and 
+							  Contrib_Risk_Attr  = BatchServices.Constants.TRISv3.RISK_ATTR1),
+							-(Contrib_Risk_field = BatchServices.Constants.TRISv3.RTNbr    and 
+							  Contrib_Risk_Attr  = BatchServices.Constants.TRISv3.RISK_ATTR1),
+							-(Contrib_Risk_field = BatchServices.Constants.TRISv3.ISPName2 and 
+							  Contrib_Risk_Attr  = BatchServices.Constants.TRISv3.RISK_ATTR1),
+							-(Contrib_Risk_field = BatchServices.Constants.TRISv3.ARNbr    and 
+							  Contrib_Risk_Attr  = BatchServices.Constants.TRISv3.RISK_ATTR1)
+						 );
 			
 			rec_final deNorm (rec_final L, slim_input_fields R, INTEGER C) := transform
 				self.Contrib_Risk_Field1	:= if(C=1, R.Contrib_Risk_field, L.Contrib_Risk_field1);
@@ -751,10 +793,18 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 			final_recs_flat := denormalize(recs_in , pre_contrib_recs,
 																			left.acctno = right.acctno,
 																			deNorm(left, right, counter));
+
+      // *--- DEBUG ---* //
+			//output(recs_in,                named('fncgcr_recs_in'));
+			//output(contrib_recs,           named('fncgcr_contrib_recs'));
+ 			//output(contrib_recs_to_return, named('fncgcr_contrib_recs_to_return'));		
+			//output(pre_contrib_recs,       named('fncgcr_pre_contrib_recs'));
+			//output(final_recs_flat,        named('fncgcr_final_recs_flat'));
+
 		return final_recs_flat;
 	END;	
 
-	
+
 	//*******************************************************************************************
 	//***********   V3_1  FILTER   ****************************************************************
 	//*******************************************************************************************
