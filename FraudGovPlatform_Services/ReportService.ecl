@@ -107,8 +107,13 @@ EXPORT ReportService() := MACRO
 	tmp := FraudGovPlatform_Services.ReportRecords(ds_batch_in_with_did, batch_params_mod, MaxVelocities, MaxKnownFrauds);
 	
 	//Final iESP Form Conversion
-	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tmp, results, iesp.fraudgovplatform.t_FraudGovReportResponse);
-											
+	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tmp, 
+																																											 results, 
+																																											 iesp.fraudgovplatform.t_FraudGovReportResponse);
+																																											 
+	Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(tmp,true);			
+	
+	output(Royalties, NAMED('RoyaltySet'));	
 	output(results, NAMED('Results'));	
 	
 ENDMACRO;

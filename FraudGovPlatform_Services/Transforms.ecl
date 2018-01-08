@@ -1,5 +1,5 @@
-﻿IMPORT CriminalRecords_BatchService, DeathV2_Services, FraudGovPlatform_Services, FraudShared, FraudShared_Services, 
-					  iesp, Patriot, risk_indicators;
+﻿IMPORT Address, CriminalRecords_BatchService, DeathV2_Services, FraudGovPlatform_Services, FraudShared, 
+						 FraudShared_Services, iesp, Patriot, risk_indicators;
 
 EXPORT Transforms := MODULE
 

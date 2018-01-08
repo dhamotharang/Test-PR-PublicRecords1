@@ -1,5 +1,6 @@
-﻿IMPORT Address, AutoStandardI, Business_Risk,iesp, CriminalRecords_BatchService, DeathV2_Services, 
-			 FraudShared_Services, Gateway, patriot, risk_indicators, riskwise, ut;
+﻿IMPORT Address, AutoStandardI, Business_Risk, iesp, CriminalRecords_BatchService, DeathV2_Services, 
+			 doxie, FraudDefenseNetwork_Services, FraudShared_Services, Gateway, patriot, risk_indicators, 
+			 riskwise, ut;
 
 EXPORT Raw := MODULE
 
@@ -217,4 +218,30 @@ EXPORT Raw := MODULE
 										 
  	END;
 	
+	EXPORT getFDN(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in,
+								FraudGovPlatform_Services.IParam.BatchParams batch_params) := FUNCTION
+	
+		ds_fdn_in := PROJECT(ds_batch_in, 
+										TRANSFORM(FraudDefenseNetwork_Services.Layouts.batch_search_rec, 	
+												SELF.v_city_name := LEFT.p_city_name,
+												SELF.zip5 := LEFT.z5,
+												SELF.phone10 := LEFT.phoneno,
+												SELF.emailaddress := LEFT.email_address,
+												SELF.ipaddress := LEFT.ip_address,
+												SELF.deviceid := 	LEFT.device_id,
+												SELF := LEFT,
+												SELF := []));
+
+		ds_fdn_raw := FraudDefenseNetwork_Services.Search_Records(ds_fdn_in, 
+																																																												FraudGovPlatform_Services.Constants.FDN.gc_id, 
+																																																												FraudGovPlatform_Services.Constants.FDN.industry_type, 
+																																																												FraudGovPlatform_Services.Constants.FDN.product_code, 	
+																																																												DATASET([], iesp.frauddefensenetwork.t_FDNIndType),
+																																																												DATASET([],iesp.frauddefensenetwork.t_FDNFileType));
+	 
+	  ds_fdn_filter := ds_fdn_raw(doxie.DataPermission.use_FDNContributoryData OR
+																														 classification_Permissible_use_access.file_type <> FraudShared_Services.Constants.FileTypeCodes.CONTRIBUTORY);
+
+		RETURN ds_fdn_filter;
+	END;
 END;

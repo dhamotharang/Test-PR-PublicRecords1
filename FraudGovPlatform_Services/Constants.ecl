@@ -175,6 +175,19 @@
 				EXPORT IDENTITY_THEFT := 'Identity Theft';
 		END;
 	END;
+	
+	EXPORT FDN := MODULE
+		EXPORT gc_id := 0;
+		EXPORT industry_type := 11;
+		EXPORT product_code := 999;
+	END;
+	
+	SHARED ClassificationActivity_Enum := ENUM(UNSIGNED2,
+			POTENTIAL = 1,
+			PROBABLE = 2,
+			PROVEN = 5);
+			
+		EXPORT ClassificationActivitySet := [ClassificationActivity_Enum.POTENTIAL, ClassificationActivity_Enum.PROBABLE, ClassificationActivity_Enum.PROVEN];
 
 	EXPORT IS_DEBUG := FALSE; 
 	
