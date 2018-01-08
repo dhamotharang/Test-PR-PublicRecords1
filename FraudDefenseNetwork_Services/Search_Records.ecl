@@ -13,7 +13,7 @@
   FraudDefenseNetwork_Services.SearchService and BatchServices.trisv31_get_fdn 
  */ 
 
-IMPORT doxie, FraudShared_Services, iesp;
+IMPORT doxie, FraudGovPlatform_Services, FraudShared_Services, iesp;
 
 EXPORT Search_Records(
 	DATASET(FraudDefenseNetwork_Services.Layouts.batch_search_rec) ds_in,
@@ -67,6 +67,10 @@ EXPORT Search_Records(
   ds_Restrictions := ds_FilterThruMBS(NOT doxie.DataRestriction.FDNInquiry      
     OR classification_Permissible_use_access.file_type = FraudShared_Services.Constants.FileTypeCodes.CONTRIBUTORY);
 
+	#IF(FraudGovPlatform_Services.Constants.Is_Debug)
+		output(ds_raw, named('ds_FDN_raw'));
+	#END;
+	
   // OUTPUT(ds_ids, NAMED('Search_Records__ds_ids'));
   // OUTPUT(ds_Raw, NAMED('Search_Records__ds_Raw'));
   // OUTPUT(ds_filtered, NAMED('Search_Records__ds_filtered'));

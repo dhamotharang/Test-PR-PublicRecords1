@@ -21,6 +21,7 @@
 	<part name="DIDScoreThreshold" type="xsd:unsigned3"/>
 	<part name="FraudPlatform" type="xsd:string"/>
 	<part name="MaxVelocities" type="xsd:integer"/>	
+	<part name="ReturnDetailedRoyalties" type="xsd:boolean"/>	
 
 	<!-- Internal Option --> 
 	<part name="TestVelocityRules" type="xsd:boolean"/>
@@ -29,7 +30,7 @@
 </message>
 */
 
-IMPORT BatchShare, FraudShared_Services, WSInput;
+IMPORT BatchShare, FraudGovPlatform_Services, FraudShared_Services, Royalty, WSInput;
 
 EXPORT BatchService(useCannedRecs = FALSE) := MACRO
 
@@ -42,35 +43,50 @@ EXPORT BatchService(useCannedRecs = FALSE) := MACRO
   // **************************************************************************************
   batch_params  := FraudGovPlatform_Services.IParam.getBatchParams();
   ds_xml_in_raw := DATASET([], FraudShared_Services.Layouts.BatchIn_rec) : STORED('batch_in', FEW);
-  ds_in         := IF(useCannedRecs, FraudGovPlatform_Services.BatchCannedInput, ds_xml_in_raw);
-
+  ds_in_temp    := IF(useCannedRecs, FraudGovPlatform_Services.BatchCannedInput, ds_xml_in_raw);
+	
   // **************************************************************************************
   // Preprocess input as necessary
   // **************************************************************************************	
-	BatchShare.MAC_SequenceInput(ds_in, ds_sequenced);
-	BatchShare.MAC_CapitalizeInput(ds_sequenced, ds_batch_in);
-	
+		BatchShare.MAC_SequenceInput(ds_in_temp, ds_sequenced);
+		BatchShare.MAC_CapitalizeInput(ds_sequenced, ds_cap_in);
+	 BatchShare.MAC_CleanAddresses(ds_cap_in, ds_batch_in);
+	 
   // **************************************************************************************
   // Append DID for Input PII
   // **************************************************************************************	  
-	ds_batch_in_with_did := BatchShare.MAC_Get_Scored_DIDs(ds_batch_in, batch_params, usePhone:=TRUE);
+	 ds_batch_in_with_did := BatchShare.MAC_Get_Scored_DIDs(ds_batch_in, batch_params, usePhone:=TRUE);
 
   // **************************************************************************************
   // Call Batch Records attribute to fetch records. 
   // **************************************************************************************
-	ds_records := FraudGovPlatform_Services.BatchRecords(ds_batch_in_with_did, batch_params);
-	
-  // ** Simple transform to convert the ds_records to the flat output layout
-	flatten_out := FraudGovPlatform_Services.Functions.getFlatBatchOut(ds_records);
-	
-	BatchShare.MAC_RestoreAcctno(ds_batch_in, flatten_out, Results,true, false);
+		ds_records := FraudGovPlatform_Services.BatchRecords(ds_batch_in_with_did, batch_params);
+		
+		// ** Simple transform to convert the ds_records to the flat output layout
+		flatten_out := FraudGovPlatform_Services.Functions.getFlatBatchOut(ds_records);
+		
+		BatchShare.MAC_RestoreAcctno(ds_batch_in, flatten_out, Results,true, false);
+	 
+	 recs_w_fdn_royalty := RECORD
+			STRING acctno;
+			UNSIGNED1 fdn_count;
+	 END;
  
-	// OUTPUT(ds_xml_in_raw, NAMED('ds_xml_in_raw'));
-	// OUTPUT(ds_in, NAMED('ds_in'));
-	// OUTPUT(ds_batch_in, NAMED('ds_batch_in'));
-	// OUTPUT(ds_batch_in_with_did, NAMED('ds_batch_in_with_did'));
-	// OUTPUT(ds_records, NAMED('ds_records'));
-	// OUTPUT(flatten_out, NAMED('flatten_out'));
-	OUTPUT(Results, NAMED('Results'));
+		ds_w_fdn_royalty := PROJECT(ds_records, 
+																								TRANSFORM(recs_w_fdn_royalty, 
+																										SELF.fdn_count := COUNT(LEFT.childRecs_FDN), 
+																										SELF := LEFT));
+	 
+		dRoyaltiesByAcctno_FDN := Royalty.RoyaltyFDNCoRR.GetBatchRoyaltiesByAcctno(ds_w_fdn_royalty);
+		dRoyalties	:= Royalty.GetBatchRoyalties(dRoyaltiesByAcctno_FDN, batch_params.ReturnDetailedRoyalties) ;
+ 
+		// OUTPUT(ds_xml_in_raw, NAMED('ds_xml_in_raw'));
+		// OUTPUT(ds_in, NAMED('ds_in'));
+		// OUTPUT(ds_batch_in, NAMED('ds_batch_in'));
+		// OUTPUT(ds_batch_in_with_did, NAMED('ds_batch_in_with_did'));
+		// OUTPUT(ds_records, NAMED('ds_records'));
+		// OUTPUT(flatten_out, NAMED('flatten_out'));
+		OUTPUT(dRoyalties,named('RoyaltySet'));
+		OUTPUT(Results, NAMED('Results'));
 
 ENDMACRO;	
