@@ -29,6 +29,7 @@ export Build_Keys(
   tools.mac_WriteIndex('TheKeys.Main.MbsFDNMasterIDKey.New'								,BuildMbsFDNMasterIDKey				 			);
   tools.mac_WriteIndex('TheKeys.Main.MbsFDNMasterIDExclKey.New'						,BuildMbsFDNMasterIDExclKey				 	);
 	tools.mac_WriteIndex('TheKeys.Main.MbsFDNMasterIDIndTypInclKey.New'			,BuildMbsFDNMasterIDIndTypInclKey	 	);
+	tools.mac_WriteIndex('TheKeys.Main.MbsVelocityRules.New'								,BuildMbsVelocityRules	 						);
 	VersionControl.macBuildNewLogicalKeyWithName(Get_Key_LinkIds.Key	,keynames(pversion,false).Main.LinkIds.new, BuildLinkIdsKey);
 													  
 	export full_build :=
@@ -52,7 +53,8 @@ export Build_Keys(
 			,BuildMbsProductIncludeKey
 			,BuildMbsFDNMasterIDKey
 			,BuildMbsFDNMasterIDExclKey
-			,If(Platform.Source = 'FraudGov'  ,BuildMbsFDNMasterIDIndTypInclKey)
+			,BuildMbsFDNMasterIDIndTypInclKey
+			,If(Platform.Source = 'FraudGov'  ,BuildMbsVelocityRules)
 			,BuildLinkIdsKey
 			
 		 )
