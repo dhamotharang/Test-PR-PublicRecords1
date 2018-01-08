@@ -634,7 +634,7 @@ export Boca_Shell_Liens_LnJ_FCRA_Hist (integer bsVersion, unsigned8 BSOptions=0,
 		SELF := ri;
 	END;
 
-	liens_rolled_original1 := ROLLUP(SORT(ungroup(liens_filtered_DF), did, tmsid,
+	liens_rolled_original1 := ROLLUP(SORT(ungroup(liensJudgments), did, tmsid,
 	-(integer) ReleaseDate, -(integer) datefiled, record),
 		LEFT.did=RIGHT.did, roll_liens(LEFT,RIGHT)); 
 	//if we have liens date from main that are not within 7 year window, drop them to the floor
