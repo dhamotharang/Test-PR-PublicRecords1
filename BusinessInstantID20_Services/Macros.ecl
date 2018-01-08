@@ -1,4 +1,4 @@
-EXPORT Macros := MODULE
+﻿EXPORT Macros := MODULE
 	
 	EXPORT mac_ReadInputIESP() := MACRO
 		UNSIGNED4  _Seq                :=   1;
@@ -165,22 +165,22 @@ EXPORT Macros := MODULE
 		UNSIGNED1	_GLBA_Purpose        := IF(TRIM(users.GLBPurpose) != ''    , (INTEGER)users.GLBPurpose, GLBPurpose_stored);
 		STRING    _DataRestrictionMask := IF( users.DataRestrictionMask != '', users.DataRestrictionMask, DataRestrictionMask_stored );
 		STRING    _DataPermissionMask  := IF( users.DataPermissionMask != '' , users.DataPermissionMask , DataPermissionMask_stored );
-		
+		STRING5	  _IndustryClass       := IF( users.IndustryClass = ''       , Business_Risk_BIP.Constants.Default_IndustryClass, users.IndustryClass );
+		BOOLEAN   _TestData_Enabled    := users.TestDataEnabled;
+		STRING    _TestData_TableName  := users.TestDataTableName;
+
 		// Read from the "option" section in the XML Request. Specify default values where necessary 
 		// when no meaningful value is present.
-		STRING5	  _IndustryClass                   := IF( option.IndustryClass = ''          , Business_Risk_BIP.Constants.Default_IndustryClass      , option.IndustryClass );
 		UNSIGNED1	_LinkSearchLevel                 := IF( option.LinkSearchLevel = 0         , Business_Risk_BIP.Constants.LinkSearch.Default         , option.LinkSearchLevel );
 		UNSIGNED1	_MarketingMode                   := IF( option.MarketingMode = 0           , Business_Risk_BIP.Constants.Default_MarketingMode      , option.MarketingMode );
 		UNSIGNED1	_BusShellVersion                 := IF( option.BusShellVersion = 0         , Business_Risk_BIP.Constants.BusShellVersion_v22        , option.BusShellVersion );
-		STRING50	_AllowedSources                  := IF( option.AllowedSources = ''         , Business_Risk_BIP.Constants.Default_AllowedSources     , option.AllowedSources );
+		STRING50	_AllowedSources                   := IF( option.AllowedSources = ''         , Business_Risk_BIP.Constants.Default_AllowedSources     , option.AllowedSources );
 		UNSIGNED1 _OFAC_Version                    := IF( option.OFACVersion = 0             , 2, option.OFACVersion );
 		REAL      _Global_Watchlist_Threshold      := IF( option.GlobalWatchlistThreshold = 0, Business_Risk_BIP.Constants.Default_Global_Watchlist_Threshold, option.GlobalWatchlistThreshold );
 		UNSIGNED6	_HistoryDate                     := IF( option.HistoryDate = 0             , 999999, option.HistoryDate );
 		UNSIGNED  _BIID20ProductType               := IF( option.BIID20ProductType = 0       , BIID20ProductType_stored, option.BIID20ProductType );
 		UNSIGNED1 _BIPBestAppend                   := option.BIPBestAppend;
 		BOOLEAN   _DisableIntermediateShellLogging := option.OutcomeTrackingOptOut;
-		BOOLEAN   _TestData_Enabled                := option.TestDataEnabled OR users.TestDataEnabled;
-		STRING  	_TestData_TableName              := option.TestDataTableName;
 		BOOLEAN   _include_ofac                    := TRUE;
 		BOOLEAN   _include_additional_watchlists   := option.IncludeAdditionalWatchLists;
 		DATASET(iesp.share.t_StringArrayItem) _Watchlists_Requested := option.WatchlistsRequested;
@@ -196,11 +196,11 @@ EXPORT Macros := MODULE
 		
 		// The following #STORED( ) attributes will be read directly within 
 		// BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs( ):
-		#STORED('CompanyID'                        , option.CompanyID);
-		#STORED('LoginID'                          , option.LoginID);
+		#STORED('CompanyID'                        , users.CompanyID);
+		#STORED('LoginID'                          , users.LoginHistoryId);
 		#STORED('DisableCustomerNetworkOptionInCVI', option.DisableCustomerNetworkOptionInCVI);
-		#STORED('DLMask'                           , option.DLMask);
-		#STORED('DOBMask'                          , option.DOBMask);
+		#STORED('DLMask'                           , users.DLMask);
+		#STORED('DOBMask'                          , users.DOBMask);
 		#STORED('DOBMatchOptions'                  , option.DOBMatchOptions);
 		#STORED('DOBRadius'                        , option.DOBRadius);
 		#STORED('EnableEmergingID'                 , option.EnableEmergingID);
@@ -230,7 +230,7 @@ EXPORT Macros := MODULE
 		#STORED('NameInputOrder'                   , option.NameInputOrder);
 		#STORED('OfacOnly'                         , option.OfacOnly);
 		#STORED('PoBoxCompliance'                  , option.PoBoxCompliance);
-		#STORED('SSNMask'                          , option.SSNMask);
+		#STORED('SSNMask'                          , users.SSNMask);
 		#STORED('UseDOBFilter'                     , option.UseDOBFilter);
 	ENDMACRO;
 
