@@ -78,10 +78,11 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			boolean Test_Data_Enabled     := FALSE; // : stored('TestDataEnabled');
 			string20 Test_Data_Table_Name := ''; //  : stored('TestDataTableName');
 			
-			string DataPermission         := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
-			unsigned1 DPPA_Purpose        := 0 : stored('DPPAPurpose');
-			unsigned1 GLB_Purpose         := 8 : stored('GLBPurpose');
-			STRING5 industry_class_val    := '' : stored('IndustryClass');
+			string DataRestriction        := Options.DataRestrictionMask; 
+			string DataPermission         := Options.DataPermissionMask;
+			unsigned1 DPPA_Purpose        := Options.DPPA_Purpose;
+			unsigned1 GLB_Purpose         := Options.GLBA_Purpose;
+			STRING5 industry_class_val    := Options.IndustryClass;
 				isUtility := StringLib.StringToUpperCase(industry_class_val) = 'UTILI';
 
 			unsigned6	_HistoryDate         := 999999 : STORED('HistoryDate'); // Reads everything from YYYYMM to YYYYMMDDTTTT
@@ -91,12 +92,12 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			boolean IsPOBoxCompliant       := false : stored('PoBoxCompliance');
 			boolean ofac_only              := true : stored('OfacOnly');
 			boolean ExcludeWatchLists      := false : stored('ExcludeWatchLists');
-			unsigned1 OFAC_version_temp    := 1 : stored('OFAC_version');
+			unsigned1 OFAC_version_temp    := Options.OFAC_Version;
 				OFAC_version := if(trim(stringlib.stringtolowercase(LoginID)) in ['keyxml','keydevxml'], 4, OFAC_version_temp);	// temporary code for Key Bank
 			
-			boolean Include_Additional_watchlists := FALSE : stored('IncludeAdditionalWatchlists');
-			boolean Include_Ofac                  := FALSE : stored('IncludeOfac');
-			real global_watchlist_threshold_temp  := 0 : stored('Global_Watchlist_Threshold');
+			boolean Include_Additional_watchlists := Options.include_additional_watchlists;
+			boolean Include_Ofac                  := Options.include_ofac;
+			real global_watchlist_threshold_temp  := Options.Global_Watchlist_Threshold;
 				global_watchlist_threshold          := if(OFAC_version=3 and global_watchlist_threshold_temp=0, 0.85, if(global_watchlist_threshold_temp=0, 0.84, global_watchlist_threshold_temp));
 			boolean use_dob_filter                := FALSE : stored('UseDobFilter');
 			integer2 dob_radius                   := 2 : stored('DobRadius');
@@ -124,8 +125,6 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			unsigned4 EverOccupant_StartDate  := 99999999 : stored('EverOccupant_StartDate');
 			unsigned3 LastSeenThresholdIn     := Risk_Indicators.iid_constants.oneyear : stored('LastSeenThreshold');
 			boolean   IncludeNAPData          := false : stored('IncludeNAPData');
-
-			string DataRestriction := Options.DataRestrictionMask; 
 
 			// they want this customizable, so instead of doing an incremental ranking, use 1 or 0 for each element
 				// everything defaulted to off would be '0000000'  
@@ -942,8 +941,8 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 			risk_indicators.Layout_InstantID_NuGenPlus combo(risk_indicators.Layout_InstantID_NuGenPlus le, scores ri) :=
 			TRANSFORM
 				SELF.models := ri.models;
-				self.ssn := ssn_value;	// replace the entered social
-				self.dob := dob_value;	// replace the input dob, it could have been blanked out for bad format
+				// self.ssn := ssn_value;	// replace the entered social
+				// self.dob := dob_value;	// replace the input dob, it could have been blanked out for bad format
 				self.recordcount := count(iid);	// add recordcount for logging by ESP
 				SELF := le;
 			END;
