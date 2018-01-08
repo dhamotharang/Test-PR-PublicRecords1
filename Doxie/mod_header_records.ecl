@@ -1,4 +1,4 @@
-import doxie, autokey, ut, header, Doxie_Raw, gong_Services, header_quick, AutoStandardI, infutor, Std;
+﻿import doxie, autokey, ut, header, Doxie_Raw, gong_Services, header_quick, AutoStandardI, infutor, Std, MDR;
 
 Did_Type_Mask_value:= AutoStandardI.InterfaceTranslator.Did_Type_mask_val.val(project(AutoStandardI.GlobalModule(),
 																												AutoStandardI.InterfaceTranslator.Did_Type_mask_val.params));
@@ -180,7 +180,7 @@ MODULE
 	HeaderPretty_MACRO(Infutor.Key_Header_Infutor_Knowx,infr_out1)
 	HeaderPretty_MACRO(doxie.key_header,hdr_out1)
 	headerPretty := if(Is_knowx
-	               ,infr_out1
+	               ,infr_out1(src <> MDR.sourceTools.src_TUCS_Ptrack)
 								 ,hdr_out1);
 
   export HeaderRecords_Unclean := headerPretty;
