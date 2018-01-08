@@ -170,7 +170,7 @@ EXPORT getAllBocaShellData (
 	END;
 	
 	//do search of ADVO by property to pick up address type - we are specifically looking for business addresses
-	prop_with_advo_roxie := join(pre_ADVO, Advo.Key_Addr1_history,  //Advo.Key_Addr1_FCRA_history or Advo.Key_Addr1_history - replace and roll to most recent
+	prop_with_advo_roxie := join(pre_ADVO, if(isFCRA, Advo.Key_Addr1_FCRA_history, Advo.Key_Addr1_history),  //join to appropriate FCRA/nonFCRA key
 					left.zip5 != '' and 
 					left.prim_range != '' and
 					keyed(left.zip5 = right.zip) and
@@ -188,7 +188,7 @@ EXPORT getAllBocaShellData (
 	prop_with_advo_thor := join(distribute(pre_ADVO, hash64(zip5,
 																												 prim_range,
 																												 prim_name)), 
-					distribute(pull(Advo.Key_Addr1_history), hash64(zip, prim_range, prim_name)),  
+					distribute(pull(if(isFCRA, Advo.Key_Addr1_FCRA_history, Advo.Key_Addr1_history)), hash64(zip, prim_range, prim_name)),  //join to appropriate FCRA/nonFCRA key
 					left.zip5 != '' and 
 					left.prim_range != '' and
 					left.zip5 = right.zip and
@@ -203,13 +203,13 @@ EXPORT getAllBocaShellData (
 					left outer,
 					atmost(riskwise.max_atmost), LOCAL);
 					
-	prop_with_advo := if(onThor, group(sort(prop_with_advo_thor, seq), seq), prop_with_advo_roxie);
+	prop_with_advo := if(onThor, group(sort(prop_with_advo_thor, seq), seq), group(prop_with_advo_roxie, seq));
 
 	prop_with_advo_deduped :=  dedup(sort(prop_with_advo, seq, did, zip5, prim_range, prim_name, addr_suffix, predir, postdir, sec_range, -date_first_seen), 
 																												seq, did, zip5, prim_range, prim_name, addr_suffix, predir, postdir, sec_range);
 
   single_property := 
-		MAP(BSversion >= 53 and ~isFCRA	=> sort(group(sort(prop_with_advo_deduped + prop_common(isrelat), seq), seq),prim_name,prim_range,zip5,sec_range,census_loose,dataSrce), 
+		MAP(BSversion >= 53 						=> sort(group(sort(prop_with_advo_deduped + prop_common(isrelat), seq), seq),prim_name,prim_range,zip5,sec_range,census_loose,dataSrce), 
 				BSversion >= 50 						=> prop_common,
 																			 IF(production_realtime_mode, prop, prop_hist)
 			 );
@@ -1051,7 +1051,7 @@ relat_prop := IF (includeRelativeInfo,
 
 //MS-158: added new business property count and assessed value fields for owned and sold properties.  Special value definitions:
 //				-1 = DID not found
-//				-2 = no properties found for input subject or isFCRA (can't calculate for FCRA)
+//				-2 = no properties found for input subject
 //				-3 = no assessed value on property records found (this valid for the assessed value fields)
 
 risk_indicators.Layout_Boca_Shell add_per_prop(risk_indicators.Layout_Boca_Shell le, Per_Property_Rolled ri) := TRANSFORM
@@ -1060,24 +1060,24 @@ risk_indicators.Layout_Boca_Shell add_per_prop(risk_indicators.Layout_Boca_Shell
 	SELF.Address_Verification.sold      := ri.sold;
 	SELF.Address_Verification.ambiguous := ri.ambiguous;
 	SELF.Address_Verification.bus_owned.property_total 								:= map(le.DID = 0																			=>	-1,
-																																					 ~prop_hit or isFCRA														=>	-2,
+																																					 ~prop_hit																			=>	-2,
 																																																															ri.bus_owned.property_total);
 	SELF.Address_Verification.bus_owned.property_owned_assessed_total := map(le.DID = 0																			=>	-1,
-																																					 ~prop_hit or isFCRA														=>	-2,
+																																					 ~prop_hit																			=>	-2,
 																																					 ri.bus_owned.property_owned_assessed_total = 0	=> 	-3,
 																																																															ri.bus_owned.property_owned_assessed_total);
 	SELF.Address_Verification.bus_owned.property_owned_assessed_count := map(le.DID = 0																			=>	-1,
-																																					 ~prop_hit or isFCRA														=>	-2,
+																																					 ~prop_hit																			=>	-2,
 																																																															ri.bus_owned.property_owned_assessed_count);
 	SELF.Address_Verification.bus_sold.property_total 								:= map(le.DID = 0																			=>	-1,
-																																					 ~prop_hit or isFCRA														=>	-2,
+																																					 ~prop_hit																			=>	-2,
 																																																															ri.bus_sold.property_total);
 	SELF.Address_Verification.bus_sold.property_owned_assessed_total 	:= map(le.DID = 0																			=>	-1,
-																																					 ~prop_hit or isFCRA														=>	-2,
+																																					 ~prop_hit																			=>	-2,
 																																					 ri.bus_sold.property_owned_assessed_total = 0	=> 	-3,
 																																																															ri.bus_sold.property_owned_assessed_total);
 	SELF.Address_Verification.bus_sold.property_owned_assessed_count 	:= map(le.DID = 0																			=>	-1,
-																																					 ~prop_hit or isFCRA														=>	-2,
+																																					 ~prop_hit																			=>	-2,
 																																																															ri.bus_sold.property_owned_assessed_count);
 	SELF := le;
 END;
@@ -1796,8 +1796,6 @@ final53 := if(bsversion >= 53, group(withEquifaxFraudFlags, seq), finalOffset);
 // output(pre_ADVO, named('pre_ADVO'));
 // output(prop_with_advo, named('prop_with_advo'));
 // output(prop_with_advo_deduped, named('prop_with_advo_deduped'));
-// output(advo_hits, named('advo_hits'));
-// output(prop_common_53, named('prop_common_53'));
 // output(single_property, named('single_property'));
 // output(Rel_Property_Rolled, named('Rel_Property_Rolled'));
 // output(Per_Property_Rolled, named('Per_Property_Rolled'));
