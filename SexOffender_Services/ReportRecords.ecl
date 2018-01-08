@@ -1,4 +1,4 @@
-import doxie, FCRA, FFD, iesp, Gateway;
+﻿import doxie, FCRA, FFD, iesp, Gateway;
 
 export ReportRecords := module
 	shared shared_val(SexOffender_Services.IParam.report in_mod, 
@@ -41,7 +41,7 @@ export ReportRecords := module
 		
 		statement_output := if(isFCRA and showConsumerStatements,FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
    			
-		FFD.MAC.PrepareResultRecord(recs, final_results, statement_output, iesp.sexualoffender_fcra.t_FcraSexOffReportRecord); 
+		FFD.MAC.PrepareResultRecord(recs, final_results, statement_output, FFD.Constants.BlankConsumerAlerts, iesp.sexualoffender_fcra.t_FcraSexOffReportRecord); 
 		
 	 return final_results;
   end;

@@ -27,6 +27,12 @@ EXPORT CONSTANTS := MODULE
     EXPORT ConsumerPhoneMessage     := 'The consumer has provided the following phone number for verification purposes: ';
  END;
 
+	EXPORT LegalFlag := MODULE
+		EXPORT Hold := 'H';
+		EXPORT SuppressAll := 'SA';
+		EXPORT SuppressProduct := 'SP';
+	END;
+	
  EXPORT RecordTypes := MODULE
     EXPORT CS   := 'CS'; // Consumer Level Consumer Statement
     EXPORT RS   := 'RS'; // Record Level Record Statement

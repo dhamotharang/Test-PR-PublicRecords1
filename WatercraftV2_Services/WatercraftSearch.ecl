@@ -1,4 +1,4 @@
-IMPORT doxie, FCRA, suppress, FFD, iesp, Gateway;
+﻿IMPORT doxie, FCRA, suppress, FFD, iesp, Gateway;
 
 EXPORT WatercraftSearch(WatercraftV2_services.Interfaces.Search_Params in_params, 
 												boolean isFCRA = false) := FUNCTION
@@ -61,7 +61,7 @@ EXPORT WatercraftSearch(WatercraftV2_services.Interfaces.Search_Params in_params
 	//Final Result
 	final_rsrt := sort(final_presort(isDeepDive or penalt <= in_params.pt),-sort_sequence, penalt, -registration_date, -date_last_seen, -watercraft_key, -sequence_key, RECORD);	
 
-	FFD.MAC.PrepareResultRecord(final_rsrt, final_rec, consumer_statements, sort_rec);
+	FFD.MAC.PrepareResultRecord(final_rsrt, final_rec, consumer_statements, FFD.Constants.BlankConsumerAlerts, sort_rec);
 														 
 	RETURN final_rec;
 

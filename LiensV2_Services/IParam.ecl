@@ -36,8 +36,7 @@ EXPORT IParam := MODULE
 																		it.rmsid_value.params,
 																		it.tmsid_value.params,
 																		TopBusiness_Services.iParam.BIDParams,
-																		FCRA.iRules,
-																		FCRA.FCRAPurpose.params)
+																		FCRA.iRules)
 			export integer1 non_subject_suppression 	:= Suppress.Constants.NonSubjectSuppression.doNothing;
 			export string person_filter_id := '';
 			export boolean includeCriminalIndicators := false;

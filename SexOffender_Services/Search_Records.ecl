@@ -1,4 +1,4 @@
-import AutoStandardI,iesp, doxie, FCRA, FFD, Alerts, Gateway, SexOffender_Services;
+﻿import AutoStandardI,iesp, doxie, FCRA, FFD, Alerts, Gateway, SexOffender_Services;
 
 export Search_Records := module
 	export getRecordsAndApplyRules(dataset (SexOffender_Services.layouts.search) spks,
@@ -106,7 +106,7 @@ export Search_Records := module
 	  // only.
    	recs := project(alert_results, iesp.sexualoffender_fcra.t_FcraOffenderRecord);
    		
-		FFD.MAC.PrepareResultRecord(recs, final_results, statement_output, iesp.sexualoffender_fcra.t_FcraOffenderRecord); 
+		FFD.MAC.PrepareResultRecord(recs, final_results, statement_output, FFD.Constants.BlankConsumerAlerts, iesp.sexualoffender_fcra.t_FcraOffenderRecord); 
 		
 		return final_results;		
 	end;

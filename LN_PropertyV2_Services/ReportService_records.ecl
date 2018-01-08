@@ -1,4 +1,4 @@
-// get the fids
+﻿// get the fids
 import suppress, FCRA, FFD, Gateway, iesp, LN_PropertyV2_Services;
 export ReportService_records (boolean isFCRA = false,
 															integer nonSS = suppress.Constants.NonSubjectSuppression.doNothing,
@@ -27,7 +27,7 @@ export ReportService_records (boolean isFCRA = false,
 		// Here we are interested only in the record statements or consumer level statements. 
 		consumer_statements := if(isFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
 				
-		FFD.MAC.PrepareResultRecord(results, results_combined, consumer_statements, 
+		FFD.MAC.PrepareResultRecord(results, results_combined, consumer_statements, FFD.Constants.BlankConsumerAlerts, 
 																LN_PropertyV2_Services.layouts.combined.widest);
 				 
 		return results_combined;

@@ -1,4 +1,4 @@
-IMPORT doxie, suppress, BIPV2, LN_PropertyV2_Services, FCRA, FFD, Gateway, iesp;
+﻿IMPORT doxie, suppress, BIPV2, LN_PropertyV2_Services, FCRA, FFD, Gateway, iesp;
 
 EXPORT SearchService_records (unsigned6 search_did=0,integer1 
 																nonSS = Suppress.Constants.NonSubjectSuppression.doNothing, 
@@ -36,7 +36,7 @@ EXPORT SearchService_records (unsigned6 search_did=0,integer1
 		
 		consumer_statements := if(isFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
 				
-		FFD.MAC.PrepareResultRecord(results, combined_out, consumer_statements, LN_PropertyV2_Services.layouts.combined.narrow);
+		FFD.MAC.PrepareResultRecord(results, combined_out, consumer_statements, FFD.Constants.BlankConsumerAlerts, LN_PropertyV2_Services.layouts.combined.narrow);
 		 
 		RETURN combined_out;
 		

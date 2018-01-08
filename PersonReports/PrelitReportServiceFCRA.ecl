@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="PrelitReportServiceFCRA" wuTimeout="300000">
   <part name="DID" type="xsd:string" required="1" />
   <separator />
@@ -146,7 +146,8 @@ EXPORT PrelitReportServiceFCRA () := MACRO
        Self._Header := iesp.ECL2ESP.GetHeaderRow ();
        
        Self.Individual := L;
-   		Self.ConsumerStatements := recs_combined.Statements;
+   		 Self.ConsumerStatements := recs_combined.Statements;
+			 Self.ConsumerAlerts := recs_combined.ConsumerAlerts;
      end;
      results := PROJECT (recs, SetResponse (Left));
    

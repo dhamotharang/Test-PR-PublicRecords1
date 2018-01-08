@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="MDSearchServiceFCRA">
 
 	<!-- MD Keys -->
@@ -100,6 +100,7 @@ export MDSearchServiceFCRA() := macro
 	tmp := marriage_divorce_v2_Services.MDSearchService_Records(rdid,nss,isFCRA,iRulesParams);
 	raw := tmp.records;
 	statements  := tmp.statements;
+	consumer_alerts  := tmp.ConsumerAlerts;
 	
   Text_Search.MAC_Append_ExternalKey(raw, raw2, INTFORMAT(l.record_id,15,1));
 	// And chop it up as necessary
@@ -109,5 +110,6 @@ export MDSearchServiceFCRA() := macro
 	// We're outta here
 	output(cooked, named('Results'));
 	output(statements,named('ConsumerStatements'));
+	output(consumer_alerts,named('ConsumerAlerts'));
 endmacro;
 // MDSearchServiceFCRA();

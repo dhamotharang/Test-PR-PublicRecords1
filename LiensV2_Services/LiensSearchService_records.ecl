@@ -93,7 +93,7 @@ export LiensSearchService_records(LiensV2_Services.IParam.search_params in_param
 	MaxResults_val := in_params.maxResults;
 	Alerts.mac_ProcessAlerts(rsrt,liensv2_Services.alert,rsrt_final);
 	
-	FFD.MAC.PrepareResultRecord(rsrt_final, results_combined, consumer_statements, LiensV2_Services.layout_lien_rollup);
+	FFD.MAC.PrepareResultRecord(rsrt_final, results_combined, consumer_statements, FFD.Constants.BlankConsumerAlerts, LiensV2_Services.layout_lien_rollup);
 
   	
 		// ============ START DEBUG ===================== 

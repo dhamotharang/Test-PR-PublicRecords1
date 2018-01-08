@@ -1,4 +1,4 @@
-import AutoStandardI, doxie_files, ut, doxie, suppress, iesp, NID, FCRA, FFD, Gateway;
+﻿import AutoStandardI, doxie_files, ut, doxie, suppress, iesp, NID, FCRA, FFD, Gateway;
 
 export SearchService_Records := module
 
@@ -170,7 +170,7 @@ export SearchService_Records := module
 		
     tempresults_slim := project(recs_sort, iesp.criminal_fcra.t_FcraCrimSearchRecord); 
 		
-		FFD.MAC.PrepareResultRecord(tempresults_slim, final_results, statements, iesp.criminal_fcra.t_FcraCrimSearchRecord); 
+		FFD.MAC.PrepareResultRecord(tempresults_slim, final_results, statements, FFD.Constants.BlankConsumerAlerts, iesp.criminal_fcra.t_FcraCrimSearchRecord); 
 		
 		return final_results;
 

@@ -1,4 +1,4 @@
-// takes id's (did's bdid's)...maybe aircraft number
+﻿// takes id's (did's bdid's)...maybe aircraft number
 // hits payload key...and then formats into layout expected ...sorts it
 // after you fetch ID's...
 
@@ -124,7 +124,7 @@ export SearchService_Records := module
 		
     tempresults_slim := project(recs_sort, iesp.faaaircraft_Fcra.t_FcraAircraftRecord); 
 		
-		FFD.MAC.PrepareResultRecord(tempresults_slim, final_results, statement_output, iesp.faaaircraft_Fcra.t_FcraAircraftRecord); 
+		FFD.MAC.PrepareResultRecord(tempresults_slim, final_results, statement_output, FFD.Constants.BlankConsumerAlerts, iesp.faaaircraft_Fcra.t_FcraAircraftRecord); 
 		
 		return final_results;
   end;

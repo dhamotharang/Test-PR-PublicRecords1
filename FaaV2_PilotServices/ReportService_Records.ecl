@@ -1,4 +1,4 @@
-import AutoStandardI, doxie, iesp, fcra, FAAV2_PilotServices, FFD, Gateway;
+﻿import AutoStandardI, doxie, iesp, fcra, FAAV2_PilotServices, FFD, Gateway;
 
 export ReportService_Records := module
 	export params := interface(
@@ -49,7 +49,9 @@ export ReportService_Records := module
                               self._Header   := iesp.ECL2ESP.GetHeaderRow(),
 															self.FAAPilot  := l,
 															self.FAAPilots := l.certificates,
-															self.ConsumerStatements := statement_output
+															self.ConsumerStatements := statement_output,
+                              self := []
+                              
 	end;
 		
 		// project into final response form here so that certificates is still available

@@ -112,6 +112,7 @@ export LiensSearchServiceFCRA() := macro
 	all_recs_and_statements := LiensV2_Services.LiensSearchService_records(liens_params, isFCRA);
 	all_recs := all_recs_and_statements.records;
 	statements := all_recs_and_statements.statements;
+	consumer_alerts := all_recs_and_statements.ConsumerAlerts;
 	
 	// returns filtered results if filter is specifed
 	recs_filt := all_recs((evictions_only and eviction = 'Y') 
@@ -127,5 +128,6 @@ export LiensSearchServiceFCRA() := macro
 	doxie.MAC_Marshall_Results(out_recs, recs_marshalled);
 	OUTPUT(recs_marshalled, NAMED('Results'));
 	OUTPUT(statements,NAMED('ConsumerStatements'));
+	OUTPUT(consumer_alerts, NAMED('ConsumerAlerts'));
 
 endmacro;

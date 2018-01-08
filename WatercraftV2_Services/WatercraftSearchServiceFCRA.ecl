@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="WatercraftSearchFCRA" wuTimeout="300000">
 	<part name = 'BDID'			type = 'xsd:string'/>
 	<part name = 'DID'			type = 'xsd:string'/>
@@ -81,5 +81,6 @@ export WatercraftSearchServiceFCRA := macro
 
 	output(rmar, named('Results'));
 	output(rsrt_stmts.Statements, named('ConsumerStatements'));
+	output(rsrt_stmts.ConsumerAlerts, named('ConsumerAlerts'));
 
 endmacro;

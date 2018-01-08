@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="LiensReportServiceFCRA">
   <part name="PersonFilterID" 					type="xsd:string"/>
   <part name="TMSID" 				type="xsd:string"/>
@@ -60,6 +60,7 @@ export LiensReportServiceFCRA() := macro
 	liens := LiensV2_Services.LiensSearchService_records(liens_params, isFCRA);
 	recs := liens.records;
 	statements := liens.statements;
+	consumer_alerts := liens.ConsumerAlerts;
 
 	doxie.MAC_Marshall_Results(recs, recs_marshalled);
 	
@@ -71,4 +72,6 @@ export LiensReportServiceFCRA() := macro
         OUTPUT(recs_marshalled, NAMED('Results'))));
 				
         OUTPUT(statements, NAMED('ConsumerStatements'));
+        OUTPUT(consumer_alerts, NAMED('ConsumerAlerts'));
+
 endmacro;
