@@ -469,7 +469,7 @@ EXPORT SmallBusiness_BIP_Combined_Service :=
 		// #stored('Deltabase_Log', Deltabase_Logging);
 
 		//Improved Scout Logging
-		IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+		IF(~DisableOutcomeTracking and ~TestData_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 		
     // OUTPUT(SmallBizCombined_inmod);   
     // OUTPUT(DPPAPurpose_stored, NAMED('DPPAPurpose_stored'));

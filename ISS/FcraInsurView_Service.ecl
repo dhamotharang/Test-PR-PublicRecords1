@@ -358,7 +358,7 @@ export FcraInsurView_Service := MACRO
 	// Middle part is the database name, in this case: 'log__mbs__fcra'
 	// Must end with '_intermediate__log'
 
-	OUTPUT(intermediateLog, NAMED('LOG_log__mbs__fcra_intermediate__log'));
+	IF(~DisableOutcomeTracking and ~Test_Data_Enabled,	OUTPUT(intermediateLog, NAMED('LOG_log__mbs__fcra_intermediate__log')) );
 	
 	//Log to Deltabase
 	Deltabase_Logging_prep := project(final_wEcho, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
@@ -400,6 +400,6 @@ export FcraInsurView_Service := MACRO
 	// #stored('Deltabase_Log', Deltabase_Logging);
 
 	//Improved Scout Logging
-	IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
+	IF(~DisableOutcomeTracking and ~Test_Data_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
 
 ENDMACRO;

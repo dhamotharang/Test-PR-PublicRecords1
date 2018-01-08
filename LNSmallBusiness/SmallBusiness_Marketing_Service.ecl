@@ -805,7 +805,7 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 		// Starts with 'LOG_' (Upper case is important!!)
 		// Middle part is the database name, in this case: 'log__mbs'
 		// Must end with '_intermediate__log'
-		OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log'));
+		IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log')) );
 
 		//Log to Deltabase
 		Deltabase_Logging_prep := project(Final_Results, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
@@ -864,7 +864,7 @@ EXPORT SmallBusiness_Marketing_Service() := FUNCTION
 		// #stored('Deltabase_Log', Deltabase_Logging);
 
 		//Improved Scout Logging
-		IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+		IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 		
 		// DEBUGs:
 		//OUTPUT(Input, NAMED('Input'));

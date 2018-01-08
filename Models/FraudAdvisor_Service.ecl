@@ -2210,7 +2210,7 @@ final_v1 );
 // Starts with 'LOG_' (Upper case is important!!)
 // Middle part is the database name, in this case: 'log__mbs'
 // Must end with '_intermediate__log'
-OUTPUT(intermediate_Log, NAMED('LOG_log__mbs_intermediate__log'));
+IF(~DisableOutcomeTracking and ~Test_Data_Enabled, OUTPUT(intermediate_Log, NAMED('LOG_log__mbs_intermediate__log')) );
 
 // pick either 3 defaults or attribute model
 scores := if((~doAttributesVersion1 AND ~doIDAttributes) or model_name in custom_models OR isWFS34, finalcustom, dataset([],Models.layouts.FP_Layout_Model));
@@ -2290,7 +2290,7 @@ Deltabase_Logging_prep :=  project(joined_results, TRANSFORM(Risk_Reporting.Layo
 Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
 // #stored('Deltabase_Log', Deltabase_Logging);
 
-IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+IF(~DisableOutcomeTracking and ~Test_Data_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 
 //===========================================================
 //==== end of commented code for debug/validation mode ======
