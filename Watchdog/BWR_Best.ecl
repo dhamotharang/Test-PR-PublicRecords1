@@ -1,4 +1,4 @@
-/*2017-02-28T09:41:41Z (Wendy Ma)
+﻿/*2017-02-28T09:41:41Z (Wendy Ma)
 DF-18485
 */
 /*2016-09-22T21:14:50Z (Wendy Ma)
@@ -152,8 +152,9 @@ send_bad_email := fileservices.SendEmail('sudhir.kasavajjala@lexisnexis.com','Wa
 													,var1='glb_nonen'         => Sequential(eight,zBestNonEN_Stats,notify('WATCHDOG GLB NONEN BASE BUILD COMPLETE','*'))
 													,var1='glb_nonen_noneq'   => Sequential(ten,zBestNonEQEN_Stats,notify('WATCHDOG GLB NONEN NONEQ BASE BUILD COMPLETE','*'))
 													,var1='supplemental'			=> Sequential(eleven,zSupplemental_Stats,notify('WATCHDOG SUPPLEMENTAL BASE BUILD COMPLETE','*'))
-													,                            Sequential(one,zBest_Stats,notify('WATCHDOG GLB BASE BUILD COMPLETE','*'))
-													),dout_all,	b,d))) : FAILURE(send_bad_email);
+													,var1='glb'               => Sequential(one,zBest_Stats,notify('WATCHDOG GLB BASE BUILD COMPLETE','*'))
+													,fail('Bad watchtype provided. Check for a Typo or bad build_type value (is this an FCRA build?)')
+                          ),dout_all,	b,d))) : FAILURE(send_bad_email);
 													
 return result; 
 
