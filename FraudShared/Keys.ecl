@@ -28,6 +28,7 @@ export Keys(
 	shared MbsFDNMasterID          				:= project(pFileKeyFDNMasterID,FraudShared.Layouts_Key.FDNMasterID);  
 	shared MbsFDNMasterIDExcl      				:= project(pFileKeyFDNMasterIDExcl,FraudShared.Layouts_Key.MbsFdnMasterIdExcl);  
 	shared MbsFDNMasterIDIndTypIncl				:= project(pFileKeyFDNMasterIDIndTypIncl,FraudShared.Layouts_Key.MbsFdnMasterIDIndTypeIncl);  
+	shared BaseMbsVelocityRules						:= File_Velocityrules.Velocity_Key;  
 
  export Main := module
 		tools.mac_FilesIndex('BaseMain,{record_id, UID},{BaseMain}',KeyNames(pversion).Main.ID,ID);
@@ -43,7 +44,7 @@ export Keys(
 	  tools.mac_FilesIndex('BaseMain_LNPID,{LNPID , classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.LNPID,LNPID);
 		tools.mac_FilesIndex('BaseMain_DriversLicense,{drivers_license ,drivers_license_state, classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.DriversLicense,DriversLicense);
 		tools.mac_FilesIndex('BaseMain_BankAccount,{bank_account_number_1 ,bank_routing_number_1,bank_account_number_2,bank_routing_number_2, classification_Entity.Entity_type_id, classification_Entity.Entity_sub_type_id},{record_id , UID}',KeyNames(pversion).Main.BankAccount,BankAccount);
-		
+				
     // MBS exclusions 
 		tools.mac_FilesIndex('BaseMbs,{classification_Permissible_use_access.fdn_file_info_id},{record_id , UID}',KeyNames(pversion).Main.Mbs,Mbs);
     tools.mac_FilesIndex('MbsIndTypExclusion,{fdn_file_info_id},{MbsIndTypExclusion}',KeyNames(pversion).Main.MbsIndTypeExclusion,MbsIndTypeExclusion);
@@ -51,6 +52,7 @@ export Keys(
 	  tools.mac_FilesIndex('MbsFDNMasterID,{gc_id},{MbsFDNMasterID}',KeyNames(pversion).Main.MbsFDNMasterID,MbsFDNMasterIDKey);
 	  tools.mac_FilesIndex('MbsFDNMasterIDExcl,{fdn_file_info_id},{MbsFDNMasterIDExcl}',KeyNames(pversion).Main.MbsFDNMasterIDExcl,MbsFDNMasterIDExclKey);
 		tools.mac_FilesIndex('MbsFDNMasterIDIndTypIncl,{fdn_file_info_id},{MbsFDNMasterIDIndTypIncl}',KeyNames(pversion).Main.MbsFDNMasterIDIndTypIncl,MbsFDNMasterIDIndTypInclKey);
+		tools.mac_FilesIndex('BaseMbsVelocityRules,{gc_id},{BaseMbsVelocityRules}',KeyNames(pversion).Main.MbsVelocityRules,MbsVelocityRules);
 
 	end; 	
 end;
