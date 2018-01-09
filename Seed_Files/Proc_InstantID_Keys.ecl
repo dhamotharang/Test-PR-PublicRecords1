@@ -48,11 +48,11 @@ roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.BIID20_keys.BIID20keypart3
 roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.key_SmallBusinessAnalyticsV20,'abc','~thor_data400::key::testseed::'+filedate+'::smallbusinessanalyticsv20',sba20);
 roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.Summary,'abc','~thor_data400::key::testseed::'+filedate+'::VOOreport::Summary',vor1);
 roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.TargetSummary,'abc','~thor_data400::key::testseed::'+filedate+'::VOOreport::TargetSummary',vor2);
-roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.Sources,'abc','~thor_data400::key::testseed::'+filedate+'::verificationofoccupancyreport',vor3);
-roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.OwnedProperties,'abc','~thor_data400::key::testseed::'+filedate+'::verificationofoccupancyreport',vor4);
-roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.OwnedPropertiesAsOf,'abc','~thor_data400::key::testseed::'+filedate+'::verificationofoccupancyreport',vor5);
-roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.PhoneAndUtility,'abc','~thor_data400::key::testseed::'+filedate+'::verificationofoccupancyreport',vor6);
-roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.AssociatedIdentities,'abc','~thor_data400::key::testseed::'+filedate+'::verificationofoccupancyreport',vor7);
+roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.Sources,'abc','~thor_data400::key::testseed::'+filedate+'::VOOreport::Sources',vor3);
+roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.OwnedProperties,'abc','~thor_data400::key::testseed::'+filedate+'::VOOreport::OwnedProperties',vor4);
+roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.OwnedPropertiesAsOf,'abc','~thor_data400::key::testseed::'+filedate+'::VOOreport::OwnedPropertiesAsOf',vor5);
+roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.PhoneAndUtility,'abc','~thor_data400::key::testseed::'+filedate+'::VOOreport::PhoneAndUtility',vor6);
+roxiekeybuild.mac_sk_buildprocess_v2_local(Seed_Files.VerificationOfOccupancy_Report_keys.AssociatedIdentities,'abc','~thor_data400::key::testseed::'+filedate+'::VOOreport::AssociatedIdentities',vor7);
 
 
 
@@ -166,7 +166,7 @@ movekey := sequential(a1,b1,c1,ca1,aa1,bb1,cc1,d1,e1,f1,g1,h1,i1,j1,k1,l1,m1,n1,
 movetoqa := sequential(a2,b2,c2,ca2,aa2,bb2,cc2,d2,e2,f2,g2,h2,i2,j2,k2,l2,m2,n2,hcqa,amlrqa,amlrbqa, amlrqav2,amlrbqav2,idfaqa,idfcqa,idfeqa,idfiqa,idfnqa,idfpqa,idfsqa,voqa,intlggqa,prboqa,sbaqa,sbfeqa,sbmqa,osqa, osattributesqa, biid20Pt1qa,biid20Pt2qa,biid20Pt3qa,sba20qa,vor1qa,vor2qa,vor3qa,vor4qa,vor5qa,vor6qa,vor7qa);
 
 
- dops_update := Roxiekeybuild.updateversion('TestseedKeys',filedate,'john.freibaum@lexisnexis.com,Anantha.Venkatachalam@lexisnexis.com',,'N');
+ dops_update := Roxiekeybuild.updateversion('TestseedKeys',filedate,'john.freibaum@lexisnexisrisk.com,Anantha.Venkatachalam@lexisnexisrisk.com',,'N');
 
 
 return sequential(buildkey,movekey,movetoqa,dops_update);

@@ -3,7 +3,7 @@ IMPORT Data_Services, ut,doxie, risk_indicators, VerificationOfOccupancy;
 
 EXPORT VerificationOfOccupancy_Report_keys := MODULE
 
-	shared locat := Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::VOOreport::';
+	shared locat := Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::testseed::qa::vooreport::';
 
 	
 	d := Seed_Files.VerificationOfOccupancy_Report_files.Summary;
