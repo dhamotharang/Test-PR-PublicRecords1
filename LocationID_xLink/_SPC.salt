@@ -1,0 +1,34 @@
+﻿OPTIONS:-ma
+MODULE:LocationId_xLink
+FILENAME:LocationId
+// Uncomment up to NINES for internal or external adl
+IDFIELD:EXISTS:LocId
+IDNAME:LocId
+RIDFIELD:rid
+RECORDS:1554843014
+POPULATION:160000000
+PROCESS:LocationID
+NINES:3
+CONFIG:_CFG
+HACK:KEYINFIX
+HACK:KEYPREFIX
+HACK:KEYSUPERFILE
+
+FIELDTYPE:zip5:ALLOW(0123456789):LENGTHS(0,5):ONFAIL(IGNORE)
+FIELDTYPE:alpha_st:ALLOW(ABCDEFGHIJKLMNOPQRSTUVWXYZ):LENGTHS(0,2):ONFAIL(IGNORE)
+FIELDTYPE:DFLT:LEFTTRIM:SPACES( <>{}[]-^=!+&,./)
+
+FIELD:prim_range:13,0
+FIELD:predir:EDIT1:5,0
+// FIELD:prim_name:BAGOFWORDS(MOST):EDIT1:ABBR(FIRST):HYPHEN1:LIKE(DFLT):13,7
+FIELD:prim_name:EDIT1:ABBR(FIRST):HYPHEN1:LIKE(DFLT):16,0
+FIELD:addr_suffix:EDIT1:4,0
+FIELD:postdir:EDIT1:7,0
+FIELD:unit_desig:EDIT1:7,0
+FIELD:sec_range:HYPHEN1:13,0
+FIELD:v_city_name:EDIT1:12,0
+FIELD:st:LIKE(alpha_st):5,0
+FIELD:zip5:LIKE(zip5):14,0
+
+LINKPATH:STATECITY:v_city_name:st:prim_range:prim_name:?:sec_range:+:unit_desig:postdir:addr_suffix:predir
+LINKPATH:ZIP:zip5:prim_range:prim_name:?:sec_range:+:unit_desig:postdir:addr_suffix:predir
