@@ -1,4 +1,4 @@
-import roxiekeybuild,seed_files;
+﻿import roxiekeybuild,seed_files;
 EXPORT Proc_Testseed_Keys(string filedate) := function
 	
 	buildkeys(indexdataset,indexsuffix, retval) := macro
@@ -31,6 +31,15 @@ buildkeys(Seed_Files.key_AMLRiskAttributesBusn,'amlriskattributesbusn',amlriskat
 buildkeys(Seed_Files.key_AMLRiskAttributesV2,'amlriskattributesV2',amlriskattributesV2);
 buildkeys(Seed_Files.key_AMLRiskAttributesBusnV2,'amlriskattributesbusnV2',amlriskattributesbusnV2);
 buildkeys(Seed_Files.Key_VerificationOfOccupancy,'verificationofoccupancy',verificationofoccupancy);
+
+buildkeys(Seed_Files.VerificationOfOccupancy_Report_keys.Summary,'VOOReport::Summary',Summary);
+buildkeys(Seed_Files.VerificationOfOccupancy_Report_keys.TargetSummary,'VOOReport::TargetSummary',TargetSummary);
+buildkeys(Seed_Files.VerificationOfOccupancy_Report_keys.Sources,'VOOReport::Sources',Sources);
+buildkeys(Seed_Files.VerificationOfOccupancy_Report_keys.OwnedProperties,'VOOReport::OwnedProperties',OwnedProperties);
+buildkeys(Seed_Files.VerificationOfOccupancy_Report_keys.OwnedPropertiesAsOf,'VOOReport::OwnedPropertiesAsOf',OwnedPropertiesAsOf);
+buildkeys(Seed_Files.VerificationOfOccupancy_Report_keys.PhoneAndUtility,'VOOReport::PhoneAndUtility',PhoneAndUtility);
+buildkeys(Seed_Files.VerificationOfOccupancy_Report_keys.AssociatedIdentities ,'VOOReport::AssociatedIdentities',AssociatedIdentities);
+
 buildkeys(Seed_Files.Key_ProfileBooster,'profilebooster',profilebooster);
 
 
@@ -72,6 +81,9 @@ roxiekeybuild.mac_sk_buildprocess_v2_local(index(Seed_Files.Key_IntlIID_GG2(Data
 
 roxiekeybuild.mac_sk_buildprocess_v2_local(index(Seed_Files.key_SmallBusinessAnalytics(TestDataTableName = 'prte'),{TestDataTableName, HashValue}, {Seed_Files.key_SmallBusinessAnalytics},
 	'~thor_data400::key::testseed::qa::smallbusinessanalytics'),'abc','~prte::key::testseed::'+filedate+'::smallbusinessanalytics',smallbusinessanalytics);
+	
+	roxiekeybuild.mac_sk_buildprocess_v2_local(index(Seed_Files.key_SmallBusinessAnalyticsv20(TestDataTableName = 'prte'),{TestDataTableName, HashValue}, {Seed_Files.key_SmallBusinessAnalyticsv20},
+	'~thor_data400::key::testseed::qa::smallbusinessanalyticsv20'),'abc','~prte::key::testseed::'+filedate+'::smallbusinessanalyticsv20',smallbusinessanalyticsv20);
 
 roxiekeybuild.mac_sk_buildprocess_v2_local(index(Seed_Files.key_SmallBusFinancialExchange(TestDataTableName = 'prte'),{TestDataTableName, HashValue}, {Seed_Files.key_SmallBusFinancialExchange},
 	'~thor_data400::key::testseed::qa::smallbusfinancialexchange'),'abc','~prte::key::testseed::'+filedate+'::smallbusfinancialexchange',smallbusfinancialexchange);	
@@ -120,6 +132,14 @@ buildkey := parallel(
 																			smallbusinessanalytics,
 																			smallbusfinancialexchange,
 																			os,
+																			Summary,
+																			TargetSummary,
+																			Sources,
+																			OwnedProperties,
+																			OwnedPropertiesAsOf,
+																			PhoneAndUtility,
+																			AssociatedIdentities,
+																			smallbusinessanalyticsv20,
 																			osattributes
 																		
 );
