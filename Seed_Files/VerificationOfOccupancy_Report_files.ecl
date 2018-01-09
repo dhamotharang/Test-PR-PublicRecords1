@@ -3,13 +3,13 @@
 export get_filenameVOO(string section) := FUNCTION
 
 fn := case(section,
-	'Summary'																=> '~thor_data400::in::VOOreport::Summary', 
-	'TargetSummary'										=> '~thor_data400::in::VOOreport::TargetSummary', 
-	'Sources'																=> '~thor_data400::in::VOOreport::Sources', 
-	'OwnedProperties'        => '~thor_data400::in::VOOreport::OwnedProperties', 
-	'OwnedPropertiesAsOf'  		=> '~thor_data400::in::VOOreport::OwnedPropertiesAsOf', 
-	'PhoneAndUtility'       	=> '~thor_data400::in::VOOreport::PhoneAndUtility', 
-	'AssociatedIdentities'			=> '~thor_data400::in::VOOreport::AssociatedIdentities', 
+	'Summary'																=> '~thor_data400::base::testseed_VOOreport_Summary', 
+	'TargetSummary'										=> '~thor_data400::base::testseed_VOOreport_TargetSummary', 
+	'Sources'																=> '~thor_data400::base::testseed_VOOreport_Sources', 
+	'OwnedProperties'        => '~thor_data400::base::testseed_VOOreport_OwnedProperties', 
+	'OwnedPropertiesAsOf'  		=> '~thor_data400::base::testseed_VOOreport_OwnedPropertiesAsOf', 
+	'PhoneAndUtility'       	=> '~thor_data400::base::testseed_VOOreport_PhoneAndUtility', 
+	'AssociatedIdentities'			=> '~thor_data400::base::testseed_VOOreport_AssociatedIdentities', 
 		'' );
 if( fn='', FAIL('Unknown Section') );
 return fn;
