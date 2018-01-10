@@ -18,4 +18,23 @@ Header.file_compromised_dl_eq_in
 
 */
 
+/*
+
+import header,RoxieKeybuild;
+filedate:='20180103z';
+
+RoxieKeybuild.Mac_SK_BuildProcess_v2_Local(    header.key_compromised_dl_eq_pre()
+                                               ,'~thor_data400::key::header::refs::qa:: compromised_dl_eq'
+                                               ,'~thor_data400::key::header::refs::'+filedate+':: compromised_dl_eq'
+                                               ,bld1);
+                                               
+bld1;
+
+Dataland test key: W20180103-100450
+Prod first key : W20180110-102717
+
+Test output: Header.key_compromised_dl_eq
+
+*/
+
 END;

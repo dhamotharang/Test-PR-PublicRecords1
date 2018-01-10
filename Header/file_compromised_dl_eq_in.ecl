@@ -1,4 +1,20 @@
-﻿EXPORT file_compromised_dl_eq_in := dataset(
+﻿/*
+
+STD.File.SprayFixed( '10.121.149.69'
+                    ,'/data/temp/equifax_driver/lexisnexishashed'
+                    ,129
+                    ,'thor400_sta01'
+                    ,'~thor_data400::key::header::refs::in::compromised_dl_eq::20180110'
+                   );
+
+// Spray job completed: W20180110-095340 / D20180110-095343
+
+*/
+
+nf := '~thor_data400::in::header::refs::compromised_dl_eq';
+ly := header.layout_key_compromised_dl_eq;
+
+dummy_dataset := dataset(
 [
 {'083534298E044B4A5B765A28F492DBE7D88443E33EA16FCFC18BE6766ABC5691EDD3C04BD8D14A387FD18913D41BABEBD5F4313E1F452577F340D1FE19D728D7'},
 {'29B7442FD41E6B5489FB974A73BC64C364743771ED009D78BDD0508771BCBF7563118CCD80A7724748CA10FEAF268867894A3E7F72ECF84BFD22BDEF91CCBAE2'},
@@ -20,3 +36,5 @@
 {'FCC3C614DAFF8281EAE5FE3D84ECD1E1D64DE258E8B8439F3DFCCB108AF3D31B421869ABB6D290B18177377BA9D4415B6A02E45FFE326B4D732AEA6AE3BDD97E'}
 ],
 header.layout_key_compromised_dl_eq);
+
+EXPORT file_compromised_dl_eq_in := project(dataset(nf,{ly,string1 pd},thor),ly);
