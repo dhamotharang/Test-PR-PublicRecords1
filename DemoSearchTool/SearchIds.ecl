@@ -1,4 +1,4 @@
-IMPORT BIPV2, DemoSearchTool;
+﻿IMPORT BIPV2, DemoSearchTool;
 
 EXPORT SearchIds := 
   MODULE
@@ -14,7 +14,7 @@ EXPORT SearchIds :=
     //       both FCRA & nonFCRA data/records.  This is ONLY acceptable because 
     //       this is the PRTE environment.  Each of the respective keys will 
     //       have one record for FCRA and one for nonFCRA for each entity type 
-    //       (Two records for each DID/BDID).  Additionally, an â€œFCRAâ€ keyed 
+    //       (Two records for each DID/BDID).  Additionally, an “FCRA” keyed 
     //       field was added as the first keyed field; which would eliminate 
     //       half the records immediately and help with performance.  
     //       This adopted change deviated from the initial proposal to add just 
@@ -25,7 +25,7 @@ EXPORT SearchIds :=
     //       properties) could be different than the nonFCRA header file counts.  
     //       Implementing this approach also allows the Demo Search Tool to handle 
     //       both FCRA and nonFCRA from one service by having an isFCRA option 
-    //       included as an input parameter at the userâ€™s request. 
+    //       included as an input parameter at the user’s request. 
     
     EXPORT fn_getLegacyOnlyIds(DATASET(DemoSearchTool.Layouts.SearchInput_rec) ds_in) := 
       FUNCTION
@@ -264,6 +264,8 @@ EXPORT SearchIds :=
           (DemoSearchTool.Layouts.combinedTemp_rec L, INTEGER C):=
           TRANSFORM
             SELF.SELEID := L.ds_owned_businesses_linkid[C].SELEID;
+            SELF.ORGID  := L.ds_owned_businesses_linkid[C].ORGID;
+            SELF.ULTID  := L.ds_owned_businesses_linkid[C].ULTID;
             SELF        := L;  
           END;
 
@@ -286,8 +288,12 @@ EXPORT SearchIds :=
                             SELF        := []),  
                  LIMIT(0),
                  KEEP(DemoSearchTool.Constants.JOIN_LIMIT));
+                
+        ds_combinedBipIds_dedup :=
+          DEDUP(SORT(ds_combinedBipIds, DID, ULTID, ORGID, SELEID),
+                DID, ULTID, ORGID, SELEID);
 
-        RETURN ds_combinedBipIds;
+        RETURN ds_combinedBipIds_dedup;
       END;
 
   END;
