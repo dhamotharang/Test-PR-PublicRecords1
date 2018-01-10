@@ -32,7 +32,7 @@ EXPORT Functions := MODULE
 			output(recs_Patriot, named('recs_Patriot'));
 			output(recs_FDN, named('recs_FDN'));
 		#END
-		
+
 		return final_recs;
 	END;
 		
@@ -195,10 +195,10 @@ EXPORT Functions := MODULE
 																						L.batchin_rec.acctno, SKIP);
 																						
 					// Lexid or full name and full ssn and full birth date) we return a line item in the Known Risk section of the batch output with 'Identity is associated with (classification matrix: Proven, Probable, Potential, Neutral, Known Good, etc.) fraud' 
-					SELF.known_risk_reason :=	MAP(R.classification_entity.entity_type = FraudGovPlatform_Services.Constants.Entity_Types.Person =>
-																																		'Identity is associated with ' +  TRIM(R.classification_activity.confidence_that_activity_was_deceitful) + ' fraud',
-																																		'Element ' + TRIM(R.classification_entity.entity_type) + ' is associated with ' +  
-																																		 TRIM(R.classification_activity.confidence_that_activity_was_deceitful) + ' fraud');
+					SELF.known_risk_reason :=	MAP( R.classification_entity.entity_type_id = FraudShared_Services.Constants.EntityTypes_Enum.Person =>
+																																		 'Identity is associated with ' +  TRIM(R.classification_activity.confidence_that_activity_was_deceitful) + ' fraud',
+																																		 'Element ' + TRIM(R.classification_entity.entity_type) + ' is associated with ' +  
+																																		  TRIM(R.classification_activity.confidence_that_activity_was_deceitful) + ' fraud');
 
 																																																																																			
 					SELF.event_date := ''; //No date to add. 
@@ -235,11 +235,12 @@ EXPORT Functions := MODULE
 		
 		//*** COMBINED KNOWN RISKS ***//
 		known_risk_ds := sort(patriot_knownrisk_ds + 
-													death_knownrisk_ds + 
-													crim_knownrisk_ds + 
-													knfd_knownrisk_ds + 
-													red_flag_knownrisk_ds + 
-													fdn_knownrisk_ds, acctno, -event_date)(known_risk_reason <> '');
+																						  death_knownrisk_ds + 
+																							 crim_knownrisk_ds + 
+																							 knfd_knownrisk_ds +
+																							 red_flag_knownrisk_ds + 
+																							 fdn_knownrisk_ds,
+																							 acctno, -event_date)(known_risk_reason <> '');
 
 		#IF(FraudGovPlatform_Services.Constants.IS_DEBUG)
 			output(ds_records, named('ds_records'));															
@@ -291,6 +292,7 @@ EXPORT Functions := MODULE
 															LEFT.acctno = RIGHT.acctno,
 															GROUP,
 															xfm_batchout(LEFT, ROWS(RIGHT)));
+
 		RETURN ds_results;
 	END;
 
