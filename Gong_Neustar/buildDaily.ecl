@@ -1,4 +1,4 @@
-EXPORT buildDaily(string current, string version = '') := FUNCTION
+﻿EXPORT buildDaily(string current, string version = '') := FUNCTION
 		mstr := DISTRIBUTE(Gong_Neustar.File_Master,hash(record_id));
 		daily := Gong_Neustar.GetDaily(current);
 		
@@ -6,7 +6,7 @@ EXPORT buildDaily(string current, string version = '') := FUNCTION
 		h := Gong_Neustar.CreateHistoryFile(m, File_History, current);
 		b := Gong_Neustar.proc_build_basefile(m, current);
 		build_it_all := SEQUENTIAL(
-			BuildScrubsReport(daily, current),
+			BuildScrubsReport(daily(action_code in ['A','I']), current),
 		  OUTPUT(m,,gong_Neustar.Constants.lfnMaster + current,COMPRESSED,OVERWRITE),
 		  OUTPUT(h,,gong_Neustar.Constants.lfnHistory + current,COMPRESSED,OVERWRITE),
 		  OUTPUT(b,,gong_Neustar.Constants.lfnBase + current,COMPRESSED,OVERWRITE),
