@@ -27,19 +27,23 @@ EXPORT reportBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) inData,
 		SELF.air := PROJECT(asl, TRANSFORM(iesp.duediligencereport.t_DDRAircraft,
 																				SELF.sequence := c;
 																				SELF.aircraft := DATASET([TRANSFORM(iesp.duediligencereport.t_DDRYearMakeModel,
-																																						SELF.year := LEFT.year;
-																																						SELF.make := LEFT.make;
-																																						SELF.model := LEFT.model;
-																																						SELF := [];)])[1];
+																																																								SELF.year := LEFT.year;
+																																																								SELF.make := LEFT.make;
+																																																								SELF.model := LEFT.model;
+																																																								SELF := [];)])[1];
 																				SELF.numberOfEngines := LEFT.numberOfEngines;
 																				SELF.tailNumber := LEFT.tailNumber;
 																				SELF._type := DATASET([TRANSFORM(iesp.duediligencereport.t_DDRAdditionalDetails,
-																																					SELF.detailType := STD.Str.ToUpperCase(codes.FAA_AIRCRAFT_REF.TYPE_AIRCRAFT(LEFT.detailType));
-																																					SELF := [];)])[1];
+																																																					SELF.detailType := STD.Str.ToUpperCase(codes.FAA_AIRCRAFT_REF.TYPE_AIRCRAFT(LEFT.detailType));
+																																																					SELF := [];)])[1];
 																				SELF.vin := DATASET([TRANSFORM(iesp.duediligencereport.t_DDRVINNumber,
-																																				SELF.vin := LEFT.vin;
-																																				SELF := [];)])[1];
-																				SELF.registrationDate := iesp.ECL2ESP.toDatestring8MMDDYYYY(LEFT.registrationDate);
+																																																			SELF.vin := LEFT.vin;
+																																																			SELF := [];)])[1];
+																				SELF.registrationDate := DATASET([TRANSFORM(iesp.share.t_Date,
+																																																																SELF.year := (UNSIGNED)LEFT.registrationDate[1..4];
+																																																																SELF.month := (UNSIGNED)LEFT.registrationDate[5..6];
+																																																																SELF.day := (UNSIGNED)LEFT.registrationDate[7..8];
+																																																																SELF := [];)])[1];;  //iesp.share.t_Date
 
 																				SELF := LEFT;
 																				SELF := [];));
@@ -56,9 +60,9 @@ EXPORT reportBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) inData,
 																			LEFT.busn_info.BIP_IDs.OrgID.LinkID = RIGHT.orgID AND
 																			LEFT.busn_info.BIP_IDs.SeleID.LinkID = RIGHT.SeleID,
 																			TRANSFORM(DueDiligence.layouts.Busn_Internal,
-																								SELF.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.AircraftOwnerShip.AircraftCount  := LEFT.aircraftCount,
-																								SELF.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.AircraftOwnerShip.Aircrafts := LEFT.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.AircraftOwnerShip.Aircrafts + RIGHT.air;
-																								SELF := LEFT;));
+																													SELF.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.AircraftOwnerShip.AircraftCount  := LEFT.aircraftCount,
+																													SELF.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.AircraftOwnerShip.Aircrafts := LEFT.BusinessReport.BusinessAttributeDetails.EconomicAttributeDataDetails.AircraftOwnerShip.Aircrafts + RIGHT.air;
+																													SELF := LEFT;));
 												
 
 
