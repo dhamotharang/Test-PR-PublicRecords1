@@ -878,6 +878,6 @@ export Set_Restricted_Colleges_For_Marketing := [
 export Set_Equifax_Active_Duty_Alert_Codes := ['W','Q','N'];
 export Set_Equifax_Fraud_Alert_Codes := ['W','Q','X','V'];
 
-export OFAC4_NoGateway := 'internal server error';  
+export OFAC4_NoGateway := 'watchlist server error';  
 
 end;
