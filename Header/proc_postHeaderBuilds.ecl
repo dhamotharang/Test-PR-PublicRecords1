@@ -31,6 +31,11 @@ export proc_postHeaderBuilds := module
 
     END;
     
+    KeySuperFile := if(_Control.mod_xADLversion.QA_version, doxie.version_superkey, 'built');
+    seg_key_name:=std.file.GetSuperFileSubName(
+        Data_Services.Data_Location.Prefix('LAB_xLink')
+        + 'key::insuranceheader_segmentation::did_ind_'+KeySuperFile,1);
+    
     SHARED checkLinkingVersion(string build_version):= if (
     
            getVname(InsuranceHeader_xLink.Key_InsuranceHeader_ADDRESS().KeyName)<>build_version OR
@@ -43,7 +48,8 @@ export proc_postHeaderBuilds := module
            getVname(InsuranceHeader_xLink.Key_InsuranceHeader_SSN().KeyName)<>build_version OR
            getVname(InsuranceHeader_xLink.Key_InsuranceHeader_SSN4().KeyName)<>build_version OR
            getVname(InsuranceHeader_xLink.Key_InsuranceHeader_ZIP_PR().KeyName)<>build_version OR
-           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_PH().KeyName)<>build_version
+           getVname(InsuranceHeader_xLink.Key_InsuranceHeader_PH().KeyName)<>build_version OR
+           getVname(seg_key_name)<>build_version
        
         ,fail('Header linking keys does not match version'));
 
@@ -72,8 +78,8 @@ export proc_postHeaderBuilds := module
 		export XADLkeys := sequential(
                                          header.LogBuild('Started :'+step)
                                         ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
-                                        ,checkLinkingVersion(header.version_build)
                                         ,nothor(Header.Proc_Copy_From_Alpha.Copy)
+                                        ,checkLinkingVersion(header.version_build)
                                         ,bld_Transunion_LN
                                         ,bld_Transunion_Ptrak
                                         ,notify('Build_Relatives','*')
@@ -155,9 +161,9 @@ export proc_postHeaderBuilds := module
                                             // ,output(verify_keys('PersonHeaderKeys'),named('PersonHeaderKeys'))
                                             // ,output(verify_keys('RelativeKeys'),named('RelativeKeys'))
                                             // ,output(verify_keys('PersonSlimsortKeys'),named('PersonSlimsortKeys'))
-                                            ,notify('Finalize_Header_build','*')
-                                            ,Header.Proc_Copy_To_Alpha(header.version_build)
-                                            ,if(isQuarterly, misc.header_hash_split, output('Hash files are not created in this build'))
+                                            // ,notify('Finalize_Header_build','*')
+                                            // ,Header.Proc_Copy_To_Alpha(header.version_build)
+                                            // ,if(isQuarterly, misc.header_hash_split, output('Hash files are not created in this build'))
                                             ,header.LogBuild('Completed :'+step)
                                             )
                                             :success(header.msg(cmpltd,elist_build_in_qa).good)
@@ -232,6 +238,7 @@ export proc_postHeaderBuilds := module
 		export booleanSrch := sequential(
                                             header.LogBuild('Started :'+step)
                                             ,if(Header.version_build<>fn[sub..sub+7],fail('Header base does not match version'))
+                                            ,checkLinkingVersion(header.version_build)
                                             ,Text_FragV1.Build_PowerSearch_Keys(Header.version_build)
                                             // ,output(verify_keys('PowerSearchKeys',,true),named('PowerSearchKeys'))
                                             ,header.LogBuild('Completed :'+step)
