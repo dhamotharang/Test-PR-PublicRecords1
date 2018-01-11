@@ -67,6 +67,6 @@ send_email:= fileservices.SendEmail(
 send_bad_email := FileServices.sendemail('gabriel.marcan@lexisnexisrisk.com', 'Header hashes build failed', failmessage,'');
 
 export header_hash_split := sequential(
-																			//build_base,header_split
+																			build_base,header_split,
 																			parallel(f0b,f1b,f2b,f3b,f4b,f5b,f6b,f7b,f8b,f9b,fvb)
 																			) :success(send_email), failure(send_bad_email);
