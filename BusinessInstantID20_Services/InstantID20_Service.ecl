@@ -142,14 +142,7 @@ EXPORT InstantID20_Service() := MACRO
 				)
 			);	
 													
-		// 6. Intermediate logging.
-		intermediateLog := DATASET([], Risk_Reporting.Layouts.LOG_BIID20) : STORED('Intermediate_Log');
-		
-		// Note: All intermediate logs must have the following name schema:
-		//    o  Starts with 'LOG_' (Upper case is important!!)
-		//    o  Middle part is the database name, in this case: 'log__mbs'
-		//    o  Must end with '_intermediate__log'
-		IF(~DisableOutcomeTracking and NOT _TestData_Enabled, OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log')) );		
+		// 6. Intermediate logging. - no longer exists for this query
 
 		// 7. Calculate Royalties. For SBFE...:		
 		ds_SBFEData := 
