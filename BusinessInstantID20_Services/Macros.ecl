@@ -165,9 +165,9 @@
 		UNSIGNED1	_GLBA_Purpose        := IF(TRIM(users.GLBPurpose) != ''    , (INTEGER)users.GLBPurpose, GLBPurpose_stored);
 		STRING    _DataRestrictionMask := IF( users.DataRestrictionMask != '', users.DataRestrictionMask, DataRestrictionMask_stored );
 		STRING    _DataPermissionMask  := IF( users.DataPermissionMask != '' , users.DataPermissionMask , DataPermissionMask_stored );
-		STRING5	  _IndustryClass       := IF( users.IndustryClass = ''       , Business_Risk_BIP.Constants.Default_IndustryClass, users.IndustryClass );
-		BOOLEAN   _TestData_Enabled    := users.TestDataEnabled;
-		STRING    _TestData_TableName  := users.TestDataTableName;
+		STRING5	  _IndustryClass       := MAP( users.IndustryClass != '' => users.IndustryClass, option.IndustryClass != '' => option.IndustryClass, Business_Risk_BIP.Constants.Default_IndustryClass );
+		BOOLEAN   _TestData_Enabled    := users.TestDataEnabled OR option.TestDataEnabled;
+		STRING    _TestData_TableName  := IF( users.TestDataTableName != '', users.TestDataTableName, option.TestDataTableName );
 
 		// Read from the "option" section in the XML Request. Specify default values where necessary 
 		// when no meaningful value is present.
@@ -193,14 +193,18 @@
 		BOOLEAN   _RunTargusGateway     := FALSE;
 		BOOLEAN   _OverRideExperianRestriction := option.OverRideExperianRestriction;
 		
-		
+  _CompanyID := IF( users.CompanyID != ''     , users.CompanyID     , option.CompanyID );
+  _Login_ID  := IF( users.LoginHistoryId != '', users.LoginHistoryId, option.LoginID );
+  _DOBMask   := IF( users.DOBMask != ''       , users.DOBMask       , option.DOBMask );
+		_SSNMask   := IF( users.SSNMask != ''       , users.SSNMask       , option.SSNMask );
+    
 		// The following #STORED( ) attributes will be read directly within 
 		// BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs( ):
-		#STORED('CompanyID'                        , users.CompanyID);
-		#STORED('LoginID'                          , users.LoginHistoryId);
+		#STORED('CompanyID'                        , _CompanyID);
+		#STORED('LoginID'                          , _Login_ID);
 		#STORED('DisableCustomerNetworkOptionInCVI', option.DisableCustomerNetworkOptionInCVI);
-		#STORED('DLMask'                           , users.DLMask);
-		#STORED('DOBMask'                          , users.DOBMask);
+		#STORED('DLMask'                           , users.DLMask OR option.DLMask);
+		#STORED('DOBMask'                          , _DOBMask);
 		#STORED('DOBMatchOptions'                  , option.DOBMatchOptions);
 		#STORED('DOBRadius'                        , option.DOBRadius);
 		#STORED('EnableEmergingID'                 , option.EnableEmergingID);
@@ -230,7 +234,7 @@
 		#STORED('NameInputOrder'                   , option.NameInputOrder);
 		#STORED('OfacOnly'                         , option.OfacOnly);
 		#STORED('PoBoxCompliance'                  , option.PoBoxCompliance);
-		#STORED('SSNMask'                          , users.SSNMask);
+		#STORED('SSNMask'                          , _SSNMask);
 		#STORED('UseDOBFilter'                     , option.UseDOBFilter);
 	ENDMACRO;
 

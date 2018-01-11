@@ -3,8 +3,7 @@ IMPORT Data_Services, ut,doxie, risk_indicators, VerificationOfOccupancy;
 
 EXPORT VerificationOfOccupancy_Report_keys := MODULE
 
-	shared locat := Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::VOOreport::';
-
+	shared locat := Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::testseed::'+ doxie.Version_SuperKey + '::vooreport::';
 	
 	d := Seed_Files.VerificationOfOccupancy_Report_files.Summary;
 	newrec := record
@@ -20,7 +19,7 @@ EXPORT VerificationOfOccupancy_Report_keys := MODULE
 	end;
 	newtable := table(d, newrec);
 	export Summary := index(newtable,{dataset_name,hashvalue}, {newtable}, 
-											locat + 'Summary_'+ doxie.Version_SuperKey);
+											locat + 'Summary');
 											
 											
 											
@@ -39,7 +38,7 @@ EXPORT VerificationOfOccupancy_Report_keys := MODULE
 	end;
 	newtable := table(d, newrec);
 	export TargetSummary := index(newtable,{dataset_name,hashvalue}, {newtable}, 
-											locat + 'TargetSummary_'+ doxie.Version_SuperKey);									
+											locat + 'TargetSummary');									
 											
 											
 											
@@ -56,7 +55,7 @@ EXPORT VerificationOfOccupancy_Report_keys := MODULE
 	end;
 	newtable := table(d, newrec);
 	export Sources := index(newtable,{dataset_name,hashvalue}, {newtable}, 
-											locat + 'Sources_'+ doxie.Version_SuperKey);																																			 
+											locat + 'Sources');																																			 
 		
 		
 		
@@ -74,7 +73,7 @@ EXPORT VerificationOfOccupancy_Report_keys := MODULE
 	end;
 	newtable := table(d, newrec);
 	export OwnedProperties := index(newtable,{dataset_name,hashvalue}, {newtable}, 
-											locat + 'OwnedProperties_'+ doxie.Version_SuperKey);						
+											locat + 'OwnedProperties');						
 		
 		
 		
@@ -91,7 +90,7 @@ EXPORT VerificationOfOccupancy_Report_keys := MODULE
 	end;
 	newtable := table(d, newrec);
 	export OwnedPropertiesAsOf := index(newtable,{dataset_name,hashvalue}, {newtable}, 
-											locat + 'OwnedPropertiesAsOf_'+ doxie.Version_SuperKey);			
+											locat + 'OwnedPropertiesAsOf');			
 		
 																				 
 	
@@ -109,7 +108,7 @@ EXPORT VerificationOfOccupancy_Report_keys := MODULE
 	end;
 	newtable := table(d, newrec);
 	export PhoneAndUtility := index(newtable,{dataset_name,hashvalue}, {newtable}, 
-											locat + 'PhoneAndUtility_'+ doxie.Version_SuperKey);			
+											locat + 'PhoneAndUtility');			
 	
 	
 	
@@ -129,7 +128,7 @@ EXPORT VerificationOfOccupancy_Report_keys := MODULE
 	end;
 	newtable := table(d, newrec);
 	export AssociatedIdentities := index(newtable,{dataset_name,hashvalue}, {newtable}, 
-											locat + 'AssociatedIdentities_'+ doxie.Version_SuperKey);			
+											locat + 'AssociatedIdentities');			
 	
 	
 	END;
