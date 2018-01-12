@@ -1,4 +1,4 @@
-import lib_fileservices,_control,VersionControl;
+﻿import lib_fileservices,_control,VersionControl,lib_thorlib;
 
 EXPORT Spray_IA(dataset({string ftype,string fdate})infile) := module
 
@@ -9,7 +9,7 @@ EXPORT Spray_IA(dataset({string ftype,string fdate})infile) := module
 	string		pDir(string lictype)		:=  map ( lictype = 'medical'  => '/data/hds_4/prolic/ia/medical/'+infile(ftype = 'medical')[1].fdate,
 	                                                                      '/data/hds_4/prolic/ia/dental_pl/'+infile(ftype = 'dentist')[1].fdate
 																						);
-	string		pGroupName	:= if ( _Control.ThisEnvironment.Name <> 'Prod_Thor' , 'thor400_dev01','thor400_60');
+	string		pGroupName	:= thorlib.group();
 	boolean    pIsTesting  := false;
 
 

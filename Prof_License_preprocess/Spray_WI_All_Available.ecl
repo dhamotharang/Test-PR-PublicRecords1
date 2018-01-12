@@ -1,6 +1,6 @@
-EXPORT Spray_WI_All_Available(string fdate) := module
+﻿EXPORT Spray_WI_All_Available(string fdate) := module
 
-import lib_fileservices,_control;
+import lib_fileservices,_control,lib_thorlib;
 
 	string					CSVSeparator				:=	',';
 	string					CSVQuote						:=	'"';
@@ -8,7 +8,7 @@ import lib_fileservices,_control;
 	
 	string          sourceLZ              := '/data/hds_4/prolic/wi/all_available/'+fdate+'/';
 	string					AASF				:=	'~thor_data400::in::prolic::wi::all_available::raw';
-		string		pGroupName	:= if ( _Control.ThisEnvironment.Name <> 'Prod_Thor' ,'thor400_dev01','thor400_60');
+		string		pGroupName	:= thorlib.group();
          
 	
 	

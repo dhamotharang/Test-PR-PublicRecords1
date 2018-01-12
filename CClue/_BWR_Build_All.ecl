@@ -1,4 +1,4 @@
-﻿pversion 	:= 	'20171206';
+﻿pversion 	:= 	'20170621'										;		// modify to current date
 
 /////////////////////////////////////////////////////////////
 // -- Quick Documentation
@@ -9,6 +9,6 @@
 /////////////////////////////////////////////////////////////
 #workunit('protect','true');
 #workunit('name', CClue._Dataset().Name + ' Build - ' + pversion);
-CClue.Build_All(pversion) ;  
+CClue.Build_All(pversion);  
 
 
