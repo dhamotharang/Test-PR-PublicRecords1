@@ -524,19 +524,23 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 	
 	self.om_first_seen_date := if(~isFCRA and is_banko_inquiry and rt.bus_intel.use NOT IN ['AM', 'CM', ''], logdate, '');
 	self.om_last_seen_date := if(~isFCRA and is_banko_inquiry and rt.bus_intel.use NOT IN ['AM', 'CM', ''], logdate, '');
-/*
+
 	//MS-87 new for BS 5.3 - corraboration counts for verified input element combinations. need to match on zip to consider address as matching so refigure addrmatch here with zip. 
-	zip_score1 := Risk_Indicators.AddrScore.zip_score(le.shell_input.z5, rt.person_q.zip[1..5]);
-	addrmatchscore2 := Risk_Indicators.AddrScore.AddressScore(le.shell_input.prim_range, le.shell_input.prim_name, le.shell_input.sec_range, 
-																													 rt.person_q.prim_range, rt.person_q.prim_name, rt.person_q.sec_range);
-	addrmatch2 := risk_indicators.iid_constants.ga(addrmatchscore) and zip_score1 = 100;
+	//Because the join to the inquiry address key further down requires exact match on address, enforce exact match on address here as well for the counts by ADL
+	addrmatch2 := le.shell_input.z5 = rt.person_q.zip[1..5] and 
+								le.shell_input.prim_range = rt.person_q.prim_range and 
+								le.shell_input.prim_name = rt.person_q.prim_name and
+								le.shell_input.sec_range = rt.person_q.sec_range and 
+								le.shell_input.predir = rt.person_q.predir and 
+								le.shell_input.addr_suffix = rt.person_q.addr_suffix;
+
 	socsmatchexact := le.shell_input.ssn = rt.person_q.ssn;
 	hphonematchexact := le.shell_input.phone10 = rt.person_q.personal_phone;
 	
 	//MS-87: the logic for these new inquiry corroboration counters includes new special values of -1, -2, -3.  Here's what they mean...
 	//  -1 will be returned if we didn't assign a valid DID or if the necessary input fields pertaining to the counter are not populated
 	//  -2 will be returned if a DID was assigned and there is an inquiry but that inquiry does not qualify as a good inquiry
-	//  -3 will be returned if a DID was assigned and there is a good inquiry but that inquiry is missing a necessary field to complete the   
+	//  -3 will be returned if a DID was assigned and there is a good inquiry but that inquiry is missing a necessary field to complete the calculation  
 	self.inq_corrnameaddr_adl 			:= map(le.DID = 0 or le.truedid = false or le.shell_input.in_streetaddress='' or le.shell_input.fname='' or le.shell_input.lname=''		=> -1,
 																				 ~good_inquiry																																																									=> -2, 
 																				 rt.person_q.address='' or rt.person_q.fname='' or rt.person_q.lname=''																													=> -3,
@@ -610,7 +614,7 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 	self.inq_corrnameaddrssn				:= if(le.shell_input.in_streetaddress='' or le.shell_input.fname='' or le.shell_input.lname='' or le.shell_input.ssn='', -1, -2);
 	self.inq_corrnamephonessn				:= if(le.shell_input.phone10='' or le.shell_input.fname='' or le.shell_input.lname='' or le.shell_input.ssn='', -1, -2);
 	self.inq_corrnameaddrphnssn			:= if(le.shell_input.in_streetaddress='' or le.shell_input.phone10='' or le.shell_input.fname='' or le.shell_input.lname='' or le.shell_input.ssn='', -1, -2);
-*/
+
 	//MS-105 - the following 3 fields cannot be populated in FCRA so set them to default here
 	self.inq_primrangesperssn_1dig	:= if(le.shell_input.in_streetaddress='' or le.shell_input.ssn='', -1, -2);
 	self.inq_dobsperssn_1dig				:= if(le.shell_input.ssn='' or le.shell_input.dob='', -1, -2);
@@ -748,7 +752,7 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 	self.Inquiry_dob_ver_ct 	:= 255;
 	self.Inquiry_phone_ver_ct := 255;
 	self.Inquiry_email_ver_ct := 255;
-/*
+
 	// MS-87 - set these fields to a default value, they will be ignored later since we don't want to count offset records in with the real records.
 	self.inq_corrnameaddr_adl 			:= -2;
 	self.inq_corrnamessn_adl				:= -2;
@@ -774,7 +778,7 @@ layout_temp trans_name(layout_bocashell_neutral le, key_did rt) := transform
 	self.inq_corrnameaddrssn				:= -2;
 	self.inq_corrnamephonessn				:= -2;
 	self.inq_corrnameaddrphnssn			:= -2;
-*/
+
 	//MS-105 - the following 3 fields cannot be populated in FCRA so set them to default here
 	self.inq_primrangesperssn_1dig	:= -2;
 	self.inq_dobsperssn_1dig				:= -2;
@@ -890,55 +894,67 @@ layout_temp roll( layout_temp le, layout_temp rt ) := TRANSFORM
 																	 rt.Inquiry_email_ver_ct=255 => le.Inquiry_email_ver_ct,
 																	 le.Inquiry_email_ver_ct=255 => rt.Inquiry_email_ver_ct,
 																	 min(le.Inquiry_email_ver_ct + rt.Inquiry_email_ver_ct, 254));
-/*																	 
+																	 
   //MS-87 - Ignore offset recs. If left and right are valid inquiries, sum them. Otherwise if one or both are not valid, take the highest sequential value as they are in precedence order.																																																												
 	self.inq_corrnameaddr_adl 			:= map(le.isOffsetRec and rt.isOffsetRec																					=> -2, 
 																				 rt.isOffsetRec																															=> le.inq_corrnameaddr_adl,
 																				 le.inq_corrnameaddr_adl >= 0 and rt.inq_corrnameaddr_adl >= 0							=> min(le.inq_corrnameaddr_adl + rt.inq_corrnameaddr_adl, 254),
+																				 le.inq_corrnameaddr_adl in [-2,-3] and rt.inq_corrnameaddr_adl in [-2,-3]	=> min(le.inq_corrnameaddr_adl, rt.inq_corrnameaddr_adl),
 																																																											 max(le.inq_corrnameaddr_adl, rt.inq_corrnameaddr_adl));
 	self.inq_corrnamessn_adl 				:= map(le.isOffsetRec and rt.isOffsetRec																					=> -2, 
 																				 rt.isOffsetRec																															=> le.inq_corrnamessn_adl,
 																				 le.inq_corrnamessn_adl >= 0 and rt.inq_corrnamessn_adl >= 0								=> min(le.inq_corrnamessn_adl + rt.inq_corrnamessn_adl, 254),
+																				 le.inq_corrnamessn_adl in [-2,-3] and rt.inq_corrnamessn_adl in [-2,-3]		=> min(le.inq_corrnamessn_adl, rt.inq_corrnamessn_adl),
 																																																											 max(le.inq_corrnamessn_adl, rt.inq_corrnamessn_adl));
 	self.inq_corrnamephone_adl 			:= map(le.isOffsetRec and rt.isOffsetRec																					=> -2, 
 																				 rt.isOffsetRec																															=> le.inq_corrnamephone_adl,
 																				 le.inq_corrnamephone_adl >= 0 and rt.inq_corrnamephone_adl >= 0						=> min(le.inq_corrnamephone_adl + rt.inq_corrnamephone_adl, 254),
+																				 le.inq_corrnamephone_adl in [-2,-3] and rt.inq_corrnamephone_adl in [-2,-3]	=>	min(le.inq_corrnamephone_adl, rt.inq_corrnamephone_adl),
 																																																											 max(le.inq_corrnamephone_adl, rt.inq_corrnamephone_adl));
 	self.inq_corraddrssn_adl 				:= map(le.isOffsetRec and rt.isOffsetRec																					=> -2, 
 																				 rt.isOffsetRec																															=> le.inq_corraddrssn_adl,
 																				 le.inq_corraddrssn_adl >= 0 and rt.inq_corraddrssn_adl >= 0								=> min(le.inq_corraddrssn_adl + rt.inq_corraddrssn_adl, 254),
+																				 le.inq_corraddrssn_adl in [-2,-3] and rt.inq_corraddrssn_adl in [-2,-3]		=> min(le.inq_corraddrssn_adl, rt.inq_corraddrssn_adl),
 																																																											 max(le.inq_corraddrssn_adl, rt.inq_corraddrssn_adl));
 	self.inq_corrdobaddr_adl 				:= map(le.isOffsetRec and rt.isOffsetRec																					=> -2, 
 																				 rt.isOffsetRec																															=> le.inq_corrdobaddr_adl,
 																				 le.inq_corrdobaddr_adl >= 0 and rt.inq_corrdobaddr_adl >= 0								=> min(le.inq_corrdobaddr_adl + rt.inq_corrdobaddr_adl, 254),
+																				 le.inq_corrdobaddr_adl in [-2,-3] and rt.inq_corrdobaddr_adl in [-2,-3]		=> min(le.inq_corrdobaddr_adl, rt.inq_corrdobaddr_adl),
 																																																											 max(le.inq_corrdobaddr_adl, rt.inq_corrdobaddr_adl));
 	self.inq_corraddrphone_adl 			:= map(le.isOffsetRec and rt.isOffsetRec																					=> -2, 
 																				 rt.isOffsetRec																															=> le.inq_corraddrphone_adl,
 																				 le.inq_corraddrphone_adl >= 0 and rt.inq_corraddrphone_adl >= 0						=> min(le.inq_corraddrphone_adl + rt.inq_corraddrphone_adl, 254),
+																				 le.inq_corraddrphone_adl in [-2,-3] and rt.inq_corraddrphone_adl in [-2,-3]	=>	min(le.inq_corraddrphone_adl, rt.inq_corraddrphone_adl),
 																																																											 max(le.inq_corraddrphone_adl, rt.inq_corraddrphone_adl));
 	self.inq_corrdobssn_adl 				:= map(le.isOffsetRec and rt.isOffsetRec																					=> -2, 
 																				 rt.isOffsetRec																															=> le.inq_corrdobssn_adl,
 																				 le.inq_corrdobssn_adl >= 0 and rt.inq_corrdobssn_adl >= 0									=> min(le.inq_corrdobssn_adl + rt.inq_corrdobssn_adl, 254),
+																				 le.inq_corrdobssn_adl in [-2,-3] and rt.inq_corrdobssn_adl in [-2,-3]			=> min(le.inq_corrdobssn_adl, rt.inq_corrdobssn_adl),
 																																																											 max(le.inq_corrdobssn_adl, rt.inq_corrdobssn_adl));
 	self.inq_corrphonessn_adl 			:= map(le.isOffsetRec and rt.isOffsetRec																					=> -2, 
 																				 rt.isOffsetRec																															=> le.inq_corrphonessn_adl,
 																				 le.inq_corrphonessn_adl >= 0 and rt.inq_corrphonessn_adl >= 0							=> min(le.inq_corrphonessn_adl + rt.inq_corrphonessn_adl, 254),
+																				 le.inq_corrphonessn_adl in [-2,-3] and rt.inq_corrphonessn_adl in [-2,-3]	=> min(le.inq_corrphonessn_adl, rt.inq_corrphonessn_adl),
 																																																											 max(le.inq_corrphonessn_adl, rt.inq_corrphonessn_adl));
 	self.inq_corrdobphone_adl 			:= map(le.isOffsetRec and rt.isOffsetRec																					=> -2, 
 																				 rt.isOffsetRec																															=> le.inq_corrdobphone_adl,
 																				 le.inq_corrdobphone_adl >= 0 and rt.inq_corrdobphone_adl >= 0							=> min(le.inq_corrdobphone_adl + rt.inq_corrdobphone_adl, 254),
+																				 le.inq_corrdobphone_adl in [-2,-3] and rt.inq_corrdobphone_adl in [-2,-3]	=> min(le.inq_corrdobphone_adl, rt.inq_corrdobphone_adl),
 																																																											 max(le.inq_corrdobphone_adl, rt.inq_corrdobphone_adl));
 	self.inq_corrnameaddrssn_adl 		:= map(le.isOffsetRec and rt.isOffsetRec																					=> -2, 
 																				 rt.isOffsetRec																															=> le.inq_corrnameaddrssn_adl,
 																				 le.inq_corrnameaddrssn_adl >= 0 and rt.inq_corrnameaddrssn_adl >= 0				=> min(le.inq_corrnameaddrssn_adl + rt.inq_corrnameaddrssn_adl, 254),
+																				 le.inq_corrnameaddrssn_adl in [-2,-3] and rt.inq_corrnameaddrssn_adl in [-2,-3]	=>	min(le.inq_corrnameaddrssn_adl, rt.inq_corrnameaddrssn_adl),
 																																																											 max(le.inq_corrnameaddrssn_adl, rt.inq_corrnameaddrssn_adl));
 	self.inq_corrnamephonessn_adl 	:= map(le.isOffsetRec and rt.isOffsetRec																					=> -2, 
 																				 rt.isOffsetRec																															=> le.inq_corrnamephonessn_adl,
 																				 le.inq_corrnamephonessn_adl >= 0 and rt.inq_corrnamephonessn_adl >= 0			=> min(le.inq_corrnamephonessn_adl + rt.inq_corrnamephonessn_adl, 254),
+																				 le.inq_corrnamephonessn_adl in [-2,-3] and rt.inq_corrnamephonessn_adl in [-2,-3]	=>	min(le.inq_corrnamephonessn_adl, rt.inq_corrnamephonessn_adl),
 																																																											 max(le.inq_corrnamephonessn_adl, rt.inq_corrnamephonessn_adl));
 	self.inq_corrnameaddrphnssn_adl := map(le.isOffsetRec and rt.isOffsetRec																					=> -2, 
 																				 rt.isOffsetRec																															=> le.inq_corrnameaddrphnssn_adl,
 																				 le.inq_corrnameaddrphnssn_adl >= 0 and rt.inq_corrnameaddrphnssn_adl >= 0	=> min(le.inq_corrnameaddrphnssn_adl + rt.inq_corrnameaddrphnssn_adl, 254),
+																				 le.inq_corrnameaddrphnssn_adl in [-2,-3] and rt.inq_corrnameaddrphnssn_adl in [-2,-3]	=>	min(le.inq_corrnameaddrphnssn_adl, rt.inq_corrnameaddrphnssn_adl),
 																																																											 max(le.inq_corrnameaddrphnssn_adl, rt.inq_corrnameaddrphnssn_adl));
 
 	//MS-87 - for these non ADL counters, the "max" will cause -1 to return if inputs are missing, else return -2.
@@ -954,7 +970,7 @@ layout_temp roll( layout_temp le, layout_temp rt ) := TRANSFORM
 	self.inq_corrnameaddrssn				:= max(le.inq_corrnameaddrssn, rt.inq_corrnameaddrssn);
 	self.inq_corrnamephonessn				:= max(le.inq_corrnamephonessn, rt.inq_corrnamephonessn);
 	self.inq_corrnameaddrphnssn			:= max(le.inq_corrnameaddrphnssn, rt.inq_corrnameaddrphnssn);
-*/
+
 	//MS-105 - for these non ADL counters, the "max" will cause -1 to return if inputs are missing, else return -2.
 	self.inq_primrangesperssn_1dig	:= max(le.inq_primrangesperssn_1dig, rt.inq_primrangesperssn_1dig);
 	self.inq_dobsperssn_1dig				:= max(le.inq_dobsperssn_1dig, rt.inq_dobsperssn_1dig);
@@ -2259,9 +2275,20 @@ inquiry_summary := if(bsversion>=50, group(with_billgroups, seq), group(with_inq
 // output(grouped_raw, named('grouped_raw'));
 // output(rolled_raw, named('rolled_raw'));
 // output(with_dobs_per_adl, named('with_dobs_per_adl'));
-// output(with_emails_per_adl, named('with_emails_per_adl'));
-// output(isCollectionRetro, named('isCollectionRetro'));
 // output(clam_pre_Inquiries, named('clam_pre_Inquiries'));
+// output(j_raw_fcra, named('j_raw_fcra'));
+// output(j_fcra_corrections, named('j_fcra_corrections'));
+// output(grouped_raw, named('grouped_raw'));
+// output(rolled_raw, named('rolled_raw'));
+// output(ssn_raw, named('ssn_raw'));
+// output(rolled_ssn_raw, named('rolled_ssn_raw'));
+// output(Addr_raw, named('Addr_raw'));
+// output(rolled_Addr_raw, named('rolled_Addr_raw'));
+// output(phone_raw, named('phone_raw'));
+// output(with_phone_velocities, named('with_phone_velocities'));
+// output(retro_mode, named('retro_mode'));
+// output(IncludeNonFCRACollectionInquiries, named('IncludeNonFCRACollectionInquiries'));
+// output(with_inquiries, named('with_inquiries'));
 // output(with_inquiries_temp1, named('with_inquiries_temp1'));
 // output(with_inquiries_temp2, named('with_inquiries_temp2'));
 

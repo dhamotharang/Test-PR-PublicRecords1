@@ -15,8 +15,8 @@ Build_all_keys := Build_keys(version);
 zDoPopulationStats:=Strata_Stat_Email(version,File_Email_Base);
 zDoPopulationVendorStats:=Strata_Stat_Vendor(version,File_Email_Base);
 
-dops_update :=  sequential(DOPS.updateversion('EmailDataKeys',(string)version,'Manila-DataOps@lexisnexisrisk.com',,'N')
-													,DOPS.updateversion('FCRA_EmailDataKeys',(string)version,'Manila-DataOps@lexisnexisrisk.com',,'F'));
+dops_update :=  sequential(DOPS.updateversion('EmailDataKeys',(string)version,'Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N')
+													,DOPS.updateversion('FCRA_EmailDataKeys',(string)version,'Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'F'));
 
 orbit_update := sequential(Orbit3.proc_Orbit3_CreateBuild_AddItem ('Email Data',(string)version,'N')
 														,Orbit3.proc_Orbit3_CreateBuild_AddItem ('FCRA Email Data',(string)version,'F')

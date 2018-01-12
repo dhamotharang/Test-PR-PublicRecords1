@@ -1,7 +1,7 @@
-EXPORT _Output_Review_Samples(
+﻿EXPORT _Output_Review_Samples(
    pMatchThreshold      = '30'
   ,pInfile              = 'BIPV2_ProxID.In_DOT_Base'
-  ,pSetReviewers        = '[\'CM\',\'LB\',\'DW\',\'HS\',\'AL\',\'DS\',\'ZS\',\'JA\',\'AJ\',\'PW\']'
+  ,pSetReviewers        = '[\'CM\',\'LB\',\'DW\',\'RP\',\'AL\',\'DS\',\'ZS\',\'JA\',\'AJ\',\'PW\']'
   ,pSamplesPerReviewer  = '15'
   ,pKeyversions         = '\'built\''
   ,pFractionAtThreshold = '.667'    //by default, 2/3 at threshold, 1/3 above

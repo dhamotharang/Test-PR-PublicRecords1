@@ -1,6 +1,6 @@
+﻿
 
-
-Party_NameBase:=DATASET( cluster.cluster_out+'base::ucc::party_Name',Layout_UCC_Common.Layout_Party_With_AID , thor)(tmsid not in UCCV2.Suppress_TMSID);
+Party_NameBase:=DATASET( cluster.cluster_out+'base::ucc::party_Name',Layout_UCC_Common.Layout_Party_With_AID , thor)(tmsid not in UCCV2.Suppress_TMSID());
 	    	List:=['NA','N/A','NONE','VOID','N./A','(NO DATA)'];
 	
 	Layout_UCC_Common.Layout_Party_With_AID  trans_clean(Layout_UCC_Common.Layout_Party_With_AID l):=transform 

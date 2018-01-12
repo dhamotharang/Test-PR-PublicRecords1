@@ -1,4 +1,4 @@
-EXPORT phone_noreconn_param := MODULE
+﻿EXPORT phone_noreconn_param := MODULE
 
 	EXPORT searchParams := INTERFACE
 		// COMPLIANCE SETTINGS
@@ -28,6 +28,10 @@ EXPORT phone_noreconn_param := MODULE
 		EXPORT STRING2   State := '';
 		EXPORT STRING6   Zip := '';
 		EXPORT STRING15  Phone := '';
+		
+	  EXPORT UNSIGNED datefirstseen := 0;
+	  EXPORT UNSIGNED datelastseen := 0;
+		EXPORT STRING30  County := '';
 		
 		// OPTIONS
 		EXPORT BOOLEAN   ExcludeCurrentGong := FALSE;

@@ -1,4 +1,4 @@
-IMPORT SALT33,ut,std;
+﻿IMPORT SALT33,ut,std;
 EXPORT Key_Classify_PS_COMPANY := MODULE
  
 //CLEAN_COMPANY_NAME:?:SEARCH_ADDR1:+:P_CITY_NAME:ST:SEARCH_ADDR2:LEXID
@@ -64,8 +64,8 @@ EXPORT ScoredEID_HASHFetch(TYPEOF(h.CLEAN_COMPANY_NAME) param_CLEAN_COMPANY_NAME
   RawData := RawFetch(param_CLEAN_COMPANY_NAME,param_SEARCH_ADDR1);
  
   Process_PS_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 13; // Set bitmap for key used
-    SELF.keys_failed := IF(le.EID_HASH = 0, 1 << 13, 0); // Set bitmap for key failed
+    SELF.keys_used := 1 << 14; // Set bitmap for key used
+    SELF.keys_failed := IF(le.EID_HASH = 0, 1 << 14, 0); // Set bitmap for key failed
     SELF.CLEAN_COMPANY_NAME_match_code := MAP(le.CLEAN_COMPANY_NAME = (TYPEOF(le.CLEAN_COMPANY_NAME))'' OR le.CLEAN_COMPANY_NAME = (TYPEOF(le.CLEAN_COMPANY_NAME))'' => SALT33.MatchCode.OneSideNull,match_methods(File_Classify_PS).match_CLEAN_COMPANY_NAME(le.CLEAN_COMPANY_NAME,param_CLEAN_COMPANY_NAME,TRUE));
     SELF.CLEAN_COMPANY_NAMEWeight := (50+MAP ( le.CLEAN_COMPANY_NAME = param_CLEAN_COMPANY_NAME  => le.CLEAN_COMPANY_NAME_weight100,
           le.CLEAN_COMPANY_NAME = (TYPEOF(le.CLEAN_COMPANY_NAME))'' OR param_CLEAN_COMPANY_NAME = (TYPEOF(le.CLEAN_COMPANY_NAME))'' => 0,
@@ -111,7 +111,7 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex) := FUN
  
   Process_PS_Layouts.LayoutScoredFetch Score_Batch(Key le,recs ri) := TRANSFORM
     SELF.Reference := ri.reference; // Copy reference field
-    SELF.keys_used := 1 << 13; // Set bitmap for key used
+    SELF.keys_used := 1 << 14; // Set bitmap for key used
     SELF.keys_failed := 0; // Set bitmap for key failed
     SELF.CLEAN_COMPANY_NAME_match_code := MAP(le.CLEAN_COMPANY_NAME = (TYPEOF(le.CLEAN_COMPANY_NAME))'' OR le.CLEAN_COMPANY_NAME = (TYPEOF(le.CLEAN_COMPANY_NAME))'' => SALT33.MatchCode.OneSideNull,match_methods(File_Classify_PS).match_CLEAN_COMPANY_NAME(le.CLEAN_COMPANY_NAME,ri.CLEAN_COMPANY_NAME,TRUE));
     SELF.CLEAN_COMPANY_NAMEWeight := (50+MAP ( le.CLEAN_COMPANY_NAME = ri.CLEAN_COMPANY_NAME  => le.CLEAN_COMPANY_NAME_weight100,

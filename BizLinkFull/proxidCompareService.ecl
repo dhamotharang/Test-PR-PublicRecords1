@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="proxidCompareService">
 <part name="proxidOne" type="xsd:string"/>
 <part name="proxidTwo" type="xsd:string"/>
@@ -31,3 +31,4 @@ OUTPUT( odl,NAMED('proxidOneRecords'));
 OUTPUT( odr,NAMED('proxidTwoRecords'));
 ENDMACRO;
  
+

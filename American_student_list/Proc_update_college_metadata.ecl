@@ -1,4 +1,4 @@
-//This ECL attribute performs following tasks -
+﻿//This ECL attribute performs following tasks -
 //   - spray the new master college database (csv file)
 //   - add the sprayed file to super file thor_data400::in::american_student_list::master_college_db
 //   - add a leading 0 to act_code and create the new lookup file thor_data400::lookup::american_student_list::date::college_metadata
@@ -22,7 +22,7 @@ EXPORT Proc_update_college_metadata(STRING iFileName) := FUNCTION
 																						',',
 																						'\r\n',
 																						'',
-																						'thor400_20', 
+																						'thor400_44', 
 																						in_dest+todaydate+'::master_college_db',
 																						,
 																						,

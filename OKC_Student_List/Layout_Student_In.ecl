@@ -1,0 +1,22 @@
+﻿EXPORT Layout_Student_In := record
+	STRING	StudentID;
+	STRING	DartID;
+	STRING 	CollegeID;
+	STRING	ProjectSource;
+	STRING	CollegeState;
+	STRING	College;
+	STRING	Semester;
+	STRING	Year;
+	STRING	DateAdded;
+	STRING	DateUpdated;
+	STRING	FirstName;
+	STRING	MiddleName;
+	STRING	LastName;
+	STRING	Suffix;
+	STRING	Major;
+	STRING	Grade;
+	STRING	Email;
+	STRING	DateofBirth;
+	STRING	AttendanceDate;
+	STRING	EnrollmentStatus;
+END; 

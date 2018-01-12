@@ -1004,6 +1004,28 @@
 		export string KEYWORD_IDPWMD								:= '692';
 		export string KEYWORD_VEPTRE_WC							:= '693';		
 		export string KEYWORD_CNSPC									:= '694';		
+		export string KEYWORD_UZTVP									:= '695';		
+		export string KEYWORD_PEOSCE_TCE						:= '696';		
+		export string KEYWORD_AZL_WC								:= '697';		
+		export string KEYWORD_RUFTS_DD							:= '698';		
+		export string KEYWORD_CANSEMVE							:= '699';		
+		export string KEYWORD_INSAE_50_WC						:= '700';		
+		export string KEYWORD_OFAC_DPRK4						:= '701';		
+		export string KEYWORD_PHNBI									:= '702';		
+		export string KEYWORD_PHDND_MLAO						:= '703';		
+		export string KEYWORD_BISN_CAATSA231				:= '704';		
+		export string KEYWORD_CANS_JVCFO						:= '705';		
+		export string KEYWORD_PPICIJ_WC							:= '706';		
+		export string KEYWORD_USCRL									:= '707';		
+		export string KEYWORD_CODIAN								:= '708';
+		export string KEYWORD_NPCIAA								:= '709';
+		export string KEYWORD_EDES									:= '710';
+		export string KEYWORD_KRFSS									:= '711';
+		export string KEYWORD_PKPPMWT									:= '712';
+		export string KEYWORD_BRPRORJ									:= '713';
+		export string KEYWORD_USFHFA									:= '714';
+		export string KEYWORD_OFAC_GLOMAG								:= '715';
+		export string KEYWORD_USCFPB									:= '716';
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	

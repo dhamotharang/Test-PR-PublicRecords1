@@ -1,4 +1,4 @@
-IMPORT _control,ut,RoxieKeyBuild;
+﻿IMPORT _control,ut,RoxieKeyBuild;
 
 EXPORT proc_spray_V12_files(STRING version) := FUNCTION
 	
@@ -14,6 +14,6 @@ EXPORT proc_spray_V12_files(STRING version) := FUNCTION
 	//Run hb spray
 	spray_hb	:= V12.spray_V12_hb(version);
 	
-RETURN parallel(spray_postal,spray_ezip, spray_optout, spray_hb);
+RETURN parallel(spray_postal/*,spray_ezip, spray_optout, spray_hb*/); //No longer receiving ezip, optout, or hb files
 
 END;

@@ -1,4 +1,4 @@
-import ut, hygenics_soff, RoxieKeyBuild;
+﻿import hygenics_soff, RoxieKeyBuild,Std;
 
 export proc_build_base(string filedate) := function
 
@@ -40,7 +40,7 @@ withdid_join := join(trimmed,images.File_idDID, left.state = right.state and
 withdid := withdid_join(image_link<>'' and imglength>0);
 
 //Add Image Date///////////////////////////////////////////////////////////////////////////
-	ds_img 	:= sort(withDid(rtype='SO'), hash(state, image_link), state, image_link);
+	ds_img 	:= sort(distribute(withDid(rtype='SO'), hash(state, image_link)), state, image_link,local);
 	ds_soff	:= hygenics_soff.File_In_SO_Defendant(photoname<>'');
 
 	imglnk_layout := record
@@ -67,12 +67,20 @@ withdid := withdid_join(image_link<>'' and imglength>0);
 	ds_pull_photo := project(ds_soff, pullPhoto(left));
 	
 	imglnk_layout addVend(ds_pull_photo l):= transform
+	
 		fixYYYYMMDD(string ds):= function
 			fulldate 	:= if(regexfind('-', ds, 0)<>'',
 										regexreplace('-', ds, '/'),
 										ds);
-			return ut.ConvertDate(fulldate);
-	end;
+										
+			fmtsin := [
+		          '%m/%d/%Y',
+		          '%m/%d/%Y'
+	              ];
+	    fmtout:='%Y%m%d';		
+			
+			return Std.date.ConvertDateFormatMultiple(fulldate,fmtsin,fmtout);
+	  end;
 			
 		photo_date				:= if(l.photodate[3] in ['/','-'],
 															fixYYYYMMDD(l.photodate[1..10]),
@@ -91,7 +99,7 @@ withdid := withdid_join(image_link<>'' and imglength>0);
 		self 							:= l;
 	end;
 
-	soff_addDate := sort(distribute(project(ds_pull_photo, addVend(left)), hash(statecode, imagelink)), statecode, imagelink): persist('~images::base::sexoffender_test');
+	soff_addDate := sort(distribute(project(ds_pull_photo, addVend(left)), hash(statecode, imagelink)), statecode, imagelink,local): persist('~images::base::sexoffender_test');
 	
 	withdid addDt(ds_img l, soff_addDate r) := transform
 		self.date				:= if(r.photodate[1..2] in ['19','20'] and length(trim(r.photodate, left, right))=8,
@@ -104,7 +112,7 @@ withdid := withdid_join(image_link<>'' and imglength>0);
 													trim(left.state,left,right) = trim(right.statecode,left,right) and																										
 													trim(left.image_link,left,right) = trim(right.imagelink,left,right), 
 													addDt(left,right), 
-													left outer, keep(1)):persist('~thor400_20::persist::soff_image_base');
+													left outer, keep(1),local):persist('~thor400_20::persist::soff_image_base');
 
 	ds_complete := withdid(rtype not in ['SO']) + soff_match;
 

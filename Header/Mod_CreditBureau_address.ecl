@@ -1,4 +1,4 @@
-import header,eq_hist,transunioncred,experiancred,ut,doxie;
+﻿import header,eq_hist,transunioncred,experiancred,ut,doxie;
 
 export Mod_CreditBureau_address := module
 
@@ -102,7 +102,7 @@ EqFiles:=project(EqFiles0
 
 EnFiles
 	:=
-	DATASET(ExperianCred.SuperFile_List.Source_File_Processed, {string75 fn { virtual(logicalfilename)},ExperianCred.Layouts.Layout_In}, THOR)
+	DATASET(ExperianCred.SuperFile_List.Source_File_History, {string75 fn { virtual(logicalfilename)},ExperianCred.Layouts.Layout_In}, THOR, opt)
 	;
 
 TnFiles

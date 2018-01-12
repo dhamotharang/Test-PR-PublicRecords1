@@ -3,7 +3,8 @@
 EXPORT Layouts := MODULE
 
 EXPORT BaseMain_in := RECORD
-LiensV2.layout_liens_main_module.layout_liens_main and not filing_status;
+//LiensV2.layout_liens_main_module.layout_liens_main and not filing_status;
+LiensV2.layout_liens_main_module.layout_liens_main and not [bCBFlag,filing_status];
 string20	cust_name;
 string10	bug_num;
 string7		courtid;

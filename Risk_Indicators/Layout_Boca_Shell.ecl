@@ -103,6 +103,8 @@ RECORD
 	integer1 inputAddr_occupancy_index := 0;
 	integer1 currAddr_occupancy_index := 0;
 	integer1 unverified_addr_count := 0;
+	integer	bus_addr_only_curr; //MS-159
+	integer	bus_addr_only;			//MS-159
 END;
 
 
@@ -924,9 +926,12 @@ RECORD
 	string8	archive_date_6mo;		//history date + 6 months
 	string8	archive_date_12mo;	//history date + 1 year
 	string8	archive_date_24mo;	//history date + 2 years
+
+	Risk_Indicators.Layouts.layout_BIP_Header_info BIP_Header;	//MS-71
+	// Risk_Indicators.Layouts.layout_Equifax_FraudFlags Eqfx_FraudFlags;	//MS-167
 	
 	//these are child sets...LEAVE as last item in Boca Shell - nothing after them:)
 	Risk_Indicators.Layouts_Derog_Info.LJ_DataSets LnJ_datasets;
-	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
+	dataset(Risk_Indicators.Layouts.tmp_Consumer_Statements) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
 
 END;

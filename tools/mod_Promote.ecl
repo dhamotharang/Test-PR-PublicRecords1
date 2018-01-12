@@ -1,4 +1,4 @@
-import ut,std;
+﻿import ut,std;
 
 export mod_Promote :=
 module
@@ -470,6 +470,7 @@ module
 		,boolean		pCheckVersionIntegrity	= false
 		,boolean		pIsNewNamingConvention	= false
 		,boolean		pIsDeltaBuild	          = false
+		,boolean		pForceGenPromotion	    = false
 	) :=
 	function
 	
@@ -507,7 +508,7 @@ module
 					sequential(
             if(pIsDeltaBuild = false ,
               sequential(
-                if(Tools.mod_Utilities.compare_supers(lVersions.qa, lVersions.prod) = false
+                if(Tools.mod_Utilities.compare_supers(lVersions.qa, lVersions.prod) = false or pForceGenPromotion = true
                   ,lTodo
                 )
                 ,Tools.mod_Utilities.clear_add(lVersions.qa		, lVersions.built)

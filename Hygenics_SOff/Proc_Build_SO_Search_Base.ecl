@@ -1,4 +1,4 @@
-import ut, sexoffender, fieldstats, doxie_build ,scrubs_sexoffender_main,scrubs_sexoffender_offense,std ;
+﻿import ut, sexoffender, fieldstats, doxie_build ,scrubs_sexoffender_main,scrubs_sexoffender_offense,std,PromoteSupers;
 
 inf 	:= Mapping_Accurint_Person_As_Common;
 inf2 	:= Mapping_Accurint_Offenses_As_Common;
@@ -17,8 +17,8 @@ fieldstats.mac_stat_file(inf2,stat2,'sexoffender_offenses',50,4,false,
 					court_case_number,'string','M')
 
 
-ut.MAC_SF_BuildProcess(Hygenics_SOff.MainFile,'~thor_data400::base::sex_offender_main'+ doxie_build.buildstate,out1)
-ut.MAC_SF_BuildProcess(Hygenics_SOff.OffenseFile,'~thor_data400::base::sex_offender_Offenses'+ doxie_build.buildstate,out2)
+PromoteSupers.MAC_SF_BuildProcess(Hygenics_SOff.MainFile,'~thor_data400::base::sex_offender_main'+ doxie_build.buildstate,out1)
+PromoteSupers.MAC_SF_BuildProcess(Hygenics_SOff.OffenseFile,'~thor_data400::base::sex_offender_Offenses'+ doxie_build.buildstate,out2)
 
 
 // Run scrubs stats and email scrubs reports

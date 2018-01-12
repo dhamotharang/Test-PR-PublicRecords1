@@ -1,4 +1,4 @@
-import Bair, SALT32;
+﻿import Bair, SALT32;
 EXPORT proc_GeoHash(string pversion, boolean pUseProd = false, boolean pUseDelta = false, boolean EmptyBase = false) := MODULE
 	_mo_bfile_  	   			:= Bair.files('', pUseProd, pUseDelta).mo_Base.built(eid<>''      and quarantined = '0',x_coordinate<>0,         y_coordinate<>0);
 	Person_bfile   			:= Bair.files('', pUseProd, pUseDelta).persons_Base.built(eid<>'' and quarantined = '0',persons_x_coordinate<>0, persons_y_coordinate<>0);
@@ -191,7 +191,8 @@ EXPORT proc_GeoHash(string pversion, boolean pUseProd = false, boolean pUseDelta
 												,plate_state
 												},record,merge,few);
 
-		j1:=join(distribute(d_mo,hash(eid)),distribute(d_per,hash(eid))
+		j1:=join(distributed(d_mo,hash(eid)),distributed(d_per,hash(eid))
+		// j1:=join(d_mo, d_per
 						,left.eid=right.eid
 						,transform({d_mo,{d_per} - eid}
 							,self:=left
@@ -201,7 +202,8 @@ EXPORT proc_GeoHash(string pversion, boolean pUseProd = false, boolean pUseDelta
 						,local
 						);
 
-		Eve_bfile:=join(j1,distribute(d_vh,hash(eid))
+		Eve_bfile:=distribute(join(distributed(j1, hash(eid)),distributed(d_vh,hash(eid))
+		// Eve_bfile:=join(j1, d_vh
 						,left.eid=right.eid
 						,transform({j1,{d_vh} - eid}
 							,self:=left
@@ -209,7 +211,7 @@ EXPORT proc_GeoHash(string pversion, boolean pUseProd = false, boolean pUseDelta
 							)
 						,left outer
 						,local
-						);
+						), hash(eid));
 	
 	export GeoHash_Keys() := FUNCTION
 						

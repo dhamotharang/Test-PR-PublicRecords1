@@ -1,4 +1,4 @@
-import ut, aid, data_services,AID_Support;
+﻿import ut, aid, data_services,AID_Support;
 
 export proc_buildaddressid (string filedate) := function
 
@@ -6,7 +6,7 @@ export proc_buildaddressid (string filedate) := function
 
 //ds_pat_raw	:= dataset(ut.foreign_prod+'~thor_data400::in::patriot_file_raw', patriot.Layout_Patriot, flat);
 ds_pat_raw	:= dataset('~thor_data400::in::patriot_file_raw', patriot.Layout_Patriot, flat);
-ds_fse_raw	:= dataset(ut.foreign_prod+ 'thor_data400::in::patriot_file_fse_raw', patriot.Layout_Patriot, flat); 
+ds_fse_raw	:= dataset(Data_Services.foreign_prod+ 'thor_data400::in::patriot_file_fse_raw', patriot.Layout_Patriot, flat); 
 
 ds_file			:= ds_pat_raw + ds_fse_raw;
 

@@ -72,6 +72,38 @@ export Layouts := module
 			BIPV2_Best.Layouts.Base;
 		end;
 		
+		export Layout_sele_relative :=
+		record
+			unsigned6 seleid1                     ;
+			unsigned6 seleid2                     ;
+			integer2  duns_number_score           ;
+			integer2  duns_number_cnt             ;
+			integer2  enterprise_number_score     ;
+			integer2  enterprise_number_cnt       ;
+			integer2  source_score                ;
+			integer2  source_cnt                  ;
+			integer2  contact_score               ;
+			integer2  contact_cnt                 ;
+			integer2  address_score               ;
+			integer2  address_cnt                 ;
+			integer2  namest_score                ;
+			integer2  namest_cnt                  ;
+			integer2  charter_score               ;
+			integer2  charter_cnt                 ;
+			integer2  fein_score                  ;
+			integer2  fein_cnt                    ;
+			integer2  mname_score                 ;
+			integer2  contact_ssn_score           ;
+			integer2  contact_phone_score         ;
+			integer2  contact_email_username_score;
+			unsigned4 dt_first_seen_track         ;
+			unsigned4 dt_last_seen_track          ;
+			unsigned4 dt_first_seen_contact_track ;
+			unsigned4 dt_last_seen_contact_track  ;
+			unsigned2 total_cnt                   ;
+			integer2  total_score                 ;
+		 end;
+		
 	end;
 	
 	////////////////////////////////////////////////////////////////////////

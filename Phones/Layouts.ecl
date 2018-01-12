@@ -1,4 +1,4 @@
-IMPORT Autokey_batch,Doxie, BatchShare, PhonesInfo;
+﻿IMPORT Autokey_batch,DeltabaseGateway,Doxie, BatchServices, BatchShare, iesp, PhonesInfo;
 
 EXPORT Layouts :=
 MODULE
@@ -14,6 +14,7 @@ MODULE
 	RECORD(doxie.layout_pp_raw_common)
 		BatchIn batch_in;
 	END;
+	
 	EXPORT Deltabase := MODULE	
 		// Deltabase Layouts
 		EXPORT dValue := RECORD
@@ -48,10 +49,72 @@ MODULE
 			STRING  ExceptionMessage								 {XPATH('Exceptions/Exception/Message')};
 		END;	
 	END;	
-	EXPORT PhoneAttributes := MODULE
-	EXPORT gatewayQuery:=record
-		STRING10 phone;
+	
+	
+	
+	
+
+	EXPORT gatewayHistory := RECORD
+		RECORDOF(DeltabaseGateway.Key_Deltabase_Gateway.Historic_Results);
 	END;
+
+	EXPORT ZumigoIdentity := MODULE
+		EXPORT subjectName := RECORD
+			UNSIGNED6 lexid;
+			STRING20 	nameType;
+			STRING20 	first_name;
+			STRING20 	last_name;		
+		END;
+		
+		business := RECORD
+			UNSIGNED6 busult_id;
+			UNSIGNED6 busorg_id;
+			UNSIGNED6 bussele_id;
+			UNSIGNED6 busprox_id;
+			UNSIGNED6 buspow_id;
+			UNSIGNED6 busemp_id;
+			UNSIGNED6 busdot_id;
+			STRING120 business_name;
+		END;
+		
+		address := RECORD
+			STRING20 	addressType;
+			BatchServices.Layouts.layout_batch_common_address;
+		END;
+		
+		EXPORT subjectVerificationRequest := RECORD
+			STRING	 	acctno;
+			UNSIGNED1 sequence_number;			
+			STRING10 	phone;
+			subjectName;
+			business;
+			address;
+		END;
+	
+		EXPORT zIn := RECORD
+			STRING acctno;
+			UNSIGNED1 sequence_number;
+			STRING MobileDeviceNumber;
+			iesp.zumigo_identity.t_ZIdNameToVerify Name;
+			iesp.zumigo_identity.t_ZIdSubjectAddress Address;
+		END;
+		
+		EXPORT zOut := RECORD
+			STRING acctno:='';
+			UNSIGNED1 sequence_number :=0 ;
+			gatewayHistory;
+		END;
+		// Deltabase format specific to report services only 
+	 EXPORT zDeltabaseLog := RECORD
+	   DATASET(zOut) Records {XPATH('Records/Rec')};
+	 END;
+	
+	END;
+
+	EXPORT PhoneAttributes := MODULE
+		EXPORT gatewayQuery:=RECORD
+			STRING10 phone;
+		END;
 		EXPORT BatchIn := RECORD
 			BatchShare.Layouts.ShareAcct;
 			BatchShare.Layouts.SharePhone;

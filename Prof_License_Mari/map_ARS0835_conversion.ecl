@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take ARS0835 Professional License raw files and convert them to a common
 //  professional license (BASE) layout to be used for MARI and PL_BASE development.
 //	01/04/2013 Cathy Tio - Modified for new layout change (removal of DOB) and new work flow
@@ -145,19 +145,20 @@ EXPORT map_ARS0835_conversion(STRING pVersion) := FUNCTION
 		SELF.NAME_MID			  	:= IF(GoodFirstName = '' AND GoodName_MID != '','',GoodNAME_MID);			
 		
 		SELF.NAME_SUFX				:= TRIM(tempSufxName,LEFT,RIGHT);				
-		tempNameOrg 					:= SELF.NAME_LAST+ ' '+SELF.NAME_FIRST;
+		tempNameOrg 					 := SELF.NAME_LAST+ ' '+SELF.NAME_FIRST;
 		SELF.NAME_ORG 				:= stringlib.stringcleanspaces(tempNameOrg);
 		
-    SELF.NAME_OFFICE    := MAP(StringLib.StringFind(stripNameOffice, 'DBA',1) > 0=>TRIM(REGEXFIND('^(.*)DBA(.*)',stripNameOffice,1),LEFT,RIGHT),
+  SELF.NAME_OFFICE    := MAP(StringLib.StringFind(stripNameOffice, 'DBA',1) > 0=>TRIM(REGEXFIND('^(.*)DBA(.*)',stripNameOffice,1),LEFT,RIGHT),
 		                           TRIM(stripNameOffice,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_MID +SELF.NAME_LAST,ALL)=> '',
-															 stripNameOffice);
+														               TRIM(stripNameOffice,ALL) = TRIM(SELF.NAME_FIRST + SELF.NAME_LAST,ALL)=> '',
+													                stripNameOffice);
 
 		SELF.OFFICE_PARSE   := MAP(SELF.NAME_OFFICE != '' AND StringLib.StringFind(TRIM(SELF.NAME_OFFICE,LEFT,RIGHT),' ',1) < 1 => 'GR',
 															 SELF.NAME_OFFICE != '' AND Prof_License_Mari.func_is_company(SELF.NAME_OFFICE) => 'GR',
 															 SELF.NAME_OFFICE != '' AND REGEXFIND('(AND|APPRAISAL$|BRANCH|BLACKWOOD TEAM|COMMERCIAL|C0|DATA|'+
 																																		'^INC|MARKETING|REMAX|SEARCHERS|THE)',SELF.NAME_OFFICE) => 'GR',
-															SELF.NAME_OFFICE != '' AND NOT Prof_License_Mari.func_is_company(SELF.NAME_OFFICE) 
-															AND NOT REGEXFIND('(AND|APPRIASAL$|BRANCH|BLACKWOOD TEAM|COMMERCIAL|C0|DATA|^INC|MARKETING|'+
+															 SELF.NAME_OFFICE != '' AND NOT Prof_License_Mari.func_is_company(SELF.NAME_OFFICE) 
+															 AND NOT REGEXFIND('(AND|APPRIASAL$|BRANCH|BLACKWOOD TEAM|COMMERCIAL|C0|DATA|^INC|MARKETING|'+
 																								'REMAX|SEARCHERS|THE)',SELF.NAME_OFFICE)=> 'MD','');		
 		
 		//Comment out next line because DOB is not in the input datasets

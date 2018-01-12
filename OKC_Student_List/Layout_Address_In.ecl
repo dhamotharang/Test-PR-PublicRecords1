@@ -1,0 +1,10 @@
+﻿EXPORT Layout_Address_In := RECORD
+	STRING	StudentID;
+	STRING	AddressType;
+	STRING	ADDRESS_1;
+	STRING	ADDRESS_2;
+	STRING	City;
+	STRING	State;
+	STRING	Zip;
+	STRING	Zip4;
+END;

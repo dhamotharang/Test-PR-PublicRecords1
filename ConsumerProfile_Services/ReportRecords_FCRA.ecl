@@ -1,4 +1,4 @@
-import iesp, risk_indicators, doxie, riskwiseFCRA, FCRA, suppress, riskwise, Consumerstatement, Address, Royalty, MDR, ut, gateway, FFD;
+﻿import iesp, risk_indicators, codes, doxie, riskwiseFCRA, FCRA, suppress, riskwise, Consumerstatement, Address, Royalty, MDR, gateway, FFD;
 
 EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReportBy in_rec,
 												  ConsumerProfile_Services.IParam.options in_param,
@@ -8,6 +8,9 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 	//Insufficient Input alert
 	input_alert := ConsumerProfile_Services.Functions.checkForAlertsFromInput(in_rec, in_param);
 	boolean insufficient_input := exists(input_alert);
+	
+	//Test data
+	test_rec := ConsumerProfile_Services.TestSeed_Function(in_rec, in_param);
 	
 	//Create a boolean to check if Bocashell and headers should be run in case we either have an insufficient input or test data is enabled.
 	//This is to avoid platform feature of IF statement which would execute this code otherwise
@@ -228,14 +231,15 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 		self.SSNInfo.Valid 					:= if(ssn_issuance.valid, 
 																		 ConsumerProfile_Services.Constants.SSN_INFO.VALID, 
 																		 ConsumerProfile_Services.Constants.SSN_INFO.INVALID);
-		self.SSNInfo.IssuedLocation := ut.St2Name(ssn_issuance.issue_state);
+		self.SSNInfo.IssuedLocation := codes.St2Name(ssn_issuance.issue_state);
 		self.SSNInfo.IssuedStartDate:= iesp.ECL2ESP.toDate(ssn_issuance.low_issue_date);
 		self.SSNInfo.IssuedEndDate 	:= iesp.ECL2ESP.toDate(ssn_issuance.high_issue_date);
 		self.HighRiskIndicators 		:= choosen(project(hri_ds, xformHRIOut(left)), iesp.Constants.MaxCountHRI);
 		self.ConsumerStatement 			:= if(has_consumer_statement, sort(consumer_statement, -dateCreated)[1].cs_text, '');
-		self.Alerts 								:= choosen(alerts, iesp.Constants.ConsumerProfile.MAX_COUNT_ALERTS);
-		self.StatementIds 					:= choosen(fcra_header_best.StatementIds, iesp.Constants.MaxConsumerStatementIds);
-		self.isDisputed 						:= fcra_header_best.isDisputed;		
+		self.Alerts 								 := choosen(alerts, iesp.Constants.ConsumerProfile.MAX_COUNT_ALERTS);
+		// blanking out below because these are redundant and to be deprecated by ESP (JIRA: ESPBS-467)
+		self.isDisputed	:= false;
+		self.StatementIds := [];				
 	end;
 	
 	statement_output_fcra := if(ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);	
@@ -256,7 +260,8 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 	null_final_rec := dataset([xformNull()]);
 	
 	out_rec := map(nullResults => null_final_rec,
-								 final_rec);
+																in_param.test_data_enabled => test_rec,
+																final_rec);
 								 
 	//DEBUG
 	// output(in_rec, named('in_rec'));

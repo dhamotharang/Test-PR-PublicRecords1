@@ -1,4 +1,4 @@
-import data_services, prte2_bankruptcy, prte2_corp, prte2_globalwatchlists,prte2_corp,prte2_doc,prte2_death_master,ut,
+﻿import data_services, prte2_bankruptcy, prte2_corp, prte2_globalwatchlists,prte2_corp,prte2_doc,prte2_death_master,ut,
 	prte2_gong,prte2_dlv2,prte2_email_data,prte2_faa,prte2_foreclosure,prte2_lnproperty,prte2_sexoffender,PRTE2_liens,Risk_Indicators,
 	prte2_paw,doxie_build,Relationship,prte2_vehicle,prte2_watercraft,prte2_prof_licensev2, header, std, doxie,prte2_header,BIPV2,
 	prte2_marriage_divorce,LiensV2, RoxieKeyBuild, prte2_phonesplus, AddressReport_Services, personReports,PRTE2_Infutor;
@@ -400,13 +400,21 @@ EXPORT file_combined_people(Boolean FCRA = false, Boolean dtc = false) := functi
 
 		people_grouped2 := project(people_grouped, people_grouped_layout2);
 		
-		people_j := join(people_grouped2, People_Owned_BDIDs.Records,
+		people_j1 := join(people_grouped2, People_Owned_BDIDs.Records,
 											left.did = right.did,
 											transform({people_grouped2},
-																self.owned_businesses_bdid := project(right.company_titles, Layouts.business_bdid_layout);
+																self.owned_businesses_bdid := choosen(project(right.company_titles, Layouts.business_bdid_layout),25);
 																self.Owned_Business_bdid_cnt := count(right.company_titles);
 																self := left;
 																), left outer);
+		people_j := join(people_j1, People_Owned_LinkIDs.Records,
+											left.did = right.did,
+											transform({people_grouped2},
+																self.owned_businesses_linkid := choosen(right.businesses_linkids,25);
+																self.Owned_Business_linkid_cnt := count(right.businesses_linkids);
+																self := left;
+																), left outer);															
+		
 
 		demorecs 	:= dataset([	
 									{888800000005,1,1,1,1,1,1,1,1,1,true ,1,1,1,1,1,1,false,true ,false,1,1,1,1,1,1,1,true ,1,1,1,1,1,1,1,1,1,[{1}],[{1}],1,1},

@@ -1,4 +1,4 @@
-IMPORT PRTE2_Watercraft, Watercraft, PRTE2, ut, Address, STD, AID_Support, AID, RoxieKeyBuild;
+﻿IMPORT PRTE2_Watercraft, Watercraft, PRTE2, ut, Address, STD, AID_Support, AID, RoxieKeyBuild;
 #constant(AID_Support.Constants.StoredWhichAIDCache, AID_Support.Constants.eCache.ForNonHeader);
 
 EXPORT proc_build_base(STRING fileVersion) := FUNCTION
@@ -8,6 +8,10 @@ ds_Alpha_Base	:= PRTE2_Watercraft.Files.Alpha_Base(watercraft_key <> '');
 
 //Spreadsheet updated by Data Insight
 ds_Boca_in := PRTE2_Watercraft.Files.Boca_in(watercraft_key <> '');
+
+//Clean invalid characters from input fields
+PRTE2.CleanFields(ds_Alpha_Base, dsCleanAlphaOut);
+PRTE2.CleanFields(ds_Boca_in, dsCleanBocaOut);
 									
 //Boca Base file
 PRTE2_Watercraft.Layouts.Base_new xfrmBoca(PRTE2_Watercraft.Layouts.Base_Boca L) := TRANSFORM
@@ -18,7 +22,6 @@ PRTE2_Watercraft.Layouts.Base_new xfrmBoca(PRTE2_Watercraft.Layouts.Base_Boca L)
 	self.orig_zip 		:= IF(trim(L.orig_zip) <> '' AND length(trim(L.orig_zip)) < 5, INTFORMAT((integer)L.orig_zip,5,1), L.orig_zip);
 	self.coastguard_flag		:= IF(L.source_code = 'CG', 'Y','');
 	self.persistent_record_id := hash64(trim(L.watercraft_key,left,right)+','+
-																		trim(L.sequence_key,left,right)+','+
 																		trim(L.watercraft_id,left,right)+','+
 																		trim(L.state_origin,left,right)+','+
 																		trim(L.source_code,left,right)+','+
@@ -118,7 +121,7 @@ PRTE2_Watercraft.Layouts.Base_new xfrmBoca(PRTE2_Watercraft.Layouts.Base_Boca L)
 	self := [];
 END;
 
-pBoca	:= PROJECT(ds_Boca_in, xfrmBoca(left));
+pBoca	:= PROJECT(dsCleanBocaOut, xfrmBoca(left));
 
 fPrevRecs	:= pBoca(trim(cust_name) = ''); //previous production records
 fNewRecs	:= pBoca(trim(cust_name) != ''); //New added records
@@ -193,9 +196,9 @@ ClnBocaBase	:= PROJECT(addr_clean, CleanNameAddr(left));
 //Append ID's
 PRTE2_Watercraft.Layouts.Base_New AddLinkID(ClnBocaBase L) := TRANSFORM
 	self.bdid						:= IF(trim(L.company_name) != '', (string)Prte2.fn_AppendFakeID.bdid(L.company_name, L.prim_range, L.prim_name, L.v_city_name, L.st, L.zip5, L.cust_name),'');
-	self.DID						:= IF(trim(L.lname) != '', (string)prte2.fn_AppendFakeID.did(L.fname, L.lname, L.orig_ssn, L.DOB, L.CUST_NAME), '');
+	self.DID						:= IF(trim(L.lname) != '', (string)prte2.fn_AppendFakeID.did(L.fname, L.lname, L.link_ssn, L.link_dob, L.cust_name), '');
 
-	vLinkingIds := prte2.fn_AppendFakeID.LinkIds(L.company_name, L.orig_fein, L.link_inc_date, L.prim_range, L.prim_name, L.sec_range, L.v_city_name, L.st, L.zip5, L.cust_name);
+	vLinkingIds := prte2.fn_AppendFakeID.LinkIds(L.company_name, L.link_fein, L.link_inc_date, L.prim_range, L.prim_name, L.sec_range, L.v_city_name, L.st, L.zip5, L.cust_name);
 	self.powid	:= vLinkingIds.powid;
 	self.proxid	:= vLinkingIds.proxid;
 	self.seleid	:= vLinkingIds.seleid;
@@ -210,8 +213,7 @@ pBocaBase	:= PROJECT(ClnBocaBase, AddLinkID(LEFT)) + fPrevRecs;
 RoxieKeyBuild.Mac_SF_BuildProcess_V2(pBocaBase, PRTE2_Watercraft.Constants.BASE_PREFIX, 'boca', fileVersion, build_base, 3);	
 
 //Add persistent_id to Alpharetta file for dedup purposes against Boca file as records overlap
-pAlphaBase := PROJECT(ds_Alpha_Base, TRANSFORM(PRTE2_Watercraft.Layouts.Base_New,SELF.persistent_record_id := hash64(trim(left.watercraft_key,left,right)+','+
-																		trim(left.sequence_key,left,right)+','+
+pAlphaBase := PROJECT(dsCleanAlphaOut, TRANSFORM(PRTE2_Watercraft.Layouts.Base_New,SELF.persistent_record_id := hash64(trim(left.watercraft_key,left,right)+','+
 																		trim(left.watercraft_id,left,right)+','+
 																		trim(left.state_origin,left,right)+','+
 																		trim(left.source_code,left,right)+','+

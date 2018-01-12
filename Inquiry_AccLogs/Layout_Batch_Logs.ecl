@@ -229,6 +229,7 @@ export subjects := record, maxlength(10000)
 	string orig_subj8_email;
 	string orig_subj8_company_name;
 	string orig_subj8_fein;
+	string orig_company_alternate_name;
 	
 end;	
 
@@ -343,10 +344,12 @@ export commonInput := record
 	 string orig_address2_z4;
 	 string orig_bdid;
 	 string orig_fein;
-	 string orig_phone;
+	 string orig_phone; 
 	 string orig_work_phone;
 	 string orig_email_address;
 	 string orig_company_name;
+	 string orig_process_id;
+	 string orig_company_alternate_name;	 
 
 end;  
 
@@ -366,7 +369,8 @@ EXPORT addedCleaned := record
 
 string datetime;
 string20 transaction_id;
-string sequence_number;                       
+string sequence_number;   
+string process_id;                    
 
 string20 	cmp_fax_number;         
 string9 	cmp_fein;                
@@ -376,6 +380,7 @@ string32 	cmp_business_structure;
 string3 	cmp_years_in_business; 
 string8 	cmp_bus_start_date;       
 string12 	cmp_yearly_revenue; 
+string100	cmp_alt_name;
 
 string30 	pii2_first_name;          
 string30 	pii2_middle_name;         

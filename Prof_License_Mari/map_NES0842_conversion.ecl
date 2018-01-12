@@ -1,4 +1,4 @@
-//************************************************************************************************************* */	
+﻿//************************************************************************************************************* */	
 //  The purpose of this development is take NE Real Estate License raw file and convert it to a common
 //  professional license (MARIFLAT_out) layout to be used for MARI and PL_BASE development.
 //************************************************************************************************************* */	
@@ -154,20 +154,19 @@ EXPORT map_NES0842_conversion(STRING pVersion) := FUNCTION
 																 );
 	
 	/*Default issue date is 17530101
-		Expire date is 12/31 each year based on last update date*/
-		temp_issue_yr					:= REGEXFIND(Datepattern,L.CURISSUEDT,3);
-		temp_issue_mon				:= REGEXFIND(Datepattern,L.CURISSUEDT,1);
-		temp_issue_day				:= REGEXFIND(Datepattern,L.CURISSUEDT,2);
-		pad_issue_mon					:= IF(LENGTH(temp_issue_mon) < 2, '0'+temp_issue_mon, temp_issue_mon);
-		pad_issue_day					:= IF(LENGTH(temp_issue_day) < 2, '0'+temp_issue_day, temp_issue_day);
-		SELF.CURR_ISSUE_DTE		:= IF(L.CURISSUEDT = ' ','17530101'
-																,TRIM(temp_issue_yr,LEFT,RIGHT) + TRIM(pad_issue_mon,LEFT,RIGHT) + TRIM(pad_issue_day,LEFT,RIGHT));
+According to the Nebraska Real Estate Commission website, all real estate licenses must be renewed once every two years.
+license expires on 1231 of the next year, unless it is issued after Nov 30.
+*/
+		
+		SELF.CURR_ISSUE_DTE		:= IF(L.CURISSUEDT = ' ','17530101',prof_license_mari.DateCleaner.ToYYYYMMDD(TRIM(L.CURISSUEDT)));
 		SELF.ORIG_ISSUE_DTE		:= '17530101';
-		next_year 						:= ((INTEGER2) StringLib.GetDateYYYYMMDD()[1..4])+1;
-		SELF.EXPIRE_DTE				:= MAP(SELF.LAST_UPD_DTE[5..8]< '1231' => StringLib.GetDateYYYYMMDD()[1..4]+'1231',
-																 SELF.LAST_UPD_DTE[5..8] >= '1231' => (STRING4)next_year+'1231',
-																 '17530101');
-																	
+
+ 	next_year 					  	:= ((INTEGER2) SELF.CURR_ISSUE_DTE[1..4])+1;
+ 	next_2_year 						:= ((INTEGER2) SELF.CURR_ISSUE_DTE[1..4])+2;
+	 SELF.EXPIRE_DTE			:= map(SELF.CURR_ISSUE_DTE[5..8] < '1201' => (STRING4)next_year +'1231',
+															         	  SELF.CURR_ISSUE_DTE[5..8] >= '1201' => (STRING4)next_2_year+'1231',
+																				       '17530101');
+																							
 		SELF.ADDR_BUS_IND			:= IF(StringLib.StringCleanSpaces(TRIM(L.ADDRESS1)+TRIM(L.ADDRESS2)) != ' ','B',' ');
 		SELF.NAME_ORG_ORIG		:= TRIM(UpperName,LEFT,RIGHT);
 		SELF.NAME_FORMAT			:= 'L';

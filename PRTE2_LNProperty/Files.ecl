@@ -1,11 +1,19 @@
 ﻿IMPORT UT, doxie, standard, ut, doxie_ln, NID,census_data, LN_Propertyv2,AID, AID_Build,BIPV2,LN_PropertyV2_Fast,std, PRTE2_LNProperty_Ins;
 EXPORT files := module
 
-	EXPORT ln_propertyv2_deed_in := DATASET('~PRTE::IN::ln_propertyv2::deed', Layouts.prte__ln_propertyV2__base__deed, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
+	ln_propertyv2_deed_in_all := DATASET('~PRTE::IN::ln_propertyv2::deed', Layouts.prte__ln_propertyV2__base__deed, CSV(HEADING(0), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
+ EXPORT ln_propertyv2_deed_in := ln_propertyv2_deed_in_all(ln_fares_id!='ln_fares_id');
 
-	EXPORT ln_propertyv2_tax_in := DATASET('~PRTE::IN::ln_propertyv2::tax', Layouts.prte__ln_propertyV2__base__tax, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
+	ln_propertyv2_tax_in_all := DATASET('~PRTE::IN::ln_propertyv2::tax', Layouts.prte__ln_propertyV2__base__tax, CSV(HEADING(0), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
+ 
+ Export ln_propertyv2_tax_in := project(ln_propertyv2_tax_in_all(ln_fares_id != 'ln_fares_id' and ln_fares_id != ''),
+ Transform(Layouts.prte__ln_propertyV2__base__tax,
+           self.cust_name:=if(Left.cust_name='0','',Left.cust_name);
+           Self:=Left;
+ ));
 
-	EXPORT ln_propertyv2_search_in := DATASET('~PRTE::IN::ln_propertyv2::search', Layouts.prte__ln_propertyV2__base__search, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
+ ln_propertyv2_search_in_all := DATASET('~PRTE::IN::ln_propertyv2::search', Layouts.prte__ln_propertyV2__base__search, CSV(HEADING(0), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
+ EXPORT ln_propertyv2_search_in :=ln_propertyv2_search_in_all(ln_fares_id!='ln_fares_id');
 
 	ln_propertyv2_deed_base := DATASET('~PRTE::BASE::ln_propertyv2::deed', Layouts.deed_mortgage_common_model_base_out, THOR );
 	EXPORT ln_propertyv2_deed := Project(ln_propertyv2_deed_base, Layouts.layout_deed_mortgage_common_model_base - [bug_num, cust_name]);

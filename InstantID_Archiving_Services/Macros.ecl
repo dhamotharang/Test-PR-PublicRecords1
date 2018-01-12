@@ -1,4 +1,4 @@
-IMPORT Doxie, ut;
+﻿IMPORT Doxie, ut;
 EXPORT Macros := MODULE
 
 	EXPORT mac_build_GetAndMassageSoapCall(selectStmt, ds_single_value, response_layout,  
@@ -329,6 +329,7 @@ EXPORT mac_GetCnts_nonRisk(ds_just_type_cnts, ds_cvi_cnts, iesp_out_layout,
 	ENDMACRO;	
 		
 	EXPORT mac_GetDisplayRowErrorsExceptions(errorCode, output_layout) := FUNCTIONMACRO
+import Risk_Indicators;		
 		iesp.share.t_WsException exceptionsS(output_layout l) := TRANSFORM
 				SELF.source := 'ROXIE';
 				SELF.code := 0;
@@ -340,7 +341,7 @@ EXPORT mac_GetCnts_nonRisk(ds_just_type_cnts, ds_cvi_cnts, iesp_out_layout,
 								TRANSFORM(iesp.share.t_ResponseHeader, SELF.exceptions := LEFT, SELF := []));
 						SELF := []; 
 		END;
-		DS := project(ut.ds_oneRecord, transform(output_layout, self := []));
+		DS := project(Risk_Indicators.iid_constants.ds_Record, transform(output_layout, self := []));
 		ds_of_Exceptions :=	DATASET(PROJECT(DS[1], xfm_soapErrors(LEFT)));	
 		
 		ds_output := ds_of_Exceptions;

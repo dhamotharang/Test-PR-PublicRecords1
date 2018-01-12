@@ -1,4 +1,4 @@
-IMPORT FCRA, Risk_indicators;
+﻿IMPORT FCRA, Risk_indicators;
 
 EXPORT Layouts_Derog_Info := MODULE
 
@@ -170,11 +170,13 @@ EXPORT Layouts_Derog_Info := MODULE
 		string FileTypeDesc;
 		string8 VendorDateLastSeen   ;  
 	END;
-	
+
 	EXPORT 	layout_derog_process_plus_working := RECORD
 		layout_derog_process_plus_slim_PR;
 		LNJ_attrs;		
 		Liens_Working;
+		string PersistId;
+		unsigned ConsumerStatementId;
 	END;	
 	
 	EXPORT layout_derog_process_plus_workingDF := RECORD
@@ -199,7 +201,8 @@ EXPORT Layouts_Derog_Info := MODULE
 		string10 FilingPage         ;    
 		string60 Agency             ;    
 		string35 AgencyCounty       ;    
-		string2 AgencyState         ;    
+		string2 AgencyState         ;  
+		unsigned ConsumerStatementId;
 	END;
 	
 	EXPORT Liens_seq := RECORD
@@ -225,7 +228,8 @@ EXPORT Layouts_Derog_Info := MODULE
 		string1 Eviction      ;                
 		string60 Agency       ;                
 		string35 AgencyCounty ;                
-		string2 AgencyState    ; 
+		string2 AgencyState    ;
+		unsigned ConsumerStatementId;
 	END;	
 	
 	EXPORT Judgments_seq := RECORD

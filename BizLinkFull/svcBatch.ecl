@@ -1,4 +1,4 @@
-IMPORT BizLinkFull;
+﻿IMPORT BizLinkFull;
 EXPORT svcBatch := MACRO
   BOOLEAN bIncludeBest:=FALSE:STORED('include_best');
   STRING sBestLevel:='SELEID':STORED('best_level');
@@ -139,3 +139,4 @@ EXPORT svcBatch := MACRO
   // reply with the output type the user requested.
   OUTPUT(BIPV2_Suppression.macSuppress(IF(bIncludeBest,dSeleBest,dAppended)),NAMED('Results'));
 ENDMACRO;
+

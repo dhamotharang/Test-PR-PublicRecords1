@@ -1,4 +1,4 @@
-import PromoteSupers,Enclarity,Enclarity_facility_sanctions;
+﻿import PromoteSupers,Enclarity,Enclarity_facility_sanctions;
 
 Export proc_build_ingenix_base(string filedate, boolean pUseProd = true) := function
 
@@ -28,20 +28,17 @@ PromoteSupers.MAC_SF_BuildProcess(Enclarity.As_Ingenix(filedate,pUseProd).Medsch
 																	'~thor_data400::base::ingenix_providers_medschool_bdid', bld_prov_med);
 				  
 //build sanction did file
-// update_BWR_Sanctions_Did_File - Enclarity backfill + Ingenix native Gap Sanctions
+// update_BWR_Sanctions_Did_File - Enclarity backfill + Enclarity Facility Sanctions
 d1a:=Enclarity.As_Ingenix(filedate,pUseProd).update_BWR_Sanctions_Did_File;
 d1b:=Enclarity_Facility_Sanctions.As_Ingenix(filedate,pUseProd).update_BWR_Sanctions_Did_File;
 d1:=d1a + d1b;
-		// + project(Ingenix_NatlProf.File_EnclaritySanctionGap,{Ingenix_NatlProf.update_BWR_Sanctions_Did_File});
-		// as of 20160630, there will be no Ingenix file.
 PromoteSupers.MAC_SF_BuildProcess(d1,'~thor_data400::base::ingenix_sanctions_did', bld_sanc_did);
 
 //build sanction bdid file
-// Sanctioned_providers_Bdid - Enclarity backfill + Ingenix native Gap Sanctions
+// Sanctioned_providers_Bdid - Enclarity backfill + Enclarity Facility Sanctions
 d2a:=Enclarity.As_Ingenix(filedate,pUseProd).Sanctioned_providers_Bdid;
 d2b:=Enclarity_Facility_Sanctions.As_Ingenix(filedate,pUseProd).Sanctioned_facilities_bdid;
 d2:=d2a + d2b;
-		// + project(Ingenix_NatlProf.File_EnclaritySanctionGap,{Ingenix_NatlProf.Sanctioned_providers_Bdid});
 PromoteSupers.MAC_SF_BuildProcess(d2,'~thor_data400::base::ingenix_sanctions_bdid', bld_sanc_bdid);
 
 //build provider license file
@@ -83,37 +80,22 @@ PromoteSupers.MAC_SF_BuildProcess(Enclarity.As_Ingenix(filedate,pUseProd).update
 // update_ProviderSanctions
 d3a:=Enclarity.As_Ingenix(filedate,pUseProd).update_ProviderSanctions;
 d3b:=Enclarity_Facility_Sanctions.As_Ingenix(filedate,pUseProd).update_ProviderSanctions;
-		// + project(Ingenix_NatlProf.File_EnclaritySanctionGap
-					// ,transform({Ingenix_NatlProf.update_ProviderSanctions}
-						// ,self.processdate:=left.process_date
-						// ,self.providerid:=left.sanc_id
-						// ,self.sanctiondate:=left.sanc_sancdte
-						// ,self.sanctioningstate:=left.sanc_state
-						// ,self.sanctionedlicensenumber:=left.sanc_licnbr
-						// ,self.licensereinstatementdate:=left.sanc_reindte
-						// ,self.sanctiontype:=left.sanc_type
-						// ,self.sanctionreason:=left.sanc_reas
-						// ,self.sanctionterms:=left.sanc_terms
-						// ,self.sanctionconditions:=left.sanc_cond
-						// ,self.sanctionfines:=left.sanc_fines
-						// ,self.sanctioningboardtype:=left.sanc_brdtype
-						// ,self.dt_first_seen:=left.date_first_seen
-						// ,self.dt_last_seen:=left.date_last_seen
-						// ,self.dt_vendor_first_reported:=left.date_first_reported
-						// ,self.dt_vendor_last_reported:=left.date_last_reported
-						// ,self.derivedlicreinstatedate:=left.derivedreinstatedate
-						// ,self:=left
-						// ,self:=[]
-					// ));
 d3:=d3a + d3b;
 PromoteSupers.MAC_SF_BuildProcess(d3,'~thor_data400::base::ingenix_ProviderSanctions', bld_ProviderSanctions);						   
 					 					   
-return parallel(	bld_prov_did, bld_prov_grp, bld_ProviderSanctions,        
-									bld_prov_hsp, bld_prov_rsd, 
-									bld_prov_med, bld_prov_lic,
+return parallel(	 bld_prov_did, 
+									bld_prov_grp, 
+									bld_ProviderSanctions,        
+									bld_prov_hsp, 
+									bld_prov_rsd, 
+									bld_prov_med, 
+									bld_prov_lic,
 									sequential(bld_sanc_did, bld_sanc_bdid),
-									bld_prov_language, bld_prov_UPIN, 
-									bld_prov_DEA, bld_prov_NPI,
-									bld_prov_degree, bld_prov_speciality
+									bld_prov_language, 
+									bld_prov_UPIN, 
+									bld_prov_DEA, 
+									bld_prov_NPI,
+									bld_prov_degree, 
+									bld_prov_speciality
 								);
 end;

@@ -1,4 +1,4 @@
-import	_control,RoxieKeyBuild,ut;
+﻿import	_control,RoxieKeyBuild,ut,Orbit3;
 
 export	proc_build_DNC(string	sourceIP,string	fileDate,string	NationalSourceFile,string	DMASourceFile	=	'',string	groupName	=	'thor400_44',string	emailTarget	=	' ')	:=
 function
@@ -53,6 +53,8 @@ function
 	buildKey	:=	DMA.proc_build_tps_all(fileDate).proc_build_key : success(sendSuccMsg),failure(sendFailMsg);
 	
 	updateVersion	:=	RoxieKeyBuild.updateversion('DoNotCallKeys',fileDate,'kgummadi@seisint.com;cbrodeur@seisint.com;randy.reyes@lexisnexis.com;manuel.tarectecan@lexisnexis.com;abednego.escobal@lexisnexis.com',,'N');
+
+  create_orbit_build:= Orbit3.proc_Orbit3_CreateBuild ('Do Not Call',fileDate,'N');	
 	
 	tpsBase		:=	distribute(DMA.file_suppressionTPS.Base,hash(phonenumber));
 	tpsFather	:=	distribute(DMA.file_suppressionTPS_father,hash(phonenumber));
@@ -83,6 +85,7 @@ function
 											buildBase,
 											buildKey,
 											updateVersion,
+											create_orbit_build,
 											qaRecs,
 											qaEmail
 										);

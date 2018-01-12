@@ -294,7 +294,7 @@ Address_Attributes.Layouts.BIP_RISK addVelocity(with_DNB l, PRTE2_BIPV2_BusHeade
 	SELF := l;
 END;
 
-w_velocity := JOIN(with_DNB, Address_Attributes.file_address_velocity,
+w_velocity := JOIN(with_DNB, PRTE2_BIPV2_BusHeader.file_address_velocity,
 	LEFT.zip 					= RIGHT.zip AND
 	LEFT.prim_range 	= RIGHT.prim_range AND
 	LEFT.prim_name 		= RIGHT.prim_name AND

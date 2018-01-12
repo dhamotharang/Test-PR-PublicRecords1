@@ -17,7 +17,7 @@ layout := RECORD // project out required fields
   h.contact_did_weight100 ; // Contains 100x the specificity
 END;
  
-s := BizLinkFull.Specificities(File_BizHead).Specificities[1];
+s := PRTE2_BIPV2_BusHeader.Specificities(PRTE2_BIPV2_BusHeader.File_BizHead).Specificities[1];
  
 DataForKey0 := DEDUP(SORT(TABLE(h((contact_did NOT IN SET(s.nulls_contact_did,contact_did) AND contact_did <> (TYPEOF(contact_did))'')),layout),contact_did,proxid,seleid,orgid,ultid,powid,contact_did_weight100,-fallback_value,LOCAL),WHOLE RECORD,EXCEPT fallback_value,LOCAL);
 SHARED DataForKey := DataForKey0;
@@ -30,7 +30,7 @@ EXPORT BuildAll := BUILDINDEX(Key, OVERWRITE);
   TSize := KeyCnt * SIZEOF(RECORDOF(Key)) / 1000000000; // Key size in gigs
   Grpd := GROUP(Key,proxid,contact_did,LOCAL); // Not perfect, does not need to be - for statistics
 EXPORT Shrinkage := DATASET([],SALT37.ShrinkLayout);
-EXPORT CanSearch(Process_Biz_Layouts.InputLayout le) := le.contact_did <> (TYPEOF(le.contact_did))'' AND BizLinkFull.Fields.InValid_contact_did((SALT37.StrType)le.contact_did)=0;
+EXPORT CanSearch(PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.InputLayout le) := le.contact_did <> (TYPEOF(le.contact_did))'' AND BizLinkFull.Fields.InValid_contact_did((SALT37.StrType)le.contact_did)=0;
 KeyRec := RECORDOF(Key);
  
 EXPORT RawFetch_server(TYPEOF(h.contact_did) param_contact_did = (TYPEOF(h.contact_did))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'') := 
@@ -54,10 +54,10 @@ END;
 EXPORT ScoredproxidFetch(TYPEOF(h.contact_did) param_contact_did = (TYPEOF(h.contact_did))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
   RawData := RawFetch(param_contact_did,param_fallback_value);
  
-  Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
+  PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
     SELF.keys_used := 1 << 16; // Set bitmap for keys used
     SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 16, 0); // Set bitmap for key failed
-    SELF.contact_did_match_code := BizLinkFull.match_methods(File_BizHead).match_contact_did(le.contact_did,param_contact_did,TRUE);
+    SELF.contact_did_match_code := BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_contact_did(le.contact_did,param_contact_did,TRUE);
     SELF.contact_didWeight := (50+MAP (
            le.contact_did = param_contact_did  => le.contact_did_weight100,
           le.contact_did = (TYPEOF(le.contact_did))'' OR param_contact_did = (TYPEOF(le.contact_did))'' => 0,
@@ -66,8 +66,8 @@ EXPORT ScoredproxidFetch(TYPEOF(h.contact_did) param_contact_did = (TYPEOF(h.con
     SELF := le;
   END;
   result0 := PROJECT(NOFOLD(RawData),Score(LEFT));
-  result1 := PROJECT(result0, Process_Biz_Layouts.update_forcefailed(LEFT,param_disableForce));
-  result2 := ROLLUP(result1,LEFT.proxid = RIGHT.proxid,Process_Biz_Layouts.combine_scores(LEFT,RIGHT,param_disableForce));
+  result1 := PROJECT(result0, PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.update_forcefailed(LEFT,param_disableForce));
+  result2 := ROLLUP(result1,LEFT.proxid = RIGHT.proxid,PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.combine_scores(LEFT,RIGHT,param_disableForce));
   RETURN result2;
 END;
  
@@ -79,11 +79,11 @@ EXPORT InputLayout_Batch := RECORD
 END;
 EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEAN In_disableForce = FALSE) := FUNCTION
  
-  Process_Biz_Layouts.LayoutScoredFetch Score_Batch(Key le,recs ri) := TRANSFORM
+  PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.LayoutScoredFetch Score_Batch(Key le,recs ri) := TRANSFORM
     SELF.Reference := ri.reference; // Copy reference field
     SELF.keys_used := 1 << 16; // Set bitmap for keys used
     SELF.keys_failed := 0; // Set bitmap for key failed
-    SELF.contact_did_match_code := BizLinkFull.match_methods(File_BizHead).match_contact_did(le.contact_did,ri.contact_did,TRUE);
+    SELF.contact_did_match_code := BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_contact_did(le.contact_did,ri.contact_did,TRUE);
     SELF.contact_didWeight := (50+MAP (
            le.contact_did = ri.contact_did  => le.contact_did_weight100,
           le.contact_did = (TYPEOF(le.contact_did))'' OR ri.contact_did = (TYPEOF(le.contact_did))'' => 0,
@@ -98,8 +98,8 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
   J1 := JOIN(Recs1,PULL(Key),LEFT.contact_did = RIGHT.contact_did,Score_Batch(RIGHT,LEFT),
     ATMOST(LEFT.contact_did = RIGHT.contact_did,BizLinkFull.Config_BIP.L_CONTACT_DID_MAXBLOCKSIZE),HASH,UNORDERED); // PULL used to cause non-indexed join
   J2 := IF(AsIndex,J0,J1);
-  J3 := PROJECT(J2, Process_Biz_Layouts.update_forcefailed(LEFT,In_disableForce));
-  J4 := Process_Biz_Layouts.CombineLinkpathScores(J3,In_disableForce); // Combine results and restrict number for one linkpath
+  J3 := PROJECT(J2, PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.update_forcefailed(LEFT,In_disableForce));
+  J4 := PRTE2_BIPV2_BusHeader.Process_Biz_Layouts.CombineLinkpathScores(J3,In_disableForce); // Combine results and restrict number for one linkpath
   DD := DISTRIBUTE(outdups,HASH(__Shadow_Ref)); // Restore dups driven in local mode
   SALT37.MAC_Dups_Restore(J4,DD,J5,Reference,TRUE)
   RETURN J5;
@@ -121,4 +121,3 @@ IMPORT SALT37,BizLinkFull;
 #END
 ENDMACRO;
 END;
-
