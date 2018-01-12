@@ -37,8 +37,7 @@ EXPORT FilterThruMBS(
   FdnMasterId_exclude_result := JOIN(
     ds_ids, FraudShared.Key_mbsfdnmasteridexclusion(fraud_platform), 
     KEYED (LEFT.classification_Permissible_use_access.fdn_file_info_id = RIGHT.fdn_file_info_id) 
-      AND RIGHT.FdnMasterId IN SetFdnMasterIds
-			AND RIGHT.Status = FraudShared_Services.Constants.ActiveStatus,  // Only active status records
+      AND RIGHT.FdnMasterId IN SetFdnMasterIds,
     TRANSFORM(LEFT), 
     LEFT ONLY);
           
@@ -46,8 +45,7 @@ EXPORT FilterThruMBS(
   ind_exclude_result := JOIN(
     FdnMasterId_exclude_result, FraudShared.Key_Mbsindtypeexclusion(fraud_platform),
     KEYED (LEFT.classification_Permissible_use_access.fdn_file_info_id = RIGHT.fdn_file_info_id) 
-      AND RIGHT.ind_type = ind_type_in
-			AND RIGHT.Status = FraudShared_Services.Constants.ActiveStatus,  // Only active status records
+      AND RIGHT.ind_type = ind_type_in,
     TRANSFORM(LEFT), 
     LEFT ONLY);  
           
@@ -60,8 +58,7 @@ EXPORT FilterThruMBS(
   pro_include_Code := JOIN(
     product_include_rest, FraudShared.Key_Mbsproductinclude(fraud_platform),
     KEYED (LEFT.classification_Permissible_use_access.fdn_file_info_id = RIGHT.fdn_file_info_id) 
-      AND product_code_in = RIGHT.product_id
-			AND RIGHT.Status = FraudShared_Services.Constants.ActiveStatus,  // Only active status records
+      AND product_code_in = RIGHT.product_id,
     TRANSFORM(LEFT),
     KEEP(FraudShared_Services.Constants.MAX_RECS_ON_JOIN),
     LIMIT(0));
