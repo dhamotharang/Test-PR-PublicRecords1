@@ -1,7 +1,7 @@
-EXPORT Spray_MA_Physician (string fdate) := module
+﻿EXPORT Spray_MA_Physician (string fdate) := module
 
 
-import lib_fileservices,_control;
+import lib_fileservices,_control,lib_thorlib;
 
 	string					CSVSeparator				:=	',';
 	string					CSVQuote						:=	'"';
@@ -11,7 +11,7 @@ import lib_fileservices,_control;
 	string					PHYSF				:=	'~thor_data400::in::prolic::ma::physicians_pl::raw';
 	string pServer			:= if ( _Control.ThisEnvironment.Name <> 'Prod_Thor' ,  _Control.IPAddress.bctlpedata12, _Control.IPAddress.bctlpedata11 );
          
-	string pGroupName			:= if ( _Control.ThisEnvironment.Name <> 'Prod_Thor' ,  'thor400_dev01', 'thor400_60' );
+	string pGroupName			:= thorlib.group();
 
 	
 	

@@ -1,4 +1,4 @@
-/*2011-07-06T18:43:20Z (Chris Albee_prod)
+﻿/*2011-07-06T18:43:20Z (Chris Albee_prod)
 Add BK daily files.
 */
 IMPORT BankruptcyV2, Business_Header, CellPhone, CourtLink, Corrections, Did_Add, Doxie, 
@@ -1070,15 +1070,15 @@ EXPORT product_files := MODULE
 		                                  : INDEPENDENT; //PERSIST('acctmon::liens::main::MA');
 
 		SHARED liens_main_pre_file := 
-				main_HOGAN_file(tmsid NOT IN Liensv2.Suppress_TMSID)
-			+ main_ILFDLN_file(tmsid NOT IN Liensv2.Suppress_TMSID)
-			+ main_NYC_file(tmsid NOT IN Liensv2.Suppress_TMSID)
-			+ main_NYFDLN_file(tmsid NOT IN Liensv2.Suppress_TMSID)
-			+ main_SA_file(tmsid NOT IN Liensv2.Suppress_TMSID)
-			+ main_chicago_law_file(tmsid NOT IN Liensv2.Suppress_TMSID)
-			+ main_CA_federal_file(tmsid NOT IN Liensv2.Suppress_TMSID)
-			+ main_superior_file(tmsid NOT IN Liensv2.Suppress_TMSID)
-			+ main_MA_file(tmsid NOT IN Liensv2.Suppress_TMSID);
+				main_HOGAN_file(tmsid NOT IN Liensv2.Suppress_TMSID())
+			+ main_ILFDLN_file(tmsid NOT IN Liensv2.Suppress_TMSID())
+			+ main_NYC_file(tmsid NOT IN Liensv2.Suppress_TMSID())
+			+ main_NYFDLN_file(tmsid NOT IN Liensv2.Suppress_TMSID())
+			+ main_SA_file(tmsid NOT IN Liensv2.Suppress_TMSID())
+			+ main_chicago_law_file(tmsid NOT IN Liensv2.Suppress_TMSID())
+			+ main_CA_federal_file(tmsid NOT IN Liensv2.Suppress_TMSID())
+			+ main_superior_file(tmsid NOT IN Liensv2.Suppress_TMSID())
+			+ main_MA_file(tmsid NOT IN Liensv2.Suppress_TMSID());
 
 		EXPORT main_file := 
 			PROJECT(liens_main_pre_file, 
@@ -1136,15 +1136,15 @@ EXPORT product_files := MODULE
 		                                   : INDEPENDENT; //PERSIST('acctmon::liens::party::MA');
 
 		EXPORT party_file := 
-				party_HOGAN_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-			+ party_ILFDLN_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-			+ party_NYC_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-			+ party_NYFDLN_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-			+ party_SA_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-			+ party_chicago_law_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-			+ party_CA_federal_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-			+ party_superior_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-			+ party_MA_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid));
+				party_HOGAN_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+			+ party_ILFDLN_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+			+ party_NYC_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+			+ party_NYFDLN_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+			+ party_SA_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+			+ party_chicago_law_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+			+ party_CA_federal_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+			+ party_superior_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+			+ party_MA_file((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid));
 	
 	END; // Liens
 	

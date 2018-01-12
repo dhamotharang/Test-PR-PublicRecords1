@@ -1,4 +1,4 @@
-export proc_build_allsources_base(string filedate) := function
+﻿export proc_build_allsources_base(string filedate) := function
 
 import LiensV2,	LiensV2_preprocess, Bankruptcyv2, ut, PromoteSupers;
 
@@ -15,15 +15,15 @@ END;
 
 HOGAN_main := project(LiensV2.file_Hogan_main, forkey(left));
 
-pre_file_liens_main := HOGAN_main(tmsid not in Liensv2.Suppress_TMSID)
-                        + LiensV2.file_ILFDLN_main(tmsid not in Liensv2.Suppress_TMSID)
-						+ LiensV2.file_NYC_main(tmsid not in Liensv2.Suppress_TMSID)
-						+ LiensV2.file_NYFDLN_main(tmsid not in Liensv2.Suppress_TMSID)
-						+ LiensV2.file_SA_main(tmsid not in Liensv2.Suppress_TMSID)
-						+ LiensV2.file_chicago_law_main(tmsid not in Liensv2.Suppress_TMSID)
-						+ LiensV2.file_CA_federal_main(tmsid not in Liensv2.Suppress_TMSID)
-						+ LiensV2.file_Superior_main(tmsid not in Liensv2.Suppress_TMSID)
-                        + LiensV2.file_MA_main(tmsid not in Liensv2.Suppress_TMSID);
+pre_file_liens_main := HOGAN_main(tmsid not in Liensv2.Suppress_TMSID())
+                        + LiensV2.file_ILFDLN_main(tmsid not in Liensv2.Suppress_TMSID())
+						+ LiensV2.file_NYC_main(tmsid not in Liensv2.Suppress_TMSID())
+						+ LiensV2.file_NYFDLN_main(tmsid not in Liensv2.Suppress_TMSID())
+						+ LiensV2.file_SA_main(tmsid not in Liensv2.Suppress_TMSID())
+						+ LiensV2.file_chicago_law_main(tmsid not in Liensv2.Suppress_TMSID())
+						+ LiensV2.file_CA_federal_main(tmsid not in Liensv2.Suppress_TMSID())
+						+ LiensV2.file_Superior_main(tmsid not in Liensv2.Suppress_TMSID())
+                        + LiensV2.file_MA_main(tmsid not in Liensv2.Suppress_TMSID());
 
 main := project(pre_file_liens_main, 
 						//transform(liensv2.Layout_liens_main_module.layout_liens_main, 
@@ -68,15 +68,15 @@ END;
 Hogan_party := project(LiensV2.file_Hogan_party, refHGPTY(left));
 
 
-pre_file_liens_party := Hogan_party((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-                        + LiensV2.file_ILFDLN_party((cname <> '' or lname <> '' or fname <> '' or mname <> '')and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-						+ LiensV2.file_NYC_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-						+ LiensV2.file_NYFDLN_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-						+ LiensV2.file_SA_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-						+ LiensV2.file_chicago_law_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-						+ LiensV2.file_CA_federal_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-						+ LiensV2.file_Superior_Party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
-						+ LiensV2.file_MA_Party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID and NOT regexfind('CAALAC1',tmsid))
+pre_file_liens_party := Hogan_party((cname <> ''or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+                        + LiensV2.file_ILFDLN_party((cname <> '' or lname <> '' or fname <> '' or mname <> '')and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+						+ LiensV2.file_NYC_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+						+ LiensV2.file_NYFDLN_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+						+ LiensV2.file_SA_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+						+ LiensV2.file_chicago_law_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+						+ LiensV2.file_CA_federal_party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+						+ LiensV2.file_Superior_Party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
+						+ LiensV2.file_MA_Party((cname <> '' or lname <> '' or fname <> '' or mname <> '') and tmsid not in Liensv2.Suppress_TMSID() and NOT regexfind('CAALAC1',tmsid))
 ;
 
 //Bugzilla #67215 - Populate 'Date_First_Seen'

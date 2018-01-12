@@ -23,7 +23,7 @@ module
   shared proxknames       := BIPV2_ProxID.keynames          (pversion,puseotherenvironment);
   shared lgid3knames      := BIPV2_LGID3.keynames           (pversion,puseotherenvironment);
   shared bestknames       := BIPV2_Best.Keynames            (pversion,puseotherenvironment);
-  shared relknames        := BIPV2_Relative.keynames        (pversion,puseotherenvironment);
+  // shared relknames        := BIPV2_Relative.keynames        (pversion,puseotherenvironment);
   shared Seleidrelknames  := BIPV2_Seleid_Relative.keynames (pversion,puseotherenvironment);
 
   //key definitions
@@ -41,11 +41,11 @@ module
   export lgid3_mtch_cand                := BIPV2_LGID3.Keys2(,pversion,puseotherenvironment).MatchCandidates;
   export lgid3_specs                    := BIPV2_LGID3.Keys2(,pversion,puseotherenvironment).Specificity    ;
   export best_linkids                   := tools.macf_FilesIndex('BIPV2_Best.Key_LinkIds.key                     ' ,bestknames.LinkIds                );
-  export relative_assoc                 := tools.macf_FilesIndex('BIPv2_Relative.keys(relbase).ASSOC             ' ,relknames.assoc                   );
+  // export relative_assoc                 := tools.macf_FilesIndex('BIPv2_Relative.keys(relbase).ASSOC             ' ,relknames.assoc                   );
   export Seleid_relative_assoc          := tools.macf_FilesIndex('BIPV2_Seleid_Relative.keys(Seleidrelbase).ASSOC' ,Seleidrelknames.assoc             );
   export Xlinkmeow                      := tools.macf_FilesIndex('BizLinkFull.Process_Biz_Layouts.Key            ' ,bizknames.meow                    );
-  export Xlinkrefs                      := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.Key                   ' ,bizknames.refs                    );
-  export Xlinkwords                     := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.ValueKey              ' ,bizknames.words                   );
+  // export Xlinkrefs                      := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.Key                   ' ,bizknames.refs                    );
+  // export Xlinkwords                     := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_.ValueKey              ' ,bizknames.words                   );
   export Xlinkrefs_l_cnpname            := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME.Key          ' ,bizknames.refs_l_cnpname          );
   export Xlinkrefs_l_cnpname_st         := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME_ST.Key       ' ,bizknames.refs_l_cnpname_st       );
   export Xlinkrefs_l_cnpname_zip        := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME_ZIP.Key      ' ,bizknames.refs_l_cnpname_zip      );
@@ -101,7 +101,7 @@ module
     ,if(pKey in [0 ,11] ,sequential(output(11 ,named('KeyNumber'),overwrite) ,output(choosen(lgid3_mtch_cand              .logical ,100),named('lgid3_mtch_cand'               ))))
     ,if(pKey in [0 ,12] ,sequential(output(12 ,named('KeyNumber'),overwrite) ,output(choosen(lgid3_specs                  .logical ,100),named('lgid3_specs'                   ))))
     ,if(pKey in [0 ,13] ,sequential(output(13 ,named('KeyNumber'),overwrite) ,output(choosen(best_linkids                 .logical ,100),named('best_linkids'                  ))))
-    ,if(pKey in [0 ,14] ,sequential(output(14 ,named('KeyNumber'),overwrite) ,output(choosen(relative_assoc               .logical ,100),named('relative_assoc'                ))))
+    // ,if(pKey in [0 ,14] ,sequential(output(14 ,named('KeyNumber'),overwrite) ,output(choosen(relative_assoc               .logical ,100),named('relative_assoc'                ))))
     ,if(pKey in [0 ,15] ,sequential(output(15 ,named('KeyNumber'),overwrite) ,output(choosen(Seleid_relative_assoc        .logical ,100),named('Seleid_relative_assoc'         ))))
     ,if(pKey in [0 ,16] ,sequential(output(16 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkmeow                    .logical ,100),named('Xlinkmeow'                     ))))
     // ,if(pKey in [0 ,17] ,sequential(output(17 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs                    .logical ,100),named('Xlinkrefs'                     ))))
