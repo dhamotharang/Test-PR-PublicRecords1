@@ -1,4 +1,4 @@
-import LN_Propertyv2,text_search;
+import LN_Propertyv2,text_search,Data_Services;
 
 	Text_assess_flat := record(Text_Search.Layout_Docseg)
 		typeof(LN_Propertyv2.File_Deed.ln_fares_id) ln_fares_id;
@@ -23,5 +23,5 @@ import LN_Propertyv2,text_search;
 	tmsid_map := dedup(sort_map,src,doc,local);
 
 export Key_Boolean_Map := index(if(fileservices.fileexists('~thor_data400::persist::ln_propertyv2::assessment::boolean'),
-																		tmsid_map,read_ret),{src,doc},{ln_fares_id},'~thor_data400::key::ln_propertyv2::assessment::qa::doc.fares_id');
+																		tmsid_map,read_ret),{src,doc},{ln_fares_id},Data_Services.Data_location.Prefix('Property')+'thor_data400::key::ln_propertyv2::assessment::qa::doc.fares_id');
 														

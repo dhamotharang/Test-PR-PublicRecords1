@@ -1,4 +1,4 @@
-import doxie, ln_property, ut;
+import doxie, Data_Services;
 
 dfd := ln_propertyV2.File_Assessment_building(ln_fares_id not in LN_PropertyV2.Suppress_LNFaresID, ln_fares_id != '');
 
@@ -30,4 +30,4 @@ export Key_Assessor_ParcelNum :=
 index(df,
 			{fares_unformatted_apn},
 			{ln_fares_id},
-			'~thor_Data400::key::ln_propertyV2::' + doxie.Version_SuperKey + '::assessor.parcelNum');
+			Data_Services.Data_location.Prefix('Property')+'thor_data400::key::ln_propertyV2::' + doxie.Version_SuperKey + '::assessor.parcelNum');

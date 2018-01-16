@@ -1,8 +1,8 @@
-import doxie_files, doxie,ut;
+import doxie,Data_Services;
 
 f_oshair := OSHAIR.file_out_hazardous_substance_cleaned;
 
 export Key_OSHAIR_hazardous_substance := index(f_oshair
                                               ,{Activity_Number}
 											  ,{f_oshair}
-											  ,'~thor_data400::key::oshair::hazardous_substance_'+doxie.Version_SuperKey);
+											  ,Data_Services.Data_location.Prefix()+'thor_data400::key::oshair::hazardous_substance_'+doxie.Version_SuperKey);

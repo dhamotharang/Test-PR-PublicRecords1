@@ -1,4 +1,4 @@
-import ut,doxie;
+import ut,doxie,Data_Services;
 
 xl_phonesplus := RECORD
 	Phonesplus_v2.Layout_Phonesplus_Base;
@@ -14,5 +14,5 @@ ut.mac_suppress_by_phonetype(f_phonesplus,cellphone,state,_dist_DSphonesplus_sli
 ut.mac_suppress_by_phonetype(_dist_DSphonesplus_slim1,cellphone,state,dist_DSphonesplus_slim,true,did);
 
 export Key_Royalty_Companyname := index(dist_DSphonesplus_slim,{Company},{fdid},
-                                         '~thor_data400::key::phonesplusv2_royalty_companyname_'+doxie.Version_SuperKey);
+                                         Data_Services.Data_location.Prefix()+'thor_data400::key::phonesplusv2_royalty_companyname_'+doxie.Version_SuperKey);
 

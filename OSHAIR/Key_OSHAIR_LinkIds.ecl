@@ -3,7 +3,7 @@ IMPORT BIPV2, Data_Services, doxie;
 EXPORT Key_OSHAIR_LinkIds := MODULE
 
   // DEFINE THE INDEX
-	EXPORT out_SuperKeyName		:= Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::oshair::linkids_'+ doxie.Version_SuperKey; //SuperKeyName
+	EXPORT out_SuperKeyName		:= Data_Services.Data_location.Prefix()+'thor_data400::key::oshair::linkids_'+ doxie.Version_SuperKey; //SuperKeyName
 
 	SHARED Base						  	:= OSHAIR.file_out_inspection_cleaned_both;
  

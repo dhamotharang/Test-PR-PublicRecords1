@@ -1,6 +1,7 @@
+import Data_Services;
 export Constants := module
 	
-	export Cluster		 := '~thor_200';
+	export Cluster		 := Data_Services.Data_location.Prefix()+'thor_200';
 	export ak_keyname  := Cluster + '::key::official_records::autokey::';
 	export ak_logical(string filedate='')	:= Cluster+'::key::official_records::'+
 	                                         filedate+'::autokey::';

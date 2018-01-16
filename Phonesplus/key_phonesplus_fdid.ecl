@@ -1,4 +1,4 @@
-import doxie_files, ut, doxie, autokey;
+import doxie, autokey, Data_Services;
 
 f_phonesplus := Phonesplus.file_phonesplus_base;
 
@@ -15,4 +15,4 @@ END;
 DS_phonesplus_xpand := project(f_phonesplus, xpand_phonesplus(left, counter));
 
 export key_phonesplus_fdid := index(DS_phonesplus_xpand,{fdid},{DS_phonesplus_xpand},
-                                  '~thor_data400::key::phonesplus_fdids_' + doxie.Version_SuperKey);
+                                  Data_Services.Data_location.Prefix()+'thor_data400::key::phonesplus_fdids_' + doxie.Version_SuperKey);

@@ -1,4 +1,4 @@
-import doxie;
+import doxie,Data_Services;
 
 p := patriot.Baddies;
 
@@ -10,7 +10,7 @@ END;
 
 keyrec := doxie.key_header;
 
-tmpi := INDEX(keyRec,{keyRec.s_did}, {keyrec}, '~thor_data400::key::header_QA'); 
+tmpi := INDEX(keyRec,{keyRec.s_did}, {keyrec}, Data_Services.Data_location.Prefix()+'thor_data400::key::header_QA'); 
 redist := DISTRIBUTE(p, tmpi, LEFT.did = RIGHT.s_did);
 
 p1 getBestName(redist le, tmpi ri) :=
@@ -28,4 +28,4 @@ j := JOIN(redist,tmpi,LEFT.did=RIGHT.s_did,getBestName(LEFT,RIGHT));
 r := PROJECT(DEDUP(SORT(j,did,nmscore),did),TRANSFORM(recordof(p), SELF := LEFT));
 
 
-export Key_Baddids_with_name := INDEX(r,{did},{r},'~thor_data400::key::patriot::Baddies_with_name_' + doxie.Version_SuperKey);
+export Key_Baddids_with_name := INDEX(r,{did},{r},Data_Services.Data_location.Prefix()+'thor_data400::key::patriot::Baddies_with_name_' + doxie.Version_SuperKey);

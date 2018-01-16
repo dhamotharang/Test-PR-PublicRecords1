@@ -1,4 +1,4 @@
-import doxie;
+import doxie,Data_Services;
 
 typeof(patriot.file_patriot_keybuild) upper(patriot.file_patriot_keybuild le) :=
 TRANSFORM
@@ -33,4 +33,4 @@ sec_range,
 p_city_name,
 v_city_name,
 st,
-zip},{p},'~thor_Data400::key::patriot_File_Full_' + doxie.Version_SuperKey);
+zip},{p},Data_Services.Data_location.Prefix()+'thor_data400::key::patriot_File_Full_' + doxie.Version_SuperKey);

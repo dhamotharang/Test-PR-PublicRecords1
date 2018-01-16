@@ -3,8 +3,8 @@ IMPORT BIPV2, Data_Services, doxie, AutoStandardI, MDR, ut;
 EXPORT Key_LinkIds := MODULE
 
   // DEFINE THE INDEX
-	//shared superfile_name		:= Data_Services.Data_location.Prefix('LN_PropertyV2') + 'thor_data400::key::ln_propertyv2::'+doxie.Version_SuperKey+'::search.linkIds';
-	shared superfile_name		:= '~' + 'thor_data400::key::ln_propertyv2::'+doxie.Version_SuperKey+'::search.linkIds';
+	shared superfile_name		:= Data_Services.Data_location.Prefix('LN_PropertyV2') + 'thor_data400::key::ln_propertyv2::'+doxie.Version_SuperKey+'::search.linkIds';
+	//shared superfile_name		:= '~' + 'thor_data400::key::ln_propertyv2::'+doxie.Version_SuperKey+'::search.linkIds';
 		
 	shared Base				:= LN_PropertyV2.file_search_building_Bip;
 	//shared dkeybuild	:= project(Base, transform(frandx.layouts.keybuild, self := left));

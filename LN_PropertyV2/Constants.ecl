@@ -1,3 +1,4 @@
+import Data_Services;
 export	Constants	:=
 module
 	// Autokey constants
@@ -8,7 +9,7 @@ module
 	export	ak_skipSet									:=	[];
 	
 	// boolean search
-	export	STRING		stem							:=	'~thor_data400';
+	export	STRING		stem							:=	Data_Services.Data_location.Prefix()+'thor_data400';
 	export	STRING		srcType 					:=	'ln_propertyv2';
 	export	STRING		srcTypeFastProp		:=	'property_fast';
 	export	STRING		qual							:=	'test';

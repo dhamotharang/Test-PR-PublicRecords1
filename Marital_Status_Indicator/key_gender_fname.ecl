@@ -1,4 +1,4 @@
-import watchdog, doxie;
+import watchdog, doxie, Data_Services;
 
 //layouts
 rInput := record
@@ -44,6 +44,6 @@ fname_gender := TABLE(ds_sort, fname_counts, ds_sort.fname);
 
 export key_gender_fname := index(fname_gender,
 																{fname},
-																{fname_gender},'~thor_data400::key::msi::' + doxie.Version_SuperKey + '::gender::fname');
+																{fname_gender},Data_Services.Data_location.Prefix()+'thor_data400::key::msi::' + doxie.Version_SuperKey + '::gender::fname');
 
  

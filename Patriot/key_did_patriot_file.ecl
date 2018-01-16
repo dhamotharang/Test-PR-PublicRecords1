@@ -1,4 +1,4 @@
-import doxie;
+import doxie,Data_Services;
 
 layout_pat_keybuild := record
 	patriot.Layout_Patriot;
@@ -24,4 +24,4 @@ j := JOIN(patriot.Dids_With_Namehook,ds,LEFT.fname=RIGHT.fname AND
 
 d := DEDUP(j,ALL);
 
-export key_did_patriot_file := INDEX(d,{did},{j},'~thor_data400::key::patriot_did_file_'+doxie.Version_SuperKey);
+export key_did_patriot_file := INDEX(d,{did},{j},Data_Services.Data_location.Prefix()+'thor_data400::key::patriot_did_file_'+doxie.Version_SuperKey);

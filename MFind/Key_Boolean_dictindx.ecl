@@ -1,4 +1,4 @@
-import liensv2;
+import Data_Services;
 
 
 tmsid_rec 
@@ -15,7 +15,7 @@ tmsid_rec
 
 tmsid_table := dataset([],tmsid_rec);
 
-export key_boolean_dictindx := index(tmsid_table,{word,nominal,suffix,freq,docfreq,fpos},'~thor_data400::key::mfind::qa::dictindx');
+export key_boolean_dictindx := index(tmsid_table,{word,nominal,suffix,freq,docfreq,fpos},Data_Services.Data_location.Prefix()+'thor_data400::key::mfind::qa::dictindx');
 
 
 

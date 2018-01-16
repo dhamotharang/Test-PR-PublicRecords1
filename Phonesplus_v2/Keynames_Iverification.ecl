@@ -1,4 +1,4 @@
-import tools;
+import tools,Data_Services;
 
 export Keynames_Iverification(
 
@@ -8,7 +8,7 @@ export Keynames_Iverification(
 ) :=
 module
 
-	export lFileTemplate	    := '~thor_data400::key::iverification::@version@::'	;
+	export lFileTemplate	    := Data_Services.Data_location.Prefix()+'thor_data400::key::iverification::@version@::'	;
 	
 	//shared lDid		:= lFileTemplate + 'did'	;
 	//shared lHhid			:= lFileTemplate + 'hhid'		;

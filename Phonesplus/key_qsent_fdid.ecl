@@ -1,4 +1,4 @@
-import doxie_files, ut, doxie, autokey;
+import doxie, autokey, Data_Services;
 
 f_qsent := Phonesplus.file_qsent_base(PublishCode != 'NP');
 
@@ -15,4 +15,4 @@ END;
 DS_qsent_xpand := project(f_qsent, xpand_qsent(left, counter));
 
 export key_qsent_fdid := index(DS_qsent_xpand,{fdid},{DS_qsent_xpand},
-                                  '~thor_data400::key::qsent_fdids_' + doxie.Version_SuperKey);
+                                  Data_Services.Data_location.Prefix()+'thor_data400::key::qsent_fdids_' + doxie.Version_SuperKey);

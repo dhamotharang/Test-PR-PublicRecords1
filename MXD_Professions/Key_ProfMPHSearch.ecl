@@ -1,4 +1,4 @@
-import doxie;
+import doxie,Data_Services;
 
 PROF_CATEGORIES := ENUM(unsigned1, ADMINISTRATION, CPA, DENTAL, IT, LEGAL, MEDICAL, NURSING, ENGINEERING, EDUCATION, FINANCIAL, MARKETING, UNKNOWN);
 PROF_PATTERN_ADMIN := '(ADMINISTRATION|MANAGEMENT|EXECUTIVE ASSISTANT|LEADERSHIP)';
@@ -139,4 +139,4 @@ dsProfMPHSearchRecs := p_recs_norm_mph;
 export Key_ProfMPHSearch := index(dsProfMPHSearchRecs,
 																	{search_type, n1_m1, n1_m2, n2_m1, n2_m2, n3_m1, n3_m2, minit, prof_cat, gender},															 
 																	{entity_id, rec_id},
-																	'~thor_data400::key::mxd_professions::'+doxie.Version_SuperKey+'::prof_mph_search_idx');
+																	Data_Services.Data_location.Prefix()+'thor_data400::key::mxd_professions::'+doxie.Version_SuperKey+'::prof_mph_search_idx');

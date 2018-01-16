@@ -1,4 +1,4 @@
-import _control, versioncontrol,ut;
+import _control, versioncontrol,ut, Data_Services;
 
 export _Dataset(
 
@@ -13,10 +13,13 @@ module
 																);
 												
 	export Name										:= 'Busreg'		;
-	export thor_cluster_Files			:= 	if(pUseOtherEnvironment 
-																			,foreign_environment + 'thor_data400::'
-																			,'~thor_data400::'
-																		);
+	//export thor_cluster_Files			:= 	if(pUseOtherEnvironment 
+	//																		,foreign_environment + 'thor_data400::'
+	//																		,'~thor_data400::'
+	//
+	//																		);
+	export thor_cluster_Files			:= 	data_services.Data_location.prefix()+'thor_data400::'; 
+																		
 	export thor_cluster_Persists	:= thor_cluster_Files		;
 	export max_record_size				:= 4096									;
 
