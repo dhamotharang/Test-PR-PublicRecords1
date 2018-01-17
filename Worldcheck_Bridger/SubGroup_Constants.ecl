@@ -1026,6 +1026,7 @@
 		export string KEYWORD_USFHFA									:= '714';
 		export string KEYWORD_OFAC_GLOMAG								:= '715';
 		export string KEYWORD_USCFPB									:= '716';
+		export string KEYWORD_TWMOJ									:= '717';
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	
