@@ -138,7 +138,13 @@ shared rels      := MAP(doThor                       => relsThor,
 												IF(HighConfidenceAssociates AND title=44,total_score>=79,TRUE) AND
 												IF(RelLookbackMonths>0 AND rel_dt_last_seen>0,rel_dt_last_seen>LookbackDate,TRUE));
 
-shared relsFlat := functions_getRelationship.convertNeutralToFlat(rels);
+relsNew := functions_getRelationship.convertNeutralToFlat(rels);
+shared relsFlat := relsNew(cohabit_score>0 or coapt_score>0 or copobox_score>0 or cossn_score>0 or copolicy_score>0
+													 or coclaim_score>0 or coproperty_score>0 or bcoproperty_score>0 or coforeclosure_score>0
+													 or bcoforeclosure_score>0 or colien_score>0 or bcolien_score>0 or cobankruptcy_score>0
+													 or bcobankruptcy_score>0 or covehicle_score>0 or coexperian_score>0 or cotransunion_score>0
+													 or coenclarity_score>0 or coecrash_score>0 or bcoecrash_score>0 or cowatercraft_score>0
+													 or coaircraft_score>0 or comarriagedivorce_score>0 or coucc_score>0 or type='TRANS CLOSURE');
 
 shared txonly := relsFlat(type NOT IN ['PERSONAL','TRANS CLOSURE']);
          
