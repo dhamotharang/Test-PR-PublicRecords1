@@ -1,6 +1,7 @@
-EXPORT _fns_offense_category := module
+﻿EXPORT _fns_offense_category := module
    
 export In_Global_Exclude (string poffense_in,string pcategory ) := function 
+
 
 special_characters := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
 poffense           := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
@@ -65,10 +66,6 @@ vio_set            := '[/\\. ]VIO[LATIONG]*[/\\. ]|[/\\. ]VIO[LATED]*[/\\. ]|VIO
 	             REGEXFIND('PRE'                                   ,poffense,0) <> '' and 
 							 REGEXFIND('TRIAL'                                 ,poffense,0) <> '' => 'Y',	   
 							 
-               // REGEXFIND('DISOBE|REV'             ,poffense,0) <> '' and 
-	             // REGEXFIND('COURT|CRT|CT'           ,poffense,0) <> '' and 
-							 // REGEXFIND('ORD'                    ,poffense,0) <> '' => 'Y',		
-							 
 							 REGEXFIND(vio_set+'|REV|RVK[D]*|REVO[CK]*|DISOBE' ,poffense,0) <> '' and 
 	             REGEXFIND('SUSP'                                  ,poffense,0) <> '' and 
 							 REGEXFIND('SENT'                                  ,poffense,0) <> '' => 'Y',	
@@ -105,6 +102,11 @@ vio_set            := '[/\\. ]VIO[LATIONG]*[/\\. ]|[/\\. ]VIO[LATED]*[/\\. ]|VIO
 							 REGEXFIND('WRIT [OF ]*HABEAS CORPUS|HOLD FOR ANOTHER AGENCY|ZONING VIOLATION[S]*|ZONING COMPLAINTS|' +
 							           'ZONING[ |\\-|/]+PERMIT[S]*|F/T PAY FINE[S]*|PETITION FOR|PETITION TO',poffense,0) <> '' => 'Y',	
 							 
+               REGEXFIND('ACCESSORY|ACCOMPLICE|CONSPIRE|CONSPIRACY'          ,poffense,0) <> '' and
+               REGEXFIND('ARSON|BRIBE|BURGLARY|FORGE|FRAUD|KIDNAP|ABDUCT|ROBBERY|ASSAULT|A&B|ASSLT|A\\.B\\.W\\.I\\.K|'+
+							           'ABDGR|ASSLT|WOUNDING|AGG BATTERY|ABWIK|CHILD ABUSE',poffense,0) <> '' => 'Y',
+												 
+	             // trim(poffense) in _fmod_offense_category_list.Globallist =>'Y',
 							 'N');
 							 
 return Is_it;							 
@@ -121,10 +123,9 @@ Arson            := 'ARS0N|ARSON';
 Arson_exc        := 'LARS[0O]N|CARS[0O]N|PEARS[0O]N|PARS[0O]N|PARS[0O]NS|OSBURN|BURNET';
 
    Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
-	 
-             	 //this was added to test the history file.
-							 //REGEXFIND('VIOLATE COAL HAUL' ,poffense,0) <> '' => 'Y',						 
-	 
+	             
+							 //trim(poffense) in _fmod_offense_category_list.ArsonList =>'Y',
+
 	             REGEXFIND('BURN'                      ,poffense,0) <> '' AND              
 							 REGEXFIND('CERTAIN'                   ,poffense,0) <> '' AND
 							 REGEXFIND('BUILD'                     ,poffense,0) <> '' AND
@@ -137,6 +138,7 @@ Arson_exc        := 'LARS[0O]N|CARS[0O]N|PEARS[0O]N|PARS[0O]N|PARS[0O]NS|OSBURN|
 							 REGEXFIND(Arson ,poffense,0) <> '' and
 							 REGEXFIND(Arson_exc ,poffense,0) = ''=> 'Y',	               
 							 'N');
+							 
 return Is_it;
 end;
 
@@ -144,14 +146,14 @@ end;
 
 export Is_Robbery_Res(string poffense_in) := function
 special_characters    := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
-poffense        := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
+poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-Robbery                        := 'ROBB[EYING]+|ROB[B]+[RE]*R[Y]*|CAR[ ]*JACK[ING]*|AGG ROB|ROBB[/\\. ]|ROBB[0-9]|[/\\. ]R.[B]+ERY|ROBBB|[R]+OBERY'; 
-Robbery_exc                    := 'PROBATION|PROBHIB'; 
-comm      := 'BANK|STORE|BUILD|BLDG|COMMERC|COMMER[CI]+AL|[/ ]BUS[/\\. ],BU[S]+IN|BUS[INS]+';
+Robbery               := 'ROBB[EYING]+|ROB[B]+[RE]*R[Y]*|CAR[ ]*JACK[ING]*|AGG ROB|ROBB[/\\. ]|ROBB[0-9]|[/\\. ]R.[B]+ERY|ROBBB|[R]+OBERY'; 
+Robbery_exc           := 'PROBATION|PROBHIB'; 
+comm                  := 'BANK|STORE|BUILD|BLDG|COMMERC|COMMER[CI]+AL|[/ ]BUS[/\\. ],BU[S]+IN|BUS[INS]+';
 	
   Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
-	
+	             // trim(poffense) in _fmod_offense_category_list.RobberyResidentialList =>'Y',
 	             REGEXFIND('ARM|ATT|PERSON|INTENT'    ,poffense,0) <> '' and
 							 REGEXFIND('ROB'                      ,poffense,0) <> '' and 
 							 REGEXFIND(Robbery_exc                ,poffense,0) =  '' and
@@ -159,7 +161,10 @@ comm      := 'BANK|STORE|BUILD|BLDG|COMMERC|COMMER[CI]+AL|[/ ]BUS[/\\. ],BU[S]+I
 							 
 	             REGEXFIND(Robbery                    ,poffense,0) <> '' and 
 							 REGEXFIND(Robbery_exc                ,poffense,0)  = '' and 
-							 REGEXFIND(comm                       ,poffense,0)  = '' => 'Y',	               
+							 REGEXFIND(comm                       ,poffense,0)  = '' => 'Y',
+							 
+							 REGEXFIND(' PC 211 |PC 664[/]211 |PC 215 A ',poffense,0)  <> '' => 'Y',
+							 
 							 'N');
 return Is_it;
 end;
@@ -167,7 +172,7 @@ end;
 
 export Is_Robbery_comm(string poffense_in) := function
 special_characters    := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
-poffense        := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
+poffense  := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
 //DF-18286 - code review comment #2, change CAR[ ]*JACKING to CAR[ ]*JACK[ING]* as in Is_Robbery_res.
 Robbery   := 'ROBB[EYING]+|ROB[B]+[RE]*R[Y]*|CAR[ ]*JACK[ING]*|AGG ROB|ROBB[/\\. ]|ROBB[0-9]|[/\\. ]R.[B]+ERY|ROBBB|[R]+OBERY';  
@@ -192,28 +197,24 @@ exclusion := 'PROBATION|PROBHIB|PRIVACY|TRES|TRSP';
 return Is_it;
 end;
 //--------------------------------------------------------------------------------------------------------------------------------------
-
 export Is_Homicide(string poffense_in) := function
 
-special_characters    := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
-poffense        := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
+special_characters:= '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
+poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-Homicide1                      := 'HOM[IO]C[IDE]*|MURDER|M[A]*NSL[AU]*G[HTER]*|AWDWIKISI|AWDWI[TS]|AWDW[/ ]|HIOMICIDE|MNS[IL]GHT[E]*R';
+Homicide1        := 'HOM[IO]C[IDE]*|MURDER|M[A]*NSL[AU]*G[HTER]*|AWDWIKISI|AWDWI[TS]|AWDW[/ ]|HIOMICIDE|MNS[IL]GHT[E]*R|PC 246\\.3|PC 246 |PC 664[/]211 |PC 664[/]187 A |PC 187 A |PC 192 C ';
 
-Homicide2a                     := 'KILL|DEATH|ADMINISTER|WILFUL';
-Homicide2b                     := 'INTENT|CAUSE|RESULT|POISON|MURDER|HOMICIDE';
+Homicide2a       := 'KILL|DEATH|ADMINISTER|WILFUL';
+Homicide2b       := 'INTENT|CAUSE|RESULT|POISON|MURDER|HOMICIDE';
 
-// Homicide2c                     := 'KNIFE|WEAPON|FIREARM';
-// Homicide2d                     := 'INTENT|MURDER|HOMICIDE';	
+Homicide_exc     := 'ALLIG$|ALLIGATOR|ANI[N]?MAL|ANIM$| ANTE$|ANTERLESS| BEAR|BIRD|CALF| CAT[TLE]|COW|DEER|[ |\\/|\\.]DOG[\\/|S| |$]| DOVE|DUCK| FOWL|GEESE|HORSE|MOOSE| OWL|PHEASANT|POULTRY|SPECIE[S|$]|TURKE[R]?Y|WATER[F]?OWL|WILDLIFE|WILD ANIM|[ |/]FISH';
 
-// Homicide_exc                   := 'ANIMAL|DOG';
-Homicide_exc                   := 'ALLIG$|ALLIGATOR|ANI[N]?MAL|ANIM$| ANTE$|ANTERLESS| BEAR|BIRD|CALF| CAT[TLE]|COW|DEER|[ |\\/|\\.]DOG[\\/|S| |$]| DOVE|DUCK| FOWL|GEESE|HORSE|MOOSE| OWL|PHEASANT|POULTRY|SPECIE[S|$]|TURKE[R]?Y|WATER[F]?OWL|WILDLIFE|WILD ANIM|[ |/]FISH';
-
-Ha                             := 'ATMUR|A TO MUR|A[/]MUR |AG MUR|AT MUR|AT[/]MUR|MUR[/ ]2N|MUR 2ND|MUR[/ ]REIN|MUR W[/]MAL|MUR WO|MUR W/O REIN|MUR WITH MALICE|'+
-                                  'MUR WM|MUR[/ ]W[/]*O[/ ]MAL|MUR WOM|ACC[/]MUR|MUR[/]HAB|MUR[/ ]MAL|MUR[/]MOTOR|MUR[/]PO|MUR[/]W[/]M|MUR[/]W[/]MAL|MUR[/]WO'; 
+Ha               := 'ATMUR|A TO MUR|A[/]MUR |AG MUR|AT MUR|AT[/]MUR|MUR[/ ]2N|MUR 2ND|MUR[/ ]REIN|MUR W[/]MAL|MUR WO|MUR W/O REIN|MUR WITH MALICE|'+
+                    'MUR WM|MUR[/ ]W[/]*O[/ ]MAL|MUR WOM|ACC[/]MUR|MUR[/]HAB|MUR[/ ]MAL|MUR[/]MOTOR|MUR[/]PO|MUR[/]W[/]M|MUR[/]W[/]MAL|MUR[/]WO'; 
 
   Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
-	
+	             // trim(poffense) in _fmod_offense_category_list.HomicideList =>'Y',
+							 
 							 //Roger's comment - QA Update - Homicide Round 3 8/26
 	             REGEXFIND('KILL'       							 							,poffense,0) <> '' and
 							 REGEXFIND('INTENT'     				 										,poffense,0) <> '' and
@@ -235,8 +236,15 @@ Ha                             := 'ATMUR|A TO MUR|A[/]MUR |AG MUR|AT MUR|AT[/]MU
 							 REGEXFIND('ANIM|BEAR|ANTLERL|ANTE|LIVESTOCK|ALLIGATOR|HAWK|CHICKEN|SPOTLIGHT|SPTLIHT|SPOT|SPLIT|W/SP| DEER' ,poffense,0) = '' 
 							 => 'Y',
 							 
+							 REGEXFIND('SHOOT'             ,poffense,0) <> '' and
+							 REGEXFIND('THROW|DEADLY'      ,poffense,0) <> '' and
+							 REGEXFIND('MIS[SI]*LE|MALIC'  ,poffense,0) <> '' => 'Y',
+							 
 							 REGEXFIND('HOMI'       ,poffense,0) <> '' and
 							 REGEXFIND('CRIM|NEG|VE[C]*H|AGG|ATT'  ,poffense,0) <> '' => 'Y',
+							 
+							 REGEXFIND('POISON'            ,poffense,0) <> '' AND   
+							 REGEXFIND('LIQUOR|FOOD|WATER|ATTEMPT|MEDICINE| WELL[S]* ',poffense,0) <> '' => 'Y',
 							 
 							 REGEXFIND('W[/]?I[NTENT]? [TO ]?[/]?KILL|W[/]?I TO KILL',poffense,0) <> '' and
 							 REGEXFIND('PISTOL'  									 ,poffense,0) <> '' => 'Y',
@@ -269,20 +277,29 @@ Ha                             := 'ATMUR|A TO MUR|A[/]MUR |AG MUR|AT MUR|AT[/]MU
 	             (REGEXFIND('BY'        ,poffense,0) <> '' or 
 							  (REGEXFIND('CRIM'     ,poffense,0) <> '' and REGEXFIND('OPER' ,poffense,0) <> '')
 							 )	 and
-							 REGEXFIND('VE[C]*H'        ,poffense,0) <> '' => 'Y',
+							 REGEXFIND('VE[C]*H'       ,poffense,0) <> '' => 'Y',
 							 
-							 REGEXFIND('POISON'     ,poffense,0) <> '' and
-							 REGEXFIND('INTENT'     ,poffense,0) <> '' => 'Y',
+							 REGEXFIND('POISON'        ,poffense,0) <> '' and
+							 REGEXFIND('INTENT'        ,poffense,0) <> '' and 
+							 REGEXFIND('INTENT TO DIST',poffense,0) = '' => 'Y',
 							 
 	             REGEXFIND('MURD'       ,poffense,0) <> '' and
 	             REGEXFIND('MURDOCK'    ,poffense,0) = '' and
 							 REGEXFIND(Homicide_exc ,poffense,0) = '' => 'Y',
+							 
+	             REGEXFIND('SHOOT[ING ]+' 						              ,poffense,0) <> '' and //VC 20170519 email
+	             REGEXFIND('MALIC[IOUS ]+' 									        ,poffense,0) <> '' and
+	             REGEXFIND(Homicide_exc,poffense,0) = '' => 'Y',
 
 							 //QA Update - Homicide/Weapons round 6
 	             REGEXFIND('FIRE|FIRING|PROPULSION|PROPEL' 						,poffense,0) <> '' and
 	             REGEXFIND('MISSIL[E]?[S]?|MILLILES' 									,poffense,0) <> '' and
 	             REGEXFIND('VEH[ICLE]?[S]?|DWELL|BUILD[ING]?|AIRCRAFT',poffense,0) <> '' and
 	             REGEXFIND(Homicide_exc,poffense,0) = '' => 'Y',
+							 
+               REGEXFIND('DSCHG' 						                        ,poffense,0) <> '' and
+	             REGEXFIND(' F/A |FIREARM|WEAPON|WEAP|WPN ' 					,poffense,0) <> '' and
+	             REGEXFIND('BUILDING|BLDG| BLD |DWELL'                ,poffense,0) <> '' => 'Y', 
 
 	             REGEXFIND(Homicide1 ,poffense,0) <> '' and
 	             (REGEXFIND(Homicide_exc ,poffense,0) = '' 
@@ -302,20 +319,23 @@ end;
 
 export Is_DrivingUndertheInfluence(string poffense_in) := function
 
+
 special_characters    := '~|=|!|-|\\^|\\+|:|\\(|\\)|,|;|_|#|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
 poffense        := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-// DrivingUndertheInfluence :=    'DRIV(.*)UND(.*) INFL|[ ]DU[0-9II]+[ ]*|D[U]I[/\\. ]|[ ]DWUIL[/ ]|[ ][0O][\\.]*V[\\.]*I[\\./ ]| OMVI[/\\. ]|'+
-DrivingUndertheInfluence :=    'DRIV(.*)UND(.*) INFL|[ ]DUI[0-9&]+[ ]*|D[U]I[/\\. ]|' +
+DrivingUndertheInfluence :=    'DRIV(.*)UND(.*) INFL|[ ]DUI[0-9&]+[ ]*|D[U]I[/\\. ]|OPERATING W[/ ]+PAC|OPERATING WITH PAC|OPER VEH WH INT [(]OWI[)]|' +
+                               'DRIV/OPR/W/UND/INFLUENCE|DRIVING/U/INFLUENCE|DRIV/U/INFLU|DRIVE/INFLUENCE|DRIVING W/U THE INFLUENCE|DRIVE WHILE UN INFLUENCE|'+
                                //Roger's comment QA Update - Traffic Round 4
                                'DRIVE U/THE|DRIVE UINDER INFLU|DRIVING [WHIL ]*[UMDER ]*[THE ]*INFLU|DRIVING INFLU|DRIV\\. .* INFLUENCE|' +
-															 'BOATING UND/INFLU|DRIV[E]*[ING]* [U/I|UTI]|' +
-                               '[ ]DWUIL[/ ]|[ ][0O][\\.]*V[\\.]*I[\\./ ]| OMVI[/\\. ]|'+
+															 'BOATING UND/INFLU|DRIV[E]*[ING]* U[/]I|DRIV[E]*[ING]* UTI|' +
+                               '[ ]DWUIL[/ ]|[ ][0O][\\.]*V[\\.]*I[\\./ ]| OMVI[/\\. ]|MV UNDER INFL ALC|'+
                                '[/ \\.]DWAI| D\\.[U]\\.I|[/ ]D[/ \\.]*U[/ \\.]*I[I/\\. ]*[/ ]+| D[ ][U][ ]I |'+
 															 '^[ ]*BUI[/ ]|DR(.*)V[I]*NG WHILE INTOX| D W I[0-9]|^ BREATH[/ ]|BREATHAL[IYERZ]+|BLOOD/BREATH|'+
 															 'BLOOD[- ]+[\\.][0-9]+| W[/]*[\\. ]08[%]| W[/][\\. ]08[% ]|BLOOD SERUM|BLOOD ALCOHOL|[ ]*B[/\\.]*A[/\\.]*C[/\\.0-9 ]+|[ ]DUI[ ]|'+
-															 '[\\.][810]+[%]BAC[&/ ]|[ ]APC[/ ]|[ ]A[\\.]P[\\.]C[\\. ]|[/\\.0-9 ]APC[VIMUF]* ';
-dwi                      := 	 '[ ]D[ ][UW][ ]I[ ]|^[ ]DWI[/ ]| D\\.[UW]\\.I|[/ ]D[/ \\.]*W[/ \\.]*I[/ \\.]*[)/ ]|D[W]I[/\\. ]';	
+															 '[\\.][810]+[%]BAC[&/ ]|[ ]APC[/ ]|[ ]A[\\.]P[\\.]C[\\. ]|[/\\.0-9 ]APC[VIMUF]* |'+
+															 '316\\.193\\.1|316\\.193\\.1A| OMVUAC | O M V I |[/ \\.]DUIL[/ \\.]|[/ \\.]DUID[/ \\.]';
+dwi                      := 	 '[ ]D[ ][UW][ ]I[ ]|^[ ]DWI[/ ]| D\\.[UW]\\.I|[/ ]D[/ \\.]*W[/ \\.]*I[/ \\.]*[)/ ]|D[W]I[/\\. ]|'+
+                               'VC 23152 [AB] |VC 23153 [AB] |VC 23222 [AB] |VC 21200\\.5|VC 23140 [A] ';	
 
                                              
 Dwiexc_list	             :=  'AWDWI|BALDWIN|DWIPER|HARDWIRE|SANDWICH|BOARDWITH|DWIGHT|CHADWICK|GOODWIN|GOODWILL|EDWIN|BANDWID|TO[B]+AC|TA[B]+AC|TOPBAC';															 
@@ -323,7 +343,7 @@ Dwiexc_list	             :=  'AWDWI|BALDWIN|DWIPER|HARDWIRE|SANDWICH|BOARDWITH|D
 DUIexc_list	             :=  'TO[B]+AC|TA[B]+AC|TOPBAC';														 
 															 
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
- 
+             // trim(poffense_in) in _fmod_offense_category_list.DUIList =>'Y',
              REGEXFIND('BREATH'                ,poffense,0) <> '' and
              REGEXFIND(' DRUI |CONCENTRAT| PRELIM| O[VP]ER[\\./ ]| RTS | FTS |REF[ED]+ | REFED | RE[FS]+[UALSEFG]* | REUSE[D]*| RFSE |O[M]*VUAC| FAIL[/]| FAIL[LURED]* | TEST | RESULT[S]* | ALC[H]* |ALCO[HOL]* |SAMPLE|[ ][\\.][0-9]{2}[0-9 ]* | [0]*[\\.][ ]*1[0-9][% ]| PAC |[/ ]REFUS|[/ ]REF[/\\. ]'        ,poffense,0) <> '' => 'Y',
 
@@ -332,10 +352,10 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
              REGEXFIND(' OR | OF |THAN'        ,poffense,0) <> '' => 'Y',
 						                                                         //check later   
 						 REGEXFIND('[/ ]DR[\\.V ]|DRI[BCING]*[/ ]|DR[OI]V| DR[VING]* |DR[UV]+ING |[/ ]OP[\\.V ]|[/\\. ][O]+P[E]*R[RATINGEOD]*[/\\. ]|OPER[SA]T[IONG]+'    ,poffense,0) <> '' and
-						 REGEXFIND('WHILE|VE[C]*H|MOTOR'       ,poffense,0) <> '' and
-             REGEXFIND('INTOX|DRUG|[/\\. ]LIQ[/\\. ]'    ,poffense,0) <> '' => 'Y',
+						 REGEXFIND('WHILE|VE[C]*H|MOTOR'                              ,poffense,0) <> '' and
+             REGEXFIND('[/\\. ]INTX[/\\. ]|INTOX|DRUG|[/\\. ]LIQ[/\\. ]|[/\\. ]OWI[/\\. ]'    ,poffense,0) <> '' => 'Y',
 						 
-						 REGEXFIND('C[O]*NSUMP'             ,poffense,0) <> '' and
+  					 REGEXFIND('C[O]*NSUMP'             ,poffense,0) <> '' and
 						 REGEXFIND('VE[C]*H|MOTOR'              ,poffense,0) <> '' and
              REGEXFIND('INTOX|DRUG|[/\\. ]LIQ[/\\. ]'    ,poffense,0) <> '' => 'Y',
  
@@ -401,12 +421,24 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 REGEXFIND('OPEN CONT'            ,poffense,0) <> '' and
 						 REGEXFIND('D[/\\.]*U[/\\.]*I[/\\.]*|D[/ \\.]*W[/ \\.]*I[/ \\.]*|D [WU] I|DRIV(.*)UND(.*) INFL(.*)|DRIV(.*)INTOX'  ,poffense,0) <> '' => 'Y',
 
+						 REGEXFIND('DUI DRIV[EING]+'             ,poffense,0) <> '' and
+						 REGEXFIND('WHILE'                       ,poffense,0) <> '' and
+						 REGEXFIND('UNSER|UNJDER|INDER|UINDER'   ,poffense,0) <> '' and
+						 REGEXFIND('INFLU[E]*NCE|INFLUNC|INFLU'  ,poffense,0) <> '' => 'Y',
+						 
+						 REGEXFIND('REFUSAL'                     ,poffense,0) <> '' and
+						 REGEXFIND('SUBMIT'                      ,poffense,0) <> '' and
+						 REGEXFIND('TEST'                        ,poffense,0) <> '' => 'Y',
+						 
              REGEXFIND(DrivingUndertheInfluence ,poffense,0) <> '' AND
 						 REGEXFIND(DUIexc_list ,poffense,0)              =  '' => 'Y',	    
 						 
 						 REGEXFIND(dwi ,poffense,0) <> '' AND
 						 REGEXFIND(Dwiexc_list ,poffense,0)              =  '' => 'Y',
 							 'N');
+
+
+
 return Is_it;
 end;
 
@@ -414,40 +446,38 @@ end;
 
 export Is_Assault_aggr(string poffense_in) := function
 
-
 special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
 poffense        := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-Assault         := 'AGG/ASS|ABDGR|ABGEN|ABOFF|ABHAN|ABWIK|ABWITK|STRANGUL|AWDW| MENACING';
+Assault         := 'AA/DW|AGG/ASS|ABDGR|ABGEN|ABOFF|ABHAN|ABWIK|ABWITK|STRANGUL|AWDW|STRANGLE|784\\.03\\.1A2|784\\.03\\.1A1|AA[/]DW[/]FV|AA[/]DW/|AA[/]SBI[/]DW[/]FV|784.021.1A|DDLY CONDUCT|'+
+                   'PC 243 [BD] |PC 245 [AC] ';
 Assault2        := 'A[\\.& ]+B[\\. ]+H[ \\.&]+A[\\. ]+N[\\. ]*|A[\\. ]+B[\\. ]+W[ \\.]+I[\\. ]+K[\\. ]*|A[\\. ]+B[\\. ]+W[\\. ]+I[\\. ]+T[\\. ]+K[\\. ]*';								 
 Assault3        := 'ASS[LAN]+UTL|ASSL|AS[SL]*AU[LK]*T|AS[S]+ULT |AS[S]+AULT| A[/]B |'+
                    'ASSA|AS[S]+U|ASST|ASSLT|ASLT|AS[S]*AULT|ASSAT|[/\\. ]AS[L][/\\. ]|ABDOM|ABGEN|ABOFF|BATTER|PHYS[ICAL\\.]+ HARM|SS[A]*U[A]*[/0-9\\. ]|ASSLT|[/0-9\\. ]ASLT[/0-9 ]|ASSAT |'+
 									 'ABDOM|ABGEN|ABOFF|BATTER|PHYS[ICAL\\.]+ HARM|[ |^|\\.|/]A[ ]*&[ ]*B[ |\\.|$|/]';
-                   
 
-// Battery         := '^[ ]*BATT[GERY/ ]+|BATTER|BAT|DOM[\\.MESTIC ]+VIO|[D]*OMESTI(.*) VIO|[/\\. ]BTRY[/\\. ]|[\\. ]ABUS[\\. ]| A&B|MENACING';                     
 Battery         := '^[ ]*BATT[GERY/ ]+|BATTER| BAT |^[ ]*BAT | BAT$|DOM[\\.MESTIC ]+VIO|[D]*OMESTI(.*) VIO|[/\\. ]BTRY[/\\. ]|[\\. ]ABUS[\\. ]| A[ ]*&[ ]*B|MENACING';
 
-//Roger's comment 7/6 QA Updates for  Assault - Aggravated
-aggravated      := 'AGG|AGGR[\\.]|AG[G]+R|AG[G]+RA[CV]ATED|AGGAVAT|AGG[TGV] |AGGVA|[/\\. ]FEL[/\\. ]|FELONY|FELONI[O]*US|' +
+//Roger's comment 7/6 QA Updates for  Assault - Aggravated 
+aggravated      := 'AGG|AGGR[\\.]|AG[G]+R|AG[G]+RA[CV]ATED|AGGAVAT|AGG[TGV] |AGGVA|[/\\. ]FEL[/\\. ]|FELONY|FELONI[O]*US|DDLY[/ ]CONDUCT|' +
                    'DANGEROUS W|[/\\. ]W/DE[/\\. ]|INTEN[T]*[\\.]* [TO ]*KILL|[^| ]WEAP| WPN|WEPON|MURD|ACT OF VIOLENCE|'+
 									 'W[/]*I[NT]*[EN]*[T]* [TO ]*KILL|INTENT T/KILL|PISTOL[ |$]';                                                 
 assault_exc     := 'SEX|RAPE|MOLEST|PORN|FOWL|[\\-|\\.|\\(| ]GAME|PETS|LIVESTOCK|NOISE|GOOSE|FRUIT|ELECTRICAL|HIGHWAY|TELEPHONE|SHELTER|ROSTER';                     										                                                                                                                      
-// assault_exc1    := 'CHILD [ABUSE.]*ENDANGER|ENDANGERMENT/CHILD|ENDANGER[ING]* [A ]*CH[I]?LD';                    										                                                                                                                      
+                    										                                                                                                                      
 assault_exc1    := 'AGG. CHILD ABUSE|AGGRAVATED CHILD ABUSE|CHILD [ABUSE.]*ENDANGER|ENDANGERMENT/CHILD|ENDANGER[ING]* [A ]*CH[I]?LD';                    										                                                                                                                      
 exc             := 'GOAT|PUP|ROBB| PET |PONY|CHOW |TORTIS|PIG|LLAMA|DUCK|FERRET|PARROT|CHIHUAHUAHOUND|SHEP|BIRDS|ROMULUS|KITTEN|ROTT[I]*|RO[T]+WEI|CANINE|LAB | TAB |L[I]*VST[OC]*K|NONLVST';									
-// aggravated_exc  := 'AGGRESSIVE|PROBAT|REVOC|SEX|KIDN|SODOMY|RAPE|PORN|MOLE|NO WPN';	
+	
 aggravated_exc  := 'AGGRESSIVE|REVOC|SEX|KIDN|SODOMY|RAPE|PORN|MOLE|NO WPN';	
   
 Terrorist_Threats  := 'TERRORIST|TERROR[ISTM]*|W[EA]*P[ON]* MASS DES[RUCT]+';
-Terrorist_ecl      := 'HARM|FALSE INFO';
+Terrorist_ecl      := 'HARM|FALSE INFO|FALSE REPORT';
 
 // Roger's comment - Round 8 Assault Other 20161114 File
 TT2a := 'EXPLOSIV|BOMB|WEAP[ON]*|WPN|WEPON|MURD| GUN[ |/|$]|FIRE[ ]?ARM|F/ARM| ARMED|DESTRUCTIVE DEVICE';
 TT2b := 'TERR';
 
 Is_it := MAP( In_Global_Exclude(poffense,'ASSAULT')='Y' => 'N',
-							
+														 
 							 REGEXFIND('CRUELTY'        ,poffense,0) <> ''  and
 							 REGEXFIND('HORSE|ANIM|ANAIMAL|ANIAL|ANML|A[IMN]I+[MN]+[AL]*|CATS|PIT[ ]*BULL'        ,poffense,0) <> ''=> 'N',
 							 
@@ -459,36 +489,43 @@ Is_it := MAP( In_Global_Exclude(poffense,'ASSAULT')='Y' => 'N',
 							 //Roger's comment QA Update - Assault - Aggravated Round 4 9/23/16, 9/27/16
                REGEXFIND('REVOC' 																			,poffense,0) <> '' OR
 						   (REGEXFIND('PROBAT', poffense,0) <> '' AND REGEXFIND('H[O]?LD|VIO[L]?', poffense,0) <> '') => 'N',
+							 
+        REGEXFIND('[\\. ]POSS[\\. ]|POSS[ESSION]+| CARRY' 																			,poffense,0) <> '' OR
+						  REGEXFIND('ASSAULT WEAPON|ASSAULT FIREARM|ASLT WPN|INELEIGIBLE PERSON|CONVICTION|UNLAWFUL|PUBLIC PLACE', poffense,0) <> '' => 'N',
+							 
 	             REGEXFIND('DEAD|DEATH'  			 ,poffense,0) <> '' and
 							 REGEXFIND('CONDUCT|THREAT'		 ,poffense,0) <> '' => 'Y',
-	             REGEXFIND('THREAT|THRT'  		 ,poffense,0) <> '' and
-							 REGEXFIND(TT2a  	 						 ,poffense,0) <> '' => 'Y',
+				
+							 REGEXFIND(' MOB | RIOT '  		 ,poffense,0) <> '' and
+							 REGEXFIND('ACTION'		         ,poffense,0) <> '' => 'Y',
 							 
-							 REGEXFIND(aggravated_exc      ,poffense,0) <>  '' OR
-							 REGEXFIND(assault_exc         ,poffense,0) <>  '' OR
-							 REGEXFIND(exc                 ,poffense,0) <>  '' => 'N',	
+	             REGEXFIND('THREAT|THRT'  		      ,poffense,0) <> '' and
+							 REGEXFIND(TT2a  	 						      ,poffense,0) <> '' and 
+							 REGEXFIND('FALSE REPORT|FALSE INFO|FALSE',poffense,0) =  '' => 'Y',
+							 
+							 REGEXFIND(aggravated_exc           ,poffense,0) <>  '' OR
+							 REGEXFIND(assault_exc              ,poffense,0) <>  '' OR
+							 REGEXFIND(exc                      ,poffense,0) <>  '' => 'N',	
 
-							 //Roger's comment QA Update - Assault - Aggravated Round 4 9/23/16
-	             REGEXFIND('DEAD'  						 ,poffense,0) <> '' and
-							 REGEXFIND('CONDUCT'  				 ,poffense,0) <> '' => 'Y',
-	             REGEXFIND('THREAT|THRT'  		 ,poffense,0) <> '' and
-							 REGEXFIND(TT2a  	 						 ,poffense,0) <> '' => 'Y',
 
 							 //Roger's comment 8/26 QA Updates for  Assault - Aggravated Round 3
 						   REGEXFIND('CH[I]?LD'                           ,poffense,0) <> '' and
                REGEXFIND('ENDANGERMENT|ENDANGERING|ENDANGER ' ,poffense,0) <> '' and
 							 REGEXFIND('AGG[\\.]? |AGG ASSLT|AGGRAVATED'		,poffense,0) = '' => 'N',
+							 
+							 REGEXFIND('RECKLESS|RECK |1ST DEGREE' ,poffense,0) <> '' and
+							 REGEXFIND('ENDANGER'		,poffense,0) <> '' => 'Y',
  							 
 							 //Roger's comment 7/6 QA Updates for  Assault - Aggravated
 							 //Remove to exclude expressions like CARRYING A CONCEALED DANGEROUS WEAPON/MA 1
 						   // REGEXFIND('[/\\. ]D[A]?NG[EROUS]*[/\\. ]|DEADLY'         ,poffense,0) <> '' and
+
                REGEXFIND('[/\\. ]WEAP|[/\\. ]WPN[/\\. ]|GUN[ |$]|KNIFE'  ,poffense,0) <> '' and		
                REGEXFIND('A[ ]*[\\&|/|AND][ ]*B|AS[S]*[A]*[U]*[L]*T[/|\\.|\\&| ]|AS[S]*LT |[ |'+
 							           '^]ASSA |AGG[RAVATED]* ASS|AGG [AALT|ALST]|SAULT |ASSAUTL |ASSUALT[\\/| ]'+
-												 '|ASS[\\.|\\/]? '                               ,poffense,0) <> '' and
-							 REGEXFIND('BRASS|[C|G]LASS| A BUS|TRESPASS'							 ,poffense,0) =  '' => 'Y',		
-							 
-							 
+												 '| ASS[\\.|\\/]? '                               ,poffense,0) <> '' and
+							 REGEXFIND('BRASS|[CG]LASS| A BUS|TRESPASS'					  		 ,poffense,0) =  '' => 'Y',		
+							 							 
 							 REGEXFIND(aggravated  ,poffense,0) <> '' and
 							 REGEXFIND('CH[I]*LD|M[IO]NOR|JUV'                                                          ,poffense,0) <> '' and 
 	             REGEXFIND('[/\\. ]ABU[/\\. ]|[/\\. ]AB[/\\. ]|[/\\. ]ABUVE|RECK DRVG|[/\\. ]IA[/\\. ]|[/\\. ]CHLDB[/\\. ]|[/\\. ]A7B[/\\. ]|[/\\. ]ABS[/\\. ]',poffense,0) <> '' and
@@ -500,11 +537,12 @@ Is_it := MAP( In_Global_Exclude(poffense,'ASSAULT')='Y' => 'N',
 							 
 							 REGEXFIND('[/\\. ]HIV[/\\. ]' ,poffense,0) <> '' and
                REGEXFIND('TRANS|EXPO|INFECT|CONDUCT|RISK|[/\\. ]TRNS[/\\. ]|ENGAG|TEST|[/\\. ]EXP[/\\. ]|[/\\. ]CAUS[/\\. ]|HARM|VIO|KNOW|INFC|UNLAW|ANOTHER|DONAT|DISCLOS',poffense,0) <> '' => 'Y',						 
-							 
+								
 							 //***terrorist threat
 							 REGEXFIND(aggravated     ,poffense,0) <> '' and
 							 REGEXFIND(TT2a           ,poffense,0) <> '' and
-               REGEXFIND(TT2b           ,poffense,0) <> '' => 'Y',	                     
+               REGEXFIND(TT2b           ,poffense,0) <> '' and 
+							 REGEXFIND('FALSE REPORT|FALSE INFO|FALSE',poffense,0) =  '' => 'Y',	                     
              
 						   REGEXFIND(aggravated        ,poffense,0) <> '' and
 						   REGEXFIND(Terrorist_Threats ,poffense,0) <> '' and
@@ -537,7 +575,10 @@ Is_it := MAP( In_Global_Exclude(poffense,'ASSAULT')='Y' => 'N',
 							 
                Is_homicide(poffense) ='N' AND							 
 							 REGEXFIND('POISON'            ,poffense,0) <> '' AND   
-							 REGEXFIND('PET|ANI(MA)*(\\.)* |ANIMAL|REPT|SNAKE|SN |CAT',poffense,0) = '' => 'Y',
+							 REGEXFIND('PET|ANI(MA)*(\\.)* |ANIMAL|REPT|SNAKE|SN |CAT|CONTROLLED SUBSTANCES',poffense,0) = '' => 'Y',
+  
+               REGEXFIND('POISON'            ,poffense,0) <> '' AND   
+							 REGEXFIND('LIQUOR|FOOD|WATER|ATTEMPT|MEDICINE| WELL[S]* ',poffense,0) <> '' => 'Y',
 
 							 REGEXFIND('ARMED'             ,poffense,0) <> '' and 
 	             REGEXFIND('VIO'               ,poffense,0) <> '' => 'Y',
@@ -590,7 +631,7 @@ Is_it := MAP( In_Global_Exclude(poffense,'ASSAULT')='Y' => 'N',
                REGEXFIND('SEX|CARD'               ,poffense,0) =  '' => 'Y',
 
 							 //QA Update - Assault Aggravated Round 6
-							 REGEXFIND('MALICIOUS[LY]*[LEY]*[ |/]WOUND',poffense,0) <> '' => 'Y',
+							 REGEXFIND('MALICIOUS[LY]*[LEY]*[ |/]WOUND|UNLAWFUL WOUNDING|AGGRAVATED MAL WOUND|WOUNDIN[/]UNLAW|UNLAW\\.WOUND[ING\\.]+',poffense,0) <> '' => 'Y',
 							 
 							 REGEXFIND(aggravated     ,poffense,0) <> '' and 
 	             REGEXFIND(Battery        ,poffense,0) <> ''  and 
@@ -628,8 +669,9 @@ export Is_Assault_other(string poffense_in) := function
 special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
 poffense        := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-Assault         := 'SIMP BAT|ASS[AU]+L[T]*|AS[SL]*LT|CRUELTY|[D]*OMESTI(.*) ABUSE|INTIMIDAT|RETALIATION';
-Assault2        := '^[ ]*A[\\.& ]+B[\\.]* |^[ ]*A AND B |[ |^|\\.|/]A[ ]*&[ ]*B[ |\\.|$|/]|A[ ]*&[ ]*B$';
+Assault         := 'SIMP BAT|ASS[AU]+L[T]*|AS[SL]*LT|CRUELTY|[D]*OMESTI(.*) ABUSE|INTIMIDAT|RETALIATION|STRIKING  PERSON|243(E)(1)PC|ACT IN AGGRESSIVE MANOR';
+Assault2        := '^[ ]*A[\\.& ]+B[\\.]* |^[ ]*A AND B |[ |^|\\.|/]A[ ]*&[ ]*B[ |\\.|$|/]|A[ ]*&[ ]*B$|'+
+                   ' PC 242 | PC 422 |PC 653M A | PC 240 |PC 646\\.9 A |PC 273\\.5 A |PC 243 [CE] | PC 273D |PC 368 C |PC 368 B  1| 2919\\.25 ';
 
 Assault3        := 'ASSAUOLT|ASS[LAN]+UTL|ASSAUTING|ASSLAT|ASSLA[UL]+T|ASSAI[ ]T|ASSAILT |ASSA[OS]*U[I]*[KL]T |ASSAUSLT|AS[SL]*AU[LK]*T|ASSAUST |AS[S]+ULT |ASSAUT[L]*|AS[S]+AULT|ASSAU[/0-9\\.]|'+
                    '[/0-9\\. ]ASSL[/0-9\\. ]|[/0-9\\. ]ASSA[/0-9\\. ]|[/0-9\\. ]ASS[A]*U[A]*[/0-9\\. ]|ASSLT|[/0-9\\. ]ASLT[/0-9 ]|ASSAT |[/\\.]AS[L]+[/\\.]|'+
@@ -644,7 +686,7 @@ exc             :=  'GOAT|PUP|ROBB| PET |PONY|CHOW |TORTIS|PIG|LLAMA|DUCK|FERRET
 										  
 //aggravated      := 'AGG|AGGR[\\.]|AG[G]+R|AG[G]+RA[CV]ATED|AGGAVAT|AGG[TGV] |AGGVA|[/\\. ]FEL[/\\. ]|FELONY|FELONI[O]*US|DANGEROUS W|[/\\. ]W/DE[/\\. ]'; 
 //Roger 7/6/16
-//Please add  WEAP  and  WPN   and  WEPON and  MURD  to  â€œaggravatedâ€.   The intent is to not select assault offenses containing these key words
+//Please add  WEAP  and  WPN   and  WEPON and  MURD  to  “aggravated”.   The intent is to not select assault offenses containing these key words
 aggravated      := 'AGG|AGGR[\\.]|AG[G]+R|AG[G]+RA[CV]ATED|AGGAVAT|AGG[TGV] |AGGVA|[/\\. ]FEL[/\\. ]|FELONY|FELONI[O]*US|DANGEROUS W|[/\\. ]W/DE[/\\. ]|MURD|WEAP|W[E]?P[O]?N/';                                                 
 
 // aggravated_exc  :=  'AGGRESSIVE|PROBAT|REVOC|SEX|KIDN|SODOMY|RAPE|PORN|MOLE';		
@@ -652,7 +694,7 @@ aggravated      := 'AGG|AGGR[\\.]|AG[G]+R|AG[G]+RA[CV]ATED|AGGAVAT|AGG[TGV] |AGG
 aggravated_exc  :=  'REVOC|SEX|KIDN|SODOMY|RAPE|PORN|MOLE|WEAP[ON]?|WPN|WEPON|MURD| GUN[ |/|$]|FIRE[ ]?ARM|F/ARM| ARMED|DESTRUCTIVE DEVICE';		
 
 Terrorist_Threats  := 'TERRORIST|TERROR[ISTM]*|W[EA]*P[ON]* MASS DES[RUCT]+';
-Terrorist_ecl      := 'HARM[ |$|/|\\-]|FALSE INFO';
+Terrorist_ecl      := 'HARM[ $/\\-]|FALSE INFO|FALSE REPORT';
 
 TT2a               := 'EXPLOSIVES|BOMB';
 TT2b               := 'TERR';
@@ -661,6 +703,8 @@ TT2b               := 'TERR';
                                                                      
 Is_it := MAP( In_Global_Exclude(poffense,'ASSAULT')='Y' => 'N',
 
+               // trim(poffense_in) in _fmod_offense_category_list.AssaultOtherList =>'Y',
+							 
 							 REGEXFIND('CRUELTY'                                                 ,poffense,0) <> ''  and
 							 REGEXFIND('HORSE|ANIM|ANAIMAL|ANIAL|ANML|A[IMN]I+[MN]+[AL]*|CATS|PIT[ ]*BULL'        ,poffense,0) <> ''=> 'N',
 
@@ -668,6 +712,8 @@ Is_it := MAP( In_Global_Exclude(poffense,'ASSAULT')='Y' => 'N',
 							 REGEXFIND('BODILY|BODY|BOD'                          ,poffense,0) <> '' and   
 							 REGEXFIND('FLUID'                                    ,poffense,0) <> '' =>'N',
 							 
+							 REGEXFIND('TERR THRT|TERR THREA|TERR ACTS'           ,poffense,0) <> '' =>'N',
+							 							 
                // REGEXFIND(aggravated              ,poffense,0) <> '' => 'N',
 							 REGEXFIND(aggravated_exc          ,poffense,0) <> '' OR
 							 REGEXFIND(assault_exc          	 ,poffense,0) <> '' OR
@@ -770,6 +816,9 @@ Is_it := MAP( In_Global_Exclude(poffense,'ASSAULT')='Y' => 'N',
 							 REGEXFIND('ABUSE'   ,poffense,0) <> '' and 
 	             REGEXFIND('PATIENT|RESIDENT|ELDER|NEGL|CARETAKER|CARTAKER|CH[I]*L[D]*|DISABL|IMPAIR|VULNERABLE',poffense,0) <> '' and
 							 REGEXFIND('SEX|CARD',poffense,0) =  '' => 'Y',
+							 
+	             REGEXFIND('CULPABLE' ,poffense,0)  <>'' and 
+							 REGEXFIND('NEGLIGENCE' ,poffense,0) <>  ''   => 'Y',
 							            
 	             REGEXFIND(Assault ,poffense,0) <> '' and 
 	             REGEXFIND(assault_exc ,poffense,0) = '' and 
@@ -786,6 +835,9 @@ Is_it := MAP( In_Global_Exclude(poffense,'ASSAULT')='Y' => 'N',
 							 REGEXFIND(Battery ,poffense,0) <> ''and 
 	             REGEXFIND(assault_exc ,poffense,0) = '' and 
 							 REGEXFIND(exc ,poffense,0) =  ''   => 'Y',
+	
+							 REGEXFIND('STRIKE|SHOVE|KICK',poffense,0) <> '' and
+							 REGEXFIND('HARASSMENT',poffense,0) <> '' => 'Y',
 							 'N');
 return Is_it;
 end;
@@ -822,7 +874,8 @@ end;
 special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
 poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-Motor_Vehicle_Theft   := ' OMVWOC |[D/\\.& ]U[U]+MV[/\\.& ]|U[\\.]U[\\.]M[\\.]V|STEAL(.*)M[/]*V|MVTHEFT|THEFTMV| NMVTA | [TI]+SMV[I]* | T[XB]TMV | TBRSMV '; 
+Motor_Vehicle_Theft   := ' OMVWOC |[D/\\.& ]U[U]+MV[/\\.& ]|U[\\.]U[\\.]M[\\.]V|STEAL(.*)M[/]*V|MVTHEFT|THEFTMV| NMVTA | [TI]+SMV[I]* | T[XB]TMV | TBRSMV |ATTEMPT UUV|'+
+                         'VC 10851 A |VC 10851 |PC 496D A |PC 487 D |VC 664\\/10851A|164135 UUV' ; 
 // Motor_Vehicle_Theft            := 'AUTO(.*)THEFT|VEH(.*)THEFT|MV(.*)THEFT|JOYRID|UUV |UUMV |U[\\.]U[\\.]M[\\.]V'; 
 MVT_Exc       := 'BURG|BREAK|ENTER';
 Burglary      := 'BUROLARY|BUR.LARY|BURBULARY|BURG[/\\. ]|B[RU]+GL|BRGLY|BRG[/]|BRG[/0-9 ]|BUR[LG]+|BYRG|BURGLK|B[OUR]+[GR]+[GLAEY]+R[Y]*|^[ ]BUR[/ ]';	
@@ -834,16 +887,13 @@ MVb := 'LAR[A]*C[AENY]*|LAR[AC]+[ENY]|LARC|STEAL|TH[E]*FT|[/\\. ]TEFT[/\\. ]|[TH
 veh          := ' COMV |AUTO|VE[C]*H|[/\\. ]M[/]*V[EHICLE/ ]+|[/\\.& ]M[/]*V[/\\.& ]|[/\\.& ]M[\\. ]*V[/\\. ]| MVT[R]* | ATV ';
 
 Is_it        := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
-
-             // REGEXFIND('GRAND THEFT MV' ,poffense,0) <> '' => 'Y',						 
+                // trim(poffense_in) in _fmod_offense_category_list.TheftMVList =>'Y',
 
 						 REGEXFIND(' REC | RECEIVING| RCV | RCV\\.'      ,poffense,0) <> '' and 
-             REGEXFIND(MVb                     ,poffense,0) <> '' => 'N',
+             REGEXFIND(MVb                            ,poffense,0) <> '' => 'N',
 						 
-						 // QA Update - MV Theft Round 6. Remove this logic per Roger.
-						 // (REGEXFIND(Burglary ,poffense,0) <> '' or REGEXFIND(BreakAndEnter ,poffense,0) <> '') and
-             // REGEXFIND(veh                            ,poffense,0) <> '' and
-						 // REGEXFIND('[ ]G[/]*T |GRAND THEFT'       ,poffense,0) = '' => 'N',
+             REGEXFIND(veh                            ,poffense,0) <> '' and
+						 REGEXFIND('TAMP[ ER]'                    ,poffense,0) <> '' => 'Y',
 						 
 						 //QA Update - MV Theft   Round 5 10/14/16 Embezzlement is included in Theft
 						 REGEXFIND('EMBEZZLE'       						  ,poffense,0) <> '' => 'N',
@@ -851,9 +901,12 @@ Is_it        := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 (REGEXFIND(Burglary ,poffense,0) <> '' or REGEXFIND(BreakAndEnter ,poffense,0) <> '') and
              REGEXFIND(veh                            ,poffense,0) <> '' and
 						 REGEXFIND('[ ]G[/]*T |GRAND THEFT'       ,poffense,0) <> '' => 'Y',
+
+						 REGEXFIND('OPERATE'                      ,poffense,0) <> '' and
+						 REGEXFIND('CHOP SHOP'                    ,poffense,0) <> '' => 'Y',
+						 
 						 //Roger's comments - QA Update - MV Theft   Round 4 9/23/16
              REGEXFIND('STEAL|[ ]G[/]*T |GRAND THEFT|^[ ]*GL |^[ ]*GL/|^[ ]*GL\\(| GL | GL/|/GL/|GRAND LARCENY|THEFT GRAND|STOLEN' ,poffense,0) <> '' and 
-             // REGEXFIND('STEAL|[ ]G[/]*T |GRAND THEFT|GRAND LARCENY|THEFT GRAND|STOLEN' ,poffense,0) <> '' and 
              REGEXFIND(veh                            ,poffense,0) <> '' and
 						 REGEXFIND('FROM| TAG'                    ,poffense,0) = '' => 'Y',
 						 
@@ -873,8 +926,7 @@ Is_it        := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 
 						 REGEXFIND(veh+'FELMV | UNMV |[/\\. ]MV[0-9]CT[S]*[/\\. ]|[/\\. ]FELM[/]*V[/\\. ]'      ,poffense,0) <> '' and 
 						 REGEXFIND(MVb                     ,poffense,0) <> '' and
-						 REGEXFIND('FROM| TAG'             ,poffense,0) = '' => 'Y',
-					
+						 REGEXFIND('FROM| TAG'             ,poffense,0) = '' => 'Y',					
  	 
 						 // |BURG|BREAK|ENTER
 						 REGEXFIND(veh+'| OFMV |[/\\. ]MV[0-9]CT[S]*[/\\. ]'           ,poffense,0) <> '' and 
@@ -882,7 +934,7 @@ Is_it        := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 REGEXFIND('UNAUT'                 ,poffense,0) <> '' and
 						 REGEXFIND('RAMP'                  ,poffense,0) = '' => 'Y',
 
-						 //QA Update - MV Theft Round 6 10/24/16 select offenses containing  â€œTAKE A MOTOR VEHICLEâ€  or  â€œTAKE MOTOR VEHICLEâ€  or  â€œTAKE VEHICLEâ€   or  â€œTAKE A VEHICLEâ€.  
+						 //QA Update - MV Theft Round 6 10/24/16 select offenses containing  “TAKE A MOTOR VEHICLE”  or  “TAKE MOTOR VEHICLE”  or  “TAKE VEHICLE”   or  “TAKE A VEHICLE”.  
 						 REGEXFIND('TAKE [A ]*[MOTOR ]*VEHICLE',poffense,0) <> '' => 'Y',
 						 
              REGEXFIND(Motor_Vehicle_Theft ,poffense,0) <> ''  => 'Y',	               
@@ -897,10 +949,13 @@ export Is_Burglary_BreakAndEnter_res(string poffense_in) := function
 special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
 poffense        := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-Burglary      := 'BUROLARY|BUR.LARY|BURBULARY|BURG[/\\. ]|B[RU]+GL|BRGLY|BRG[/]|BRG[/0-9 ]|BUR[LG]+|BYRG|BURGLK|[/\\. ]B[OUR]+[GR]+[GLAEY]+R[Y]*|^[ ]BUR[/ ]|^[ ]*BURG[L]? | BURG ';	
-BreakAndEnter := 'BREAK[ING]* [&] EN[T]{1,2}[E]{1,2}R[ING]*|BREAK[ING]* AND EN[T]{1,2}[E]{1,2}R[ING]*|BREAK[ING]* OR ENT[E]{1,2}R[ING]*|B[&][ ]*E|[/ ]B[ ]*AND[ ]E| BANDE |B[&]E |B[/]E |BREAKING INTO|HOUSE(.*)BREAK|INVASION';   
+Burglary      := 'BUROLARY|BUR.LARY|BURBULARY|BURG[/\\. ]|B[RU]+GL|BRGLY|BRG[/]|BRG[/0-9 ]|BUR[LG]+|BYRG|BURGLK|[/\\. ]B[OUR]+[GR]+[GLAEY]+R[Y]*|^[ ]BUR[/ ]|^[ ]*BURG[L]? | BURG |'+
+                 'PC 459 |PC 664[/]459 ';	
+BreakAndEnter := 'BREAK[ING]* [&] EN[T]{1,2}[E]{1,2}R[ING]*|BREAK[ING]* AND EN[T]{1,2}[E]{1,2}R[ING]*|BREAK[ING]* OR ENT[E]{1,2}R[ING]*|B[&][ ]*E|[/ ]B[ ]*AND[ ]E| BANDE |B[&]E |B[/]E |'+
+                 'BREAKING INTO|HOUSE(.*)BREAK|INVASION|BREAK[/]ENTERING FELONY';   
 //Roger's comment - QA Update - Burglary Residential Round 3 8/26. Added BANK, BUIDL,GTMV, and BLD to BBE_exc
-BBE_exc       := 'AUTO|[/\\. ]M[/]*V[H/ ]+| M[/]*V |[/\\. ]M\\.[ ]*V[/\\. ]|BUS|VE[C]*H|BUILD|BLDG|COMMERC|COMMER[IC]+AL|[/ ]BUS[/\\. ]|BU[S]+IN|BUS[INS]+|B\\&EMV| CHURCH|BLD|GTMV|BANK|BUIDL';
+BBE_exc       := 'AUTO|[/\\. ]M[/]*V[H/ ]+| M[/]*V |[/\\. ]M\\.[ ]*V[/\\. ]|BUS|VE[C]*H|BUILD|BLDG|COMMERC|COMMER[IC]+AL|[/ ]BUS[/\\. ]|BU[S]+IN|BUS[INS]+|B\\&EMV| CHURCH|BLD|GTMV|BANK|'+
+                 'BUIDL|BLDNG|BLDING|[/\\. ]BUSM[/\\. ]|[/\\. ]BLD[/\\. ]|BLDDG|[/\\. ]BLD[SHTBF2][/\\. ]';
 //Roger's comment - QA Update - Burglary Residential Round 3 8/26. Remove Driving W... 
 //Roger's comment - QA update - Theft Round 5 remove TRES and TRSP from the list
 BBE_exc1      := 'PRIVACY|BREAKAGE|DRIVING[ ]?W[/|\\.|H|I|L| ]';
@@ -913,7 +968,7 @@ comm    := 'BUILD|BLD[G| ]|COMMERC|COMMER[IC]+AL|[/ ]BUS[\\. ]|BU[S]+IN|BUS[INES
 // FRAUD / FAIL TO PAY LABORERS, MAN, FOR WORK VALUED A
 
   Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
-	
+	             // trim(poffense_in) in _fmod_offense_category_list.BurglaryResidentialList =>'Y',
 	             REGEXFIND(BBE_exc                    ,poffense,0) <> '' and 
 							 REGEXFIND(residence + '|/JERRY'      ,poffense,0) = '' => 'N',
 							 
@@ -991,11 +1046,12 @@ BreakAndEnter := 'BREAK[ING]* [&] EN[T]{1,2}[E]{1,2}R[ING]*|BREAK[ING]* AND EN[T
 BBE_exc       := 'AUTO|[/\\. ]M[/]*V[H/ ]+| M[/]*V |[/\\. ]M\\.[ ]*V[/\\. ]|VE[C]*H|[/ ]HAB[IT]*[/ ]|HABI[A]*TAT|[/ ]RES[ID]*[/ ]|RESIDENCE|HOUSE|HOME';
 //Roger's comment - QA update - Theft Round 5 remove TRES and TRSP from the list
 BBE_exc1      := 'PRIVACY|BREAKAGE';                                                        
-           
 					 
 comm    := 'BUILD|BLD[G| ]|COMMERC|COMMER[IC]+AL|[/ ]BUS[\\. ]|BU[S]+IN|BUS[INES]+|CHURCH|BANK|BUIDL';
   Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 	
+	             // trim(poffense_in) in _fmod_offense_category_list.BurglaryCommercialList =>'Y',
+							 
 	             (REGEXFIND(Burglary                   ,poffense,0) <> ''  OR 
 							  REGEXFIND(BreakAndEnter              ,poffense,0) <> '') AND 
 							 ((REGEXFIND('NON' ,poffense,0) <> '' AND REGEXFIND('RESID' ,poffense,0) <> '') OR
@@ -1054,9 +1110,16 @@ comm    := 'BUILD|BLD[G| ]|COMMERC|COMMER[IC]+AL|[/ ]BUS[\\. ]|BU[S]+IN|BUS[INES
 							 REGEXFIND(BreakAndEnter              ,poffense,0) <> '') and
 							 REGEXFIND(comm                       ,poffense,0) <> '' AND
 							 (REGEXFIND('LAR[A]*C|TH[E]*FT|[/\\. ]TEFT[/\\. ]|[TH]+EFT|[/\\. ]STLNG[/\\. ]'     ,poffense,0) <> '' and 
-							  REGEXFIND('RED' ,poffense,0) <> '') => 'N',						
+							  REGEXFIND('RED' ,poffense,0) <> '') => 'N',			
+								
+							(REGEXFIND(Burglary                  ,poffense,0) <> '' or	
+							 REGEXFIND(BreakAndEnter             ,poffense,0) <> '') AND	
+							 REGEXFIND('BLDNG|BLDING|[/\\. ]BUSM[/\\. ]|[/\\. ]BLD[/\\. ]|BLDDG|[/\\. ]BLD[SHTBF2]+[/\\. ]' ,poffense,0) <> ''  => 'Y',
 
 							 REGEXFIND('^[ ]*B & E BLDG[ ]*$'     ,poffense,0) <> '' => 'Y',	
+							 
+							 REGEXFIND('VENDING'                  ,poffense,0) <> '' AND
+							 REGEXFIND(' B & E '                  ,poffense,0) <> '' => 'Y',	           
 							 
 							 'N');
 							 							 
@@ -1071,12 +1134,14 @@ special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|\\*|<|>|"|`|\\[|]|
 poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' '); 
 
 //DF-18286 code review comment #3, add ^[ ]*BURG[L]? | BURG to Burglary to keep it in sync with burglary comm and res
-Burglary      := 'BUROLARY|BUR.LARY|BURBULARY|BURG[/\\. ]|B[RU]+GL|BRGLY|BRG[/]|BRG[/0-9 ]|BUR[LG]+|BYRG|BURGLK|[/\\. ]B[OUR]+[GR]+[GLAEY]+R[Y]*|^[ ]BUR[/ ]|^[ ]*BURG[L]? | BURG ';	
+Burglary      := 'BUROLARY|BUR.LARY|BURBULARY|BURG[/\\. ]|B[RU]+GL|BRGLY|BRG[/]|BRG[/0-9 ]|BUR[LG]+|BYRG|BURGLK|[/\\. ]B[OUR]+[GR]+[GLAEY]+R[Y]*|'+
+                 '^[ ]BUR[/ ]|^[ ]*BURG[L]? | BURG |VEHICLE PROWLING|B & E VEHICLES';	
 BreakAndEnter := 'BREAK[ING]* [&] EN[T]{1,2}[E]{1,2}R[ING]*|BREAK[ING]* AND EN[T]{1,2}[E]{1,2}R[ING]*|BREAK[ING]* OR EN[T]{1,2}[E]{1,2}R[ING]*|B[&][ ]*E|[/ ]B[ ]*AND[ ]E| BANDE |B[&]E |B[/]E |BREAKING INTO|INVASION';  
 
 
 //DF-18286 code review comment #4, BLD should be added to BBE_exc in Is_Burglary_BreakAndEnter_Veh
-BBE_exc       := 'BUILD|BUIDL|BANK|BLDG|COMMERC|COMMER[IC]+AL|[-/ ]BUS[-/\\. ]|BU[S]+IN|BUS[INS]+|[/ ]HAB[IT]*[/ ]|HABI[A]*TAT|[/ ]RES[ID]*[/ ]|RESIDENCE|HOUSE|HOME| CHURCH[ |$]|BLD';
+BBE_exc       := 'BLDNG|BLDING|[/\\. ]BUSM[/\\. ]|[/\\. ]BLD[/\\. ]|BLDDG|[/\\. ]BLD[SHTBF2][/\\. ]|BUILD|BUIDL|BANK|BLDG|BLD|COMMERC|COMMER[IC]+AL|'+
+                 '[-/ ]BUS[-/\\. ]|BU[S]+IN|BUS[INS]+|[/ ]HAB[IT]*[/ ]|HABI[A]*TAT|[/ ]RES[ID]*[/ ]|RESIDENCE|HOUSE|HOME| CHURCH[ |$]';
 BBE_exc1      := 'PRIVACY|TRES|TRSP|BREAKAGE';
 
 Larceny           := 'LAR[A]*C[AENY]*|LAR[AC]+[ENY]|LARC|STEAL|TH[E]*FT|[/\\. ]TEFT[/\\. ]|[TH]+EFT|[/\\. ]STLNG[/\\. ]';       
@@ -1085,7 +1150,7 @@ veh               := 'AUTO|VE[C]*H|[/\\. ]M[/]*V[EHICLE/ ]+| M[/]*V |[/\\. ]M[\\
 // L2a               := 'AUTO|VEH|[/ ]MV[-)(;H ]|M/V';
 // BURG OF BUILDING W/INT COMM TH 1
   Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
-						 
+						   // trim(poffense_in) in _fmod_offense_category_list.BurglaryMVList =>'Y',
                REGEXFIND(BBE_exc                                ,poffense,0) <> '' and 
 							 REGEXFIND(veh                                    ,poffense,0) = '' => 'N',
 							 
@@ -1146,6 +1211,9 @@ veh               := 'AUTO|VE[C]*H|[/\\. ]M[/]*V[EHICLE/ ]+| M[/]*V |[/\\. ]M[\\
                REGEXFIND('FROM'                                  ,poffense,0) <> '' and
 							 REGEXFIND(veh                                     ,poffense,0) <> '' => 'Y',
 							 
+  						 REGEXFIND('PROWL[ING ]+'                          ,poffense,0) <> '' and
+							 REGEXFIND(veh                                     ,poffense,0) <> '' => 'Y',
+							 
 							 (REGEXFIND(Burglary                                ,poffense,0) <> '' or
 							  REGEXFIND(BreakAndEnter                           ,poffense,0) <> '') and
                 REGEXFIND(veh                                     ,poffense,0) <> '' 	and						 
@@ -1165,8 +1233,11 @@ poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
 Computer_Crimes                := 'COMPU(.*) GRAND TH|COMPU(.*) TRAFF|COMPU(.*)R[ES]|COMPUTER';
 
-CC_exclude                     := 'COMPUL';
+CC_exclude                     := 'COMPUL|COMPUTER TRESP';
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
+
+             // trim(poffense_in) in _fmod_offense_category_list.ComputerCrimesList =>'Y', 
+						 
              REGEXFIND(Computer_Crimes ,poffense,0) <> '' and 
              REGEXFIND(CC_exclude ,poffense,0) = '' => 'Y',	               
 							 'N');
@@ -1180,7 +1251,7 @@ export Is_Counterfeiting_Forgery(string poffense_in) := function //done
 special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
 poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' '); 
 
-Counterfeiting_Forgery  := 'FROG|FORG|FO[R]*GERY|FOEGE|FOERG|CTRFT|COUNTERF[IE]*T|COUNTF';										
+Counterfeiting_Forgery  := 'FROG|FORG|FO[R]*GERY|FOEGE|FOERG|CTRFT|COUNTERF[IE]*T|COUNTF|PC 475 [ABC] |PC 475A|PC 476A(A)|PC 470 [AD] |PC 470B|PC 476|HS 11368';										
 
 Counterfeiting_Forgery2 := '^[ ](FRG[/ &\\.]|FRGD|FRGE|FRGING|FRGRY|FRGY|FRGNG)';	
 
@@ -1208,13 +1279,14 @@ export Is_Destruction_Damage_Vandalism(string poffense_in) := function //done
 special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|[\\\']';
 poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-Destruction_Damage_Vandalism   := 'VANDALISM|DESTROY|DESTRUCTION|GRAFFITI|CRIM[\\.]*DAM|MALMISCH|DAMACE PROPERTY|DAMPROPRTY|MALICDAMAG';			
+Destruction_Damage_Vandalism   := 'VANDALISM|DESTROY|DESTRUCTION|GRAFFITI|CRIM[\\.]*DAM|MALMISCH|DAMACE PROPERTY|DAMPROPRTY|MALICDAMAG|'+
+                                  'PC 594 [AB] |PC 594 |PC 594\\.2|PC 591 | PC 591\\.5';			
 
 Destruction_Damage_Vandalism2   := '^[ ](DAMAG|DAMAMGE|DAMATE|DAMATO|DAMDAGE|DAMEAGE|DAMG|DANAGE)';	
 		                                                
 damage := 'DAMAMGE|[/\\. ]DA[M]+[AGEING]*[/\\. ]|[/\\. ]DAM[AGES0-9]*[/\\. ]|[/\\. ]DMG[INGSE0-9]*[/\\. ]|DAMAG|DAMAGIN|DMGNG' ;
   Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',	
-	
+	             // trim(poffense) in _fmod_offense_category_list.DestructionList =>'Y',
 							 // REGEXFIND('POSS'                            ,poffense,0) <> '' and 
 							 // REGEXFIND('BURG'                            ,poffense,0) <> '' and
                // REGEXFIND('TOOL'                            ,poffense,0) <> '' => 'Y',
@@ -1242,22 +1314,23 @@ damage := 'DAMAMGE|[/\\. ]DA[M]+[AGEING]*[/\\. ]|[/\\. ]DAM[AGES0-9]*[/\\. ]|[/\
                REGEXFIND('BUILD|PROP|VE[C]*H|GRAVE|AUT$'  ,poffense,0) <> '' => 'Y',
 							 
 							 REGEXFIND('PROP'                            ,poffense,0) <> '' and 
-							 REGEXFIND('DAMAG|INJ|DEST|GRAFF|DEFACE|CRIM',poffense,0)   <> '' and
-               REGEXFIND('ACC|INVOL'                       ,poffense,0) =  '' => 'Y',
-							 
+							 REGEXFIND('DAMAG|INJ|DEST|GRAFF|DEFACE|CRIM',poffense,0) <> '' and
+               REGEXFIND('ACC|INVOL|POSS|STOLEN|TRESPASS| TRES | TR[E]*SP |MOVABLE PROP' ,poffense,0) =  '' => 'Y',
+							  
                REGEXFIND('[/\\. ]VAND[A]*[\\\']|[/\\. ]VAN[D]+[ALISUOZNMEDH]*[/\\. ]|[/\\. ]VAND[ALIZED]*[/\\. ]|[/\\. ]VAND[ALIZATIONG]*[/\\. ]',poffense,0)  <> '' => 'Y',
 							 
 							 // REGEXFIND(damage          ,poffense,0) <> '' and 
 							 // REGEXFIND('[/\\. ]MAL[ICIOUS]*[/\\. ]||MALICIOUS'     ,poffense,0) <> '' and
                // REGEXFIND('WI[LL]FUL'      ,poffense,0) <> '' => 'Y',
 							 
-							 REGEXFIND(damage          ,poffense,0) <> '' and 
+							 REGEXFIND(damage                       ,poffense,0) <> '' and 
 							 REGEXFIND('FACITITY|FACILITIES|WILLFUL|[/\\. ]MAL[ICIOUSLY]*[/\\. ]|MAL[AI]CIOUS|MALICIONS|TAMPER|UNLAW|RECKL|CR[I]*M|CRMNL'      ,poffense,0) <> '' => 'Y',
 							 						 
                REGEXFIND(Destruction_Damage_Vandalism ,poffense,0) <> '' and
-	             REGEXFIND('EVID|DUI' ,poffense,0) = '' => 'Y',	               
+	             REGEXFIND('EVID|DUI'                   ,poffense,0) = '' => 'Y',	               
 							 
 							 REGEXFIND(Destruction_Damage_Vandalism2 ,poffense,0) <> '' => 'Y',
+  
 							 'N');
 return Is_it;
 end;
@@ -1310,7 +1383,7 @@ Drug_Ctrl_sub        :=  '[/\\. ]C[ON]*T[RL]+[LED]*[\\. /]SUB[STANCES]*[/\\. ]|[
 												 '[/\\. ]C[ON]*T[RL]+[LED]*(.*) SUS[BTANCEY]*[/\\. ]|C[O]*NTR[OLED]* [DANGEROUS]+ SUBS|OCNTROLLED SUBSTANCE ';												 
                                                    
 //TAMP                         
-Drug_Narcotic_exc    := 'MISCHIEF|MISCH|SPEEDING|CARD|LICENSE|BURG|DEERSPECIES|IDENTIFICATION|REGISTRATION|TELE|PORNO|STOLEN|'+
+Drug_Narcotic_exc    := 'MISCHIEF|MISCH|SPEEDING|CARD|LICENSE|BURG|DEERSPECIES|IDENTIFICATION|REGISTRATION|TELE|PORNO|STOLEN|SWEEPING|'+
                         'DOG|ANIMAL|TITLE|TOBACCO|TAMP|RAPE |FIREARM|FIREWORK|WEAPON|KNIFE|VESSEL|FORGE|CYCLE|BB RIFLE|SNOOK|BAG LIMIT|DRUM|SNAPPER|'+
 												'BASS |ROOSTER|CRAB|SPD LMT|SPEED LIMIT|DIST SPIRIT|[/\\. ]DEER|POSS CONT ALC|ALCOHOL|SHOTGUN|F(.*)[O]+D(.*)[ ]*STAMP|'+
 												'FAIL OBTAIN STAMP|POSTMARKING STAMP|GAMBL(.*)DEV(.*)EQUIP|NO EMERG EQUIP|EXPLO|HUMAN TRAF|CHILD PORN|POSS(.*) OF COMPUTER|DIST(.*) OF COMPUTER|'+
@@ -1345,6 +1418,12 @@ Drug6                := 'HANDROLIN|STANOZ|TYLOX|ULTRAM|XYDONE|SEBOXONE|ENDOCET|E
                         'HASHISH|DILUADID|COCAINE|[/\\. ]M[AI]RI[JUANA]*[/\\. ]|PROXAMOL|[/\\. ]MAIRJ[UANA]*[/\\. ]|MAIRJUANA|OF[ ]*SCHED|OF LSD';
 												
 Drug7                := '[ (](ANA|CPAM|KHAT|METC|PCIN|SCAT|SMAR|SYCA|TET|TRIF|METH|ALPR|AMPH|APLR|BUPR|CHLO|COD|DEXT|DIAZ|DPOX|FEN|HCOD|HER|HMOR|K2|LIS|LOR|MARJ|MBN|MDA|MDMA|MDN|MEPR|MORP|MPHE|OPM1|OXY|OXYC|OXYM|PARA|PCP|PENT|PERC|PSIL|RITA|ROID|TYN3|XAN|ZOL)[)]';
+
+Drug8                := '893\\.13\\.6B|893\\.147\\.1|893\\.13\\.6A| VUCSA |893\\.13\\.1A1| P\\.O\\.M\\.[ ]*B |HS 11377 A | HS 11364 |'+
+                        'HS 11364\\.1 |HS 11550 A |HS 11350 A |HS 11359 |HS 11550 |HS 11379 A |HS 11379 |HS 11377 |'+
+                        'HS 11350 |HS 11532 A |HS 11357 [ABC] |HS 11378 |BP 4140 |VC 23222 B |HS 11352 A |HS 11352 |'+
+                        'BP 4060 |HS 11360 A |HS 11358 |PC 4573\\.6|HS 11368 |HS 11365 |BP 4149 |HS 11351 |HS 11375 B ';
+
 veh                  := ' COMV |AUTO|VE[C]*H|[/\\. ]M[/]*V[EHICLE/ ]+|[/\\.& ]M[/]*V[/\\.& ]|[/\\.& ]M[\\. ]*V[/\\. ]| MVT[R]* |BOAT|CRAFT| ATV ';
  
 traff_list           := 'TRAFFIN|TRAFF[IN]*CIKING|TRAFFI[CK]+[IK]*NG|TRAFFING|TRAFFINKING|TRAFFKG|TRAFFKICKING|TRAFFRKG|TRAFFKING|TRAFFICK|'+
@@ -1353,9 +1432,17 @@ traff_list           := 'TRAFFIN|TRAFF[IN]*CIKING|TRAFFI[CK]+[IK]*NG|TRAFFING|TR
 child_set            := '[/\\. ]CHLD[/\\. ]|[/\\. ]CHIL[DREN]*[/\\. ]|MINOR|JUV';
 
   Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
-							
+							 // trim(poffense_in) in _fmod_offense_category_list.DrugList =>'Y',
+							 
+               REGEXFIND('MANUF|SELLING|DIST\\.|SALE|MANUFACTURE|SELL',poffense,0) <> '' and 
+               REGEXFIND('FALSE'                                      ,poffense,0) <> '' and 
+               REGEXFIND('IDENTIFIC|LIC[/]ID| ID |DOCUMENT'           ,poffense,0) <> '' => 'N', 
+							 
                REGEXFIND('POSS|DEPOSIT|OPER|SMUGG',poffense,0) <> '' and 
                REGEXFIND('COIN'                   ,poffense,0) <> '' => 'N',
+							 							  
+							 REGEXFIND('MINOR MISD'             ,poffense,0) <> '' and 
+               REGEXFIND('DRUG ABUSE'             ,poffense,0) <> '' => 'N',
 							 
 							 REGEXFIND('PORN'                   ,poffense,0) <> '' and 
 							 REGEXFIND('POSS'                   ,poffense,0) <> '' and 
@@ -1543,15 +1630,16 @@ child_set            := '[/\\. ]CHLD[/\\. ]|[/\\. ]CHIL[DREN]*[/\\. ]|MINOR|JUV'
 							     REGEXFIND(drug4                ,poffense,0) <> '' OR
  								   REGEXFIND(drug5                ,poffense,0) <> '' OR
  								   REGEXFIND(drug6                ,poffense,0) <> '' OR
- 								   REGEXFIND(Drug7                ,poffense7,0) <> ''     
+ 								   REGEXFIND(Drug7                ,poffense,0) <> '' OR
+									 REGEXFIND(' THC[( ]'           ,poffense,0) <> ''
  								)=> 'Y',
 
 							 //Roger's comment on 7/27
 							 REGEXFIND('TRAFFIC[K| ]|TRAFF IN|^[ ]*POSS[ |\\.]| POSS |\\-POSS |POSSESSION|^[ ]*PERMIT| PERMIT| ABUSE',poffense,0) <> '' AND 
-									(	 REGEXFIND(' DRUG[S| |\\-]| COCAINE| METH | HEROIN | PROPOXYPHENE | PARA[P| ]| MARIJ[A| ]' ,poffense,0) <>  '' OR 
-										 (REGEXFIND(' CONT[R| ]',poffense,0) <> ''  AND REGEXFIND(' SUB[S| |\\.]',poffense,0) <> '') OR
+									(	 REGEXFIND(' DRUG[S \\-]| COCAINE| METH | HEROIN | PROPOXYPHENE | PARA[P| ]| MARIJ[A ]' ,poffense,0) <>  '' OR 
+										 (REGEXFIND(' CONT[R ]',poffense,0) <> ''  AND REGEXFIND(' SUB[S\\. ]',poffense,0) <> '') OR
 										 // REGEXFIND(Drug_Ctrl_sub,poffense,0) <> '' OR
-										 (REGEXFIND(' PRECU[R| ]',poffense,0) <> '' AND REGEXFIND(' SUB[S| |\\.]',poffense,0) <> '')	
+										 (REGEXFIND(' PRECU[R ]',poffense,0) <> '' AND REGEXFIND(' SUB[S\\. ]',poffense,0) <> '')	
  								)=> 'Y',
 										 
 							 REGEXFIND('[/\\.]CS[IX3]*[/\\. ]',poffense,0) <> '' and 
@@ -1636,9 +1724,14 @@ child_set            := '[/\\. ]CHLD[/\\. ]|[/\\. ]CHIL[DREN]*[/\\. ]|MINOR|JUV'
 							 
 							 REGEXFIND('METH'                         ,poffense,0) <> '' and 
 	             REGEXFIND('METH[O]*D|FISH'               ,poffense,0) = ''  => 'Y',	
-
+							 
+							 REGEXFIND('[/\\. ]COKE[/\\. ]|[/\\. ]CANN[/\\. ]|[/\\. ]CRACK[/\\. ]|[/\\. ]COC[/\\. ]'                         ,poffense,0) <> '' and 
+	             REGEXFIND('[/\\. ]SELL[/\\. ]|[/\\. ]DEL[/\\. ]|DELIVER|[/\\. ]TRAF[/\\. ]|TRFK|[/\\. ]TRF[/\\. ]|[/\\. ]PURC[/\\. ]|[/\\. ]MAN[/\\. ]' ,poffense,0) <> ''  => 'Y',
+							 
+							 REGEXFIND(Drug8                          ,poffense,0) <> ''  => 'Y',
+							 
 							 REGEXFIND(Drug_Narcotic1                 ,poffense,0) <> '' and 
-	             REGEXFIND(Drug_Narcotic_exc              ,poffense,0) = ''  => 'Y',	
+	             REGEXFIND(Drug_Narcotic_exc +'|UNLAWFUL LIQUORS'             ,poffense,0) = ''  => 'Y',	
 							 
 							 REGEXFIND(Drug_Narcotic2                 ,poffense,0) <> '' and 
 	             REGEXFIND(Drug_Narcotic_exc              ,poffense,0) = ''  => 'Y',	
@@ -1647,7 +1740,7 @@ child_set            := '[/\\. ]CHLD[/\\. ]|[/\\. ]CHIL[DREN]*[/\\. ]|MINOR|JUV'
 	             REGEXFIND(Drug_Narcotic_exc              ,poffense,0) = ''  => 'Y',	
 							 
 							 REGEXFIND(Drug_Narcotic4                 ,poffense,0) <> '' and 
-	             REGEXFIND(Drug_Narcotic_exc              ,poffense,0) = ''  => 'Y',	
+	             REGEXFIND(Drug_Narcotic_exc+'|LIQUOR'    ,poffense,0) = ''  => 'Y',	
 							 
 							 REGEXFIND(Drug_Ctrl_sub                  ,poffense,0) <> '' and 
 	             REGEXFIND(Drug_Narcotic_exc              ,poffense,0) = ''  => 'Y',	
@@ -1667,14 +1760,15 @@ Weapon_Law_Violations          := 'CONCEALED| C[\\. ]*C[\\. ]*[FW][:\\.-/ ]+|CNC
                                   'IRGUNS|[/\\. ][AIR ]*GUN[S0-9]*[/\\. ]|SELLINGUN|[0-9]GUN |SLINGSHOT|GUNSHOT|WE[A]*P[A]*ONS|STUNGUN|'+
 																	'H[A]*NDGUN|GUNNING|HAN[D]*GUN|GUNFIRE|MACHINE[ ]*GUN|GUNRUNNING|FIRIN(.*)GUN|STL[N]*GUN|MANS...GUN|CONGUN|CAR[ ]*CON[C]*GUN|'+
                                   '[/\\. ]GUN[/\\. ]|[/\\. ][AIR ]*GUN[S0-9]*[/\\. ]|[/\\. ][SHOTSPEAR ]*GUN[S]*[/\\. ]|WEAP|FIREARM|WPN|'+  //SH[.]*TGUN|
-																	'F[IRE ]+ARM|F.ARM|BOMB|EXPLOS|[/\\.  ]U[U]+W|PISTOL';															
+																	'F[IRE ]+ARM|F.ARM|BOMB|EXPLOS|[/\\.  ]U[U]+W|PISTOL| PC 4502 |PC 12280 |PC 30305 A ';		
 																	
+													
 																														
 //Roger's comment QA Updates - Weapons Law Violations 7/6
 //Roger's comment QA Updates - Weapons Law Violations Round 3 8/26
 //DF-16568 Review comment #5, remove ^SEX,^LARC,^FRAUD,^SODOMY
-wpn_ecl                        := 'ROBB|THEFT|MURD|HOMI|BATT|BURG|BOMB(.)*THREAT|THREAT(.)*BOMB|KIDNAP|AS[S]?AULT|ASSAU|AS[S]?LT |[^| ]AS[AU]*LT| RAPE[/| ]|^[ ]*RAPE |/RAPE|\\.RAPE| RAPE\\-|RAPE$|A[ ]*\\&[ ]*B|HOAX BOMB|ASSULT |ASSUA |AGG[\\/|\\.| ]ASS|AGG[\\/|\\.| ]ASLT|ASSALT |ASSULT |ASSUA|' +
-                                  ' SEX| LARC| FRAUD| SODOMY|SODMY|/ABDUCT| ABDUCT|MANSLAU';
+wpn_ecl                        := 'ROB[(B ]+|THEFT|MURD|HOMI|BATT|BURG|BOMB(.)*THREAT|THREAT(.)*BOMB|KIDNAP|AS[S]?AULT|ASSAU|AS[S]?LT |[^| ]AS[AU]*LT| RAPE[/| ]|^[ ]*RAPE |/RAPE|\\.RAPE| RAPE\\-|RAPE$|A[ ]*\\&[ ]*B|HOAX BOMB|ASSULT |ASSUA |AGG[\\/|\\.| ]ASS|AGG[\\/|\\.| ]ASLT|ASSALT |ASSULT |ASSUA|' +
+                                  ' SEX| LARC| FRAUD| SODOMY|SODMY|/ABDUCT| ABDUCT|MANSLAU|CONCEALED MA[T ]+';
 //DF-16568 Review comment #6, remove ^SEX,^LARC,^FRAUD,^SODOMY
 wpn_ecl_2											 := 'ROBB|THEFT|MURD|HOMI|BATT|BURG|BOMB(.)*THREAT|THREAT(.)*BOMB|KIDNAP| RAPE[/| ]|/RAPE|\\.RAPE| RAPE\\-|RAPE$|A[ ]*\\&[ ]*B|HOAX BOMB| SEX| LARC| FRAUD| SODOMY|SODMY|/ABDUCT| ABDUCT|MANSLAU';
 wpn_2a                         := 'CONCEAL|[/\\.  ]CONC[/\\.  ]';
@@ -1683,10 +1777,12 @@ wpn_2b                         := 'WEAPON|WEAP[ON]*[/\\. ]|FIREA|GUN[/\\.]|PIST|
 
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 
+             // trim(poffense) in _fmod_offense_category_list.WeaponsLawViolationList =>'Y', 
+							
              REGEXFIND('HOAX|FALSE|FALS\\.|WARN|SCARE|FIRE ',poffense,0) <> '' and 
-						 REGEXFIND('BOMB'            									 ,poffense,0) <> '' => 'N' ,
-						 
-             REGEXFIND('LARC[ |E]|THEFT |BURG|MURD|ROBBERY|CAR[ ]*JACK',poffense,0) <> '' => 'N' ,
+						 REGEXFIND('BOMB'            									  ,poffense,0) <> '' => 'N' ,
+
+             REGEXFIND('LARC[ E]|TH[E]*FT |STEAL[LING ]+|BURG|MURD|ROBBERY|CAR[ ]*JACK',poffense,0) <> '' => 'N' ,
 
              REGEXFIND('POS'                               ,poffense,0) <> '' and
 						 //Roger's comment QA Update - Weapons Law Violations Round 4
@@ -1759,7 +1855,14 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 
 						 //Roger's comment RE: QA Update - Weapon Law Violation Round 6
 						 REGEXFIND('ASSAULT'                           ,poffense,0) <> '' and
-						 REGEXFIND('[PISTOL|FIREARM|HANDGGUN] ROSTER'  ,poffense,0) <> '' => 'Y',
+						 REGEXFIND('ROSTER'                            ,poffense,0) <> '' and
+						 REGEXFIND('PISTOL|FIREARM|HANDGGUN '          ,poffense,0) <> '' => 'Y',
+						 
+						 REGEXFIND('PC 12020 A |PC 653K|PC 12021 [AC] |PC 417 A |PC 12025 [AB] | PC 12025 |PC 12031 A |PC 12031 |PC 246\\.3| PC 246 |PC 12316 B |PC 29800 A '   ,poffense,0) <> '' => 'Y',					 
+             
+						 REGEXFIND('POSS[ESSION ]+'                    ,poffense,0) <> '' and
+						 REGEXFIND('ILLEGAL '                          ,poffense,0) <> '' and
+						 REGEXFIND('AMMO '                             ,poffense,0) <> '' => 'Y',
 
           	 'N');
 return Is_it;
@@ -1771,9 +1874,13 @@ special_characters    := '~|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|@|\\*|<|>|"|`|\\[|
 poffense1             := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 poffense := stringlib.stringtouppercase(poffense1);
 
-Stolen_Property_Offenses_Fence := 'REC(.*)ST[O]*L(.*)|^[ ]R[/\\. ]*S[/\\. ]*P[0-9/\\. ]|[ /]R[/]S[/]P[R/ ]|RCVESTOLPR|[ ]R[ ]S[ ]PRP';
+Stolen_Property_Offenses_Fence := 'REC(.*)ST[O]*L(.*)|^[ ]R[/\\. ]*S[/\\. ]*P[0-9/\\. ]|[ /]R[/]S[/]P[R/ ]|RCVESTOLPR|[ ]R[ ]S[ ]PRP| KCSP | RCSP | PC 496 ';
 STP_exc := '[0-9]+[/][0-9]+';
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
+
+
+             REGEXFIND('GRAND THEFT'    ,poffense,0) <> '' => 'N',  
+
              REGEXFIND('STOL' ,poffense,0) <> '' and REGEXFIND('PISTOL' ,poffense,0) = '' and
              REGEXFIND('THEFT|RECEIV|[/\\. ]REC[IEVD]*[/\\. ]|[/\\. ]REC[IEVNG]*[0-9/\\. ]|[/\\. ]RCV[ING]*[/\\. ]|[/\\. ]RVC[/\\. ]|POSS|GOODS|PROP|CONCEAL|BUY|SELL|SALE|TRANS|DEAL|TRAFF|VEH' ,poffense,0) <> '' AND
 						 //Roger's comments QA Update - Theft  Round 5 10/11/16
@@ -1802,6 +1909,10 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 
              REGEXFIND(Stolen_Property_Offenses_Fence ,poffense,0) <> '' and
 						 REGEXFIND(STP_exc,poffense,0) = '' => 'Y',
+						 
+						 REGEXFIND(' STLN ' ,poffense,0) <> '' and
+						 REGEXFIND('PRPRTY|PROPERTY',poffense,0) <> '' => 'Y',
+
 							 'N');
 return Is_it;
 end;
@@ -1813,7 +1924,7 @@ special_characters    := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|\\*|<|>|"|`|\\[|
 poffense        := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
 														
-Identity_Theft:= 'IDENTITY|TAKE[ THE]IDENTITY';
+Identity_Theft:= 'IDENTITY|TAKE[ THE]IDENTITY|PC 530\\.5 A |PC 529\\.3|PC 368 D ';
 IT_exc        := 'SERV[ED]*[ |$]|D[AY]+S|SEX|REFUSAL|ACCID[ENT]*|REFUSAL';	
 
 IT2           := 'CREDIT|CRED|CRD|DEBIT';
@@ -1821,8 +1932,9 @@ IT_exc2       := 'USE|ABUSE|CHARGE|CHRG|FORG';
 
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 
-             REGEXFIND('UNLAW'                  ,poffense,0) <> '' and 	
-						 REGEXFIND('NAME'                   ,poffense,0) <> '' and
+             // trim(poffense_in) in _fmod_offense_category_list.IdentityTheftList =>'Y',
+
+             REGEXFIND('NAME'                   ,poffense,0) <> '' and
              REGEXFIND('ASSAUME|ASSUM'          ,poffense,0) <> '' => 'Y',
 						 
 						 REGEXFIND('UNLAW'                      ,poffense,0) <> '' and 	
@@ -1857,8 +1969,12 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 // Roger's comment - QA Updates -Theft Round 5 10/11
 						 REGEXFIND('IDENT[ |Y|I|/]'        ,poffense,0) <> '' AND 
 						 REGEXFIND('TH[E]?FT'			         ,poffense,0) <> '' AND 
-             REGEXFIND(IT_exc 								 ,poffense,0)  = '' => 'Y',	               
-
+             REGEXFIND(IT_exc 								 ,poffense,0)  = '' => 'Y',	   
+						 
+						 REGEXFIND('DISCLOSE|USE'          ,poffense,0) <> '' and 	
+						 REGEXFIND('CREDIT|DEBIT'          ,poffense,0) <> '' and
+             REGEXFIND('CARD| CRD '            ,poffense,0) <> '' and 
+						 REGEXFIND('NOS |NUMBER'           ,poffense,0) <> '' => 'Y',
 						 'N');
 return Is_it;
 end;
@@ -1870,7 +1986,9 @@ special_characters:= '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|@|\\*|<|>|"|`|\\[|]|
 poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
 Fraud            := 'DECEPTION|ILL(.*) PROC(.*) DR DOC|'+
-                    '^[ ](ATT)[ ]*FR.|MISAPPROPRIATION|MISPRESENT|MISREP|MISAPP FIDUC|F[RAU]+D| FRAID | FRAU |MONEY LAUNDERING|IMPERSONAT';
+                    '^[ ](ATT)[ ]*FR.|MISAPPROPRIATION|MISPRESENT|MISREP|MISAPP FIDUC|F[RAU]+D| FRAID | FRAU |MONEY LAUNDERING|IMPERSONAT|'+
+										'517.312|IC 1871.4 A 1|MONEY LAUD|ASSUME NAME OF|CRIMINAL USE OF PERSONAL I\\.D\\.|CREDIT CARD[ /]|FINANCIAL TRANSACTION CARD|'+
+                    'PC 530\\.5 A |PC 529\\.3|PC 368 D |WI 10980 C |WI 10980 C |PC 476A A |PC 476 |PC 532 A | 13A-9-13\\.1';
 f2a              :=  'FRAUD|PRE[N]*TENSE';
 f2b              :=  'FICTITIOUS';
 
@@ -1885,7 +2003,11 @@ IT_exc2a         := 'USE|ABUSE';
 IT_exc2b1        := false_set; 
 IT_exc2b2        := 'CHARGE|CHRG';
 			 
+		 
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
+
+             // trim(poffense_in) in _fmod_offense_category_list.FraudList =>'Y',
+						 
               Is_Identity_Theft(poffense)='Y' => 'Y',
 						 (REGEXFIND('ILL|UNLIC'                 ,poffense,0) <> '' OR 
 						  (REGEXFIND('W[/][0O][/\\. ]|[/\\. ]WO[/\\. ]',poffense,0) <> '' and REGEXFIND('LIC',poffense,0) <> '')
@@ -1895,7 +2017,7 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 
              REGEXFIND('TAMP|FALS|[/\\. ]USE[/\\. ]|FICTI|ANOTHER|FAKE|FRAUD|UNAUT' ,poffense,0) <> '' and 
 						 REGEXFIND('RIDE|PLATE'                                                                 ,poffense,0) = '' and 
-						 (REGEXFIND('LABEL|TRADEMARK|TAG |SERIAL|VIN|[/\\. ]ID[ENIFICATION]*[/\\. ]|[/\\. ]ID[ENTIFYING]*[/\\. ]| I[/]D |[/\\. ]D[/]LIC[ENSE]*[/\\. ]|[/\\. ]DL[/\\. ]|DEBIT',poffense,0) <> '' OR 
+						 (REGEXFIND('LABEL|TRADEMARK|TAG |SERIAL|[/\\. ]VIN[/\\. ]|[/\\. ]ID[ENIFICATION]*[/\\. ]|[/\\. ]ID[ENTIFYING]*[/\\. ]| I[/]D |[/\\. ]D[/]LIC[ENSE]*[/\\. ]|[/\\. ]DL[/\\. ]|DEBIT',poffense,0) <> '' OR 
 						  (REGEXFIND('[/\\. ]FIN[ANCIALE]*[/\\. ]|CREDIT|CDT ',poffense,0) <> '' and REGEXFIND('CARD|DEV',poffense,0) <> '') 
 							)=> 'Y',
 							
@@ -1937,7 +2059,7 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
              REGEXFIND('LAUND'                      ,poffense,0) <> '' => 'Y',
 
              REGEXFIND('CONCEAL|CONCCEAL|CONCEAML|CONCELAM',poffense,0) <> '' and 
-						 REGEXFIND('SHOPLIFT'                          ,poffense,0) = '' and 
+						 REGEXFIND('SHOPLIFT|[/\\. ]MERCH[/\\. ]|MERCH[ANDISE]+'      ,poffense,0) = '' and 
              Is_Weapon_Law_Violations(poffense)               ='N'  and 
              Is_Stolen_Property_Offenses_Fence(poffense)      ='N'  => 'Y',
 						 
@@ -1985,7 +2107,11 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
              REGEXFIND('PUB'                     ,poffense,0) <> '' and 
 						 REGEXFIND('SERV'                    ,poffense,0) <> '' => 'Y',
 						 
-						 REGEXFIND('EVASI'                   ,poffense,0) <> '' and 	
+						 REGEXFIND('EVAS[I ]|EVAD[EING ]|VIOL[ATION ]',poffense,0) <> '' and 	
+             REGEXFIND('TAX'                              ,poffense,0) <> '' => 'Y',
+
+						 REGEXFIND('FAIL'                    ,poffense,0) <> '' and 	
+						 REGEXFIND('PAY'                     ,poffense,0) <> '' and 	
              REGEXFIND('TAX'                     ,poffense,0) <> '' => 'Y',
 
 						 REGEXFIND(false_set                 ,poffense,0) <> '' and 	
@@ -2051,14 +2177,30 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 REGEXFIND('STAMP|[/\\. ]STPS[/\\. ]|STMP'   ,poffense,0) <> '' => 'Y',
 	
 						 //QA Update - Fraud Round 6
-						 REGEXFIND('FALSE PERSONATION'    ,poffense,0) <> '' => 'Y',
+						 REGEXFIND('FALSE PERSONATION|HEALTH PROFESSION - UNAUTHORIZED PRACTICE'    ,poffense,0) <> '' => 'Y',
 						 
              REGEXFIND(Identity_Theft ,poffense,0) <> '' AND 
              REGEXFIND(IT_exc         ,poffense,0) = '' AND
 						 (REGEXFIND(IT_exc2a      ,poffense,0) <> '' OR
 						  (REGEXFIND(IT_exc2b1 ,poffense,0) <> '' AND REGEXFIND(IT_exc2b2 ,poffense,0) <> '' ))
 							=> 'Y',
-							 'N');
+	
+						 REGEXFIND('DECEPTIVE'              ,poffense,0) <> '' and 
+						 REGEXFIND('PRACTICE'               ,poffense,0) <> '' => 'Y',
+						 
+						 REGEXFIND('FALSE'                  ,poffense,0) <> '' and 
+						 REGEXFIND('INFORMATION'            ,poffense,0) <> '' and 
+						 REGEXFIND('PUBLIC OFFICIAL'        ,poffense,0) <> '' => 'Y',						 
+
+						 REGEXFIND('VIOL[ATION ]'           ,poffense,0) <> '' and 
+						 REGEXFIND('BANK'                   ,poffense,0) <> '' and 
+						 REGEXFIND('LAW'                    ,poffense,0) <> '' => 'Y',
+						 
+						 REGEXFIND('FALSE'                  ,poffense,0) <> '' AND              
+						 REGEXFIND('INFO'                   ,poffense,0) <> '' AND              
+						 REGEXFIND('ID|DR|NAME|APP|GOV'     ,poffense,0) <> '' => 'Y',
+						 
+						 'N');
 return Is_it;
 end;																	
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -2073,6 +2215,8 @@ gam1                           := ' SPORT';
 gam2                           := 'BRIB|GAM';
   
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
+             
+						 // trim(poffense) in _fmod_offense_category_list.GamblingList =>'Y', 
 
              REGEXFIND('[/\\. ]MAK[INGER]*[/\\. ]' ,poffense,0) <> '' and 	
              REGEXFIND('BOOK ' ,poffense,0) <> '' => 'Y',
@@ -2092,7 +2236,11 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 
              REGEXFIND(gam1 ,poffense,0) <> '' and 	
              REGEXFIND(gam2 ,poffense,0) <> '' => 'Y',
-             REGEXFIND(Gambling ,poffense,0) <> '' => 'Y',	               
+             REGEXFIND(Gambling ,poffense,0) <> '' => 'Y',	
+						 
+						 REGEXFIND('LOTTERY' ,poffense,0) <> '' and 	
+             REGEXFIND('TICKET| LAW ' ,poffense,0) <> '' => 'Y',
+
 							 'N');
 return Is_it;
 end;
@@ -2109,6 +2257,8 @@ poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 child_set := '[/\\. ]CHLD[/\\. ]|[/\\. ]CHIL[DREN]*[/\\. ]|MINOR|JUV';
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 
+             // trim(poffense) in _fmod_offense_category_list.HumanTraffickingList =>'Y',
+						 
              REGEXFIND(' COMM[ERCIAL]*[/\\. ]'  ,poffense,0) <> '' and 
 						 REGEXFIND('SEX|NUDITY'             ,poffense,0) <> '' and
 						 //Roger's comment - QA Update - Human Trafficking  Round 3 8/26/16
@@ -2144,8 +2294,10 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 
 						 //QA Update - Human trafficking round 6
 						 REGEXFIND('TRAVEL[ING]* TO MEET',poffense,0) <> '' and 
-             REGEXFIND('MINOR|CHILD|PARENT|SOLIC|GUARDIAN',poffense,0) <> '' 
-						 => 'Y',
+             REGEXFIND('MINOR|CHILD|PARENT|SOLIC|GUARDIAN',poffense,0) <> ''  => 'Y',
+						 
+						 REGEXFIND(' PC 236 ',poffense,0) <> ''  => 'Y',
+						 
 
 						 'N');
 return Is_it;
@@ -2160,10 +2312,11 @@ special_characters    := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|@|\\*|>|"|`|\\[|]|
 poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 false_set             := 'FALSE|[/\\. ]FAL[STEIFYNG]*[/\\. ]|[/\\. ]FAL[SFEID]*[/\\. ]|[/\\. ]FLS[ELY]*[/\\. ]|[/\\. ]FAL[SFICATION]*[/\\. ]|FALSIFICATION';
 
-Kidnapping_Abduction  := 'CHILD STEALING|HIJACKING|AB[U]*D[U]*CT|KI[DA]+[N]*A[P]+ING|K[I]*DN[A]*P|HOSTAGE|KIDANP|KIDKNA|HIJACKIDNG';
+Kidnapping_Abduction  := 'CHILD STEALING|HIJACKING|AB[U]*D[U]*CT|KI[DA]+[N]*A[P]+ING|K[I]*DN[A]*P|HOSTAGE|KIDANP|KIDKNA|HIJACKIDNG|PC 236 |PC 207 A ';
 
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
            
+             // trim(poffense_in) in _fmod_offense_category_list.KidnappingList =>'Y',
 
              REGEXFIND('UNLAW'                       ,poffense,0) <> '' and 
 						 REGEXFIND('IMPRIS|RESTR|DENTEN|DETEN'   ,poffense,0) <> '' and  
@@ -2174,7 +2327,8 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 REGEXFIND('PROST|PORN|FAILURE'          ,poffense,0) = ''  => 'Y',
 						 
              REGEXFIND('RESTRAIN'                    ,poffense,0) <> '' and 
-						 REGEXFIND('CRIM|IMPRIS|FELON|ABUSE'     ,poffense,0) <> ''  => 'Y',
+						 REGEXFIND('CRIM|IMPRIS|FELON|ABUSE'     ,poffense,0) <> '' and 
+						 REGEXFIND('ORDER'                       ,poffense,0) = '' => 'Y',
                                                                  
              REGEXFIND('IMPRISIO'                    ,poffense,0) <> '' and 
 						 REGEXFIND(false_set+'[/\\. ]UNL[FULY]*[/\\. ]'               ,poffense,0) <> ''  => 'Y',
@@ -2221,13 +2375,13 @@ export Is_theft(string poffense_in) := function //done
 special_characters    := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|\\*|<|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
 poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
               
-Burglary_BreakAndEnter := 'BUROLARY|BUR.LARY|BURBULARY|BURG[/\\. ]|B[RU]+GL|BRGLY|BRG[/]|BRG[/0-9 ]|BUR[LG]+|BYRG|BURG[\\. LK]*|B[OUR]+[GR]+[GLAEY]+R[Y]*|BREAK[ING]* [&] ENTER[ING]*|B[&][ ]*E|[/ ]B[ ]*AND[ ]E| BANDE |B[&]E |B[/]E |BREAKING INTO|HOUSE(.*)BREAK|INVASION';       
+Burglary_BreakAndEnter := 'BUROLARY|BUR.LARY|BURBULARY|BURG[/\\. ]|B[RU]+GL|BRGLY|BRG[/]|BRG[/0-9 ]|BUR[LG]+|BYRG|BURG[\\. LK]*|B[OUR]+[GR]+[GLAEY]+R[Y]*|'+
+                          'BREAK[ING]* [&] ENTER[ING]*|B[&][ ]*E|[/ ]B[ ]*AND[ ]E| BANDE |B[&]E |B[/]E |BREAKING INTO|HOUSE(.*)BREAK|INVASION';       
 
 Larceny                 := 'LAR[A]*C[AENY]*|LAR[AC]+[ENY]|STEAL|SAFECRACK|TH[E]*FT';
 Larceny_exc             := 'CHILD STEAL|VE[C]*H|AUTO|[-/ ]M[/]*V[-/ ]|DECLARCATION';
 
 shopl                   := '^[ ]SHOP |TH[E]*FT[ ]*SHOP|SHOP[L]+[OI]FT|SHOPFTING|X[ ]*SHOP[ ]|[- ]SHOP[L\\.]+|SHOP[L\\.]+|[- ]*SHOP[-T ]*L[IGFS]+[TING]*|SHO[PF]+[ ]*LIFT|SHOPLFT|[/ ]SHOP[LIFTING]*[/ ]';                                                                           
-// shopl                   := '^SHOP |TH[E]*FTSHOP|SHOPLIFT|SHOPFTING|XSHOP[- ]|[-"]SHOP[L]*|[- ]*SHOP[-T ]*L[IGFS]+[TING]*|SHO[PF]+[ ]*LIFT|SHOPLFT|[-=/( ]SHOP[LIT]*[-/ ]';                                                                           
 
 Extortion_Blackmail     := 'EXTORT|BLACK[ ]*MAIL|RACKET| RICO ';
 EB_exc                  := 'BRACKET';
@@ -2239,13 +2393,12 @@ E1b := 'MINOR|JUVE|CHILD';
 E2a := 'BREACH';
 E2b := 'PEAC[E]*';
 
-// x43:='"B&E & STEALING-SHOP            ';
-// x44:='"B&E AND STEALING-SHOP    ';
-// x45:='"GRAND LARCENY ""SHOPL" 1                ';
-// x46:='CONVERSION:(812.015(2) /2303/S/M/000/32 ) SHOPLIFTING/TRANSIT FARE EVASION 1  ';
-
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 
+             // trim(poffense) in _fmod_offense_category_list.TheftList =>'Y',
+						 
+						 REGEXFIND('THEFT[ ]*[ \\-]*[BY ]*CONTROL'  ,poffense,0) <>'' => 'Y',
+						 
              REGEXFIND(shopl                ,poffense,0) <> '' => 'N',
 						 REGEXFIND('^IDENT| IDENT|^ID |IDENTIFY'    ,poffense,0) <> '' and 
              REGEXFIND('TH[E]*FT|TEFT|TEHT|[^| ]FRAUD|INTIMIDAT|CONCEAL' ,poffense,0) <> '' => 'N',
@@ -2254,6 +2407,11 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 REGEXFIND('STOLEN|THEFT[\\(|/| ]|LARC[ |E]',poffense,0) <> '' and 
 						 REGEXFIND('AUTO|VEHICLE'       ,poffense,0) <> '' and 
 						 REGEXFIND('TAG'          			,poffense,0) <> '' => 'Y',	
+						 
+						 REGEXFIND('GRAND THEFT'        ,poffense,0) <> '' and 
+						 REGEXFIND('MOTOR VEHICLE|AUTO|VEHICLE|M/VEHICLE|MTR VEH| VEH | MV ' ,poffense,0) =  '' => 'Y',
+						 						 
+						 REGEXFIND(' PC 484 | PC 666 |PC 484E D |PC 484G A |PC 484G | PC 508 |PC 537 A | PC 485 | PC 503 | 2913\\.02 |PC 487 [ABC] |PC 487\\.1| PC 487 | PC 488 |PC 532 A ' ,poffense,0) <> '' => 'Y',
 						 
              REGEXFIND('STOL[EN]*|STLN'     ,poffense,0) <> '' and 
              REGEXFIND('TH[E]*FT|REC[EIV]*|RCV|RVC|POSS|GOODS|PROP|CONCEAL|BUY|SELL|SALE|TRANS' ,poffense,0) <> '' => 'N',
@@ -2264,7 +2422,8 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 
              REGEXFIND(Embezzlement            ,poffense,0) <> '' and 
 						 REGEXFIND(Emb_ecl                 ,poffense,0) = '' => 'Y',	               
-						 
+						  
+
 						 // Roger's comment - 7/15 QA Updates -Theft
 						 // Roger's comment - QA Updates -Theft Round 3 8/26
 						 // Roger's comment - QA Updates -Theft Round 4 9/23
@@ -2335,9 +2494,6 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 	           REGEXFIND('LAR[A]*C|THEFT'             ,poffense,0) <> '' and 
 						 REGEXFIND('RED'                        ,poffense,0) <> '' => 'Y',						 
 						 
-						 // REGEXFIND(Burglary_BreakAndEnter  ,poffense,0) <> '' and
-	           // REGEXFIND(Larceny_exc             ,poffense,0) = '' => 'Y',	
-						 
              REGEXFIND(Larceny                 ,poffense,0) <> '' and 
 						 REGEXFIND(Larceny_exc             ,poffense,0) = '' => 'Y',	         
 						 
@@ -2368,7 +2524,18 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 
              REGEXFIND(E2a                     ,poffense,0) <> '' and 
              REGEXFIND(E2b                     ,poffense,0) = '' => 'Y',
+						 
+						 REGEXFIND('812\\.014\\.2C1|GRAND[ ]*>|GRAND TFT PROP',poffense,0) <> '' => 'Y',
 
+						 REGEXFIND('EVAS[I ]|EVAD[EING ]|VIOL[ATION ]' ,poffense,0) <> '' and 	
+             REGEXFIND('TAX|TOLL'                          ,poffense,0) <> '' => 'Y',
+
+						 REGEXFIND('FAIL| FT '               ,poffense,0) <> '' and 	
+						 REGEXFIND('PAY'                     ,poffense,0) <> '' and 	
+             REGEXFIND('TAX|TOLL'                ,poffense,0) <> '' => 'Y',	
+						 
+						 REGEXFIND('CONCEAL|CONCCEAL|CONCEAML|CONCELAM',poffense,0) <> '' and 
+						 REGEXFIND('SHOPLIFT|[/\\. ]MERCH[/\\. ]|MERCH[ANDISE]+'      ,poffense,0) <> '' => 'Y', 
 						'N');						 
 				 
 return Is_it;
@@ -2385,6 +2552,9 @@ poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 PeepingTom   := 'PEEP|VOY[EU]';
 
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
+             
+						 // trim(poffense_in) in _fmod_offense_category_list.PeepingTomList =>'Y', 
+
              REGEXFIND('NUD'  ,poffense,0)              <> '' and
 						 REGEXFIND('CAPT' ,poffense,0)              <> '' and
              REGEXFIND('IMAG' ,poffense,0)              <> '' => 'Y',
@@ -2399,7 +2569,7 @@ end;
 export Is_Prostitution(string poffense_in) := function //done
 special_characters    := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
 poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
-Prostitution                   := 'PROSI|PRSTIT|PROTIT|PROST|PIMP|PAND';
+Prostitution                   := 'PROSI|PRSTIT|PROTIT|PROST|PIMP|PAND|PC 647 B ';
 P_exc                          := 'EXPAND|PANHAND';
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 
@@ -2408,6 +2578,10 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						
 						 REGEXFIND('FORNICAT'   ,poffense,0) <> '' and 
 						 REGEXFIND('MONEY'      ,poffense,0) <> ''  => 'Y',
+						 
+					   REGEXFIND('PROMOTE'    ,poffense,0) <> '' and 
+						 REGEXFIND('SEX'        ,poffense,0) <> '' and 
+						 REGEXFIND('ACTIV|RELATIONS|IMMORALITY|INTER' ,poffense,0) <> ''  => 'Y',
 						 
              REGEXFIND(Prostitution ,poffense,0) <> '' and
 						 REGEXFIND(P_exc        ,poffense,0) = ''  => 'Y',	               
@@ -2467,31 +2641,33 @@ end;
 
 //--------------------------------------------------------------------------------------------------------------------------------------
 
+
 export Is_SexOffensesForcible(string poffense_in) := function //done
 
 special_characters    := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|%|\\*|>|"|`|\\[|]|\\{|\\}|\\\\|\\\'';
 poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-SexOffensesForcible     := 'AT[TE]*MP[T]*[/\\. ]CSC[/\\. ]|^[ ]*[/\\. ]ATT CSC[/\\. ]|^[ ]*[/\\. ]CSC[/\\. ]|DEG(.*)CSC|'+
-                           'MOLES|RAPE|SEX|SODOM|PENETRAT[ION]*|INTERCOU|IDSI FORCIBLE COMPULSION';
-
+SexOffensesForcible     := 'AT[TE]*MP[T]*[/\\. ]CSC[/\\. ]|^[ ]*[/\\. ]ATT CSC[/\\. ]|^[ ]*[/\\. ]C[\\. ]*S[\\. ]*C[/\\. ]|DEG(.*)CSC|'+
+                           'MOLES|RAPE|[/\\. ]SEX[/\\. ]|SODOM|SODOOMY|SODOBY|SODONY|PENETRAT[ION]*|INTERCOU| IDSI |'+
+													 'PC 243\\.4 A |PC 288 [ABC] |PC 261 [A] | PC 220 ';
 
 SexOffensesForcible_exc := 'WRONG SEX|ALLIGATOR|STATU[T]*[AORY]+|INCEST|STAT RAPE|PERFORM|PORN|FILM|MOVIE|TECH|MATERI|CARJACKING|'+
                            'IMPERSON|PROMOTE|PRODUCE|VIDEO|WILDLIFE|COIN|VEND|VE[C]*H|REPRODUC|AUTO| M[/]*V |PRODUCTION|PLATESEXP|'+
-													 'PAY COST';
+													 'PAY COST|POSS PHOTO|SEX MAT|SEXUAL MATERIAL|PERF BY A CHILD|RECORD SEX ACT';
 
 Assault         := 'ABDOM|ABDGR|ABGEN|ABOFF|ABHAN|ABWIK|ABWITK|BATTER|ASSL|ASS[AU]+L[T]*|AS[SL]*LT|CRUELTY|DOM[.MESTIC ]+VIO|DOMESTI(.*) ABUSE|INTIMIDAT|PHYSICAL HARM|RETALIATION';
 Assault2        := '^[ ]*A[.& ]+B[.]* |^[ ]*A AND B | A[ ]*&[ ]*B |A[ ]*&[ ]*B$|A[.& ]+B[. ]+H[ .&]+A[. ]+N[. ]*|A[. ]+B[. ]+W[ .]+I[. ]+K[. ]*|A[. ]+B[. ]+W[ .]+I[. ]+T[. ]+K[. ]*';
 // assault_ext     := 'SEX|RAPE|MOLES|CARNAL|PENETRAT|INTERCOU|SODOM';
 assault_ext     := 'SEX|RAPE|MOLES|PENETRAT';
-child_set := 'M[OI]NOR|[/\\. ]MIN[/\\. ]|JUV|CHI[U]*LD[REN]*|[/\\. ]CHI[KLD]*[/\\. ]|[/\\. ]CH[I]*L[TDEF][/\\. ]|[/\\. ]CHLD[</\\. ]|[/\\. ]CHILED[/\\. ]| CHITL ';
+child_set       := 'M[OI]NOR|[/\\. ]MIN[/\\. ]|JUV|CHI[U]*LD[REN]*|[/\\. ]CHI[KLD]*[/\\. ]|[/\\. ]CH[I]*L[TDEF][/\\. ]|[/\\. ]CHLD[</\\. ]|[/\\. ]CHILED[/\\. ]| CHITL ';
 
   Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 							 // Roger's comment - QA Update - Sex Offenses Forcible
 							 determine_SOF_SONF(poffense)='SONF' => 'N',
 							
 						   REGEXFIND('PARAPE'                ,poffense,0) <> '' => 'N',
-							 
+							 // trim(poffense) in _fmod_offense_category_list.SexOffensesForcibleList =>'Y', 
+							 							 
 							 REGEXFIND('THERAPE'               ,poffense,0) <> '' and 
 							 REGEXFIND('RAPE'                  ,poffense,0) <> '' => 'Y',
 							 
@@ -2504,6 +2680,10 @@ child_set := 'M[OI]NOR|[/\\. ]MIN[/\\. ]|JUV|CHI[U]*LD[REN]*|[/\\. ]CHI[KLD]*[/\
 							 
 							 REGEXFIND(child_set ,poffense,0) <> '' and
 	             REGEXFIND('[/\\. ]L[&/]L[/\\. ]|LEWD'     ,poffense,0) <> ''   => 'Y',
+							 
+							 REGEXFIND(Assault2                ,poffense,0) <> '' and
+							 REGEXFIND(Assault2                ,poffense,0) <> '' and 
+	             REGEXFIND(assault_ext             ,poffense,0) <> '' => 'Y',
 
                REGEXFIND(SexOffensesForcible     ,poffense,0) <> '' and 
 	             REGEXFIND('FORC'                  ,poffense,0) <> '' => 'Y',	
@@ -2514,11 +2694,16 @@ child_set := 'M[OI]NOR|[/\\. ]MIN[/\\. ]|JUV|CHI[U]*LD[REN]*|[/\\. ]CHI[KLD]*[/\
 							 REGEXFIND(Assault                 ,poffense,0) <> '' and 
 	             REGEXFIND(assault_ext             ,poffense,0) <> ''  => 'Y',
 							 
-							 REGEXFIND(Assault2                ,poffense,0) <> ''and 
-	             REGEXFIND(assault_ext             ,poffense,0) <> '' => 'Y',
+							 REGEXFIND('ATT |COMMIT|FORCIBLE'  ,poffense,0) <> ''and
+							 REGEXFIND(' SODO '                ,poffense,0) <> ''and 							 
+	             REGEXFIND('[/\\. ]STAT[/\\. ]|STAUTORY|STAT[AU][TAORY]+|STA[T]+O[TO]*R|STATRY'             ,poffense,0) = '' => 'Y',							 
+							 
+							 REGEXFIND('[/\\. ]SXOFF[/\\. ]|[/\\. ]SX OF[/\\. ]|SEX OFF[E]*ND'  ,poffense,0) <> ''and 							 
+	             REGEXFIND('[/\\. ]REG[/\\. ]|REGISTER'     ,poffense,0) <> '' => 'Y',
 							 'N');
 return Is_it;
 end;
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------
 
@@ -2527,11 +2712,16 @@ export Is_SexOffensesNon_forcible(string poffense_in) := function //done
 special_characters    := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|@|\\*|>|"|`|\\[|]|\\{|\\}|\\\\|\'';
 poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
     
-SexOffensesNon_forcible        := 'STAT[U/ ]*RAPE|STATSODOMY|STATE(.*)[ ]SEX[UAL]* OFF|STATE SEX[UAL]* [OPFFEC ]*REG';
+SexOffensesNon_forcible        := 'STAT[U/ ]*RAPE|STATSODOMY|STATE(.*)[ ]SEX[UAL]* OFF|STATE SEX[UAL]* [OPFFEC ]*REG|'+
+                                  'PC 647\\.6 [A] |PC 647\\.6 |PC 290 [FG]  |PC 290.018 [B] |PC 261.5 [CD] ';
+																	
 SexOffensesNon_forcible_exc    := 'BURG|OBSCENE|PERFORM|PORN|FILM|MOVIE|COMPUTER|TECH|MATERI|VIDEO|WORDS|GESTURES|PICTURE|PIC|LANGUAGE|PHOTOGRAPH|CONVERSATION|POSING|PHONE|LANUGAGE';
 
 child_set := 'M[OI]NOR|[/\\. ]MIN[/\\. ]|JUV|CHI[U]*LD[REN]*|[/\\. ]CHI[KLD]*[/\\. ]|[/\\. ]CH[I]*L[TDEF][/\\. ]|[/\\. ]CHLD[</\\. ]|[/\\. ]CHILED[/\\. ]| CHITL ';
   Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
+	
+							 // trim(poffense) in _fmod_offense_category_list.SexOffensesNonForcibleList =>'Y',
+							 
 							 // Roger's comment - QA Update - Sex Offenses Non-Forcible
 							 determine_SOF_SONF(poffense)='SONF' => 'Y',	
                REGEXFIND('^[ ]IND[/]CHILD|^[ ]IND[/]EXPOS',poffense,0) <> ''=>  'Y',
@@ -2579,8 +2769,9 @@ child_set := 'M[OI]NOR|[/\\. ]MIN[/\\. ]|JUV|CHI[U]*LD[REN]*|[/\\. ]CHI[KLD]*[/\
 	             REGEXFIND(child_set  ,poffense,0) <> '' => 'Y',
 							 
 	             REGEXFIND('[/\\. ]STAT[/\\. ]|STAUTORY|STAT[AU][TAORY]+|STA[T]+O[TO]*R|STATRY' ,poffense,0) <> '' and
-	             REGEXFIND('RAPE|SOD[O]*MY|INTERCOU|[/\\. ]SEX[USAL]*[/\\. ]|CARNAL|MOLEST' ,poffense,0) <> ''   
-							 => 'Y',				
+	             REGEXFIND('RAPE| SODO |SOD[O]*MY|INTERCOU|[/\\. ]SEX[USAL]*[/\\. ]|CARNAL|MOLEST' ,poffense,0) <> ''   
+							 => 'Y',	
+							
 							 REGEXFIND('CARNAL|MOLEST'        							,poffense,0) <> '' and
 	             REGEXFIND(child_set+'|DAHGHTER| < |YOA|[/\\. ]YR[/\\. ]| Y | [0-1][0-7]Y |LESS THAN|[/\\. ]AGE[/\\. ]' ,poffense,0) <> ''   => 'Y',
 							 
@@ -2624,13 +2815,17 @@ child_set := '[/\\. ]CHLD[/\\. ]|[/\\. ]CHIL[DREN]*[/\\. ]|MINOR|JUV';
 							 
                REGEXFIND(Pornography_Obscene_Material            ,poffense,0)<> ''  => 'Y',	
 							 
+							 // trim(poffense_in) in _fmod_offense_category_list.PornList =>'Y',
+							 
 							 REGEXFIND('[/\\. ]INDE[/\\. ]'                                ,poffense,0) <> ''  and
 							 REGEXFIND('OBSCENI|UTTER|LANG|[\\. ]LAN[NDUAGE]*[\\. ]|[/\\. ]CALL[S]*[/\\. ]|PHON[E]*|[/\\. ]WORD[S]*[/\\. ]|[/\\. ]GEST[URES]*[/\\. ]|MESSAGE|BEHAV[IOR]* ' ,poffense,0) <> '' => 'N',							 
 															 							 
 							 REGEXFIND('DI[SC]*ORDERLY|DISORDER|[/\\. ]DIS[ORDER]*[/\\. ]' ,poffense,0) <> '' and
-						   REGEXFIND('[/\\. ]CON[DUCT]*[/\\. ]'                          ,poffense,0) <> '' => 'N',							 
+						   REGEXFIND('[/\\. ]CON[DUCT]*[/\\. ]'                          ,poffense,0) <> '' => 'N',
 							 
-							 REGEXFIND('[/\\. ]INDE[CENTY]*[/\\. ]'                                ,poffense,0) <> ''  and
+							 REGEXFIND('TEL MISUSE|TELEPHONE MISUSE'                       ,poffense,0) <> '' => 'N',
+							 
+							 REGEXFIND('[/\\. ]INDE[CENTY]*[/\\. ]'                        ,poffense,0) <> ''  and
 							 REGEXFIND('EXHIBITION|[/\\. ]MAT[ERIALS]*[/\\. ]|WRITING|PERFORMAN|DISPLAY|PHOTO|MOVIES|PRINTING|PUBLCTN|PICTURE' ,poffense,0) <> '' => 'Y',	
 							 
 							 REGEXFIND('[/\\. ]NUD[EITY]*[/\\. ]|[/\\. ]OBSCEN[EITY]*[/\\. ]'                                ,poffense,0) <> ''  and
@@ -2702,7 +2897,7 @@ end;
 export Is_Terrorist_Threats(string poffense_in) := function //done
 special_characters    := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|@|\\*|>|"|`|\\[|]|\\{|\\}|\\\\|\'';
 poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
-Terrorist_Threats  := 'TERRORIST|TERROR[ISTM]*|TERRORISTIC|W[EA]*P[ON]*[S]* [OF ]*MASS DES[T]*[RUCT]+';
+Terrorist_Threats  := 'TERRORIST|TERROR[ISTM]*|TERRORISTIC|W[EA]*P[ON]*[S]* [OF ]*MASS DES[T]*[RUCT]+|TERR THRT|TERR THREA|TERR ACTS|PC 186\\.22 A ';
 // Terrorist_ecl      := 'HARM|FALSE INFO';
 Terrorist_ecl      := 'HARM[ |$|/|\\-]|FALSE INFO';
 
@@ -2712,6 +2907,7 @@ TT2b := 'TERR';
 Is_it := MAP(In_Global_Exclude(poffense,'TERROR') = 'Y' => 'N',						 
              REGEXFIND('REVOC' 																			,poffense,0) <> '' OR
 						 (REGEXFIND('PROBAT', poffense,0) <> '' AND REGEXFIND('H[O]?LD|VIO[L]?', poffense,0) <> '') => 'N',
+						 
 						 //Roger's comment - QA terrorist Threats  Round 5 10/11/16
              // REGEXFIND(TT2b 																				,poffense,0) <> '' => 'Y',	
              REGEXFIND(TT2a 																				,poffense,0) <> '' and
@@ -2743,12 +2939,16 @@ export Is_Restraining_Order_Violations(string poffense_in) := function //done
 special_characters    := '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|@|\\*|>|"|`|\\[|]|\\{|\\}|\\\\|\'';
 poffense              := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-Restraining_Order_Violations   := 'VIO(.*)PROT(.*)|VIO(.*) ORD(.*) PROT|VIO(.*) T[\\. ]*P[\\. ]*O|^[ ]V(.*) T[\\.A-Z]* P[\\.PROTECTIVE]* O[\\.ORDER]';
+Restraining_Order_Violations   := 'VIO(.*)PROT(.*)|VIO(.*) ORD(.*) PROT|VIO(.*) T[\\. ]*P[\\. ]*O|^[ ]V(.*) T[\\.A-Z]* P[\\.PROTECTIVE]* O[\\.ORDER]|'+
+                                  'DOMESTIC - VIOLATION OF O|PC 273\\.6 A |PC 273\\.6 |PC 166 C |PC 646\\.9 B ';
 ROV2a                          := 'RESTRAIN(.*) ORDER|PROT(.*) ORDER';
 ROV2b                          := 'VIOL';
 
 vio_set := '[/\\. ]VIO[LATIONG]*[/\\. ]|[/\\. ]VIO[LATED]*[/\\. ]|VIOLATION';
 Is_it := MAP(In_Global_Exclude(poffense,'TERROR') = 'Y' => 'N',
+
+             // trim(poffense) in _fmod_offense_category_list.RestrainingOrderVioList =>'Y',
+
              REGEXFIND('[/\\. ]TPO[/\\. ]|[/\\. ]T\\.P\\.O[/\\. ]' ,poffense,0) <> '' and 
 	           REGEXFIND(vio_set          ,poffense,0) <> '' => 'Y',
 						 
@@ -2794,7 +2994,7 @@ poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
 BadChecks         := ' BD CK | BAD CH| BAD CK| BAD [BEH]+CK | BADC[H]*K[S]*[0-9 ]|PBADCKU|PASBADCHEC|[/ ]PA[DS]+BAD[H]*CK[S]*|[/0-9 ]P[A]*[S][/]*+BADC[HEC]*K[S]*|P[A]*[S]+[BAD]+C[H]*K[S]* | P/BADCK|HOT CHECK|WRIT[E]*BADCK[S]*|'+
                      '^[ ][FEL ]*W/C[ \\$]*[0-9\\.]+|[/\\. ]BAD C[HEC]*KS[/\\. ]|[/\\. ]BAD CK[/\\. ]|PASS BAD|[/\\. ]P[/]*W[/ ]*C[HEC]*K|PASSING BAD|BAD CHECK|'+
-										 'POSSBADCKS|PSBDCKSNSF|PSGBADCHEK|POS(.*)BAD(.)*CHE[C]*KS';
+										 'POSSBADCKS|PSBDCKSNSF|PSGBADCHEK|POS(.*)BAD(.)*CHE[C]*KS| HOT CHK[S]*|PC 476A A |PC 476 |2913\\.11| 13A-9-13\\.1';
 Bogus_chks        := 'BOGUS [C ]*HECK[/ ]|BOGUS CH|BOGUS CK| BOGU[ ]*SCK|BOGUS [CDW]*HECK[S]*[ /]|PASBOGUSCK';	 
 
 worthless_chks    := 'WORTHLESS CH|WORTHLESS CK|WORTHLESS [CDW]HECK[S]* |PASS(.*)W(.*)CHECK| W/LESSCHKS|'+
@@ -2804,10 +3004,10 @@ ck_set            := 'CH[A]*ECK|[/\\. ]C[E]*H[C]*K[S]*[/\\. ]|[/\\. ]CK[S]*[/\\.
                          '[/\\. ]CHE[DX]*K[/\\. ]|[/\\. ]CH[C]*EKC[/\\. ]|[/\\. ]CECK[/\\. ]';                                                                  
 
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
-
+             // trim(poffense_in) in _fmod_offense_category_list.BadChecksList =>'Y',
 //Please select offenses containing OBT  and also contain PROP    and also contain  WORTHLES or W/L.
              REGEXFIND('[/\\. ]NSF[S]*[-/\\. ]|[/\\. ]INSF[ ]*[FUNDS]+[-/\\. ]|[/\\. ]INSF[CHECK]*[-/\\. ]+|[/\\. ]INSF[FUNDS \\.]+C[HEC]*[CK][S0-9]*[-/\\. ]|[/\\. ]INSFC[HEC]*K[OU]'      ,poffense,0) <> '' => 'Y',
-						 REGEXFIND('[/\\. ]BAD[CHECK]*[-/\\. ]+|[/\\. ]BAD[ ]*+C[HEC]*[CK][S0-9]*[-/\\. ]|[/\\. ]BADC[HEC]*K[OUINSUF]+'      ,poffense,0) <> '' => 'Y',
+						 REGEXFIND('[/\\. ]BAD[CHECK]+[-/\\. ]+|[/\\. ]BAD[ ]*+C[HEC]*[CK][S0-9]*[-/\\. ]|[/\\. ]BADC[HEC]*K[OUINSUF]+'      ,poffense,0) <> '' => 'Y',
 						 
 						 REGEXFIND('[/\\. ]STP[/\\. ]'        ,poffense,0) <> '' AND     
 						 REGEXFIND('[/\\. ]PAY[MENT]*[/\\. ]' ,poffense,0) <> '' => 'Y',
@@ -2858,12 +3058,23 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
              REGEXFIND('FUND'                ,poffense,0) <> '' AND               
              REGEXFIND('FORG|COUNTERF'       ,poffense,0) = '' => 'Y',	 
 						 //Roger's comment on Cannot Classify - Bad Check
-             REGEXFIND('FELONY CHECK'       ,poffense,0) <> '' => 'Y',	   
+             REGEXFIND('FELONY CHECK'        ,poffense,0) <> '' => 'Y',	   
 						 
-             REGEXFIND(BadChecks      ,poffense,0) <> '' => 'Y',
+             REGEXFIND(BadChecks             ,poffense,0) <> '' => 'Y',
 						 REGEXFIND(worthless_chks        ,poffense,0) <> '' => 'Y',	
 						 REGEXFIND(Bogus_chks            ,poffense,0) <> '' => 'Y',	
-						 
+
+             REGEXFIND('CRIMINAL'            ,poffense,0) <> '' AND
+						 REGEXFIND('HOT'                 ,poffense,0) <> '' AND
+             REGEXFIND(' CHK[S]* '           ,poffense,0) <>'' => 'Y',
+
+             REGEXFIND(' VIO[L ]+'           ,poffense,0) <> '' AND  
+             REGEXFIND('CHECK'               ,poffense,0) <> '' AND 
+             REGEXFIND(' LAW '               ,poffense,0) <> '' => 'Y',
+
+						 REGEXFIND('OBTAINING'           ,poffense,0) <> '' AND  
+             REGEXFIND('PROPERTY'            ,poffense,0) <> '' AND 
+             REGEXFIND(' WC '                ,poffense,0) <> '' => 'Y',
 						 'N');
 
 return Is_it;
@@ -2875,9 +3086,12 @@ export Is_CurfewLoiteringVagrancyVio(string poffense_in) := function //done
 special_characters:= '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\'';
 poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-CurfewLoiteringVagrancyVio  := 'LOI[T]+|LOTIER|LOUTER|CURF|VAGRA|HOMELES|BEG[G]+IN|BEGG[EA]R|BEGG[/\\. ]';
+CurfewLoiteringVagrancyVio  := 'LOI[T]+|LOTIER|LOUTER|CURF|VAGRA|HOMELES|BEG[G]+IN|BEGG[EA]R|BEGG[/\\. ]|PC 653\\.22 A |HS 11532 A |856\\.021';
+
 Curfew_exc                  := 'EXPLOIT|BEGGINER|HABEGGER ';
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
+
+             // trim(poffense_in) in _fmod_offense_category_list.LoiteringList =>'Y',
 
              REGEXFIND('PAN'   ,poffense,0) <> '' AND               
 						 REGEXFIND('OCCUPANT'            ,poffense,0) =  '' AND 
@@ -2904,8 +3118,16 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 )=> 'Y',
 						  
              REGEXFIND(CurfewLoiteringVagrancyVio ,poffense,0) <> '' AND
-						 REGEXFIND(Curfew_exc ,poffense,0) = '' => 'Y',	               
-							 'N');
+						 REGEXFIND(Curfew_exc ,poffense,0) = '' => 'Y',	       
+						 
+						 REGEXFIND('SLEEP|LODG|CAMP'              ,poffense,0) <> '' and
+						 REGEXFIND('PROHIB'                       ,poffense,0) <> '' and	
+             REGEXFIND('PLAC |PLACES|AREA'            ,poffense,0) <> '' => 'Y',
+						 
+             REGEXFIND('PROWL[ING ]+'                 ,poffense,0) <> '' and
+						 REGEXFIND(' VEH[\\.ICLE ]+'              ,poffense,0) = ''  => 'Y',
+
+						 'N');
 return Is_it;
 end;
 
@@ -2917,7 +3139,7 @@ export Is_Drunkenness(string poffense_in) := function //done
 special_characters:= '~|=|!|-|%|\\^|\\+|:|\\(|\\)|,|;|_|#|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\'';
 poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-Drunkenness                 := 'PUB[LIC]* INTOX|DRUNKENNESS|DUNKNNESS|INTOXICATED IN PUBLIC';
+Drunkenness                 := 'PUB[LIC]* INTOX|DRUNKENNESS|DUNKNNESS|INTOXICATED IN PUBLIC| 647[ ]*F ';
 
 D3                          := 'DISORDER';  
 D3a                         := 'INTOX|ALCOH';
@@ -2926,8 +3148,9 @@ D1                          := 'PUBLIC INTOX|DISORD';
 D2                          := 'DRIV'; 
 D2a                         := 'DRUNK';
 
-Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 
+Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
+             // trim(poffense_in) in _fmod_offense_category_list.DrunkennessList =>'Y',
              REGEXFIND('INTOX'                ,poffense,0) <> '' and
 						 REGEXFIND('[/\\. ][IO]N[/\\. ]|ALONG|UPON'     ,poffense,0) <> '' and
 						 REGEXFIND('FREEWAY|HIGHWA|HIWAY|[/\\. ]HWY[/\\. ]|ROAD| H[YW] |[/\\. ]RD[/\\. ]| RDWAY|PREM' ,poffense,0) <> '' => 'Y',
@@ -2952,26 +3175,36 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 REGEXFIND(D3  ,poffense,0) <> '' and
 						 REGEXFIND(D3a ,poffense,0) <> '' => 'Y',
 						 
+						 REGEXFIND(' INTOX |INTOXICATION'  ,poffense,0) <> '' and
+						 REGEXFIND(' DIS | DOC ' ,poffense,0) <> '' => 'Y',						 
+						 
 						 REGEXFIND(Drunkenness ,poffense,0) <> '' => 'Y',
 							 'N');
 return Is_it;
 end;
 //--------------------------------------------------------------------------------------------------------------------------------------
-
 export Is_FamilyOffenses(string poffense) := function
 
-FamilyOffenses    := 'ALIMONY';
-fam_excl := 'NON[ -]*FAMILY|TERR|ASS[AU]*LT|BATT|INCEST|SEX|PORN|RAPE';
+FamilyOffenses  := 'CRIMINAL MISTREATMENT|ALIMONY|PARENTAL RESPONSIBILITY| F S O P C |COMPULSORY EDUCATION|COMPULSORY SCHOOL|TRUANCY|'+
+                   'PC 243[(]E[)]| PC 273D |PC 368[(]C[)]|PC 368[(]B[)][(]1| 2919\\.25 |243(E)(1)PC-M PC|'+
+                   'PC 273[\\.5 ]+|PC 273A[(][AB2][)]| PC 270 | EC 48262 | EC 48200 | PC 272 ';
+fam_excl        := 'NON[ -]*FAMILY|TERR|ASS[AU]*LT|BATT|INCEST|SEX|PORN|RAPE|DELI[N]*Q';
 
 fon2a := 'THREAT|ABUS[EING]+|CRUEL|ABANABON|DESERT|SUPPORT|NEGLECT|CONTRIB|ENDANGE';
 fon2b := 'FAMILY|CHILD|CHLD|MINOR|SPOUSE|DEPEND|FAM & HSH';    
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
+
+             // trim(poffense) in _fmod_offense_category_list.FamilyOffensesList =>'Y',
+			 
              REGEXFIND('SODOM|RAPE'                 ,poffense,0) <> '' and 
              REGEXFIND('THERAPEUTIC'                ,poffense,0) = '' => 'N',
 
              REGEXFIND('[- ]FTP[ /]'                ,poffense,0) <> '' and
 						 REGEXFIND('CHILD|CHD'                  ,poffense,0) <> '' and
 						 REGEXFIND('SUPP| SP |SAFE'             ,poffense,0) <> '' => 'Y',
+						 
+						 REGEXFIND('OMITTING TO PROVIDE FOR'    ,poffense,0) <> '' and
+						 REGEXFIND('CHILD|MINOR|CHILDREN'       ,poffense,0) <> '' => 'Y',
 						 
 						 (REGEXFIND('NON|FAIL|WITHHOLD|REFUSE|FLR|OBLIGAT|SPOUS|CHIL|PARENT|PAY|FTP |F[/]T[/]P|CHILD|MINOR|DESERT|PROVID' ,poffense,0) <> '' OR
 						  (REGEXFIND('CRIM',poffense,0) <> '' and REGEXFIND('NO[- ]',poffense,0) <> '')
@@ -3032,12 +3265,16 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
              REGEXFIND('UNAT| CAR|CAR |VEH|MV|AUTO' ,poffense,0) <> '' => 'Y',
 						 
 						 REGEXFIND('SCHOOL'                     ,poffense,0) <> '' and  
-             REGEXFIND('MINOR|CHILD|JUV'            ,poffense,0) <> '' and  
-             REGEXFIND('ABSENT|SKIP|SEND|SND|F[/]*T[/]*S|LEAVE|ATT|ATTENDANCE' ,poffense,0) <> '' => 'Y',
+             REGEXFIND('ABSENT|SKIP|SEND|SND |ATTEN[ CST]+|ATT[AET]*ND[ANCE]*|TARDY' ,poffense,0) <> '' => 'Y',
 						 
 						 //Roger's comment - QA Update - Family Offenses  Round 3 8/26/16
 						 REGEXFIND('ENDANGERMENT|ENDANGER[ING]' ,poffense,0) <> '' and  
              REGEXFIND('CHILD'            					,poffense,0) <> '' => 'Y',
+						   
+             trim(poffense) IN [' DOMESTIC',' CRIMINAL DOMESTIC',' REFUSE/RELINQUISH PHONE/DOMES'] => 'Y', //VC 20170519 email req change
+
+				     REGEXFIND('DOM[ EST]'                                     ,poffense,0) <> '' and     //VC 20170519 email req change
+						 REGEXFIND('VIO[LENCE \\.]+|ABUS[E]*|ASSAULT|BATTERY|ABDOM',poffense,0) <> '' => 'Y',
 						 
              REGEXFIND(FamilyOffenses ,poffense,0) <> '' and 
              REGEXFIND(fam_excl ,poffense,0) = '' => 'Y',	
@@ -3045,6 +3282,17 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 REGEXFIND(fon2a ,poffense,0) <> '' and 
 						 REGEXFIND(fon2b ,poffense,0) <> '' and 
              REGEXFIND(fam_excl ,poffense,0) = '' => 'Y',	
+						 
+						 REGEXFIND('NONSUPP'                          ,poffense,0) <> '' and
+						 REGEXFIND('MINOR|CHILD'                      ,poffense,0) <> '' => 'Y',
+						 
+						 // REGEXFIND('INFLICT'                          ,poffense,0) <> '' and
+						 REGEXFIND(' CORP |CORPORAL|TRAUMA|INJ[ URY]+',poffense,0) <> '' and
+						 REGEXFIND('SPOUSE|COHABIT|COHABITANT| COHA ' ,poffense,0) <> '' => 'Y',
+						 
+						 REGEXFIND('MALICIOUS'                        ,poffense,0) <> '' and
+						 REGEXFIND('PUNISHMENT'                       ,poffense,0) <> '' and
+						 REGEXFIND('CHILD|MINOR'                      ,poffense,0) <> '' => 'Y',
 						 'N');
 return Is_it;
 end;
@@ -3060,7 +3308,7 @@ misc         := 'UNDER|MINOR|AFTER|HOUR|HR|[<]21|[<]18';
 IDSET        := '[/\\. ]ID[ENDIFICATION]*[/\\. ]|[/\\. ]ID[ENTIFYING]*[/\\. ]| I[/]D | I[/\\. ]D[/\\. ]';
 vio_set      := '[/\\. ]VIO[LATIONGS]*[/\\. ]|[/\\. ]VIO[LATED]*[/\\. ]|[/\\. ]VOL[LATIONGS]*[/\\. ]|[/\\. ]VOL[ILATED]*[/\\. ]|VIOLATION';
 liq_set      := '[/\\. ]LIQ[U]*M[0-9]|[/\\. ]LIQ[0UIOERS]*[/\\. ]|LIQUO[LR]';
-alc_set      := liq_set+'|ALCAHOL|LACOHOL|ACOHOL|ALCOHOL|[/\\. ]AL[C]+[0OHLIC]*[/\\. ]|ALOCH|ALC[OH]+|ALCONHLIC|ALCIHOL| AALC[/]| OFALC[/]|ALCLOHOLIC';
+alc_set      := liq_set+'| ALC/|ALCAHOL|LACOHOL|ACOHOL|ALCOHOL|[/\\. ]AL[C]+[0OHLIC]*[/\\. ]|ALOCH|ALC[OH]+|ALCONHLIC|ALCIHOL| AALC[/]| OFALC[/]|ALCLOHOLIC';
 Intox        := alc_set+'|INOTXI[CATING]*[/\\. ]|BEER|INTOX|WINE|[/\\. ]QLCO[/\\. ]|[/\\. ]QALC[/\\. ]';
 // Intox        := '[/\\. ]ALC[OHOL]*[/\\. ]|LIQ|BEER|INTOX|WINE|ALOCH| QLCO[/\\. ]|ALCOHOL';
                                                                  
@@ -3068,17 +3316,26 @@ Intox        := alc_set+'|INOTXI[CATING]*[/\\. ]|BEER|INTOX|WINE|[/\\. ]QLCO[/\\
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' OR
 						 Is_Drunkenness(poffense)='Y'   OR     
 						 Is_DrivingUndertheInfluence(poffense)='Y'	=> 'N',
+						 
+						 // trim(poffense_in) in _fmod_offense_category_list.LiquorLawViolationsList =>'Y',
 
-             REGEXFIND('DRIV'               		,poffense,0) <> ''and 
-						 REGEXFIND('UNDER|WHILE'        		,poffense,0) <> ''and  
+             REGEXFIND('DRIV'               		,poffense,0) <> '' and 
+						 REGEXFIND('UNDER|WHILE'        		,poffense,0) <> '' and  
 						 REGEXFIND('INFL[EU]|INLFU'     		,poffense,0) <> '' => 'N',
 						 
-						 REGEXFIND('DRIV'               		,poffense,0) <> ''and 
+						 REGEXFIND('DRIV'               		,poffense,0) <> '' and 
 						 REGEXFIND('INTOX|W/INTOX'     		  ,poffense,0) <> '' => 'N',
 						 
 						 REGEXFIND(alc_set                  ,poffense,0) <> '' AND
-						 REGEXFIND('FALSE'                  ,poffense,0) <> ''  AND
+						 REGEXFIND('FALSE'                  ,poffense,0) <> '' AND
 						 REGEXFIND('STATEMENT|EVIDEN|APPLI|REPP'  ,poffense,0) <> ''  => 'Y',
+						 
+						 
+             REGEXFIND('BP 25662|BP 25658 A |BP 25620|VC 23223 B |VC 23224 A '  ,poffense,0) <> ''  => 'Y',
+
+						 
+						 REGEXFIND('CONSUMPTION|CONSUM|CONSUMING'                  ,poffense,0) <> ''  AND
+						 REGEXFIND('MINOR|UNDERAGE|ILLEGAL| MV | MOTOR VEHICLE| U/A |PREMISE LIC'  ,poffense,0) <> ''  => 'Y',
 
 						 REGEXFIND('[/\\. ]ALC09[/\\. ]|[/\\. ]ALC21[/\\. ]|[/\\. ]ALC13[/\\. ]|LIQ[UOR]* LAW VIO|ALC[B0OHPOL]*[/\\. ]*BEV|POSS[OF]*ALC[BY ]+|ALCPUBLIC|ALC(.*)UNDER 21|'+
 						           'POSSLIQ[U]*M[I]*N|POSSLIQON|SALE[OF]*LIQ[/\\. ]|SELL[OF]*LIQ[/\\. ]|SUPPLYLIQ[UOR]* ',poffense,0) <> '' => 'Y',
@@ -3237,7 +3494,43 @@ Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' OR
 						 REGEXFIND(vio_set+'|[/\\. ]VIL[OATION]*[/\\. ]|VILOATION|LAW|BEER|ALCOH|'+liq_set       ,poffense,0) <> '' => 'Y',
 
 						 REGEXFIND('OPEN BOTTLE|OPEN/C PUBLIC PLACE',poffense,0) <> ''		  => 'Y',
+						
+						 REGEXFIND(' VEH[ICLE]* |PUBLIC'        ,poffense,0) <> '' and  
+						 REGEXFIND(' IN '                       ,poffense,0) <> '' and
+						 REGEXFIND(Intox+'|CONSUM'   					  ,poffense,0) <>  '' => 'Y',
 
+						 REGEXFIND(' VEH |PUBLIC'               ,poffense,0) <> '' and  
+						 REGEXFIND(' CONT '                     ,poffense,0) <> '' and
+						 REGEXFIND(Intox             					  ,poffense,0) <>  '' => 'Y',
+
+						 REGEXFIND('CHAPTER 123'                ,poffense,0) <> '' and
+						 REGEXFIND(Intox             					  ,poffense,0) <>  '' => 'Y',
+						 
+						 REGEXFIND('SELL|SALE' 		                                          ,poffense,0) <> '' and						 
+						 REGEXFIND('MALT|BEV'                                            		,poffense,0) <> '' => 'Y',
+
+						 REGEXFIND(alc_set      		                                        ,poffense,0) <> '' and
+						 REGEXFIND('POSN'     		                                          ,poffense,0) <> '' and						 
+						 REGEXFIND('STORE'                                               		,poffense,0) <> '' => 'Y',
+
+						 REGEXFIND(alc_set      		                                        ,poffense,0) <> '' and
+						 REGEXFIND('UNDER'     		                                          ,poffense,0) <> '' and						 
+						 REGEXFIND('21'                                                 		,poffense,0) <> '' => 'Y',
+
+						 REGEXFIND('OPEN FLASK| T[\\.][ ]*O[\\.][ ]*C[\\.]| BP 25620| BP 25662 A '     		,poffense,0) <> '' => 'Y',
+						 
+						 REGEXFIND(alc_set      		                                        ,poffense,0) <> '' and
+						 REGEXFIND('PROVISIONS'     		                                    ,poffense,0) <> '' and						 
+						 REGEXFIND('VIOLATION'                                          		,poffense,0) <> '' => 'Y',
+
+             REGEXFIND('ALCOHOL VIOLATION|ALCOHOL/PUB/|ALCOHOL/CURB|ALCOHOL/POSN/|ALCOHOL ORDINANCE'	,poffense,0) <> '' => 'Y',
+						 
+						 REGEXFIND('POSS|PURCH'        		                                  ,poffense,0) <> '' and
+						 REGEXFIND('MINOR| <21 AG'     		                                  ,poffense,0) <> '' and						 
+						 REGEXFIND('MALT BEV'                                            		,poffense,0) <> '' => 'Y',
+						 
+						 REGEXFIND('MINOR IN POSSESSION'                                    ,poffense,0) <> '' => 'Y',
+						 
 							 'N');							 
 							 
 return Is_it;
@@ -3250,7 +3543,9 @@ special_characters:= '~|=|!|%|\\^|\\+|:|\\(|\\)|,|;|_|-|#|@|\\*|<|>|"|`|\\[|]|\\
 poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 																	 
 DisorderlyConduct   :=  '^ DC |DEF[AE]CAT|ISORDERLY CONDUCT|[/\\ ]D[\\.]C[\\.][/ ]|[/\\. ]D/C[ONDUCT]*[/\\. ]|[/\\ ]D[\\.]C[\\.][PERSITNG\\.]*[/ ]|[/\\ ]D[\\.]C[\\.]I[\\.N]+|'+
-                        'NUDE|INDEC|INDCE|INDENC|URIN[A]*TE|DISORDER[L]+[Y]*|DIS ORDER[ER]*LY|DISORDERY|NOISE|URINAT|DEFACAT|INDEC(.*)EXP| DIS[C/\\.]*COND | DIS[\\.][ ]*COND';
+                        'NUDE|INDEC|INDCE|INDENC|URIN[A]*TE|DISORDER[L]+[Y]*|DIS ORDER[ER]*LY|DISORDERY|NOISE|URINAT|DEFACAT|INDEC(.*)EXP| DIS[C/\\.]*COND | DIS[\\.][ ]*COND|'+
+												'PC 647 A |PC 647 H |PC 288 A |PC 288 C |PC 314\\.1|PC 415 |PC 415 [12] |VC 27151 A | 2917\\.11 ';
+
 DisorderlyConduct1  := 	'DI[S]*ORD[ERLY]* CON[DUCT]*|DISOR(.*)CON[DUCT]*[/\\. ]|DIS(.*)CONDUCT|RECKL[ESS]* COND[AUCT]*|RECKL[ESS]* COND[TACT]*|DIS CON[DUCT]*[/\\. ]| DIS[\\. ]COND[LUISNGCTF]+[INTOX]* |'+
 												'DIS[OERDER]+LY COND|DIS[C]*OR[/D][ER]*[/ ]*CON[FD]| DIS[/ ]CONDM[.][ ]|DISC..[ ]*COND PER';
 DC_Exc              := 'TAG|T\\.D\\.C\\.J|D[/]COC|WASH STATE|WASHINGTON|FORGE|NO DC|NO VALID|FRAUD|SUSP|CON SUB| REGIS';
@@ -3269,6 +3564,8 @@ DC2c                := 'OBSCEN';
 DC2d                := 'LANG|PHONE|WORDS|GESTU|PUBLIC|COND'; 
 Is_it := MAP(In_Global_Exclude(poffense,'other')='Y' => 'N',
 
+             // trim(poffense) in _fmod_offense_category_list.DisorderlyConductList =>'Y',
+						 
              //this expression has to be above the  Is_LiquorLawViolations clause below. 
 						 REGEXFIND('DI[SC]*ORDERLY|DISORDER|[/\\. ]DIS[ORDER]*[/\\. ]' ,poffense,0) <> '' and
 						 REGEXFIND('[/\\. ]COND[UCT]*[/\\. ]|CONDUCT'      ,poffense,0) <> '' => 'Y', 
@@ -3369,12 +3666,16 @@ export Is_TrespassofRealProperty(string poffense_in) := function //done
 special_characters:= '~|=|!|%|\\^|\\+|:|\\(|\\)|,|;|_|-|#|@|\\*|<|>|"|`|\\[|]|\\{|\\}|\\\\|\'';
 poffense          := ' '+REGEXREPLACE(special_characters, poffense_in, ' ');
 
-TrespassofRealProperty      := 'TRANSPAS|TRES[PASS]*|TRESSPASS|TR[ES]PASS|TREAPAS|TRSP[S]* ';
+TrespassofRealProperty      := 'TRANSPAS|TRES[PASS]*|TRESSPASS|TR[ES]PASS|TREAPAS|TRSP[S]* |810.09.2A|810.08.2A|810.09.2B|810.09.1A1|'+
+                               'PC 602\\.5|PC 602 |PC 602\\.1 A |PC 369 I |PC 369I A ';
+
 Is_it := MAP( In_Global_Exclude(poffense,'other')='Y'      OR
               Is_Burglary_BreakAndEnter_res(poffense)='Y'  OR
 							Is_Burglary_BreakAndEnter_comm(poffense)='Y' OR
 							Is_Burglary_BreakAndEnter_veh(poffense)='Y'  => 'N',
-						 
+							
+						 // trim(poffense_in) in _fmod_offense_category_list.TrespassingList =>'Y',
+
              REGEXFIND('ENTER|ENTYR|ENTRY'            ,poffense,0) <> '' and	
              (REGEXFIND('UNAUTH'                      ,poffense,0) <> '' or
              ( REGEXFIND('WITHOUT|[/\\. ]W[/]O[UT]*[/\\. ]|[/\\. ]W[- ]O[/\\. ]|[/\\. ]NO[/\\. ]',poffense,0) <> '' and 
@@ -3397,47 +3698,52 @@ Is_it := MAP( In_Global_Exclude(poffense,'other')='Y'      OR
              REGEXFIND('POST'                         ,poffense,0) <> '' => 'Y',	
 
 						 //QA Update - Trespassing Round 6
-             REGEXFIND('[REFUSING|REFUSAL] TO LEAVE'  ,poffense,0) <> '' => 'Y',	               
+             REGEXFIND('REFUS[ALING]+ TO LEAVE'       ,poffense,0) <> '' => 'Y',	   	               
 						 
-             REGEXFIND(TrespassofRealProperty         ,poffense,0) <> '' => 'Y',	               
-
+             REGEXFIND(TrespassofRealProperty         ,poffense,0) <> '' => 'Y',	       
+						 
+             REGEXFIND('SLEEP|LODG|CAMP'              ,poffense,0) <> '' and
+						 REGEXFIND('PROHIB'                       ,poffense,0) <> '' and	
+             REGEXFIND('PLAC |PLACES|AREA'            ,poffense,0) <> '' => 'Y',
+						 
 						 'N');
 return Is_it;
 end;
 //--------------------------------------------------------------------------------------------------------------------------------------
 
 export Is_traffic(string poffense) := function
-
+ 
 LIC1         :=   '^D.LICENSE|^D[/\\. ]*L[IC/\\. ]*NOT|DR(.*)LIC(.*)LAW|DISP[LAY]*(.*) LICENSE|CONDITIONAL LICENSES|CANCEL[LED]* LICENSE|ALLOW(.*)NON[ -]*LICENSED|'+
-                  'PERMIT(.*)UNLICENSED|CHAUF(.*) LIC|LICENSE REQ|NO(.*) LICENSE|LIC. SUS.|'+
+                  'PERMIT(.*)UNLICENSED|CHAUF(.*) LIC|LICENSE REQ|NO(.*) LICENSE|LIC. SUS.|DRG LIC SUS[/]REV PURS TO SEC|OPERATING WHILE REVOKED|'+
 									'ALLOW(.*) UNLIC(.*)|ALLOW(.*) NON(.*)LIC(.*) DR|LICENSE RESTR|ST[ATE]* LIC(.*)PLAT|FAIL WEAR LICEN|FAIL[URE]*(.*)DISPLAY LICENSE|'+
                   'FAIL[URE]*(.*)EXHIBIT[ED]*(.*)LICENSE|LICENSE(.*)CARRIED|SUSPENDED(.*) LICENSE|IMPR(.*) LIC|FAIL(.*) LIC|RESTRICT[ED]* LIC[ENSE]*|'+									
-									'SUSP[ \\.]LIC|VALID LIC|^EXP(.*) LIC|^FIC[TICIOUS]* LIC| FIC[TICIOUS]* LIC|NO LIC|PRESENT LICENSE|^O[-\\. /]L[ \\.]'+
-									'NO DR(.*) LIC|NO OPERATOR(.*) LIC|UNLIC(.*) VEH| DL |^(VIO[ .])*D[/\\. ]*L[/\\. ]*LAW|ALLOW(.*)REVOKE|MOPED LICENS';		
+									'SUSP[ \\.]LIC|VALID LIC|^EXP(.*) LIC|^FIC[TICIOUS]* LIC| FIC[TICIOUS]* LIC|NO LIC|PRESENT LICENSE|^O[-\\. /]L[ \\.]|RECK DR:|'+
+									'NO DR(.*) LIC|NO OPERATOR(.*) LIC|UNLIC(.*) VEH| DL |^(VIO[ .])*D[/\\. ]*L[/\\. ]*LAW|ALLOW(.*)REVOKE|MOPED LICENS|LICENSE PLATE|'+
+									'LICENSE SUSPENSION|LSOA WITHOUT GIVING INFO|NO VALID D[\\./ ]+L[\\. ]|OPER SUSP[/]REV';		
 //DIS(.*) LIC|															
-traffic_list :=   '^TAG[;: ]|12 P[OIN]*T|^AUTO |ACCIDENT|ABAND(.*)VEH|ABAND(.*)M/V|BUMPER|BRAKES|'+	                 
-                  'CHILD(.*) SEAT|[ *]CMV|^CMV |EXCEED[ING]* [0-9]+ MPH|^DUS|DR (.*)SUSP|DR (.*)REV|DL SUSP|DISR(.*) SAFE|'+ 
+traffic_list :=   '^TAG[;: ]|12 P[OIN]*T|^AUTO |ACCIDENT|ABAND(.*)VEH|ABAND(.*)M/V|BUMPER|BRAKES|PERIOD[S]* FOR REQUIRING LIGHTED LAMPS|HEAD[ ]*LAMPS[- ]+(.*)[ ]*VEH|'+	                 
+                  'CHILD(.*) SEAT|[ *]CMV|^CMV |EXCEED[ING]* [0-9]+ MPH|^DUS|DR (.*)SUSP|DR (.*)REV|DL SUSP|DISR(.*) SAFE|WINDSHIELD[S]* REQUIRED|'+ 
 									'CITATION|COMMERCIAL TAG REQ|CANCEL(.*) O[. /]L|[C]*DL RESTRICTION|PARENT, GUARDIAN, OTHER ALLOWING|ALLOWING UNAUTHORIZED|ALLOWING UNLAWFUL|'+
                   'IMPROPER REG|IMPROPER CLASS|IMPROPER I[.]*D|NO SINGLE STATE|STATE TAG|IMPR(.*) TAG|FINANCIAL RESP|REGISTRATION REQUIRED|^REG(.*) LAW|REG(.*) EXP|'+
                   'NOT[ICE ]+OF CH[AN]*G[E]*(.*) ADD|FAIL(.*)CHANGE(.*)ADD[RESS]|FAIL(.*) TO COMPLY|FAIL TO SURR|FAIL TO REG|FAIL(.*) APPR|'+
                   'NOTIFY CHP|NOTIFY(.*) ADD(.*) CHANGE|SU[SPE]+NDED|EXP[ .]|EXPIRE|^EXP(.*) PL|^EXP(.*) RE|^EXP(.*) TAG|'+
-                  'VALID REG|VIOLATION(.*) YOA|DIS(.*) REG|RADAR|^R[./ ]+D[. -/]|^R[ ]*D[:. /]+|DWLS|'+
+                  'VALID REG|VIOLATION(.*) YOA|DIS(.*) REG|RADAR|^R[./ ]+D[. -/]|^R[ ]*D[:. /]+|DWLS|OBSCURED (.*)[ ]*PLATE|'+
                   '^FIC[TICIOUS]* PL|^FIC[TICIOUS]* RE|^FIC[TICIOUS]* TAG| FIC[TICIOUS]* PL| FIC[TICIOUS]* RE| FIC[TICIOUS]* TAG';
 //EXPIRED|FAIL(.*) REG|
 
- traffic_list2 :=	'LEFT OF CENTER|FOLLOW[ING]* TOO CLOSE|MUFFLER|MUDGUARD|'+		                								  
+ traffic_list2 :=	'LEFT OF CENTER|FOLLOW[ING]* TOO CLOSE|MUFFLER|MUDGUARD|EXCEED 65 OR 70 MPH FOR ALL VEHICLES BY|DEFECTIVE WINDSHIELD|ASSURED CLEAR DIST|'+		                								  
 	                'HWY SIGN|HELMET|H[OU]*R[\\. ]*RULE|HIGHWAY|HIT (.*)SKIP|WIDE[ ]*LOAD|WRONG CLASS|NO(.*) O[\\. /]*L|NO CERT|'+
-                  'NO(.*) REGISTRATION|^NO OP[A-Z]* |^NO OL |^NO D[\\. ]*L|NO LIAB[ILITY]* INS[URANCE]*|NO VALID MVI|'+
+                  'NO(.*) REGISTRATION|^NO OP[A-Z]* |^NO OL |^NO D[\\. ]*L|NO LIAB[ILITY]* INS[URANCE]*|NO VALID MVI|OVER LIC[\\.ENSED ]+WEIGHT|'+
                   '^LOG[ ]*BOOK|NO LOG BOOK|NO O[/ .]L[\\. ]|NO OVERSIZE PERMIT|NO OVERWIDTH PERMIT|OVERW[EI]+GHT|OVERH[EI]+GHT|'+		
 							    'OMVI|^OUI|^OWI| OWI | OUIL|OPER(.*) W(.*)O(.*) CARRIER PERMIT|OL(.*) SUSP|OVER [GROSS ]*WEIGHT|'+
                   '[O0]\\.V\\.I|[O0][/]V[/]I|OVI |OVER[ ]*WIDTH|OVER[ ]*SIZE|OVER[ ]*LIMIT|OVER[ ]*LENGTH|OVERDIMENSIONAL LOAD|ODOMETER|'+ 
-                  'OPER(.*)CERT|RIGHT OF WAY|RIGHT TURN|CONT(.*) DEV|VEHICLE[S]* SUBJECT TO REGISTRATION';
+                  'OPER(.*)CERT|RIGHT OF WAY|RIGHT TURN|CONT(.*) DEV|VEHICLE[S]* SUBJECT TO REGISTRATION|EVIDENCE OF REGIS|EVID REG SIGN';
 //ROAD|									
  traffic_list3 := 'SIGNAL|^REV[.OKE ]+|^SUSP|^SURR|SEA[TL][ ]*B[EA]*LT|TRANSPORTER|TOLLWAY|TOO FAST|STO[P]+ING AFTER ACC|'+
-                  'UNREGISTERED|UNINSURED|UNSECURE(.*) LO\\]AD|UNSAFE BACKING|VIO(.*) REG|'+	
+                  'UNREGISTERED|UNINSURED|UNSECURE(.*) LO\\]AD|UNSAFE BACKING|VIO(.*) REG|WINDSHIELD WIPERS|STARTING [AND\\&]+ BACKING|'+	
                   'WHEEL|WRONG SIDE|WRONG DIRECTION|WRONG WAY|WINDSHEILD|TINT|UNSIGNED REGISTRATION|YIELD|PK[0-9]+[ 0-9]+$|'+
-									 'HORN|FMCSR|FMCSK|PWC|MCV[-:]|PEDEST|VSRL|U[/ -]*TURN|RD[-/]SP|PARKING|RIDE|RIDING|DWLR|CFR[ ]*-|'+
-									 'CRASH|USDOT | US DOT[ #]|^DPS[- /]';
+									 'HORN|FMCSR|FMCSK|PWC|MCV[-:]|PEDEST|VSRL|U[/ -]*TURN|RD[-/]SP|PARKING|RIDE|RIDING|DWLR|CFR[ ]*-|SIDE WINDOWS[-: ]+RESTRICT|'+
+									 'CRASH|USDOT | US DOT[ #]|^DPS[- /]|ILLEGAL SUN[ ]*SHAD|WINDSHIELD[S]*[- ]+SIGN[,/ ]+COVERING[,/ ]+SUNSCREEN MATERIAL';
 
  traffic_list4 := 'SUSPD[-)/ \\.]|SPD[-)/ \\.]|SPDG[-\\. ]|BOAT|BICYCLE|BIKE|CYCLING|D\\.[ ]*U\\.[ ]*S|D[/]U[/]S|D\\.[ ]*W\\.[ ]*[0OD][\\. ]*L|D[ ]*\\.[ ]*W[ ]*\\.[ I]*[OL]|D\\.[ ]*W\\.[ ]*[SR]|'+   
                   'D[/]W[/]O[/]L|D[/]W[/]L|D[/]W[/]O|D[/]W[/]S|D[/]W[/]R';  
@@ -3445,31 +3751,40 @@ traffic_list :=   '^TAG[;: ]|12 P[OIN]*T|^AUTO |ACCIDENT|ABAND(.*)VEH|ABAND(.*)M
  traffic_list5 := 'LANE|DISOBEY|^DUS[-/ ]|[-/ ]DUS[-/ ]|[-/ ]DWOL[-/ ]|^DWOL[-/ ]|DWOVDL|[-/ ]DWS[-/ ]|^DWS[-/ ]|[-/ ]DWR[-/ ]|^DWR[-/ ]|D[ ]*W[ ]*L[ ]*S[/]R |'+
                   '^DLWSR[-/ ]|[-/ ]DLWSR[-/ ]|DSLW[/]R |[-/ ]DWSOL[-/ ]|^DWSOL[-/ ]|SPDOMTR|DWLC/S/R/L';
 									
-																		
+ traffic_list6 :='322.34.2|322.031[(]1[)]|322.03.1|3162952[(]2[)]B|169-475-2|322\\.34[(]10[)]|17AAC25\\.210|169-06-5-A-3-III|316130[(]11[)]|316614[(]4[)(]+A[)]|DAC[/]IPS|'+
+                 'VC 22350 |VC 22349[(]A[)]|VC 12500[(]A[)]|VC 16028[(][AC][)]|VC 20002[(]A[)]|VC 4000[(]A[)]|VC 12500[(]B[)]|VC 12500[(]D[)]|VC 27315[(][DEF][)]|VC 21453[(][AC][)]|VC 22450[(]A[)]|'+
+                 'VC 14601\\.1[(]A[)]|VC 16028[(]A[)]|VC 27315[(][DEF][)]VC 14601\\.5[(]A[)]|VC 26708[(]A[)][(]1[)]|VC 26708\\.5|VC 22101[(][AD][)]|VC 21461[(]A[)]|VC 21461\\.5 |VC 14601\\.[25][(]A[)]|'+
+                 'VC 14601[(]A[)]|VC 16028(C)|VC 12951[(]A[)]|VC 23103\\.5|VC 23103 |VC 23103[(]A[)]|VC 22349[(]B[)]|VC 16020[(]A[)]|VC 5200 |VC 5200[(]A[)]|VC 24252[(]A[)]|VC 4454[(]A[)]|VC 22451[(]A[)]|'+
+                 'VC 14600[(]A[)]|4511\\.21|4513\\.263|4511\\.21D1|4511\\.202|4511\\.19A1|4511\\.43A|VC 5204[(]A[)]|VC 23123[(]A[)]|VC 23123\\.5[(]A[)]|VC 22454[(]A[)]|VC 26453|VC 21703 |VC 24601 |VC 35550[(]A[)]|'+
+                 'VC 27007 |VC 21658[(]A[)]| VC 23222[(]B[)]|VC 2800\\.[12]|VC 27360[(]A[)]|VC 27360\\.5[(][AB][)]|VC 27360[(]B[)]|VC 21212[(]A[)]|VC 21755 |14601VC|VC 21460[(]A[)]|VC 21460\\.5[(]C[)]|VC 24250 ';
+
+ traffic_list7 :='VC 24400 |VC 24400[(]A[)]|74-55-B|VC 24603[(][BE][)]|VC 24603 |VC 24002[(][AB][)]|VC 22107 |VC 26710 |VC 21651[(]A[)]|VC 21651[(]A[)]|VC 2815 |VC 21453[(]B[)]|VC 35551[(]A[)]|VC 21801[(]A[)]|316063[(]1[)]|'+
+'VC 4462\\.5|VC 4462[(]B[)]|VC 22406[(][AB][)]|VC 21950[(]A[)]|VC 23111|VC 27600|VC 21650 |VC 21650\\.1|VC 20001[(]A[)]|VC 20001 |VC 21955 |VC 24600[(][ABE][)]|VC 22348[(][BC][)]|VC 22100[(][AB][)]|VC 22400[(]A[)]|'+
+'VC 21804[(]A[)]|VC 21802[(]A[)]|487465 VBR|VC 27151[(]A[)]|VC 31 |VC 21201[(][D[)]|VC 27465[(]B[)]|4507\\.02A|VC 21457[(]A[)]|VC 5201 |VC 5201[(]F[)]|VC 21718[(]A[)]|VC 34506\\.3|VC 345063 |VC 23225[(]A[)]|'+
+'VC 14603 |VC 22106 |VC 22102 |VC 4159 |VC 26101 |VC 27150[(]A[)]|4513\\.263[(]P|4513\\.263 |VC 38366[(]A[)]|VC 21800[(]D[)][(]1[)]|4507\\.02B|VC 22108 |VC 23223[(]A[)]|VC 23223 |VC 10852|VC 12814\\.6|VC 14604[(]A[)]|'+
+'VC 21655\\.5[(]B[)]|VC 27156[(]B[)]|VC 21456[(]B[)]|VC 2800\\.1|VC 22526[(]C[)]|VC 22526[(]A[)]|VC 21209[(]A[)]|VC 27153 |VC 2818 |VC 34507\\.5[(][AB][)]|VC 23109[(]C[)]|VC 27803[(]B[)]|VC 21453[(]D|'+
+'VC 24003 |VC 35400[(]A[)]|VC 21367[(]C[)]|VC 23224[(]A[)]|73\\.20[(]A[)]|VC 25950[(]A[)]|VC 38020|VC 24953[(]A[)]|VC 26709[(]A[)]|VC 27400 |VC 21806[(]A[)]|4503\\.21|VC 27900[(]A[)]|VC 23247[(]E[)]|6701H 1B ';																
 
  exclude_list_traffic := 'DEER|DOG|FISH|WILD[ LIFE]*|SU[SP]*(.*) SENT|SEX|REGISTRY|OCCUPATION|PROBATION|VIO(.*) REGULATION|THEFT|VANDALISM|TRES[S]*PASS|TRAFFICING|TRAFFICKING|'+
 		             'NARCOTIC|COCAIN|TRAFFIC[ /]DR[UG]+|CHILD TRAFFIC|TRAFFIC [HERO]*IN|TRAFFIC MAR|TRAFFIC[ /]CO|DRUG TRAFFIC|TRAFFIC NARC|TRAFFIC CRA[CK]+|TRAFFIC ECSTASY|AGG(.*)TRAFFIC|'+
 								 'RSP|FIREARM';		
-//PARKING|PARKED|NO PERMIT|
-					 						 // 2 RECORDS KEEPING REQUIRE/VIOL 1
+
 Is_it := MAP(
 
-In_Global_Exclude(poffense,'other')='Y' => 'N',
+            // trim(poffense) in _fmod_offense_category_list.Trafficlist =>'Y', 
+						
+            In_Global_Exclude(poffense,'other')='Y' => 'N',
               
 						Is_Arson(poffense)='Y' OR                        
 						Is_Assault_aggr(poffense)='Y' OR                      
 						Is_Assault_other(poffense)='Y' OR                      
 						Is_Bribery(poffense)='Y' OR                      
 						Is_Burglary_BreakAndEnter_res(poffense)='Y' OR
-						Is_Burglary_BreakAndEnter_comm(poffense)='Y' OR
-						Is_Burglary_BreakAndEnter_veh(poffense)='Y' OR
-						Is_Counterfeiting_Forgery(poffense)='Y' OR       
+						Is_Burglary_BreakAndEnter_comm(poffense)='Y' OR 
+						Is_Burglary_BreakAndEnter_veh(poffense)='Y' OR 
+	  				Is_Counterfeiting_Forgery(poffense)='Y' OR       
 						Is_Destruction_Damage_Vandalism(poffense)='Y' OR
-						
-						Is_Drug_Narcotic(poffense)='Y' OR                
-						// Is_Embezzlement(poffense)='Y' OR                 
-						
-						// Is_Extortion_Blackmail(poffense)='Y' OR          
+						Is_Drug_Narcotic(poffense)='Y' OR              
 						Is_Fraud(poffense)='Y' OR                        
 						Is_Gambling(poffense)='Y' OR 
 						Is_Homicide(poffense)='Y' OR                     
@@ -3505,6 +3820,7 @@ In_Global_Exclude(poffense,'other')='Y' => 'N',
 						//Roger's comments - QA Update - Traffic   Round 3 8/26/16		
 						REGEXFIND('DRIV|OPR'                             		 ,poffense,0) <> '' and
 					  REGEXFIND('U/INFLU|/U THE INFLU|/INFLUENCE|W/UND/INFLU',poffense,0) <> ''  => 'N',
+						
 						REGEXFIND('DRIV[E|I| |\\.]|BOATING|OPR'              ,poffense,0) <> '' and
 					  REGEXFIND('INFLUEN'                          				 ,poffense,0) <> ''  AND
 						REGEXFIND('UNDER|UND|WHILE|LIQUOR|ALCOH|DRUG|NAC|CONT[.]+SUB|SUB[.*]CONT',poffense,0) <> '' => 'N',						
@@ -3513,6 +3829,10 @@ In_Global_Exclude(poffense,'other')='Y' => 'N',
 						REGEXFIND('BUSIN[ESS]*|VENDOR'                       ,poffense,0) <> '' and
 					  REGEXFIND('LICENSE|LIC |LIC[\\.]?$|LICENS$|PERMIT'	 ,poffense,0) <> '' and
 					  REGEXFIND('NO[T]? |EXPIRED|FAIL[ |E|U|/]|SUSPEND|NO |REQ[U| ]|WITHOUT|W/O',poffense,0) <> ''  => 'N',
+						
+						REGEXFIND('HIT'             ,poffense,0) <> '' AND              
+						REGEXFIND('RUN'             ,poffense,0) <> '' => 'Y',
+						
 						REGEXFIND('INFRACTION VC'                            ,poffense,0) <> '' => 'Y',
 						
 						REGEXFIND('VEH| M[/]*V '                             ,poffense,0) <> '' and
@@ -3568,11 +3888,13 @@ In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 (REGEXFIND('AVOID'  ,poffense,0) <>'' and REGEXFIND('COLLIS'   ,poffense,0) <> '') or
 						 (REGEXFIND('DIM'    ,poffense,0) <>'' and REGEXFIND('BEAM| LT | LTS ',poffense,0) <> '') or
 						 (REGEXFIND('REMAIN' ,poffense,0) <>'' and REGEXFIND('LANE|SCEN|ACC',poffense,0) <> '') or
-						 (REGEXFIND('RIGHT'  ,poffense,0) <>'' and REGEXFIND('CNT |CTR ',poffense,0) <> '') 
+						 (REGEXFIND('CONTROL',poffense,0) <>'' and REGEXFIND('WEAVING|VEHICLE',poffense,0) <> '') or
+						 (REGEXFIND('RIGHT'  ,poffense,0) <>'' and REGEXFIND('CNT |CTR ',poffense,0) <> '') or
+						  REGEXFIND('PROOF OF INSURANCE|KEEP RIGHT',poffense,0) <> ''  
 						 
 							) => 'Y',
-													
-							
+
+
 							REGEXFIND('UNLAW'   ,poffense,0) <> '' and REGEXFIND('OP'  ,poffense,0) <>'' and REGEXFIND('HWY' ,poffense,0) <> '' and REGEXFIND(' MV | M[/]V |VEH|MOTOR' ,poffense,0) <> '' => 'Y',
 							REGEXFIND('DEADLINE',poffense,0) <> '' and REGEXFIND('OP|OPER'  ,poffense,0) <>'' and REGEXFIND('AFTER|PAST' ,poffense,0) <> '' and REGEXFIND(' M[\\./]*V[\\. ]|VEH' ,poffense,0) <> '' => 'Y',
 							
@@ -3686,10 +4008,6 @@ In_Global_Exclude(poffense,'other')='Y' => 'N',
 
              REGEXFIND('EXHAUST|EXHST'                           ,poffense,0) <> '' and
              REGEXFIND('BATH|VENT'                               ,poffense,0) <> '' => 'Y',
-						 
-             REGEXFIND('LEAV'                                    ,poffense,0) <> '' and
-						 REGEXFIND('SCE'                                     ,poffense,0) <> '' and
-             REGEXFIND('ACC'                                     ,poffense,0) <> '' => 'Y',
 
 						 REGEXFIND('CHILD'                                   ,poffense,0) <> '' and
 						 REGEXFIND('UNSECU|RESTRAINT|UNRESTR'                ,poffense,0) <>  '' => 'Y',	
@@ -3707,7 +4025,7 @@ In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 ) => 'Y',
 
 						 REGEXFIND('FAIL|FA[/]'                               ,poffense,0) <> '' and						 
-						 ( 
+						 ( (REGEXFIND('SHOW|OBTAIN' ,poffense,0) <>'' and REGEXFIND(' DL| ID | CDL '  ,poffense,0) <> '') or
 						   (REGEXFIND('MAINT'       ,poffense,0) <>'' and REGEXFIND('CONT'      ,poffense,0) <> '') or
 							 (REGEXFIND('DISP|WEAR'   ,poffense,0) <>'' and REGEXFIND('TAG|SEAT'  ,poffense,0) <> '') or
 							 (REGEXFIND('RES|SECURE'  ,poffense,0) <>'' and REGEXFIND('CHILD'     ,poffense,0) <> '') or
@@ -3734,11 +4052,9 @@ In_Global_Exclude(poffense,'other')='Y' => 'N',
 					 
              REGEXFIND('ESPIRED|EX[P]*IRED'                        ,poffense,0) <> '' and
              ( REGEXFIND('INSP|INSEC|INS[EP]+C|REG|TAG|PLATE|DECAL|LIC|STICK|MOTOR|D[/]L|CDL| OL |O\\.L\\.|REJEC'   ,poffense,0) <> '' or
-						  (REGEXFIND('REJ',poffense,0)<>'' and REGEXFIND('STKR',poffense,0) <> '')
-						 )=> 'Y',
+						  (REGEXFIND('REJ',poffense,0)<>'' and REGEXFIND('STKR',poffense,0) <> '')						 )=> 'Y',						 
 						 
-						 
-						 REGEXFIND('PASSING'                                 ,poffense,0) <> ''  => 'Y',					 
+						 REGEXFIND(' PASSING '                               ,poffense,0) <> ''  => 'Y',					 
 						                            
 						 REGEXFIND('DRIV|DROV'                               ,poffense,0) <> '' => 'Y',	
              
@@ -3821,6 +4137,8 @@ In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 
 						 REGEXFIND('STOP|STP'                                   ,poffense,0) <> '' and
              REGEXFIND('PAY|PMT|PYMT|FOOD|ARREST|ARST|ARRST|CHECK|CHRISTOPHER|CHRISTOPOLOU|URINATE|ORD|CONT|DEATH|DETH|FRISK|ARRES'  ,poffense,0) = '' => 'Y',
+ 
+             REGEXFIND('STOP SIGN'  ,poffense,0) <> '' => 'Y',
 
              REGEXFIND('TRAFF|TRAFFIC'                              ,poffense,0) <> '' and
              REGEXFIND('TRAFFICING|TRAFFICNG|TRAFFICO|TRAFFICS|TRAFFING|TRAFFINKING|TRAFFIS|TRAFFKG|TRAFFKICKING|TRAFFKING|TRAFFKNG|TRAFFRKG' ,poffense,0) ='' and 
@@ -3830,21 +4148,11 @@ In_Global_Exclude(poffense,'other')='Y' => 'N',
              REGEXFIND('INSUR|INSURANCE|INS|LIAB|INSP|INSPEC|STICK' ,poffense,0) <> '' and
 						 REGEXFIND('NO|WITHOUT|W[/]O|PROOF|PRF'                 ,poffense,0) <> '' and
              REGEXFIND('FINL|FINC'                                  ,poffense,0) = ''  => 'Y',
-						 
-             REGEXFIND('^F T|^F[/-]T|F[/]|F/[AL]|^F\\.[ ]*T'        ,poffense,0) <> '' and
-						 REGEXFIND('STOP|STP'                                   ,poffense,0) <> '' and
-             REGEXFIND('SCENE'                                      ,poffense,0) <> '' => 'Y',		
-						 
+						 					 
 						 REGEXFIND('DUTY|APPRO|F/[TO]*|F\\.TO|FT|F\\.T\\.| FL |DISRE|F[/-]T|FAI[L]| FA |FIAL|FLURE|R[-]*O[-]*W|ROW|SIGN|DIS|F[-]T-[OS]|OBEY|RIGHT|FALI |FAL | FIL | FLD |WAY|TURN| RT'    ,poffense,0) <> '' and
 						 REGEXFIND('YEILD'                                      ,poffense,0) <> '' => 'Y',
-						 						 
-						 REGEXFIND('F-T-S|^F ST[O]*P|^F[AL] ST[O]*P'            ,poffense,0) <> '' and
-             REGEXFIND('SCENE'                                      ,poffense,0) <> '' => 'Y',	
-
-             REGEXFIND('LEAV|LEA|LV|LVG|LEFT'                       ,poffense,0) <> '' and
-             REGEXFIND('SCENE'                                      ,poffense,0) <> '' => 'Y',							 
-						 
-             REGEXFIND('UNAU|UNAT |UNSAF'                           ,poffense,0) <> '' and
+	
+	           REGEXFIND('UNAU|UNAT |UNSAF'                           ,poffense,0) <> '' and
 						 REGEXFIND('VEH|MV|BOAT'                                ,poffense,0) <> '' and
              REGEXFIND('CHILD|MINOR'                                ,poffense,0) = ''  => 'Y',
 												 
@@ -3879,16 +4187,15 @@ In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 
 						 REGEXFIND('DRIV|OP'                                 ,poffense,0) <> '' and
              REGEXFIND('COND'                                    ,poffense,0) <> '' and
-             //REGEXFIND('M[/]V| MV |VEH|BOAT'                     ,poffense,0) <> ''
 						 REGEXFIND('DISORD|CONDUCT|CONDE'                    ,poffense,0)  = '' => 'Y',
 			  
 						 REGEXFIND('RECKL|RCK'                               ,poffense,0) <> '' and
 						 REGEXFIND('DR|OP|DRIV'                              ,poffense,0) <> '' and
              REGEXFIND('BOAT|CRAFT|VEH|MV|M/B|PWC|W/C|W/KRFT'    ,poffense,0) <> '' => 'Y',
 						 
-             REGEXFIND('RECKL|RCK'                               ,poffense,0) <> '' and
+             REGEXFIND('RECKL| RCK |RECK '                       ,poffense,0) <> '' and
              REGEXFIND('DR'                                      ,poffense,0) <> '' => 'Y',
-							 
+							  
              REGEXFIND('LANE'                                    ,poffense,0) <> '' and
 						 REGEXFIND('IMP'                                     ,poffense,0) <> '' and
              REGEXFIND('CHAG|CHAN'                               ,poffense,0) <> '' => 'Y',
@@ -3911,12 +4218,6 @@ In_Global_Exclude(poffense,'other')='Y' => 'N',
              REGEXFIND('HOUR|HR'                                 ,poffense,0) <> '' and 
 						 REGEXFIND('BODY'                                    ,poffense,0) = ''  and 
              REGEXFIND('WASTE'                                   ,poffense,0) = ''  => 'Y',
-
-						 // REGEXFIND('LOG'                                     ,poffense,0) <> '' and
-						 // ( REGEXFIND('CHAIN|SAW|POLE|ANAL|ARCHA|ARCHE|HARV|DUTY|FOOD|SALMON|GEOLOG|LOGAN|BACTER|KING|KILOG|HARVEST|COSMET|CLOG|LOGAN|BLOOD|FISH|SAL|GENERATOR|PHYCHO'+
-                         // 'VETER|YELLOW|BUNK|KILO|STAKE|LOGR|WKND|LAMP|DEPT|DUTY|K/S|KN/SLM|PERSO|SPORT|SPTFISH|STEEL|TAKE|TROUT|DEAL|HUNTER|GUID',poffense,0) = '' OR
-							 // (REGEXFIND('LOGGING',poffense,0) = '' and REGEXFIND('EST',poffense,0) = '')
-						 // ) => 'Y',
 
              REGEXFIND('PLATE'                                   ,poffense,0) <> '' and
 						 ( REGEXFIND('VIO',poffense,0) <> '' OR 
@@ -3958,7 +4259,7 @@ In_Global_Exclude(poffense,'other')='Y' => 'N',
                        'HYD|SNOW|TRAFF|HGWY|HWY|SPACE|SPCE|LANE|NO |OBST|BEYOND|BLOCK|BOAT|DESIG|DISAB|TRUCK|TRK|SNOW|EXEMPT|H\\.C\\.|H[/]C|IMPR|SCHOOL'
                        ,poffense,0) <>  '' => 'Y',
 				 						 
-	//
+	
              REGEXFIND('P[A]*RK'                                 ,poffense,0) <> '' and
 						 ( (REGEXFIND('LOAD'          ,poffense,0) <>'' and REGEXFIND('ZO|ZN',poffense,0) <> '') or
 						   (REGEXFIND('PROH'          ,poffense,0) <>'' and REGEXFIND('ZO|ZN',poffense,0) <> '') or						 
@@ -4047,7 +4348,7 @@ In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 REGEXFIND('BEAMS REQUIRE'                           ,poffense,0) <> '' => 'Y',
 						 
 						 //QA Update - Traffic Round 6
-             REGEXFIND('^F[\\.]?T[\\.]?Y[\\.]?[R| |\\-|/]|INSURANCE CARD|[LIABILITY|AUTOMOBILE|VEHICLE] INSURANCE|' +
+             REGEXFIND('^F[\\.]?T[\\.]?Y[\\.]?[R /-]|INSURANCE CARD|[LIABILITY|AUTOMOBILE|VEHICLE] INSURANCE|' +
 						           'INSURANCE VERIFICATION|LEAV[E]?[ |/]SC[NE]*[\\.]?[ |/]*[OF ]*ACC|VEHICLES FOLLOWING|FOLLOWING TOO C|' +
 											 'TAIL LAMP[S]*|TAIL LITE[S]*|HEAD LAMP[S]* REQUIRE|OPERATE W/O REASONABLE CONTROL|' +
 											 '^[ ]*DISPLAY OF PLATES[\\.]*[ ]*$|MILES PER HOUR LIMIT|SQUEAL[ING]* TIRE'
@@ -4060,10 +4361,31 @@ In_Global_Exclude(poffense,'other')='Y' => 'N',
              REGEXFIND('TRAVEL[ING]*'                            ,poffense,0) <> '' and
 						 REGEXFIND('TO FAST'                           			 ,poffense,0) <> '' and
 						 REGEXFIND('FOR CONDITION'                           ,poffense,0) <> '' => 'Y',
+						 
+             REGEXFIND('HOV'                                     ,poffense,0) <> '' and 
+						 REGEXFIND('SHOVE|SHOVI'                             ,poffense,0) =  '' => 'Y',
+						 
+						 REGEXFIND('^FL '                                    ,poffense,0) <> '' and //Roger comments - Traffic 20161114 File Round 8
+						 REGEXFIND('CARRY'                                   ,poffense,0) <> '' and
+						 REGEXFIND(' D[/]*L | [OD]\\.L\\.| O[/]*L '          ,poffense,0) <> '' => 'Y',
+						 
+						 REGEXFIND('VOIL'                                    ,poffense,0) <> '' and 
+						 REGEXFIND('RULE'                                    ,poffense,0) <> '' and
+						 REGEXFIND('BASIC|FAST|TURNPIKE| DPS '               ,poffense,0) <> '' => 'Y',
 
-						 //Roger comments - Traffic 20161114 File Round 8
-             REGEXFIND('LEAVING SCENE'                           ,poffense,0) <> '' and
-						 REGEXFIND(' CRASH| ACCIDENT'                        ,poffense,0) <> '' => 'Y',
+             REGEXFIND('LEAV'                                    ,poffense,0) <> '' and      
+             REGEXFIND('SCENE'                                   ,poffense,0) <> '' and 
+						 REGEXFIND('PRIV PROP'                               ,poffense,0) = '' => 'Y',		
+
+             REGEXFIND('MAXIMUM|LIMIT|EXCEED'                                ,poffense,0) <> '' and      
+						 REGEXFIND('WEIGHT|AXLE|SIZE|EMISSION| MPH |LICENSE|LOAD|BACKING',poffense,0) <> '' => 'Y',
+
+             REGEXFIND('INSUFF'                                  ,poffense,0) <> '' and 
+						 REGEXFIND('TREAD'                                   ,poffense,0) <> '' and     
+						 REGEXFIND('TIRE'                                    ,poffense,0) <> '' => 'Y',
+						 
+						 REGEXFIND('METER'                                   ,poffense,0) <> '' and     
+						 REGEXFIND('VIOLATION|STREET'                        ,poffense,0) <> '' => 'Y',
 
              REGEXFIND(traffic_list                              ,poffense,0) <> '' and
              REGEXFIND(exclude_list_traffic                      ,poffense,0) = ''  => 'Y',          
@@ -4080,10 +4402,39 @@ In_Global_Exclude(poffense,'other')='Y' => 'N',
 						 REGEXFIND(traffic_list5                             ,poffense,0) <> ''  and
              REGEXFIND(exclude_list_traffic                      ,poffense,0) = ''  => 'Y',
 						 
+						 REGEXFIND(traffic_list6                             ,poffense,0) <> '' => 'Y',
+						 
+						 REGEXFIND(traffic_list7                             ,poffense,0) <> '' => 'Y',	
+						 						 
 						 REGEXFIND(LIC1                                      ,poffense,0) <> '' and
              REGEXFIND(exclude_list_traffic                      ,poffense,0) = ''  => 'Y',	 
 						 
-							 'N');
+						 REGEXFIND('^[0-9][0-9][/][0-9][05][ ]*$'            ,poffense,0) <> '' => 'Y',
+             REGEXFIND('^[0-9][0-9][/][0-9][05] RD[ ]*$'         ,poffense,0) <> '' => 'Y',
+						 REGEXFIND('^[0-9][0-9][-][0-9][05][-]B[ ]*$'        ,poffense,0) <> '' => 'Y',
+ 						 REGEXFIND('^[0-9][0-9][-][0-9][05][ ]*$'            ,poffense,0) <> '' => 'Y',
+ 						 REGEXFIND('^[0-9][0-9] IN [0-9][05][ ]*$'           ,poffense,0) <> '' => 'Y',
+						 REGEXFIND('^[0-9][0-9][/][0-9][05] DR[V]*[ ]*$'     ,poffense,0) <> '' => 'Y',
+						 REGEXFIND('X[0-9][0-9][/][0-9][05][ ]*$'            ,poffense,0) <> '' => 'Y',
+						 REGEXFIND('SP [-] [0-9][0-9][/][0-9][05][ ]*$'      ,poffense,0) <> '' => 'Y',
+						 REGEXFIND('^[0-9]+[/][0-9][50] (2ND|MPH)[ ]'        ,poffense,0) <> '' => 'Y',
+						 REGEXFIND('^[0-9]+[/][0-9][50] RECKLESS[ ]'         ,poffense,0) <> '' => 'Y',						 
+						 REGEXFIND('^RD [0-9]+[/][0-9][50][ ]'               ,poffense,0) <> '' => 'Y',
+
+						 REGEXFIND('LIGHTED'                                 ,poffense,0) <> '' and
+             REGEXFIND('LIGHT|LAMPS'                             ,poffense,0) <> ''  => 'Y',	
+						 
+						 // REGEXFIND('LIGHTED'                                 ,poffense,0) <> '' and
+             // REGEXFIND('LIGHT|LAMPS'                             ,poffense,0) <> ''  => 'Y',	
+						 
+						 REGEXFIND('EVAD|EVASI|ELUD[E]*|EVAS |VIOL[ATION ]+'  ,poffense,0) <> '' AND
+						 REGEXFIND('TAX|TOLL|TAXES'                           ,poffense,0) = ''  => 'Y',
+						
+						 REGEXFIND('EVAD|EVASI|ELUD[E]*|EVAS |VIOL[ATION ]+'  ,poffense,0) <> '' AND
+						 REGEXFIND('TR[A]*F[FIC ]+'                           ,poffense,0) <> '' AND
+						 REGEXFIND('DEVICE'                                   ,poffense,0) = ''  => 'Y',
+
+						 'N');
 return Is_it;
 end;
 //--------------------------------------------------------------------------------------------------------------------------------------
@@ -4110,7 +4461,7 @@ Other3:= 'MAKING FALSE|MISCOND|NEGLECT|NON(.*)SUPPORT|PERJU|RESIST|OFFICER|OBSTR
 	     	 'RECK(.*) OP|RESIST|RIOT|RECKLESS|RESISTING ARREST|TOXIC|THROW|TERMS OF PROB|VOY[EU]+RISM|VICIOUS|'+  
 	       '^SPEC AL|SOLIC[I]*T|TAMPERING|TAX|HUNT|IRRIGATE|IRIRGATE|LAWN|HOME|HOOK|'+
 	       'VIOLATION OF FED|VIT:|VIT-|SU[SP]*(.*) SENT|VIOLATION OF PROB| OBST|DEC(.*) OBT(.*) D[A]*N|'+
-	       '^UCW|CURFEW|WILLFUL|JAIL|SHELLS|W[/ ]*SPEC[ ,]+|^SP[E]*C[- I]|SPEC[ -.//CIAL]+A[L]+EG';
+	       '^UCW|CURFEW|WILLFUL|JAIL|SHELLS|W[/ ]*SPEC[ ,]+|^SP[E]*C[- I]|SPEC[ -.//CIAL]+A[L]+EG|TEL MISUSE|TELEPHONE MISUSE';
 				 
 Other4:= 'TRASH|JUNK|ACCESRY|SERV|INTERF|CAPIAS|LOG|SBPP|TIME ZONE|TOBAC|C[O]*NT[EM]+PT|CONT OF CT|'+
 				 'UNPAID|UNPD|ZONE|TRANSP|WALTON|WAOJ|W\\.C\\.|W[/]C|APPEAR|FISH|GAME|WILDLIFE|DEER|TURKEY|DOG|WILD|ANIMAL|WOLF|RACCOON|HUNT|CATTLE|'+
@@ -4118,7 +4469,10 @@ Other4:= 'TRASH|JUNK|ACCESRY|SERV|INTERF|CAPIAS|LOG|SBPP|TIME ZONE|TOBAC|C[O]*NT
 				 'LOCAL|EXOTIC|FACILITAT|FACILAT|FACILIAT|FACILITIES|FACILITY|CORPSE|PAINT|PAINTING|ENDAN|EMDAN|ENDG|ENDNG|ENDAG| END |ENGAN|ENFAN|ENDN|ENDGR|EBDANG|'+
 				 'EBDAMG|ENDNGR|ENDNAG|ENDENG|ENDAND|EDANG|ENANG|ENDDANG|FAIL|DOOR|DEAD|BATT|CUSTODY|DUMP|DUTY|ERROR|UPDATE|FOCUS|UNDERSIZE|EXTRA|REMOV|UNSWORN';			 
 
-Other5:= ' CAT ' ;	
+Other5:= ' CAT |843\\.02[\\. ]|843.15.1A|[-/\\. ]VASAP[-/;\\. ]|843\\.15\\.1B|PC 368[(][BC][)]|PC 136\\.1[(][BC][)]|901\\.04 |HS 11365 | PC 118 |42-8-38 |PC 182[(]A[)]| 1244B |'+
+         'EC 48200|12\\.44B|VC 2800\\.1|BP 7028| 12\\.44 [(]*[AB][) ]|99-9997|HS 12677 |PC 4502[(][A][)]|VC 40508[(][A][)]|PC 166\\.4|PC 166[(][A][)]|PC 1463\\.07|'+
+				 'PC 1320[(][A][)]| PSP [123] | PC 69 | PC 272 |12.44[(][A][)]| PC 32 |FG 7145[(][A][)]|EC 48262|PC 148[(][A][)]|PC 148 |PC 148\\.9|'+
+				  'PC 853\\.7|PC 1551\\.1|VC 2800\\.[12]|PC 466 |PC 118[(]A[)]| PC 69 |PC 148\\.5| PC 32 | 948\\.06 ';
 
 Other6:= '^CPF[/ ]|^CPFX|^CTMPT |^D\\.O\\.C\\.|^BW |^C/A ON |C/A FAIL |^FPFC |^FNSB |^FRAM[INGE]*[/ ]|^FRA |^FTC |^ICE |.BENCH WARRANT.|^F REPAIR[/ ]|^FOJ OTHER |^CON ';
 Other7:= '^FTO COURT |^FTO CT[\\. ]|^TSO|^F[POR]+ PROSECUTION SEE[:/ ]|^F[POR]+ SENTENC|^FOUND [FG]UI[L]*TY|^FOUND [FG]UI[L]*TU|^FOUND INCOMPETANT|^FOUND INCOMPETENT|^FOUND NOT GUILTY';		 
@@ -4132,6 +4486,11 @@ Is_it := MAP(
 						 
 						 In_Global_Exclude(poffense,'other')='Y' => 'Y', //this stmt has to be before the other tests
 						 
+						 // trim(poffense) in _fmod_offense_category_list.OtherList =>'Y',
+						 
+						 REGEXFIND('CONTRIB' ,poffense,0) <> '' AND              
+						 REGEXFIND('DELI[N]*Q' ,poffense,0) <> '' => 'Y',
+
        			 REGEXFIND('FAIL' ,poffense,0) <> '' AND              
 						 REGEXFIND('SPEED|LANE|SIGNAL' ,poffense,0) <> '' => 'N',
 
@@ -4202,11 +4561,7 @@ Is_it := MAP(
 						
 						REGEXFIND('ADULT'                 ,poffense,0) <> '' AND              
 						REGEXFIND('ESTAB'                 ,poffense,0) <>  '' => 'Y',
-						
-						// REGEXFIND('POSS'                  ,poffense,0) <> '' AND              
-						// REGEXFIND('BURG'                  ,poffense,0) <> '' AND     
-						// REGEXFIND('TOOL'                  ,poffense,0) <>  '' => 'Y',
-						
+												
 						REGEXFIND('DO NOT'                ,poffense,0) <> '' AND              
 						REGEXFIND('REL|OCCUPY|USE'        ,poffense,0) <>  '' => 'Y',
 						
@@ -4262,7 +4617,7 @@ Is_it := MAP(
 						REGEXFIND('EVID'                ,poffense,0) <> '' => 'Y',
 
 						//Roger's comment 7/15
-            REGEXFIND('ROWOV |PROBAT HLD' ,poffense,0) <> ''
+            REGEXFIND('ROWOV |PROBAT HLD'   ,poffense,0) <> ''
 						=> 'Y',
 						
             REGEXFIND('SUPPORT'             ,poffense,0) <> '' AND              
@@ -4295,7 +4650,7 @@ Is_it := MAP(
 						(REGEXFIND('MOVE'             ,poffense,0) <> '' OR
 						 (REGEXFIND('LAW',poffense,0) <> '' AND REGEXFIND('ORDER' ,poffense,0) <> '' )
 						)=> 'Y',
-
+	
             REGEXFIND('EXHAUST'           ,poffense,0) <> '' AND              
 						REGEXFIND('BATH|VENT'         ,poffense,0) <> '' => 'Y',
 
@@ -4348,9 +4703,6 @@ Is_it := MAP(
 						REGEXFIND('TELEPHONE'         ,poffense,0) <> '' AND              
 						REGEXFIND('HAR'               ,poffense,0) <> '' => 'Y',
 						 						 
-						REGEXFIND('APPLY'             ,poffense,0) <> '' AND              
-						REGEXFIND('MISAPPLY|FAL|FLSE' ,poffense,0) = '' => 'Y',
-						
             REGEXFIND('NUISA'             ,poffense,0) <> '' AND              
 						REGEXFIND('PUB'               ,poffense,0) = '' => 'Y',
 						                          
@@ -4365,9 +4717,7 @@ Is_it := MAP(
             REGEXFIND('MOTION'            ,poffense,0) <> '' AND  
 						REGEXFIND('PROMOTION'         ,poffense,0) = '' => 'Y',
 						
-						REGEXFIND('FALSE'           ,poffense,0) <> '' AND              
-						REGEXFIND('INFO'            ,poffense,0) <> '' AND              
-						REGEXFIND('ID|DR|NAME|APP|GOV' ,poffense,0) <> '' => 'Y',
+
 
             REGEXFIND('FALSE|FAL'                           ,poffense,0) <> '' AND              
 						REGEXFIND('REPORT|RPT|REPT|ALARM|CALL|INFO|INF' ,poffense,0) <> '' AND  
@@ -4424,6 +4774,10 @@ Is_it := MAP(
 						REGEXFIND('FOWL|GAME|DOG|PETS|LIVESTOCK|GOOSE|HORSE|CAT|KITTEN|A[ANI]+[MA]+L|ANIM|A[NM]I[MN][AL]+|PONY|CHOW|TORTIS|ROTT[I]*|GOAT|PUP|'+
                        'HOUND|SHEP|BIRDS|ROMULUS|LAB|K-9|PIT[ ]*BULL|TAB|PIG|LLAMA|DUCK|FERRET|PARROT|CHIHUAHUA|L[I]*VST[OC]*K|RO[T]+WEI|CANINE' ,poffense,0) <> '' => 'Y',
 
+						REGEXFIND(' ID | CDL | DL ' ,poffense,0) <> '' AND
+						REGEXFIND('POSS'            ,poffense,0) <> '' AND 
+						REGEXFIND(' NO '            ,poffense,0) <> ''  => 'Y',	
+						
 						REGEXFIND('POSS'            ,poffense,0) <> '' AND    
 						REGEXFIND('ALCOH|LIQ|BEER|INTOX' ,poffense,0) = ''  => 'Y',	
 
@@ -4444,14 +4798,12 @@ Is_it := MAP(
 						
 						REGEXFIND('FALSE'           ,poffense,0) <> '' AND              
 						REGEXFIND('UTTER'           ,poffense,0) <> '' AND 
-						REGEXFIND('FRAUD|BANK|CHECK|PRESC|FORGE|CREDIT|DEBIT|CURRENCY|BILL|NOTE|INSTRU' ,poffense,0) = '' => 'Y',
+						REGEXFIND('FRAUD|BANK|CHECK|PRESC|FORGE|CREDIT|DEBIT|CURRENCY|BILL|NOTE|INSTRU|DOC[UMENT ]+|INSTUMENT|FINANCIAL' ,poffense,0) = '' => 'Y',
 											 
 						REGEXFIND('VIOL'            ,poffense,0) <> '' AND              
 						REGEXFIND('ORDER'           ,poffense,0) <> '' => 'Y',
 						 
-            REGEXFIND('HIT'             ,poffense,0) <> '' AND              
-						REGEXFIND('RUN'             ,poffense,0) <> '' => 'Y',
-						
+				
 						REGEXFIND('VIO'             ,poffense,0) <> '' AND              
 						REGEXFIND('PAR|TITL|QUARA|RECORD|QUARE|QUARI|MEDICAL|LOP[ -]|OFFER|ORD' ,poffense,0) <> '' => 'Y',
 						 
@@ -4478,9 +4830,6 @@ Is_it := MAP(
 						REGEXFIND('MUNI|CITY'       ,poffense,0) <> '' => 'Y',						
  
 						REGEXFIND('HARASS|HARRASS'  ,poffense,0) <> '' => 'Y',	
-						 
-						REGEXFIND('EVAD|EVASI|ELUD[E]*' ,poffense,0) <> '' AND
-						REGEXFIND('TAX'                 ,poffense,0) = ''  => 'Y',
 
             REGEXFIND('BEACH'            ,poffense,0) <> '' AND              
 						REGEXFIND('HOUR|HR'          ,poffense,0) <> '' => 'Y',
@@ -4558,27 +4907,18 @@ Is_it := MAP(
 					  REGEXFIND('NO[T]? |EXPIRED|FAIL[ |E|U|/]|SUSPEND|NO |REQ[U| ]|WITHOUT|W/O',poffense,0) <> ''  => 'Y',
 
 						//Roger's comments - QA Update - Other Offenses Round 6
-						//Please select offenses containing  â€œSC-BONDâ€ or  â€œS/C BONDSMANâ€  or â€œS.C. â€“ BONDSMANâ€  or  
-						//â€œS/C BONDSMANâ€  or  â€œSC BONDSMANâ€  or  â€œBOND POSTEDâ€  or  â€œCASH BONDâ€   or  â€œNO BONDâ€  or 
-						//â€œBAIL BONDâ€  or â€œBOND JUMPINGâ€  or  â€œBOND JUMPâ€  or  â€œBOND REDUCEDâ€  or  â€œCASH BONDâ€.
-						//Please select offenses containing  FIREWORK  or  FIREWORKS  or  â€œFIRE WORKSâ€.
-						//Please select offenses containing  â€œBUSINESS PURPOSEâ€  or  â€œBUSINESS PURPOSESâ€.
-						//Please select offenses containing  PREVENT  or  PREVENTING  or  PREVENTION.
-						//Please select offenses containing    HAZARD   or     HAZARDOUS.
-						//Please select offenses containing  MASSAGE  
-						//Please select offenses containing  HINDER  or  HINDERING.
-						//Please select offenses containing  â€œCOMPULSORY EDUCATIONâ€.
-						//Please select offenses containing  SCHOOL.
-						REGEXFIND('S[\\.]*[/]*C[\\.][ ]*[\\-]*[ ]*BONDSMAN|SC\\-BOND|[CASH|NO|BAIL] BOND|' + 
-						          'BOND [POSTED|JUMP|REDUCED]|FIRE[ ]*WORK|PREVENT[ING|ION]*' +
-											'HAZARD|HINDER|COMPULSORY EDUCATION',poffense,0) <> '' 												=> 'Y',
+						REGEXFIND('S[\\.]*[/]*C[\\.][ ]*[\\-]*[ ]*BONDSMAN|SC\\-BOND|CASH BOND|NO BOND|BAIL BOND|' + 
+						          'BOND [POSTED|JUMP|REDUCED]|FIRE[ ]*WORK|PREVENT[IONG]*|HAZARD|HINDER',poffense,0) <> ''		=> 'Y',
 						REGEXFIND('SCHOOL'						                       ,poffense,0) <> '' and
 					  REGEXFIND('SMO[I]?K[E|I]|GD\\.| ARM|SIMULAT|M/S/D/P CS|CONT SUB|ALCOHOL|DISTURB|' +
-						          'S/C CK TRAF|N[A]*RCTCS|LAW VIOL|DISRUPTING|UNLAWFUL ACT|TARDY'	 ,poffense,0) <> '' => 'Y',
+						          'S/C CK TRAF|N[A]*RCTCS|LAW VIOL|DISRUPTING|UNLAWFUL ACT'	 ,poffense,0) <> '' => 'Y',
 						REGEXFIND('BUSINESS PURPOSE|MASSAGE'						     ,poffense,0) <> '' and
 					  REGEXFIND('VIOL|ILLEGAL|UNLAWF|WITHOUT [A ]*LIC|W[/]*O [A ]*LIC|W/O|PERMIT|IMPROPER|OPERATE AGAINST|' +
 						          'GENITALS|EROGENOUS|UNLICENSED|EXIT LOCK'	 ,poffense,0) <> '' 								=> 'Y',
-						
+
+						REGEXFIND('ENDANG'                  ,poffense,0) <> '' AND              
+						(REGEXFIND('CRIMINAL|FELONY| FEL '   ,poffense,0) <>  '' OR
+						 (REGEXFIND('RISK',poffense,0) <>  '' and REGEXFIND('DEATH ',poffense,0) <>  ''))=> 'Y',
 					  'N');
                               		 
 return Is_it;
@@ -4635,6 +4975,7 @@ export Is_Unclassified(string poffense) := function
 						Is_Fraud(poffense)='Y' OR                        
 						Is_Gambling(poffense)='Y' OR                     
 						Is_Homicide(poffense)='Y' OR                     
+						Is_Homicide(poffense)='Y' OR                     
 						Is_Kidnapping_Abduction(poffense)='Y' OR   
 						//Roger's comment QA Results for Cannot Classify File  and the Other Offenses File 7/15
 						Is_Motor_Vehicle_Theft(poffense)='Y' OR 
@@ -4662,7 +5003,8 @@ export Is_Unclassified(string poffense) := function
 						Is_LiquorLawViolations(poffense)='Y' OR          
 						Is_TrespassofRealProperty(poffense)='Y' OR       
 						Is_PeepingTom(poffense)='Y' OR      
-						Is_HumanTrafficking(poffense)='Y' =>                'N', 
+						Is_HumanTrafficking(poffense)='Y' OR
+						Is_Other(poffense)='Y' =>                'N', 
 						
 	             REGEXFIND('[A-Za-z]'   ,poffense,0) = ''  => 'Y',
 	             REGEXFIND(Non_offense1 ,poffense,0) <> '' => 'Y',	               
@@ -4728,7 +5070,7 @@ bit_TrespassofRealProperty         := IF(Is_TrespassofRealProperty(poffense)='Y'
 bit_PeepingTom                     := IF(Is_PeepingTom(poffense)='Y',                         bit_TrespassofRealProperty|          hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_PeepingTom)                    ,bit_TrespassofRealProperty);
 bit_HumanTrafficking               := IF(Is_HumanTrafficking(poffense)='Y',                   bit_PeepingTom|                      hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Human_Trafficking)             ,bit_PeepingTom);
 bit_Other                          := IF(Is_Other(poffense)='Y',                              bit_HumanTrafficking|                hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Other)                         ,bit_HumanTrafficking);
-bit_Unclassified                   := IF(Is_Unclassified(poffense)='Y',                       bit_Other|                           hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Unclassified)                  ,bit_Other)                              ;
+bit_Unclassified                   := IF(Is_Unclassified(poffense)='Y',                       bit_Other|                           hygenics_crim._functions.category_to_bitmap(hygenics_crim._functions.ctg_Unclassified)                  ,bit_Other);
 return bit_Unclassified;                                                                                                                                                                                                                                       
 end;
 
