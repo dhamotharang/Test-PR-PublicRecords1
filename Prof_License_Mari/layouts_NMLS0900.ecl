@@ -51,10 +51,6 @@ export layouts_NMLS0900 := module
 			string500	FEDREGULATOR,
 			string20	FEDSTATUS,
 			string50	BUSINESS_STRUCTURE,
-			string5 FISCALYEAREND,     //New field
-			string50 FORMEDIN,         //New field 
-			string DATEFORMED,         //New field
-			string4 STOCKSYMBOL,       //DF-12096
 	END;
 
 export Business_Lic := 
