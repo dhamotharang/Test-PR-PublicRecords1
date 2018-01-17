@@ -3,6 +3,7 @@ EXPORT WorkunitTimingDetails(string esp
 														,string fromemail
 														,string toemaillist
 														,string p_wuid = ''
+														,string dopsenv = dops.constants.dopsenvironment
 														) := module
 	shared states := ['completed','aborted','failed'];
 	shared startwu := 'W' + (string)STD.Date.AdjustDate(STD.Date.Today(),0,-1) + '-' + (string)STD.Date.CurrentTime(true);
@@ -101,6 +102,7 @@ EXPORT WorkunitTimingDetails(string esp
 			self.totaldfutime := dfutime;
 			self.totalcompiletime := compiletime;
 			self.cnt := c;
+			self.job := regexreplace('[\'â]',l.job,'');
 			self := l;
 		end;
 		
@@ -170,7 +172,7 @@ EXPORT WorkunitTimingDetails(string esp
 		end;
 	
 		rSOAPResponse := SOAPCALL(
-				dops.constants.prboca.serviceurl('dev'),
+				dops.constants.prboca.serviceurl(dopsenv),
 				'UpdateWUTimings',
 				rUpdateWUTimingsRequest,
 				rUpdateWUTimingsResponse,
