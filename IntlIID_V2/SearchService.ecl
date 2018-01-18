@@ -161,7 +161,7 @@ endmacro;
 	</ROW>
 	<ROW>
 		<servicename>netacuity</servicename>
-		<url>http://rw_score_dev:Password01@rwgatewaycert.br.seisint.com:8090/wsGateway</url>
+		<url>http://rw_score_dev:[PASSWORD_REDACTED]@rwgatewaycert.br.seisint.com:8090/wsGateway</url>
 	</ROW>
 </DATASET>
 */

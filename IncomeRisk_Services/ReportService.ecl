@@ -184,7 +184,7 @@ export ReportService := MACRO
 	// eri_gtway_results_test := incomeRisk_services.raw.report_view.eri_Gateway(eri_in_test);
 	// *** UNCOMMENT TO TEST GATEWAY
 
-    // gateways_in := dataset([{'erisalary','HTTPS://webapp_roxie_test:web33436$@securedev.accurint.com/espdev/gw/ERISalaryReport'}]
+    // gateways_in := dataset([{'erisalary','HTTPS://webapp_roxie_test:[PASSWORD_REDACTED]@securedev.accurint.com/espdev/gw/ERISalaryReport'}]
 		                                // ,risk_indicators.Layout_Gateways_In) : STORED('gateways',few);     
     gateways_in := Gateway.Configuration.Get();
 		

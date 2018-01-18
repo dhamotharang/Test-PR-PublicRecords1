@@ -64,7 +64,7 @@ export Get_Polk_Data := MODULE
 		gateway_cfg 		 := Gateway.Configuration.Get(); 
 		// to be on the safe side, make sure we're always dealing with only one RTV gateway URL.
 		polk_gateway_cfg := gateway_cfg(doxie.DataPermission.use_Polk, Gateway.Configuration.IsPolk(servicename));	
-		 // string gateway_url := 'http://webapp_roxie_test:web33436$@10.176.68.164:7726/WsGateway?ver_=1.58';
+		 // string gateway_url := 'http://webapp_roxie_test:[PASSWORD_REDACTED]@10.176.68.164:7726/WsGateway?ver_=1.58';
     string PermissibleUse:=VehicleV2_Services.Polk_Code_Translations.RealTimePermissibleUse(in_mod.RealTimePermissibleUse);
 	
 		//***********************************************************

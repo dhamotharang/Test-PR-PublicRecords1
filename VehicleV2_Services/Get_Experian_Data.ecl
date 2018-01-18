@@ -24,8 +24,8 @@ EXPORT Get_Experian_Data := MODULE
 	END;
 
 	EXPORT val(IParam.polkParams in_mod, BOOLEAN doCombined=FALSE) := FUNCTION
-		// STRING serviceURL := 'http://webapp_roxie_test:web33436$@10.194.9.67:8082/';
-		// STRING serviceURL := 'http://webapp_roxie_test:web33436$@10.194.5.12:5004/';		
+		// STRING serviceURL := 'http://webapp_roxie_test:[PASSWORD_REDACTED]@10.194.9.67:8082/';
+		// STRING serviceURL := 'http://webapp_roxie_test:[PASSWORD_REDACTED]@10.194.5.12:5004/';		
 		gateway_cfg					 := Gateway.Configuration.Get();
 		// to be on the safe side, make sure we're always dealing with only one RTV gateway URL.
 		experian_gateway_cfg := gateway_cfg(~doxie.DataPermission.use_Polk, Gateway.Configuration.IsExperian(servicename));	

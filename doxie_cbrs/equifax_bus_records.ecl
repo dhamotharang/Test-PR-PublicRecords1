@@ -40,7 +40,7 @@ MODULE
 	request := DATASET ([prep_request()]);
 	
 	STRING gateway_equifax := Equifax_gateways_in(servicename='inviewreport')[1].url;
-	// TESTING STRING gateway_equifax := 'https://webapp_roxie_test:web33436$@securedev.accurint.com/espdev/dev/WsGateway/?ver_=1.7';
+	// TESTING STRING gateway_equifax := 'https://webapp_roxie_test:[PASSWORD_REDACTED]@securedev.accurint.com/espdev/dev/WsGateway/?ver_=1.7';
 	
 	SHARED equifax_result := IF(gateway_equifax != '',inView_Services.Get_Equifax_Bus_Data.report_view.equifax_gateway(request,gateway_equifax));	
 	

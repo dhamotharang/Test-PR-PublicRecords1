@@ -18,7 +18,7 @@ export RealTimePhones_Raw(
 		
 		boolean isNewGateway := in_mod.UseQSENTV2; //New gateway version is 1.67
 
-		// gateway_URL := 'http://web_bps_roxie:r45gu@lt-esponline01:8091/wsGateway?ver_=1.57';									 											 
+		// gateway_URL := 'http://web_bps_roxie:[PASSWORD_REDACTED]@lt-esponline01:8091/wsGateway?ver_=1.57';									 											 
 		gateway_cfg := if(isNewGateway, gateways(Gateway.Configuration.isQsentV2(servicename)), gateways(Gateway.Configuration.isQsent(servicename)));
 		gateway_URL := gateway_cfg[1].url;
 

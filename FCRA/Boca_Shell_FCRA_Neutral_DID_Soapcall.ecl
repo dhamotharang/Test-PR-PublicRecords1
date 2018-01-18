@@ -101,7 +101,7 @@ ret := risk_indicators.InstantID_Function(iid,
 
 esp_input := project(outf, transform(risk_indicators.layout_input, self.did := left.did, self.ssn := left.shell_input.ssn, self.lname := left.shell_input.lname, self := []));
 
-// mbs_gateway_url := 'http://rw_score_dev:Password01@espdev.br.seisint.com:9999/WsDbHandler';
+// mbs_gateway_url := 'http://rw_score_dev:[PASSWORD_REDACTED]@espdev.br.seisint.com:9999/WsDbHandler';
 mbs_gateway_url := gateways(servicename='mbs_dost')[1].url;
 
 esp_response := Gateway.Soapcall_DOST_ConsumerFlags(esp_input, mbs_gateway_url );
