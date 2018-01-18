@@ -1,4 +1,4 @@
-import doxie,ut;
+import doxie,data_services;
 
 in_sh := watercraft.File_Base_Search_Dev;
 in_mn := watercraft.File_Base_Main_Dev;
@@ -49,4 +49,4 @@ vslnam_slim_vld := join(vslnam_slim_dst2, in_sh_dep,
 
 export key_watercraft_vslnam := index(vslnam_slim_vld,
             {vessel_name},{state_origin,watercraft_key,sequence_key},
-            ut.foreign_prod+'thor_data400::key::watercraft_vslnam_'+doxie.Version_SuperKey);
+            data_services.foreign_prod+'thor_data400::key::watercraft_vslnam_'+doxie.Version_SuperKey);

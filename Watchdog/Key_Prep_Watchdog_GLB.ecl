@@ -87,7 +87,7 @@ wdog := t0 + Base_File_Append;
 
 candidates := distribute(wdog(trim(fname)='' or trim(lname)=''),hash(did));
 not_candidates := wdog(~(trim(fname)='' or trim(lname)=''));
-glb_pst        := distribute(dataset('~thor400_84::out::watchdog_filtered_header',header.layout_header,flat),hash(did));;
+glb_pst        := distribute(dataset(data_services.data_location.prefix() + 'thor400_84::out::watchdog_filtered_header',header.layout_header,flat),hash(did));;
 
 header.layout_header t1(glb_pst le, candidates ri) := transform
  self := le;
@@ -141,4 +141,4 @@ concat1 := fb00+not_candidates1;
 _fb := project(concat1,watchdog.layout_key);
 ut.mac_suppress_by_phonetype(_fb,phone,st,fb,true,did);
 
-export Key_Prep_Watchdog_GLB := INDEX(fb,{fb},'~thor_data400::key::watchdog_best.did_'+doxie.Version_SuperKey);
+export Key_Prep_Watchdog_GLB := INDEX(fb,{fb},data_services.data_location.prefix() + 'thor_data400::key::watchdog_best.did_'+doxie.Version_SuperKey);

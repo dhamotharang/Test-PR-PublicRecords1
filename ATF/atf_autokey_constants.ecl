@@ -7,8 +7,8 @@ export ak_dataset	:=  ATF.file_atf_firearms_autokey; //ATF.searchFileATF;/*ATF.f
 export ak_skipSet	:= ['P','Q','F'];
 export ak_typeStr	:= 'BC';
 
-export str_autokeyname_fcra := '~thor_data400::key::atf::firearms::fcra::autokey::';
-export ak_keyname_fcra	:= '~thor_data400::key::atf::firearms::fcra::@version@::autokey::';
+export str_autokeyname_fcra := data_services.data_location.prefix('ATF') + 'thor_data400::key::atf::firearms::fcra::autokey::';
+export ak_keyname_fcra	:= data_services.data_location.prefix('ATF') + 'thor_data400::key::atf::firearms::fcra::@version@::autokey::';
 export ak_logical_fcra	:= '~thor_data400::key::atf::firearms::fcra::'+filedate+'::autokey::';
 export ak_dataset_fcra	:=  ATF.file_atf_firearms_autokey; // there are no fcra restrictions
 

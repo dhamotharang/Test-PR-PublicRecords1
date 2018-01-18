@@ -1,5 +1,5 @@
 //WARNING: THIS KEY IS AN FCRA KEY...
-import doxie_build, codes, doxie;
+import doxie_build, codes, doxie, data_services;
 
 den := doxie_build.Vehlic_Denormed;
 
@@ -120,12 +120,12 @@ end;
 
 o15 := project(o14,map_lein_holder_county_names(LEFT));
 
-//Old name: '~thor_data400::key::'+doxie_build.buildstate+'vehiclefull_FCRA_'+doxie.Version_SuperKey);
+//Old name: 'thor_data400::key::'+doxie_build.buildstate+'vehiclefull_FCRA_'+doxie.Version_SuperKey);
 export Key_Vehicles_FCRA := 
   // INDEX (o15, {sseq_no := seq_no}, 
          // {Best_Model_Year,Best_Make_Code,Best_Model_Code,
           // history, LIEN_COUNTxBG10,orig_vin,dt_first_seen, orig_state},
-          // '~thor_data400::key::vehicle::fcra::full_' + doxie.Version_SuperKey);
+          // data_services.data_location.prefix() + 'thor_data400::key::vehicle::fcra::full_' + doxie.Version_SuperKey);
   INDEX (o15, {sseq_no := seq_no}, 
          {
           dt_first_seen, orig_state, source_code, orig_vin, LIEN_COUNTxBG10,
@@ -143,4 +143,4 @@ export Key_Vehicles_FCRA :=
           reg_2_unit_desig, reg_2_p_city_name, reg_2_state_2, reg_2_zip5, reg_2_zip4, 
 					history, Best_Make_Code, Best_Model_Code, Best_Model_Year
          },
-         '~thor_data400::key::vehicle::fcra::full_' + doxie.Version_SuperKey);
+         data_services.data_location.prefix() + 'thor_data400::key::vehicle::fcra::full_' + doxie.Version_SuperKey);

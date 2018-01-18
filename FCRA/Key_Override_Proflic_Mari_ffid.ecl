@@ -1,10 +1,10 @@
-import data_services,prof_license_mari, ut;
+import prof_license_mari, data_services;
 
 EXPORT Key_Override_Proflic_Mari_ffid := module
 
 shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
 shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-shared keyname_prefix := '~thor_data400::key::override::fcra::';
+shared keyname_prefix := data_services.data_location.prefix() + 'thor_data400::key::override::fcra::';
 
 
 // Professional License MARI record

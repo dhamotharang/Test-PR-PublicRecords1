@@ -216,7 +216,7 @@ intermediateLog := DATASET([], Risk_Reporting.Layouts.LOG_Boca_Shell) : STORED('
 // Starts with 'LOG_' (Upper case is important!!)
 // Middle part is the database name, in this case: 'log__mbs'
 // Must end with '_intermediate__log'
-OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log'));
+IF(~DisableOutcomeTracking and Log_trib and ~runSeed_value, OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log')) );
 
 	//Log to Deltabase
 	Deltabase_Logging_prep := project(ret, transform(Risk_Reporting.Layouts.LOG_Deltabase_Layout_Record,
@@ -262,7 +262,7 @@ Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.
 // #stored('Deltabase_Log', Deltabase_Logging);
 
 //Improved Scout Logging
-IF(~DisableOutcomeTracking and Log_trib, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+IF(~DisableOutcomeTracking and Log_trib and ~runSeed_value, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 	
 output(ret, named('Results'));
 

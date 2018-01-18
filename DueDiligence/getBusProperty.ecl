@@ -1,4 +1,4 @@
-﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, SALT28, iesp;
+﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, SALT28, iesp, STD;
 
 EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
@@ -26,6 +26,9 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------ Add our sequence number to the Raw Property records found for this Business ------
 	// ------                                                                             ------
 	PropertyRaw_with_seq := DueDiligence.Common.AppendSeq(PropertyRaw, BusnData, TRUE);
+	
+	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
+	propertyCleanDates := DueDiligence.Common.CleanDatasetDateFields(PropertyRaw_with_seq, 'dt_first_seen, dt_vendor_first_reported');
 
 
   // ------                                                                                    ------	
@@ -34,7 +37,7 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------ If the History date is all 9's essentially no records will be dropped - also known ------
 	// ------ as CURRENT MODE.                                                                   ------
 	// ------                                                                                    ------
-	Property_Filtered := DueDiligence.Common.FilterRecords(PropertyRaw_with_seq, dt_first_seen, dt_vendor_first_reported); 
+	Property_Filtered := DueDiligence.Common.FilterRecords(propertyCleanDates, dt_first_seen, dt_vendor_first_reported); 
 	
 	// ------                                                                                    ------
 	// ------ select property records that were OWNED at some point by this business             ------
@@ -163,7 +166,7 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	 // ------ highest property value at the top                                                  ------
 	 // ------ Note:  think about changing this to ROLLUP  so that we can be more thoughtful      ------
 	 // ------                                                                                    ------
-	 PropertyCurrentlyOwnedButLimited   := dedup(sort(BusPropertyOwnedWithDetails,  PropertyReportData.seleid, -TaxAssdValue), PropertyReportData.seleid,  KEEP(iesp.constants.DDRAttributesConst.MaxAssets)); 
+	 PropertyCurrentlyOwnedButLimited   := dedup(sort(BusPropertyOwnedWithDetails,  PropertyReportData.seleid, -TaxAssdValue), PropertyReportData.seleid,  KEEP(iesp.constants.DDRAttributesConst.MaxProperties)); 
   
 	//UpdateBusnPropertyWithReport  := UpdateBusnPropertyForAttributeLogic; 
 	 UpdateBusnPropertyWithReport  := DueDiligence.reportBusProperty(UpdateBusnPropertyForAttributeLogic,

@@ -1,4 +1,4 @@
-import ut;
+import data_services;
 
 export Key_Boca_Shell (boolean IsFCRA = false) := function
   
@@ -11,8 +11,8 @@ export Key_Boca_Shell (boolean IsFCRA = false) := function
 	newtable := table(d, newrec);
 
 	file_name := if (IsFCRA, 
-                   '~thor_data400::key::testseed::qa::boca_shell_fcra',
-                   '~thor_data400::key::testseed::qa::boca_shell');
+                   data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::boca_shell_fcra',
+                   data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::boca_shell');
 
 	return index (newtable, {dataset_name,hashvalue}, {newtable}, file_name);
 end;

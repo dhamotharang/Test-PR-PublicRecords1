@@ -1,4 +1,4 @@
-import header, census_data, did_add;
+﻿import header, census_data, did_add, data_services;
 
 death_record := record
 	header.File_Did_Death_Master;
@@ -11,4 +11,4 @@ census_data.MAC_Fips2County(death_ready,state,fipscounty,county_name,dead_with_c
 
 export key_death_master_did := index(dead_with_county(did<>'000000000000'),
                                {unsigned6 l_did := (integer)did},{dead_with_county},
-				           '~thor_data400::key::did_death_master' + thorlib.WUID());
+				           data_services.data_location.prefix() + 'thor_data400::key::did_death_master' + thorlib.WUID());

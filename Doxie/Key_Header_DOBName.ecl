@@ -1,4 +1,4 @@
-IMPORT header, ut;
+IMPORT header, ut, data_services;
 
 ds_src := header.prepped_for_keys;
 
@@ -51,4 +51,6 @@ END;
 
 recs := PROJECT(ds_ready, trans(LEFT));
 
-EXPORT Key_Header_DOBName := INDEX (recs, {recs}, '~thor_data400::key::header.dobname_' + doxie.version_superkey, OPT);
+EXPORT Key_Header_DOBName := INDEX (recs, 
+                                    {recs}, 
+                                    data_services.data_location.prefix() + 'thor_data400::key::header.dobname_' + doxie.version_superkey, OPT);

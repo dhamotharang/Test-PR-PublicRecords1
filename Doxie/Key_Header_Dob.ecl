@@ -1,4 +1,4 @@
-IMPORT header, ut;
+IMPORT header, ut, data_services;
 
 ds_src := header.prepped_for_keys;
 
@@ -22,5 +22,7 @@ ds_grp := GROUP (SORT (ds_filt, did, dob, fname, pfname, -zip, -st, LOCAL), did,
 // For every did: get rid of same zip (choosign whatever state); skip blank zips, if non-blank exists
 ds_ready := DEDUP (ds_grp, ut.NNEQ(Left.zip, Right.zip) and ut.NNEQ(Left.st, Right.st));
 
-EXPORT key_header_dob := INDEX (ds_ready, {dob, fname, pfname, st, zip}, {did}, 
-                                     '~thor_data400::key::header.dob_' + doxie.version_superkey, OPT);
+EXPORT key_header_dob := INDEX (ds_ready, 
+                                {dob, fname, pfname, st, zip}, 
+                                {did}, 
+                                data_services.data_location.prefix() + 'thor_data400::key::header.dob_' + doxie.version_superkey, OPT);

@@ -1,4 +1,4 @@
-import vehiclev2,text_search;
+import vehiclev2,text_search,data_services;
 	
 	// Flat record format - from convert function
 	Text_vehicle_flat := record(Text_Search.Layout_Docseg)
@@ -19,7 +19,7 @@ import vehiclev2,text_search;
 	// Empty dataset for reading purposes
 	read_ret := dataset([],string_rec);
 	// read the persist during boolean build to build the key
-	ret := dataset('~thor_data400::persist::vehiclev2::boolean',text_vehicle_flat,thor);
+	ret := dataset(data_services.data_location.prefix('Vehicle') + 'thor_data400::persist::vehiclev2::boolean',text_vehicle_flat,thor);
 
 
 	proj_map := project(ret,transform(string_rec,self.src := left.DocRef.src;
@@ -30,6 +30,6 @@ import vehiclev2,text_search;
 	sort_map := sort(dist_map,src,doc,local);
 	tmsid_map := dedup(sort_map,src,doc,local);
 // check if the persist file exists, if it does do the boolean build, if not read the key.
-export Key_Boolean_Map := index(if(fileservices.fileexists('~thor_data400::persist::vehiclev2::boolean'),
-																		tmsid_map,read_ret),{src,doc},{vehicle_key,iteration_key,sequence_key},'~thor_data400::key::vehiclev2::qa::docref.vehkey');
+export Key_Boolean_Map := index(if(fileservices.fileexists(data_services.data_location.prefix('Vehicle') + 'thor_data400::persist::vehiclev2::boolean'),
+																		tmsid_map,read_ret),{src,doc},{vehicle_key,iteration_key,sequence_key},data_services.data_location.prefix('Vehicle') + 'thor_data400::key::vehiclev2::qa::docref.vehkey');
 														

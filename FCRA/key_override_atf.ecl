@@ -1,9 +1,9 @@
-import ATF_Services, data_services, mdr;
+import ATF_Services, data_services;
 
 EXPORT key_override_atf := module
-	shared fname_prefix := data_services.data_location.prefix('ATF') + 'thor_data400::base::override::fcra::qa::';
+	shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
 	shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-  shared keyname_prefix := data_services.data_location.prefix('ATF') + 'thor_data400::key::override::fcra::atf::qa::';
+  shared keyname_prefix := data_services.data_location.prefix() + 'thor_data400::key::override::fcra::atf::qa::';
 
   atf_rec := RECORD
     ATF_Services.layouts.firearms_out;

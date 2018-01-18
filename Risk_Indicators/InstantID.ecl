@@ -348,7 +348,7 @@ Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.
 final := project(iid, risk_indicators.Layout_InstandID_NuGen);
 output( final, named( 'Results' ) );
 
-IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+IF(~DisableOutcomeTracking and not Test_Data_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 
 dRoyalties := royalties4us;
 output(dRoyalties, named('RoyaltySet'));

@@ -1,6 +1,6 @@
-import ut;
+import data_services;
 
 export foreign_prod := if(VersionControl._Flags.IsDataland
-													,ut.foreign_prod
+													,data_services.foreign_prod
 													,'~'
 												);

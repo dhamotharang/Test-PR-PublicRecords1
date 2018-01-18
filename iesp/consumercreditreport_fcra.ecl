@@ -30,6 +30,7 @@ export t_FcraConsumerCreditReportResponse := record (iesp.share.t_BaseResponse)
 	string UniqueId {xpath('UniqueId')};//hidden[log_only]
 	dataset(t_FcraCCReport) ConsumerCreditReports {xpath('ConsumerCreditReports/ConsumerCreditReport'), MAXCOUNT(iesp.Constants.MAX_REPORT_SOURCES)};
 	dataset(iesp.share_fcra.t_ConsumerStatement) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
+	dataset(iesp.share_fcra.t_ConsumerAlert) ConsumerAlerts {xpath('ConsumerAlerts/ConsumerAlert'), MAXCOUNT(iesp.Constants.MaxConsumerAlerts)};
 	iesp.riskview2.t_RiskView2LiensJudgmentsReport LiensJudgmentsReports {xpath('LiensJudgmentsReports')};
 end;
 		

@@ -1,4 +1,4 @@
-import AutoStandardI, doxie, iesp, suppress, FCRA, FFD, Gateway;
+﻿import AutoStandardI, doxie, iesp, suppress, FCRA, FFD, Gateway;
 
 export Search_Records := module
 	export params := interface(
@@ -105,7 +105,7 @@ export Search_Records := module
 		boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(in_mod.FFDOptionsMask);
 		consumer_statements := if(isFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
 
-		FFD.MAC.PrepareResultRecord(recs_proj, final_rec, consumer_statements, iesp.huntingfishing_fcra.t_FcraHuntFishRecord);
+		FFD.MAC.PrepareResultRecord(recs_proj, final_rec, consumer_statements, FFD.Constants.BlankConsumerAlerts, iesp.huntingfishing_fcra.t_FcraHuntFishRecord);
 		
 		return final_rec;
 	end;

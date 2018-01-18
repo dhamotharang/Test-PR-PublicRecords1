@@ -1,4 +1,4 @@
-import doxie,ut,bankrupt,bankruptcyv2;
+import doxie,ut,bankrupt,bankruptcyv2, data_services;
 
 //get_recs := BankruptcyV2.file_bankruptcy_search;
 
@@ -55,7 +55,7 @@ trans_V1 := project(BankruptcyV2.file_bankruptcy_search(name_type ='D') , trefor
 export key_bankruptcy_casenumber_FCRA := index(trans_V1,{typeof(case_number) s_casenum := case_number, 
 							 typeof(court_code) s_courtcode := court_code, 
 							 typeof(seq_number) s_seqnumber := seq_number}, {trans_V1},
-							 '~thor_data400::key::BankruptcyV2::fcra::case_number_'  + doxie.Version_SuperKey);
+							 data_services.data_location.prefix('bankruptcyv2') + 'thor_data400::key::BankruptcyV2::fcra::case_number_'  + doxie.Version_SuperKey);
 
 
 /*
@@ -89,5 +89,5 @@ export key_bankruptcy_casenumber_FCRA := index (get_recs_norm,
   {typeof(case_number) s_casenum := case_number, 
    typeof(court_code) s_courtcode := court_code, 
    typeof(seq_number) s_seqnumber := seq_number}, 
-  {get_recs_norm},'~thor_data400::key::BankruptcyV2::fcra::case_number_' + doxie.Version_SuperKey);
+  {get_recs_norm},data_services.data_location.prefix() + 'thor_data400::key::BankruptcyV2::fcra::case_number_' + doxie.Version_SuperKey);
  */ 

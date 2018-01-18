@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="AssetReportService" wuTimeout="300000">
   <part name="DID" type="xsd:string" required="1" />
   <separator />
@@ -131,6 +131,7 @@ EXPORT AssetReportServiceFCRA () := MACRO
        Self._Header := iesp.ECL2ESP.GetHeaderRow ();
        Self.Individual := L;
 			 Self.ConsumerStatements := recs_combined.Statements;
+			 Self.ConsumerAlerts := recs_combined.ConsumerAlerts;
      end;
      results := PROJECT (recs, SetResponse (Left));
 

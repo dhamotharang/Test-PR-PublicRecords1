@@ -1,4 +1,4 @@
-import doxie_files, doxie;
+import doxie_files, doxie, data_services;
 
 f_nextones := doxie_files.file_nextones_base;
 
@@ -23,4 +23,4 @@ nextones_did := f_nextones_exp((unsigned)did<>0, (unsigned)MSISDN<>0);
 
 export key_nextones_did := index(nextones_did,
                                 {unsigned6 l_did := did},{nextones_did},
-                                '~thor_data400::key::nextones_did_'+doxie.Version_SuperKey);
+                                data_services.data_location.prefix() + 'thor_data400::key::nextones_did_'+doxie.Version_SuperKey);

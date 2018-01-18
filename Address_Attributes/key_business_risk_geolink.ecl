@@ -1,4 +1,4 @@
-import address_attributes, doxie, ut;
+import address_attributes, doxie, ut, data_services;
 
 ds_in := distribute(Address_Attributes.file_business_risk(geolink <> ''), hash64(geolink));
 
@@ -19,5 +19,5 @@ ds := TABLE(ds_in,rCountHRB,geolink,few,local);
 export key_business_risk_geolink:=INDEX(ds, 																												       										//dataset
 																		{geolink},  											 																												//key fields
 																		{ds},  																												   			 										//layout
-																		'~thor_data400::key::business_header::'+doxie.Version_SuperKey+'::business_risk_geolink');//file
+																		data_services.data_location.prefix() + 'thor_data400::key::business_header::'+doxie.Version_SuperKey+'::business_risk_geolink');//file
 

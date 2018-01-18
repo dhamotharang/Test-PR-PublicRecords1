@@ -7,8 +7,8 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 	STRING2 INVALID_BUSINESS_SCORE := '-1';
 
 	//We have both companies with and without BIP IDs
-	withBIPs := BusnBIPIDs(Busn_Info.BIP_IDs.PowID.LinkID <> 0 OR Busn_Info.BIP_IDs.ProxID.LinkID <> 0 OR Busn_Info.BIP_IDs.SeleID.LinkID <> 0 OR Busn_Info.BIP_IDs.OrgID.LinkID <> 0 OR Busn_Info.BIP_IDs.UltID.LinkID <> 0);
-	noBIPs := BusnBIPIDs(Busn_Info.BIP_IDs.PowID.LinkID = 0 AND Busn_Info.BIP_IDs.ProxID.LinkID = 0 AND Busn_Info.BIP_IDs.SeleID.LinkID = 0 AND Busn_Info.BIP_IDs.OrgID.LinkID = 0 AND Busn_Info.BIP_IDs.UltID.LinkID = 0);
+	withBIPs := BusnBIPIDs(Busn_Info.BIP_IDs.PowID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO OR Busn_Info.BIP_IDs.ProxID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO OR Busn_Info.BIP_IDs.SeleID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO OR Busn_Info.BIP_IDs.OrgID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO OR Busn_Info.BIP_IDs.UltID.LinkID <> DueDiligence.Constants.NUMERIC_ZERO);
+	noBIPs := BusnBIPIDs(Busn_Info.BIP_IDs.PowID.LinkID = DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.ProxID.LinkID = DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.SeleID.LinkID = DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.OrgID.LinkID = DueDiligence.Constants.NUMERIC_ZERO AND Busn_Info.BIP_IDs.UltID.LinkID = DueDiligence.Constants.NUMERIC_ZERO);
 	
 
 	DueDiligence.Layouts.Busn_Internal  BusnKRIs(BusnBIPIDs le)  := TRANSFORM
@@ -351,11 +351,11 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
     /* BUSINESS GEOGRAPHIC RISK  */  
 		BusGeoRisk_Flag9 := IF (le.CountyHasHighCrimeIndex   
 		                    AND le.CountyBordersForgeinJur
-												AND (le.HIDTA OR le.HIFCA),      'T','F');                                      /* Set the Index value to 9 */	
+											          	AND (le.HIDTA OR le.HIFCA),      'T','F');                                      /* Set the Index value to 9 */	
 												
 		BusGeoRisk_Flag8 := IF (le.CityBorderStation 
 		                    OR  le.CityFerryCrossing  
-												OR  le.CityRailStation ,         'T','F');                                      /* Set the Index value to 8 */
+											          	OR  le.CityRailStation ,         'T','F');                                      /* Set the Index value to 8 */
 												
 		BusGeoRisk_Flag7 := IF (le.CountyBordersForgeinJur,  'T','F');                                      /* Set the Index value to 7 */
 		
@@ -422,10 +422,128 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		 self.BusMatchLevel_Flags  :=  BusMatchLevel_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
 		 self.BusMatchLevel        := (STRING)(10 - STD.Str.Find(BusMatchLevel_Flag_final, 'T', 1));        /* Set the index to the position of the first 'T'.  */  
 		
+			/* BUSINESS LEGAL EVENTS - CRIMINAL */  																																																	 
+		 BusLegalCriminal_Flag9 := If (le.BEOevidenceOfCurrentIncarceration
+		                               OR le.BEOevidenceOfCurrentParole,          'T','F');           /* Index value of 9 was set */
+		 BusLegalCriminal_Flag8 := IF (le.BEOevidenceOfFelonyConvictionInLastNYR, 'T','F');           /* Index value of 8 was set */
+		 BusLegalCriminal_Flag7 := IF (le.BEOevidenceOfFelonyConvictionOlderNYR,  'T','F');           /* Index value of 7 was set */
+		 BusLegalCriminal_Flag6 := IF (le.BEOevidenceOfPreviousIncarceration,     'T','F');           /* Index value of 6 was set */
+		 BusLegalCriminal_Flag5 := IF (le.BEOevidenceOfUncatagorizedConvictionInLastNYR, 'T','F');    /* Index value of 5 was set */
+		 BusLegalCriminal_Flag4 := IF (le.BEOevidenceOfMisdeameanorConvictionInLastNYR,  'T','F');    /* Index value of 4 was set */
+		 BusLegalCriminal_Flag3 := IF (le.BEOevidenceOfUncatagorizedConvictionOlderNYR,  'T','F');    /* Index value of 3 was set */
+		 BusLegalCriminal_Flag2 := IF (le.BEOevidenceOfMisdeameanorConvictionOlderNYR,   'T','F');    /* Index value of 2 was set */
+		 BusLegalCriminal_Flag1 := If (~le.BEOevidenceOfCurrentIncarceration
+		                           AND ~le.BEOevidenceOfCurrentParole
+															 AND ~le.BEOevidenceOfFelonyConvictionInLastNYR
+															 AND ~le.BEOevidenceOfFelonyConvictionOlderNYR
+															 AND ~le.BEOevidenceOfPreviousIncarceration
+															 AND ~le.BEOevidenceOfUncatagorizedConvictionInLastNYR
+															 AND ~le.BEOevidenceOfMisdeameanorConvictionInLastNYR
+															 AND ~le.BEOevidenceOfUncatagorizedConvictionOlderNYR
+															 AND ~le.BEOevidenceOfMisdeameanorConvictionOlderNYR,  'T','F');    /* Index value of 1 was set */
+		 
+		 BusLegalCriminal_Flag_Concat :=  BusLegalCriminal_Flag9 +
+																			BusLegalCriminal_Flag8 +
+																			BusLegalCriminal_Flag7 +
+																			BusLegalCriminal_Flag6 +
+																			BusLegalCriminal_Flag5 +
+																			BusLegalCriminal_Flag4 +
+																			BusLegalCriminal_Flag3 +
+																			BusLegalCriminal_Flag2 +
+																			BusLegalCriminal_Flag1;
+		 
+		 BusLegalCriminal_Flag0    := IF(STD.Str.Find(BusLegalCriminal_Flag_Concat, 'T', 1) = 0, 'T', 'F');     /* Insufficient information reported on the business */
+		 BusLegalCriminal_Flag_final  := BusLegalCriminal_Flag_Concat + BusLegalCriminal_Flag0; 
 		
+		 self.BusLegalCriminal_Flags  :=  BusLegalCriminal_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
+		 self.BusLegalCriminal        := (STRING)(10 - STD.Str.Find(BusLegalCriminal_Flag_final, 'T', 1));        /* Set the index to the position of the first 'T'.  */  
 		
+/* BUSINESS LEGAL EVENTS - TRAFFIC & INFRACTIONS */  																																																	 
+		 BusLegalTraffInfr_Flag9 := If (le.BEOevidenceOf3TrafficNYR,               'T','F');           /* Index value of 9 was set */
+		 BusLegalTraffInfr_Flag8 := IF (le.BEOevidenceOf2TrafficNYR,               'T','F');           /* Index value of 8 was set */
+		 BusLegalTraffInfr_Flag7 := IF (le.BEOevidenceOf3InfractionsNYR,           'T','F');           /* Index value of 7 was set */
+		 BusLegalTraffInfr_Flag6 := IF (le.BEOevidenceOf2InfractionsNYR,           'T','F');           /* Index value of 6 was set */
+		 BusLegalTraffInfr_Flag5 := IF (le.BEOevidenceOf3TrafficOlderNYR,          'T','F');           /* Index value of 5 was set */
+		 BusLegalTraffInfr_Flag4 := IF (le.BEOevidenceOf2TrafficOlderNYR,          'T','F');           /* Index value of 4 was set */
+		 BusLegalTraffInfr_Flag3 := IF (le.BEOevidenceOf3InfractionsOlderNYR,      'T','F');           /* Index value of 3 was set */
+		 BusLegalTraffInfr_Flag2 := IF (le.BEOevidenceOf2InfractionsOlderNYR,      'T','F');           /* Index value of 2 was set */
+		 BusLegalTraffInfr_Flag1 := If (~le.BEOevidenceOf3TrafficNYR
+		                           AND ~le.BEOevidenceOf2TrafficNYR
+															              AND ~le.BEOevidenceOf3InfractionsNYR
+															              AND ~le.BEOevidenceOf2InfractionsNYR
+															              AND ~le.BEOevidenceOf3TrafficOlderNYR
+															              AND ~le.BEOevidenceOf2TrafficOlderNYR
+															              AND ~le.BEOevidenceOf3InfractionsOlderNYR
+															              AND ~le.BEOevidenceOf2InfractionsOlderNYR,      'T','F');           /* Index value of 1 was set */
+		 
+		 BusLegalTraffInfr_Flag_Concat :=  BusLegalTraffInfr_Flag9 +
+																			BusLegalTraffInfr_Flag8 +
+																			BusLegalTraffInfr_Flag7 +
+																			BusLegalTraffInfr_Flag6 +
+																			BusLegalTraffInfr_Flag5 +
+																			BusLegalTraffInfr_Flag4 +
+																			BusLegalTraffInfr_Flag3 +
+																			BusLegalTraffInfr_Flag2 +
+																			BusLegalTraffInfr_Flag1;
+		 
+		 BusLegalTraffInfr_Flag0    := IF(STD.Str.Find(BusLegalTraffInfr_Flag_Concat, 'T', 1) = 0, 'T', 'F');       /* Insufficient information reported on the business */
+		 BusLegalTraffInfr_Flag_final  := BusLegalTraffInfr_Flag_Concat + BusLegalTraffInfr_Flag0; 
 		
-
+		 self.BusLegalTraffInfr_Flags  :=  BusLegalTraffInfr_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
+		 self.BusLegalTraffInfr        := (STRING)(10 - STD.Str.Find(BusLegalTraffInfr_Flag_final, 'T', 1));        /* Set the index to the position of the first 'T'.  */ /* BUSINESS LEGAL EVENTS - TRAFFIC & INFRACTIONS */  																																																	 
+	
+	
+	/* BUSINESS LEGAL EVENTS - CIVIL (LIENS, JUDGEMENTS and EVICTIONS) */ 
+	/*   these are for the Business Executive Officer (BEO) or the INQUIRED BUSINESS  */ 
+	  tempBusCivilNYR     := le.Business.liensUnreleasedCntInThePastNYR + le.Business.evictionsCntInThePastNYR;
+		 BusLegalCivil_Flag9 := If (le.BEOevidenceOf10CivilNYR
+		                            OR  tempBusCivilNYR >= 10,                                       'T','F');     /* Index value of 9 was set */
+		 BusLegalCivil_Flag8 := IF (le.BEOevidenceOf5To9CivilNYR
+		                            OR  tempBusCivilNYR IN DueDiligence.Constants.CIVIL_RANGE_A,     'T','F');     /* Index value of 8 was set */
+																
+		 BusLegalCivil_Flag7 := IF (le.BEOevidenceOf3To4CivilNYR
+		                            OR  tempBusCivilNYR IN DueDiligence.Constants.CIVIL_RANGE_B,     'T','F');     /* Index value of 7 was set */
+																
+		 BusLegalCivil_Flag6 := IF (le.BEOevidenceOf1To2CivilNYR
+		                            OR  tempBusCivilNYR IN DueDiligence.Constants.CIVIL_RANGE_C,     'T','F');     /* Index value of 6 was set */
+			
+			tempBusCivilOlderNYR := le.Business.liensUnreleasedCnt - le.Business.liensUnreleasedCntInThePastNYR;  													
+		 BusLegalCivil_Flag5 := IF (le.BEOevidenceOf10CivilOlderNYR 
+		                            OR  tempBusCivilOlderNYR >= 10 ,                                 'T','F');     /* Index value of 5 was set */
+																
+		 BusLegalCivil_Flag4 := IF (le.BEOevidenceOf5To9CivilOlderNYR
+		                            OR  tempBusCivilOlderNYR IN DueDiligence.Constants.CIVIL_RANGE_A, 'T','F');    /* Index value of 4 was set */
+																
+		 BusLegalCivil_Flag3 := IF (le.BEOevidenceOf3To4CivilOlderNYR
+		                            OR  tempBusCivilOlderNYR IN DueDiligence.Constants.CIVIL_RANGE_B, 'T','F');   /* Index value of 3 was set */
+																
+		 BusLegalCivil_Flag2 := IF (le.BEOevidenceOf1To2CivilOlderNYR
+		                            OR  tempBusCivilOlderNYR IN DueDiligence.Constants.CIVIL_RANGE_C, 'T','F');   /* Index value of 2 was set */
+		 BusLegalCivil_Flag1 := If (BusLegalCivil_Flag9 = 'F' 
+		                           AND BusLegalCivil_Flag8 = 'F' 
+															              AND BusLegalCivil_Flag7 = 'F' 
+															              AND BusLegalCivil_Flag6 = 'F'
+															              AND BusLegalCivil_Flag5 = 'F' 
+															              AND BusLegalCivil_Flag4 = 'F' 
+															              AND BusLegalCivil_Flag3 = 'F'
+															              AND BusLegalCivil_Flag2 = 'F',                                     'T','F');   /* Index value of 1 was set */
+		 
+		 BusLegalCivil_Flag_Concat :=  BusLegalCivil_Flag9 +
+																			BusLegalCivil_Flag8 +
+																		 BusLegalCivil_Flag7 +
+																			BusLegalCivil_Flag6 +
+																			BusLegalCivil_Flag5 +
+																			BusLegalCivil_Flag4 +
+																			BusLegalCivil_Flag3 +
+																			BusLegalCivil_Flag2 +
+																			BusLegalCivil_Flag1;
+		 
+		 BusLegalCivil_Flag0       := IF(STD.Str.Find(BusLegalCivil_Flag_Concat, 'T', 1) = 0, 'T', 'F');       /* Insufficient information reported on the business */
+		 BusLegalCivil_Flag_final  := BusLegalCivil_Flag_Concat + BusLegalCivil_Flag0; 
+		
+		 self.BusLegalCivil_Flags      :=  BusLegalCivil_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
+		 self.BusLegalCivil            := (STRING)(10 - STD.Str.Find(BusLegalCivil_Flag_final, 'T', 1));        /* Set the index to the position of the first 'T'.  */ /* BUSINESS LEGAL EVENTS - TRAFFIC & INFRACTIONS */  																																																	 
+		//***
 			
 		SELF := le;
 	END;
@@ -461,8 +579,12 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 																										SELF.BusShellShelfRisk_Flags := INVALID_BUSINESS_FLAGS;
 																										SELF.BusMatchLevel := INVALID_BUSINESS_SCORE;
 																										SELF.BusMatchLevel_Flags := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusLegalEvents := INVALID_BUSINESS_SCORE;
-																										// SELF.BusLegalEvents_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusLegalCriminal := INVALID_BUSINESS_SCORE;
+																										SELF.BusLegalCriminal_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusLegalCivil := INVALID_BUSINESS_SCORE;
+																										SELF.BusLegalCivil_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusLegalTraffInfr := INVALID_BUSINESS_SCORE;
+																										SELF.BusLegalTraffInfr_Flags := INVALID_BUSINESS_FLAGS;
 																										// SELF.BusLegalEventsFelonyType := INVALID_BUSINESS_SCORE;
 																										// SELF.BusLegalEventsFelonyType_Flags := INVALID_BUSINESS_FLAGS;
 																										// SELF.BusHighRiskNewsProfiles := INVALID_BUSINESS_SCORE;

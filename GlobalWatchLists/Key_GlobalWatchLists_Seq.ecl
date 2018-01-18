@@ -1,4 +1,4 @@
-Import doxie;
+﻿Import doxie, data_services;
 
 p := DEDUP(File_GlobalWatchLists_Keybuild,pty_key,orig_vessel_name,fname,mname,lname,cname,all);
 
@@ -34,4 +34,4 @@ END;
 
 iter := ITERATE(srt, iterator(LEFT,RIGHT));
 
-Export Key_GlobalWatchLists_seq := INDEX(iter,{seq},{iter},'~thor_data400::key::globalwatchlists::seq_'+doxie.Version_SuperKey);
+Export Key_GlobalWatchLists_seq := INDEX(iter,{seq},{iter},data_services.data_location.prefix() + 'thor_data400::key::globalwatchlists::seq_'+doxie.Version_SuperKey);

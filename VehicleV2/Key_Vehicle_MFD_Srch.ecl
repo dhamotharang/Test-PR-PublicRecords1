@@ -1,4 +1,4 @@
-IMPORT VehicleV2, Doxie, Doxie_Build, data_services, BIPV2, ut;
+IMPORT VehicleV2, Doxie, Doxie_Build, data_services, ut;
 
 	//advo does not exist in Distrix. Thus use Vehicle Party base file to determine if an address is MFD or not in Distrix environment.
 	mac_get_address_list(rec_slim, distrix_flag):= FUNCTIONMACRO
@@ -94,4 +94,4 @@ IMPORT VehicleV2, Doxie, Doxie_Build, data_services, BIPV2, ut;
 EXPORT Key_Vehicle_MFD_Srch := INDEX(rec_dedup, 
                                      {zip5, prim_range,prim_name,suffix,predir,postdir}, 
 																		 {rec_dedup},
-																		 '~thor_data400::key::VehicleV2::mfd_srch_'+ doxie.Version_SuperKey);
+																		 data_services.data_location.prefix('Vehicle') + 'thor_data400::key::VehicleV2::mfd_srch_'+ doxie.Version_SuperKey);

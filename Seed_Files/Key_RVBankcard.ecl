@@ -1,3 +1,5 @@
+import data_services;
+
 d :=  seed_files.file_RVBankcard;
 
 newrec := record
@@ -6,4 +8,4 @@ newrec := record
 end;
 newtable := table(d, newrec);
 
-export Key_RVBankcard := index(newtable,{dataset_name,hashvalue}, {newtable}, '~thor_data400::key::testseed::qa::rvbankcard');
+export Key_RVBankcard := index(newtable,{dataset_name,hashvalue}, {newtable}, data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::rvbankcard');

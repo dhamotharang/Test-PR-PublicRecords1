@@ -1,4 +1,4 @@
-IMPORT Business_Header, ut;
+IMPORT Business_Header, ut, data_services;
 
 //***** CONSTANT
 ceiling_for_duplicates := 2000;
@@ -58,7 +58,7 @@ myindex :=
 		dedup(words,metaphone, state, zip, bdid, all),
 		{metaphone, state, zip},
 		{bdid}, 
-		'~thor_data400::key::business_header.CoNameWordsMetaphone_' + business_header_ss.key_version
+		data_services.data_location.prefix() + 'thor_data400::key::business_header.CoNameWordsMetaphone_' + business_header_ss.key_version
 	);
 
 

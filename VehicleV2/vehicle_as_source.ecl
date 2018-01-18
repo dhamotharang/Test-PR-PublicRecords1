@@ -1,4 +1,4 @@
-import header,ut,vehlic;
+import header,ut,vehlic,data_services;
 
 export	Vehicle_as_Source(	dataset(VehicleV2.Layout_Base_Main)		pVehiclemain		=	dataset([],VehicleV2.Layout_Base_Main),
 														dataset(VehicleV2.Layout_Base.Party_bip)	pVehicleSearch	=	dataset([],VehicleV2.Layout_Base.Party_bip),
@@ -7,14 +7,14 @@ export	Vehicle_as_Source(	dataset(VehicleV2.Layout_Base_Main)		pVehiclemain		=	d
 													)
 	:=
   function
-	dSourceDatasearch_	:=	project(map(pForHeaderBuild => dataset(ut.foreign_prod+'~thor_data400::base::vehicles_v2_party_header_building',VehicleV2.Layout_Base.Party_bip,flat)
+	dSourceDatasearch_	:=	project(map(pForHeaderBuild => dataset(data_services.foreign_prod+'~thor_data400::base::vehicles_v2_party_header_building',VehicleV2.Layout_Base.Party_bip,flat)
 																		,pFastHeader => dataset('~thor_data400::base::vehicles_v2_party_Quickheader_building',VehicleV2.Layout_Base.Party_bip,flat)
 														,pvehicleSearch(append_did<999999000000)
 													),VehicleV2.Layout_Base.Party)
 													(lname<>'' and fname<>'' and ace_prim_name<>'')
 													;
 								
-	dSourceDataMain		:=	map(	pForHeaderBuild => dataset(ut.foreign_prod+'~thor_data400::base::vehicles_v2_main_header_building',VehicleV2.Layout_Base_Main,flat)
+	dSourceDataMain		:=	map(	pForHeaderBuild => dataset(data_services.foreign_prod+'~thor_data400::base::vehicles_v2_main_header_building',VehicleV2.Layout_Base_Main,flat)
 														,pFastHeader => dataset('~thor_data400::base::vehicles_v2_main_Quickheader_building',VehicleV2.Layout_Base_Main,flat)
 														,pvehicleMain
 													)

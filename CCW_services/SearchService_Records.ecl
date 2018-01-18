@@ -1,4 +1,4 @@
-import AutoStandardI, CCW_services, ut, doxie, iesp, Suppress, FCRA, FFD, Gateway;
+﻿import AutoStandardI, CCW_services, ut, doxie, iesp, Suppress, FCRA, FFD, Gateway;
 
 export SearchService_Records := module
 	export params := interface(
@@ -107,7 +107,7 @@ export SearchService_Records := module
 		// Here we are interested only in the record statements or consumer level statements. 
    	consumer_statements := if(isFCRA and showConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
 				
-		FFD.MAC.PrepareResultRecord(final_recs, rec_out, consumer_statements, iesp.concealedweapon_fcra.t_FcraWeaponRecord);
+		FFD.MAC.PrepareResultRecord(final_recs, rec_out, consumer_statements, FFD.Constants.BlankConsumerAlerts, iesp.concealedweapon_fcra.t_FcraWeaponRecord);
 		 
 		RETURN rec_out;
 	end;

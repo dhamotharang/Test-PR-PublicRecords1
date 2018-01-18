@@ -96,7 +96,7 @@
 											'IncludePeopleAtWork',
 											'IncludePhonesFeedback',
 											'IncludePhonesPlus',
-											'IncludeProgessivePhone',
+											'IncludeProgressivePhone',
 											'IncludeRelativeNames',
 											'IncludeSourceList',
 											'IncludeZeroDIDRefs',

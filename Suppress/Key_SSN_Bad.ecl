@@ -1,4 +1,4 @@
-import header, doxie, watchdog;
+import  doxie, watchdog,data_services;
 
 r :=
 RECORD
@@ -16,6 +16,6 @@ ssn_ddp := DEDUP(SORT(DISTRIBUTE(h,HASH(ssn)),ssn,did,LOCAL),ssn,did,LOCAL);
 ssn_cnt := TABLE(ssn_ddp,ssn_cnt_rec,ssn,LOCAL);
 ssn_bad := ssn_cnt(cnt > 3);
 
-i := INDEX(ssn_bad,{s_ssn := ssn,cnt},'~thor_data400::key::ssn_bads_'+doxie.Version_SuperKey);
+i := INDEX(ssn_bad,{s_ssn := ssn,cnt},data_services.data_location.prefix() + 'thor_data400::key::ssn_bads_'+doxie.Version_SuperKey);
 
 export Key_SSN_Bad := i;

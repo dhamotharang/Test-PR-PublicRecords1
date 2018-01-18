@@ -1,3 +1,5 @@
+import  data_services;
+
 d :=  seed_files.file_RiskView;
 
 newrec := record
@@ -6,4 +8,4 @@ newrec := record
 end;
 newtable := table(d, newrec);
 
-export Key_RiskView := index(newtable,{dataset_name,hashvalue}, {newtable}, '~thor_data400::key::testseed::qa::riskview');
+export Key_RiskView := index(newtable,{dataset_name,hashvalue}, {newtable}, data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::riskview');

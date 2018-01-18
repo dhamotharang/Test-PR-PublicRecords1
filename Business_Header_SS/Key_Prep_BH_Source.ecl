@@ -1,4 +1,4 @@
-IMPORT Business_Header, ut;
+IMPORT Business_Header, ut, data_services;
 
 bh := Business_Header.File_Prep_Business_Header_Plus;
 bh_ded := DEDUP(bh, bdid, source, ALL);
@@ -15,4 +15,4 @@ ut.MAC_Sequence_Records_NewRec(bh_ded, layout_src_seq, seq, outf)
 export Key_Prep_BH_Source := INDEX(
 	outf,
 	{source, seq, state, __filepos},
-	'~thor_data400::key::business_header.src' + thorlib.wuid());
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.src' + thorlib.wuid());

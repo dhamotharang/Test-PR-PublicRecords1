@@ -172,14 +172,27 @@ export BankruptcySearchServiceFCRA(
 	
     matched_recs	:= 	project(temp_rollup, transform(bankruptcyv3_services.layouts.Matched_party_rec, self := left.matched_party));
 		
-    dsDIDs	      := 	project(dedup(matched_recs(party_type IN BankruptcyV3_Services.consts.DEBTOR_TYPES), did, all), 
+    matched_rec_dids    := 	project(dedup(matched_recs, did, all), 
 		                          transform(FFD.Layouts.DidBatch, 
 		                          self.acctno := FFD.Constants.SingleSearchAcctno, 
 															self.did := (unsigned6) left.did));
-
+                              
+    ds_subj_did := dataset([{FFD.Constants.SingleSearchAcctno, subj_did}],FFD.Layouts.DidBatch);
+    
+    // even if no data found we still need to check for alerts and consumer level statements for subject
+    dsDIDs := if(exists(matched_rec_dids), matched_rec_dids, ds_subj_did);
+ 
 	  //  Call the person context
-	  pc_recs := FFD.FetchPersonContext(dsDIDs, gateways, FFD.Constants.DataGroupSet.Bankruptcy);
+	  pc_recs_prelim := FFD.FetchPersonContext(dsDIDs, gateways, FFD.Constants.DataGroupSet.Bankruptcy);
 	 	
+    // for record level statement/dispute  filter to keep data only if subject is debtor
+    pc_recs_rlvl := join(pc_recs_prelim(RecordType IN FFD.Constants.RecordType.RecordLevel), 
+                        matched_recs(party_type IN BankruptcyV3_Services.consts.DEBTOR_TYPES),
+                        (unsigned6) left.LexId = (unsigned6) right.did,
+                        transform(left), keep(1), limit(0));
+                        
+    pc_recs := pc_recs_rlvl + pc_recs_prelim(RecordType IN FFD.Constants.RecordType.ConsumerLevel);
+    
 	  // Slim down the PersonContext
 	  slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 		
@@ -207,11 +220,16 @@ export BankruptcySearchServiceFCRA(
             ut.MapMessageCodes(ut.constants_MessageCodes.FCRA_CASE_NUM_MORE_THAN_1_REC_RETURNED)));
 
 	  // get FFD statements
-	  consumer_statements := IF(ShowConsumerStatements and exists(final), FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
+    // Consumer Level statements will always be returned along with any alert messages.
+		all_statements := IF(ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
+	  consumer_statements := IF( exists(final), all_statements, 
+                              all_statements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel));
 
+    consumer_alerts := FFD.Constants.BlankConsumerAlerts;
 	  doxie.MAC_Marshall_Results(final, recs_marshalled);
 
     OUTPUT(recs_marshalled, NAMED('Results'));		
     OUTPUT (consumer_statements, named ('ConsumerStatements'));	
-
-		endmacro;
+    OUTPUT (consumer_alerts, named ('ConsumerAlerts'));	
+    
+ 		endmacro;

@@ -1,4 +1,4 @@
-IMPORT Accident_Services,doxie,ut;
+IMPORT Accident_Services,doxie,ut, data_services;
 
 StateRestrictions := DATASET([
 	// GOVERNMENT
@@ -165,5 +165,5 @@ StateRestrictions := DATASET([
 
 EXPORT Key_StResReport := INDEX(StateRestrictions,
 	{ApplicationType},{AccidentState,Allowed,InquiryDataAllowed,Aknowledgement,ResaleAllowed,RestrictedOutputBitmap},
-	'~thor_data400::key::accident_state_restrictions::report_' + doxie.Version_SuperKey);
+	data_services.data_location.prefix() + 'thor_data400::key::accident_state_restrictions::report_' + doxie.Version_SuperKey);
 	

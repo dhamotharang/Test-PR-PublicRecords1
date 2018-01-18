@@ -1,7 +1,6 @@
 ﻿/*--SOAP--
 <message name="SearchServiceFCRA">
-    <part name="FcraBenefitAssessSearchRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
-    <part name="gateways" 								type="tns:XmlDataSet" cols="110" rows="4"/>
+    <part name="FraudGovReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
 </message>
 */
 
@@ -16,6 +15,16 @@ EXPORT ReportService() := MACRO
 		ds_in  := DATASET ([], rec_in) : STORED ('FraudGovReportRequest', FEW);
 		first_row := ds_in[1] : independent;
 		iesp.ECL2ESP.SetInputBaseRequest (first_row);
+		
+		MaxVelocities := MAP(first_row.options.IsOnline and first_row.options.MaxVelocities > 0 => MIN(first_row.options.MaxVelocities, iesp.Constants.FraudGov.MAX_COUNT_VELOCITY),
+												 first_row.options.IsOnline and first_row.options.MaxVelocities = 0 => iesp.Constants.FraudGov.MAX_COUNT_VELOCITY,
+												 ~first_row.options.IsOnline => FraudGovPlatform_Services.Constants.MAX_VELOCITIES,
+												 0);
+												 
+		MaxKnownFrauds := MAP(first_row.options.IsOnline and first_row.options.MaxKnownFrauds > 0 => MIN(first_row.options.MaxKnownFrauds, iesp.Constants.FraudGov.MAX_COUNT_KNOWN_RISK),
+												  first_row.options.IsOnline and first_row.options.MaxKnownFrauds = 0 => iesp.Constants.FraudGov.MAX_COUNT_KNOWN_RISK,
+												 ~first_row.options.IsOnline => FraudGovPlatform_Services.Constants.MAX_KNOWN_FRAUDS,
+												 0);
 	
 		#STORED('AppendBest', first_row.options.AppendBest);
 		#STORED('DIDScoreThreshold', first_row.options.DIDScoreThreshold);
@@ -26,8 +35,8 @@ EXPORT ReportService() := MACRO
 		#STORED('AgencyCounty',  first_row.options.AgencyCounty);
 		#STORED('AgencyState',  first_row.options.AgencyState);
 		#STORED('FraudPlatform',	first_row.options.Platform);
-		#STORED('MaxVelocities', IF(first_row.options.IsOnline, 1000, FraudGovPlatform_Services.Constants.MAX_VELOCITIES));
-		#STORED('MaxKnownFrauds', IF(first_row.options.IsOnline, 1000, FraudGovPlatform_Services.Constants.MAX_KNOWN_FRAUDS));
+		#STORED('MaxVelocities', MaxVelocities);
+		#STORED('MaxKnownFrauds', MaxKnownFrauds);
 
 		GetReportModule(iesp.fraudgovplatform.t_FraudGovReportBy reportBy) := FUNCTION
 	
@@ -95,13 +104,16 @@ EXPORT ReportService() := MACRO
  // **************************************************************************************	  
 	ds_batch_in_with_did := BatchShare.MAC_Get_Scored_DIDs(report_mod, batch_params_mod, usePhone:=TRUE);
 
-	tmp := FraudGovPlatform_Services.ReportRecords(ds_batch_in_with_did, batch_params_mod);
+	tmp := FraudGovPlatform_Services.ReportRecords(ds_batch_in_with_did, batch_params_mod, MaxVelocities, MaxKnownFrauds);
 	
 	//Final iESP Form Conversion
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(tmp, 
 																																											 results, 
 																																											 iesp.fraudgovplatform.t_FraudGovReportResponse);
-											
+																																											 
+	Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(tmp,true);			
+	
+	output(Royalties, NAMED('RoyaltySet'));	
 	output(results, NAMED('Results'));	
 	
 ENDMACRO;

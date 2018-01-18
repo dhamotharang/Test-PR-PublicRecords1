@@ -1,5 +1,5 @@
 //WARNING: THIS KEY IS AN FCRA KEY...
-import doxie, bankrupt, ut, risk_indicators, FCRA;
+import doxie, bankrupt, ut, risk_indicators, FCRA, data_services;
 
 slimrec := record
 	unsigned6	did;
@@ -118,4 +118,4 @@ doc_rolled := ROLLUP(SORT(doc_added,did,crim_case_num, local), LEFT.did=RIGHT.di
 
 //old key name:  '~thor_data400::key::BocaShell_Derogs_DID_' + doxie.Version_SuperKey
 export Key_BJL_DID_FCRA := INDEX (doc_rolled, {did}, {doc_rolled}, 
-                                  '~thor_data400::key::bankrupt::fcra::bocashell.did_' + doxie.Version_SuperKey);
+                                  data_services.data_location.prefix() + 'thor_data400::key::bankrupt::fcra::bocashell.did_' + doxie.Version_SuperKey);

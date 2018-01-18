@@ -1,4 +1,4 @@
-import doxie, watchdog, ut, doxie_files;
+import doxie, ut, doxie_files, data_services;
 
 layout_addr := record
 	qstring28	prim_name;
@@ -51,4 +51,7 @@ TRANSFORM
 END;
 dl_rolled := ROLLUP(dl_id,left.roll_count < 100, roll_dls(LEFT,RIGHT));
 
-export Key_BocaShell_DL := index (dl_rolled, {did}, {dl_rolled}, '~thor_data400::key::bocaShell_DL_DID_' + doxie.Version_SuperKey);
+export Key_BocaShell_DL := index (dl_rolled, 
+                                  {did}, 
+                                  {dl_rolled}, 
+                                  data_services.data_location.prefix() + 'thor_data400::key::bocaShell_DL_DID_' + doxie.Version_SuperKey);

@@ -1,7 +1,7 @@
 import doxie,address,ut;
 
 export verifiedPhones(boolean Legacy_Verified_Value = false) :=
-MODULE
+INLINE MODULE
 
 //****** Pull the listed phone, which comes from gong, off of the verified records
 shared csa := project(doxie.Comp_Subject_Addresses_wrap.raw, transform(doxie.Layout_Comp_Addresses, self.hri_address := [], self := left));

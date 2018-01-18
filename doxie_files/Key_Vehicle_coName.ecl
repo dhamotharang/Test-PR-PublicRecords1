@@ -1,4 +1,4 @@
-import doxie,doxie_build,ut;
+import doxie,doxie_build,ut, data_services;
 
 f := doxie_build.File_VehicleContacts_KeyBuilding(company_name<>'');
 
@@ -33,4 +33,7 @@ n := NORMALIZE(clean_co,LENGTH(StringLib.StringFilter(TRIM(LEFT.company_name),' 
 
 d := DEDUP(SORT(n,RECORD,EXCEPT pick),RECORD,EXCEPT pick);
 
-export Key_Vehicle_coName := INDEX(d, {d.company_name,d.state,d.city_name}, {d.pick, d.seq_no}, '~thor_data400::key::'+doxie_build.buildstate+'vehicle_coName_'+doxie.Version_SuperKey);
+export Key_Vehicle_coName := INDEX(d, 
+                                   {d.company_name,d.state,d.city_name}, 
+                                   {d.pick, d.seq_no}, 
+                                   data_services.data_location.prefix() + 'thor_data400::key::'+doxie_build.buildstate+'vehicle_coName_'+doxie.Version_SuperKey);

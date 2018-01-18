@@ -1,4 +1,4 @@
-import doxie,FLAccidents;
+import doxie,FLAccidents, data_services;
 
 ecrash_vin_base := pull(FLAccidents_Ecrash.Key_ecrash_vin);
 
@@ -17,7 +17,7 @@ end;
 
 ecrash_vin_base_7:=project(ecrash_vin_base,add_vin7(LEFT))(trim(l_vin7)<>'');
 
-export Key_Ecrash_vin7 := index(ecrash_vin_base_7
-							,{l_vin7}
-							,{l_vin,accident_nbr}
-							,'~thor_data400::key::ecrash_vin7_' + doxie.Version_SuperKey);
+export Key_Ecrash_vin7 := index(ecrash_vin_base_7,
+                                {l_vin7},
+                                {l_vin,accident_nbr},
+                                data_services.data_location.prefix() + 'thor_data400::key::ecrash_vin7_' + doxie.Version_SuperKey);

@@ -1,4 +1,4 @@
-import AutoStandardI, FaaV2_PilotServices, ut, doxie, iesp, suppress, fcra, FFD, Gateway;
+﻿import AutoStandardI, FaaV2_PilotServices, ut, doxie, iesp, suppress, fcra, FFD, Gateway;
 
 export SearchService_Records := module
 	export params := interface(
@@ -96,7 +96,7 @@ export SearchService_Records := module
 		
 		tempresults_slim := project(recs_sort, iesp.faapilot_Fcra.t_FcraPilotRecord); 
 		
-		FFD.MAC.PrepareResultRecord(tempresults_slim, final_results, statement_output, iesp.faapilot_Fcra.t_FcraPilotRecord); 
+		FFD.MAC.PrepareResultRecord(tempresults_slim, final_results, statement_output, FFD.Constants.BlankConsumerAlerts, iesp.faapilot_Fcra.t_FcraPilotRecord); 
 		
 		return final_results;
 	end;

@@ -1,6 +1,6 @@
-import doxie, nid;
+import doxie, nid,data_services;
 
-file_prefix := '~thor_data400';
+file_prefix := data_services.data_location.prefix() + 'thor_data400';
 
 
 baserecset := Relocations.file_wdtgGong;

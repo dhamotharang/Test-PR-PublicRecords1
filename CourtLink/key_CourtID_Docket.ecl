@@ -1,4 +1,4 @@
-import CourtLink, Doxie;
+﻿import CourtLink, Doxie, data_services;
 
 file_in := courtlink.files().base.qa;
 
@@ -12,4 +12,4 @@ dist_id_base := distribute(dedup(File_fixed,all), hash(CourtID, DocketNumber));
 sort_id_base := sort(dist_id_base, CourtID, DocketNumber, local);
 
 export key_CourtID_Docket := index(sort_id_base, {CourtID, DocketNumber},{sort_id_base},
-				            '~thor_data400::key::courtLink::'+doxie.Version_SuperKey+'::courtID_Docket');
+				            data_services.data_location.prefix() + 'thor_data400::key::courtLink::'+doxie.Version_SuperKey+'::courtID_Docket');

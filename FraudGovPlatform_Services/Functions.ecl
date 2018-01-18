@@ -1,14 +1,15 @@
-﻿IMPORT CriminalRecords_BatchService, FraudGovPlatform_Services, FraudShared_Services,Patriot , ut;
+﻿IMPORT CriminalRecords_BatchService, FraudGovPlatform_Services, FraudShared_Services, Patriot, ut, STD;
 
 EXPORT Functions := MODULE
 	
-	EXPORT getExternalServicesRecs(	DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in, 
-																	FraudGovPlatform_Services.IParam.BatchParams batch_params ) := FUNCTION
+	EXPORT getExternalServicesRecs(DATASET(FraudShared_Services.Layouts.BatchIn_rec) ds_batch_in, 
+																														  FraudGovPlatform_Services.IParam.BatchParams batch_params ) := FUNCTION
 
 		recs_Death := FraudGovPlatform_Services.Raw.GetDeath(ds_batch_in, batch_params);
 		recs_Criminal := FraudGovPlatform_Services.Raw.GetCriminal(ds_batch_in, batch_params);
 		recs_RedFlag := FraudGovPlatform_Services.Raw.GetRedFlags(ds_batch_in, batch_params);
 		recs_Patriot := FraudGovPlatform_Services.Raw.GetGlobalWatchlist(ds_batch_in, batch_params);
+		recs_FDN := FraudGovPlatform_Services.Raw.GetFDN(ds_batch_in, batch_params);
 		
 		FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw xfm_Compilation(FraudShared_Services.Layouts.BatchIn_rec L) := TRANSFORM
 			SELF.batchin_rec := L;
@@ -16,6 +17,7 @@ EXPORT Functions := MODULE
 			SELF.childRecs_Criminal := recs_Criminal(acctno = L.acctno);
 			SELF.childRecs_RedFlag := recs_RedFlag(seq = (INTEGER)L.acctno);
 			SELF.childRecs_Patriot := UNGROUP(recs_Patriot(acctno = L.acctno));
+			SELF.childRecs_FDN := recs_FDN(acctno = L.acctno);
 			SELF := L;
 			SELF := [];
 		END;
@@ -28,8 +30,9 @@ EXPORT Functions := MODULE
 			output(recs_Criminal, named('recs_Criminal'));
 			output(recs_RedFlag, named('recs_RedFlag'));
 			output(recs_Patriot, named('recs_Patriot'));
+			output(recs_FDN, named('recs_FDN'));
 		#END
-		
+
 		return final_recs;
 	END;
 		
@@ -165,12 +168,12 @@ EXPORT Functions := MODULE
 		ds_red_flag_sorted := SORT(ds_red_flag_temp2, seq, category_weight, hri_weight);
 
 		red_flag_knownrisk_ds := JOIN(ds_records, ds_red_flag_sorted,
-																														LEFT.batchin_rec.acctno = (STRING)RIGHT.seq,
-																																TRANSFORM(slim_knownrisk_rec,
-																																		SELF.acctno := LEFT.batchin_rec.acctno,
-																																		SELF.known_risk_reason :=	RIGHT.desc;
-																																		SELF.event_date := '';
-																																		SELF.event_type := 'RedFlag'));	
+																	LEFT.batchin_rec.acctno = (STRING)RIGHT.seq,
+																			TRANSFORM(slim_knownrisk_rec,
+																					SELF.acctno := LEFT.batchin_rec.acctno,
+																					SELF.known_risk_reason :=	RIGHT.desc;
+																					SELF.event_date := '';
+																					SELF.event_type := 'RedFlag'));	
 
 		// *** PATRIOT/GLOBAL WATCH LIST KNOWN RISKS ***
 		patriot_recs_raw := PROJECT(ds_records.childRecs_Patriot, TRANSFORM(Patriot.layout_batch_out, SELF := LEFT, SELF := []));
@@ -181,6 +184,30 @@ EXPORT Functions := MODULE
 																		SELF.known_risk_reason :=	'Name match on the Global watch list';
 																		SELF.event_date := ''; //No date to add. 
 																		SELF.event_type := 'Patriot'));
+																		
+		// FDN Known Risk				
+		ds_fdn_raw := PROJECT(ds_records.childRecs_fdn, FraudShared_Services.Layouts.Raw_Payload_rec);
+		
+		slim_knownrisk_rec xform_fdn_known_risk(FraudGovPlatform_Services.Layouts.Batch_out_pre_w_raw L,
+																						FraudShared_Services.Layouts.Raw_Payload_rec R) := TRANSFORM
+																																											
+				SELF.acctno := IF(R.classification_activity.confidence_that_activity_was_deceitful_id in FraudGovPlatform_Services.Constants.ClassificationActivitySet,
+																						L.batchin_rec.acctno, SKIP);
+																						
+					// Lexid or full name and full ssn and full birth date) we return a line item in the Known Risk section of the batch output with 'Identity is associated with (classification matrix: Proven, Probable, Potential, Neutral, Known Good, etc.) fraud' 
+					SELF.known_risk_reason :=	MAP( R.classification_entity.entity_type_id = FraudShared_Services.Constants.EntityTypes_Enum.Person =>
+																																		 'Identity is associated with ' +  TRIM(R.classification_activity.confidence_that_activity_was_deceitful) + ' fraud',
+																																		 'Element ' + TRIM(R.classification_entity.entity_type) + ' is associated with ' +  
+																																		  TRIM(R.classification_activity.confidence_that_activity_was_deceitful) + ' fraud');
+
+																																																																																			
+					SELF.event_date := ''; //No date to add. 
+					SELF.event_type := 'FDN';
+		END;
+		
+		fdn_knownrisk_ds := JOIN(ds_records, ds_fdn_raw,
+														LEFT.batchin_rec.acctno = RIGHT.acctno,
+																xform_fdn_known_risk(LEFT, RIGHT));
 																		
 		//*** KNFD KNOWN RISKS ***//
 		FraudGovPlatform_Services.Layouts.KnownFrauds_rec trans (FraudGovPlatform_Services.Layouts.KnownFrauds_rec R) := TRANSFORM
@@ -207,15 +234,23 @@ EXPORT Functions := MODULE
 																		SELF.event_type := 'KNFD'));
 		
 		//*** COMBINED KNOWN RISKS ***//
-		known_risk_ds := sort(patriot_knownrisk_ds + death_knownrisk_ds + crim_knownrisk_ds + knfd_knownrisk_ds + red_flag_knownrisk_ds, acctno, -event_date)(known_risk_reason <> '');
+		known_risk_ds := sort(patriot_knownrisk_ds + 
+																						  death_knownrisk_ds + 
+																							 crim_knownrisk_ds + 
+																							 knfd_knownrisk_ds +
+																							 red_flag_knownrisk_ds + 
+																							 fdn_knownrisk_ds,
+																							 acctno, -event_date)(known_risk_reason <> '');
 
 		#IF(FraudGovPlatform_Services.Constants.IS_DEBUG)
 			output(ds_records, named('ds_records'));															
-			// output(death_knownrisk_ds, named('death_knownrisk_ds'));
-			// output(crim_knownrisk_ds, named('crim_knownrisk_ds'));
-			// output(patriot_knownrisk_ds, named('patriot_knownrisk_ds'));
-			// output(knfd_knownrisk_ds, named('knfd_knownrisk_ds'));
-			// output(known_risk_ds, named('known_risk_ds'));
+			output(death_knownrisk_ds, named('death_knownrisk_ds'));
+			output(crim_knownrisk_ds, named('crim_knownrisk_ds'));
+			output(red_flag_knownrisk_ds, named('red_flag_knownrisk_ds'));
+			output(patriot_knownrisk_ds, named('patriot_knownrisk_ds'));
+			output(fdn_knownrisk_ds, named('fdn_knownrisk_ds'));
+			output(knfd_knownrisk_ds, named('knfd_knownrisk_ds'));
+			output(known_risk_ds, named('known_risk_ds'));
 		#END
 		
 		return known_risk_ds;
@@ -232,9 +267,9 @@ EXPORT Functions := MODULE
 			
 			unsigned4 VEL_CNT := COUNT(L.childRecs_Velocities);
 			SELF.velocity_exceeded_cnt := VEL_CNT;
-			SELF.velocity_exceeded_reason1 := IF(VEL_CNT >= 1, L.childRecs_Velocities[1].description, '');
-			SELF.velocity_exceeded_reason2 := IF(VEL_CNT >= 2, L.childRecs_Velocities[2].description, '');
-			SELF.velocity_exceeded_reason3 := IF(VEL_CNT >= 3, L.childRecs_Velocities[3].description, '');
+			SELF.velocity_exceeded_reason1 := IF(VEL_CNT >= 1, STD.Str.CleanSpaces(L.childRecs_Velocities[1].description), '');
+			SELF.velocity_exceeded_reason2 := IF(VEL_CNT >= 2, STD.Str.CleanSpaces(L.childRecs_Velocities[2].description), '');
+			SELF.velocity_exceeded_reason3 := IF(VEL_CNT >= 3, STD.Str.CleanSpaces(L.childRecs_Velocities[3].description), '');
 
 			SELF := L;
 			SELF := [];
@@ -257,6 +292,7 @@ EXPORT Functions := MODULE
 															LEFT.acctno = RIGHT.acctno,
 															GROUP,
 															xfm_batchout(LEFT, ROWS(RIGHT)));
+
 		RETURN ds_results;
 	END;
 

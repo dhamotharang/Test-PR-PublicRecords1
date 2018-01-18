@@ -1,4 +1,4 @@
-import doxie, ut;
+﻿import doxie, ut, data_services;
 
 HashDS := distribute(project(inquiry_acclogs.File_FCRA_Inquiry_Base(length(trim(person_q.personal_phone))=10 and (unsigned)person_q.personal_phone<>0 and
 					trim(bus_intel.vertical)<>'' and
@@ -10,10 +10,10 @@ HashDS := distribute(project(inquiry_acclogs.File_FCRA_Inquiry_Base(length(trim(
 																													self := left)), hash(person_q.ssn));
 
 export Key_FCRA_Phone := index(HashDS, {string10 phone10 := person_q.personal_phone}, {HashDS}, 
-					'~thor_data400::key::inquiry_table::fcra::phone_' + doxie.Version_SuperKey);
+					data_services.data_location.prefix() + 'thor_data400::key::inquiry_table::fcra::phone_' + doxie.Version_SuperKey);
 					
 																													
 // HashDS := dataset([], inquiry_acclogs.Layout_FCRAKeys.Phone);
 
 // export Key_FCRA_PHONE := index(HashDS, {phone10}, {HashDS}, 
-					// '~thor_data400::key::inquiry_table::fcra::phone_' + doxie.Version_SuperKey);
+					// data_services.data_location.prefix() + 'thor_data400::key::inquiry_table::fcra::phone_' + doxie.Version_SuperKey);

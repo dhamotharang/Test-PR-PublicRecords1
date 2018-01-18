@@ -158,7 +158,7 @@ EXPORT PAR_Search_Service() := MACRO
 	packagedTestseedInput := PROJECT(ut.ds_oneRecord, intoLayoutInput(LEFT, COUNTER));	
 
 	searchResults := IF(TestDataEnabled, 
-		PROJECT(VerificationOfOccupancy.TestSeed_Function(packagedTestseedInput, TestDataTableName), TRANSFORM(VerificationOfOccupancy.Layouts.Layout_PARBatchOutReport, SELF := LEFT; SELF := [])),	// TestSeed Values
+		PROJECT(VerificationOfOccupancy.TestSeed_Function(packagedTestseedInput, TestDataTableName,IncludeModel,IncludeReport), TRANSFORM(VerificationOfOccupancy.Layouts.Layout_PARBatchOutReport, SELF := LEFT; SELF := [])),	// TestSeed Values
 		VerificationOfOccupancy.Search_Function(PAR_Input, DataRestriction, glba, dppa, isUtility, AttributesVersion, IncludeModel, DataPermission, IncludeReport, PAR_request := true).PARReport // Realtime Values
 	);
 
@@ -250,7 +250,7 @@ EXPORT PAR_Search_Service() := MACRO
 	// #stored('Deltabase_Log', Deltabase_Logging);
 	
 	//Improved Scout Logging
-	IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+	IF(~DisableOutcomeTracking and ~TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 	
 	OUTPUT(PARResults, NAMED('Results'));
 	

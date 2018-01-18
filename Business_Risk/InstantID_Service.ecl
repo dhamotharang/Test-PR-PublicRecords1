@@ -738,10 +738,10 @@ Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.
 // Starts with 'LOG_' (Upper case is important!!)
 // Middle part is the database name, in this case: 'log__mbs'
 // Must end with '_intermediate__log'
-OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log'));
+IF(~DisableOutcomeTracking and ~test_data_enabled, OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log')) );
 
 //Improved Scout Logging
-IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+IF(~DisableOutcomeTracking and ~test_data_enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 
 output(dRoyalties, named('RoyaltySet'));
 

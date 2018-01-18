@@ -1,6 +1,6 @@
 
 
-import doxie;
+import doxie,data_services;
 
 f_vin := VINA.file_vina_infile;
 
@@ -278,5 +278,5 @@ aces_data,base_shipping_weight_expanded,filler7,customer_defined_data
 			
 							
 							},
-              '~thor_data400::key::vina::vin_'+doxie.Version_SuperKey);
+              data_services.data_location.prefix() + 'thor_data400::key::vina::vin_'+doxie.Version_SuperKey);
 			  

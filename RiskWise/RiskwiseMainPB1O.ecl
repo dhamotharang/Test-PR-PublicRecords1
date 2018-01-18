@@ -265,7 +265,7 @@ Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.
 // #stored('Deltabase_Log', Deltabase_Logging);
 
 //Improved Scout Logging
-IF(~DisableOutcomeTracking and Log_trib, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+IF(~DisableOutcomeTracking and Log_trib and ~runSeed_value, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 
 output(ret, named('Results'));
 output(if(runSeed_value, DATASET([], Royalty.Layouts.Royalty), dRoyalties), named('RoyaltySet'));

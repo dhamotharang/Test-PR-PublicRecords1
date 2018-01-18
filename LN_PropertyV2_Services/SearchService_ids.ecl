@@ -1,4 +1,5 @@
-import doxie,business_header,AutoStandardI, AutoHeaderI, BIPV2, TopBusiness_Services;
+IMPORT doxie, business_header, AutoStandardI, AutoHeaderI, TopBusiness_Services;
+
 it 							:= AutoStandardI.InterfaceTranslator;
 gm 							:= input.gm();
 
@@ -58,7 +59,7 @@ inner_id_search (inner_params2 in_mod,
 					and ((zipradius_value=0 or state_value='') and city_value in ['',right.p_city_name,right.v_city_name]) // covers literal City when no radius
 					and (zipradius_value=0 and state_value in ['',right.st]),	// covers literal State when no radius
 				transform(layouts.fid, self:=left),
-				keep(1)
+				keep(1), limit(0) //can be a few, but we need just fares ID.
 			),
 			by_key
 		);

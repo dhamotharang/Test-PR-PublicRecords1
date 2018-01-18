@@ -1,4 +1,4 @@
-import ut;
+﻿import ut, data_services;
 df := dataset('~thor_Data400::base::hss_name_dayob_BUILDING',header_slimsort.layout_name_dob_dayob,flat);
 
 export key_prep_name_dayob := index(df(~near_name),{mob,
@@ -6,4 +6,4 @@ export key_prep_name_dayob := index(df(~near_name),{mob,
 	 string2 alphinit := ut.alphinit2(fname[1],lname[1]),
 	 fname,lname,mname,zip,
      dob_fnname_dids,dob_fnmname_dids,
-     dob_fnname_zip_dids,dob_fnname_dob_dids,did},'~thor_data400::key::file_name_dayob_' + thorlib.wuid());
+     dob_fnname_zip_dids,dob_fnname_dob_dids,did},data_services.data_location.prefix() + 'thor_data400::key::file_name_dayob_' + thorlib.wuid());

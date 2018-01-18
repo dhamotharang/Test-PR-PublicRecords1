@@ -1,4 +1,4 @@
-import doxie, doxie_files, watchdog, bankrupt, ut, risk_indicators;
+import doxie, doxie_files, bankrupt, ut, data_services;
 
 layout_date := RECORD
 	unsigned4 date;
@@ -51,4 +51,8 @@ END;
 liens_rolled := rollup(sort(DISTRIBUTE(w_liens,HASH(did)), did, rmsid, local),LEFT.did=RIGHT.did,roll_liens(LEFT,RIGHT), local);	 
 
 liens_slimmed := PROJECT (liens_rolled, slimrec);
-export Key_BocaShell_Liens_FCRA := index(liens_slimmed, {did}, {liens_slimmed}, '~thor_data400::key::liens::fcra::bocashell_did_' + doxie.Version_SuperKey);
+
+export Key_BocaShell_Liens_FCRA := index(liens_slimmed, 
+                                         {did}, 
+                                         {liens_slimmed}, 
+                                         data_services.data_location.prefix() + 'thor_data400::key::liens::fcra::bocashell_did_' + doxie.Version_SuperKey);

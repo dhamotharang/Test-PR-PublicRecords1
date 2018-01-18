@@ -1,13 +1,13 @@
-IMPORT FBNV2_services;
+﻿IMPORT iesp, FBNV2_services;
 
-export transform_FBN (dataset (FBNV2_services.Layout_FBN_Report) fbni) := function
+EXPORT transform_FBN (dataset (FBNV2_services.Layout_FBN_Report) fbni) := function
 
 iesp.fictitiousbusinesssearch.t_OwnerInformation SetOwners (FBNV2_services.Layout_Contact l) := TRANSFORM
 	self.UniqueId := intformat(l.did,12,1);
 	self.Name := l.CONTACT_NAME ;
 	self.Phone := l.CONTACT_PHONE;
-  self.Address := ROW ({L.prim_name, L.prim_range, L.predir, L.postdir, L.addr_suffix, L.unit_desig, L.sec_range,
-                                    '', '', L.st, L.v_city_name, L.zip5, L.zip4, L.county_name, '', '','','',false}, share.t_UniversalAddress);
+	self.Address := iesp.ECL2ESP.SetUniversalAddress(l.prim_name, l.prim_range, l.predir, l.postdir, l.addr_suffix, l.unit_desig, l.sec_range,
+			l.v_city_name, l.st, l.zip5, l.zip4, l.county_name);
 	self.ContactType := l.Contact_Type_decoded;
 	self.Status := l.CONTACT_STATUS;
 	self.NameFormat := l.Contact_Name_Format_decoded;
@@ -16,9 +16,7 @@ iesp.fictitiousbusinesssearch.t_OwnerInformation SetOwners (FBNV2_services.Layou
 	self.WithdrawlDate := iesp.ECL2ESP.toDate(l.WITHDRAWAL_DATE);
  END;
 
-
-iesp.fictitiousbusinesssearch.t_FictitiousBusinessSearchRecord toOut (FBNV2_services.Layout_FBN_Report L) := TRANSFORM
-
+iesp.fictitiousbusinesssearch.t_FictitiousBusinessSearchRecord toOut (FBNV2_services.Layout_FBN_Report l) := TRANSFORM
 	self.TMSId :=l.TMSId;
 	self.RMSId := l.RMSId;
 	self.FilingJurisdiction := L.Filing_Jurisdiction;
@@ -29,20 +27,20 @@ iesp.fictitiousbusinesssearch.t_FictitiousBusinessSearchRecord toOut (FBNV2_serv
 	self.OriginalFilingDate := iesp.ECL2ESP.toDate(l.ORIG_FILING_DATE);
 	self.FilingExpirationDate := iesp.ECL2ESP.toDate(l.EXPIRATION_DATE);
 	self.FilingCancellationDate := iesp.ECL2ESP.toDate(l.CANCELLATION_DATE);
-	self.Business := project(L, transform(iesp.fictitiousbusinesssearch.t_BusinessInformation,
-				self.BusinessId := intformat(l.bdid,12,1),
-				self.Name := l.BUS_NAME,
-				self.SICCode := l.SIC_CODE,
-				self.TypeDescription := l.BUS_TYPE_DESC,
-				self.FEIN := l.orig_FEIN,   
-				self.Phone := l.BUS_PHONE_NUM,
-				self.Status := l.bus_status,
-				self.StartDate := iesp.ECL2ESP.todate(l.bus_comm_dATE),
-	      self.OfficeAddress := ROW ({L.prim_name, L.prim_range, L.predir, L.postdir, L.addr_suffix, L.unit_desig, L.sec_range,
-                                    '', '', L.st, L.v_city_name, L.zip5, L.zip4, L.county_name, '', '','','',false}, share.t_UniversalAddress),
-	      self.MailingAddress := iesp.ECL2ESP.SetAddressFields(L.mail_prim_name, L.mail_prim_range, L.mail_predir, L.mail_postdir, L.mail_addr_suffix, L.mail_unit_desig, L.mail_sec_range,
-                                    '', L.mail_v_city_name, '', L.mail_st, L.mail_zip5, L.mail_zip4, '', '')));
-   self.owners      := project (choosen (L.Contacts,      iesp.Constants.FBN.MaxCountOwners),      SetOwners (Left));
+	self.Business := project(l, transform(iesp.fictitiousbusinesssearch.t_BusinessInformation,
+		self.BusinessId := intformat(l.bdid,12,1),
+		self.Name := l.BUS_NAME,
+		self.SICCode := l.SIC_CODE,
+		self.TypeDescription := l.BUS_TYPE_DESC,
+		self.FEIN := l.orig_FEIN,   
+		self.Phone := l.BUS_PHONE_NUM,
+		self.Status := l.bus_status,
+		self.StartDate := iesp.ECL2ESP.todate(l.bus_comm_dATE),
+		self.OfficeAddress := iesp.ECL2ESP.SetUniversalAddress(l.prim_name, l.prim_range, l.predir, l.postdir, l.addr_suffix, l.unit_desig, l.sec_range,
+			l.v_city_name, l.st, l.zip5, l.zip4, l.county_name),
+		self.MailingAddress := iesp.ECL2ESP.SetAddressFields(l.mail_prim_name, l.mail_prim_range, l.mail_predir, L.mail_postdir, l.mail_addr_suffix, l.mail_unit_desig, l.mail_sec_range,
+			'', l.mail_v_city_name, '', l.mail_st, l.mail_zip5, l.mail_zip4, '', '')));
+   self.owners := project (choosen (l.Contacts, iesp.Constants.FBN.MaxCountOwners), SetOwners (Left));
 	 self := [];
 end;
 

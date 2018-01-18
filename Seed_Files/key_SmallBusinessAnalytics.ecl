@@ -1,4 +1,4 @@
-IMPORT Business_Risk_BIP, Data_Services, UT;
+IMPORT Business_Risk_BIP, Data_Services;
 
 baseFile := Seed_Files.file_SmallBusinessAnalytics;
 
@@ -18,4 +18,4 @@ withHashValue := TABLE(baseFile, appendHashValue);
 export key_SmallBusinessAnalytics := index(withHashValue, {TestDataTableName, HashValue},
 																	{withHashValue},
 																	Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::testseed::qa::smallbusinessanalytics');
-																	// UT.foreign_dataland + 'thor_data400::key::testseed::qa::smallbusinessanalytics');
+																	// Data_Services.foreign_dataland + 'thor_data400::key::testseed::qa::smallbusinessanalytics');

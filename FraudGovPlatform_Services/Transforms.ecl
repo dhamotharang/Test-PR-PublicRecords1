@@ -1,5 +1,5 @@
-﻿IMPORT CriminalRecords_BatchService, DeathV2_Services, FraudGovPlatform_Services, FraudShared, FraudShared_Services, 
-					  iesp, Patriot, risk_indicators;
+﻿IMPORT Address, CriminalRecords_BatchService, DeathV2_Services, FraudGovPlatform_Services, FraudShared, 
+						 FraudShared_Services, iesp, Patriot, risk_indicators;
 
 EXPORT Transforms := MODULE
 
@@ -121,13 +121,6 @@ EXPORT Transforms := MODULE
 		
 	END;
 	
-	EXPORT iesp.fraudgovplatform.t_FraudGovKnownRisk xform_known_frauds(FraudGovPlatform_Services.Layouts.KnownFrauds_rec l) := TRANSFORM		
-    SELF.KnownRiskReasons := PROJECT(l.payload, TRANSFORM({iesp.share.t_StringArrayItem}, SELF.value := FraudGovPlatform_Services.Utilities.getKnownFraudDescriptionFromPayload(LEFT.event_date,LEFT.event_end_date, LEFT.event_type_1, LEFT.event_type_2, LEFT.event_type_3)));		
-		SELF.KnownRiskCount := COUNT(l.payload);
-		// SELF.PayloadRecords := PROJECT(l.payload, TRANSFORM(FraudShared.Layouts_Key.Main, SELF := LEFT));
-
-	END;
-		
 	EXPORT FraudGovPlatform_Services.Layouts.red_flag_desc_w_details xnorm_red_flag(FraudGovPlatform_Services.Layouts.combined_layouts l, INTEGER c) := TRANSFORM
 																		
 		SELF.seq := l.seq;

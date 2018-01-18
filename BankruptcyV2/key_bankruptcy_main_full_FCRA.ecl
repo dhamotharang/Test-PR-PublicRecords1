@@ -1,4 +1,4 @@
-import bankruptcyv2, Doxie, ut,bankrupt,address;
+import bankruptcyv2, Doxie, ut,bankrupt,address, data_services;
 
 
 bankrupt.layout_bk_main_v8  tjoin(BankruptcyV2.file_bankruptcy_main l, BankruptcyV2.file_bankruptcy_search r) := transform
@@ -72,7 +72,7 @@ export key_bankruptcy_main_full_fcra :=
           typeof(court_code) s_courtcode := court_code, 
           typeof(seq_number) s_seqnumber := seq_number}, 
 		{trans_v1},
-       '~thor_data400::key::bankruptcyv2::fcra::main_' + doxie.version_superKey);
+       data_services.data_location.prefix('bankruptcyv2') + 'thor_data400::key::bankruptcyv2::fcra::main_' + doxie.version_superKey);
 							 
 
 

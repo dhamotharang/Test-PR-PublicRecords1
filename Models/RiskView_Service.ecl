@@ -104,7 +104,8 @@ export RiskView_Service := MACRO
 		string1 ExcludeDMVPII       := '' : STORED('ExcludeDMVPII');
 		BOOLEAN DisableOutcomeTracking := FALSE : STORED('OutcomeTrackingOptOut');
 		string1 ArchiveOptIn        := '' : STORED('instantidarchivingoptin');
-
+		boolean   Test_Data_Enabled := false   	: stored('TestDataEnabled');
+		
 	//Look up the industry by the company ID.
 	Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(TRUE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Models__RiskView_Service);
 	/* ************* End Scout Fields **************/
@@ -195,9 +196,9 @@ export RiskView_Service := MACRO
 	// Starts with 'LOG_' (Upper case is important!!)
 	// Middle part is the database name, in this case: 'log__mbs__fcra'
 	// Must end with '_intermediate__log'
-	OUTPUT(intermediateLog, NAMED('LOG_log__mbs__fcra_intermediate__log'));
+	IF(~DisableOutcomeTracking and ~Test_Data_Enabled, 	OUTPUT(intermediateLog, NAMED('LOG_log__mbs__fcra_intermediate__log')) );
 
-	IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
+	IF(~DisableOutcomeTracking and ~Test_Data_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs__fcra_transaction__log__scout')));
 
 	output( riskview_xml, named( 'Results' ) );
 

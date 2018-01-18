@@ -1,4 +1,4 @@
-import ingenix_natlprof, doxie;
+import ingenix_natlprof, doxie, data_services;
 
 file_in := ingenix_natlprof.Basefile_Provider_Did_keybuild;
 											 
@@ -8,5 +8,5 @@ dedup_providerid_base := dedup(sort_providerid_base, except did, did_score, loca
 
 export key_provider_id := index(dedup_providerid_base, 
                                 {unsigned6 l_providerid := (unsigned6)providerid},
-						  {dedup_providerid_base},
-				            '~thor_data400::key::ing_provider_id_' + doxie.Version_SuperKey);
+                                {dedup_providerid_base},
+                                data_services.data_location.prefix() + 'thor_data400::key::ing_provider_id_' + doxie.Version_SuperKey);

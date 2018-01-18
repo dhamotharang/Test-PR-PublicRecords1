@@ -1,4 +1,4 @@
-IMPORT doxie, iesp, FCRA, FFD, Gateway, PersonReports;
+﻿IMPORT doxie, iesp, FCRA, FFD, Gateway, PersonReports;
 
 // returns extended structure to allow for different versions of data.
 out_rec := personreports.layouts.CommonPreLitigationReportIndividual;
@@ -159,7 +159,7 @@ EXPORT PrelitReport (
   individual := dataset ([Format ()]);
 
 	consumer_statements := if(isFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
-	FFD.MAC.PrepareResultRecord(individual, individual_combined, consumer_statements, 
+	FFD.MAC.PrepareResultRecord(individual, individual_combined, consumer_statements, FFD.Constants.BlankConsumerAlerts, 
 														 out_rec);
 	
 /* 				output(pc_recs,named('pc_recs'));

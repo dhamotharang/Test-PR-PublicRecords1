@@ -1,4 +1,4 @@
-IMPORT doxie;
+﻿IMPORT doxie, data_services;
 
 InpFile2 := PROJECT(InstantID_Archiving.Files_Base.InstantID_RedFlags + InstantID_Archiving.Files_Batch.InstantID_RedFlags, 
 										TRANSFORM({STRING25 product := 'INSTANTID', InstantID_Archiving.Layouts.RedFlags}, 
@@ -11,4 +11,4 @@ SrtFile2 := SORT(DstFile2, transaction_ID, product, date_added, LOCAL);
 
 DdpFile2 := DEDUP(SrtFile2, RECORD, LOCAL);
 
-EXPORT Key_RedFlags := INDEX(DdpFile2, {transaction_id}, {DdpFile2}, '~thor_data400::key::instantid_archiving::'+doxie.Version_SuperKey+'::redflags', opt);
+EXPORT Key_RedFlags := INDEX(DdpFile2, {transaction_id}, {DdpFile2}, data_services.data_location.prefix() + 'thor_data400::key::instantid_archiving::'+doxie.Version_SuperKey+'::redflags', opt);

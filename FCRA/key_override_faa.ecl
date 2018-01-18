@@ -1,4 +1,4 @@
-import data_services, faa, ut;
+import data_services, faa;
 
 // TODO: OPT options should be removed from basefile and index definitions;
 //       'temp' should be removed from index names
@@ -9,7 +9,7 @@ export key_override_faa := MODULE
 
   shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
 	shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-  shared keyname_prefix := '~thor_data400::key::override::fcra::';
+  shared keyname_prefix := data_services.data_location.prefix() + 'thor_data400::key::override::fcra::';
 	
 
 

@@ -1,4 +1,4 @@
-import doxie;
+import doxie, data_services;
 
 layout_auto_phone := record
   string7 p7;
@@ -22,4 +22,6 @@ p := PROJECT(file_cwp_with_fdid, proj(LEFT));
 
 recs := DEDUP(SORT(p((integer)p7<>0),record),record);
   
-export key_auto_phone := INDEX(recs, {recs}, '~thor_data400::key::canadianwp_phone_' + doxie.Version_SuperKey);
+export key_auto_phone := INDEX(recs, 
+                               {recs}, 
+                               data_services.data_location.prefix() + 'thor_data400::key::canadianwp_phone_' + doxie.Version_SuperKey);

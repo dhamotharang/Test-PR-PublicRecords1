@@ -1,4 +1,4 @@
-import address, address_attributes, doxie, doxie_files, watchdog, liensv2, ut, risk_indicators;
+import address_attributes, doxie, data_services;
 
 //liens file build
 liens_and_main_slimmed := Address_Attributes.file_liens;
@@ -16,5 +16,5 @@ export key_liens_address := index(cleaned,{
 																		predir, 
 																		postdir, 
 																		sec_range},
-																		{cleaned},'~thor_Data400::key::neighborhood::'+ doxie.Version_SuperKey + '::Liens_Evictions::address');
+																		{cleaned},data_services.data_location.prefix() + 'thor_Data400::key::neighborhood::'+ doxie.Version_SuperKey + '::Liens_Evictions::address');
 

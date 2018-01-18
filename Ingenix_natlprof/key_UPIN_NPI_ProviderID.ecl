@@ -1,4 +1,4 @@
-import ingenix_natlprof, Doxie;
+﻿import ingenix_natlprof, Doxie, data_services;
 
 
 UPIN_in := 	distribute(Ingenix_natlprof.Basefile_ProviderUPIN,hash(filetyp,providerid));
@@ -38,4 +38,4 @@ sort_id_base := sort(dist_id_base, providerid, local);
 export key_UPIN_NPI_providerid := index(	sort_id_base, 
 																					{unsigned6 l_providerid := (unsigned6)providerid},
 																					{sort_id_base},
-																					'~thor_data400::key::ingenix_UPIN_NPI_providerid_' + Doxie.Version_SuperKey);
+																					data_services.data_location.prefix() + 'thor_data400::key::ingenix_UPIN_NPI_providerid_' + Doxie.Version_SuperKey);

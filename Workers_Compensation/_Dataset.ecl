@@ -1,6 +1,6 @@
 import _control, versioncontrol;
 
-export _Dataset(boolean pUseOtherEnvironment = false) := module
+export _Dataset(boolean pUseOtherEnvironment = false) := INLINE module
 	export Name										:= 	'Workers_Compensation';
 	export pname                                    := 'WorkersCompensation';
 	export thor_cluster_Files			:= 	'~thor_data400::';

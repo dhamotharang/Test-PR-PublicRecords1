@@ -1,3 +1,5 @@
+﻿import data_services;
+
 all_images := images.File_Images_KeyBuilding(did != 0, imglength != 0);
 
 LayoutNoPhoto :=
@@ -42,6 +44,6 @@ sequenceAdded := iterate(groupInfo, addSequence(LEFT, RIGHT, counter));
 numbered := iterate(sort(sequenceAdded, date), copySequence(LEFT, RIGHT, COUNTER))(did != 0);
 
 
-i := INDEX(numbered,, '~images::key::Matrix_Images_did'+thorlib.wuid());
+i := INDEX(numbered,, data_services.data_location.prefix() + 'images::key::Matrix_Images_did'+thorlib.wuid());
 
 export key_prep_did := i;

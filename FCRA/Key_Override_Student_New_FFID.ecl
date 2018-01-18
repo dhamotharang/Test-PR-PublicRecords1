@@ -1,4 +1,4 @@
-Import Data_Services, fcra, ut, data_services;
+Import fcra, data_services;
 
 EXPORT Key_Override_Student_New_FFID := FUNCTION
 
@@ -7,7 +7,7 @@ EXPORT Key_Override_Student_New_FFID := FUNCTION
 	ds_type := 'student_new';
 	fname_prefix := '~thor_data400::base::override::fcra::qa::';
 	daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-	keyname_prefix := data_services.data_location.prefix('fcra_overrides')+
+	keyname_prefix := data_services.data_location.prefix()+
 	                  'thor_data400::key::override::fcra::'+ds_type+'::qa::';
 
  	ds_layout_old := RECORD

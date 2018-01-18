@@ -1,4 +1,4 @@
-import advo, doxie, Risk_Indicators;
+import advo, doxie, Risk_Indicators, data_services;
 
 //Data Declarations
 ADVO_BASE_PRE := advo.key_addr1;
@@ -136,6 +136,6 @@ Neighborhood_ADVO := rollup(sort(Neighborhood_ADVO_dist, geolink, local), rollAD
 
 export key_ADVO_Neighborhood_geolink  := index(Neighborhood_ADVO,{
 																			geolink},
-																			{Neighborhood_ADVO},'~thor_data400::key::neighborhood::'+ doxie.Version_SuperKey +'::advo_neighborhoodstats::geolink');
+																			{Neighborhood_ADVO},data_services.data_location.prefix() + 'thor_data400::key::neighborhood::'+ doxie.Version_SuperKey +'::advo_neighborhoodstats::geolink');
 
 

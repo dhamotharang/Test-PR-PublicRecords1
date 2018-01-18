@@ -92,7 +92,10 @@ doxie_crs.layout_report_fcra patch(doxie.layout_central_records l) := transform
 end;
 
 all_records := project (cent, patch(left));
-consumer_statements := if(ShowConsumerStatements and exists(all_records), FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements); 
+consumer_statements_all := if(ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
+
+consumer_statements := consumer_statements_all(exists(all_records) OR StatementType IN FFD.Constants.RecordType.StatementConsumerLevel); 
+consumer_alerts := FFD.Constants.BlankConsumerAlerts;
 
 outputErrors := output (remote_header_err, NAMED('exception'), EXTEND);
 
@@ -102,6 +105,7 @@ royalties := IF(EquifaxDecisioningRequested, Royalty.RoyaltyEqDecisioning.GetOnl
 DO_ALL := parallel(
   output (all_records,named('CRS_result')),
   output (consumer_statements,named('ConsumerStatements')),
+  output (consumer_alerts,named('ConsumerAlerts')),
   output (royalties,named('RoyaltySet')),
   outputErrors);
 DO_ALL;

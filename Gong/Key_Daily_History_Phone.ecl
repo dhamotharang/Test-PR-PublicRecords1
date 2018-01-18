@@ -1,4 +1,4 @@
-import gong, doxie; 
+﻿import gong, doxie, data_services; 
 
 hist_in := Gong.file_daily_full(trim(phone10)<>'');
 gong.mac_hist_full_slim_dep_dly(hist_in, hist_out)
@@ -24,4 +24,4 @@ export key_daily_history_phone := index(seven_three_file,
 						    //boolean current_flag := if(current_record_flag='Y',true,false),
 						   // boolean business_flag := if(listing_type_bus='B',true,false)},
 						    {seven_three_file},
-                                  '~thor_data400::key::gong_daily_phone_'+doxie.Version_SuperKey);
+                                  data_services.data_location.prefix() + 'thor_data400::key::gong_daily_phone_'+doxie.Version_SuperKey);

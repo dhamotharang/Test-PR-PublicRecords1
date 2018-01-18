@@ -1,3 +1,5 @@
+import data_services;
+
 numrec := record
 	layout_prioprii;
 	string3	prodnum;
@@ -108,4 +110,4 @@ export Key_prioprii := index(df,{prodnum, social},{account_out,
 	addr2,
 	city2,
 	state2,
-	zip2},'~thor_Data400::key::seed::qa::prioprii');
+	zip2},data_services.data_location.prefix() + 'thor_Data400::key::seed::qa::prioprii');

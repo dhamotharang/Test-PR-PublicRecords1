@@ -1,4 +1,4 @@
-import gong, doxie, NID, _Control;
+﻿import gong, doxie, NID, _Control, data_services;
 
 hist_in := Gong.File_History_Full_Prepped_for_FCRA_Keys(z5<>'');
 gong.mac_hist_full_slim_dep(hist_in, hist_out)
@@ -13,6 +13,6 @@ Export key_FCRA_history_zip_name :=
 					       },
             {hist_out},
 			if(_Control.ThisEnvironment.Name='Dataland',
-			'~thor40_241::key::gong_history::fcra::qa::zip_name',
-			'~thor_data400::key::gong_history::fcra::qa::zip_name')
+			data_services.data_location.prefix() + 'thor40_241::key::gong_history::fcra::qa::zip_name',
+			data_services.data_location.prefix() + 'thor_data400::key::gong_history::fcra::qa::zip_name')
 			);

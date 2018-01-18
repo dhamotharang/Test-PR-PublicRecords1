@@ -7,9 +7,9 @@ FCRA.Key_Override_Crim_Offender_FFID
 
 export key_override_crim := MODULE
 
-  shared fname_prefix := data_services.data_location.prefix('fcra_overrides')+'thor_data400::base::override::fcra::qa::';
-	shared daily_prefix := data_services.data_location.prefix('fcra_overrides')+'thor_data400::base::override::fcra::daily::qa::';
-  shared keyname_prefix := data_services.data_location.prefix('fcra_overrides')+'thor_data400::key::override::fcra::crim::qa::';
+  shared fname_prefix := data_services.data_location.prefix() + 'thor_data400::base::override::fcra::qa::';
+  shared daily_prefix := data_services.data_location.prefix() + 'thor_data400::base::override::fcra::daily::qa::';
+  shared keyname_prefix := data_services.data_location.prefix() + 'thor_data400::key::override::fcra::crim::qa::';
 
 	//offenders --- override for doxie_files.key_offenders
   export offenders_rec := record

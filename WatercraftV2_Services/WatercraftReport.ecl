@@ -1,4 +1,4 @@
-import doxie, FCRA, Suppress, FFD, iesp, Gateway;
+﻿import doxie, FCRA, Suppress, FFD, iesp, Gateway;
 
 export WatercraftReport(WatercraftV2_services.Interfaces.report_Params in_params,  
 												boolean isFCRA = false) := FUNCTION
@@ -52,7 +52,7 @@ export WatercraftReport(WatercraftV2_services.Interfaces.report_Params in_params
 	
 	final_rsrt := sort(r, -registration_date, -date_last_seen, -watercraft_key, -sequence_key);	
 							 
-	FFD.MAC.PrepareResultRecord(final_rsrt, final_rec, consumer_statements, WatercraftV2_Services.Layouts.report_out);
+	FFD.MAC.PrepareResultRecord(final_rsrt, final_rec, consumer_statements, FFD.Constants.BlankConsumerAlerts, WatercraftV2_Services.Layouts.report_out);
 														 
 	RETURN final_rec;
 

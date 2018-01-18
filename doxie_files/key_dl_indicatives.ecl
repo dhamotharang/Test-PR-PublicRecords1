@@ -1,4 +1,4 @@
-import doxie_build;
+import doxie_build, data_services;
 
 only_with := doxie_build.file_dl_keybuilding(race IN ['W','H','A','I','B'],
 									sex_flag IN ['M','F'],(INTEGER)age<>0);
@@ -24,4 +24,4 @@ dl4key := dedup(SORT(p, race, sex_flag, age, orig_state, dl_number), race, sex_f
 
 export key_dl_indicatives := index(dl4key, {race, sex_flag, age, orig_state}, 
 								   {dl_number}, 
-								   '~thor_data400::key::dl_indicatives'+doxie_build.buildstate + '_QA');
+								   data_services.data_location.prefix() + 'thor_data400::key::dl_indicatives'+doxie_build.buildstate + '_QA');

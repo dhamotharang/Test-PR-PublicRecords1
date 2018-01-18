@@ -1,4 +1,4 @@
-import header, watchdog, ut;
+import header, watchdog, ut, data_services;
 
 
 h_all := header.File_Headers;
@@ -50,4 +50,7 @@ t := table(wb, {wb.lname,wb.did, cnt := count(group)},did,lname);
 // output(wb, named('wb'));
 // output(t, named('t'));
 
-export key_ParentLnames := index(t, {did}, {t}, '~thor_data400::key::header.parentlnames_'+doxie.Version_SuperKey);
+export key_ParentLnames := index(t, 
+                                 {did}, 
+                                 {t}, 
+                                 data_services.data_location.prefix() + 'thor_data400::key::header.parentlnames_'+doxie.Version_SuperKey);

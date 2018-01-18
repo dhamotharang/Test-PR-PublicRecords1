@@ -25,17 +25,12 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 	// Add back to Corp Filings our Seq numbers.
 	corpFilingsSeq := DueDiligence.Common.AppendSeq(corpFilingsRaw, indata, TRUE);
+		
+	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
+	corpFilingsCleanDate := DueDiligence.Common.CleanDatasetDateFields(corpFilingsSeq, 'dt_first_seen, dt_vendor_first_reported, corp_inc_date, corp_filing_date, dt_last_seen');
 	
 	// Filter out records after our history date.
-	corpFilingsFiltRecs := DueDiligence.Common.FilterRecords(corpFilingsSeq, dt_first_seen, dt_vendor_first_reported);
-	
-	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently - dates used in FilterRecords have been cleaned
-	clean_corpIncDt := DueDiligence.Common.CleanDateFields(corpFilingsFiltRecs, corp_inc_date);
-	clean_corpFilingDt := DueDiligence.Common.CleanDateFields(clean_corpIncDt, corp_filing_date);
-	clean_dateLastSeen := DueDiligence.Common.CleanDateFields(clean_corpFilingDt, dt_last_seen);
-
-	//creating variable to be used in logic so if add additional dates, does not impact flow
-	corpFilingsFilt := clean_dateLastSeen;
+	corpFilingsFilt := DueDiligence.Common.FilterRecords(corpFilingsCleanDate, dt_first_seen, dt_vendor_first_reported);
 	
 	//get incorporation date
 	incDateSort := SORT(corpFilingsFilt(corp_inc_date <> 0), seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_inc_date);
@@ -92,11 +87,11 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 												LEFT OUTER);
 																						
 	//retrieve SIC and NAIC codes with dates
-	outCorpSic := DueDiligence.Common.getSicNaicCodes(corpFilingsFilt, corp_sic_code, TRUE, TRUE, dt_first_seen, dt_last_seen, DueDiligence.Constants.SOURCE_BUSINESS_CORP);
-	outCorpNaic := DueDiligence.Common.getSicNaicCodes(corpFilingsFilt, corp_naic_code, FALSE, TRUE, dt_first_seen, dt_last_seen, DueDiligence.Constants.SOURCE_BUSINESS_CORP);
+	outCorpSic := DueDiligence.Common.getSicNaicCodes(corpFilingsFilt, corp_sic_code, TRUE, TRUE, dt_first_seen, dt_last_seen);
+	outCorpNaic := DueDiligence.Common.getSicNaicCodes(corpFilingsFilt, corp_naic_code, FALSE, TRUE, dt_first_seen, dt_last_seen);
 	
 	allCorpSicNaic := outCorpSic + outCorpNaic;
-	sortCorpRollSicNaic := DueDiligence.Common.rollSicNaicBySeqAndBIP(allCorpSicNaic);
+	sortCorpRollSicNaic := DueDiligence.Common.rollSicNaicBySeqAndBIP(addBusnLocCnt, allCorpSicNaic);
 		
 	addCorpSicNaic := JOIN(addBusnLocCnt, sortCorpRollSicNaic,
 													LEFT.seq = RIGHT.seq AND
@@ -104,7 +99,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 													LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
 													LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
 													TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																		SELF.SicNaicSources := LEFT.SicNaicSources + RIGHT.sources;
+																		SELF.SicNaicSources := RIGHT.sources;
 																		SELF := LEFT;),
 													LEFT OUTER);												
 													
@@ -112,15 +107,15 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	projectDates := PROJECT(corpFilingsFilt, TRANSFORM({UNSIGNED4 lastReinstateDate, BOOLEAN otherStatusExists, BOOLEAN dissolvedExists, BOOLEAN inactiveExists, Boolean suspendedExists, BOOLEAN allDissolveInactiveSuspended, BOOLEAN activeExists, BOOLEAN sosFilingExists, {RECORDOF(corpFilingsFilt)}},
 																											corpStatusDescUC := STD.Str.ToUpperCase(LEFT.corp_status_desc);
 																											corpStatusCd := MAP(business_header.is_ActiveCorp(LEFT.record_type, LEFT.corp_status_cd, LEFT.corp_status_desc) => DueDiligence.Constants.CORP_STATUS_ACTIVE,
-																																					STD.Str.Find(CorpStatusDescUC, 'GOOD STANDING', 1) != 0 => DueDiligence.Constants.CORP_STATUS_ACTIVE,
-																																					STD.Str.Find(CorpStatusDescUC, 'INACTIVE', 1) != 0 => DueDiligence.Constants.CORP_STATUS_INACTIVE,
-																																					STD.Str.Find(CorpStatusDescUC, 'DISSOLV', 1) != 0 => DueDiligence.Constants.CORP_STATUS_DISSOLVED,
-																																					STD.Str.Find(CorpStatusDescUC, 'DISSOLUTION', 1) != 0 => DueDiligence.Constants.CORP_STATUS_DISSOLVED,
-																																					STD.Str.Find(CorpStatusDescUC, 'REINSTAT', 1) != 0 => DueDiligence.Constants.CORP_STATUS_REINSTATE,
-																																					STD.Str.Find(CorpStatusDescUC, 'SUSPEN', 1) != 0 => DueDiligence.Constants.CORP_STATUS_SUSPEND,
+																																					STD.Str.Find(CorpStatusDescUC, 'GOOD STANDING', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_ACTIVE,
+																																					STD.Str.Find(CorpStatusDescUC, 'INACTIVE', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_INACTIVE,
+																																					STD.Str.Find(CorpStatusDescUC, 'DISSOLV', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_DISSOLVED,
+																																					STD.Str.Find(CorpStatusDescUC, 'DISSOLUTION', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_DISSOLVED,
+																																					STD.Str.Find(CorpStatusDescUC, 'REINSTAT', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_REINSTATE,
+																																					STD.Str.Find(CorpStatusDescUC, 'SUSPEN', 1) != DueDiligence.Constants.NUMERIC_ZERO => DueDiligence.Constants.CORP_STATUS_SUSPEND,
 																																					DueDiligence.Constants.COPR_STATUS_OTHER);
 										
-																												SELF.lastReinstateDate := IF(corpStatusCd = DueDiligence.Constants.CORP_STATUS_REINSTATE, LEFT.dt_last_seen, 0);
+																												SELF.lastReinstateDate := IF(corpStatusCd = DueDiligence.Constants.CORP_STATUS_REINSTATE, LEFT.dt_last_seen, DueDiligence.Constants.NUMERIC_ZERO);
 																												SELF.activeExists := IF(corpStatusCd = DueDiligence.Constants.CORP_STATUS_ACTIVE, TRUE, FALSE);
 																												SELF.dissolvedExists := IF(corpStatusCd = DueDiligence.Constants.CORP_STATUS_DISSOLVED, TRUE, FALSE);
 																												SELF.inactiveExists := IF(corpStatusCd = DueDiligence.Constants.CORP_STATUS_INACTIVE, TRUE, FALSE);
@@ -214,57 +209,31 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																		 SELF.dt_last_seen := MAX(LEFT.dt_last_seen, RIGHT.dt_last_seen);
 																		 SELF := LEFT;));
 	
-	projectSosAgent := PROJECT(rollSosAgent, TRANSFORM(DueDiligence.LayoutsInternal.AgentLayout,
-																											SELF.ultID := LEFT.ultID;
-																											SELF.orgID := LEFT.orgID;
-																											SELF.seleID := LEFT.seleID;
-																											SELF.proxID := LEFT.proxID;
-																											SELF.powID := LEFT.powID;
-																											SELF.agents := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.LayoutAgent,
-																																															SELF.source := DueDiligence.Constants.SOURCE_BUSINESS_CORP;
-																																															SELF.prim_range := LEFT.corp_ra_prim_range;
-																																															SELF.predir := LEFT.corp_ra_predir;
-																																															SELF.prim_name := LEFT.corp_ra_prim_name;
-																																															SELF.addr_suffix := LEFT.corp_ra_addr_suffix;
-																																															SELF.postdir := LEFT.corp_ra_postdir;
-																																															SELF.unit_desig := LEFT.corp_ra_unit_desig;
-																																															SELF.sec_range := LEFT.corp_ra_sec_range;
-																																															SELF.city := LEFT.corp_ra_v_city_name;
-																																															SELF.state := LEFT.corp_ra_state;
-																																															SELF.zip5 := LEFT.corp_ra_zip5;
-																																															SELF.zip4 := LEFT.corp_ra_zip4;
-																																															SELF.fullName := LEFT.corp_ra_cname1;
-																																															SELF.firstName := LEFT.corp_ra_fname1;
-																																															SELF.lastName := LEFT.corp_ra_lname1;
-																																															SELF.dateFirstSeen := LEFT.dt_first_seen;
-																																															SELF.dateLastSeen := LEFT.dt_last_seen;
-																																															SELF := [];));
+	projectSosAgent := PROJECT(rollSosAgent, TRANSFORM(DueDiligence.LayoutsInternal.Agent,
+																											SELF.agent.source := DueDiligence.Constants.SOURCE_BUSINESS_CORP;
+																											SELF.agent.prim_range := LEFT.corp_ra_prim_range;
+																											SELF.agent.predir := LEFT.corp_ra_predir;
+																											SELF.agent.prim_name := LEFT.corp_ra_prim_name;
+																											SELF.agent.addr_suffix := LEFT.corp_ra_addr_suffix;
+																											SELF.agent.postdir := LEFT.corp_ra_postdir;
+																											SELF.agent.unit_desig := LEFT.corp_ra_unit_desig;
+																											SELF.agent.sec_range := LEFT.corp_ra_sec_range;
+																											SELF.agent.city := LEFT.corp_ra_v_city_name;
+																											SELF.agent.state := LEFT.corp_ra_state;
+																											SELF.agent.zip5 := LEFT.corp_ra_zip5;
+																											SELF.agent.zip4 := LEFT.corp_ra_zip4;
+																											SELF.agent.fullName := LEFT.corp_ra_cname1;
+																											SELF.agent.firstName := LEFT.corp_ra_fname1;
+																											SELF.agent.lastName := LEFT.corp_ra_lname1;
+																											SELF.agent.dateFirstSeen := LEFT.dt_first_seen;
+																											SELF.agent.dateLastSeen := LEFT.dt_last_seen;
 																											SELF := LEFT;
 																											SELF := [];));
 																											
-	rollAgents := ROLLUP(projectSosAgent,
-												LEFT.seq = RIGHT.seq AND
-												LEFT.ultID = RIGHT.ultID AND
-												LEFT.orgID = RIGHT.orgID AND
-												LEFT.seleID = RIGHT.seleID,
-												TRANSFORM(DueDiligence.LayoutsInternal.AgentLayout,
-																	SELF.agents := LEFT.agents + RIGHT.agents;
-																	SELF := LEFT;));
-																	
-	addRegisteredAgents := JOIN(addIncLooseLaws, rollAgents,
-															LEFT.seq = RIGHT.seq AND
-															LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-															LEFT.Busn_info.BIP_IDS.OrgID.LinkID = RIGHT.orgID AND
-															LEFT.Busn_info.BIP_IDS.SeleID.LinkID = RIGHT.seleID,
-															TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-																				SELF.registeredAgentExists := LEFT.registeredAgentExists OR EXISTS(RIGHT.agents);
-																				SELF.registeredAgents := LEFT.registeredAgents + RIGHT.agents;
-																				SELF := LEFT;),
-															LEFT OUTER);
-																																																		
-
+																											
+	addAgents := DueDiligence.Common.AddAgents(projectSosAgent, addIncLooseLaws); 			
 	
-		
+	
 
 	// OUTPUT(indata, NAMED('indata'));
 	// OUTPUT(linkedBus, NAMED('linkedBus'));
@@ -293,13 +262,12 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(sosAgent, NAMED('sosAgent'));	
 	// OUTPUT(sortSosAgent, NAMED('sortSosAgent'));
 	// OUTPUT(rollSosAgent, NAMED('rollSosAgent'));
-	// OUTPUT(projectSosAgent, NAMED('projectSosAgent'));
-	// OUTPUT(rollAgents, NAMED('rollAgents'));
-	// OUTPUT(addRegisteredAgents, NAMED('addRegisteredAgents'));
+
+	// OUTPUT(addAgents, NAMED('addAgentsSOS'));
 	
 	
 		
-	RETURN addRegisteredAgents;
+	RETURN addAgents;
 END;
 
 

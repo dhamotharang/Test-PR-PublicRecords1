@@ -1,4 +1,5 @@
-import vehlic;
+import vehlic, data_services;
+
 v := vehlic.File_Vehicles;
 
 doxie.keytype_troy_vehicle make_tv(v le,unsigned4 cnt) := transform
@@ -15,4 +16,4 @@ doxie.keytype_troy_vehicle make_tv(v le,unsigned4 cnt) := transform
 
 p1 := normalize(v,4,make_tv(left,counter))(did<>0);
 
-export Key_Troy_Vehicle_Prep := index(p1,{p1},'~thor_data400::key::troy_vehicle' + thorlib.WUID()) ;
+export Key_Troy_Vehicle_Prep := index(p1,{p1}, data_services.data_location.prefix() + 'thor_data400::key::troy_vehicle' + thorlib.WUID()) ;

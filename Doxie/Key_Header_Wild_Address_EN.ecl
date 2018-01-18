@@ -1,4 +1,4 @@
-import header,autokey,ut;
+﻿import header,autokey,ut, data_services;
 
 t := header.Prepped_For_Keys;
 
@@ -13,7 +13,7 @@ autokey.MAC_Wild_Address_EN(t,fname,mname,lname,
 						rel_fname1,rel_fname2,rel_fname3,
 						lookups,
 						did,
-						'~thor_data400::key::header.wild.pname.prange.st.city.sec_range.lname.en',
+						data_services.data_location.prefix() + 'thor_data400::key::header.wild.pname.prange.st.city.sec_range.lname.en',
 						k)
 
 export Key_Header_Wild_Address_EN := k;

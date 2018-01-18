@@ -1,4 +1,5 @@
-import autokey,header,ut;
+import autokey,header, data_services;
+
 t := header.Prepped_For_Keys;
 
 autokey.MAC_Name(t,fname,mname,lname,
@@ -12,7 +13,7 @@ autokey.MAC_Name(t,fname,mname,lname,
 						rel_fname1,rel_fname2,rel_fname3,
 						lookups,
 						did,
-						'~thor_data400::key::header.lname.fname',
+						data_services.data_location.prefix() + 'thor_data400::key::header.lname.fname',
 						k)
 
 

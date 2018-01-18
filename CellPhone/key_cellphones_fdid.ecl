@@ -1,4 +1,4 @@
-import doxie_files, ut, doxie, autokey;
+import doxie, autokey, data_services;
 
 f_cellphones := Cellphone.file_cellphones_base;
 
@@ -15,4 +15,4 @@ END;
 DS_cellpho_xpand := project(f_cellphones, xpand_cellpho(left, counter));
 
 export key_cellphones_fdid := index(DS_cellpho_xpand,{fdid},{DS_cellpho_xpand},
-                                  '~thor_data400::key::cellphones_fdids_' + doxie.Version_SuperKey);
+                                  data_services.data_location.prefix() + 'thor_data400::key::cellphones_fdids_' + doxie.Version_SuperKey);

@@ -1,4 +1,4 @@
-import header, doxie;
+﻿import header, doxie, data_services;
 
 hdr := header.File_Headers;
 core_check_pst  := header.fn_ADLSegmentation_v2(hdr).core_check_pst;
@@ -28,5 +28,5 @@ end;
 append_ind2  := join(distribute(append_ind1,hash(did)), distribute(core_check, hash(did)),
 left.did = right.did, tjoin(left, right), left outer, local);
 
-export key_adl_segmentation := index(append_ind2, {DID},{append_ind2},'~thor_data400::key::adl_segmentation_' + Doxie.Version_SuperKey);
+export key_adl_segmentation := index(append_ind2, {DID},{append_ind2},data_services.data_location.prefix() + 'thor_data400::key::adl_segmentation_' + Doxie.Version_SuperKey);
 

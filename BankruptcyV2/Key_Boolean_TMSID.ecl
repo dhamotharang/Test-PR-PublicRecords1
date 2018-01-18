@@ -1,4 +1,4 @@
-import liensv2;
+import liensv2, data_services;
 
 
 tmsid_rec := RECORD
@@ -12,5 +12,5 @@ tmsid_rec := RECORD
 
 tmsid_table := dataset([],tmsid_rec);
 
-export key_boolean_tmsid := index(tmsid_table,{src,doc,tmsid,__filepos},'~thor_data400::key::bankruptcyv2::qa::docref.tmsid');
+export key_boolean_tmsid := index(tmsid_table,{src,doc,tmsid,__filepos},data_services.data_location.prefix('bankruptcyv2') + 'thor_data400::key::bankruptcyv2::qa::docref.tmsid');
 

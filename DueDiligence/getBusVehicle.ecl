@@ -1,4 +1,4 @@
-﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, SALT28, iesp, VehicleV2, VehicleV2_Services, TopBusiness_Services;
+﻿IMPORT Address, BIPV2, Business_Risk_BIP, LN_PropertyV2, MDR, DueDiligence, SALT28, iesp, VehicleV2, VehicleV2_Services, TopBusiness_Services, STD;
 
 
 EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
@@ -28,13 +28,16 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------                                                                                                                -----	
 	VehicleRaw_with_seq := DueDiligence.Common.AppendSeq(VehicleRaw, BusnData, FALSE);	
 	
+	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
+	vehicleCleanDates := DueDiligence.Common.CleanDatasetDateFields(VehicleRaw_with_seq, 'date_first_seen, date_vendor_first_reported');
+	
   // ------                                                                                    -----------
   // ------ When this query runs in ARCHIVE MODE the History date on the input contains a date -----------
 	// ------ Use this function drop public records that are out of scope for this transaction   -----------
 	// ------ If the History date is all 9's essentially no records will be dropped - also known -----------
 	// ------ as CURRENT MODE.                                                                   -----------
 	// ------                                                                                    -----------
-	VehicleRecords := DueDiligence.Common.FilterRecords(VehicleRaw_with_seq, date_first_seen, date_vendor_first_reported);	
+	VehicleRecords := DueDiligence.Common.FilterRecords(vehicleCleanDates, date_first_seen, date_vendor_first_reported);	
 	
 	
 	// ------                                                                                   -----																
@@ -154,7 +157,7 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	 // ------ highest value at the top                                                           ------
 	 // ------                                                                                    ------
 	 // ------                                                                                    ------
-	VehiclesCurrentlyOwnedButLimited   := dedup(sort(BusVehicleUnique,  VehicleReportData.seleID, -Vina_Price), VehicleReportData.seleid,  KEEP(iesp.constants.DDRAttributesConst.MaxAssets)); 
+	VehiclesCurrentlyOwnedButLimited   := dedup(sort(BusVehicleUnique,  VehicleReportData.seleID, -Vina_Price), VehicleReportData.seleid,  KEEP(iesp.constants.DDRAttributesConst.MaxVehicles)); 
   
 	//UpdateBusnVehicleWithReport  := UpdateBusnPropertyForAttributeLogic; 
 	UpdateBusnVehicleWithReport  := DueDiligence.reportBusVehicle(UpdateBusnVehicleForAttributeLogic,

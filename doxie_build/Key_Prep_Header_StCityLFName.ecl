@@ -1,4 +1,5 @@
-import header;
+import header, data_services;
+
 t := header.Prepped_For_Keys;
 
 stflcrec := record
@@ -25,4 +26,6 @@ stflcrec := record
 
 recs := dedup( sort( table( t,stflcrec ), record), record );
 
-export Key_Prep_Header_StCityLFName := INDEX(recs, {recs}, '~thor_data400::key::header.st.city.fname.lname' + thorlib.wuid());
+export Key_Prep_Header_StCityLFName := INDEX(recs, 
+                                             {recs}, 
+                                             data_services.data_location.prefix() + 'thor_data400::key::header.st.city.fname.lname' + thorlib.wuid());

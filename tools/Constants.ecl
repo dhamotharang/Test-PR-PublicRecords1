@@ -1,4 +1,5 @@
-import tools,ut;
+﻿import tools, data_services;
+
 export Constants(
 
 	 string					pDatasetName
@@ -10,18 +11,18 @@ export Constants(
 	,string					pAutokey_typestr			= ''
 
 ) :=
-module, virtual
+INLINE module, virtual
 												
 	export Name										:= pDatasetName		;
 	export IsTesting 							:= pIsTesting			;
 	export IsDataland 						:= pIsTesting			;
-	export foreign_environment		:= if(IsDataland						,ut.foreign_prod													,ut.foreign_dataland);
+	export foreign_environment		:= if(IsDataland						,data_services.foreign_prod								,data_services.foreign_dataland);
 	export prefix           			:= if(pUseOtherEnvironment 	,foreign_environment 		                  ,'~'	              );
 	export thor_cluster_Files			:= if(pUseOtherEnvironment 	,foreign_environment + 'thor_data400::'		,'~thor_data400::'	);
 	export thor_cluster_Persists	:= thor_cluster_Files		;
 
 	shared lTemplate(string ptype)		:= thor_cluster_files		+ ptype + '::'	+ Name + '::@version@::'	;
-	shared lOldTemplate(string ptype)	:= thor_cluster_files		+ ptype + '::'	+ Name ;
+	shared lOldTemplate(string ptype)	:= INLINE thor_cluster_files		+ ptype + '::'	+ Name ;
 	shared lwildcard(string ptype)		:= thor_cluster_files		+ ptype + '::'	+ Name + '::*::'	;
 	shared lGenericTemplate           := prefix		            + Name  + '::@version@::'	;
 

@@ -291,6 +291,34 @@ EXPORT Layouts := MODULE
 		unsigned2 OshaViolations;
 		unsigned2 Total_Inspections;
   END;		
+	
+	EXPORT RegisteredAgentInfo :=
+	RECORD
+	  STRING20 acctno;
+		BIPV2.IDlayouts.l_header_ids;			
+		STRING5  RA_title; // maybe make this smaller.
+		STRING20  RA_fname;
+		STRING20  RA_mname;
+		STRING20  RA_lname;
+		STRING5   RA_name_suffix;		
+		string40  RA_position_title;
+		unsigned4 RA_dt_first_seen;
+	  unsigned4 RA_dt_last_seen;
+		string120 RA_CompanyName;
+		
+		string10 RA_prim_range;
+		string2  RA_predir;
+		string28 RA_prim_name;
+		string4  RA_addr_suffix;
+		string2  RA_postdir;
+		string10 RA_unit_desig;
+		string8  RA_sec_range;
+		string25 RA_city_name;
+		string2  RA_state;
+		string5  RA_zip;
+		string4  RA_zip4;
+		 
+  END;
 		
 	EXPORT PARENT_FINAL := record	  
 		STRING120 parent_company_name;
@@ -795,6 +823,229 @@ EXPORT Layouts := MODULE
 		STRING10  phone_var9_last_seen;
 		STRING10  phone_var9_first_seen;
     UNSIGNED2 total_phones;
+		
+		// RA's
+		STRING5   RA_title_var1; 
+		STRING20  RA_fname_var1;
+		STRING20  RA_mname_var1;
+		STRING20  RA_lname_var1;
+		STRING5   RA_name_suffix_var1;		
+		string40  RA_position_title_var1;
+		STRING10   RA_dt_first_seen_var1;
+	  STRING10   RA_dt_last_seen_var1;
+		string120 RA_CompanyName_var1;
+		
+		string10 RA_prim_range_var1;
+		string2  RA_predir_var1;
+		string28 RA_prim_name_var1;
+		string4  RA_addr_suffix_var1;
+		string2  RA_postdir_var1;
+		string10 RA_unit_desig_var1;
+		string8  RA_sec_range_var1;
+		string25 RA_city_name_var1;
+		string2  RA_state_var1;
+		string5  RA_zip_var1;
+		string4  RA_zip4_var1;
+
+    STRING5   RA_title_var2; 
+		STRING20  RA_fname_var2;
+		STRING20  RA_mname_var2;
+		STRING20  RA_lname_var2;
+		STRING5   RA_name_suffix_var2;		
+		STRING40  RA_position_title_var2;
+		STRING10 RA_dt_first_seen_var2;
+	  STRING10 RA_dt_last_seen_var2;
+		string120 RA_CompanyName_var2;
+		
+		string10 RA_prim_range_var2;
+		string2  RA_predir_var2;
+		string28 RA_prim_name_var2;
+		string4  RA_addr_suffix_var2;
+		string2  RA_postdir_var2;
+		string10 RA_unit_desig_var2;
+		string8  RA_sec_range_var2;
+		string25 RA_city_name_var2;
+		string2  RA_state_var2;
+		string5  RA_zip_var2;
+		string4  RA_zip4_var2;
+		//
+		STRING5   RA_title_var3; 
+		STRING20  RA_fname_var3;
+		STRING20  RA_mname_var3;
+		STRING20  RA_lname_var3;
+		STRING5   RA_name_suffix_var3;		
+		string40  RA_position_title_var3;
+		STRING10 RA_dt_first_seen_var3;
+	  STRING10 RA_dt_last_seen_var3;
+		string120 RA_CompanyName_var3;
+		
+		string10 RA_prim_range_var3;
+		string2  RA_predir_var3;
+		string28 RA_prim_name_var3;
+		string4  RA_addr_suffix_var3;
+		string2  RA_postdir_var3;
+		string10 RA_unit_desig_var3;
+		string8  RA_sec_range_var3;
+		string25 RA_city_name_var3;
+		string2  RA_state_var3;
+		string5  RA_zip_var3;
+		string4  RA_zip4_var3;
+		
+	  STRING5   RA_title_var4; 
+		STRING20  RA_fname_var4;
+		STRING20  RA_mname_var4;
+		STRING20  RA_lname_var4;
+		STRING5   RA_name_suffix_var4;		
+		string40  RA_position_title_var4;
+		STRING10 RA_dt_first_seen_var4;
+	  STRING10 RA_dt_last_seen_var4;
+		string120 RA_CompanyName_var4;
+		
+		string10 RA_prim_range_var4;
+		string2  RA_predir_var4;
+		string28 RA_prim_name_var4;
+		string4  RA_addr_suffix_var4;
+		string2  RA_postdir_var4;
+		string10 RA_unit_desig_var4;
+		string8  RA_sec_range_var4;
+		string25 RA_city_name_var4;
+		string2  RA_state_var4;
+		string5  RA_zip_var4;
+		string4  RA_zip4_var4;
+		
+			STRING5   RA_title_var5; 
+		STRING20  RA_fname_var5;
+		STRING20  RA_mname_var5;
+		STRING20  RA_lname_var5;
+		STRING5   RA_name_suffix_var5;		
+		string40  RA_position_title_var5;
+		STRING10 RA_dt_first_seen_var5;
+	  STRING10 RA_dt_last_seen_var5;
+		string120 RA_CompanyName_var5;
+		
+		string10 RA_prim_range_var5;
+		string2  RA_predir_var5;
+		string28 RA_prim_name_var5;
+		string4  RA_addr_suffix_var5;
+		string2  RA_postdir_var5;
+		string10 RA_unit_desig_var5;
+		string8  RA_sec_range_var5;
+		string25 RA_city_name_var5;
+		string2  RA_state_var5;
+		string5  RA_zip_var5;
+		string4  RA_zip4_var5;
+		
+		STRING5   RA_title_var6; 
+		STRING20  RA_fname_var6;
+		STRING20  RA_mname_var6;
+		STRING20  RA_lname_var6;
+		STRING5   RA_name_suffix_var6;		
+		STRING40  RA_position_title_var6;
+		STRING10  RA_dt_first_seen_var6;
+	  STRING10  RA_dt_last_seen_var6;
+		STRING120 RA_CompanyName_var6;
+		
+		STRING10 RA_prim_range_var6;
+		STRING2  RA_predir_var6;
+		STRING28 RA_prim_name_var6;
+		STRING4  RA_addr_suffix_var6;
+		STRING2  RA_postdir_var6;
+		STRING10 RA_unit_desig_var6;
+		STRING8  RA_sec_range_var6;
+		STRING25 RA_city_name_var6;
+		STRING2  RA_state_var6;
+		STRING5  RA_zip_var6;
+		STRING4  RA_zip4_var6;
+		
+		STRING5   RA_title_var7; 
+		STRING20  RA_fname_var7;
+		STRING20  RA_mname_var7;
+		STRING20  RA_lname_var7;
+		STRING5   RA_name_suffix_var7;		
+		STRING40  RA_position_title_var7;
+		STRING10  RA_dt_first_seen_var7;
+	  STRING10  RA_dt_last_seen_var7;
+		STRING120 RA_CompanyName_var7;
+		
+		STRING10 RA_prim_range_var7;
+		STRING2  RA_predir_var7;
+		STRING28 RA_prim_name_var7;
+		STRING4  RA_addr_suffix_var7;
+		STRING2  RA_postdir_var7;
+		STRING10 RA_unit_desig_var7;
+		STRING8  RA_sec_range_var7;
+		STRING25 RA_city_name_var7;
+		STRING2  RA_state_var7;
+		STRING5  RA_zip_var7;
+		STRING4  RA_zip4_var7;
+		
+		STRING5   RA_title_var8; 
+		STRING20  RA_fname_var8;
+		STRING20  RA_mname_var8;
+		STRING20  RA_lname_var8;
+		STRING5   RA_name_suffix_var8;		
+		STRING40  RA_position_title_var8;
+		STRING10  RA_dt_first_seen_var8;
+	  STRING10  RA_dt_last_seen_var8;
+		STRING120 RA_CompanyName_var8;
+		
+		STRING10 RA_prim_range_var8;
+		STRING2  RA_predir_var8;
+		STRING28 RA_prim_name_var8;
+		STRING4  RA_addr_suffix_var8;
+		STRING2  RA_postdir_var8;
+		STRING10 RA_unit_desig_var8;
+		STRING8  RA_sec_range_var8;
+		STRING25 RA_city_name_var8;
+		STRING2  RA_state_var8;
+		STRING5  RA_zip_var8;
+		STRING4  RA_zip4_var8;
+		
+	  STRING5   RA_title_var9; 
+		STRING20  RA_fname_var9;
+		STRING20  RA_mname_var9;
+		STRING20  RA_lname_var9;
+		STRING5   RA_name_suffix_var9;		
+		STRING40  RA_position_title_var9;
+		STRING10  RA_dt_first_seen_var9;
+	  STRING10  RA_dt_last_seen_var9;
+		STRING120 RA_CompanyName_var9;
+		
+		STRING10 RA_prim_range_var9;
+		STRING2  RA_predir_var9;
+		STRING28 RA_prim_name_var9;
+		STRING4  RA_addr_suffix_var9;
+		STRING2  RA_postdir_var9;
+		STRING10 RA_unit_desig_var9;
+		STRING8  RA_sec_range_var9;
+		STRING25 RA_city_name_var9;
+		STRING2  RA_state_var9;
+		STRING5  RA_zip_var9;
+		STRING4  RA_zip4_var9;
+		
+	  STRING5   RA_title_var10; 
+		STRING20  RA_fname_var10;
+		STRING20  RA_mname_var10;
+		STRING20  RA_lname_var10;
+		STRING5   RA_name_suffix_var10;		
+		STRING40  RA_position_title_var10;
+		STRING10  RA_dt_first_seen_var10;
+	  STRING10  RA_dt_last_seen_var10;
+		STRING120 RA_CompanyName_var10;
+		
+		STRING10 RA_prim_range_var10;
+		STRING2  RA_predir_var10;
+		STRING28 RA_prim_name_var10;
+		STRING4  RA_addr_suffix_var10;
+		STRING2  RA_postdir_var10;
+		STRING10 RA_unit_desig_var10;
+		STRING8  RA_sec_range_var10;
+		STRING25 RA_city_name_var10;
+		STRING2  RA_state_var10;
+		STRING5  RA_zip_var10;
+		STRING4  RA_zip4_var10;
+				
+		
 		UNSIGNED6 executive_var1_lexid;
 		STRING5   executive_title_var1;
 		STRING20  executive_fname_var1;

@@ -1,10 +1,10 @@
-import UCCV2, ut;
+import UCCV2, data_services;
 
 export key_override_ucc := MODULE
 
   shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
 	shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-  shared keyname_prefix := '~thor_data400::key::override::fcra::';
+  shared keyname_prefix := data_services.data_location.prefix() + 'thor_data400::key::override::fcra::';
 
   // UCC main data
   main_rec := record

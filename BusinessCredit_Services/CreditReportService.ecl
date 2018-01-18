@@ -192,7 +192,7 @@ EXPORT CreditReportService := MACRO
 	// #stored('Deltabase_Log', Deltabase_Logging);
 
 	//Improved Scout Logging
-	IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+	IF(~DisableOutcomeTracking and ~input_mod.TestDataEnabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 	
 	OUTPUT(results, NAMED('Results'));
 	OUTPUT(ds_Royalties, NAMED('ds_Royalties'));

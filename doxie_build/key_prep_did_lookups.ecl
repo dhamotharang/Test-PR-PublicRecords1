@@ -1,4 +1,5 @@
-import doxie,header;
+import doxie,header, data_services;
+
 res1 := doxie.Lookups;
 res2 := header.LivingSituation;
 
@@ -45,4 +46,6 @@ end;
 res := join(res1,res2,left.did = right.did,into(Left,right),full outer,hash);
 
 
-export Key_prep_Did_Lookups := index(res,{res},'~thor_data400::key::header_lookups' + thorlib.wuid());
+export Key_prep_Did_Lookups := index(res,
+                                     {res},
+                                     data_services.data_location.prefix() + 'thor_data400::key::header_lookups' + thorlib.wuid());

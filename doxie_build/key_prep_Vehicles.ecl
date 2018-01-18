@@ -1,4 +1,4 @@
-import Vehlic, doxie_build, doxie, codes, census_data;
+import doxie_build, doxie, codes, data_services;
 
 den := doxie_build.Vehlic_Denormed_KeyBuilding;
 
@@ -120,4 +120,7 @@ end;
 
 o15 := project(o14,map_lein_holder_county_names(LEFT));
 
-export Key_prep_Vehicles := INDEX(o15, {sseq_no := seq_no}, {o15}, '~thor_data400::key::'+doxie_build.buildstate+'vehiclefull'+thorlib.wuid());
+export Key_prep_Vehicles := INDEX(o15, 
+                                  {sseq_no := seq_no}, 
+                                  {o15}, 
+                                  data_services.data_location.prefix() + 'thor_data400::key::'+doxie_build.buildstate+'vehiclefull'+thorlib.wuid());

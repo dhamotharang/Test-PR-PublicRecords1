@@ -1,10 +1,4 @@
-﻿/*2016-05-21T00:27:27Z (Kevin Huls)
-Automated reinstate from 2016-05-19T17:47:55Z
-*/
-/*2015-12-30T20:07:33Z (Kevin Huls)
-Bug 194701 - accept input email address
-*/
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FlexID (aka IID Model)">
 	<part name="FlexIDRequest" type="tns:XmlDataSet" cols="80" rows="50"/>
 	<part name="HistoryDateYYYYMM" type="xsd:integer"/>
@@ -506,7 +500,7 @@ royalties4us := royalties4ustemp(royalty_type_code != 0);
    																												 self := [] ));
 	Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);
 	
-	IF(~(DisableOutcomeTracking or user.OutcomeTrackingOptOut), OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+	IF(~(DisableOutcomeTracking or user.OutcomeTrackingOptOut) and not Test_Data_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 	
 	dRoyalties := royalties4us;
 	output(dRoyalties, named('RoyaltySet'));

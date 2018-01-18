@@ -19,6 +19,7 @@ MODULE
   MODULE
 		EXPORT UNSIGNED2 MaxCorps             := 10000;
 		EXPORT UNSIGNED1 MaxResultsPerSection := 9;
+		EXPORT UNSIGNED1 MaxResultsRegisteredAgents := 10;
     // Executives - days to go back to treat as current
     EXPORT INTEGER2 TwoYearsInDays        := -730;
 		EXPORT UNSIGNED4 MAXProps             := 10000;
@@ -58,6 +59,5 @@ MODULE
       EXPORT STRING1 BorrowerMailing := 'B';
       EXPORT STRING1 SellerMailing   := 'S';
     END;
-  END;
-
+  END;   
 END;

@@ -1,4 +1,4 @@
-import VehicleV2, VehLic, Doxie, ut;
+import VehicleV2, Doxie, ut,data_services;
 
 get_recs	:= VehicleV2.file_VehicleV2_Party;
 
@@ -28,5 +28,5 @@ party_norm  := normalize(get_recs(Append_DL_number != '' or Orig_DL_number != ''
 party_dedup := dedup(party_norm(DL_number <> ''), all);
 
 export Key_Vehicle_DL_number := index(party_dedup, {DL_number, state_origin,is_minor}, {Vehicle_Key,Iteration_Key,Sequence_Key},
-'~thor_data400::key::VehicleV2::dl_number_'+ doxie.Version_SuperKey);
+data_services.data_location.prefix('Vehicle') + 'thor_data400::key::VehicleV2::dl_number_'+ doxie.Version_SuperKey);
 

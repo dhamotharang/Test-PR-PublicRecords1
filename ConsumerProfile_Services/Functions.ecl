@@ -79,7 +79,6 @@ EXPORT Functions := MODULE
 	//Rollup FCRA header data on DID to concatenate best record
 	EXPORT getBestRecord(dataset(ConsumerProfile_Services.Layouts.working) ds_in) := function
 		ConsumerProfile_Services.Layouts.working xformRoll2Best(ConsumerProfile_Services.Layouts.working L, ConsumerProfile_Services.Layouts.working R) := transform
-		  CheckRight := (L.title = '' OR L.fname = '' OR L.mname = '' OR L.lname = '' OR L.name_suffix = '' OR L.ssn = '' OR L.dob <> 0);
 			self.title 				:= if(L.title <> '', L.title, R.title);
 			self.fname 				:= if(L.fname <> '', L.fname, R.fname);
 			self.mname 				:= if(L.mname <> '', L.mname, R.mname);
@@ -87,22 +86,13 @@ EXPORT Functions := MODULE
 			self.name_suffix 	:= if(L.name_suffix <> '', L.name_suffix, R.name_suffix); //TODO: DO I WANT TO CONCATENATE NAME LIKE THIS...
 			self.ssn					:= if(L.ssn <> '', L.ssn, R.ssn);
 			self.dob					:= if(L.dob <> 0, L.dob, R.dob);
-			self.StatementIds := L.StatementIds + R.StatementIds(CheckRight);
+			self.StatementIds := FFD.Constants.BlankStatements; // no record level statements for header data
 			self 							:= L;
 		end;
 		//sort to ensure oldest record is at the top
 		ds_sort := sort(ds_in, did, -dt_last_seen, dt_first_seen, -persistent_record_id);
-		ds_out := rollup(ds_sort, left.did = right.did, xformRoll2Best(left, right));
+		best_header_ds := rollup(ds_sort, left.did = right.did, xformRoll2Best(left, right));
 		
-	 RecordTypes := [FFD.Constants.RecordType.HSS, FFD.Constants.RecordType.HSN, FFD.Constants.RecordType.HSD];
-   //--------------FFD------------------
-   ConsumerProfile_Services.Layouts.working xform(ConsumerProfile_Services.Layouts.working L) := transform
-    	self.StatementIDs := l.StatementIDs(RecordType IN RecordTypes);
-    	self.isDisputed :=	l.isDisputed;
-    	self := L;
-   end;
-   best_header_ds  := project(ds_out,xform(left));		
-   
 	 RETURN best_header_ds;
 	END;
 	
@@ -110,11 +100,10 @@ EXPORT Functions := MODULE
 	EXPORT getAddressHistory(dataset(ConsumerProfile_Services.Layouts.working) ds_in) := function
 		ds_filt_sort := sort(ds_in, prim_range, prim_name, city_name, st, zip, sec_range);
 		ds_in xformRollDup(ds_in L, ds_in R) := transform
-			CheckRight := ((L.dt_last_seen > R.dt_last_seen) AND (L.dt_first_seen < R.dt_first_seen AND L.dt_first_seen <> 0 ));
 			self.dt_last_seen := if(L.dt_last_seen > R.dt_last_seen, L.dt_last_seen, R.dt_last_seen);
 			self.dt_first_seen := if(L.dt_first_seen < R.dt_first_seen and L.dt_first_seen <> 0, 
 															 L.dt_first_seen, if(R.dt_first_seen <> 0, R.dt_first_seen, L.dt_first_seen)); //to get full dt_seen range on an address
-			self.StatementIds := if(CheckRight, L.StatementIds, L.StatementIds + R.StatementIds);		
+			self.StatementIds := FFD.Constants.BlankStatements;  // no record level statements for header data		
 			self := L;
 		end;
 		ds_filt_roll := rollup(ds_filt_sort, left.prim_range = right.prim_range and
@@ -122,15 +111,7 @@ EXPORT Functions := MODULE
 															left.sec_range = right.sec_range,
 															xformRollDup(left, right));
 										 
-	 //--------------FFD------------------
-   ConsumerProfile_Services.Layouts.working xform(ConsumerProfile_Services.Layouts.working L) := transform
-    	self.StatementIDs := l.StatementIDs(RecordType = FFD.Constants.RecordType.HSA);
-    	self.isDisputed :=	l.isDisputed;
-    	self := L;
-   end;
-   ds_sort_out_filtered  := project(ds_filt_roll,xform(left));	
-	 
-	 ds_sort_out := sort(ds_sort_out_filtered, -dt_last_seen, dt_first_seen, -persistent_record_id);
+	 ds_sort_out := sort(ds_filt_roll, -dt_last_seen, dt_first_seen, -persistent_record_id);
 	 
 	 RETURN ds_sort_out;
 	END;
@@ -200,7 +181,7 @@ EXPORT Functions := MODULE
 	
 	//Alert Dataset
 	export getAlertDataset(string alertCode) := function
-		return dataset([{alertCode, FCRA.Constants.ALERT_DESCRIPTION(alertCode)}], iesp.fcraconsumerprofilereport.t_ConsumerProfileAlert);
+		return dataset([{alertCode, FCRA.Constants.ALERT_DESCRIPTION(alertCode),''}], iesp.fcraconsumerprofilereport.t_ConsumerProfileAlert);
 	end;
 	
 	//Extract Alerts from input

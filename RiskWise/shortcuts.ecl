@@ -1,7 +1,7 @@
 /*2014-11-16T00:19:09Z (Nathan Koubsky)
 Added core roxie ip
 */
-import risk_indicators, Phone_Shell, ut;
+import risk_indicators, Phone_Shell, Data_Services;
 
 // placeholder for all of the roxie VIPs to use when processing files using soapcall
 export shortcuts := module
@@ -102,7 +102,7 @@ export shortcuts := module
 		string employername;
 	END;
 
-	export IPs     := dataset( ut.foreign_dataland + 'thor_data400::in::ips__layout_ip2o', riskwise.Layout_IP2O, csv(quote('"'), heading(1)) );
+	export IPs     := dataset( Data_Services.foreign_dataland + 'thor_data400::in::ips__layout_ip2o', riskwise.Layout_IP2O, csv(quote('"'), heading(1)) );
 
 	export test_login_ids := ['RSKW0000','RSKW0010','webapp_roxie_test','amexdevxml', 'BurkeWSADL', 'eqngdevxml', 'falosdevxml', 'ndanamprod_realroxie', 'repubdevxml', 'webapp_roxie_qateam', 'ln_api_ivs2'];
 	export test_company_ids := ['1385345','1006061','1448650','1488800','1028725','1104341','1357055','1005199', '1216650'];		
@@ -173,13 +173,13 @@ export shortcuts := module
 		STRING score := '';
 	END;
 
-	export validation_input_file108 := dataset(ut.foreign_dataland + 'thor50_dev::in::validation_input_108', s, thor );
-	export validation_input_file108_csv := dataset(ut.foreign_dataland + 'thor50_dev02::in::validation_input_108_csv', s, csv(quote('"'), heading(single) ) );
+	export validation_input_file108 := dataset(Data_Services.foreign_dataland + 'thor50_dev::in::validation_input_108', s, thor );
+	export validation_input_file108_csv := dataset(Data_Services.foreign_dataland + 'thor50_dev02::in::validation_input_108_csv', s, csv(quote('"'), heading(single) ) );
 	
-	export testseed_input_file := dataset(ut.foreign_dataland + 'thor_data50::in::testseed_input_file', ts, thor);
+	export testseed_input_file := dataset(Data_Services.foreign_dataland + 'thor_data50::in::testseed_input_file', ts, thor);
 	
 	// As of 10/1/2013 contains 633,301 unique records
-	EXPORT input_file := DATASET(ut.foreign_dataland + 'bpahl::out::sample_input_file_PROTECTED.csv', s, CSV(HEADING(single), QUOTE('"')));
+	EXPORT input_file := DATASET(Data_Services.foreign_dataland + 'bpahl::out::sample_input_file_PROTECTED.csv', s, CSV(HEADING(single), QUOTE('"')));
 	// Run this code to get a list of DataSources and counts available in our Input_File:
 	// OUTPUT(Riskwise.shortcuts.input_file_sources, NAMED('Input_File_Source_Table'));
 	EXPORT input_file_sources := SORT(TABLE(input_file, {STRING DataSource := input_file.DataSource, UNSIGNED8 DataSourceRecordCount := COUNT(GROUP), UNSIGNED8 TotalFileCount := COUNT(input_file), REAL8 PercentOfFullFile := (COUNT(GROUP) / COUNT(input_file)) * 100}, DataSource), -DataSourceRecordCount, DataSource);

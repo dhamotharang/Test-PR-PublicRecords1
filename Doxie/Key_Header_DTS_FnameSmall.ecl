@@ -1,4 +1,4 @@
-import header,ut;
+import header,ut, data_services;
 
 t := header.Prepped_For_Keys(prim_name<>'');
 
@@ -103,4 +103,6 @@ TRANSFORM
 END;
 tot := recs+PROJECT(i(fname_count>20000), xpand(LEFT));
 
-export Key_Header_DTS_FnameSmall := INDEX(tot, {tot}, '~thor_data400::key::header.dts.fname_small_'+doxie.Version_SuperKey);
+export Key_Header_DTS_FnameSmall := INDEX(tot, 
+                                          {tot}, 
+                                          data_services.data_location.prefix() + 'thor_data400::key::header.dts.fname_small_'+doxie.Version_SuperKey);

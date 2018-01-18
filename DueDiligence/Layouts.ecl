@@ -82,6 +82,7 @@ EXPORT LinkIDs := RECORD
 		Address address;
 		STRING phone;
 		STRING ssn;
+		STRING8 dob;
 	END;
 
 
@@ -197,19 +198,25 @@ EXPORT LinkIDs := RECORD
 		STRING2  BusPublicRecordAgeRange;
 		STRING10 BusPublicRecordAgeRange_Flags;
 		
-		STRING30 BusShellShelfRisk;
+		STRING2  BusShellShelfRisk;
 		STRING10 BusShellShelfRisk_Flags;
 		
 		STRING2  BusMatchLevel;
 		STRING10 BusMatchLevel_Flags;
 		
-		STRING2  BusLegalEvents;
-		STRING10 BusLegalEvents_Flags;
+		STRING2  BusLegalCriminal;
+		STRING10 BusLegalCriminal_Flags;
+		
+		STRING2  BusLegalCivil;
+		STRING10 BusLegalCivil_Flags;
+		
+		STRING2  BusLegalTraffInfr;
+		STRING10 BusLegalTraffInfr_Flags;
 		
 		STRING2  BusLegalEventsFelonyType;
 		STRING10 BusLegalEventsFelonyType_Flags;
 		
-		STRING4  BusHighRiskNewsProfiles;
+		STRING2  BusHighRiskNewsProfiles;
 		STRING10 BusHighRiskNewsProfiles_Flags;
 		
 		STRING2  BusLinkedBusRisk; 
@@ -261,6 +268,7 @@ EXPORT LinkIDs := RECORD
 		unsigned4	HistoryDateYYYYMMDD;
 	END;
 
+//***Coordinate these changes witht the batch team ***//
 	EXPORT BatchOut := RECORD
 		STRING30 AcctNo;
 		STRING15 IndLexID;
@@ -343,10 +351,8 @@ EXPORT LinkIDs := RECORD
 	END;
 	
 	EXPORT LayoutSICNAIC := RECORD
-		STRING3 Source;
 		UNSIGNED4 DateFirstSeen;
 		UNSIGNED4 DateLastSeen;
-		UNSIGNED4 RecordCount;
 		STRING10 SICCode;
 		STRING5 SICIndustry;
 		STRING7 SICRiskLevel;
@@ -371,24 +377,138 @@ EXPORT LinkIDs := RECORD
 		STRING naicCodes;
 	END;
 
+
+ //---                                                                          ---
+ //--- This is all of the criminal data we have for each DID and each offense   ---
+ //--- So there are multiple rows for each DID.                                 ---
+ //--- data collected came from key-offenders, key-offenses, offenders-risk-key ---
+ //--- and key-punishments                                                      ---
+ //---                                                                          ---
+	EXPORT CriminalOffenseLayout_by_DIDOffense  := RECORD
+		unsigned4	seq := 0;
+		UNSIGNED6 DID;
+		string60 	offender_key;               // offenders key
+		unsigned6 origdid;
+		unsigned4 historydate;
+		unsigned4 ToDaysDate;   
+		UNSIGNED4 DateToUse; 
+		UNSIGNED3 NumOfDaysAgo;  
+		string8 	file_date;
+		string8   earliestOffenseDate;         // in order to calculate how old this date is I need to send we clean it before using it.
+		string8   untouchedearliestOffenseDate;  // if we need to show this in the report it should be the uncleaned date. 
+		/* data from the offender_risk_ key */    // A summary of offenses for this offender_key
+		/* data about the offense */ 
+		string1   dataType;                    // ***new 2 = Criminal court 
+		string1   convictionFlag;              // ***new
+		string1   trafficFlag;                 // ***new
+		string1   untouchedOffenseScore;
+		string1   offenseScore;                // values are 'U' or null = UNKOWN, 'M'= Misdemeanor, 'F'= Felony, 'T' = TRAFFIC, 'I'=Infraction.
+		string1   criminalOffenderLevel;       // values are 4 = NON-TRAFFIC/CONVICTED, 3 = NON-TRAFFIC/NOT-CONVICTED, 2 = TRAFFIC/CONVICTED, 1 = TRAFFIC/NOT-CONVICTED
+		string5   courtOffenseLevel;           // values are documented in a spreadsheet.  
+		string20  courtStatute;                // offenders risk key - offense.court_statute
+		string70  courtStatuteDesc;            // offenders risk key - offense.court_statute_desc
+		string35 	caseNum;                     // offenders risk key
+		string20  caseCourt;                   // offenders risk key
+		string20  caseTypeDesc;                // ***???
+		string20  courtType;                   // offenders risk key - source_file
+		string75  charge;                      // offenders risk key - offense.court_off_desc_1
+		string40  courtDispDesc1;              // offender_risk_ key
+		string40  courtDispDesc2;              // offender_risk_ key
+		string8   offenseDate;                 // offender_risk_ key
+		string8   arrestDate;                  // offender_risk_ key
+		string8   courtDispDate;               // offender_risk_ key
+		string8   sentenceDate;                // offender_risk_ key
+		string8   appealDate;                  // offender_risk_ key
+		string30  countyOfOrigin;              // offender_risk_ key
+		string2   origState;                   // offender_risk_ key
+		string30  stc_desc_2;                  // offenses key
+		string35  arr_off_lev_mapped;          // Court_Offenses key
+		string35  court_off_lev_mapped;        // Court_Offenses key
+		string1   punishment_type;             // punishment key
+		/*  To determine whether any of these 3 condition are CURRENTLY TRUE - Use logic similar to the VOO function */
+		string1   Curr_incarc_offenders;        // pulled from key_ offenders
+		string1   Curr_incarc_offenses;         // pulled from key_ offenses
+		string1   Curr_incarc_punishments;      // pulled from key_ punishment
+		/*  To determine whether any of these 3 conditions were EVER TRUE - follow the code in getIndCriminal */
+		string1   Ever_incarc_offenders;       // pulled from key_ offenders
+		string1   Ever_incarc_offenses;        // pulled from key_ offenses
+		string1   Ever_incarc_punishments;     // pulled from key_ punishment
+		/*  To determine whether any of these conditions are CURRENTLY TRUE */ 
+  string1 	 curr_parole_flag;            // pulled from the offenders key
+  string1 	 curr_parole_punishments;     // pulled from the key_ punishment
+	 string20  curr_stat_inm;               // pulled from the punishment key
+	END;
 	
-	 EXPORT DerogatoryEvents := RECORD                                //*** This section supports the legal events for Business Executives 
-		unsigned2   potentialSOcnt;                                     //*** potential sexual offense
-		unsigned2   EverIncarcerCnt;                                    //*** Ever incarcerated
-		unsigned2   CurrIncarcerCnt;                                    //*** Currently incarcerated (is this a 1 or 0?) 
-		unsigned2   CurrParoleCnt;                                      //*** Currently on Parole
+ //---                                                                          ---
+ //--- These counts are all of the data we have for each offense but it is      ---
+ //--- rolled up to a single DID                                                ---
+ //---                                                                          ---
+	EXPORT TrafficOffensesCounts := RECORD                            
+	 /* CONVICTED TRAFFIC VIOLATIONS */ 
+		unsigned2   ConvictedTraffic2T_OVNYR;                           //*** Convicted Traffic Violations over 3 years
+		unsigned2   ConvictedTraffic2T_NYR;                             //*** Convicted Traffic Violations in the past 3 years
+		unsigned2   ConvictedTraffic2T_Ever;                            //*** Convicted Traffic Violations EVER
+	/*  CONVICTED INFRACTIONS VIOLATIONS */    
+		unsigned2   ConvictedInfractions2I_OVNYR;                       //*** Convicted Infractions over 3 years
+		unsigned2   ConvictedInfractions2I_NYR;                         //*** Convicted Infractions in the past 3 years
+		unsigned2   ConvictedInfractions2I_Ever;                        //*** Convicted Infractions EVER
+  END;  
+	
+	EXPORT CivilOffensesCounts := RECORD                               
+	/* LIENS and JUDGMENTS and EVICTIONS */  
+		unsigned2   liensUnreleasedCntOVNYR;                            //*** liens unreleased over 3 years
+		unsigned2   liensUnreleasedCntInThePastNYR;                     //*** liens unreleased in the past 3 years
 		unsigned2   liensUnreleasedCnt;                                 //*** liens unreleased EVER
-		unsigned2   liensUnreleasedCntInThePast1YR;                     //*** liens unreleased in the past 1 year
-		unsigned2   liensUnreleasedCntInThePast3YR;                     //*** liens unreleased in the past 3 years
+		
+		unsigned2   evictionsCntOVNYR;                                  //*** evictions over 3 years ago
+		unsigned2   evictionsCntInThePastNYR;                           //*** evcitions in the past 3 years
 		unsigned2   evictionsCnt;                                       //*** evictions EVER
-		unsigned2   evictionsCntInThePast1YR;                           //***
-		unsigned2   evictionsCntInThePast3YR;                           //*** evcitions in the past 3 years
-		unsigned2   FelonyCount;                                        //*** Felony count EVER
-		unsigned2   FelonyCountInThePast1YR;                             //*** Felony count in the past 1 year
-		unsigned2   FelonyCountInThePast3YR;                            //*** Felony count in the past 3 years
-		unsigned2   nonFelonyCriminalCount;                             //*** non Felony count EVER
-		unsigned2   nonFelonyCrininalCountPast1YR;                             //*** non Felony count in the past 1 year
-		unsigned2   nonFelonyCriminalCountInThePast3YR;                 //*** non Felony count in the past 3 year
+	END;  
+	
+	EXPORT CriminalOffensesCounts := RECORD                            
+	/* CONVICTED NON-TRAFFIC VIOLATIONS */  
+		unsigned2   ConvictedFelonyCount4F_OVNYR;                          //*** Convicted Felony counts over 3 years ago 
+		unsigned2   ConvictedFelonyCount4F_NYR;                          //*** Convicted Felony counts in past 3 years
+		unsigned2   ConvictedFelonyCount4F_Ever;                         //*** Convicted Felony counts EVER
+		
+		unsigned2   ConvictedUnknownCount4U_OVNYR;                         //*** Convicted Unknown counts over 3 years ago
+		unsigned2   ConvictedUnknownCount4U_NYR;                         //*** Convicted Unknown counts in past 3 years
+		unsigned2   ConvictedUnknownCount4U_Ever;                        //*** Convicted Unknown counts EVER
+		
+		unsigned2   ConvictedMisdemeanorCount4M_OVNYR;                     //*** Convicted Misdemeanor counts over 3 years ago 
+		unsigned2   ConvictedMisdemeanorCount4M_NYR;                     //*** Convicted Misdemeanor counts in past 3 years
+		unsigned2   ConvictedMisdemeanorCount4M_Ever;                    //*** Convicted Misdemeanor counts EVER
+		
+		/* NON-CONVICTED NON-TRAFFIC VIOLATIONS */ 
+		unsigned2   NonConvictedFelonyCount3F_OVNYR;                       //*** Non-Convicted Felony counts over 3 years ago
+		unsigned2   NonConvictedFelonyCount3F_NYR;                       //*** Non-Convicted Felony counts in past 3 years
+		unsigned2   NonConvictedFelonyCount3F_EVER;                        //*** Non-Convicted Felony count EVER
+		
+		unsigned2   NonConvictedUnknownCount3U_OVNYR;                      //*** Non-Convicted Unknown counts over 3 years ago
+		unsigned2   NonConvictedUnknownCount3U_NYR;                      //*** Non-Convicted Unknown counts in past N# of years
+		unsigned2   NonConvictedUnknownCount3U_EVER;                     //*** Non-Convicted Unknown counts EVER
+		
+		unsigned2   NonConvictedMisdemeanorCount3M_OVNYR;                  //*** Non-Convicted Misdemeanor counts over 3 years ago
+		unsigned2   NonConvictedMisdemeanorCount3M_NYR;                  //*** Non-Convicted Misdemeanor counts in past N# of years
+		unsigned2   NonConvictedMisdemeanorCount3M_EVER;                   //*** Non-Convicted Misdemeanor count EVER
+	END;   
+	
+	EXPORT IncarcaratedParoleFlags := RECORD                           
+    /* Incarcarated and Parole Evidence of */    
+		BOOLEAN     EverIncarcer;                                       //*** Ever incarcerated
+		BOOLEAN     CurrIncarcer;                                       //*** Currently incarcerated  
+		BOOLEAN     CurrParole;                                         //*** Currently on Parole	
+	END;
+  
+	
+	 EXPORT DerogatoryEvents := RECORD 
+	  /* Incarcarated and Parole counts */    
+		 IncarcaratedParoleFlags; 
+	  CivilOffensesCounts;  
+		 CriminalOffensesCounts;
+		 TrafficOffensesCounts;  
+		/* TOTAL OF ALL OFFENSES  */  
+		unsigned2   ALLOffensesForThisDID;                            //*** All Criminal Offenses EVER.
  END;
 	
 	
@@ -421,18 +541,19 @@ EXPORT LinkIDs := RECORD
 		STRING9 ssn;
 		Name;
 		Address;
-		DerogatoryEvents; 
+		DerogatoryEvents;                           //***these are rolled upto the DID 
 		UNSIGNED3 numOfPositions;
-		DATASET(Positions) positions;
+		DATASET(Positions) positions; //{MAXCOUNT(DueDiligence.Constants.MAX_POSITIONS)};
 		UNSIGNED3 numOfLicenses;
-		DATASET(Licenses) licenses;
+		DATASET(Licenses) licenses; //{MAXCOUNT(DueDiligence.Constants.MAX_LICENSES)};
+		DATASET(CriminalOffenseLayout_by_DIDOffense) partyOffenses;    //***these are listed at the offense level for each DID
 	END;
 
 	
 	EXPORT LayoutAgent := RECORD
 		UNSIGNED4 dateFirstSeen;
 		UNSIGNED4 dateLastSeen;
-		STRING3 source;
+		STRING4 source;
 		Name;
 		Address;
 	END;
@@ -452,13 +573,13 @@ EXPORT LinkIDs := RECORD
 		UNSIGNED4	  historydate;
 		BOOLEAN 		inputAddressProvided;
 		BOOLEAN			fullInputAddressProvided;
-		SET setUniquePowIDs;																//populated in DueDiligence.getBusHeader 
-		Busn_Input	busn_input;							 								// This is the raw input as is
+		SET setUniquePowIDs;																        //populated in DueDiligence.getBusHeader 
+		Busn_Input	busn_input;							 								      // This is the raw input as is
 		Busn_Input  busn_info;          	   								// This all of this information has been cleaned - address is either cleaned or best
-		STRING2			relatedDegree;					 								//IB = Inquired Bus, LB = Linked Bus, RB = Related Bus, IE = Inquired Bus Exec
-		UNSIGNED3 	linkedBusncount;												//populated in DueDiligence.getBusAttributes
-		DATASET(Busn_Input)   linkedBusinesses; //{MAXCOUNT(DueDiligence.Constants.MAX_ATMOST_100)};				    //populated in DueDiligence.getBusLinkedBus
-		DATASET(RelatedParty) execs; //{MAXCOUNT(DueDiligence.Constants.MAX_ATMOST_100)};										//populated in DueDiligence.getBusExec
+		STRING2			relatedDegree;					 								      //IB = Inquired Bus, LB = Linked Bus, RB = Related Bus, IE = Inquired Bus Exec
+		UNSIGNED2		linkBusCount;
+		DATASET(Busn_Input) linkedBusinesses {MAXCOUNT(DueDiligence.Constants.MAX_LINKED_BUSINESSES)};	//populated in DueDiligence.getBusLinkedBus
+		DATASET(RelatedParty) execs {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};												//populated in DueDiligence.getBusExec
 		/* BusAssetOwnProperty */
 		unsigned6 	PropTaxValue;                           //populated in DueDiligence.getBusProperty
 		unsigned2 	CurrPropOwnedCount;                     //populated in DueDiligence.getBusProperty - do we need this?
@@ -466,91 +587,91 @@ EXPORT LinkIDs := RECORD
 		unsigned2 	CountOwnProp;                           //populated in DueDiligence.getBusProperty - 
 		/* BusAssetOwnWatercraft */ 
 		unsigned2 	WatercraftCount;                        //populated in DueDiligence.getBusWatercraft 
-		unsigned2   Watercraftlength;                       //populated in DueDiligence.getBusWatercraft 
+		unsigned2  Watercraftlength;                       //populated in DueDiligence.getBusWatercraft 
 		/* BusAssetOwnAircraft */
 		unsigned2 	AircraftCount;                          //populated in DueDiligence.getBusAircraft 
 		/* BusAssetOwnVehicle */
 		unsigned2 	VehicleCount;                           //populated in DueDiligence.getBusVehicle
-		unsigned6   VehicleBaseValue;
+		unsigned6  VehicleBaseValue;
 		/*BusSOSAgeRange*/  
-		UNSIGNED4   sosIncorporationDate;										//populated in DueDiligence.getBusSOSDetail
-		BOOLEAN   	noSOSFilingEver;												//populated in DueDiligence.getBusSOSDetail
+		UNSIGNED4  sosIncorporationDate;										         //populated in DueDiligence.getBusSOSDetail
+		BOOLEAN   	noSOSFilingEver;												            //populated in DueDiligence.getBusSOSDetail
 		UNSIGNED4		filingDate;	
 		/*BusPublicRecordAgeRange*/ 	
-		UNSIGNED4 	busnHdrDtFirstSeen;											//populated in DueDiligence.getBusHeader
-		UNSIGNED3 	srcCount;																//populated in DueDiligence.getBusHeader
+		UNSIGNED4 	busnHdrDtFirstSeen;											          //populated in DueDiligence.getBusHeader
+		UNSIGNED3 	srcCount;																               //populated in DueDiligence.getBusHeader
 		/*BusValidityRisk*/
-		UNSIGNED2 	sosAddrLocationCount;										//populated in DueDiligence.getBusSOSDetail
-		UNSIGNED2 	hdAddrCount;														//populated in DueDiligence.getBusHeader 
-		UNSIGNED2 	creditSrcCnt;														//populated in DueDiligence.getBusHeader
-		BOOLEAN     noFein;																	//populated in DueDiligence.getBusHeader			
-		BOOLEAN     busRegHit;															//populated in DueDiligence.getBusRegistration
+		UNSIGNED2 	sosAddrLocationCount;										         //populated in DueDiligence.getBusSOSDetail
+		UNSIGNED2 	hdAddrCount;														              //populated in DueDiligence.getBusHeader 
+		UNSIGNED2 	creditSrcCnt;														             //populated in DueDiligence.getBusHeader
+		BOOLEAN     noFein;																	               //populated in DueDiligence.getBusHeader			
+		BOOLEAN     busRegHit;															              //populated in DueDiligence.getBusRegistration
 		/*BusStabilityRisk*/
-		BOOLEAN			sosFilingExists;												//populated in DueDiligence.getBusSOSDetail
-		BOOLEAN			sosAllDissolveInactiveSuspend;					//populated in DueDiligence.getBusSOSDetail
-		BOOLEAN			sosHasAtleastOneDissolvedFiling;				//populated in DueDiligence.getBusSOSDetail					
-		BOOLEAN			sosHasAtleastOneInactiveFiling;					//populated in DueDiligence.getBusSOSDetail			
-		BOOLEAN			sosHasAtleastOneSuspendedFiling;				//populated in DueDiligence.getBusSOSDetail	
-		BOOLEAN			sosHasAtleastOneOtherStatusFiling;			//populated in DueDiligence.getBusSOSDetail		
-		BOOLEAN			sosHasAtleastOneActiveFiling;						//populated in DueDiligence.getBusSOSDetail
-		UNSIGNED4   sosLastReinstateDate;										//populated in DueDiligence.getBusSOSDetail
-		UNSIGNED4   firstReportedAtInputAddress;						//populated in DueDiligence.getBusSOSDetail
-		BOOLEAN   	sosBusNameChange;												//populated in DueDiligence.getBusSOSDetail																				
-		BOOLEAN   	sosBusAddressChange;										//populated in DueDiligence.getBusSOSDetail
-		BOOLEAN   	sosContactNameChange;										//populated in DueDiligence.getBusSOSDetail			
-		BOOLEAN   	sosContactAddressChange;								//populated in DueDiligence.getBusSOSDetail		
-		BOOLEAN			feinIsSSN;															//populated in DueDiligence.getBusAsInd
-		BOOLEAN			busIsSOHO;															//populated in DueDiligence.getBusAsInd
-		STRING2			residentialAddr;												//populated in DueDiligence.getBusAsInd
-		UNSIGNED1		personNameSSN;													//populated in DueDiligence.getBusAsInd
-		UNSIGNED1		personAddrSSN;													//populated in DueDiligence.getBusAsInd
+		BOOLEAN			sosFilingExists;												             //populated in DueDiligence.getBusSOSDetail
+		BOOLEAN			sosAllDissolveInactiveSuspend;					      //populated in DueDiligence.getBusSOSDetail
+		BOOLEAN			sosHasAtleastOneDissolvedFiling;				     //populated in DueDiligence.getBusSOSDetail					
+		BOOLEAN			sosHasAtleastOneInactiveFiling;					     //populated in DueDiligence.getBusSOSDetail			
+		BOOLEAN			sosHasAtleastOneSuspendedFiling;				     //populated in DueDiligence.getBusSOSDetail	
+		BOOLEAN			sosHasAtleastOneOtherStatusFiling;			    //populated in DueDiligence.getBusSOSDetail		
+		BOOLEAN			sosHasAtleastOneActiveFiling;						      //populated in DueDiligence.getBusSOSDetail
+		UNSIGNED4   sosLastReinstateDate;										        //populated in DueDiligence.getBusSOSDetail
+		UNSIGNED4   firstReportedAtInputAddress;						     //populated in DueDiligence.getBusSOSDetail
+		BOOLEAN   	sosBusNameChange;												           //populated in DueDiligence.getBusSOSDetail																				
+		BOOLEAN   	sosBusAddressChange;										          //populated in DueDiligence.getBusSOSDetail
+		BOOLEAN   	sosContactNameChange;										         //populated in DueDiligence.getBusSOSDetail			
+		BOOLEAN   	sosContactAddressChange;								        //populated in DueDiligence.getBusSOSDetail		
+		BOOLEAN			feinIsSSN;															                //populated in DueDiligence.getBusAsInd
+		BOOLEAN			busIsSOHO;															                //populated in DueDiligence.getBusAsInd
+		STRING2			residentialAddr;												             //populated in DueDiligence.getBusAsInd
+		UNSIGNED1		personNameSSN;													             //populated in DueDiligence.getBusAsInd
+		UNSIGNED1		personAddrSSN;													             //populated in DueDiligence.getBusAsInd
 		BOOLEAN     inputAddressVerified;                		//populated in DueDiligence.getBusHeader
-		BOOLEAN			cmra;																		//populated in DueDiligence.getBusAddrData
-		BOOLEAN			vacant;																	//populated in DueDiligence.getBusAddrData
-		BOOLEAN			notFoundInHeader;												//populated in DueDiligence.getBusHeader
+		BOOLEAN			cmra;																		                  //populated in DueDiligence.getBusAddrData
+		BOOLEAN			vacant;																	                 //populated in DueDiligence.getBusAddrData
+		BOOLEAN			notFoundInHeader;												            //populated in DueDiligence.getBusHeader
 		/*BusStructureType*/
-		STRING60    hdBusnType;															//populated in DueDiligence.getBusHeader
-		STRING60    adrBusnType;														//populated in DueDiligence.getBusAddrData
+		STRING60    hdBusnType;															             //populated in DueDiligence.getBusHeader
+		STRING60    adrBusnType;														             //populated in DueDiligence.getBusAddrData
 		/*BusIndustryRisk*/
-		SicNaicRiskLayout sicNaicRisk;											//populated in DueDiligence.getBusSicNaic
+		SicNaicRiskLayout sicNaicRisk;											          //populated in DueDiligence.getBusSicNaic
 		UNSIGNED3		numOfSicNaic;
-		DATASET(LayoutSICNAIC) sicNaicSources; //{MAXCOUNT(DueDiligence.Constants.MAX_ATMOST_1000)};		//populated in DueDiligence.getBusSicNaic, DueDiligence.getBusHeader, DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
+		DATASET(LayoutSICNAIC) sicNaicSources {MAXCOUNT(DueDiligence.Constants.MAX_SIC_NAIC)};		//populated in DueDiligence.getBusSicNaic, DueDiligence.getBusHeader, DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
 		/*BusShellShelfRisk*/
-		UNSIGNED3 	numOfBusFoundAtAddr;										//populated in DueDiligence.getBusAddrData
-		UNSIGNED3		numOfBusIncInStateLooseLaws;						//populated in DueDiligence.getBusAddrData
-		UNSIGNED3		numOfBusNoReportedFein;									//populated in DueDiligence.getBusAddrData
-		UNSIGNED4 	busnHdrDtFirstSeenNonCredit;						//populated in DueDiligence.getBusHeader
-		UNSIGNED2 	shellHdrSrcCnt;													//populated in DueDiligence.getBusHeader
-		BOOLEAN			incorpWithLooseLaws;										//populated in DueDiligence.getBusHeader, DueDiligence.getBusSOSDetail, DueDiligence.getBusAddrData
-		BOOLEAN			privatePostExists;											//populated in DueDiligence.getBusAddrData
-		BOOLEAN			mailDropExists;													//populated in DueDiligence.getBusAddrData
-		BOOLEAN			remailerExists;													//populated in DueDiligence.getBusAddrData
-		BOOLEAN			storageFacilityExists;									//populated in DueDiligence.getBusAddrData
-		BOOLEAN			undeliverableSecRangeExists;						//populated in DueDiligence.getBusAddrData
-		BOOLEAN			registeredAgentExists;									//populated in DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
-		BOOLEAN 		atleastOneAgentSameAddrAsBus;						//populated in DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
+		UNSIGNED3 	numOfBusFoundAtAddr;										         //populated in DueDiligence.getBusAddrData
+		UNSIGNED3		numOfBusIncInStateLooseLaws;						     //populated in DueDiligence.getBusAddrData
+		UNSIGNED3		numOfBusNoReportedFein;									       //populated in DueDiligence.getBusAddrData
+		UNSIGNED4 	busnHdrDtFirstSeenNonCredit;						     //populated in DueDiligence.getBusHeader
+		UNSIGNED2 	shellHdrSrcCnt;													           //populated in DueDiligence.getBusHeader
+		BOOLEAN			incorpWithLooseLaws;										          //populated in DueDiligence.getBusHeader, DueDiligence.getBusSOSDetail, DueDiligence.getBusAddrData
+		BOOLEAN			privatePostExists;											           //populated in DueDiligence.getBusAddrData
+		BOOLEAN			mailDropExists;													            //populated in DueDiligence.getBusAddrData
+		BOOLEAN			remailerExists;													            //populated in DueDiligence.getBusAddrData
+		BOOLEAN			storageFacilityExists;								         	//populated in DueDiligence.getBusAddrData
+		BOOLEAN			undeliverableSecRangeExists;						      //populated in DueDiligence.getBusAddrData
+		BOOLEAN			registeredAgentExists;									         //populated in DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
+		BOOLEAN 		atleastOneAgentSameAddrAsBus;						     //populated in DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
 		UNSIGNED3		numOfRegAgents;
-		DATASET(LayoutAgent) registeredAgents; //{MAXCOUNT(DueDiligence.Constants.MAX_ATMOST_1000)};							//populated in DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
-		BOOLEAN     agentShelfBusn;													//populated in DueDiligence.getBusAddrData
-		BOOLEAN		  agentPotentialNIS;											//populated in DueDiligence.getBusAddrData
+		DATASET(LayoutAgent) registeredAgents {MAXCOUNT(DueDiligence.Constants.MAX_REGISTERED_AGENTS)};							//populated in DueDiligence.getBusRegistration, DueDiligence.getBusSOSDetail
+		BOOLEAN     agentShelfBusn;													         //populated in DueDiligence.getBusAddrData
+		BOOLEAN		  agentPotentialNIS;											         //populated in DueDiligence.getBusAddrData
 		/*BusExecutiveOfficersRisk*/
-		UNSIGNED3		numOfBusExecs;													//populated in DueDiligence.getBusExec
-		BOOLEAN			atleastOneActiveLawAcctExec;						//populated in DueDiligence.getBusProfLic
-		BOOLEAN			atleastOneActiveFinRealEstateExec;			//populated in DueDiligence.getBusProfLic
-		BOOLEAN			atleastOneActiveMedicalExec;						//populated in DueDiligence.getBusProfLic
-		BOOLEAN			atleastOneActiveBlastPilotExec;					//populated in DueDiligence.getBusProfLic
-		BOOLEAN			atleastOneInactiveLawAcctExec;					//populated in DueDiligence.getBusProfLic
-		BOOLEAN			atleastOneInactiveFinRealEstateExec;		//populated in DueDiligence.getBusProfLic
-		BOOLEAN			atleastOneInactiveMedicalExec;					//populated in DueDiligence.getBusProfLic
-		BOOLEAN			atleastOneInactiveBlastPilotExec;				//populated in DueDiligence.getBusProfLic
+		UNSIGNED3		numOfBusExecs;												           	//populated in DueDiligence.getBusExec
+		BOOLEAN			atleastOneActiveLawAcctExec;					     	//populated in DueDiligence.getBusProfLic
+		BOOLEAN			atleastOneActiveFinRealEstateExec;		  	//populated in DueDiligence.getBusProfLic
+		BOOLEAN			atleastOneActiveMedicalExec;						     //populated in DueDiligence.getBusProfLic
+		BOOLEAN			atleastOneActiveBlastPilotExec;					   //populated in DueDiligence.getBusProfLic
+		BOOLEAN			atleastOneInactiveLawAcctExec;					    //populated in DueDiligence.getBusProfLic
+		BOOLEAN			atleastOneInactiveFinRealEstateExec;		 //populated in DueDiligence.getBusProfLic
+		BOOLEAN			atleastOneInactiveMedicalExec;					    //populated in DueDiligence.getBusProfLic
+		BOOLEAN			atleastOneInactiveBlastPilotExec;				  //populated in DueDiligence.getBusProfLic
 		
 		/* BusMatchLevel  */ 
 		INTEGER2		weight;                                 //populated in -------------------------- 
 		
 		unsigned4   SOSLastReported;																								
 		unsigned2 	CorpStateCount;													
-		unsigned4	  BusnHdrDtLastSeen;											//populated in DueDiligence.getBusHeader
-		unsigned2 	HDStateCount;														//populated in DueDiligence.getBusHeader  		
+		unsigned4	  BusnHdrDtLastSeen;										        	//populated in DueDiligence.getBusHeader
+		unsigned2 	HDStateCount;														           //populated in DueDiligence.getBusHeader  		
 		STRING1     dwelltype := '';
 		STRING1     hriskaddrflag := '';
 		string5     FIPsCode;
@@ -562,8 +683,8 @@ EXPORT LinkIDs := RECORD
 		STRING3	    EasiTotCrime;
 		STRING      CityState;
     // for debugging only end 	
-		string1   	AddressVacancyInd;                      //populated in DueDiligence.getBusGeographicRisk
-		boolean     CountyHasHighCrimeIndex;                //populated in DueDiligence.getBusGeographicRisk(new)
+		string1   	 AddressVacancyInd;                      //populated in DueDiligence.getBusGeographicRisk
+		boolean     CountyHasHighCrimeIndex;                //populated in DueDiligence.getBusGeographicRisk
 		boolean     CountyBordersForgeinJur;                //populated in DueDiligence.getBusGeographicRisk
 		boolean     CountyBorderOceanForgJur;               //populated in DueDiligence.getBusGeographicRisk
 		boolean     CityBorderStation;                      //populated in DueDiligence.getBusGeographicRisk
@@ -579,8 +700,39 @@ EXPORT LinkIDs := RECORD
 		boolean     ShelfBusn;
 		BOOLEAN		  PotentialNIS;
 		boolean     ExecSNNMatch;
-	  /* Derogatory Events   */   
-		DerogatoryEvents Business;
+	  /* Civil Offenses   */   
+		CivilOffensesCounts  Business;
+		
+		/* Criminal Evidence flags  are all for any one of the Business Executives tied to this business*/                                    
+		BOOLEAN     BEOevidenceOfCurrentIncarceration;                // Level 9
+		BOOLEAN     BEOevidenceOfCurrentParole;                       // Level 9
+		BOOLEAN     BEOevidenceOfFelonyConvictionInLastNYR;           // Level 8 - at least one 4F - in last 3 years
+		BOOLEAN     BEOevidenceOfFelonyConvictionOlderNYR;            // Level 7 - at least one 4F - older than 3 years
+		BOOLEAN     BEOevidenceOfPreviousIncarceration;               // Level 6
+		BOOLEAN     BEOevidenceOfUncatagorizedConvictionInLastNYR;    // Level 5 - at least one 4U - in the last 3 years
+		BOOLEAN     BEOevidenceOfMisdeameanorConvictionInLastNYR;     // Level 4 - at least one 4M - in the last 3 years
+		BOOLEAN     BEOevidenceOfUncatagorizedConvictionOlderNYR;     // Level 3 - at least one 4U - older than 3 years
+		BOOLEAN     BEOevidenceOfMisdeameanorConvictionOlderNYR;      // Level 2 - at lease one 4M - older than 3 years
+		
+		/* Civil Evidence flags  are all for any one of the Business Executives tied to this business - Civil can be any combo of liens, judgments and evictions */                                    
+		BOOLEAN     BEOevidenceOf10CivilNYR;                          // Level 9 - 10 or more Civil      in last 3 years
+		BOOLEAN     BEOevidenceOf5To9CivilNYR;                        // Level 8 -  5 - 9     Civil      in last 3 years
+		BOOLEAN     BEOevidenceOf3To4CivilNYR;                        // Level 7 -  3 - 4     Civil      in last 3 years
+		BOOLEAN     BEOevidenceOf1To2CivilNYR;                        // Level 6 -  1 - 2     Civil      in last 3 years
+		BOOLEAN     BEOevidenceOf10CivilOlderNYR;                     // Level 5 - 10 or more Civil      older than 3 years
+		BOOLEAN     BEOevidenceOf5To9CivilOlderNYR;                   // Level 4 -  5 - 9     Civil      older than 3 years
+		BOOLEAN     BEOevidenceOf3To4CivilOlderNYR;                   // Level 3 -  3 - 4     Civil      older than 3 years
+		BOOLEAN     BEOevidenceOf1To2CivilOlderNYR;                   // Level 2 -  1 - 2     Civil      older than 3 years
+		
+		/* Traffic & Infraction Evidence flags  are all for any one of the Business Executives tied to this business*/                                    
+		BOOLEAN     BEOevidenceOf3TrafficNYR;                         // Level 9 - 3 or more traffic     in last 3 years
+		BOOLEAN     BEOevidenceOf2TrafficNYR;                         // Level 8 - 1 or 2    traffic     in last 3 years
+		BOOLEAN     BEOevidenceOf3InfractionsNYR;                     // Level 7 - 3 or more infractions in last 3 years
+		BOOLEAN     BEOevidenceOf2InfractionsNYR;                     // Level 6 - 1 or 2    infractions in last 3 years
+		BOOLEAN     BEOevidenceOf3TrafficOlderNYR;                    // Level 5 - 3 or more traffic     older than 3 years
+		BOOLEAN     BEOevidenceOf2TrafficOlderNYR;                    // Level 4 - 1 or 2    traffic     older than 3 years
+		BOOLEAN     BEOevidenceOf3InfractionsOlderNYR;                // Level 3 - 3 or more infractions older than 3 years
+		BOOLEAN     BEOevidenceOf2InfractionsOlderNYR;                // Level 2 - 1 or 2    infractions older than 3 years
 		
 		unsigned2		LinkedBusnValidityCount	 := 0;	
 		string120		bestCompanyName	         := '';										//populated in DueDiligence.getBusBestData

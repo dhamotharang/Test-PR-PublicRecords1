@@ -1,4 +1,4 @@
-import ut, data_services;
+import data_services;
 
 string_rec := record
 string20 flag_file_id;
@@ -58,7 +58,7 @@ string2 src;
 end;
 
 
-ds := dataset(ut.foreign_prod+'thor_data400::base::override::fcra::qa::gong', string_rec,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
+ds := dataset(data_services.data_location.prefix() + 'thor_data400::base::override::fcra::qa::gong', string_rec,csv(separator('\t'),quote('\"'),terminator('\r\n')),opt);
 
 fcra.Layout_Override_Gong proj_recs(ds l) := transform
 	self.l_did := (unsigned6)l.did;

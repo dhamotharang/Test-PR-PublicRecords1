@@ -1,4 +1,4 @@
-import autokey, header;
+import autokey, header, data_services;
 
 t := header.Prepped_For_Keys;
 
@@ -13,7 +13,7 @@ autokey.MAC_SSN(t,fname,mname,lname,
 						rel_fname1,rel_fname2,rel_fname3,
 						lookups,
 						did,
-						'~thor_data400::key::header.ssn.did',
+						data_services.data_location.prefix() + 'thor_data400::key::header.ssn.did',
 						k)
 
 export key_header_ssn := k;

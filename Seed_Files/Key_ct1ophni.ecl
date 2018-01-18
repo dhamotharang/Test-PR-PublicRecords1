@@ -1,3 +1,5 @@
+import data_services;
+
 df := file_seed1;
 
 numrec := record
@@ -23,4 +25,4 @@ export Key_ct1ophni := index(df2,{prodnum, homephone},{account_out,
 									 zip,
 									 reserved,
 									 phonserviceflag,
-									 cmpy},'~thor_Data400::key::seed::qa::ct1ophni');
+									 cmpy},data_services.data_location.prefix() + 'thor_Data400::key::seed::qa::ct1ophni');

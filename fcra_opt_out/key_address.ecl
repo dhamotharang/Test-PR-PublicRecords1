@@ -1,9 +1,4 @@
-
-
-
-
-import doxie;
-
+import doxie, data_services;
 
 f_optout := fcra_opt_out.file_infile_appended;
 
@@ -35,8 +30,6 @@ tbl_address := table(f_optout,
 			city,state,zip5,did_score,ssn_append,permanent_flag,opt_back_in,date_YYYYMMDD,few);
 							
 export key_address := index(tbl_address(z5<>'' and prim_range <> '' and prim_name <> ''),
-               {z5,prim_range,prim_name,sec_range},
-			   {tbl_address},
-                '~thor_data400::key::fcra::optout::address_'+doxie.Version_SuperKey);
-				
-				
+                            {z5,prim_range,prim_name,sec_range},
+                            {tbl_address},
+                            data_services.data_location.prefix() + 'thor_data400::key::fcra::optout::address_'+doxie.Version_SuperKey);

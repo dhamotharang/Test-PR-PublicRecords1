@@ -1,6 +1,6 @@
 import doxie, Data_Services, risk_indicators;
 
-EXPORT File_Inquiry_Billgroups_DID() := MODULE
+EXPORT File_Inquiry_Billgroups_DID() := INLINE MODULE
 
 // same base file filtering as the Inquiry_AccLogs.Key_Inquiry_DID
 df := inquiry_acclogs.File_inquiry_mbs(bus_intel.industry <> '' and person_q.Appended_ADL > 0 and 

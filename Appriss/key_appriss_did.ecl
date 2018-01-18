@@ -1,4 +1,4 @@
-import doxie,ut;
+import doxie,ut, data_services;
 layout_slim:=RECORD
 unsigned6 did;
 string15 booking_sid;
@@ -14,7 +14,7 @@ df := PROJECT(file_bookings_base(did <> 0 ),tSlim(LEFT));
 
 export key_appriss_did := 
  index(df,{did},{booking_sid},
-         '~thor_200::key::appriss::'+ doxie.Version_SuperKey+'::did' );
+         data_services.data_location.prefix() + 'thor_200::key::appriss::'+ doxie.Version_SuperKey+'::did' );
 
 
 

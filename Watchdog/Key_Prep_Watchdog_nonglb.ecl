@@ -1,4 +1,4 @@
-import ut, header_services, doxie,_Control,header;
+import ut, header_services, doxie,_Control,header,data_services;
 
 //compare to glb data and set flags
 watchdog.Layout_best_flags flags(watchdog.layout_best L, watchdog.Layout_Best R) := transform
@@ -110,7 +110,7 @@ wdog := t0 + Base_File_Append;
 
 candidates := distribute(wdog(trim(fname)='' or trim(lname)=''),hash(did));
 not_candidates := wdog(~(trim(fname)='' or trim(lname)=''));
-glb_pst        := distribute(dataset('~thor400_84::out::watchdog_filtered_header_nonglb',header.layout_header,flat),hash(did));;
+glb_pst        := distribute(dataset(data_services.data_location.prefix() + 'thor400_84::out::watchdog_filtered_header_nonglb',header.layout_header,flat),hash(did));;
 
 header.layout_header t1(glb_pst le, candidates ri) := transform
  self := le;
@@ -163,4 +163,4 @@ fb00:=join(candidates1,_bestSSN
 _fb := fb00+not_candidates1;
 ut.mac_suppress_by_phonetype(_fb,phone,st,fb,true,did);
 
-export Key_Prep_Watchdog_nonglb := index(fb,{fb},'~thor_data400::key::watchdog_nonglb.did_'+doxie.Version_SuperKey);
+export Key_Prep_Watchdog_nonglb := index(fb,{fb},data_services.data_location.prefix() + 'thor_data400::key::watchdog_nonglb.did_'+doxie.Version_SuperKey);

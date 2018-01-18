@@ -1,4 +1,4 @@
-import doxie;
+import doxie,data_services;
 
 standard__addr := RECORD
 
@@ -101,4 +101,4 @@ d := dataset([],full_rec);
 
  
 
-export key_payload := index(d,{fakeid},{d},'~thor_data400::key::ucc::autokey::payload_' + doxie.Version_SuperKey);
+export key_payload := index(d,{fakeid},{d},data_services.data_location.prefix() + 'thor_data400::key::ucc::autokey::payload_' + doxie.Version_SuperKey);

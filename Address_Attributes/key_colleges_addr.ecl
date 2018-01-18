@@ -1,4 +1,4 @@
-import address, address_attributes, doxie, lib_stringlib, ut;
+import address_attributes, doxie, lib_stringlib, data_services;
 
 colleges := address_attributes.file_colleges;
 
@@ -13,4 +13,4 @@ export key_colleges_addr := index(clean_key_data,{
 														prim_range, 
 														prim_name
 														},
-														{clean_key_data},'~thor_data400::key::neighborhood::' + doxie.Version_SuperKey + '::colleges::address');
+														{clean_key_data},data_services.data_location.prefix() + 'thor_data400::key::neighborhood::' + doxie.Version_SuperKey + '::colleges::address');

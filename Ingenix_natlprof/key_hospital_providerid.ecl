@@ -1,5 +1,5 @@
-
-import ingenix_natlprof, Doxie;
+﻿
+import ingenix_natlprof, Doxie, data_services;
 
 
 file_in := ingenix_natlprof.Basefile_Hospital_BDID_extended; // added _extended to include
@@ -12,6 +12,6 @@ sort_id_base := sort(dist_id_base, providerid, local);
 
 export key_hospital_providerid := index(sort_id_base, 
                                 {unsigned6 l_providerid := (unsigned6)providerid},{sort_id_base},				           
-										'~thor_data400::key::ingenix_hospital_providerid_' + Doxie.Version_SuperKey);
+										data_services.data_location.prefix() + 'thor_data400::key::ingenix_hospital_providerid_' + Doxie.Version_SuperKey);
 
 

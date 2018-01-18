@@ -1,4 +1,4 @@
-import doxie,ut;
+import doxie,ut, data_services;
 
 layout_slim:=RECORD
 String1   KEY_GENDER;	
@@ -28,4 +28,4 @@ df := PROJECT(file_bookings_base(key_gender <> '' and key_race <> '' ),tSlim(LEF
 //key_gender <> '' or key_race <> '' or DATE_OF_BIRTH <> 0 or key_hgt <> 0 or  key_wgt <> '0'  
 export Key_prep_demographic := 
  index(df,{key_gender,key_race,DATE_OF_BIRTH,key_hgt,key_wgt},{key_hair,key_eye,booking_sid},
-         '~thor_200::key::appriss::'+ doxie.Version_SuperKey+'::demographic' );
+         data_services.data_location.prefix() + 'thor_200::key::appriss::'+ doxie.Version_SuperKey+'::demographic' );

@@ -1,4 +1,4 @@
-import doxie_files, doxie,ut;
+import doxie,data_services;
 
 f1_worldcheck := WorldCheck.File_Main;
 
@@ -12,4 +12,4 @@ f_worldcheck := project(f1_worldcheck,worldtran(left));
 export Key_WorldCheck_main := index(f_worldcheck
                                    ,{UID}
 								   ,{f_worldcheck}
-								   ,'~thor_data400::key::WorldCheck::main_'+doxie.Version_SuperKey);
+								   ,data_services.data_location.prefix() + 'thor_data400::key::WorldCheck::main_'+doxie.Version_SuperKey);

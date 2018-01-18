@@ -1,4 +1,4 @@
-import header, doxie;
+import header, doxie, data_services;
 
 t := header.Prepped_For_Keys;
 
@@ -18,4 +18,4 @@ ssn5_recs := project(t, get_ssn_last5(left));
 ssn5_dep := dedup(sort(ssn5_recs((unsigned)ssn5<>0, lname<>''), record),record);
 
 export Key_Header_SSN5 := INDEX(ssn5_dep, {ssn5_dep}, 
-                                '~thor_data400::key::header.ssn5.did_' + doxie.Version_SuperKey);
+                                data_services.data_location.prefix() + 'thor_data400::key::header.ssn5.did_' + doxie.Version_SuperKey);

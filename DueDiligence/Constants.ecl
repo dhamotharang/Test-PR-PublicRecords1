@@ -4,19 +4,6 @@ EXPORT Constants := MODULE
 
 
 EXPORT VERSION_3 := 3;
-EXPORT NAME_TYPE := 'D'; 
-EXPORT YEARS_TO_LOOK_BACK  := 3;  
-
-/*  Use position 3 through 5 to build the 3 digit county from the 5 digit FIPS code    */  
-EXPORT FIRST_POS := 3;                 
-EXPORT LAST_POS  := 5;  
-
-EXPORT MAX_KEEP        := 1000;             /* The maximum number of records we KEEP */
-EXPORT MAX_ATMOST      := 1000;             /* The maximum number of records we care to use in an ATMOST within a JOIN. */
-EXPORT MAX_ATMOST_100  := 100;
-EXPORT MAX_ATMOST_500  := 500;
-EXPORT MAX_ATMOST_1000 := 1000;
-
 
 EXPORT IND_REQ_ATTRIBUTE_V3 := 'DDAINDV3';
 EXPORT BUS_REQ_ATTRIBUTE_V3 := 'DDABUSV3';
@@ -38,7 +25,61 @@ EXPORT VALIDATION_INVALID_DPPA := 'Not an allowable DPPA permissible purpose';
 EXPORT DEFAULT_DPPA := 3;
 EXPORT DEFAULT_GLBA := 5;
 
+
+
+EXPORT NAME_TYPE := 'D'; 
+EXPORT YEARS_TO_LOOK_BACK  := 3;  
+
+/*  Use position 3 through 5 to build the 3 digit county from the 5 digit FIPS code    */  
+EXPORT FIRST_POS := 3;                 
+EXPORT LAST_POS  := 5;  
+
+EXPORT MAX_KEEP        := 1000;             /* The maximum number of records we KEEP */
+EXPORT MAX_ATMOST      := 1000;             /* The maximum number of records we care to use in an ATMOST within a JOIN. */
+EXPORT MAX_ATMOST_100  := 100;
+EXPORT MAX_ATMOST_500  := 500;
+EXPORT MAX_ATMOST_1000 := 1000;
+EXPORT MAX_ATMOST_OFFENSES := 5000; 
+
+EXPORT MAX_SIC_NAIC := 250;
+EXPORT MAX_POSITIONS := 50;
+EXPORT MAX_LICENSES := MAX_ATMOST_100;
+EXPORT MAX_EXECS := 200;
+EXPORT MAX_LINKED_BUSINESSES := 300;
+EXPORT MAX_REGISTERED_AGENTS := 200;  
+
+
 EXPORT EMPTY := '';
+EXPORT ZERO := '0';
+EXPORT YES := 'Y'; 
+EXPORT NUMERIC_ZERO := 0;
+
+
+
+
+// ---- 
+// ---- constants used for Offense Score  
+// ----
+
+EXPORT KEYWORD_FELONY           := 'FELONY';  
+EXPORT KEYWORD_REDUCED          := 'REDUCED';  
+EXPORT KEYWORD_THEFT            := 'THEFT';  
+EXPORT FELONY                   := 'F';
+EXPORT MISDEMEANOR              := 'M';
+EXPORT INFRACTION               := 'I';
+EXPORT TRAFFIC                  := 'T';
+EXPORT UNKNOWN                  := 'U';  
+EXPORT UNKNOWN_OFFENSES         := [ 'U', '' ];  
+ 
+
+// ---- 
+// ---- constants used for Offender Level
+// ----
+EXPORT NONTRAFFIC_CONVICTED     := '4'; 
+EXPORT NONTRAFFIC_NOT_CONVICTED := '3';
+EXPORT TRAFFIC_CONVICTED        := '2';
+EXPORT TRAFFIC_NOT_CONVICTED    := '1';
+
 
 // ---- 
 // ---- constants used in the Liens processing
@@ -62,6 +103,21 @@ EXPORT INVALID_JUDGMENT := 'Invalid';
 EXPORT JUDGMENT         := 'Judgment';
 EXPORT LIEN             := 'Lien';  
 
+// ---- 
+// ---- constants used in the Filing Status
+// ----
+EXPORT SATISFIED        := 'Satis';
+EXPORT DISMISS          := 'Dismiss';
+EXPORT UNLAPSED_LOWER   := 'Unlapsed';
+EXPORT OTHER_LOWER      := 'Other';  
+EXPORT UNLAPSED_UPPER   := 'UNLAPSED';  
+EXPORT LAPSED_LOWER   := 'lapsed';
+EXPORT LAPSED_UPPER   := 'LAPSED';  
+
+EXPORT CIVIL_RANGE_A :=  [5, 6, 7, 8, 9];
+EXPORT CIVIL_RANGE_B :=  [3, 4];
+EXPORT CIVIL_RANGE_C :=  [1, 2];
+
 EXPORT SET OF STRING filing_status_satisfied :=
 		[
 			'SATISFIED', 'SETTLED', 'RELEASED', 'CLOSED', 'DISCHARGED'
@@ -77,12 +133,42 @@ EXPORT SET OF STRING filing_status_dismissed :=
 
 EXPORT NOT_PO_ADDRESS_EXPRESSION := '^((?!((P[\\s\\.]*O[\\.\\s]*)|(POST[\\s]*OFFICE[\\s]*))+BOX).)*$';  //finds reference to anything other than po box or post office box
 
+
+//****SECTION FOR MACROS *****
 // NOTE: when calling these macros (mac_ListTop*), you will need to add a "#expand(...)" before the actual
 // fully qualified macro name or it will sort/dedup/group on the full string below 
 // instead of the field names inside the string.
 EXPORT mac_ListTop3Linkids := MACRO
     'Busn_info.BIP_IDS.UltID.LinkID, Busn_info.BIP_IDS.OrgID.LinkID, Busn_info.BIP_IDS.SeleID.LinkID'
 ENDMACRO;
+
+EXPORT mac_calculate_evictions := MACRO
+     'SUM(GROUP, (integer)(eviction = DueDiligence.Constants.YES))'
+ENDMACRO; 
+
+EXPORT mac_calculate_evictions_OVNYR := MACRO
+     'SUM(GROUP, (integer)(eviction = DueDiligence.Constants.YES  AND  NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK)))'
+ENDMACRO;  
+
+EXPORT mac_calculate_evictionsNYR := MACRO
+     'SUM(GROUP, (integer)(eviction = DueDiligence.Constants.YES  AND  NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK)))'
+ENDMACRO;  
+
+EXPORT mac_calculate_liens := MACRO
+     'SUM(GROUP, (integer)(eviction != DueDiligence.Constants.YES))'
+ENDMACRO; 
+
+EXPORT mac_calculate_liens_OVNYR := MACRO
+     'SUM(GROUP, (integer)(eviction != DueDiligence.Constants.YES 	AND   NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK)))'
+ENDMACRO; 
+
+EXPORT mac_calculate_liensNYR := MACRO
+     'SUM(GROUP, (integer)(eviction != DueDiligence.Constants.YES   AND  NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK)))'
+ENDMACRO; 
+									                                                                
+
+
+//**** END OF SECTION FOR MACROS *****
 
 EXPORT NUMERIC_VALUES := '0123456789';
 EXPORT date8Nines := 99999999;
@@ -421,6 +507,7 @@ EXPORT SOURCE_FICTICIOUS_BUSINESS := MDR.SourceTools.src_FBNV2_BusReg;
 EXPORT SOURCE_CAL_BUSINESS := MDR.SourceTools.src_CalBus;
 EXPORT SOURCE_YELLOW_PAGES := MDR.SourceTools.src_Yellow_Pages;
 EXPORT SOURCE_EBR := MDR.SourceTools.src_EBR;
+EXPORT SOURCE_BOTH_SOS_BUSINESS_REGISTRATION := 'BOTH';
 
 EXPORT INDUSTRY_CASH_INTENSIVE_BUSINESS_RETAIL := 'CIBR';
 EXPORT INDUSTRY_CASH_INTENSIVE_BUSINESS_NON_RETAIL := 'CIBNR';
@@ -1078,6 +1165,26 @@ EXPORT AMLNewsCategory := ['ADVERSE MEDIA-AIRCRAFT HIJACKING',
 				'PEP-WAR CRIMES',
 				'SANCTION LIST-N/A'];
 
+ //*** These are the 5 digit court offense levels that can be mapped to a FELONY
+EXPORT setFELONY := ['CA', '*F', '1F', '2F', '3F', '4 F', '4F', ';F2', 'AF', 'AF1', 
+											'AF2', 'AF3', 'AF4', 'AGGF1', 'AGGF2', 'AGGF3', 'CAPIA', 'CCA', 
+											'CF', 'CL', 'DF', 'F', 'F 3', 'F*', 'F*;F*', 'F*;F1', 'F*;F2', 
+											'F*;F3', 'F*;FS', 'F*;FX', 'F*;M*', 'F*;MA', 'F*;MB', 'F*;MC', 
+											'F*;MT', 'F*\\M*', 'F-1', 'F-1)', 'F-2', 'F-2)', 'F-3', 'F-3)', 
+											'F-4', 'F-4)', 'F-4PR', 'F-5', 'F-5)', 'F/GM', 'F/M', 'F0', 'F1', 
+											'F10', 'F1;F*', 'F1;F1', 'F1;F2', 'F1;F3', 'F1;FS', 'F1;MA', 'F1D', 
+											'F2', 'F2;F*', 'F2;F1', 'F2;F2', 'F2;F3', 'F2;FS', 'F2;MA', 'F2D', 
+											'F3', 'F3;F*', 'F3;F1', 'F3;F2', 'F3;F3', 'F3;FS', 'F3;MA', 'F3;MB', 
+											'F3D', 'F4', 'F4D', 'F5', 'F5D', 'F6', 'F6TH', 'F7', 'F8', 'F9', 
+											'FA', 'FAD', 'FB', 'FBC', 'FC', 'FCA', 'FCAP', 'FD', 'FDM', 'FE', 
+											'FEM', 'FF', 'FG', 'FH', 'FI', 'FL', 'FL1', 'FLOWE', 'FM', 'FN', 
+											'FNC', 'FNG', 'FO', 'FOG', 'FP', 'FQ', 'FS', 'FS;E', 'FS;E;', 
+											'FS;F*', 'FS;F1', 'FS;F2', 'FS;F3', 'FS;FS', 'FS;MA', 'FS;MB', 
+											'FSJ', 'FT', 'FU', 'FUPPE', 'FV', 'FW', 'FX', 'FX;F1', 'FX;FX', 
+											'FY-1', 'FY-3', 'FZ', 'LIFE', 'MA;FS', 'MB;F3', 'MB;FS', 'SF', 
+											'SJF', 'SPF', 'UF'];
 
+//*** These are the 5 digit court offense levels that can be mapped to a MISDEMEANOR
+EXPORT setMISDEMEANOR := ['AM', 'BM', 'GM', 'GMT', 'GM2', 'GM3'];
 
 END;

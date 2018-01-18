@@ -1,10 +1,10 @@
-IMPORT SALT37,std;
+﻿IMPORT SALT37,std,data_services;
 EXPORT Key_InsuranceHeader_SRC_RID(BOOLEAN incremental=FALSE) := MODULE
  
 //SRC:SOURCE_RID:?:FNAME:DOB:CITY:DERIVED_GENDER:SNAME:+:ST
 EXPORT KeyName := KeyNames().SRC_RID_super; /*HACK*/
  
-EXPORT KeyName_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::SRC_RID';
+EXPORT KeyName_sf := data_services.data_location.prefix() + KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs::SRC_RID';
  
 EXPORT AssignCurrentKeyToSuperFile := FileServices.AddSuperFile(KeyName_sf,KeyName);
  

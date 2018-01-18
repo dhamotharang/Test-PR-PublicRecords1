@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="WatercraftReportServiceFCRA">  
 	<part name="DID"         type="xsd:string"/>
 	<part name="GLBPurpose"	 type="xsd:byte"/>
@@ -37,5 +37,6 @@ export WatercraftReportServiceFCRA := macro
 																	
 	output(report_recs.Records, named('Results'));
 	output(report_recs.Statements, named('ConsumerStatements'));
+	output(report_recs.ConsumerAlerts, named('ConsumerAlerts'));
 
 endmacro;

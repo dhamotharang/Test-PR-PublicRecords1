@@ -89,6 +89,7 @@ EXPORT TestSeed_Function(iesp.fcraconsumerprofilereport.t_ConsumerProfileReportB
 		alert_desc := choose(C, L.alertcode_desc, L.alertcode2_desc, L.alertcode3_desc, L.alertcode4_desc, L.alertcode5_desc);
 		self.Code := if(alert_code <> '', alert_code, skip);
 		self.Description := alert_desc;
+		self.Message := '';
 	end;
 	
 	iesp.fcraconsumerprofilereport.t_ConsumerProfileAKA xformAKAsOut(recordof(cpAKAs) L) := transform

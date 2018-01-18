@@ -1,4 +1,4 @@
-import doxie, ut;
+import doxie, data_services;
 
 d := canadianphones.file_CanadianWhitePagesBase;
 
@@ -36,6 +36,7 @@ end;
 
 f := project(d(phonenumber<>''), transform(payload, self := left));
 
-export Key_CWP_Phone := index(f,{phonenumber},
-								{f},
-                                  '~thor_data400::key::canadianwp_phone_payload_'+doxie.Version_SuperKey);
+export Key_CWP_Phone := index(f,
+                              {phonenumber},
+                              {f},
+                              data_services.data_location.prefix() + 'thor_data400::key::canadianwp_phone_payload_'+doxie.Version_SuperKey);

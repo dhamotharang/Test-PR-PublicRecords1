@@ -13,7 +13,8 @@ EXPORT IParam := MODULE
     EXPORT string18  AgencyCounty;        // agency location
     EXPORT string2   AgencyState;         // agency location
     EXPORT integer 	 MaxVelocities;
-    EXPORT string 	 FraudPlatform;
+    EXPORT string 	  FraudPlatform;
+			 EXPORT boolean  	ReturnDetailedRoyalties;
   END;
 
   // **************************************************************************************
@@ -37,6 +38,7 @@ EXPORT IParam := MODULE
 			
       EXPORT integer   MaxVelocities      := FraudGovPlatform_Services.Constants.MAX_VELOCITIES : STORED('MaxVelocities');
       EXPORT string    FraudPlatform			:= FraudGovPlatform_Services.Constants.FRAUD_PLATFORM : STORED('FraudPlatform');
+						EXPORT BOOLEAN   ReturnDetailedRoyalties := false : STORED('ReturnDetailedRoyalties');
     END;
 	
     RETURN in_mod;

@@ -1,4 +1,4 @@
-import doxie, doxie_build, codes, census_data, ut, lib_stringlib;
+import doxie, doxie_build, codes, census_data, data_services;
 
 ExtendedLayout :=
 RECORD
@@ -89,4 +89,7 @@ o6 := join(o5,
 		 left.orig_state = right.code,
 		 getState(LEFT,RIGHT),left outer, lookup);
 
-export Key_prep_DL_number := INDEX(o6, {typeof(o6.dl_number) s_dl := o6.dl_number}, {o6}, '~thor_data400::key::dl2::'+ doxie.Version_SuperKey +'::dl_number_'+doxie_build.buildstate);
+export Key_prep_DL_number := INDEX(o6, 
+                                   {typeof(o6.dl_number) s_dl := o6.dl_number}, 
+                                   {o6}, 
+                                   data_services.data_location.prefix() + 'thor_data400::key::dl2::'+ doxie.Version_SuperKey +'::dl_number_'+doxie_build.buildstate);

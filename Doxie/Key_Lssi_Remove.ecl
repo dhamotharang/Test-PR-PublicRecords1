@@ -1,4 +1,4 @@
-import lssi;
+import lssi, data_services;
 
 rmvs_plus_rec := record
 	lssi.layout_in,
@@ -17,4 +17,4 @@ rmvs_slim := table(rmvs_plus, rmvs_slim_rec);
 
 export key_lssi_remove := index(rmvs_slim,
                           {string16 l_recid := recid,__fpos},
-					 '~thor_data400::key::lssi_remove_' + doxie.Version_SuperKey, OPT);
+                          data_services.data_location.prefix() + 'thor_data400::key::lssi_remove_' + doxie.Version_SuperKey, OPT);

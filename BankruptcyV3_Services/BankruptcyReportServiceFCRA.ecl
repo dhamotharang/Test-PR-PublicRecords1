@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="BankruptcyReportServiceFCRA">
   <part name="PersonFilterID" 			type="xsd:string"/>
   <part name="TMSID" 				    type="xsd:string"/>
@@ -45,7 +45,8 @@ export BankruptcyReportServiceFCRA() :=	macro
 	valFFDOptionsMask := FFD.FFDMask.Get(inApplicationType := application_type_value);
 	boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(valFFDOptionsMask);
   dataset (Gateway.layouts.config) gateways := Gateway.Configuration.Get();  
-	
+	unsigned6 input_did := (unsigned6) did_value;
+
   // Adjust party-type: only [D]ebtors should be used for collections:
   string party_type_adj := if (returnByDidOnly, BankruptcyV3_Services.consts.NAME_TYPES.DEBTOR, party_type);
 
@@ -125,16 +126,36 @@ export BankruptcyReportServiceFCRA() :=	macro
 	
 	//projecting to common layout for fn_fcra_ffd call
 	temp_rollup := project(out_recs_final, bankruptcyv3_services.layouts.layout_rollup);
+  
+  did_batch_exp_rec := record(FFD.Layouts.DidBatch)
+    boolean is_debtor := false;
+  end;
 
-	// returns FFD records for subject debtors only
-	dsDIDs := dedup(project(temp_rollup,           
-      TRANSFORM(FFD.Layouts.DidBatch,
-        _debtor := LEFT.debtors(did = LEFT.matched_party.did);
-        SELF.did := IF(exists(_debtor), (unsigned6) LEFT.matched_party.did, SKIP),
-        SELF.acctno := FFD.Constants.SingleSearchAcctno)), all);
+	// for call to PC we need to grab all dids even if subject is not debtor
+	matched_rec_dids := dedup(sort(project(temp_rollup,           
+                            transform(did_batch_exp_rec,
+                              _debtor := left.debtors(did = left.matched_party.did);
+                              self.is_debtor := exists(_debtor),
+                              self.did := (unsigned6) left.matched_party.did, 
+                              self.acctno := FFD.Constants.SingleSearchAcctno)),
+                              did, -is_debtor), did);
 		                          
+  ds_subj_did := dataset([{FFD.Constants.SingleSearchAcctno, input_did}], FFD.Layouts.DidBatch);
+    
+  // even if no data found we still need to check for alerts and consumer level statements for subject
+  dsDIDs := if(exists(matched_rec_dids), project(matched_rec_dids, FFD.Layouts.DidBatch), ds_subj_did);
+
 	//  call person context
-	pc_recs := FFD.FetchPersonContext(dsDIDs, gateways, FFD.Constants.DataGroupSet.Bankruptcy);
+	pc_recs_prelim := FFD.FetchPersonContext(dsDIDs, gateways, FFD.Constants.DataGroupSet.Bankruptcy);
+  
+  // for record level statement/dispute  filter to keep data only if subject is debtor
+  pc_recs_rlvl := join(pc_recs_prelim(RecordType IN FFD.Constants.RecordType.RecordLevel), 
+                        matched_rec_dids(is_debtor),
+                        (unsigned6) left.LexId = (unsigned6) right.did,
+                        transform(left), keep(1), limit(0));
+                        
+  pc_recs := pc_recs_rlvl + pc_recs_prelim(RecordType in FFD.Constants.RecordType.ConsumerLevel);
+
 	slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 	
 	// get FFD compliance records
@@ -149,11 +170,16 @@ export BankruptcyReportServiceFCRA() :=	macro
 										self := right, // to get statementids and isdisputed for debtors child dataset
 										self:= left));
 	
-	consumer_statements := if(ShowConsumerStatements and exists(final), FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
+  // Consumer Level statements will always be returned along with any alert messages.
+	all_statements := IF(ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
+	consumer_statements := if( exists(final), all_statements,
+                            all_statements(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel));
 	
+  consumer_alerts := FFD.Constants.BlankConsumerAlerts;
 	doOutput := sequential(
-		OUTPUT(final, NAMED('Results')),
-		output(consumer_statements,named('ConsumerStatements')));
+		output(final, named('Results')),
+		output(consumer_statements,named('ConsumerStatements')),
+    output(consumer_alerts, named('ConsumerAlerts')));	
 		
 	
 	sequential(

@@ -1,4 +1,4 @@
-import dnb_feinv2, Doxie, ut;
+import dnb_feinv2, Doxie, data_services;
 
 get_recs := DNB_FEINv2.File_DNB_Fein_base_main;
 
@@ -9,8 +9,7 @@ slim_dist   := distribute(slim_party,hash(tmsid,bdid));
 slim_sort   := sort(slim_dist, tmsid, bdid,local);
 slim_dedup  := dedup(slim_sort,tmsid, bdid,local);
 
-export key_DNB_Fein_BDID := index(slim_dedup,{unsigned6 p_bdid :=(unsigned6)bdid},{TMSID},
-'~thor_data400::key::dnbfein::BDID_' + Doxie.Version_SuperKey);
-
-
-
+export key_DNB_Fein_BDID := index(slim_dedup,
+                                  {unsigned6 p_bdid :=(unsigned6)bdid},
+                                  {TMSID},
+                                  data_services.data_location.prefix() + 'thor_data400::key::dnbfein::BDID_' + Doxie.Version_SuperKey);

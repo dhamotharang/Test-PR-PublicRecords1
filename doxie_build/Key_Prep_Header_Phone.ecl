@@ -1,4 +1,4 @@
-import header,gong;
+import header,gong, data_services;
 
 t := header.Prepped_For_Keys;
 
@@ -38,4 +38,6 @@ gong_phone_recs := PROJECT(gong_did+gong_hhid_did, to_phone_rec(LEFT));
 
 phone_recs := DEDUP(SORT((header_phone_recs+gong_phone_recs)((integer)p7<>0),record),record);
 
-export Key_Prep_Header_Phone := INDEX(phone_recs, {phone_recs}, '~thor_data400::key::header.phone' + thorlib.wuid());
+export Key_Prep_Header_Phone := INDEX(phone_recs, 
+                                      {phone_recs}, 
+                                      data_services.data_location.prefix() + 'thor_data400::key::header.phone' + thorlib.wuid());

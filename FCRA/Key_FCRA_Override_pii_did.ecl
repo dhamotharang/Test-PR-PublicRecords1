@@ -1,4 +1,4 @@
-import fcra, ut;
+import data_services;
 
 kf := Pii_for_FCRA ((unsigned)did<>0);
 
@@ -11,6 +11,7 @@ END;
 kf_rolled := rollup( group(sort(kf,did),did), true, roll(left,right) );
 
 
-export Key_FCRA_Override_pii_did := 
-index(kf_rolled,
-			{unsigned6 s_did := (unsigned)did}, {kf_rolled}, '~thor_data400::key::fcra::override::pii::qa::did');
+export Key_FCRA_Override_pii_did := index(kf_rolled,
+			                                    {unsigned6 s_did := (unsigned)did}, 
+			                                    {kf_rolled}, 
+			                                    data_services.data_location.prefix() + 'thor_data400::key::fcra::override::pii::qa::did');

@@ -182,5 +182,8 @@ export BillingIndex := MODULE
 		export FP1706_1		 := '166'; //FP1706_1 - Fraudpoint 3.0 Custom Model for MetaBank (166 % 100 + 30 = 96)
 		export FP1702_2			:= '167'; //FP1702_2 - Fraudpoint 3.0 Custom Model for Kohls POS (167 % 100 + 30 = 97)	
 		export FP1609_2			:= '168'; //FP1609_2 - Fraudpoint 3.0 Custom Model for Discovery (168 % 100 + 30 = 98)	
+		export FP1607_1			:= '169'; //FP1607_1 - Fraudpoint 3.0 Custom Model for TracPhone (169 % 100 + 30 = 99)	
+		export FP1712_0			:= '170'; //FP1712_0 - Fraudpoint/Shell Custom Model for Bureau Fraud (170 % 100 + 30 = 100)	
+	
 END;
 

@@ -1,4 +1,4 @@
-Import Data_Services, doxie,FLAccidents;
+Import doxie,FLAccidents, data_services;
 
 /////////////////////////////////////////////////////////////////
 //Expand Florida file 
@@ -176,8 +176,7 @@ piyetek := project(metadata,slimiyetek(left));*/
 
 allrecs :=dedup(pflc0+pntl+pInq+pecrash/*+piyetek*/,record,all): persist('~thor_data400::persist::ecrash0');
 
-export Key_ECrash0 := index(allrecs
-                            ,{string40 l_acc_nbr :=accident_nbr}
-							,{allrecs}
-							,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrash0_' + doxie.Version_SuperKey);
-						 	 
+export Key_ECrash0 := index(allrecs,
+                            {string40 l_acc_nbr :=accident_nbr},
+                            {allrecs},
+                            Data_Services.Data_location.Prefix() + 'thor_data400::key::ecrash0_' + doxie.Version_SuperKey);

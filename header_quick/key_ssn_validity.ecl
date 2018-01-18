@@ -1,4 +1,4 @@
-import header, header_quick, experiancred,doxie;
+﻿import header, header_quick, experiancred,doxie, data_services;
 
 //get SSN from header, quick_header and experian credit
 hdr     := header.file_headers(ssn<>'');
@@ -17,4 +17,4 @@ combine_files_dedup := dedup(distribute(combine_files, hash(ssn)),all,local);
 
 hdr_ssn := header.fn_append_ssn_flags(combine_files_dedup);
 
-export key_ssn_validity := index(hdr_ssn, {ssn}, {ssn, ssn_flags_bitmap},'~thor_data400::key::' + header_quick.str_SegmentName + '_SSN_validity_' + Doxie.Version_SuperKey);
+export key_ssn_validity := index(hdr_ssn, {ssn}, {ssn, ssn_flags_bitmap},data_services.data_location.prefix() + 'thor_data400::key::' + header_quick.str_SegmentName + '_SSN_validity_' + Doxie.Version_SuperKey);

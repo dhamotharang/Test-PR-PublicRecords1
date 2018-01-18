@@ -1,4 +1,4 @@
-import fcra, ut, data_services;
+import fcra, data_services;
 
 EXPORT key_Override_Alloy_FFID := FUNCTION
 
@@ -6,8 +6,7 @@ EXPORT key_Override_Alloy_FFID := FUNCTION
 	ds_type := 'alloy';
 	fname_prefix := '~thor_data400::base::override::fcra::qa::';
 	daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-	keyname_prefix := data_services.data_location.prefix('fcra_overrides')+
-	                  'thor_data400::key::override::fcra::'+ds_type+'::qa::';
+	keyname_prefix := data_services.data_location.prefix() + 'thor_data400::key::override::fcra::'+ds_type+'::qa::';
 
  	ds_layout_old := RECORD
    		fcra.layout_override_alloy AND NOT tier2;

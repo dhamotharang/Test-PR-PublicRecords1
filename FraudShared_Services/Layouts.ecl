@@ -121,8 +121,8 @@ EXPORT Layouts := MODULE
     integer responsetime                  {XPATH('_call_latency_ms')};
   END;
 	
-	SHARED STRING30 fragment;
-	SHARED STRING30 contributionType;
+	SHARED STRING60 fragment;
+	SHARED STRING60 contributionType;
 	SHARED STRING30 transactionType;
 
 	EXPORT layout_velocity_in :=  RECORD 	//this layout is for the records found for each customer 

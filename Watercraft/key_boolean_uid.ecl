@@ -1,4 +1,4 @@
-import watercraft,header;
+import watercraft,data_services;
 
 wc_uid := watercraft.Create_Watercraft_file('20070406b');
 
@@ -14,7 +14,7 @@ uid_rec := RECORD
 
 uid_table := dataset([],uid_rec);
 
-export key_boolean_uid := index(uid_table,{uid},{watercraft_key,sequence_key,state_origin},'~thor_data400::key::watercraft::qa::uid_map');
+export key_boolean_uid := index(uid_table,{uid},{watercraft_key,sequence_key,state_origin},data_services.data_location.prefix() + 'thor_data400::key::watercraft::qa::uid_map');
 
 
 

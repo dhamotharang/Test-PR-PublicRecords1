@@ -1,10 +1,10 @@
-IMPORT BIPV2;
+IMPORT BIPV2,data_services;
 
 EXPORT Key_LinkIds := MODULE
 
   // DEFINE THE INDEX
 	shared superfile_name	:= Keynames().linkids.qa;
-//	shared superfile_name	:= '~thor_data400::key::sheila_greco::qa::linkids';
+//	shared superfile_name	:= data_services.data_location.prefix() + 'thor_data400::key::sheila_greco::qa::linkids';
 	
 	shared Base := File_Base;
   

@@ -1,4 +1,4 @@
-import doxie,gong,gong_services,ut,_Control;
+﻿import doxie,gong,gong_services,ut,_Control, data_services;
 
 // Threshold for overly frequent combinations is 5000 instances
 // Any combination with less than 5000 instances will be excluded from the key (query will just search for these);
@@ -158,8 +158,8 @@ surnames_final := surnames_l_final + surnames_lf_final + surnames_ls_final + sur
 
 d:=INDEX(surnames_final,{k_name_last,k_name_first,k_st},{surnames_final},
 	if(_Control.ThisEnvironment.Name='Dataland',
-		'~thor40_241::key::gong_history::fcra::qa::surnames',
-		'~thor_data400::key::gong_history::qa::surnames')
+		data_services.data_location.prefix() + 'thor40_241::key::gong_history::fcra::qa::surnames',
+		data_services.data_location.prefix() + 'thor_data400::key::gong_history::qa::surnames')
 		);
 
 export Key_FCRA_History_Surname := d;

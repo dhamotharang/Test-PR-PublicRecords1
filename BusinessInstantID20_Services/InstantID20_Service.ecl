@@ -66,12 +66,6 @@ EXPORT InstantID20_Service() := MACRO
 			//Look up the industry by the company ID.
 			Industry_Search := Inquiry_AccLogs.Key_Inquiry_industry_use_vertical_login(FALSE)(s_company_id = CompanyID and s_product_id = (String)Risk_Reporting.ProductID.Business_Risk__InstantID_20_Service);
 		/* ************* End Scout Fields **************/
-
-		// Rename #STORED attributes found in the service interface above so they match what 
-		// BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs *only* is expecting. 
-		#STORED('GLBPurpose'                ,_GLBA_Purpose);
-		#STORED('OFAC_version'              ,_OFAC_Version);
-		#STORED('Global_Watchlist_Threshold',_Global_Watchlist_Threshold);
 		
 		ds_Input := DATASET([xfm_LoadInput]); // see this transform in Macros.mac_LoadInput()
 		
@@ -148,14 +142,7 @@ EXPORT InstantID20_Service() := MACRO
 				)
 			);	
 													
-		// 6. Intermediate logging.
-		intermediateLog := DATASET([], Risk_Reporting.Layouts.LOG_BIID20) : STORED('Intermediate_Log');
-		
-		// Note: All intermediate logs must have the following name schema:
-		//    o  Starts with 'LOG_' (Upper case is important!!)
-		//    o  Middle part is the database name, in this case: 'log__mbs'
-		//    o  Must end with '_intermediate__log'
-		OUTPUT(intermediateLog, NAMED('LOG_log__mbs_intermediate__log'));		
+		// 6. Intermediate logging. - no longer exists for this query
 
 		// 7. Calculate Royalties. For SBFE...:		
 		ds_SBFEData := 
@@ -258,7 +245,7 @@ EXPORT InstantID20_Service() := MACRO
 		// #stored('Deltabase_Log', Deltabase_Logging);
 
 		//Improved Scout Logging
-		IF(~DisableOutcomeTracking, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
+		IF(~DisableOutcomeTracking and NOT _TestData_Enabled, OUTPUT(Deltabase_Logging, NAMED('LOG_log__mbs_transaction__log__scout')));
 		
 	// DEBUGs:
 	// OUTPUT( ds_Input, NAMED('Input') );

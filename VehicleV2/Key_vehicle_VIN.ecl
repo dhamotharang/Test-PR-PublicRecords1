@@ -1,4 +1,4 @@
-import VehicleV2, VehLic, Doxie, ut;
+import VehicleV2, Doxie, data_services;
 
 get_recs	:= VehicleV2.file_VehicleV2_Main;
 
@@ -25,7 +25,7 @@ party_norm  := normalize(get_recs(orig_vin != '' or vina_vin != ''), 2, tnormali
 party_dedup := dedup(party_norm(vin <> ''), all);
 
 export Key_vehicle_VIN := index(party_dedup, {VIN, state_origin}, {Vehicle_Key,Iteration_Key},
-'~thor_data400::key::VehicleV2::VIN_'+ doxie.Version_SuperKey);
+data_services.data_location.prefix('Vehicle') + 'thor_data400::key::VehicleV2::VIN_'+ doxie.Version_SuperKey);
 
 
 

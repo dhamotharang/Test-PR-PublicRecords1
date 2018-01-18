@@ -1,4 +1,4 @@
-import ut, Foreclosure_Vacancy;
+import Foreclosure_Vacancy,data_services;
 
 d := seed_files.file_FOVInteractive;
 
@@ -11,5 +11,5 @@ newtable := table(d,newrec);
 
 export key_FOVInteractive := index(newtable,{hashvalue,dataset_name},
 																	{newtable},
-																	'~thor_data400::key::testseed::qa::FOV_Interactive');
+																	data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::FOV_Interactive');
 

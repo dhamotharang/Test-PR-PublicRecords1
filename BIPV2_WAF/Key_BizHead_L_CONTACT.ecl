@@ -1,9 +1,9 @@
 EXPORT Key_BizHead_L_CONTACT := MODULE
  
-IMPORT SALT29,ut,std;
+IMPORT SALT29,ut,std, data_services;
 //fname:lname:?:mname:cnp_name:st:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:p_city_name:prim_range:sec_range
  
-EXPORT KeyName := '~'+'key::BIPV2_WAF::proxid::Refs::L_CONTACT';
+EXPORT KeyName := data_services.data_location.prefix('bipv2') +'key::BIPV2_WAF::proxid::Refs::L_CONTACT';
 SHARED h := CandidatesForKey;//The input file - distributed by proxid
 layout := RECORD // project out required fields
 // Compulsory fields

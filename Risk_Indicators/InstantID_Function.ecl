@@ -1,4 +1,4 @@
-import iesp,_Control,Gateway;
+﻿import iesp,_Control,Gateway;
 
 USE_LIBRARY := not _Control.LibraryUse.ForceOff_Risk_Indicators__LIB_InstantID_Function;
 
@@ -36,7 +36,9 @@ FUNCTION
 in_BSOptions_override := if(in_bsversion >= 50 and in_isFCRA=false, 
 (if(Risk_Indicators.iid_constants.CheckBSOptionFlag(Risk_Indicators.iid_constants.BSOptions.IncludeInsNAP, in_BSOptions), 0, risk_indicators.iid_constants.BSOptions.IncludeInsNAP) + 
  if(Risk_Indicators.iid_constants.CheckBSOptionFlag(Risk_Indicators.iid_constants.BSOptions.IsInstantIDv1, in_BSOptions), 0, risk_indicators.iid_constants.BSOptions.IsInstantIDv1) + 
- if(Risk_Indicators.iid_constants.CheckBSOptionFlag(Risk_Indicators.iid_constants.BSOptions.IncludeInquiries, in_BSOptions), 0, risk_indicators.iid_constants.BSOptions.IncludeInquiries))  +
+ if(Risk_Indicators.iid_constants.CheckBSOptionFlag(Risk_Indicators.iid_constants.BSOptions.IncludeInquiries, in_BSOptions), 0, 
+		if(in_DataRestriction[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue , risk_indicators.iid_constants.BSOptions.IncludeInquiries, 0)
+		))  +
  in_BSOptions,
  in_BSOptions);
 

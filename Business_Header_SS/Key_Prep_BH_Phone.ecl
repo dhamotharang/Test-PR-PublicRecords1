@@ -1,4 +1,4 @@
-IMPORT Business_Header;
+IMPORT Business_Header, data_services;
 
 f_p := Business_Header_SS.File_Prep_BH_CompanyName_Phone_Plus;
 
@@ -16,4 +16,4 @@ END;
 
 EXPORT Key_Prep_BH_Phone := INDEX(
 	f_p, layout_phone_index, 
-	'~thor_data400::key::business_header.Phone_2' + thorlib.wuid());
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.Phone_2' + thorlib.wuid());

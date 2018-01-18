@@ -1,4 +1,4 @@
-IMPORT doxie, iesp,fcra, FFD, Gateway, PersonReports;
+﻿IMPORT doxie, iesp,fcra, FFD, Gateway, PersonReports;
 
 out_rec := personreports.layouts.CommonAssetReportIndividual;
 
@@ -130,7 +130,7 @@ EXPORT  AssetReport (
   individual := dataset ([Format ()]);
 	
 	consumer_statements := if(isFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
-	FFD.MAC.PrepareResultRecord(individual, individual_combined, consumer_statements, 
+	FFD.MAC.PrepareResultRecord(individual, individual_combined, consumer_statements, FFD.Constants.BlankConsumerAlerts, 
 														 out_rec);
 	
 /*  	FFD

@@ -203,6 +203,8 @@ MODULE
    
   // Create RoyaltySet to be returned
  EXPORT dRoyalties := Royalty.GetBatchRoyalties(dRoyaltiesByAcctno, inMod.DetailedRoyalties);
-
- EXPORT Zumigo_History_Recs := IF(inMod.UseZumigoIdentity, Zum_gw_recs.Zumigo_Hist, DATASET([],Phones.Layouts.ZumigoIdentity.zOut));
+ 
+ Zumigo_log_records := DATASET([{Zum_gw_recs.Zumigo_Hist}], Phones.Layouts.ZumigoIdentity.zDeltabaseLog);
+ 
+ EXPORT Zumigo_History_Recs := IF(inMod.UseZumigoIdentity, Zumigo_log_records, DATASET([],Phones.Layouts.ZumigoIdentity.zDeltabaseLog));
 END;

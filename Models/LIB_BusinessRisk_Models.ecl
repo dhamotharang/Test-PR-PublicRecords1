@@ -17,7 +17,7 @@ EXPORT LIB_BusinessRisk_Models(
 											GROUPED DATASET(Business_Risk_BIP.Layouts.Shell) busShell = blankBusShell,
 											Models.BR_LIBIN arguments = blankArguments,
 											GROUPED DATASET(Risk_Indicators.Layout_Boca_Shell) bocaShell = blankBocaShell
-																							) := MODULE
+																							) := INLINE MODULE
 
 	SHARED modelName				:= StringLib.StringToUpperCase(arguments.modelName);
 	SHARED customInputs			:= arguments.Custom_Inputs; // not used

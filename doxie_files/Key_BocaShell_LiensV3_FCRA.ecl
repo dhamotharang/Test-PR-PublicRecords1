@@ -1,4 +1,4 @@
-import doxie, doxie_files, watchdog, bankrupt, ut, risk_indicators, liensv2, fcra, riskwise;
+import doxie, doxie_files, ut, risk_indicators, liensv2, data_services;
 
 liens_party := distribute(LiensV2.file_liens_party,hash(tmsid,rmsid));
 liens_main := distribute(LiensV2.file_liens_main,hash(tmsid,rmsid));
@@ -96,4 +96,7 @@ liens_slimmed := PROJECT (liens_rolled, transform(slimrec,
 						self.liens_recent_released_count := left.liens_recent_released_count,
 						self.liens_historical_released_count := left.liens_historical_released_count));
 						
-export Key_BocaShell_LiensV3_FCRA := index(liens_slimmed, {did}, {liens_slimmed}, '~thor_data400::key::liensv2::fcra::bocashell_did_v2_' + doxie.Version_SuperKey);
+export Key_BocaShell_LiensV3_FCRA := index(liens_slimmed, 
+                                           {did}, 
+                                           {liens_slimmed}, 
+                                           data_services.data_location.prefix() + 'thor_data400::key::liensv2::fcra::bocashell_did_v2_' + doxie.Version_SuperKey);

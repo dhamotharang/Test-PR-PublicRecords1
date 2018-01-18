@@ -1,3 +1,5 @@
+import data_services;
+
 d :=  seed_files.file_CBD;
 
 newrec := record
@@ -7,4 +9,4 @@ end;
 newtable := table(d, newrec);
 
 
-export Key_CBD := index(newtable,{dataset_name,hashvalue}, {newtable}, '~thor_data400::key::testseed::qa::cbd');
+export Key_CBD := index(newtable,{dataset_name,hashvalue}, {newtable}, data_services.data_location.prefix() + 'thor_data400::key::testseed::qa::cbd');

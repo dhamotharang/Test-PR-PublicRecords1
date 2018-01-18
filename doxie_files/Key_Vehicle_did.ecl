@@ -1,4 +1,4 @@
-import doxie_build,doxie;
+import doxie_build,doxie, data_services;
 
 f := File_VehicleContacts;
 
@@ -15,4 +15,7 @@ t := TABLE(f, i_rec);
 r := t(sdid != 0, pick != 0);
 d := DEDUP(r, sdid, seq_no, ALL);
 
-export Key_Vehicle_did := INDEX(d, {d.sdid}, {d.pick, d.seq_no}, '~thor_data400::key::'+doxie_build.buildstate+'vehicle_did_'+doxie.Version_SuperKey);
+export Key_Vehicle_did := INDEX(d, 
+                                {d.sdid}, 
+                                {d.pick, d.seq_no}, 
+                                data_services.data_location.prefix() + 'thor_data400::key::'+doxie_build.buildstate+'vehicle_did_'+doxie.Version_SuperKey);

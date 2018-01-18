@@ -1,4 +1,4 @@
-import VehicleV2, VehLic, Doxie, ut;
+import VehicleV2, Doxie, ut,data_services;
 
 get_recs	:= VehicleV2.file_VehicleV2_Party;
 
@@ -21,4 +21,4 @@ end;
 slim_dedup := dedup(project(slim_party,get_minor(left)), all);
 
 export Key_Vehicle_DID := index(slim_dedup, {Append_DID, is_minor}, {Vehicle_Key,Iteration_Key,Sequence_Key},
-'~thor_data400::key::VehicleV2::DID_'+ doxie.Version_SuperKey);
+data_services.data_location.prefix('Vehicle') + 'thor_data400::key::VehicleV2::DID_'+ doxie.Version_SuperKey);

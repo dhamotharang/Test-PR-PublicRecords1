@@ -1,4 +1,4 @@
-import autokey, doxie_build, header, gong;
+import autokey, doxie_build, header, gong, data_services;
 
 //t := dataset('~thor_data400::Base::HeaderKey_Building',header.Layout_Header,flat);
 //  Bug 12065, use blocked data filter on header instead of raw data
@@ -38,18 +38,18 @@ gong_phone_recs := PROJECT(gong_did+gong_hhid_did, to_phone_rec(LEFT));
 all_phone_recs := header_phone_recs+gong_phone_recs;
 
 autokey.MAC_Wild_Phone(all_phone_recs,
-                              fname,mname,lname,
-						ssn,
-						dob,
-						phone,
-						prim_name,prim_range,st,city_name,zip,sec_range,
-						states,
-						lname1,lname2,lname3,
-						city1,city2,city3,
-						rel_fname1,rel_fname2,rel_fname3,
-						lookups,
-						did,
-						'~thor_data400::key::header.wild.phone',
-						k)
+                       fname,mname,lname,
+                       ssn,
+                       dob,
+                       phone,
+                       prim_name,prim_range,st,city_name,zip,sec_range,
+                       states,
+                       lname1,lname2,lname3,
+                       city1,city2,city3,
+                       rel_fname1,rel_fname2,rel_fname3,
+                       lookups,
+                       did,
+                       data_services.data_location.prefix() + 'thor_data400::key::header.wild.phone',
+                       k)
 						
 export Key_Header_Wild_Phone := k;

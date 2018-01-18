@@ -1,9 +1,4 @@
-﻿/*2017-08-31T13:23:46Z (khuls)
-C:\Users\hulske01\AppData\Roaming\HPCC Systems\eclide\khuls\dataland_dev\Risk_Indicators\Boca_Shell_Derogs_Hist\2017-08-31T13_23_46Z.ecl
-*/
- 
-
-import doxie_files, ut, liensv2, riskwise, property, bankruptcyv3;
+﻿import doxie_files, ut, liensv2, riskwise, property, bankruptcyv3;
 
 export Boca_Shell_Derogs_Hist (GROUPED DATASET(layouts.layout_derogs_input) ids, integer bsversion) := FUNCTION
 															 
@@ -292,8 +287,8 @@ layout_extended get_evictions(liens_full le, liensV2.key_liens_main_ID ri) := tr
 	isSuitsReleased := ftd in iid_constants.setSuits and goodResult and released and (bsversion<50 or (~isEviction));
 
 	isWithin84 := risk_indicators.iid_constants.checkdays(myGetDate,(STRING8)le.date_first_seen,ut.DaysInNYears(7),le.historydate);
-	isAnyUnreleased := isCivilJudgment or isFederalTax or isForeclosure or isLandlordTenant or isLisPendens or isOtherLJ or isOtherTax or isSmallClaims or isSuits;
-	isAnyReleased 	:= isCivilJudgmentReleased or isFederalTaxReleased or isForeclosureReleased or isLandlordTenantReleased or isLisPendensReleased or isOtherLJReleased or isOtherTaxReleased or isSmallClaimsReleased or isSuitsReleased;
+	isAnyUnreleased := (isCivilJudgment or isFederalTax or isForeclosure or isLandlordTenant or isLisPendens or isOtherLJ or isOtherTax or isSmallClaims) and not isSuits;
+	isAnyReleased 	:= (isCivilJudgmentReleased or isFederalTaxReleased or isForeclosureReleased or isLandlordTenantReleased or isLisPendensReleased or isOtherLJReleased or isOtherTaxReleased or isSmallClaimsReleased) and not isSuitsReleased;
 
 	self.liens.liens_unrel_total_amount84 := if(isWithin84 and isAnyUnreleased, (real)ri.amount, 0);
 	self.liens.liens_rel_total_amount84 	:= if(isWithin84 and isAnyReleased, (real)ri.amount, 0);

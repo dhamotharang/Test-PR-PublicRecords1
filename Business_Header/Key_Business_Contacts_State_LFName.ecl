@@ -1,4 +1,4 @@
-import business_header_ss, NID;
+import business_header_ss, NID, data_services;
 
 fbc := File_Prep_Business_Contacts_Plus(state <> '', lname <> '');
 USE_NEW := TRUE;
@@ -11,4 +11,4 @@ EXPORT Key_Business_Contacts_State_LFName :=
 						qstring20 pfname := NID.PreferredFirstNew (fbc.fname,USE_NEW),
 						fname},
 				 {fp := __filepos},
-         '~thor_data400::key::business_contacts.state.lfname_' + business_header_ss.key_version);
+         data_services.data_location.prefix() + 'thor_data400::key::business_contacts.state.lfname_' + business_header_ss.key_version);

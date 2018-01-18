@@ -1,4 +1,4 @@
-IMPORT Business_Header;
+IMPORT Business_Header, data_services;
 
 f_cn := Business_Header_SS.File_BH_CompanyName_Plus;
 
@@ -12,6 +12,6 @@ END;
 
 EXPORT Key_BH_CompanyName := INDEX(
 	f_cn, layout_company_name_index, 
-	'~thor_data400::key::business_header.CompanyName_3_' +  
+	data_services.data_location.prefix() + 'thor_data400::key::business_header.CompanyName_3_' +  
 	//'built');
 	business_header_ss.key_version, OPT);

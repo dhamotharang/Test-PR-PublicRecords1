@@ -1,4 +1,4 @@
-import gong, address, doxie;
+﻿import gong, address, doxie, data_services;
 
 dels_rec := record
 	gong.Layout_gong_deletion,
@@ -22,4 +22,4 @@ file_remove := project(dels_plus(phone7[4..7]<>'XXXX'), get_phone10(left));
 
 export key_remove := index(file_remove(phone10!=''),
                            {l_phone10 := phone10, __fpos}, 
-				       '~thor_data400::key::gong_remove_'+ doxie.Version_SuperKey,OPT);
+				       data_services.data_location.prefix() + 'thor_data400::key::gong_remove_'+ doxie.Version_SuperKey,OPT);

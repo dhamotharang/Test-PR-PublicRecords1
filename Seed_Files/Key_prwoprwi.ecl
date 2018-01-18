@@ -1,4 +1,4 @@
-import ut;
+import data_services;
 
 numrec := record
 	layout_prwoprwi;
@@ -131,4 +131,4 @@ export Key_prwoprwi := index (df,{prodnum, social},{account_out,
 	emailuserflag,
 	emailbrowserflag,
 	hriskemaildomainflag,
-	distaddrdomain}, '~thor_data400::key::seed::qa::prwoprwi');
+	distaddrdomain}, data_services.data_location.prefix() + 'thor_data400::key::seed::qa::prwoprwi');

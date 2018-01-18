@@ -1,10 +1,10 @@
-IMPORT SALT37,std;
+﻿IMPORT SALT37,std, data_services;
 EXPORT Key_InsuranceHeader_(BOOLEAN incremental=FALSE) := MODULE
  
 //SNAME:FNAME:MNAME:?:LNAME:DERIVED_GENDER:+:PRIM_RANGE:PRIM_NAME:SEC_RANGE:CITY:ST:ZIP:SSN5:SSN4:DOB:PHONE:DL_STATE:DL_NBR:SRC:SOURCE_RID:DT_FIRST_SEEN:DT_LAST_SEEN:DT_EFFECTIVE_FIRST:DT_EFFECTIVE_LAST:MAINNAME:FULLNAME:ADDR1:LOCALE:ADDRESS
-EXPORT KeyName := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+Config.KeyInfix+'::DID::Refs';
+EXPORT KeyName := data_services.data_location.prefix()+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+Config.KeyInfix+'::DID::Refs';
  
-EXPORT KeyName_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs';
+EXPORT KeyName_sf := data_services.data_location.prefix() + KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Refs';
  
 EXPORT AssignCurrentKeyToSuperFile := FileServices.AddSuperFile(KeyName_sf,KeyName);
  
@@ -68,9 +68,9 @@ afields0 := NORMALIZE(infile,2,IntoInversion0(LEFT,COUNTER))(word<>'');
 invert_records := nfields_r + nfields24 + afields0;
 SHARED DataForKey0 := Fn_Reduce_UBER_Local( DISTRIBUTE(invert_records,HASH(uid)) );
  
-EXPORT ValueKeyName := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+Config.KeyInfix+'::DID::Words';
+EXPORT ValueKeyName := data_services.data_location.prefix() + KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+Config.KeyInfix+'::DID::Words';
  
-EXPORT ValueKeyName_sf := '~'+KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Words';
+EXPORT ValueKeyName_sf := data_services.data_location.prefix() + KeyPrefix+'::'+'key::InsuranceHeader_xLink'+'::'+KeySuperfile+'::DID::Words';
  
 EXPORT AssignCurrentValueKeyToSuperFile := FileServices.AddSuperFile(ValueKeyName_sf,ValueKeyName);
  

@@ -1,4 +1,4 @@
-import gong, doxie;
+import gong, doxie, data_services;
 
 input_recs := gong.file_daily_full((listing_type_bus = 'B') AND (TRIM(listed_name)<>''));
 
@@ -45,4 +45,4 @@ export Key_st_bizword_city_add :=
 						  string30 word := word,
 							string25 city := city},
              {key_recs},
-		   '~thor_data400::key::gong_eda_st_bizword_city_add_' + doxie.Version_SuperKey, OPT);
+		         data_services.data_location.prefix() + 'thor_data400::key::gong_eda_st_bizword_city_add_' + doxie.Version_SuperKey, OPT);

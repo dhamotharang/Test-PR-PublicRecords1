@@ -1,4 +1,4 @@
-Import Data_Services, doxie, ut, header,lib_stringlib, lib_metaphone;
+﻿Import Data_Services, doxie, ut, header,lib_stringlib, lib_metaphone,data_services;
 
 df := Header.file_Phonetic_equivs_fname;
 
@@ -34,4 +34,4 @@ ds_ph := group(sort(ds_phonetics(ph_fname != ''),ph_fname),ph_fname);
 ds_ph_top_10 := topn(ds_ph, 10, -_count); 
 
 export key_Phonetic_equivs_fname_fcra := index(ds_ph_top_10,{ph_fname}, {fname,_count}, 
-                                  ut.foreign_prod+'thor_data400::key::phonetic_fname_top10_fcra_' + doxie.Version_SuperKey);
+                                  data_services.foreign_prod+'thor_data400::key::phonetic_fname_top10_fcra_' + doxie.Version_SuperKey);

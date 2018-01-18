@@ -1,4 +1,4 @@
-import doxie, gong;
+﻿import data_services, doxie, gong;
 
 f_base := Gong.File_History_Full_Prepped_for_Keys(current_record_flag<>'', listing_type_bus !='' or listing_type_gov != '');
 
@@ -29,4 +29,4 @@ f_cn_norm_dep := dedup(sort(f_cn_norm, record), record);
 
 export key_cn := index(f_cn_norm_dep(metaphonelib.DMetaPhone1(cn) <> ''), 
                        {string6 dph_cn := metaphonelib.DMetaPhone1(cn), cn, st, p_city_name, v_city_name, z5},{listed_name, phone10},
-                       '~thor_data400::key::gong_cn_'+doxie.Version_SuperKey);
+                       data_services.data_location.prefix() + 'thor_data400::key::gong_cn_'+doxie.Version_SuperKey);

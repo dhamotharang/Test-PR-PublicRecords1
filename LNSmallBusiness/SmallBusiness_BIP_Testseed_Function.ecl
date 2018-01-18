@@ -34,12 +34,12 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 	END;
 	
 	// 1. Get the LN SBA Specific Attribute Testseed Results
-	intermediate_layout_without_SBFEAttributes := RECORD
+  intermediate_layout_SBAV10Attributes := RECORD
 		IntermediateLayout_temp;
 		LNSmallBusiness.BIP_Layouts.Version1Attributes;
 	END;
-	
-	intermediate_layout_without_SBFEAttributes getSBAKey(LNSmallBusiness.BIP_Layouts.Input le, Seed_Files.key_SmallBusinessAnalytics ri) := TRANSFORM
+  
+	intermediate_layout_SBAV10Attributes getSBAKey(LNSmallBusiness.BIP_Layouts.Input le, Seed_Files.key_SmallBusinessAnalytics ri) := TRANSFORM
 		SELF.Seq := 1; // XML Testseeds - can only have 1 record on input
 		SELF.AcctNo := ri.AccountNumber;
 		
@@ -262,14 +262,379 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 			getHashValue(LEFT) = RIGHT.HashValue), 
 			getSBAKey(LEFT, RIGHT), LEFT OUTER, KEEP(1), ATMOST(10)
 		);
-	// 2. Get the SBFE SBA Specific Attribute Testseed Results.	
-	intermediate_layout_without_Version1Attributes := RECORD
+    
+	intermediate_layout_SBAV20Attributes := RECORD
 		IntermediateLayout_temp;
-		LNSmallBusiness.BIP_Layouts.SBFEAttributes;
-		
+		LNSmallBusiness.BIP_Layouts.Version2Attributes Version2;
 	END;
 	
-	intermediate_layout_without_Version1Attributes getSBFEKey(LNSmallBusiness.BIP_Layouts.Input le, Seed_Files.key_SmallBusFinancialExchange ri) := TRANSFORM
+  
+	intermediate_layout_SBAV20Attributes getSBA20Key(LNSmallBusiness.BIP_Layouts.Input le, Seed_Files.key_SmallBusinessAnalyticsV20 ri) := TRANSFORM
+		SELF.Seq := 1; // XML Testseeds - can only have 1 record on input
+		SELF.AcctNo := ri.AccountNumber;
+		
+		SELF.Bus_Company_Name := ri.Company_Name;
+		SELF.Version2.LNLexIDPOW := ri.LNLexIDPOW;
+		SELF.Version2.LNLexIDProx := ri.LNLexIDProx;
+		SELF.Version2.LNLexIDSELE := ri.LNLexIDSELE;
+		SELF.Version2.LNLexIDORG := ri.LNLexIDORG;
+		SELF.Version2.LNLexIDULT := ri.LNLexIDULT;
+		SELF.Version2.InputCheckBusName := ri.InputCheckBusName;
+		SELF.Version2.InputCheckBusAltName := ri.InputCheckBusAltName;
+		SELF.Version2.InputCheckBusAddr := ri.InputCheckBusAddr;
+		SELF.Version2.InputCheckBusCity := ri.InputCheckBusCity;
+		SELF.Version2.InputCheckBusState := ri.InputCheckBusState;
+		SELF.Version2.InputCheckBusZip := ri.InputCheckBusZip;
+		SELF.Version2.InputCheckBusFEIN := ri.InputCheckBusFEIN;
+		SELF.Version2.InputCheckBusPhone := ri.InputCheckBusPhone;
+		SELF.Version2.InputCheckBusFax := ri.InputCheckBusFax;
+		SELF.Version2.InputCheckBusNAICS := ri.InputCheckBusNAICS;
+		SELF.Version2.InputCheckBusSIC := ri.InputCheckBusSIC;
+		SELF.Version2.InputCheckBusStartDate := ri.InputCheckBusStartDate;
+		SELF.Version2.InputCheckBusStructure := ri.InputCheckBusStructure;
+		SELF.Version2.InputCheckAnnualRevenue := ri.InputCheckAnnualRevenue;
+		SELF.Version2.InputCheckAuthRepFirstName := ri.InputCheckAuthRepFirstName;
+		SELF.Version2.InputCheckAuthRepMiddleName := ri.InputCheckAuthRepMiddleName;
+		SELF.Version2.InputCheckAuthRepLastName := ri.InputCheckAuthRepLastName;
+		SELF.Version2.InputCheckAuthRepAddr := ri.InputCheckAuthRepAddr;
+		SELF.Version2.InputCheckAuthRepCity := ri.InputCheckAuthRepCity;
+		SELF.Version2.InputCheckAuthRepState := ri.InputCheckAuthRepState;
+		SELF.Version2.InputCheckAuthRepZip := ri.InputCheckAuthRepZip;
+		SELF.Version2.InputCheckAuthRepSSN := ri.InputCheckAuthRepSSN;
+		SELF.Version2.InputCheckAuthRepPhone := ri.InputCheckAuthRepPhone;
+		SELF.Version2.InputCheckAuthRepAge := ri.InputCheckAuthRepAge;
+		SELF.Version2.InputCheckAuthRepDOB := ri.InputCheckAuthRepDOB;
+		SELF.Version2.InputCheckAuthRepDL := ri.InputCheckAuthRepDL;
+		SELF.Version2.InputCheckAuthRepDLState := ri.InputCheckAuthRepDLState;
+		SELF.Version2.InputCheckAuthRepTitle := ri.InputCheckAuthRepTitle;
+		SELF.Version2.InputCheckAuthRep2FirstName := ri.InputCheckAuthRep2FirstName;
+		SELF.Version2.InputCheckAuthRep2MiddleName := ri.InputCheckAuthRep2MiddleName;
+		SELF.Version2.InputCheckAuthRep2LastName := ri.InputCheckAuthRep2LastName;
+		SELF.Version2.InputCheckAuthRep2Addr := ri.InputCheckAuthRep2Addr;
+		SELF.Version2.InputCheckAuthRep2City := ri.InputCheckAuthRep2City;
+		SELF.Version2.InputCheckAuthRep2State := ri.InputCheckAuthRep2State;
+		SELF.Version2.InputCheckAuthRep2Zip := ri.InputCheckAuthRep2Zip;
+		SELF.Version2.InputCheckAuthRep2SSN := ri.InputCheckAuthRep2SSN;
+		SELF.Version2.InputCheckAuthRep2Phone := ri.InputCheckAuthRep2Phone;
+		SELF.Version2.InputCheckAuthRep2Age := ri.InputCheckAuthRep2Age;
+		SELF.Version2.InputCheckAuthRep2DOB := ri.InputCheckAuthRep2DOB;
+		SELF.Version2.InputCheckAuthRep2DL := ri.InputCheckAuthRep2DL;
+		SELF.Version2.InputCheckAuthRep2DLState := ri.InputCheckAuthRep2DLState;
+		SELF.Version2.InputCheckAuthRep2Title := ri.InputCheckAuthRep2Title;
+		SELF.Version2.InputCheckAuthRep3FirstName := ri.InputCheckAuthRep3FirstName;
+		SELF.Version2.InputCheckAuthRep3MiddleName := ri.InputCheckAuthRep3MiddleName;
+		SELF.Version2.InputCheckAuthRep3LastName := ri.InputCheckAuthRep3LastName;
+		SELF.Version2.InputCheckAuthRep3Addr := ri.InputCheckAuthRep3Addr;
+		SELF.Version2.InputCheckAuthRep3City := ri.InputCheckAuthRep3City;
+		SELF.Version2.InputCheckAuthRep3State := ri.InputCheckAuthRep3State;
+		SELF.Version2.InputCheckAuthRep3Zip := ri.InputCheckAuthRep3Zip;
+		SELF.Version2.InputCheckAuthRep3SSN := ri.InputCheckAuthRep3SSN;
+		SELF.Version2.InputCheckAuthRep3Phone := ri.InputCheckAuthRep3Phone;
+		SELF.Version2.InputCheckAuthRep3Age := ri.InputCheckAuthRep3Age;
+		SELF.Version2.InputCheckAuthRep3DOB := ri.InputCheckAuthRep3DOB;
+		SELF.Version2.InputCheckAuthRep3DL := ri.InputCheckAuthRep3DL;
+		SELF.Version2.InputCheckAuthRep3DLState := ri.InputCheckAuthRep3DLState;
+		SELF.Version2.InputCheckAuthRep3Title := ri.InputCheckAuthRep3Title;
+		SELF.Version2.OutBestBusName := ri.OutBestBusName;
+		SELF.Version2.OutBestBusStreetAddr := ri.OutBestBusStreetAddr;
+		SELF.Version2.OutBestBusCity := ri.OutBestBusCity;
+		SELF.Version2.OutBestBusState := ri.OutBestBusState;
+		SELF.Version2.OutBestBusZip := ri.OutBestBusZip;
+		SELF.Version2.OutBestBusFEIN := ri.OutBestBusFEIN;
+		SELF.Version2.OutBestBusPhone := ri.OutBestBusPhone;
+		SELF.Version2.OutBestNAICS := ri.OutBestNAICS;
+		SELF.Version2.OutBestSIC := ri.OutBestSIC;
+		SELF.Version2.LNHitInd := ri.LNHitInd;
+		SELF.Version2.LNInputInd := ri.LNInputInd;
+		SELF.Version2.VerificationBusInputName := ri.VerificationBusInputName;
+		SELF.Version2.VerificationBusInputAltName := ri.VerificationBusInputAltName;
+		SELF.Version2.VerificationBusInputAddr := ri.VerificationBusInputAddr;
+		SELF.Version2.VerificationBusInputPhone := ri.VerificationBusInputPhone;
+		SELF.Version2.VerificationBusInputFEIN := ri.VerificationBusInputFEIN;
+		SELF.Version2.VerificationBusInputIndustry := ri.VerificationBusInputIndustry;
+		SELF.Version2.BusinessRecordTimeOldest := ri.BusinessRecordTimeOldest;
+		SELF.Version2.BusinessRecordTimeNewest := ri.BusinessRecordTimeNewest;
+		SELF.Version2.BusinessRecordUpdated12M := ri.BusinessRecordUpdated12M;
+		SELF.Version2.BusinessActivity03M := ri.BusinessActivity03M;
+		SELF.Version2.BusinessActivity06M := ri.BusinessActivity06M;
+		SELF.Version2.BusinessActivity12M := ri.BusinessActivity12M;
+		SELF.Version2.AddrOwnershipCurrent := ri.AddrOwnershipCurrent;
+		SELF.Version2.AddrAssessedValueCurrent := ri.AddrAssessedValueCurrent;
+		SELF.Version2.AddrLotSizeCurrent := ri.AddrLotSizeCurrent;
+		SELF.Version2.AddrBuildingSizeCurrent := ri.AddrBuildingSizeCurrent;
+		SELF.Version2.FirmNonProfit := ri.FirmNonProfit;
+		SELF.Version2.FirmIRSRetirementPlan := ri.FirmIRSRetirementPlan;
+		SELF.Version2.FirmAgeObserved := ri.FirmAgeObserved;
+		SELF.Version2.FirmAgeEstablished := ri.FirmAgeEstablished;
+		SELF.Version2.FirmEmployeeCount := ri.FirmEmployeeCount;
+		SELF.Version2.FirmOwnershipType := ri.FirmOwnershipType;
+		SELF.Version2.FirmReportedSales := ri.FirmReportedSales;
+		SELF.Version2.FirmParentCompanyInd := ri.FirmParentCompanyInd;
+		SELF.Version2.SOSIncorporationFilingsCount := ri.SOSIncorporationFilingsCount;
+		SELF.Version2.SOSIncorporationTimeOldest := ri.SOSIncorporationTimeOldest;
+		SELF.Version2.SOSStateCount := ri.SOSStateCount;
+		SELF.Version2.SOSStateMatchInputState := ri.SOSStateMatchInputState;
+		SELF.Version2.SOSDomesticCount := ri.SOSDomesticCount;
+		SELF.Version2.SOSForeignCount := ri.SOSForeignCount;
+		SELF.Version2.SOSForeignStateCount := ri.SOSForeignStateCount;
+		SELF.Version2.SOSStandingWorst := ri.SOSStandingWorst;
+		SELF.Version2.SOSStandingBest := ri.SOSStandingBest;
+		SELF.Version2.SOSStandingDefunct := ri.SOSStandingDefunct;
+		SELF.Version2.BankruptcyCount := ri.BankruptcyCount;
+		SELF.Version2.BankruptcyCount12M := ri.BankruptcyCount12M;
+		SELF.Version2.BankruptcyCount24M := ri.BankruptcyCount24M;
+		SELF.Version2.BankruptcyCount84M := ri.BankruptcyCount84M;
+		SELF.Version2.BankruptcyChapter := ri.BankruptcyChapter;
+		SELF.Version2.BankruptcyTimeNewest := ri.BankruptcyTimeNewest;
+		SELF.Version2.LienCount := ri.LienCount;
+		SELF.Version2.LienStateCount := ri.LienStateCount;
+		SELF.Version2.LienStateMatchInputState := ri.LienStateMatchInputState;
+		SELF.Version2.LienTotalAmount := ri.LienTotalAmount;
+		SELF.Version2.LienNewestType := ri.LienNewestType;
+		SELF.Version2.LienTimeOldest := ri.LienTimeOldest;
+		SELF.Version2.LienTimeNewest := ri.LienTimeNewest;
+		SELF.Version2.LienCount03M := ri.LienCount03M;
+		SELF.Version2.LienCount06M := ri.LienCount06M;
+		SELF.Version2.LienCount12M := ri.LienCount12M;
+		SELF.Version2.LienCount24M := ri.LienCount24M;
+		SELF.Version2.LienCount36M := ri.LienCount36M;
+		SELF.Version2.LienCount60M := ri.LienCount60M;
+		SELF.Version2.LienFedTaxCount := ri.LienFedTaxCount;
+		SELF.Version2.LienFedTaxTotalAmount := ri.LienFedTaxTotalAmount;
+		SELF.Version2.LienForeclosureCount := ri.LienForeclosureCount;
+		SELF.Version2.LienForeclosureTotalAmount := ri.LienForeclosureTotalAmount;
+		SELF.Version2.LienTenantCount := ri.LienTenantCount;
+		SELF.Version2.LienTenantTotalAmount := ri.LienTenantTotalAmount;
+		SELF.Version2.LienMechanicalCount := ri.LienMechanicalCount;
+		SELF.Version2.LienMechanicalTotalAmount := ri.LienMechanicalTotalAmount;
+		SELF.Version2.LienOtherCount := ri.LienOtherCount;
+		SELF.Version2.LienOtherTotalAmount := ri.LienOtherTotalAmount;
+		SELF.Version2.JudgmentCount := ri.JudgmentCount;
+		SELF.Version2.JudgmentStateCount := ri.JudgmentStateCount;
+		SELF.Version2.JudgmentStateMatchInputState := ri.JudgmentStateMatchInputState;
+		SELF.Version2.JudgmentTotalAmount := ri.JudgmentTotalAmount;
+		SELF.Version2.JudgmentNewestType := ri.JudgmentNewestType;
+		SELF.Version2.JudgmentTimeOldest := ri.JudgmentTimeOldest;
+		SELF.Version2.JudgmentTimeNewest := ri.JudgmentTimeNewest;
+		SELF.Version2.JudgmentCount03M := ri.JudgmentCount03M;
+		SELF.Version2.JudgmentCount06M := ri.JudgmentCount06M;
+		SELF.Version2.JudgmentCount12M := ri.JudgmentCount12M;
+		SELF.Version2.JudgmentCount24M := ri.JudgmentCount24M;
+		SELF.Version2.JudgmentCount36M := ri.JudgmentCount36M;
+		SELF.Version2.JudgmentCount60M := ri.JudgmentCount60M;
+		SELF.Version2.JudgmentClaimsCount := ri.JudgmentClaimsCount;
+		SELF.Version2.JudgmentClaimsTotalAmount := ri.JudgmentClaimsTotalAmount;
+		SELF.Version2.JudgmentSmallClaimsCount := ri.JudgmentSmallClaimsCount;
+		SELF.Version2.JudgmentSmallClaimsTotalAmount := ri.JudgmentSmallClaimsTotalAmount;
+		SELF.Version2.JudgmentSuitsCount := ri.JudgmentSuitsCount;
+		SELF.Version2.JudgmentsSuitsTotalAmount := ri.JudgmentsSuitsTotalAmount;
+		SELF.Version2.JudgmentsOtherCount := ri.JudgmentsOtherCount;
+		SELF.Version2.JudgmentOtherTotalAmount := ri.JudgmentOtherTotalAmount;
+		SELF.Version2.AssetPropCountEver := ri.AssetPropCountEver;
+		SELF.Version2.AssetPropCountCurrent := ri.AssetPropCountCurrent;
+		SELF.Version2.AssetPropStateCountEver := ri.AssetPropStateCountEver;
+		SELF.Version2.AssetPropStateCountCurrent := ri.AssetPropStateCountCurrent;
+		SELF.Version2.AssetPropLotSizeTotalEver := ri.AssetPropLotSizeTotalEver;
+		SELF.Version2.AssetPropLotSizeTotalCurrent := ri.AssetPropLotSizeTotalCurrent;
+		SELF.Version2.AssetPropSqFootageTotalEver := ri.AssetPropSqFootageTotalEver;
+		SELF.Version2.AssetPropSqFootageTotalCurrent := ri.AssetPropSqFootageTotalCurrent;
+		SELF.Version2.AssetPropAssessedTotalEver := ri.AssetPropAssessedTotalEver;
+		SELF.Version2.AssetPropAssessedTotalCurrent := ri.AssetPropAssessedTotalCurrent;
+		SELF.Version2.AssetAircraftCount := ri.AssetAircraftCount;
+		SELF.Version2.AssetWatercraftCount := ri.AssetWatercraftCount;
+		SELF.Version2.AssetVehicleCount := ri.AssetVehicleCount;
+		SELF.Version2.AssetVehiclePersonalCount := ri.AssetVehiclePersonalCount;
+		SELF.Version2.AssetVehicleCommercialCount := ri.AssetVehicleCommercialCount;
+		SELF.Version2.AssetVehicleOtherCount := ri.AssetVehicleOtherCount;
+		SELF.Version2.UCCCount := ri.UCCCount;
+		SELF.Version2.UCCTimeOldest := ri.UCCTimeOldest;
+		SELF.Version2.UCCTimeNewest := ri.UCCTimeNewest;
+		SELF.Version2.UCCActiveCount := ri.UCCActiveCount;
+		SELF.Version2.UCCTerminatedCount := ri.UCCTerminatedCount;
+		SELF.Version2.UCCOtherCount := ri.UCCOtherCount;
+		SELF.Version2.UCCRoles := ri.UCCRoles;
+		SELF.Version2.UCCRolesActive := ri.UCCRolesActive;
+		SELF.Version2.GovernmentDebarred := ri.GovernmentDebarred;
+		SELF.Version2.B2BProviderAvg12M := ri.B2BProviderAvg12M;
+		SELF.Version2.B2BProviderDelta12M := ri.B2BProviderDelta12M;
+		SELF.Version2.B2BProviderDelta24M := ri.B2BProviderDelta24M;
+		SELF.Version2.B2BSpendCategories12M := ri.B2BSpendCategories12M;
+		SELF.Version2.B2BSpendTotal12M := ri.B2BSpendTotal12M;
+		SELF.Version2.B2BSpendDelta12M := ri.B2BSpendDelta12M;
+		SELF.Version2.B2BSpendDelta24M := ri.B2BSpendDelta24M;
+		SELF.Version2.B2BDBTAvg03 := ri.B2BDBTAvg03;
+		SELF.Version2.B2B30DBT12MInd := ri.B2B30DBT12MInd;
+		SELF.Version2.B2B60DBT12MInd := ri.B2B60DBT12MInd;
+		SELF.Version2.B2B90DBT12Ind := ri.B2B90DBT12Ind;
+		SELF.Version2.B2BDBT30Delta12M := ri.B2BDBT30Delta12M;
+		SELF.Version2.B2BDBT30Delta24M := ri.B2BDBT30Delta24M;
+		SELF.Version2.B2BDBT60Delta12M := ri.B2BDBT60Delta12M;
+		SELF.Version2.B2BDBT60Delta24M := ri.B2BDBT60Delta24M;
+		SELF.Version2.B2BPaid12M := ri.B2BPaid12M;
+		SELF.Version2.B2BBalanceAvg03M := ri.B2BBalanceAvg03M;
+		SELF.Version2.InquiryCount := ri.InquiryCount;
+		SELF.Version2.InquiryCount03M := ri.InquiryCount03M;
+		SELF.Version2.InquiryCount06M := ri.InquiryCount06M;
+		SELF.Version2.InquiryCount12M := ri.InquiryCount12M;
+		SELF.Version2.InquiryCount24M := ri.InquiryCount24M;
+		SELF.Version2.InquiryCreditCount := ri.InquiryCreditCount;
+		SELF.Version2.InquiryCreditCount03M := ri.InquiryCreditCount03M;
+		SELF.Version2.InquiryCreditCount06M := ri.InquiryCreditCount06M;
+		SELF.Version2.InquiryCreditCount12M := ri.InquiryCreditCount12M;
+		SELF.Version2.InquiryCreditCount24M := ri.InquiryCreditCount24M;
+		SELF.Version2.InquiryHighRiskCount := ri.InquiryHighRiskCount;
+		SELF.Version2.InquiryHighRiskCount03M := ri.InquiryHighRiskCount03M;
+		SELF.Version2.InquiryHighRiskCount06M := ri.InquiryHighRiskCount06M;
+		SELF.Version2.InquiryHighRiskCount12M := ri.InquiryHighRiskCount12M;
+		SELF.Version2.InquiryHighRiskCount24M := ri.InquiryHighRiskCount24M;
+		SELF.Version2.InquiryOtherCount := ri.InquiryOtherCount;
+		SELF.Version2.InquiryOtherCount03M := ri.InquiryOtherCount03M;
+		SELF.Version2.InquiryOtherCount06M := ri.InquiryOtherCount06M;
+		SELF.Version2.InquiryOtherCount12M := ri.InquiryOtherCount12M;
+		SELF.Version2.InquiryOtherCount24M := ri.InquiryOtherCount24M;
+		SELF.Version2.BusExecLinkRepNameOnFile := ri.BusExecLinkRepNameOnFile;
+		SELF.Version2.BusExecLinkRepAddrOnFile := ri.BusExecLinkRepAddrOnFile;
+		SELF.Version2.BusExecLinkRepPhoneOnFile := ri.BusExecLinkRepPhoneOnFile;
+		SELF.Version2.BusExecLinkRepSSNOnFile := ri.BusExecLinkRepSSNOnFile;
+		SELF.Version2.BusExecLinkBusNameRepFirst := ri.BusExecLinkBusNameRepFirst;
+		SELF.Version2.BusExecLinkBusNameRepLast := ri.BusExecLinkBusNameRepLast;
+		SELF.Version2.BusExecLinkBusNameRepFull := ri.BusExecLinkBusNameRepFull;
+		SELF.Version2.BusExecLinkRepAddrBusAddr := ri.BusExecLinkRepAddrBusAddr;
+		SELF.Version2.BusExecLinkRepPhoneBusPhone := ri.BusExecLinkRepPhoneBusPhone;
+		SELF.Version2.BusExecLinkRepSSNBusFEIN := ri.BusExecLinkRepSSNBusFEIN;
+		SELF.Version2.BusExecLinkUtilOverlapCount := ri.BusExecLinkUtilOverlapCount;
+		SELF.Version2.BusExecLinkInqOverlapCount := ri.BusExecLinkInqOverlapCount;
+		SELF.Version2.BusExecLinkPropOverlapCount := ri.BusExecLinkPropOverlapCount;
+		SELF.Version2.BusExecLinkBusAddrRepOwned := ri.BusExecLinkBusAddrRepOwned;
+		SELF.Version2.BusExecLinkRep2NameOnFile := ri.BusExecLinkRep2NameOnFile;
+		SELF.Version2.BusExecLinkRep2AddrOnFile := ri.BusExecLinkRep2AddrOnFile;
+		SELF.Version2.BusExecLinkRep2PhoneOnFile := ri.BusExecLinkRep2PhoneOnFile;
+		SELF.Version2.BusExecLinkRep2SSNOnFile := ri.BusExecLinkRep2SSNOnFile;
+		SELF.Version2.BusExecLinkBusNameRep2First := ri.BusExecLinkBusNameRep2First;
+		SELF.Version2.BusExecLinkBusNameRep2Last := ri.BusExecLinkBusNameRep2Last;
+		SELF.Version2.BusExecLinkBusNameRep2Full := ri.BusExecLinkBusNameRep2Full;
+		SELF.Version2.BusExecLinkRep2AddrBusAddr := ri.BusExecLinkRep2AddrBusAddr;
+		SELF.Version2.BusExecLinkRep2PhoneBusPhone := ri.BusExecLinkRep2PhoneBusPhone;
+		SELF.Version2.BusExecLinkRep2SSNBusFEIN := ri.BusExecLinkRep2SSNBusFEIN;
+		SELF.Version2.BusExecLinkUtilOverlapCount2 := ri.BusExecLinkUtilOverlapCount2;
+		SELF.Version2.BusExecLinkInqOverlapCount2 := ri.BusExecLinkInqOverlapCount2;
+		SELF.Version2.BusExecLinkPropOverlapCount2 := ri.BusExecLinkPropOverlapCount2;
+		SELF.Version2.BusExecLinkBusAddrRep2Owned := ri.BusExecLinkBusAddrRep2Owned;
+		SELF.Version2.BusExecLinkRep3NameOnFile := ri.BusExecLinkRep3NameOnFile;
+		SELF.Version2.BusExecLinkRep3AddrOnFile := ri.BusExecLinkRep3AddrOnFile;
+		SELF.Version2.BusExecLinkRep3PhoneOnFile := ri.BusExecLinkRep3PhoneOnFile;
+		SELF.Version2.BusExecLinkRep3SSNOnFile := ri.BusExecLinkRep3SSNOnFile;
+		SELF.Version2.BusExecLinkBusNameRep3First := ri.BusExecLinkBusNameRep3First;
+		SELF.Version2.BusExecLinkBusNameRep3Last := ri.BusExecLinkBusNameRep3Last;
+		SELF.Version2.BusExecLinkBusNameRep3Full := ri.BusExecLinkBusNameRep3Full;
+		SELF.Version2.BusExecLinkRep3AddrBusAddr := ri.BusExecLinkRep3AddrBusAddr;
+		SELF.Version2.BusExecLinkRep3PhoneBusPhone := ri.BusExecLinkRep3PhoneBusPhone;
+		SELF.Version2.BusExecLinkRep3SSNBusFEIN := ri.BusExecLinkRep3SSNBusFEIN;
+		SELF.Version2.BusExecLinkUtilOverlapCount3 := ri.BusExecLinkUtilOverlapCount3;
+		SELF.Version2.BusExecLinkInqOverlapCount3 := ri.BusExecLinkInqOverlapCount3;
+		SELF.Version2.BusExecLinkPropOverlapCount3 := ri.BusExecLinkPropOverlapCount3;
+		SELF.Version2.BusExecLinkBusAddrRep3Owned := ri.BusExecLinkBusAddrRep3Owned;
+		SELF.Version2.BusAddrPersonNameOverlap := ri.BusAddrPersonNameOverlap;
+		SELF.Version2.BusAddrPersonNameAltNameOverlap := ri.BusAddrPersonNameAltNameOverlap;
+		SELF.Version2.BusFEINPersonAddrOverlap := ri.BusFEINPersonAddrOverlap;
+		SELF.Version2.BusFEINPersonPhoneOverlap := ri.BusFEINPersonPhoneOverlap;
+		SELF.Version2.BusFEINPersonOverlap := ri.BusFEINPersonOverlap;
+		SELF.Version2.InputAddrConsumerCount := ri.InputAddrConsumerCount;
+		SELF.Version2.InputFEINEntityCount := ri.InputFEINEntityCount;
+		SELF.Version2.InputPhoneEntityCount := ri.InputPhoneEntityCount;
+		SELF.Version2.InputBusAddrCurrentCount := ri.InputBusAddrCurrentCount;
+		SELF.Version2.InputAddrFEINCount := ri.InputAddrFEINCount;
+		SELF.Version2.InputBusNameOtherBusNameMatch := ri.InputBusNameOtherBusNameMatch;
+		SELF.Version2.InputBusNameDBAMatch := ri.InputBusNameDBAMatch;
+		SELF.Version2.InputAltNameBusNameMatch := ri.InputAltNameBusNameMatch;
+		SELF.Version2.InputAltNameOtherBusNameMatch := ri.InputAltNameOtherBusNameMatch;
+		SELF.Version2.InputAltNameDBAMatch := ri.InputAltNameDBAMatch;
+		SELF.Version2.InputAddrValid := ri.InputAddrValid;
+		SELF.Version2.InputAddrPoBox := ri.InputAddrPoBox;
+		SELF.Version2.InputAddrType := ri.InputAddrType;
+		SELF.Version2.InputAddrZipMismatch := ri.InputAddrZipMismatch;
+		SELF.Version2.InputAddrVacancy := ri.InputAddrVacancy;
+		SELF.Version2.InputAddrTimeOldest := ri.InputAddrTimeOldest;
+		SELF.Version2.InputAddrOwnership := ri.InputAddrOwnership;
+		SELF.Version2.InputAddrAssessedValue := ri.InputAddrAssessedValue;
+		SELF.Version2.InputAddrLotSize := ri.InputAddrLotSize;
+		SELF.Version2.InputAddrBuildingSize := ri.InputAddrBuildingSize;
+		SELF.Version2.InputPhoneMismatch := ri.InputPhoneMismatch;
+		SELF.Version2.InputPhoneDisconnected := ri.InputPhoneDisconnected;
+		SELF.Version2.InputPhoneValid := ri.InputPhoneValid;
+		SELF.Version2.InputPhoneType := ri.InputPhoneType;
+		SELF.Version2.InputPhoneResidential := ri.InputPhoneResidential;
+		SELF.Version2.InputPhoneProblems := ri.InputPhoneProblems;
+		SELF.Version2.InputFEINBIIMismatch := ri.InputFEINBIIMismatch;
+		SELF.Version2.InputFEINHitIndex := ri.InputFEINHitIndex;
+		SELF.Version2.AssociateCount := ri.AssociateCount;
+		SELF.Version2.AssociateBusinessCount := ri.AssociateBusinessCount;
+		SELF.Version2.AssociateFelonyCount := ri.AssociateFelonyCount;
+		SELF.Version2.AssociateCountWithFelony := ri.AssociateCountWithFelony;
+		SELF.Version2.AssociateBankruptCount := ri.AssociateBankruptCount;
+		SELF.Version2.AssociateCountWithBankruptcy := ri.AssociateCountWithBankruptcy;
+		SELF.Version2.AssociateBankrupt12MCount := ri.AssociateBankrupt12MCount;
+		SELF.Version2.AssociateLienCount := ri.AssociateLienCount;
+		SELF.Version2.AssociateCountWithLien := ri.AssociateCountWithLien;
+		SELF.Version2.AssociateJudgmentCount := ri.AssociateJudgmentCount;
+		SELF.Version2.AssociateCountWithJudgment := ri.AssociateCountWithJudgment;
+		SELF.Version2.AssociateCityCount := ri.AssociateCityCount;
+		SELF.Version2.AssociateCountyCount := ri.AssociateCountyCount;
+		SELF.Version2.AssociateHighRiskAddrCount := ri.AssociateHighRiskAddrCount;
+		SELF.Version2.AssociateHighCrimeAddrCount := ri.AssociateHighCrimeAddrCount;
+		SELF.Version2.AssociateCurrCount := ri.AssociateCurrCount;
+		SELF.Version2.AssociateCurrCountWithFelony := ri.AssociateCurrCountWithFelony;
+		SELF.Version2.AssociateCurrCountWithBkrpt := ri.AssociateCurrCountWithBkrpt;
+		SELF.Version2.AssociateCurrCountWithLien := ri.AssociateCurrCountWithLien;
+		SELF.Version2.AssociateCurrCountWithJudgment := ri.AssociateCurrCountWithJudgment;
+		SELF.Version2.AssociateCurrCountWithProp := ri.AssociateCurrCountWithProp;
+		SELF.Version2.AssociateCurrBusinessesTotal := ri.AssociateCurrBusinessesTotal;
+		SELF.Version2.AssociateCurrSOSCount := ri.AssociateCurrSOSCount;
+
+		SELF.ModelResults := DATASET([], iesp.smallbusinessanalytics.t_SBAModelHRI);
+		
+		SELF.HistoryDateYYYYMM := le.HistoryDateYYYYMM;
+		SELF.HistoryDate := le.HistoryDate;
+		SELF.Input_Echo := le;
+		
+    SELF := le;
+		SELF := ri;
+		SELF := [];
+	END;
+	
+	lnSBA20keyResults := 
+		JOIN(
+			Input, Seed_Files.key_SmallBusinessAnalyticsV20, 
+			KEYED(TestDataTableName = RIGHT.TestDataTableName AND 
+			getHashValue(LEFT) = RIGHT.HashValue), 
+			getSBA20Key(LEFT, RIGHT), LEFT OUTER, KEEP(1), ATMOST(10)
+		);
+    
+	intermediate_layout_without_SBFEAttributes := RECORD
+		IntermediateLayout_temp;
+		LNSmallBusiness.BIP_Layouts.Version1Attributes;
+		LNSmallBusiness.BIP_Layouts.Version2Attributes Version2;
+	END;
+	
+  
+  lnSBAAllkeyResults :=
+		JOIN(
+			lnSBAkeyResults, lnSBA20keyResults, 
+			LEFT.seq = RIGHT.seq,
+			TRANSFORM(intermediate_layout_without_SBFEAttributes,
+				SELF := LEFT,
+				SELF := RIGHT,
+				SELF := []
+			),
+			LEFT OUTER, KEEP(1), ATMOST(10)
+		);
+  
+	intermediate_layout_without_SBAAttributes := RECORD
+		IntermediateLayout_temp;
+		LNSmallBusiness.BIP_Layouts.SBFEAttributes;
+	END;
+
+	intermediate_layout_without_SBAAttributes getSBFEKey(LNSmallBusiness.BIP_Layouts.Input le, Seed_Files.key_SmallBusFinancialExchange ri) := TRANSFORM
 		SELF.Seq := 1; // XML Testseeds - can only have 1 record on input
 		SELF.AcctNo := ri.AccountNumber;
 		SELF.Bus_Company_Name := ri.Company_Name;
@@ -2144,7 +2509,7 @@ EXPORT SmallBusiness_BIP_Testseed_Function (
 	// Now join the two attribute datasets together.
 	keyResults := 
 		JOIN(
-			lnSBAkeyResults, SBFEkeyResults, 
+			lnSBAAllkeyResults, SBFEkeyResults, 
 			LEFT.seq = RIGHT.seq,
 			TRANSFORM( LNSmallBusiness.BIP_Layouts.IntermediateLayout,
 				SELF := LEFT,

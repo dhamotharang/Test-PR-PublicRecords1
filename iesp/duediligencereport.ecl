@@ -26,13 +26,13 @@ export t_DDRHighRiskNewsProfiles := record
 	iesp.share.t_Name IndividualName {xpath('IndividualName')};
 	string Category {xpath('Category')};
 	iesp.share.t_Date Date {xpath('Date')};
-	dataset(t_DDRMatchSummary) MatchSummaries {xpath('MatchSummaries/MatchSummary'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxRecords)};
+	dataset(t_DDRMatchSummary) MatchSummaries {xpath('MatchSummaries/MatchSummary'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxMatchSummaries)};
 end;
 		
 export t_DDRAdverseMediaDataDetails := record
 	integer2 NumberOfBusinesses {xpath('NumberOfBusinesses')};
 	integer2 NumberOfBusinessExecutiveOfficers {xpath('NumberOfBusinessExecutiveOfficers')};
-	dataset(t_DDRHighRiskNewsProfiles) HighRiskNewsProfiles {xpath('HighRiskNewsProfiles/HighRiskNewsProfile'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxRecords)};
+	dataset(t_DDRHighRiskNewsProfiles) HighRiskNewsProfiles {xpath('HighRiskNewsProfiles/HighRiskNewsProfile'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxNewsProfiles)};
 end;
 		
 export t_DDRComponentsOfBusiness := record
@@ -63,7 +63,7 @@ export t_DDRVINNumber := record
 end;
 		
 export t_DDRAdditionalDetails := record
-	string4 DetailType {xpath('DetailType')};
+	string50 DetailType {xpath('DetailType')};
 end;
 		
 export t_DDRTitleInfo := record
@@ -91,16 +91,21 @@ export t_DDRAreaRisk := record
 	boolean Hifca {xpath('Hifca')};
 	boolean Hidta {xpath('Hidta')};
 	string CrimeIndex {xpath('CrimeIndex')};
-	integer2 NumberOfNeighborhoodFelons {xpath('NumberOfNeighborhoodFelons')};
-	integer2 NumberOfHighRiskBusinesses {xpath('NumberOfHighRiskBusinesses')};
-	integer2 NumberOfVacantProperties {xpath('NumberOfVacantProperties')};
 end;
 		
 export t_DDRCountyCityRisk := record
 	string CountyName {xpath('CountyName')};
 	boolean BoardersForeignJurisdiction {xpath('BoardersForeignJurisdiction')};
 	boolean BoardersOceanWithin150ForeignJurisdiction {xpath('BoardersOceanWithin150ForeignJurisdiction')};
-	boolean CityHasAccessViaStationOrCrossing {xpath('CityHasAccessViaStationOrCrossing')};
+	boolean AccessThroughBoarderStation {xpath('AccessThroughBoarderStation')};
+	boolean AccessThroughRailCrossing {xpath('AccessThroughRailCrossing')};
+	boolean AccessThroughFerryCrossing {xpath('AccessThroughFerryCrossing')};
+end;
+		
+export t_DDRTenant := record
+	string LexID {xpath('LexID')};
+	iesp.share.t_Name Name {xpath('Name')};
+	iesp.share.t_Date DateOfBirth {xpath('DateOfBirth')};
 end;
 		
 export t_DDRProperty := record
@@ -113,25 +118,29 @@ export t_DDRProperty := record
 	t_DDRTaxAssessmentValues MostRecentTax {xpath('MostRecentTax')};
 	t_DDRAreaRisk AreaRisk {xpath('AreaRisk')};
 	t_DDRCountyCityRisk CountyRisk {xpath('CountyRisk')};
-	string ResidentTennant {xpath('ResidentTennant')};
+	dataset(t_DDRTenant) ResidentTennants {xpath('ResidentTennants/ResidentTennant'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxTennants)};
 end;
 		
 export t_DDRAircraft := record
 	integer2 Sequence {xpath('Sequence')};
 	t_DDRYearMakeModel Aircraft {xpath('Aircraft')};
 	t_DDRAdditionalDetails _Type {xpath('Type')};
+	integer1 NumberOfEngines {xpath('NumberOfEngines')};
+	string50 TailNumber {xpath('TailNumber')};
 	t_DDRVINNumber VIN {xpath('VIN')};
-	t_DDRTitleInfo Title {xpath('Title')};
-	t_DDRRegistration Registration {xpath('Registration')};
+	iesp.share.t_Date RegistrationDate {xpath('RegistrationDate')};
 end;
 		
 export t_DDRWatercraft := record
 	integer2 Sequence {xpath('Sequence')};
 	t_DDRYearMakeModel Watercraft {xpath('Watercraft')};
 	t_DDRAdditionalDetails VesselType {xpath('VesselType')};
-	integer2 VesselLength {xpath('VesselLength')};
 	t_DDRTitleInfo Title {xpath('Title')};
 	t_DDRRegistration Registration {xpath('Registration')};
+	integer2 LengthInches {xpath('LengthInches')};
+	integer2 Lengthfeet {xpath('Lengthfeet')};
+	t_DDRVINNumber VIN {xpath('VIN')};
+	string25 Propulsion {xpath('Propulsion')};
 end;
 		
 export t_DDRSOSActions := record
@@ -162,22 +171,22 @@ end;
 export t_DDRBusinessPropertyOwnership := record
 	integer2 PropertyCurrentCount {xpath('PropertyCurrentCount')};
 	integer8 TaxAssessedValue {xpath('TaxAssessedValue')};
-	dataset(t_DDRProperty) Properties {xpath('Properties/Property'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxAssets)};
+	dataset(t_DDRProperty) Properties {xpath('Properties/Property'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxProperties)};
 end;
 		
 export t_DDRBusinessAircraftOwnership := record
 	integer2 AircraftCount {xpath('AircraftCount')};
-	dataset(t_DDRAircraft) Aircrafts {xpath('Aircrafts/Aircraft'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxAssets)};
+	dataset(t_DDRAircraft) Aircrafts {xpath('Aircrafts/Aircraft'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxAircraft)};
 end;
 		
 export t_DDRBusinessWatercraftOwnership := record
 	integer2 WatercraftCount {xpath('WatercraftCount')};
-	dataset(t_DDRWatercraft) Watercrafts {xpath('Watercrafts/Watercraft'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxAssets)};
+	dataset(t_DDRWatercraft) Watercrafts {xpath('Watercrafts/Watercraft'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxWatercraft)};
 end;
 		
 export t_DDRBusinessMotorVehicleOwnership := record
 	integer2 MotorVehicleCount {xpath('MotorVehicleCount')};
-	dataset(t_DDRMotorVehicle) MotorVehicles {xpath('MotorVehicles/MotorVehicle'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxAssets)};
+	dataset(t_DDRMotorVehicle) MotorVehicles {xpath('MotorVehicles/MotorVehicle'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxVehicles)};
 end;
 		
 export t_DDREconomicAttributeDataDetails := record
@@ -202,59 +211,92 @@ end;
 		
 export t_DDRBusinessOperatingLocations := record
 	integer2 OperatingLocationCount {xpath('OperatingLocationCount')};
-	dataset(t_DDRBusinessAddressRisk) OperatingLocations {xpath('OperatingLocations/OperatingLocation'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxAssets)};
+	dataset(t_DDRBusinessAddressRisk) OperatingLocations {xpath('OperatingLocations/OperatingLocation'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxOperatingLocations)};
+end;
+		
+export t_DDRReportingSources := record
+	string50 SourceName {xpath('SourceName')};
+	string25 SourceType {xpath('SourceType')};
+	iesp.share.t_Date FirstReported {xpath('FirstReported')};
+	iesp.share.t_Date LastReported {xpath('LastReported')};
+end;
+		
+export t_DDRSICNAIC := record
+	string8 SICCode {xpath('SICCode')};
+	string8 NAICSCode {xpath('NAICSCode')};
+	string50 Description {xpath('Description')};
+	iesp.share.t_Date FirstReported {xpath('FirstReported')};
+	iesp.share.t_Date LastReported {xpath('LastReported')};
+	string10 IndustryRisk {xpath('IndustryRisk')};
+	boolean CashIntensiveRetail {xpath('CashIntensiveRetail')};
+	boolean CashIntensiveNonRetail {xpath('CashIntensiveNonRetail')};
+	boolean MoneyServiceBusiness {xpath('MoneyServiceBusiness')};
+	boolean NonBankFinancialInstituion {xpath('NonBankFinancialInstituion')};
+	boolean CasinoOrGamblingRelated {xpath('CasinoOrGamblingRelated')};
+	boolean LegalAccountantTelemarketerFlightOrTravel {xpath('LegalAccountantTelemarketerFlightOrTravel')};
+	boolean Automotive {xpath('Automotive')};
+end;
+		
+export t_SOSFiling := record
+	string SOSFilingStatus {xpath('SOSFilingStatus')};
+	iesp.share.t_Date SOSIncorporationDate {xpath('SOSIncorporationDate')};
+	string SOSIncorporationState {xpath('SOSIncorporationState')};
+	iesp.share.t_Date SOSLastUpdated {xpath('SOSLastUpdated')};
+	dataset(t_DDRSOSActions) SOSActions {xpath('SOSActions/SOSAction'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxActions)};
 end;
 		
 export t_DDRBusinessOperatingInformation := record
 	iesp.share.t_Date FirstReported {xpath('FirstReported')};
 	iesp.share.t_Date LastReported {xpath('LastReported')};
 	integer2 NumberOfBureauReporting {xpath('NumberOfBureauReporting')};
+	dataset(t_DDRReportingSources) ReportingBureaus {xpath('ReportingBureaus/ReportingBureau'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxReportingBureaus)};
 	boolean RegisteredBusiness {xpath('RegisteredBusiness')};
 	integer2 NumberOfSourcesReporting {xpath('NumberOfSourcesReporting')};
-	string SOSFilingStatus {xpath('SOSFilingStatus')};
-	iesp.share.t_Date SOSIncorporationDate {xpath('SOSIncorporationDate')};
-	string SOSIncorporationState {xpath('SOSIncorporationState')};
-	iesp.share.t_Date SOSLastUpdated {xpath('SOSLastUpdated')};
-	dataset(t_DDRSOSActions) SOSActions {xpath('SOSActions/SOSAction'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxActions)};
-	string SICCode {xpath('SICCode')};
-	string SICDescription {xpath('SICDescription')};
-	string NAICSCode {xpath('NAICSCode')};
-	string NAICSDescription {xpath('NAICSDescription')};
-	string NAICSIndustryRisk {xpath('NAICSIndustryRisk')};
-	string SICIndustryRisk {xpath('SICIndustryRisk')};
-	boolean CashIntensive {xpath('CashIntensive')};
-	boolean MoneyServiceBusiness {xpath('MoneyServiceBusiness')};
-	boolean NonBankFinancialInstituion {xpath('NonBankFinancialInstituion')};
-	boolean CasinoOrGamblingRelated {xpath('CasinoOrGamblingRelated')};
-	boolean LegalAccountantTelemarketerFlightOrTravel {xpath('LegalAccountantTelemarketerFlightOrTravel')};
-	boolean Automotive {xpath('Automotive')};
+	dataset(t_DDRReportingSources) ReportingSources {xpath('ReportingSources/ReportingSource'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxReportingSources)};
+	dataset(t_SOSFiling) SOSFilingStatuses {xpath('SOSFilingStatuses/SOSFilingStatus'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxSOSFilingStatuses)};
+	dataset(t_DDRSICNAIC) SICNAICs {xpath('SICNAICs/SICNAIC'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxSICNAICs)};
 	dataset(t_DDRComponentsOfBusiness) BusinessNameVariations {xpath('BusinessNameVariations/Variation'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxBusinesses)};
 	string FEIN {xpath('FEIN')};
 	boolean FEINIsSSN {xpath('FEINIsSSN')};
-	dataset(iesp.share.t_Name) SSNAssociatedWith {xpath('SSNAssociatedWith/Name'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxBusinesses)};
+	dataset(iesp.share.t_Name) SSNAssociatedWith {xpath('SSNAssociatedWith/Name'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxSSNAssociations)};
 	boolean OperatesOutOfAHomeOffice {xpath('OperatesOutOfAHomeOffice')};
 	string Filing {xpath('Filing')};
 	string StructureType {xpath('StructureType')};
 	string ParentCompany {xpath('ParentCompany')};
 end;
 		
+export t_DDRRegisteredAgent := record
+	iesp.share.t_Name Name {xpath('Name')};
+	iesp.share.t_Address Address {xpath('Address')};
+	boolean AgentAndBusinessShareAddress {xpath('AgentAndBusinessShareAddress')};
+end;
+		
 export t_DDRBusinessShellShelfCharacteristics := record
 	boolean IncorporatedInStateWithLooseIncorpLaws {xpath('IncorporatedInStateWithLooseIncorpLaws')};
 	string IncoporationState {xpath('IncoporationState')};
+	string20 FEINReported {xpath('FEINReported')};
+	integer2 NumberOfSourcesReporting {xpath('NumberOfSourcesReporting')};
+	string SourcesReporting {xpath('SourcesReporting')};
 	boolean BetterBusinessBureau {xpath('BetterBusinessBureau')};
 	boolean YellowPages {xpath('YellowPages')};
-	boolean BureauSources {xpath('BureauSources')};
-	boolean GovernmentSources {xpath('GovernmentSources')};
-	boolean UtilitySources {xpath('UtilitySources')};
+	integer2 NumberOfBureauReporting {xpath('NumberOfBureauReporting')};
+	t_DDRReportingSources BureauSources {xpath('BureauSources')};
+	integer2 NumberOfGovernmentSources {xpath('NumberOfGovernmentSources')};
+	t_DDRReportingSources GovernmentSources {xpath('GovernmentSources')};
+	integer2 NumberOfUtilitySources {xpath('NumberOfUtilitySources')};
+	t_DDRReportingSources UtilitySources {xpath('UtilitySources')};
 	integer2 NumberOfBusinessesFoundAtAddress {xpath('NumberOfBusinessesFoundAtAddress')};
 	integer2 NumberOfIncorporatedInStateWithLooseIncorpLaws {xpath('NumberOfIncorporatedInStateWithLooseIncorpLaws')};
 	integer2 NumberOfBusinessWithNoFEIN {xpath('NumberOfBusinessWithNoFEIN')};
-	boolean AddressPrivatePostMailDropRemailerStorageFacilityOrUndeliverable {xpath('AddressPrivatePostMailDropRemailerStorageFacilityOrUndeliverable')};
-	boolean IncludesRegisteredAgent {xpath('IncludesRegisteredAgent')};
-	dataset(iesp.share.t_Name) RegisteredAgents {xpath('RegisteredAgents/Agent'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxPersonNames)};
+	boolean AddressPrivatePost {xpath('AddressPrivatePost')};
+	boolean AddressMailDrop {xpath('AddressMailDrop')};
+	boolean AddressRemailer {xpath('AddressRemailer')};
+	boolean AddressStorageFacility {xpath('AddressStorageFacility')};
+	boolean AddressUndeliverableSecondaryRange {xpath('AddressUndeliverableSecondaryRange')};
+	string25 AgentSource {xpath('AgentSource')};
+	dataset(iesp.share.t_Name) RegisteredAgents {xpath('RegisteredAgents/Agent'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxAgents)};
 	boolean AppearsAtAddressContainingNISOrBusIncubator {xpath('AppearsAtAddressContainingNISOrBusIncubator')};
-	integer2 Years {xpath('Years')};
-	integer1 Months {xpath('Months')};
+	iesp.share.t_Date SOSIncorporationDate {xpath('SOSIncorporationDate')};
 	iesp.share.t_Date DateFirstSeen {xpath('DateFirstSeen')};
 	integer4 TimeBetweenSOSIncorporationDateDateFirstSeen {xpath('TimeBetweenSOSIncorporationDateDateFirstSeen')};
 end;
@@ -273,41 +315,139 @@ export t_DDRLegalEventIndividual := record
 	string LexID {xpath('LexID')};
 end;
 		
-export t_DDRLegalEventDetails := record
-	string CaseNumber {xpath('CaseNumber')};
-	string TypeOfOffense {xpath('TypeOfOffense')};
-	string Charge {xpath('Charge')};
-	string LevelDegree {xpath('LevelDegree')};
+export t_DDRCreditorDebtor := record
+	iesp.share.t_Name Name {xpath('Name')};
+	iesp.share.t_Address Address {xpath('Address')};
+	string TaxID {xpath('TaxID')};
 end;
 		
-export t_DDRCriminalRecords := record
-	integer2 Sequence {xpath('Sequence')};
-	t_DDRLegalEventIndividual IndividualFelon {xpath('IndividualFelon')};
-	t_DDRLegalEventDetails OffenseDetails {xpath('OffenseDetails')};
-	string OffenseLocationState {xpath('OffenseLocationState')};
-	iesp.share.t_Date OffenseLocationDate {xpath('OffenseLocationDate')};
-	boolean Incarcerated {xpath('Incarcerated')};
-	iesp.share.t_Date IncarcerationDate {xpath('IncarcerationDate')};
-	iesp.share.t_Date ReleaseDate {xpath('ReleaseDate')};
-end;
-		
-export t_DDRNonCriminalRecords := record
-	integer2 Sequence {xpath('Sequence')};
-	t_DDRLegalEventIndividual IndividualFelon {xpath('IndividualFelon')};
-	t_DDRLegalEventDetails OffenseDetails {xpath('OffenseDetails')};
+export t_DDRLiensJudgmentsEvictionRecords := record
+	string FilingType {xpath('FilingType')};
+	integer8 FilingAmount {xpath('FilingAmount')};
 	iesp.share.t_Date FilingDate {xpath('FilingDate')};
-	iesp.share.t_Date ActionDate {xpath('ActionDate')};
+	string FilingNumber {xpath('FilingNumber')};
+	string FilingJurisdiction {xpath('FilingJurisdiction')};
+	iesp.share.t_Date ReleaseDate {xpath('ReleaseDate')};
+	boolean Eviction {xpath('Eviction')};
+	string Agency {xpath('Agency')};
+	string2 AgencyState {xpath('AgencyState')};
+	string AgencyCounty {xpath('AgencyCounty')};
+	dataset(t_DDRCreditorDebtor) Creditors {xpath('Creditors/Creditor'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxCreditors)};
+	dataset(t_DDRCreditorDebtor) Debtors {xpath('Debtors/Debtor'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxCreditors)};
+end;
+		
+export t_DDRLegalEventRecords := record
+	t_DDRLegalEventIndividual ExecutiveOfficer {xpath('ExecutiveOfficer')};
+	string ExecutiveOfficerTitle {xpath('ExecutiveOfficerTitle')};
+	iesp.share.t_Date ExecutiveOfficerDate {xpath('ExecutiveOfficerDate')};
+	string1 Conviction {xpath('Conviction')};
+	string1 TrafficRelated {xpath('TrafficRelated')};
+	string CaseNumber {xpath('CaseNumber')};
+	string CourtType {xpath('CourtType')};
+	string CaseTypeDescription {xpath('CaseTypeDescription')};
+	string1 OffenseScore {xpath('OffenseScore')};
+	string OffenseScoreDescription {xpath('OffenseScoreDescription')};
+	string OffenseLevel {xpath('OffenseLevel')};
+	string OffenseLevelDescription {xpath('OffenseLevelDescription')};
+	string ArrestLevelDescription {xpath('ArrestLevelDescription')};
+	string CourtStatute {xpath('CourtStatute')};
+	string CourtStatuteDescription {xpath('CourtStatuteDescription')};
+	string Charge {xpath('Charge')};
+	string3 NumberOfCounts {xpath('NumberOfCounts')};
+	string DispositionDescription1 {xpath('DispositionDescription1')};
+	string DispositionDescription2 {xpath('DispositionDescription2')};
+	string ProbationSentence {xpath('ProbationSentence')};
+	boolean Incarceration {xpath('Incarceration')};
+	boolean CurrentIncarceration {xpath('CurrentIncarceration')};
+	boolean CurrentParole {xpath('CurrentParole')};
+	boolean CurrentProbation {xpath('CurrentProbation')};
+	iesp.share.t_Date EarliestOffenseDate {xpath('EarliestOffenseDate')};
+	iesp.share.t_Date OffenseDate {xpath('OffenseDate')};
+	iesp.share.t_Date ArrestDate {xpath('ArrestDate')};
+	iesp.share.t_Date CourtDispositionDate {xpath('CourtDispositionDate')};
+	iesp.share.t_Date SentenceDate {xpath('SentenceDate')};
+	iesp.share.t_Date AppealDate {xpath('AppealDate')};
+	iesp.share.t_Date IncarcerationDate {xpath('IncarcerationDate')};
+	iesp.share.t_Date IncarcerationReleaseDate {xpath('IncarcerationReleaseDate')};
+	string50 AgencyDescription {xpath('AgencyDescription')};
+	string2 StateOrigin {xpath('StateOrigin')};
+	string30 CountyOfOrigin {xpath('CountyOfOrigin')};
+	string40 CourtCounty {xpath('CourtCounty')};
+	string40 OffenseTown {xpath('OffenseTown')};
+	string2 Citizenship {xpath('Citizenship')};
+	string30 RaceDescription {xpath('RaceDescription')};
+	string7 Sex {xpath('Sex')};
+	string15 HairColor {xpath('HairColor')};
+	string15 EyeColor {xpath('EyeColor')};
+	string3 Height {xpath('Height')};
+	string3 Weight {xpath('Weight')};
 end;
 		
 export t_DDRLegalEventAttributeDataDetails := record
-	integer2 NumberOfFelonies {xpath('NumberOfFelonies')};
-	integer2 NumberOfNonFelonies {xpath('NumberOfNonFelonies')};
-	integer2 NumberOfLiends {xpath('NumberOfLiends')};
 	integer2 NumberOfEvictions {xpath('NumberOfEvictions')};
-	integer2 NumberOfJudgements {xpath('NumberOfJudgements')};
-	dataset(t_DDRCriminalRecords) PossibleCriminalRecords {xpath('PossibleCriminalRecords/Record'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxRecords)};
-	dataset(t_DDRNonCriminalRecords) NonCrimialRecords {xpath('NonCrimialRecords/Record'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxRecords)};
-	dataset(iesp.share.t_Name) AssociatedBusExecutiveOfficers {xpath('AssociatedBusExecutiveOfficers/Record'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxRecords)};
+	integer2 NumberOfFelonyConvictions {xpath('NumberOfFelonyConvictions')};
+	integer2 NumberOfFelonyNonConvictions {xpath('NumberOfFelonyNonConvictions')};
+	integer2 NumberOfMisdemeanorConvictions {xpath('NumberOfMisdemeanorConvictions')};
+	integer2 NumberOfMisdemeanorNonConcivtions {xpath('NumberOfMisdemeanorNonConcivtions')};
+	integer2 NumberOfTrafficConvictions {xpath('NumberOfTrafficConvictions')};
+	integer2 NumberOfTrafficNonConvictions {xpath('NumberOfTrafficNonConvictions')};
+	integer2 NumberOfInfractionConvictions {xpath('NumberOfInfractionConvictions')};
+	integer2 NumberOfInfractionNonConvictions {xpath('NumberOfInfractionNonConvictions')};
+	integer2 NumberOfUnknownConvictions {xpath('NumberOfUnknownConvictions')};
+	integer2 NumberOfUnknownNonConvictions {xpath('NumberOfUnknownNonConvictions')};
+	integer2 NumberOfJudgmentsLeans {xpath('NumberOfJudgmentsLeans')};
+	dataset(t_DDRLiensJudgmentsEvictionRecords) PossibleLiensJudgmentsEvictions {xpath('PossibleLiensJudgmentsEvictions/Eviction'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLienJudgementsEvictions)};
+	dataset(t_DDRLegalEventRecords) PossibleLegalEvents {xpath('PossibleLegalEvents/Event'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLegalEvents)};
+end;
+		
+export t_DDRPositionTitles := record
+	string Title {xpath('Title')};
+	iesp.share.t_Date FirstReported {xpath('FirstReported')};
+	iesp.share.t_Date LastReported {xpath('LastReported')};
+end;
+		
+export t_DDRProfessionalLicenses := record
+	string Status {xpath('Status')};
+	string IssuingAgency {xpath('IssuingAgency')};
+	iesp.share.t_Date IssueDate {xpath('IssueDate')};
+	iesp.share.t_Date ExpirationDate {xpath('ExpirationDate')};
+	boolean LawAccounting {xpath('LawAccounting')};
+	boolean FinanceRealEstate {xpath('FinanceRealEstate')};
+	boolean MedicalDoctor {xpath('MedicalDoctor')};
+	boolean PilotMarinePilotHarborPilotExplosives {xpath('PilotMarinePilotHarborPilotExplosives')};
+end;
+		
+export t_DDRBusinessExecutives := record
+	iesp.share.t_Name Name {xpath('Name')};
+	boolean Deceased {xpath('Deceased')};
+	boolean MoreThanTwoIndvsAssociatedWithSSN {xpath('MoreThanTwoIndvsAssociatedWithSSN')};
+	string LexID {xpath('LexID')};
+	iesp.share.t_Date DOB {xpath('DOB')};
+	dataset(t_DDRPositionTitles) Titles {xpath('Titles/Title'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxTitles)};
+	boolean AssociatedWithOtherCompanies {xpath('AssociatedWithOtherCompanies')};
+	integer2 BusinessScore {xpath('BusinessScore')};
+	dataset(t_DDRProfessionalLicenses) ProfessionalLicenses {xpath('ProfessionalLicenses/ProfessionalLicense'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxLicenses)};
+	string1 USResidency {xpath('USResidency')};
+	integer1 IdentityRisk {xpath('IdentityRisk')};
+	integer1 AssociatesRisk {xpath('AssociatesRisk')};
+	integer1 CriminalLegalEvents {xpath('CriminalLegalEvents')};
+	integer1 CivilLegalEvents {xpath('CivilLegalEvents')};
+	integer1 LegalTypes {xpath('LegalTypes')};
+end;
+		
+export t_DDRRegisteredAgents := record
+	iesp.share.t_Name Name {xpath('Name')};
+	string LexID {xpath('LexID')};
+	iesp.share.t_Address Address {xpath('Address')};
+	boolean AddressMatchesInputBusiness {xpath('AddressMatchesInputBusiness')};
+	integer1 NumberOfBusinessesAtAddress {xpath('NumberOfBusinessesAtAddress')};
+	integer1 NumberOfBusinessesWithNoFEIN {xpath('NumberOfBusinessesWithNoFEIN')};
+	integer1 NumberOfBusinessesIncorpStateWithLooseIncorpLaws {xpath('NumberOfBusinessesIncorpStateWithLooseIncorpLaws')};
+end;
+		
+export t_DDRNetworkDetails := record
+	dataset(t_DDRBusinessExecutives) BusinessExecutives {xpath('BusinessExecutives/BusinessExecutive'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxBusinessExecs)};
+	dataset(t_DDRRegisteredAgents) RegisteredAgents {xpath('RegisteredAgents/RegisteredAgent'), MAXCOUNT(iesp.constants.DDRAttributesConst.MaxRegisteredAgents)};
 end;
 		
 export t_DDRAttributeDetails := record
@@ -315,6 +455,7 @@ export t_DDRAttributeDetails := record
 	t_DDROperatingAttributeDataDetails OperatingAttributeDataDetails {xpath('OperatingAttributeDataDetails')};
 	t_DDRLegalEventAttributeDataDetails LegalEventAttributeDataDetails {xpath('LegalEventAttributeDataDetails')};
 	t_DDRAdverseMediaDataDetails AdverseMediaDataDetails {xpath('AdverseMediaDataDetails')};
+	t_DDRNetworkDetails NetworkDataDetails {xpath('NetworkDataDetails')};
 end;
 		
 export t_DDRBusinessReport := record
@@ -351,6 +492,7 @@ export t_DDRAttributesOptions := record (iesp.share.t_BaseOption)
 	iesp.share.t_Date HistoryDate {xpath('HistoryDate')};
 	boolean IncludeNews {xpath('IncludeNews')};
 	boolean IncludeReport {xpath('IncludeReport')};
+	boolean DisplayText {xpath('DisplayText')};
 end;
 		
 export t_DDRAttributesGroup := record

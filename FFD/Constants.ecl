@@ -1,20 +1,38 @@
-IMPORT BatchShare, FFD, PersonContext, iesp;
+﻿IMPORT BatchShare, FFD, PersonContext, iesp;
 
 EXPORT Constants := MODULE
 
 	EXPORT BlankStatementid := ROW ([], FFD.Layouts.StatementIdRec);
 	EXPORT BlankStatements := DATASET ([], FFD.Layouts.StatementIdRec);
-	EXPORT BlankConsumerStatements := dataset([], iesp.share_fcra.t_ConsumerStatement);	
-	EXPORT BlankPersonContextBatchSlim := dataset([], FFD.Layouts.PersonContextBatchSlim);
-	
+	EXPORT BlankConsumerStatements := DATASET([], iesp.share_fcra.t_ConsumerStatement);	
+	EXPORT BlankConsumerAlerts := DATASET([], iesp.share_fcra.t_ConsumerAlert);	
+	EXPORT BlankPersonContextBatchSlim := DATASET([], FFD.Layouts.PersonContextBatchSlim);
+
+/*  -- RecordTypes --
+  CS - common consumer level statement
+  DR - disputed record indicator
+  FA - Fraud Alert flag
+  HS - header specific consumer level statement
+  IT - Identity Theft flag
+  LH - Legal Hold flag
+  RS - record level consumer statement
+  SF - Security Freeze flag
+  SR - long term suppression record indicator
+*/	
 	EXPORT RecordType := MODULE(PersonContext.Constants.RecordTypes)
+		EXPORT AlertFlags := [SF, IT, FA, LH];
 		EXPORT ComplianceRecordLevel := [DR, SR];
-		EXPORT StatementRecordLevel := [HS,RS,HSN,HSA,HSD,HSS,HSP,HSL];
-		EXPORT ComplianceSet := ComplianceRecordLevel;  // we will add other record types here later
+		EXPORT StatementRecordLevel := [RS];
+		EXPORT StatementConsumerLevel := [HS,CS];
+		EXPORT ComplianceSet := ComplianceRecordLevel + AlertFlags;  
 	END;
 	
+  EXPORT AlertMessage := MODULE(PersonContext.Constants.AlertMessages)
+    EXPORT CSMessage := 'The subject of this consumer report has Consumer Statement(s) on file.';
+  END;
+  
   // to be used when fabricating a batch structure from a single input record
-	EXPORT  typeof(BatchShare.Layouts.ShareAcct.acctno) SingleSearchAcctno := 'SingleRecord';
+	EXPORT  TYPEOF(BatchShare.Layouts.ShareAcct.acctno) SingleSearchAcctno := 'SingleRecord';
  
 	EXPORT StatusCode := PersonContext.Constants.StatusCodes;
  

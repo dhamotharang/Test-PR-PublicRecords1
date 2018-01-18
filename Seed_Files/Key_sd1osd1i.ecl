@@ -1,4 +1,4 @@
-import ut;
+import data_services;
 
 numrec := record
 	layout_sd1osd1i;
@@ -101,4 +101,4 @@ export Key_sd1osd1i := index (df,{prodnum, social},{	account_out,
 	reason24,
 	reason34,
 	reason44,
-	reserved_out}, '~thor_data400::key::seed::qa::sd1osd1i');
+	reserved_out}, data_services.data_location.prefix() + 'thor_data400::key::seed::qa::sd1osd1i');

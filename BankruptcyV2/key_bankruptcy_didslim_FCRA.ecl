@@ -1,4 +1,4 @@
-import bankruptcyv2, Doxie, ut,bankrupt;
+import bankruptcyv2, Doxie, ut,bankrupt, data_services;
 
 bankrupt.Layout_BK_Search_v8  treformat(BankruptcyV2.layout_bankruptcy_search  l) := transform 
 
@@ -60,5 +60,5 @@ dedp_f := dedup(sort_f,all);
 
 export key_bankruptcy_didslim_FCRA := index (dedp_f,{unsigned6 s_did := (unsigned)debtor_did},
                                          {court_code,case_number}, 
-                                         '~thor_Data400::key::BankruptcyV2::fcra::didslim_' + doxie.Version_SuperKey);
+                                         data_services.data_location.prefix('bankruptcyv2') + 'thor_Data400::key::BankruptcyV2::fcra::didslim_' + doxie.Version_SuperKey);
 

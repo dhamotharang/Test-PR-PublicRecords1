@@ -1,4 +1,4 @@
-import doxie,FLAccidents;
+import doxie, FLAccidents, data_services;
 
 allrecs := FLAccidents_Ecrash.File_Keybuild(vin+driver_license_nbr+tag_nbr+lname <>'');
 
@@ -9,9 +9,9 @@ dst_accnbr_base := distribute(crash_accnbr_base, hash(accident_nbr));
 srt_accnbr_base := sort(dst_accnbr_base, except did, except b_did, local);
 dep_accnbr_base := dedup(srt_accnbr_base, except did, except b_did, local);
 
-export key_ecrash_accnbr := index(dep_accnbr_base
-                                  ,{string40 l_accnbr := accident_nbr}
-								 ,{
+export key_ecrash_accnbr := index(dep_accnbr_base,
+                 {string40 l_accnbr := accident_nbr},
+								 {
 								   vehicle_incident_id,
 									 vehicle_status,
 									 dt_first_seen,
@@ -149,6 +149,6 @@ motorcycle_type_of_bike,
 motorcycle_cylinder_coding
 
 									 
-									 }
-							      ,'~thor_data400::key::ecrash_accnbr_' + doxie.Version_SuperKey);
+									 },
+									 data_services.data_location.prefix() + 'thor_data400::key::ecrash_accnbr_' + doxie.Version_SuperKey);
  

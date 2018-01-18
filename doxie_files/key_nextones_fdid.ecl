@@ -1,4 +1,4 @@
-import doxie_files, ut, doxie, autokey;
+import doxie_files, doxie, autokey, data_services;
 
 f_nextones := doxie_files.file_nextones_base;
 
@@ -22,4 +22,4 @@ END;
 DS_nxto_xpand := project(f_nextones, xpand_nexo(left, counter));
 
 export key_nextones_fdid := index(DS_nxto_xpand,{fdid},{DS_nxto_xpand},
-                                  '~thor_data400::key::nextones_fdids_' + doxie.Version_SuperKey);
+                                  data_services.data_location.prefix() + 'thor_data400::key::nextones_fdids_' + doxie.Version_SuperKey);

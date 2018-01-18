@@ -12,7 +12,7 @@ end;
 	
 	fname_prefix := '~thor_data400::base::override::fcra::qa::';
 	daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-  keyname_prefix := '~thor_data400::key::override::fcra::';
+  keyname_prefix := data_services.data_location.prefix() + 'thor_data400::key::override::fcra::';
 	
 
   // lexid_rec := RECORD
@@ -29,5 +29,3 @@ end;
 
 // export key_cnsmr_statement_lexid := index (proj_lexid, {lexid}, {proj_lexid}, 
 // data_services.data_location.prefix('fcra_overrides')+'~thor_data400::key::override::consumerstatement::qa::lexid');
-
-

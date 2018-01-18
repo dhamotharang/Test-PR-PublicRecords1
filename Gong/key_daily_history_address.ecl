@@ -1,5 +1,5 @@
-//gong key based on some address fields
-import doxie, gong;
+﻿//gong key based on some address fields
+import doxie, gong, data_services;
 
 hist_in := Gong.file_daily_full(trim(prim_name)<>'', trim(z5)<>'');
 gong.mac_hist_full_slim_dep_dly(hist_in, hist_out);
@@ -14,4 +14,4 @@ export Key_Daily_History_Address :=
 		    //boolean current_flag := if(current_record_flag='Y',true,false),
 		    //boolean business_flag := if(listing_type_bus='B',true,false)},
 		    {hist_out},
-		    '~thor_data400::key::gong_daily_address_' + doxie.Version_SuperKey);
+		    data_services.data_location.prefix() + 'thor_data400::key::gong_daily_address_' + doxie.Version_SuperKey);

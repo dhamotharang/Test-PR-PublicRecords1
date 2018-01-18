@@ -1,4 +1,4 @@
-IMPORT Business_Risk_BIP, Data_Services, UT;
+IMPORT Business_Risk_BIP, Data_Services;
 
 baseFile := Seed_Files.file_SmallBusModels;
 
@@ -18,4 +18,4 @@ withHashValue := TABLE(baseFile, appendHashValue);
 export key_SmallBusModels := index(withHashValue, {tablename, HashValue},
 																	{withHashValue},
 																	Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::testseed::qa::smallbusmodels');
-																	// UT.foreign_dataland + 'thor_data400::key::testseed::qa::smallbusmodels');
+																	// Data_Services.foreign_dataland + 'thor_data400::key::testseed::qa::smallbusmodels');

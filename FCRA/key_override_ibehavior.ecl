@@ -1,4 +1,4 @@
-import data_services, ibehavior, ut;
+import data_services, ibehavior;
 
 EXPORT key_override_ibehavior := MODULE
 
@@ -6,8 +6,8 @@ EXPORT key_override_ibehavior := MODULE
 	
 	shared fname_prefix := '~thor_data400::base::override::fcra::qa::';
 	shared daily_prefix := '~thor_data400::base::override::fcra::daily::qa::';
-	shared keyname_prefix_consumer := '~thor_data400::key::override::fcra::ibehavior_consumer::qa::';
-	shared keyname_prefix_purchase := '~thor_data400::key::override::fcra::ibehavior_purchase::qa::';
+	shared keyname_prefix_consumer := data_services.data_location.prefix() + 'thor_data400::key::override::fcra::ibehavior_consumer::qa::';
+	shared keyname_prefix_purchase := data_services.data_location.prefix() + 'thor_data400::key::override::fcra::ibehavior_purchase::qa::';
 	
 	
 // consumer record

@@ -21,37 +21,6 @@ EXPORT Layouts := MODULE
     string30 ClientID;            //Unique Identifier  
     string30 CaseID  ;
     string1  ExceedsVelocityMax;  //Y if greater that max value, N if lessthan or equal to max value, blank if not matches found
-    // String8  Activity_Date1;
-    // string40 Activity_Reason1;
-    // string40 Activity_Place1;
-    // string8  Activity_Date2;
-    // string40 Activity_Reason2;
-    // string40 Activity_Place2;
-    // String8  Activity_Date3;
-    // string40 Activity_Reason3;
-    // string40 Activity_Place3;
-    // String8  Activity_Date4;
-    // string40 Activity_Reason4;
-    // string40 Activity_Place4;
-    // String8  Activity_Date5;
-    // string40 Activity_Reason5;
-    // string40 Activity_Place5;
-    // String8  Activity_Date6;
-    // string40 Activity_Reason6;
-    // string40 Activity_Place6;  
-    // String8  Activity_Date7;
-    // string40 Activity_Reason7;
-    // string40 Activity_Place7;  
-    // String8  Activity_Date8;
-    // string40 Activity_Reason8;
-    // string40 Activity_Place8;
-    // String8  Activity_Date9;
-    // string40 Activity_Reason9;
-    // string40 Activity_Place9;  
-    // String8  Activity_Date10;
-    // string40 Activity_Reason10;
-    // string40 Activity_Place10;
-    
     DeathV2_Services.layouts.BatchOut;
     CriminalRecords_BatchService.Layouts.batch_out;
     riskwise.layouts.red_flags_batch_layout;  //Red Flag
@@ -126,6 +95,7 @@ EXPORT Layouts := MODULE
     DATASET(DeathV2_Services.layouts.BatchOut) childRecs_Death;
     DATASET(CriminalRecords_BatchService.Layouts.batch_out) childRecs_Criminal;
     DATASET(combined_layouts) childRecs_RedFlag;
+		  DATASET(FraudShared_Services.Layouts.Raw_Payload_rec) childRecs_fdn;
     DATASET(Patriot.layout_batch_out) childRecs_Patriot;
     DATASET(Velocities) childRecs_Velocities;
   END;
