@@ -1,4 +1,4 @@
-import ut,roxiekeybuild, doxie_files, promotesupers,std;
+﻿import ut,roxiekeybuild, doxie_files, promotesupers,std,dops;
 
 export proc_build_keys(string version_date) := function
 
@@ -102,8 +102,8 @@ export proc_build_keys(string version_date) := function
 	RoxieKeyBuild.Mac_Daily_Email_Local('FAA','SUCC',version_date,send_succ_msg,faa.Spray_Notification_Email_Address.roxie_email_list);
 	RoxieKeyBuild.Mac_Daily_Email_Local('FAA','FAIL',version_date,send_fail_msg,faa.Spray_Notification_Email_Address.email_list);
 
-	update_faa_version := roxiekeybuild.updateversion('FAAKeys',version_date,faa.Spray_Notification_Email_Address.email_list,,'N|BN');
-	update_faa_fcra_version := roxiekeybuild.updateversion('FCRA_FAAKeys',version_date,faa.Spray_Notification_Email_Address.email_list,,'F');
+	update_faa_version := dops.updateversion('FAAKeys',version_date,faa.Spray_Notification_Email_Address.email_list,,'N|BN');
+	update_faa_fcra_version := dops.updateversion('FCRA_FAAKeys',version_date,faa.Spray_Notification_Email_Address.email_list,,'F');
 
 	final := sequential(
 		do_airmen,

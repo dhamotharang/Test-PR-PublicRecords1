@@ -1,4 +1,4 @@
-#WORKUNIT('name','Yogurt:Score Attribute and Outcome Daily Build');
+﻿#WORKUNIT('name','Yogurt:Score Attribute and Outcome Daily Build');
 #WORKUNIT('priority','high');  
 #OPTION('allowedClusters', 'thor400_44');
 #OPTION('AllowAutoQueueSwitch', true);
