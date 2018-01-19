@@ -71,10 +71,10 @@ mSSv2:= PROJECT(dsKeyBuild(trim(lname, left, right) <> trim(orig_lname, left, ri
 																						self := [];
 																						));
 																						
-EXPORT ds_lastname_state := project(project(mSSv2 + dsKeyBuild, Layouts.key_slim_rec),layouts.ecrashv2_lastname_state);
+EXPORT ds_lastname_state := project(mSSv2 + dsKeyBuild, Layouts.key_slim_rec);
 
 
-EXPORT ds_prefname_state := project(dsKeybuildSearchSlim(fname <> ''), transform(Layouts.ecrashv2_prefname_state,
+EXPORT ds_prefname_state := project(dsKeybuildSearchSlim(fname <> ''), transform(Layouts.key_slim_rec,
 																																		self.fname :=	LEFT.fname;
 																																		self := LEFT;
 																																		self := [];
