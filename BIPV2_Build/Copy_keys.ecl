@@ -1,4 +1,4 @@
-import BIPV2,tools,BizLinkFull,wk_ut;
+﻿import BIPV2,tools,BizLinkFull,wk_ut;
 
 //copies xlink keys to other clusters on prod, and copies them to 1 cluster on dataland
 
@@ -35,9 +35,9 @@ functionmacro
       if(pkeyfilter != '' //hack because we will probably never copy all of the keys to other clusters(normally a blank would signify all keys)
       ,sequential(
          BIPV2_Build.Copy_BIPV2FullKeys(pversion  ,psuperversions,true ,[] ,['thor_data400',tools.fun_Groupname('44')]  ,pkeyfilter ,pSkipSuperStuff,pOverwrite,,,tools.fun_Groupname('44') ,,,pistesting)   //copy to 44
-        ,BIPV2_Build.Copy_BIPV2FullKeys(pversion  ,psuperversions,true ,[] ,['thor_data400',tools.fun_Groupname('60')]  ,pkeyfilter ,pSkipSuperStuff,pOverwrite,,,tools.fun_Groupname('60') ,,,pistesting)   //copy to 60
+        ,BIPV2_Build.Copy_BIPV2FullKeys(pversion  ,psuperversions,true ,[] ,['thor_data400',tools.fun_Groupname('66')]  ,pkeyfilter ,pSkipSuperStuff,pOverwrite,,,tools.fun_Groupname('66') ,,,pistesting)   //copy to 66
         ,BizLinkFull.Promote(pversion,pkeyfilter,,pIsTesting,tools.fun_Groupname('44')).new2Built
-        ,BizLinkFull.Promote(pversion,pkeyfilter,,pIsTesting,tools.fun_Groupname('60')).new2Built
+        ,BizLinkFull.Promote(pversion,pkeyfilter,,pIsTesting,tools.fun_Groupname('66')).new2Built
       ))
       ,if(pSkipDatalandCopy = false,kickDatalandCopy)
       ,semail.BuildSuccess

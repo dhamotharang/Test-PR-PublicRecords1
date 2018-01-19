@@ -1,4 +1,4 @@
-// Bair._CRON_Build_Payloads
+﻿// Bair._CRON_Build_Payloads
 // scheduler job nane -> Bair Build All Scheduler
 // queued job nane -> Bair DELTA Build All
 // ON_NOTIFY: Bair Build All Scheduler
@@ -7,32 +7,30 @@
 
 import ut,wk_ut,std;
 
-BldChkPt		:= dataset(Bair.Superfile_List(true).BldChkPt, {unsigned1 pos}, flat, opt);
-ChkPtPos		:= BldChkPt[1].pos;
+BldChkPt				:= dataset(Bair.Superfile_List(true).BldChkPt, {unsigned1 pos}, flat, opt);
+ChkPtPos				:= BldChkPt[1].pos;
 rec_lastBld	:= if(ChkPtPos < 12, true, false);
 
-reprocess := if(rec_lastBld,'true','false');
+reprocess 		:= if(rec_lastBld,'true','false');
 
-PrevDelta 	:= dataset(bair.Superfile_List(true).BuiltVers, bair.layouts.rBuiltVers, flat);
+PrevDelta 		:= dataset(bair.Superfile_List(true).BuiltVers, bair.layouts.rBuiltVers, flat);
 PrevBldVer 	:= PrevDelta[1].ver;
 PrevBldName := PrevDelta[1].buildName;
 
-bair_build_name_version   := Bair.Orbit_Update.BairBuildReadyToGo():independent;
+bair_build_name_version   := Bair.Manage_Builds.BairBuildReadyToGo():independent;
 bair_build_name           := STD.STr.SplitWords(bair_build_name_version,' ')[1];
 bair_build_version        := STD.STr.SplitWords(bair_build_name_version,' ')[2];
-bair_reprocess_flag       := if(rec_lastBld, '', STD.STr.SplitWords(bair_build_name_version,' ')[3]);
+run_bair_build    								:= if(bair_build_version !='','true','false');
 
-run_bair_build    := if(bair_build_version !='','true','false');
-
-agency_build_name_version := Bair.Orbit_Update.AgencyBuildReadyToGo():independent;
+agency_build_name_version := Bair.Manage_Builds.AgencyBuildReadyToGo():independent;
 agency_build_name         := STD.STr.SplitWords(agency_build_name_version,' ')[1];
 agency_build_version      := STD.STr.SplitWords(agency_build_name_version,' ')[2];
 agency_build_to_run       := if(run_bair_build = 'false' and agency_build_name_version !='','true','false');
 
-valid_state := ['blocked','running','wait','submitted','compiling','compiled'];
-prep_wuname := 'Bair Importer - Importing*?';
+valid_state 	:= ['blocked','running','wait','submitted','compiling','compiled'];
+prep_wuname 	:= 'Bair Importer - Importing*?';
 build_wuname := 'Bair DELTA Build All*?';
-bool_wuname := 'Bair BOOLEAN Delta Build and Deploy*?';
+bool_wuname 	:= 'Bair BOOLEAN Delta Build and Deploy*?';
 
 d := sort(nothor(WorkunitServices.WorkunitList('',NAMED jobname:=prep_wuname))(wuid <> thorlib.wuid() and state in valid_state)
 +         nothor(WorkunitServices.WorkunitList('',NAMED jobname:=build_wuname))(wuid <> thorlib.wuid() and state in valid_state)
@@ -46,19 +44,20 @@ run_recover_build  := if(rec_lastBld = true and active_workunit_prep = false,'tr
 run_build          := if(run_agency_build ='true' or run_bair_build = 'true' or run_recover_build = 'true', 'true', 'false');
 
 build_name         := if(rec_lastBld
-												,PrevBldName
-												,if(run_bair_build='true',bair_build_name, agency_build_name)
-												);
+																							,PrevBldName
+																							,if(run_bair_build='true',bair_build_name, agency_build_name)
+																							);
 build_version      := if(rec_lastBld
-												,PrevBldVer
-												,if(run_bair_build='true',bair_build_version, agency_build_version)
-												);
+																							,PrevBldVer
+																							,if(run_bair_build='true',bair_build_version, agency_build_version)
+																							);
+																							
 scheduler_type     := if(rec_lastBld
-												,if(regexfind('bair', PrevBldName, nocase),'BAIR','AGENCIES')
-												,if(run_bair_build='true','BAIR','AGENCIES')
-												);
+																							,if(regexfind('bair', PrevBldName, nocase),'BAIR','AGENCIES')
+																							,if(run_bair_build='true','BAIR','AGENCIES')
+																							);
 
-scheduler_title    := if(run_build = 'true', if(rec_lastBld,' AUTO RECOVER','') + ' - ' + scheduler_type + ' ' +  build_version + ' ' + bair_reprocess_flag,' - NO BUILD'); 
+scheduler_title    := if(run_build = 'true', if(rec_lastBld,' AUTO RECOVER','') + ' - ' + scheduler_type + ' ' +  build_version,' - NO BUILD'); 
 
 ECL0:=
  '//Bair._CRON_Build_Payloads\n'
@@ -69,8 +68,6 @@ ECL0:=
 +'// Expected execution time -> 3-5 minutes Delta\n'
 +'\n'
 ;
-
-ECL1 := if(not rec_lastBld, ',Bair.Orbit_Update.SetOrbitForBuildAll(\''+build_name+'\',\''+build_version+'\',\''+bair_reprocess_flag+'\')\n', '');
 
 ECL:= 
  ECL0
@@ -93,8 +90,7 @@ ECL:=
 	+'\n'
 	+'Sequential(\n'
 	+'           Bair_importer.Sentinel_Flag.fn_SetBairSentinelFlag(TRUE,tVersion,TRUE)\n'
-	+						 ECL1
-	+'    			,Bair.Build_All(\''+build_name+'\',\''+build_version+'\', pUseProd,IsUpdates,'+reprocess+');\n'
+	+'    			   ,Bair.Build_All(\''+build_name+'\',\''+build_version+'\', pUseProd,IsUpdates,'+reprocess+');\n'
 	+'          );\n'
 //ELSE
 	,'wuname := \''+if(active_workunit_prep,'DELTA blocked by active importer','No DELTAS to build')+'\';\n'

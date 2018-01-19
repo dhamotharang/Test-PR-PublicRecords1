@@ -1,4 +1,4 @@
-
+﻿
 import ut, scrubs_sexoffender_main;
 
 layout_sex_offender_offense := RECORD,maxlength(200000)
@@ -34,8 +34,8 @@ offender_soff := scrubs_sexoffender_main.in_sex_offender_mainpublic;
 
 offense_soff := dataset(
                        // ut.foreign_dataland +
-                         ut.foreign_prod +
-                          'thor_data400::base::sex_offender_offensespublic',layout_sex_offender_offense,flat);
+                         //ut.foreign_prod +
+                          '~thor_data400::base::sex_offender_offensespublic',layout_sex_offender_offense,flat);
 
 // Need to get seisint_primary_key,orig_state,orig_state_code,vendor_code from in_sex_offender_mainpublic
 slim_offender_soff := TABLE(offender_soff,{seisint_primary_key,

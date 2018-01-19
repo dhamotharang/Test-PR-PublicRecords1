@@ -5,15 +5,17 @@ rmv_filing		:=	'(VACATE|TERMINATION|LIS PENDENS WITHDRAWAL|FORECLOSURE DISMISSED
 									'HOSPITAL LIEN|HOSPITAL RELEASE|HOSPITAL WITHDRAWAL)';
 
 //	Filter Main by Filing Types
-dMainVacated	:=	LiensV2.file_liens_main(REGEXFIND(rmv_filing, filing_type_desc)	OR 
-																					REGEXFIND(rmv_filing, filing_status[1].filing_status_desc)	OR 
-																					REGEXFIND(rmv_filing, orig_filing_type));
+dMainVacated	:=	LiensV2.file_liens_main(tmsid not in Liensv2.Suppress_TMSID(true) and 
+																					(REGEXFIND(rmv_filing, filing_type_desc)	OR 
+																					 REGEXFIND(rmv_filing, filing_status[1].filing_status_desc)	OR 
+																					 REGEXFIND(rmv_filing, orig_filing_type)
+																					 ));
 //	Filter Main Vacated by Source Types (Hogan and Massachusetts Only)
 dMainVacatedFiltered	:=	dMainVacated(	
 														tmsid[..2]	IN	['HG','MA']
 													);
 //	Filter Main by Source Types (Hogan and Massachusetts Only)
-dMainSourceFiltered		:=	LiensV2.file_liens_main(
+dMainSourceFiltered		:=	LiensV2.file_liens_main(tmsid not in Liensv2.Suppress_TMSID(true) and
 														tmsid[..2]	IN	['HG','MA']
 													);
 

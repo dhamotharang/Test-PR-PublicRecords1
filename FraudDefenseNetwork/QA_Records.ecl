@@ -55,6 +55,7 @@ newbase.ip_address;
 newbase.ultid;
 newbase.classification_Permissible_use_access.gc_id;
 newbase.classification_Permissible_use_access.fdn_file_info_id;
+newbase.ssn;
 end;
 
 finaljoinrec  getdata( distmain l , distdid r ) := transform
@@ -78,7 +79,7 @@ did_join_main := join ( distmain, distdid ,left.did = right.did ,getdata(left,ri
 SampleRecs   :=  parallel(
 		                     output(sort(SampleFileMain,-record_id), named('SampleNewMainRecordsForQA'),all),
 		 		                 output(choosen(didSample,250), named('DidSampleNewMainRecordsForQA')),
-											output(choosen(did_join_main,500),named('Miles_Sample'))
+											output(choosen(did_join_main,500),named('Validation_Sample'))
 												 );
 										
 	return SampleRecs;
