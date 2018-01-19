@@ -1,4 +1,4 @@
-import doxie,LN_PropertyV2;
+import doxie,LN_PropertyV2,Data_Services;
 
 dAssess	:=	distribute(	LN_PropertyV2.File_Assessment(tax_year	!=	'',assessed_total_value	!=	'',tax_amount	!=	''),
 												hash(ln_fares_id)
@@ -43,4 +43,4 @@ end;
 
 final	:=	table(res2,rOut_layout,res2.zip,res2.tax_year);
 
-export key_tax_summary := index(final,{final},'~thor_data400::key::ln_propertyv2::'	+	doxie.Version_SuperKey	+	'::tax_summary');
+export key_tax_summary := index(final,{final},Data_Services.Data_location.Prefix('Property')+'thor_data400::key::ln_propertyv2::'	+	doxie.Version_SuperKey	+	'::tax_summary');

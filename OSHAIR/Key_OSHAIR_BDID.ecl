@@ -1,4 +1,4 @@
-import doxie_files, doxie,ut;
+import doxie,Data_Services;
 
 f_oshair := OSHAIR.file_out_inspection_cleaned;
 
@@ -12,6 +12,6 @@ tbl_bdid := table (f_oshair (BDID<>0), slim_oshair);
 export Key_OSHAIR_BDID := index(tbl_BDID
                               ,{bdid}
 							  ,{Activity_Number}
-							  ,'~thor_data400::key::oshair::Bdid_'+doxie.Version_SuperKey);
+							  ,Data_Services.Data_location.Prefix()+'thor_data400::key::oshair::Bdid_'+doxie.Version_SuperKey);
 
 

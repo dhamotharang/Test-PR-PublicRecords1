@@ -1,4 +1,4 @@
-import doxie, FCRA, ut;
+import doxie, FCRA, Data_Services;
 
 export key_proflic_did (boolean IsFCRA = false) := function
   df := Prof_LicenseV2.File_Proflic_Base_Keybuild((unsigned)did != 0 and vendor<>'INFUTOR');
@@ -16,9 +16,9 @@ export key_proflic_did (boolean IsFCRA = false) := function
   out_df := project(df (~IsFCRA or orbit_source not in FCRA.compliance.proflicenses.restricted_sources), trfProject(left));
 
   file_name := if (IsFCRA, 
-                   // instead of '~thor_data400::key::fcra::prolicense_did_' + doxie.Version_SuperKey)
-                   '~thor_data400::key::ProlicV2::fcra::' + doxie.Version_SuperKey + '::prolicense_did',
-                   '~thor_data400::key::ProlicV2::'+ doxie.Version_SuperKey +'::prolicense_did');
+                   // instead of Data_Services.Data_location.Prefix()+'thor_data400::key::fcra::prolicense_did_' + doxie.Version_SuperKey)
+                   Data_Services.Data_location.Prefix()+'thor_data400::key::ProlicV2::fcra::' + doxie.Version_SuperKey + '::prolicense_did',
+                   Data_Services.Data_location.Prefix()+'thor_data400::key::ProlicV2::'+ doxie.Version_SuperKey +'::prolicense_did');
 
   return index (out_df, {did}, {out_df}, file_name);
 end;

@@ -1,4 +1,4 @@
-import tools;
+import tools,Data_Services;
 
 export Keynames_Scoring(
 
@@ -8,7 +8,7 @@ export Keynames_Scoring(
 ) :=
 module
 
-	export lFileTemplate	    := '~thor_data400::key::phonesplus_scoring::@version@::'	;
+	export lFileTemplate	    := Data_Services.Data_location.Prefix()+'thor_data400::key::phonesplus_scoring::@version@::'	;
 
 	shared laddress			:= lFileTemplate + 'address'		;
 	shared lPhone			:= lFileTemplate + 'phone'		;

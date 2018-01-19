@@ -1,9 +1,9 @@
-IMPORT BIPV2, Prof_License_Mari;
+IMPORT BIPV2, Prof_License_Mari, Data_Services;
 
 EXPORT key_Linkids := MODULE
 
   // DEFINE THE INDEX
-	shared superfile_name	:= '~thor_data400::key::proflic_mari::qa::linkids';
+	shared superfile_name	:= Data_Services.Data_location.Prefix('mari')+'thor_data400::key::proflic_mari::qa::linkids';
 		
 	shared Base := Prof_License_Mari.file_mari_search;
 	

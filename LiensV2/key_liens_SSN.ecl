@@ -1,4 +1,4 @@
-import liensv2, Doxie, ut;
+import liensv2, Doxie, Data_Services;
 get_recs := project(LiensV2.file_liens_party,transform(liensv2.layout_liens_party_ssn,self:=left));
 
 slim_rec := record
@@ -23,6 +23,6 @@ slim_sort   := sort(slim_dist, tmsid, rmsid, ssn, local);
 slim_dedup  := dedup(slim_sort, tmsid, rmsid, ssn, local);
 
 export Key_liens_SSN := index(slim_dedup,{ssn},{TMSID,RMSID},
-'~thor_data400::key::liensv2::SSN_' + doxie.Version_SuperKey);
+Data_Services.Data_location.Prefix('Liensv2')+'thor_data400::key::liensv2::SSN_' + doxie.Version_SuperKey);
 
 

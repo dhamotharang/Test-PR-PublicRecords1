@@ -1,4 +1,4 @@
-import liensv2, Doxie, ut;
+import liensv2, Data_Services;
 get_recs := LiensV2.file_liens_main;
 
 slim_rec := record
@@ -23,7 +23,7 @@ slim_main_sort := sort(slim_main_dist, tmsid,rmsid,irs_serial_number,agency_stat
 slim_main_dedup  := dedup(slim_main_sort, tmsid, rmsid, irs_serial_number,agency_state, local);
 
 export key_fcra_liens_irs_serial_number := index(slim_main_dedup ,{irs_serial_number,agency_state},{tmsid,rmsid},
-                                   '~thor_data400::key::liensv2::fcra::qa::main::IRS_serial_number') ;
+                                   Data_Services.Data_location.Prefix('Liensv2')+'thor_data400::key::liensv2::fcra::qa::main::IRS_serial_number') ;
 
 
 			   

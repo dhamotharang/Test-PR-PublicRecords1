@@ -1,4 +1,4 @@
-import ut, doxie, Business_Header, Business_Header_SS;
+import ut, doxie, Business_Header, Business_Header_SS, Data_Services;
 
 layout_pat_keybuild := record
 	patriot.Layout_Patriot;
@@ -32,4 +32,4 @@ pat_bdid_key := project(pat_bdid(bdid <> 0), transform(layout_bdid_key, self := 
 
 pat_bdid_key_dedup := dedup(pat_bdid_key, all);
 
-export key_bdid_patriot_file := INDEX(pat_bdid_key_dedup,{bdid},{pat_bdid_key},'~thor_data400::key::patriot_bdid_file_'+doxie.Version_SuperKey);
+export key_bdid_patriot_file := INDEX(pat_bdid_key_dedup,{bdid},{pat_bdid_key},Data_Services.Data_location.Prefix()+'thor_data400::key::patriot_bdid_file_'+doxie.Version_SuperKey);

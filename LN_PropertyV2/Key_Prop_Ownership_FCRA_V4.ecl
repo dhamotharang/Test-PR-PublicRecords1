@@ -1,4 +1,4 @@
-import ut, doxie, risk_indicators;
+import ut, doxie, risk_indicators, Data_Services;
 
 unsigned2 MAX_FARES := 100;
 
@@ -478,4 +478,4 @@ END;
 Prop := project(wDistressed, to_relat_prop(LEFT));
 
 export Key_Prop_Ownership_FCRA_V4 := index (Prop, {did}, {Prop},
-																	'~thor_data400::key::ln_propertyv2::fcra::'+doxie.Version_SuperKey+'::did.ownership_v4');
+																	Data_Services.Data_location.Prefix('Property')+'thor_data400::key::ln_propertyv2::fcra::'+doxie.Version_SuperKey+'::did.ownership_v4');

@@ -1,4 +1,4 @@
-import doxie, ut,BIPV2;
+import doxie, BIPV2, Data_Services;
 
 //property.file_nod_building_bdid
 df := project(File_NOD_Building,
@@ -9,4 +9,4 @@ df := project(File_NOD_Building,
 							 BIPV2.IDlayouts.l_xlink_ids name4},
 			self := left));	
 
-export Key_NOD_FID_Linkids := index(df,{string70 fid := foreclosure_id},{df},'~thor_Data400::key::nod::' + doxie.Version_SuperKey + '::fid::linkids');
+export Key_NOD_FID_Linkids := index(df,{string70 fid := foreclosure_id},{df},Data_Services.Data_location.Prefix()+'thor_data400::key::nod::' + doxie.Version_SuperKey + '::fid::linkids');

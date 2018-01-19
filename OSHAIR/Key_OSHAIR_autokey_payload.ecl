@@ -1,4 +1,4 @@
-import autokeyb2,doxie;
+import doxie,Data_Services;
 
 standard__base := RECORD
    string10 prim_range;
@@ -35,4 +35,4 @@ rec := RECORD
 
 d := dataset([],rec);
 
-export Key_OSHAIR_autokey_payload := index(d,{fakeid},{d},'~thor_data400::key::oshair::' + doxie.Version_SuperKey + '::autokey::payload');
+export Key_OSHAIR_autokey_payload := index(d,{fakeid},{d},Data_Services.Data_location.Prefix()+'thor_data400::key::oshair::' + doxie.Version_SuperKey + '::autokey::payload');

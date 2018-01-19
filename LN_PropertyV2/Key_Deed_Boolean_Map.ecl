@@ -1,4 +1,4 @@
-import LN_Propertyv2,text_search;
+import LN_Propertyv2,text_search,Data_Services;
 	
 	// Flat record format - from convert function
 	Text_assess_flat := record(Text_Search.Layout_Docseg)
@@ -27,5 +27,5 @@ import LN_Propertyv2,text_search;
 	tmsid_map := dedup(sort_map,src,doc,local);
 // check if the persist file exists, if it does do the boolean build, if not read the key.
 export Key_Deed_Boolean_Map := index(if(fileservices.fileexists('~thor_data400::persist::ln_propertyv2::deeds::boolean'),
-																		tmsid_map,read_ret),{src,doc},{ln_fares_id},'~thor_data400::key::ln_propertyv2::deeds::qa::doc.fares_id');
+																		tmsid_map,read_ret),{src,doc},{ln_fares_id},Data_Services.Data_location.Prefix('Property')+'thor_data400::key::ln_propertyv2::deeds::qa::doc.fares_id');
 														

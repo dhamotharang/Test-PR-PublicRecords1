@@ -1,4 +1,4 @@
-import doxie, LN_Property;
+import doxie, Data_Services;
 
 dfd := LN_PropertyV2.File_Deed_Building(ln_fares_id != '');
 	
@@ -30,4 +30,4 @@ export Key_Deed_ParcelNum :=
 index(df,
   {fares_unformatted_apn},
   {ln_fares_id},
-  '~thor_Data400::key::ln_propertyV2::' + doxie.Version_SuperKey + '::deed.parcelNum');
+  Data_Services.Data_location.Prefix('Property')+'thor_data400::key::ln_propertyV2::' + doxie.Version_SuperKey + '::deed.parcelNum');

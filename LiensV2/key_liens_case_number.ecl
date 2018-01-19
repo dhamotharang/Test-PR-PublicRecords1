@@ -1,4 +1,4 @@
-import liensv2, Doxie, ut;
+import liensv2, Doxie, Data_Services;
 
 get_recs := LiensV2.file_liens_main;
 
@@ -45,4 +45,4 @@ slim_dedup := dedup(slim_sort, tmsid, rmsid, case_number, filing_state, local);
 
 
 export Key_liens_case_number := index(slim_dedup,{case_number, filing_state},{TMSID,RMSID},
-'~thor_data400::key::liensv2::case_number_' + doxie.Version_SuperKey);
+Data_Services.Data_location.Prefix('Liensv2')+'thor_data400::key::liensv2::case_number_' + doxie.Version_SuperKey);

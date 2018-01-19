@@ -1,4 +1,4 @@
-import Mfind;
+import Data_Services;
 
 
 tmsid_rec 
@@ -19,7 +19,7 @@ tmsid_rec
 
 tmsid_table := dataset([],tmsid_rec);
 
-export key_boolean_nidx := index(tmsid_table,{part,typ,nominal,src,doc,seg,kwp,wip},{suffix,fpos},'~thor_data400::key::mfind::qa::nidx');
+export key_boolean_nidx := index(tmsid_table,{part,typ,nominal,src,doc,seg,kwp,wip},{suffix,fpos},Data_Services.Data_location.Prefix()+'thor_data400::key::mfind::qa::nidx');
 
 
 
