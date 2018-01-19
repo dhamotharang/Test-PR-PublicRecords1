@@ -29,9 +29,11 @@ module
     export MbsFDNMasterID        			:= tools.mod_FilenamesBuild(lTemplate('Gcid_2_MbsFDNMasterID'),pversion);
     export MbsFDNMasterIDExcl    			:= tools.mod_FilenamesBuild(lTemplate('MbsFDNMasterIDExclusion'),pversion);
 		export MbsFDNMasterIDIndTypIncl   := tools.mod_FilenamesBuild(lTemplate('MbsFdnMasterIDIndTypeInclusion'),pversion);
+		export MbsVelocityRules         	:= tools.mod_FilenamesBuild(lTemplate('MbsVelocityRules'),pversion);
   	export LinkIds               			:= tools.mod_FilenamesBuild(lTemplate('LINKIDS'),pversion);
 		export DriversLicense        			:= tools.mod_FilenamesBuild(lTemplate('DriversLicense'),pversion);
 		export BankAccount           			:= tools.mod_FilenamesBuild(lTemplate('BankAccount'),pversion);
+
 				
 		export dAll_filenames :=
 		    ID.dAll_filenames +
@@ -50,11 +52,11 @@ module
 				MbsProductInclude.dAll_filenames +
 				MbsFDNMasterID.dAll_filenames +
 				MbsFDNMasterIDExcl.dAll_filenames +
-				if(Platform.Source = 'FraudGov',MbsFDNMasterIDIndTypIncl.dAll_filenames) +
+				MbsFDNMasterIDIndTypIncl.dAll_filenames +
+				If(Platform.Source = 'FraudGov'  ,MbsVelocityRules.dAll_filenames) +
 				DriversLicense.dAll_filenames +
 				BankAccount.dAll_filenames +
-				LinkIds.dAll_filenames;  
-				
+				LinkIds.dAll_filenames ;
 		end;
 	
 		

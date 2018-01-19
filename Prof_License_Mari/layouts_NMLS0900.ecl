@@ -1,4 +1,4 @@
-//Nationwide Mortgage Licensing System Professional Licenses Files for MARI
+﻿//Nationwide Mortgage Licensing System Professional Licenses Files for MARI
 
 export layouts_NMLS0900 := module
 
@@ -72,7 +72,7 @@ export Business_Lic :=
 			integer 	COMPANY_NMLS_ID,
 			string500 REGULATOR,
 			string150 DBA,
-			string10	NAME_TYPE
+			string21	NAME_TYPE  //DF-20827 Layout change
 	END;
 
 	export Individual := 

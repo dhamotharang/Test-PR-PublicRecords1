@@ -24,7 +24,7 @@
 	export	string	dataland_sasha	:=	'10.173.65.201';						// No br domain DNS entry
 	
 	export	string	alpharetta_poc_thor	:=	'10.194.10.5';
-	export	string	aprod_thor_esp	    :=	'10.194.12.2';				// 10.173.84.202
+	export	string	aprod_thor_esp	    :=	'alpha_prod_thor_dali.risk.regn.net';				// 10.173.84.202
 	export	string	aprod_thor_dali	    :=	'alpha_prod_thor_dali.risk.regn.net';				// 10.173.84.201
 	export	string	prod_thor_esp	      :=	'prod_esp.br.seisint.com';				// 10.173.84.202
 	export	string	prod_thor_dali	    :=	'prod_dali.br.seisint.com';				// 10.173.84.201

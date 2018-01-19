@@ -91,7 +91,7 @@ EXPORT GenerationMod := MODULE
     + 'LINKPATH:L_CONTACT_DID:contact_did\n'
     ;
  
-  EXPORT linkpaths := DATASET([
+  EXPORT xlinkpaths := DATASET([
     {'L_CNPNAME_ZIP','cnp_name,zip','prim_name,st(HASBASE),city','company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
     ,{'L_CNPNAME_ST','cnp_name,st','prim_name,zip(HASBASE),city','company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','L_CNPNAME_ZIP',''}
     ,{'L_CNPNAME','cnp_name','prim_name,st,city','company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,zip(HASBASE)','L_CNPNAME_ST',''}

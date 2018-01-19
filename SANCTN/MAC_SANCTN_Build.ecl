@@ -1,4 +1,4 @@
-﻿import SANCTN,RoxieKeyBuild,PromoteSupers,Scrubs_SANCTNKeys;
+﻿import SANCTN,RoxieKeyBuild,PromoteSupers,Scrubs_SANCTNKeys, dops;
 
 export MAC_SANCTN_Build(filedate,skipTest=false) := MACRO
 #workunit('name','SANCTN Build ' + filedate);
@@ -65,7 +65,7 @@ PromoteSupers.MAC_SF_BuildProcess(combined_incident_data, SANCTN.cluster_name +'
 
 %build_keys%  := SANCTN.proc_build_SANCTN_keys(filedate);
 							 
-%updatedops% := RoxieKeyBuild.updateversion('SanctnKeys',filedate,'skasavajjala@seisint.com',,'N|B');
+%updatedops% := dops.updateversion('SanctnKeys',filedate,'skasavajjala@seisint.com',,'N|B');
 
 %qa_samp%    := SANCTN.out_incident_party_samples;
 
