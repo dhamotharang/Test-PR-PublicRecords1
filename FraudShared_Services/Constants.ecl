@@ -19,10 +19,6 @@ EXPORT Constants := MODULE
   EXPORT MAX_REQUIRED_INPUTS := 100;
   EXPORT PRODUCT_INCLUDE_CODE_ALL := 1; //There are many other codes in data_file
 
-  // Status Field on the MBS Exclusion/Inclusion Keys Records with status 1 (Active Records)
-  // Will not be needed once the MBS records are pre-processed to remove non-active ones....
- 	EXPORT ActiveStatus := 1;
-
   // FDN id key classification_Permissible_use_access.file_type field possible data values
   EXPORT FileTypeCodes  := MODULE
     EXPORT CONTRIBUTORY  := 1; // 1 = Event Outcome or Contributory data
