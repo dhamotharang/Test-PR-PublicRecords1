@@ -21,7 +21,7 @@ export proc_quickHdr_build_all (string sourceIP, string filedate) := function
                                     ,fail('Superfiles are not in sync!'));
 	
 	destinationGroup	:= _control.TargetGroup.Thor400_44;
-	recordSize				:= 567;
+	recordSize				:= 579;
   sprayIP           := header_quick._config.sprayIP(sourceIP);
                                                      
 	weeklyFileName		:= FileServices.remotedirectory(sprayIP,header_quick._config.sourcePath,'WEEKLY_HEADER_*.DAT',false)(size != 0 )[1].name;
