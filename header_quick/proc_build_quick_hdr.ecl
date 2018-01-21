@@ -1,4 +1,4 @@
-import Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl;
+﻿import Header,ut,Header_SlimSort,MDR,DID_Add,DidVille,Address,RoxieKeyBuild,header_services,jtrost_stuff,VersionControl;
 
 export proc_build_quick_hdr(string filedate, string leMailTarget='jose.bello@lexisnexis.com;michael.gould@lexisnexis.com;Gabriel.Marcan@lexisnexis.com;Harry.Gist@lexisnexis.com',string leMailTargetScoring='jose.bello@lexisnexis.com;michael.gould@lexisnexis.com;Gabriel.Marcan@lexisnexis.com;Scoring_QA@risk.lexisnexis.com') := function
 
@@ -154,7 +154,7 @@ rHashDIDAddress := header_services.Supplemental_Data.layout_out;
 
 	fSendMail(string pSubject, string pBody) := fileservices.sendemail(leMailTarget,pSubject,pBody);
 	
-  weekly_handling := sequential(output(header.file_header_in_weekly,,'~thor400_84::in::'+header.sourcedata_month.v_eq_as_of_date+'::eq_weekly_with_as_of_date',__compressed__),
+  weekly_handling := sequential(output(header.file_header_in_weekly.File,,'~thor400_84::in::'+header.sourcedata_month.v_eq_as_of_date+'::eq_weekly_with_as_of_date',__compressed__),
 																fileservices.addsuperfile('~thor400_84::in::eq_weekly_with_as_of_date','~thor400_84::in::'+header.sourcedata_month.v_eq_as_of_date+'::eq_weekly_with_as_of_date'),
 																fileservices.addsuperfile('~thor400_84::in::eq_weekly_history','~thor400_84::in::eq_weekly',,true),
 				    										fileservices.clearsuperfile('~thor400_84::in::eq_weekly')
