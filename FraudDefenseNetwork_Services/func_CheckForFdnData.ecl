@@ -61,18 +61,22 @@ EXPORT func_CheckForFdnData(
 		SELF := R; // fdn id key record fields
 	END;
 
-  // Join the input dataset to the search_recs output ds, joining on seq#/acctno to only return 
+	// Join the input dataset to the search_recs output ds, joining on seq#/acctno to only return 
 	// input records that had data found in the fdn keys.
 	// Also filter to only include records where the input "search by" field type corresponds 
 	// to the appropriate fdn id key entity_type field data value.
-  ds_results := JOIN(
-    ds_input_seq, ds_search_recs,
-    LEFT.seq = (integer) RIGHT.acctno,
-    tf_dojoin(LEFT,RIGHT));	
+	ds_results := JOIN(
+			ds_input_seq, ds_search_recs,
+					LEFT.seq = (integer) RIGHT.acctno AND 
+					((LEFT.prim_name != '' AND RIGHT.classification_Entity.Entity_type_id = FraudShared_Services.Constants.EntityTypes_Enum.ADDRESS)
+					OR (LEFT.did != 0  AND RIGHT.classification_Entity.Entity_type_id = FraudShared_Services.Constants.EntityTypes_Enum.PERSON)
+					OR (LEFT.phone10 != '' AND RIGHT.classification_Entity.Entity_type_id = FraudShared_Services.Constants.EntityTypes_Enum.PHONE) 
+					OR (LEFT.ssn != '' AND RIGHT.classification_Entity.Entity_type_id = FraudShared_Services.Constants.EntityTypes_Enum.SSN)),
+			tf_dojoin(LEFT,RIGHT));	
 
-    // output(ds_input_seq,   named('ds_input_seq'));
-    // output(ds_search_recs, named('ds_search_recs'));
-    // output(ds_results,     named('ds_results'));
+	// output(ds_input_seq,   named('ds_input_seq'));
+	// output(ds_search_recs, named('ds_search_recs'));
+	// output(ds_results,     named('ds_results'));
 
-    RETURN ds_results;
+	RETURN ds_results;
 END;
