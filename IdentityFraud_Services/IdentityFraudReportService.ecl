@@ -17,6 +17,7 @@
   <part name="IncludeIdentityRisklevel" type="xsd:boolean" default="true"/>
   <part name="IncludeSourceRisklevel" type="xsd:boolean" default="true"/>
   <part name="IncludeVelocityRisklevel" type="xsd:boolean" default="true"/>
+  <part name="SkipPenaltyFilter" type="xsd:boolean" default="false"/>
   <separator />
   <part name="CountBySource" type="xsd:boolean" default="false" description=" debug: count by source (vs. by category)"/> 
   <part name="IncludeSummary" type="xsd:boolean" description=" debug: summary section is deprecated"/> 
@@ -61,6 +62,7 @@
   &lt;IncludeIdentityRisklevel&gt;&lt;/IncludeIdentityRisklevel&gt;
   &lt;IncludeSourceRisklevel&gt;&lt;/IncludeSourceRisklevel&gt;
   &lt;IncludeVelocityRisklevel&gt;&lt;/IncludeVelocityRisklevel&gt;
+  &lt;SkipPenaltyFilter&gt;&lt;/SkipPenaltyFilter&gt;
  &lt;/Options&gt;
  &lt;ReportBy&gt;
   &lt;UniqueId&gt;&lt;/UniqueId&gt;
@@ -96,6 +98,7 @@
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, IdentityFraud_Services, PersonReports, ut, seed_files, suppress;
 
 EXPORT IdentityFraudReportService () := MACRO
+#onwarning(4207, warning);
 #constant('SelectIndividually', true); // we will setup all components explicitly
 
 // need these for imposters
@@ -119,9 +122,9 @@ string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : 
 
   // for convenience only: to make it work from flat SOAP
   SetLegacyInput (iesp.identityfraudreport.t_IdentityFraudReportBy xml_in) := function
-    #stored ('dl_state', xml_in.DLState);
-		#stored ('dl_number', xml_in.DLNumber);
-    iesp.ECL2ESP.EnforceRead ();
+				#stored ('dl_state', xml_in.DLState);
+				#stored ('dl_number', xml_in.DLNumber);
+				iesp.ECL2ESP.EnforceRead ();
     return 0;
   end;
 
@@ -140,9 +143,10 @@ string DataPermission := Risk_Indicators.iid_constants.default_DataPermission : 
   tag_options := global (first_row.Options);
   options := module (IdentityFraud_Services.IParam._identityfraudreport) 
     export boolean include_phonesplus := tag_options.IncludePhonesPlus	:	stored('IncludePhonesPlus');
-		export boolean include_identity_risk_level := tag_options.IncludeIdentityRisklevel : stored('IncludeIdentityRisklevel');
-		export boolean include_source_risk_level := tag_options.IncludeSourceRisklevel : stored('IncludeSourceRisklevel');
-		export boolean include_velocity_risk_level := tag_options.IncludeVelocityRisklevel : stored('IncludeVelocityRisklevel');
+				export boolean include_identity_risk_level := tag_options.IncludeIdentityRisklevel : stored('IncludeIdentityRisklevel');
+				export boolean include_source_risk_level := tag_options.IncludeSourceRisklevel : stored('IncludeSourceRisklevel');
+				export boolean include_velocity_risk_level := tag_options.IncludeVelocityRisklevel : stored('IncludeVelocityRisklevel');
+				export boolean skip_penalty_filter := tag_options.SkipPenaltyFilter : stored('SkipPenaltyFilter');
   end;  
 
   // get search parameters from global #stored variables;
