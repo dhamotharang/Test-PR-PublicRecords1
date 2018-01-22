@@ -1,4 +1,4 @@
-﻿IMPORT Address,Autokey_batch,BatchServices,Doxie,header,iesp,Phones,PhoneFinder_Services,std,ut;
+﻿IMPORT Address,Autokey_batch,BatchServices,Doxie,header,iesp,MDR,NID,Phones,PhoneFinder_Services,std,ut;
 
 pfLayouts     := PhoneFinder_Services.Layouts;
 lBatchInAcctno:= pfLayouts.BatchInAppendAcctno;
@@ -53,7 +53,7 @@ MODULE
 	
  END;
  
-	EXPORT getNameMatch(DATASET(iesp.phonefinder.t_PhoneIdentityInfo) dIdentitiesInfo, 
+	EXPORT getNameMatch(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp) dIdentitiesInfo, 
 											iesp.phonefinder.t_PhoneFinderSearchBy pSearchBy, 
 											BOOLEAN phoneticMatch = FALSE,
 											string bestDID = ''
@@ -64,11 +64,10 @@ MODULE
 		lastName := StringLib.StringToUpperCase(pSearchBy.Name.Last);
 		// performing a lexid , name match
 
-    valid_did := (UNSIGNED) bestDID > 0 ;
-		dRec := IF(phoneticMatch, dIdentitiesInfo((valid_did AND UniqueId = bestDID) OR (Name.First = firstName AND 
+   valid_did := (UNSIGNED) bestDID > 0 ;
+		 dRec := IF(phoneticMatch, dIdentitiesInfo((valid_did AND UniqueId = bestDID) OR (NID.mod_PFirstTools.PFLeqPFR(Name.First, firstName) AND 
 														metaphonelib.DMetaPhone1(Name.Last) = metaphonelib.DMetaPhone1(lastName))),
-														dIdentitiesInfo((valid_did AND UniqueId = bestDID) OR (Name.First = firstName AND Name.Last = lastName)));
-														
+														dIdentitiesInfo((valid_did AND UniqueId = bestDID) OR (NID.mod_PFirstTools.PFLeqPFR(Name.First, firstName) AND Name.Last = lastName)));
 		
     vRec := TOPN(dRec, 1, -LastSeenWithPrimaryPhone); 
    
@@ -76,14 +75,14 @@ MODULE
 			
 	END;
 	
-	EXPORT getNameAddressMatch(DATASET(iesp.phonefinder.t_PhoneIdentityInfo) dIdentitiesInfo, 
+	EXPORT getNameAddressMatch(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp) dIdentitiesInfo, 
 														 iesp.phonefinder.t_PhoneFinderSearchBy pSearchBy, 
 														 BOOLEAN phoneticMatch = FALSE,
 														 string bestDID = ''
 														 ) := FUNCTION
 														 
 											 
-    firstName     := StringLib.StringToUpperCase(pSearchBy.Name.First);
+  firstName     := StringLib.StringToUpperCase(pSearchBy.Name.First);
 		lastName			:= StringLib.StringToUpperCase(pSearchBy.Name.Last);
 		streetNumber	:= pSearchBy.Address.StreetNumber;
 		streetName 		:= StringLib.StringToUpperCase(pSearchBy.Address.StreetName);
@@ -93,22 +92,24 @@ MODULE
 		
      valid_did := (UNSIGNED) bestDID > 0 ;
 		// For a positive result, there must be a match on lexid, name (first, last) AND city/state OR zip.
-		dRec := IF(phoneticMatch, dIdentitiesInfo((valid_did AND UniqueId = bestDID) OR (Name.First = firstName AND 
+		//for targus, verifying by city, state and zip (as targus data is blank sometimes)
+		dRec := IF(phoneticMatch, dIdentitiesInfo((valid_did AND UniqueId = bestDID) OR (NID.mod_PFirstTools.PFLeqPFR(Name.First, firstName) AND 
 									metaphonelib.DMetaPhone1(Name.Last) = metaphonelib.DMetaPhone1(lastName) AND
-									RecentAddress.StreetNumber = streetNumber AND RecentAddress.StreetName = streetName AND 
-									((RecentAddress.City = city AND RecentAddress.State = state) OR RecentAddress.Zip5 = zip))),
-								dIdentitiesInfo((valid_did AND UniqueId = bestDID) OR (Name.First = firstName AND Name.Last = lastName AND
-									RecentAddress.StreetNumber = streetNumber AND RecentAddress.StreetName = streetName AND 
+									((vendor_id = MDR.sourceTools.src_Targus_Gateway AND RecentAddress.StreetNumber = '' AND RecentAddress.StreetName = '') OR
+									(RecentAddress.StreetNumber = streetNumber AND RecentAddress.StreetName = streetName)) AND 
+									((RecentAddress.City = city AND RecentAddress.State = state) OR RecentAddress.Zip5 = zip))),								
+								 dIdentitiesInfo((valid_did AND UniqueId = bestDID) OR (NID.mod_PFirstTools.PFLeqPFR(Name.First, firstName) AND Name.Last = lastName AND
+								 ((vendor_id = MDR.sourceTools.src_Targus_Gateway AND RecentAddress.StreetNumber = '' AND RecentAddress.StreetName = '') OR
+									(RecentAddress.StreetNumber = streetNumber AND RecentAddress.StreetName = streetName)) AND 
 									((RecentAddress.City = city AND RecentAddress.State = state) OR RecentAddress.Zip5 = zip))));
-													
-														
+																											
 		vRec := TOPN(dRec, 1, -LastSeenWithPrimaryPhone); 
 		
-	  RETURN vRec;
+	 RETURN vRec;
 		
 	END;
 	
-	EXPORT getPhoneActive(DATASET(iesp.phonefinder.t_PhoneIdentityInfo) dIdentitiesInfo, 
+	EXPORT getPhoneActive(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp) dIdentitiesInfo, 
 												PhoneFinder_Services.iParam.ReportParams inMod, 
 												iesp.phonefinder.t_PhoneFinderSearchBy pSearchBy) :=	FUNCTION
 			today:= (STRING)Std.Date.Today();		
@@ -143,7 +144,7 @@ MODULE
 				
 	END;
 
-	EXPORT getVerifyRecs(	DATASET(iesp.phonefinder.t_PhoneIdentityInfo) dIdentitiesInfo, 
+	EXPORT getVerifyRecs(	DATASET(PhoneFinder_Services.Layouts.PhoneFinder.IdentityIesp) dIdentitiesInfo, 
 												PhoneFinder_Services.iParam.ReportParams inMod, 
 												iesp.phonefinder.t_PhoneFinderSearchBy pSearchBy,
 												string best_did) := FUNCTION
@@ -525,7 +526,9 @@ MODULE
 			SELF.phoneriskindicator	:= IF(EXISTS(le.alerts),le.phoneriskindicator,ri.phoneriskindicator);
 			SELF.otprifailed				:= IF(EXISTS(le.alerts),le.otprifailed,ri.otprifailed);
 			SELF.alerts							:= IF(EXISTS(le.alerts),le.alerts,ri.alerts);
-			SELF.CallForwardingIndicator := IF(le.CallForwardingIndicator = PhoneFinder_Services.Functions.CallForwardingDesc(1), le.CallForwardingIndicator , ri.CallForwardingIndicator);
+			SELF.CallForwardingIndicator := IF(ri.CallForwardingIndicator = '' or le.CallForwardingIndicator = PhoneFinder_Services.Functions.CallForwardingDesc(1),
+			                                   le.CallForwardingIndicator , 
+			                                   ri.CallForwardingIndicator);
 			SELF                 		:= le;
 		END;		
 		dPhoneRollup := ROLLUP(dPhoneSort,
@@ -727,7 +730,9 @@ MODULE
 																	PhoneFinder_Services.Constants.PhoneType.Other);
 			SELF.ListingType     := IF(le.ListingType != '',le.ListingType,ri.ListingType);
 			SELF.PhoneOwnershipIndicator := le.PhoneOwnershipIndicator or ri.PhoneOwnershipIndicator;
-			SELF.CallForwardingIndicator := IF(le.CallForwardingIndicator = PhoneFinder_Services.Functions.CallForwardingDesc(1), le.CallForwardingIndicator , ri.CallForwardingIndicator);
+			SELF.CallForwardingIndicator := IF(ri.CallForwardingIndicator = '' or le.CallForwardingIndicator = PhoneFinder_Services.Functions.CallForwardingDesc(1),
+			                                   le.CallForwardingIndicator , 
+			                                   ri.CallForwardingIndicator);
 			SELF                 := le;
 		END;
 		
