@@ -328,7 +328,8 @@ MODULE
 		EXPORT IdentityIesp :=
 		RECORD(iesp.phonefinder.t_PhoneIdentityInfo)
 			STRING20 acctno; 
-			STRING10  phone;			
+			STRING10  phone;		
+			STRING2   vendor_id; // for zumigo logging dataset
 		END;
 		
 		EXPORT PhoneIesp :=
