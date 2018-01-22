@@ -32,6 +32,7 @@ OFAC_XG5.Layout.InputLayout XG5prep(in_data le) := TRANSFORM
 	search_string := 	IF(le.name_unparsed<>'',
 												le.name_unparsed,
 												TRIM(le.name_first)+' '+TRIM(le.name_middle)+' '+TRIM(le.name_last));
+												// Code will change here
 	SELF.seq := le.seq;
 	self.acctno := le.acctno;
 	SELF.FullName := TRIM(search_string,LEFT,RIGHT);
