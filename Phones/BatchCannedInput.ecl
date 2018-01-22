@@ -1,3 +1,4 @@
+IMPORT Phones;
 EXPORT BatchCannedInput := MODULE
 	EXPORT PhonesAttribute := dataset([
 		{'101', '2012042665'}, //disconnected
@@ -16,8 +17,8 @@ EXPORT BatchCannedInput := MODULE
 		{'114', '2012060184'}, //disconnected
 		{'115', '2012069861'}, //suspended
 		{'116', '2012061419'}, //suspended-reactivated
-		{'117', '2012077757'}, //suspended-reactivated 
-		{'118', '2012060963'}, //suspended-reactivated 
+		{'117', '2012077757'}, //suspended-reactivated
+		{'118', '2012060963'}, //suspended-reactivated
 		{'119', '5407472291'}, //no specific event
 		{'220', '4079820087'}, //no specific event
 		{'221', '2012000404'}, //disconnected
