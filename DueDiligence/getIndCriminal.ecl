@@ -1,8 +1,9 @@
-﻿Import SexOffender, Risk_indicators, doxie_files, SexOffender_Services, RiskWise, ut, VerificationOfOccupancy, liensv2, STD;
+﻿Import SexOffender, Risk_indicators, doxie_files, SexOffender_Services, RiskWise, ut, VerificationOfOccupancy, liensv2, STD, iesp;
 
 
 
 export getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individuals ,
+              boolean ReportIsRequested = FALSE,  
 													 boolean debugmode = FALSE,  
 													 boolean isFCRA = false
   													) := FUNCTION
@@ -231,12 +232,6 @@ export getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
 									 KEEP(DueDiligence.Constants.MAX_KEEP));	
 
  
-  //*****BEGIN FOR TESTING ONLY
-   //   BuildSomeTestCases  := DueDiligence.ForTesting_Business_LAF.MockUpCriminalData(WithOffenseRiskData);	
-
-  //****END FOR TESTING ONLY
- 
- 
  // ----                                                                                 ------	
 	// ---- Dates in the raw data are not guaranteed to be clean.  Go through and           ------
 	// ---- clean any dates(upto 10) used to calculate the attributes                       ------
@@ -246,7 +241,9 @@ export getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
 	// ---- same date is displayed in the report you should show both the cleaned date and  ------
 	// ---- and the vendor supplied date.                                                   ------
 	// ----                                                                                 ------
-	//OffenseRiskCleanDates   :=  DueDiligence.Common.CleanDatasetDateFields(BuildSomeTestCases, 'earliestOffenseDate'); 
+	//***FOR TESTING BEGIN
+	     //OffenseRiskCleanDates   :=  DueDiligence.Common.CleanDatasetDateFields(WithCourtOffenseData_FORTESTINGONLY, 'earliestOffenseDate');
+	//***FOR TESTING END
 	
 	OffenseRiskCleanDates   :=  DueDiligence.Common.CleanDatasetDateFields(WithCourtOffenseData, 'earliestOffenseDate'); 
 	
@@ -254,23 +251,27 @@ export getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
  // ------ Filter the offenses that are not in scope for this run when we have an archrive    ------ 
 	// ------ date present in the input file                                                     ------
 	// ------
-	OffenseRiskFiltered      :=  DueDiligence.Common.FilterRecordsSingleDate(OffenseRiskCleanDates, earliestOffenseDate);    
+	OffenseRiskFiltered      :=  DueDiligence.Common.FilterRecordsSingleDate(OffenseRiskCleanDates, earliestOffenseDate);  
+  
+	
 	
 	// ------                                                                                    ------
  // ------ Calculate how old each offense is and do some additional work on the data          ------ 
 	// ------                                                                                    ------
-	OffenseRiskCalculateAge  := PROJECT(OffenseRiskFiltered, TRANSFORM(RECORDOF (OffenseRiskFiltered), 
+	OffenseRiskCalculateAge  := PROJECT(OffenseRiskFiltered, TRANSFORM(DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense, 
 	                                    SELF.offenseScore                := IF(LEFT.offenseScore IN DueDiligence.Constants.UNKNOWN_OFFENSES,         //** If the offense score is UNKNOWN
-																			                                       DueDiligence.Common.LookAtOther(LEFT.courtOffenseLevel,                 
-																				                                                                     LEFT.charge, 
-																																																						 LEFT.courtDispDesc1, 
-																																																						 LEFT.courtDispDesc2,
-																																																						 LEFT.arr_off_lev_mapped,
-																																																						LEFT.court_off_lev_mapped),              //** THEN look at courtoffenseLevel and/or charge
-																			                                       LEFT.offenseScore),                                                     //** ELSE just keep the offense score as is
+																			                                                         DueDiligence.Common.LookAtOther(LEFT.courtOffenseLevel,                 
+																				                                                                                        LEFT.charge, 
+																																																						                                                      LEFT.courtDispDesc1, 
+																																																						                                                      LEFT.courtDispDesc2,
+																																																						                                                      LEFT.arr_off_lev_mapped,
+																																																						                                                      LEFT.court_off_lev_mapped),              //** THEN look at courtoffenseLevel and/or charge
+																			                                                                                         LEFT.offenseScore),                      //** ELSE just keep the offense score as is
 	                                      /*  Calculate how old each offense is based on the earliest offense date */  
-																			SELF.NumOfDaysAgo                := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)LEFT.earliestOffenseDate, (STRING)LEFT.DateToUse),
-																			SELF                             := LEFT;));
+																			                  SELF.NumOfDaysAgo                := DueDiligence.Common.DaysApartWithZeroEmptyDate((STRING)LEFT.earliestOffenseDate, (STRING)LEFT.DateToUse),
+																												           /* The earliest offense date was cleaned and defined as an integer by the clean date routine  */ 
+																												         SELF.earliestOffenseDate         := (STRING)LEFT.earliestOffenseDate,
+																			                  SELF                             := LEFT;));
 											
  // ------                                                                                    ------
  // ------ Sort the offenses in offender_key sequence so that we can roll up the data         ------ 
@@ -282,7 +283,7 @@ export getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
 	// ------                                                                                    ------
  // ------ Use this TRANSFORM for the ROLLUP                                                  ------ 
 	// ------                                                                                    ------	
-	recordof(OffenseDataSorted) rollupthecriminaloffenses(OffenseDataSorted le, OffenseDataSorted ri)  := TRANSFORM
+  DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense rollupthecriminaloffenses(OffenseDataSorted le, OffenseDataSorted ri)  := TRANSFORM
 	                              SELF.seq                        := ri.seq;
 																															SELF.did                        := ri.did;
 																															/* These are all evidence that indicates if the DID is currently incarcerated or EVER incarcerated */   
@@ -299,13 +300,13 @@ export getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
 																															SELF                            := le;
 	                              END;
 	// ------                                                                                    ------
-  // ------ Rollup the offenses to get the proper count and eliminated duplicate records       ------ 
+ // ------ Rollup the offenses to get the proper count and eliminated duplicate records       ------ 
 	// ------ Note:  If the case number is blank all rows will be lumped under 1 offense         ------
 	// ------                                                                                    ------
 	OffenseDataRolled := rollup(OffenseDataSorted, rollupthecriminaloffenses(left, right), seq, did, offender_key, caseNum, criminalOffenderLevel);	
   	
 		// ------                                                             ------
-	  // ------  Summarize the Data up to the DID/Individual                ------
+	 // ------  Summarize the Data up to the DID/Individual                ------
 		// ------                                                             ------
 		// ------  criminalOffenderLevel indicates convicted or non-convicted ------
 		// ------   (4 and 2 are convicted, while 3 is non-convicted          ------
@@ -313,118 +314,8 @@ export getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
 		// ------   the type of offenses                                      ------
 		// ------   (F = FELONY, M = MISDEMEANOR, T = TRAFFIC, I = INFRACTIONS -----
 		// ------                                                             ------
-		SummaryOffensesFelony := table(OffenseDataRolled,
-	                               /* columns in the table */  
-	                              {seq, 
-																 did, 
-																 HistoryDate,
-																 DateToUse,
-                                   																 
-																 TotalEverIncarcerations                                      := SUM(GROUP, (integer)(Ever_incarc_offenses  = DueDiligence.Constants.YES
-																                                                                 OR Ever_incarc_offenders = DueDiligence.Constants.YES
-																																																                                 OR Ever_incarc_Punishments = DueDiligence.Constants.YES)),																														 
-                 TotalCurrentIncarcerations                                   := SUM(GROUP, (integer)(Curr_incarc_offenses  = DueDiligence.Constants.YES
-																                                                                 OR Curr_incarc_offenders  = DueDiligence.Constants.YES
-																																																                                 OR Curr_incarc_Punishments = DueDiligence.Constants.YES)),																																																 
-																 TotalCurrentParoles                                          := SUM(GROUP, (integer)(curr_parole_flag = DueDiligence.Constants.YES
-																                                                                 OR Curr_parole_Punishments = DueDiligence.Constants.YES)), 																																			
-                                   																 
-																 TotalConvictedFelonies4F_OVERNYR    /*4F Over n years */     := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_CONVICTED  
-		                                                                               AND  offenseScore = DueDiligence.Constants.FELONY  
-																																		                                               AND  NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																									 
-																 TotalConvictedFelonies4F_NY    /*4F in last N# of years*/    := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_CONVICTED  
-																                                                                 AND  offenseScore = DueDiligence.Constants.FELONY  
-																																																                                 AND  NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																																 
-																 TotalConvictedFelonies4F_EVER    /*4F EVER*/                 := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_CONVICTED  
-		                                                                               AND  offenseScore = DueDiligence.Constants.FELONY)),  																													
-																																		 
-																 TotalConvictedUnknowns4U_OVERNYR  /*4U Over N years */       := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_CONVICTED
-																                                                                 AND  offenseScore IN DueDiligence.Constants.UNKNOWN_OFFENSES
-																																																                                 AND  NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																 
-																 TotalConvictedUnknowns4U_NY    /*4U in last N# of years*/    := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_CONVICTED
-																                                                                 AND  offenseScore IN DueDiligence.Constants.UNKNOWN_OFFENSES
-																																																                                 AND  NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																 
-																 TotalConvictedFelonies4U_EVER  /*4U EVER*/   								        := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_CONVICTED
-																                                                                 AND  offenseScore IN DueDiligence.Constants.UNKNOWN_OFFENSES)),  			 
-																																										 
-																 TotalConvictedMisdemeanor4M_OVERNYR /*4M*/                   := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.MISDEMEANOR
-																																																                                 AND  NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																 
-																 TotalConvictedMisdemeanor4M_NY /*4M*/                        := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.MISDEMEANOR
-																																																                                 AND  NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																 
-																 TotalConvictedMisdemeanor4M_EVER  /*4M EVER*/   						        := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.MISDEMEANOR)), 
-																																																
-																TotalNonConvictedFelonies3F_OVERNYR /*3F  */                   := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.FELONY
-                                                                                 AND  NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																 
-																TotalNonConvictedFelonies3F_NY /*3F in last N# of years*/     := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.FELONY
-																																																                                 AND  NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																 
-																TotalNonConvictedFelonies3F_EVER /*3F EVER*/                  := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.FELONY)), 
-																																																  																																					
-																TotalNonConvictedUnknowns3U_OVERNYR /*3U  */                  := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED
-																                                                                 AND  offenseScore IN DueDiligence.Constants.UNKNOWN_OFFENSES
-																																																                                 AND  NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																																 
-																TotalNonConvictedUnknowns3U_NY /*3U in last N# of years*/     := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED
-																                                                                 AND  offenseScore IN DueDiligence.Constants.UNKNOWN_OFFENSES
-																																																                                 AND  NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																 
-																TotalNonConvictedUnknowns3U_EVER/*3U EVER*/                   := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED
-																                                                                 AND  offenseScore IN DueDiligence.Constants.UNKNOWN_OFFENSES)), 
-	 
-																TotalNonConvictedMisdemeanor3M_OVERNYR /*3M in last year*/    := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.MISDEMEANOR
-																																																                                 AND  NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																 
-																TotalNonConvictedMisdemeanor3M_NY /*3M in last N# of years*/  := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.MISDEMEANOR
-																																																                                 AND  NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																 
-															  TotalNonConvictedMisdemeanor3M_EVER /*3M EVER*/               := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.NONTRAFFIC_NOT_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.MISDEMEANOR)),
-																																																 
-																TotalConvictedTraffic2T_OVERNYR     /*2T*/                     := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.TRAFFIC_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.TRAFFIC
-																																																                                 AND  NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																
-																TotalConvictedTraffic2T_NY     /*2T*/                         := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.TRAFFIC_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.TRAFFIC
-																																															 	                                AND  NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																																
-																TotalConvictedTraffic2T_EVER     /*2T*/                       := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.TRAFFIC_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.TRAFFIC)),
-																																															 	                                
-																																																																															
-																TotalConvictedInfractions2I_OVERNYR /*2I*/                    := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.TRAFFIC_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.INFRACTION
-																																																                                 AND  NumOfDaysAgo > ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																
-																TotalConvictedInfractions2I_NY  /*2I*/                        := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.TRAFFIC_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.INFRACTION
-																																																                                 AND  NumOfDaysAgo <= ut.DaysInNYears(DueDiligence.Constants.YEARS_TO_LOOK_BACK))),
-																																																																 
-																TotalConvictedInfractions2I_EVER  /*2I*/                      := SUM(GROUP, (integer)(criminalOffenderLevel = DueDiligence.Constants.TRAFFIC_CONVICTED
-																                                                                 AND  offenseScore = DueDiligence.Constants.INFRACTION)),
-																																																                                 
-																																																
-															  /*  Calculate the TOTAL of all OFFENSES for this DID  */   
-																TotalOffensesThisDID                                          := COUNT(GROUP) 
-				
-															  /*end of columns in the table */ },
-																/* Grouped by */  
-																seq, did);
+		
+	SummaryOffensesFelony    :=  DueDiligence.subFunctions.ProcessOffenses(OffenseDataRolled);  
 																
 	// ------                                                                                    ------
 	// ------ Do the final join back to the businessExecutives input                             ------ 
@@ -476,7 +367,8 @@ export getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
 														self := left),
 									left outer);
 	
-
+  
+	
 	
 	// -----                                   ----
 	// ----- FOR SPECIAL VALIDATION            ----
@@ -487,6 +379,7 @@ export getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
   // ----- a CHILD DATASET of OFFENSES for   ----
   // ----- each DID in the Related Parties   ----
   // -----                                   ----
+  // DIDOffensesPreSort  := PROJECT(UpdateBusnExecCriminalWithReport, 
    DIDOffensesPreSort  := PROJECT(OffenseDataRolled, 
 	                                 TRANSFORM(DueDiligence.LayoutsInternal.CriminalDATASETLayout,
 	                                    SELF.DIDOffenses := PROJECT(LEFT, 
@@ -522,6 +415,11 @@ export getIndCriminal(DATASET(DueDiligence.LayoutsInternal.RelatedParty) Individ
 	 														TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty,
 	 																			SELF.party.partyOffenses := RIGHT.DIDOffenses;
 	 																			SELF := LEFT;));
+																				
+																				
+																				
+																				
+	
 									
 	// ********************
 	//   DEBUGGING OUTPUTS

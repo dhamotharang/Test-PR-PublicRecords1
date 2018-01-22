@@ -10,7 +10,7 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   // ------                                                                             ------
 	// ------ Get the LinkIDs for this Business                                          ------
 	// ------                                                                            ------
-	BusnKeys    := DueDiligence.Common.GetLinkIDs(BusnData);
+	BusnKeys    := DueDiligence.CommonBusiness.GetLinkIDs(BusnData);
 	
   // ------                                                                            ------	
 	// ------ Property Data - Using Business IDs                                         ------
@@ -25,7 +25,7 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------                                                                             ------
 	// ------ Add our sequence number to the Raw Property records found for this Business ------
 	// ------                                                                             ------
-	PropertyRaw_with_seq := DueDiligence.Common.AppendSeq(PropertyRaw, BusnData, TRUE);
+	PropertyRaw_with_seq := DueDiligence.CommonBusiness.AppendSeq(PropertyRaw, BusnData, TRUE);
 	
 	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
 	propertyCleanDates := DueDiligence.Common.CleanDatasetDateFields(PropertyRaw_with_seq, 'dt_first_seen, dt_vendor_first_reported');

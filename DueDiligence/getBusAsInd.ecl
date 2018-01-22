@@ -39,9 +39,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	// Filter out records after our history date.
 	advoFilt := DueDiligence.Common.FilterRecords(advoCleanRecs, date_first_seen, date_vendor_first_reported);
-	
-	
-																
+																	
 	advoOnInputAddrSort := SORT(advoFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), zip, prim_range,	prim_name, addr_suffix, predir, postdir, sec_range, -advoDtfirstseen); 
 	advoDedup := DEDUP(advoOnInputAddrSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), zip, prim_range, prim_name, addr_suffix, predir, postdir, sec_range);
 																									
@@ -118,31 +116,7 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																											RIGHT.feinMatched => RIGHT.fein,
 																											DueDiligence.Constants.EMPTY);
 																		SELF := LEFT;));
-																		
-	fn_isFoundInCompanyName(STRING CompanyName, STRING PersonName) := FUNCTION
-		UCase       := STD.Str.ToUpperCase;
-		layout_word := {STRING companyname_word};
-
-		// Make sure the first and last name are at least 2 characters long so 
-		// we aren't comparing blank or 1 character names to the company name.
-		hasAtLeastTwoChars := LENGTH(TRIM(PersonName)) >= 2;
-
-		// Remove possessive suffixes (...'s and ...'), and commas.
-		layout_word xfm_removeUnwantedChars( layout_word le ) := TRANSFORM
-			filt1 := STD.Str.FindReplace( le.companyname_word, '\'S', DueDiligence.Constants.EMPTY );
-			filt2 := STD.Str.FindReplace( filt1     , '\'' , DueDiligence.Constants.EMPTY );
-			filt3 := STD.Str.FindReplace( filt2     , ','  , DueDiligence.Constants.EMPTY );
-			SELF.companyname_word := filt3;
-		END;
-		
-		set_CompanyName_words     := STD.Str.SplitWords(UCase(CompanyName),' ');
-		ds_CompanyName_words      := DATASET(set_CompanyName_words, layout_word);
-		ds_CompanyName_words_filt := PROJECT(ds_CompanyName_words, xfm_removeUnwantedChars(LEFT));
-		isFoundInCompanyName      := EXISTS(ds_CompanyName_words_filt(companyname_word = UCase(PersonName)));
-		
-		RETURN isFoundInCompanyName AND hasAtLeastTwoChars;
-	END;
-	
+																			
 	consumerHeaderDidRaw := JOIN(uniqueDIDs, doxie.Key_Header, 
 																LEFT.did > 0 AND 
 																KEYED(LEFT.did = RIGHT.s_did) AND
@@ -160,8 +134,8 @@ EXPORT getBusAsInd(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																					
 																					SELF.dt_first_seen := IF(RIGHT.dt_first_seen > 0, (STRING)RIGHT.dt_first_seen, (STRING)RIGHT.dt_vendor_first_reported);
 																					
-																					fNameHit := feinMatched AND fn_isFoundInCompanyName(LEFT.companyName, RIGHT.fname);
-																					lNameHit := feinMatched AND fn_isFoundInCompanyName(LEFT.companyName, RIGHT.lname);
+																					fNameHit := feinMatched AND Business_Risk_BIP.Common.fn_isFoundInCompanyName(LEFT.companyName, RIGHT.fname);
+																					lNameHit := feinMatched AND Business_Risk_BIP.Common.fn_isFoundInCompanyName(LEFT.companyName, RIGHT.lname);
 																					nameSimilar := fNameHit OR lNameHit;
 																					
 																					addressPopulated := TRIM(LEFT.prim_Name) <> DueDiligence.Constants.EMPTY AND TRIM(LEFT.zip5) <> DueDiligence.Constants.EMPTY;

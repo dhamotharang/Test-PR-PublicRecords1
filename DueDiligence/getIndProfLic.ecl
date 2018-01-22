@@ -19,13 +19,7 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 																	SELF := [];),
 											ATMOST(RIGHT.did = LEFT.party.did, DueDiligence.Constants.MAX_ATMOST_1000));
 											
-	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
-	licenseCleanDate := DueDiligence.Common.CleanDatasetDateFields(licenseRaw, 'date_first_seen, date_last_seen, expiration_date, issue_date');										
-											
-	// Filter out records after our history date.
-	licenseFilt := DueDiligence.Common.FilterRecordsSingleDate(licenseCleanDate, date_first_seen);
-	
-	projectLicense := PROJECT(licenseFilt, TRANSFORM(DueDiligence.LayoutsInternal.PartyLicences,
+	projectLicense := PROJECT(licenseRaw, TRANSFORM(DueDiligence.LayoutsInternal.PartyLicenses,
 																										
 																										professionCat := TRIM(LEFT.profession_or_board, LEFT, RIGHT);
 																										licenseType := TRIM(LEFT.license_type, LEFT, RIGHT);
@@ -46,9 +40,9 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 																																		DueDiligence.Constants.PROF_LIC_OTHER);
 																																		
 																										histDate := IF(LEFT.historyDate = DueDiligence.Constants.date8Nines, STD.Date.Today(), LEFT.historyDate);
-																										
-																										current := MAP(LEFT.expiration_date = 0 => TRUE,
-																																		histDate <= LEFT.expiration_date => TRUE,
+																										convertExpiration := (UNSIGNED4)LEFT.expiration_date;
+																										current := MAP(convertExpiration = DueDiligence.Constants.NUMERIC_ZERO => TRUE,
+																																		histDate <= convertExpiration => TRUE,
 																																		FALSE);
 																										
 																										SELF.license.licenseType := licenseType;
@@ -59,12 +53,12 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 																										SELF.license.medical := category = DueDiligence.Constants.PROF_LIC_MEDICAL;
 																										SELF.license.blastPilot := category = DueDiligence.Constants.PROF_LIC_BLAST_PILOT;
 																										SELF.license.other := category = DueDiligence.Constants.PROF_LIC_OTHER;
-																										SELF.license.expirationDate := (UNSIGNED)LEFT.expiration_date;
-																										SELF.license.dateFirstSeen := LEFT.date_first_seen;
-																										SELF.license.dateLastSeen := LEFT.date_last_seen;
+																										SELF.license.expirationDate := (UNSIGNED4)LEFT.expiration_date;
+																										SELF.license.dateFirstSeen := (UNSIGNED4)LEFT.date_first_seen;
+																										SELF.license.dateLastSeen := (UNSIGNED4)LEFT.date_last_seen;
 																										SELF.license.isActive := current;
 																										SELF.license.licenseNumber := LEFT.license_number;
-																										SELF.license.issueDate := LEFT.issue_date;
+																										SELF.license.issueDate := (UNSIGNED4)LEFT.issue_date;
 																										SELF := LEFT;
 																										SELF := [];));
 
@@ -81,14 +75,8 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 																			SELF := RIGHT;
 																			SELF := [];),
 													ATMOST(LEFT.party.did = RIGHT.s_did, DueDiligence.Constants.MAX_ATMOST_1000));
-
-	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently - dates used in FilterRecords have been cleaned
-	mariLicenseDateClean:= DueDiligence.Common.CleanDatasetDateFields(mariLicenseRaw, 'date_first_seen, date_vendor_first_reported, date_last_seen, expire_dte, orig_issue_dte');
 	
-	// Filter out records after our history date.
-	mariLicenseFilt := DueDiligence.Common.FilterRecords(mariLicenseDateClean, date_first_seen, date_vendor_first_reported);
-	
-	projectMariLicense := PROJECT(mariLicenseFilt, TRANSFORM(DueDiligence.LayoutsInternal.PartyLicences,
+	projectMariLicense := PROJECT(mariLicenseRaw, TRANSFORM(DueDiligence.LayoutsInternal.PartyLicenses,
 																														
 																														professionCat := TRIM(LEFT.std_prof_desc, LEFT, RIGHT);
 																														licenseType := TRIM(LEFT.std_license_desc, LEFT, RIGHT);
@@ -110,9 +98,9 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 																																						DueDiligence.Constants.PROF_LIC_OTHER);
 																																						
 																														histDate := IF(LEFT.historyDate = DueDiligence.Constants.date8Nines, STD.Date.Today(), LEFT.historyDate);
-																														
-																														current := MAP(LEFT.expire_dte = 0 => TRUE,
-																																						histDate <= LEFT.expire_dte => TRUE,
+																														convertExpiration := (UNSIGNED4)LEFT.expire_dte;
+																														current := MAP(convertExpiration = DueDiligence.Constants.NUMERIC_ZERO => TRUE,
+																																						histDate <= convertExpiration => TRUE,
 																																						FALSE);
 																																						
 																														SELF.license.licenseType := licenseType;
@@ -123,10 +111,10 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 																														SELF.license.medical := category = DueDiligence.Constants.PROF_LIC_MEDICAL;
 																														SELF.license.blastPilot := category = DueDiligence.Constants.PROF_LIC_BLAST_PILOT;
 																														SELF.license.other := category = DueDiligence.Constants.PROF_LIC_OTHER;
-																														SELF.license.expirationDate := (UNSIGNED)LEFT.expire_dte;
-																														SELF.license.dateFirstSeen := LEFT.date_first_seen;
-																														SELF.license.dateLastSeen := LEFT.date_last_seen;
-																														SELF.license.issueDate := LEFT.orig_issue_dte;
+																														SELF.license.expirationDate := (UNSIGNED4)LEFT.expire_dte;
+																														SELF.license.dateFirstSeen := (UNSIGNED4)IF(LEFT.date_first_seen = DueDiligence.Constants.EMPTY, LEFT.date_vendor_first_reported, LEFT.date_first_seen);
+																														SELF.license.dateLastSeen := (UNSIGNED4)LEFT.date_last_seen;
+																														SELF.license.issueDate := (UNSIGNED4)LEFT.orig_issue_dte;
 																														SELF.license.isActive := current;
 																														SELF.license.licenseNumber := LEFT.license_nbr;
 																														SELF.ultID := LEFT.parentUltID;
@@ -140,7 +128,13 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 																												
 	allLicenses := projectLicense + projectMariLicense;		
 	
-	sortLicenses := SORT(allLicenses, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, license.licenseNumber, license.dateFirstSeen);
+	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently - dates used in FilterRecords have been cleaned
+	allLicenseDateClean:= DueDiligence.Common.CleanDatasetDateFields(allLicenses, 'license.dateFirstSeen');
+	
+	// Filter out records after our history date.
+	allLicenseFilt := DueDiligence.Common.FilterRecordsSingleDate(allLicenseDateClean, license.dateFirstSeen);
+	
+	sortLicenses := SORT(allLicenseFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), did, license.licenseNumber, license.dateFirstSeen);
 	rollupLicenses := ROLLUP(sortLicenses,
 														LEFT.seq = RIGHT.seq AND
 														LEFT.ultID = RIGHT.ultID AND
@@ -149,8 +143,7 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 														LEFT.did = RIGHT.did AND
 														LEFT.license.licenseNumber = RIGHT.license.licenseNumber,
 														TRANSFORM(RECORDOF(LEFT),
-																				SELF.license.dateFirstSeen := IF(LEFT.license.dateFirstSeen = 0, RIGHT.license.dateFirstSeen, LEFT.license.dateFirstSeen);
-																				// SELF.license.issueDate := 
+																				SELF.license.dateFirstSeen := IF(LEFT.license.dateFirstSeen = DueDiligence.Constants.NUMERIC_ZERO, RIGHT.license.dateFirstSeen, LEFT.license.dateFirstSeen);
 																				
 																				leftOrRight := IF(LEFT.license.dateLastSeen < RIGHT.license.dateLastSeen, RIGHT, LEFT);
 																				
@@ -173,7 +166,9 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 																												BOOLEAN inactiveMed, BOOLEAN inactiveBP, DATASET(DueDiligence.Layouts.RelatedParty) party},
 																									
 																									SELF.party := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.RelatedParty,
-																																												SELF.licenses := LEFT.license;
+																																												SELF.licenses := PROJECT(LEFT.license, TRANSFORM(DueDiligence.Layouts.Licenses,
+																																																																					SELF := LEFT;
+																																																																					SELF := [];));
 																																												SELF := LEFT;
 																																												SELF := [];));
 																									SELF.activeLA := LEFT.license.isActive AND LEFT.license.lawAcct;
@@ -211,19 +206,19 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 
 
 
+	// OUTPUT(indiv, NAMED('indiv'));
 	// OUTPUT(licenseRaw, NAMED('licenseRaw'));
-	// OUTPUT(licenseFiltRecs, NAMED('licenseFiltRecs'));
 	// OUTPUT(projectLicense, NAMED('projectLicense'));
 	
 	// OUTPUT(mariLicenseRaw, NAMED('mariLicenseRaw'));
-	// OUTPUT(mariLicenseFiltRecs, NAMED('mariLicenseFiltRecs'));
-	// OUTPUT(mariLicenseFilt, NAMED('mariLicenseFilt'));
 	// OUTPUT(projectMariLicense, NAMED('projectMariLicense'));
 	
 	// OUTPUT(allLicenses, NAMED('allLicenses'));
+	// OUTPUT(allLicenseDateClean, NAMED('allLicenseDateClean'));
+	// OUTPUT(allLicenseFilt, NAMED('allLicenseFilt'));
+	
 	// OUTPUT(sortLicenses, NAMED('sortLicenses'));
 	// OUTPUT(rollupLicenses, NAMED('rollupLicenses'));
-	// OUTPUT(dedupLicenses, NAMED('dedupLicenses'));
 	
 	// OUTPUT(projectLic, NAMED('projectLic'));
 	// OUTPUT(rollLicense, NAMED('rollLicense'));

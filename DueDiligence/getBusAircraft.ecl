@@ -30,7 +30,7 @@ EXPORT getBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   // ------                                                                                    ------
 	// ------ FAA - Aircraft Records                                                             ------
 	// ------                                                                                    ------
-	AircraftRaw := FAA.Key_Aircraft_LinkIDs.kFetch2(DueDiligence.Common.GetLinkIDs(BusnData),
+	AircraftRaw := FAA.Key_Aircraft_LinkIDs.kFetch2(DueDiligence.CommonBusiness.GetLinkIDs(BusnData),
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0, /*ScoreThreshold --> 0 = Give me everything*/
 																							Business_Risk_BIP.Constants.Limit_Default,
@@ -39,7 +39,7 @@ EXPORT getBusAircraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   // ------                                                                                    ------	
 	// ------ Add our sequence number to the avaiation records found for this Business           ------
 	// ------                                                                                    ------
-	AircraftRaw_with_seq := DueDiligence.Common.AppendSeq(AircraftRaw, tempBusnData, TRUE);
+	AircraftRaw_with_seq := DueDiligence.CommonBusiness.AppendSeq(AircraftRaw, tempBusnData, TRUE);
 	
 	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
 	aircraftDateClean := DueDiligence.Common.CleanDatasetDateFields(AircraftRaw_with_seq, 'date_first_seen, date_last_seen');
