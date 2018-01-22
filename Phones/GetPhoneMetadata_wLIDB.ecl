@@ -106,7 +106,7 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 	//is_current looks like it's true for all records but we are keeping the old logic for now.
 	dPortedPhonesFinal := JOIN(dPortedPhones, PhonesInfo.Key_Source_Reference.ocn_name,
 		KEYED(LEFT.account_owner = RIGHT.ocn) AND
-		Phones.StandardName(LEFT.carrier_name) = RIGHT.name AND
+		Phones.Functions.StandardName(LEFT.carrier_name) = RIGHT.name AND
 		RIGHT.is_current,
 		TRANSFORM(Layout_BatchRaw,
 			//All records get carrier_city and carrier_state added
