@@ -76,14 +76,14 @@ export WorkPlace_Get_Clarity_Data := module
 	 // gateway location.
 	 // The part after the "http://" and before the "@" is the uid & password.
    // ESP gateway dev, on 10/18/10 securedev was re-configured to point at the vendor prod system for running initial tests
-	 // gateway_url := 'https://webapp_roxie_test:web33436$@securedev.accurint.com/espdev/gw/?ver_=1.5';
+	 // gateway_url := 'https://webapp_roxie_test:[PASSWORD_REDACTED]@securedev.accurint.com/espdev/gw/?ver_=1.5';
    // ESP gateway cert, configured to point at vendor test system
-	 //gateway_url := 'http://webapp_roxie_test:web33436$@rwgatewaycert.br.seisint.com:8090/WsGateway';
+	 //gateway_url := 'http://webapp_roxie_test:[PASSWORD_REDACTED]@rwgatewaycert.br.seisint.com:8090/WsGateway';
 	 // OR per ken Subratie use this ip ----v
-	 //gateway_url := 'http://webapp_roxie_test:web33436$@10.173.251.111:8090/WsGateway'; //.../SkipTraceSearch?form ???
+	 //gateway_url := 'http://webapp_roxie_test:[PASSWORD_REDACTED]@10.173.251.111:8090/WsGateway'; //.../SkipTraceSearch?form ???
 	 // ESP gateway prod - on 10/28/10 SkipTraceSearch is scheduled to be released on ESP gateway prod
 	 // This is similar to what Kettle passes in to RealTimePhones_BatchService
-	 // gateway_url := 'http://web_bps_roxie:r45gu@lt-esponline01:8091/wsGateway';
+	 // gateway_url := 'http://web_bps_roxie:[PASSWORD_REDACTED]@lt-esponline01:8091/wsGateway';
 
 	 ds_in_gateways := project(in_gateways,transform(risk_indicators.Layout_Gateways_In,
 		                                      self.servicename  := StringLib.StringToUpperCase(LEFT.serviceName),

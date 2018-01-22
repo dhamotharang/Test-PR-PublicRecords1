@@ -225,7 +225,7 @@ END;
 <gateways>
   <row>
     <servicename>erc</servicename>
-    <url>http://rw_score_dev:Password01@10.176.68.164:7726/WsGatewayEx?ver_=1.7</url>
+    <url>http://rw_score_dev:[PASSWORD_REDACTED]@10.176.68.164:7726/WsGatewayEx?ver_=1.7</url>
   </row>
   <row>
     <servicename>reportservice</servicename>

@@ -2,7 +2,7 @@ import iesp, Risk_Indicators, Fingerprint, ut, Gateway;
 
 /*
 This information is required on transactions...
-gates := dataset([{'News','HTTP://xmlrsk_qa_gw_roxie:g0h3%40t2x@gatewaycertesp.sc.seisint.com:7726/WsGateway'}], Risk_Indicators.Layout_Gateways_In);
+gates := dataset([{'News','HTTP://xmlrsk_qa_gw_roxie:[PASSWORD_REDACTED]@gatewaycertesp.sc.seisint.com:7726/WsGateway'}], Risk_Indicators.Layout_Gateways_In);
 #stored('_TransactionId', '111r000');
 #stored('Gateways',gates);
 */

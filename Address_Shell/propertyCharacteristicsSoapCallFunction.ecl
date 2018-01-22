@@ -38,7 +38,7 @@ EXPORT propertyCharacteristicsSoapCallFunction (DATASET(Address_Shell.layoutInpu
 	InsuranceContext_iesp.insurance_risk_context.t_PropertyInformationContext intoInsuranceContextRequest(Address_Shell.layoutInput le) := TRANSFORM
 		gateway := PROJECT(ut.ds_oneRecord, TRANSFORM(InsuranceContext_iesp.AccountInformation.t_Gateway,
 																							SELF.ServiceName := 'property_value';
-																							// Engineering test URL: 'http://rw_score_dev:Password01@10.176.68.164:7726/WsGatewayEx?ver_=1.7';
+																							// Engineering test URL: 'http://rw_score_dev:[PASSWORD_REDACTED]@10.176.68.164:7726/WsGatewayEx?ver_=1.7';
 																							SELF.URL := ercGatewayURL;
 																							SELF := []));
 

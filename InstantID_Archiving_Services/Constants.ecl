@@ -5,7 +5,7 @@ EXPORT Constants := MODULE
 	EXPORT	Max_RECORD_COUNT								:=	2;
 	EXPORT	Max_RISK_COUNT									:=	40;// usually there is only 20 risk indicators returned with a transaction so no need to do a 1000 in the atmost
 	EXPORT  Max_Error_COUNT 								:= 250000;//225000; //works
-//	EXPORT	string	ServiceURL						:=	'http://delta_iidarch_dev:g3t3m2013@espdev64.sc.seisint.com:8501/WsDeltaBase/preparedsql?ver_=1';
+//	EXPORT	string	ServiceURL						:=	'http://delta_iidarch_dev:[PASSWORD_REDACTED]@espdev64.sc.seisint.com:8501/WsDeltaBase/preparedsql?ver_=1';
 	EXPORT  ForAll													:=  'ALL';
 	EXPORT  Flexid			 										:=  'FLEXID';
 	EXPORT  InstantId				 								:=  'INSTANTID';

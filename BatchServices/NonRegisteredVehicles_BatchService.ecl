@@ -88,13 +88,13 @@ ENDMACRO;
    // the url & id/password below should now be used: ------v
    <dataset><row>
      <servicename>polk</servicename>
-     <url>http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7726/WsGateway</url>
+     <url>http://rw_score_dev:[PASSWORD_REDACTED]@gatewaycertesp.sc.seisint.com:7726/WsGateway</url>
    </row></dataset>
 
    OR Per Roberto Perez on 02/15/12, this is used by Kettle for testing:
    <RealTimeMVRGateway>
     <servicename>polk</servicename>
-    <url>http://webapp_roxie_test:web33436$@gatewaycertesp.sc.seisint.com:7726/WsGateway</url>
+    <url>http://webapp_roxie_test:[PASSWORD_REDACTED]@gatewaycertesp.sc.seisint.com:7726/WsGateway</url>
    </RealTimeMVRGateway>
 
   !!! NOTE: On the esp cert gatewaty box(url), the "polk" servicename not listed, but on the ESP gateway boxes, 
