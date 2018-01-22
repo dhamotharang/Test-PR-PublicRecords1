@@ -1,4 +1,4 @@
-IMPORT IdentityFraud_Services, PersonReports, doxie, iesp, Codes, header, doxie_crs, 
+﻿IMPORT IdentityFraud_Services, PersonReports, doxie, iesp, Codes, header, doxie_crs, 
           doxie_raw, ContactCard, ut, person_models, suppress;
 
 ifr := iesp.identityfraudreport;
@@ -44,7 +44,8 @@ EXPORT IdentityFraudReport (
                    ut.Min2 (doxie.Fn_Tra_Penalty_Phone (L.phone), doxie.Fn_Tra_Penalty_Phone (L.listed_phone));
     Self := L;
   end;
-  shared headerSubj := project (header_all_subj, CalculatePenalty (Left)) (penalt < Constants.MAX_PENALTY_SCORE);
+  headerSubj_w_penalty := project (header_all_subj, CalculatePenalty (Left));
+		shared headerSubj := headerSubj_w_penalty(param.skip_penalty_filter or penalt < Constants.MAX_PENALTY_SCORE);
 
   // and here we make the decision whether to use input DID
 	shared subj_did := if (exists (headerSubj), input_dids[1].did, 0);
