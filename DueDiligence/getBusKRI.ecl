@@ -39,7 +39,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		 BusAssetOwnProperty_Flag0        := IF(STD.Str.Find(BusAssetOwnProperty_Flag_Concat, 'T', 1) = 0, 'T', 'F');     /* Insufficient information reported on the business */
 		 BusAssetOwn_property_Flag_final  := BusAssetOwnProperty_Flag_Concat + BusAssetOwnProperty_Flag0; 
 		
-		 self.BusAssetOwnProperty_Flags   :=  BusAssetOwn_property_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
+		 self.BusAssetOwnProperty_Flag   :=  BusAssetOwn_property_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
 		 self.BusAssetOwnProperty         := (STRING)(10 - STD.Str.Find(BusAssetOwn_property_Flag_final, 'T', 1));        /* Set the index to the position of the first 'T'.  
 	 
 		
@@ -68,7 +68,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 	 BusAssetOwnAircraft_Flag0        := IF(STD.Str.Find(BusAssetOwnAircraft_Flag_Concat, 'T', 1) = 0, 'T', 'F');     /* Insufficient information reported on the business */
 	 BusAssetOwnAircraft_Flag_final   := BusAssetOwnAircraft_Flag_Concat + BusAssetOwnAircraft_Flag0; 
 	
-	 self.BusAssetOwnAircraft_Flags   :=  BusAssetOwnAircraft_Flag_final;                                             /* This a string of T or F based on how the data used to calculate the KRI  */
+	 self.BusAssetOwnAircraft_Flag   :=  BusAssetOwnAircraft_Flag_final;                                             /* This a string of T or F based on how the data used to calculate the KRI  */
 	 self.BusAssetOwnAircraft         := (STRING)(10-STD.Str.Find(BusAssetOwnAircraft_Flag_final, 'T', 1));           /* Set the index to the position of the first 'T'. */ 
 																						 
 																																																					 
@@ -96,7 +96,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		BusAssetOwnWatercraft_Flag0        := IF(STD.Str.Find(BusAssetOwnWatercraft_Flag_Concat, 'T', 1) = 0, 'T', 'F');     /* Insufficient information reported on the business */
 		BusAssetOwnWatercraft_Flag_final   := BusAssetOwnWatercraft_Flag_Concat + BusAssetOwnWatercraft_Flag0; 
 		
-		self.BusAssetOwnWatercraft_Flags   :=  BusAssetOwnWatercraft_Flag_final;                                             /* This a string of T or F based on how the data used to calculate the KRI  */
+		self.BusAssetOwnWatercraft_Flag   :=  BusAssetOwnWatercraft_Flag_final;                                             /* This a string of T or F based on how the data used to calculate the KRI  */
 		self.BusAssetOwnWatercraft         := (STRING)(10-STD.Str.Find(BusAssetOwnWatercraft_Flag_final, 'T', 1));           /* Set the index to the position of the first 'T'.  */
 			
 			
@@ -125,7 +125,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		BusAssetOwnVehicle_Flag0        := IF(STD.Str.Find(BusAssetOwnVehicle_Flag_Concat, 'T', 1) = 0, 'T', 'F');      /* Insufficient information reported on the business */
 		BusAssetOwnVehicle_Flag_final   := BusAssetOwnVehicle_Flag_Concat + BusAssetOwnVehicle_Flag0; 
 		
-		self.BusAssetOwnVehicle_Flags   :=  BusAssetOwnVehicle_Flag_final;                                              /* This a string of T or F based on how the data used to calculate the KRI  */
+		self.BusAssetOwnVehicle_Flag   :=  BusAssetOwnVehicle_Flag_final;                                              /* This a string of T or F based on how the data used to calculate the KRI  */
 		self.BusAssetOwnVehicle         := (STRING)(10-STD.Str.Find(BusAssetOwnVehicle_Flag_final, 'T', 1));            /* Set the index to the position of the first 'T'.  */
 																						
 																						
@@ -153,7 +153,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		 BusAccessToFundsProperty_Flag0       := IF(STD.Str.Find(BusAccessToFundsProperty_Flag_Concat, 'T', 1) = 0, 'T', 'F');     /* Insufficient information reported on the business */
 		 BusAccessToFundsProperty_Flag_final  := BusAccessToFundsProperty_Flag_Concat + BusAccessToFundsProperty_Flag0; 
 		
-		 self.BusAccessToFundsProperty_Flags  :=  BusAccessToFundsProperty_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
+		 self.BusAccessToFundsProperty_Flag  :=  BusAccessToFundsProperty_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
 		 self.BusAccessToFundsProperty        := (STRING)(10 - STD.Str.Find(BusAccessToFundsProperty_Flag_final, 'T', 1));        /* Set the index to the position of the first 'T'.  
 	 
 																					
@@ -189,8 +189,8 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		bvrConcat_final := bvrConcat + bvrFlag0;
 
-		SELF.BusValidityRisk_Flags := bvrConcat_final;
-		SELF.BusValidityRisk  := (STRING)(10-STD.Str.Find(bvrConcat_final, 'T', 1));
+		SELF.BusValidity_Flag := bvrConcat_final;
+		SELF.BusValidity  := (STRING)(10-STD.Str.Find(bvrConcat_final, 'T', 1));
 		
 																		
 		/*BUSINESS SOS AGE RANGE*/ 
@@ -210,7 +210,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		sosConcat_Final := sosConcat + sosFlag0;
 
-		SELF.BusSOSAgeRange_Flags := sosConcat_Final;
+		SELF.BusSOSAgeRange_Flag := sosConcat_Final;
 		SELF.BusSOSAgeRange  := (STRING)(10-STD.Str.Find(sosConcat_Final, 'T', 1)); 
 
 
@@ -231,7 +231,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		hdrAgeConcat_Final := hdrAgeConcat + hdrAgeFlag0;
 		
-		SELF.BusPublicRecordAgeRange_Flags := hdrAgeConcat_Final;
+		SELF.BusPublicRecordAgeRange_Flag := hdrAgeConcat_Final;
 		SELF.BusPublicRecordAgeRange := (STRING)(10-STD.Str.Find(hdrAgeConcat_Final, 'T', 1)); 
 		
 		
@@ -252,7 +252,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		structConcat_Final := structConcat + structFlag0;
 		
-		SELF.BusStructureType_Flags := structConcat_Final;
+		SELF.BusStructureType_Flag := structConcat_Final;
 		SELF.BusStructureType := (STRING)(10-STD.Str.Find(structConcat_Final, 'T', 1)); 
 		
 				
@@ -272,8 +272,8 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		industConcat_Final := industConcat + industFlag0;
 		
-		SELF.BusIndustryRisk_Flags := industConcat_Final;
-		SELF.BusIndustryRisk := (STRING)(10-STD.Str.Find(industConcat_Final, 'T', 1)); 
+		SELF.BusIndustry_Flag := industConcat_Final;
+		SELF.BusIndustry := (STRING)(10-STD.Str.Find(industConcat_Final, 'T', 1)); 
 		
 
 		/*BUSINESS STABILITY RISK*/
@@ -295,8 +295,8 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		stabConcat_Final := stabConcat + stabFlag0;
 		
-		SELF.BusStabilityRisk_Flags := stabConcat_Final;
-		SELF.BusStabilityRisk := (STRING)(10-STD.Str.Find(stabConcat_Final, 'T', 1)); 
+		SELF.BusStability_Flag := stabConcat_Final;
+		SELF.BusStability := (STRING)(10-STD.Str.Find(stabConcat_Final, 'T', 1)); 
 		
 		
 		/*BUSINESS SHELL SHELF RISK*/
@@ -320,8 +320,8 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		shellShelfConcat_Final := shellShelfConcat + shellShelfFlag1 + shellShelfFlag0;
 		
-		SELF.BusShellShelfRisk_Flags := shellShelfConcat_Final;
-		SELF.BusShellShelfRisk := (STRING)(10-STD.Str.Find(shellShelfConcat_Final, 'T', 1)); 
+		SELF.BusShellShelf_Flag := shellShelfConcat_Final;
+		SELF.BusShellShelf := (STRING)(10-STD.Str.Find(shellShelfConcat_Final, 'T', 1)); 
 		
 		
 		/*BUSINESS EXECUTIVE OFFICERS RISK*/
@@ -343,8 +343,8 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		
 		execOfficerRiskConcat_Final := execOfficerRiskConcat + execOfficerRiskFlag0;
 		
-		SELF.BusExecOfficersRisk_Flags := execOfficerRiskConcat_Final;
-		SELF.BusExecOfficersRisk := (STRING)(10-STD.Str.Find(execOfficerRiskConcat_Final, 'T', 1));
+		SELF.BusBEOProfLicense_Flag := execOfficerRiskConcat_Final;
+		SELF.BusBEOProfLicense := (STRING)(10-STD.Str.Find(execOfficerRiskConcat_Final, 'T', 1));
 		
 		
 		
@@ -389,8 +389,8 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		BusGeoRisk_Flag0        := IF(STD.Str.Find(BusGeoRisk_Flag_Concat, 'T', 1) = 0, 'T', 'F');     /* Insufficient information reported on the business */
 		BusGeoRisk_Flag_final   := BusGeoRisk_Flag_Concat + BusGeoRisk_Flag0; 
 		
-		self.BusGeographicRisk_Flags   :=  BusGeoRisk_Flag_final;                                             /* This a string of T or F based on how the data used to calculate the KRI  */
-		self.BusGeographicRisk         := (STRING)(10-STD.Str.Find(BusGeoRisk_Flag_final, 'T', 1));           /* Set the index to the position of the first 'T'.  */
+		self.BusGeographic_Flag   :=  BusGeoRisk_Flag_final;                                             /* This a string of T or F based on how the data used to calculate the KRI  */
+		self.BusGeographic         := (STRING)(10-STD.Str.Find(BusGeoRisk_Flag_final, 'T', 1));           /* Set the index to the position of the first 'T'.  */
 			
 			
 		
@@ -419,7 +419,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		 BusMatchLevel_Flag0       := IF(STD.Str.Find(BusMatchLevel_Flag_Concat, 'T', 1) = 0, 'T', 'F');     /* Insufficient information reported on the business */
 		 BusMatchLevel_Flag_final  := BusMatchLevel_Flag_Concat + BusMatchLevel_Flag0; 
 		
-		 self.BusMatchLevel_Flags  :=  BusMatchLevel_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
+		 self.BusMatchLevel_Flag  :=  BusMatchLevel_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
 		 self.BusMatchLevel        := (STRING)(10 - STD.Str.Find(BusMatchLevel_Flag_final, 'T', 1));        /* Set the index to the position of the first 'T'.  */  
 		
 			/* BUSINESS LEGAL EVENTS - CRIMINAL */  																																																	 
@@ -455,7 +455,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		 BusLegalCriminal_Flag0    := IF(STD.Str.Find(BusLegalCriminal_Flag_Concat, 'T', 1) = 0, 'T', 'F');     /* Insufficient information reported on the business */
 		 BusLegalCriminal_Flag_final  := BusLegalCriminal_Flag_Concat + BusLegalCriminal_Flag0; 
 		
-		 self.BusLegalCriminal_Flags  :=  BusLegalCriminal_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
+		 self.BusLegalCriminal_Flag  :=  BusLegalCriminal_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
 		 self.BusLegalCriminal        := (STRING)(10 - STD.Str.Find(BusLegalCriminal_Flag_final, 'T', 1));        /* Set the index to the position of the first 'T'.  */  
 		
 /* BUSINESS LEGAL EVENTS - TRAFFIC & INFRACTIONS */  																																																	 
@@ -489,7 +489,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		 BusLegalTraffInfr_Flag0    := IF(STD.Str.Find(BusLegalTraffInfr_Flag_Concat, 'T', 1) = 0, 'T', 'F');       /* Insufficient information reported on the business */
 		 BusLegalTraffInfr_Flag_final  := BusLegalTraffInfr_Flag_Concat + BusLegalTraffInfr_Flag0; 
 		
-		 self.BusLegalTraffInfr_Flags  :=  BusLegalTraffInfr_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
+		 self.BusLegalTraffInfr_Flag  :=  BusLegalTraffInfr_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
 		 self.BusLegalTraffInfr        := (STRING)(10 - STD.Str.Find(BusLegalTraffInfr_Flag_final, 'T', 1));        /* Set the index to the position of the first 'T'.  */ /* BUSINESS LEGAL EVENTS - TRAFFIC & INFRACTIONS */  																																																	 
 	
 	
@@ -530,7 +530,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		 
 		 BusLegalCivil_Flag_Concat :=  BusLegalCivil_Flag9 +
 																			BusLegalCivil_Flag8 +
-																		 BusLegalCivil_Flag7 +
+																			BusLegalCivil_Flag7 +
 																			BusLegalCivil_Flag6 +
 																			BusLegalCivil_Flag5 +
 																			BusLegalCivil_Flag4 +
@@ -541,7 +541,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		 BusLegalCivil_Flag0       := IF(STD.Str.Find(BusLegalCivil_Flag_Concat, 'T', 1) = 0, 'T', 'F');       /* Insufficient information reported on the business */
 		 BusLegalCivil_Flag_final  := BusLegalCivil_Flag_Concat + BusLegalCivil_Flag0; 
 		
-		 self.BusLegalCivil_Flags      :=  BusLegalCivil_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
+		 self.BusLegalCivil_Flag      :=  BusLegalCivil_Flag_final;                                            /* This a string of T or F based on how the data used to calculate the KRI  */
 		 self.BusLegalCivil            := (STRING)(10 - STD.Str.Find(BusLegalCivil_Flag_final, 'T', 1));        /* Set the index to the position of the first 'T'.  */ /* BUSINESS LEGAL EVENTS - TRAFFIC & INFRACTIONS */  																																																	 
 		//***
 			
@@ -550,51 +550,53 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 
 
 	KRIndexesBusn := project(sort(withBIPs, seq), BusnKRIs(left));
-	kriIndexesUnknownBus := PROJECT(noBIPs, TRANSFORM(DueDiligence.Layouts.Busn_Internal,
+	kriIndexesUnknownBus := PROJECT(noBIPs, TRANSFORM(DueDiligence.Layouts.Busn_Internal,				
 																										SELF.BusAssetOwnProperty := INVALID_BUSINESS_SCORE;
-																										SELF.BusAssetOwnProperty_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusAssetOwnProperty_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusAssetOwnAircraft := INVALID_BUSINESS_SCORE;
-																										SELF.BusAssetOwnAircraft_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusAssetOwnAircraft_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusAssetOwnWatercraft := INVALID_BUSINESS_SCORE;
-																										SELF.BusAssetOwnWatercraft_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusAssetOwnWatercraft_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusAssetOwnVehicle := INVALID_BUSINESS_SCORE;
-																										SELF.BusAssetOwnVehicle_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusAssetOwnVehicle_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusAccessToFundsProperty := INVALID_BUSINESS_SCORE;
-																										SELF.BusAccessToFundsProperty_Flags := INVALID_BUSINESS_FLAGS;
-																										SELF.BusGeographicRisk := INVALID_BUSINESS_SCORE;
-																										SELF.BusGeographicRisk_Flags := INVALID_BUSINESS_FLAGS;
-																										SELF.BusValidityRisk := INVALID_BUSINESS_SCORE;
-																										SELF.BusValidityRisk_Flags := INVALID_BUSINESS_FLAGS;
-																										SELF.BusStabilityRisk := INVALID_BUSINESS_SCORE;
-																										SELF.BusStabilityRisk_Flags := INVALID_BUSINESS_FLAGS;
-																										SELF.BusIndustryRisk := INVALID_BUSINESS_SCORE;
-																										SELF.BusIndustryRisk_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusAccessToFundsProperty_Flag := INVALID_BUSINESS_FLAGS;
+																										SELF.BusGeographic := INVALID_BUSINESS_SCORE;
+																										SELF.BusGeographic_Flag := INVALID_BUSINESS_FLAGS;
+																										SELF.BusValidity := INVALID_BUSINESS_SCORE;
+																										SELF.BusValidity_Flag := INVALID_BUSINESS_FLAGS;
+																										SELF.BusStability := INVALID_BUSINESS_SCORE;
+																										SELF.BusStability_Flag := INVALID_BUSINESS_FLAGS;
+																										SELF.BusIndustry := INVALID_BUSINESS_SCORE;
+																										SELF.BusIndustry_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusStructureType := INVALID_BUSINESS_SCORE;
-																										SELF.BusStructureType_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusStructureType_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusSOSAgeRange := INVALID_BUSINESS_SCORE;
-																										SELF.BusSOSAgeRange_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusSOSAgeRange_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusPublicRecordAgeRange := INVALID_BUSINESS_SCORE;
-																										SELF.BusPublicRecordAgeRange_Flags := INVALID_BUSINESS_FLAGS;
-																										SELF.BusShellShelfRisk := INVALID_BUSINESS_SCORE;
-																										SELF.BusShellShelfRisk_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusPublicRecordAgeRange_Flag := INVALID_BUSINESS_FLAGS;
+																										SELF.BusShellShelf := INVALID_BUSINESS_SCORE;
+																										SELF.BusShellShelf_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusMatchLevel := INVALID_BUSINESS_SCORE;
-																										SELF.BusMatchLevel_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusMatchLevel_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusLegalCriminal := INVALID_BUSINESS_SCORE;
-																										SELF.BusLegalCriminal_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusLegalCriminal_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusLegalCivil := INVALID_BUSINESS_SCORE;
-																										SELF.BusLegalCivil_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusLegalCivil_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF.BusLegalTraffInfr := INVALID_BUSINESS_SCORE;
-																										SELF.BusLegalTraffInfr_Flags := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusLegalEventsFelonyType := INVALID_BUSINESS_SCORE;
-																										// SELF.BusLegalEventsFelonyType_Flags := INVALID_BUSINESS_FLAGS;
+																										SELF.BusLegalTraffInfr_Flag := INVALID_BUSINESS_FLAGS;
+																										// SELF.BusLegalTypes := INVALID_BUSINESS_SCORE;
+																										// SELF.BusLegalTypes_Flag := INVALID_BUSINESS_FLAGS;
 																										// SELF.BusHighRiskNewsProfiles := INVALID_BUSINESS_SCORE;
-																										// SELF.BusHighRiskNewsProfiles_Flags := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusLinkedBusRisk := INVALID_BUSINESS_SCORE;
-																										// SELF.BusLinkedBusRisk_Flags := INVALID_BUSINESS_FLAGS;
-																										SELF.BusExecOfficersRisk := INVALID_BUSINESS_SCORE;
-																										SELF.BusExecOfficersRisk_Flags := INVALID_BUSINESS_FLAGS;
-																										// SELF.BusExecOfficersResidencyRisk := INVALID_BUSINESS_SCORE;
-																										// SELF.BusExecOfficersResidencyRisk_Flags := INVALID_BUSINESS_FLAGS;
+																										// SELF.BusHighRiskNewsProfiles_Flag := INVALID_BUSINESS_FLAGS;
+																										// SELF.BusLinkedBusFootprint := INVALID_BUSINESS_SCORE;
+																										// SELF.BusLinkedBusFootprint_Flag := INVALID_BUSINESS_FLAGS;
+																										// SELF.BusLinkedBusIndex := INVALID_BUSINESS_SCORE;
+																										// SELF.BusLinkedBusIndex_Flag := INVALID_BUSINESS_FLAGS;
+																										SELF.BusBEOProfLicense := INVALID_BUSINESS_SCORE;
+																										SELF.BusBEOProfLicense_Flag := INVALID_BUSINESS_FLAGS;
+																										// SELF.BusBEOUSResidency := INVALID_BUSINESS_SCORE;
+																										// SELF.BusBEOUSResidency_Flag := INVALID_BUSINESS_FLAGS;
 																										SELF := LEFT;));
 
 

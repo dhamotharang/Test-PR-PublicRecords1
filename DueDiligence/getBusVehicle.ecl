@@ -4,18 +4,19 @@
 EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,     //***search level options set to SELEID
 											 BIPV2.mod_sources.iParams linkingOptions,               //***These are all your DRM, GLBA, DPPA options
-											 //ReportIsRequested = TRUE,  
+											 boolean ReportIsRequested = FALSE,  
 											 boolean DebugMode = FALSE
 											 ) := FUNCTION
 
 
-	BusnKeys    := DueDiligence.Common.GetLinkIDsForKFetch(BusnData);
+	BusnKeys    := DueDiligence.CommonBusiness.GetLinkIDsForKFetch(BusnData);
 
 	
 	// --------------- Vehicle Data - Using Business IDs ----------------
 	// *** Key fetch to get vehicle_keys from linkids
 	// *** Notice, there is no sequence number in this linkid layout 
 	// *** like you see in the attributues using the kFETCH2 
+	// *** DPPA must be set to a value of 3 to get vehicle data 
 	// ------------------------------------------------------------------
 	VehicleRaw := VehicleV2.Key_Vehicle_linkids.kFetch(BusnKeys, 
 																							Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
@@ -26,7 +27,7 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   // ------ Add our sequence number and History date from the BusnData to the Raw Vehicle records found for this Business ------
 	// ------ Set the 3rd parameter to FALSE when using the KFETCH                                                          ------
 	// ------                                                                                                                -----	
-	VehicleRaw_with_seq := DueDiligence.Common.AppendSeq(VehicleRaw, BusnData, FALSE);	
+	VehicleRaw_with_seq := DueDiligence.CommonBusiness.AppendSeq(VehicleRaw, BusnData, FALSE);	
 	
 	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
 	vehicleCleanDates := DueDiligence.Common.CleanDatasetDateFields(VehicleRaw_with_seq, 'date_first_seen, date_vendor_first_reported');
@@ -54,10 +55,15 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	VehicleDetails       := VehicleV2.Key_Vehicle_Main_Key;          																			 
   // ------                              ------------
   // ------ Define the TRANSFORM here    ------------
+	 // ------ We are formatting the Vehicle -----------
+	 // ------ Slim result set here         ------------
+	 // ------ These are all the intermediate ----------
+	 // ------ fields needed for the         -----------
+	 // ------ attribute or the report      ------------
   // ------                              ------------
 	DueDiligence.LayoutsInternal.VehicleSlimLayout  getVehicleDetails(RECORDOF(VehiclesSelectedForThisBusiness) le, RECORDOF(VehicleDetails) ri, integer internal_seq) := TRANSFORM
 	       /*  data from left  (VehiclesSelectedForThisBusiness) */  
-	       SELF.VehicleReportData.seq    := le.Seq,
+	    SELF.VehicleReportData.seq    := le.Seq,
 				 SELF.VehicleReportData.ultID  := le.ultID,
 				 SELF.VehicleReportData.orgID  := le.orgID,
 				 SELF.VehicleReportData.seleID := le.seleID,
@@ -65,18 +71,31 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 				 SELF.VehicleReportData.powID  := le.powID,
 				 
 				 self.historyDateYYYYMMDD       := le.HistoryDate;
+				 self.license_Plate_Type        := le.reg_license_plate_type_desc;                  //*** vehiclev2 LinkID's 
+				 SELF.Registered_State          := le.reg_license_state;
+				 
+				 SELF.Registered_Year           := (integer)le.reg_latest_effective_date[1..4];
+				 SELF.Registered_Month          := (integer)le.reg_latest_effective_date[5..6];
+				 SELF.Registered_Day            := (integer)le.reg_latest_effective_date[7..8];
+				 
+				 SELF.Title_Year                := (integer)le.ttl_latest_issue_date[1..4];
+				 SELF.Title_Month               := (integer)le.ttl_latest_issue_date[5..6];
+				 SELF.Title_Day                 := (integer)le.ttl_latest_issue_date[7..8];
+				 
+				 
 				 self.sl_vehicleCount           := 1;  
 				 /*  additional detailed data from right (VehicleDetails)  */ 
-				 ///self.Orig_name_type            := le.Orig_name_type;  
-	       SELF.vehicle_key               := ri.vehicle_key;
+				 //self.Orig_name_type            := le.Orig_name_type;  
+	    SELF.vehicle_key               := ri.vehicle_key;
 				 self.Iteration_Key             := ri.Iteration_Key;  
 	      // self.Source_Code               := le.Source_Code;
-				 self.Orig_VIN               := ri.orig_vin; 
-	       self.Orig_Year              := ri.orig_year; 
-	       self.Orig_Make_Code         := ri.orig_make_code;
-	       self.Orig_Make_Desc         := ri.orig_make_desc; 
-         self.Vina_Price             := (unsigned6)ri.vina_price; 
-	       self := [];
+				 self.Orig_VIN                  := ri.orig_vin; 
+	    self.Orig_Year                 := ri.orig_year; 
+	    self.Orig_Make_Code            := ri.orig_make_code;
+	    self.Orig_Make_Desc            := ri.orig_make_desc; 
+     self.Vina_Price                := (unsigned6)ri.vina_price;
+			  SELF.Class_Type                := ri.model_class;  
+	    self := [];
    END;
 	// ------                                                                 ------------
   // ------  JOIN the 2 tables together                                     ------------
@@ -101,20 +120,22 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	                                          self.VehicleReportData.ultid              := bestleft.VehicleReportData.ultid;
 	                                          self.VehicleReportData.orgid              := bestleft.VehicleReportData.orgid;
 	                                          self.VehicleReportData.seleid             := bestleft.VehicleReportData.seleid;
-	                                          SELF.vehicle_key        := bestleft.vehicle_key;
-				                                    self.Iteration_Key      := bestleft.Iteration_Key;  
-	                                          self.Source_Code        := bestleft.Source_Code;
-	                                          SELF.sl_vehicleCount    := bestleft.sl_vehicleCount;
-																						SELF.historyDateYYYYMMDD := bestleft.historyDateYYYYMMDD;
-																						self.Orig_name_type      := bestleft.Orig_name_type;
-																						/*  grab the most expensive priced vehicle */  
-																            SELF.Vina_Price         :=  IF(bestleft.Vina_Price >= bestright.Vina_Price, bestleft.Vina_Price, bestright.Vina_Price);
-																            /*  try and get the most information about the Make Model and Year   */  
-																            SELF.Orig_Year          :=  IF(bestright.Orig_Year != '', bestright.Orig_Year, bestleft.Orig_Year);
-																            SELF.Orig_Make_Code     :=  IF(bestright.Orig_Make_Code != '', bestright.Orig_Make_Code, bestleft.Orig_Make_Code);
-																            SELF.Orig_Make_Desc     :=  IF(bestright.Orig_Make_Desc != '', bestright.Orig_Make_Desc, bestleft.Orig_Make_Desc);
-																						self := [];
-																						END;  
+																						                     self.VehicleReportData.seq                := bestleft.VehicleReportData.seq;
+	                                          SELF.vehicle_key                          := bestleft.vehicle_key;
+				                                       self.Iteration_Key                        := bestleft.Iteration_Key;  
+	                                          self.Source_Code                          := bestleft.Source_Code;
+	                                          SELF.sl_vehicleCount                      := bestleft.sl_vehicleCount;
+																						                     SELF.historyDateYYYYMMDD                  := bestleft.historyDateYYYYMMDD;
+																						                     self.Orig_name_type                       := bestleft.Orig_name_type;
+																						                     /*  grab the most expensive priced vehicle */  
+																                           SELF.Vina_Price         :=  IF(bestleft.Vina_Price >= bestright.Vina_Price, bestleft.Vina_Price, bestright.Vina_Price);
+																                           /*  try and get the most information about the Make Model and Year   */  
+																                           SELF.Orig_Year          :=  IF(bestright.Orig_Year != '', bestright.Orig_Year, bestleft.Orig_Year);
+																                           SELF.Orig_Make_Code     :=  IF(bestright.Orig_Make_Code != '', bestright.Orig_Make_Code, bestleft.Orig_Make_Code);
+																                           SELF.Orig_Make_Desc     :=  IF(bestright.Orig_Make_Desc != '', bestright.Orig_Make_Desc, bestleft.Orig_Make_Desc);
+																													              SELF                    :=  bestleft;  
+																						                     self := [];
+																						                     END;  
 	BusVehicleUnique := rollup(Vehicles_sorted,
 											 LEFT.VehicleReportData.ultid   = RIGHT.VehicleReportData.ultid AND
 											 LEFT.VehicleReportData.orgid   = RIGHT.VehicleReportData.orgid AND
@@ -149,7 +170,7 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																	SELF := LEFT), 
 																	LEFT OUTER);
  	 
-   // ------                                                                                    ------   
+  // ------                                                                                    ------   
 	 // ------ START BUILDING SECTIONS of the REPORT                                              ------ 
 	 // ------                                                                                    ------ 
 	 // ------ Limit the number of records for each business listed in the report                 ------
@@ -159,12 +180,17 @@ EXPORT getBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	 // ------                                                                                    ------
 	VehiclesCurrentlyOwnedButLimited   := dedup(sort(BusVehicleUnique,  VehicleReportData.seleID, -Vina_Price), VehicleReportData.seleid,  KEEP(iesp.constants.DDRAttributesConst.MaxVehicles)); 
   
-	//UpdateBusnVehicleWithReport  := UpdateBusnPropertyForAttributeLogic; 
-	UpdateBusnVehicleWithReport  := DueDiligence.reportBusVehicle(UpdateBusnVehicleForAttributeLogic,
-	                                                                VehiclesCurrentlyOwnedButLimited,
-	 																																DebugMode);   
-	 																				
-
+  // -----                                                                                     ----- 
+	 // ----- If the report is requested by the XML Service (not allowed by Batch)                -----
+	 // ----- THEN add the vehicle data to that section of the report.                            -----
+	 // ----- ELSE just leave the reporting sections empty                                        -----
+	 // -----                                                                                     -----
+	UpdateBusnVehicleWithReport  := IF(ReportIsRequested, 
+	                                     DueDiligence.reportBusVehicle(UpdateBusnVehicleForAttributeLogic, VehiclesCurrentlyOwnedButLimited, DebugMode),
+																			             /* ELSE */ 
+																			                   UpdateBusnVehicleForAttributeLogic); 
+	
+																				
  IF(DebugMode,     OUTPUT(CHOOSEN(VehicleRaw, 100),                       NAMED('Step1VehicleRaw')));
  IF(DebugMode,     OUTPUT(COUNT  (VehicleRaw),                            NAMED('Step1')));
  

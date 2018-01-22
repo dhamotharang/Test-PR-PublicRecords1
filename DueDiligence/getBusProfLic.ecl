@@ -7,7 +7,7 @@ EXPORT getBusProfLic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 											
 											
 	//grab the executives
-	execs := DueDiligence.Common.getExecs(indata);
+	execs := DueDiligence.CommonBusiness.getExecs(indata);
 	
 	//call individual routine to get prof licenses for the exec individuals
 	profLic := DueDiligence.getIndProfLic(execs, includeReportData);
@@ -26,7 +26,7 @@ EXPORT getBusProfLic(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 											LEFT OUTER);
 
 	//add updated execs back to the inquired business
-	addExecsWithLicenses := DueDiligence.Common.ReplaceExecs(indata, joinExecLic);										
+	addExecsWithLicenses := DueDiligence.CommonBusiness.ReplaceExecs(indata, joinExecLic);										
 																
 	//roll the licenses to see if an exec under an inquired business had an active/inactive category				
 	rollLic := ROLLUP(profLic, 

@@ -51,7 +51,7 @@ EXPORT Constants := MODULE
 	export unsigned2 MAX_CONSUMER_STATEMENTS := 100;
   
 	// Full File Disclosure
-	export unsigned2 MaxConsumerAlerts := 50;
+	export unsigned2 MaxConsumerAlerts := 100;
 	export unsigned2 MaxConsumerStatementIds := 20 * 5; 
 	export unsigned2 MaxConsumerStatements := 200;
 	
@@ -421,7 +421,7 @@ EXPORT Constants := MODULE
 		
 	//Due Diligence
 	export DDRAttributesConst := MODULE
-		export unsigned2 MaxAttributes      				:= 22;		
+		export unsigned2 MaxAttributes      				:= 23;		
     export unsigned2 MaxMatchSummaries     		 	:= 20;
     export unsigned2 MaxNewsProfiles       		 	:= 20;
     export unsigned2 MaxProperties         			:= 20;

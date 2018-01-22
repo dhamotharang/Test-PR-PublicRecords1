@@ -10,7 +10,7 @@ EXPORT getBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   // ------                                                                                    ------
   // ------ Watercraft Records                                                                 ------
 	// ------                                                                                    ------
-	WatercraftRaw := Watercraft.Key_LinkIds.kFetch2(DueDiligence.Common.GetLinkIDs(BusnData),
+	WatercraftRaw := Watercraft.Key_LinkIds.kFetch2(DueDiligence.CommonBusiness.GetLinkIDs(BusnData),
 																						 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																							0,                                                                     /*ScoreThreshold --> 0 = Give me everything*/
 																							linkingOptions,
@@ -20,7 +20,7 @@ EXPORT getBusWatercraft(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
   // ------                                                                                    ------	
 	// ------ Add our sequence number to the Raw Watercraft records found for this Business      ------
 	// ------                                                                                    ------
-	WatercraftRaw_with_seq := DueDiligence.Common.AppendSeq(WatercraftRaw, BusnData, TRUE);
+	WatercraftRaw_with_seq := DueDiligence.CommonBusiness.AppendSeq(WatercraftRaw, BusnData, TRUE);
 	
 	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
 	watercraftCleanDates := DueDiligence.Common.CleanDatasetDateFields(WatercraftRaw_with_seq, 'date_first_seen, date_vendor_first_reported');

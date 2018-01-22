@@ -3,9 +3,9 @@
 EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											          BIPV2.mod_sources.iParams linkingOptions,
-																//ReportIsRequested = TRUE, 
-		  											    boolean DebugMode = FALSE,
-																boolean isFCRA = false
+																     boolean ReportIsRequested = FALSE, 
+		  											      boolean DebugMode = FALSE,
+																     boolean isFCRA = false
 																) := FUNCTION
 
 	// ------                                                                                    ------
@@ -16,7 +16,7 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------ The results will come back this layout:                                            ------
 	// ------  DueDiligence.LayoutsInternal.RelatedParty                                         ------
 	// ------                                                                                    ------
-	SimpleBusinessExecutives   := DueDiligence.Common.getexecs(BusnData);   
+	SimpleBusinessExecutives   := DueDiligence.CommonBusiness.getexecs(BusnData);   
 	 
 	// ------   Start by getting all of the liens and judgment data                              ------
 	// ------ The results will come back this layout:                                            ------
@@ -29,7 +29,7 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------  DueDiligence.LayoutsInternal.RelatedParty                                         ------
 	// ------  
 	 
-  UpdateBusinessExecutivesCriminalOffense  := DueDiligence.getIndCriminal(updatewithBusinessExecutivesWithLiens, debugmode, isFCRA);
+  UpdateBusinessExecutivesCriminalOffense  := DueDiligence.getIndCriminal(updatewithBusinessExecutivesWithLiens, ReportIsRequested, Debugmode, isFCRA);
 
   // ------                                                                                    ------
 	// ------ Call the Common.ReplaceExecs routine to  update   executive information            ------ 
@@ -37,7 +37,7 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------ The results will come back this layout:                                            ------
 	// ------      DueDiligence.layouts.Busn_Internal                                            ------
 	// ------                                                                                    ------ 
-  UpdateBusnExecsWithDerog   := DueDiligence.Common.ReplaceExecs(BusnData, UpdateBusinessExecutivesCriminalOffense);
+  UpdateBusnExecsWithDerog   := DueDiligence.CommonBusiness.ReplaceExecs(BusnData, UpdateBusinessExecutivesCriminalOffense);
 	
 	//**********************roll the criminal offenses to up to inquired business  		
 	rolledExecutiveCriminalOffense := ROLLUP(UpdateBusinessExecutivesCriminalOffense, 
@@ -45,6 +45,7 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 										LEFT.ultID = RIGHT.ultID AND
 										LEFT.orgID = RIGHT.orgID AND
 										LEFT.seleID = RIGHT.seleID,
+										//LEFT.party.DID = RIGHT.party.DID,
 										TRANSFORM(DueDiligence.LayoutsInternal.RelatedParty,
 										          /*  If the DID on the left is currently incarcerated or currently on parole (per the VOO Function) 
                                   - keep that flag, else pick up the flag from the RIGHT.  */  
@@ -235,6 +236,29 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																SELF := LEFT;),
 											LEFT OUTER);
 											
+	// ------                                                                                    ------   
+	 // ------ START BUILDING SECTIONS of the REPORT                                              ------ 
+	 // ------                                                                                    ------ 
+	 // ------ Limit the number of records for each business listed in the report                 ------
+	 // ------ Start by sorting them in seleid sequence and  earliest offense date                ------
+	 // ------ highest value at the top                                                           ------
+	 // ------                                                                                    ------
+	 // ------                                                                                    ------
+	//OffensesToListButLimited   := dedup(sort(addCriminalToRelatedParty, seq, did, offender_key, caseNum, criminalOffenderLevel, -earliestOffenseDate), seq, did, offender_key, caseNum, criminalOffenderLevel,  KEEP(iesp.constants.DDRAttributesConst.MaxLegalEvents)); 
+ 	//VehiclesCurrentlyOwnedButLimited   := dedup(sort(BusVehicleUnique,  VehicleReportData.seleID, -Vina_Price), VehicleReportData.seleid,  KEEP(iesp.constants.DDRAttributesConst.MaxVehicles));  
+  // -----                                                                                     ----- 
+	 // ----- If the report is requested by the XML Service (not allowed by Batch)                -----
+	 // ----- THEN add the BEO Criminal data to that section of the report.                       -----
+	 // ----- ELSE just leave the reporting sections empty                                        -----
+	 // -----   The AddCriminalOffenses is in Business Internal layout                            -----
+	 // -----   The OffensesToListButLimited is a subset of all the offenses when there are       -----
+	 // -----   more than 20 offenses.  
+	 // -----                                                                                     -----
+	// UpdateBusnExecCriminalWithReport  := AddCriminalOffenses;
+	UpdateBusnExecCriminalWithReport  := IF(ReportIsRequested, 
+	                                     DueDiligence.reportBusExecCriminal(UpdateBusnWithEvidenceOfCrim, UpdateBusinessExecutivesCriminalOffense, DebugMode),
+	      																		             /* ELSE */ 
+																			                   UpdateBusnWithEvidenceOfCrim); 
 	
 	
 	// -----                                                                                     ------
@@ -243,7 +267,8 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------      DueDiligence.layouts.Busn_Internal                                            ------
 	// ------                                                                                    ------ 
 	
-	UpdateInquiredBusinessWithDerog   := DueDiligence.getBusLien(UpdateBusnWithEvidenceOfCrim, options, linkingOptions, DebugMode); 
+	//UpdateInquiredBusinessWithDerog   := DueDiligence.getBusLien(UpdateBusnWithEvidenceOfCrim, options, linkingOptions, ReportIsRequested, DebugMode); 
+	UpdateInquiredBusinessWithDerog   := DueDiligence.getBusLien(UpdateBusnExecCriminalWithReport, options, linkingOptions, ReportIsRequested, DebugMode); 
 	   
 	// ********************
 	//   DEBUGGING OUTPUTS

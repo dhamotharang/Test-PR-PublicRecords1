@@ -2,8 +2,8 @@
 
 EXPORT DueDiligence_Service := MACRO
 
-	UNSIGNED1 NUMBER_OF_INDIVIDUAL_ATTRIBUTES := 17;
-	UNSIGNED1 NUMBER_OF_BUSINESS_ATTRIBUTES := 22;
+	UNSIGNED1 NUMBER_OF_INDIVIDUAL_ATTRIBUTES := 19;
+	UNSIGNED1 NUMBER_OF_BUSINESS_ATTRIBUTES := 23;
 
 	//The following macro defines the field sequence on WsECL page of query.
   WSInput.MAC_DueDiligence_Service();
@@ -22,9 +22,9 @@ EXPORT DueDiligence_Service := MACRO
 	search 			:= GLOBAL(firstRow.reportBy);
 	
 	//get outer band data - to use if customer data is not populated
-	outerBandDPPA := DueDiligence.Constants.EMPTY : STORED('DPPAPurpose');
-	outerBandGLBA := DueDiligence.Constants.EMPTY : STORED('GLBPurpose');
-	outerBandHistoryDate := DueDiligence.Constants.NUMERIC_ZERO : STORED('HistoryDateYYYYMMDD');
+	outerBandDPPA := DueDiligence.Constants.EMPTY : STORED('DD_DPPAPurpose');
+	outerBandGLBA := DueDiligence.Constants.EMPTY : STORED('DD_GLBPurpose');
+	outerBandHistoryDate := DueDiligence.Constants.NUMERIC_ZERO : STORED('DD_HistoryDateYYYYMMDD');
 	
 	drm	:= IF(TRIM(userIn.DataRestrictionMask) <> DueDiligence.Constants.EMPTY, userIn.DataRestrictionMask, AutoStandardI.GlobalModule().DataRestrictionMask);
 	dpm	:= IF(TRIM(userIn.DataPermissionMask) <> DueDiligence.Constants.EMPTY, userIn.DataPermissionMask, AutoStandardI.GlobalModule().DataPermissionMask);
@@ -33,8 +33,9 @@ EXPORT DueDiligence_Service := MACRO
 	
 	requestedVersion := TRIM(STD.Str.ToUpperCase(optionsIn.AttributesVersionRequest));
 	includeReport := optionsIn.IncludeReport;
+	displayAttributeText := optionsIn.displayText;
 	
-	//gateways				:= Gateway.Configuration.Get();
+	gateways := Gateway.Configuration.Get();
 	
 	
 	
@@ -152,7 +153,7 @@ EXPORT DueDiligence_Service := MACRO
 																															 // UseXG5,
 																															 // IncludeNewsProfile));
 																					 
-	consumerResults := DATASET([TRANSFORM(DueDiligence.Layouts.Indv_Internal, SELF.seq := 1; SELF := [];)]); 
+	consumerResults := DueDiligence.getIndAttributes(cleanData, DPPA, glba, drm, gateways, includeReport, displayAttributeText, debugIndicator);
 		
 		
 	
@@ -161,54 +162,58 @@ EXPORT DueDiligence_Service := MACRO
 	iesp.share.t_NameValuePair createIndIndex(consumerResults le, INTEGER c) := TRANSFORM
 	
 		SELF := CASE(c,
-									1  => ROW(createNVPair('IndAssetOwnProperty', le.IndAssetOwnProperty)),
-									2  => ROW(createNVPair('IndAssetOwnAircraft', le.IndAssetOwnAircraft)),
-									3  => ROW(createNVPair('IndAssetOwnWatercraft', le.IndAssetOwnWatercraft)),
-									4  => ROW(createNVPair('IndAssetOwnVehicle', le.IndAssetOwnVehicle)),
-									5  => ROW(createNVPair('IndAccessToFundsIncome', le.IndAccessToFundsIncome)),
-									6  => ROW(createNVPair('IndAccessToFundsProperty', le.IndAccessToFundsProperty)),
-									7  => ROW(createNVPair('IndGeographicRisk', le.IndGeographicRisk)),
-									8  => ROW(createNVPair('IndMobility', le.IndMobility)),
-									9 => ROW(createNVPair('IndLegalEvents', le.IndLegalEvents)),
-									10 => ROW(createNVPair('IndLegalEventsFelonyType', le.IndLegalEventsFelonyType)),
-									11 => ROW(createNVPair('IndHighRiskNewsProfiles', le.IndHighRiskNewsProfiles)),
-									12 => ROW(createNVPair('IndAgeRange', le.IndAgeRange)),
-									13 => ROW(createNVPair('IndIdentityRisk', le.IndIdentityRisk)),
-									14 => ROW(createNVPair('IndResidencyRisk', le.IndResidencyRisk)),
-									15 => ROW(createNVPair('IndMatchLevel', le.IndMatchLevel)),
-									16 => ROW(createNVPair('IndAssociatesRisk', le.IndAssociatesRisk)),
-									17 => ROW(createNVPair('IndProfessionalRisk', le.IndProfessionalRisk)),
+									1  => ROW(createNVPair('PerAssetOwnProperty', le.PerAssetOwnProperty)),
+									2  => ROW(createNVPair('PerAssetOwnAircraft', le.PerAssetOwnAircraft)),
+									3  => ROW(createNVPair('PerAssetOwnWatercraft', le.PerAssetOwnWatercraft)),
+									4  => ROW(createNVPair('PerAssetOwnVehicle', le.PerAssetOwnVehicle)),
+									5  => ROW(createNVPair('PerAccessToFundsProperty', le.PerAccessToFundsProperty)),
+									6  => ROW(createNVPair('PerAccessToFundsIncome', le.PerAccessToFundsIncome)),
+									7  => ROW(createNVPair('PerGeographic', le.PerGeographic)),
+									8  => ROW(createNVPair('PerMobility', le.PerMobility)),
+									9  => ROW(createNVPair('PerLegalCriminal', le.PerLegalCriminal)),
+									10 => ROW(createNVPair('PerLegalCivil', le.PerLegalCivil)),
+									11 => ROW(createNVPair('PerLegalTraffInfr', le.PerLegalTraffInfr)),
+									12 => ROW(createNVPair('PerLegalTypes', le.PerLegalTypes)),
+									13 => ROW(createNVPair('PerHighRiskNewsProfiles', le.PerHighRiskNewsProfiles)),
+									14 => ROW(createNVPair('PerAgeRange', le.PerAgeRange)),
+									15 => ROW(createNVPair('PerIdentityRisk', le.PerIdentityRisk)),
+									16 => ROW(createNVPair('PerUSResidency', le.PerUSResidency)),
+									17 => ROW(createNVPair('PerMatchLevel', le.PerMatchLevel)),
+									18 => ROW(createNVPair('PerAssociatesIndex', le.PerAssociatesIndex)),
+									19 => ROW(createNVPair('PerProfLicense', le.PerProfLicense)),
 												ROW(createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID)));
 	END;
 	
 	iesp.share.t_NameValuePair createIndHit(consumerResults le, INTEGER c) := TRANSFORM
 	
 		SELF := CASE(c,
-									1  => ROW(createNVPair('IndAssetOwnProperty', le.IndAssetOwnProperty_Flags)),
-									2  => ROW(createNVPair('IndAssetOwnAircraft', le.IndAssetOwnAircraft_Flags)),
-									3  => ROW(createNVPair('IndAssetOwnWatercraft', le.IndAssetOwnWatercraft_Flags)),
-									4  => ROW(createNVPair('IndAssetOwnVehicle', le.IndAssetOwnVehicle_Flags)),
-									5  => ROW(createNVPair('IndAccessToFundsIncome', le.IndAccessToFundsIncome_Flags)),
-									6  => ROW(createNVPair('IndAccessToFundsProperty', le.IndAccessToFundsProperty_Flags)),
-									7  => ROW(createNVPair('IndGeographicRisk', le.IndGeographicRisk_Flags)),
-									8  => ROW(createNVPair('IndMobility', le.IndMobility_Flags)),
-									9  => ROW(createNVPair('IndLegalEvents', le.IndLegalEvents_Flags)),
-									10 => ROW(createNVPair('IndLegalEventsFelonyType', le.IndLegalEventsFelonyType_Flags)),
-									11 => ROW(createNVPair('IndHighRiskNewsProfiles', le.IndHighRiskNewsProfiles_Flags)),
-									12 => ROW(createNVPair('IndAgeRange', le.IndAgeRange_Flags)),
-									13 => ROW(createNVPair('IndIdentityRisk', le.IndIdentityRisk_Flags)),
-									14 => ROW(createNVPair('IndResidencyRisk', le.IndResidencyRisk_Flags)),
-									15 => ROW(createNVPair('IndMatchLevel', le.IndMatchLevel_Flags)),
-									16 => ROW(createNVPair('IndAssociatesRisk', le.IndAssociatesRisk_Flags)),
-									17 => ROW(createNVPair('IndProfessionalRisk', le.IndProfessionalRisk_Flags)),
+									1  => ROW(createNVPair('PerAssetOwnProperty_Flag', le.PerAssetOwnProperty_Flag)),
+									2  => ROW(createNVPair('PerAssetOwnAircraft_Flag', le.PerAssetOwnAircraft_Flag)),
+									3  => ROW(createNVPair('PerAssetOwnWatercraft_Flag', le.PerAssetOwnWatercraft_Flag)),
+									4  => ROW(createNVPair('PerAssetOwnVehicle_Flag', le.PerAssetOwnVehicle_Flag)),
+									5  => ROW(createNVPair('PerAccessToFundsProperty_Flag', le.PerAccessToFundsProperty_Flag)),
+									6  => ROW(createNVPair('PerAccessToFundsIncome_Flag', le.PerAccessToFundsIncome_Flag)),
+									7  => ROW(createNVPair('PerGeographic_Flag', le.PerGeographic_Flag)),
+									8  => ROW(createNVPair('PerMobility_Flag', le.PerMobility_Flag)),
+									9  => ROW(createNVPair('PerLegalCriminal_Flag', le.PerLegalCriminal_Flag)),
+									10 => ROW(createNVPair('PerLegalCivil_Flag', le.PerLegalCivil_Flag)),
+									11 => ROW(createNVPair('PerLegalTraffInfr_Flag', le.PerLegalTraffInfr_Flag)),
+									12 => ROW(createNVPair('PerLegalTypes_Flag', le.PerLegalTypes_Flag)),
+									13 => ROW(createNVPair('PerHighRiskNewsProfiles_Flag', le.PerHighRiskNewsProfiles_Flag)),
+									14 => ROW(createNVPair('PerAgeRange_Flag', le.PerAgeRange_Flag)),
+									15 => ROW(createNVPair('PerIdentityRisk_Flag', le.PerIdentityRisk_Flag)),
+									16 => ROW(createNVPair('PerUSResidency_Flag', le.PerUSResidency_Flag)),
+									17 => ROW(createNVPair('PerMatchLevel_Flag', le.PerMatchLevel_Flag)),
+									18 => ROW(createNVPair('PerAssociatesIndex_Flag', le.PerAssociatesIndex_Flag)),
+									19 => ROW(createNVPair('PerProfLicense_Flag', le.PerProfLicense_Flag)),
 												ROW(createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID)));
 	END;
- 	
+
 	indIndex := NORMALIZE(UNGROUP(consumerResults), NUMBER_OF_INDIVIDUAL_ATTRIBUTES, createIndIndex(LEFT, COUNTER));
 	indIndexHits := NORMALIZE(consumerResults, NUMBER_OF_INDIVIDUAL_ATTRIBUTES, createIndHit(LEFT, COUNTER));
 	
 	iesp.duediligencereport.t_DueDiligenceReportResponse IntoConsumerAttributes(layout_acctseq le, DueDiligence.Layouts.Indv_Internal ri ) := TRANSFORM
-    	SELF.result.uniqueID := '';
+    	SELF.result.uniqueID := (STRING)ri.individual.did;
 			SELF.Result.InputEcho := le.reportBy;	
 			SELF.Result.AttributeGroup.attributes :=  indIndex;
 			SELF.Result.AttributeGroup.AttributeLevelHits := indIndexHits;
@@ -221,12 +226,12 @@ EXPORT DueDiligence_Service := MACRO
 													 LEFT.seq = RIGHT.seq,
 													 IntoConsumerAttributes(LEFT, RIGHT));
 
-
+ 
 //********************************************************BUSINESS ATTRIBUTES STARTS HERE********************************************************
 	options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
 		// Clean up the Options and make sure that defaults are enforced
-		EXPORT UNSIGNED1	DPPA_Purpose 				:= DPPA;
-		EXPORT UNSIGNED1	GLBA_Purpose 				:= GLBA;
+		EXPORT UNSIGNED1	DPPA_Purpose 				:= dppa;
+		EXPORT UNSIGNED1	GLBA_Purpose 				:= glba;
 		EXPORT STRING50		DataRestrictionMask	:= TRIM(drm);
 		EXPORT STRING50		DataPermissionMask	:= TRIM(dpm);
 		EXPORT STRING10		IndustryClass				:= STD.Str.ToUpperCase(IF(TRIM(userIn.IndustryClass) <> DueDiligence.Constants.EMPTY, userIn.IndustryClass, Business_Risk_BIP.Constants.Default_IndustryClass));
@@ -261,51 +266,53 @@ EXPORT DueDiligence_Service := MACRO
 									3  => ROW(createNVPair('BusAssetOwnWatercraft', le.BusAssetOwnWatercraft)),
 									4  => ROW(createNVPair('BusAssetOwnVehicle', le.BusAssetOwnVehicle)),
 									5  => ROW(createNVPair('BusAccessToFundsProperty', le.BusAccessToFundsProperty)),
-									6  => ROW(createNVPair('BusGeographicRisk', le.BusGeographicRisk)),
-									7  => ROW(createNVPair('BusValidityRisk', le.BusValidityRisk)),
-									8  => ROW(createNVPair('BusStabilityRisk', le.BusStabilityRisk)),
-									9 => ROW(createNVPair('BusIndustryRisk', le.BusIndustryRisk)),
+									6  => ROW(createNVPair('BusGeographic', le.BusGeographic)),
+									7  => ROW(createNVPair('BusValidity', le.BusValidity)),
+									8  => ROW(createNVPair('BusStability', le.BusStability)),
+									9  => ROW(createNVPair('BusIndustry', le.BusIndustry)),
 									10 => ROW(createNVPair('BusStructureType', le.BusStructureType)),
 									11 => ROW(createNVPair('BusSOSAgeRange', le.BusSOSAgeRange)),
 									12 => ROW(createNVPair('BusPublicRecordAgeRange', le.BusPublicRecordAgeRange)),
-									13 => ROW(createNVPair('BusShellShelfRisk', le.BusShellShelfRisk)),
+									13 => ROW(createNVPair('BusShellShelf', le.BusShellShelf)),
 									14 => ROW(createNVPair('BusMatchLevel', le.BusMatchLevel)),
 									15 => ROW(createNVPair('BusLegalCriminal', le.BusLegalCriminal)),
 									16 => ROW(createNVPair('BusLegalCivil', le.BusLegalCivil)),
 									17 => ROW(createNVPair('BusLegalTraffInfr', le.BusLegalTraffInfr)),
-									18 => ROW(createNVPair('BusLegalEventsFelonyType', le.BusLegalEventsFelonyType)),
+									18 => ROW(createNVPair('BusLegalTypes', le.BusLegalTypes)),
 									19 => ROW(createNVPair('BusHighRiskNewsProfiles', le.BusHighRiskNewsProfiles)),
-									20 => ROW(createNVPair('BusLinkedBusRisk', le.BusLinkedBusRisk)),
-									21 => ROW(createNVPair('BusExecOfficersRisk', le.BusExecOfficersRisk)),
-									22 => ROW(createNVPair('BusExecOfficersResidencyRisk', le.BusExecOfficersResidencyRisk)),
+									20 => ROW(createNVPair('BusLinkedBusFootprint', le.BusLinkedBusFootprint)),
+									21 => ROW(createNVPair('BusLinkedBusIndex', le.BusLinkedBusIndex)),
+									22 => ROW(createNVPair('BusBEOProfLicense', le.BusBEOProfLicense)),
+									23 => ROW(createNVPair('BusBEOUSResidency', le.BusBEOUSResidency)),
 												ROW(createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID)));
 	END;
 	
 	iesp.share.t_NameValuePair createBusHit(DueDiligence.Layouts.Busn_Internal le, INTEGER C) := TRANSFORM
 		
 		SELF := CASE(c,
-									1  => ROW(createNVPair('BusAssetOwnProperty_Flags', le.BusAssetOwnProperty_Flags)),
-									2  => ROW(createNVPair('BusAssetOwnAircraft_Flags', le.BusAssetOwnAircraft_Flags)),
-									3  => ROW(createNVPair('BusAssetOwnWatercraft_Flags', le.BusAssetOwnWatercraft_Flags)),
-									4  => ROW(createNVPair('BusAssetOwnVehicle_Flags', le.BusAssetOwnVehicle_Flags)),
-									5  => ROW(createNVPair('BusAccessToFundsProperty_Flags', le.BusAccessToFundsProperty_Flags)),
-									6  => ROW(createNVPair('BusGeographicRisk_Flags', le.BusGeographicRisk_Flags)),
-									7  => ROW(createNVPair('BusValidityRisk_Flags', le.BusValidityRisk_Flags)),
-									8  => ROW(createNVPair('BusStabilityRisk_Flags', le.BusStabilityRisk_Flags)),
-									9  => ROW(createNVPair('BusIndustryRisk_Flags', le.BusIndustryRisk_Flags)),
-									10 => ROW(createNVPair('BusStructureType_Flags', le.BusStructureType_Flags)),
-									11 => ROW(createNVPair('BusSOSAgeRange_Flags', le.BusSOSAgeRange_Flags)),
-									12 => ROW(createNVPair('BusPublicRecordAgeRange_Flags', le.BusPublicRecordAgeRange_Flags)),
-									13 => ROW(createNVPair('BusShellShelfRisk_Flags', le.BusShellShelfRisk_Flags)),
-									14 => ROW(createNVPair('BusMatchLevel_Flags', le.BusMatchLevel_Flags)),
-									15 => ROW(createNVPair('BusLegalCriminal_Flags', le.BusLegalCriminal_Flags)),
-									16 => ROW(createNVPair('BusLegalCivil_Flags', le.BusLegalCivil_Flags)),
-									17 => ROW(createNVPair('BusLegalTraffInfr_Flags', le.BusLegalTraffInfr_Flags)),
-									18 => ROW(createNVPair('BusLegalEventsFelonyType_Flags', le.BusLegalEventsFelonyType_Flags)),
-									19 => ROW(createNVPair('BusHighRiskNewsProfiles_Flags', le.BusHighRiskNewsProfiles_Flags)),
-									20 => ROW(createNVPair('BusLinkedBusRisk_Flags', le.BusLinkedBusRisk_Flags)),
-									21 => ROW(createNVPair('BusExecOfficersRisk_Flags', le.BusExecOfficersRisk_Flags)),
-									22 => ROW(createNVPair('BusExecOfficersResidencyRisk_Flags', le.BusExecOfficersResidencyRisk_Flags)),
+									1  => ROW(createNVPair('BusAssetOwnProperty_Flag', le.BusAssetOwnProperty_Flag)),
+									2  => ROW(createNVPair('BusAssetOwnAircraft_Flag', le.BusAssetOwnAircraft_Flag)),
+									3  => ROW(createNVPair('BusAssetOwnWatercraft_Flag', le.BusAssetOwnWatercraft_Flag)),
+									4  => ROW(createNVPair('BusAssetOwnVehicle_Flag', le.BusAssetOwnVehicle_Flag)),
+									5  => ROW(createNVPair('BusAccessToFundsProperty_Flag', le.BusAccessToFundsProperty_Flag)),
+									6  => ROW(createNVPair('BusGeographic_Flag', le.BusGeographic_Flag)),
+									7  => ROW(createNVPair('BusValidity_Flag', le.BusValidity_Flag)),
+									8  => ROW(createNVPair('BusStability_Flag', le.BusStability_Flag)),
+									9  => ROW(createNVPair('BusIndustry_Flag', le.BusIndustry_Flag)),
+									10 => ROW(createNVPair('BusStructureType_Flag', le.BusStructureType_Flag)),
+									11 => ROW(createNVPair('BusSOSAgeRange_Flag', le.BusSOSAgeRange_Flag)),
+									12 => ROW(createNVPair('BusPublicRecordAgeRange_Flag', le.BusPublicRecordAgeRange_Flag)),
+									13 => ROW(createNVPair('BusShellShelf_Flag', le.BusShellShelf_Flag)),
+									14 => ROW(createNVPair('BusMatchLevel_Flag', le.BusMatchLevel_Flag)),
+									15 => ROW(createNVPair('BusLegalCriminal_Flag', le.BusLegalCriminal_Flag)),
+									16 => ROW(createNVPair('BusLegalCivil_Flag', le.BusLegalCivil_Flag)),
+									17 => ROW(createNVPair('BusLegalTraffInfr_Flag', le.BusLegalTraffInfr_Flag)),
+									18 => ROW(createNVPair('BusLegalTypes_Flag', le.BusLegalTypes_Flag)),
+									19 => ROW(createNVPair('BusHighRiskNewsProfiles_Flag', le.BusHighRiskNewsProfiles_Flag)),
+									20 => ROW(createNVPair('BusLinkedBusFootprint_Flag', le.BusLinkedBusFootprint_Flag)),
+									21 => ROW(createNVPair('BusLinkedBusIndex_Flag', le.BusLinkedBusIndex_Flag)),
+									22 => ROW(createNVPair('BusBEOProfLicense_Flag', le.BusBEOProfLicense_Flag)),
+									23 => ROW(createNVPair('BusBEOUSResidency_Flag', le.BusBEOUSResidency_Flag)),
 												ROW(createNVPair(DueDiligence.Constants.INVALID, DueDiligence.Constants.INVALID)));
 	END;
 
@@ -335,6 +342,7 @@ EXPORT DueDiligence_Service := MACRO
 	IF(debugIndicator, output(cleanData, NAMED('cleanData')));                              //This is for debug mode 	
 	IF(debugIndicator, output(wseq, NAMED('wseq')));                              					//This is for debug mode 
 	IF(intermediates, output(businessResults, NAMED('busResults')));                        //This is for debug mode 
+	IF(intermediates, output(consumerResults, NAMED('indResults')));                        //This is for debug mode 
 
 ENDMACRO;
 

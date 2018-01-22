@@ -17,12 +17,23 @@ EXPORT reportBusVehicle(DATASET(DueDiligence.layouts.Busn_Internal) UpdateBusnVe
 	 
 	 
 	iesp.duediligencereport.t_DDRMotorVehicle   FormatTheListOfVehicle(RECORDOF(VehicleCurrentlyOwnedButLimited) le, Integer VehicleSeq) := TRANSFORM 
-                                                 SELF.Sequence                      := VehicleSeq;
- 	                                               
-																								 SELF.VIN.VIN                       := le.Orig_VIN;  
-																								 SELF.Vehicle.Make                  := le.Orig_Make_Desc;   
-																	               SELF.Vehicle.Model                 := le.Orig_Model_Desc;  
-				                                         SELF                               := [];
+                                              SELF.Sequence                      := VehicleSeq;   
+																								                      SELF.VIN.VIN                       := le.Orig_VIN;
+																																			           SELF.Vehicle.Year                  := le.Orig_Year;
+																								                      SELF.Vehicle.Make                  := le.Orig_Make_Desc;   
+																	                             SELF.Vehicle.Model                 := le.Orig_Model_Desc; 
+																															               SELF.LicensePlateType.DetailType   := le.license_Plate_Type;       
+																																						        SELF.ClassType.DetailType          := le.Class_Type;               
+																																										    SELF.BasePrice                     := le.Vina_Price;
+																																												  SELF.Title.State                   := le.Title_State;             
+																																													 SELF.Title.Date.Year               := le.Title_Year;               
+																																													 SELF.Title.Date.Month              := le.Title_Month;              
+																																													 SELF.Title.Date.Day                := le.Title_Day;                
+																																													 SELF.Registration.State            := le.Registered_State;
+																																													 SELF.Registration.Date.Year        := le.Registered_Year;                    
+																																													 SELF.Registration.Date.Month       := le.Registered_Month;                   
+																																													 SELF.Registration.Date.Day         := le.Registered_Day;                     
+				                                          SELF                               := [];
 																								 END;  
 	 
 	  
