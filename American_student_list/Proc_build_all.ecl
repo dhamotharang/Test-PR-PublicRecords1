@@ -1,5 +1,5 @@
 ﻿// Process to build the American Student List Files.
-import ut, _control, roxiekeybuild, VersionControl, Scrubs_American_Student_List;
+import ut, _control, roxiekeybuild, VersionControl, Scrubs_American_Student_List,dops;
 
 export Proc_build_all(string filedate, string filename) :=
 function
@@ -31,8 +31,8 @@ e_mail_fail := fileservices.sendemail(
 build_keys  				:=	American_student_list.Proc_build_keys(filedate);
 
 //Update Roxie Page with Key Version
-UpdateRoxiePage := sequential(RoxieKeybuild.updateversion('AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie)
-											,RoxieKeybuild.updateversion('FCRA_AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie));
+UpdateRoxiePage := sequential(dops.updateversion('AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie)
+											,dops.updateversion('FCRA_AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie));
 
 
 email_notify := sequential(
@@ -48,8 +48,8 @@ email_notify := sequential(
 										,American_student_list.Proc_Build_Autokeys(filedate)
 									   ),
 										 American_student_list.fn_Key_Compare(filedate),
-							if(American_student_list.fn_CheckBeforeDops(filedate),UpdateRoxiePage);
-							Scrubs_American_Student_List.PostBuildScrubs(filedate)
+							Scrubs_American_Student_List.PostBuildScrubs(filedate),
+							if(American_student_list.fn_CheckBeforeDops(filedate),UpdateRoxiePage),
 							) : 
 							SUCCESS(e_mail_success), 
 							FAILURE(e_mail_fail)
