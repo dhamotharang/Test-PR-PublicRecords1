@@ -31,8 +31,16 @@ e_mail_fail := fileservices.sendemail(
 build_keys  				:=	American_student_list.Proc_build_keys(filedate);
 
 //Update Roxie Page with Key Version
-UpdateRoxiePage := sequential(dops.updateversion('AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie)
-											,dops.updateversion('FCRA_AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie));
+UpdateRoxiePage := sequential(dops.updateversion('AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie,,'N')
+											,dops.updateversion('FCRA_AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie,,'F'));
+											
+											import STD,dops;
+export updateversion(string l_datasetname,string l_uversion,string l_email_t,
+string l_auto_pkg = 'N',string l_inenvment = '',string l_isboolready = 'Y',
+string l_isprodready = 'N',string l_inloc = dops.constants.location,string l_indaliip = '',string l_includeboolean = 'Y', 
+string l_updateflag = 'F',
+string l_tagdelta = '',
+string l_dopsenv = dops.constants.dopsenvironment)
 
 
 email_notify := sequential(
