@@ -2,8 +2,49 @@
 
 export file_header_in(boolean pFastHeader=false) := module
 
+shared rec := record
+ebcdic string15 first_name;
+ebcdic string15 middle_initial;
+ebcdic string25 last_name;
+ebcdic string2  suffix;
+ebcdic string15 former_first_name;
+ebcdic string15 former_middle_initial;
+ebcdic string25 former_last_name;
+ebcdic string2  former_suffix;
+ebcdic string15 former_first_name2;
+ebcdic string15 former_middle_initial2;
+ebcdic string25 former_last_name2;
+ebcdic string2  former_suffix2;
+ebcdic string15 aka_first_name;
+ebcdic string15 aka_middle_initial;
+ebcdic string25 aka_last_name;
+ebcdic string2  aka_suffix;
+ebcdic string57 current_address;
+ebcdic string20 current_city;
+ebcdic string2  current_state;
+ebcdic string5  current_zip;
+ebcdic string6  current_address_date_reported;
+ebcdic string57 former1_address;
+ebcdic string20 former1_city;
+ebcdic string2  former1_state;
+ebcdic string5  former1_zip;
+ebcdic string6  former1_address_date_reported;
+ebcdic string57 former2_address;
+ebcdic string20 former2_city;
+ebcdic string2  former2_state;
+ebcdic string5  former2_zip;
+ebcdic string6  former2_address_date_reported;
+ebcdic string6  blank1;
+ebcdic string9  ssn;
+ebcdic string9  cid;
+ebcdic string1  ssn_confirmed;
+ebcdic string1  blank2;
+ebcdic string43 blank3;
+end;
+
+
 shared rec_monthly := record
- header.file_header_in_weekly.Layout AND NOT [   
+header.file_header_in_weekly.Layout AND NOT [   
                                                  filler1,
                                                  name_change,
                                                  addr_change,
@@ -11,8 +52,8 @@ shared rec_monthly := record
                                                  former_name_change,
                                                  new_rec,
                                                  filler2 ];
- ebcdic string10 blank2;
- ebcdic string43 blank3;
+ebcdic string10 blank2;
+ebcdic string43 blank3;
 end;
 
 SHARED rec_monthly_old :=record
@@ -33,8 +74,8 @@ shared rec_weekly := record
         file_header_in_weekly.Layout;
 end;
 lc:=data_Services.Data_location.prefix('header_quick');
-EXPORT monthly_file :=	dataset(lc+'thor_data400::in::hdr_raw',rec_monthly,flat) +
-                        project(dataset(lc+'thor_data400::in::hdr_supplement2',rec_monthly_old,flat),transform(rec_monthly,SELF:=LEFT,SELF:=[]));
+EXPORT monthly_file :=                dataset(lc+'thor_data400::in::hdr_raw',rec,flat) +
+                        dataset(lc+'thor_data400::in::hdr_supplement2',rec,flat);
 EXPORT weekly_file  := dataset('~thor400_84::in::eq_weekly_with_as_of_date',rec_weekly,flat);
 
 //all this is in the attempt to avoid the monthly data from re-cleaning/DID'ing (header.preprocess)
@@ -62,28 +103,28 @@ export eq_uid_monthly := withUID;
 //if the Weekly data were ever added
 
 fn_convert_to_days(integer pInput) := 
-	 (((integer)(((string)pInput)[1..4])*365)
-	+ ((integer)(((string)pInput)[5..6])* 12)
-	+ ((integer)(((string)pInput)[7..8])    )
-	 );
-	 
+                 (((integer)(((string)pInput)[1..4])*365)
+                + ((integer)(((string)pInput)[5..6])* 12)
+                + ((integer)(((string)pInput)[7..8])    )
+                );
+                
 r_layout_header_in_with_as_of_dt := record
- string8 eq_as_of_dt;
- integer eq_as_of_dt_in_days;
- integer today_in_days;
- boolean within_range;
- header.layout_header_in;
+string8 eq_as_of_dt;
+integer eq_as_of_dt_in_days;
+integer today_in_days;
+boolean within_range;
+header.layout_header_in;
 end;
 
 r_layout_header_in_with_as_of_dt t_map_weekly(weekly_file le, integer c) := transform
- self.eq_as_of_dt         := le.eq_as_of_dt;
- self.eq_as_of_dt_in_days := fn_convert_to_days((integer)le.eq_as_of_dt);
- self.today_in_days       := fn_convert_to_days((integer)(STRING8)Std.Date.Today());
- self.within_range        := ut.DaysApart((STRING8)Std.Date.Today(),le.eq_as_of_dt)	<= header.sourcedata_month.v_nbr_of_days_to_keep;
- self.src                 := 'WH';
- self.uid                 := c + seed + 100000000000;
- self                     := le;
- self                     := [];
+self.eq_as_of_dt         := le.eq_as_of_dt;
+self.eq_as_of_dt_in_days := fn_convert_to_days((integer)le.eq_as_of_dt);
+self.today_in_days       := fn_convert_to_days((integer)(STRING8)Std.Date.Today());
+self.within_range        := ut.DaysApart((STRING8)Std.Date.Today(),le.eq_as_of_dt)        <= header.sourcedata_month.v_nbr_of_days_to_keep;
+self.src                 := 'WH';
+self.uid                 := c + seed + 100000000000;
+self                     := le;
+self                     := [];
 end;
 
 export eq_uid_weekly  := project(weekly_file,t_map_weekly(left,counter))(within_range=true) : persist('~thor_data400::headerbuild_eq_src_weekly');
