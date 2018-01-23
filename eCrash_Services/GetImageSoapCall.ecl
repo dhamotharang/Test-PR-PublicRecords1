@@ -1,4 +1,7 @@
-﻿IMPORT iesp, Gateway, eCrash_Services;
+﻿/*2017-09-23T00:08:22Z (Lazarenko, Dmitriy (RIS-HBE))
+[ECH-5121] implementing append/overwrite supplement images behavior.
+*/
+IMPORT iesp, Gateway, eCrash_Services;
 
 EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 	
@@ -24,7 +27,8 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 		BOOLEAN IyetekRedactFlag,
 		STRING RequestAgencyOri,
 		STRING RequestVendorCode,
-		iesp.share.t_Date RequestDateOfCrash) := FUNCTION
+		iesp.share.t_Date RequestDateOfCrash,
+		BOOLEAN isOnlyTm) := FUNCTION
 		
 		//special logic for 'KYCrashLogic'
 		IsVendorCrashLogic := RequestVendorCode = Constants.VENDOR_CRASHLOGIC;
@@ -76,7 +80,7 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 					[TRANSFORM(iesp.accident_image.t_AccidentImageRequest, SELF := [])]
 				),
 				EXISTS(ImageHashes) => DATASET([CreateRequest]),
-				NOT EXISTS(ImageHashes) => DATASET([CreateRequestTm])
+				isOnlyTm => DATASET([CreateRequestTm])
 		);
 		
 		RETURN Result;
