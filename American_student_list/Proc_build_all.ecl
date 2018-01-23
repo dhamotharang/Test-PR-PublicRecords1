@@ -31,9 +31,8 @@ e_mail_fail := fileservices.sendemail(
 build_keys  				:=	American_student_list.Proc_build_keys(filedate);
 
 //Update Roxie Page with Key Version
-UpdateRoxiePage := sequential(dops.updateversion('AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie)
-											,dops.updateversion('FCRA_AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie));
-
+UpdateRoxiePage := sequential(dops.updateversion('AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie,,'N')
+											,dops.updateversion('FCRA_AmericanstudentKeys', filedate, Email_Notification_Lists.Roxie,,'F'));
 
 email_notify := sequential(
 							//DF-20264 Build base file for ASL suppression list
