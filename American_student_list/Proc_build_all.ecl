@@ -48,8 +48,8 @@ email_notify := sequential(
 										,American_student_list.Proc_Build_Autokeys(filedate)
 									   ),
 										 American_student_list.fn_Key_Compare(filedate),
-							if(American_student_list.fn_CheckBeforeDops(filedate),UpdateRoxiePage);
-							Scrubs_American_Student_List.PostBuildScrubs(filedate)
+							Scrubs_American_Student_List.PostBuildScrubs(filedate),
+							if(American_student_list.fn_CheckBeforeDops(filedate),UpdateRoxiePage),
 							) : 
 							SUCCESS(e_mail_success), 
 							FAILURE(e_mail_fail)
