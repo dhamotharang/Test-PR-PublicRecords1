@@ -289,9 +289,9 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 		Main_U := Main_S.FromExpanded(Main_N.ExpandedInFile); 	// Pass the expanded error flags into the Expanded module
 
 		//Outputs reports
-		Main_ErrorSummary					:= OUTPUT(Main_U.SummaryStats, NAMED('Main_ErrorSummary_GA'));
-		Main_ScrubErrorReport 		:= OUTPUT(CHOOSEN(Main_U.AllErrors, 1000), NAMED('Main_ScrubErrorReport_GA'));
-		Main_SomeErrorValues			:= OUTPUT(CHOOSEN(Main_U.BadValues, 1000), NAMED('Main_SomeErrorValues_GA'));
+		Main_ErrorSummary					:= OUTPUT(Main_U.SummaryStats, NAMED('Main_ErrorSummary_GA'+filedate));
+		Main_ScrubErrorReport 		:= OUTPUT(CHOOSEN(Main_U.AllErrors, 1000), NAMED('Main_ScrubErrorReport_GA'+filedate));
+		Main_SomeErrorValues			:= OUTPUT(CHOOSEN(Main_U.BadValues, 1000), NAMED('Main_SomeErrorValues_GA'+filedate));
 		Main_IsScrubErrors		 		:= IF(COUNT(Main_U.AllErrors)<> 0,TRUE,FALSE);
 
 		// Orbit Stats
@@ -397,7 +397,7 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 																										,OUTPUT(Main_BadRecords,,Corp2_Mapping._Dataset().thor_cluster_Files + 'out::corp2::'+version+'::rejected::main_GA',__COMPRESSED__)
 																										)
 																								)
-																							,OUTPUT(Main_ScrubsWithExamples, ALL, NAMED('CorpMainGAScrubsReportWithExamples'))
+																							,OUTPUT(Main_ScrubsWithExamples, ALL, NAMED('CorpMainGAScrubsReportWithExamples'+filedate))
 																							,IF(COUNT(Main_ScrubsAlert) > 0, Main_MailFile, OUTPUT('CORP2_MAPPING.GA - No "MAIN" Corp Scrubs Alerts'))
 																							,Main_ErrorSummary
 																							,Main_ScrubErrorReport
@@ -415,9 +415,9 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 		Event_U := Event_S.FromExpanded(Event_N.ExpandedInFile); 		// Pass the expanded error flags into the Expanded module
 		
 		//Outputs reports
-		Event_ErrorSummary				:= OUTPUT(Event_U.SummaryStats, NAMED('Event_ErrorSummary_GA'));
-		Event_ScrubErrorReport 		:= OUTPUT(CHOOSEN(Event_U.AllErrors, 1000), NAMED('Event_ScrubErrorReport_GA'));
-		Event_SomeErrorValues			:= OUTPUT(CHOOSEN(Event_U.BadValues, 1000), NAMED('Event_SomeErrorValues_GA'));
+		Event_ErrorSummary				:= OUTPUT(Event_U.SummaryStats, NAMED('Event_ErrorSummary_GA'+filedate));
+		Event_ScrubErrorReport 		:= OUTPUT(CHOOSEN(Event_U.AllErrors, 1000), NAMED('Event_ScrubErrorReport_GA'+filedate));
+		Event_SomeErrorValues			:= OUTPUT(CHOOSEN(Event_U.BadValues, 1000), NAMED('Event_SomeErrorValues_GA'+filedate));
 		Event_IsScrubErrors		 		:= IF(COUNT(Event_U.AllErrors)<> 0,TRUE,FALSE);
 
 		// Orbit Stats
@@ -477,7 +477,7 @@ EXPORT UPDATE(STRING filedate, STRING version, BOOLEAN pShouldSpray = Corp2_mapp
 																									 ,OUTPUT(Event_BadRecords,,Corp2_Mapping._Dataset().thor_cluster_Files + 'out::corp2::'+version+'::rejected::event_GA',__COMPRESSED__)
 																									)
 																								)
-																						 ,OUTPUT(Event_ScrubsWithExamples, ALL, NAMED('CorpEventGAScrubsReportWithExamples'))
+																						 ,OUTPUT(Event_ScrubsWithExamples, ALL, NAMED('CorpEventGAScrubsReportWithExamples'+filedate))
 																						 ,IF(COUNT(Event_ScrubsAlert) > 0, Event_MailFile, OUTPUT('CORP2_MAPPING.GA - No "EVENT" Corp Scrubs Alerts'))
 																						 ,Event_ErrorSummary
 																						 ,Event_ScrubErrorReport
