@@ -1,4 +1,4 @@
-/* Converting Nationwide Mortgage Licensing System and Registry File to MARI common layout
+﻿/* Converting Nationwide Mortgage Licensing System and Registry File to MARI common layout
 // Following allowable Real Estate License Type: APR, RLE, MTG, LND
 */
 
@@ -658,7 +658,8 @@ maribase_plus_dbas	transformToCommon_CO(Layout_clean_name pInput) := TRANSFORM
 	ClnSpaceDBA		:= StringLib.StringCleanSpaces(Prof_License_Mari.mod_clean_name_addr.StdCorpSuffix(prepDBA));
   tmpDBA				:= IF(trimDBA2 != ' ' AND TRIM(trimDBA2,LEFT,RIGHT) != TRIM(ClnNameDBA,LEFT,RIGHT), trimDBA2,' ');	
 	SELF.NAME_DBA_ORIG		:= UpperDBAName;
-	SELF.NAME_TYPE				:= stringlib.stringfindreplace(ut.CleanSpacesAndUpper(pInput.NAME_TYPE),'"','');
+	TmpName_Type      := stringlib.stringfindreplace(ut.CleanSpacesAndUpper(pInput.NAME_TYPE),'"','');
+	SELF.NAME_TYPE    := IF(TmpName_Type = 'PRIORINSTITUTIONLEGAL','PRINSTLEGL',TmpName_Type);
 	SELF.DBA1			:=  MAP(tmpDBA != ' ' => tmpDBA,
 											StringLib.stringfind(ClnSpaceDBA,'/',1) = 0	=> ClnSpaceDBA,
 											StringLib.stringfind(ClnSpaceDBA,'/',1) > 0 AND StringLib.stringfind(ClnSpaceDBA,',',1) > 0 => REGEXFIND('^([\\/]?)([A-Za-z ][^\\/]+)',ClnSpaceDBA,2),

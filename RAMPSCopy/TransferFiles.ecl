@@ -334,12 +334,12 @@ EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
 	end;
 	
 	
-	export SubmitWUonRampsThor(string jobtype) := function
+	export SubmitWUonRampsThor(string jobtype, string clustertorun = thorlib.cluster()) := function
 	
 		return map(
 															jobtype = 'stage' => output(RAMPSCopy.WorkUnitModule(trim(RAMPSCopy.constants(destenv).ramps.dstesp,left,right),RAMPSCopy.constants(destenv).ramps.port).fSubmitNewWorkunit(
 																	'#workunit(\'name\',\'Move Boca Indexes to Staging\');\r\n'+
-																	'sequential(\r\noutput(rampscopy.constants(\''+destenv+'\').rampsfileds,,\'~\'+rampscopy.constants(\''+destenv+'\').rampsfile+\'_cert\',overwrite)\r\n,RAMPSCopy.TransferFiles(\''+destenv+'\').MoveCopiedToStaging()) : failure(fileservices.deletelogicalfile(\'~\'+rampscopy.constants(\''+destenv+'\').rampsfile+\'_cert\'));','hthor')),
+																	'sequential(\r\noutput(rampscopy.constants(\''+destenv+'\').rampsfileds,,\'~\'+rampscopy.constants(\''+destenv+'\').rampsfile+\'_cert\',overwrite)\r\n,RAMPSCopy.TransferFiles(\''+destenv+'\').MoveCopiedToStaging()) : failure(fileservices.deletelogicalfile(\'~\'+rampscopy.constants(\''+destenv+'\').rampsfile+\'_cert\'));',clustertorun)),
 															jobtype = 'live' => output(RAMPSCopy.WorkUnitModule(trim(RAMPSCopy.constants(destenv).ramps.dstesp,left,right),RAMPSCopy.constants(destenv).ramps.port).fSubmitNewWorkunit(
 																	'#workunit(\'name\',\'Move Staging Indexes to Live\');\r\n'+
 																	'RAMPSCopy.TransferFiles(\''+destenv+'\','+(string)noofgens+').MoveStagingToLive() : failure(\r\n' +
@@ -351,7 +351,7 @@ EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
 																								',\r\n' +
 																								',RAMPSCopy.constants(\''+destenv+'\').rFromEmail\r\n' +
 																								')\r\n' +
-																						');','hthor')),
+																						');',clustertorun)),
 															output('NA')
 														);
 	
@@ -382,7 +382,7 @@ EXPORT TransferFiles(string destenv = '',integer noofgens = 2) := module
 																			),
 																output(RAMPSCopy.WorkUnitModule(RAMPSCopy.constants(destenv).boca.srcesp,RAMPSCopy.constants(destenv).boca.port).fSubmitNewWorkunit(
 																	'#workunit(\'name\',\'Copy Files to RAMPS '+ stringlib.StringToUpperCase(destenv) +' thor\')\r\n'+
-																	'Rampscopy.TransferFiles(\''+destenv+'\').begincopy : WHEN(CRON(\'0 17,21 * * *\'));','hthor'))
+																	'Rampscopy.TransferFiles(\''+destenv+'\').begincopy : WHEN(CRON(\'0 17,21 * * *\'));',thorlib.cluster()))
 																)
 														);
 		
