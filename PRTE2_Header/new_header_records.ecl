@@ -61,7 +61,7 @@ PRTE2_Vehicle;
     // docs_in         := prte2_DOC.as_headers();
     // domn_in         := prte2_Domains.as_headers.person_header_domain_recs;
     // emal_in         := PRTE2_Email_Data.as_headers.person_header_email_recs;
-    // gong_in         := dedup(sort(PRTE2_Gong.as_headers.person_header_gong_recs,record),record);
+    gong_in         := dedup(sort(PRTE2_Gong.as_headers.person_header_gong_recs,record),record);
     // mrrg_in         := PRTE2_Marriage_Divorce.as_header.person_header_mar_div;
     phnp_in         := dedup(sort(PRTE2_PhonesPlus.as_headers.person_header_phones,record),record);
     // sxof_in         := PRTE2_SexOffender.as_headers.person_header_SOF;
@@ -103,7 +103,7 @@ PRTE2_Vehicle;
             // + docs_in
             // + domn_in
             // + emal_in
-            // + gong_in
+        + gong_in
             // + mrrg_in
         + phnp_in
             // + sxof_in
