@@ -14,17 +14,17 @@
 	S	:=	folder.#EXPAND(scrubs_name);									//	My scrubs module
 	N	:=	S.FromNone(F);																//	Generate the error flags
 	U :=	S.FromExpanded(N.ExpandedInFile);							//	Pass the expanded error flags into the Expanded module
-	ErrorSummary			:=	OUTPUT(U.SummaryStats, NAMED(Prefix+'_ErrorSummary'+filedate));										//	Show errors by field and type
-	EyeballSomeErrors	:=	OUTPUT(CHOOSEN(U.AllErrors, 1000), NAMED(Prefix+'_EyeballSomeErrors'+filedate));		//	Just eyeball some errors
-	SomeErrorValues		:=	OUTPUT(CHOOSEN(U.BadValues, 1000), NAMED(Prefix+'_SomeErrorValues'+filedate));			//	See my error field values
+	ErrorSummary			:=	OUTPUT(U.SummaryStats, NAMED(Prefix+'_ErrorSummary'));										//	Show errors by field and type
+	EyeballSomeErrors	:=	OUTPUT(CHOOSEN(U.AllErrors, 1000), NAMED(Prefix+'_EyeballSomeErrors'));		//	Just eyeball some errors
+	SomeErrorValues		:=	OUTPUT(CHOOSEN(U.BadValues, 1000), NAMED(Prefix+'_SomeErrorValues'));			//	See my error field values
 	
 	if(count(infile)=0,sequential(output('No Records Found in '+Prefix,named('No_Record_Alert_'+Prefix)),
 																if(EmailList<>'',fileservices.sendEmail(emailList,'No Records Found in '+Prefix,'No Records Found in '+Prefix))));
 	
 	
 	Orbit_stats					:=	U.OrbitStats(); 
-	OrbitReport					:=	output(Orbit_stats,,'~thor_data400::'+ScrubsProfileName+'_orbit_stats',all,thor,overwrite,expire(10),NAMED(Prefix+'_OrbitReport'+filedate));
-	OrbitReportSummary	:=	output(Scrubs.OrbitProfileStats(,,Orbit_stats).SummaryStats,,'~thor_data400::'+ScrubsProfileName+'_orbit_stats_summary',all,thor,overwrite,expire(10),NAMED(Prefix+'_OrbitReportSummary'+filedate));
+	OrbitReport					:=	output(Orbit_stats,,'~thor_data400::'+ScrubsProfileName+'_orbit_stats',all,thor,overwrite,expire(10),NAMED(Prefix+'_OrbitReport'));
+	OrbitReportSummary	:=	output(Scrubs.OrbitProfileStats(,,Orbit_stats).SummaryStats,,'~thor_data400::'+ScrubsProfileName+'_orbit_stats_summary',all,thor,overwrite,expire(10),NAMED(Prefix+'_OrbitReportSummary'));
 	NumRules						:=	Count(Orbit_stats);
 	NumFailedRules			:=	Count(Orbit_Stats(rulecnt>0));
 	TotalRecs						:=	Count(N.ExpandedInFile);
@@ -106,9 +106,9 @@
 	
 	bitfile_name		:=	'~thor_data::'+scope_datasetName+'::Scrubs_Bits';
 	processedfile_name		:=	'~thor_data::'+scope_datasetName+'::Processed_File';
-	CreateBitmaps		:=	OUTPUT( N.BitmapInfile,,bitfile_name, OVERWRITE, compressed, named(scope_datasetName+'_BitFile_'+filedate)); // long term storage
+	CreateBitmaps		:=	OUTPUT( N.BitmapInfile,,bitfile_name, OVERWRITE, compressed, named(scope_datasetName+'_BitFile_')); // long term storage
 	#if(UseOnFail)
-	CreateProcessed		:=	OUTPUT( N.ProcessedInfile,,processedfile_name, OVERWRITE, compressed, named(scope_datasetName+'_ProcessedInfile_'+filedate)); // long term storage	
+	CreateProcessed		:=	OUTPUT( N.ProcessedInfile,,processedfile_name, OVERWRITE, compressed, named(scope_datasetName+'_ProcessedInfile_')); // long term storage	
 	#end
 	DS := DATASET(bitfile_name,S.Bitmap_Layout,FLAT); // Read in my data (which has bitmap appended
 	//This will translate the bitmap(s)

@@ -1,5 +1,5 @@
 ﻿import Salt35, Orbit3SOA, ut,_control,std;
-EXPORT OrbitProfileStats (string pProfileName = '', string pProfileType = 'ScrubsAlerts', dataset(Salt35.ScrubsOrbitLayout)ScrubsStats = dataset([], Salt35.ScrubsOrbitLayout), string versionDate = (STRING8)Std.Date.Today(), string FileType = '', string CustomTag = versionDate, string maxThreshold = '10' , string minThreshold = '-10'):= module
+EXPORT OrbitProfileStats (string pProfileName = '', string pProfileType = 'ScrubsAlerts', dataset(Salt35.ScrubsOrbitLayout)ScrubsStats = dataset([], Salt35.ScrubsOrbitLayout), string versionDate = (STRING8)Std.Date.Today(), string FileType = '', string CustomTag = '', string maxThreshold = '10' , string minThreshold = '-10'):= module
 				
 EXPORT GetProfile:= Orbit3SOA.Orbit3GetProfileRules(pProfileType, pProfileName);
 				DefaultPass:=GetProfile(Name='Default')[1].PassPercentage;
