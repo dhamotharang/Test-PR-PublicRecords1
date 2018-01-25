@@ -5,7 +5,7 @@
 'S0635',		// ** State of Alabama Banking Department
 'S0376',	 	// ** Alaska Department of Community & Economic Development
 'S0813',		// ** Arizona Department of Real Estate
-'S0808',		// ** Arizona Board of Appraisers
+// 'S0808',		// ** Arizona Board of Appraisers
 // 'S0639',		// ** Arizona State Banking Department
 'S0835',  	// ** Arkansas Real Estate Commision
 'S0824',		// ** Arkansas Appraiser Licensing & Certification Board 
