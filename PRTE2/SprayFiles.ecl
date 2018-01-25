@@ -1,4 +1,4 @@
-IMPORT lib_fileservices,tools, std;
+IMPORT $, STD, lib_fileservices, tools;
 
 EXPORT SprayFiles := module;
 
