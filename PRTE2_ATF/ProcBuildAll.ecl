@@ -12,7 +12,7 @@
  */
 IMPORT $, STD, PRTE2;
 
-EXPORT procBuildAll (
+EXPORT ProcBuildAll (
 	STRING file_name,
 	STRING host_name,
 	STRING directory
