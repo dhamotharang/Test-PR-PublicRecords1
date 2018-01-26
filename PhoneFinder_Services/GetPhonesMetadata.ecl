@@ -1,9 +1,8 @@
 ﻿IMPORT Advo,DID_Add, Gateway, Inquiry_AccLogs,MDR,PhoneFinder_Services,PhoneFraud,PhonesInfo,Phones,Risk_Indicators, std, ut;
-	EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dSearchRecs0, 
+	EXPORT GetPhonesMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dInRecs, 
 													 PhoneFinder_Services.iParam.ReportParams inMod, 
 													 DATASET(Gateway.Layouts.Config) dGateways, 
 													 DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInBestInfo,
-													 DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInPhone,
 													 DATASET(PhoneFinder_Services.Layouts.SubjectPhone) subjectInfo) :=
 	FUNCTION
 
@@ -11,15 +10,6 @@
   displayAll := inMod.TransactionType in [PhoneFinder_Services.Constants.TransType.PREMIUM,
 																						PhoneFinder_Services.Constants.TransType.ULTIMATE,
 																						PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT];	
-	
-  dInRecs	:= IF(inMod.TransactionType=PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
-																PROJECT(dInPhone,TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final,
-																																SELF.acctno:=LEFT.acctno, 
-																																SELF.seq:=LEFT.seq, 
-																																SELF.phone:=LEFT.homephone, 
-																																SELF.batch_in.homephone:=LEFT.homephone, 
-																																SELF:=[])),
-																dSearchRecs0);	
 	
 	// ---------------------------------------------------------------------------------------------------------
 	// ****************************************Process Location*************************************************
@@ -173,6 +163,35 @@
 	
 	dPhoneInquiryRecs_final := PROJECT(dPhoneInquiryRecs, PhoneFinder_Services.Layouts.PhoneFinder.Final); 
 	
+	// Adding Ported data
+	
+		PhoneFinder_Services.Layouts.PhoneFinder.Final UpdatePhonePortedInfo(PhoneFinder_Services.Layouts.PhoneFinder.Final l,PhoneFinder_Services.Layouts.PhoneFinder.Final r) := TRANSFORM 
+		
+			SELF.PortingCode        := r.PortingCode;
+			SELF.PortingCount       := r.PortingCount;
+			SELF.PortingHistory     := r.PortingHistory;	
+			SELF.FirstPortedDate    := r.FirstPortedDate;		
+			SELF.LastPortedDate     := r.LastPortedDate;
+			SELF.NoContractCarrier  := r.NoContractCarrier;
+			SELF.Prepaid				        := r.Prepaid;
+			SELF.ActivationDate     := r.ActivationDate;
+			SELF.DisconnectDate     := r.DisconnectDate;
+			SELF.serviceType  	     := r.serviceType;
+			SELF.RealTimePhone_Ext.ServiceClass := r.RealTimePhone_Ext.ServiceClass;
+			SELF.COC_description   := r.COC_description;
+			SELF.PortingStatus     := r.PortingStatus;	
+			SELF := l;
+			SELF := [];
+	END;
+	dPhoneInfoWPorting 		:= JOIN(dPhoneInquiryRecs_final,dInRecs,
+															LEFT.acctno	= RIGHT.acctno AND
+															LEFT.phone 	= RIGHT.phone,
+															UpdatePhonePortedInfo(LEFT,RIGHT),
+															LEFT OUTER, KEEP(1),
+															LIMIT(0));
+	
+	dPortedRecs := IF(inMod.TransactionType=PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT, dPhoneInfoWPorting, dPhoneInquiryRecs_final);
+	
 	// ---------------------------------------------------------------------------------------------------------
 	// ****************************************Process SPOOFs***************************************************
 	// ---------------------------------------------------------------------------------------------------------											
@@ -259,7 +278,7 @@
 			SELF := r;
 			SELF := l;
 	END;
-	dPhoneInfoWSpoofing		:= JOIN(dPhoneInquiryRecs_final,spoofInfowHistory,
+	dPhoneInfoWSpoofing		:= JOIN(dPortedRecs,spoofInfowHistory,
 															LEFT.acctno	= RIGHT.acctno AND
 															LEFT.did		= RIGHT.did AND
 															LEFT.phone 	= RIGHT.phone,
@@ -268,7 +287,7 @@
 															LIMIT(0));
 	dPhoneInfoUpdate := IF(EXISTS(spoofInfo) AND inMod.TransactionType IN [PhoneFinder_Services.Constants.TransType.ULTIMATE,
 																																					 PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT],
-																																										dPhoneInfoWSpoofing,dPhoneInquiryRecs_final);															
+																																										dPhoneInfoWSpoofing,dPortedRecs);															
 	// ---------------------------------------------------------------------------------------------------------
 	// ****************************************Process OTPs****************************************************
 	// ---------------------------------------------------------------------------------------------------------	
@@ -428,8 +447,8 @@
 		
 	
   #IF(PhoneFinder_Services.Constants.Debug.PhoneMetadata)		
- 		OUTPUT(dSearchRecs0,NAMED('dSearchRecs0'));												
- 		OUTPUT(dInBestInfo,NAMED('dInBestInfo'));												
+ 		 OUTPUT(dInRecs,NAMED('dInRecs'));												
+ 		 OUTPUT(dInBestInfo,NAMED('dInBestInfo'));												
    	OUTPUT(dSearchRecs,NAMED('dSearchRecs_metadata'));												
    	OUTPUT(phoneStateUpdate,NAMED('phoneStateUpdate'));												
     OUTPUT(bestInfo,NAMED('bestInfo'));												
@@ -438,6 +457,8 @@
     OUTPUT(ds_cityState,NAMED('ds_cityState'));												
     OUTPUT(dSearchRecswAddrType,NAMED('dSearchRecswAddrType'));												
     OUTPUT(dPhoneInquiryRecs_final,NAMED('dPhoneInquiryRecs_final'));												
+    OUTPUT(dPhoneInfoWPorting,NAMED('dPhoneInfoWPorting'));												
+    OUTPUT(dPortedRecs,NAMED('dPortedRecs'));												
 		// OUTPUT(dssubjects,NAMED('dsSubjects'));												
 		// OUTPUT(subjectInfo,NAMED('subjectInfo'));																			
 		// OUTPUT(dDeltabaseSpoofed,NAMED('dDeltabaseSpoofed'));												
