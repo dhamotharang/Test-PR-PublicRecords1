@@ -42,7 +42,6 @@ ebcdic string1  blank2;
 ebcdic string43 blank3;
 end;
 
-
 shared rec_monthly := record
 header.file_header_in_weekly.Layout AND NOT [   
                                                  filler1,
@@ -73,10 +72,35 @@ shared rec_weekly := record
         string8  eq_as_of_dt;
         file_header_in_weekly.Layout;
 end;
+
+shared rec_weekly_old := record
+
+          rec_weekly AND NOT  [
+                                current_address_date_last_reported,
+                                former1_address_date_last_reported,
+                                former2_address_date_last_reported,
+                                filler1,name_change,addr_change,ssn_change,
+                                former_name_change,new_rec,filler2
+                               ],
+                               
+          EBCDIC string1 filler1;
+          EBCDIC string1 name_change;
+          EBCDIC string1 addr_change;
+          EBCDIC string1 ssn_change;
+          EBCDIC string1 former_name_change;
+          EBCDIC string1 new_rec;
+          EBCDIC string38 filler2;
+
+end;
+
 lc:=data_Services.Data_location.prefix('header_quick');
 EXPORT monthly_file :=                dataset(lc+'thor_data400::in::hdr_raw',rec,flat) +
                         dataset(lc+'thor_data400::in::hdr_supplement2',rec,flat);
-EXPORT weekly_file  := dataset('~thor400_84::in::eq_weekly_with_as_of_date',rec_weekly,flat);
+
+
+EXPORT weekly_file  := dataset('~thor400_84::in::eq_weekly_with_as_of_date2',rec_weekly,flat)+
+               project(dataset('~thor400_84::in::eq_weekly_with_as_of_date',rec_weekly_old,flat),
+                       transform(rec_weekly,SELF:=LEFT,SELF:=[]));
 
 //all this is in the attempt to avoid the monthly data from re-cleaning/DID'ing (header.preprocess)
 //when the addition of a new weekly file would trigger the UID to re-sequence
