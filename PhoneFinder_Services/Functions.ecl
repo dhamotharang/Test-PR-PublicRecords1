@@ -10,18 +10,9 @@ lIdentityIesp := pfLayouts.PhoneFinder.IdentityIesp;
 EXPORT Functions :=
 MODULE
 
- EXPORT GetSubjectInfo(DATASET(PhoneFinder_Services.Layouts.BatchInAppendDID) dInPhone,
-                      DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dSearchRecs,
+ EXPORT GetSubjectInfo(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.Final) dInRecs,
 											           PhoneFinder_Services.iParam.ReportParams      inMod) := FUNCTION
 
-  dInRecs	:= IF(inMod.TransactionType=PhoneFinder_Services.Constants.TransType.PHONERISKASSESSMENT,
-																PROJECT(dInPhone,TRANSFORM(PhoneFinder_Services.Layouts.PhoneFinder.Final,
-																																SELF.acctno:=LEFT.acctno, 
-																																SELF.seq:=LEFT.seq, 
-																																SELF.phone:=LEFT.homephone, 
-																																SELF.batch_in.homephone:=LEFT.homephone, 
-																																SELF:=[])),
-																dSearchRecs);	
 	
   //phone searches do not generate other phones related to the subject, hence all phone searches are subject related.
 	 dNeedPortingInfo 	:= IF(inMod.SubjectMetadataOnly,dInRecs(isprimaryphone OR batch_in.homephone<>''),dInRecs);
