@@ -68,10 +68,9 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 	realtimeAttPhones := IF(EXISTS(numbersForRealtime) AND attGateway.url<>'' AND attLIBD_enabled,
 		Gateway.Soapcall_ATTPhoneSearch(numbersForRealtime, attGateway, attLIBD_enabled));
 
-	//Eliminate useless records, we need a phone number, carrier name, and account owner to join the carrier info.
-	filteredAttPhones := realtimeAttPhones(Response.AttMessage.EchoData.Custom1 <> ''
-		AND Response.AttMessage.AttResponse.InformationRetrievalResponse.CarrierName <> ''
-		AND Response.AttMessage.AttResponse.InformationRetrievalResponse.AccountOwner <> '');
+	//Eliminate records with no phone number. This is more in line with the old logic that wasn't filtering.
+	//It also allows us to pass errors through to error_desc
+	filteredAttPhones := realtimeAttPhones(Response.AttMessage.EchoData.Custom1 <> '');
 
 	//Convert response to our layout and add the account numbers back.
 	Layout_BatchRaw transformRealTimeLIDB(Phones.Layouts.PhoneAttributes.BatchIn l, iesp.att_iap.t_ATTIapQueryResponseEx r) := TRANSFORM
@@ -113,9 +112,9 @@ EXPORT GetPhoneMetadata_wLIDB(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dB
 			SELF.carrier_city := RIGHT.carrier_city,
 			SELF.carrier_state := RIGHT.carrier_state,
 
-			//Check if the source is deltabase or realtime.
+			//Check if the source is deltabase or realtime and that we didn't get an error.
 			SET OF STRING2 sourcesMissingInfo := [Consts.ATT_LIDB_Delta, Consts.ATT_LIDB_RealTime];
-			recNeedsLineServ := LEFT.source IN sourcesMissingInfo;
+			recNeedsLineServ := LEFT.source IN sourcesMissingInfo AND LEFT.error_desc = '';
 
 			//Add the remaining information only to deltabase and realtime records.
 			SELF.line:=IF(recNeedsLineServ, RIGHT.line, LEFT.line),

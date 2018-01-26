@@ -68,9 +68,14 @@ EXPORT PhoneAttributes_BatchRecords(
 		SELF.source := L.source;
 		SELF.prepaid := L.prepaid;
 		SELF.error_desc	:= L.error_desc;
-		SELF.dialable := ~disconnected AND L.source <> Consts.DISCONNECT_SRC;
 		SELF.carrier_city := L.carrier_city;
 		SELF.carrier_state := L.carrier_state;
+
+		//Check if the current record is outdated, from PX, or has an error_code, if so we mark dialable false.
+		today := STD.Date.Today();
+		earliestAllowedDate := (UNSIGNED)ut.date_math((STRING)today, -in_mod.max_lidb_age_days);
+		boolean is_outdated := SELF.event_date < earliestAllowedDate;
+		SELF.dialable := ~is_outdated AND L.error_desc = '' AND L.source <> Consts.DISCONNECT_SRC;
 
 		//These values are assigned below when all the most recent data is combined so they match what is being displayed.
 		SELF.phone_line_type_desc := '';
