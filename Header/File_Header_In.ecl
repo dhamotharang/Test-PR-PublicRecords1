@@ -2,46 +2,6 @@
 
 export file_header_in(boolean pFastHeader=false) := module
 
-shared rec := record
-ebcdic string15 first_name;
-ebcdic string15 middle_initial;
-ebcdic string25 last_name;
-ebcdic string2  suffix;
-ebcdic string15 former_first_name;
-ebcdic string15 former_middle_initial;
-ebcdic string25 former_last_name;
-ebcdic string2  former_suffix;
-ebcdic string15 former_first_name2;
-ebcdic string15 former_middle_initial2;
-ebcdic string25 former_last_name2;
-ebcdic string2  former_suffix2;
-ebcdic string15 aka_first_name;
-ebcdic string15 aka_middle_initial;
-ebcdic string25 aka_last_name;
-ebcdic string2  aka_suffix;
-ebcdic string57 current_address;
-ebcdic string20 current_city;
-ebcdic string2  current_state;
-ebcdic string5  current_zip;
-ebcdic string6  current_address_date_reported;
-ebcdic string57 former1_address;
-ebcdic string20 former1_city;
-ebcdic string2  former1_state;
-ebcdic string5  former1_zip;
-ebcdic string6  former1_address_date_reported;
-ebcdic string57 former2_address;
-ebcdic string20 former2_city;
-ebcdic string2  former2_state;
-ebcdic string5  former2_zip;
-ebcdic string6  former2_address_date_reported;
-ebcdic string6  blank1;
-ebcdic string9  ssn;
-ebcdic string9  cid;
-ebcdic string1  ssn_confirmed;
-ebcdic string1  blank2;
-ebcdic string43 blank3;
-end;
-
 shared rec_monthly := record
 header.file_header_in_weekly.Layout AND NOT [   
                                                  filler1,
@@ -94,9 +54,10 @@ shared rec_weekly_old := record
 end;
 
 lc:=data_Services.Data_location.prefix('header_quick');
-EXPORT monthly_file :=                dataset(lc+'thor_data400::in::hdr_raw',rec,flat) +
-                        dataset(lc+'thor_data400::in::hdr_supplement2',rec,flat);
 
+
+EXPORT monthly_file :=	dataset(lc+'thor_data400::in::hdr_raw',rec_monthly,flat) +
+                        project(dataset(lc+'thor_data400::in::hdr_supplement2',rec_monthly_old,flat),transform(rec_monthly,SELF:=LEFT,SELF:=[]));
 
 EXPORT weekly_file  := dataset('~thor400_84::in::eq_weekly_with_as_of_date2',rec_weekly,flat)+
                project(dataset('~thor400_84::in::eq_weekly_with_as_of_date',rec_weekly_old,flat),
