@@ -1,6 +1,7 @@
 ﻿import Salt35, Orbit3SOA, ut,_control,std;
 EXPORT OrbitProfileStats (string pProfileName = '', string pProfileType = 'ScrubsAlerts', dataset(Salt35.ScrubsOrbitLayout)ScrubsStats = dataset([], Salt35.ScrubsOrbitLayout), string versionDate = (STRING8)Std.Date.Today(), string FileType = '', string CustomTag = '', string maxThreshold = '10' , string minThreshold = '-10'):= module
-				
+	ut.CleanFields(ScrubsStats,ScrubsStatsClean);
+Shared CleanStats:=ScrubsStatsClean;	
 EXPORT GetProfile:= Orbit3SOA.Orbit3GetProfileRules(pProfileType, pProfileName);
 				DefaultPass:=GetProfile(Name='Default')[1].PassPercentage;
 				DefaultConversion	:=	project(GetProfile,Transform(Scrubs.Layouts.OrbitLayoutStep1,
@@ -11,7 +12,7 @@ shared	RemoveBlankRules	:=	DefaultConversion(STD.Str.find(name,':POP',1)<>0 or S
 SHARED Filename := '~profiletemplate::' + pProfileType + '::' + pProfileName + '.csv';
 //	Scrubs
 SHARED profile_header := dataset([{'Name', 'Description', 'IsEnabled', 'Group', 'Order', 'Severity', 'PassPercentage', 'Code'}], layouts.ProfileTemplateLayout);
-EXPORT ProfileTemplate:=  output(profile_header + project(dedup(sort(ScrubsStats, ruledesc, errormessage, -rulepcnt), ruledesc, errormessage),
+EXPORT ProfileTemplate:=  output(profile_header + project(dedup(sort(CleanStats, ruledesc, errormessage, -rulepcnt), ruledesc, errormessage),
 																																	 transform(layouts.ProfileTemplateLayout,
 																													 	       self.ruleName := trim(left.ruledesc, left, right),
 																																	 self.ruledesc :=  trim(stringlib.stringfindreplace(left.errormessage[..100], ',', ' '),left, right),
@@ -26,7 +27,7 @@ EXPORT ProfileTemplate:=  output(profile_header + project(dedup(sort(ScrubsStats
 //	Scrubs Alerts
 SHARED profile_alerts_header := dataset([{'Profile','Rule Name','Description','Enabled','Default','Order','Code','Severity','Pass Percentage','Percentage Error - Relative to previous (Min)','Percentage Error - Relative to previous (Max)','ScrubsAlertsPerRelToPopulationMin','Change To/From Zero'},
 																  {pProfileName,'Default','','true','true','0','','','','-10','20','','false'}], layouts.ProfileAlertsTemplateLayout);
-EXPORT ProfileAlertsTemplate:=  output(profile_alerts_header + project(dedup(sort(ScrubsStats, ruledesc, -rulepcnt), ruledesc),
+EXPORT ProfileAlertsTemplate:=  output(profile_alerts_header + project(dedup(sort(CleanStats, ruledesc, -rulepcnt), ruledesc),
 																																	 transform(layouts.ProfileAlertsTemplateLayout,
 																																	 self.Profile := pProfileName;
 																													 	       self.Rule_Name := trim(left.ruledesc, left, right),
@@ -43,7 +44,7 @@ EXPORT ProfileAlertsTemplate:=  output(profile_alerts_header + project(dedup(sor
 																																	 self.Change_To_From_Zero	:=	'',
 																																	 self := left)) ,, Filename, csv(separator(','),terminator('\r\n'),quote('"'),maxlength(65535)), compressed, overwrite, named('ProfileAlertsTemplate'+FileType)); 	
 											
-Export CompareToProfile_with_examples 	 := join(ScrubsStats, RemoveBlankRules, trim(left.RuleDesc, left, right) = trim(right.Name, left, right),
+Export CompareToProfile_with_examples 	 := join(CleanStats, RemoveBlankRules, trim(left.RuleDesc, left, right) = trim(right.Name, left, right),
                                          transform( layouts.StatsOutLayout, 
 																				 self.RulePcnt := (decimal5_2) (((real)left.Rulecnt/(real)left.RecordsTotal) * 100.00);
 																				 self.RejectWarning := if(self.RulePcnt > (decimal5_2) right.passpercentage, 'Y', 'N'),
@@ -57,7 +58,7 @@ Export CompareToProfile_with_examples 	 := join(ScrubsStats, RemoveBlankRules, t
 																				 self := right));
 
 EXPORT CompareToProfile_for_Orbit := dedup(sort(CompareToProfile_with_examples, Sourcecode, RuleName), Sourcecode, RuleName);
-EXPORT SubmitStats :=  sequential(output(ScrubsStats,,'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+CustomTag,thor,all,expire(2)),
+EXPORT SubmitStats :=  sequential(output(CleanStats,,'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+CustomTag,thor,all,expire(2)),
 output(RemoveBlankRules),
 																	output(_control.fSubmitNewWorkunit('#workunit(\'name\',\'Build Scrubs - '+pProfileName+'\');\r\n'+
 																																		 'Submission:=dataset(\'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+CustomTag+'\',Salt35.ScrubsOrbitLayout,thor);\r\n'+
@@ -67,7 +68,7 @@ output(RemoveBlankRules),
 																																		 
 																																		 
 
-EXPORT SummaryStats := dedup(sort(project(ScrubsStats,
+EXPORT SummaryStats := dedup(sort(project(CleanStats,
 																					transform(Salt35.ScrubsOrbitLayout and not [rejectwarning, rawcodemissing, rawcodemissingcnt],
 																					self := left)), sourcecode, ruledesc), sourcecode, ruledesc);
 
