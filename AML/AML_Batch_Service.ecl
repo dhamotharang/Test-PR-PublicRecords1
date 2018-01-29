@@ -1,4 +1,4 @@
-IMPORT iesp, Risk_indicators, Riskwise, address, Business_risk, AutoStandardI, gateway;
+﻿IMPORT iesp, Risk_indicators, Riskwise, address, Business_risk, AutoStandardI, gateway;
 
 EXPORT AML_Batch_Service() := FUNCTION
 
@@ -9,7 +9,7 @@ EXPORT AML_Batch_Service() := FUNCTION
                 'AttributesVersion',
                 'IncludeNewsProfile',
                 'DataRestriction',
-								'DataPermissionMask',
+																'DataPermissionMask',
                 'gateways'
                 ));
 
@@ -149,6 +149,7 @@ INDIndexV1 := join(consumerAttributesV1, IndRecs,
   self.IndProfessionalRiskV2          	:= le.IndProfessionalRisk;
   self.IndBusExecOffAssocRiskV2      		:= le.IndBusExecOffAssocRisk;
 	self.RoyaltySrc                    		:= '0';
+	self.lexID := le.DID;
 	self := [];
 END;
 
