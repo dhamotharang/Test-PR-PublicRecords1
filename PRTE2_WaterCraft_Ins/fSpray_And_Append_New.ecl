@@ -60,9 +60,10 @@ EXPORT fSpray_And_Append_New(STRING lzFilePath, STRING fileVersion) := FUNCTION
 																										todayLess50				:= ut.date_math(bestTodayDate,-50);																										
 																										todayL30Plus3y		:= ut.date_add('3Y', todayLess30);
 																										BestRegistrationDate := PickOne(LEFT.registration_date, todayLess30);
-
+																										BestRegistrationExpire := PickOne(LEFT.registration_expiration_date, todayL30Plus3y);
+																										
 																										SELF.Watercraft_key	:= PickOne(LEFT.Watercraft_key, bestHullNumber);
-																										SELF.sequence_key	:= bestTodayDate;
+																										SELF.sequence_key	:= BestRegistrationExpire;		// Data team doesn't fill this
 																										SELF.history_flag_Search	:= PickOne(LEFT.history_flag_Search, bestHistoryFlag);
 																										// SELF.history_flag_Main	:= PickOne(LEFT.history_flag_Main, bestHistoryFlag);
 																										SELF.Source_code  	:= bestSourceCode; 
@@ -73,7 +74,7 @@ EXPORT fSpray_And_Append_New(STRING lzFilePath, STRING fileVersion) := FUNCTION
 																										SELF.date_first_seen := PickOne(LEFT.date_first_seen, todayLess60);
 																										SELF.date_last_seen := PickOne(LEFT.date_last_seen, BestRegistrationDate);
 																										SELF.registration_date := BestRegistrationDate;
-																										SELF.registration_expiration_date := PickOne(LEFT.registration_expiration_date, todayL30Plus3y);
+																										SELF.registration_expiration_date := BestRegistrationExpire;
 																										SELF.date_vendor_first_reported := PickOne(LEFT.date_vendor_first_reported, todayLess50);
 																										SELF.date_vendor_last_reported := PickOne(LEFT.date_vendor_last_reported, bestTodayDate);
 																										

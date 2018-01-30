@@ -50,17 +50,23 @@ EXPORT fspray_And_Build_Base(STRING lzFilePath, STRING fileVersion) := FUNCTION
 																										bestHullNumber 	:= PickOne(LEFT.hull_number_Main, LEFT.hull_number_cg);
 																										bestSourceCode 	:= PickOne(LEFT.source_code_Main, LEFT.source_code_CG);
 																										bestHistoryFlag 	:= PickOne(LEFT.history_flag_Main, LEFT.history_flag_Search);
-																										today 							:= PRTE2_Common.Constants.TodayString; 
-																										isValidLastReport := LEFT.date_vendor_last_reported<>'' AND STD.Date.IsValidDate((UNSIGNED4) LEFT.date_vendor_last_reported);
-																										bestTodayDate			:= IF(isValidLastReport, LEFT.date_vendor_last_reported, today);
-																										todayLess30				:= ut.date_math(bestTodayDate,-30);
-																										todayLess60				:= ut.date_math(bestTodayDate,-60);
-																										todayLess50				:= ut.date_math(bestTodayDate,-50);
-																										todayL30Plus3y		:= ut.date_add('3Y', todayLess30);
-																										BestRegistrationDate := PickOne(LEFT.registration_date, todayLess30);
-
-																										SELF.Watercraft_key	:= PickOne(LEFT.Watercraft_key, bestHullNumber);
-																										SELF.sequence_key	:= PickOne(LEFT.sequence_key, bestTodayDate);
+																										
+																										// Existing data - skipping date fields and Watercraft_key and Sequence_key fields.
+																										// today 							:= PRTE2_Common.Constants.TodayString; 
+																										// isValidLastReport := LEFT.date_vendor_last_reported<>'' AND STD.Date.IsValidDate((UNSIGNED4) LEFT.date_vendor_last_reported);
+																										// isValidLastSeen	 := LEFT.date_last_seen<>'' AND STD.Date.IsValidDate((UNSIGNED4) LEFT.date_last_seen);
+																										// For existing records - try to keep old historical time periods.
+																										// bestTodayDate1			:= IF(isValidLastReport, LEFT.date_vendor_last_reported, '');
+																										// bestTodayDate2			:= IF(isValidLastSeen, LEFT.date_last_seen, '');
+																										// bestTodayDate3			:= PickOne(bestTodayDate1,bestTodayDate2);
+																										// bestTodayDate			:= PickOne(bestTodayDate3, today);
+																										// todayLess30				:= ut.date_math(bestTodayDate,-30);
+																										// todayLess60				:= ut.date_math(bestTodayDate,-60);
+																										// todayLess50				:= ut.date_math(bestTodayDate,-50);
+																										// todayL30Plus3y		:= ut.date_add('3Y', todayLess30);
+																										// BestRegistrationDate := PickOne(LEFT.registration_date, todayLess30);
+																										// SELF.Watercraft_key	:= PickOne(LEFT.Watercraft_key, bestHullNumber);
+																										// SELF.sequence_key	:= PickOne(LEFT.sequence_key, bestTodayDate);
 																										SELF.history_flag_Search	:= PickOne(LEFT.history_flag_Search, bestHistoryFlag);
 																										// SELF.history_flag_Main	:= PickOne(LEFT.history_flag_Main, bestHistoryFlag);
 																										SELF.Source_code  	:= bestSourceCode; 
