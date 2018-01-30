@@ -64,7 +64,7 @@ output(RemoveBlankRules),
 																																		 'Submission:=dataset(\'~thor_data400::Scrubs::FileToSubmit_'+pProfileName+'_'+workunit+'_'+CustomTag+'\',Salt35.ScrubsOrbitLayout,thor);\r\n'+
 																																		 'CalculateWarnings:=Scrubs.OrbitProfileStats(\''+pProfileName+'\',\'ScrubsAlerts\',Submission,\''+versionDate+'\',\''+pProfileName+'\').CompareToProfile_for_Orbit;\r\n'+
 																																		 'Scrubs.StatSubmit(Submission,CalculateWarnings,\''+pProfileName+'\',\''+CustomTag+'\',\''+pProfileType+'\',\''+versionDate+'\',\''+FileType+'\',\''+workunit+'\');'
-																																		 ,std.system.job.target()),named(pProfileName+'_Submission'+CustomTag)));
+																																		 ,std.system.job.target())));
 																																		 
 																																		 
 
