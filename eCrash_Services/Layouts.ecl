@@ -34,9 +34,11 @@ EXPORT Layouts := MODULE
 				string jurisNotNullIfNoParmSQL; 
 				string jurisAndStateIfParms; 
 				string jurisAndStateIfParmsElseNotNull;
-				string fNameStateSQL; 
-				string vinLicenseTagOfficerBadgeSQL;
 				string simplePartialReportNumberWhere;
+				string vinTagSQL;
+				string licenseSQL;
+				string officerBadgeSQL;
+				string jurisStateSQL;
 		END;		
 		
 		EXPORT search := record

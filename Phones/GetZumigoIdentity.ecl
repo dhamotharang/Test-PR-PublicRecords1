@@ -56,9 +56,12 @@ EXPORT GetZumigoIdentity(DATASET(Phones.Layouts.ZumigoIdentity.subjectVerificati
 	//normalization drops error records, hence we re-append here.
 	dsZResults_wErrors := zumOut(response._header.transactionID NOT IN SET(normZResults,response._header.transactionID)) + normZResults;
 	
+	batch_jobid_val := Gateway.Configuration.GetBatchJobId(inMod.gateways(Gateway.Configuration.IsZumigoIdentity(ServiceName))[1]);
+	
 	//start building the gateway history table.
 	Phones.Layouts.gatewayHistory savedAllowedZumigoData(iesp.zumigo_identity.t_ZumigoIdentityResponseEx l) := TRANSFORM
 		SELF.transaction_id := l.response._header.TransactionId;
+		SELF.batch_job_id := (string)batch_jobid_val;
 		SELF.source := IF(l.response._header.Message='',Phones.Constants.GatewayValues.ZumigoIdentity,'');
 		SELF.vendor_transaction_id := l.response.LineIdentityResponse.TrackingId;
 		SELF.submitted_phonenumber := l.response.LineIdentityResponse.MobileDeviceNumber[2..11];

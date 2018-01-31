@@ -17,14 +17,14 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	allBusinesses := indata + linkedBus;
 
 	// ---------------[ Corporate Filings (SoS) Data ]----------------		
-	corpFilingsRaw := Corp2.Key_LinkIDs.Corp.kfetch2(DueDiligence.Common.GetLinkIDs(allBusinesses),
+	corpFilingsRaw := Corp2.Key_LinkIDs.Corp.kfetch2(DueDiligence.CommonBusiness.GetLinkIDs(allBusinesses),
 																										 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																										 0, // ScoreThreshold --> 0 = Give me everything
 																										 Business_Risk_BIP.Constants.Limit_Default,
 																										 Options.KeepLargeBusinesses);
 
 	// Add back to Corp Filings our Seq numbers.
-	corpFilingsSeq := DueDiligence.Common.AppendSeq(corpFilingsRaw, indata, TRUE);
+	corpFilingsSeq := DueDiligence.CommonBusiness.AppendSeq(corpFilingsRaw, indata, TRUE);
 		
 	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
 	corpFilingsCleanDate := DueDiligence.Common.CleanDatasetDateFields(corpFilingsSeq, 'dt_first_seen, dt_vendor_first_reported, corp_inc_date, corp_filing_date, dt_last_seen');
@@ -47,7 +47,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 											LEFT OUTER);
 											
 	//has corporation ever filed	
-	corpFilingDateSort := SORT(corpFilingsFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_filing_date);
+	corpFilingDateSort := SORT(corpFilingsFilt, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), -corp_filing_date);
 	corpFilingDateDedup := DEDUP(corpFilingDateSort, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids()), corp_filing_date);
 	
 	rollForCorpFilingDate := ROLLUP(corpFilingDateDedup, 
@@ -72,26 +72,50 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	
 	//get sos address location count - should only have 1 address associated with proxID
 	filtAddrLoc := corpFilingsFilt(corp_addr1_prim_name != DueDiligence.Constants.EMPTY AND REGEXFIND(DueDiligence.Constants.NOT_PO_ADDRESS_EXPRESSION, TRIM(corp_addr1_prim_name), NOCASE));
-	corpAddrLocSort := SORT(filtAddrLoc, seq, #EXPAND(BIPV2.IDmacros.mac_ListTop4Linkids()));
+	corpAddrLocSort := SORT(filtAddrLoc, seq, #EXPAND(BIPV2.IDmacros.mac_ListTop4Linkids()), -dt_last_seen);
 	corpAddrLocDedup := DEDUP(corpAddrLocSort, seq, #EXPAND(BIPV2.IDmacros.mac_ListTop4Linkids()));
-
-	corpAddrLocCount := TABLE(corpAddrLocDedup, {seq, ultID, UNSIGNED3 addrLocCount := COUNT(GROUP)}, seq, ultID);		
 	
-	addBusnLocCnt := JOIN(addEverFiled, corpAddrLocCount, 
-												LEFT.seq = RIGHT.seq AND
-												LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
-												LEFT.relatedDegree = DueDiligence.Constants.INQUIRED_BUSINESS_DEGREE,
-												TRANSFORM(DueDiligence.Layouts.Busn_Internal,
-															SELF.SOSAddrLocationCount := RIGHT.addrLocCount;
-															SELF := LEFT;),
-												LEFT OUTER);
+	corpAddrProject := PROJECT(corpAddrLocDedup, TRANSFORM(DueDiligence.LayoutsInternal.OperatingLocationLayout,
+																													SELF.addrCount := 1;
+																													SELF.locAddrs := PROJECT(LEFT, TRANSFORM(DueDiligence.Layouts.Address,
+																																																		SELF.prim_range:= LEFT.corp_addr1_prim_range;
+																																																		SELF.predir:= LEFT.corp_addr1_predir;
+																																																		SELF.prim_name:= LEFT.corp_addr1_prim_name;
+																																																		SELF.addr_suffix:= LEFT.corp_addr1_addr_suffix;
+																																																		SELF.postdir:= LEFT.corp_addr1_postdir;
+																																																		SELF.unit_desig:= LEFT.corp_addr1_unit_desig;
+																																																		SELF.sec_range:= LEFT.corp_addr1_sec_range;
+																																																		SELF.city:= LEFT.corp_addr1_v_city_name;
+																																																		SELF.state:= LEFT.corp_addr1_state;
+																																																		SELF.zip5:= LEFT.corp_addr1_zip5;
+																																																		SELF.zip4:= LEFT.corp_addr1_zip4;
+																																																		SELF.cart:= LEFT.corp_addr1_cart;
+																																																		SELF.cr_sort_sz:= LEFT.corp_addr1_cr_sort_sz;
+																																																		SELF.lot:= LEFT.corp_addr1_lot;	
+																																																		SELF.lot_order:= LEFT.corp_addr1_lot_order;
+																																																		SELF.dbpc:= LEFT.corp_addr1_dpbc;	
+																																																		SELF.chk_digit:= LEFT.corp_addr1_chk_digit;
+																																																		SELF.rec_type:= LEFT.corp_addr1_rec_type;                               
+																																																		SELF.geo_lat:= LEFT.corp_addr1_geo_lat;
+																																																		SELF.geo_long:= LEFT.corp_addr1_geo_long;
+																																																		SELF.msa:= LEFT.corp_addr1_msa; 	
+																																																		SELF.geo_blk:= LEFT.corp_addr1_geo_blk;
+																																																		SELF.geo_match:= LEFT.corp_addr1_geo_match;
+																																																		SELF.err_stat:= LEFT.corp_addr1_err_stat;
+																																																		SELF.dateLastSeen := LEFT.dt_last_seen;
+																																																		SELF := LEFT;
+																																																		SELF := [];));
+																													SELF := LEFT;
+																													SELF := [];));
+	
+	addBusnLocCnt := DueDiligence.CommonBusiness.AddOperatingLocations(corpAddrProject, addEverFiled, DueDiligence.Constants.SOURCE_BUSINESS_CORP);
 																						
 	//retrieve SIC and NAIC codes with dates
-	outCorpSic := DueDiligence.Common.getSicNaicCodes(corpFilingsFilt, corp_sic_code, TRUE, TRUE, dt_first_seen, dt_last_seen);
-	outCorpNaic := DueDiligence.Common.getSicNaicCodes(corpFilingsFilt, corp_naic_code, FALSE, TRUE, dt_first_seen, dt_last_seen);
+	outCorpSic := DueDiligence.CommonBusiness.getSicNaicCodes(corpFilingsFilt, corp_sic_code, TRUE, TRUE, dt_first_seen, dt_last_seen);
+	outCorpNaic := DueDiligence.CommonBusiness.getSicNaicCodes(corpFilingsFilt, corp_naic_code, FALSE, TRUE, dt_first_seen, dt_last_seen);
 	
 	allCorpSicNaic := outCorpSic + outCorpNaic;
-	sortCorpRollSicNaic := DueDiligence.Common.rollSicNaicBySeqAndBIP(addBusnLocCnt, allCorpSicNaic);
+	sortCorpRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(addBusnLocCnt, allCorpSicNaic);
 		
 	addCorpSicNaic := JOIN(addBusnLocCnt, sortCorpRollSicNaic,
 													LEFT.seq = RIGHT.seq AND
@@ -231,7 +255,7 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																											SELF := [];));
 																											
 																											
-	addAgents := DueDiligence.Common.AddAgents(projectSosAgent, addIncLooseLaws); 			
+	addAgents := DueDiligence.CommonBusiness.AddAgents(projectSosAgent, addIncLooseLaws); 			
 	
 	
 
@@ -247,8 +271,8 @@ EXPORT getBusSOSDetail(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(addIncDate, NAMED('addIncDate'));
 	
 	// OUTPUT(filtAddrLoc, NAMED('filtAddrLoc'));
-	// OUTPUT(corpAddrLocCount, NAMED('corpAddrLocCount'));
 	// OUTPUT(addBusnLocCnt, NAMED('addBusnLocCnt'));
+	
 	
 	// OUTPUT(projectDates, NAMED('projectDates'));
 	// OUTPUT(lastSeenSort, NAMED('lastSeenSort'));

@@ -21,7 +21,7 @@ END;
 EXAMPLE:
 
 
-gates := dataset([{'News','http://khillqa:time4beer@espdev.br.seisint.com:5005/WsGateway'}], Risk_Indicators.Layout_Gateways_In);
+gates := dataset([{'News','http://khillqa:[PASSWORD_REDACTED]@espdev.br.seisint.com:5005/WsGateway'}], Risk_Indicators.Layout_Gateways_In);
 #stored('_TransactionId', '111r000');
 #stored('Gateways',gates);
 

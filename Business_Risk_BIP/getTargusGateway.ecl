@@ -5,7 +5,7 @@ EXPORT getTargusGateway(DATASET(Business_Risk_BIP.Layouts.Shell) Shell,
 											 BIPV2.mod_sources.iParams linkingOptions,
 											 SET OF STRING2 AllowedSourcesSet) := FUNCTION
 	
-	// Gateway url for development: 'http://rw_score_dev:Password01@gatewaycertesp.sc.seisint.com:7726/WsGateway'
+	// Gateway url for development: 'http://rw_score_dev:[PASSWORD_REDACTED]@gatewaycertesp.sc.seisint.com:7726/WsGateway'
 
 	RESTRICTED_SET := ['0', ''];
 	RESTRICT_GATEWAY_URL := '';

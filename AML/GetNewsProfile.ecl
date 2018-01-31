@@ -5,9 +5,9 @@ Import UT, Gateway, Risk_Indicators;
 for testing use this declaration with set up the gateways in the appropriate stored variable
 */
 // gateway_ext := dataset([
-	// {'bridgerxg5','http://bridger_dev:NoMoreBugs!@10.173.132.10:7001/WsSearchCore?ver_=1'}
+	// {'bridgerxg5','http://bridger_dev:[PASSWORD_REDACTED]@10.173.132.10:7001/WsSearchCore?ver_=1'}
 	// ,
-	// {'searchcore','HTTP://khillqa:time4beer@gatewaycertesp.sc.seisint.com:7726/WsGateway/?ver_=1.93'}
+	// {'searchcore','HTTP://khillqa:[PASSWORD_REDACTED]@gatewaycertesp.sc.seisint.com:7726/WsGateway/?ver_=1.93'}
 // ],  Risk_Indicators.Layout_Gateways_In );
 // ],  Gateway.Layouts.Config );
 // #stored('Gateways', gateway_ext);

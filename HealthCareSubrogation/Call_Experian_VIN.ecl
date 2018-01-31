@@ -50,7 +50,7 @@ EXPORT Call_Experian_VIN (iesp.bpsreport.t_BpsReportBy Input, STRING8 Date_of_Se
 		isValidRequest := Input.Address.StreetName <> '' and Input.Address.Zip5 <> '';
 	// changing the logic below to be as close as possible to the one used in Get_Polk_Data.
 		vMakeGWCall := experian_gateway_cfg[1].Url !='' and isValidRequest;
-	// STRING serviceURL := 'http://webapp_roxie_test:web33436$@10.194.5.12:5004/';		
+	// STRING serviceURL := 'http://webapp_roxie_test:[PASSWORD_REDACTED]@10.194.5.12:5004/';		
 		VIN_Resp := if (isValidRequest,Gateway.SoapCall_Experian(vinReq, gateway_cfg[1],,,vMakeGWCall),dummy_ds); 
 
 		r := record

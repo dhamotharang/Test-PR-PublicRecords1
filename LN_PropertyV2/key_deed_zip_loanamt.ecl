@@ -1,4 +1,4 @@
-import doxie,ln_propertyv2,ut;
+import doxie,ln_propertyv2,Data_Services;
 
 dAddlFaresDeedMortg	:=	distribute(ln_propertyv2.File_addl_fares_deed,hash(ln_fares_id));
 dDeedMortg					:=	distribute(ln_propertyv2.file_deed_building,hash(ln_fares_id));
@@ -113,5 +113,5 @@ dZipLoanAmt	:=	dDeedNormLoanAmt(			loan_amount	!=	''
 export key_deed_zip_loanamt := index(	dZipLoanAmt,
 																			{zip,loan_amount,loan_date},
 																			{ln_fares_id},
-																			'~thor_Data400::key::ln_propertyV2::' + doxie.Version_SuperKey + '::deed.zip_loanamt'
+																			Data_Services.Data_location.Prefix('Property')+'thor_data400::key::ln_propertyV2::' + doxie.Version_SuperKey + '::deed.zip_loanamt'
 																		);

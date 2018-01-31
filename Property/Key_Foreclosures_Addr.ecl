@@ -1,4 +1,4 @@
-import doxie, ut, property;
+import doxie, property, Data_Services;
 
 Foreclosure_Address := property.file_Foreclosure;
 
@@ -235,4 +235,4 @@ export key_foreclosures_addr := index(cleaned,{
 																		situs1_prim_name, 
 																		situs1_addr_suffix, 
 																		situs1_predir},
-																		{cleaned},'~thor_data400::key::foreclosure_address_' + doxie.Version_SuperKey);
+																		{cleaned},Data_Services.Data_location.Prefix()+'thor_data400::key::foreclosure_address_' + doxie.Version_SuperKey);

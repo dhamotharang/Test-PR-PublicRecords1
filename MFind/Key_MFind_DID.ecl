@@ -1,4 +1,4 @@
-import MFind, Doxie, ut;
+import MFind, Doxie, Data_Services;
 
 get_recs := MFind.File_MFind_Clean;
 
@@ -9,5 +9,5 @@ slim_sort   := sort(slim_dist, did, trim_vid, local);
 slim_dedup  := dedup(slim_sort, did, trim_vid, local);
 
 export Key_MFind_DID := index(slim_dedup,{did},{trim_vid},
-'~thor_data400::key::mfind::DID_'+ doxie.Version_SuperKey);
+Data_Services.Data_location.Prefix()+'thor_data400::key::mfind::DID_'+ doxie.Version_SuperKey);
 

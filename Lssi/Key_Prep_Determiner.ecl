@@ -1,4 +1,4 @@
-import doxie;
+import Data_Services;
 
 f := lssi.File_QuestionFile;
 
@@ -25,4 +25,4 @@ t := TABLE(f, no_did);
 
 d := DEDUP(t, ALL);
 
-export Key_Prep_Determiner := INDEX(d, {d}, '~thor_data400::key::lssi.determiner'+ thorlib.wuid());
+export Key_Prep_Determiner := INDEX(d, {d}, Data_Services.Data_location.Prefix()+'thor_data400::key::lssi.determiner'+ thorlib.wuid());

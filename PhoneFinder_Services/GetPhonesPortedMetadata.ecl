@@ -148,7 +148,6 @@ EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.
 	END;
 	dPhoneMetadataWPorting 		:= JOIN(dSearchRecs0,dPortedRolled,
 															LEFT.acctno	= RIGHT.acctno AND
-															LEFT.did		= RIGHT.did AND
 															LEFT.phone 	= RIGHT.phone,
 															UpdatePhoneInfo(LEFT,RIGHT),
 															LEFT OUTER, KEEP(1),
@@ -159,9 +158,8 @@ EXPORT GetPhonesPortedMetadata(DATASET(PhoneFinder_Services.Layouts.PhoneFinder.
 	    OUTPUT(dDeltabasePorted,NAMED('dDeltabasePorted'));																						
 	    OUTPUT(dPortedInfo,NAMED('dPortedInfo'));																						
 	    OUTPUT(dPortedPhones,NAMED('dPortedPhones_getportedmetadata'));											
-	    OUTPUT(dPhoneMetadataWPorting,NAMED('dPhoneMetadataWPorting'));											
-		  OUTPUT(transformPort,NAMED('transformPort'));																							
-		  OUTPUT(dPortedRolled,NAMED('dPortedRolled'));												
+		   OUTPUT(transformPort,NAMED('transformPort'));																							
+		   OUTPUT(dPortedRolled,NAMED('dPortedRolled'));												
 	    OUTPUT(dphonemetadataWPorting,NAMED('dphonemetadataWPorting'));															
 	#END;
 	

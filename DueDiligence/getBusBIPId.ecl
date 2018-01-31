@@ -49,7 +49,7 @@ EXPORT getBusBIPId(DATASET(DueDiligence.Layouts.CleanedData) indata,
 																			SELF := LEFT;),
 													LEFT OUTER);
 	//Put the data including the Clean this address into the Busines Shell layout for the further processing by the BIP_LINK_ID_Append logic
-	cleanedInput := DueDiligence.Common.GetCleanBIPShell(addFoundBipIDs);
+	cleanedInput := DueDiligence.CommonBusiness.GetCleanBIPShell(addFoundBipIDs);
 	
 	//Do 1 more reformatting step to Grab just the clean input to pass to the BIP Linking Process
 	prepBIPAppend := PROJECT(cleanedInput, TRANSFORM(Business_Risk_BIP.Layouts.Input, SELF := LEFT.Clean_Input));

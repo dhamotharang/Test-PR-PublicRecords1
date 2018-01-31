@@ -4,6 +4,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 												Business_Risk_BIP.LIB_Business_Shell_LIBIN options,
 												BIPV2.mod_sources.iParams linkingOptions,
 												BOOLEAN includeReport = FALSE,
+												BOOLEAN displayAttributeText = FALSE,
 												BOOLEAN debugMode = FALSE) := FUNCTION
 
 
@@ -29,7 +30,7 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	linkedBus := DueDiligence.getBusLinkedBus(busBestData, options, linkingOptions);
 	
 	//Get executives from inquired businesses
-	busExecs := DueDiligence.getBusExec(linkedBus, options, linkingOptions);
+	busExecs := DueDiligence.getBusExec(linkedBus, options, linkingOptions, includeReport);
 	
 	//Get related businesses
 	relatedBus := DATASET([], DueDiligence.Layouts.Busn_Internal);
@@ -39,18 +40,18 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	//get attribute data for individuals related to the inquired business
 	busProfLicense := DueDiligence.getBusProfLic(busExecs, includeReport);
 	
-	busLegalEvents := DueDiligence.getBusLegalEvents(busProfLicense, options, linkingOptions); 
+	busLegalEvents := DueDiligence.getBusLegalEvents(busProfLicense, options, linkingOptions, includeReport); 
 	
 
 
 	//get attribute data for the inquired business
-	busProperty := DueDiligence.getBusProperty(busLegalEvents, options, linkingOptions);
+	busProperty := DueDiligence.getBusProperty(busLegalEvents, options, linkingOptions, includeReport);
 
 	busWatercraft := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions, includeReport);
 
 	busAircraft := DueDiligence.getBusAircraft(busWatercraft, options, includeReport);
 	
-	busVehicle := DueDiligence.getBusVehicle(busAircraft, options, linkingOptions);
+	busVehicle := DueDiligence.getBusVehicle(busAircraft, options, linkingOptions, includeReport);
 
 	busReg := DueDiligence.getBusRegistration(busVehicle, options, linkingOptions);
 	

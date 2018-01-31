@@ -3,14 +3,14 @@
 EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 //ReportIsRequested = TRUE,  
+											 boolean ReportIsRequested,  
 											 boolean DebugMode = FALSE
 											 ) := FUNCTION
 
   // ------                                                                             ------
 	// ------ Get the LinkIDs for this Business                                          ------
 	// ------                                                                            ------
-	BusnKeys    := DueDiligence.Common.GetLinkIDs(BusnData);
+	BusnKeys    := DueDiligence.CommonBusiness.GetLinkIDs(BusnData);
 	
   // ------                                                                            ------	
 	// ------ Property Data - Using Business IDs                                         ------
@@ -25,7 +25,7 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------                                                                             ------
 	// ------ Add our sequence number to the Raw Property records found for this Business ------
 	// ------                                                                             ------
-	PropertyRaw_with_seq := DueDiligence.Common.AppendSeq(PropertyRaw, BusnData, TRUE);
+	PropertyRaw_with_seq := DueDiligence.CommonBusiness.AppendSeq(PropertyRaw, BusnData, TRUE);
 	
 	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently
 	propertyCleanDates := DueDiligence.Common.CleanDatasetDateFields(PropertyRaw_with_seq, 'dt_first_seen, dt_vendor_first_reported');
@@ -169,9 +169,11 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	 PropertyCurrentlyOwnedButLimited   := dedup(sort(BusPropertyOwnedWithDetails,  PropertyReportData.seleid, -TaxAssdValue), PropertyReportData.seleid,  KEEP(iesp.constants.DDRAttributesConst.MaxProperties)); 
   
 	//UpdateBusnPropertyWithReport  := UpdateBusnPropertyForAttributeLogic; 
-	 UpdateBusnPropertyWithReport  := DueDiligence.reportBusProperty(UpdateBusnPropertyForAttributeLogic,
-	                                                                PropertyCurrentlyOwnedButLimited,
-																																	DebugMode);   
+	 UpdateBusnPropertyWithReport  := IF(ReportIsRequested,
+	                                     DueDiligence.reportBusProperty(UpdateBusnPropertyForAttributeLogic,
+	                                                                PropertyCurrentlyOwnedButLimited,DebugMode),
+																																	    /* ELSE */
+																																			   UpdateBusnPropertyForAttributeLogic); 
 	 
 	
 	// ********************

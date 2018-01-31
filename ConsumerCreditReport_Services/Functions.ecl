@@ -1,4 +1,4 @@
-﻿IMPORT Address, BatchShare, Gateway, FFD, iesp, PersonContext, Risk_Indicators, RiskView, Standard, Suppress;
+﻿IMPORT Address, BatchShare, Gateway, FFD, FCRA, iesp, PersonContext, Risk_Indicators, RiskView, Standard, Suppress;
 
 EXPORT Functions := MODULE
 
@@ -72,12 +72,11 @@ EXPORT Functions := MODULE
 
 
 	EXPORT append_PersonContext (DATASET(ConsumerCreditReport_Services.Layouts.workRec) ds_work_in,
-																ConsumerCreditReport_Services.IParams.Params in_mod) := FUNCTION
+																ConsumerCreditReport_Services.IParams.Params in_mod, 
+																DATASET(FFD.Layouts.PersonContextBatch) pc_recs = DATASET([],FFD.Layouts.PersonContextBatch)) := FUNCTION
 
-		ds_dids:=PROJECT(ds_work_in(did!=0),TRANSFORM(FFD.Layouts.DidBatch,SELF:=LEFT));
-		DataGroupSet:=IF(in_mod.FetchLiensJudgments,FFD.Constants.DataGroupSet.Liens,FFD.Constants.DataGroupSet.Person);
 		showConsumerStatements:=FFD.FFDMask.isShowConsumerStatements(in_mod.FFDOptionsMask);
-		ds_prsnCntxt:=IF(showConsumerStatements,FFD.FetchPersonContext(ds_dids,in_mod.gateways,DataGroupSet),DATASET([],FFD.Layouts.PersonContextBatch));
+		ds_prsnCntxt:=IF(showConsumerStatements,pc_recs,DATASET([],FFD.Layouts.PersonContextBatch));
 
 		Risk_Indicators.Layouts.tmp_Consumer_Statements xformConsumerStatement(ds_prsnCntxt L) := TRANSFORM	
 			SELF.UniqueId:=L.LexID;
@@ -173,12 +172,18 @@ EXPORT Functions := MODULE
 
 
 	EXPORT append_LiensJudgments (DATASET(ConsumerCreditReport_Services.Layouts.ccrResp) ds_ccr_resp,
-																ConsumerCreditReport_Services.IParams.Params in_mod) := FUNCTION
+																ConsumerCreditReport_Services.IParams.Params in_mod, 
+																DATASET(FCRA.Layout_override_flag) ds_flags = FCRA.compliance.blank_flagfile) := FUNCTION
 
+  flagfile := ds_flags(file_id=FCRA.FILE_ID.LIEN);
+	
 		Risk_Indicators.Layouts_Derog_Info.layout_derog_process_plus xformInput(ds_ccr_resp L) := TRANSFORM
+			override_flags:=flagfile(did=L.UniqueId1);
 			SELF.seq:=(UNSIGNED)L.AccountNumber;
 			SELF.historyDate:=Risk_Indicators.iid_constants.default_history_date;
 			SELF.did:=(UNSIGNED)L.UniqueId1;
+   SELF.lien_correct_ffid:=SET(override_flags,flag_file_id);
+   SELF.lien_correct_tmsid_rmsid :=SET(override_flags,record_id);
 			SELF:=[];
 		END;
 

@@ -9,7 +9,15 @@ EXPORT LayoutsInternal := MODULE
 		UNSIGNED6 seleID;
 		UNSIGNED6 proxID;
 		UNSIGNED6 powID;
-	END;   
+	END; 
+	
+	
+  
+	EXPORT OperatingLocationLayout := RECORD
+		InternalBIPIDsLayout;
+		UNSIGNED3 addrCount;
+		DATASET(DueDiligence.Layouts.Address) locAddrs;
+	END;
 	
 	
 	EXPORT SicNaicLayout := RECORD
@@ -56,7 +64,7 @@ EXPORT LayoutsInternal := MODULE
 		DueDiligence.Layouts.RelatedParty party;
 	END;
 	
-	EXPORT PartyLicences := RECORD
+	EXPORT PartyLicenses := RECORD
 		InternalBIPIDsLayout;
 		UNSIGNED4	  historydate;
 		UNSIGNED6 did;
@@ -121,9 +129,16 @@ EXPORT LayoutsInternal := MODULE
 	unsigned6   Vina_Price;                     //*** base price
 	UNSIGNED4   historyDateYYYYMMDD;
 	unsigned4   sl_vehicleCount  := 0;
-	string30    license_Plate_Type;               //*** where does this come from?
+	string30    license_Plate_Type;            //*** reg license plate type desc
+	string50    Class_Type;
+	/*  Registration */
+	string2     Registered_State;                     //*** Title State
+ integer2    Registered_Year;                      //*** Title Year
+	integer2    Registered_Month;                     //*** Title Month
+	integer2    Registered_Day; 
+	/*  Title        */  
 	string2     Title_State;                     //*** Title State
-  integer2    Title_Year;                      //*** Title Year
+ integer2    Title_Year;                      //*** Title Year
 	integer2    Title_Month;                     //*** Title Month
 	integer2    Title_Day;                       //*** Title Day  
  END;		
@@ -170,7 +185,7 @@ END;
 
 EXPORT 	layout_liens_judgments_categorized := RECORD
 		layout_liens_judgments;
-		plus_category_liens_judgments
+		plus_category_liens_judgments;
 	END;
 
 //------                                      ------
@@ -206,6 +221,16 @@ EXPORT CriminalDATASETLayout := RECORD
 		DATASET(DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense) DIDOffenses;
 	END;
 
+
+	EXPORT IndSlimHeader := RECORD
+		UNSIGNED4 seq;
+		UNSIGNED6 did;
+		DueDiligence.Layouts.Name;
+		STRING ssn;
+		DueDiligence.Layouts.Address;
+		UNSIGNED4 dateFirstSeen;
+		STRING50 src;
+	END;
 
 
 END;

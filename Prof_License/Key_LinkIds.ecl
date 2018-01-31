@@ -1,9 +1,9 @@
-IMPORT BIPV2;
+IMPORT BIPV2,Data_Services;
 
 EXPORT Key_LinkIds := MODULE
 
   shared  base_recs 					:= Prof_License.File_prof_license_base_AID(company_name<>'');
-	export  out_SuperKeyName    := '~thor_data400::key::prolicv2::qa::linkids'; //logicalKeyName
+	export  out_SuperKeyName    := Data_Services.Data_location.Prefix()+'thor_data400::key::prolicv2::qa::linkids'; //logicalKeyName
 	
   BIPV2.IDmacros.mac_IndexWithXLinkIDs(base_recs, out_key, out_SuperKeyName)
 	

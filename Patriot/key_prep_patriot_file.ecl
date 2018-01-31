@@ -1,3 +1,4 @@
+import Data_Services;
 export key_prep_patriot_file := index(patriot.File_Patriot_keybuild,
 {
 pty_key,
@@ -23,4 +24,4 @@ sec_range,
 p_city_name,
 v_city_name,
 st,
-zip},{patriot.file_patriot_keybuild},'~thor_Data400::key::patriot_File_Full_' + thorlib.wuid());
+zip},{patriot.file_patriot_keybuild},Data_Services.Data_location.Prefix()+'thor_data400::key::patriot_File_Full_' + thorlib.wuid());

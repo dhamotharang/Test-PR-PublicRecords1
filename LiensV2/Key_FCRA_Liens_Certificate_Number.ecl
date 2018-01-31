@@ -1,4 +1,4 @@
-import liensv2, Doxie, ut;
+import liensv2, Data_Services;
 get_recs := LiensV2.file_liens_main;
 
 slim_rec := record
@@ -22,4 +22,4 @@ slim_main_sort := sort(slim_main_dist, tmsid,rmsid,certificate_number,local);
 slim_main_dedup  := dedup(slim_main_sort, tmsid, rmsid, certificate_number, local);
 
 export key_fcra_liens_certificate_number := index(slim_main_dedup ,{certificate_number},{tmsid,rmsid},
-                                   '~thor_data400::key::liensv2::fcra::qa::main::certificate_number') ;
+                                   Data_Services.Data_location.Prefix('Liensv2')+'thor_data400::key::liensv2::fcra::qa::main::certificate_number') ;

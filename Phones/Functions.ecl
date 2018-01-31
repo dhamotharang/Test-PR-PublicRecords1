@@ -1,12 +1,12 @@
-﻿IMPORT Drivers,MDR,Phonesplus_v2,STD,ut;
+﻿IMPORT Drivers,MDR,Phones,Phonesplus_v2,STD,ut;
 
 EXPORT Functions :=
 MODULE
 
-  //NOTE: This function should ONLY be used for checking phone data restrictions for the  
+  //NOTE: This function should ONLY be used for checking phone data restrictions for the
 	// PhonesPlusV2 data or the phones "Last Resort" (AKA Wired_Assets_Royalty) data.
 
-	// Important!: IF you change this permission logic, you might also need to modify all the 
+	// Important!: IF you change this permission logic, you might also need to modify all the
 	//  attributes that call it when using Phonesplus_v2.Key_Phonesplus_Did or Key_Phonesplus_Fdid.
 	EXPORT BOOLEAN isPhoneRestricted(STRING2 state,
 																	 UNSIGNED1 glb_purpose,
@@ -25,14 +25,14 @@ MODULE
     GLB_OK  := ut.glb_ok(glb_purpose, checkRNA);
     DPPA_OK := ut.dppa_ok(dppa_purpose, checkRNA);
 
-    // Decode passed in "rules" field and look for special Insurance text. 
+    // Decode passed in "rules" field and look for special Insurance text.
     STRING rules_decoded := Phonesplus_v2.Translation_Codes.fGet_rules_caption_from_bitmap(rules);
     BOOLEAN INSURANCE_RESTRICTED := STD.Str.Find(STD.Str.ToUpperCase(rules_decoded),
-		                                             Phones.Constants.InsVeriBelow,1) > 0 
+		                                             Phones.Constants.InsVeriBelow,1) > 0
 																		and NOT GLB_OK;
 
  		// Decode the input "src_all" value to see all the 2 char source codes that were rolled into
-		// that phonesplus record.  The decode function output is a string with 1 or more 2 char 
+		// that phonesplus record.  The decode function output is a string with 1 or more 2 char
 		// "src" codes each separated by a space. i.e. "AA BB CC ..."
     STRING src_all_decoded := Phonesplus_v2.Translation_Codes.fGet_all_sources(src_all);
 
@@ -41,8 +41,8 @@ MODULE
 
     // Turn the set into a dataset
 		ds_src_all := DATASET(set_src_all, {STRING2 src});
-		
-    // Use mutiple filters against the dataset of all sources to check for specific sources 
+
+    // Use mutiple filters against the dataset of all sources to check for specific sources
 		// that are restricted via: GLB/preGLB or DPPA or Utility/Industry_Class or DRM.
     ds_srcs_restricted := ds_src_all(
 
@@ -51,23 +51,23 @@ MODULE
 			   and NOT GLB_OK
 			   and NOT ut.PermissionTools.glb.HeaderIsPreGLB(dt_nonglb_last_seen, dt_first_seen, src))
 
-       // 2 additonal PhonesPlus sources that might also be restricted via GLB: IQ & L9, 
+       // 2 additonal PhonesPlus sources that might also be restricted via GLB: IQ & L9,
 			 // but the additional PreGLB restriction/permission does not apply to them.
 			 OR ((src = MDR.sourceTools.src_InquiryAcclogs or src = MDR.sourceTools.src_Link2Tek)
 			     and NOT GLB_OK)
 
 		   // Sources that might be restricted via DPPA
-       OR (src in MDR.sourceTools.set_DPPA_sources 
-			     and NOT DPPA_OK  
+       OR (src in MDR.sourceTools.set_DPPA_sources
+			     and NOT DPPA_OK
 			     and Drivers.state_dppa_ok(state,dppa_purpose,src))
 
-       // Utility data that might be restricted via input Industry_Class value 
+       // Utility data that might be restricted via input Industry_Class value
        OR (src in MDR.sourceTools.set_Utilities and industry_class = 'UTILI')
 
        //Sources that might be restricted via DataRestrictionMask
 			 // Instead of trying to re-create some of the coding in AutoStandardI.DataRestrictionI,
 			 // just used a subset of the coding here.
-       OR (src = MDR.sourceTools.src_LnPropV2_Fares_Asrs    and data_restriction_mask[1] != '0') 
+       OR (src = MDR.sourceTools.src_LnPropV2_Fares_Asrs    and data_restriction_mask[1] != '0')
        OR (src = MDR.sourceTools.src_Experian_Credit_Header and data_restriction_mask[6] != '0')
 		   OR (src = MDR.sourceTools.src_Certegy         and data_restriction_mask[7] not in ['0',''])
 	     OR (src = MDR.sourceTools.src_Equifax         and data_restriction_mask[8] not in ['0',''])
@@ -76,7 +76,7 @@ MODULE
 
     ); //end of filters
 
-		// Join to remove restricted sources from the dataset of all sources to see if any 
+		// Join to remove restricted sources from the dataset of all sources to see if any
 		// non-restricted sources are left.
 		ds_srcs_not_restricted := JOIN(ds_src_all, ds_srcs_restricted,
 		                                 LEFT.src = RIGHT.src,
@@ -90,20 +90,20 @@ MODULE
     //output(rules,                  NAMED('rules'),EXTEND);
     //output(rules_decoded,          NAMED('rules_decoded'),EXTEND);
 	  //output(INSURANCE_RESTRICTED,   NAMED('INSURANCE_RESTRICTED'),EXTEND);
-    //output(src_all,                NAMED('src_all'),EXTEND); 
+    //output(src_all,                NAMED('src_all'),EXTEND);
     //output(src_all_decoded,        NAMED('src_all_decoded'),EXTEND);
     //output(ds_src_all,             NAMED('ds_src_all'),EXTEND);
     //output(ds_srcs_restricted,     NAMED('ds_srcs_restricted'),EXTEND);
     //output(ds_srcs_not_restricted, NAMED('ds_srcs_not_restricted'),EXTEND);
-  
-	  // "TRUE"(restricted) is returned if either the input rec is restricted by Insurance verified/GLB 
+
+	  // "TRUE"(restricted) is returned if either the input rec is restricted by Insurance verified/GLB
 	  // OR the dataset of sources that are not-restricted is empty
-    RETURN (INSURANCE_RESTRICTED OR 
+    RETURN (INSURANCE_RESTRICTED OR
 						NOT EXISTS(ds_srcs_not_restricted)
 		       );
-					 
+
   END; // end of isPhoneRestricted function
-	
+
 	// Phones(phonesplus, last resort and inhouse qsent) data
 	EXPORT GetPhonesPlusData( dIn,
 														inAKMod,
@@ -114,17 +114,17 @@ MODULE
 													) :=
 	FUNCTIONMACRO
 		IMPORT Autokey_Batch,AutokeyB2_batch,Data_Services,Header,MDR,Phones,Phonesplus,Phonesplus_v2,ut;
-		
+
 		l_BatchIn := Phones.Layouts.BatchIn;
 		l_Common  := Phones.Layouts.PhonesCommon;
-		
+
 		modpenalty := Phones.GetPenalty;
-		
+
 		// BOOLEAN variables for phone sources
 		BOOLEAN isPhonesPlus   := phoneSrc = MDR.SourceTools.src_Phones_Plus;
 		BOOLEAN isLastResort   := phoneSrc = MDR.SourceTools.src_wired_Assets_Royalty;
 		BOOLEAN isInHouseQSent := phoneSrc = MDR.SourceTools.src_InHouse_QSent;
-		
+
 		// doOnlyPhoneSearch - check to search by only phone number or not
 		#IF(doPhoneOnlySearch)
 			l_BatchIn tKeepPhoneOnly(dIn pInput) :=
@@ -133,12 +133,12 @@ MODULE
 				SELF.homephone := pInput.homephone;
 				SELF           := [];
 			END;
-			
+
 			dInReformat := PROJECT(dIn,tKeepPhoneOnly(LEFT));
 		#ELSE
 			dInReformat := dIn;
 		#END
-		
+
 		// Phones index
 		#IF(isPhonesPlus)
 			keyDID      := Phonesplus_v2.Key_Phonesplus_Did;
@@ -153,7 +153,7 @@ MODULE
 			keyFDID     := Phonesplus.key_qsent_fdid;
 			keyCompName := Phonesplus.key_qsent_companyname;
 		#END
-		
+
 		// Phones layout
 		rPhones_Layout :=
 		RECORD(Phonesplus_v2.layoutCommonOut)
@@ -166,7 +166,7 @@ MODULE
 		#IF(~doPhoneOnlySearch)
 			rPhones_Layout tGetByDID(dInReformat le,keyDID	ri) :=
 			TRANSFORM
-				SELF.glb_dppa_flag := 
+				SELF.glb_dppa_flag :=
 				                   #IF(isPhonesPlus or isLastResort)
 				                      IF( Phones.Functions.isPhoneRestricted(ri.origstate,
 																																		 inAKMod.GLBPurpose,
@@ -182,7 +182,7 @@ MODULE
 																	SKIP,
 																	ri.glb_dppa_flag
 																);
-													 #ELSE		
+													 #ELSE
 													  ri.glb_dppa_flag;
 													 #END
 				SELF.listed_name   := IF(ri.origname != '',ri.origname,ri.company);
@@ -190,19 +190,19 @@ MODULE
 				SELF.batch_in      := le;
 				SELF               := ri;
 			END;
-			
+
 			dDIDs := JOIN(dInReformat,
 										keyDID,
 										KEYED(LEFT.did = RIGHT.l_did),
 										tGetByDID(LEFT,RIGHT),
 										LIMIT(ut.Limits.PHONE_PER_PERSON,SKIP));
 		#END
-		
+
 		// Autokey Fake DIDs
 		dFDIDs := MAP(isPhonesPlus   => AutoKey_Batch.get_fids(dInReformat,Data_Services.Data_location.Prefix('PHONES')+'thor_data400::key::phonesplusv2_',inAKMod),
 									isLastResort   => AutoKey_Batch.get_fids(dInReformat,Data_Services.Data_location.Prefix('PHONES')+'thor_data400::key::phonesplusv2_royalty_',inAKMod),
 									isInHouseQSent => AutoKey_Batch.get_fids(dInReformat,Data_Services.Data_location.Prefix('PHONES')+'thor_data400::key::qsent_',inAKMod));
-		
+
 		// Get fake ids by company name
 		#IF(doPhoneOnlySearch)
 			dFDIDsAll := dFDIDs;
@@ -213,7 +213,7 @@ MODULE
 				SELF.id     := ri.fdid;
 				SELF.isDID  := TRUE;
 			END;
-			
+
 			dCompFDIDs := JOIN( dInReformat,
 													keyCompName,
 													LEFT.comp_name != '' and
@@ -221,17 +221,17 @@ MODULE
 													(TRIM(LEFT.comp_name)+' ') = RIGHT.company[1..length(TRIM(LEFT.comp_name))+1]),
 													tGetByComp(LEFT,RIGHT),
 													LIMIT(ut.Limits.PHONE_PER_ADDRESS));
-			
+
 			// Combine the FDIDs
 			dFDIDsAll := dFDIDs + dCompFDIDs;
 		#END
-		
+
 		// JOIN to the payload key to get the phone data
 		rPhones_Layout tGetByFDID(dFDIDsAll le,keyFDID ri) :=
 		TRANSFORM
 			SELF.batch_in.acctno := le.acctno;
 			SELF.vendor          := ri.vendor;
-			SELF.glb_dppa_flag   := 
+			SELF.glb_dppa_flag   :=
 			                     #IF(isPhonesPlus or isLastResort)
 				                      IF( Phones.Functions.isPhoneRestricted(ri.origstate,
 																																		 inAKMod.GLBPurpose,
@@ -247,27 +247,27 @@ MODULE
 																	SKIP,
 																	ri.glb_dppa_flag
 																);
-													 #ELSE		
+													 #ELSE
 													  ri.glb_dppa_flag;
 													 #END
 			SELF.listed_name     := IF(ri.origname != '',ri.origname,ri.company);
 			SELF                 := ri;
 			SELF                 := [];
 		END;
-		
+
 		dFDIDsPayload := JOIN(dFDIDsAll,
 													keyFDID,
 													KEYED(LEFT.id = RIGHT.fdid),
 													tGetByFDID(LEFT,RIGHT),
 													LIMIT(ut.Limits.PHONE_PER_PERSON,SKIP));
-		
+
 		// Append input data to the phone recs for use in penalty calculations
 		rPhones_Layout tAppendInputData(dInReformat le,dFDIDsPayload ri) :=
 		TRANSFORM
 			SELF.batch_in := le;
 			SELF          := ri;
 		END;
-		
+
 		dPayloadWInput := JOIN( dInReformat,
 														dFDIDsPayload,
 														LEFT.acctno = RIGHT.batch_in.acctno,
@@ -276,7 +276,7 @@ MODULE
 														// Since we are essentially using the same for phone7 search too, I had to increase the limit
 														// and did it conditionally depending on the type of search
 														LIMIT(IF(isPhone7Search,ut.Limits.PHONE7_LIMIT,ut.Limits.PHONE_PER_PERSON),SKIP));
-		
+
 		#IF(doPhoneOnlySearch)
 			dPPRecs := IF(skipAutokeys,
 										PROJECT(dInReformat,TRANSFORM(rPhones_Layout,SELF.batch_in := LEFT,SELF := [])),
@@ -284,21 +284,21 @@ MODULE
 		#ELSE
 			dPPRecs := IF(skipAutoKeys,dDIDs,dDIDs + dPayloadWInput);
 		#END
-		
+
 		// Filter records below the confidence score threshold
 		#IF(isPhonesPlus)
 			// Filter records by source
-			Header.MAC_Filter_Sources(dPPRecs,dPPFilterSources,src,inAKMod.DataRestrictionMask);	
+			Header.MAC_Filter_Sources(dPPRecs,dPPFilterSources,src,inAKMod.DataRestrictionMask);
 			dPPFilterByPhoneThreshold := dPPFilterSources(confidencescore >= Phones.Constants.PhoneConfidenceScore);
 		#ELSE
 			dPPFilterByPhoneThreshold := dPPRecs(confidencescore >= Phones.Constants.PhoneConfidenceScore);
 		#END
-		
+
 		// Format to common layout
 		l_Common tFormat2PPCommon(dPPFilterByPhoneThreshold pInput) :=
 		TRANSFORM
 			dls_value := IF(pInput.datelastseen=0,pInput.datevendorlastreported,pInput.datelastseen);
-			
+
 			SELF.penalt                   := 0;
 			SELF.vendor_id                := pInput.vendor;
 			SELF.src                      := MAP( isPhonesPlus and pInput.vendor = 'GH' => MDR.SourceTools.src_Gong_phone_append,
@@ -332,10 +332,10 @@ MODULE
 		END;
 
 		dPPCommon := PROJECT(dPPFilterByPhoneThreshold,tFormat2PPCommon(LEFT));
-		
+
 		// Dedup records
 		dPPCommonDedup := DEDUP(SORT(dPPCommon,RECORD),RECORD, EXCEPT isDeepDive);
-		
+
 		// Calculate penalty
 		l_Common tGetPenalty(dPPCommonDedup pInput) :=
 		TRANSFORM
@@ -355,10 +355,10 @@ MODULE
 		END;
 
 		dPPPenalty := PROJECT(dPPCommonDedup,tGetPenalty(LEFT));
-		
+
 		// Filter out records which don't fall with in the penalty threshold
 		dPPPenaltyFilter := dPPPenalty(penalt <= inAKMod.PenaltyThreshold);
-		
+
 		// Debug
 		#IF(Phones.Constants.Debug.PhonesPlus)
 			OUTPUT(dIn,NAMED('dPP_In'),EXTEND);
@@ -376,7 +376,7 @@ MODULE
 			OUTPUT(dPPCommonDedup,NAMED('dPPCommonDedup'),EXTEND);
 			OUTPUT(dPPPenalty,NAMED('dPPPenalty'),EXTEND);
 		#END
-		
+
 		RETURN dPPPenaltyFilter;
 	ENDMACRO;
 
@@ -400,13 +400,19 @@ MODULE
 										Phones.Constants.SSC.PRnUSVI 					=> 'PUERTO RICO and U.S. VIRGIN ISLANDS CODES',
 										'');
 		RETURN ssc_out;
-	
+
 	END;
-	
+
 	EXPORT STRING LineServiceTypeDesc(INTEGER LineServiceType) := CASE(LineServiceType,
-																																0 => Phones.Constants.PhoneServiceType.Landline,
-																																1 => Phones.Constants.PhoneServiceType.Wireless,
-																																2 => Phones.Constants.PhoneServiceType.VoIP,
-																																Phones.Constants.PhoneServiceType.Other);		
+		0 => Phones.Constants.PhoneServiceType.Landline,
+		1 => Phones.Constants.PhoneServiceType.Wireless,
+		2 => Phones.Constants.PhoneServiceType.VoIP,
+		Phones.Constants.PhoneServiceType.Other);
+
+	//Taken from PhonesInfo._Functions. Spoke with Ricardo about this, decided it's best to seperate it to avoid :PERSIST
+	EXPORT STRING StandardName(string name):= FUNCTION
+		stdName := STD.Str.Filter(stringlib.stringtouppercase(trim(name, left, right)), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+	return stdName;
+END;
 
 END;

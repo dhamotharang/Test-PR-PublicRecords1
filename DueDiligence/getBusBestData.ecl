@@ -7,7 +7,7 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 											BOOLEAN includeReport) := FUNCTION
 
 
-	cleanedShell := IF(EXISTS(indata), DueDiligence.Common.GetCleanBIPShell(indata), DueDiligence.Common.GetBusInternalBIPShell(busInfo));
+	cleanedShell := IF(EXISTS(indata), DueDiligence.CommonBusiness.GetCleanBIPShell(indata), DueDiligence.CommonBusiness.GetBusInternalBIPShell(busInfo));
 	
 	withBIP := JOIN(cleanedShell, busInfo, 
 										LEFT.Seq = RIGHT.Seq AND
@@ -87,14 +87,7 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 															SELF.busn_info.address.err_stat := IF(LEFT.fullinputaddressprovided, cleanBus.address.err_stat, bestBus.addr_status);
 															SELF.busn_info.address.geo_blk := IF(LEFT.fullinputaddressprovided, cleanBus.address.geo_blk, bestBus.geo_block);
 															
-															SELF.bestCompanyName := bestBus.CompanyName;
-															SELF.bestAddr := bestBus.streetAddress1;
-															SELF.bestCity := bestBus.city;
-															SELF.bestState := bestBus.state;
-															SELF.bestZip := bestBus.zip5;
-															SELF.bestZip4 := bestBus.zip4;
-															SELF.bestFEIN := bestBus.fein;
-															SELF.bestPhone := bestBus.phone10;
+															//populate report with best data - may need to revisit, but something to pass to web
 															SELF.businessReport.businessInformation.bestFEIN := IF(includeReport, bestBus.fein, DueDiligence.Constants.EMPTY);
 															SELF.businessReport.businessInformation.bestAddress := IF(includeReport, DATASET([TRANSFORM(iesp.share.t_Address,
 																																																								SELF.StreetAddress1 := bestBus.streetAddress1;

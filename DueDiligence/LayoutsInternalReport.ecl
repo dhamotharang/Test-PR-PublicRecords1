@@ -40,6 +40,20 @@ EXPORT LayoutsInternalReport := MODULE
 		VinTitleAndRegistration;
 		UNSIGNED2 watercraftCount;
   END;
+	
+	EXPORT BusSourceLayout := RECORD
+		STRING sourceName;
+		STRING source;
+		STRING sourceType;
+		UNSIGNED4 firstReported;
+		UNSIGNED4 lastReported;
+	END;
+
+ EXPORT BEOCriminalReportingOFOffenses := RECORD
+  DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
+  DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense ReportOfOffenses;  
+  END;
+
 
 	
 	EXPORT BusAircraftReportChildren := RECORD
@@ -52,9 +66,9 @@ EXPORT LayoutsInternalReport := MODULE
 		DATASET(iesp.duediligencereport.t_DDRWatercraft) water {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxWatercraft)};
 	END;
 	
-	// EXPORT BusIndustryRiskChildren := RECORD
-		// DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
-		// DATASET(iesp.duediligencereport.t_DDRSICNAIC) industryRisk {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxSICNAICs)};
-	// END;
+	EXPORT BusIndustryRiskChildren := RECORD
+		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
+		DATASET(iesp.duediligencereport.t_DDRSICNAIC) industryRisk {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxSICNAICs)};
+	END;
 
 END;

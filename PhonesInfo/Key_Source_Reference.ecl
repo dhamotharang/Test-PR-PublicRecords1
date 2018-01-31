@@ -6,6 +6,6 @@ inFile	:=PhonesInfo.File_Source_Reference.main;
 export ocn_name := index(inFile
 																				,{ocn,name}
 																				,{inFile}
-																				,Data_Services.Data_location.Prefix('NONAMEGIVEN')+'thor_data400::key::phonesmetadata::carrier_reference_'+doxie.Version_SuperKey);
+																				,Data_Services.Data_location.Prefix()+'thor_data400::key::phonesmetadata::carrier_reference_'+doxie.Version_SuperKey);
 
 END;

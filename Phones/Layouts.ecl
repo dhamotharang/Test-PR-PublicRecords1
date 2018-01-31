@@ -1,8 +1,7 @@
-﻿IMPORT Autokey_batch,DeltabaseGateway,Doxie, BatchServices, BatchShare, iesp, PhonesInfo;
+﻿IMPORT Autokey_batch, DeltabaseGateway, Doxie, BatchServices, BatchShare, iesp, Phones, PhonesInfo;
 
 EXPORT Layouts :=
 MODULE
-
 	// Batch input common layout
 	EXPORT BatchIn :=
 	RECORD(Autokey_batch.Layouts.rec_inBatchMaster)
@@ -20,24 +19,24 @@ MODULE
 	END;
 	EXPORT PhoneIdentity := RECORD
 		UNSIGNED8 seq;
-		STRING20 acctno;	
-		STRING10 phone;	
-		STRING2 src;			
-		STRING1	ActiveFlag;			
+		STRING20 acctno;
+		STRING10 phone;
+		STRING2 src;
+		STRING1	ActiveFlag;
 		UNSIGNED6 did;
 		UNSIGNED6 ultid;
 		UNSIGNED6 orgid;
 		UNSIGNED6 seleid;
 		UNSIGNED6 proxid;
-		UNSIGNED6 powid;	
+		UNSIGNED6 powid;
 		UNSIGNED6 bdid := 0;
-		STRING8 dt_first_seen;	
-		STRING8 dt_last_seen;	
+		STRING8 dt_first_seen;
+		STRING8 dt_last_seen;
 		STRING9 ssn;
 		STRING20 fname;
 		STRING20 mname;
 		STRING20 lname;
-		STRING5 name_suffix;				
+		STRING5 name_suffix;
 		STRING120 CompanyName;
 		STRING10 prim_range;
 		STRING2 predir;
@@ -53,19 +52,19 @@ MODULE
 		STRING4	zip4;
 		STRING30 county;
 		STRING120 listed_name;
-		STRING1 listing_type_res;	
+		STRING1 listing_type_res;
 		STRING1 listing_type_bus;
 		STRING1 listing_type_gov;
 		STRING25 append_phone_type;
-	END;	
-	
-	EXPORT Deltabase := MODULE	
+	END;
+
+	EXPORT Deltabase := MODULE
 		// Deltabase Layouts
 		EXPORT dValue := RECORD
 			STRING100 Value {XPATH('Value')};
 		END;
 		EXPORT dParameters := RECORD
-			DATASET(dValue) Parameter {XPATH('Parameter')}; 
+			DATASET(dValue) Parameter {XPATH('Parameter')};
 		END;
 		EXPORT dInput := RECORD
 			STRING Select {XPATH('Select')};
@@ -75,28 +74,24 @@ MODULE
 			 STRING   transaction_id				{XPATH('transaction_id')};
 			 STRING	 	batch_job_id					{XPATH('batch_job_id')};
 			 STRING   vendor_transaction_id	{XPATH('vendor_transaction_id')};
-			 STRING   date_added				  	{XPATH('date_added')};	
+			 STRING   date_added				  	{XPATH('date_added')};
 			 STRING   source				  			{XPATH('source')};
-			 STRING10 submitted_phonenumber	{XPATH('submitted_phonenumber')};	
-			 STRING   carrier_name				  {XPATH('carrier_name')};	
-			 STRING   carrier_category			{XPATH('carrier_category')};	
+			 STRING10 submitted_phonenumber	{XPATH('submitted_phonenumber')};
+			 STRING   carrier_name				  {XPATH('carrier_name')};
+			 STRING   carrier_category			{XPATH('carrier_category')};
 			 STRING		carrier_ocn				  	{XPATH('carrier_ocn')};
 			 STRING		lata									{XPATH('lata')};
 			 STRING 	reply_code						{XPATH('reply_code')};
 			 STRING 	point_code				  	{XPATH('point_code')};
-		END;		
-		
-		EXPORT ATTResponse := RECORD                         
-			DATASET (ATTRecord) Records	 			 {XPATH('Records/Rec'), MAXCOUNT(Phones.Constants.GatewayValues.SQLSelectLimit)};
-			STRING  RecsReturned                     {XPATH('RecsReturned'),MAXLENGTH(Phones.Constants.GatewayValues.MaxRecords)};
-			STRING  Latency													 {XPATH('Latency')};
-			STRING  ExceptionMessage								 {XPATH('Exceptions/Exception/Message')};
-		END;	
-	END;	
-	
-	
-	
-	
+		END;
+
+		EXPORT ATTResponse := RECORD
+			DATASET (ATTRecord) Records	{XPATH('Records/Rec'), MAXCOUNT(Phones.Constants.GatewayValues.SQLSelectLimit)};
+			STRING  RecsReturned {XPATH('RecsReturned'),MAXLENGTH(Phones.Constants.GatewayValues.MaxRecords)};
+			STRING  Latency {XPATH('Latency')};
+			STRING  ExceptionMessage {XPATH('Exceptions/Exception/Message')};
+		END;
+	END;
 
 	EXPORT gatewayHistory := RECORD
 		RECORDOF(DeltabaseGateway.Key_Deltabase_Gateway.Historic_Results);
@@ -105,11 +100,11 @@ MODULE
 	EXPORT ZumigoIdentity := MODULE
 		EXPORT subjectName := RECORD
 			UNSIGNED6 lexid;
-			STRING20 	nameType;
-			STRING20 	first_name;
-			STRING20 	last_name;		
+			STRING20 nameType;
+			STRING20 first_name;
+			STRING20 last_name;
 		END;
-		
+
 		business := RECORD
 			UNSIGNED6 busult_id;
 			UNSIGNED6 busorg_id;
@@ -120,21 +115,21 @@ MODULE
 			UNSIGNED6 busdot_id;
 			STRING120 business_name;
 		END;
-		
+
 		address := RECORD
 			STRING20 	addressType;
 			BatchServices.Layouts.layout_batch_common_address;
 		END;
-		
+
 		EXPORT subjectVerificationRequest := RECORD
 			STRING	 	acctno;
-			UNSIGNED1 sequence_number;			
+			UNSIGNED1 sequence_number;
 			STRING10 	phone;
 			subjectName;
 			business;
 			address;
 		END;
-	
+
 		EXPORT zIn := RECORD
 			STRING acctno;
 			UNSIGNED1 sequence_number;
@@ -142,21 +137,21 @@ MODULE
 			iesp.zumigo_identity.t_ZIdNameToVerify Name;
 			iesp.zumigo_identity.t_ZIdSubjectAddress Address;
 		END;
-		
+
 		EXPORT zOut := RECORD
 			STRING acctno:='';
 			UNSIGNED1 sequence_number :=0 ;
 			gatewayHistory;
 		END;
-		// Deltabase format specific to report services only 
+		// Deltabase format specific to report services only
 	 EXPORT zDeltabaseLog := RECORD
 	   DATASET(zOut) Records {XPATH('Records/Rec')};
 	 END;
-	
+
 	END;
-	
+
 	EXPORT AccuDataCNAM := RECORD
-		STRING20 acctno;	
+		STRING20 acctno;
 		UNSIGNED6 did;
 		STRING2 source;
 		STRING20 name_first;
@@ -166,7 +161,7 @@ MODULE
 		UNSIGNED1 privateFlag;
 		UNSIGNED1 availabilityIndicator;
 		STRING error_desc;
-	END;	
+	END;
 
 	EXPORT PhoneAttributes := MODULE
 		EXPORT gatewayQuery:=RECORD
@@ -176,17 +171,20 @@ MODULE
 			BatchShare.Layouts.ShareAcct;
 			BatchShare.Layouts.SharePhone;
 		END;
-		
+
 		EXPORT Raw := RECORD
 			BatchShare.Layouts.ShareAcct;
 			recordof(PhonesInfo.Key_Phones.Ported_Metadata);
-			STRING error_desc;					
+			STRING error_desc;
+			//Add carrier_city and carrier_state here so we don't need to do an additional keyed join.
+			string30 carrier_city;
+			string2 carrier_state;
 		END;
-		
+
 		EXPORT BatchOut := RECORD
 			BatchIn;
 			boolean 	is_current;
-			unsigned8 event_date;
+			unsigned8 	event_date;
 			string4 	event_type;
 			unsigned8	disconnect_date;
 			unsigned8	ported_date;
@@ -195,18 +193,23 @@ MODULE
 			string10	carrier_category;
 			string		operator_id;
 			string		operator_name;
-			unsigned8 line_type_last_seen;
-			string		phone_serv_type;
-			string		phone_line_type;
+			unsigned8 	line_type_last_seen;
+			string1		phone_serv_type;
+			string1		phone_line_type;
 			unsigned8	swapped_phone_number_date;
 			string10	new_phone_number_from_swap;
 			unsigned8	suspended_date;
 			unsigned8	reactivated_date;
-			string1		prepaid;			
+			string1		prepaid;
 			string5		source;
-			string		error_desc;			
+			string		error_desc;
+			boolean 	dialable;
+			string10	phone_line_type_desc;
+			string10	phone_serv_type_desc;
+			string30 carrier_city;
+			string2 carrier_state;
 		END;
 
 	END;
-	
+
 END;

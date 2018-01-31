@@ -1,4 +1,4 @@
-import doxie, Text;
+import doxie, Text, Data_Services;
 
 df := patriot.File_Patriot;
 
@@ -50,4 +50,4 @@ end;
 
 outf := Parse(df3,full_name_orig_or_company,is_a_name,into_norm(LEFT), maxlength(50));
 
-export key_phonetic_name := index(outf(pnamecomponent != ''),{pnamecomponent, source},{lname, fname, mname, cname, pty_key},'~thor_Data400::key::patriot_phoneticnames_'+ doxie.Version_SuperKey);
+export key_phonetic_name := index(outf(pnamecomponent != ''),{pnamecomponent, source},{lname, fname, mname, cname, pty_key},Data_Services.Data_location.Prefix()+'thor_data400::key::patriot_phoneticnames_'+ doxie.Version_SuperKey);

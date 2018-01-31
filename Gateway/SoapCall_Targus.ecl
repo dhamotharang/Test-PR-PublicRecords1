@@ -20,7 +20,7 @@ targus.layout_targus_out errX(targus.Layout_Targus_In le) := transform
 	self := [];
 end;
 
-//'http://web_bps_roxie:r45gu@172.16.18.165:7996/WsGateway'
+//'http://web_bps_roxie:[PASSWORD_REDACTED]@172.16.18.165:7996/WsGateway'
 
 targus.layout_targus_in into_in(df L) := transform
 	self.user.referenceCode := if(L.user.referenceCode <> '', trim(L.user.referenceCode), gateway_cfg.TransactionId);

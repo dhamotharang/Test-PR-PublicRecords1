@@ -1,8 +1,9 @@
-﻿IMPORT BIPV2, Business_Risk_BIP, MDR, LiensV2, Risk_Indicators, UT, STD;
+﻿IMPORT BIPV2, Business_Risk_BIP, MDR, LiensV2, Risk_Indicators, UT, STD, iesp;
  
 EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,  
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,           //***search level options set to SELEID
 											 BIPV2.mod_sources.iParams linkingOptions,                     //***These are all your DRM, GLBA, DPPA options
+											 boolean ReportIsRequested = FALSE, 
 											 boolean DebugMode = FALSE
 											 //SET OF STRING2 AllowedSourcesSet) 
 											 )  := FUNCTION
@@ -10,7 +11,7 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------                                                                             ------
 	// ------ Get the LinkIDs for this Business                                          ------
 	// ------                                                                            ------
-	BusnKeys    := DueDiligence.Common.GetLinkIDs(BusnData);
+	BusnKeys    := DueDiligence.CommonBusiness.GetLinkIDs(BusnData);
 	
 	// --------------- Judgments and Liens ----------------
 	
@@ -25,7 +26,7 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------                                                                             ------
 	// ------ Add our sequence number to the Raw  records found for this Business         ------
 	// ------                                                                             ------
-	BusinessLiensTMSIDSeq    :=  DueDiligence.Common.AppendSeq(BusinessLiensTMSIDRaw, BusnData, TRUE);
+	BusinessLiensTMSIDSeq    :=  DueDiligence.CommonBusiness.AppendSeq(BusinessLiensTMSIDRaw, BusnData, TRUE);
 	
 	// ----                                                                                 ------	
 	// ---- Dates in the raw data are not guaranteed to be clean.  Go through and           ------
@@ -223,7 +224,21 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																	SELF := LEFT),
 																	LEFT OUTER);
 
-	
+	 // -----                                                                                     ----- 
+	 // ------ Limit the number of records for each business listed in the report                 ------
+	 // ------ Start by sorting them in seleid sequence and getting the records  with the         ------
+	 // ------ most recent filed and largest dollar amount                                        ------
+	 // ------ Note:  think about changing this to ROLLUP  so that we can be more thoughtful      ------
+	 // ------                                                                                    ------
+	 BusinessLiensUnreleasedButLimted   := dedup(sort(BusinessLiens_unreleased,  liensJudgment.seleid, -orig_filing_date, -amount), liensJudgment.seleid,  KEEP(iesp.constants.DDRAttributesConst.MaxLienJudgementsEvictions)); 
+	 // ----- If the report is requested by the XML Service (not allowed by Batch)                -----
+	 // ----- THEN add the liens and judgement data to that section of the report.                -----
+	 // ----- ELSE just leave the reporting sections empty                                        -----
+	 // -----                                                                                     -----
+	UpdateBusnLiensWithReport  := IF(ReportIsRequested, 
+	                                     DueDiligence.reportBusLien(Update_BusnLiens, BusinessLiensUnreleasedButLimted, DebugMode),
+																			             /* ELSE */ 
+																			                   Update_BusnLiens); 
 		
 	
 	// *********************
@@ -239,7 +254,7 @@ EXPORT getBusLien(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	IF(DebugMode,    OUTPUT(CHOOSEN (Update_BusnLiens, 10),                  NAMED('Update_BusnLiens')));  
 	
 
-	RETURN Update_BusnLiens;
+	RETURN UpdateBusnLiensWithReport;
 	 
 END;
 

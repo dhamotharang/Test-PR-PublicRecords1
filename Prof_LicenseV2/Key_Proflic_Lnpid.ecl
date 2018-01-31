@@ -25,5 +25,5 @@ ln_unique:=dedup(sort(distribute(joindist, lnpid),lnpid, prolic_key, prolic_seq_
 // Create the index file
 export Key_Proflic_lnpid := index(ln_unique,
                                   {lnpid}, {prolic_key, prolic_seq_id},
-                                  Data_Services.Data_location.Prefix('NONAMEGIVEN')+
+                                  Data_Services.Data_location.Prefix()+
                                   'thor_data400::key::prolicv2::'+ doxie.Version_SuperKey +'::prolicense_lnpid'); 

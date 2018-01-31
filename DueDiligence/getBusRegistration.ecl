@@ -11,14 +11,14 @@ EXPORT getBusRegistration(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 
 
 	// ---------------- BusReg - Business Registration ------------------
-	regBusRaw := BusReg.key_busreg_company_linkids.kFetch2(DueDiligence.Common.GetLinkIDs(indata),
+	regBusRaw := BusReg.key_busreg_company_linkids.kFetch2(DueDiligence.CommonBusiness.GetLinkIDs(indata),
 																												 Business_Risk_BIP.Common.SetLinkSearchLevel(Options.LinkSearchLevel),
 																												 0, /*ScoreThreshold --> 0 = Give me everything*/
 																												 Business_Risk_BIP.Constants.Limit_Default,
 																												 Options.KeepLargeBusinesses);
 	
 	// Add back our Seq numbers
-	regBusSeq := DueDiligence.Common.AppendSeq(regBusRaw, indata, TRUE);
+	regBusSeq := DueDiligence.CommonBusiness.AppendSeq(regBusRaw, indata, TRUE);
 	
 	//Clean dates used in logic and/or attribute levels here so all comparisions flow through consistently - dates used in FilterRecords have been cleaned
 	regBusCleanDates := DueDiligence.Common.CleanDatasetDateFields(regBusSeq, 'dt_first_seen, dt_vendor_first_reported, record_date, dt_last_seen');
@@ -42,11 +42,11 @@ EXPORT getBusRegistration(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 												LEFT OUTER);
 												
 	//retrieve SIC and NAIC codes with dates
-	outRegBusSic := DueDiligence.Common.getSicNaicCodes(regBusFilt, RawFields.SIC, TRUE, TRUE, dt_first_seen, dt_last_seen);
-	outRegBusNaic := DueDiligence.Common.getSicNaicCodes(regBusFilt, RawFields.NAICS, FALSE, TRUE, dt_first_seen, dt_last_seen);
+	outRegBusSic := DueDiligence.CommonBusiness.getSicNaicCodes(regBusFilt, RawFields.SIC, TRUE, TRUE, dt_first_seen, dt_last_seen);
+	outRegBusNaic := DueDiligence.CommonBusiness.getSicNaicCodes(regBusFilt, RawFields.NAICS, FALSE, TRUE, dt_first_seen, dt_last_seen);
 	
 	allRegBusSicNaic := outRegBusSic + outRegBusNaic;
-	sortRegBusRollSicNaic := DueDiligence.Common.rollSicNaicBySeqAndBIP(addRegBusHit, allRegBusSicNaic);
+	sortRegBusRollSicNaic := DueDiligence.CommonBusiness.rollSicNaicBySeqAndBIP(addRegBusHit, allRegBusSicNaic);
 		
 	addRegBusSicNaic := JOIN(addRegBusHit, sortRegBusRollSicNaic,
 														LEFT.seq = RIGHT.seq AND
@@ -104,7 +104,7 @@ EXPORT getBusRegistration(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																														SELF := [];));
 																														
 																														
-	addAgents := DueDiligence.Common.AddAgents(projectBusRegAgent, addRegBusSicNaic); 	
+	addAgents := DueDiligence.CommonBusiness.AddAgents(projectBusRegAgent, addRegBusSicNaic); 	
 
 
 

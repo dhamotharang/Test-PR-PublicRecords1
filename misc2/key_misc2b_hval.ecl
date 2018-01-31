@@ -1,4 +1,4 @@
-import doxie;
+import doxie,Data_Services;
 
 in_ds := misc2.file_in_misc2b;
 
@@ -17,4 +17,4 @@ layout_out in_to_base(in_ds l) := transform
 	end;
 kf := project(in_ds, in_to_base(left));
 
-export Key_misc2b_hval  := index(kf,{hval},{kf}, '~thor_data400::key::misc2b::hval_' + doxie.Version_SuperKey);
+export Key_misc2b_hval  := index(kf,{hval},{kf}, Data_Services.Data_location.Prefix()+'thor_data400::key::misc2b::hval_' + doxie.Version_SuperKey);

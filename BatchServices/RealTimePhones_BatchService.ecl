@@ -130,7 +130,7 @@ endmacro;
 <Gateways>
  <row>
  <servicename>qsent</servicename>
- <url>http://web_bps_roxie:r45gu@lt-esponline01:8091/wsGateway</url>
+ <url>http://web_bps_roxie:[PASSWORD_REDACTED]@lt-esponline01:8091/wsGateway</url>
  </row>
 </Gateways>
 */

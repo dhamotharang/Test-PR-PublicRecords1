@@ -1,20 +1,21 @@
+import Data_Services;
 export Constants := module
 
-   export Cluster := '~thor_data400::';
+   export Cluster := Data_Services.Data_location.Prefix()+'thor_data400::';
    
-   export autokey_logical(string filedate) := '~thor_data400::key::prolicV2::'+ filedate + '::autokey::';
+   export autokey_logical(string filedate) := Data_Services.Data_location.Prefix()+'thor_data400::key::prolicV2::'+ filedate + '::autokey::';
    
-   export autokey_keyname := '~thor_data400::key::prolicV2::autokey::@version@::';
+   export autokey_keyname := Data_Services.Data_location.Prefix()+'thor_data400::key::prolicV2::autokey::@version@::';
    
-   export autokey_qa_name := '~thor_data400::key::prolicV2::autokey::qa::';
+   export autokey_qa_name := Data_Services.Data_location.Prefix()+'thor_data400::key::prolicV2::autokey::qa::';
 	 
-	 export bid_autokey_logical(string filedate) := '~thor_data400::key::prolicV2::'+ filedate + '::autokey::bid::';
+	 export bid_autokey_logical(string filedate) := Data_Services.Data_location.Prefix()+'thor_data400::key::prolicV2::'+ filedate + '::autokey::bid::';
    
-   export bid_autokey_keyname := '~thor_data400::key::prolicV2::autokey::@version@::bid::';
+   export bid_autokey_keyname := Data_Services.Data_location.Prefix()+'thor_data400::key::prolicV2::autokey::@version@::bid::';
    
-   export bid_autokey_qa_name := '~thor_data400::key::prolicV2::autokey::qa::bid::';
+   export bid_autokey_qa_name := Data_Services.Data_location.Prefix()+'thor_data400::key::prolicV2::autokey::qa::bid::';
 
-	 export STRING stem		:= '~thor_data400::base';
+	 export STRING stem		:= Data_Services.Data_location.Prefix()+'thor_data400::base';
 	 export STRING srcType:= 'Prolic';
 	 export STRING qual		:= 'test';	 
    //P in this set to skip personal phones

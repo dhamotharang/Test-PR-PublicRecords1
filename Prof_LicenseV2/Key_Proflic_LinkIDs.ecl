@@ -3,7 +3,7 @@ IMPORT doxie, BIPV2, Data_Services;
 EXPORT Key_Proflic_LinkIDs := MODULE
 
   shared  base_recs 					:= Prof_LicenseV2.File_Proflic_Base_Keybuild(company_name<>'');
-	export  out_SuperFileName   := Data_Services.Data_location.Prefix('NONAMEGIVEN')
+	export  out_SuperFileName   := Data_Services.Data_location.Prefix()
 	                               +'thor_data400::key::prolicv2::'+ doxie.Version_SuperKey +'::linkids'; //SuperFileName
 	
   BIPV2.IDmacros.mac_IndexWithXLinkIDs(base_recs, out_key, out_SuperFileName)

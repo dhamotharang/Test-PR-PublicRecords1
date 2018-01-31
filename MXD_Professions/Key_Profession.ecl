@@ -1,4 +1,4 @@
-import doxie;
+import doxie,Data_Services;
 
 MXProfession := record
 	unsigned8 	rec_id;
@@ -78,5 +78,5 @@ export Key_Profession := index(dsProfRecs,
 																	matronymic, husbandslastname, patronymic, gender, full_name, prof_cat,
 																	profno, profession, education_level
 																},
-																'~thor_data400::key::mxd_professions::'+doxie.Version_SuperKey+'::prof_idx'
+																Data_Services.Data_location.Prefix()+'thor_data400::key::mxd_professions::'+doxie.Version_SuperKey+'::prof_idx'
 															 );
