@@ -11,6 +11,52 @@ layout_counts := RECORD
     unsigned2 count24;
    END;
 
+Layout_inq_PII_tumblings := RECORD
+	integer	inq_ssnsperadl_1subs	;
+	integer	inq_phnsperadl_1subs	;
+	integer	inq_primrangesperadl_1subs	;
+	integer	inq_dobsperadl_1subs	;
+	integer	inq_fnamesperadl_1subs	;
+	integer	inq_lnamesperadl_1subs	;
+	integer	inq_dobsperadl_daysubs	;
+	integer	inq_dobsperadl_mosubs	;
+	integer	inq_dobsperadl_yrsubs	;
+	integer	inq_ssnsperadl_1dig	;
+	integer	inq_phnsperadl_1dig	;
+	integer	inq_primrangesperadl_1dig	;
+	integer	inq_dobsperadl_1dig	;
+	integer	inq_primrangesperssn_1dig	;
+	integer	inq_dobsperssn_1dig	;
+	integer	inq_ssnsperaddr_1dig	;
+END;
+
+Layout_inq_PII_corroboration := RECORD
+	integer	inq_corrnameaddr	;
+	integer	inq_corrnameaddr_adl	;
+	integer	inq_corrnamessn	;
+	integer	inq_corrnamessn_adl	;
+	integer	inq_corrnamephone	;
+	integer	inq_corrnamephone_adl	;
+	integer	inq_corraddrssn	;
+	integer	inq_corraddrssn_adl	;
+	integer	inq_corrdobaddr	;
+	integer	inq_corrdobaddr_adl	;
+	integer	inq_corraddrphone	;
+	integer	inq_corraddrphone_adl	;
+	integer	inq_corrdobssn	;
+	integer	inq_corrdobssn_adl	;
+	integer	inq_corrphonessn	;
+	integer	inq_corrphonessn_adl	;
+	integer	inq_corrdobphone	;
+	integer	inq_corrdobphone_adl	;
+	integer	inq_corrnameaddrssn	;
+	integer	inq_corrnameaddrssn_adl	;
+	integer	inq_corrnamephonessn	;
+	integer	inq_corrnamephonessn_adl	;
+	integer	inq_corrnameaddrphnssn	;
+	integer	inq_corrnameaddrphnssn_adl	;
+END;
+
 layout_inquiries_edina := RECORD
 	string8 first_log_date;
 	string8 last_log_date;
@@ -176,6 +222,8 @@ layout_inquiries_edina := RECORD
 		unsigned2	inq_adlsperemail_count03	;
 		unsigned2	inq_adlsperemail_count06	;
 
+		Layout_inq_PII_tumblings; //     		 inq_PII_tumblings; //new for 5.3
+
 		string8 am_first_seen_date;
 		string8 am_last_seen_date;
 		string8 cm_first_seen_date;
@@ -184,6 +232,9 @@ layout_inquiries_edina := RECORD
 		string8 om_last_seen_date;
 	
 		risk_indicators.layouts.layout_best_pii_inquiries;
+		
+		Layout_inq_PII_corroboration; //     inq_PII_corroboration; //new for 5.3
+		
   END;
 	
 Layout_Name_Verification := RECORD
@@ -774,6 +825,7 @@ Layout_Attributes := RECORD
 	unsigned1 eviction_count24;
 	unsigned1 eviction_count36;
 	unsigned1 eviction_count60;
+	unsigned1	attr_eviction_count84	;	
 	unsigned1 num_nonderogs;
 	unsigned1 num_nonderogs30;
 	unsigned1 num_nonderogs90;
@@ -925,7 +977,12 @@ Layout_RV_Scores := RECORD
 	string3 reason3mv5 := '';
 	string3 reason4mv5 := '';
 	string3 reason5mv5 := '';
-	string3 prescreenv5 := '';
+	string3 crossindv5 := '';
+	string3 reason1cv5 := '';
+	string3 reason2cv5 := '';
+	string3 reason3cv5 := '';
+	string3 reason4cv5 := '';
+	string3 reason5cv5 := '';
 END;
 
 Layout_FD_Scores := RECORD
@@ -998,18 +1055,30 @@ Layout_Derogs_edina := RECORD
 	BOOLEAN bankrupt;
 	UNSIGNED4 date_last_seen;
 	STRING1 filing_type;
+	unsigned1	filing_count120	;
 	STRING35 disposition;	
 	UNSIGNED1 filing_count;
 	UNSIGNED1 bk_dismissed_recent_count;  
 	UNSIGNED1 bk_dismissed_historical_count;
+	unsigned1	bk_dismissed_historical_cnt120	;
 	string3 bk_chapter;
 	UNSIGNED1 bk_disposed_recent_count;
 	UNSIGNED1 bk_disposed_historical_count;
+	unsigned1	bk_disposed_historical_cnt120	;
 	UNSIGNED1 liens_recent_unreleased_count;
 	UNSIGNED1 liens_historical_unreleased_count;
+	unsigned1	liens_unreleased_count84	;
 	UNSIGNED1 liens_recent_released_count;
 	UNSIGNED1 liens_historical_released_count;
+	unsigned1	liens_released_count84	;
 	string8 last_liens_unreleased_date;
+	string8		liens_last_unrel_date84	;
+	unsigned4	liens_last_rel_date84	;
+	unsigned	liens_unrel_total_amount84	;
+	unsigned	liens_unrel_total_amount	;
+	unsigned	liens_rel_total_amount84	;
+	unsigned	liens_rel_total_amount	;
+	
 	layout_liens Liens;
 	// risk_indicators.Layouts_Derog_Info.LNJ_attrs LnJ_attributes;  // new JuLi fields for 5.2
 	UNSIGNED1 criminal_count;
@@ -1018,6 +1087,7 @@ Layout_Derogs_edina := RECORD
 	UNSIGNED4 last_felony_date;
 	boolean foreclosure_flag;
 	string8 last_foreclosure_date;
+	
 END;
 
 Layout_Accident := RECORD
@@ -1232,69 +1302,6 @@ Layout_credit_derived_perf := RECORD
 
 END;
 
-//new for BS 5.3 - PII corroboration counters based off of verified elements against inquiry keys
-Layout_inq_PII_corroboration := RECORD
-	integer	inq_corrnameaddr	;
-	integer	inq_corrnameaddr_adl	;
-	integer	inq_corrnamessn	;
-	integer	inq_corrnamessn_adl	;
-	integer	inq_corrnamephone	;
-	integer	inq_corrnamephone_adl	;
-	integer	inq_corraddrssn	;
-	integer	inq_corraddrssn_adl	;
-	integer	inq_corrdobaddr	;
-	integer	inq_corrdobaddr_adl	;
-	integer	inq_corraddrphone	;
-	integer	inq_corraddrphone_adl	;
-	integer	inq_corrdobssn	;
-	integer	inq_corrdobssn_adl	;
-	integer	inq_corrphonessn	;
-	integer	inq_corrphonessn_adl	;
-	integer	inq_corrdobphone	;
-	integer	inq_corrdobphone_adl	;
-	integer	inq_corrnameaddrssn	;
-	integer	inq_corrnameaddrssn_adl	;
-	integer	inq_corrnamephonessn	;
-	integer	inq_corrnamephonessn_adl	;
-	integer	inq_corrnameaddrphnssn	;
-	integer	inq_corrnameaddrphnssn_adl	;
-END;
-
-//new for BS 5.3 - PII tumblings in Inquiries
-Layout_inq_PII_tumblings := RECORD
-	integer	inq_ssnsperadl_1subs	;
-	integer	inq_phnsperadl_1subs	;
-	integer	inq_primrangesperadl_1subs	;
-	integer	inq_dobsperadl_1subs	;
-	integer	inq_fnamesperadl_1subs	;
-	integer	inq_lnamesperadl_1subs	;
-	integer	inq_dobsperadl_daysubs	;
-	integer	inq_dobsperadl_mosubs	;
-	integer	inq_dobsperadl_yrsubs	;
-	integer	inq_ssnsperadl_1dig	;
-	integer	inq_phnsperadl_1dig	;
-	integer	inq_primrangesperadl_1dig	;
-	integer	inq_dobsperadl_1dig	;
-	integer	inq_primrangesperssn_1dig	;
-	integer	inq_dobsperssn_1dig	;
-	integer	inq_ssnsperaddr_1dig	;
-END;
-
-//new for BS 5.3 - MS-110 fields
-Layout_BRM_Derogs := RECORD
-	unsigned1	liens_unreleased_count84	;
-	unsigned1	liens_released_count84	;
-	unsigned1	filing_count120	;
-	string8		liens_last_unrel_date84	;
-	unsigned4	liens_last_rel_date84	;
-	unsigned	liens_unrel_total_amount84	;
-	unsigned	liens_unrel_total_amount	;
-	unsigned	liens_rel_total_amount84	;
-	unsigned	liens_rel_total_amount	;
-	unsigned1	bk_dismissed_historical_cnt120	;
-	unsigned1	bk_disposed_historical_cnt120	;
-	unsigned1	attr_eviction_count84	;	
-END;
 
 export Layout_Boca_Shell_Edina_v53 := RECORD
 	#if(includeADLFields)
@@ -1311,14 +1318,24 @@ export Layout_Boca_Shell_Edina_v53 := RECORD
 	string15 adlCategory;
 	BOOLEAN DIDdeceased := false;
 	UNSIGNED4 DIDdeceasedDate := 0;
+	integer swappedNames;
 	edina_Layout_Input 																			Shell_Input;
 	Layout_InstantID_Results 																iid;
 	decimal4_1 source_profile;  					
 	integer source_profile_index; 				
 	header_verification_summary 														header_summary;
+	Layout_corr_risk_summary         												corr_risk_summary; 
   risk_indicators.layouts.layout_best_pii_flags						best_pii_flags;
 	Layout_Available_Sources 																Available_Sources;
-	risk_indicators.layouts.layout_business_header_summary  business_header_address_summary;  
+	integer	bus_addr_only_curr;
+	integer	bus_addr_only;
+	Risk_Indicators.Layouts.layout_BIP_Header_info 					BIP_Header;
+	integer bus_property_owned_total;
+	integer bus_property_owned_assess_total;
+	integer bus_property_owned_assess_count;
+	integer bus_property_sold_total;
+	integer bus_property_sold_assess_total;
+	integer bus_property_sold_assess_count;
 	Layout_Input_Validation 																Input_Validation;
 	Layout_Name_Verification 																Name_Verification;
 	Layout_Utility																					Utility;
@@ -1350,6 +1367,7 @@ export Layout_Boca_Shell_Edina_v53 := RECORD
 	Layout_RV_Scores																				RV_Scores;
 	risk_indicators.layouts.layout_riskview_alerts 					riskview_alerts;
 	Layout_FD_Scores																				FD_Scores;
+	Risk_Indicators.Layouts.layout_Equifax_FraudFlags 			Eqfx_FraudFlags;
 
 	
 	string1 wealth_indicator;
@@ -1368,35 +1386,11 @@ export Layout_Boca_Shell_Edina_v53 := RECORD
 	string3 AbilityIndexPrimaryFactor := '';  
 	string2 WillingnessIndex := '';  
 	string3 WillingnessIndexPrimaryFactor := '';  
+	Layout_credit_derived_perf       												credit_derived_perf; 
 	string20	historyDateTimeStamp := '';  
 	STRING200 errorcode;
 
 	// Layout_VOOAttributes             VOO_attributes; 
-	Layout_corr_risk_summary         corr_risk_summary; 
-	Layout_credit_derived_perf       credit_derived_perf; 
-	Layout_inq_PII_tumblings     		 inq_PII_tumblings; 
-	integer swappedNames;
-	Layout_inq_PII_corroboration     inq_PII_corroboration; 
-	Layout_BRM_Derogs                BRM_Derogs;
-	//MS-159: new business address fields
-	integer	bus_addr_only_curr;
-	integer	bus_addr_only;
-	//MS-71: new BIP header fields
-	Risk_Indicators.Layouts.layout_BIP_Header_info BIP_Header;
-	//MS-158: new business property fields
-	integer bus_property_owned_total;
-	integer bus_property_owned_assess_total;
-	integer bus_property_owned_assess_count;
-	integer bus_property_sold_total;
-	integer bus_property_sold_assess_total;
-	integer bus_property_sold_assess_count;
-	Risk_Indicators.Layouts.layout_Equifax_FraudFlags Eqfx_FraudFlags;
-	string3 crossindv5 := '';
-	string3 reason1cv5 := '';
-	string3 reason2cv5 := '';
-	string3 reason3cv5 := '';
-	string3 reason4cv5 := '';
-	string3 reason5cv5 := '';
 
 	
 END;
