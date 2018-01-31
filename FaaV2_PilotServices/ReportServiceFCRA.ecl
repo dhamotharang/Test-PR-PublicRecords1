@@ -1,9 +1,10 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ReportServiceFCRA">
 	
 	<!-- COMPLIANCE SETTINGS -->
 	<part name="GLBPurpose"          type="xsd:byte"/>
 	<part name="DPPAPurpose"           type="xsd:byte"/>
+  <part name="FCRAPurpose"         type="xsd:string"/>
 	<part name="ApplicationType"     	type="xsd:string"/>
 	<part name="MaxWaitSeconds"      type="xsd:integer"/>
 	<part name="did"                   type="xsd:string"/>
@@ -41,6 +42,7 @@ export ReportServiceFCRA := macro
 	tempmod := module(project(glbMod, FaaV2_PilotServices.ReportService_Records.params,opt))
 		export string32 ApplicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(glbMod,AutoStandardI.InterfaceTranslator.application_type_val.params));
     export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
+    export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
 	end;
 	
 	results := FaaV2_PilotServices.ReportService_Records.Fcra_val(tempmod);

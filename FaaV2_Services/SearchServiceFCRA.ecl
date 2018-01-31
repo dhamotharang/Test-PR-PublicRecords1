@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchServiceFCRA">
 	<part name="did"                 type="xsd:string"/>
  	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="4"/>
@@ -20,7 +20,6 @@
 import FaaV2_services, iesp, AutoStandardI, FCRA;
 
 export SearchServiceFCRA := macro
-
 
 		#constant('NoDeepDive', true);
     rec_in := iesp.faaaircraft_fcra.t_FcraAircraftSearchRequest;
@@ -49,13 +48,15 @@ export SearchServiceFCRA := macro
 		  export string14 did := rdid;
 			export string32 ApplicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
 		  export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
+		  export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
 		end;
 		
 		recs := FaaV2_Services.SearchService_Records.fcra_val(tempmod);
 				
  		iesp.ECL2ESP.Marshall.MAC_Marshall_Results(recs.Records, results, iesp.faaaircraft_Fcra.t_FcraAircraftSearchResponse);
    	
-		FFD.MAC.AppendConsumerStatements(results, results_out, recs.Statements, iesp.faaaircraft_Fcra.t_FcraAircraftSearchResponse);
+		FFD.MAC.AppendConsumerStatements(results, results_with_cs, recs.Statements, iesp.faaaircraft_Fcra.t_FcraAircraftSearchResponse);
+		FFD.MAC.AppendConsumerAlerts(results_with_cs, results_out, recs.ConsumerAlerts, iesp.faaaircraft_Fcra.t_FcraAircraftSearchResponse);
 
 	  output(results_out, named('Results'));
 

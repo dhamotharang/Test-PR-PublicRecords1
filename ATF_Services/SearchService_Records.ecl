@@ -60,24 +60,29 @@ export SearchService_Records := module
 		ids := ATF_services.SearchService_IDs.val(in_mod, isFCRA);
 																 		
 		ds_best := project(ids,transform(doxie.layout_best,self:=left,self:=[]));
-		ds_flags := if(isFCRA, FCRA.GetFlagFile (ds_best), fcra.compliance.blank_flagfile);
 		
 		//FCRA FFD 
 		ds_dids := dataset([{FFD.Constants.SingleSearchAcctno,
 												 (unsigned)in_mod.DID}],FFD.Layouts.DidBatch);
     
-		pc_recs := if(isFCRA,FFD.FetchPersonContext(ds_dids, Gateway.Configuration.Get(), FFD.Constants.DataGroupSet.ATF));
+		pc_recs := if(isFCRA,FFD.FetchPersonContext(ds_dids, Gateway.Configuration.Get(), FFD.Constants.DataGroupSet.ATF, in_mod.FFDOptionsMask));
 		
 		slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 
-		final_records := raw_records(ids, in_mod, isFCRA, ds_flags, FALSE, slim_pc_recs);
+		ds_flags := if(isFCRA, FFD.GetFlagFile(ds_best, pc_recs), FCRA.compliance.blank_flagfile);
+    
+  suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1].suppress_records;
+
+		final_records := if(~suppress_results_due_alerts, raw_records(ids, in_mod, isFCRA, ds_flags, FALSE, slim_pc_recs),
+                      dataset([], iesp.firearm_fcra.t_FcraFirearmRecord));
 
 		/* Here we are interested only in the ATF record statements or consumer level statements.
 			 It was decided to put al the statements that come up for a person irrespective of if 
 				we are showing that record or not. */
 		boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(in_mod.FFDOptionsMask);
-  	consumer_statements := if(isFCRA and showConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
-    consumer_alerts := FFD.Constants.BlankConsumerAlerts;
+    
+  consumer_statements := if(isFCRA and showConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
+  consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
 		FFD.MAC.PrepareResultRecord(final_records, rec_out, consumer_statements, consumer_alerts, iesp.firearm_fcra.t_FcraFirearmRecord);
     
 		return rec_out;

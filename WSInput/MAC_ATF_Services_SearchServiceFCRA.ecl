@@ -1,4 +1,4 @@
-// This service created to add Web Service fields for ATF_Services.SearchServiceFCRA
+﻿// This service created to add Web Service fields for ATF_Services.SearchServiceFCRA
 
 
 EXPORT MAC_ATF_Services_SearchServiceFCRA := MACRO
@@ -11,6 +11,7 @@ EXPORT MAC_ATF_Services_SearchServiceFCRA := MACRO
 												'DLMask',
 												'DOBMask',
 												'DPPAPurpose',
+										  'FCRAPurpose',
 												'GLBPurpose',
 												'IndustryClass',
 												'SSNMask',  
