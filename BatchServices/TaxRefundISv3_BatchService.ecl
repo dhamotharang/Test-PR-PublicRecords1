@@ -15,8 +15,6 @@
 
 	<!-- TRIS specific input options -->
   <part name="InputState"           type="xsd:string"/>
-  <part name="BestSSNScoreMin"      type="xsd:unsigned2"/>
-	<part name="BestNameScoreMin"     type="xsd:unsigned2"/>
   <part name="ModelName"            type="xsd:string"/>
   <part name="FilterRule"           type="xsd:string"/>
   <part name="ScoreCut"             type="xsd:string"/>
@@ -118,8 +116,6 @@ EXPORT TaxRefundISv3_BatchService := MACRO
 		EXPORT string120 append_l           := 'BEST_ALL, BEST_EDA'; //Append allows all Best Info to return
 		EXPORT string120 verify_l           := 'BEST_ALL';
 		EXPORT string2   input_state        := '' : stored('InputState');
-		EXPORT unsigned2 BestSSNScoreMin    := 0 : stored('BestSSNScoreMin');  //default=90 in TRIS KTR Layouts xls "Input Options" tab???
-		EXPORT unsigned2 BestNameScoreMin   := 0 : stored('BestNameScoreMin'); //default=30 in TRIS KTR Layouts xls "Input Options" tab???
 		EXPORT string20  ModelName          := '' : stored('ModelName');
 		EXPORT string30  FilterRule         := '' : stored('FilterRule');
 		EXPORT boolean   GetSSNBest         := TRUE : stored('GetSSNBest');

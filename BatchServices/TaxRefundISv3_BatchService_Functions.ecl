@@ -14,8 +14,9 @@ EXPORT TaxRefundISv3_BatchService_Functions := MODULE
 		boolean allFieldsBlank := aRisk='' AND iRisk='' AND rOnly='';
 		
 		// TRIS v3.2 Enhancement : Updated HRI codes per Req # 3.1.3.8
+		// TRIS v3.2.1 Enhancement: Updated HRI codes per Req 4.1.4 (remove S5)
 		aRisk2 := IF(allFieldsBlank, '11,14', aRisk);
-		iRisk2 := IF(allFieldsBlank, '03,72,IS,QD,QA,QE,BO,S5,S2,S1',iRisk);
+		iRisk2 := IF(allFieldsBlank, '03,72,IS,QD,QA,QE,BO,S2,S1',iRisk);
 		rOnly2 := IF(allFieldsBlank, '71,RS,MO', rOnly);
 		
 		finalResults := MODULE(PROJECT(mod_args, BatchServices.TaxRefundISv3_BatchService_Interfaces.Input))

@@ -17,8 +17,6 @@
 		EXPORT string120 verify_l;
 		EXPORT string2 input_state;
 		EXPORT boolean isInputState(string2 st) := st = input_state or input_state = '' or st = '';
-		EXPORT unsigned2 BestSSNScoreMin;
-		EXPORT unsigned2 BestNameScoreMin;
 		EXPORT string20  ModelName;        
 		EXPORT string30  FilterRule;
 		EXPORT boolean   GetSSNBest := true;
