@@ -52,7 +52,7 @@ module
     + bipv2_lgid3.keynames            (pversion,pUseOtherEnvironment).match_sample_debug    .dall_filenames
     + BizLinkFull.keynames            (pversion,pUseOtherEnvironment).dall_filenames
     + BIPV2_Best.Keynames             (pversion,pUseOtherEnvironment).dall_filenames
-    + BIPV2_Relative.keynames         (pversion,pUseOtherEnvironment).dall_filenames
+    // + BIPV2_Relative.keynames         (pversion,pUseOtherEnvironment).dall_filenames
     + BIPV2_Seleid_Relative.keynames  (pversion,pUseOtherEnvironment).dall_filenames
     + TopBusiness_BIPV2.KeyNames      (pversion,pUseOtherEnvironment).dall_filenames
     ;

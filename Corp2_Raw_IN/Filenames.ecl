@@ -1,4 +1,4 @@
-IMPORT tools;
+﻿IMPORT tools;
 
 EXPORT Filenames(STRING  pversion = '',
 	               BOOLEAN pUseOtherEnvironment = FALSE) := MODULE
@@ -12,7 +12,6 @@ EXPORT Filenames(STRING  pversion = '',
 		EXPORT CorpMergers	      			:= tools.mod_FilenamesInput(Template('corp_mergers::in'), 		 pversion);					
 		EXPORT CorpNames	      				:= tools.mod_FilenamesInput(Template('corp_names::in'), 			 pversion);					
 		EXPORT CorpOfficers	      			:= tools.mod_FilenamesInput(Template('corp_officers::in'), 		 pversion);					
-		EXPORT CorpReports	      			:= tools.mod_FilenamesInput(Template('corp_reports::in'), 		 pversion);					
 
 	END;
 
@@ -25,7 +24,6 @@ EXPORT Filenames(STRING  pversion = '',
 		EXPORT CorpMergers	      			:= tools.mod_FilenamesBuild(Template('corp_mergers::in'), 		 pversion);					
 		EXPORT CorpNames	      				:= tools.mod_FilenamesBuild(Template('corp_names::in'), 			 pversion);					
 		EXPORT CorpOfficers	      			:= tools.mod_FilenamesBuild(Template('corp_officers::in'), 		 pversion);					
-		EXPORT CorpReports	      			:= tools.mod_FilenamesBuild(Template('corp_reports::in'), 		 pversion);		
 		
 		EXPORT dAll_CorpAgents 				 	:= CorpAgents.dAll_filenames;
 		EXPORT dAll_CorpCorporations 		:= CorpCorporations.dAll_filenames;
@@ -33,7 +31,6 @@ EXPORT Filenames(STRING  pversion = '',
 		EXPORT dAll_CorpMergers 			 	:= CorpMergers.dAll_filenames;
 		EXPORT dAll_CorpNames 					:= CorpNames.dAll_filenames;
 		EXPORT dAll_CorpOfficers 				:= CorpOfficers.dAll_filenames;
-		EXPORT dAll_CorpReports 				:= CorpReports.dAll_filenames;
 	END;
 	
   EXPORT dAll_filenames 						:= Base.dAll_CorpAgents 			+
@@ -41,7 +38,6 @@ EXPORT Filenames(STRING  pversion = '',
 																			 Base.dAll_CorpFilings 			+
 																			 Base.dAll_CorpMergers 			+
 																			 Base.dAll_CorpNames 				+
-																			 Base.dAll_CorpOfficers 		+
-																			 Base.dAll_CorpReports;
+																			 Base.dAll_CorpOfficers;
 
 END;

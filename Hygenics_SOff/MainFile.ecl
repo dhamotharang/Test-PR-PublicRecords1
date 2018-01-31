@@ -1,4 +1,4 @@
-import sexoffender, doxie_build, codes, didville, did_add, header_slimsort, watchdog, ut, _control, header, idl_header;
+﻿import sexoffender, doxie_build, codes, didville, did_add, header_slimsort, watchdog, ut, _control, header, idl_header,Std;
 
 // 'local'
 // 'hash'
@@ -158,59 +158,6 @@ string os(string i) := if (i = '','',trim(i) + ' ');
 
 main1 := project(full_df,produce_main(LEFT));
 
-/*
-//get addr_dt_last_seen from header and SO main
-header_layout := RECORD
-  unsigned6 did;
-  unsigned6 rid;
-  string1 pflag1;
-  string1 pflag2;
-  string1 pflag3;
-  string2 src;
-  unsigned3 dt_first_seen;
-  unsigned3 dt_last_seen;
-  unsigned3 dt_vendor_last_reported;
-  unsigned3 dt_vendor_first_reported;
-  unsigned3 dt_nonglb_last_seen;
-  string1 rec_type;
-  qstring18 vendor_id;
-  qstring10 phone;
-  qstring9 ssn;
-  integer4 dob;
-  qstring5 title;
-  qstring20 fname;
-  qstring20 mname;
-  qstring20 lname;
-  qstring5 name_suffix;
-  qstring10 prim_range;
-  string2 predir;
-  qstring28 prim_name;
-  qstring4 suffix;
-  string2 postdir;
-  qstring10 unit_desig;
-  qstring8 sec_range;
-  qstring25 city_name;
-  string2 st;
-  qstring5 zip;
-  qstring4 zip4;
-  string3 county;
-  qstring7 geo_blk;
-  qstring5 cbsa;
-  string1 tnt;
-  string1 valid_ssn;
-  string1 jflag1;
-  string1 jflag2;
-  string1 jflag3;
-  unsigned8 rawaid;
-  string5 dodgy_tracking;
-  unsigned8 nid;
-  unsigned2 address_ind;
-  unsigned2 name_ind;
-  unsigned8 persistent_record_id;
- END;
-
-hdr := 	dataset('~thor20_241_10::persist::dataland::header_file', header_layout, flat);
-*/
 	hdr := header.File_Headers;
 		
 	hdr_slim_rec := record
@@ -232,9 +179,9 @@ main_dst := distribute(main1, hash(did)): persist('~thor_data400::Persist::hd::S
 	Hygenics_SOff.Layout_Out_Main_CROSS get_addr_dt(main_dst l, hdr_slim_tbl_dep r) := transform
 		 self.addr_dt_last_seen :=  if(l.prim_name = '',
 										'',
-									if(r.dt_last_seen > (unsigned3)l.reg_date_1[1..6] and (unsigned3)ut.getdate[1..6] > r.dt_last_seen,
+									if(r.dt_last_seen > (unsigned3)l.reg_date_1[1..6] and (unsigned3)(STRING8)Std.Date.Today()[1..6] > r.dt_last_seen,
 										(string6)r.dt_last_seen,
-									if((unsigned3)ut.getdate[1..6] > (unsigned3)l.reg_date_1[1..6],
+									if((unsigned3)(STRING8)Std.Date.Today()[1..6] > (unsigned3)l.reg_date_1[1..6],
 										l.reg_date_1[1..6],
 										''))); 
 		self := l;
@@ -331,7 +278,7 @@ ds_fixed_data2 	:= sort(distribute(ds_fixed_d2, hash(seisint_primary_key)), seis
 
 //Orig Name Has DID
 orig_d 		:= ds_fixed_data(name_type='0' and did<>0);
-orig_did	:= sort(distribute(orig_d, hash(seisint_primary_key)), seisint_primary_key);
+orig_did	:= sort(distribute(orig_d, hash(seisint_primary_key)), seisint_primary_key,local);
 
 //Orig Name Has No DID
 orig_no_did	:= ds_fixed_data(name_type='0' and did=0);
@@ -397,7 +344,9 @@ ds_fixed_data_flagged := PROJECT(fix_file,tr_set_flags(LEFT));
 									(l.ssn_appended='178546978' and l.did=2074179303) or
 									(l.ssn_appended='196364565' and l.did=93428187) or
 									(l.ssn_appended=''          and l.did=107007223771) or
-									(l.ssn_appended='046561828' and l.did=66048309),
+									(l.ssn_appended='046561828' and l.did=66048309) or
+									(l.ssn_appended='132663291' and l.did=2640241816) or
+									(l.ssn_appended='623211738' and l.did=122113244666),
 								'',
 								l.ssn_appended);
 		self.did			:= if((l.ssn_appended='353561176' and l.did=2275932305) or 
@@ -407,7 +356,9 @@ ds_fixed_data_flagged := PROJECT(fix_file,tr_set_flags(LEFT));
 									(l.ssn_appended='178546978' and l.did=2074179303) or
 									(l.ssn_appended='196364565' and l.did=93428187) or
 									(l.ssn_appended=''          and l.did=107007223771) or
-									(l.ssn_appended='046561828' and l.did=66048309),
+									(l.ssn_appended='046561828' and l.did=66048309) or
+									(l.ssn_appended='132663291' and l.did=2640241816) or
+									(l.ssn_appended='623211738' and l.did=122113244666),
 								0,
 								l.did);
 		self.score			:= if((l.ssn_appended='353561176' and l.did=2275932305) or 
@@ -417,7 +368,9 @@ ds_fixed_data_flagged := PROJECT(fix_file,tr_set_flags(LEFT));
 									(l.ssn_appended='178546978' and l.did=2074179303) or
 									(l.ssn_appended='196364565' and l.did=93428187) or
 									(l.ssn_appended=''          and l.did=107007223771) or
-									(l.ssn_appended='046561828' and l.did=66048309),
+									(l.ssn_appended='046561828' and l.did=66048309) or
+									(l.ssn_appended='132663291' and l.did=2640241816) or
+									(l.ssn_appended='623211738' and l.did=122113244666),
 								0,
 								l.score);
 		

@@ -35,16 +35,18 @@ EXPORT TaxRefundISv3_BatchService_Records(
 																					self := left,
 																					self := []));
 																																									 																																	
-	// *--- Take Input through ADL_Best -> DidVille.Did_Batch_Service_Raw ---* //
-	ds_w_bestSsn_res := BatchServices.TaxRefundISv3_BatchService_Functions.getBestSSNInfo(ds_having_suff_input, args_in);
+	// *--- Take Input through ADL Best ---> didville.did_service_common_function ---* //
+  ds_AdlBest_res := BatchServices.TaxRefundISv3_BatchService_Functions.getAdlBestInfo(
+                                  ds_having_suff_input, args_in);
+
 	// *--- Append best DID to clean input ---* //
-	ds_clean_batch_w_did := join(ds_w_bestSsn_res, ds_having_suff_input,
+	ds_clean_batch_w_did := join(ds_AdlBest_res, ds_having_suff_input,
 											         left.seq = right.seq,
 															 transform(rec_in_wdid,
 																						self.did := left.did,
 																				    self := right)); 
 																					
-	// *--- Go through Best Address batch ---* //
+	// *--- Go through Best Address/Address history batch ---* //
   ds_addrBest_res := BatchServices.TaxRefundISv3_BatchService_Functions.getBestAddress(ds_clean_batch_w_did, args_in);
    
 	// *--- Run through Deceased batch service ---* //
@@ -176,7 +178,8 @@ EXPORT TaxRefundISv3_BatchService_Records(
 	// *--- First/interim transform to combine info accumlated so far ---* //
 	rec_out xformOutRecs(ds_clean_batch_w_did L) := transform
 		// ADL Best info
-		ssn_rec := ds_w_bestSsn_res(seq = L.seq)[1];
+		ssn_rec := ds_AdlBest_res(seq = L.seq)[1];
+
 		// req 4.1.20 
 		self.best_ssn := if((ssn_rec.best_ssn <> L.ssn) and (ssn_rec.score >= args_in.DIDScoreThreshold), ssn_rec.best_ssn, '');
 		use_best_dob := ssn_rec.best_dob <> '' and 
@@ -209,9 +212,9 @@ EXPORT TaxRefundISv3_BatchService_Records(
 		// req. 4.1.23		
 		self.Address_Confidence := if ((temp_addr_name_score >= args_in.BestNameScoreMin) and  
 																	 (temp_addr_ssn_score >= args_in.BestSSNScoreMin), addr_rec.conf_flag, '');
-																	 
-		self.best_fname := if(take_best, addr_rec.name_first, '');
-		self.best_lname := if(take_best, addr_rec.name_last, ''); 
+
+		self.best_fname := if(take_best, ssn_rec.best_fname, '');
+		self.best_lname := if(take_best, ssn_rec.best_lname, ''); 
 		self.best_addr1 := if(take_best, Address.Addr1FromComponents(addr_rec.prim_range, addr_rec.predir, addr_rec.prim_name, addr_rec.suffix, addr_rec.postdir, addr_rec.unit_desig, addr_rec.sec_range),'');
 		self.best_city  := if(take_best, addr_rec.p_city_name, '');
 		self.best_state := if(take_best, addr_rec.st, '');
@@ -235,7 +238,7 @@ EXPORT TaxRefundISv3_BatchService_Records(
 																			if(best_dist < 10000, (string4) best_dist,'9999')
 																			);
     
-		// req 4.1.24	
+		// v3.0 req 4.1.24	
 		self.InputAddrDate	:= if ((temp_addr_name_score >= args_in.BestNameScoreMin) and 
 															(temp_addr_ssn_score >= args_in.BestSSNScoreMin), 
 															addr_rec.InputAddrDate, '');
@@ -252,13 +255,14 @@ EXPORT TaxRefundISv3_BatchService_Records(
 														 addr_rec.InputZipMatch,
 														 addr_rec.InputZipMatchDate,''); //YYYYMMDD format	
 
-		// end req 4.1.24
+		// end v3.0 req 4.1.24
 				
-		self.InputAddrFirst_Seen := if(isInputAddrMatch, addr_rec.addr_dt_first_seen, '');
-		self.InputAddrLast_Seen  := if(isInputAddrMatch, addr_rec.addr_dt_last_seen, '');
-
-		// req 4.1.25
+		// v3.0 req 4.1.25
 		self.InputAddrState := if(addr_rec.InputStateMatch, 'Y', 'N');
+    
+    // v3.2 08/11/17 reqs 3.1.11 & 3.1.12 
+		self.InputAddrFirst_Seen := addr_rec.InputAddrFirstSeen;
+		self.InputAddrLast_Seen  := addr_rec.InputAddrLastSeen;
 
 		// Deceased info needed for reqs 4.1.27 thru 4.1.35
 		death_rec := ds_death_res(acctno = L.acctno);
@@ -400,7 +404,7 @@ EXPORT TaxRefundISv3_BatchService_Records(
   
 	// Project cleaned input with did, using interim transform to save the data accumlated so far.
 	ds_recs_pre_res_temp := project(ds_clean_batch_w_did, xformOutRecs(left));
-		
+  
 	// TRIS v3.2 Enhancement : Req# 3.1.3.12 : Return IP data using BatchServices.IP_Metadata_BatchService.
 	ds_recs_ip_metadata_res := join(ds_recs_pre_res_temp ,ds_ip_metadata,
 																		left.acctno = right.acctno,
@@ -445,7 +449,7 @@ EXPORT TaxRefundISv3_BatchService_Records(
   // *--- Second transform to combine 2nd set of info accumlated ---* //
 	rec_out xformFinal(rec_out L) := transform
 
-		ssn_rec := ds_w_bestSsn_res(seq = L.seq)[1];  
+		ssn_rec := ds_AdlBest_res(seq = L.seq)[1];  
 		temp_verify_best_ssn  := if (ssn_rec.verify_best_ssn = 255, 0, ssn_rec.verify_best_ssn);
 		temp_verify_best_name := if (ssn_rec.verify_best_name = 255, 0, ssn_rec.verify_best_name);
 		// SSNIssuance info
@@ -621,7 +625,8 @@ EXPORT TaxRefundISv3_BatchService_Records(
 														(L.hri_3_code in ACCEPTABLE_HRI_CODES_ADDR_risk) or
 														(L.hri_4_code in ACCEPTABLE_HRI_CODES_ADDR_risk)
 														,'Y','');
-	  SELF := L;
+	  SELF.FDN_COUNT := COUNT(R);
+		SELF := L;
 	  SELF := [];
 	END;
 		 
@@ -642,4 +647,5 @@ EXPORT TaxRefundISv3_BatchService_Records(
 	ds_final_recs_sorted := sort(ds_final_recs, acctno);
 
  return ds_final_recs_sorted;
+
 END;

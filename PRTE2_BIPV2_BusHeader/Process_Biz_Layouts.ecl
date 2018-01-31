@@ -1,7 +1,7 @@
 ﻿EXPORT Process_Biz_Layouts := MODULE
  
 IMPORT BizLinkFull,SALT37;
-SHARED h := File_BizHead;//The input file
+SHARED h := PRTE2_BIPV2_BusHeader.File_BizHead;//The input file
  
 EXPORT KeyName := PRTE2_BIPV2_BusHeader.Filename_keys.meow; /*HACK07meow*/
  
@@ -159,7 +159,7 @@ EXPORT Fetch_Stream(DATASET(id_stream_layout) d) := FUNCTION
       SELF := ri;
       SELF := le;
     END;
-    J := JOIN( d,k,(LEFT.ultid = RIGHT.ultid) AND (LEFT.orgid = 0 OR LEFT.orgid = RIGHT.orgid) AND (LEFT.seleid = 0 OR LEFT.seleid = RIGHT.seleid) AND (LEFT.proxid = 0 OR LEFT.proxid = RIGHT.proxid) AND (LEFT.powid = 0 OR LEFT.powid = RIGHT.powid),tr(LEFT,RIGHT), LEFT OUTER, KEEP(10000), LIMIT(BizLinkFull.Config_BIP.JoinLimit)); // Ignore excess records without erroring
+    J := JOIN( d,k,(LEFT.ultid = RIGHT.ultid) AND (LEFT.orgid = 0 OR LEFT.orgid = RIGHT.orgid) AND (LEFT.seleid = 0 OR LEFT.seleid = RIGHT.seleid) AND (LEFT.proxid = 0 OR LEFT.proxid = RIGHT.proxid) AND (LEFT.powid = 0 OR LEFT.powid = RIGHT.powid),tr(LEFT,RIGHT), LEFT OUTER, KEEP(10000)/*, LIMIT(Config_BIP.JoinLimit)*/); // Ignore excess records without erroring
     RETURN J;
 END;
  
@@ -669,7 +669,6 @@ EXPORT ScoreSummary(DATASET(OutputLayout_Base) ds0) := FUNCTION
   RETURN SORT(TABLE(P,{Summary, Cnt := COUNT(GROUP)},Summary,FEW),-Cnt);
 END;
 EXPORT AdjustScoresForNonExactMatches(DATASET(LayoutScoredFetch) in_data) := FUNCTION
- 
 aggregateRec := RECORD
   in_data.reference;
   parent_proxidWeight := MAX(GROUP,IF( in_data.parent_proxid_match_code=SALT37.MatchCode.ExactMatch, in_data.parent_proxidWeight,0 ));
@@ -768,8 +767,8 @@ LayoutScoredFetch FixScores(LayoutScoredFetch le, aggregateRec ri) := TRANSFORM
   SELF.fallback_valueWeight := MAP( ri.fallback_valueWeight=0 OR le.fallback_value_match_code=SALT37.MatchCode.ExactMatch => le.fallback_valueWeight,MIN(le.fallback_valueWeight,ri.fallback_valueWeight-1) );
   SELF.CONTACTNAMEWeight := MAP( ri.CONTACTNAMEWeight=0 OR le.CONTACTNAME_match_code=SALT37.MatchCode.ExactMatch => le.CONTACTNAMEWeight,MIN(le.CONTACTNAMEWeight,ri.CONTACTNAMEWeight-1) );
   SELF.STREETADDRESSWeight := MAP( ri.STREETADDRESSWeight=0 OR le.STREETADDRESS_match_code=SALT37.MatchCode.ExactMatch => le.STREETADDRESSWeight,MIN(le.STREETADDRESSWeight,ri.STREETADDRESSWeight-1) );
-  INTEGER2 Weight := MAX(0,SELF.parent_proxidWeight) + MAX(0,SELF.sele_proxidWeight) + MAX(0,SELF.org_proxidWeight) + MAX(0,SELF.ultimate_proxidWeight) + MAX(0,SELF.has_lgidWeight) + MAX(0,SELF.empidWeight) + MAX(0,SELF.sourceWeight) + MAX(0,SELF.source_record_idWeight) + MAX(0,SELF.source_docidWeight) + MAX(0,SELF.company_nameWeight) + MAX(0,SELF.company_name_prefixWeight) + MAX(0,SELF.cnp_nameWeight) + MAX(0,SELF.cnp_numberWeight) + MAX(0,SELF.cnp_btypeWeight) + MAX(0,SELF.cnp_lowvWeight) + MAX(0,SELF.company_phoneWeight) + MAX(0,SELF.company_phone_3Weight) + MAX(0,SELF.company_phone_3_exWeight) + MAX(0,SELF.company_phone_7Weight) + MAX(0,SELF.company_feinWeight) + MAX(0,SELF.company_sic_code1Weight) + MAX(0,SELF.active_duns_numberWeight) + MAX(0,SELF.cityWeight) + MAX(0,SELF.city_cleanWeight) + MAX(0,SELF.stWeight) + MAX(0,SELF.zipWeight) + MAX(0,SELF.company_urlWeight) + MAX(0,SELF.isContactWeight) + MAX(0,SELF.contact_didWeight) + MAX(0,SELF.titleWeight) + MAX(0,SELF.fname_preferredWeight) + MAX(0,SELF.name_suffixWeight) + MAX(0,SELF.contact_ssnWeight) + MAX(0,SELF.contact_emailWeight) + MAX(0,SELF.sele_flagWeight) + MAX(0,SELF.org_flagWeight) + MAX(0,SELF.ult_flagWeight) + MAX(0,SELF.fallback_valueWeight) + MAX(0,SELF.fnameWeight) + MAX(0,SELF.mnameWeight) + MAX(0,SELF.lnameWeight) + MAX(0,SELF.prim_rangeWeight) + MAX(0,SELF.prim_nameWeight) + MAX(0,SELF.sec_rangeWeight);
-  SELF.Weight := IF(Weight>0,Weight,MAX(0,le.Weight));
+  Weight := MAX(0,SELF.parent_proxidWeight) + MAX(0,SELF.sele_proxidWeight) + MAX(0,SELF.org_proxidWeight) + MAX(0,SELF.ultimate_proxidWeight) + MAX(0,SELF.has_lgidWeight) + MAX(0,SELF.empidWeight) + MAX(0,SELF.sourceWeight) + MAX(0,SELF.source_record_idWeight) + MAX(0,SELF.source_docidWeight) + MAX(0,SELF.company_nameWeight) + MAX(0,SELF.company_name_prefixWeight) + MAX(0,SELF.cnp_nameWeight) + MAX(0,SELF.cnp_numberWeight) + MAX(0,SELF.cnp_btypeWeight) + MAX(0,SELF.cnp_lowvWeight) + MAX(0,SELF.company_phoneWeight) + MAX(0,SELF.company_phone_3Weight) + MAX(0,SELF.company_phone_3_exWeight) + MAX(0,SELF.company_phone_7Weight) + MAX(0,SELF.company_feinWeight) + MAX(0,SELF.company_sic_code1Weight) + MAX(0,SELF.active_duns_numberWeight) + MAX(0,SELF.cityWeight) + MAX(0,SELF.city_cleanWeight) + MAX(0,SELF.stWeight) + MAX(0,SELF.zipWeight) + MAX(0,SELF.company_urlWeight) + MAX(0,SELF.isContactWeight) + MAX(0,SELF.contact_didWeight) + MAX(0,SELF.titleWeight) + MAX(0,SELF.fname_preferredWeight) + MAX(0,SELF.name_suffixWeight) + MAX(0,SELF.contact_ssnWeight) + MAX(0,SELF.contact_emailWeight) + MAX(0,SELF.sele_flagWeight) + MAX(0,SELF.org_flagWeight) + MAX(0,SELF.ult_flagWeight) + MAX(0,SELF.fallback_valueWeight) + MAX(0,SELF.fnameWeight) + MAX(0,SELF.mnameWeight) + MAX(0,SELF.lnameWeight) + MAX(0,SELF.prim_rangeWeight) + MAX(0,SELF.prim_nameWeight) + MAX(0,SELF.sec_rangeWeight);
+  SELF.Weight := IF(Weight>0,Weight,MAX(0,le.Weight)); // JA 20171109: I had this commented out to mimic SALT 3.3, but changed it back in order to implement Edin's recommended hack
   SELF := le;
 END;
  
@@ -1006,5 +1005,22 @@ EXPORT UpdateIDs(DATASET(InputLayout) in) := FUNCTION
   ids_updated := PROJECT(ids_updated0,TRANSFORM(LayoutScoredFetch,SELF.Reference:=LEFT.UniqueId,SELF.keys_used:=0,SELF.keys_failed:=0,SELF:=LEFT));
   RETURN CombineLinkpathScores(ids_updated);
 END;
-END;
+// JA 20171114
+EXPORT AdjustKeysUsedAndFailed(DATASET(LayoutScoredFetch) in_data) := FUNCTION
+  LayoutScoredFetch AdjustFlags(LayoutScoredFetch le, UNSIGNED4 flagFail) := TRANSFORM // JA 20171114: UNSIGNED4 substituted for Config_BIP.KeysBitmapType 
+    SELF.keys_used := le.keys_used | flagFail;
+    SELF.keys_failed := le.keys_failed | flagFail;
+    SELF := le;
+  END;
+  outR := {UNSIGNED4 keys_failed; };
+  outR AggregateFlags(LayoutScoredFetch le, outR ri) := TRANSFORM
+    SELF.keys_failed := ri.keys_failed | le.keys_failed;
+  END;
+  agg := AGGREGATE(in_data(proxid=0),outR,AggregateFlags(LEFT,RIGHT),FEW);
+  flgFail := agg[1].keys_failed;
+  RETURN IF(COUNT(in_data(proxid = 0)) > 0, IF(COUNT(in_data(proxid <> 0)) > 0, PROJECT(in_data(proxid <> 0), AdjustFlags(LEFT, flgFail)), PROJECT(in_data(proxid = 0)[1..1], AdjustFlags(LEFT, flgFail))), in_data);
+  END;
 
+// if at least one key failed and at least one not key failed row, remove keys failed rows and put keys failed into put into existing rows
+// if you have only key failed rows - aggregate, and return one with all aggregated
+END;

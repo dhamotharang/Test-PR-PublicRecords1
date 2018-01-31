@@ -50,6 +50,7 @@ module
 		export lNewBHLroot				:= lNewroot + 'license_linkids'						;
 		export lNewControot				:= lNewroot + 'contacts'									;
 		export lNewBestroot				:= lNewroot + 'best'											;
+		export lNewRelroot				:= lNewroot + 'Seleid_Relatives'					;
 		
 
 		//////////////////////////////////////////////////////////////////
@@ -59,8 +60,8 @@ module
 		export IndustryBase				:= tools.mod_FilenamesBuild(lNewBHIroot					,lversiondate	,'',1	);
 		export LicenseBase				:= tools.mod_FilenamesBuild(lNewBHLroot					,lversiondate	,'',1	);
 		export ContactBase				:= tools.mod_FilenamesBuild(lNewControot				,lversiondate	,'',1	);
-		export Bestbase 					:= tools.mod_FilenamesBuild(lNewBestroot				,lversiondate	,'',1	);
-		//export Relatives								:= tools.mod_FilenamesBuild(lNewBRroot				,lversiondate	,'',1	);
+		export BestBase 					:= tools.mod_FilenamesBuild(lNewBestroot				,lversiondate	,'',1	);
+		export RelativesBase			:= tools.mod_FilenamesBuild(lNewRelroot					,lversiondate	,'',1	);
 		
 		
 		
@@ -73,6 +74,7 @@ module
 			+ LicenseBase.dAll_filenames
 			+ ContactBase.dAll_filenames
 			+ BestBase.dAll_filenames
+			+ RelativesBase.dAll_filenames
 	
 			;
 	end;

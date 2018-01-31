@@ -1,20 +1,22 @@
-IMPORT	LiensV2,	BIPV2,	FCRA,	STD,	lib_date;
+﻿IMPORT	LiensV2,	LiensV2_SrcInfoRpt,	BIPV2,	FCRA,	STD,	lib_date;
 // Remove requested records from FCRA. -- bug #132111
 rmv_filing		:=	'(VACATE|TERMINATION|LIS PENDENS WITHDRAWAL|FORECLOSURE DISMISSED|FILED IN ERROR|FEDERAL COURT DISMISSAL|ERRONEOUS TERMINATION|'+
 									'FEDERAL COURT CHANGE OF VENUE|DISMISSED JUDGMENT|COURT ORDER NO CHANGE|CIVIL DISMISSAL|'+
 									'HOSPITAL LIEN|HOSPITAL RELEASE|HOSPITAL WITHDRAWAL)';
 
 //	Filter Main by Filing Types
-dMainVacated	:=	LiensV2.file_liens_main(REGEXFIND(rmv_filing, filing_type_desc)	OR 
+dMainVacated	:=	LiensV2.file_liens_main(tmsid not in Liensv2.Suppress_TMSID(true) and 
+																					(REGEXFIND(rmv_filing, filing_type_desc)	OR 
 																					REGEXFIND(rmv_filing, filing_status[1].filing_status_desc)	OR 
-																					REGEXFIND(rmv_filing, orig_filing_type));
+																					REGEXFIND(rmv_filing, orig_filing_type)
+																					));
 //	Filter Main by Source Types (Hogan and Massachusetts Only)
 dMainSourceFiltered	:=	dMainVacated(	
 															tmsid[..2]	IN	['HG','MA']
 														);
 
 //	Filter Party by Source Types (Hogan and Massachusetts Only)
-dPartySourceFilter	:=	LiensV2.File_Liens_Party_BIPV2_with_Linkflags(
+dPartySourceFilter	:=	LiensV2.File_Liens_Party_BIPV2_with_Linkflags(tmsid not in Liensv2.Suppress_TMSID(true) and 
 													tmsid[..2]	IN	['HG','MA']
 												);
 														
@@ -55,16 +57,32 @@ dPartyFCRALexIDFilter	:=	PROJECT(
 																		)
 																);
 
+//	Remove Main records by TMSID/RMSID from Jurisdictions are non-updating 				
+dPartyRemoveSuppressedJurisdictions	:=	JOIN(
+																					SORT(DISTRIBUTE(dPartyFCRALexIDFilter,
+																						HASH(	TMSID, RMSID)),
+																									TMSID, RMSID,LOCAL),
+																					SORT(DISTRIBUTE(LiensV2_SrcInfoRpt.fn_SuppressedFCRALiensMain,
+																						HASH(	TMSID, RMSID)),
+																									TMSID, RMSID,LOCAL),
+																						LEFT.tmsid	=	RIGHT.tmsid	AND
+																						LEFT.rmsid	=	RIGHT.rmsid,
+																					TRANSFORM(
+																						{LiensV2.file_liens_party,BIPV2.IDlayouts.l_xlink_ids}, 
+																						SELF	:=	LEFT
+																					),
+																					LEFT ONLY,
+																					LOCAL
+																				);
+
 //	Remove Party Records that match Main records that have been filtered.
-EXPORT	file_liens_fcra_party	:=	JOIN(
-																		DISTRIBUTE(dPartyFCRALexIDFilter,HASH(tmsid)),
-																		DISTRIBUTE(dMainSourceFiltered,HASH(tmsid))  , 
-																			LEFT.tmsid	=	RIGHT.tmsid,
-																		TRANSFORM(
-																			{LiensV2.file_liens_party,BIPV2.IDlayouts.l_xlink_ids}, 
-																			SELF	:=	LEFT
-																		),
-																		LEFT ONLY,
-																		LOCAL
-																	):PERSIST('~thor_data400::persist::file_liens_fcra_party');
+dPartyRemoveMainSourceFiltered	:=	JOIN(
+																			DISTRIBUTE(dPartyRemoveSuppressedJurisdictions,HASH(tmsid)),
+																			DISTRIBUTE(dMainSourceFiltered,HASH(tmsid)), 
+																				LEFT.tmsid	=	RIGHT.tmsid,
+																			TRANSFORM(LEFT),
+																			LEFT ONLY,
+																			LOCAL
+																		):PERSIST('~thor_data400::persist::file_liens_fcra_party');
 									
+EXPORT	file_liens_fcra_party	:=	dPartyRemoveMainSourceFiltered;

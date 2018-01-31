@@ -428,7 +428,7 @@ BIID20_results_raw :=
 				{BIID20_input}, 
 				DATASET(BIID20_Output_layout),
         RETRY(5), TIMEOUT(500),
-				XPATH('BusinessInstantID20_Services.InstantID20_Batch_ServiceResponse/Results/Result/Dataset[@name=\'Results\']/Row'),
+				XPATH('*/Results/Result/Dataset[@name=\'Results\']/Row'),
 				PARALLEL(threads), onFail(myFail(LEFT)));
 
 OUTPUT( COUNT(BIID20_results_raw), NAMED('COUNT_BIID20_results') );

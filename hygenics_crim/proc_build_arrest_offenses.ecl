@@ -1,9 +1,9 @@
 ﻿import crim_common, lib_date,STD ;
  
-def := distribute(hygenics_crim.file_in_defendant_arrests(),hash(recordid+statecode));
-cha := distribute(hygenics_crim.file_in_charge_arrests(),hash(recordid+statecode));
-off := distribute(hygenics_crim.file_in_offense_arrests(),hash(recordid+statecode));
-sen := distribute(hygenics_crim.file_in_sentence_arrests(),hash(recordid+statecode));
+def := distribute(hygenics_crim.file_in_defendant_arrests(),hash(recordid,sourceid));
+cha := distribute(hygenics_crim.file_in_charge_arrests(),hash(recordid,sourceid));
+off := distribute(hygenics_crim.file_in_offense_arrests(),hash(recordid,sourceid));
+sen := distribute(hygenics_crim.file_in_sentence_arrests(),hash(recordid,sourceid));
 
 
 layout_j_final := record
@@ -157,6 +157,7 @@ layout_j_final := record
 	string10	ProbationMinMonths			:= '';
 	string10	ProbationMinDays			:= '';
 	string100	ProbationStatus				:= '';
+	string20  sourceid              :='';
 	//
 end;
 
@@ -200,7 +201,7 @@ layout_j_final to_j1(def l, off r) := transform
 end;
 
 j1 := join(def,off, 
-		left.statecode=right.statecode and 
+		left.sourceid=right.sourceid and 
 		left.recordid=right.recordid, 
 		to_j1(left,right),local);
 
@@ -230,7 +231,7 @@ layout_j_final to_j2(j1 l, cha r) := transform
 end;
 
 j2 := join(j1, cha,
-			left.statecode=right.statecode and 
+			left.sourceid=right.sourceid and 
 			left.recordid=right.recordid and 
 			left.caseid=right.caseid, 
 			to_j2(left,right), left outer, local);
@@ -278,7 +279,7 @@ layout_j_final to_j3(j2 l, sen r) := transform
  self := l;
  //self := r;
  end;
-j3 := join(j2,sen, left.statecode=right.statecode and left.recordid=right.recordid and left.caseid=right.caseid, 
+j3 := join(j2,sen, left.sourceid=right.sourceid and left.recordid=right.recordid and left.caseid=right.caseid, 
 										to_j3(left,right), left outer, local);
 
 j_final := j3;

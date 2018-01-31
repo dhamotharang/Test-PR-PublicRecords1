@@ -45,7 +45,7 @@ Business_Sources1 :=
   // + BusData.SKA_As_Business_Linking  //on blacklist of ingest sources, filtered out completely
   + Business_Credit.Business_Credit_As_Business_Linking
   + BusReg.BusReg_As_Business_Linking(false).Busreg  //*** set to false to use the dataland base files for input.
-  + CClue.As_Business_Linking()  
+  // + CClue.As_Business_Linking()  //comment out in january 2018 build because of possible source rid issue
   + Corp2.Corp2_As_Business_Linking()
   // + CrashCarrier.As_Business_Linking       //on blacklist of ingest sources, filtered out completely
   + Credit_Unions.as_business_linking(FALSE)
@@ -53,7 +53,7 @@ Business_Sources1 :=
   + DEA.DEA_As_Business_Linking
   + DNB_DMI.As_Business_Linking()
   + DNB_FEINV2.DNB_FEIN_As_Business_Linking			//***Business info only, no contacts
-  + EBR.EBR_As_Business_Linking
+  // + EBR.EBR_As_Business_Linking            // comment out in january 2018 because of big increase in new records.
   + Experian_CRDB.As_Business_Linking()
   + Experian_FEIN.As_Business_Linking()
   + FAA.faa_aircraft_reg_as_business_linking
@@ -87,17 +87,4 @@ Business_Sources1 :=
  // -- We are ingesting the re-corp states in stages
  // -- any changes made to this attribute regarding the re-corp need to also be made to 
  // -- Corp2.Corp2_As_Business_Linking.
- export Business_Sources:=Business_Sources1
- (~(        
-           mdr.sourceTools.SourceIsNJ_Corporations(source)  //BH-245 -- corp keys changed, need to patch
-        or mdr.sourceTools.SourceIsMO_Corporations(source)  //BH-245 -- corp keys changed, need to patch
-        // or mdr.sourceTools.SourceIsSC_Corporations(source)  //BH-245 -- no address
-        // or mdr.sourceTools.SourceIsWI_Corporations(source)  //BH-245 -- no address
-
-        or mdr.sourceTools.SourceIsGA_Corporations(source)  //BH-245 -- corp keys changed, need to patch
-        or mdr.sourceTools.SourceIsNC_Corporations(source)  //BH-245 -- corp keys changed, need to patch
-        or mdr.sourceTools.SourceIsPA_Corporations(source)  //BH-245 -- corp keys changed, need to patch
-        or mdr.sourceTools.SourceIsUT_Corporations(source)  //BH-245 -- corp keys changed, need to patch
-        or mdr.sourceTools.SourceIsVT_Corporations(source)  //BH-245 -- corp keys changed, need to patch
-
-));
+ export Business_Sources:=Business_Sources1;

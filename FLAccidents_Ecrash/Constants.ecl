@@ -1,7 +1,9 @@
-﻿IMPORT _control;
+﻿IMPORT _control,lib_thorlib;
 EXPORT CONSTANTS := MODULE
 		EXPORT LandingZone		 								:= IF (_control.ThisEnvironment.Name <> 'Prod_Thor', _control.IPAddress.bctlpedata12, _control.IPAddress.bctlpedata10);
-		
+	
+		EXPORT alpha_ip := fileservices.ResolveHostName('alpha_prod_thor_dali.risk.regn.net');
+
 		export prefix                        :=   '/data/super_credit/ecrash/sla_build/';                
 		EXPORT InPathForIncident					  := prefix + 'noniyetek/incident/in';
 		EXPORT InPathForBillingAgency					  := prefix + 'noniyetek/BillingAgencies/in';
@@ -34,7 +36,7 @@ EXPORT CONSTANTS := MODULE
 				EXPORT BackupPathForDocument					  := prefix + 'noniyetek/document/backup';
 
 
-	EXPORT DestinationCluster 		        := IF (_control.ThisEnvironment.Name = 'Prod_Thor', 'thor400_60', 'thor400_dev01');	
+	EXPORT DestinationCluster 		        := thorlib.group();	
 	EXPORT SprayCompleteFile							:= '~thor::CD::Spray::Complete';
 	EXPORT IncidentFileMask												:= 'dbpeccl-???.risk.regn.net.incident*' ;
 		EXPORT BillingAgencyFileMask												:= 'dbpeccl-???.risk.regn.net.BillingAgencies*' ;

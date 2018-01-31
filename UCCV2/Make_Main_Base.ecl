@@ -1,4 +1,4 @@
-import address, did_add, didville,PromoteSupers,header_slimsort,UccV2,business_header,Business_Header_SS;
+﻿import address, did_add, didville,PromoteSupers,header_slimsort,UccV2,business_header,Business_Header_SS;
 
 
 PromoteSupers.MAC_SF_BuildProcess(UCCV2.proc_build_CA_main_base,uccv2.cluster.cluster_out+'base::UCC::main::CA',OutCA, 2,,true);
@@ -8,7 +8,7 @@ PromoteSupers.MAC_SF_BuildProcess(UCCV2.proc_build_MA_main_base,uccv2.cluster.cl
 PromoteSupers.MAC_SF_BuildProcess(UCCV2.proc_build_NYC_main_base,uccv2.cluster.cluster_out+'base::UCC::main::NYC',OutNYC, 2,,true);
 PromoteSupers.MAC_SF_BuildProcess(UCCV2.proc_build_TX_main_base,uccv2.cluster.cluster_out+'base::UCC::main::TX',OutTX, 2,,true);
 PromoteSupers.MAC_SF_BuildProcess(UCCV2.proc_build_Harris_TX_main_base,uccv2.cluster.cluster_out+'base::UCC::main::TH',OutTH, 2,,true);
-PromoteSupers.MAC_SF_BuildProcess(UCCV2.proc_build_WA_main_base,uccv2.cluster.cluster_out+'base::UCC::main::WA',OutWA, 2,,true);
+outWA	:=	UCCV2.proc_build_WA_main_base;
 
 oCA :=IF(NOTHOR(FileServices.GetSuperFileSubCount('~thor_data400::in::uccv2::CA::initialfiling')>0),outCA,output('no new data in CA'));
 oDnB:=IF(NOTHOR(FileServices.GetSuperFileSubCount('~thor_data400::in::uccV2::dnb::financingStatement')>0),outDNB,output('no new data in DnB'));
@@ -19,6 +19,7 @@ oTX :=IF(NOTHOR(FileServices.GetSuperFileSubCount('~thor_data400::in::uccV2::Tx:
 oTH :=IF(NOTHOR(FileServices.GetSuperFileSubCount('~thor_data400::in::uccV2::TH ')>0),outTH,output('no new data in TH'));
 oWA :=IF(NOTHOR(FileServices.GetSuperFileSubCount('~thor_data400::in::uccV2::WA')>0),outWA,output('no new data in WA'));
 
-Done:=parallel(oCA,oDnB,oIL,oMA,oNYC,oTX,oTH,oWA);
+Done:=parallel(
+								oCA,oDnB,oIL,oMA,oNYC,oTX,oTH,oWA);
 
 export Make_Main_Base := Done;

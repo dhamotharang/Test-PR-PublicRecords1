@@ -1,7 +1,7 @@
-
+﻿
 EXPORT Spray_AR(dataset({string ftype,string fdate})infile) := module
 
-import VersionControl,_Control;
+import VersionControl,_Control,lib_thorlib;
 //spray dentists
 
 	string		pServer			              :=  _Control.IPAddress.bctlpedata11  ;
@@ -12,7 +12,7 @@ import VersionControl,_Control;
 																                                      '/data/hds_4/prolic/ar/pharmacists/'+infile(ftype = 'pharmacy')[1].fdate
 																             );
 	                               
-	string		pGroupName	             := if ( _Control.ThisEnvironment.Name <> 'Prod_Thor' ,'thor400_dev01','thor400_60');;
+	string		pGroupName	             := thorlib.group();
 	boolean    pIsTesting              := false;
 
 

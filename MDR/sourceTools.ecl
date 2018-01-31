@@ -1,4 +1,4 @@
-import corp2,doxie,codes,_control;
+﻿import corp2,doxie,codes,_control;
 // -- When adding a source code, please do this, PLEASE PLEASE PLEASE, to prevent DUPLICATE 
 //    source codes:
 // -- 1.  Use MDR.Misc_SourceTools.fGetNewSourceCodes() to find new unused source codes (since
@@ -34,7 +34,7 @@ MODULE
 	export src_Accurint_Trade_Show       := 'AT';
 	export src_ACF                       := 'CF';  // America's Corporate Financial Directory
 	export src_Acquiredweb 							 := 'AW';
-  export src_advo_valassis	           := 'VL';  // US POSTAL SERVICE VIA VALASSIS COMMUNICATIONS, INC. â€“ ADVO file 
+  export src_advo_valassis	           := 'VL';  // US POSTAL SERVICE VIA VALASSIS COMMUNICATIONS, INC. – ADVO file 
 	export src_AHA                       := 'AH';  // American Hospital Association for Organization master repositry
 	export src_Aircrafts                 := 'AR';  // Aircraft registrations from the FAA
 	export src_Airmen                    := 'AM';  // Pilot license info from the FAA
@@ -120,6 +120,7 @@ MODULE
 	export src_WV_Corporations           := 'CV';
 	export src_WV_Hist_Corporations      := 'C!';
 	export src_WY_Corporations           := 'CZ';
+	export src_Correctional_Facilities	 := '14';  // Correctional Facilities - Internal
 	export src_Cortera                   := 'RR';
 	export src_CrashCarrier							 := 'KC';  // aka US DOT "Safer Census" data for BIP
 	export src_Credit_Unions             := 'CU';
@@ -316,7 +317,8 @@ MODULE
 	export src_OIG                       := 'ZO';  // US Office of Inspector General
 	export src_One_Click_Data            := 'OC';
 	export src_OSHAIR                    := 'OS';  // US Occupational Safety & Health Administration, incident reports
-	export src_OutwardMedia 						 := 'OM';
+	export src_OutwardMedia 						 						:= 'OM';
+	export src_OKC_Student_List										:= 'O9';  //okc student list	
 	export src_PBSA                      := 'QY';  // United States Postal Service
   export src_pcnsr							 			 := 'PN';
 	export src_Phones_Plus               := 'PP';
@@ -488,6 +490,7 @@ MODULE
 	export src_MS_Worker_Comp            := 'MW';  // Mississippi workers compensation info
 	export src_OR_Worker_Comp            := 'WC';  // Oregon workers compensation info
 	export src_Yellow_Pages              := 'Y ';
+	export src_Zumigo_GetLineId  				 := 'ZG';
 	export src_ZOOM                      := 'ZM';
 	export src_BKFS_Nod                  := 'B7';  //Black Knight Foreclosure Nod info
 	export src_BKFS_Reo                  := 'I5';  //Black Knight Foreclosure Deed(Reo) info
@@ -1493,6 +1496,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_Cellphones_Traffix 	     := [src_Cellphones_Traffix				 ];	
 	export set_Certegy                   := [src_Certegy                   ];
 	export set_CClue	                   := [src_CClue	                   ];
+	export set_Correctional_Facilities   := [src_Correctional_Facilities   ];
 	export set_Cortera                   := [src_Cortera                   ];
 	export set_FL_CH                     := [src_FL_CH                     ];
 	export set_GA_CH                     := [src_GA_CH                     ];
@@ -1743,7 +1747,8 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_OIG                       := [src_OIG                       ];
 	export set_One_Click_Data            := [src_One_Click_Data            ];
 	export set_OSHAIR                    := [src_OSHAIR                    ];
-	export set_OutwardMedia		           := [src_OutwardMedia			         ];
+	export set_OutwardMedia		           	:= [src_OutwardMedia			         ];
+	export set_OKC_Student_List					 				:= [src_OKC_Student_List					 ];
 	export set_PBSA			                 := [src_PBSA 			               ];
 	export set_Pcnsr		                 := [src_Pcnsr			               ];
 	export set_Phones_Plus               := [src_Phones_Plus               ];
@@ -1911,6 +1916,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export set_OR_Worker_Comp            := [src_OR_Worker_Comp            ];
 	export set_Yellow_Pages              := [src_Yellow_Pages              ];
 	export set_ZOOM                      := [src_ZOOM                      ];
+	export set_Zumigo_GetLineId  				 := [src_Zumigo_GetLineId 				 ];
 	export set_BKFS_Nod                  := [src_BKFS_Nod                  ];
 	export set_BKFS_Reo                  := [src_BKFS_Reo                  ];
 	export set_credit_header_bureau      := set_Transunion + set_Experian_Credit_Header +
@@ -1992,6 +1998,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsCellphones_Traffix	        (string  sr) := sr               in set_Cellphones_Traffix				 ;
 	export SourceIsCertegy                    (string  sr) := sr               in set_Certegy                    ;
 	export SourceIsCClue	                    (string  sr) := sr               in set_CClue 	                   ;
+	export SourceIsCorrectional_Facilities    (string  sr) := sr               in set_Correctional_Facilities    ;
 	export SourceIsCortera                    (string  sr) := sr               in set_Cortera                    ;
 	export SourceIsFL_CH                      (string  sr) := sr               in set_FL_CH                      ;
 	export SourceIsGA_CH                      (string  sr) := sr               in set_GA_CH                      ;
@@ -2260,6 +2267,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 	export SourceIsNonUpdatingSrc             (string  sr) := sr               in set_NonUpdatingSrc             ;
 	export SourceIsOIG                        (string  sr) := sr               in set_OIG           	           ;
 	export SourceIsOne_Click_Data             (string  sr) := sr               in set_One_Click_Data	           ;
+	export SourceIsOKC_Student_List           (string  sr) := sr               in set_OKC_Student_List           ;
 	#if(_Control.ThisEnvironment.IsPlatformThor = true)
 		export SourceIsOnProbation                (string  sr) := SourceGroup(sr)  in set_Probation                ;
 	#else
@@ -2520,6 +2528,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_CLIA		                  ,'Clinical Laboratory Improvement Amendments'                }
 		,{src_CNLD_Facilities           ,'CNLD Facilities'                                           }
 		,{src_CNLD_Practitioner         ,'CNLD Practitioner'                                         }
+		,{src_Correctional_Facilities   ,'Correctional Facilities - Internal'					               }
 		,{src_Cortera		                ,'Cortera'                                                   }
 		,{src_FL_CH                     ,'FL CH'                                                     }
 		,{src_GA_CH                     ,'GA CH'                                                     }
@@ -2767,6 +2776,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,{src_NPPES                     ,'NPPES'                                                     }
 		,{src_OIG                       ,'OIG'                                                       }
 		,{src_One_Click_Data            ,'One Click Data'                                            }
+		,{src_OKC_Student_List          ,'OKC Student List'                                          }
 		,{src_OSHAIR                    ,'OSHAIR'                                                    }
 		,{src_OutwardMedia			        ,'Outward Media Email'                                       }
 		,{src_PBSA                      ,'United States Postal Service' 			                       }	  
@@ -3016,6 +3026,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_CClue              	     => 'Commercial Clue'
 		,src_Clarity					         => 'Clarity'				                                      
 		,src_CLIA		                   => 'Clinical Laboratory Improvement Amendments'
+		,src_Correctional_Facilities   => 'Correctional Facilities - Internal'
 		,src_Cortera                   => 'Cortera'
 		,src_FL_CH                     => 'FL CH'                                                
 		,src_GA_CH                     => 'GA CH'                                                
@@ -3265,6 +3276,7 @@ export set_NonDerog_FCRA_sources_v50 := [
 		,src_NPPES                     => 'NPPES'                                                
 		,src_OIG                       => 'OIG'                                       
 		,src_One_Click_Data            => 'One Click Data'                                       
+		,src_OKC_Student_List					 				=> 'OKC Student List'
 		,src_OSHAIR                    => 'OSHAIR'                                               
 		,src_OutwardMedia			         => 'Outward Media Email'                                  
 		,src_PBSA	                     => 'United States Postal Service'                   		 	

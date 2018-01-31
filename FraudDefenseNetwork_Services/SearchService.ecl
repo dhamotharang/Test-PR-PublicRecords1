@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="FraudDefenseNetwork_Service">
   <part name="FDNSearchRequest" type="tns:Xmldataset" cols="70" rows="10" />
   <part name="Request" type="tns:XmlDataSet" cols="200" rows="20" />
@@ -119,11 +119,15 @@ EXPORT SearchService() := MACRO
     doxie.DataPermission.use_FDNContributoryData 
     OR classification_Permissible_use_access.file_type <> FraudShared_Services.Constants.FileTypeCodes.CONTRIBUTORY);
 
+	Royalties := Royalty.RoyaltyFDNCoRR.GetOnlineRoyalties(ds_res_filter,true);
+		
   results := FraudDefenseNetwork_Services.GetResults(ds_res_filter);
   
   // OUTPUT(ds_res_filter ,NAMED('ds_res_filter'));
   // OUTPUT(ds_seq ,NAMED('Flat_Request'));
   // OUTPUT(ds_res ,NAMED('Search_Records'));
+	OUTPUT(Royalties, NAMED('RoyaltySet'));
   OUTPUT(results, NAMED('Results'));
+
   
 ENDMACRO;

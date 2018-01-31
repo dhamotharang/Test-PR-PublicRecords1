@@ -22,7 +22,7 @@ module
       export MBSFdnHHID           						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MBSFdnHHID       							.Sprayed))) > 0;
       export MBSTableCol          						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MBSTableCol       							.Sprayed))) > 0;
       export MBSColValDesc        						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MBSColValDesc       						.Sprayed))) > 0;
-
+			export MbsVelocityRules      						:= count(nothor(FileServices.SuperFileContents(Filenames().Input.MbsVelocityRules   						.Sprayed))) > 0;
 		end;
 					
 

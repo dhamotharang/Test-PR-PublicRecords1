@@ -1,4 +1,4 @@
-import BIPV2_Files, BIPV2, BIPV2_Ingest,BIPV2_Tools; 
+﻿import BIPV2_Files, BIPV2, BIPV2_Ingest,BIPV2_Tools; 
 import wk_ut,tools,std;
 export proc_ingest(STRING omitDisposition='') := module
 	/* ---------------------- Files -------------------------------------- */
@@ -104,7 +104,8 @@ export proc_ingest(STRING omitDisposition='') := module
 	
 	shared ingest_results := PROJECT(BIPV2_Ingest.Ingest().AllRecords, TRANSFORM(BIPV2.CommonBase.Layout, SELF.ingest_status:=BIPV2_Ingest.Ingest().RTToText(LEFT.__Tpe), SELF:=LEFT));
   SHARED ds_re_DID   := BIPV2_Files.tools_dotid().APPEND_DID(distribute(omittedSources.preserve(ingest_results)));//this can get skewed, so add distribute
-	SHARED ds_ingested := project(ds_re_DID,recordof(BIPV2_Ingest.In_BASE));  
+  SHARED ds_setsos   := BIPV2_Files.tools_dotid().SetSOS(project(ds_re_DID,BIPV2.CommonBase.Layout));//set sos again because the ingest status affects it.
+	SHARED ds_ingested := project(ds_setsos,recordof(BIPV2_Ingest.In_BASE));  
 	// SHARED ds_ingested := project(dataset('~thor_data400::bipv2_ingest::out_20161216',bipv2.CommonBase.layout,thor),recordof(BIPV2_Ingest.In_BASE));  
 
 	SHARED xt_src_status	:= TABLE(ds_ingested, {source, STRING50 src_name:=BIPV2.mod_sources.TranslateSource_aggregate(source), ingest_status, UNSIGNED cnt:=COUNT(GROUP)}, source, ingest_status, MERGE);
@@ -522,7 +523,7 @@ function
 		RETURN kickBuild;
 	ENDMACRO;
 	
-	EXPORT runIngest(pversion = 'BIPV2.KeySuffix', omitDisposition='') := FUNCTIONMACRO
+	EXPORT runIngest(pversion = 'BIPV2.KeySuffix', omitDisposition='\'\'') := FUNCTIONMACRO
 		eclsample	:= '#workunit(\'name\',\'BIPV2 runIngest @version@\');\n'
 		             + '#workunit(\'priority\',\'high\');\n'
 		             + '#OPTION(\'multiplePersistInstances\',FALSE);\n'

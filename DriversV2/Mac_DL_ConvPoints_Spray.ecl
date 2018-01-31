@@ -1,4 +1,4 @@
-import Drivers, DriversV2;
+﻿import Drivers, DriversV2;
 
 //***** Usage :-
 //***** DriversV2.Mac_DL_ConvPoints_Spray
@@ -19,6 +19,7 @@ import Drivers, DriversV2;
 //*****                      TN are - "TN" or "WDL" 
 //***** Modification History :-
 //***** Removed "MO" data, per Jill Luber to be compliant with the new state law(bug#37550; 20090309)
+//***** Commented out "WY", per Ellison.  There is no interest in the WY Convictions Data.
 export Mac_DL_ConvPoints_Spray(source_IP,source_path,file_name,state,file_type,process_dte,filedate,group_name,clear_Super='N') := 
 macro
 #uniquename(spray_main)
@@ -55,8 +56,8 @@ macro
 %st%    := stringlib.StringToUpperCase(trim(state,left,right));
 
 // Removed "MO" data, to be compliant with the new state law(bug#37550; 20090309)
-//#if (%st% in ['OH','MO'])
-#if (%st% in ['OH','MN','TN','WY'])
+//#if (%st% in ['OH','MO','WY'])
+#if (%st% in ['OH','MN','TN'])
 
 	%ftype% := stringlib.StringToUpperCase(trim(file_type,left,right));
 
@@ -89,10 +90,11 @@ macro
 	#if (%st% = 'TN' and %ftype% = 'WDL')
 	  %stype% := 'TN_WDL';  //TN Withdrawals data
 	#end
+ /*	
 	#if (%st% = 'WY')
 	  %stype% := 'WY';      //WY Convictions data
 	#end
-/* Removed "MO" data, to be compliant with the new state law(bug#37550; 20090309)
+  Removed "MO" data, to be compliant with the new state law(bug#37550; 20090309)
 	#if (%stype% = 'MO_ACTION')
 	  %recSize% := 328;  //ebcdic
 	#end
@@ -115,9 +117,11 @@ macro
 	#if (%stype% = 'TN_WDL')
 	  %recSize% := 201;  //TN Withdrawals data
 	#end
+	/*
 	#if (%stype% = 'WY')
 	  %recSize% := 172;  //WY Convictions data
 	#end
+  */
 	%doCleanup% := sequential(FileServices.RemoveSuperFile(DriversV2.Constants.cluster + 'in::dl2::'+%stype%+'_CP_updates::Old',
 															DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_cp_update::'+filedate),
 															FileServices.RemoveSuperFile(DriversV2.Constants.cluster + 'in::dl2::'+%stype%+'_CP_updates::Delete',
@@ -130,9 +134,9 @@ macro
 						  %doCleanup%);
 												
 /* Removed "MO" data, to be compliant with the new state law(bug#37550; 20090309)
-	%spray_main% := if (%stype% in ['MO_ACTION', 'MO_POINTS', 'MO_DPRDPS', 'OH'],
+	%spray_main% := if (%stype% in ['MO_ACTION', 'MO_POINTS', 'MO_DPRDPS', 'OH','WY'],
 */
-	%spray_main% := if (%stype% in ['OH','MN','TN','TN_WDL','WY'],
+	%spray_main% := if (%stype% in ['OH','MN','TN','TN_WDL'],
 						FileServices.SprayFixed(Source_IP
 												,source_path + file_name
 												,%recSize%
@@ -181,9 +185,11 @@ macro
 		#if(%stype% = 'TN_WDL')
 			DriversV2.Layouts_DL_TN_In.Layout_TN_WDL;     // Fixed length vendor raw data structure
 		#end
+		/*
 		#if(%stype% = 'WY')
 			DriversV2.Layouts_DL_WY_In.Layout_WY_CP;  // Fixed length vendor raw data structure
 		#end
+    */
 	end;
 
 	%Layout_Out_File% := record
@@ -210,9 +216,11 @@ macro
 		#if(%stype% = 'TN_WDL')
 			DriversV2.Layouts_DL_TN_In.Layout_TN_WDL_With_ProcessDte;     // Fixed length vendor raw data structure
 		#end
+		/*
 		#if(%stype% = 'WY')
 			DriversV2.Layouts_DL_WY_In.Layout_WY_CP_With_ProcessDte;  // Fixed length vendor raw data structure
 		#end
+    */
 	end;
 
 	// Adding process date to layout.

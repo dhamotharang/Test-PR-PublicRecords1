@@ -1,4 +1,4 @@
-/*
+﻿/*
   gets samples to review for people in the set
   should output the rolled up views for all samples first, then later output details if needed to look at 
   this should allow much faster review times
@@ -123,7 +123,7 @@ functionmacro
   #APPEND(ECL    ,'                          + table(samplerecseq + samplerecsgt  ,{unsigned6 ' + %'lID'% + ' := ' + %'lID'% + '2})\n')
   #APPEND(ECL    ,'                      ,{' + %'lID'% + '},' + %'lID'% + ',few);\n')
   #APPEND(ECL    ,'setsampleproxids  := set(allsampleproxids  ,' + %'lID'% + ');\n')
-  #APPEND(ECL    ,'allproxidcands    := project(' + %'kcand'% + '(' + %'lID'% + ' in setsampleproxids)  ,' + %'lModule'% + '.match_candidates(' + %'lInfile'% + ').layout_candidates);\n')
+  #APPEND(ECL    ,'allproxidcands    := project(' + %'kcand'% + '(' + %'lID'% + ' in setsampleproxids)  ,transform(' + %'lModule'% + '.match_candidates(' + %'lInfile'% + ').layout_candidates,self := left,self := []));\n')
   #APPEND(ECL    ,'s := dataset([],' + %'lModule'% + '.Layout_Specificities.R);\n')
   #APPEND(ECL    ,'allproxidsrolled := ' + %'lModule'% + '.Debug(' + %'lInfile'% + ',s).RolledEntities(allproxidcands);\n')
   #APPEND(ECL    ,'layrolled := recordof(allproxidsrolled);\n\n')

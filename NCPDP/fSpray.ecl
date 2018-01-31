@@ -1,4 +1,4 @@
-IMPORT _Control, lib_fileservices, lib_stringlib, VersionControl, tools;
+﻿IMPORT _Control, lib_fileservices, lib_stringlib, VersionControl, tools;
 
 EXPORT fSpray(STRING filedate) := FUNCTION
 	cluster1:='~thor_data400';
@@ -43,73 +43,73 @@ EXPORT fSpray(STRING filedate) := FUNCTION
 		IF(NOT FileServices.SuperFileExists(Filenames().change_owner_Input.Sprayed), CreateChangeOwnerSuper);
 
 	do_prov_info_spray :=
-			 FileServices.SprayFixed(_Control.IPAddress.bctlpedata11,
+			 FileServices.SprayFixed(_Control.IPAddress.bctlpedata10,
 			                         '/data/data_build_4/NCPDP/data/' + filedate + '/mas.txt',
 															 1002,
 															 dest_group,
 															 Cluster1 + '::in::' + _Dataset().name + '::prov_information::' + filedate + '::data', compress := TRUE);
 	do_prov_relat_spray	:=
-				FileServices.SprayFixed(_Control.IPAddress.bctlpedata11,
+				FileServices.SprayFixed(_Control.IPAddress.bctlpedata10,
 																'/data/data_build_4/NCPDP/data/' + filedate + '/mas_rr.txt',
 																152,
 																dest_group,
 																Cluster1 + '::in::' + _Dataset().name + '::prov_relationship::' + filedate + '::data', compress := TRUE);
 	do_medicaid_spray	:=
-				FileServices.SprayFixed(_Control.IPAddress.bctlpedata11,
+				FileServices.SprayFixed(_Control.IPAddress.bctlpedata10,
 																'/data/data_build_4/NCPDP/data/' + filedate + '/mas_md.txt',
 																152,
 																dest_group,
 																Cluster1 + '::in::' + _Dataset().name + '::medicaid::' + filedate + '::data', compress := TRUE);
 	do_taxonomy_spray	:=
-				FileServices.SprayFixed(_Control.IPAddress.bctlpedata11,
+				FileServices.SprayFixed(_Control.IPAddress.bctlpedata10,
 																'/data/data_build_4/NCPDP/data/' + filedate + '/mas_tx.txt',
 																152,
 																dest_group,
 																Cluster1 + '::in::' + _Dataset().name + '::taxonomy::' + filedate + '::data', compress := TRUE);
 	do_demographic_spray	:=
-				FileServices.SprayFixed(_Control.IPAddress.bctlpedata11,
+				FileServices.SprayFixed(_Control.IPAddress.bctlpedata10,
 																'/data/data_build_4/NCPDP/data/' + filedate + '/mas_af.txt',
 																1002,
 																dest_group,
 																Cluster1 + '::in::' + _Dataset().name + '::demographic::' + filedate + '::data', compress := TRUE);
 	do_pay_center_spray	:= 
-				FileServices.SprayFixed(_Control.IPAddress.bctlpedata11,
+				FileServices.SprayFixed(_Control.IPAddress.bctlpedata10,
 																'/data/data_build_4/NCPDP/data/' + filedate + '/mas_pc.txt',
 																502,
 																dest_group,
 																Cluster1 + '::in::' + _Dataset().name + '::pay_center::' + filedate + '::data', compress := TRUE);
 	do_parent_org_spray	:=
-				FileServices.SprayFixed(_Control.IPAddress.bctlpedata11,
+				FileServices.SprayFixed(_Control.IPAddress.bctlpedata10,
 																'/data/data_build_4/NCPDP/data/' + filedate + '/mas_pr.txt',
 																502,
 																dest_group,
 																Cluster1 + '::in::' + _Dataset().name + '::parent_org::' + filedate + '::data', compress := TRUE);
 	do_eprescribe_spray	:=
-				FileServices.SprayFixed(_Control.IPAddress.bctlpedata11,
+				FileServices.SprayFixed(_Control.IPAddress.bctlpedata10,
 																'/data/data_build_4/NCPDP/data/' + filedate + '/mas_erx.txt',
 																152,
 																dest_group,
 																Cluster1 + '::in::' + _Dataset().name + '::eprescribe::' + filedate + '::data', compress := TRUE);
 	do_remit_info_spray	:=
-				FileServices.SprayFixed(_Control.IPAddress.bctlpedata11,
+				FileServices.SprayFixed(_Control.IPAddress.bctlpedata10,
 																'/data/data_build_4/NCPDP/data/' + filedate + '/mas_rec.txt',
 																502,
 																dest_group,
 																Cluster1 + '::in::' + _Dataset().name + '::remit_information::' + filedate + '::data', compress := TRUE);
 	do_state_lic_spray	:=
-				FileServices.SprayFixed(_Control.IPAddress.bctlpedata11,
+				FileServices.SprayFixed(_Control.IPAddress.bctlpedata10,
 																'/data/data_build_4/NCPDP/data/' + filedate + '/mas_stl.txt',
 																152,
 																dest_group,
 																Cluster1 + '::in::' + _Dataset().name + '::state_license::' + filedate + '::data', compress := TRUE);
 	do_services_spray	:=
-				FileServices.SprayFixed(_Control.IPAddress.bctlpedata11,
+				FileServices.SprayFixed(_Control.IPAddress.bctlpedata10,
 																'/data/data_build_4/NCPDP/data/' + filedate + '/mas_svc.txt',
 																152,
 																dest_group,
 																Cluster1 + '::in::' + _Dataset().name + '::services_information::' + filedate + '::data', compress := TRUE);
 	do_change_owner_spray	:=
-				FileServices.SprayFixed(_Control.IPAddress.bctlpedata11,
+				FileServices.SprayFixed(_Control.IPAddress.bctlpedata10,
 																'/data/data_build_4/NCPDP/data/' + filedate + '/mas_coo.txt',
 																152,
 																dest_group,

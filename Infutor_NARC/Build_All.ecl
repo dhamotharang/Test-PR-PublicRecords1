@@ -1,9 +1,10 @@
-
-import versioncontrol, _control, ut, tools, Roxiekeybuild, Scrubs_Infutor_NARC;
+﻿
+import versioncontrol, _control, ut, tools, Roxiekeybuild, Scrubs_Infutor_NARC, Orbit3;
 export Build_all(string pversion, boolean pUseProd = false) := function
 
 spray_  		 := VersionControl.fSprayInputFiles(fSpray(pversion,pUseProd));
-dops_update := Roxiekeybuild.updateversion('InfutorNARCKeys',pversion,'Randy.Reyes@lexisnexis.com;Manuel.Tarectecan@lexisnexis.com;Abednego.Escobal@lexisnexis.com',,'N');
+dops_update := Roxiekeybuild.updateversion('InfutorNARCKeys',pversion,'Randy.Reyes@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com,Abednego.Escobal@lexisnexisrisk.com',,'N');
+orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem ('Consumer Marketing Database',(string)pversion,'N');
 
 built := sequential(
 					spray_
@@ -20,6 +21,7 @@ built := sequential(
 					,FileServices.ClearSuperFile(Filenames(pversion,pUseProd).lInputTemplate)
 					,FileServices.FinishSuperFileTransaction()
 					,dops_update
+					,orbit_update
 				): success(Send_Email(pversion,pUseProd).BuildSuccess), failure(send_email(pversion,pUseProd).BuildFailure
 
 );

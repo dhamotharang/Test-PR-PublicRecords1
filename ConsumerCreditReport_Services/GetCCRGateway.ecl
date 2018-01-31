@@ -1,4 +1,4 @@
-IMPORT iesp, Gateway, MDR;
+﻿IMPORT iesp, Gateway, MDR;
 
 EXPORT GetCCRGateway (DATASET(ConsumerCreditReport_Services.Layouts.workRec) ds_work_in,
 											ConsumerCreditReport_Services.IParams.Params in_mod) := FUNCTION
@@ -9,7 +9,7 @@ EXPORT GetCCRGateway (DATASET(ConsumerCreditReport_Services.Layouts.workRec) ds_
 		// QueryId is assigned as acctno as the ONLY input field returned in gateway response
 		SELF.User.QueryId:=(STRING)L.acctno;
 		SELF.User.EndUser.CompanyName:=in_mod.EndUserCompanyName;
-		SELF.Options.PermissiblePurpose:=in_mod.FCRAPurpose;
+		SELF.Options.PermissiblePurpose:=in_mod.PermissiblePurpose; 
 		SELF.SearchBy.Subject.SSN:=L.ssn;
 		SELF.SearchBy.Subject.PhoneNumber:=L.phoneno;
 		SELF.SearchBy.Subject.Name.First:=L.name_first;

@@ -67,7 +67,7 @@ layout := RECORD // project out required fields
   h.ult_flag_weight100 ; // Contains 100x the specificity
 END;
  
-s := BizLinkFull.Specificities(File_BizHead).Specificities[1];
+s := PRTE2_BIPV2_BusHeader.Specificities(PRTE2_BIPV2_BusHeader.File_BizHead).Specificities[1];
  
 DataForKey0 := DEDUP(SORT(TABLE(h((company_fein NOT IN SET(s.nulls_company_fein,company_fein) AND company_fein <> (TYPEOF(company_fein))'')),layout),company_fein,proxid,seleid,orgid,ultid,company_sic_code1,cnp_name,cnp_number,cnp_btype,cnp_lowv,zip,prim_name,city,st,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,powid,company_fein_len,prim_name_len,city_len,prim_range_len,sec_range_len,company_fein_weight100,company_fein_e1_Weight100,company_sic_code1_weight100,cnp_name_weight100,cnp_name_initial_char_weight100,cnp_number_weight100,cnp_btype_weight100,cnp_lowv_weight100,zip_weight100,prim_name_weight100,prim_name_e1_Weight100,city_weight100,city_p_Weight100,city_e2_Weight100,city_e2p_Weight100,st_weight100,prim_range_weight100,prim_range_e1_Weight100,sec_range_weight100,sec_range_e1_Weight100,parent_proxid_weight100,sele_proxid_weight100,org_proxid_weight100,ultimate_proxid_weight100,sele_flag_weight100,org_flag_weight100,ult_flag_weight100,-fallback_value,LOCAL),WHOLE RECORD,EXCEPT fallback_value,LOCAL);
 SHARED DataForKey := DataForKey0;
@@ -143,49 +143,49 @@ EXPORT ScoredproxidFetch(TYPEOF(h.company_fein) param_company_fein = (TYPEOF(h.c
   Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
     SELF.keys_used := 1 << 9; // Set bitmap for keys used
     SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 9, 0); // Set bitmap for key failed
-    SELF.company_fein_match_code := BizLinkFull.match_methods(File_BizHead).match_company_fein(le.company_fein,param_company_fein,le.company_fein_len,param_company_fein_len,TRUE);
+    SELF.company_fein_match_code := BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_company_fein(le.company_fein,param_company_fein,le.company_fein_len,param_company_fein_len,TRUE);
     SELF.company_feinWeight := (50+MAP (
            le.company_fein = param_company_fein  => le.company_fein_weight100,
           le.company_fein = (TYPEOF(le.company_fein))'' OR param_company_fein = (TYPEOF(le.company_fein))'' => 0,
           -0.941*le.company_fein_weight100))/100; 
     SELF.company_sic_code1_match_code := MAP(
            le.company_sic_code1 = (TYPEOF(le.company_sic_code1))'' OR param_company_sic_code1 = (TYPEOF(param_company_sic_code1))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_company_sic_code1(le.company_sic_code1,param_company_sic_code1,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_company_sic_code1(le.company_sic_code1,param_company_sic_code1,FALSE));
     SELF.company_sic_code1Weight := (50+MAP (
            le.company_sic_code1 = (TYPEOF(le.company_sic_code1))'' OR param_company_sic_code1 = (TYPEOF(param_company_sic_code1))'' => 0,
            le.company_sic_code1 = param_company_sic_code1  => le.company_sic_code1_weight100,
            -0.727*le.company_sic_code1_weight100))/100; 
     SELF.cnp_name_match_code := MAP(
            le.cnp_name = (TYPEOF(le.cnp_name))'' OR param_cnp_name = (TYPEOF(param_cnp_name))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_cnp_name(le.cnp_name,param_cnp_name,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_name(le.cnp_name,param_cnp_name,FALSE));
     SELF.cnp_nameWeight := (50+MAP (
            le.cnp_name = (TYPEOF(le.cnp_name))'' OR param_cnp_name = (TYPEOF(param_cnp_name))'' => 0,
            le.cnp_name = param_cnp_name  => le.cnp_name_weight100,
            SALT37.MatchBagOfWords(le.cnp_name,param_cnp_name,3177747,1)))/100; 
     SELF.cnp_number_match_code := MAP(
            le.cnp_number = (TYPEOF(le.cnp_number))'' OR param_cnp_number = (TYPEOF(param_cnp_number))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_cnp_number(le.cnp_number,param_cnp_number,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_number(le.cnp_number,param_cnp_number,FALSE));
     SELF.cnp_numberWeight := (50+MAP (
            le.cnp_number = (TYPEOF(le.cnp_number))'' OR param_cnp_number = (TYPEOF(param_cnp_number))'' => 0,
            le.cnp_number = param_cnp_number  => le.cnp_number_weight100,
            -0.996*le.cnp_number_weight100))/100; 
     SELF.cnp_btype_match_code := MAP(
            le.cnp_btype = (TYPEOF(le.cnp_btype))'' OR param_cnp_btype = (TYPEOF(param_cnp_btype))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_cnp_btype(le.cnp_btype,param_cnp_btype,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_btype(le.cnp_btype,param_cnp_btype,FALSE));
     SELF.cnp_btypeWeight := (50+MAP (
            le.cnp_btype = (TYPEOF(le.cnp_btype))'' OR param_cnp_btype = (TYPEOF(param_cnp_btype))'' => 0,
            le.cnp_btype = param_cnp_btype  => le.cnp_btype_weight100,
            -0.958*le.cnp_btype_weight100))/100; 
     SELF.cnp_lowv_match_code := MAP(
            le.cnp_lowv = (TYPEOF(le.cnp_lowv))'' OR param_cnp_lowv = (TYPEOF(param_cnp_lowv))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_cnp_lowv(le.cnp_lowv,param_cnp_lowv,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_lowv(le.cnp_lowv,param_cnp_lowv,FALSE));
     SELF.cnp_lowvWeight := (50+MAP (
            le.cnp_lowv = (TYPEOF(le.cnp_lowv))'' OR param_cnp_lowv = (TYPEOF(param_cnp_lowv))'' => 0,
            le.cnp_lowv = param_cnp_lowv  => le.cnp_lowv_weight100,
            -0.962*le.cnp_lowv_weight100))/100; 
     SELF.zip_match_code := MAP(
 le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_zip_el(le.zip,param_zip,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_zip_el(le.zip,param_zip,FALSE));
     SELF.zipWeight := (50+MAP (
            EXISTS(param_zip(le.zip=zip)) => /*HACK16  le.zip_weight100 */ 1100 * param_zip(zip=le.zip)[1].weight/100.0,
           le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => 0,
@@ -193,7 +193,7 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => SALT37.MatchCode.OneSideNul
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_layouts.layout_zip_cases);
     SELF.prim_name_match_code := MAP(
            le.prim_name = (TYPEOF(le.prim_name))'' OR param_prim_name = (TYPEOF(param_prim_name))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_prim_name(le.prim_name,param_prim_name,le.prim_name_len,param_prim_name_len,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_prim_name(le.prim_name,param_prim_name,le.prim_name_len,param_prim_name_len,FALSE));
     SELF.prim_nameWeight := (50+MAP (
            le.prim_name = (TYPEOF(le.prim_name))'' OR param_prim_name = (TYPEOF(param_prim_name))'' => 0,
            le.prim_name = param_prim_name  => le.prim_name_weight100,
@@ -202,7 +202,7 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => SALT37.MatchCode.OneSideNul
     SELF.city_match_code := MAP(
            le.city = (TYPEOF(le.city))'' OR param_city = (TYPEOF(param_city))'' => SALT37.MatchCode.OneSideNull,
            le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' OR le.st <> param_st => 0, // Only valid if the context variable is equal
-           BizLinkFull.match_methods(File_BizHead).match_city(le.city,param_city,le.city_len,param_city_len,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_city(le.city,param_city,le.city_len,param_city_len,FALSE));
     SELF.cityWeight := (50+MAP (
            le.city = (TYPEOF(le.city))'' OR param_city = (TYPEOF(param_city))'' => 0,
            le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' OR le.st <> param_st => 0, // Only valid if the context variable is equal
@@ -212,14 +212,14 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => SALT37.MatchCode.OneSideNul
            -0.947*le.city_weight100))/100; 
     SELF.st_match_code := MAP(
            le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_st(le.st,param_st,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_st(le.st,param_st,FALSE));
     SELF.stWeight := (50+MAP (
            le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' => 0,
            le.st = param_st  => le.st_weight100,
            -1.000*le.st_weight100))/100; 
     SELF.prim_range_match_code := MAP(
            le.prim_range = (TYPEOF(le.prim_range))'' OR param_prim_range = (TYPEOF(param_prim_range))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_prim_range(le.prim_range,param_prim_range,le.prim_range_len,param_prim_range_len,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_prim_range(le.prim_range,param_prim_range,le.prim_range_len,param_prim_range_len,FALSE));
     SELF.prim_rangeWeight := (50+MAP (
            le.prim_range = (TYPEOF(le.prim_range))'' OR param_prim_range = (TYPEOF(param_prim_range))'' => 0,
            le.prim_range = param_prim_range  => le.prim_range_weight100,
@@ -227,7 +227,7 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => SALT37.MatchCode.OneSideNul
            -1.000*le.prim_range_weight100))/100; 
     SELF.sec_range_match_code := MAP(
            le.sec_range = (TYPEOF(le.sec_range))'' OR param_sec_range = (TYPEOF(param_sec_range))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_sec_range(le.sec_range,param_sec_range,le.sec_range_len,param_sec_range_len,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_sec_range(le.sec_range,param_sec_range,le.sec_range_len,param_sec_range_len,FALSE));
     SELF.sec_rangeWeight := (50+MAP (
            le.sec_range = (TYPEOF(le.sec_range))'' OR param_sec_range = (TYPEOF(param_sec_range))'' => 0,
            le.sec_range = param_sec_range  => le.sec_range_weight100,
@@ -235,49 +235,49 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => SALT37.MatchCode.OneSideNul
            -0.888*le.sec_range_weight100))/100; 
     SELF.parent_proxid_match_code := MAP(
            le.parent_proxid = (TYPEOF(le.parent_proxid))'' OR param_parent_proxid = (TYPEOF(param_parent_proxid))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_parent_proxid(le.parent_proxid,param_parent_proxid,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_parent_proxid(le.parent_proxid,param_parent_proxid,FALSE));
     SELF.parent_proxidWeight := (50+MAP (
            le.parent_proxid = (TYPEOF(le.parent_proxid))'' OR param_parent_proxid = (TYPEOF(param_parent_proxid))'' => 0,
            le.parent_proxid = param_parent_proxid  => le.parent_proxid_weight100,
            -1.000*le.parent_proxid_weight100))/100*0.00; 
     SELF.sele_proxid_match_code := MAP(
            le.sele_proxid = (TYPEOF(le.sele_proxid))'' OR param_sele_proxid = (TYPEOF(param_sele_proxid))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_sele_proxid(le.sele_proxid,param_sele_proxid,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_sele_proxid(le.sele_proxid,param_sele_proxid,FALSE));
     SELF.sele_proxidWeight := (50+MAP (
            le.sele_proxid = (TYPEOF(le.sele_proxid))'' OR param_sele_proxid = (TYPEOF(param_sele_proxid))'' => 0,
            le.sele_proxid = param_sele_proxid  => le.sele_proxid_weight100,
            -1.000*le.sele_proxid_weight100))/100*0.00; 
     SELF.org_proxid_match_code := MAP(
            le.org_proxid = (TYPEOF(le.org_proxid))'' OR param_org_proxid = (TYPEOF(param_org_proxid))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_org_proxid(le.org_proxid,param_org_proxid,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_org_proxid(le.org_proxid,param_org_proxid,FALSE));
     SELF.org_proxidWeight := (50+MAP (
            le.org_proxid = (TYPEOF(le.org_proxid))'' OR param_org_proxid = (TYPEOF(param_org_proxid))'' => 0,
            le.org_proxid = param_org_proxid  => le.org_proxid_weight100,
            -1.000*le.org_proxid_weight100))/100*0.00; 
     SELF.ultimate_proxid_match_code := MAP(
            le.ultimate_proxid = (TYPEOF(le.ultimate_proxid))'' OR param_ultimate_proxid = (TYPEOF(param_ultimate_proxid))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_ultimate_proxid(le.ultimate_proxid,param_ultimate_proxid,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_ultimate_proxid(le.ultimate_proxid,param_ultimate_proxid,FALSE));
     SELF.ultimate_proxidWeight := (50+MAP (
            le.ultimate_proxid = (TYPEOF(le.ultimate_proxid))'' OR param_ultimate_proxid = (TYPEOF(param_ultimate_proxid))'' => 0,
            le.ultimate_proxid = param_ultimate_proxid  => le.ultimate_proxid_weight100,
            -1.000*le.ultimate_proxid_weight100))/100*0.00; 
     SELF.sele_flag_match_code := MAP(
            le.sele_flag = (TYPEOF(le.sele_flag))'' OR param_sele_flag = (TYPEOF(param_sele_flag))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_sele_flag(le.sele_flag,param_sele_flag,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_sele_flag(le.sele_flag,param_sele_flag,FALSE));
     SELF.sele_flagWeight := (50+MAP (
            le.sele_flag = (TYPEOF(le.sele_flag))'' OR param_sele_flag = (TYPEOF(param_sele_flag))'' => 0,
            le.sele_flag = param_sele_flag  => le.sele_flag_weight100,
            -1.000*le.sele_flag_weight100))/100*0.00; 
     SELF.org_flag_match_code := MAP(
            le.org_flag = (TYPEOF(le.org_flag))'' OR param_org_flag = (TYPEOF(param_org_flag))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_org_flag(le.org_flag,param_org_flag,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_org_flag(le.org_flag,param_org_flag,FALSE));
     SELF.org_flagWeight := (50+MAP (
            le.org_flag = (TYPEOF(le.org_flag))'' OR param_org_flag = (TYPEOF(param_org_flag))'' => 0,
            le.org_flag = param_org_flag  => le.org_flag_weight100,
            -1.000*le.org_flag_weight100))/100*0.00; 
     SELF.ult_flag_match_code := MAP(
            le.ult_flag = (TYPEOF(le.ult_flag))'' OR param_ult_flag = (TYPEOF(param_ult_flag))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_ult_flag(le.ult_flag,param_ult_flag,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_ult_flag(le.ult_flag,param_ult_flag,FALSE));
     SELF.ult_flagWeight := (50+MAP (
            le.ult_flag = (TYPEOF(le.ult_flag))'' OR param_ult_flag = (TYPEOF(param_ult_flag))'' => 0,
            le.ult_flag = param_ult_flag  => le.ult_flag_weight100,
@@ -326,49 +326,49 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEA
     SELF.Reference := ri.reference; // Copy reference field
     SELF.keys_used := 1 << 9; // Set bitmap for keys used
     SELF.keys_failed := 0; // Set bitmap for key failed
-    SELF.company_fein_match_code := BizLinkFull.match_methods(File_BizHead).match_company_fein(le.company_fein,ri.company_fein,le.company_fein_len,ri.company_fein_len,TRUE);
+    SELF.company_fein_match_code := BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_company_fein(le.company_fein,ri.company_fein,le.company_fein_len,ri.company_fein_len,TRUE);
     SELF.company_feinWeight := (50+MAP (
            le.company_fein = ri.company_fein  => le.company_fein_weight100,
           le.company_fein = (TYPEOF(le.company_fein))'' OR ri.company_fein = (TYPEOF(le.company_fein))'' => 0,
           -0.941*le.company_fein_weight100))/100; 
     SELF.company_sic_code1_match_code := MAP(
            le.company_sic_code1 = (TYPEOF(le.company_sic_code1))'' OR ri.company_sic_code1 = (TYPEOF(ri.company_sic_code1))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_company_sic_code1(le.company_sic_code1,ri.company_sic_code1,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_company_sic_code1(le.company_sic_code1,ri.company_sic_code1,FALSE));
     SELF.company_sic_code1Weight := (50+MAP (
            le.company_sic_code1 = (TYPEOF(le.company_sic_code1))'' OR ri.company_sic_code1 = (TYPEOF(ri.company_sic_code1))'' => 0,
            le.company_sic_code1 = ri.company_sic_code1  => le.company_sic_code1_weight100,
            -0.727*le.company_sic_code1_weight100))/100; 
     SELF.cnp_name_match_code := MAP(
            le.cnp_name = (TYPEOF(le.cnp_name))'' OR ri.cnp_name = (TYPEOF(ri.cnp_name))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_cnp_name(le.cnp_name,ri.cnp_name,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_name(le.cnp_name,ri.cnp_name,FALSE));
     SELF.cnp_nameWeight := (50+MAP (
            le.cnp_name = (TYPEOF(le.cnp_name))'' OR ri.cnp_name = (TYPEOF(ri.cnp_name))'' => 0,
            le.cnp_name = ri.cnp_name  => le.cnp_name_weight100,
            SALT37.MatchBagOfWords(le.cnp_name,ri.cnp_name,3177747,1)))/100; 
     SELF.cnp_number_match_code := MAP(
            le.cnp_number = (TYPEOF(le.cnp_number))'' OR ri.cnp_number = (TYPEOF(ri.cnp_number))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_cnp_number(le.cnp_number,ri.cnp_number,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_number(le.cnp_number,ri.cnp_number,FALSE));
     SELF.cnp_numberWeight := (50+MAP (
            le.cnp_number = (TYPEOF(le.cnp_number))'' OR ri.cnp_number = (TYPEOF(ri.cnp_number))'' => 0,
            le.cnp_number = ri.cnp_number  => le.cnp_number_weight100,
            -0.996*le.cnp_number_weight100))/100; 
     SELF.cnp_btype_match_code := MAP(
            le.cnp_btype = (TYPEOF(le.cnp_btype))'' OR ri.cnp_btype = (TYPEOF(ri.cnp_btype))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_cnp_btype(le.cnp_btype,ri.cnp_btype,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_btype(le.cnp_btype,ri.cnp_btype,FALSE));
     SELF.cnp_btypeWeight := (50+MAP (
            le.cnp_btype = (TYPEOF(le.cnp_btype))'' OR ri.cnp_btype = (TYPEOF(ri.cnp_btype))'' => 0,
            le.cnp_btype = ri.cnp_btype  => le.cnp_btype_weight100,
            -0.958*le.cnp_btype_weight100))/100; 
     SELF.cnp_lowv_match_code := MAP(
            le.cnp_lowv = (TYPEOF(le.cnp_lowv))'' OR ri.cnp_lowv = (TYPEOF(ri.cnp_lowv))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_cnp_lowv(le.cnp_lowv,ri.cnp_lowv,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_cnp_lowv(le.cnp_lowv,ri.cnp_lowv,FALSE));
     SELF.cnp_lowvWeight := (50+MAP (
            le.cnp_lowv = (TYPEOF(le.cnp_lowv))'' OR ri.cnp_lowv = (TYPEOF(ri.cnp_lowv))'' => 0,
            le.cnp_lowv = ri.cnp_lowv  => le.cnp_lowv_weight100,
            -0.962*le.cnp_lowv_weight100))/100; 
     SELF.zip_match_code := MAP(
 le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_zip_el(le.zip,ri.zip_cases,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_zip_el(le.zip,ri.zip_cases,FALSE));
     SELF.zipWeight := (50+MAP (
            EXISTS(ri.zip_cases(le.zip=zip)) => le.zip_weight100 * ri.zip_cases(zip=le.zip)[1].weight/100.0,
           le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => 0,
@@ -376,7 +376,7 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => SALT37.MatchCode.OneSide
     SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_layouts.layout_zip_cases);
     SELF.prim_name_match_code := MAP(
            le.prim_name = (TYPEOF(le.prim_name))'' OR ri.prim_name = (TYPEOF(ri.prim_name))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_prim_name(le.prim_name,ri.prim_name,le.prim_name_len,ri.prim_name_len,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_prim_name(le.prim_name,ri.prim_name,le.prim_name_len,ri.prim_name_len,FALSE));
     SELF.prim_nameWeight := (50+MAP (
            le.prim_name = (TYPEOF(le.prim_name))'' OR ri.prim_name = (TYPEOF(ri.prim_name))'' => 0,
            le.prim_name = ri.prim_name  => le.prim_name_weight100,
@@ -385,7 +385,7 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => SALT37.MatchCode.OneSide
     SELF.city_match_code := MAP(
            le.city = (TYPEOF(le.city))'' OR ri.city = (TYPEOF(ri.city))'' => SALT37.MatchCode.OneSideNull,
            le.st = (TYPEOF(le.st))'' OR ri.st = (TYPEOF(ri.st))'' OR le.st <> ri.st => 0, // Only valid if the context variable is equal
-           BizLinkFull.match_methods(File_BizHead).match_city(le.city,ri.city,le.city_len,ri.city_len,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_city(le.city,ri.city,le.city_len,ri.city_len,FALSE));
     SELF.cityWeight := (50+MAP (
            le.city = (TYPEOF(le.city))'' OR ri.city = (TYPEOF(ri.city))'' => 0,
            le.st = (TYPEOF(le.st))'' OR ri.st = (TYPEOF(ri.st))'' OR le.st <> ri.st => 0, // Only valid if the context variable is equal
@@ -395,14 +395,14 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => SALT37.MatchCode.OneSide
            -0.947*le.city_weight100))/100; 
     SELF.st_match_code := MAP(
            le.st = (TYPEOF(le.st))'' OR ri.st = (TYPEOF(ri.st))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_st(le.st,ri.st,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_st(le.st,ri.st,FALSE));
     SELF.stWeight := (50+MAP (
            le.st = (TYPEOF(le.st))'' OR ri.st = (TYPEOF(ri.st))'' => 0,
            le.st = ri.st  => le.st_weight100,
            -1.000*le.st_weight100))/100; 
     SELF.prim_range_match_code := MAP(
            le.prim_range = (TYPEOF(le.prim_range))'' OR ri.prim_range = (TYPEOF(ri.prim_range))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_prim_range(le.prim_range,ri.prim_range,le.prim_range_len,ri.prim_range_len,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_prim_range(le.prim_range,ri.prim_range,le.prim_range_len,ri.prim_range_len,FALSE));
     SELF.prim_rangeWeight := (50+MAP (
            le.prim_range = (TYPEOF(le.prim_range))'' OR ri.prim_range = (TYPEOF(ri.prim_range))'' => 0,
            le.prim_range = ri.prim_range  => le.prim_range_weight100,
@@ -410,7 +410,7 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => SALT37.MatchCode.OneSide
            -1.000*le.prim_range_weight100))/100; 
     SELF.sec_range_match_code := MAP(
            le.sec_range = (TYPEOF(le.sec_range))'' OR ri.sec_range = (TYPEOF(ri.sec_range))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_sec_range(le.sec_range,ri.sec_range,le.sec_range_len,ri.sec_range_len,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_sec_range(le.sec_range,ri.sec_range,le.sec_range_len,ri.sec_range_len,FALSE));
     SELF.sec_rangeWeight := (50+MAP (
            le.sec_range = (TYPEOF(le.sec_range))'' OR ri.sec_range = (TYPEOF(ri.sec_range))'' => 0,
            le.sec_range = ri.sec_range  => le.sec_range_weight100,
@@ -418,49 +418,49 @@ le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(ri.zip_cases) => SALT37.MatchCode.OneSide
            -0.888*le.sec_range_weight100))/100; 
     SELF.parent_proxid_match_code := MAP(
            le.parent_proxid = (TYPEOF(le.parent_proxid))'' OR ri.parent_proxid = (TYPEOF(ri.parent_proxid))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_parent_proxid(le.parent_proxid,ri.parent_proxid,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_parent_proxid(le.parent_proxid,ri.parent_proxid,FALSE));
     SELF.parent_proxidWeight := (50+MAP (
            le.parent_proxid = (TYPEOF(le.parent_proxid))'' OR ri.parent_proxid = (TYPEOF(ri.parent_proxid))'' => 0,
            le.parent_proxid = ri.parent_proxid  => le.parent_proxid_weight100,
            -1.000*le.parent_proxid_weight100))/100*0.00; 
     SELF.sele_proxid_match_code := MAP(
            le.sele_proxid = (TYPEOF(le.sele_proxid))'' OR ri.sele_proxid = (TYPEOF(ri.sele_proxid))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_sele_proxid(le.sele_proxid,ri.sele_proxid,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_sele_proxid(le.sele_proxid,ri.sele_proxid,FALSE));
     SELF.sele_proxidWeight := (50+MAP (
            le.sele_proxid = (TYPEOF(le.sele_proxid))'' OR ri.sele_proxid = (TYPEOF(ri.sele_proxid))'' => 0,
            le.sele_proxid = ri.sele_proxid  => le.sele_proxid_weight100,
            -1.000*le.sele_proxid_weight100))/100*0.00; 
     SELF.org_proxid_match_code := MAP(
            le.org_proxid = (TYPEOF(le.org_proxid))'' OR ri.org_proxid = (TYPEOF(ri.org_proxid))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_org_proxid(le.org_proxid,ri.org_proxid,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_org_proxid(le.org_proxid,ri.org_proxid,FALSE));
     SELF.org_proxidWeight := (50+MAP (
            le.org_proxid = (TYPEOF(le.org_proxid))'' OR ri.org_proxid = (TYPEOF(ri.org_proxid))'' => 0,
            le.org_proxid = ri.org_proxid  => le.org_proxid_weight100,
            -1.000*le.org_proxid_weight100))/100*0.00; 
     SELF.ultimate_proxid_match_code := MAP(
            le.ultimate_proxid = (TYPEOF(le.ultimate_proxid))'' OR ri.ultimate_proxid = (TYPEOF(ri.ultimate_proxid))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_ultimate_proxid(le.ultimate_proxid,ri.ultimate_proxid,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_ultimate_proxid(le.ultimate_proxid,ri.ultimate_proxid,FALSE));
     SELF.ultimate_proxidWeight := (50+MAP (
            le.ultimate_proxid = (TYPEOF(le.ultimate_proxid))'' OR ri.ultimate_proxid = (TYPEOF(ri.ultimate_proxid))'' => 0,
            le.ultimate_proxid = ri.ultimate_proxid  => le.ultimate_proxid_weight100,
            -1.000*le.ultimate_proxid_weight100))/100*0.00; 
     SELF.sele_flag_match_code := MAP(
            le.sele_flag = (TYPEOF(le.sele_flag))'' OR ri.sele_flag = (TYPEOF(ri.sele_flag))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_sele_flag(le.sele_flag,ri.sele_flag,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_sele_flag(le.sele_flag,ri.sele_flag,FALSE));
     SELF.sele_flagWeight := (50+MAP (
            le.sele_flag = (TYPEOF(le.sele_flag))'' OR ri.sele_flag = (TYPEOF(ri.sele_flag))'' => 0,
            le.sele_flag = ri.sele_flag  => le.sele_flag_weight100,
            -1.000*le.sele_flag_weight100))/100*0.00; 
     SELF.org_flag_match_code := MAP(
            le.org_flag = (TYPEOF(le.org_flag))'' OR ri.org_flag = (TYPEOF(ri.org_flag))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_org_flag(le.org_flag,ri.org_flag,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_org_flag(le.org_flag,ri.org_flag,FALSE));
     SELF.org_flagWeight := (50+MAP (
            le.org_flag = (TYPEOF(le.org_flag))'' OR ri.org_flag = (TYPEOF(ri.org_flag))'' => 0,
            le.org_flag = ri.org_flag  => le.org_flag_weight100,
            -1.000*le.org_flag_weight100))/100*0.00; 
     SELF.ult_flag_match_code := MAP(
            le.ult_flag = (TYPEOF(le.ult_flag))'' OR ri.ult_flag = (TYPEOF(ri.ult_flag))'' => SALT37.MatchCode.OneSideNull,
-           BizLinkFull.match_methods(File_BizHead).match_ult_flag(le.ult_flag,ri.ult_flag,FALSE));
+           BizLinkFull.match_methods(PRTE2_BIPV2_BusHeader.File_BizHead).match_ult_flag(le.ult_flag,ri.ult_flag,FALSE));
     SELF.ult_flagWeight := (50+MAP (
            le.ult_flag = (TYPEOF(le.ult_flag))'' OR ri.ult_flag = (TYPEOF(ri.ult_flag))'' => 0,
            le.ult_flag = ri.ult_flag  => le.ult_flag_weight100,
@@ -557,4 +557,3 @@ IMPORT SALT37,BizLinkFull;
 #END
 ENDMACRO;
 END;
-

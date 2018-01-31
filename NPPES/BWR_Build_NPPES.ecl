@@ -1,4 +1,4 @@
-import Lib_FileServices, STRATA, ut, Roxiekeybuild, PromoteSupers, Orbit3;
+﻿import Lib_FileServices, STRATA, ut, Roxiekeybuild, PromoteSupers, Orbit3;
 export BWR_Build_NPPES(string version) := function
 #workunit('name','Yogurt:NPPES Build - ' + version);
 
@@ -175,7 +175,7 @@ build_Keys      := NPPES.proc_Build_Keys(version) :
 							
 build_stats := NPPES.out_STRATA_population_stats(version);
 
-orbit_update := Orbit3.proc_Orbit3_CreateBuild ('NPPES',version,'N');
+orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem('NPPES',(string)version,'N');
 
 dops_update := Roxiekeybuild.updateversion('NppesKeys',version,'Randy.Reyes@lexisnexis.com;Manuel.Tarectecan@lexisnexis.com',,'N'); 
 

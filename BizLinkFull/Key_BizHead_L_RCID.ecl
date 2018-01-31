@@ -1,4 +1,4 @@
-EXPORT Key_BizHead_L_RCID := MODULE
+﻿EXPORT Key_BizHead_L_RCID := MODULE
 IMPORT SALT28,ut,std;
 //rcid2
 EXPORT KeyName := BizLinkFull.Filename_keys.L_RCID;
@@ -74,3 +74,4 @@ IMPORT SALT28,BizLinkFull;
 #END
 ENDMACRO;
 END;
+

@@ -1,4 +1,4 @@
-/*
+﻿/*
   _Control.Config
     This attribute should be checked into each environment with its own values, like _Control.ThisEnvironment.
     
@@ -50,7 +50,8 @@ module
                                                               ,										 if(not pForMacroUse	,'thor400_dev'	,'\'thor400_dev\''  	)
                                                           )
       ,																										map( pHint = '20'			  => if(not pForMacroUse	,'thor400_20'			    ,'\'thor400_20\''			    )																												
-                                                              ,pHint = '60'			  => if(not pForMacroUse	,'thor400_60'			    ,'\'thor400_60\''			    )																												
+                                                              ,pHint = '60'			  => if(not pForMacroUse	,'thor400_66'			    ,'\'thor400_66\''			    )		
+                                                              ,pHint = '66'			  => if(not pForMacroUse	,'thor400_66'			    ,'\'thor400_66\''			    )		
                                                               ,pHint = '44'			  => if(not pForMacroUse	,'thor400_44'			    ,'\'thor400_44\''			    )																												
                                                               ,pHint = 'scoring'  => if(not pForMacroUse	,'thor400_44_scoring'	,'\'thor400_44_scoring\'' )																												
                                                               ,pHint = 'sla'			=> if(not pForMacroUse	,'thor400_44_sla'			,'\'thor400_44_sla\''			)																												

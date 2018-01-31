@@ -1,4 +1,4 @@
-IMPORT SALT33,ut,std;
+﻿IMPORT SALT33,ut,std;
 EXPORT Key_Classify_PS_DOB := MODULE
  
 //DOB:LNAME:?:FNAME:MNAME:+:ST:P_CITY_NAME:NAME_SUFFIX
@@ -87,8 +87,8 @@ EXPORT ScoredEID_HASHFetch(UNSIGNED4 param_DOB,TYPEOF(h.LNAME) param_LNAME = (TY
   RawData := RawFetch(param_DOB,param_LNAME,param_FNAME,param_MNAME);
  
   Process_PS_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 3; // Set bitmap for key used
-    SELF.keys_failed := IF(le.EID_HASH = 0, 1 << 3, 0); // Set bitmap for key failed
+    SELF.keys_used := 1 << 4; // Set bitmap for key used
+    SELF.keys_failed := IF(le.EID_HASH = 0, 1 << 4, 0); // Set bitmap for key failed
     SELF.DOBWeight_year := (50+MAP ( le.DOB_year = 0 OR ((UNSIGNED)param_DOB) DIV 10000 = 0 => 0,
        le.DOB_year = ((UNSIGNED)param_DOB) DIV 10000  => le.DOB_year_weight100,
        SALT33.Fn_YearMatch(le.DOB_year,((unsigned)param_DOB) DIV 10000,13)=> le.DOB_year_weight100-358, //YEAR_SHIFT
@@ -171,7 +171,7 @@ EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex) := FUN
  
   Process_PS_Layouts.LayoutScoredFetch Score_Batch(Key le,recs ri) := TRANSFORM
     SELF.Reference := ri.reference; // Copy reference field
-    SELF.keys_used := 1 << 3; // Set bitmap for key used
+    SELF.keys_used := 1 << 4; // Set bitmap for key used
     SELF.keys_failed := 0; // Set bitmap for key failed
     SELF.DOBWeight_year := (50+MAP ( le.DOB_year = 0 OR ((UNSIGNED)ri.DOB) DIV 10000 = 0 => 0,
        le.DOB_year = ((UNSIGNED)ri.DOB) DIV 10000  => le.DOB_year_weight100,

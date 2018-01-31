@@ -1,4 +1,4 @@
-this needs to be returning actual orgid and utlid (either as bonus fields or as idparents) - check mapping in Business_Header_SS.MAC_Match_Flex_V2, outfile20 join
+﻿this needs to be returning actual orgid and utlid (either as bonus fields or as idparents) - check mapping in Business_Header_SS.MAC_Match_Flex_V2, outfile20 join
 need another bagofwords option hacked in to j1 and jo of cnpname and _st? (should be ok if MOST used in bagofwords for cnpname)
 and might need to hack MatchBagOfWords out of the atmosts in some j0 and j1 (or thor wont compile)
 phone j0 and j1:  a) reduce atmost to 1000.  b) add phone 3 to atmost and recs filter and join condition (phone join TOO SLOW and adds very little value)
@@ -25,4 +25,4 @@ AT THE LAST MINUTE BEFORE CHECK IN:
 	syntax check TopBusiness_Services.BusinessSearch
 
 NOT CURRENTLY AN ISSUE BUT COULD BE WITH FUTURE LINKPATHS:
-	if you have something like fixed:zip and optional:cnp_name (to let it be fuzzy), then you will want to manually enforce that cnp_name is not blank			
+	if you have something like fixed:zip and optional:cnp_name (to let it be fuzzy), then you will want to manually enforce that cnp_name is not blank

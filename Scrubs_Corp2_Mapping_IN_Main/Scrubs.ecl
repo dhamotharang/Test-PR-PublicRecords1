@@ -1,4 +1,4 @@
-IMPORT ut,SALT34;
+﻿IMPORT ut,SALT34;
 IMPORT Scrubs,Scrubs_Corp2_Mapping_IN_Main; // Import modules for FieldTypes attribute definitions
 EXPORT Scrubs := MODULE
  
@@ -80,7 +80,7 @@ EXPORT FromNone(DATASET(Layout_in_file) h) := MODULE
     SELF.recordorigin_Invalid := Fields.InValid_recordorigin((SALT34.StrType)le.recordorigin);
     SELF := le;
   END;
-  EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE)):independent;
+  EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
   EXPORT ProcessedInfile := PROJECT(PROJECT(h,toExpanded(LEFT,TRUE)),Layout_in_file);
   Bitmap_Layout Into(ExpandedInfile le) := TRANSFORM
     SELF.ScrubsBits1 := ( le.dt_vendor_first_reported_Invalid << 0 ) + ( le.dt_vendor_last_reported_Invalid << 2 ) + ( le.dt_first_seen_Invalid << 4 ) + ( le.dt_last_seen_Invalid << 6 ) + ( le.corp_ra_dt_first_seen_Invalid << 8 ) + ( le.corp_ra_dt_last_seen_Invalid << 10 ) + ( le.corp_key_Invalid << 12 ) + ( le.corp_supp_key_Invalid << 14 ) + ( le.corp_vendor_Invalid << 15 ) + ( le.corp_state_origin_Invalid << 16 ) + ( le.corp_process_date_Invalid << 17 ) + ( le.corp_orig_sos_charter_nbr_Invalid << 19 ) + ( le.corp_legal_name_Invalid << 21 ) + ( le.corp_ln_name_type_cd_Invalid << 22 ) + ( le.corp_address1_effective_date_Invalid << 23 ) + ( le.corp_filing_date_Invalid << 25 ) + ( le.corp_status_cd_Invalid << 27 ) + ( le.corp_inc_state_Invalid << 28 ) + ( le.corp_inc_date_Invalid << 29 ) + ( le.corp_fed_tax_id_Invalid << 31 ) + ( le.corp_term_exist_cd_Invalid << 33 ) + ( le.corp_term_exist_exp_Invalid << 34 ) + ( le.corp_term_exist_desc_Invalid << 36 ) + ( le.corp_foreign_domestic_ind_Invalid << 37 ) + ( le.corp_forgn_state_cd_Invalid << 38 ) + ( le.corp_forgn_state_desc_Invalid << 39 ) + ( le.corp_forgn_date_Invalid << 40 ) + ( le.corp_orig_org_structure_cd_Invalid << 42 ) + ( le.corp_orig_org_structure_desc_Invalid << 43 ) + ( le.corp_for_profit_ind_Invalid << 44 ) + ( le.corp_acts_Invalid << 45 ) + ( le.cont_title1_desc_Invalid << 46 ) + ( le.corp_llc_managed_ind_Invalid << 47 ) + ( le.recordorigin_Invalid << 48 );
@@ -199,7 +199,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     corp_llc_managed_ind_ENUM_ErrorCount := COUNT(GROUP,h.corp_llc_managed_ind_Invalid=1);
     recordorigin_ENUM_ErrorCount := COUNT(GROUP,h.recordorigin_Invalid=1);
   END;
-  EXPORT SummaryStats := TABLE(h,r):independent;
+  EXPORT SummaryStats := TABLE(h,r);
   r := RECORD
     STRING10 Src;
     STRING FieldName;
@@ -248,7 +248,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,CHOOSE(le.corp_llc_managed_ind_Invalid,'ENUM','UNKNOWN')
           ,CHOOSE(le.recordorigin_Invalid,'ENUM','UNKNOWN'),'UNKNOWN'));
     SELF.FieldName := CHOOSE(c,'dt_vendor_first_reported','dt_vendor_last_reported','dt_first_seen','dt_last_seen','corp_ra_dt_first_seen','corp_ra_dt_last_seen','corp_key','corp_supp_key','corp_vendor','corp_state_origin','corp_process_date','corp_orig_sos_charter_nbr','corp_legal_name','corp_ln_name_type_cd','corp_address1_effective_date','corp_filing_date','corp_status_cd','corp_inc_state','corp_inc_date','corp_fed_tax_id','corp_term_exist_cd','corp_term_exist_exp','corp_term_exist_desc','corp_foreign_domestic_ind','corp_forgn_state_cd','corp_forgn_state_desc','corp_forgn_date','corp_orig_org_structure_cd','corp_orig_org_structure_desc','corp_for_profit_ind','corp_acts','cont_title1_desc','corp_llc_managed_ind','recordorigin','UNKNOWN');
-    SELF.FieldType := CHOOSE(c,'invalid_date','invalid_date','invalid_date','invalid_date','invalid_date','invalid_date','invalid_corp_key','invalid_supp_key','invalid_corp_vendor','invalid_state_origin','invalid_date','invalid_charter_nbr','invalid_mandatory','invalid_name_type_cd','invalid_date','invalid_date','invalid_status_cd','invalid_state_origin','invalid_date','invalid_fein','invalid_term_exist_cd','invalid_numblank','invalid_term_exist_desc','invalid_for_dom_ind','invalid_alphablank','invalid_alphablank','invalid_date','invalid_orig_org_structure_cd','invalid_alphaNum_sp','invalid_flag_code','invalid_alphaNum_sp','invalid_alphablank','invalid_llc_managed_cd','invalid_recordorigin','UNKNOWN');
+    SELF.FieldType := CHOOSE(c,'invalid_date','invalid_date','invalid_date','invalid_date','invalid_date','invalid_date','invalid_corp_key','invalid_supp_key','invalid_corp_vendor','invalid_state_origin','invalid_date','invalid_charter_nbr','invalid_mandatory','invalid_name_type_cd','invalid_date','invalid_date','invalid_status_cd','invalid_state_origin','invalid_future_date','invalid_fein','invalid_term_exist_cd','invalid_numblank','invalid_term_exist_desc','invalid_for_dom_ind','invalid_alphablank','invalid_alphablank','invalid_future_date','invalid_orig_org_structure_cd','invalid_alphaNum_sp','invalid_flag_code','invalid_alphaNum_sp','invalid_alphaNum_sp','invalid_llc_managed_cd','invalid_recordorigin','UNKNOWN');
     SELF.FieldContents := CHOOSE(c,(SALT34.StrType)le.dt_vendor_first_reported,(SALT34.StrType)le.dt_vendor_last_reported,(SALT34.StrType)le.dt_first_seen,(SALT34.StrType)le.dt_last_seen,(SALT34.StrType)le.corp_ra_dt_first_seen,(SALT34.StrType)le.corp_ra_dt_last_seen,(SALT34.StrType)le.corp_key,(SALT34.StrType)le.corp_supp_key,(SALT34.StrType)le.corp_vendor,(SALT34.StrType)le.corp_state_origin,(SALT34.StrType)le.corp_process_date,(SALT34.StrType)le.corp_orig_sos_charter_nbr,(SALT34.StrType)le.corp_legal_name,(SALT34.StrType)le.corp_ln_name_type_cd,(SALT34.StrType)le.corp_address1_effective_date,(SALT34.StrType)le.corp_filing_date,(SALT34.StrType)le.corp_status_cd,(SALT34.StrType)le.corp_inc_state,(SALT34.StrType)le.corp_inc_date,(SALT34.StrType)le.corp_fed_tax_id,(SALT34.StrType)le.corp_term_exist_cd,(SALT34.StrType)le.corp_term_exist_exp,(SALT34.StrType)le.corp_term_exist_desc,(SALT34.StrType)le.corp_foreign_domestic_ind,(SALT34.StrType)le.corp_forgn_state_cd,(SALT34.StrType)le.corp_forgn_state_desc,(SALT34.StrType)le.corp_forgn_date,(SALT34.StrType)le.corp_orig_org_structure_cd,(SALT34.StrType)le.corp_orig_org_structure_desc,(SALT34.StrType)le.corp_for_profit_ind,(SALT34.StrType)le.corp_acts,(SALT34.StrType)le.cont_title1_desc,(SALT34.StrType)le.corp_llc_managed_ind,(SALT34.StrType)le.recordorigin,'***SALTBUG***');
   END;
   EXPORT AllErrors := NORMALIZE(h,34,Into(LEFT,COUNTER));
@@ -279,7 +279,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'corp_filing_date:invalid_date:ALLOW','corp_filing_date:invalid_date:CUSTOM'
           ,'corp_status_cd:invalid_status_cd:ENUM'
           ,'corp_inc_state:invalid_state_origin:ENUM'
-          ,'corp_inc_date:invalid_date:ALLOW','corp_inc_date:invalid_date:CUSTOM'
+          ,'corp_inc_date:invalid_future_date:ALLOW','corp_inc_date:invalid_future_date:CUSTOM'
           ,'corp_fed_tax_id:invalid_fein:ALLOW','corp_fed_tax_id:invalid_fein:LENGTH'
           ,'corp_term_exist_cd:invalid_term_exist_cd:ENUM'
           ,'corp_term_exist_exp:invalid_numblank:ALLOW','corp_term_exist_exp:invalid_numblank:LENGTH'
@@ -287,12 +287,12 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
           ,'corp_foreign_domestic_ind:invalid_for_dom_ind:ENUM'
           ,'corp_forgn_state_cd:invalid_alphablank:ALLOW'
           ,'corp_forgn_state_desc:invalid_alphablank:ALLOW'
-          ,'corp_forgn_date:invalid_date:ALLOW','corp_forgn_date:invalid_date:CUSTOM'
+          ,'corp_forgn_date:invalid_future_date:ALLOW','corp_forgn_date:invalid_future_date:CUSTOM'
           ,'corp_orig_org_structure_cd:invalid_orig_org_structure_cd:ENUM'
           ,'corp_orig_org_structure_desc:invalid_alphaNum_sp:ALLOW'
           ,'corp_for_profit_ind:invalid_flag_code:ENUM'
           ,'corp_acts:invalid_alphaNum_sp:ALLOW'
-          ,'cont_title1_desc:invalid_alphablank:ALLOW'
+          ,'cont_title1_desc:invalid_alphaNum_sp:ALLOW'
           ,'corp_llc_managed_ind:invalid_llc_managed_cd:ENUM'
           ,'recordorigin:invalid_recordorigin:ENUM','UNKNOWN');
       SELF.ErrorMessage := CHOOSE(c

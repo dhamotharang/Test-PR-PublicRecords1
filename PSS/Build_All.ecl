@@ -1,4 +1,4 @@
-import tools,_control,VersionControl,roxiekeybuild, ut; 
+﻿import tools,_control,VersionControl,roxiekeybuild, ut, Orbit3; 
 
 export Build_All(
 	
@@ -9,6 +9,8 @@ export Build_All(
 ) :=
 module
 
+orbit_update := Orbit3.proc_Orbit3_CreateBuild ('Phone Status Service',pversion,'N');
+
 export full_build :=
 	sequential(
 	  spray(jobid)
@@ -17,6 +19,7 @@ export full_build :=
 		,Build_Strata(pversion, pIsTesting).all
 		,Promote(pversion).Built2QA
 		//,roxiekeybuild.updateversion('PSSKeys',pversion,'christopher.brodeur@lexisnexis.com',,'N')
+		,orbit_update
 		,output(Fn_Get_Report(pversion, pIsTesting),all, named('ReportAllRecords'))
 		,output(Fn_Get_Report(pversion, pIsTesting, ut.getdate[..6]),all, named('ReportCurrentMonth'))
 	) : success(Send_Emails(pversion,,not pIsTesting).Roxie), failure(send_emails(pversion,,not pIsTesting).buildfailure)

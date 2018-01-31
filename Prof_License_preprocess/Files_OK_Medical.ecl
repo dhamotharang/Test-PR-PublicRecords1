@@ -1,7 +1,7 @@
-EXPORT Files_OK_Medical := module
+﻿EXPORT Files_OK_Medical := module
 
-Layout_OK_raw := record                             
-   string ProfTYPE;                
+ Layout_OK_raw := record                             
+   //string ProfTYPE;                
    string  FIRSTNAME;              
    string  MIDDLENAME;             
    string  LASTNAME;               
@@ -30,7 +30,8 @@ Layout_OK_raw := record
    string  PRACTPROV;              
    string  PRACTCOUNTRY;           
    string  PractCounty;            
-   string  Practice_Phone;         
+   string  Practice_Phone;
+	 string LicType;
    string LicenseNum;              
    string IssueDate;               
    string DATEEXPIRE;              
@@ -47,16 +48,17 @@ Layout_OK_raw := record
 	 string Specialty5;
 	 string LastMedSch;
 	 string LastMedSchCity;
-	 string LastMedSchState; 
 	 string LastMedSchCountry; 
 	 string LastMedSchMFROM; 
 	 string LastMedSchYFROM;
 	 string LastMedSchMTo;
 	 string LastMedSchYTo;
 	 string MedSchDegree;
+	 string DiscCount;
+	 	 string DiscDate;
 	 string DiscAct;
+	 string Description;
 	 string Disc_Remarks;
-	 string DiscDate;
 	 string lf;
 
                        

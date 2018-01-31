@@ -12,9 +12,9 @@ module
 
 export proc_Build_Bases := sequential(			
 			PRTE2_BIPV2_BusHeader.proc_build_base_files(pversion).all
+		 ,PRTE2_BIPV2_BusHeader.Proc_build_Seleid_Relatives(pversion).all
 		 ,PRTE2_BIPV2_BusHeader.proc_build_Keys(pversion)
 		 ,PRTE2_BIPV2_BusHeader.proc_build_BizLinkFull_Keys(pversion)
-		 ,PRTE2_BIPV2_BusHeader.Seleid_Relative_Proc_Iterate('1').DoAll
 		 ,PRTE2_BIPV2_BusHeader.BIPV2_Best_Proc_Build(pversion)
 		 ,PRTE2_BIPV2_BusHeader.Proc_Build_HRCY_Keys(pversion)
 		 ,PRTE2_BIPV2_BusHeader.proc_build_BIP_business_contact(pversion).all
@@ -46,7 +46,8 @@ export update_dops_WeeklyKeys :=	iff(pShouldUpdateDOPS,
 export All := 
 	if(tools.fun_IsValidVersion(pversion)
 		,sequential(
-			  proc_Build_Bases			 
+				Create_Supers
+			 ,proc_Build_Bases			 
 			 ,update_dops_FullKeys
 			 ,update_dops_WeeklyKeys
 		 )

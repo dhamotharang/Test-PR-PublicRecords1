@@ -1,4 +1,4 @@
-/*2015-11-06T19:44:02Z (Krishna Gummadi)
+﻿/*2015-11-06T19:44:02Z (Krishna Gummadi)
 RRBug 193228 - Midex report upgrade changes
 */
 /*--SOAP--
@@ -57,7 +57,7 @@ EXPORT MidexReportService  :=
     #STORED( 'searchType',        ReportBy.searchType);
 	  #STORED( 'BDID',              ReportBy.BusinessId );
     #STORED( 'DID',               ReportBy.UniqueId);
-    #STORED( 'StartLoadDate',     iesp.ECL2ESP.DateToString(ReportBy.StartLoadDate));
+    #STORED( 'StartLoadDate',     iesp.ECL2ESP.t_DateToString8(ReportBy.StartLoadDate));
 		#STORED('DotID',							ReportBy.BusinessIds.DotID);
 		#STORED('EmpID',							ReportBy.BusinessIds.EmpID);
 		#STORED('POWID',							ReportBy.BusinessIds.POWID);

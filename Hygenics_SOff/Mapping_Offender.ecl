@@ -1,7 +1,7 @@
-#option('skipFileFormatCrcCheck', 1);
+﻿#option('skipFileFormatCrcCheck', 1);
 #option('maxLength', 131072);
 
-import lib_stringlib, lib_date, ut;
+import lib_stringlib, lib_date, ut, Std;
 
 //Join Defendant and AddressHistory Files
 ds_defend 	:= sort(distribute(hygenics_soff.Mapping_Defendant, hash(recordid)), recordid, local);
@@ -228,7 +228,7 @@ sorted_ds_dedupedAkaName_final 	:= sorted_ds_dedupedAkaName(~(trim(name_orig)='C
 //Added 60 Day Restriction to INDIANA Sourced Data///////////////////////////////////////////////////////////////////
 
 	ds_filter 	:= sorted_ds_dedupedAkaName_final(state_of_origin<>'IN'); 
-	ds_IN				:= sorted_ds_dedupedAkaName_final(state_of_origin='IN' and LIB_Date.DaysApart(src_upload_date,ut.GetDate )<=60);
+	ds_IN				:= sorted_ds_dedupedAkaName_final(state_of_origin='IN' and LIB_Date.DaysApart(src_upload_date,(STRING8)Std.Date.Today())<=60);
 											
 filtered_recs	:= ds_filter + ds_IN;
 

@@ -1,4 +1,4 @@
-export layout_in_sentence := record
+﻿export layout_in_sentence := record
 string40	RecordID;
 string2	  StateCode;
 string40	CaseID;
@@ -47,4 +47,5 @@ string10	ProbationMinMonths;
 string10	ProbationMinDays;
 string100	ProbationStatus;
 string100	SourceName;
+string20  sourceid;
 end;

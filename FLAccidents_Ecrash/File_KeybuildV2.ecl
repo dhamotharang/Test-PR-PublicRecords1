@@ -378,7 +378,7 @@ pflc_ss slimrec3(eFile L, unsigned1 cnt) := transform
 		self.vehicle_unit_number 						:= L.unit_number;
 		self.next_street 										:= l.next_street;
 		self.addl_report_number							:= if(l.source_id in ['TF','TM'],L.case_identifier,L.state_report_number);
-		self.agency_ori											:= IF (l.ori_number = 'FL0130600','FL0130000',l.ori_number); //MDPD ORI correction remove this code after the historical update completed successfully
+		self.agency_ori											:= l.ori_number;
 		self.Insurance_Company_Standardized := l.Insurance_Company_Standardized;
 		self.is_available_for_public				:= if(l.report_code in ['TF','EA'],'1',l.is_available_for_public);
 		self.report_status 									:= l.report_status;

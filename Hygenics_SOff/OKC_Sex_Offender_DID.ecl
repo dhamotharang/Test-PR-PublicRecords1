@@ -1,4 +1,4 @@
-import DID_Add, Header, Header_Slimsort, ut, Lib_Stringlib, WatchDog, didville, sexoffender, idl_header;
+﻿import DID_Add, Header, Header_Slimsort, ut, Lib_Stringlib, WatchDog, didville, sexoffender, idl_header;
 
 	Lay_OKC_Sex_Off_WithDID := record
 			Hygenics_SOff.Layout_OKC_Sex_Offender_Common.final;
@@ -446,7 +446,9 @@ Ds_OKC_Sex_Off_WithDidSsn := Project(Ds_OKC_Sex_Off_with_did_ssn,trf(left));
 									(l.ssn='178546978' and l.did='002074179303') or
 									(l.ssn='196364565' and l.did='000093428187') or
 									(l.ssn=''          and l.did='107007223771') or
-									(l.ssn='046561828' and l.did='000066048309'),
+									(l.ssn='046561828' and l.did='000066048309') or
+									(l.ssn='132663291' and l.did='002640241816') or
+									(l.ssn='623211738' and l.did='122113244666'),
 							'',
 							l.ssn);
 		self.did		:= if((l.ssn='353561176' and l.did='2275932305') or 
@@ -456,7 +458,9 @@ Ds_OKC_Sex_Off_WithDidSsn := Project(Ds_OKC_Sex_Off_with_did_ssn,trf(left));
 									(l.ssn='178546978' and l.did='002074179303') or
 									(l.ssn='196364565' and l.did='000093428187') or
 									(l.ssn=''          and l.did='107007223771') or
-									(l.ssn='046561828' and l.did='000066048309'),
+									(l.ssn='046561828' and l.did='000066048309') or
+									(l.ssn='132663291' and l.did='002640241816') or
+									(l.ssn='623211738' and l.did='122113244666'),
 							'',
 							l.did);
 		self.did_score	:= if((l.ssn='353561176' and l.did='2275932305') or 
@@ -466,7 +470,9 @@ Ds_OKC_Sex_Off_WithDidSsn := Project(Ds_OKC_Sex_Off_with_did_ssn,trf(left));
 									(l.ssn='178546978' and l.did='002074179303') or
 									(l.ssn='196364565' and l.did='000093428187') or
 									(l.ssn=''          and l.did='107007223771') or
-									(l.ssn='046561828' and l.did='000066048309'),
+									(l.ssn='046561828' and l.did='000066048309') or
+									(l.ssn='132663291' and l.did='002640241816') or
+									(l.ssn='623211738' and l.did='122113244666'),
 							'',
 							l.did_score);
 		self 			:= l;
