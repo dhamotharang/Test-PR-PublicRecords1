@@ -52,6 +52,7 @@
 
   <!-- Full File Disclosure -->	
   <part name="FFDOptionsMask" 	      type="xsd:string"/>
+  <part name="FCRAPurpose" type="xsd:string"/>
 
 	<!-- Record management -->
 	<part name="MaxResults"					type="xsd:unsignedInt"/>
@@ -85,7 +86,6 @@
 <tr><td>true</td><td>false</td><td>zip, zilch, zero, zippo, zot, ...</td></tr>
 </table>
 */
-/*--USES-- ut.input_xslt */
 import FCRA;
 
 export SearchServiceFCRA() := macro

@@ -3,6 +3,7 @@
 	<part name="DID"         type="xsd:string"/>
 	<part name="GLBPurpose"	 type="xsd:byte"/>
 	<part name="DPPAPurpose" type="xsd:byte"/>
+	<part name="FCRAPurpose" type="xsd:string"/>
 	<part name="ApplicationType"     	type="xsd:string"/>
   <part name="SSNMask"     type="xsd:string"/>	<!-- [NONE, ALL, LAST4, FIRST5] -->
 	<part name="FFDOptionsMask"      type="xsd:string"/>
@@ -17,8 +18,8 @@
 					 -2: co-owners are blanked and lname is overriden with value "FCRA Restricted"<br/>
 					 -3: co-owners are suppressed<p/>
 					 The default behavior for NonSubjectSuppression is 2.*/
-/*--USES-- ut.input_xslt */
 IMPORT STD;
+
 export WatercraftReportServiceFCRA := macro
 	
 	gm := AutoStandardI.GlobalModule(true);
@@ -31,6 +32,7 @@ export WatercraftReportServiceFCRA := macro
 		export unsigned2 pt 			:= 10;
 		export integer1 non_subject_suppression := nss;
 		export integer8 FFDOptionsMask := FFD.FFDMask.Get();
+		export integer  FCRAPurpose := FCRA.FCRAPurpose.Get();
 	END;
 	
 	report_recs := watercraftV2_Services.WatercraftReport(params, true);
