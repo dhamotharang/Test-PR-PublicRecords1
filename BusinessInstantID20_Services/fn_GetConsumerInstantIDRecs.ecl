@@ -123,8 +123,10 @@ EXPORT fn_GetConsumerInstantIDRecs( DATASET(BusinessInstantID20_Services.layouts
 
 			unsigned2 EverOccupant_PastMonths := 0 : stored('EverOccupant_PastMonths');
 			unsigned4 EverOccupant_StartDate  := 99999999 : stored('EverOccupant_StartDate');
-			unsigned3 LastSeenThresholdIn     := Risk_Indicators.iid_constants.oneyear : stored('LastSeenThreshold');
 			boolean   IncludeNAPData          := false : stored('IncludeNAPData');
+
+			unsigned3 LastSeenThresholdIn_pre := 0 : stored('LastSeenThreshold');
+			unsigned3 LastSeenThresholdIn := IF( LastSeenThresholdIn_pre = 0, Risk_Indicators.iid_constants.oneyear, LastSeenThresholdIn_pre );
 
 			// they want this customizable, so instead of doing an incremental ranking, use 1 or 0 for each element
 				// everything defaulted to off would be '0000000'  
