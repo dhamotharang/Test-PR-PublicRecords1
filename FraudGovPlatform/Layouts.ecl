@@ -1,9 +1,9 @@
-﻿import Address , bipv2, Inquiry_Acclogs, corrections,FraudShared;
+﻿import Address , bipv2, Inquiry_Acclogs, corrections,FraudShared, NAC;
 
-export Layouts := MODULE
+EXPORT Layouts := MODULE
 
-	export Sprayed := module
-		export IdentityData := RECORD
+	EXPORT Sprayed := module
+		EXPORT IdentityData := RECORD
 			string		Customer_Name;  
 			string20	Customer_Account_Number;
 			string2		Customer_State;
@@ -19,10 +19,10 @@ export Layouts := MODULE
 			unsigned6	LexID;
 			string60	Full_Name;
 			string5		Title;
-			string25	First_name;
-			string25	Middle_Name;
-			string30	Last_Name;
-			string5		Suffix;
+			string100	First_name;
+			string60	Middle_Name;
+			string100	Last_Name;
+			string10	Suffix;
 			string9		SSN;
 			string4		SSN4;
 			string10	Address_Type;
@@ -65,7 +65,7 @@ export Layouts := MODULE
 			string11	geo_long; 
 		END;
 		
-		export KnownFraud := RECORD
+		EXPORT KnownFraud := RECORD
 			string		customer_name;
 			string20	customer_account_number;
 			string2		customer_state;
@@ -141,7 +141,7 @@ export Layouts := MODULE
 			string8		ip_address_date;
 			string10	version;
 			string75	isp;
-			string12	device_id;
+			string50	device_id;
 			string8		device_date;
 			string60	device_risk_code;
 			string20	unique_number;
@@ -186,64 +186,118 @@ export Layouts := MODULE
 			string		reason_cleared_code;
 		END;
 
-		export validate_record := record
-			string 		Customer_Name								 		:= '';
-			string20 	Customer_Account_Number			 		:= '';
-			string2 	Customer_State 									:= '';
-			string3		customer_county 								:= '';
-			string		customer_agency 								:= '';
-			string 		Customer_Agency_Vertical_Type 	:= '';
-			string1 	Customer_Program 								:= '';
-			string		Customer_Job_ID 								:= '';
-			string		Batch_Record_ID 								:= '';
-			string		Reason_for_Transaction_Activity	:= '';
-			string10	Date_of_Transaction							:= '';
-			string20	customer_event_id 							:= '';
-			string8		reported_date 									:= '';
-			string10	reported_time 									:= '';
-			string30	reported_by 										:= '';
-			string20	lexid 													:= '';
-			string25 	First_name 											:= '';
-			string30 	Last_Name 											:= '';
-			string9 	SSN 														:= '';
-			string10 	phone_number 										:= '';
-			string10 	Cell_Phone 											:= '';
-			string2 	State 													:= '';
-			string9 	Zip 														:= '';
-			string2 	Mailing_State 									:= '';
-			string9 	Mailing_Zip 										:= '';
-			string10	Address_Type 										:= '';
-			string8 	dob  														:= '';
-			string25	Drivers_License_Number					:= '';
-			string2		Drivers_License_State						:= '';			
+		EXPORT InquiryLogs := RECORD
+			unsigned6	InqLog_ID;
+			string20	Client_ID;
+			string		Transaction_ID_Number;
+			string10	Date_of_Transaction;
+			string20	Case_ID;
+			unsigned6	client_uid;
+			string1		Customer_Program;
+			string		Reason_for_Transaction_Activity;
+			string100	inquiry_source;
+			string3		customer_county;
+			string2		customer_state;
+			string		customer_agency_vertical_type;
+			string10	ssn;
+			string10	dob;
+			unsigned6	lexid;
+			string100	full_name;
+			string50	title;
+			string100	first_name;
+			string60	middle_name;
+			string100 last_name;
+			string10	suffix;
+			string  	full_address;
+			string100	physical_address;
+			string100	city;
+			string10	state;
+			string10	zip;
+			string3		county;
+			string100	mailing_address;
+			string30	mailing_city;
+			string2		mailing_state;
+			string9		mailing_zip;
+			string3		mailing_county;
+			string10	phone_number;
+			unsigned6	ultid;
+			unsigned6	orgid;
+			unsigned6	seleid;
+			string10	tin;
+			string256	Email_Address;
+			unsigned6	appended_provider_id;
+			unsigned6	lnpid;
+			string10	npi;
+			string25	ip_address;
+			string50	device_id;
+			string12	professional_id;
+			string20	bank_routing_number_1;
+			string20	bank_account_number_1;
+			string2		Drivers_License_State;
+			string25	Drivers_License_Number;
+			string10	geo_lat;
+			string11	geo_long;
+			string14	reported_date;			
 		END;
+	
+		EXPORT validate_record := record
+			string20	Client_ID	:= '';
+			string2 	Customer_State	:= '';
+			string3		customer_county	:= '';
+			string 		Customer_Agency_Vertical_Type	:= '';
+			string1 	Customer_Program	:= '';
+			string8		reported_date	:= '';
+			string20	lexid	:= '';
+			string100	full_name	:= '';
+			string25 	First_name	:= '';
+			string30 	Last_Name	:= '';
+			string9 	SSN	:= '';
+			string  	full_address	:= '';
+			string100	physical_address	:= '';
+			string100	physical_address_1	:= '';
+			string100	city	:= '';
+			string2 	State	:= '';
+			string9 	Zip	:= '';
+			string25	Drivers_License_Number	:= '';
+			string2		Drivers_License_State	:= '';			
+		END;
+		
+		
 	END;
 
-	export vLoad := {string75 fn { virtual(logicalfilename)},Sprayed.IdentityData};
+	EXPORT vLoad := {string75 fn { virtual(logicalfilename)},Sprayed.IdentityData};
 
-	export Provenance := RECORD
-				string75 FileName:=''
-				,unsigned4 ProcessDate:=0
-				,unsigned4 FileDate:=0
-				,string6   FileTime:=''
-				,unsigned6 PrepRecNo:=0
-				,unsigned6 PrepRecSeq:=0	
+	EXPORT Provenance := RECORD
+				string75 FileName	:=''
+				,unsigned4 ProcessDate	:=0
+				,unsigned4 FileDate	:=0
+				,string6   FileTime	:=''
+				,unsigned6 PrepRecNo	:=0
+				,unsigned6 PrepRecSeq	:=0	
 	END;
 	
-	export Input := module
-		export IdentityData := RECORD
+	EXPORT Input := module
+		EXPORT IdentityData := RECORD
 				Sprayed.IdentityData;
 				Provenance;
 		END;
-		export KnownFraud := RECORD
+		EXPORT KnownFraud := RECORD
 				Sprayed.KnownFraud;
 				Provenance;
 		END;
-	end;
+		EXPORT InquiryLogs := RECORD
+				Sprayed.InquiryLogs;
+				Provenance;
+		END;	
+		EXPORT NAC := RECORD
+				NAC.Layouts.MSH;
+				Provenance;
+		END;		
+	END;
 
 
 EXPORT Base := MODULE
-	export IdentityData	:= 
+	EXPORT IdentityData	:= 
 		record 
 		Sprayed.IdentityData ;
 		string100		address_1 ;   
@@ -260,9 +314,9 @@ EXPORT Base := MODULE
 		string100		Source; 
 		unsigned8		source_rec_id;
 		unsigned8		Unique_Id ; 
-	end; 
+	END; 
 	
-	export KnownFraud	:= 
+	EXPORT KnownFraud	:= 
 		record 
 		Sprayed.KnownFraud ;
 		string100		address_1 ;   
@@ -280,6 +334,26 @@ EXPORT Base := MODULE
 		unsigned8		source_rec_id;
 		unsigned8		Unique_Id ; 
 	END;
+
+	EXPORT InquiryLogs	:= 
+		record 
+		Sprayed.InquiryLogs ;
+		string100		address_1 ;   
+		string50		address_2 ; 
+		Address.Layout_Clean_Name	cleaned_name;         
+		string			current ; 
+		unsigned4		dt_first_seen;
+		unsigned4		dt_last_seen;
+		unsigned4		dt_vendor_first_reported;
+		unsigned4		dt_vendor_last_reported;
+		unsigned2		name_ind:=0;
+		unsigned8		NID:=0;
+		unsigned4		process_date ; 
+		string100		Source; 
+		unsigned8		source_rec_id;
+		unsigned8		Unique_Id ; 
+	END;	
+	
 END;
 
 END;
