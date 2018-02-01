@@ -725,7 +725,8 @@ string2 FP1607_1_0_reason4 := '';
 string2 FP1607_1_0_reason5 := '';
 string2 FP1607_1_0_reason6 := '';
 
-
+string3 FP1712_0_0_score := '';
+string2 FP1712_0_0_reason1 := '';
 
 String3 FP31105_1_0_score := '';
 string2 FP31105_1_0_reason1 := '';

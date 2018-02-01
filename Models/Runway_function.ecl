@@ -1571,11 +1571,21 @@ self.FP1607_1_0_reason6 := if(exclude_reasons, '',  right.ri[6].hri);
 self := left), keep(1), left outer);
 // output(with_FP1607_1_0, named('with_FP1607_1_0'));
 
+FP1712_0_0_score := Models.FP1712_0_0	( ungroup(clam), 1);
+// output(FP1712_0_0_score, named('FP1712_0_0_score'));
+
+with_FP1712_0_0	:= join(with_FP1607_1_0, FP1712_0_0_score,
+left.seq=right.seq,
+transform(Models.layout_Runway,
+self.FP1712_0_0_score := right.score;
+self.FP1712_0_0_reason1 := if(exclude_reasons, '',  right.ri[1].hri);
+self := left), keep(1), left outer);
+// output(with_FP1712_0_0, named('with_FP1712_0_0'));
 
 FP1406_1_0_score := Models.FP1406_1_0( ungroup(clam), 6);
 // output(FP1406_1_0_score, named('FP1406_1_0_score'));
 
-with_FP1406_1_0	:= join(with_FP1607_1_0, FP1406_1_0_score,
+with_FP1406_1_0	:= join(with_FP1712_0_0, FP1406_1_0_score,
 left.seq=right.seq,
 transform(Models.layout_Runway,
 self.fp1406_1_0_score := right.score;
@@ -5064,6 +5074,9 @@ self.FP1606_1_0_reason3	:= if(model_environment in [1,3], left.FP1606_1_0_reason
 self.FP1606_1_0_reason4	:= if(model_environment in [1,3], left.FP1606_1_0_reason4	, '');
 self.FP1606_1_0_reason5	:= if(model_environment in [1,3], left.FP1606_1_0_reason5	, '');
 self.FP1606_1_0_reason6	:= if(model_environment in [1,3], left.FP1606_1_0_reason6	, '');
+
+self.FP1712_0_0_score	:= if(model_environment in [1,3], left.FP1712_0_0_score	, '');
+self.FP1712_0_0_reason1	:= if(model_environment in [1,3], left.FP1712_0_0_reason1	, '');
 
 self.FP1406_1_0_score	:= if(model_environment in [1,3], left.FP1406_1_0_score	, '');
 self.FP1406_1_0_reason1	:= if(model_environment in [1,3], left.FP1406_1_0_reason1	, '');
