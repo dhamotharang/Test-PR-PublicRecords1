@@ -230,9 +230,7 @@ dSuppressRecs				:=
 	//	LNK-575	Alive Consumer marked as deceased
 		{/*'001146418435'*/'', 100, '19990501', 'A', 'A', '482563467', 'HOFFMAN             ', '    ', 'SANDRA         ', '               ', ' ', '19861100', '19571206', '23', '48640', '     ', 'MI', '111', '  ', 'N', 'SSA', /*'482563467H861100'*/'', 'DE', 'N'},
 	//	LNK-447	Health Equity - Olugbenga Fadare
-    {'191961589382', 100, '20170707', ' ', ' ', '         ', 'FADARE              ', '    ', 'OLUGBENGA      ', '               ', ' ', '        ', '19860830', '39', '44118', '     ', 'OH', '035', '  ', 'N', 'TUN', /*'191961589382FTUN'*/'', 'TN', 'Y'},
-	//	LNK-679	Health Equity - Margaret McCauley
-    {/*'001651592818'*/'', 99, '20130524', ' ', ' ', '         ', 'MC CAULEY           ', '    ', 'MARGARET       ', '               ', ' ', '20101220', '19161028', '39', '44138', '     ', 'OH', '035', '  ', 'Y', 'OHI', 'OH00000001252126', 'D@', 'N'}
+    {'191961589382', 100, '20170707', ' ', ' ', '         ', 'FADARE              ', '    ', 'OLUGBENGA      ', '               ', ' ', '        ', '19860830', '39', '44118', '     ', 'OH', '035', '  ', 'N', 'TUN', /*'191961589382FTUN'*/'', 'TN', 'Y'}
 	], Header.Layout_Did_Death_MasterV3);
 
 EXPORT	File_Death_Master_Suppression	:=	dSuppressRecs;

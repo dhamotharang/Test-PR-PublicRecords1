@@ -1130,6 +1130,8 @@
 				trim(kword, left, right) = 'USCFPB' =>SubGroup_Constants.numKeywordsID.KEYWORD_USCFPB,
 				trim(kword, left, right) = 'TWMOJ' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWMOJ,
 				trim(kword, left, right) = 'EU-VE' =>SubGroup_Constants.numKeywordsID.KEYWORD_EU_VE,
+				trim(kword, left, right) = 'RSSRE-DIR4-WC' =>SubGroup_Constants.numKeywordsID.KEYWORD_RSSRE_DIR4_WC,
+				trim(kword, left, right) = 'MYRMP' =>SubGroup_Constants.numKeywordsID.KEYWORD_MYRMP,
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
 				SubGroup_Constants.numKeywordsID.KEYWORD_NO_VALUE);

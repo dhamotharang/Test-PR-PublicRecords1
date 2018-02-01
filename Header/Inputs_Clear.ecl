@@ -1,4 +1,4 @@
-﻿export Inputs_Clear(boolean incremental=FALSE) := sequential(
+export Inputs_Clear(boolean incremental=FALSE) := sequential(
 fileservices.RemoveOwnedSubFiles('~thor_data400::BASE::dl2::DLHeader_Building',true)
 ,fileservices.RemoveOwnedSubFiles('~thor_data400::base::emergesHeader_Building',true)
 ,fileservices.RemoveOwnedSubFiles('~thor_data400::Base::AKHeader_Building',true)
@@ -26,7 +26,6 @@ fileservices.RemoveOwnedSubFiles('~thor_data400::BASE::dl2::DLHeader_Building',t
 ,fileservices.RemoveOwnedSubFiles('~thor_data400::Base::WatercraftCGHeader_Building',true)
 ,fileservices.RemoveOwnedSubFiles('~thor_data400::Base::DeaHeader_Building',true)
 ,fileservices.RemoveOwnedSubFiles('~thor_data400::Base::ASLHeader_Building',true)
-,fileservices.RemoveOwnedSubFiles('~thor_data400::Base::OKC_SLHeader_Building',true)
 ,fileservices.RemoveOwnedSubFiles('~thor_data400::BASE::LN_PropV2AddlDeedHeader_Building',true)
 ,fileservices.RemoveOwnedSubFiles('~thor_data400::BASE::LN_PropV2AddlAssessHeader_Building',true)
 ,fileservices.RemoveOwnedSubFiles('~thor_data400::BASE::Voters_Header_Building',true)
@@ -70,7 +69,6 @@ fileservices.RemoveOwnedSubFiles('~thor_data400::BASE::dl2::DLHeader_Building',t
 ,fileservices.clearsuperfile('~thor_data400::Base::WatercraftCGHeader_Building')
 ,fileservices.clearsuperfile('~thor_data400::Base::DeaHeader_Building')
 ,fileservices.clearsuperfile('~thor_data400::Base::ASLHeader_Building')
-,fileservices.clearsuperfile('~thor_data400::Base::OKC_SLHeader_Building')
 ,fileservices.clearsuperfile('~thor_data400::BASE::LN_PropV2AddlDeedHeader_Building')
 ,fileservices.clearsuperfile('~thor_data400::BASE::LN_PropV2AddlAssessHeader_Building')
 ,fileservices.clearsuperfile('~thor_data400::BASE::Voters_Header_Building')
