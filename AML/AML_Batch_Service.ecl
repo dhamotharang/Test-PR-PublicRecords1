@@ -1,4 +1,4 @@
-IMPORT iesp, Risk_indicators, Riskwise, address, Business_risk, AutoStandardI, gateway;
+﻿IMPORT iesp, Risk_indicators, Riskwise, address, Business_risk, AutoStandardI, gateway;
 
 EXPORT AML_Batch_Service() := FUNCTION
 
@@ -9,7 +9,7 @@ EXPORT AML_Batch_Service() := FUNCTION
                 'AttributesVersion',
                 'IncludeNewsProfile',
                 'DataRestriction',
-								'DataPermissionMask',
+																'DataPermissionMask',
                 'gateways'
                 ));
 
@@ -109,7 +109,7 @@ consumerAttributesV2 := AML.getAMLAttributesV2(iid_prep,
 																						 IncludeNewsProfile
 																						 );  
 																				 
-	Layouts.AMLBatchOut IndMapOut(consumerAttributesV1 le, wseq ri) := TRANSFORM
+	AML.Layouts.AMLBatchOut IndMapOut(consumerAttributesV1 le, wseq ri) := TRANSFORM
 	self.acctNo   										 := ri.acctNo;
 	self.IndCitizenshipIndex   				 := le.AMLAttributes.IndCitizenshipIndex;
 	self.IndMobilityIndex     				 := le.AMLAttributes.IndMobilityIndex;
@@ -131,7 +131,7 @@ INDIndexV1 := join(consumerAttributesV1, IndRecs,
 						left.seq = right.seq, 
 						IndMapOut(left, right), left outer);  
 																						 
-	Layouts.AMLBatchOut IndMapOutV2(consumerAttributesV2 le, wseq ri) := TRANSFORM
+	AML.Layouts.AMLBatchOut IndMapOutV2(consumerAttributesV2 le, wseq ri) := TRANSFORM
 	self.acctNo   										 	  := ri.acctNo;
 	self.IndHighValueAssetsV2   				 	:= le.IndHighValueAssets;
 	self.IndAccessToFundsV2     				 	:= le.IndAccessToFunds;
@@ -149,6 +149,7 @@ INDIndexV1 := join(consumerAttributesV1, IndRecs,
   self.IndProfessionalRiskV2          	:= le.IndProfessionalRisk;
   self.IndBusExecOffAssocRiskV2      		:= le.IndBusExecOffAssocRisk;
 	self.RoyaltySrc                    		:= '0';
+	self.lexID := le.DID;
 	self := [];
 END;
 
@@ -217,7 +218,7 @@ busInput := project(BusRecs,into_input(LEFT));
 																												UseXG5,
 																												IncludeNewsProfile)); 
 														 
-Layouts.AMLBatchOut BusMapOut(businessResultsV1 le, BusRecs ri) := TRANSFORM
+AML.Layouts.AMLBatchOut BusMapOut(businessResultsV1 le, BusRecs ri) := TRANSFORM
 	self.acctNo   							:= ri.acctNo;
 	self.BusValidityIndex				:=  le.BusValidityIndex;
 	self.BusStabilityIndex			:=  le.BusStabilityIndex;
@@ -236,7 +237,7 @@ BusIndexV1 := join(businessResultsV1, BusRecs,
 								left.seq = right.seq, 
 								BusMapOut(left, right), left outer); 
 
-Layouts.AMLBatchOut BusMapOutV2(businessResultsV2 le, BusRecs ri) := TRANSFORM
+AML.Layouts.AMLBatchOut BusMapOutV2(businessResultsV2 le, BusRecs ri) := TRANSFORM
 	self.acctNo   							:= ri.acctNo;
 	self.BusHighValueAssetsV2    := le.BusHighValueAssets;
 	self.BusAccessToFundsV2      := le.BusAccessToFunds;
