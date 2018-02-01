@@ -1,6 +1,6 @@
-﻿import ut,ak_perm_fund,utilfile,vehiclev2,bankrupt,mdr,driversv2,emerges,
+import ut,ak_perm_fund,utilfile,vehiclev2,bankrupt,mdr,driversv2,emerges,
        atf,prof_license,govdata,mdr,faa,dea,watercraft,property,targus,
-       LiensV2,ln_propertyv2,american_student_list,OKC_Student_List,votersv2,certegy,
+       LiensV2,ln_propertyv2,american_student_list,votersv2,certegy,
 	   ExperianCred,ExperianIRSG_Build,address,eq_hist, TransunionCred, AlloyMedia_student_list,header,Std;
 
 export New_Header_Records(boolean pFastHeader = false) := function
@@ -30,7 +30,6 @@ use_ln_tu := true;
 use_targus := true;
 use_liensv2 := true;
 use_asl := true;
-use_osl := true;
 use_voters := true;
 use_certegy := true;
 use_nod := true;
@@ -89,8 +88,6 @@ liens_v2 := if(pFastHeader, LiensV2.LiensV2_as_header(pFastHeader:=true)(use_lie
 
 asl_in := american_student_list.asl_as_header(,true)(use_asl);
 
-osl_in := okc_student_list.OKC_Student_List_as_header(,true)(use_osl);
-
 voters_in := votersv2.voters_as_header(,true)(use_voters);
 
 certegy_in := Certegy.As_header(,true)(use_certegy);
@@ -132,7 +129,6 @@ concat0 := if(~pFastHeader,
 		 + targus_wp 
 		 + liens_v2 
 		 + asl_in 
-     + osl_in
 		 + voters_in
 		 + certegy_in
 		 +nod_in
