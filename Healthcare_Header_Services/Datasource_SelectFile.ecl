@@ -1,3 +1,6 @@
+/*2018-02-01T01:11:27Z (HABBU, JAIDEEP (RIS-BCT))
+checkin changes as per RR-12063
+*/
 Import Enclarity,ut,doxie_files,codes,Ingenix_NatlProf,Enclarity_Facility_Sanctions;
 /*Changes for RR11959*/
 EXPORT Datasource_SelectFile := MODULE
@@ -498,10 +501,10 @@ EXPORT Datasource_SelectFile := MODULE
 			// output(mergedRecs,named('mergewithBase'),overwrite);
 			// updateFEIN := join(baseRecs(min(names,namepenalty) < Healthcare_Header_Services.Constants.BUS_NAME_MATCH_THRESHOLD),fein_rolled,left.acctno=right.acctno,transform(Layouts.CombinedHeaderResults, self.feins:=dedup(sort(left.feins+right.childinfo,record),record);self:=left;self:=[];),left outer,keep(Constants.MAX_RECS_ON_JOIN), limit(0));
 			updateFEIN := join(mergedRecs,fein_rolled,left.acctno=right.acctno and left.lnpid=right.providerid,transform(Healthcare_Header_Services.layouts.CombinedHeaderResults, self.feins:=dedup(sort(left.feins+right.childinfo,record),record);self:=left;self:=[];),left outer,keep(Healthcare_Header_Services.Constants.MAX_RECS_ON_JOIN), limit(0));
-			updateSanctions := project(updateFEIN,transform(Healthcare_Header_Services.layouts.CombinedHeaderResults,
-																										sanctionLookup := appendSanctionLookupStep1(left.Sanctions(sanc1_code <> ''));
-																										StateSanctions := left.Sanctions(sanc1_code = '');
-																										FinalSanctions := appendSanctionGroup(sanctionLookup+StateSanctions);
+			updateSanctions := project(updateFEIN+getSanctionRecords,transform(Healthcare_Header_Services.layouts.CombinedHeaderResults,
+																										//sanctionLookup := appendSanctionLookupStep1(left.Sanctions);
+																										StateSanctions := left.Sanctions;
+																										FinalSanctions := appendSanctionGroup(StateSanctions);
 																										self.Sanctions := FinalSanctions;
 																										self.LegacySanctions := Functions.buildLegacySanctionRecord(left,FinalSanctions);
 																										self := Left));
@@ -509,22 +512,11 @@ EXPORT Datasource_SelectFile := MODULE
 																															self.TaxID:=left.userTaxID; self.UPIN:=left.userUPIN;self.NPI:=left.userNPI;
 																															self.DEA:=left.userDEA;self.fein:=left.userfein;self:=left));
 
-			filterRec := Functions.doPenalty(updateSanctions+getSanctionRecords,dedup(sort(getInput,acctno),acctno),10);
+			filterRec := Functions.doPenalty(updateSanctions,dedup(sort(getInput,acctno),acctno),10);
 			facilities_final_sorted := sort(filterRec, acctno, SrcId, Src,vendorid);
 			facilities_final_grouped := group(facilities_final_sorted, acctno, SrcId, Src,vendorid);
 			facilities_rolled := rollup(facilities_final_grouped, group, Transforms.doSelectFileFacilitiesBaseRecordSrcIdRollup(left,rows(left)));			
-			// output(input);
-			// output(getSanctionRecords);
-			// output(rawdataFacilities,named('rawdataFacilities'));
-			// output(noHits,named('noHits'));
-			// output(rawdataFacilitiesbyVendorid,named('rawdataFacilitiesbyVendorid'), overwrite);
-			// output(baseRecs,named('baseRecs'), overwrite);
-			// output(getFEIN,named('getFEIN'), overwrite);
-			// output(fein_rolled,named('fein_rolled'), overwrite);
-			// output(updateFEIN,named('updateFEIN'), overwrite);
-			// output(updateSanctions,named('updateSanctions'), overwrite);
-			// output(facilities_rolled,named('facilities_rolled'), overwrite);
-		return facilities_rolled;
+     return facilities_rolled;
 	end;
 
 	Export get_selectfile_entity (dataset(Healthcare_Header_Services.layouts.searchKeyResults_plus_input) input,dataset(Healthcare_Header_Services.layouts.common_runtime_config) cfg):= function
@@ -554,6 +546,8 @@ EXPORT Datasource_SelectFile := MODULE
 			// output(providers_final_grouped);
 			providers_rolled := rollup(providers_final_grouped, group, Transforms.doSelectFileProvidersBaseRecordSrcIdRollup(left,rows(left)));			
 			// output(providers_rolled);
+		
+			 
 			return providers_rolled;//Only one should ever get populated
 	end;
 
