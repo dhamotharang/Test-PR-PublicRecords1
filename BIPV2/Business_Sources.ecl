@@ -45,7 +45,7 @@ Business_Sources1 :=
   // + BusData.SKA_As_Business_Linking  //on blacklist of ingest sources, filtered out completely
   + Business_Credit.Business_Credit_As_Business_Linking
   + BusReg.BusReg_As_Business_Linking(false).Busreg  //*** set to false to use the dataland base files for input.
-  // + CClue.As_Business_Linking()  //comment out in january 2018 build because of possible source rid issue
+  + CClue.As_Business_Linking()  //comment out in january 2018 build because of possible source rid issue
   + Corp2.Corp2_As_Business_Linking()
   // + CrashCarrier.As_Business_Linking       //on blacklist of ingest sources, filtered out completely
   + Credit_Unions.as_business_linking(FALSE)
@@ -53,7 +53,7 @@ Business_Sources1 :=
   + DEA.DEA_As_Business_Linking
   + DNB_DMI.As_Business_Linking()
   + DNB_FEINV2.DNB_FEIN_As_Business_Linking			//***Business info only, no contacts
-  // + EBR.EBR_As_Business_Linking            // comment out in january 2018 because of big increase in new records.
+  + EBR.EBR_As_Business_Linking            // comment out in january 2018 because of big increase in new records.
   + Experian_CRDB.As_Business_Linking()
   + Experian_FEIN.As_Business_Linking()
   + FAA.faa_aircraft_reg_as_business_linking
