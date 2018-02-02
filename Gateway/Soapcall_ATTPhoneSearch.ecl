@@ -15,7 +15,8 @@ iesp.att_iap.t_ATTIapQueryRequest populateATTSearch({STRING10 phone} L):= TRANSF
 	SELF.SearchBy.Query.InformationRetrievalService.IncludeCarrierName := TRUE;
 	SELF.SearchBy.Query.InformationRetrievalService.IncludeCategory := TRUE;
 	SELF.SearchBy.Query.InformationRetrievalService.IncludeLocalAccessAndTransport := TRUE;
-	SELF.SearchBy.Query.InformationRetrievalService.IncludeCityState := TRUE;
+	//IncludeCityState was deactivated for RR-12047.
+	//SELF.SearchBy.Query.InformationRetrievalService.IncludeCityState := TRUE;
 	SELF.Options.QueryType := Phones.Constants.GatewayValues.QueryType_ATT_DQ_IRS;
 	//This was added per project requirements but may be removed later.
 	SELF.Options.ProductName := queryName;
