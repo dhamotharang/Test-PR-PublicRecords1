@@ -72,7 +72,7 @@ rvBank5 := models.RVB1503_0_0(bsdata);
 rvAuto5 := models.RVA1503_0_0(bsdata);
 rvTelecom5 := models.RVT1503_0_0(bsdata);
 rvMoney5 := models.RVG1502_0_0(bsdata);
-rvCrossInd5 := models.RVS1706_0_0(bsdata);
+rvCrossInd5 := models.RVS1706_0_2(bsdata); 
 
 Layout_Boca_Shell doModels(Layout_Boca_Shell le, Models.Layout_ModelOut ri, integer i) := transform
 	self.rv_scores.auto := if(i=1, ri.score, le.rv_scores.auto);
