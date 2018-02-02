@@ -11,9 +11,9 @@ EXPORT Constants := MODULE
 		EXPORT STRING IDENTITY_THEFT_ALERT := '100E';
 		EXPORT STRING LEGAL_HOLD_ALERT := '100F';
 		EXPORT STRING NO_DID_FOUND := '222A';
-	end;
+	END;
 
-  SHARED ds_alerts := DATASET ([
+ SHARED ds_alerts := DATASET ([
 					{ALERT_CODE.INSUFFICIENT_INPUT_INFO, 'Insufficient Input','',''},
 					{ALERT_CODE.STATE_EXCEPTION, 'Insufficient verification to return a score under state or federal law', '', ''},
 					{ALERT_CODE.NO_DID_FOUND, 'No consumer file was found matching the input information', '', ''},
@@ -24,10 +24,14 @@ EXPORT Constants := MODULE
 					{ALERT_CODE.SECURITY_FRAUD_ALERT, 'Security Fraud Alert on file',  FFD.Constants.RecordType.FA, FFD.Constants.AlertMessage.FraudMessage}
   ], {STRING code, STRING description, STRING alert_type, STRING message});
   
-  EXPORT dict_AlertCode2Description := DICTIONARY (ds_alerts, {code => description});
-  EXPORT dict_AlertCode2Message := DICTIONARY (ds_alerts, {code => message});
-  EXPORT dict_AlertType2Code := DICTIONARY (ds_alerts(alert_type<>''), {alert_type => code});
+ dict_AlertCode2Description := DICTIONARY (ds_alerts, {code => description});
+	EXPORT STRING getAlertDescription(STRING cd) := dict_AlertCode2Description[cd].description;
+  
+ dict_AlertCode2Message := DICTIONARY (ds_alerts, {code => message});
+	EXPORT STRING getAlertMessage(STRING cd) := dict_AlertCode2Message[cd].message;
+  
+ dict_AlertType2Code := DICTIONARY (ds_alerts(alert_type<>''), {alert_type => code});
+	EXPORT STRING convertAlertType2Code(STRING cd) := dict_AlertType2Code[cd].code;
 	
-	EXPORT STRING ALERT_DESCRIPTION(STRING cd) := dict_AlertCode2Description[cd].description;
 		
 END;

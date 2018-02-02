@@ -8,6 +8,7 @@ EXPORT MAC_FCRA_Comprehensive_Report_Service() := MACRO
 										'DataPermissionMask',
 										'DataRestrictionMask',
 										'DPPAPurpose',
+										'FCRAPurpose',
 										'GLBPurpose',
 										'IndustryClass',
 										'SSNMask',

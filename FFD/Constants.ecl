@@ -162,7 +162,8 @@ EXPORT Constants := MODULE
   EXPORT ConsumerOptions := module
     EXPORT integer SHOW_CONSUMER_STATEMENTS := 1;
     EXPORT integer SHOW_DISPUTED_BANKRUPTCY := 2;
-    EXPORT integer SHOW_DISPUTED            := 4; // bit will be used internally for debugging purposes
+    EXPORT integer SUPPRESS_RECORDS_WHEN_IT_ALERT := 4; 
+    EXPORT integer SHOW_DISPUTED            := 8; // bit will be used internally for debugging purposes
   END;
 
   EXPORT JoinLimits  := module

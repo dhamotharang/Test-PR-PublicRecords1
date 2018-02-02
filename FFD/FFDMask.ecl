@@ -1,4 +1,4 @@
-IMPORT $,ut,STD,AutoStandardI;
+﻿IMPORT $,ut,STD,AutoStandardI;
 EXPORT FFDMask := MODULE
 	isFCRA := TRUE;
 	STRING inFFDMaskSTORED := '0' : STORED('FFDOptionsMask'); 
@@ -19,6 +19,8 @@ EXPORT FFDMask := MODULE
 	//2nd position in FFDOptionsMask string
 	EXPORT BOOLEAN isShowDisputedBankruptcies(INTEGER8 inFFDMask) := (inFFDMask & $.Constants.ConsumerOptions.SHOW_DISPUTED_BANKRUPTCY) = $.Constants.ConsumerOptions.SHOW_DISPUTED_BANKRUPTCY;
 	//3rd position in FFDOptionsMask string
+	EXPORT BOOLEAN isSuppressRecordsWhenITAlert(INTEGER8 inFFDMask) := (inFFDMask & $.Constants.ConsumerOptions.SUPPRESS_RECORDS_WHEN_IT_ALERT) = $.Constants.ConsumerOptions.SUPPRESS_RECORDS_WHEN_IT_ALERT;
+	//4th position in FFDOptionsMask string
 	EXPORT BOOLEAN isShowDisputed(INTEGER8 inFFDMask) := (inFFDMask & $.Constants.ConsumerOptions.SHOW_DISPUTED) = $.Constants.ConsumerOptions.SHOW_DISPUTED;
 	
 	// EXPORT SetMask(STRING strFFDMask) := FUNCTION
