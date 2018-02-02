@@ -8,6 +8,7 @@
 	<part name="NonSubjectSuppression" type="xsd:unsignedInt" default="2"/> <!-- [1,2,3] -->
   <part name="ApplyNonsubjectRestrictions" type="xsd:boolean"/>
 	<part name="FFDOptionsMask" type="xsd:string"/>
+  <part name="FCRAPurpose" type="xsd:string"/>
 	
 </message>
 */
@@ -32,8 +33,6 @@ export LiensReportServiceFCRA() := macro
 	boolean isCollections := application_type_value IN AutoStandardI.Constants.COLLECTION_TYPES;
 	boolean returnByDidOnly := fcra_subj_only OR isCollections;
 	
-	// FFD				 
-	integer8 valFFDOptionsMask := FFD.FFDMask.Get();
 		
 	nss_default := if(fcra_subj_only or isCollections, Suppress.Constants.NonSubjectSuppression.returnRestrictedDescription, Suppress.Constants.NonSubjectSuppression.doNothing);
 	nss := ut.GetNonSubjectSuppression(nss_default);
@@ -55,7 +54,8 @@ export LiensReportServiceFCRA() := macro
 		export string50 tmsid := tmsid_value;
 		export string person_filter_id := '' : stored('PersonFilterID');
 		export boolean subject_only := returnByDidOnly;
-		export integer8 FFDOptionsMask := valFFDOptionsMask;
+		export integer8 FFDOptionsMask := FFD.FFDMask.Get();
+		export integer FCRAPurpose := FCRA.FCRAPurpose.Get();
 	END;
 	liens := LiensV2_Services.LiensSearchService_records(liens_params, isFCRA);
 	recs := liens.records;

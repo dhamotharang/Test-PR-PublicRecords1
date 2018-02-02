@@ -14,27 +14,28 @@ EXPORT PrelitReport (
 
   // Suppression/correction data (FCRA side only)
   ds_best := project(dids,transform(doxie.layout_best,self:=left,self:=[]));
-  ds_flags := if (IsFCRA, FCRA.GetFlagFile (ds_best));
-	
-	//FFD 
-	boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(param.FFDOptionsMask);
-	gateways := Gateway.Configuration.Get();
-	
-	// 1) we are using the subject DID rather than the Best DID 
-	ds_dids := dataset([{FFD.Constants.SingleSearchAcctno,(unsigned)did}],FFD.Layouts.DidBatch);
-	
-	// 2) Call the person context		
-	pc_recs := if(isFCRA, FFD.FetchPersonContext(ds_dids, gateways, FFD.Constants.DataGroupSet.PrelitReport));
+  
+  //FFD 
+  boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(param.FFDOptionsMask);
+  gateways := Gateway.Configuration.Get();
+  
+  // 1) we are using the subject DID rather than the Best DID 
+  ds_dids := dataset([{FFD.Constants.SingleSearchAcctno,(unsigned)did}],FFD.Layouts.DidBatch);
+  
+  // 2) Call the person context    
+  pc_recs := if(isFCRA, FFD.FetchPersonContext(ds_dids, gateways, FFD.Constants.DataGroupSet.PrelitReport, param.FFDOptionsMask));
 
-	// 3) Slim down the PersonContext				 
-	slim_pc_recs := FFD.SlimPersonContext(pc_recs);	
-	
+  // 3) Slim down the PersonContext         
+  slim_pc_recs := FFD.SlimPersonContext(pc_recs);  
+  
+  ds_flags := if (IsFCRA, FFD.GetFlagFile (ds_best, pc_recs));
+
   // person records 
   pers := PersonReports.Person_records (dids, 
-																				module (project (param, PersonReports.input.personal, opt)) end,
-																				IsFCRA,
-																				ds_flags, 
-																				slim_pc_recs(DataGroup = FFD.Constants.DataGroups.HDR));
+                                        module (project (param, PersonReports.input.personal, opt)) end,
+                                        IsFCRA,
+                                        ds_flags, 
+                                        slim_pc_recs(DataGroup = FFD.Constants.DataGroups.HDR));
 
   p_addresses   := choosen (pers.SubjectAddressesSlim,  iesp.Constants.BR.MaxAddress);
 
@@ -44,13 +45,13 @@ EXPORT PrelitReport (
     Self.DriverLicenses2 := if (C = 1, pers.driver_licenses_v2, dataset ([], iesp.driverlicense2.t_DLEmbeddedReport2Record));
     Self.DriverLicenses := [];
     Self := L;
-		Self := [];
+    Self := [];
   end;
   p_akas        := project (choosen (pers.Akas, iesp.Constants.BR.MaxAKA), SwitchDL (Left, Counter));
   p_imposters   := choosen (pers.Imposters,  iesp.Constants.BR.MaxImposters);
   p_relatives   := choosen (pers.RelativesSlim,  iesp.constants.BR.MaxRelatives);
   p_associates  := choosen (pers.AssociatesSlim, iesp.constants.BR.MaxAssociates);
-	
+  
   pplus := PersonReports.phonesplus_records(dids, module (project(param, PersonReports.input.phonesplus, opt)) end, IsFCRA);
   p_phonesplus  := choosen (pplus.phonesplus,  iesp.constants.BR.MaxPhonesPlus);
 
@@ -58,39 +59,39 @@ EXPORT PrelitReport (
   p_proflic     := choosen (proflic.proflicenses_v2, iesp.constants.BR.MaxProfLicenses);
 
   bankrpt := PersonReports.bankruptcy_records(dids, 
-																							module (project(param, PersonReports.input.bankruptcy, opt)) end,
-																							IsFCRA, 
-																							ds_flags, 
-																							param.non_subject_suppression, 
-																							slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Bankruptcy));
-																																			
+                                              module (project(param, PersonReports.input.bankruptcy, opt)) end,
+                                              IsFCRA, 
+                                              ds_flags, 
+                                              param.non_subject_suppression, 
+                                              slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Bankruptcy));
+                                                                      
   p_bankruptcy_v1  := if (param.bankruptcy_version = 1, choosen (bankrpt.bankruptcy, iesp.Constants.BR.MaxBankruptcies));
   p_bankruptcy_v3  := if (param.bankruptcy_version = 3, choosen (bankrpt.bankruptcy_v3, iesp.Constants.BR.MaxBankruptcies));
 
   p_liens := PersonReports.lienjudgment_records (dids, 
-																								module (project (param, PersonReports.input.liens, opt)) end, 
-																								IsFCRA, 
-																								ds_flags, 
-																								slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Liens));
+                                                module (project (param, PersonReports.input.liens, opt)) end, 
+                                                IsFCRA, 
+                                                ds_flags, 
+                                                slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Liens));
 
   p_liens_v1    := if (param.liensjudgments_version = 1, choosen (p_liens.liensjudgment, iesp.Constants.BR.MaxLiensJudgments));
   p_liens_v2    := if (param.liensjudgments_version = 2, choosen (p_liens.liensjudgment_v2, iesp.Constants.BR.MaxLiensJudgments));
 
   // asset data
   p_assessments := choosen(PersonReports.property_records(dids, 
-																													module (project (param, PersonReports.input.property)) end, 
-																													IsFCRA, ds_flags, 
-																													slim_pc_recs(DataGroup IN [FFD.Constants.DataGroups.ASSESSMENT,
-																																				FFD.Constants.DataGroups.PROPERTY_SEARCH]
-														)).prop_assessments, iesp.Constants.BR.MaxAssessments);
-														
+                                                          module (project (param, PersonReports.input.property)) end, 
+                                                          IsFCRA, ds_flags, 
+                                                          slim_pc_recs(DataGroup IN [FFD.Constants.DataGroups.ASSESSMENT,
+                                                                        FFD.Constants.DataGroups.PROPERTY_SEARCH]
+                            )).prop_assessments, iesp.Constants.BR.MaxAssessments);
+                            
   p_deeds := choosen(PersonReports.property_records(dids, 
-																										module (project (param, PersonReports.input.property)) end, 
-																										IsFCRA, 
-																										ds_flags, 
-																										slim_pc_recs(DataGroup IN [FFD.Constants.DataGroups.DEED,
-																																	FFD.Constants.DataGroups.PROPERTY_SEARCH]
-											)).prop_deeds_all, iesp.Constants.BR.MaxDeeds);
+                                                    module (project (param, PersonReports.input.property)) end, 
+                                                    IsFCRA, 
+                                                    ds_flags, 
+                                                    slim_pc_recs(DataGroup IN [FFD.Constants.DataGroups.DEED,
+                                                                  FFD.Constants.DataGroups.PROPERTY_SEARCH]
+                      )).prop_deeds_all, iesp.Constants.BR.MaxDeeds);
 
   uccs := PersonReports.ucc_records(dids, module (project (param, PersonReports.input.ucc, opt)) end, IsFCRA);
   p_uccs        := choosen (uccs.ucc_v2, iesp.Constants.BR.MaxUCCFilings);
@@ -99,12 +100,12 @@ EXPORT PrelitReport (
   p_vehicles    := choosen (vehs.vehicles, iesp.Constants.BR.MaxVehicles);
 
   p_watercrafts := choosen(PersonReports.watercraft_records(dids, 
-													module (project (param, PersonReports.input.watercrafts)) end, 
-													IsFCRA,
-													true,
-													ds_flags, 
-													slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Watercraft
-													)).wtr_recs, iesp.Constants.BR.MaxWatercrafts);
+                          module (project (param, PersonReports.input.watercrafts)) end, 
+                          IsFCRA,
+                          true,
+                          ds_flags, 
+                          slim_pc_recs(DataGroup IN FFD.Constants.DataGroupSet.Watercraft
+                          )).wtr_recs, iesp.Constants.BR.MaxWatercrafts);
 
   p_at_work     := choosen (PersonReports.peopleatwork_records (dids, module (project (param, PersonReports.input.peopleatwork, opt)) end, IsFCRA), iesp.Constants.BR.MaxPeopleAtWork);
 
@@ -155,14 +156,18 @@ EXPORT PrelitReport (
     Self.LiensJudgments2    := IF (param.include_liensjudgments, p_liens_v2);
   END;
 
-  // is supposed to produce one row only (usebestdid = true)
-  individual := dataset ([Format ()]);
+  suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, param.FCRAPurpose, param.FFDOptionsMask)[1].suppress_records;
 
-	consumer_statements := if(isFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
-	FFD.MAC.PrepareResultRecord(individual, individual_combined, consumer_statements, FFD.Constants.BlankConsumerAlerts, 
-														 out_rec);
-	
-/* 				output(pc_recs,named('pc_recs'));
+  // is supposed to produce one row only (usebestdid = true)
+  individual_results := dataset ([Format ()]);
+  individual := if(suppress_results_due_alerts, dataset ([], out_rec), individual_results);
+
+  consumer_statements := if(isFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
+  consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
+  FFD.MAC.PrepareResultRecord(individual, individual_combined, consumer_statements, consumer_alerts, 
+                             out_rec);
+  
+/*         output(pc_recs,named('pc_recs'));
            output(ShowConsumerStatements,named('ShowConsumerStatements'));
            output(p_liens_v2 ,named('LiensJudgments2'));
            output(p_bankruptcy_v3 ,named('Bankruptcies3'));
@@ -173,7 +178,7 @@ EXPORT PrelitReport (
 */
 
 
-	
+  
   return individual_combined;
 
 end;
