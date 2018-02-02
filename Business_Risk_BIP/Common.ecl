@@ -182,6 +182,24 @@ OUTPUT(converted, NAMED('Converted_Set'));
 		RETURN(filtered);
 	ENDMACRO;
 
+//start FilterRecords3
+
+	// This functionmacro is a copy of 'FilterRecords' above, but with additional logic to use the HistoryDateTime field as well as the HistoryDate field for filtering out header records for 	
+	// archive purposes.  This is to make running in current mode return identical results as running with an archive date of today's date in the Boca shell.
+	EXPORT FilterRecords3(myDataset, dateFirstSeenField, secondaryDateFirstSeenField, sourceCode, AllowedSourcesSet) := FUNCTIONMACRO
+		filtered := myDataset ((sourceCode = '' OR sourceCode IN AllowedSourcesSet) AND // Only keep allowed Business Shell sources as specified by the prebuilt key
+														IF((INTEGER)dateFirstSeenField > 0, ((HistoryDate = (INTEGER)Business_Risk_BIP.Constants.NinesDate AND (INTEGER)(((STRING)dateFirstSeenField)[1..6]) <= (INTEGER)(StringLib.getDateYYYYMMDD()[1..6])) // If running in realtime mode - still filter out any future dates, but include everything up to today's date (Thus <= comparison)
+														OR (INTEGER)(((STRING)dateFirstSeenField)[1..6]) < HistoryDate
+														OR Business_Risk_BIP.Common.fn_filter_on_archive_date((INTEGER)dateFirstSeenField, HistoryDateTime, HistoryDateLength)),
+														((INTEGER)secondaryDateFirstSeenField > 0 AND ((HistoryDate = (INTEGER)Business_Risk_BIP.Constants.NinesDate AND (INTEGER)(((STRING)secondaryDateFirstSeenField)[1..6]) <= (INTEGER)(StringLib.getDateYYYYMMDD()[1..6]))
+														OR (INTEGER)(((STRING)secondaryDateFirstSeenField)[1..6]) < HistoryDate
+														OR Business_Risk_BIP.Common.fn_filter_on_archive_date((INTEGER)secondaryDateFirstSeenField, HistoryDateTime, HistoryDateLength)))));
+		
+		RETURN(filtered);
+	ENDMACRO;
+
+//end FilterRecords3
+
 	// This functionmacro does the same thing as FilterRecords2 above, except it omits the check for NinesDate
 	// (actually covered in getFutureDate( ) below), and it filters on a HistoryDate set in the future.
 	EXPORT FilterRecordsFuture(myDataset, dateFirstSeenField, sourceCode, AllowedSourcesSet) := FUNCTIONMACRO
