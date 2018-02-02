@@ -3941,7 +3941,7 @@ RVS811_0_0_score := Models.RVS811_0_0(ungroup(clam), bshell);
    self := left), keep(1), left outer);
    // output(with_RVS811_0_0, named('with_RVS811_0_0'));		
    
-	RVS1706_0_score := Models.RVS1706_0_0(clam);
+	RVS1706_0_score := Models.RVS1706_0_2(clam);
 // output(RVS1706_0_score, named('RVS1706_0_score'));
                                      
 with_RVS1706_0 := join(with_RVS811_0_0, RVS1706_0_score,

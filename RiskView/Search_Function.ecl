@@ -184,8 +184,10 @@ end;
 // For batch, assuming that if 1 record is LexID only on input that all records are LexID only on input to greatly simplify this calculation/requirement
 LexIDOnlyOnInput := bsprep[1].DID > 0 AND bsprep[1].SSN = '' AND bsprep[1].dob = '' AND bsprep[1].phone10 = '' AND bsprep[1].wphone10 = '' AND 
 										bsprep[1].fname = '' AND bsprep[1].lname = '' AND bsprep[1].in_streetAddress = '' AND bsprep[1].z5 = '' AND bsprep[1].dl_number = '';
+										
+Crossindustry_model := StringLib.StringToUpperCase(Crossindustry_model_name);									
 
-bsversion := IF(Crossindustry_model_name = 'rvs1706_0', 52,50);  // hard code this for now
+bsversion := IF(Crossindustry_model = 'RVS1706_0', 52,50);  // hard code this for now
 
 	// set variables for passing to bocashell function fcra
 	BOOLEAN isUtility := FALSE;
@@ -383,11 +385,11 @@ valid_telecommunications := telecommunications_model <> '' AND telecommunication
 telecommunications_model_result := MAP(valid_telecommunications	=> Models.LIB_RiskView_V50_Function(clam, telecommunications_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
 																																	 noModelResults);
 
-Crossindustry_model := StringLib.StringToUpperCase(Crossindustry_model_name);
+
 valid_Crossindustry := Crossindustry_model <> '' AND Crossindustry_model IN valid_model_names;
 Crossindustry_model_result := MAP(valid_Crossindustry	=> Models.LIB_RiskView_V50_Function(clam, Crossindustry_model, intended_purpose, LexIDOnlyOnInput, Custom_Inputs_in := customInputs),
-																																	 noModelResults);
-
+																															 noModelResults);
+	
 custom_model := StringLib.StringToUpperCase(Custom_model_name);
 //MLA1608_0 is not a real model so bypass the call to the models library here
 valid_custom := custom_model not in ['','MLA1608_0'] AND custom_model IN valid_model_names;
