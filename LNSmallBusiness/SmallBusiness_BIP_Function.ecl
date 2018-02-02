@@ -359,7 +359,7 @@ unsigned8 BSOptions :=
 	
 	Blank_Boca_Shell := GROUP(DATASET([], Risk_Indicators.Layout_Boca_Shell), Seq);
 	
-	Boca_Shell_Grouped := IF(EXISTS(ModelsRequested(ModelName in [BusinessCredit_Services.Constants.BLENDED_SCORE_MODEL,BusinessCredit_Services.Constants.BLENDED_SCORE_SLBB])), Clam, Blank_Boca_Shell); //don't call the boca shell if a model doesn't need it
+	Boca_Shell_Grouped := IF(EXISTS(ModelsRequested(ModelName in BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL)), Clam, Blank_Boca_Shell); //don't call the boca shell if a model doesn't need it
 	
 /* ************************************************************************
 	 *                       Prepare Attribute Outputs                      *
@@ -406,9 +406,18 @@ unsigned8 BSOptions :=
 
 		DATASET([], Layout_ModelOut_Plus);
 
+	// If no rep info is input, but a blended model is requested, set the score to 0 and blank out the reason codes since there isn't enough info to calculate.
+	Model_Results_Good_Inputs := JOIN(Model_Results_unsorted, SeqInput, LEFT.Seq = RIGHT.Seq, TRANSFORM(RECORDOF(LEFT),
+		Invalid_Blended_Request := LEFT.ModelName IN BusinessCredit_Services.Constants.MODEL_NAME_SETS.BLENDED_ALL AND 
+																													(TRIM(RIGHT.Rep_1_Full_Name) = '' AND TRIM(RIGHT.Rep_1_First_Name) = '' AND TRIM(RIGHT.Rep_1_Last_Name) = '');
+		SELF.Score := IF(Invalid_Blended_Request, '0', LEFT.Score);
+		SELF.ri := IF(Invalid_Blended_Request, DATASET([],	Risk_Indicators.Layout_Desc), LEFT.ri);
+		SELF := LEFT), 
+		LEFT OUTER, KEEP(1));
+		
 	Model_Results_sorted := 
 		SORT( 
-			Model_Results_unsorted, // Sort to the top the "real" model names.
+			Model_Results_Good_Inputs, // Sort to the top the "real" model names.
 			seq,
 			IF( StringLib.StringFind(ModelName,'1601_0_0',1) > 0, 0, 1 ), 
 			ModelName 
