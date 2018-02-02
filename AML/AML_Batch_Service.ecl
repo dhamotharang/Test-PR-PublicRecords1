@@ -22,7 +22,7 @@ EXPORT AML_Batch_Service() := FUNCTION
 	unsigned1 AttributesVersion     		:= 1  : stored('AttributesVersion'); // keep for customer still using ver 1
 	Boolean  IncludeNegNewsCounts      	:= FALSE;
 	Boolean  IncludeNewsProfile 				:= TRUE  : stored('IncludeNewsProfile');
-	string50	DataRestriction 					:= risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
+	string	DataRestriction 						:= risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 	gateways 														:= Gateway.Configuration.Get();
   string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 	integer bsversion := if(AttributesVersion = 1, 41, 50);
