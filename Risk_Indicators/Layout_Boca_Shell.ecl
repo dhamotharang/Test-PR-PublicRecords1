@@ -935,6 +935,7 @@ RECORD
 
 	Risk_Indicators.Layouts.layout_BIP_Header_info BIP_Header;	//MS-71
 	Risk_Indicators.Layouts.layout_Equifax_FraudFlags Eqfx_FraudFlags;	//MS-167
+	Risk_Indicators.Layouts.layout_BIP_Header_info_54 BIP_Header54;	//MS-123
 	
 	//these are child sets...LEAVE as last item in Boca Shell - nothing after them:)
 	Risk_Indicators.Layouts_Derog_Info.LJ_DataSets LnJ_datasets;
