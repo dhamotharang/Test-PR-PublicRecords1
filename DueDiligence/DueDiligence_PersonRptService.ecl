@@ -1,64 +1,44 @@
 ﻿IMPORT AutoStandardI, DueDiligence, Gateway, iesp, STD, WSInput;
 
-EXPORT DueDiligence_Service := MACRO
+
+EXPORT DueDiligence_PersonRptService := MACRO
 
 			requestName := 'DueDiligenceReportRequest';
-	
+			
 			//The following macro defines the field sequence on WsECL page of query.
 			WSInput.MAC_DueDiligence_Service(requestName);
-			
-			DueDiligence.CommonQuery.mac_CreateInputFromXML(iesp.duediligencereport.t_DueDiligenceReportRequest, requestName, FALSE);
+	
+			DueDiligence.CommonQuery.mac_CreateInputFromXML(iesp.duediligencereport.t_DueDiligenceReportRequest, requestName, TRUE);
 			
 			validatedRequest := DueDiligence.Common.ValidateRequest(input, glba, dppa);
 			
 			DueDiligence.CommonQuery.mac_FailOnError(validatedRequest(validRequest = FALSE));
 			
 			cleanData := DueDiligence.Common.GetCleanData(validatedRequest(validRequest));
+			
 
-
-			//********************************************************PERSON ATTRIBUTES STARTS HERE**********************************************************
+		//********************************************************PERSON ATTRIBUTES STARTS HERE**********************************************************
 			consumerResults := DueDiligence.getIndAttributes(cleanData, DPPA, glba, drm, gateways, includeReport, displayAttributeText, debugIndicator);
 		 
 			indIndex := DueDiligence.CommonQuery.GetIndividualAttributes(consumerResults);
 			indIndexHits := DueDiligence.CommonQuery.GetIndividualAttributeFlags(consumerResults);
 			
-			finalInd := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, consumerResults, iesp.duediligencereport.t_DueDiligenceReportResponse, DueDiligence.Constants.INDIVIDUAL,
+			final := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, consumerResults, iesp.duediligencereport.t_DueDiligenceReportResponse, DueDiligence.Constants.INDIVIDUAL,
 																																DueDiligence.Constants.STRING_FALSE, indIndex, indIndexHits, requestedVersion);
-																					
-		
-			
-			
-			//********************************************************BUSINESS ATTRIBUTES STARTS HERE********************************************************
-			DueDiligence.CommonQuery.mac_GetBusinessOptionSettings();
-
-			businessResults := DueDiligence.getBusAttributes(cleanData, options, linkingOptions, includeReport, displayAttributeText, debugIndicator);
-
-			busIndex := DueDiligence.CommonQuery.GetBusinessAttributes(businessResults);
-			busIndexHits := DueDiligence.CommonQuery.GetBusinessAttributeFlags(businessResults);
-			
-			finalBus := DueDiligence.CommonQuery.mac_GetESPReturnData(wseq, businessResults, iesp.duediligencereport.t_DueDiligenceReportResponse, DueDiligence.Constants.BUSINESS,
-																															  DueDiligence.Constants.STRING_FALSE, busIndex, busIndexHits, requestedVersion);
-
-
-
-
-			//Depending if business or individual was requested, return corresponding data
-			final := IF(requestedVersion IN DueDiligence.Constants.VALID_IND_ATTRIBUTE_VERSIONS, finalInd, finalBus);
 
 
 			output(final, NAMED('Results')); //This is the customer facing output    
 
 			IF(debugIndicator, output(cleanData, NAMED('cleanData')));                         //This is for debug mode 	
-			IF(debugIndicator, output(wseq, NAMED('wseq')));                              		 //This is for debug mode 
-			IF(intermediates, output(businessResults, NAMED('busResults')));                   //This is for debug mode 
+			IF(debugIndicator, output(wseq, NAMED('wseq')));                              					//This is for debug mode 
 			IF(intermediates, output(consumerResults, NAMED('indResults')));                   //This is for debug mode 
-
+	
 
 ENDMACRO;
 
 
 /*--SOAP-- 
-<message name="duediligence.duediligence_service">
+<message name="duediligence.duediligence_personrptservice">
 	<part name="duediligencereportrequest" sequence="1" type="tns:XmlDataset"/>
 	<part name="datapermissionmask" sequence="2" type="xsd:string"/>
 	<part name="datarestrictionmask" sequence="3" type="xsd:string"/>

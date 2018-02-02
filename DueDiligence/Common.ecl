@@ -1,8 +1,18 @@
-﻿IMPORT Address, BIPV2, Business_Header, Business_Risk_BIP, DueDiligence, Risk_Indicators, STD, ut;
+﻿IMPORT Address, BIPV2, Business_Header, Business_Risk_BIP, DueDiligence, iesp, Risk_Indicators, STD, ut;
 
 
 EXPORT Common := MODULE
 
+	EXPORT createNVPair(STRING name, STRING val) := FUNCTION
+			
+			iesp.share.t_NameValuePair createPair(STRING n, STRING v) := TRANSFORM
+				SELF.Name := n;
+				SELF.Value := v;
+			END;
+			
+			RETURN ROW(createPair(name, val));			
+	END;
+	
 	EXPORT getNameFromList(UNSIGNED fieldNumber, CONST STRING fieldList, UNSIGNED numberOfFields) := FUNCTION
 		//determine the location of the commas in the list
 		previousCommaLocation := IF(fieldNumber = 1, DueDiligence.Constants.NUMERIC_ZERO, STD.Str.Find(fieldList, ',', fieldNumber-1));
