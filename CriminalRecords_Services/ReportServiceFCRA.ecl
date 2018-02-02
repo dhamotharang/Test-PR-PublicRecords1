@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="CriminalRecords::ReportService">
 
 	<!-- Keyed Fields -->
@@ -16,6 +16,7 @@
   <part name="SSNMask"					type="xsd:string"/>
   <part name="DLMask"						type="xsd:string"/>
 	<part name="ApplicationType"  type="xsd:string"/>
+  <part name="FCRAPurpose" type="xsd:string"/>
 	
 	<!-- Record Management -->
 	<part name="MaxResults"					type="xsd:unsignedInt"/>
@@ -63,6 +64,7 @@ export ReportServiceFCRA := MACRO
 		EXPORT integer8 	FFDOptionsMask 	:= FFD.FFDMask.Get(report_opt.FFDOptionsMask);
 		export dataset(Gateway.Layouts.Config) gateways := Gateway.Configuration.Get();
 		export boolean 		SkipPersonContextCall := false;		
+		export integer FCRAPurpose := FCRA.FCRAPurpose.Get(report_opt.FCRAPurpose);	
 	end;
 
 	results := CriminalRecords_Services.ReportService_Records.val(tempmod, isFCRA);

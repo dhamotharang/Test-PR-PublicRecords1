@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchServiceFCRA">
 
 	<part name="DID"              type="xsd:string"/>
@@ -12,6 +12,7 @@
 import iesp, AutoStandardI, FCRA, STD;
 
 export SearchServiceFCRA := macro
+
 		#constant('NoDeepDive', true);
 		// Get XML input 
 		rec_in := iesp.huntingfishing_fcra.t_FcraHuntFishSearchRequest;
@@ -42,6 +43,7 @@ export SearchServiceFCRA := macro
 			export string14 did := rdid;
 			export string32 applicationType	:= AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
 			export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
+			export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
 		end;
 		tempresults := hunting_fishing_services.Search_Records.val(tempmod, true);
 
@@ -49,6 +51,7 @@ export SearchServiceFCRA := macro
 																																	
 		results_new := project(results,transform(iesp.huntingfishing_fcra.t_FcraHuntFishSearchResponse,
 																								self.ConsumerStatements := tempresults.Statements,
+																								self.ConsumerAlerts := tempresults.ConsumerAlerts,
 																								self := left));
 																
 		output(results_new, named('Results'));

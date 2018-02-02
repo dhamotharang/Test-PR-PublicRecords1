@@ -1,9 +1,10 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="ReportServiceFCRA">
 
 	<!-- COMPLIANCE SETTINGS -->
 	<part name="GLBPurpose"          type="xsd:byte"/>
 	<part name="DPPAPurpose"           type="xsd:byte"/>
+ <part name="FCRAPurpose"         type="xsd:string"/>
 	<part name="ApplicationType"     type="xsd:string"/>
 	<part name="MaxWaitSeconds"      type="xsd:integer"/>
 
@@ -49,13 +50,15 @@ export ReportServiceFCRA := macro
   tempmod := module(project(input_params, FaaV2_Services.ReportService_Records.params,opt))
     export string32 ApplicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
     export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
+    export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
   end;
 	
   recs := FaaV2_Services.ReportService_Records.fcra_val(tempmod);
 	
   iesp.ECL2ESP.Marshall.MAC_Marshall_Results(recs.records, results_pre, iesp.faaaircraft_fcra.t_FcraAircraftReportResponse, Aircrafts, true);
 	 
-  FFD.MAC.AppendConsumerStatements(results_pre, results, recs.Statements, iesp.faaaircraft_fcra.t_FcraAircraftReportResponse);
+  FFD.MAC.AppendConsumerStatements(results_pre, results_with_cs, recs.Statements, iesp.faaaircraft_fcra.t_FcraAircraftReportResponse);
+  FFD.MAC.AppendConsumerAlerts(results_with_cs, results, recs.ConsumerAlerts, iesp.faaaircraft_fcra.t_FcraAircraftReportResponse);
   
   output(results, named('Results'));							
 		

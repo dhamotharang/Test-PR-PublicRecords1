@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchServiceFCRA">
 	<part name="DID"                 type="xsd:string"/>
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="4"/>
@@ -42,13 +42,15 @@ EXPORT SearchServiceFCRA := MACRO
 		EXPORT STRING32 ApplicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(input_params,AutoStandardI.InterfaceTranslator.application_type_val.params));
 		EXPORT STRING5 IndustryClass := AutoStandardI.InterfaceTranslator.industry_class_value.val (project(input_params,AutoStandardI.InterfaceTranslator.industry_class_value.params));
 		export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
+		export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);
 	end;
 	
 	ccwresults := CCW_services.SearchService_Records.search(tempmod, true);		
 	
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(ccwresults.Records, results, iesp.concealedweapon_fcra.t_FcraWeaponSearchResponse);	
 	
-  FFD.MAC.AppendConsumerStatements(results, results_final, ccwresults.Statements, iesp.concealedweapon_fcra.t_FcraWeaponSearchResponse);	 																						
+  FFD.MAC.AppendConsumerStatements(results, results_with_statements, ccwresults.Statements, iesp.concealedweapon_fcra.t_FcraWeaponSearchResponse);	 																						
+  FFD.MAC.AppendConsumerAlerts(results_with_statements, results_final, ccwresults.ConsumerAlerts, iesp.concealedweapon_fcra.t_FcraWeaponSearchResponse);	 																						
 	
 	output(results_final, named('Results'));
 	 
