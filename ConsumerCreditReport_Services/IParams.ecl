@@ -36,6 +36,7 @@ EXPORT IParams := MODULE
 			EXPORT BOOLEAN hasGlbPermissiblePurpose := perm.glb.ok(bs_mod.GLBPurpose);
 			EXPORT INTEGER bsVersion := 50 : STORED('bsVersion');
 			EXPORT DATASET(Gateway.Layouts.Config) gateways := Gateway.Configuration.Get();
+			EXPORT INTEGER FCRAPurpose := FCRA.FCRAPurpose.Get(PermissiblePurpose);	
 		END;
 	END;
 
