@@ -1,6 +1,6 @@
 ﻿//This is the code to execute in a builder window
 #OPTION('multiplePersistInstances', FALSE);
-#workunit('name','Scrubs_PhonesInfo.BaseFile_BWR_Hygiene - Hygiene & Stats - SALT V3.8.0');
+#workunit('name','Scrubs_PhonesInfo.BaseFile_BWR_Hygiene - Hygiene & Stats - SALT V3.8.2');
 IMPORT Scrubs_PhonesInfo,SALT38;
 // First create an instantiated hygiene module
   infile := Scrubs_PhonesInfo.BaseFile_In_PhonesInfo;
