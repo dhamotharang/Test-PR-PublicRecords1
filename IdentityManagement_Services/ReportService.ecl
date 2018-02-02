@@ -27,6 +27,7 @@
 	<part name="RealTimePermissibleUse" type="xsd:string"/>
   <part name="IncludeNonRegulatedVehicleSources" type="xsd:boolean"/>
   <part name="IncludeNonRegulatedWatercraftSources" type="xsd:boolean"/>
+  <part name="SuppressCompromisedDLs" type="xsd:boolean"/>
 </message>
 */
 /*--INFO-- IDM (Identity Management) searches through nine services to create a set of questions.
@@ -72,13 +73,13 @@
    &lt;NeighborsPerNA&gt;6&lt;/NeighborsPerNA&gt;
 	 &lt;RealTimePermissibleUse&gt;&lt;/RealTimePermissibleUse&gt;
 	 &lt;LinkingWeightThreshold&gt;&lt;/LinkingWeightThreshold&gt;
-   &lt;ReturnCount&gt;0&lt;/ReturnCount&gt; 
+   &lt;ReturnCount&gt;0&lt;/ReturnCount&gt;
    &lt;StartingRecord&gt;0&lt;/StartingRecord&gt;
   &lt;/Options&gt;
   &lt;ReportBy&gt;
    &lt;UniqueId&gt;&lt;/UniqueId&gt;
   &lt;/ReportBy&gt;
- &lt;/row&gt;  
+ &lt;/row&gt;
 &lt;/IdentityManagementReportRequest&gt;
 </pre>
 */
@@ -96,13 +97,13 @@ import AutoStandardI, AutoHeaderI, iesp, doxie, PersonReports, suppress, Identit
 		// #CONSTANT('IncludeNonRegulatedVehicleSources', TRUE);
 		#STORED('MaxRelativeAddresses', IdentityManagement_Services.Constants.MaxRelativeAddresses);
 		//To show both vendor A and B DataRestrictionMask needs to be '0000000000' (first digit needs to be '0')
-		// #STORED('DataRestrictionMask', '0000000000'); 
-		
+		// #STORED('DataRestrictionMask', '0000000000');
+
 		//We need to set IncludeInsuranceDrivers to false as a stored constant since we do not need to retrieve the Insurance Drivers records from DriversV2.
-		//In DriversV2 we have to retrieve the Insurance Drivers by DL which did not make sense here as we want to retrieve records by DID and not be forced to retrieve records we do not want. 
+		//In DriversV2 we have to retrieve the Insurance Drivers by DL which did not make sense here as we want to retrieve records by DID and not be forced to retrieve records we do not want.
 		//For example we might want to only retrieve Insurance Drivers without other sources from DriversV2, but this would not be possible using DriversV2 code.
 		#CONSTANT('IncludeInsuranceDrivers', FALSE);
-		
+
 		//Include options
 		GetInputOptions (iesp.identitymanagementreport.t_IdentityManagementReportOption tag) := function
 			options := module
@@ -126,13 +127,14 @@ import AutoStandardI, AutoHeaderI, iesp, doxie, PersonReports, suppress, Identit
 				export boolean include_noregulatedwatercrafts := tag.IncludeNonRegulatedWatercraftSources	: STORED('IncludeNonRegulatedWatercraftSources');
 				export boolean include_professionallicenses		:= tag.IncludeProfessionalLicenses	: STORED('IncludeProfessionalLicenses');
 				export boolean include_InternetDomains		    := tag.IncludeInternetDomains				: STORED('IncludeInternetDomains');
-				export boolean include_InsuranceDL				    := tag.IncludeInsuranceDrivers;               //DEFAULT	:	FALSE 
+				export boolean include_InsuranceDL				    := tag.IncludeInsuranceDrivers;               //DEFAULT	:	FALSE
 				export unsigned1 relative_depth         			:= MIN(MAX(tag.RelativeDepth, 1), 3);					//DEFAULT : 1
-			  export unsigned1 neighborhoods 								:= IF(tag.MaxNeighborhoods > 0,MIN(tag.MaxNeighborhoods,5), 1);
+			  	export unsigned1 neighborhoods 								:= IF(tag.MaxNeighborhoods > 0,MIN(tag.MaxNeighborhoods,5), 1);
 				export unsigned1 neighbors_per_address 				:= MIN(MAX(tag.NeighborsPerAddress, 3), 20);	//DEFAULT : 3
 				export unsigned1 neighbors_per_na 						:= MIN(MAX(tag.NeighborsPerNA, 6), 10);				//DEFAULT : 6
 				export string RealTimePermissibleUse					:= tag.RealTimePermissibleUse;								//DEFAULT : ''
 				export unsigned2 LinkingWeightThreshold				:= tag.LinkingWeightThreshold;								//DEFAULT : 0
+				export boolean SuppressCompromisedDLs := tag.SuppressCompromisedDLs : STORED('SuppressCompromisedDLs');
 			end;
 			return options;
 		end;
@@ -156,22 +158,22 @@ import AutoStandardI, AutoHeaderI, iesp, doxie, PersonReports, suppress, Identit
 		ds_in := DATASET ([], rec_in) : STORED ('IdentityManagementReportRequest', FEW);
 		first_row := ds_in[1] : INDEPENDENT;
 
-		//Search 
+		//Search
 		reportby := first_row.reportby;
-		reportby_bps:=project(reportby,transform(iesp.bpsreport.t_BpsReportBy,self:=left,self:=[])); 
-		
+		reportby_bps:=project(reportby,transform(iesp.bpsreport.t_BpsReportBy,self:=left,self:=[]));
+
 		// this will #store some standard input parameters (generally, for search purpose)
 		iesp.ECL2ESP.SetInputReportBy (reportby_bps);
 		iesp.ECL2ESP.SetInputBaseRequest (first_row);
 
-		// create module incorporating XML input options 
+		// create module incorporating XML input options
 		options_in := GetInputOptions (global (first_row.Options));
 
 		// define parameters
 		global_mod := AutoStandardI.GlobalModule();
 		Relationship.IParams.storeHighConfidence(global_mod.ApplicationType);
 
-		// set up default options 
+		// set up default options
 		AI := AutoStandardI.InterfaceTranslator;
 		idm_mod := module (project (options_in, IdentityManagement_services.IParam._report, opt))
 			// all required report's options (cleaned/translated)
@@ -193,7 +195,7 @@ import AutoStandardI, AutoHeaderI, iesp, doxie, PersonReports, suppress, Identit
 		//Only one DID is expected; otherwise fail:
 		dids := AutoHeaderI.LIBCALL_FetchI_Hdr_Indv.do (search_mod);
 		// #stored ('DID', dids[1].did);
-	 
+
 		recs := IdentityManagement_Services.Report(dids, idm_mod);
 
 		 // wrap it into output structure
@@ -209,15 +211,15 @@ import AutoStandardI, AutoHeaderI, iesp, doxie, PersonReports, suppress, Identit
 		// This code will be tagged under unacceptable coding style.But this gets rid of project and normalize.
 		Royalty.RoyaltyVehicles.MAC_ReportSet(recs.MotorVehicleRecords, royalties_rtv, datasource, vehicleinfo.vin);
 		Royalty.MAC_RoyaltyEmail(recs.Emailaddresses, royalties_email, source);
-		
+
 		//Access to this data has to be authorized by FDN team and royalty tracking is required
-	  royalties_insuraceDL := Royalty.RoyaltyFDNDLDATA.GetWebRoyalties(recs.InsuranceDriverLicenses,UniqueId,(Source <>'' and LicenseNumber <>'' and IssueState <>''), TRUE); //doesn't pay to search unless input DID has DL info populated 
-		
+	  royalties_insuraceDL := Royalty.RoyaltyFDNDLDATA.GetWebRoyalties(recs.InsuranceDriverLicenses,UniqueId,(Source <>'' and LicenseNumber <>'' and IssueState <>''), TRUE); //doesn't pay to search unless input DID has DL info populated
+
 		royalties := if(idm_mod.include_emailaddresses , royalties_email) +
                  if(idm_mod.include_realtimevehicle, royalties_rtv) +
                  if(idm_mod.include_InsuranceDL,royalties_insuraceDL);
-    
-   
+
+
 		IF (count (dids) > 1,
 			fail (203, doxie.ErrorCodes (203)), // or ('ambiguous criteria')
 			// comment the "fail" above and uncomment the "output" below for debugging
@@ -225,7 +227,7 @@ import AutoStandardI, AutoHeaderI, iesp, doxie, PersonReports, suppress, Identit
 			parallel(
 			output (results, named ('Results')),
 			output (royalties, named('RoyaltySet'))));
-		
+
 endmacro;
 
  // IdentityManagement_Services.ReportService();
