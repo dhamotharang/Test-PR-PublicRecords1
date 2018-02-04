@@ -8,8 +8,7 @@ EXPORT BaseFile_Delta(DATASET(BaseFile_Layout_PhonesInfo)old_s, DATASET(BaseFile
     hygieneDiffOverall := DifferenceSummary;
     SALT38.mod_StandardStatsTransforms.mac_hygieneSummaryTransform(Scrubs_PhonesInfo, BaseFile_Fields, 'RECORDOF(hygieneDiffOverall)', FALSE);
     hygieneDiffOverall_Standard := IF(doHygieneSummaryGlobal, NORMALIZE(hygieneDiffOverall, COUNT(inFieldList) * 6, xSummary(LEFT, COUNTER, myTimeStamp, LEFT.txt + '_all', LEFT.txt + '_all')));
-
-
+ 
     RETURN hygieneDiffOverall_Standard;
   END;
 END;

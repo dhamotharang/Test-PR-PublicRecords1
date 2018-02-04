@@ -1,4 +1,4 @@
-import business_header, ut, tools, lib_fileservices, _control,bipv2;
+﻿import business_header, ut, tools, lib_fileservices, _control,bipv2;
 
 export Copy_BIPV2FullKeys(
  
@@ -11,8 +11,8 @@ export Copy_BIPV2FullKeys(
 	,boolean	                                      pSkipSuperStuff		= false	                            // If true, don't add to superfiles.  if false, add to supers
 	,boolean	                                      pOverwrite			  = false	                            // Should Overwrite existing files?
 	,boolean	                                      pShouldCompress   = true	                            // Should Compress Files?		
-	,dataset(tools.Layout_FilenameVersions.builds)	pFiles            = keynames(pversion).BIPV2FullKeys + BIPV2.Filenames(pversion).Common_Base.dall_filenames
-	,string		                                      pdestinationgroup	= if(Tools._Constants.isdataland = false,tools.fun_Groupname('60')  ,tools.fun_Clustername_DFU(''))
+	,dataset(tools.Layout_FilenameVersions.builds)	pFiles            = keynames(pversion).BIPV2FullKeys + keynames(pversion).BIPV2WeeklyKeys + BIPV2.Filenames(pversion).Common_Base.dall_filenames
+	,string		                                      pdestinationgroup	= if(Tools._Constants.isdataland = false,tools.fun_Clustername_DFU('66')  ,tools.fun_Clustername_DFU(''))
 	,string		                                      pRegexVersion			= '^(.*?_'+ psuperversions + '|.*?::' + psuperversions + '::.*)$'					
 	,boolean	                                      pDeleteSrcFiles		= false	                            // If true, delete source logical files.  False = Do not
 	,boolean	                                      pIsTesting			  = true	                            // If true, just output dataset of what to do, false actually copy the files
