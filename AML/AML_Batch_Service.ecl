@@ -1,26 +1,28 @@
-﻿IMPORT iesp, Risk_indicators, Riskwise, address, Business_risk, AutoStandardI, gateway;
+﻿IMPORT iesp, Risk_indicators, Riskwise, address, Business_risk, gateway;
 
 EXPORT AML_Batch_Service() := FUNCTION
 
 #WEBSERVICE(FIELDS(
                 'batch_in',
-                'GLBAPurpose',
+                'GLBPurpose',
                 'DPPAPurpose',
                 'AttributesVersion',
                 'IncludeNewsProfile',
-                'DataRestriction',
-																'DataPermissionMask',
+                'DataRestrictionMask',
+								'DataPermissionMask',
                 'gateways'
                 ));
 
+	#STORED('GLBPurpose', 5);
+	#STORED('DataRestrictionMask', risk_indicators.iid_constants.default_DataRestriction);
 
   batch_in  := dataset( [], AML.layouts.AMLBatchInLayout ) : stored('batch_in');
-  unsigned1 glba       								:= 5  : stored('GLBAPurpose');
+  unsigned1 glba       								:= 5  : stored('GLBPurpose');
 	unsigned1 dppa      								:= 3  : stored('DPPAPurpose');
 	unsigned1 AttributesVersion     		:= 1  : stored('AttributesVersion'); // keep for customer still using ver 1
 	Boolean  IncludeNegNewsCounts      	:= FALSE;
 	Boolean  IncludeNewsProfile 				:= TRUE  : stored('IncludeNewsProfile');
-	string50	DataRestriction 					:= risk_indicators.iid_constants.default_DataRestriction : stored('DataRestriction');
+	string	DataRestriction 						:= risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 	gateways 														:= Gateway.Configuration.Get();
   string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 	integer bsversion := if(AttributesVersion = 1, 41, 50);
@@ -149,7 +151,7 @@ INDIndexV1 := join(consumerAttributesV1, IndRecs,
   self.IndProfessionalRiskV2          	:= le.IndProfessionalRisk;
   self.IndBusExecOffAssocRiskV2      		:= le.IndBusExecOffAssocRisk;
 	self.RoyaltySrc                    		:= '0';
-	self.lexID := le.DID;
+	self.lexID 														:= le.DID;
 	self := [];
 END;
 
