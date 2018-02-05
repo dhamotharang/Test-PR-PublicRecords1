@@ -9,7 +9,8 @@ export Prefix(string serviceName = 'NoNameGiven') := function
 								'BogusPlaceHolder' => Data_Services.Default_Data_Location,	// Can add exceptions here
 								'LAB_xLink' 			 => '~thor_data400::',
 								'biz_linking'      => '~thor_data400::',
-								Data_Services.Default_Data_Location),left,right);
+								'Relatives' => '~',
+								Data_Services.foreign_prod),left,right);
 end;
 
 export person_header      := Prefix('person_header');

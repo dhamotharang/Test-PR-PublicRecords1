@@ -1,25 +1,25 @@
-﻿IMPORT Risk_Indicators, Business_Risk, Models, iesp, doxie, Gateway, ut, Address, AutoStandardI;
+﻿IMPORT DueDiligence, Risk_Indicators, Business_Risk, Models, iesp, doxie, Gateway, ut, Address, AutoStandardI;
 
 EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
-												UNSIGNED1 dppa,
-												UNSIGNED1 glba,
-												STRING dataRestrictionMask,
-												DATASET(Gateway.Layouts.Config) gateways,
-												BOOLEAN includeReport = FALSE,
-												BOOLEAN displayAttributeText = FALSE,
-												BOOLEAN debugMode = FALSE) := FUNCTION
+																								UNSIGNED1 dppa,
+																								UNSIGNED1 glba,
+																								STRING dataRestrictionMask,
+																								DATASET(Gateway.Layouts.Config) gateways,
+																								BOOLEAN includeReport = FALSE,
+																								BOOLEAN displayAttributeText = FALSE,
+																								BOOLEAN debugMode = FALSE) := FUNCTION
 																						 
 
-	INTEGER bsVersion := 50;
-	UNSIGNED8 bsOptions :=  0;
-	BOOLEAN isFCRA := FALSE;
+	INTEGER bsVersion := DueDiligence.Constants.DEFAULT_BS_VERSION;
+	UNSIGNED8 bsOptions := DueDiligence.Constants.DEFAULT_BS_OPTIONS;
+	BOOLEAN isFCRA := DueDiligence.Constants.DEFAULT_IS_FCRA;
 	
 	
 	//get the DID of the inquired individual
 	inquiredInd := DueDiligence.getIndDID(cleanedInput, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, gateways, includeReport);
 	
-	didFound := inquiredInd(individual.did <> 0);
-	noDIDFound := inquiredInd(individual.did = 0);
+	didFound := inquiredInd(inquiredDID <> 0);
+	noDIDFound := inquiredInd(inquiredDID = 0);
 	
 	//get the best data for the individual if do not have it
 	inquiredBest := DueDiligence.getIndBestData(didFound, dppa, glba, includeReport);
@@ -28,14 +28,14 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	inquiredRelatives := DueDiligence.getIndRelatives(inquiredBest, dppa, glba, includeReport);
 	
 	//get header information
-	// indHeader := DueDiligence.getIndHeader(inquiredRelatives, dppa, glba, isFCRA, includeReport);
+	indHeader := DueDiligence.getIndHeader(inquiredRelatives, dataRestrictionMask, dppa, glba, isFCRA, includeReport);
 	
 	//get information pertaining to SSN
-	//indSSNData := DueDiligence.getIndSSNData(indHeader, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, isFCRA, includeReportData);
+	indSSNData := DueDiligence.getIndSSNData(indHeader, dataRestrictionMask, dppa, glba, bsVersion, bsOptions, isFCRA, includeReport);
 	
 	
 	//populate the attributes and flags
-	indKRI := DueDiligence.getIndKRI(inquiredRelatives + noDIDFound);
+	indKRI := DueDiligence.getIndKRI(indSSNData + noDIDFound);
 	
 	
 	
@@ -49,8 +49,8 @@ EXPORT getIndAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	
 	
 	IF(debugMode, OUTPUT(inquiredRelatives, NAMED('inquiredRelatives')));
-	// IF(debugMode, OUTPUT(indHeader, NAMED('indHeader')));
-	// IF(debugMode, OUTPUT(indSSNData, NAMED('indSSNData')));
+	IF(debugMode, OUTPUT(indHeader, NAMED('indHeader')));
+	IF(debugMode, OUTPUT(indSSNData, NAMED('indSSNData')));
 	
 	IF(debugMode, OUTPUT(indKRI, NAMED('indKRI')));
 

@@ -1,2 +1,3 @@
-import _control;
-export foreign_prod := '~';
+﻿import _control;
+export foreign_prod := '~foreign::' + _control.IPAddress.prod_thor_dali + '::';
+// export foreign_prod := '~';

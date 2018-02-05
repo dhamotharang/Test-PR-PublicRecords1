@@ -49,6 +49,9 @@ EXPORT LayoutsInternalReport := MODULE
 		UNSIGNED4 lastReported;
 	END;
 
+
+
+
  EXPORT BEOCriminalReportingOFOffenses := RECORD
   DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
   DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense ReportOfOffenses;  
@@ -70,5 +73,11 @@ EXPORT LayoutsInternalReport := MODULE
 		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
 		DATASET(iesp.duediligencereport.t_DDRSICNAIC) industryRisk {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxSICNAICs)};
 	END;
-
+	
+	
+	EXPORT ReportingOfOperatingLocations  := RECORD
+	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
+	 DueDiligence.Layouts.BusOperLocationLayout ReportOfOperatingLocs;
+	END;
+	
 END;
