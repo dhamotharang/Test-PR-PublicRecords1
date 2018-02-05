@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="DocumentRetrievalService">
   <part name="ECrashRetrieveDocumentRequest" type="tns:XmlDataSet" cols="200" rows="20" />
   <part name="ECrashRetrieveDocumentResponseEx" type="tns:XmlDataSet" cols="200" rows="20" />
@@ -38,11 +38,15 @@ EXPORT DocumentRetrievalService() := FUNCTION
 	ImageSoapCallGateways := ROW(ImageSoapCallGatewaysStructure);
 	ImageService := eCrash_Services.GetImageSoapCall(ImageSoapCallGateways);	
 	
-	RequestReportId := Request[1].ReportBy.ReportID;
+	ReportBy := Request[1].ReportBy;
+	
+	RequestReportId := ReportBy.ReportID;
+	DocumentType := ReportBy.DocumentType;
+	ColoredImage := Request[1].Options.ColoredImage;
 	
 	ErrorCodeImageOverflow := 404;
 	
-  FilteredDupedDocuments := RawDocumentIn.GetReportDocuments(RequestReportId);
+ FilteredDupedDocuments := RawDocumentIn.GetReportDocuments(RequestReportId, DocumentType);
 	
 	//OUTPUT(FilteredDupedDocuments,named('FilteredDupedDocuments'));
 	
@@ -55,7 +59,7 @@ EXPORT DocumentRetrievalService() := FUNCTION
 		)
 	);
 	
-	ImageRetrievalResponse := ImageService.GetImages(ImageService.GetDocumentImageRequest(ImageHashes,RequestReportId));
+	ImageRetrievalResponse := ImageService.GetImages(ImageService.GetDocumentImageRequest(ImageHashes,RequestReportId, ColoredImage));
 	
 	EmptyHeader := ROW(
 		TRANSFORM(

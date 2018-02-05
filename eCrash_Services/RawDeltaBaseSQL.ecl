@@ -408,12 +408,18 @@ EXPORT RawDeltaBaseSQL(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 				return  'SELECT DISTINCT k.incident_id AS incidentId from delta_ec.delta_key k WHERE k.jurisdiction="' + TRIM(Primary_rec[1].Jurisdiction)+'"' +  ' AND k.jurisdiction_state="' + TRIM(Primary_rec[1].JurisdictionState)+'"' + ' AND k.report_type_id = "A" ORDER BY date_added desc ' + ' limit ' + limitValue;
 		END;
 	
-		EXPORT GetDocumentsByReportIdSQL(STRING ReportId, STRING DateAdded) := FUNCTION
-				RETURN eCrash_Services.ConstantsDeltaBase.Document_Select + ' report_id IN ( ' + ReportId + ' )  AND date_added > "' + DateAdded + '"' + SQL_LIMIT;
+		EXPORT GetDocumentsByReportIdSQL(STRING ReportId, STRING DateAdded, STRING DocumentType) := FUNCTION
+		    DocumentReportType := IF(
+				  TRIM(DocumentType,left,right) <> '', 
+			   'report_type_id = "' + DocumentType + '"',
+				  '(report_type_id IS Not NULL OR report_type_id <> "")'
+			   );	
+				
+			  RETURN eCrash_Services.ConstantsDeltaBase.Document_Select + ' report_id IN ( ' + ReportId + ' )  AND date_added > "' + DateAdded + '" AND ' + DocumentReportType + SQL_LIMIT;
     END;
 
-		EXPORT GetDocumentsSQL(FLAccidents_Ecrash.Key_eCrashv2_Supplemental SearchBy, STRING DateAdded) := FUNCTION
-			CaseIdentifier := IF(
+		EXPORT GetDocumentsSQL(FLAccidents_Ecrash.Key_eCrashv2_Supplemental SearchBy, STRING DateAdded, STRING DocumentType) := FUNCTION
+		  CaseIdentifier := IF(
 				TRIM(SearchBy.accident_nbr) = '', 
 				'(case_identifier IS NULL OR case_identifier = "")',
 				'case_identifier = "' + TRIM(SearchBy.accident_nbr) + '"'
@@ -425,14 +431,22 @@ EXPORT RawDeltaBaseSQL(eCrash_Services.IParam.searchrecords in_mod) := MODULE
 				'state_report_number = "' + TRIM(SearchBy.addl_report_number) + '"'
 			);	
 			
+			DocumentReportType := IF(
+				TRIM(DocumentType,left,right) <> '', 
+			  'report_type_id = "' + DocumentType + '"',
+				'(report_type_id IS Not NULL OR report_type_id <> "")'
+			);	
+			
+			
 			STRING WhereClause := CaseIdentifier + 
 					' AND ' + StateReportNumber + 
+					' AND ' + DocumentReportType + 
 					' AND jurisdiction = "' + TRIM(SearchBy.jurisdiction) + 
 					'" AND jurisdiction_state = "' + TRIM(SearchBy.jurisdiction_state) +
 					'" AND date_of_loss = "' + dateFormatted(TRIM(SearchBy.accident_date)) + '"' +
 					' AND date_added > "' + DateAdded + '"';
 					
+					
 			RETURN eCrash_Services.ConstantsDeltaBase.Document_Select + WhereClause + SQL_LIMIT;
 		END;
-
 END;
