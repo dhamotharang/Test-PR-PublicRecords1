@@ -68,7 +68,7 @@ EXPORT getAttributes (DATASET(doxie.layout_best) infile,
             useGatewayDOB := LENGTH(TRIM(l.EquifaxHeader.DateOfBirthOrAge,LEFT,RIGHT)) = 8;
 
             SELF.ssn := l.EquifaxHeader.SubjectsSSN;
-            SELF.dob := IF(useGatewayDOB,l.EquifaxHeader.DateOfBirthOrAge, 0);
+            SELF.dob := (IF(useGatewayDOB,(UNSIGNED8)l.EquifaxHeader.DateOfBirthOrAge, 0));
             SELF.phone := l.CurrentAddress.TelephoneNumber;
             SELF.firstname := l.EquifaxHeader.SubjectsFirstName;
             SELF.middlename := l.EquifaxHeader.SubjectsMiddleName;
