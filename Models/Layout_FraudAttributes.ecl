@@ -1,4 +1,4 @@
-import Risk_Indicators;
+﻿import Risk_Indicators;
 
 Layout_Version1 := RECORD
 	// Identity Authentication Attributes
@@ -418,6 +418,7 @@ Layout_version201 := record
 	string2	IDVerSSNDriversLicense	:= '';
 	string2	SourceVehicleRegistration	:= '';
 	string2	SourceDriversLicense	:= '';
+	string2	IdentityDriversLicenseComp	:= '';
 end;
 
 Layout_IDAttributes := RECORD
