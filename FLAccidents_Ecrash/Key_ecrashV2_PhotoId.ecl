@@ -22,5 +22,3 @@ ds_PhotoSuperCmbnd	:= JOIN(ds_PhotoBase, ds_SuperReport,
 EXPORT Key_ecrashV2_PhotoId := INDEX(ds_PhotoSuperCmbnd
                                      ,{Super_report_id,Document_id,Report_Type}
 							                       ,{ds_PhotoSuperCmbnd}
-							                       ,Data_Services.Data_location.Prefix('ecrash')+'thor_data400::key::ecrashV2_PhotoId_' + doxie.Version_SuperKey);
-																		
