@@ -463,7 +463,7 @@ EXPORT CommonBusiness := MODULE
 																						SELF.ultID := LEFT.Busn_info.BIP_IDS.UltID.LinkID;
 																						SELF.orgID := LEFT.Busn_info.BIP_IDS.OrgID.LinkID;
 																						SELF.seleID := LEFT.Busn_info.BIP_IDS.SeleID.LinkID;
-																						SELF.locAddrs := DATASET([TRANSFORM(DueDiligence.Layouts.Address,
+																						SELF.locAddrs := DATASET([TRANSFORM(DueDiligence.LayoutsInternal.CommonGeographicLayout,
 																																									SELF := RIGHT;
 																																									SELF := [];)])[1];
 																						SELF := LEFT;
@@ -506,9 +506,11 @@ EXPORT CommonBusiness := MODULE
 																						SELF.hdAddrCount := IF(caller = DueDiligence.Constants.SOURCE_BUSINESS_CORP, LEFT.hdAddrCount, RIGHT.addrCount);
 																						SELF.SOSAddrLocationCount := IF(caller = DueDiligence.Constants.SOURCE_BUSINESS_CORP, RIGHT.addrCount, LEFT.SOSAddrLocationCount);
 																						SELF.operatingLocations := RIGHT.locAddrs[1..DueDiligence.Constants.MAX_OPERATING_LOCATIONS];
+																						SELF := RIGHT;
 																						SELF := LEFT;),
 																	LEFT OUTER);
 																	
+	//OUTPUT(rollAddr, NAMED('rollAddr'));																
 																	
 		RETURN addOperatingLocations;
 	END;
