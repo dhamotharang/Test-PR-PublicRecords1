@@ -41,13 +41,17 @@ EXPORT LayoutsInternalReport := MODULE
 		UNSIGNED2 watercraftCount;
   END;
 	
-	EXPORT BusSourceLayout := RECORD
+	EXPORT ListOfBusSourceLayout := RECORD
+	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
 		STRING sourceName;
 		STRING source;
 		STRING sourceType;
 		UNSIGNED4 firstReported;
 		UNSIGNED4 lastReported;
 	END;
+
+
+
 
  EXPORT BEOCriminalReportingOFOffenses := RECORD
   DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
@@ -70,5 +74,11 @@ EXPORT LayoutsInternalReport := MODULE
 		DueDiligence.LayoutsInternal.InternalBIPIDsLayout;
 		DATASET(iesp.duediligencereport.t_DDRSICNAIC) industryRisk {MAXCOUNT(iesp.Constants.DDRAttributesConst.MaxSICNAICs)};
 	END;
-
+	
+	
+	EXPORT ReportingOfOperatingLocations  := RECORD
+	 DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
+	 DueDiligence.Layouts.BusOperLocationLayout ReportOfOperatingLocs;
+	END;
+	
 END;

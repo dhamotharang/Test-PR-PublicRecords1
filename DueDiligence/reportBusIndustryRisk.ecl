@@ -110,11 +110,11 @@ EXPORT reportBusIndustryRisk(DATASET(DueDiligence.Layouts.Busn_Internal) inData)
 
 
 
-	OUTPUT(industryRisk, NAMED('industryRisk'));
-	OUTPUT(sicOnly, NAMED('sicOnly'));
-	OUTPUT(naicsOnly, NAMED('naicsOnly'));
-	OUTPUT(sicDescriptions, NAMED('sicDescriptions'));
-	OUTPUT(naicDiscriptions, NAMED('naicDiscriptions'));
+	// OUTPUT(industryRisk, NAMED('industryRisk'));
+	// OUTPUT(sicOnly, NAMED('sicOnly'));
+	// OUTPUT(naicsOnly, NAMED('naicsOnly'));
+	// OUTPUT(sicDescriptions, NAMED('sicDescriptions'));
+	// OUTPUT(naicDiscriptions, NAMED('naicDiscriptions'));
 	// OUTPUT(joinedCodes, NAMED('joinedCodes'));
 	// OUTPUT(sortCodes, NAMED('sortCodes'));
 

@@ -1,4 +1,4 @@
-﻿IMPORT Address, BIPV2, Business_Header, Business_Risk_BIP, DueDiligence, iesp, Risk_Indicators, STD, ut;
+﻿IMPORT Address, BIPV2, Business_Header, Business_Risk_BIP, codes, DueDiligence, Easi, iesp, Risk_Indicators, STD, ut;
 
 
 EXPORT Common := MODULE
@@ -12,7 +12,7 @@ EXPORT Common := MODULE
 			
 			RETURN ROW(createPair(name, val));			
 	END;
-	
+
 	EXPORT getNameFromList(UNSIGNED fieldNumber, CONST STRING fieldList, UNSIGNED numberOfFields) := FUNCTION
 		//determine the location of the commas in the list
 		previousCommaLocation := IF(fieldNumber = 1, DueDiligence.Constants.NUMERIC_ZERO, STD.Str.Find(fieldList, ',', fieldNumber-1));
@@ -83,18 +83,18 @@ EXPORT Common := MODULE
 
 			updatedData := PROJECT(ds, TRANSFORM({RECORDOF(removeAliasFromTopLevelLayout), RECORDOF(newUpdatedAliasLayout) #EXPAND(aliasName)}, 
 																						
-																						#EXPAND(IF(numberOfAliasFields >= 1, DueDiligence.Common.getFieldProject(1, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
-																						#EXPAND(IF(numberOfAliasFields >= 2, DueDiligence.Common.getFieldProject(2, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
-																						#EXPAND(IF(numberOfAliasFields >= 3, DueDiligence.Common.getFieldProject(3, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
-																						#EXPAND(IF(numberOfAliasFields >= 4, DueDiligence.Common.getFieldProject(4, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
-																						#EXPAND(IF(numberOfAliasFields >= 5, DueDiligence.Common.getFieldProject(5, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
-																						#EXPAND(IF(numberOfAliasFields >= 6, DueDiligence.Common.getFieldProject(6, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
-																						#EXPAND(IF(numberOfAliasFields >= 7, DueDiligence.Common.getFieldProject(7, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
-																						#EXPAND(IF(numberOfAliasFields >= 8, DueDiligence.Common.getFieldProject(8, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
-																						#EXPAND(IF(numberOfAliasFields >= 9, DueDiligence.Common.getFieldProject(9, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
-																						#EXPAND(IF(numberOfAliasFields >= 10, DueDiligence.Common.getFieldProject(10, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
-																						
-																						SELF := LEFT;));	
+																																									#EXPAND(IF(numberOfAliasFields >= 1, DueDiligence.Common.getFieldProject(1, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
+																																									#EXPAND(IF(numberOfAliasFields >= 2, DueDiligence.Common.getFieldProject(2, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
+																																									#EXPAND(IF(numberOfAliasFields >= 3, DueDiligence.Common.getFieldProject(3, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
+																																									#EXPAND(IF(numberOfAliasFields >= 4, DueDiligence.Common.getFieldProject(4, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
+																																									#EXPAND(IF(numberOfAliasFields >= 5, DueDiligence.Common.getFieldProject(5, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
+																																									#EXPAND(IF(numberOfAliasFields >= 6, DueDiligence.Common.getFieldProject(6, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
+																																									#EXPAND(IF(numberOfAliasFields >= 7, DueDiligence.Common.getFieldProject(7, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
+																																									#EXPAND(IF(numberOfAliasFields >= 8, DueDiligence.Common.getFieldProject(8, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
+																																									#EXPAND(IF(numberOfAliasFields >= 9, DueDiligence.Common.getFieldProject(9, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
+																																									#EXPAND(IF(numberOfAliasFields >= 10, DueDiligence.Common.getFieldProject(10, appendAliasName, numberOfAliasFields), DueDiligence.Constants.EMPTY))
+																																									
+																																									SELF := LEFT;));	
 																			
 		#end
 
@@ -114,9 +114,9 @@ EXPORT Common := MODULE
 				alias := dateFieldName[..periodLocation-1] + ',';
 				
 				name := MAP(dateFieldName = DueDiligence.Constants.EMPTY => DueDiligence.Constants.EMPTY,
-										periodLocation = DueDiligence.Constants.NUMERIC_ZERO => IF(returnAlias, DueDiligence.Constants.EMPTY, dateFieldName + ','),
-										returnAlias AND STD.Str.Find(previousNames, alias, 1) = DueDiligence.Constants.NUMERIC_ZERO => alias,
-										DueDiligence.Constants.EMPTY);
+																periodLocation = DueDiligence.Constants.NUMERIC_ZERO => IF(returnAlias, DueDiligence.Constants.EMPTY, dateFieldName + ','),
+																returnAlias AND STD.Str.Find(previousNames, alias, 1) = DueDiligence.Constants.NUMERIC_ZERO => alias,
+																DueDiligence.Constants.EMPTY);
 
 				RETURN previousNames + name;
 		END;
@@ -199,18 +199,18 @@ EXPORT Common := MODULE
 		
 		updatedDS := PROJECT(aliasLayout10, TRANSFORM(finalTopLevelLayout, 
 
-																									#EXPAND(IF(numberOfTopLevelFields >= 1, DueDiligence.Common.getFieldProject(1, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
-																									#EXPAND(IF(numberOfTopLevelFields >= 2, DueDiligence.Common.getFieldProject(2, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
-																									#EXPAND(IF(numberOfTopLevelFields >= 3, DueDiligence.Common.getFieldProject(3, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
-																									#EXPAND(IF(numberOfTopLevelFields >= 4, DueDiligence.Common.getFieldProject(4, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
-																									#EXPAND(IF(numberOfTopLevelFields >= 5, DueDiligence.Common.getFieldProject(5, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
-																									#EXPAND(IF(numberOfTopLevelFields >= 6, DueDiligence.Common.getFieldProject(6, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
-																									#EXPAND(IF(numberOfTopLevelFields >= 7, DueDiligence.Common.getFieldProject(7, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
-																									#EXPAND(IF(numberOfTopLevelFields >= 8, DueDiligence.Common.getFieldProject(8, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
-																									#EXPAND(IF(numberOfTopLevelFields >= 9, DueDiligence.Common.getFieldProject(9, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
-																									#EXPAND(IF(numberOfTopLevelFields >= 10, DueDiligence.Common.getFieldProject(10, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
+																																																#EXPAND(IF(numberOfTopLevelFields >= 1, DueDiligence.Common.getFieldProject(1, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
+																																																#EXPAND(IF(numberOfTopLevelFields >= 2, DueDiligence.Common.getFieldProject(2, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
+																																																#EXPAND(IF(numberOfTopLevelFields >= 3, DueDiligence.Common.getFieldProject(3, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
+																																																#EXPAND(IF(numberOfTopLevelFields >= 4, DueDiligence.Common.getFieldProject(4, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
+																																																#EXPAND(IF(numberOfTopLevelFields >= 5, DueDiligence.Common.getFieldProject(5, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
+																																																#EXPAND(IF(numberOfTopLevelFields >= 6, DueDiligence.Common.getFieldProject(6, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
+																																																#EXPAND(IF(numberOfTopLevelFields >= 7, DueDiligence.Common.getFieldProject(7, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
+																																																#EXPAND(IF(numberOfTopLevelFields >= 8, DueDiligence.Common.getFieldProject(8, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
+																																																#EXPAND(IF(numberOfTopLevelFields >= 9, DueDiligence.Common.getFieldProject(9, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
+																																																#EXPAND(IF(numberOfTopLevelFields >= 10, DueDiligence.Common.getFieldProject(10, topLevelFieldList, numberOfTopLevelFields), DueDiligence.Constants.EMPTY))
 
-																									SELF := LEFT;));
+																																																SELF := LEFT;));
 
 		RETURN updatedDS;
 	ENDMACRO;
@@ -390,13 +390,13 @@ EXPORT Common := MODULE
   EXPORT GetMyDate(unsigned4 history_date)                 := FUNCTION
 	   /* today_date will be in YYYYMMDD format */  
 	   unsigned4 todays_date               := STD.Date.Today();
-	   unsigned4 returnDateToUse := IF(history_date=99999999,
-	                      todays_date,
-												history_date);
+	   unsigned4 returnDateToUse := IF(history_date = DueDiligence.Constants.date8Nines,
+																																				todays_date,
+																																				history_date);
 	
 	   RETURN returnDateToUse; 
 	
-	END;       //END OF THIS FUNCTION
+	END;
 	
 	
 	EXPORT GetCleanData(DATASET(DueDiligence.Layouts.Input) input) := FUNCTION
@@ -669,7 +669,8 @@ EXPORT Common := MODULE
 		RETURN ReturnValue;
 	END;	
 	
-	// ------                                                                                -----
+
+ // ------                                                                                -----
  // ------   THIS FUNCTION IS EXPECTING THE 3 DIGIT FIPS CODE TO BE POPULATED             -----
 	// ------   IT NEEDS BOTH THE 3 DIGIT FIPS AND THE 5 DIGIT FIPS CODE                     -----
 	// ------   The FIPS county code is a five-digit Federal Information Processing          -----
@@ -731,11 +732,17 @@ EXPORT Common := MODULE
 		RETURN withGeographicRisk;
 	END;
 	
-	
-	
-	
-	
-	
-	
+	EXPORT getRelatedPartyOffenses(DATASET(DueDiligence.LayoutsInternal.RelatedParty) relatedParty) := FUNCTION
+		
+		execOffenses := NORMALIZE(relatedParty, LEFT.party.partyOffenses, TRANSFORM(DueDiligence.LayoutsInternal.CriminalOffenses,
+																																																																															SELF.ultID := LEFT.UltID;
+																																																																															SELF.orgID := LEFT.OrgID;
+																																																																															SELF.seleID := LEFT.SeleID;
+																																																																															SELF.offense := RIGHT;
+																																																																															SELF := LEFT;
+																																																																															SELF := [];));	
+																													
+		RETURN execOffenses;
+	END;
 	
 END;
