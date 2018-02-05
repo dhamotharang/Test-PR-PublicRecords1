@@ -8,6 +8,8 @@ MODULE
 
 	BatchShare.MAC_ProcessInput(dIn,SHARED dProcessInput);
 	
+	SHARED IsPhoneRiskAssessment	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment;
+	
 	// Format to common batch input layout
 	Autokey_batch.Layouts.rec_inBatchMaster tFormat2BatchCommonInput(dProcessInput pInput) :=
 	TRANSFORM
@@ -18,11 +20,15 @@ MODULE
 		SELF           := [];
 	END;
 	
-	dFormat2BatchCommonInput := PROJECT(dProcessInput,tFormat2BatchCommonInput(LEFT));
-	// DIDs
-	dGetDIDs := IF(inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment,
-																								DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID),
-																								PhoneFinder_Services.Functions.GetDIDsBatch(dFormat2BatchCommonInput(did = 0)));				
+	SHARED dFormat2BatchCommonInput := PROJECT(dProcessInput,tFormat2BatchCommonInput(LEFT));
+
+  dEmpty_dids := DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID);
+			
+		// DIDs	
+	 dGetDIDs := IF(IsPhoneRiskAssessment, dEmpty_dids,
+	                     PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput, true) + PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput));				
+																																														
+	
 	PhoneFinder_Services.Layouts.BatchInAppendAcctno tDIDs(Autokey_batch.Layouts.rec_inBatchMaster le,
 																													PhoneFinder_Services.Layouts.BatchInAppendDID ri) :=
 	TRANSFORM
@@ -54,7 +60,7 @@ MODULE
 																								SELF.zip4      := LEFT.z4,
 																								SELF           := LEFT));
 	SHARED dInPhone   := dAppendDIDsFormat(homephone != '');
-	SHARED dInNoPhone := dAppendDIDsFormat(did != 0 and homephone = '' and inMod.TransactionType != PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment);
+	SHARED dInNoPhone := dAppendDIDsFormat(did != 0 and homephone = '' and ~IsPhoneRiskAssessment);
 	
 	// Append best info
 	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dInNoPhone);
@@ -78,14 +84,14 @@ MODULE
 		SELF                      := [];
   END;
 
- SHARED dSearchRecs := IF(inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment,
+ SHARED dSearchRecs := IF(IsPhoneRiskAssessment,
                      PROJECT(dInPhone, withInputphone(LEFT)), dSearchRecs_pre_a);
 	
  SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dSearchRecs, inMod);
  
- SHARED IsReturnMetadata := inMod.IncludePhoneMetadata OR inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment;
+ SHARED IsReturnMetadata := inMod.IncludePhoneMetadata OR IsPhoneRiskAssessment;
 														
- ds_in_accu := IF(inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment,
+ ds_in_accu := IF(IsPhoneRiskAssessment,
 	                 project(dedup(sort(dSearchRecs, acctno), acctno),
 									 transform(PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in, self.acctno := left.acctno, self.phone := left.phone)),
 									 project(dSearchRecs(typeflag = Phones.Constants.TypeFlag.DataSource_PV), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in));
