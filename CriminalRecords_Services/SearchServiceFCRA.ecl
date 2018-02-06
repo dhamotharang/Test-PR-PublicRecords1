@@ -43,6 +43,7 @@
 import iesp, AutoStandardI, STD;
 
 export SearchServiceFCRA := MACRO
+ #onwarning(4207, ignore);
 
 	boolean isFCRA := true;
 	#constant('NoDeepDive', true);

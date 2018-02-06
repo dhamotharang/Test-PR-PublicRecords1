@@ -20,7 +20,7 @@
 import FaaV2_PilotServices, iesp, AutoStandardI, fcra, FFD;
 
 export SearchServiceFCRA := macro
-
+  #onwarning(4207, ignore);
   #constant('NoDeepDive', true);
   
   rec_in := iesp.faapilot_fcra.t_FCRAPilotSearchRequest;

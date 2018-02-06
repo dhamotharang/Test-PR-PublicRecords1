@@ -13,6 +13,7 @@
 IMPORT risk_indicators, Address, Models, iesp;
 
 export RiskViewReport_Service := MACRO
+  #onwarning(4207, ignore);
 
 		/* Force layout of WsECL page */
 		#WEBSERVICE(FIELDS(

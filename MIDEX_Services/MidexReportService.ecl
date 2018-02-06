@@ -37,7 +37,7 @@ IMPORT AutoStandardI, iesp, lib_stringlib, MIDEX_Services, BIPV2;
 
 EXPORT MidexReportService  := 
   MACRO
-
+    #onwarning(4207, ignore);
     // Get XML input 
     rec_in    := iesp.midexcompreport.t_MIDEXCompReportRequest;
     ds_in     := DATASET ([], rec_in) : STORED ('MIDEXCompReportRequest', FEW);
