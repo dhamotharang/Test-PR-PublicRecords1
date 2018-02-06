@@ -1030,6 +1030,8 @@
 		export string KEYWORD_EU_VE									:= '718';
 		export string KEYWORD_RSSRE_DIR4_WC					:= '719';
 		export string KEYWORD_MYRMP									:= '720';
+		export string KEYWORD_INMCA_DD2							:= '721';
+		export string KEYWORD_INMCA_SC							:= '722';
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
 	
