@@ -1,4 +1,4 @@
-IMPORT AutoKeyI, AutoStandardI, census_data, iesp,
+﻿IMPORT AutoKeyI, AutoStandardI, census_data, iesp,
        lib_stringlib, liensv2_services, LN_PropertyV2_Services, 
        Midex_Services, Prof_License_Mari, SANCTN, SANCTN_Mari, 
        Suppress, ut;
@@ -419,7 +419,14 @@ EXPORT Functions :=
           PROJECT( ds_inMidexCompResults,
                    TRANSFORM( iesp.midexcompreport.t_MIDEXCompReportResponse,
                               SELF._Header                                        := iesp.ECL2ESP.GetHeaderRow(),
-                              SELF.RecordCount                                    := 1,
+                              SELF.RecordCount                                    := IF(EXISTS(ds_inMidexCompResults.PublicRecords) OR
+																																																																																								EXISTS(ds_inMidexCompResults.NonPublicRecords) OR
+																																																																																								EXISTS(ds_inMidexCompResults[1].NonPublicExRecords) OR
+																																																																																								EXISTS(ds_inMidexCompResults.Licenses)OR
+																																																																																								ds_inMidexCompResults[1].BusinessSmartLinxRecord.BestInformation.BusinessId[1]<>'' OR
+																																																																																								ds_inMidexCompResults[1].PersonSmartLinxRecord.UniqueId[1]<>'' OR
+																																																																																								ds_inMidexCompResults[1].TopBusinessRecord.BestSection.BusinessIds.SeleID[1] <> '0',
+																																																																																							1,0),
                               SELF.Records                                        := ds_inMidexCompResults,
                               SELF.AlertResult.RecordDeleted                      := ds_hashVals.deleted,
                               SELF.AlertResult.AlertVersion                       := pAlertVersion,

@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Consumer Profile FCRA Report" wuTimeout="300000">
 	<part name="gateways" type="tns:XmlDataSet" cols="70" rows="4"/>
 	<part name="FCRAConsumerProfileReportRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
@@ -92,6 +92,7 @@ EXPORT ReportServiceFCRA := MACRO
 			export boolean isECHRestricted := AutoStandardI.DataRestrictionI.val(drm_mod).isECHRestricted(datarestrictionmask);
 			export boolean isEQCHRestricted := AutoStandardI.DataRestrictionI.val(drm_mod).isEQCHRestricted(datarestrictionmask);
 			export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);
+			export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.IntendedPurpose);	
 		end;
 		
 		rec_out := ConsumerProfile_Services.ReportRecords_FCRA(ReportBy, ConsumerProfile_mod, gateways_in);

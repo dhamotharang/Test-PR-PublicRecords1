@@ -2,21 +2,21 @@
 <message name="AssetReportService" wuTimeout="300000">
   <part name="DID" type="xsd:string" required="1" />
   <separator />
-  <part name="SSNMask" type="xsd:string"/>	<!-- [NONE, ALL, LAST4, FIRST5] -->
+  <part name="SSNMask" type="xsd:string"/>  <!-- [NONE, ALL, LAST4, FIRST5] -->
   <part name="DOB" type="xsd:unsignedInt"/>
+  <part name="FCRAPurpose" type="xsd:string"/>
   <part name="DPPAPurpose" type="xsd:byte" default="1"/>
   <part name="GLBPurpose" type="xsd:byte" default="1"/> 
-	<part name="ApplicationType"     	type="xsd:string"/>
+  <part name="ApplicationType"       type="xsd:string"/>
   <part name="LnBranded" type="xsd:boolean"/>
   <part name="DataRestrictionMask" type="xsd:string" default="00000000000"/>
-	<part name="FFDOptionsMask" 	      type="xsd:string"/>
+  <part name="FFDOptionsMask"         type="xsd:string"/>
   <part name="SuppressWithdrawnBankruptcy" type="xsd:boolean"/>
   <separator />
   <part name="FcraAssetReportRequest" type="tns:XmlDataSet" cols="80" rows="30" />
 </message>
 */
 /*--INFO-- Searches for personal assets (FCRA-data only)<p/><p/>*/
-/*--USES-- ut.input_xslt */
 
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, ut;
 
@@ -40,7 +40,7 @@ EXPORT AssetReportServiceFCRA () := MACRO
   // so far there are no any specific options for FCRA report, I keep it here for the future needs
   GetInputOptions (iesp.assetreport_fcra.t_FcraAssetReportOption tag) := function
     options := module
-			export boolean bk_suppress_withdrawn := tag.SuppressWithdrawnBankruptcy;
+      export boolean bk_suppress_withdrawn := tag.SuppressWithdrawnBankruptcy;
      // export boolean include_alsofound            := tag.ReturnAlsoFound;
       // export boolean include_proflicenses         := tag.IncludeProfessionalLicenses;
       // export boolean include_peopleatwork         := tag.IncludePeopleAtWork;
@@ -51,10 +51,7 @@ EXPORT AssetReportServiceFCRA () := MACRO
   rec_in := iesp.assetreport_fcra.t_FcraAssetReportRequest;
   ds_in := DATASET ([], rec_in) : STORED ('FcraAssetReportRequest', FEW);
   first_row := ds_in[1] : INDEPENDENT;
-	
-	// FFD 
-  valFFDOptionsMask := FFD.FFDMask.Get(first_row.Options.FFDOptionsMask);
-
+  
   // this will #store some standard input parameters (generally, for search purpose)
   iesp.ECL2ESP.SetInputBaseRequest (first_row);
 
@@ -86,7 +83,7 @@ EXPORT AssetReportServiceFCRA () := MACRO
   // options := options_esdl;  
 
   // define search parameters; in "pure" ESDL mode this must be replaced with a module created from XML input
- 	globals := AutoStandardI.GlobalModule();
+   globals := AutoStandardI.GlobalModule();
   search_mod := module (project (globals, PersonReports.input._didsearch, opt))
   end;
 
@@ -104,17 +101,18 @@ EXPORT AssetReportServiceFCRA () := MACRO
     // Do all required translations here
     export unsigned1 GLBPurpose := AutoStandardI.InterfaceTranslator.glb_purpose.val (search_mod);
     export unsigned1 DPPAPurpose := AutoStandardI.InterfaceTranslator.dppa_purpose.val (search_mod);
-		export string5 IndustryClass := AutoStandardI.InterfaceTranslator.industry_class_value.val (search_mod);
-		export string DataPermissionMask := search_mod.dataPermissionMask;
+    export string5 IndustryClass := AutoStandardI.InterfaceTranslator.industry_class_value.val (search_mod);
+    export string DataPermissionMask := search_mod.dataPermissionMask;
     export string DataRestrictionMask := globals.dataRestrictionMask;
     export boolean ln_branded := AutoStandardI.InterfaceTranslator.ln_branded_value.val (search_mod);
     export string6 ssn_mask := 'NONE' : stored('SSNMask'); // ideally, must be "translated" ssnmask
     //export string6 ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_val.val (search_mod);
     export unsigned1 score_threshold := AutoStandardI.InterfaceTranslator.score_threshold_value.val (search_mod);
-		export string32 applicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(search_mod,AutoStandardI.InterfaceTranslator.application_type_val.params));
+    export string32 applicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(search_mod,AutoStandardI.InterfaceTranslator.application_type_val.params));
     export integer1 non_subject_suppression := options_esdl.non_subject_suppression;
-		export boolean bk_suppress_withdrawn := options_esdl.bk_suppress_withdrawn;
-		export integer8 FFDOptionsMask := valFFDOptionsMask;
+    export boolean bk_suppress_withdrawn := options_esdl.bk_suppress_withdrawn;
+    export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.Options.FFDOptionsMask);
+    export integer8 FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.Options.FCRAPurpose);
   end;
 
   // The DID must be provided in the input
@@ -123,22 +121,22 @@ EXPORT AssetReportServiceFCRA () := MACRO
   // main records
   asset_mod := module (project (report_mod, PersonReports.input._assetreport, opt)) end;
   recs_combined := PersonReports.AssetReport(dids, asset_mod, TRUE);
-	recs := recs_combined.Records;
+  recs := recs_combined.Records[1];  // single row coming as dataset here
 //  output (recs);
 
   // wrap it into output structure
-   iesp.assetreport_fcra.t_FcraAssetReportResponse SetResponse (PersonReports.layouts.CommonAssetReportIndividual L) := transform
+   iesp.assetreport_fcra.t_FcraAssetReportResponse SetResponse () := transform
        Self._Header := iesp.ECL2ESP.GetHeaderRow ();
-       Self.Individual := L;
-			 Self.ConsumerStatements := recs_combined.Statements;
-			 Self.ConsumerAlerts := recs_combined.ConsumerAlerts;
+       Self.Individual := recs;
+       Self.ConsumerStatements := recs_combined.Statements;
+       Self.ConsumerAlerts := recs_combined.ConsumerAlerts;
      end;
-     results := PROJECT (recs, SetResponse (Left));
+   results := dataset ([SetResponse ()]);
 
 
     IF (count (dids) > 1,
                      fail (203, doxie.ErrorCodes (203)), // or ('ambiguous criteria'),
-										output (results, named ('Results')));
+                    output (results, named ('Results')));
 
 
   
@@ -164,8 +162,8 @@ ENDMACRO;
   <EndUser/>
 </User>
 <Options>
-	<ReturnAlsoFound></ReturnAlsoFound>
-	<IncludeProfessionalLicenses></IncludeProfessionalLicenses>
+  <ReturnAlsoFound></ReturnAlsoFound>
+  <IncludeProfessionalLicenses></IncludeProfessionalLicenses>
 </Options>
 <ReportBy>
   <UniqueId></UniqueId>

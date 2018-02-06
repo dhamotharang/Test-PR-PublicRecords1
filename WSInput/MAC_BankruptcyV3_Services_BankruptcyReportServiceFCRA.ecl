@@ -1,4 +1,4 @@
-// This service created to add Web Service fields for BankruptcyV3_Services.BankruptcyReportServiceFCRA
+﻿// This service created to add Web Service fields for BankruptcyV3_Services.BankruptcyReportServiceFCRA
 
 EXPORT MAC_BankruptcyV3_Services_BankruptcyReportServiceFCRA := MACRO
 
@@ -10,6 +10,7 @@ EXPORT MAC_BankruptcyV3_Services_BankruptcyReportServiceFCRA := MACRO
 												'DLMask',
 												'DOBMask',
 												'DPPAPurpose',
+										  'FCRAPurpose',
 												'GLBPurpose',
 												'IndustryClass',
 												'SSNMask',

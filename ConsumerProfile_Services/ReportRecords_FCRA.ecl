@@ -71,21 +71,22 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 	bshell_dids	:= project(ungroup(clam), transform(doxie.layout_references, self.did := left.did));
 	//Get FCRA files
 	ds_best := project(bshell_dids,transform(doxie.layout_best,self:=left,self:=[]));
-	ds_flags := FCRA.GetFlagFile (ds_best);
 		
 	// FFD				 
 	boolean showDisputedRecords := FFD.FFDMask.isShowDisputed(in_param.FFDOptionsMask);
 	boolean showConsumerStatements := FFD.FFDMask.isShowConsumerStatements(in_param.FFDOptionsMask);
 
 	//Get the DID 
-	dids	  := 	project(ds_best, transform(FFD.Layouts.DidBatch, 
+	dids	  := 	project(ds_best(did<>0), transform(FFD.Layouts.DidBatch, 
 		                           self.acctno := FFD.Constants.SingleSearchAcctno, 
 															 self.did := (unsigned6) left.did));
 															
 	//Call the person context
-	pc_recs := FFD.FetchPersonContext(dids, in_gateways, FFD.Constants.DataGroupSet.HDR);
+	pc_recs := FFD.FetchPersonContext(dids, in_gateways, FFD.Constants.DataGroupSet.HDR, in_param.FFDOptionsMask);
 	slim_pc_recs := FFD.SlimPersonContext(pc_recs);														
 	
+	ds_flags := FFD.GetFlagFile (ds_best, pc_recs);
+
 	//Get FCRA header records
 	//to avoid platform feature of IF statement which executed FCRA header call even when there was insufficient input,
 	//adding extra boolean condition
@@ -131,25 +132,31 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 	fcra_address_hist := ConsumerProfile_Services.Functions.getAddressHistory(fcra_header_final);	
 	
 	//Get consumer statement
+	statement_output_fcra := if(ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);	
 	consumer_statement := join(bshell_dids, Consumerstatement.key.fcra.lexid, 
 														left.did <> 0 and
 														KEYED(left.did = right.LexID), 
 														transform(right),
 														atmost(riskwise.max_atmost)); //Potentially we could have more than 1 consumer statement per DID, but currently we are only returning the most recent one
 	//Alerts
-	clam_alerts := ConsumerProfile_Services.Functions.checkForAlertsFromClam(clam[1], in_param);
+ pc_alert_ind := FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_param.FCRAPurpose, in_param.FFDOptionsMask)[1];
+ pc_alerts := ConsumerProfile_Services.Functions.checkForAlertsFromPC(pc_recs, pc_alert_ind.suppress_records);  // alerts coming from Person Context
+	clam_alerts := ConsumerProfile_Services.Functions.checkForAlertsFromClam(clam[1], in_param);  // alerts coming from indices
 	cs_alert := ConsumerProfile_Services.Functions.getAlertDataset(FCRA.Constants.ALERT_CODE.CONSUMER_STATEMENT);
-	boolean has_consumer_statement := exists(consumer_statement);
+	boolean has_consumer_statement := exists(consumer_statement) or pc_alert_ind.consumer_flags.has_consumer_statement<>'';
 	
-	alerts := if(insufficient_input, input_alert, 
+	alerts_pre := if(insufficient_input, input_alert, 
 								if(~in_param.test_data_enabled, clam_alerts + if(has_consumer_statement, cs_alert)));
 	
+  alerts := dedup(sort(alerts_pre + pc_alerts, Code), Code);  // dedup in case if same alert comes from PC and index
+  
 	//Alerts that null all other results
 	null_alerts_set := [FCRA.Constants.ALERT_CODE.INSUFFICIENT_INPUT_INFO, 
 											FCRA.Constants.ALERT_CODE.SECURITY_FREEZE,
+											FCRA.Constants.ALERT_CODE.SECURITY_FRAUD_ALERT,
 											FCRA.Constants.ALERT_CODE.STATE_EXCEPTION,
 											FCRA.Constants.ALERT_CODE.NO_DID_FOUND];
-	boolean nullResults := exists(alerts(Code in null_alerts_set));
+	boolean nullResults := exists(alerts_pre(Code in null_alerts_set)) or pc_alert_ind.suppress_records;
 	//Alerts that null results and aren't billable
 	null_unbillable_alerts_set := [FCRA.Constants.ALERT_CODE.INSUFFICIENT_INPUT_INFO,
 																 FCRA.Constants.ALERT_CODE.NO_DID_FOUND];
@@ -240,7 +247,6 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 		self.StatementIds := [];				
 	end;
 	
-	statement_output_fcra := if(ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);	
 	royalty_rec := Royalty.RoyaltyExperianHeader.GetFCRARoyaltySet(fcra_header_final);
 	
 	ConsumerProfile_Services.Layouts.cp_out_layout xformOut() := transform
@@ -253,6 +259,8 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 	ConsumerProfile_Services.Layouts.cp_out_layout xformNull() := transform
 		self.Result.isBillable:= isBillable;
 		self.Result.Alerts 		:= choosen(alerts/*(alertCode in null_alerts_set)*/, iesp.Constants.ConsumerProfile.MAX_COUNT_ALERTS);
+		self.Result.ConsumerStatement := if(has_consumer_statement, sort(consumer_statement, -dateCreated)[1].cs_text, '');
+		self.ConsumerStatements := choosen(statement_output_fcra(StatementType IN FFD.Constants.RecordType.StatementConsumerLevel), iesp.Constants.MaxConsumerStatements); // consumer level statements are always returned even if blank result
 		self := [];
 	end;
 	null_final_rec := dataset([xformNull()]);
@@ -268,5 +276,8 @@ EXPORT ReportRecords_FCRA(iesp.fcraconsumerprofilereport.t_ConsumerProfileReport
 	// output(fcra_header_final,named('fcra_header_final'));
 	// output(alerts,named('alerts'));
 	// output(slim_pc_recs,named('slim_pc_recs'));	
+	// output(pc_recs,named('pc_recs'));	
+	// output(pc_alert_ind,named('pc_alert_ind'));	
+	// output(pc_alerts,named('pc_alerts'));	
 	return out_rec;
 END;

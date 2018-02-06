@@ -545,5 +545,12 @@ export getHRIDesc(string5 rc) := CASE(TRIM(rc),
 'O6' => 'Unable to locate Ship-To identity',
 'O7' => 'Unable to locate Bill-To identity',
 
+//Fraud Flags
+'GW' => 'Credit Bureaus currently reporting an active duty alert and fraud victim extended alert (W)',
+'GX' => 'Credit Bureaus currently reporting a fraud victim extended alert (X)',
+'GQ' => 'Credit Bureaus currently reporting an active duty alert and fraud victim initial alert (Q)',
+'GV' => 'Credit Bureaus currently reporting a fraud victim initial alert (V)',
+'GN' => 'Credit Bureaus currently reporting an active duty alert(N)',
+
 '00' => '',
 'REASON CODE' + rc + ' IS INVALID');

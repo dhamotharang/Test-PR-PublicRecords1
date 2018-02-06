@@ -1,5 +1,5 @@
 ﻿IMPORT Address,autoHeaderV2,AutoStandardI,doxie,EquifaxDecisioning,
-       Gateway,iesp; 
+       Gateway,iesp,riskwisefcra; 
 
 EXPORT getAttributes (DATASET(doxie.layout_best) infile, 
                       DATASET(Gateway.Layouts.Config) gateways,
@@ -59,21 +59,26 @@ EXPORT getAttributes (DATASET(doxie.layout_best) infile,
         gatewayOutput := Gateway.SoapCall_EquifaxDecisioning(gatewayInput,ds_gatewayConfig,pMakeGatewayCall); 
         _rowGw := gatewayOutput[1].Response.Report;
         
+        // FCRA URL needed for the remote header search
+        gateway_check := gateways (servicename IN riskwisefcra.Neutral_Service_Name)[1].url;
+        STRING remote_ip := IF (gateway_check='', ERROR (301, doxie.ErrorCodes(301)), gateway_check);
+        
         AutoHeaderV2.layouts.unprocessed_input xfm_intoGetDidLayout(iesp.equifax_attributes.t_EquifaxAttributesReport l) := 
           TRANSFORM
             useGatewayDOB := LENGTH(TRIM(l.EquifaxHeader.DateOfBirthOrAge,LEFT,RIGHT)) = 8;
 
-            SELF.ssn := (STRING11)l.EquifaxHeader.SubjectsSSN;
-            SELF.dob := IF(useGatewayDOB,(UNSIGNED8)l.EquifaxHeader.DateOfBirthOrAge, 0);
-            SELF.phone := (STRING15)l.CurrentAddress.TelephoneNumber;
-            SELF.firstname := (STRING30)l.EquifaxHeader.SubjectsFirstName;
-            SELF.middlename := (STRING30)l.EquifaxHeader.SubjectsMiddleName;
-            SELF.lastname := (STRING30)l.EquifaxHeader.SubjectsLastName;
+            SELF.ssn := l.EquifaxHeader.SubjectsSSN;
+            SELF.dob := (IF(useGatewayDOB,(UNSIGNED8)l.EquifaxHeader.DateOfBirthOrAge, 0));
+            SELF.phone := l.CurrentAddress.TelephoneNumber;
+            SELF.firstname := l.EquifaxHeader.SubjectsFirstName;
+            SELF.middlename := l.EquifaxHeader.SubjectsMiddleName;
+            SELF.lastname := l.EquifaxHeader.SubjectsLastName;
             SELF.primrange := l.CurrentAddress.StreetNumber;
-            SELF.primname := (STRING28)l.CurrentAddress.StreetName;
-            SELF.city := (STRING25)l.CurrentAddress.City;
+            SELF.primname := l.CurrentAddress.StreetName;
+            SELF.city := l.CurrentAddress.City;
             SELF.state := l.CurrentAddress.StateCode;
-            SELF.zip := (STRING5)l.CurrentAddress.ZipCode[1..5];
+            SELF.zip := l.CurrentAddress.ZipCode[1..5];
+            SELF.seisintadlservice := remote_ip;
             SELF := [];
           END;
 
@@ -83,32 +88,28 @@ EXPORT getAttributes (DATASET(doxie.layout_best) infile,
         useGatewayResults := ds_gatewayRecDid[1].DID = _rowInf.DID;
 
         fn_getAttributeValue(iesp.equifax_attributes.t_EquifaxAttributes gw_attributes, STRING4 CodeValueToReturn) := 
-          FUNCTION
-          
-            RETURN CASE(CodeValueToReturn,
-                        gw_attributes.Field1[1..4] => gw_attributes.Field1[6..],
-                        gw_attributes.Field2[1..4] => gw_attributes.Field2[6..],
-                        gw_attributes.Field3[1..4] => gw_attributes.Field3[6..],
-                        gw_attributes.Field4[1..4] => gw_attributes.Field4[6..],
-                        gw_attributes.Field5[1..4] => gw_attributes.Field5[6..],
-                        gw_attributes.Field6[1..4] => gw_attributes.Field6[6..],
-                        gw_attributes.Field7[1..4] => gw_attributes.Field7[6..],
-                        gw_attributes.Field8[1..4] => gw_attributes.Field8[6..],
-                        gw_attributes.Field9[1..4] => gw_attributes.Field9[6..],
-                        gw_attributes.Field10[1..4] => gw_attributes.Field10[6..],
-                        gw_attributes.Field11[1..4] => gw_attributes.Field11[6..],
-                        gw_attributes.Field12[1..4] => gw_attributes.Field12[6..],
-                        gw_attributes.Field13[1..4] => gw_attributes.Field13[6..],
-                        gw_attributes.Field14[1..4] => gw_attributes.Field14[6..],
-                        gw_attributes.Field15[1..4] => gw_attributes.Field15[6..],
-                        gw_attributes.Field16[1..4] => gw_attributes.Field16[6..],
-                        gw_attributes.Field17[1..4] => gw_attributes.Field17[6..],
-                        gw_attributes.Field18[1..4] => gw_attributes.Field18[6..],
-                        gw_attributes.Field19[1..4] => gw_attributes.Field19[6..],
-                        gw_attributes.Field20[1..4] => gw_attributes.Field20[6..],
-                                                       '');
-
-            END;
+          CASE( CodeValueToReturn,
+                gw_attributes.Field1[1..4] => gw_attributes.Field1[6..],
+                gw_attributes.Field2[1..4] => gw_attributes.Field2[6..],
+                gw_attributes.Field3[1..4] => gw_attributes.Field3[6..],
+                gw_attributes.Field4[1..4] => gw_attributes.Field4[6..],
+                gw_attributes.Field5[1..4] => gw_attributes.Field5[6..],
+                gw_attributes.Field6[1..4] => gw_attributes.Field6[6..],
+                gw_attributes.Field7[1..4] => gw_attributes.Field7[6..],
+                gw_attributes.Field8[1..4] => gw_attributes.Field8[6..],
+                gw_attributes.Field9[1..4] => gw_attributes.Field9[6..],
+                gw_attributes.Field10[1..4] => gw_attributes.Field10[6..],
+                gw_attributes.Field11[1..4] => gw_attributes.Field11[6..],
+                gw_attributes.Field12[1..4] => gw_attributes.Field12[6..],
+                gw_attributes.Field13[1..4] => gw_attributes.Field13[6..],
+                gw_attributes.Field14[1..4] => gw_attributes.Field14[6..],
+                gw_attributes.Field15[1..4] => gw_attributes.Field15[6..],
+                gw_attributes.Field16[1..4] => gw_attributes.Field16[6..],
+                gw_attributes.Field17[1..4] => gw_attributes.Field17[6..],
+                gw_attributes.Field18[1..4] => gw_attributes.Field18[6..],
+                gw_attributes.Field19[1..4] => gw_attributes.Field19[6..],
+                gw_attributes.Field20[1..4] => gw_attributes.Field20[6..],
+                                               '');
 
        EquifaxDecisioning.Layouts.Eq_DecisioningAttr xfm_getValidOutput (iesp.equifax_attributes.t_EquifaxAttributes gw_attributes) :=
           TRANSFORM

@@ -504,8 +504,26 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 																			TRIM(Rep_3_SSN) = '' AND TRIM(Rep_3_DOB) = '' AND TRIM(Rep_3_Street_Address1) = '' AND TRIM(Rep_3_City) = '' AND TRIM(Rep_3_State) = '' AND TRIM(Rep_3_Zip) = '' AND TRIM(Rep_3_Phone10) = '' AND TRIM(Rep_3_DL_Number) = ''
 																		 );
 																		 
+	  // If blended model is requested, then one of the three minimum input options for the authorized rep must be met:
+  //    a. Authorized Rep Last Name, Authorized Rep First Name, Authorized Rep Street Address, Authorized Rep Zip
+  //    b. Authorized Rep Last Name, Authorized Rep First Name and SSN
+  //    c. Authorized Rep Last Name, Authorized Rep First Name, Authorized Rep Street Address, Authorized Rep City, Authorized Rep State
+  MinimumInputMetForAuthorizedRep_ScoreOption1 := (TRIM(Rep_1_Full_Name) <> '' OR (TRIM(Rep_1_First_Name) <> '' AND TRIM(Rep_1_Last_Name) <> '')) AND
+                                      TRIM(Rep_1_Street_Address1) <> '' AND TRIM(Rep_1_Zip) <> '';  
+  MinimumInputMetForAuthorizedRep_ScoreOption2 := (TRIM(Rep_1_Full_Name) <> '' OR (TRIM(Rep_1_First_Name) <> '' AND TRIM(Rep_1_Last_Name) <> '')) AND
+                                      TRIM(Rep_1_SSN) <> '';
+  MinimumInputMetForAuthorizedRep_ScoreOption3 := (TRIM(Rep_1_Full_Name) <> '' OR (TRIM(Rep_1_First_Name) <> '' AND TRIM(Rep_1_Last_Name) <> '')) AND
+                                      TRIM(Rep_1_Street_Address1) <> '' AND TRIM(Rep_1_City) <> '' AND TRIM(Rep_1_State) <> '';
+  
+  // If the customer requests the Business Blended score and provides no Authorized Rep input, then populate the Business Blended score with a '0' value.
+  AuthorizedRepNotInput := TRIM(Rep_1_Full_Name) = '' AND TRIM(Rep_1_First_Name) = '' AND TRIM(Rep_1_Last_Name) = '' AND
+                 TRIM(Rep_1_SSN) = '' AND TRIM(Rep_1_DOB) = '' AND TRIM(Rep_1_Street_Address1) = '' AND TRIM(Rep_1_City) = '' AND TRIM(Rep_1_State) = '' AND TRIM(Rep_1_Zip) = '' AND TRIM(Rep_1_Phone10) = '' AND TRIM(Rep_1_DL_Number) = '';
+  
+  BlendedModelRequested := EXISTS(ModelsRequested(ModelName IN SET(LNSmallBusiness.Constants.DATASET_MODELS.BLENDED_ALL, ModelName)));
+	
 	IF((MinimumInputMetForOption1 = FALSE AND MinimumInputMetForOption2 = FALSE) OR // Minimum Business Inputs not met
-		 ((MinimumInputMetForOption1 = TRUE OR MinimumInputMetForOption2 = TRUE) AND MinimumInputMetForAuthorizedRep = FALSE), // Minimum Business Inputs met, but minimum Authorized Rep Inputs not met
+		 ((MinimumInputMetForOption1 = TRUE OR MinimumInputMetForOption2 = TRUE) AND MinimumInputMetForAuthorizedRep = FALSE) OR // Minimum Business Inputs met, but minimum Authorized Rep Inputs not met
+		 (BlendedModelRequested AND AuthorizedRepNotInput = FALSE AND MinimumInputMetForAuthorizedRep_ScoreOption1 = FALSE AND MinimumInputMetForAuthorizedRep_ScoreOption2 = FALSE AND MinimumInputMetForAuthorizedRep_ScoreOption3 = FALSE),
 		FAIL('Please input the minimum required fields:\nOption 1: Company Name, Street Address, Zip\nOR\nOption 2: Company Name, Street Address, City, State'));
 	
 	/* ************************************************************************
@@ -698,13 +716,13 @@ EXPORT SmallBusiness_BIP_Service() := FUNCTION
 																							 self.o_reason_1_4 := left.Result.Models[1].Scores[1].ScoreReasons[4].ReasonCode,
 																							 self.o_reason_1_5 := left.Result.Models[1].Scores[1].ScoreReasons[5].ReasonCode,
 																							 self.o_reason_1_6 := left.Result.Models[1].Scores[1].ScoreReasons[6].ReasonCode,
-																							 self.o_score_2    := left.Result.Models[1].Scores[2].Value,
-																							 self.o_reason_2_1 := left.Result.Models[1].Scores[2].ScoreReasons[1].ReasonCode,
-																							 self.o_reason_2_2 := left.Result.Models[1].Scores[2].ScoreReasons[2].ReasonCode,
-																							 self.o_reason_2_3 := left.Result.Models[1].Scores[2].ScoreReasons[3].ReasonCode,
-																							 self.o_reason_2_4 := left.Result.Models[1].Scores[2].ScoreReasons[4].ReasonCode,
-																							 self.o_reason_2_5 := left.Result.Models[1].Scores[2].ScoreReasons[5].ReasonCode,
-																							 self.o_reason_2_6 := left.Result.Models[1].Scores[2].ScoreReasons[6].ReasonCode,
+																							 self.o_score_2    := left.Result.Models[2].Scores[1].Value,
+																							 self.o_reason_2_1 := left.Result.Models[2].Scores[1].ScoreReasons[1].ReasonCode,
+																							 self.o_reason_2_2 := left.Result.Models[2].Scores[1].ScoreReasons[2].ReasonCode,
+																							 self.o_reason_2_3 := left.Result.Models[2].Scores[1].ScoreReasons[3].ReasonCode,
+																							 self.o_reason_2_4 := left.Result.Models[2].Scores[1].ScoreReasons[4].ReasonCode,
+																							 self.o_reason_2_5 := left.Result.Models[2].Scores[1].ScoreReasons[5].ReasonCode,
+																							 self.o_reason_2_6 := left.Result.Models[2].Scores[1].ScoreReasons[6].ReasonCode,
 																							 self := left,
 																							 self := [] ));
 	Deltabase_Logging := DATASET([{Deltabase_Logging_prep}], Risk_Reporting.Layouts.LOG_Deltabase_Layout);

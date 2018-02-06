@@ -53,7 +53,8 @@ EXPORT TaxRefundISv3_BatchService_Records(
   END;			
 
   //Have to translate the information into something the Death batch service can recognize.
-  death_clean_batch := PROJECT(ds_clean_batch, DeathV2_Services.Layouts.BatchIn);		
+	//TRIS v3.2.1 req 4.1.5: Adding did (LexID) to values passed in to deceased service
+  death_clean_batch := PROJECT(ds_clean_batch_w_did, DeathV2_Services.Layouts.BatchIn);
   ds_death_res := DeathV2_Services.BatchRecords(death_clean_batch, death_in_mod)
 	                     (matchcode in set_deceased_match_codes);	
    
@@ -100,23 +101,24 @@ EXPORT TaxRefundISv3_BatchService_Records(
 																	L.st          = addr_rec.st) or
 																	L.z5          = addr_rec.z5)             and
 															  (L.prim_range <> '' or L.prim_name <> '');
+		
+		boolean isInputFullNameMatch := L.name_first = ssn_rec.fname AND
+																		L.name_last = ssn_rec.lname;
+		
 		boolean hasInputAddrInHistory := StringLib.StringContains(addr_rec.matchcodes, 'A', TRUE) or 
 		                                                          addr_rec.hasInputAddr;
 		boolean is_input_state := args_in.isInputState(addr_rec.st);
-		boolean take_best := ~( isInputAddrMatch) and
-													(temp_addr_name_score >= args_in.BestNameScoreMin) and 
-													(temp_addr_ssn_score >= args_in.BestSSNScoreMin);
-		// req 4.1.22
-		self.address_outside_of_agency_state := if(~is_input_state AND
-																							(temp_addr_name_score >= args_in.BestNameScoreMin) and 
-																							(temp_addr_ssn_score >= args_in.BestSSNScoreMin), 'OS', '');
-		// req. 4.1.23		
-		self.Address_Confidence := if ((temp_addr_name_score >= args_in.BestNameScoreMin) and  
-																	 (temp_addr_ssn_score >= args_in.BestSSNScoreMin), 
-																	 addr_rec.conf_flag, '');
+		
+		//TRIS v3.2.1 update req 4.2.1 remove NameScore logic and 4.2.2 remove SSNScore logic
+		boolean take_best := ~( isInputAddrMatch);
+		boolean take_best_name := ~(isInputFullNameMatch);
+		// req 4.1.22 -- TRIS v3.2.1 update req 4.2.1 remove NameScore logic and 4.2.2 remove SSNScore logic
+		self.address_outside_of_agency_state := if(~is_input_state, 'OS', '');
+		// req. 4.1.23		-- TRIS v3.2.1 update req 4.2.1 remove NameScore logic and 4.2.2 remove SSNScore logic, and 4.1.3 fill in best field if not match to input
+		self.Address_Confidence := addr_rec.conf_flag;
 
-		self.best_fname := if(take_best, ssn_rec.best_fname, '');
-		self.best_lname := if(take_best, ssn_rec.best_lname, ''); 
+		self.best_fname := if(take_best_name, ssn_rec.fname, '');
+		self.best_lname := if(take_best_name, ssn_rec.lname, '');
 		self.best_addr1 := if(take_best, Address.Addr1FromComponents(addr_rec.prim_range, 
 		                                                             addr_rec.predir, 
 																																 addr_rec.prim_name, 
@@ -146,22 +148,17 @@ EXPORT TaxRefundISv3_BatchService_Records(
 																			if(best_dist < 10000, (string4) best_dist,'9999')
 																			);
     
-		// v3.0 req 4.1.24	
-		self.InputAddrDate	:= if ((temp_addr_name_score >= args_in.BestNameScoreMin) and 
-															 (temp_addr_ssn_score >= args_in.BestSSNScoreMin), 
-															 addr_rec.InputAddrDate, '');
+		// v3.0 req 4.1.24	-- TRIS v3.2.1 update req 4.2.1 remove NameScore logic and 4.2.2 remove SSNScore logic
+		self.InputAddrDate	:= addr_rec.InputAddrDate;
 
+		//TRIS v3.2.1 update req 4.2.1 remove NameScore logic and 4.2.2 remove SSNScore logic
 		self.MatchedInputAddr := map(addr_rec.InputAddrDate <> ''                     => '', 
 																 (isInputAddrMatch or hasInputAddrInHistory)        and 
-																 addr_rec.InputAddrDate = ''                        and
-																 (temp_addr_name_score >= args_in.BestNameScoreMin) and 
-																 (temp_addr_ssn_score >= args_in.BestSSNScoreMin) => 'Y',
-																 'N');
-															
-		self.InputAddrZipDate := if ((temp_addr_name_score >= args_in.BestNameScoreMin) and 
-														     (temp_addr_ssn_score >= args_in.BestSSNScoreMin)  and 
-														     addr_rec.InputZipMatch,
-														     addr_rec.InputZipMatchDate,''); //YYYYMMDD format	
+																 addr_rec.InputAddrDate = ''  => 'Y'
+																 ,'N');
+		
+		//TRIS v3.2.1 update req 4.2.1 remove NameScore logic and 4.2.2 remove SSNScore logic
+		self.InputAddrZipDate := if (addr_rec.InputZipMatch, addr_rec.InputZipMatchDate,''); //YYYYMMDD format	
 
 		// end v3.0 req 4.1.24
 				
@@ -330,10 +327,9 @@ EXPORT TaxRefundISv3_BatchService_Records(
 		//	This is to check for father-son with same name but different YOBs.
 		//	-If one or both DOBs are blank, then just match SSNs.
 		//	-If both DOBs are populated then match SSNs and YOBs. (Icing on cake situation)		
-
-		dob_to_use := if((INTEGER)ssn_rec.best_dob <> 0 and
-											temp_verify_best_ssn  >= args_in.BestSSNScoreMin and
-											temp_verify_best_name >= args_in.BestNameScoreMin,ssn_rec.best_dob[1..4],'');
+		
+		//TRIS v3.2.1 update req 4.2.1 remove NameScore logic and 4.2.2 remove SSNScore logic
+		dob_to_use := if((INTEGER)ssn_rec.best_dob <> 0,ssn_rec.best_dob[1..4],'');
 
 		boolean yobs_not_blank := ((INTEGER)crim_best_rec.dob[1..4] <> 0  and (INTEGER)dob_to_use <> 0);
 		boolean crim_yob_matches_best_yob := (crim_best_rec.dob[1..4] = dob_to_use) ;

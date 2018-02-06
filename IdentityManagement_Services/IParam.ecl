@@ -1,8 +1,8 @@
 /***
  ** Module to define parameter interface for selection of desired reports. Each defaults to 'false' unless requested.
 ***/
- 
-import PersonReports;
+
+import IdentityManagement_Services, PersonReports;
 
 export IParam := module
   export _include := INTERFACE
@@ -30,14 +30,15 @@ export IParam := module
 		export string RealTimePermissibleUse := '';
 		export unsigned2 LinkingWeightThreshold := 0;
   end;
-	
-	export _report := INTERFACE (PersonReports.input._report, PersonReports.input.relatives, 
+
+	export _report := INTERFACE (PersonReports.input._report, PersonReports.input.relatives,
 															 PersonReports.input.neighbors, _include)
+		export boolean SuppressCompromisedDLs := false;
 	end;
 
 	export _search := INTERFACE
-		export boolean include_hri   := FALSE;
-		export boolean use_saltFetch := FALSE;
+		export boolean include_hri   := false;
+		export boolean use_saltFetch := false;
 	end;
 
 end;

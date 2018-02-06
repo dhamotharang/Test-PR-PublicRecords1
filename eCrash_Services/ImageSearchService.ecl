@@ -1,4 +1,7 @@
-﻿/*2015-06-24T16:52:16Z (Sai Nagula)
+﻿/*2017-09-23T00:08:22Z (Lazarenko, Dmitriy (RIS-HBE))
+[ECH-5121] implementing append/overwrite supplement images behavior.
+*/
+/*2015-06-24T16:52:16Z (Sai Nagula)
 Open State search and Drivers exchange report grouping.
 */
 /*--SOAP--
@@ -46,6 +49,7 @@ EXPORT ImageSearchService() := FUNCTION
 	RequestVendorCode := Request[1].ReportBy.Vendor;
 	RequestAgencyOri := Request[1].ReportBy.AgencyORI;
 	RequestDateOfCrash := Request[1].ReportBy.DateOfCrash;
+		RequestColoredImage := Request[1].Options.ColoredImage;
 
 	RequestReportIdRaw := Request[1].ReportBy.ReportID;
 	//blanking out RequestReportId for KYCrashLogic since we need to get an image for it straigt away without search performed. 
@@ -90,12 +94,27 @@ EXPORT ImageSearchService() := FUNCTION
 	);
 	ReportsAllSlimWithoutDeleted := ReportsDeltabaseResult.reportsAllSlim; 
 		
-	ReportsAllSlimDeduped := SORT(	
+	ReportsAllSlimDedupedRaw := SORT(	
 		DEDUP(
 			SORT(ReportsAllSlimWithoutDeleted, hash_key, -(UNSIGNED8)report_id),
 			hash_key
 		),
 		(UNSIGNED8)report_id
+	);
+	
+	AgencyInfo := FLAccidents_Ecrash.key_EcrashV2_agency(
+		KEYED(
+			agency_state_abbr = SuperReportRow[1].jurisdiction_state 
+			AND agency_name = SuperReportRow[1].jurisdiction
+		)	
+	);
+	AgencyAppendOverwriteFlag := AgencyInfo[1].append_overwrite_flag;
+	
+	ReportsAllSlimDeduped := CASE(
+		AgencyAppendOverwriteFlag,
+		Constants.AGENCY_FLAG_APPEND => ReportsAllSlimDedupedRaw,
+		Constants.AGENCY_FLAG_OVERWRITE => TOPN(ReportsAllSlimDedupedRaw, 1, -(UNSIGNED8)report_id),
+		ReportsAllSlimDedupedRaw
 	);
 	
 	ImageHashes := PROJECT(
@@ -106,6 +125,8 @@ EXPORT ImageSearchService() := FUNCTION
 			SELF.IncludeCoverPage := RequestIncludeCoverPage;
 		)
 	);
+
+	isOnlyTm := COUNT(ReportsAllSlimWithoutDeleted) = COUNT(ReportsAllSlimWithoutDeleted(report_code = 'TM'));
 
 	IyetekRedactFlag := SuperReportRow[1].jurisdiction_nbr IN eCrash_Services.constants.REDACTION_AGENCY_LIST;
 	ImageRetrievalRequest := ImageService.GetAccidentImageRequest(
@@ -118,10 +139,11 @@ EXPORT ImageSearchService() := FUNCTION
 		IyetekRedactFlag,
 		RequestAgencyOri,
 		RequestVendorCode,
-		RequestDateOfCrash
+		RequestDateOfCrash,
+		isOnlyTm,
+		RequestColoredImage
 	);
 
-	isOnlyTm := COUNT(ReportsAllSlimWithoutDeleted) = COUNT(ReportsAllSlimWithoutDeleted(report_code = 'TM'));
 	//We don't know which report_id was used to retreive image for TM that's why we are searching by all the possible report ids. ESP inserts report_id from the request.
 	AllReportIdSet := SET(ReportsAll, report_id) + SET(ReportHashKeysFromKeyFinal, report_id) + [RequestReportId]; 
 	

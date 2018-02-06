@@ -3,7 +3,7 @@
 EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData, 
 											 Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											 BIPV2.mod_sources.iParams linkingOptions,
-											 //ReportIsRequested = TRUE,  
+											 boolean ReportIsRequested,  
 											 boolean DebugMode = FALSE
 											 ) := FUNCTION
 
@@ -169,9 +169,11 @@ EXPORT getBusProperty(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	 PropertyCurrentlyOwnedButLimited   := dedup(sort(BusPropertyOwnedWithDetails,  PropertyReportData.seleid, -TaxAssdValue), PropertyReportData.seleid,  KEEP(iesp.constants.DDRAttributesConst.MaxProperties)); 
   
 	//UpdateBusnPropertyWithReport  := UpdateBusnPropertyForAttributeLogic; 
-	 UpdateBusnPropertyWithReport  := DueDiligence.reportBusProperty(UpdateBusnPropertyForAttributeLogic,
-	                                                                PropertyCurrentlyOwnedButLimited,
-																																	DebugMode);   
+	 UpdateBusnPropertyWithReport  := IF(ReportIsRequested,
+	                                     DueDiligence.reportBusProperty(UpdateBusnPropertyForAttributeLogic,
+	                                                                PropertyCurrentlyOwnedButLimited,DebugMode),
+																																	    /* ELSE */
+																																			   UpdateBusnPropertyForAttributeLogic); 
 	 
 	
 	// ********************

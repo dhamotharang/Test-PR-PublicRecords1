@@ -86,39 +86,7 @@ EXPORT Records := module
 		
 		// sort ascending by penalty with lowest penalty as first record.
 		finalRecs := sort(finalRecsRaw+stillfailedRecs,acctno,record_penalty);
-		
-		// output(ReEntryRecords, Named('getRecordsIndividual_ReEntryRecords'),extend);
-		// output(SearchInputRecords, Named('getRecordsIndividual_SearchInputRecords'),extend);
-		// output(ReEntryHeaderRecords, Named('getRecordsIndividual_ReEntryHeaderRecords'),extend);
-		// output(ReEntrySanctionRecords, Named('getRecordsIndividual_ReEntrySanctionRecords'),extend);
-		// output(ReEntryGSASanctionRecords, Named('getRecordsIndividual_ReEntryGSASanctionRecords'),extend);
-		// output(IndividualRecords, Named('getRecordsIndividual_IndividualRecords'),extend);
-		// output(getLNPIDs, Named('getRecordsIndividual_getLNPIDs'),extend);
-		// output(failedSearches, Named('getRecordsIndividual_failedSearches'),extend);
-		// output(goodSearches, Named('getRecordsIndividual_goodSearches'),extend);
-		// output(getIndividuals, Named('getRecordsIndividual_getIndividuals'),extend);
-		// output(mergedIndividuals, Named('getRecordsIndividual_mergedIndividuals'),extend);
-		// output(groupedIndividuals, Named('getRecordsIndividual_groupedIndividuals'),extend);
-		// output(DistinctInputRecsbyAcctno, Named('DistinctInputRecsbyAcctno'),extend);
-		// output(rolledIndividuals, Named('getRecordsIndividual_rolledIndividuals'),extend);
-		// output(finalIndividuals, Named('getRecordsIndividual_finalIndividuals'),extend);
-		// output(getGSASanctionsHits, Named('getRecordsIndividual_getGSASanctionsHits'),extend);
-		// output(getGSASanctionsHitsHighConf, Named('getRecordsIndividual_getGSASanctionsHitsHighConf'), extend);
-		// output(NoHitsforIndivDeepDive, Named('getRecordsIndividual_NoHitsforIndivDeepDive'), extend);
-		// output(getIndividualsDeepDive, Named('getRecordsIndividual_getIndividualsDeepDive'), extend);
-		// output(getGSASanctionsWithoutMatch, Named('getRecordsIndividual_getGSASanctionsWithoutMatch'),extend);
-		// output(getGSASanctionsWithMatchMoreBMoreRestrictive, Named('getRecordsIndividual_getGSASanctionsWithMatchMoreBMoreRestrictive'),extend);
-		// output(collectedIndividuals, Named('getRecordsIndividual_collectedIndividuals'),extend);
-		// output(getSanctionReEntryRecs, Named('getRecordsIndividual_getSanctionReEntryRecs'),extend);
-		// output(getGSASanctionReEntryRecs, Named('getRecordsIndividual_getGSASanctionReEntryRecs'),extend);
-		// output(getLNPIDs, Named('getRecordsIndividual_getLNPIDs'),extend);
-		// output(failedSearches, Named('getRecordsIndividual_failedSearches'),extend);
-		// output(mergedRecs, Named('getRecordsIndividual_mergedRecs'),extend);
-		// output(groupedRecs, Named('getRecordsIndividual_groupedRecs'),extend);
-		// output(rolledRecs, Named('getRecordsIndividual_rolledRecs'),extend);
-		// output(finalRecsRaw, Named('getRecordsIndividual_finalRecsRaw'),extend);
-		// output(stillfailedRecs, Named('getRecordsIndividual_stillfailedRecs'),extend);
-		// output(finalRecs, Named('getRecordsIndividual_finalRecs'),extend);
+	
 		return finalRecs;
 	end;
 	Export getRecordsBusiness (dataset(Layouts.autokeyInput) input, dataset(Layouts.common_runtime_config) cfg = RunTimeConfig) := function
@@ -162,29 +130,7 @@ EXPORT Records := module
 		rolledRecs := rollup(groupedRecs, group, Transforms.doFinalRollup(left,rows(left)));
 		finalRecs := Functions.doPenalty(rolledRecs,DistinctInputRecsbyAcctno,cfg[1].penalty_threshold);
     //final_sort:=sort(finalRecs	,-record_penalty);
-		//output(cfg,named('cfggetRecordsBusiness'),overwrite);
-		//output(ReEntryHeaderRecords,named('ReEntryHeaderRecords'));
-		//output(ReEntryGSASanctionRecords,named('ReEntryGSASanctionRecords'));
-		//output(BusinessRecords,named('BusinessRecords'));
-		//output(getLNPIDsBusiness,named('getLNPIDsBusiness'),extend);
-		//output(getRawBusinesses,named('getRawBusinesses'),extend);
-		//output(rolledRawBusinesses,named('rolledRawBusinesses'));
-		//output(finalRawBusinesses,named('finalRawBusinesses'));
-		//output(getGSABusSanctionsHits,named('getGSABusSanctionsHits'));
-		//output(NoHitsforBusDeepDive,named('NoHitsforBusDeepDive'));
-		//output(getBusinessDeepDive,named('getBusinessDeepDive'));
-		//output(rolledRawBusinesses,named('rolledRawBusinesses'));
-		//output(finalBusinessRemoveFailed,named('finalBusinessRemoveFailed'));
-		//output(collectedBusiness,named('collectedBusiness'));
-		//utput(getGSASanctionReEntryRecs,named('getGSASanctionReEntryRecs'));
-		//output(mergedRecs,named('mergedRecs'));
-		//output(groupedRecs,named('groupedRecs'));
-		//output(rolledRecs,named('rolledRecs'));
-		//output(mergedRecs,named('mergedRecs'));
-		//output(rolledRecs,named('rolledRecs'));
-		//output(finalRecs,named('getRecordsBusinessfinalRecs'));
-		//output(final_sort,named('getRecordsBusinessfinal_sort'));
-		return finalRecs;
+			return finalRecs;
 	end;
 	Export getRecordsBusinessLegacy (dataset(Layouts.autokeyInput) input, dataset(Layouts.common_runtime_config) cfg = RunTimeConfig) := function
 		ReEntryRecords := input(ProviderSrc <> '' and ProviderID > 0);//These are records that are coming back into the code from a result list
@@ -293,12 +239,6 @@ EXPORT Records := module
 		exactLNPIDMatches := finalRecs(isExactLNPID=true);
 		nonExactLNPIDMatchRecs := join(finalRecs,exactLNPIDMatches,left.acctno=right.acctno,transform(left),left only);
 		finalRecsFiltered := sort(exactLNPIDMatches+nonExactLNPIDMatchRecs,acctno,record_penalty);
-		// output(getIndividuals,named('getRecordsRaw_getIndividuals'),extend);		
-		// output(getBusinesses,named('getRecordsRaw_getBusinesses'),extend);		
-		// output(finalRecs,named('getRecordsRaw_finalRecsgetRecordsRaw'),extend);		
-		// output(exactLNPIDMatches,named('getRecordsRaw_exactLNPIDMatches'),extend);		
-		// output(nonExactLNPIDMatchRecs,named('getRecordsRaw_nonExactLNPIDMatchRecs'),extend);		
-		// output(finalRecsFiltered,named('getRecordsRaw_finalRecsFiltered'),extend);		
 		return finalRecsFiltered;
 	end;
 	Export getRecordsAppend (dataset(Layouts.autokeyInput) input, dataset(layouts.CombinedHeaderResults) rawRecs, dataset(Layouts.common_runtime_config) cfg = RunTimeConfig) := function
@@ -322,34 +262,10 @@ EXPORT Records := module
 		// fmtRec_Sanctions := join(fmtRec_w_ABMS,getFullLegacySanction,left.acctno=right.acctno and left.lnpid=right.LNPID,transform(layouts.CombinedHeaderResultsDoxieLayout, self.LegacySanctions:=left.LegacySanctions+right.LegacySanctions;self:=left;),left outer, keep(Constants.MAX_RECS_ON_JOIN), limit(0));
 		fmtRec_AppendGSA := Healthcare_Header_Services.DataSource_GSA.get_GSA_by_LNPID(project(fmtRec_w_ABMS,transform(layouts.CombinedHeaderResults,self:=left)));
 		fmtRec_GSASanctions := join(fmtRec_w_ABMS,fmtRec_AppendGSA,left.acctno=right.acctno and left.lnpid=right.LNPID,transform(layouts.CombinedHeaderResultsDoxieLayout, self.LegacySanctions:=right.LegacySanctions;self:=left;),left outer, keep(Constants.MAX_RECS_ON_JOIN), limit(0));
-		recToRemove:=fmtRec_GSASanctions(src=Healthcare_Header_Services.Constants.SRC_GSA_SANC and exists(LegacySanctions(src=Healthcare_Header_Services.Constants.SRC_HEADER)));
-		fmtRec_FinalGSA := join(fmtRec_GSASanctions,recToRemove,left.acctno=right.acctno and right.LNPID = left.LNPID,transform(recordof(fmtRec_GSASanctions),self := left),left only);
-		fmtRec_Final := join(fmtRec_FinalGSA,input(derivedinputrecord=false),left.acctno=right.acctno,Functions_Validation.processVerifications(left,right,cfg),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
+		fmtRec_Final := join(fmtRec_GSASanctions,input(derivedinputrecord=false),left.acctno=right.acctno,Functions_Validation.processVerifications(left,right,cfg),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
     fmtRec_FinalNew := if(cfg[1].includeAffiliations,functions.AppendAffiliations(fmtRec_Final,cfg),fmtRec_Final);
 		// fmtRec_Final := join(fmtRec_w_ABMS,input(derivedinputrecord=false),left.acctno=right.acctno,Functions_Validation.processVerifications(left,right),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
-		// output(rawDoxieFmt,named('rawDoxieFmt'),overwrite);
-		// output(slim,named('slim'),overwrite);
-		// output(fmtRec_w_SSN,named('fmtRec_w_SSN'),overwrite);
-		// output(fmtRec_w_Death,named('fmtRec_w_Death'),overwrite);
-		// output(fmtRec_w_SSN,named('fmtRec_w_SSN'),overwrite);
-		// output(fmtRec_w_CustomerLicense,named('fmtRec_w_CustomerLicense'),overwrite);
-		// output(fmtRec_w_CustomerDeath,named('fmtRec_w_CustomerDeath'),overwrite);
-		// output(slim(clianumbers[1].clianumber<>''),named('fmtRec_Clia_Input'),overwrite);
-		// output(fmtRec_Clia,named('fmtRec_Clia'),overwrite);
-		// output(fmtRec_w_Clia,named('fmtRec_w_Clia'),overwrite);
-		// output(fmtRec_w_ABMS,named('getRecordsAppend_fmtRec_w_ABMS'),overwrite);
-		// output(getSanctionsbyLNPID,named('getRecordsAppend_getSanctionsbyLNPID'),overwrite);
-		// output(SanctionsAlreadyInResults,named('getRecordsAppend_SanctionsAlreadyInResults'),overwrite);
-		// output(SanctionsToGet,named('getRecordsAppend_SanctionsToGet'),overwrite);
-		// output(getFullLegacySanction,named('getRecordsAppend_getFullLegacySanction'),overwrite);
-		// output(getFullLegacySanctionTest,named('getRecordsAppend_getFullLegacySanctionTest'),overwrite);
-		// output(fmtRec_Sanctions,named('getRecordsAppend_fmtRec_Sanctions'),overwrite);
-		// output(fmtRec_AppendGSA,named('getRecordsAppend_fmtRec_AppendGSA'),overwrite);
-		// output(fmtRec_GSASanctions,named('getRecordsAppend_fmtRec_GSASanctions'),overwrite);
-		// output(recToRemove,named('recToRemove'),overwrite);
-		// output(fmtRec_Final,named('getRecordsAppend_fmtRec_Final'),overwrite);
-		//return sort(fmtRec_Final,acctno,if(isBestBIPResult,0,1),record_penalty);
-		return sort(fmtRec_FinalNew,acctno,if(isBestBIPResult,0,1),record_penalty);
+		 		return sort(fmtRec_FinalNew,acctno,if(isBestBIPResult,0,1),record_penalty);
 	end;
 
 	Export getRecordsRawDoxiebyDid (dataset(doxie.layout_references) input, dataset(Layouts.common_runtime_config) cfg = RunTimeConfig) := function
@@ -404,15 +320,7 @@ EXPORT Records := module
 		normDups:=normalize(rolledDups,left.dupAcctno,transform(Layouts.rawNormRec,self.dupAcctno := right.acctno, self:=left;));
 		processDups := join(normDups,appendSupplementalData,left.acctno=right.acctno,transform(recordof(appendSupplementalData),self.acctno:=left.dupAcctno;self:=right),keep(Constants.MAX_RECS_ON_JOIN), limit(0));
 		reCombineAndSort:=sort(appendSupplementalData+processDups,Acctno,record_penalty,if(Src=Healthcare_Header_Services.Constants.SRC_GSA_SANC,2,0));
-		// output(input,Named('getRecordsRawDoxie_ServiceInput'),extend);
-		// output(dupFree,Named('getRecordsRawDoxie_ServiceDupFree'),extend);
-		// output(rawRecs,Named('getRecordsRawDoxie_rawRecs'),extend);
-		// output(appendSupplementalData,Named('ServiceAppendSupplementalData'));
-		// output(findDups,Named('ServiceFindDups'));
-		// output(rolledDups,Named('getRecordsRawDoxie_ServiceRolledDups'));
-		// output(normDups,Named('getRecordsRawDoxie_ServiceNormDups'),extend);
-		// output(processDups,Named('ServiceProcessDups'),extend);
-		// output(reCombineAndSort,Named('getRecordsRawDoxieReCombineAndSort'),extend);
+		
 		return reCombineAndSort;
 	end;
 	Export fmtRecordsLegacyReport (dataset(Layouts.CombinedHeaderResultsDoxieLayout) rawRecs,dataset(Layouts.common_runtime_config) cfg = RunTimeConfig) := function
@@ -566,9 +474,7 @@ EXPORT Records := module
 		rawRecs:=sort(dedup(sort(getRecordsRawDoxie(input, cfg),acctno, LNPID),acctno, LNPID),acctno,record_penalty,-SRC,if(Src=Healthcare_Header_Services.Constants.SRC_GSA_SANC,2,0));
 		filterRecs := if(cfg[1].IncludeSanctionsOnly = True,rawRecs(exists(LegacySanctions)),rawRecs);
 		// provRec:=project(filterRecs,Transforms.formatSearchServiceProviderOutput(left,convertedInput,cfg));
-		 //output(rawRecs,named('getSearchServiceRecordsRawrecs'));
-		 //output(filterRecs,named('getSearchServiceRecordsfilterRecsnamed'));
-		return filterRecs;
+		 		return filterRecs;
 	end;
 	Export fmtRecordsSearch (dataset(Layouts.CombinedHeaderResults) rawRecs) := function
 		return project(rawRecs,Transforms.fmtLegacySearch(left));

@@ -31,6 +31,7 @@ export t_AccidentImageSearchOption := record (iesp.share.t_BaseSearchOption)
 	string IyetekRoyaltyType {xpath('IyetekRoyaltyType')}; //values['','N','R','']
 	boolean IncludeCoverPage {xpath('IncludeCoverPage')};
 	boolean IyetekRedact {xpath('IyetekRedact')};
+	boolean ColoredImage {xpath('ColoredImage')};
 end;
 		
 export t_AccidentImageResponse := record

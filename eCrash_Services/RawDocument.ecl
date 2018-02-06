@@ -1,8 +1,8 @@
-import FLAccidents_Ecrash, Risk_Indicators, lib_stringlib, ut, doxie;
+﻿import FLAccidents_Ecrash, Risk_Indicators, lib_stringlib, ut, doxie;
 EXPORT RawDocument(IParam.searchrecords in_mod) := MODULE
 
-EXPORT GetReportDocuments(string RequestReportId) := FUNCTION
-	
+EXPORT GetReportDocuments(string RequestReportId, string DocumentType='') := FUNCTION
+
 		DeltaBaseService := eCrash_Services.DeltaBaseSoapCall(in_mod);
 		DeltaBaseSql := RawDeltaBaseSQL(in_mod);	
 		SuperReportIdToReportId := CHOOSEN(FLAccidents_Ecrash.Key_eCrashV2_ReportId(KEYED(report_id = RequestReportId)), 1);
@@ -56,14 +56,15 @@ EXPORT GetReportDocuments(string RequestReportId) := FUNCTION
 
 		ReportIdSet := if (LENGTH(TRIM(FinalSuperReportId)) > 0,[FinalSuperReportId, RequestReportId],[RequestReportId]);      
 		ReportIdString := eCrash_Services.fn_CombineWords(ReportIdSet, ',');
-
-		deltabaseDocReportIdSql := DeltaBaseSql.GetDocumentsByReportIdSQL(ReportIdString,DeltaBaseDateAddedSql);
-		DeltaDocumentDataById := DeltaBaseService.GetDocumentData(deltabaseDocReportIdSql);
+  deltabaseDocReportIdSql := DeltaBaseSql.GetDocumentsByReportIdSQL(ReportIdString,DeltaBaseDateAddedSql, DocumentType);
+  EmptyDocumentData := DATASET([],eCrash_Services.Layouts.DocumentData);
+		
+  DeltaDocumentDataById :=  if (TRIM(ReportIdString, LEFT, RIGHT) = '', EmptyDocumentData, DeltaBaseService.GetDocumentData(deltabaseDocReportIdSql));
 		
 		DeltabaseSuperReport := project(ReportDeltabaseRow,TRANSFORM(recordof(FLAccidents_Ecrash.Key_eCrashv2_Supplemental), SELF.accident_nbr:=LEFT.l_accnbr, self.addl_report_number:=LEFT.formattedStateReportNumber, SELF:=LEFT,SELF:=[]));	//project(ReportDeltabaseRow,TRANSFORM(FLAccidents_Ecrash.Key_eCrashv2_Supplemental, SELF:=LEFT));
 		
 	  //OUTPUT(DeltabaseSuperReport, named('DeltabaseSuperReport_temp'));
-		deltabaseDocBySupplementalSql := if (EXISTS(ReportHashKeysFromKey),DeltaBaseSql.GetDocumentsSQL(ReportHashKeysFromKey[1],DeltaBaseDateAddedSql),DeltaBaseSql.GetDocumentsSQL(DeltabaseSuperReport[1],DeltaBaseDateAddedSql));
+	 deltabaseDocBySupplementalSql := if (EXISTS(ReportHashKeysFromKey),DeltaBaseSql.GetDocumentsSQL(ReportHashKeysFromKey[1],DeltaBaseDateAddedSql, DocumentType),DeltaBaseSql.GetDocumentsSQL(DeltabaseSuperReport[1],DeltaBaseDateAddedSql, DocumentType));
 		DeltaDocumentDataBySupKey := DeltaBaseService.GetDocumentData(deltabaseDocBySupplementalSql);
 		
 		//OUTPUT(DeltaDocumentDataBySupKey,named('DeltaDocumentDataBySupKey_temp'));
@@ -73,7 +74,10 @@ EXPORT GetReportDocuments(string RequestReportId) := FUNCTION
 		
 		DocumentKey := FLAccidents_Ecrash.Key_ecrashV2_PhotoId;
 		PayloadDocumentsTemp := CHOOSEN(
-			DocumentKey(keyed(Super_report_id=FinalSuperReportId)),
+		 DocumentKey(keyed(Super_report_id=FinalSuperReportId) 
+			           and keyed(Document_id <> '') 
+									     and keyed(DocumentType = '' or report_type = DocumentType)
+									     ),
 			constants.MAX_REPORT_NUMBER
 		);
 		

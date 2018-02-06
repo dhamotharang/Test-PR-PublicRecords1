@@ -1901,9 +1901,9 @@ layout_temp trans_name(layout_temp le, addr_key rt) := transform
 	
 	self.inq_peraddr_count_day := if(good_inquiry and within1day, 1, 0);
 	self.inq_peraddr_count_week := if(good_inquiry and within1week, 1, 0);
-	self.inq_peraddr_count01 := if(good_inquiry, 1, 0);
-	self.inq_peraddr_count03 := if(good_inquiry, 1, 0);
-	self.inq_peraddr_count06 := if(good_inquiry, 1, 0);
+	self.inq_peraddr_count01 := if(good_inquiry and ageBucket = 1, 1, 0);
+	self.inq_peraddr_count03 := if(good_inquiry and ageBucket between 1 and 3, 1, 0);
+	self.inq_peraddr_count06 := if(good_inquiry and ageBucket between 1 and 6, 1, 0);
 	
 	self.inq_adlsperaddr_count_day := if(good_inquiry and rt.person_q.appended_adl<>0 and within1day, 1, 0);  	
 	self.inq_adlsperaddr_count_week := if(good_inquiry and rt.person_q.appended_adl<>0 and within1week, 1, 0);

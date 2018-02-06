@@ -1,26 +1,28 @@
-IMPORT iesp, Risk_indicators, Riskwise, address, Business_risk, AutoStandardI, gateway;
+﻿IMPORT iesp, Risk_indicators, Riskwise, address, Business_risk, gateway;
 
 EXPORT AML_Batch_Service() := FUNCTION
 
 #WEBSERVICE(FIELDS(
                 'batch_in',
-                'GLBAPurpose',
+                'GLBPurpose',
                 'DPPAPurpose',
                 'AttributesVersion',
                 'IncludeNewsProfile',
-                'DataRestriction',
+                'DataRestrictionMask',
 								'DataPermissionMask',
                 'gateways'
                 ));
 
+	#STORED('GLBPurpose', 5);
+	#STORED('DataRestrictionMask', risk_indicators.iid_constants.default_DataRestriction);
 
   batch_in  := dataset( [], AML.layouts.AMLBatchInLayout ) : stored('batch_in');
-  unsigned1 glba       								:= 5  : stored('GLBAPurpose');
+  unsigned1 glba       								:= 5  : stored('GLBPurpose');
 	unsigned1 dppa      								:= 3  : stored('DPPAPurpose');
 	unsigned1 AttributesVersion     		:= 1  : stored('AttributesVersion'); // keep for customer still using ver 1
 	Boolean  IncludeNegNewsCounts      	:= FALSE;
 	Boolean  IncludeNewsProfile 				:= TRUE  : stored('IncludeNewsProfile');
-	string50	DataRestriction 					:= risk_indicators.iid_constants.default_DataRestriction : stored('DataRestriction');
+	string	DataRestriction 						:= risk_indicators.iid_constants.default_DataRestriction : stored('DataRestrictionMask');
 	gateways 														:= Gateway.Configuration.Get();
   string50 DataPermission := Risk_Indicators.iid_constants.default_DataPermission : stored('DataPermissionMask');
 	integer bsversion := if(AttributesVersion = 1, 41, 50);
@@ -109,7 +111,7 @@ consumerAttributesV2 := AML.getAMLAttributesV2(iid_prep,
 																						 IncludeNewsProfile
 																						 );  
 																				 
-	Layouts.AMLBatchOut IndMapOut(consumerAttributesV1 le, wseq ri) := TRANSFORM
+	AML.Layouts.AMLBatchOut IndMapOut(consumerAttributesV1 le, wseq ri) := TRANSFORM
 	self.acctNo   										 := ri.acctNo;
 	self.IndCitizenshipIndex   				 := le.AMLAttributes.IndCitizenshipIndex;
 	self.IndMobilityIndex     				 := le.AMLAttributes.IndMobilityIndex;
@@ -131,7 +133,7 @@ INDIndexV1 := join(consumerAttributesV1, IndRecs,
 						left.seq = right.seq, 
 						IndMapOut(left, right), left outer);  
 																						 
-	Layouts.AMLBatchOut IndMapOutV2(consumerAttributesV2 le, wseq ri) := TRANSFORM
+	AML.Layouts.AMLBatchOut IndMapOutV2(consumerAttributesV2 le, wseq ri) := TRANSFORM
 	self.acctNo   										 	  := ri.acctNo;
 	self.IndHighValueAssetsV2   				 	:= le.IndHighValueAssets;
 	self.IndAccessToFundsV2     				 	:= le.IndAccessToFunds;
@@ -149,6 +151,7 @@ INDIndexV1 := join(consumerAttributesV1, IndRecs,
   self.IndProfessionalRiskV2          	:= le.IndProfessionalRisk;
   self.IndBusExecOffAssocRiskV2      		:= le.IndBusExecOffAssocRisk;
 	self.RoyaltySrc                    		:= '0';
+	self.lexID 														:= le.DID;
 	self := [];
 END;
 
@@ -217,7 +220,7 @@ busInput := project(BusRecs,into_input(LEFT));
 																												UseXG5,
 																												IncludeNewsProfile)); 
 														 
-Layouts.AMLBatchOut BusMapOut(businessResultsV1 le, BusRecs ri) := TRANSFORM
+AML.Layouts.AMLBatchOut BusMapOut(businessResultsV1 le, BusRecs ri) := TRANSFORM
 	self.acctNo   							:= ri.acctNo;
 	self.BusValidityIndex				:=  le.BusValidityIndex;
 	self.BusStabilityIndex			:=  le.BusStabilityIndex;
@@ -236,7 +239,7 @@ BusIndexV1 := join(businessResultsV1, BusRecs,
 								left.seq = right.seq, 
 								BusMapOut(left, right), left outer); 
 
-Layouts.AMLBatchOut BusMapOutV2(businessResultsV2 le, BusRecs ri) := TRANSFORM
+AML.Layouts.AMLBatchOut BusMapOutV2(businessResultsV2 le, BusRecs ri) := TRANSFORM
 	self.acctNo   							:= ri.acctNo;
 	self.BusHighValueAssetsV2    := le.BusHighValueAssets;
 	self.BusAccessToFundsV2      := le.BusAccessToFunds;

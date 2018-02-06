@@ -13,9 +13,16 @@ MODULE
 	SHARED BOOLEAN vIsPhone10  := LENGTH(TRIM(first_row.homephone)) = 10;
 	SHARED BOOLEAN vDIDBlank   := (UNSIGNED)first_row.did = 0;
 	BatchShare.MAC_CapitalizeInput(dIn, SHARED dProcessInput);
-	SHARED dGetDIDs := IF(inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment,
-																								DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID),
-																								PhoneFinder_Services.Functions.GetDIDsBatch(dProcessInput));																						
+
+  SHARED IsPhoneRiskAssessment	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment;
+
+  dEmpty_dids := DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID);
+																								
+	 SHARED dGetDIDs := IF(IsPhoneRiskAssessment, dEmpty_dids,
+	                   IF(vPhoneBlank, PhoneFinder_Services.GetDIDs(dProcessInput, true), 
+										                          PhoneFinder_Services.GetDIDs(dProcessInput)));						
+	
+																					
 	PhoneFinder_Services.Layouts.BatchInAppendDID tDIDs(Autokey_batch.Layouts.rec_inBatchMaster le,
 																											PhoneFinder_Services.Layouts.BatchInAppendDID ri) :=
 	TRANSFORM
@@ -38,7 +45,7 @@ MODULE
 	
 	// Split the input DATASET into two depending on the input criteria
 	SHARED dInPhone   := dAppendDIDs(homephone != '');
-	SHARED dInNoPhone := dAppendDIDs(homephone = '' and did != 0 and inMod.TransactionType != PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment);
+	SHARED dInNoPhone := dAppendDIDs(homephone = '' and did != 0 and ~IsPhoneRiskAssessment);
 
 	// Best information
 	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dInNoPhone);
@@ -56,21 +63,36 @@ MODULE
 
 	SHARED dSearchRecs_pre		     := IF(vPhoneBlank,dWaterfallResults,dPhoneSearchResults);
 
-	SHARED dSearchRecs		 := dSearchRecs_pre(((did <> 0 AND fname <> ''AND lname <> '') OR typeflag = Phones.Constants.TypeFlag.DataSource_PV) OR listed_name <> '');
+	dSearchRecs_pre_a		 := dSearchRecs_pre(((did <> 0 AND fname <> ''AND lname <> '') OR typeflag = Phones.Constants.TypeFlag.DataSource_PV) OR listed_name <> '');
+	
+ PhoneFinder_Services.Layouts.PhoneFinder.Final withInputphone(PhoneFinder_Services.Layouts.BatchInAppendDID L) := TRANSFORM
+  SELF.acctno               := L.acctno;
+	 SELF.seq                  := L.seq;
+	 SELF.phone                := L.homephone;
+	 SELF.batch_in.homephone   := L.homephone;
+		SELF                      := [];
+ END;
 
- SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dInPhone, dSearchRecs, inMod);
+ SHARED dSearchRecs := IF(IsPhoneRiskAssessment,
+                     PROJECT(dInPhone, withInputphone(LEFT)), dSearchRecs_pre_a);
+                       
 
-	ds_in_accu := IF(inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment,
-	                 project(dedup(sort(dInPhone, acctno), acctno),
-									 transform(PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in, self.acctno := left.acctno, self.phone := left.homephone)),
+ SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dSearchRecs, inMod);
+ 
+ SHARED IsReturnMetadata := inMod.IncludePhoneMetadata OR IsPhoneRiskAssessment;
+
+	ds_in_accu := IF(IsPhoneRiskAssessment,
+	                 project(dedup(sort(dSearchRecs, acctno), acctno),
+									 transform(PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in, self.acctno := left.acctno, self.phone := left.phone)),
 									 project(dSearchRecs(typeflag = Phones.Constants.TypeFlag.DataSource_PV), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in));
 									 
   AccuDataGateway := if(inMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));
   SHARED dAccu_porting := PhoneFinder_Services.GetAccuDataPhones.GetAccuData_Ocn_PortingData(ds_in_accu,
    	                                                                                       AccuDataGateway[1]);		   
   dAccu_inport := PROJECT(dAccu_porting, PhoneFinder_Services.Layouts.PortedMetadata);
+	
 	// get ported info
-	SHARED dPorted_Phones := IF(inMod.IncludePhoneMetadata, 
+	SHARED dPorted_Phones := IF(IsReturnMetadata, 
 		                           PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs,inMod,dGateways,dSubjectInfo,dAccu_inport(port_end_dt <> 0)),
 															              dSearchRecs);
 	// zumigo call														 
@@ -80,13 +102,10 @@ MODULE
 	SHARED dZum_final := IF(inMod.UseZumigoIdentity, dZumigo_recs, dPorted_Phones);
 
   // get remaining phone metadata
-  SHARED dSearchResultsUnfiltered := IF((inMod.IncludePhoneMetadata AND EXISTS(dSearchRecs))
-      																					OR (inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment AND EXISTS(dInPhone))
-      																												,PhoneFinder_Services.GetPhonesMetadata(dZum_final,inMod,dGateways,dinBestInfo,dInPhone,dSubjectInfo)
+ SHARED dSearchResultsUnfiltered := IF(IsReturnMetadata
+      																												,PhoneFinder_Services.GetPhonesMetadata(dZum_final,inMod,dGateways,dinBestInfo,dSubjectInfo)
       																												,dZum_final);	
  
- //output(dSearchResultsUnfiltered,named('dSearchResultsUnfiltered'));	
-  // output(dSearchResultsUnfiltered,named('dSearchResultsUnfiltered'));	 
   verifyRequest := (INTEGER)inMod.VerifyPhoneIsActive + (INTEGER)inMod.VerifyPhoneName + (INTEGER)inMod.VerifyPhoneNameAddress;
          	
   // Fail the service if multiple DIDs are returned for the search criteria OR if the phone number is not 10 digits OR if no records are returned

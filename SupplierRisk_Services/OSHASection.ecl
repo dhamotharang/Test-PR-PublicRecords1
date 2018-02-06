@@ -1,4 +1,4 @@
-IMPORT AutoStandardI, Oshair, BIPV2, iesp, MDR, TopBusiness_Services, ut;
+﻿IMPORT AutoStandardI, Oshair, BIPV2, iesp, MDR, TopBusiness_Services, ut;
 
 EXPORT OSHASection := MODULE
 
@@ -40,10 +40,12 @@ EXPORT OSHASection := MODULE
 	
 	oshair_act_recs_dedup := DEDUP(SORT(oshair_act_recs,activity_number),activity_number);
 	
-	oshair_viol_recs := JOIN(oshair_act_recs_dedup,OSHAIR.Key_OSHAIR_violations,
+	Violations_key := OSHAIR.Key_OSHAIR_violations;
+		
+	oshair_viol_recs := JOIN(oshair_act_recs_dedup, Violations_key,
 														KEYED(LEFT.activity_number = RIGHT.activity_number),
 														TRANSFORM(osha_work_layout,
-																			SELF.violations := ROW(RIGHT,OSHAIR.layout_OSHAIR_violations_clean),
+																			SELF.violations := ROW(RIGHT, OSHAIR.layout_OSHAIR_violations_clean),
 																			SELF := LEFT),
 														LEFT OUTER,
 														LIMIT(0),
@@ -52,7 +54,7 @@ EXPORT OSHASection := MODULE
 	oshair_grp := GROUP(SORT(oshair_viol_recs,activity_number,RECORD),activity_number);
 	
 	osha_work_layout roll_violations(osha_work_layout L, DATASET(osha_work_layout) allRows) := TRANSFORM
-			SELF.violations := allRows.violations;
+			SELF.violations := DEDUP(SORT(allRows.violations, issuance_date, citation_number, item_number, item_group),activity_number, issuance_date, citation_number, item_number, item_group);
 			SELF := L;
 	END;
 	
@@ -102,6 +104,7 @@ EXPORT OSHASection := MODULE
 	end;
 
 	oshair_final_results := DATASET([format()]);
+	
 	return oshair_final_results;
 
  END; // end of the fn_FullView function

@@ -10,6 +10,7 @@ EXPORT MAC_BankruptcyV3_Services_BankruptcySearchServiceFCRA := MACRO
 												'DLMask',
 												'DOBMask',
 												'DPPAPurpose',
+										  'FCRAPurpose',
 												'GLBPurpose',
 												'IndustryClass',
 												'SSNMask',  

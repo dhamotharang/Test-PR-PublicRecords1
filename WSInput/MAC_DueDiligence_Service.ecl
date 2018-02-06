@@ -1,12 +1,12 @@
-﻿// This service created to add Web Service fields for DueDiligence.DueDiligence_Service 
+﻿// This service created to add Web Service fields for all 3 DueDiligence XML services
 
-EXPORT MAC_DueDiligence_Service := MACRO
+EXPORT MAC_DueDiligence_Service(reqName) := MACRO
 
   #WEBSERVICE(FIELDS(	
 										/*---- Request Fields ----*/
-										'DueDiligenceReportRequest',
+										reqName,
 										/*---- Gateways ----*/
-										//'Gateways'
+										'Gateways',
 										/*---- Compliance Fields ----*/
 										'DataPermissionMask',
 										'DataRestrictionMask',
@@ -17,4 +17,4 @@ EXPORT MAC_DueDiligence_Service := MACRO
 										'DebugMode',
 										'IntermediateVariables'
 									));
-ENDMACRO;	
+ENDMACRO;

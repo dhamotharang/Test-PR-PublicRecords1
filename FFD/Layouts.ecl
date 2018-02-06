@@ -44,7 +44,7 @@ EXPORT Layouts := MODULE
   EXPORT PersonContextBatch := RECORD
     STRING20 acctno;  //for batch input
     BOOLEAN suppress_for_legal_hold := FALSE; // indicator whether all data has to be suppressed if Legal Hold alert is set
-    SET OF STRING set_FCRA_purpose := [];  // list of FCRA permissible purposes for which Security Freeze Alert should be applied
+    SET OF INTEGER set_FCRA_purpose := [];  // list of FCRA permissible purposes for which Security Freeze Alert should be applied
     PersonContext.Layouts.Layout_PCResponseRec;
   END;
 	

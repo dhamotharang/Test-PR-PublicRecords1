@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="CriminalRecords::SearchService">
 
 	<!-- Keyed Fields -->
@@ -20,6 +20,7 @@
 	<part name="NoDeepDive" 			type="xsd:boolean"/>
 	
 	<!-- Compliance Settings -->
+  <part name="FCRAPurpose" type="xsd:string"/>
   <part name="DPPAPurpose"			type="xsd:byte"/>
   <part name="GLBPurpose"				type="xsd:byte"/>
   <part name="SSNMask"					type="xsd:string"/>
@@ -42,6 +43,7 @@
 import iesp, AutoStandardI, STD;
 
 export SearchServiceFCRA := MACRO
+
 	boolean isFCRA := true;
 	#constant('NoDeepDive', true);
 	#constant('DidOnly', true); // for picklist
@@ -71,8 +73,9 @@ export SearchServiceFCRA := MACRO
 	
 	input_params := AutoStandardI.GlobalModule();
 	tempmod := module(project(input_params,CriminalRecords_Services.IParam.search,opt))
-		EXPORT string14 did 								:= rdid;
-		EXPORT integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);	
+		export string14 did 								:= rdid;
+		export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.options.FFDOptionsMask);	
+		export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.options.FCRAPurpose);	
 	end;
 
 	crim_all := CriminalRecords_Services.SearchService_Records.fcra_val(tempmod);
@@ -82,7 +85,8 @@ export SearchServiceFCRA := MACRO
 
 	iesp.ECL2ESP.Marshall.MAC_Marshall_Results(crim_records, results_pre, iesp.criminal_fcra.t_FcraCriminalSearchResponse);
 
-	FFD.MAC.AppendConsumerStatements(results_pre, results, crim_all.Statements, iesp.criminal_fcra.t_FcraCriminalSearchResponse);	
+	FFD.MAC.AppendConsumerStatements(results_pre, results_with_cs, crim_all.Statements, iesp.criminal_fcra.t_FcraCriminalSearchResponse);	
+	FFD.MAC.AppendConsumerAlerts(results_with_cs, results, crim_all.ConsumerAlerts, iesp.criminal_fcra.t_FcraCriminalSearchResponse);	
 	
 	output(results, named('Results'), all);																	 															
 																 															

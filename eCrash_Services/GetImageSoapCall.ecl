@@ -1,4 +1,7 @@
-﻿IMPORT iesp, Gateway, eCrash_Services;
+﻿/*2017-09-23T00:08:22Z (Lazarenko, Dmitriy (RIS-HBE))
+[ECH-5121] implementing append/overwrite supplement images behavior.
+*/
+IMPORT iesp, Gateway, eCrash_Services;
 
 EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 	
@@ -24,7 +27,9 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 		BOOLEAN IyetekRedactFlag,
 		STRING RequestAgencyOri,
 		STRING RequestVendorCode,
-		iesp.share.t_Date RequestDateOfCrash) := FUNCTION
+		iesp.share.t_Date RequestDateOfCrash,
+		BOOLEAN isOnlyTm,
+		BOOLEAN ColoredImage) := FUNCTION
 		
 		//special logic for 'KYCrashLogic'
 		IsVendorCrashLogic := RequestVendorCode = Constants.VENDOR_CRASHLOGIC;
@@ -65,6 +70,7 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 			SELF.Options.DataSource := eCrash_Services.Constants.DATA_SOURCE_CRU;
 			SELF.Options.DataSource2 := eCrash_Services.Constants.DATA_SOURCE_CRU;
 			SELF.Options.IncludeCoverPage := IncludeCoverPage;
+			SELF.Options.ColoredImage := ColoredImage;
 			SELF.SearchBy.ImageHashes := ImageHashes;
 			SELF.SearchBy.ReportID := RequestReportId;
 			SELF := [];	
@@ -76,19 +82,20 @@ EXPORT GetImageSoapCall(Gateway.Layouts.Config gatewayCfg) := MODULE
 					[TRANSFORM(iesp.accident_image.t_AccidentImageRequest, SELF := [])]
 				),
 				EXISTS(ImageHashes) => DATASET([CreateRequest]),
-				NOT EXISTS(ImageHashes) => DATASET([CreateRequestTm])
+				isOnlyTm => DATASET([CreateRequestTm])
 		);
 		
 		RETURN Result;
 	END;
 	
 	EXPORT GetDocumentImageRequest(
-		DATASET(iesp.accident_image.t_AccidentImageCRUImageHash) ImageHashes, STRING RequestReportId) := FUNCTION
+		DATASET(iesp.accident_image.t_AccidentImageCRUImageHash) ImageHashes, STRING RequestReportId, BOOLEAN ColoredImage) := FUNCTION
 			
 		iesp.accident_image.t_AccidentImageRequest CreateRequest := TRANSFORM
 			SELF.Options.DataSource := eCrash_Services.Constants.DATA_SOURCE_CRU;
 			SELF.Options.DataSource2 := eCrash_Services.Constants.DATA_SOURCE_CRU;
 			SELF.Options.IncludeCoverPage := true;
+			SELF.Options.ColoredImage := ColoredImage;
 			SELF.SearchBy.ImageHashes := ImageHashes;
 			SELF.SearchBy.ReportID := RequestReportId;
 			SELF := [];	

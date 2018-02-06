@@ -1,4 +1,4 @@
-IMPORT Risk_Indicators, iesp;
+﻿IMPORT Risk_Indicators, iesp;
 
 EXPORT Layouts := MODULE
 
@@ -392,6 +392,7 @@ EXPORT AMLBatchOut := RECORD
 	LayoutAMLAttributes;
 	LayoutAMLAttributesV2;
 	string1 RoyaltySrc;
+	UNSIGNED6 lexID;
 END;
 
 

@@ -11,6 +11,7 @@ export t_ECrashRetrieveImageOptions := record (iesp.share.t_BaseOption)
 	boolean AppendSupplements {xpath('AppendSupplements')};
 	string RoyaltyType {xpath('RoyaltyType')}; //values['','N','R','']
 	string TransactionID {xpath('TransactionID')};
+	boolean ColoredImage {xpath('ColoredImage')};
 end;
 		
 export t_ECrashRetrieveImageReportBy := record

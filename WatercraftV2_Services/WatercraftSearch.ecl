@@ -9,7 +9,6 @@ EXPORT WatercraftSearch(WatercraftV2_services.Interfaces.Search_Params in_params
 	
 	// corrections on FCRA side require using overrides flag file. If isFCRA, then we have a DID in incoming in_params
 	did_rec 	:= if(isFCRA, project(dataset([{in_params.did}], doxie.layout_references), doxie.layout_best));
-	ds_flags 	:= if(isFCRA, FCRA.GetFlagFile(did_rec), fcra.compliance.blank_flagfile);
 	
 	//FCRA FFD 
 	boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(in_params.FFDOptionsMask);
@@ -17,15 +16,20 @@ EXPORT WatercraftSearch(WatercraftV2_services.Interfaces.Search_Params in_params
 																			 
 	dsDIDs := dataset([{FFD.Constants.SingleSearchAcctno,in_params.did}],FFD.Layouts.DidBatch);
 
-	pc_recs := if(isFCRA, FFD.FetchPersonContext(dsDIDs, gateways, FFD.Constants.DataGroupSet.Watercraft));  
+	pc_recs := if(isFCRA, FFD.FetchPersonContext(dsDIDs, gateways, FFD.Constants.DataGroupSet.Watercraft, in_params.FFDOptionsMask));  
 	
 	slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 	
+	ds_flags 	:= if(isFCRA, FFD.GetFlagFile(did_rec, pc_recs), FCRA.compliance.blank_flagfile);
+
 	watercraft_r := watercraftV2_services.get_watercraft(ids, in_params.ssn_mask, isFCRA, ds_flags, 
 																												in_params.include_non_regulated_sources,
 																												slim_pc_recs, in_params.FFDOptionsMask).search();
 																												
+ suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_params.FCRAPurpose, in_params.FFDOptionsMask)[1].suppress_records;
+
 	consumer_statements := if(IsFCRA and ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements); 
+ consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
 									
 	//Handle non-subject found records
 	WatercraftV2_Services.Layouts.search_out xformNonSubject(WatercraftV2_Services.Layouts.search_out L) := transform
@@ -61,7 +65,9 @@ EXPORT WatercraftSearch(WatercraftV2_services.Interfaces.Search_Params in_params
 	//Final Result
 	final_rsrt := sort(final_presort(isDeepDive or penalt <= in_params.pt),-sort_sequence, penalt, -registration_date, -date_last_seen, -watercraft_key, -sequence_key, RECORD);	
 
-	FFD.MAC.PrepareResultRecord(final_rsrt, final_rec, consumer_statements, FFD.Constants.BlankConsumerAlerts, sort_rec);
+ recs := if(suppress_results_due_alerts, dataset([], sort_rec), final_rsrt);
+
+	FFD.MAC.PrepareResultRecord(recs, final_rec, consumer_statements, consumer_alerts, sort_rec);
 														 
 	RETURN final_rec;
 

@@ -88,26 +88,32 @@ export SearchService_Records := module
    
 	 //Get FCRA files
 		ds_best := project(ids,transform(doxie.layout_best,self:=left,self:=[]));
-		ds_flags := if(isFCRA, FCRA.GetFlagFile (ds_best));
 		
 		//FCRA FFD 
-		// 1) we are using the subject DID rather than the Best DID 
+		// we are using the subject DID rather than the Best DID 
 		ds_dids := dataset([{FFD.Constants.SingleSearchAcctno,(unsigned)in_mod.DID}],FFD.Layouts.DidBatch);
 		
-		pc_recs := if(isFCRA, FFD.FetchPersonContext(ds_dids, Gateway.Configuration.Get(), FFD.Constants.DataGroupSet.CCW));
+		pc_recs := if(isFCRA, FFD.FetchPersonContext(ds_dids, Gateway.Configuration.Get(), FFD.Constants.DataGroupSet.CCW, in_mod.FFDOptionsMask));
 		
+		ds_flags := if(isFCRA, FFD.GetFlagFile (ds_best, pc_recs));
+    
 		slim_pc_recs := FFD.SlimPersonContext(pc_recs);
+		suppress_results_due_alerts := isFCRA and FFD.ConsumerFlag.getAlertIndicators(pc_recs, in_mod.FCRAPurpose, in_mod.FFDOptionsMask)[1].suppress_records;
 		
-		// 4) Send the DID and show disputed inside 
+		// Send the DID and show disputed inside 
 		boolean isCNSMR := in_mod.IndustryClass = ut.IndustryClass.Knowx_IC; // D2C - consumer restriction
 		recs := CCW_Services.Raw.byRids(ids, isFCRA, ds_flags, slim_pc_recs, in_mod.FFDOptionsMask, isCNSMR);
-		final_recs := getFormatedRecords (recs, in_mod, skip_penalizing := isFCRA); //don't penalize on FCRA side
-		
+		final_recs := if(~suppress_results_due_alerts, getFormatedRecords (recs, in_mod, skip_penalizing := isFCRA), //don't penalize on FCRA side
+                     dataset([],iesp.concealedweapon_fcra.t_FcraWeaponRecord));
+                     
 		// 5) Make the statements
 		// Here we are interested only in the record statements or consumer level statements. 
-   	consumer_statements := if(isFCRA and showConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
-				
-		FFD.MAC.PrepareResultRecord(final_recs, rec_out, consumer_statements, FFD.Constants.BlankConsumerAlerts, iesp.concealedweapon_fcra.t_FcraWeaponRecord);
+  consumer_statements := if(isFCRA and showConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
+
+  // process alerts coming from PersonContext
+		consumer_alerts := if(isFCRA, FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts), FFD.Constants.BlankConsumerAlerts);
+		
+		FFD.MAC.PrepareResultRecord(final_recs, rec_out, consumer_statements, consumer_alerts, iesp.concealedweapon_fcra.t_FcraWeaponRecord);
 		 
 		RETURN rec_out;
 	end;

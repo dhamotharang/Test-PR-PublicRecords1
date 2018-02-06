@@ -8,6 +8,8 @@ MODULE
 
 	BatchShare.MAC_ProcessInput(dIn,SHARED dProcessInput);
 	
+	SHARED IsPhoneRiskAssessment	:= inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment;
+	
 	// Format to common batch input layout
 	Autokey_batch.Layouts.rec_inBatchMaster tFormat2BatchCommonInput(dProcessInput pInput) :=
 	TRANSFORM
@@ -18,11 +20,15 @@ MODULE
 		SELF           := [];
 	END;
 	
-	dFormat2BatchCommonInput := PROJECT(dProcessInput,tFormat2BatchCommonInput(LEFT));
-	// DIDs
-	dGetDIDs := IF(inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment,
-																								DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID),
-																								PhoneFinder_Services.Functions.GetDIDsBatch(dFormat2BatchCommonInput(did = 0)));				
+	SHARED dFormat2BatchCommonInput := PROJECT(dProcessInput,tFormat2BatchCommonInput(LEFT));
+
+  dEmpty_dids := DATASET([],PhoneFinder_Services.Layouts.BatchInAppendDID);
+			
+		// DIDs	
+	 dGetDIDs := IF(IsPhoneRiskAssessment, dEmpty_dids,
+	                     PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput, true) + PhoneFinder_Services.GetDIDs(dFormat2BatchCommonInput));				
+																																														
+	
 	PhoneFinder_Services.Layouts.BatchInAppendAcctno tDIDs(Autokey_batch.Layouts.rec_inBatchMaster le,
 																													PhoneFinder_Services.Layouts.BatchInAppendDID ri) :=
 	TRANSFORM
@@ -54,7 +60,7 @@ MODULE
 																								SELF.zip4      := LEFT.z4,
 																								SELF           := LEFT));
 	SHARED dInPhone   := dAppendDIDsFormat(homephone != '');
-	SHARED dInNoPhone := dAppendDIDsFormat(did != 0 and homephone = '' and inMod.TransactionType != PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment);
+	SHARED dInNoPhone := dAppendDIDsFormat(did != 0 and homephone = '' and ~IsPhoneRiskAssessment);
 	
 	// Append best info
 	SHARED dInNoPhoneBestInfo := PhoneFinder_Services.Functions.GetBestInfo(dInNoPhone);
@@ -68,21 +74,34 @@ MODULE
 	//combine results to get phone metadata
  	SHARED dSearchRecs_pre		:= UNGROUP(dPhoneSearchResults + dWaterfallResults);
 	
-  SHARED dSearchRecs		 := dSearchRecs_pre(((did <> 0 AND fname <> ''AND lname <> '') OR typeflag = Phones.Constants.TypeFlag.DataSource_PV) OR listed_name <> '');
+  dSearchRecs_pre_a		 := dSearchRecs_pre(((did <> 0 AND fname <> ''AND lname <> '') OR typeflag = Phones.Constants.TypeFlag.DataSource_PV) OR listed_name <> '');
 	
-  SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dInPhone, dSearchRecs, inMod);
+	 PhoneFinder_Services.Layouts.PhoneFinder.Final withInputphone(PhoneFinder_Services.Layouts.BatchInAppendDID L) := TRANSFORM
+  SELF.acctno               := L.acctno;
+	 SELF.seq                  := L.seq;
+	 SELF.phone                := L.homephone;
+	 SELF.batch_in.homephone   := L.homephone;
+		SELF                      := [];
+  END;
+
+ SHARED dSearchRecs := IF(IsPhoneRiskAssessment,
+                     PROJECT(dInPhone, withInputphone(LEFT)), dSearchRecs_pre_a);
+	
+ SHARED dSubjectInfo := PhoneFinder_Services.Functions.GetSubjectInfo(dSearchRecs, inMod);
+ 
+ SHARED IsReturnMetadata := inMod.IncludePhoneMetadata OR IsPhoneRiskAssessment;
 														
-  ds_in_accu := IF(inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment,
-	                 project(dedup(sort(dInPhone, acctno), acctno),
-									 transform(PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in, self.acctno := left.acctno, self.phone := left.homephone)),
+ ds_in_accu := IF(IsPhoneRiskAssessment,
+	                 project(dedup(sort(dSearchRecs, acctno), acctno),
+									 transform(PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in, self.acctno := left.acctno, self.phone := left.phone)),
 									 project(dSearchRecs(typeflag = Phones.Constants.TypeFlag.DataSource_PV), PhoneFinder_Services.Layouts.PhoneFinder.Accudata_in));
 									 
- 	AccuDataGateway := if(inMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));
-  SHARED accu_porting := PhoneFinder_Services.GetAccuDataPhones.GetAccuData_Ocn_PortingData(ds_in_accu,
+ AccuDataGateway := if(inMod.UseAccuData_ocn, dGateways(Gateway.Configuration.IsAccuDataOCN(servicename)));
+ SHARED accu_porting := PhoneFinder_Services.GetAccuDataPhones.GetAccuData_Ocn_PortingData(ds_in_accu,
 	                                                                                          AccuDataGateway[1]);	
-	 accu_inport := PROJECT(accu_porting, PhoneFinder_Services.Layouts.PortedMetadata);	
+	accu_inport := PROJECT(accu_porting, PhoneFinder_Services.Layouts.PortedMetadata);	
 	
-	 SHARED ported_phones := IF(inMod.IncludePhoneMetadata, 
+	SHARED ported_phones := IF(IsReturnMetadata, 
 		                           PhoneFinder_Services.GetPhonesPortedMetadata(dSearchRecs,inMod,dGateways,dSubjectInfo,accu_inport(port_end_dt <> 0)),
 															              dSearchRecs);																	 
    
@@ -91,13 +110,12 @@ MODULE
 
 	SHARED Zum_final := if(inMod.UseZumigoIdentity, Zumigo_recs, ported_phones);
 
-	dSearchResultsUnfiltered := IF((inMod.IncludePhoneMetadata AND EXISTS(dSearchRecs))
-																					OR (inMod.TransactionType = PhoneFinder_Services.Constants.TransType.PhoneRiskAssessment AND EXISTS(dInPhone))
-																																	,PhoneFinder_Services.GetPhonesMetadata(Zum_final,inMod,dGateways,dinBestInfo,dInPhone,dSubjectInfo)
+	dSearchResultsUnfiltered := IF(IsReturnMetadata
+																																	,PhoneFinder_Services.GetPhonesMetadata(Zum_final,inMod,dGateways,dinBestInfo,dSubjectInfo)
 																																	,Zum_final);
     // restriction added here if plugin from batch is set to true ....
 		//  if not then don't do any restrictions.																																	
-   dSearchResultsUnfilteredFinal := IF (inMod.DirectMarketingSourcesOnly, 
+ dSearchResultsUnfilteredFinal := IF (inMod.DirectMarketingSourcesOnly, 
 	                                  dSearchResultsUnfiltered(src NOT IN (PhoneFinder_Services.Constants.BatchRestrictedDirectMarketingSourcesSet)), 
 								                           dSearchResultsUnfiltered);																																	
   // output(dSearchResultsUnfiltered, named('dSearchResultsUnfiltered'));

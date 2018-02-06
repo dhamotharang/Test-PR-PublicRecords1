@@ -1,5 +1,6 @@
-﻿includeADLFields := FALSE; // If you set this to TRUE, make sure you set it to TRUE in Risk_Indicators.ToEdina_v4!
-
+﻿/*2017-04-20T01:40:11Z (Dave Schlangen_Prod)
+part of MS-149, moved the banko fields
+*/
 layout_counts := RECORD
     unsigned2 counttotal;
     unsigned2 countday;  // new for shell 5.0
@@ -43,6 +44,13 @@ layout_inquiries_edina := RECORD
 	// unsigned2 Inq_BillGroup_count12;// new for shell 5.0
 	// unsigned2 Inq_BillGroup_count24;// new for shell 5.0
 	
+		string8 am_first_seen_date;
+		string8 am_last_seen_date;
+		string8 cm_first_seen_date;
+		string8 cm_last_seen_date;
+		string8 om_first_seen_date;
+		string8 om_last_seen_date;
+		
    unsigned2 inquiryperadl;
 		unsigned2	inq_peradl_count_day	;
 		unsigned2	inq_peradl_count_week	;
@@ -182,14 +190,7 @@ layout_inquiries_edina := RECORD
 		unsigned2	inq_adlsperemail_count01	;
 		unsigned2	inq_adlsperemail_count03	;
 		unsigned2	inq_adlsperemail_count06	;
-	
-	// these aren't in shell 5.2 layout
-		string8 am_first_seen_date;
-		string8 am_last_seen_date;
-		string8 cm_first_seen_date;
-		string8 cm_last_seen_date;
-		string8 om_first_seen_date;
-		string8 om_last_seen_date;
+
 		risk_indicators.layouts.layout_best_pii_inquiries;
   END;
 	
@@ -1223,9 +1224,6 @@ layout_pii_stability52 := record
 end;
 
 export Layout_Boca_Shell_Edina_v52 := RECORD
-	#if(includeADLFields)
-	risk_indicators.iid_constants.adl_based_modeling_flags;
-	#end
 	integer bsversion;
 	string1 isFCRA;	// 2.5 field
 	string3 cb_allowed;	// EQ/EN/ALL

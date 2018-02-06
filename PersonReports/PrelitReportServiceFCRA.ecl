@@ -2,14 +2,15 @@
 <message name="PrelitReportServiceFCRA" wuTimeout="300000">
   <part name="DID" type="xsd:string" required="1" />
   <separator />
-  <part name="SSNMask" type="xsd:string"/>	<!-- [NONE, ALL, LAST4, FIRST5] -->
+  <part name="SSNMask" type="xsd:string"/>  <!-- [NONE, ALL, LAST4, FIRST5] -->
   <part name="DOB" type="xsd:unsignedInt"/>
   <part name="DPPAPurpose" type="xsd:byte" default="1"/>
+  <part name="FCRAPurpose" type="xsd:string"/>
   <part name="GLBPurpose" type="xsd:byte" default="1"/> 
-	<part name="ApplicationType"     	type="xsd:string"/>
+  <part name="ApplicationType"       type="xsd:string"/>
   <part name="LnBranded" type="xsd:boolean"/>
   <part name="DataRestrictionMask" type="xsd:string" default="0000000000000000"/>
-	<part name="FFDOptionsMask" 	      type="xsd:string"/>
+  <part name="FFDOptionsMask"         type="xsd:string"/>
   <part name="SuppressWithdrawnBankruptcy" type="xsd:boolean"/>
   <separator />
 <!--  <part name="SelectIndividually" type="xsd:boolean" default="false"/> -->
@@ -17,7 +18,6 @@
 </message>
 */
 /*--INFO-- Prelit(igation) report. Almost same as asset report*/
-/*--USES-- ut.input_xslt */
 
 IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, FFD, ut;
 
@@ -58,11 +58,8 @@ EXPORT PrelitReportServiceFCRA () := MACRO
   rec_in := iesp.prelitigationreport_fcra.t_FcraPreLitigationReportRequest;
   ds_in := DATASET ([], rec_in) : STORED ('FcraPrelitigationReportRequest', FEW);
   first_row := ds_in[1] : INDEPENDENT;
-	
-	// FFD 
-  valFFDOptionsMask := FFD.FFDMask.Get(first_row.Options.FFDOptionsMask);
-
-  // this will #store some standard input parameters (generally, for search purpose)
+  
+   // this will #store some standard input parameters (generally, for search purpose)
   iesp.ECL2ESP.SetInputBaseRequest (first_row);
 
   string12 UniqueId := global(first_row.ReportBy).UniqueId;
@@ -70,7 +67,7 @@ EXPORT PrelitReportServiceFCRA () := MACRO
 
   // set up default options -- those, which must be always chosen in ESDL mode
   options_esdl := module (PersonReports.input._prelitreport)
-		export boolean bk_suppress_withdrawn := first_row.Options.SuppressWithdrawnBankruptcy;
+    export boolean bk_suppress_withdrawn := first_row.Options.SuppressWithdrawnBankruptcy;
 
     // this coming not from the t_FcraPrelitReportOption but from the t_User structure
     export integer1 non_subject_suppression := ut.getNonSubjectSuppression (first_row.User.NonSubjectSuppression);
@@ -92,7 +89,7 @@ EXPORT PrelitReportServiceFCRA () := MACRO
   // options := options_esdl;  
 
   // define search parameters; in "pure" ESDL mode this must be replaced with a module created from XML input
-	globals := AutoStandardI.GlobalModule();
+  globals := AutoStandardI.GlobalModule();
   search_mod := module (project (globals, PersonReports.input._didsearch, opt))
   end;
 
@@ -117,18 +114,19 @@ EXPORT PrelitReportServiceFCRA () := MACRO
     // Do all required translations here
     export unsigned1 GLBPurpose := AutoStandardI.InterfaceTranslator.glb_purpose.val (search_mod);
     export unsigned1 DPPAPurpose := AutoStandardI.InterfaceTranslator.dppa_purpose.val (search_mod);
-		export string5 IndustryClass := AutoStandardI.InterfaceTranslator.industry_class_value.val (search_mod);
-		export string DataPermissionMask := search_mod.dataPermissionMask;
+    export string5 IndustryClass := AutoStandardI.InterfaceTranslator.industry_class_value.val (search_mod);
+    export string DataPermissionMask := search_mod.dataPermissionMask;
     export string DataRestrictionMask := globals.dataRestrictionMask;
     export boolean ln_branded := AutoStandardI.InterfaceTranslator.ln_branded_value.val (search_mod);
     export string6 ssn_mask := 'NONE' : stored('SSNMask'); // ideally, must be "translated" ssnmask
     //export string6 ssn_mask := AutoStandardI.InterfaceTranslator.ssn_mask_val.val (search_mod);
     export unsigned1 score_threshold := AutoStandardI.InterfaceTranslator.score_threshold_value.val (search_mod);
-		export string32 applicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(search_mod,AutoStandardI.InterfaceTranslator.application_type_val.params));
+    export string32 applicationType := AutoStandardI.InterfaceTranslator.application_type_val.val(project(search_mod,AutoStandardI.InterfaceTranslator.application_type_val.params));
     export integer1 non_subject_suppression := options_esdl.non_subject_suppression;
     export boolean bk_include_dockets := options_esdl.bk_include_dockets;
-		export boolean bk_suppress_withdrawn := options_esdl.bk_suppress_withdrawn;
-		export integer8 FFDOptionsMask := valFFDOptionsMask;
+    export boolean bk_suppress_withdrawn := options_esdl.bk_suppress_withdrawn;
+    export integer8 FFDOptionsMask := FFD.FFDMask.Get(first_row.Options.FFDOptionsMask);
+    export integer FCRAPurpose := FCRA.FCRAPurpose.Get(first_row.Options.FCRAPurpose);
   end;
 
   // The DID must be provided in the input
@@ -137,19 +135,19 @@ EXPORT PrelitReportServiceFCRA () := MACRO
   // main records
   prelit_mod := module (project (report_mod, PersonReports.input._prelitreport, opt)) end;
   recs_combined := PersonReports.PrelitReport (dids, prelit_mod, TRUE);
-	recs := project(recs_combined.Records, transform(iesp.prelitigationreport_fcra.t_FcraPreLitigationReportIndividual,
-			 Self := Left));
+  recs := project(recs_combined.Records, transform(iesp.prelitigationreport_fcra.t_FcraPreLitigationReportIndividual,
+       Self := Left));  // it is single record coming as dataset
   
 
   // wrap it into output structure
-   iesp.prelitigationreport_fcra.t_FcraPreLitigationReportResponse SetResponse (iesp.prelitigationreport_fcra.t_FcraPreLitigationReportIndividual L) := transform
+   iesp.prelitigationreport_fcra.t_FcraPreLitigationReportResponse SetResponse () := transform
        Self._Header := iesp.ECL2ESP.GetHeaderRow ();
        
-       Self.Individual := L;
-   		 Self.ConsumerStatements := recs_combined.Statements;
-			 Self.ConsumerAlerts := recs_combined.ConsumerAlerts;
+       Self.Individual := recs[1];
+       Self.ConsumerStatements := recs_combined.Statements;
+       Self.ConsumerAlerts := recs_combined.ConsumerAlerts;
      end;
-     results := PROJECT (recs, SetResponse (Left));
+     results := dataset ([SetResponse ()]);
    
      IF (count (dids) > 1,
          fail (203, doxie.ErrorCodes (203)), // or ('ambiguous criteria')
@@ -179,12 +177,12 @@ ENDMACRO;
   <NonSubjectSuppression/>
 </User>
 <Options>
-	<ReturnAlsoFound></ReturnAlsoFound>
-	<IncludeRelatives></IncludeRelatives>
-	<IncludeAssociates></IncludeAssociates>
-	<IncludePhonesPlus></IncludePhonesPlus>
-	<IncludeProfessionalLicenses></IncludeProfessionalLicenses>
-	<IncludeDriversLicenses></IncludeDriversLicenses>
+  <ReturnAlsoFound></ReturnAlsoFound>
+  <IncludeRelatives></IncludeRelatives>
+  <IncludeAssociates></IncludeAssociates>
+  <IncludePhonesPlus></IncludePhonesPlus>
+  <IncludeProfessionalLicenses></IncludeProfessionalLicenses>
+  <IncludeDriversLicenses></IncludeDriversLicenses>
 </Options>
 <ReportBy>
   <Name>

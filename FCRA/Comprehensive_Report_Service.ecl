@@ -7,8 +7,9 @@
 /*--INFO-- This service searches all available datafiles for fcra-compliant entries.*/
 
 export Comprehensive_Report_Service := MACRO
+
 IMPORT  AutoStandardI, CriminalRecords_Services, doxie, doxie_crs, 
-        EquifaxDecisioning, FFD, Gateway, iesp, Royalty, suppress, WSInput;
+        EquifaxDecisioning, FFD, FCRA, Gateway, iesp, Royalty, suppress, WSInput;
 
 WSInput.MAC_FCRA_Comprehensive_Report_Service();
 
@@ -37,14 +38,16 @@ did_fcra := dids[1].did;
 application_type_value := AutoStandardI.InterfaceTranslator.application_type_val.val(project(AutoStandardI.GlobalModule(isFCRA),AutoStandardI.InterfaceTranslator.application_type_val.params));
 
 // FFD - BEGIN				 
+integer  inFCRAPurpose := FCRA.FCRAPurpose.Get();
 integer8 inFFDMask := FFD.FFDMask.Get(inApplicationType:=application_type_value);
 boolean ShowConsumerStatements := FFD.FFDMask.isShowConsumerStatements(inFFDMask);
 
 // get person context
 in_pc := dataset([{FFD.Constants.SingleSearchAcctno, (unsigned)did_fcra}], FFD.Layouts.DidBatch);
-pc_recs := FFD.FetchPersonContext(in_pc, gateways)(ShowConsumerStatements OR (RecordType = FFD.Constants.RecordType.DR));
+pc_recs := FFD.FetchPersonContext(in_pc, gateways,, inFFDMask);
 slim_pc_recs := FFD.SlimPersonContext(pc_recs);
 
+suppress_results_due_alerts := FFD.ConsumerFlag.getAlertIndicators(pc_recs, inFCRAPurpose, inFFDMask)[1].suppress_records;
 // FFD - END
 
 boolean verify_did := false : stored ('VerifyUniqueID');
@@ -75,6 +78,7 @@ tempmod := module(project(AutoStandardI.GlobalModule(IsFCRA),CriminalRecords_Ser
   export boolean  IncludeAllCriminalRecords := true;
   export boolean  IncludeSexualOffenses := false;
   export integer8 FFDOptionsMask := inFFDMask;
+  export integer  FCRAPurpose := inFCRAPurpose;
   export boolean  SkipPersonContextCall := true;
 end;
 crmr := CriminalRecords_Services.ReportService_Records.val(tempmod, IsFCRA, pc_recs);
@@ -91,11 +95,12 @@ doxie_crs.layout_report_fcra patch(doxie.layout_central_records l) := transform
   self := []; //vehicles, images
 end;
 
-all_records := project (cent, patch(left));
-consumer_statements_all := if(ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
+all_records := if(suppress_results_due_alerts, dataset([], doxie_crs.layout_report_fcra), 
+                  project (cent, patch(left)));
 
+consumer_statements_all := if(ShowConsumerStatements, FFD.prepareConsumerStatements(pc_recs), FFD.Constants.BlankConsumerStatements);
 consumer_statements := consumer_statements_all(exists(all_records) OR StatementType IN FFD.Constants.RecordType.StatementConsumerLevel); 
-consumer_alerts := FFD.Constants.BlankConsumerAlerts;
+consumer_alerts := FFD.ConsumerFlag.prepareAlertMessages(pc_recs, suppress_results_due_alerts);
 
 outputErrors := output (remote_header_err, NAMED('exception'), EXTEND);
 
