@@ -561,7 +561,7 @@ EXPORT getBusKRI(DATASET(DueDiligence.Layouts.Busn_Internal) BusnBIPIDs) := FUNC
 		beoResidencyFlag4 := IF(le.atleastOneBEOPublicRecordsLess3YrsWithNoVote , 'T', 'F');
 		beoResidencyFlag3 := IF(le.atleastOneBEOPublicRecordsBetween3And10YrsWithNoVote , 'T', 'F');
 		beoResidencyFlag2 := IF(le.atleastOneBEOPublicRecordsMoreThan10YrsWithNoVote , 'T', 'F');
-		beoResidencyFlag1 := IF(le.atleastOneBEOOrParentRegisteredVoter , 'T', 'F');
+		beoResidencyFlag1 := IF(le.execCount = 0 OR le.atleastOneBEOOrParentRegisteredVoter , 'T', 'F');
 												
 		beoResidencyConcat := beoResidencyFlag9 + beoResidencyFlag8 + beoResidencyFlag7 + beoResidencyFlag6 + beoResidencyFlag5 + beoResidencyFlag4 + beoResidencyFlag3 + beoResidencyFlag2 + beoResidencyFlag1;
 		beoResidencyFlag0 := IF(STD.Str.Find(beoResidencyConcat, 'T', 1) = 0, 'T', 'F');  //Insufficient information reported on business and cannot calculate

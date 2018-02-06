@@ -81,14 +81,13 @@ EXPORT getBusAttributes(DATASET(DueDiligence.Layouts.CleanedData) cleanedInput,
 	addCounts := PROJECT(busSicNaic, TRANSFORM(RECORDOF(LEFT),
 																										SELF.numOfRegAgents := COUNT(LEFT.registeredAgents);
 																										SELF.numOfSicNaic := COUNT(LEFT.sicNaicSources);
+																										SELF.execCount := COUNT(LEFT.execs);
 																										SELF := LEFT;));
 
  
  	//***There are sections of the report that need to be populated with bits and pieces of information that spans accross the multiple attributes.
-	 //*** Under the 3 service framework - the Attributes Only Service will always pass a report flag of FALSE.  
-	 //*** The Business Report Service will pass a report flag of TRUE.   
 	
-	AddBusinessDataForReport   :=  IF(includeReport, DueDiligence.getBusReport(addCounts),
+	AddBusinessDataForReport   :=  IF(includeReport, getBusReport(addCounts),
                                 /* ELSE */
 																                addCounts);
 

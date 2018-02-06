@@ -138,6 +138,7 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 																		LEFT OUTER);
 																		
 	
+	getExecResidency := DueDiligence.getBusExecResidency(addExecs, options);																	
 	//getExecResidency := DueDiligence.getBusExecResidency(addExecs, options);	
 	getExecResidency   := addExecs;
 
@@ -153,18 +154,19 @@ EXPORT getBusExec(DATASET(DueDiligence.Layouts.Busn_Internal) indata,
 	// OUTPUT(transformExecsWithDID, NAMED('transformExecsWithDID'));
 	// OUTPUT(sortExecsWithDID, NAMED('sortExecsWithDID'));
 	// OUTPUT(rollUniqueExecsWithDID, NAMED('rollUniqueExecsWithDID'));
-	
 	// OUTPUT(sortRecentExecs, NAMED('sortRecentExecs'));
 	// OUTPUT(groupExecs, NAMED('groupExecs'));
 	// OUTPUT(getMaxExecutives, NAMED('getMaxExecutives'));
 	// OUTPUT(rollAllExecs, NAMED('rollAllExecs'));
 	
 	// OUTPUT(getExecResidency, NAMED('getExecResidency'));
+	// OUTPUT(getExecResidency, NAMED('getExecResidency'));
 	
 	
 																								
 
 
+	RETURN getExecResidency;
 
 	RETURN getExecResidency;
 

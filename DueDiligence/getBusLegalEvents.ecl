@@ -3,10 +3,9 @@
 EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																Business_Risk_BIP.LIB_Business_Shell_LIBIN Options,
 											          BIPV2.mod_sources.iParams linkingOptions,
-																     boolean ReportIsRequested = FALSE, 
+												 boolean ReportIsRequested, 
 		  											      boolean DebugMode = FALSE,
-																     boolean isFCRA = false
-																) := FUNCTION
+												 boolean isFCRA = false) := FUNCTION
 
 	// ------                                                                                    ------
 	// ------ The Business Executives have been added to the Busn_Internal                       ------
@@ -21,29 +20,21 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	// ------   Start by getting all of the liens and judgment data                              ------
 	// ------ The results will come back this layout:                                            ------
 	// ------  DueDiligence.LayoutsInternal.RelatedParty                                         ------  
- // updatewithBusinessExecutivesWithLiens    := DueDiligence.getIndLiens(SimpleBusinessExecutives, debugmode, isFCRA);
+	// ------  
+  UpdateBusinessExecutivesCriminalOffense  := DueDiligence.getIndCriminal(SimpleBusinessExecutives, ReportIsRequested, Debugmode, isFCRA);
 	
 	// ------  Collect all of the Criminal offenses data                                         ------
+	getBEOLegalEventType := DueDiligence.getIndLegalEventType(UpdateBusinessExecutivesCriminalOffense);
 	// ------ The results will come back this layout:                                            ------
 	// ------  DueDiligence.LayoutsInternal.RelatedParty                                         ------
 	// ------  
   UpdateBusinessExecutivesCriminalOffense  := DueDiligence.getIndCriminal(SimpleBusinessExecutives, ReportIsRequested, Debugmode, isFCRA);
-	
-	
-	
-
-	getBEOLegalEventType := DueDiligence.getIndLegalEventType(UpdateBusinessExecutivesCriminalOffense);
-	//test := DueDiligence.getIndLegalEventType(UpdateBusinessExecutivesCriminalOffense);
-
- // ------                                                                                    ------
-	// ------ Call the Common.ReplaceExecs routine to  update   executive information            ------ 
- // ------ with the derogatory events found in the previous function                          ------
+  // ------ with the derogatory events found in the previous function                          ------
 	// ------ The results will come back this layout:                                            ------
-	// ------      DueDiligence.layouts.Busn_Internal                                            ------
+	// ------ DueDiligence.layouts.Busn_Internal                                                 ------
 
   UpdateBusnExecsWithDerog   := DueDiligence.CommonBusiness.ReplaceExecs(BusnData, getBEOLegalEventType);
-	
-	//**********************roll the criminal offenses to up to inquired business  		
+	 		
 
 	//**********************roll the BEO legal info up to inquired business  		
 	rolledExecutiveCriminalOffense := ROLLUP(SORT(getBEOLegalEventType, seq, #EXPAND(BIPv2.IDmacros.mac_ListTop3Linkids())), 
@@ -125,18 +116,16 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 								                                                           LEFT.party.ConvictedInfractions2I_Ever,
 																																					                             RIGHT.party.ConvictedInfractions2I_Ever);  
 															
-															// SELF.party.liensUnreleasedCntOVNYR           := IF(LEFT.party.liensUnreleasedCntOVNYR  > RIGHT.party.liensUnreleasedCntOVNYR,
-															                                                    // LEFT.party.liensUnreleasedCntOVNYR,
-																																									                         // RIGHT.party.liensUnreleasedCntOVNYR);
+															SELF.party.category9 := LEFT.party.category9 OR RIGHT.party.category9;
+															SELF.party.category8 := LEFT.party.category8 OR RIGHT.party.category8;
+															SELF.party.category7 := LEFT.party.category7 OR RIGHT.party.category7;
+															SELF.party.category6 := LEFT.party.category6 OR RIGHT.party.category6;
+															SELF.party.category5 := LEFT.party.category5 OR RIGHT.party.category5;
+															SELF.party.category4 := LEFT.party.category4 OR RIGHT.party.category4;
+															SELF.party.category3 := LEFT.party.category3 OR RIGHT.party.category3;
+															SELF.party.category2 := LEFT.party.category2 OR RIGHT.party.category2;
 															
-															// SELF.party.liensUnreleasedCntInThePastNYR     := IF(LEFT.party.liensUnreleasedCntInThePastNYR  > RIGHT.party.liensUnreleasedCntInThePastNYR,
-															                                                    // LEFT.party.liensUnreleasedCntInThePastNYR,
-																																									                         // RIGHT.party.liensUnreleasedCntInThePastNYR);
-															
-															// SELF.party.liensUnreleasedCnt                 := IF(LEFT.party.liensUnreleasedCnt           > RIGHT.party.liensUnreleasedCnt,
-															                                                    // LEFT.party.liensUnreleasedCnt,
-																																									                         // RIGHT.party.liensUnreleasedCnt);
-															
+								 
 															// SELF.party.evictionsCntOVNYR                  := IF(LEFT.party.evictionsCntOVNYR     > RIGHT.party.evictionsCntOVNYR,
 															                                                    // LEFT.party.evictionsCntOVNYR,
 																																									                         // RIGHT.party.evictionsCntOVNYR);
@@ -161,7 +150,6 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 								 
 															SELF := LEFT;));
 	
-	//add any license categories to the inquired business
 	UpdateBusnWithEvidenceOfCrim := JOIN(UpdateBusnExecsWithDerog, rolledExecutiveCriminalOffense,
 											LEFT.seq = RIGHT.seq AND
 											LEFT.Busn_info.BIP_IDS.UltID.LinkID = RIGHT.ultID AND
@@ -189,19 +177,6 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																      /* These are all of the evidence flags used in the CIVIL ATTRIBUTE  */ 
 																			   /*   CIVIL ATTRIBUTE includes liens, judgements (held in the liens  */
 																				  /*   unreleased count) plus evictions                               */
-																//***************************************************************************************************
-																     /*  This will be used in Level 9 of BusLegalCivil attribute  */  
-																// tempBEOCivilNYR                                      := RIGHT.party.liensUnreleasedCntInThePastNYR + RIGHT.party.evictionsCntInThePastNYR;  /* include evictions in past 3 years */
-											     // SELF.BEOevidenceOf10CivilNYR                         := IF(tempBEOCivilNYR >= 10, TRUE, FALSE), 
-													        // /*  This will be used in Level 8 of BusLegalCivil attribute  */
-											     // SELF.BEOevidenceOf5To9CivilNYR                       := IF(tempBEOCivilNYR IN DueDiligence.Constants.CIVIL_RANGE_A , TRUE, FALSE),
-													        // /*  This will be used in Level 7 of BusLegalCivil attribute  */
-																// SELF.BEOevidenceOf3To4CivilNYR                       := IF(tempBEOCivilNYR IN DueDiligence.Constants.CIVIL_RANGE_B , TRUE, FALSE),
-											          // /*  This will be used in Level 6 of BusLegalCivil attribute  */     
-															 // SELF.BEOevidenceOf1To2CivilNYR                       := IF(tempBEOCivilNYR IN DueDiligence.Constants.CIVIL_RANGE_C, TRUE, FALSE),
-															      // /*  This will be used in Level 5 of BusLegalCivil attribute  */ 
-															 // tempCivilOlderNYR                                    := RIGHT.party.liensUnreleasedCntOVNYR + RIGHT.party.evictionsCntOVNYR;    /* include evictions older than 3 years */
-																// SELF.BEOevidenceOf10CivilOlderNYR                    := IF(tempCivilOlderNYR >= 10, TRUE, FALSE),   
 																     // /*  This will be used in Level 4 of BusLegalCivil attribute  */
 																// SELF.BEOevidenceOf5To9CivilOlderNYR                  := IF(tempCivilOlderNYR IN DueDiligence.Constants.CIVIL_RANGE_A , TRUE,  FALSE),
 																	    // /*  This will be used in Level 3 of BusLegalCivil attribute  */
@@ -228,25 +203,25 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 																     /*  This will be used in Level 2 of busTrafficInfractions attribute  */
 																SELF.BEOevidenceOf2InfractionsOlderNYR               := IF(RIGHT.party.ConvictedInfractions2I_OVNYR IN [1, 2], TRUE,  FALSE),
 																
-																//legal event type
-																SELF.atleastOneBEOInCategory9 := RIGHT.party.category9;
-																SELF.atleastOneBEOInCategory8 := RIGHT.party.category8;
-																SELF.atleastOneBEOInCategory7 := RIGHT.party.category7;
-																SELF.atleastOneBEOInCategory6 := RIGHT.party.category6;
-																SELF.atleastOneBEOInCategory5 := RIGHT.party.category5;
-																SELF.atleastOneBEOInCategory4 := RIGHT.party.category4;
-																SELF.atleastOneBEOInCategory3 := RIGHT.party.category3;
-																SELF.atleastOneBEOInCategory2 := RIGHT.party.category2;
-																SELF.BEOsHaveNoConvictionsOrCategoryHits := RIGHT.party.category9 = FALSE AND RIGHT.party.category8 = FALSE AND
-																																																												RIGHT.party.category7 = FALSE AND RIGHT.party.category6 = FALSE AND
-																																																												RIGHT.party.category5 = FALSE AND RIGHT.party.category4 = FALSE AND
-																																																												RIGHT.party.category3 = FALSE AND RIGHT.party.category2 = FALSE;
-																
-																SELF := LEFT;),
+															//legal event type
+															SELF.atleastOneBEOInCategory9 := RIGHT.party.category9;
+															SELF.atleastOneBEOInCategory8 := RIGHT.party.category8;
+															SELF.atleastOneBEOInCategory7 := RIGHT.party.category7;
+															SELF.atleastOneBEOInCategory6 := RIGHT.party.category6;
+															SELF.atleastOneBEOInCategory5 := RIGHT.party.category5;
+															SELF.atleastOneBEOInCategory4 := RIGHT.party.category4;
+															SELF.atleastOneBEOInCategory3 := RIGHT.party.category3;
+															SELF.atleastOneBEOInCategory2 := RIGHT.party.category2;
+															SELF.BEOsHaveNoConvictionsOrCategoryHits := RIGHT.party.category9 = FALSE AND RIGHT.party.category8 = FALSE AND
+																																					RIGHT.party.category7 = FALSE AND RIGHT.party.category6 = FALSE AND
+																																					RIGHT.party.category5 = FALSE AND RIGHT.party.category4 = FALSE AND
+																																					RIGHT.party.category3 = FALSE AND RIGHT.party.category2 = FALSE;
+															
+															SELF := LEFT;),
 											LEFT OUTER);
 		
 		
-		// -----                                                                                     ----- 
+	 // -----                                                                                     ----- 
 	 // ----- If the report is requested by the XML Service (not allowed by Batch)                -----
 	 // ----- THEN add the BEO Criminal data to that section of the report.                       -----
 	 // ----- ELSE just leave the reporting sections empty                                        -----
@@ -273,7 +248,6 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	 
 	 IF(DebugMode,     OUTPUT(CHOOSEN(BusnData, 50),                              NAMED('BusnData')));    	   	    	   	   	   	 
 	 IF(DebugMode,     OUTPUT(CHOOSEN(SimpleBusinessExecutives, 50),              NAMED('SimpleBusinessExecutives')));    	   	    	   	   	   	 
-	 // IF(DebugMode,     OUTPUT(CHOOSEN(updatewithBusinessExecutivesWithLiens, 50), NAMED('updatewithBusinessExecutivesWithLiens'))); 
 	 IF(DebugMode,     OUTPUT(CHOOSEN(UpdateBusinessExecutivesCriminalOffense, 50),   NAMED('UpdateBusinessExecutivesCriminalOffense'))); 
 	 IF(DebugMode,     OUTPUT(CHOOSEN(UpdateBusnExecsWithDerog, 50),              NAMED('UpdateBusnExecsWithDerog')));
 	 IF(DebugMode,     OUTPUT(CHOOSEN(rolledExecutiveCriminalOffense, 50),        NAMED('rolledExecutiveCriminalOffense'))); 
@@ -282,15 +256,13 @@ EXPORT getBusLegalEvents(DATASET(DueDiligence.layouts.Busn_Internal) BusnData,
 	  
 		
 		
-		// OUTPUT(updatewithBusinessExecutivesWithLiens, NAMED('updatewithBusinessExecutivesWithLiens'));
-		// OUTPUT(UpdateBusinessExecutivesCriminalOffense, NAMED('UpdateBusinessExecutivesCriminalOffense'));
-		// OUTPUT(rolledExecutiveCriminalOffense, NAMED('rolledExecutiveCriminalOffense'));
-		// OUTPUT(UpdateBusnWithEvidenceOfCrim, NAMED('UpdateBusnWithEvidenceOfCrim'));
-		// OUTPUT(UpdateInquiredBusinessWithDerog, NAMED('UpdateInquiredBusinessWithDerog'));
-		// OUTPUT(getBEOLegalEventType, NAMED('getBEOLegalEventType'));
+	
+
+	// OUTPUT(rolledExecutiveCriminalOffense, NAMED('rolledExecutiveCriminalOffense'));
+	// OUTPUT(UpdateBusnWithEvidenceOfCrim, NAMED('UpdateBusnWithEvidenceOfCrim'));
+	// OUTPUT(UpdateInquiredBusinessWithDerog, NAMED('UpdateInquiredBusinessWithDerog'));
+	// OUTPUT(getBEOLegalEventType, NAMED('getBEOLegalEventType'));
 	
  
 	RETURN UpdateInquiredBusinessWithDerog;
-	
-
 END; 

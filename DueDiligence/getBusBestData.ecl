@@ -107,6 +107,9 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 																																																			 DATASET([], iesp.share.t_Address))[1];
 															SELF  := LEFT;),
 										LEFT OUTER);
+										
+										
+	// addReportData := IF(includeReport, DueDiligence.reportBestBusInfo(bestData), bestData);							
 	
 
 	// OUTPUT(busInfo, NAMED('busInfo'));
@@ -114,6 +117,7 @@ EXPORT getBusBestData(DATASET(DueDiligence.Layouts.CleanedData) indata,
 	// OUTPUT(withBIP, NAMED('withBIP'));
 	// OUTPUT(linkIDsFound, NAMED('linkIDsFound'));
 	// OUTPUT(bestData, NAMED('bestData'));
+	// OUTPUT(addReportData, NAMED('addReportData'));
 	
 
 	RETURN bestData;

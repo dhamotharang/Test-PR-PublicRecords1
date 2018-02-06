@@ -654,6 +654,7 @@ EXPORT BusOperLocationLayout := RECORD
 		STRING2			relatedDegree;					 								      //IB = Inquired Bus, LB = Linked Bus, RB = Related Bus, IE = Inquired Bus Exec
 		UNSIGNED2		linkBusCount;
 		DATASET(Busn_Input) linkedBusinesses {MAXCOUNT(DueDiligence.Constants.MAX_LINKED_BUSINESSES)};	//populated in DueDiligence.getBusLinkedBus
+		UNSIGNED2		execCount;
 		DATASET(RelatedParty) execs {MAXCOUNT(DueDiligence.Constants.MAX_EXECS)};												//populated in DueDiligence.getBusExec
 		/* BusAssetOwnProperty */
 		unsigned6 	PropTaxValue;                           //populated in DueDiligence.getBusProperty
@@ -682,7 +683,6 @@ EXPORT BusOperLocationLayout := RECORD
 		UNSIGNED2 	creditSrcCnt;														             //populated in DueDiligence.getBusHeader
 		BOOLEAN     noFein;																	               //populated in DueDiligence.getBusHeader			
 		BOOLEAN     busRegHit;															              //populated in DueDiligence.getBusRegistration
-		//DATASET(BusOperLocationLayout) operatingLocations {MAXCOUNT(DueDiligence.Constants.MAX_OPERATING_LOCATIONS)};
 		DATASET(BusSourceLayout) bureauReporting {MAXCOUNT(DueDiligence.Constants.MAX_BUREAUS)};
 		/*BusStabilityRisk*/
 		BOOLEAN			sosFilingExists;												             //populated in DueDiligence.getBusSOSDetail

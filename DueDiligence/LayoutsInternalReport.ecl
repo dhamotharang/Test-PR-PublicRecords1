@@ -58,6 +58,9 @@ EXPORT LayoutsInternalReport := MODULE
 
 
 
+
+
+
  EXPORT BEOCriminalReportingOFOffenses := RECORD
   DueDiligence.LayoutsInternal.InternalBIPIDsLayout; 
   DueDiligence.Layouts.CriminalOffenseLayout_by_DIDOffense ReportOfOffenses;  
