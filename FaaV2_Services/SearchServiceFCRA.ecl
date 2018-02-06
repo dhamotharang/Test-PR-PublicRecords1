@@ -20,7 +20,7 @@
 import FaaV2_services, iesp, AutoStandardI, FCRA;
 
 export SearchServiceFCRA := macro
-
+  #onwarning(4207, ignore);
 		#constant('NoDeepDive', true);
     rec_in := iesp.faaaircraft_fcra.t_FcraAircraftSearchRequest;
     ds_in := DATASET ([], rec_in) : STORED ('FcraAircraftSearchRequest', FEW);

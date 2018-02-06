@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SearchService">
    
 	<part name="TaxRefundInvestigativeRequest" type="tns:XmlDataSet" cols="80" rows="30"/>
@@ -11,6 +11,7 @@ import TaxRefundIS_Service, iesp, AutoStandardI;
 
 EXPORT SearchService := MACRO
 
+  #onwarning(4207, ignore);
 //b. Receive input 
 		rec_in := iesp.taxrefundinvestigation.t_TaxRefundInvestigativeRequest;
 		

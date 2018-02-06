@@ -23,6 +23,7 @@ IMPORT iesp, doxie, AutoHeaderI, AutoStandardI, FFD, ut;
 
 EXPORT PrelitReportServiceFCRA () := MACRO
 
+#onwarning(4207, ignore);
 #constant('NoDeepDive', true); // needed in bankruptcy V3 to exclude non-fcra business header search
 
 #CONSTANT('TwoPartySearch', FALSE);

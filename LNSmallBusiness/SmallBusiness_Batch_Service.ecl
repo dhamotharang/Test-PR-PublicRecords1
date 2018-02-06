@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="SmallBusiness_Batch_Service">
 	<!-- XML INPUT -->
 	<part name="SmallBusinessRiskRequest" type="tns:XmlDataSet" cols="80" rows="30" />
@@ -77,7 +77,7 @@ SmallBusinessRiskRequest XML:
 import iesp, Risk_Indicators;
 
 export SmallBusiness_Batch_Service := MACRO
-
+ #onwarning(4207, ignore);
 	// Can't have duplicate definitions of Stored with different default values, 
 	// so add the default to #stored to eliminate the assignment of a default value.
 	#stored('DataRestrictionMask',risk_indicators.iid_constants.default_DataRestriction);
