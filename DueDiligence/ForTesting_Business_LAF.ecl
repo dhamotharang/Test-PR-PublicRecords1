@@ -256,6 +256,12 @@ EXPORT TRENDZ :=  DATASET([{99, 'LN_TestRecord_99', 0, 'TRENDZ SALON', '', '', '
 											
 EXPORT BIKE_FITTERS := DATASET([{100, 'LN_TestRecord_100', 0, 'BIKE FITTERS INC', '', '', '',                      // Operating locations           
 											'3936 AIA SOUTH', '',  'ST AUGUSTINE', 'FL', '32080'}], CompanyTestLayout);    
+											
+EXPORT ARNOLD_CONST := DATASET([{100, 'LN_TestRecord_101', 0, 'ARNOLD CONSTRUCTION INC', '', '', '',               // Credit Sources          
+											'17210 SW ARCHER RD', '',  'ARCHER', 'FL', '32618'}], CompanyTestLayout);    
+											
+EXPORT DUNN_OIL := DATASET([{100, 'LN_TestRecord_101', 0, 'DUNN OIL TEXACO', '', '', '',                    // Credit Sources          
+											'1881 WEST CALIFORNIA AVE', '',  'SALT LAKE CITY', 'UT', '84104'}], CompanyTestLayout);   
 
 
 

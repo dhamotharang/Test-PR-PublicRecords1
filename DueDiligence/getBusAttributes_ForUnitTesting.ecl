@@ -41,18 +41,18 @@ EXPORT getBusAttributes_ForUnitTesting(DATASET(DueDiligence.Layouts.CleanedData)
 	busProfLicense := DueDiligence.getBusProfLic(busExecs, includeReport);
 	
 	//***FOR TESTING - pass the debugmode = TRUE ***
-	busLegalEvents := DueDiligence.getBusLegalEvents(busProfLicense, options, linkingOptions, includeReport, debugMode); 
+	busLegalEvents := DueDiligence.getBusLegalEvents(busProfLicense, options, linkingOptions, includeReport); 
 	
 
 
 	//get attribute data for the inquired business
-	busProperty := DueDiligence.getBusProperty(busLegalEvents, options, linkingOptions, includeReport, debugMode);
+	busProperty := DueDiligence.getBusProperty(busLegalEvents, options, linkingOptions, includeReport);
 
-	busWatercraft := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions, includeReport, debugMode);
+	busWatercraft := DueDiligence.getBusWatercraft(busProperty, options, linkingOptions, includeReport);
 
-	busAircraft := DueDiligence.getBusAircraft(busWatercraft, options, includeReport, debugMode);
+	busAircraft := DueDiligence.getBusAircraft(busWatercraft, options, includeReport);
 	
-	busVehicle := DueDiligence.getBusVehicle(busAircraft, options, linkingOptions, includeReport, debugMode);
+	busVehicle := DueDiligence.getBusVehicle(busAircraft, options, linkingOptions, includeReport);
 
 	busReg := DueDiligence.getBusRegistration(busVehicle, options, linkingOptions);
 	
